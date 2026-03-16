@@ -943,6 +943,8 @@ sound_xaudio2::voice_info::voice_info(sound_xaudio2 &host, WAVEFORMATEX const &f
 	m_need_update(false),
 	m_underflowing(false)
 {
+	m_buffer.set_latency(host.m_audio_latency / 20e-3);
+
 	// set default volume matrix
 	for (unsigned i = 0; format.nChannels > i; ++i)
 	{

@@ -407,12 +407,14 @@ void m6502_device::execute_set_input(int inputnum, int state)
 	case IRQ_LINE: m_irq_state = state == ASSERT_LINE; break;
 	case APU_IRQ_LINE: m_apu_irq_state = state == ASSERT_LINE; break;
 	case NMI_LINE:
-		if(machine().time() > attotime::zero && !m_nmi_state && state == ASSERT_LINE)
+		// don't accept NMI edge at exactly the same time RESET is cleared
+		if(!m_nmi_state && state == ASSERT_LINE && total_cycles())
 			m_nmi_pending = true;
 		m_nmi_state = state == ASSERT_LINE;
 		break;
 	case V_LINE:
-		if(machine().time() > attotime::zero && !m_v_state && state == ASSERT_LINE)
+		// don't accept SO edge at exactly the same time RESET is cleared
+		if(!m_v_state && state == ASSERT_LINE && total_cycles())
 			m_P |= F_V;
 		m_v_state = state == ASSERT_LINE;
 		break;

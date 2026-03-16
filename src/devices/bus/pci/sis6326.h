@@ -82,6 +82,8 @@ public:
 	sis6326_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	sis6326_agp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
@@ -100,7 +102,19 @@ private:
 	void agp_command_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 };
 
+class sis6326_dvd_device : public sis6326_agp_device
+{
+public:
+	sis6326_dvd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
+
 DECLARE_DEVICE_TYPE(SIS6326_PCI, sis6326_pci_device)
 DECLARE_DEVICE_TYPE(SIS6326_AGP, sis6326_agp_device)
+DECLARE_DEVICE_TYPE(SIS6326_DVD, sis6326_dvd_device)
 
 #endif // MAME_BUS_PCI_SIS6326_H

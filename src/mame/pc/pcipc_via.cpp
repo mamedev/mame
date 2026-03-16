@@ -38,7 +38,6 @@
 #include "machine/vt82c586b_isa.h"
 #include "machine/vt82c586b_usb.h"
 #include "machine/vt82c598mvp.h"
-//#include "video/voodoo_pci.h"
 
 #include "softlist.h"
 #include "softlist_dev.h"
@@ -187,4 +186,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1998, ls5amvp3,    0,     0, mvp3,   0, mvp3_state, empty_init, "Lucky Star", "5AMVP3 (VIA MVP3 chipset)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP(1998, ls5amvp3,    0,     0, mvp3,   0, mvp3_state, empty_init, "Lucky Star", "5AMVP3 (VIA MVP3 chipset)", MACHINE_NOT_WORKING )

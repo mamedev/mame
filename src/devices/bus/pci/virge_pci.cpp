@@ -181,7 +181,9 @@ void virge_pci_device::device_start()
 
 	// INTA#
 	intr_pin = 1;
-	// TODO: min_gnt 0x04, max_lat = 0xff
+	// min_gnt = 1 usec, max_lat = <maximum allowed>
+	minimum_grant = 0x04;
+	maximum_latency = 0xff;
 
 	remap_cb();
 	machine().save().register_postload(save_prepost_delegate(FUNC(virge_pci_device::postload), this));

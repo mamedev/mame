@@ -123,6 +123,31 @@ protected:
 	bool m_seq_unlock_reg = false;
 	u8 m_linear_address[2];
 
+	struct {
+		u16 h_display_start, h_display_end;
+		u16 v_display_start, v_display_end;
+		u32 capture_fb_addr;
+		u32 display_fb_addr;
+
+		u16 fb_offset;
+		u8 display_fb_end;
+		u8 capture_threshold;
+		u8 h_down_scaling;
+		u8 v_down_scaling;
+		u8 h_up_scaling, h_up_interpolation_factor;
+		u8 v_up_scaling, fb_format;
+		u8 h_scaling_factor_int;
+		u32 color_key;
+
+		u8 control_0;
+		bool capture_enable;
+		bool playback_enable;
+		bool video_only;
+		bool capture_interlace;
+		bool yuv_select;
+		bool field_polarity;
+	} m_overlay;
+
 	u8 m_tvout_index;
 	struct {
 		u8 control;
@@ -137,6 +162,11 @@ protected:
 	//virtual bool get_interlace_mode() override { return BIT(m_ramdac_mode, 5); }
 
 	virtual u16 line_compare_mask() override;
+
+	bitmap_rgb32 m_bitmap;
+	std::unique_ptr<bitmap_rgb32> m_overlay_bitmap;
+	void draw_overlay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 yuvtorgb32(u8 y, u8 u, u8 v);
 };
 
 class sis630_vga_device : public sis6326_vga_device

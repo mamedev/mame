@@ -53,6 +53,7 @@ TODO:
   - doesn't agree at all with the current reel implementation
   - locks when soft-reset
   - inputs, outputs
+- circus2 has the same problems as pharmyst, bat the stopping at system RAM check
 */
 
 
@@ -94,6 +95,7 @@ public:
 
 	void init_arthurkn() ATTR_COLD;
 	void init_arthurkn100() ATTR_COLD;
+	void init_circus2() ATTR_COLD;
 	void init_fruitcat() ATTR_COLD;
 	void init_pharmyst() ATTR_COLD;
 
@@ -581,6 +583,23 @@ ROM_START( pharmyst ) // no stickers on ROMs
 	ROM_LOAD( "atf16v8b-15pc.u21", 0x000, 0x117, NO_DUMP )
 ROM_END
 
+ROM_START( circus2 ) // no stickers on ROMs
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx26c1000b.u21", 0x00000, 0x20000, CRC(d573d9d5) SHA1(43d72a53be06b1b4cdf5e0273ad338760b2fad62) )
+
+	ROM_REGION( 0x200000, "tiles", 0 )
+	ROM_LOAD16_WORD_SWAP( "m27c160.u42", 0x000000, 0x200000, CRC(048afd3d) SHA1(6f969c78c4d6242df4ec41d84d2b41d6705d19df) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "reels", 0 )
+	ROM_LOAD16_WORD_SWAP( "m27c160.u43", 0x000000, 0x200000, CRC(7b6ef226) SHA1(d86bb0b54094971df34403f1cc0cc426b647cc6e) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "am29f040.u18", 0x00000, 0x80000, CRC(71c42437) SHA1(70c63ea468aecf573edebb357f1b877490d65b24) )
+
+	ROM_REGION( 0x200, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "atf16v8b-15pc.u3", 0x000, 0x117, NO_DUMP )
+ROM_END
+
 
 void lgtz80_state::init_fruitcat()
 {
@@ -971,6 +990,51 @@ void lgtz80_state::init_pharmyst()
 	}
 }
 
+void lgtz80_state::init_circus2()
+{
+	// Encryption involves a permutation of odd-numbered data lines, conditional on address lines
+	u8 *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x20000; i++)
+	{
+		switch (i & 0x7c0)
+		{
+			case 0x000: rom[i] = bitswap<8>(rom[i], 7, 6, 3, 4, 1, 2, 5, 0); break;
+			case 0x040: rom[i] = bitswap<8>(rom[i], 7, 6, 1, 4, 3, 2, 5, 0); break;
+			case 0x080: rom[i] = bitswap<8>(rom[i], 7, 6, 1, 4, 3, 2, 5, 0); break;
+			case 0x0c0: rom[i] = bitswap<8>(rom[i], 1, 6, 3, 4, 7, 2, 5, 0); break;
+			case 0x100: rom[i] = bitswap<8>(rom[i], 3, 6, 7, 4, 1, 2, 5, 0); break;
+			case 0x140: rom[i] = bitswap<8>(rom[i], 5, 6, 1, 4, 7, 2, 3, 0); break;
+			case 0x180: rom[i] = bitswap<8>(rom[i], 3, 6, 1, 4, 7, 2, 5, 0); break;
+			case 0x1c0: rom[i] = bitswap<8>(rom[i], 5, 6, 1, 4, 3, 2, 7, 0); break;
+			case 0x200: rom[i] = bitswap<8>(rom[i], 1, 6, 5, 4, 3, 2, 7, 0); break;
+			case 0x240: rom[i] = bitswap<8>(rom[i], 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x280: rom[i] = bitswap<8>(rom[i], 5, 6, 1, 4, 3, 2, 7, 0); break;
+			case 0x2c0: rom[i] = bitswap<8>(rom[i], 1, 6, 5, 4, 7, 2, 3, 0); break;
+			case 0x300: rom[i] = bitswap<8>(rom[i], 7, 6, 3, 4, 1, 2, 5, 0); break;
+			case 0x340: rom[i] = bitswap<8>(rom[i], 7, 6, 5, 4, 1, 2, 3, 0); break;
+			case 0x380: rom[i] = bitswap<8>(rom[i], 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x3c0: rom[i] = bitswap<8>(rom[i], 3, 6, 7, 4, 5, 2, 1, 0); break;
+			case 0x400: rom[i] = bitswap<8>(rom[i], 3, 6, 1, 4, 5, 2, 7, 0); break;
+			case 0x440: rom[i] = bitswap<8>(rom[i], 3, 6, 5, 4, 1, 2, 7, 0); break;
+			case 0x480: rom[i] = bitswap<8>(rom[i], 7, 6, 1, 4, 5, 2, 3, 0); break;
+			case 0x4c0: rom[i] = bitswap<8>(rom[i], 5, 6, 1, 4, 7, 2, 3, 0); break;
+			case 0x500: rom[i] = bitswap<8>(rom[i], 5, 6, 3, 4, 7, 2, 1, 0); break;
+			case 0x540: rom[i] = bitswap<8>(rom[i], 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x580: rom[i] = bitswap<8>(rom[i], 3, 6, 7, 4, 5, 2, 1, 0); break;
+			case 0x5c0: rom[i] = bitswap<8>(rom[i], 5, 6, 7, 4, 1, 2, 3, 0); break;
+			case 0x600: rom[i] = bitswap<8>(rom[i], 7, 6, 3, 4, 1, 2, 5, 0); break;
+			case 0x640: rom[i] = bitswap<8>(rom[i], 3, 6, 5, 4, 1, 2, 7, 0); break;
+			case 0x680: rom[i] = bitswap<8>(rom[i], 7, 6, 1, 4, 5, 2, 3, 0); break;
+			case 0x6c0: rom[i] = bitswap<8>(rom[i], 1, 6, 7, 4, 5, 2, 3, 0); break;
+			case 0x700: rom[i] = bitswap<8>(rom[i], 5, 6, 3, 4, 1, 2, 7, 0); break;
+			case 0x740: rom[i] = bitswap<8>(rom[i], 1, 6, 7, 4, 3, 2, 5, 0); break;
+			case 0x780: rom[i] = bitswap<8>(rom[i], 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x7c0: rom[i] = bitswap<8>(rom[i], 5, 6, 7, 4, 3, 2, 1, 0); break;
+		}
+	}
+}
+
 } // anonymous namespace
 
 
@@ -978,3 +1042,4 @@ GAME( 2003?, fruitcat,    0,        fruitcat,    arthurkn,    lgtz80_state, init
 GAME( 200?,  arthurkn,    0,        arthurkn,    arthurkn,    lgtz80_state, init_arthurkn,    ROT0, "LGT",               "Arthur's Knights",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 200?,  arthurkn100, arthurkn, arthurkn100, arthurkn100, lgtz80_state, init_arthurkn100, ROT0, "LGT (LSE license)", "Arthur's Knights (v1.00)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2007,  pharmyst,    0,        fruitcat,    pharmyst,    lgtz80_state, init_pharmyst,    ROT0, "LGT",               "Pharaoh's Mystery (USA v3.00)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 200?,  circus2,     0,        arthurkn,    arthurkn,    lgtz80_state, init_circus2,     ROT0, "LGT",               "Circus 2",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

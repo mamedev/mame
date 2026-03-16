@@ -1027,7 +1027,7 @@ void sprinter_state::check_accel(bool is_read, offs_t offset, u8 &data)
 			if (BIT(m_acc_dir, 2)) // block operation
 			{
 				// fastram doesn't apply waits, hence m_wait_cycles_count is not updated
-				if (is_read && ~(m_pages[BIT(offset, 14, 2)] & BANK_FASTRAM_MASK))
+				if (is_read && (~m_pages[BIT(offset, 14, 2)] & BANK_FASTRAM_MASK))
 					m_maincpu->adjust_icount(m_wait_ticks_count);
 
 				m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
@@ -1181,6 +1181,8 @@ template <u8 Bank> u8 sprinter_state::ram_r(offs_t offset)
 template <u8 Bank> void sprinter_state::ram_w(offs_t offset, u8 data)
 {
 	static_assert(Bank < 4, "unexpected bank number");
+	if (m_access_state == ACCEL_GO)
+		return;
 
 	do_mem_wait(3);
 

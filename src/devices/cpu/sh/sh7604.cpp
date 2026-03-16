@@ -1036,7 +1036,7 @@ void sh7604_device::vcra_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t sh7604_device::vcrb_r()
 {
-	return m_vcrb;
+	return m_vcrb & 0x7f7f;
 }
 
 void sh7604_device::vcrb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -1067,7 +1067,7 @@ uint16_t sh7604_device::vcrd_r()
 void sh7604_device::vcrd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vcrd);
-	m_irq_vector.fov = (m_vcrc >> 8) & 0x7f;
+	m_irq_vector.fov = (m_vcrd >> 8) & 0x7f;
 	sh2_recalc_irq();
 }
 
@@ -1629,7 +1629,7 @@ void sh7604_device::dmaor_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	if (ACCESSING_BITS_0_7)
 	{
 		uint8_t old = m_dmaor & 0xf;
-		m_dmaor = (data & ~6) | (old & m_dmaor & 6); // TODO: should this be old & data & 6? bug?
+		m_dmaor = (data & ~6) | (old & data & 6);
 		sh2_dmac_check(0);
 		sh2_dmac_check(1);
 	}

@@ -2,10 +2,30 @@
 // copyright-holders:Luca Elia, David Haywood
 /***************************************************************************
 
-                          -= Newer Seta Hardware =-
+    Allumer X1-020/NEC DX-101 Video controller
 
-                    driver by   Luca Elia (l.elia@tin.it)
+    Video controller hardware with sprite generator
 
+    features:
+    - "floating tilemap" feature
+    - full screen zoom/shrink support
+    - raster interrupt
+    - Shadow support
+    - Shift/masking pixel data for support variable bpp
+
+    used by:
+    - namco/namcoeva.cpp
+    - namco/funcube.cpp
+    - seta/seta2.cpp
+
+    TODO:
+    - improvements to Flip screen / Zooming support. (Flip Screen is often done with 'negative zoom value')
+    - Fix some graphics imperfections (e.g. color depth selection, "tilemap" sprites) [all done? - NS]
+    - I added a kludge involving a -0x10 yoffset, this fixes the lifeline in myangel.
+      I didn't find a better way to do it without breaking pzlbowl's title screen.
+    - Background color is not verified
+
+-- Original docs from seta/seta2_v.cpp:
 
     This hardware only generates sprites. But they're of various types,
     including some large "floating tilemap" ones.
@@ -70,7 +90,19 @@
                 ---- ---8 7654 3210     "Tilemap" scroll Y
 
 
-    Shadows (same principle as ssv.cpp):
+    Each tile in "Tilemap":
+
+        0.w     fedc ba98 765- ----     Color code (16 color steps)
+                ---- ---- ---4 ----     Flip X
+                ---- ---- ---- 3---     Flip Y
+                ---- ---- ---- -210     Code (high bits)
+
+        2.w                             Code (low bits)*
+
+        * lowest 2 bits are ignored when tile size is 16x16
+
+
+    Shadows (same principle as seta/ssv.cpp):
 
     The low bits of the pens from a "shadowing" tile (regardless of color code)
     substitute the top bits of the color index (0-7fff) in the frame buffer.
@@ -87,7 +119,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "seta2.h"
+#include "x1_020_dx_101.h"
 
 #define LOG_VREG    (1U << 1)
 #define LOG_VIDEO   (1U << 2)
@@ -105,14 +137,68 @@
 #define LOGOFFSET(...) LOGMASKED(LOG_OFFSET, __VA_ARGS__)
 
 
+static const gfx_layout tile_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(7*8, -8) },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8*8) },
+	8*8*8
+};
+
+
+/*  Tiles are 8bpp, but the hardware is additionally able to discard
+    some bitplanes and use the low 4 bits only, or the high 4 bits only */
+GFXDECODE_START( x1_020_dx_101_device::gfxinfo )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, tile_layout, 0, 0x8000/16 )   // 8bpp, but 4bpp color granularity
+GFXDECODE_END
+
+DEFINE_DEVICE_TYPE(X1_020_DX_101, x1_020_dx_101_device, "x1_020_dx_101", "Allumer X1-020/NEC DX-101 Video")
+
+x1_020_dx_101_device::x1_020_dx_101_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, X1_020_DX_101, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
+	, m_raster_irq_cb(*this)
+	, m_flip_screen_cb(*this)
+	, m_flip_screen_x_cb(*this)
+	, m_flip_screen_y_cb(*this)
+	, m_spriteram(*this, "spriteram", 0x40000, ENDIANNESS_BIG)
+	, m_vregs(*this, "vregs", 0x40, ENDIANNESS_BIG)
+{
+}
+
+void x1_020_dx_101_device::device_start()
+{
+	decode_gfx(gfxinfo);
+	gfx(0)->set_granularity(16);
+
+	m_private_spriteram = make_unique_clear<uint16_t[]>(0x1000 / 2);
+
+	m_realtilenumber = std::make_unique<uint32_t[]>(0x80000);
+
+	for (int i = 0; i < 0x80000; i++)
+		m_realtilenumber[i] = i % gfx(0)->elements();
+
+	m_raster_timer = timer_alloc(FUNC(x1_020_dx_101_device::raster_timer_done), this);
+
+	save_pointer(NAME(m_private_spriteram), 0x1000 / 2);
+}
+
+void x1_020_dx_101_device::device_reset()
+{
+}
+
 /***************************************************************************
 
                                 Video Registers
 
     Offset:     Bits:                   Value:
 
-    0/2/4/6                             Horizontal: Sync, Blank, DSPdot, Cycle (same as ssv.cpp?)
-    8/a/c/e                             Vertical  : Sync, Blank, DSPdot, Cycle (same as ssv.cpp?)
+    0/2/4/6                             Horizontal: Sync, Blank, DSPdot, Cycle (same as seta/ssv.cpp?)
+    8/a/c/e                             Vertical  : Sync, Blank, DSPdot, Cycle (same as seta/ssv.cpp?)
 
     10                                  Offxet X low bits (sub pixels)
     12                                  Offset X high bits (pixels)
@@ -165,12 +251,12 @@
 
 ***************************************************************************/
 
-uint16_t seta2_state::vregs_r(offs_t offset)
+uint16_t x1_020_dx_101_device::vregs_r(offs_t offset)
 {
 	return m_vregs[offset];
 }
 
-void seta2_state::vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void x1_020_dx_101_device::vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* 02/04 = horizontal display start/end
 	           mj4simai = 0065/01E5 (0180 visible area)
@@ -191,7 +277,7 @@ void seta2_state::vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	COMBINE_DATA(&m_vregs[offset]);
 
 	if (m_vregs[offset] != olddata)
-		LOGVREG("CPU #0 PC %06X: Video Reg %02X <- %04X\n", m_maincpu->pc(), offset * 2, data);
+		LOGVREG("%s: Video Reg %02X <- %04X\n", machine().describe_context(), offset * 2, data);
 
 	switch (offset * 2)
 	{
@@ -200,20 +286,20 @@ void seta2_state::vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		break;
 
 	case 0x1c:  // FLIP SCREEN (myangel)    <- this is actually zoom
-		flip_screen_set(BIT(data, 0));
-		if (data & ~1)  LOGVREG("CPU #0 PC %06X: flip screen unknown bits %04X\n", m_maincpu->pc(), data);
+		m_flip_screen_cb(BIT(data, 0));
+		if (data & ~1)  LOGVREG("%s: flip screen unknown bits %04X\n", machine().describe_context(), data);
 		break;
 	case 0x2a:  // FLIP X (pzlbowl)
-		flip_screen_x_set(BIT(data, 0));
-		if (data & ~1)  LOGVREG("CPU #0 PC %06X: flipx unknown bits %04X\n", m_maincpu->pc(), data);
+		m_flip_screen_x_cb(BIT(data, 0));
+		if (data & ~1)  LOGVREG("%s: flipx unknown bits %04X\n", machine().describe_context(), data);
 		break;
 	case 0x2c:  // FLIP Y (pzlbowl)
-		flip_screen_y_set(BIT(data, 0));
-		if (data & ~1)  LOGVREG("CPU #0 PC %06X: flipy unknown bits %04X\n", m_maincpu->pc(), data);
+		m_flip_screen_y_cb(BIT(data, 0));
+		if (data & ~1)  LOGVREG("%s: flipy unknown bits %04X\n", machine().describe_context(), data);
 		break;
 
 	case 0x30:  // BLANK SCREEN (pzlbowl, myangel)
-		if (data & ~1)  LOGVREG("CPU #0 PC %06X: blank unknown bits %04X\n", m_maincpu->pc(), data);
+		if (data & ~1)  LOGVREG("%s: blank unknown bits %04X\n", machine().describe_context(), data);
 		break;
 
 	case 0x24: // funcube3 and staraudi write here instead, why? mirror or different meaning?
@@ -267,7 +353,7 @@ void seta2_state::vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		break;
 
 	case 0x3c: // Raster IRQ related
-		//LOGVREG("%s: Register 3c write (raster enable?) current vpos is %d  :   %04X (%04x)\n",machine().describe_context(),m_screen->vpos(), data, mem_mask);
+		//LOGVREG("%s: Register 3c write (raster enable?) current vpos is %d  :   %04X (%04x)\n",machine().describe_context(),screen().vpos(), data, mem_mask);
 		COMBINE_DATA(&m_rasterenabled);
 
 		//if (BIT(m_rasterenabled, 0))
@@ -277,9 +363,9 @@ void seta2_state::vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 			// in the vblank it specifies line 0, the first raster interrupt then specifies line 0 again before the subsequent ones use the real line numbers?
 			// It seems more likely that the raster IRQ stays asserted for the entire line, thus triggering a second interrupt unless the line number is changed?
-			if (m_rasterposition == m_screen->vpos()) hpos = m_screen->hpos() + 0x100;
+			if (m_rasterposition == screen().vpos()) hpos = screen().hpos() + 0x100;
 			//LOGVREG("setting raster to %d %d\n", vpos, hpos);
-			m_raster_timer->adjust(m_screen->time_until_pos(vpos, hpos), 0);
+			m_raster_timer->adjust(screen().time_until_pos(vpos, hpos), 0);
 		}
 		break;
 
@@ -290,12 +376,12 @@ void seta2_state::vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-uint16_t seta2_state::spriteram_r(offs_t offset)
+uint16_t x1_020_dx_101_device::spriteram_r(offs_t offset)
 {
 	return m_spriteram[offset];
 }
 
-void seta2_state::spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void x1_020_dx_101_device::spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
 }
@@ -308,7 +394,38 @@ void seta2_state::spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 ***************************************************************************/
 
-inline void seta2_state::drawgfx_line(
+static inline void draw_pixel(
+		uint16_t *const dest,
+		const uint8_t *const source,
+		uint32_t realcolor,
+		int sx,
+		int minx,
+		int maxx,
+		int column,
+		int shadow,
+		int gfx_mask,
+		int gfx_shift,
+		bool opaque)
+{
+	if (sx >= minx && sx < maxx)
+	{
+		const int realsx = sx >> 16;
+		const uint8_t pen = (source[column] & gfx_mask) >> gfx_shift;
+		if (pen || opaque)
+		{
+			if (!shadow)
+				dest[realsx] = (realcolor + pen) & 0x7fff;
+			else
+			{
+				const int pen_shift = 15 - shadow;
+				const int pen_mask = (1 << pen_shift) - 1;
+				dest[realsx] = ((dest[realsx] & pen_mask) | (pen << pen_shift)) & 0x7fff;
+			}
+		}
+	}
+}
+
+inline void x1_020_dx_101_device::drawgfx_line(
 		bitmap_ind16 &bitmap,
 		const rectangle &cliprect,
 		int which_gfx,
@@ -330,7 +447,7 @@ inline void seta2_state::drawgfx_line(
 		int shadow;
 	};
 
-	// this is the same logic as ssv.cpp, although this has more known cases, but also some bugs with the handling
+	// this is the same logic as seta/ssv.cpp, although this has more known cases, but also some bugs with the handling
 	static constexpr drawmodes BPP_MASK_TABLE[8] = {
 		{ 0xff, 0, 4 }, // 0: ultrax, twineag2 text - is there a local / global mixup somewhere, or is this an 'invalid' setting that just enables all planes?
 		{ 0x30, 4, 2 }, // 1: unverified case, mimic old driver behavior of only using lowest bit  (myangel2 question bubble, myangel endgame)
@@ -342,9 +459,9 @@ inline void seta2_state::drawgfx_line(
 		{ 0xff, 0, 8 }, // 7: common 8bpp case
 	};
 
-	int shadow = BPP_MASK_TABLE[(which_gfx & 0x0700) >> 8].shadow;
-	const int gfx_mask = BPP_MASK_TABLE[(which_gfx & 0x0700) >> 8].gfx_mask;
-	const int gfx_shift = BPP_MASK_TABLE[(which_gfx & 0x0700) >> 8].gfx_shift;
+	int shadow = BPP_MASK_TABLE[which_gfx].shadow;
+	const int gfx_mask = BPP_MASK_TABLE[which_gfx].gfx_mask;
+	const int gfx_shift = BPP_MASK_TABLE[which_gfx].gfx_shift;
 
 	if (!use_shadow)
 		shadow = 0;
@@ -354,82 +471,37 @@ inline void seta2_state::drawgfx_line(
 	const int minx = cliprect.min_x << 16;
 	const int maxx = (cliprect.max_x + 1) << 16;
 
+	if (flipy)
+		line = 7 - line;
+
+	const uint8_t *const source = addr + line * 8;
+
 	if (xzoom < 0x10000) // shrink
 	{
-		const int x0 = flipx ? (base_sx + (8 * xzoom) - xzoom) : (base_sx);
+		const int x0 = flipx ? (base_sx + (8 * xzoom) - xzoom) : base_sx;
 		const int x1 = flipx ? (base_sx - xzoom) : (x0 + (8 * xzoom));
-		const int dx = flipx ? (-xzoom) : (xzoom);
+		const int dx = flipx ? -xzoom : xzoom;
 
-		const uint8_t* const source = flipy ? addr + (7 - line) * 8 : addr + line * 8;
-		int column = 0;
-
-		for (int sx = x0; sx != x1; sx += dx)
+		for (int sx = x0, column = 0; sx != x1; sx += dx, column++)
 		{
-			const uint8_t pen = (source[column++] & gfx_mask) >> gfx_shift;
-
-			if (sx >= minx && sx < maxx)
-			{
-				const int realsx = sx >> 16;
-
-				if (pen || opaque)
-				{
-					if (!shadow)
-						dest[realsx] = (realcolor + pen) & 0x7fff;
-					else
-					{
-						const int pen_shift = 15 - shadow;
-						const int pen_mask = (1 << pen_shift) - 1;
-						dest[realsx] = ((dest[realsx] & pen_mask) | (pen << pen_shift)) & 0x7fff;
-					}
-				}
-			}
+			draw_pixel(dest, source, realcolor, sx, minx, maxx, column, shadow, gfx_mask, gfx_shift, opaque);
 		}
 	}
 	else // enlarge or no zoom
 	{
-		const uint8_t* const source = flipy ? addr + (7 - line) * 8 : addr + line * 8;
+		const int x0 = base_sx;
+		const int x1 = x0 + (8 * xzoom);
+		const int column_inc = flipx ? -1 : 1;
 
-		const int x0 = (base_sx);
-		const int x1 = (x0 + (8 * xzoom));
-
-		int column;
-		if (!flipx)
-			column = 0;
-		else
-			column = 7;
-
+		int column = flipx ? 7 : 0;
 		uint32_t countx = 0;
 		for (int sx = x0; sx < x1; sx += 0x10000)
 		{
-			const uint8_t pen = (source[column] & gfx_mask) >> gfx_shift;
-
-			if (sx >= minx && sx < maxx)
-			{
-				const int realsx = sx >> 16;
-
-				if (pen || opaque)
-				{
-					if (!shadow)
-					{
-						dest[realsx] = (realcolor + pen) & 0x7fff;
-					}
-					else
-					{
-						const int pen_shift = 15 - shadow;
-						const int pen_mask = (1 << pen_shift) - 1;
-						dest[realsx] = ((dest[realsx] & pen_mask) | (pen << pen_shift)) & 0x7fff;
-					}
-				}
-			}
-
+			draw_pixel(dest, source, realcolor, sx, minx, maxx, column, shadow, gfx_mask, gfx_shift, opaque);
 			countx += 0x10000;
 			if (countx >= xzoom)
 			{
-				if (!flipx)
-					column++;
-				else
-					column--;
-
+				column += column_inc;
 				countx -= xzoom;
 			}
 		}
@@ -438,7 +510,7 @@ inline void seta2_state::drawgfx_line(
 
 
 // takes an x/y pixel position in the virtual tilemap and returns the code + attributes etc. for it
-inline void seta2_state::get_tile(
+inline void x1_020_dx_101_device::get_tile(
 		uint16_t const *const spriteram,
 		bool is_16x16,
 		int x,
@@ -490,12 +562,12 @@ inline void seta2_state::get_tile(
 	}
 }
 
-int seta2_state::calculate_global_xoffset(bool nozoom_fixedpalette_fixedposition)
+int x1_020_dx_101_device::calculate_global_xoffset(bool nozoom_fixedpalette_fixedposition)
 {
-	/*
+#if 0
 	int global_xoffset = (m_vregs[0x12/2] & 0x7ff); // and 0x10/2 for low bits
 	if (global_xoffset & 0x400)
-	    global_xoffset -= 0x800;
+		global_xoffset -= 0x800;
 
 	// funcube3 sets a global xoffset of -1 causing a single pixel shift, does something else compensate for it?
 	// note, it also writes a different address for the sprite buffering (related?) but doesn't also have the global zoom set to negative like Star Audition which also writes there.
@@ -506,9 +578,9 @@ int seta2_state::calculate_global_xoffset(bool nozoom_fixedpalette_fixedposition
 	// TODO: properly render negative zoom sprites
 	if (global_xzoom & 0x400)
 	{
-	    global_xoffset -= 0x14f;
+		global_xoffset -= 0x14f;
 	}
-	*/
+#endif
 
 	int global_xoffset = 0;
 
@@ -518,7 +590,7 @@ int seta2_state::calculate_global_xoffset(bool nozoom_fixedpalette_fixedposition
 	return global_xoffset;
 }
 
-int seta2_state::calculate_global_yoffset(bool nozoom_fixedpalette_fixedposition)
+int x1_020_dx_101_device::calculate_global_yoffset(bool nozoom_fixedpalette_fixedposition)
 {
 	// Sprites list
 	//int global_yoffset = (m_vregs[0x1a / 2] & 0x7ff); // and 0x18/2 for low bits
@@ -535,7 +607,7 @@ int seta2_state::calculate_global_yoffset(bool nozoom_fixedpalette_fixedposition
 }
 
 
-void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int scanline, int realscanline, int xoffset, uint32_t xzoom, bool xzoominverted)
+void x1_020_dx_101_device::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int scanline, int realscanline, int xoffset, uint32_t xzoom, bool xzoominverted)
 {
 	const uint16_t *s1 = m_private_spriteram.get();
 
@@ -561,7 +633,7 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 		const bool opaque = BIT(num, 13);
 		const bool use_global_size = BIT(num, 12);
 		bool use_shadow = BIT(num, 11);
-		const int which_gfx = num & 0x0700;
+		const int which_gfx = (num & 0x0700) >> 8;
 		xoffs &= 0x3ff;
 		yoffs &= 0x3ff;
 
@@ -694,7 +766,7 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 							drawgfx_line(
 									bitmap, cliprect,
 									which_gfx,
-									m_spritegfx->get_data(m_realtilenumber[code]),
+									gfx(0)->get_data(m_realtilenumber[code]),
 									color << 4,
 									flipx, flipy,
 									realsx,
@@ -764,8 +836,6 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 					sx = (sx & 0x1ff) - (sx & 0x200);
 					sx -= global_xoffset;
 
-					const int basecode = code &= ~((sizex + 1) * (sizey + 1) - 1);   // see myangel, myangel2 and grdians
-
 					int line = usedscanline - firstline;
 					const int y = (line >> 3);
 					line &= 0x7;
@@ -776,24 +846,29 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 						color = 0x7ff;
 					}
 
+					// see myangel, myangel2 and grdians
+					int basecode = (code &= ~((sizex + 1) * (sizey + 1) - 1)) + 
+						((flipy ? (sizey - y) : y) * (sizex + 1)) + (flipx ? sizex : 0);
+
+					const int code_inc = flipx ? -1 : 1;
+
 					for (int x = 0; x <= sizex; x++)
 					{
-						const int realcode = (basecode + (flipy ? sizey - y : y)*(sizex + 1)) + (flipx ? sizex - x : x);
 						uint32_t realsx = (sx + x * 8);
 						realsx -= usedxoffset >> 16; // need to refactor, this causes loss of lower 16 bits of offset which are important in zoomed cases for precision
 						realsx = realsx * usedxzoom;
 						drawgfx_line(
 								bitmap, cliprect,
 								which_gfx,
-								m_spritegfx->get_data(m_realtilenumber[realcode]),
+								gfx(0)->get_data(m_realtilenumber[basecode]),
 								color << 4,
 								flipx, flipy,
 								realsx,
 								usedxzoom, use_shadow,
 								realscanline, line,
 								opaque);
+						basecode += code_inc;
 					}
-
 				}
 			}
 		}
@@ -802,22 +877,21 @@ void seta2_state::draw_sprites_line(bitmap_ind16 &bitmap, const rectangle &clipr
 }
 
 
-TIMER_CALLBACK_MEMBER(seta2_state::raster_timer_done)
+TIMER_CALLBACK_MEMBER(x1_020_dx_101_device::raster_timer_done)
 {
-	auto *tmp68301 = dynamic_cast<tmp68301_device *>(m_maincpu.target());
-	if (tmp68301)
+	if (!m_raster_irq_cb.isunset())
 	{
 		if (BIT(m_rasterenabled, 0))
 		{
-			tmp68301->set_input_line(1, HOLD_LINE);
-			LOGVIDEO("external int (vpos is %d)\n", m_screen->vpos());
-			m_screen->update_partial(m_screen->vpos() - 1);
+			LOGVIDEO("external int (vpos is %d)\n", screen().vpos());
+			screen().update_partial(screen().vpos() - 1);
+			m_raster_irq_cb(ASSERT_LINE);
 		}
 	}
 }
 
 
-void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
+void x1_020_dx_101_device::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 {
 	//LOGOFFSET("yoffset: %04x%04x yzoom: %04x%04x | xoffset: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2],  m_vregs[0x18/2],  m_vregs[0x1e/2],  m_vregs[0x1c/2]   ,   m_vregs[0x12/2],  m_vregs[0x10/2],  m_vregs[0x16/2],  m_vregs[0x14/2]);
 
@@ -889,36 +963,10 @@ void seta2_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
 }
 
 
-/***************************************************************************
-
-
-                                Screen Drawing
-
-
-***************************************************************************/
-
-void seta2_state::video_start()
-{
-	for (int i = 0; m_gfxdecode->gfx(i); ++i)
-		m_gfxdecode->gfx(i)->set_granularity(16);
-
-	m_private_spriteram = make_unique_clear<uint16_t[]>(0x1000 / 2);
-
-	m_realtilenumber = std::make_unique<uint32_t[]>(0x80000);
-
-	m_spritegfx = m_gfxdecode->gfx(0);
-	for (int i = 0; i < 0x80000; i++)
-		m_realtilenumber[i] = i % m_spritegfx->elements();
-
-	m_raster_timer = timer_alloc(FUNC(seta2_state::raster_timer_done), this);
-
-	save_pointer(NAME(m_private_spriteram), 0x1000 / 2);
-}
-
-uint32_t seta2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t x1_020_dx_101_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// Black or pen 0?
-	bitmap.fill(m_palette->pen(0), cliprect);
+	bitmap.fill(palette().pen(0), cliprect);
 
 	if (BIT(~m_vregs[0x30/2], 0))   // 1 = BLANK SCREEN
 		draw_sprites(bitmap, cliprect);
@@ -926,33 +974,7 @@ uint32_t seta2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-void seta2_state::screen_vblank(int state)
+void x1_020_dx_101_device::screen_vblank(int state)
 {
 	//LOGVIDEO("yoffset: %04x%04x yzoom: %04x%04x | xoffset: %04x%04x xzoom: %04x%04x  \n", m_vregs[0x1a/2], m_vregs[0x18/2], m_vregs[0x1e/2], m_vregs[0x1c/2], m_vregs[0x12/2], m_vregs[0x10/2], m_vregs[0x16/2], m_vregs[0x14/2]);
-}
-
-// staraudi
-void staraudi_state::draw_rgbram(bitmap_ind16 &bitmap)
-{
-	if (!(m_cam & 0x0008))
-		return;
-
-	for (int y = 0x100; y < 0x200; ++y)
-	{
-		for (int x = 0; x < 0x200; ++x)
-		{
-			const int offs = x * 2/2 + y * 0x400/2;
-			const uint32_t data = ((m_rgbram[offs + 0x40000/2] & 0xff) << 16) | m_rgbram[offs];
-			bitmap.pix(y, x) = (data & 0x7fff);
-		}
-	}
-}
-
-uint32_t staraudi_state::staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	screen_update(screen, bitmap, cliprect);
-	if (false)
-		draw_rgbram(bitmap);
-
-	return 0;
 }

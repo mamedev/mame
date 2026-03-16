@@ -789,6 +789,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/ky3211_ky10510.h,VIDEOS["KY3211_KY10510"] = true
+--------------------------------------------------
+
+if VIDEOS["KY3211_KY10510"] then
+	files {
+		MAME_DIR .. "src/devices/video/ky3211_ky10510.cpp",
+		MAME_DIR .. "src/devices/video/ky3211_ky10510.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/lc7580.h,VIDEOS["LC7580"] = true
 --------------------------------------------------
 
@@ -1815,6 +1827,18 @@ if VIDEOS["X1_001"] then
 	files {
 		MAME_DIR .. "src/devices/video/x1_001.cpp",
 		MAME_DIR .. "src/devices/video/x1_001.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/x1_020_dx_101.h,VIDEOS["X1_020_DX_101"] = true
+--------------------------------------------------
+
+if VIDEOS["X1_020_DX_101"] then
+	files {
+		MAME_DIR .. "src/devices/video/x1_020_dx_101.cpp",
+		MAME_DIR .. "src/devices/video/x1_020_dx_101.h",
 	}
 end
 

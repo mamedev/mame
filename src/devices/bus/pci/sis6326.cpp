@@ -23,7 +23,7 @@ SiS 6326
 
 DEFINE_DEVICE_TYPE(SIS6326_PCI, sis6326_pci_device,   "sis6326_pci",   "SiS 6326 PCI card")
 DEFINE_DEVICE_TYPE(SIS6326_AGP, sis6326_agp_device,   "sis6326_agp",   "SiS 6326 AGP card")
-
+DEFINE_DEVICE_TYPE(SIS6326_DVD, sis6326_dvd_device,   "sis6326_dvd",   "SiS 6326 DVD card")
 
 
 sis6326_pci_device::sis6326_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -97,7 +97,8 @@ void sis6326_pci_device::device_reset()
 	// doc makes multiple ninja jumps in messing up these defaults
 	// bus master (hardwired)
 	command = 0x0004;
-	command_mask = 0x23;
+	// palette snoop, uses <reserved> bit 7 as r/w buffer
+	command_mask = 0xa3;
 	// medium DEVSEL#
 	// assume capability list & 66 MHz disabled in this variant
 	status = 0x0200;
@@ -201,7 +202,7 @@ void sis6326_pci_device::mmio_map(address_map &map)
 		})
 	);
 
-	// HACK: fake Turbo Queue so to not lockup windows
+	// HACK: fake Turbo Queue so to not lockup Windows
 	map(0x82a8, 0x82a9).lr16(
 		NAME([] (offs_t offset) { return 0x0100; })
 	);
@@ -523,10 +524,10 @@ void sis6326_pci_device::trigger_2d_command()
 					const u8 src = (this->*get_src_table[src_select])(src_base, xi);
 					const u8 dst = m_vga->read_memory(xi + dst_base);
 					const u8 dot = (m_pattern_data[pattern_base] >> (7 - x) & 1);
-					// ROP and pattern depends on pattern
+					// ROP and pattern depends on dot output
 					// - win98se start menu hovering
 					const u8 res = GetROP(dot ? m_fg_rop : m_bg_rop, src, dst, dot ? m_fg_color : m_bg_color) & 0xff;
-					m_vga->write_memory(xi + dst_base, res & 0xff);
+					m_vga->write_memory(xi + dst_base, res);
 				}
 			}
 
@@ -536,8 +537,84 @@ void sis6326_pci_device::trigger_2d_command()
 		{
 			const bool major_axis = !!BIT(m_draw_command, 10);
 			const bool last_pixel = !!BIT(m_draw_command, 11);
-			LOGBLIT("\tLine: major axis %s %d\n", major_axis ? "Y" : "X", !last_pixel);
-			// ...
+			const u16 pixel_count = m_rect_width - 1;
+			const u16 half_count = pixel_count / 2;
+			const u16 k1_term = (m_mask[0] | (m_mask[1] << 8)) & 0x3fff;
+			const u16 k2_term = (m_mask[2] | (m_mask[3] << 8)) & 0x3fff;
+			const u16 error_term = (m_mask[4] | (m_mask[5] << 8)) & 0x3fff;
+			const u16 line_style = (m_mask[6] | (m_mask[7] << 8));
+			const u16 xs = m_src_start_addr & 0xfff;
+			const u16 ys = m_dst_start_addr & 0xfff;
+			LOGBLIT("\tLine: major axis %s last pixel %d\n", major_axis ? "Y" : "X", !last_pixel);
+			LOGBLIT("\tX Start %d Y Start %d\n", xs, ys);
+			LOGBLIT("\tMajor Axial Pixel Count %d K1 %d K2 %d error %d style %04x\n", m_rect_width, k1_term, k2_term, error_term, line_style);
+			LOGBLIT("\tFG ROP %02x Color %06x | BG ROP %02x Color %06x\n", m_fg_rop, m_fg_color, m_bg_rop, m_bg_color);
+
+			// TODO: preliminary, enough for crosshair in Windows Gaming Options and not much else
+			// Standard Bresenham line drawing
+			// - win98se Curves and Colors screensaver requires this for curves;
+			if (major_axis)
+			{
+				const s32 xi = xs + half_count;
+
+				if (clip_enable)
+				{
+					if ((xi == std::clamp<u16>(xi, m_clip_left, m_clip_right)) ^ clip_external)
+						return;
+				}
+
+				for (s32 y = 0; y < pixel_count; y++)
+				{
+					const s32 yi = ys - half_count + y * y_dir;
+
+					if (clip_enable)
+					{
+						if ((yi == std::clamp<u16>(yi, m_clip_top, m_clip_bottom)) ^ clip_external)
+							continue;
+					}
+
+					const u32 src_base = (yi * m_src_pitch);
+					const u32 dst_base = (yi * m_dst_pitch);
+
+					const u8 src = (this->*get_src_table[src_select])(src_base, xi);
+					const u8 dst = m_vga->read_memory(xi + dst_base);
+					const u16 dot = BIT(line_style, (15 - y) & 0xf);
+					const u8 res = GetROP(dot ? m_fg_rop : m_bg_rop, src, dst, dot ? m_fg_color : m_bg_color) & 0xff;
+					m_vga->write_memory(xi + dst_base, res);
+				}
+			}
+			else
+			{
+				const s32 yi = ys + half_count;
+
+				if (clip_enable)
+				{
+					if ((yi == std::clamp<u16>(yi, m_clip_top, m_clip_bottom)) ^ clip_external)
+						return;
+				}
+
+				for (s32 x = 0; x < pixel_count; x++)
+				{
+					const s32 xi = xs - half_count + x * x_dir;
+
+					if (clip_enable)
+					{
+						if ((xi == std::clamp<u16>(xi, m_clip_left, m_clip_right)) ^ clip_external)
+							continue;
+					}
+
+					const u32 src_base = (yi * m_src_pitch);
+					const u32 dst_base = (yi * m_dst_pitch);
+
+					const u8 src = (this->*get_src_table[src_select])(src_base, xi);
+					const u8 dst = m_vga->read_memory(xi + dst_base);
+					const u16 dot = BIT(line_style, (15 - x) & 0xf);
+					const u8 res = GetROP(dot ? m_fg_rop : m_bg_rop, src, dst, dot ? m_fg_color : m_bg_color) & 0xff;
+					m_vga->write_memory(xi + dst_base, res);
+				}
+			}
+
+
 			break;
 		}
 	}
@@ -548,10 +625,16 @@ void sis6326_pci_device::trigger_2d_command()
  * AGP overrides
  */
 
-sis6326_agp_device::sis6326_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sis6326_pci_device(mconfig, SIS6326_AGP, tag, owner, clock)
+sis6326_agp_device::sis6326_agp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: sis6326_pci_device(mconfig, type, tag, owner, clock)
 {
 }
+
+sis6326_agp_device::sis6326_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sis6326_agp_device(mconfig, SIS6326_AGP, tag, owner, clock)
+{
+}
+
 
 ROM_START( sis6326agp )
 	ROM_REGION32_LE( 0x10000, "bios", ROMREGION_ERASEFF )
@@ -576,6 +659,7 @@ const tiny_rom_entry *sis6326_agp_device::device_rom_region() const
 void sis6326_agp_device::device_add_mconfig(machine_config &config)
 {
 	sis6326_pci_device::device_add_mconfig(config);
+	// TODO: JP1 to MD18 (NTSC/PAL select), JP2 to MD27 (INTA# enable)
 	m_vga->md20_cb().set_constant(1);
 	m_vga->md21_cb().set_constant(1);
 	m_vga->md23_cb().set_constant(1);
@@ -589,7 +673,7 @@ void sis6326_agp_device::device_reset()
 	// doc makes multiple ninja jumps in messing up these defaults
 	// bus master (hardwired)
 	command = 0x0004;
-	command_mask = 0x23;
+	command_mask = 0xa3;
 	// medium DEVSEL#, 66 MHz capable, has capabilities list
 	status = 0x0230;
 
@@ -644,5 +728,38 @@ void sis6326_agp_device::config_map(address_map &map)
 	map(0x54, 0x57).lr32(NAME([] () { return 0x01000003; } ));
 	map(0x58, 0x5b).rw(FUNC(sis6326_agp_device::agp_command_r), FUNC(sis6326_agp_device::agp_command_w));
 	map(0x5c, 0x5f).lr32(NAME([] () { return 0x00000000; } )); // NULL terminator
+}
+
+/*
+ * DVD overrides
+ */
+
+sis6326_dvd_device::sis6326_dvd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sis6326_agp_device(mconfig, SIS6326_DVD, tag, owner, clock)
+{
+	set_ids(0x10396326, 0xa0, 0x030000, 0x10924920);
+}
+
+ROM_START( sis6326dvd )
+	ROM_REGION32_LE( 0x10000, "bios", ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("diamond")
+
+	ROM_SYSTEM_BIOS( 0, "diamond", "Diamond SpeedStar A70 (123A0A50)" )
+	ROMX_LOAD( "diamondspeedstar_a70.vbi", 0x000000, 0x00c000, CRC(9501f6fc) SHA1(7566f1483c3e963762ef19b4deeb8fc24ccd217f), ROM_BIOS(0) )
+ROM_END
+
+const tiny_rom_entry *sis6326_dvd_device::device_rom_region() const
+{
+	return ROM_NAME(sis6326dvd);
+}
+
+void sis6326_dvd_device::device_add_mconfig(machine_config &config)
+{
+	sis6326_agp_device::device_add_mconfig(config);
+	// Tip Top 6326AGP-E variant has feature connector, Diamond doesn't (solder pads in its place)
+	// TODO: allegedly a 8MB card but detects as 4 even if properly mapped
+	// (something inside the VGA core?)
+
+	// TODO: extra TV out (by definition)
 }
 

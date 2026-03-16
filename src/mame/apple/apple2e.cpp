@@ -310,6 +310,8 @@ public:
 	optional_device<cpu_device> m_kbdcpu;
 	optional_device<ls259_device> m_kbdlatch;
 
+	// align VBL to the end of active video
+	static constexpr int HPOS_VBL = 40 * 14;
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(accel_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
@@ -468,7 +470,7 @@ private:
 
 	bool m_an0, m_an1, m_an2, m_an3;
 
-	bool m_vblmask;
+	bool m_vbl, m_vblmask;
 
 	bool m_xy, m_x0edge, m_y0edge;
 	bool m_x0, m_x1, m_y0, m_y1;
@@ -991,6 +993,9 @@ void apple2e_state::machine_start()
 	m_video->set_aux_mask(m_aux_mask);
 	m_video->set_char_pointer(memregion("gfx1")->base(), memregion("gfx1")->bytes());
 
+	// IOU events occur at the rightmost edge of active video
+	m_scantimer->adjust(m_screen->time_until_pos(0, HPOS_VBL));
+
 	int ram_size = 0x10000;
 	if (m_ram_size < 0x10000)
 	{
@@ -1126,6 +1131,7 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_ramrd));
 	save_item(NAME(m_ramwrt));
 	save_item(NAME(m_ioudis));
+	save_item(NAME(m_vbl));
 	save_item(NAME(m_vblmask));
 	save_item(NAME(m_romswitch));
 	save_item(NAME(m_irqmask));
@@ -1195,7 +1201,7 @@ void apple2e_state::machine_reset()
 	m_video->a80store_w(false);
 	m_video->a80col_w(false);
 	m_video->altcharset_w(false);
-	m_video->page2_w(false);
+	m_video->scr_w(0);
 	m_video->res_w(0);
 
 	// IIe IOU
@@ -1217,6 +1223,7 @@ void apple2e_state::machine_reset()
 	m_lcwriteenable = true;
 
 	m_video->monohgr_w(m_iscecm);
+	m_vbl = false;
 	m_vblmask = false;
 	m_irqmask = 0;
 	m_strobe = 0;
@@ -1377,7 +1384,8 @@ void apple2e_state::lower_irq(int irq)
 
 TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 {
-	int scanline = param;
+	// timer fires at the end of active video; handle events for the next line
+	int scanline = param + 1;
 
 	if ((m_isiic) || (m_has_laser_mouse) || (m_isace500))
 	{
@@ -1396,6 +1404,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 
 	if (scanline == 192)
 	{
+		m_vbl = true;
 		if (m_vblmask)
 		{
 			raise_irq(IRQ_VBL);
@@ -1419,6 +1428,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 			m_franklin_last_fkeys = uFkeys;
 		}
 	}
+	else if (scanline == m_screen->height())
+	{
+		m_vbl = false;
+		scanline = 0;
+	}
+
+	m_scantimer->adjust(m_screen->time_until_pos(scanline, HPOS_VBL), scanline);
 }
 
 void apple2e_state::reset_w(int state)
@@ -1454,7 +1470,7 @@ void apple2e_state::reset_w(int state)
 			m_video->a80store_w(false);
 			m_video->a80col_w(false);
 			m_video->altcharset_w(false);
-			m_video->page2_w(false);
+			m_video->scr_w(0);
 			m_video->res_w(0);
 
 			// IIe IOU
@@ -1504,7 +1520,7 @@ void apple2e_state::accel_full_speed()
 
 void apple2e_state::accel_normal_speed()
 {
-	m_maincpu->set_unscaled_clock(1021800);
+	m_maincpu->set_unscaled_clock(1021800, true); // re-align to PH0
 }
 
 void apple2e_state::accel_slot(int slot)
@@ -2082,7 +2098,7 @@ u8 apple2e_state::c000_r(offs_t offset)
 			return (m_video->get_80store() ? 0x80 : 0x00) | m_transchar;
 
 		case 0x19:  // read VBLBAR
-			return (m_screen->vblank() ? 0x00 : 0x80) | m_transchar;
+			return (m_vbl ? 0x00 : 0x80) | m_transchar;
 
 		case 0x1a:  // read TEXT
 			return (m_video->get_graphics() ? 0x00 : 0x80) | m_transchar;
@@ -2674,6 +2690,7 @@ void apple2e_state::update_iic_mouse()
 		m_y0 = !m_y0;
 	}
 
+	// FIXME: IIc Tech Ref states this happens only once per frame
 	if (raise_mousexy_irq)
 	{
 		raise_irq(IRQ_MOUSEXY);
@@ -5011,7 +5028,7 @@ void apple2e_state::apple2e_common(machine_config &config, bool enhanced, bool r
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
-	TIMER(config, m_scantimer, 0).configure_scanline(FUNC(apple2e_state::apple2_interrupt), "screen", 0, 1);
+	TIMER(config, m_scantimer, 0).configure_generic(FUNC(apple2e_state::apple2_interrupt));
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	TIMER(config, m_acceltimer, 0).configure_generic(FUNC(apple2e_state::accel_timer));
@@ -5027,8 +5044,10 @@ void apple2e_state::apple2e_common(machine_config &config, bool enhanced, bool r
 
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
+	// HBL is positioned to the right of active video here, but to the left on hardware.
+	// this must be compensated for in any use of hpos/vpos/vblank.
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
+	m_screen->set_raw(1021800 * 14, 65 * 14, 0, 40 * 14, 262, 0, 192);
 	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::IIE, false, false>)));
 	m_screen->set_palette(m_video);
 
@@ -5153,7 +5172,7 @@ void apple2e_state::tk3000_keybio_map(address_map &map)
 u8 apple2e_state::tk3000_kbdflags_r()
 {
 	auto kbspecial = m_kbspecial->read();
-	return (m_screen->vblank() || m_screen->hblank() ? 0x20 : 0)
+	return (m_vbl || m_screen->hblank() ? 0x20 : 0)
 		| (kbspecial & 0x40) >> 2
 		| (m_an1 ? 0x08 : 0)
 		| (kbspecial & 0x01) << 2

@@ -36,13 +36,16 @@ TODO (sis630):
 #include "screen.h"
 
 #define LOG_SEQ    (1U << 1) // extended sequencer register descriptions
-
+#define LOG_CRTC   (1U << 2) // extended CRTC registers (overlay)
+#define LOG_PLL    (1U << 3) // PLL calculation (verbose, needs dirty flag)
 #define LOG_LOCKED (1U << 4) // log lock/unlock sequences
 
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_GENERAL | LOG_CRTC)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #define LOGSEQ(...)       LOGMASKED(LOG_SEQ, __VA_ARGS__)
+#define LOGCRTC(...)      LOGMASKED(LOG_CRTC, __VA_ARGS__)
+#define LOGPLL(...)       LOGMASKED(LOG_PLL, __VA_ARGS__)
 #define LOGLOCKED(...)    LOGMASKED(LOG_LOCKED, __VA_ARGS__)
 
 #include "logmacro.h"
@@ -94,6 +97,10 @@ void sis6326_vga_device::device_start()
 	// Avoid an infinite loop when displaying.  0 is not possible anyway.
 	vga.crtc.maximum_scan_line = 1;
 
+	screen().register_screen_bitmap(m_bitmap);
+	// VCD resolution, DVD tbd
+	m_overlay_bitmap = std::make_unique<bitmap_rgb32>(352, 240);
+
 	// copy over interfaces
 	vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
 	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
@@ -143,6 +150,32 @@ void sis6326_vga_device::device_start()
 	save_item(STRUCT_MEMBER(m_cursor, pattern_select));
 	save_item(STRUCT_MEMBER(m_cursor, side_pattern_enable));
 
+	save_item(STRUCT_MEMBER(m_overlay, h_display_start));
+	save_item(STRUCT_MEMBER(m_overlay, h_display_end));
+	save_item(STRUCT_MEMBER(m_overlay, v_display_start));
+	save_item(STRUCT_MEMBER(m_overlay, v_display_end));
+	save_item(STRUCT_MEMBER(m_overlay, capture_fb_addr));
+	save_item(STRUCT_MEMBER(m_overlay, display_fb_addr));
+
+	save_item(STRUCT_MEMBER(m_overlay, fb_offset));
+	save_item(STRUCT_MEMBER(m_overlay, display_fb_end));
+	save_item(STRUCT_MEMBER(m_overlay, capture_threshold));
+	save_item(STRUCT_MEMBER(m_overlay, h_down_scaling));
+	save_item(STRUCT_MEMBER(m_overlay, v_down_scaling));
+	save_item(STRUCT_MEMBER(m_overlay, h_up_scaling));
+	save_item(STRUCT_MEMBER(m_overlay, h_up_interpolation_factor));
+	save_item(STRUCT_MEMBER(m_overlay, v_up_scaling));
+	save_item(STRUCT_MEMBER(m_overlay, fb_format));
+	save_item(STRUCT_MEMBER(m_overlay, h_scaling_factor_int));
+	save_item(STRUCT_MEMBER(m_overlay, control_0));
+	save_item(STRUCT_MEMBER(m_overlay, capture_enable));
+	save_item(STRUCT_MEMBER(m_overlay, playback_enable));
+	save_item(STRUCT_MEMBER(m_overlay, video_only));
+	save_item(STRUCT_MEMBER(m_overlay, capture_interlace));
+	save_item(STRUCT_MEMBER(m_overlay, yuv_select));
+	save_item(STRUCT_MEMBER(m_overlay, field_polarity));
+	save_item(STRUCT_MEMBER(m_overlay, color_key));
+
 	save_item(STRUCT_MEMBER(m_tv, pycin));
 	save_item(STRUCT_MEMBER(m_tv, enyf));
 	save_item(STRUCT_MEMBER(m_tv, encf));
@@ -169,10 +202,14 @@ void sis6326_vga_device::device_reset()
 	// irrelevant really
 	m_crtc_hcounter_latch = m_crtc_vcounter_latch = 0xffff;
 
-	// everything else shouldn't matter for cursor
+	// everything else shouldn't matter for cursor (enable disabled with RAMDAC mode above)
 	// initialize fixed part here: HW cannot set any other bit beyond 21 ~ 18.
 	// On win98se this will map at bottom of VRAM i.e. at $3f'fc00 on 4MiB cards
 	m_cursor.address_base = 0x03'fc00;
+
+	// same deal for overlay, just knock off enable bits
+	m_overlay.control_0 = 0;
+	m_overlay.capture_enable = m_overlay.playback_enable = false;
 
 	m_turbo_queue_address = 0;
 	m_mpeg_turbo_queue_address = 0;
@@ -274,7 +311,309 @@ void sis6326_vga_device::crtc_map(address_map &map)
 			LOGLOCKED("CR80: Unlock register write %02x (%s)\n", data, m_crtc_unlock_reg ? "unlocked" : "locked");
 		})
 	);
-	// ...
+	map(0x81, 0x81).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_overlay.h_display_start & 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR80: H Display Start Low %02x\n", data);
+			m_overlay.h_display_start &= ~0xff;
+			m_overlay.h_display_start |= data;
+		})
+	);
+	map(0x82, 0x82).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_overlay.h_display_end & 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR81: H Display End Low %02x\n", data);
+			m_overlay.h_display_end &= ~0xff;
+			m_overlay.h_display_end |= data;
+		})
+	);
+	map(0x83, 0x83).lrw8(
+		NAME([this] (offs_t offset) {
+			return (((m_overlay.h_display_end >> 8) & 7) << 4)
+				| ((m_overlay.h_display_start >> 8) & 7);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR83: H Display Overflow %02x\n", data);
+			m_overlay.h_display_start &= 0xff;
+			m_overlay.h_display_start |= (data & 0x7) << 8;
+
+			m_overlay.h_display_end &= 0xff;
+			m_overlay.h_display_end |= (data & 0x70) << 4;
+		})
+	);
+	map(0x84, 0x84).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_overlay.v_display_start & 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR84: V Display Start Low %02x\n", data);
+			m_overlay.v_display_start &= ~0xff;
+			m_overlay.v_display_start |= data;
+		})
+	);
+	map(0x85, 0x85).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_overlay.v_display_end & 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR85: V Display End Low %02x\n", data);
+			m_overlay.v_display_end &= ~0xff;
+			m_overlay.v_display_end |= data;
+		})
+	);
+	map(0x86, 0x86).lrw8(
+		NAME([this] (offs_t offset) {
+			return (((m_overlay.v_display_end >> 8) & 7) << 4)
+				| ((m_overlay.v_display_start >> 8) & 7);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR86: V Display Overflow %02x\n", data);
+			m_overlay.v_display_start &= 0xff;
+			m_overlay.v_display_start |= (data & 0x7) << 8;
+
+			m_overlay.v_display_end &= 0xff;
+			m_overlay.v_display_end |= (data & 0x70) << (8 - 4);
+		})
+	);
+	map(0x87, 0x87).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_overlay.capture_fb_addr & 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR87: Video Capture FB Starting Address Low %02x\n", data);
+			m_overlay.capture_fb_addr &= 0x0fff00;
+			m_overlay.capture_fb_addr |= data & 0xff;
+		})
+	);
+	map(0x88, 0x88).lrw8(
+		NAME([this] (offs_t offset) {
+			return (m_overlay.capture_fb_addr >> 8) & 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR88: Video Capture FB Starting Address Middle %02x\n", data);
+			m_overlay.capture_fb_addr &= 0x0f00ff;
+			m_overlay.capture_fb_addr |= data << 8;
+		})
+	);
+	map(0x89, 0x89).lrw8(
+		NAME([this] (offs_t offset) {
+			return ((m_overlay.capture_fb_addr >> 16) & 0xf)
+				| (((m_overlay.display_fb_addr >> 16) & 0xf) << 4);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR89: Video FB Overflow %02x\n", data);
+			m_overlay.capture_fb_addr &= 0x00ffff;
+			m_overlay.capture_fb_addr |= (data & 0xf) << 16;
+			m_overlay.display_fb_addr &= 0x00ffff;
+			m_overlay.display_fb_addr |= (data & 0xf0) << (16 - 4);
+			LOG("\tCapture FB addr %06x Display FB addr %06x\n"
+				, m_overlay.capture_fb_addr
+				, m_overlay.display_fb_addr
+			);
+		})
+	);
+	map(0x8a, 0x8a).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_overlay.display_fb_addr & 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR8A: Video Display FB Starting Address Low %02x\n", data);
+			m_overlay.display_fb_addr &= 0x0fff00;
+			m_overlay.display_fb_addr |= data & 0xff;
+		})
+	);
+	map(0x8b, 0x8b).lrw8(
+		NAME([this] (offs_t offset) {
+			return (m_overlay.display_fb_addr >> 8) & 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR88: Video Display FB Starting Address Middle %02x\n", data);
+			m_overlay.display_fb_addr &= 0x0f00ff;
+			m_overlay.display_fb_addr |= data << 8;
+		})
+	);
+	map(0x8c, 0x8c).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_overlay.fb_offset & 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR8B: FB Offset Low %02x\n", data);
+			m_overlay.fb_offset &= 0x0f00;
+			m_overlay.fb_offset |= data & 0xff;
+		})
+	);
+	map(0x8d, 0x8d).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_overlay.display_fb_end;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR8D: Video Display FB End Low %02x (%06x)\n", data, data * 1024);
+			m_overlay.display_fb_end = data;
+		})
+	);
+	map(0x8e, 0x8e).lrw8(
+		NAME([this] (offs_t offset) {
+			return (m_overlay.fb_offset >> 8) & 0x0f;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR8E: FB Offset High %02x\n", data);
+			m_overlay.fb_offset &= 0x00ff;
+			m_overlay.fb_offset |= (data & 0x0f) << 8;
+		})
+	);
+	map(0x8f, 0x8f).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_overlay.capture_threshold;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			// TODO: low bits 2-0, high 6-4
+			LOG("CR8F: Capture Threshold %02x\n", data);
+			m_overlay.capture_threshold = data & 0x77;
+		})
+	);
+	map(0x90, 0x90).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_overlay.h_down_scaling;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR90: H Down Scaling Factor %02x\n", data);
+			m_overlay.h_down_scaling = data & 0x3f;
+		})
+	);
+	map(0x91, 0x91).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_overlay.v_down_scaling;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR90: V Down Scaling Factor %02x\n", data);
+			m_overlay.v_down_scaling = data & 0x3f;
+		})
+	);
+	map(0x92, 0x92).lrw8(
+		NAME([this] (offs_t offset) {
+			return (m_overlay.h_up_scaling & 0x3f) | (m_overlay.h_up_interpolation_factor << 6);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR92: H Up Scaling Factor %02x\n", data);
+			m_overlay.h_up_scaling = data & 0x3f;
+			m_overlay.h_up_interpolation_factor = data >> 6;
+		})
+	);
+	map(0x93, 0x93).lrw8(
+		NAME([this] (offs_t offset) {
+			return (m_overlay.v_up_scaling & 0x3f) | (m_overlay.fb_format);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR93: V Up Scaling Factor %02x\n", data);
+			m_overlay.v_up_scaling = data & 0x3f;
+			m_overlay.fb_format = data >> 6;
+		})
+	);
+	map(0x94, 0x94).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_overlay.h_scaling_factor_int;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR94: H Scaling Factor Integer %02x\n", data);
+			m_overlay.h_scaling_factor_int = data;
+		})
+	);
+	map(0x95, 0x95).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_overlay.color_key & 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR95: Blue Key Low %02x -> %06x\n", data, m_overlay.color_key);
+			m_overlay.color_key &= 0xffff00;
+			m_overlay.color_key |= data & 0xff;
+		})
+	);
+	map(0x96, 0x96).lrw8(
+		NAME([this] (offs_t offset) {
+			return (m_overlay.color_key >> 8) & 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR96: Green Key Low %02x -> %06x\n", data, m_overlay.color_key);
+			m_overlay.color_key &= 0xff00ff;
+			m_overlay.color_key |= data << 8;
+		})
+	);
+	map(0x97, 0x97).lrw8(
+		NAME([this] (offs_t offset) {
+			return (m_overlay.color_key >> 16) & 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR97: Red Key Low %02x -> %06x\n", data, m_overlay.color_key);
+			m_overlay.color_key &= 0x00ffff;
+			m_overlay.color_key |= data << 16;
+		})
+	);
+	map(0x98, 0x98).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_overlay.control_0;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("CR98: Control Misc. 0 %02x\n", data);
+			m_overlay.control_0 = data;
+			m_overlay.capture_enable = !!BIT(data, 0);
+			m_overlay.playback_enable = !!BIT(data, 1);
+			LOGCRTC("\tVideo Capture %d Video Playback %d\n"
+				, m_overlay.capture_enable
+				, m_overlay.playback_enable
+			);
+			m_overlay.video_only = !!BIT(data, 4);
+			m_overlay.capture_interlace = !!BIT(data, 5);
+			m_overlay.yuv_select = !!BIT(data, 6);
+			m_overlay.field_polarity = !!BIT(data, 7);
+			LOGCRTC("\tVideo Only Display %d Capture Interlace %d Format %s Field Polarity %s\n"
+				, m_overlay.video_only
+				, m_overlay.capture_interlace
+				, m_overlay.yuv_select ? "YUV" : "RGB"
+				, m_overlay.field_polarity ? "*Odd/Even" : "Odd/*Even"
+			);
+		})
+	);
+//	map(0x99, 0x99) Video Control Misc. 1
+//	map(0x9a, 0x9a) Video Chroma B/Y Low
+//	map(0x9b, 0x9b) Video Chroma G/U Low
+//	map(0x9c, 0x9c) Video Chroma R/V Low
+	// NOTE: there's no Video Control Misc. 2
+//	map(0x9d, 0x9d) Video Control Misc. 3
+//	map(0x9e, 0x9e) Video Playback Threshold Low
+//	map(0x9f, 0x9f) Video Playback Threshold High
+//	map(0xa0, 0xa0) Line Buffer Size
+//	map(0xa1, 0xa1) Color Key Blue High
+//	map(0xa2, 0xa2) Color Key Green High
+//	map(0xa3, 0xa3) Color Key Red High
+//	map(0xa4, 0xa4) Video Chroma B/Y High
+//	map(0xa5, 0xa5) Video Chroma G/U High
+//	map(0xa6, 0xa6) Video Chroma R/V High
+//	map(0xa7, 0xa7) Graphics Data Alpha
+//	map(0xa8, 0xa8) Video Data Alpha
+//	map(0xa9, 0xa9) Key Overlay Op Mode
+//	map(0xaa, 0xaa) Video Capture Horizontal Start
+//	map(0xab, 0xab) Video Capture Horizontal End
+//	map(0xac, 0xac) Video Capture Vertical Start
+//	map(0xad, 0xad) Video Capture Vertical End
+//	map(0xae, 0xae) Video Capture Horizontal Overflow
+//	map(0xaf, 0xaf) Video Capture Vertical Overflow (+ Input Delay Compensation)
+//	map(0xb0, 0xb1) System Memory Video FB Setting 1/2 (<reserved>)
+//	map(0xb2, 0xb2) System Memory Video FB Setting 3 and Video Control
+//	map(0xb3, 0xb3) Contrast Enhancement Mean Value Sampling Rate Factor
+//	map(0xb4, 0xb4) Brightness
+//	map(0xb5, 0xb5) Contrast Enhancement Control
+//	map(0xb6, 0xb6) Video Control Misc. 4
+//	map(0xb7, 0xb7) Video U Plane Starting Address Low
+//	map(0xb8, 0xb8) Video U Plane Starting Address Middle
+//	map(0xb9, 0xb9) Video UV Plane Starting Address High
+//	map(0xba, 0xba) Video V Plane Starting Address Low
+//	map(0xbb, 0xbb) Video V Plane Starting Address Middle
+//	map(0xbc, 0xbc) Video UV Plane Offset Low
+//	map(0xbd, 0xbd) Video UV Plane Offset High
 
 	map(0xe0, 0xe0).lrw8(
 		NAME([this] (offs_t offset) -> u8 {
@@ -932,10 +1271,6 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			LOG("SR38: Misc. Control 7 %02x\n", data);
-			//if ((m_ext_sr38 & 3) != (data & 3))
-			//{
-			//	recompute_params();
-			//}
 			m_ext_sr38 = data;
 			m_cursor.address_base &= ~0x3c'0000;
 			m_cursor.address_base |= (data >> 4) << 18;
@@ -943,6 +1278,7 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			// testable at 1600x1200, needs HW test
 			vga.crtc.line_compare = (vga.crtc.line_compare & 0x3ff) | (BIT(data, 2) * 0xfc00);
 			//vga.crtc.line_compare = (vga.crtc.line_compare & 0x3ff) | (BIT(data, 2) << 10);
+			recompute_params();
 		})
 	);
 
@@ -1105,8 +1441,26 @@ void sis6326_vga_device::recompute_params()
 		// TODO: stub, barely enough to make BeOS 5 to set ~60 Hz for 640x480x16
 		case 2:
 		default:
-			xtal = XTAL(25'174'800).value();
+		{
+			// TODO: setting 2 is external (all available card pics shows a 14 MHz XTAL anyway)
+			// TODO: PLL calculation is not necessarily correct or even confirmed
+			// - shutms11 beos5 expects a 25 MHz base clock for getting ~60 Hz
+			// - SDD tests, particularly stuff that enables interlace (tbd)
+			const int clock_select[] = { 25'174'800, 28'636'363, 14'318'181, 14'318'181 };
+
+			float numerator = (m_vclk_int[0] & 0x7f) + 1;
+			float denominator = (m_vclk_int[1] & 0x1f) + 1;
+			const u8 postscale_types[] = { 1, 2, 3, 4, 1, 1, 6, 8 };
+			// assume doc mistake for bit 6 (claims bit 7 that is MCLK related instead)
+			float postscale = postscale_types[((m_vclk_int[1] & 0x60) >> 5) | BIT(m_ext_sr13, 6) << 2];
+			float div = BIT(m_vclk_int[0], 7) + 1;
+			float raw_xtal = ((XTAL(clock_select[m_ext_sr38 & 3]).value() / 2) * (numerator / denominator) * (div / postscale));
+			xtal = (int)raw_xtal;
+			LOGPLL("SR13 %02x SR2A %02x SR2B %02x SR38[0:1] %01x\n", m_ext_sr13, m_vclk_int[0], m_vclk_int[1], m_ext_sr38 & 3);
+			LOGPLL("num %f dem %f postscale %f div %f ->\n", numerator, denominator, postscale, div);
+			LOGPLL("%f %d\n", raw_xtal, xtal);
 			break;
+		}
 	}
 
 	recompute_params_clock(1, xtal);
@@ -1164,9 +1518,74 @@ void sis6326_vga_device::cursor_mmio_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
+u32 sis6326_vga_device::yuvtorgb32(u8 y, u8 u, u8 v)
+{
+	const double bf = y + (1.772 * (u - 128));
+	const double gf = y - (0.334 * (u - 128)) - (0.714 * (v - 128));
+	const double rf = y + (1.402 * (v - 128));
+
+	const u8 r = u8(std::clamp(rf, 0.0, 255.0));
+	const u8 g = u8(std::clamp(gf, 0.0, 255.0));
+	const u8 b = u8(std::clamp(bf, 0.0, 255.0));
+
+	return (r << 16) | (g << 8) | b;
+}
+
+void sis6326_vga_device::draw_overlay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+//	popmessage("(H %d %d V %d %d) %08x %d %06x"
+//		, m_overlay.h_display_start, m_overlay.h_display_end
+//		, m_overlay.v_display_start, m_overlay.v_display_end
+//		, m_overlay.display_fb_addr
+//		, m_overlay.fb_offset
+//		, m_overlay.color_key
+//	);
+
+	for (int y = 0; y < 240; y++)
+	{
+		const u32 base_addr = (m_overlay.display_fb_addr << 2) + ((y * m_overlay.fb_offset) << 2);
+		for (int x = 0; x < 176; x++)
+		{
+			const u32 pixel_addr = (base_addr + x * 4);
+			// YUYV 4:2:2 format (mode 2, as used by SiS MMPlayer and mplayer2 with VCDs)
+			// TODO: any other format, including pure RGB555/565
+			u8 const y1 = vga.memory[pixel_addr + 0];
+			u8 const u =  vga.memory[pixel_addr + 1];
+			u8 const y2 = vga.memory[pixel_addr + 2];
+			u8 const v =  vga.memory[pixel_addr + 3];
+
+			bitmap.pix(y, x * 2 + 0) = yuvtorgb32(y1, u, v);
+			bitmap.pix(y, x * 2 + 1) = yuvtorgb32(y2, u, v);
+		}
+	}
+}
+
 uint32_t sis6326_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	svga_device::screen_update(screen, bitmap, cliprect);
+	if (m_overlay.playback_enable)
+	{
+		draw_overlay(screen, *m_overlay_bitmap, cliprect);
+
+		// punch the overlay around the color key
+		// TODO: color key changes in non-8bpp modes, can also blend thru Key op
+		bitmap.fill(rgb_t::black(), cliprect);
+
+		// naive upscaling implementation with no real dithering for now,
+		// more or less enough for 640x480 full screen
+		// (the actual dithering implementation is unknown at current time, also origin may follow suit)
+		// - documentation claims 64/value, mplayer2 sets 31, 31 on zoom 200%
+		const u32 pixel_size = m_overlay.h_up_scaling == 0 ? 0x10000 : 0x10000 - ((63 - m_overlay.h_up_scaling) * 0x400);
+		const u32 line_size = m_overlay.v_up_scaling == 0 ? 0x10000 : 0x10000 - ((63 - m_overlay.v_up_scaling) * 0x400);
+		copyrozbitmap(bitmap, cliprect, *m_overlay_bitmap,
+			(-(m_overlay.h_display_start) << 16), (-(m_overlay.v_display_start) << 16),
+			pixel_size, 0, 0, line_size,
+			false
+		);
+		svga_device::screen_update(screen, m_bitmap, cliprect);
+		copybitmap_trans(bitmap, m_bitmap, 0, 0, 0, 0, cliprect, pen(m_overlay.color_key & 0xff));
+	}
+	else
+		svga_device::screen_update(screen, bitmap, cliprect);
 
 	// HW cursor
 	if (BIT(m_ramdac_mode, 6))

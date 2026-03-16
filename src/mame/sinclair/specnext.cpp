@@ -31,7 +31,11 @@
 #include "specnext_lores.h"
 #include "specnext_sprites.h"
 #include "specnext_tiles.h"
+#include "specnext_uart.h"
 
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/pty.h"
 #include "bus/spectrum/zxbus/bus.h"
 #include "cpu/z80/z80n.h"
 #include "machine/ds1307.h"
@@ -58,7 +62,7 @@
 
 namespace {
 
-#define TIMINGS_PERFECT     1
+#define TIMINGS_PERFECT     0
 
 constexpr u8 INT_PRIORITY_LINE     = 0;
 constexpr u8 INT_PRIORITY_UART0_RX = 1;
@@ -115,11 +119,16 @@ public:
 		, m_view6(*this, "mem_view6")
 		, m_view7(*this, "mem_view7")
 		, m_im2_line(*this, "im2_line")
+		, m_im2_uart0_rx(*this, "im2_uart0_rx")
+		, m_im2_uart1_rx(*this, "im2_uart1_rx")
 		, m_im2_ula(*this, "im2_ula")
+		, m_im2_uart0_tx(*this, "im2_uart0_tx")
+		, m_im2_uart1_tx(*this, "im2_uart1_tx")
 		, m_copper(*this, "copper")
 		, m_ctc(*this, "ctc")
 		, m_dma(*this, "dma")
 		, m_i2c(*this, "i2c")
+		, m_uart(*this, "uart%u", 0U)
 		, m_sdcards(*this, "sdcard%u", 0U)
 		, m_ay(*this, "ay%u", 0U)
 		, m_dac(*this, "dac%u", 0U)
@@ -177,6 +186,8 @@ protected:
 	void spi_data_w(u8 data);
 	void spi_miso_w(u8 data);
 	void i2c_scl_w(u8 data);
+	template <u8 Reg> u8 uart_reg_r();
+	template <u8 Reg> void uart_reg_w(u8 data);
 	void palette_val_w(u8 nr_palette_priority, u16 nr_palette_value);
 	u8 port_ff_r();
 	void port_ff_w(u8 data);
@@ -346,11 +357,16 @@ private:
 	memory_bank_array_creator<8> m_bank_ram;
 	memory_view m_view0, m_view1, m_view2, m_view3, m_view4, m_view5, m_view6, m_view7;
 	required_device<specnext_im2_device> m_im2_line;
+	optional_device<specnext_im2_device> m_im2_uart0_rx;
+	optional_device<specnext_im2_device> m_im2_uart1_rx;
 	required_device<specnext_im2_device> m_im2_ula;
+	optional_device<specnext_im2_device> m_im2_uart0_tx;
+	optional_device<specnext_im2_device> m_im2_uart1_tx;
 	required_device<specnext_copper_device> m_copper;
 	required_device<specnext_ctc_device> m_ctc;
 	required_device<specnext_dma_device> m_dma;
 	optional_device<i2c_ds1307_device> m_i2c;
+	optional_device_array<specnext_uart_device, 2> m_uart;
 	required_device_array<spi_sdcard_device, 2> m_sdcards;
 	required_device_array<ym2149_device, 3> m_ay;
 	required_device_array<dac_byte_interface, 4> m_dac;
@@ -601,6 +617,7 @@ private:
 	bool m_port_ff3b_ulap_en;
 
 	u8 m_ay_select; // u2
+	bool m_uart_select;
 
 	emu_timer *m_irq_line_timer;
 	emu_timer *m_spi_clock;
@@ -1183,6 +1200,25 @@ void specnext_state::i2c_scl_w(u8 data)
 		m_i2c_scl_data = data & 1;
 		m_i2c->scl_write(m_i2c_scl_data);
 	}
+}
+
+template <u8 Reg> u8 specnext_state::uart_reg_r()
+{
+	if (!port_uart_io_en())
+		return 0x00;
+
+	return m_uart[m_uart_select]->reg_r(Reg);
+}
+
+template <u8 Reg> void specnext_state::uart_reg_w(u8 data)
+{
+	if (!port_uart_io_en())
+		return;
+
+	if (Reg == 0b01)
+		m_uart_select = BIT(data, 6);
+
+	m_uart[m_uart_select]->reg_w(Reg, data);
 }
 
 void specnext_state::turbosound_address_w(u8 data)
@@ -2596,17 +2632,23 @@ void specnext_state::nr_c0_im2_vector_w(bool mode_im2, u8 vector)
 
 	const u8 vector_base = mode_im2 ? m_nr_c0_im2_vector << 5 : 0xff;
 	m_im2_line->vector_w(vector_base | (INT_PRIORITY_LINE << 1));
+	m_im2_uart0_rx->vector_w(vector_base | (INT_PRIORITY_UART0_RX << 1));
+	m_im2_uart1_rx->vector_w(vector_base | (INT_PRIORITY_UART1_RX << 1));
 	m_ctc->vector_w(vector_base);
 	m_im2_ula->vector_w(vector_base | (INT_PRIORITY_ULA << 1));
+	m_im2_uart0_tx->vector_w(vector_base | (INT_PRIORITY_UART0_TX << 1));
+	m_im2_uart1_tx->vector_w(vector_base | (INT_PRIORITY_UART1_TX << 1));
 }
 
 static const z80_daisy_config z80_daisy_chain[] =
 {
 	{ "im2_line" },
-	// { "uart_rx" },
+	{ "im2_uart0_rx" },
+	{ "im2_uart1_rx" },
 	{ "ctc" },
 	{ "im2_ula" },
-	// { "uart_tx" },
+	{ "im2_uart0_tx" },
+	{ "im2_uart1_tx" },
 	{ nullptr }
 };
 
@@ -2640,11 +2682,15 @@ void specnext_state::irq_w(int state)
 
 	const int tmp = m_im2_int_status;
 	m_im2_int_status &= 1 << INT_PRIORITY_NMI;
+	m_im2_int_status |= ((m_im2_uart0_tx->z80daisy_irq_state() & Z80_DAISY_IEO) != 0) << INT_PRIORITY_UART0_TX;
+	m_im2_int_status |= ((m_im2_uart1_tx->z80daisy_irq_state() & Z80_DAISY_IEO) != 0) << INT_PRIORITY_UART1_TX;
 	m_im2_int_status |= ((m_im2_ula->z80daisy_irq_state() & Z80_DAISY_IEO) != 0) << INT_PRIORITY_ULA;
 	m_im2_int_status |= ((m_ctc->z80daisy_chanel_irq_state(3) & Z80_DAISY_IEO) != 0) << (INT_PRIORITY_CTC + 3);
 	m_im2_int_status |= ((m_ctc->z80daisy_chanel_irq_state(2) & Z80_DAISY_IEO) != 0) << (INT_PRIORITY_CTC + 2);
 	m_im2_int_status |= ((m_ctc->z80daisy_chanel_irq_state(1) & Z80_DAISY_IEO) != 0) << (INT_PRIORITY_CTC + 1);
 	m_im2_int_status |= ((m_ctc->z80daisy_chanel_irq_state(0) & Z80_DAISY_IEO) != 0) << (INT_PRIORITY_CTC + 0);
+	m_im2_int_status |= ((m_im2_uart0_rx->z80daisy_irq_state() & Z80_DAISY_IEO) != 0) << INT_PRIORITY_UART0_RX;
+	m_im2_int_status |= ((m_im2_uart1_rx->z80daisy_irq_state() & Z80_DAISY_IEO) != 0) << INT_PRIORITY_UART1_RX;
 	m_im2_int_status |= ((m_im2_line->z80daisy_irq_state() & Z80_DAISY_IEO) != 0) << INT_PRIORITY_LINE;
 	LOGINTVVV("IRQ%s: %04x -> %04x\n", state ? "+" : "-", tmp, m_im2_int_status);
 
@@ -3016,6 +3062,10 @@ void specnext_state::map_io(address_map &map)
 
 		bank_update(0, 6);
 	}));
+	map(0x133b, 0x133b).rw(FUNC(specnext_state::uart_reg_r<3>), FUNC(specnext_state::uart_reg_w<3>));
+	map(0x143b, 0x143b).rw(FUNC(specnext_state::uart_reg_r<0>), FUNC(specnext_state::uart_reg_w<0>));
+	map(0x153b, 0x153b).w(FUNC(specnext_state::uart_reg_w<1>));
+	map(0x163b, 0x163b).w(FUNC(specnext_state::uart_reg_w<2>));
 	map(0x243b, 0x243b).lrw8(NAME([this]() { return m_nr_register; })
 		, NAME([this](u8 data) { m_nr_register = data; }));
 	map(0x253b, 0x253b).lrw8(NAME([this]() { return m_next_regs.read_byte(m_nr_register); })
@@ -3466,6 +3516,7 @@ void specnext_state::machine_start()
 	save_item(NAME(m_port_bf3b_ulap_index));
 	save_item(NAME(m_port_ff3b_ulap_en));
 	save_item(NAME(m_ay_select));
+	save_item(NAME(m_uart_select));
 	save_item(NAME(m_spi_clock_cycles));
 	save_item(NAME(m_spi_clock_state));
 	save_item(NAME(m_spi_mosi_dat));
@@ -3862,6 +3913,7 @@ void specnext_state::machine_reset()
 	mmu_x2_w(6, 0x00);
 
 	m_ay_select = 0;
+	m_uart_select = 0;
 	m_video_output_hdmi = -1;
 }
 
@@ -3902,6 +3954,17 @@ void specnext_state::video_start()
 			m_maincpu->adjust_icount(-1);
 		}
 	});
+}
+
+static DEVICE_INPUT_DEFAULTS_START(rs232_baud)
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_115200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_115200 )
+DEVICE_INPUT_DEFAULTS_END
+
+static void rs232_devices(device_slot_interface &device)
+{
+	device.option_add("null_modem", NULL_MODEM);
+	device.option_add("pty",        PSEUDO_TERMINAL);
 }
 
 void specnext_state::tbblue(machine_config &config)
@@ -3945,6 +4008,36 @@ void specnext_state::tbblue(machine_config &config)
 
 	I2C_DS1307(config, m_i2c);
 	m_i2c->sda_callback().set([this](int state) { m_i2c_sda_data = state & 1; });
+
+	SPECNEXT_IM2(config, m_im2_uart0_rx);
+	m_im2_uart0_rx->irq_callback().set(FUNC(specnext_state::irq_w));
+
+	SPECNEXT_IM2(config, m_im2_uart0_tx);
+	m_im2_uart0_tx->irq_callback().set(FUNC(specnext_state::irq_w));
+
+	SPECNEXT_UART(config, m_uart[0], 28_MHz_XTAL);
+	m_uart[0]->out_txd_callback().set("rs232_esp", FUNC(rs232_port_device::write_txd));
+	m_uart[0]->out_rx_full_near_callback().set(m_im2_uart0_rx, FUNC(specnext_im2_device::irq_w));
+	m_uart[0]->out_tx_empty_callback().set(m_im2_uart0_tx, FUNC(specnext_im2_device::irq_w));
+	rs232_port_device &rs232_esp(RS232_PORT(config, "rs232_esp", rs232_devices, nullptr));
+	rs232_esp.rxd_handler().set(m_uart[0], FUNC(specnext_uart_device::rx_w));
+	rs232_esp.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(rs232_baud));
+	rs232_esp.set_option_device_input_defaults("pty", DEVICE_INPUT_DEFAULTS_NAME(rs232_baud));
+
+	SPECNEXT_IM2(config, m_im2_uart1_rx);
+	m_im2_uart1_rx->irq_callback().set(FUNC(specnext_state::irq_w));
+
+	SPECNEXT_IM2(config, m_im2_uart1_tx);
+	m_im2_uart1_tx->irq_callback().set(FUNC(specnext_state::irq_w));
+
+	SPECNEXT_UART(config, m_uart[1], 28_MHz_XTAL);
+	m_uart[1]->out_txd_callback().set("rs232_rpi", FUNC(rs232_port_device::write_txd));
+	m_uart[1]->out_rx_full_near_callback().set(m_im2_uart1_rx, FUNC(specnext_im2_device::irq_w));
+	m_uart[1]->out_tx_empty_callback().set(m_im2_uart1_tx, FUNC(specnext_im2_device::irq_w));
+	rs232_port_device &rs232_rpi(RS232_PORT(config, "rs232_rpi", rs232_devices, nullptr));
+	rs232_rpi.rxd_handler().set(m_uart[1], FUNC(specnext_uart_device::rx_w));
+	rs232_rpi.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(rs232_baud));
+	rs232_rpi.set_option_device_input_defaults("pty", DEVICE_INPUT_DEFAULTS_NAME(rs232_baud));
 
 	SPI_SDCARD(config, m_sdcards[0], 0);
 	m_sdcards[0]->set_prefer_sdhc();

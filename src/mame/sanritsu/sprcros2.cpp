@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /*
 
-Super Cross II (スーパークロスⅡ) (c) 1986 GM Shoji
+Super Cross II 『スーパークロスⅡ』 (c) 1986 GM Shoji
 
 driver by Angelo Salese, based on "wiped off due to not anymore licenseable"
 driver by insideoutboy.

@@ -695,8 +695,6 @@ DEFINE_DEVICE_TYPE(MCPX_SMBUS, mcpx_smbus_device, "mcpx_smbus", "MCPX SMBus Cont
 void mcpx_smbus_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x3e, 0x3e).r(FUNC(mcpx_smbus_device::minimum_grant_r));
-	map(0x3f, 0x3f).r(FUNC(mcpx_smbus_device::maximum_latency_r));
 }
 
 void mcpx_smbus_device::smbus_io0(address_map &map)
@@ -738,8 +736,10 @@ void mcpx_smbus_device::device_start()
 	bank_infos[2].adr = 0xc200;
 	status = 0x00b0;
 	command = 0x0001;
-	// Min Grant 3
-	// Max Latency 1
+	// min_gnt = 0.75 usec, max_lat = 0.25 usec
+	minimum_grant = 3;
+	maximum_latency = 1;
+
 	intr_pin = 1;
 	memset(&smbusst, 0, sizeof(smbusst));
 	for (int b = 0; b < 2; b++)
@@ -866,8 +866,6 @@ DEFINE_DEVICE_TYPE(MCPX_OHCI, mcpx_ohci_device, "mcpx_ohci", "MCPX OHCI USB Cont
 void mcpx_ohci_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x3e, 0x3e).r(FUNC(mcpx_ohci_device::minimum_grant_r));
-	map(0x3f, 0x3f).r(FUNC(mcpx_ohci_device::maximum_latency_r));
 }
 
 void mcpx_ohci_device::ohci_mmio(address_map &map)
@@ -904,6 +902,9 @@ void mcpx_ohci_device::device_start()
 	bank_infos[0].adr = 0xfed00000;
 	status = 0x00b0;
 	command = 0x0002;
+	// min_gnt = 0.75 usec, max_lat = 0.25 usec
+	minimum_grant = 3;
+	maximum_latency = 1;
 	intr_pin = 1;
 	ohci_usb = new ohci_usb_controller();
 	ohci_usb->set_cpu(maincpu.target());
@@ -1034,8 +1035,6 @@ DEFINE_DEVICE_TYPE(MCPX_APU, mcpx_apu_device, "mcpx_apu", "MCP APU")
 void mcpx_apu_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x3e, 0x3e).r(FUNC(mcpx_apu_device::minimum_grant_r));
-	map(0x3f, 0x3f).r(FUNC(mcpx_apu_device::maximum_latency_r));
 }
 
 void mcpx_apu_device::apu_mmio(address_map &map)
@@ -1045,13 +1044,43 @@ void mcpx_apu_device::apu_mmio(address_map &map)
 
 void mcpx_apu_device::p_map(address_map &map)
 {
-	map(0xc00000, 0xc01fff).ram();
-	//map(0x002000, 0x002fff).r(FUNC(mcpx_apu_device::test_r));
+	map(0x000c00, 0x003fff).ram();
+	map(0x100000, 0x02fffff).r(FUNC(mcpx_apu_device::program_memory_r));
+}
+
+// a routine to help you look at the contents of the scatter-gather memories
+// for the global and encode processor dsps
+uint32_t mcpx_apu_device::program_memory_r(offs_t offset)
+{
+	offs_t sub;
+	offs_t page;
+	u32 *sgblocks, *sgaddress;
+
+	if (~offset & 0x100000) {
+		sub = 0;
+		sgblocks = &apust.gpdsp_sgblocks;
+		sgaddress = &apust.gpdsp_sgaddress;
+	}
+	else if (offset & 0x100000) {
+		sub = 0x100000;
+		sgblocks = &apust.epdsp_sgblocks;
+		sgaddress = &apust.epdsp_sgaddress;
+	}
+	else
+		return 0x0bad;
+	offset -= sub;
+	page = offset >> 10;
+	if (page >= *sgblocks)
+		return 0;
+	u32 page_address = apust.space->read_dword(*sgaddress + page * 2 * 4);
+	u32 opcode_dword = apust.space->read_dword(page_address + (offset & 0x3ff) * 4);
+	return opcode_dword & 0xffffff;
 }
 
 mcpx_apu_device::mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pci_device(mconfig, MCPX_APU, tag, owner, clock),
 	gpdsp(*this, "gpdsp"),
+	epdsp(*this, "epdsp"),
 	cpu(*this, finder_base::DUMMY_TAG)
 {
 }
@@ -1063,6 +1092,10 @@ void mcpx_apu_device::device_start()
 	bank_infos[0].adr = 0xfe800000;
 	status = 0x00b0;
 	command = 0x0002;
+	// min_gnt = 0.25 usec, max_lat = 3 usec
+	minimum_grant = 1;
+	maximum_latency = 0xc;
+
 	intr_pin = 1;
 	memset(apust.memory, 0, sizeof(apust.memory));
 	memset(apust.voices_heap_blockaddr, 0, sizeof(apust.voices_heap_blockaddr));
@@ -1075,6 +1108,7 @@ void mcpx_apu_device::device_start()
 	apust.timer = timer_alloc(FUNC(mcpx_apu_device::audio_update), this);
 	apust.timer->enable(false);
 	gpdsp->set_disable();
+	epdsp->set_disable();
 }
 
 void mcpx_apu_device::device_reset()
@@ -1087,8 +1121,9 @@ void mcpx_apu_device::device_add_mconfig(machine_config &config)
 	DSP56362(config, gpdsp, 10'000'000);
 	gpdsp->set_hard_omr(0); // try to reset at 0xc00000
 	gpdsp->set_addrmap(dsp56362_device::AS_P, &mcpx_apu_device::p_map);
-	//m_dsp->set_addrmap(dsp56364_device::AS_X, &mcpx_apu_device::x_map);
-	//m_dsp->set_addrmap(dsp56364_device::AS_Y, &mcpx_apu_device::y_map);
+	DSP56362(config, epdsp, 10'000'000);
+	//epdsp->set_addrmap(dsp56364_device::AS_X, &mcpx_apu_device::x_map);
+	//epdsp->set_addrmap(dsp56364_device::AS_Y, &mcpx_apu_device::y_map);
 }
 
 TIMER_CALLBACK_MEMBER(mcpx_apu_device::audio_update)
@@ -1139,6 +1174,10 @@ void mcpx_apu_device::apu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		apust.timer->enable();
 		apust.timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 	}
+	if (offset == 0x02044 / 4) // address of memory area with information about blocks
+		apust.gpdsp_sgaddress2 = data;
+	if (offset == 0x020d8 / 4) // block count - 1
+		apust.gpdsp_sgblocks2 = data;
 	if (offset == 0x02048 / 4) // (epdsp scratch dma)
 		apust.epdsp_sgaddress = data;
 	if (offset == 0x020dc / 4) // (epdsp)
@@ -1194,7 +1233,7 @@ void mcpx_apu_device::apu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		int16_t v0 = (int16_t)(data >> 16); // upper 16 bits as a signed 16 bit value
 		float vv = ((float)v0) / 4096.0f; // divide by 4096
 		float vvv = powf(2, vv); // two to the vv
-		int f = vvv*48000.0f; // sample rate
+		int f = vvv * 48000.0f; // sample rate
 		apust.voices_frequency[apust.voice_number] = f;
 		return;
 	}
@@ -1228,6 +1267,35 @@ void mcpx_apu_device::apu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		return;
 	if (offset == 0x20280 / 4) // hrtf headroom ?
 		return;
+	if (offset == 0x3fffc / 4) { // some reset ?
+		LOGMASKED(LOG_AUDIO, "Audio_APU: reset %08X\n", data);
+		data = data & 0xf;
+		if (data == 3)
+			// copy 24 bit words from processor ram into dsp program ram
+			for (int b = 0; b < apust.gpdsp_sgblocks; b++) {
+				uint32_t page = apust.space->read_dword(apust.gpdsp_sgaddress + b * 8);
+				for (int w = 0; w < 1024; w++) {
+					v = apust.space->read_dword(page + w * 4);
+					v = v & 0xffffff;
+					gpdsp->space(dsp563xx_device::AS_P).write_dword(b * 1024 + w, v);
+				}
+			}
+		return;
+	}
+	if (offset == 0x5fffc / 4) {
+		LOGMASKED(LOG_AUDIO, "Audio_APU: reset %08X\n", data);
+		data = data & 0xf;
+		if (data == 3)
+			// copy 24 bit words from processor ram into dsp program ram
+			for (int b = 0; b < apust.epdsp_sgblocks; b++) {
+				uint32_t page = apust.space->read_dword(apust.epdsp_sgaddress + b * 8);
+				for (int w = 0; w < 1024; w++) {
+					v = apust.space->read_dword(page + w * 4);
+					v = v & 0xffffff;
+					epdsp->space(dsp563xx_device::AS_P).write_dword(b * 1024 + w, v);
+				}
+			}
+	}
 }
 
 /*
@@ -1239,8 +1307,6 @@ DEFINE_DEVICE_TYPE(MCPX_AC97_AUDIO, mcpx_ac97_audio_device, "mcpx_ac97_audio", "
 void mcpx_ac97_audio_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x3e, 0x3e).r(FUNC(mcpx_ac97_audio_device::minimum_grant_r));
-	map(0x3f, 0x3f).r(FUNC(mcpx_ac97_audio_device::maximum_latency_r));
 }
 
 void mcpx_ac97_audio_device::ac97_mmio(address_map &map)
@@ -1281,6 +1347,10 @@ void mcpx_ac97_audio_device::device_start()
 	bank_infos[2].adr = 0xfec00000;
 	status = 0x00b0;
 	command = 0x0003;
+	// min_gnt = 0.5 usec, max_lat = 1.25 usec
+	minimum_grant = 2;
+	maximum_latency = 5;
+
 	intr_pin = 1;
 	memset(&ac97st, 0, sizeof(ac97st));
 }
@@ -1373,8 +1443,6 @@ void mcpx_ide_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
 	map(0x08, 0x0b).rw(FUNC(pci_device::class_rev_r), FUNC(mcpx_ide_device::class_rev_w));
-	map(0x3e, 0x3e).r(FUNC(mcpx_ide_device::minimum_grant_r));
-	map(0x3f, 0x3f).r(FUNC(mcpx_ide_device::maximum_latency_r));
 }
 
 void mcpx_ide_device::ide_pri_command(address_map &map)
@@ -1431,6 +1499,9 @@ void mcpx_ide_device::device_start()
 	bank_infos[4].adr = 0xff60;
 	status = 0x00b0;
 	command = 0x0001;
+	// min_gnt = 0.75 usec, max_lat = 0.25 usec
+	minimum_grant = 3;
+	maximum_latency = 1;
 }
 
 void mcpx_ide_device::device_reset()

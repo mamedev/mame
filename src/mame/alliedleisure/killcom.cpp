@@ -148,7 +148,8 @@ uint32_t killcom_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	{
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			bitmap.pix(y, x) = m_videoram[y << 8 | x] & 0x07;
+			const uint16_t offset = (y << 8 & 0xff00) | (x & 0xff);
+			bitmap.pix(y, x) = m_videoram[offset] & 0x07;
 		}
 	}
 

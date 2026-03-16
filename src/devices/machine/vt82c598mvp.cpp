@@ -514,7 +514,8 @@ void vt82c598mvp_bridge_device::device_reset()
 	pci_bridge_device::device_reset();
 
 	command = 0x0007;
-	command_mask = 0x0047;
+	// has SERR# enable (bit 8), has parity error response (bit 6)
+	command_mask = 0x0147;
 	// Medium DEVSEL#, 66 MHz Capable
 	status = 0x0220;
 

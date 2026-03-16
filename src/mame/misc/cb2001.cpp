@@ -1805,6 +1805,23 @@ ROM_END
 ROM_START( bsbonanza ) // DYNA D9902 PCB; DYNA DYNA BSB  V1.1G in bookkeeping screen. Has no DIPs and no PROMs.
 	ROM_REGION16_LE( 0x40000, "boot_prg", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD( "bsb_11g.4c", 0x00000, 0x40000, CRC(6d58b5db) SHA1(ed4f44ecdd66efc433d956f4c571492affa77ff3) )
+	// also seen with "DYNA CASINO HALL HIRANO OSAKA JAPAN" disclaimer text with following hash
+	// CRC(0ceae7c6) SHA1(2a5d216761c2057ad4c17248e872973eec765784)
+	// this second PCB also had 2 banks of 8 switches present
+
+	ROM_REGION( 0x80000, "gfx", 0 )
+	ROM_LOAD16_BYTE( "bsb_1d.12e", 0x00000, 0x40000, CRC(bb74f46c) SHA1(7a969df9adf28c1fa747e553b6cda99cc866ee0c) )
+	// 11e not populated
+	ROM_LOAD16_BYTE( "bsb_3g.9e",  0x00001, 0x40000, CRC(30e2065e) SHA1(6ada4b4c2ff84f1213ced0ce3603c90d7b17c43e) )
+	// 7e not populated
+
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )
+	// no PROMs on PCB
+ROM_END
+
+ROM_START( bsbonanza10 ) // DYNA D9902 PCB; DYNA DYNA BSB  V1.0G in bookkeeping screen. Has no PROMs.
+	ROM_REGION16_LE( 0x40000, "boot_prg", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD( "bsb_10g.4c", 0x00000, 0x40000, CRC(1f48ad0d) SHA1(aae8229bce307b9f3ead3f6481da11bcb914566f) )
 
 	ROM_REGION( 0x80000, "gfx", 0 )
 	ROM_LOAD16_BYTE( "bsb_1d.12e", 0x00000, 0x40000, CRC(bb74f46c) SHA1(7a969df9adf28c1fa747e553b6cda99cc866ee0c) )
@@ -1858,3 +1875,4 @@ GAME( 1995, crzybell,     0,         scherrym,  cb2001,    cb2001_state, init_sm
 GAME( 1998, nmondop,      0,         cb2001,    cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "New Mondo Plus (V0.6I)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, pdouble8 ,    0,         scherrym,  cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna & MK Electronics", "Premium Double Eight (V5.3FA)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2001, bsbonanza,    0,         scherrym,  cb2001,    cb2001_state, empty_init,         ROT0, "Dyna",                  "Bonus Spin Bonanza (V1.1G)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, bsbonanza10,  bsbonanza, scherrym,  cb2001,    cb2001_state, empty_init,         ROT0, "Dyna",                  "Bonus Spin Bonanza (V1.0G)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

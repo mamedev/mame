@@ -53,7 +53,7 @@
 
 #include "emu.h"
 #include "abc1600_v.h"
-#include "abc1600mac.h"
+#include "abc1600_mmu.h"
 #include "bus/abcbus/abcbus.h"
 #include "bus/abckb/abckb.h"
 #include "bus/rs232/rs232.h"
@@ -133,7 +133,7 @@ public:
 	abc1600_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, MC68008P8_TAG),
-		m_mac(*this, ABC1600_MAC_TAG),
+		m_mac(*this, "mmu"),
 		m_dma0(*this, Z8410AB1_0_TAG),
 		m_dma1(*this, Z8410AB1_1_TAG),
 		m_dma2(*this, Z8410AB1_2_TAG),
@@ -158,7 +158,7 @@ public:
 
 private:
 	required_device<m68008_device> m_maincpu;
-	required_device<abc1600_mac_device> m_mac;
+	required_device<abc1600_mmu_device> m_mac;
 	required_device<z80dma_device> m_dma0;
 	required_device<z80dma_device> m_dma1;
 	required_device<z80dma_device> m_dma2;
@@ -212,8 +212,6 @@ private:
 
 	void nmi_w(int state);
 
-	void cpu_space_map(address_map &map) ATTR_COLD;
-
 	void update_br();
 	void update_pren0(int state);
 	void update_pren1(int state);
@@ -232,8 +230,8 @@ private:
 	int m_dbrq1 = CLEAR_LINE;
 	int m_dbrq2 = CLEAR_LINE;
 
-	void abc1600_mem(address_map &map) ATTR_COLD;
 	void mac_mem(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 
 	// peripherals
 	int m_cs7 = 0;                  // card select address bit 7
@@ -645,20 +643,6 @@ void abc1600_state::sysfs_w(int state)
 //  ADDRESS MAPS
 //**************************************************************************
 
-//-------------------------------------------------
-//  ADDRESS_MAP( abc1600_mem )
-//-------------------------------------------------
-
-void abc1600_state::abc1600_mem(address_map &map)
-{
-	map(0x00000, 0xfffff).rw(ABC1600_MAC_TAG, FUNC(abc1600_mac_device::read), FUNC(abc1600_mac_device::write));
-}
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( mac_mem )
-//-------------------------------------------------
-
 void abc1600_state::mac_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).ram();
@@ -680,8 +664,16 @@ void abc1600_state::mac_mem(address_map &map)
 	map(0x1ffa00, 0x1ffaff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr2_map));
 	map(0x1ffb00, 0x1ffb00).mirror(0x7e).w(FUNC(abc1600_state::fw0_w));
 	map(0x1ffb01, 0x1ffb01).mirror(0x7e).w(FUNC(abc1600_state::fw1_w));
-	map(0x1ffd00, 0x1ffd07).mirror(0xf8).w(ABC1600_MAC_TAG, FUNC(abc1600_mac_device::dmamap_w));
+	map(0x1ffd00, 0x1ffd07).mirror(0xf8).w("mmu", FUNC(abc1600_mmu_device::dmamap_w));
 	map(0x1ffe00, 0x1ffe00).mirror(0xff).w("spec_contr_reg", FUNC(ls259_device::write_nibble_d3));
+}
+
+void abc1600_state::cpu_space_map(address_map &map)
+{
+	map(0xffff0, 0xfffff).m(m_maincpu, FUNC(m68008_device::autovectors_map));
+	map(0xffff5, 0xffff5).lr8(NAME([this]() -> u8 { return m_cio->intack_r(); }));
+	map(0xffffb, 0xffffb).lr8(NAME([this]() -> u8 { return m_dart->m1_r(); }));
+	map(0xfffff, 0xfffff).lr8(NAME([this]() -> u8 { m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE); return m68008_device::autovector(7); }));
 }
 
 
@@ -864,14 +856,14 @@ uint8_t abc1600_state::cio_pa_r()
 
 	uint8_t data = 0;
 
-	data |= m_bus2->irq_r();
-	data |= m_bus1->irq_r() << 1;
-	data |= m_bus0x->xint2_r() << 2;
-	data |= m_bus0x->xint3_r() << 3;
-	data |= m_bus0x->xint4_r() << 4;
-	data |= m_bus0x->xint5_r() << 5;
-	data |= m_bus0x->irq_r() << 6;
-	data |= m_bus0i->irq_r() << 7;
+	data |= !m_bus2->irq_r();
+	data |= !m_bus1->irq_r() << 1;
+	data |= !m_bus0x->xint2_r() << 2;
+	data |= !m_bus0x->xint3_r() << 3;
+	data |= !m_bus0x->xint4_r() << 4;
+	data |= !m_bus0x->xint5_r() << 5;
+	data |= !m_bus0x->irq_r() << 6;
+	data |= !m_bus0i->irq_r() << 7;
 
 	return data;
 }
@@ -1008,14 +1000,6 @@ void abc1600_state::nmi_w(int state)
 //  MACHINE INITIALIZATION
 //**************************************************************************
 
-void abc1600_state::cpu_space_map(address_map &map)
-{
-	map(0xffff0, 0xfffff).m(m_maincpu, FUNC(m68008_device::autovectors_map));
-	map(0xffff5, 0xffff5).lr8(NAME([this]() -> u8 { return m_cio->intack_r(); }));
-	map(0xffffb, 0xffffb).lr8(NAME([this]() -> u8 { return m_dart->m1_r(); }));
-	map(0xfffff, 0xfffff).lr8(NAME([this]() -> u8 { m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE); return m68008_device::autovector(7); }));
-}
-
 void abc1600_state::machine_start()
 {
 	// state saving
@@ -1061,29 +1045,27 @@ void abc1600_state::abc1600(machine_config &config)
 {
 	// basic machine hardware
 	M68008(config, m_maincpu, 64_MHz_XTAL / 8);
-	m_maincpu->set_addrmap(AS_PROGRAM, &abc1600_state::abc1600_mem);
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &abc1600_state::cpu_space_map);
-	//m_maincpu->out_bg_callback().set(FUNC(abc1600_state::bg_w));
+	m_maincpu->enable_mmu8();
+
+	LUXOR_ABC1600_MMU(config, m_mac);
+	m_mac->set_addrmap(AS_PROGRAM, &abc1600_state::mac_mem);
+	m_mac->set_addrmap(m68000_base_device::AS_CPU_SPACE, &abc1600_state::cpu_space_map);
+	m_mac->set_cpu(m_maincpu);
+	m_mac->in_tren_cb<0>().set(FUNC(abc1600_state::read_tren0));
+	m_mac->out_tren_cb<0>().set(FUNC(abc1600_state::write_tren0));
+	m_mac->in_tren_cb<1>().set(m_bus1, FUNC(abcbus_slot_device::read_tren));
+	m_mac->out_tren_cb<1>().set(m_bus1, FUNC(abcbus_slot_device::write_tren));
+	m_mac->in_tren_cb<2>().set(m_bus2, FUNC(abcbus_slot_device::read_tren));
+	m_mac->out_tren_cb<2>().set(m_bus2, FUNC(abcbus_slot_device::write_tren));
 
 	// video hardware
 	ABC1600_MOVER(config, ABC1600_MOVER_TAG, 0);
-
-	// devices
-	ABC1600_MAC(config, m_mac, 0);
-	m_mac->set_addrmap(AS_PROGRAM, &abc1600_state::mac_mem);
-	m_mac->set_cpu(m_maincpu);
-	m_mac->in_tren0_cb().set(FUNC(abc1600_state::read_tren0));
-	m_mac->out_tren0_cb().set(FUNC(abc1600_state::write_tren0));
-	m_mac->in_tren1_cb().set(m_bus1, FUNC(abcbus_slot_device::read_tren));
-	m_mac->out_tren1_cb().set(m_bus1, FUNC(abcbus_slot_device::write_tren));
-	m_mac->in_tren2_cb().set(m_bus2, FUNC(abcbus_slot_device::read_tren));
-	m_mac->out_tren2_cb().set(m_bus2, FUNC(abcbus_slot_device::write_tren));
 
 	ls259_device &spec_contr_reg(LS259(config, "spec_contr_reg"));
 	spec_contr_reg.q_out_cb<0>().set(FUNC(abc1600_state::cs7_w));
 	spec_contr_reg.q_out_cb<2>().set(FUNC(abc1600_state::btce_w));
 	spec_contr_reg.q_out_cb<3>().set(FUNC(abc1600_state::atce_w));
-	spec_contr_reg.q_out_cb<4>().set(m_mac, FUNC(abc1600_mac_device::partst_w));
+	spec_contr_reg.q_out_cb<4>().set(m_mac, FUNC(abc1600_mmu_device::partst_w));
 	spec_contr_reg.q_out_cb<5>().set(FUNC(abc1600_state::dmadis_w));
 	spec_contr_reg.q_out_cb<6>().set(FUNC(abc1600_state::sysscc_w));
 	spec_contr_reg.q_out_cb<7>().set(FUNC(abc1600_state::sysfs_w));
@@ -1091,28 +1073,28 @@ void abc1600_state::abc1600(machine_config &config)
 	Z80DMA(config, m_dma0, 64_MHz_XTAL / 16);
 	m_dma0->out_busreq_callback().set(FUNC(abc1600_state::dbrq0_w));
 	m_dma0->out_bao_callback().set(m_dma1, FUNC(z80dma_device::bai_w));
-	m_dma0->in_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_mreq_r));
-	m_dma0->out_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_mreq_w));
+	m_dma0->in_mreq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma0_mreq_r));
+	m_dma0->out_mreq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma0_mreq_w));
 	m_dma0->out_ieo_callback().set([this](int state) { m_bus0i->prac_w(state); m_bus0x->prac_w(state); }).exor(1);
-	m_dma0->in_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_iorq_r));
-	m_dma0->out_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_iorq_w));
+	m_dma0->in_iorq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma0_iorq_r));
+	m_dma0->out_iorq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma0_iorq_w));
 
 	Z80DMA(config, m_dma1, 64_MHz_XTAL / 16);
 	m_dma1->out_busreq_callback().set(FUNC(abc1600_state::dbrq1_w));
 	m_dma1->out_bao_callback().set(m_dma2, FUNC(z80dma_device::bai_w));
-	m_dma1->in_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma1_mreq_r));
-	m_dma1->out_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma1_mreq_w));
+	m_dma1->in_mreq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma1_mreq_r));
+	m_dma1->out_mreq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma1_mreq_w));
 	m_dma1->out_ieo_callback().set(m_bus1, FUNC(abcbus_slot_device::prac_w)).exor(1);
-	m_dma1->in_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma1_iorq_r));
-	m_dma1->out_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma1_iorq_w));
+	m_dma1->in_iorq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma1_iorq_r));
+	m_dma1->out_iorq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma1_iorq_w));
 
 	Z80DMA(config, m_dma2, 64_MHz_XTAL / 16);
 	m_dma2->out_busreq_callback().set(FUNC(abc1600_state::dbrq2_w));
-	m_dma2->in_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma2_mreq_r));
-	m_dma2->out_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma2_mreq_w));
+	m_dma2->in_mreq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma2_mreq_r));
+	m_dma2->out_mreq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma2_mreq_w));
 	m_dma2->out_ieo_callback().set(m_bus2, FUNC(abcbus_slot_device::prac_w)).exor(1);
-	m_dma2->in_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma2_iorq_r));
-	m_dma2->out_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma2_iorq_w));
+	m_dma2->in_iorq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma2_iorq_r));
+	m_dma2->out_iorq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma2_iorq_w));
 
 	Z80DART(config, m_dart, 64_MHz_XTAL / 16);
 	m_dart->out_int_callback().set(FUNC(abc1600_state::dart_irq_w));
@@ -1181,22 +1163,22 @@ void abc1600_state::abc1600(machine_config &config)
 	m_bus0i->trrq_callback().set(FUNC(abc1600_state::update_drdy0));
 
 	ABCBUS_SLOT(config, m_bus0x, 64_MHz_XTAL / 16, abc1600bus_cards, nullptr);
-	m_bus0x->irq_callback().set(m_cio, FUNC(z8536_device::pa6_w));
+	m_bus0x->irq_callback().set(m_cio, FUNC(z8536_device::pa6_w)).invert();
 	m_bus0x->nmi_callback().set(FUNC(abc1600_state::nmi_w));
-	m_bus0x->xint2_callback().set(m_cio, FUNC(z8536_device::pa2_w));
-	m_bus0x->xint3_callback().set(m_cio, FUNC(z8536_device::pa3_w));
-	m_bus0x->xint4_callback().set(m_cio, FUNC(z8536_device::pa4_w));
-	m_bus0x->xint5_callback().set(m_cio, FUNC(z8536_device::pa5_w));
+	m_bus0x->xint2_callback().set(m_cio, FUNC(z8536_device::pa2_w)).invert();
+	m_bus0x->xint3_callback().set(m_cio, FUNC(z8536_device::pa3_w)).invert();
+	m_bus0x->xint4_callback().set(m_cio, FUNC(z8536_device::pa4_w)).invert();
+	m_bus0x->xint5_callback().set(m_cio, FUNC(z8536_device::pa5_w)).invert();
 	m_bus0x->pren_callback().set(FUNC(abc1600_state::update_pren0));
 	m_bus0x->trrq_callback().set(FUNC(abc1600_state::update_drdy0));
 
 	ABCBUS_SLOT(config, m_bus1, 64_MHz_XTAL / 16, abc1600bus_cards, nullptr);
-	m_bus1->irq_callback().set(m_cio, FUNC(z8536_device::pa1_w));
+	m_bus1->irq_callback().set(m_cio, FUNC(z8536_device::pa1_w)).invert();
 	m_bus1->pren_callback().set(FUNC(abc1600_state::update_pren1));
 	m_bus1->trrq_callback().set(FUNC(abc1600_state::update_drdy1));
 
 	ABCBUS_SLOT(config, m_bus2, 64_MHz_XTAL / 16, abc1600bus_cards, "4105");
-	m_bus2->irq_callback().set(m_cio, FUNC(z8536_device::pa0_w));
+	m_bus2->irq_callback().set(m_cio, FUNC(z8536_device::pa0_w)).invert();
 	m_bus2->pren_callback().set(m_dma2, FUNC(z80dma_device::iei_w)).exor(1);
 	m_bus2->trrq_callback().set(m_dma2, FUNC(z80dma_device::rdy_w));
 

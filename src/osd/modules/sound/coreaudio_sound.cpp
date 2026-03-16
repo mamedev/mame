@@ -1703,6 +1703,7 @@ int sound_coreaudio::coreaudio_stream::create_sink_stream(struct coreaudio_devic
 	// Allocate buffer
 	m_headroom = m_sample_bytes * (m_audio_latency * m_sample_rate * 20e-3f);
 	m_buffer_size = m_sample_bytes * std::max<uint32_t>(m_sample_rate * (m_audio_latency + 3) * 20e-3f, 512U);
+	m_input_buffer.set_latency(m_audio_latency);
 	osd_printf_verbose("CoreAudio: Allocating %d bytes of buffer space (%d bytes per frame)\n", m_buffer_size, m_sample_bytes);
 	try
 	{

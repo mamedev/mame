@@ -270,9 +270,9 @@ static const res_net_info popper_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_TTL_OUT,
 	{
-			{ RES_NET_AMP_NONE, 0, 0, 3, { 1000, 470, 220 } },
-			{ RES_NET_AMP_NONE, 0, 0, 3, { 1000, 470, 220 } },
-			{ RES_NET_AMP_NONE, 0, 0, 2, {  470, 220,   0 } }
+		{ RES_NET_AMP_NONE, 0, 0, 3, { 1000, 470, 220 } },
+		{ RES_NET_AMP_NONE, 0, 0, 3, { 1000, 470, 220 } },
+		{ RES_NET_AMP_NONE, 0, 0, 2, {  470, 220,   0 } }
 	}
 };
 
@@ -540,7 +540,7 @@ void popper_state::popper(machine_config &config)
 	Z80(config, m_subcpu, XTAL(18'432'000)/3/2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &popper_state::sub_map);
 
-	config.set_perfect_quantum(m_maincpu);
+	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4));
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
 	outlatch.q_out_cb<0>().set(FUNC(popper_state::nmi_control_w));

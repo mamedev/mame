@@ -29,6 +29,7 @@ Happy Farm (IN.01.02B)             11    P1                        ASTRO V102PX-
 Happy Farm (US.01.02B)             07    _P_ROHS                   ASTRO V102PX-008   ASTRO V07      ASTRO ROHS BA21C00009 M835KK01             Encrypted, also seen on ASTRO _P CS350P071
 Keno 21                            02?   T-3802A                   ASTRO V102PX-001   ASTRO V05      ASTRO F02 2003-04-14                       Encrypted
 Little Witch (EN.01A)              06    P1                        ASTRO V102PX-016   ASTRO V07      ASTRO ROHS BA21C00009 JF13022              Encrypted
+Lucky Spin 1999                    99    B50-4001A                 MC68HC000FN16      ASTRO V01      pLSI1016-60LJ, ASTRO 0006B MCU? (28 pins)
 Magic Bomb (A3.0)                        None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
 Magic Bomb (A3.1A)                       None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
 Magic Bomb (A3.6A)                       None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
@@ -114,6 +115,7 @@ TODO:
 - keno21: doesn't manage to read the CPU code. bp 1160,1,{D5=0x2188;g} for now to go further.
 - crzcircus: needs verifying of inputs, outputs and layout.
 - foxyruby: needs verifying of inputs, outputs and layout.
+- luckys99: needs verifying of inputs, outputs and layout creation.
 
 magibomb sets Q/A as of 18.07.2025:
 MAGIC BOMB\A3.0 (magibomb_a30 run protected)
@@ -326,6 +328,7 @@ public:
 	{ }
 
 	void luckycoin(machine_config &config) ATTR_COLD;
+	void luckys99(machine_config &config) ATTR_COLD;
 	void showhandc(machine_config &config) ATTR_COLD;
 	void showhand(machine_config &config) ATTR_COLD;
 	void skilldrp(machine_config &config) ATTR_COLD;
@@ -381,6 +384,7 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void luckycoin_map(address_map &map) ATTR_COLD;
+	void luckys99_map(address_map &map) ATTR_COLD;
 	void showhandc_map(address_map &map) ATTR_COLD;
 	void showhand_map(address_map &map) ATTR_COLD;
 	void skilldrp_map(address_map &map) ATTR_COLD;
@@ -875,6 +879,23 @@ void astrocorp_state::luckycoin_map(address_map &map)
 	map(0x500000, 0x500001).nopr().w(FUNC(astrocorp_state::screen_enable_w)).umask16(0x00ff);
 	map(0x580001, 0x580001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x600001, 0x600001).w(FUNC(astrocorp_state::oki_bank_w));
+}
+
+void astrocorp_state::luckys99_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x040000, 0x043fff).ram().share("nvram"); // battery
+	map(0x060000, 0x060fff).ram().share(m_spriteram);
+	map(0x062000, 0x062001).nopr().w(FUNC(astrocorp_state::draw_sprites_w));
+	map(0x064000, 0x064001).portr("INPUTS");
+	map(0x068001, 0x068001).w(FUNC(astrocorp_state::eeprom_w));
+	map(0x06a000, 0x06a001).w(FUNC(astrocorp_state::showhandc_outputs_w));
+	map(0x06e000, 0x06e001).portr("EEPROM_IN");
+	map(0x070000, 0x070001).r(FUNC(astrocorp_state::unk_r));
+	map(0x070000, 0x070000).w(m_oki, FUNC(okim6295_device::write));
+	map(0x080000, 0x080000).w(FUNC(astrocorp_state::oki_bank_w)); // always writes 0x00 as ROM is only 0x40000
+	map(0x090000, 0x090001).nopr().w(FUNC(astrocorp_state::screen_enable_w)).umask16(0x00ff);
+	map(0x0a0000, 0x0a01ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
 void astrocorp_state::speeddrp_map(address_map &map)
@@ -1466,6 +1487,28 @@ static INPUT_PORTS_START( skilldrp )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( luckys99 )
+	PORT_INCLUDE( showhand )
+
+	PORT_MODIFY("INPUTS")    // 64000
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1         ) PORT_IMPULSE(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYOUT ) // press with memory_reset to reset settings
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_SLOT_STOP_ALL ) PORT_NAME("Stop All Reels / Take")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_GAMBLE_D_UP   )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_BUTTON2       ) PORT_PLAYER(4)
+	PORT_SERVICE_NO_TOGGLE( 0x0020,   IP_ACTIVE_LOW     )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_SLOT_STOP4    ) PORT_NAME("Stop Reel 4 / Start")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_BUTTON3       ) PORT_PLAYER(4)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_SLOT_STOP1    )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_SLOT_STOP2    )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SLOT_STOP3    ) PORT_NAME("Stop Reel 3 / Bet")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_MEMORY_RESET  ) // press with keyout to reset settings
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_BUTTON4       ) PORT_PLAYER(4)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( magibomb )
 	PORT_INCLUDE( skilldrp )
 
@@ -1674,6 +1717,12 @@ void astrocorp_state::showhandc(machine_config &config)
 {
 	showhand(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &astrocorp_state::showhandc_map);
+}
+
+void astrocorp_state::luckys99(machine_config &config)
+{
+	showhand(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrocorp_state::luckys99_map);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(astrocorp_state::irq_2_4_scanline_cb)
@@ -1957,6 +2006,26 @@ void astoneag_state::astoneag(machine_config &config)
 /***************************************************************************
                                 ROMs Loading
 ***************************************************************************/
+
+// B50-4001A
+// program ROM labels say A.3 but test mode shows A.1
+// similarly to other games, it's possible to enter a test mode with more choices by doing bpset 1230,1,{PC=1236;g}
+// however none of the added choices seems to work
+ROM_START( luckys99 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rom_1_lucky_a.3.even.u16", 0x00000, 0x10000, CRC(5a9a4c57) SHA1(51358f41056e59ee32b7f2e8afd58a968ff8a4ba) ) // 1xxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "rom_2_lucky_a.3.odd.u17",  0x00001, 0x10000, CRC(a339faae) SHA1(c4bd132f095856514cd1049acb5d69ef5e8862b7) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "rom_4_lucky_3.1.even.u26", 0x00000, 0x80000, CRC(05547ef1) SHA1(4730fd4e5843f1eed53d64e24f04f720162ebf7f) )
+	ROM_LOAD16_BYTE( "rom_3_lucky_3.1.odd.u27",  0x00001, 0x80000, CRC(87e1f125) SHA1(cd765c12a9945ddc11678cca765195c0eab464ee) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "rom_5_lucky1", 0x00000, 0x40000, CRC(2b3bece9) SHA1(421a8b9dc314a00304fc3c94f5428bde52c21531) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u9", 0x00, 0x80, CRC(91245bbd) SHA1(e2b677bfd45840a7bcfde6d057a396ad9fbf2d62) ) // factory default
+ROM_END
 
 /***************************************************************************
 
@@ -4550,6 +4619,7 @@ void astoneag_state::interleave_sprites_16x32()
 //     YEAR   NAME             PARENT    MACHINE          INPUTS          STATE            INIT            ROT   COMPANY                         FULLNAME                                        FLAGS                                                                               LAYOUT
 
 // unencrypted
+GAME(  1999,  luckys99,        0,        luckys99,        luckys99,       astrocorp_state, init_showhand,  ROT0, "Astro Corp.",                  "Lucky Spin 1999 (Ver. A.1)",                   MACHINE_SUPPORTS_SAVE )
 GAMEL( 2000,  showhand,        0,        showhand,        showhand,       astrocorp_state, init_showhand,  ROT0, "Astro Corp.",                  "Show Hand (Italy)",                            MACHINE_SUPPORTS_SAVE,                                                              layout_showhand  )
 GAMEL( 2000,  showhandc,       showhand, showhandc,       showhandc,      astrocorp_state, init_showhandc, ROT0, "Astro Corp.",                  "Wangpai Duijue (China)",                       MACHINE_SUPPORTS_SAVE,                                                              layout_showhandc  )
 GAMEL( 2002,  skilldrp,        0,        skilldrp,        skilldrp,       astrocorp_state, empty_init,     ROT0, "Astro Corp.",                  "Skill Drop Georgia (Ver. G1.01S, Oct 1 2002)", MACHINE_SUPPORTS_SAVE,                                                              layout_skilldrp  ) // Oct  1 2002 09:42:32

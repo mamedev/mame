@@ -152,11 +152,10 @@ uint32_t ace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void ace_state::ace_characterram_w(offs_t offset, uint8_t data)
 {
+	data &= 0x07;
+
 	if (m_characterram[offset] != data)
 	{
-		if (data & ~0x07)
-			logerror("write to %04x data = %02x\n", 0x8000 + offset, data);
-
 		m_characterram[offset] = data;
 		m_gfxdecode->gfx(1)->mark_dirty(0);
 		m_gfxdecode->gfx(2)->mark_dirty(0);

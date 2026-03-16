@@ -111,6 +111,18 @@ if SOUNDS["AC97"] then
 	}
 end
 
+---------------------------------------------------
+-- SigmaTel STAC9704
+--@src/devices/sound/ac97_stac9704.h,SOUNDS["AC97_STAC9704"] = true
+---------------------------------------------------
+
+if SOUNDS["AC97_STAC9704"] then
+	files {
+		MAME_DIR .. "src/devices/sound/ac97_stac9704.cpp",
+		MAME_DIR .. "src/devices/sound/ac97_stac9704.h",
+	}
+end
+
 
 ---------------------------------------------------
 -- Apple custom sound chips

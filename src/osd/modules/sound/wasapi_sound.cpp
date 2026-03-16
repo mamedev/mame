@@ -275,6 +275,7 @@ sound_wasapi::stream_info::stream_info(
 	m_exiting(false)
 {
 	info.m_node = node.m_id;
+	m_buffer.set_latency(host.m_audio_latency / 20e-3F);
 	InitializeCriticalSection(&m_critical_section);
 }
 

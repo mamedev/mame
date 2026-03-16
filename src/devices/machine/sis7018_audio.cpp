@@ -5,9 +5,8 @@
 SiS 7018 Audio device (AC'97 compliant)
 
 TODO:
-- Stub interface, to be improved;
+- Derive from Trident 4DWave-DX/-NX (very similar interface);
 - shutms11 uses an AD1881 as AC'97 engine;
-- Reportedly based off Trident 4DWave technology, some registers effectively matches up;
 
 **************************************************************************************************/
 
@@ -35,7 +34,7 @@ sis7018_audio_device::sis7018_audio_device(const machine_config &mconfig, const 
 	: pci_device(mconfig, SIS7018_AUDIO, tag, owner, clock)
 	, m_joy(*this, "pc_joy")
 {
-	// 0x040100 - Multimedia device, audio device (vendor specific i/f)
+	// 0x040100 - Multimedia device, audio device (no specific vendor interface)
 	// 0x01 - Rev 1
 	set_ids(0x10397018, 0x01, 0x040100, 0x00);
 }
@@ -65,6 +64,8 @@ void sis7018_audio_device::config_map(address_map &map)
 	);
 	// 0x45 Legacy DMA Decoding
 	// 0x46 PM_CFG Power Management Config (Legacy Control on Trident)
+	// 0x47 Inactivity Timer Expiration Control
+	// 0x48-0x49 Int Acknowledge Snoop
 
 	// PMC capability identifier
 	map(0xdc, 0xdf).r(FUNC(sis7018_audio_device::pmc_id_r));
@@ -100,11 +101,14 @@ void sis7018_audio_device::io_map(address_map &map)
 void sis7018_audio_device::device_start()
 {
 	pci_device::device_start();
+
 	add_map(256, M_IO, FUNC(sis7018_audio_device::io_map));
 	// not explicitly stated, assume 4096 size from the MEM decoding
 	add_map(4096, M_MEM, FUNC(sis7018_audio_device::memory_map));
 
-	// TODO: PCI regs 0x3e/0x3f max_lat = 0x18, min_gnt = 0x02
+	// min_gnt = 500 nsec, max_lat = 6 usec (way more than Trident)
+	minimum_grant = 0x02;
+	maximum_latency = 0x18;
 }
 
 
@@ -113,9 +117,14 @@ void sis7018_audio_device::device_reset()
 	pci_device::device_reset();
 
 	command = 0x0000;
-	status = 0x0000;
+	command_mask = 7;
+	// NOTE: claims fast back-to-back capable vs. Trident
+	status = 0x0290;
+
 	// INTA#
 	intr_pin = 1;
+	intr_line = 0x05;
+
 	// TODO: can be written to with $46=1
 	subsystem_id = 0x10397018;
 

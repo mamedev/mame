@@ -315,17 +315,14 @@ uint32_t yiear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 uint8_t yiear_state::speech_r()
 {
-	if (m_vlm->bsy())
-		return 1;
-	else
-		return 0;
+	return m_vlm->bsy_r();
 }
 
 void yiear_state::vlm5030_control_w(uint8_t data)
 {
 	// bit 0 is latch direction
-	m_vlm->st((data >> 1) & 1);
-	m_vlm->rst((data >> 2) & 1);
+	m_vlm->st_w(BIT(data, 1));
+	m_vlm->rst_w(BIT(data, 2));
 }
 
 void yiear_state::vblank_irq(int state)

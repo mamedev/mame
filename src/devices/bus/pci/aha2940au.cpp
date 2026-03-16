@@ -44,6 +44,7 @@ aha2940_scsi_device::aha2940_scsi_device(const machine_config &mconfig, device_t
 aha2940_scsi_device::aha2940_scsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: aha2940_scsi_device(mconfig, AHA2940, tag, owner, clock)
 {
+	// lspci confirmed values
 	set_ids(0x90047178, 0x01, 0x010000, 0x90047178);
 }
 
@@ -62,7 +63,7 @@ const tiny_rom_entry *aha2940_scsi_device::device_rom_region() const
 
 void aha2940_scsi_device::device_add_mconfig(machine_config &config)
 {
-	// AIC-7870
+	// AIC-7870P/7881U [AHA-2940U/UW/D/S76]
 
 	// C06/C46/C56/C66 compatible, confirmed C46 in this case
 	EEPROM_93C46_16BIT(config, m_eeprom);
@@ -83,8 +84,9 @@ void aha2940_scsi_device::device_start()
 
 	// INTA#
 	intr_pin = 1;
-	// TODO: definitely uses PCI regs 0x3e/0x3f
-	// max_lat = 0x08, min_gnt = 0x08
+	// max_lat = 2 usec, min_gnt = 2 usec
+	minimum_grant = 0x08;
+	maximum_latency = 0x08;
 }
 
 void aha2940_scsi_device::device_reset()
@@ -165,9 +167,8 @@ void aha2940_scsi_device::mem_map(address_map &map)
 aha2940au_scsi_device::aha2940au_scsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: aha2940_scsi_device(mconfig, AHA2940AU, tag, owner, clock)
 {
-	// TODO: unknown revision
-	// class code should be 0x01'0000 as per AIC-7890 manual
-	set_ids(0x90046178, 0x00, 0x010000, 0x90046178);
+	// lspci confirmed values
+	set_ids(0x90046178, 0x01, 0x010000, 0x90046178);
 }
 
 // NOTE: BIOS is FAT compressed, decompress as 8bios.bin under the hood.
@@ -210,9 +211,9 @@ void aha2940au_scsi_device::device_start()
 
 	// INTA#
 	intr_pin = 1;
-	// TODO: definitely uses PCI regs 0x3e/0x3f
-	// max_lat = 0x19, min_gnt = 0x27 for AIC-7890
-	// others may be different
+	// max_lat = 1 usec, min_gnt = 1 usec
+	minimum_grant = 0x04;
+	maximum_latency = 0x04;
 }
 
 void aha2940au_scsi_device::device_reset()

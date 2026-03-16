@@ -17,6 +17,8 @@ public:
 		virtual void write_data(offs_t addr, u8 data) = 0;
 		virtual u8 read_cpu(offs_t addr) = 0;
 		virtual void set_super(bool super) = 0;
+
+		virtual bool translate(int spacenum, int intention, offs_t &address, address_space *&target_space) = 0;
 	};
 
 	// construction/destruction
@@ -24,12 +26,26 @@ public:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	void set_current_mmu(mmu8 *m);
+	void enable_mmu8(bool disable_spaces = true);
+	void set_current_mmu8(mmu8 *m);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 protected:
+	struct mmu8_disabled : public mmu8 {
+		u8 read_program(offs_t addr) override { return 0; }
+		void write_program(offs_t addr, u8 data) override { }
+		u8 read_data(offs_t addr) override { return 0; }
+		void write_data(offs_t addr, u8 data) override { }
+		u8 read_cpu(offs_t addr) override { return 0; }
+		void set_super(bool super) override { }
+
+		bool translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override { return false; }
+	};
+
 	// Typed constructor
 	m68008_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
@@ -48,7 +64,8 @@ protected:
 	// Dynamic specifics, depending on supervisor state
 	memory_access<24, 0, 0, ENDIANNESS_BIG>::specific m_program8, m_opcodes8;
 
-	// MMU, if one present
+	// MMU, if one present, plus the default one
+	mmu8_disabled m_mmu8_disabled;
 	mmu8 *m_mmu8;
 
 	virtual void update_user_super() override;

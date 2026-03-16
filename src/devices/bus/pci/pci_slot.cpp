@@ -193,4 +193,5 @@ void agp_cards(device_slot_interface &device)
 	device.option_add("neon250",        NEON250);
 	// SiS
 	device.option_add("sis6326_agp",    SIS6326_AGP);
+	device.option_add("sis6326_dvd",    SIS6326_DVD);
 }

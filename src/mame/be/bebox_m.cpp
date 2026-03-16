@@ -85,6 +85,8 @@
         #11     Intel 82378 PCI/ISA bridge
         #12     NCR 53C810 SCSI
 
+    Super I/O is an Intel 82091AA AIP
+
     More hardware information at http://www.netbsd.org/Ports/bebox/hardware.html
 
 ***************************************************************************/

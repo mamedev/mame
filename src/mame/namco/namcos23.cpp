@@ -4048,7 +4048,7 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 		u32 type = data[offs++];
 		u32 h    = data[offs++];
 
-		u32 cmode = (type & 0x70000000) >> 29;
+		u32 cmode = (type & 0x70000000) >> 28;
 		u32 tbase = (((type & 0x0f000000) >> 24) << 12) | (BIT(type, 31) << 16);
 		u8 color = (h >> 24) & 0x7f;
 		int lmode = (type >> 19) & 3;

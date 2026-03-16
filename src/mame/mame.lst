@@ -13,9 +13,9 @@
 virusa
 virusb
 virusc
+viruscl
 virusrck
 virusrckxl
-viruscl
 
 @source:acorn/aa310.cpp
 aa500
@@ -463,6 +463,7 @@ funlddlx
 funlddlx2
 funlddlx4
 quickjac
+sbsoli
 skattv
 skattva
 trumpfas
@@ -522,17 +523,34 @@ vmulti
 action
 allfred
 bigjkpot
+bigwinnr
+disc4000
+discfun
+dpplson
 dscbonus
 dscjkpot
+gjubil
 grandhnd
+grnada
+jack4000
 jkrpoker
 jmbojmbo
 jmbojmbf
+jumbo400
+jumboa
 kleoptra
+kometf1
+mdouble
+moneyf1
 multmult
+multprim
+multstar
+mystjack
+nunran
 st_ohla
 st_vulkn
 sunny
+suprdisc
 taipan
 turbosun
 
@@ -638,7 +656,6 @@ champbasja
 champbasjb
 champbb2
 champbb2j
-tbasebal
 exctscc2
 exctsccr
 exctsccra
@@ -647,6 +664,7 @@ exctsccrj
 exctsccrjo
 exctsccru
 talbot
+tbasebal
 
 @source:alpha/equites.cpp
 bngotime
@@ -1562,6 +1580,7 @@ hapfarm_in0101a
 hapfarm_in0102b
 keno21
 luckycoin
+luckys99
 lwitch
 magibomb
 magibomb_a30
@@ -2473,6 +2492,7 @@ ppsatan
 pwrinst2
 pwrinst2a
 pwrinst2j
+pwrinst2ja
 sailormn
 sailormnh
 sailormnj
@@ -16499,11 +16519,11 @@ hrclass
 tsclass
 
 @source:ces/galgames.cpp
+galgames
 galgame2
 galgame3
 galgame4
 galgame4p
-galgbios
 
 @source:chess/ave_arb.cpp
 arb
@@ -17693,6 +17713,10 @@ aviion_4600
 @source:dgrm/blackt96.cpp
 blackt96
 
+@source:dgrm/onetwo.cpp
+onetwo
+onetwoe
+
 @source:dgrm/pokechmp.cpp
 billlist
 pokechmp
@@ -18870,6 +18894,9 @@ surfplnt40
 @source:gaelco/gaelcof3.cpp
 autopapa
 donpepito
+futbol
+futbola
+futbolt
 mueve
 obladi
 susanita
@@ -18888,6 +18915,7 @@ glass10a
 glass10b
 glass10c
 glass10d
+glass10e
 glassa
 glassat
 glasskr
@@ -18913,6 +18941,9 @@ lotoplay
 lotoplaya
 lotoplayb
 lotoplayp
+lotoplayz
+lotoplayza
+lotoplayzb
 
 @source:gaelco/mastboy.cpp
 mastboy
@@ -18957,6 +18988,7 @@ nsplashkra
 paintlad
 puckpepl
 rebus
+ringball
 roldfrog
 roldfroga
 splash
@@ -18965,7 +18997,6 @@ splash11
 splash12
 splashkr
 splashna
-ringball
 
 @source:gaelco/splash_ms.cpp
 splashms
@@ -20835,6 +20866,7 @@ fl7_twa
 goldfrui
 goldstar
 goldstbl
+goldstbla
 gregular
 halltsk
 hamhouse
@@ -21075,6 +21107,7 @@ tarzan
 tarzan103m
 tarzan106fa
 tarzan201fa
+tarzan201faa
 tarzan202fa
 tarzana
 tarzanb
@@ -22185,6 +22218,9 @@ in213ae
 @source:intel/basic52.cpp
 basic31
 basic52
+
+@source:intel/i420ex.cpp
+entrada
 
 @source:intel/imds2.cpp
 imds2
@@ -30213,6 +30249,7 @@ castrev
 
 @source:misc/cb2001.cpp
 bsbonanza
+bsbonanza10
 cb2001
 cb4
 cb4a
@@ -31736,6 +31773,9 @@ h01b
 nf500a
 h01jce
 
+@source:misc/haiwei.cpp
+hqdf
+
 @source:misc/hapyfish.cpp
 hapyfsh2
 
@@ -32722,10 +32762,6 @@ maddonna
 komocomo
 maddonnab
 oneshot
-
-@source:misc/onetwo.cpp
-onetwo
-onetwoe
 
 @source:misc/opercoin.cpp
 multibaby
@@ -34147,6 +34183,13 @@ ds5000
 @source:namco/ds6000.cpp
 ds6000
 
+@source:namco/funcube.cpp
+funcube
+funcube2
+funcube3
+funcube4
+funcube5
+
 @source:namco/gal3.cpp
 gal3
 
@@ -34216,6 +34259,9 @@ superpacm
 todruaga
 todruagao
 todruagas
+
+@source:namco/namcoeva.cpp
+hammerch
 
 @source:namco/namcofl.cpp
 finalapr
@@ -34661,6 +34707,7 @@ ridgeracf
 ridgeracj
 timecris
 timecrisa
+timecrisj
 tokyowar
 tokyowarj
 victlap
@@ -34742,6 +34789,7 @@ topracera
 topracern
 
 @source:namco/quickncrash.cpp
+cgunman
 qncrash
 qncrasha
 
@@ -34977,6 +35025,9 @@ tg16
 @source:nec/pcfx.cpp
 pcfx
 pcfxga
+
+@source:nec/piet1.cpp
+piet1
 
 @source:nec/tk80bs.cpp
 tk80bs
@@ -36961,6 +37012,7 @@ mspacmanbhe
 mspacmanbi
 mspacmanblt
 mspacmanblt2
+mspacmanbpl
 mspacmancr
 mspacmane
 mspacmane2
@@ -42258,6 +42310,7 @@ pdrift
 pdrifta
 pdrifte
 pdriftj
+pdriftja
 pdriftjb
 pdriftl
 rchase
@@ -43079,9 +43132,6 @@ macsbios
 yujan
 yuka
 
-@source:seta/namcoeva.cpp
-hammerch
-
 @source:seta/rmhaihai.cpp
 rmhaihai
 rmhaihai2
@@ -43174,11 +43224,6 @@ deerhuntj
 endrichs
 endrichsa
 endrichsb
-funcube
-funcube2
-funcube3
-funcube4
-funcube5
 grdians
 grdiansa
 grdiansbl
@@ -43460,6 +43505,20 @@ warcadia
 @source:sigma/r2dtank.cpp
 r2dtank
 
+@source:sigma/sammymdl.cpp
+animalc
+gocowboy
+gunkids
+haekaka
+itazuram
+kingyosu
+kotekita
+pyenaget
+sammymdl
+shatekds
+tdoboon
+wantouch
+
 @source:sigma/sigma21.cpp
 sigma21
 
@@ -43477,28 +43536,16 @@ cool104
 freedeal
 
 @source:sigma/sigmab98.cpp
-animalc
 b3rinsya
 dashhero
 dodghero
 gegege
-gocowboy
-gunkids
-haekaka
-itazuram
-kingyosu
-kotekita
 lufykzku
 mnrockman
 pepsiman
-pyenaget
-sammymdl
-shatekds
 sushimar
 tbeastw2
-tdoboon
 ucytokyu
-wantouch
 
 @source:sigma/spiders.cpp
 spiders
@@ -44053,6 +44100,7 @@ hprotr8a
 ht68k
 
 @source:skeleton/huangyeh_m68k.cpp
+wlfx
 wlzb
 
 @source:skeleton/hudson_poems.cpp
@@ -44153,6 +44201,7 @@ lggp40
 @source:skeleton/lgtz80.cpp
 arthurkn
 arthurkn100
+circus2
 fruitcat
 pharmyst
 
@@ -46985,6 +47034,9 @@ ti990_10
 @source:ti/ti990_4.cpp
 ti990_4
 ti990_4v
+
+@source:ti/tipc.cpp
+tipc
 
 @source:ti/tm990189.cpp
 990189

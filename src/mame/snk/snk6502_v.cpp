@@ -168,7 +168,7 @@ VIDEO_START_MEMBER(snk6502_state,snk6502)
 	m_gfxdecode->gfx(0)->set_source(m_charram);
 }
 
-VIDEO_START_MEMBER(snk6502_state,pballoon)
+VIDEO_START_MEMBER(fantasy_state,pballoon)
 {
 	VIDEO_START_CALL_MEMBER( snk6502 );
 

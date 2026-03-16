@@ -9,6 +9,7 @@
 
 
 // constants for IEEE754 single-precision float format
+constexpr uint32_t  FLOAT_CANONICAL_NAN     = 0xffffffff;
 constexpr uint32_t  FLOAT_INFINITY          = 0x7f800000;
 constexpr uint32_t  FLOAT_SIGN_MASK         = 0x80000000;
 constexpr uint32_t  FLOAT_EXPONENT_MASK     = 0x7f800000;

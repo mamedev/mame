@@ -303,8 +303,8 @@ ROM_END
 
 ROM_START( fscc9ps )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("play64c1.bin", 0xc000, 0x2000, CRC(e96aa95d) SHA1(16d90cf0ef166aef579d442671290a2c43e24dfe) )
-	ROM_LOAD("play64en.bin", 0xe000, 0x2000, CRC(6fa188d2) SHA1(1b9b0209c496c89ecb7f9ec07bfd9429ff9b275e) )
+	ROM_LOAD("c_green", 0xc000, 0x2000, CRC(e96aa95d) SHA1(16d90cf0ef166aef579d442671290a2c43e24dfe) )
+	ROM_LOAD("e_green", 0xe000, 0x2000, CRC(d7a95999) SHA1(27c19bc56a15f1ac78177683441e04f27c6e48ef) )
 ROM_END
 
 } // anonymous namespace

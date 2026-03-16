@@ -867,7 +867,7 @@ void cio_base_device::match_pattern(int port)
 	switch ((pms & PMS_PMS_MASK) >> 1)
 	{
 	case PMS_OR_PEV:
-		m_match[port] = (m_input[port] ^ pol) & ddr & pm;
+		m_match[port] = (m_input[port] ^ ~pol) & ddr & pm;
 
 		if (m_match[port])
 		{

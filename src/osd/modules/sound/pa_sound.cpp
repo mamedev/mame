@@ -209,15 +209,16 @@ uint32_t sound_pa::stream_sink_open(uint32_t node, std::string name, uint32_t ra
 	if(node < 1 || node > m_info.m_nodes.size())
 		return 0;
 
-	uint32_t id = m_stream_id ++;
-	auto si = m_streams.emplace(id, stream_info(this, m_info.m_nodes[node-1].m_sinks, id, node)).first;
-
 	PaStreamParameters op;
 	op.device = node - 1;
 	op.channelCount = m_info.m_nodes[node-1].m_sinks;
 	op.sampleFormat = paInt16;
 	op.suggestedLatency = (m_audio_latency > 0.0f) ? m_audio_latency : Pa_GetDeviceInfo(node - 1)->defaultLowOutputLatency;
 	op.hostApiSpecificStreamInfo = nullptr;
+
+	uint32_t id = m_stream_id ++;
+	auto si = m_streams.emplace(id, stream_info(this, m_info.m_nodes[node-1].m_sinks, id, node)).first;
+	si->second.m_buffer.set_latency(op.suggestedLatency / 20e-3);
 
 	PaError err = Pa_OpenStream(&si->second.m_stream, nullptr, &op, rate, paFramesPerBufferUnspecified, 0, s_stream_callback, &si->second);
 	if(!err)
@@ -239,15 +240,16 @@ uint32_t sound_pa::stream_source_open(uint32_t node, std::string name, uint32_t 
 	if(node < 1 || node > m_info.m_nodes.size())
 		return 0;
 
-	uint32_t id = m_stream_id ++;
-	auto si = m_streams.emplace(id, stream_info(this, m_info.m_nodes[node-1].m_sources, id, node)).first;
-
 	PaStreamParameters ip;
 	ip.device = node - 1;
 	ip.channelCount = m_info.m_nodes[node-1].m_sources;
 	ip.sampleFormat = paInt16;
 	ip.suggestedLatency = (m_audio_latency > 0.0f) ? m_audio_latency : Pa_GetDeviceInfo(node - 1)->defaultLowInputLatency;
 	ip.hostApiSpecificStreamInfo = nullptr;
+
+	uint32_t id = m_stream_id ++;
+	auto si = m_streams.emplace(id, stream_info(this, m_info.m_nodes[node-1].m_sources, id, node)).first;
+	si->second.m_buffer.set_latency(ip.suggestedLatency / 20e-3);
 
 	PaError err = Pa_OpenStream(&si->second.m_stream, &ip, nullptr, rate, paFramesPerBufferUnspecified, 0, s_stream_callback, &si->second);
 	if(!err)

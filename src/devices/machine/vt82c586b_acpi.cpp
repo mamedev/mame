@@ -45,6 +45,7 @@ vt82c586b_acpi_device::vt82c586b_acpi_device(const machine_config &mconfig, cons
 	: pci_device(mconfig, VT82C586B_ACPI, tag, owner, clock)
 	, m_acpi(*this, "acpi")
 	, m_sci_pin_cb(*this)
+	, m_general_config(0)
 {
 	// xxxx ---- Silicon Version Code
 	// ---- xxxx Silicon Revision Code
@@ -58,6 +59,9 @@ vt82c586b_acpi_device::vt82c586b_acpi_device(const machine_config &mconfig, cons
 void vt82c586b_acpi_device::device_start()
 {
 	pci_device::device_start();
+
+	// undefined, use ls5ampv3 default
+	m_iobase = 0x5000;
 
 	save_item(NAME(m_pin_config));
 	save_item(NAME(m_general_config));
@@ -80,17 +84,18 @@ void vt82c586b_acpi_device::device_reset()
 	m_pin_config = 0xc0;
 	m_general_config = 0;
 	m_sci_irq_config = 0;
-	// undefined, use ls5ampv3 default
-	m_iobase = 0x5000;
 	std::fill(std::begin(m_irq_channel), std::end(m_irq_channel), 0);
 	remap_cb();
+}
+
+uint8_t vt82c586b_acpi_device::latency_timer_r()
+{
+	return 0x16;
 }
 
 void vt82c586b_acpi_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	// latency timer
-	map(0x0d, 0x0d).lr8(NAME([] () { return 0x16; }));
 
 	map(0x40, 0x40).lrw8(
 		NAME([this] () { return m_pin_config; }),

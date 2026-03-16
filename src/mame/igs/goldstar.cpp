@@ -15698,7 +15698,7 @@ void goldstar_state::goldstbl(machine_config &config)
 	aysnd.port_b_read_callback().set_ioport("DSW3");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	OKIM6295(config, "oki", OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // 1000J blue resonator. Pin 7 not verified
 
 	// payout hardware
 	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(50));
@@ -17118,6 +17118,21 @@ ROM_START( goldstbl )
 
 	ROM_REGION( 0x40000, "oki", 0 )  // Audio ADPCM
 	ROM_LOAD( "gs1-snd.bin",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
+ROM_END
+
+ROM_START( goldstbla ) // program similar to goldstbl, with some spelling fixes and other minor changes
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "14", 0x00000, 0x10000, CRC(1bf55f1e) SHA1(dff12d357fc4ce1fd07140e53e983a24a7b7c3f7) ) // 0xxxxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(   0x00000, 0x10000 )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "12", 0x00000, 0x20000, CRC(a2d5b898) SHA1(84cca22c91628cfefb67013652b151f034a06159) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "13", 0x00000, 0x20000, CRC(8a5f274d) SHA1(0f2ad61b00e220fc509c01c11c1a8f4e47b54f2a) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "11", 0x00000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
 ROM_END
 
 
@@ -33722,6 +33737,7 @@ void cmaster_state::init_cm99()
 //     YEAR  NAME        PARENT    MACHINE   INPUT     STATE           INIT            ROT   COMPANY              FULLNAME                                       FLAGS                LAYOUT
 GAMEL( 199?, goldstar,   0,        goldstar, goldstar, goldstar_state, init_goldstar,  ROT0, "IGS",               "Golden Star",                                 0,                   layout_goldstar )
 GAMEL( 199?, goldstbl,   goldstar, goldstbl, goldstar, goldstar_state, empty_init,     ROT0, "IGS",               "Golden Star (Blue version)",                  0,                   layout_goldstar )
+GAMEL( 199?, goldstbla,  goldstar, moonlght, goldstar, goldstar_state, empty_init,     ROT0, "bootleg",           "Golden Star (Blue version, newer)",           0,                   layout_goldstar )
 GAME(  199?, moonlght,   goldstar, moonlght, goldstar, goldstar_state, empty_init,     ROT0, "bootleg",           "Moon Light (v.0629, low program)",            0 )
 GAME(  199?, moonlghta,  goldstar, moonlght, goldstar, goldstar_state, empty_init,     ROT0, "bootleg",           "Moon Light (v.0629, high program)",           0 )
 GAME(  199?, moonlghtb,  goldstar, moonlght, goldstar, goldstar_state, init_moonlghtb, ROT0, "bootleg",           "Moon Light (v.02L0A, low program)",           0 )

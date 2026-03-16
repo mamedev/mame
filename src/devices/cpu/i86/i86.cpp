@@ -606,10 +606,9 @@ void i8086_common_cpu_device::execute_set_input( int inptnum, int state )
 {
 	if (inptnum == INPUT_LINE_NMI)
 	{
-		if (!m_nmi_state && state)
-		{
+		// don't accept NMI edge at exactly the same time RESET is cleared
+		if (!m_nmi_state && state && total_cycles())
 			m_pending_irq |= NMI_IRQ;
-		}
 		m_nmi_state = state;
 	}
 	else if (inptnum == INPUT_LINE_TEST)
@@ -619,13 +618,9 @@ void i8086_common_cpu_device::execute_set_input( int inptnum, int state )
 	else
 	{
 		if (state == CLEAR_LINE)
-		{
 			m_pending_irq &= ~INT_IRQ;
-		}
 		else
-		{
 			m_pending_irq |= INT_IRQ;
-		}
 	}
 }
 

@@ -94,7 +94,7 @@ void vrender0soc_device::regs_map(address_map &map)
 //  map(0x02400, 0x027ff)                            // Peripheral Chip Select
 //  map(0x02800, 0x02bff)                            // SIO
 //  map(0x03400, 0x037ff)                            // CRT Controller
-	map(0x03400, 0x037ff).rw(FUNC(vrender0soc_device::crtc_r), FUNC(vrender0soc_device::crtc_w)).share("crtcregs");
+	map(0x03400, 0x037ff).rw(FUNC(vrender0soc_device::crtc_r), FUNC(vrender0soc_device::crtc_w)).share(m_crtcregs);
 //  map(0x04000, 0x043ff)                            // RAMDAC & PLL
 //  map(0x04000, 0x04003)                            // PLL control register
 //  map(0x04004, 0x04007)                            // PLL Program register
@@ -160,10 +160,10 @@ void vrender0soc_device::device_start()
 	if (this->clock() == 0)
 		fatalerror("%s: bus clock not setup properly", machine().describe_context());
 
-	m_timer[0] = timer_alloc(FUNC(vrender0soc_device::timer_cb<0>), this);
-	m_timer[1] = timer_alloc(FUNC(vrender0soc_device::timer_cb<1>), this);
-	m_timer[2] = timer_alloc(FUNC(vrender0soc_device::timer_cb<2>), this);
-	m_timer[3] = timer_alloc(FUNC(vrender0soc_device::timer_cb<3>), this);
+	m_timer[0].timer = timer_alloc(FUNC(vrender0soc_device::timer_cb<0>), this);
+	m_timer[1].timer = timer_alloc(FUNC(vrender0soc_device::timer_cb<1>), this);
+	m_timer[2].timer = timer_alloc(FUNC(vrender0soc_device::timer_cb<2>), this);
+	m_timer[3].timer = timer_alloc(FUNC(vrender0soc_device::timer_cb<3>), this);
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -175,8 +175,8 @@ void vrender0soc_device::device_start()
 	save_item(NAME(m_int_high));
 	save_item(NAME(m_intst));
 
-	save_item(NAME(m_timer_control));
-	save_item(NAME(m_timer_count));
+	save_item(STRUCT_MEMBER(m_timer, control));
+	save_item(STRUCT_MEMBER(m_timer, count));
 	save_item(STRUCT_MEMBER(m_dma, src));
 	save_item(STRUCT_MEMBER(m_dma, dst));
 	save_item(STRUCT_MEMBER(m_dma, size));
@@ -185,7 +185,7 @@ void vrender0soc_device::device_start()
 
 void vrender0soc_device::write_line_tx(int port, u8 value)
 {
-	//printf("callback %d %02x\n",port,value);
+	//logerror("callback %d %02x\n", port, value);
 	m_write_tx[port & 1](value);
 }
 
@@ -203,13 +203,14 @@ void vrender0soc_device::device_reset()
 	//m_FlipCount = 0;
 	m_int_high = 0;
 
-	m_dma[0].ctrl = 0;
-	m_dma[1].ctrl = 0;
-
-	for (int i = 0; i < 4; i++)
+	for (auto &dma: m_dma)
 	{
-		m_timer_control[i] = 0xff << 8;
-		m_timer[i]->adjust(attotime::never);
+		dma.ctrl = 0;
+	}
+	for (auto &tmr : m_timer)
+	{
+		tmr.control = 0xff << 8;
+		tmr.timer->adjust(attotime::never);
 	}
 }
 
@@ -332,24 +333,26 @@ void vrender0soc_device::soundirq_cb(int state)
 
 void vrender0soc_device::timer_start(int which)
 {
-	int const pd = (m_timer_control[which] >> 8) & 0xff;
-	int const tcv = m_timer_count[which] & 0xffff;
+	vr0_timer &tmr = m_timer[which];
+	int const pd = (tmr.control >> 8) & 0xff;
+	int const tcv = tmr.count & 0xffff;
 	// TODO: documentation claims this is bus clock, half the internal PLL frequency.
 	attotime const period = attotime::from_hz(this->clock()) * 2 * ((pd + 1) * (tcv + 1));
-	m_timer[which]->adjust(period);
+	tmr.timer->adjust(period);
 
-//  printf("timer %d start, pd = %x tcv = %x period = %s\n", which, pd, tcv, period.as_string());
+//  logerror("timer %d start, pd = %x tcv = %x period = %s\n", which, pd, tcv, period.as_string());
 }
 
 template<int Which>
 TIMER_CALLBACK_MEMBER(vrender0soc_device::timer_cb)
 {
 	static const int num[] = { 0, 1, 9, 10 };
+	vr0_timer &tmr = m_timer[Which];
 
-	if (m_timer_control[Which] & 2)
+	if (BIT(tmr.control, 1))
 		timer_start(Which);
 	else
-		m_timer_control[Which] &= ~1;
+		tmr.control &= ~1;
 
 	int_req(num[Which]);
 }
@@ -357,26 +360,27 @@ TIMER_CALLBACK_MEMBER(vrender0soc_device::timer_cb)
 template<int Which>
 u32 vrender0soc_device::tmcon_r()
 {
-	return m_timer_control[Which];
+	return m_timer[Which].control;
 }
 
 template<int Which>
 void vrender0soc_device::tmcon_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	u32 const old = m_timer_control[Which];
-	data = COMBINE_DATA(&m_timer_control[Which]);
+	vr0_timer &tmr = m_timer[Which];
+	u32 const old = tmr.control;
+	data = COMBINE_DATA(&tmr.control);
 
-	if ((data ^ old) & 1)
+	if (BIT(data ^ old, 0))
 	{
-		if (data & 1)
+		if (BIT(data, 0))
 		{
 			timer_start(Which);
 		}
 		else
 		{
 			// Timer stop
-			m_timer[Which]->adjust(attotime::never);
-//          printf("timer %d stop\n", Which);
+			tmr.timer->adjust(attotime::never);
+//          logerror("%s: timer %d stop\n", machine().describe_context(), Which);
 		}
 	}
 }
@@ -384,13 +388,13 @@ void vrender0soc_device::tmcon_w(offs_t offset, u32 data, u32 mem_mask)
 template<int Which>
 u16 vrender0soc_device::tmcnt_r()
 {
-	return m_timer_count[Which] & 0xffff;
+	return m_timer[Which].count & 0xffff;
 }
 
 template<int Which>
 void vrender0soc_device::tmcnt_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_timer_count[Which]);
+	COMBINE_DATA(&m_timer[Which].count);
 }
 
 /*
@@ -400,13 +404,16 @@ void vrender0soc_device::tmcnt_w(offs_t offset, u16 data, u16 mem_mask)
  */
 
 // helper
-// bit 5 and bit 3 of the DMA control don't increment source/destination addresses if enabled.
+// bit 5 and bit 3 of the DMA control don't in/decrement source/destination addresses if enabled.
 // At the time of writing P's Attack is the only SW that uses this feature,
 // in a work RAM to area $4500000 transfer, probably to extend something ...
-inline int vrender0soc_device::dma_setup_hold(u8 setting, u8 bitmask)
+inline int dma_setup_hold(u8 setting, u8 holdbit, u8 dirbit)
 {
-	// TODO: supports negative value
-	return setting & bitmask ? 0 : (setting & 2) ? 4 : (1 << (setting & 1));
+	if (BIT(setting, holdbit))
+		return 0;
+
+	int const amount = BIT(setting, 1) ? 4 : (1 << BIT(setting, 0));
+	return BIT(setting, dirbit) ? -amount : amount;
 }
 
 template<int Which> u32 vrender0soc_device::dmasa_r() { return m_dma[Which].src; }
@@ -419,19 +426,42 @@ template<int Which> u32 vrender0soc_device::dmac_r() { return m_dma[Which].ctrl;
 template<int Which>
 void vrender0soc_device::dmac_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	if (((data ^ m_dma[Which].ctrl) & (1 << 10)) && (data & (1 << 10)))   //DMAOn
+	vr0_dma &dma = m_dma[Which];
+	// Control register format: (per DMA controller)
+	// Bit                                     Description
+	// 1111 1111 1111 1111 0000 0000 0000 0000 
+	// fedc ba98 7654 3210 fedc ba98 7654 3210 
+	// xxxx xxxx xxxx xxxx xxxx x--- ---- ---- Reserved
+	// ---- ---- ---- ---- ---- -x-- ---- ---- DMA enable
+	// ---- ---- ---- ---- ---- --x- ---- ---- DMA request active polarity (0: high, 1: low)
+	// ---- ---- ---- ---- ---- ---x ---- ---- DMA Counter write enable (0: disable, 1: enable)
+	// ---- ---- ---- ---- ---- ---- xx-- ---- DMA transfer mode
+	// ---- ---- ---- ---- ---- ---- 0*-- ---- Single transfer
+	// ---- ---- ---- ---- ---- ---- 10-- ---- Repeat with reload counter
+	// ---- ---- ---- ---- ---- ---- 11-- ---- Repeat with reload counter and registers
+	// ---- ---- ---- ---- ---- ---- --x- ---- DMA Source address hold (0: in/decrease, 1: fix address)
+	// ---- ---- ---- ---- ---- ---- ---x ---- DMA Source address direction (0: increase, 1: decrease)
+	// ---- ---- ---- ---- ---- ---- ---- x--- DMA Destination address hold (0: in/decrease, 1: fix address)
+	// ---- ---- ---- ---- ---- ---- ---- -x-- DMA Destination address direction (0: increase, 1: decrease)
+	// ---- ---- ---- ---- ---- ---- ---- --xx DMA Transfer width
+	// ---- ---- ---- ---- ---- ---- ---- --00 8 bit
+	// ---- ---- ---- ---- ---- ---- ---- --01 16 bit
+	// ---- ---- ---- ---- ---- ---- ---- --1* 32 bit
+	// *: Don't care
+
+	if (BIT(data ^ dma.ctrl, 10) && BIT(data, 10))   //DMAOn
 	{
 		u32 const ctr = data;
-		u32 const src = m_dma[Which].src;
-		u32 const dst = m_dma[Which].dst;
-		u32 const cnt = m_dma[Which].size;
-		int const src_inc = dma_setup_hold(ctr, 0x20);
-		int const dst_inc = dma_setup_hold(ctr, 0x08);
+		u32 const src = dma.src;
+		u32 const dst = dma.dst;
+		u32 const cnt = dma.size;
+		int const src_inc = dma_setup_hold(ctr, 5, 4);
+		int const dst_inc = dma_setup_hold(ctr, 3, 2);
 
-		if ((ctr & 0xd4) != 0)
-			popmessage("DMA%d with unhandled mode %02x, contact MAMEdev",Which,ctr);
+		if ((ctr & 0xc0) != 0)
+			popmessage("DMA%d with unhandled mode %02x, contact MAMEdev", Which, ctr);
 
-		if (ctr & 0x2)  //32 bits
+		if (BIT(ctr, 1))  //32 bits
 		{
 			for (int i = 0; i < cnt; ++i)
 			{
@@ -439,7 +469,7 @@ void vrender0soc_device::dmac_w(offs_t offset, u32 data, u32 mem_mask)
 				m_host_space->write_dword(dst + i * dst_inc, v);
 			}
 		}
-		else if (ctr & 0x1) //16 bits
+		else if (BIT(ctr, 0)) //16 bits
 		{
 			for (int i = 0; i < cnt; ++i)
 			{
@@ -457,10 +487,10 @@ void vrender0soc_device::dmac_w(offs_t offset, u32 data, u32 mem_mask)
 		}
 		data &= ~(1 << 10);
 		// TODO: insta-DMA
-		m_dma[Which].size = 0;
+		dma.size = 0;
 		int_req(7 + Which);
 	}
-	COMBINE_DATA(&m_dma[Which].ctrl);
+	COMBINE_DATA(&dma.ctrl);
 }
 
 /*
@@ -638,10 +668,10 @@ void vrender0soc_device::crtc_update()
 	// TODO: divider setting = 0 is reserved, guess it just desyncs the signal?
 	pixel_clock /= (m_crtcregs[0x04 / 4] & 7) + 1;
 
-	//printf("DCLK divider %d\n",(m_crtcregs[0x04 / 4] & 7) + 1);
-	//printf("VCLK select %d\n",(m_crtcregs[0x04 / 4] & 8));
-	//printf("CBCLK divider %d\n",((m_crtcregs[0x04 / 4] & 0x70) >> 4) + 1);
-	//printf("ivclk speed %d\n",(m_crtcregs[0x04 / 4] & 0x80));
+	//logerror("DCLK divider %d\n",(m_crtcregs[0x04 / 4] & 7) + 1);
+	//logerror("VCLK select %d\n",(m_crtcregs[0x04 / 4] & 8));
+	//logerror("CBCLK divider %d\n",((m_crtcregs[0x04 / 4] & 0x70) >> 4) + 1);
+	//logerror("ivclk speed %d\n",(m_crtcregs[0x04 / 4] & 0x80));
 
 	if (!interlace_mode)
 	{
@@ -653,7 +683,7 @@ void vrender0soc_device::crtc_update()
 
 	vtot += 9;
 
-	//printf("%dX%d %dX%d %d\n",htot, vtot, hdisp, vdisp, pixel_clock);
+	//logerror("%dX%d %dX%d %d\n",htot, vtot, hdisp, vdisp, pixel_clock);
 
 	rectangle const visarea(0, hdisp - 1, 0, vdisp - 1);
 	m_screen->configure(htot, vtot, visarea, HZ_TO_ATTOSECONDS(pixel_clock) * vtot * htot);

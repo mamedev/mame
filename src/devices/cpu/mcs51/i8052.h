@@ -4,12 +4,14 @@
 #ifndef MAME_CPU_MCS51_I8052_H
 #define MAME_CPU_MCS51_I8052_H
 
+#pragma once
+
 #include "i8051.h"
 
-// variants with no internal rom and 256 byte internal memory
+// variants with no internal ROM and 256 byte internal memory
 DECLARE_DEVICE_TYPE(I8032, i8032_device)
 
-// variants 8k internal rom and 256 byte internal memory and more registers
+// variants 8k internal ROM, 256 byte internal memory and more registers
 DECLARE_DEVICE_TYPE(I8052, i8052_device)
 DECLARE_DEVICE_TYPE(I8752, i8752_device)
 
@@ -74,4 +76,4 @@ public:
 };
 
 
-#endif
+#endif // MAME_CPU_MCS51_I8052_H

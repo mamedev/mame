@@ -125,6 +125,7 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_screen(*this, "screen"),
 		  m_scantimer(*this, "scantimer"),
+		  m_vgctimer(*this, "vgctimer"),
 		  m_acceltimer(*this, "acceltimer"),
 		  m_adbmicro(*this, "adbmicro"),
 		  m_macadb(*this, "macadb"),
@@ -187,7 +188,7 @@ protected:
 private:
 	required_device<g65816_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<timer_device> m_scantimer, m_acceltimer;
+	required_device<timer_device> m_scantimer, m_vgctimer, m_acceltimer;
 	required_device<m5074x_device> m_adbmicro;
 	required_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
@@ -306,7 +307,15 @@ private:
 
 	address_space *m_maincpu_space = nullptr;
 
+	// align timing to match observed hardware behavior
+	static constexpr int ALIGN_VBL = 4;
+	static constexpr int ALIGN_CNT = 2;
+	static constexpr int ALIGN_RFB = 1;
+	static constexpr int HPOS_VBL = BORDER_LEFT + ((40 - ALIGN_VBL) * 16);
+	// hardware testing shows SCB IRQs fire 8 video cycles after VBL
+	static constexpr int HPOS_VGC = HPOS_VBL + (8 * 16);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(apple2_vgc);
 	TIMER_DEVICE_CALLBACK_MEMBER(accel_timer);
 
 	void palette_init(palette_device &palette);
@@ -441,7 +450,7 @@ private:
 	bool m_lcram = false, m_lcram2 = false, m_lcprewrite = false, m_lcwriteenable = false;
 	bool m_rombank = false;
 
-	u8 m_shadow = 0, m_speed = 0, m_textcol = 0;
+	u8 m_shadow = 0, m_speed = 0;
 	u8 m_motors_active = 0, m_slotromsel = 0, m_intflag = 0, m_vgcint = 0, m_inten = 0;
 
 	bool m_last_speed = false;
@@ -519,7 +528,7 @@ private:
 		}
 		else
 		{
-			m_maincpu->set_unscaled_clock(A2GS_1M);
+			m_maincpu->set_unscaled_clock(A2GS_1M, true); // re-align with PH0
 		}
 	}
 
@@ -543,7 +552,7 @@ private:
 		}
 		else
 		{
-			m_maincpu->set_unscaled_clock(A2GS_1M);
+			m_maincpu->set_unscaled_clock(A2GS_1M, true); // re-align with PH0
 		}
 	}
 
@@ -726,9 +735,12 @@ void apple2gs_state::machine_start()
 	m_video->set_char_pointer(memregion("gfx1")->base(), memregion("gfx1")->bytes());
 	m_video->setup_GS_graphics();
 
-	m_textcol = 0xf2;
-	m_video->set_GS_foreground((m_textcol >> 4) & 0xf);
-	m_video->set_GS_background(m_textcol & 0xf);
+	m_video->set_GS_textcol(0xf2);
+
+	// Mega II events occur near the rightmost edge of active video
+	m_scantimer->adjust(m_screen->time_until_pos(0, HPOS_VBL));
+	// VGC IRQs occur slightly later during HBL
+	m_vgctimer->adjust(m_screen->time_until_pos(0, HPOS_VGC));
 
 	m_inh_slot = -1;
 	m_cnxx_slot = CNXX_UNCLAIMED;
@@ -768,7 +780,6 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_lcwriteenable));
 	save_item(NAME(m_shadow));
 	save_item(NAME(m_speed));
-	save_item(NAME(m_textcol));
 	save_item(NAME(m_clock_control));
 	save_item(NAME(m_clkdata));
 	save_item(NAME(m_motors_active));
@@ -812,10 +823,9 @@ void apple2gs_state::machine_reset()
 	m_adb_p2_last = m_adb_p3_last = 0;
 	m_adb_reset_freeze = 0;
 	m_romswitch = false;
-	m_video->page2_w(false);
+	m_video->scr_w(0);
 	m_video->set_GS_border(0x02);
-	m_video->set_GS_background(0x02);
-	m_video->set_GS_foreground(0x0f);
+	m_video->set_GS_textcol(0xf2);
 	m_an0 = m_an1 = m_an2 = m_an3 = false;
 	m_gameio->an0_w(0);
 	m_gameio->an1_w(0);
@@ -969,7 +979,7 @@ void apple2gs_state::update_speed()
 		}
 		else
 		{
-			m_maincpu->set_unscaled_clock(isfast ? A2GS_2_8M : A2GS_1M);
+			m_maincpu->set_unscaled_clock(isfast ? A2GS_2_8M : A2GS_1M, !isfast);
 		}
 		m_last_speed = isfast;
 	}
@@ -1001,37 +1011,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::accel_timer)
 
 TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 {
-	int scanline = m_screen->vpos();
-	m_screen->update_partial(scanline);
-
-	// check scanline interrupt bits if we're in super hi-res and the current scanline is within the active display area
-	if ((m_video->get_newvideo() & 0x80) && (scanline >= BORDER_TOP) && (scanline < (200+BORDER_TOP)))
-	{
-		u8 scb;
-		const int shrline = scanline - BORDER_TOP;
-
-		if (shrline & 1)
-		{
-			scb = m_megaii_ram[0x19e80 + (shrline >> 1)];
-		}
-		else
-		{
-			scb = m_megaii_ram[0x15e80 + (shrline >> 1)];
-		}
-
-		if (scb & 0x40)
-		{
-			// VGC and MegaII status flags are set even when the interrupt is disabled
-			m_vgcint |= VGCINT_SCANLINE;
-
-			// trigger the interrupt if enabled
-			if (m_vgcint & VGCINT_SCANLINEEN)
-			{
-				m_vgcint |= VGCINT_ANYVGCINT;
-				raise_irq(IRQS_SCAN);
-			}
-		}
-	}
+	// timer fires near the end of active video; handle events for the next line
+	int scanline = param + 1;
 
 	if (scanline == BORDER_TOP)
 	{
@@ -1041,7 +1022,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	{
 		m_vbl = true;
 
-		// VBL interrupt
+		// Mega II status flags are set even when the interrupt is disabled
 		m_intflag |= INTFLAG_VBL;
 		if (m_inten & 0x08)
 		{
@@ -1069,7 +1050,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	{
 		// TODO: latch LANGSEL here to toggle NTSC/PAL
 
-		// "quarter" second IRQ occurs every 16 frames, ~3.75 Hz (NTSC)
+		// "quarter" second IRQ occurs every 16 frames, ~3.75 Hz
 		if ((m_screen->frame_number() & 0xf) == 0)
 		{
 			m_intflag |= INTFLAG_QUARTER;
@@ -1079,6 +1060,55 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 			}
 		}
 	}
+	else if (scanline == m_screen->height())
+		scanline = 0;
+
+	m_scantimer->adjust(m_screen->time_until_pos(scanline, HPOS_VBL), scanline);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_vgc)
+{
+	// flush the previous scanline to ensure SCB or palette changes are visible
+	m_screen->update_now();
+
+	// timer fires during HBL past right border; handle events for the next line
+	int scanline = param + 1;
+	if (scanline >= m_screen->height())
+		scanline -= m_screen->height(); // catch 50Hz toggle
+
+	// scanline interrupts occur during HBL of each super hi-res line
+	if ((m_video->get_newvideo() & 0x80) && (scanline >= BORDER_TOP) && (scanline < (BORDER_TOP + 200)))
+	{
+		u8 scb;
+		const int shrline = scanline - BORDER_TOP;
+
+		if (shrline & 1)
+		{
+			scb = m_megaii_ram[0x19e80 + (shrline >> 1)];
+		}
+		else
+		{
+			scb = m_megaii_ram[0x15e80 + (shrline >> 1)];
+		}
+
+		// latch scb on this cycle for subsequent palette lookups
+		m_video->set_SHR_scb(shrline, scb);
+
+		if (scb & 0x40)
+		{
+			// VGC status flags are set even when the interrupt is disabled
+			m_vgcint |= VGCINT_SCANLINE;
+
+			// trigger the interrupt if enabled
+			if (m_vgcint & VGCINT_SCANLINEEN)
+			{
+				m_vgcint |= VGCINT_ANYVGCINT;
+				raise_irq(IRQS_SCAN);
+			}
+		}
+	}
+
+	m_vgctimer->adjust(m_screen->time_until_pos(scanline, HPOS_VGC), scanline);
 }
 
 void apple2gs_state::rtc_vgc(int cko)
@@ -1460,12 +1490,13 @@ void apple2gs_state::do_io(int offset)
 int apple2gs_state::get_vpos()
 {
 	int vpos = m_screen->vpos();
+	vpos += (m_screen->hpos() >= (BORDER_LEFT + (40 - ALIGN_CNT) * 16)); // adjust for set_raw
 
 	if (vpos < BORDER_TOP)
 		vpos += m_screen->height(); // remap top border to bottom of VBL
 	vpos += 256 - BORDER_TOP;
 	if (vpos > 511)
-		vpos -= m_screen->height(); // reset scanline 256 to 250 (NTSC) or 200 (PAL)
+		vpos -= m_screen->height(); // wrap scanline 256 to 250 (60 Hz) or 200 (50 Hz)
 
 	return vpos;
 }
@@ -1580,7 +1611,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return m_video->get_80col() ? 0x80 : 0x00;
 
 		case 0x22:  // TEXTCOL
-			return m_textcol;
+			return m_video->get_GS_textcol();
 
 		case 0x23:  // VGCINT
 			return m_vgcint;
@@ -1616,10 +1647,12 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			// reading HORIZCNT clears SCB status
 			clear_vgcint(~VGCINT_SCANLINE);
 
-			ret = m_screen->hpos() / 11;
+			ret = (m_screen->hpos() - BORDER_LEFT) / 16 + (25 + ALIGN_CNT); // adjust for set_raw
+			if (ret >= 65)
+				ret -= 65;
 			if (ret > 0)
 			{
-				ret += 0x40;
+				ret += 0x3f; // HBL [0, 0x40...57] active [0x58...7f]
 			}
 
 			if (get_vpos() & 1)
@@ -1873,13 +1906,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x22:  // TEXTCOL
-			if (m_textcol != data)
-			{
-				m_screen->update_now();
-			}
-			m_textcol = data;
-			m_video->set_GS_foreground((data >> 4) & 0xf);
-			m_video->set_GS_background(data & 0xf);
+			m_video->set_GS_textcol(data);
 			break;
 
 		case 0x23:  // VGCINT
@@ -2114,7 +2141,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 
 		case 0x68: // STATEREG
 			m_altzp = (data & 0x80);
-			m_video->page2_w(data & 0x40);
+			m_video->scr_w(data & 0x40);
 			m_ramrd = (data & 0x20);
 			m_ramwrt = (data & 0x10);
 			m_lcram = (data & 0x08) ? false : true;
@@ -3362,7 +3389,7 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 		m_ramrd = false;
 		m_ramwrt = false;
 		m_altzp = false;
-		m_video->page2_w(false);
+		m_video->scr_w(0);
 		m_video->res_w(0);
 		m_irqmask = 0;
 
@@ -3742,9 +3769,8 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_maincpu->set_addrmap(g65816_device::AS_VECTORS, &apple2gs_state::vectors_map);
 	m_maincpu->set_dasm_override(FUNC(apple2gs_state::dasm_trampoline));
 	m_maincpu->wdm_handler().set(FUNC(apple2gs_state::wdm_trampoline));
-	TIMER(config, m_scantimer, 0);
-	m_scantimer->configure_scanline(FUNC(apple2gs_state::apple2_interrupt), "screen", 0, 1);
-
+	TIMER(config, m_scantimer, 0).configure_generic(FUNC(apple2gs_state::apple2_interrupt));
+	TIMER(config, m_vgctimer, 0).configure_generic(FUNC(apple2gs_state::apple2_vgc));
 	TIMER(config, m_acceltimer, 0).configure_generic(FUNC(apple2gs_state::accel_timer));
 
 	config.set_maximum_quantum(attotime::from_hz(60));
@@ -3776,10 +3802,11 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::default_options, nullptr);
 
+	// HBL is positioned to the right of active video here, but to the left on hardware.
+	// the left border is positioned to the left here, but to the far right on hardware.
+	// these must be compensated for in any use of hpos/vpos/hblank/vblank.
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(704, 262);  // 640+32+32 for the borders
-	m_screen->set_visarea(0,703,0,230);
+	m_screen->set_raw(A2GS_1M.value() * 16, 65 * 16, 0, BORDER_LEFT + 40 * 16 + BORDER_RIGHT, 262, 0, 231);
 	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update_GS)));
 
 	PALETTE(config, "palette", FUNC(apple2gs_state::palette_init), 256);

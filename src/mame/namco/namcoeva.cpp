@@ -36,21 +36,20 @@ TODO:
 - sound system is the same as namco/namcond1.cpp (puts "Quattro Ver.1.2.H8" in H8 RAM). It interacts
   with the keycus. Handling is copied over from said driver, but could probably be improved;
 - after coining up there's a GFX bug that maybe points to some unimplemented feature in seta2_v.cpp;
-- once the video emulation in seta/seta2_v.cpp has been devicified, remove derivation from
-  seta/seta2.h and possibly move to namco/ folder.
 */
 
 
 #include "emu.h"
 
-#include "seta2.h"
-
+#include "cpu/m68000/tmp68301.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "cpu/h8/h83002.h"
 #include "machine/mb8421.h"
 #include "machine/watchdog.h"
 #include "sound/c352.h"
+#include "video/x1_020_dx_101.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -70,13 +69,17 @@ TODO:
 
 namespace {
 
-class namcoeva_state : public seta2_state
+class namcoeva_state : public driver_device
 {
 public:
 	namcoeva_state(const machine_config &mconfig, device_type type, const char *tag) :
-		seta2_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
-		m_iocpu(*this, "iocpu")
+		m_iocpu(*this, "iocpu"),
+		m_video(*this, "video"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 	{ }
 
 	void hammerch(machine_config &config) ATTR_COLD;
@@ -86,18 +89,22 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	required_device<cpu_device> m_maincpu;
 	required_device<h83002_device> m_subcpu;
 	required_device<mc68hc11k1_device> m_iocpu;
-
-	void maincpu_map(address_map &map) ATTR_COLD;
-	void subcpu_map(address_map &map) ATTR_COLD;
-	void iocpu_map(address_map &map) ATTR_COLD;
+	required_device<x1_020_dx_101_device> m_video;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	uint8_t m_h8_irq5_enabled = 0;
 
 	uint16_t keycus_r(offs_t offset);
 	void keycus_w(offs_t offset, uint16_t data);
 	INTERRUPT_GEN_MEMBER(mcu_interrupt);
+
+	void maincpu_map(address_map &map) ATTR_COLD;
+	void subcpu_map(address_map &map) ATTR_COLD;
+	void iocpu_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -172,9 +179,9 @@ void namcoeva_state::maincpu_map(address_map &map)
 	map(0x600300, 0x600301).portr("DSW1");
 	map(0x600302, 0x600303).portr("DSW2");
 	map(0x800000, 0x800fff).rw("dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)).umask16(0x00ff); // EXT IO CHECK: NG if unmapped
-	map(0xa00000, 0xa3ffff).ram().share(m_spriteram);
+	map(0xa00000, 0xa3ffff).rw(m_video, FUNC(x1_020_dx_101_device::spriteram_r), FUNC(x1_020_dx_101_device::spriteram_w));
 	map(0xa40000, 0xa4ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xa60000, 0xa6003f).ram().w(FUNC(namcoeva_state::vregs_w)).share(m_vregs);
+	map(0xa60000, 0xa6003f).rw(m_video, FUNC(x1_020_dx_101_device::vregs_r), FUNC(x1_020_dx_101_device::vregs_w));
 	map(0xc3ff00, 0xc3ffff).rw(FUNC(namcoeva_state::keycus_r), FUNC(namcoeva_state::keycus_w));
 }
 
@@ -311,25 +318,6 @@ static INPUT_PORTS_START( hammerch )
 INPUT_PORTS_END
 
 
-static const gfx_layout tile_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(7*8, -8) },
-	{ STEP8(0, 1) },
-	{ STEP8(0, 8*8) },
-	8*8*8
-};
-
-
-/*  Tiles are 8bpp, but the hardware is additionally able to discard
-    some bitplanes and use the low 4 bits only, or the high 4 bits only */
-static GFXDECODE_START( gfx_dx_10x )
-	GFXDECODE_ENTRY( "sprites", 0, tile_layout, 0, 0x8000 / 16 )   // 8bpp, but 4bpp color granularity
-GFXDECODE_END
-
-
 void namcoeva_state::hammerch(machine_config &config)
 {
 	tmp68301_device &maincpu(TMP68301(config, m_maincpu, 50_MHz_XTAL / 4)); // TODO: clock and divider not verified
@@ -399,14 +387,21 @@ void namcoeva_state::hammerch(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(0x200, 0x100);
 	m_screen->set_visarea(0x00, 0x140-1, 0x00, 0xe0-1);
-	m_screen->set_screen_update(FUNC(namcoeva_state::screen_update));
-	m_screen->screen_vblank().set(FUNC(namcoeva_state::screen_vblank));
+	m_screen->set_screen_update(m_video, FUNC(x1_020_dx_101_device::screen_update));
+	m_screen->screen_vblank().set(m_video, FUNC(x1_020_dx_101_device::screen_vblank));
 	m_screen->screen_vblank().append_inputline(m_maincpu, 0);
 	m_screen->set_palette(m_palette);
 	//m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dx_10x);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000+0xf0);    // extra 0xf0 because we might draw 256-color object with 16-color granularity
+
+	X1_020_DX_101(config, m_video, 50_MHz_XTAL); // clock and divider not verified
+	m_video->set_palette(m_palette);
+	m_video->set_screen(m_screen);
+	m_video->raster_irq_callback().set_inputline(m_maincpu, 1, HOLD_LINE);
+	m_video->flip_screen_callback().set(FUNC(namcoeva_state::flip_screen_set));
+	m_video->flip_screen_x_callback().set(FUNC(namcoeva_state::flip_screen_x_set));
+	m_video->flip_screen_y_callback().set(FUNC(namcoeva_state::flip_screen_y_set));
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
@@ -429,7 +424,7 @@ ROM_START( hammerch )
 	ROM_REGION( 0x10000, "iocpu", 0 ) // MC68HC11K1
 	ROM_LOAD( "hc1prg0_ioboard.ic2", 0x00000, 0x10000, CRC(606fad7e) SHA1(cf975e09038f84eb75d30130bfaf31f4c74986b2) )
 
-	ROM_REGION( 0x1000000, "sprites", 0 )
+	ROM_REGION( 0x1000000, "video", 0 )
 	ROM_LOAD64_WORD( "hc1_cg3.u29", 0x000000, 0x400000, CRC(d9cc519b) SHA1(43670b357fadc5faf5ee229176ae97e8c29b6874) )
 	ROM_LOAD64_WORD( "hc1_cg1.u28", 0x000002, 0x400000, CRC(386c129e) SHA1(21325b44d96b184df09118cd0c68733afde6db03) )
 	ROM_LOAD64_WORD( "hc1_cg2.u31", 0x000004, 0x400000, CRC(3aea6bf0) SHA1(a8e7a7fae0ab83b08b80ff28461c9e97afe85cf7) )

@@ -28,6 +28,9 @@ protected:
 						uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	void acpi_map(address_map &map) ATTR_COLD;
+
+	virtual uint8_t latency_timer_r() override;
+
 private:
 	required_device<acpi_pipc_device> m_acpi;
 	devcb_write8 m_sci_pin_cb;
