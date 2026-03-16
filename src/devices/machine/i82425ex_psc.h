@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
 
 #ifndef MAME_MACHINE_I82425EX_PSC_H
 #define MAME_MACHINE_I82425EX_PSC_H
@@ -76,6 +76,7 @@ private:
 	u8 m_ctltmrh;
 
 	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
+	void map_shadowram(address_space *memory_space, offs_t start_offs, offs_t end_offs, u8 setting);
 };
 
 DECLARE_DEVICE_TYPE(I82425EX_PSC, i82425ex_psc_device)

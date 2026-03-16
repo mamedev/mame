@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
 
 #include "emu.h"
 #include "i82425ex_psc.h"
@@ -337,6 +337,35 @@ void i82425ex_psc_device::map_bios(address_space *memory_space, uint32_t start, 
 	memory_space->install_rom(start, end, m_region->base() + (start & mask));
 }
 
+// For each PAM register:
+// x--- PE PCI Enable
+// -x-- CE Cache Enable (from L2)
+// --x- WE Write Enable
+// ---x RE Read Enable
+void i82425ex_psc_device::map_shadowram(address_space *memory_space, offs_t start_offs, offs_t end_offs, u8 setting)
+{
+	LOGMAP("- 0x%08x-0x%08x ", start_offs, end_offs);
+
+	switch(setting)
+	{
+		case 0:
+			LOGMAP("shadow RAM off\n");
+			break;
+		case 1:
+			LOGMAP("shadow RAM r/o\n");
+			memory_space->install_rom(start_offs, end_offs, &m_ram[start_offs/4]);
+			break;
+		case 2:
+			LOGMAP("shadow RAM w/o\n");
+			memory_space->install_writeonly(start_offs, end_offs, &m_ram[start_offs/4]);
+			break;
+		case 3:
+			LOGMAP("shadow RAM r/w\n");
+			memory_space->install_ram(start_offs, end_offs, &m_ram[start_offs/4]);
+			break;
+	}
+}
+
 void i82425ex_psc_device::map_extra(
 	uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space
@@ -351,6 +380,31 @@ void i82425ex_psc_device::map_extra(
 	// TODO: dictated by XBCSA
 	map_bios(memory_space, 0xffffffff - m_region->bytes() + 1, 0xffffffff);
 	map_bios(memory_space, 0x000e0000, 0x000fffff);
+
+	int i;
+
+	// handle 0xc0000-0xdffff
+	for (i = 0; i < 8; i++)
+	{
+		const offs_t start_offs = 0xc0000 + (i * 0x4000);
+		const offs_t end_offs = start_offs + 0x3fff;
+		const u8 reg = i >> 1;
+		const u8 shift = BIT(i, 0) * 4;
+		map_shadowram(memory_space, start_offs, end_offs, (m_pam[1 + reg] >> shift) & 3);
+	}
+
+	// handle 0xe0000-0xeffff
+	for (i = 0; i < 4; i++)
+	{
+		const offs_t start_offs = 0xe0000 + (i * 0x4000);
+		const offs_t end_offs = start_offs + 0x3fff;
+		const u8 reg = BIT(i, 1);
+		const u8 shift = BIT(i, 0) * 4;
+		map_shadowram(memory_space, start_offs, end_offs, (m_pam[5 + reg] >> shift) & 3);
+	}
+
+	// bits 3-0 are reserved on PAM0
+	map_shadowram(memory_space, 0xf0000, 0xfffff, (m_pam[0] >> 4) & 3);
 
 	memory_space->install_ram(0x00100000, m_ram_size - 1, &m_ram[0x00100000/4]);
 

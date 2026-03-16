@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
 
 #ifndef MAME_MACHINE_I82426EX_IB_H
 #define MAME_MACHINE_I82426EX_IB_H

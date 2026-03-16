@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
 
 #include "emu.h"
 #include "i82426ex_ib.h"
@@ -70,16 +70,16 @@ void i82426ex_ib_device::device_add_mconfig(machine_config &config)
 
 	// 82C54
 	PIT8254(config, m_pit, 0);
-	m_pit->set_clk<0>(DERIVED_CLOCK(1, 12));
+	m_pit->set_clk<0>(this->clock() / 12);
 	m_pit->out_handler<0>().set(m_intc[0], FUNC(pic8259_device::ir0_w));
-	m_pit->set_clk<1>(DERIVED_CLOCK(1, 12));
+	m_pit->set_clk<1>(this->clock() / 12);
 	m_pit->out_handler<1>().set([this] (int state) {
 		m_refresh_toggle ^= state;
 		m_portb = (m_portb & 0xef) | (m_refresh_toggle << 4);
 	});
-	m_pit->set_clk<2>(DERIVED_CLOCK(1, 12));
+	m_pit->set_clk<2>(this->clock() / 12);
 	m_pit->out_handler<2>().set([this] (int state) {
-		m_write_spkr(!(state & BIT(m_portb, 1)));
+		m_write_spkr((state & BIT(m_portb, 1)));
 		m_portb = (m_portb & 0xdf) | (state << 5);
 	});
 }
@@ -143,6 +143,14 @@ u8 i82426ex_ib_device::portb_r()
 	return m_portb;
 }
 
+// x--- ---- SERR# NMI Source Status (r/o)
+// -x-- ---- IOCHK# NMI Source Status (r/o)
+// --x- ---- Timer Counter 2 Out Status (r/o)
+// ---x ---- Refresh Cycle Toggle (r/o)
+// ---- x--- IOCHK# NMI Enable
+// ---- -x-- PCI SERR# Enable
+// ---- --x- Speaker Data Enable
+// ---- ---x Timer Counter 2 Enable
 void i82426ex_ib_device::portb_w(u8 data)
 {
 	m_portb = (m_portb & 0xf0) | (data & 0x0f);
@@ -153,7 +161,11 @@ void i82426ex_ib_device::portb_w(u8 data)
 
 	m_pit->write_gate2(BIT(m_portb, 0));
 
-	m_write_spkr(!BIT(m_portb, 1));
+	// TODO: doesn't work properly
+	if (!BIT(m_portb, 1))
+		m_write_spkr(0);
+
+//	m_write_spkr(BIT(m_portb, 1));
 
 	// clear channel check latch?
 	if (BIT(m_portb, 3))
