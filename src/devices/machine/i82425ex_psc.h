@@ -9,6 +9,9 @@
 #include "pci.h"
 #include "i82426ex_ib.h"
 
+#include "bus/ata/ataintf.h"
+#include "machine/idectrl.h"
+
 class i82425ex_psc_device : public pci_host_device
 {
 public:
@@ -28,6 +31,8 @@ public:
 	template <typename T> void set_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_ib_tag(T &&tag)  { m_ib.set_tag(std::forward<T>(tag)); }
 	void set_ram_size(int ram_size) { m_ram_size = ram_size; }
+	auto ide1_irq_w() { return m_ide1_irq.bind(); }
+	auto ide2_irq_w() { return m_ide2_irq.bind(); }
 
 //	void smi_act_w(int state);
 
@@ -36,6 +41,7 @@ protected:
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void reset_all_mappings() override;
 
@@ -47,6 +53,9 @@ protected:
 private:
 	required_device<cpu_device> m_host_cpu;
 	required_device<i82426ex_ib_device> m_ib;
+	required_device_array<ide_controller_32_device, 2> m_ide;
+	devcb_write_line m_ide1_irq;
+	devcb_write_line m_ide2_irq;
 	std::vector<uint32_t> m_ram;
 
 	u32 m_ram_size = 0;

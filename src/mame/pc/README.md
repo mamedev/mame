@@ -49,3 +49,4 @@ ISA debug port $80, `wpiset 0x80,1,w,1,{printf "%02x",wpdata;g}`.
 - "Unknown" CPU: r/w the info thru CMOS (Phoenix BIOSes do something similar);
 - DOS (up to Win98) startup stuck while looping around on clearly incorrect conventional memory opcodes: fix A20, chipset possibly has fast A20 mechanism at I/O $92;
 - Award System Config shows N/A for PCI card IRQs: check PCI config space numbering, use cards with confirmed good line/pin setup.
+- Running awfully slow with moderate CPU clocks: don't use `DERIVED_CLOCK` with PIT;

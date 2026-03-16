@@ -62,8 +62,14 @@ private:
 	u8 portb_r();
 	void portb_w(u8 data);
 
+	int m_dma_eop;
+	u8 m_dma_page[0x10];
+	u8 m_dma_high_byte;
+	int m_dma_channel;
+
 	u8 m_portb;
 	int m_refresh_toggle;
+	int m_iochck;
 	u8 m_nmi_mask;
 };
 

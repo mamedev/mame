@@ -88,11 +88,19 @@ void i82426ex_ib_device::device_start()
 {
 	save_item(NAME(m_portb));
 	save_item(NAME(m_refresh_toggle));
+	save_item(NAME(m_iochck));
 	save_item(NAME(m_nmi_mask));
+
+	save_item(NAME(m_dma_eop));
+	save_item(NAME(m_dma_page));
+	save_item(NAME(m_dma_high_byte));
+	save_item(NAME(m_dma_channel));
 }
 
 void i82426ex_ib_device::device_reset()
 {
+	m_dma_channel = -1;
+
 	m_nmi_mask = 1;
 	m_dma[0]->set_unscaled_clock(2'500'000);
 	m_dma[1]->set_unscaled_clock(2'500'000);
@@ -126,12 +134,20 @@ void i82426ex_ib_device::io_map(address_map &map)
 			m_rtccs_write(data);
 		})
 	);
+	// ???
+	map(0x0078, 0x0078).lr8(NAME([] () { return 0; }));
 
-//	map(0x0080, 0x008f) DMA page
+	map(0x0080, 0x008f).lrw8(
+		NAME([this] (offs_t offset) { return m_dma_page[offset]; }),
+		NAME([this] (offs_t offset, u8 data) { m_dma_page[offset] = data; })
+	);
 	map(0x00a0, 0x00a1).rw(m_intc[1], FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 //	map(0x00b2, 0x00b2) APMC
 //	map(0x00b3, 0x00b3) APMS
-//	map(0x00c0, 0x00df) DMA2
+	map(0x00c0, 0x00df).lrw8(
+		NAME([this] (offs_t offset) { return m_dma[1]->read(offset >> 1); }),
+		NAME([this] (offs_t offset, u8 data) { m_dma[1]->write(offset >> 1, data); })
+	);
 //	map(0x00f0, 0x00f0) Coprocessor Error
 //	map(0x0480, 0x048f) DMA high page (not all of it)
 //	map(0x04d0, 0x04d0) INT-1 Edge/Level Control

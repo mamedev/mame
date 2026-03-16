@@ -14,7 +14,11 @@ Intel 420EX PCIset EX "Aries" x86 based HW
 - Proprietary PISA riser slot for 1x ISA + 2 PCI slots;
 
 TODO:
-- skeleton;
+- Remaining bits in chipset (DMA, ISA bus, SMI, pin mapper & pirqrc);
+- Super I/O (PnP capable);
+- Keyboard fails working in places;
+- CMOS memory sets System Time with illegal hour
+  (workaround: fix it manually then "Exit Saving Changes");
 
 **************************************************************************************************/
 
@@ -97,7 +101,9 @@ void i420ex_state::i420ex(machine_config &config)
 	// TODO: config space not known
 	// 05.0 is clearly host: it's what the BIOS addresses at startup
 	PCI_ROOT(config, "pci", 0);
-	I82425EX_PSC(config, "pci:05.0", 0, "maincpu", "ib", 64*1024*1024);
+	i82425ex_psc_device &psc(I82425EX_PSC(config, "pci:05.0", 0, "maincpu", "ib", 64*1024*1024));
+	psc.ide1_irq_w().set("ib:intc2", FUNC(pic8259_device::ir6_w));
+	psc.ide2_irq_w().set("ib:intc2", FUNC(pic8259_device::ir7_w));
 
 	GD5434_PCI(config, "pci:06.0", 0);
 
@@ -130,7 +136,7 @@ void i420ex_state::i420ex(machine_config &config)
 	keybc.aux_clk().set("aux", FUNC(pc_kbdc_device::clock_write_from_mb));
 	keybc.aux_data().set("aux", FUNC(pc_kbdc_device::data_write_from_mb));
 
-	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, "pcat"));
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, "ms_naturl"));
 	pc_kbdc.out_clock_cb().set(keybc, FUNC(at_kbc_device_base::kbd_clk_w));
 	pc_kbdc.out_data_cb().set(keybc, FUNC(at_kbc_device_base::kbd_data_w));
 

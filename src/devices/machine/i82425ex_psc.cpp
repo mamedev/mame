@@ -19,7 +19,19 @@ i82425ex_psc_device::i82425ex_psc_device(const machine_config &mconfig, const ch
 	: pci_host_device(mconfig, I82425EX_PSC, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 	, m_ib(*this, finder_base::DUMMY_TAG)
+	, m_ide(*this, "ide%u", 1U)
+	, m_ide1_irq(*this)
+	, m_ide2_irq(*this)
 {
+}
+
+void i82425ex_psc_device::device_add_mconfig(machine_config &config)
+{
+	IDE_CONTROLLER_32(config, m_ide[0]).options(ata_devices, "hdd", nullptr, false);
+	m_ide[0]->irq_handler().set([this] (int state) { m_ide1_irq(state); });
+
+	IDE_CONTROLLER_32(config, m_ide[1]).options(ata_devices, "cdrom", nullptr, false);
+	m_ide[1]->irq_handler().set([this] (int state) { m_ide2_irq(state); });
 }
 
 void i82425ex_psc_device::device_start()
@@ -409,5 +421,19 @@ void i82425ex_psc_device::map_extra(
 	memory_space->install_ram(0x00100000, m_ram_size - 1, &m_ram[0x00100000/4]);
 
 	io_space->install_device(0x0000, 0x07ff, *m_ib, &i82426ex_ib_device::io_map);
+
+	const u8 idee = m_lbide & 3;
+
+	// TODO: should be IDEE = 1 primary only, IDEE = 2 secondary only
+	// But in doing so freedos13 never enable cdrom drive,
+	// is this chipset/BIOS believing that IDEs are for HDDs only?
+	if (idee == 1 || idee == 2)
+	{
+		io_space->install_readwrite_handler(0x1f0, 0x1f7, read32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs0_w)));
+		io_space->install_readwrite_handler(0x3f0, 0x3f7, read32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs1_r)), write32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs1_w)));
+
+		io_space->install_readwrite_handler(0x170, 0x177, read32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs0_w)));
+		io_space->install_readwrite_handler(0x370, 0x377, read32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs1_r)), write32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs1_w)));
+	}
 }
 
