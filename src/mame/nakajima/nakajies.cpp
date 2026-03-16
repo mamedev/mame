@@ -388,6 +388,46 @@ void nakajies_pccard_state::nakajies_pccard_map(address_map &map)
 }
 
 
+void nakajies_state::nakajies_io_map(address_map &map)
+{
+	map(0x0000, 0x0000).w(FUNC(nakajies_state::lcd_memory_start_w));
+	map(0x0010, 0x0017).w(FUNC(nakajies_state::banking_w));
+	map(0x30, 0x30).w(FUNC(nakajies_state::uart_control_w));
+	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x0050, 0x0050).lw8(NAME([this](u8 data) { m_beep_freq = (m_beep_freq & 0xff00) | data; m_beep->set_clock(250000/m_beep_freq); }));
+	map(0x0051, 0x0051).lw8(NAME([this](u8 data) { m_beep_freq = (m_beep_freq & 0x00ff) | (data << 8); m_beep->set_clock(250000/m_beep_freq); }));
+	map(0x0052, 0x0052).lw8(NAME([this](u8 data) { m_beep->set_state(!BIT(data, 7)); }));
+	// Unknown
+	map(0x0053, 0x0053).noprw();
+	map(0x0060, 0x0060).rw(FUNC(nakajies_state::irq_enable_r), FUNC(nakajies_state::irq_enable_w));
+	map(0x0061, 0x0061).w(FUNC(nakajies_state::keyboard_row_reset));
+	map(0x0070, 0x0070).lw8(NAME([this](u8 data) {
+		m_lcd_on = false;
+		m_maincpu->suspend(SUSPEND_REASON_HALT, true);
+	}));
+	map(0x0090, 0x0090).rw(FUNC(nakajies_state::irq_clear_r), FUNC(nakajies_state::irq_clear_w));
+	map(0x00a0, 0x00a0).r(FUNC(nakajies_state::sys_stat_r));
+	map(0x00b0, 0x00b0).r(FUNC(nakajies_state::keyboard_r));
+	map(0x00c0, 0x00c1).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x00d0, 0x00df).rw(m_rtc, FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
+}
+
+
+void nakajies_pccard_state::nakajies_io_pccard_map(address_map &map)
+{
+	nakajies_io_map(map);
+	map(0x0010, 0x0017).w(FUNC(nakajies_pccard_state::banking_w));
+	map(0x00a0, 0x00a0).r(FUNC(nakajies_pccard_state::sys_stat_r));
+}
+
+
+void nakajies_fdc_state::nakajies_io_map_fdc(address_map &map)
+{
+	nakajies_io_pccard_map(map);
+	map(0x00e0, 0x00ef).m(m_fdc, FUNC(n82077aa_device::map));
+}
+
+
 template<int Bank>
 u8 nakajies_pccard_state::pcmcia_r(offs_t offset)
 {
@@ -586,51 +626,6 @@ void nakajies_state::keyboard_row_reset(u8 data)
 		m_keyboard_row = 0;
 	}
 	m_keyboard_row_reset = data;
-}
-
-
-void nakajies_state::nakajies_io_map(address_map &map)
-{
-	// Temp for debugging
-//	map(0x0000, 0x00ff).lrw8(NAME([](offs_t offset) { printf("read %02x\n", offset); return 0xff; }), NAME([](offs_t offset, u8 data) { printf("write %02x %02x\n", offset, data); }));
-
-	map(0x0000, 0x0000).w(FUNC(nakajies_state::lcd_memory_start_w));
-	map(0x0010, 0x0017).w(FUNC(nakajies_state::banking_w));
-	// Parallel coomunication
-	map(0x30, 0x30).w(FUNC(nakajies_state::uart_control_w));
-	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
-	// Unknown, 60 is written frequently
-	map(0x0050, 0x0050).lw8(NAME([this](u8 data) { m_beep_freq = (m_beep_freq & 0xff00) | data; m_beep->set_clock(250000/m_beep_freq); }));
-	map(0x0051, 0x0051).lw8(NAME([this](u8 data) { m_beep_freq = (m_beep_freq & 0x00ff) | (data << 8); m_beep->set_clock(250000/m_beep_freq); }));
-	map(0x0052, 0x0052).lw8(NAME([this](u8 data) { m_beep->set_state(!BIT(data, 7)); }));
-	map(0x0053, 0x0053).noprw();
-	map(0x0060, 0x0060).rw(FUNC(nakajies_state::irq_enable_r), FUNC(nakajies_state::irq_enable_w));
-	map(0x0061, 0x0061).w(FUNC(nakajies_state::keyboard_row_reset));
-	map(0x0070, 0x0070).lw8(NAME([this](u8 data) {
-		m_lcd_on = false;
-		m_maincpu->suspend(SUSPEND_REASON_HALT, true);
-	}));
-	map(0x0090, 0x0090).rw(FUNC(nakajies_state::irq_clear_r), FUNC(nakajies_state::irq_clear_w));
-	map(0x00a0, 0x00a0).r(FUNC(nakajies_state::sys_stat_r));
-	map(0x00b0, 0x00b0).r(FUNC(nakajies_state::keyboard_r));
-	// Serial communication
-	map(0x00c0, 0x00c1).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0x00d0, 0x00df).rw(m_rtc, FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
-}
-
-
-void nakajies_pccard_state::nakajies_io_pccard_map(address_map &map)
-{
-	nakajies_io_map(map);
-	map(0x0010, 0x0017).w(FUNC(nakajies_pccard_state::banking_w));
-	map(0x00a0, 0x00a0).r(FUNC(nakajies_pccard_state::sys_stat_r));
-}
-
-
-void nakajies_fdc_state::nakajies_io_map_fdc(address_map &map)
-{
-	nakajies_io_pccard_map(map);
-	map(0x00e0, 0x00ef).m(m_fdc, FUNC(n82077aa_device::map));
 }
 
 
