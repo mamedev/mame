@@ -177,7 +177,7 @@ void i82426ex_ib_device::portb_w(u8 data)
 
 	m_pit->write_gate2(BIT(m_portb, 0));
 
-	// TODO: doesn't work properly
+	// Other way around wrt other chipsets
 	if (!BIT(m_portb, 1))
 		m_write_spkr(0);
 
