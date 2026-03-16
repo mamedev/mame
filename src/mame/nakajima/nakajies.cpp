@@ -209,14 +209,11 @@ public:
 		, m_rambank(*this, "rambank%u", 0U)
 		, m_rom_region(*this, "bios")
 		, m_nvram(*this, "nvram")
-		, m_pcmcia(*this, "pcmcia")
 		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_speaker(*this, "mono")
 		, m_beep(*this, "beep")
-		, m_fdc(*this, "fdc")
-		, m_floppy(*this, "fdc:0")
 		, m_centronics(*this, "centronics")
 		, m_cent_data_out(*this, "cent_data_out")
 		, m_uart(*this, "uart")
@@ -226,10 +223,6 @@ public:
 	}
 
 	void drwrt100(machine_config &config);
-	void nakajies210(machine_config &config);
-	void nakajies220(machine_config &config);
-	void nakajies250(machine_config &config);
-	void dator3k(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_button_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(power_button_irq);
@@ -238,10 +231,10 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-private:
+protected:
+	static constexpr int NUMBER_OF_AREAS = 8;
 	static constexpr int VIEW_ROM = 0;
 	static constexpr int VIEW_RAM = 1;
-	static constexpr int VIEW_EXT = 2;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -254,7 +247,7 @@ private:
 	void lcd_memory_start_w(u8 data);
 	u8 keyboard_r();
 	void keyboard_row_reset(u8 data);
-	void banking_w(offs_t offset, u8 data);
+	virtual void banking_w(offs_t offset, u8 data);
 	void uart_control_w(u8 data);
 	void centronics_busy_w(int state);
 	void centronics_ack_w(int state);
@@ -265,34 +258,23 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(hz10_timer);
 	void nakajies_io_map(address_map &map) ATTR_COLD;
-	void nakajies_io_map_fdc(address_map &map) ATTR_COLD;
 	void nakajies_map(address_map &map) ATTR_COLD;
-	void pcmcia_card_detect_w(int state) { m_pcmcia_card_detect = state; }
-	void pcmcia_write_protect_w(int state) { m_pcmcia_write_protect = state; }
-	void pcmcia_battery_failed_w(int state) { m_pcmcia_battery_failed = state; }
-	int pcmcia_card_detect_r() { return m_pcmcia_card_detect; }
-	int pcmcia_write_protect_r() { return m_pcmcia_write_protect; }
-	template<int Bank> u8 pcmcia_r(offs_t offset);
-	template<int Bank> void pcmcia_w(offs_t offset, u8 data);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<rp5c01_device> m_rtc;
-	memory_view m_view[8];
+	memory_view m_view[NUMBER_OF_AREAS];
 
 	required_ioport_array<10> m_port_row;
 	required_ioport m_port_status;
-	memory_bank_array_creator<8> m_rombank;
-	memory_bank_array_creator<8> m_rambank;
+	memory_bank_array_creator<NUMBER_OF_AREAS> m_rombank;
+	memory_bank_array_creator<NUMBER_OF_AREAS> m_rambank;
 	required_memory_region m_rom_region;
 	required_device<nvram_device> m_nvram;
-	optional_device<pccard_slot_device> m_pcmcia;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<speaker_device> m_speaker;
 	required_device<beep_device> m_beep;
-	optional_device<n82077aa_device> m_fdc;
-	optional_device<floppy_connector> m_floppy;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<i8251_device> m_uart;
@@ -306,9 +288,6 @@ private:
 	u8 m_keyboard_row_reset = 0;
 	std::unique_ptr<u8[]> m_ram_base;
 	u32 m_ram_size = 0;
-	u32 m_pcmcia_card_detect = 1;
-	u32 m_pcmcia_write_protect = 1;
-	u32 m_pcmcia_battery_failed = 1;
 	u8 m_uart_control = 0;
 	u32 m_centronics_busy = 0;
 	u32 m_centronics_ack = 0;
@@ -319,9 +298,77 @@ private:
 };
 
 
+class nakajies_pccard_state : public nakajies_state
+{
+public:
+	nakajies_pccard_state(const machine_config &mconfig, device_type type, const char *tag)
+		: nakajies_state(mconfig, type, tag)
+		, m_pccard(*this, "pccard")
+	{ }
+
+	void nakajies210(machine_config &config);
+	void nakajies220(machine_config &config);
+	void dator3k(machine_config &config);
+
+protected:
+	static constexpr int VIEW_EXT = 2;
+
+	virtual void machine_start() override ATTR_COLD;
+	void nakajies_pccard_map(address_map &map) ATTR_COLD;
+	void nakajies_io_pccard_map(address_map &map) ATTR_COLD;
+	virtual void banking_w(offs_t offset, u8 data) override;
+	u8 sys_stat_r();
+	void pcmcia_card_detect_w(int state) { m_pccard_card_detect = state; }
+	void pcmcia_write_protect_w(int state) { m_pccard_write_protect = state; }
+	void pcmcia_battery_failed_w(int state) { m_pccard_battery_failed = state; }
+	int pcmcia_card_detect_r() { return m_pccard_card_detect; }
+	int pcmcia_write_protect_r() { return m_pccard_write_protect; }
+	template<int Bank> u8 pcmcia_r(offs_t offset);
+	template<int Bank> void pcmcia_w(offs_t offset, u8 data);
+
+	required_device<pccard_slot_device> m_pccard;
+	u32 m_pccard_card_detect = 1;
+	u32 m_pccard_write_protect = 1;
+	u32 m_pccard_battery_failed = 1;
+
+};
+
+
+class nakajies_fdc_state : public nakajies_pccard_state
+{
+public:
+	nakajies_fdc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: nakajies_pccard_state(mconfig, type, tag)
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:0")
+	{ }
+
+	void nakajies250(machine_config &config);
+
+protected:
+	required_device<n82077aa_device> m_fdc;
+	required_device<floppy_connector> m_floppy;
+
+	void nakajies_io_map_fdc(address_map &map) ATTR_COLD;
+};
+
+
 void nakajies_state::nakajies_map(address_map &map)
 {
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < NUMBER_OF_AREAS; i++)
+	{
+		const offs_t start = i * 0x20000;
+		const offs_t end = start + 0x1ffff;
+		map(start, end).view(m_view[i]);
+		m_view[i][VIEW_ROM](start, end).bankr(m_rombank[i]);
+		m_view[i][VIEW_RAM](start, end).bankrw(m_rambank[i]);
+	}
+}
+
+
+void nakajies_pccard_state::nakajies_pccard_map(address_map &map)
+{
+	for (int i = 0; i < NUMBER_OF_AREAS; i++)
 	{
 		const offs_t start = i * 0x20000;
 		const offs_t end = start + 0x1ffff;
@@ -329,29 +376,29 @@ void nakajies_state::nakajies_map(address_map &map)
 		m_view[i][VIEW_ROM](start, end).bankr(m_rombank[i]);
 		m_view[i][VIEW_RAM](start, end).bankrw(m_rambank[i]);
 		// Banking to external PCMCIA card space
-		m_view[i][VIEW_EXT + 0](start, end).rw(FUNC(nakajies_state::pcmcia_r<0>), FUNC(nakajies_state::pcmcia_w<0>));
-		m_view[i][VIEW_EXT + 1](start, end).rw(FUNC(nakajies_state::pcmcia_r<1>), FUNC(nakajies_state::pcmcia_w<1>));
-		m_view[i][VIEW_EXT + 2](start, end).rw(FUNC(nakajies_state::pcmcia_r<2>), FUNC(nakajies_state::pcmcia_w<2>));
-		m_view[i][VIEW_EXT + 3](start, end).rw(FUNC(nakajies_state::pcmcia_r<3>), FUNC(nakajies_state::pcmcia_w<3>));
-		m_view[i][VIEW_EXT + 4](start, end).rw(FUNC(nakajies_state::pcmcia_r<4>), FUNC(nakajies_state::pcmcia_w<4>));
-		m_view[i][VIEW_EXT + 5](start, end).rw(FUNC(nakajies_state::pcmcia_r<5>), FUNC(nakajies_state::pcmcia_w<5>));
-		m_view[i][VIEW_EXT + 6](start, end).rw(FUNC(nakajies_state::pcmcia_r<6>), FUNC(nakajies_state::pcmcia_w<6>));
-		m_view[i][VIEW_EXT + 7](start, end).rw(FUNC(nakajies_state::pcmcia_r<7>), FUNC(nakajies_state::pcmcia_w<7>));
+		m_view[i][VIEW_EXT + 0](start, end).rw(FUNC(nakajies_pccard_state::pcmcia_r<0>), FUNC(nakajies_pccard_state::pcmcia_w<0>));
+		m_view[i][VIEW_EXT + 1](start, end).rw(FUNC(nakajies_pccard_state::pcmcia_r<1>), FUNC(nakajies_pccard_state::pcmcia_w<1>));
+		m_view[i][VIEW_EXT + 2](start, end).rw(FUNC(nakajies_pccard_state::pcmcia_r<2>), FUNC(nakajies_pccard_state::pcmcia_w<2>));
+		m_view[i][VIEW_EXT + 3](start, end).rw(FUNC(nakajies_pccard_state::pcmcia_r<3>), FUNC(nakajies_pccard_state::pcmcia_w<3>));
+		m_view[i][VIEW_EXT + 4](start, end).rw(FUNC(nakajies_pccard_state::pcmcia_r<4>), FUNC(nakajies_pccard_state::pcmcia_w<4>));
+		m_view[i][VIEW_EXT + 5](start, end).rw(FUNC(nakajies_pccard_state::pcmcia_r<5>), FUNC(nakajies_pccard_state::pcmcia_w<5>));
+		m_view[i][VIEW_EXT + 6](start, end).rw(FUNC(nakajies_pccard_state::pcmcia_r<6>), FUNC(nakajies_pccard_state::pcmcia_w<6>));
+		m_view[i][VIEW_EXT + 7](start, end).rw(FUNC(nakajies_pccard_state::pcmcia_r<7>), FUNC(nakajies_pccard_state::pcmcia_w<7>));
 	}
 }
 
 
 template<int Bank>
-u8 nakajies_state::pcmcia_r(offs_t offset)
+u8 nakajies_pccard_state::pcmcia_r(offs_t offset)
 {
-	return m_pcmcia->read_memory_byte((Bank * 0x20000) + offset);
+	return m_pccard->read_memory_byte((Bank * 0x20000) + offset);
 }
 
 
 template<int Bank>
-void nakajies_state::pcmcia_w(offs_t offset, u8 data)
+void nakajies_pccard_state::pcmcia_w(offs_t offset, u8 data)
 {
-	m_pcmcia->write_memory_byte((Bank * 0x20000) + offset, data);
+	m_pccard->write_memory_byte((Bank * 0x20000) + offset, data);
 }
 
 
@@ -425,9 +472,17 @@ void nakajies_state::irq_enable_w(u8 data)
 u8 nakajies_state::sys_stat_r()
 {
 	return
-		(m_pcmcia_card_detect ? 0x80 : 0x00) |
-		(m_pcmcia_write_protect ? 0x40 : 0x00) |
-		(m_pcmcia_battery_failed ? 0x10 : 0x00) |
+		m_port_status->read() |
+		(m_centronics_busy ? 0x02 : 0x00) |
+		0xf1;
+}
+
+u8 nakajies_pccard_state::sys_stat_r()
+{
+	return
+		(m_pccard_card_detect ? 0x80 : 0x00) |
+		(m_pccard_write_protect ? 0x40 : 0x00) |
+		(m_pccard_battery_failed ? 0x10 : 0x00) |
 		m_port_status->read() |
 		(m_centronics_busy ? 0x02 : 0x00) |
 		0x21;
@@ -442,6 +497,39 @@ void nakajies_state::lcd_memory_start_w(u8 data)
 
 
 void nakajies_state::banking_w(offs_t offset, u8 data)
+{
+	if (!BIT(data, 4))
+	{
+		// ROM or extra RAM
+		if (BIT(data, 3))
+		{
+			if (m_ram_size >= 256 * 1024)
+			{
+				m_view[offset].select(VIEW_RAM);
+				m_rambank[offset]->set_entry(1);
+			}
+			else
+			{
+				m_view[offset].disable();
+			}
+		}
+		else
+		{
+			m_rombank[offset]->set_entry((data & 0x07) ^ 0x07);
+			m_view[offset].select(VIEW_ROM);
+		}
+	}
+	else
+	{
+		// Internal (S)RAM
+		// Banking and actual storage not verified
+		m_rambank[offset]->set_entry(0);
+		m_view[offset].select(VIEW_RAM);
+	}
+}
+
+
+void nakajies_pccard_state::banking_w(offs_t offset, u8 data)
 {
 	if (!BIT(data, 4))
 	{
@@ -504,7 +592,7 @@ void nakajies_state::keyboard_row_reset(u8 data)
 void nakajies_state::nakajies_io_map(address_map &map)
 {
 	// Temp for debugging
-	map(0x0000, 0x00ff).lrw8(NAME([](offs_t offset) { printf("read %02x\n", offset); return 0xff; }), NAME([](offs_t offset, u8 data) { printf("write %02x %02x\n", offset, data); }));
+//	map(0x0000, 0x00ff).lrw8(NAME([](offs_t offset) { printf("read %02x\n", offset); return 0xff; }), NAME([](offs_t offset, u8 data) { printf("write %02x %02x\n", offset, data); }));
 
 	map(0x0000, 0x0000).w(FUNC(nakajies_state::lcd_memory_start_w));
 	map(0x0010, 0x0017).w(FUNC(nakajies_state::banking_w));
@@ -531,9 +619,17 @@ void nakajies_state::nakajies_io_map(address_map &map)
 }
 
 
-void nakajies_state::nakajies_io_map_fdc(address_map &map)
+void nakajies_pccard_state::nakajies_io_pccard_map(address_map &map)
 {
 	nakajies_io_map(map);
+	map(0x0010, 0x0017).w(FUNC(nakajies_pccard_state::banking_w));
+	map(0x00a0, 0x00a0).r(FUNC(nakajies_pccard_state::sys_stat_r));
+}
+
+
+void nakajies_fdc_state::nakajies_io_map_fdc(address_map &map)
+{
+	nakajies_io_pccard_map(map);
 	map(0x00e0, 0x00ef).m(m_fdc, FUNC(n82077aa_device::map));
 }
 
@@ -757,14 +853,21 @@ void nakajies_state::machine_start()
 	save_item(NAME(m_lcd_memory_start));
 	save_item(NAME(m_keyboard_row));
 	save_item(NAME(m_keyboard_row_reset));
-	save_item(NAME(m_pcmcia_card_detect));
-	save_item(NAME(m_pcmcia_write_protect));
-	save_item(NAME(m_pcmcia_battery_failed));
 	save_item(NAME(m_uart_control));
 	save_item(NAME(m_centronics_busy));
 	save_item(NAME(m_centronics_ack));
 	save_item(NAME(m_uart_rxrdy));
 	save_item(NAME(m_uart_txrdy));
+}
+
+
+void nakajies_pccard_state::machine_start()
+{
+	nakajies_state::machine_start();
+	save_item(NAME(m_pccard_card_detect));
+	save_item(NAME(m_pccard_write_protect));
+	save_item(NAME(m_pccard_battery_failed));
+
 }
 
 
@@ -775,12 +878,12 @@ void nakajies_state::machine_reset()
 	m_lcd_memory_start = 0;
 	m_keyboard_row = 0;
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < NUMBER_OF_AREAS; i++)
 	{
 		m_view[i].select(VIEW_ROM);
 	}
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < NUMBER_OF_AREAS; i++)
 	{
 		m_rombank[i]->set_entry(0x07);
 		m_rambank[i]->set_entry(0);
@@ -937,34 +1040,36 @@ void nakajies_state::drwrt100(machine_config &config)
 	m_ram_size = 128 * 1024;
 }
 
-void nakajies_state::nakajies210(machine_config &config)
+void nakajies_pccard_state::nakajies210(machine_config &config)
 {
 	drwrt100(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nakajies_pccard_state::nakajies_pccard_map);
+	m_maincpu->set_addrmap(AS_IO, &nakajies_pccard_state::nakajies_io_pccard_map);
 
-	PCCARD_SLOT(config, m_pcmcia, pcmcia_devices, nullptr);
-	m_pcmcia->cd1().set(FUNC(nakajies_state::pcmcia_card_detect_w));
-	m_pcmcia->wp().set(FUNC(nakajies_state::pcmcia_write_protect_w));
-	m_pcmcia->bvd1().set(FUNC(nakajies_state::pcmcia_battery_failed_w));
+	PCCARD_SLOT(config, m_pccard, pcmcia_devices, nullptr);
+	m_pccard->cd1().set(FUNC(nakajies_pccard_state::pcmcia_card_detect_w));
+	m_pccard->wp().set(FUNC(nakajies_pccard_state::pcmcia_write_protect_w));
+	m_pccard->bvd1().set(FUNC(nakajies_pccard_state::pcmcia_battery_failed_w));
 
 }
 
-void nakajies_state::dator3k(machine_config &config)
+void nakajies_pccard_state::dator3k(machine_config &config)
 {
 	nakajies210(config);
 	m_gfxdecode->set_info(gfx_dator3k);
 }
 
-void nakajies_state::nakajies220(machine_config &config)
+void nakajies_pccard_state::nakajies220(machine_config &config)
 {
 	nakajies210(config);
 	m_gfxdecode->set_info(gfx_drwrt400);
 	m_ram_size = 256 * 1024;
 }
 
-void nakajies_state::nakajies250(machine_config &config)
+void nakajies_fdc_state::nakajies250(machine_config &config)
 {
 	nakajies220(config);
-	m_maincpu->set_addrmap(AS_IO, &nakajies_state::nakajies_io_map_fdc);
+	m_maincpu->set_addrmap(AS_IO, &nakajies_fdc_state::nakajies_io_map_fdc);
 
 	m_screen->set_size(80 * 6, 16 * 8);
 	m_screen->set_visarea(0, 6 * 80 - 1, 0, 16 * 8 - 1);
@@ -1035,11 +1140,11 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     CLASS           INIT        COMPANY     FULLNAME            FLAGS
-COMP( 199?, wales210, 0,        0,      nakajies210, nakajies_irq, nakajies_state, empty_init, "Walther",  "ES-210",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // German, 128KB RAM
-COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies_irq, nakajies_state, empty_init, "Dator",    "Dator 3000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
-COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies_irq, nakajies_state, empty_init, "Nakajima", "ES-210 (Spain)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
-COMP( 1996, drwrt100, wales210, 0,      drwrt100,    nakajies_irq, nakajies_state, empty_init, "NTS",      "DreamWriter T100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 128KB RAM
-COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies_nmi, nakajies_state, empty_init, "NTS",      "DreamWriter T400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
-COMP( 199?, drwrt450, wales210, 0,      nakajies220, nakajies_nmi, nakajies_state, empty_init, "NTS",      "DreamWriter 450",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
-COMP( 1996, drwrt200, wales210, 0,      nakajies250, nakajies_nmi, nakajies_state, empty_init, "NTS",      "DreamWriter T200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
+//    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT         CLASS                  INIT        COMPANY     FULLNAME            FLAGS
+COMP( 199?, wales210, 0,        0,      nakajies210, nakajies_irq, nakajies_pccard_state, empty_init, "Walther",  "ES-210",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // German, 128KB RAM
+COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies_irq, nakajies_pccard_state, empty_init, "Dator",    "Dator 3000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
+COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies_irq, nakajies_pccard_state, empty_init, "Nakajima", "ES-210 (Spain)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
+COMP( 1996, drwrt100, wales210, 0,      drwrt100,    nakajies_irq, nakajies_state,        empty_init, "NTS",      "DreamWriter T100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 128KB RAM
+COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies_nmi, nakajies_pccard_state, empty_init, "NTS",      "DreamWriter T400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
+COMP( 199?, drwrt450, wales210, 0,      nakajies220, nakajies_nmi, nakajies_pccard_state, empty_init, "NTS",      "DreamWriter 450",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
+COMP( 1996, drwrt200, wales210, 0,      nakajies250, nakajies_nmi, nakajies_fdc_state,    empty_init, "NTS",      "DreamWriter T200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
