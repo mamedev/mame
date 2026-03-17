@@ -775,7 +775,7 @@ void esq5505_state::common(machine_config &config)
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
-	mdin.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w)); // route MIDI Tx send directly to 68681 channel A Rx
+	mdin.rxd_handler().set(m_duart, FUNC(mc68681_device::rx_a_w)); // route MIDI Tx send directly to 68681 channel A Rx
 
 	midiout_slot(MIDI_PORT(config, "mdout"));
 
@@ -906,7 +906,7 @@ void esq5505_state::common32(machine_config &config)
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
-	mdin.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w)); // route MIDI Tx send directly to 68681 channel A Rx
+	mdin.rxd_handler().set(m_duart, FUNC(mc68681_device::rx_a_w)); // route MIDI Tx send directly to 68681 channel A Rx
 
 	midiout_slot(MIDI_PORT(config, "mdout"));
 
