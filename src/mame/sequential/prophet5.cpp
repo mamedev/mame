@@ -64,6 +64,7 @@ the current knob positions, press the "preset" button ('P') to exit preset mode
 #include "sound/flt_rc.h"
 #include "sound/mixer.h"
 #include "sound/mm5837.h"
+#include "sound/va_eg.h"
 #include "sound/va_ops.h"
 #include "sound/va_vca.h"
 #include "video/pwm.h"
@@ -94,6 +95,7 @@ constexpr double VCC = 5.0;
 constexpr double VPLUS = 15.0;
 constexpr double VMINUS = -15.0;
 constexpr double MAX_CV_IN = 10.0;  // Maximun voltage for CV inputs on back panel.
+constexpr double VD = 0.6;  // Diode voltage drop / PNP emitter-base voltage drop.
 
 double normalized(const required_ioport &input)
 {
@@ -115,7 +117,6 @@ double cv2cc(double cv, double r)
 	// These values were chosen to work for the Rs found on the Prophet 5.
 	constexpr double CV_ZERO = 0.3;
 	constexpr double CV_LINEAR = 0.8;
-	constexpr double QVBE = 0.6;
 
 	if (cv <= CV_ZERO)
 	{
@@ -125,7 +126,7 @@ double cv2cc(double cv, double r)
 	else if (cv >= CV_LINEAR)
 	{
 		// Large control voltage. Current is essentially linear wrt voltage.
-		return (cv - QVBE) / r;
+		return (cv - VD) / r;
 	}
 	else
 	{
@@ -139,7 +140,7 @@ double cv2cc(double cv, double r)
 
 		constexpr double P0[2] = { 0.3, 0.0 };
 		constexpr double P1[2] = { 0.6, 0.0 };
-		const double P2[2] = { 0.8, (0.8 - QVBE) / r };
+		const double P2[2] = { 0.8, (0.8 - VD) / r };
 
 		const double t = (cv - P0[0]) / (P2[0] - P0[0]);
 		const double t1 = 1.0 - t;
@@ -241,7 +242,7 @@ private:
 
 	device_sound_interface *const m_filt_sum_cv;
 	device_sound_interface *const m_noise;
-	sound_stream *m_stream = nullptr;
+	sound_stream *m_stream;
 
 	required_device<cem3310_device> m_vca_eg;  // U412
 	required_device<ca3280_vca_lin_device> m_vca;  // U477A
@@ -298,6 +299,7 @@ prophet5_voice_device::prophet5_voice_device(
 	, m_filt_offset_name(util::string_format("%s TRIMMER: FILT OFFSET", strmakeupper(basetag())))
 	, m_filt_sum_cv(filt_sum_cv)
 	, m_noise(noise)
+	, m_stream(nullptr)
 	, m_vca_eg(*this, "vca_eg")
 	, m_vca(*this, "vca")
 	, m_filt_eg(*this, "filt_eg")
@@ -488,13 +490,16 @@ protected:
 private:
 	static double eg_rate_cv(double cv);
 	static double eg_sustain_cv(double cv);
+	static double glide_rate_cc(double cv);
 
 	void update_wmod_amount();
 	void update_wmod_routing();
+	void update_glide_out_routing();
 	void update_filter_fixed_cvs();
 	void update_voice_volume();
 	void update_master_volume();
 
+	required_device<va_ota_eg_device> m_glide_eg;  // U381A (CA3280) + surrounding components.
 	required_device<ca3280_vca_device> m_mod_noise_vca;  // U378B
 	required_device<mixer_device> m_wmod;  // R2, U374D (LM348) - W-MOD BUFFER
 	required_device<va_const_device> m_filt_fixed_cvs;
@@ -548,6 +553,7 @@ DEFINE_DEVICE_TYPE(PROPHET5_AUDIO, prophet5_audio_device, "prophet5_audio", "Pro
 
 prophet5_audio_device::prophet5_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, PROPHET5_AUDIO, tag, owner, clock)
+	, m_glide_eg(*this, "glide_eg")
 	, m_mod_noise_vca(*this, "mod_noise_vca")
 	, m_wmod(*this, "wmod")
 	, m_filt_fixed_cvs(*this, "filt_fixed_cvs")
@@ -572,6 +578,16 @@ prophet5_audio_device::prophet5_audio_device(const machine_config &mconfig, cons
 void prophet5_audio_device::device_add_mconfig(machine_config &config)
 {
 	// *** Modulation ***
+
+	// Unison / Glide CV generator.
+	// An OTA-based envelope generator produces the "GLIDE OUT CV". It slews
+	// towards UNISON CV with a rate controlled by GLIDE CV. The EG ramp starts
+	// as linear, and transitions to an "RC" curve when very close to the target
+	// voltage. The EG consists of U381A (CA3280), U380A (TL082) and surrounding
+	// passives. The GLIDE OUT CV is distributed to the "sum CVs" of the filter
+	// and two oscillators (see update_glide_out_routing()).
+	VA_OTA_EG(config, m_glide_eg, va_ota_eg_device::ota_type::CA3280, CAP_U(0.1)) // C376
+		.add_route(0, m_filt_cv_mixer, 1.0);
 
 	// Pink noise modulation source.
 	// The output of the noise IC is offset, scaled, inverted and low-pass-
@@ -716,6 +732,7 @@ void prophet5_audio_device::device_reset()
 
 	update_wmod_amount();
 	update_wmod_routing();
+	update_glide_out_routing();
 	update_filter_fixed_cvs();
 	update_voice_volume();
 	update_master_volume();
@@ -739,7 +756,7 @@ void prophet5_audio_device::filt_kbd_s_w(int state)
 {
 	m_filt_kbd_s = bool(state);
 	LOGMASKED(LOG_PROG_LATCH, "filt_kbd_s = %d\n", m_filt_kbd_s);
-	update_filter_fixed_cvs();
+	update_glide_out_routing();
 }
 
 void prophet5_audio_device::wmod_filt_s_w(int state)
@@ -781,10 +798,8 @@ void prophet5_audio_device::cv_w(offs_t cv_index, double cv)
 			m_noise_vca->set_fixed_gain_cv(cv2cc(cv, RES_K(75)));  // Q305, R327
 			break;
 
-		case CV_UNISON:
-			if (m_filt_kbd_s)
-				update_filter_fixed_cvs();
-			break;
+		case CV_GLIDE:  m_glide_eg->set_iabc(glide_rate_cc(cv)); break;
+		case CV_UNISON: m_glide_eg->set_target_v(cv); break;
 
 		case CV_FILT_CUTOFF: update_filter_fixed_cvs(); break;
 		case CV_FILT_1_SH: m_voices[0]->filt_sh_w(cv); break;
@@ -890,6 +905,42 @@ double prophet5_audio_device::eg_sustain_cv(double cv)
 	return cv * RES_VOLTAGE_DIVIDER(RES_K(4.75), RES_K(4.75));  // both 1%
 }
 
+double prophet5_audio_device::glide_rate_cc(double cv)
+{
+	// The glide control current (CC) generator is a voltage-to-exponential-current
+	// converter built around a matched PNP transistor pair (Q309).
+	//
+	// This setup is a typical PNP-based BJT differential pair, with one side
+	// tied to GND.
+	//
+	//                             +15V----R(30K) R3126
+	//                                       |
+	//                                       +--------+
+	//                                       |        |
+	//             R3124                     v        v
+	// GLIDE CV---R(100K)---+---------------PNP      PNP--+--GND
+	//                      |                |        |   |
+	//                   R(2.7K)          R(100K)     +---+
+	//               R3125  |         R3123  |
+	//                     GND               +-------------CA3280 Iabc
+
+	assert(cv >= 0.0);
+
+	constexpr double VCE_MIN = 0.1;  // Minimum collector-emitter voltage drop.
+	constexpr double VT = 25.7E-3F;  // Thermal voltage constant at 25 deg C.
+
+	constexpr double I_EE = (VPLUS - VD) / RES_K(30);  // Approximate total current to both PNP emitters.
+	const double v_b = cv * RES_VOLTAGE_DIVIDER(RES_K(100), RES_K(2.7));
+	const double i_c = I_EE / (1 + exp(v_b / VT));  // Theoretical collector current.
+
+	// The collector resistor limits the collector current.
+	constexpr double VC_MAX = /*GND*/0 + VD - VCE_MIN;  // Max possible collector voltage.
+	constexpr double VIABC = VMINUS + 2 * VD;  // CA3280 Iabc input is ~2 diode drops above the negative supply.
+	constexpr double IC_MAX = (VC_MAX - VIABC) / RES_K(100);  // Max possible collector current.
+
+	return std::min(i_c, IC_MAX);
+}
+
 void prophet5_audio_device::update_wmod_amount()
 {
 	// The two VCAs are current sources.
@@ -920,16 +971,19 @@ void prophet5_audio_device::update_wmod_routing()
 	LOGMASKED(LOG_WHEEL, "Mod wheel routing - filter: %f\n", filt_gain);
 }
 
+void prophet5_audio_device::update_glide_out_routing()
+{
+	const double filt_route_gain = m_filt_kbd_s ? (1.0 / RES_K(100)) : 0.0;  // R372 (1%)
+	m_glide_eg->set_route_gain(0, m_filt_cv_mixer, 0, filt_route_gain);
+}
+
 void prophet5_audio_device::update_filter_fixed_cvs()
 {
 	// Multiple cutoff frequency sources are summed and inverted by U367A (
 	// LM348, configured as an inverting mixer) and surrounding resistors.
-	// TODO: Glide amount is not yet emulated. The "glide out" CV tracks the
-	// "unison" CV for now, regardless of glide amount.
 	const double i_cv_in = MAX_CV_IN * normalized(m_filter_cv_in) / RES_K(100);  // R374 (1%)
 	const double i_ctf_cv = m_cv[CV_FILT_CUTOFF] / RES_K(100);  // R352 (1%)
-	const double i_glide_out_cv = m_filt_kbd_s ? (m_cv[CV_UNISON] / RES_K(100)) : 0.0;  // R372 (1%)
-	m_filt_fixed_cvs->set_value(i_cv_in + i_ctf_cv + i_glide_out_cv);
+	m_filt_fixed_cvs->set_value(i_cv_in + i_ctf_cv);
 }
 
 void prophet5_audio_device::update_voice_volume()

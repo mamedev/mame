@@ -5,8 +5,18 @@
 #include "va_eg.h"
 #include "machine/rescap.h"
 
+#define LOG_PARAMS      (1U << 1)
+#define LOG_CONVERGENCE (1U << 2)
+
+#define VERBOSE (0)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
+#include "logmacro.h"
+
+
 // The envelope is considered completed after this many time constants.
 static constexpr const float TIME_CONSTANTS_TO_END = 10;
+
 
 va_rc_eg_device::va_rc_eg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VA_RC_EG, tag, owner, clock)
@@ -157,4 +167,183 @@ void va_rc_eg_device::snapshot()
 	m_t_end_approx = m_t_start + attotime::from_double(TIME_CONSTANTS_TO_END * m_r * m_c);
 }
 
+
+va_ota_eg_device::va_ota_eg_device(const machine_config &mconfig, const char *tag, device_t *owner, ota_type ota, float c)
+	: device_t(mconfig, VA_OTA_EG, tag, owner, 0)
+	, device_sound_interface(mconfig, *this)
+	, m_c(c)
+	, m_max_iout_scale(1)
+	, m_stream(nullptr)
+	, m_converged(true)
+	, m_g(0)
+	, m_max_step(0)
+	, m_target_v(0)
+	, m_iabc(1E-3F)
+	, m_v(0)
+{
+	// Based on the "Peak Output Current" specs in the datasheets.
+	switch (ota)
+	{
+		case ota_type::LM13600:
+		case ota_type::LM13700:
+		case ota_type::CA3080:
+			m_max_iout_scale = 1.0F;
+			break;
+		case ota_type::CA3280:
+			m_max_iout_scale = 4.1F / 5.0F;
+			break;
+		default:
+			fatalerror("%s: Unrecognized ota_type.\n", tag);
+	}
+}
+
+va_ota_eg_device::va_ota_eg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: va_ota_eg_device(mconfig, tag, owner, ota_type::CA3280, CAP_U(1))
+{
+}
+
+void va_ota_eg_device::set_target_v(float v)
+{
+	if (v == m_target_v)
+		return;
+	m_stream->update();
+	m_target_v = v;
+	m_converged = false;
+	LOGMASKED(LOG_PARAMS, "%s: Target V: %f\n", tag(), m_target_v);
+}
+
+void va_ota_eg_device::set_iabc(float iabc)
+{
+	if (iabc == m_iabc)
+		return;
+	m_stream->update();
+	m_iabc = iabc;
+	recalc();
+	LOGMASKED(LOG_PARAMS, "%s: Iabc: %e\n", tag(), m_iabc);
+}
+
+void va_ota_eg_device::device_start()
+{
+	m_stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
+	save_item(NAME(m_converged));
+	save_item(NAME(m_g));
+	save_item(NAME(m_max_step));
+	save_item(NAME(m_target_v));
+	save_item(NAME(m_iabc));
+	save_item(NAME(m_v));
+}
+
+void va_ota_eg_device::device_reset()
+{
+	recalc();
+}
+
+void va_ota_eg_device::recalc()
+{
+	const float h = 1.0F / float(m_stream->sample_rate());
+	m_g = (h / 2.0F) * m_iabc * m_max_iout_scale / m_c;
+	m_max_step = 2.0F * m_g;
+}
+
+void va_ota_eg_device::sound_stream_update(sound_stream &stream)
+{
+	/*
+	For an OTA: Iout = s * Iabc * tanh((vp - vm) / (2 * VT))
+	Where:
+	  s ~ A device-specific scaling factor. Typically 1.
+	  Iabc ~ Control current.
+	  vp ~ Voltage at the '+' input.
+	  vm ~ Voltage at the '-' input.
+	  VT ~ Thermal voltage. A temperature-dependent constant.
+
+	In this EG application, the target voltage (Vtarget) is applied to 'vp', and
+	the EG output (v(t)) is fed back to 'vm'.
+	Let x(t) = (Vtarget - v(t)) / (2 * VT)
+	Therefore: Iout(t) = s * Iabc * tanh(x(t))
+
+	Simulate using the trapezoidal rule:
+	v(t+1) = v(t) + (h/2) * (v'(t) + v'(t+1)), where 'h' is the timestep.
+
+	In this EG application, the OTA's output current is (dis)charging a
+	capacitor. Therefore:
+	v'(t) = Iout(t) / C = (s * Iabc / C) * tanh(x(t))
+
+	Let G = (s * Iabc / C) * (h / 2). Now:
+	v(t+1) = v(t) + G * tanh(x(t)) + G * tanh(x(t+1))
+
+	Solving for v(t+1) is only possible with iterative methods, since it also
+	appears inside a tanh (recall that x(t+1) is a function of v(t+1)). Instead,
+	use the "linearization at operating point" approximation:
+	tanh(x(t+1)) = tanh(x(t)) + (x(t+1) - x(t)) * tanh'(x(t))
+
+	Substitute on the simulation equation to get:
+	v(t+1) = v(t) + G * tanh(x(t)) + G * (tanh(x(t)) + (x(t+1) - x(t)) * tanh'(x(t)))
+
+	Substitute the `x()`s that are outside the `tanh()`s and simplify to get:
+	v(t+1) = v(t) + 2 * G * tanh(x(t)) + (G / (2 * VT)) * (-v(t+1) + v(t)) * tanh'(x(t))
+
+	Now it is possible to solve for v(t+1). After some algebra:
+	v(t+1) = v(t) + (2 * G * tanh(x(t))) / (1 + (G / (2 * VT)) * tanh'(x(t)))
+
+
+	Note that tanh((Vtarget - v(t)) / (2 * VT)) will saturate when
+	abs(Vtarget - v(t)) > ~10 * VT. When that happens:
+	tan(x(t)) = tan(x(t+1)) = +/- 1 (+ or - depending on whether Vtarget is
+	larger or smaller than v(t) respectively).
+
+	During saturation, the simulation equation simplifies to a linear ramp:
+	v(t+1) = v(t) + G * tanh(x(t)) + G * tanh(x(t+1))  ==>
+	v(t+1) = v(t) +/- 2 * G
+	*/
+
+	constexpr float VT = 25.7E-3F;  // Thermal voltage at 25 degrees C.
+	constexpr float INV_2VT = 1.0F / (2.0F * VT);
+	constexpr float V_OTA_SAT = 10 * VT;
+
+	if (m_converged)
+	{
+		stream.fill(0, m_target_v);
+		return;
+	}
+
+	float v_step = 0;
+	const float last_v = m_v;
+	const int n = stream.samples();
+
+	for (int i = 0; i < n; ++i)
+	{
+		const float dv = m_target_v - m_v;
+		if (dv > V_OTA_SAT)
+		{
+			v_step = m_max_step;
+		}
+		else if (dv < -V_OTA_SAT)
+		{
+			v_step = -m_max_step;
+		}
+		else
+		{
+			const float tanhv = tanhf(INV_2VT * dv);
+			const float dtanhv = 1.0F - tanhv * tanhv;  // tanh'(v) = sech(v) ^ 2 = 1 - tanh(v) ^ 2
+			v_step = (2.0F * m_g * tanhv) / (1.0F + m_g * INV_2VT * dtanhv);
+		}
+		m_v += v_step;
+		stream.put(0, i, m_v);
+	}
+
+	if (fabsf(m_v - last_v) < 1E-15 || fabsf(m_target_v - m_v) < 1E-6)
+	{
+		m_converged = true;
+		LOGMASKED(LOG_CONVERGENCE, "%s: converged: %e %e %e - %e %e\n",
+				  tag(), m_target_v, m_target_v - m_v, m_v - last_v, v_step, m_max_step);
+	}
+	else
+	{
+		LOGMASKED(LOG_CONVERGENCE, "%s: NOT converged: %e %e %e - %e %e\n",
+				  tag(), m_target_v, m_target_v - m_v, m_v - last_v, v_step, m_max_step);
+	}
+}
+
+
 DEFINE_DEVICE_TYPE(VA_RC_EG, va_rc_eg_device, "va_rc_eg", "RC-based Envelope Generator")
+DEFINE_DEVICE_TYPE(VA_OTA_EG, va_ota_eg_device, "va_ota_eg", "OTA-based Envelope Generator")
