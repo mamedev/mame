@@ -990,6 +990,26 @@ void f256k_state::mem_w(offs_t offset, u8 data)
                             logerror("RNG Write %04X %02X\n", adj_addr, data);
                             switch (adj_addr)
                             {
+                                case 0xd6a0:
+                                    m_iopage[0]->write(adj_addr - 0xc000, data);
+                                    if (m_reset_unlock)
+                                    {
+                                        logerror("SOFTWARE RESET triggered\n");
+                                        m_reset_unlock = false;
+                                        m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+                                        device_reset();
+                                    }
+                                    break;
+                                case 0xd6a2:
+                                    m_iopage[0]->write(adj_addr - 0xc000, data);
+                                    if (data == 0xde && m_iopage[0]->read(0xd6a3 - 0xc000) == 0xad)
+                                        m_reset_unlock = true;
+                                    break;
+                                case 0xd6a3:
+                                    m_iopage[0]->write(adj_addr - 0xc000, data);
+                                    if (data == 0xad && m_iopage[0]->read(0xd6a2 - 0xc000) == 0xde)
+                                        m_reset_unlock = true;
+                                    break;
                                 case 0xd6a1:
                                     // mix the PSG or SID based on the value
                                     m_iopage[0]->write(0xd6a1 - 0xc000, data);
