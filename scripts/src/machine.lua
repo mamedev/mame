@@ -4628,6 +4628,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/i82091aa.h,MACHINES["I82091AA"] = true
+---------------------------------------------------
+
+if MACHINES["I82091AA"] then
+	files {
+		MAME_DIR .. "src/devices/machine/i82091aa.cpp",
+		MAME_DIR .. "src/devices/machine/i82091aa.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/it8671f.h,MACHINES["IT8671F"] = true
 ---------------------------------------------------
 

@@ -15,13 +15,13 @@ Intel 420EX PCIset EX "Aries" x86 based HW
 
 TODO:
 - Remaining bits in chipset (SMI, pin mapper & pirqrc);
-- Super I/O (PnP capable);
 - Keyboard fails working in places (same as ls5amvp3, forgets to read at $60 for irq ack);
 - CMOS memory sets System Time with illegal hour
   (workaround: fix it manually then "Exit Saving Changes");
-- AZ08 / AZ07 BIOSes: goes Auto Configuration Error with PCI bus, extend that if cards are
+- AZ08 / AZ07 BIOSes: goes "Auto Configuration Error" with PCI bus, propagate that if cards are
   hooked up;
-- sb16_lle: DMA crashes with testsb16.exe
+- isa1:sb16_lle: DMA crashes with testsb16.exe
+- serport0:logitech_mouse: fails freedos13 init on every odd boot;
 
 **************************************************************************************************/
 
@@ -32,14 +32,15 @@ TODO:
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/pci/clgd543x_alpine.h"
 #include "bus/pci/pci_slot.h"
-//#include "bus/rs232/hlemouse.h"
-//#include "bus/rs232/null_modem.h"
-//#include "bus/rs232/rs232.h"
-//#include "bus/rs232/sun_kbd.h"
-//#include "bus/rs232/terminal.h"
+#include "bus/rs232/hlemouse.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
 #include "machine/at_keybc.h"
 #include "machine/ds128x.h"
+#include "machine/i82091aa.h"
 #include "machine/i82425ex_psc.h"
 #include "machine/i82426ex_ib.h"
 #include "machine/pci.h"
@@ -71,6 +72,8 @@ protected:
 private:
 	void main_io(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
+
+	static void intel_superio_config(device_t *device);
 };
 
 
@@ -82,6 +85,35 @@ void i420ex_state::main_map(address_map &map)
 void i420ex_state::main_io(address_map &map)
 {
 	map.unmap_value_high();
+}
+
+static void pc_isa_onboard(device_slot_interface &device)
+{
+	device.option_add_internal("superio", I82091AA);
+}
+
+static void isa_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+	device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("null_modem", NULL_MODEM);
+	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
+}
+
+void i420ex_state::intel_superio_config(device_t *device)
+{
+	i82091aa_device &aip = *downcast<i82091aa_device *>(device);
+
+	aip.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	aip.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	aip.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	aip.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	aip.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	aip.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
 
 void i420ex_state::i420ex(machine_config &config)
@@ -114,7 +146,7 @@ void i420ex_state::i420ex(machine_config &config)
 	PCI_SLOT(config, "pci:1", pci_cards, 7,  0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards, 8,  1, 2, 3, 0, nullptr);
 
-//	ISA16_SLOT(config, "board1", 0, "ib:isabus", isa_internal_devices, "i82091aa", true).set_option_machine_config("i82091aa", intel_superio_config);
+	ISA16_SLOT(config, "board1", 0, "ib:isabus", pc_isa_onboard, "superio", true).set_option_machine_config("superio", intel_superio_config);
 	ISA16_SLOT(config, "isa1",   0, "ib:isabus", pc_isa16_cards, nullptr, false);
 
 	// TODO: really DS12887
@@ -142,6 +174,20 @@ void i420ex_state::i420ex(machine_config &config)
 	pc_kbdc_device &aux_kbdc(PC_KBDC(config, "aux", ps2_mice, nullptr));
 	aux_kbdc.out_clock_cb().set(keybc, FUNC(at_kbc_device_base::kbd_clk_w));
 	aux_kbdc.out_data_cb().set(keybc, FUNC(at_kbc_device_base::kbd_data_w));
+
+	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
+	serport0.rxd_handler().set("board1:superio", FUNC(i82091aa_device::rxd1_w));
+	serport0.dcd_handler().set("board1:superio", FUNC(i82091aa_device::ndcd1_w));
+	serport0.dsr_handler().set("board1:superio", FUNC(i82091aa_device::ndsr1_w));
+	serport0.ri_handler().set("board1:superio", FUNC(i82091aa_device::nri1_w));
+	serport0.cts_handler().set("board1:superio", FUNC(i82091aa_device::ncts1_w));
+
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("board1:superio", FUNC(i82091aa_device::rxd2_w));
+	serport1.dcd_handler().set("board1:superio", FUNC(i82091aa_device::ndcd2_w));
+	serport1.dsr_handler().set("board1:superio", FUNC(i82091aa_device::ndsr2_w));
+	serport1.ri_handler().set("board1:superio", FUNC(i82091aa_device::nri2_w));
+	serport1.cts_handler().set("board1:superio", FUNC(i82091aa_device::ncts2_w));
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
