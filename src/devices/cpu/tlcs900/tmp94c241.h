@@ -12,7 +12,8 @@
 #pragma once
 
 #include "tlcs900.h"
-#include "tmp94c241_serial.h"
+
+class tmp94c241_serial_device;
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -40,14 +40,14 @@ tmp94c241_serial_device::tmp94c241_serial_device(const machine_config &mconfig, 
 	m_txd_cb(*this),
 	m_sclk_in_cb(*this),
 	m_sclk_out_cb(*this),
-	m_tx_start_cb(*this)
+	m_tx_start_cb(*this),
+	m_cpu(*this, DEVICE_SELF_OWNER)
 {
 }
 
 void tmp94c241_serial_device::device_start()
 {
 	m_timer = timer_alloc(FUNC(tmp94c241_serial_device::timer_callback), this);
-	m_cpu = dynamic_cast<tmp94c241_device *>(owner());
 
 	save_item(NAME(m_serial_control));
 	save_item(NAME(m_serial_mode));

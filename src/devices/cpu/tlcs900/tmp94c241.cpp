@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "tmp94c241.h"
+#include "tmp94c241_serial.h"
 #include "dasm900.h"
 
 #define LOG_DMA    (1U << 1)

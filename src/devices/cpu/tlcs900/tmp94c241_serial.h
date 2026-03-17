@@ -11,7 +11,7 @@
 
 #pragma once
 
-class tmp94c241_device;
+#include "tmp94c241.h"
 
 class tmp94c241_serial_device :
 	public device_t
@@ -74,7 +74,7 @@ protected:
 	devcb_write_line m_sclk_out_cb;
 	devcb_write_line m_tx_start_cb;  // Signals start of new byte transmission
 
-	tmp94c241_device *m_cpu;
+	required_device<tmp94c241_device> m_cpu;
 };
 
 DECLARE_DEVICE_TYPE(TMP94C241_SERIAL, tmp94c241_serial_device)
