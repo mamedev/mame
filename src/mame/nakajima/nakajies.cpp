@@ -239,12 +239,7 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void nakajies_update_irqs();
-	u8 irq_clear_r();
-	void irq_clear_w(u8 data);
-	u8 irq_enable_r();
-	void irq_enable_w(u8 data);
 	u8 sys_stat_r();
-	void lcd_memory_start_w(u8 data);
 	u8 keyboard_r();
 	void keyboard_row_reset(u8 data);
 	virtual void banking_w(offs_t offset, u8 data);
@@ -390,22 +385,41 @@ void nakajies_pccard_state::nakajies_pccard_map(address_map &map)
 
 void nakajies_state::nakajies_io_map(address_map &map)
 {
-	map(0x0000, 0x0000).w(FUNC(nakajies_state::lcd_memory_start_w));
+	map(0x0000, 0x0000).lw8(
+		NAME([this](u8 data) {
+			// TODO: Not yet identified where or what enables the lcd display.
+			m_lcd_on = true;
+			m_lcd_memory_start = data;
+		})
+	);
 	map(0x0010, 0x0017).w(FUNC(nakajies_state::banking_w));
 	map(0x30, 0x30).w(FUNC(nakajies_state::uart_control_w));
-	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x0050, 0x0050).lw8(NAME([this](u8 data) { m_beep_freq = (m_beep_freq & 0xff00) | data; m_beep->set_clock(250000/m_beep_freq); }));
-	map(0x0051, 0x0051).lw8(NAME([this](u8 data) { m_beep_freq = (m_beep_freq & 0x00ff) | (data << 8); m_beep->set_clock(250000/m_beep_freq); }));
+	map(0x40, 0x40).w(m_cent_data_out, FUNC(output_latch_device::write));
+	map(0x0050, 0x0050).lw8(NAME([this](u8 data) { m_beep_freq = (m_beep_freq & 0xff00) | data; m_beep->set_clock(250000/m_beep_freq); })); // 250000 is a wild guess
+	map(0x0051, 0x0051).lw8(NAME([this](u8 data) { m_beep_freq = (m_beep_freq & 0x00ff) | (data << 8); m_beep->set_clock(250000/m_beep_freq); })); // 250000 is a wild guess
 	map(0x0052, 0x0052).lw8(NAME([this](u8 data) { m_beep->set_state(!BIT(data, 7)); }));
 	// Unknown
 	map(0x0053, 0x0053).noprw();
-	map(0x0060, 0x0060).rw(FUNC(nakajies_state::irq_enable_r), FUNC(nakajies_state::irq_enable_w));
+	map(0x0060, 0x0060).lrw8(
+		NAME([this] { return m_irq_enabled; }),
+		NAME([this](u8 data) {
+			m_irq_enabled = data;
+			nakajies_update_irqs();
+		})
+	);
 	map(0x0061, 0x0061).w(FUNC(nakajies_state::keyboard_row_reset));
-	map(0x0070, 0x0070).lw8(NAME([this](u8 data) {
-		m_lcd_on = false;
-		m_maincpu->suspend(SUSPEND_REASON_HALT, true);
-	}));
-	map(0x0090, 0x0090).rw(FUNC(nakajies_state::irq_clear_r), FUNC(nakajies_state::irq_clear_w));
+	map(0x0070, 0x0070).lw8(
+		NAME([this](u8 data) {
+			m_lcd_on = false;
+			m_maincpu->suspend(SUSPEND_REASON_HALT, true);
+		})
+	);
+	map(0x0090, 0x0090).lw8(
+		NAME([this](u8 data) {
+			m_irq_active &= ~data;
+			nakajies_update_irqs();
+		})
+	);
 	map(0x00a0, 0x00a0).r(FUNC(nakajies_state::sys_stat_r));
 	map(0x00b0, 0x00b0).r(FUNC(nakajies_state::keyboard_r));
 	map(0x00c0, 0x00c1).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
@@ -444,11 +458,8 @@ void nakajies_pccard_state::pcmcia_w(offs_t offset, u8 data)
 
 void nakajies_state::nakajies_update_irqs()
 {
-	// Hack: IRQ mask is temporarily disabled because it doesn't allow the IRQ vectors 0xFA
-	// and 0xFB that are used for scanning the kb, this need further investigation.
-	// drwrt200 stops responding to keyboard input when checking against m_irq_enabled
-	uint8_t irq = m_irq_active; // & m_irq_enabled;
-	uint8_t vector = 0xff;
+	uint8_t irq = m_irq_active & m_irq_enabled;
+	uint8_t vector = 0xFF;
 
 	if (LOG)
 		logerror("nakajies_update_irqs: irq_enabled = %02x, irq_active = %02x\n", m_irq_enabled, m_irq_active);
@@ -468,33 +479,6 @@ void nakajies_state::nakajies_update_irqs()
 	{
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 	}
-}
-
-
-u8 nakajies_state::irq_clear_r()
-{
-	return 0x00;
-}
-
-
-void nakajies_state::irq_clear_w(u8 data)
-{
-	m_irq_active &= ~data;
-	nakajies_update_irqs();
-}
-
-
-u8 nakajies_state::irq_enable_r()
-{
-	return m_irq_enabled;
-}
-
-
-void nakajies_state::irq_enable_w(u8 data)
-{
-	// Bit 0 - set after scanning of keyboard?
-	m_irq_enabled = data;
-	nakajies_update_irqs();
 }
 
 
@@ -526,13 +510,6 @@ u8 nakajies_pccard_state::sys_stat_r()
 		m_port_status->read() |
 		(m_centronics_busy ? 0x02 : 0x00) |
 		0x21;
-}
-
-void nakajies_state::lcd_memory_start_w(u8 data)
-{
-	// TODO: Not yet identified where or what enables the lcd display.
-	m_lcd_on = true;
-	m_lcd_memory_start = data;
 }
 
 
