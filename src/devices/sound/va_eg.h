@@ -85,8 +85,8 @@ private:
 // When the EG output is far from the target (e.g. > ~0.2V), the EG will ramp
 // towards the target linearly. As the output approaches the target, the EG ramp
 // will start curving. When the difference is < ~0.02V, the ramp  will closely
-// approximate an "RC" curve with R ~= s * Iabc / (2 * VT). Where 's' is a
-// device-specific constant (typically ~1) and VT is the thermal voltage.
+// approximate an "RC" curve with R = (2 * VT) / (s * Iabc). Where 's' is a
+// device-specific constant (typically 1) and VT is the thermal voltage.
 //
 //                                x      Iabc
 //                             ___|__     |
