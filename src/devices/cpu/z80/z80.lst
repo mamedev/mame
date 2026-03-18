@@ -902,6 +902,7 @@ macro   take_nmi
 macro   z80n:take_nmi
 	leave_halt();
 	m_iff1 = 0;
+	m_nmiack_cb(1);
 	m_r++;
 	+ 5
 	if (m_stackless) {
@@ -1002,7 +1003,6 @@ macro   take_interrupt
 
 macro   check_interrupts
 	if (get_service_attention<SA_NMI_PENDING>()) {
-		m_nmiack_cb(1);
 		@take_nmi
 	} else if (m_irq_state != CLEAR_LINE && m_iff1 && !get_service_attention<SA_AFTER_EI>()) { // SA_IRQ_ON
 		@take_interrupt
@@ -1035,7 +1035,6 @@ macro   nsc800_take_interrupt
 
 macro   nsc800:check_interrupts
 	if (get_service_attention<SA_NMI_PENDING>()) {
-		m_nmiack_cb(1);
 		@take_nmi
 	} else if (get_service_attention<SA_NSC800_IRQ_ON>() && m_iff1 && !get_service_attention<SA_AFTER_EI>()) {
 		@nsc800_take_interrupt

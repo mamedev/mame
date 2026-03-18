@@ -25,6 +25,7 @@ std::unique_ptr<util::disasm_interface> z80n_device::create_disassembler()
 
 z80n_device::z80n_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: z80_device(mconfig, Z80N, tag, owner, clock)
+	, m_nmiack_cb(*this)
 	, m_out_retn_seen_cb(*this)
 	, m_in_nextreg_cb(*this, 0)
 	, m_out_nextreg_cb(*this)
