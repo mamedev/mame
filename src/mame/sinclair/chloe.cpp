@@ -896,7 +896,8 @@ void chloe_state::video_start()
 	spectrum_128_state::video_start();
 
 	const u8 *ram = m_ram->pointer();
-	m_ula_scr->set_host_ram_ptr(ram);
+	m_ula_scr->set_bram_bank5_ptr(ram + (5 << 14));
+	m_ula_scr->set_bram_bank7_ptr(ram + (7 << 14));
 }
 
 

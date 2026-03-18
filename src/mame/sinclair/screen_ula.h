@@ -9,7 +9,8 @@ class screen_ula_device : public device_t, public device_gfx_interface
 {
 
 public:
-	screen_ula_device &set_host_ram_ptr(const u8 *host_ram_ptr) { m_host_ram_ptr = host_ram_ptr; return *this; }
+	screen_ula_device &set_bram_bank5_ptr(const u8 *bram_bank5_ptr) { m_bram_bank5_ptr = bram_bank5_ptr; return *this; }
+	screen_ula_device &set_bram_bank7_ptr(const u8 *bram_bank7_ptr) { m_bram_bank7_ptr = bram_bank7_ptr; return *this; }
 	screen_ula_device &set_palette(const char *tag, u16 base_offset, u16 alt_offset);
 
 	void set_raster_offset(u16 offset_h,  u16 offset_v) { m_offset_h = offset_h; m_offset_v = offset_v; }
@@ -55,7 +56,8 @@ private:
 	static inline constexpr u16 UTM_FALLBACK_PEN = 0x800;
 
 	u16 m_offset_h, m_offset_v;
-	const u8 *m_host_ram_ptr;
+	const u8 *m_bram_bank5_ptr;
+	const u8 *m_bram_bank7_ptr;
 	u8 m_global_transparent;
 	u16 m_palette_base_offset;
 	u16 m_palette_alt_offset;

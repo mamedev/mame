@@ -13,7 +13,8 @@ class specnext_tiles_device : public device_t, public device_gfx_interface
 public:
 	specnext_tiles_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	specnext_tiles_device &set_host_ram_ptr(const u8 *host_ram_ptr) { m_host_ram_ptr = host_ram_ptr; tilemap_update(); return *this; }
+	specnext_tiles_device &set_bram_bank5_ptr(const u8 *bram_bank5_ptr) { m_bram_bank5_ptr = bram_bank5_ptr; tilemap_update(); return *this; }
+	specnext_tiles_device &set_bram_bank7_ptr(const u8 *bram_bank7_ptr) { m_bram_bank7_ptr = bram_bank7_ptr; tilemap_update(); return *this; }
 	specnext_tiles_device &set_palette(const char *tag, u16 base_offset, u16 alt_offset);
 	void tilemap_update();
 
@@ -46,7 +47,8 @@ protected:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	const u8 *m_host_ram_ptr;
+	const u8 *m_bram_bank5_ptr;
+	const u8 *m_bram_bank7_ptr;
 	const u8 *m_tiles_info;
 	tilemap_t *m_tilemap[2];
 

@@ -110,6 +110,8 @@ public:
 		, m_io_expbus_view(*this, "io_expbus_view")
 		, m_bank_boot_rom(*this, "bootrom")
 		, m_bank_ram(*this, "bank_ram%u", 0U)
+		, m_bram_bank5(*this, "bram_bank5", 0x4000, ENDIANNESS_LITTLE)
+		, m_bram_bank7(*this, "bram_bank7", 0x2000, ENDIANNESS_LITTLE)
 		, m_view0(*this, "mem_view0")
 		, m_view1(*this, "mem_view1")
 		, m_view2(*this, "mem_view2")
@@ -355,6 +357,8 @@ private:
 	memory_view m_io_expbus_view;
 	memory_bank_creator m_bank_boot_rom;
 	memory_bank_array_creator<8> m_bank_ram;
+	memory_share_creator<u8> m_bram_bank5;
+	memory_share_creator<u8> m_bram_bank7;
 	memory_view m_view0, m_view1, m_view2, m_view3, m_view4, m_view5, m_view6, m_view7;
 	required_device<specnext_im2_device> m_im2_line;
 	optional_device<specnext_im2_device> m_im2_uart0_rx;
@@ -830,28 +834,41 @@ void specnext_state::bank_update(u8 bank)
 		}
 
 		if (false) // unused in current implementation, makes compiler happy
-			printf("%d", sram_active + sram_bank5 + sram_romcs_en + sram_mem_hide_n);
+			printf("%d", sram_romcs_en);
 
-		if (cpu_rd_n)
+		if (cpu_rd_n) // write cycle
 		{
 			m_page_shadow[bank] = sram_rdonly ? -1 : sram_A21_A13;
 		}
-		else
+		else // read cycle
 		{
-			const bool ro = sram_rdonly || (m_page_shadow[bank] != sram_A21_A13);
 			if (sram_A21_A13 < m_ram_pages)
 			{
-				m_bank_ram[bank]->set_entry(sram_A21_A13);
-				views[bank].get().select(ro);
-				LOGMEM("%s%d = %x\n", ro ? "ROM" : "RAM", bank, sram_A21_A13);
+				if (!sram_active && !sram_mem_hide_n && (sram_bank5 || sram_bank7))
+				{
+					views[bank].get().select(sram_A21_A13);
+					LOGMEM("RAM%d = bank%d\n", bank, sram_bank5 ? 5 : 7);
+					m_page_shadow[bank] = -1;
+				}
+				else
+				{
+					const bool ro = sram_rdonly || (m_page_shadow[bank] != sram_A21_A13);
+					m_bank_ram[bank]->set_entry(sram_A21_A13);
+					views[bank].get().select(ro);
+					LOGMEM("%s%d = %x\n", ro ? "ROM" : "RAM", bank, sram_A21_A13);
+
+					if (!ro)
+					{
+						if (m_page_shadow[bank] == sram_A21_A13)
+							m_page_shadow[bank] = -1;
+					}
+				}
+
 			}
 			else
-				views[bank].get().disable();
-
-			if (!ro)
 			{
-				if (m_page_shadow[bank] == sram_A21_A13)
-					m_page_shadow[bank] = -1;
+				views[bank].get().disable();
+				m_page_shadow[bank] = -1;
 			}
 		}
 	}
@@ -2959,6 +2976,21 @@ void specnext_state::map_mem(address_map &map)
 		map(0x0000 + i * 0x2000, 0x1fff + i * 0x2000).view(views[i].get());
 		views[i].get()[0](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).bankrw(m_bank_ram[i]);
 		views[i].get()[1](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).bankr(m_bank_ram[i]);
+
+		// bank5
+		views[i].get()[0x2a](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lrw8(
+			NAME([this](offs_t offset) { return m_bram_bank5[offset & 0x1fff]; }),
+			NAME([this](offs_t offset, u8 data) { m_bram_bank5[offset & 0x1fff] = data; })
+		);
+		views[i].get()[0x2b](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lrw8(
+			NAME([this](offs_t offset) { return m_bram_bank5[0x2000 + (offset & 0x1fff)]; }),
+			NAME([this](offs_t offset, u8 data) { m_bram_bank5[0x2000 + (offset & 0x1fff)] = data; })
+		);
+		// bank7
+		views[i].get()[0x2e](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lrw8(
+			NAME([this](offs_t offset) { return m_bram_bank7[offset & 0x1fff]; }),
+			NAME([this](offs_t offset, u8 data) { m_bram_bank7[offset & 0x1fff] = data; })
+		);
 	}
 	views[0].get()[2](0x0000, 0x1fff).bankr(m_bank_boot_rom);
 	views[1].get()[2](0x2000, 0x3fff).bankr(m_bank_boot_rom);
@@ -3292,10 +3324,12 @@ void specnext_state::machine_start()
 	m_bank_boot_rom->configure_entry(0, memregion("maincpu")->base());
 
 	const u8 *ram = m_ram->pointer() + 0x40000;
-	m_ula_scr->set_host_ram_ptr(ram);
-	m_tiles->set_host_ram_ptr(ram);
+	m_ula_scr->set_bram_bank5_ptr(m_bram_bank5.target());
+	m_ula_scr->set_bram_bank7_ptr(m_bram_bank7.target());
+	m_tiles->set_bram_bank5_ptr(m_bram_bank5.target());
+	m_tiles->set_bram_bank7_ptr(m_bram_bank7.target());
 	m_layer2->set_host_ram_ptr(ram);
-	m_lores->set_host_ram_ptr(ram);
+	m_lores->set_bram_bank5_ptr(m_bram_bank5.target());
 
 	m_nr_02_hard_reset = 1;
 
@@ -3940,7 +3974,7 @@ void specnext_state::video_start()
 	prg.install_write_tap(0x0000, 0xbfff, "shadow_w", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
 		u8 bank8 = offset >> 13;
-		if (m_page_shadow[bank8] >= 0 && m_ram_pages > m_page_shadow[bank8])
+		if (m_page_shadow[bank8] >= 0)
 		{
 			u8 *to = m_ram->pointer() + (m_page_shadow[bank8] << 13);
 			to[offset & 0x1fff] = data;
