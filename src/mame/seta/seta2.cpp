@@ -3915,7 +3915,7 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1994, gundamex,  0,        gundamex, gundamex, seta2_state,    empty_init,    ROT0,   "Banpresto",                     "Mobile Suit Gundam EX Revue",                         MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_TIMING )
+GAME( 1994, gundamex,  0,        gundamex, gundamex, seta2_state,    empty_init,    ROT0,   "Banpresto",                     "Mobile Suit Gundam EX Revue",                         MACHINE_IMPERFECT_TIMING )
 
 GAME( 1995, grdians,   0,        grdians,  grdians,  seta2_state,    empty_init,    ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II (P-FG01-1 PCB)",          MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, grdiansa,  grdians,  grdiansa, grdians,  seta2_state,    empty_init,    ROT0,   "Winkysoft (Banpresto license)", "Guardians / Denjin Makai II (P0-113A PCB)",           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
