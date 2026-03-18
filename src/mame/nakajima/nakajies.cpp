@@ -120,26 +120,15 @@ I/O Map:
 
 0053 - unknown
 
-0060 - Irq enable/disable (?)
-       0xff written at start of boot sequence
-       0x7e written just before enabling interrupts
+0060 - Irq enable/disable
 
-0061 - unknown
-       0xFE written in irq 0xFB handler
+0061 - Reset keyboard scan row
 
 0070 - 0x01 (probably any value) powers the unit down. The system will have already
        stored enough information to allow it to continue execution when started
        again.
 
 0090 - Interrupt source clear
-       b7 - 1 = clear interrupt source for irq vector 0xf8
-       b6 - 1 = clear interrupt source for irq vector 0xf9
-       b5 - 1 = clear interrupt source for irq vector 0xfa
-       b4 - 1 = clear interrupt source for irq vector 0xfb
-       b3 - 1 = clear interrupt source for irq vector 0xfc
-       b2 - 1 = clear interrupt source for irq vector 0xfd
-       b1 - 1 = clear interrupt source for irq vector 0xfe
-       b0 - 1 = clear interrupt source for irq vector 0xff
 
 00A0 - System status
 
@@ -152,13 +141,14 @@ I/O Map:
 00D0 - 00DF - RTC
 
 
-
-TODO:
-- drwrt200,drwrt400,drwrt450 only go up to 512KB to initialize pcmcia card.
+Notes:
+- drwrt200,drwrt400, and drwrt450 only go up to 512KB to initialize pcmcia card.
   Very likely BTANB. At least the documentation for the T400 mentions support
   for 512KB instead of 1MB SRAM card.
-- Serial port
-- Floppy support
+
+TODO:
+- Serial port causes source selection to hang on dreamlink
+- Floppy support in drwtr200
 - centronics ack signal is not checked anywhere?
 - Frequncy of the keyboard timer is unknown.
 - beeper sound is not verified against a real system.
