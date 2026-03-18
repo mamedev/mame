@@ -620,9 +620,11 @@ void ppc_device::device_start()
 	memset(m_read32, 0, sizeof(m_read32));
 	memset(m_read32align, 0, sizeof(m_read32align));
 	memset(m_read32mask, 0, sizeof(m_read32mask));
+	memset(m_read32reserve, 0, sizeof(m_read32reserve));
 	memset(m_write32, 0, sizeof(m_write32));
 	memset(m_write32align, 0, sizeof(m_write32align));
 	memset(m_write32mask, 0, sizeof(m_write32mask));
+	memset(m_write32reserve, 0, sizeof(m_write32reserve));
 	memset(m_read64, 0, sizeof(m_read64));
 	memset(m_read64mask, 0, sizeof(m_read64mask));
 	memset(m_write64, 0, sizeof(m_write64));
@@ -1004,22 +1006,24 @@ void ppc_device::device_start()
 		/* add subroutines for memory accesses */
 		for (int mode = 0; mode < 8; mode++)
 		{
-			static_generate_memory_accessor(mode, 1, false, false, "read8",       m_read8[mode],       nullptr);
-			static_generate_memory_accessor(mode, 1, true,  false, "write8",      m_write8[mode],      nullptr);
-			static_generate_memory_accessor(mode, 2, false, true,  "read16mask",  m_read16mask[mode],  nullptr);
-			static_generate_memory_accessor(mode, 2, false, false, "read16",      m_read16[mode],      m_read16mask[mode]);
-			static_generate_memory_accessor(mode, 2, true,  true,  "write16mask", m_write16mask[mode], nullptr);
-			static_generate_memory_accessor(mode, 2, true,  false, "write16",     m_write16[mode],     m_write16mask[mode]);
-			static_generate_memory_accessor(mode, 4, false, true,  "read32mask",  m_read32mask[mode],  nullptr);
-			static_generate_memory_accessor(mode, 4, false, false, "read32align", m_read32align[mode], nullptr);
-			static_generate_memory_accessor(mode, 4, false, false, "read32",      m_read32[mode],      m_read32mask[mode]);
-			static_generate_memory_accessor(mode, 4, true,  true,  "write32mask", m_write32mask[mode], nullptr);
-			static_generate_memory_accessor(mode, 4, true,  false, "write32align",m_write32align[mode],nullptr);
-			static_generate_memory_accessor(mode, 4, true,  false, "write32",     m_write32[mode],     m_write32mask[mode]);
-			static_generate_memory_accessor(mode, 8, false, true,  "read64mask",  m_read64mask[mode],  nullptr);
-			static_generate_memory_accessor(mode, 8, false, false, "read64",      m_read64[mode],      m_read64mask[mode]);
-			static_generate_memory_accessor(mode, 8, true,  true,  "write64mask", m_write64mask[mode], nullptr);
-			static_generate_memory_accessor(mode, 8, true,  false, "write64",     m_write64[mode],     m_write64mask[mode]);
+			static_generate_memory_accessor(mode, 1, false, false, false, "read8",         m_read8[mode],         nullptr);
+			static_generate_memory_accessor(mode, 1, true,  false, false, "write8",        m_write8[mode],        nullptr);
+			static_generate_memory_accessor(mode, 2, false, true,  false, "read16mask",    m_read16mask[mode],    nullptr);
+			static_generate_memory_accessor(mode, 2, false, false, false, "read16",        m_read16[mode],        m_read16mask[mode]);
+			static_generate_memory_accessor(mode, 2, true,  true,  false, "write16mask",   m_write16mask[mode],   nullptr);
+			static_generate_memory_accessor(mode, 2, true,  false, false, "write16",       m_write16[mode],       m_write16mask[mode]);
+			static_generate_memory_accessor(mode, 4, false, true,  false, "read32mask",    m_read32mask[mode],    nullptr);
+			static_generate_memory_accessor(mode, 4, false, false, false, "read32align",   m_read32align[mode],   nullptr);
+			static_generate_memory_accessor(mode, 4, false, false, true,  "read32reserve", m_read32reserve[mode], nullptr);
+			static_generate_memory_accessor(mode, 4, false, false, false, "read32",        m_read32[mode],        m_read32mask[mode]);
+			static_generate_memory_accessor(mode, 4, true,  true,  false, "write32mask",   m_write32mask[mode],   nullptr);
+			static_generate_memory_accessor(mode, 4, true,  false, false, "write32align",  m_write32align[mode],  nullptr);
+			static_generate_memory_accessor(mode, 4, true,  false, true,  "write32reserve",m_write32reserve[mode],nullptr);
+			static_generate_memory_accessor(mode, 4, true,  false, false, "write32",       m_write32[mode],       m_write32mask[mode]);
+			static_generate_memory_accessor(mode, 8, false, true,  false, "read64mask",    m_read64mask[mode],    nullptr);
+			static_generate_memory_accessor(mode, 8, false, false, false, "read64",        m_read64[mode],        m_read64mask[mode]);
+			static_generate_memory_accessor(mode, 8, true,  true,  false, "write64mask",   m_write64mask[mode],   nullptr);
+			static_generate_memory_accessor(mode, 8, true,  false, false, "write64",       m_write64[mode],       m_write64mask[mode]);
 			static_generate_lsw_entries(mode);
 			static_generate_stsw_entries(mode);
 		}

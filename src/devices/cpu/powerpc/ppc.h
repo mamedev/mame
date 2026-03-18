@@ -603,9 +603,11 @@ protected:
 	uml::code_handle *   m_read32[8];                  /* read word */
 	uml::code_handle *   m_read32align[8];             /* read word aligned */
 	uml::code_handle *   m_read32mask[8];              /* read word */
+	uml::code_handle *   m_read32reserve[8];           /* read word reserved */
 	uml::code_handle *   m_write32[8];                 /* write word */
 	uml::code_handle *   m_write32align[8];            /* write word aligned */
 	uml::code_handle *   m_write32mask[8];             /* write word */
+	uml::code_handle *   m_write32reserve[8];          /* write word reserved */
 	uml::code_handle *   m_read64[8];                  /* read double */
 	uml::code_handle *   m_read64mask[8];              /* read double */
 	uml::code_handle *   m_write64[8];                 /* write double */
@@ -682,7 +684,7 @@ protected:
 	void static_generate_out_of_cycles();
 	void static_generate_tlb_mismatch();
 	void static_generate_exception(uint8_t exception, int recover, const char *name);
-	void static_generate_memory_accessor(int mode, int size, int iswrite, int ismasked, const char *name, uml::code_handle *&handleptr, uml::code_handle *masked);
+	void static_generate_memory_accessor(int mode, int size, int iswrite, int ismasked, int isreserve, const char *name, uml::code_handle *&handleptr, uml::code_handle *masked);
 	void static_generate_swap_tgpr();
 	void static_generate_lsw_entries(int mode);
 	void static_generate_stsw_entries(int mode);

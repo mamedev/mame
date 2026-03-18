@@ -939,7 +939,7 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
     static_generate_memory_accessor
 ------------------------------------------------------------------*/
 
-void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite, int ismasked, const char *name, uml::code_handle *&handleptr, uml::code_handle *masked)
+void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite, int ismasked, int isreserve, const char *name, uml::code_handle *&handleptr, uml::code_handle *masked)
 {
 	/* on entry, address is in I0; data for writes is in I1; masks are in I2 */
 	/* on exit, read result is in I0 */
@@ -1009,6 +1009,27 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 	else if (m_cap & PPCCAP_4XX)
 		UML_AND(block, I0, I0, 0x7fffffff);                                 // and     i0,i0,0x7fffffff
 	UML_XOR(block, I0, I0, (mode & MODE_LITTLE_ENDIAN) ? (8 - size) : 0);   // xor     i0,i0,8-size
+
+	if (isreserve)
+	{
+		if (iswrite)
+		{
+			int dowrite = label++;
+			UML_CMP(block, mem(&m_core->reserve), 0);                              // cmp     reserve,0
+			UML_JMPc(block, COND_NZ, dowrite);                                     // bnz      1:
+			UML_MOV(block, CR32(0), XERSO32);                                      // mov     [cr0],[xerso]
+			UML_RET(block);                                                        // ret
+			UML_LABEL(block, dowrite);                                             // 1:
+			UML_MOV(block, mem(&m_core->reserve), 0);                              // mov     reserve,0
+			UML_OR(block, CR32(0), 2, XERSO32);                                    // or      [cr0],2,[xerso]
+		}
+		else
+		{
+			UML_MOV(block, mem(&m_core->reserve), 1);                              // mov     reserve,1
+			UML_AND(block, I3, I0, 0xffffffe0);                                    // and     i3,i0,0xffffffe0
+			UML_MOV(block, mem(&m_core->reserve_address), I3);                     // mov     reserve_address,i3
+		}
+	}
 
 	if (!debugger_enabled())
 		for (ramnum = 0; ramnum < PPC_MAX_FASTRAM; ramnum++)
@@ -1304,9 +1325,11 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 	/* handle an alignment exception */
 	if (alignex != 0)
 	{
-		UML_LABEL(block, alignex);                                                      // alignex:
-		UML_RECOVER(block, SPR32(SPROEA_DSISR), MAPVAR_DSISR);                              // recover [dsisr],DSISR
-		UML_EXH(block, *m_exception[EXCEPTION_ALIGN], I0);                 // exh     align,i0
+		UML_LABEL(block, alignex);                                             // alignex:
+		if (isreserve && iswrite)
+			UML_MOV(block, mem(&m_core->reserve), 0);                          // mov     reserve,0
+		UML_RECOVER(block, SPR32(SPROEA_DSISR), MAPVAR_DSISR);                 // recover [dsisr],DSISR
+		UML_EXH(block, *m_exception[EXCEPTION_ALIGN], I0);                     // exh     align,i0
 	}
 
 	/* handle a TLB miss */
@@ -1324,17 +1347,21 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 		/* 4XX case: protection exception */
 		if (m_cap & PPCCAP_4XX)
 		{
-			UML_MOV(block, SPR32(SPR4XX_DEAR), I0);                                 // mov     [dear],i0
-			UML_EXH(block, *m_exception[EXCEPTION_DSI], I0);               // exh     dsi,i0
+			if (isreserve && iswrite)
+				UML_MOV(block, mem(&m_core->reserve), 0);                      // mov     reserve,0
+			UML_MOV(block, SPR32(SPR4XX_DEAR), I0);                            // mov     [dear],i0
+			UML_EXH(block, *m_exception[EXCEPTION_DSI], I0);                   // exh     dsi,i0
 		}
 
 		/* 603 case: TLBMISS exception */
 		else if (m_cap & PPCCAP_603_MMU)
 		{
-			UML_MOV(block, SPR32(SPR603_DMISS), I0);                                    // mov     [dmiss],i0
-			UML_MOV(block, SPR32(SPR603_DCMP), mem(&m_core->mmu603_cmp));                      // mov     [dcmp],[mmu603_cmp]
-			UML_MOV(block, SPR32(SPR603_HASH1), mem(&m_core->mmu603_hash[0]));                 // mov     [hash1],[mmu603_hash][0]
-			UML_MOV(block, SPR32(SPR603_HASH2), mem(&m_core->mmu603_hash[1]));                 // mov     [hash2],[mmu603_hash][1]
+			if (isreserve && iswrite)
+				UML_MOV(block, mem(&m_core->reserve), 0);                      // mov     reserve,0
+			UML_MOV(block, SPR32(SPR603_DMISS), I0);                           // mov     [dmiss],i0
+			UML_MOV(block, SPR32(SPR603_DCMP), mem(&m_core->mmu603_cmp));      // mov     [dcmp],[mmu603_cmp]
+			UML_MOV(block, SPR32(SPR603_HASH1), mem(&m_core->mmu603_hash[0])); // mov     [hash1],[mmu603_hash][0]
+			UML_MOV(block, SPR32(SPR603_HASH2), mem(&m_core->mmu603_hash[1])); // mov     [hash2],[mmu603_hash][1]
 			if (iswrite)
 				UML_EXH(block, *m_exception[EXCEPTION_DTLBMISSS], I0);     // exh     dtlbmisss,i0
 			else
@@ -1344,7 +1371,9 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 		/* general case: DSI exception */
 		else
 		{
-			UML_MOV(block, SPR32(SPROEA_DAR), mem(&m_core->param0));            // mov [dar],[param0]
+			if (isreserve && iswrite)
+				UML_MOV(block, mem(&m_core->reserve), 0);                      // mov     reserve,0
+			UML_MOV(block, SPR32(SPROEA_DAR), mem(&m_core->param0));           // mov [dar],[param0]
 			// signal read or write to cfunc to get proper reason back
 			if (iswrite)
 			{
@@ -3168,11 +3197,8 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 
 		case 0x014: /* LWARX */
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                     // add     i0,ra,rb
-			UML_MOV(block, mem(&m_core->reserve), 1);                              // mov     reserve,1
-			UML_AND(block, I1, I0, 0xffffffe0);                                    // and     i1,i0,0xffffffe0
-			UML_MOV(block, mem(&m_core->reserve_address), I1);                     // mov     reserve_address,i1
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                        // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *m_read32align[m_core->mode]);                        // callh   read32align
+			UML_CALLH(block, *m_read32reserve[m_core->mode]);                      // callh   read32reserve
 			UML_MOV(block, R32(G_RD(op)), I0);                                     // mov     rd,i0
 			generate_update_cycles(block, compiler, desc->pc + 4, true);           // <update cycles>
 			return true;
@@ -3317,18 +3343,10 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			return true;
 
 		case 0x096: /* STWCX. */
-			UML_CMP(block, mem(&m_core->reserve), 0);                              // cmp     reserve,0
-			UML_JMPc(block, COND_Z, compiler->labelnum);                           // bz      1:
 			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                     // add     i0,ra,rb
 			UML_MOV(block, I1, R32(G_RS(op)));                                     // mov     i1,rs
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                        // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *m_write32align[m_core->mode]);                       // callh   write32align
-			UML_MOV(block, mem(&m_core->reserve), 0);                              // mov     reserve,0
-			UML_OR(block, CR32(0), 2, XERSO32);                                    // or      [cr0],2,[xerso]
-			UML_JMP(block, compiler->labelnum + 1);                                // b       2:
-			UML_LABEL(block, compiler->labelnum++);                                // 1:
-			UML_MOV(block, CR32(0), XERSO32);                                      // mov     [cr0],[xerso]
-			UML_LABEL(block, compiler->labelnum++);                                // 2:
+			UML_CALLH(block, *m_write32reserve[m_core->mode]);                     // callh   write32reserve
 			generate_update_cycles(block, compiler, desc->pc + 4, true);           // <update cycles>
 			return true;
 
