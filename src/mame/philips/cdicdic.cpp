@@ -456,8 +456,8 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 			sampleL = m_samples[0][i];
 			sampleR = m_samples[coding & CODING_STEREO][i];
 
-			outL = (sampleL * scaleLL + sampleR * scaleRL) * 0.5;
-			outR = (sampleL * scaleLR + sampleR * scaleRR) * 0.5;
+			outL = (sampleL * scaleLL + sampleR * scaleRL) * 0.25;
+			outR = (sampleL * scaleLR + sampleR * scaleRR) * 0.25;
 			m_dmadac[0]->transfer(0, 1, 1, 1, &outL);
 			m_dmadac[1]->transfer(0, 1, 1, 1, &outR);
 		}
