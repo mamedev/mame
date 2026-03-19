@@ -143,18 +143,17 @@ void cdislave_hle_device::set_mouse_position()
 
 void cdislave_hle_device::slave_w_mouse(offs_t offset, uint16_t data)
 {
-	m_in_buf[m_in_index] = data & 0x00ff;
 	bool set_mouse = m_in_buf[0] >= 0xc0;
 	if (set_mouse)
 	{
-		if (m_in_index == 0)
+		if (m_in_index == 1)
 		{
 			LOGMASKED(LOG_COMMANDS, "slave_w: Channel %d: Update Mouse Position (0x%02x)\n", offset, data & 0x00ff);
-			m_in_count = 3;
+			m_in_count = 4;
 		}
 		else
 		{
-			if (m_in_index == m_in_count - 1)
+			if (m_in_index == m_in_count)
 			{
 				// Update Mouse Position
 				set_mouse_position();
@@ -168,62 +167,55 @@ void cdislave_hle_device::slave_w_mouse(offs_t offset, uint16_t data)
 	else
 	{
 		LOGMASKED(LOG_COMMANDS | LOG_UNKNOWNS, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff);
-		if (m_in_index == 0){
+		if (m_in_index == 1)
+		{
+			m_in_index = 0;
 			return;
 		}
 	}
-	m_in_index++;
 }
 
 void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 {
 	LOGMASKED(LOG_WRITES, "slave_w: Channel %d: %d = %02x\n", offset, m_in_index, data & 0x00ff);
+	if (offset == 1 && m_in_index == 0)
+	{
+		LOGMASKED(LOG_COMMANDS | LOG_UNKNOWNS, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff);
+		memset(m_in_buf, 0, 17);
+		m_in_index = 0;
+		m_in_count = 0;
+		return;
+	}
+
+	m_in_buf[m_in_index] = data & 0x00ff;
+	m_in_index++;
 	switch (offset)
 	{
 		case 0:
 			slave_w_mouse(offset, data);
 			break;
 		case 1:
-			if (m_in_index)
+			if (m_in_index > 1)
 			{
-				m_in_buf[m_in_index] = data & 0x00ff;
-				m_in_index++;
 				if (m_in_index == m_in_count)
 				{
 					switch (m_in_buf[0])
 					{
 						case 0xf0: // Set Front Panel LCD
 							memcpy(m_lcd_state, m_in_buf + 1, 16);
-							memset(m_in_buf, 0, 17);
-							m_in_index = 0;
-							m_in_count = 0;
 							break;
 						default:
-							memset(m_in_buf, 0, 17);
-							m_in_index = 0;
-							m_in_count = 0;
 							break;
 					}
-				}
-			}
-			else
-			{
-				switch (data & 0x00ff)
-				{
-					default:
-						LOGMASKED(LOG_COMMANDS | LOG_UNKNOWNS, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff);
-						memset(m_in_buf, 0, 17);
-						m_in_index = 0;
-						m_in_count = 0;
-						break;
+					memset(m_in_buf, 0, 17);
+					m_in_index = 0;
+					m_in_count = 0;
 				}
 			}
 			break;
 		case 2:
-			if (m_in_index)
+			if (m_in_index > 1)
 			{
-				m_in_buf[m_in_index] = data & 0x00ff;
-				m_in_index++;
 				if (m_in_index == m_in_count)
 				{
 					switch (m_in_buf[0])
@@ -248,8 +240,6 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 			}
 			else
 			{
-				m_in_buf[m_in_index] = data & 0x00ff;
-				m_in_index++;
 				switch (data & 0x00ff)
 				{
 					case 0x82: // Mute Audio
@@ -290,38 +280,28 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 			}
 			break;
 		case 3:
-			if (m_in_index)
+			if (m_in_index > 1)
 			{
-				m_in_buf[m_in_index] = data & 0x00ff;
-				m_in_index++;
 				if (m_in_index == m_in_count)
 				{
 					switch (m_in_buf[0])
 					{
 						case 0xb0: // Request Disc Status
-							memset(m_in_buf, 0, 17);
-							m_in_index = 0;
-							m_in_count = 0;
 							prepare_readback(attotime::from_hz(4), 3, 4, 0xb0, 0x00, 0x02, 0x15, 0xb0);
 							break;
 						//case 0xb1: // Request Disc Base
-							//memset(m_in_buf, 0, 17);
-							//m_in_index = 0;
-							//m_in_count = 0;
 							//prepare_readback(attotime::from_hz(10000), 3, 4, 0xb1, 0x00, 0x00, 0x00, 0xb1);
 							//break;
 						default:
-							memset(m_in_buf, 0, 17);
-							m_in_index = 0;
-							m_in_count = 0;
 							break;
 					}
+					memset(m_in_buf, 0, 17);
+					m_in_index = 0;
+					m_in_count = 0;
 				}
 			}
 			else
 			{
-				m_in_buf[m_in_index] = data & 0x00ff;
-				m_in_index++;
 				switch (data & 0x00ff)
 				{
 					case 0xb0: // Request Disc Status
