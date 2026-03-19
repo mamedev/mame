@@ -11,6 +11,8 @@
 
 ***************************************************************************/
 
+#include "sprite013.h"
+
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "machine/ticket.h"
@@ -32,12 +34,11 @@ public:
 		, m_eeprom(*this, "eeprom")
 		, m_hopper(*this, "hopper")
 		, m_gfxdecode(*this, "gfxdecode.%u", 0U)
-		, m_spr_gfxdecode(*this, "spr_gfxdecode.%u", 0U)
 		, m_screen(*this, "screen.%u", 0U)
 		, m_palette(*this, "palette.%u", 0U)
+		, m_spritegen(*this, "spritegen.%u", 0U)
 		, m_tilemap(*this, "tilemap.%u", 0U)
 		, m_led_outputs(*this, "led%u", 0U)
-		, m_videoregs(*this, "videoregs.%u", 0)
 		, m_spriteram(*this, "spriteram.%u", 0)
 		, m_io_in0(*this, "IN0")
 		, m_io_bet(*this, "BET")
@@ -49,39 +50,37 @@ public:
 	int paccarn_bet4_r();
 	int paccarn_bet8_r();
 
-	void init_ddonpach();
-	void init_dfeveron();
-	void init_donpachi();
-	void init_esprade();
-	void init_feversos();
-	void init_gaia();
-	void init_guwange();
-	void init_korokoro();
-	void init_tjumpman();
-	void init_uopoko();
+	void init_ddonpach() ATTR_COLD;
+	void init_donpachi() ATTR_COLD;
+	void init_esprade() ATTR_COLD;
+	void init_feversos() ATTR_COLD;
+	void init_guwange() ATTR_COLD;
+	void init_korokoro() ATTR_COLD;
+	void init_tjumpman() ATTR_COLD;
+	void init_uopoko() ATTR_COLD;
 
-	void cellage(machine_config &config);
-	void crusherm(machine_config &config);
-	void ddonpach(machine_config &config);
-	void dfeveron(machine_config &config);
-	void donpachi(machine_config &config);
-	void esprade(machine_config &config);
-	void gaia(machine_config &config);
-	void guwange(machine_config &config);
-	void jumbogod(machine_config &config);
-	void korokoro(machine_config &config);
-	void paccarn(machine_config &config);
-	void paceight(machine_config &config);
-	void pacslot(machine_config &config);
-	void tekkenbs(machine_config &config);
-	void tekkencw(machine_config &config);
-	void tjumpman(machine_config &config);
-	void uopoko(machine_config &config);
+	void cellage(machine_config &config) ATTR_COLD;
+	void crusherm(machine_config &config) ATTR_COLD;
+	void ddonpach(machine_config &config) ATTR_COLD;
+	void dfeveron(machine_config &config) ATTR_COLD;
+	void donpachi(machine_config &config) ATTR_COLD;
+	void esprade(machine_config &config) ATTR_COLD;
+	void gaia(machine_config &config) ATTR_COLD;
+	void guwange(machine_config &config) ATTR_COLD;
+	void jumbogod(machine_config &config) ATTR_COLD;
+	void korokoro(machine_config &config) ATTR_COLD;
+	void paccarn(machine_config &config) ATTR_COLD;
+	void paceight(machine_config &config) ATTR_COLD;
+	void pacslot(machine_config &config) ATTR_COLD;
+	void tekkenbs(machine_config &config) ATTR_COLD;
+	void tekkencw(machine_config &config) ATTR_COLD;
+	void tjumpman(machine_config &config) ATTR_COLD;
+	void uopoko(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void device_post_load() override;
+	virtual void video_start() override ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -90,14 +89,13 @@ protected:
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<ticket_dispenser_device> m_hopper;
 	optional_device_array<gfxdecode_device, 4> m_gfxdecode;
-	optional_device_array<gfxdecode_device, 4> m_spr_gfxdecode;
 	optional_device_array<screen_device, 4> m_screen;
 	optional_device_array<palette_device, 4> m_palette;
+	optional_device_array<sprite013_device, 4> m_spritegen;
 	optional_device_array<tilemap038_device, 4> m_tilemap;
 	output_finder<9> m_led_outputs;
 
 	// memory pointers
-	optional_shared_ptr_array<u16, 4> m_videoregs;
 	optional_shared_ptr_array<u16, 4> m_spriteram;
 
 	optional_ioport m_io_in0;
@@ -108,71 +106,14 @@ protected:
 	optional_memory_region_array<4> m_tileregion;
 	optional_memory_region_array<2> m_okiregion;
 
-	enum
-	{
-		TYPE_ZOOM = 0,
-		TYPE_NOZOOM = 1,
-		TYPE_ISPWRINST2 = 2
-	};
-
-	// video-related
-	enum
-	{
-		MAX_PRIORITY        = 4,
-		MAX_SPRITE_NUM      = 0x400
-	};
-
-	struct sprite_cave
-	{
-		sprite_cave() { }
-
-		int priority = 0, flags = 0;
-
-		const u8 *pen_data = nullptr;  // points to top left corner of tile data
-		int line_offset = 0;
-
-		pen_t base_pen = 0;
-		int tile_width = 0, tile_height = 0;
-		int total_width = 0, total_height = 0;  // in screen coordinates
-		int x = 0, y = 0, xcount0 = 0, ycount0 = 0;
-		int zoomx_re = 0, zoomy_re = 0;
-	};
-
-	struct
-	{
-		int clip_left = 0, clip_right = 0, clip_top = 0, clip_bottom = 0;
-		u32  *baseaddr = nullptr;
-		int line_offset = 0;
-		u16  *baseaddr_zbuf = nullptr;
-		int line_offset_zbuf = 0;
-	} m_blit;
-
-	std::unique_ptr<sprite_cave []> m_sprite[4];
-	sprite_cave *m_sprite_table[4][MAX_PRIORITY][MAX_SPRITE_NUM + 1]{};
-
-	bitmap_ind16 m_sprite_zbuf[4];
-	u16       m_sprite_zbuf_baseval = 0U;
-
-	std::unique_ptr<u8[]> m_sprite_gfx[4];
-	offs_t                m_sprite_gfx_mask[4]{};
-
-	u32       m_num_sprites[4]{};
-
-	u32       m_spriteram_bank[4]{};
-	u32       m_spriteram_bank_delay[4]{};
-
 	s32       m_layers_offs_x = 0;
 	s32       m_layers_offs_y = 0;
 	s32       m_row_effect_offs_n = 0;
 	s32       m_row_effect_offs_f = 0;
 	u16       m_background_pen[4]{};
 
-	int       m_spritetype[2]{};
 	int       m_kludge = 0;
 	emu_timer *m_vblank_end_timer = nullptr;
-
-	u16       m_sprite_granularity = 0U;
-	u32       m_max_sprite_clk[4]{}; // max usable clock for sprites
 
 	// misc
 	int       m_time_vblank_irq = 0;
@@ -186,16 +127,13 @@ protected:
 	int       m_old_rasflag = 0;
 	u16       m_leds[2]{};
 
-	void (cave_state::*m_get_sprite_info)(int chip);
-	void (cave_state::*m_sprite_draw)(int chip, int priority);
-
-	void add_base_config(machine_config &config, int layer);
-	void add_ymz(machine_config &config);
+	void add_base_config(machine_config &config, int layer) ATTR_COLD;
+	void add_ymz(machine_config &config) ATTR_COLD;
+	void namco_em_common(machine_config &config) ATTR_COLD;
 
 	u16 irq_cause_r(offs_t offset);
 	void gaia_coin_w(u8 data);
 	u16 donpachi_videoregs_r(offs_t offset);
-	template<int Chip> void videoregs_w(offs_t offset, u16 data, u16 mem_mask);
 	void jumbogod_leds_w(u8 data);
 	void korokoro_leds_w(offs_t offset, u16 data, u16 mem_mask);
 	void tjumpman_leds_w(u8 data);
@@ -204,36 +142,21 @@ protected:
 	void guwange_eeprom_w(u8 data);
 	void korokoro_eeprom_w(offs_t offset, u16 data, u16 mem_mask);
 	void tjumpman_eeprom_w(u8 data);
-	DECLARE_VIDEO_START(spr_4bpp);
-	DECLARE_VIDEO_START(spr_8bpp);
+
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(vblank_end);
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank_start);
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank_start_left);
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank_start_right);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_lev2_cb);
-	void get_sprite_info(int chip);
+
 	void sound_irq_gen(int state);
 	void update_irq_state();
-	void unpack_sprites(int chip);
 
-	inline void tilemap_draw(int chip, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u32 priority, u32 priority2, int GFX);
-	void set_pens(int chip);
-	void vh_start(u16 sprcol_granularity);
-	void get_sprite_info_cave(int chip);
-	void get_sprite_info_donpachi(int chip);
-	void sprite_init();
-	void sprite_check(int chip, int screen_no, screen_device &screen, const rectangle &clip);
-	void do_blit_zoom32(int chip, const sprite_cave *sprite);
-	void do_blit_zoom32_zb(int chip, const sprite_cave *sprite);
-	void do_blit_32(int chip, const sprite_cave *sprite);
-	void do_blit_32_zb(int chip, const sprite_cave *sprite);
-	void sprite_draw_cave(int chip, int priority);
-	void sprite_draw_cave_zbuf(int chip, int priority);
-	void sprite_draw_donpachi(int chip, int priority);
-	void sprite_draw_donpachi_zbuf(int chip, int priority);
-	void init_cave();
+	bool colpri_cb(u8 &dstpri, u32 &colpri);
+
+	inline void tilemap_draw(int chip, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u32 priority, u32 priority2, int layer);
+	void init_cave() ATTR_COLD;
 	void show_leds();
 
 	void cellage_map(address_map &map) ATTR_COLD;
@@ -273,19 +196,20 @@ public:
 		, m_okibank_hi(*this, "oki%u_bankhi", 1)
 	{}
 
-	void init_agallet();
-	void init_hotdogst();
-	void init_mazinger();
-	void init_metmqstr();
-	void init_pwrinst2();
-	void init_pwrinst2a();
-	void init_sailormn();
+	void init_agallet() ATTR_COLD;
+	void init_hotdogst() ATTR_COLD;
+	void init_mazinger() ATTR_COLD;
+	void init_metmqstr() ATTR_COLD;
+	void init_pwrinst2() ATTR_COLD;
+	void init_pwrinst2a() ATTR_COLD;
+	void init_sailormn() ATTR_COLD;
 
-	void hotdogst(machine_config &config);
-	void mazinger(machine_config &config);
-	void metmqstr(machine_config &config);
-	void pwrinst2(machine_config &config);
-	void sailormn(machine_config &config);
+	void agallet(machine_config &config) ATTR_COLD;
+	void hotdogst(machine_config &config) ATTR_COLD;
+	void mazinger(machine_config &config) ATTR_COLD;
+	void metmqstr(machine_config &config) ATTR_COLD;
+	void pwrinst2(machine_config &config) ATTR_COLD;
+	void sailormn(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -295,10 +219,10 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_16_device> m_soundlatch;
 	optional_device<timer_device> m_startup;
-	required_memory_region          m_z80region;
-	required_memory_bank            m_z80bank;
-	optional_memory_bank_array<2>   m_okibank_lo;
-	optional_memory_bank_array<2>   m_okibank_hi;
+	required_memory_region        m_z80region;
+	required_memory_bank          m_z80bank;
+	optional_memory_bank_array<2> m_okibank_lo;
+	optional_memory_bank_array<2> m_okibank_hi;
 
 	// sound related
 	u8        m_soundbuf_wptr = 0;
@@ -321,8 +245,7 @@ private:
 	template<int Chip> void pwrinst2_vctrl_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 sailormn_input0_r();
 	template<int Mask> void z80_rombank_w(u8 data);
-	template<int Mask> void oki1_bank_w(u8 data);
-	template<int Mask> void oki2_bank_w(u8 data);
+	template<unsigned Chip, int Mask> void oki_bank_w(u8 data);
 	void sailormn_eeprom_w(u8 data);
 	void hotdogst_eeprom_w(u8 data);
 	void metmqstr_eeprom_w(u8 data);
@@ -335,6 +258,12 @@ private:
 	void init_z80_bank();
 	void init_oki_bank(int chip);
 
+	bool pwrinst2_colpri_cb(u8 &dstpri, u32 &colpri);
+
+	void mazinger_decrypt_cb();
+	void pwrinst2_decrypt_cb();
+	void sailormn_decrypt_cb();
+
 	void hotdogst_map(address_map &map) ATTR_COLD;
 	void hotdogst_sound_map(address_map &map) ATTR_COLD;
 	void hotdogst_sound_portmap(address_map &map) ATTR_COLD;
@@ -343,8 +272,7 @@ private:
 	void mazinger_sound_portmap(address_map &map) ATTR_COLD;
 	void metmqstr_map(address_map &map) ATTR_COLD;
 	void metmqstr_sound_portmap(address_map &map) ATTR_COLD;
-	void oki2_map(address_map &map) ATTR_COLD;
-	void oki_map(address_map &map) ATTR_COLD;
+	template<unsigned Chip> void oki_map(address_map &map) ATTR_COLD;
 	void pwrinst2_map(address_map &map) ATTR_COLD;
 	void pwrinst2_sound_map(address_map &map) ATTR_COLD;
 	void pwrinst2_sound_portmap(address_map &map) ATTR_COLD;
@@ -365,9 +293,7 @@ public:
 		, m_touch_y(*this, "TOUCH%u_Y", 1U)
 	{}
 
-	void init_ppsatan();
-
-	void ppsatan(machine_config &config);
+	void ppsatan(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -380,13 +306,14 @@ private:
 	required_ioport_array<2> m_touch_y;
 
 	// ppsatan
-	u16       m_ppsatan_io_mux = 0U;
+	u16 m_ppsatan_io_mux = 0U;
 
 	void ppsatan_eeprom_w(offs_t offset, u16 data, u16 mem_mask);
 	void ppsatan_io_mux_w(offs_t offset, u16 data, u16 mem_mask);
 	template<int Player> u16 ppsatan_touch_r();
 	void ppsatan_out_w(offs_t offset, u16 data, u16 mem_mask);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_lev2_cb);
 	INTERRUPT_GEN_MEMBER(interrupt_ppsatan);
 	u32 screen_update_ppsatan_core (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int chip);
 	u32 screen_update_ppsatan_top  (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
