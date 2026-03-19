@@ -1372,7 +1372,7 @@ void cave_z80_state::hotdogst_sound_portmap(address_map &map)
 	map(0x40, 0x40).r(FUNC(cave_z80_state::soundlatch_hi_r));                                // ""
 	map(0x50, 0x51).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));      // YM2203
 	map(0x60, 0x60).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // M6295
-	map(0x70, 0x70).w(cave_z80_state::oki_bank_w<0, 0x3>, "okibank0");                       // Samples bank
+	map(0x70, 0x70).w(&cave_z80_state::oki_bank_w<0, 0x3>, "okibank0");                       // Samples bank
 }
 
 
@@ -1397,7 +1397,7 @@ void cave_z80_state::mazinger_sound_portmap(address_map &map)
 	map(0x50, 0x51).w("ymsnd", FUNC(ym2203_device::write));            // YM2203
 	map(0x52, 0x53).r("ymsnd", FUNC(ym2203_device::read));             // YM2203
 	map(0x70, 0x70).w("oki1", FUNC(okim6295_device::write));           // M6295
-	map(0x74, 0x74).w(cave_z80_state::oki_bank_w<0, 0x3>, "okibank0"); // Samples bank
+	map(0x74, 0x74).w(&cave_z80_state::oki_bank_w<0, 0x3>, "okibank0"); // Samples bank
 }
 
 
@@ -1414,9 +1414,9 @@ void cave_z80_state::metmqstr_sound_portmap(address_map &map)
 	map(0x40, 0x40).r(FUNC(cave_z80_state::soundlatch_hi_r));                             // ""
 	map(0x50, 0x51).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));   // YM2151
 	map(0x60, 0x60).w("oki1", FUNC(okim6295_device::write));                              // M6295 #0
-	map(0x70, 0x70).w(cave_z80_state::oki_bank_w<0, 0x7>, "okibank0");                    // Samples Bank #0
+	map(0x70, 0x70).w(&cave_z80_state::oki_bank_w<0, 0x7>, "okibank0");                    // Samples Bank #0
 	map(0x80, 0x80).w("oki2", FUNC(okim6295_device::write));                              // M6295 #1
-	map(0x90, 0x90).w(cave_z80_state::oki_bank_w<1, 0x7>, "okibank1");                    // Samples Bank #1
+	map(0x90, 0x90).w(&cave_z80_state::oki_bank_w<1, 0x7>, "okibank1");                    // Samples Bank #1
 }
 
 
@@ -1467,9 +1467,9 @@ void cave_z80_state::sailormn_sound_portmap(address_map &map)
 	map(0x40, 0x40).r(FUNC(cave_z80_state::soundlatch_hi_r));                               // ""
 	map(0x50, 0x51).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));     // YM2151
 	map(0x60, 0x60).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // M6295 #0
-	map(0x70, 0x70).w(cave_z80_state::oki_bank_w<0, 0xf>, "okibank1");                      // Samples Bank #0
+	map(0x70, 0x70).w(&cave_z80_state::oki_bank_w<0, 0xf>, "okibank1");                      // Samples Bank #0
 	map(0x80, 0x80).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // M6295 #1
-	map(0xc0, 0xc0).w(cave_z80_state::oki_bank_w<1, 0xf>, "okibank1");                      // Samples Bank #1
+	map(0xc0, 0xc0).w(&cave_z80_state::oki_bank_w<1, 0xf>, "okibank1");                      // Samples Bank #1
 }
 
 
@@ -5694,6 +5694,5 @@ GAME( 1999, crusherm,   0,        crusherm, korokoro, cave_state,     init_korok
 
 GAME( 1999, tjumpman,   0,        tjumpman, tjumpman, cave_state,     init_tjumpman,  ROT0,   "Namco",                                  "Tobikose! Jumpman", MACHINE_SUPPORTS_SAVE )
 
-// bootleg of gaia?
 GAME( 2001, theroes,    0,        gaia,     theroes,  cave_state,     init_guwange,   ROT0,   "Primetek Investments",                   "Thunder Heroes (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // cuts out occasionally
 GAME( 2001, theroesa,   theroes,  gaia,     theroes,  cave_state,     init_guwange,   ROT0,   "Primetek Investments",                   "Thunder Heroes (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // cuts out occasionally
