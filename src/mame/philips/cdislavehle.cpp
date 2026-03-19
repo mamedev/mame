@@ -149,7 +149,7 @@ void cdislave_hle_device::slave_w_mouse(offs_t offset, uint16_t data)
 		if (m_in_index == 1)
 		{
 			LOGMASKED(LOG_COMMANDS, "slave_w: Channel %d: Update Mouse Position (0x%02x)\n", offset, data & 0x00ff);
-			m_in_count = 4;
+			m_in_count = 3;
 		}
 		else
 		{
