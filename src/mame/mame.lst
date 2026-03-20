@@ -48661,6 +48661,9 @@ wavesynth
 @source:virtual/utdsp563xx.cpp
 utdsp563xx
 
+@source:virtual/utm6502.cpp
+utm6502
+
 @source:visual/v100.cpp
 v100
 
