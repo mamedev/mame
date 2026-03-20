@@ -20,8 +20,7 @@ public:
 		IRQ_LINE = INPUT_LINE_IRQ0,
 		APU_IRQ_LINE = INPUT_LINE_IRQ1,
 		NMI_LINE = INPUT_LINE_NMI,
-		V_LINE   = INPUT_LINE_IRQ0 + 16,
-		DMA_LINE = INPUT_LINE_IRQ0 + 17
+		V_LINE   = INPUT_LINE_IRQ0 + 16
 	};
 
 	class memory_interface {
@@ -137,40 +136,15 @@ protected:
 	int m_inst_state, m_inst_substate;
 	int m_icount, m_bcount, m_count_before_instruction_step;
 	bool m_nmi_state, m_irq_state, m_apu_irq_state, m_v_state;
-	bool m_dma_state;
 	bool m_nmi_pending, m_irq_taken, m_sync, m_inhibit_interrupts;
 	bool m_uses_custom_memory_interface;
 
-	uint8_t read(uint16_t adr) {
-		if (m_dma_state) {
-			defer_access();
-			return 0;
-		}
-		return m_mintf->read(adr);
-	}
+	uint8_t read(uint16_t adr) { return m_mintf->read(adr); }
 	uint8_t read_9(uint16_t adr) { return m_mintf->read_9(adr); }
-	uint8_t read_sync(uint16_t adr) {
-		if (m_dma_state) {
-			defer_access();
-			return 0;
-		}
-		return m_mintf->read_sync(adr);
-	}
-	void write(uint16_t adr, uint8_t val) {
-		if (m_dma_state) {
-			defer_access();
-			return;
-		}
-		m_mintf->write(adr, val);
-	}
+	uint8_t read_sync(uint16_t adr) { return m_mintf->read_sync(adr); }
+	void write(uint16_t adr, uint8_t val) { m_mintf->write(adr, val); }
 	void write_9(uint16_t adr, uint8_t val) { m_mintf->write_9(adr, val); }
-	uint8_t read_arg(uint16_t adr) {
-		if (m_dma_state) {
-			defer_access();
-			return 0;
-		}
-		return m_mintf->read_arg(adr);
-	}
+	uint8_t read_arg(uint16_t adr) { return m_mintf->read_arg(adr); }
 	uint8_t read_pc() { return read_arg(m_PC); }
 	void prefetch_start();
 	void prefetch_end();
@@ -325,8 +299,7 @@ enum {
 enum {
 	M6502_IRQ_LINE = m6502_device::IRQ_LINE,
 	M6502_NMI_LINE = m6502_device::NMI_LINE,
-	M6502_SET_OVERFLOW = m6502_device::V_LINE,
-	M6502_DMA_LINE = m6502_device::DMA_LINE
+	M6502_SET_OVERFLOW = m6502_device::V_LINE
 };
 
 DECLARE_DEVICE_TYPE(M6502, m6502_device)

@@ -169,7 +169,7 @@ void st2205u_device::device_start()
 {
 	std::unique_ptr<mi_st2205u> intf = std::make_unique<mi_st2205u>();
 	space(AS_DATA).specific(intf->m_data);
-	space(AS_DATA).specific(intf->m_dcache);
+	intf->m_dcache = intf->m_data;
 	intf->m_irr_enable = false;
 	intf->m_irr = 0;
 	intf->m_prr = 0;
@@ -264,7 +264,7 @@ void st2302u_device::device_start()
 {
 	std::unique_ptr<mi_st2302u> intf = std::make_unique<mi_st2302u>();
 	space(AS_DATA).specific(intf->m_data);
-	space(AS_DATA).specific(intf->m_dcache);
+	intf->m_dcache = intf->m_data;
 	intf->m_irr_enable = false;
 	intf->m_irr = 0;
 	intf->m_prr = 0;

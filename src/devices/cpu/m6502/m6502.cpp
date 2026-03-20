@@ -49,12 +49,18 @@ void m6502_device::init()
 		// specific group 1-14 or 15-31
 		if(space(AS_PROGRAM).addr_width() > 14) {
 			space(AS_PROGRAM).specific(m_mintf->m_program);
-			space(AS_PROGRAM).specific(m_mintf->m_cprogram);
-			space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).specific(m_mintf->m_csprogram);
+			m_mintf->m_cprogram = m_mintf->m_program;
+			if(has_space(AS_OPCODES))
+				space(AS_OPCODES).specific(m_mintf->m_csprogram);
+			else
+				m_mintf->m_csprogram = m_mintf->m_program;
 		} else {
 			space(AS_PROGRAM).specific(m_mintf->m_program14);
-			space(AS_PROGRAM).specific(m_mintf->m_cprogram14);
-			space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).specific(m_mintf->m_csprogram14);
+			m_mintf->m_cprogram14 = m_mintf->m_program14;
+			if(has_space(AS_OPCODES))
+				space(AS_OPCODES).specific(m_mintf->m_csprogram14);
+			else
+				m_mintf->m_csprogram14 = m_mintf->m_program14;
 		}
 	}
 
@@ -84,7 +90,6 @@ void m6502_device::init()
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_apu_irq_state));
 	save_item(NAME(m_v_state));
-	save_item(NAME(m_dma_state));
 	save_item(NAME(m_nmi_pending));
 	save_item(NAME(m_irq_taken));
 	save_item(NAME(m_inst_state));
@@ -110,7 +115,6 @@ void m6502_device::init()
 	m_irq_state = false;
 	m_apu_irq_state = false;
 	m_v_state = false;
-	m_dma_state = false;
 	m_nmi_pending = false;
 	m_irq_taken = false;
 	m_inst_state = STATE_RESET;
@@ -131,7 +135,6 @@ void m6502_device::device_reset()
 	m_sync = false;
 	m_sync_w(CLEAR_LINE);
 	m_inhibit_interrupts = false;
-	m_dma_state = false;
 }
 
 
@@ -422,9 +425,6 @@ void m6502_device::execute_set_input(int inputnum, int state)
 		if(!m_v_state && state == ASSERT_LINE && total_cycles())
 			m_P |= F_V;
 		m_v_state = state == ASSERT_LINE;
-		break;
-	case DMA_LINE:
-		m_dma_state = state == ASSERT_LINE;
 		break;
 	}
 }

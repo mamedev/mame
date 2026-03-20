@@ -5087,7 +5087,7 @@ void apple2e_state::apple2e_common(machine_config &config, bool enhanced, bool r
 	m_a2bus->irq_w().set(FUNC(apple2e_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple2e_state::a2bus_nmi_w));
 	m_a2bus->inh_w().set(FUNC(apple2e_state::a2bus_inh_w));
-	m_a2bus->dma_w().set_inputline(m_maincpu, M6502_DMA_LINE);
+	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	A2BUS_SLOT(config, "sl1", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, nullptr);
 	A2BUS_SLOT(config, "sl3", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, nullptr);
