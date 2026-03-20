@@ -46,14 +46,16 @@ void m6502_device::device_start()
 void m6502_device::init()
 {
 	if(m_mintf) {
-		space(AS_PROGRAM).cache(m_mintf->m_cprogram);
-		space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_mintf->m_csprogram);
-
 		// specific group 1-14 or 15-31
-		if(space(AS_PROGRAM).addr_width() > 14)
+		if(space(AS_PROGRAM).addr_width() > 14) {
 			space(AS_PROGRAM).specific(m_mintf->m_program);
-		else
+			space(AS_PROGRAM).specific(m_mintf->m_cprogram);
+			space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).specific(m_mintf->m_csprogram);
+		} else {
 			space(AS_PROGRAM).specific(m_mintf->m_program14);
+			space(AS_PROGRAM).specific(m_mintf->m_cprogram14);
+			space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).specific(m_mintf->m_csprogram14);
+		}
 	}
 
 	state_add(STATE_GENPC,     "GENPC",     m_XPC).callexport().noshow();
@@ -82,6 +84,7 @@ void m6502_device::init()
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_apu_irq_state));
 	save_item(NAME(m_v_state));
+	save_item(NAME(m_dma_state));
 	save_item(NAME(m_nmi_pending));
 	save_item(NAME(m_irq_taken));
 	save_item(NAME(m_inst_state));
@@ -107,6 +110,7 @@ void m6502_device::init()
 	m_irq_state = false;
 	m_apu_irq_state = false;
 	m_v_state = false;
+	m_dma_state = false;
 	m_nmi_pending = false;
 	m_irq_taken = false;
 	m_inst_state = STATE_RESET;
@@ -127,6 +131,7 @@ void m6502_device::device_reset()
 	m_sync = false;
 	m_sync_w(CLEAR_LINE);
 	m_inhibit_interrupts = false;
+	m_dma_state = false;
 }
 
 
@@ -418,6 +423,9 @@ void m6502_device::execute_set_input(int inputnum, int state)
 			m_P |= F_V;
 		m_v_state = state == ASSERT_LINE;
 		break;
+	case DMA_LINE:
+		m_dma_state = state == ASSERT_LINE;
+		break;
 	}
 }
 
@@ -447,7 +455,7 @@ void m6502_device::state_import(const device_state_entry &entry)
 		m_PC = m_NPC;
 		m_irq_taken = false;
 		prefetch_start();
-		m_IR = m_mintf->read_sync(m_PC);
+		m_IR = read_sync(m_PC);
 		prefetch_end();
 		m_PPC = m_NPC;
 		m_inst_state = m_IR | m_inst_state_base;
@@ -535,32 +543,42 @@ void m6502_device::memory_interface::write_9(uint16_t adr, uint8_t val)
 
 uint8_t m6502_device::mi_default::read(uint16_t adr)
 {
-	return m_program.read_byte(adr);
+	return m_program.read_interruptible(adr);
 }
 
 uint8_t m6502_device::mi_default::read_sync(uint16_t adr)
 {
-	return m_csprogram.read_byte(adr);
+	return m_csprogram.read_interruptible(adr);
 }
 
 uint8_t m6502_device::mi_default::read_arg(uint16_t adr)
 {
-	return m_cprogram.read_byte(adr);
+	return m_cprogram.read_interruptible(adr);
 }
 
 void m6502_device::mi_default::write(uint16_t adr, uint8_t val)
 {
-	m_program.write_byte(adr, val);
+	m_program.write_interruptible(adr, val);
 }
 
 uint8_t m6502_device::mi_default14::read(uint16_t adr)
 {
-	return m_program14.read_byte(adr);
+	return m_program14.read_interruptible(adr);
+}
+
+uint8_t m6502_device::mi_default14::read_sync(uint16_t adr)
+{
+	return m_csprogram14.read_interruptible(adr);
+}
+
+uint8_t m6502_device::mi_default14::read_arg(uint16_t adr)
+{
+	return m_cprogram14.read_interruptible(adr);
 }
 
 void m6502_device::mi_default14::write(uint16_t adr, uint8_t val)
 {
-	m_program14.write_byte(adr, val);
+	m_program14.write_interruptible(adr, val);
 }
 
 
