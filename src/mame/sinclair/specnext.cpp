@@ -143,7 +143,7 @@ public:
 		, m_sprites(*this, "sprites")
 		, m_io_video(*this, "VIDEO")
 		, m_io_layers(*this, "LYRS")
-		, m_io_mouse(*this, "mouse_input%u", 1U)
+		, m_io_mouse(*this, "mouse_input%u", 0U)
 		, m_io_joy_left(*this, "JOY_LEFT")
 		, m_io_joy_right(*this, "JOY_RIGHT")
 	{}
@@ -196,6 +196,7 @@ protected:
 	template <u8 Lsb> u8 mf_port_r(offs_t addr);
 	template <u8 Lsb> void mf_port_w(offs_t addr, u8 data);
 	template <u8 Joy> u8 kempston_md_r(offs_t addr);
+	u8 mouse_button_r();
 	attotime copper_until_pos_r(u16 pos);
 
 	void bank_update(u8 bank, u8 count);
@@ -1320,6 +1321,15 @@ template <u8 Joy> u8 specnext_state::kempston_md_r(offs_t addr)
 	{
 		return 0x00;
 	}
+}
+
+u8 specnext_state::mouse_button_r()
+{
+	u8 buttons = m_io_mouse[2]->read();
+	if (m_nr_0a_mouse_button_reverse)
+		buttons = bitswap<3>(buttons, 2, 0, 1);
+
+	return (m_io_mouse[3]->read() << 4) | buttons;
 }
 
 template <u8 Lsb> void specnext_state::mf_port_w(offs_t addr, u8 data)
@@ -3118,9 +3128,9 @@ void specnext_state::map_io(address_map &map)
 	map(0x000b, 0x000b).mirror(0xff00).lrw8(NAME([this]() { return dma_r(1); }), NAME([this](u8 data) { dma_w(1, data); }));
 	map(0x006b, 0x006b).mirror(0xff00).lrw8(NAME([this]() { return dma_r(0); }), NAME([this](u8 data) { dma_w(0, data); }));
 
-	map(0x0bdf, 0x0bdf).mirror(0xf000).lr8(NAME([this]() -> u8 { return m_io_mouse[0]->read(); })); // #fbdf
-	map(0x0fdf, 0x0fdf).mirror(0xf000).lr8(NAME([this]() -> u8 { return m_io_mouse[1]->read(); })); // #ffdf
-	map(0x0adf, 0x0adf).mirror(0xf000).lr8(NAME([this]() -> u8 { return (m_io_mouse[3]->read() << 4) | m_io_mouse[2]->read(); })); // #fadf
+	map(0x0bdf, 0x0bdf).mirror(0xf000).lr8(NAME([this]() { return m_io_mouse[0]->read() >> m_nr_0a_mouse_dpi; })); // #fbdf
+	map(0x0fdf, 0x0fdf).mirror(0xf000).lr8(NAME([this]() { return m_io_mouse[1]->read() >> m_nr_0a_mouse_dpi; })); // #ffdf
+	map(0x0adf, 0x0adf).mirror(0xf000).r(FUNC(specnext_state::mouse_button_r)); // #fadf
 
 	map(0x0037, 0x0037).mirror(0xff00).r(FUNC(specnext_state::kempston_md_r<1>));
 
@@ -3212,19 +3222,19 @@ INPUT_PORTS_START(specnext)
 	PORT_CONFSETTING(0x01, "320x256 (VGA)" )
 	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
 
+	PORT_START("mouse_input0")
+	PORT_BIT(0x7ff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(100)
+
 	PORT_START("mouse_input1")
-	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(40)
+	PORT_BIT(0x7ff, 0, IPT_MOUSE_Y) PORT_REVERSE PORT_SENSITIVITY(100)
 
 	PORT_START("mouse_input2")
-	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_REVERSE PORT_SENSITIVITY(40)
-
-	PORT_START("mouse_input3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Mouse Button Left") PORT_CODE(MOUSECODE_BUTTON1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Mouse Button Right") PORT_CODE(MOUSECODE_BUTTON2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Mouse Button Middle") PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse Button Right")  PORT_CODE(MOUSECODE_BUTTON2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Mouse Button Left")   PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Mouse Button Middle") PORT_CODE(MOUSECODE_BUTTON3)
 	PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("mouse_input4")
+	PORT_START("mouse_input3")
 	PORT_BIT(0x0f, 0, IPT_DIAL_V) PORT_REVERSE PORT_NAME("Mouse Scroll V") PORT_SENSITIVITY(1) PORT_CODE(MOUSECODE_Z)
 
 	PORT_START("JOY_LEFT")
