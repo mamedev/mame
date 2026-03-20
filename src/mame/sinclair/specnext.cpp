@@ -2998,7 +2998,7 @@ void specnext_state::map_mem(address_map &map)
 
 void specnext_state::map_io(address_map &map)
 {
-	map.unmap_value_low();
+	map.unmap_value_high();
 	map(0x0000, 0xffff).unmaprw();
 
 	map(0x0000, 0x0000).select(0xfffe).rw(FUNC(specnext_state::spectrum_ula_r), FUNC(specnext_state::spectrum_ula_w));
