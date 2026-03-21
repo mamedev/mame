@@ -42,6 +42,10 @@
 #include <tuple>
 #include <utility>
 
+#ifdef __APPLE__
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+
 // winnt.h defines this
 #ifdef DELETE
 #undef DELETE
@@ -2747,6 +2751,13 @@ public:
 		sdl_joystick_module_base::input_init(machine);
 
 		osd_printf_verbose("Game Controller: Start initialization\n");
+
+#ifdef __APPLE__
+		// allow GCController to discover devices asynchronously
+		CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.1, false);
+#endif
+		SDL_PumpEvents();
+
 		int stick_count = 0;
 		const auto joysticks = SDL_GetJoysticks(&stick_count);
 		for (int physical_stick = 0; physical_stick < stick_count; physical_stick++)
