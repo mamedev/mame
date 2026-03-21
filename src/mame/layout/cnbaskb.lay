@@ -22,8 +22,8 @@ authors:hap
 		<disk state="2"><color red="1.0" green="0.25" blue="0.28" /></disk>
 	</element>
 
-	<element name="text_time"><text string="TIME"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_score"><text string="SCORE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_time"><text string="TIME" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_score"><text string="SCORE" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 
 
 <!-- build screen -->
@@ -34,8 +34,8 @@ authors:hap
 		<element name="digit8" ref="digit"><bounds x="9.666" y="1" width="1.333" height="2" /></element>
 		<element name="digit7" ref="digit"><bounds x="11" y="1" width="1.333" height="2" /></element>
 
-		<element ref="text_time"><bounds x="3.666" y="1" width="6" height="2" /></element>
-		<element ref="text_score"><bounds x="12.666" y="1" width="6" height="2" /></element>
+		<element ref="text_time"><bounds x="1" y="1" width="8" height="2" /></element>
+		<element ref="text_score"><bounds x="13" y="1" width="8" height="2" /></element>
 
 		<!-- bezel -->
 		<element ref="static_white"><bounds x="2" y="4" width="18.1" height="13" /></element>

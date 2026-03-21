@@ -36,6 +36,7 @@ private:
 	required_device<i8255_device> m_ppi;
 	required_device<pit8253_device> m_pit;
 	required_device<tms3631_device> m_tms;
+	required_memory_region m_bios;
 };
 
 // device type definition

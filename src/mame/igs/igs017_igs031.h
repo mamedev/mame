@@ -74,6 +74,7 @@ public:
 	void spkrform_decrypt_sprites();
 	void starzan_decrypt_sprites(size_t max_size, size_t flip_size);
 	void tjsb_decrypt_sprites();
+	void jking302us_decrypt_sprites();
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

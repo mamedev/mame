@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
-/**************************************************************************
+/*******************************************************************************
 
   Last Duel                       - Capcom, 1988
   LED Storm                       - Capcom, 1988
@@ -25,8 +25,6 @@ To advance test mode screens:
 TODO:
 - There seem to be minor priority issues in Mad Gear, but the game might just
   be like that. The priority PROM is dumped but currently not used.
-- Verify lastduel clocks, XTALs on photos are the same as leds2011 PCB notes
-  below, so: 10MHz, 3.57MHz, 24MHz, CPU is MC68000P10.
 
 **************************************************************************
 
@@ -118,20 +116,350 @@ Notes:
       81301       - ? (SDIP28)
       29          - 63S141 bipolar PROM (DIP16)
 
-**************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
-#include "lastduel.h"
 
-#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
+#include "video/bufsprite.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
-/******************************************************************************/
+namespace {
+
+class lastduel_state : public driver_device
+{
+public:
+	lastduel_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_spriteram(*this, "spriteram"),
+		m_txram(*this, "txram"),
+		m_vram(*this, "vram_%u", 0U),
+		m_audiobank(*this, "audiobank")
+	{ }
+
+	void init_madgear();
+
+	void lastduel(machine_config &config);
+	void madgear(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	TILE_GET_INFO_MEMBER(ld_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(ld_get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fix_info);
+	static rgb_t lastduel_RRRRGGGGBBBBIIII(uint32_t raw);
+	DECLARE_VIDEO_START(lastduel);
+	DECLARE_VIDEO_START(madgear);
+
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int pri_mask, int flipy_mask);
+	uint32_t screen_update_lastduel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_madgear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void flip_w(uint8_t data);
+	void vctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void txram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template<int Layer> void lastduel_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template<int Layer> void madgear_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void lastduel_interrupt(int state);
+	void madgear_interrupt(int state);
+
+	void lastduel_map(address_map &map) ATTR_COLD;
+	void madgear_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void madgear_sound_map(address_map &map) ATTR_COLD;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	// memory pointers
+	required_device<buffered_spriteram16_device> m_spriteram;
+	required_shared_ptr<uint16_t> m_txram;
+	required_shared_ptr_array<uint16_t, 2> m_vram;
+
+	optional_memory_bank m_audiobank;
+
+	// video-related
+	tilemap_t *m_tilemap[2]{};
+	tilemap_t *m_tx_tilemap = nullptr;
+	uint16_t m_vctrl[8]{};
+	uint16_t m_tilemap_priority = 0;
+};
+
+
+
+/*******************************************************************************
+
+  Machine initialization
+
+*******************************************************************************/
+
+void lastduel_state::init_madgear()
+{
+	uint8_t *ROM = memregion("audiocpu")->base();
+	m_audiobank->configure_entries(0, 2, &ROM[0x8000], 0x4000);
+}
+
+void lastduel_state::machine_start()
+{
+	save_item(NAME(m_tilemap_priority));
+	save_item(NAME(m_vctrl));
+}
+
+void lastduel_state::machine_reset()
+{
+	m_tilemap_priority = 0;
+
+	for (int i = 0; i < 8; i++)
+		m_vctrl[i] = 0;
+}
+
+
+
+/*******************************************************************************
+
+  Callbacks for the TileMap code
+
+*******************************************************************************/
+
+TILE_GET_INFO_MEMBER(lastduel_state::ld_get_bg_tile_info)
+{
+	int const tile = m_vram[1][2 * tile_index] & 0x1fff;
+	int const color = m_vram[1][2 * tile_index + 1];
+	tileinfo.set(2,
+			tile,color & 0xf,
+			TILE_FLIPYX((color & 0x60) >> 5));
+}
+
+TILE_GET_INFO_MEMBER(lastduel_state::ld_get_fg_tile_info)
+{
+	int const tile = m_vram[0][2 * tile_index] & 0x1fff;
+	int const color = m_vram[0][2 * tile_index + 1];
+	tileinfo.set(3,
+			tile,
+			color & 0xf,
+			TILE_FLIPYX((color & 0x60) >> 5));
+	tileinfo.group = (color & 0x80) >> 7;
+}
+
+TILE_GET_INFO_MEMBER(lastduel_state::get_bg_tile_info)
+{
+	int const tile = m_vram[1][tile_index] & 0x1fff;
+	int const color = m_vram[1][tile_index + 0x0800];
+	tileinfo.set(2,
+			tile,
+			color & 0xf,
+			TILE_FLIPYX((color & 0x60) >> 5));
+}
+
+TILE_GET_INFO_MEMBER(lastduel_state::get_fg_tile_info)
+{
+	int const tile = m_vram[0][tile_index] & 0x1fff;
+	int const color = m_vram[0][tile_index + 0x0800];
+	tileinfo.set(3,
+			tile,
+			color & 0xf,
+			TILE_FLIPYX((color & 0x60) >> 5));
+	tileinfo.group = (color & 0x10) >> 4;
+}
+
+TILE_GET_INFO_MEMBER(lastduel_state::get_fix_info)
+{
+	int const tile = m_txram[tile_index];
+	tileinfo.set(1,
+			tile & 0x7ff,
+			tile>>12,
+			(tile & 0x800) ? TILE_FLIPY : 0);
+}
+
+
+
+/*******************************************************************************
+
+  Start the video hardware emulation
+
+*******************************************************************************/
+
+rgb_t lastduel_state::lastduel_RRRRGGGGBBBBIIII(uint32_t raw)
+{
+	// Brightness parameter interpreted same way as CPS1
+	int const bright = 0x10 + (raw & 0x0f);
+
+	int const red   = ((raw >> 12) & 0x0f) * bright * 0x11 / 0x1f;
+	int const green = ((raw >> 8)  & 0x0f) * bright * 0x11 / 0x1f;
+	int const blue  = ((raw >> 4)  & 0x0f) * bright * 0x11 / 0x1f;
+
+	return rgb_t(red, green, blue);
+}
+
+VIDEO_START_MEMBER(lastduel_state,lastduel)
+{
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lastduel_state::ld_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lastduel_state::ld_get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lastduel_state::get_fix_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+	m_tilemap[0]->set_transmask(0, 0xffff, 0x0001);
+	m_tilemap[0]->set_transmask(1, 0xf07f, 0x0f81);
+	m_tx_tilemap->set_transparent_pen(3);
+}
+
+VIDEO_START_MEMBER(lastduel_state,madgear)
+{
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lastduel_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lastduel_state::get_fg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lastduel_state::get_fix_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+	m_tilemap[0]->set_transmask(0, 0xffff, 0x8000);
+	m_tilemap[0]->set_transmask(1, 0x80ff, 0xff00);
+	m_tx_tilemap->set_transparent_pen(3);
+	m_tilemap[1]->set_transparent_pen(15);
+}
+
+
+
+/*******************************************************************************
+
+  Display refresh
+
+*******************************************************************************/
+
+void lastduel_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int pri_mask, int flipy_mask)
+{
+	uint16_t const *const spriteram = m_spriteram->buffer();
+
+	for (int offs = m_spriteram->length() - 4; offs >= 0; offs -= 4)
+	{
+		int const attr = spriteram[offs + 1];
+		if (pri_mask) // only madgear seems to have this
+		{
+			if (pri == 1 && (attr & pri_mask))
+				continue;
+			if (pri == 0 && !(attr & pri_mask))
+				continue;
+		}
+
+		int const code = spriteram[offs];
+		int sx = spriteram[offs + 3] & 0x1ff;
+		int sy = spriteram[offs + 2] & 0x1ff;
+		if (sy > 0x100)
+			sy -= 0x200;
+
+		int flipx = attr & 0x20;
+		int flipy = attr & flipy_mask; // 0x40 for lastduel, 0x80 for madgear
+		int const color = attr & 0x0f;
+
+		if (flip_screen())
+		{
+			sx = 496 - sx;
+			sy = 240 - sy;
+			flipx = !flipx;
+			flipy = !flipy;
+		}
+
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+				code,
+				color,
+				flipx,flipy,
+				sx, sy, 15);
+	}
+}
+
+uint32_t lastduel_state::screen_update_lastduel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	draw_sprites(bitmap, cliprect, 0, 0, 0x40);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+uint32_t lastduel_state::screen_update_madgear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (m_tilemap_priority & 0x80)
+	{
+		m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | TILEMAP_DRAW_OPAQUE, 0);
+		draw_sprites(bitmap, cliprect, 0, 0x10, 0x80);
+		m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+		m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+		draw_sprites(bitmap, cliprect, 1, 0x10, 0x80);
+	}
+	else
+	{
+		m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+		draw_sprites(bitmap, cliprect, 0, 0x10, 0x80);
+		m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+		draw_sprites(bitmap, cliprect, 1, 0x10, 0x80);
+	}
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+
+
+/*******************************************************************************
+
+  Memory handlers
+
+*******************************************************************************/
+
+void lastduel_state::flip_w(uint8_t data)
+{
+	flip_screen_set(BIT(data, 0));
+
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 4));
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 5));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 6));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 7));
+}
+
+void lastduel_state::vctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	data = COMBINE_DATA(&m_vctrl[offset]);
+	switch (offset)
+	{
+		case 0: m_tilemap[0]->set_scrolly(0, data); break;
+		case 1: m_tilemap[0]->set_scrollx(0, data); break;
+		case 2: m_tilemap[1]->set_scrolly(0, data); break;
+		case 3: m_tilemap[1]->set_scrollx(0, data); break;
+		case 4: m_spriteram->copy(); break;
+		case 7: m_tilemap_priority = data; break;
+		default:
+			logerror("Unmapped video write %d %04x\n", offset, data);
+			break;
+	}
+}
+
+void lastduel_state::txram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_txram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
+}
 
 template<int Layer>
 void lastduel_state::lastduel_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -147,13 +475,36 @@ void lastduel_state::madgear_vram_w(offs_t offset, uint16_t data, uint16_t mem_m
 	m_tilemap[Layer]->mark_tile_dirty(offset & 0x7ff);
 }
 
-/******************************************************************************/
+
+void lastduel_state::lastduel_interrupt(int state)
+{
+	if (state)
+		m_maincpu->set_input_line(2, HOLD_LINE); // vblank
+	else
+		m_maincpu->set_input_line(4, HOLD_LINE); // controls
+}
+
+void lastduel_state::madgear_interrupt(int state)
+{
+	if (state)
+		m_maincpu->set_input_line(5, HOLD_LINE); // vblank
+	else
+		m_maincpu->set_input_line(6, HOLD_LINE); // controls
+}
+
+
+
+/*******************************************************************************
+
+  Address maps
+
+*******************************************************************************/
 
 void lastduel_state::lastduel_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
-	map(0xfc0000, 0xfc0003).nopw(); /* Written rarely */
-	map(0xfc0800, 0xfc0fff).ram().share("spriteram");
+	map(0xfc0000, 0xfc07ff).mirror(0x003000).ram(); // unused
+	map(0xfc0800, 0xfc0fff).mirror(0x003000).ram().share("spriteram");
 	map(0xfc4000, 0xfc4001).portr("P1_P2");
 	map(0xfc4001, 0xfc4001).w(FUNC(lastduel_state::flip_w));
 	map(0xfc4002, 0xfc4003).portr("SYSTEM");
@@ -161,32 +512,31 @@ void lastduel_state::lastduel_map(address_map &map)
 	map(0xfc4004, 0xfc4005).portr("DSW1");
 	map(0xfc4006, 0xfc4007).portr("DSW2");
 	map(0xfc8000, 0xfc800f).w(FUNC(lastduel_state::vctrl_w));
-	map(0xfcc000, 0xfcdfff).ram().w(FUNC(lastduel_state::txram_w)).share("txram");
-	map(0xfd0000, 0xfd3fff).ram().w(FUNC(lastduel_state::lastduel_vram_w<0>)).share("vram_0");
-	map(0xfd4000, 0xfd7fff).ram().w(FUNC(lastduel_state::lastduel_vram_w<1>)).share("vram_1");
+	map(0xfcc000, 0xfcdfff).ram().w(FUNC(lastduel_state::txram_w)).share(m_txram);
+	map(0xfd0000, 0xfd3fff).ram().w(FUNC(lastduel_state::lastduel_vram_w<0>)).share(m_vram[0]);
+	map(0xfd4000, 0xfd7fff).ram().w(FUNC(lastduel_state::lastduel_vram_w<1>)).share(m_vram[1]);
 	map(0xfd8000, 0xfd87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xfe0000, 0xffffff).ram();
+	map(0xfe0000, 0xfe7fff).mirror(0x018000).ram();
 }
 
 void lastduel_state::madgear_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0xfc1800, 0xfc1fff).ram().share("spriteram");
+	map(0xfc0000, 0xfc07ff).mirror(0x003000).ram(); // unused
+	map(0xfc0800, 0xfc0fff).mirror(0x003000).ram().share("spriteram");
 	map(0xfc4000, 0xfc4001).portr("DSW1");
 	map(0xfc4001, 0xfc4001).w(FUNC(lastduel_state::flip_w));
 	map(0xfc4002, 0xfc4003).portr("DSW2");
 	map(0xfc4003, 0xfc4003).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xfc4004, 0xfc4005).portr("P1_P2");
 	map(0xfc4006, 0xfc4007).portr("SYSTEM");
-	map(0xfc8000, 0xfc9fff).ram().w(FUNC(lastduel_state::txram_w)).share("txram");
+	map(0xfc8000, 0xfc9fff).ram().w(FUNC(lastduel_state::txram_w)).share(m_txram);
 	map(0xfcc000, 0xfcc7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfd0000, 0xfd000f).w(FUNC(lastduel_state::vctrl_w));
-	map(0xfd4000, 0xfd7fff).ram().w(FUNC(lastduel_state::madgear_vram_w<0>)).share("vram_0");
-	map(0xfd8000, 0xfdffff).ram().w(FUNC(lastduel_state::madgear_vram_w<1>)).share("vram_1");
+	map(0xfd4000, 0xfd7fff).ram().w(FUNC(lastduel_state::madgear_vram_w<0>)).share(m_vram[0]);
+	map(0xfd8000, 0xfdffff).ram().w(FUNC(lastduel_state::madgear_vram_w<1>)).share(m_vram[1]);
 	map(0xff0000, 0xffffff).ram();
 }
-
-/******************************************************************************/
 
 void lastduel_state::sound_map(address_map &map)
 {
@@ -197,24 +547,25 @@ void lastduel_state::sound_map(address_map &map)
 	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
-void lastduel_state::mg_bankswitch_w(uint8_t data)
-{
-	m_audiobank->set_entry(data & 0x01);
-}
-
 void lastduel_state::madgear_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xcfff).bankr("audiobank");
+	map(0x8000, 0xcfff).bankr(m_audiobank);
 	map(0xd000, 0xd7ff).ram();
 	map(0xf000, 0xf001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xf002, 0xf003).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xf004, 0xf004).w("oki", FUNC(okim6295_device::write));
 	map(0xf006, 0xf006).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xf00a, 0xf00a).w(FUNC(lastduel_state::mg_bankswitch_w));
+	map(0xf00a, 0xf00a).lw8(NAME([this] (uint8_t data) { m_audiobank->set_entry(data & 0x01); }));
 }
 
-/******************************************************************************/
+
+
+/*******************************************************************************
+
+  Input ports
+
+*******************************************************************************/
 
 static INPUT_PORTS_START( lastduel )
 	PORT_START("P1_P2")
@@ -434,7 +785,12 @@ static INPUT_PORTS_START( leds2011p )
 INPUT_PORTS_END
 
 
-/******************************************************************************/
+
+/*******************************************************************************
+
+  GFX layouts
+
+*******************************************************************************/
 
 static const gfx_layout sprite_layout =
 {
@@ -477,74 +833,38 @@ static GFXDECODE_START( gfx_lastduel )
 	GFXDECODE_ENTRY( "gfx4", 0, madgear_tile,  0x100, 16 )  /* colors 0x100-0x1ff */
 GFXDECODE_END
 
-/******************************************************************************/
 
-void lastduel_state::lastduel_interrupt(int state)
-{
-	if (state)
-		m_maincpu->set_input_line(2, HOLD_LINE); // vblank
-	else
-		m_maincpu->set_input_line(4, HOLD_LINE); // controls
-}
 
-void lastduel_state::madgear_interrupt(int state)
-{
-	if (state)
-		m_maincpu->set_input_line(5, HOLD_LINE); // vblank
-	else
-		m_maincpu->set_input_line(6, HOLD_LINE); // controls
-}
+/*******************************************************************************
 
-MACHINE_START_MEMBER(lastduel_state,lastduel)
-{
-	save_item(NAME(m_tilemap_priority));
-	save_item(NAME(m_vctrl));
-}
+  Machine configs
 
-MACHINE_START_MEMBER(lastduel_state,madgear)
-{
-	uint8_t *ROM = memregion("audiocpu")->base();
-
-	m_audiobank->configure_entries(0, 2, &ROM[0x8000], 0x4000);
-
-	MACHINE_START_CALL_MEMBER(lastduel);
-}
-
-void lastduel_state::machine_reset()
-{
-	m_tilemap_priority = 0;
-
-	for (int i = 0; i < 8; i++)
-		m_vctrl[i] = 0;
-}
+*******************************************************************************/
 
 void lastduel_state::lastduel(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lastduel_state::lastduel_map);
 
 	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lastduel_state::sound_map);
 
-	MCFG_MACHINE_START_OVERRIDE(lastduel_state,lastduel)
-
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(24_MHz_XTAL / 3, 512, 64, 448, 272, 8, 248);
 	screen.set_screen_update(FUNC(lastduel_state::screen_update_lastduel));
 	screen.screen_vblank().set(FUNC(lastduel_state::lastduel_interrupt));
-	screen.screen_vblank().append("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lastduel);
-	PALETTE(config, m_palette).set_format(2, &lastduel_state::lastduel_RRRRGGGGBBBBIIII, 1024);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(2, &lastduel_state::lastduel_RRRRGGGGBBBBIIII, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,lastduel)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -559,31 +879,28 @@ void lastduel_state::lastduel(machine_config &config)
 
 void lastduel_state::madgear(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lastduel_state::madgear_map);
 
 	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lastduel_state::madgear_sound_map);
 
-	MCFG_MACHINE_START_OVERRIDE(lastduel_state,madgear)
-
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(24_MHz_XTAL / 3, 512, 64, 448, 272, 8, 248); // measured 57.4444Hz
 	screen.set_screen_update(FUNC(lastduel_state::screen_update_madgear));
 	screen.screen_vblank().set(FUNC(lastduel_state::madgear_interrupt));
-	screen.screen_vblank().append("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lastduel);
-	PALETTE(config, m_palette).set_format(2, &lastduel_state::lastduel_RRRRGGGGBBBBIIII, 1024);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(2, &lastduel_state::lastduel_RRRRGGGGBBBBIIII, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,madgear)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -599,7 +916,12 @@ void lastduel_state::madgear(machine_config &config)
 	oki.add_route(ALL_OUTPUTS, "mono", 0.98);
 }
 
-/******************************************************************************/
+
+/*******************************************************************************
+
+  ROM definitions
+
+*******************************************************************************/
 
 ROM_START( lastduel )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code */
@@ -949,19 +1271,27 @@ ROM_START( leds2011p ) /* CAPCOM 87616A-2 PCB connected to a CAPCOM 87616B-2 + 4
 	ROM_LOAD( "63s141an.15k",   0x0000, 0x0100, CRC(7f862e1e) SHA1(7134c4f741463007a177d55922e1284d132f60e3) ) /* priority (not used) BPROM type MMI 63S141AN or compatible like 82S129A */
 ROM_END
 
-/******************************************************************************/
+} // anonymous namespace
 
-GAME( 1988, lastduel,  0,        lastduel, lastduel, lastduel_state, empty_init, ROT270, "Capcom",  "Last Duel (US New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, lastduelo, lastduel, lastduel, lastduel, lastduel_state, empty_init, ROT270, "Capcom",  "Last Duel (US Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, lastduelj, lastduel, lastduel, lastduel, lastduel_state, empty_init, ROT270, "Capcom",  "Last Duel (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, lastduelb, lastduel, lastduel, lastduel, lastduel_state, empty_init, ROT270, "bootleg", "Last Duel (bootleg)", MACHINE_SUPPORTS_SAVE )
+
+
+/*******************************************************************************
+
+  Game drivers
+
+*******************************************************************************/
+
+GAME( 1988, lastduel,  0,        lastduel, lastduel, lastduel_state, empty_init,   ROT270, "Capcom",  "Last Duel (US New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, lastduelo, lastduel, lastduel, lastduel, lastduel_state, empty_init,   ROT270, "Capcom",  "Last Duel (US Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, lastduelj, lastduel, lastduel, lastduel, lastduel_state, empty_init,   ROT270, "Capcom",  "Last Duel (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, lastduelb, lastduel, lastduel, lastduel, lastduel_state, empty_init,   ROT270, "bootleg", "Last Duel (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // are both Mad Gear and Led Storm really US sets, both have a (c) Capcom USA, but so do several World sets from Capcom during this era, including Led Storm Rally 2011.  None of these display a region warning, 2011 does.
 // the region warning text is however still present in the ROM (albeit unused) and does appear to indicate both are US sets, so it's possible the title was revised to avoid confusion with the older Led Storm Rally 2011.
-GAME( 1989, madgear,   0,        madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Mad Gear (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, madgearj,  madgear,  madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Mad Gear (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ledstorm,  madgear,  madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, madgear,   0,        madgear,  madgear,  lastduel_state, init_madgear, ROT270, "Capcom",  "Mad Gear (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, madgearj,  madgear,  madgear,  madgear,  lastduel_state, init_madgear, ROT270, "Capcom",  "Mad Gear (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ledstorm,  madgear,  madgear,  madgear,  lastduel_state, init_madgear, ROT270, "Capcom",  "Led Storm (US)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, leds2011,  0,        madgear,  leds2011, lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, leds2011u, leds2011, madgear,  leds2011, lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, leds2011p, leds2011, madgear,  leds2011p,lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (US, prototype 12)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leds2011,  0,        madgear,  leds2011, lastduel_state, init_madgear, ROT270, "Capcom",  "Led Storm Rally 2011 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leds2011u, leds2011, madgear,  leds2011, lastduel_state, init_madgear, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leds2011p, leds2011, madgear,  leds2011p,lastduel_state, init_madgear, ROT270, "Capcom",  "Led Storm Rally 2011 (US, prototype 12)", MACHINE_SUPPORTS_SAVE )

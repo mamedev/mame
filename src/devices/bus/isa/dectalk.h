@@ -6,9 +6,11 @@
 #pragma once
 
 #include "isa.h"
-#include "sound/dac.h"
+
 #include "cpu/i86/i186.h"
-#include "cpu/tms32010/tms32010.h"
+#include "cpu/tms320c1x/tms320c1x.h"
+#include "sound/dac.h"
+
 
 class dectalk_isa_device : public device_t,
 						public device_isa8_card_interface
@@ -55,7 +57,7 @@ private:
 
 	required_device<i80186_cpu_device> m_cpu;
 	required_device<dac_12bit_r2r_twos_complement_device> m_dac;
-	required_device<tms32015_device> m_dsp;
+	required_device<tms320c15_device> m_dsp;
 };
 
 DECLARE_DEVICE_TYPE(ISA8_DECTALK, dectalk_isa_device)

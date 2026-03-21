@@ -10,9 +10,14 @@
 
 #include "emu.h"
 #include "mips3.h"
+
 #include "mips3com.h"
 #include "mips3dsm.h"
+#include "mips3fe.h"
 #include "ps2vu.h"
+
+#include "emuopts.h"
+
 #include <cmath>
 
 #define ENABLE_OVERFLOWS            (0)
@@ -215,6 +220,10 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 		set_vtlb_fixed_entries(2 * m_tlbentries + 2);
 }
 
+mips3_device::~mips3_device()
+{
+}
+
 device_memory_interface::space_config_vector mips3_device::memory_space_config() const
 {
 	return space_config_vector {
@@ -387,18 +396,19 @@ void r5900_device::check_irqs()
 void mips3_device::device_start()
 {
 	m_isdrc = allow_drc();
+	m_drc_cache.allocate_cache(mconfig().options().drc_rwx());
 
 	/* allocate the implementation-specific state from the full cache */
-	m_core = (internal_mips3_state *)m_drc_cache.alloc_near(sizeof(internal_mips3_state));
-	m_icache = (uint8_t *)m_drc_cache.alloc_near(c_dcache_size);
-	m_dcache = (uint8_t *)m_drc_cache.alloc_near(c_icache_size);
+	m_core = m_drc_cache.alloc_near<internal_mips3_state>();
+	m_icache = (uint8_t *)m_drc_cache.alloc_near(c_dcache_size, std::align_val_t(alignof(uint64_t)));
+	m_dcache = (uint8_t *)m_drc_cache.alloc_near(c_icache_size, std::align_val_t(alignof(uint64_t)));
 
 	/* initialize based on the config */
 	memset(m_core, 0, sizeof(internal_mips3_state));
 
 	m_cpu_clock = clock();
 	m_program = &space(AS_PROGRAM);
-	if(m_program->endianness() == ENDIANNESS_LITTLE)
+	if (m_program->endianness() == ENDIANNESS_LITTLE)
 	{
 		if (m_data_bits == 32)
 		{
@@ -481,7 +491,7 @@ void mips3_device::device_start()
 	m_drcuml->symbol_add(&m_fpmode, sizeof(m_fpmode), "fpmode");
 
 	/* initialize the front-end helper */
-	m_drcfe = std::make_unique<mips3_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+	m_drcfe = std::make_unique<frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 
 	/* allocate memory for cache-local state and initialize it */
 	memcpy(m_fpmode, fpmode_source, sizeof(fpmode_source));

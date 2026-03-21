@@ -168,7 +168,6 @@ TODO:
 #include "emu.h"
 #include "taitosj.h"
 
-#include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "speaker.h"
 
@@ -1837,6 +1836,7 @@ void taitosj_state::mcu(machine_config &config)
 	nomcu(config);
 
 	// basic machine hardware
+	m_maincpu->busack_cb().set(m_mcu, FUNC(taito_sj_security_mcu_device::busak_w));
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitosj_state::main_mcu_map);
 
 	TAITO_SJ_SECURITY_MCU(config, m_mcu, 3_MHz_XTAL); // divided by 4 internally
@@ -1844,7 +1844,7 @@ void taitosj_state::mcu(machine_config &config)
 	m_mcu->m68read_cb().set(FUNC(taitosj_state::mcu_mem_r));
 	m_mcu->m68write_cb().set(FUNC(taitosj_state::mcu_mem_w));
 	m_mcu->m68intrq_cb().set(FUNC(taitosj_state::mcu_intrq_w));
-	m_mcu->busrq_cb().set(FUNC(taitosj_state::mcu_busrq_w));
+	m_mcu->busrq_cb().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 }

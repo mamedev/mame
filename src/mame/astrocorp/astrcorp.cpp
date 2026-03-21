@@ -22,12 +22,14 @@ Game                               Year  PCB ID                    CPU          
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Captain Shark                      06    M1.2 (CS350P016)          ASTRO V102PX-006   ASTRO V06      ASTRO F02 2005-05-29                       Encrypted
 Dino Dino                          05    T-3802A                   ASTRO V102PX-010   ASTRO V05      ASTRO F02 2003-03-12                       Encrypted
+Foxy Ruby                          09    _P (CS350P071)            ASTRO V102PX-002   ASTRO V07      ASTRO ROHS BA21C00009                      Encrypted
 Go & Stop                          04    K2 (CS350P011)            no markings        ASTRO V05      ASTRO F01 2007-06-03                       Encrypted
 Hacher (hack)                      05?   M1.2                      ?                  ?              ASTRO F02 2005-02-18                       Encrypted
 Happy Farm (IN.01.02B)             11    P1                        ASTRO V102PX-008   ASTRO V07      ASTRO ROHS BA21C00009 N011483              Encrypted
 Happy Farm (US.01.02B)             07    _P_ROHS                   ASTRO V102PX-008   ASTRO V07      ASTRO ROHS BA21C00009 M835KK01             Encrypted, also seen on ASTRO _P CS350P071
 Keno 21                            02?   T-3802A                   ASTRO V102PX-001   ASTRO V05      ASTRO F02 2003-04-14                       Encrypted
 Little Witch (EN.01A)              06    P1                        ASTRO V102PX-016   ASTRO V07      ASTRO ROHS BA21C00009 JF13022              Encrypted
+Lucky Spin 1999                    99    B50-4001A                 MC68HC000FN16      ASTRO V01      pLSI1016-60LJ, ASTRO 0006B MCU? (28 pins)
 Magic Bomb (A3.0)                        None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
 Magic Bomb (A3.1A)                       None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
 Magic Bomb (A3.6A)                       None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
@@ -100,18 +102,20 @@ TODO:
 - MCU on showhand/showhandc PCB, what does it do? Games run fine and there appears to be no interaction...
 - Protection in magibomb sets with simpler encryption (writes to $a0101x, $a11100, etc.). Some sets appear to work fine regardless, others freeze.
 - Find source of level 2 interrupt (sprite DMA end?).
-- magibomb_br44, westvent: need a redump of one of the program ROMs.
+- magibomb_br44: needs a redump of one of the program ROMs.
 - hacher, winbingo_gm051: need a redump of the sprite ROMs.
 - gostopac: needs verifying of outputs and layout. Sound doesn't seem 100% correct (Oki banking problem?)
 - monkeyl and clones: need verifying of inputs, outputs and layout.
 - speedmst and clones: need verifying of inputs, outputs and layout.
 - cptshark: needs verifying of inputs and layout
 - wwitch, lwitch: need verifying of inputs, outputs and layout.
-- hapfarm and clone: need verifying of inputs, outputs and layout.
+- hapfarm and clones: need verifying of inputs, outputs and layout.
 - zulu: needs verifying of inputs, outputs and layout.
 - westvent and clones: needs verifying of inputs, outputs and layout.
 - keno21: doesn't manage to read the CPU code. bp 1160,1,{D5=0x2188;g} for now to go further.
 - crzcircus: needs verifying of inputs, outputs and layout.
+- foxyruby: needs verifying of inputs, outputs and layout.
+- luckys99: needs verifying of inputs, outputs and layout creation.
 
 magibomb sets Q/A as of 18.07.2025:
 MAGIC BOMB\A3.0 (magibomb_a30 run protected)
@@ -324,6 +328,7 @@ public:
 	{ }
 
 	void luckycoin(machine_config &config) ATTR_COLD;
+	void luckys99(machine_config &config) ATTR_COLD;
 	void showhandc(machine_config &config) ATTR_COLD;
 	void showhand(machine_config &config) ATTR_COLD;
 	void skilldrp(machine_config &config) ATTR_COLD;
@@ -379,6 +384,7 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void luckycoin_map(address_map &map) ATTR_COLD;
+	void luckys99_map(address_map &map) ATTR_COLD;
 	void showhandc_map(address_map &map) ATTR_COLD;
 	void showhand_map(address_map &map) ATTR_COLD;
 	void skilldrp_map(address_map &map) ATTR_COLD;
@@ -420,6 +426,7 @@ public:
 
 	void crzcircus(machine_config &config) ATTR_COLD;
 	void dinodino(machine_config &config) ATTR_COLD;
+	void foxyruby(machine_config &config) ATTR_COLD;
 	void gostopac(machine_config &config) ATTR_COLD;
 	void hacher(machine_config &config) ATTR_COLD;
 	void hapfarm(machine_config &config) ATTR_COLD;
@@ -444,6 +451,7 @@ public:
 
 	void init_gostopac() ATTR_COLD { decrypt_rom(gostopac_table); }
 	void init_px001() ATTR_COLD { decrypt_rom(v102_px001_table); }
+	void init_px002() ATTR_COLD { decrypt_rom(v102_px002_table); }
 	void init_px005() ATTR_COLD { decrypt_rom(v102_px005_table); }
 	void init_px006() ATTR_COLD { decrypt_rom(v102_px006_table); }
 	void init_px007() ATTR_COLD { decrypt_rom(v102_px007_table); }
@@ -467,6 +475,7 @@ private:
 
 	void crzcircus_map(address_map &map) ATTR_COLD;
 	void dinodino_map(address_map &map) ATTR_COLD;
+	void foxyruby_map(address_map &map) ATTR_COLD;
 	void gostopac_map(address_map &map) ATTR_COLD;
 	void hacher_map(address_map &map) ATTR_COLD;
 	void hapfarm_map(address_map &map) ATTR_COLD;
@@ -508,6 +517,7 @@ private:
 	// so they can be copied over if needed by future dumps
 	static const decryption_info gostopac_table;
 	static const decryption_info v102_px001_table;
+	static const decryption_info v102_px002_table;
 	static const decryption_info v102_px005_table;
 	static const decryption_info v102_px006_table;
 	static const decryption_info v102_px007_table;
@@ -869,6 +879,23 @@ void astrocorp_state::luckycoin_map(address_map &map)
 	map(0x500000, 0x500001).nopr().w(FUNC(astrocorp_state::screen_enable_w)).umask16(0x00ff);
 	map(0x580001, 0x580001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x600001, 0x600001).w(FUNC(astrocorp_state::oki_bank_w));
+}
+
+void astrocorp_state::luckys99_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x040000, 0x043fff).ram().share("nvram"); // battery
+	map(0x060000, 0x060fff).ram().share(m_spriteram);
+	map(0x062000, 0x062001).nopr().w(FUNC(astrocorp_state::draw_sprites_w));
+	map(0x064000, 0x064001).portr("INPUTS");
+	map(0x068001, 0x068001).w(FUNC(astrocorp_state::eeprom_w));
+	map(0x06a000, 0x06a001).w(FUNC(astrocorp_state::showhandc_outputs_w));
+	map(0x06e000, 0x06e001).portr("EEPROM_IN");
+	map(0x070000, 0x070001).r(FUNC(astrocorp_state::unk_r));
+	map(0x070000, 0x070000).w(m_oki, FUNC(okim6295_device::write));
+	map(0x080000, 0x080000).w(FUNC(astrocorp_state::oki_bank_w)); // always writes 0x00 as ROM is only 0x40000
+	map(0x090000, 0x090001).nopr().w(FUNC(astrocorp_state::screen_enable_w)).umask16(0x00ff);
+	map(0x0a0000, 0x0a01ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
 void astrocorp_state::speeddrp_map(address_map &map)
@@ -1273,8 +1300,8 @@ void zoo_state::lwitch_map(address_map &map)
 void zoo_state::hapfarm_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
-	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0x480000, 0x483fff).ram().share("nvram"); // battery
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0xb00000, 0xb00001).portr("CPUCODE_IN");
 	map(0xb80000, 0xb80fff).ram().share(m_spriteram);
 	map(0xb82000, 0xb82001).nopr().w(FUNC(zoo_state::draw_sprites_w));
@@ -1291,8 +1318,8 @@ void zoo_state::hapfarm_map(address_map &map)
 void zoo_state::hapfarm_in0102b_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
-	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0x300000, 0x303fff).ram().share("nvram"); // battery
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0xa80000, 0xa80001).portr("CPUCODE_IN");
 	map(0xb80000, 0xb80fff).ram().share(m_spriteram);
 	map(0xb82000, 0xb82001).nopr().w(FUNC(zoo_state::draw_sprites_w));
@@ -1340,6 +1367,24 @@ void zoo_state::crzcircus_map(address_map &map)
 	map(0xc00000, 0xc00001).nopr().w(FUNC(zoo_state::screen_enable_w)).umask16(0x00ff);
 	map(0xd00000, 0xd03fff).ram().share("nvram"); // battery
 	map(0xd80000, 0xd801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+}
+
+void zoo_state::foxyruby_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x500000, 0x503fff).ram().share("nvram"); // battery
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
+	map(0x980000, 0x980001).portr("CPUCODE_IN");
+	map(0xb00000, 0xb001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xc80000, 0xc80000).w(FUNC(zoo_state::oki_bank_w));
+	map(0xd80001, 0xd80001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xe00000, 0xe00fff).ram().share(m_spriteram);
+	map(0xe02000, 0xe02001).nopr().w(FUNC(zoo_state::draw_sprites_w));
+	map(0xe04000, 0xe04001).portr("INPUTS");
+	map(0xe08001, 0xe08001).w(FUNC(zoo_state::eeprom_w));
+	map(0xe0a000, 0xe0a001).w(FUNC(zoo_state::magibomb_outputs_w));
+	map(0xe0e000, 0xe0e001).portr("EEPROM_IN");
+//  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
 }
 
 void astoneag_state::astoneag_map(address_map &map)
@@ -1442,6 +1487,28 @@ static INPUT_PORTS_START( skilldrp )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( luckys99 )
+	PORT_INCLUDE( showhand )
+
+	PORT_MODIFY("INPUTS")    // 64000
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1         ) PORT_IMPULSE(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYOUT ) // press with memory_reset to reset settings
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_SLOT_STOP_ALL ) PORT_NAME("Stop All Reels / Take")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_GAMBLE_D_UP   )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_BUTTON2       ) PORT_PLAYER(4)
+	PORT_SERVICE_NO_TOGGLE( 0x0020,   IP_ACTIVE_LOW     )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_SLOT_STOP4    ) PORT_NAME("Stop Reel 4 / Start")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_BUTTON3       ) PORT_PLAYER(4)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_SLOT_STOP1    )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_SLOT_STOP2    )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SLOT_STOP3    ) PORT_NAME("Stop Reel 3 / Bet")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_MEMORY_RESET  ) // press with keyout to reset settings
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_BUTTON4       ) PORT_PLAYER(4)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( magibomb )
 	PORT_INCLUDE( skilldrp )
 
@@ -1523,7 +1590,7 @@ static INPUT_PORTS_START( astoneag )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_SLOT_STOP3    ) PORT_NAME("Take")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_SLOT_STOP1    ) PORT_NAME("Auto Play")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_GAMBLE_DOOR   )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_DOOR          )
 	PORT_SERVICE_NO_TOGGLE( 0x0020,   IP_ACTIVE_LOW     )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_START         ) PORT_NAME("Start / Stop")
@@ -1650,6 +1717,12 @@ void astrocorp_state::showhandc(machine_config &config)
 {
 	showhand(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &astrocorp_state::showhandc_map);
+}
+
+void astrocorp_state::luckys99(machine_config &config)
+{
+	showhand(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrocorp_state::luckys99_map);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(astrocorp_state::irq_2_4_scanline_cb)
@@ -1876,6 +1949,12 @@ void zoo_state::lwitch(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::lwitch_map);
 }
 
+void zoo_state::foxyruby(machine_config &config)
+{
+	winbingo(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::foxyruby_map);
+}
+
 void zoo_state::hapfarm(machine_config &config)
 {
 	winbingo(config);
@@ -1927,6 +2006,26 @@ void astoneag_state::astoneag(machine_config &config)
 /***************************************************************************
                                 ROMs Loading
 ***************************************************************************/
+
+// B50-4001A
+// program ROM labels say A.3 but test mode shows A.1
+// similarly to other games, it's possible to enter a test mode with more choices by doing bpset 1230,1,{PC=1236;g}
+// however none of the added choices seems to work
+ROM_START( luckys99 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rom_1_lucky_a.3.even.u16", 0x00000, 0x10000, CRC(5a9a4c57) SHA1(51358f41056e59ee32b7f2e8afd58a968ff8a4ba) ) // 1xxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "rom_2_lucky_a.3.odd.u17",  0x00001, 0x10000, CRC(a339faae) SHA1(c4bd132f095856514cd1049acb5d69ef5e8862b7) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "rom_4_lucky_3.1.even.u26", 0x00000, 0x80000, CRC(05547ef1) SHA1(4730fd4e5843f1eed53d64e24f04f720162ebf7f) )
+	ROM_LOAD16_BYTE( "rom_3_lucky_3.1.odd.u27",  0x00001, 0x80000, CRC(87e1f125) SHA1(cd765c12a9945ddc11678cca765195c0eab464ee) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "rom_5_lucky1", 0x00000, 0x40000, CRC(2b3bece9) SHA1(421a8b9dc314a00304fc3c94f5428bde52c21531) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u9", 0x00, 0x80, CRC(91245bbd) SHA1(e2b677bfd45840a7bcfde6d057a396ad9fbf2d62) ) // factory default
+ROM_END
 
 /***************************************************************************
 
@@ -2918,7 +3017,7 @@ Western Venture
 
 ASTRO V07 0709
 ASTRO F01 2007-06-03
-ASTRO ??? (V102?)
+ASTRO ??? (V102PX-007)
 AD-65?
 93C46 EEPROM
 
@@ -2938,19 +3037,19 @@ ROM_START( westvent )
 	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
 
 	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
-	ROM_LOAD16_BYTE( "1_w.v.aa.02.d.bin", 0x00000, 0x20000, CRC(5e208192) SHA1(5a35a419fe95513b68423d4eb6c77fdd375667f3) )  // good?
-	ROM_LOAD16_BYTE( "2_w.v.aa.02.d.bin", 0x00001, 0x20000, BAD_DUMP CRC(f56d3ead) SHA1(2cf8960eab221cfce1c7ac6a20d002c4b05d8cc6) ) // FIXED BITS (xxxxxx0xxxxxxxxx)
+	ROM_LOAD16_BYTE( "1_w.v.aa.02.d.u26", 0x00000, 0x20000, CRC(65235ebc) SHA1(78650e46e5ac741bfed8c13064d45c4149f577e8) )
+	ROM_LOAD16_BYTE( "2_w.v.aa.02.d.u25", 0x00001, 0x20000, CRC(020a84bd) SHA1(2c83ebb495e821f1c27f18cfdf47aa927095f5d4) )
 
 	ROM_REGION( 0x1800000, "sprites", ROMREGION_ERASE00 )
-	ROM_LOAD( "mx29f1610mc_middle.u51", 0x0000000, 0x200000, CRC(7348fd37) SHA1(b5ec0994afb5bceae5627c37f1b35c7abcfd2f0a) )
-	ROM_LOAD( "mx29f1610mc_top.u30",    0x0800000, 0x200000, CRC(75bbaae0) SHA1(ef35775dd481ff343df1ee071ccd52b024d084b7) )
-	ROM_LOAD( "mx29f1610mc_bottom.bin", 0x1000000, 0x200000, CRC(e2dd58d5) SHA1(9ab881cfb2ee6cbc48aa28ba28529adb00803e44) ) // no U location on the PCB
+	ROM_LOAD( "mx29f1610mc_middle.u51",  0x0000000, 0x200000, CRC(7348fd37) SHA1(b5ec0994afb5bceae5627c37f1b35c7abcfd2f0a) )
+	ROM_LOAD( "mx29f1610mc_top.u30",     0x0800000, 0x200000, CRC(75bbaae0) SHA1(ef35775dd481ff343df1ee071ccd52b024d084b7) )
+	ROM_LOAD( "mx29f1610mc_bottom.rom7", 0x1000000, 0x200000, CRC(e2dd58d5) SHA1(9ab881cfb2ee6cbc48aa28ba28529adb00803e44) ) // no U location on the PCB
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "5.bin", 0x00000, 0x80000, CRC(92dc09d1) SHA1(6b448b3372e78047d054c5e42fcfcff7f75ff9b9) )
+	ROM_LOAD( "5_western_venture.rom5", 0x00000, 0x80000, CRC(92dc09d1) SHA1(6b448b3372e78047d054c5e42fcfcff7f75ff9b9) )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "at93c46.bin", 0x00, 0x80, CRC(fd961d46) SHA1(e238da65e8769575f17b4464fb00f5c4813bafab) ) // TODO: factory reset if the program ROMs get redumped
+	ROM_LOAD( "at93c46.u13", 0x00, 0x80, CRC(acd6a834) SHA1(9f7019e59267d31bff3bfde588a2e114d0799c64) ) // factory default but with demo sounds on
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "westvent_cpucode.key", 0x00, 0x02, CRC(34a0ddfb) SHA1(36cc99917d43f0ee966e85a67eb89cc60b3ca02a) )
@@ -3942,6 +4041,28 @@ ROM_START( hapfarm_in0102b )
 	ROM_LOAD( "hapfarm_in0102b_cpucode.key", 0x00, 0x02, CRC(3e92abb0) SHA1(8e0eb6b43a45a4a4d402d06c32a25b64c7503f0c) ) // TODO: is this needed? game doesn't seem to check it
 ROM_END
 
+ROM_START( hapfarm_in0101a )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_LOAD16_BYTE( "1_happy_farm_in.01.01.a.u26", 0x00000, 0x20000, CRC(335514b6) SHA1(7207955a8a40b6704b26e533af9e9f9b6d733fd1) )
+	ROM_LOAD16_BYTE( "2_happy_farm_in.01.01.a.u25", 0x00001, 0x20000, CRC(f4663851) SHA1(d2472d0ef50fa3558d1c30952a7041d2206ec4cf) )
+
+	ROM_REGION( 0x1800000, "sprites", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx29f1610mc.rom3.u51", 0x0000000, 0x200000, CRC(8cd1274e) SHA1(308f4de0e7f9addbbbfd9526abc8b3c55167c856) )
+	ROM_LOAD( "mx29f1610mc.rom4.u30", 0x0800000, 0x200000, CRC(ff9d27b0) SHA1(9f34d8feb9570f8cc8812669315151e586cf9816) )
+	ROM_LOAD( "mx29f1610mc.rom7",     0x1000000, 0x200000, CRC(b44439d2) SHA1(15b48111c37aac145d1f6cce62df0e8c6638cdbd) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_happy_farm.rom5", 0x00000, 0x80000, CRC(f6b7cc89) SHA1(3a5863a643b9259db95522e1a7f1b1eea457d28a) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(99219840) SHA1(c0df22c2423d23b73edcbbeecd4964f78042e5c2) ) // factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "hapfarm_in0101a_cpucode.key", 0x00, 0x02, CRC(3e92abb0) SHA1(8e0eb6b43a45a4a4d402d06c32a25b64c7503f0c) )
+ROM_END
+
 /***************************************************************************
 
 Crazy Circus
@@ -3976,6 +4097,28 @@ ROM_START( crzcircus )
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "crzcircus_cpucode.key", 0x00, 0x02, CRC(ab1539f0) SHA1(051861faa374e2de66f629b3789bdfb04c80e138) )
+ROM_END
+
+ROM_START( foxyruby )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_LOAD16_BYTE( "1_foxy_ruby_us.01.01.a.u26", 0x00000, 0x20000, CRC(1c5b8b97) SHA1(f52df61c5bf60a3426afe0558ca057dedf5168e3) ) // read as F29C51001T
+	ROM_LOAD16_BYTE( "2_foxy_ruby_us.01.01.a.u25", 0x00001, 0x20000, CRC(41914d8c) SHA1(bce787cf10bd8995ca80cef4018fd989a4310425) ) // read as F29C51001T
+
+	ROM_REGION( 0x1000000, "sprites", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx29f1610mc.u51", 0x0000000, 0x200000, CRC(f116c767) SHA1(a05abd89d0015831a2953bbf0a7b95178f9ca6e4) ) // silkscreened 'ROM # 3' on PCB under the chip
+	ROM_LOAD( "mx29f1610mc.u30", 0x0800000, 0x200000, CRC(820fa9f6) SHA1(ae7fb4f9f4b6321f5c67f3bb563c8622446ef732) ) // silkscreened 'ROM # 4' on PCB under the chip
+	// rom 7 not populated
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_foxy_ruby.rom5", 0x00000, 0x80000, CRC(211a8dba) SHA1(9512bc97a4205df72f1875a6688dda75aaaf1aaf) ) // read as A29040
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(8623a18d) SHA1(7547702edaae72e9e4eb9d55665011fab8dd6959) ) // factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "foxyruby_cpucode.key", 0x00, 0x02, CRC(5bb17b89) SHA1(ac6dd51b168ed93dd29ead451a7d482b88571860) )
 ROM_END
 
 
@@ -4036,18 +4179,20 @@ void magibomb_state::init_magibomb()
 void zoo_state::decrypt_rom(const decryption_info &table)
 {
 	const u32 size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("encrypted_rom")->base();
-	u16 * const decrypted = (u16 *)memregion("maincpu")->base();
-	std::unique_ptr<u16[]> tmp = std::make_unique<u16[]>(size/2);
+	u16 const *const rom = &memregion("encrypted_rom")->as_u16();
+	u16 *const decrypted = &memregion("maincpu")->as_u16();
+	std::unique_ptr<u16 []> tmp = std::make_unique<u16 []>(size/2);
 
 	// Pass 1: decrypt high and low byte independently.  They go
 	// through a bitswap and an xor, choosing between 8 possibilities
 	// through address bits.
 
-	for (u32 i = 0; i != size; i += 2) {
+	for (u32 i = 0; i != size; i += 2)
+	{
 		u16 orig = rom[i >> 1];
 		u16 result = 0;
-		for (u32 rb = 0; rb < 2; rb ++) {
+		for (u32 rb = 0; rb < 2; rb ++)
+		{
 			u8 val = orig >> (rb ? 0 : 8);
 			u32 index =
 				(BIT(i, table.rom[rb].bits[0]) << 2) |
@@ -4071,7 +4216,8 @@ void zoo_state::decrypt_rom(const decryption_info &table)
 
 	// Pass 2: copy back the decrypted data following the address
 	// scrambling
-	for (u32 i = 0; i != size; i += 2) {
+	for (u32 i = 0; i != size; i += 2)
+	{
 		u32 dest =
 			(i & 0xffffe003) |
 			(BIT(i, table.bits[0])  << 12) |
@@ -4158,6 +4304,38 @@ const zoo_state::decryption_info zoo_state::v102_px001_table = {
 		}
 	},
 	{ 12, 10, 8, 11, 9, 7, 2, 4, 6, 5, 3 }
+};
+
+const zoo_state::decryption_info zoo_state::v102_px002_table = {
+	{
+		{
+			{ 8, 11, 9 },
+			{
+				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
+				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
+				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
+				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
+				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
+				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
+				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
+				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
+			}
+		},
+		{
+			{ 12, 11, 10 },
+			{
+				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
+				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
+				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
+				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
+				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
+				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
+				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
+				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
+			}
+		}
+	},
+	{ 12, 9, 8, 10, 11, 7, 2, 4, 6, 5, 3 }
 };
 
 const zoo_state::decryption_info zoo_state::v102_px005_table = {
@@ -4441,6 +4619,7 @@ void astoneag_state::interleave_sprites_16x32()
 //     YEAR   NAME             PARENT    MACHINE          INPUTS          STATE            INIT            ROT   COMPANY                         FULLNAME                                        FLAGS                                                                               LAYOUT
 
 // unencrypted
+GAME(  1999,  luckys99,        0,        luckys99,        luckys99,       astrocorp_state, init_showhand,  ROT0, "Astro Corp.",                  "Lucky Spin 1999 (Ver. A.1)",                   MACHINE_SUPPORTS_SAVE )
 GAMEL( 2000,  showhand,        0,        showhand,        showhand,       astrocorp_state, init_showhand,  ROT0, "Astro Corp.",                  "Show Hand (Italy)",                            MACHINE_SUPPORTS_SAVE,                                                              layout_showhand  )
 GAMEL( 2000,  showhandc,       showhand, showhandc,       showhandc,      astrocorp_state, init_showhandc, ROT0, "Astro Corp.",                  "Wangpai Duijue (China)",                       MACHINE_SUPPORTS_SAVE,                                                              layout_showhandc  )
 GAMEL( 2002,  skilldrp,        0,        skilldrp,        skilldrp,       astrocorp_state, empty_init,     ROT0, "Astro Corp.",                  "Skill Drop Georgia (Ver. G1.01S, Oct 1 2002)", MACHINE_SUPPORTS_SAVE,                                                              layout_skilldrp  ) // Oct  1 2002 09:42:32
@@ -4477,8 +4656,10 @@ GAMEL( 2007,  astoneag_aa05h,  astoneag, astoneag,        astoneag,       astone
 GAMEL( 2006,  cptshark,        0,        winbingo,        winbingo,       zoo_state,       init_px006,     ROT0, "Astro Corp. / American Alpha", "Captain Shark (Ver. CS.01.6, Apr 21 2006)",    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_winbingo ) // 13:50:11 Apr 21 2006
 GAME(  2007,  crzcircus,       0,        crzcircus,       winbingo,       zoo_state,       init_px001,     ROT0, "Astro Corp.",                  "Crazy Circus (Ver. US.01.7)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Dec 25 2007
 GAMEL( 2005,  dinodino,        0,        dinodino,        dinodino,       zoo_state,       init_px010,     ROT0, "Astro Corp.",                  "Dino Dino (Ver. A1.1, 01/13/2005)",            MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION,                              layout_dinodino ) // 13/01.2005 10:59
+GAME ( 2009,  foxyruby,        0,        foxyruby,        magibomb_aa72d, zoo_state,       init_px002,     ROT0, "Astro Corp.",                  "Foxy Ruby (Ver. US.01.01.A)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2009/06/17
 GAME(  2004,  gostopac,        0,        gostopac,        gostopac,       zoo_state,       init_gostopac,  ROT0, "Astro Corp.",                  "Go & Stop (Ver. EN1.10)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME ( 2008,  hapfarm,         0,        hapfarm,         magibomb_aa72d, zoo_state,       init_px008,     ROT0, "Astro Corp.",                  "Happy Farm (Ver. US.01.02.B)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2008/10/16
+GAME ( 2008,  hapfarm_in0101a, hapfarm,  hapfarm_in0102b, magibomb_aa72d, zoo_state,       init_px008,     ROT0, "Astro Corp.",                  "Happy Farm (Ver. IN.01.01.A)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2008/10/27
 GAME ( 2011,  hapfarm_in0102b, hapfarm,  hapfarm_in0102b, magibomb_aa72d, zoo_state,       init_px008,     ROT0, "Astro Corp.",                  "Happy Farm (Ver. IN.01.02.B)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2011/06/02
 GAME(  200?,  keno21,          0,        keno21,          keno21,         zoo_state,       init_px001,     ROT0, "Astro Corp.",                  "Keno 21 (Ver. A-2.30)",                        MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAMEL( 2004,  magibomb_aa71a,  magibomb, magibomb_aa72d,  magibomb_aa72d, zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AA.71.A, 30/04/04)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a ) // 30/04/04 10:55
@@ -4504,7 +4685,7 @@ GAME(  2013,  monkeyl_en20b,   monkeyl,  monkeyl_en20b,   magibomb_aa72d, zoo_st
 GAMEL( 2004,  speedmst,        0,        speedmst,        dinodino,       zoo_state,       init_px005,     ROT0, "D2 Enterprises",               "Speed Master (D2.01.C, Apr 29 2004)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_magibomb ) // Apr 29 2004 16:29:35
 GAMEL( 2003,  speedmst_d14,    speedmst, speedmst,        dinodino,       zoo_state,       init_px005,     ROT0, "D2 Enterprises",               "Speed Master (D1.4, May 23 2003)",             MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_magibomb ) // May 23 2003 16:38:02
 GAMEL( 2003,  speedmst_d201ca, speedmst, speedmst,        dinodino,       zoo_state,       init_px005,     ROT0, "D2 Enterprises",               "Speed Master (D2.01.C, Apr 28 2004)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_magibomb ) // Apr 28 2004 17:21:26
-GAME ( 2007?, westvent,        0,        westvent,        winbingo,       zoo_state,       init_px007,     ROT0, "Astro Corp.",                  "Western Venture (Ver. AA.02.D)",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // One bad program ROM
+GAME ( 2008,  westvent,        0,        westvent,        winbingo,       zoo_state,       init_px007,     ROT0, "Astro Corp.",                  "Western Venture (Ver. AA.02.D)",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 2008/1/21
 GAME ( 2006,  westvent_aa01b,  westvent, westvent,        winbingo,       zoo_state,       init_px007,     ROT0, "Astro Corp.",                  "Western Venture (Ver. AA.01.B)",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 2006/8/15
 GAME ( 2008,  westvent_aa02e,  westvent, westvent,        winbingo,       zoo_state,       init_px007,     ROT0, "Astro Corp.",                  "Western Venture (Ver. AA.02.E)",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 2008/9/8
 GAMEL( 2006,  winbingo,        0,        winbingo,        winbingo,       zoo_state,       init_px006,     ROT0, "Astro Corp.",                  "Win Win Bingo (Ver. GM.03.3, Feb 23 2006)",    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION,                              layout_winbingo ) // 15:47:48 Feb 23 2006

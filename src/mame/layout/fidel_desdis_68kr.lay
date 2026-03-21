@@ -407,22 +407,22 @@ authors:hap
 		<element ref="text_p5" blend="multiply"><bounds x="67.25" y="98.35" width="3.5" height="3.5" /></element>
 		<element ref="text_p6" blend="multiply"><bounds x="76.25" y="98.35" width="3.5" height="3.5" /></element>
 
-		<element ref="text_white"><bounds x="33" y="87.5" width="10" height="2" /></element>
-		<element ref="text_black"><bounds x="43" y="87.5" width="10" height="2" /></element>
+		<element ref="text_white"><bounds x="34" y="87.5" width="8" height="2" /></element>
+		<element ref="text_black"><bounds x="44" y="87.5" width="8" height="2" /></element>
 
-		<element ref="text_s1"><bounds x="3" y="89.7" width="10" height="1.8" /></element>
-		<element ref="text_s2"><bounds x="12" y="89.7" width="10" height="1.8" /></element>
-		<element ref="text_s3"><bounds x="21" y="89.7" width="10" height="1.8" /></element>
-		<element ref="text_s4"><bounds x="55" y="89.7" width="10" height="1.8" /></element>
-		<element ref="text_s5"><bounds x="64" y="89.7" width="10" height="1.8" /></element>
-		<element ref="text_s6"><bounds x="73" y="89.7" width="10" height="1.8" /></element>
+		<element ref="text_s1"><bounds x="4" y="89.7" width="8" height="1.8" /></element>
+		<element ref="text_s2"><bounds x="13" y="89.7" width="8" height="1.8" /></element>
+		<element ref="text_s3"><bounds x="22" y="89.7" width="8" height="1.8" /></element>
+		<element ref="text_s4"><bounds x="56" y="89.7" width="8" height="1.8" /></element>
+		<element ref="text_s5"><bounds x="65" y="89.7" width="8" height="1.8" /></element>
+		<element ref="text_s6"><bounds x="74" y="89.7" width="8" height="1.8" /></element>
 
-		<element ref="text_u1"><bounds x="3" y="96.3" width="10" height="1.8" /></element>
-		<element ref="text_u2"><bounds x="12" y="96.3" width="10" height="1.8" /></element>
-		<element ref="text_u3"><bounds x="21" y="96.3" width="10" height="1.8" /></element>
-		<element ref="text_u4"><bounds x="55" y="96.3" width="10" height="1.8" /></element>
-		<element ref="text_u5"><bounds x="64" y="96.3" width="10" height="1.8" /></element>
-		<element ref="text_u6"><bounds x="73" y="96.3" width="10" height="1.8" /></element>
+		<element ref="text_u1"><bounds x="4" y="96.3" width="8" height="1.8" /></element>
+		<element ref="text_u2"><bounds x="13" y="96.3" width="8" height="1.8" /></element>
+		<element ref="text_u3"><bounds x="22" y="96.3" width="8" height="1.8" /></element>
+		<element ref="text_u4"><bounds x="56" y="96.3" width="8" height="1.8" /></element>
+		<element ref="text_u5"><bounds x="65" y="96.3" width="8" height="1.8" /></element>
+		<element ref="text_u6"><bounds x="74" y="96.3" width="8" height="1.8" /></element>
 
 		<element ref="disk_black"><bounds x="6" y="92" width="4" height="4" /></element>
 		<element ref="disk_black"><bounds x="15" y="92" width="4" height="4" /></element>

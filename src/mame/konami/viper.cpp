@@ -391,10 +391,10 @@ The golf club acts like a LED gun. PCB power input is 12V.
 
 #include "emu.h"
 
-#include "cpu/powerpc/ppc.h"
-#include "cpu/upd78k/upd78k4.h"
 #include "bus/ata/ataintf.h"
 #include "bus/ata/hdd.h"
+#include "cpu/powerpc/ppc.h"
+#include "cpu/upd78k/upd78k4.h"
 #include "machine/ds2430a.h"
 #include "machine/ins8250.h"
 #include "machine/k056230.h"
@@ -452,15 +452,15 @@ public:
 	{
 	}
 
-	void viper(machine_config &config);
-	void viper_ppp(machine_config &config);
-	void viper_omz(machine_config &config);
-	void viper_fullbody(machine_config &config);
-	void viper_fbdongle(machine_config &config);
+	void viper(machine_config &config) ATTR_COLD;
+	void viper_ppp(machine_config &config) ATTR_COLD;
+	void viper_omz(machine_config &config) ATTR_COLD;
+	void viper_fullbody(machine_config &config) ATTR_COLD;
+	void viper_fbdongle(machine_config &config) ATTR_COLD;
 
-	void init_viper();
-	void init_vipercf();
-	void init_viperhd();
+	void init_viper() ATTR_COLD;
+	void init_vipercf() ATTR_COLD;
+	void init_viperhd() ATTR_COLD;
 
 	int ds2430_combined_r();
 
@@ -605,8 +605,8 @@ private:
 
 	void epic_update_interrupts();
 	void mpc8240_interrupt(int irq);
-	void mpc8240_epic_init();
-	void mpc8240_epic_reset(void);
+	void mpc8240_epic_init() ATTR_COLD;
+	void mpc8240_epic_reset() ATTR_COLD;
 
 	struct MPC8240_I2C {
 		uint8_t adr = 0U;
@@ -1154,8 +1154,6 @@ TIMER_CALLBACK_MEMBER(viper_state::epic_global_timer_callback)
 
 void viper_state::epic_update_interrupts()
 {
-	int i;
-
 	int irq = -1;
 	int priority = -1;
 
@@ -1164,7 +1162,7 @@ void viper_state::epic_update_interrupts()
 		return;
 
 	// find the highest priority pending interrupt
-	for (i=MPC8240_NUM_INTERRUPTS-1; i >= 0; i--)
+	for (int i = MPC8240_NUM_INTERRUPTS - 1; i >= 0; i--)
 	{
 		if (m_epic.irq[i].pending)
 		{
@@ -1215,11 +1213,9 @@ void viper_state::mpc8240_epic_init()
 	m_epic.global_timer[3].timer = timer_alloc(FUNC(viper_state::epic_global_timer_callback), this);
 }
 
-void viper_state::mpc8240_epic_reset(void)
+void viper_state::mpc8240_epic_reset()
 {
-	int i;
-
-	for (i=0; i < MPC8240_NUM_INTERRUPTS; i++)
+	for (int i = 0; i < MPC8240_NUM_INTERRUPTS; i++)
 	{
 		m_epic.irq[i].mask = 1;
 	}
@@ -2987,6 +2983,19 @@ ROM_START(sscopex)
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(e4f44830) SHA1(97a43ae1605b59ffc57b59608f46e6258dcee5ba) )
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("a13eaa_nvram.u39", 0x000000, 0x2000, CRC(7b0e1ac8) SHA1(1ea549964539e27f87370e9986bfa44eeed037cd))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "a13c02", 0, SHA1(d740784fa51a3f43695ea95e23f92ef05f43284a) )
+ROM_END
+
+ROM_START(sscopexu)
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
 	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(427a65ef) SHA1(745e951715ece9f60898b7ed4809e69558145d2d))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
@@ -3249,7 +3258,7 @@ ROM_START(mfightcc) //*
 ROM_END
 
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /*****************************************************************************/
@@ -3278,8 +3287,9 @@ GAME(2000, p911ud,    p911,      viper_fullbody,     p911,       viper_state, in
 GAME(2000, p911ed,    p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD)", MACHINE_NOT_WORKING)
 GAME(2000, p911j,     p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver JAE)", MACHINE_NOT_WORKING)
 GAME(2001, p9112,     kviper,    viper_fbdongle,     p9112,      viper_state, init_vipercf,  ROT90, "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING)
-GAME(2001, sscopex,   kviper,    viper,     sscopex,    viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING)
-GAME(2001, sogeki,    sscopex,   viper,     sogeki,     viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", MACHINE_NOT_WORKING)
+GAME(2001, sscopex,   kviper,    viper,     sscopex,    viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver EAC 1.20)", MACHINE_NOT_WORKING)
+GAME(2001, sscopexu,  sscopex,   viper,     sscopex,    viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAC 1.20)", MACHINE_NOT_WORKING)
+GAME(2001, sogeki,    sscopex,   viper,     sogeki,     viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JRB 1.01)", MACHINE_NOT_WORKING)
 GAME(2002, sscopefh,  kviper,    viper,     sscopefh,   viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter (ver EAA)", MACHINE_NOT_WORKING) // UK only?
 GAME(2001, thrild2,   kviper,    viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EBB)", MACHINE_NOT_WORKING)
 GAME(2001, thrild2j,  thrild2,   viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver JAA)", MACHINE_NOT_WORKING)

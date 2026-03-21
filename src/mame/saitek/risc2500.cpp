@@ -20,7 +20,8 @@ Hardware notes:
 
 *: Sold with 128KB RAM by default. This can be easily increased up to 2MB
 by the user(chesscomputer owner, but also the MAME user in this case).
-The manual also says that RAM is expandable.
+The manual also says that RAM is expandable. Although the hardware only
+supports 128KB, 512KB, or 2MB, the software also supports 256KB or 1MB.
 
 According to Saitek's repair manual, there is a GAL and a clock frequency
 divider chip, ROM access goes through it. This allows reading from slow EPROM

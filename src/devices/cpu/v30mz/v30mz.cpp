@@ -10,12 +10,12 @@
     fetches limited on tight loops and is more than enough for the longest
     instruction.
 
-    Todo!
-      - Double check cycle timing is 100%.
-            - Add penalties when BW, BP, SP, IX, IY etc are changed in the immediately
-              preceding instruction.
-            - wswan mjkiwame (at 0x40141) has rep in al,$b5 (f3 e4 b5). Should this
-              repeat the in instruction or is this a bug made by the programmer?
+    TODO:
+    - Double check cycle timing is 100%.
+      * Add penalties when BW, BP, SP, IX, IY etc are changed in the immediately
+        preceding instruction.
+      * wswan mjkiwame (at 0x40141) has rep in al,$b5 (f3 e4 b5). Should this
+        repeat the in instruction or is this a bug made by the programmer?
 
 ****************************************************************************/
 
@@ -1015,9 +1015,9 @@ inline void v30mz_cpu_device::i_popf()
 }
 
 
-inline void v30mz_cpu_device::add_byte()
+inline void v30mz_cpu_device::add_byte(uint8_t c)
 {
-	uint32_t res = (m_dst & 0xff) + (m_src & 0xff);
+	uint32_t res = (m_dst & 0xff) + (m_src & 0xff) + c;
 
 	set_CF_byte(res);
 	set_OF_byte_add(res, m_src, m_dst);
@@ -1027,9 +1027,9 @@ inline void v30mz_cpu_device::add_byte()
 }
 
 
-inline void v30mz_cpu_device::add_word()
+inline void v30mz_cpu_device::add_word(uint8_t c)
 {
-	uint32_t res = (m_dst & 0xffff) + (m_src & 0xffff);
+	uint32_t res = (m_dst & 0xffff) + (m_src & 0xffff) + c;
 
 	set_CF_word(res);
 	set_OF_word_add(res, m_src, m_dst);
@@ -1039,9 +1039,9 @@ inline void v30mz_cpu_device::add_word()
 }
 
 
-inline void v30mz_cpu_device::sub_byte()
+inline void v30mz_cpu_device::sub_byte(uint8_t c)
 {
-	uint32_t res = (m_dst & 0xff) - (m_src & 0xff);
+	uint32_t res = (m_dst & 0xff) - (m_src & 0xff) - c;
 
 	set_CF_byte(res);
 	set_OF_byte_sub(res, m_src, m_dst);
@@ -1051,9 +1051,9 @@ inline void v30mz_cpu_device::sub_byte()
 }
 
 
-inline void v30mz_cpu_device::sub_word()
+inline void v30mz_cpu_device::sub_word(uint8_t c)
 {
-	uint32_t res = (m_dst & 0xffff) - (m_src & 0xffff);
+	uint32_t res = (m_dst & 0xffff) - (m_src & 0xffff) - c;
 
 	set_CF_word(res);
 	set_OF_word_sub(res, m_src, m_dst);
@@ -1563,48 +1563,42 @@ void v30mz_cpu_device::execute_run()
 
 			case 0x10: // i_adc_br8
 				def_br8();
-				m_src += CF ? 1 : 0;
-				add_byte();
+				add_byte(CF ? 1 : 0);
 				store_ea_rm_byte(m_dst);
 				clkm(1,3);
 				break;
 
 			case 0x11: // i_adc_wr16
 				def_wr16();
-				m_src += CF ? 1 : 0;
-				add_word();
+				add_word(CF ? 1 : 0);
 				store_ea_rm_word(m_dst);
 				clkm(1,3);
 				break;
 
 			case 0x12: // i_adc_r8b
 				def_r8b();
-				m_src += CF ? 1 : 0;
-				add_byte();
+				add_byte(CF ? 1 : 0);
 				reg_byte(m_dst);
 				clkm(1,2);
 				break;
 
 			case 0x13: // i_adc_r16w
 				def_r16w();
-				m_src += CF ? 1 : 0;
-				add_word();
+				add_word(CF ? 1 : 0);
 				reg_word(m_dst);
 				clkm(1,2);
 				break;
 
 			case 0x14: // i_adc_ald8
 				def_ald8();
-				m_src += CF ? 1 : 0;
-				add_byte();
+				add_byte(CF ? 1 : 0);
 				m_regs.b[AL] = m_dst;
 				clk(1);
 				break;
 
 			case 0x15: // i_adc_axd16
 				def_awd16();
-				m_src += CF ? 1 : 0;
-				add_word();
+				add_word(CF ? 1 : 0);
 				m_regs.w[AW] = m_dst;
 				clk(1);
 				break;
@@ -1623,48 +1617,42 @@ void v30mz_cpu_device::execute_run()
 
 			case 0x18: // i_sbb_br8
 				def_br8();
-				m_src += CF ? 1 : 0;
-				sub_byte();
+				sub_byte(CF ? 1 : 0);
 				store_ea_rm_byte(m_dst);
 				clkm(1,3);
 				break;
 
 			case 0x19: // i_sbb_wr16
 				def_wr16();
-				m_src += CF ? 1 : 0;
-				sub_word();
+				sub_word(CF ? 1 : 0);
 				store_ea_rm_word(m_dst);
 				clkm(1,3);
 				break;
 
 			case 0x1a: // i_sbb_r8b
 				def_r8b();
-				m_src += CF ? 1 : 0;
-				sub_byte();
+				sub_byte(CF ? 1 : 0);
 				reg_byte(m_dst);
 				clkm(1,2);
 				break;
 
 			case 0x1b: // i_sbb_r16w
 				def_r16w();
-				m_src += CF ? 1 : 0;
-				sub_word();
+				sub_word(CF ? 1 : 0);
 				reg_word(m_dst);
 				clkm(1,2);
 				break;
 
 			case 0x1c: // i_sbb_ald8
 				def_ald8();
-				m_src += CF ? 1 : 0;
-				sub_byte();
+				sub_byte(CF ? 1 : 0);
 				m_regs.b[AL] = m_dst;
 				clk(1);
 				break;
 
 			case 0x1d: // i_sbb_axd16
 				def_awd16();
-				m_src += CF ? 1 : 0;
-				sub_word();
+				sub_word(CF ? 1 : 0);
 				m_regs.w[AW] = m_dst;
 				clk(1);
 				break;
@@ -2309,14 +2297,14 @@ void v30mz_cpu_device::execute_run()
 				else                             { clk(3); }
 				switch (m_modrm & 0x38)
 				{
-				case 0x00:                      add_byte(); store_ea_rm_byte(m_dst);   break;
-				case 0x08:                      or_byte();  store_ea_rm_byte(m_dst);   break;
-				case 0x10: m_src += CF ? 1 : 0; add_byte(); store_ea_rm_byte(m_dst);   break;
-				case 0x18: m_src += CF ? 1 : 0; sub_byte(); store_ea_rm_byte(m_dst);   break;
-				case 0x20:                      and_byte(); store_ea_rm_byte(m_dst);   break;
-				case 0x28:                      sub_byte(); store_ea_rm_byte(m_dst);   break;
-				case 0x30:                      xor_byte(); store_ea_rm_byte(m_dst);   break;
-				case 0x38:                      sub_byte();                         break;  // CMP
+				case 0x00: add_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x08: or_byte();  store_ea_rm_byte(m_dst);   break;
+				case 0x10: add_byte(CF ? 1 : 0); store_ea_rm_byte(m_dst);   break;
+				case 0x18: sub_byte(CF ? 1 : 0); store_ea_rm_byte(m_dst);   break;
+				case 0x20: and_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x28: sub_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x30: xor_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x38: sub_byte();                         break;  // CMP
 				}
 				break;
 
@@ -2330,14 +2318,14 @@ void v30mz_cpu_device::execute_run()
 				else                             { clk(3); }
 				switch (m_modrm & 0x38)
 				{
-				case 0x00:                      add_word(); store_ea_rm_word(m_dst);   break;
-				case 0x08:                      or_word();  store_ea_rm_word(m_dst);   break;
-				case 0x10: m_src += CF ? 1 : 0; add_word(); store_ea_rm_word(m_dst);   break;
-				case 0x18: m_src += CF ? 1 : 0; sub_word(); store_ea_rm_word(m_dst);   break;
-				case 0x20:                      and_word(); store_ea_rm_word(m_dst);   break;
-				case 0x28:                      sub_word(); store_ea_rm_word(m_dst);   break;
-				case 0x30:                      xor_word(); store_ea_rm_word(m_dst);   break;
-				case 0x38:                      sub_word();                         break;  // CMP
+				case 0x00: add_word(); store_ea_rm_word(m_dst);   break;
+				case 0x08: or_word();  store_ea_rm_word(m_dst);   break;
+				case 0x10: add_word(CF ? 1 : 0); store_ea_rm_word(m_dst);   break;
+				case 0x18: sub_word(CF ? 1 : 0); store_ea_rm_word(m_dst);   break;
+				case 0x20: and_word(); store_ea_rm_word(m_dst);   break;
+				case 0x28: sub_word(); store_ea_rm_word(m_dst);   break;
+				case 0x30: xor_word(); store_ea_rm_word(m_dst);   break;
+				case 0x38: sub_word();                         break;  // CMP
 				}
 				break;
 
@@ -2351,14 +2339,14 @@ void v30mz_cpu_device::execute_run()
 				else                               { clk(3); }
 				switch (m_modrm & 0x38)
 				{
-				case 0x00:                      add_byte(); store_ea_rm_byte(m_dst);   break;
-				case 0x08:                      or_byte();  store_ea_rm_byte(m_dst);   break;
-				case 0x10: m_src += CF ? 1 : 0; add_byte(); store_ea_rm_byte(m_dst);   break;
-				case 0x18: m_src += CF ? 1 : 0; sub_byte(); store_ea_rm_byte(m_dst);   break;
-				case 0x20:                      and_byte(); store_ea_rm_byte(m_dst);   break;
-				case 0x28:                      sub_byte(); store_ea_rm_byte(m_dst);   break;
-				case 0x30:                      xor_byte(); store_ea_rm_byte(m_dst);   break;
-				case 0x38:                      sub_byte();                         break; // CMP
+				case 0x00: add_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x08: or_byte();  store_ea_rm_byte(m_dst);   break;
+				case 0x10: add_byte(CF ? 1 : 0); store_ea_rm_byte(m_dst);   break;
+				case 0x18: sub_byte(CF ? 1 : 0); store_ea_rm_byte(m_dst);   break;
+				case 0x20: and_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x28: sub_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x30: xor_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x38: sub_byte();                         break; // CMP
 				}
 				break;
 
@@ -2372,14 +2360,14 @@ void v30mz_cpu_device::execute_run()
 				else                               { clk(3); }
 				switch (m_modrm & 0x38)
 				{
-				case 0x00:                      add_word(); store_ea_rm_word(m_dst); break;
-				case 0x08:                      or_word();  store_ea_rm_word(m_dst); break;
-				case 0x10: m_src += CF ? 1 : 0; add_word(); store_ea_rm_word(m_dst); break;
-				case 0x18: m_src += CF ? 1 : 0; sub_word(); store_ea_rm_word(m_dst); break;
-				case 0x20:                      and_word(); store_ea_rm_word(m_dst); break;
-				case 0x28:                      sub_word(); store_ea_rm_word(m_dst); break;
-				case 0x30:                      xor_word(); store_ea_rm_word(m_dst); break;
-				case 0x38:                      sub_word();                       break; // CMP
+				case 0x00: add_word(); store_ea_rm_word(m_dst); break;
+				case 0x08: or_word();  store_ea_rm_word(m_dst); break;
+				case 0x10: add_word(CF ? 1 : 0); store_ea_rm_word(m_dst); break;
+				case 0x18: sub_word(CF ? 1 : 0); store_ea_rm_word(m_dst); break;
+				case 0x20: and_word(); store_ea_rm_word(m_dst); break;
+				case 0x28: sub_word(); store_ea_rm_word(m_dst); break;
+				case 0x30: xor_word(); store_ea_rm_word(m_dst); break;
+				case 0x38: sub_word();                       break; // CMP
 				}
 				break;
 

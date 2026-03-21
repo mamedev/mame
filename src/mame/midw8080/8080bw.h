@@ -398,6 +398,7 @@ public:
 	}
 
 	void rollingc(machine_config &config);
+	void mraker(machine_config &config);
 
 	ioport_value game_select_r();
 
@@ -406,6 +407,7 @@ protected:
 
 private:
 	void rollingc_sh_port_w(uint8_t data);
+	void mraker_sh_port1_w(uint8_t data);
 
 	uint8_t scattered_colorram_r(offs_t offset);
 	void scattered_colorram_w(offs_t offset, uint8_t data);
@@ -417,7 +419,8 @@ private:
 	uint32_t screen_update_rollingc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map) ATTR_COLD;
-	void io_map(address_map &map) ATTR_COLD;
+	void rollingc_io_map(address_map &map) ATTR_COLD;
+	void mraker_io_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<uint8_t []> m_scattered_colorram;
 	std::unique_ptr<uint8_t []> m_scattered_colorram2;

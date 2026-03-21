@@ -29,7 +29,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ctc(*this, "ctc")
 		, m_fdc(*this, "fdc")
-		, m_hdc(*this, "scsi:7:hdc")
+		, m_hdc(*this, "hdc")
 		, m_lcdc(*this, "lcdc")
 	{
 	}
@@ -188,7 +188,7 @@ void emax_state::palette_init(palette_device &palette)
 
 void emax_state::scsihd(machine_config &config)
 {
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr, false);
@@ -196,7 +196,9 @@ void emax_state::scsihd(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, "harddisk", false);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("hdc", NCR5380);
+
+	NCR5380(config, m_hdc);
+	scsi.set_external_device(7, m_hdc);
 }
 
 void emax_state::emax(machine_config &config)

@@ -41,6 +41,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/pcd3311.h"
+#include "video/82c425.h"
 #include "video/hd61830.h"
 
 #include "emupal.h"
@@ -74,31 +75,38 @@ static const uint8_t INTERRUPT_VECTOR[] = { 0x08, 0x09, 0x00 };
 class portfolio_state : public driver_device
 {
 public:
-	portfolio_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, M80C88A_TAG),
-		m_lcdc(*this, HD61830_TAG),
-		m_keyboard(*this, "keyboard"),
-		m_dtmf(*this, PCD3311T_TAG),
-		m_ccm(*this, PORTFOLIO_MEMORY_CARD_SLOT_A_TAG),
-		m_exp(*this, "exp"),
-		m_timer_tick(*this, TIMER_TICK_TAG),
-		m_nvram(*this, "nvram"),
-		m_ram(*this, "ram"),
-		m_rom(*this, M80C88A_TAG),
-		m_char_rom(*this, HD61830_TAG),
-		m_battery(*this, "BATTERY")
+	portfolio_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, M80C88A_TAG)
+		, m_lcdc(*this, HD61830_TAG)
+		, m_82c425(*this, "82c425")
+		, m_keyboard(*this, "keyboard")
+		, m_dtmf(*this, PCD3311T_TAG)
+		, m_ccma(*this, PORTFOLIO_MEMORY_CARD_SLOT_A_TAG)
+		, m_exp(*this, "exp")
+		, m_timer_tick(*this, TIMER_TICK_TAG)
+		, m_nvram(*this, "nvram")
+		, m_ram(*this, RAM_TAG)
+		, m_rom(*this, M80C88A_TAG)
+		, m_char_rom(*this, HD61830_TAG)
+		, m_battery(*this, "BATTERY")
 	{ }
 
+	void portfolio_base(machine_config &config);
 	void portfolio(machine_config &config);
+	void portfolio2(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void portfolio_io(address_map &map) ATTR_COLD;
-	void portfolio_lcdc(address_map &map) ATTR_COLD;
 	void portfolio_mem(address_map &map) ATTR_COLD;
+	void portfolio_lcdc(address_map &map) ATTR_COLD;
+
+	void portfolio2_io(address_map &map) ATTR_COLD;
+	void portfolio2_mem(address_map &map) ATTR_COLD;
+	void dispfont_map(address_map &map) ATTR_COLD;
 
 	void check_interrupt();
 	void trigger_interrupt(int level);
@@ -141,22 +149,24 @@ private:
 	void keyboard_int_w(int state);
 
 	void portfolio_palette(palette_device &palette) const;
+	void portfolio2_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(system_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(counter_tick);
 	uint8_t hd61830_rd_r(offs_t offset);
 	IRQ_CALLBACK_MEMBER(portfolio_int_ack);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<hd61830_device> m_lcdc;
+	optional_device<hd61830_device> m_lcdc;
+	optional_device<f82c425_device> m_82c425;
 	required_device<pofo_keyboard_device> m_keyboard;
 	required_device<pcd3311_device> m_dtmf;
-	required_device<portfolio_memory_card_slot_device> m_ccm;
+	required_device<portfolio_memory_card_slot_device> m_ccma;
 	required_device<portfolio_expansion_slot_device> m_exp;
 	required_device<timer_device> m_timer_tick;
 	required_device<nvram_device> m_nvram;
 	required_device<ram_device> m_ram;
 	required_region_ptr<uint8_t> m_rom;
-	required_region_ptr<uint8_t> m_char_rom;
+	optional_region_ptr<uint8_t> m_char_rom;
 	required_ioport m_battery;
 
 	uint8_t m_ip = 0;
@@ -511,13 +521,15 @@ uint8_t portfolio_state::mem_r(offs_t offset)
 	int bcom = 1;
 	int ncc1 = 1;
 
-	if (offset < 0x1f000)
+	const offs_t vram_offset = m_ram->size() - 0x1000;
+
+	if (offset < vram_offset)
 	{
 		data = m_ram->read(offset);
 	}
 	else if (offset >= 0xb0000 && offset < 0xc0000)
 	{
-		data = m_ram->read(0x1f000 + (offset & 0xfff));
+		data = m_ram->read(vram_offset + (offset & 0xfff));
 	}
 	else if (offset >= 0xc0000 && offset < 0xe0000)
 	{
@@ -530,7 +542,7 @@ uint8_t portfolio_state::mem_r(offs_t offset)
 		case CCM_A:
 			if (LOG) logerror("%s %s CCM0 read %05x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff);
 
-			data = m_ccm->nrdi_r(offset & 0x1ffff);
+			data = m_ccma->nrdi_r(offset & 0x1ffff);
 			break;
 
 		case CCM_B:
@@ -567,13 +579,15 @@ void portfolio_state::mem_w(offs_t offset, uint8_t data)
 	int bcom = 1;
 	int ncc1 = 1;
 
-	if (offset < 0x1f000)
+	const offs_t vram_offset = m_ram->size() - 0x1000;
+
+	if (offset < vram_offset)
 	{
 		m_ram->write(offset, data);
 	}
 	else if (offset >= 0xb0000 && offset < 0xc0000)
 	{
-		m_ram->write(0x1f000 + (offset & 0xfff), data);
+		m_ram->write(vram_offset + (offset & 0xfff), data);
 	}
 	else if (offset >= 0xc0000 && offset < 0xe0000)
 	{
@@ -582,7 +596,7 @@ void portfolio_state::mem_w(offs_t offset, uint8_t data)
 		case CCM_A:
 			if (LOG) logerror("%s %s CCM0 write %05x:%02x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff, data);
 
-			m_ccm->nwri_w(offset & 0x1ffff, data);
+			m_ccma->nwri_w(offset & 0x1ffff, data);
 			break;
 
 		case CCM_B:
@@ -624,13 +638,16 @@ uint8_t portfolio_state::io_r(offs_t offset)
 			break;
 
 		case 1:
-			if (offset & 0x01)
+			if (m_lcdc)
 			{
-				data = m_lcdc->status_r();
-			}
-			else
-			{
-				data = m_lcdc->data_r();
+				if (offset & 0x01)
+				{
+					data = m_lcdc->status_r();
+				}
+				else
+				{
+					data = m_lcdc->data_r();
+				}
 			}
 			break;
 
@@ -681,13 +698,16 @@ void portfolio_state::io_w(offs_t offset, uint8_t data)
 		switch ((offset >> 4) & 0x0f)
 		{
 		case 1:
-			if (offset & 0x01)
+			if (m_lcdc)
 			{
-				m_lcdc->control_w(data);
-			}
-			else
-			{
-				m_lcdc->data_w(data);
+				if (offset & 0x01)
+				{
+					m_lcdc->control_w(data);
+				}
+				else
+				{
+					m_lcdc->data_w(data);
+				}
 			}
 			break;
 
@@ -742,6 +762,12 @@ void portfolio_state::portfolio_mem(address_map &map)
 	map(0x00000, 0xfffff).rw(FUNC(portfolio_state::mem_r), FUNC(portfolio_state::mem_w));
 }
 
+void portfolio_state::portfolio2_mem(address_map &map)
+{
+	portfolio_mem(map);
+	map(0xb8000, 0xbbfff).rw(m_82c425, FUNC(f82c425_device::mem_r), FUNC(f82c425_device::mem_w));
+}
+
 
 //-------------------------------------------------
 //  ADDRESS_MAP( portfolio_io )
@@ -750,6 +776,12 @@ void portfolio_state::portfolio_mem(address_map &map)
 void portfolio_state::portfolio_io(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(portfolio_state::io_r), FUNC(portfolio_state::io_w));
+}
+
+void portfolio_state::portfolio2_io(address_map &map)
+{
+	portfolio_io(map);
+	map(0x03d0, 0x03df).m(m_82c425, FUNC(f82c425_device::io_map));
 }
 
 
@@ -761,6 +793,12 @@ void portfolio_state::portfolio_lcdc(address_map &map)
 {
 	map.global_mask(0x7ff);
 	map(0x0000, 0x07ff).ram();
+}
+
+void portfolio_state::dispfont_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram();
+	map(0x4000, 0x5fff).rom().region("chargen", 0).nopw();
 }
 
 
@@ -807,6 +845,19 @@ void portfolio_state::portfolio_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(142, 193, 172));
 	palette.set_pen_color(1, rgb_t(67, 71, 151));
+}
+
+void portfolio_state::portfolio2_palette(palette_device &palette) const
+{
+	// estimated LCD palette
+	palette.set_pen_color(0, rgb_t(0xa0, 0xd0, 0x08));
+	palette.set_pen_color(1, rgb_t(0x90, 0xbb, 0x07));
+	palette.set_pen_color(2, rgb_t(0x80, 0xa6, 0x06));
+	palette.set_pen_color(3, rgb_t(0x70, 0x92, 0x06));
+	palette.set_pen_color(4, rgb_t(0x60, 0x7d, 0x05));
+	palette.set_pen_color(5, rgb_t(0x50, 0x68, 0x04));
+	palette.set_pen_color(6, rgb_t(0x40, 0x53, 0x03));
+	palette.set_pen_color(7, rgb_t(0x30, 0x3e, 0x02));
 }
 
 
@@ -878,30 +929,13 @@ void portfolio_state::machine_start()
 //  machine_config( portfolio )
 //-------------------------------------------------
 
-void portfolio_state::portfolio(machine_config &config)
+void portfolio_state::portfolio_base(machine_config &config)
 {
 	// basic machine hardware
 	I8088(config, m_maincpu, XTAL(4'915'200));
 	m_maincpu->set_addrmap(AS_PROGRAM, &portfolio_state::portfolio_mem);
 	m_maincpu->set_addrmap(AS_IO, &portfolio_state::portfolio_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(portfolio_state::portfolio_int_ack));
-
-	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(72);
-	screen.set_screen_update(HD61830_TAG, FUNC(hd61830_device::screen_update));
-	screen.set_size(240, 64);
-	screen.set_visarea(0, 240-1, 0, 64-1);
-	screen.set_palette("palette");
-
-	PALETTE(config, "palette", FUNC(portfolio_state::portfolio_palette), 2);
-
-	GFXDECODE(config, "gfxdecode", "palette", gfx_portfolio);
-
-	HD61830(config, m_lcdc, XTAL(4'915'200)/2/2);
-	m_lcdc->set_addrmap(0, &portfolio_state::portfolio_lcdc);
-	m_lcdc->rd_rd_callback().set(FUNC(portfolio_state::hd61830_rd_r));
-	m_lcdc->set_screen(SCREEN_TAG);
 
 	POFO_KEYBOARD(config, m_keyboard);
 	m_keyboard->int_handler().set(FUNC(portfolio_state::keyboard_int_w));
@@ -911,7 +945,7 @@ void portfolio_state::portfolio(machine_config &config)
 	PCD3311(config, m_dtmf, XTAL(3'578'640)).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	PORTFOLIO_MEMORY_CARD_SLOT(config, m_ccm, portfolio_memory_cards, nullptr);
+	PORTFOLIO_MEMORY_CARD_SLOT(config, m_ccma, portfolio_memory_cards, nullptr);
 
 	PORTFOLIO_EXPANSION_SLOT(config, m_exp, XTAL(4'915'200), portfolio_expansion_cards, nullptr);
 	m_exp->eint_wr_callback().set(FUNC(portfolio_state::eint_w));
@@ -925,9 +959,58 @@ void portfolio_state::portfolio(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("pofo");
 
 	// internal ram
-	RAM(config, RAM_TAG).set_default_size("128K");
+	RAM(config, m_ram);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
+
+void portfolio_state::portfolio(machine_config &config)
+{
+	portfolio_base(config);
+
+	m_ram->set_default_size("128K");
+
+	// video hardware
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(72);
+	screen.set_screen_update(HD61830_TAG, FUNC(hd61830_device::screen_update));
+	screen.set_size(240, 64);
+	screen.set_visarea_full();
+	screen.set_palette("palette");
+
+	PALETTE(config, "palette", FUNC(portfolio_state::portfolio_palette), 2);
+
+	GFXDECODE(config, "gfxdecode", "palette", gfx_portfolio);
+
+	HD61830(config, m_lcdc, XTAL(4'915'200)/2/2);
+	m_lcdc->set_addrmap(0, &portfolio_state::portfolio_lcdc);
+	m_lcdc->rd_rd_callback().set(FUNC(portfolio_state::hd61830_rd_r));
+	m_lcdc->set_screen(SCREEN_TAG);
+}
+
+void portfolio_state::portfolio2(machine_config &config)
+{
+	portfolio_base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &portfolio_state::portfolio2_mem);
+	m_maincpu->set_addrmap(AS_IO, &portfolio_state::portfolio2_io);
+
+	m_ram->set_default_size("512K");
+
+	// video hardware
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(56);
+	screen.set_size(640, 200);
+	screen.set_visarea_full();
+	screen.set_physical_aspect(640, 400);
+	screen.set_screen_update(m_82c425, FUNC(f82c425_device::screen_update));
+
+	PALETTE(config, "palette", FUNC(portfolio_state::portfolio2_palette), 8);
+
+	F82C425(config, m_82c425, 14.318181_MHz_XTAL);
+	m_82c425->set_addrmap(0, &portfolio_state::dispfont_map);
+	m_82c425->set_screen(SCREEN_TAG);
+	m_82c425->set_lcd_palette("palette");
 }
 
 
@@ -950,12 +1033,23 @@ ROM_START( pofo )
 	ROM_LOAD( "c101783-001a-01.u3", 0x0000, 0x8000, CRC(61fdaff1) SHA1(5eb99e7a19af7b8d77ea8a2f1f554e6e3d382fa2) )
 ROM_END
 
-} // Anonymous namespace
+ROM_START( pofo2 )
+	ROM_REGION( 0x40000, M80C88A_TAG, 0 )
+	ROM_SYSTEM_BIOS( 0, "dip1680", "DIP DOS 1.680" )
+	ROMX_LOAD( "bd_1.68_c0_15aug90.bin", 0x00000, 0x20000, CRC(c883def4) SHA1(15219b769f0e75f93d54c75cb7481d3b798a955a), ROM_BIOS(0) )
+	ROMX_LOAD( "bd_1.68_e0_15aug90.bin", 0x20000, 0x20000, CRC(76df504c) SHA1(45a088507672d55fcc6d41a4ec495f23abe40095), ROM_BIOS(0) )
+
+	ROM_REGION( 0x2000, "chargen", 0 )
+	ROM_LOAD( "font.bin", 0x0000, 0x2000, BAD_DUMP CRC(736583b0) SHA1(5fce700fe1ad61a88381de6665800970818fa4af) ) // partially taken from mc600
+ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY  FULLNAME     FLAGS
-COMP( 1989, pofo, 0,      0,      portfolio, portfolio, portfolio_state, empty_init, "Atari", "Portfolio", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE     INPUT      CLASS            INIT        COMPANY  FULLNAME       FLAGS
+COMP( 1989, pofo,  0,      0,      portfolio,  portfolio, portfolio_state, empty_init, "Atari", "Portfolio",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1990, pofo2, pofo,   0,      portfolio2, portfolio, portfolio_state, empty_init, "Atari", "Portfolio 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

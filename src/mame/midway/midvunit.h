@@ -76,7 +76,7 @@ protected:
 		, m_dcs(*this, "dcs")
 		, m_paletteram(*this, "paletteram")
 		, m_ram_base(*this, "ram_base")
-		, m_tms32031_control(*this, "32031_control")
+		, m_tms320c31_control(*this, "320c31_control")
 	{ }
 
 	virtual void device_post_load() override;
@@ -99,8 +99,8 @@ protected:
 	uint32_t textureram_r(offs_t offset);
 	void control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void sound_w(uint32_t data);
-	uint32_t tms32031_control_r(offs_t offset);
-	void tms32031_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t tms320c31_control_r(offs_t offset);
+	void tms320c31_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t generic_speedup_r(offs_t offset);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -110,14 +110,14 @@ protected:
 
 	void midvcommon(machine_config &config);
 
-	required_device<tms32031_device> m_maincpu;
+	required_device<tms320c31_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<palette_device> m_palette;
 	required_device_array<timer_device, 2> m_timer;
 	required_device<dcs_audio_device> m_dcs;
 	required_shared_ptr<uint32_t> m_paletteram;
 	required_shared_ptr<uint32_t> m_ram_base;
-	required_shared_ptr<uint32_t> m_tms32031_control;
+	required_shared_ptr<uint32_t> m_tms320c31_control;
 
 	uint8_t m_cmos_protected = 0;
 	uint16_t m_control_data = 0;

@@ -1117,7 +1117,8 @@ std::tuple<struct mips1core_device_base::cache::line &, bool> mips1core_device_b
 }
 
 // compute bit position of sub-unit within a word given endianness and address
-template <typename T> unsigned mips1core_device_base::shift_factor(u32 address) const
+template <typename T>
+unsigned mips1core_device_base::shift_factor(u32 address) const
 {
 	if constexpr (sizeof(T) == 1)
 		return ((m_endianness == ENDIANNESS_BIG) ? (address & 3) ^ 3 : (address & 3)) * 8;
@@ -1127,7 +1128,8 @@ template <typename T> unsigned mips1core_device_base::shift_factor(u32 address) 
 		return 0;
 }
 
-template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, void> mips1core_device_base::load(u32 address, U &&apply)
+template <typename T, bool Aligned, typename U>
+std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, void> mips1core_device_base::load(offs_t address, U &&apply)
 {
 	// alignment error
 	if (Aligned && (address & (sizeof(T) - 1)))
@@ -1204,7 +1206,8 @@ template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convert
 	apply(data);
 }
 
-template <typename T, bool Aligned> void mips1core_device_base::store(u32 address, T data, T mem_mask)
+template <typename T, bool Aligned>
+void mips1core_device_base::store(offs_t address, T data, T mem_mask)
 {
 	// alignment error
 	if (Aligned && (address & (sizeof(T) - 1)))
@@ -1274,7 +1277,7 @@ template <typename T, bool Aligned> void mips1core_device_base::store(u32 addres
 	}
 }
 
-void mips1core_device_base::fetch(u32 address, std::function<void(u32)> &&apply)
+void mips1core_device_base::fetch(offs_t address, std::function<void(u32)> &&apply)
 {
 	// alignment error
 	if (address & 3)

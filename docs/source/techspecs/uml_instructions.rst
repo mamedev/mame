@@ -283,7 +283,8 @@ HASH
 Associate a location with the specified mode and emulated program
 counter values.  The :ref:`HASHJMP <umlinst-hashjmp>` instruction may be
 used to transfer control to the location associated with a mode and
-emulated program counter value.
+emulated program counter value.  HASH instructions are not permitted in
+invariant code blocks.
 
 This is usually used to mark the location of the generated code for an
 emulated instruction or sequence of instructions.
@@ -378,7 +379,7 @@ Call the subroutine beginning at the specified code handle.
 | .. code-block::         | .. code-block:: C++                  |
 |                         |                                      |
 |     callh   handle      |     UML_CALLH(block, handle);        |
-|     callh   handle,cond |     UML_CALLHc(block, handle, cond); |
+|     callh   handle,cond |     UML_CALLHc(block, cond, handle); |
 +-------------------------+--------------------------------------+
 
 Operands
@@ -615,7 +616,9 @@ Simplification rules
 CALLC
 ~~~~~
 
-Call a C function with the signature ``void (*)(void *)``.
+Call a C function with the signature ``void (*)(T *)`` or
+``void (*)(T &)`` (i.e. a function with a single pointer or reference
+parameter that does not return a value).
 
 +---------------------------+-----------------------------------------+
 | Disassembly               | Usage                                   |

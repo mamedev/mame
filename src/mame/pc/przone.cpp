@@ -13,6 +13,7 @@ TODO:
 - CD-ROM reading test is too fast (739% of what is reported as 8X);
 - Tri-Scraper / Super Solitaire / Super 11's: timer doesn't count down (goes only up),
   it does with mouse click, likely bug for wrong input device?
+- Scud Attack: bonus objects disappear midway thru (virge bug?)
 - Outputs, writes to $301-$305 aren't (comms with a CPU?)
 
 ===================================================================================================
@@ -136,8 +137,10 @@ void isa16_przone_jamma_if::io_map(address_map &map)
 
 static INPUT_PORTS_START( przone_jamma )
 	PORT_START("IOCARD")
+	// "Mechanical" chutes
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	// "Electrical" chutes
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN5 )

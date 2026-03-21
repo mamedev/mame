@@ -485,6 +485,29 @@ void midyunit_adpcm_state::init_mkyturbo()
 	init_mkyunit();
 }
 
+void midyunit_adpcm_state::init_mkrep()
+{
+	// patch out protection for now
+
+	uint16_t *rom = (uint16_t *)memregion("maindata")->base();
+
+	rom[0x94234 / 2] = 0x05a0;
+	rom[0x94236 / 2] = 0xe660;
+	rom[0x94238 / 2] = 0x0104;
+
+	rom[0x9637c / 2] = 0x0d3f;
+	rom[0x9637e / 2] = 0xf343;
+	rom[0x96380 / 2] = 0x4c00;
+
+	rom[0x9c476 / 2] = 0xb5a0;
+	rom[0x9c478 / 2] = 0x0030;
+	rom[0x9c47a / 2] = 0x1420;
+	rom[0x9c47c / 2] = 0xb00d;
+	rom[0x9c47e / 2] = 0x0030;
+
+	init_mkyunit();
+}
+
 void midyunit_adpcm_state::init_mkla3bl()
 {
 	// rearrange GFX so the driver can deal with them

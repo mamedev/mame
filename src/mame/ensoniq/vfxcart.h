@@ -10,8 +10,8 @@ class ensoniq_vfx_cartridge:
 	public device_image_interface
 {
 public:
-	typedef delegate<void (ensoniq_vfx_cartridge *)> load_cb;
-	typedef delegate<void (ensoniq_vfx_cartridge *)> unload_cb;
+	using load_cb = delegate<void (ensoniq_vfx_cartridge *)>;
+	using unload_cb = delegate<void (ensoniq_vfx_cartridge *)>;
 
 	ensoniq_vfx_cartridge(
 			const machine_config &mconfig,
@@ -21,12 +21,11 @@ public:
 
 	virtual ~ensoniq_vfx_cartridge();
 
-	u8 read(offs_t offset);
-	void write(offs_t offset, u8 data);
-	virtual const char *filename() const { return device_image_interface::filename(); }
-
 	void setup_load_cb(load_cb cb);
 	void setup_unload_cb(unload_cb cb);
+
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	// device_image_interface overrides
 	virtual std::pair<std::error_condition, std::string> call_load() override;
@@ -42,7 +41,7 @@ public:
 	virtual char const *image_brief_type_name()         const noexcept override { return "cart"; }
 
 protected:
-	virtual void device_start() override ATTR_COLD {}
+	virtual void device_start() override ATTR_COLD;
 
 private:
 
@@ -55,8 +54,8 @@ private:
 		CMD2,
 		WR
 	};
-	state m_state = state::IDLE;
-	std::array<uint8_t, SIZE> m_storage;
+	state m_state;
+	std::unique_ptr<uint8_t []> m_storage;
 	bool m_is_writeable;
 
 	load_cb m_load_cb;

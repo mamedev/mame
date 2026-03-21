@@ -1951,7 +1951,6 @@ again:
 				}
 
 				m_icount -= curcycles;
-
 				handle_io_timers(curcycles);
 
 				/* if channel 0 was started in burst mode, go recheck the mode */

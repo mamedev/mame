@@ -416,10 +416,9 @@ void docastle_state::palette(palette_device &palette) const
 		int const g = 0x23 * bit0 + 0x4b * bit1 + 0x91 * bit2;
 
 		// blue component
-		bit0 = 0;
-		bit1 = BIT(color_prom[i], 0);
-		bit2 = BIT(color_prom[i], 1);
-		int const b = 0x23 * bit0 + 0x4b * bit1 + 0x91 * bit2;
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		/* because the graphics are decoded as 4bpp with the top bit used for transparency
 		   or priority, we create matching 3bpp sets of palette entries, which effectively
@@ -1649,12 +1648,14 @@ GAME( 1983, docastle,   0,        docastle, docastle, docastle_state, empty_init
 GAME( 1983, docastle2,  docastle, docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do's Castle (set 2)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1983, docastleo,  docastle, docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do's Castle (older)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1983, douni,      docastle, docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do! vs. Unicorns (Japan)",              MACHINE_SUPPORTS_SAVE )
+
 GAME( 1984, dorunrun,   0,        dorunrun, dorunrun, dorunrun_state, empty_init, ROT0,   "Universal", "Do! Run Run (set 1)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1984, dorunrun2,  dorunrun, dorunrun, dorunrun, dorunrun_state, empty_init, ROT0,   "Universal", "Do! Run Run (set 2)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1984, dorunrunc,  dorunrun, docastle, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, dorunrunca, dorunrun, docastle, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, runrun,     dorunrun, docastle, runrun,   docastle_state, empty_init, ROT0,   "bootleg",   "Run Run (Do! Run Run bootleg)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1987, spiero,     dorunrun, dorunrun, dorunrun, dorunrun_state, empty_init, ROT0,   "Universal", "Super Pierrot (Japan)",                     MACHINE_SUPPORTS_SAVE )
+
 GAME( 1984, dowild,     0,        dorunrun, dowild,   dorunrun_state, empty_init, ROT0,   "Universal", "Mr. Do's Wild Ride",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1984, jjack,      0,        dorunrun, jjack,    dorunrun_state, empty_init, ROT270, "Universal", "Jumping Jack",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1984, kickridr,   0,        dorunrun, kickridr, dorunrun_state, empty_init, ROT0,   "Universal", "Kick Rider",                                MACHINE_SUPPORTS_SAVE )

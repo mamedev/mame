@@ -75,10 +75,10 @@ authors:hap
 		</text>
 	</element>
 	<element name="lamp_smoke_r" defstate="0">
-		<text string="SMOKE" align="1" state="0">
+		<text string="SMOKE " align="1" state="0">
 			<color red="0.3" green="0.0" blue="0.25" />
 		</text>
-		<text string="SMOKE" align="1" state="1">
+		<text string="SMOKE " align="1" state="1">
 			<color red="1.0" green="0.2" blue="0.8" />
 		</text>
 	</element>
@@ -116,10 +116,10 @@ authors:hap
 		</text>
 	</element>
 	<element name="lamp_smoke_l" defstate="0">
-		<text string="SMOKE" align="2" state="0">
+		<text string=" SMOKE" align="2" state="0">
 			<color red="0.3" green="0.0" blue="0.25" />
 		</text>
-		<text string="SMOKE" align="2" state="1">
+		<text string=" SMOKE" align="2" state="1">
 			<color red="1.0" green="0.2" blue="0.8" />
 		</text>
 	</element>
@@ -193,18 +193,18 @@ authors:hap
 			<bounds x="72" y="0" width="59" height="25" />
 		</element>
 		<element name="lamp2" ref="lamp_van">
-			<bounds x="172" y="0" width="85" height="25" />
+			<bounds x="165" y="0" width="85" height="25" />
 		</element>
 		<element name="lamp3" ref="lamp_smoke">
-			<bounds x="295" y="0" width="93" height="25" />
+			<bounds x="287" y="0" width="93" height="25" />
 		</element>
 		<element name="lamp4" ref="lamp_gun">
-			<bounds x="390" y="0" width="90" height="25" />
+			<bounds x="387" y="0" width="90" height="25" />
 		</element>
 	</group>
 
 	<group name="lamps_left">
-		<bounds x="-50" y="0" width="50" height="640" />
+		<bounds x="-53" y="0" width="53" height="640" />
 
 		<element name="lamp1" ref="lamp_miss_l">
 			<bounds x="-42" y="430" width="38" height="25" />
@@ -216,7 +216,7 @@ authors:hap
 			<bounds x="-34" y="480" width="26" height="25" />
 		</element>
 		<element name="lamp3" ref="lamp_smoke_l">
-			<bounds x="-50" y="505" width="42" height="25" />
+			<bounds x="-53" y="505" width="45" height="25" />
 		</element>
 		<element name="lamp4" ref="lamp_gun_l">
 			<bounds x="-40" y="530" width="32" height="25" />
@@ -224,7 +224,7 @@ authors:hap
 	</group>
 
 	<group name="lamps_right">
-		<bounds x="480" y="0" width="50" height="640" />
+		<bounds x="480" y="0" width="53" height="640" />
 
 		<element name="lamp1" ref="lamp_miss_r">
 			<bounds x="488" y="430" width="38" height="25" />
@@ -236,7 +236,7 @@ authors:hap
 			<bounds x="488" y="480" width="26" height="25" />
 		</element>
 		<element name="lamp3" ref="lamp_smoke_r">
-			<bounds x="488" y="505" width="42" height="25" />
+			<bounds x="488" y="505" width="45" height="25" />
 		</element>
 		<element name="lamp4" ref="lamp_gun_r">
 			<bounds x="488" y="530" width="32" height="25" />
@@ -361,7 +361,7 @@ authors:hap
 
 		<collection name="Lamps">
 			<group ref="lamps_right">
-				<bounds x="480" y="0" width="50" height="640" />
+				<bounds x="480" y="0" width="53" height="640" />
 			</group>
 		</collection>
 
@@ -388,7 +388,7 @@ authors:hap
 
 		<collection name="Lamps">
 			<group ref="lamps_left">
-				<bounds x="-50" y="0" width="50" height="640" />
+				<bounds x="-53" y="0" width="53" height="640" />
 			</group>
 		</collection>
 

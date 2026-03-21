@@ -22,7 +22,7 @@
 // ======================> pc9801_118_device
 
 class pc9801_118_device : public device_t
-					    , public device_pc98_cbus_slot_interface
+						, public device_pc98_cbus_slot_interface
 {
 public:
 	// construction/destruction
@@ -30,10 +30,10 @@ public:
 
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
-	uint8_t opn3_r(offs_t offset);
-	void opn3_w(offs_t offset, uint8_t data);
-	uint8_t id_r(offs_t offset);
-	void ext_w(offs_t offset, uint8_t data);
+	u8 opn3_r(offs_t offset);
+	void opn3_w(offs_t offset, u8 data);
+	u8 id_r(offs_t offset);
+	void ext_w(offs_t offset, u8 data);
 
 protected:
 	pc9801_118_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -53,16 +53,7 @@ private:
 	u8 m_ext_reg;
 };
 
-
 // device type definition
 DECLARE_DEVICE_TYPE(PC9801_118, pc9801_118_device)
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-
 
 #endif // MAME_BUS_PC98_CBUS_PC9801_118_H

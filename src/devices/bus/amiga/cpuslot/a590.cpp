@@ -46,7 +46,7 @@ a590_device::a590_device(const machine_config &mconfig, const char *tag, device_
 	device_amiga_cpuslot_interface(mconfig, *this),
 	m_irq(*this, "irq"),
 	m_dmac(*this, "dmac"),
-	m_wdc(*this, "scsi:7:wdc"),
+	m_wdc(*this, "wdc"),
 	m_xt(*this, "xt"),
 	m_jp1(*this, "jp1"),
 	m_dip(*this, "dip"),
@@ -167,13 +167,6 @@ const tiny_rom_entry *a590_device::device_rom_region() const
 //  MACHINE DEFINITIONS
 //**************************************************************************
 
-void a590_device::wd33c93_config(device_t *device)
-{
-	device->set_clock(28.37516_MHz_XTAL / 4); // 7M
-	downcast<wd33c93a_device *>(device)->irq_cb().set(m_irq, FUNC(input_merger_any_high_device::in_w<0>));
-	downcast<wd33c93a_device *>(device)->drq_cb().set(m_dmac, FUNC(amiga_dmac_device::sdreq_w));
-}
-
 void a590_device::device_add_mconfig(machine_config &config)
 {
 	AMIGA_DMAC_REV2(config, m_dmac, 28.37516_MHz_XTAL / 4); // 7M
@@ -191,14 +184,18 @@ void a590_device::device_add_mconfig(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_irq);
 	m_irq->output_handler().set(m_dmac, FUNC(amiga_dmac_device::intx_w));
 
-	NSCSI_BUS(config, "scsi", 0);
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("wdc", WD33C93A).machine_config([this] (device_t *device) { wd33c93_config(device); });
+
+	WD33C93A(config, m_wdc, 28.37516_MHz_XTAL / 4); // 7M
+	scsi.set_external_device(7, m_wdc);
+	m_wdc->irq_cb().set(m_irq, FUNC(input_merger_any_high_device::in_w<0>));
+	m_wdc->drq_cb().set(m_dmac, FUNC(amiga_dmac_device::sdreq_w));
 
 	XT_HDC(config, m_xt, 0);
 	m_xt->irq_handler().set(m_irq, FUNC(input_merger_any_high_device::in_w<1>));

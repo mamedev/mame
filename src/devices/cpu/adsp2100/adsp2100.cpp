@@ -127,48 +127,48 @@ DEFINE_DEVICE_TYPE(ADSP2181, adsp2181_device, "adsp2181", "Analog Devices ADSP-2
 //  adsp21xx_device - constructor
 //-------------------------------------------------
 
-adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype)
-	: cpu_device(mconfig, type, tag, owner, clock),
-		m_program_config("program", ENDIANNESS_LITTLE, 32, 14, -2),
-		m_data_config("data", ENDIANNESS_LITTLE, 16, 14, -1),
-		m_chip_type(chiptype),
-		m_pc(0),
-		m_ppc(0),
-		m_loop(0),
-		m_loop_condition(0),
-		m_cntr(0),
-		m_astat(0),
-		m_sstat(0),
-		m_mstat(0),
-		m_mstat_prev(0),
-		m_astat_clear(0),
-		m_idle(0),
-		m_px(0),
-		m_pmovlay(0),
-		m_dmovlay(0),
-		m_pc_sp(0),
-		m_cntr_sp(0),
-		m_stat_sp(0),
-		m_loop_sp(0),
-		m_flagout(0),
-		m_flagin(0),
-		m_fl0(0),
-		m_fl1(0),
-		m_fl2(0),
-		m_idma_addr(0),
-		m_idma_cache(0),
-		m_idma_offs(0),
-		m_imask(0),
-		m_icntl(0),
-		m_ifc(0),
-		m_icount(0),
-		m_mstat_mask((m_chip_type >= CHIP_TYPE_ADSP2101) ? 0x7f : 0x0f),
-		m_imask_mask((m_chip_type >= CHIP_TYPE_ADSP2181) ? 0x3ff :
-					(m_chip_type >= CHIP_TYPE_ADSP2101) ? 0x3f : 0x0f),
-		m_sport_rx_cb(*this, 0),
-		m_sport_tx_cb(*this),
-		m_timer_fired_cb(*this),
-		m_dmovlay_cb(*this)
+adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype) :
+	cpu_device(mconfig, type, tag, owner, clock),
+	m_program_config("program", ENDIANNESS_LITTLE, 32, 14, -2),
+	m_data_config("data", ENDIANNESS_LITTLE, 16, 14, -1),
+	m_chip_type(chiptype),
+	m_pc(0),
+	m_ppc(0),
+	m_loop(0),
+	m_loop_condition(0),
+	m_cntr(0),
+	m_astat(0),
+	m_sstat(0),
+	m_mstat(0),
+	m_mstat_prev(0),
+	m_astat_clear(0),
+	m_idle(0),
+	m_px(0),
+	m_pmovlay(0),
+	m_dmovlay(0),
+	m_pc_sp(0),
+	m_cntr_sp(0),
+	m_stat_sp(0),
+	m_loop_sp(0),
+	m_flagout(0),
+	m_flagin(0),
+	m_fl0(0),
+	m_fl1(0),
+	m_fl2(0),
+	m_idma_addr(0),
+	m_idma_cache(0),
+	m_idma_offs(0),
+	m_imask(0),
+	m_icntl(0),
+	m_ifc(0),
+	m_icount(0),
+	m_mstat_mask((m_chip_type >= CHIP_TYPE_ADSP2101) ? 0x7f : 0x0f),
+	m_imask_mask((m_chip_type >= CHIP_TYPE_ADSP2181) ? 0x3ff :
+				(m_chip_type >= CHIP_TYPE_ADSP2101) ? 0x3f : 0x0f),
+	m_sport_rx_cb(*this, 0),
+	m_sport_tx_cb(*this),
+	m_timer_fired_cb(*this),
+	m_dmovlay_cb(*this)
 {
 	// initialize remaining state
 	memset(&m_core, 0, sizeof(m_core));
@@ -584,8 +584,7 @@ void adsp21xx_device::device_start()
 	state_add(ADSP2100_ICNTL,   "ICNTL",     m_icntl).mask(0x1f).callimport();
 
 	for (int irqnum = 0; irqnum < 4; irqnum++)
-		if (irqnum < 4 || m_chip_type == CHIP_TYPE_ADSP2100)
-			state_add(ADSP2100_IRQSTATE0 + irqnum, string_format("IRQ%d", irqnum).c_str(), m_irq_state[irqnum]).mask(1).callimport();
+		state_add(ADSP2100_IRQSTATE0 + irqnum, string_format("IRQ%d", irqnum).c_str(), m_irq_state[irqnum]).mask(1).callimport();
 
 	state_add(ADSP2100_FLAGIN,  "FLAGIN",    m_flagin).mask(1);
 	state_add(ADSP2100_FLAGOUT, "FLAGOUT",   m_flagout).mask(1);

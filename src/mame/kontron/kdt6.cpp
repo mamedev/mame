@@ -624,7 +624,7 @@ void kdt6_state::psi98(machine_config &config)
 	TIMER(config, m_beep_timer).configure_generic(FUNC(kdt6_state::beeper_off));
 
 	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
-	m_dma->out_busreq_callback().set_inputline(m_cpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_busreq_callback().set_inputline(m_cpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->out_int_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 	m_dma->in_mreq_callback().set(FUNC(kdt6_state::memory_r));
 	m_dma->out_mreq_callback().set(FUNC(kdt6_state::memory_w));

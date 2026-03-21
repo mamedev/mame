@@ -393,7 +393,7 @@ authors:hap
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-3.6875" right="138.5" top="7" bottom="86" />
+		<bounds left="-3.6875" right="139" top="7" bottom="86" />
 
 		<group ref="sb_board"><bounds x="8.5" y="9" width="75" height="75" /></group>
 		<group ref="sb_ui"><bounds x="-2.28125" y="9" width="9.375" height="75" /></group>

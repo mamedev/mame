@@ -119,7 +119,7 @@ void a2bus_sider_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "sasibus:4", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "sasibus:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "sasibus:6", default_scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "sasibus:7", default_scsi_devices, "scsicb", true).option_add_internal("scsicb", NSCSI_CB);
+	m_sasibus->set_external_device(7, *this);
 }
 
 //-------------------------------------------------
@@ -142,9 +142,9 @@ const tiny_rom_entry *a2bus_sider1card_device::device_rom_region() const
 
 a2bus_sider_device::a2bus_sider_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	nscsi_device_interface(mconfig, *this),
 	device_a2bus_card_interface(mconfig, *this),
 	m_sasibus(*this, "sasibus"),
-	m_sasi(*this, "sasibus:7:scsicb"),
 	m_rom(*this, SASI_ROM_REGION),
 	m_latch(0xff),
 	m_control(0)
@@ -193,19 +193,19 @@ uint8_t a2bus_sider_device::read_c0nx(uint8_t offset)
 	//      b5: I/O
 	//      b6: C/D
 	//      b7: REQ
-			rv |= m_sasi->req_r() ? 0x80 : 0;
-			rv |= m_sasi->cd_r() ? 0x40 : 0;
-			rv |= m_sasi->io_r() ? 0x20 : 0;
-			rv |= m_sasi->msg_r() ? 0x10 : 0;
-			rv |= m_sasi->bsy_r() ? 0x08 : 0;
+			rv |= m_scsi_bus->ctrl_r() & S_REQ ? 0x80 : 0;
+			rv |= m_scsi_bus->ctrl_r() & S_CTL ? 0x40 : 0;
+			rv |= m_scsi_bus->ctrl_r() & S_INP ? 0x20 : 0;
+			rv |= m_scsi_bus->ctrl_r() & S_MSG ? 0x10 : 0;
+			rv |= m_scsi_bus->ctrl_r() & S_BSY ? 0x08 : 0;
 			return rv;
 
 		case 1:
-			rv = m_sasi->read();
-			if ((m_sasi->req_r()) && (m_sasi->io_r()))
+			rv = m_scsi_bus->data_r();
+			if ((m_scsi_bus->ctrl_r() & S_REQ) && (m_scsi_bus->ctrl_r() & S_INP))
 			{
-				m_sasi->ack_w(1);
-				m_sasi->ack_w(0);
+				m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
+				m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 			}
 			return rv;
 
@@ -230,13 +230,13 @@ void a2bus_sider_device::write_c0nx(uint8_t offset, uint8_t data)
 			m_latch = data;
 			if (!(m_control & 0x10))
 			{
-				m_sasi->write(m_latch);
+				m_scsi_bus->data_w(m_scsi_refid, m_latch);
 
-				if (m_sasi->req_r())
+				if (m_scsi_bus->ctrl_r() & S_REQ)
 				{
-					m_sasi->ack_w(1);
-					m_sasi->write(0);   // stop driving the data lines
-					m_sasi->ack_w(0);
+					m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
+					m_scsi_bus->data_w(m_scsi_refid, 0); // stop driving the data lines
+					m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 				}
 			}
 			break;
@@ -247,16 +247,9 @@ void a2bus_sider_device::write_c0nx(uint8_t offset, uint8_t data)
 //          b6: /BSY
 //          b7: /SEL (error in note on A2DP's schematic; BSY and SEL are the same polarity from the 6502's POV)
 			m_control = data;
-			m_sasi->sel_w((data & 0x80) ? 1 : 0);
-			m_sasi->bsy_w((data & 0x40) ? 1 : 0);
-			if (data & 0x20)
-			{
-				m_sasibus->reset();
-			}
-			else if (!(data & 0x10))
-			{
-				m_sasi->write(m_latch);
-			}
+			m_scsi_bus->ctrl_w(m_scsi_refid, ((data & 0x80) ? S_SEL : 0) | ((data & 0x40) ? S_BSY : 0) | ((data & 0x20) ? S_RST : 0), S_SEL|S_BSY|S_RST);
+			if (!(data & 0x10))
+				m_scsi_bus->data_w(m_scsi_refid, m_latch);
 			break;
 
 		default:

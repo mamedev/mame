@@ -41,8 +41,8 @@
 #include "machine/nscsi_bus.h"
 
 class ncr5385_device
-	: public nscsi_device
-	, public nscsi_slot_card_interface
+	: public device_t
+	, public nscsi_device_interface
 {
 public:
 	auto irq() { return m_int.bind(); }

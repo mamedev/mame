@@ -62,7 +62,7 @@ public:
 		m_adbmodem(*this, "adbmodem"),
 		m_asc(*this, "asc"),
 		m_scsibus1(*this, "scsi"),
-		m_ncr5380(*this, "scsi:7:ncr5380"),
+		m_ncr5380(*this, "ncr5380"),
 		m_scsihelp(*this, "scsihelp"),
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
@@ -176,14 +176,17 @@ private:
 			m_fdc->write((offset >> 8) & 0xf, data & 0xff);
 		else
 			m_fdc->write((offset >> 8) & 0xf, data >> 8);
+
+		if (!machine().side_effects_disabled())
+			m_maincpu->adjust_icount(-5);
 	}
 };
 
 void maciici_state::machine_start()
 {
-	m_rbv->set_ram_info((u32 *)m_ram->pointer(), m_ram->size());
+	m_rbv->set_ram_info(m_ram->pointer<u32>(), m_ram->size());
 
-	m_rom_ptr = (u32 *)memregion("bootrom")->base();
+	m_rom_ptr = &memregion("bootrom")->as_u32();
 	m_rom_size = memregion("bootrom")->bytes();
 
 	m_last_taken_interrupt = -1;
@@ -191,7 +194,7 @@ void maciici_state::machine_start()
 
 void maciici_state::machine_reset()
 {
-	// main cpu shouldn't start until Egret wakes it up
+	// main CPU shouldn't start until Egret wakes it up
 	if (m_egret)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -559,7 +562,7 @@ void maciici_state::maciixi_base(machine_config &config)
 	m_via1->cb2_handler().set(FUNC(maciici_state::via_out_cb2));
 	m_via1->irq_handler().set(FUNC(maciici_state::via_irq));
 
-	NSCSI_BUS(config, "scsi");
+	NSCSI_BUS(config, m_scsibus1);
 	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
@@ -572,10 +575,9 @@ void maciici_state::maciixi_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device)
-																					 {
-		ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
-		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w)); });
+	NCR53C80(config, m_ncr5380);
+	m_scsibus1->set_external_device(7, m_ncr5380);
+	m_ncr5380->drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
 
 	MAC_SCSI_HELPER(config, m_scsihelp);
 	m_scsihelp->scsi_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::read));

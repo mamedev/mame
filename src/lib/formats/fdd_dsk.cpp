@@ -34,8 +34,7 @@
 #include "fdd_dsk.h"
 
 #include "ioprocs.h"
-
-#include "osdcomm.h" // little_endianize_int32
+#include "multibyte.h"
 
 #include <cstring>
 
@@ -104,7 +103,7 @@ bool fdd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			secs[(track * 26) + sect] = hsec[2];
 			sec_sizes[(track * 26) + sect] = hsec[3];
 			fill_vals[(track * 26) + sect] = hsec[4];
-			sec_offs[(track * 26) + sect] = little_endianize_int32(*(uint32_t *)(hsec + 0x08));
+			sec_offs[(track * 26) + sect] = get_u32le(hsec + 0x08);
 
 			curr_track_size += (128 << hsec[3]);
 			curr_num_sec++;

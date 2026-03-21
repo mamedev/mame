@@ -226,7 +226,7 @@ static INPUT_PORTS_START( mk3 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_INTERLOCK )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_DOOR )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )
 INPUT_PORTS_END
@@ -335,7 +335,7 @@ static INPUT_PORTS_START( openice )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START4 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_INTERLOCK )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_DOOR )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )
 INPUT_PORTS_END
@@ -428,7 +428,7 @@ static INPUT_PORTS_START( nbahangt )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START4 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_INTERLOCK )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_DOOR )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )
 INPUT_PORTS_END
@@ -521,7 +521,7 @@ static INPUT_PORTS_START( rmpgwt )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START4 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_INTERLOCK )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_DOOR )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )
 INPUT_PORTS_END
@@ -607,7 +607,7 @@ static INPUT_PORTS_START( wwfmania )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_INTERLOCK ) // Coin Door
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_DOOR ) // Coin Door
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )
 INPUT_PORTS_END
@@ -1105,6 +1105,9 @@ ROM_START( nbahangt )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_112_image_rom.u112", 0x1400001, 0x100000, CRC(644e1bca) SHA1(447cc3b0a16aaff39b6cd095f1c255a91f235f7f) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_111_image_rom.u111", 0x1400002, 0x100000, CRC(10d3b768) SHA1(e22fcb02a17c78f963ee5d35a38a9ab14f3de450) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_110_image_rom.u110", 0x1400003, 0x100000, CRC(8575aeb2) SHA1(883acfc45416ab6e1ab77fc897638f89286bea7e) )
+
+	ROM_REGION( 0x2000, "serial_security:pic", 0 )   // security PIC16C57 (provides game ID code and serial number)
+	ROM_LOAD( "459_nba_hang_time_u64.u64",  0x0000, 0x2000, CRC(0e642b39) SHA1(7e93a5bd0bd4a5fabf0612cdfdbfb400c6035ef7) )
 ROM_END
 
 
@@ -1146,6 +1149,9 @@ ROM_START( nbahangtm13 )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_112_image_rom.u112", 0x1400001, 0x100000, CRC(644e1bca) SHA1(447cc3b0a16aaff39b6cd095f1c255a91f235f7f) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_111_image_rom.u111", 0x1400002, 0x100000, CRC(10d3b768) SHA1(e22fcb02a17c78f963ee5d35a38a9ab14f3de450) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_110_image_rom.u110", 0x1400003, 0x100000, CRC(8575aeb2) SHA1(883acfc45416ab6e1ab77fc897638f89286bea7e) )
+
+	ROM_REGION( 0x2000, "serial_security:pic", 0 )   // security PIC16C57 (provides game ID code and serial number)
+	ROM_LOAD( "459_nba_hang_time_u64.u64",  0x0000, 0x2000, CRC(0e642b39) SHA1(7e93a5bd0bd4a5fabf0612cdfdbfb400c6035ef7) )
 ROM_END
 
 
@@ -1187,6 +1193,9 @@ ROM_START( nbahangtl12 )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_112_image_rom.u112", 0x1400001, 0x100000, CRC(644e1bca) SHA1(447cc3b0a16aaff39b6cd095f1c255a91f235f7f) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_111_image_rom.u111", 0x1400002, 0x100000, CRC(10d3b768) SHA1(e22fcb02a17c78f963ee5d35a38a9ab14f3de450) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_110_image_rom.u110", 0x1400003, 0x100000, CRC(8575aeb2) SHA1(883acfc45416ab6e1ab77fc897638f89286bea7e) )
+
+	ROM_REGION( 0x2000, "serial_security:pic", 0 )   // security PIC16C57 (provides game ID code and serial number)
+	ROM_LOAD( "459_nba_hang_time_u64.u64",  0x0000, 0x2000, CRC(0e642b39) SHA1(7e93a5bd0bd4a5fabf0612cdfdbfb400c6035ef7) )
 ROM_END
 
 
@@ -1228,6 +1237,9 @@ ROM_START( nbahangtm12 )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_112_image_rom.u112", 0x1400001, 0x100000, CRC(644e1bca) SHA1(447cc3b0a16aaff39b6cd095f1c255a91f235f7f) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_111_image_rom.u111", 0x1400002, 0x100000, CRC(10d3b768) SHA1(e22fcb02a17c78f963ee5d35a38a9ab14f3de450) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_110_image_rom.u110", 0x1400003, 0x100000, CRC(8575aeb2) SHA1(883acfc45416ab6e1ab77fc897638f89286bea7e) )
+
+	ROM_REGION( 0x2000, "serial_security:pic", 0 )   // security PIC16C57 (provides game ID code and serial number)
+	ROM_LOAD( "459_nba_hang_time_u64.u64",  0x0000, 0x2000, CRC(0e642b39) SHA1(7e93a5bd0bd4a5fabf0612cdfdbfb400c6035ef7) )
 ROM_END
 
 
@@ -1269,6 +1281,9 @@ ROM_START( nbahangtl11 )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_112_image_rom.u112", 0x1400001, 0x100000, CRC(644e1bca) SHA1(447cc3b0a16aaff39b6cd095f1c255a91f235f7f) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_111_image_rom.u111", 0x1400002, 0x100000, CRC(10d3b768) SHA1(e22fcb02a17c78f963ee5d35a38a9ab14f3de450) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_110_image_rom.u110", 0x1400003, 0x100000, CRC(8575aeb2) SHA1(883acfc45416ab6e1ab77fc897638f89286bea7e) )
+
+	ROM_REGION( 0x2000, "serial_security:pic", 0 )   // security PIC16C57 (provides game ID code and serial number)
+	ROM_LOAD( "459_nba_hang_time_u64.u64",  0x0000, 0x2000, CRC(0e642b39) SHA1(7e93a5bd0bd4a5fabf0612cdfdbfb400c6035ef7) )
 ROM_END
 
 
@@ -1310,6 +1325,9 @@ ROM_START( nbahangtm11 )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_112_image_rom.u112", 0x1400001, 0x100000, CRC(644e1bca) SHA1(447cc3b0a16aaff39b6cd095f1c255a91f235f7f) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_111_image_rom.u111", 0x1400002, 0x100000, CRC(10d3b768) SHA1(e22fcb02a17c78f963ee5d35a38a9ab14f3de450) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_110_image_rom.u110", 0x1400003, 0x100000, CRC(8575aeb2) SHA1(883acfc45416ab6e1ab77fc897638f89286bea7e) )
+
+	ROM_REGION( 0x2000, "serial_security:pic", 0 )   // security PIC16C57 (provides game ID code and serial number)
+	ROM_LOAD( "459_nba_hang_time_u64.u64",  0x0000, 0x2000, CRC(0e642b39) SHA1(7e93a5bd0bd4a5fabf0612cdfdbfb400c6035ef7) )
 ROM_END
 
 
@@ -1360,6 +1378,9 @@ ROM_START( nbamht )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_112_image_rom.u112", 0x1400001, 0x100000, CRC(644e1bca) SHA1(447cc3b0a16aaff39b6cd095f1c255a91f235f7f) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_111_image_rom.u111", 0x1400002, 0x100000, CRC(10d3b768) SHA1(e22fcb02a17c78f963ee5d35a38a9ab14f3de450) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_110_image_rom.u110", 0x1400003, 0x100000, CRC(8575aeb2) SHA1(883acfc45416ab6e1ab77fc897638f89286bea7e) )
+
+	ROM_REGION( 0x2000, "serial_security:pic", 0 )   // security PIC16C57 (provides game ID code and serial number)
+	ROM_LOAD( "459_nba_hang_time_u64.u64",  0x0000, 0x2000, CRC(0e642b39) SHA1(7e93a5bd0bd4a5fabf0612cdfdbfb400c6035ef7) )
 ROM_END
 
 
@@ -1401,6 +1422,9 @@ ROM_START( nbamhtl10 )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_112_image_rom.u112", 0x1400001, 0x100000, CRC(644e1bca) SHA1(447cc3b0a16aaff39b6cd095f1c255a91f235f7f) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_111_image_rom.u111", 0x1400002, 0x100000, CRC(10d3b768) SHA1(e22fcb02a17c78f963ee5d35a38a9ab14f3de450) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_110_image_rom.u110", 0x1400003, 0x100000, CRC(8575aeb2) SHA1(883acfc45416ab6e1ab77fc897638f89286bea7e) )
+
+	ROM_REGION( 0x2000, "serial_security:pic", 0 )   // security PIC16C57 (provides game ID code and serial number)
+	ROM_LOAD( "459_nba_hang_time_u64.u64",  0x0000, 0x2000, CRC(0e642b39) SHA1(7e93a5bd0bd4a5fabf0612cdfdbfb400c6035ef7) )
 ROM_END
 
 
@@ -1442,6 +1466,9 @@ ROM_START( nbamhtm10 )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_112_image_rom.u112", 0x1400001, 0x100000, CRC(644e1bca) SHA1(447cc3b0a16aaff39b6cd095f1c255a91f235f7f) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_111_image_rom.u111", 0x1400002, 0x100000, CRC(10d3b768) SHA1(e22fcb02a17c78f963ee5d35a38a9ab14f3de450) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_110_image_rom.u110", 0x1400003, 0x100000, CRC(8575aeb2) SHA1(883acfc45416ab6e1ab77fc897638f89286bea7e) )
+
+	ROM_REGION( 0x2000, "serial_security:pic", 0 )   // security PIC16C57 (provides game ID code and serial number)
+	ROM_LOAD( "459_nba_hang_time_u64.u64",  0x0000, 0x2000, CRC(0e642b39) SHA1(7e93a5bd0bd4a5fabf0612cdfdbfb400c6035ef7) )
 ROM_END
 
 
@@ -1483,6 +1510,9 @@ ROM_START( nbamhtp )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_112_image_rom.u112", 0x1400001, 0x100000, CRC(644e1bca) SHA1(447cc3b0a16aaff39b6cd095f1c255a91f235f7f) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_111_image_rom.u111", 0x1400002, 0x100000, CRC(10d3b768) SHA1(e22fcb02a17c78f963ee5d35a38a9ab14f3de450) )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_110_image_rom.u110", 0x1400003, 0x100000, CRC(8575aeb2) SHA1(883acfc45416ab6e1ab77fc897638f89286bea7e) )
+
+	ROM_REGION( 0x2000, "serial_security:pic", 0 )   // security PIC16C57 (provides game ID code and serial number)
+	ROM_LOAD( "459_nba_hang_time_u64.u64",  0x0000, 0x2000, CRC(0e642b39) SHA1(7e93a5bd0bd4a5fabf0612cdfdbfb400c6035ef7) )
 ROM_END
 
 
@@ -1752,17 +1782,17 @@ GAME( 1995, wwfmaniap,   wwfmania, wunit_picsim, wwfmania, midwunit_state, init_
 GAME( 1995, openice,     0,        wunit_picsim, openice,  midwunit_state, init_openice,  ROT0, "Midway", "NHL Open Ice: 2 on 2 Challenge (rev 1.21)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, openicea,    openice,  wunit_picsim, openice,  midwunit_state, init_openice,  ROT0, "Midway", "NHL Open Ice: 2 on 2 Challenge (rev 1.2A)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, nbahangt,    0,        wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Hangtime (ver L1.3 10/10/96)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nbahangtm13, nbahangt, wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Hangtime (ver M1.3 10/10/96)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nbahangtl12, nbahangt, wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Hangtime (ver L1.2 8/29/96)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nbahangtm12, nbahangt, wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Hangtime (ver M1.2 8/29/96)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nbahangtl11, nbahangt, wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Hangtime (ver L1.1 4/16/96)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nbahangtm11, nbahangt, wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Hangtime (ver M1.1 4/16/96)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbahangt,    0,        wunit_picemu, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Hangtime (ver L1.3 10/10/96)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbahangtm13, nbahangt, wunit_picemu, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Hangtime (ver M1.3 10/10/96)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbahangtl12, nbahangt, wunit_picemu, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Hangtime (ver L1.2 8/29/96)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbahangtm12, nbahangt, wunit_picemu, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Hangtime (ver M1.2 8/29/96)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbahangtl11, nbahangt, wunit_picemu, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Hangtime (ver L1.1 4/16/96)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbahangtm11, nbahangt, wunit_picemu, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Hangtime (ver M1.1 4/16/96)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, nbamht,      nbahangt, wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (ver L1.03 06/09/97)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nbamhtl10,   nbahangt, wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (ver L1.0 11/08/96)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nbamhtm10,   nbahangt, wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (ver M1.0 11/08/96)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nbamhtp,     nbahangt, wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (ver L0.9 10/30/96)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbamht,      nbahangt, wunit_picemu, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (ver L1.03 06/09/97)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbamhtl10,   nbahangt, wunit_picemu, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (ver L1.0 11/08/96)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbamhtm10,   nbahangt, wunit_picemu, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (ver M1.0 11/08/96)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbamhtp,     nbahangt, wunit_picemu, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (ver L0.9 10/30/96)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1997, rmpgwt,      0,        wunit_picemu, rmpgwt,   midwunit_state, init_rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, rmpgwt11,    rmpgwt,   wunit_picemu, rmpgwt,   midwunit_state, init_rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.1)", MACHINE_SUPPORTS_SAVE )

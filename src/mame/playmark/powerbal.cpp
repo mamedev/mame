@@ -847,6 +847,29 @@ ROM_START( hotminda )
 	ROM_LOAD( "rom10.rom",       0x00000, 0x40000,  CRC(0bf3a3e5) SHA1(2ae06f37a6bcd20bc5fbaa90d970aba2ebf3cf5a) )
 ROM_END
 
+
+ROM_START( hotmindb ) // possible bug fix version of the above? Just a couple of data table changes, but they match what's in hotmind (playmark.cpp)
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "1.u66", 0x00001, 0x20000, CRC(24b1a1df) SHA1(8e909a2a4b9c64ddb845c9102e8f5b70513ed9cf) ) // red dot on the label
+	ROM_LOAD16_BYTE( "2.u77", 0x00000, 0x20000, CRC(f5accd9f) SHA1(12194ea7c35263be9afd91f0abe2041998528af9) ) // red dot on the label
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "13.u36", 0x00000, 0x20000, CRC(18d22109) SHA1(52bbb68f4ef5f4d41f5915bef4304784451ca6d8) )
+	ROM_LOAD( "14.u42", 0x20000, 0x20000, CRC(f95a1ff6) SHA1(646c59199570ccd11cb53b0b59a6cd03b1b42fac) )
+	ROM_LOAD( "15.u39", 0x40000, 0x20000, CRC(8a9ea7ed) SHA1(529c0466df3f0aa050526699099ea7a5da9dbcfe) )
+	ROM_LOAD( "16.u45", 0x60000, 0x20000, CRC(df63b642) SHA1(d5df740717193b06267508d169bb5df6214ca13d))
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "17.u86", 0x00000, 0x20000, CRC(805002cf) SHA1(dc97881bc78dcb753f404b7df2cfd4a071ca8393) )
+	ROM_LOAD( "18.u85", 0x20000, 0x20000, CRC(6a9d896b) SHA1(d617a69e6954de3bf7c322529232eadb90034fbc) )
+	ROM_LOAD( "19.u84", 0x40000, 0x20000, CRC(223ad90f) SHA1(57b4e364f21aeea24a99deb6bab13019846e8f9b) )
+	ROM_LOAD( "20.u83", 0x60000, 0x20000, CRC(ab37a273) SHA1(2051ee99a7ff3f4fc2b91c2c9d4e4da2f12db256) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // OKI Samples
+	ROM_LOAD( "10.u16", 0x00000, 0x40000, CRC(0bf3a3e5) SHA1(2ae06f37a6bcd20bc5fbaa90d970aba2ebf3cf5a) )
+ROM_END
+
+
 ROM_START( atombjt ) // based off bjtwina set
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "22.u67",  0x00000, 0x20000, CRC(bead8c70) SHA1(2694bb0639f6b94119c21faf3810f00ef20b50da) )
@@ -881,15 +904,16 @@ void magicstk_state::init_magicstk()
 	m_yoffset = -5;
 }
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /*************************
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT           ROT      COMPANY             FULLNAME                           FLAGS
-GAME( 1994, powerbal, 0,       powerbal, powerbal, powerbal_state, init_powerbal, ROT0,   "Playmark",          "Power Balls",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, magicstk, 0,       magicstk, magicstk, magicstk_state, init_magicstk, ROT0,   "Playmark",          "Magic Sticks",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1995, hotminda, hotmind, magicstk, hotminda, magicstk_state, init_magicstk, ROT0,   "Playmark",          "Hot Mind (adjustable prize)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993, atombjt,  bjtwin,  atombjt,  atombjt,  atombjt_state,  empty_init,    ROT270, "bootleg (Kyon K.)", "Atom (bootleg of Bombjack Twin)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // some non-trivial mods to the gfx and sound hw wrt nmk16 hw original
+//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT           ROT      COMPANY             FULLNAME                               FLAGS
+GAME( 1994, powerbal, 0,       powerbal, powerbal, powerbal_state, init_powerbal, ROT0,   "Playmark",          "Power Balls",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1995, magicstk, 0,       magicstk, magicstk, magicstk_state, init_magicstk, ROT0,   "Playmark",          "Magic Sticks",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hotminda, hotmind, magicstk, hotminda, magicstk_state, init_magicstk, ROT0,   "Playmark",          "Hot Mind (adjustable prize, set 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hotmindb, hotmind, magicstk, hotminda, magicstk_state, init_magicstk, ROT0,   "Playmark",          "Hot Mind (adjustable prize, set 2)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1993, atombjt,  bjtwin,  atombjt,  atombjt,  atombjt_state,  empty_init,    ROT270, "bootleg (Kyon K.)", "Atom (bootleg of Bombjack Twin)",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // some non-trivial mods to the gfx and sound hw wrt nmk16 hw original

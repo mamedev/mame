@@ -521,7 +521,8 @@ public:
 		FF_3        = 0x20202033, //!< "3   " 3 inch disk
 		FF_35       = 0x20203533, //!< "35  " 3.5 inch disk
 		FF_525      = 0x20353235, //!< "525 " 5.25 inch disk
-		FF_8        = 0x20202038  //!< "8   " 8 inch disk
+		FF_8        = 0x20202038, //!< "8   " 8 inch disk
+		FF_TWIG     = 0x47495754, //!< "TWIG" 5.25 twiggy
 	};
 
 	//! Variants
@@ -548,7 +549,7 @@ public:
 		DSQD   = 0x44515344, //!< "DSQD", Double-sided quad-density (720K in 5.25, means DD+80 tracks)
 		DSQD10 = 0x30315144, //!< "DQ10", Double-sided quad-density 10 hard sector
 		DSQD16 = 0x36315144, //!< "DQ16", Double-sided quad-density 16 hard sector (720K in 5.25, means DD+80 tracks)
-		DSHD   = 0x44485344, //!< "DSHD", Double-sided high-density (1440K)
+		DSHD   = 0x44485344, //!< "DSHD", Double-sided high-density (1440K in 3.5, 1200K in 5.25)
 		DSED   = 0x44455344  //!< "DSED", Double-sided extra-density (2880K)
 	};
 

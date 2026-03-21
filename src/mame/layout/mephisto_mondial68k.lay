@@ -56,14 +56,14 @@ authors:Sandro Ronco, hap
 	<element name="text_b7"> <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text string="G7"> <color red="0" green="0" blue="0" /></text> </element>
 	<element name="text_b8"> <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text string="H8"> <color red="0" green="0" blue="0" /></text> </element>
 
-	<element name="text_pos">  <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" POS">                 <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_mem">  <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" MEM">                 <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_info"> <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" INFO">                <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_lev">  <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" LEV">                 <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_9">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" &#x25c4; &#x25a0; 9"> <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_0">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" &#x25ba; &#x25a1; 0"> <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_cl">   <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" CL">                  <color red="0.8" green="0.2" blue="0.2" /></text> </element>
-	<element name="text_ent">  <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" ENT">                 <color red="0.8" green="0.2" blue="0.2" /></text> </element>
+	<element name="text_pos">  <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" POS ">                 <color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_mem">  <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" MEM ">                 <color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_info"> <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" INFO ">                <color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_lev">  <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" LEV ">                 <color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_9">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" &#x25c4; &#x25a0; 9 "><color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_0">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" &#x25ba; &#x25a1; 0 "><color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_cl">   <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" CL ">                  <color red="0.8" green="0.2" blue="0.2" /></text> </element>
+	<element name="text_ent">  <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" ENT ">                 <color red="0.8" green="0.2" blue="0.2" /></text> </element>
 
 	<element name="text_p1"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/wp.svg" /><rect><color red="1" green="1" blue="1" alpha="0.03" /></rect></element>
 	<element name="text_p2"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/wn.svg" /><rect><color red="1" green="1" blue="1" alpha="0.03" /></rect></element>

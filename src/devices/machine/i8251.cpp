@@ -452,6 +452,7 @@ void i8251_device::device_reset()
 	receive_register_reset();
 	/* expecting mode byte */
 	m_flags = I8251_NEXT_MODE;
+	m_sync_byte_count = 0;
 
 	/* no character to read by cpu */
 	/* transmitter is ready and is empty */
@@ -463,6 +464,7 @@ void i8251_device::device_reset()
 	m_tx_data = 0;
 	m_rxc_count = m_txc_count = 0;
 	m_br_factor = 1;
+	m_hunt_on = false;
 
 	/* update tx empty pin output */
 	update_tx_empty();

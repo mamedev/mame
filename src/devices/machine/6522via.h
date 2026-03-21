@@ -118,6 +118,10 @@ public:
 	void shift_out();
 	void shift_in();
 
+	int ca2_r() const { return m_out_ca2; }
+	int cb1_r() const { return m_out_cb1; }
+	int cb2_r() const { return m_out_cb2; }
+
 protected:
 	// construction/destruction
 	via6522_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

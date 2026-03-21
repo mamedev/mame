@@ -538,7 +538,7 @@ offs_t st9_disassembler::dasm_8f(std::ostream &stream, u8 byte1, offs_t pc, cons
 
 	case 0xc1: case 0xc3:
 		util::stream_format(stream, "%-8s", BIT(byte1, 1) ? "pushuw" : "pushw");
-		format_immw(stream, opcodes.r8(pc + 2));
+		format_immw(stream, opcodes.r16(pc + 2));
 		return 4 | SUPPORTED;
 
 	case 0xf1: case 0xf3:

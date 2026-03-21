@@ -11,6 +11,7 @@
     Hitachi Deskstar HDS721680PLA320 80 GB
     EGIS2JVS V1.2 card
     Windows XP embedded
+	TODO: north/southbridge?
 
     The system was meant to be modular, but only 2 titles are said to have been actually released.
 
@@ -49,12 +50,9 @@ void skopro_state::skopro_map(address_map &map)
 {
 }
 
-static INPUT_PORTS_START( skopro )
-INPUT_PORTS_END
-
 void skopro_state::skopro(machine_config &config)
 {
-	/* basic machine hardware */
+	// Socket T
 	PENTIUM4(config, m_maincpu, 100'000'000); // actually a Pentium E2160 at 1.80 GHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &skopro_state::skopro_map);
 	m_maincpu->set_disable();
@@ -80,4 +78,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2008, drgdance,  0,   skopro, skopro, skopro_state, empty_init, ROT0, "Success", "Dragon Dance (V1.02J)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2008, drgdance,  0,   skopro, 0, skopro_state, empty_init, ROT0, "Success", "Dragon Dance (V1.02J)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -71,6 +71,7 @@ public:
 	void ctrl_w(offs_t offset, u16 data, u16 mem_mask);
 
 	void sound_map(address_map &map) ATTR_COLD;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -83,8 +84,6 @@ protected:
 	// device_memory_interface configuration
 	virtual space_config_vector memory_space_config() const override;
 
-	address_space_config m_texture_config;
-	address_space_config m_frame_config;
 private:
 	enum
 	{
@@ -109,28 +108,25 @@ private:
 
 	struct channel_t
 	{
-		channel_t()
-		{
-			std::fill(std::begin(EnvRate), std::end(EnvRate), 0);
-			std::fill(std::begin(EnvTarget), std::end(EnvTarget), 0);
-		}
-
-		memory_access<23, 1, 0, ENDIANNESS_LITTLE>::cache *Cache;
-		u32 CurSAddr = 0; // Current Address Pointer, 22.10 Fixed Point
-		s32 EnvVol = 0; // Envelope Volume (Overall Volume), S.7.16 Fixed Point
-		u8 EnvStage = 1; // Envelope Stage
-		u16 dSAddr = 0; // Frequency, 6.10 Fixed Point
-		u8 Modes = 0; // Modes
-		bool LD = true; // Loop Direction (Not Implemented)
-		u32 LoopBegin = 0; // Loop Start Pointer, High 22 Bits
-		u32 LoopEnd = 0; // Loop End Pointer, High 22 Bits
-		u8 LChnVol = 0; // Left Volume, 7 bit unsigned
-		u8 RChnVol = 0; // Right Volume, 7 bit unsigned
-		s32 EnvRate[4]; // Envenloe Rate per Each stages, S.16 Fixed Point
-		u8 EnvTarget[4]; // Envelope Target Volume per Each stages, High 7 Bits
+		memory_access<23, 1, 0, ENDIANNESS_LITTLE>::cache *cache;
+		u32 cur_saddr = 0; // Current Address Pointer, 22.10 Fixed Point
+		s32 env_vol = 0; // Envelope Volume (Overall Volume), S.7.16 Fixed Point
+		u8 env_stage = 1; // Envelope Stage
+		u16 ds_addr = 0; // Frequency, 6.10 Fixed Point
+		u8 modes = 0; // modes
+		bool ld = true; // Loop Direction (Not Implemented)
+		u32 loop_begin = 0; // Loop Start Pointer, High 22 Bits
+		u32 loop_end = 0; // Loop End Pointer, High 22 Bits
+		u8 l_chn_vol = 0; // Left Volume, 7 bit unsigned
+		u8 r_chn_vol = 0; // Right Volume, 7 bit unsigned
+		s32 env_rate[4]{0}; // Envenloe Rate per Each stages, S.16 Fixed Point
+		u8 env_target[4]{0}; // Envelope Target Volume per Each stages, High 7 Bits
 		u16 read(offs_t offset);
 		void write(offs_t offset, u16 data, u16 mem_mask);
 	};
+
+	address_space_config m_texture_config;
+	address_space_config m_frame_config;
 
 	memory_access<23, 1, 0, ENDIANNESS_LITTLE>::cache m_texcache;
 	memory_access<23, 1, 0, ENDIANNESS_LITTLE>::cache m_fbcache;
@@ -141,17 +137,17 @@ private:
 	devcb_write_line m_irq_cb;
 
 	// Registers
-	u32 m_Status = 0; // Status (0 Idle, 1 Busy)
-	u32 m_NoteOn = 0; // Note On (0 Off, 1 On) (Not Implemented)
-	u8 m_RevFactor = 0; // Reverb Factor (Not Implemented)
-	u32 m_BufferAddr = 0; // 21bit Reverb Buffer Start Address (Not Implemented)
-	u16 m_BufferSize[4] = {0, 0, 0, 0}; // Reverb Buffer Size (Not Implemented)
-	u32 m_IntMask = 0; // Interrupt Mask (0 Enable, 1 Disable)
-	u32 m_IntPend = 0; // Interrupt Pending
-	u8 m_MaxChn = 0x1f; // Max Channels - 1
-	u8 m_ChnClkNum = 0; // Clock Number per Channel
-	u16 m_Ctrl = 0; // 0x602 Control Functions
-	void VR0_RenderAudio(sound_stream &stream);
+	u32 m_status = 0; // Status (0 Idle, 1 Busy)
+	u32 m_note_on = 0; // Note On (0 Off, 1 On) (Not Implemented)
+	u8 m_rev_factor = 0; // Reverb Factor (Not Implemented)
+	u32 m_buffer_addr = 0; // 21bit Reverb Buffer Start Address (Not Implemented)
+	u16 m_buffer_size[4]{0}; // Reverb Buffer Size (Not Implemented)
+	u32 m_int_mask = 0; // Interrupt Mask (0 Enable, 1 Disable)
+	u32 m_int_pend = 0; // Interrupt Pending
+	u8 m_max_chan = 0x1f; // Max Channels - 1
+	u8 m_chan_clk_num = 0; // Clock Number per Channel
+	u16 m_ctrl = 0; // 0x602 Control Functions
+	void render_audio(sound_stream &stream);
 };
 
 DECLARE_DEVICE_TYPE(SOUND_VRENDER0, vr0sound_device)

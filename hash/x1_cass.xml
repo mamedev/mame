@@ -135,7 +135,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="castlea" cloneof="castle">
-		<description>The Castle (Alt)</description>
+		<description>The Castle (alt)</description>
 		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="release" value="198506xx"/>
@@ -173,7 +173,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="cprowspa" cloneof="cprowsp">
-		<description>Champion ProWres Special (Alt)</description>
+		<description>Champion ProWres Special (alt)</description>
 		<year>1985</year>
 		<publisher>マイクロネット (Micronet)</publisher>
 		<info name="release" value="198511xx"/>
@@ -186,7 +186,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="cprowspb" cloneof="cprowsp">
-		<description>Champion ProWres Special (Alt 2)</description>
+		<description>Champion ProWres Special (alt 2)</description>
 		<year>1985</year>
 		<publisher>マイクロネット (Micronet)</publisher>
 		<info name="release" value="198511xx"/>
@@ -212,7 +212,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="cockpita" cloneof="cockpit">
-		<description>The Cockpit (Alt)</description>
+		<description>The Cockpit (alt)</description>
 		<year>1985</year>
 		<publisher>コムパック (Compaq)</publisher>
 		<info name="release" value="198506xx"/>
@@ -253,7 +253,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="dcrystala" cloneof="dcrystal">
-		<description>Demon Crystal (Alt)</description>
+		<description>Demon Crystal (alt)</description>
 		<year>1985</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="release" value="198512xx"/>
@@ -305,7 +305,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="firecrysa" cloneof="firecrys" supported="no">
-		<description>The Fire Crystal (Alt)</description>
+		<description>The Fire Crystal (alt)</description>
 		<year>1986</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 		<info name="release" value="198601xx"/>
@@ -331,7 +331,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="holein1a" cloneof="holein1">
-		<description>Hole in One (Alt)</description>
+		<description>Hole in One (alt)</description>
 		<year>1985</year>
 		<publisher>HAL研究所 (HAL Kenkyuujo)</publisher>
 		<info name="release" value="198507xx"/>
@@ -395,7 +395,7 @@ Titles, publishers and release dates taken from:
 
 
 	<software name="dstukaa" cloneof="dstuka">
-		<description>JU87A DSTUKA (Alt)</description>
+		<description>JU87A DSTUKA (alt)</description>
 		<year>1987</year>
 		<publisher>マイクロネット (Micronet)</publisher>
 		<info name="release" value="198506xx"/>
@@ -445,7 +445,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="mappya" cloneof="mappy">
-		<description>Mappy (Alt)</description>
+		<description>Mappy (alt)</description>
 		<year>1986</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="release" value="198611xx"/>
@@ -497,7 +497,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="ngolfa" cloneof="ngolf">
-		<description>Nintendo no Golf (Alt)</description>
+		<description>Nintendo no Golf (alt)</description>
 		<year>1985</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="release" value="198506xx"/>
@@ -525,7 +525,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="pacmana" cloneof="pacman">
-		<description>Pac-Man (Alt)</description>
+		<description>Pac-Man (alt)</description>
 		<year>1985</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="release" value="198506xx"/>
@@ -567,7 +567,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="plazmalia" cloneof="plazmali" supported="no">
-		<description>Plazma Line (Alt)</description>
+		<description>Plazma Line (alt)</description>
 		<year>1985</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
 		<info name="release" value="198506xx"/>
@@ -596,7 +596,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="poibosa" cloneof="poibos">
-		<description>Poibos Part-1 - Dasshutsu (Alt)</description>
+		<description>Poibos Part-1 - Dasshutsu (alt)</description>
 		<year>1985</year>
 		<publisher>応用電算技研</publisher>
 		<info name="release" value="198506xx"/>
@@ -624,7 +624,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="punchbala" cloneof="punchbal">
-		<description>Punch Ball Mario Bros. (Alt)</description>
+		<description>Punch Ball Mario Bros. (alt)</description>
 		<year>1985</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="release" value="198506xx"/>
@@ -650,7 +650,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="tritona" cloneof="triton">
-		<description>Triton (Alt)</description>
+		<description>Triton (alt)</description>
 		<year>1985</year>
 		<publisher>ザインソフト (Sein Soft)</publisher>
 		<info name="release" value="198511xx"/>
@@ -723,7 +723,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="yakyukyoa" cloneof="yakyukyo" supported="no">
-		<description>Yakyuu Kyou (Alt)</description>
+		<description>Yakyuu Kyou (alt)</description>
 		<year>1985</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="release" value="198508xx"/>
@@ -869,7 +869,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="crazyspya" cloneof="crazyspy">
-		<description>Crazy Spy (Alt)</description>
+		<description>Crazy Spy (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="x1_cass">
@@ -927,7 +927,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="flappya" cloneof="flappy">
-		<description>Flappy (Alt)</description>
+		<description>Flappy (alt)</description>
 		<year>1983?</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
 		<part name="cass" interface="x1_cass">
@@ -974,7 +974,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="golfkyoa" cloneof="golfkyo">
-		<description>Golf Kyo (Alt)</description>
+		<description>Golf Kyo (alt)</description>
 		<year>19??</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="alt_title" value="ゴルフ狂"/>
@@ -998,7 +998,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="gunmana" cloneof="gunman">
-		<description>Gunman (Alt)</description>
+		<description>Gunman (alt)</description>
 		<year>19??</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="alt_title" value="ガンマン"/>
@@ -1062,7 +1062,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="hoveratka" cloneof="hoveratk">
-		<description>Hover Attack (Alt)</description>
+		<description>Hover Attack (alt)</description>
 		<year>1985?</year>
 		<publisher>コムパック (Compaq)</publisher>
 		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
@@ -1098,7 +1098,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="hyprol84a" cloneof="hyprol84">
-		<description>Hyper Olympics '84 (Alt)</description>
+		<description>Hyper Olympics '84 (alt)</description>
 		<year>1984?</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
 		<part name="cass" interface="x1_cass">
@@ -1133,7 +1133,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="jeldaa" cloneof="jelda">
-		<description>Jelda (Alt)</description>
+		<description>Jelda (alt)</description>
 		<year>1983?</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<part name="cass" interface="x1_cass">
@@ -1144,7 +1144,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="jeldab" cloneof="jelda">
-		<description>Jelda (Alt 2)</description>
+		<description>Jelda (alt 2)</description>
 		<year>1983?</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<part name="cass" interface="x1_cass">
@@ -1179,7 +1179,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="kagiria" cloneof="kagiri">
-		<description>Kagirinaki Tatakai (Alt)</description>
+		<description>Kagirinaki Tatakai (alt)</description>
 		<year>1983?</year>
 		<publisher>エニックス (Enix)</publisher>
 		<info name="alt_title" value="カギリナキ (or 限りなき戦い)"/>
@@ -1203,7 +1203,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="kimdan2a" cloneof="kimdan2">
-		<description>Kim Kim Dan Dan 2 (Alt)</description>
+		<description>Kim Kim Dan Dan 2 (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="キムキムダンダン2"/>
@@ -1239,7 +1239,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="macrossa" cloneof="macross">
-		<description>Choujikuu Yousai Macross (Alt)</description>
+		<description>Choujikuu Yousai Macross (alt)</description>
 		<year>19??</year>
 		<publisher>ボーステック (Bothtec)</publisher>
 		<info name="alt_title" value="超時空要塞マクロス"/>
@@ -1336,7 +1336,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="pstar2a" cloneof="pstar2">
-		<description>Polar Star 2 (Alt)</description>
+		<description>Polar Star 2 (alt)</description>
 		<year>1983?</year>
 		<publisher>SPS</publisher>
 		<part name="cass" interface="x1_cass">
@@ -1359,7 +1359,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="popbalona" cloneof="popbalon">
-		<description>Pop Balloon (Alt)</description>
+		<description>Pop Balloon (alt)</description>
 		<year>1984?</year>
 		<publisher>コムパック (Compaq)</publisher>
 		<info name="alt_title" value="ポップバルーン"/>
@@ -1410,7 +1410,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="rowballa" cloneof="rowball">
-		<description>Rowdy Ball (Alt)</description>
+		<description>Rowdy Ball (alt)</description>
 		<year>19??</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
@@ -1437,7 +1437,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="spartanxa" cloneof="spartanx" supported="no">
-		<description>Spartan X (Alt)</description>
+		<description>Spartan X (alt)</description>
 		<year>1984?</year>
 		<publisher>ポニカ (Pony Canyon)</publisher>
 		<info name="alt_title" value="スパルタンX"/>
@@ -1508,7 +1508,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="sbuggona" cloneof="sbuggon">
-		<description>Super Buggon (Alt)</description>
+		<description>Super Buggon (alt)</description>
 		<year>19??</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
 		<part name="cass" interface="x1_cass">
@@ -1568,7 +1568,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="tdowna" cloneof="tdown">
-		<description>Touch Down (Alt)</description>
+		<description>Touch Down (alt)</description>
 		<year>19??</year>
 		<publisher>ウィンキーソフト (Winky Soft)</publisher>
 		<info name="alt_title" value="タッチダウン"/>
@@ -1592,7 +1592,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="tomathima" cloneof="tomathim" supported="no">
-		<description>Salad no Kuni no Tomato Hime (Alt)</description>
+		<description>Salad no Kuni no Tomato Hime (alt)</description>
 		<year>1984?</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="alt_title" value="サラダの国のトマト姫"/>
@@ -1659,7 +1659,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="wildwesta" cloneof="wildwest">
-		<description>Wild Western (Alt)</description>
+		<description>Wild Western (alt)</description>
 		<year>19??</year>
 		<publisher>ニデコム (Nidecom) / タイトー (Taito)</publisher>
 		<info name="alt_title" value="ワイルドウェスタン"/>
@@ -1695,7 +1695,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="yellwcaba" cloneof="yellwcab">
-		<description>Yellow Cab (Alt)</description>
+		<description>Yellow Cab (alt)</description>
 		<year>19??</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
 		<info name="alt_title" value="イエローキャブ"/>
@@ -1772,7 +1772,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="bat1">
-		<description>BAT (Alt)</description>
+		<description>BAT (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="x1_cass">

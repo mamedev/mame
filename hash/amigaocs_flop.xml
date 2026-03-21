@@ -1280,7 +1280,7 @@ ATK test: OK
 
 	<software name="aburner" supported="no">
 		<!-- SPS (CAPS) release 95 -->
-		<description>Afterburner (Europe)</description>
+		<description>After Burner (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
@@ -1304,7 +1304,7 @@ ATK test: failed
 
 	<software name="aburneru" cloneof="aburner" supported="no">
 		<!-- SPS (CAPS) release 947 -->
-		<description>Afterburner (USA)</description>
+		<description>After Burner (USA)</description>
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>

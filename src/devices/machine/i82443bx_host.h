@@ -66,7 +66,7 @@ public:
 	    T &&gui_tag
 	) : i82443bx_bridge_device(mconfig, tag, owner, clock)
 	{
-		set_ids_bridge(0x80867191, 0x00);
+	    set_ids_bridge(0x80867191, 0x00);
 	    //set_multifunction_device(true);
 	    //m_vga.set_tag(std::forward<T>(gui_tag));
 	}*/
@@ -83,7 +83,7 @@ protected:
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 private:
-	//required_device<sis630_gui_device> m_vga;
+	//required_device<vga_device> m_vga;
 
 	virtual void bridge_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };

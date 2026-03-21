@@ -101,6 +101,8 @@ Main 2650A runs at 1.78MHz (14.318/8).
 Sound board 2650As run at 0.89MHz (14.318/16). Also seen with a 15.625MHz XTAL,
 which would result in slightly higher DAC sound pitch.
 
+TMS5100 is around 620kHz from an R/C osc with a VR, slightly differs per PCB.
+
 Video timing is via a Signetics 2621 (PAL).
 
 *******************************************************************************/
@@ -108,6 +110,7 @@ Video timing is via a Signetics 2621 (PAL).
 #include "emu.h"
 
 #include "cpu/s2650/s2650.h"
+#include "machine/clock.h"
 #include "machine/s2636.h"
 #include "sound/beep.h"
 #include "sound/dac.h"
@@ -1351,13 +1354,16 @@ void cvs_state::cvs(machine_config &config)
 	m_maincpu->flag_handler().set([this] (int state) { m_ram_view.select(state); });
 	m_maincpu->intack_handler().set([this] { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 
+	CLOCK(config, "sense_osc", 380); // R/C osc, measured 380Hz
+
 	S2650(config, m_audiocpu, 14.318181_MHz_XTAL / 16);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cvs_state::audio_cpu_map);
+	m_audiocpu->sense_handler().set("sense_osc", FUNC(clock_device::signal_r));
 	m_audiocpu->intack_handler().set([this] { m_audiocpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 
 	S2650(config, m_speechcpu, 14.318181_MHz_XTAL / 16);
 	m_speechcpu->set_addrmap(AS_PROGRAM, &cvs_state::speech_cpu_map);
-	m_speechcpu->sense_handler().set("tms", FUNC(tms5100_device::romclk_hack_r));
+	m_speechcpu->sense_handler().set("sense_osc", FUNC(clock_device::signal_r));
 
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cvs);
@@ -1394,7 +1400,7 @@ void cvs_state::cvs(machine_config &config)
 	BEEP(config, m_beep[1], 150).add_route(ALL_OUTPUTS, "speaker", 0.15); // "
 	BEEP(config, m_beep[2], 0).add_route(ALL_OUTPUTS, "speaker", 0.075); // "
 
-	TMS5100(config, m_tms5100, 640_kHz_XTAL);
+	TMS5100(config, m_tms5100, 620'000); // R/C osc, approximation
 	m_tms5100->data().set(FUNC(cvs_state::speech_rom_read_bit));
 	m_tms5100->add_route(ALL_OUTPUTS, "speaker", 0.30);
 }

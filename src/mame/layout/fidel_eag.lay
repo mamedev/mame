@@ -402,7 +402,7 @@ authors:hap
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-13" right="102" top="-1.5" bottom="87.5" />
+		<bounds left="-13" right="102.5" top="-1.5" bottom="87.5" />
 
 		<element ref="cblack"><bounds x="-1" y="-1.5" width="89" height="89" /></element>
 		<element ref="cwhite"><bounds x="3" y="2.5" width="81" height="81" /></element>

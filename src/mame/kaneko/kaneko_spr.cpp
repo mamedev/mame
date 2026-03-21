@@ -232,12 +232,11 @@ int kaneko16_sprite_device::parse_sprite_type012(int i, struct tempsprite_t *s, 
 			(BIT(attr, 15) ? USE_LATCHED_CODE  : 0) ;
 }
 
+
 // custom function to draw a single sprite. needed to keep correct sprites - sprites and sprites - tilemaps priorities
 
-
-void kaneko16_sprite_device::draw_sprites_custom(const rectangle &clip,gfx_element *gfx,
-		u32 code,u32 color,bool flipx,bool flipy,int sx,int sy,
-		int priority)
+void kaneko16_sprite_device::draw_sprites_custom(const rectangle &clip, gfx_element *gfx,
+		u32 code, u32 color, bool flipx, bool flipy, int sx, int sy, int priority)
 {
 	const pen_t pen_base = gfx->granularity() * (color % gfx->colors());
 	const u8 *source_base = gfx->get_data(code % gfx->elements());
@@ -272,31 +271,35 @@ void kaneko16_sprite_device::draw_sprites_custom(const rectangle &clip,gfx_eleme
 	}
 
 	if (sx < clip.min_x)
-	{ /* clip left */
+	{
+		// clip left
 		int pixels = clip.min_x - sx;
 		sx += pixels;
 		x_index_base += pixels * dx;
 	}
 	if (sy < clip.min_y)
-	{ /* clip top */
+	{
+		// clip top
 		int pixels = clip.min_y - sy;
 		sy += pixels;
 		y_index += pixels * dy;
 	}
-	/* NS 980211 - fixed incorrect clipping */
 	if (ex > clip.max_x + 1)
-	{ /* clip right */
+	{
+		// clip right
 		int pixels = ex-clip.max_x - 1;
 		ex -= pixels;
 	}
 	if (ey > clip.max_y + 1)
-	{ /* clip bottom */
+	{
+		// clip bottom
 		int pixels = ey-clip.max_y - 1;
 		ey -= pixels;
 	}
 
+	// skip if inner loop doesn't draw anything
 	if (ex > sx)
-	{ /* skip if inner loop doesn't draw anything */
+	{
 		for (int y = sy; y < ey; y++)
 		{
 			u8 const *const source = source_base + y_index * gfx->rowbytes();

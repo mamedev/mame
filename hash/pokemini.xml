@@ -346,7 +346,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ppuzzlcfp" cloneof="ppuzzlc" supported="partial">
-		<description>Pok&#233;mon Puzzle Collection (Fra, GameCube Preview)</description>
+		<description>Pok&#233;mon Puzzle Collection (France, GameCube preview)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="pokemini_cart">

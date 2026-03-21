@@ -85,6 +85,7 @@
 #include "bus/ieee488/ieee488.h"
 #include "machine/tms9914.h"
 
+
 namespace {
 
 class a2bus_ieee488_device:
@@ -166,12 +167,7 @@ a2bus_ieee488_device::a2bus_ieee488_device(const machine_config &mconfig, device
 
 uint8_t a2bus_ieee488_device::read_c0nx(uint8_t offset)
 {
-	uint8_t data = 0xff;
-	if (!machine().side_effects_disabled())
-	{
-		data = m_tms9914->read(offset & 0x07);
-	}
-	return data;
+	return m_tms9914->read(offset & 0x07);
 }
 
 void a2bus_ieee488_device::write_c0nx(uint8_t offset, uint8_t data)

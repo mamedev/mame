@@ -24,13 +24,13 @@ authors:hap
 	<element name="text_b4"><text string="CLR"><color red="0.1" green="0.1" blue="0.1" /></text></element>
 	<element name="text_b5"><text string="BAR"><color red="0.1" green="0.1" blue="0.1" /></text></element>
 	<element name="text_b10"><text string="Δ"><color red="0.1" green="0.1" blue="0.1" /></text></element>
-	<element name="text_b15"><text string="E&#x2009;N"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- thin space -->
+	<element name="text_b15"><text string="EN"><color red="0.1" green="0.1" blue="0.1" /></text></element>
 	<element name="text_b20"><text string="Δ"><color red="0.1" green="0.1" blue="0.1" /></text></element>
-	<element name="text_b21"><text string="S&#x2009;T"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- thin space -->
+	<element name="text_b21"><text string="ST"><color red="0.1" green="0.1" blue="0.1" /></text></element>
 	<element name="text_b22"><text string="ACC"><color red="0.1" green="0.1" blue="0.1" /></text></element>
 	<element name="text_b23"><text string="DBL"><color red="0.1" green="0.1" blue="0.1" /></text></element>
-	<element name="text_b24"><text string="V&#x2009;R"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- thin space -->
-	<element name="text_b25"><text string="B&#x2009;O"><color red="0.1" green="0.1" blue="0.1" /></text></element> <!-- thin space -->
+	<element name="text_b24"><text string="VR"><color red="0.1" green="0.1" blue="0.1" /></text></element>
+	<element name="text_b25"><text string="BO"><color red="0.1" green="0.1" blue="0.1" /></text></element>
 
 	<element name="text_b6"><text string="1"><color red="0.87" green="0.87" blue="0.87" /></text></element>
 	<element name="text_b7"><text string="2"><color red="0.87" green="0.87" blue="0.87" /></text></element>

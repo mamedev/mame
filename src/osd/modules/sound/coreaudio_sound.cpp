@@ -243,8 +243,8 @@ private:
 	class coreaudio_stream
 	{
 	public:
-		coreaudio_stream(sound_coreaudio *parent, int input_channels) :
-			m_input_buffer(input_channels),
+		coreaudio_stream(sound_coreaudio *parent, int input_channels, uint32_t rate) :
+			m_input_buffer(input_channels, rate),
 			m_parent(parent),
 			m_graph(nullptr),
 			m_is_source(false),
@@ -392,9 +392,9 @@ private:
 		std::shared_ptr<coreaudio_stream> m_stream;
 		std::vector<float> m_volumes;
 
-		coreaudio_stream_info(sound_coreaudio *parent, int channels)
+		coreaudio_stream_info(sound_coreaudio *parent, int channels, uint32_t rate)
 		{
-			m_stream = std::make_shared<coreaudio_stream>(parent, channels);
+			m_stream = std::make_shared<coreaudio_stream>(parent, channels, rate);
 		}
 	};
 
@@ -534,7 +534,7 @@ uint32_t sound_coreaudio::stream_sink_open(uint32_t node, std::string name, uint
 	{
 		if (our_device->second.m_sinks > 0)
 		{
-			struct coreaudio_stream_info stream(this, 1);
+			struct coreaudio_stream_info stream(this, 1, rate);
 
 			if (!stream.m_stream->create_sink_stream(our_device->second, name.c_str(), rate, m_audio_latency))
 			{
@@ -567,7 +567,7 @@ uint32_t sound_coreaudio::stream_source_open(uint32_t node, std::string name, ui
 
 		if (sources > 0)
 		{
-			struct coreaudio_stream_info stream(this, sources);
+			struct coreaudio_stream_info stream(this, sources, rate);
 
 			if (!stream.m_stream->create_source_stream(our_device->second, name.c_str(), rate, m_audio_latency))
 			{
@@ -1062,9 +1062,17 @@ void sound_coreaudio::build_device_list()
 
 						if ((chDesc.mChannelLabel == 0xffffffff) || (chDesc.mChannelLabel >= sMacChannelCount))
 						{
-							std::string chLabel = "Channel " + std::to_string(desc + 1);
-							node.m_port_names.push_back(chLabel);
-							node.m_port_positions.emplace_back(osd::channel_position::FC());
+							if (chanLayout->mNumberChannelDescriptions > 1)
+							{
+								node.m_port_names.push_back(sMacChannelLabels[desc + 1]);
+								node.m_port_positions.emplace_back(sChannelPositions[desc + 1]);
+							}
+							else
+							{
+								std::string chLabel = "Channel " + std::to_string(desc + 1);
+								node.m_port_names.push_back(chLabel);
+								node.m_port_positions.emplace_back(osd::channel_position::FC());
+							}
 						}
 						else
 						{
@@ -1695,6 +1703,7 @@ int sound_coreaudio::coreaudio_stream::create_sink_stream(struct coreaudio_devic
 	// Allocate buffer
 	m_headroom = m_sample_bytes * (m_audio_latency * m_sample_rate * 20e-3f);
 	m_buffer_size = m_sample_bytes * std::max<uint32_t>(m_sample_rate * (m_audio_latency + 3) * 20e-3f, 512U);
+	m_input_buffer.set_latency(m_audio_latency);
 	osd_printf_verbose("CoreAudio: Allocating %d bytes of buffer space (%d bytes per frame)\n", m_buffer_size, m_sample_bytes);
 	try
 	{

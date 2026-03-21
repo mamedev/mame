@@ -45,6 +45,12 @@ public:
 
 	void install_cart_mem();
 
+	// from slot to host
+	auto vres_cb() { return m_vres_cb.bind(); }
+
+	// from cart to slot
+	void vres_w(int state) { m_vres_cb(state); }
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
@@ -64,6 +70,8 @@ private:
 
 	std::error_condition load_swlist();
 	std::error_condition load_loose(util::random_read &file);
+
+	devcb_write_line m_vres_cb;
 };
 
 class device_megadrive_cart_interface : public device_interface

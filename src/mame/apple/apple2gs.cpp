@@ -125,6 +125,7 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_screen(*this, "screen"),
 		  m_scantimer(*this, "scantimer"),
+		  m_vgctimer(*this, "vgctimer"),
 		  m_acceltimer(*this, "acceltimer"),
 		  m_adbmicro(*this, "adbmicro"),
 		  m_macadb(*this, "macadb"),
@@ -187,7 +188,7 @@ protected:
 private:
 	required_device<g65816_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<timer_device> m_scantimer, m_acceltimer;
+	required_device<timer_device> m_scantimer, m_vgctimer, m_acceltimer;
 	required_device<m5074x_device> m_adbmicro;
 	required_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
@@ -306,11 +307,18 @@ private:
 
 	address_space *m_maincpu_space = nullptr;
 
+	// align timing to match observed hardware behavior
+	static constexpr int ALIGN_VBL = 4;
+	static constexpr int ALIGN_CNT = 2;
+	static constexpr int ALIGN_RFB = 1;
+	static constexpr int HPOS_VBL = BORDER_LEFT + ((40 - ALIGN_VBL) * 16);
+	// hardware testing shows SCB IRQs fire 8 video cycles after VBL
+	static constexpr int HPOS_VGC = HPOS_VBL + (8 * 16);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(apple2_vgc);
 	TIMER_DEVICE_CALLBACK_MEMBER(accel_timer);
 
 	void palette_init(palette_device &palette);
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void apple2gs_map(address_map &map) ATTR_COLD;
 	void vectors_map(address_map &map) ATTR_COLD;
@@ -442,7 +450,7 @@ private:
 	bool m_lcram = false, m_lcram2 = false, m_lcprewrite = false, m_lcwriteenable = false;
 	bool m_rombank = false;
 
-	u8 m_shadow = 0, m_speed = 0, m_textcol = 0;
+	u8 m_shadow = 0, m_speed = 0;
 	u8 m_motors_active = 0, m_slotromsel = 0, m_intflag = 0, m_vgcint = 0, m_inten = 0;
 
 	bool m_last_speed = false;
@@ -473,7 +481,7 @@ private:
 
 	// clock/BRAM
 	u8 m_clkdata = 0, m_clock_control = 0;
-	u8 m_clock_frame = 0;
+	void rtc_vgc(int cko);
 
 	void lcrom_update();
 	void do_io(int offset);
@@ -520,7 +528,7 @@ private:
 		}
 		else
 		{
-			m_maincpu->set_unscaled_clock(A2GS_1M);
+			m_maincpu->set_unscaled_clock(A2GS_1M, true); // re-align with PH0
 		}
 	}
 
@@ -544,7 +552,7 @@ private:
 		}
 		else
 		{
-			m_maincpu->set_unscaled_clock(A2GS_1M);
+			m_maincpu->set_unscaled_clock(A2GS_1M, true); // re-align with PH0
 		}
 	}
 
@@ -727,9 +735,12 @@ void apple2gs_state::machine_start()
 	m_video->set_char_pointer(memregion("gfx1")->base(), memregion("gfx1")->bytes());
 	m_video->setup_GS_graphics();
 
-	m_textcol = 0xf2;
-	m_video->set_GS_foreground((m_textcol >> 4) & 0xf);
-	m_video->set_GS_background(m_textcol & 0xf);
+	m_video->set_GS_textcol(0xf2);
+
+	// Mega II events occur near the rightmost edge of active video
+	m_scantimer->adjust(m_screen->time_until_pos(0, HPOS_VBL));
+	// VGC IRQs occur slightly later during HBL
+	m_vgctimer->adjust(m_screen->time_until_pos(0, HPOS_VGC));
 
 	m_inh_slot = -1;
 	m_cnxx_slot = CNXX_UNCLAIMED;
@@ -769,10 +780,8 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_lcwriteenable));
 	save_item(NAME(m_shadow));
 	save_item(NAME(m_speed));
-	save_item(NAME(m_textcol));
 	save_item(NAME(m_clock_control));
 	save_item(NAME(m_clkdata));
-	save_item(NAME(m_clock_frame));
 	save_item(NAME(m_motors_active));
 	save_item(NAME(m_slotromsel));
 	save_item(NAME(m_diskreg));
@@ -814,10 +823,9 @@ void apple2gs_state::machine_reset()
 	m_adb_p2_last = m_adb_p3_last = 0;
 	m_adb_reset_freeze = 0;
 	m_romswitch = false;
-	m_video->page2_w(false);
+	m_video->scr_w(0);
 	m_video->set_GS_border(0x02);
-	m_video->set_GS_background(0x02);
-	m_video->set_GS_foreground(0x0f);
+	m_video->set_GS_textcol(0xf2);
 	m_an0 = m_an1 = m_an2 = m_an3 = false;
 	m_gameio->an0_w(0);
 	m_gameio->an1_w(0);
@@ -833,7 +841,6 @@ void apple2gs_state::machine_reset()
 	m_ramrd = false;
 	m_ramwrt = false;
 	m_video->set_newvideo(0x01); // verified on ROM03 hardware
-	m_clock_frame = 0;
 	m_slot_irq = false;
 	m_clkdata = 0;
 	m_clock_control = 0;
@@ -972,7 +979,7 @@ void apple2gs_state::update_speed()
 		}
 		else
 		{
-			m_maincpu->set_unscaled_clock(isfast ? A2GS_2_8M : A2GS_1M);
+			m_maincpu->set_unscaled_clock(isfast ? A2GS_2_8M : A2GS_1M, !isfast);
 		}
 		m_last_speed = isfast;
 	}
@@ -1004,11 +1011,73 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::accel_timer)
 
 TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 {
-	int scanline = m_screen->vpos();
-	m_screen->update_partial(scanline);
+	// timer fires near the end of active video; handle events for the next line
+	int scanline = param + 1;
 
-	// check scanline interrupt bits if we're in super hi-res and the current scanline is within the active display area
-	if ((m_video->get_newvideo() & 0x80) && (scanline >= BORDER_TOP) && (scanline < (200+BORDER_TOP)))
+	if (scanline == BORDER_TOP)
+	{
+		m_vbl = false;
+	}
+	else if (scanline == (192+BORDER_TOP))
+	{
+		m_vbl = true;
+
+		// Mega II status flags are set even when the interrupt is disabled
+		m_intflag |= INTFLAG_VBL;
+		if (m_inten & 0x08)
+		{
+			raise_irq(IRQS_VBL);
+		}
+
+		m_adbmicro->set_input_line(m5074x_device::M5074X_INT1_LINE, ASSERT_LINE);
+
+		// 3.5 motor off timeout
+		if (m_motoroff_time > 0)
+		{
+			m_motoroff_time--;
+			if (m_motoroff_time == 0)
+			{
+				if (m_floppy[2]->get_device()) m_floppy[2]->get_device()->tfsel_w(0);
+				if (m_floppy[3]->get_device()) m_floppy[3]->get_device()->tfsel_w(0);
+			}
+		}
+	}
+	else if (scanline == (192+BORDER_TOP+1))
+	{
+		m_adbmicro->set_input_line(m5074x_device::M5074X_INT1_LINE, CLEAR_LINE);
+	}
+	else if (scanline == ((256+BORDER_TOP) % m_screen->height()))
+	{
+		// TODO: latch LANGSEL here to toggle NTSC/PAL
+
+		// "quarter" second IRQ occurs every 16 frames, ~3.75 Hz
+		if ((m_screen->frame_number() & 0xf) == 0)
+		{
+			m_intflag |= INTFLAG_QUARTER;
+			if (m_inten & 0x10)
+			{
+				raise_irq(IRQS_QTRSEC);
+			}
+		}
+	}
+	else if (scanline == m_screen->height())
+		scanline = 0;
+
+	m_scantimer->adjust(m_screen->time_until_pos(scanline, HPOS_VBL), scanline);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_vgc)
+{
+	// flush the previous scanline to ensure SCB or palette changes are visible
+	m_screen->update_now();
+
+	// timer fires during HBL past right border; handle events for the next line
+	int scanline = param + 1;
+	if (scanline >= m_screen->height())
+		scanline -= m_screen->height(); // catch 50Hz toggle
+
+	// scanline interrupts occur during HBL of each super hi-res line
+	if ((m_video->get_newvideo() & 0x80) && (scanline >= BORDER_TOP) && (scanline < (BORDER_TOP + 200)))
 	{
 		u8 scb;
 		const int shrline = scanline - BORDER_TOP;
@@ -1022,9 +1091,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 			scb = m_megaii_ram[0x15e80 + (shrline >> 1)];
 		}
 
+		// latch scb on this cycle for subsequent palette lookups
+		m_video->set_SHR_scb(shrline, scb);
+
 		if (scb & 0x40)
 		{
-			// VGC and MegaII status flags are set even when the interrupt is disabled
+			// VGC status flags are set even when the interrupt is disabled
 			m_vgcint |= VGCINT_SCANLINE;
 
 			// trigger the interrupt if enabled
@@ -1036,63 +1108,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 		}
 	}
 
-	if (scanline == BORDER_TOP)
+	m_vgctimer->adjust(m_screen->time_until_pos(scanline, HPOS_VGC), scanline);
+}
+
+void apple2gs_state::rtc_vgc(int cko)
+{
+	if (cko) // one second IRQ
 	{
-		m_vbl = false;
-	}
-	else if (scanline == (192+BORDER_TOP))
-	{
-		m_vbl = true;
-
-		// VBL interrupt
-		m_intflag |= INTFLAG_VBL;
-		if (m_inten & 0x08)
+		m_vgcint |= VGCINT_SECOND;
+		if (m_vgcint & VGCINT_SECONDENABLE)
 		{
-			raise_irq(IRQS_VBL);
+			m_vgcint |= VGCINT_ANYVGCINT;
+			raise_irq(IRQS_SECOND);
 		}
-
-		m_adbmicro->set_input_line(m5074x_device::M5074X_INT1_LINE, ASSERT_LINE);
-
-		m_clock_frame++;
-
-		// quarter second?
-		if ((m_clock_frame % 15) == 0)
-		{
-			m_intflag |= INTFLAG_QUARTER;
-			if (m_inten & 0x10)
-			{
-				raise_irq(IRQS_QTRSEC);
-			}
-		}
-
-		// 3.5 motor off timeout
-		if (m_motoroff_time > 0)
-		{
-			m_motoroff_time--;
-			if (m_motoroff_time == 0)
-			{
-				if (m_floppy[2]->get_device()) m_floppy[2]->get_device()->tfsel_w(0);
-				if (m_floppy[3]->get_device()) m_floppy[3]->get_device()->tfsel_w(0);
-			}
-		}
-
-		// one second
-		if (m_clock_frame >= 60)
-		{
-			//printf("one sec, vgcint = %02x\n", m_vgcint);
-			m_clock_frame = 0;
-
-			m_vgcint |= VGCINT_SECOND;
-			if (m_vgcint & VGCINT_SECONDENABLE)
-			{
-				m_vgcint |= VGCINT_ANYVGCINT;
-				raise_irq(IRQS_SECOND);
-			}
-		}
-	}
-	else if (scanline == (192+BORDER_TOP+1))
-	{
-		m_adbmicro->set_input_line(m5074x_device::M5074X_INT1_LINE, CLEAR_LINE);
 	}
 }
 
@@ -1127,11 +1155,6 @@ void apple2gs_state::palette_init(palette_device &palette)
 
 		m_video->set_GS_border_color(i, rgb_t(apple2gs_palette[(3*i)]*17, apple2gs_palette[(3*i)+1]*17, apple2gs_palette[(3*i)+2]*17));
 	}
-}
-
-u32 apple2gs_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return m_video->screen_update_GS(screen, bitmap, cliprect);
 }
 
 /***************************************************************************
@@ -1463,16 +1486,18 @@ void apple2gs_state::do_io(int offset)
 	}
 }
 
-// apple2gs_get_vpos - return the correct vertical counter value for the current scanline.
+// return the correct vertical counter per IIgs Tech Note #39
 int apple2gs_state::get_vpos()
 {
-	// as per IIgs Tech Note #39, this is simply scanline + 250 on NTSC (262 lines),
-	// or scanline + 200 on PAL (312 lines)
-	int vpos = m_screen->vpos() + (511 - BORDER_TOP + 6);
+	int vpos = m_screen->vpos();
+	vpos += (m_screen->hpos() >= (BORDER_LEFT + (40 - ALIGN_CNT) * 16)); // adjust for set_raw
+
+	if (vpos < BORDER_TOP)
+		vpos += m_screen->height(); // remap top border to bottom of VBL
+	vpos += 256 - BORDER_TOP;
 	if (vpos > 511)
-	{
-		vpos -= (511 - 250);
-	}
+		vpos -= m_screen->height(); // wrap scanline 256 to 250 (60 Hz) or 200 (50 Hz)
+
 	return vpos;
 }
 
@@ -1524,9 +1549,9 @@ u8 apple2gs_state::c000_r(offs_t offset)
 	}
 
 	slow_cycle();
-	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
-	u8 uKeyboard = keyglu_816_read(GLU_C000);
-	u8 uKeyboardC010 = keyglu_816_read(GLU_C010);
+	const u8 uFloatingBus = read_floatingbus(); // video side-effects latch after reading
+	const u8 uFloatingBus7 = uFloatingBus & 0x7f;
+	const u8 uKeyboard = keyglu_816_read(GLU_C000);
 
 	switch (offset)
 	{
@@ -1538,55 +1563,55 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 		case 0x10:  // read any key down, reset keyboard strobe
 			keyglu_816_write(GLU_C010, 0);
-			return uKeyboardC010 | (uKeyboard & 0x7f);
+			return keyglu_816_read(GLU_C010) | (uKeyboard & 0x7f);
 
 		case 0x11:  // read LCRAM2 (LC Dxxx bank)
-			return (uKeyboardC010 & 0x7f) | (m_lcram2 ? 0x80 : 0x00);
+			return m_lcram2 ? 0x80 : 0x00;
 
 		case 0x12:  // read LCRAM (is LC readable?)
-			return (uKeyboardC010 & 0x7f) | (m_lcram ? 0x80 : 0x00);
+			return m_lcram ? 0x80 : 0x00;
 
 		case 0x13:  // read RAMRD
-			return (uKeyboardC010 & 0x7f) | (m_ramrd ? 0x80 : 0x00);
+			return m_ramrd ? 0x80 : 0x00;
 
 		case 0x14:  // read RAMWRT
-			return (uKeyboardC010 & 0x7f) | (m_ramwrt ? 0x80 : 0x00);
+			return m_ramwrt ? 0x80 : 0x00;
 
 		case 0x15:  // read INTCXROM
-			return (uKeyboardC010 & 0x7f) | (m_intcxrom ? 0x80 : 0x00);
+			return m_intcxrom ? 0x80 : 0x00;
 
 		case 0x16:  // read ALTZP
-			return (uKeyboardC010 & 0x7f) | (m_altzp ? 0x80 : 0x00);
+			return m_altzp ? 0x80 : 0x00;
 
 		case 0x17:  // read SLOTC3ROM
-			return (uKeyboardC010 & 0x7f) | (m_slotc3rom ? 0x80 : 0x00);
+			return m_slotc3rom ? 0x80 : 0x00;
 
 		case 0x18:  // read 80STORE
-			return (uKeyboardC010 & 0x7f) | (m_video->get_80store() ? 0x80 : 0x00);
+			return m_video->get_80store() ? 0x80 : 0x00;
 
 		case 0x19:  // read VBL (not VBLBAR, see Apple IIGS Technical Note #40)
-			return (uKeyboardC010 & 0x7f) | (m_vbl ? 0x80 : 0x00);
+			return m_vbl ? 0x80 : 0x00;
 
 		case 0x1a:  // read TEXT
-			return (uKeyboardC010 & 0x7f) | (m_video->get_graphics() ? 0x00 : 0x80);
+			return m_video->get_graphics() ? 0x00 : 0x80;
 
 		case 0x1b:  // read MIXED
-			return (uKeyboardC010 & 0x7f) | (m_video->get_mix() ? 0x80 : 0x00);
+			return m_video->get_mix() ? 0x80 : 0x00;
 
 		case 0x1c:  // read PAGE2
-			return (uKeyboardC010 & 0x7f) | (m_video->get_page2() ? 0x80 : 0x00);
+			return m_video->get_page2() ? 0x80 : 0x00;
 
 		case 0x1d:  // read HIRES
-			return (uKeyboardC010 & 0x7f) | (m_video->get_hires() ? 0x80 : 0x00);
+			return m_video->get_hires() ? 0x80 : 0x00;
 
 		case 0x1e:  // read ALTCHARSET
-			return (uKeyboardC010 & 0x7f) | (m_video->get_altcharset() ? 0x80 : 0x00);
+			return m_video->get_altcharset() ? 0x80 : 0x00;
 
 		case 0x1f:  // read 80COL
-			return (uKeyboardC010 & 0x7f) | (m_video->get_80col() ? 0x80 : 0x00);
+			return m_video->get_80col() ? 0x80 : 0x00;
 
 		case 0x22:  // TEXTCOL
-			return m_textcol;
+			return m_video->get_GS_textcol();
 
 		case 0x23:  // VGCINT
 			return m_vgcint;
@@ -1622,10 +1647,12 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			// reading HORIZCNT clears SCB status
 			clear_vgcint(~VGCINT_SCANLINE);
 
-			ret = m_screen->hpos() / 11;
+			ret = (m_screen->hpos() - BORDER_LEFT) / 16 + (25 + ALIGN_CNT); // adjust for set_raw
+			if (ret >= 65)
+				ret -= 65;
 			if (ret > 0)
 			{
-				ret += 0x40;
+				ret += 0x3f; // HBL [0, 0x40...57] active [0x58...7f]
 			}
 
 			if (get_vpos() & 1)
@@ -1638,7 +1665,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return m_diskreg;
 
 		case 0x32: // VGCINTCLEAR
-			return read_floatingbus();
+			return uFloatingBus;
 
 		case 0x33: // CLOCKDATA
 			return m_clkdata;
@@ -1693,6 +1720,10 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 		case 0x41:  // INTEN
 			return m_inten;
+
+		case 0x44: // MMDELTAX
+		case 0x45: // MMDELTAY
+			return 0; // read by AppleTalk to detect SCC activity
 
 		case 0x46:  // INTFLAG
 			return (m_an3 ? INTFLAG_AN3 : 0x00) | m_intflag;
@@ -1776,13 +1807,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			break;
 	}
 
-	// assume all $C00X returns the keyboard, like on the IIe
-	if ((offset & 0xf0) == 0x00)
-	{
-		return uKeyboard;
-	}
-
-	return read_floatingbus();
+	return uFloatingBus;
 }
 
 void apple2gs_state::c000_w(offs_t offset, u8 data)
@@ -1881,13 +1906,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x22:  // TEXTCOL
-			if (m_textcol != data)
-			{
-				m_screen->update_now();
-			}
-			m_textcol = data;
-			m_video->set_GS_foreground((data >> 4) & 0xf);
-			m_video->set_GS_background(data & 0xf);
+			m_video->set_GS_textcol(data);
 			break;
 
 		case 0x23:  // VGCINT
@@ -1930,7 +1949,8 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 		case 0x2d:  // SLOTROMSEL
 			m_slotromsel = data;
 			break;
-		case 0x31:  //
+
+		case 0x31:  // DISKREG
 			if (!BIT(data, DISKREG_35SEL))
 			{
 				m_motoroff_time = 30;
@@ -2121,7 +2141,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 
 		case 0x68: // STATEREG
 			m_altzp = (data & 0x80);
-			m_video->page2_w(data & 0x40);
+			m_video->scr_w(data & 0x40);
 			m_ramrd = (data & 0x20);
 			m_ramwrt = (data & 0x10);
 			m_lcram = (data & 0x08) ? false : true;
@@ -2943,7 +2963,6 @@ u8 apple2gs_state::b0ram0800_r(offs_t offset)  { return m_ram_ptr[offset+0x800];
 void apple2gs_state::b0ram0800_w(offs_t offset, u8 data)
 {
 	m_ram_ptr[offset+0x800] = data;
-
 	if (offset < 0x400)
 	{
 		if ((!(m_shadow & SHAD_TXTPG2)) && (m_is_rom3))
@@ -2997,8 +3016,11 @@ void apple2gs_state::b1ram0800_w(offs_t offset, u8 data)
 	m_ram_ptr[offset+0x10800] = data;
 	if (offset < 0x400)
 	{
-		slow_cycle();
-		m_megaii_ram[offset+0x10800] = data;
+		if ((!(m_shadow & SHAD_TXTPG2)) && (m_is_rom3))
+		{
+			slow_cycle();
+			m_megaii_ram[offset+0x10800] = data;
+		}
 	}
 }
 u8 apple2gs_state::b1ram2000_r(offs_t offset)  { return m_ram_ptr[offset+0x12000]; }
@@ -3369,7 +3391,7 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 		m_ramrd = false;
 		m_ramwrt = false;
 		m_altzp = false;
-		m_video->page2_w(false);
+		m_video->scr_w(0);
 		m_video->res_w(0);
 		m_irqmask = 0;
 
@@ -3749,9 +3771,8 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_maincpu->set_addrmap(g65816_device::AS_VECTORS, &apple2gs_state::vectors_map);
 	m_maincpu->set_dasm_override(FUNC(apple2gs_state::dasm_trampoline));
 	m_maincpu->wdm_handler().set(FUNC(apple2gs_state::wdm_trampoline));
-	TIMER(config, m_scantimer, 0);
-	m_scantimer->configure_scanline(FUNC(apple2gs_state::apple2_interrupt), "screen", 0, 1);
-
+	TIMER(config, m_scantimer, 0).configure_generic(FUNC(apple2gs_state::apple2_interrupt));
+	TIMER(config, m_vgctimer, 0).configure_generic(FUNC(apple2gs_state::apple2_vgc));
 	TIMER(config, m_acceltimer, 0).configure_generic(FUNC(apple2gs_state::accel_timer));
 
 	config.set_maximum_quantum(attotime::from_hz(60));
@@ -3771,6 +3792,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_macadb->adb_data_callback().set(FUNC(apple2gs_state::set_adb_line));
 
 	RTC3430042(config, m_rtc, XTAL(32'768));
+	m_rtc->cko_cb().set(FUNC(apple2gs_state::rtc_vgc));
 
 	APPLE2_VIDEO(config, m_video, A2GS_14M).set_screen(m_screen);
 
@@ -3782,11 +3804,12 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::default_options, nullptr);
 
+	// HBL is positioned to the right of active video here, but to the left on hardware.
+	// the borders are counted as active video here, but as HBL on hardware.
+	// these must be compensated for in any use of hpos/vpos/hblank/vblank.
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(704, 262);  // 640+32+32 for the borders
-	m_screen->set_visarea(0,703,0,230);
-	m_screen->set_screen_update(FUNC(apple2gs_state::screen_update));
+	m_screen->set_raw(A2GS_1M.value() * 16, 65 * 16, 0, BORDER_LEFT + 40 * 16 + BORDER_RIGHT, 262, 0, 231);
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update_GS)));
 
 	PALETTE(config, "palette", FUNC(apple2gs_state::palette_init), 256);
 
@@ -3907,7 +3930,7 @@ ROM_START(apple2gs)
 	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
 
 	ROM_REGION(0x4000,"gfx1",0)
-	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
+	ROM_LOAD("344s0047.bin", 0x000000, 0x004000, CRC(2d541944) SHA1(5a5a77c8ec45632aea1a57cd9c9257f7f6e44668)) /* Mega II: 344S0047.  Dumped from the test registers, verified identical on both ROM 1 and 3 */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	// 341-0728 is the MASK rom version while 341-0737 is the EPROM version - SAME data.
@@ -3922,7 +3945,7 @@ ROM_START(apple2gsr3p)
 	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
 
 	ROM_REGION(0x4000,"gfx1",0)
-	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
+	ROM_LOAD("344s0047.bin", 0x000000, 0x004000, CRC(2d541944) SHA1(5a5a77c8ec45632aea1a57cd9c9257f7f6e44668)) /* Mega II: 344S0047.  Dumped from the test registers, verified identical on both ROM 1 and 3 */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD("341-0728", 0x00000, 0x20000, CRC(8d410067) SHA1(c0f4704233ead14cb8e1e8a68fbd7063c56afd27) ) /* 341-0728: IIgs ROM03 prototype FC-FD - 28 pin MASK rom */
@@ -3934,7 +3957,7 @@ ROM_START(apple2gsr1)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
 	ROM_REGION(0x4000,"gfx1",0)
-	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
+	ROM_LOAD("344s0047.bin", 0x000000, 0x004000, CRC(2d541944) SHA1(5a5a77c8ec45632aea1a57cd9c9257f7f6e44668)) /* Mega II: 344S0047.  Dumped from the test registers, verified identical on both ROM 1 and 3 */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD("342-0077-b", 0x20000, 0x20000, CRC(42f124b0) SHA1(e4fc7560b69d062cb2da5b1ffbe11cd1ca03cc37)) /* 342-0077-B: IIgs ROM01 */
@@ -3945,7 +3968,7 @@ ROM_START(apple2gsr0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
 	ROM_REGION(0x4000,"gfx1",0)
-	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
+	ROM_LOAD("344s0047.bin", 0x000000, 0x004000, CRC(2d541944) SHA1(5a5a77c8ec45632aea1a57cd9c9257f7f6e44668)) /* Mega II: 344S0047.  Dumped from the test registers, verified identical on both ROM 1 and 3 */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD("342-0077-a", 0x20000, 0x20000, CRC(dfbdd97b) SHA1(ff0c245dd0732ec4413a934fd80efc2defd8a8e3) ) /* 342-0077-A: IIgs ROM00 */
@@ -3956,7 +3979,7 @@ ROM_START(apple2gsr0p)  // 6/19/1986 Cortland prototype
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
 	ROM_REGION(0x4000,"gfx1",0)
-	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
+	ROM_LOAD("344s0047.bin", 0x000000, 0x004000, CRC(2d541944) SHA1(5a5a77c8ec45632aea1a57cd9c9257f7f6e44668)) /* Mega II: 344S0047.  Dumped from the test registers, verified identical on both ROM 1 and 3 */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD( "rombf.bin",    0x020000, 0x020000, CRC(ab04fedf) SHA1(977589a17553956d583a21020080a39dd396df5c) )
@@ -3967,7 +3990,7 @@ ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
 	ROM_REGION(0x4000,"gfx1",0)
-	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
+	ROM_LOAD("344s0047.bin", 0x000000, 0x004000, CRC(2d541944) SHA1(5a5a77c8ec45632aea1a57cd9c9257f7f6e44668)) /* Mega II: 344S0047.  Dumped from the test registers, verified identical on both ROM 1 and 3 */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD( "apple iigs alpha rom 2.0 19860310.bin", 0x020000, 0x020000, CRC(a47d275f) SHA1(c5836adcfc8be69c7351b84afa94c814e8d92b81) )
@@ -3979,7 +4002,7 @@ ROM_START(apple2gsmt)
 	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
 
 	ROM_REGION(0x4000, "gfx1", 0)
-	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
+	ROM_LOAD("344s0047.bin", 0x000000, 0x004000, CRC(2d541944) SHA1(5a5a77c8ec45632aea1a57cd9c9257f7f6e44668)) /* Mega II: 344S0047.  Dumped from the test registers, verified identical on both ROM 1 and 3 */
 
 	ROM_REGION(0x80000, "maincpu", 0)
 	// The Mark Twain ROM is 512K, with address bit 16 inverted (same as ROM 3).

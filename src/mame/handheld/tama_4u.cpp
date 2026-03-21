@@ -65,7 +65,7 @@ void tama_4u_state::tama4u(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(128, 128); 
+	m_screen->set_size(128, 128);
 	m_screen->set_visarea(0, 128 - 1, 0, 128 - 1);
 	m_screen->set_screen_update(FUNC(tama_4u_state::screen_update));
 
@@ -74,7 +74,7 @@ void tama_4u_state::tama4u(machine_config &config)
 
 ROM_START( tama4u )
 	ROM_REGION( 0x800000, "maincpu", 0 )
-	// vector table(?) at 0x400000, similar to tamaid 
+	// vector table(?) at 0x400000, similar to tamaid
 	ROM_LOAD( "mx29lb640eb.u4", 0x000000, 0x800000, CRC(f9dcc04a) SHA1(5f5d738357219b2a4a1452835455abef25fe7dcb) )
 ROM_END
 

@@ -14,6 +14,8 @@ class svga_device;
 class ibm8514a_device : public device_t
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 	ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename T> void set_vga(T &&tag) { m_vga.set_tag(std::forward<T>(tag)); }

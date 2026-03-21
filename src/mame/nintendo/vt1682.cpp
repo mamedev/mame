@@ -6540,6 +6540,14 @@ ROM_START( anpncpc )
 	ROM_LOAD( "l24c64.u5", 0x00000, 0x2000, CRC(968f8234) SHA1(6fb961a06892e4a577f78b3687c428b8e1c4c7d3) )
 ROM_END
 
+ROM_START( anpnvt12 )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58fvm7t5btg65.bin", 0x00000, 0x1000000, CRC(00b858c9) SHA1(8017a8346516b05296cd6f24d2a27a319af07a70) )
+
+	ROM_REGION( 0x2000, "seeprom", ROMREGION_ERASE00 ) // probably just settings / profiles, remove later if so
+	ROM_LOAD( "l24c64.u5", 0x00000, 0x2000, CRC(f162e733) SHA1(b48644caa66bde07d78d26a8b94d6926a1e17884) )
+ROM_END
+
 ROM_START( cmpmx10 )
 	ROM_REGION( 0x4000000, "mainrom", ROMREGION_ERASE00 )
 	// despite V1682 being able to access 32Mbytes natively, this is split into 2 4Mbyte banks with external banking
@@ -6651,6 +6659,9 @@ CONS( 200?, gm235upc,  0,  0,  gm235upc, gm235upc, vt1682_dance_state, regular_i
 
 // "Anpanman Color PC" (アンパンマンカラーパソコン)
 CONS( 2009, anpncpc,   0,  0,  anpncpc, anpncpc, vt1682_anpncpc_state, regular_init,  "Bandai", "Anpanman Color PC (Japan)", MACHINE_NOT_WORKING )
+
+// マウスでクリック アンパンマンカラーパソコン
+CONS( 2012, anpnvt12,  0,  0,  anpncpc, anpncpc, vt1682_anpncpc_state, regular_init,  "Bandai", "Mouse de Click Anpanman Color PC (Japan)", MACHINE_NOT_WORKING )
 
 // as with others the cmpmx10 and cmpmx11 have minor offset issues in some games, you can see it easily in Jewel Master
 // 2007 is the copyright date shown on all the games, but the unit could have been released later

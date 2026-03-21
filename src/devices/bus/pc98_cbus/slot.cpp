@@ -11,6 +11,7 @@ References:
 - https://98epjunk.shakunage.net/sw/ext_card/ext_card.html
 - https://ja.wikipedia.org/wiki/C%E3%83%90%E3%82%B9
 - https://www.pc-9800.net/db2/db2_ga_index.htm
+- https://web.archive.org/web/20240921232349/https://radioc.web.fc2.com/column/pc98bas/pc98memmap_en.htm
 - http://ookumaneko.s1005.xrea.com/pcibios.htm (PCI era mapping)
 
 TODO:
@@ -46,7 +47,10 @@ pc98_cbus_root_device::pc98_cbus_root_device(const machine_config &mconfig, cons
 	, m_space_mem_config("mem_space", ENDIANNESS_LITTLE, 16, 24, 0, address_map_constructor())
 	, m_space_io_config("io_space", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor())
 	, m_int_cb(*this)
+	, m_drq_cb(*this)
 {
+	std::fill(std::begin(m_dma_device), std::end(m_dma_device), nullptr);
+	std::fill(std::begin(m_dma_eop), std::end(m_dma_eop), false);
 }
 
 device_memory_interface::space_config_vector pc98_cbus_root_device::memory_space_config() const
@@ -66,8 +70,14 @@ void pc98_cbus_root_device::device_start()
 
 void pc98_cbus_root_device::device_reset()
 {
+	logerror("Unmap memory ranges\n");
 	space(AS_PROGRAM).unmap_readwrite(0, 0xffffff);
 	space(AS_IO).unmap_readwrite(0, 0xffff);
+}
+
+void pc98_cbus_root_device::device_reset_after_children()
+{
+	logerror("Remap card ranges\n");
 	remap(AS_PROGRAM, 0, 0xffffff);
 	remap(AS_IO, 0, 0xffff);
 }
@@ -80,7 +90,6 @@ void pc98_cbus_root_device::device_config_complete()
 void pc98_cbus_root_device::add_slot(const char *tag)
 {
 	device_t *dev = subdevice(tag);
-	//printf(tag);
 	add_slot(dynamic_cast<device_slot_interface *>(dev));
 }
 
@@ -134,6 +143,30 @@ void pc98_cbus_root_device::io_w(offs_t offset, u16 data, u16 mem_mask)
 	space(AS_IO).write_word(offset << 1, data, mem_mask);
 }
 
+u8 pc98_cbus_root_device::dack_r(int line)
+{
+	if (m_dma_device[line])
+		return m_dma_device[line]->dack_r(line);
+	return 0xff;
+}
+
+void pc98_cbus_root_device::dack_w(int line, u8 data)
+{
+	if (m_dma_device[line])
+		m_dma_device[line]->dack_w(line, data);
+}
+
+void pc98_cbus_root_device::eop_w(int line, int state)
+{
+	if (m_dma_eop[line] && m_dma_device[line])
+		m_dma_device[line]->eop_w(state);
+}
+
+void pc98_cbus_root_device::set_dma_channel(u8 channel, device_pc98_cbus_slot_interface *dev, bool do_eop)
+{
+	m_dma_device[channel] = dev;
+	m_dma_eop[channel] = do_eop;
+}
 
 
 //**************************************************************************
@@ -148,6 +181,20 @@ device_pc98_cbus_slot_interface::device_pc98_cbus_slot_interface(const machine_c
 device_pc98_cbus_slot_interface::~device_pc98_cbus_slot_interface()
 {
 }
+
+u8 device_pc98_cbus_slot_interface::dack_r(int line)
+{
+	return 0;
+}
+
+void device_pc98_cbus_slot_interface::dack_w(int line, u8 data)
+{
+}
+
+void device_pc98_cbus_slot_interface::eop_w(int state)
+{
+}
+
 
 pc98_cbus_slot_device::pc98_cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pc98_cbus_slot_device(mconfig, PC98_CBUS_SLOT, tag, owner, clock)

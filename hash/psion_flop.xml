@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="psion_flop" description="Psion diskettes">
+
+	<!-- Series MC -->
+
+	<software name="dosutils">
+		<description>MS-DOS Utilities &amp; Laplink III</description>
+		<year>1990</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="DOS"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="MSDOS_Utilities_Laplink3.img" size="737280" crc="16b58e56" sha1="d20af1ed83de68101dc1ce975cdb636f94f1bc65" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Series 3/3a -->
+
+	<software name="fileman" supported="no">
+		<description>File Manager</description>
+		<year>1996</year>
+		<publisher>Purple Software</publisher>
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="File_Manager.img" size="1474560" crc="82b6b61a" sha1="591a0071f57cb5d7c1c73e8bf0ba8568705bab77" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

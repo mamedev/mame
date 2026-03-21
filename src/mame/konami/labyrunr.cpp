@@ -95,7 +95,6 @@ void labyrunr_state::palette(palette_device &palette) const
 			for (int i = 0; i < 0x100; i++)
 			{
 				uint8_t const ctabentry = !color_prom[i] ? 0 : ((pal << 4) | (color_prom[i] & 0x0f));
-
 				palette.set_pen_indirect((pal << 8) | i, ctabentry);
 			}
 		}
@@ -181,20 +180,20 @@ void labyrunr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t ctrl_0 = m_k007121->ctrl_r(0);
+	const uint8_t ctrl_0 = m_k007121->ctrl_r(0);
+	const uint8_t ctrl_2 = m_k007121->ctrl_r(2);
 
 	const int bgpen = (m_k007121->ctrl_r(6) & 0x30) * 2 + 16;
 	bitmap.fill(bgpen << 4, cliprect);
 	screen.priority().fill(0, cliprect);
 
 	const rectangle &visarea = screen.visible_area();
+	rectangle clip[3];
+	clip[0] = clip[1] = clip[2] = visarea;
 
-	if (~m_k007121->ctrl_r(3) & 0x20)
+	if (BIT(m_k007121->ctrl_r(3), 4))
 	{
 		// compute clipping
-		rectangle clip[2];
-		clip[0] = clip[1] = visarea;
-
 		if (m_k007121->flipscreen())
 		{
 			clip[0].max_x -= 40;
@@ -208,61 +207,50 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 		clip[0] &= cliprect;
 		clip[1] &= cliprect;
+		clip[2] = clip[0];
 
 		// set scroll registers
-		m_tilemap[0]->set_scrollx(0, ctrl_0 - 40);
-		m_tilemap[1]->set_scrollx(0, 0);
+		m_tilemap[0]->set_scrollx(ctrl_0 - 40);
+		m_tilemap[1]->set_scrollx(0);
+		m_tilemap[1]->set_scrolly(0);
+		m_k007121->set_sprite_offsets(40, 16);
 
-		for (int i = 0; i < 32; i++)
+		// enable colscroll
+		if (BIT(m_k007121->ctrl_r(1), 1))
 		{
-			// enable colscroll
-			if (m_k007121->ctrl_r(1) & 2)
+			for (int i = 0; i < 32; i++)
 				m_tilemap[0]->set_scrolly((i + 2) & 0x1f, m_k007121->scroll_r(i));
-			else
-				m_tilemap[0]->set_scrolly((i + 2) & 0x1f, m_k007121->ctrl_r(2));
 		}
-
-		// draw the graphics
-		m_tilemap[0]->draw(screen, bitmap, clip[0], TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(0), 0);
-		draw_sprites(bitmap, clip[0], screen.priority());
-		m_tilemap[0]->draw(screen, bitmap, clip[0], TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(1), 0);
-		m_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
+		else
+			m_tilemap[0]->set_scrolly(ctrl_2);
 	}
 	else
 	{
-		rectangle clip[3];
-		int use_clip2[2] = { 0, 0 };
-
-		// custom cliprects needed for the weird effect used in the ending sequence to hide and show the needed part of text
-		clip[0] = clip[1] = clip[2] = visarea;
-
+		// custom clipping needed for the weird effect used in the ending sequence to hide and show the needed part of text
 		if (m_k007121->ctrl_r(1) & 1)
 		{
-			if (ctrl_0 < 40)
-			{
-				use_clip2[0] = 1;
-				clip[1].min_x = 40 - ctrl_0;
-			}
-
-			clip[0].min_x = clip[0].max_x - ctrl_0 + 8;
-			clip[1].max_x = clip[1].max_x - ctrl_0 + 8;
+			clip[0].min_x = clip[0].max_x - ctrl_0 - 8;
+			clip[1].max_x = clip[1].max_x - ctrl_0 - 8;
 		}
 		else
 		{
-			if (ctrl_0 < 40)
-			{
-				use_clip2[1] = 1;
-				clip[0].min_x = 40 - ctrl_0;
-			}
-
-			clip[0].max_x = clip[0].max_x - ctrl_0 + 8;
-			clip[1].min_x = clip[1].max_x - ctrl_0 + 8;
+			clip[0].max_x = clip[0].max_x - ctrl_0 - 8;
+			clip[1].min_x = clip[1].max_x - ctrl_0 - 8;
 		}
 
-		if (use_clip2[0] || use_clip2[1])
-			clip[2].max_x = 40 - ctrl_0 - 8;
+		// width of 240 or 256
+		if (BIT(m_k007121->ctrl_r(3), 6))
+		{
+			clip[2].min_x += 24;
+			clip[2].max_x -= 16;
+		}
+		else
+		{
+			clip[2].min_x += 16;
+			clip[2].max_x -= 8;
+		}
 
-		for (int i = 0; i < 3; i++)
+		for (int i = 2; i >= 0; i--)
 		{
 			// flip the cliprects
 			if (m_k007121->flipscreen())
@@ -273,27 +261,23 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				clip[i].min_x = min_x;
 			}
 
-			clip[i] &= cliprect;
+			clip[i] &= (i == 2) ? cliprect : clip[2];
 		}
 
-		m_tilemap[0]->set_scrollx(0, ctrl_0 - 40);
-		m_tilemap[1]->set_scrollx(0, ctrl_0 - 40);
-
-		// draw the graphics
-		m_tilemap[0]->draw(screen, bitmap, clip[0], TILEMAP_DRAW_CATEGORY(0), 0);
-		if (use_clip2[0])
-			m_tilemap[0]->draw(screen, bitmap, clip[2], TILEMAP_DRAW_CATEGORY(0), 0);
-
-		draw_sprites(bitmap, cliprect, screen.priority());
-
-		m_tilemap[0]->draw(screen, bitmap, clip[0], TILEMAP_DRAW_CATEGORY(1), 0);
-		if (use_clip2[0])
-			m_tilemap[0]->draw(screen, bitmap, clip[2], TILEMAP_DRAW_CATEGORY(1), 0);
-
-		m_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
-		if (use_clip2[1])
-			m_tilemap[1]->draw(screen, bitmap, clip[2], 0, 0);
+		// set scroll registers
+		m_tilemap[0]->set_scrollx(ctrl_0 - 16);
+		m_tilemap[1]->set_scrollx(ctrl_0 - 16);
+		m_tilemap[0]->set_scrolly(ctrl_2);
+		m_tilemap[1]->set_scrolly(ctrl_2);
+		m_k007121->set_sprite_offsets(16, -8);
 	}
+
+	// draw the graphics
+	const uint32_t opaque = BIT(m_k007121->ctrl_r(3), 5) ? 0 : TILEMAP_DRAW_OPAQUE;
+	m_tilemap[0]->draw(screen, bitmap, clip[0], opaque | TILEMAP_DRAW_CATEGORY(0), 0);
+	draw_sprites(bitmap, clip[2], screen.priority());
+	m_tilemap[0]->draw(screen, bitmap, clip[0], opaque | TILEMAP_DRAW_CATEGORY(1), 0);
+	m_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
 
 	return 0;
 }
@@ -304,7 +288,7 @@ void labyrunr_state::bankswitch_w(uint8_t data)
 	if (data & 0xe0) logerror("bankswitch %02x", data);
 
 	// bits 0-2 = bank number
-	m_mainbank->set_entry(data & 0x07); // shall we check if data & 7 > #banks?
+	m_mainbank->set_entry(data & 0x07);
 
 	// bits 3 and 4 are coin counters
 	machine().bookkeeping().coin_counter_w(0, data & 0x08);
@@ -338,7 +322,7 @@ void labyrunr_state::prg_map(address_map &map)
 	map(0x3000, 0x37ff).ram().w(FUNC(labyrunr_state::vram_w<0>)).share(m_videoram[0]);
 	map(0x3800, 0x3fff).ram().w(FUNC(labyrunr_state::vram_w<1>)).share(m_videoram[1]);
 	map(0x4000, 0x7fff).bankr(m_mainbank);
-	map(0x8000, 0xffff).rom();
+	map(0x8000, 0xffff).rom().region("maincpu", 0x18000);
 }
 
 
@@ -421,9 +405,7 @@ GFXDECODE_END
 
 void labyrunr_state::machine_start()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-
-	m_mainbank->configure_entries(0, 6, &ROM[0x10000], 0x4000);
+	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 }
 
 void labyrunr_state::labyrunr(machine_config &config)
@@ -434,23 +416,22 @@ void labyrunr_state::labyrunr(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
+	K051733(config, "k051733", 24_MHz_XTAL / 2);
+
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 280, 264, 16, 240);
-	screen.set_screen_update(FUNC(labyrunr_state::screen_update));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 280, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(labyrunr_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(labyrunr_state::palette));
 	m_palette->set_format(palette_device::xBGR_555, 8*16*16, 128);
 
 	K007121(config, m_k007121, 0, gfx_labyrunr, m_palette, "screen");
-	m_k007121->set_sprite_offsets(40, 16);
 	m_k007121->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
 	m_k007121->set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_k007121->set_flipscreen_cb().set(FUNC(labyrunr_state::flipscreen_w));
 	m_k007121->set_sprite_callback(FUNC(labyrunr_state::sprite_callback));
-
-	K051733(config, "k051733", 24_MHz_XTAL / 2);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -479,10 +460,10 @@ void labyrunr_state::labyrunr(machine_config &config)
 ***************************************************************************/
 
 ROM_START( tricktrp )
-	ROM_REGION( 0x28000, "maincpu", 0 ) // code + banked ROMs
-	ROM_LOAD( "771e04",     0x10000, 0x08000, CRC(ba2c7e20) SHA1(713dcc0e65bf9431f2c0df9db1210346a9476a52) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
-	ROM_LOAD( "771e03",     0x18000, 0x10000, CRC(d0d68036) SHA1(8589ee07e229259341a4cc22bc64de8f06536472) )
+	ROM_REGION( 0x20000, "maincpu", 0 ) // code + banked ROMs
+	ROM_LOAD( "771e04",     0x00000, 0x08000, CRC(ba2c7e20) SHA1(713dcc0e65bf9431f2c0df9db1210346a9476a52) )
+	ROM_CONTINUE(           0x18000, 0x08000 )
+	ROM_LOAD( "771e03",     0x08000, 0x10000, CRC(d0d68036) SHA1(8589ee07e229259341a4cc22bc64de8f06536472) )
 
 	ROM_REGION( 0x40000, "gfx", 0 )
 	ROM_LOAD16_BYTE( "771e01a", 0x00001, 0x10000, CRC(103ffa0d) SHA1(1949c49ca3b243e4cfb5fb19ecd3a1e1492cfddd) ) // tiles + sprites
@@ -496,10 +477,10 @@ ROM_START( tricktrp )
 ROM_END
 
 ROM_START( labyrunr )
-	ROM_REGION( 0x28000, "maincpu", 0 ) // code + banked ROMs
-	ROM_LOAD( "771j04.10f", 0x10000, 0x08000, CRC(354a41d0) SHA1(302e8f5c469ad3f615aeca8005ebde6b6051aaae) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
-	ROM_LOAD( "771j03.08f", 0x18000, 0x10000, CRC(12b49044) SHA1(e9b22fb093cfb746a9767e94ef5deef98bed5b7a) )
+	ROM_REGION( 0x20000, "maincpu", 0 ) // code + banked ROMs
+	ROM_LOAD( "771j04.10f", 0x00000, 0x08000, CRC(354a41d0) SHA1(302e8f5c469ad3f615aeca8005ebde6b6051aaae) )
+	ROM_CONTINUE(           0x18000, 0x08000 )
+	ROM_LOAD( "771j03.08f", 0x08000, 0x10000, CRC(12b49044) SHA1(e9b22fb093cfb746a9767e94ef5deef98bed5b7a) )
 
 	ROM_REGION( 0x40000, "gfx", 0 )
 	ROM_LOAD16_WORD_SWAP( "771d01.14a", 0x00000, 0x40000, CRC(15c8f5f9) SHA1(e4235e1315d0331f3ce5047834a68764ed43aa4b) ) // tiles + sprites
@@ -510,10 +491,10 @@ ROM_START( labyrunr )
 ROM_END
 
 ROM_START( labyrunrk )
-	ROM_REGION( 0x28000, "maincpu", 0 ) // code + banked ROMs
-	ROM_LOAD( "771k04.10f", 0x10000, 0x08000, CRC(9816ab35) SHA1(6efb0332f4a62f20889f212682ee7225e4a182a9) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
-	ROM_LOAD( "771k03.8f",  0x18000, 0x10000, CRC(48d732ae) SHA1(8bc7917397f32cf5f995b3763ae921725e27de05) )
+	ROM_REGION( 0x20000, "maincpu", 0 ) // code + banked ROMs
+	ROM_LOAD( "771k04.10f", 0x00000, 0x08000, CRC(9816ab35) SHA1(6efb0332f4a62f20889f212682ee7225e4a182a9) )
+	ROM_CONTINUE(           0x18000, 0x08000 )
+	ROM_LOAD( "771k03.8f",  0x08000, 0x10000, CRC(48d732ae) SHA1(8bc7917397f32cf5f995b3763ae921725e27de05) )
 
 	ROM_REGION( 0x40000, "gfx", 0 )
 	ROM_LOAD16_BYTE( "771d01a.13a", 0x00001, 0x10000, CRC(0cd1ed1a) SHA1(eac6c106de28acc54535ae1fb99f778c1ed4013e) ) // tiles + sprites
@@ -527,10 +508,10 @@ ROM_START( labyrunrk )
 ROM_END
 
 ROM_START( labyrunrf )
-	ROM_REGION( 0x28000, "maincpu", 0 ) // code + banked ROMs
-	ROM_LOAD( "771k04.10f", 0x10000, 0x08000, CRC(86a36806) SHA1(d1c916a24117290e890b5e14d6e1932d65943bc6) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
-	ROM_LOAD( "771k03.8f",  0x18000, 0x10000, CRC(6c073295) SHA1(67be17ad0c3bfd5ff8cd6ed31b217e438733ed1c) )
+	ROM_REGION( 0x20000, "maincpu", 0 ) // code + banked ROMs
+	ROM_LOAD( "771k04.10f", 0x00000, 0x08000, CRC(86a36806) SHA1(d1c916a24117290e890b5e14d6e1932d65943bc6) )
+	ROM_CONTINUE(           0x18000, 0x08000 )
+	ROM_LOAD( "771k03.8f",  0x08000, 0x10000, CRC(6c073295) SHA1(67be17ad0c3bfd5ff8cd6ed31b217e438733ed1c) )
 
 	ROM_REGION( 0x40000, "gfx", 0 )
 	ROM_LOAD16_BYTE( "771d01a.13a", 0x00001, 0x10000, CRC(0cd1ed1a) SHA1(eac6c106de28acc54535ae1fb99f778c1ed4013e) ) // tiles + sprites

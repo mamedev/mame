@@ -17,18 +17,22 @@ TODO:
 For rebel5 and newer, the chess engine is by Ed Schröder. Older chesscomputers in
 this driver were authored by Ulf Rathsman.
 
+B&P (Blitz- und Problemlösungs-Modul, initially called Blitz-Modul) 2025 version
+is a free update by one of the people who worked on the original version. It adds
+some new features, and supports the HG240 module.
+
 The MM II program was also licensed to Daimler-Benz, who gave away several custom
 chesscomputers as a parting gift to retiring executives. The hardware is same as MM II.
 see(1): http://chesseval.com/ChessEvalJournal/DaimlerBenz.htm
 see(2): http://chesseval.com/RareBoard/DaimlerBenzBoard.htm
 
-MM III was never released officially. Rebell 5,0 is commonly known as MM III, but the
-real one (updated MM II engine) didn't get further than a prototype.
-
 MM II (Nona program) wasn't a commercial release. After Mondial came out, Frans Morsch
 ported his Nona program to MM II hardware, using Ed Schröder's interface (hence the
 similarity with Rebel). According to research, this version competed in the 1985 Dutch
 Open Computer Chess Championship.
+
+MM III was never released officially. Rebell 5,0 is commonly known as MM III, but the
+real one (updated MM II engine) didn't get further than a prototype.
 
 MM IV TurboKit 18MHz - (mm4tk)
 This is a replacement ROM combining the TurboKit initial ROM with the original MM IV.
@@ -47,7 +51,9 @@ Polgar. Ed Schröder participated with it at the 1989 WMCCC in Portorose, on an 
 module combined with the TK20 TurboKit. For more information, see:
 http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm (mistakenly claims it's MM V)
 
-MM VI (Saitek, 1994) is on different hardware, H8 CPU.
+MM VI was announced in 1994, and was going to be on similar hardware with a program
+by Ed Schröder. After H+G was bought by Saitek, it was released in 1996 on H8 CPU
+hardware with a program by Frans Morsch.
 
 ================================================================================
 
@@ -112,6 +118,7 @@ $8000-$FFFF ROM
 #include "bus/generic/carts.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/74259.h"
+#include "sound/beep.h"
 #include "sound/dac.h"
 
 #include "softlist_dev.h"
@@ -147,6 +154,8 @@ public:
 	void mm2(machine_config &config);
 	void mm2nona(machine_config &config);
 	void bup(machine_config &config);
+	void bupp(machine_config &config);
+	void bup25(machine_config &config);
 
 protected:
 	virtual void machine_reset() override ATTR_COLD { m_maincpu->set_input_line(0, CLEAR_LINE); }
@@ -394,6 +403,30 @@ void mm2_state::bup(machine_config &config)
 	config.set_default_layout(layout_mephisto_bup);
 }
 
+void mm2_state::bupp(machine_config &config)
+{
+	bup(config);
+
+	// basic machine hardware
+	m_maincpu->set_clock(4.194304_MHz_XTAL / 2);
+
+	const attotime irq_period = attotime::from_hz(4.194304_MHz_XTAL / 0x2000); // 512Hz
+	m_maincpu->set_periodic_int(FUNC(mm2_state::irq0_line_assert), irq_period);
+
+	// sound hardware
+	config.device_remove("dac");
+	beep_device &beeper(BEEP(config, "beeper", 4.194304_MHz_XTAL / 0x400)); // 4096Hz
+	beeper.add_route(ALL_OUTPUTS, "speaker", 0.25);
+
+	m_outlatch->q_out_cb<6>().set("beeper", FUNC(beep_device::set_state));
+}
+
+void mm2_state::bup25(machine_config &config)
+{
+	mm2(config);
+	config.set_default_layout(layout_mephisto_bup);
+}
+
 void mm2_state::mm2(machine_config &config)
 {
 	bup(config);
@@ -410,7 +443,6 @@ void mm2_state::mm2(machine_config &config)
 void mm2_state::mm2nona(machine_config &config)
 {
 	bup(config);
-
 	config.set_default_layout(layout_mephisto_mm2);
 }
 
@@ -430,6 +462,24 @@ ROM_START( bupa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("bupa_1.bin", 0x8000, 0x4000, CRC(e1e9625a) SHA1(8a757e28b7afca2a092f8ff419087e06b07b743e) )
 	ROM_LOAD("bupa_2.bin", 0xc000, 0x4000, CRC(708338ea) SHA1(d617c4aa2161865a22b4b0646ba793f8a1fda863) )
+ROM_END
+
+ROM_START( bupb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("a1", 0x8000, 0x4000, CRC(99c6293d) SHA1(10f6fa425afeff65146cede02a3a454c6f170af9) ) // D27128A-2
+	ROM_LOAD("b1", 0xc000, 0x4000, CRC(b446c9be) SHA1(8523d7f35a65c77b42bf43f5fb6036740331fd4a) ) // "
+ROM_END
+
+ROM_START( bupp ) // 18 Jan 1985
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("8-b_18.1.85", 0x8000, 0x4000, CRC(e1e9625a) SHA1(8a757e28b7afca2a092f8ff419087e06b07b743e) ) // Seeq 27128-45
+	ROM_LOAD("c-f_18.1.85", 0xc000, 0x4000, CRC(8f59ba3f) SHA1(a8302f302919183d25a0ef1bbb79c5edd298349e) ) // "
+ROM_END
+
+ROM_START( bup25 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("bup_v25.2-1.bin", 0x8000, 0x4000, CRC(f9e688b6) SHA1(414f3930f306025c64f55bd5b2593e560a3a4697) )
+	ROM_LOAD("bup_v25.2-2.bin", 0xc000, 0x4000, CRC(0db90894) SHA1(f385d002bca55521c9dd61417f49c93021a5662e) )
 ROM_END
 
 
@@ -545,8 +595,11 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1985, bup,      0,      0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1985, bupa,     bup,    0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, bup,      0,      0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 1)", MACHINE_SUPPORTS_SAVE ) // aka Blitz-Modul
+SYST( 1985, bupa,     bup,    0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 2)", MACHINE_SUPPORTS_SAVE ) // "
+SYST( 1985, bupb,     bup,    0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 3)", MACHINE_SUPPORTS_SAVE ) // "
+SYST( 1985, bupp,     bup,    0,      bupp,     bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (prototype)", MACHINE_SUPPORTS_SAVE ) // "
+SYST( 2025, bup25,    bup,    0,      bup25,    bup,   mm2_state, empty_init, "Lars Hjorth",      u8"Mephisto Blitz- und Problemlösungs-Modul (version 25.2)", MACHINE_SUPPORTS_SAVE ) // "
 
 SYST( 1985, mm2,      0,      0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 1, v4.00)", MACHINE_SUPPORTS_SAVE )
 SYST( 1985, mm2a,     mm2,    0,      mm2,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM II (set 2, v3.00)", MACHINE_SUPPORTS_SAVE )

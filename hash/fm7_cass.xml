@@ -322,7 +322,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="chackna" cloneof="chackn">
-		<description>Chack'n Pop (Alt)</description>
+		<description>Chack'n Pop (alt)</description>
 		<year>1984</year>
 		<publisher>ニデコム (Nidecom)</publisher>
 		<info name="serial" value="NH-S49"/>
@@ -758,7 +758,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="gbanka" cloneof="gbank">
-		<description>Gutchan Bank (Alt)</description>
+		<description>Gutchan Bank (alt)</description>
 		<year>1985</year>
 		<publisher>日本ソフトバンク (Nihon SoftBank)</publisher>
 		<info name="release" value="198506xx"/>
@@ -894,7 +894,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="hydlidea" cloneof="hydlide">
-		<description>Hydlide (Alt)</description>
+		<description>Hydlide (alt)</description>
 		<year>1985</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TET-53"/>
@@ -933,7 +933,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="hydlide2a" cloneof="hydlide2">
-		<description>Hydlide II - Shine of Darkness (Alt)</description>
+		<description>Hydlide II - Shine of Darkness (alt)</description>
 		<year>1986</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TET-65"/>
@@ -1383,7 +1383,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="ninjakuna" cloneof="ninjakun">
-		<description>Ninja-kun (Alt)</description>
+		<description>Ninja-kun (alt)</description>
 		<year>1986</year>
 		<publisher>日本デクスタ (Nihon Dexter)</publisher>
 		<info name="alt_title" value="忍者くん"/>
@@ -1586,7 +1586,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="punchbala" cloneof="punchbal">
-		<description>Punch Ball Mario Bros. (Alt)</description>
+		<description>Punch Ball Mario Bros. (alt)</description>
 		<year>1984</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="release" value="198410xx"/>
@@ -1654,7 +1654,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="rallyxa" cloneof="rallyx">
-		<description>Rally-X (Alt)</description>
+		<description>Rally-X (alt)</description>
 		<year>1984</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="serial" value="DP-3301162"/>
@@ -2024,7 +2024,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="tforcea" cloneof="tforce">
-		<description>Thunder Force (Alt)</description>
+		<description>Thunder Force (alt)</description>
 		<year>1984</year>
 		<publisher>テクノソフト (Tecno Soft)</publisher>
 		<info name="serial" value="TF7-010"/>

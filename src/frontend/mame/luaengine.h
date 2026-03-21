@@ -27,6 +27,7 @@
 #define SOL_ALL_SAFETIES_ON 1
 #else
 #define SOL_SAFE_USERTYPE 1
+#define SOL_SAFE_NUMERICS 1
 #endif
 #include "sol/sol.hpp"
 

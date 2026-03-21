@@ -436,18 +436,18 @@ authors:hap
 		<element ref="text_black"><bounds x="48" y="101.3" width="4" height="1.5" /></element>
 		<element ref="butd" inputtag="IN.0" inputmask="0x01"><bounds x="48.5" y="103.5" width="3" height="3" /></element>
 
-		<element ref="text_b3"><bounds x="52" y="89.2" width="12" height="1.8" /></element>
-		<element ref="butr" inputtag="IN.1" inputmask="0x10"><bounds x="57" y="91.5" width="2" height="6" /></element>
-		<element ref="text_b4"><bounds x="60" y="89.2" width="12" height="1.8" /></element>
-		<element ref="butr" inputtag="IN.1" inputmask="0x80"><bounds x="65" y="91.5" width="2" height="6" /></element>
-		<element ref="text_b5"><bounds x="68" y="89.2" width="12" height="1.8" /></element>
-		<element ref="butr" inputtag="IN.1" inputmask="0x40"><bounds x="73" y="91.5" width="2" height="6" /></element>
-		<element ref="text_b6"><bounds x="52" y="98.7" width="12" height="1.8" /></element>
-		<element ref="butr" inputtag="IN.1" inputmask="0x08"><bounds x="57" y="101" width="2" height="6" /></element>
-		<element ref="text_b7"><bounds x="60" y="98.7" width="12" height="1.8" /></element>
-		<element ref="butr" inputtag="IN.1" inputmask="0x04"><bounds x="65" y="101" width="2" height="6" /></element>
-		<element ref="text_b8"><bounds x="68" y="98.7" width="12" height="1.8" /></element>
-		<element ref="butr" inputtag="IN.1" inputmask="0x20"><bounds x="73" y="101" width="2" height="6" /></element>
+		<element ref="text_b3"><bounds xc="58" y="89.2" width="7" height="1.8" /></element>
+		<element ref="butr" inputtag="IN.1" inputmask="0x10"><bounds xc="58" y="91.5" width="2" height="6" /></element>
+		<element ref="text_b4"><bounds xc="66" y="89.2" width="7" height="1.8" /></element>
+		<element ref="butr" inputtag="IN.1" inputmask="0x80"><bounds xc="66" y="91.5" width="2" height="6" /></element>
+		<element ref="text_b5"><bounds xc="74" y="89.2" width="7" height="1.8" /></element>
+		<element ref="butr" inputtag="IN.1" inputmask="0x40"><bounds xc="74" y="91.5" width="2" height="6" /></element>
+		<element ref="text_b6"><bounds xc="58" y="98.7" width="7" height="1.8" /></element>
+		<element ref="butr" inputtag="IN.1" inputmask="0x08"><bounds xc="58" y="101" width="2" height="6" /></element>
+		<element ref="text_b7"><bounds xc="66" y="98.7" width="7" height="1.8" /></element>
+		<element ref="butr" inputtag="IN.1" inputmask="0x04"><bounds xc="66" y="101" width="2" height="6" /></element>
+		<element ref="text_b8"><bounds xc="74" y="98.7" width="7" height="1.8" /></element>
+		<element ref="butr" inputtag="IN.1" inputmask="0x20"><bounds xc="74" y="101" width="2" height="6" /></element>
 
 		<element ref="white"><bounds x="61.85" y="89.2" width="0.3" height="18.5" /></element>
 		<element ref="white"><bounds x="69.85" y="89.2" width="0.3" height="18.5" /></element>

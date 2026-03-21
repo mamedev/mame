@@ -18,13 +18,14 @@ Debug cheats:
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "debugger.h"
 
 
 namespace {
@@ -56,8 +57,13 @@ public:
 
 	void ron(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	virtual void video_start() override ATTR_COLD;
+
 private:
-	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ron_palette(palette_device &palette) const;
 	void vblank_irq(int state);
@@ -72,17 +78,12 @@ private:
 	void audio_p2_w(uint8_t data);
 	int audio_t1_r();
 	void ay_pa_w(uint8_t data);
+	uint8_t read_mux(bool which, bool side);
 
 	void ron_audio_io(address_map &map) ATTR_COLD;
 	void ron_audio_map(address_map &map) ATTR_COLD;
 	void ron_io(address_map &map) ATTR_COLD;
 	void ron_map(address_map &map) ATTR_COLD;
-
-	// driver_device overrides
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-
-	virtual void video_start() override ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -98,12 +99,11 @@ private:
 	required_ioport m_in2;
 	required_ioport m_in3;
 
-	bool m_nmi_enable;
-	uint8_t m_mux_data;
-	uint8_t read_mux(bool which,bool side);
-	uint8_t m_prev_p2;
-	uint8_t m_sound_command;
-	bool m_ay_address_sel;
+	bool m_nmi_enable = false;
+	uint8_t m_mux_data = 0;
+	uint8_t m_prev_p2 = 0;
+	uint8_t m_sound_command = 0;
+	bool m_ay_address_sel = false;
 };
 
 void ron_state::video_start()
@@ -113,17 +113,14 @@ void ron_state::video_start()
 uint32_t ron_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	int y,x;
 	int count = 0;
 
-	for (y=0;y<32;y++)
+	for (int y = 0; y < 32; y++)
 	{
-		for (x=0;x<32;x++)
+		for (int x = 0; x < 32; x++)
 		{
 			uint16_t tile = m_cram[count];
-
-			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
-
+			gfx->opaque(bitmap, cliprect, tile, 0, 0, 0, x*8, y*8);
 			count++;
 		}
 	}
@@ -131,14 +128,12 @@ uint32_t ron_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 	gfx = m_gfxdecode->gfx(1);
 	count = 0;
 
-	for (y=0;y<32;y++)
+	for (int y = 0; y < 32; y++)
 	{
-		for (x=0;x<32;x++)
+		for (int x = 0; x < 32; x++)
 		{
 			uint16_t tile = m_vram[count];
-
-			gfx->transpen(bitmap,cliprect,tile,0,0,0,x*8,y*8,0);
-
+			gfx->transpen(bitmap, cliprect, tile, 0, 0, 0, x*8, y*8, 0);
 			count++;
 		}
 	}
@@ -230,7 +225,6 @@ void ron_state::ron_audio_map(address_map &map)
 
 void ron_state::ron_audio_io(address_map &map)
 {
-
 }
 
 static INPUT_PORTS_START( ron )
@@ -465,7 +459,7 @@ void ron_state::audio_p2_w(uint8_t data)
 	m_prev_p2 = data;
 
 	//printf("p2 %02x\n",data);
-//  machine().debug_break();
+	//machine().debug_break();
 }
 
 int ron_state::audio_t1_r()

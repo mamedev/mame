@@ -214,6 +214,8 @@ private:
 // ======================> adpcm_b_registers
 
 //
+// See https://github.com/hyano/opna-analyze/blob/main/doc/OPNA.md for details on ADPCM timing
+//
 // ADPCM-B register map:
 //
 //      System-wide registers:
@@ -263,6 +265,7 @@ public:
 	void save_restore(ymfm_saved_state &state);
 
 	// direct read/write access
+	uint8_t read(uint32_t index) const { return m_regdata[index]; }
 	void write(uint32_t index, uint8_t data) { m_regdata[index] = data; }
 
 	// system-wide registers
@@ -301,11 +304,22 @@ class adpcm_b_channel
 	static constexpr int32_t STEP_MIN = 127;
 	static constexpr int32_t STEP_MAX = 24576;
 
-public:
-	static constexpr uint8_t STATUS_EOS = 0x01;
-	static constexpr uint8_t STATUS_BRDY = 0x02;
-	static constexpr uint8_t STATUS_PLAYING = 0x04;
+	static constexpr uint32_t LATCH_ADDRESS = 0xffffffff;
 
+public:
+	// publicly visible status bits
+	static constexpr uint32_t STATUS_EOS = 0x01;
+	static constexpr uint32_t STATUS_BRDY = 0x02;
+	static constexpr uint32_t STATUS_PLAYING = 0x04;
+
+private:
+	// internal status bits
+	static constexpr uint32_t STATUS_EXTERNAL = STATUS_EOS | STATUS_BRDY | STATUS_PLAYING;
+	static constexpr uint32_t STATUS_INTERNAL_DRAIN = 0x08;
+	static constexpr uint32_t STATUS_INTERNAL_PLAYING = 0x10;
+	static constexpr uint32_t STATUS_INTERNAL_SUPPRESS_WRITE = 0x20;
+
+public:
 	// constructor
 	adpcm_b_channel(adpcm_b_engine &owner, uint32_t addrshift);
 
@@ -326,7 +340,10 @@ public:
 	void output(ymfm_output<NumOutputs> &output, uint32_t rshift) const;
 
 	// return the status register
-	uint8_t status() const { return m_status; }
+	uint8_t status() const { return m_status & STATUS_EXTERNAL; }
+
+	// clear bits in the status register
+	void clear_status(uint8_t status) { m_status &= ~(status & STATUS_EXTERNAL); }
 
 	// handle special register reads
 	uint8_t read(uint32_t regnum);
@@ -335,31 +352,56 @@ public:
 	void write(uint32_t regnum, uint8_t value);
 
 private:
-	// helper - return the current address shift
+	// update the status register
+	void set_reset_status(uint32_t set, uint32_t reset = 0) { m_status = (m_status & ~reset) | set; }
+
+	// return the current address shift
 	uint32_t address_shift() const;
 
-	// load the start address
-	void load_start();
+	// advance the address by one byte, return true if the end address was hit
+	bool advance_address();
 
-	// limit checker; stops at the last byte of the chunk described by address_shift()
-	bool at_limit() const { return (m_curaddress == (((m_regs.limit() + 1) << address_shift()) - 1)); }
+	// request the next byte of data
+	bool request_data();
 
-	// end checker; stops at the last byte of the chunk described by address_shift()
-	bool at_end() const { return (m_curaddress == (((m_regs.end() + 1) << address_shift()) - 1)); }
+	// perform a read cycle from RAM/ROM
+	uint8_t read_ram();
+
+	// perform a write cycle to RAM
+	void write_ram(uint8_t value);
+
+	// latch the current address
+	void latch_addresses() { m_curaddress = m_regs.external() ? (m_regs.start() << address_shift()) : 0; }
+
+	// append a byte to our internal buffer
+	void append_buffer_byte(uint8_t data)
+	{
+		m_buffer |= data << (24 - 4 * m_nibbles);
+		m_nibbles += 2;
+	}
+
+	// consume the requested number of nibbles from the buffer
+	uint32_t consume_nibbles(uint8_t count)
+	{
+		uint32_t result = m_buffer >> (32 - 4 * count);
+		m_buffer <<= 4 * count;
+		m_nibbles = (m_nibbles > count) ? (m_nibbles - count) : 0;
+		return result;
+	}
 
 	// internal state
-	uint32_t const m_address_shift; // address bits shift-left
-	uint32_t m_status;              // currently playing?
-	uint32_t m_curnibble;           // index of the current nibble
-	uint32_t m_curbyte;             // current byte of data
-	uint32_t m_dummy_read;          // dummy read tracker
-	uint32_t m_position;            // current fractional position
-	uint32_t m_curaddress;          // current address
-	int32_t m_accumulator;          // accumulator
-	int32_t m_prev_accum;           // previous accumulator (for linear interp)
-	int32_t m_adpcm_step;           // next forecast
-	adpcm_b_registers &m_regs;      // reference to registers
-	adpcm_b_engine &m_owner;        // reference to our owner
+	uint32_t const m_address_shift;     // address bits shift-left
+	uint32_t m_status;                  // currently playing?
+	uint32_t m_buffer;                  // buffer of bytes read, left-justified
+	uint32_t m_nibbles;                 // number of nibbles in m_bytebuffer
+	uint32_t m_position;                // current fractional position
+	uint32_t m_curaddress;              // current address
+	int32_t m_accumulator;              // accumulator
+	int32_t m_output;                   // current output value
+	int32_t m_prev_output;              // previous output value (for linear interp)
+	int32_t m_adpcm_step;               // next forecast
+	adpcm_b_registers &m_regs;          // reference to registers
+	adpcm_b_engine &m_owner;            // reference to our owner
 };
 
 
@@ -392,6 +434,7 @@ public:
 
 	// status
 	uint8_t status() const { return m_channel->status(); }
+	void clear_status(uint8_t status) { m_channel->clear_status(status); }
 
 	// return a reference to our interface
 	ymfm_interface &intf() { return m_intf; }

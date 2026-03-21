@@ -10,6 +10,7 @@ main components:
 RMI AU1250-400MGD SoC
 2x Zentel A3R12E4JFF-G8E DDR2-800MHz 32Mx16 DRAM
 Lattice XP2
+93C46 EEPROM
 bank of 8 switches
 
 other components aren't readable
@@ -36,7 +37,7 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	void amcoe_ha1(machine_config &config);
+	void amcoe_ha1(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -105,7 +106,17 @@ ROM_START( burningr )
 	ROM_LOAD16_BYTE( "mx29lv040.u22", 0x00001, 0x80000, BAD_DUMP CRC(8dfbee69) SHA1(4a899e81aafe68d76086c1d1269df046a44b6a33) ) // very suspect dump, odd bytes are always 0
 ROM_END
 
+ROM_START( creepyrl ) // not exactly the same PCB, but same CPU and mostly same components
+	ROM_REGION( 0x10000000, "maincpu", 0 )
+	ROM_LOAD( "k9f2g08u0a.bin", 0x00000000, 0x10000000, BAD_DUMP CRC(96bca4e6) SHA1(c13efbe4773b4270e49c61bc85afd64802687ac8) )
+
+	ROM_REGION( 0x100000, "unsorted", 0 )
+	ROM_LOAD16_BYTE( "en29f040.u25", 0x00000, 0x80000, CRC(a5239994) SHA1(8102e3f6191d847b12db2a9db84818fd599cb801) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "en29f040.u26", 0x00001, 0x80000, CRC(b94d1863) SHA1(1c4877cef0c43c939477810f257f241686fe256e) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+ROM_END
+
 } // anonymous namespace
 
 
 GAME( 2010, burningr, 0, amcoe_ha1, burningr, amcoe_ha1_state, empty_init, ROT0, "Amcoe", "Burning Rubber (Amcoe)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2010, creepyrl, 0, amcoe_ha1, burningr, amcoe_ha1_state, empty_init, ROT0, "Amcoe", "Creepy Reels",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

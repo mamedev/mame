@@ -21,7 +21,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mdosa" cloneof="mdos">
-		<description>MicroDOS 2.6 (Alt)</description>
+		<description>MicroDOS 2.6 (alt)</description>
 		<year>1988</year>
 		<publisher>IRIMS</publisher>
 		<part name="flop" interface="floppy_5_25">
@@ -54,7 +54,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="caosa" cloneof="caos">
-		<description>CAOS (Alt)</description>
+		<description>CAOS (alt)</description>
 		<year>198?</year>
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="flop" interface="floppy_5_25">

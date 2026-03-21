@@ -1648,17 +1648,8 @@ static const gfx_layout spi_spritelayout5 =
 #endif
 
 static GFXDECODE_START( gfx_spi )
-	GFXDECODE_ENTRY( "sprites", 0, spi_spritelayout,  0, 64 )
 	GFXDECODE_ENTRY( "tiles",   0, spi_tilelayout, 4096, 24 )
 	GFXDECODE_ENTRY( "chars",   0, spi_charlayout, 5632, 16 )
-#if PLANE_SPRITE
-	GFXDECODE_ENTRY( "sprites", 0, spi_spritelayout0, 0, 6144/2 )
-	GFXDECODE_ENTRY( "sprites", 0, spi_spritelayout1, 0, 6144/2 )
-	GFXDECODE_ENTRY( "sprites", 0, spi_spritelayout2, 0, 6144/2 )
-	GFXDECODE_ENTRY( "sprites", 0, spi_spritelayout3, 0, 6144/2 )
-	GFXDECODE_ENTRY( "sprites", 0, spi_spritelayout4, 0, 6144/2 )
-	GFXDECODE_ENTRY( "sprites", 0, spi_spritelayout5, 0, 6144/2 )
-#endif
 #if PLANE_TILE
 	GFXDECODE_ENTRY( "tiles",   0, spi_tilelayout0,   0, 6144/2 )
 	GFXDECODE_ENTRY( "tiles",   0, spi_tilelayout1,   0, 6144/2 )
@@ -1674,6 +1665,18 @@ static GFXDECODE_START( gfx_spi )
 	GFXDECODE_ENTRY( "chars",   0, spi_charlayout3,   0, 6144/2 )
 	GFXDECODE_ENTRY( "chars",   0, spi_charlayout4,   0, 6144/2 )
 	GFXDECODE_ENTRY( "chars",   0, spi_charlayout5,   0, 6144/2 )
+#endif
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_spi_spr )
+	GFXDECODE_ENTRY( "sprites", 0, spi_spritelayout,  0, 64 )
+#if PLANE_SPRITE
+	GFXDECODE_ENTRY( "sprites", 0, spi_spritelayout0, 0, 6144/2 )
+	GFXDECODE_ENTRY( "sprites", 0, spi_spritelayout1, 0, 6144/2 )
+	GFXDECODE_ENTRY( "sprites", 0, spi_spritelayout2, 0, 6144/2 )
+	GFXDECODE_ENTRY( "sprites", 0, spi_spritelayout3, 0, 6144/2 )
+	GFXDECODE_ENTRY( "sprites", 0, spi_spritelayout4, 0, 6144/2 )
+	GFXDECODE_ENTRY( "sprites", 0, spi_spritelayout5, 0, 6144/2 )
 #endif
 GFXDECODE_END
 
@@ -1785,6 +1788,13 @@ void seibuspi_tilemap_state::base_video(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spi);
 
 	PALETTE(config, m_palette, palette_device::BLACK, 6144);
+
+	SEI25X_RISE1X(config, m_spritegen, 0, m_palette, gfx_spi_spr);
+	m_spritegen->set_screen("screen");
+	m_spritegen->set_gfxbank_callback(FUNC(seibuspi_state::gfxbank_callback));
+	m_spritegen->set_pix_raw_shift(6);
+	m_spritegen->set_pri_raw_shift(14);
+	m_spritegen->set_transpen(63);
 
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.decrypt_key_callback().set(FUNC(seibuspi_tilemap_state::tile_decrypt_key_w));
@@ -1973,9 +1983,13 @@ void sys386f_state::sys386f(machine_config &config)
 	screen.set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
 	screen.set_screen_update(FUNC(sys386f_state::screen_update_sys386f));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sys386f);
-
 	PALETTE(config, m_palette, palette_device::BLACK, 8192);
+
+	SEI25X_RISE1X(config, m_spritegen, 0, m_palette, gfx_sys386f);
+	m_spritegen->set_screen("screen");
+	m_spritegen->set_pix_raw_shift(8);
+	m_spritegen->set_pri_raw_shift(14);
+	m_spritegen->set_transpen(255);
 
 	/* sound hardware */
 	// Single PCBs only output mono sound

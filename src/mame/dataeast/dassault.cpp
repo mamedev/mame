@@ -474,7 +474,7 @@ void dassault_state::control_w(uint16_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	if (data & 0xfffe)
-		logerror("Coin cointrol %04x\n", data);
+		logerror("Coin control %04x\n", data);
 }
 
 /**********************************************************************************/

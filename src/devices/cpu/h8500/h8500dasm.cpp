@@ -63,7 +63,7 @@ const char *const h8500_disassembler::s_branches[0x10] =
 	"BGT", "BLE"
 };
 
-offs_t h8500_disassembler::opcode_alignment() const
+u32 h8500_disassembler::opcode_alignment() const
 {
 	return 1;
 }

@@ -74,11 +74,6 @@
 
 #include "emu.h"
 
-#include "cpu/i386/i386.h"
-#include "machine/pci.h"
-#include "machine/pci-ide.h"
-#include "machine/i82371sb.h"
-#include "machine/i82439hx.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/pci/vision.h"
 //#include "bus/rs232/hlemouse.h"
@@ -86,7 +81,11 @@
 #include "bus/rs232/rs232.h"
 //#include "bus/rs232/sun_kbd.h"
 #include "bus/rs232/terminal.h"
+#include "cpu/i386/i386.h"
+#include "machine/i82371sb.h"
+#include "machine/i82439hx.h"
 #include "machine/pc87306.h"
+#include "machine/pci.h"
 
 
 namespace {

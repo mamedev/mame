@@ -8,6 +8,9 @@
 
     driver by Nicola Salmoria
 
+    BTANB:
+    - dark red opaque background behind text labels
+
 
     PCB Layout (Combat Hawk)
     -----------------------
@@ -197,16 +200,17 @@ void bankp_state::palette(palette_device &palette) const
 		bit1 = BIT(*color_prom, 1);
 		bit2 = BIT(*color_prom, 2);
 		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		// green component
 		bit0 = BIT(*color_prom, 3);
 		bit1 = BIT(*color_prom, 4);
 		bit2 = BIT(*color_prom, 5);
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		// blue component
-		bit0 = 0;
-		bit1 = BIT(*color_prom, 6);
-		bit2 = BIT(*color_prom, 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(*color_prom, 6);
+		bit1 = BIT(*color_prom, 7);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 

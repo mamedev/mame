@@ -94,7 +94,8 @@ Notes (couriersud)
 
     From http://www.crazykong.com/tech/IremBoardList.txt
 
-    ipminvad:       M-10L + M-10S (also exists on M-11 hw)
+    ipminvad:       M-10L + M-10S
+    ipminvad2:      M-11L + M-11S-1
     andromed:       M-11L + M-11S + M-29S
     skychut:        M-11 (?)
     spacbeam:       not listed
@@ -102,16 +103,6 @@ Notes (couriersud)
     greenber:       M-15T, M-24S
 
     M10-Board: Has SN76477
-
-    ipminvad1
-    ========
-
-    This is from an incomplete dump without documentation.
-    The filename contained m10 and with a hack to work
-    around the missing ROM you get some action.
-
-    The files are all different from ipminvad. Either this has
-    been a prototype or possibly the famous "Capsule Invader".
 
 ***************************************************************************/
 
@@ -174,28 +165,6 @@ protected:
 
 	required_ioport m_cab;
 
-	static constexpr XTAL IREMM10_MASTER_CLOCK = 12.5_MHz_XTAL;
-
-	static constexpr XTAL IREMM10_CPU_CLOCK = IREMM10_MASTER_CLOCK / 16;
-	static constexpr XTAL IREMM10_PIXEL_CLOCK = IREMM10_MASTER_CLOCK / 2;
-	static constexpr int IREMM10_HTOTAL = 360; // (0x100-0xd3) * 8
-	static constexpr int IREMM10_HBSTART = 248;
-	static constexpr int IREMM10_HBEND = 8;
-	static constexpr int IREMM10_VTOTAL = 281; // (0x200-0xe7)
-	static constexpr int IREMM10_VBSTART = 240;
-	static constexpr int IREMM10_VBEND = 16;
-
-	static constexpr XTAL IREMM11_MASTER_CLOCK = 11.73_MHz_XTAL;
-
-	static constexpr XTAL IREMM11_CPU_CLOCK = IREMM11_MASTER_CLOCK / 16;
-	static constexpr XTAL IREMM11_PIXEL_CLOCK = IREMM11_MASTER_CLOCK / 2;
-	static constexpr int IREMM11_HTOTAL = 372;
-	static constexpr int IREMM11_HBSTART = 256;
-	static constexpr int IREMM11_HBEND = 0;
-	static constexpr int IREMM11_VTOTAL = 262;
-	static constexpr int IREMM11_VBSTART = 240;
-	static constexpr int IREMM11_VBEND = 16;
-
 	// video-related
 	tilemap_t *m_tx_tilemap;
 
@@ -220,8 +189,11 @@ public:
 		m_ic8j2(*this, "ic8j2")
 	{ }
 
-	void m10(machine_config &config);
-	void m11(machine_config &config);
+	void init_ipminvad();
+	void init_andromed();
+
+	void m10(machine_config &config) ATTR_COLD;
+	void m11(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(set_vr1) { m_ic8j2->set_resistor_value(RES_K(10 + newval / 5.0)); }
 
@@ -246,7 +218,6 @@ private:
 	uint8_t clear_74123_r();
 	void chargen_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	inline void plot_pixel(bitmap_ind16 &bm, int x, int y, int col);
 
 	void m10_main(address_map &map) ATTR_COLD;
 	void m11_main(address_map &map) ATTR_COLD;
@@ -259,7 +230,7 @@ public:
 		m1x_state(mconfig, type, tag)
 	{ }
 
-	void m15(machine_config &config);
+	void m15(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -345,15 +316,6 @@ void m15_state::chargen_w(offs_t offset, uint8_t data)
 }
 
 
-inline void m10_state::plot_pixel(bitmap_ind16 &bm, int x, int y, int col)
-{
-	if (!m_flip)
-		bm.pix(y, x) = col;
-	else
-		bm.pix((IREMM10_VBSTART - 1) - (y - IREMM10_VBEND),
-				(IREMM10_HBSTART - 1) - (x - IREMM10_HBEND)) = col; // only when flip_screen(?)
-}
-
 void m10_state::video_start()
 {
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m10_state::get_tile_info)), tilemap_mapper_delegate(*this, FUNC(m10_state::tilemap_scan)), 8, 8, 32, 32);
@@ -370,6 +332,7 @@ void m15_state::video_start()
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m15_state::get_tile_info)), tilemap_mapper_delegate(*this, FUNC(m15_state::tilemap_scan)), 8, 8, 32, 32);
 }
 
+
 /***************************************************************************
 
   Draw the game screen in the given bitmap_ind16.
@@ -382,14 +345,21 @@ uint32_t m10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	for (int i = 0; i < 4; i++)
 		if (m_flip)
-				m_back_gfx->opaque(bitmap,cliprect, i, m_back_color[i], 1, 1, 31 * 8 - m_back_xpos[i], 0);
+			m_back_gfx->opaque(bitmap,cliprect, i, m_back_color[i], 1, 1, 31 * 8 - m_back_xpos[i], 0);
 		else
-				m_back_gfx->opaque(bitmap,cliprect, i, m_back_color[i], 0, 0, m_back_xpos[i], 0);
+			m_back_gfx->opaque(bitmap,cliprect, i, m_back_color[i], 0, 0, m_back_xpos[i], 0);
 
 	if (m_bottomline)
 	{
-		for (int y = IREMM10_VBEND; y < IREMM10_VBSTART; y++)
-			plot_pixel(bitmap, 16, y, 1);
+		int x = 16;
+		if (m_flip)
+			x = screen.visible_area().right() - (x - screen.visible_area().left());
+
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+		{
+			if (cliprect.contains(x, y))
+				bitmap.pix(y, x) = 1;
+		}
 	}
 
 	for (int offs = m_videoram.bytes() - 1; offs >= 0; offs--)
@@ -446,6 +416,19 @@ void m10_state::machine_start()
 {
 	m1x_state::machine_start();
 	save_item(NAME(m_bottomline));
+}
+
+void m10_state::init_ipminvad()
+{
+	m_back_color[0] = 3; m_back_color[1] = 3; m_back_color[2] = 5; m_back_color[3] = 5;
+	m_back_xpos[0] = 4 * 8; m_back_xpos[1] = 26 * 8; m_back_xpos[2] = 7 * 8; m_back_xpos[3] = 6 * 8;
+}
+
+void m10_state::init_andromed()
+{
+	// chargen is unused by skychut?
+	m_back_color[0] = 3; m_back_color[1] = 0; m_back_color[2] = 3; m_back_color[3] = 3;
+	m_back_xpos[0] = 4 * 8; m_back_xpos[1] = 26 * 8; m_back_xpos[2] = 2 * 8; m_back_xpos[3] = 3 * 8;
 }
 
 void m1x_state::machine_reset()
@@ -539,7 +522,6 @@ void m10_state::m10_ctrl_w(uint8_t data)
 		m_samples->stop(4);
 	else
 		m_samples->start(4, 9, true);
-
 }
 
 /*
@@ -650,7 +632,6 @@ void m10_state::m11_a100_w(uint8_t data)
 		m_samples->start(4, 9, true);
 	else
 		m_samples->stop(4);
-
 }
 
 void m15_state::a100_w(uint8_t data)
@@ -734,7 +715,7 @@ INPUT_CHANGED_MEMBER(m1x_state::coin_inserted)
 
 INTERRUPT_GEN_MEMBER(m15_state::interrupt)
 {
-	device.execute().pulse_input_line(0, m_screen->time_until_pos(IREMM11_VBSTART + 1, 80));
+	device.execute().pulse_input_line(0, m_screen->time_until_pos(m_screen->visible_area().bottom() + 1, 80));
 }
 
 
@@ -1017,10 +998,10 @@ INPUT_PORTS_END
  *
  *************************************/
 
-
 static GFXDECODE_START( gfx_m10 )
 	GFXDECODE_ENTRY( "tiles", 0x0000, charlayout, 0, 8 )
 GFXDECODE_END
+
 
 /*************************************
  *
@@ -1054,12 +1035,12 @@ static const char *const m10_sample_names[] =
 void m10_state::m10(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, IREMM10_CPU_CLOCK);
+	M6502(config, m_maincpu, 12.5_MHz_XTAL / 16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m10_state::m10_main);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(IREMM10_PIXEL_CLOCK, IREMM10_HTOTAL, IREMM10_HBEND, IREMM10_HBSTART, IREMM10_VTOTAL, IREMM10_VBEND, IREMM10_VBSTART);
+	m_screen->set_raw(12.5_MHz_XTAL / 2, 360 /* (0x100-0xd3) * 8 */, 8, 248, 281 /* (0x200-0xe7) */, 16, 240);
 	m_screen->set_screen_update(FUNC(m10_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -1093,35 +1074,30 @@ void m10_state::m10(machine_config &config)
 	m_samples->set_channels(6);
 	m_samples->set_samples_names(m10_sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	m_back_color[0] = 3; m_back_color[1] = 3; m_back_color[2] = 5; m_back_color[3] = 5;
-	m_back_xpos[0] = 4 * 8; m_back_xpos[1] = 26 * 8; m_back_xpos[2] = 7 * 8; m_back_xpos[3] = 6 * 8;
 }
 
 void m10_state::m11(machine_config &config)
 {
 	m10(config);
 
-	m_maincpu->set_clock(IREMM11_CPU_CLOCK);
-	m_screen->set_raw(IREMM11_PIXEL_CLOCK, IREMM11_HTOTAL, IREMM11_HBEND, IREMM11_HBSTART, IREMM11_VTOTAL, IREMM11_VBEND, IREMM11_VBSTART);
+	// video hardware
+	m_maincpu->set_clock(11.73_MHz_XTAL / 16);
+	m_screen->set_raw(11.73_MHz_XTAL / 2, 372, 0, 256, 262, 16, 240);
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &m10_state::m11_main);
-
-	m_back_color[0] = 3; m_back_color[1] = 0; m_back_color[2] = 3; m_back_color[3] = 3;
-	m_back_xpos[0] = 4 * 8; m_back_xpos[1] = 26 * 8; m_back_xpos[2] = 2 * 8; m_back_xpos[3] = 3 * 8;
 }
 
 void m15_state::m15(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, IREMM11_CPU_CLOCK);
+	M6502(config, m_maincpu, 11.73_MHz_XTAL / 16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m15_state::main);
 	m_maincpu->set_vblank_int("screen", FUNC(m15_state::interrupt));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(IREMM11_PIXEL_CLOCK, IREMM11_HTOTAL, IREMM11_HBEND, IREMM11_HBSTART, IREMM11_VTOTAL, IREMM11_VBEND, IREMM11_VBSTART);
+	m_screen->set_raw(11.73_MHz_XTAL / 2, 372, 0, 256, 262, 16, 240);
 	m_screen->set_screen_update(FUNC(m15_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -1174,6 +1150,18 @@ ROM_START( ipminvad1 )
 	ROM_REGION( 0x0800, "tiles", 0 )
 	ROM_LOAD( "b9.g3",  0x0000, 0x0400, CRC(f6cfa53c) SHA1(ec1076982edee95efb24a1bb08e733bcccacb922) )
 	ROM_LOAD( "b10.h3", 0x0400, 0x0400, CRC(63672cd2) SHA1(3d9fa15509a363e1a32e58a2242b266b1162e9a6) )
+ROM_END
+
+ROM_START( ipminvad2 ) // Uses TMM334P mask ROMs (2716 compatible) instead of 2708, all soldered in
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "4610.f8",         0x1000, 0x0800, CRC(6cc19f10) SHA1(e43780fd0a00a884d3021f9149d3d120974d806f) )
+	ROM_LOAD( "4611.h8",         0x1800, 0x0800, CRC(fc9de345) SHA1(b2630c8100339124a5f590d15f2d62d2d784bbe5) )
+	ROM_LOAD( "4612.e8",         0x2000, 0x0800, CRC(9c7adf92) SHA1(a2720757c29863c42b2a63879ccc234bfaa3c5c8) )
+	ROM_LOAD( "4613.c8",         0x2800, 0x0800, CRC(0d592485) SHA1(dc54ac86a9010da1211f067d8235e7ae01db4f04) ) // 1xxxxxxxxxx = 0xFF
+	ROM_COPY( "maincpu", 0x1c00, 0xfc00, 0x0400 ) // for the reset and interrupt vectors
+
+	ROM_REGION( 0x0800, "tiles", 0 )
+	ROM_LOAD( "4614.c6",  0x0000, 0x0800, CRC(d48d622d) SHA1(ad463bbc12d67136f3b5891e39b2a113c84181e4) )
 ROM_END
 
 ROM_START( andromed )
@@ -1249,13 +1237,14 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME       PARENT    MACHINE INPUT     CLASS      INIT        ROT     COMPANY FULLNAME                         FLAGS
-GAME( 1979, ipminvad,  0,        m10,    ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (set 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, ipminvad1, ipminvad, m10,    ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (set 2)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE INPUT     CLASS      INIT           ROT     COMPANY FULLNAME                         FLAGS
+GAME( 1979, ipminvad,  0,        m10,    ipminvad, m10_state, init_ipminvad, ROT270, "IPM",  "IPM Invader (M10, set 1)",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ipminvad1, ipminvad, m10,    ipminvad, m10_state, init_ipminvad, ROT270, "IPM",  "IPM Invader (M10, set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ipminvad2, ipminvad, m11,    ipminvad, m10_state, init_ipminvad, ROT270, "IPM",  "IPM Invader (M11)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1980, andromed,  0,        m11,    andromed, m10_state, empty_init, ROT270, "Irem", "Andromeda SS (Japan?)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // export version known as simply "Andromeda"
-GAME( 1980, skychut,   0,        m11,    skychut,  m10_state, empty_init, ROT270, "Irem", "Sky Chuter",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, andromed,  0,        m11,    andromed, m10_state, init_andromed, ROT270, "Irem", "Andromeda SS (Japan?)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // export version known as simply "Andromeda"
+GAME( 1980, skychut,   0,        m11,    skychut,  m10_state, init_andromed, ROT270, "Irem", "Sky Chuter",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1979, headoni,   0,        m15,    headoni,  m15_state, empty_init, ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spacbeam,  0,        m15,    spacbeam, m15_state, empty_init, ROT270, "Irem", "Space Beam",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
-GAME( 1980, greenber,  0,        m15,    greenber, m15_state, empty_init, ROT270, "Irem", "Green Beret (Irem)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headoni,   0,        m15,    headoni,  m15_state, empty_init,    ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacbeam,  0,        m15,    spacbeam, m15_state, empty_init,    ROT270, "Irem", "Space Beam",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
+GAME( 1980, greenber,  0,        m15,    greenber, m15_state, empty_init,    ROT270, "Irem", "Green Beret (Irem)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

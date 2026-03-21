@@ -33,7 +33,7 @@ menu_plugin::menu_plugin(mame_ui_manager &mui, render_container &container) :
 	menu(mui, container),
 	m_plugins(mame_machine_manager::instance()->lua()->get_menu())
 {
-	set_heading(_("Plugin Options"));
+	set_heading(_("menu-pluginopts", "Plugin Options"));
 }
 
 void menu_plugin::populate()
@@ -61,12 +61,14 @@ menu_plugin_opt::menu_plugin_opt(mame_ui_manager &mui, render_container &contain
 	m_menu(menu),
 	m_need_idle(false)
 {
+	set_needs_prev_menu_item(false);
 	set_one_shot(one_shot);
 }
 
 bool menu_plugin_opt::handle(event const *ev)
 {
 	void *const itemref = ev ? ev->itemref : get_selection_ref();
+	auto const itemrefno = uintptr_t(itemref);
 	std::string key;
 	if (ev)
 	{
@@ -91,6 +93,11 @@ bool menu_plugin_opt::handle(event const *ev)
 			key = "nextgroup";
 			break;
 		case IPT_UI_SELECT:
+			if (!itemrefno)
+			{
+				stack_pop();
+				return false;
+			}
 			key = "select";
 			break;
 		case IPT_UI_DISPLAY_COMMENT:
@@ -116,9 +123,13 @@ bool menu_plugin_opt::handle(event const *ev)
 	if (key.empty() && !m_need_idle)
 		return false;
 
-	auto const result = mame_machine_manager::instance()->lua()->menu_callback(m_menu, uintptr_t(itemref), key);
+	auto const result = mame_machine_manager::instance()->lua()->menu_callback(m_menu, itemrefno, key);
 	if (result.second)
-		set_selection(reinterpret_cast<void *>(uintptr_t(*result.second)));
+	{
+		auto const selno = uintptr_t(*result.second);
+		if (selno >= 1)
+			set_selection(reinterpret_cast<void *>(selno));
+	}
 	if (result.first)
 		reset(reset_options::REMEMBER_REF);
 	else if (ev && (ev->iptkey == IPT_UI_BACK))
@@ -176,9 +187,17 @@ void menu_plugin_opt::populate()
 		++i;
 	}
 	item_append(menu_item_type::SEPARATOR);
+	item_append(
+			is_one_shot() ? _("menu-pluginopts", "Close Menu") : _("menu-pluginopts", "Return to Plugin Options Menu"),
+			0,
+			reinterpret_cast<void *>(uintptr_t(0)));
 
 	if (sel)
-		set_selection(reinterpret_cast<void *>(uintptr_t(*sel)));
+	{
+		auto const selno = uintptr_t(*sel);
+		if ((sel >= 1U) && (sel < i))
+			set_selection(reinterpret_cast<void *>(selno));
+	}
 
 	uint32_t process_flags = 0U;
 	m_need_idle = false;

@@ -13,7 +13,7 @@ uint32_t v60_device::opINCB() /* TRUSTED */
 	else
 		appb = m_program->read_byte(m_amout);
 
-	ADDB(appb, 1);
+	ADDB(appb, 1, 0);
 
 	if (m_amflag)
 		SETREG8(m_reg[m_amout], appb);
@@ -36,7 +36,7 @@ uint32_t v60_device::opINCH() /* TRUSTED */
 	else
 		apph = m_program->read_word_unaligned(m_amout);
 
-	ADDW(apph, 1);
+	ADDW(apph, 1, 0);
 
 	if (m_amflag)
 		SETREG16(m_reg[m_amout], apph);
@@ -59,7 +59,7 @@ uint32_t v60_device::opINCW() /* TRUSTED */
 	else
 		appw = m_program->read_dword_unaligned(m_amout);
 
-	ADDL(appw, 1);
+	ADDL(appw, 1, 0);
 
 	if (m_amflag)
 		m_reg[m_amout] = appw;
@@ -82,7 +82,7 @@ uint32_t v60_device::opDECB() /* TRUSTED */
 	else
 		appb = m_program->read_byte(m_amout);
 
-	SUBB(appb, 1);
+	SUBB(appb, 1, 0);
 
 	if (m_amflag)
 		SETREG8(m_reg[m_amout], appb);
@@ -105,7 +105,7 @@ uint32_t v60_device::opDECH() /* TRUSTED */
 	else
 		apph = m_program->read_word_unaligned(m_amout);
 
-	SUBW(apph, 1);
+	SUBW(apph, 1, 0);
 
 	if (m_amflag)
 		SETREG16(m_reg[m_amout], apph);
@@ -128,7 +128,7 @@ uint32_t v60_device::opDECW() /* TRUSTED */
 	else
 		appw = m_program->read_dword_unaligned(m_amout);
 
-	SUBL(appw, 1);
+	SUBL(appw, 1, 0);
 
 	if (m_amflag)
 		m_reg[m_amout] = appw;
@@ -417,18 +417,18 @@ uint32_t v60_device::opTASI()
 
 	// Load uint8_t from the address
 	if (m_amflag)
-		appb = (uint8_t)m_reg[m_amout & 0x1F];
+		appb = (uint8_t)m_reg[m_amout & 0x1f];
 	else
 		appb = m_program->read_byte(m_amout);
 
 	// Set the flags for SUB appb, FF
-	SUBB(appb, 0xff);
+	SUBB(appb, 0xff, 0);
 
 	// Write FF in the operand
 	if (m_amflag)
-		SETREG8(m_reg[m_amout & 0x1F], 0xFF);
+		SETREG8(m_reg[m_amout & 0x1f], 0xff);
 	else
-		m_program->write_byte(m_amout, 0xFF);
+		m_program->write_byte(m_amout, 0xff);
 
 	return m_amlength1 + 1;
 }

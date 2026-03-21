@@ -4,7 +4,7 @@
 
 TODO:
 - SIGABRT in pcipc/pciagp trying to execute ppm.exe,
-  in shutms11 will draw "Parallel Port Manager v4.0" then fail on device check.
+  in shutms11 & ls5amvp3 will draw "Parallel Port Manager v4.0" then fail on device check.
 \- "Testing I/O board connection"
    bp 100027e2, edit $25dd11 = 0x02 (board identifier?)
 \- "Testing I/O board communications"
@@ -15,6 +15,16 @@ TODO:
    Goes ahead in checking each port r/w, TBD
 \- Fails win98 PS/2 PnP afterwards, which isn't supposed to be connected in the first place.
 - Extract "Guard.zip" and understand what is for;
+\- WARNING: once in non-Safe Mode Windows (after drivers installation etc.) the OS has a Startup
+   item for the frontend (neofend.exe). If protection fails it will proceed to *wipe out* the
+   entire HDD and any non-write protected floppy, it is advised to backup the .dif before fiddling
+   with that.
+\- PPM puts following files in memory, with header "NeomaniaUniversalMonitorVer5":
+   - C:/Neomania/Pkunzip.exe;Guard.zip;Pkzip.exe
+   - C:/windows/win.ini;user.dat
+   - <A scrambled pattern in between>, xor with 0xff gives back the same
+     'C:/Neomania/Driver/Ppm.exe' (...)
+   - C:/Neomania/Neofend.dat (as a key result for the protection?)
 
 ===================================================================================================
 
@@ -71,13 +81,8 @@ void neomania_state::neomania_map(address_map &map)
 {
 }
 
-static INPUT_PORTS_START( neomania )
-INPUT_PORTS_END
-
-
 void neomania_state::neomania(machine_config &config)
 {
-	// Basic machine hardware
 	// Neoemu.exe requires a processor with at least MMX features
 	PENTIUM3(config, m_maincpu, 100'000'000); // Exact hardware not specified
 	m_maincpu->set_addrmap(AS_PROGRAM, &neomania_state::neomania_map);
@@ -104,4 +109,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 2003, neomania, 0, neomania, neomania, neomania_state, empty_init, ROT0, "bootleg (Hyper M.A.R.)", "Neo Mania (Portugal)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2003, neomania, 0, neomania, 0, neomania_state, empty_init, ROT0, "bootleg (Hyper M.A.R.)", "Neo Mania (Portugal)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

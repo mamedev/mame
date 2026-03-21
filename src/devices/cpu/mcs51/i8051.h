@@ -15,7 +15,7 @@
 
 enum
 {
-	MCS51_PC=1, MCS51_SP, MCS51_PSW, MCS51_ACC, MCS51_B, MCS51_DPTR, MCS51_IE, MCS51_IP,
+	MCS51_PC = 1, MCS51_SP, MCS51_PSW, MCS51_ACC, MCS51_B, MCS51_DPTR, MCS51_IE, MCS51_IP,
 	MCS51_P0, MCS51_P1, MCS51_P2, MCS51_P3,
 	MCS51_R0, MCS51_R1, MCS51_R2, MCS51_R3, MCS51_R4, MCS51_R5, MCS51_R6, MCS51_R7, MCS51_RB,
 	MCS51_TCON, MCS51_TMOD, MCS51_TL0, MCS51_TL1, MCS51_TH0, MCS51_TH1
@@ -23,14 +23,14 @@ enum
 
 enum
 {
-	MCS51_INT0_LINE = 0,    // P3.2: External Interrupt 0
-	MCS51_INT1_LINE,        // P3.3: External Interrupt 1
-	MCS51_T0_LINE,          // P3.4: Timer 0 External Input
-	MCS51_T1_LINE,          // P3.5: Timer 1 External Input
-	MCS51_T2_LINE,          // P1.0: Timer 2 External Input
-	MCS51_T2EX_LINE,        // P1.1: Timer 2 Capture Reload Trigger
+	MCS51_INT0_LINE = 0, // P3.2: External Interrupt 0
+	MCS51_INT1_LINE,     // P3.3: External Interrupt 1
+	MCS51_T0_LINE,       // P3.4: Timer 0 External Input
+	MCS51_T1_LINE,       // P3.5: Timer 1 External Input
+	MCS51_T2_LINE,       // P1.0: Timer 2 External Input
+	MCS51_T2EX_LINE,     // P1.1: Timer 2 Capture Reload Trigger
 
-	DS5002FP_PFI_LINE       // DS5002FP Power fail interrupt
+	DS5002FP_PFI_LINE    // DS5002FP Power fail interrupt
 };
 
 
@@ -47,83 +47,83 @@ public:
 
 protected:
 	enum {
-		AS_INTD = 4,  // Direct internal access space
-		AS_INTI = 5,  // Indirect internal access space
+		AS_INTD = 4, // Direct internal access space
+		AS_INTI = 5, // Indirect internal access space
 	};
 
 	enum {
-		PSW_CY = 7,  //Carry Flag
-		PSW_AC = 6,  //Aux.Carry Flag
-		PSW_FO = 5,  //User Flag
-		PSW_RS = 3,  //R Bank Select
-		PSW_OV = 2,  //Overflow Flag
-		PSW_P  = 0,  //Parity Flag
+		PSW_CY = 7, // Carry Flag
+		PSW_AC = 6, // Aux.Carry Flag
+		PSW_FO = 5, // User Flag
+		PSW_RS = 3, // R Bank Select
+		PSW_OV = 2, // Overflow Flag
+		PSW_P  = 0, // Parity Flag
 	};
 
 	enum {
-		IE_A  = 7,  //Global Interrupt Enable/Disable
-		IE_T2 = 6,  //Timer 2 Interrupt Enable/Disable
-		IE_S  = 4,  //Serial Interrupt Enable/Disable
-		IE_T1 = 3,  //Timer 1 Interrupt Enable/Disable
-		IE_X1 = 2,  //External Int 1 Interrupt Enable/Disable
-		IE_T0 = 1,  //Timer 0 Interrupt Enable/Disable
-		IE_X0 = 0,  //External Int 0 Interrupt Enable/Disable
+		IE_A  = 7, // Global Interrupt Enable/Disable
+		IE_T2 = 6, // Timer 2 Interrupt Enable/Disable
+		IE_S  = 4, // Serial Interrupt Enable/Disable
+		IE_T1 = 3, // Timer 1 Interrupt Enable/Disable
+		IE_X1 = 2, // External Int 1 Interrupt Enable/Disable
+		IE_T0 = 1, // Timer 0 Interrupt Enable/Disable
+		IE_X0 = 0, // External Int 0 Interrupt Enable/Disable
 	};
 
 	enum {
-		IP_T2 = 5,  //Set Timer 2 Priority Level
-		IP_S  = 4,  //Set Serial Priority Level
-		IP_T1 = 3,  //Set Timer 1 Priority Level
-		IP_X1 = 2,  //Set External Int 1 Priority Level
-		IP_T0 = 1,  //Set Timer 0 Priority Level
-		IP_X0 = 0,  //Set External Int 0 Priority Level
+		IP_T2 = 5, // Set Timer 2 Priority Level
+		IP_S  = 4, // Set Serial Priority Level
+		IP_T1 = 3, // Set Timer 1 Priority Level
+		IP_X1 = 2, // Set External Int 1 Priority Level
+		IP_T0 = 1, // Set Timer 0 Priority Level
+		IP_X0 = 0, // Set External Int 0 Priority Level
 	};
 
 	enum {
-		TCON_TF1 = 7,  //Timer 1 Overflow Int Triggered
-		TCON_TR1 = 6,  //Timer 1 is running
-		TCON_TF0 = 5,  //Timer 0 Overflow Int Triggered
-		TCON_TR0 = 4,  //Timer 0 is running
-		TCON_IE1 = 3,  //External Int 1 Triggered
-		TCON_IT1 = 2,  //External Int 1 Trigger Cause
-		TCON_IE0 = 1,  //External Int 0 Triggered
-		TCON_IT0 = 0,  //External Int 0 Trigger Cause
+		TCON_TF1 = 7, // Timer 1 Overflow Int Triggered
+		TCON_TR1 = 6, // Timer 1 is running
+		TCON_TF0 = 5, // Timer 0 Overflow Int Triggered
+		TCON_TR0 = 4, // Timer 0 is running
+		TCON_IE1 = 3, // External Int 1 Triggered
+		TCON_IT1 = 2, // External Int 1 Trigger Cause
+		TCON_IE0 = 1, // External Int 0 Triggered
+		TCON_IT0 = 0, // External Int 0 Trigger Cause
 	};
 
 	enum {
-		SCON_SM0 = 7,  //Sets Serial Port Mode
-		SCON_SM1 = 6,  //Sets Serial Port Mode
-		SCON_SM2 = 5,  //Sets Serial Port Mode (Multiprocesser mode)
-		SCON_REN = 4,  //Sets Serial Port Receive Enable
-		SCON_TB8 = 3,  //Transmit 8th Bit
-		SCON_RB8 = 2,  //Receive 8th Bit
-		SCON_TI  = 1,  //Indicates Transmit Interrupt Occurred
-		SCON_RI  = 0,  //Indicates Receive Interrupt Occurred
+		SCON_SM0 = 7, // Sets Serial Port Mode
+		SCON_SM1 = 6, // Sets Serial Port Mode
+		SCON_SM2 = 5, // Sets Serial Port Mode (Multiprocesser mode)
+		SCON_REN = 4, // Sets Serial Port Receive Enable
+		SCON_TB8 = 3, // Transmit 8th Bit
+		SCON_RB8 = 2, // Receive 8th Bit
+		SCON_TI  = 1, // Indicates Transmit Interrupt Occurred
+		SCON_RI  = 0, // Indicates Receive Interrupt Occurred
 	};
 
 	enum {
-		TMOD_GATE1 = 7,  //Timer 1 Gate Mode
-		TMOD_CT1   = 6,  //Timer 1 Counter Mode
-		TMOD_M1_1  = 5,  //Timer 1 Timer Mode Bit 1
-		TMOD_M1_0  = 4,  //Timer 1 Timer Mode Bit 0
-		TMOD_GATE0 = 3,  //Timer 0 Gate Mode
-		TMOD_CT0   = 2,  //Timer 0 Counter Mode
-		TMOD_M0_1  = 1,  //Timer 0 Timer Mode Bit 1
-		TMOD_M0_0  = 0,  //Timer 0 Timer Mode Bit 0
+		TMOD_GATE1 = 7, // Timer 1 Gate Mode
+		TMOD_CT1   = 6, // Timer 1 Counter Mode
+		TMOD_M1_1  = 5, // Timer 1 Timer Mode Bit 1
+		TMOD_M1_0  = 4, // Timer 1 Timer Mode Bit 0
+		TMOD_GATE0 = 3, // Timer 0 Gate Mode
+		TMOD_CT0   = 2, // Timer 0 Counter Mode
+		TMOD_M0_1  = 1, // Timer 0 Timer Mode Bit 1
+		TMOD_M0_0  = 0, // Timer 0 Timer Mode Bit 0
 	};
 
 	enum {
-		PCON_SMOD  = 7,
-		PCON_GF1   = 3,
-		PCON_GF0   = 2,
-		PCON_PD    = 1,
-		PCON_IDL   = 0,
+		PCON_SMOD = 7,
+		PCON_GF1  = 3,
+		PCON_GF0  = 2,
+		PCON_PD   = 1,
+		PCON_IDL  = 0,
 
-		PCON_POR   = 6,
-		PCON_PFW   = 5,
-		PCON_WTR   = 4,
-		PCON_EPFW  = 3,
-		PCON_EWT   = 2,
+		PCON_POR  = 6,
+		PCON_PFW  = 5,
+		PCON_WTR  = 4,
+		PCON_EPFW = 3,
+		PCON_EWT  = 2,
 	};
 
 	// construction/destruction
@@ -156,45 +156,45 @@ protected:
 	address_space_config m_inti_config;
 
 	// Internal stuff
-	u16 m_ppc;              // previous pc
-	u16 m_pc;               // current pc
-	bool m_has_pd;          // can powerdown
-	u8  m_rwm;              // Signals that the current instruction is a read/write/modify instruction
+	u16 m_ppc;             // previous pc
+	u16 m_pc;              // current pc
+	bool m_has_pd;         // can powerdown
+	u8 m_rwm;              // Signals that the current instruction is a read/write/modify instruction
 
-	int      m_inst_cycles;      // cycles for the current instruction
-	const u32 m_rom_size;   // size (in bytes) of internal program ROM/EPROM
-	int      m_ram_mask;         // second ram bank for indirect access available ?
-	int      m_num_interrupts;   // number of interrupts supported
-	u32 m_last_line_state;  // last state of input lines line
-	int      m_t0_cnt;           // number of 0->1 transitions on T0 line
-	int      m_t1_cnt;           // number of 0->1 transitions on T1 line
-	int      m_t2_cnt;           // number of 0->1 transitions on T2 line
-	int      m_t2ex_cnt;         // number of 0->1 transitions on T2EX line
-	int      m_cur_irq_prio;     // Holds value of the current IRQ Priority Level; -1 if no irq
-	u8  m_irq_active;       // mask which irq levels are serviced
-	u8  m_irq_prio[8];      // interrupt priority
+	int m_inst_cycles;     // cycles for the current instruction (temporary variable)
+	const u32 m_rom_size;  // size (in bytes) of internal program ROM/EPROM
+	int m_ram_mask;        // second ram bank for indirect access available?
+	int m_num_interrupts;  // number of interrupts supported
+	u32 m_last_line_state; // last state of input lines line
+	int m_t0_cnt;          // number of 0->1 transitions on T0 line
+	int m_t1_cnt;          // number of 0->1 transitions on T1 line
+	int m_t2_cnt;          // number of 0->1 transitions on T2 line
+	int m_t2ex_cnt;        // number of 0->1 transitions on T2EX line
+	int m_cur_irq_prio;    // Holds value of the current IRQ Priority Level; -1 if no irq
+	u8 m_irq_active;       // mask which irq levels are serviced
+	u8 m_irq_prio[8];      // interrupt priority
 
-	u8  m_forced_inputs[4]; // allow read even if configured as output
+	u8 m_forced_inputs[4]; // allow read even if configured as output
 
 	// JB-related hacks
-	u8  m_last_op;
-	u8  m_last_bit;
+	u8 m_last_op;
+	u8 m_last_bit;
 
-	int      m_icount;
+	int m_icount;
 
 	struct mcs51_uart
 	{
-		u8  data_out;       // data to send out
-		u8  data_in;
-		u8  txbit;
-		u8  txd;
-		u8  rxbit;
-		u8  rxb8;
+		u8 data_out;       // data to send out
+		u8 data_in;
+		u8 txbit;
+		u8 txd;
+		u8 rxbit;
+		u8 rxb8;
 
-		int      smod_div;       // signal divided by 2^SMOD
-		int      rx_clk;         // rx clock
-		int      tx_clk;         // tx clock
-	} m_uart;                    // internal uart
+		int smod_div;      // signal divided by 2^SMOD
+		int rx_clk;        // rx clock
+		int tx_clk;        // tx clock
+	} m_uart;              // internal uart
 
 	// Internal Ram
 	u16 m_dptr;
@@ -210,49 +210,49 @@ protected:
 	virtual void sfr_map(address_map &map) ATTR_COLD;
 
 	// SFR Callbacks
-	u8   psw_r  ();
-	void psw_w  (u8 data);
-	u8   acc_r  ();
-	void acc_w  (u8 data);
-	u8   b_r    ();
-	void b_w    (u8 data);
+	u8 psw_r();
+	void psw_w(u8 data);
+	u8 acc_r();
+	void acc_w(u8 data);
+	u8 b_r();
+	void b_w(u8 data);
 
-	u8   sp_r   ();
-	void sp_w   (u8 data);
-	u8   dptr_r (offs_t offset);
-	void dptr_w (offs_t offset, u8 data);
-	u8   pcon_r ();
-	void pcon_w (u8 data);
-	u8   tcon_r ();
-	void tcon_w (u8 data);
-	u8   tmod_r ();
-	void tmod_w (u8 data);
-	u8   scon_r ();
-	void scon_w (u8 data);
-	u8   sbuf_r ();
-	void sbuf_w (u8 data);
-	u8   ie_r   ();
-	void ie_w   (u8 data);
-	u8   ip_r   ();
-	void ip_w   (u8 data);
+	u8 sp_r();
+	void sp_w(u8 data);
+	u8 dptr_r(offs_t offset);
+	void dptr_w(offs_t offset, u8 data);
+	u8 pcon_r();
+	void pcon_w(u8 data);
+	u8 tcon_r();
+	void tcon_w(u8 data);
+	u8 tmod_r();
+	void tmod_w(u8 data);
+	u8 scon_r();
+	void scon_w(u8 data);
+	u8 sbuf_r();
+	void sbuf_w(u8 data);
+	u8 ie_r();
+	void ie_w(u8 data);
+	u8 ip_r();
+	void ip_w(u8 data);
 
-	u8   p0_r   ();
-	void p0_w   (u8 data);
-	u8   p1_r   ();
-	void p1_w   (u8 data);
-	u8   p2_r   ();
-	void p2_w   (u8 data);
-	u8   p3_r   ();
-	void p3_w   (u8 data);
+	u8 p0_r();
+	void p0_w(u8 data);
+	u8 p1_r();
+	void p1_w(u8 data);
+	u8 p2_r();
+	void p2_w(u8 data);
+	u8 p3_r();
+	void p3_w(u8 data);
 
-	u8   tl0_r  ();
-	void tl0_w  (u8 data);
-	u8   tl1_r  ();
-	void tl1_w  (u8 data);
-	u8   th0_r  ();
-	void th0_w  (u8 data);
-	u8   th1_r  ();
-	void th1_w  (u8 data);
+	u8 tl0_r();
+	void tl0_w(u8 data);
+	u8 tl1_r();
+	void tl1_w(u8 data);
+	u8 th0_r();
+	void th0_w(u8 data);
+	u8 th1_r();
+	void th1_w(u8 data);
 
 	template<int bit> void set_bit(u8 &reg, bool state) {
 		if (state)
@@ -285,7 +285,6 @@ protected:
 	void set_pd (bool state) { set_bit<PCON_PD >(m_pcon, state); }
 	void set_idl(bool state) { set_bit<PCON_IDL>(m_pcon, state); }
 
-
 	void transmit(int state);
 
 	// Memory spaces
@@ -297,8 +296,7 @@ protected:
 	devcb_read8::array<8> m_port_in_cb;
 	devcb_write8::array<8> m_port_out_cb;
 
-	// for the debugger
-	u8 m_rtemp;
+	u8 m_rtemp; // for the debugger
 
 	static const u8 mcs51_cycles[256];
 	static const u8 parity_value[256];
@@ -310,7 +308,6 @@ protected:
 	virtual void handle_ta_window();
 	virtual bool manage_idle_on_interrupt(u8 ints);
 	virtual void handle_irq(int irqline, int state, u32 new_state, u32 tr_state);
-
 
 	u8 port_default_r(int port);
 	void port_default_w(int port, u8 data);
@@ -509,8 +506,6 @@ public:
 protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
-
-
 
 
 #endif // MAME_CPU_MCS51_MCS51_H

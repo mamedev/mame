@@ -43,7 +43,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="basic21" cloneof="basic">
-		<description>BASIC (v2.1, Alt)</description>
+		<description>BASIC (v2.1, alt)</description>
 		<year>198?</year>
 		<publisher>Intelligent Software</publisher>
 

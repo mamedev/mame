@@ -36,7 +36,7 @@ protected:
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
 	required_device<promotion_vga_device> m_vga;
-	required_memory_region m_vga_rom;
+	required_memory_region m_bios;
 private:
 	u8 vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);

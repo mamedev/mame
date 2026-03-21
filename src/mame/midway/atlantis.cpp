@@ -46,7 +46,6 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
-#include "machine/idectrl.h"
 #include "machine/ins8250.h"
 #include "machine/pci-ide.h"
 #include "machine/pci.h"
@@ -825,6 +824,7 @@ void atlantis_state::mwskins(machine_config &config)
 	m_rtc->reset_cb().set(FUNC(atlantis_state::watchdog_reset));
 	m_rtc->irq_cb().set(FUNC(atlantis_state::watchdog_irq));
 
+	// Silicon Image/CMD PCI0646
 	IDE_PCI(config, m_ide, 0, 0x10950646, 0x07, 0x0, PCI_ID_NILE, AS_DATA).irq_handler().set(FUNC(atlantis_state::ide_irq));
 
 	/* video hardware */

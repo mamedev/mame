@@ -999,7 +999,7 @@ void namconb1_state::namconb1(machine_config &config)
 	m_c355spr->set_palette(m_c116);
 	m_c355spr->set_scroll_offsets(0x26, 0x19);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB1objcode2tile, this));
-	m_c355spr->set_palxor(0x0);
+	m_c355spr->set_mix_callback(FUNC(namconb1_state::sprite_mix_callback));
 	m_c355spr->set_buffer(2); // triple buffered
 	m_c355spr->set_color_base(0);
 	m_c355spr->set_draw_2_lists(false); // prevents bad tile on top left of vshoot during certain scenes

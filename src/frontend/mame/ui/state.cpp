@@ -218,12 +218,12 @@ void menu_load_save_state_base::populate()
 
 	if (m_entries_vec.empty())
 	{
-		item_append(_("[no saved states found]"), FLAG_DISABLE, nullptr);
+		item_append(_("menu-savestate", "[no saved states found]"), FLAG_DISABLE, nullptr);
 		set_selection(nullptr);
 	}
 	item_append(menu_item_type::SEPARATOR);
 	if (is_one_shot())
-		item_append(_("Cancel"), 0, nullptr);
+		item_append(_("menu-savestate", "Cancel"), 0, nullptr);
 
 	// get ready to poll inputs
 	m_switch_poller.reset();
@@ -262,7 +262,7 @@ bool menu_load_save_state_base::handle(event const *ev)
 			// prompt to confirm delete
 			m_confirm_delete = &file_entry_from_itemref(ev->itemref);
 			m_confirm_prompt = util::string_format(
-					_("Delete saved state %1$s?\nPress %2$s to delete\nPress %3$s to cancel"),
+					_("menu-savestate", "Delete saved state %1$s?\nPress %2$s to delete\nPress %3$s to cancel"),
 					m_confirm_delete->visible_name(),
 					ui().get_general_input_setting(IPT_UI_SELECT),
 					ui().get_general_input_setting(IPT_UI_BACK));
@@ -399,7 +399,7 @@ bool menu_load_save_state_base::handle_keys(uint32_t flags, int &iptkey)
 						err.category().name(),
 						err.value(),
 						err.message());
-				machine().popmessage(_("Error removing saved state file %1$s"), filename);
+				machine().popmessage(_("menu-savestate", "Error removing saved state file %1$s"), filename);
 			}
 
 			// repopulate the menu
@@ -480,7 +480,7 @@ void menu_load_save_state_base::custom_render(uint32_t flags, void *selectedref,
 	if (selected_item().ref())
 	{
 		if (m_delete_prompt.empty())
-			m_delete_prompt = util::string_format(_("Press %1$s to delete"), ui().get_general_input_setting(IPT_UI_CLEAR));
+			m_delete_prompt = util::string_format(_("menu-savestate", "Press %1$s to delete"), ui().get_general_input_setting(IPT_UI_CLEAR));
 		text[count++] = m_delete_prompt;
 	}
 
@@ -551,7 +551,7 @@ bool menu_load_save_state_base::is_present(const std::string &name) const
 //-------------------------------------------------
 
 menu_load_state::menu_load_state(mame_ui_manager &mui, render_container &container, bool one_shot)
-	: menu_load_save_state_base(mui, container, _("Load State"), _("Select state to load"), true, one_shot)
+	: menu_load_save_state_base(mui, container, _("menu-savestate", "Load State"), _("menu-savestate", "Select state to load"), true, one_shot)
 {
 }
 
@@ -575,7 +575,7 @@ void menu_load_state::process_file(std::string &&file_name)
 //-------------------------------------------------
 
 menu_save_state::menu_save_state(mame_ui_manager &mui, render_container &container, bool one_shot)
-	: menu_load_save_state_base(mui, container, _("Save State"), _("Press a key or joystick button, or select state to overwrite"), false, one_shot)
+	: menu_load_save_state_base(mui, container, _("menu-savestate", "Save State"), _("menu-savestate", "Press a key or joystick button, or select state to overwrite"), false, one_shot)
 {
 }
 
@@ -588,6 +588,5 @@ void menu_save_state::process_file(std::string &&file_name)
 {
 	machine().schedule_save(std::move(file_name));
 }
-
 
 } // namespace ui

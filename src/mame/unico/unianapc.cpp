@@ -9,6 +9,8 @@
 
     Intel Celeron CPU, 1.70GHz
     MSI MS-6566E VER: 2 motherboard
+	Intel RG82845E (MCH)
+	Intel FW82801BA (ICH2)
     Samsung 256MB DDR PC2100 CL2.5 RAM
     Inside TNC 128MB(?) VGA Graphics Video Card E-G012-01-1247 <- seems to be a Korean OEM for nVidia GeForce2 MX400 (NV11) -AS
     Dynamic 4281 Rev. A sound card by Jin Information Technology with Crystal CS4281 sound chip
@@ -54,12 +56,9 @@ void unianapc_state::unianapc_map(address_map &map)
 {
 }
 
-static INPUT_PORTS_START( unianapc )
-INPUT_PORTS_END
-
 void unianapc_state::unianapc(machine_config &config)
 {
-	/* basic machine hardware */
+	// Socket 478
 	PENTIUM3(config, m_maincpu, 100'000'000); // actually a Celeron at 1.70 GHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &unianapc_state::unianapc_map);
 	m_maincpu->set_disable();
@@ -102,5 +101,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2002, dhunting,  0,   unianapc, unianapc, unianapc_state, empty_init, ROT0, "Game Box Entertainment", "Dream Hunting (US)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Ver 1007?
-GAME( 2003, hogwild,   0,   unianapc, unianapc, unianapc_state, empty_init, ROT0, "Uniana",                 "Hog Wild (US)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Ver.00.26.b?
+GAME( 2002, dhunting,  0,   unianapc, 0, unianapc_state, empty_init, ROT0, "Game Box Entertainment", "Dream Hunting (US)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Ver 1007?
+GAME( 2003, hogwild,   0,   unianapc, 0, unianapc_state, empty_init, ROT0, "Uniana",                 "Hog Wild (US)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Ver.00.26.b?

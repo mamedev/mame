@@ -14,8 +14,11 @@
 
 #include "emu.h"
 #include "mb86235.h"
-#include "mb86235fe.h"
+
 #include "mb86235d.h"
+#include "mb86235fe.h"
+
+#include "emuopts.h"
 
 
 #define ENABLE_DRC      0
@@ -89,7 +92,8 @@ void mb86235_device::device_start()
 	space(AS_BUSA).specific(m_dataa);
 	space(AS_BUSB).specific(m_datab);
 
-	m_core = (mb86235_internal_state *)m_cache.alloc_near(sizeof(mb86235_internal_state));
+	m_cache.allocate_cache(mconfig().options().drc_rwx());
+	m_core = m_cache.alloc_near<mb86235_internal_state>();
 	memset(m_core, 0, sizeof(mb86235_internal_state));
 
 

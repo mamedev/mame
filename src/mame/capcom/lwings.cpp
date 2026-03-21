@@ -1,59 +1,60 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Leaman
-/***************************************************************************
+/*******************************************************************************
 
-  Legendary Wings
-  Section Z
-  Trojan
-  Avengers
+Legendary Wings
+Section Z
+Trojan
+Avengers
 
-  Driver provided by Paul Leaman
+Driver provided by Paul Leaman
 
 TODO:
 - sectionz does "false contacts" on the coin counters, causing them to
   increment twice per coin.
-- accurate music tempo (audiocpu irq freq)
-- accurate video timing, raw params
-- verify avengers MCU comms, and redump internal ROM as well (see note
-  in ROM defs under AVENGERS_MCU)
+- verify avengers MCU comms, and redump internal ROM as well (see note in
+  ROM defs under AVENGERS_MCU)
+- palette bus conflicts, real hardware does weird stuff if you write to
+  palette RAM outside of vblank
 
+BTANB:
+- sectionz abrupt sprite popups on left-scrolling levels
 
 Notes:
 
-  Avengers has a protection chip underneath the sound module.
-  The protection is extensive: palette data, calculates player movement,
-  even a hand in the sound.
+Avengers has a protection chip underneath the sound module. The protection
+is extensive: palette data, calculates player movement, even a hand in the
+sound. The PCB has wiremods connected to MREQ and WAIT for keeping the Z80
+in sync with the MCU during comms. The Trojan schematics also include the MCU,
+but the PCB doesn't?
 
-  avengers061gre2: corrupted graphics in Avengers' ending not fixed.
-  This bug is not in the Japanese set "Buraiken".
-  It might just be a bug in the original: the tiles for the character
-  image are just not present in the US version, replaced by more tiles
-  for the title animation. The tile map ROM is the same between the two
-  versions.
+avengers061gre2: corrupted graphics in Avengers' ending not fixed. This bug
+is not in the Japanese set "Buraiken".
+It might just be a bug in the original: the tiles for the character
+image are just not present in the US version, replaced by more tiles
+for the title animation. The tile map ROM is the same between the two
+versions.
 
-  trojan37b1gre: stage 2-1 boss x flip glitches not fixed.
-  This could be a side effect of sprite RAM buffering. Suggest buffering
-  on-screen content instead of sprite memory.
+Previous clock settings were too low. Sometimes Avengers and Trojan could
+not finish clearing VRAM before a new frame is drawn and left behind
+screen artifacts. Avengers' second CPU was forced to pre-empt during
+soundlatch operations, resulting in double or missing sound effects.
 
-  Previous clock settings were too low. Sometimes Avengers and Trojan
-  could not finish clearing VRAM before a new frame is drawn and left
-  behind screen artifacts. Avengers' second CPU was forced to pre-empt
-  during soundlatch operations, resulting in double or missing sound
-  effects.
+Trojan (Romstar) Manual has some bonus life values as well as locations
+which do no jive with actual emulation. One can only assume this means
+the manual is incorrect and software was adjusted later but the game could
+use some PCB comparisons of DIP selections to be certain.
 
-  Trojan (Romstar) Manual has some bonus live values as well as locations
-  which do no jive with actual emulation.  One can only assume this means
-  the manual is incorrect and software was adjusted later but the game could
-  use some PCB comparisons of DIP selections to be certain.
+Video timing: Measured 55.37Hz on Section Z, 15.62kHz & 55.4Hz on Avengers.
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "machine/watchdog.h"
+#include "machine/timer.h"
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
@@ -121,28 +122,24 @@ private:
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank2;
 	optional_memory_bank m_samplebank;
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_maincpu_program;
 
 	// video-related
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_bg1_tilemap = nullptr;
 	tilemap_t *m_bg2_tilemap = nullptr;
-	uint8_t   m_bg2_image = 0U;
-	int       m_spr_avenger_hw = 0;
-	uint8_t   m_scroll_x[2]{};
-	uint8_t   m_scroll_y[2]{};
+	uint8_t m_bg2_image = 0U;
+	uint8_t m_scroll_x[2]{};
+	uint8_t m_scroll_y[2]{};
 
 	// misc
-	uint8_t   m_adpcm = 0U;
-	uint8_t   m_nmi_mask = 0U;
-	int       m_sprbank = 0;
+	uint8_t m_nmi_mask = 0U;
+	uint8_t m_sprbank = 0;
+	emu_timer *m_sprite_dma_timer = nullptr;
 
 	// MCU-related (avengers)
-	uint8_t   m_mcu_data[2]{};
-	uint8_t   m_mcu_control = 0xff;
+	uint8_t m_mcu_data[2]{};
+	uint8_t m_mcu_control = 0xff;
 
-	void avengers_adpcm_w(uint8_t data);
-	uint8_t avengers_adpcm_r();
 	void lwings_bankswitch_w(uint8_t data);
 	uint8_t avengers_soundlatch_ack_r();
 	void lwings_fgvideoram_w(offs_t offset, uint8_t data);
@@ -151,6 +148,9 @@ private:
 	void lwings_bg1_scrolly_w(offs_t offset, uint8_t data);
 	void trojan_bg2_scrollx_w(uint8_t data);
 	void trojan_bg2_image_w(uint8_t data);
+	void sprite_dma_trigger_w(uint8_t data);
+	void sprite_dma_start_w(int state);
+	TIMER_CALLBACK_MEMBER(sprite_dma_end);
 	void msm5205_w(uint8_t data);
 	void fball_oki_bank_w(uint8_t data);
 
@@ -167,18 +167,13 @@ private:
 	TILE_GET_INFO_MEMBER(trojan_get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	DECLARE_VIDEO_START(trojan);
-	DECLARE_VIDEO_START(avengers);
 	uint32_t screen_update_lwings(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void lwings_interrupt(int state);
-	void avengers_interrupt(int state);
-	bool is_sprite_on(uint8_t const *buffered_spriteram, int offs);
-	void lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void lwings_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void trojan_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void avengers_adpcm_io_map(address_map &map) ATTR_COLD;
 	void avengers_map(address_map &map) ATTR_COLD;
-	void buraikenb_map(address_map &map) ATTR_COLD;
 	void fball_map(address_map &map) ATTR_COLD;
 	void fball_oki_map(address_map &map) ATTR_COLD;
 	void fball_sound_map(address_map &map) ATTR_COLD;
@@ -189,24 +184,242 @@ private:
 	void trojan_map(address_map &map) ATTR_COLD;
 };
 
-/* Avengers runs on hardware almost identical to Trojan, but with a protection
- * device and some small changes to the memory map and video hardware.
- *
- * Background colors are fetched 64 bytes at a time and copied to palette RAM.
- *
- * Another function takes as input 2 pairs of (x,y) coordinates, and returns
- * a code reflecting the direction (8 angles) from one point to the other.
- */
 
-void lwings_state::avengers_adpcm_w(uint8_t data)
+/*************************************
+ *
+ *  Callbacks for the TileMap code
+ *
+ *************************************/
+
+TILEMAP_MAPPER_MEMBER(lwings_state::get_bg2_memory_offset)
 {
-	m_adpcm = data;
+	return (row * 0x800) | (col * 2);
 }
 
-uint8_t lwings_state::avengers_adpcm_r()
+TILE_GET_INFO_MEMBER(lwings_state::get_fg_tile_info)
 {
-	return m_adpcm;
+	int code = m_fgvideoram[tile_index];
+	int color = m_fgvideoram[tile_index + 0x400];
+	tileinfo.set(0,
+			code + ((color & 0xc0) << 2),
+			color & 0x0f,
+			TILE_FLIPYX((color & 0x30) >> 4));
 }
+
+TILE_GET_INFO_MEMBER(lwings_state::lwings_get_bg1_tile_info)
+{
+	int code = m_bg1videoram[tile_index];
+	int color = m_bg1videoram[tile_index + 0x400];
+	tileinfo.set(1,
+			code + ((color & 0xe0) << 3),
+			color & 0x07,
+			TILE_FLIPYX((color & 0x18) >> 3));
+}
+
+TILE_GET_INFO_MEMBER(lwings_state::trojan_get_bg1_tile_info)
+{
+	int code = m_bg1videoram[tile_index];
+	int color = m_bg1videoram[tile_index + 0x400];
+	code += (color & 0xe0)<<3;
+	tileinfo.set(1,
+			code,
+			(color & 7),
+			((color & 0x10) ? TILE_FLIPX : 0));
+
+	tileinfo.group = (color & 0x08) >> 3;
+}
+
+TILE_GET_INFO_MEMBER(lwings_state::get_bg2_tile_info)
+{
+	int code, color;
+	uint8_t *rom = memregion("gfx5")->base();
+	int mask = memregion("gfx5")->bytes() - 1;
+
+	tile_index = (tile_index + m_bg2_image * 0x20) & mask;
+	code = rom[tile_index];
+	color = rom[tile_index + 1];
+	tileinfo.set(3,
+			code + ((color & 0x80) << 1),
+			color & 0x07,
+			TILE_FLIPYX((color & 0x30) >> 4));
+}
+
+
+/*************************************
+ *
+ *  Start the video hardware emulation
+ *
+ *************************************/
+
+void lwings_state::video_start()
+{
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::lwings_get_bg1_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+
+	m_fg_tilemap->set_transparent_pen(3);
+}
+
+VIDEO_START_MEMBER(lwings_state,trojan)
+{
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::trojan_get_bg1_tile_info)),TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::get_bg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(lwings_state::get_bg2_memory_offset)), 16, 16, 32, 16);
+
+	m_fg_tilemap->set_transparent_pen(3);
+	m_bg1_tilemap->set_transmask(0, 0xffff, 0x0001); // split type 0 is totally transparent in front half
+	m_bg1_tilemap->set_transmask(1, 0xf07f, 0x0f81); // split type 1 has pens 7-11 opaque in front half
+}
+
+
+/*************************************
+ *
+ *  Display refresh
+ *
+ *************************************/
+
+void lwings_state::lwings_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	uint8_t const *const spriteram = m_spriteram->buffer();
+
+	for (int offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
+	{
+		int sx = spriteram[offs + 3] - 0x100 * (spriteram[offs + 1] & 0x01);
+		int sy = spriteram[offs + 2];
+		if (sy > 0xf8)
+			sy -= 0x100;
+		int code = spriteram[offs] | (spriteram[offs + 1] & 0xc0) << 2;
+		int color = (spriteram[offs + 1] & 0x38) >> 3;
+		int flipx = spriteram[offs + 1] & 0x02;
+		int flipy = spriteram[offs + 1] & 0x04;
+
+		if (flip_screen())
+		{
+			sx = 240 - sx;
+			sy = 240 - sy;
+			flipx = !flipx;
+			flipy = !flipy;
+		}
+
+		m_gfxdecode->gfx(2)->transpen(
+				bitmap, cliprect,
+				code + (m_sprbank * 0x400), color,
+				flipx, flipy, sx, sy,
+				15);
+	}
+}
+
+void lwings_state::trojan_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	uint8_t const *const spriteram = m_spriteram->buffer();
+
+	for (int offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
+	{
+		int sx = spriteram[offs + 3] - 0x100 * (spriteram[offs + 1] & 0x01);
+		int sy = spriteram[offs + 2];
+		if (sy > 0xf8)
+			sy -= 0x100;
+		int code = spriteram[offs] | bitswap<3>(spriteram[offs + 1],7,5,6) << 8;
+		int color = (spriteram[offs + 1] & 0x0e) >> 1;
+
+		// flipping differs between horizontal/vertical orientation
+		int flipx, flipy;
+		if ((machine().system().flags & machine_flags::MASK_ORIENTATION) == 0)
+		{
+			// Trojan
+			flipx = spriteram[offs + 1] & 0x10;
+			flipy = 1;
+		}
+		else
+		{
+			// Avengers
+			flipx = 0;
+			flipy = ~spriteram[offs + 1] & 0x10;
+		}
+
+		if (flip_screen())
+		{
+			sx = 240 - sx;
+			sy = 240 - sy;
+			flipx = !flipx;
+			flipy = !flipy;
+		}
+
+		m_gfxdecode->gfx(2)->transpen(
+				bitmap, cliprect,
+				code, color,
+				flipx, flipy, sx, sy,
+				15);
+	}
+}
+
+uint32_t lwings_state::screen_update_lwings(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	lwings_draw_sprites(bitmap, cliprect);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+uint32_t lwings_state::screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+
+	trojan_draw_sprites(bitmap, cliprect);
+
+	m_bg1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+
+/*************************************
+ *
+ *  Memory & I/O handlers
+ *
+ *************************************/
+
+void lwings_state::lwings_fgvideoram_w(offs_t offset, uint8_t data)
+{
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+}
+
+void lwings_state::lwings_bg1videoram_w(offs_t offset, uint8_t data)
+{
+	m_bg1videoram[offset] = data;
+	m_bg1_tilemap->mark_tile_dirty(offset & 0x3ff);
+}
+
+
+void lwings_state::lwings_bg1_scrollx_w(offs_t offset, uint8_t data)
+{
+	m_scroll_x[offset] = data;
+	m_bg1_tilemap->set_scrollx(0, m_scroll_x[0] | (m_scroll_x[1] << 8));
+}
+
+void lwings_state::lwings_bg1_scrolly_w(offs_t offset, uint8_t data)
+{
+	m_scroll_y[offset] = data;
+	m_bg1_tilemap->set_scrolly(0, m_scroll_y[0] | (m_scroll_y[1] << 8));
+}
+
+void lwings_state::trojan_bg2_scrollx_w(uint8_t data)
+{
+	m_bg2_tilemap->set_scrollx(0, data);
+}
+
+void lwings_state::trojan_bg2_image_w(uint8_t data)
+{
+	if (m_bg2_image != data)
+	{
+		m_bg2_image = data;
+		m_bg2_tilemap->mark_all_dirty();
+	}
+}
+
 
 void lwings_state::lwings_bankswitch_w(uint8_t data)
 {
@@ -230,18 +443,64 @@ void lwings_state::lwings_bankswitch_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 7));
 }
 
-void lwings_state::lwings_interrupt(int state)
+void lwings_state::msm5205_w(uint8_t data)
 {
-	if (state && m_nmi_mask)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* Z80 - RST 10h */
+	m_msm->s1_w(BIT(data, 6));
+	m_msm->reset_w(BIT(data, 7));
+
+	m_msm->data_w(data & 0xf);
 }
 
-void lwings_state::avengers_interrupt(int state)
+
+void lwings_state::sprite_dma_trigger_w(uint8_t data)
 {
-	if (state && m_nmi_mask)
+	if (m_screen->vblank())
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, ASSERT_LINE);
+}
+
+void lwings_state::sprite_dma_start_w(int state)
+{
+	if (state)
+	{
+		m_spriteram->copy();
+
+		// measured 128.4us on avengers, so 2 6MHz cycles per byte
+		uint32_t clocks = m_spriteram->bytes() * 2;
+		m_sprite_dma_timer->adjust(attotime::from_ticks(clocks, 12_MHz_XTAL / 2));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(lwings_state::sprite_dma_end)
+{
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, CLEAR_LINE);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(lwings_state::scanline)
+{
+	const int scanline = param;
+
+	// note: for lwings, RST 10h also works for vblank interrupt
+	if (scanline == 248 && m_nmi_mask)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+
+	// mid-screen interrupt on V128 (120 scanlines before vblank interrupt)
+	if (scanline == 128)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+
+	// 4 sound interrupts per frame on V32
+	if ((scanline % 64) == 32)
+		m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
+
+/* Avengers runs on hardware almost identical to Trojan, but with a protection
+ * device and some small changes to the memory map and video hardware.
+ *
+ * Background colors are fetched 64 bytes at a time and copied to palette RAM.
+ *
+ * Another function takes as input 2 pairs of (x,y) coordinates, and returns
+ * a code reflecting the direction (8 angles) from one point to the other.
+ */
 
 uint8_t lwings_state::mcu_p0_r()
 {
@@ -300,16 +559,16 @@ uint8_t lwings_state::avengers_soundlatch_ack_r()
 	return data;
 }
 
-void lwings_state::msm5205_w(uint8_t data)
-{
-	m_msm->reset_w(BIT(data, 7));
-	m_msm->data_w(data);
-	m_msm->vclk_w(1);
-	m_msm->vclk_w(0);
-}
 
-void lwings_state::buraikenb_map(address_map &map)
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
+
+void lwings_state::lwings_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xddff).ram();
@@ -317,41 +576,8 @@ void lwings_state::buraikenb_map(address_map &map)
 	map(0xdf80, 0xdfff).ram();
 	map(0xe000, 0xe7ff).ram().w(FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
 	map(0xe800, 0xefff).ram().w(FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
-	map(0xf000, 0xf3ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0xf400, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xf800, 0xf801).w(FUNC(lwings_state::lwings_bg1_scrollx_w));
-	map(0xf802, 0xf803).w(FUNC(lwings_state::lwings_bg1_scrolly_w));
-	map(0xf804, 0xf804).w(FUNC(lwings_state::trojan_bg2_scrollx_w));
-	map(0xf805, 0xf805).w(FUNC(lwings_state::trojan_bg2_image_w));
-
-	map(0xf808, 0xf808).portr("SERVICE").nopw(); // ?
-	map(0xf809, 0xf809).portr("P1");
-	map(0xf80a, 0xf80a).portr("P2");
-	map(0xf80b, 0xf80b).portr("DSWB");
-	map(0xf80c, 0xf80c).portr("DSWA").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xf80d, 0xf80d).w(FUNC(lwings_state::avengers_adpcm_w));
-	map(0xf80e, 0xf80e).w(FUNC(lwings_state::lwings_bankswitch_w));
-}
-
-void lwings_state::avengers_map(address_map &map)
-{
-	buraikenb_map(map);
-
-	map(0xf809, 0xf809).w(m_mculatch[0], FUNC(generic_latch_8_device::write));
-	map(0xf80c, 0xf80c).w(m_mculatch[1], FUNC(generic_latch_8_device::write));
-	map(0xf80d, 0xf80d).r(m_mculatch[2], FUNC(generic_latch_8_device::read));
-}
-
-void lwings_state::lwings_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xddff).ram();
-	map(0xde00, 0xdfff).ram().share("spriteram");
-	map(0xe000, 0xe7ff).ram().w(FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
-	map(0xe800, 0xefff).ram().w(FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
-	map(0xf000, 0xf3ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0xf400, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf000, 0xf3ff).writeonly().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xf400, 0xf7ff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
 	map(0xf808, 0xf808).portr("SERVICE");
 	map(0xf809, 0xf809).portr("P1");
@@ -360,32 +586,7 @@ void lwings_state::lwings_map(address_map &map)
 	map(0xf80b, 0xf80b).portr("DSWA");
 	map(0xf80a, 0xf80b).w(FUNC(lwings_state::lwings_bg1_scrolly_w));
 	map(0xf80c, 0xf80c).portr("DSWB").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xf80d, 0xf80d).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xf80e, 0xf80e).w(FUNC(lwings_state::lwings_bankswitch_w));
-}
-
-void lwings_state::trojan_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xddff).ram();
-	map(0xde00, 0xdf7f).ram().share("spriteram");
-	map(0xdf80, 0xdfff).ram();
-	map(0xe000, 0xe7ff).ram().w(FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
-	map(0xe800, 0xefff).ram().w(FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
-	map(0xf000, 0xf3ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0xf400, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-
-	map(0xf800, 0xf801).w(FUNC(lwings_state::lwings_bg1_scrollx_w));
-	map(0xf802, 0xf803).w(FUNC(lwings_state::lwings_bg1_scrolly_w));
-	map(0xf804, 0xf804).w(FUNC(lwings_state::trojan_bg2_scrollx_w));
-	map(0xf805, 0xf805).w(FUNC(lwings_state::trojan_bg2_image_w));
-	map(0xf808, 0xf808).portr("SERVICE").nopw(); // watchdog
-	map(0xf809, 0xf809).portr("P1");
-	map(0xf80a, 0xf80a).portr("P2");
-	map(0xf80b, 0xf80b).portr("DSWA");
-	map(0xf80c, 0xf80c).portr("DSWB").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xf80d, 0xf80d).w("soundlatch2", FUNC(generic_latch_8_device::write));
+	map(0xf80d, 0xf80d).w(FUNC(lwings_state::sprite_dma_trigger_w));
 	map(0xf80e, 0xf80e).w(FUNC(lwings_state::lwings_bankswitch_w));
 }
 
@@ -399,17 +600,54 @@ void lwings_state::lwings_sound_map(address_map &map)
 	map(0xe006, 0xe006).r(FUNC(lwings_state::avengers_soundlatch_ack_r)).nopw();
 }
 
+void lwings_state::trojan_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xddff).ram();
+	map(0xde00, 0xdf7f).ram().share("spriteram");
+	map(0xdf80, 0xdfff).ram();
+	map(0xe000, 0xe7ff).ram().w(FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
+	map(0xe800, 0xefff).ram().w(FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
+	map(0xf000, 0xf3ff).writeonly().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xf400, 0xf7ff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf800, 0xf801).w(FUNC(lwings_state::lwings_bg1_scrollx_w));
+	map(0xf802, 0xf803).w(FUNC(lwings_state::lwings_bg1_scrolly_w));
+	map(0xf804, 0xf804).w(FUNC(lwings_state::trojan_bg2_scrollx_w));
+	map(0xf805, 0xf805).w(FUNC(lwings_state::trojan_bg2_image_w));
+
+	map(0xf808, 0xf808).portr("SERVICE").w(FUNC(lwings_state::sprite_dma_trigger_w));
+	map(0xf809, 0xf809).portr("P1");
+	map(0xf80a, 0xf80a).portr("P2");
+	map(0xf80b, 0xf80b).portr("DSWB");
+	map(0xf80c, 0xf80c).portr("DSWA").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xf80d, 0xf80d).w("soundlatch2", FUNC(generic_latch_8_device::write));
+	map(0xf80e, 0xf80e).w(FUNC(lwings_state::lwings_bankswitch_w));
+}
+
+void lwings_state::avengers_map(address_map &map)
+{
+	trojan_map(map);
+
+	map(0xf809, 0xf809).w(m_mculatch[0], FUNC(generic_latch_8_device::write));
+	map(0xf80c, 0xf80c).w(m_mculatch[1], FUNC(generic_latch_8_device::write));
+	map(0xf80d, 0xf80d).r(m_mculatch[2], FUNC(generic_latch_8_device::read));
+}
+
 
 void lwings_state::fball_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x7fff).bankr("bank2");
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xddff).ram();
-	map(0xde00, 0xdfff).ram().share("spriteram");
+	map(0xde00, 0xdf7f).ram().share("spriteram");
+	map(0xdf80, 0xdfff).ram();
 	map(0xe000, 0xe7ff).ram().w(FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
 	map(0xe800, 0xefff).ram().w(FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
-	map(0xf000, 0xf3ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0xf400, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf000, 0xf3ff).writeonly().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xf400, 0xf7ff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
 	map(0xf808, 0xf808).portr("SERVICE");
 	map(0xf809, 0xf809).portr("P1");
@@ -418,7 +656,7 @@ void lwings_state::fball_map(address_map &map)
 	map(0xf80b, 0xf80b).portr("DSWA");
 	map(0xf80a, 0xf80b).w(FUNC(lwings_state::lwings_bg1_scrolly_w));
 	map(0xf80c, 0xf80c).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xf80d, 0xf80d).portr("P3").w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xf80d, 0xf80d).portr("P3").w(FUNC(lwings_state::sprite_dma_trigger_w));
 	map(0xf80e, 0xf80e).portr("P4");
 
 	map(0xf80e, 0xf80e).w(FUNC(lwings_state::lwings_bankswitch_w));
@@ -452,272 +690,11 @@ void lwings_state::trojan_adpcm_map(address_map &map)
 	map(0x0000, 0xffff).rom().nopw();
 }
 
-void lwings_state::avengers_adpcm_io_map(address_map &map)
-{
-	map.global_mask(0xff);
-	map(0x00, 0x00).r(FUNC(lwings_state::avengers_adpcm_r));
-	map(0x01, 0x01).w(FUNC(lwings_state::msm5205_w));
-}
-
 void lwings_state::trojan_adpcm_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch2", FUNC(generic_latch_8_device::read));
 	map(0x01, 0x01).w(FUNC(lwings_state::msm5205_w));
-}
-
-
-/***************************************************************************
-
-  Callbacks for the TileMap code
-
-***************************************************************************/
-
-TILEMAP_MAPPER_MEMBER(lwings_state::get_bg2_memory_offset)
-{
-	return (row * 0x800) | (col * 2);
-}
-
-TILE_GET_INFO_MEMBER(lwings_state::get_fg_tile_info)
-{
-	int code = m_fgvideoram[tile_index];
-	int color = m_fgvideoram[tile_index + 0x400];
-	tileinfo.set(0,
-			code + ((color & 0xc0) << 2),
-			color & 0x0f,
-			TILE_FLIPYX((color & 0x30) >> 4));
-}
-
-TILE_GET_INFO_MEMBER(lwings_state::lwings_get_bg1_tile_info)
-{
-	int code = m_bg1videoram[tile_index];
-	int color = m_bg1videoram[tile_index + 0x400];
-	tileinfo.set(1,
-			code + ((color & 0xe0) << 3),
-			color & 0x07,
-			TILE_FLIPYX((color & 0x18) >> 3));
-}
-
-TILE_GET_INFO_MEMBER(lwings_state::trojan_get_bg1_tile_info)
-{
-	int code = m_bg1videoram[tile_index];
-	int color = m_bg1videoram[tile_index + 0x400];
-	code += (color & 0xe0)<<3;
-	tileinfo.set(1,
-			code,
-			(color & 7),
-			((color & 0x10) ? TILE_FLIPX : 0));
-
-	tileinfo.group = (color & 0x08) >> 3;
-}
-
-TILE_GET_INFO_MEMBER(lwings_state::get_bg2_tile_info)
-{
-	int code, color;
-	uint8_t *rom = memregion("gfx5")->base();
-	int mask = memregion("gfx5")->bytes() - 1;
-
-	tile_index = (tile_index + m_bg2_image * 0x20) & mask;
-	code = rom[tile_index];
-	color = rom[tile_index + 1];
-	tileinfo.set(3,
-			code + ((color & 0x80) << 1),
-			color & 0x07,
-			TILE_FLIPYX((color & 0x30) >> 4));
-}
-
-
-/***************************************************************************
-
-  Start the video hardware emulation.
-
-***************************************************************************/
-
-void lwings_state::video_start()
-{
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::lwings_get_bg1_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-
-	m_fg_tilemap->set_transparent_pen(3);
-}
-
-VIDEO_START_MEMBER(lwings_state,trojan)
-{
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::trojan_get_bg1_tile_info)),TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::get_bg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(lwings_state::get_bg2_memory_offset)), 16, 16, 32, 16);
-
-	m_fg_tilemap->set_transparent_pen(3);
-	m_bg1_tilemap->set_transmask(0, 0xffff, 0x0001); // split type 0 is totally transparent in front half
-	m_bg1_tilemap->set_transmask(1, 0xf07f, 0x0f81); // split type 1 has pens 7-11 opaque in front half
-
-	m_spr_avenger_hw = 0;
-}
-
-VIDEO_START_MEMBER(lwings_state,avengers)
-{
-	VIDEO_START_CALL_MEMBER(trojan);
-	m_spr_avenger_hw = 1;
-}
-
-
-/***************************************************************************
-
-  Memory handlers
-
-***************************************************************************/
-
-void lwings_state::lwings_fgvideoram_w(offs_t offset, uint8_t data)
-{
-	m_fgvideoram[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
-}
-
-void lwings_state::lwings_bg1videoram_w(offs_t offset, uint8_t data)
-{
-	m_bg1videoram[offset] = data;
-	m_bg1_tilemap->mark_tile_dirty(offset & 0x3ff);
-}
-
-
-void lwings_state::lwings_bg1_scrollx_w(offs_t offset, uint8_t data)
-{
-	m_scroll_x[offset] = data;
-	m_bg1_tilemap->set_scrollx(0, m_scroll_x[0] | (m_scroll_x[1] << 8));
-}
-
-void lwings_state::lwings_bg1_scrolly_w(offs_t offset, uint8_t data)
-{
-	m_scroll_y[offset] = data;
-	m_bg1_tilemap->set_scrolly(0, m_scroll_y[0] | (m_scroll_y[1] << 8));
-}
-
-void lwings_state::trojan_bg2_scrollx_w(uint8_t data)
-{
-	m_bg2_tilemap->set_scrollx(0, data);
-}
-
-void lwings_state::trojan_bg2_image_w(uint8_t data)
-{
-	if (m_bg2_image != data)
-	{
-		m_bg2_image = data;
-		m_bg2_tilemap->mark_all_dirty();
-	}
-}
-
-
-/***************************************************************************
-
-  Display refresh
-
-***************************************************************************/
-
-inline bool lwings_state::is_sprite_on(uint8_t const *buffered_spriteram, int offs)
-{
-	int const sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
-	int const sy = buffered_spriteram[offs + 2];
-
-	return sx || sy;
-}
-
-void lwings_state::lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	uint8_t const *const buffered_spriteram = m_spriteram->buffer();
-
-	for (int offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
-	{
-		if (is_sprite_on(buffered_spriteram, offs))
-		{
-			int sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
-			int sy = buffered_spriteram[offs + 2];
-			if (sy > 0xf8)
-				sy -= 0x100;
-			int code = buffered_spriteram[offs] | (buffered_spriteram[offs + 1] & 0xc0) << 2;
-			int color = (buffered_spriteram[offs + 1] & 0x38) >> 3;
-			int flipx = buffered_spriteram[offs + 1] & 0x02;
-			int flipy = buffered_spriteram[offs + 1] & 0x04;
-
-			if (flip_screen())
-			{
-				sx = 240 - sx;
-				sy = 240 - sy;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
-
-			m_gfxdecode->gfx(2)->transpen(
-					bitmap, cliprect,
-					code + (m_sprbank * 0x400), color,
-					flipx, flipy, sx, sy,
-					15);
-		}
-	}
-}
-
-void lwings_state::trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	uint8_t const *const buffered_spriteram = m_spriteram->buffer();
-
-	for (int offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
-	{
-		if (is_sprite_on(buffered_spriteram, offs))
-		{
-			int sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
-			int sy = buffered_spriteram[offs + 2];
-			if (sy > 0xf8)
-				sy -= 0x100;
-			int code = buffered_spriteram[offs] |
-					((buffered_spriteram[offs + 1] & 0x20) << 4) |
-					((buffered_spriteram[offs + 1] & 0x40) << 2) |
-					((buffered_spriteram[offs + 1] & 0x80) << 3);
-			int color = (buffered_spriteram[offs + 1] & 0x0e) >> 1;
-
-			int flipx, flipy;
-			if (m_spr_avenger_hw)
-			{
-				flipx = 0;                                      /* Avengers */
-				flipy = ~buffered_spriteram[offs + 1] & 0x10;
-			}
-			else
-			{
-				flipx = buffered_spriteram[offs + 1] & 0x10;    /* Trojan */
-				flipy = 1;
-			}
-
-			if (flip_screen())
-			{
-				sx = 240 - sx;
-				sy = 240 - sy;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
-
-			m_gfxdecode->gfx(2)->transpen(
-					bitmap, cliprect,
-					code, color,
-					flipx, flipy, sx, sy,
-					15);
-		}
-	}
-}
-
-uint32_t lwings_state::screen_update_lwings(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_bg1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	lwings_draw_sprites(bitmap, cliprect);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	return 0;
-}
-
-uint32_t lwings_state::screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_bg1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	trojan_draw_sprites(bitmap, cliprect);
-	m_bg1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	return 0;
 }
 
 
@@ -823,7 +800,7 @@ static INPUT_PORTS_START( sectionz )
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:2,1")
 	PORT_DIPSETTING(    0x00, "Upright One Player" )
 	PORT_DIPSETTING(    0x40, "Upright Two Players" )
-/*      PORT_DIPSETTING(    0x80, "???" )       probably unused */
+/*  PORT_DIPSETTING(    0x80, "???" )       probably unused */
 	PORT_DIPSETTING(    0xc0, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
@@ -886,57 +863,6 @@ static INPUT_PORTS_START( lwingsb )
 	PORT_DIPSETTING(    0x00, "5" )
 INPUT_PORTS_END
 
-
-static INPUT_PORTS_START( fball )
-	PORT_INCLUDE( lwings_generic )
-
-	PORT_MODIFY("SERVICE")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START4 )
-
-	PORT_START("DSWA") // only one set of dipswitches
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SWA:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) ) // smaller starting explosion
-	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWA:2,3")
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x06, "4" )
-	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SWA:4,5")
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("SWA:7") // 'X' in test mode, presumably unused
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SWA:8" )
-
-	PORT_START("P3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-
-	PORT_START("P4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-INPUT_PORTS_END
-
 /* Trojan with level selection - starting level dip switches not used */
 static INPUT_PORTS_START( trojanls )
 	PORT_INCLUDE( lwings_generic )
@@ -949,27 +875,7 @@ static INPUT_PORTS_START( trojanls )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 
-	/* DSW tags inverted to use lwings map */
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:1,2")
-	PORT_DIPSETTING(    0x00, "Upright 1 Player" )
-	PORT_DIPSETTING(    0x02, "Upright 2 Players" )
-	PORT_DIPSETTING(    0x03, DEF_STR( Cocktail ) )
-/* 0x01 same as 0x02 or 0x03 */
-	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SWB:3,4,5")
-	PORT_DIPSETTING(    0x10, "20000 60000" )
-	PORT_DIPSETTING(    0x0c, "20000 70000" )
-	PORT_DIPSETTING(    0x08, "20000 80000" )
-	PORT_DIPSETTING(    0x1c, "30000 60000" )
-	PORT_DIPSETTING(    0x18, "30000 70000" )
-	PORT_DIPSETTING(    0x14, "30000 80000" )
-	PORT_DIPSETTING(    0x04, "40000 80000" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SWB:6" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SWB:7" )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWB:8" )
-
-	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
@@ -991,12 +897,31 @@ static INPUT_PORTS_START( trojanls )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SWA:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:1,2")
+	PORT_DIPSETTING(    0x00, "Upright 1 Player" )
+	PORT_DIPSETTING(    0x02, "Upright 2 Players" )
+	PORT_DIPSETTING(    0x03, DEF_STR( Cocktail ) )
+	// 0x01 same as 0x02 or 0x03
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SWB:3,4,5")
+	PORT_DIPSETTING(    0x10, "20000 60000" )
+	PORT_DIPSETTING(    0x0c, "20000 70000" )
+	PORT_DIPSETTING(    0x08, "20000 80000" )
+	PORT_DIPSETTING(    0x1c, "30000 60000" )
+	PORT_DIPSETTING(    0x18, "30000 70000" )
+	PORT_DIPSETTING(    0x14, "30000 80000" )
+	PORT_DIPSETTING(    0x04, "40000 80000" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SWB:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SWB:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWB:8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( trojan )
 	PORT_INCLUDE( trojanls )
 
-	PORT_MODIFY("DSWA")
+	PORT_MODIFY("DSWB")
 	PORT_DIPNAME( 0xe0, 0xe0, "Starting Level" ) PORT_DIPLOCATION("SWB:6,7,8")
 	PORT_DIPSETTING(    0xe0, "1" )
 	PORT_DIPSETTING(    0xc0, "2" )
@@ -1004,7 +929,7 @@ static INPUT_PORTS_START( trojan )
 	PORT_DIPSETTING(    0x80, "4" )
 	PORT_DIPSETTING(    0x60, "5" )
 	PORT_DIPSETTING(    0x40, "6" )
-/* 0x00 and 0x20 start at level 6 */
+	// 0x00 and 0x20 start at level 6
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( avengers )
@@ -1056,6 +981,56 @@ static INPUT_PORTS_START( avengers )
 	PORT_DIPSETTING(    0x40, "4" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( fball )
+	PORT_INCLUDE( lwings_generic )
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START4 )
+
+	PORT_START("DSWA") // only one set of dipswitches
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SWA:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) ) // smaller starting explosion
+	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWA:2,3")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x06, "4" )
+	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SWA:4,5")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("SWA:7") // 'X' in test mode, presumably unused
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SWA:8" )
+
+	PORT_START("P3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+
+	PORT_START("P4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 INPUT_PORTS_END
 
 
@@ -1139,15 +1114,13 @@ GFXDECODE_END
 void lwings_state::machine_start()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-
 	m_bank1->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
-	m_maincpu->space(AS_PROGRAM).specific(m_maincpu_program);
+	m_sprite_dma_timer = timer_alloc(FUNC(lwings_state::sprite_dma_end), this);
 
 	save_item(NAME(m_bg2_image));
 	save_item(NAME(m_scroll_x));
 	save_item(NAME(m_scroll_y));
-	save_item(NAME(m_adpcm));
 	save_item(NAME(m_nmi_mask));
 	save_item(NAME(m_sprbank));
 
@@ -1205,33 +1178,26 @@ void lwings_state::machine_reset()
 	m_scroll_x[1] = 0;
 	m_scroll_y[0] = 0;
 	m_scroll_y[1] = 0;
-	m_adpcm = 0;
 }
 
 void lwings_state::lwings(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 12_MHz_XTAL/2); // verified on PCB
+	Z80(config, m_maincpu, 12_MHz_XTAL / 2); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::lwings_map);
+	m_maincpu->busack_cb().set(FUNC(lwings_state::sprite_dma_start_w));
 
-	Z80(config, m_soundcpu, 12_MHz_XTAL/4); // verified on PCB
+	Z80(config, m_soundcpu, 12_MHz_XTAL / 4); // verified on PCB
 	m_soundcpu->set_addrmap(AS_PROGRAM, &lwings_state::lwings_sound_map);
-	m_soundcpu->set_periodic_int(FUNC(lwings_state::irq0_line_hold), attotime::from_hz(222));
-	// above frequency is an approximation from PCB music recording - where is the frequency actually derived from?
 
-	WATCHDOG_TIMER(config, "watchdog");
+	TIMER(config, "scantimer").configure_scanline(FUNC(lwings_state::scanline), "screen", 0, 8);
 
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 282, 8, 248);
 	m_screen->set_screen_update(FUNC(lwings_state::screen_update_lwings));
-	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	m_screen->screen_vblank().append(FUNC(lwings_state::lwings_interrupt));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lwings);
@@ -1242,13 +1208,13 @@ void lwings_state::lwings(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ym2203a(YM2203(config, "2203a", 12_MHz_XTAL/8)); // verified on PCB
+	ym2203_device &ym2203a(YM2203(config, "2203a", 12_MHz_XTAL / 8)); // verified on PCB
 	ym2203a.add_route(0, "mono", 0.20);
 	ym2203a.add_route(1, "mono", 0.20);
 	ym2203a.add_route(2, "mono", 0.20);
 	ym2203a.add_route(3, "mono", 0.10);
 
-	ym2203_device &ym2203b(YM2203(config, "2203b", 12_MHz_XTAL/8)); // verified on PCB
+	ym2203_device &ym2203b(YM2203(config, "2203b", 12_MHz_XTAL / 8)); // verified on PCB
 	ym2203b.add_route(0, "mono", 0.20);
 	ym2203b.add_route(1, "mono", 0.20);
 	ym2203b.add_route(2, "mono", 0.20);
@@ -1259,48 +1225,8 @@ void lwings_state::sectionz(machine_config &config)
 {
 	lwings(config);
 
-	m_maincpu->set_clock(12_MHz_XTAL/4); // XTAL and clock verified on an original PCB and on a bootleg with ROMs matching those of sectionza
-
-	m_screen->set_refresh_hz(55.37); // verified on an original PCB
-}
-
-void lwings_state::fball(machine_config &config)
-{
-	// basic machine hardware
-	Z80(config, m_maincpu, 12_MHz_XTAL/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::fball_map);
-
-	Z80(config, m_soundcpu, 12_MHz_XTAL/4); // ?
-	m_soundcpu->set_addrmap(AS_PROGRAM, &lwings_state::fball_sound_map);
-	//m_soundcpu->set_periodic_int(FUNC(lwings_state::irq0_line_hold), attotime::from_hz(222));
-
-	WATCHDOG_TIMER(config, "watchdog");
-
-	// video hardware
-	BUFFERED_SPRITERAM8(config, m_spriteram);
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1); // the 16-pixel black border on left edge is correct, test mode actually uses that area
-	m_screen->set_screen_update(FUNC(lwings_state::screen_update_lwings));
-	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	m_screen->screen_vblank().append(FUNC(lwings_state::avengers_interrupt));
-	m_screen->set_palette(m_palette);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lwings);
-	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
-
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->set_separate_acknowledge(true);
-
-	okim6295_device &oki(OKIM6295(config, "oki", 12_MHz_XTAL/12, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
-	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
-	oki.set_addrmap(0, &lwings_state::fball_oki_map);
+	// XTAL and clock verified on an original PCB and on a bootleg with ROMs matching those of sectionza
+	m_maincpu->set_clock(12_MHz_XTAL / 4);
 }
 
 void lwings_state::trojan(machine_config &config)
@@ -1308,15 +1234,14 @@ void lwings_state::trojan(machine_config &config)
 	lwings(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(12_MHz_XTAL/4); // verified on PCB
+	m_maincpu->set_clock(12_MHz_XTAL / 4); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::trojan_map);
 
-	m_soundcpu->set_clock(12_MHz_XTAL/4); // verified on PCB
+	m_soundcpu->set_clock(12_MHz_XTAL / 4); // verified on PCB
 
-	Z80(config, m_adpcmcpu, 12_MHz_XTAL/4); // verified on PCB
+	Z80(config, m_adpcmcpu, 12_MHz_XTAL / 4); // verified on PCB
 	m_adpcmcpu->set_addrmap(AS_PROGRAM, &lwings_state::trojan_adpcm_map);
 	m_adpcmcpu->set_addrmap(AS_IO, &lwings_state::trojan_adpcm_io_map);
-	m_adpcmcpu->set_periodic_int(FUNC(lwings_state::irq0_line_hold), attotime::from_hz(4000));
 
 	// video hardware
 	m_gfxdecode->set_info(gfx_trojan);
@@ -1328,7 +1253,8 @@ void lwings_state::trojan(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MSM5205(config, m_msm, 384_kHz_XTAL); // verified on PCB
-	m_msm->set_prescaler_selector(msm5205_device::SEX_4B); // slave mode
+	m_msm->vck_callback().set_inputline(m_adpcmcpu, 0, HOLD_LINE);
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B); // 4 KHz
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -1337,11 +1263,12 @@ void lwings_state::avengers(machine_config &config)
 	trojan(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(12_MHz_XTAL/2);
-	m_maincpu->z80_set_m1_cycles(4+2); // 2 WAIT states per M1? (needed to keep in sync with MCU)
+	m_maincpu->set_clock(12_MHz_XTAL / 2); // verified on PCB
+	m_maincpu->z80_set_mreq_cycles(3+1); // 1 WAIT state per MREQ (but not with RFSH)
+	m_maincpu->z80_set_m1_cycles(4+1); // "
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::avengers_map);
 
-	I8751(config, m_mcu, 12_MHz_XTAL/2);
+	I8751(config, m_mcu, 12_MHz_XTAL / 2);
 	m_mcu->port_in_cb<0>().set(FUNC(lwings_state::mcu_p0_r));
 	m_mcu->port_out_cb<0>().set(FUNC(lwings_state::mcu_p0_w));
 	m_mcu->port_in_cb<1>().set(FUNC(lwings_state::mcu_p1_r));
@@ -1358,26 +1285,35 @@ void lwings_state::avengers(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_mculatch[1]);
 	GENERIC_LATCH_8(config, m_mculatch[2]);
-
-	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	m_screen->screen_vblank().append(FUNC(lwings_state::avengers_interrupt)); // RST 38h triggered by software
-
-	m_adpcmcpu->set_addrmap(AS_IO, &lwings_state::avengers_adpcm_io_map);
-
-	// video hardware
-	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengers)
 }
 
 void lwings_state::buraikenb(machine_config &config)
 {
-	avengers(config);
+	trojan(config);
+
+	// assume same maincpu clock as avengers (lots of slowdowns otherwise)
+	m_maincpu->set_clock(12_MHz_XTAL / 2);
+}
+
+void lwings_state::fball(machine_config &config)
+{
+	lwings(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::buraikenb_map);
-	config.device_remove("mcu");
-	config.device_remove("mculatch0");
-	config.device_remove("mculatch1");
-	config.device_remove("mculatch2");
+	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::fball_map);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &lwings_state::fball_sound_map);
+
+	// video hardware: the 16-pixel black border on left edge is correct, test mode actually uses that area
+
+	// sound hardware
+	m_soundlatch->set_separate_acknowledge(true);
+
+	okim6295_device &oki(OKIM6295(config, "oki", 12_MHz_XTAL / 12, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+	oki.set_addrmap(0, &lwings_state::fball_oki_map);
+
+	config.device_remove("2203a");
+	config.device_remove("2203b");
 }
 
 

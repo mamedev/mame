@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="ibmpc110" description="IBM Palm Top PC-110 floppy disk images">
+
+	<software name="pc110sys" supported="no">
+		<!-- Bundled with the system -->
+		<description>Palm Top PC-110 System Disks</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<!-- Ver 1.00 -->
+			<feature name="part_id" value="System Install Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="39h5729.img" size="1474560" crc="25975137" sha1="4dbb2ebaacab598685ec44be79c57dc7706e65ca"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<!-- Ver 1 -->
+			<feature name="part_id" value="Personaware Install Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="39h5730.img" size="1474560" crc="76cfda87" sha1="cf32ed0a24191b3fc9395462490a56359accf276"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<!-- Ver 1.10 -->
+			<feature name="part_id" value="Utility Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="39h5731.img" size="1474560" crc="ecfdd88e" sha1="1d72bc74619c4e5cea75695513cb1c7cfd819fad"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<!-- Ver 1.00 -->
+			<feature name="part_id" value="Utility Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="39h5743.img" size="1474560" crc="14d4bb10" sha1="9b83ef1db3758a0fb542012ad298fabea4cf6f51"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

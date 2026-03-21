@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, Angelo Salese
+
 /****************************************************************************
     Time Attacker
 
@@ -57,8 +58,10 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/samples.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -80,14 +83,34 @@ public:
 		m_samples(*this, "samples")
 	{ }
 
-	void tattack(machine_config &config);
+	void tattack(machine_config &config) ATTR_COLD;
 
-	void init_tattack();
+	void init_tattack() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_ram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<samples_device> m_samples;
+
+	tilemap_t *m_tmap = nullptr;
+	uint8_t m_ball_regs[2]{};
+	uint8_t m_paddle_reg = 0;
+	uint8_t m_paddle_ysize = 0;
+	bool m_bottom_edge_enable = false;
+	bool m_bricks_color_bank = false;
+
+	static constexpr uint8_t white_pen = 0xf;
+	static constexpr uint8_t green_pen = 0x5;
+	static constexpr uint8_t yellow_pen = 0x7;
+	static constexpr uint8_t red_pen = 0x3;
+	static constexpr int paddle_xpos = 38;
+
 	void paddle_w(uint8_t data);
 	void ball_w(offs_t offset, uint8_t data);
 	void brick_dma_w(uint8_t data);
@@ -99,70 +122,49 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void prg_map(address_map &map) ATTR_COLD;
 
-	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_ram;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<samples_device> m_samples;
-	tilemap_t *m_tmap = nullptr;
-	uint8_t m_ball_regs[2]{};
-	uint8_t m_paddle_reg = 0;
-	uint8_t m_paddle_ysize = 0;
-	bool m_bottom_edge_enable = false;
-	bool m_bricks_color_bank = false;
-
 	void draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_edge_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	static constexpr uint8_t white_pen = 0xf;
-	static constexpr uint8_t green_pen = 0x5;
-	static constexpr uint8_t yellow_pen = 0x7;
-	static constexpr uint8_t red_pen = 0x3;
-	static constexpr int paddle_xpos = 38;
 };
 
 
 
 TILE_GET_INFO_MEMBER(tattack_state::get_tile_info)
 {
-	int code = m_videoram[tile_index];
+	const int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
 
-	if((color & 1) || (color > 15))
+	if ((color & 1) || (color > 15))
 		logerror("COLOR %i\n", color);
 
 	color >>= 1;
 
-	tileinfo.set(0,
-			code,
-			color,
-			0);
+	tileinfo.set(0, code, color, 0);
 }
 
 void tattack_state::draw_edge_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// left column
-	bitmap.plot_box(0,16,216,4,white_pen);
+	bitmap.plot_box(0, 16, 216, 4, white_pen);
 	// upper row
-	bitmap.plot_box(216,16,6,226,white_pen);
+	bitmap.plot_box(216, 16, 6, 226, white_pen);
 	// right column
-	bitmap.plot_box(0,238,216,4,white_pen);
-	if(m_bottom_edge_enable == true)
-		bitmap.plot_box(paddle_xpos,16,4,226,white_pen);
+	bitmap.plot_box(0, 238, 216, 4, white_pen);
+
+	if (m_bottom_edge_enable == true)
+		bitmap.plot_box(paddle_xpos, 16, 4, 226, white_pen);
 }
 
 void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const uint16_t ram_base = 0x40+(m_ram[0x33] & 0x10);
+	const uint16_t ram_base = 0x40 + (m_ram[0x33] & 0x10);
 	const int x_base = -8;
 
 	// draw brick pattern
-	for(uint16_t ram_offs=ram_base;ram_offs<ram_base+0xe;ram_offs++)
+	for (uint16_t ram_offs = ram_base; ram_offs < ram_base + 0xe; ram_offs++)
 	{
-		uint8_t cur_column = m_ram[ram_offs];
+		const uint8_t cur_column = m_ram[ram_offs];
 
-		for(int bit=7;bit>-1;bit--)
+		for (int bit = 7; bit > -1; bit--)
 		{
 			bool draw_block = ((cur_column >> bit) & 1) == 1;
 
@@ -171,25 +173,25 @@ void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &
 			// Sometimes game forgets to update the location or the blinking itself (both bits 0)
 			// can be either intentional or a game bug.
 			// TODO: the mask used here is guessed
-			if((m_ram[0x33] & 0x3) == 3)
+			if ((m_ram[0x33] & 0x3) == 3)
 			{
-				int blink_row = m_ram[0x2b];
-				int blink_col = m_ram[0x2c];
+				const int blink_row = m_ram[0x2b];
+				const int blink_col = m_ram[0x2c];
 
-				if(bit == blink_col && (ram_offs & 0xf) == blink_row)
+				if (bit == blink_col && (ram_offs & 0xf) == blink_row)
 					draw_block = false;
 			}
 
-			if(draw_block == true)
+			if (draw_block == true)
 			{
-				for(int xi=0;xi<3;xi++)
+				for (int xi = 0; xi < 3; xi++)
 				{
-					for(int yi=0;yi<15;yi++)
+					for (int yi = 0; yi < 15; yi++)
 					{
-						int resx = bit*4+xi+160+x_base;
-						int resy = (ram_offs & 0xf)*16+yi+16;
+						const int resx = bit * 4 + xi + 160 + x_base;
+						const int resy = (ram_offs & 0xf) * 16 + yi + 16;
 
-						if(cliprect.contains(resx,resy))
+						if (cliprect.contains(resx, resy))
 							bitmap.pix(resy, resx) = m_bricks_color_bank == true ? red_pen : (bit & 4 ? yellow_pen : green_pen);
 					}
 				}
@@ -198,47 +200,47 @@ void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &
 	}
 
 	// draw paddle
-	if(m_bottom_edge_enable == false)
+	if (m_bottom_edge_enable == false)
 	{
-		for(int xi=0;xi<4;xi++)
-			for(int yi=0;yi<m_paddle_ysize;yi++)
+		for (int xi = 0; xi < 4; xi++)
+			for (int yi = 0; yi < m_paddle_ysize; yi++)
 			{
-				int resx =(paddle_xpos+xi);
-				int resy = m_paddle_reg+yi;
+				const int resx = paddle_xpos + xi;
+				const int resy = m_paddle_reg + yi;
 
-				if(cliprect.contains(resx,resy))
+				if (cliprect.contains(resx, resy))
 					bitmap.pix(resy, resx) = white_pen;
 			}
 	}
 	// draw ball
-	for(int xi=0;xi<3;xi++)
-		for(int yi=0;yi<3;yi++)
+	for (int xi = 0; xi < 3; xi++)
+		for (int yi = 0; yi < 3; yi++)
 		{
-			int resx = m_ball_regs[0]+xi-2+x_base;
-			int resy = m_ball_regs[1]+yi;
+			const int resx = m_ball_regs[0] + xi - 2 + x_base;
+			const int resy = m_ball_regs[1] + yi;
 
-			if(cliprect.contains(resx,resy))
-				bitmap.pix(resy, resx) = (white_pen);
+			if (cliprect.contains(resx, resy))
+				bitmap.pix(resy, resx) = white_pen;
 		}
 }
 
 uint32_t tattack_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tmap->mark_all_dirty();
-	m_tmap->draw(screen, bitmap, cliprect, 0,0);
+	m_tmap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// draw bricks/ball/paddle
 	draw_gameplay_bitmap(bitmap, cliprect);
 	// draw edges
 	// probably enables thru 0xe040?
-	draw_edge_bitmap(bitmap,cliprect);
+	draw_edge_bitmap(bitmap, cliprect);
 
 	return 0;
 }
 
 void tattack_state::video_start()
 {
-	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tattack_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tattack_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	save_item(NAME(m_ball_regs));
 	save_item(NAME(m_paddle_reg));
@@ -261,26 +263,26 @@ void tattack_state::brick_dma_w(uint8_t data)
 {
 	// bit 7: 0->1 transfers from RAM to internal video buffer
 	// bit 6: bricks color bank
-	m_bricks_color_bank = BIT(data,6);
+	m_bricks_color_bank = BIT(data, 6);
 	// bit 5: flip screen
-	flip_screen_set(!(data & 0x20));
+	flip_screen_set(!BIT(data, 5));
 	// bit 4: x paddle half size
-	m_paddle_ysize = data & 0x10 ? 8 : 16;
+	m_paddle_ysize = BIT(data, 4) ? 8 : 16;
 	// bit 3: enable bottom edge
 	m_bottom_edge_enable = BIT(data,3);
-//  popmessage("%02x",data&0x7f);
+//  popmessage("%02x", data & 0x7f);
 }
 
 void tattack_state::sound_w(uint8_t data)
 {
 	// bit 4 enabled on coin insertion (coin counter?)
 	// bit 3-0 samples enable, @see tattack_sample_names
-	for(int i=0;i<4;i++)
+	for (int i = 0; i < 4; i++)
 	{
 		// don't restart playing if it is still enabled (victory BGM relies on this)
-		if(data & 1 << i && m_samples->playing(i) == false)
-			m_samples->start(i,i);
-		//if((data & 1 << i) == 0 && m_samples->playing(i) == true)
+		if (data & 1 << i && m_samples->playing(i) == false)
+			m_samples->start(i, i);
+		// if ((data & 1 << i) == 0 && m_samples->playing(i) == true)
 		//  m_samples->stop(i);
 	}
 }
@@ -414,15 +416,15 @@ static const char *const tattack_sample_names[] =
 
 void tattack_state::tattack(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 8000000 / 2);   /* 4 MHz ? */
+	// basic machine hardware
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2);   // 4 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &tattack_state::prg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tattack_state::irq0_line_hold));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(24, 256-32-1, 13, 256-11-1);
 	screen.set_screen_update(FUNC(tattack_state::screen_update));
@@ -431,14 +433,14 @@ void tattack_state::tattack(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_tattack);
 	PALETTE(config, "palette", FUNC(tattack_state::palette), 16);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(4);
 	m_samples->set_samples_names(tattack_sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.6);
 
-	/* Discrete ???? */
+	// Discrete ????
 //  DISCRETE(config, m_discrete);
 //  m_discrete->set_intf(tattack);
 //  m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -498,7 +500,7 @@ void tattack_state::init_tattack()
 
 }
 
-} // Anonymous namespace
+} // anonymous namespace
 
 GAME( 1983?, tattack, 0, tattack, tattack, tattack_state, init_tattack, ROT270, "Shonan", "Time Attacker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 // there is another undumped version with katakana Shonan logo and black background

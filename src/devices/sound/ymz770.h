@@ -41,9 +41,10 @@ protected:
 	virtual void sequencer();
 	uint8_t get_rom_byte(uint32_t offset) { return m_rom[offset % m_rom.bytes()]; } // need optimise or its good as is ?
 
-	ymz770_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t sclock);
+	ymz770_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t divider);
 
 	sound_stream *m_stream;
+	uint32_t m_divider;
 	uint32_t m_sclock;
 
 	// data

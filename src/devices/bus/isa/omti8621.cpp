@@ -206,10 +206,12 @@ void omti8621_device::floppy_formats(format_registration &fr)
 // and a PC BIOS to make the card bootable on a PC.
 // we have the Z8 program, we still need the PC BIOS.
 ROM_START( omti8621 )
-	ROM_REGION(0x4000, OMTI_CPU_REGION, 0)  // disassembles fine as Z8 code
+	ROM_REGION(0x4000, OMTI_CPU_REGION, 0 )  // disassembles fine as Z8 code
+	// TODO: add the other bitsavers Z8 dumps
 	ROM_LOAD( "omti_8621_102640-b.bin", 0x000000, 0x004000, CRC(e6f20dbb) SHA1(cf1990ad72eac6b296485410f5fa3309a0d6d078) )
-	ROM_REGION(0x1000, OMTI_BIOS_REGION, 0)
-	ROM_LOAD_OPTIONAL("omti_bios", 0x0000, 0x1000, NO_DUMP)
+
+	ROM_REGION16_LE(0x2000, OMTI_BIOS_REGION, ROMREGION_ERASEFF )
+	ROM_LOAD("1002662a_bios.bin", 0x0000, 0x2000, CRC(aea62438) SHA1(4f382dbb0ca4873c44afd48c5bffb50b9c89e7dc) )
 ROM_END
 
 static INPUT_PORTS_START( omti_port )
@@ -228,7 +230,7 @@ static INPUT_PORTS_START( omti_port )
 	PORT_DIPSETTING(    0x01, "0370h" )
 
 	PORT_START("BIOS_OPTS")
-	PORT_DIPNAME( 0x01, 0x00, "BIOS control")
+	PORT_DIPNAME( 0x01, 0x01, "BIOS control")
 	PORT_DIPSETTING(    0x00, "Disabled" )
 	PORT_DIPSETTING(    0x01, "Enabled" )
 	PORT_DIPNAME( 0x02, 0x00, "BIOS base")
@@ -279,11 +281,9 @@ ioport_constructor omti8621_device::device_input_ports() const
 
 void omti8621_device::device_start()
 {
-	LOGMASKED(LOG_LEVEL2, "device_start");
+	LOGMASKED(LOG_LEVEL2, "device_start\n");
 
 	set_isa_device();
-
-	m_installed = false;
 
 	m_sector_buffer.resize(OMTI_DISK_SECTOR_SIZE*OMTI_MAX_BLOCK_COUNT);
 
@@ -301,31 +301,24 @@ void omti8621_device::device_reset()
 {
 	static const int io_bases[8] = { 0x320, 0x324, 0x328, 0x32c, 0x1a0, 0x1a4, 0x1a8, 0x1ac };
 
-	LOGMASKED(LOG_LEVEL2, "device_reset");
+	LOGMASKED(LOG_LEVEL2, "device_reset\n");
 
-	// you can't read I/O ports in device_start() even if they're required_ioport<> in your class!
-	if (!m_installed)
-	{
-		int esdi_base = io_bases[m_iobase->read() & 7];
+	// setup memory and I/O bases
+	m_bios_enable = !!BIT(m_biosopts->read(), 0);
+	m_bios_base = BIT(m_biosopts->read(), 1) ? 0xca000 : 0xc8000;
+	m_esdi_base = io_bases[m_iobase->read() & 7];
+	m_fdc_base = BIT(m_iobase->read(), 3) ? 0x0370 : 0x3f0;
 
-		// install the ESDI ports
-		m_isa->install16_device(esdi_base, esdi_base + 7, read16s_delegate(*this, FUNC(omti8621_device::read)), write16s_delegate(*this, FUNC(omti8621_device::write)));
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
+	m_isa->set_dma_channel(2, this, true);
+	// separate software reset from ISA remapping
+	sw_reset();
+}
 
-		// and the onboard AT FDC ports
-		if (m_iobase->read() & 8)
-		{
-			m_isa->install_device(0x0370, 0x0377, *this, &omti8621_device::fdc_map);
-		}
-		else
-		{
-			m_isa->install_device(0x03f0, 0x03f7, *this, &omti8621_device::fdc_map);
-		}
-
-		m_isa->set_dma_channel(2, this, true);
-
-		m_installed = true;
-	}
-
+void omti8621_device::sw_reset()
+{
+	LOGMASKED(LOG_LEVEL2, "sw_reset\n");
 	set_jumper(our_disks[0]->m_type);
 
 	// should go from reset to idle after 100 us
@@ -365,7 +358,26 @@ void omti8621_device::device_reset()
 	fd_moten_w(0);
 	fd_rate_w(0);
 	fd_extra_w(0);
+
 }
+
+void omti8621_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		if (m_bios_enable)
+			m_isa->install_rom(this, m_bios_base, m_bios_base | 0x1fff, OMTI_BIOS_REGION);
+	}
+	else if (space_id == AS_IO)
+	{
+		// install the ESDI ports
+		m_isa->install16_device(m_esdi_base, m_esdi_base + 7, read16s_delegate(*this, FUNC(omti8621_device::read)), write16s_delegate(*this, FUNC(omti8621_device::write)));
+
+		// and the onboard AT FDC ports
+		m_isa->install_device(m_fdc_base, m_fdc_base + 7, *this, &omti8621_device::fdc_map);
+	}
+}
+
 
 DEFINE_DEVICE_TYPE(ISA16_OMTI8621, omti8621_pc_device, "omti8621isa", "OMTI 8621 ESDI/floppy controller (ISA)")
 
@@ -408,7 +420,6 @@ omti8621_device::omti8621_device(
 	, m_diskaddr_format_bad_track(0)
 	, m_timer(nullptr)
 	, m_moten(0)
-	, m_installed(false)
 {
 }
 
@@ -418,7 +429,7 @@ omti8621_device::omti8621_device(
 
 void omti8621_device::set_interrupt(line_state state)
 {
-	LOGMASKED(LOG_LEVEL2, "%s: set_interrupt: status_port=%x, line_state %d", cpu_context(), m_status_port, state);
+	LOGMASKED(LOG_LEVEL2, "%s: set_interrupt: status_port=%x, line_state %d\n", cpu_context(), m_status_port, state);
 	m_isa->irq14_w(state);
 }
 
@@ -432,7 +443,7 @@ TIMER_CALLBACK_MEMBER(omti8621_device::trigger_interrupt)
  ***************************************************************************/
 
 void omti8621_device::clear_sense_data() {
-	LOGMASKED(LOG_LEVEL2, "%s: clear_sense_data", cpu_context());
+	LOGMASKED(LOG_LEVEL2, "%s: clear_sense_data\n", cpu_context());
 	std::fill_n(m_sense_data, std::size(m_sense_data), 0);
 }
 
@@ -441,7 +452,7 @@ void omti8621_device::clear_sense_data() {
  ***************************************************************************/
 
 void omti8621_device::set_sense_data(uint8_t code, const uint8_t * cdb) {
-	LOGMASKED(LOG_LEVEL2, "%s: set_sense_data code=%x", cpu_context(), code);
+	LOGMASKED(LOG_LEVEL2, "%s: set_sense_data code=%x\n", cpu_context(), code);
 	m_sense_data[0] = code;
 	m_sense_data[1] = cdb[1];
 	m_sense_data[2] = cdb[2];
@@ -453,7 +464,7 @@ void omti8621_device::set_sense_data(uint8_t code, const uint8_t * cdb) {
  ***************************************************************************/
 
 void omti8621_device::set_configuration_data(uint8_t lun) {
-	LOGMASKED(LOG_LEVEL2, "%s: set_configuration_data lun=%x", cpu_context(), lun);
+	LOGMASKED(LOG_LEVEL2, "%s: set_configuration_data lun=%x\n", cpu_context(), lun);
 
 	// initialize the configuration data
 	omti_disk_image_device *disk = our_disks[lun];
@@ -497,7 +508,7 @@ uint8_t omti8621_device::check_disk_address(const uint8_t *cdb)
 	uint32_t disk_addr = (disk_track * disk->m_sectors) + sector;
 
 	if (block_count > OMTI_MAX_BLOCK_COUNT) {
-		LOGMASKED(LOG_LEVEL0, "%s: ########### check_disk_address: unexpected block count %x", cpu_context(), block_count);
+		LOGMASKED(LOG_LEVEL0, "%s: ########### check_disk_address: unexpected block count %x\n", cpu_context(), block_count);
 		sense_code = OMTI_SENSE_CODE_ILLEGAL_ADDRESS | OMTI_SENSE_CODE_ADDRESS_VALID;
 	}
 
@@ -575,7 +586,7 @@ void omti8621_device::read_sectors_from_disk(int32_t diskaddr, uint8_t count, ui
 	device_image_interface *image = our_disks[lun]->m_image;
 
 	while (count-- > 0) {
-		LOGMASKED(LOG_LEVEL2, "%s: read_sectors_from_disk lun=%d diskaddr=%x", cpu_context(), lun, diskaddr);
+		LOGMASKED(LOG_LEVEL2, "%s: read_sectors_from_disk lun=%d diskaddr=%x\n", cpu_context(), lun, diskaddr);
 
 		image->fseek(diskaddr * OMTI_DISK_SECTOR_SIZE, SEEK_SET);
 		image->fread(data_buffer, OMTI_DISK_SECTOR_SIZE);
@@ -595,7 +606,7 @@ void omti8621_device::write_sectors_to_disk(int32_t diskaddr, uint8_t count, uin
 	device_image_interface *image = our_disks[lun]->m_image;
 
 	while (count-- > 0) {
-		LOGMASKED(LOG_LEVEL2, "%s: write_sectors_to_disk lun=%d diskaddr=%x", cpu_context(), lun, diskaddr);
+		LOGMASKED(LOG_LEVEL2, "%s: write_sectors_to_disk lun=%d diskaddr=%x\n", cpu_context(), lun, diskaddr);
 
 		image->fseek(diskaddr * OMTI_DISK_SECTOR_SIZE, SEEK_SET);
 		image->fwrite(data_buffer, OMTI_DISK_SECTOR_SIZE);
@@ -618,7 +629,7 @@ void omti8621_device::copy_sectors(int32_t dst_addr, int32_t src_addr, uint8_t c
 {
 	device_image_interface *image = our_disks[lun]->m_image;
 
-	LOGMASKED(LOG_LEVEL2, "%s: copy_sectors lun=%d src_addr=%x dst_addr=%x count=%x", cpu_context(), lun, src_addr, dst_addr, count);
+	LOGMASKED(LOG_LEVEL2, "%s: copy_sectors lun=%d src_addr=%x dst_addr=%x count=%x\n", cpu_context(), lun, src_addr, dst_addr, count);
 
 	while (count-- > 0) {
 		image->fseek(src_addr * OMTI_DISK_SECTOR_SIZE, SEEK_SET);
@@ -970,7 +981,7 @@ void omti8621_device::do_command(const uint8_t cdb[], const uint16_t cdb_length)
 		break;
 
 	default:
-		LOGMASKED(LOG_LEVEL0, "%s: do_command: UNEXPECTED command %02x", cpu_context(), cdb[0]);
+		LOGMASKED(LOG_LEVEL0, "%s: do_command: UNEXPECTED command %02x\n", cpu_context(), cdb[0]);
 		set_sense_data(OMTI_SENSE_CODE_INVALID_COMMAND, cdb);
 		m_command_status |= OMTI_COMMAND_STATUS_ERROR;
 		break;
@@ -978,7 +989,7 @@ void omti8621_device::do_command(const uint8_t cdb[], const uint16_t cdb_length)
 
 	if (m_mask_port & OMTI_MASK_INTE) {
 //      if (m_omti_state != OMTI_STATE_STATUS) {
-//          LOGMASKED(LOG_LEVEL0, "%s: do_command: UNEXPECTED omti_state %02x", cpu_context(), m_omti_state));
+//          LOGMASKED(LOG_LEVEL0, "%s: do_command: UNEXPECTED omti_state %02x\n", cpu_context(), m_omti_state));
 //      }
 		m_status_port |= OMTI_STATUS_IREQ;
 		if (command_duration == 0)
@@ -1018,7 +1029,7 @@ uint16_t omti8621_device::get_data()
 			log_data();
 		}
 	} else {
-		LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED reading OMTI 8621 data (buffer length exceeded)", cpu_context());
+		LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED reading OMTI 8621 data (buffer length exceeded)\n", cpu_context());
 	}
 	return data;
 }
@@ -1036,7 +1047,7 @@ void omti8621_device::set_data(uint16_t data)
 			do_command(m_command_buffer, m_command_index);
 		}
 	} else {
-		LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED writing OMTI 8621 data (buffer length exceeded)", cpu_context());
+		LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED writing OMTI 8621 data (buffer length exceeded)\n", cpu_context());
 	}
 }
 
@@ -1069,7 +1080,7 @@ void omti8621_device::write8(offs_t offset, uint8_t data)
 	case OMTI_PORT_DATA_OUT: //  0x00
 		switch (m_omti_state) {
 		case OMTI_STATE_COMMAND:
-			LOGMASKED(LOG_LEVEL2, "%s: writing OMTI 8621 Command Register at offset %02x = %02x", cpu_context(), offset, data);
+			LOGMASKED(LOG_LEVEL2, "%s: writing OMTI 8621 Command Register at offset %02x = %02x\n", cpu_context(), offset, data);
 			if (m_command_index == 0) {
 				m_command_length = get_command_length(data);
 			}
@@ -1077,7 +1088,7 @@ void omti8621_device::write8(offs_t offset, uint8_t data)
 			if (m_command_index < m_command_length) {
 				m_command_buffer[m_command_index++] = data;
 			} else {
-				LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED writing OMTI 8621 Data Register at offset %02x = %02x (command length exceeded)", cpu_context(), offset, data);
+				LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED writing OMTI 8621 Data Register at offset %02x = %02x (command length exceeded)\n", cpu_context(), offset, data);
 			}
 
 			if (m_command_index == m_command_length) {
@@ -1109,22 +1120,22 @@ void omti8621_device::write8(offs_t offset, uint8_t data)
 			break;
 
 		case OMTI_STATE_DATA:
-			LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED: writing OMTI 8621 Data Register at offset %02x = %02x", cpu_context(), offset, data);
+			LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED: writing OMTI 8621 Data Register at offset %02x = %02x\n", cpu_context(), offset, data);
 			break;
 
 		default:
-			LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED writing OMTI 8621 Data Register at offset %02x = %02x (omti state = %02x)", cpu_context(), offset, data, m_omti_state);
+			LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED writing OMTI 8621 Data Register at offset %02x = %02x (omti state = %02x)\n", cpu_context(), offset, data, m_omti_state);
 			break;
 		}
 		break;
 
 	case OMTI_PORT_RESET: // 0x01
-		LOGMASKED(LOG_LEVEL2, "%s: writing OMTI 8621 Reset Register at offset %02x = %02x", cpu_context(), offset, data);
-		device_reset();
+		LOGMASKED(LOG_LEVEL2, "%s: writing OMTI 8621 Reset Register at offset %02x = %02x\n", cpu_context(), offset, data);
+		sw_reset();
 		break;
 
 	case OMTI_PORT_SELECT: // 0x02
-		LOGMASKED(LOG_LEVEL2, "%s: writing OMTI 8621 Select Register at offset %02x = %02x (omti state = %02x)", cpu_context(), offset, data, m_omti_state);
+		LOGMASKED(LOG_LEVEL2, "%s: writing OMTI 8621 Select Register at offset %02x = %02x (omti state = %02x)\n", cpu_context(), offset, data, m_omti_state);
 		m_omti_state = OMTI_STATE_COMMAND;
 
 		m_status_port |= OMTI_STATUS_BUSY | OMTI_STATUS_REQ | OMTI_STATUS_CD;
@@ -1135,7 +1146,7 @@ void omti8621_device::write8(offs_t offset, uint8_t data)
 		break;
 
 	case OMTI_PORT_MASK: // 0x03
-		LOGMASKED(LOG_LEVEL2, "%s: writing OMTI 8621 Mask Register at offset %02x = %02x", cpu_context(), offset, data);
+		LOGMASKED(LOG_LEVEL2, "%s: writing OMTI 8621 Mask Register at offset %02x = %02x\n", cpu_context(), offset, data);
 		m_mask_port = data;
 
 		if ((data & OMTI_MASK_INTE) == 0) {
@@ -1149,7 +1160,7 @@ void omti8621_device::write8(offs_t offset, uint8_t data)
 		break;
 
 	default:
-		LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED writing OMTI 8621 Register at offset %02x = %02x", cpu_context(), offset, data);
+		LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED writing OMTI 8621 Register at offset %02x = %02x\n", cpu_context(), offset, data);
 		break;
 	}
 }
@@ -1180,21 +1191,21 @@ uint8_t omti8621_device::read8(offs_t offset)
 			switch (m_omti_state)
 			{
 			case OMTI_STATE_COMMAND:
-				LOGMASKED(LOG_LEVEL2, "%s: reading OMTI 8621 Data Status Register 1 at offset %02x = %02x (omti state = %02x)", cpu_context(), offset, data, m_omti_state);
+				LOGMASKED(LOG_LEVEL2, "%s: reading OMTI 8621 Data Status Register 1 at offset %02x = %02x (omti state = %02x)\n", cpu_context(), offset, data, m_omti_state);
 				break;
 			case OMTI_STATE_STATUS:
 				m_omti_state = OMTI_STATE_IDLE;
 				m_status_port &= ~(OMTI_STATUS_BUSY | OMTI_STATUS_CD  | OMTI_STATUS_IO | OMTI_STATUS_REQ);
-				LOGMASKED(LOG_LEVEL2, "%s: reading OMTI 8621 Data Status Register 2 at offset %02x = %02x", cpu_context(), offset, data);
+				LOGMASKED(LOG_LEVEL2, "%s: reading OMTI 8621 Data Status Register 2 at offset %02x = %02x\n", cpu_context(), offset, data);
 				break;
 			default:
-				LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED reading OMTI 8621 Data Status Register 3 at offset %02x = %02x (omti state = %02x)", cpu_context(), offset, data, m_omti_state);
+				LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED reading OMTI 8621 Data Status Register 3 at offset %02x = %02x (omti state = %02x)\n", cpu_context(), offset, data, m_omti_state);
 				break;
 			}
 		}
 		else
 		{
-			LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED reading OMTI 8621 Data Register 4 at offset %02x = %02x (status bit C/D = 0)", cpu_context(), offset, data);
+			LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED reading OMTI 8621 Data Register 4 at offset %02x = %02x (status bit C/D = 0)\n", cpu_context(), offset, data);
 		}
 		break;
 
@@ -1203,24 +1214,24 @@ uint8_t omti8621_device::read8(offs_t offset)
 		// omit excessive logging
 		if (data != last_data)
 		{
-			LOGMASKED(LOG_LEVEL2, "%s: reading OMTI 8621 Status Register 5 at offset %02x = %02x", cpu_context(), offset, data);
+			LOGMASKED(LOG_LEVEL2, "%s: reading OMTI 8621 Status Register 5 at offset %02x = %02x\n", cpu_context(), offset, data);
 //          last_data = data;
 		}
 		break;
 
 	case OMTI_PORT_CONFIG: // 0x02
 		data = m_config_port;
-		LOGMASKED(LOG_LEVEL2, "%s: reading OMTI 8621 Configuration Register at offset %02x = %02x", cpu_context(), offset, data);
+		LOGMASKED(LOG_LEVEL2, "%s: reading OMTI 8621 Configuration Register at offset %02x = %02x\n", cpu_context(), offset, data);
 		break;
 
 	case OMTI_PORT_MASK: // 0x03
 		data = m_mask_port;
 		// win.dex will update the mask register with read-modify-write
-		// LOGMASKED(LOG_LEVEL2, "%s: reading OMTI 8621 Mask Register at offset %02x = %02x (UNEXPECTED!)", cpu_context(), offset, data);
+		// LOGMASKED(LOG_LEVEL2, "%s: reading OMTI 8621 Mask Register at offset %02x = %02x (UNEXPECTED!)\n", cpu_context(), offset, data);
 		break;
 
 	default:
-		LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED reading OMTI 8621 Register at offset %02x = %02x", cpu_context(), offset, data);
+		LOGMASKED(LOG_LEVEL0, "%s: UNEXPECTED reading OMTI 8621 Register at offset %02x = %02x\n", cpu_context(), offset, data);
 		break;
 	}
 
@@ -1241,7 +1252,7 @@ uint32_t omti8621_apollo_device::get_sector(int32_t diskaddr, uint8_t *buffer, u
 	}
 	else
 	{
-//      LOGMASKED(LOG_LEVEL1, "%s: omti8621_get_sector %x on lun %d", cpu_context(), diskaddr, lun);
+//      LOGMASKED(LOG_LEVEL1, "%s: omti8621_get_sector %x on lun %d\n", cpu_context(), diskaddr, lun);
 
 		// restrict length to size of 1 sector (i.e. 1024 Byte)
 		length = length < OMTI_DISK_SECTOR_SIZE ? length  : OMTI_DISK_SECTOR_SIZE;
@@ -1259,7 +1270,7 @@ uint32_t omti8621_apollo_device::get_sector(int32_t diskaddr, uint8_t *buffer, u
 
 void omti8621_device::set_jumper(uint16_t disk_type)
 {
-	LOGMASKED(LOG_LEVEL1, "%s: set_jumper: disk type=%x", cpu_context(), disk_type);
+	LOGMASKED(LOG_LEVEL1, "%s: set_jumper: disk type=%x\n", cpu_context(), disk_type);
 
 	switch (disk_type)
 	{

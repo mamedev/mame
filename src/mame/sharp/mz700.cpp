@@ -403,6 +403,7 @@ void mz_state::mz700(machine_config &config)
 	m_cassette->set_interface("mz_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("mz700_cass");
+	SOFTWARE_LIST(config, "cass_list_80k").set_compatible("mz80k_cass");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -428,6 +429,7 @@ void mz800_state::mz800(machine_config &config)
 
 	config.device_remove("cass_list");
 	SOFTWARE_LIST(config, "cass_list").set_original("mz800_cass");
+	SOFTWARE_LIST(config, "cass_list_700").set_compatible("mz700_cass");
 
 	/* devices */
 	m_pit->set_clk<0>(XTAL(17'734'470)/16);

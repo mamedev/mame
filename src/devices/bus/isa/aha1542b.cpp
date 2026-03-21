@@ -27,7 +27,7 @@ aha154x_device::aha154x_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_localcpu(*this, "localcpu")
-	, m_scsic(*this, "scsi:7:scsic")
+	, m_scsic(*this, "scsic")
 	, m_fdc(*this, "fdc")
 	, m_bios(*this, "bios")
 {
@@ -379,18 +379,9 @@ ioport_constructor aha1542b_device::device_input_ports() const
 	return INPUT_PORTS_NAME(aha1542b);
 }
 
-void aha154x_device::scsic_config(device_t *device)
-{
-	device->set_clock(20_MHz_XTAL);
-	downcast<aic6250_device &>(*device).int_cb().set_inputline("^^localcpu", I8085_RST65_LINE);
-	downcast<aic6250_device &>(*device).breq_cb().set("^^dmaaic", FUNC(aic580_device::breq_w));
-	downcast<aic6250_device &>(*device).port_a_r_cb().set_ioport("^^SETUP");
-	downcast<aic6250_device &>(*device).port_b_r_cb().set_ioport("^^CONFIG");
-}
-
 void aha154x_device::scsi_add(machine_config &config)
 {
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
@@ -398,10 +389,15 @@ void aha154x_device::scsi_add(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("scsic", AIC6250)
-		.machine_config([this] (device_t *device) { scsic_config(device); });
+
+	AIC6250(config, m_scsic, 20_MHz_XTAL);
+	scsi.set_external_device(7, m_scsic);
+	m_scsic->int_cb().set_inputline(m_localcpu, I8085_RST65_LINE);
+	m_scsic->port_a_r_cb().set_ioport("SETUP");
+	m_scsic->port_b_r_cb().set_ioport("CONFIG");
 
 	aic580_device &dmaaic(AIC580(config, "dmaaic", 20_MHz_XTAL));
+	m_scsic->breq_cb().set(dmaaic, FUNC(aic580_device::breq_w));
 	dmaaic.bdin_callback().set(m_scsic, FUNC(aic6250_device::dma_r));
 	dmaaic.bdout_callback().set(m_scsic, FUNC(aic6250_device::dma_w));
 	dmaaic.back_callback().set(m_scsic, FUNC(aic6250_device::back_w));
@@ -409,8 +405,8 @@ void aha154x_device::scsi_add(machine_config &config)
 
 void aha1542a_device::device_add_mconfig(machine_config &config)
 {
-	i8085a_cpu_device &localcpu(I8085A(config, m_localcpu, 20_MHz_XTAL / 2));
-	localcpu.set_addrmap(AS_PROGRAM, &aha1542a_device::i8085_map);
+	I8085A(config, m_localcpu, 20_MHz_XTAL / 2);
+	m_localcpu->set_addrmap(AS_PROGRAM, &aha1542a_device::i8085_map);
 
 	generic_latch_8_device &fromhost(GENERIC_LATCH_8(config, "fromhost"));
 	fromhost.data_pending_callback().set_inputline(m_localcpu, I8085_RST55_LINE);
@@ -424,8 +420,8 @@ void aha1542a_device::device_add_mconfig(machine_config &config)
 
 void aha1542b_device::device_add_mconfig(machine_config &config)
 {
-	i8085a_cpu_device &localcpu(I8085A(config, m_localcpu, 20_MHz_XTAL / 2));
-	localcpu.set_addrmap(AS_PROGRAM, &aha1542b_device::i8085_map);
+	I8085A(config, m_localcpu, 20_MHz_XTAL / 2);
+	m_localcpu->set_addrmap(AS_PROGRAM, &aha1542b_device::i8085_map);
 
 	AIC565(config, m_busaic);
 	m_busaic->hrst_callback().set_inputline(m_localcpu, INPUT_LINE_RESET);

@@ -412,12 +412,12 @@ authors:hap
 	<element name="text_l9"><text string="TAKE BACK" align="2"></text></element>
 	<element name="text_l10"><text string="MOVE" align="2"></text></element>
 
-	<element name="text_l11"><text string="ERROR" align="2"></text></element>
-	<element name="text_l12"><text string="CHECK" align="2"></text></element>
-	<element name="text_l13"><text string="MATE" align="2"></text></element>
-	<element name="text_l14"><text string="DRAW" align="2"></text></element>
-	<element name="text_l15"><text string="3RD REPET" align="2"></text></element> <!-- sic -->
-	<element name="text_l16"><text string="RESIGN" align="2"></text></element>
+	<element name="text_l11"><rect><color red="0" green="0" blue="0" /></rect><text string=" ERROR" align="2"></text></element>
+	<element name="text_l12"><rect><color red="0" green="0" blue="0" /></rect><text string=" CHECK" align="2"></text></element>
+	<element name="text_l13"><rect><color red="0" green="0" blue="0" /></rect><text string=" MATE" align="2"></text></element>
+	<element name="text_l14"><rect><color red="0" green="0" blue="0" /></rect><text string=" DRAW" align="2"></text></element>
+	<element name="text_l15"><rect><color red="0" green="0" blue="0" /></rect><text string=" 3RD REPET" align="2"></text></element> <!-- sic -->
+	<element name="text_l16"><rect><color red="0" green="0" blue="0" /></rect><text string=" RESIGN" align="2"></text></element>
 
 	<element name="text_p1"><image file="chess/wk.svg"/></element>
 	<element name="text_p2"><image file="chess/wq.svg"/></element>
@@ -445,20 +445,19 @@ authors:hap
 		</repeat>
 
 		<repeat count="6">
-			<param name="y" start="69.75" increment="5" />
-			<param name="i" start="11" increment="1" />
-			<element ref="text_l~i~"><bounds x="1" y="~y~" width="15" height="1.5" /></element>
+			<param name="y" start="70.5" increment="5" />
+			<element ref="whiter"><bounds x="4.5" yc="~y~" width="8" height="0.15" /></element>
 		</repeat>
+
+		<element ref="text_l11"><bounds left="10.5" y="69.75" right="16" height="1.5" /></element>
+		<element ref="text_l12"><bounds left="10.7" y="74.75" right="16" height="1.5" /></element>
+		<element ref="text_l13"><bounds left="11.4" y="79.75" right="16" height="1.5" /></element>
+		<element ref="text_l14"><bounds left="11.0" y="84.75" right="16" height="1.5" /></element>
+		<element ref="text_l15"><bounds left="8.5"  y="89.75" right="16" height="1.5" /></element>
+		<element ref="text_l16"><bounds left="10.3" y="94.75" right="16" height="1.5" /></element>
 
 		<element ref="text_black"><bounds x="4.5" y="35.875" width="11.5" height="1.5" /></element>
 		<element ref="text_white"><bounds x="4.5" y="48.075" width="11.5" height="1.5" /></element>
-
-		<element ref="whiter"><bounds x="4.5" yc="70.5" width="6.0" height="0.15" /></element>
-		<element ref="whiter"><bounds x="4.5" yc="75.5" width="6.2" height="0.15" /></element>
-		<element ref="whiter"><bounds x="4.5" yc="80.5" width="6.9" height="0.15" /></element>
-		<element ref="whiter"><bounds x="4.5" yc="85.5" width="6.5" height="0.15" /></element>
-		<element ref="whiter"><bounds x="4.5" yc="90.5" width="4.0" height="0.15" /></element>
-		<element ref="whiter"><bounds x="4.5" yc="95.5" width="5.8" height="0.15" /></element>
 
 		<element ref="blackr"><bounds x="4.5" yc="16.1" width="1.8" height="1.8" /></element>
 		<element ref="whiter"><bounds x="4.5" yc="19.8" width="1.8" height="1.8" /></element>

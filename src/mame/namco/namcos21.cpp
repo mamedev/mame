@@ -280,22 +280,25 @@ Filter Board
 */
 
 #include "emu.h"
-#include "screen.h"
-#include "emupal.h"
-#include "speaker.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/m6805/m6805.h"
-#include "cpu/m6809/m6809.h"
-#include "cpu/tms32025/tms32025.h"
-#include "machine/timer.h"
-#include "machine/nvram.h"
+
 #include "namco65.h"
 #include "namcos21_dsp.h"
 #include "namco_c139.h"
 #include "namco_c148.h"
 #include "namcos21_3d.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/m6805/m6805.h"
+#include "cpu/m6809/m6809.h"
+#include "cpu/tms320c2x/tms320c2x.h"
+#include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/c140.h"
 #include "sound/ymopm.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 namespace {

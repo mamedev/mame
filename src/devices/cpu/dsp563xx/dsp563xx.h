@@ -14,8 +14,9 @@
 enum {
 	DSP563XX_PC, DSP563XX_LA, DSP563XX_LC,
 	DSP563XX_SR, DSP563XX_EMR, DSP563XX_MR, DSP563XX_CCR, DSP563XX_OMR,
-	DSP563XX_SSH, DSP563XX_SSL,
-	DSP563XX_A, DSP563XX_B, DSP563XX_X0, DSP563XX_X1, DSP563XX_Y0, DSP563XX_Y1,
+	DSP563XX_SSH, DSP563XX_SSL, DSP563XX_VBA, DSP563XX_EP,
+	DSP563XX_A, DSP563XX_B, DSP563XX_A0, DSP563XX_A1, DSP563XX_A2, DSP563XX_B0, DSP563XX_B1, DSP563XX_B2,
+	DSP563XX_X0, DSP563XX_X1, DSP563XX_Y0, DSP563XX_Y1, DSP563XX_X, DSP563XX_Y,
 	DSP563XX_R0, DSP563XX_R1, DSP563XX_R2, DSP563XX_R3, DSP563XX_R4, DSP563XX_R5, DSP563XX_R6, DSP563XX_R7,
 	DSP563XX_N0, DSP563XX_N1, DSP563XX_N2, DSP563XX_N3, DSP563XX_N4, DSP563XX_N5, DSP563XX_N6, DSP563XX_N7,
 	DSP563XX_M0, DSP563XX_M1, DSP563XX_M2, DSP563XX_M3, DSP563XX_M4, DSP563XX_M5, DSP563XX_M6, DSP563XX_M7,
@@ -64,7 +65,7 @@ protected:
 
 	static const u64 t_move_ex[40];
 	static const u64 t_npar_ex[72];
-		
+
 	dsp563xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
 					address_map_constructor map_p, address_map_constructor map_x, address_map_constructor map_y);
 
@@ -97,6 +98,7 @@ protected:
 	memory_access<24, 2, -2, ENDIANNESS_LITTLE>::cache m_p;
 	memory_access<24, 2, -2, ENDIANNESS_LITTLE>::specific m_x, m_y;
 
+	u64 m_temp;
 	u64 m_a, m_b;
 	u32 m_tmp1, m_tmp2;
 	std::array<u32, 16> m_stackh, m_stackl;
@@ -150,15 +152,17 @@ protected:
 	inline void set_omr(u32 v) { m_omr = v; }
 	inline void set_sc(u32 v) { m_sc = v; }
 	inline void set_sp(u32 v) { m_sp = v; }
-	inline void set_sr(u32 v) { m_emr = v >> 16; m_mr = v >> 8; m_ccr = v; }
+	inline void set_sr(u32 v) { m_emr = (v >> 16) & 0xfb; m_mr = (v >> 8) & 0xef; m_ccr = v; }
 	inline void set_ssh(u32 v) { m_stackh[m_sp] = v; }
 	inline void set_ssl(u32 v) { m_stackl[m_sp] = v; }
 	inline void set_sz(u32 v) { m_sz = v; }
 	inline void set_vba(u32 v) { m_vba = v; }
-	inline void set_mr(u8 v) { m_mr = v; }
 	inline void set_ccr(u8 v) { m_ccr = v; }
+	inline void set_mr(u8 v) { m_mr = v & 0xef; }
+	inline void set_emr(u8 v) { m_emr = v & 0xfb; }
 	inline void set_com(u8 v) { m_omr = (m_omr & 0xffff00) | v; }
 	inline void set_eom(u8 v) { m_omr = (m_omr & 0xff00ff) | (v << 8); }
+	inline void set_scs(u8 v) { m_omr = (m_omr & 0x00ffff) | (v << 16); }
 
 	inline u64 get_a() const { return m_a; }
 	inline u32 get_ah() const { return std::clamp(s32(m_a >> 24), -0x00800000, 0x007fffff) & 0xffffff; }
@@ -197,9 +201,10 @@ protected:
 	inline u32 get_sz() const { return m_sz; }
 	inline u32 get_vba() const { return m_vba; }
 	inline u8 get_mr() const { return m_mr; }
-	inline u8 get_ccr() const { return m_mr; }
+	inline u8 get_ccr() const { return m_ccr; }
 	inline u8 get_com() const { return m_omr; }
 	inline u8 get_eom() const { return m_omr >> 8; }
+	inline u8 get_scs() const { return m_omr >> 16; }
 
 	inline bool test_cc() const { return (m_ccr & CCR_C) == 0; }
 	inline bool test_ge() const { return (m_ccr & (CCR_N|CCR_V)) == 0 || (m_ccr & (CCR_N|CCR_V)) == (CCR_N|CCR_V); }

@@ -5,7 +5,7 @@
     pgm2_memcard.cpp
 
     PGM2 Memory card functions.
-    Presumably Siemens SLE 4442 or compatible.
+    Siemens SLE 4442 or compatible.
 
 *********************************************************************/
 

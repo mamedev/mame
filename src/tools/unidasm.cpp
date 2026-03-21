@@ -51,7 +51,7 @@ using util::BIT;
 #include "cpu/dsp563xx/dsp563xxd.h"
 #include "cpu/dspp/dsppdasm.h"
 #include "cpu/e0c6200/e0c6200d.h"
-#include "cpu/e132xs/32xsdasm.h"
+#include "cpu/e132xs/e1dasm.h"
 #include "cpu/es5510/es5510d.h"
 #include "cpu/esrip/esripdsm.h"
 #include "cpu/f2mc16/f2mc16d.h"
@@ -88,6 +88,7 @@ using util::BIT;
 #include "cpu/ks0164/ks0164d.h"
 #include "cpu/lc57/lc57d.h"
 #include "cpu/lc58/lc58d.h"
+#include "cpu/lc6500/lc6500_dasm.h"
 #include "cpu/lc8670/lc8670dsm.h"
 #include "cpu/lh5801/5801dasm.h"
 #include "cpu/lr35902/lr35902d.h"
@@ -168,7 +169,7 @@ using util::BIT;
 #include "cpu/scudsp/scudspdasm.h"
 #include "cpu/se3208/se3208dis.h"
 #include "cpu/sh/sh_dasm.h"
-#include "cpu/sharc/sharcdsm.h"
+#include "cpu/sharc/sharc_dasm.h"
 #include "cpu/sigma2/sigma2d.h"
 #include "cpu/sm510/sm510d.h"
 #include "cpu/sm8500/sm8500d.h"
@@ -185,12 +186,12 @@ using util::BIT;
 #include "cpu/tlcs90/tlcs90d.h"
 #include "cpu/tlcs900/dasm900.h"
 #include "cpu/tms1000/tms1k_dasm.h"
-#include "cpu/tms32010/32010dsm.h"
-#include "cpu/tms32025/32025dsm.h"
-#include "cpu/tms32031/dis32031.h"
-#include "cpu/tms32051/dis32051.h"
-#include "cpu/tms32082/dis_mp.h"
-#include "cpu/tms32082/dis_pp.h"
+#include "cpu/tms320c1x/tms320c1x_dasm.h"
+#include "cpu/tms320c2x/tms320c2x_dasm.h"
+#include "cpu/tms320c3x/tms320c3x_dasm.h"
+#include "cpu/tms320c5x/tms320c5x_dasm.h"
+#include "cpu/tms320c82/mp_dasm.h"
+#include "cpu/tms320c82/pp_dasm.h"
 #include "cpu/tms34010/34010dsm.h"
 #include "cpu/tms57002/57002dsm.h"
 #include "cpu/tms7000/7000dasm.h"
@@ -347,16 +348,6 @@ struct z8000_unidasm_t : z8000_disassembler::config
 } z8000_unidasm;
 
 // Configuration missing
-struct hyperstone_unidasm_t : hyperstone_disassembler::config
-{
-	bool h;
-	hyperstone_unidasm_t() { h = false; }
-	virtual ~hyperstone_unidasm_t() = default;
-
-	virtual bool get_h() const { return h; }
-} hyperstone_unidasm;
-
-// Configuration missing
 struct nec_unidasm_t : nec_disassembler::config
 {
 	int mode;
@@ -490,7 +481,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "hp_09825_67907",  be, -1, []() -> util::disasm_interface * { return new hp_09825_67907_disassembler; } },
 	{ "hpc16083",        le,  0, []() -> util::disasm_interface * { return new hpc16083_disassembler; } },
 	{ "hpc16164",        le,  0, []() -> util::disasm_interface * { return new hpc16164_disassembler; } },
-	{ "hyperstone",      be,  0, []() -> util::disasm_interface * { return new hyperstone_disassembler(&hyperstone_unidasm); } },
+	{ "hyperstone",      be,  0, []() -> util::disasm_interface * { return new hyperstone_disassembler(nullptr); } },
 	{ "ht1130",          le,  0, []() -> util::disasm_interface * { return new ht1130_disassembler; } },
 	{ "i4004",           le,  0, []() -> util::disasm_interface * { return new i4004_disassembler; } },
 	{ "i4040",           le,  0, []() -> util::disasm_interface * { return new i4040_disassembler; } },
@@ -518,6 +509,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "kl1839vm1",       be,  0, []() -> util::disasm_interface * { return new kl1839vm1_disassembler; } },
 	{ "lc57",            be,  0, []() -> util::disasm_interface * { return new lc57_disassembler; } },
 	{ "lc58",            be, -1, []() -> util::disasm_interface * { return new lc58_disassembler; } },
+	{ "lc6500",          be,  0, []() -> util::disasm_interface * { return new lc6500_disassembler; } },
 	{ "lc8670",          be,  0, []() -> util::disasm_interface * { return new lc8670_disassembler; } },
 	{ "lh5801",          le,  0, []() -> util::disasm_interface * { return new lh5801_disassembler; } },
 	{ "lr35902",         le,  0, []() -> util::disasm_interface * { return new lr35902_disassembler; } },
@@ -658,12 +650,12 @@ static const dasm_table_entry dasm_table[] =
 	{ "tms1400",         le,  0, []() -> util::disasm_interface * { return new tms1400_disassembler; } },
 	{ "tms2100",         le,  0, []() -> util::disasm_interface * { return new tms2100_disassembler; } },
 	{ "tms2400",         le,  0, []() -> util::disasm_interface * { return new tms2400_disassembler; } },
-	{ "tms32010",        be, -1, []() -> util::disasm_interface * { return new tms32010_disassembler; } },
-	{ "tms32025",        be, -1, []() -> util::disasm_interface * { return new tms32025_disassembler; } },
-	{ "tms32031",        le, -2, []() -> util::disasm_interface * { return new tms32031_disassembler; } },
-	{ "tms32051",        le, -1, []() -> util::disasm_interface * { return new tms32051_disassembler; } },
-	{ "tms32082_mp",     be,  0, []() -> util::disasm_interface * { return new tms32082_mp_disassembler; } },
-	{ "tms32082_pp",     be,  0, []() -> util::disasm_interface * { return new tms32082_pp_disassembler; } },
+	{ "tms320c1x",       be, -1, []() -> util::disasm_interface * { return new tms320c1x_disassembler; } },
+	{ "tms320c2x",       be, -1, []() -> util::disasm_interface * { return new tms320c2x_disassembler; } },
+	{ "tms320c3x",       le, -2, []() -> util::disasm_interface * { return new tms320c3x_disassembler; } },
+	{ "tms320c5x",       le, -1, []() -> util::disasm_interface * { return new tms320c5x_disassembler; } },
+	{ "tms320c82_mp",    be,  0, []() -> util::disasm_interface * { return new tms320c82_mp_disassembler; } },
+	{ "tms320c82_pp",    be,  0, []() -> util::disasm_interface * { return new tms320c82_pp_disassembler; } },
 	{ "tms34010",        le,  3, []() -> util::disasm_interface * { return new tms34010_disassembler(false); } },
 	{ "tms34020",        le,  3, []() -> util::disasm_interface * { return new tms34010_disassembler(true); } },
 	{ "tms57002",        le, -2, []() -> util::disasm_interface * { return new tms57002_disassembler; } },
@@ -1176,7 +1168,7 @@ void unidasm_data_buffer::decrypt(const unidasm_data_buffer &buffer, bool opcode
 static int parse_number(const char *curarg, const char *default_format, u32 *value)
 {
 	int result;
-	if(curarg[0] == '0') {
+	if(curarg[0] == '0' && curarg[1] != '\0') {
 		if(tolower((uint8_t)curarg[1]) == 'x')
 			result = sscanf(&curarg[2], "%x", value);
 		else if(tolower((uint8_t)curarg[1]) == 'o')

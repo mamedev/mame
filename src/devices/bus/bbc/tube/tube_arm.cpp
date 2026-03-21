@@ -111,7 +111,7 @@ void bbc_tube_arm_device::device_add_mconfig(machine_config &config)
 
 	RAM(config, m_ram).set_default_size("4M").set_default_value(0);
 
-	SOFTWARE_LIST(config, "flop_ls_arm").set_original("bbc_flop_arm");
+	SOFTWARE_LIST(config, "flop_list").set_original("bbc_flop_arm").set_filter("ARM");
 }
 
 

@@ -354,6 +354,8 @@ namespace {
 #define DMA_SOUND_BUFFER_SIZE       16000
 
 
+class cobra_state;
+
 /* Cobra Renderer class */
 
 struct cobra_polydata
@@ -367,8 +369,9 @@ struct cobra_polydata
 class cobra_renderer : public poly_manager<float, cobra_polydata, 8>
 {
 public:
-	cobra_renderer(screen_device &screen)
+	cobra_renderer(cobra_state &cobra, screen_device &screen)
 		: poly_manager<float, cobra_polydata, 8>(screen.machine())
+		, m_cobra(cobra)
 		, m_screen(screen)
 		, m_framebuffer_size(0, 511, 0, 399)
 	{
@@ -414,7 +417,9 @@ public:
 
 	void display(bitmap_rgb32 *bitmap, const rectangle &cliprect);
 	inline rgb_t texture_fetch(uint32_t *texture, int u, int v, int width, int format);
+
 private:
+	cobra_state &m_cobra;
 	screen_device &m_screen;
 	std::unique_ptr<bitmap_rgb32> m_framebuffer;
 	std::unique_ptr<bitmap_rgb32> m_backbuffer;
@@ -932,7 +937,7 @@ void cobra_state::video_start()
 {
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&cobra_state::cobra_video_exit, this));
 
-	m_renderer = std::make_unique<cobra_renderer>(*m_screen);
+	m_renderer = std::make_unique<cobra_renderer>(*this, *m_screen);
 	m_renderer->gfx_init();
 }
 
@@ -1877,9 +1882,7 @@ void cobra_renderer::gfx_exit()
 
 void cobra_renderer::gfx_reset()
 {
-	cobra_state *cobra = screen().machine().driver_data<cobra_state>();
-
-	cobra->m_gfx_re_status = RE_STATUS_IDLE;
+	m_cobra.m_gfx_re_status = RE_STATUS_IDLE;
 }
 
 uint32_t cobra_renderer::gfx_read_gram(uint32_t address)
@@ -1977,38 +1980,36 @@ void cobra_renderer::gfx_write_reg(uint64_t data)
 
 void cobra_renderer::gfx_fifo_exec()
 {
-	cobra_state *cobra = screen().machine().driver_data<cobra_state>();
-
-	if (cobra->m_gfx_fifo_loopback != 0)
+	if (m_cobra.m_gfx_fifo_loopback != 0)
 		return;
 
 	vertex_t vert[32];
 
-	cobra_fifo *fifo_in = cobra->m_gfxfifo_in.get();
-	cobra_fifo *fifo_out = cobra->m_gfxfifo_out.get();
+	cobra_fifo *fifo_in = m_cobra.m_gfxfifo_in.get();
+	cobra_fifo *fifo_out = m_cobra.m_gfxfifo_out.get();
 
 	while (fifo_in->current_num() >= 2)
 	{
 		uint64_t in1, in2 = 0;
 		uint32_t w1, w2;
 
-		if (cobra->m_gfx_re_status == RE_STATUS_IDLE)
+		if (m_cobra.m_gfx_re_status == RE_STATUS_IDLE)
 		{
 			fifo_in->pop(nullptr, &in1);
 			fifo_in->pop(nullptr, &in2);
 			w1 = (uint32_t)(in1);
 			w2 = (uint32_t)(in2);
 
-			cobra->m_gfx_re_command_word1 = w1;
-			cobra->m_gfx_re_command_word2 = w2;
-			cobra->m_gfx_re_word_count = 0;
+			m_cobra.m_gfx_re_command_word1 = w1;
+			m_cobra.m_gfx_re_command_word2 = w2;
+			m_cobra.m_gfx_re_word_count = 0;
 
-			cobra->m_gfx_re_status = RE_STATUS_COMMAND;
+			m_cobra.m_gfx_re_status = RE_STATUS_COMMAND;
 		}
 		else
 		{
-			w1 = cobra->m_gfx_re_command_word1;
-			w2 = cobra->m_gfx_re_command_word2;
+			w1 = m_cobra.m_gfx_re_command_word1;
+			w2 = m_cobra.m_gfx_re_command_word2;
 		}
 
 
@@ -2063,10 +2064,10 @@ void cobra_renderer::gfx_fifo_exec()
 				}
 				else
 				{
-					cobra->logerror("gfxfifo_exec: unknown %08X %08X\n", w1, w2);
+					m_cobra.logerror("gfxfifo_exec: unknown %08X %08X\n", w1, w2);
 				}
 
-				cobra->m_gfx_re_status = RE_STATUS_IDLE;
+				m_cobra.m_gfx_re_status = RE_STATUS_IDLE;
 				break;
 			}
 			case 0x0f:
@@ -2084,7 +2085,7 @@ void cobra_renderer::gfx_fifo_exec()
 
 				if (w1 != 0x0f600000 && w1 != 0xf0600000)
 				{
-					cobra->logerror("gfxfifo_exec: unknown %08X %08X\n", w1, w2);
+					m_cobra.logerror("gfxfifo_exec: unknown %08X %08X\n", w1, w2);
 				}
 
 				//printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
@@ -2104,7 +2105,7 @@ void cobra_renderer::gfx_fifo_exec()
 					fifo_out->push(nullptr, in4);
 				}
 
-				cobra->m_gfx_re_status = RE_STATUS_IDLE;
+				m_cobra.m_gfx_re_status = RE_STATUS_IDLE;
 				break;
 			}
 
@@ -2113,7 +2114,7 @@ void cobra_renderer::gfx_fifo_exec()
 			{
 				//printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
 
-				cobra->m_gfx_re_status = RE_STATUS_IDLE;
+				m_cobra.m_gfx_re_status = RE_STATUS_IDLE;
 				break;
 			}
 
@@ -2171,7 +2172,7 @@ void cobra_renderer::gfx_fifo_exec()
 					vp_center_x = 256.0f;
 				}
 
-				if (LOG_DRAW_COMMANDS) cobra->logerror("--- Draw command %08X %08X ---\n", w1, w2);
+				if (LOG_DRAW_COMMANDS) m_cobra.logerror("--- Draw command %08X %08X ---\n", w1, w2);
 
 				// extract vertex data
 				for (int i=0; i < units; i++)
@@ -2224,36 +2225,36 @@ void cobra_renderer::gfx_fifo_exec()
 
 					if (w2 & 0x40000000)
 					{
-						if (LOG_DRAW_COMMANDS) cobra->logerror("    ?: %08X\n", (uint32_t)in[0]);
+						if (LOG_DRAW_COMMANDS) m_cobra.logerror("    ?: %08X\n", (uint32_t)in[0]);
 					}
 					if (w2 & 0x20000000)
 					{
-						if (LOG_DRAW_COMMANDS) cobra->logerror("    ?: %08X\n", (uint32_t)in[1]);
+						if (LOG_DRAW_COMMANDS) m_cobra.logerror("    ?: %08X\n", (uint32_t)in[1]);
 					}
 
-					if (LOG_DRAW_COMMANDS) cobra->logerror("    x: %f\n", x);
-					if (LOG_DRAW_COMMANDS) cobra->logerror("    y: %f\n", y);
-					if (LOG_DRAW_COMMANDS) cobra->logerror("    ?: %08X\n", (uint32_t)in[2]);
-					if (LOG_DRAW_COMMANDS) cobra->logerror("    z: %f\n", z);
+					if (LOG_DRAW_COMMANDS) m_cobra.logerror("    x: %f\n", x);
+					if (LOG_DRAW_COMMANDS) m_cobra.logerror("    y: %f\n", y);
+					if (LOG_DRAW_COMMANDS) m_cobra.logerror("    ?: %08X\n", (uint32_t)in[2]);
+					if (LOG_DRAW_COMMANDS) m_cobra.logerror("    z: %f\n", z);
 
 					if (w2 & 0x00200000)
 					{
-						if (LOG_DRAW_COMMANDS) cobra->logerror("    w: %f\n", w);
-						if (LOG_DRAW_COMMANDS) cobra->logerror("    u: %f\n", vert[i].p[POLY_U]);
-						if (LOG_DRAW_COMMANDS) cobra->logerror("    v: %f\n", vert[i].p[POLY_V]);
+						if (LOG_DRAW_COMMANDS) m_cobra.logerror("    w: %f\n", w);
+						if (LOG_DRAW_COMMANDS) m_cobra.logerror("    u: %f\n", vert[i].p[POLY_U]);
+						if (LOG_DRAW_COMMANDS) m_cobra.logerror("    v: %f\n", vert[i].p[POLY_V]);
 					}
 
-					if (LOG_DRAW_COMMANDS) cobra->logerror("    a: %f\n", a);
-					if (LOG_DRAW_COMMANDS) cobra->logerror("    r: %f\n", r);
-					if (LOG_DRAW_COMMANDS) cobra->logerror("    g: %f\n", g);
-					if (LOG_DRAW_COMMANDS) cobra->logerror("    b: %f\n", b);
+					if (LOG_DRAW_COMMANDS) m_cobra.logerror("    a: %f\n", a);
+					if (LOG_DRAW_COMMANDS) m_cobra.logerror("    r: %f\n", r);
+					if (LOG_DRAW_COMMANDS) m_cobra.logerror("    g: %f\n", g);
+					if (LOG_DRAW_COMMANDS) m_cobra.logerror("    b: %f\n", b);
 
 					if (w2 & 0x00000001)
 					{
-						if (LOG_DRAW_COMMANDS) cobra->logerror("    ?: %08X\n", (uint32_t)in[3]);
+						if (LOG_DRAW_COMMANDS) m_cobra.logerror("    ?: %08X\n", (uint32_t)in[3]);
 					}
 
-					if (LOG_DRAW_COMMANDS) cobra->logerror("\n");
+					if (LOG_DRAW_COMMANDS) m_cobra.logerror("\n");
 				}
 
 
@@ -2323,7 +2324,7 @@ void cobra_renderer::gfx_fifo_exec()
 					}
 				}
 
-				cobra->m_gfx_re_status = RE_STATUS_IDLE;
+				m_cobra.m_gfx_re_status = RE_STATUS_IDLE;
 				break;
 			}
 
@@ -2383,7 +2384,7 @@ void cobra_renderer::gfx_fifo_exec()
 					y++;
 				}
 
-				cobra->m_gfx_re_status = RE_STATUS_IDLE;
+				m_cobra.m_gfx_re_status = RE_STATUS_IDLE;
 				break;
 			}
 
@@ -2428,7 +2429,7 @@ void cobra_renderer::gfx_fifo_exec()
 					fifo_out->push(nullptr, buffer[x+3]);
 				}
 
-				cobra->m_gfx_re_status = RE_STATUS_IDLE;
+				m_cobra.m_gfx_re_status = RE_STATUS_IDLE;
 				break;
 			}
 
@@ -2438,10 +2439,10 @@ void cobra_renderer::gfx_fifo_exec()
 
 				if (w1 != 0x8fff0000 || w2 != 0x00000000)
 				{
-					cobra->logerror("gfxfifo_exec: buf_flush: %08X %08X\n", w1, w2);
+					m_cobra.logerror("gfxfifo_exec: buf_flush: %08X %08X\n", w1, w2);
 				}
 
-				cobra->m_gfx_re_status = RE_STATUS_IDLE;
+				m_cobra.m_gfx_re_status = RE_STATUS_IDLE;
 				break;
 			}
 
@@ -2496,10 +2497,10 @@ void cobra_renderer::gfx_fifo_exec()
 
 				if (reg != 0x118 && reg != 0x114 && reg != 0x11c)
 				{
-					if (LOG_GFX_RAM_WRITES) cobra->logerror("gfxfifo_exec: ram write %05X (mask %08X): %08X (%f)\n", reg, mask, w2, u2f(w2));
+					if (LOG_GFX_RAM_WRITES) m_cobra.logerror("gfxfifo_exec: ram write %05X (mask %08X): %08X (%f)\n", reg, mask, w2, u2f(w2));
 				}
 
-				cobra->m_gfx_re_status = RE_STATUS_IDLE;
+				m_cobra.m_gfx_re_status = RE_STATUS_IDLE;
 				break;
 			}
 
@@ -2529,7 +2530,7 @@ void cobra_renderer::gfx_fifo_exec()
 					gfx_write_gram(reg + (i*4), 0xffffffff, value);
 				}
 
-				cobra->m_gfx_re_status = RE_STATUS_IDLE;
+				m_cobra.m_gfx_re_status = RE_STATUS_IDLE;
 				break;
 			}
 
@@ -2549,7 +2550,7 @@ void cobra_renderer::gfx_fifo_exec()
 
 		//      printf("GFX: reg read %08X\n", reg);
 
-				cobra->m_gfx_re_status = RE_STATUS_IDLE;
+				m_cobra.m_gfx_re_status = RE_STATUS_IDLE;
 				break;
 			}
 			case 0xd0:
@@ -2575,7 +2576,7 @@ void cobra_renderer::gfx_fifo_exec()
 					fifo_out->push(nullptr, value);
 				}
 
-				cobra->m_gfx_re_status = RE_STATUS_IDLE;
+				m_cobra.m_gfx_re_status = RE_STATUS_IDLE;
 				break;
 			}
 			case 0xed:
@@ -2585,32 +2586,32 @@ void cobra_renderer::gfx_fifo_exec()
 				//int reg = (w1 >> 8) & 0xff;
 				int num = w2;
 
-				int num_left = num - cobra->m_gfx_re_word_count;
+				int num_left = num - m_cobra.m_gfx_re_word_count;
 
 				if (fifo_in->current_num() < num_left)
 				{
 					num_left = fifo_in->current_num();
 				}
 
-				cobra->m_gfx_unk_status |= 0x400;
+				m_cobra.m_gfx_unk_status |= 0x400;
 
-				if (cobra->m_gfx_re_word_count == 0 && num_left > 0)
-					printf("gfxfifo_exec: tex_ints %d words left\n", num - cobra->m_gfx_re_word_count);
+				if (m_cobra.m_gfx_re_word_count == 0 && num_left > 0)
+					printf("gfxfifo_exec: tex_ints %d words left\n", num - m_cobra.m_gfx_re_word_count);
 
 				for (int i=0; i < num_left; i++)
 				{
 					uint64_t param = 0;
 					fifo_in->pop(nullptr, &param);
-					cobra->m_gfx_re_word_count++;
+					m_cobra.m_gfx_re_word_count++;
 
 					m_texture_ram[m_texram_ptr] = (uint32_t)(param);
 					m_texram_ptr++;
 				}
 
 
-				if (cobra->m_gfx_re_word_count >= num)
+				if (m_cobra.m_gfx_re_word_count >= num)
 				{
-					cobra->m_gfx_re_status = RE_STATUS_IDLE;
+					m_cobra.m_gfx_re_status = RE_STATUS_IDLE;
 				}
 				break;
 			}
@@ -2641,7 +2642,7 @@ void cobra_renderer::gfx_fifo_exec()
 						c = 0;
 					}
 				};
-				cobra->logerror("\n");
+				m_cobra.logerror("\n");
 			}
 		}
 

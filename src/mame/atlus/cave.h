@@ -141,9 +141,9 @@ protected:
 	struct
 	{
 		int clip_left = 0, clip_right = 0, clip_top = 0, clip_bottom = 0;
-		u8  *baseaddr = 0U;
+		u32  *baseaddr = nullptr;
 		int line_offset = 0;
-		u8  *baseaddr_zbuf =0U;
+		u16  *baseaddr_zbuf = nullptr;
 		int line_offset_zbuf = 0;
 	} m_blit;
 

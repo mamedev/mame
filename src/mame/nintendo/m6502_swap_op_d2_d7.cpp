@@ -26,7 +26,7 @@ m6502_swap_op_d2_d7::m6502_swap_op_d2_d7(const machine_config &mconfig, const ch
 
 void m6502_swap_op_d2_d7::device_start()
 {
-	mintf = std::make_unique<mi_decrypt>();
+	m_mintf = std::make_unique<mi_decrypt>();
 	init();
 }
 
@@ -42,7 +42,7 @@ uint8_t m6502_swap_op_d2_d7::mi_decrypt::descramble(uint8_t op)
 
 uint8_t m6502_swap_op_d2_d7::mi_decrypt::read_sync(uint16_t adr)
 {
-	uint8_t res = cprogram.read_byte(adr);
+	uint8_t res = m_cprogram.read_byte(adr);
 
 	res = descramble(res);
 
@@ -51,10 +51,10 @@ uint8_t m6502_swap_op_d2_d7::mi_decrypt::read_sync(uint16_t adr)
 
 std::unique_ptr<util::disasm_interface> m6502_swap_op_d2_d7::create_disassembler()
 {
-	return std::make_unique<disassembler>(downcast<mi_decrypt *>(mintf.get()));
+	return std::make_unique<disassembler>(downcast<mi_decrypt *>(m_mintf.get()));
 }
 
-m6502_swap_op_d2_d7::disassembler::disassembler(mi_decrypt *mi) : mintf(mi)
+m6502_swap_op_d2_d7::disassembler::disassembler(mi_decrypt *mi) : m_mintf(mi)
 {
 }
 
@@ -65,5 +65,5 @@ u32 m6502_swap_op_d2_d7::disassembler::interface_flags() const
 
 u8 m6502_swap_op_d2_d7::disassembler::decrypt8(u8 value, offs_t pc, bool opcode) const
 {
-	return opcode ? mintf->descramble(value) : value;
+	return opcode ? m_mintf->descramble(value) : value;
 }

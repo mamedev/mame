@@ -184,7 +184,7 @@ void h_88_5_device::device_add_mconfig(machine_config &config)
 	cassette_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	cassette_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
-	SPEAKER(config, "mono").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	CASSETTE(config, m_cass_player);
 	m_cass_player->set_formats(h8_cassette_formats);

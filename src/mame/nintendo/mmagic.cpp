@@ -40,16 +40,18 @@
 
     - CPU is an NEC D8085A
     - Crystal is marked 6.1440, but this looks to have been replaced.
-    - X1/X2 clock frequency measured at pins 1 + 2 is 6.14330 mhz
-    - Test point with stable readings is :
-    - TP4 (HS) = 15.9982 khz (Horizontal sync)
-    - TP5 (VS) = 60.5992 hz  (Vertical Sync)
+    - X1/X2 clock frequency measured at pins 1 + 2 is 6.14330 MHz.
+    - TP4 (HS) = 15.9982 kHz (Horizontal Sync)
+    - TP5 (VS) = 60.5992 Hz  (Vertical Sync)
+      (~60.5 Hz is also confirmed from a cocktail cab video, so XTAL is correct)
 
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
 #include "sound/samples.h"
+
 #include "emupal.h"
 #include "speaker.h"
 #include "screen.h"
@@ -160,15 +162,15 @@ static INPUT_PORTS_START( mmagic )
 	PORT_START("DIPSW")
 	PORT_SERVICE_DIPLOC(0x01, IP_ACTIVE_LOW, "DSW:1")
 	PORT_DIPNAME(0x06, 0x06, DEF_STR(Bonus_Life)) PORT_DIPLOCATION ("DSW:2,3")
-	PORT_DIPSETTING(0x00, "30000")
-	PORT_DIPSETTING(0x02, "20000")
-	PORT_DIPSETTING(0x04, "15000")
 	PORT_DIPSETTING(0x06, "10000")
+	PORT_DIPSETTING(0x04, "15000")
+	PORT_DIPSETTING(0x02, "20000")
+	PORT_DIPSETTING(0x00, "30000")
 	PORT_DIPNAME(0x18, 0x18, DEF_STR(Lives)) PORT_DIPLOCATION ("DSW:4,5")
-	PORT_DIPSETTING(0x00, "6")
-	PORT_DIPSETTING(0x08, "5")
-	PORT_DIPSETTING(0x10, "4")
 	PORT_DIPSETTING(0x18, "3")
+	PORT_DIPSETTING(0x10, "4")
+	PORT_DIPSETTING(0x08, "5")
+	PORT_DIPSETTING(0x00, "6")
 	PORT_DIPUNUSED_DIPLOC(0x20, IP_ACTIVE_LOW, "DSW:6" )
 	PORT_DIPUNUSED_DIPLOC(0x40, IP_ACTIVE_LOW, "DSW:7" )
 	PORT_DIPUNUSED_DIPLOC(0x80, IP_ACTIVE_LOW, "DSW:8" )
@@ -363,6 +365,7 @@ void mmagic_state::mmagic(machine_config& config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
+
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1);
 	m_samples->set_samples_names(sample_names);
@@ -383,13 +386,13 @@ ROM_START( mmagic )
 	ROM_LOAD("4ai.45a", 0x0c00, 0x0400, CRC(3048bd6c) SHA1(740051589f6ba44b2ee68edf76a3177bb973d78e))
 	ROM_LOAD("5ai.5a",  0x1000, 0x0400, CRC(2cab8f04) SHA1(203a3c005f18f968cd14c972bbb9fd7e0fc3b670))
 	// location 6a is unpopulated, if the "debug" switch is activated on bootup it would jump here
-	ROM_FILL(0x1400, 0x0400, 0xff)
+	ROM_FILL(           0x1400, 0x0400, 0xff)
 
 	ROM_REGION(0x800, "tiles", 0)
 	ROM_LOAD("6h.6hi", 0x000, 0x200, CRC(b6321b6f) SHA1(06611f7419d2982e006a3e81b79677e59e194f38))
 	ROM_LOAD("7h.7hi", 0x200, 0x200, CRC(9ec0e82c) SHA1(29983f690a1b6134bb1983921f42c14898788095))
 	ROM_LOAD("6j.6jk", 0x400, 0x200, CRC(7ce83302) SHA1(1870610ff07ab11622e183e04e3fce29328ff291))
-	ROM_FILL(0x600, 0x200, 0xff)
+	ROM_FILL(          0x600, 0x200, 0xff)
 
 	ROM_REGION(0x200, "colors", ROMREGION_INVERT)
 	ROM_LOAD("7j.7jk", 0x000, 0x200, CRC(b7eb8e1c) SHA1(b65a8efb88668dcf1c1d00e31a9b15a67c2972c8))
@@ -403,5 +406,5 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  MACHINE INPUT   CLASS         INIT        ROT     COMPANY     FULLNAME        FLAGS
+//    YEAR  NAME    PARENT  MACHINE INPUT   CLASS         INIT        ROT    COMPANY     FULLNAME        FLAGS
 GAME( 1979, mmagic, 0,      mmagic, mmagic, mmagic_state, empty_init, ROT90, "Nintendo", "Monkey Magic", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

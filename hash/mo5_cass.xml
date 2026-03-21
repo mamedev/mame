@@ -104,7 +104,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Animatix</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Christian Belin &amp; Jacques Pagès"/>
+		<info name="author" value="Christian Belin"/>
+		<info name="author" value="Jacques Pagès"/>
 		<info name="serial" value="THKF 85081"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -118,7 +119,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Animatix (alt)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Christian Belin &amp; Jacques Pagès"/>
+		<info name="author" value="Christian Belin"/>
+		<info name="author" value="Jacques Pagès"/>
 		<info name="serial" value="THKF 85081"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -132,7 +134,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Animatix (alt 2)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Christian Belin &amp; Jacques Pagès"/>
+		<info name="author" value="Christian Belin"/>
+		<info name="author" value="Jacques Pagès"/>
 		<info name="serial" value="THKF 85081"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -778,7 +781,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
 		<info name="alt_title" value="Forth MO5"/>
-		<info name="author" value="J.C. Bandini &amp; T. Schiex"/>
+		<info name="author" value="J.C. Bandini"/>
+		<info name="author" value="T. Schiex"/>
 		<info name="notice" value="COPYRIGHT LORICIELS Mars 1985"/>
 		<info name="serial" value="054"/>
 
@@ -801,7 +805,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
 		<info name="alt_title" value="Forth MO5"/>
-		<info name="author" value="J.C. Bandini &amp; T. Schiex"/>
+		<info name="author" value="J.C. Bandini"/>
+		<info name="author" value="T. Schiex"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="25367">
@@ -815,7 +820,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
 		<info name="alt_title" value="Forth MO5"/>
-		<info name="author" value="J.C. Bandini &amp; T. Schiex"/>
+		<info name="author" value="J.C. Bandini"/>
+		<info name="author" value="T. Schiex"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="25367">
@@ -828,7 +834,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Forth MO5 (single tape, alt 2)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
-		<info name="author" value="J.C. Bandini &amp; T. Schiex"/>
+		<info name="author" value="J.C. Bandini"/>
+		<info name="author" value="T. Schiex"/>
 		<info name="serial" value="054"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -842,7 +849,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Forth MO5 (single tape, alt 3)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
-		<info name="author" value="J.C. Bandini &amp; T. Schiex"/>
+		<info name="author" value="J.C. Bandini"/>
+		<info name="author" value="T. Schiex"/>
 		<info name="serial" value="054"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -3698,7 +3706,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Éducatif 4 - Mathasard</description>
 		<year>1985</year>
 		<publisher>Cobrasoft</publisher>
-		<info name="author" value="Jean Biron, Jérôme Gelin"/>
+		<info name="author" value="Jean Biron"/>
+		<info name="author" value="Jérôme Gelin"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="19971">
@@ -3711,7 +3720,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Éducatif 5 - Ortho-Repere</description>
 		<year>1985</year>
 		<publisher>Cobrasoft</publisher>
-		<info name="author" value="Frank Megel, H. Letzelter"/>
+		<info name="author" value="Frank Megel"/>
+		<info name="author" value="H. Letzelter"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="16373">
@@ -3761,11 +3771,13 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>En Allant à l'École - Le Cycliste</description>
 		<year>1985</year>
 		<publisher>Cedic-Nathan</publisher>
-		<info name="author" value="Daniel Dieudonné, Jacques Sanvoisin, La Prévention Routière"/>
+		<info name="author" value="Daniel Dieudonné"/>
+		<info name="author" value="Jacques Sanvoisin"/>
+		<info name="author" value="La Prévention Routière"/>
 		<info name="serial" value="4 TF 006"/>
 
 		<part name="cass1" interface="mo_cass">
-			<feature name="part_id" value="Cassette 1: Ma bicyclette - Roulez le vélos"/>
+			<feature name="part_id" value="Cassette 1: Ma bicyclette - Roulez les vélos"/>
 			<dataarea name="cass" size="40484">
 				<rom name="en allant a l'ecole cycliste (1985)(cedic)(fr)(tape 1 of 2).k7" size="40484" crc="05418b66" sha1="8f0973974a8e555dc875255d0acd609e93272199"/>
 			</dataarea>
@@ -6579,7 +6591,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Microscillo</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Philippe Himbert, Gilles Delbèque"/>
+		<info name="author" value="Philippe Himbert"/>
+		<info name="author" value="Gilles Delbèque"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="23382">
@@ -6592,7 +6605,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Microscillo (alt)</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Philippe Himbert, Gilles Delbèque"/>
+		<info name="author" value="Philippe Himbert"/>
+		<info name="author" value="Gilles Delbèque"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="23382">
@@ -6605,7 +6619,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Microscillo (alt 2)</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Philippe Himbert, Gilles Delbèque"/>
+		<info name="author" value="Philippe Himbert"/>
+		<info name="author" value="Gilles Delbèque"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="23382">
@@ -6618,7 +6633,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Le Minotaure</description>
 		<year>1984</year>
 		<publisher>Hatier</publisher>
-		<info name="author" value="H. Bonneton, Y. Janin"/>
+		<info name="author" value="H. Bonneton"/>
+		<info name="author" value="Y. Janin"/>
 		<info name="serial" value="HA 7002"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -6632,7 +6648,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Le Minotaure (alt)</description>
 		<year>1984</year>
 		<publisher>Hatier</publisher>
-		<info name="author" value="H. Bonneton, Y. Janin"/>
+		<info name="author" value="H. Bonneton"/>
+		<info name="author" value="Y. Janin"/>
 		<info name="serial" value="HA 7002"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -6646,7 +6663,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Le Minotaure (alt 2)</description>
 		<year>1984</year>
 		<publisher>Hatier</publisher>
-		<info name="author" value="H. Bonneton, Y. Janin"/>
+		<info name="author" value="H. Bonneton"/>
+		<info name="author" value="Y. Janin"/>
 		<info name="serial" value="HA 7002"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -6660,7 +6678,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Le Minotaure (alt 3)</description>
 		<year>1984</year>
 		<publisher>Hatier</publisher>
-		<info name="author" value="H. Bonneton, Y. Janin"/>
+		<info name="author" value="H. Bonneton"/>
+		<info name="author" value="Y. Janin"/>
 		<info name="serial" value="HA 7002"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -6674,7 +6693,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Le Minotaure (alt 4)</description>
 		<year>1984</year>
 		<publisher>Hatier</publisher>
-		<info name="author" value="H. Bonneton, Y. Janin"/>
+		<info name="author" value="H. Bonneton"/>
+		<info name="author" value="Y. Janin"/>
 		<info name="serial" value="HA 7002"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -6688,7 +6708,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Le Minotaure (alt 5)</description>
 		<year>1984</year>
 		<publisher>Hatier</publisher>
-		<info name="author" value="H. Bonneton, Y. Janin"/>
+		<info name="author" value="H. Bonneton"/>
+		<info name="author" value="Y. Janin"/>
 		<info name="serial" value="HA 7002"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -7844,7 +7865,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>1789</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Yves Laurisse, Vincent Balvet &amp; Laurent-Pierre Gilliard"/>
+		<info name="author" value="Yves Laurisse"/>
+		<info name="author" value="Vincent Balvet"/>
+		<info name="author" value="Laurent-Pierre Gilliard"/>
 
 		<part name="cass1" interface="mo_cass">
 			<feature name="part_id" value="Tape 1 Side A"/>
@@ -7876,7 +7899,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>1789 (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Yves Laurisse, Vincent Balvet &amp; Laurent-Pierre Gilliard"/>
+		<info name="author" value="Yves Laurisse"/>
+		<info name="author" value="Vincent Balvet"/>
+		<info name="author" value="Laurent-Pierre Gilliard"/>
 
 		<part name="cass1" interface="mo_cass">
 			<feature name="part_id" value="Tape 1 Side A"/>
@@ -7908,7 +7933,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>1789 (alt 2)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Yves Laurisse, Vincent Balvet &amp; Laurent-Pierre Gilliard"/>
+		<info name="author" value="Yves Laurisse"/>
+		<info name="author" value="Vincent Balvet"/>
+		<info name="author" value=" Laurent-Pierre Gilliard"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="73427">
@@ -8770,7 +8797,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Arsène Lapin</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="André Caillaud &amp; Patrick Moizan"/>
+		<info name="author" value="André Caillaud"/>
+		<info name="author" value="Patrick Moizan"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="33520">
@@ -8783,7 +8811,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Arsène Lapin (alt)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="André Caillaud &amp; Patrick Moizan"/>
+		<info name="author" value="André Caillaud"/>
+		<info name="author" value="Patrick Moizan"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="33520">
@@ -8796,7 +8825,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Arsène Lapin (alt 2)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="André Caillaud &amp; Patrick Moizan"/>
+		<info name="author" value="André Caillaud"/>
+		<info name="author" value="Patrick Moizan"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="33520">
@@ -9334,7 +9364,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Bidul</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Antoine Leca &amp; Eric Canton"/>
+		<info name="author" value="Antoine Leca"/>
+		<info name="author" value="Eric Canton"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="11007">
@@ -9347,7 +9378,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Bidul (alt)</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Antoine Leca &amp; Eric Canton"/>
+		<info name="author" value="Antoine Leca"/>
+		<info name="author" value="Eric Canton"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="11007">
@@ -9360,7 +9392,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Bidul (alt 2)</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Antoine Leca &amp; Eric Canton"/>
+		<info name="author" value="Antoine Leca"/>
+		<info name="author" value="Eric Canton"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="11007">
@@ -10081,7 +10114,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Chasseur Omega</description>
 		<year>1983</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Sylvain Karpf &amp; Grégory Ruck"/>
+		<info name="author" value="Sylvain Karpf"/>
+		<info name="author" value="Grégory Ruck"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="6479">
@@ -10094,7 +10128,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Chasseur Omega (alt)</description>
 		<year>1983</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Sylvain Karpf &amp; Grégory Ruck"/>
+		<info name="author" value="Sylvain Karpf"/>
+		<info name="author" value="Grégory Ruck"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="6479">
@@ -10107,7 +10142,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Chasseur Omega (alt 2)</description>
 		<year>1983</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Sylvain Karpf &amp; Grégory Ruck"/>
+		<info name="author" value="Sylvain Karpf"/>
+		<info name="author" value="Grégory Ruck"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="6479">
@@ -10538,7 +10574,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Cyberlab</description>
 		<year>1984</year>
 		<publisher>TO TEK International</publisher>
-		<info name="author" value="Philippe Descamps, Marc Rolin"/>
+		<info name="author" value="Philippe Descamps"/>
+		<info name="author" value="Marc Rolin"/>
 		<info name="serial" value="CY1 006"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -10552,7 +10589,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Cyberlab (alt)</description>
 		<year>1984</year>
 		<publisher>TO TEK International</publisher>
-		<info name="author" value="Philippe Descamps, Marc Rolin"/>
+		<info name="author" value="Philippe Descamps"/>
+		<info name="author" value="Marc Rolin"/>
 		<info name="serial" value="CY1 006"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -10566,7 +10604,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Cyberlab (alt 2)</description>
 		<year>1984</year>
 		<publisher>TO TEK International</publisher>
-		<info name="author" value="Philippe Descamps, Marc Rolin"/>
+		<info name="author" value="Philippe Descamps"/>
+		<info name="author" value="Marc Rolin"/>
 		<info name="serial" value="CY1 006"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -10580,7 +10619,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Cyberlab (WAV format)</description>
 		<year>1984</year>
 		<publisher>TO TEK International</publisher>
-		<info name="author" value="Philippe Descamps, Marc Rolin"/>
+		<info name="author" value="Philippe Descamps"/>
+		<info name="author" value="Marc Rolin"/>
 		<info name="serial" value="CY1 006"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -10594,7 +10634,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Cyberlab (WAV format, alt)</description>
 		<year>1984</year>
 		<publisher>TO TEK International</publisher>
-		<info name="author" value="Philippe Descamps, Marc Rolin"/>
+		<info name="author" value="Philippe Descamps"/>
+		<info name="author" value="Marc Rolin"/>
 		<info name="serial" value="CY1 006"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -10824,7 +10865,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Les Dieux du Stade II</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Kamel Bala, Emile Nguyen, Josyane Girard"/>
+		<info name="author" value="Kamel Bala"/>
+		<info name="author" value="Emile Nguyen"/>
+		<info name="author" value="Josyane Girard"/>
 		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -10839,7 +10882,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Les Dieux du Stade II (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Kamel Bala, Emile Nguyen, Josyane Girard"/>
+		<info name="author" value="Kamel Bala"/>
+		<info name="author" value="Emile Nguyen"/>
+		<info name="author" value="Josyane Girard"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="120702">
@@ -10853,7 +10898,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Les Dieux du Stade II (alt 2)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Kamel Bala, Emile Nguyen, Josyane Girard"/>
+		<info name="author" value="Kamel Bala"/>
+		<info name="author" value="Emile Nguyen"/>
+		<info name="author" value="Josyane Girard"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="120702">
@@ -10867,7 +10914,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Les Dieux du Stade II (alt 3)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Kamel Bala, Emile Nguyen, Josyane Girard"/>
+		<info name="author" value="Kamel Bala"/>
+		<info name="author" value="Emile Nguyen"/>
+		<info name="author" value="Josyane Girard"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="125502">
@@ -10881,7 +10930,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Dossier Boerhaave</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Roger Granier &amp; Pierre Bayle"/>
+		<info name="author" value="Roger Granier"/>
+		<info name="author" value="Pierre Bayle"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="66662">
@@ -10895,7 +10945,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Dossier Boerhaave (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Roger Granier &amp; Pierre Bayle"/>
+		<info name="author" value="Roger Granier"/>
+		<info name="author" value="Pierre Bayle"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="66662">
@@ -10909,7 +10960,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Dossier Boerhaave (alt 2)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Roger Granier &amp; Pierre Bayle"/>
+		<info name="author" value="Roger Granier"/>
+		<info name="author" value="Pierre Bayle"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="66662">
@@ -10923,7 +10975,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Dossier Boerhaave (alt 3)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Roger Granier &amp; Pierre Bayle"/>
+		<info name="author" value="Roger Granier"/>
+		<info name="author" value="Pierre Bayle"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="69062">
@@ -11659,7 +11712,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Félonies</description>
 		<year>1986</year>
 		<publisher>ERE Informatique</publisher>
-		<info name="author" value="Pascal Bacoux &amp; Guy Bec"/>
+		<info name="author" value="Pascal Bacoux"/>
+		<info name="author" value="Guy Bec"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="82242">
@@ -11672,7 +11726,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Félonies (alt)</description>
 		<year>1986</year>
 		<publisher>ERE Informatique</publisher>
-		<info name="author" value="Pascal Bacoux &amp; Guy Bec"/>
+		<info name="author" value="Pascal Bacoux"/>
+		<info name="author" value="Guy Bec"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="87465">
@@ -11685,7 +11740,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Félonies (alt 2)</description>
 		<year>1986</year>
 		<publisher>ERE Informatique</publisher>
-		<info name="author" value="Pascal Bacoux &amp; Guy Bec"/>
+		<info name="author" value="Pascal Bacoux"/>
+		<info name="author" value="Guy Bec"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="87465">
@@ -11698,7 +11754,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Félonies (alt 3)</description>
 		<year>1986</year>
 		<publisher>ERE Informatique</publisher>
-		<info name="author" value="Pascal Bacoux &amp; Guy Bec"/>
+		<info name="author" value="Pascal Bacoux"/>
+		<info name="author" value="Guy Bec"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="87465">
@@ -12074,7 +12131,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Geodyssee</description>
 		<year>1985</year>
 		<publisher>Coktel Vision</publisher>
-		<info name="author" value="Patrick Bideau, Vincent Caradec, Sylvie Renaud"/>
+		<info name="author" value="Patrick Bideau"/>
+		<info name="author" value="Vincent Caradec"/>
+		<info name="author" value="Sylvie Renaud"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="33735">
@@ -12123,7 +12182,10 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>La Geste d'Artillac</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="François Leger, Philippe Rabergeau, Thierry Souques, André Di Bartolo"/>
+		<info name="author" value="François Leger"/>
+		<info name="author" value="Philippe Rabergeau"/>
+		<info name="author" value="Thierry Souques"/>
+		<info name="author" value="André Di Bartolo"/>
 		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -12151,7 +12213,10 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>La Geste d'Artillac (alt)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="François Leger, Philippe Rabergeau, Thierry Souques, André Di Bartolo"/>
+		<info name="author" value="François Leger"/>
+		<info name="author" value="Philippe Rabergeau"/>
+		<info name="author" value="Thierry Souques"/>
+		<info name="author" value="André Di Bartolo"/>
 		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -12178,7 +12243,10 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>La Geste d'Artillac (single tape)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="François Leger, Philippe Rabergeau, Thierry Souques, André Di Bartolo"/>
+		<info name="author" value="François Leger"/>
+		<info name="author" value="Philippe Rabergeau"/>
+		<info name="author" value="Thierry Souques"/>
+		<info name="author" value="André Di Bartolo"/>
 		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -12192,7 +12260,10 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>La Geste d'Artillac (single tape, alt)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="François Leger, Philippe Rabergeau, Thierry Souques, André Di Bartolo"/>
+		<info name="author" value="François Leger"/>
+		<info name="author" value="Philippe Rabergeau"/>
+		<info name="author" value="Thierry Souques"/>
+		<info name="author" value="André Di Bartolo"/>
 		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -12206,7 +12277,10 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>La Geste d'Artillac (single tape, alt 2)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="François Leger, Philippe Rabergeau, Thierry Souques, André Di Bartolo"/>
+		<info name="author" value="François Leger"/>
+		<info name="author" value="Philippe Rabergeau"/>
+		<info name="author" value="Thierry Souques"/>
+		<info name="author" value="André Di Bartolo"/>
 		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -12571,7 +12645,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>L'Heritage 2: Micmac en Ecosse</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Pierre Bayle &amp; Roger Granier"/>
+		<info name="author" value="Pierre Bayle"/>
+		<info name="author" value="Roger Granier"/>
 		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -12586,7 +12661,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>L'Heritage 2: Micmac en Ecosse (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Pierre Bayle &amp; Roger Granier"/>
+		<info name="author" value="Pierre Bayle"/>
+		<info name="author" value="Roger Granier"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="41201">
@@ -12600,7 +12676,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>L'Heritage 2: Micmac en Ecosse (alt 2)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Pierre Bayle &amp; Roger Granier"/>
+		<info name="author" value="Pierre Bayle"/>
+		<info name="author" value="Roger Granier"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="39521">
@@ -12614,7 +12691,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>L'Heritage 2: Micmac en Ecosse (alt 3)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Pierre Bayle &amp; Roger Granier"/>
+		<info name="author" value="Pierre Bayle"/>
+		<info name="author" value="Roger Granier"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="39521">
@@ -13561,7 +13639,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Khronos</description>
 		<year>1986</year>
 		<publisher>Coktel Vision</publisher>
-		<info name="author" value="Benoit Gaborit, Philippe Maincon, Fred Trancart"/>
+		<info name="author" value="Benoit Gaborit"/>
+		<info name="author" value="Philippe Maincon"/>
+		<info name="author" value="Fred Trancart"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="48948">
@@ -13574,7 +13654,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Khronos (alt)</description>
 		<year>1986</year>
 		<publisher>Coktel Vision</publisher>
-		<info name="author" value="Benoit Gaborit, Philippe Maincon, Fred Trancart"/>
+		<info name="author" value="Benoit Gaborit"/>
+		<info name="author" value="Philippe Maincon"/>
+		<info name="author" value="Fred Trancart"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="49187">
@@ -13587,7 +13669,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Khronos (alt 2)</description>
 		<year>1986</year>
 		<publisher>Coktel Vision</publisher>
-		<info name="author" value="Benoit Gaborit, Philippe Maincon, Fred Trancart"/>
+		<info name="author" value="Benoit Gaborit"/>
+		<info name="author" value="Philippe Maincon"/>
+		<info name="author" value="Fred Trancart"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="49187">
@@ -13600,7 +13684,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Khronos (alt 3)</description>
 		<year>1986</year>
 		<publisher>Coktel Vision</publisher>
-		<info name="author" value="Benoit Gaborit, Philippe Maincon, Fred Trancart"/>
+		<info name="author" value="Benoit Gaborit"/>
+		<info name="author" value="Philippe Maincon"/>
+		<info name="author" value="Fred Trancart"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="49187">
@@ -13783,7 +13869,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Las Vegas</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Roger Granier, Pierre Bayle"/>
+		<info name="author" value="Roger Granier"/>
+		<info name="author" value="Pierre Bayle"/>
 		<info name="serial" value="MSKF85181"/>
 		<info name="usage" value="Load with LOADM"/>
 
@@ -13805,7 +13892,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Las Vegas (split side A)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Roger Granier, Pierre Bayle"/>
+		<info name="author" value="Roger Granier"/>
+		<info name="author" value="Pierre Bayle"/>
 		<info name="serial" value="MSKF85181"/>
 		<info name="usage" value="Load with LOADM"/>
 
@@ -13833,7 +13921,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Las Vegas (single tape)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Roger Granier, Pierre Bayle"/>
+		<info name="author" value="Roger Granier"/>
+		<info name="author" value="Pierre Bayle"/>
 		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -13847,7 +13936,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Las Vegas (single tape, alt)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Roger Granier, Pierre Bayle"/>
+		<info name="author" value="Roger Granier"/>
+		<info name="author" value="Pierre Bayle"/>
 		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -13862,7 +13952,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Las Vegas (single tape, alt 2)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Roger Granier, Pierre Bayle"/>
+		<info name="author" value="Roger Granier"/>
+		<info name="author" value="Pierre Bayle"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="85282">
@@ -13876,7 +13967,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Las Vegas (single tape, alt 3)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Roger Granier, Pierre Bayle"/>
+		<info name="author" value="Roger Granier"/>
+		<info name="author" value="Pierre Bayle"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="85282">
@@ -13889,7 +13981,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Las Vegas (KCI format)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Roger Granier, Pierre Bayle"/>
+		<info name="author" value="Roger Granier"/>
+		<info name="author" value="Pierre Bayle"/>
 		<info name="serial" value="MSKF85181"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -13910,7 +14003,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Las Vegas (WAV format)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Roger Granier, Pierre Bayle"/>
+		<info name="author" value="Roger Granier"/>
+		<info name="author" value="Pierre Bayle"/>
 		<info name="serial" value="MSKF85181"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -14736,7 +14830,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>La Mine aux Diamants</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Philippe Bruneel, Christian Lemaire"/>
+		<info name="author" value="Philippe Bruneel"/>
+		<info name="author" value="Christian Lemaire"/>
 		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -14751,7 +14846,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>La Mine aux Diamants (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Philippe Bruneel, Christian Lemaire"/>
+		<info name="author" value="Philippe Bruneel"/>
+		<info name="author" value="Christian Lemaire"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="31374">
@@ -14765,7 +14861,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>La Mine aux Diamants (alt 2)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Philippe Bruneel, Christian Lemaire"/>
+		<info name="author" value="Philippe Bruneel"/>
+		<info name="author" value="Christian Lemaire"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="32814">
@@ -15316,7 +15413,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Numéro 10</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
-		<info name="author" value="Albert Loridan, Bruno Duriez, Joel Sana"/>
+		<info name="author" value="Albert Loridan"/>
+		<info name="author" value="Bruno Duriez"/>
+		<info name="author" value="Joel Sana"/>
 		<info name="developer" value="D &amp; L Research"/>
 		<info name="serial" value="PJ 7501 - FO 1050"/>
 
@@ -15331,7 +15430,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Numéro 10 (alt)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
-		<info name="author" value="Albert Loridan, Bruno Duriez, Joel Sana"/>
+		<info name="author" value="Albert Loridan"/>
+		<info name="author" value="Bruno Duriez"/>
+		<info name="author" value="Joel Sana"/>
 		<info name="developer" value="D &amp; L Research"/>
 		<info name="serial" value="PJ 7501 - FO 1050"/>
 
@@ -15346,7 +15447,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Numéro 10 (alt 2)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
-		<info name="author" value="Albert Loridan, Bruno Duriez, Joel Sana"/>
+		<info name="author" value="Albert Loridan"/>
+		<info name="author" value="Bruno Duriez"/>
+		<info name="author" value="Joel Sana"/>
 		<info name="developer" value="D &amp; L Research"/>
 		<info name="serial" value="PJ 7501 - FO 1050"/>
 
@@ -15361,7 +15464,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Numéro 10 (alt 3)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
-		<info name="author" value="Albert Loridan, Bruno Duriez, Joel Sana"/>
+		<info name="author" value="Albert Loridan"/>
+		<info name="author" value="Bruno Duriez"/>
+		<info name="author" value="Joel Sana"/>
 		<info name="developer" value="D &amp; L Research"/>
 		<info name="serial" value="PJ 7501 - FO 1050"/>
 
@@ -15376,7 +15481,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Numéro 10 (alt 4)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
-		<info name="author" value="Albert Loridan, Bruno Duriez, Joel Sana"/>
+		<info name="author" value="Albert Loridan"/>
+		<info name="author" value="Bruno Duriez"/>
+		<info name="author" value="Joel Sana"/>
 		<info name="developer" value="D &amp; L Research"/>
 		<info name="serial" value="PJ 7501 - FO 1050"/>
 
@@ -15391,7 +15498,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Numéro 10 Special - Coupe du Monde 86</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
-		<info name="author" value="Albert Loridan, Bruno Duriez, Joel Sana"/>
+		<info name="author" value="Albert Loridan"/>
+		<info name="author" value="Bruno Duriez"/>
+		<info name="author" value="Joel Sana"/>
 		<info name="developer" value="D &amp; L Research"/>
 		<info name="serial" value="SM 1050"/>
 
@@ -15406,7 +15515,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Numéro 10 Special - Coupe du Monde 86 (alt)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
-		<info name="author" value="Albert Loridan, Bruno Duriez, Joel Sana"/>
+		<info name="author" value="Albert Loridan"/>
+		<info name="author" value="Bruno Duriez"/>
+		<info name="author" value="Joel Sana"/>
 		<info name="developer" value="D &amp; L Research"/>
 		<info name="serial" value="SM 1050"/>
 
@@ -15421,7 +15532,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Numéro 10 Special - Coupe du Monde 86 (alt 2)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
-		<info name="author" value="Albert Loridan, Bruno Duriez, Joel Sana"/>
+		<info name="author" value="Albert Loridan"/>
+		<info name="author" value="Bruno Duriez"/>
+		<info name="author" value="Joel Sana"/>
 		<info name="developer" value="D &amp; L Research"/>
 		<info name="serial" value="SM 1050"/>
 
@@ -15436,7 +15549,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Numéro 10 Special - Coupe du Monde 86 (alt 3)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
-		<info name="author" value="Albert Loridan, Bruno Duriez, Joel Sana"/>
+		<info name="author" value="Albert Loridan"/>
+		<info name="author" value="Bruno Duriez"/>
+		<info name="author" value="Joel Sana"/>
 		<info name="developer" value="D &amp; L Research"/>
 		<info name="serial" value="SM 1050"/>
 
@@ -16163,7 +16278,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Pouss Ball</description>
 		<year>1984</year>
 		<publisher>TO TEK International</publisher>
-		<info name="author" value="Philippe Descamps, Marc Rolin"/>
+		<info name="author" value="Philippe Descamps"/>
+		<info name="author" value="Marc Rolin"/>
 		<info name="serial" value="PO1 005 (E02)"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -16177,7 +16293,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Pouss Ball (alt)</description>
 		<year>1984</year>
 		<publisher>TO TEK International</publisher>
-		<info name="author" value="Philippe Descamps, Marc Rolin"/>
+		<info name="author" value="Philippe Descamps"/>
+		<info name="author" value="Marc Rolin"/>
 		<info name="serial" value="PO1 005 (E02)"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -16191,7 +16308,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Pouss Ball (alt 2)</description>
 		<year>1984</year>
 		<publisher>TO TEK International</publisher>
-		<info name="author" value="Philippe Descamps, Marc Rolin"/>
+		<info name="author" value="Philippe Descamps"/>
+		<info name="author" value="Marc Rolin"/>
 		<info name="serial" value="PO1 005 (E02)"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -16395,7 +16513,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>PV 2000</description>
 		<year>1983</year>
 		<publisher>TO TEK International</publisher>
-		<info name="author" value="Philippe Descamps, Marc Rolin"/>
+		<info name="author" value="Philippe Descamps"/>
+		<info name="author" value="Marc Rolin"/>
 		<info name="serial" value="PV1 015"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -17155,7 +17274,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Scrontch</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
-		<info name="author" value="Pierre Mauvignier &amp; Philippe Barreau"/>
+		<info name="author" value="Pierre Mauvignier"/>
+		<info name="author" value="Philippe Barreau"/>
 		<info name="serial" value="45 0024"/>
 		<info name="usage" value="Load with LOADM&quot;&quot;,,R"/>
 
@@ -17170,7 +17290,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Scrontch (alt)</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
-		<info name="author" value="Pierre Mauvignier &amp; Philippe Barreau"/>
+		<info name="author" value="Pierre Mauvignier"/>
+		<info name="author" value="Philippe Barreau"/>
 		<info name="serial" value="45 0024"/>
 		<info name="usage" value="Load with LOADM&quot;&quot;,,R"/>
 
@@ -17185,7 +17306,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Scrontch (alt 2)</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
-		<info name="author" value="Pierre Mauvignier &amp; Philippe Barreau"/>
+		<info name="author" value="Pierre Mauvignier"/>
+		<info name="author" value="Philippe Barreau"/>
 		<info name="serial" value="45 0024"/>
 		<info name="usage" value="Load with LOADM&quot;&quot;,,R"/>
 
@@ -17200,7 +17322,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Scrontch (alt 3)</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
-		<info name="author" value="Pierre Mauvignier &amp; Philippe Barreau"/>
+		<info name="author" value="Pierre Mauvignier"/>
+		<info name="author" value="Philippe Barreau"/>
 		<info name="serial" value="45 0024"/>
 		<info name="usage" value="Load with LOADM&quot;&quot;,,R"/>
 
@@ -17406,7 +17529,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Sortilèges</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="William Hennebois, Alain Vialon, Laurent Droulez"/>
+		<info name="author" value="William Hennebois"/>
+		<info name="author" value="Alain Vialon"/>
+		<info name="author" value="Laurent Droulez"/>
 		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -17421,7 +17546,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Sortilèges (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="William Hennebois, Alain Vialon, Laurent Droulez"/>
+		<info name="author" value="William Hennebois"/>
+		<info name="author" value="Alain Vialon"/>
+		<info name="author" value="Laurent Droulez"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="30438">
@@ -17435,7 +17562,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Sortilèges (alt 2)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="William Hennebois, Alain Vialon, Laurent Droulez"/>
+		<info name="author" value="William Hennebois"/>
+		<info name="author" value="Alain Vialon"/>
+		<info name="author" value="Laurent Droulez"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="30438">
@@ -17449,7 +17578,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Sortilèges (alt 3)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="William Hennebois, Alain Vialon, Laurent Droulez"/>
+		<info name="author" value="William Hennebois"/>
+		<info name="author" value="Alain Vialon"/>
+		<info name="author" value="Laurent Droulez"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="31630">
@@ -17462,7 +17593,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Sortilèges (KCI format)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="William Hennebois, Alain Vialon, Laurent Droulez"/>
+		<info name="author" value="William Hennebois"/>
+		<info name="author" value="Alain Vialon"/>
+		<info name="author" value="Laurent Droulez"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="278906">
@@ -18808,7 +18941,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Vampire</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Alain Vialon, Philippe Nottoli, Dominique Girou"/>
+		<info name="author" value="Alain Vialon"/>
+		<info name="author" value="Philippe Nottoli"/>
+		<info name="author" value="Dominique Girou"/>
 		<info name="usage" value="Load with LOADM"/>
 
 		<part name="cass1" interface="mo_cass">
@@ -18823,7 +18958,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Vampire (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Alain Vialon, Philippe Nottoli, Dominique Girou"/>
+		<info name="author" value="Alain Vialon"/>
+		<info name="author" value="Philippe Nottoli"/>
+		<info name="author" value="Dominique Girou"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="40145">
@@ -18837,7 +18974,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Vampire (alt 2)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Alain Vialon, Philippe Nottoli, Dominique Girou"/>
+		<info name="author" value="Alain Vialon"/>
+		<info name="author" value="Philippe Nottoli"/>
+		<info name="author" value="Dominique Girou"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="40145">
@@ -18851,7 +18990,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 		<description>Vampire (alt 3)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
-		<info name="author" value="Alain Vialon, Philippe Nottoli, Dominique Girou"/>
+		<info name="author" value="Alain Vialon"/>
+		<info name="author" value="Philippe Nottoli"/>
+		<info name="author" value="Dominique Girou"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="41345">

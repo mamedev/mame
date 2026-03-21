@@ -156,7 +156,7 @@ void seicross_state::machine_start()
 	// install MCU waitstates
 	address_space &space = m_mcu->space(AS_PROGRAM);
 
-	// MR is asserted when it does an access with A15 is high,
+	// MR is asserted when it does an access with A15 high,
 	// this makes DAC sound pitch the same as PCB recordings.
 	space.install_read_tap(
 			0x8000, 0xffff,

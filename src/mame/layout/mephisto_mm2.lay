@@ -411,6 +411,8 @@ thanks-to:Franz Huber
 
 	<element name="gray"><rect><color red="0.25" green="0.25" blue="0.25" /></rect></element>
 	<element name="white"><rect><color red="0.95" green="0.95" blue="0.95" /></rect></element>
+	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="whitem"><rect><color red="0.7" green="0.7" blue="0.7" /></rect></element>
 
 	<element name="blackw">
 		<rect><bounds x="0" y="0" width="1" height="1" /><color red="0.95" green="0.95" blue="0.95" /></rect>
@@ -421,13 +423,13 @@ thanks-to:Franz Huber
 		<rect state="1"><color red="0.0" green="0.0" blue="0.0" /></rect>
 	</element>
 
-	<element name="text_cl">  <text string="CL">   <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_pos"> <text string="POS">  <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_mem"> <text string="MEM">  <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_info"><text string=" INFO"><color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_lev"> <text string="LEV">  <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_ent"> <text string="ENT">  <color red="0.95" green="0.95" blue="0.95" /></text> </element>
-	<element name="text_res"> <text string="RES">  <color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_cl">  <text string="CL">  <color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_pos"> <text string="POS"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_mem"> <text string="MEM"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_info"><text string="INFO"><color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_lev"> <text string="LEV"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_ent"> <text string="ENT"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
+	<element name="text_res"> <text string="RES"> <color red="0.95" green="0.95" blue="0.95" /></text> </element>
 
 	<element name="text_a1"><text string="A1"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 	<element name="text_b2"><text string="B2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
@@ -443,12 +445,12 @@ thanks-to:Franz Huber
 	<element name="text_l9"><text string="&#x2190;"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 	<element name="text_r0"><text string="&#x2192;"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 
-	<element name="text_p1"><image file="chess/wk.svg"><color alpha="0.95" /></image></element>
-	<element name="text_p2"><image file="chess/wq.svg"><color alpha="0.95" /></image></element>
-	<element name="text_p3"><image file="chess/wr.svg"><color alpha="0.95" /></image></element>
-	<element name="text_p4"><image file="chess/wb.svg"><color alpha="0.95" /></image></element>
-	<element name="text_p5"><image file="chess/wn.svg"><color alpha="0.95" /></image></element>
-	<element name="text_p6"><image file="chess/wp.svg"><color alpha="0.95" /></image></element>
+	<element name="text_p1"><image file="chess/wk.svg"></image></element>
+	<element name="text_p2"><image file="chess/wq.svg"></image></element>
+	<element name="text_p3"><image file="chess/wr.svg"></image></element>
+	<element name="text_p4"><image file="chess/wb.svg"></image></element>
+	<element name="text_p5"><image file="chess/wn.svg"></image></element>
+	<element name="text_p6"><image file="chess/wp.svg"></image></element>
 
 	<group name="buttons">
 		<bounds x="69" y="93" width="29" height="14" />
@@ -474,16 +476,47 @@ thanks-to:Franz Huber
 		<element ref="gray"><bounds x="89" y="103" width="4" height="4" /></element>
 		<element ref="gray"><bounds x="94" y="103" width="4" height="4" /></element>
 
-		<element ref="text_cl">  <bounds x="69" y="94"  width="4" height="2.2" /></element>
-		<element ref="text_pos"> <bounds x="74" y="94"  width="4" height="2.2" /></element>
-		<element ref="text_mem"> <bounds x="79" y="94"  width="4" height="2.2" /></element>
-		<element ref="text_info"><bounds x="84" y="94"  width="4" height="2.2" /></element>
-		<element ref="text_lev"> <bounds x="89" y="94"  width="4" height="2.2" /></element>
-		<element ref="text_ent"> <bounds x="94" y="94"  width="4" height="2.2" /></element>
-		<element ref="text_res"> <bounds x="69" y="104" width="4" height="2.2" /></element>
-		<element ref="text_res"> <bounds x="74" y="104" width="4" height="2.2" /></element>
-		<element ref="text_g7">  <bounds x="79" y="104" width="4" height="2.2" /></element>
-		<element ref="text_h8">  <bounds x="84" y="104" width="4" height="2.2" /></element>
+		<element ref="blackb"><bounds x="69" y="98" width="2" height="1.9" /></element>
+		<element ref="blackb"><bounds x="74" y="98" width="2" height="1.9" /></element>
+		<element ref="blackb"><bounds x="79" y="98" width="2" height="1.9" /></element>
+		<element ref="blackb"><bounds x="84" y="98" width="2" height="1.9" /></element>
+		<element ref="blackb"><bounds x="89" y="98" width="2" height="1.9" /></element>
+		<element ref="blackb"><bounds x="94" y="98" width="2" height="1.9" /></element>
+
+		<element ref="text_p6"><bounds x="69" y="98" width="2" height="1.9" /></element>
+		<element ref="text_p5"><bounds x="74" y="98" width="2" height="1.9" /></element>
+		<element ref="text_p4"><bounds x="79" y="98" width="2" height="1.9" /></element>
+		<element ref="text_p3"><bounds x="84" y="98" width="2" height="1.9" /></element>
+		<element ref="text_p2"><bounds x="89" y="98" width="2" height="1.9" /></element>
+		<element ref="text_p1"><bounds x="94" y="98" width="2" height="1.9" /></element>
+
+		<element ref="whitem" blend="multiply"><bounds x="69" y="98" width="2" height="1.9" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="74" y="98" width="2" height="1.9" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="79" y="98" width="2" height="1.9" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="84" y="98" width="2" height="1.9" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="89" y="98" width="2" height="1.9" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="94" y="98" width="2" height="1.9" /></element>
+
+		<element ref="gray" blend="add"><bounds x="69" y="98" width="2" height="1.9" /></element>
+		<element ref="gray" blend="add"><bounds x="74" y="98" width="2" height="1.9" /></element>
+		<element ref="gray" blend="add"><bounds x="79" y="98" width="2" height="1.9" /></element>
+		<element ref="gray" blend="add"><bounds x="84" y="98" width="2" height="1.9" /></element>
+		<element ref="gray" blend="add"><bounds x="89" y="98" width="2" height="1.9" /></element>
+		<element ref="gray" blend="add"><bounds x="94" y="98" width="2" height="1.9" /></element>
+
+		<element ref="blackw"><bounds x="89.5" y="105.1" width="1.3" height="1.3" /></element>
+		<element ref="white"><bounds x="94.5" y="105.1" width="1.3" height="1.3" /></element>
+
+		<element ref="text_cl">  <bounds x="69.2" y="94"  width="3.6" height="2.2" /></element>
+		<element ref="text_pos"> <bounds x="74.2" y="94"  width="3.6" height="2.2" /></element>
+		<element ref="text_mem"> <bounds x="79.2" y="94"  width="3.6" height="2.2" /></element>
+		<element ref="text_info"><bounds x="84.2" y="94"  width="3.6" height="2.2" /></element>
+		<element ref="text_lev"> <bounds x="89.2" y="94"  width="3.6" height="2.2" /></element>
+		<element ref="text_ent"> <bounds x="94.2" y="94"  width="3.6" height="2.2" /></element>
+		<element ref="text_res"> <bounds x="69.2" y="104" width="3.6" height="2.2" /></element>
+		<element ref="text_res"> <bounds x="74.2" y="104" width="3.6" height="2.2" /></element>
+		<element ref="text_g7">  <bounds x="79.2" y="104" width="3.6" height="2.2" /></element>
+		<element ref="text_h8">  <bounds x="84.2" y="104" width="3.6" height="2.2" /></element>
 
 		<element ref="text_l9"><bounds x="90.0" y="103" width="2" height="1.8" /></element>
 		<element ref="text_r0"><bounds x="95.2" y="103" width="2" height="1.8" /></element>
@@ -496,15 +529,6 @@ thanks-to:Franz Huber
 		<element ref="text_f6"><bounds x="95.7" y="99.5" width="2.27" height="2.2" /></element>
 		<element ref="text_9l"><bounds x="91" y="104.5" width="1.97" height="2.2" /></element>
 		<element ref="text_0r"><bounds x="96" y="104.5" width="1.97" height="2.2" /></element>
-
-		<element ref="text_p6"><bounds x="69" y="98" width="2" height="1.9" /></element>
-		<element ref="text_p5"><bounds x="74" y="98" width="2" height="1.9" /></element>
-		<element ref="text_p4"><bounds x="79" y="98" width="2" height="1.9" /></element>
-		<element ref="text_p3"><bounds x="84" y="98" width="2" height="1.9" /></element>
-		<element ref="text_p2"><bounds x="89" y="98" width="2" height="1.9" /></element>
-		<element ref="text_p1"><bounds x="94" y="98" width="2" height="1.9" /></element>
-		<element ref="blackw"><bounds x="89.5" y="105.1" width="1.3" height="1.3" /></element>
-		<element ref="white"><bounds x="94.5" y="105.1" width="1.3" height="1.3" /></element>
 
 		<element ref="keys" inputtag="KEY.0" inputmask="0x01"><bounds x="69" y="93" width="4" height="4" /><color alpha="0.25" /></element>
 		<element ref="keys" inputtag="KEY.0" inputmask="0x02"><bounds x="74" y="93" width="4" height="4" /><color alpha="0.25" /></element>

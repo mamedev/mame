@@ -472,8 +472,8 @@ authors:hap
 			<param name="x" start="10" increment="10" />
 			<param name="i" start="1" increment="1" />
 
-			<element ref="text_ba~i~"><bounds xc="~x~" y="0" width="10" height="1.7" /></element>
-			<element ref="text_bb~i~"><bounds xc="~x~" y="5.15" width="10" height="1.7" /></element>
+			<element ref="text_ba~i~"><bounds xc="~x~" y="0" width="9" height="1.7" /></element>
+			<element ref="text_bb~i~"><bounds xc="~x~" y="5.15" width="9" height="1.7" /></element>
 		</repeat>
 
 		<element ref="but" inputtag="IN.2" inputmask="0x02"><bounds xc="10"  y="2.2" width="5" height="1.7" /></element>
@@ -511,7 +511,8 @@ authors:hap
 	<element name="text_l3"><text string="Trace Mode"></text></element>
 	<element name="text_l4"><text string="Emotions"></text></element>
 	<element name="text_l5"><text string="Sound"></text></element>
-	<element name="text_l6"><text string="Piece Discrepancy"></text></element>
+	<element name="text_l6"><text string=" "></text></element>
+	<element name="text_l6a"><text string="Piece Discrepancy"></text></element>
 	<element name="text_l7"><text string="Illegal"></text></element>
 	<element name="text_l8"><text string="Set Up"></text></element>
 	<element name="text_l9"><text string="Verify"></text></element>
@@ -532,8 +533,9 @@ authors:hap
 			<param name="x" start="15" increment="10" />
 			<param name="i" start="1" increment="1" />
 
-			<element ref="text_l~i~"><bounds xc="~x~" y="0" width="20" height="1.7" /></element>
+			<element ref="text_l~i~"><bounds xc="~x~" y="0" width="9" height="1.7" /></element>
 		</repeat>
+		<element ref="text_l6a"><bounds xc="65" y="0" width="12" height="1.7" /></element>
 
 		<repeat count="6">
 			<param name="x" start="25" increment="10" />

@@ -2,7 +2,9 @@
 // copyright-holders:David Haywood
 
 /*****************************************************************************
-Mogura Desse, Konami 1991
+
+Mogura Desse (GX141), Konami 1991
+
 Hardware info by Guru
 ---------------------
 
@@ -97,6 +99,8 @@ public:
 	void mogura(machine_config &config);
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -108,7 +112,9 @@ private:
 	required_shared_ptr<uint8_t> m_tileram;
 
 	tilemap_t *m_tilemap = nullptr;
+	uint8_t m_control = false;
 
+	void vblank(int state);
 	void tileram_w(offs_t offset, uint8_t data);
 	void control_w(uint8_t data);
 	void dac_w(uint8_t data);
@@ -143,10 +149,9 @@ void mogura_state::palette(palette_device &palette) const
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
-		bit0 = 0;
-		bit1 = BIT(color_prom[i], 6);
-		bit2 = BIT(color_prom[i], 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(bitswap<5>(i, 2, 1, 0, 4, 3), rgb_t(r, g, b));
 	}
@@ -186,6 +191,12 @@ void mogura_state::tileram_w(offs_t offset, uint8_t data)
 	m_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
+void mogura_state::vblank(int state)
+{
+	if (state && BIT(m_control, 3))
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+}
+
 void mogura_state::control_w(uint8_t data)
 {
 	// bits 0 & 1: coin counters
@@ -193,7 +204,11 @@ void mogura_state::control_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 0));
 
 	// bit 2: sound related?
-	// bit 3: always toggles?
+	// bit 3: irq enable
+	if (!BIT(data, 3))
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+
+	m_control = data;
 }
 
 void mogura_state::dac_w(uint8_t data)
@@ -278,18 +293,28 @@ static GFXDECODE_START( gfx_mogura )
 GFXDECODE_END
 
 
+void mogura_state::machine_start()
+{
+	save_item(NAME(m_control));
+}
+
+void mogura_state::machine_reset()
+{
+	control_w(0);
+}
+
 void mogura_state::mogura(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, 24_MHz_XTAL / 8); // 3 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &mogura_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &mogura_state::io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(mogura_state::irq0_line_hold));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240); // measured 59.1881
 	screen.set_screen_update(FUNC(mogura_state::screen_update));
+	screen.screen_vblank().set(FUNC(mogura_state::vblank));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_mogura);

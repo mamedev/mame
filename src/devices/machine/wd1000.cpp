@@ -230,33 +230,25 @@ void wd1000_device::end_command()
 	set_intrq(1);
 }
 
+bool wd1000_device::validate_id_field()
+{
+	harddisk_image_device *file = m_drives[drive()];
+	const auto &info = file->get_info();
+	if ((m_cylinder > info.cylinders) || (head() >= info.heads))
+		return false;
+	const int16_t sector = m_sector_number - m_sector_base;
+	if ((sector < 0) || (sector >= info.sectors) || (sector_bytes() != info.sectorbytes))
+		return false;
+	return true;
+}
+
 int wd1000_device::get_lbasector()
 {
 	harddisk_image_device *file = m_drives[drive()];
 	const auto &info = file->get_info();
 	int lbasector;
 
-	if (m_cylinder > info.cylinders)
-	{
-		logerror("%s: Unexpected cylinder %d for range 0 to %d\n", machine().describe_context(), m_cylinder, info.cylinders - 1);
-	}
-
-	if (head() >= info.heads)
-	{
-		logerror("%s: Unexpected head %d for range 0 to %d\n", machine().describe_context(), head(), info.heads - 1);
-	}
-
 	int16_t sector = m_sector_number - m_sector_base;
-
-	if (sector < 0 || sector >= info.sectors)
-	{
-		logerror("%s: Unexpected sector number %d for range %d to %d\n", machine().describe_context(), m_sector_number, m_sector_base, info.sectors + m_sector_base);
-	}
-
-	if (sector_bytes() != info.sectorbytes)
-	{
-		logerror("%s: Unexpected sector bytes %d, expected %d\n", machine().describe_context(), sector_bytes(), info.sectorbytes);
-	}
 
 	lbasector = m_cylinder;
 	lbasector *= info.heads;
@@ -567,9 +559,16 @@ void wd1000_device::cmd_restore()
 // so it is not necessary to guard that case in these functions.
 void wd1000_device::cmd_read_sector()
 {
-	harddisk_image_device *file = m_drives[drive()];
-	uint8_t dma = BIT(m_command, 3);
+	if (!validate_id_field())
+	{
+		set_error(ERR_ID);
+		end_command();
+		return;
+	}
 
+	harddisk_image_device *file = m_drives[drive()];
+
+	uint8_t dma = BIT(m_command, 3);
 	file->read(get_lbasector(), m_buffer);
 
 	m_buffer_index = 0;
@@ -588,12 +587,19 @@ void wd1000_device::cmd_read_sector()
 
 void wd1000_device::cmd_write_sector()
 {
-	harddisk_image_device *file = m_drives[drive()];
+	if (!validate_id_field())
+	{
+		set_error(ERR_ID);
+		end_command();
+		return;
+	}
 
 	if (m_buffer_index != sector_bytes())
 	{
 		logerror("%s: Unexpected unfilled buffer on write, only %d or %d bytes filled\n", machine().describe_context(), m_buffer_index, sector_bytes());
 	}
+
+	harddisk_image_device *file = m_drives[drive()];
 
 	file->write(get_lbasector(), m_buffer);
 

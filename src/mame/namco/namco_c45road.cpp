@@ -144,7 +144,7 @@ void namco_c45_road_device::tileram_w(offs_t offset, uint16_t data, uint16_t mem
 //  draw -- render to the target bitmap
 //-------------------------------------------------
 
-void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
+void namco_c45_road_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, uint8_t prival, uint8_t primask)
 {
 	bitmap_ind16 &source_bitmap = m_tilemap->pixmap();
 	unsigned yscroll = m_lineram[0x3fe/2];
@@ -198,6 +198,7 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		// BUT: support transparent color for Thunder Ceptor
 		uint16_t *dest = &bitmap.pix(y);
+		uint8_t *destpri = &screen.priority().pix(y);
 		if (m_transparent_color != ~0)
 		{
 			while (numpixels-- > 0)
@@ -208,6 +209,7 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 					if (m_clut != nullptr)
 						pen = (pen & ~0xff) | m_clut[pen & 0xff];
 					dest[screenx] = pen;
+					destpri[screenx] = (destpri[screenx] & primask) | prival;
 				}
 				screenx++;
 				sourcex += dsourcex;
@@ -220,7 +222,9 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 				int pen = source_gfx[sourcex >> 16];
 				if (m_clut != nullptr)
 					pen = (pen & ~0xff) | m_clut[pen & 0xff];
-				dest[screenx++] = pen;
+				dest[screenx] = pen;
+				destpri[screenx] = (destpri[screenx] & primask) | prival;
+				screenx++;
 				sourcex += dsourcex;
 			}
 		}

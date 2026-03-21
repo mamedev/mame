@@ -2,18 +2,28 @@
 // copyright-holders:
 /**********************************************************************************************************************************
 
-Skeleton driver for "Play 4 Texas Hold'em", by Sleic.
+Skeleton driver for "Play4Texas Hold'em", by Sleic.
 
-Based on an Innocore / Advantech "E105MB/B" PCB (specific for embedded gaming systems):
--CPU Intel Atom N270 SLB73, 1.6 GHz / 512 / 533.
--512MB RAM.
--Safenet Sentinel USB security dongle.
--Intel NH82801GBM chipset, RTL8111CP Ethernet controller, IT8718F-S EC - LPC I/O, GL826/MX2AE12G12 USB 2.0 card reader controller.
--PIC16F54 near a 4MHz xtal, Lattice ispMACH LC4256V near a 40MHz xtal, PIC16LF747, Lattice ispMACH LC4384V, CY62157EV3 SRAM.
+Advantech DPX-E105, based on an Innocore / Advantech "E105MB/B" PCB (specific for embedded gaming systems):
+- CPU Intel Atom N270 SLB73, 1.6 GHz / 512 / 533.
+- 512MB RAM.
+- Safenet Sentinel USB security dongle.
+- Intel NH82801GBM chipset
+- Realtek RTL8111CP Ethernet controller
+- ITE IT8718F-S EC - LPC I/O
+- GL826/MX2AE12G12 USB 2.0 card reader controller.
+- PIC16F54 near a 4MHz xtal, Lattice ispMACH LC4256V near a 40MHz xtal, PIC16LF747, Lattice ispMACH LC4384V, CY62157EV3 SRAM.
 
 The machine has two anti-tamper switches directly connected to the PCB.
 
-Linux-based operating system called "LudOS".
+Custom Java software called "LudOS" running on Debian 5.0.5
+Screen resolution: 1366x768
+Dongle is used to get the GPG passphrase to decrypt /root/loader/ludicus.tar.gz.gpg which contains the software and game.
+GPG passphrase is stored in plaintext in /root/loader/bin/gpgExtract.sh
+
+Existing Play4Texas dump has the date of the last patch as 2011-10-18.
+
+Appears to be based on Play4Pro by Ludicus?
 
 ***********************************************************************************************************************************/
 
@@ -51,9 +61,6 @@ void play4texash_state::play4texash_io(address_map &map)
 {
 }
 
-static INPUT_PORTS_START(play4texash)
-INPUT_PORTS_END
-
 void play4texash_state::play4texash(machine_config &config)
 {
 	PENTIUM4(config, m_maincpu, 100'000'000); // Intel Atom N270 SLB73, 1.6 GHz / 512 / 533
@@ -87,4 +94,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(2010, play4texash, 0, play4texash, play4texash, play4texash_state, empty_init, ROT0, "Sleic", "Play 4 Texas Hold'em", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(2011, play4texash, 0, play4texash, 0, play4texash_state, empty_init, ROT0, "Sleic", "Play4Texas Hold'em", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

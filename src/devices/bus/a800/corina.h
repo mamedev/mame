@@ -12,7 +12,6 @@
 class a800_rom_corina_device : public a800_rom_device
 {
 public:
-	a800_rom_corina_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	a800_rom_corina_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void cart_map(address_map &map) override ATTR_COLD;
@@ -20,6 +19,8 @@ public:
 	virtual std::tuple<int, int> get_initial_rd_state() override { return std::make_tuple(1, 1); }
 
 protected:
+	a800_rom_corina_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

@@ -57,7 +57,7 @@ public:
 		, m_int(*this, "int")
 		, m_nvram(*this, "nvram")
 		, m_rtc(*this, "rtc")
-		, m_scsi(*this, "scsi:0:wd33c93a")
+		, m_scsi(*this, "wd33c93a")
 		, m_eth(*this, "eth")
 		, m_scc(*this, "scc%u", 0U)
 		, m_dsp(*this, "dsp")
@@ -209,16 +209,13 @@ void ip20_state::ip20(machine_config &config)
 
 	DP8572A(config, m_rtc, 32.768_kHz_XTAL).set_use_utc(true);
 
-	NSCSI_BUS(config, "scsi", 0);
-	NSCSI_CONNECTOR(config, "scsi:0").option_set("wd33c93a", WD33C93A).machine_config(
-		[this](device_t *device)
-		{
-			wd33c93a_device &scsi = downcast<wd33c93a_device &>(*device);
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 
-			scsi.set_clock(10_MHz_XTAL);
-			scsi.irq_cb().set(m_int, FUNC(sgi_int2_device::lio0_w<sgi_int2_device::LIO0_SCSI>));
-			scsi.drq_cb().set(m_hpc, FUNC(hpc1_device::write_drq<0>));
-		});
+	WD33C93A(config, m_scsi, 10_MHz_XTAL);
+	scsi.set_external_device(0, m_scsi);
+	m_scsi->irq_cb().set(m_int, FUNC(sgi_int2_device::lio0_w<sgi_int2_device::LIO0_SCSI>));
+	m_scsi->drq_cb().set(m_hpc, FUNC(hpc1_device::write_drq<0>));
+
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr, false);

@@ -122,7 +122,7 @@ if __name__ == '__main__':
             original=options.executable,
             product=('MAME' if options.target == 'mame' else options.target),
             rdns=('org.mamedev.' + internal),
-            copyright='\u00a9 1997-2025 MAMEdev and contributors',
+            copyright='\u00a9 1997-2026 MAMEdev and contributors',
             winfileflags=('0x0L' if verbuild == '0' else 'VS_FF_PRERELEASE'),
             resources=(options.resources or 'mame.rc'))
 

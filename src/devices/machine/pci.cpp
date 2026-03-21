@@ -34,6 +34,8 @@ void pci_device::config_map(address_map &map)
 	map(0x34, 0x34).r(FUNC(pci_device::capptr_r));
 	map(0x3c, 0x3c).rw(FUNC(pci_device::interrupt_line_r), FUNC(pci_device::interrupt_line_w));
 	map(0x3d, 0x3d).rw(FUNC(pci_device::interrupt_pin_r), FUNC(pci_device::interrupt_pin_w));
+	map(0x3e, 0x3e).r(FUNC(pci_device::minimum_grant_r));
+	map(0x3f, 0x3f).r(FUNC(pci_device::maximum_latency_r));
 }
 
 void pci_bridge_device::config_map(address_map &map)
@@ -97,7 +99,7 @@ pci_device::pci_device(const machine_config &mconfig, device_type type, const ch
 // main_id & 0xffff = device ID ($02-$03)
 // revision = board versioning ($08)
 // pclass = programming interface/sub class code/base class code ($09-$0b)
-// subsystem_id << 16 = sub vendor ID ($2c-$2d)    - NB: not all cards have these
+// subsystem_id << 16 = sub vendor ID ($2c-$2d)    - NOTE: not all cards have these
 // subsystem_id & 0xffff = sub device ID ($2e-$2f) /
 void pci_device::set_ids(uint32_t _main_id, uint8_t _revision, uint32_t _pclass, uint32_t _subsystem_id)
 {
@@ -112,6 +114,8 @@ void pci_device::device_start()
 	command = 0x0000;
 	command_mask = 0x01bf;
 	status = 0x0000;
+	minimum_grant = 0;
+	maximum_latency = 0;
 
 	bank_count = 0;
 	bank_reg_count = 0;
@@ -209,7 +213,7 @@ void pci_device::command_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	mem_mask &= command_mask;
 	COMBINE_DATA(&command);
-	logerror("command = %04x\n", command);
+	logerror("command = %04x (%04x & %04x)\n", command, data, command_mask);
 	if ((old ^ command) & 3)
 		remap_cb();
 }
@@ -224,11 +228,13 @@ uint32_t pci_device::class_rev_r()
 	return (pclass << 8) | revision;
 }
 
+// vendor defined, writeable with optional "fallback to zero" if unsupported
 uint8_t pci_device::cache_line_size_r()
 {
 	return 0x00;
 }
 
+// latency timer in PCI bus clocks, optionally writeable if supported
 uint8_t pci_device::latency_timer_r()
 {
 	return 0x00;
@@ -315,6 +321,20 @@ void pci_device::interrupt_pin_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&intr_pin);
 	logerror("interrupt_pin_w = %02x\n", data);
+}
+
+// value x 0.25 usec to complete a burst
+uint8_t pci_device::minimum_grant_r()
+{
+	logerror("minimum_grant_r = %02x\n", minimum_grant);
+	return minimum_grant;
+}
+
+// value x 0.25 usec between request cycles
+uint8_t pci_device::maximum_latency_r()
+{
+	logerror("maximum_latency_r = %02x\n", maximum_latency);
+	return maximum_latency;
 }
 
 void pci_device::set_remap_cb(mapper_cb _remap_cb)

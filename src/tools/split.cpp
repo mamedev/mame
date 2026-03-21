@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    split.c
+    split.cpp
 
     Simple file splitter/joiner with hashes.
 

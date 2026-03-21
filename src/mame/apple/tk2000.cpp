@@ -10,6 +10,10 @@
     The keyboard works entirely differently, which is a big deal.
 
     TODO: emulate expansion connector (not wholly Apple II compatible)
+    TODO: emulate joystick port (wired to KBIN and KBOUT)
+    TODO: emulate cassette MOTOR softswitch
+    TODO: emulate dual RESET keys
+    TODO: correct PAL colors and XTAL
 
     $C05A - banks RAM from c100-ffff
     $C05B - banks ROM from c100-ffff
@@ -107,7 +111,6 @@ private:
 	uint8_t snd_r();
 	void snd_w(uint8_t data);
 	uint8_t switches_r(offs_t offset);
-	uint8_t cassette_r();
 	void color_w(int state);
 	void motor_a_w(int state);
 	void motor_b_w(int state);
@@ -149,6 +152,7 @@ void tk2000_state::machine_start()
 	// setup video pointers
 	m_video->set_ram_pointers(m_ram_ptr, m_ram_ptr);
 	m_video->set_char_pointer(nullptr, 0);  // no text modes on this machine
+	m_video->set_hgr2(0xa000);
 }
 
 void tk2000_state::machine_reset()
@@ -202,7 +206,7 @@ uint8_t tk2000_state::kbin_r()
 	if (m_ctrl_key)
 		kbin |= m_kbspecial->read();
 
-	return kbin | (m_printer_busy ? 0x40 : 0);
+	return kbin | (m_printer_busy ? 0x40 : 0) | (m_cassette->input() > 0.0 ? 0x80 : 0);
 }
 
 uint8_t tk2000_state::casout_r()
@@ -233,19 +237,16 @@ void tk2000_state::snd_w(uint8_t data)
 
 uint8_t tk2000_state::switches_r(offs_t offset)
 {
+	const uint8_t uFloatingBus = read_floatingbus(); // video side-effects latch after reading
 	if (!machine().side_effects_disabled())
 		m_softlatch->write_bit((offset & 0x0e) >> 1, offset & 0x01);
-	return read_floatingbus();
-}
-
-uint8_t tk2000_state::cassette_r()
-{
-	return (m_cassette->input() > 0.0 ? 0x80 : 0) | (read_floatingbus() & 0x7f);
+	return uFloatingBus;
 }
 
 void tk2000_state::color_w(int state)
 {
 	// 0 = color, 1 = black/white
+	m_video->monohgr_w(state);
 }
 
 void tk2000_state::motor_a_w(int state)
@@ -398,8 +399,8 @@ uint8_t tk2000_state::read_floatingbus()
 		// Y: insert hires only address bits
 		//
 		address |= v_C << 12; // a12
-		address |= (1 ^ (Page2 & (1 ^ _80Store))) << 13; // a13
-		address |= (Page2 & (1 ^ _80Store)) << 14; // a14
+		address |= 1 << 13; // a13
+		address |= (Page2 & (1 ^ _80Store)) << 15; // a15, from a000
 	}
 	else
 	{
@@ -446,7 +447,6 @@ void tk2000_state::apple2_map(address_map &map)
 	map(0xc020, 0xc020).rw(FUNC(tk2000_state::casout_r), FUNC(tk2000_state::casout_w));
 	map(0xc030, 0xc030).rw(FUNC(tk2000_state::snd_r), FUNC(tk2000_state::snd_w));
 	map(0xc050, 0xc05f).r(FUNC(tk2000_state::switches_r)).w(m_softlatch, FUNC(addressable_latch_device::write_a0));
-	map(0xc060, 0xc060).mirror(8).r(FUNC(tk2000_state::cassette_r));
 	map(0xc080, 0xc0ff).rw(FUNC(tk2000_state::c080_r), FUNC(tk2000_state::c080_w));
 	map(0xc100, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
 }
@@ -558,7 +558,7 @@ INPUT_PORTS_END
 void tk2000_state::tk2000(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 1021800);     /* close to actual CPU frequency of 1.020484 MHz */
+	M6502(config, m_maincpu, 1021800); // FIXME 14.30244 MHz XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &tk2000_state::apple2_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(tk2000_state::apple2_interrupt), "screen", 0, 1);
@@ -567,10 +567,7 @@ void tk2000_state::tk2000(machine_config &config)
 	APPLE2_VIDEO_COMPOSITE(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(280*2, 262);
-	m_screen->set_visarea(0, (280*2)-1,0,192-1);
+	m_screen->set_raw(1021800 * 14, 65 * 14, 0, 40 * 14, 262, 0, 192);
 	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, false, false>)));
 	m_screen->set_palette(m_video);
 
@@ -619,5 +616,5 @@ ROM_END
 
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY         FULLNAME */
-COMP( 1984, tk2000, 0,      0,      tk2000,  tk2000, tk2000_state, empty_init, "Microdigital", "TK2000 Color Computer", MACHINE_NOT_WORKING )
-COMP( 1982, mpf2,   tk2000, 0,      tk2000,  tk2000, tk2000_state, empty_init, "Multitech",    "Microprofessor II",     MACHINE_NOT_WORKING )
+COMP( 1984, tk2000, 0,      0,      tk2000,  tk2000, tk2000_state, empty_init, "Microdigital", "TK2000 Color Computer", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, mpf2,   tk2000, 0,      tk2000,  tk2000, tk2000_state, empty_init, "Multitech",    "Microprofessor II",     MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

@@ -385,9 +385,9 @@ authors:hap
 		<element ref="butdb"><bounds xc="13.6" yc="17.5" width="4.2" height="4.2" /></element>
 		<element ref="butdr"><bounds xc="13.6" yc="22.5" width="4.2" height="4.2" /></element>
 
-		<element ref="text_b0a"><bounds xc="13.6" yc="17.5" width="5" height="1.4" /></element>
-		<element ref="text_b0b"><bounds xc="13.6" yc="21.75" width="5" height="1.4" /></element>
-		<element ref="text_b0c"><bounds xc="13.6" yc="23.25" width="5" height="1.4" /></element>
+		<element ref="text_b0a"><bounds xc="13.6" yc="17.5" width="3" height="1.4" /></element>
+		<element ref="text_b0b"><bounds xc="13.6" yc="21.75" width="3" height="1.4" /></element>
+		<element ref="text_b0c"><bounds xc="13.6" yc="23.25" width="3" height="1.4" /></element>
 		<element ref="cwhite"><bounds xc="13.6" yc="22.5" width="2" height="0.1" /></element>
 
 		<element ref="hlbd" inputtag="RESET" inputmask="0x01"><bounds xc="13.6" yc="17.5" width="4.2" height="4.2" /><color alpha="0.25" /></element>
@@ -417,10 +417,10 @@ authors:hap
 
 			<element ref="butr"><bounds xc="~x~" yc="16.9" width="4.2" height="2.6" /></element>
 			<element ref="butr"><bounds xc="~x~" yc="23.1" width="4.2" height="2.6" /></element>
-			<element ref="text_b~i~a"><bounds xc="~x~" y="18.3" width="4.85" height="1.4" /></element>
-			<element ref="text_b~i~b"><bounds xc="~x~" y="19.6" width="4.85" height="1.4" /></element>
-			<element ref="text_b~i~c"><bounds xc="~x~" y="24.5" width="4.85" height="1.4" /></element>
-			<element ref="text_b~i~d"><bounds xc="~x~" y="25.8" width="4.85" height="1.4" /></element>
+			<element ref="text_b~i~a"><bounds xc="~x~" y="18.3" width="4.5" height="1.4" /></element>
+			<element ref="text_b~i~b"><bounds xc="~x~" y="19.6" width="4.5" height="1.4" /></element>
+			<element ref="text_b~i~c"><bounds xc="~x~" y="24.5" width="4.5" height="1.4" /></element>
+			<element ref="text_b~i~d"><bounds xc="~x~" y="25.8" width="4.5" height="1.4" /></element>
 		</repeat>
 
 		<element ref="hlb" inputtag="IN.0" inputmask="0x4000"><bounds xc="60" yc="16.9" width="4.2" height="2.6" /><color alpha="0.25" /></element>

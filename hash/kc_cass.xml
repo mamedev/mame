@@ -1063,7 +1063,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="socobana" cloneof="socoban">
-		<description>Socoban (Alt)</description>
+		<description>Socoban (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">

@@ -419,7 +419,6 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override { m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero); }
 	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;

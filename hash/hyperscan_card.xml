@@ -23,7 +23,7 @@ license:CC0-1.0
     NOTE: all cards marked baddump are not real dumps, but manually generated.
 -->
 
-<softwarelist name="hyperscan_card" description="Mattel Hyperscan RFID cards">
+<softwarelist name="hyperscan_card" description="Mattel HyperScan RFID cards">
 	<software name="ben001">
 		<description>Ben 10: Ben Tennyson (Character)</description>
 		<year>2006</year>

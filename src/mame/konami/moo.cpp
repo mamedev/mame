@@ -278,9 +278,9 @@ K053246_CB_MEMBER(moo_base_state::sprite_callback)
 	else if (pri <= m_layerpri[1])
 		priority_mask = 0xf0;
 	else if (pri <= m_layerpri[0])
-		priority_mask = 0xf0|0xcc;
+		priority_mask = 0xf0 | 0xcc;
 	else
-		priority_mask = 0xf0|0xcc|0xaa;
+		priority_mask = 0xf0 | 0xcc | 0xaa;
 
 	color = m_sprite_colorbase | (color & 0x001f);
 }
@@ -323,15 +323,12 @@ VIDEO_START_MEMBER(moo_prot_state,bucky)
 uint32_t moo_base_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	static const int K053251_CI[4] = { k053251_device::CI1, k053251_device::CI2, k053251_device::CI3, k053251_device::CI4 };
-	int layers[3];
-	int plane, dirty;
-
 	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
 	m_layer_colorbase[0] = 0x70;
 
 	if (m_k056832->get_layer_association())
 	{
-		for (plane = 1; plane < 4; plane++)
+		for (int plane = 1; plane < 4; plane++)
 		{
 			const int new_colorbase = m_k053251->get_palette_index(K053251_CI[plane]);
 			if (m_layer_colorbase[plane] != new_colorbase)
@@ -343,27 +340,29 @@ uint32_t moo_base_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	}
 	else
 	{
-		for (dirty = 0, plane = 1; plane < 4; plane++)
+		bool dirty = false;
+		for (int plane = 1; plane < 4; plane++)
 		{
 			const int new_colorbase = m_k053251->get_palette_index(K053251_CI[plane]);
 			if (m_layer_colorbase[plane] != new_colorbase)
 			{
 				m_layer_colorbase[plane] = new_colorbase;
-				dirty = 1;
+				dirty = true;
 			}
 		}
 		if (dirty)
 			m_k056832->mark_all_tilemaps_dirty();
 	}
 
-	layers[0] = 1;
-	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI2);
-	layers[1] = 2;
-	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI3);
-	layers[2] = 3;
-	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI4);
+	// sort layers and draw
+	int layer[3];
+	for (int i = 0; i < 3; i++)
+	{
+		layer[i] = i + 1;
+		m_layerpri[i] = m_k053251->get_priority(K053251_CI[i + 1]);
+	}
 
-	konami_sortlayers3(layers, m_layerpri);
+	konami_sortlayers3(layer, m_layerpri);
 
 	m_k054338->update_all_shadows(0, *m_palette);
 	m_k054338->fill_solid_bg(bitmap, cliprect);
@@ -371,9 +370,9 @@ uint32_t moo_base_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	screen.priority().fill(0, cliprect);
 
 	if (m_layerpri[0] < m_k053251->get_priority(k053251_device::CI1))   /* bucky hides back layer behind background */
-		m_k056832->tilemap_draw(screen, bitmap, cliprect, layers[0], 0, 1);
+		m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 1);
 
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, layers[1], 0, 2);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
 
 	// Enabling alpha improves fog and fading in Moo but causes other things to disappear.
 	// There is probably a control bit somewhere to turn off alpha blending.
@@ -382,7 +381,7 @@ uint32_t moo_base_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	const int alpha = (m_alpha_enabled) ? m_k054338->set_alpha_level(1) & 0xff : 255;
 
 	if (alpha > 0)
-		m_k056832->tilemap_draw(screen, bitmap, cliprect, layers[2], TILEMAP_DRAW_ALPHA(alpha), 4);
+		m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[2], TILEMAP_DRAW_ALPHA(alpha), 4);
 
 	m_k053246->k053247_sprites_draw( bitmap, cliprect);
 

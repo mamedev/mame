@@ -115,32 +115,24 @@ void menu_file_manager::fill_image_line(device_image_interface &img, std::string
 	// get the image type/id
 	instance = string_format("%s (%s)", img.instance_name(), img.brief_instance_name());
 
-	// get the base name
-	if (img.basename())
+	if (!img.basename())
 	{
-		filename.assign(img.basename());
-
-		// if the image has been loaded through softlist, also show the loaded part
-		if (img.loaded_through_softlist())
-		{
-			const software_part *tmp = img.part_entry();
-			if (!tmp->name().empty())
-			{
-				filename.append(" (");
-				filename.append(tmp->name());
-				// also check if this part has a specific part_id (e.g. "Map Disc", "Bonus Disc", etc.), and in case display it
-				if (img.get_feature("part_id") != nullptr)
-				{
-					filename.append(": ");
-					filename.append(img.get_feature("part_id"));
-				}
-				filename.append(")");
-			}
-		}
+		filename = "---";
+	}
+	else if (!img.loaded_through_softlist())
+	{
+		filename = img.basename();
 	}
 	else
 	{
-		filename.assign("---");
+		// if the image has been loaded through softlist, also show the loaded part
+		// also check if this part has a specific part_id (e.g. "Map Disc", "Bonus Disc", etc.)
+		software_part const *const part = img.part_entry();
+		auto const partid = img.get_feature("part_id");
+		if (partid)
+			filename = string_format(_("%1$s (%2$s: %3$s)"), img.basename(), part->name(), partid);
+		else
+			filename = string_format(_("%1$s (%2$s)"), img.basename(), part->name());
 	}
 }
 
@@ -232,7 +224,7 @@ bool menu_file_manager::handle(event const *ev)
 
 	if (ev)
 	{
-		if ((uintptr_t)ev->itemref == 1)
+		if (uintptr_t(ev->itemref) == 1)
 		{
 			if (m_selected_device)
 			{
@@ -266,6 +258,15 @@ bool menu_file_manager::handle(event const *ev)
 						menu::stack_push<menu_control_device_image>(ui(), container(), *m_selected_device);
 				}
 			}
+		}
+	}
+	else
+	{
+		auto const selected = get_selection_ref();
+		if (selected && (uintptr_t(selected) != 1) && (selected != m_selected_device))
+		{
+			m_selected_device = (device_image_interface *)selected;
+			result = true;
 		}
 	}
 

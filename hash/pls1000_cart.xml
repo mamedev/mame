@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+TODO:
+- system bootstrap checks if cart has 0x5a05 as first word, if that check fails it tries for $03
+  on second byte. Compatibility/version flag? All these carts are 0x5a03.
+
+-->
+<softwarelist name="pls1000_cart" description="Brainchild PLS-1000 cartridges">
+
+	<software name="algebra">
+		<!-- Compile date 8/16/1995 -->
+		<description>Introduction to Algebra (v2.83)</description>
+		<year>1995</year>
+		<publisher>Brainchild</publisher>
+		<!-- Published under license from Skills Bank Corporation -->
+		<part name="cart" interface="pls1000_cart">
+			<dataarea name="rom" size="0x40000" width="16" endianness="big">
+				<rom name="cart_algebraintro_m27c2001.bin" size="0x40000" crc="bd8740ab" sha1="501ebde60a26ebd179564492c859b127472d9f5c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="capital">
+		<!-- Compile date 6/7/1995 -->
+		<description>Capitalization (v2.83)</description>
+		<year>1995</year>
+		<publisher>Brainchild</publisher>
+		<!-- Published under license from Skills Bank Corporation -->
+		<part name="cart" interface="pls1000_cart">
+			<dataarea name="rom" size="0x40000" width="16" endianness="big">
+				<rom name="cart_capitalization_m27c2001.bin" size="0x40000" crc="f0095080" sha1="c755b373188c5a54ccc87a33993256bda3121e48"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="decmath">
+		<!-- Compile date 8/16/1995 -->
+		<description>Decimal Math (v2.83)</description>
+		<year>1995</year>
+		<publisher>Brainchild</publisher>
+		<!-- Published under license from Skills Bank Corporation -->
+		<part name="cart" interface="pls1000_cart">
+			<dataarea name="rom" size="0x40000" width="16" endianness="big">
+				<rom name="cart_decimals_am27c020.bin" size="0x40000" crc="891a7ad5" sha1="9debe21f55ce1de33b14df33f44764b78dd287bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="punctua">
+		<!-- Compile date 8/6/1997 -->
+		<description>Punctuation (v2.90)</description>
+		<year>1997</year>
+		<publisher>Brainchild</publisher>
+		<!-- Published under license from Skills Bank Corporation -->
+		<part name="cart" interface="pls1000_cart">
+			<dataarea name="rom" size="0x40000" width="16" endianness="big">
+				<rom name="cart_punctuation_m27c2001.bin" size="0x40000" crc="3164606d" sha1="7fb0790f05cd40e172135bb0e2fd987e7d6f501e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordknow">
+		<!-- Compile date 6/8/1995 -->
+		<description>Word Knowledge (v2.83)</description>
+		<year>1995</year>
+		<publisher>Brainchild</publisher>
+		<!-- Published under license from Skills Bank Corporation -->
+		<part name="cart" interface="pls1000_cart">
+			<dataarea name="rom" size="0x40000" width="16" endianness="big">
+				<rom name="cart_wordknowledge_m27c2001.bin" size="0x40000" crc="83afa4fa" sha1="1b84a8520a74570fabaefa8b594ecc48bb0e4a0b"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

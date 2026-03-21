@@ -29,8 +29,7 @@ public:
 	// 16-bit read / write handlers (when /IOCS16 is low)
 	u16 word_r(offs_t offset, u16 mem_mask);
 	void word_w(offs_t offset, u16 data, u16 mem_mask);
-	TIMER_CALLBACK_MEMBER(timer_cb_0);
-	TIMER_CALLBACK_MEMBER(timer_cb_1);
+	TIMER_CALLBACK_MEMBER(timer_cb);
 
 protected:
 	// device-level overrides
@@ -111,6 +110,12 @@ private:
 		void update_ramp();
 	};
 
+	struct ics2115_timer {
+		u8 scale, preset;
+		emu_timer *timer;
+		u64 period;  /* in nsec */
+	};
+
 	// internal register helper functions
 	u16 reg_read();
 	void reg_write(u16 data, u16 mem_mask);
@@ -136,11 +141,7 @@ private:
 	static const int volume_bits = 15;
 
 	ics2115_voice m_voice[32];
-	struct {
-		u8 scale, preset;
-		emu_timer *timer;
-		u64 period;  /* in nsec */
-	} m_timer[2];
+	ics2115_timer m_timer[2];
 
 	u8 m_active_osc;
 	u8 m_osc_select;

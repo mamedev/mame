@@ -285,7 +285,7 @@ void taitof2_state::taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_i
 
 	if (sprite_screen_width && sprite_screen_height)
 	{
-		/* compute sprite increment per screen pixel */
+		// compute sprite increment per screen pixel
 		int dx = (gfx->width() << 16) / sprite_screen_width;
 		int dy = (gfx->height() << 16) / sprite_screen_height;
 
@@ -316,32 +316,35 @@ void taitof2_state::taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_i
 		}
 
 		if (sx < clip.min_x)
-		{ /* clip left */
+		{
+			// clip left
 			int pixels = clip.min_x - sx;
 			sx += pixels;
 			x_index_base += pixels * dx;
 		}
 		if (sy < clip.min_y)
-		{ /* clip top */
+		{
+			// clip top
 			int pixels = clip.min_y - sy;
 			sy += pixels;
 			y_index += pixels * dy;
 		}
-		/* NS 980211 - fixed incorrect clipping */
 		if (ex > clip.max_x + 1)
-		{ /* clip right */
+		{
+			// clip right
 			int pixels = ex - clip.max_x - 1;
 			ex -= pixels;
 		}
 		if (ey > clip.max_y + 1)
-		{ /* clip bottom */
+		{
+			// clip bottom
 			int pixels = ey - clip.max_y - 1;
 			ey -= pixels;
 		}
 
+		// skip if inner loop doesn't draw anything
 		if (ex > sx)
 		{
-			/* skip if inner loop doesn't draw anything */
 			if (use_mixer)
 			{
 				for (int y = sy; y < ey; y++)

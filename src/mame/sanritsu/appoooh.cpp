@@ -314,10 +314,9 @@ void appoooh_state::palette(palette_device &palette) const
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
-		bit0 = 0;
-		bit1 = BIT(color_prom[pen], 6);
-		bit2 = BIT(color_prom[pen], 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[pen], 6);
+		bit1 = BIT(color_prom[pen], 7);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -344,10 +343,9 @@ void robowres_state::palette(palette_device &palette) const
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
-		bit0 = 0;
-		bit1 = BIT(color_prom[pen], 6);
-		bit2 = BIT(color_prom[pen], 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[pen], 6);
+		bit1 = BIT(color_prom[pen], 7);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -443,7 +441,7 @@ void base_state::draw_sprites(bitmap_ind16 &dest_bmp, const rectangle &cliprect,
 		int sx    = sprite[offs + 3];
 		int flipx = sprite[offs + 1] & 0x01;
 
-		if(sx >= 248)
+		if (sx >= 248)
 			sx -= 256;
 
 		if (flipy)
@@ -454,10 +452,9 @@ void base_state::draw_sprites(bitmap_ind16 &dest_bmp, const rectangle &cliprect,
 		}
 
 		gfx->transpen(dest_bmp, cliprect,
-		code,
-		color,
-		flipx, flipy,
-		sx, sy, 0);
+				code, color,
+				flipx, flipy,
+				sx, sy, 0);
 	}
 }
 
@@ -581,7 +578,7 @@ static INPUT_PORTS_START( appoooh )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 
 	PORT_START("P2")
@@ -597,7 +594,7 @@ static INPUT_PORTS_START( appoooh )
 	PORT_START("BUTTON3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // probably unused
 
 	PORT_START("DSW1")

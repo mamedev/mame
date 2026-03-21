@@ -16,7 +16,7 @@
 
 #include "input_common.h"
 
-#include "sdl/osdsdl.h"
+#include "osdsdl.h"
 
 // MAME headers
 #include "inpttype.h"

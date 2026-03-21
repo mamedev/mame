@@ -372,9 +372,9 @@ authors:hap
 		<element ref="text_ll4"><bounds x="29.5" y="13.9" width="5.5" height="2" /></element>
 		<element ref="text_ll5"><bounds x="13.5" y="13.9" width="6.7" height="2" /></element>
 
-		<element ref="text_lm1"><bounds x="39.3" y="0.2" width="5.1" height="2" /></element>
-		<element ref="text_lm2"><bounds x="44.7" y="0.2" width="5.1" height="2" /></element>
-		<element ref="text_lm3"><bounds x="50.1" y="0.2" width="5.1" height="2" /></element>
+		<element ref="text_lm1"><bounds x="39.4" y="0.2" width="4.9" height="2" /></element>
+		<element ref="text_lm2"><bounds x="44.8" y="0.2" width="4.9" height="2" /></element>
+		<element ref="text_lm3"><bounds x="50.2" y="0.2" width="4.9" height="2" /></element>
 		<element ref="text_lm4"><bounds x="42" y="13.9" width="10.5" height="2" /></element>
 
 		<element ref="text_l7"><bounds x="58.8" y="0.2" width="2.7" height="2" /></element>
