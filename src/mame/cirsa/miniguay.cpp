@@ -214,7 +214,9 @@ ROM_START( miniguay )
 	ROM_LOAD( "pat_031_pal16r4.bin", 0x000, 0x104, NO_DUMP )
 ROM_END
 
-// Mini Bar - 860607-3 PCB
+/* Mini Bar - 860607-3 PCB
+   This is the "regular" displays Mini Bar version. There is another one with bigger displays,
+   (labeled "Displays Grandes") but it's unknown if it uses a different ROM. */
 ROM_START( minibar )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "c_mini_bar_b-1831_v4.0.ic13", 0x0000, 0x8000, CRC(accc2dc9) SHA1(a4574c451e0dd65365a552b03ba2d1f8af1ab1cc) )
