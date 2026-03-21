@@ -80,7 +80,7 @@ private:
 };
 
 // An envelope generator (EG) built around an operational transconductance
-// amplifier (OTA).
+// amplifier (OTA). Its rate is controlled by Iabc.
 //
 // When the EG output is far from the target (e.g. > ~0.2V), the EG will ramp
 // towards the target linearly. As the output approaches the target, the EG ramp
@@ -107,7 +107,9 @@ private:
 // to the negative supply, for OTAs that have it.
 //
 // A variant of the above uses anti-parallel diodes to connect the inputs (e.g.
-// prophet 5 glide EG). That variant behaves pretty much identically.
+// prophet 5 glide EG). This configuration protects the OTA from large voltage
+// differences, but otherwise behaves the same to the above. The values of R
+// don't matter.
 //
 //                                x      Iabc
 //                             ___|__     |
@@ -123,7 +125,25 @@ private:
 //                   |                                          |
 //                   +-------------------- R -------------------+
 //
-// TODO: Implement and document the scaled input variant (e.g. moog source EGs).
+// Another common variant uses voltage dividers at the two inputs. These ensure
+// the voltage difference at the inputs is small, keeping the OTA in its linear
+// region, and producing "RC" curves. In this configuration, the output will
+// converge to: TargetV * scale+ / scale-, where scale = Rgnd / (Rin + Rgnd).
+// For small enough scaling factors, R ~= (2 * VT) / (s * Iabc * scale-).
+//
+//                                x      Iabc
+//                             ___|__     |
+//                            |   |  \    |
+// Target V - Rin+- -+------- |+  Id  \   |
+//                   |        |        \  |
+//                 Rgnd+      |         \ |
+//                   |        |   OTA    OO ---+---- BUFFER --- EG output V
+//                  GND       |         /      |                |
+//                            |        /       C                |
+//                   +------- |-      /        |                |
+//                   |        |______/        GND               |
+//                   |                                          |
+// GND --- RGnd- --- +-------------------- Rin- ----------------+
 //
 class va_ota_eg_device : public device_t, public device_sound_interface
 {
@@ -139,6 +159,10 @@ public:
 	va_ota_eg_device(const machine_config &mconfig, const char *tag, device_t *owner, ota_type ota, float c) ATTR_COLD;
 	va_ota_eg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
 
+	// These configure the "scaled input" variant.
+	va_ota_eg_device &configure_plus_divider(float r_in, float r_gnd);
+	va_ota_eg_device &configure_minus_divider(float r_in, float r_gnd);
+
 	void set_target_v(float v);
 	void set_iabc(float iabc);  // Iabc control current in Amperes.
 
@@ -153,12 +177,13 @@ private:
 	// configuration
 	const float m_c;
 	float m_max_iout_scale;
+	float m_plus_scale;
+	float m_minus_scale;
 	sound_stream *m_stream;
 
 	// state
 	bool m_converged;
 	float m_g;  // Caches the product of multiple factors. See recalc().
-	float m_max_step;
 	float m_target_v;
 	float m_iabc;
 	float m_v;

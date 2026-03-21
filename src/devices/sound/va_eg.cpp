@@ -173,10 +173,11 @@ va_ota_eg_device::va_ota_eg_device(const machine_config &mconfig, const char *ta
 	, device_sound_interface(mconfig, *this)
 	, m_c(c)
 	, m_max_iout_scale(1)
+	, m_plus_scale(1)
+	, m_minus_scale(1)
 	, m_stream(nullptr)
 	, m_converged(true)
 	, m_g(0)
-	, m_max_step(0)
 	, m_target_v(0)
 	, m_iabc(1E-3F)
 	, m_v(0)
@@ -200,6 +201,18 @@ va_ota_eg_device::va_ota_eg_device(const machine_config &mconfig, const char *ta
 va_ota_eg_device::va_ota_eg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: va_ota_eg_device(mconfig, tag, owner, ota_type::CA3280, CAP_U(1))
 {
+}
+
+va_ota_eg_device &va_ota_eg_device::configure_plus_divider(float r_in, float r_gnd)
+{
+	m_plus_scale = RES_VOLTAGE_DIVIDER(r_in, r_gnd);
+	return *this;
+}
+
+va_ota_eg_device &va_ota_eg_device::configure_minus_divider(float r_in, float r_gnd)
+{
+	m_minus_scale = RES_VOLTAGE_DIVIDER(r_in, r_gnd);
+	return *this;
 }
 
 void va_ota_eg_device::set_target_v(float v)
@@ -227,7 +240,6 @@ void va_ota_eg_device::device_start()
 	m_stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
 	save_item(NAME(m_converged));
 	save_item(NAME(m_g));
-	save_item(NAME(m_max_step));
 	save_item(NAME(m_target_v));
 	save_item(NAME(m_iabc));
 	save_item(NAME(m_v));
@@ -242,7 +254,6 @@ void va_ota_eg_device::recalc()
 {
 	const float h = 1.0F / float(m_stream->sample_rate());
 	m_g = (h / 2.0F) * m_iabc * m_max_iout_scale / m_c;
-	m_max_step = 2.0F * m_g;
 }
 
 void va_ota_eg_device::sound_stream_update(sound_stream &stream)
@@ -300,11 +311,19 @@ void va_ota_eg_device::sound_stream_update(sound_stream &stream)
 	constexpr float INV_2VT = 1.0F / (2.0F * VT);
 	constexpr float V_OTA_SAT = 10 * VT;
 
+	// If the two inputs are scaled by different amounts, the EG will converge
+	// off target.
+	const float conv_v = m_target_v * m_plus_scale / m_minus_scale;
 	if (m_converged)
 	{
-		stream.fill(0, m_target_v);
+		stream.fill(0, conv_v);
 		return;
 	}
+
+	// Cache some computations for the loop.
+	const float scaled_target_v = m_plus_scale * m_target_v;
+	const float g2 = m_g * 2.0F;
+	const float gvt = m_g * INV_2VT;
 
 	float v_step = 0;
 	const float last_v = m_v;
@@ -312,36 +331,30 @@ void va_ota_eg_device::sound_stream_update(sound_stream &stream)
 
 	for (int i = 0; i < n; ++i)
 	{
-		const float dv = m_target_v - m_v;
+		const float dv = scaled_target_v - m_minus_scale * m_v;
 		if (dv > V_OTA_SAT)
 		{
-			v_step = m_max_step;
+			v_step = g2;
 		}
 		else if (dv < -V_OTA_SAT)
 		{
-			v_step = -m_max_step;
+			v_step = -g2;
 		}
 		else
 		{
 			const float tanhv = tanhf(INV_2VT * dv);
 			const float dtanhv = 1.0F - tanhv * tanhv;  // tanh'(v) = sech(v) ^ 2 = 1 - tanh(v) ^ 2
-			v_step = (2.0F * m_g * tanhv) / (1.0F + m_g * INV_2VT * dtanhv);
+			v_step = (g2 * tanhv) / (1.0F + gvt * dtanhv);
 		}
 		m_v += v_step;
 		stream.put(0, i, m_v);
 	}
 
-	if (fabsf(m_v - last_v) < 1E-15 || fabsf(m_target_v - m_v) < 1E-6)
-	{
+	if (fabsf(m_v - last_v) < 1E-15 || fabsf(conv_v - m_v) < 1E-6)
 		m_converged = true;
-		LOGMASKED(LOG_CONVERGENCE, "%s: converged: %e %e %e - %e %e\n",
-				  tag(), m_target_v, m_target_v - m_v, m_v - last_v, v_step, m_max_step);
-	}
-	else
-	{
-		LOGMASKED(LOG_CONVERGENCE, "%s: NOT converged: %e %e %e - %e %e\n",
-				  tag(), m_target_v, m_target_v - m_v, m_v - last_v, v_step, m_max_step);
-	}
+
+	LOGMASKED(LOG_CONVERGENCE, "%s: converged %d, target: %e %e, deltas %e %e, step: %e %e, current: %e %d\n",
+			  tag(), m_converged, m_target_v, conv_v, conv_v - m_v, m_v - last_v, v_step, g2, m_v, n);
 }
 
 
