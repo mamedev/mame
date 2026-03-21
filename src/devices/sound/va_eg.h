@@ -6,6 +6,10 @@
 
 #pragma once
 
+DECLARE_DEVICE_TYPE(VA_RC_EG, va_rc_eg_device)
+DECLARE_DEVICE_TYPE(VA_OTA_EG, va_ota_eg_device)
+
+
 // Building block for emulating envelope generators (EGs) based on a single RC
 // circuit. The controlling source sets a target voltage and the device
 // interpolates up or down to it through a RC circuit. The voltage is published
@@ -40,6 +44,7 @@ public:
 
 	// Sets target voltage to (dis)charge towards.
 	va_rc_eg_device &set_target_v(float v);
+	float get_target_v() const { return m_v_end; }
 
 	// Sets the voltage to the given value, instantly.
 	va_rc_eg_device &set_instant_v(float v);
@@ -51,6 +56,9 @@ public:
 	// Returns attotime::never if `v` was reached in the past, or if it is
 	// impossible to reach.
 	attotime get_dt(float v) const;
+
+	// Returns true if the voltage converged to the target by time `t`.
+	bool converged(const attotime &t) const { return t >= m_t_end_approx; }
 
 protected:
 	void device_start() override ATTR_COLD;
@@ -71,6 +79,89 @@ private:
 	attotime m_t_end_approx;
 };
 
-DECLARE_DEVICE_TYPE(VA_RC_EG, va_rc_eg_device)
+// An envelope generator (EG) built around an operational transconductance
+// amplifier (OTA).
+//
+// When the EG output is far from the target (e.g. > ~0.2V), the EG will ramp
+// towards the target linearly. As the output approaches the target, the EG ramp
+// will start curving. When the difference is < ~0.02V, the ramp  will closely
+// approximate an "RC" curve with R = (2 * VT) / (s * Iabc). Where 's' is a
+// device-specific constant (typically 1) and VT is the thermal voltage.
+//
+//                                x      Iabc
+//                             ___|__     |
+//                            |   |  \    |
+//        Target V ---------- |+  Id  \   |
+//                            |        \  |
+//                            |         \ |
+//                            |   OTA    OO ---+---- BUFFER --- EG output V
+//                            |         /      |                |
+//                            |        /       C                |
+//                   +------- |-      /        |                |
+//                   |        |______/        GND               |
+//                   |                                          |
+//                   +------------------------------------------+
+//
+// Note that this configuration does not make use of the linearizing diodes (Id
+// input). The emulation here assumes the Id input is disconnected or connected
+// to the negative supply, for OTAs that have it.
+//
+// A variant of the above uses anti-parallel diodes to connect the inputs (e.g.
+// prophet 5 glide EG). That variant behaves pretty much identically.
+//
+//                                x      Iabc
+//                             ___|__     |
+//                            |   |  \    |
+// Target V --- R ---+---+--- |+  Id  \   |
+//                   |   |    |        \  |
+//                   D   ^    |         \ |
+//                   v   D    |   OTA    OO ---+---- BUFFER --- EG output V
+//                   |   |    |         /      |                |
+//                   |   |    |        /       C                |
+//                   +---+--- |-      /        |                |
+//                   |        |______/        GND               |
+//                   |                                          |
+//                   +-------------------- R -------------------+
+//
+// TODO: Implement and document the scaled input variant (e.g. moog source EGs).
+//
+class va_ota_eg_device : public device_t, public device_sound_interface
+{
+public:
+	enum class ota_type : s8
+	{
+		LM13600 = 0,
+		LM13700,
+		CA3080,
+		CA3280,
+	};
+
+	va_ota_eg_device(const machine_config &mconfig, const char *tag, device_t *owner, ota_type ota, float c) ATTR_COLD;
+	va_ota_eg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
+
+	void set_target_v(float v);
+	void set_iabc(float iabc);  // Iabc control current in Amperes.
+
+protected:
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
+	void sound_stream_update(sound_stream &stream) override;
+
+private:
+	void recalc();
+
+	// configuration
+	const float m_c;
+	float m_max_iout_scale;
+	sound_stream *m_stream;
+
+	// state
+	bool m_converged;
+	float m_g;  // Caches the product of multiple factors. See recalc().
+	float m_max_step;
+	float m_target_v;
+	float m_iabc;
+	float m_v;
+};
 
 #endif  // MAME_SOUND_VA_EG_H

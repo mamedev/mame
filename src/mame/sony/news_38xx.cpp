@@ -101,7 +101,7 @@ public:
 		m_net(*this, "net"),
 		m_fdc(*this, "fdc"),
 		m_hid(*this, "hid"),
-		m_scsi(*this, "scsi%u:7:cxd1180", 0U),
+		m_scsi(*this, "cxd1180_%u", 0U),
 		m_serial(*this, "serial%u", 0U),
 		m_scsibus(*this, "scsi%u", 0U),
 		m_parallel(*this, "parallel"),
@@ -928,18 +928,14 @@ void news_38xx_state::common(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi0:6", news_scsi_devices, nullptr);
 
 	// scsi bus 0 host adapter
-	NSCSI_CONNECTOR(config, "scsi0:7").option_set("cxd1180", CXD1180).machine_config(
-		[this](device_t *device) {
-			auto &adapter = downcast<cxd1180_device &>(*device);
-			adapter.set_clock(20_MHz_XTAL / 2);
+	CXD1180(config, m_scsi[0], 20_MHz_XTAL / 2);
+	m_scsibus[0]->set_external_device(7, m_scsi[0]);
+	m_scsi[0]->irq_handler().set(DEVICE_SELF, FUNC(news_38xx_state::irq_w<iop_irq::SCSI0>));
+	m_scsi[0]->irq_handler().append(m_dma[0], FUNC(dmac_0266_device::eop_w));
+	m_scsi[0]->drq_handler().set(m_dma[0], FUNC(dmac_0266_device::req_w));
 
-			adapter.irq_handler().set(*this, FUNC(news_38xx_state::irq_w<iop_irq::SCSI0>));
-			adapter.irq_handler().append(m_dma[0], FUNC(dmac_0266_device::eop_w));
-			adapter.drq_handler().set(m_dma[0], FUNC(dmac_0266_device::req_w));
-
-			subdevice<dmac_0266_device>(":dma0")->dma_r_cb().set(adapter, FUNC(cxd1180_device::dma_r));
-			subdevice<dmac_0266_device>(":dma0")->dma_w_cb().set(adapter, FUNC(cxd1180_device::dma_w));
-		});
+	m_dma[0]->dma_r_cb().set(m_scsi[0], FUNC(cxd1180_device::dma_r));
+	m_dma[0]->dma_w_cb().set(m_scsi[0], FUNC(cxd1180_device::dma_w));
 
 	// scsi bus 1 and devices
 	NSCSI_BUS(config, m_scsibus[1]);
@@ -952,18 +948,14 @@ void news_38xx_state::common(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi1:6", news_scsi_devices, nullptr);
 
 	// scsi bus 1 host adapter
-	NSCSI_CONNECTOR(config, "scsi1:7").option_set("cxd1180", CXD1180).machine_config(
-		[this](device_t *device) {
-			auto &adapter = downcast<cxd1180_device &>(*device);
-			adapter.set_clock(20_MHz_XTAL / 2);
+	CXD1180(config, m_scsi[1], 20_MHz_XTAL / 2);
+	m_scsibus[1]->set_external_device(7, m_scsi[0]);
+	m_scsi[1]->irq_handler().set(DEVICE_SELF, FUNC(news_38xx_state::irq_w<iop_irq::SCSI1>));
+	m_scsi[1]->irq_handler().append(m_dma[1], FUNC(dmac_0266_device::eop_w));
+	m_scsi[1]->drq_handler().set(m_dma[1], FUNC(dmac_0266_device::req_w));
 
-			adapter.irq_handler().set(*this, FUNC(news_38xx_state::irq_w<iop_irq::SCSI1>));
-			adapter.irq_handler().append(m_dma[1], FUNC(dmac_0266_device::eop_w));
-			adapter.drq_handler().set(m_dma[1], FUNC(dmac_0266_device::req_w));
-
-			subdevice<dmac_0266_device>(":dma1")->dma_r_cb().set(adapter, FUNC(cxd1180_device::dma_r));
-			subdevice<dmac_0266_device>(":dma1")->dma_w_cb().set(adapter, FUNC(cxd1180_device::dma_w));
-		});
+	m_dma[1]->dma_r_cb().set(m_scsi[1], FUNC(cxd1180_device::dma_r));
+	m_dma[1]->dma_w_cb().set(m_scsi[1], FUNC(cxd1180_device::dma_w));
 
 	CENTRONICS(config, m_parallel, centronics_devices, nullptr);
 	// Note: printing works, but I'm not sure how accurate triggering the IRQ on each edge is.

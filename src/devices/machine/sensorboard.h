@@ -99,7 +99,7 @@ private:
 	output_finder<0x10, 0x10> m_out_piece;
 	output_finder<0x20+1> m_out_pui;
 	output_finder<2> m_out_count;
-	required_ioport_array<10> m_inp_rank;
+	required_ioport_array<13> m_inp_rank;
 	required_ioport m_inp_spawn;
 	required_ioport m_inp_ui;
 	required_ioport m_inp_conf;

@@ -33,8 +33,8 @@ DEFINE_DEVICE_TYPE(DP8490,   dp8490_device,   "dp8490",   "National Semiconducto
 ALLOW_SAVE_TYPE(ncr5380_device::state);
 
 ncr5380_device::ncr5380_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, bool has_lbs)
-	: nscsi_device(mconfig, type, tag, owner, clock)
-	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
+	: device_t(mconfig, type, tag, owner, clock)
+	, nscsi_device_interface(mconfig, *this)
 	, m_irq_handler(*this)
 	, m_drq_handler(*this)
 	, m_has_lbs(has_lbs)
@@ -109,12 +109,12 @@ void ncr5380_device::device_reset()
 	m_idata = 0;
 
 	// clear scsi bus
-	scsi_bus->data_w(scsi_refid, 0);
-	scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
+	m_scsi_bus->data_w(m_scsi_refid, 0);
+	m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
 
 	// monitor all control lines
 	m_scsi_ctrl = 0;
-	scsi_bus->ctrl_wait(scsi_refid, S_ALL, S_ALL);
+	m_scsi_bus->ctrl_wait(m_scsi_refid, S_ALL, S_ALL);
 
 	// clear output lines
 	set_irq(false);
@@ -123,7 +123,7 @@ void ncr5380_device::device_reset()
 
 void ncr5380_device::scsi_ctrl_changed()
 {
-	u32 const ctrl = scsi_bus->ctrl_r();
+	u32 const ctrl = m_scsi_bus->ctrl_r();
 
 	if (VERBOSE & LOG_SCSI)
 	{
@@ -174,8 +174,8 @@ void ncr5380_device::scsi_ctrl_changed()
 		m_state_timer->enable(false);
 
 		// clear scsi bus
-		scsi_bus->data_w(scsi_refid, 0);
-		scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
+		m_scsi_bus->data_w(m_scsi_refid, 0);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
 	}
 	else if (!(m_scsi_ctrl & S_REQ) && (ctrl & S_REQ))
 	{
@@ -206,7 +206,7 @@ void ncr5380_device::scsi_ctrl_changed()
 
 u8 ncr5380_device::csdata_r()
 {
-	u8 const data = scsi_bus->data_r();
+	u8 const data = m_scsi_bus->data_r();
 	LOGMASKED(LOG_REGR, "csdata_r 0x%02x (%s)\n", data, machine().describe_context());
 
 	return data;
@@ -256,14 +256,14 @@ void ncr5380_device::icmd_w(u8 data)
 				(data & IC_ATN ? S_ATN : 0);
 
 			LOGMASKED(LOG_SCSI, "changing control lines 0x%04x\n", ctrl);
-			scsi_bus->ctrl_w(scsi_refid, ctrl, mask);
+			m_scsi_bus->ctrl_w(m_scsi_refid, ctrl, mask);
 		}
 	}
 	else
 	{
 		LOG("scsi reset issued\n");
 		device_reset();
-		scsi_bus->ctrl_w(scsi_refid, S_RST, S_RST);
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_RST, S_RST);
 
 		set_irq(true);
 	}
@@ -299,7 +299,7 @@ void ncr5380_device::mode_w(u8 data)
 		set_drq(false);
 
 		// clear ACK
-		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 	}
 
 	// start/stop arbitration
@@ -342,7 +342,7 @@ void ncr5380_device::tcmd_w(u8 data)
 
 u8 ncr5380_device::csstat_r()
 {
-	u32 const ctrl = scsi_bus->ctrl_r();
+	u32 const ctrl = m_scsi_bus->ctrl_r();
 	u8 const data =
 		(ctrl & S_RST ? ST_RST : 0) |
 		(ctrl & S_BSY ? ST_BSY : 0) |
@@ -363,7 +363,7 @@ void ncr5380_device::selen_w(u8 data)
 
 u8 ncr5380_device::bas_r()
 {
-	u32 const ctrl = scsi_bus->ctrl_r();
+	u32 const ctrl = m_scsi_bus->ctrl_r();
 	u8 const data = m_bas |
 		(((ctrl & S_PHASE_MASK) == (m_tcmd & TC_PHASE)) ? BAS_PHASEMATCH : 0) |
 		(ctrl & S_ATN ? BAS_ATN : 0) |
@@ -434,7 +434,7 @@ void ncr5380_device::state_timer(s32 param)
 
 int ncr5380_device::state_step()
 {
-	u32 const ctrl = scsi_bus->ctrl_r();
+	u32 const ctrl = m_scsi_bus->ctrl_r();
 	int delay = 0;
 
 	switch (m_state)
@@ -464,12 +464,12 @@ int ncr5380_device::state_step()
 		delay = 2200;
 
 		// assert own ID and BSY
-		scsi_bus->data_w(scsi_refid, m_odata);
-		scsi_bus->ctrl_w(scsi_refid, S_BSY, S_BSY);
+		m_scsi_bus->data_w(m_scsi_refid, m_odata);
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_BSY, S_BSY);
 		break;
 	case ARB_EVALUATE:
 		// check if SEL asserted, or if there's a higher ID on the bus
-		if ((ctrl & S_SEL) || (scsi_bus->data_r() & ~((m_odata - 1) | m_odata)))
+		if ((ctrl & S_SEL) || (m_scsi_bus->data_r() & ~((m_odata - 1) | m_odata)))
 		{
 			LOGMASKED(LOG_ARB, "arbitration: lost\n");
 			m_icmd &= ~IC_BSY;
@@ -478,8 +478,8 @@ int ncr5380_device::state_step()
 			m_state = IDLE;
 
 			// clear data and BSY
-			scsi_bus->data_w(scsi_refid, 0);
-			scsi_bus->ctrl_w(scsi_refid, 0, S_BSY);
+			m_scsi_bus->data_w(m_scsi_refid, 0);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_BSY);
 		}
 		else
 		{
@@ -493,14 +493,14 @@ int ncr5380_device::state_step()
 		{
 			if ((ctrl & S_PHASE_MASK) == (m_tcmd & TC_PHASE))
 			{
-				m_idata = scsi_bus->data_r();
+				m_idata = m_scsi_bus->data_r();
 				LOGMASKED(LOG_DMA, "dma in: 0x%02x\n", m_idata);
 
 				m_state = DMA_IN_ACK;
 				set_drq(true);
 
 				// assert ACK
-				scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
+				m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
 			}
 
 			delay = -1;
@@ -512,7 +512,7 @@ int ncr5380_device::state_step()
 			m_state = (m_bas & BAS_ENDOFDMA) ? IDLE : DMA_IN_REQ;
 
 			// clear ACK
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 		}
 		break;
 
@@ -532,8 +532,8 @@ int ncr5380_device::state_step()
 				m_state = DMA_OUT_ACK;
 
 				// assert data and ACK
-				scsi_bus->data_w(scsi_refid, m_odata);
-				scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
+				m_scsi_bus->data_w(m_scsi_refid, m_odata);
+				m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
 			}
 		}
 		break;
@@ -551,8 +551,8 @@ int ncr5380_device::state_step()
 				m_state = DMA_OUT_DRQ;
 
 			// clear data and ACK
-			scsi_bus->data_w(scsi_refid, 0);
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+			m_scsi_bus->data_w(m_scsi_refid, 0);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 		}
 		break;
 	}
@@ -602,12 +602,12 @@ u8 ncr5380_device::dma_r()
 void ncr5380_device::scsi_data_w(u8 data)
 {
 	// TODO: release data bus when any of the prerequisite conditions expire
-	u32 const ctrl = scsi_bus->ctrl_r();
+	u32 const ctrl = m_scsi_bus->ctrl_r();
 
 	if ((m_mode & MODE_TARGET) || (!(ctrl & S_INP) && (ctrl & S_PHASE_MASK) == (m_tcmd & S_PHASE_MASK)))
 	{
 		LOGMASKED(LOG_SCSI, "scsi data 0x%02x\n", data);
-		scsi_bus->data_w(scsi_refid, data);
+		m_scsi_bus->data_w(m_scsi_refid, data);
 	}
 }
 

@@ -134,9 +134,11 @@ void memoryview_info::update_context_menu(HMENU menu)
 	bool enable = false;
 	debug_view_memory &memview(*view<debug_view_memory>());
 	debug_view_memory_source const &source = downcast<debug_view_memory_source const &>(*memview.source());
-	address_space *const space = source.space();
-	if (space)
+	auto const [mintf, spacenum] = source.space();
+	assert(!mintf || ((0 <= spacenum) && mintf->has_space(spacenum)));
+	if (mintf)
 	{
+		address_space *const space = &mintf->space(spacenum);
 		if (memview.cursor_visible())
 		{
 			// get the last known PC to write to this memory location

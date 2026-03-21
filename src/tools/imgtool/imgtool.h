@@ -170,8 +170,6 @@ namespace imgtool
 		imgtoolerr_t get_block_size(uint32_t &length);
 		imgtoolerr_t read_block(uint64_t block, void *buffer);
 		imgtoolerr_t write_block(uint64_t block, const void *buffer);
-		imgtoolerr_t get_chain(const char *path, imgtool::chainent *chain, size_t chain_size);
-		imgtoolerr_t get_chain_string(const char *path, char *buffer, size_t buffer_len);
 		imgtool_partition_features get_features() const;
 		void *       get_info_ptr(uint32_t state);
 		const char * get_info_string(uint32_t state);
@@ -216,7 +214,6 @@ namespace imgtool
 		std::function<imgtoolerr_t(uint32_t attribute, const imgtool_attribute *attr, char *buffer, size_t buffer_len)> m_attr_name;
 		std::function<imgtoolerr_t(imgtool::partition &partition, const char *path, imgtool_iconinfo *iconinfo)> m_get_iconinfo;
 		std::function<imgtoolerr_t(imgtool::partition &partition, const char *path, imgtool::transfer_suggestion *suggestions, size_t suggestions_length)> m_suggest_transfer;
-		std::function<imgtoolerr_t(imgtool::partition &partition, const char *path, imgtool::chainent *chain, size_t chain_size)> m_get_chain;
 
 		const util::option_guide *m_writefile_optguide;
 		std::string m_writefile_optspec;

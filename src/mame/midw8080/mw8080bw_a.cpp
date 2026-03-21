@@ -3496,12 +3496,11 @@ void invad2ct_audio_device::p4_w(u8 data)
 
 void invad2ct_audio_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "spk1").front_left();
-	SPEAKER(config, "spk2").front_right();
+	SPEAKER(config, "speakers", 2).front();
 
 	DISCRETE(config, m_discrete, invad2ct_discrete);
-	m_discrete->add_route(0, "spk1", 0.5);
-	m_discrete->add_route(1, "spk2", 0.5);
+	m_discrete->add_route(0, "speakers", 0.5, 0);
+	m_discrete->add_route(1, "speakers", 0.5, 1);
 
 	SN76477(config, m_sn[0]);
 	m_sn[0]->set_noise_params(0, 0, 0);
@@ -3517,7 +3516,7 @@ void invad2ct_audio_device::device_add_mconfig(machine_config &config)
 	m_sn[0]->set_mixer_params(0, 0, 0);
 	m_sn[0]->set_envelope_params(1, 0);
 	m_sn[0]->set_enable(1);
-	m_sn[0]->add_route(ALL_OUTPUTS, "spk1", 0.3);
+	m_sn[0]->add_route(ALL_OUTPUTS, "speakers", 0.3, 0);
 
 	SN76477(config, m_sn[1]);
 	m_sn[1]->set_noise_params(0, 0, 0);
@@ -3533,7 +3532,7 @@ void invad2ct_audio_device::device_add_mconfig(machine_config &config)
 	m_sn[1]->set_mixer_params(0, 0, 0);
 	m_sn[1]->set_envelope_params(1, 0);
 	m_sn[1]->set_enable(1);
-	m_sn[1]->add_route(ALL_OUTPUTS, "spk2", 0.3);
+	m_sn[1]->add_route(ALL_OUTPUTS, "speakers", 0.3, 1);
 }
 
 void invad2ct_audio_device::device_start()

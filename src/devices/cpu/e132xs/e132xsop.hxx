@@ -1265,11 +1265,7 @@ void hyperstone_device::hyperstone_sardi()
 	{
 		SR |= (val >> (n - 1)) & 1;
 
-		const uint64_t sign_bit = val >> 63;
-		val >>= n;
-
-		if (sign_bit)
-			val |= 0xffffffff00000000U << (32 - n);
+		val = int64_t(val) >> n;
 	}
 
 	if (val == 0)
@@ -1307,11 +1303,7 @@ void hyperstone_device::hyperstone_sard()
 	{
 		SR |= (val >> (n - 1)) & 1;
 
-		const uint64_t sign_bit = val >> 63;
-		val >>= n;
-
-		if (sign_bit)
-			val |= 0xffffffff00000000L << (32 - n);
+		val = int64_t(val) >> n;
 	}
 
 	if (val == 0)
@@ -1337,14 +1329,9 @@ void hyperstone_device::hyperstone_sar()
 
 	if (n)
 	{
-		const uint32_t sign_bit = ret & 0x80000000;
-
 		SR |= (ret >> (n - 1)) & 1;
 
-		ret >>= n;
-
-		if (sign_bit)
-			ret |= 0xffffffff << (32 - n);
+		ret = int32_t(ret) >> n;
 	}
 
 	if (ret == 0)
@@ -2063,14 +2050,9 @@ void hyperstone_device::hyperstone_sari()
 
 	if (HiN || n)
 	{
-		const uint32_t sign_bit = val & 0x80000000;
-
 		SR |= (val >> (n - 1)) & 1;
 
-		val >>= n;
-
-		if (sign_bit)
-			val |= 0xffffffff << (32 - n);
+		val = int32_t(val) >> n;
 	}
 
 	if (val == 0)

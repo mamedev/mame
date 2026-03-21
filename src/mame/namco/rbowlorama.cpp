@@ -1,13 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:
 /*
-    Cosmodog / Namco Rockin' Bowl-o-Rama.
+Cosmodog / Namco Rockin' Bowl-o-Rama.
 
-    PC hardware running Linux:
-    -Motherboard: Elitegroup P4M800PRO-M478 v1.0.
-    -CPU: Celeron, socket 478, 800/533MHz
-    -Video: R9600PRO 256M DDR AGP.
-    -Boot from USB flash drive.
+PC hardware running Linux:
+- Motherboard: Elitegroup P4M800PRO-M478 v1.0.
+- CPU: Celeron, socket 478, 800/533MHz
+- Video: R9600PRO 256M DDR AGP a.k.a. PowerColor R96 a.k.a. ATi Radeon 9600 Pro
+- Boot from USB flash drive.
+- VIA P4M800 Pro
+- VIA VT8237
+- Realtek ALC655
+- VIA VT6103L
+- ITE IT8705F Super I/O
 
  Additional I/O board that serves also as protection (labeled "HYdra V2.3"),
  connected via RS-232 (DB9):

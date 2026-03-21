@@ -29,6 +29,9 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
+	// alias of above for ISA PnP targets (where $279 writes are really routed there)
+	void isa_map(address_map &map);
+
 	uint8_t data_r();
 	void data_w(uint8_t data);
 	uint8_t status_r();

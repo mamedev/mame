@@ -19,8 +19,6 @@
 
 namespace ui {
 
-// ======================> menu_control_device_image
-
 class menu_control_device_image : public menu
 {
 public:

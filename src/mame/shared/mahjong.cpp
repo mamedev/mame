@@ -42,6 +42,303 @@
 #include "mahjong.h"
 
 
+namespace {
+
+INPUT_PORTS_START(mahjong_matrix_bet)
+	PORT_INCLUDE(mahjong_matrix_1p_bet)
+
+	PORT_MODIFY("KEY0")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START)                PORT_PLAYER(1)
+
+	PORT_START("KEY5")
+	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START(mahjong_matrix_bet_wup)
+	PORT_INCLUDE(mahjong_matrix_1p_bet_wup)
+
+	PORT_MODIFY("KEY0")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START)                PORT_PLAYER(1)
+
+	PORT_START("KEY5")
+	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START(hanafuda_matrix_bet)
+	PORT_START("KEY0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A)           PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E)           PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES)         PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START)                PORT_PLAYER(1)
+
+	PORT_START("KEY1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B)           PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F)           PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO)          PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET)          PORT_PLAYER(1)
+
+	PORT_START("KEY2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C)           PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G)           PORT_PLAYER(1)
+	PORT_BIT(0x3c, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D)           PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H)           PORT_PLAYER(1)
+	PORT_BIT(0x3c, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY4")
+	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP)    PORT_PLAYER(1)
+	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY5")
+	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START(hanafuda_matrix_bet_wup)
+	PORT_INCLUDE(hanafuda_matrix_bet)
+
+	PORT_MODIFY("KEY4")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE)        PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP)    PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG)          PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL)        PORT_PLAYER(1)
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START(hanaroku_panel)
+	PORT_START("KEY0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A)           PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_B)           PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_C)           PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_D)           PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP)    // only a single Flip Flop
+
+	PORT_START("KEY1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_E)           PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_NO)          PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_YES)         PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_F)           PORT_PLAYER(1)
+	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START)                PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_BET)          PORT_PLAYER(1)
+	PORT_BIT(0x38, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A)           PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_B)           PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_C)           PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_D)           PORT_PLAYER(2)
+	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_E)           PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_NO)          PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_YES)         PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_F)           PORT_PLAYER(2)
+	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY5")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START)                PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_BET)          PORT_PLAYER(2)
+	PORT_BIT(0x38, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
+
+
+
+class mahjong_panel_device_base : public device_t, public device_mahjong_panel_interface
+{
+public:
+	virtual u8 read(u8 select) override
+	{
+		u8 result = 0x3f;
+		for (unsigned i = 0; m_keys.size() > i; ++i)
+		{
+			if (!BIT(select, i))
+				result &= m_keys[i]->read();
+		}
+		return result;
+	}
+
+protected:
+	mahjong_panel_device_base(
+			machine_config const &mconfig,
+			device_type type,
+			char const *tag,
+			device_t *owner,
+			u32 clock) :
+		device_t(mconfig, type, tag, owner, clock),
+		device_mahjong_panel_interface(mconfig, *this),
+		m_keys(*this, "KEY%u", 0U)
+	{
+	}
+
+	virtual void device_start() override ATTR_COLD { }
+
+private:
+	required_ioport_array<6> m_keys;
+};
+
+
+class mahjong_panel_device : public mahjong_panel_device_base
+{
+public:
+	mahjong_panel_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			u32 clock) :
+		mahjong_panel_device_base(mconfig, MAHJONG_PANEL, tag, owner, clock)
+	{
+	}
+
+protected:
+	ioport_constructor device_input_ports() const override ATTR_COLD
+	{
+		return INPUT_PORTS_NAME(mahjong_matrix_bet);
+	}
+};
+
+
+class mahjong_medal_panel_device : public mahjong_panel_device_base
+{
+public:
+	mahjong_medal_panel_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			u32 clock) :
+		mahjong_panel_device_base(mconfig, MAHJONG_MEDAL_PANEL, tag, owner, clock)
+	{
+	}
+
+protected:
+	ioport_constructor device_input_ports() const override ATTR_COLD
+	{
+		return INPUT_PORTS_NAME(mahjong_matrix_bet_wup);
+	}
+};
+
+
+class hanafuda_panel_device : public mahjong_panel_device_base
+{
+public:
+	hanafuda_panel_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			u32 clock) :
+		mahjong_panel_device_base(mconfig, HANAFUDA_PANEL, tag, owner, clock)
+	{
+	}
+
+protected:
+	ioport_constructor device_input_ports() const override ATTR_COLD
+	{
+		return INPUT_PORTS_NAME(hanafuda_matrix_bet);
+	}
+};
+
+
+class hanafuda_medal_panel_device : public mahjong_panel_device_base
+{
+public:
+	hanafuda_medal_panel_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			u32 clock) :
+		mahjong_panel_device_base(mconfig, HANAFUDA_MEDAL_PANEL, tag, owner, clock)
+	{
+	}
+
+protected:
+	ioport_constructor device_input_ports() const override ATTR_COLD
+	{
+		return INPUT_PORTS_NAME(hanafuda_matrix_bet_wup);
+	}
+};
+
+
+class hanaroku_panel_device : public mahjong_panel_device_base
+{
+public:
+	hanaroku_panel_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			u32 clock) :
+		mahjong_panel_device_base(mconfig, HANAROKU_PANEL, tag, owner, clock)
+	{
+	}
+
+protected:
+	ioport_constructor device_input_ports() const override ATTR_COLD
+	{
+		return INPUT_PORTS_NAME(hanaroku_panel);
+	}
+};
+
+} // anonymous namespace
+
+
+
+DEFINE_DEVICE_TYPE(MAHJONG_PANEL_CONNECTOR, mahjong_panel_connector_device, "mahjong_panel_connector", "Mahjong panel connector")
+
+DEFINE_DEVICE_TYPE_PRIVATE(MAHJONG_PANEL,        device_mahjong_panel_interface, mahjong_panel_device,        "mahjong_panel",        "Mahjong panel")
+DEFINE_DEVICE_TYPE_PRIVATE(MAHJONG_MEDAL_PANEL,  device_mahjong_panel_interface, mahjong_medal_panel_device,  "mahjong_medal_panel",  "Mahjong panel with double-up controls")
+DEFINE_DEVICE_TYPE_PRIVATE(HANAFUDA_PANEL,       device_mahjong_panel_interface, hanafuda_panel_device,       "hanafuda_panel",       "Hanafuda panel")
+DEFINE_DEVICE_TYPE_PRIVATE(HANAFUDA_MEDAL_PANEL, device_mahjong_panel_interface, hanafuda_medal_panel_device, "hanafuda_medal_panel", "Hanafuda panel with double-up controls")
+DEFINE_DEVICE_TYPE_PRIVATE(HANAROKU_PANEL,       device_mahjong_panel_interface, hanaroku_panel_device,       "hanaroku_panel",       "Hanaroku panel")
+
+
+device_mahjong_panel_interface::device_mahjong_panel_interface(
+		machine_config const &mconfig,
+		device_t &device) :
+	device_interface(device, "mahjongpanel")
+{
+}
+
+device_mahjong_panel_interface::~device_mahjong_panel_interface()
+{
+}
+
+
+mahjong_panel_connector_device::mahjong_panel_connector_device(
+		machine_config const &mconfig,
+		char const *tag,
+		device_t *owner,
+		u32 clock) :
+	device_t(mconfig, MAHJONG_PANEL_CONNECTOR, tag, owner, clock),
+	device_single_card_slot_interface<device_mahjong_panel_interface>(mconfig, *this),
+	m_panel(nullptr)
+{
+}
+
+mahjong_panel_connector_device::~mahjong_panel_connector_device()
+{
+}
+
+void mahjong_panel_connector_device::device_start()
+{
+	m_panel = get_card_device();
+}
+
+
+
 INPUT_PORTS_START(mahjong_matrix_1p)
 	PORT_START("KEY0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A)

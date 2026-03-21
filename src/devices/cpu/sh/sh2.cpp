@@ -15,7 +15,10 @@
 
 #include "emu.h"
 #include "sh2.h"
+
+#include "sh2fe.h"
 #include "sh_dasm.h"
+
 #include "cpu/drcumlsh.h"
 
 //#define VERBOSE 1
@@ -32,6 +35,10 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 {
 	m_cpu_type = cpu_type;
 	m_isdrc = allow_drc();
+}
+
+sh2_device::~sh2_device()
+{
 }
 
 void sh2_device::device_start()
@@ -492,7 +499,7 @@ void sh2_device::sh2_exception_internal(const char *message, int irqline, int ve
 /////////
 // DRC
 
-const opcode_desc* sh2_device::get_desclist(offs_t pc)
+const sh2_device::opcode_desc* sh2_device::get_desclist(offs_t pc)
 {
 	return m_drcfe->describe_code(pc);
 }

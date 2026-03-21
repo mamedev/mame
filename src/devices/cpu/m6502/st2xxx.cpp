@@ -87,13 +87,13 @@ st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, co
 	, m_irctr(0)
 	, m_bctr(0)
 {
-	program_config.m_internal_map = std::move(internal_map);
+	m_program_config.m_internal_map = std::move(internal_map);
 }
 
 device_memory_interface::space_config_vector st2xxx_device::memory_space_config() const
 {
 	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &program_config),
+		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_DATA, &m_data_config)
 	};
 }
@@ -150,7 +150,7 @@ void st2xxx_device::init_lcd_timer(u16 ireq)
 
 void st2xxx_device::save_common_registers()
 {
-	mi_st2xxx *intf = downcast<mi_st2xxx *>(mintf.get());
+	mi_st2xxx *intf = downcast<mi_st2xxx *>(m_mintf.get());
 
 	save_item(NAME(m_pdata));
 	save_item(NAME(m_pctrl));
@@ -161,14 +161,14 @@ void st2xxx_device::save_common_registers()
 	{
 		if (BIT(st2xxx_sys_mask(), 1))
 		{
-			save_item(NAME(intf->irq_service));
-			save_item(NAME(intf->irr_enable));
-			save_item(NAME(intf->irr));
+			save_item(NAME(intf->m_irq_service));
+			save_item(NAME(intf->m_irr_enable));
+			save_item(NAME(intf->m_irr));
 		}
-		save_item(NAME(intf->prr));
+		save_item(NAME(intf->m_prr));
 	}
 	if (m_drr_mask != 0)
-		save_item(NAME(intf->drr));
+		save_item(NAME(intf->m_drr));
 	if (m_bt_mask != 0)
 	{
 		save_item(NAME(m_bten));
@@ -230,11 +230,11 @@ void st2xxx_device::device_reset()
 	m_pmcr = 0x80;
 
 	// reset bank registers
-	mi_st2xxx &m = downcast<mi_st2xxx &>(*mintf);
-	m.irr_enable = false;
-	m.irr = 0;
-	m.prr = 0;
-	m.drr = 0;
+	mi_st2xxx &m = downcast<mi_st2xxx &>(*m_mintf);
+	m.m_irr_enable = false;
+	m.m_irr = 0;
+	m.m_prr = 0;
+	m.m_drr = 0;
 
 	// reset interrupt registers
 	m_ireq = 0;
@@ -297,7 +297,7 @@ u8 st2xxx_device::read_vector(u16 adr)
 			set_irq_service(true);
 
 			// Make sure this doesn't change in between vector pull cycles
-			m_irq_level = irq_taken ? active_irq_level() : 0xff;
+			m_irq_level = m_irq_taken ? active_irq_level() : 0xff;
 		}
 
 		if (m_irq_level != 0xff)
@@ -306,7 +306,7 @@ u8 st2xxx_device::read_vector(u16 adr)
 
 			LOGMASKED(LOG_IRQ, "Acknowledging %s interrupt (PC = $%04X, IREQ = $%04X, IENA = $%04X, vector pull from $%04X)\n",
 				st2xxx_irq_name(m_irq_level),
-				PPC,
+				m_PPC,
 				m_ireq,
 				m_iena,
 				adr & 0x7fff);
@@ -318,7 +318,7 @@ u8 st2xxx_device::read_vector(u16 adr)
 			}
 		}
 	}
-	return downcast<mi_st2xxx &>(*mintf).read_vector(adr);
+	return downcast<mi_st2xxx &>(*m_mintf).read_vector(adr);
 }
 
 u8 st2xxx_device::pdata_r(offs_t offset)
@@ -441,12 +441,12 @@ void st2xxx_device::bten_w(u8 data)
 			assert(div != 0);
 			assert(m_base_timer[n] != nullptr);
 			m_base_timer[n]->adjust(attotime::from_ticks(div, 32768), n);
-			LOGMASKED(LOG_BT, "Base timer %d enabled at %.1f Hz (PC = $%04X)\n", n, 32768.0 / div, PPC);
+			LOGMASKED(LOG_BT, "Base timer %d enabled at %.1f Hz (PC = $%04X)\n", n, 32768.0 / div, m_PPC);
 		}
 		else if (!BIT(data, n) && BIT(m_bten, n))
 		{
 			m_base_timer[n]->adjust(attotime::never);
-			LOGMASKED(LOG_BT, "Base timer %d disabled (PC = $%04X)\n", n, PPC);
+			LOGMASKED(LOG_BT, "Base timer %d disabled (PC = $%04X)\n", n, m_PPC);
 		}
 	}
 
@@ -523,7 +523,7 @@ void st2xxx_device::sys_w(u8 data)
 	u8 mask = st2xxx_sys_mask();
 	m_sys = data & mask;
 	if (BIT(mask, 1))
-		downcast<mi_st2xxx &>(*mintf).irr_enable = BIT(data, 1);
+		downcast<mi_st2xxx &>(*m_mintf).m_irr_enable = BIT(data, 1);
 }
 
 u8 st2xxx_device::misc_r()
@@ -538,67 +538,67 @@ void st2xxx_device::misc_w(u8 data)
 
 u8 st2xxx_device::irrl_r()
 {
-	return downcast<mi_st2xxx &>(*mintf).irr & 0xff;
+	return downcast<mi_st2xxx &>(*m_mintf).m_irr & 0xff;
 }
 
 void st2xxx_device::irrl_w(u8 data)
 {
-	u16 &irr = downcast<mi_st2xxx &>(*mintf).irr;
+	u16 &irr = downcast<mi_st2xxx &>(*m_mintf).m_irr;
 	irr = (data & m_prr_mask) | (irr & 0xff00);
 }
 
 u8 st2xxx_device::irrh_r()
 {
-	return downcast<mi_st2xxx &>(*mintf).irr >> 8;
+	return downcast<mi_st2xxx &>(*m_mintf).m_irr >> 8;
 }
 
 void st2xxx_device::irrh_w(u8 data)
 {
-	u16 &irr = downcast<mi_st2xxx &>(*mintf).irr;
+	u16 &irr = downcast<mi_st2xxx &>(*m_mintf).m_irr;
 	irr = ((u16(data) << 8) & m_prr_mask) | (irr & 0x00ff);
 }
 
 u8 st2xxx_device::prrl_r()
 {
-	return downcast<mi_st2xxx &>(*mintf).prr & 0xff;
+	return downcast<mi_st2xxx &>(*m_mintf).m_prr & 0xff;
 }
 
 void st2xxx_device::prrl_w(u8 data)
 {
-	u16 &prr = downcast<mi_st2xxx &>(*mintf).prr;
+	u16 &prr = downcast<mi_st2xxx &>(*m_mintf).m_prr;
 	prr = (data & m_prr_mask) | (prr & 0xff00);
 }
 
 u8 st2xxx_device::prrh_r()
 {
-	return downcast<mi_st2xxx &>(*mintf).prr >> 8;
+	return downcast<mi_st2xxx &>(*m_mintf).m_prr >> 8;
 }
 
 void st2xxx_device::prrh_w(u8 data)
 {
-	u16 &prr = downcast<mi_st2xxx &>(*mintf).prr;
+	u16 &prr = downcast<mi_st2xxx &>(*m_mintf).m_prr;
 	prr = ((u16(data) << 8) & m_prr_mask) | (prr & 0x00ff);
 }
 
 u8 st2xxx_device::drrl_r()
 {
-	return downcast<mi_st2xxx &>(*mintf).drr & 0xff;
+	return downcast<mi_st2xxx &>(*m_mintf).m_drr & 0xff;
 }
 
 void st2xxx_device::drrl_w(u8 data)
 {
-	u16 &drr = downcast<mi_st2xxx &>(*mintf).drr;
+	u16 &drr = downcast<mi_st2xxx &>(*m_mintf).m_drr;
 	drr = (data & m_drr_mask) | (drr & 0xff00);
 }
 
 u8 st2xxx_device::drrh_r()
 {
-	return downcast<mi_st2xxx &>(*mintf).drr >> 8;
+	return downcast<mi_st2xxx &>(*m_mintf).m_drr >> 8;
 }
 
 void st2xxx_device::drrh_w(u8 data)
 {
-	u16 &drr = downcast<mi_st2xxx &>(*mintf).drr;
+	u16 &drr = downcast<mi_st2xxx &>(*m_mintf).m_drr;
 	drr = ((u16(data) << 8) & m_drr_mask) | (drr & 0x00ff);
 }
 
@@ -614,7 +614,7 @@ void st2xxx_device::ireql_w(u8 data)
 		for (int i = 0; i < 8; i++)
 		{
 			if (!BIT(data, i) && BIT(m_ireq, i))
-				LOGMASKED(LOG_IRQ, "%s interrupt cleared (PC = $%04X)\n", st2xxx_irq_name(i), PPC);
+				LOGMASKED(LOG_IRQ, "%s interrupt cleared (PC = $%04X)\n", st2xxx_irq_name(i), m_PPC);
 		}
 		m_ireq &= data | 0xff00;
 		update_irq_state();
@@ -633,7 +633,7 @@ void st2xxx_device::ireqh_w(u8 data)
 		for (int i = 0; i < 8; i++)
 		{
 			if (!BIT(data, i) && BIT(m_ireq, i + 8))
-				LOGMASKED(LOG_IRQ, "%s interrupt cleared (PC = $%04X)\n", st2xxx_irq_name(i + 8), PPC);
+				LOGMASKED(LOG_IRQ, "%s interrupt cleared (PC = $%04X)\n", st2xxx_irq_name(i + 8), m_PPC);
 		}
 		m_ireq &= u16(data) << 8 | 0x00ff;
 		update_irq_state();
@@ -656,7 +656,7 @@ void st2xxx_device::ienal_w(u8 data)
 				LOGMASKED(LOG_IRQ, "%s interrupt %sabled (PC = $%04X)\n",
 					st2xxx_irq_name(i),
 					BIT(data, i) ? "en" : "dis",
-					PPC);
+					m_PPC);
 		}
 		m_iena = (m_iena & 0xff00) | data;
 		update_irq_state();
@@ -679,7 +679,7 @@ void st2xxx_device::ienah_w(u8 data)
 				LOGMASKED(LOG_IRQ, "%s interrupt %sabled (PC = $%04X)\n",
 					st2xxx_irq_name(i + 8),
 					BIT(data, i) ? "en" : "dis",
-					PPC);
+					m_PPC);
 		}
 		m_iena = (m_iena & 0x00ff) | (u16(data) << 8);
 		update_irq_state();
@@ -766,7 +766,7 @@ void st2xxx_device::lfr_recalculate_period()
 		unsigned clocks = st2xxx_lfr_clocks();
 		assert(clocks != 0);
 		attotime period = cycles_to_attotime(clocks);
-		LOGMASKED(LOG_LCDC, "LCD frame rate = %f Hz (PC = $%04X)\n", period.as_hz(), PPC);
+		LOGMASKED(LOG_LCDC, "LCD frame rate = %f Hz (PC = $%04X)\n", period.as_hz(), m_PPC);
 		m_lcd_timer->adjust(period, 0, period);
 	}
 	else
@@ -880,7 +880,7 @@ u8 st2xxx_device::udata_r()
 
 void st2xxx_device::udata_w(u8 data)
 {
-	logerror("Writing %02X to UART transmitter (PC = %04X)\n", data, PPC);
+	logerror("Writing %02X to UART transmitter (PC = %04X)\n", data, m_PPC);
 }
 
 u8 st2xxx_device::bctr_r()

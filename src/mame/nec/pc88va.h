@@ -16,9 +16,6 @@
 //#include "bus/nec_fdd/pc80s31k.h"
 #include "bus/pc98_cbus/slot.h"
 #include "bus/msx/ctrl/ctrl.h"
-#include "bus/scsi/pc9801_sasi.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
 
 #include "cpu/nec/v5x.h"
 #include "cpu/z80/z80.h"
@@ -52,7 +49,7 @@ public:
 		, m_fdd(*this, "upd765:%u", 0U)
 		, m_pic2(*this, "pic8259_slave")
 		, m_rtc(*this, "rtc")
-		, m_cbus_root(*this, "cbus_root")
+		, m_cbus_root(*this, "cbus")
 		// labelled "マウス" (mouse) - can't use "mouse" because of core -mouse option
 		, m_mouse_port(*this, "mouseport")
 		, m_opna(*this, "opna")
@@ -67,10 +64,6 @@ public:
 		, m_kanji_rom(*this, "kanji")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		, m_sasibus(*this, "sasi")
-		, m_sasi_data_out(*this, "sasi_data_out")
-		, m_sasi_data_in(*this, "sasi_data_in")
-		, m_sasi_ctrl_in(*this, "sasi_ctrl_in")
 	{ }
 
 	void pc88va(machine_config &config);
@@ -111,7 +104,6 @@ protected:
 
 protected:
 	void pc88va_cbus(machine_config &config);
-	void pc88va_sasi(machine_config &config);
 
 private:
 
@@ -152,17 +144,16 @@ private:
 	uint8_t m_fdc_ctrl_2 = 0;
 	bool m_xtmask = false;
 	TIMER_CALLBACK_MEMBER(t3_mouse_callback);
-	TIMER_CALLBACK_MEMBER(pc88va_fdc_timer);
-	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_0);
-	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_1);
+	TIMER_CALLBACK_MEMBER(fdc_timer);
+	template <unsigned N> TIMER_CALLBACK_MEMBER(fdc_motor_start);
 	void tc_w(int state);
 
 	void fdc_irq(int state);
 	static void floppy_formats(format_registration &fr);
-	void pc88va_fdc_update_ready(floppy_image_device *, int);
+	void fdc_update_ready(floppy_image_device *, int);
 	uint8_t fake_subfdc_r();
-	uint8_t pc88va_fdc_r(offs_t offset);
-	void pc88va_fdc_w(offs_t offset, uint8_t data);
+	uint8_t fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, uint8_t data);
 
 	uint16_t bios_bank_r();
 	void bios_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -310,14 +301,12 @@ private:
 
 	void sgp_map(address_map &map) ATTR_COLD;
 
+	int m_dack;
+
 // TODO: stuff backported from PC88/PC98 as QoL that should really be common
 protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<scsi_port_device> m_sasibus;
-	required_device<output_latch_device> m_sasi_data_out;
-	required_device<input_buffer_device> m_sasi_data_in;
-	required_device<input_buffer_device> m_sasi_ctrl_in;
 
 private:
 	uint8_t misc_ctrl_r();
@@ -334,18 +323,6 @@ private:
 	bool m_sound_irq_enable = false;
 	bool m_sound_irq_pending = false;
 	void int4_irq_w(int state);
-
-	// C-Bus SASI
-	void sasi_data_w(uint8_t data);
-	uint8_t sasi_data_r();
-	void write_sasi_io(int state);
-	void write_sasi_req(int state);
-	uint8_t sasi_status_r();
-	void sasi_ctrl_w(uint8_t data);
-
-	uint8_t m_sasi_data = 0;
-	int m_sasi_data_enable = 0;
-	uint8_t m_sasi_ctrl = 0;
 };
 
 

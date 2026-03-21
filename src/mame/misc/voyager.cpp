@@ -9,7 +9,7 @@ skeleton driver by R. Belmont
 
 All of these games run Linux.
 
-Motherboard is FIC AZIIEA with AMD Duron processor of unknown speed
+Motherboard is FIC AZ11EA with AMD Duron processor of unknown speed
 Chipset: VIA KT133a with VT8363A Northbridge and VT82C686B Southbridge
 Video: Jaton 3DForce2MX-32, based on nVidia GeForce 2MX chipset w/32 MB of VRAM
 I/O: JAMMA adapter board connects to parallel port, VGA out, audio out.
@@ -48,7 +48,7 @@ public:
 private:
 	void voyager_map(address_map &map) ATTR_COLD;
 
-	required_device<pentium3_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -59,11 +59,11 @@ void voyager_state::voyager_map(address_map &map)
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
 }
 
-static INPUT_PORTS_START( voyager )
-INPUT_PORTS_END
 
 void voyager_state::voyager(machine_config &config)
 {
+	// Socket A / PGA462
+	// TODO: doesn't map anything with ATHLONXP (wants PCI_ROOT stuff?)
 	PENTIUM3(config, m_maincpu, 133000000); // actually AMD Duron CPU of unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &voyager_state::voyager_map);
 //  m_maincpu->set_addrmap(AS_IO, &voyager_state::voyager_io);
@@ -107,6 +107,6 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 2002, voyager,  0,       voyager, voyager, voyager_state, empty_init, ROT0, "Team Play/Game Refuge/Monaco Entertainment", "Star Trek: Voyager", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-GAME( 2002, voyagers, voyager, voyager, voyager, voyager_state, empty_init, ROT0, "Team Play/Game Refuge/Monaco Entertainment", "Star Trek: Voyager (stand-up version 1.002)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-GAME( 2003, policet2, 0,       voyager, voyager, voyager_state, empty_init, ROT0, "Team Play/Phantom Entertainment", "Police Trainer 2", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 2002, voyager,  0,       voyager, 0, voyager_state, empty_init, ROT0, "Team Play/Game Refuge/Monaco Entertainment", "Star Trek: Voyager", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 2002, voyagers, voyager, voyager, 0, voyager_state, empty_init, ROT0, "Team Play/Game Refuge/Monaco Entertainment", "Star Trek: Voyager (stand-up version 1.002)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 2003, policet2, 0,       voyager, 0, voyager_state, empty_init, ROT0, "Team Play/Phantom Entertainment", "Police Trainer 2", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

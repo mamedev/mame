@@ -19,16 +19,16 @@ void alpha68k_prom_state::palette_init(palette_device &palette) const
 	/* create a lookup table for the palette */
 	for (int i = 0; i < 0x100; i++)
 	{
-		int const r = pal4bit(color_prom[i + 0x000]);
-		int const g = pal4bit(color_prom[i + 0x100]);
-		int const b = pal4bit(color_prom[i + 0x200]);
+		const int r = pal4bit(color_prom[i + 0x000]);
+		const int g = pal4bit(color_prom[i + 0x100]);
+		const int b = pal4bit(color_prom[i + 0x200]);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	for (int i = 0; i < clut_romsize; i++)
 	{
-		u8 const ctabentry = ((clut_proms[i + clut_romsize] & 0x0f) << 4) | (clut_proms[i] & 0x0f);
+		const u8 ctabentry = ((clut_proms[i + clut_romsize] & 0x0f) << 4) | (clut_proms[i] & 0x0f);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -76,7 +76,7 @@ VIDEO_START_MEMBER(alpha68k_II_state,alpha68k)
 
 /******************************************************************************/
 
-// TODO: sprite flip select as in snk68.cpp, palette bank for V games if they ever trigger it
+// TODO: sprite flip select as in snk/snk68.cpp, palette bank for V games if they ever trigger it
 void alpha68k_II_state::video_control2_w(int state)
 {
 	logerror("%s: Q2 changed to %d\n", machine().describe_context(), state);
@@ -87,31 +87,34 @@ void alpha68k_II_state::video_control3_w(int state)
 	logerror("%s: Q3 changed to %d\n", machine().describe_context(), state);
 }
 
-void alpha68k_II_state::tile_callback(int &tile, int& fx, int& fy, int& region)
+void alpha68k_II_state::tile_callback(u32 &tile, bool &fx, bool &fy, u8 &region, u32 &color)
 {
 	fx = tile & 0x4000;
 	fy = tile & 0x8000;
 	tile &= 0x3fff;
-	region = 1;
+	region = 0;
+	color &= m_color_entry_mask;
 }
 
-void alpha68k_II_state::tile_callback_noflipx(int &tile, int& fx, int& fy, int& region)
+void alpha68k_II_state::tile_callback_noflipx(u32 &tile, bool &fx, bool &fy, u8 &region, u32 &color)
 {
 	fx = 0;
 	fy = tile & 0x8000;
 	tile &= 0x7fff;
-	region = 1;
+	region = 0;
+	color &= m_color_entry_mask;
 }
 
-void alpha68k_II_state::tile_callback_noflipy(int &tile, int& fx, int& fy, int& region)
+void alpha68k_II_state::tile_callback_noflipy(u32 &tile, bool &fx, bool &fy, u8 &region, u32 &color)
 {
 	fx = tile & 0x8000;
 	fy = 0;
 	tile &= 0x7fff;
-	region = 1;
+	region = 0;
+	color &= m_color_entry_mask;
 }
 
-uint32_t alpha68k_II_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 alpha68k_II_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->get_backdrop_pen(), cliprect);
 
@@ -120,4 +123,3 @@ uint32_t alpha68k_II_state::screen_update(screen_device &screen, bitmap_ind16 &b
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
-

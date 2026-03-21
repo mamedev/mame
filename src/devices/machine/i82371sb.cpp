@@ -263,6 +263,7 @@ void i82371sb_isa_device::xbcs_w(offs_t offset, uint16_t data, uint16_t mem_mask
 {
 	COMBINE_DATA(&xbcs);
 	logerror("xbcs = %04x\n", xbcs);
+	// TODO: likely needs a remap_cb
 }
 
 uint8_t i82371sb_isa_device::pirqrc_r(offs_t offset)

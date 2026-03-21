@@ -82,7 +82,7 @@ public:
 		, m_ioga(*this, "ioga")
 		, m_rtc(*this, "rtc")
 		, m_scc(*this, "scc%u", 0U)
-		, m_asc(*this, "scsi:7:asc")
+		, m_asc(*this, "asc")
 		, m_vrom(*this, "gfx")
 		, m_bt459(*this, "bt459")
 		, m_lance(*this, "am79c90")
@@ -276,7 +276,7 @@ void kn02ba_state::kn02ba(machine_config &config, u32 clock)
 	rs232b.dcd_handler().set(m_scc[0], FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc[0], FUNC(z80scc_device::ctsb_w));
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", dec_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", dec_scsi_devices, "cdrom");
 	NSCSI_CONNECTOR(config, "scsi:2", dec_scsi_devices, nullptr);
@@ -284,13 +284,9 @@ void kn02ba_state::kn02ba(machine_config &config, u32 clock)
 	NSCSI_CONNECTOR(config, "scsi:4", dec_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", dec_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", dec_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("asc", NCR53C94).clock(10_MHz_XTAL).machine_config(
-		[this](device_t *device)
-		{
-			ncr53c94_device &asc = downcast<ncr53c94_device &>(*device);
-
-			asc.irq_handler_cb().set_inputline(m_cpu, INPUT_LINE_IRQ0);
-		});
+	NCR53C94(config, m_asc, 10_MHz_XTAL);
+	scsi.set_external_device(7, m_asc);
+	m_asc->irq_handler_cb().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 }
 
 static INPUT_PORTS_START(kn02ba)

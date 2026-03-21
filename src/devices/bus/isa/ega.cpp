@@ -969,7 +969,7 @@ uint8_t isa8_ega_device::read(offs_t offset)
 {
 	uint8_t data = 0xFF;
 
-	if ( !machine().side_effects_disabled() && !( m_graphics_controller.data[5] & 0x10 ) )
+	if ( !machine().side_effects_disabled() )
 	{
 		/* Fill read latches */
 		m_read_latch[0] = m_plane[0][offset & 0xffff];
@@ -981,8 +981,23 @@ uint8_t isa8_ega_device::read(offs_t offset)
 	if ( m_graphics_controller.data[5] & 0x08 )
 	{
 		// Read mode #1
-		popmessage("ega: Read mode 1 not supported yet!");
-		printf("EGA: Read mode 1 not supported yet!\n");
+		data = 0;
+		for ( int i = 0; i < 8; i++ )
+		{
+			int bit = 1;
+			for ( int p = 0; p < 4; p++ )
+			{
+				if ( BIT(m_graphics_controller.data[7], p) )
+				{
+					if ( BIT(m_graphics_controller.data[2], p) != BIT(m_plane[p][offset & 0xffff], i) )
+					{
+						bit = 0;
+						break;
+					}
+				}
+			}
+			data |= bit << i;
+		}
 	}
 	else
 	{

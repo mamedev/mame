@@ -29,8 +29,8 @@ DEFINE_DEVICE_TYPE(WD9710_PCI, wd9710_pci_device,   "wd9710_pci",   "Western Dig
 
 wd9710_pci_device::wd9710_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_card_device(mconfig, type, tag, owner, clock)
-	, m_svga(*this, "svga")
-	, m_vga_rom(*this, "vga_rom")
+	, m_vga(*this, "vga")
+	, m_bios(*this, "bios")
 {
 	set_ids(0x101c9710, 0x00, 0x030000, 0x101c9710);
 }
@@ -41,7 +41,7 @@ wd9710_pci_device::wd9710_pci_device(const machine_config &mconfig, const char *
 }
 
 ROM_START( wd9710mz )
-	ROM_REGION32_LE( 0x8000, "vga_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x8000, "bios", ROMREGION_ERASEFF )
 	// Philips Paradise Pipeline 64
 	ROM_SYSTEM_BIOS( 0, "paradise", "Paradise WD9710 v1.01.00 12/06/95")
 	ROMX_LOAD( "bios.bin", 0x0000, 0x8000, CRC(98338249) SHA1(b5dbb28d60adf53c711ec16bc45eab102e40b6a2), ROM_BIOS(0) )
@@ -57,13 +57,13 @@ void wd9710_pci_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
-	screen.set_screen_update("svga", FUNC(wd90c33_vga_device::screen_update));
+	screen.set_screen_update("vga", FUNC(wd90c33_vga_device::screen_update));
 
 	// TODO: bump to specific WD9710 VGA core
-	WD90C33(config, m_svga, 0);
-	m_svga->set_screen("screen");
+	WD90C33(config, m_vga, 0);
+	m_vga->set_screen("screen");
 	// 2MB, 4MB
-	m_svga->set_vram_size(4*1024*1024);
+	m_vga->set_vram_size(4*1024*1024);
 }
 
 void wd9710_pci_device::device_start()
@@ -72,7 +72,7 @@ void wd9710_pci_device::device_start()
 
 	add_map(4*1024*1024, M_MEM, FUNC(wd9710_pci_device::vram_aperture_map));
 
-	add_rom((u8 *)m_vga_rom->base(), 0x8000);
+	add_rom((u8 *)m_bios->base(), 0x8000);
 	expansion_rom_base = 0xc0000;
 
 	// INTA#
@@ -98,22 +98,26 @@ void wd9710_pci_device::config_map(address_map &map)
 
 void wd9710_pci_device::vram_aperture_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rw(m_svga, FUNC(wd90c33_vga_device::mem_linear_r), FUNC(wd90c33_vga_device::mem_linear_w));
+	map(0x000000, 0x3fffff).rw(m_vga, FUNC(wd90c33_vga_device::mem_linear_r), FUNC(wd90c33_vga_device::mem_linear_w));
 }
 
 void wd9710_pci_device::legacy_io_map(address_map &map)
 {
-	map(0, 0x02f).m(m_svga, FUNC(wd90c33_vga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(wd90c33_vga_device::io_map));
+	map(0x23c0, 0x23c7).m(m_vga, FUNC(wd90c33_vga_device::ext_io_map));
+	map(0x23d0, 0x23d3).m(m_vga, FUNC(wd90c33_vga_device::localbus_if_map));
+	// NOTE: akin to base wd90c33 ISA card, wants mode setup to avoid dropping in MDA mode
+	map(0x46e8, 0x46e8).w(m_vga, FUNC(wd90c33_vga_device::mode_setup_w));
 }
 
 uint8_t wd9710_pci_device::vram_r(offs_t offset)
 {
-	return downcast<wd90c33_vga_device *>(m_svga.target())->mem_r(offset);
+	return downcast<wd90c33_vga_device *>(m_vga.target())->mem_r(offset);
 }
 
 void wd9710_pci_device::vram_w(offs_t offset, uint8_t data)
 {
-	downcast<wd90c33_vga_device *>(m_svga.target())->mem_w(offset, data);
+	downcast<wd90c33_vga_device *>(m_vga.target())->mem_w(offset, data);
 }
 
 void wd9710_pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -126,7 +130,7 @@ void wd9710_pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_
 
 	if (BIT(command, 0))
 	{
-		io_space->install_device(0x03b0, 0x03df, *this, &wd9710_pci_device::legacy_io_map);
+		io_space->install_device(0x0000, 0xffff, *this, &wd9710_pci_device::legacy_io_map);
 		// TODO: PnP ports (shouldn't have any other BAR space)
 	}
 }

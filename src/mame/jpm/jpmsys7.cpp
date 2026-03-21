@@ -51,7 +51,7 @@ void jpmsys7_state::jpmsys7_map(address_map &map)
 	map(0x20000018, 0x2000001b).nopw(); // large data upload like astra/pluto?
 	map(0x50000000, 0x50001fff).ram();
 
-//	map(0xf0000000, 0xf00003ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
+//  map(0xf0000000, 0xf00003ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
 }
 
 static INPUT_PORTS_START(  jpmsys7 )

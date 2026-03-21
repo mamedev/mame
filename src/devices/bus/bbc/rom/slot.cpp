@@ -212,11 +212,13 @@ void bbc_romslot_device::write(offs_t offset, uint8_t data)
 #include "ram.h"
 #include "nvram.h"
 #include "datagem.h"
+#include "detalker.h"
 #include "dfs.h"
 #include "genie.h"
 //#include "gommc.h"
 #include "pal.h"
 //#include "ramagic.h"
+//#include "replay.h"
 #include "rtc.h"
 
 
@@ -241,6 +243,7 @@ void bbc_rom_devices(device_slot_interface &device)
 	device.option_add_internal("cciword", BBC_CCIWORD);
 	device.option_add_internal("ccibase", BBC_CCIBASE);
 	device.option_add_internal("ccispell", BBC_CCISPELL);
+	device.option_add_internal("detalker", BBC_DETALKER);
 	device.option_add_internal("palqst", BBC_PALQST);
 	device.option_add_internal("palwap", BBC_PALWAP);
 	device.option_add_internal("palted", BBC_PALTED);
@@ -252,6 +255,7 @@ void bbc_rom_devices(device_slot_interface &device)
 	//device.option_add_internal("gommc", BBC_GOMMC);
 	device.option_add_internal("dfse00", BBC_DFSE00);
 	//device.option_add_internal("ramagic", BBC_RAMAGIC);
+	//device.option_add_internal("replay", BBC_REPLAY);
 	device.option_add_internal("stlrtc",  BBC_STLRTC);
 	device.option_add_internal("pmsrtc", BBC_PMSRTC);
 	device.option_add_internal("trilogy", BBC_TRILOGY);

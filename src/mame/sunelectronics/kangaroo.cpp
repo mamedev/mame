@@ -189,9 +189,9 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	DECLARE_MACHINE_RESET(kangaroob);
 
 	virtual void main_map(address_map &map) ATTR_COLD;
+	void kangaroob_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -206,6 +206,7 @@ protected:
 
 	// misc
 	void coin_counter_w(uint8_t data);
+	void kangaroob_nmi_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);
 	void video_control_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -437,13 +438,6 @@ void kangaroo_mcu_state::machine_start()
 	save_item(NAME(m_mcu_port_r));
 }
 
-MACHINE_RESET_MEMBER(kangaroo_base_state, kangaroob)
-{
-	// The MCU triggers an NMI to make the game boot. The bootleg does not have an MCU,
-	// but still expects an NMI somehow, otherwise it gets stuck at the RAM check.
-	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
-
 
 
 /*************************************
@@ -504,6 +498,14 @@ void kangaroo_mcu_state::mcu_port_r_w(uint8_t data)
 }
 
 
+void kangaroo_base_state::kangaroob_nmi_w(uint8_t data)
+{
+	// The MCU triggers an NMI to make the game boot. The bootleg does not have an MCU,
+	// but still expects an NMI somehow, otherwise it gets stuck at the RAM check.
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
+
 
 /*************************************
  *
@@ -536,6 +538,12 @@ void kangaroo_base_state::main_map(address_map &map)
 	map(0xec00, 0xec00).mirror(0x00ff).portr("IN0").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xed00, 0xed00).mirror(0x00ff).portr("IN1").w(FUNC(kangaroo_base_state::coin_counter_w));
 	map(0xee00, 0xee00).mirror(0x00ff).portr("IN2");
+}
+
+void kangaroo_base_state::kangaroob_map(address_map &map)
+{
+	main_map(map);
+	map(0xc000, 0xc000).mirror(0x1fff).w(FUNC(kangaroo_base_state::kangaroob_nmi_w));
 }
 
 void kangaroo_mcu_state::main_map(address_map &map)
@@ -748,7 +756,7 @@ void kangaroo_mcu_state::kangaroo(machine_config &config)
 void kangaroo_base_state::kangaroob(machine_config &config)
 {
 	fnkyfish(config);
-	MCFG_MACHINE_RESET_OVERRIDE(kangaroo_base_state, kangaroob)
+	m_maincpu->set_addrmap(AS_PROGRAM, &kangaroo_base_state::kangaroob_map);
 }
 
 

@@ -253,7 +253,7 @@ public:
 	konamigv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_screen(*this, "screen")
-		, m_ncr53cf96(*this, "scsi:7:ncr53cf96")
+		, m_ncr53cf96(*this, "ncr53cf96")
 		, m_btc_trackball(*this, "upd%u", 1)
 		, m_maincpu(*this, "maincpu")
 		, m_duart(*this, "duart")
@@ -581,20 +581,16 @@ void konamigv_state::konamigv(machine_config &config)
 	MB89371(config, m_duart, 4_MHz_XTAL);
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:4").option_set("cdrom", NSCSI_XM5401).machine_config(
-			[](device_t *device)
-			{
-				device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
-				device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
-			});
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53cf96", NCR53CF96).clock(32_MHz_XTAL/2).machine_config(
-			[this](device_t *device)
-			{
-				ncr53cf96_device &adapter = downcast<ncr53cf96_device &>(*device);
-				adapter.irq_handler_cb().set(":maincpu:irq", FUNC(psxirq_device::intin10));
-				adapter.drq_handler_cb().set(*this, FUNC(konamigv_state::scsi_drq));
-			});
+	auto &scsi(NSCSI_BUS(config, "scsi"));
+	auto &cdrom(NSCSI_XM5401(config, "cdrom"));
+	scsi.set_external_device(4, cdrom);
+	cdrom.subdevice<cdda_device>("cdda")->add_route(0, ":speaker", 1.0, 0);
+	cdrom.subdevice<cdda_device>("cdda")->add_route(1, ":speaker", 1.0, 1);
+
+	NCR53CF96(config, m_ncr53cf96, 32_MHz_XTAL/2);
+	scsi.set_external_device(7, m_ncr53cf96);
+	m_ncr53cf96->irq_handler_cb().set(":maincpu:irq", FUNC(psxirq_device::intin10));
+	m_ncr53cf96->drq_handler_cb().set(DEVICE_SELF, FUNC(konamigv_state::scsi_drq));
 
 	// video hardware
 	CXD8514Q(config, "gpu", XTAL(53'693'175), 0x100000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
@@ -1306,7 +1302,7 @@ ROM_START( lacrazyc )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "lacrazyc.25c",   0x000000, 0x000080, CRC(e20e5730) SHA1(066b49236c658a4ef2930f7bacc4b2354dd7f240) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "gv027-a1", 0, BAD_DUMP SHA1(840d0d4876cf1b814c9d8db975aa6c92e1fe4039) )
 ROM_END
 
@@ -1316,7 +1312,7 @@ ROM_START( susume )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "susume.25c",   0x000000, 0x000080, CRC(52f17df7) SHA1(b8ad7787b0692713439d7d9bebfa0c801c806006) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "gv027j1", 0, BAD_DUMP SHA1(e7e6749ac65de7771eb8fed7d5eefaec3f902255) )
 ROM_END
 
@@ -1326,7 +1322,7 @@ ROM_START( hyperath )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "hyperath.25c", 0x000000, 0x000080, CRC(20a8c435) SHA1(a0f203a999757fba68b391c525ac4b9684a57ba9) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "gv021-j1", 0, SHA1(579442444025b18da658cd6455c51459fbc3de0e) )
 ROM_END
 
@@ -1336,7 +1332,7 @@ ROM_START( powyak96 )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "powyak96.25c", 0x000000, 0x000080, CRC(405a7fc9) SHA1(e2d978f49748ba3c4a425188abcd3d272ec23907) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "powyak96", 0, BAD_DUMP SHA1(ebd0ea18ff9ce300ea1e30d66a739a96acfb0621) )
 ROM_END
 
@@ -1346,7 +1342,7 @@ ROM_START( weddingr )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "weddingr.25c", 0x000000, 0x000080, CRC(b90509a0) SHA1(41510a0ceded81dcb26a70eba97636d38d3742c3) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "weddingr", 0, BAD_DUMP SHA1(4e7122b191747ab7220fe4ce1b4483d62ab579af) )
 ROM_END
 
@@ -1356,7 +1352,7 @@ ROM_START( simpbowl )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "simpbowl.25c", 0x000000, 0x000080, CRC(2c61050c) SHA1(16ae7f81cbe841c429c5c7326cf83e87db1782bf) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "829uaa02", 0, SHA1(2ec4cc608d5582e478ee047b60ccee67b52f060c) )
 ROM_END
 
@@ -1366,7 +1362,7 @@ ROM_START( btchamp )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "btchmp.25c", 0x000000, 0x000080, CRC(6d02ea54) SHA1(d3babf481fd89db3aec17f589d0d3d999a2aa6e1) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "btchamp", 0, BAD_DUMP SHA1(c9c858e9034826e1a12c3c003dd068a49a3577e1) )
 ROM_END
 
@@ -1377,7 +1373,7 @@ ROM_START( kdeadeye )
 	ROM_LOAD( "kdeadeye.25c", 0x000000, 0x000080, CRC(3935d2df) SHA1(cbb855c475269077803c380dbc3621e522efe51e) )
 
 	// constructed from six reads of the same disc using two drives, 80 sectors have Q subcode CRC errors
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "054uaa01", 0, SHA1(a05079e4e5024ca66b7f6b81de74695d86c62dd8) )
 ROM_END
 
@@ -1387,7 +1383,7 @@ ROM_START( nagano98 )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "nagano98.25c",  0x000000, 0x000080, CRC(b64b7451) SHA1(a77a37e0cc580934d1e7e05d523bae0acd2c1480) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "nagano98", 0, BAD_DUMP SHA1(1be7bd4531f249ff2233dd40a206c8d60054a8c6) )
 ROM_END
 
@@ -1397,7 +1393,7 @@ ROM_START( naganoj )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "720ja.25c",  0x000000, 0x000080, CRC(34c473ba) SHA1(768225b04a293bdbc114a092d14dee28d52044e9) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "720jaa01", 0, SHA1(437160996551ef4dfca43899d1d14beca62eb4c9) )
 ROM_END
 
@@ -1407,7 +1403,7 @@ ROM_START( tmosh )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "tmosh.25c", 0x000000, 0x000080, BAD_DUMP CRC(2f6a27fc) SHA1(4ead9313f07e9bf7aa0272dba59db6b21510e00b) ) // hand crafted
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "673jaa01", 0, SHA1(eaa76073749f9db48c1bee3dff9bea955683c8a8) )
 ROM_END
 
@@ -1417,7 +1413,7 @@ ROM_START( tmoshs )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "tmoshs.25c", 0x000000, 0x000080, CRC(e57b833f) SHA1(f18a0974a6be69dc179706643aab837ff61c2738) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "755jaa01", 0, SHA1(fc742a0b763ba38350ba7eb5d775948632aafd9d) )
 ROM_END
 
@@ -1427,7 +1423,7 @@ ROM_START( tmoshsp )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "tmoshsp.25c", 0x000000, 0x000080, CRC(af4cdd87) SHA1(97041e287e4c80066043967450779b81b62b2b8e) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "756jab01", 0, SHA1(b2c59b9801debccbbd986728152f314535c67e53) )
 ROM_END
 
@@ -1437,7 +1433,7 @@ ROM_START( tmoshspa )
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "tmoshsp.25c", 0x000000, 0x000080, CRC(af4cdd87) SHA1(97041e287e4c80066043967450779b81b62b2b8e) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "756jaa01", 0, BAD_DUMP SHA1(5e6d349ad1a22c0dbb1ec26aa05febc830254339) ) // The CD was damaged
 ROM_END
 

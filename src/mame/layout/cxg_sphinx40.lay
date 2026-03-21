@@ -358,10 +358,8 @@ authors:hap
 	<element name="text_l1"><text string="FUNCTION"><color red="1" green="1" blue="1" /></text></element>
 	<element name="text_l2"><text string="NEW GAME"><color red="1" green="1" blue="1" /></text></element>
 	<element name="text_l3"><text string="SOUND"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l4"><text string="F.W. "><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l4a"><text string="&#x2191;" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l5"><text string="B.W. "><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_l5a"><text string="&#x2193;" align="2"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_l4"><text string="F.W. &#x25b2;"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_l5"><text string="B.W. &#x25bc;"><color red="1" green="1" blue="1" /></text></element>
 	<element name="text_l6"><text string="W.I.?"><color red="1" green="1" blue="1" /></text></element>
 	<element name="text_l7"><text string="ANALY"><color red="1" green="1" blue="1" /></text></element>
 	<element name="text_l8"><text string="CLOCK"><color red="1" green="1" blue="1" /></text></element>
@@ -385,8 +383,8 @@ authors:hap
 	<group name="buttons">
 		<bounds x="6" y="6" width="88" height="44" />
 
-		<element ref="text_l1"><bounds x="34.75" y="6.5" width="16" height="3.29" /></element>
-		<element ref="text_l2"><bounds x="49.75" y="6.5" width="16" height="3.29" /></element>
+		<element ref="text_l1"><bounds xc="43" y="6.5" width="12" height="3.2" /></element>
+		<element ref="text_l2"><bounds xc="57" y="6.5" width="12" height="3.2" /></element>
 
 		<element ref="text_p6"><bounds x="12.25" y="16.65" width="5.5" height="5.5" /></element>
 		<element ref="text_p5"><bounds x="26.25" y="16.65" width="5.5" height="5.5" /></element>
@@ -395,20 +393,17 @@ authors:hap
 		<element ref="text_p2"><bounds x="68.25" y="16.65" width="5.5" height="5.5" /></element>
 		<element ref="text_p1"><bounds x="82.25" y="16.65" width="5.5" height="5.5" /></element>
 
-		<element ref="text_l3"><bounds x="8"  y="29.7" width="14" height="4.3" /></element>
-		<element ref="text_l4"><bounds x="22" y="29.7" width="14" height="4.3" /></element>
-		<element ref="text_l5"><bounds x="36" y="29.7" width="14" height="4.3" /></element>
-		<element ref="text_l6"><bounds x="50" y="29.7" width="14" height="4.3" /></element>
-		<element ref="text_l7"><bounds x="64" y="29.7" width="14" height="4.3" /></element>
-		<element ref="text_l8"><bounds x="78" y="29.7" width="14" height="4.3" /></element>
+		<element ref="text_l3"><bounds xc="15" y="29.7" width="11.5" height="4.3" /></element>
+		<element ref="text_l4"><bounds xc="29" y="29.7" width="11.5" height="4.3" /></element>
+		<element ref="text_l5"><bounds xc="43" y="29.7" width="11.5" height="4.3" /></element>
+		<element ref="text_l6"><bounds xc="57" y="29.7" width="11.5" height="4.3" /></element>
+		<element ref="text_l7"><bounds xc="71" y="29.7" width="11.5" height="4.3" /></element>
+		<element ref="text_l8"><bounds xc="85" y="29.7" width="11.5" height="4.3" /></element>
 
-		<element ref="text_l4a"><bounds x="24" y="29.48" width="10" height="4.0" /></element>
-		<element ref="text_l5a"><bounds x="38" y="29.48" width="10" height="4.0" /></element>
-
-		<element ref="text_l9"><bounds x="36" y="41.7" width="14" height="4.3" /></element>
-		<element ref="text_l10"><bounds x="50" y="41.7" width="14" height="4.3" /></element>
-		<element ref="text_l11"><bounds x="64" y="41.7" width="14" height="4.3" /></element>
-		<element ref="text_l12"><bounds x="78" y="41.7" width="14" height="4.3" /></element>
+		<element ref="text_l9"> <bounds xc="43" y="41.7" width="11.5" height="4.3" /></element>
+		<element ref="text_l10"><bounds xc="57" y="41.7" width="11.5" height="4.3" /></element>
+		<element ref="text_l11"><bounds xc="71" y="41.7" width="11.5" height="4.3" /></element>
+		<element ref="text_l12"><bounds xc="85" y="41.7" width="11.5" height="4.3" /></element>
 
 		<element ref="white"><bounds x="13.4" y="42.1" width="3.2" height="3.2" /></element>
 		<element ref="black"><bounds x="13.9" y="42.6" width="2.2" height="2.2" /></element>

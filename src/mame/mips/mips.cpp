@@ -46,16 +46,14 @@
  */
 
 #include "emu.h"
-
 #include "mips.h"
 
-#include "machine/nscsi_bus.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
 #include "bus/nscsi/tape.h"
-
-#include "bus/rs232/rs232.h"
 #include "bus/rs232/hlemouse.h"
+#include "bus/rs232/rs232.h"
+#include "machine/nscsi_bus.h"
 
 
 void mips_scsi_devices(device_slot_interface &device)

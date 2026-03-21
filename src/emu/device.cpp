@@ -1000,9 +1000,9 @@ device_resolver_base *device_t::register_auto_finder(device_resolver_base &autod
 //-------------------------------------------------
 
 device_interface::device_interface(device_t &device, const char *type)
-	: m_interface_next(nullptr),
-		m_device(device),
-		m_type(type)
+	: m_interface_next(nullptr)
+	, m_device(device)
+	, m_type(type)
 {
 	device_interface **tailptr;
 	for (tailptr = &device.interfaces().m_head; *tailptr != nullptr; tailptr = &(*tailptr)->m_interface_next) { }

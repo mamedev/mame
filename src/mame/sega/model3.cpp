@@ -15,7 +15,8 @@
     Step 2.1: 166 MHz PPC, same 3D engine as 2.0, differences unknown
 
     Game status:
-    vf3/vf3a/vf3tb - crashes
+    vf3/vf3a/vf3tb - crashes sometimes, performance dips at startup (illegal polygons filling the
+	                 pipeline?), runs too slow during gameplay
     getbassur - works
     basssdx/getbass/getbassdx - I/O board error (?)
 
@@ -32,7 +33,7 @@
     skichamp - boots after skipping the drive board errors, massive slowdowns
     srally2 - works, uses JTAG patch, draws no polygon if coin is inserted at Sega logo
     srally2p/srally2pa/sraly2dx - needs specific JTAG patch / bypass
-    von2/von2a/von2o/von254g - works
+    von2/von2a/von2o/von254g - works, corrupted robot textures (mip mapping?)
     fvipers2 - crashes after player selection
     vs298 - hangs with an onscreen "unknown error code" during attract, polygon covers most of the 3d.
     vs299/vs2v991 - works, polygon covers most of the 3d.

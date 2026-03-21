@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "screen.h"
 #include "tilemap.h"
 
 class namco_c169roz_device : public device_t, public device_gfx_interface
@@ -27,7 +28,7 @@ public:
 	typedef delegate<void (uint16_t, int&, int&, int)> c169_tilemap_delegate;
 	void set_tile_callback(c169_tilemap_delegate tilemap_cb) { m_c169_cb = tilemap_cb; }
 
-	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
+	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, uint8_t prival = 0, uint8_t primask = uint8_t(~0));
 	void mark_all_dirty();
 
 protected:
@@ -46,8 +47,8 @@ private:
 		int wrap;
 	};
 	void unpack_params(const uint16_t *source, roz_parameters &params);
-	void draw_helper(screen_device &screen, bitmap_ind16 &bitmap, tilemap_t &tmap, const rectangle &clip, const roz_parameters &params);
-	void draw_scanline(screen_device &screen, bitmap_ind16 &bitmap, int line, int which, int pri, const rectangle &cliprect);
+	void draw_helper(screen_device &screen, bitmap_ind16 &bitmap, tilemap_t &tmap, const rectangle &clip, const roz_parameters &params, uint8_t prival, uint8_t primask);
+	void draw_scanline(screen_device &screen, bitmap_ind16 &bitmap, int line, int which, int pri, const rectangle &cliprect, uint8_t prival, uint8_t primask);
 	void get_info(tile_data &tileinfo, int tile_index, int which);
 	template<int Which> TILE_GET_INFO_MEMBER( get_info );
 	TILEMAP_MAPPER_MEMBER( mapper );

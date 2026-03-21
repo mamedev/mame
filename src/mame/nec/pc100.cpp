@@ -628,7 +628,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_10hz_irq)
 
 static void pc100_floppies(device_slot_interface &device)
 {
-	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525dd", TEAC_FD_55F);
 	device.option_add("525sd", FLOPPY_525_SD);
 }
 

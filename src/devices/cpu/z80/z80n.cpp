@@ -31,6 +31,14 @@ z80n_device::z80n_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
+void z80n_device::nmi(int state)
+{
+	if (state != CLEAR_LINE)
+		set_service_attention<SA_NMI_PENDING, 1>();
+	else
+		set_service_attention<SA_NMI_PENDING, 0>();
+}
+
 void z80n_device::execute_run()
 {
 	#include "cpu/z80/z80n.hxx"

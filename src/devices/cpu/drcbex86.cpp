@@ -10,6 +10,8 @@
 
    Future improvements/changes:
 
+    * Restore floating point environment when calling out to C code
+
     * Optimize to avoid unnecessary reloads
         - especially EDX for 64-bit operations
         - also FCMP/FLAGS has unnecessary PUSHF/POP EAX
@@ -98,7 +100,11 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <locale>
+#include <string>
+#include <sstream>
 #include <type_traits>
+#include <utility>
 
 
 namespace drc {
@@ -634,14 +640,13 @@ private:
 	void emit_fld_p(Assembler &a, int size, be_parameter const &param);
 	void emit_fstp_p(Assembler &a, int size, be_parameter const &param);
 
-	size_t emit(asmjit::CodeHolder &ch);
+	size_t emit(asmjit::CodeHolder &ch, bool invariant);
 
 	// internal state
 	drc_hash_table          m_hash;                 // hash table state
 	drc_map_variables       m_map;                  // code map
 	x86log_context::ptr     m_log;                  // logging
 	FILE *                  m_log_asmjit;
-	bool                    m_logged_common;        // logged common code already?
 	bool const              m_sse3;                 // do we have SSE3 support?
 
 	x86_entry_point_func    m_entry;                // entry point
@@ -660,6 +665,7 @@ private:
 	x86code *               m_last_upper_pc;        // PC after instruction where we last stored an upper register
 	uint32_t *              m_last_upper_addr;      // address where we last stored an upper register
 	double                  m_fptemp;               // temporary storage for floating point
+	bool                    m_invariant_block;      // are we generating an invariant block?
 
 	uint16_t                m_fpumode;              // saved FPU mode
 	uint16_t                m_fmodesave;            // temporary location for saving
@@ -1022,7 +1028,6 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	, m_hash(cache, modes, addrbits, ignorebits)
 	, m_map(cache, 0)
 	, m_log_asmjit(nullptr)
-	, m_logged_common(false)
 	, m_sse3(CpuInfo::host().features().x86().has_sse3())
 	, m_entry(nullptr)
 	, m_exit(nullptr)
@@ -1037,6 +1042,7 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	, m_last_upper_pc(nullptr)
 	, m_last_upper_addr(nullptr)
 	, m_fptemp(0)
+	, m_invariant_block(false)
 	, m_fpumode(0)
 	, m_fmodesave(0)
 	, m_stacksave(nullptr)
@@ -1088,75 +1094,22 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	// create the log
 	if (device.machine().options().drc_log_native())
 	{
-		std::string filename = std::string("drcbex86_").append(device.shortname()).append(".asm");
-		m_log = x86log_context::create(filename);
-		m_log_asmjit = fopen(std::string("drcbex86_asmjit_").append(device.shortname()).append(".asm").c_str(), "w");
+		std::string filename = device.tag();
+		for (auto &ch : filename)
+		{
+			if (':' == ch)
+				ch = '_';
+		}
+		std::ostringstream str;
+		str.imbue(std::locale::classic());
+		str << device.shortname();
+		if ('_' != filename[0])
+			str << '_';
+		str << filename << ".asm";
+		filename = std::move(str).str();
+		m_log = x86log_context::create("drcbex86_" + filename);
+		m_log_asmjit = fopen(("drcbex86_asmjit_" + filename).c_str(), "w");
 	}
-}
-
-
-//-------------------------------------------------
-//  ~drcbe_x86 - destructor
-//-------------------------------------------------
-
-drcbe_x86::~drcbe_x86()
-{
-	// free the log context
-	m_log.reset();
-
-	if (m_log_asmjit)
-		fclose(m_log_asmjit);
-}
-
-size_t drcbe_x86::emit(CodeHolder &ch)
-{
-	Error err;
-
-	// the following three calls aren't currently required, but may be if
-	// other asmjist features are used in future
-	if (false)
-	{
-		err = ch.flatten();
-		if (err != kErrorOk)
-			throw emu_fatalerror("asmjit::CodeHolder::flatten() error %u", std::underlying_type_t<Error>(err));
-
-		err = ch.resolve_cross_section_fixups();
-		if (err != kErrorOk)
-			throw emu_fatalerror("asmjit::CodeHolder::resolve_cross_section_fixups() error %u", std::underlying_type_t<Error>(err));
-
-		err = ch.relocate_to_base(ch.base_address());
-		if (err != kErrorOk)
-			throw emu_fatalerror("asmjit::CodeHolder::relocate_to_base() error %u", std::underlying_type_t<Error>(err));
-	}
-
-	size_t const alignment = ch.base_address() - uint64_t(m_cache.top());
-	size_t const code_size = ch.code_size();
-
-	// test if enough room remains in drc cache
-	drccodeptr *cachetop = m_cache.begin_codegen(alignment + code_size);
-	if (cachetop == nullptr)
-		return 0;
-
-	err = ch.copy_flattened_data(drccodeptr(ch.base_address()), code_size, CopySectionFlags::kPadTargetBuffer);
-	if (err != kErrorOk)
-		throw emu_fatalerror("asmjit::CodeHolder::copy_flattened_data() error %u", std::underlying_type_t<Error>(err));
-
-	// update the drc cache and end codegen
-	*cachetop += alignment + code_size;
-	m_cache.end_codegen();
-
-	return code_size;
-}
-
-//-------------------------------------------------
-//  reset - reset back-end specific state
-//-------------------------------------------------
-
-void drcbe_x86::reset()
-{
-	// output a note to the log
-	if (m_log)
-		m_log->printf("%s", "\n\n===========\nCACHE RESET\n===========\n\n");
 
 	// generate a little bit of glue code to set up the environment
 	x86code *dst = (x86code *)m_cache.top();
@@ -1193,19 +1146,19 @@ void drcbe_x86::reset()
 
 	a.emit_prolog(frame);
 	a.emit_args_assignment(frame, args);
-	a.sub(esp, 24);                                                                     // sub   esp,24
-	a.mov(MABS(&m_hashstacksave), esp);                                                 // mov   [hashstacksave],esp
-	a.sub(esp, 4);                                                                      // sub   esp,4
-	a.mov(MABS(&m_stacksave), esp);                                                     // mov   [stacksave],esp
-	a.fnstcw(MABS(&m_fpumode));                                                         // fstcw [fpumode]
-	a.jmp(eax);                                                                         // jmp   eax
+	a.sub(esp, 24);
+	a.mov(MABS(&m_hashstacksave), esp);
+	a.sub(esp, 4);
+	a.mov(MABS(&m_stacksave), esp);
+	a.fnstcw(MABS(&m_fpumode));
+	a.call(eax);
 
 	// generate an exit point
 	m_exit = dst + a.offset();
 	a.bind(a.new_named_label("exit_point"));
-	a.fldcw(MABS(&m_fpumode));                                                          // fldcw [fpumode]
-	a.mov(esp, MABS(&m_hashstacksave));                                                 // mov   esp,[hashstacksave]
-	a.add(esp, 24);                                                                     // add   esp,24
+	a.fldcw(MABS(&m_fpumode));
+	a.mov(esp, MABS(&m_hashstacksave));
+	a.add(esp, 24);
 	a.emit_epilog(frame);
 
 	// generate a no code point
@@ -1306,9 +1259,9 @@ void drcbe_x86::reset()
 
 
 	// emit the generated code
-	size_t bytes = emit(ch);
+	size_t const bytes = emit(ch, true);
 
-	if (m_log && !m_logged_common)
+	if (m_log)
 	{
 		m_log->disasm_code_range("entry_point", dst, m_exit);
 		m_log->disasm_code_range("exit_point", m_exit, m_nocode);
@@ -1316,13 +1269,79 @@ void drcbe_x86::reset()
 		m_log->disasm_code_range("end_of_block", m_endofblock, m_save);
 		m_log->disasm_code_range("save", m_save, m_restore);
 		m_log->disasm_code_range("restore", m_restore, dst + bytes);
-
-		m_logged_common = true;
 	}
+
+	// set the "no code" pointer
+	m_hash.set_default_codeptr(m_nocode);
+}
+
+
+//-------------------------------------------------
+//  ~drcbe_x86 - destructor
+//-------------------------------------------------
+
+drcbe_x86::~drcbe_x86()
+{
+	// free the log context
+	m_log.reset();
+
+	if (m_log_asmjit)
+		fclose(m_log_asmjit);
+}
+
+size_t drcbe_x86::emit(CodeHolder &ch, bool invariant)
+{
+	Error err;
+
+	// the following three calls aren't currently required, but may be if
+	// other asmjit features are used in future
+	if (false)
+	{
+		err = ch.flatten();
+		if (err != kErrorOk)
+			throw emu_fatalerror("asmjit::CodeHolder::flatten() error %u", std::underlying_type_t<Error>(err));
+
+		err = ch.resolve_cross_section_fixups();
+		if (err != kErrorOk)
+			throw emu_fatalerror("asmjit::CodeHolder::resolve_cross_section_fixups() error %u", std::underlying_type_t<Error>(err));
+
+		err = ch.relocate_to_base(ch.base_address());
+		if (err != kErrorOk)
+			throw emu_fatalerror("asmjit::CodeHolder::relocate_to_base() error %u", std::underlying_type_t<Error>(err));
+	}
+
+	size_t const alignment = ch.base_address() - uint64_t(m_cache.top());
+	size_t const code_size = ch.code_size();
+
+	// try to allocate space from the DRC cache
+	auto space = invariant
+			? m_cache.alloc_invariant(alignment + code_size, std::align_val_t(1))
+			: m_cache.alloc_transient(alignment + code_size, std::align_val_t(1));
+	if (!space)
+		return 0;
+
+	assert(uintptr_t(space) <= ch.base_address());
+	err = ch.copy_flattened_data(drccodeptr(ch.base_address()), code_size, CopySectionFlags::kPadTargetBuffer);
+	if (err != kErrorOk)
+		throw emu_fatalerror("asmjit::CodeHolder::copy_flattened_data() error %u", std::underlying_type_t<Error>(err));
+
+	osd::invalidate_instruction_cache(drccodeptr(ch.base_address()), code_size);
+
+	return code_size;
+}
+
+//-------------------------------------------------
+//  reset - reset back-end specific state
+//-------------------------------------------------
+
+void drcbe_x86::reset()
+{
+	// output a note to the log
+	if (m_log)
+		m_log->printf("%s", "\n\n===========\nCACHE RESET\n===========\n\n");
 
 	// reset our hash tables
 	m_hash.reset();
-	m_hash.set_default_codeptr(m_nocode);
 }
 
 
@@ -1346,7 +1365,7 @@ int drcbe_x86::execute(code_handle &entry)
 void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint32_t numinst)
 {
 	// do this here because device.debug() isn't initialised at construction time
-	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED))
+	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED) && m_device.debug())
 	{
 		m_debug_cpu_instruction_hook.set(*m_device.debug(), &device_debug::instruction_hook);
 		if (!m_debug_cpu_instruction_hook)
@@ -1356,6 +1375,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 	// tell all of our utility objects that a block is beginning
 	m_hash.block_begin(block, instlist, numinst);
 	m_map.block_begin(block);
+	m_invariant_block = block.invariant();
 
 	// compute the base by aligning the cache top to a cache line
 	auto [err, linesize] = osd_get_cache_line_size();
@@ -1429,7 +1449,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint3
 	a.jmp(imm(m_endofblock));
 
 	// emit the generated code
-	size_t const bytes = emit(ch);
+	size_t const bytes = emit(ch, block.invariant());
 	if (!bytes)
 		block.abort();
 
@@ -2888,14 +2908,14 @@ void drcbe_x86::op_handle(Assembler &a, const instruction &inst)
 
 	// emit a jump around the stack adjust in case code falls through here
 	Label skip = a.new_label();
-	a.short_().jmp(skip);                                                               // jmp   skip
+	a.short_().jmp(skip);
 
 	// register the current pointer for the handle
 	inst.param(0).handle().set_codeptr(drccodeptr(a.code()->base_address() + a.offset()));
 
 	// by default, the handle points to prolog code that moves the stack pointer
-	a.lea(esp, ptr(esp, -28));                                                          // lea   rsp,[rsp-28]
-	a.bind(skip);                                                                   // skip:
+	a.lea(esp, ptr(esp, -28));
+	a.bind(skip);
 	reset_last_upper_lower_reg();
 }
 
@@ -3083,60 +3103,60 @@ void drcbe_x86::op_hashjmp(Assembler &a, const instruction &inst)
 	}
 
 	// load the stack base one word early so we end up at the right spot after our call below
-	a.mov(esp, MABS(&m_hashstacksave));                                                 // mov   esp,[hashstacksave]
+	a.mov(esp, MABS(&m_hashstacksave));
 
-	if (modep.is_immediate() && m_hash.is_mode_populated(modep.immediate()))
+	if (modep.is_immediate() && m_hash.populate_mode(modep.immediate()))
 	{
 		// fixed mode cases
-		if (pcp.is_immediate())
+		if (pcp.is_immediate() && !m_invariant_block)
 		{
 			// a straight immediate jump is direct, though we need the PC in EAX in case of failure
-			uint32_t l1val = (pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask();
-			uint32_t l2val = (pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask();
-			a.call(MABS(&m_hash.base()[modep.immediate()][l1val][l2val]));              // call  hash[modep][l1val][l2val]
+			uint32_t const l1val = (pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask();
+			uint32_t const l2val = (pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask();
+			a.call(MABS(&m_hash.base()[modep.immediate()][l1val][l2val]));
 		}
 		else
 		{
 			// a fixed mode but variable PC
-			emit_mov_r32_p32(a, eax, pcp);                                              // mov   eax,pcp
-			a.mov(edx, eax);                                                            // mov   edx,eax
-			a.shr(edx, m_hash.l1shift());                                               // shr   edx,l1shift
-			a.and_(eax, m_hash.l2mask() << m_hash.l2shift());                           // and  eax,l2mask << l2shift
-			a.mov(edx, ptr(uintptr_t(&m_hash.base()[modep.immediate()][0]), edx, 2));   // mov   edx,hash[modep+edx*4]
-			a.call(ptr(edx, eax, 2 - m_hash.l2shift()));                                // call  [edx+eax*shift]
+			emit_mov_r32_p32(a, eax, pcp);
+			a.mov(edx, eax);
+			a.shr(edx, m_hash.l1shift());
+			a.and_(eax, m_hash.l2mask() << m_hash.l2shift());
+			a.mov(edx, ptr(uintptr_t(&m_hash.base()[modep.immediate()][0]), edx, 2));
+			a.call(ptr(edx, eax, 2 - m_hash.l2shift()));
 		}
 	}
 	else
 	{
 		// variable mode
 		Gp const modereg = modep.select_register(ecx);
-		emit_mov_r32_p32(a, modereg, modep);                                            // mov   modereg,modep
-		a.mov(ecx, ptr(uintptr_t(m_hash.base()), modereg, 2));                          // mov   ecx,hash[modereg*4]
+		emit_mov_r32_p32(a, modereg, modep);
+		a.mov(ecx, ptr(uintptr_t(m_hash.base()), modereg, 2));
 
 		if (pcp.is_immediate())
 		{
 			// fixed PC
-			uint32_t l1val = (pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask();
-			uint32_t l2val = (pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask();
-			a.mov(edx, ptr(ecx, l1val*4));                                              // mov   edx,[ecx+l1val*4]
-			a.call(ptr(edx, l2val*4));                                                  // call  [l2val*4]
+			uint32_t const l1val = (pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask();
+			uint32_t const l2val = (pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask();
+			a.mov(edx, ptr(ecx, l1val * 4));
+			a.call(ptr(edx, l2val * 4));
 		}
 		else
 		{
 			// variable PC
-			emit_mov_r32_p32(a, eax, pcp);                                              // mov   eax,pcp
-			a.mov(edx, eax);                                                            // mov   edx,eax
-			a.shr(edx, m_hash.l1shift());                                               // shr   edx,l1shift
-			a.mov(edx, ptr(ecx, edx, 2));                                               // mov   edx,[ecx+edx*4]
-			a.and_(eax, m_hash.l2mask() << m_hash.l2shift());                           // and  eax,l2mask << l2shift
-			a.call(ptr(edx, eax, 2 - m_hash.l2shift()));                                // call  [edx+eax*shift]
+			emit_mov_r32_p32(a, eax, pcp);
+			a.mov(edx, eax);
+			a.shr(edx, m_hash.l1shift());
+			a.mov(edx, ptr(ecx, edx, 2));
+			a.and_(eax, m_hash.l2mask() << m_hash.l2shift());
+			a.call(ptr(edx, eax, 2 - m_hash.l2shift()));
 		}
 	}
 
 	// in all cases, if there is no code, we return here to generate the exception
-	emit_mov_m32_p32(a, MABS(&m_state.exp, 4), pcp);                                    // mov   [exp],param
-	a.sub(esp, 4);                                                                      // sub   esp,4
-	a.call(MABS(exp.handle().codeptr_addr()));                                          // call  [exp]
+	emit_mov_m32_p32(a, MABS(&m_state.exp, 4), pcp);
+	a.sub(esp, 4);
+	a.call(MABS(exp.handle().codeptr_addr()));
 }
 
 
@@ -7244,9 +7264,9 @@ void drcbe_x86::op_ffrint(Assembler &a, const instruction &inst)
 	parameter const &sizep = inst.param(2);
 	assert(sizep.is_size());
 
-	// 4-byte integer case
 	if (sizep.size() == SIZE_DWORD)
 	{
+		// 4-byte integer case
 		if (srcp.is_immediate())
 		{
 			a.mov(MABS(&m_fptemp, 4), srcp.immediate());                                // mov   [fptemp],srcp
@@ -7260,10 +7280,9 @@ void drcbe_x86::op_ffrint(Assembler &a, const instruction &inst)
 			a.fild(MABS(m_reglo[srcp.ireg()], 4));                                      // fild  reglo[srcp]
 		}
 	}
-
-	// 8-bit integer case
 	else if (sizep.size() == SIZE_QWORD)
 	{
+		// 8-bit integer case
 		if (srcp.is_immediate())
 		{
 			a.mov(MABS(&m_fptemp, 4), srcp.immediate());                                // mov   [fptemp],srcp

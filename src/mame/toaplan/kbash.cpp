@@ -43,12 +43,8 @@ public:
 	void kbash(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void video_start() override ATTR_COLD;
-
 	void kbash_68k_mem(address_map &map) ATTR_COLD;
 	void kbash_v25_mem(address_map &map) ATTR_COLD;
-
-	void kbash_oki_bankswitch_w(u8 data);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
@@ -64,7 +60,6 @@ protected:
 	required_device<okim6295_device> m_oki;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	bitmap_ind8 m_custom_priority_bitmap;
 };
 
 class kbash2_state : public kbash_state
@@ -77,23 +72,18 @@ public:
 
 	void kbash2(machine_config &config) ATTR_COLD;
 
-protected:
+private:
+	void oki_bankswitch_w(u8 data);
 	void kbash2_68k_mem(address_map &map) ATTR_COLD;
 
 	required_device<okim6295_device> m_musicoki;
 };
 
-void kbash_state::video_start()
-{
-	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
-	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
-}
-
 u32 kbash_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp->render_vdp(bitmap, cliprect);
+	screen.priority().fill(0, cliprect);
+	m_vdp->render_vdp(bitmap, cliprect, screen.priority());
 	return 0;
 }
 
@@ -107,7 +97,7 @@ void kbash_state::screen_vblank(int state)
 
 
 
-void kbash_state::kbash_oki_bankswitch_w(u8 data)
+void kbash2_state::oki_bankswitch_w(u8 data)
 {
 	m_oki->set_rom_bank(data & 1);
 }
@@ -273,7 +263,7 @@ void kbash2_state::kbash2_68k_mem(address_map &map)
 	map(0x200018, 0x200019).portr("SYS");
 	map(0x200021, 0x200021).rw(m_musicoki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x200025, 0x200025).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x200029, 0x200029).w(FUNC(kbash2_state::kbash_oki_bankswitch_w));
+	map(0x200029, 0x200029).w(FUNC(kbash2_state::oki_bankswitch_w));
 	map(0x20002c, 0x20002d).r(m_vdp, FUNC(gp9001vdp_device::vdpcount_r));
 	map(0x300000, 0x30000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -496,8 +486,8 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1993, kbash,       0,        kbash,        kbash,      kbash_state, empty_init,    ROT0,   "Toaplan / Atari", "Knuckle Bash",                 MACHINE_SUPPORTS_SAVE ) // Atari license shown for some regions.
-GAME( 1993, kbashk,      kbash,    kbash,        kbashk,     kbash_state, empty_init,    ROT0,   "Toaplan / Taito", "Knuckle Bash (Korean PCB)",    MACHINE_SUPPORTS_SAVE ) // Japan region has optional Taito license, maybe the original Japan release?
-GAME( 1993, kbashp,      kbash,    kbash,        kbash,      kbash_state, empty_init,    ROT0,   "Toaplan / Taito", "Knuckle Bash (location test)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, kbash,       0,        kbash,        kbash,      kbash_state,  empty_init,    ROT0,   "Toaplan / Atari", "Knuckle Bash",                 MACHINE_SUPPORTS_SAVE ) // Atari license shown for some regions.
+GAME( 1993, kbashk,      kbash,    kbash,        kbashk,     kbash_state,  empty_init,    ROT0,   "Toaplan / Taito", "Knuckle Bash (Korean PCB)",    MACHINE_SUPPORTS_SAVE ) // Japan region has optional Taito license, maybe the original Japan release?
+GAME( 1993, kbashp,      kbash,    kbash,        kbash,      kbash_state,  empty_init,    ROT0,   "Toaplan / Taito", "Knuckle Bash (location test)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, kbash2,      0,        kbash2,       kbash2,     kbash2_state, empty_init,    ROT0,   "bootleg",         "Knuckle Bash 2 (bootleg)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1999, kbash2,      0,        kbash2,       kbash2,     kbash2_state, empty_init,    ROT0,   "bootleg",         "Knuckle Bash 2 (bootleg of Knuckle Bash)",  MACHINE_SUPPORTS_SAVE )

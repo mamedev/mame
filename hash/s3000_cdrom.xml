@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="s3000_cdrom" description="Akai S2000 and S3000 series CD-ROMs">
+	<software name="cdsndlib1" supported="yes">
+		<description>Akai CD-ROM Sound Library Volume 1: Complete S3000 and CD3000 Sound Library</description>
+		<year>1993</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Works with Akai S2000 and S3000 series samplers, including CD3000" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cdsndlib1" sha1="77e77ba0087c70e369b086d7cf2e582d6a0abf73"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="cdsndlib2" supported="yes">
+		<description>Akai CD-ROM Sound Library Volume 2: Complete S1000/S1100 Library</description>
+		<year>1993</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Works with Akai S2000 and S3000 series samplers, including CD3000" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cdsndlib2" sha1="279edbfa4f88ae56dcf080c774017d3dabc073b6"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="cdsndlib3" supported="yes">
+		<description>Akai CD-ROM Sound Library Volume 3: Drum Kit Collection</description>
+		<year>1993</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Works with Akai S2000 and S3000 series samplers, including CD3000" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cdsndlib3" sha1="f81dbbe2f75e9a847cd23f727ce3e7cbe13ee3ae"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="cdsndlib4" supported="yes">
+		<description>Akai CD-ROM Sound Library Volume 4: Rhythm Loop Collection</description>
+		<year>1993</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Works with Akai S2000 and S3000 series samplers, including CD3000" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cdsndlib4" sha1="9246307c908f69b1b7672c39edccaa7d834462e7"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="cdsndlib5" supported="yes">
+		<description>Akai CD-ROM Sound Library Volume 5: Percussion Collection</description>
+		<year>1993</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Works with Akai S2000 and S3000 series samplers, including CD3000" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cdsndlib5" sha1="5708312e487d488cdca3caeed860505865f1a756"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="cdsndlib6" supported="yes">
+		<description>Akai CD-ROM Sound Library Volume 6: Sound Effects Collection</description>
+		<year>1993</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Works with Akai S2000 and S3000 series samplers, including CD3000" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cdsndlib6" sha1="366f58c8cbc9a1e8fbda529f3bbf5f388ecb2f09"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="cdsndlib7" supported="yes">
+		<description>Akai CD-ROM Sound Library Volume 7: New Keyboard Collection</description>
+		<year>1993</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Works with Akai S2000 and S3000 series samplers, including CD3000" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cdsndlib7" sha1="9cfeb43b9f986c1c9ecfca5f4b6cabc9998ab21d"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="cdsndlib8" supported="yes">
+		<description>Akai CD-ROM Sound Library Volume 8: General MIDI Sets</description>
+		<year>1993</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Works with Akai S2000 and S3000 series samplers, including CD3000" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cdsndlib8" sha1="5f4c1c256e32b9d885f639de58ce4b60283617f6"/>
+			</diskarea>
+		</part>
+	</software>
+</softwarelist>

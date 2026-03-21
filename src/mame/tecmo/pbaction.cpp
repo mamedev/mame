@@ -917,6 +917,33 @@ ROM_START( pbactiont )
 	ROM_LOAD( "b-f7.bin",     0x04000, 0x2000, CRC(af6e9817) SHA1(56f47d25761b3850c49a3a81b5ea35f12bd77b14) )
 ROM_END
 
+// PCB has Tehkan logo (6001-1A/1B) and also "Fabricado por Tecfri S.A. Made in Spain"
+ROM_START( pbactiont2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "16.p7", 0x00000, 0x4000, CRC(01d8b452) SHA1(98edc4ce5d441b0326c9f0a3c23f7c23b12afbf6) )
+	ROM_LOAD( "15.n7", 0x04000, 0x4000, CRC(8a7ad290) SHA1(54892125d46a28d2f9f7be64f9595ab9b35b1574) )
+	ROM_LOAD( "14.l7", 0x08000, 0x2000, CRC(d7d77c67) SHA1(c6797f5597d5f485b963059e1ab8ad1255f6f255) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "1.e3",  0x00000, 0x2000, CRC(8b69b933) SHA1(eb0762579d52ed9f5b1a002ffe7e517c59650e22) )
+
+	ROM_REGION( 0x06000, "fgchars", 0 )
+	ROM_LOAD( "7.s6",  0x00000, 0x2000, CRC(9a74a8e1) SHA1(bd27439b91f41db3fd7eedb44e828d61b793bda0) )
+	ROM_LOAD( "8.s7",  0x02000, 0x2000, CRC(5ca6ad3c) SHA1(7c8eff087f18cc2ff0572ea45e681a3a1ec94fad) )
+	ROM_LOAD( "9.s8",  0x04000, 0x2000, CRC(9f00b757) SHA1(74b6d926b8f456c8d0101f0232c5d3662423b396) )
+
+	ROM_REGION( 0x10000, "bgchars", 0 )
+	ROM_LOAD( "2.j5",  0x00000, 0x4000, CRC(21efe866) SHA1(0c0a05a26d793ba98b0f421d464ff4b1d301ff9e) )
+	ROM_LOAD( "3.j6",  0x04000, 0x4000, CRC(7f984c80) SHA1(18795ecbcd2da94f1cfcce5559d652388d1b8bc0) )
+	ROM_LOAD( "4.j7",  0x08000, 0x4000, CRC(df69e51b) SHA1(52ab15c63332f0fa98884fa9adc8d35b93c939c4) )
+	ROM_LOAD( "5.j8",  0x0c000, 0x4000, CRC(0094cb8b) SHA1(58f48d24903b797e8451bf231f9e8df621685d9f) )
+
+	ROM_REGION( 0x06000, "sprites", 0 )
+	ROM_LOAD( "11.c7", 0x00000, 0x2000, CRC(d1795ef5) SHA1(69ad8e419e340d2f548468ed7838102789b978da) )
+	ROM_LOAD( "12.d7", 0x02000, 0x2000, CRC(f28df203) SHA1(060f70ed6386c808303a488c97691257681bd8f3) )
+	ROM_LOAD( "13.f7", 0x04000, 0x2000, CRC(af6e9817) SHA1(56f47d25761b3850c49a3a81b5ea35f12bd77b14) )
+ROM_END
+
 uint8_t pbaction_state::pbaction2_prot_kludge_r()
 {
 	// on startup, the game expect this location to NOT act as RAM
@@ -942,8 +969,9 @@ void pbaction_state::init_pbaction2()
 
 
 // some of these are probably bootlegs
-GAME( 1985, pbaction,  0,        pbaction,  pbaction, pbaction_state, empty_init,     ROT90, "Tehkan",                  "Pinball Action (set 1)",            MACHINE_SUPPORTS_SAVE ) // possible bootleg due to not being encrypted + different sound map
-GAME( 1985, pbaction2, pbaction, pbactionx, pbaction, pbaction_state, init_pbaction2, ROT90, "Tehkan",                  "Pinball Action (set 2, encrypted)", MACHINE_SUPPORTS_SAVE ) // likely bootleg due to extra protection on top of usual
-GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, empty_init,     ROT90, "Tehkan",                  "Pinball Action (set 3, encrypted)", MACHINE_SUPPORTS_SAVE ) // possible bootleg due to oversized ROMs
-GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, pbaction_state, empty_init,     ROT90, "Tehkan",                  "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE ) // original?
-GAMEL(1985, pbactiont, pbaction, pbactiont, pbaction, pbaction_tecfri_state, empty_init,     ROT90, "Tehkan (Tecfri license)", "Pinball Action (Tecfri license)",   MACHINE_SUPPORTS_SAVE, layout_pbactiont )
+GAME( 1985, pbaction,   0,        pbaction,  pbaction, pbaction_state,        empty_init,     ROT90, "Tehkan",                  "Pinball Action (set 1)",                            MACHINE_SUPPORTS_SAVE ) // possible bootleg due to not being encrypted + different sound map
+GAME( 1985, pbaction2,  pbaction, pbactionx, pbaction, pbaction_state,        init_pbaction2, ROT90, "Tehkan",                  "Pinball Action (set 2, encrypted)",                 MACHINE_SUPPORTS_SAVE ) // likely bootleg due to extra protection on top of usual
+GAME( 1985, pbaction3,  pbaction, pbactionx, pbaction, pbaction_state,        empty_init,     ROT90, "Tehkan",                  "Pinball Action (set 3, encrypted)",                 MACHINE_SUPPORTS_SAVE ) // possible bootleg due to oversized ROMs
+GAME( 1985, pbaction4,  pbaction, pbactionx, pbaction, pbaction_state,        empty_init,     ROT90, "Tehkan",                  "Pinball Action (set 4, encrypted)",                 MACHINE_SUPPORTS_SAVE ) // original?
+GAMEL(1985, pbactiont,  pbaction, pbactiont, pbaction, pbaction_tecfri_state, empty_init,     ROT90, "Tehkan (Tecfri license)", "Pinball Action (Tecfri, with external display)",    MACHINE_SUPPORTS_SAVE, layout_pbactiont )
+GAME( 1985, pbactiont2, pbaction, pbaction,  pbaction, pbaction_state,        empty_init,     ROT90, "Tehkan (Tecfri license)", "Pinball Action (Tecfri, without external display)", MACHINE_SUPPORTS_SAVE )

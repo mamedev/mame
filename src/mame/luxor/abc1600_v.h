@@ -13,7 +13,7 @@
 
 #include "video/mc6845.h"
 #include "emupal.h"
-
+#include "screen.h"
 
 
 ///*************************************************************************
@@ -29,7 +29,7 @@
 // ======================> abc1600_mover_device
 
 class abc1600_mover_device :  public device_t,
-								public device_memory_interface
+							  public device_memory_interface
 {
 public:
 	// construction/destruction
@@ -42,6 +42,7 @@ public:
 	virtual void iowr2_map(address_map &map) ATTR_COLD;
 
 	void mover_map(address_map &map) ATTR_COLD;
+	
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

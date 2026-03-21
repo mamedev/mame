@@ -228,6 +228,7 @@ public:
 		set_clock(pixclock);
 		m_refresh = HZ_TO_ATTOSECONDS(pixclock) * htotal * vtotal;
 		m_vblank = m_refresh / vtotal * (vtotal - (vbstart - vbend));
+		m_oldstyle_vblank_supplied = false;
 		m_width = htotal;
 		m_height = vtotal;
 		m_visarea.set(hbend, hbstart ? hbstart - 1 : htotal - 1, vbend, vbstart - 1);

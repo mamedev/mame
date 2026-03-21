@@ -170,6 +170,27 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- this one has some songs programmed into it:
+	    君をのせて                          井上あずみ      Kimi o Nosete                                   Inoue Azumi
+	    陽は、また昇る                      アラジン        Hi wa, Mata Noboru                              aladdin
+	    タッチ                              岩崎良美        TOUCH                                           Iwasaki Yoshimi
+	    ハッピー♥ラッキー~お願いミルモ~     Kaede-chan      Happy♥Lucky (Onegai Mirumo)                     Kaede-chan
+	    こころのたまご                      Buono!          Kokoro no Tamago                                Buono!
+	    遥か                                GReeeeN         Haruka                                          GReeeeN
+	    Love yourself ~君が嫌いな君が好き~  KAT-TUN         Love yourself (Kimi ga Kiraina Kimi ga Suki)    KAT-TUN
+	    Butterfly                           木村カエラ      Butterfly                                       Kimura Kaela
+	    さくらんぼ                          大塚愛          Sakuranbo                                       Ōtsuka Ai -->
+	<software name="user10b" cloneof="user10" supported="no">
+		<description>Hi-kara 10-song capacity user cartridge (used, with 9 songs) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="usercart10.bin" size="0x200000" crc="48bac1fc" sha1="87c26fe1ada9940bf2712ae86dffa207dbeb2123"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="user20" supported="no">
 		<description>Hi-kara 20-song capacity user cartridge (blank) (Japan)</description>
 		<year>2008</year>

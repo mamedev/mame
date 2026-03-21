@@ -39,12 +39,8 @@ public:
 
 	void init_enmadaio() ATTR_COLD;
 
-protected:
-	virtual void video_start() override ATTR_COLD;
-
 private:
-
-	void enmadaio_oki_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void oki_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void enmadaio_68k_mem(address_map &map) ATTR_COLD;
 	void enmadaio_oki(address_map &map) ATTR_COLD;
 
@@ -57,20 +53,13 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_memory_bank m_okibank;
-	bitmap_ind8 m_custom_priority_bitmap;
 };
-
-void enmadaio_state::video_start()
-{
-	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
-	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
-}
 
 u32 enmadaio_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp->render_vdp(bitmap, cliprect);
+	screen.priority().fill(0, cliprect);
+	m_vdp->render_vdp(bitmap, cliprect, screen.priority());
 	return 0;
 }
 
@@ -294,7 +283,7 @@ static INPUT_PORTS_START( enmadaio )
 INPUT_PORTS_END
 
 
-void enmadaio_state::enmadaio_oki_bank_w(offs_t offset, u16 data, u16 mem_mask)
+void enmadaio_state::oki_bank_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	data &= mem_mask;
 
@@ -304,7 +293,7 @@ void enmadaio_state::enmadaio_oki_bank_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 	else
 	{
-		logerror("enmadaio_oki_bank_w >=0x60 (%04x)\n",data);
+		logerror("%s: oki_bank_w >=0x60 (%04x)\n", machine().describe_context(), data);
 	}
 }
 
@@ -328,7 +317,7 @@ void enmadaio_state::enmadaio_68k_mem(address_map &map)
 	map(0x700018, 0x700019).portr("SYS");
 	map(0x70001c, 0x70001d).portr("UNK"); //.portr("SYS");
 
-	map(0x700020, 0x700021).w(FUNC(enmadaio_state::enmadaio_oki_bank_w)); // oki bank
+	map(0x700020, 0x700021).w(FUNC(enmadaio_state::oki_bank_w)); // oki bank
 
 	map(0x700028, 0x700029).nopw();
 	map(0x70003c, 0x70003d).nopw();

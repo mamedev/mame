@@ -165,7 +165,7 @@ void superchs_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		}
 
 		if (bad_chunks)
-logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
+			logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 
 	/* this happens only if primsks != nullptr */

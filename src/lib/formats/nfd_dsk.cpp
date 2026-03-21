@@ -80,8 +80,7 @@
 #include "nfd_dsk.h"
 
 #include "ioprocs.h"
-
-#include "osdcomm.h" // little_endianize_int*
+#include "multibyte.h"
 
 #include <cstring>
 
@@ -138,7 +137,7 @@ bool nfd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	uint8_t mfm[164 * 26];
 	uint8_t sec_sizes[164 * 26];
 
-	uint32_t hsize = little_endianize_int32(*(uint32_t *)(h+0x110));
+	uint32_t hsize = get_u32le(h+0x110);
 
 	int pos = 0x120;
 
@@ -151,7 +150,7 @@ bool nfd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			// read sector map absolute location
 			read_at(io, pos, hsec, 4); // FIXME: check for errors and premature EOF
 			pos += 4;
-			uint32_t secmap_addr = little_endianize_int32(*(uint32_t *)(hsec));
+			uint32_t secmap_addr = get_u32le(hsec);
 
 			if (secmap_addr)
 			{
@@ -160,8 +159,8 @@ bool nfd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				// first WORD is # of sectors, second WORD is # of special data sectors
 				read_at(io, secmap_addr, hsec, 0x10); // FIXME: check for errors and premature EOF
 				secmap_addr += 0x10;
-				num_secs[track] = little_endianize_int16(*(uint16_t *)(hsec));
-				num_specials[track] = little_endianize_int16(*(uint16_t *)(hsec + 0x2));
+				num_secs[track] = get_u16le(hsec);
+				num_specials[track] = get_u16le(hsec + 0x2);
 
 				for (int sect = 0; sect < num_secs[track]; sect++)
 				{
@@ -186,7 +185,7 @@ bool nfd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					{
 						read_at(io, secmap_addr, hsec, 0x10); // FIXME: check for errors and premature EOF
 						secmap_addr += 0x10;
-						curr_track_size += (hsec[9] + 1) * little_endianize_int32(*(uint32_t *)(hsec + 0x0a));
+						curr_track_size += (hsec[9] + 1) * get_u32le(hsec + 0x0a);
 					}
 				}
 			}

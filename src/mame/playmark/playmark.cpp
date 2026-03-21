@@ -1434,6 +1434,38 @@ ROM_START( bigtwinb )
 	ROM_LOAD( "io13.bin",     0x00000, 0x40000, CRC(ff6671dc) SHA1(517941946a3edfc2da0b7aa8a106ebb4ae849beb) )
 ROM_END
 
+ROM_START( bigtwinc )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "2.u67", 0x00000, 0x20000, CRC(0fdfeaef) SHA1(0badc764c81bdfc10a4ecb8d0b7c3a1d64a5d8da) )
+	ROM_LOAD16_BYTE( "3.u66", 0x00001, 0x20000, CRC(67464a4e) SHA1(a8de5634f03589e4dbb35dd8269ff8c614985bf4) )
+
+	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
+//  ROM_LOAD( "16c57hs.bin",  0x0000, 0x1000, CRC(b4c95cc3) SHA1(7fc9b141e7782aa5c17310ee06db99d884537c30) )
+	// ROM will be copied here by the init code from "user1"
+
+	ROM_REGION( 0x3000, "user1", 0 )
+	ROM_LOAD( "pic16c57-hs_bigtwin_015.hex",  0x0000, 0x2d4c, CRC(c07e9375) SHA1(7a6714ab888ea6e37bc037bc7419f0998868cfce) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "4.u36", 0x000000, 0x20000, CRC(99aaeacc) SHA1(0281237722d5a94fb9831616ae2ffc8288e78e2c) )
+	ROM_CONTINUE(             0x040000, 0x20000 )
+	ROM_LOAD16_BYTE( "5.u42", 0x000001, 0x20000, CRC(5c1dfd72) SHA1(31fab4d3bd4e8ff5a16daeaff0ccaa4fc8f60c92) )
+	ROM_CONTINUE(             0x040001, 0x20000 )
+	ROM_LOAD16_BYTE( "6.u39", 0x080000, 0x20000, CRC(788f2df6) SHA1(186f4f9f79c80dc5c6faa9eddc4b3c98b52b374d) )
+	ROM_CONTINUE(             0x0c0000, 0x20000 )
+	ROM_LOAD16_BYTE( "7.u45", 0x080001, 0x20000, CRC(aedb2e6d) SHA1(775e13d328c8ee3c36b9d77ad49fa5a092b85a95) )
+	ROM_CONTINUE(             0x0c0001, 0x20000 )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "11.u86",       0x00000, 0x20000, CRC(2749644d) SHA1(f506ed1a14ee411eda8a7e639f5572e35b89b13f) )
+	ROM_LOAD( "10.u85",       0x20000, 0x20000, CRC(1d1897af) SHA1(0ad00906b94443d7ceef383717b39c6aa8cca241) )
+	ROM_LOAD( "9.u84",        0x40000, 0x20000, CRC(2a03432e) SHA1(44722b83093211d88460cbcd9e9c0b638d24ad3e) )
+	ROM_LOAD( "8.u83",        0x60000, 0x20000, CRC(2c980c4c) SHA1(77af29a1f5d4302650915f4a7daf2918a2519a6e) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // OKIM6295 samples
+	ROM_LOAD( "io13.bin",     0x00000, 0x40000, CRC(ff6671dc) SHA1(517941946a3edfc2da0b7aa8a106ebb4ae849beb) )
+ROM_END
+
 ROM_START( wbeachvl )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "wbv_02.bin",   0x000000, 0x40000, CRC(c7cca29e) SHA1(03af361081d688c4204a95f7f5babcc598b72c23) )
@@ -1757,6 +1789,46 @@ ROM_START( hotmind ) // PCB marked Hard Times 28-06-94
 	ROM_LOAD( "tibpal22v10acnt_u211.jed",    0x0000, 0x1e84, BAD_DUMP CRC(94106c63) SHA1(b4b153756398cc1378411a21d503f3ab325c9cf7) )
 ROM_END
 
+ROM_START( hotmindc ) // PCB marked Hard Times 28-06-94
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "1.u67",       0x00000, 0x20000, CRC(35b0f62d) SHA1(c96b1dacaf918ff822899df4dc672f3a9f47637e) ) // label has a red marker dot on the right of the number
+	ROM_LOAD16_BYTE( "2.u66",       0x00001, 0x20000, CRC(1a27033f) SHA1(8eed0c1db27b7e0ed1df973c3b8f9306690413be) ) // label has a red marker dot on the right of the number
+
+	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
+	// ROM will be copied here by the init code from "user1"
+
+	ROM_REGION( 0x3000, "user1", 0 )
+	ROM_LOAD( "hotmind_pic16c57-hs_io15.hex", 0x0000, 0x2d4c, BAD_DUMP CRC(f3300d13) SHA1(78892453c7374ea3d1606cdb81197cc466e2a8c5) )  // protected, contains upper nibble?
+	ROM_LOAD( "hotmind_pic16c57.hex",         0x0000, 0x2d4c, BAD_DUMP CRC(11957803) SHA1(c2f87659819bfcf3a5b43fbccf81988c43b9c9c8) )  // Using modified Excelsior PIC code to make it suite this game
+
+	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "23.u36",       0x000000, 0x10000, CRC(ddcf60b9) SHA1(0c0fbc44131cb7d36c21bf5aead87b498c5684f5) )
+	ROM_CONTINUE(                    0x020000, 0x10000 )
+	ROM_LOAD16_BYTE( "27.u42",       0x000001, 0x10000, CRC(413bbcf4) SHA1(d82ae9d26df1a69b760b3025048e47ab757d9175) )
+	ROM_CONTINUE(                    0x020001, 0x10000 )
+	ROM_LOAD16_BYTE( "24.u39",       0x040000, 0x10000, CRC(4baa5b4c) SHA1(ee953ed9a4a45715d1ae39b5bb8b9b6505a4e95d) )
+	ROM_CONTINUE(                    0x060000, 0x10000 )
+	ROM_LOAD16_BYTE( "28.u45",       0x040001, 0x10000, CRC(8df34d6a) SHA1(ca0d2ca7e0f2a302bc8b1a03c0c18ac72fe105ac) )
+	ROM_CONTINUE(                    0x060001, 0x10000 )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "26.u86",       0x00000, 0x20000, CRC(ff8d3b75) SHA1(5427b70a61dee4c125877e040be21cb1cadb1af5) )
+	ROM_LOAD16_BYTE( "30.u85",       0x00001, 0x20000, CRC(87a640c7) SHA1(818ff3243cb3ed0189988348e6c2e954f0d3dd4f) )
+	ROM_LOAD16_BYTE( "25.u84",       0x40000, 0x20000, CRC(c4fd4445) SHA1(ab0c5a328a312740595b5c92a1050527140518f3) )
+	ROM_LOAD16_BYTE( "29.u83",       0x40001, 0x20000, CRC(0bebfb53) SHA1(d4342f808141b70af98c370004153a31d120e2a4) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // Samples
+	ROM_LOAD( "20.io13",      0x00000, 0x40000, CRC(0bf3a3e5) SHA1(2ae06f37a6bcd20bc5fbaa90d970aba2ebf3cf5a) )
+
+	ROM_REGION( 0x8000, "plds", 0 )     // These were read protected
+	ROM_LOAD( "palce16v8h-25-pc4_u58.jed",   0x0000, 0xb89,  BAD_DUMP CRC(ba88c1da) SHA1(9b55e96eee44a467bdfbf760137ccb2fb3afedf0) )
+	ROM_LOAD( "palce16v8h-25-pc4_u182.jed",  0x0000, 0xb89,  BAD_DUMP CRC(ba88c1da) SHA1(9b55e96eee44a467bdfbf760137ccb2fb3afedf0) )
+	ROM_LOAD( "palce16v8h-25-pc4_jamma.jed", 0x0000, 0xb89,  BAD_DUMP CRC(ba88c1da) SHA1(9b55e96eee44a467bdfbf760137ccb2fb3afedf0) )  // On the Jamma Expansion board
+	ROM_LOAD( "tibpal22v10acnt_u113.jed",    0x0000, 0x1e84, BAD_DUMP CRC(94106c63) SHA1(b4b153756398cc1378411a21d503f3ab325c9cf7) )
+	ROM_LOAD( "tibpal22v10acnt_u183.jed",    0x0000, 0x1e84, BAD_DUMP CRC(95a446b6) SHA1(e47e39bc51ff16b75acb37983cc307ad421bfcc7) )
+	ROM_LOAD( "tibpal22v10acnt_u211.jed",    0x0000, 0x1e84, BAD_DUMP CRC(94106c63) SHA1(b4b153756398cc1378411a21d503f3ab325c9cf7) )
+ROM_END
+
 ROM_START( luckboomh )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "21.u67",       0x00000, 0x20000, CRC(5578dd75) SHA1(ed3c2ea302f8bfe49ab5d8c33e572492daa651ae) )
@@ -1874,7 +1946,8 @@ void playmark_state::init_pic_decode()
 
 
 GAME( 1995, bigtwin,   0,        bigtwin,      bigtwin,   playmark_state, init_pic_decode, ROT0, "Playmark", "Big Twin",                                       MACHINE_SUPPORTS_SAVE )
-GAME( 1995, bigtwinb,  bigtwin,  bigtwinb,     bigtwinb,  playmark_state, init_pic_decode, ROT0, "Playmark", "Big Twin (No Girls Conversion)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, bigtwinb,  bigtwin,  bigtwinb,     bigtwinb,  playmark_state, init_pic_decode, ROT0, "Playmark", "Big Twin (no girls conversion, set 1)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, bigtwinc,  bigtwin,  bigtwinb,     bigtwinb,  playmark_state, init_pic_decode, ROT0, "Playmark", "Big Twin (no girls conversion, set 2)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1995, wbeachvl,  0,        wbeachvl_pic, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 1, PIC16C57 audio CPU)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // no music due to incorrect OKI banking / PIC hookup
 GAME( 1995, wbeachvla, wbeachvl, wbeachvl_mcs, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 1, S87C751 audio CPU)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // wrong banking, so some sounds are played at the wrong time
 GAME( 1995, wbeachvl2, wbeachvl, wbeachvl_pic, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 2)",                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
@@ -1883,5 +1956,6 @@ GAME( 1996, excelsr,   0,        excelsr,      excelsr,   playmark_state, init_p
 GAME( 1996, excelsra,  excelsr,  excelsr,      excelsr,   playmark_state, init_pic_decode, ROT0, "Playmark", "Excelsior (set 2)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, hrdtimes,  0,        hrdtimes,     hrdtimes,  playmark_state, empty_init,      ROT0, "Playmark", "Hard Times (set 1)",                             MACHINE_SUPPORTS_SAVE )
 GAME( 1994, hrdtimesa, hrdtimes, hrdtimes,     hrdtimes,  playmark_state, empty_init,      ROT0, "Playmark", "Hard Times (set 2)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1995, hotmind,   0,        hotmind,      hotmind,   playmark_state, init_pic_decode, ROT0, "Playmark", "Hot Mind (Hard Times hardware)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hotmind,   0,        hotmind,      hotmind,   playmark_state, init_pic_decode, ROT0, "Playmark", "Hot Mind (Hard Times hardware, set 1)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hotmindc,  hotmind,  hotmind,      hotmind,   playmark_state, init_pic_decode, ROT0, "Playmark", "Hot Mind (Hard Times hardware, set 2)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1996, luckboomh, luckboom, luckboomh,    luckboomh, playmark_state, init_pic_decode, ROT0, "Playmark", "Lucky Boom (Hard Times hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

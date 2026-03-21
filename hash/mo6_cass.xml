@@ -23,7 +23,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="animatixa" cloneof="animatix">
-		<description>Animatix (Alt)</description>
+		<description>Animatix (alt)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
 		<info name="author" value="Christian Belin &amp; Jacques Pages"/>
@@ -36,7 +36,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="animatixb" cloneof="animatix">
-		<description>Animatix (Alt 2)</description>
+		<description>Animatix (alt 2)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
 		<info name="author" value="Christian Belin &amp; Jacques Pages"/>
@@ -100,7 +100,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="music3va" cloneof="music3v">
-		<description>Music 3 Voix (Alt)</description>
+		<description>Music 3 Voix (alt)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
 		<info name="author" value="P.O. Richez"/>
@@ -115,7 +115,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="music3vb" cloneof="music3v">
-		<description>Music 3 Voix (Alt 2)</description>
+		<description>Music 3 Voix (alt 2)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
 		<info name="author" value="P.O. Richez"/>
@@ -164,7 +164,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack -->
 	<software name="sjeuxmo6a" cloneof="sjeuxmo6" supported="no">
-		<description>Super Jeux MO6 (Alt)</description>
+		<description>Super Jeux MO6 (alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -249,7 +249,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="aquanauta" cloneof="aquanaut">
-		<description>Aquanaute (Alt)</description>
+		<description>Aquanaute (alt)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 		<info name="author" value="Bruno Ouachee"/>
@@ -263,7 +263,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="aquanautb" cloneof="aquanaut">
-		<description>Aquanaute (Alt 2)</description>
+		<description>Aquanaute (alt 2)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 		<info name="author" value="Bruno Ouachee"/>
@@ -291,7 +291,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack -->
 	<software name="bactrona" cloneof="bactron">
-		<description>Bactron (Alt)</description>
+		<description>Bactron (alt)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
 		<info name="serial" value="144"/>
@@ -305,7 +305,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack -->
 	<software name="bactronb" cloneof="bactron">
-		<description>Bactron (Alt 2)</description>
+		<description>Bactron (alt 2)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
 		<info name="serial" value="144"/>
@@ -319,7 +319,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack -->
 	<software name="bactronc" cloneof="bactron">
-		<description>Bactron (Alt 3)</description>
+		<description>Bactron (alt 3)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
 		<info name="serial" value="144"/>
@@ -347,7 +347,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $41 loader hack -->
 	<software name="bivouaca" cloneof="bivouac" supported="no">
-		<description>Bivouac (Alt)</description>
+		<description>Bivouac (alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -361,7 +361,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack -->
 	<software name="bivouacb" cloneof="bivouac" supported="no">
-		<description>Bivouac (Alt 2)</description>
+		<description>Bivouac (alt 2)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -399,7 +399,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bluestara" cloneof="bluestar">
-		<description>Blue Star (Alt)</description>
+		<description>Blue Star (alt)</description>
 		<year>1987</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -411,7 +411,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="bluestarb" cloneof="bluestar">
-		<description>Blue Star (Alt 2)</description>
+		<description>Blue Star (alt 2)</description>
 		<year>1987</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -438,7 +438,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack -->
 	<software name="moranecha" cloneof="moranech" supported="no">
-		<description>Bob Morane Chevalerie 1 (Alt)</description>
+		<description>Bob Morane Chevalerie 1 (alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -452,7 +452,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack -->
 	<software name="moranechb" cloneof="moranech" supported="no">
-		<description>Bob Morane Chevalerie 1 (Alt 2)</description>
+		<description>Bob Morane Chevalerie 1 (alt 2)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -480,7 +480,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $41 loader hack -->
 	<software name="moranejua" cloneof="moraneju" supported="no">
-		<description>Bob Morane Jungle 1 (Alt)</description>
+		<description>Bob Morane Jungle 1 (alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -494,7 +494,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack -->
 	<software name="moranejub" cloneof="moraneju" supported="no">
-		<description>Bob Morane Jungle 1 (Alt 2)</description>
+		<description>Bob Morane Jungle 1 (alt 2)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -522,7 +522,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $41 loader hack -->
 	<software name="moranesfa" cloneof="moranesf" supported="no">
-		<description>Bob Morane Science Fiction 1 (Alt)</description>
+		<description>Bob Morane Science Fiction 1 (alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -536,7 +536,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack -->
 	<software name="moranesfb" cloneof="moranesf" supported="no">
-		<description>Bob Morane Science Fiction 1 (Alt 2)</description>
+		<description>Bob Morane Science Fiction 1 (alt 2)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -563,7 +563,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $41 loader hack -->
 	<software name="boboa" cloneof="bobo" supported="no">
-		<description>Bobo (Alt)</description>
+		<description>Bobo (alt)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -577,7 +577,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $41 loader hack -->
 	<software name="bobob" cloneof="bobo" supported="no">
-		<description>Bobo (Alt 2)</description>
+		<description>Bobo (alt 2)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -591,7 +591,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack -->
 	<software name="boboc" cloneof="bobo" supported="no">
-		<description>Bobo (Alt 3)</description>
+		<description>Bobo (alt 3)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -619,7 +619,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $41 loader hack, works in dcmoto -->
 	<software name="capblooda" cloneof="capblood" supported="no">
-		<description>Captain Blood (Alt)</description>
+		<description>Captain Blood (alt)</description>
 		<year>1988</year>
 		<publisher>ERE Informatique</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -633,7 +633,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack, works in dcmoto -->
 	<software name="capbloodb" cloneof="capblood" supported="no">
-		<description>Captain Blood (Alt 2)</description>
+		<description>Captain Blood (alt 2)</description>
 		<year>1988</year>
 		<publisher>ERE Informatique</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -659,7 +659,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack, works in dcmoto -->
 	<software name="chicagoa" cloneof="chicago" supported="no">
-		<description>Chicago 90 (Alt)</description>
+		<description>Chicago 90 (alt)</description>
 		<year>1989</year>
 		<publisher>Microïds</publisher>
 
@@ -672,7 +672,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack, works in dcmoto -->
 	<software name="chicagob" cloneof="chicago" supported="no">
-		<description>Chicago 90 (Alt 2)</description>
+		<description>Chicago 90 (alt 2)</description>
 		<year>1989</year>
 		<publisher>Microïds</publisher>
 
@@ -685,7 +685,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack, works in dcmoto -->
 	<software name="chicagoc" cloneof="chicago" supported="no">
-		<description>Chicago 90 (Alt 3)</description>
+		<description>Chicago 90 (alt 3)</description>
 		<year>1989</year>
 		<publisher>Microïds</publisher>
 
@@ -709,7 +709,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="crepuscua" cloneof="crepuscu">
-		<description>Les Aventures du Ka 1 - Le Crepuscule du Naja (Alt)</description>
+		<description>Les Aventures du Ka 1 - Le Crepuscule du Naja (alt)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -721,7 +721,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="crepuscub" cloneof="crepuscu">
-		<description>Les Aventures du Ka 1 - Le Crepuscule du Naja (Alt 2)</description>
+		<description>Les Aventures du Ka 1 - Le Crepuscule du Naja (alt 2)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -745,7 +745,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="demineura" cloneof="demineur">
-		<description>Demineur (Alt)</description>
+		<description>Demineur (alt)</description>
 		<year>2002</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -757,7 +757,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="demineurb" cloneof="demineur">
-		<description>Demineur (Alt 2)</description>
+		<description>Demineur (alt 2)</description>
 		<year>2002</year>
 		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
 
@@ -781,7 +781,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="dieuxglia" cloneof="dieuxgli">
-		<description>Les Dieux de la Glisse (Alt)</description>
+		<description>Les Dieux de la Glisse (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 
@@ -793,7 +793,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="dieuxglib" cloneof="dieuxgli">
-		<description>Les Dieux de la Glisse (Alt 2)</description>
+		<description>Les Dieux de la Glisse (alt 2)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 
@@ -817,7 +817,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="dieuxmera" cloneof="dieuxmer">
-		<description>Les Dieux de la Mer (Alt)</description>
+		<description>Les Dieux de la Mer (alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -829,7 +829,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="dieuxmerb" cloneof="dieuxmer">
-		<description>Les Dieux de la Mer (Alt 2)</description>
+		<description>Les Dieux de la Mer (alt 2)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -855,7 +855,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $41 loader hack -->
 	<software name="fbia" cloneof="fbi" supported="no">
-		<description>F.B.I. (Alt)</description>
+		<description>F.B.I. (alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -868,7 +868,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $41 loader hack -->
 	<software name="fbib" cloneof="fbi" supported="no">
-		<description>F.B.I. (Alt 2)</description>
+		<description>F.B.I. (alt 2)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -881,7 +881,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack -->
 	<software name="fbic" cloneof="fbi" supported="no">
-		<description>F.B.I. (Alt 3)</description>
+		<description>F.B.I. (alt 3)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -907,7 +907,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack, works in dcmoto -->
 	<software name="gp500cca" cloneof="gp500cc" supported="no">
-		<description>Grand Prix 500cc (Alt)</description>
+		<description>Grand Prix 500cc (alt)</description>
 		<year>1986</year>
 		<publisher>Microïds</publisher>
 
@@ -920,7 +920,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack, works in dcmoto -->
 	<software name="gp500ccb" cloneof="gp500cc" supported="no">
-		<description>Grand Prix 500cc (Alt 2)</description>
+		<description>Grand Prix 500cc (alt 2)</description>
 		<year>1986</year>
 		<publisher>Microïds</publisher>
 
@@ -944,7 +944,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="hmscobraa" cloneof="hmscobra">
-		<description>HMS Cobra - Convois pour Mourmansk (Alt)</description>
+		<description>HMS Cobra - Convois pour Mourmansk (alt)</description>
 		<year>1987</year>
 		<publisher>Cobrasoft</publisher>
 
@@ -968,7 +968,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="invasiona" cloneof="invasion">
-		<description>Invasion (Alt)</description>
+		<description>Invasion (alt)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
 
@@ -995,7 +995,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $41 loader hack -->
 	<software name="iznogouda" cloneof="iznogoud" supported="no">
-		<description>Iznogoud (Alt)</description>
+		<description>Iznogoud (alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -1009,7 +1009,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack -->
 	<software name="iznogoudb" cloneof="iznogoud" supported="no">
-		<description>Iznogoud (Alt 2)</description>
+		<description>Iznogoud (alt 2)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -1036,7 +1036,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $41 loader hack -->
 	<software name="karatea" cloneof="karate" supported="no">
-		<description>Karate (Alt)</description>
+		<description>Karate (alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -1064,7 +1064,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack, works in dcmoto -->
 	<software name="kyaa" cloneof="kya" supported="no">
-		<description>K.Y.A. - Keep Yourself Alive (Alt)</description>
+		<description>K.Y.A. - Keep Yourself Alive (alt)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
 		<info name="serial" value="L 548"/>
@@ -1078,7 +1078,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack, works in dcmoto -->
 	<software name="kyab" cloneof="kya" supported="no">
-		<description>K.Y.A. - Keep Yourself Alive (Alt 2)</description>
+		<description>K.Y.A. - Keep Yourself Alive (alt 2)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
 		<info name="serial" value="L 548"/>
@@ -1103,7 +1103,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="luckyluka" cloneof="luckyluk">
-		<description>Lucky Luke - Nitroglycerine (Alt)</description>
+		<description>Lucky Luke - Nitroglycerine (alt)</description>
 		<year>1987</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -1115,7 +1115,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="luckylukb" cloneof="luckyluk">
-		<description>Lucky Luke - Nitroglycerine (Alt 2)</description>
+		<description>Lucky Luke - Nitroglycerine (alt 2)</description>
 		<year>1987</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -1139,7 +1139,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="macadama" cloneof="macadam">
-		<description>Macadam Bumper (Alt)</description>
+		<description>Macadam Bumper (alt)</description>
 		<year>1989</year>
 		<publisher>ERE Informatique</publisher>
 
@@ -1151,7 +1151,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="macadamb" cloneof="macadam">
-		<description>Macadam Bumper (Alt 2)</description>
+		<description>Macadam Bumper (alt 2)</description>
 		<year>1989</year>
 		<publisher>ERE Informatique</publisher>
 
@@ -1178,7 +1178,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack -->
 	<software name="mach3a" cloneof="mach3" supported="no">
-		<description>Mach 3 (Alt)</description>
+		<description>Mach 3 (alt)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
 
@@ -1191,7 +1191,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack -->
 	<software name="mach3b" cloneof="mach3" supported="no">
-		<description>Mach 3 (Alt 2)</description>
+		<description>Mach 3 (alt 2)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
 
@@ -1204,7 +1204,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack -->
 	<software name="mach3c" cloneof="mach3" supported="no">
-		<description>Mach 3 (Alt 3)</description>
+		<description>Mach 3 (alt 3)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
 		<info name="notice" value="COPYRIGHT LORICIELS Décembre 1987"/>
@@ -1230,7 +1230,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="malefatla" cloneof="malefatl">
-		<description>Les Aventures du Ka 4 - Le Maléfice des Atlantes (Alt)</description>
+		<description>Les Aventures du Ka 4 - Le Maléfice des Atlantes (alt)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -1242,7 +1242,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="malefatlb" cloneof="malefatl">
-		<description>Les Aventures du Ka 4 - Le Maléfice des Atlantes (Alt 2)</description>
+		<description>Les Aventures du Ka 4 - Le Maléfice des Atlantes (alt 2)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -1268,7 +1268,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $41 loader hack -->
 	<software name="marchomba" cloneof="marchomb" supported="no">
-		<description>Marche à l'Ombre (Alt)</description>
+		<description>Marche à l'Ombre (alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -1282,7 +1282,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $41 loader hack -->
 	<software name="marchombb" cloneof="marchomb" supported="no">
-		<description>Marche à l'Ombre (Alt 2)</description>
+		<description>Marche à l'Ombre (alt 2)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -1296,7 +1296,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack -->
 	<software name="marchombc" cloneof="marchomb" supported="no">
-		<description>Marche à l'Ombre (Alt 3)</description>
+		<description>Marche à l'Ombre (alt 3)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -1321,7 +1321,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="menacarca" cloneof="menacarc">
-		<description>Les Aventures du Ka 6 - Menace sur l'Arctique (Alt)</description>
+		<description>Les Aventures du Ka 6 - Menace sur l'Arctique (alt)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -1333,7 +1333,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="menacarcb" cloneof="menacarc">
-		<description>Les Aventures du Ka 6 - Menace sur l'Arctique (Alt 2)</description>
+		<description>Les Aventures du Ka 6 - Menace sur l'Arctique (alt 2)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -1360,7 +1360,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack -->
 	<software name="mgta" cloneof="mgt" supported="no">
-		<description>M.G.T. (Alt)</description>
+		<description>M.G.T. (alt)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
 
@@ -1373,7 +1373,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack -->
 	<software name="mgtb" cloneof="mgt" supported="no">
-		<description>M.G.T. (Alt 2)</description>
+		<description>M.G.T. (alt 2)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
 
@@ -1386,7 +1386,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack -->
 	<software name="mgtc" cloneof="mgt" supported="no">
-		<description>M.G.T. (Alt 3)</description>
+		<description>M.G.T. (alt 3)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
 
@@ -1427,7 +1427,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack, works in dcmoto -->
 	<software name="missiona" cloneof="mission" supported="no">
-		<description>Mission (Alt)</description>
+		<description>Mission (alt)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
 		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1987"/>
@@ -1442,7 +1442,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack, works in dcmoto -->
 	<software name="missionb" cloneof="mission" supported="no">
-		<description>Mission (Alt 2)</description>
+		<description>Mission (alt 2)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
 		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1987"/>
@@ -1457,7 +1457,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack, works in dcmoto -->
 	<software name="missionc" cloneof="mission" supported="no">
-		<description>Mission (Alt 3)</description>
+		<description>Mission (alt 3)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
 		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1987"/>
@@ -1484,7 +1484,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="oxphara" cloneof="oxphar">
-		<description>Oxphar - La Pierre Bleue de Savanah (Alt)</description>
+		<description>Oxphar - La Pierre Bleue de Savanah (alt)</description>
 		<year>1987</year>
 		<publisher>ERE Informatique</publisher>
 		<info name="author" value="Pascal Bacoux"/>
@@ -1512,7 +1512,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack -->
 	<software name="passventa" cloneof="passvent" supported="no">
-		<description>Les Passagers du Vent (Alt)</description>
+		<description>Les Passagers du Vent (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -1526,7 +1526,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack -->
 	<software name="passventb" cloneof="passvent" supported="no">
-		<description>Les Passagers du Vent (Alt 2)</description>
+		<description>Les Passagers du Vent (alt 2)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -1553,7 +1553,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $41 loader hack -->
 	<software name="prohibita" cloneof="prohibit" supported="no">
-		<description>Prohibition (Alt)</description>
+		<description>Prohibition (alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -1567,7 +1567,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $41 loader hack -->
 	<software name="prohibitb" cloneof="prohibit" supported="no">
-		<description>Prohibition (Alt 2)</description>
+		<description>Prohibition (alt 2)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -1581,7 +1581,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack -->
 	<software name="prohibitc" cloneof="prohibit" supported="no">
-		<description>Prohibition (Alt 3)</description>
+		<description>Prohibition (alt 3)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -1608,7 +1608,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack, works in dcmoto -->
 	<software name="quada" cloneof="quad" supported="no">
-		<description>Quad (Alt)</description>
+		<description>Quad (alt)</description>
 		<year>1987</year>
 		<publisher>Microïds</publisher>
 
@@ -1621,7 +1621,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack, works in dcmoto -->
 	<software name="quadb" cloneof="quad" supported="no">
-		<description>Quad (Alt 2)</description>
+		<description>Quad (alt 2)</description>
 		<year>1987</year>
 		<publisher>Microïds</publisher>
 
@@ -1634,7 +1634,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack, works in dcmoto -->
 	<software name="quadc" cloneof="quad" supported="no">
-		<description>Quad (Alt 3)</description>
+		<description>Quad (alt 3)</description>
 		<year>1987</year>
 		<publisher>Microïds</publisher>
 
@@ -1674,7 +1674,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sservicea" cloneof="sservice">
-		<description>Silent Service (Alt)</description>
+		<description>Silent Service (alt)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 		<info name="serial" value="SS 1109"/>
@@ -1687,7 +1687,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sserviceb" cloneof="sservice">
-		<description>Silent Service (Alt 2)</description>
+		<description>Silent Service (alt 2)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 		<info name="serial" value="SS 1109"/>
@@ -1712,7 +1712,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="snakya" cloneof="snaky">
-		<description>Snaky (Alt)</description>
+		<description>Snaky (alt)</description>
 		<year>1990</year>
 		<publisher>Sylvain Echardour</publisher>
 
@@ -1724,7 +1724,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="snakyb" cloneof="snaky">
-		<description>Snaky (Alt 2)</description>
+		<description>Snaky (alt 2)</description>
 		<year>1990</year>
 		<publisher>Sylvain Echardour</publisher>
 
@@ -1751,7 +1751,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack -->
 	<software name="spaceraca" cloneof="spacerac" supported="no">
-		<description>Space Racer (Alt)</description>
+		<description>Space Racer (alt)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
 
@@ -1764,7 +1764,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack -->
 	<software name="spaceracb" cloneof="spacerac" supported="no">
-		<description>Space Racer (Alt 2)</description>
+		<description>Space Racer (alt 2)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
 
@@ -1777,7 +1777,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack -->
 	<software name="spaceracc" cloneof="spacerac" supported="no">
-		<description>Space Racer (Alt 3)</description>
+		<description>Space Racer (alt 3)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
 
@@ -1802,7 +1802,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack, works in dcmoto -->
 	<software name="superskia" cloneof="superski" supported="no">
-		<description>Super Ski (Alt)</description>
+		<description>Super Ski (alt)</description>
 		<year>1987</year>
 		<publisher>Microïds</publisher>
 
@@ -1815,7 +1815,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack, works in dcmoto -->
 	<software name="superskib" cloneof="superski" supported="no">
-		<description>Super Ski (Alt 2)</description>
+		<description>Super Ski (alt 2)</description>
 		<year>1987</year>
 		<publisher>Microïds</publisher>
 
@@ -1828,7 +1828,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack, works in dcmoto -->
 	<software name="superskic" cloneof="superski" supported="no">
-		<description>Super Ski (Alt 3)</description>
+		<description>Super Ski (alt 3)</description>
 		<year>1987</year>
 		<publisher>Microïds</publisher>
 
@@ -1867,7 +1867,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="traitbzza" cloneof="traitbzz">
-		<description>Les Aventures du Ka 5 - Traitement Bzzz (Alt)</description>
+		<description>Les Aventures du Ka 5 - Traitement Bzzz (alt)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -1879,7 +1879,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="traitbzzb" cloneof="traitbzz">
-		<description>Les Aventures du Ka 5 - Traitement Bzzz (Alt 2)</description>
+		<description>Les Aventures du Ka 5 - Traitement Bzzz (alt 2)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -1904,7 +1904,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack, works in dcmoto -->
 	<software name="turbocupa" cloneof="turbocup" supported="no">
-		<description>Turbo Cup (Alt)</description>
+		<description>Turbo Cup (alt)</description>
 		<year>1989</year>
 		<publisher>Loriciels</publisher>
 
@@ -1917,7 +1917,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $42 loader hack, works in dcmoto -->
 	<software name="turbocupb" cloneof="turbocup" supported="no">
-		<description>Turbo Cup (Alt 2)</description>
+		<description>Turbo Cup (alt 2)</description>
 		<year>1989</year>
 		<publisher>Loriciels</publisher>
 
@@ -1944,7 +1944,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $41 loader hack -->
 	<software name="mortdinoa" cloneof="mortdino" supported="no">
-		<description>Vie et Mort des Dinosaures (Alt)</description>
+		<description>Vie et Mort des Dinosaures (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>
@@ -1958,7 +1958,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- $11F1 loader hack -->
 	<software name="mortdinob" cloneof="mortdino" supported="no">
-		<description>Vie et Mort des Dinosaures (Alt 2)</description>
+		<description>Vie et Mort des Dinosaures (alt 2)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 		<info name="usage" value="Load with LOADM"/>

@@ -56,7 +56,7 @@ void specnext_copper_device::copper_en_w(u8 data)
 			break;
 		case 0b01:
 			LOGCTRL("RESET\n");
-			m_timer->adjust(m_in_until_pos_cb(0x0000));
+			m_timer->adjust(attotime::zero);
 			break;
 		case 0b10:
 			LOGCTRL("START\n");
@@ -79,31 +79,42 @@ void specnext_copper_device::data_w(u16 addr, u8 data)
 
 TIMER_CALLBACK_MEMBER(specnext_copper_device::timer_callback)
 {
-	if (m_copper_dout == 0)
-		m_copper_list_data = (m_listram[m_copper_list_addr << 1] << 8) | m_listram[(m_copper_list_addr << 1) | 1];
+	int times = 0;
+	do
+	{
+		if (m_copper_dout == 0)
+			m_copper_list_data = (m_listram[m_copper_list_addr << 1] << 8) | m_listram[(m_copper_list_addr << 1) | 1];
 
-	if (m_copper_dout == 1) // if we are on MOVE, clear the output for the next cycle
-	{
-		LOGEXEC("MOVE(%02x, %02x)\n", (m_copper_list_data >> 8) & 0x7f, m_copper_list_data & 0xff);
-		m_out_nextreg_cb((m_copper_list_data >> 8) & 0x7f, m_copper_list_data & 0xff);
-		m_copper_dout = 0;
-	}
-	else if (BIT(m_copper_list_data, 15) == 1)  // command WAIT
-	{
-		m_timer->adjust(m_in_until_pos_cb(0x8000 | m_copper_list_data));
-		++m_copper_list_addr;
-		m_copper_dout = 0;
-		return;
-	}
-	else // command MOVE
-	{
-		if (BIT(m_copper_list_data, 8, 7) != 0) // dont generate the write pulse if its a NOP (MOVE 0,0)
-			m_copper_dout = 1;
-		++m_copper_list_addr;
-	};
+		if (m_copper_dout == 1) // if we are on MOVE, clear the output for the next cycle
+		{
+			LOGEXEC("MOVE(%02x, %02x)\n", (m_copper_list_data >> 8) & 0x7f, m_copper_list_data & 0xff);
+			m_out_nextreg_cb((m_copper_list_data >> 8) & 0x7f, m_copper_list_data & 0xff);
+			m_copper_dout = 0;
+		}
+		else if (BIT(m_copper_list_data, 15) == 1)  // command WAIT
+		{
+			m_timer->adjust(m_in_until_pos_cb(0x8000 | m_copper_list_data));
+			++m_copper_list_addr;
+			m_copper_dout = 0;
+			return;
+		}
+		else // command MOVE
+		{
+			if (BIT(m_copper_list_data, 8, 7) != 0) // dont generate the write pulse if its a NOP (MOVE 0,0)
+				m_copper_dout = 1;
+			++m_copper_list_addr;
+		};
+
+		/* This loop has been added for performance reasons.
+		m_copper_dout, m_copper_list_data and m_copper_list_addr are set to the future value.
+		Ideally they must be recalculated if data_w() happens. However, in practice racing
+		with the copper's counter is unreasonable, so we can avoid that complexity till required.
+		*/
+		++times;
+	} while (m_copper_dout == 0 && m_copper_list_addr < 0x400);
 
 	m_copper_list_addr %= 0x400;
-	m_timer->adjust(attotime::from_hz(clock()));
+	m_timer->adjust(clocks_to_attotime(times));
 }
 
 TIMER_CALLBACK_MEMBER(specnext_copper_device::frame_timer_callback)

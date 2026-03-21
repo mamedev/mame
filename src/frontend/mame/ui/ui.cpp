@@ -266,6 +266,7 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_showfps_end(0)
 	, m_show_profiler(false)
 	, m_popup_text_end(0)
+	, m_last_frame_update(0)
 	, m_mouse_bitmap(32, 32)
 	, m_mouse_arrow_texture(nullptr)
 	, m_pointers_changed(false)
@@ -339,7 +340,7 @@ void mame_ui_manager::update_target_font_height()
 
 
 //-------------------------------------------------
-//  exit - called for each emulated frame
+//  frame_update - called for each emulated frame
 //-------------------------------------------------
 
 void mame_ui_manager::frame_update()
@@ -354,6 +355,8 @@ void mame_ui_manager::frame_update()
 				target->update_pointer_fields();
 		}
 	}
+
+	m_last_frame_update = osd_ticks();
 }
 
 
@@ -834,7 +837,13 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 
 			// loop while we have a handler
 			while (m_handler_callback_type == ui_callback_type::MODAL && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(*this))
-				machine().video().frame_update();
+			{
+				// don't update more than 60 times per second
+				if ((osd_ticks() - m_last_frame_update) > (osd_ticks_per_second() / screen_device::DEFAULT_FRAME_RATE))
+					machine().video().frame_update();
+				else
+					osd_sleep(osd_ticks_per_second() / 1000);
+			}
 		}
 
 		// clear the handler and force an update
@@ -857,7 +866,13 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 
 		// loop while we have a handler
 		while (m_handler_callback_type != ui_callback_type::GENERAL && !machine().scheduled_event_pending())
-			machine().video().frame_update();
+		{
+			// don't update more than 60 times per second
+			if ((osd_ticks() - m_last_frame_update) > (osd_ticks_per_second() / screen_device::DEFAULT_FRAME_RATE))
+				machine().video().frame_update();
+			else
+				osd_sleep(osd_ticks_per_second() / 1000);
+		}
 	}
 }
 
@@ -869,18 +884,12 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 
 void mame_ui_manager::set_startup_text(const char *text, bool force)
 {
-	static osd_ticks_t lastupdatetime = 0;
-	osd_ticks_t curtime = osd_ticks();
-
 	// copy in the new text
 	messagebox_text.assign(text);
 
-	// don't update more than 4 times/second
-	if (force || (curtime - lastupdatetime) > osd_ticks_per_second() / 4)
-	{
-		lastupdatetime = curtime;
+	// don't update more than 10 times per second
+	if (force || (osd_ticks() - m_last_frame_update) > (osd_ticks_per_second() / 10))
 		machine().video().frame_update();
-	}
 }
 
 
@@ -1744,22 +1753,17 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	if (machine().ui_input().pressed(IPT_UI_SHOW_FPS))
 		set_show_fps(!show_fps());
 
-	// increment frameskip?
+	// increment frameskip
 	if (machine().ui_input().pressed(IPT_UI_FRAMESKIP_INC))
 		increase_frameskip();
 
-	// decrement frameskip?
+	// decrement frameskip
 	if (machine().ui_input().pressed(IPT_UI_FRAMESKIP_DEC))
 		decrease_frameskip();
 
-	// toggle throttle?
+	// toggle throttle
 	if (machine().ui_input().pressed(IPT_UI_THROTTLE))
-	{
-		const bool new_throttle_state = !machine().video().throttled();
-		machine().video().set_throttled(new_throttle_state);
-		if (m_unthrottle_mute)
-			machine().sound().ui_mute(!new_throttle_state);
-	}
+		machine().video().set_throttled(!machine().video().throttled());
 
 	// check for fast forward
 	if (machine().ioport().type_pressed(IPT_UI_FAST_FORWARD))
@@ -1769,6 +1773,10 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	}
 	else
 		machine().video().set_fastforward(false);
+
+	// update mute when unthrottled
+	if (m_unthrottle_mute)
+		machine().sound().ui_mute(machine().video().fastforward() || !machine().video().throttled());
 
 	return 0;
 }

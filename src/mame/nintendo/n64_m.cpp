@@ -30,6 +30,8 @@ n64_periphs::n64_periphs(const machine_config &mconfig, const char *tag, device_
 	, m_rsp(*this, "^rsp")
 	, m_rsp_imem(*this, "^rsp_imem")
 	, m_rsp_dmem(*this, "^rsp_dmem")
+	, m_sram(*this, finder_base::DUMMY_TAG)
+	, m_rdram(*this, finder_base::DUMMY_TAG)
 	, ai_dac(*this, "^dac%u", 1U)
 {
 	for (int32_t i = 0; i < 256; i++)
@@ -128,7 +130,6 @@ void n64_periphs::device_start()
 	vi_scanline_timer = timer_alloc(FUNC(n64_periphs::vi_scanline_callback), this);
 	dp_delay_timer = timer_alloc(FUNC(n64_periphs::dp_delay_callback), this);
 	reset_timer = timer_alloc(FUNC(n64_periphs::reset_timer_callback), this);
-	m_n64 = machine().driver_data<n64_state>();
 }
 
 void n64_periphs::device_reset()
@@ -136,9 +137,6 @@ void n64_periphs::device_reset()
 	uint32_t *cart = (uint32_t*)machine().root_device().memregion("user2")->base();
 
 	m_mem_map = &m_vr4300->space(AS_PROGRAM);
-
-	m_rdram = m_n64->rdram();
-	m_sram = m_n64->sram();
 
 	mi_version = 0x01010101;
 	mi_interrupt = 0;
@@ -683,13 +681,13 @@ uint32_t n64_periphs::sp_reg_r(offs_t offset)
 			break;
 
 		case 0x20/4:        // DP_CMD_START
-			return m_n64->rdp()->get_start();
+			return m_rdp->get_start();
 
 		case 0x24/4:        // DP_CMD_END
-			return m_n64->rdp()->get_end();
+			return m_rdp->get_end();
 
 		case 0x28/4:        // DP_CMD_CURRENT
-			return m_n64->rdp()->get_current();
+			return m_rdp->get_current();
 
 		case 0x34/4:        // DP_CMD_BUSY
 		case 0x38/4:        // DP_CMD_PIPE_BUSY
@@ -697,10 +695,10 @@ uint32_t n64_periphs::sp_reg_r(offs_t offset)
 			return 0;
 
 		case 0x2c/4:        // DP_CMD_STATUS
-			return m_n64->rdp()->get_status();
+			return m_rdp->get_status();
 
 		case 0x30/4:        // DP_CMD_CLOCK
-			if(!(m_n64->rdp()->get_status() & DP_STATUS_FREEZE))
+			if(!(m_rdp->get_status() & DP_STATUS_FREEZE))
 			{
 				dp_clock += 13;
 				return dp_clock;
@@ -916,19 +914,19 @@ uint32_t n64_periphs::dp_reg_r(offs_t offset, uint32_t mem_mask)
 	switch (offset)
 	{
 		case 0x00/4:        // DP_START_REG
-			return m_n64->rdp()->get_start();
+			return m_rdp->get_start();
 
 		case 0x04/4:        // DP_END_REG
-			return m_n64->rdp()->get_end();
+			return m_rdp->get_end();
 
 		case 0x08/4:        // DP_CURRENT_REG
-			return m_n64->rdp()->get_current();
+			return m_rdp->get_current();
 
 		case 0x0c/4:        // DP_STATUS_REG
-			return m_n64->rdp()->get_status();
+			return m_rdp->get_status();
 
 		case 0x10/4:        // DP_CLOCK_REG
-			if(!(m_n64->rdp()->get_status() & DP_STATUS_FREEZE))
+			if(!(m_rdp->get_status() & DP_STATUS_FREEZE))
 			{
 				dp_clock += 13;
 				return dp_clock;
@@ -945,7 +943,7 @@ uint32_t n64_periphs::dp_reg_r(offs_t offset, uint32_t mem_mask)
 
 void n64_periphs::dp_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	uint32_t status = m_n64->rdp()->get_status();
+	uint32_t status = m_rdp->get_status();
 
 	switch (offset)
 	{
@@ -956,32 +954,32 @@ void n64_periphs::dp_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			else
 			{
-				m_n64->rdp()->set_status(status | DP_STATUS_START_VALID);
-				m_n64->rdp()->set_start(data & ~7);
+				m_rdp->set_status(status | DP_STATUS_START_VALID);
+				m_rdp->set_start(data & ~7);
 			}
 			break;
 
 		case 0x04/4:        // DP_END_REG
 			if(status & DP_STATUS_START_VALID)
 			{
-				m_n64->rdp()->set_status(status & ~DP_STATUS_START_VALID);
-				m_n64->rdp()->set_current(m_n64->rdp()->get_start());
-				m_n64->rdp()->set_end(data & ~7);
+				m_rdp->set_status(status & ~DP_STATUS_START_VALID);
+				m_rdp->set_current(m_rdp->get_start());
+				m_rdp->set_end(data & ~7);
 				auto profile = g_profiler.start(PROFILER_USER1);
-				m_n64->rdp()->process_command_list();
+				m_rdp->process_command_list();
 				break;
 			}
 			else
 			{
-				m_n64->rdp()->set_end(data & ~7);
+				m_rdp->set_end(data & ~7);
 				auto profile = g_profiler.start(PROFILER_USER1);
-				m_n64->rdp()->process_command_list();
+				m_rdp->process_command_list();
 				break;
 			}
 
 		case 0x0c/4:        // DP_STATUS_REG
 		{
-			uint32_t current_status = m_n64->rdp()->get_status();
+			uint32_t current_status = m_rdp->get_status();
 			if (data & 0x00000001)  current_status &= ~DP_STATUS_XBUS_DMA;
 			if (data & 0x00000002)  current_status |= DP_STATUS_XBUS_DMA;
 			if (data & 0x00000004)  current_status &= ~DP_STATUS_FREEZE;
@@ -989,7 +987,7 @@ void n64_periphs::dp_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			if (data & 0x00000010)  current_status &= ~DP_STATUS_FLUSH;
 			if (data & 0x00000020)  current_status |= DP_STATUS_FLUSH;
 			if (data & 0x00000200)  dp_clock = 0;
-			m_n64->rdp()->set_status(current_status);
+			m_rdp->set_status(current_status);
 			break;
 		}
 
@@ -1271,7 +1269,7 @@ n64_periphs::AUDIO_DMA *n64_periphs::ai_fifo_get_top()
 
 void n64_periphs::ai_dma()
 {
-	int16_t *ram = (int16_t*)m_rdram;
+	int16_t *ram = (int16_t*)&m_rdram[0];
 	AUDIO_DMA *current = ai_fifo_get_top();
 	attotime period;
 
@@ -1418,7 +1416,7 @@ void n64_periphs::pi_dma_tick()
 {
 	bool update_bm = false;
 	uint16_t *cart16;
-	uint16_t *dram16 = (uint16_t*)m_rdram;
+	uint16_t *dram16 = (uint16_t*)&m_rdram[0];
 
 	uint32_t cart_addr = (pi_cart_addr & 0x0fffffff) >> 1;
 	uint32_t dram_addr = (pi_dram_addr & 0x007fffff) >> 1;
@@ -1437,7 +1435,7 @@ void n64_periphs::pi_dma_tick()
 	}
 	else if((cart_addr & 0x04000000) == 0x04000000)
 	{
-		cart16 = (uint16_t*)m_sram;
+		cart16 = (uint16_t*)&m_sram[0];
 		cart_addr = (pi_cart_addr & 0x0001ffff) >> 1;
 	}
 	else if((cart_addr & 0x03000000) == 0x03000000 && dd_present)

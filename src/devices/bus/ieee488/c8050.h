@@ -32,18 +32,6 @@ public:
 	// construction/destruction
 	c8050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t dio_r();
-	void dio_w(uint8_t data);
-	uint8_t riot1_pa_r();
-	void riot1_pa_w(uint8_t data);
-	uint8_t riot1_pb_r();
-	void riot1_pb_w(uint8_t data);
-	void via_pb_w(uint8_t data);
-
-	void c8050_fdc_mem(address_map &map) ATTR_COLD;
-	void c8050_main_mem(address_map &map) ATTR_COLD;
-	void c8250lp_fdc_mem(address_map &map) ATTR_COLD;
-	void sfd1001_fdc_mem(address_map &map) ATTR_COLD;
 protected:
 	c8050_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -63,6 +51,14 @@ protected:
 	void add_common_devices(machine_config &config);
 	inline void update_ieee_signals();
 
+	uint8_t dio_r() { return m_bus->dio_r(); };
+	void dio_w(uint8_t data) { m_bus->dio_w(this, data); };
+	uint8_t riot1_pa_r();
+	void riot1_pa_w(uint8_t data);
+	uint8_t riot1_pb_r();
+	void riot1_pb_w(uint8_t data);
+	void via_pb_w(uint8_t data);
+
 	required_device<m6502_device> m_maincpu;
 	required_device<m6504_device> m_fdccpu;
 	required_device<mos6532_device> m_riot0;
@@ -74,6 +70,11 @@ protected:
 	required_device<c8050_fdc_device> m_fdc;
 	required_ioport m_address;
 	output_finder<4> m_leds;
+
+	void c8050_fdc_mem(address_map &map) ATTR_COLD;
+	void c8050_main_mem(address_map &map) ATTR_COLD;
+	void c8250lp_fdc_mem(address_map &map) ATTR_COLD;
+	void sfd1001_fdc_mem(address_map &map) ATTR_COLD;
 
 	// IEEE-488 bus
 	int m_rfdo;                         // not ready for data output

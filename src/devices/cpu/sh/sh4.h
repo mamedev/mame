@@ -155,8 +155,6 @@ struct sh4_utlb
 
 typedef void (*sh4_ftcsr_callback)(uint32_t);
 
-class sh4_frontend;
-
 class sh34_base_device : public sh_common_execution
 {
 public:
@@ -250,6 +248,8 @@ public:
 	void func_STCSPC();
 
 protected:
+	class sh4_frontend;
+
 	// construction/destruction
 	sh34_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal);
 
@@ -677,14 +677,14 @@ protected:
 	virtual void static_generate_entry_point() override;
 	virtual void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle *&handleptr) override;
 
-private:
 	bool            m_bigendian;
 };
 
 
 class sh3_base_device : public sh34_base_device
 {
-	friend class sh4_frontend;
+public:
+	virtual ~sh3_base_device();
 
 protected:
 	// construction/destruction
@@ -1234,9 +1234,10 @@ protected:
 
 class sh4_base_device : public sh34_base_device
 {
-protected:
-	friend class sh4_frontend;
+public:
+	virtual ~sh4_base_device();
 
+protected:
 	// construction/destruction
 	sh4_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
 
@@ -1900,15 +1901,6 @@ public:
 	virtual void sh3_register_map(address_map& map) override ATTR_COLD;
 };
 
-class sh7709s_device : public sh3_base_device
-{
-public:
-	sh7709s_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock, endianness_t endianness = ENDIANNESS_LITTLE);
-
-	virtual void sh3_register_map(address_map& map) override ATTR_COLD;
-};
-
-
 class sh4_device : public sh4_base_device
 {
 public:
@@ -1972,32 +1964,17 @@ protected:
 	virtual void sh4_register_map(address_map& map) override ATTR_COLD;
 };
 
-class sh4_frontend : public sh_frontend
-{
-public:
-	sh4_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
 
-protected:
-	virtual uint16_t read_word(opcode_desc &desc) override;
-
-private:
-	virtual bool describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
-	virtual bool describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
-	virtual bool describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
-	bool describe_op1111_0x13(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_op1111_0xf13(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-};
-
-DECLARE_DEVICE_TYPE(SH3, sh3_device)
+DECLARE_DEVICE_TYPE(SH3,     sh3_device)
 DECLARE_DEVICE_TYPE(SH7708S, sh7708s_device)
-DECLARE_DEVICE_TYPE(SH7709, sh7709_device)
-DECLARE_DEVICE_TYPE(SH7709S, sh7709s_device)
-DECLARE_DEVICE_TYPE(SH4, sh4_device)
-DECLARE_DEVICE_TYPE(SH7091, sh7091_device)
-DECLARE_DEVICE_TYPE(SH7750, sh7750_device)
+DECLARE_DEVICE_TYPE(SH7709,  sh7709_device)
+
+DECLARE_DEVICE_TYPE(SH4,     sh4_device)
+DECLARE_DEVICE_TYPE(SH7091,  sh7091_device)
+DECLARE_DEVICE_TYPE(SH7750,  sh7750_device)
 DECLARE_DEVICE_TYPE(SH7750R, sh7750r_device)
 DECLARE_DEVICE_TYPE(SH7750S, sh7750s_device)
-DECLARE_DEVICE_TYPE(SH7751, sh7751_device)
+DECLARE_DEVICE_TYPE(SH7751,  sh7751_device)
 DECLARE_DEVICE_TYPE(SH7751R, sh7751r_device)
 
 #endif // MAME_CPU_SH_SH4_H

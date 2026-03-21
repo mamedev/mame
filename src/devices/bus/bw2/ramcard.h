@@ -12,6 +12,7 @@
 #pragma once
 
 #include "exp.h"
+#include "machine/ram.h"
 
 
 
@@ -37,16 +38,20 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// device_bw2_expansion_slot_interface overrides
-	virtual uint8_t bw2_cd_r(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6) override;
-	virtual void bw2_cd_w(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6) override;
-	virtual void bw2_slot_w(offs_t offset, uint8_t data) override;
+	virtual void ram_select() override;
+	virtual void slot_w(offs_t offset, uint8_t data) override;
 
 private:
 	required_memory_region m_rom;
-	memory_share_creator<uint8_t> m_ram;
+	memory_passthrough_handler m_rom_tap;
 
-	int m_en;
-	uint8_t m_bank;
+	memory_share_creator<uint8_t> m_ram;
+	memory_passthrough_handler m_ram_tap;
+
+	void tap();
+
+	bool m_en;
+	int m_bank;
 };
 
 

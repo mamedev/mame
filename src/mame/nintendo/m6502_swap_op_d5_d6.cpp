@@ -27,19 +27,19 @@ m6502_swap_op_d5_d6::m6502_swap_op_d5_d6(const machine_config &mconfig, const ch
 
 void m6502_swap_op_d5_d6::device_start()
 {
-	mintf = std::make_unique<mi_decrypt>();
+	m_mintf = std::make_unique<mi_decrypt>();
 	init();
 }
 
 void m6502_swap_op_d5_d6::device_reset()
 {
-	downcast<mi_decrypt &>(*mintf).m_encryption_enabled = true;
+	downcast<mi_decrypt &>(*m_mintf).m_encryption_enabled = true;
 	m6502_device::device_reset();
 }
 
 void m6502_swap_op_d5_d6::set_encryption_state(bool state)
 {
-	downcast<mi_decrypt &>(*mintf).m_encryption_enabled = state;
+	downcast<mi_decrypt &>(*m_mintf).m_encryption_enabled = state;
 }
 
 uint8_t m6502_swap_op_d5_d6::mi_decrypt::descramble(uint8_t op)
@@ -52,7 +52,7 @@ uint8_t m6502_swap_op_d5_d6::mi_decrypt::descramble(uint8_t op)
 
 uint8_t m6502_swap_op_d5_d6::mi_decrypt::read_sync(uint16_t adr)
 {
-	uint8_t res = cprogram.read_byte(adr);
+	uint8_t res = m_cprogram.read_byte(adr);
 
 	res = descramble(res);
 
@@ -61,10 +61,10 @@ uint8_t m6502_swap_op_d5_d6::mi_decrypt::read_sync(uint16_t adr)
 
 std::unique_ptr<util::disasm_interface> m6502_swap_op_d5_d6::create_disassembler()
 {
-	return std::make_unique<disassembler>(downcast<mi_decrypt *>(mintf.get()));
+	return std::make_unique<disassembler>(downcast<mi_decrypt *>(m_mintf.get()));
 }
 
-m6502_swap_op_d5_d6::disassembler::disassembler(mi_decrypt *mi) : mintf(mi)
+m6502_swap_op_d5_d6::disassembler::disassembler(mi_decrypt *mi) : m_mintf(mi)
 {
 }
 
@@ -75,7 +75,7 @@ u32 m6502_swap_op_d5_d6::disassembler::interface_flags() const
 
 u8 m6502_swap_op_d5_d6::disassembler::decrypt8(u8 value, offs_t pc, bool opcode) const
 {
-	return opcode ? mintf->descramble(value) : value;
+	return opcode ? m_mintf->descramble(value) : value;
 }
 
 
@@ -91,21 +91,21 @@ rp2a03_core_swap_op_d5_d6::rp2a03_core_swap_op_d5_d6(const machine_config &mconf
 
 void rp2a03_core_swap_op_d5_d6::device_start()
 {
-	mintf = std::make_unique<mi_decrypt>();
+	m_mintf = std::make_unique<mi_decrypt>();
 	init();
-	save_item(downcast<mi_decrypt &>(*mintf).m_encryption_enabled, "m_encryption_enabled");
+	save_item(downcast<mi_decrypt &>(*m_mintf).m_encryption_enabled, "m_encryption_enabled");
 }
 
 void rp2a03_core_swap_op_d5_d6::device_reset()
 {
-	downcast<mi_decrypt &>(*mintf).m_encryption_enabled = m_encryption_enabled_on_reset;
-	downcast<mi_decrypt &>(*mintf).m_whichcrypt = m_cryptconfig;
+	downcast<mi_decrypt &>(*m_mintf).m_encryption_enabled = m_encryption_enabled_on_reset;
+	downcast<mi_decrypt &>(*m_mintf).m_whichcrypt = m_cryptconfig;
 	rp2a03_core_device::device_reset();
 }
 
 void rp2a03_core_swap_op_d5_d6::set_encryption_state(bool state)
 {
-	downcast<mi_decrypt &>(*mintf).m_encryption_enabled = state;
+	downcast<mi_decrypt &>(*m_mintf).m_encryption_enabled = state;
 }
 
 uint8_t rp2a03_core_swap_op_d5_d6::mi_decrypt::descramble(uint8_t op)
@@ -127,7 +127,7 @@ uint8_t rp2a03_core_swap_op_d5_d6::mi_decrypt::descramble(uint8_t op)
 
 uint8_t rp2a03_core_swap_op_d5_d6::mi_decrypt::read_sync(uint16_t adr)
 {
-	uint8_t res = cprogram.read_byte(adr);
+	uint8_t res = m_cprogram.read_byte(adr);
 
 	res = descramble(res);
 
@@ -136,10 +136,10 @@ uint8_t rp2a03_core_swap_op_d5_d6::mi_decrypt::read_sync(uint16_t adr)
 
 std::unique_ptr<util::disasm_interface> rp2a03_core_swap_op_d5_d6::create_disassembler()
 {
-	return std::make_unique<disassembler>(downcast<mi_decrypt *>(mintf.get()));
+	return std::make_unique<disassembler>(downcast<mi_decrypt *>(m_mintf.get()));
 }
 
-rp2a03_core_swap_op_d5_d6::disassembler::disassembler(mi_decrypt *mi) : mintf(mi)
+rp2a03_core_swap_op_d5_d6::disassembler::disassembler(mi_decrypt *mi) : m_mintf(mi)
 {
 }
 
@@ -150,6 +150,6 @@ u32 rp2a03_core_swap_op_d5_d6::disassembler::interface_flags() const
 
 u8 rp2a03_core_swap_op_d5_d6::disassembler::decrypt8(u8 value, offs_t pc, bool opcode) const
 {
-	return opcode ? mintf->descramble(value) : value;
+	return opcode ? m_mintf->descramble(value) : value;
 }
 

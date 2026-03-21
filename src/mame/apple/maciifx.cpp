@@ -142,7 +142,7 @@ void maciifx_state::machine_start()
 	m_6015_timer = timer_alloc(FUNC(maciifx_state::oss_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
 
-	m_rom_ptr = (u32 *)memregion("bootrom")->base();
+	m_rom_ptr = &memregion("bootrom")->as_u32();
 	m_rom_size = memregion("bootrom")->bytes();
 
 	m_last_taken_interrupt = -1;

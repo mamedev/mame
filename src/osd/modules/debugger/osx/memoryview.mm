@@ -150,7 +150,9 @@
 	for (auto &ptr : view->source_list())
 	{
 		debug_view_memory_source const *const source = downcast<debug_view_memory_source const *>(ptr.get());
-		if (source->space() == space)
+		auto const [mintf, spacenum] = source->space();
+		assert(!mintf || ((0 <= spacenum) && mintf->has_space(spacenum)));
+		if (mintf && (&mintf->space(spacenum) == space))
 		{
 			if (view->source() != source)
 			{

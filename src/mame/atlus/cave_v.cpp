@@ -679,10 +679,10 @@ void cave_state::do_blit_zoom32(int chip, const sprite_cave *sprite)
 	}
 
 	{
-		const u8 *pen_data = sprite->pen_data -1 -sprite->line_offset;
+		const u8 *pen_data = sprite->pen_data - 1 - sprite->line_offset;
 		const pen_t base_pen = sprite->base_pen;
-		const int pitch = m_blit.line_offset * dy / 4;
-		u32 *dest = (u32 *)(m_blit.baseaddr + m_blit.line_offset * y1);
+		const int pitch = m_blit.line_offset * dy;
+		u32 *dest = m_blit.baseaddr + (m_blit.line_offset * y1);
 		int ycount = ycount0;
 
 		for (int y = y1; y != y2; y += dy)
@@ -805,11 +805,11 @@ void cave_state::do_blit_zoom32_zb(int chip, const sprite_cave *sprite)
 	{
 		const u8 *pen_data = sprite->pen_data - 1 - sprite->line_offset;
 		const pen_t base_pen = sprite->base_pen;
-		const int pitch = m_blit.line_offset * dy / 4;
-		u32 *dest = (u32 *)(m_blit.baseaddr + m_blit.line_offset * y1);
-		const int pitchz = m_blit.line_offset_zbuf * dy / 2;
-		u16 *zbf = (u16 *)(m_blit.baseaddr_zbuf + m_blit.line_offset_zbuf * y1);
-		const u16 pri_sp = (u16)(sprite - m_sprite[chip].get()) + m_sprite_zbuf_baseval;
+		const int pitch = m_blit.line_offset * dy;
+		u32 *dest = m_blit.baseaddr + (m_blit.line_offset * y1);
+		const int pitchz = m_blit.line_offset_zbuf * dy;
+		u16 *zbf = m_blit.baseaddr_zbuf + (m_blit.line_offset_zbuf * y1);
+		const u16 pri_sp = u16(sprite - m_sprite[chip].get()) + m_sprite_zbuf_baseval;
 		int ycount = ycount0;
 
 		for (int y = y1; y != y2; y += dy)
@@ -915,8 +915,8 @@ void cave_state::do_blit_32(int chip, const sprite_cave *sprite)
 	{
 		const u8 *pen_data = sprite->pen_data;
 		const pen_t base_pen = sprite->base_pen;
-		const int pitch = m_blit.line_offset * dy / 4;
-		u32 *dest = (u32 *)(m_blit.baseaddr + m_blit.line_offset * y1);
+		const int pitch = m_blit.line_offset * dy;
+		u32 *dest = m_blit.baseaddr + (m_blit.line_offset * y1);
 
 		pen_data += sprite->line_offset * ycount0 + xcount0;
 		for (int y = y1; y != y2; y += dy)
@@ -1008,11 +1008,11 @@ void cave_state::do_blit_32_zb(int chip, const sprite_cave *sprite)
 	{
 		const u8 *pen_data = sprite->pen_data;
 		const pen_t base_pen = sprite->base_pen;
-		const int pitch = m_blit.line_offset * dy / 4;
-		u32 *dest = (u32 *)(m_blit.baseaddr + m_blit.line_offset * y1);
-		const int pitchz = m_blit.line_offset_zbuf * dy / 2;
-		u16 *zbf = (u16 *)(m_blit.baseaddr_zbuf + m_blit.line_offset_zbuf * y1);
-		const u16 pri_sp = (u16)(sprite - m_sprite[chip].get()) + m_sprite_zbuf_baseval;
+		const int pitch = m_blit.line_offset * dy;
+		u32 *dest = m_blit.baseaddr + (m_blit.line_offset * y1);
+		const int pitchz = m_blit.line_offset_zbuf * dy;
+		u16 *zbf = m_blit.baseaddr_zbuf + (m_blit.line_offset_zbuf * y1);
+		const u16 pri_sp = u16(sprite - m_sprite[chip].get()) + m_sprite_zbuf_baseval;
 
 		pen_data += sprite->line_offset * ycount0 + xcount0;
 		for (int y = y1; y != y2; y += dy)
@@ -1268,10 +1268,10 @@ u32 cave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 {
 	int layers_ctrl = -1;
 
-	m_blit.baseaddr = reinterpret_cast<u8 *>(bitmap.raw_pixptr(0));
-	m_blit.line_offset = bitmap.rowbytes();
-	m_blit.baseaddr_zbuf = reinterpret_cast<u8 *>(m_sprite_zbuf[0].raw_pixptr(0));
-	m_blit.line_offset_zbuf = m_sprite_zbuf[0].rowbytes();
+	m_blit.baseaddr = &bitmap.pix(0);
+	m_blit.line_offset = bitmap.rowbytes() >> 2;
+	m_blit.baseaddr_zbuf = &m_sprite_zbuf[0].pix(0);
+	m_blit.line_offset_zbuf = m_sprite_zbuf[0].rowbytes() >> 1;
 
 	for (int GFX = 0; GFX < 4; GFX++)
 	{
@@ -1407,10 +1407,10 @@ void cave_state::device_post_load()
 
 u32 ppsatan_state::screen_update_ppsatan_core(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int chip)
 {
-	m_blit.baseaddr = reinterpret_cast<u8 *>(bitmap.raw_pixptr(0));
-	m_blit.line_offset = bitmap.rowbytes();
-	m_blit.baseaddr_zbuf = reinterpret_cast<u8 *>(m_sprite_zbuf[chip].raw_pixptr(0));
-	m_blit.line_offset_zbuf = m_sprite_zbuf[chip].rowbytes();
+	m_blit.baseaddr = &bitmap.pix(0);
+	m_blit.line_offset = bitmap.rowbytes() >> 2;
+	m_blit.baseaddr_zbuf = &m_sprite_zbuf[chip].pix(0);
+	m_blit.line_offset_zbuf = m_sprite_zbuf[chip].rowbytes() >> 1;
 
 	m_tilemap[chip]->prepare();
 

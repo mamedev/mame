@@ -42,8 +42,9 @@ device_memory_interface::space_config_vector upd931_device::memory_space_config(
 /**************************************************************************/
 void upd931_device::io_map(address_map &map)
 {
-	map(0x20, 0x27).w(FUNC(upd931_device::note_w));
-	map(0x30, 0x37).w(FUNC(upd931_device::octave_w));
+	// voice note and octave: dg10/dg20 uses 0x/1x, others use 2x/3x
+	map(0x00, 0x07).mirror(0x20).w(FUNC(upd931_device::note_w));
+	map(0x10, 0x17).mirror(0x20).w(FUNC(upd931_device::octave_w));
 	// waveform write position: ct8000 uses 40, mt65 uses 60
 	map(0x40, 0x40).mirror(0x20).w(FUNC(upd931_device::wave_pos_w));
 	map(0xa7, 0xa7).w(FUNC(upd931_device::wave_data_w));
@@ -261,7 +262,33 @@ void upd931_device::note_w(offs_t offset, u8 data)
 /**************************************************************************/
 void upd931_device::octave_w(offs_t offset, u8 data)
 {
-	m_voice[offset].m_octave = m_data;
+	voice_t &voice = m_voice[offset];
+	voice.m_octave = m_data;
+
+	if (voice.m_note >= 0x2 && voice.m_note <= 0xe)
+	{
+		const u8 note = voice.m_note - 2;
+		u8 octave = voice.m_octave & 7;
+
+		if (octave >= 2)
+			octave -= 2; // octave values 0-1 are the same as 2-3
+
+		/*
+		setting bit 3 of the octave reduces the duty cycle of individual notes, which is
+		implemented here by changing which part of the phase counter to use as the sample address.
+		ct8000 uses this for a few of its presets to produce a simple key-scaling effect.
+		*/
+		if (BIT(voice.m_octave, 3))
+			voice.m_timbre_shift = 3 - octave;
+		else
+			voice.m_timbre_shift = 0;
+
+		voice.m_pitch = m_pitch[octave * 12 + note];
+	}
+	else
+	{
+		voice.m_pitch = 0;
+	}
 }
 
 /**************************************************************************/
@@ -325,31 +352,6 @@ void upd931_device::note_on_w(offs_t offset, u8 data)
 /**************************************************************************/
 void upd931_device::note_on(voice_t &voice)
 {
-	if (voice.m_note >= 0x2 && voice.m_note <= 0xe)
-	{
-		const u8 note = voice.m_note - 2;
-		u8 octave = voice.m_octave & 7;
-
-		if (octave >= 2)
-			octave -= 2; // octave values 0-1 are the same as 2-3
-
-		/*
-		setting bit 3 of the octave reduces the duty cycle of individual notes, which is
-		implemented here by changing which part of the phase counter to use as the sample address.
-		ct8000 uses this for a few of its presets to produce a simple key-scaling effect.
-		*/
-		if (BIT(voice.m_octave, 3))
-			voice.m_timbre_shift = 3 - octave;
-		else
-			voice.m_timbre_shift = 0;
-
-		voice.m_pitch = m_pitch[octave * 12 + note];
-	}
-	else
-	{
-		voice.m_pitch = 0;
-	}
-
 	voice.m_pitch_counter = 0;
 	voice.m_wave_pos = 0xff;
 	voice.m_wave_out[0] = voice.m_wave_out[1] = 0;

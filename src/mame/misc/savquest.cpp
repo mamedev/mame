@@ -79,7 +79,6 @@
 #include "machine/i82371sb.h"
 #include "machine/i82443bx_host.h"
 #include "machine/pci.h"
-#include "machine/pci-ide.h"
 #include "machine/w83977tf.h"
 #include "video/voodoo_2.h"
 #include "video/voodoo_pci.h"
@@ -444,7 +443,7 @@ void savquest_state::winbond_superio_config(device_t *device)
 	w83977tf_device &fdc = *downcast<w83977tf_device *>(device);
 //  fdc.set_sysopt_pin(1);
 	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
-	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.gp25_gatea20().set(":pci:07.0", FUNC(i82371eb_isa_device::a20gate_w));
 	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
 //  fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
@@ -476,6 +475,7 @@ void savquest_state::savquest(machine_config &config)
 	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu"));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 
 	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", 0, "maincpu"));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
@@ -483,7 +483,7 @@ void savquest_state::savquest(machine_config &config)
 
 	I82371EB_USB (config, "pci:07.2", 0);
 	I82371EB_ACPI(config, "pci:07.3", 0);
-	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+	ACPI_PIIX4   (config, "pci:07.3:acpi");
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
@@ -505,10 +505,9 @@ void savquest_state::savquest(machine_config &config)
 	screen.set_visarea(0, 512 - 1, 0, 240 - 1);
 	screen.set_screen_update("pci:0d.0", FUNC(voodoo_2_pci_device::screen_update));
 
-	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, nullptr);
 
-	// TODO: trio64
-	PCI_SLOT(config, "pci:1", pci_cards, 9, 0, 1, 2, 3, "virge").set_fixed(true);
+	PCI_SLOT(config, "pci:1", pci_cards, 9, 0, 1, 2, 3, "trio64dx").set_fixed(true);
 	PCI_SLOT(config, "pci:2", pci_cards, 10, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 11, 2, 3, 0, 1, nullptr);
 //  PCI_SLOT(config, "pci:4", pci_cards, 12, 3, 0, 1, 2, "voodoo2");

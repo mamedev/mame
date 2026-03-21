@@ -107,8 +107,12 @@ Rz          Rudder
 #include "util/corestr.h"
 
 #ifdef SDLMAME_WIN32
+#ifdef SDLMAME_SDL3
+#include <SDL3/SDL.h>
+#else
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_syswm.h>
+#endif
 #endif
 
 #include <algorithm>

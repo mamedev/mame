@@ -121,7 +121,7 @@ public:
 		, m_inputs(*this, { "IN0", "IN1", "IN2", "DSW2", "DSW1" })
 	{ }
 
-	void battlera(machine_config &config);
+	void battlera(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -136,17 +136,15 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_ioport_array<5> m_inputs;
 
-	uint8_t m_control_port_select = 0;
-	uint8_t m_msm5205next = 0;
-	uint8_t m_toggle = 0;
+	u8 m_control_port_select = 0;
+	u8 m_msm5205next = 0;
+	u8 m_toggle = 0;
 
-	void control_data_w(uint8_t data);
-	uint8_t control_data_r();
-	void adpcm_data_w(uint8_t data);
-	void adpcm_reset_w(uint8_t data);
+	void control_data_w(u8 data);
+	u8 control_data_r();
+	void adpcm_data_w(u8 data);
+	void adpcm_reset_w(u8 data);
 	void adpcm_int(int state);
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_prg_map(address_map &map) ATTR_COLD;
 	void main_portmap(address_map &map) ATTR_COLD;
@@ -170,14 +168,14 @@ void battlera_state::machine_reset()
 
 /******************************************************************************/
 
-void battlera_state::control_data_w(uint8_t data)
+void battlera_state::control_data_w(u8 data)
 {
 	m_control_port_select = data;
 }
 
-uint8_t battlera_state::control_data_r()
+u8 battlera_state::control_data_r()
 {
-	uint8_t data = 0xff;
+	u8 data = 0xff;
 
 	for (int i = 0; i < 5; i++)
 		if (!BIT(m_control_port_select, i))
@@ -194,13 +192,13 @@ void battlera_state::main_prg_map(address_map &map)
 	map(0x1e0800, 0x1e0800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1e1000, 0x1e13ff).rw(m_huc6260, FUNC(huc6260_device::palette_direct_read), FUNC(huc6260_device::palette_direct_write)).share("paletteram");
 	map(0x1f0000, 0x1f1fff).ram(); // Main RAM
-	map(0x1fe000, 0x1fe3ff).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+	map(0x1fe000, 0x1fe3ff).rw("huc6270", FUNC(huc6270_device::read8), FUNC(huc6270_device::write8));
 	map(0x1fe400, 0x1fe7ff).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
 }
 
 void battlera_state::main_portmap(address_map &map)
 {
-	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read8), FUNC(huc6270_device::write8));
 }
 
 /******************************************************************************/
@@ -215,12 +213,12 @@ void battlera_state::adpcm_int(int state)
 		m_audiocpu->set_input_line(1, HOLD_LINE);
 }
 
-void battlera_state::adpcm_data_w(uint8_t data)
+void battlera_state::adpcm_data_w(u8 data)
 {
 	m_msm5205next = data;
 }
 
-void battlera_state::adpcm_reset_w(uint8_t data)
+void battlera_state::adpcm_reset_w(u8 data)
 {
 	m_msm->reset_w(0);
 }
@@ -302,13 +300,6 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-uint32_t battlera_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_huc6260->video_update(bitmap, cliprect);
-	return 0;
-}
-
-
 void battlera_state::battlera(machine_config &config)
 {
 	// basic machine hardware
@@ -328,7 +319,7 @@ void battlera_state::battlera(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(21.477272_MHz_XTAL, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
-	m_screen->set_screen_update(FUNC(battlera_state::screen_update));
+	m_screen->set_screen_update(m_huc6260, FUNC(huc6260_device::screen_update));
 	m_screen->set_palette(m_huc6260);
 
 	HUC6260(config, m_huc6260, 21.477272_MHz_XTAL);
@@ -337,7 +328,7 @@ void battlera_state::battlera(machine_config &config)
 	m_huc6260->vsync_changed().set("huc6270", FUNC(huc6270_device::vsync_changed));
 	m_huc6260->hsync_changed().set("huc6270", FUNC(huc6270_device::hsync_changed));
 
-	huc6270_device &huc6270(HUC6270(config, "huc6270", 0));
+	huc6270_device &huc6270(HUC6270(config, "huc6270", 21.477272_MHz_XTAL));
 	huc6270.set_vram_size(0x20000);
 	huc6270.irq().set_inputline(m_maincpu, 0);
 

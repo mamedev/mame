@@ -97,4 +97,32 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="j3kgame1">
+		<description>J3K Games Disk 2024</description>
+		<year>2024</year>
+		<publisher>Juku 3000</publisher>
+		<info name="usage" value="Press T D D to boot EKDOS 2.30" />
+		<info name="comment" value="The first J3K games disk was published in 2024 to celebrate inclusion of JUKU E5104 in MAME." />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="J3KGAMES-1" /><!-- See https://j3k.infoaed.ee/mängude-ketas-2024/ for details. -->
+			<dataarea name="flop" size="819200">
+				<rom name="J3KGAME1.JUK" size="819200" crc="680d6411" sha1="4c864901be28e2d075ad9c73040003ce2a1ca069" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="j3kgame2">
+		<description>J3K Games Disk 2025</description>
+		<year>2025</year>
+		<publisher>Juku 3000</publisher>
+		<info name="usage" value="Press T D D to boot EKDOS 2.30" />
+		<info name="comment" value="The second J3K games disk was published in 2025 and is dedicated to ported games and remakes." />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="J3KGAMES-2" /><!-- See https://j3k.infoaed.ee/porditud-mängud-2025/ for details. -->
+			<dataarea name="flop" size="819200">
+				<rom name="J3KGAME2.JUK" size="819200" crc="88f3f847" sha1="2e5703cf190f8e564bb1be844d5963711148e242" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

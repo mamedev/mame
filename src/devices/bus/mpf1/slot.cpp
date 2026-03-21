@@ -114,7 +114,7 @@ void mpf1p_exp_devices(device_slot_interface &device)
 	device.option_add("iom_ip", MPF_IOM_IP);
 	device.option_add("prt_ip", MPF_PRT_IP);
 	//device.option_add("sgb_ip", MPF_SGB_IP);
-	//device.option_add("ssb_ip", MPF_SSB_IP);
+	device.option_add("ssb_ip", MPF_SSB_IP);
 	device.option_add("tva", MPF_TVA_IP);
 	device.option_add("vid", MPF_VID);
 }

@@ -62,14 +62,14 @@ authors:hap
 
 	<element name="text_byl">
 		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
-		<text string="RECONNAISSANCE"><color red="0.7" green="0.7" blue="0.7" /></text>
+		<text string=" RECONNAISSANCE "><color red="0.7" green="0.7" blue="0.7" /></text>
 	</element>
 	<element name="text_by1"><text string="MAGNA"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_by2"><text string="ENEMY"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 
 	<element name="text_bbl">
 		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
-		<text string="GAME"><color red="0.7" green="0.7" blue="0.7" /></text>
+		<text string=" GAME "><color red="0.7" green="0.7" blue="0.7" /></text>
 	</element>
 	<element name="text_bb1"><text string="BASIC"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_bb2"><text string="INTER"><color red="0.7" green="0.7" blue="0.7" /></text></element>
@@ -78,7 +78,7 @@ authors:hap
 
 	<element name="text_bgl">
 		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
-		<text string="TACTICAL REACTION"><color red="0.7" green="0.7" blue="0.7" /></text>
+		<text string=" TACTICAL REACTION "><color red="0.7" green="0.7" blue="0.7" /></text>
 	</element>
 	<element name="text_bg1"><text string="EM"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_bg2"><text string="BS"><color red="0.7" green="0.7" blue="0.7" /></text></element>
@@ -86,7 +86,7 @@ authors:hap
 
 	<element name="text_brl">
 		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
-		<text string="MANEUVERS"><color red="0.7" green="0.7" blue="0.7" /></text>
+		<text string=" MANEUVERS "><color red="0.7" green="0.7" blue="0.7" /></text>
 	</element>
 	<element name="text_br11"><text string="START"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_br12"><text string="TURN"><color red="0.7" green="0.7" blue="0.7" /></text></element>

@@ -13,6 +13,7 @@
 
 #include "tlcs900.h"
 
+class tmp94c241_serial_device;
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -22,6 +23,7 @@
 
 class tmp94c241_device : public tlcs900h_device
 {
+	friend class tmp94c241_serial_device;
 	static constexpr uint8_t PORT_0 = 0; // 8 bit I/O. Shared with d0-d7
 	static constexpr uint8_t PORT_1 = 1; // 8 bit I/O. Shared with d8-d15
 	static constexpr uint8_t PORT_2 = 2; // 8 bit I/O. Shared with d16-d23
@@ -65,6 +67,27 @@ class tmp94c241_device : public tlcs900h_device
 	static constexpr uint8_t CAPB = 7;
 
 public:
+	enum : uint8_t {
+		INTE45   = 0,
+		INTE67   = 1,
+		INTE89   = 2,
+		INTEAB   = 3,
+		INTET01  = 4,
+		INTET23  = 5,
+		INTET45  = 6,
+		INTET67  = 7,
+		INTET89  = 8,
+		INTETAB  = 9,
+		INTES0   = 10,
+		INTES1   = 11,
+		INTETC01 = 12,
+		INTETC23 = 13,
+		INTETC45 = 14,
+		INTETC67 = 15,
+		INTE0AD  = 16,
+		INTNMWDT = 17,
+	};
+
 	// device type constructor
 	tmp94c241_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
@@ -111,6 +134,7 @@ protected:
 	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -125,6 +149,16 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
+	struct irq_vector_entry {
+		uint8_t reg;
+		uint8_t iff;
+		uint8_t vector;
+		uint8_t dma_start_vector;
+	};
+	static const irq_vector_entry irq_vector_map[];
+
+	int tlcs900_process_hdma(int channel);
+	void tlcs900_process_software_dma(int channel);
 	void change_timer_flipflop(uint8_t flipflop, uint8_t operation);
 
 	// Ports
@@ -142,14 +176,6 @@ private:
 	template <uint8_t N> void msar_w(uint8_t data);
 	template <uint8_t Timer> void treg_8_w(uint8_t data);
 	template <uint8_t Timer> void treg_16_w(uint16_t data);
-	template <uint8_t Channel> uint8_t scNbuf_r();
-	template <uint8_t Channel> void scNbuf_w(uint8_t data);
-	template <uint8_t Channel> uint8_t scNcr_r();
-	template <uint8_t Channel> void scNcr_w(uint8_t data);
-	template <uint8_t Channel> uint8_t scNmod_r();
-	template <uint8_t Channel> void scNmod_w(uint8_t data);
-	template <uint8_t Channel> uint8_t brNcr_r();
-	template <uint8_t Channel> void brNcr_w(uint8_t data);
 	uint8_t t8run_r();
 	void t8run_w(uint8_t data);
 	uint8_t t01mod_r();
@@ -195,6 +221,7 @@ private:
 	void iimc_w(uint8_t data);
 	void intclr_w(uint8_t data);
 	void dmav_w(offs_t offset, uint8_t data);
+	void dmar_w(uint8_t data);
 	uint8_t drefcr1_r();
 	void drefcr1_w(uint8_t data);
 	uint8_t dmemcr1_r();
@@ -243,10 +270,7 @@ private:
 	// Watchdog Timer
 	uint8_t m_watchdog_mode;
 
-	// Serial Channel
-	uint8_t m_serial_control[2];
-	uint8_t m_serial_mode[2];
-	uint8_t m_baud_rate[2];
+	// I/O Control
 	uint8_t m_od_enable;
 
 	// A/D Converter Control
@@ -271,6 +295,9 @@ private:
 
 	// D/A Converter Control
 	uint8_t m_da_drive;
+
+public:
+	required_device_array<tmp94c241_serial_device, 2> m_serial;
 };
 
 // device type declaration

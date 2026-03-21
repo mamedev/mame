@@ -40,7 +40,7 @@
  *      nopping bit 0 writes to 0x40081e makes gfxs to draw better!?
  *    - fix Gynotai row scroll glitches;
  *    - fix attract mode garbage for Namco Collection Vol. 2 (either transparent or page banking select registers) (done);
- *    - fix tilemap dirty flags, move tilemap data in own space prolly helps;
+ *    - fix tilemap dirty flags, move tilemap data in own space probably helps;
  *    - DMA from/to ROM;
  *    - color palette accessors presumably accesses an internal RAMDAC with controllable auto-increment, convert to that;
  *    - fix char getting cut off from GAME SELECT msg in NCV2 (done, sprite wraparound for sx & sy);

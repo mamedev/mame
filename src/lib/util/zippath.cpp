@@ -209,12 +209,15 @@ std::error_condition zippath_resolve(std::string_view path, osd::directory::entr
 	bool went_up = false;
 	do
 	{
-		// trim the path of trailing path separators
-		auto const i = apath.find_last_not_of(PATH_SEPARATOR);
-		if (i != std::string::npos)
-			apath.erase(std::max<decltype(i)>(i + 1, 2)); // don't erase drive letter
-		else if (!is_root(apath))
-			break;
+		if (apath != ".")
+		{
+			// trim the path of trailing path separators
+			auto const i = apath.find_last_not_of(PATH_SEPARATOR);
+			if (i != std::string::npos)
+				apath.erase(std::max<decltype(i)>(i + 1, 2)); // don't erase drive letter
+			else if (!is_root(apath))
+				break;
+		}
 
 		apath_trimmed = apath;
 
@@ -608,9 +611,20 @@ std::string &zippath_combine(std::string &dst, const std::string &path1, const s
 	}
 	else if (path2 == "..")
 	{
-		dst = zippath_parent(path1);
+		if (path1 == ".")
+		{
+			// go back to an absolute path (hoping we can get one)
+			if (osd_get_full_path(dst, path2))
+				dst.clear();
+		}
+		else
+		{
+			dst = zippath_parent(path1);
+			if (dst.empty())
+				dst = ".";
+		}
 	}
-	else if (osd_is_absolute_path(path2))
+	else if (path1 == "." || osd_is_absolute_path(path2))
 	{
 		dst.assign(path2);
 	}

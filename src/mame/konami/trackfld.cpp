@@ -181,22 +181,375 @@ MAIN BOARD:
 ***************************************************************************/
 
 #include "emu.h"
-#include "trackfld.h"
-#include "konamipt.h"
+
 #include "hyprolyb.h"
+#include "konami1.h"
+#include "konamipt.h"
+#include "trackfld_a.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "konami1.h"
+#include "machine/74259.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "sound/dac.h"
+#include "sound/sn76496.h"
+#include "sound/vlm5030.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+#include "video/resnet.h"
+
+namespace {
+
+class trackfld_state : public driver_device
+{
+	static constexpr XTAL MASTER_CLOCK = XTAL(18'432'000);
+	static constexpr XTAL SOUND_CLOCK  = XTAL(14'318'181);
+	static constexpr XTAL VLM_CLOCK    = XTAL(3'579'545);
+
+public:
+	trackfld_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_spriteram2(*this, "spriteram2"),
+		m_scroll(*this, "scroll"),
+		m_spriteram(*this, "spriteram"),
+		m_scroll2(*this, "scroll2"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_maincpu(*this, "maincpu"),
+		m_mainlatch(*this, "mainlatch"),
+		m_audiocpu(*this, "audiocpu"),
+		m_soundbrd(*this, "trackfld_audio"),
+		m_sn(*this, "snsnd"),
+		m_vlm(*this, "vlm"),
+		m_dac(*this, "dac"),
+		m_screen(*this, "screen"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
+	{ }
+
+	void reaktor(machine_config &config);
+	void atlantol(machine_config &config);
+	void yieartf(machine_config &config);
+	void wizzquiz(machine_config &config);
+	void trackfld(machine_config &config);
+	void trackfldu(machine_config &config);
+	void hyprolyb(machine_config &config);
+	void mastkin(machine_config &config);
+
+	void init_trackfld();
+	void init_atlantol();
+	void init_wizzquiz();
+	void init_mastkin();
+	void init_trackfldnz();
+
+private:
+	void questions_bank_w(uint8_t data);
+	void trackfld_videoram_w(offs_t offset, uint8_t data);
+	void trackfld_colorram_w(offs_t offset, uint8_t data);
+	void atlantol_gfxbank_w(uint8_t data);
+	uint8_t trackfld_SN76489a_r();
+	uint8_t trackfld_speech_r();
+	void trackfld_VLM5030_control_w(uint8_t data);
+	void konami_SN76489a_latch_w(uint8_t data) { m_SN76489a_latch = data; }
+	void konami_SN76489a_w(uint8_t data) { m_sn->write(m_SN76489a_latch); }
+
+	void hyprolyb_sound_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void mastkin_map(address_map &map) ATTR_COLD;
+	void reaktor_io_map(address_map &map) ATTR_COLD;
+	void reaktor_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void vlm_map(address_map &map) ATTR_COLD;
+	void wizzquiz_map(address_map &map) ATTR_COLD;
+	void yieartf_map(address_map &map) ATTR_COLD;
+	void hyprolyb_adpcm_map(address_map &map) ATTR_COLD;
+
+	/* memory pointers */
+	required_shared_ptr<uint8_t> m_spriteram2;
+	required_shared_ptr<uint8_t> m_scroll;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_scroll2;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	optional_device<ls259_device> m_mainlatch;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<trackfld_audio_device> m_soundbrd;
+	optional_device<sn76489a_device> m_sn;
+	optional_device<vlm5030_device> m_vlm;
+	required_device<dac_8bit_r2r_device> m_dac;
+	required_device<screen_device> m_screen;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	/* video-related */
+	tilemap_t  *m_bg_tilemap = nullptr;
+	int      m_bg_bank = 0;
+	int      m_sprite_bank1 = 0;
+	int      m_sprite_bank2 = 0;
+	int      m_old_gfx_bank = 0;                    // needed by atlantol
+	int      m_sprites_gfx_banked = 0;
+
+	bool     m_irq_mask = false;
+	bool     m_nmi_mask = false;
+
+	uint8_t m_SN76489a_latch = 0;
+
+	void coin_counter_1_w(int state);
+	void coin_counter_2_w(int state);
+	void irq_mask_w(int state);
+	void nmi_mask_w(int state);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	DECLARE_MACHINE_START(trackfld);
+	DECLARE_MACHINE_RESET(trackfld);
+	DECLARE_VIDEO_START(trackfld);
+	void trackfld_palette(palette_device &palette) const;
+	DECLARE_VIDEO_START(atlantol);
+	uint32_t screen_update_trackfld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void vblank_irq(int state);
+	void vblank_nmi(int state);
+	TIMER_DEVICE_CALLBACK_MEMBER(yieartf_timer_irq);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+};
 
 
-#define MASTER_CLOCK          XTAL(18'432'000)
-#define SOUND_CLOCK           XTAL(14'318'181)
-#define VLM_CLOCK             XTAL(3'579'545)
+/***************************************************************************
+
+  Convert the color PROMs into a more useable format.
+
+  Track 'n Field has one 32x8 palette PROM and two 256x4 lookup table PROMs
+  (one for characters, one for sprites).
+  The palette PROM is connected to the RGB output this way:
+
+  bit 7 -- 220 ohm resistor  -- BLUE
+        -- 470 ohm resistor  -- BLUE
+        -- 220 ohm resistor  -- GREEN
+        -- 470 ohm resistor  -- GREEN
+        -- 1  kohm resistor  -- GREEN
+        -- 220 ohm resistor  -- RED
+        -- 470 ohm resistor  -- RED
+  bit 0 -- 1  kohm resistor  -- RED
+
+***************************************************************************/
+
+void trackfld_state::trackfld_palette(palette_device &palette) const
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
+	static constexpr int resistances_b [2] = { 470, 220 };
+
+	// compute the color output resistor weights
+	double rweights[3], gweights[3], bweights[2];
+	compute_resistor_weights(0, 255, -1.0,
+			3, &resistances_rg[0], rweights, 1000, 0,
+			3, &resistances_rg[0], gweights, 1000, 0,
+			2, &resistances_b[0],  bweights, 1000, 0);
+
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x20; i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
+
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
+
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = combine_weights(bweights, bit0, bit1);
+
+		palette.set_indirect_color(i, rgb_t(r, g, b));
+	}
+
+	// color_prom now points to the beginning of the lookup table
+	color_prom += 0x20;
+
+	// sprites
+	for (int i = 0; i < 0x100; i++)
+	{
+		uint8_t const ctabentry = color_prom[i] & 0x0f;
+		palette.set_pen_indirect(i, ctabentry);
+	}
+
+	// characters
+	for (int i = 0x100; i < 0x200; i++)
+	{
+		uint8_t const ctabentry = (color_prom[i] & 0x0f) | 0x10;
+		palette.set_pen_indirect(i, ctabentry);
+	}
+}
+
+void trackfld_state::trackfld_videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void trackfld_state::trackfld_colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void trackfld_state::atlantol_gfxbank_w(uint8_t data)
+{
+	if (data & 1)
+	{
+		/* male / female sprites switch */
+		if ((m_old_gfx_bank == 1 && (data & 1) == 1) || (m_old_gfx_bank == 0 && (data & 1) == 1))
+			m_sprite_bank2 = 0x200;
+		else
+			m_sprite_bank2 = 0;
+
+		m_sprite_bank1 = 0;
+		m_old_gfx_bank = data & 1;
+	}
+	else
+	{
+		/* male / female sprites switch */
+		if ((m_old_gfx_bank == 0 && (data & 1) == 0) || (m_old_gfx_bank == 1 && (data & 1) == 0))
+			m_sprite_bank2 = 0;
+		else
+			m_sprite_bank2 = 0x200;
+
+		m_sprite_bank1 = 0;
+		m_old_gfx_bank = data & 1;
+	}
+
+	if ((data & 3) == 3)
+	{
+		if (m_sprite_bank2)
+			m_sprite_bank1 = 0x500;
+		else
+			m_sprite_bank1 = 0x300;
+	}
+	else if ((data & 3) == 2)
+	{
+		if (m_sprite_bank2)
+			m_sprite_bank1 = 0x300;
+		else
+			m_sprite_bank1 = 0x100;
+	}
+
+	if (m_bg_bank != (data & 0x8))
+	{
+		m_bg_bank = data & 0x8;
+		m_bg_tilemap->mark_all_dirty();
+	}
+}
+
+TILE_GET_INFO_MEMBER(trackfld_state::get_bg_tile_info)
+{
+	int attr = m_colorram[tile_index];
+	int code = m_videoram[tile_index] + 4 * (attr & 0xc0);
+	int color = attr & 0x0f;
+	int flags = ((attr & 0x10) ? TILE_FLIPX : 0) | ((attr & 0x20) ? TILE_FLIPY : 0);
+
+	if (m_bg_bank)
+		code |= 0x400;
+
+	tileinfo.set(1, code, color, flags);
+}
+
+VIDEO_START_MEMBER(trackfld_state,trackfld)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(trackfld_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap->set_scroll_rows(32);
+	m_sprites_gfx_banked = 0;
+}
+
+
+VIDEO_START_MEMBER(trackfld_state,atlantol)
+{
+	VIDEO_START_CALL_MEMBER( trackfld );
+	m_sprites_gfx_banked = 1;
+}
+
+
+
+void trackfld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+	uint8_t *spriteram = m_spriteram;
+	uint8_t *spriteram_2 = m_spriteram2;
+
+	for (int offs = m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
+	{
+		int attr = spriteram_2[offs];
+		int code = spriteram[offs + 1];
+		int color = attr & 0x0f;
+		if (!m_sprites_gfx_banked)
+			if (attr&1) code|=0x100; // extra tile# bit for the yiear conversion, trackfld doesn't have this many sprites so it will just get masked
+		int flipx = ~attr & 0x40;
+		int flipy = attr & 0x80;
+		int sx = spriteram[offs] - 1;
+		int sy = 240 - spriteram_2[offs + 1];
+
+		if (flip_screen())
+		{
+			sy = 240 - sy;
+			flipy = !flipy;
+		}
+
+		/* Note that this adjustement must be done AFTER handling flip screen, thus */
+		/* proving that this is a hardware related "feature" */
+		sy += 1;
+
+		// to fix the title screen in yieartf it would have to be like this, the same as yiear.c, this should be verified on the hw
+		//
+		//if (offs < 0x26)
+		//{
+		//  sy++;   /* fix title screen & garbage at the bottom of the screen */
+		//}
+
+		m_gfxdecode->gfx(0)->transmask(bitmap,cliprect,
+			code + m_sprite_bank1 + m_sprite_bank2, color,
+			flipx, flipy,
+			sx, sy,
+			m_palette->transpen_mask(*m_gfxdecode->gfx(0), color, 0));
+
+		/* redraw with wraparound */
+		m_gfxdecode->gfx(0)->transmask(bitmap,cliprect,
+			code + m_sprite_bank1 + m_sprite_bank2, color,
+			flipx, flipy,
+			sx - 256, sy,
+			m_palette->transpen_mask(*m_gfxdecode->gfx(0), color, 0));
+	}
+}
+
+
+uint32_t trackfld_state::screen_update_trackfld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int row, scrollx;
+
+	for (row = 0; row < 32; row++)
+	{
+		scrollx = m_scroll[row] + 256 * (m_scroll2[row] & 0x01);
+		if (flip_screen()) scrollx = -scrollx;
+		m_bg_tilemap->set_scrollx(row, scrollx);
+	}
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect);
+	return 0;
+}
 
 
 void trackfld_state::coin_counter_1_w(int state)
@@ -260,17 +613,14 @@ void trackfld_state::nmi_mask_w(int state)
 
 uint8_t trackfld_state::trackfld_speech_r()
 {
-	if (m_vlm->bsy())
-		return 1;
-	else
-		return 0;
+	return m_vlm->bsy_r();
 }
 
 void trackfld_state::trackfld_VLM5030_control_w(uint8_t data)
 {
 	/* bit 0 is latch direction */
-	m_vlm->st((data >> 1) & 1);
-	m_vlm->rst((data >> 2) & 1);
+	m_vlm->st_w(BIT(data, 1));
+	m_vlm->rst_w(BIT(data, 2));
 }
 
 
@@ -911,10 +1261,7 @@ void trackfld_state::trackfld(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(trackfld_state::screen_update_trackfld));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(trackfld_state::vblank_irq));
@@ -947,10 +1294,10 @@ void trackfld_state::trackfldu(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &trackfld_state::main_map);
 }
 
-INTERRUPT_GEN_MEMBER(trackfld_state::yieartf_timer_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(trackfld_state::yieartf_timer_irq)
 {
 	if (m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 void trackfld_state::yieartf(machine_config &config)
@@ -958,11 +1305,9 @@ void trackfld_state::yieartf(machine_config &config)
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, MASTER_CLOCK/6/2);   /* a guess for now */
 	m_maincpu->set_addrmap(AS_PROGRAM, &trackfld_state::yieartf_map);
-	m_maincpu->set_periodic_int(FUNC(trackfld_state::yieartf_timer_irq), attotime::from_hz(480));
 
-//  z80 isn't used
-//  Z80(config, m_audiocpu, SOUND_CLOCK/4);
-//  m_audiocpu->set_addrmap(AS_PROGRAM, &trackfld_state::sound_map);
+	// NMI source assumed to be same as in yiear
+	TIMER(config, "16v").configure_scanline(FUNC(trackfld_state::yieartf_timer_irq), "screen", 16, 32);
 
 	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
@@ -983,10 +1328,7 @@ void trackfld_state::yieartf(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(trackfld_state::screen_update_trackfld));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(trackfld_state::vblank_irq));
@@ -1717,6 +2059,8 @@ void trackfld_state::init_wizzquiz()
 
 	membank("bank1")->configure_entries(0, 8, ROM, 0x8000);
 }
+
+} // anonymous namespace
 
 
 GAME( 1983, trackfld,   0,        trackfld,  trackfld, trackfld_state, init_trackfld,   ROT0,  "Konami",                               "Track & Field",                        MACHINE_SUPPORTS_SAVE )

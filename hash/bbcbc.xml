@@ -44,7 +44,7 @@ The BBC Bridge Companion only used a cartridge slot for software
 	</software>
 
 	<software name="bbuildera" cloneof="bbuilder">
-		<description>Bridge Builder (Alt)</description>
+		<description>Bridge Builder (alt)</description>
 		<year>1985</year>
 		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
@@ -81,7 +81,7 @@ The BBC Bridge Companion only used a cartridge slot for software
 	</software>
 
 	<software name="cplay2a" cloneof="cplay2">
-		<description>Club Play 2 (Alt)</description>
+		<description>Club Play 2 (alt)</description>
 		<year>198?</year>
 		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">

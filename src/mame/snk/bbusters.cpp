@@ -54,10 +54,6 @@
         . COIN6    : adds coin(s)/credit(s) for player 3 depending on "Coin B" Dip Switch
         . SERVICE1 : adds coin(s)/credit(s) for all players depending on "Coin A" Dip Switch
 
-    Note that I had to map COIN5 and COIN6 to SERVICE2 and SERVICE3 to be
-    able to use the default parametrable keys. Let me know if there is a
-    another (better ?) way to do so.
-
     ----------------------------------------------------------------------------------------
 
     RansAckeR's notes:
@@ -100,9 +96,8 @@
 
 #include "emu.h"
 
-// src/mame
 #include "snk_bbusters_spr.h"
-// src/devices
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
@@ -110,7 +105,7 @@
 #include "machine/upd7004.h"
 #include "sound/ymopn.h"
 #include "video/bufsprite.h"
-// src/emu
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -245,7 +240,6 @@ void bbusters_state::tx_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 /******************************************************************************/
 
-
 void bbusters_state::video_start()
 {
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bbusters_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -262,8 +256,6 @@ void bbusters_state::video_start()
 		bitmap.fill(0xffff);
 	}
 }
-
-/******************************************************************************/
 
 /******************************************************************************/
 
@@ -396,19 +388,6 @@ static INPUT_PORTS_START( bbusters )
 	PORT_DIPSETTING(    0x06, "7 / 3" )
 	PORT_DIPSETTING(    0x02, "9 / 4" )
 	PORT_DIPSETTING(    0x00, "12 / 5" )
-	/* Manual (from a different revision/region?) says:
-	                    SW1:4   SW1:5   SW1:6
-	1C_1C 1 To continue OFF     OFF     OFF
-	2C_1C 1 To continue ON      OFF     OFF
-	1C_2C 1 To continue OFF     ON      OFF
-	2C_1C 2 To continue ON      ON      OFF
-	3C_1C 1 To continue OFF     OFF     ON
-	3C_1C 2 To continue ON      OFF     ON
-	4C_3C 1 To continue OFF     ON      ON
-	Free Play Mode      OFF     OFF     OFF
-
-	SW1:7 Unused
-	SW1:8 Blood color: ON=green OFF=red */
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
@@ -456,6 +435,55 @@ static INPUT_PORTS_START( bbusters )
 
 	PORT_START("GUNX3")
 	PORT_BIT(0x3ff, 0x212, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x14e, 0x33e) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(3)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bbustersu )
+	PORT_INCLUDE( bbusters )
+
+	PORT_MODIFY("COINS")
+	PORT_BIT( 0x38, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPSETTING(    0x10, "3 Coins/1 Credit 2/1" )
+	PORT_DIPSETTING(    0x18, "3 Coins/1 Credit 1/1" )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x30, "2 Coins/1 Credit 1/1" )
+	PORT_DIPSETTING(    0x08, "4 Coins/3 Credits 1/1" )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x28, "1 Coin/2 Credits 1/1" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x40, 0x40, "Blood Color" )               PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, "Green" )
+	PORT_DIPSETTING(    0x40, "Red" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hardest ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bbustersja )
+	PORT_INCLUDE( bbusters )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )
+
+	// remove player 3
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("COINS")
+	PORT_BIT( 0x3c, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("GUNY3")
+	PORT_BIT(0x3ff, 0x000, IPT_UNUSED)
+
+	PORT_MODIFY("GUNX3")
+	PORT_BIT(0x3ff, 0x000, IPT_UNUSED)
 INPUT_PORTS_END
 
 /******************************************************************************/
@@ -766,8 +794,8 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1989, bbusters,   0,        bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (World)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersu,  bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (US, Version 3)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersua, bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (US, Version 2)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersj,  bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (Japan, Version 2, 3 Player)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersja, bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (Japan, Version 2, 2 Player)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbusters,   0,        bbusters, bbusters,   bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (World)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersu,  bbusters, bbusters, bbustersu,  bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (US, Version 3)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersua, bbusters, bbusters, bbustersu,  bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (US, Version 2)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersj,  bbusters, bbusters, bbusters,   bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (Japan, Version 2, 3 Player)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersja, bbusters, bbusters, bbustersja, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (Japan, Version 2, 2 Player)", MACHINE_SUPPORTS_SAVE )

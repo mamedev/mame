@@ -6,9 +6,13 @@
 #include "emu.h"
 #include "debugbuf.h"
 
+#include <locale>
+
+
 debug_disasm_buffer::debug_data_buffer::debug_data_buffer(util::disasm_interface const &intf) : m_intf(intf)
 {
-	m_space = nullptr;
+	m_dev = nullptr;
+	m_spacenum = -1;
 	m_back = nullptr;
 	m_opcode = true;
 	m_lstart = m_lend = 0;
@@ -17,18 +21,21 @@ debug_disasm_buffer::debug_data_buffer::debug_data_buffer(util::disasm_interface
 
 bool debug_disasm_buffer::debug_data_buffer::active() const
 {
-	return m_space || m_back;
+	return m_dev || m_back;
 }
 
-void debug_disasm_buffer::debug_data_buffer::set_source(address_space &space)
+void debug_disasm_buffer::debug_data_buffer::set_source(device_memory_interface *dev, int spacenum)
 {
-	m_space = &space;
+	m_dev = dev;
+	m_spacenum = spacenum;
 	setup_methods();
 }
 
 void debug_disasm_buffer::debug_data_buffer::set_source(debug_data_buffer &back, bool opcode)
 {
 	m_back = &back;
+	m_dev = back.m_dev;
+	m_spacenum = back.m_spacenum;
 	m_opcode = opcode;
 	setup_methods();
 }
@@ -51,11 +58,6 @@ u32 debug_disasm_buffer::debug_data_buffer::r32(offs_t pc) const
 u64 debug_disasm_buffer::debug_data_buffer::r64(offs_t pc) const
 {
 	return m_do_r64(pc & m_pc_mask);
-}
-
-address_space *debug_disasm_buffer::debug_data_buffer::get_underlying_space() const
-{
-	return m_space;
 }
 
 void debug_disasm_buffer::debug_data_buffer::fill(offs_t lstart, offs_t size) const
@@ -177,13 +179,13 @@ void debug_disasm_buffer::debug_data_buffer::data_get(offs_t pc, offs_t size, st
 
 void debug_disasm_buffer::debug_data_buffer::setup_methods()
 {
-	address_space *space = m_space ? m_space : m_back->get_underlying_space();
-	int shift = space->addr_shift();
+	const address_space_config *config = m_dev->logical_space_config(m_spacenum);
+	int shift = config->addr_shift();
 	int alignment = m_intf.opcode_alignment();
-	endianness_t endian = space->endianness();
-	bool is_octal = space->is_octal();
+	endianness_t endian = config->endianness();
+	bool is_octal = config->is_octal();
 
-	m_pc_mask = space->logaddrmask();
+	m_pc_mask = config->logaddrmask();
 
 	if(m_intf.interface_flags() & util::disasm_interface::PAGED)
 		m_page_mask = (1 << m_intf.page_address_bits()) - 1;
@@ -201,32 +203,33 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 	}
 
 	// Define the filler
-	if(m_space) {
+	if(!m_back) {
 		// get the data from given space
 		if(m_intf.interface_flags() & util::disasm_interface::NONLINEAR_PC) {
 			switch(shift) {
 			case -1:
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
-					auto dis = m_space->device().machine().disable_side_effects();
+					auto dis = m_dev->device().machine().disable_side_effects();
 					u16 *dest = get_ptr<u16>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
 						offs_t tpc = m_intf.pc_linear_to_real(lpc);
 						address_space *space;
-						if (m_space->device().memory().translate(m_space->spacenum(), device_memory_interface::TR_FETCH, tpc, space))
+						if (m_dev->translate(m_spacenum, device_memory_interface::TR_FETCH, tpc, space)) {
+							auto dis = space->device().machine().disable_side_effects();
 							*dest++ = space->read_word(tpc);
-						else
+						} else
 							*dest++ = 0;
 					}
 				};
 				break;
 			case 0:
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
-					auto dis = m_space->device().machine().disable_side_effects();
+					auto dis = m_dev->device().machine().disable_side_effects();
 					u8 *dest = get_ptr<u8>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
 						offs_t tpc = m_intf.pc_linear_to_real(lpc);
 						address_space *space;
-						if (m_space->device().memory().translate(m_space->spacenum(), device_memory_interface::TR_FETCH, tpc, space))
+						if (m_dev->translate(m_spacenum, device_memory_interface::TR_FETCH, tpc, space))
 							*dest++ = space->read_byte(tpc);
 						else
 							*dest++ = 0;
@@ -239,12 +242,12 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			switch(shift) {
 			case -3: // bus granularity 64
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
-					auto dis = m_space->device().machine().disable_side_effects();
+					auto dis = m_dev->device().machine().disable_side_effects();
 					u64 *dest = get_ptr<u64>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
 						offs_t tpc = lpc;
 						address_space *space;
-						if (m_space->device().memory().translate(m_space->spacenum(), device_memory_interface::TR_FETCH, tpc, space))
+						if (m_dev->translate(m_spacenum, device_memory_interface::TR_FETCH, tpc, space))
 							*dest++ = space->read_qword(tpc);
 						else
 							*dest++ = 0;
@@ -254,12 +257,12 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 
 			case -2: // bus granularity 32
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
-					auto dis = m_space->device().machine().disable_side_effects();
+					auto dis = m_dev->device().machine().disable_side_effects();
 					u32 *dest = get_ptr<u32>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
 						offs_t tpc = lpc;
 						address_space *space;
-						if (m_space->device().memory().translate(m_space->spacenum(), device_memory_interface::TR_FETCH, tpc, space))
+						if (m_dev->translate(m_spacenum, device_memory_interface::TR_FETCH, tpc, space))
 							*dest++ = space->read_dword(tpc);
 						else
 							*dest++ = 0;
@@ -269,12 +272,12 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 
 			case -1: // bus granularity 16
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
-					auto dis = m_space->device().machine().disable_side_effects();
+					auto dis = m_dev->device().machine().disable_side_effects();
 					u16 *dest = get_ptr<u16>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
 						offs_t tpc = lpc;
 						address_space *space;
-						if (m_space->device().memory().translate(m_space->spacenum(), device_memory_interface::TR_FETCH, tpc, space))
+						if (m_dev->translate(m_spacenum, device_memory_interface::TR_FETCH, tpc, space))
 							*dest++ = space->read_word(tpc);
 						else
 							*dest++ = 0;
@@ -284,12 +287,12 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 
 			case  0: // bus granularity 8
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
-					auto dis = m_space->device().machine().disable_side_effects();
+					auto dis = m_dev->device().machine().disable_side_effects();
 					u8 *dest = get_ptr<u8>(lstart);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
 						offs_t tpc = lpc;
 						address_space *space;
-						if (m_space->device().memory().translate(m_space->spacenum(), device_memory_interface::TR_FETCH, tpc, space))
+						if (m_dev->translate(m_spacenum, device_memory_interface::TR_FETCH, tpc, space))
 							*dest++ = space->read_byte(tpc);
 						else
 							*dest++ = 0;
@@ -299,12 +302,12 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 
 			case  3: // bus granularity 1, stored as u16
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
-					auto dis = m_space->device().machine().disable_side_effects();
+					auto dis = m_dev->device().machine().disable_side_effects();
 					u16 *dest = reinterpret_cast<u16 *>(&m_buffer[0]) + ((lstart - m_lstart) >> 4);
 					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 0x10) & m_pc_mask) {
 						offs_t tpc = lpc;
 						address_space *space;
-						if (m_space->device().memory().translate(m_space->spacenum(), device_memory_interface::TR_FETCH, tpc, space))
+						if (m_dev->translate(m_spacenum, device_memory_interface::TR_FETCH, tpc, space))
 							*dest++ = space->read_word(tpc);
 						else
 							*dest++ = 0;
@@ -965,6 +968,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 		if(is_octal)
 			m_data_to_string = [this](offs_t pc, offs_t size) {
 				std::ostringstream out;
+				out.imbue(std::locale::classic());
 				for(offs_t i=0; i != size; i++) {
 					if(i)
 						out << ' ';
@@ -976,6 +980,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 		else
 			m_data_to_string = [this](offs_t pc, offs_t size) {
 				std::ostringstream out;
+				out.imbue(std::locale::classic());
 				for(offs_t i=0; i != size; i++) {
 					if(i)
 						out << ' ';
@@ -992,6 +997,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			if(is_octal)
 				m_data_to_string = [this](offs_t pc, offs_t size) {
 					std::ostringstream out;
+					out.imbue(std::locale::classic());
 					for(offs_t i=0; i != size; i++) {
 						if(i)
 							out << ' ';
@@ -1003,6 +1009,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			else
 				m_data_to_string = [this](offs_t pc, offs_t size) {
 					std::ostringstream out;
+					out.imbue(std::locale::classic());
 					for(offs_t i=0; i != size; i++) {
 						if(i)
 							out << ' ';
@@ -1017,6 +1024,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			if(is_octal)
 				m_data_to_string = [this](offs_t pc, offs_t size) {
 					std::ostringstream out;
+					out.imbue(std::locale::classic());
 					for(offs_t i=0; i != size; i += 2) {
 						if(i)
 							out << ' ';
@@ -1028,6 +1036,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			else
 				m_data_to_string = [this](offs_t pc, offs_t size) {
 					std::ostringstream out;
+					out.imbue(std::locale::classic());
 					for(offs_t i=0; i != size; i += 2) {
 						if(i)
 							out << ' ';
@@ -1046,6 +1055,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			if(is_octal)
 				m_data_to_string = [this](offs_t pc, offs_t size) {
 					std::ostringstream out;
+					out.imbue(std::locale::classic());
 					for(offs_t i=0; i != size; i++) {
 						if(i)
 							out << ' ';
@@ -1057,6 +1067,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			else
 				m_data_to_string = [this](offs_t pc, offs_t size) {
 					std::ostringstream out;
+					out.imbue(std::locale::classic());
 					for(offs_t i=0; i != size; i++) {
 						if(i)
 							out << ' ';
@@ -1071,6 +1082,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			if(is_octal)
 				m_data_to_string = [this](offs_t pc, offs_t size) {
 					std::ostringstream out;
+					out.imbue(std::locale::classic());
 					for(offs_t i=0; i != size; i += 2) {
 						if(i)
 							out << ' ';
@@ -1082,6 +1094,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			else
 				m_data_to_string = [this](offs_t pc, offs_t size) {
 					std::ostringstream out;
+					out.imbue(std::locale::classic());
 					for(offs_t i=0; i != size; i += 2) {
 						if(i)
 						out << ' ';
@@ -1096,6 +1109,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			if(is_octal)
 				m_data_to_string = [this](offs_t pc, offs_t size) {
 					std::ostringstream out;
+					out.imbue(std::locale::classic());
 					for(offs_t i=0; i != size; i += 4) {
 						if(i)
 							out << ' ';
@@ -1107,6 +1121,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			else
 				m_data_to_string = [this](offs_t pc, offs_t size) {
 					std::ostringstream out;
+					out.imbue(std::locale::classic());
 					for(offs_t i=0; i != size; i += 4) {
 						if(i)
 							out << ' ';
@@ -1125,6 +1140,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			if(is_octal)
 				m_data_to_string = [this](offs_t pc, offs_t size) {
 					std::ostringstream out;
+					out.imbue(std::locale::classic());
 					for(offs_t i=0; i != size; i++) {
 						if(i)
 							out << ' ';
@@ -1136,6 +1152,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			else
 				m_data_to_string = [this](offs_t pc, offs_t size) {
 					std::ostringstream out;
+					out.imbue(std::locale::classic());
 					for(offs_t i=0; i != size; i++) {
 						if(i)
 							out << ' ';
@@ -1150,6 +1167,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			if(is_octal)
 				m_data_to_string = [this](offs_t pc, offs_t size) {
 					std::ostringstream out;
+					out.imbue(std::locale::classic());
 					for(offs_t i=0; i != size; i += 2) {
 						if(i)
 							out << ' ';
@@ -1161,6 +1179,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			else
 				m_data_to_string = [this](offs_t pc, offs_t size) {
 					std::ostringstream out;
+					out.imbue(std::locale::classic());
 					for(offs_t i=0; i != size; i += 2) {
 						if(i)
 							out << ' ';
@@ -1175,6 +1194,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			if(is_octal)
 				m_data_to_string = [this](offs_t pc, offs_t size) {
 					std::ostringstream out;
+					out.imbue(std::locale::classic());
 					for(offs_t i=0; i != size; i += 4) {
 						if(i)
 							out << ' ';
@@ -1186,6 +1206,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			else
 				m_data_to_string = [this](offs_t pc, offs_t size) {
 					std::ostringstream out;
+					out.imbue(std::locale::classic());
 					for(offs_t i=0; i != size; i += 4) {
 						if(i)
 						out << ' ';
@@ -1200,6 +1221,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			if(is_octal)
 				m_data_to_string = [this](offs_t pc, offs_t size) {
 					std::ostringstream out;
+					out.imbue(std::locale::classic());
 					for(offs_t i=0; i != size; i += 8) {
 						if(i)
 							out << ' ';
@@ -1211,6 +1233,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			else
 				m_data_to_string = [this](offs_t pc, offs_t size) {
 					std::ostringstream out;
+					out.imbue(std::locale::classic());
 					for(offs_t i=0; i != size; i += 8) {
 						if(i)
 							out << ' ';
@@ -1227,6 +1250,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 		if(is_octal)
 			m_data_to_string = [this](offs_t pc, offs_t size) {
 				std::ostringstream out;
+				out.imbue(std::locale::classic());
 				for(offs_t i=0; i != size; i += 16) {
 					if(i)
 						out << ' ';
@@ -1238,6 +1262,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 		else
 			m_data_to_string = [this](offs_t pc, offs_t size) {
 				std::ostringstream out;
+				out.imbue(std::locale::classic());
 				for(offs_t i=0; i != size; i += 16) {
 					if(i)
 						out << ' ';
@@ -1333,22 +1358,22 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 	m_buf_params(dynamic_cast<device_disasm_interface &>(device).get_disassembler()),
 	m_flags(m_dintf.interface_flags())
 {
-	address_space &pspace = m_mintf->space(AS_PROGRAM);
+	const address_space_config *pconfig = m_mintf->logical_space_config(AS_PROGRAM);
 
 	if(m_flags & util::disasm_interface::INTERNAL_DECRYPTION) {
-		m_buf_raw.set_source(pspace);
+		m_buf_raw.set_source(m_mintf, AS_PROGRAM);
 		m_buf_opcodes.set_source(m_buf_raw, true);
 		if((m_flags & util::disasm_interface::SPLIT_DECRYPTION) == util::disasm_interface::SPLIT_DECRYPTION)
 			m_buf_params.set_source(m_buf_raw, false);
 	} else {
-		if(m_mintf->has_space(AS_OPCODES)) {
-			m_buf_opcodes.set_source(m_mintf->space(AS_OPCODES));
-			m_buf_params.set_source(pspace);
+		if(m_mintf->has_logical_space(AS_OPCODES)) {
+			m_buf_opcodes.set_source(m_mintf, AS_OPCODES);
+			m_buf_params.set_source(m_mintf, AS_PROGRAM);
 		} else
-			m_buf_opcodes.set_source(pspace);
+			m_buf_opcodes.set_source(m_mintf, AS_PROGRAM);
 	}
 
-	m_pc_mask = pspace.logaddrmask();
+	m_pc_mask = pconfig->logaddrmask();
 
 	if(m_flags & util::disasm_interface::PAGED)
 		m_page_mask = (1 << m_dintf.page_address_bits()) - 1;
@@ -1395,8 +1420,8 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 	}
 
 	// pc to string conversion
-	int aw = pspace.logaddr_width();
-	bool is_octal = pspace.is_octal();
+	int aw = pconfig->logaddr_width();
+	bool is_octal = pconfig->is_octal();
 	if((m_flags & util::disasm_interface::PAGED2LEVEL) == util::disasm_interface::PAGED2LEVEL && aw > (m_dintf.page_address_bits() + m_dintf.page2_address_bits())) {
 		int bits1 = m_dintf.page_address_bits();
 		int bits2 = m_dintf.page2_address_bits();
@@ -1411,7 +1436,7 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 			int nc2 = (bits2+2)/3;
 			int nc3 = (bits3+2)/3;
 			m_pc_to_string = [nc1, nc2, nc3, sm1, sm2, sh2, sh3](offs_t pc) -> std::string {
-				return util::string_format("%0*o:%0*o:%0*o",
+				return util::string_format(std::locale::classic(), "%0*o:%0*o:%0*o",
 										   nc3, pc >> sh3,
 										   nc2, (pc >> sh2) & sm2,
 										   nc1, pc & sm1);
@@ -1421,7 +1446,7 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 			int nc2 = (bits2+3)/4;
 			int nc3 = (bits3+3)/4;
 			m_pc_to_string = [nc1, nc2, nc3, sm1, sm2, sh2, sh3](offs_t pc) -> std::string {
-				return util::string_format("%0*X:%0*X:%0*X",
+				return util::string_format(std::locale::classic(), "%0*X:%0*X:%0*X",
 										   nc3, pc >> sh3,
 										   nc2, (pc >> sh2) & sm2,
 										   nc1, pc & sm1);
@@ -1438,7 +1463,7 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 			int nc1 = (bits1+2)/3;
 			int nc2 = (bits2+2)/3;
 			m_pc_to_string = [nc1, nc2, sm1, sh2](offs_t pc) -> std::string {
-				return util::string_format("%0*o:%0*o",
+				return util::string_format(std::locale::classic(), "%0*o:%0*o",
 										   nc2, pc >> sh2,
 										   nc1, pc & sm1);
 			};
@@ -1446,7 +1471,7 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 			int nc1 = (bits1+3)/4;
 			int nc2 = (bits2+3)/4;
 			m_pc_to_string = [nc1, nc2, sm1, sh2](offs_t pc) -> std::string {
-				return util::string_format("%0*X:%0*X",
+				return util::string_format(std::locale::classic(), "%0*X:%0*X",
 										   nc2, pc >> sh2,
 										   nc1, pc & sm1);
 			};
@@ -1458,13 +1483,13 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 		if(is_octal) {
 			int nc1 = (bits1+2)/3;
 			m_pc_to_string = [nc1](offs_t pc) -> std::string {
-				return util::string_format("%0*o",
+				return util::string_format(std::locale::classic(), "%0*o",
 										   nc1, pc);
 			};
 		} else {
 			int nc1 = (bits1+3)/4;
 			m_pc_to_string = [nc1](offs_t pc) -> std::string {
-				return util::string_format("%0*X",
+				return util::string_format(std::locale::classic(), "%0*X",
 										   nc1, pc);
 			};
 		}
@@ -1474,6 +1499,7 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 void debug_disasm_buffer::disassemble(offs_t pc, std::string &instruction, offs_t &next_pc, offs_t &size, u32 &info) const
 {
 	std::ostringstream out;
+	out.imbue(std::locale::classic());
 	u32 result = m_dintf.disassemble(out, pc, m_buf_opcodes, m_buf_params.active() ? m_buf_params : m_buf_opcodes);
 	instruction = out.str();
 	size = result & util::disasm_interface::LENGTHMASK;
@@ -1485,6 +1511,7 @@ void debug_disasm_buffer::disassemble(offs_t pc, std::string &instruction, offs_
 u32 debug_disasm_buffer::disassemble_info(offs_t pc) const
 {
 	std::ostringstream out;
+	out.imbue(std::locale::classic());
 	return m_dintf.disassemble(out, pc, m_buf_opcodes, m_buf_params.active() ? m_buf_params : m_buf_opcodes);
 }
 

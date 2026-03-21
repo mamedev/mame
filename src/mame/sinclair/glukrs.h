@@ -28,7 +28,7 @@ protected:
 	void device_start() override ATTR_COLD;
 	void device_reset() override ATTR_COLD;
 
-	virtual int data_size() const override { return 0xff; }
+	virtual int data_size() const override { return 0x100; }
 
 private:
 	bool m_glukrs_active;

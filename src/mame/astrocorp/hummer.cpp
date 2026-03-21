@@ -224,9 +224,9 @@ ROM_END
 void hummer_state::decrypt_rom(const decryption_info &table)
 {
 	const u32 size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("encrypted_rom")->base();
-	u16 * const decrypted = (u16 *)memregion("maincpu")->base();
-	std::unique_ptr<u16[]> tmp = std::make_unique<u16[]>(size/2);
+	u16 const* const rom = &memregion("encrypted_rom")->as_u16();
+	u16 *const decrypted = &memregion("maincpu")->as_u16();
+	std::unique_ptr<u16[]> tmp = std::make_unique<u16 []>(size/2);
 
 	// Pass 1: decrypt high and low byte independently.  They go
 	// through a bitswap and an xor, choosing between 8 possibilities

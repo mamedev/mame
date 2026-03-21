@@ -152,6 +152,9 @@ DEFINE_DEVICE_TYPE(OAD34V, oa_d34v_device, "oa_d34v", "Apple/Sony 3.5 SD (400K G
 DEFINE_DEVICE_TYPE(MFD51W, mfd51w_device,  "mfd51w",  "Apple/Sony 3.5 DD (400/800K GCR)")
 DEFINE_DEVICE_TYPE(MFD75W, mfd75w_device,  "mfd75w",  "Apple/Sony 3.5 HD (Superdrive)")
 
+// Apple Twiggy 5.25" drive
+DEFINE_DEVICE_TYPE(FLOPPY_TWIGGY, floppy_twiggy, "floppy_twiggy", "5.25\" twiggy drive")
+
 
 format_registration::format_registration()
 {
@@ -2904,12 +2907,12 @@ bool mac_floppy_device::wpt_r()
 	case 0xa: // Not on track 0?
 		return m_cyl != 0;
 
-	case 0xb:{// Tachometer, 60 pulses/rotation
+	case 0xb:{// Tachometer, 120 inversions/rotation
 		if(m_image.get() != nullptr && !m_mon) {
 			attotime base;
 			uint32_t pos = find_position(base, machine().time());
 			uint32_t subpos = pos % 3333334;
-			return subpos < 20000;
+			return subpos < 3333334/2;
 		} else
 			return false;
 	}
@@ -3114,4 +3117,27 @@ bool mfd75w_device::is_2m() const
 		return true;
 
 	return false;
+}
+
+//-------------------------------------------------
+//  5.25" twiggy drive
+//-------------------------------------------------
+
+floppy_twiggy::floppy_twiggy(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_TWIGGY, tag, owner, clock)
+{
+}
+
+floppy_twiggy::~floppy_twiggy()
+{
+}
+
+void floppy_twiggy::setup_characteristics()
+{
+	m_form_factor = floppy_image::FF_TWIG;
+	m_tracks = 46;
+	m_sides = 2;
+	set_rpm(218); // Variable between 218 and 320
+
+	add_variant(floppy_image::DSHD);
 }

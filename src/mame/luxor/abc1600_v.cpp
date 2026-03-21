@@ -7,8 +7,8 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "abc1600.h"
 #include "abc1600.lh"
+#include "abc1600_v.h"
 #include "render.h"
 
 //#define VERBOSE 1
@@ -18,6 +18,9 @@
 //**************************************************************************
 //  CONSTANTS / MACROS
 //**************************************************************************
+
+#define SCREEN_TAG "screen"
+
 
 // video RAM
 #define VIDEORAM_SIZE       0x40000

@@ -340,7 +340,8 @@ void fp1100_state::kbd_row_w(u8 data)
 
 void fp1100_state::sub_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rom().region("sub_ipl", 0x0000);
+//  map(0x0000, 0x0fff) internal 7801 ROM
+	map(0x1000, 0x1fff).rom().region("sub_ipl", 0);
 	map(0x2000, 0x5fff).rw(FUNC(fp1100_state::vram_r<0>), FUNC(fp1100_state::vram_w<0>)).share(m_videoram[0]);
 	map(0x6000, 0x9fff).rw(FUNC(fp1100_state::vram_r<1>), FUNC(fp1100_state::vram_w<1>)).share(m_videoram[1]);
 	map(0xa000, 0xdfff).rw(FUNC(fp1100_state::vram_r<2>), FUNC(fp1100_state::vram_w<2>)).share(m_videoram[2]);
@@ -351,7 +352,7 @@ void fp1100_state::sub_map(address_map &map)
 	map(0xe800, 0xe800).mirror(0x3ff).w("sub2main", FUNC(generic_latch_8_device::write));
 	map(0xec00, 0xec00).mirror(0x3ff).lw8(NAME([this] (u8 data) { m_subcpu->set_input_line(UPD7810_INTF0, CLEAR_LINE); }));
 	map(0xf000, 0xf000).mirror(0x3ff).w(FUNC(fp1100_state::colour_control_w));
-	map(0xf400, 0xff7f).rom().region("sub_ipl", 0x2400);
+	map(0xf400, 0xff7f).rom().region("chargen", 0x0400);
 //  map(0xff80, 0xffff) internal 7801 RAM
 }
 
@@ -650,7 +651,7 @@ static const gfx_layout chars_8x8 =
 };
 
 static GFXDECODE_START( gfx_fp1100 )
-	GFXDECODE_ENTRY( "sub_ipl", 0x2400, chars_8x8, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0400, chars_8x8, 0, 1 )
 GFXDECODE_END
 
 void fp1100_state::centronics_busy_w(int state)
@@ -818,11 +819,15 @@ ROM_START( fp1100 )
 	ROM_REGION( 0x1000, "basic", ROMREGION_ERASEFF )
 	ROM_COPY( "bios", 0x8000, 0x0000, 0x1000 )
 
-	ROM_REGION( 0x3000, "sub_ipl", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "sub", ROMREGION_ERASEFF )
 	ROM_LOAD( "sub1.rom", 0x0000, 0x1000, CRC(8feda489) SHA1(917d5b398b9e7b9a6bfa5e2f88c5b99923c3c2a3))
-	ROM_LOAD( "sub2.rom", 0x1000, 0x1000, CRC(359f007e) SHA1(0188d5a7b859075cb156ee55318611bd004128d7))
+
+	ROM_REGION( 0x1000, "sub_ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "sub2.rom", 0x0000, 0x1000, CRC(359f007e) SHA1(0188d5a7b859075cb156ee55318611bd004128d7))
+
+	ROM_REGION( 0x1000, "chargen", ROMREGION_ERASEFF )
 	// Japan chargen ROM (GTA?)
-	ROM_LOAD( "sub3.rom", 0x2000, 0xf80, BAD_DUMP CRC(fb2b577a) SHA1(a9ae6b03e06ea2f5db30dfd51ebf5aede01d9672))
+	ROM_LOAD( "sub3.rom", 0x0000, 0xf80, BAD_DUMP CRC(fb2b577a) SHA1(a9ae6b03e06ea2f5db30dfd51ebf5aede01d9672))
 ROM_END
 
 /* FP-1000 has video RAM locations RAM9 to RAM24 unpopulated (only RAM1 to RAM8 are populated) - needs its own machine configuration.
@@ -834,11 +839,15 @@ ROM_START( fp1000 )
 	ROM_REGION( 0x1000, "basic", ROMREGION_ERASEFF )
 	ROM_LOAD( "2l_a10_kkk_fp1000_basic.c1", 0x0000, 0x1000, CRC(9322dedd) SHA1(40a00684ced2b7ead53ca15a915d98f3fe00d3ba))
 
-	ROM_REGION( 0x3000, "sub_ipl", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "sub", ROMREGION_ERASEFF )
 	ROM_LOAD( "sub1.rom", 0x0000, 0x1000, BAD_DUMP CRC(8feda489) SHA1(917d5b398b9e7b9a6bfa5e2f88c5b99923c3c2a3)) // Not dumped, borrowed from 'fp1100'
-	ROM_LOAD( "jka_fp1000.e8",    0x1000, 0x1000, CRC(2aefa4e4) SHA1(b3cc5484426c19a7266d17ea5c4d55441b4e3be8))
+
+	ROM_REGION( 0x1000, "sub_ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "jkc_fp1000.e8", 0x0000, 0x1000, CRC(67a668a9) SHA1(37fb9308505b47db36f8c341144ca3fe3fec64af))
+
+	ROM_REGION( 0x1000, "chargen", ROMREGION_ERASEFF )
 	// Spain chargen ROM (GKA really?)
-	ROM_LOAD( "jkc_fp1000.e21",   0x2000, 0x1000, CRC(67a668a9) SHA1(37fb9308505b47db36f8c341144ca3fe3fec64af))
+	ROM_LOAD( "jka_fp1000.e21", 0x0000, 0x1000, CRC(2aefa4e4) SHA1(b3cc5484426c19a7266d17ea5c4d55441b4e3be8))
 ROM_END
 
 } // anonymous namespace

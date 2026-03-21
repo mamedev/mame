@@ -43,7 +43,8 @@ public:
 	// configuration access
 	address_map_constructor get_addrmap(int spacenum = 0) const { return spacenum >= 0 && spacenum < int(m_address_map.size()) ? m_address_map[spacenum] : address_map_constructor(); }
 	const address_space_config *space_config(int spacenum = 0) const { return spacenum >= 0 && spacenum < int(m_address_config.size()) ? m_address_config[spacenum] : nullptr; }
-	int max_space_count() const { return m_address_config.size(); }
+	const address_space_config *logical_space_config(int spacenum = 0) const { return spacenum >= 0 && spacenum < int(m_logical_address_config.size()) ? m_logical_address_config[spacenum] : nullptr; }
+	int max_space_count() const { return std::max(m_address_config.size(), m_logical_address_config.size()); }
 
 	// configuration helpers
 	template <typename T, typename U, typename Ret, typename... Params>
@@ -60,6 +61,7 @@ public:
 
 	// basic information getters
 	bool has_space(int index = 0) const { return index >= 0 && index < int(m_addrspace.size()) && m_addrspace[index]; }
+	bool has_logical_space(int index = 0) const { return index >= 0 && index < int(m_logical_address_config.size()) && m_logical_address_config[index]; }
 	bool has_configured_map(int index = 0) const { return index >= 0 && index < int(m_address_map.size()) && !m_address_map[index].isnull(); }
 	address_space &space(int index = 0) const { assert(index >= 0 && index < int(m_addrspace.size()) && m_addrspace[index]); return *m_addrspace[index]; }
 
@@ -87,6 +89,7 @@ protected:
 
 	// required overrides
 	virtual space_config_vector memory_space_config() const = 0;
+	virtual space_config_vector memory_logical_space_config() const;
 
 	// optional operation overrides
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space);
@@ -101,6 +104,7 @@ protected:
 private:
 	// internal state
 	std::vector<const address_space_config *>   m_address_config; // configuration for each space
+	std::vector<const address_space_config *>   m_logical_address_config; // configuration for each logical (virtual) space
 	std::vector<std::unique_ptr<address_space>> m_addrspace; // reported address spaces
 };
 

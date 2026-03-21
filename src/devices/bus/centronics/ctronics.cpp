@@ -128,6 +128,7 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 #include "epson_lx810l.h"
 #include "epson_rx80.h"
 #include "hasp_savquest.h"
+#include "neomania_adapter.h"
 #include "mz1p16.h"
 #include "nec_p72.h"
 #include "nlq401.h"
@@ -158,4 +159,6 @@ void centronics_devices(device_slot_interface &device)
 	device.option_add("mz1p16", MZ1P16);
 
 	device.option_add_internal("hasp_savquest", HASP_SAVQUEST);
+	// TODO: will become option_add_internal when misc/neomania.cpp will have a working chipset
+	device.option_add("neomania", NEOMANIA_ADAPTER);
 }

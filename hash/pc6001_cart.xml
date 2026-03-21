@@ -5,7 +5,7 @@ license:CC0-1.0
 -->
 <softwarelist name="pc6001_cart" description="NEC PC-6001 cartridges">
 
-	<!-- Official Games -->
+<!-- !Official Games -->
 
 	<software name="canyoncl" supported="yes">
 		<description>Canyon Climber</description>
@@ -19,28 +19,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- Doesn't boot -->
-	<software name="crowman" supported="no">
+	<software name="crowman" supported="partial">
 		<description>The Curse of Crowley Manor</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1981</year>
+		<!-- "FOR NEC HOME ELECTRONICS" -->
+		<publisher>Adventure International</publisher>
+		<notes><![CDATA[
+Doesn't boot on regular pc6001 (does on pc6001mk2)
+]]></notes>
 		<part name="cart" interface="pc6001_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="the curse of crowley manor.bin" size="16384" crc="592c54af" sha1="c0e2155181a20d3c963ee9151a3eabab4765ffd9"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Cart back has a date code of 57.10.12, Showa 57 is 1982 -->
-	<software name="turpina" cloneof="turpin" supported="yes">
-		<description>Turpin (1982-10-12)</description>
-		<year>1982</year>
-		<publisher>Konami</publisher>
-		<info name="serial" value="5200003"/>
-		<info name="alt_title" value="ターピン"/>
-		<part name="cart" interface="pc6001_cart">
-			<dataarea name="rom" size="4096">
-				<rom name="turpin-pc-6001.bin" size="4096" crc="e1c4676c" sha1="09ca64e9c79b18fcd322c6676d12710ba095054d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -59,11 +48,27 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- Has missing text (uses raster effect) -->
+	<!-- Cart back has a date code of 57.10.12, Showa 57 is 1982 -->
+	<software name="turpina" cloneof="turpin" supported="yes">
+		<description>Turpin (1982-10-12)</description>
+		<year>1982</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="5200003"/>
+		<info name="alt_title" value="ターピン"/>
+		<part name="cart" interface="pc6001_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="turpin-pc-6001.bin" size="4096" crc="e1c4676c" sha1="09ca64e9c79b18fcd322c6676d12710ba095054d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tutankhm" supported="partial">
 		<description>Tutankham</description>
 		<year>1982</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Has missing text (uses raster effect)
+]]></notes>
 		<info name="alt_title" value="ツタンカーム"/>
 
 		<part name="cart" interface="pc6001_cart">
@@ -73,9 +78,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- Homebrew Games -->
+<!-- !Homebrew Games -->
 
-	<!-- both these dumps aren't valid ROM sizes -->
 	<software name="moonraid" supported="yes">
 		<description>Moon Raiders</description>
 		<year>2010</year>
@@ -85,7 +89,7 @@ license:CC0-1.0
 
 		<part name="cart" interface="pc6001_cart">
 			<dataarea name="rom" size="16079">
-				<rom name="mr.bin" size="16079" crc="51ac06d8" sha1="736c7c72bb632a3bc26ed2e081a53d30b99cee2b" status="baddump"/>
+				<rom name="mr.bin" size="16079" crc="51ac06d8" sha1="736c7c72bb632a3bc26ed2e081a53d30b99cee2b" />
 			</dataarea>
 		</part>
 	</software>
@@ -100,18 +104,20 @@ license:CC0-1.0
 
 		<part name="cart" interface="pc6001_cart">
 			<dataarea name="rom" size="16106">
-				<rom name="moon raiders.bin" size="16106" crc="997a98ce" sha1="3b79342d24b87af70e9c4d3ad112153c6c02045a" status="baddump"/>
+				<rom name="moon raiders.bin" size="16106" crc="997a98ce" sha1="3b79342d24b87af70e9c4d3ad112153c6c02045a" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Too slow during gameplay -->
 	<software name="dawnpat" supported="no">
 		<!-- VZ200 port -->
 		<description>Dawn Patrol (beta)</description>
 		<year>2012</year>
 		<!-- Developed by fuzzballj -->
 		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Too slow during gameplay
+]]></notes>
 		<part name="cart" interface="pc6001_cart">
 			<dataarea name="rom" size="11829">
 				<rom name="dawn.bin" size="11829" crc="17f5a534" sha1="bd2a1bb78ae25e4f0f189bdcb963ba8e4038228d" status="baddump"/>
@@ -119,13 +125,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- Operating Systems -->
+<!-- !Operating Systems -->
 
-	<!-- TODO: checkout which extra commands it introduces -->
 	<software name="n60basic">
 		<description>N60 Extended BASIC</description>
 		<year>1981</year>
 		<publisher>NEC / Microsoft</publisher>
+		<info name="usage" value="Introduces modes 3 and 4 for vanilla pc6001" />
 		<part name="cart" interface="pc6001_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="[os] n60 extended basic.bin" size="8192" crc="26a33482" sha1="9034860224856033717a6d1157b469e61ff4467a"/>
@@ -133,7 +139,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- Utilities -->
+<!-- !Utilities -->
 
 	<!-- TODO: how to actually draw? Missing key? -->
 	<software name="micropai" supported="no">
@@ -149,11 +155,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- Doesn't boot -->
 	<software name="musedit" supported="no">
 		<description>Music Editor</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Eventually requires [cassette] recording to save music scores
+Not extensively tested
+]]></notes>
 		<part name="cart" interface="pc6001_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="[utility] music editor.bin" size="8192" crc="5bad1bca" sha1="1b41fc82f9b59c30fadb8d40d326145dd76a0bd2"/>
@@ -166,6 +175,11 @@ license:CC0-1.0
 		<description>The Electric Pencil (v2.0R)</description>
 		<year>1982</year>
 		<publisher>Racet Computes</publisher>
+		<notes><![CDATA[
+Word processor?
+Eventually requires [cassette] recording to save files (cfr. F2 key menu)
+Not extensively tested
+]]></notes>
 		<part name="cart" interface="pc6001_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="[utility] the electric pencil (32kb).bin" size="16384" crc="31237eb5" sha1="7a46de43d30f5f5d05cc99bd1159d3a00238cf90"/>
@@ -173,15 +187,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- White screen, pings AY8910 registers with custom writes -->
 	<software name="touchpan" supported="no">
 		<description>Touch Panel Utility</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+White screen, pings [PSG] registers with custom writes
+]]></notes>
 		<part name="cart" interface="pc6001_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="[Utility] Touch Panel (ROM cart).bin" size="4096" crc="50a31175" sha1="9c18b6fad8acdd438d63b144a21c4405e7ae8f15"/>
 			</dataarea>
 		</part>
 	</software>
+
 </softwarelist>

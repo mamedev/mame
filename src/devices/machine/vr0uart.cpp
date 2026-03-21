@@ -32,9 +32,9 @@ DEFINE_DEVICE_TYPE(VRENDER0_UART, vr0uart_device, "vr0uart", "MagicEyes VRender0
 //  vr0uart_device - constructor
 //-------------------------------------------------
 
-vr0uart_device::vr0uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VRENDER0_UART, tag, owner, clock),
-	  device_serial_interface(mconfig, *this)
+vr0uart_device::vr0uart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, VRENDER0_UART, tag, owner, clock),
+	device_serial_interface(mconfig, *this)
 {
 }
 
@@ -71,32 +71,32 @@ void vr0uart_device::device_reset()
 	update_serial_config();
 }
 
-inline void vr0uart_device::tx_send_byte(uint8_t val)
+inline void vr0uart_device::tx_send_byte(u8 val)
 {
 	transmit_register_setup(val);
 	m_ustat |= 0x20;
 }
 
-inline uint32_t vr0uart_device::calculate_baud_rate()
+inline u32 vr0uart_device::calculate_baud_rate()
 {
-	uint32_t div_rate = ((m_ubdr & 0xffff) + 1) * 16;
+	const u32 div_rate = ((m_ubdr & 0xffff) + 1) * 16;
 	// TODO: external / internal serial clock config
 	return (this->clock() / 2) / div_rate;
 }
 
 void vr0uart_device::update_serial_config()
 {
-	const parity_t parity_modes[4] = { PARITY_NONE, PARITY_NONE, PARITY_EVEN, PARITY_ODD };
+	constexpr parity_t parity_modes[4] = { PARITY_NONE, PARITY_NONE, PARITY_EVEN, PARITY_ODD };
 
-	uint8_t word_length = m_ucon & 1 ? 8 : 7;
-	parity_t parity_mode = parity_modes[(m_ucon & 0xc) >> 2];
-	stop_bits_t stop_bits = m_ucon & 2 ? STOP_BITS_2 : STOP_BITS_1;
+	const u8 word_length = BIT(m_ucon, 0) ? 8 : 7;
+	const parity_t parity_mode = parity_modes[(m_ucon & 0xc) >> 2];
+	const stop_bits_t stop_bits = BIT(m_ucon, 1) ? STOP_BITS_2 : STOP_BITS_1;
 
 	set_data_frame(1, word_length, parity_mode, stop_bits);
 
-	if (m_ucon & 0x100) // UART Enable
+	if (BIT(m_ucon, 8)) // UART Enable
 	{
-		uint32_t clock_rate = calculate_baud_rate();
+		const u32 clock_rate = calculate_baud_rate();
 		set_rcv_rate(clock_rate);
 		set_tra_rate(clock_rate);
 	}
@@ -109,7 +109,7 @@ void vr0uart_device::update_serial_config()
 
 void vr0uart_device::tra_callback()
 {
-	int bit = transmit_register_get_data_bit();
+	const int bit = transmit_register_get_data_bit();
 	m_ustat |= 0x40;
 	m_parent->write_line_tx(m_channel_num, bit);
 }
@@ -117,7 +117,7 @@ void vr0uart_device::tra_callback()
 void vr0uart_device::tra_complete()
 {
 	m_ustat &= ~0x60;
-	m_parent->IntReq(m_channel_num ? 18 : 15);
+	m_parent->int_req(m_channel_num ? 18 : 15);
 }
 
 void vr0uart_device::rcv_complete()
@@ -136,10 +136,10 @@ void vr0uart_device::rcv_complete()
 	else
 		m_ustat |= 1; // overrun
 
-	if (m_ucon & 0x20 && m_ustat & 0xf)
-		m_parent->IntReq(m_channel_num ? 16 : 13);
+	if (BIT(m_ucon, 5) && m_ustat & 0xf)
+		m_parent->int_req(m_channel_num ? 16 : 13);
 	else
-		m_parent->IntReq(m_channel_num ? 17 : 14);
+		m_parent->int_req(m_channel_num ? 17 : 14);
 }
 
 
@@ -157,12 +157,12 @@ void vr0uart_device::rcv_complete()
  * ---- ---- --x- Stop Bits (1=2 bits, 0=1 Bit)
  * ---- ---- ---x Word Length (1=8 bits, 0=7 bits)
  */
-uint32_t vr0uart_device::control_r()
+u32 vr0uart_device::control_r()
 {
 	return m_ucon;
 }
 
-void vr0uart_device::control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void vr0uart_device::control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_ucon);
 	update_serial_config();
@@ -178,42 +178,43 @@ void vr0uart_device::control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
  * ---- ---- --x- Parity error
  * ---- ---- ---x Overrun Error
  */
-uint32_t vr0uart_device::status_r()
+u32 vr0uart_device::status_r()
 {
-	uint32_t res = m_ustat;
+	u32 res = m_ustat;
 	if (!m_urxb_fifo.empty())
 	{
 		res |= 0x10;
 		res |= (m_urxb_fifo.queue_length() << 8);
 	}
 	// Break detect and errors are cleared by reading this
-	m_ustat &= ~0xf;
+	if (!machine().side_effects_disabled())
+		m_ustat &= ~0xf;
 	return res;
 }
 
-void vr0uart_device::transmit_buffer_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void vr0uart_device::transmit_buffer_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		tx_send_byte(data & 0xff);
 }
 
-uint32_t vr0uart_device::receive_buffer_r(offs_t offset, uint32_t mem_mask)
+u32 vr0uart_device::receive_buffer_r(offs_t offset, u32 mem_mask)
 {
 	// TODO: unknown value & behaviour attempting to read this on empty FIFO (stall?)
-	uint8_t res = 0;
+	u8 res = 0;
 
 	if (ACCESSING_BITS_0_7 && !m_urxb_fifo.empty())
-		res = m_urxb_fifo.dequeue();
+		res = machine().side_effects_disabled() ? m_urxb_fifo.peek() : m_urxb_fifo.dequeue();
 
 	return res;
 }
 
-uint32_t vr0uart_device::baud_rate_div_r()
+u32 vr0uart_device::baud_rate_div_r()
 {
 	return m_ubdr;
 }
 
-void vr0uart_device::baud_rate_div_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void vr0uart_device::baud_rate_div_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_ubdr);
 	update_serial_config();

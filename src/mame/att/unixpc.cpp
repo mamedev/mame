@@ -16,9 +16,10 @@
 
 
 #include "emu.h"
-#include "cpu/m68000/m68010.h"
+
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
+#include "cpu/m68000/m68010.h"
 #include "imagedev/floppy.h"
 #include "imagedev/harddriv.h"
 #include "machine/6850acia.h"
@@ -30,6 +31,7 @@
 #include "machine/wd1010.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80sio.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -153,7 +155,7 @@ void unixpc_state::ram_mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void unixpc_state::machine_start()
 {
-	m_ramptr = (uint16_t *)m_ram->pointer();
+	m_ramptr = m_ram->pointer<uint16_t>();
 	m_ramsize = m_ram->size();
 }
 

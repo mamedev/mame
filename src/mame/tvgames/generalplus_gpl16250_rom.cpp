@@ -26,18 +26,17 @@ public:
 	{
 	}
 
-	void tkmag220(machine_config &config);
+	void tkmag220(machine_config &config) ATTR_COLD;
 
 protected:
-
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	int m_upperbase = 0;
-
 	virtual uint16_t cs0_r(offs_t offset) override;
 
 	void tkmag220_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	int m_upperbase = 0;
 };
 
 
@@ -49,19 +48,18 @@ public:
 	{
 	}
 
-	void beijuehh(machine_config &config);
+	void beijuehh(machine_config &config) ATTR_COLD;
 
 protected:
-
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	int m_upperbase = 0;
-
 	virtual uint16_t cs0_r(offs_t offset) override;
 
 	void beijuehh_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void beijuehh_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	int m_upperbase = 0;
 
 	uint16_t m_portb_data = 0U;
 	uint16_t m_portd_data = 0U;
@@ -79,24 +77,21 @@ public:
 
 	virtual uint16_t cs0_r(offs_t offset) override;
 
-	void gameu(machine_config &config);
+	void gameu(machine_config &config) ATTR_COLD;
 
-	void init_gameu();
-	void init_gameu50();
-	void init_gameu108();
+	void init_gameu() ATTR_COLD;
+	void init_gameu50() ATTR_COLD;
+	void init_gameu108() ATTR_COLD;
 
 protected:
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void gameu_porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gameu_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gameu_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gameu_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-	void decrypt_gameu();
 
 	uint32_t m_upperbase;
 	uint16_t m_porta_data;
@@ -729,6 +724,8 @@ void gameu_handheld_game_state::gameu_portd_w(offs_t offset, uint16_t data, uint
 }
 void gameu_handheld_game_state::machine_start()
 {
+	gcm394_game_state::machine_start();
+
 	m_upperbase = 0;
 	m_porta_data = 0;
 	m_portb_data = 0;
@@ -816,7 +813,7 @@ CONS(2009, smartfpf,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init,
 CONS(2008, fpsport,   0,       0, base, base,     gcm394_game_state, empty_init, "Fisher-Price", "3-in-1 Smart Sports! (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // uses a barcode card scanner device with custom cards
-CONS(200?, dressmtv,  0,       0, base_alt_irq, dressmtv, gcm394_game_state, empty_init, "Tomy Takara", "Disney Princess Dress Mania TV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(200?, dressmtv,  0,       0, base_alt_irq, dressmtv, gcm394_game_state, empty_init, "Takara Tomy", "Disney Princess Dress Mania TV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // These are ports of the 'Family Sport' games to GPL16250 type hardware, but they don't seem to use many unSP 2.0 instructions.
 // The menu style is close to 'm505neo' but the game selection is closer to 'dnv200fs' (but without the Sports titles removed, and with a few other extras not found on that unit)

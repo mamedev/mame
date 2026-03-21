@@ -203,24 +203,23 @@ public:
 		, m_cart(*this, "cartslot")
 	{ }
 
-	void tourvision(machine_config &config);
+	void tourvision(machine_config &config) ATTR_COLD;
 
 private:
-	void tourvision_8085_d000_w(uint8_t data);
-	void tourvision_i8155_a_w(uint8_t data);
-	void tourvision_i8155_b_w(uint8_t data);
-	void tourvision_i8155_c_w(uint8_t data);
+	void tourvision_8085_d000_w(u8 data);
+	void tourvision_i8155_a_w(u8 data);
+	void tourvision_i8155_b_w(u8 data);
+	void tourvision_i8155_c_w(u8 data);
 	void tourvision_timer_out(int state);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void pce_io(address_map &map) ATTR_COLD;
 	void pce_mem(address_map &map) ATTR_COLD;
 	void tourvision_8085_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_subcpu;
 	required_device<generic_slot_device> m_cart;
-	uint32_t  m_rom_size = 0;
+	u32  m_rom_size = 0;
 };
 
 DEVICE_IMAGE_LOAD_MEMBER(tourvision_state::cart_load)
@@ -229,27 +228,27 @@ DEVICE_IMAGE_LOAD_MEMBER(tourvision_state::cart_load)
 	m_cart->rom_alloc(m_rom_size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), m_rom_size, "rom");
 
-	uint8_t *rgn = memregion("maincpu")->base();
-	uint8_t *base = m_cart->get_rom_base();
+	u8 *rgn = memregion("maincpu")->base();
+	u8 *base = m_cart->get_rom_base();
 
 	if (m_rom_size == 0x0c0000)
 	{
-		memcpy(rgn+0x000000, base+0x000000, 0x0c0000 );
-		memcpy(rgn+0x0c0000, base+0x080000, 0x040000 );
+		memcpy(rgn + 0x000000, base + 0x000000, 0x0c0000 );
+		memcpy(rgn + 0x0c0000, base + 0x080000, 0x040000 );
 	}
 	else if (m_rom_size == 0x060000)
 	{
-		memcpy(rgn+0x000000, base+0x000000, 0x040000 );
-		memcpy(rgn+0x040000, base+0x000000, 0x040000 );
-		memcpy(rgn+0x080000, base+0x040000, 0x020000 );
-		memcpy(rgn+0x0a0000, base+0x040000, 0x020000 );
-		memcpy(rgn+0x0c0000, base+0x040000, 0x020000 );
-		memcpy(rgn+0x0e0000, base+0x040000, 0x020000 );
+		memcpy(rgn + 0x000000, base + 0x000000, 0x040000 );
+		memcpy(rgn + 0x040000, base + 0x000000, 0x040000 );
+		memcpy(rgn + 0x080000, base + 0x040000, 0x020000 );
+		memcpy(rgn + 0x0a0000, base + 0x040000, 0x020000 );
+		memcpy(rgn + 0x0c0000, base + 0x040000, 0x020000 );
+		memcpy(rgn + 0x0e0000, base + 0x040000, 0x020000 );
 	}
 	else
 	{
-		for (int i=0; i<0x100000; i+=m_rom_size)
-			memcpy(rgn+i, base+0x000000, m_rom_size);
+		for (int i = 0; i < 0x100000; i += m_rom_size)
+			memcpy(rgn + i, base + 0x000000, m_rom_size);
 	}
 
 #if 0
@@ -339,18 +338,11 @@ INPUT_PORTS_END
 
 void tourvision_state::pce_mem(address_map &map)
 {
-	map(0x000000, 0x0FFFFF).rom();
-	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000);
-	map(0x1FE000, 0x1FE3FF).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
-	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
+	map(0x000000, 0x0fffff).rom();
+	common_mem_map(map);
 }
 
-void tourvision_state::pce_io(address_map &map)
-{
-	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
-}
-
-void tourvision_state::tourvision_8085_d000_w(uint8_t data)
+void tourvision_state::tourvision_8085_d000_w(u8 data)
 {
 	//logerror( "D000 (8085) write %02x\n", data );
 }
@@ -369,18 +361,18 @@ void tourvision_state::tourvision_8085_map(address_map &map)
 	map(0xf000, 0xf000).nopr(); // protection or internal counter ? there is sometimes some data in BIOS0 which is replaced by 0xff in BIOS1
 }
 
-void tourvision_state::tourvision_i8155_a_w(uint8_t data)
+void tourvision_state::tourvision_i8155_a_w(u8 data)
 {
 	//logerror("i8155 Port A: %02X\n", data);
 }
 
-void tourvision_state::tourvision_i8155_b_w(uint8_t data)
+void tourvision_state::tourvision_i8155_b_w(u8 data)
 {
 	// Selects game slot in bits 0 - 1
 	//logerror("i8155 Port B: %02X\n", data);
 }
 
-void tourvision_state::tourvision_i8155_c_w(uint8_t data)
+void tourvision_state::tourvision_i8155_c_w(u8 data)
 {
 	//logerror("i8155 Port C: %02X\n", data);
 }
@@ -395,11 +387,8 @@ void tourvision_state::tourvision_timer_out(int state)
 void tourvision_state::tourvision(machine_config &config)
 {
 	// Basic machine hardware
-	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
+	common_cpu(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tourvision_state::pce_mem);
-	m_maincpu->set_addrmap(AS_IO, &tourvision_state::pce_io);
-	m_maincpu->port_in_cb().set(FUNC(tourvision_state::pce_joystick_r));
-	m_maincpu->port_out_cb().set(FUNC(tourvision_state::pce_joystick_w));
 	m_maincpu->add_route(0, "speaker", 1.00, 0);
 	m_maincpu->add_route(1, "speaker", 1.00, 1);
 
@@ -409,20 +398,7 @@ void tourvision_state::tourvision(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &tourvision_state::tourvision_8085_map);
 
 	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
-	screen.set_screen_update(FUNC(pce_common_state::screen_update));
-	screen.set_palette(m_huc6260);
-
-	HUC6260(config, m_huc6260, PCE_MAIN_CLOCK);
-	m_huc6260->next_pixel_data().set("huc6270", FUNC(huc6270_device::next_pixel));
-	m_huc6260->time_til_next_event().set("huc6270", FUNC(huc6270_device::time_until_next_event));
-	m_huc6260->vsync_changed().set("huc6270", FUNC(huc6270_device::vsync_changed));
-	m_huc6260->hsync_changed().set("huc6270", FUNC(huc6270_device::hsync_changed));
-
-	huc6270_device &huc6270(HUC6270(config, "huc6270", 0));
-	huc6270.set_vram_size(0x10000);
-	huc6270.irq().set_inputline(m_maincpu, 0);
+	common_video(config);
 
 	i8155_device &i8155(I8155(config, "i8155", 1000000 /*?*/));
 	i8155.out_pa_callback().set(FUNC(tourvision_state::tourvision_i8155_a_w));
@@ -430,7 +406,7 @@ void tourvision_state::tourvision(machine_config &config)
 	i8155.out_pc_callback().set(FUNC(tourvision_state::tourvision_i8155_c_w));
 	i8155.out_to_callback().set(FUNC(tourvision_state::tourvision_timer_out));
 
-	SPEAKER(config, "speaker", 2).front();
+	SPEAKER(config, "speaker", 2).front(); // TODO: correct?
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "tourvision_cart", "bin"));
 	cartslot.set_device_load(FUNC(tourvision_state::cart_load));

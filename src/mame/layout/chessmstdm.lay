@@ -58,7 +58,7 @@ authors:Sandro Ronco, hap
 	<element name="text_diamond">     <text string="diamond"      align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
 	<element name="text_monitor">     <text string="MONITOR"      align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
 	<element name="text_view">        <text string="VIEW"         align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_reset">       <text string="RESET"        align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
+	<element name="text_reset">       <text string="RESET"        align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
 	<element name="text_selection">   <text string="SELECTION"    align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
 	<element name="text_dialogue">    <text string="DIALOGUE"     align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
 	<element name="text_function">    <text string="FUNCTION"     align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
@@ -377,7 +377,7 @@ authors:Sandro Ronco, hap
 
 		<element ref="text_monitor">    <bounds x="103" y="20.4" width="10" height="2" /></element>
 		<element ref="text_view">       <bounds x="103" y="27.5" width="14" height="2" /></element>
-		<element ref="text_reset">      <bounds x="111" y="24.0" width="7"  height="2" /></element>
+		<element ref="text_reset">      <bounds x="103" y="24.0" width="13" height="2" /></element>
 		<element ref="text_function">   <bounds x="103" y="33.3" width="14" height="2" /></element>
 		<element ref="text_notation">   <bounds x="103" y="35.7" width="14" height="2" /></element>
 		<element ref="text_selection">  <bounds x="103" y="40.3" width="14" height="2" /></element>
@@ -398,8 +398,8 @@ authors:Sandro Ronco, hap
 			<element ref="brown"><bounds x="101" yc="~y~" width="26" height="0.2" /></element>
 		</repeat>
 
-		<element name="8.a" ref="led"><bounds x="111.2" y="20.65" width="1.5" height="1.5" /></element>
-		<element name="9.a" ref="led"><bounds x="112.7" y="75.25" width="1.5" height="1.5" /></element>
+		<element name="8.a" ref="led"><bounds x="112.5" y="20.65" width="1.5" height="1.5" /></element>
+		<element name="9.a" ref="led"><bounds x="113.75" y="75.25" width="1.5" height="1.5" /></element>
 		<element ref="brown"><bounds x="119.4" y="24.2" width="1" height="1.6" /></element>
 		<element ref="brown"><bounds x="116.7" yc="25.0" width="3" height="0.2" /></element>
 		<element ref="cwhite"><bounds x="119.6" y="24.2" width="1" height="1.6" /></element>

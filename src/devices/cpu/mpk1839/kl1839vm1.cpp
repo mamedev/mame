@@ -715,6 +715,12 @@ void kl1839vm1_device::vax_decode_pc()
 					m_mem_reg[arg_n] = p;
 					m_op_size += 1;
 				}
+				else if ((p & 0xc0) == 0x00) // 0x00-0x3f constants
+				{
+					m_pcm_queue[arg_n] = p;
+					m_mem_reg[arg_n] = p;
+					m_op_size += 1;
+				}
 				else // ?
 				{
 					LOGVAX("OP=%02x unknown prefix %02x in operand mode::%02d\n", op, p, u8(mode));
@@ -757,6 +763,12 @@ void kl1839vm1_device::vax_decode_pc()
 					m_mem_reg[arg_n] = p;
 					m_op_size += 1;
 				}
+				else if ((p & 0xc0) == 0x00) // 0x00-0x3f constants
+				{
+					m_pcm_queue[arg_n] = p;
+					m_mem_reg[arg_n] = p;
+					m_op_size += 1;
+				}
 				else // ?
 				{
 					LOGVAX("OP=%02x unknown prefix %02x in operand mode::%02d\n", op, p, u8(mode));
@@ -785,9 +797,11 @@ void kl1839vm1_device::vax_decode_pc()
 			{
 				args_type <<= 1;
 				if ((m_mem_reg[i] & 0xf0) == 0x80)
-					args_type |= 1;
+					args_type |= 1; // M
 				else if ((m_mem_reg[i] & 0xf0) == 0x50)
-					args_type |= 0;
+					args_type |= 0; // R
+				else if ((m_mem_reg[i] & 0xc0) == 0x00)
+					args_type |= 1; // M
 				else
 					LOGVAX("Unknown argument type: %02x\n", m_mem_reg[i]);
 			}
@@ -897,10 +911,11 @@ u32 kl1839vm1_device::vax_pcm_pull(bool is_bo)
 	{
 		PCM = m_pcm_queue[0];
 
-		bool is_mem = (m_mem_reg[0] & 0xf0) == 0x80;
+		const bool is_mem = (m_mem_reg[0] & 0xf0) == 0x80;
 		if (is_bo && !is_mem)
 		{
-			PCM = R(PCM);
+			if ((m_mem_reg[0] & 0xc0) != 0x00) // !constant
+				PCM = R(PCM);
 		}
 		else if (is_mem && ((m_mem_reg[0] & 0x0f) != 0x0f))
 		{

@@ -4,8 +4,20 @@
 
 #include "emu.h"
 #include "unsp.h"
-#include "unspfe.h"
+
 #include "unspdefs.h"
+#include "unspfe.h"
+
+#include "cpu/drcumlsh.h"
+
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+/* map variables */
+#define MAPVAR_PC               M0
+
 
 void unsp_device::invalidate_cache()
 {
@@ -179,7 +191,7 @@ void unsp_device::code_compile_block(offs_t pc)
 
 				/* determine the last instruction in this sequence */
 				for (seqlast = seqhead; seqlast != nullptr; seqlast = seqlast->next())
-					if (seqlast->flags & OPFLAG_END_SEQUENCE)
+					if (seqlast->end_sequence())
 						break;
 				assert(seqlast != nullptr);
 
@@ -204,11 +216,11 @@ void unsp_device::code_compile_block(offs_t pc)
 				}
 
 				/* validate this code block if we're not pointing into ROM */
-				if (m_program.space().get_write_ptr(seqhead->physpc) != nullptr)
+				if (m_program.space().get_write_ptr(seqhead->pc) != nullptr)
 					generate_checksum_block(block, compiler, seqhead, seqlast);
 
 				/* label this instruction, if it may be jumped to locally */
-				if (seqhead->flags & OPFLAG_IS_BRANCH_TARGET)
+				if (seqhead->is_branch_target())
 					UML_LABEL(block, seqhead->pc | 0x80000000);
 
 				/* iterate over instructions in the sequence and compile them */
@@ -525,9 +537,9 @@ void unsp_device::generate_checksum_block(drcuml_block &block, compiler_state &c
 	}
 
 	/* full verification; sum up everything */
-	void *memptr = m_program.space().get_write_ptr(seqhead->physpc);
+	void *memptr = m_program.space().get_write_ptr(seqhead->pc);
 	UML_LOAD(block, I0, memptr, 0, SIZE_WORD, SCALE_x2);
-	uint32_t sum = seqhead->opptr.w[0];
+	uint32_t sum = seqhead->opptr[0];
 	for (int i = 1; i < seqhead->length; i++)
 	{
 		UML_LOAD(block, I1, memptr, i, SIZE_WORD, SCALE_x2);
@@ -536,12 +548,12 @@ void unsp_device::generate_checksum_block(drcuml_block &block, compiler_state &c
 	}
 	for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 	{
-		if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
+		if (!curdesc->virtual_noop())
 		{
-			memptr = m_program.space().get_write_ptr(curdesc->physpc);
+			memptr = m_program.space().get_write_ptr(curdesc->pc);
 			UML_LOAD(block, I1, memptr, 0, SIZE_WORD, SCALE_x2);
 			UML_ADD(block, I0, I0, I1);
-			sum += curdesc->opptr.w[0];
+			sum += curdesc->opptr[0];
 			for (int i = 1; i < curdesc->length; i++)
 			{
 				UML_LOAD(block, I1, memptr, i, SIZE_WORD, SCALE_x2);
@@ -603,8 +615,8 @@ void unsp_device::generate_branch(drcuml_block &block, compiler_state &compiler,
 void unsp_device::generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	/* add an entry for the log */
-	if (m_drcuml->logging() && !(desc->flags & OPFLAG_VIRTUAL_NOOP))
-		log_add_disasm_comment(block, desc->pc, desc->opptr.w[0]);
+	if (m_drcuml->logging() && !desc->virtual_noop())
+		log_add_disasm_comment(block, desc->pc, desc->opptr[0]);
 
 	/* set the PC map variable */
 	UML_MAPVAR(block, MAPVAR_PC, desc->pc);
@@ -620,14 +632,14 @@ void unsp_device::generate_sequence_instruction(drcuml_block &block, compiler_st
 	UML_CALLC(block, cfunc_log_regs, this);
 #endif
 
-	if (!(desc->flags & OPFLAG_VIRTUAL_NOOP))
+	if (!desc->virtual_noop())
 	{
 		/* compile the instruction */
 		if (!generate_opcode(block, compiler, desc))
 		{
 			UML_ROLINS(block, mem(&m_core->m_r[REG_SR]), desc->pc, 16, 0x3f);
 			UML_AND(block, mem(&m_core->m_r[REG_PC]), desc->pc, 0x0000ffff);
-			UML_MOV(block, mem(&m_core->m_arg0), desc->opptr.w[0]);
+			UML_MOV(block, mem(&m_core->m_arg0), desc->opptr[0]);
 			UML_CALLC(block, cfunc_unimplemented, this);
 		}
 	}
@@ -700,7 +712,7 @@ void unsp_device::generate_update_nz(drcuml_block &block)
 
 bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
-	uint32_t op = (uint32_t)desc->opptr.w[0];
+	const uint32_t op = uint32_t(desc->opptr[0]);
 
 	generate_add_lpc(block, 1);
 
@@ -1032,7 +1044,7 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 					return false;
 
 				// MULS
-				UML_MOV(block, mem(&m_core->m_arg0), desc->opptr.w[0]);
+				UML_MOV(block, mem(&m_core->m_arg0), desc->opptr[0]);
 				UML_CALLC(block, ccfunc_muls, this);
 				return true;
 

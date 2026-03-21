@@ -9,7 +9,7 @@
 #include "slot.h"
 
 class pc9801_54_2mb_device : public device_t
-					  	   , public device_pc9801_54_interface
+						   , public device_pc9801_54_interface
 {
 public:
 	pc9801_54_2mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -19,7 +19,7 @@ protected:
 };
 
 class pc9801_54_4mb_device : public device_t
-					  	   , public device_pc9801_54_interface
+						   , public device_pc9801_54_interface
 {
 public:
 	pc9801_54_4mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -29,7 +29,7 @@ protected:
 };
 
 class pc9801_54_7mb_device : public device_t
-					  	   , public device_pc9801_54_interface
+						   , public device_pc9801_54_interface
 {
 public:
 	pc9801_54_7mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -40,7 +40,7 @@ protected:
 
 
 class pc9801_54_8mb_device : public device_t
-					  	   , public device_pc9801_54_interface
+						   , public device_pc9801_54_interface
 {
 public:
 	pc9801_54_8mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -50,7 +50,7 @@ protected:
 };
 
 class pc9801_54_9mb_device : public device_t
-					  	   , public device_pc9801_54_interface
+						   , public device_pc9801_54_interface
 {
 public:
 	pc9801_54_9mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -60,7 +60,7 @@ protected:
 };
 
 class pc9801_54_15mb_device : public device_t
-					  	   , public device_pc9801_54_interface
+						   , public device_pc9801_54_interface
 {
 public:
 	pc9801_54_15mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

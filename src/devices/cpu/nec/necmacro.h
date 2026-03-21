@@ -25,8 +25,14 @@
 #define ADDB { uint32_t res=dst+src; SetCFB(res); SetOFB_Add(res,src,dst); SetAF(res,src,dst); SetSZPF_Byte(res); dst=(BYTE)res; }
 #define ADDW { uint32_t res=dst+src; SetCFW(res); SetOFW_Add(res,src,dst); SetAF(res,src,dst); SetSZPF_Word(res); dst=(WORD)res; }
 
+#define ADDCB { uint32_t res=dst+src+CF; SetCFB(res); SetOFB_Add(res,src,dst); SetAF(res,src,dst); SetSZPF_Byte(res); dst=(BYTE)res; }
+#define ADDCW { uint32_t res=dst+src+CF; SetCFW(res); SetOFW_Add(res,src,dst); SetAF(res,src,dst); SetSZPF_Word(res); dst=(WORD)res; }
+
 #define SUBB { uint32_t res=dst-src; SetCFB(res); SetOFB_Sub(res,src,dst); SetAF(res,src,dst); SetSZPF_Byte(res); dst=(BYTE)res; }
 #define SUBW { uint32_t res=dst-src; SetCFW(res); SetOFW_Sub(res,src,dst); SetAF(res,src,dst); SetSZPF_Word(res); dst=(WORD)res; }
+
+#define SUBCB { uint32_t res=dst-src-CF; SetCFB(res); SetOFB_Sub(res,src,dst); SetAF(res,src,dst); SetSZPF_Byte(res); dst=(BYTE)res; }
+#define SUBCW { uint32_t res=dst-src-CF; SetCFW(res); SetOFW_Sub(res,src,dst); SetAF(res,src,dst); SetSZPF_Word(res); dst=(WORD)res; }
 
 #define ORB dst|=src; m_CarryVal=m_OverVal=m_AuxVal=0; SetSZPF_Byte(dst)
 #define ORW dst|=src; m_CarryVal=m_OverVal=m_AuxVal=0; SetSZPF_Word(dst)

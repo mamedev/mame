@@ -56,7 +56,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="applethfa" cloneof="applethf">
-		<description>Apple Thief (Alt)</description>
+		<description>Apple Thief (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="사과도둑" />
@@ -68,7 +68,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="applethfb" cloneof="applethf">
-		<description>Apple Thief (Alt 2)</description>
+		<description>Apple Thief (alt 2)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="사과도둑" />
@@ -92,7 +92,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="astbelta" cloneof="astbelt">
-		<description>Asteroid Belt (Alt)</description>
+		<description>Asteroid Belt (alt)</description>
 		<year>1985</year>
 		<publisher>Static Soft</publisher>
 		<info name="usage" value="LOAD twice" />
@@ -127,7 +127,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bazookaa" cloneof="bazooka">
-		<description>Bazooka (Alt)</description>
+		<description>Bazooka (alt)</description>
 		<year>198?</year>
 		<publisher>Samsung Software</publisher>
 		<info name="alt_title" value="바주카" />
@@ -162,7 +162,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="blockgama" cloneof="blockgam">
-		<description>Block Game (Alt)</description>
+		<description>Block Game (alt)</description>
 		<year>198?</year>
 		<publisher>Samsung Software</publisher>
 		<info name="alt_title" value="블럭격파 ~ Beulleog Gyeogpa" />
@@ -174,7 +174,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="blockgamb" cloneof="blockgam">
-		<description>Block Game (Alt 2)</description>
+		<description>Block Game (alt 2)</description>
 		<year>198?</year>
 		<publisher>Samsung Software</publisher>
 		<info name="alt_title" value="블럭격파 ~ Beulleog Gyeogpa" />
@@ -296,7 +296,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dexa" cloneof="dex">
-		<description>DEX (Alt)</description>
+		<description>DEX (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="LOAD twice" />
@@ -604,7 +604,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="leda" cloneof="led">
-		<description>LED Display Designer (Alt)</description>
+		<description>LED Display Designer (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
@@ -704,7 +704,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="morsea" cloneof="morse">
-		<description>Morse Signal (Alt)</description>
+		<description>Morse Signal (alt)</description>
 		<year>198?</year>
 		<publisher>Samsung Software</publisher>
 		<part name="cass" interface="spc1000_cass">
@@ -883,7 +883,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="spaceinva" cloneof="spaceinv">
-		<description>Space Invaders (Hacked, Alt)</description>
+		<description>Space Invaders (Hacked, alt)</description>
 		<year>198?</year>
 		<publisher>Honeybug?</publisher>
 		<info name="alt_title" value="인베이더" />
@@ -1087,7 +1087,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="z80asma" cloneof="z80asm">
-		<description>Z80 Assembler v1.0 (Alt)</description>
+		<description>Z80 Assembler v1.0 (alt)</description>
 		<year>1983</year>
 		<publisher>Samsung Software</publisher>
 		<info name="alt_title" value="Z80 어쏌블러 v1.0" />
@@ -1195,7 +1195,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="relocateb" cloneof="relocate" supported="no">
-		<description>Relocater (Alt)</description>
+		<description>Relocater (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="spc1000_cass">
@@ -1251,7 +1251,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="hangeula" cloneof="hangeul" supported="no">
-		<description>Hangeul (Alt)</description>
+		<description>Hangeul (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="한글" />

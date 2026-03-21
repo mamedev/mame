@@ -347,18 +347,23 @@ public:
 			// make the wav file header
 			uint8_t header[44];
 			memcpy(&header[0], "RIFF", 4);
-			*(uint32_t *)&header[4] = m_buffer.size() * 2 + 44 - 8;
+			put_u32(&header[4], m_buffer.size() * 2 + 44 - 8);
 			memcpy(&header[8], "WAVE", 4);
 			memcpy(&header[12], "fmt ", 4);
-			*(uint32_t *)&header[16] = 16;
-			*(uint16_t *)&header[20] = 1;
-			*(uint16_t *)&header[22] = Channels;
-			*(uint32_t *)&header[24] = m_samplerate;
-			*(uint32_t *)&header[28] = m_samplerate * 2 * Channels;
-			*(uint16_t *)&header[32] = 2 * Channels;
-			*(uint16_t *)&header[34] = 16;
+			put_u32(&header[16], 16);
+			put_u16(&header[20], 1);
+			put_u16(&header[22], Channels);
+			put_u32(&header[24], m_samplerate);
+			put_u32(&header[28], m_samplerate * 2 * Channels);
+			put_u16(&header[32], 2 * Channels);
+			put_u16(&header[34], 16);
 			memcpy(&header[36], "data", 4);
-			*(uint32_t *)&header[40] = m_buffer.size() * 2 + 44 - 44;
+			put_u32(&header[40], m_buffer.size() * 2 + 44 - 44);
+
+#if (defined(__BYTE_ORDER__) && ((defined(__ORDER_BIG_ENDIAN__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)) || (__BYTE_ORDER__ == 4321))) || (!defined(__BYTE_ORDER__) && !defined(__LITTLE_ENDIAN__))
+			for (int16_t &sample : m_buffer)
+				sample = int16_t(uint16_t((uint16_t(sample) >> 8) | (uint16_t(sample) << 8)));
+#endif
 
 			// write header then data
 			fwrite(&header[0], 1, sizeof(header), out);
@@ -390,6 +395,20 @@ public:
 	}
 
 private:
+	static void put_u32(uint8_t *buffer, uint32_t value)
+	{
+		buffer[0] = uint8_t((value >> 0) & 0x00ff);
+		buffer[1] = uint8_t((value >> 8) & 0x00ff);
+		buffer[2] = uint8_t((value >> 16) & 0x00ff);
+		buffer[3] = uint8_t((value >> 24) & 0x00ff);
+	}
+
+	static void put_u16(uint8_t *buffer, uint16_t value)
+	{
+		buffer[0] = uint8_t((value >> 0) & 0x00ff);
+		buffer[1] = uint8_t((value >> 8) & 0x00ff);
+	}
+
 	// internal state
 	uint32_t m_index;
 	uint32_t m_samplerate;

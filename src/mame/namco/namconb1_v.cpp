@@ -91,6 +91,27 @@ void namconb1_state::screen_vblank(int state)
 	}
 }
 
+bool namconb1_state::sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri)
+{
+	if (srcpri >= destpri)
+	{
+		if ((src & 0xff) != 0xff)
+		{
+			if (src == 0xffe)
+			{
+				dest |= 0x800;
+			}
+			else
+			{
+				dest = colbase + src;
+			}
+			destpri = srcpri;
+			return true;
+		}
+	}
+	return false;
+}
+
 /************************************************************************************************/
 
 u32 namconb1_state::screen_update_namconb1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -107,12 +128,12 @@ u32 namconb1_state::screen_update_namconb1(screen_device &screen, bitmap_ind16 &
 	clip &= cliprect;
 
 	bitmap.fill(m_c116->black_pen(), cliprect);
+	screen.priority().fill(0, cliprect);
 
 	for (int pri = 0; pri < 8; pri++)
-	{
-		m_c123tmap->draw(screen, bitmap, clip, pri);
-		m_c355spr->draw(screen, bitmap, clip, pri);
-	}
+		m_c123tmap->draw(screen, bitmap, clip, pri, pri, 0);
+
+	m_c355spr->draw(screen, bitmap, clip);
 
 	return 0;
 }
@@ -153,6 +174,7 @@ u32 namconb2_state::screen_update_namconb2(screen_device &screen, bitmap_ind16 &
 	clip &= cliprect;
 
 	bitmap.fill(m_c116->black_pen(), cliprect);
+	screen.priority().fill(0, cliprect);
 
 	if (memcmp(m_tilemap_tile_bank, m_tilebank32, sizeof(m_tilemap_tile_bank)) != 0)
 	{
@@ -161,13 +183,13 @@ u32 namconb2_state::screen_update_namconb2(screen_device &screen, bitmap_ind16 &
 	}
 	for (int pri = 0; pri < 16; pri++)
 	{
-		m_c169roz->draw(screen, bitmap, clip, pri);
+		m_c169roz->draw(screen, bitmap, clip, pri, pri, 0);
 		if ((pri & 1) == 0)
 		{
-			m_c123tmap->draw(screen, bitmap, clip, pri >> 1);
+			m_c123tmap->draw(screen, bitmap, clip, pri >> 1, pri, 0);
 		}
-		m_c355spr->draw(screen, bitmap, clip, pri);
 	}
+	m_c355spr->draw(screen, bitmap, clip);
 	return 0;
 }
 

@@ -107,11 +107,6 @@ class cps_state : public driver_device
 {
 public:
 	cps_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cps_state(mconfig, type, tag, 1)
-	{ }
-
-protected:
-	cps_state(const machine_config &mconfig, device_type type, const char *tag, int version)
 		: driver_device(mconfig, type, tag)
 		, m_mainram(*this, "mainram")
 		, m_gfxram(*this, "gfxram")
@@ -119,7 +114,6 @@ protected:
 		, m_cps_b_regs(*this, "cps_b_regs")
 		, m_qsound_sharedram1(*this, "qsound_ram1")
 		, m_qsound_sharedram2(*this, "qsound_ram2")
-		, m_cps_version(version)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_oki(*this, "oki")
@@ -305,7 +299,6 @@ protected:
 	optional_shared_ptr<uint8_t> m_qsound_sharedram1;
 	optional_shared_ptr<uint8_t> m_qsound_sharedram2;
 	std::unique_ptr<uint8_t[]> m_decrypt_kabuki;
-	int m_cps_version = 0;
 
 	/* devices */
 	required_device<m68000_base_device> m_maincpu;
@@ -322,7 +315,7 @@ protected:
 };
 
 
-/*----------- defined in drivers/cps1.cpp -----------*/
+/*----------- defined in capcom/cps1.cpp -----------*/
 
 extern gfx_decode_entry const gfx_cps1[];
 

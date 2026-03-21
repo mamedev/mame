@@ -22,7 +22,6 @@
 #include "machine/input_merger.h"
 #include "machine/mpc106.h"
 #include "machine/pci.h"
-#include "machine/pci-ide.h"
 #include "machine/ram.h"
 #include "video/atirage.h"
 #include "awacs_macrisc.h"

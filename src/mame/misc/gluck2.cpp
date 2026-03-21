@@ -175,7 +175,7 @@
   Good Luck II.
 
   There are pieces of code that initialize two PIA 6821s, that are not included
-  in the PCB. Seems a leftover. Also the program try to handle a suppossed lamps
+  in the PCB. Seems a leftover. Also the program tries to handle a supposed lamps
   system through these 'phantom' PIAs...
 
   The sound system is through a YM2413, and sound a lot nicer than the former

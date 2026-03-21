@@ -130,9 +130,11 @@ void sf_state::sound2_bank_w(u8 data)
 template<int Chip>
 void sf_state::msm_w(u8 data)
 {
+	// m_msm[Chip]->s1_w(BIT(data, 6)); // maybe?
 	m_msm[Chip]->reset_w(BIT(data, 7));
-	/* ?? bit 6?? */
-	m_msm[Chip]->data_w(data);
+
+	m_msm[Chip]->data_w(data & 0xf);
+
 	m_msm[Chip]->vclk_w(1);
 	m_msm[Chip]->vclk_w(0);
 }
@@ -751,17 +753,17 @@ void sf_state::machine_reset()
 void sf_state::sfan(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(8'000'000));
+	M68000(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sf_state::sfan_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sf_state::irq1_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));   /* ? xtal is 3.579545MHz */
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL); // ? xtal is 3.579545MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sf_state::sound_map);
 
-	z80_device &audio2(Z80(config, "audio2", XTAL(3'579'545))); /* ? xtal is 3.579545MHz */
+	z80_device &audio2(Z80(config, "audio2", 3.579545_MHz_XTAL)); // ? xtal is 3.579545MHz
 	audio2.set_addrmap(AS_PROGRAM, &sf_state::sound2_map);
 	audio2.set_addrmap(AS_IO, &sf_state::sound2_io_map);
-	audio2.set_periodic_int(FUNC(sf_state::irq0_line_hold), attotime::from_hz(8000)); // ?
+	audio2.set_periodic_int(FUNC(sf_state::irq0_line_hold), attotime::from_hz(8000)); // from MSM5205?
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -780,18 +782,18 @@ void sf_state::sfan(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "speaker", 0.60, 0);
 	ymsnd.add_route(1, "speaker", 0.60, 1);
 
-	MSM5205(config, m_msm[0], 384000);
-	m_msm[0]->set_prescaler_selector(msm5205_device::SEX_4B);   /* 8KHz playback ? */
+	MSM5205(config, m_msm[0], 384_kHz_XTAL);
+	m_msm[0]->set_prescaler_selector(msm5205_device::SEX_4B); // 8KHz playback?
 	m_msm[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	m_msm[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	MSM5205(config, m_msm[1], 384000);
-	m_msm[1]->set_prescaler_selector(msm5205_device::SEX_4B);   /* 8KHz playback ? */
+	MSM5205(config, m_msm[1], 384_kHz_XTAL);
+	m_msm[1]->set_prescaler_selector(msm5205_device::SEX_4B); // 8KHz playback?
 	m_msm[1]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	m_msm[1]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
@@ -807,7 +809,7 @@ void sf_state::sfjp(machine_config &config)
 	sfan(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sf_state::sfjp_map);
 
-	I8751(config, m_protcpu, XTAL(8'000'000)); // Clock unknown, but shares the bus with the 68k, so could be similar
+	I8751(config, m_protcpu, 8_MHz_XTAL); // Clock unknown, but shares the bus with the 68k, so could be similar
 	m_protcpu->set_addrmap(AS_DATA, &sf_state::prot_map);
 	m_protcpu->port_out_cb<3>().set(FUNC(sf_state::prot_p3_w));
 }

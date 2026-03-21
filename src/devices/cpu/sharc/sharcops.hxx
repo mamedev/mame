@@ -9,27 +9,6 @@
 #define DM_REG_B(x)         (m_core->dag1.b[x])
 #define DM_REG_L(x)         (m_core->dag1.l[x])
 
-// ASTAT flags
-#define AZ      0x1         /* ALU result zero */
-#define AV      0x2         /* ALU overflow */
-#define AN      0x4         /* ALU result negative */
-#define AC      0x8         /* ALU fixed-point carry */
-#define AS      0x10        /* ALU X input sign */
-#define AI      0x20        /* ALU floating-point invalid operation */
-#define MN      0x40        /* Multiplier result negative */
-#define MV      0x80        /* Multiplier overflow */
-#define MU      0x100       /* Multiplier underflow */
-#define MI      0x200       /* Multiplier floating-point invalid operation */
-#define AF      0x400
-#define SV      0x800       /* Shifter overflow */
-#define SZ      0x1000      /* Shifter result zero */
-#define SS      0x2000      /* Shifter input sign */
-#define BTF     0x40000     /* Bit Test Flag */
-#define FLG0    0x80000     /* FLAG0 */
-#define FLG1    0x100000    /* FLAG1 */
-#define FLG2    0x200000    /* FLAG2 */
-#define FLG3    0x400000    /* FLAG3 */
-
 #define REG_PC              0x63
 #define REG_PCSTK           0x64
 #define REG_PCSTKP          0x65
@@ -81,6 +60,8 @@
 		}                                                   \
 	}
 
+#define SHARC_COND_LT  ((m_core->astat & AF) ? ((m_core->astat & AN) && !(m_core->astat & AZ)) : (bool(m_core->astat & AN) != ((m_core->astat & AV) && !(m_core->mode1 & MODE1_ALUSAT))))
+#define SHARC_COND_LE  ((m_core->astat & AZ) || ((m_core->astat & AF) ? (m_core->astat & AN) : (bool(m_core->astat & AN) != ((m_core->astat & AV) && !(m_core->mode1 & MODE1_ALUSAT)))))
 
 /*****************************************************************************/
 
@@ -88,7 +69,7 @@ void adsp21062_device::add_systemreg_write_latency_effect(int sysreg, uint32_t d
 {
 	if (m_core->systemreg_latency_cycles > 0)
 	{
-		//fatalerror("SHARC: add_systemreg_write_latency_effect: already scheduled! (reg: %02X, data: %08X, PC: %08X)\n", systemreg_latency_reg, systemreg_latency_data, m_core->pc);
+		//throw emu_fatalerror("%s: add_systemreg_write_latency_effect: already scheduled! (reg: %02X, data: %08X, PC: %08X)", tag(), systemreg_latency_reg, systemreg_latency_data, m_core->pc);
 		systemreg_write_latency_effect();
 	}
 
@@ -98,128 +79,133 @@ void adsp21062_device::add_systemreg_write_latency_effect(int sysreg, uint32_t d
 	m_core->systemreg_previous_data = prev_data;
 }
 
-void adsp21062_device::swap_register(uint32_t *a, uint32_t *b)
-{
-	uint32_t temp = *a;
-	*a = *b;
-	*b = temp;
-}
-
 void adsp21062_device::systemreg_write_latency_effect()
 {
-	int i;
-	uint32_t data = m_core->systemreg_latency_data;
-	uint32_t old_data = m_core->systemreg_previous_data;
+	uint32_t const data = m_core->systemreg_latency_data;
+	uint32_t const old_data = m_core->systemreg_previous_data;
 
-	switch(m_core->systemreg_latency_reg)
+	switch (m_core->systemreg_latency_reg)
 	{
 		case 0xb:   /* MODE1 */
 		{
-			uint32_t oldreg = old_data;
+			uint32_t const diff = data ^ old_data;
 			m_core->mode1 = data;
 
-			if ((data & 0x1) != (oldreg & 0x1))
+			if (diff & MODE1_BR8)
 			{
-				fatalerror("SHARC: systemreg_latency_op: enable I8 bit-reversing\n");
+				throw emu_fatalerror("%s: systemreg_latency_op: enable I8 bit-reversing", tag());
 			}
-			if ((data & 0x2) != (oldreg & 0x2))
+			if (diff & MODE1_BR0)
 			{
-				fatalerror("SHARC: systemreg_latency_op: enable I0 bit-reversing\n");
+				throw emu_fatalerror("%s: systemreg_latency_op: enable I0 bit-reversing", tag());
 			}
-			if ((data & 0x4) != (oldreg & 0x4))
+			if (diff & MODE1_SRCU)
 			{
-				fatalerror("SHARC: systemreg_latency_op: enable MR alternate\n");
+				throw emu_fatalerror("%s: systemreg_latency_op: enable MR alternate", tag());
 			}
 
-			if ((data & 0x8) != (oldreg & 0x8))         /* Switch DAG1 7-4 */
+			if (diff & MODE1_SRD1H) // Switch DAG1 7-4
 			{
-				swap_register(&m_core->dag1.i[4], &m_core->dag1_alt.i[4]);
-				swap_register(&m_core->dag1.i[5], &m_core->dag1_alt.i[5]);
-				swap_register(&m_core->dag1.i[6], &m_core->dag1_alt.i[6]);
-				swap_register(&m_core->dag1.i[7], &m_core->dag1_alt.i[7]);
-				swap_register(&m_core->dag1.m[4], &m_core->dag1_alt.m[4]);
-				swap_register(&m_core->dag1.m[5], &m_core->dag1_alt.m[5]);
-				swap_register(&m_core->dag1.m[6], &m_core->dag1_alt.m[6]);
-				swap_register(&m_core->dag1.m[7], &m_core->dag1_alt.m[7]);
-				swap_register(&m_core->dag1.l[4], &m_core->dag1_alt.l[4]);
-				swap_register(&m_core->dag1.l[5], &m_core->dag1_alt.l[5]);
-				swap_register(&m_core->dag1.l[6], &m_core->dag1_alt.l[6]);
-				swap_register(&m_core->dag1.l[7], &m_core->dag1_alt.l[7]);
-				swap_register(&m_core->dag1.b[4], &m_core->dag1_alt.b[4]);
-				swap_register(&m_core->dag1.b[5], &m_core->dag1_alt.b[5]);
-				swap_register(&m_core->dag1.b[6], &m_core->dag1_alt.b[6]);
-				swap_register(&m_core->dag1.b[7], &m_core->dag1_alt.b[7]);
+				using std::swap;
+				swap(m_core->dag1.i[4], m_core->dag1_alt.i[4]);
+				swap(m_core->dag1.i[5], m_core->dag1_alt.i[5]);
+				swap(m_core->dag1.i[6], m_core->dag1_alt.i[6]);
+				swap(m_core->dag1.i[7], m_core->dag1_alt.i[7]);
+				swap(m_core->dag1.m[4], m_core->dag1_alt.m[4]);
+				swap(m_core->dag1.m[5], m_core->dag1_alt.m[5]);
+				swap(m_core->dag1.m[6], m_core->dag1_alt.m[6]);
+				swap(m_core->dag1.m[7], m_core->dag1_alt.m[7]);
+				swap(m_core->dag1.l[4], m_core->dag1_alt.l[4]);
+				swap(m_core->dag1.l[5], m_core->dag1_alt.l[5]);
+				swap(m_core->dag1.l[6], m_core->dag1_alt.l[6]);
+				swap(m_core->dag1.l[7], m_core->dag1_alt.l[7]);
+				swap(m_core->dag1.b[4], m_core->dag1_alt.b[4]);
+				swap(m_core->dag1.b[5], m_core->dag1_alt.b[5]);
+				swap(m_core->dag1.b[6], m_core->dag1_alt.b[6]);
+				swap(m_core->dag1.b[7], m_core->dag1_alt.b[7]);
 			}
-			if ((data & 0x10) != (oldreg & 0x10))       /* Switch DAG1 3-0 */
+			if (diff & MODE1_SRD1L) // Switch DAG1 3-0
 			{
-				swap_register(&m_core->dag1.i[0], &m_core->dag1_alt.i[0]);
-				swap_register(&m_core->dag1.i[1], &m_core->dag1_alt.i[1]);
-				swap_register(&m_core->dag1.i[2], &m_core->dag1_alt.i[2]);
-				swap_register(&m_core->dag1.i[3], &m_core->dag1_alt.i[3]);
-				swap_register(&m_core->dag1.m[0], &m_core->dag1_alt.m[0]);
-				swap_register(&m_core->dag1.m[1], &m_core->dag1_alt.m[1]);
-				swap_register(&m_core->dag1.m[2], &m_core->dag1_alt.m[2]);
-				swap_register(&m_core->dag1.m[3], &m_core->dag1_alt.m[3]);
-				swap_register(&m_core->dag1.l[0], &m_core->dag1_alt.l[0]);
-				swap_register(&m_core->dag1.l[1], &m_core->dag1_alt.l[1]);
-				swap_register(&m_core->dag1.l[2], &m_core->dag1_alt.l[2]);
-				swap_register(&m_core->dag1.l[3], &m_core->dag1_alt.l[3]);
-				swap_register(&m_core->dag1.b[0], &m_core->dag1_alt.b[0]);
-				swap_register(&m_core->dag1.b[1], &m_core->dag1_alt.b[1]);
-				swap_register(&m_core->dag1.b[2], &m_core->dag1_alt.b[2]);
-				swap_register(&m_core->dag1.b[3], &m_core->dag1_alt.b[3]);
+				using std::swap;
+				swap(m_core->dag1.i[0], m_core->dag1_alt.i[0]);
+				swap(m_core->dag1.i[1], m_core->dag1_alt.i[1]);
+				swap(m_core->dag1.i[2], m_core->dag1_alt.i[2]);
+				swap(m_core->dag1.i[3], m_core->dag1_alt.i[3]);
+				swap(m_core->dag1.m[0], m_core->dag1_alt.m[0]);
+				swap(m_core->dag1.m[1], m_core->dag1_alt.m[1]);
+				swap(m_core->dag1.m[2], m_core->dag1_alt.m[2]);
+				swap(m_core->dag1.m[3], m_core->dag1_alt.m[3]);
+				swap(m_core->dag1.l[0], m_core->dag1_alt.l[0]);
+				swap(m_core->dag1.l[1], m_core->dag1_alt.l[1]);
+				swap(m_core->dag1.l[2], m_core->dag1_alt.l[2]);
+				swap(m_core->dag1.l[3], m_core->dag1_alt.l[3]);
+				swap(m_core->dag1.b[0], m_core->dag1_alt.b[0]);
+				swap(m_core->dag1.b[1], m_core->dag1_alt.b[1]);
+				swap(m_core->dag1.b[2], m_core->dag1_alt.b[2]);
+				swap(m_core->dag1.b[3], m_core->dag1_alt.b[3]);
 			}
-			if ((data & 0x20) != (oldreg & 0x20))       /* Switch DAG2 15-12 */
+			if (diff & MODE1_SRD2H) // Switch DAG2 15-12
 			{
-				swap_register(&m_core->dag2.i[4], &m_core->dag2_alt.i[4]);
-				swap_register(&m_core->dag2.i[5], &m_core->dag2_alt.i[5]);
-				swap_register(&m_core->dag2.i[6], &m_core->dag2_alt.i[6]);
-				swap_register(&m_core->dag2.i[7], &m_core->dag2_alt.i[7]);
-				swap_register(&m_core->dag2.m[4], &m_core->dag2_alt.m[4]);
-				swap_register(&m_core->dag2.m[5], &m_core->dag2_alt.m[5]);
-				swap_register(&m_core->dag2.m[6], &m_core->dag2_alt.m[6]);
-				swap_register(&m_core->dag2.m[7], &m_core->dag2_alt.m[7]);
-				swap_register(&m_core->dag2.l[4], &m_core->dag2_alt.l[4]);
-				swap_register(&m_core->dag2.l[5], &m_core->dag2_alt.l[5]);
-				swap_register(&m_core->dag2.l[6], &m_core->dag2_alt.l[6]);
-				swap_register(&m_core->dag2.l[7], &m_core->dag2_alt.l[7]);
-				swap_register(&m_core->dag2.b[4], &m_core->dag2_alt.b[4]);
-				swap_register(&m_core->dag2.b[5], &m_core->dag2_alt.b[5]);
-				swap_register(&m_core->dag2.b[6], &m_core->dag2_alt.b[6]);
-				swap_register(&m_core->dag2.b[7], &m_core->dag2_alt.b[7]);
+				using std::swap;
+				swap(m_core->dag2.i[4], m_core->dag2_alt.i[4]);
+				swap(m_core->dag2.i[5], m_core->dag2_alt.i[5]);
+				swap(m_core->dag2.i[6], m_core->dag2_alt.i[6]);
+				swap(m_core->dag2.i[7], m_core->dag2_alt.i[7]);
+				swap(m_core->dag2.m[4], m_core->dag2_alt.m[4]);
+				swap(m_core->dag2.m[5], m_core->dag2_alt.m[5]);
+				swap(m_core->dag2.m[6], m_core->dag2_alt.m[6]);
+				swap(m_core->dag2.m[7], m_core->dag2_alt.m[7]);
+				swap(m_core->dag2.l[4], m_core->dag2_alt.l[4]);
+				swap(m_core->dag2.l[5], m_core->dag2_alt.l[5]);
+				swap(m_core->dag2.l[6], m_core->dag2_alt.l[6]);
+				swap(m_core->dag2.l[7], m_core->dag2_alt.l[7]);
+				swap(m_core->dag2.b[4], m_core->dag2_alt.b[4]);
+				swap(m_core->dag2.b[5], m_core->dag2_alt.b[5]);
+				swap(m_core->dag2.b[6], m_core->dag2_alt.b[6]);
+				swap(m_core->dag2.b[7], m_core->dag2_alt.b[7]);
 			}
-			if ((data & 0x40) != (oldreg & 0x40))       /* Switch DAG2 11-8 */
+			if (diff & MODE1_SRD2L) // Switch DAG2 11-8
 			{
-				swap_register(&m_core->dag2.i[0], &m_core->dag2_alt.i[0]);
-				swap_register(&m_core->dag2.i[1], &m_core->dag2_alt.i[1]);
-				swap_register(&m_core->dag2.i[2], &m_core->dag2_alt.i[2]);
-				swap_register(&m_core->dag2.i[3], &m_core->dag2_alt.i[3]);
-				swap_register(&m_core->dag2.m[0], &m_core->dag2_alt.m[0]);
-				swap_register(&m_core->dag2.m[1], &m_core->dag2_alt.m[1]);
-				swap_register(&m_core->dag2.m[2], &m_core->dag2_alt.m[2]);
-				swap_register(&m_core->dag2.m[3], &m_core->dag2_alt.m[3]);
-				swap_register(&m_core->dag2.l[0], &m_core->dag2_alt.l[0]);
-				swap_register(&m_core->dag2.l[1], &m_core->dag2_alt.l[1]);
-				swap_register(&m_core->dag2.l[2], &m_core->dag2_alt.l[2]);
-				swap_register(&m_core->dag2.l[3], &m_core->dag2_alt.l[3]);
-				swap_register(&m_core->dag2.b[0], &m_core->dag2_alt.b[0]);
-				swap_register(&m_core->dag2.b[1], &m_core->dag2_alt.b[1]);
-				swap_register(&m_core->dag2.b[2], &m_core->dag2_alt.b[2]);
-				swap_register(&m_core->dag2.b[3], &m_core->dag2_alt.b[3]);
+				using std::swap;
+				swap(m_core->dag2.i[0], m_core->dag2_alt.i[0]);
+				swap(m_core->dag2.i[1], m_core->dag2_alt.i[1]);
+				swap(m_core->dag2.i[2], m_core->dag2_alt.i[2]);
+				swap(m_core->dag2.i[3], m_core->dag2_alt.i[3]);
+				swap(m_core->dag2.m[0], m_core->dag2_alt.m[0]);
+				swap(m_core->dag2.m[1], m_core->dag2_alt.m[1]);
+				swap(m_core->dag2.m[2], m_core->dag2_alt.m[2]);
+				swap(m_core->dag2.m[3], m_core->dag2_alt.m[3]);
+				swap(m_core->dag2.l[0], m_core->dag2_alt.l[0]);
+				swap(m_core->dag2.l[1], m_core->dag2_alt.l[1]);
+				swap(m_core->dag2.l[2], m_core->dag2_alt.l[2]);
+				swap(m_core->dag2.l[3], m_core->dag2_alt.l[3]);
+				swap(m_core->dag2.b[0], m_core->dag2_alt.b[0]);
+				swap(m_core->dag2.b[1], m_core->dag2_alt.b[1]);
+				swap(m_core->dag2.b[2], m_core->dag2_alt.b[2]);
+				swap(m_core->dag2.b[3], m_core->dag2_alt.b[3]);
 			}
-			if ((data & 0x80) != (oldreg & 0x80))
+			if (diff & MODE1_SRRFH)
 			{
-				for (i=8; i<16; i++)
-					swap_register((uint32_t*)&m_core->r[i].r, (uint32_t*)&m_core->reg_alt[i].r);
+				using std::swap;
+				for (int i = 8; i < 16; i++)
+					swap(m_core->r[i].r, m_core->reg_alt[i].r);
 			}
-			if ((data & 0x400) != (oldreg & 0x400))
+			if (diff & MODE1_SRRFL)
 			{
-				for (i=0; i<8; i++)
-					swap_register((uint32_t*)&m_core->r[i].r, (uint32_t*)&m_core->reg_alt[i].r);
+				using std::swap;
+				for (int i = 0; i < 8; i++)
+					swap(m_core->r[i].r, m_core->reg_alt[i].r);
+			}
+			if (diff & MODE1_SSE)   // Short word sign extension
+			{
+				if (data & MODE1_SSE)
+					m_dm_short_view.select(0);
+				else
+					m_dm_short_view.disable();
 			}
 			break;
 		}
-		default:    fatalerror("SHARC: systemreg_latency_op: unknown register %02X at %08X\n", m_core->systemreg_latency_reg, m_core->pc);
+		default:    throw emu_fatalerror("%s: systemreg_latency_op: unknown register %02X at %08X\n", tag(), m_core->systemreg_latency_reg, m_core->pc);
 	}
 
 	m_core->systemreg_latency_reg = -1;
@@ -290,8 +276,11 @@ uint32_t adsp21062_device::GET_UREG(int ureg)
 		{
 			switch(reg)
 			{
-				case 0x4:   return m_core->pcstack[m_core->pcstkp];     /* PCSTK */
-				default:    fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
+				case 0x4:   return m_core->pcstk;                       /* PCSTK */
+				case 0x5:   return m_core->pcstkp;                      /* PCSTKP */
+				case 0x7:   return m_core->curlcntr;                    /* CURLCNTR */
+				case 0x8:   return m_core->lcntr;                       /* LCNTR */
+				default:    throw emu_fatalerror("%s: GET_UREG: unknown register %08X at %08X", tag(), ureg, m_core->pc);
 			}
 			break;
 		}
@@ -305,19 +294,20 @@ uint32_t adsp21062_device::GET_UREG(int ureg)
 				case 0x9:   return m_core->irptl;         /* IRPTL */
 				case 0xa:   return m_core->mode2;         /* MODE2 */
 				case 0xb:   return m_core->mode1;         /* MODE1 */
-				case 0xc:                               /* ASTAT */
+				case 0xc:                                 /* ASTAT */
 				{
 					uint32_t r = m_core->astat;
-					r &= ~0x00780000;
-					r |= (m_core->flag[0] << 19);
-					r |= (m_core->flag[1] << 20);
-					r |= (m_core->flag[2] << 21);
-					r |= (m_core->flag[3] << 22);
+					r &= (BIT(m_core->mode2, 15, 4) << FLG0_SHIFT) | ~(FLG0 | FLG1 | FLG2 | FLG3);
+					for (unsigned i = 0; 4 > i; ++i)
+					{
+						if (!BIT(m_core->mode2, i + 15))
+							r |= m_core->flag[i] << (FLG0_SHIFT + i);
+					}
 					return r;
 				}
 				case 0xd:   return m_core->imask;         /* IMASK */
 				case 0xe:   return m_core->stky;          /* STKY */
-				default:    fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
+				default:    throw emu_fatalerror("%s: GET_UREG: unknown register %08X at %08X", tag(), ureg, m_core->pc);
 			}
 			break;
 		}
@@ -327,15 +317,15 @@ uint32_t adsp21062_device::GET_UREG(int ureg)
 			switch(reg)
 			{
 				/* PX needs to be handled separately if the whole 48 bits are needed */
-				case 0xb:   return (uint32_t)(m_core->px);          /* PX */
-				case 0xc:   return (uint16_t)(m_core->px);          /* PX1 */
-				case 0xd:   return (uint32_t)(m_core->px >> 16);    /* PX2 */
-				default:    fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
+				case 0xb:   return uint32_t(m_core->px);            /* PX */
+				case 0xc:   return uint16_t(m_core->px);            /* PX1 */
+				case 0xd:   return uint32_t(m_core->px >> 16);      /* PX2 */
+				default:    throw emu_fatalerror("%s: GET_UREG: unknown register %08X at %08X", tag(), ureg, m_core->pc);
 			}
 			break;
 		}
 
-		default:            fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
+		default:            throw emu_fatalerror("%s: GET_UREG: unknown register %08X at %08X", tag(), ureg, m_core->pc);
 	}
 }
 
@@ -398,10 +388,58 @@ void adsp21062_device::SET_UREG(int ureg, uint32_t data)
 		case 0x6:
 			switch (reg)
 			{
-				case 0x5:   m_core->pcstkp = data; break;     /* PCSTKP */
-				case 0x7:   m_core->curlcntr = data; break;   /* CURLCNTR (Zero Gunner 2B) */
-				case 0x8:   m_core->lcntr = data; break;      /* LCNTR */
-				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
+				case 0x4:                                     /* PCSTK */
+					if ((m_core->pcstkp > 0) && (m_core->pcstkp < 31))
+						m_core->pcstk = data & 0x00ffffff;
+					break;
+
+				case 0x5:                                     /* PCSTKP */
+					if (m_core->pcstkp < 31)
+					{
+						// TODO: this should take effect with a one-cycle delay
+						uint32_t const prev = std::exchange(m_core->pcstkp, data & 0x1f);
+
+						if (prev > 0)
+							m_core->pcstack[prev - 1] = m_core->pcstk;
+
+						if (prev < m_core->pcstkp)
+						{
+							if (m_core->pcstkp >= 31)
+								throw emu_fatalerror("%s: PC Stack overflow!", tag());
+
+							m_core->pcstk = m_core->pcstack[m_core->pcstkp - 1];
+
+							m_core->stky &= ~PCEM;
+							if (m_core->pcstkp >= 30)
+								m_core->stky |= PCFL;
+						}
+						else if (prev > m_core->pcstkp)
+						{
+							if (m_core->pcstkp > 0)
+							{
+								m_core->pcstk = m_core->pcstack[m_core->pcstkp - 1];
+							}
+							else
+							{
+								m_core->pcstk = 0x00ffffff;
+								m_core->stky |= PCEM;
+							}
+							m_core->stky &= ~PCFL;
+						}
+					}
+					break;
+
+				case 0x7:                                     /* CURLCNTR */
+					if ((m_core->lstkp > 0) && (m_core->lstkp < 7))
+						m_core->curlcntr = data;
+					break;
+
+				case 0x8:                                     /* LCNTR */
+					if (m_core->lstkp < 6)
+						m_core->lcntr = data;
+					break;
+
+				default:    throw emu_fatalerror("%s: SET_UREG: unknown register %08X at %08X", tag(), ureg, m_core->pc);
 			}
 			break;
 
@@ -412,26 +450,45 @@ void adsp21062_device::SET_UREG(int ureg, uint32_t data)
 				case 0x1:   m_core->ustat2 = data; break;     /* USTAT2 */
 
 				case 0x9:   m_core->irptl = data; break;      /* IRPTL */
-				case 0xa:   m_core->mode2 = data; break;      /* MODE2 */
-
-				case 0xb:                                   /* MODE1 */
+				case 0xa:                                     /* MODE2 */
 				{
+					u32 const set = ~m_core->mode2 & data;
+					m_core->mode2 = data;
+					for (unsigned i = 0; i < 4; i++)
+					{
+						if (BIT(set, 15 + i))
+							m_flag_out_cb[i](BIT(m_core->astat, FLG0_SHIFT + i));
+					}
+					break;
+				}
+
+				case 0xb:                                     /* MODE1 */
 					add_systemreg_write_latency_effect(reg, data, m_core->mode1);
 					m_core->mode1 = data;
 					break;
-				}
 
-				case 0xc:   m_core->astat = data; break;      /* ASTAT */
-
-				case 0xd:                                   /* IMASK */
+				case 0xc:                                     /* ASTAT */
 				{
-					check_interrupts();
-					m_core->imask = data;
+					u32 const flags = (m_core->astat ^ data) & (BIT(m_core->mode2, 15, 4) << FLG0_SHIFT);
+					m_core->astat = data;
+					for (unsigned i = 0; i < 4; i++)
+					{
+						if (BIT(flags, FLG0_SHIFT + i))
+							m_flag_out_cb[i](BIT(data, FLG0_SHIFT + i));
+					}
 					break;
 				}
 
-				case 0xe:   m_core->stky = data; break;       /* STKY */
-				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
+				case 0xd:                                     /* IMASK */
+					check_interrupts();
+					m_core->imask = data;
+					break;
+
+				case 0xe:                                     /* STKY */
+					m_core->stky = (m_core->stky & (LSEM | LSOV | SSEM | SSOV | PCEM | PCFL)) | (data & ~(LSEM | LSOV | SSEM | SSOV | PCEM | PCFL));
+					break;
+
+				default:    throw emu_fatalerror("%s: SET_UREG: unknown register %08X at %08X", tag(), ureg, m_core->pc);
 			}
 			break;
 
@@ -440,11 +497,11 @@ void adsp21062_device::SET_UREG(int ureg, uint32_t data)
 			{
 				case 0xc:   m_core->px &= 0xffffffffffff0000U; m_core->px |= (data & 0xffff); break;        /* PX1 */
 				case 0xd:   m_core->px &= 0x000000000000ffffU; m_core->px |= (uint64_t)data << 16; break;     /* PX2 */
-				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
+				default:    throw emu_fatalerror("%s: SET_UREG: unknown register %08X at %08X", tag(), ureg, m_core->pc);
 			}
 			break;
 
-		default:            fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
+		default:            throw emu_fatalerror("%s: SET_UREG: unknown register %08X at %08X", tag(), ureg, m_core->pc);
 	}
 }
 
@@ -456,19 +513,22 @@ void adsp21062_device::SET_UREG(int ureg, uint32_t data)
 
 void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx)
 {
-	int8_t shift = data & 0xff;
-	int bit = data & 0x3f;
-	int len = (data >> 6) & 0x3f;
+	int8_t const shift = data & 0xff;
+	int const bit = data & 0x3f;
+	int const len = (data >> 6) & 0x3f;
 
 	m_core->astat &= ~(SZ|SV|SS);
 
-	switch(shiftop)
+	switch (shiftop)
 	{
 		case 0x00:      /* LSHIFT Rx BY <data8>*/
 		{
-			if(shift < 0) {
+			if (shift < 0)
+			{
 				REG(rn) = (shift > -32 ) ? ((uint32_t)REG(rx) >> -shift) : 0;
-			} else {
+			}
+			else
+			{
 				REG(rn) = (shift < 32) ? ((uint32_t)REG(rx) << shift) : 0;
 				if (shift > 0)
 				{
@@ -483,7 +543,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 		{
 			if (shift < 0)
 			{
-				REG(rn) = (shift > -32) ? ((int32_t)REG(rx) >> -shift) : ((REG(rx) & 0x80000000) ? 0xffffffff : 0);
+				REG(rn) = (int32_t)REG(rx) >> ((shift > -32) ? -shift : 31);
 			}
 			else
 			{
@@ -507,9 +567,12 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 		case 0x08:      /* Rn = Rn OR LSHIFT Rx BY <data8> */
 		{
 			uint32_t r = 0;
-			if(shift < 0) {
+			if (shift < 0)
+			{
 				r = (shift > -32 ) ? ((uint32_t)REG(rx) >> -shift) : 0;
-			} else {
+			}
+			else
+			{
 				r = (shift < 32) ? ((uint32_t)REG(rx) << shift) : 0;
 				if (shift > 0)
 				{
@@ -557,6 +620,8 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 		{
 			if (len == 0 || bit >= 32)
 				REG(rn) = 0;
+			else if (bit+len > 32)
+				REG(rn) = (uint32_t)REG(rx) >> bit;
 			else
 				REG(rn) = util::sext(REG(rx) >> bit, std::min(len, 32));
 
@@ -656,7 +721,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 			break;
 		}
 
-		default:    fatalerror("SHARC: unimplemented shift operation %02X at %08X\n", shiftop, m_core->pc);
+		default:    throw emu_fatalerror("SHARC: unimplemented shift operation %02X at %08X", tag(), shiftop, m_core->pc);
 	}
 }
 
@@ -664,116 +729,92 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 
 void adsp21062_device::COMPUTE(uint32_t opcode)
 {
-	int multiop;
-	int op = (opcode >> 12) & 0xff;
-	int cu = (opcode >> 20) & 0x3;
-	int rn = (opcode >> 8) & 0xf;
-	int rx = (opcode >> 4) & 0xf;
-	int ry = (opcode >> 0) & 0xf;
-	//int rs = (opcode >> 12) & 0xf;
-	//int ra = rn;
-	//int rm = rs;
+	int const op = (opcode >> 12) & 0xff;
+	int const cu = (opcode >> 20) & 0x3;
+	int const rn = (opcode >> 8) & 0xf;
+	int const rx = (opcode >> 4) & 0xf;
+	int const ry = (opcode >> 0) & 0xf;
+	//int const rs = op_get_rs(opcode);
+	//int const ra = op_get_ra(opcode);
+	//int const rm = rs;
 
-	if(opcode & 0x400000)       /* Multi-function opcode */
+	if (opcode & 0x400000)       /* Multi-function opcode */
 	{
-		int fm = (opcode >> 12) & 0xf;
-		int fa = (opcode >> 8) & 0xf;
-		int fxm = (opcode >> 6) & 0x3;          // registers 0 - 3
-		int fym = ((opcode >> 4) & 0x3) + 4;    // registers 4 - 7
-		int fxa = ((opcode >> 2) & 0x3) + 8;    // registers 8 - 11
-		int fya = (opcode & 0x3) + 12;          // registers 12 - 15
+		int const fm = (opcode >> 12) & 0xf;
+		int const fa = (opcode >> 8) & 0xf;
+		int const fxm = (opcode >> 6) & 0x3;          // registers 0 - 3
+		int const fym = ((opcode >> 4) & 0x3) + 4;    // registers 4 - 7
+		int const fxa = ((opcode >> 2) & 0x3) + 8;    // registers 8 - 11
+		int const fya = (opcode & 0x3) + 12;          // registers 12 - 15
 
-		multiop = (opcode >> 16) & 0x3f;
-		switch(multiop)
+		int const multiop = (opcode >> 16) & 0x3f;
+		switch (multiop)
 		{
 			case 0x00:      compute_multi_mr_to_reg(op & 0xf, rn); break;
 			case 0x01:      compute_multi_reg_to_mr(op & 0xf, rn); break;
 
 			case 0x04:      /* Rm = Rxm * Rym (SSFR),   Ra = Rxa + Rya */
-			{
 				compute_mul_ssfr_add(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
 			case 0x05:      /* Rm = Rxm * Rym (SSFR),   Ra = Rxa - Rya */
-			{
 				compute_mul_ssfr_sub(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
 			case 0x18:      /* Fm = Fxm * Fym,   Fa = Fxa + Fya */
-			{
 				compute_fmul_fadd(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
 			case 0x19:      /* Fm = Fxm * Fym,   Fa = Fxa - Fya */
-			{
 				compute_fmul_fsub(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
-			case 0x1a:      /* Fm = Fxm * Fym,   Fa = FLOAT Fxa BY Fya */
-			{
+			case 0x1a:      /* Fm = Fxm * Fym,   Fa = FLOAT Fxa BY Rya */
 				compute_fmul_float_scaled(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
-			case 0x1b:      /* Fm = Fxm * Fym,   Fa = FIX Fxa BY Fya */
-			{
+			case 0x1b:      /* Fm = Fxm * Fym,   Ra = FIX Fxa BY Rya */
 				compute_fmul_fix_scaled(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
-			// TODO: verify this (last bronx)
-			case 0x1c:
-			{
-				compute_fmul_avg(fm, fxm, fym, fa, fxa, fya);
+			case 0x1c:      /* Fm = Fxm * Fym,   Fa = (Fxa + Fya) / 2 */
+				compute_fmul_favg(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
-			// TODO: verify this (Gunblade NY Score Attack Remix mode)
-			case 0x1d:
-			{
-				compute_fmul_abs(fm, fxm, fym, fa, fxa, fya);
+			case 0x1d:      /* Fm = Fxm * Fym,   Fa = ABS Fxa */
+				compute_fmul_fabs(fm, fxm, fym, fa, fxa);
 				break;
-			}
 
 			case 0x1e:      /* Fm = Fxm * Fym,   Fa = MAX(Fxa, Fya) */
-			{
 				compute_fmul_fmax(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
 			case 0x1f:      /* Fm = Fxm * Fym,   Fa = MIN(Fxa, Fya) */
-			{
 				compute_fmul_fmin(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
 			case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
 			case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 			{
 				/* Parallel Multiplier & Dual Add/Subtract */
 				/* Floating-point */
-				int fs = (opcode >> 16) & 0xf;
+				int const fs = (opcode >> 16) & 0xf;
 				compute_fmul_dual_fadd_fsub(fm, fxm, fym, fa, fs, fxa, fya);
 				break;
 			}
 
 			default:
-				fatalerror("SHARC: compute: multi-function opcode %02X not implemented ! (%08X, %08X)\n", multiop, m_core->pc, opcode);
-				break;
+				throw emu_fatalerror("%s: compute: multi-function opcode %02X not implemented ! (%08X, %08X)", tag(), multiop, m_core->pc, opcode);
 		}
 	}
 	else                        /* Single-function opcode */
 	{
-		switch(cu)
+		switch (cu)
 		{
 			/* ALU operations */
 			case 0:
 			{
-				switch(op)
+				switch (op)
 				{
 					case 0x01:      compute_add(rn, rx, ry); break;
 					case 0x02:      compute_sub(rn, rx, ry); break;
@@ -782,19 +823,24 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 					case 0x0a:      compute_comp(rx, ry); break;
 					case 0x21:      compute_pass(rn, rx); break;
 					case 0x22:      compute_neg(rn, rx); break;
+					case 0x25:      compute_add_ci(rn, rx); break;
+					case 0x26:      compute_sub_ci(rn, rx); break;
 					case 0x29:      compute_inc(rn, rx); break;
 					case 0x2a:      compute_dec(rn, rx); break;
+					case 0x30:      compute_abs(rn, rx); break;
 					case 0x40:      compute_and(rn, rx, ry); break;
 					case 0x41:      compute_or(rn, rx, ry); break;
 					case 0x42:      compute_xor(rn, rx, ry); break;
 					case 0x43:      compute_not(rn, rx); break;
 					case 0x61:      compute_min(rn, rx, ry); break;
 					case 0x62:      compute_max(rn, rx, ry); break;
+					case 0x63:      compute_clip(rn, rx, ry); break;
 					case 0x81:      compute_fadd(rn, rx, ry); break;
 					case 0x82:      compute_fsub(rn, rx, ry); break;
 					case 0x89:      compute_favg(rn, rx, ry); break;
 					case 0x8a:      compute_fcomp(rx, ry); break;
-					case 0x91:      compute_fabs_plus(rn, rx, ry); break;
+					case 0x91:      compute_fadd_abs(rn, rx, ry); break;
+					case 0x92:      compute_fsub_abs(rn, rx, ry); break;
 					case 0xa1:      compute_fpass(rn, rx); break;
 					case 0xa2:      compute_fneg(rn, rx); break;
 					case 0xb0:      compute_fabs(rn, rx); break;
@@ -815,8 +861,8 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 					case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 					{
 						/* Fixed-point Dual Add/Subtract */
-						int rs = (opcode >> 12) & 0xf;
-						int ra = (opcode >> 8) & 0xf;
+						int const rs = op_get_rs(opcode);
+						int const ra = op_get_ra(opcode);
 						compute_dual_add_sub(ra, rs, rx, ry);
 						break;
 					}
@@ -825,13 +871,13 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 					case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff:
 					{
 						/* Floating-point Dual Add/Subtract */
-						int rs = (opcode >> 12) & 0xf;
-						int ra = (opcode >> 8) & 0xf;
+						int const rs = op_get_rs(opcode);
+						int const ra = op_get_ra(opcode);
 						compute_dual_fadd_fsub(ra, rs, rx, ry);
 						break;
 					}
 
-					default:        fatalerror("SHARC: compute: unimplemented ALU operation %02X (%08X, %08X)\n", op, m_core->pc, opcode);
+					default:        throw emu_fatalerror("%s: compute: unimplemented ALU operation %02X (%08X, %08X)", tag(), op, m_core->pc, opcode);
 				}
 				break;
 			}
@@ -853,8 +899,7 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 					case 0xb2:      REG(rn) = compute_mrb_plus_mul_ssin(rx, ry); break;
 
 					default:
-						fatalerror("SHARC: compute: multiplier operation %02X not implemented ! (%08X, %08X)\n", op, m_core->pc, opcode);
-						break;
+						throw emu_fatalerror("%s: compute: multiplier operation %02X not implemented ! (%08X, %08X)", tag(), op, m_core->pc, opcode);
 				}
 				break;
 			}
@@ -865,13 +910,12 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 			{
 				m_core->astat &= ~(SZ|SV|SS);
 
-				op >>= 2;
-				switch(op)
+				switch (op >> 2)
 				{
 					case 0x00:      /* LSHIFT Rx BY Ry*/
 					{
-						int shift = REG(ry);
-						if(shift < 0)
+						int const shift = REG(ry);
+						if (shift < 0)
 						{
 							REG(rn) = (shift > -32 ) ? ((uint32_t)REG(rx) >> -shift) : 0;
 						}
@@ -889,7 +933,7 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 
 					case 0x02:      /* ROT Rx BY Ry */
 					{
-						int shift = REG(ry);
+						int const shift = REG(ry);
 						if (shift < 0)
 						{
 							REG(rn) = rotr_32(REG(rx), -shift);
@@ -908,10 +952,13 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 
 					case 0x08:      /* Rn = Rn OR LSHIFT Rx BY Ry*/
 					{
-						int8_t shift = REG(ry);
-						if(shift < 0) {
+						int8_t const shift = REG(ry);
+						if (shift < 0)
+						{
 							REG(rn) = REG(rn) | ((shift > -32 ) ? (REG(rx) >> -shift) : 0);
-						} else {
+						}
+						else
+						{
 							REG(rn) = REG(rn) | ((shift < 32) ? (REG(rx) << shift) : 0);
 							if (shift > 0)
 							{
@@ -924,8 +971,8 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 
 					case 0x10:      /* FEXT Rx BY Ry */
 					{
-						int bit = REG(ry) & 0x3f;
-						int len = (REG(ry) >> 6) & 0x3f;
+						int const bit = REG(ry) & 0x3f;
+						int const len = (REG(ry) >> 6) & 0x3f;
 						if (len == 0 || bit >= 32)
 							REG(rn) = 0;
 						else
@@ -941,10 +988,12 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 
 					case 0x12:      /* FEXT Rx BY Ry (Sign Extended) */
 					{
-						int bit = REG(ry) & 0x3f;
-						int len = (REG(ry) >> 6) & 0x3f;
+						int const bit = REG(ry) & 0x3f;
+						int const len = (REG(ry) >> 6) & 0x3f;
 						if (len == 0 || bit >= 32)
 							REG(rn) = 0;
+						else if (bit+len > 32)
+							REG(rn) = (uint32_t)REG(rx) >> bit;
 						else
 							REG(rn) = util::sext(REG(rx) >> bit, std::min(len, 32));
 
@@ -958,8 +1007,8 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 
 					case 0x19:      /* Rn = Rn OR FDEP Rx BY Ry */
 					{
-						int bit = REG(ry) & 0x3f;
-						int len = (REG(ry) >> 6) & 0x3f;
+						int const bit = REG(ry) & 0x3f;
+						int const len = (REG(ry) >> 6) & 0x3f;
 
 						if (len != 0 && bit < 32)
 							REG(rn) |= (REG(rx) & util::make_bitmask<uint32_t>(std::min(len, 32))) << bit;
@@ -974,7 +1023,7 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 
 					case 0x30:      /* BSET Rx BY Ry */
 					{
-						uint32_t shift = REG(ry);
+						uint32_t const shift = REG(ry);
 						REG(rn) = REG(rx);
 						if (shift < 32)
 						{
@@ -990,7 +1039,7 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 
 					case 0x31:      /* BCLR Rx BY Ry */
 					{
-						uint32_t shift = REG(ry);
+						uint32_t const shift = REG(ry);
 						REG(rn) = REG(rx);
 						if (shift < 32)
 						{
@@ -1006,10 +1055,10 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 
 					case 0x33:      /* BTST Rx BY Ry */
 					{
-						uint32_t shift = REG(ry);
+						uint32_t const shift = REG(ry);
 						if (shift < 32)
 						{
-							uint32_t r = REG(rx) & (1 << shift);
+							uint32_t const r = REG(rx) & (1 << shift);
 
 							SET_FLAG_SZ(r);
 						}
@@ -1021,166 +1070,145 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 					}
 
 					default:
-						fatalerror("SHARC: compute: shift operation %02X not implemented ! (%08X, %08X)\n", op, m_core->pc, opcode);
+						throw emu_fatalerror("%s: compute: shift operation %02X not implemented ! (%08X, %08X)", tag(), op >> 2, m_core->pc, opcode);
 				}
 				break;
 			}
 
 			default:
-				fatalerror("SHARC: compute: invalid single-function operation %02X\n", cu);
+				throw emu_fatalerror("%s: compute: invalid single-function operation %02X", tag(), cu);
 		}
 	}
 }
 
-void adsp21062_device::PUSH_PC(uint32_t pc)
+inline void adsp21062_device::PUSH_PC()
 {
+	if (m_core->pcstkp >= 30)
+		throw emu_fatalerror("%s: PC Stack overflow!", tag());
+
+	if (m_core->pcstkp > 0)
+		m_core->pcstack[m_core->pcstkp - 1] = m_core->pcstk;
+
 	m_core->pcstkp++;
-	if(m_core->pcstkp >= 32)
-	{
-		fatalerror("SHARC: PC Stack overflow!\n");
-	}
 
-	if (m_core->pcstkp == 0)
-	{
-		m_core->stky |= 0x400000;
-	}
-	else
-	{
-		m_core->stky &= ~0x400000;
-	}
-
-	m_core->pcstk = pc;
-	m_core->pcstack[m_core->pcstkp] = pc;
+	m_core->stky &= ~PCEM;
+	if (m_core->pcstkp >= 30)
+		m_core->stky |= PCFL;
 }
 
-uint32_t adsp21062_device::POP_PC()
+inline uint32_t adsp21062_device::POP_PC()
 {
-	m_core->pcstk = m_core->pcstack[m_core->pcstkp];
+	if (m_core->pcstkp == 0)
+		throw emu_fatalerror("%s: PC Stack underflow!", tag());
 
-	if(m_core->pcstkp == 0)
-	{
-		fatalerror("SHARC: PC Stack underflow!\n");
-	}
+	uint32_t const result = m_core->pcstk;
 
 	m_core->pcstkp--;
 
-	if (m_core->pcstkp == 0)
+	if (m_core->pcstkp < 30)
 	{
-		m_core->stky |= 0x400000;
-	}
-	else
-	{
-		m_core->stky &= ~0x400000;
+		m_core->pcstack[m_core->pcstkp] = m_core->pcstk;
+		if (m_core->pcstkp > 0)
+		{
+			m_core->pcstk = m_core->pcstack[m_core->pcstkp - 1];
+		}
+		else
+		{
+			m_core->pcstk = 0x00ffffff;
+			m_core->stky |= PCEM;
+		}
+		m_core->stky &= ~PCFL;
 	}
 
+	return result;
+}
+
+inline uint32_t adsp21062_device::TOP_PC()
+{
 	return m_core->pcstk;
 }
 
-uint32_t adsp21062_device::TOP_PC()
+inline void adsp21062_device::PUSH_LOOP()
 {
-	return m_core->pcstack[m_core->pcstkp];
-}
+	if (m_core->lstkp >= 6)
+		throw emu_fatalerror("%s: Loop Stack overflow!", tag());
 
-void adsp21062_device::PUSH_LOOP(uint32_t addr, uint32_t code, uint32_t type, uint32_t count)
-{
+	if (m_core->lstkp > 0)
+	{
+		m_core->lcstack[m_core->lstkp - 1] = m_core->curlcntr;
+		m_core->lastack[m_core->lstkp - 1] = m_core->laddr.pack();
+	}
+	m_core->curlcntr = m_core->lcntr;
+	m_core->laddr.unpack(m_core->lastack[m_core->lstkp]);
+
 	m_core->lstkp++;
-	if(m_core->lstkp >= 6)
-	{
-		fatalerror("SHARC: Loop Stack overflow!\n");
-	}
 
-	if (m_core->lstkp == 0)
-	{
-		m_core->stky |= 0x4000000;
-	}
+	if (m_core->lstkp < 6)
+		m_core->lcntr = m_core->lcstack[m_core->lstkp];
 	else
-	{
-		m_core->stky &= ~0x4000000;
-	}
+		m_core->lcntr = 0xffffffff;
 
-	m_core->lcstack[m_core->lstkp] = count;
-	m_core->lastack[m_core->lstkp] = (type << 30) | (code << 24) | addr;
-	m_core->curlcntr = count;
-
-	m_core->laddr.addr = addr;
-	m_core->laddr.code = code;
-	m_core->laddr.loop_type = type;
+	m_core->stky &= ~LSEM;
 }
 
-void adsp21062_device::POP_LOOP()
+inline void adsp21062_device::POP_LOOP()
 {
-	if(m_core->lstkp == 0)
-	{
-		fatalerror("SHARC: Loop Stack underflow!\n");
-	}
+	if (m_core->lstkp == 0)
+		throw emu_fatalerror("%s: Loop Stack underflow!", tag());
 
 	m_core->lstkp--;
 
-	if (m_core->lstkp == 0)
+	m_core->lcntr = m_core->curlcntr;
+	m_core->lastack[m_core->lstkp] = m_core->laddr.pack();
+
+	if (m_core->lstkp > 0)
 	{
-		m_core->stky |= 0x4000000;
+		m_core->curlcntr = m_core->lcstack[m_core->lstkp - 1];
+		m_core->laddr.unpack(m_core->lastack[m_core->lstkp - 1]);
 	}
 	else
 	{
-		m_core->stky &= ~0x4000000;
+		m_core->curlcntr = 0xffffffff;
+		m_core->laddr.unpack(0xffffffff);
+
+		m_core->stky |= LSEM;
 	}
-
-	m_core->curlcntr = m_core->lcstack[m_core->lstkp];
-
-	m_core->laddr.addr = m_core->lastack[m_core->lstkp] & 0xffffff;
-	m_core->laddr.code = (m_core->lastack[m_core->lstkp] >> 24) & 0x1f;
-	m_core->laddr.loop_type = (m_core->lastack[m_core->lstkp] >> 30) & 0x3;
 }
 
-void adsp21062_device::PUSH_STATUS_STACK()
+inline void adsp21062_device::PUSH_STATUS_STACK()
 {
 	m_core->status_stkp++;
 	if (m_core->status_stkp >= 5)
-	{
-		fatalerror("SHARC: Status stack overflow!\n");
-	}
+		throw emu_fatalerror("%s: Status stack overflow!", tag());
 
-	if (m_core->status_stkp == 0)
-	{
-		m_core->stky |= 0x1000000;
-	}
-	else
-	{
-		m_core->stky &= ~0x1000000;
-	}
+	m_core->status_stack[m_core->status_stkp - 1].mode1 = GET_UREG(REG_MODE1);
+	m_core->status_stack[m_core->status_stkp - 1].astat = GET_UREG(REG_ASTAT);
 
-	m_core->status_stack[m_core->status_stkp].mode1 = GET_UREG(REG_MODE1);
-	m_core->status_stack[m_core->status_stkp].astat = GET_UREG(REG_ASTAT);
+	m_core->stky &= ~SSEM;
 }
 
-void adsp21062_device::POP_STATUS_STACK()
+inline void adsp21062_device::POP_STATUS_STACK()
 {
-	SET_UREG(REG_MODE1, m_core->status_stack[m_core->status_stkp].mode1);
-	SET_UREG(REG_ASTAT, m_core->status_stack[m_core->status_stkp].astat);
+	if (m_core->status_stkp <= 0)
+		throw emu_fatalerror("%s: Status stack underflow!", tag());
 
 	m_core->status_stkp--;
-	if (m_core->status_stkp < 0)
-	{
-		fatalerror("SHARC: Status stack underflow!\n");
-	}
+
+	uint32_t const flags_mask = FLG0 | FLG1 | FLG2 | FLG3;
+	SET_UREG(REG_MODE1, m_core->status_stack[m_core->status_stkp].mode1);
+	SET_UREG(REG_ASTAT, (m_core->astat & flags_mask) | (m_core->status_stack[m_core->status_stkp].astat & ~flags_mask));
 
 	if (m_core->status_stkp == 0)
-	{
-		m_core->stky |= 0x1000000;
-	}
-	else
-	{
-		m_core->stky &= ~0x1000000;
-	}
+		m_core->stky |= SSEM;
 }
 
-int adsp21062_device::IF_CONDITION_CODE(int cond)
+inline int adsp21062_device::IF_CONDITION_CODE(int cond)
 {
-	switch(cond)
+	switch (cond)
 	{
 		case 0x00:  return m_core->astat & AZ;        /* EQ */
-		case 0x01:  return !(m_core->astat & AZ) && (m_core->astat & AN);   /* LT */
-		case 0x02:  return (m_core->astat & AZ) || (m_core->astat & AN);    /* LE */
+		case 0x01:  return SHARC_COND_LT;             /* LT */
+		case 0x02:  return SHARC_COND_LE;             /* LE */
 		case 0x03:  return (m_core->astat & AC);      /* AC */
 		case 0x04:  return (m_core->astat & AV);      /* AV */
 		case 0x05:  return (m_core->astat & MV);      /* MV */
@@ -1192,11 +1220,11 @@ int adsp21062_device::IF_CONDITION_CODE(int cond)
 		case 0x0b:  return (m_core->flag[2] != 0);    /* FLAG2 */
 		case 0x0c:  return (m_core->flag[3] != 0);    /* FLAG3 */
 		case 0x0d:  return (m_core->astat & BTF);     /* TF */
-		case 0x0e:  return 0;                       /* BM */
-		case 0x0f:  return (m_core->curlcntr!=1);     /* NOT LCE */
+		case 0x0e:  return 0;                         /* BM */
+		case 0x0f:  return (m_core->curlcntr != 1);   /* NOT LCE */
 		case 0x10:  return !(m_core->astat & AZ);     /* NOT EQUAL */
-		case 0x11:  return (m_core->astat & AZ) || !(m_core->astat & AN);   /* GE */
-		case 0x12:  return !(m_core->astat & AZ) && !(m_core->astat & AN);  /* GT */
+		case 0x11:  return !SHARC_COND_LT;            /* GE */
+		case 0x12:  return !SHARC_COND_LE;            /* GT */
 		case 0x13:  return !(m_core->astat & AC);     /* NOT AC */
 		case 0x14:  return !(m_core->astat & AV);     /* NOT AV */
 		case 0x15:  return !(m_core->astat & MV);     /* NOT MV */
@@ -1208,19 +1236,19 @@ int adsp21062_device::IF_CONDITION_CODE(int cond)
 		case 0x1b:  return (m_core->flag[2] == 0);    /* NOT FLAG2 */
 		case 0x1c:  return (m_core->flag[3] == 0);    /* NOT FLAG3 */
 		case 0x1d:  return !(m_core->astat & BTF);    /* NOT TF */
-		case 0x1e:  return 1;                       /* NOT BM */
-		case 0x1f:  return 1;                       /* TRUE */
+		case 0x1e:  return 1;                         /* NOT BM */
+		case 0x1f:  return 1;                         /* TRUE */
 	}
 	return 1;
 }
 
-int adsp21062_device::DO_CONDITION_CODE(int cond)
+inline int adsp21062_device::DO_CONDITION_CODE(int cond)
 {
-	switch(cond)
+	switch (cond)
 	{
 		case 0x00:  return m_core->astat & AZ;        /* EQ */
-		case 0x01:  return !(m_core->astat & AZ) && (m_core->astat & AN);   /* LT */
-		case 0x02:  return (m_core->astat & AZ) || (m_core->astat & AN);    /* LE */
+		case 0x01:  return SHARC_COND_LT;             /* LT */
+		case 0x02:  return SHARC_COND_LE;             /* LE */
 		case 0x03:  return (m_core->astat & AC);      /* AC */
 		case 0x04:  return (m_core->astat & AV);      /* AV */
 		case 0x05:  return (m_core->astat & MV);      /* MV */
@@ -1232,11 +1260,11 @@ int adsp21062_device::DO_CONDITION_CODE(int cond)
 		case 0x0b:  return (m_core->flag[2] != 0);    /* FLAG2 */
 		case 0x0c:  return (m_core->flag[3] != 0);    /* FLAG3 */
 		case 0x0d:  return (m_core->astat & BTF);     /* TF */
-		case 0x0e:  return 0;                       /* BM */
-		case 0x0f:  return (m_core->curlcntr==1);     /* LCE */
+		case 0x0e:  return 0;                         /* BM */
+		case 0x0f:  return (m_core->curlcntr == 1);   /* LCE */
 		case 0x10:  return !(m_core->astat & AZ);     /* NOT EQUAL */
-		case 0x11:  return (m_core->astat & AZ) || !(m_core->astat & AN);   /* GE */
-		case 0x12:  return !(m_core->astat & AZ) && !(m_core->astat & AN);  /* GT */
+		case 0x11:  return !SHARC_COND_LT;            /* GE */
+		case 0x12:  return !SHARC_COND_LE;            /* GT */
 		case 0x13:  return !(m_core->astat & AC);     /* NOT AC */
 		case 0x14:  return !(m_core->astat & AV);     /* NOT AV */
 		case 0x15:  return !(m_core->astat & MV);     /* NOT MV */
@@ -1248,8 +1276,8 @@ int adsp21062_device::DO_CONDITION_CODE(int cond)
 		case 0x1b:  return (m_core->flag[2] == 0);    /* NOT FLAG2 */
 		case 0x1c:  return (m_core->flag[3] == 0);    /* NOT FLAG3 */
 		case 0x1d:  return !(m_core->astat & BTF);    /* NOT TF */
-		case 0x1e:  return 1;                       /* NOT BM */
-		case 0x1f:  return 0;                       /* FALSE (FOREVER) */
+		case 0x1e:  return 1;                         /* NOT BM */
+		case 0x1f:  return 0;                         /* FALSE (FOREVER) */
 	}
 	return 1;
 }
@@ -1260,25 +1288,23 @@ int adsp21062_device::DO_CONDITION_CODE(int cond)
 /* compute / dreg <-> DM / dreg <-> PM */
 void adsp21062_device::sharcop_compute_dreg_dm_dreg_pm()
 {
-	int pm_dreg = (m_core->opcode >> 23) & 0xf;
-	int pmm = (m_core->opcode >> 27) & 0x7;
-	int pmi = (m_core->opcode >> 30) & 0x7;
-	int dm_dreg = (m_core->opcode >> 33) & 0xf;
-	int dmm = (m_core->opcode >> 38) & 0x7;
-	int dmi = (m_core->opcode >> 41) & 0x7;
-	int pmd = (m_core->opcode >> 37) & 0x1;
-	int dmd = (m_core->opcode >> 44) & 0x1;
-	int compute = m_core->opcode & 0x7fffff;
+	int const pm_dreg = (m_core->opcode >> 23) & 0xf;
+	int const pmm = op_get_pmm(m_core->opcode);
+	int const pmi = op_get_pmi(m_core->opcode);
+	int const dm_dreg = (m_core->opcode >> 33) & 0xf;
+	int const dmm = op_get_dmm(m_core->opcode);
+	int const dmi = op_get_dmi(m_core->opcode);
+	int const pmd = (m_core->opcode >> 37) & 0x1;
+	int const dmd = (m_core->opcode >> 44) & 0x1;
+	int const compute = op_get_compute(m_core->opcode);
 
 	/* due to parallelity issues, source DREGs must be saved */
 	/* because the compute operation may change them */
-	uint32_t parallel_pm_dreg = REG(pm_dreg);
-	uint32_t parallel_dm_dreg = REG(dm_dreg);
+	uint32_t const parallel_pm_dreg = REG(pm_dreg);
+	uint32_t const parallel_dm_dreg = REG(dm_dreg);
 
 	if (compute)
-	{
 		COMPUTE(compute);
-	}
 
 	if (pmd)        // dreg -> PM
 	{
@@ -1313,13 +1339,11 @@ void adsp21062_device::sharcop_compute_dreg_dm_dreg_pm()
 /* compute */
 void adsp21062_device::sharcop_compute()
 {
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	int compute = m_core->opcode & 0x7fffff;
+	int const cond = op_get_cond(m_core->opcode);
+	int const compute = op_get_compute(m_core->opcode);
 
-	if (IF_CONDITION_CODE(cond) && compute != 0)
-	{
+	if (IF_CONDITION_CODE(cond) && compute)
 		COMPUTE(compute);
-	}
 }
 
 /*****************************************************************************/
@@ -1328,60 +1352,46 @@ void adsp21062_device::sharcop_compute()
 /* compute / ureg <-> DM|PM, pre-modify */
 void adsp21062_device::sharcop_compute_ureg_dmpm_premod()
 {
-	int i = (m_core->opcode >> 41) & 0x7;
-	int m = (m_core->opcode >> 38) & 0x7;
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	int g = (m_core->opcode >> 32) & 0x1;
-	int d = (m_core->opcode >> 31) & 0x1;
-	int ureg = (m_core->opcode >> 23) & 0xff;
-	int compute = m_core->opcode & 0x7fffff;
+	int const i = (m_core->opcode >> 41) & 0x7;
+	int const m = (m_core->opcode >> 38) & 0x7;
+	int const cond = op_get_cond(m_core->opcode);
+	int const g = (m_core->opcode >> 32) & 0x1;
+	int const d = (m_core->opcode >> 31) & 0x1;
+	int const ureg = (m_core->opcode >> 23) & 0xff;
+	int const compute = op_get_compute(m_core->opcode);
 
 	if (IF_CONDITION_CODE(cond))
 	{
 		/* due to parallelity issues, source UREG must be saved */
 		/* because the compute operation may change it */
-		uint32_t parallel_ureg = GET_UREG(ureg);
+		uint32_t const parallel_ureg = GET_UREG(ureg);
 
 		if (compute)
-		{
 			COMPUTE(compute);
-		}
 
 		if (g)      /* PM */
 		{
 			if (d)      /* ureg -> PM */
 			{
 				if (ureg == 0xdb)       /* PX register access is always 48-bit */
-				{
 					pm_write48(PM_REG_I(i)+PM_REG_M(m), m_core->px);
-				}
 				else
-				{
 					pm_write32(PM_REG_I(i)+PM_REG_M(m), parallel_ureg);
-				}
 			}
 			else        /* PM <- ureg */
 			{
 				if (ureg == 0xdb)       /* PX register access is always 48-bit */
-				{
 					m_core->px = pm_read48(PM_REG_I(i)+PM_REG_M(m));
-				}
 				else
-				{
 					SET_UREG(ureg, pm_read32(PM_REG_I(i)+PM_REG_M(m)));
-				}
 			}
 		}
 		else    /* DM */
 		{
 			if (d)      /* ureg -> DM */
-			{
 				dm_write32(DM_REG_I(i)+DM_REG_M(m), parallel_ureg);
-			}
 			else        /* DM <- ureg */
-			{
 				SET_UREG(ureg, dm_read32(DM_REG_I(i)+DM_REG_M(m)));
-			}
 		}
 	}
 }
@@ -1389,50 +1399,40 @@ void adsp21062_device::sharcop_compute_ureg_dmpm_premod()
 /* compute / ureg <-> DM|PM, post-modify */
 void adsp21062_device::sharcop_compute_ureg_dmpm_postmod()
 {
-	int i = (m_core->opcode >> 41) & 0x7;
-	int m = (m_core->opcode >> 38) & 0x7;
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	int g = (m_core->opcode >> 32) & 0x1;
-	int d = (m_core->opcode >> 31) & 0x1;
-	int ureg = (m_core->opcode >> 23) & 0xff;
-	int compute = m_core->opcode & 0x7fffff;
+	int const i = (m_core->opcode >> 41) & 0x7;
+	int const m = (m_core->opcode >> 38) & 0x7;
+	int const cond = op_get_cond(m_core->opcode);
+	int const g = (m_core->opcode >> 32) & 0x1;
+	int const d = (m_core->opcode >> 31) & 0x1;
+	int const ureg = (m_core->opcode >> 23) & 0xff;
+	int const compute = op_get_compute(m_core->opcode);
 
-	if(IF_CONDITION_CODE(cond))
+	if (IF_CONDITION_CODE(cond))
 	{
 		/* due to parallelity issues, source UREG must be saved */
 		/* because the compute operation may change it */
-		uint32_t parallel_ureg = GET_UREG(ureg);
+		uint32_t const parallel_ureg = GET_UREG(ureg);
 
 		if (compute)
-		{
 			COMPUTE(compute);
-		}
 
 		if (g)      /* PM */
 		{
 			if (d)      /* ureg -> PM */
 			{
 				if (ureg == 0xdb)       /* PX register access is always 48-bit */
-				{
 					pm_write48(PM_REG_I(i), m_core->px);
-				}
 				else
-				{
 					pm_write32(PM_REG_I(i), parallel_ureg);
-				}
 				PM_REG_I(i) += PM_REG_M(m);
 				UPDATE_CIRCULAR_BUFFER_PM(i);
 			}
 			else        /* PM <- ureg */
 			{
 				if (ureg == 0xdb)       /* PX register access is always 48-bit */
-				{
 					m_core->px = pm_read48(PM_REG_I(i));
-				}
 				else
-				{
 					SET_UREG(ureg, pm_read32(PM_REG_I(i)));
-				}
 				PM_REG_I(i) += PM_REG_M(m);
 				UPDATE_CIRCULAR_BUFFER_PM(i);
 			}
@@ -1461,16 +1461,16 @@ void adsp21062_device::sharcop_compute_ureg_dmpm_postmod()
 /* compute / dreg <- DM, immediate modify */
 void adsp21062_device::sharcop_compute_dm_to_dreg_immmod()
 {
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	int u = (m_core->opcode >> 38) & 0x1;
-	int dreg = (m_core->opcode >> 23) & 0xf;
-	int i = (m_core->opcode >> 41) & 0x7;
-	int mod = util::sext((m_core->opcode >> 27) & 0x3f, 6);
-	int compute = m_core->opcode & 0x7fffff;
+	int const cond = op_get_cond(m_core->opcode);
+	int const u = (m_core->opcode >> 38) & 0x1;
+	int const dreg = (m_core->opcode >> 23) & 0xf;
+	int const i = (m_core->opcode >> 41) & 0x7;
+	int const mod = op_get_reladdr(m_core->opcode);
+	int const compute = op_get_compute(m_core->opcode);
 
 	if (IF_CONDITION_CODE(cond))
 	{
-		if (compute != 0)
+		if (compute)
 		{
 			COMPUTE(compute);
 		}
@@ -1491,23 +1491,21 @@ void adsp21062_device::sharcop_compute_dm_to_dreg_immmod()
 /* compute / dreg -> DM, immediate modify */
 void adsp21062_device::sharcop_compute_dreg_to_dm_immmod()
 {
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	int u = (m_core->opcode >> 38) & 0x1;
-	int dreg = (m_core->opcode >> 23) & 0xf;
-	int i = (m_core->opcode >> 41) & 0x7;
-	int mod = util::sext((m_core->opcode >> 27) & 0x3f, 6);
-	int compute = m_core->opcode & 0x7fffff;
+	int const cond = op_get_cond(m_core->opcode);
+	int const u = (m_core->opcode >> 38) & 0x1;
+	int const dreg = (m_core->opcode >> 23) & 0xf;
+	int const i = (m_core->opcode >> 41) & 0x7;
+	int const mod = op_get_reladdr(m_core->opcode);
+	int const compute = op_get_compute(m_core->opcode);
 
 	/* due to parallelity issues, source REG must be saved */
 	/* because the shift operation may change it */
-	uint32_t parallel_dreg = REG(dreg);
+	uint32_t const parallel_dreg = REG(dreg);
 
 	if (IF_CONDITION_CODE(cond))
 	{
-		if (compute != 0)
-		{
+		if (compute)
 			COMPUTE(compute);
-		}
 
 		if (u)      /* post-modify with update */
 		{
@@ -1525,19 +1523,17 @@ void adsp21062_device::sharcop_compute_dreg_to_dm_immmod()
 /* compute / dreg <- PM, immediate modify */
 void adsp21062_device::sharcop_compute_pm_to_dreg_immmod()
 {
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	int u = (m_core->opcode >> 38) & 0x1;
-	int dreg = (m_core->opcode >> 23) & 0xf;
-	int i = (m_core->opcode >> 41) & 0x7;
-	int mod = util::sext((m_core->opcode >> 27) & 0x3f, 6);
-	int compute = m_core->opcode & 0x7fffff;
+	int const cond = op_get_cond(m_core->opcode);
+	int const u = (m_core->opcode >> 38) & 0x1;
+	int const dreg = (m_core->opcode >> 23) & 0xf;
+	int const i = (m_core->opcode >> 41) & 0x7;
+	int const mod = op_get_reladdr(m_core->opcode);
+	int const compute = op_get_compute(m_core->opcode);
 
 	if (IF_CONDITION_CODE(cond))
 	{
-		if (compute != 0)
-		{
+		if (compute)
 			COMPUTE(compute);
-		}
 
 		if (u)      /* post-modify with update */
 		{
@@ -1555,23 +1551,21 @@ void adsp21062_device::sharcop_compute_pm_to_dreg_immmod()
 /* compute / dreg -> PM, immediate modify */
 void adsp21062_device::sharcop_compute_dreg_to_pm_immmod()
 {
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	int u = (m_core->opcode >> 38) & 0x1;
-	int dreg = (m_core->opcode >> 23) & 0xf;
-	int i = (m_core->opcode >> 41) & 0x7;
-	int mod = util::sext((m_core->opcode >> 27) & 0x3f, 6);
-	int compute = m_core->opcode & 0x7fffff;
+	int const cond = op_get_cond(m_core->opcode);
+	int const u = (m_core->opcode >> 38) & 0x1;
+	int const dreg = (m_core->opcode >> 23) & 0xf;
+	int const i = (m_core->opcode >> 41) & 0x7;
+	int const mod = op_get_reladdr(m_core->opcode);
+	int const compute = op_get_compute(m_core->opcode);
 
 	/* due to parallelity issues, source REG must be saved */
 	/* because the compute operation may change it */
-	uint32_t parallel_dreg = REG(dreg);
+	uint32_t const parallel_dreg = REG(dreg);
 
 	if (IF_CONDITION_CODE(cond))
 	{
-		if (compute != 0)
-		{
+		if (compute)
 			COMPUTE(compute);
-		}
 
 		if (u)      /* post-modify with update */
 		{
@@ -1592,21 +1586,19 @@ void adsp21062_device::sharcop_compute_dreg_to_pm_immmod()
 /* compute / ureg <-> ureg */
 void adsp21062_device::sharcop_compute_ureg_to_ureg()
 {
-	int src_ureg = (m_core->opcode >> 36) & 0xff;
-	int dst_ureg = (m_core->opcode >> 23) & 0xff;
-	int cond = (m_core->opcode >> 31) & 0x1f;
-	int compute = m_core->opcode & 0x7fffff;
+	int const src_ureg = op_get_ureg_src(m_core->opcode);
+	int const dst_ureg = op_get_ureg_dst(m_core->opcode);
+	int const cond = op_get_cond_ureg(m_core->opcode);
+	int const compute = op_get_compute(m_core->opcode);
 
 	if (IF_CONDITION_CODE(cond))
 	{
 		/* due to parallelity issues, source UREG must be saved */
 		/* because the compute operation may change it */
-		uint32_t parallel_ureg = GET_UREG(src_ureg);
+		uint32_t const parallel_ureg = GET_UREG(src_ureg);
 
-		if (compute != 0)
-		{
+		if (compute)
 			COMPUTE(compute);
-		}
 
 		SET_UREG(dst_ureg, parallel_ureg);
 	}
@@ -1618,22 +1610,22 @@ void adsp21062_device::sharcop_compute_ureg_to_ureg()
 /* immediate shift / dreg <-> DM|PM */
 void adsp21062_device::sharcop_imm_shift_dreg_dmpm()
 {
-	int i = (m_core->opcode >> 41) & 0x7;
-	int m = (m_core->opcode >> 38) & 0x7;
-	int g = (m_core->opcode >> 32) & 0x1;
-	int d = (m_core->opcode >> 31) & 0x1;
-	int dreg = (m_core->opcode >> 23) & 0xf;
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	int data = ((m_core->opcode >> 8) & 0xff) | ((m_core->opcode >> 19) & 0xf00);
-	int shiftop = (m_core->opcode >> 16) & 0x3f;
-	int rn = (m_core->opcode >> 4) & 0xf;
-	int rx = (m_core->opcode & 0xf);
+	int const i = (m_core->opcode >> 41) & 0x7;
+	int const m = (m_core->opcode >> 38) & 0x7;
+	int const g = (m_core->opcode >> 32) & 0x1;
+	int const d = (m_core->opcode >> 31) & 0x1;
+	int const dreg = (m_core->opcode >> 23) & 0xf;
+	int const cond = op_get_cond(m_core->opcode);
+	int const data = ((m_core->opcode >> 8) & 0xff) | ((m_core->opcode >> 19) & 0xf00);
+	int const shiftop = (m_core->opcode >> 16) & 0x3f;
+	int const rn = (m_core->opcode >> 4) & 0xf;
+	int const rx = (m_core->opcode & 0xf);
 
 	if (IF_CONDITION_CODE(cond))
 	{
 		/* due to parallelity issues, source REG must be saved */
 		/* because the shift operation may change it */
-		uint32_t parallel_dreg = REG(dreg);
+		uint32_t const parallel_dreg = REG(dreg);
 
 		SHIFT_OPERATION_IMM(shiftop, data, rn, rx);
 
@@ -1676,16 +1668,14 @@ void adsp21062_device::sharcop_imm_shift_dreg_dmpm()
 /* immediate shift */
 void adsp21062_device::sharcop_imm_shift()
 {
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	int data = ((m_core->opcode >> 8) & 0xff) | ((m_core->opcode >> 19) & 0xf00);
-	int shiftop = (m_core->opcode >> 16) & 0x3f;
-	int rn = (m_core->opcode >> 4) & 0xf;
-	int rx = (m_core->opcode & 0xf);
+	int const cond = op_get_cond(m_core->opcode);
+	int const data = ((m_core->opcode >> 8) & 0xff) | ((m_core->opcode >> 19) & 0xf00);
+	int const shiftop = (m_core->opcode >> 16) & 0x3f;
+	int const rn = (m_core->opcode >> 4) & 0xf;
+	int const rx = (m_core->opcode & 0xf);
 
 	if (IF_CONDITION_CODE(cond))
-	{
 		SHIFT_OPERATION_IMM(shiftop, data, rn, rx);
-	}
 }
 
 /*****************************************************************************/
@@ -1694,18 +1684,16 @@ void adsp21062_device::sharcop_imm_shift()
 /* compute / modify */
 void adsp21062_device::sharcop_compute_modify()
 {
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	int compute = m_core->opcode & 0x7fffff;
-	int g = (m_core->opcode >> 38) & 0x1;
-	int m = (m_core->opcode >> 27) & 0x7;
-	int i = (m_core->opcode >> 30) & 0x7;
+	int const cond = op_get_cond(m_core->opcode);
+	int const compute = op_get_compute(m_core->opcode);
+	int const g = (m_core->opcode >> 38) & 0x1;
+	int const m = (m_core->opcode >> 27) & 0x7;
+	int const i = (m_core->opcode >> 30) & 0x7;
 
 	if (IF_CONDITION_CODE(cond))
 	{
-		if (compute != 0)
-		{
+		if (compute)
 			COMPUTE(compute);
-		}
 
 		if (g)      /* Modify PM */
 		{
@@ -1726,22 +1714,23 @@ void adsp21062_device::sharcop_compute_modify()
 /* direct call to absolute address */
 void adsp21062_device::sharcop_direct_call()
 {
-	int j = (m_core->opcode >> 26) & 0x1;
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	uint32_t address = m_core->opcode & 0xffffff;
+	int const j = op_get_jump_j(m_core->opcode);
+	int const cond = op_get_cond(m_core->opcode);
+	uint32_t const address = m_core->opcode & 0xffffff;
 
 	if (IF_CONDITION_CODE(cond))
 	{
+		PUSH_PC();
 		if (j)
 		{
-			//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
-			PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
+			//m_core->pcstk = m_core->pc + 3;     /* 1 instruction + 2 delayed instructions */
+			m_core->pcstk = m_core->nfaddr;     /* 1 instruction + 2 delayed instructions */
 			CHANGE_PC_DELAYED(address);
 		}
 		else
 		{
-			//PUSH_PC(m_core->pc+1);
-			PUSH_PC(m_core->daddr);
+			//m_core->pcstk = m_core->pc + 1;
+			m_core->pcstk = m_core->daddr;
 			CHANGE_PC(address);
 		}
 	}
@@ -1750,22 +1739,20 @@ void adsp21062_device::sharcop_direct_call()
 /* direct jump to absolute address */
 void adsp21062_device::sharcop_direct_jump()
 {
-	int la = (m_core->opcode >> 38) & 0x1;
-	int ci = (m_core->opcode >> 24) & 0x1;
-	int j = (m_core->opcode >> 26) & 0x1;
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	uint32_t address = m_core->opcode & 0xffffff;
+	int const la = op_get_jump_la(m_core->opcode);
+	int const ci = op_get_jump_ci(m_core->opcode);
+	int const j = op_get_jump_j(m_core->opcode);
+	int const cond = op_get_cond(m_core->opcode);
+	uint32_t const address = m_core->opcode & 0xffffff;
 
-	if(IF_CONDITION_CODE(cond))
+	if (IF_CONDITION_CODE(cond))
 	{
 		// Clear Interrupt
 		if (ci)
 		{
-			// TODO: anything else?
-			if (m_core->status_stkp > 0)
-			{
+			// TODO: timer and VIRPT interrupts also push the status stack
+			if (m_core->active_irq_num >= 6 && m_core->active_irq_num <= 8)
 				POP_STATUS_STACK();
-			}
 
 			m_core->interrupt_active = 0;
 			m_core->irptl &= ~(1 << m_core->active_irq_num);
@@ -1778,13 +1765,9 @@ void adsp21062_device::sharcop_direct_jump()
 		}
 
 		if (j)
-		{
 			CHANGE_PC_DELAYED(address);
-		}
 		else
-		{
 			CHANGE_PC(address);
-		}
 	}
 }
 
@@ -1794,20 +1777,21 @@ void adsp21062_device::sharcop_direct_jump()
 /* direct call to relative address */
 void adsp21062_device::sharcop_relative_call()
 {
-	int j = (m_core->opcode >> 26) & 0x1;
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	uint32_t address = m_core->opcode & 0xffffff;
+	int const j = op_get_jump_j(m_core->opcode);
+	int const cond = op_get_cond(m_core->opcode);
+	uint32_t const address = m_core->opcode & 0xffffff;
 
 	if (IF_CONDITION_CODE(cond))
 	{
+		PUSH_PC();
 		if (j)
 		{
-			PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
+			m_core->pcstk = m_core->pc + 3;  /* 1 instruction + 2 delayed instructions */
 			CHANGE_PC_DELAYED(m_core->pc + util::sext(address, 24));
 		}
 		else
 		{
-			PUSH_PC(m_core->pc+1);
+			m_core->pcstk = m_core->pc + 1;
 			CHANGE_PC(m_core->pc + util::sext(address, 24));
 		}
 	}
@@ -1816,22 +1800,20 @@ void adsp21062_device::sharcop_relative_call()
 /* direct jump to relative address */
 void adsp21062_device::sharcop_relative_jump()
 {
-	int la = (m_core->opcode >> 38) & 0x1;
-	int ci = (m_core->opcode >> 24) & 0x1;
-	int j = (m_core->opcode >> 26) & 0x1;
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	uint32_t address = m_core->opcode & 0xffffff;
+	int const la = op_get_jump_la(m_core->opcode);
+	int const ci = op_get_jump_ci(m_core->opcode);
+	int const j = op_get_jump_j(m_core->opcode);
+	int const cond = op_get_cond(m_core->opcode);
+	uint32_t const address = m_core->opcode & 0xffffff;
 
 	if (IF_CONDITION_CODE(cond))
 	{
 		// Clear Interrupt
 		if (ci)
 		{
-			// TODO: anything else?
-			if (m_core->status_stkp > 0)
-			{
+			// TODO: timer and VIRPT interrupts also push the status stack
+			if (m_core->active_irq_num >= 6 && m_core->active_irq_num <= 8)
 				POP_STATUS_STACK();
-			}
 
 			m_core->interrupt_active = 0;
 			m_core->irptl &= ~(1 << m_core->active_irq_num);
@@ -1844,13 +1826,9 @@ void adsp21062_device::sharcop_relative_jump()
 		}
 
 		if (j)
-		{
 			CHANGE_PC_DELAYED(m_core->pc + util::sext(address, 24));
-		}
 		else
-		{
 			CHANGE_PC(m_core->pc + util::sext(address, 24));
-		}
 	}
 }
 
@@ -1860,23 +1838,21 @@ void adsp21062_device::sharcop_relative_jump()
 /* indirect jump */
 void adsp21062_device::sharcop_indirect_jump()
 {
-	int la = (m_core->opcode >> 38) & 0x1;
-	int ci = (m_core->opcode >> 24) & 0x1;
-	int j = (m_core->opcode >> 26) & 0x1;
-	int e = (m_core->opcode >> 25) & 0x1;
-	int pmi = (m_core->opcode >> 30) & 0x7;
-	int pmm = (m_core->opcode >> 27) & 0x7;
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	int compute = m_core->opcode & 0x7fffff;
+	int const la = op_get_jump_la(m_core->opcode);
+	int const ci = op_get_jump_ci(m_core->opcode);
+	int const j = op_get_jump_j(m_core->opcode);
+	int const e = op_get_jump_e(m_core->opcode);
+	int const pmi = op_get_pmi(m_core->opcode);
+	int const pmm = op_get_pmm(m_core->opcode);
+	int const cond = op_get_cond(m_core->opcode);
+	int const compute = op_get_compute(m_core->opcode);
 
 	// Clear Interrupt
 	if (ci)
 	{
-		// TODO: anything else?
-		if (m_core->status_stkp > 0)
-		{
+		// TODO: timer and VIRPT interrupts also push the status stack
+		if (m_core->active_irq_num >= 6 && m_core->active_irq_num <= 8)
 			POP_STATUS_STACK();
-		}
 
 		m_core->interrupt_active = 0;
 		m_core->irptl &= ~(1 << m_core->active_irq_num);
@@ -1892,21 +1868,15 @@ void adsp21062_device::sharcop_indirect_jump()
 				POP_LOOP();
 			}
 
-			if(j)
-			{
+			if (j)
 				CHANGE_PC_DELAYED(PM_REG_I(pmi) + PM_REG_M(pmm));
-			}
 			else
-			{
 				CHANGE_PC(PM_REG_I(pmi) + PM_REG_M(pmm));
-			}
 		}
 		else
 		{
 			if (compute)
-			{
 				COMPUTE(compute);
-			}
 		}
 	}
 	else        /* IF */
@@ -1914,9 +1884,7 @@ void adsp21062_device::sharcop_indirect_jump()
 		if (IF_CONDITION_CODE(cond))
 		{
 			if (compute)
-			{
 				COMPUTE(compute);
-			}
 
 			if (la)
 			{
@@ -1924,14 +1892,10 @@ void adsp21062_device::sharcop_indirect_jump()
 				POP_LOOP();
 			}
 
-			if(j)
-			{
+			if (j)
 				CHANGE_PC_DELAYED(PM_REG_I(pmi) + PM_REG_M(pmm));
-			}
 			else
-			{
 				CHANGE_PC(PM_REG_I(pmi) + PM_REG_M(pmm));
-			}
 		}
 	}
 }
@@ -1939,36 +1903,35 @@ void adsp21062_device::sharcop_indirect_jump()
 /* indirect call */
 void adsp21062_device::sharcop_indirect_call()
 {
-	int j = (m_core->opcode >> 26) & 0x1;
-	int e = (m_core->opcode >> 25) & 0x1;
-	int pmi = (m_core->opcode >> 30) & 0x7;
-	int pmm = (m_core->opcode >> 27) & 0x7;
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	int compute = m_core->opcode & 0x7fffff;
+	int const j = op_get_jump_j(m_core->opcode);
+	int const e = op_get_jump_e(m_core->opcode);
+	int const pmi = op_get_pmi(m_core->opcode);
+	int const pmm = op_get_pmm(m_core->opcode);
+	int const cond = op_get_cond(m_core->opcode);
+	int const compute = op_get_compute(m_core->opcode);
 
 	if (e)      /* IF...ELSE */
 	{
 		if (IF_CONDITION_CODE(cond))
 		{
+			PUSH_PC();
 			if (j)
 			{
-				//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
-				PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
+				//m_core->pcstk = m_core->pc + 3;     /* 1 instruction + 2 delayed instructions */
+				m_core->pcstk = m_core->nfaddr;     /* 1 instruction + 2 delayed instructions */
 				CHANGE_PC_DELAYED(PM_REG_I(pmi) + PM_REG_M(pmm));
 			}
 			else
 			{
-				//PUSH_PC(m_core->pc+1);
-				PUSH_PC(m_core->daddr);
+				//m_core->pcstk = m_core->pc + 1;
+				m_core->pcstk = m_core->daddr;
 				CHANGE_PC(PM_REG_I(pmi) + PM_REG_M(pmm));
 			}
 		}
 		else
 		{
 			if (compute)
-			{
 				COMPUTE(compute);
-			}
 		}
 	}
 	else        /* IF */
@@ -1976,20 +1939,19 @@ void adsp21062_device::sharcop_indirect_call()
 		if (IF_CONDITION_CODE(cond))
 		{
 			if (compute)
-			{
 				COMPUTE(compute);
-			}
 
+			PUSH_PC();
 			if (j)
 			{
-				//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
-				PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
+				//m_core->pcstk = m_core->pc + 3;     /* 1 instruction + 2 delayed instructions */
+				m_core->pcstk = m_core->nfaddr;     /* 1 instruction + 2 delayed instructions */
 				CHANGE_PC_DELAYED(PM_REG_I(pmi) + PM_REG_M(pmm));
 			}
 			else
 			{
-				//PUSH_PC(m_core->pc+1);
-				PUSH_PC(m_core->daddr);
+				//m_core->pcstk = m_core->pc + 1;
+				m_core->pcstk = m_core->daddr;
 				CHANGE_PC(PM_REG_I(pmi) + PM_REG_M(pmm));
 			}
 		}
@@ -2002,21 +1964,19 @@ void adsp21062_device::sharcop_indirect_call()
 /* indirect jump to relative address */
 void adsp21062_device::sharcop_relative_jump_compute()
 {
-	int la = (m_core->opcode >> 38) & 0x1;
-	int ci = (m_core->opcode >> 24) & 0x1;
-	int j = (m_core->opcode >> 26) & 0x1;
-	int e = (m_core->opcode >> 25) & 0x1;
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	int compute = m_core->opcode & 0x7fffff;
+	int const la = op_get_jump_la(m_core->opcode);
+	int const ci = op_get_jump_ci(m_core->opcode);
+	int const j = op_get_jump_j(m_core->opcode);
+	int const e = op_get_jump_e(m_core->opcode);
+	int const cond = op_get_cond(m_core->opcode);
+	int const compute = op_get_compute(m_core->opcode);
 
 	// Clear Interrupt
 	if (ci)
 	{
-		// TODO: anything else?
-		if (m_core->status_stkp > 0)
-		{
+		// TODO: timer and VIRPT interrupts also push the status stack
+		if (m_core->active_irq_num >= 6 && m_core->active_irq_num <= 8)
 			POP_STATUS_STACK();
-		}
 
 		m_core->interrupt_active = 0;
 		m_core->irptl &= ~(1 << m_core->active_irq_num);
@@ -2033,20 +1993,14 @@ void adsp21062_device::sharcop_relative_jump_compute()
 			}
 
 			if (j)
-			{
-				CHANGE_PC_DELAYED(m_core->pc + util::sext((m_core->opcode >> 27) & 0x3f, 6));
-			}
+				CHANGE_PC_DELAYED(m_core->pc + op_get_reladdr(m_core->opcode));
 			else
-			{
-				CHANGE_PC(m_core->pc + util::sext((m_core->opcode >> 27) & 0x3f, 6));
-			}
+				CHANGE_PC(m_core->pc + op_get_reladdr(m_core->opcode));
 		}
 		else
 		{
 			if (compute)
-			{
 				COMPUTE(compute);
-			}
 		}
 	}
 	else        /* IF */
@@ -2054,9 +2008,7 @@ void adsp21062_device::sharcop_relative_jump_compute()
 		if (IF_CONDITION_CODE(cond))
 		{
 			if (compute)
-			{
 				COMPUTE(compute);
-			}
 
 			if (la)
 			{
@@ -2065,13 +2017,9 @@ void adsp21062_device::sharcop_relative_jump_compute()
 			}
 
 			if (j)
-			{
-				CHANGE_PC_DELAYED(m_core->pc + util::sext((m_core->opcode >> 27) & 0x3f, 6));
-			}
+				CHANGE_PC_DELAYED(m_core->pc + op_get_reladdr(m_core->opcode));
 			else
-			{
-				CHANGE_PC(m_core->pc + util::sext((m_core->opcode >> 27) & 0x3f, 6));
-			}
+				CHANGE_PC(m_core->pc + op_get_reladdr(m_core->opcode));
 		}
 	}
 }
@@ -2079,34 +2027,33 @@ void adsp21062_device::sharcop_relative_jump_compute()
 /* indirect call to relative address */
 void adsp21062_device::sharcop_relative_call_compute()
 {
-	int j = (m_core->opcode >> 26) & 0x1;
-	int e = (m_core->opcode >> 25) & 0x1;
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	int compute = m_core->opcode & 0x7fffff;
+	int const j = op_get_jump_j(m_core->opcode);
+	int const e = op_get_jump_e(m_core->opcode);
+	int const cond = op_get_cond(m_core->opcode);
+	int const compute = op_get_compute(m_core->opcode);
 
 	if (e)      /* IF...ELSE */
 	{
 		if (IF_CONDITION_CODE(cond))
 		{
+			PUSH_PC();
 			if (j)
 			{
-				//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
-				PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
-				CHANGE_PC_DELAYED(m_core->pc + util::sext((m_core->opcode >> 27) & 0x3f, 6));
+				//m_core->pcstk = m_core->pc + 3;     /* 1 instruction + 2 delayed instructions */
+				m_core->pcstk = m_core->nfaddr;     /* 1 instruction + 2 delayed instructions */
+				CHANGE_PC_DELAYED(m_core->pc + op_get_reladdr(m_core->opcode));
 			}
 			else
 			{
-				//PUSH_PC(m_core->pc+1);
-				PUSH_PC(m_core->daddr);
-				CHANGE_PC(m_core->pc + util::sext((m_core->opcode >> 27) & 0x3f, 6));
+				//m_core->pcstk = m_core->pc + 1;
+				m_core->pcstk = m_core->daddr;
+				CHANGE_PC(m_core->pc + op_get_reladdr(m_core->opcode));
 			}
 		}
 		else
 		{
 			if (compute)
-			{
 				COMPUTE(compute);
-			}
 		}
 	}
 	else        /* IF */
@@ -2114,21 +2061,20 @@ void adsp21062_device::sharcop_relative_call_compute()
 		if (IF_CONDITION_CODE(cond))
 		{
 			if (compute)
-			{
 				COMPUTE(compute);
-			}
 
+			PUSH_PC();
 			if (j)
 			{
-				//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
-				PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
-				CHANGE_PC_DELAYED(m_core->pc + util::sext((m_core->opcode >> 27) & 0x3f, 6));
+				//m_core->pcstk = m_core->pc + 3;     /* 1 instruction + 2 delayed instructions */
+				m_core->pcstk = m_core->nfaddr;     /* 1 instruction + 2 delayed instructions */
+				CHANGE_PC_DELAYED(m_core->pc + op_get_reladdr(m_core->opcode));
 			}
 			else
 			{
-				//PUSH_PC(m_core->pc+1);
-				PUSH_PC(m_core->daddr);
-				CHANGE_PC(m_core->pc + util::sext((m_core->opcode >> 27) & 0x3f, 6));
+				//m_core->pcstk = m_core->pc + 1;
+				m_core->pcstk = m_core->daddr;
+				CHANGE_PC(m_core->pc + op_get_reladdr(m_core->opcode));
 			}
 		}
 	}
@@ -2140,13 +2086,13 @@ void adsp21062_device::sharcop_relative_call_compute()
 /* indirect jump / compute / dreg <-> DM */
 void adsp21062_device::sharcop_indirect_jump_compute_dreg_dm()
 {
-	int d = (m_core->opcode >> 44) & 0x1;
-	int dmi = (m_core->opcode >> 41) & 0x7;
-	int dmm = (m_core->opcode >> 38) & 0x7;
-	int pmi = (m_core->opcode >> 30) & 0x7;
-	int pmm = (m_core->opcode >> 27) & 0x7;
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	int dreg = (m_core->opcode >> 23) & 0xf;
+	int const d = (m_core->opcode >> 44) & 0x1;
+	int const dmi = op_get_dmi(m_core->opcode);
+	int const dmm = op_get_dmm(m_core->opcode);
+	int const pmi = op_get_pmi(m_core->opcode);
+	int const pmm = op_get_pmm(m_core->opcode);
+	int const cond = op_get_cond(m_core->opcode);
+	int const dreg = (m_core->opcode >> 23) & 0xf;
 
 	if (IF_CONDITION_CODE(cond))
 	{
@@ -2154,15 +2100,13 @@ void adsp21062_device::sharcop_indirect_jump_compute_dreg_dm()
 	}
 	else
 	{
-		uint32_t compute = m_core->opcode & 0x7fffff;
+		uint32_t const compute = op_get_compute(m_core->opcode);
 		/* due to parallelity issues, source REG must be saved */
 		/* because the compute operation may change it */
-		uint32_t parallel_dreg = REG(dreg);
+		uint32_t const parallel_dreg = REG(dreg);
 
 		if (compute)
-		{
 			COMPUTE(compute);
-		}
 
 		if (d)      /* dreg -> DM */
 		{
@@ -2185,27 +2129,25 @@ void adsp21062_device::sharcop_indirect_jump_compute_dreg_dm()
 /* relative jump / compute / dreg <-> DM */
 void adsp21062_device::sharcop_relative_jump_compute_dreg_dm()
 {
-	int d = (m_core->opcode >> 44) & 0x1;
-	int dmi = (m_core->opcode >> 41) & 0x7;
-	int dmm = (m_core->opcode >> 38) & 0x7;
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	int dreg = (m_core->opcode >> 23) & 0xf;
+	int const d = (m_core->opcode >> 44) & 0x1;
+	int const dmi = op_get_dmi(m_core->opcode);
+	int const dmm = op_get_dmm(m_core->opcode);
+	int const cond = op_get_cond(m_core->opcode);
+	int const dreg = (m_core->opcode >> 23) & 0xf;
 
 	if (IF_CONDITION_CODE(cond))
 	{
-		CHANGE_PC(m_core->pc + util::sext((m_core->opcode >> 27) & 0x3f, 6));
+		CHANGE_PC(m_core->pc + op_get_reladdr(m_core->opcode));
 	}
 	else
 	{
-		uint32_t compute = m_core->opcode & 0x7fffff;
+		uint32_t const compute = op_get_compute(m_core->opcode);
 		/* due to parallelity issues, source REG must be saved */
 		/* because the compute operation may change it */
-		uint32_t parallel_dreg = REG(dreg);
+		uint32_t const parallel_dreg = REG(dreg);
 
 		if (compute)
-		{
 			COMPUTE(compute);
-		}
 
 		if (d)      /* dreg -> DM */
 		{
@@ -2228,34 +2170,28 @@ void adsp21062_device::sharcop_relative_jump_compute_dreg_dm()
 /* return from subroutine / compute */
 void adsp21062_device::sharcop_rts()
 {
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	int j = (m_core->opcode >> 26) & 0x1;
-	int e = (m_core->opcode >> 25) & 0x1;
-	//int lr = (m_core->opcode >> 24) & 0x1;
-	int compute = m_core->opcode & 0x7fffff;
+	int const cond = op_get_cond(m_core->opcode);
+	int const j = op_get_jump_j(m_core->opcode);
+	int const e = op_get_jump_e(m_core->opcode);
+	//int const lr = (m_core->opcode >> 24) & 0x1;
+	int const compute = op_get_compute(m_core->opcode);
 
 	//if(lr)
-	//  fatalerror("SHARC: rts: loop reentry not implemented!\n");
+	//  throw emu_fatalerror("%s: rts: loop reentry not implemented!", tag());
 
 	if (e)      /* IF...ELSE */
 	{
-		if(IF_CONDITION_CODE(cond))
+		if (IF_CONDITION_CODE(cond))
 		{
 			if (j)
-			{
 				CHANGE_PC_DELAYED(POP_PC());
-			}
 			else
-			{
 				CHANGE_PC(POP_PC());
-			}
 		}
 		else
 		{
 			if (compute)
-			{
 				COMPUTE(compute);
-			}
 		}
 	}
 	else        /* IF */
@@ -2263,18 +2199,12 @@ void adsp21062_device::sharcop_rts()
 		if (IF_CONDITION_CODE(cond))
 		{
 			if (compute)
-			{
 				COMPUTE(compute);
-			}
 
 			if (j)
-			{
 				CHANGE_PC_DELAYED(POP_PC());
-			}
 			else
-			{
 				CHANGE_PC(POP_PC());
-			}
 		}
 	}
 }
@@ -2285,32 +2215,26 @@ void adsp21062_device::sharcop_rts()
 /* return from interrupt / compute */
 void adsp21062_device::sharcop_rti()
 {
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	int j = (m_core->opcode >> 26) & 0x1;
-	int e = (m_core->opcode >> 25) & 0x1;
-	int compute = m_core->opcode & 0x7fffff;
+	int const cond = op_get_cond(m_core->opcode);
+	int const j = op_get_jump_j(m_core->opcode);
+	int const e = op_get_jump_e(m_core->opcode);
+	int const compute = op_get_compute(m_core->opcode);
 
 	m_core->irptl &= ~(1 << m_core->active_irq_num);
 
-	if(e)       /* IF...ELSE */
+	if (e)       /* IF...ELSE */
 	{
 		if (IF_CONDITION_CODE(cond))
 		{
 			if (j)
-			{
 				CHANGE_PC_DELAYED(POP_PC());
-			}
 			else
-			{
 				CHANGE_PC(POP_PC());
-			}
 		}
 		else
 		{
 			if (compute)
-			{
 				COMPUTE(compute);
-			}
 		}
 	}
 	else        /* IF */
@@ -2318,25 +2242,18 @@ void adsp21062_device::sharcop_rti()
 		if (IF_CONDITION_CODE(cond))
 		{
 			if (compute)
-			{
 				COMPUTE(compute);
-			}
 
 			if (j)
-			{
 				CHANGE_PC_DELAYED(POP_PC());
-			}
 			else
-			{
 				CHANGE_PC(POP_PC());
-			}
 		}
 	}
 
-	if (m_core->status_stkp > 0)
-	{
+	// TODO: timer and VIRPT interrupts also push the status stack
+	if (m_core->active_irq_num >= 6 && m_core->active_irq_num <= 8)
 		POP_STATUS_STACK();
-	}
 
 	m_core->interrupt_active = 0;
 	check_interrupts();
@@ -2348,32 +2265,27 @@ void adsp21062_device::sharcop_rti()
 /* do until counter expired, LCNTR immediate */
 void adsp21062_device::sharcop_do_until_counter_imm()
 {
-	uint16_t data = (uint16_t)(m_core->opcode >> 24);
-	int offset = util::sext(m_core->opcode & 0xffffff, 24);
-	uint32_t address = m_core->pc + offset;
-	int type;
-	int cond = 0xf;     /* until LCE (loop counter expired */
-	int distance = abs(offset);
+	uint16_t const data = uint16_t(m_core->opcode >> 24);
+	int const offset = util::sext(m_core->opcode & 0xffffff, 24);
+	uint32_t const address = m_core->pc + offset;
+	int const cond = 0xf;     /* until LCE (loop counter expired */
+	int const distance = abs(offset);
 
+	int type;
 	if (distance == 1)
-	{
 		type = 1;
-	}
 	else if (distance == 2)
-	{
 		type = 2;
-	}
 	else
-	{
 		type = 3;
-	}
 
 	m_core->lcntr = data;
-	if (m_core->lcntr > 0)
-	{
-		PUSH_PC(m_core->pc+1);
-		PUSH_LOOP(address, cond, type, m_core->lcntr);
-	}
+	PUSH_PC();
+	PUSH_LOOP();
+	m_core->pcstk = m_core->pc + 1;
+	m_core->laddr.addr = address;
+	m_core->laddr.code = cond;
+	m_core->laddr.loop_type = type;
 }
 
 /*****************************************************************************/
@@ -2382,32 +2294,27 @@ void adsp21062_device::sharcop_do_until_counter_imm()
 /* do until counter expired, LCNTR from UREG */
 void adsp21062_device::sharcop_do_until_counter_ureg()
 {
-	int ureg = (m_core->opcode >> 32) & 0xff;
-	int offset = util::sext(m_core->opcode & 0xffffff, 24);
-	uint32_t address = m_core->pc + offset;
-	int type;
-	int cond = 0xf;     /* until LCE (loop counter expired */
-	int distance = abs(offset);
+	int const ureg = (m_core->opcode >> 32) & 0xff;
+	int const offset = util::sext(m_core->opcode & 0xffffff, 24);
+	uint32_t const address = m_core->pc + offset;
+	int const cond = 0xf;     /* until LCE (loop counter expired */
+	int const distance = abs(offset);
 
+	int type;
 	if (distance == 1)
-	{
 		type = 1;
-	}
 	else if (distance == 2)
-	{
 		type = 2;
-	}
 	else
-	{
 		type = 3;
-	}
 
 	m_core->lcntr = GET_UREG(ureg);
-	if (m_core->lcntr > 0)
-	{
-		PUSH_PC(m_core->pc+1);
-		PUSH_LOOP(address, cond, type, m_core->lcntr);
-	}
+	PUSH_PC();
+	PUSH_LOOP();
+	m_core->pcstk = m_core->pc + 1;
+	m_core->laddr.addr = address;
+	m_core->laddr.code = cond;
+	m_core->laddr.loop_type = type;
 }
 
 /*****************************************************************************/
@@ -2416,12 +2323,16 @@ void adsp21062_device::sharcop_do_until_counter_ureg()
 /* do until */
 void adsp21062_device::sharcop_do_until()
 {
-	int cond = (m_core->opcode >> 33) & 0x1f;
-	int offset = util::sext(m_core->opcode & 0xffffff, 24);
-	uint32_t address = (m_core->pc + offset);
+	int const cond = op_get_cond(m_core->opcode);
+	int const offset = util::sext(m_core->opcode & 0xffffff, 24);
+	uint32_t const address = (m_core->pc + offset);
 
-	PUSH_PC(m_core->pc+1);
-	PUSH_LOOP(address, cond, 0, 0);
+	PUSH_PC();
+	PUSH_LOOP();
+	m_core->pcstk = m_core->pc + 1;
+	m_core->laddr.addr = address;
+	m_core->laddr.code = cond;
+	m_core->laddr.loop_type = 0;
 }
 
 /*****************************************************************************/
@@ -2430,8 +2341,8 @@ void adsp21062_device::sharcop_do_until()
 /* ureg <- DM (direct addressing) */
 void adsp21062_device::sharcop_dm_to_ureg_direct()
 {
-	int ureg = (m_core->opcode >> 32) & 0xff;
-	uint32_t address = (uint32_t)(m_core->opcode);
+	int const ureg = (m_core->opcode >> 32) & 0xff;
+	uint32_t const address = uint32_t(m_core->opcode);
 
 	SET_UREG(ureg, dm_read32(address));
 }
@@ -2439,8 +2350,8 @@ void adsp21062_device::sharcop_dm_to_ureg_direct()
 /* ureg -> DM (direct addressing) */
 void adsp21062_device::sharcop_ureg_to_dm_direct()
 {
-	int ureg = (m_core->opcode >> 32) & 0xff;
-	uint32_t address = (uint32_t)(m_core->opcode);
+	int const ureg = (m_core->opcode >> 32) & 0xff;
+	uint32_t const address = uint32_t(m_core->opcode);
 
 	dm_write32(address, GET_UREG(ureg));
 }
@@ -2448,33 +2359,25 @@ void adsp21062_device::sharcop_ureg_to_dm_direct()
 /* ureg <- PM (direct addressing) */
 void adsp21062_device::sharcop_pm_to_ureg_direct()
 {
-	int ureg = (m_core->opcode >> 32) & 0xff;
-	uint32_t address = (uint32_t)(m_core->opcode);
+	int const ureg = (m_core->opcode >> 32) & 0xff;
+	uint32_t const address = uint32_t(m_core->opcode);
 
 	if (ureg == 0xdb)       // PX is 48-bit
-	{
 		m_core->px = pm_read48(address);
-	}
 	else
-	{
 		SET_UREG(ureg, pm_read32(address));
-	}
 }
 
 /* ureg -> PM (direct addressing) */
 void adsp21062_device::sharcop_ureg_to_pm_direct()
 {
-	int ureg = (m_core->opcode >> 32) & 0xff;
-	uint32_t address = (uint32_t)(m_core->opcode);
+	int const ureg = (m_core->opcode >> 32) & 0xff;
+	uint32_t const address = uint32_t(m_core->opcode);
 
 	if (ureg == 0xdb)       // PX is 48-bit
-	{
 		pm_write48(address, m_core->px);
-	}
 	else
-	{
 		pm_write32(address, GET_UREG(ureg));
-	}
 }
 
 /*****************************************************************************/
@@ -2483,9 +2386,9 @@ void adsp21062_device::sharcop_ureg_to_pm_direct()
 /* ureg <- DM (indirect addressing) */
 void adsp21062_device::sharcop_dm_to_ureg_indirect()
 {
-	int ureg = (m_core->opcode >> 32) & 0xff;
-	uint32_t offset = (uint32_t)m_core->opcode;
-	int i = (m_core->opcode >> 41) & 0x7;
+	int const ureg = (m_core->opcode >> 32) & 0xff;
+	uint32_t const offset = uint32_t(m_core->opcode);
+	int const i = (m_core->opcode >> 41) & 0x7;
 
 	SET_UREG(ureg, dm_read32(DM_REG_I(i) + offset));
 }
@@ -2493,9 +2396,9 @@ void adsp21062_device::sharcop_dm_to_ureg_indirect()
 /* ureg -> DM (indirect addressing) */
 void adsp21062_device::sharcop_ureg_to_dm_indirect()
 {
-	int ureg = (m_core->opcode >> 32) & 0xff;
-	uint32_t offset = (uint32_t)m_core->opcode;
-	int i = (m_core->opcode >> 41) & 0x7;
+	int const ureg = (m_core->opcode >> 32) & 0xff;
+	uint32_t const offset = uint32_t(m_core->opcode);
+	int const i = (m_core->opcode >> 41) & 0x7;
 
 	dm_write32(DM_REG_I(i) + offset, GET_UREG(ureg));
 }
@@ -2503,35 +2406,27 @@ void adsp21062_device::sharcop_ureg_to_dm_indirect()
 /* ureg <- PM (indirect addressing) */
 void adsp21062_device::sharcop_pm_to_ureg_indirect()
 {
-	int ureg = (m_core->opcode >> 32) & 0xff;
-	uint32_t offset = m_core->opcode & 0xffffff;
-	int i = (m_core->opcode >> 41) & 0x7;
+	int const ureg = (m_core->opcode >> 32) & 0xff;
+	uint32_t const offset = m_core->opcode & 0xffffff;
+	int const i = (m_core->opcode >> 41) & 0x7;
 
 	if (ureg == 0xdb)       /* PX is 48-bit */
-	{
 		m_core->px = pm_read48(PM_REG_I(i) + offset);
-	}
 	else
-	{
 		SET_UREG(ureg, pm_read32(PM_REG_I(i) + offset));
-	}
 }
 
 /* ureg -> PM (indirect addressing) */
 void adsp21062_device::sharcop_ureg_to_pm_indirect()
 {
-	int ureg = (m_core->opcode >> 32) & 0xff;
-	uint32_t offset = (uint32_t)m_core->opcode;
-	int i = (m_core->opcode >> 41) & 0x7;
+	int const ureg = (m_core->opcode >> 32) & 0xff;
+	uint32_t const offset = uint32_t(m_core->opcode);
+	int const i = (m_core->opcode >> 41) & 0x7;
 
 	if (ureg == 0xdb)       /* PX is 48-bit */
-	{
 		pm_write48(PM_REG_I(i) + offset, m_core->px);
-	}
 	else
-	{
 		pm_write32(PM_REG_I(i) + offset, GET_UREG(ureg));
-	}
 }
 
 /*****************************************************************************/
@@ -2540,10 +2435,10 @@ void adsp21062_device::sharcop_ureg_to_pm_indirect()
 /* immediate data -> DM|PM */
 void adsp21062_device::sharcop_imm_to_dmpm()
 {
-	int i = (m_core->opcode >> 41) & 0x7;
-	int m = (m_core->opcode >> 38) & 0x7;
-	int g = (m_core->opcode >> 37) & 0x1;
-	uint32_t data = (uint32_t)m_core->opcode;
+	int const i = (m_core->opcode >> 41) & 0x7;
+	int const m = (m_core->opcode >> 38) & 0x7;
+	int const g = (m_core->opcode >> 37) & 0x1;
+	uint32_t data = uint32_t(m_core->opcode);
 
 	if (g)
 	{
@@ -2567,8 +2462,8 @@ void adsp21062_device::sharcop_imm_to_dmpm()
 /* immediate data -> ureg */
 void adsp21062_device::sharcop_imm_to_ureg()
 {
-	int ureg = (m_core->opcode >> 32) & 0xff;
-	uint32_t data = (uint32_t)m_core->opcode;
+	int const ureg = (m_core->opcode >> 32) & 0xff;
+	uint32_t const data = uint32_t(m_core->opcode);
 
 	SET_UREG(ureg, data);
 }
@@ -2579,13 +2474,13 @@ void adsp21062_device::sharcop_imm_to_ureg()
 /* system register bit manipulation */
 void adsp21062_device::sharcop_sysreg_bitop()
 {
-	int bop = (m_core->opcode >> 37) & 0x7;
-	int sreg = (m_core->opcode >> 32) & 0xf;
-	uint32_t data = (uint32_t)m_core->opcode;
+	int const bop = (m_core->opcode >> 37) & 0x7;
+	int const sreg = (m_core->opcode >> 32) & 0xf;
+	uint32_t const data = uint32_t(m_core->opcode);
 
 	uint32_t src = GET_UREG(0x70 | sreg);
 
-	switch(bop)
+	switch (bop)
 	{
 		case 0:     /* SET */
 		{
@@ -2605,30 +2500,21 @@ void adsp21062_device::sharcop_sysreg_bitop()
 		case 4:     /* TEST */
 		{
 			if ((src & data) == data)
-			{
 				m_core->astat |= BTF;
-			}
 			else
-			{
 				m_core->astat &= ~BTF;
-			}
 			break;
 		}
 		case 5:     /* XOR */
 		{
 			if (src == data)
-			{
 				m_core->astat |= BTF;
-			}
 			else
-			{
 				m_core->astat &= ~BTF;
-			}
 			break;
 		}
 		default:
-			fatalerror("SHARC: sysreg_bitop: invalid bitop %d\n", bop);
-			break;
+			throw emu_fatalerror("%s: sysreg_bitop: invalid bitop %d", tag(), bop);
 	}
 
 	SET_UREG(0x70 | sreg, src);
@@ -2640,9 +2526,9 @@ void adsp21062_device::sharcop_sysreg_bitop()
 /* I register modify */
 void adsp21062_device::sharcop_modify()
 {
-	int g = (m_core->opcode >> 38) & 0x1;
-	int i = (m_core->opcode >> 32) & 0x7;
-	int32_t data = (m_core->opcode);
+	int const g = (m_core->opcode >> 38) & 0x1;
+	int const i = (m_core->opcode >> 32) & 0x7;
+	int32_t const data = int32_t(uint32_t(m_core->opcode));
 
 	if (g)      // PM
 	{
@@ -2662,7 +2548,7 @@ void adsp21062_device::sharcop_modify()
 /* I register bit-reverse */
 void adsp21062_device::sharcop_bit_reverse()
 {
-	fatalerror("SHARC: sharcop_bit_reverse unimplemented\n");
+	throw emu_fatalerror("%s: sharcop_bit_reverse unimplemented", tag());
 }
 
 /*****************************************************************************/
@@ -2673,25 +2559,24 @@ void adsp21062_device::sharcop_push_pop_stacks()
 {
 	if (m_core->opcode & 0x008000000000U)
 	{
-		fatalerror("sharcop_push_pop_stacks: push loop not implemented\n");
+		PUSH_LOOP();
 	}
 	if (m_core->opcode & 0x004000000000U)
 	{
-		fatalerror("sharcop_push_pop_stacks: pop loop not implemented\n");
+		POP_LOOP();
 	}
 	if (m_core->opcode & 0x002000000000U)
 	{
-		//fatalerror("sharcop_push_pop_stacks: push sts not implemented\n");
 		PUSH_STATUS_STACK();
 	}
 	if (m_core->opcode & 0x001000000000U)
 	{
-		//fatalerror("sharcop_push_pop_stacks: pop sts not implemented\n");
 		POP_STATUS_STACK();
 	}
 	if (m_core->opcode & 0x000800000000U)
 	{
-		PUSH_PC(m_core->pcstk);
+		// TODO: what should the top-of-stack value be after this?
+		PUSH_PC();
 	}
 	if (m_core->opcode & 0x000400000000U)
 	{
@@ -2724,5 +2609,6 @@ void adsp21062_device::sharcop_idle()
 
 void adsp21062_device::sharcop_unimplemented()
 {
-	fatalerror("SHARC: Unimplemented opcode %04X%08X at %08X\n", (uint16_t)(m_core->opcode >> 32), (uint32_t)(m_core->opcode), m_core->pc);
+	throw emu_fatalerror("%s: Unimplemented opcode %012X at %08X: %s",
+			tag(), m_core->opcode, m_core->pc, disassemble_one(m_core->pc, m_core->opcode));
 }

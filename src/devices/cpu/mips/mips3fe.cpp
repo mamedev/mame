@@ -10,8 +10,10 @@
 
 #include "emu.h"
 #include "mips3fe.h"
+
 #include "mips3com.h"
-#include "ps2vu.h"
+
+#include "cpu/drcfe.ipp"
 
 
 //**************************************************************************
@@ -22,10 +24,21 @@
 //  mips3_frontend - constructor
 //-------------------------------------------------
 
-mips3_frontend::mips3_frontend(mips3_device *mips3, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
-	: drc_frontend(*mips3, window_start, window_end, max_sequence),
-		m_mips3(mips3)
+mips3_device::frontend::frontend(mips3_device *mips3, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
+	: drc_frontend_base(mips3->space_config(AS_PROGRAM)->page_shift(), window_start, window_end, max_sequence)
+	, m_mips3(mips3)
 {
+}
+
+mips3_device::frontend::~frontend()
+{
+}
+
+mips3_device::opcode_desc const *mips3_device::frontend::describe_code(offs_t startpc)
+{
+	return do_describe_code(
+			[this] (opcode_desc &desc, opcode_desc const *prev) { return describe(desc, prev); },
+			startpc);
 }
 
 
@@ -34,10 +47,8 @@ mips3_frontend::mips3_frontend(mips3_device *mips3, uint32_t window_start, uint3
 //  instruction
 //-------------------------------------------------
 
-bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
+bool mips3_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 {
-	uint32_t op, opswitch;
-
 	// compute the physical PC
 	assert((desc.physpc & 3) == 0);
 	address_space *tspace;
@@ -45,20 +56,24 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 	{
 		// uh-oh: a page fault; leave the description empty and just if this is the first instruction, leave it empty and
 		// mark as needing to validate; otherwise, just end the sequence here
-		desc.flags |= OPFLAG_VALIDATE_TLB | OPFLAG_CAN_CAUSE_EXCEPTION | OPFLAG_COMPILER_PAGE_FAULT | OPFLAG_VIRTUAL_NOOP | OPFLAG_END_SEQUENCE;
+		desc.set_validate_tlb();
+		desc.set_can_cause_exception();
+		desc.set_compiler_page_fault();
+		desc.set_virtual_noop();
+		desc.set_end_sequence();
 		return true;
 	}
 
 	// fetch the opcode
 	assert((desc.physpc & 3) == 0);
-	op = desc.opptr.l[0] = m_mips3->m_pr32(desc.physpc);
+	const uint32_t op = desc.opptr = m_mips3->m_pr32(desc.physpc);
 
 	// all instructions are 4 bytes and default to a single cycle each
 	desc.length = 4;
 	desc.cycles = 1;
 
 	// parse the instruction
-	opswitch = op >> 26;
+	const uint32_t opswitch = op >> 26;
 	switch (opswitch)
 	{
 		case 0x00:  // SPECIAL
@@ -85,14 +100,16 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			return describe_idt(op, desc);
 
 		case 0x02:  // J
-			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			desc.set_is_unconditional_branch();
+			desc.set_end_sequence();
 			desc.targetpc = (desc.pc & 0xf0000000) | (LIMMVAL << 2);
 			desc.delayslots = 1;
 			return true;
 
 		case 0x03:  // JAL
-			desc.regout[0] |= REGFLAG_R(31);
-			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			desc.set_r_modified(31);
+			desc.set_is_unconditional_branch();
+			desc.set_end_sequence();
 			desc.targetpc = (desc.pc & 0xf0000000) | (LIMMVAL << 2);
 			desc.delayslots = 1;
 			return true;
@@ -102,11 +119,15 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case 0x14:  // BEQL
 		case 0x15:  // BNEL
 			if ((opswitch == 0x04 || opswitch == 0x14) && RSREG == RTREG)
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			{
+				desc.set_is_unconditional_branch();
+				desc.set_end_sequence();
+			}
 			else
 			{
-				desc.regin[0] |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-				desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
+				desc.set_r_used(RSREG);
+				desc.set_r_used(RTREG);
+				desc.set_is_conditional_branch();
 			}
 			desc.targetpc = desc.pc + 4 + SIMMVAL * 4;
 			desc.delayslots = 1;
@@ -118,11 +139,14 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case 0x16:  // BLEZL
 		case 0x17:  // BGTZL
 			if ((opswitch == 0x06 || opswitch == 0x16) && RSREG == 0)
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			{
+				desc.set_is_unconditional_branch();
+				desc.set_end_sequence();
+			}
 			else
 			{
-				desc.regin[0] |= REGFLAG_R(RSREG);
-				desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
+				desc.set_r_used(RSREG);
+				desc.set_is_conditional_branch();
 			}
 			desc.targetpc = desc.pc + 4 + SIMMVAL * 4;
 			desc.delayslots = 1;
@@ -131,9 +155,9 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 		case 0x08:  // ADDI
 		case 0x18:  // DADDI
-			desc.regin[0] |= REGFLAG_R(RSREG);
-			desc.regout[0] |= REGFLAG_R(RTREG);
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
+			desc.set_r_used(RSREG);
+			desc.set_r_modified(RTREG);
+			desc.set_can_cause_exception();
 			return true;
 
 		case 0x09:  // ADDIU
@@ -143,19 +167,19 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case 0x0d:  // ORI
 		case 0x0e:  // XORI
 		case 0x19:  // DADDIU
-			desc.regin[0] |= REGFLAG_R(RSREG);
-			desc.regout[0] |= REGFLAG_R(RTREG);
+			desc.set_r_used(RSREG);
+			desc.set_r_modified(RTREG);
 			return true;
 
 		case 0x0f:  // LUI
-			desc.regout[0] |= REGFLAG_R(RTREG);
+			desc.set_r_modified(RTREG);
 			return true;
 
 		case 0x1a:  // LDL
 		case 0x1b:  // LDR
 		case 0x22:  // LWL
 		case 0x26:  // LWR
-			desc.regin[0] |= REGFLAG_R(RTREG);
+			desc.set_r_used(RTREG);
 			[[fallthrough]];
 		case 0x20:  // LB
 		case 0x21:  // LH
@@ -166,9 +190,10 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case 0x30:  // LL
 		case 0x34:  // LLD
 		case 0x37:  // LD
-			desc.regin[0] |= REGFLAG_R(RSREG);
-			desc.regout[0] |= REGFLAG_R(RTREG);
-			desc.flags |= OPFLAG_READS_MEMORY | OPFLAG_CAN_CAUSE_EXCEPTION;
+			desc.set_r_used(RSREG);
+			desc.set_r_modified(RTREG);
+			desc.set_reads_memory();
+			desc.set_can_cause_exception();
 			return true;
 
 		case 0x28:  // SB
@@ -179,41 +204,49 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case 0x2d:  // SDR
 		case 0x2e:  // SWR
 		case 0x3f:  // SD
-			desc.regin[0] |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc.flags |= OPFLAG_WRITES_MEMORY | OPFLAG_CAN_CAUSE_EXCEPTION;
+			desc.set_r_used(RSREG);
+			desc.set_r_used(RTREG);
+			desc.set_writes_memory();
+			desc.set_can_cause_exception();
 			return true;
 
 		case 0x38:  // SC
 		case 0x3c:  // SCD
-			desc.regin[0] |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc.regout[0] |= REGFLAG_R(RTREG);
-			desc.flags |= OPFLAG_WRITES_MEMORY | OPFLAG_CAN_CAUSE_EXCEPTION;
+			desc.set_r_used(RSREG);
+			desc.set_r_used(RTREG);
+			desc.set_r_modified(RTREG);
+			desc.set_writes_memory();
+			desc.set_can_cause_exception();
 			return true;
 
 		case 0x31:  // LWC1
 		case 0x35:  // LDC1
-			desc.regin[0] |= REGFLAG_R(RSREG);
-			desc.regout[1] |= REGFLAG_CPR1(RTREG);
-			desc.flags |= OPFLAG_READS_MEMORY | OPFLAG_CAN_CAUSE_EXCEPTION;
+			desc.set_r_used(RSREG);
+			desc.set_cpr1_modified(RTREG);
+			desc.set_reads_memory();
+			desc.set_can_cause_exception();
 			return true;
 
 		case 0x39:  // SWC1
 		case 0x3d:  // SDC1
-			desc.regin[0] |= REGFLAG_R(RSREG);
-			desc.regin[1] |= REGFLAG_CPR1(RTREG);
-			desc.flags |= OPFLAG_WRITES_MEMORY | OPFLAG_CAN_CAUSE_EXCEPTION;
+			desc.set_r_used(RSREG);
+			desc.set_cpr1_used(RTREG);
+			desc.set_writes_memory();
+			desc.set_can_cause_exception();
 			return true;
 
 		case 0x32:  // LWC2
 		case 0x36:  // LDC2
-			desc.regin[0] |= REGFLAG_R(RSREG);
-			desc.flags |= OPFLAG_READS_MEMORY | OPFLAG_CAN_CAUSE_EXCEPTION;
+			desc.set_r_used(RSREG);
+			desc.set_reads_memory();
+			desc.set_can_cause_exception();
 			return true;
 
 		case 0x3a:  // SWC2
 		case 0x3e:  // SDC2
-			desc.regin[0] |= REGFLAG_R(RSREG);
-			desc.flags |= OPFLAG_WRITES_MEMORY | OPFLAG_CAN_CAUSE_EXCEPTION;
+			desc.set_r_used(RSREG);
+			desc.set_writes_memory();
+			desc.set_can_cause_exception();
 			return true;
 
 		case 0x33:  // PREF
@@ -234,7 +267,7 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 //  single instruction in the 'special' group
 //-------------------------------------------------
 
-bool mips3_frontend::describe_special(uint32_t op, opcode_desc &desc)
+bool mips3_device::frontend::describe_special(uint32_t op, opcode_desc &desc)
 {
 	switch (op & 63)
 	{
@@ -247,15 +280,15 @@ bool mips3_frontend::describe_special(uint32_t op, opcode_desc &desc)
 		case 0x3c:  // DSLL32
 		case 0x3e:  // DSRL32
 		case 0x3f:  // DSRA32
-			desc.regin[0] |= REGFLAG_R(RTREG);
-			desc.regout[0] |= REGFLAG_R(RDREG);
+			desc.set_r_used(RTREG);
+			desc.set_r_modified(RDREG);
 			return true;
 
 		case 0x0a:  // MOVZ - MIPS IV
 		case 0x0b:  // MOVN - MIPS IV
 			if (m_mips3->m_flavor < mips3_device::MIPS3_TYPE_MIPS_IV)
 				return false;
-			desc.regin[0] |= REGFLAG_R(RDREG);
+			desc.set_r_used(RDREG);
 			[[fallthrough]];
 		case 0x04:  // SLLV
 		case 0x06:  // SRLV
@@ -273,17 +306,19 @@ bool mips3_frontend::describe_special(uint32_t op, opcode_desc &desc)
 		case 0x2b:  // SLTU
 		case 0x2d:  // DADDU
 		case 0x2f:  // DSUBU
-			desc.regin[0] |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc.regout[0] |= REGFLAG_R(RDREG);
+			desc.set_r_used(RSREG);
+			desc.set_r_used(RTREG);
+			desc.set_r_modified(RDREG);
 			return true;
 
 		case 0x20:  // ADD
 		case 0x22:  // SUB
 		case 0x2c:  // DADD
 		case 0x2e:  // DSUB
-			desc.regin[0] |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc.regout[0] |= REGFLAG_R(RDREG);
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
+			desc.set_r_used(RSREG);
+			desc.set_r_used(RTREG);
+			desc.set_r_modified(RDREG);
+			desc.set_can_cause_exception();
 			return true;
 
 		case 0x30:  // TGE
@@ -292,84 +327,96 @@ bool mips3_frontend::describe_special(uint32_t op, opcode_desc &desc)
 		case 0x33:  // TLTU
 		case 0x34:  // TEQ
 		case 0x36:  // TNE
-			desc.regin[0] |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
+			desc.set_r_used(RSREG);
+			desc.set_r_used(RTREG);
+			desc.set_can_cause_exception();
 			return true;
 
 		case 0x01:  // MOVF - MIPS IV
 			if (m_mips3->m_flavor < mips3_device::MIPS3_TYPE_MIPS_IV)
 				return false;
-			desc.regin[0] |= REGFLAG_R(RSREG);
-			desc.regin[2] |= REGFLAG_FCC;
-			desc.regout[0] |= REGFLAG_R(RDREG);
+			desc.set_r_used(RSREG);
+			desc.set_fcc_used();
+			desc.set_r_modified(RDREG);
 			return true;
 
 		case 0x08:  // JR
-			desc.regin[0] |= REGFLAG_R(RSREG);
-			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			desc.set_r_used(RSREG);
+			desc.set_is_unconditional_branch();
+			desc.set_end_sequence();
 			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.delayslots = 1;
 			return true;
 
 		case 0x09:  // JALR
-			desc.regin[0] |= REGFLAG_R(RSREG);
-			desc.regout[0] |= REGFLAG_R(RDREG);
-			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			desc.set_r_used(RSREG);
+			desc.set_r_modified(RDREG);
+			desc.set_is_unconditional_branch();
+			desc.set_end_sequence();
 			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.delayslots = 1;
 			return true;
 
 		case 0x10:  // MFHI
-			desc.regin[2] |= REGFLAG_HI;
-			desc.regout[0] |= REGFLAG_R(RDREG);
+			desc.set_hi_used();
+			desc.set_r_modified(RDREG);
 			return true;
 
 		case 0x11:  // MTHI
-			desc.regin[0] |= REGFLAG_R(RSREG);
-			desc.regout[2] |= REGFLAG_HI;
+			desc.set_r_used(RSREG);
+			desc.set_hi_modified();
 			return true;
 
 		case 0x12:  // MFLO
-			desc.regin[2] |= REGFLAG_LO;
-			desc.regout[0] |= REGFLAG_R(RDREG);
+			desc.set_lo_used();
+			desc.set_r_modified(RDREG);
 			return true;
 
 		case 0x13:  // MTLO
-			desc.regin[0] |= REGFLAG_R(RSREG);
-			desc.regout[2] |= REGFLAG_LO;
+			desc.set_r_used(RSREG);
+			desc.set_lo_modified();
 			return true;
 
 		case 0x18:  // MULT
 		case 0x19:  // MULTU
-			desc.regin[0] |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc.regout[2] |= REGFLAG_LO | REGFLAG_HI;
+			desc.set_r_used(RSREG);
+			desc.set_r_used(RTREG);
+			desc.set_lo_modified();
+			desc.set_hi_modified();
 			desc.cycles = 3;
 			return true;
 
 		case 0x1a:  // DIV
 		case 0x1b:  // DIVU
-			desc.regin[0] |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc.regout[2] |= REGFLAG_LO | REGFLAG_HI;
+			desc.set_r_used(RSREG);
+			desc.set_r_used(RTREG);
+			desc.set_lo_modified();
+			desc.set_hi_modified();
 			desc.cycles = 35;
 			return true;
 
 		case 0x1c:  // DMULT
 		case 0x1d:  // DMULTU
-			desc.regin[0] |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc.regout[2] |= REGFLAG_LO | REGFLAG_HI;
+			desc.set_r_used(RSREG);
+			desc.set_r_used(RTREG);
+			desc.set_lo_modified();
+			desc.set_hi_modified();
 			desc.cycles = 7;
 			return true;
 
 		case 0x1e:  // DDIV
 		case 0x1f:  // DDIVU
-			desc.regin[0] |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc.regout[2] |= REGFLAG_LO | REGFLAG_HI;
+			desc.set_r_used(RSREG);
+			desc.set_r_used(RTREG);
+			desc.set_lo_modified();
+			desc.set_hi_modified();
 			desc.cycles = 67;
 			return true;
 
 		case 0x0c:  // SYSCALL
 		case 0x0d:  // BREAK
-			desc.flags |= OPFLAG_WILL_CAUSE_EXCEPTION | OPFLAG_END_SEQUENCE;
+			desc.set_will_cause_exception();
+			desc.set_end_sequence();
 			return true;
 
 		case 0x0f:  // SYNC
@@ -386,7 +433,7 @@ bool mips3_frontend::describe_special(uint32_t op, opcode_desc &desc)
 //  single instruction in the 'regimm' group
 //-------------------------------------------------
 
-bool mips3_frontend::describe_regimm(uint32_t op, opcode_desc &desc)
+bool mips3_device::frontend::describe_regimm(uint32_t op, opcode_desc &desc)
 {
 	switch (RTREG)
 	{
@@ -395,11 +442,14 @@ bool mips3_frontend::describe_regimm(uint32_t op, opcode_desc &desc)
 		case 0x02:  // BLTZL
 		case 0x03:  // BGEZL
 			if (RTREG == 0x01 && RSREG == 0)
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			{
+				desc.set_is_unconditional_branch();
+				desc.set_end_sequence();
+			}
 			else
 			{
-				desc.regin[0] |= REGFLAG_R(RSREG);
-				desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
+				desc.set_r_used(RSREG);
+				desc.set_is_conditional_branch();
 			}
 			desc.targetpc = desc.pc + 4 + SIMMVAL * 4;
 			desc.delayslots = 1;
@@ -412,8 +462,8 @@ bool mips3_frontend::describe_regimm(uint32_t op, opcode_desc &desc)
 		case 0x0b:  // TLTIU
 		case 0x0c:  // TEQI
 		case 0x0e:  // TNEI
-			desc.regin[0] |= REGFLAG_R(RSREG);
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
+			desc.set_r_used(RSREG);
+			desc.set_can_cause_exception();
 			return true;
 
 		case 0x10:  // BLTZAL
@@ -421,13 +471,16 @@ bool mips3_frontend::describe_regimm(uint32_t op, opcode_desc &desc)
 		case 0x12:  // BLTZALL
 		case 0x13:  // BGEZALL
 			if (RTREG == 0x11 && RSREG == 0)
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			{
+				desc.set_is_unconditional_branch();
+				desc.set_end_sequence();
+			}
 			else
 			{
-				desc.regin[0] |= REGFLAG_R(RSREG);
-				desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
+				desc.set_r_used(RSREG);
+				desc.set_is_conditional_branch();
 			}
-			desc.regout[0] |= REGFLAG_R(31);
+			desc.set_r_modified(31);
 			desc.targetpc = desc.pc + 4 + SIMMVAL * 4;
 			desc.delayslots = 1;
 			desc.skipslots = (RTREG & 0x02) ? 1 : 0;
@@ -443,7 +496,7 @@ bool mips3_frontend::describe_regimm(uint32_t op, opcode_desc &desc)
 //  instruction in the IDT-specific group
 //-------------------------------------------------
 
-bool mips3_frontend::describe_idt(uint32_t op, opcode_desc &desc)
+bool mips3_device::frontend::describe_idt(uint32_t op, opcode_desc &desc)
 {
 	// only on the R4650
 	if (m_mips3->m_flavor != mips3_device::MIPS3_TYPE_R4650)
@@ -453,14 +506,18 @@ bool mips3_frontend::describe_idt(uint32_t op, opcode_desc &desc)
 	{
 		case 0: // MAD
 		case 1: // MADU
-			desc.regin[0] |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc.regin[2] |= REGFLAG_LO | REGFLAG_HI;
-			desc.regout[2] |= REGFLAG_LO | REGFLAG_HI;
+			desc.set_r_used(RSREG);
+			desc.set_r_used(RTREG);
+			desc.set_lo_used();
+			desc.set_hi_used();
+			desc.set_lo_modified();
+			desc.set_hi_modified();
 			return true;
 
 		case 2: // MUL
-			desc.regin[0] |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc.regout[0] |= REGFLAG_R(RDREG);
+			desc.set_r_used(RSREG);
+			desc.set_r_used(RTREG);
+			desc.set_r_modified(RDREG);
 			desc.cycles = 3;
 			return true;
 	}
@@ -474,10 +531,10 @@ bool mips3_frontend::describe_idt(uint32_t op, opcode_desc &desc)
 //  single instruction in the COP0 group
 //-------------------------------------------------
 
-bool mips3_frontend::describe_cop0(uint32_t op, opcode_desc &desc)
+bool mips3_device::frontend::describe_cop0(uint32_t op, opcode_desc &desc)
 {
 	// any COP0 instruction can potentially cause an exception
-	desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
+	desc.set_can_cause_exception();
 
 	switch (RSREG)
 	{
@@ -487,23 +544,27 @@ bool mips3_frontend::describe_cop0(uint32_t op, opcode_desc &desc)
 				desc.cycles += MIPS3_COUNT_READ_CYCLES;
 			if (RDREG == COP0_Cause)
 				desc.cycles += MIPS3_CAUSE_READ_CYCLES;
-			desc.regout[0] |= REGFLAG_R(RTREG);
+			desc.set_r_modified(RTREG);
 			return true;
 
 		case 0x02:  // CFCz
-			desc.regout[0] |= REGFLAG_R(RTREG);
+			desc.set_r_modified(RTREG);
 			return true;
 
 		case 0x04:  // MTCz
 		case 0x05:  // DMTCz
 		case 0x06:  // CTCz
-			desc.regin[0] |= REGFLAG_R(RTREG);
+			desc.set_r_used(RTREG);
 			if (RSREG == 0x04 || RSREG == 0x05)
 			{
 				if (RDREG == COP0_Cause)
-					desc.flags |= OPFLAG_CAN_TRIGGER_SW_INT;
+					desc.set_can_trigger_sw_int();
 				if (RDREG == COP0_Status)
-					desc.flags |= OPFLAG_CAN_EXPOSE_EXTERNAL_INT | OPFLAG_CAN_CHANGE_MODES | OPFLAG_END_SEQUENCE;
+				{
+					desc.set_can_expose_external_int();
+					desc.set_can_change_modes();
+					desc.set_end_sequence();
+				}
 			}
 			return true;
 
@@ -512,7 +573,7 @@ bool mips3_frontend::describe_cop0(uint32_t op, opcode_desc &desc)
 			{
 				case 0x00:  // BCzF
 				case 0x01:  // BCzT
-					desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
+					desc.set_is_conditional_branch();
 					desc.targetpc = desc.pc + 4 + SIMMVAL * 4;
 					desc.delayslots = 1;
 					return true;
@@ -530,11 +591,13 @@ bool mips3_frontend::describe_cop0(uint32_t op, opcode_desc &desc)
 
 				case 0x02:  // TLBWI
 				case 0x06:  // TLBWR
-					desc.flags |= OPFLAG_MODIFIES_TRANSLATION;
+					desc.set_modifies_translation();
 					return true;
 
 				case 0x18:  // ERET
-					desc.flags |= OPFLAG_CAN_CHANGE_MODES | OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+					desc.set_is_unconditional_branch();
+					desc.set_end_sequence();
+					desc.set_can_change_modes();
 					return true;
 			}
 			return false;
@@ -549,31 +612,31 @@ bool mips3_frontend::describe_cop0(uint32_t op, opcode_desc &desc)
 //  single instruction in the COP1 group
 //-------------------------------------------------
 
-bool mips3_frontend::describe_cop1(uint32_t op, opcode_desc &desc)
+bool mips3_device::frontend::describe_cop1(uint32_t op, opcode_desc &desc)
 {
 	// any COP1 instruction can potentially cause an exception
-//  desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
+	//desc.set_can_cause_exception();
 
 	switch (RSREG)
 	{
 		case 0x00:  // MFCz
 		case 0x01:  // DMFCz
-			desc.regin[1] |= REGFLAG_CPR1(RDREG);
-			desc.regout[0] |= REGFLAG_R(RTREG);
+			desc.set_cpr1_used(RDREG);
+			desc.set_r_modified(RTREG);
 			return true;
 
 		case 0x02:  // CFCz
-			desc.regout[0] |= REGFLAG_R(RTREG);
+			desc.set_r_modified(RTREG);
 			return true;
 
 		case 0x04:  // MTCz
 		case 0x05:  // DMTCz
-			desc.regin[0] |= REGFLAG_R(RTREG);
-			desc.regout[1] |= REGFLAG_CPR1(RDREG);
+			desc.set_r_used(RTREG);
+			desc.set_cpr1_modified(RDREG);
 			return true;
 
 		case 0x06:  // CTCz
-			desc.regin[0] |= REGFLAG_R(RTREG);
+			desc.set_r_used(RTREG);
 			return true;
 
 		case 0x08:  // BC
@@ -583,8 +646,8 @@ bool mips3_frontend::describe_cop1(uint32_t op, opcode_desc &desc)
 				case 0x01:  // BCzT
 				case 0x02:  // BCzFL
 				case 0x03:  // BCzTL
-					desc.regin[2] |= REGFLAG_FCC;
-					desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
+					desc.set_fcc_used();
+					desc.set_is_conditional_branch();
 					desc.targetpc = desc.pc + 4 + SIMMVAL * 4;
 					desc.delayslots = 1;
 					desc.skipslots = (RTREG & 0x02) ? 1 : 0;
@@ -605,8 +668,9 @@ bool mips3_frontend::describe_cop1(uint32_t op, opcode_desc &desc)
 				case 0x01:  // SUB
 				case 0x02:  // MUL
 				case 0x03:  // DIV
-					desc.regin[1] |= REGFLAG_CPR1(FSREG) | REGFLAG_CPR1(FTREG);
-					desc.regout[1] |= REGFLAG_CPR1(FDREG);
+					desc.set_cpr1_used(FSREG);
+					desc.set_cpr1_used(FTREG);
+					desc.set_cpr1_modified(FDREG);
 					return true;
 
 				case 0x15:  // RECIP - MIPS IV
@@ -630,21 +694,21 @@ bool mips3_frontend::describe_cop1(uint32_t op, opcode_desc &desc)
 				case 0x21:  // CVT.D
 				case 0x24:  // CVT.W
 				case 0x25:  // CVT.L
-					desc.regin[1] |= REGFLAG_CPR1(FSREG);
-					desc.regout[1] |= REGFLAG_CPR1(FDREG);
+					desc.set_cpr1_used(FSREG);
+					desc.set_cpr1_modified(FDREG);
 					return true;
 
 				case 0x11:  // MOVT/F - MIPS IV
 					if (m_mips3->m_flavor < mips3_device::MIPS3_TYPE_MIPS_IV)
 						return false;
-					desc.regin[1] |= REGFLAG_CPR1(FSREG);
-					desc.regin[2] |= REGFLAG_FCC;
-					desc.regout[1] |= REGFLAG_CPR1(FDREG);
+					desc.set_cpr1_used(FSREG);
+					desc.set_fcc_used();
+					desc.set_cpr1_modified(FDREG);
 					return true;
 
 				case 0x30:  case 0x38:  // C.F
 				case 0x31:  case 0x39:  // C.UN
-					desc.regout[2] |= REGFLAG_FCC;
+					desc.set_fcc_modified();
 					return true;
 
 				case 0x32:  case 0x3a:  // C.EQ
@@ -653,8 +717,9 @@ bool mips3_frontend::describe_cop1(uint32_t op, opcode_desc &desc)
 				case 0x35:  case 0x3d:  // C.ULT
 				case 0x36:  case 0x3e:  // C.OLE
 				case 0x37:  case 0x3f:  // C.ULE
-					desc.regin[1] |= REGFLAG_CPR1(FSREG) | REGFLAG_CPR1(FTREG);
-					desc.regout[2] |= REGFLAG_FCC;
+					desc.set_cpr1_used(FSREG);
+					desc.set_cpr1_used(FTREG);
+					desc.set_fcc_modified();
 					return true;
 			}
 			return false;
@@ -669,7 +734,7 @@ bool mips3_frontend::describe_cop1(uint32_t op, opcode_desc &desc)
 //  single instruction in the COP1X group
 //-------------------------------------------------
 
-bool mips3_frontend::describe_cop1x(uint32_t op, opcode_desc &desc)
+bool mips3_device::frontend::describe_cop1x(uint32_t op, opcode_desc &desc)
 {
 	// any COP1 instruction can potentially cause an exception
 //  desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
@@ -678,16 +743,18 @@ bool mips3_frontend::describe_cop1x(uint32_t op, opcode_desc &desc)
 	{
 		case 0x00:  // LWXC1
 		case 0x01:  // LDXC1
-			desc.regin[0] |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc.regout[1] |= REGFLAG_CPR1(FDREG);
-			desc.flags |= OPFLAG_READS_MEMORY;
+			desc.set_r_used(RSREG);
+			desc.set_r_used(RTREG);
+			desc.set_cpr1_modified(FDREG);
+			desc.set_reads_memory();
 			return true;
 
 		case 0x08:  // SWXC1
 		case 0x09:  // SDXC1
-			desc.regin[0] |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc.regin[1] |= REGFLAG_CPR1(FDREG);
-			desc.flags |= OPFLAG_WRITES_MEMORY;
+			desc.set_r_used(RSREG);
+			desc.set_r_used(RTREG);
+			desc.set_cpr1_used(FDREG);
+			desc.set_writes_memory();
 			return true;
 
 		case 0x0f:  // PREFX
@@ -698,8 +765,10 @@ bool mips3_frontend::describe_cop1x(uint32_t op, opcode_desc &desc)
 		case 0x28:  case 0x29:  // MSUB
 		case 0x30:  case 0x31:  // NMADD
 		case 0x38:  case 0x39:  // NMSUB
-			desc.regin[1] |= REGFLAG_CPR1(FSREG) | REGFLAG_CPR1(FTREG) | REGFLAG_CPR1(FRREG);
-			desc.regout[1] |= REGFLAG_CPR1(FDREG);
+			desc.set_cpr1_used(FSREG);
+			desc.set_cpr1_used(FTREG);
+			desc.set_cpr1_used(FRREG);
+			desc.set_cpr1_modified(FDREG);
 			return true;
 	}
 
@@ -712,23 +781,23 @@ bool mips3_frontend::describe_cop1x(uint32_t op, opcode_desc &desc)
 //  single instruction in the COP2 group
 //-------------------------------------------------
 
-bool mips3_frontend::describe_cop2(uint32_t op, opcode_desc &desc)
+bool mips3_device::frontend::describe_cop2(uint32_t op, opcode_desc &desc)
 {
 	// any COP2 instruction can potentially cause an exception
-	desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
+	desc.set_can_cause_exception();
 
 	switch (RSREG)
 	{
 		case 0x00:  // MFCz
 		case 0x01:  // DMFCz
 		case 0x02:  // CFCz
-			desc.regout[0] |= REGFLAG_R(RTREG);
+			desc.set_r_modified(RTREG);
 			return true;
 
 		case 0x04:  // MTCz
 		case 0x05:  // DMTCz
 		case 0x06:  // CTCz
-			desc.regin[0] |= REGFLAG_R(RTREG);
+			desc.set_r_used(RTREG);
 			return true;
 
 		case 0x08:  // BC
@@ -736,7 +805,7 @@ bool mips3_frontend::describe_cop2(uint32_t op, opcode_desc &desc)
 			{
 				case 0x00:  // BCzF
 				case 0x01:  // BCzT
-					desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
+					desc.set_is_conditional_branch();
 					desc.targetpc = desc.pc + 4 + SIMMVAL * 4;
 					desc.delayslots = 1;
 					return true;

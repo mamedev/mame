@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "machine/eepromser.h"
 #include "video/ati_mach8.h"
 #include "video/pc_vga.h"
 
@@ -29,6 +28,12 @@ public:
 	virtual uint16_t offset() override;
 
 	mach8_device* get_8514() { return m_8514; }
+
+	auto eeprom_data_in_cb() { return m_eeprom_data_in.bind(); }
+	auto eeprom_data_out_cb() { return  m_eeprom_data_out.bind(); }
+	auto eeprom_clock_out_cb() { return m_eeprom_clock_out.bind(); }
+	auto eeprom_chip_select_out_cb() { return m_eeprom_chip_select_out.bind(); }
+
 protected:
 	ati_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -43,8 +48,14 @@ protected:
 		uint8_t vga_chip_id;
 	} ati;
 
+	virtual void refresh_bank();
+
 private:
 	mach8_device* m_8514;
+	devcb_read_line m_eeprom_data_in;
+	devcb_write_line m_eeprom_data_out;
+	devcb_write_line m_eeprom_clock_out;
+	devcb_write_line m_eeprom_chip_select_out;
 };
 
 // device type definition

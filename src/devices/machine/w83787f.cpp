@@ -96,7 +96,7 @@ void w83787f_device::remap(int space_id, offs_t start, offs_t end)
 			const u16 lpt_addr = lpt_port[lpt_setting & 3];
 			LOG("Map LPT1 to I/O port %04x-%04x\n", lpt_addr, lpt_addr + 3);
 
-			m_isa->install_device(lpt_addr, lpt_addr + 3, read8sm_delegate(*m_pc_lpt, FUNC(pc_lpt_device::read)), write8sm_delegate(*m_pc_lpt, FUNC(pc_lpt_device::write)));
+			m_isa->install_device(lpt_addr, lpt_addr + 3, *m_pc_lpt, &pc_lpt_device::isa_map);
 		}
 
 		for (int i = 0; i < 2; i++)

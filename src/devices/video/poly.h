@@ -1239,6 +1239,10 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(re
 			int32_t istartx = round_coordinate(startx);
 			int32_t istopx = round_coordinate(stopx);
 
+			// force start < stop
+			if (istartx > istopx)
+				std::swap(istartx, istopx);
+
 			// compute parameter starting points and deltas
 			extent_t &extent = unit.extent[extnum];
 			if (ParamCount > 0)
@@ -1254,7 +1258,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(re
 					BaseType rparam = redge->v1->p[paramnum] + rdy * redge->dpdy[paramnum];
 					BaseType dpdx = (rparam - lparam) * oox;
 
-					extent.param[paramnum].start = lparam;// - (BaseType(istartx) + 0.5f) * dpdx;
+					extent.param[paramnum].start = lparam + (BaseType(istartx) + BaseType(0.5) - startx) * dpdx;
 					extent.param[paramnum].dpdx = dpdx;
 				}
 			}

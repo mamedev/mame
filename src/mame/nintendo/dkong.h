@@ -20,6 +20,7 @@
 #include "machine/z80dma.h"
 #include "sound/discrete.h"
 #include "sound/tms5110.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -104,6 +105,9 @@ public:
 	dkong_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_dma8257(*this, "dma8257")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
 		, m_soundcpu(*this, "soundcpu")
 		, m_eeprom(*this, "eeprom")
 		, m_dev_rp2a03a(*this, "rp2a03a")
@@ -117,11 +121,8 @@ public:
 		, m_video_ram(*this,"video_ram")
 		, m_sprite_ram(*this,"sprite_ram")
 		, m_snd_rom(*this, "soundcpu")
-		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
-		, m_palette(*this, "palette")
 		, m_z80dma(*this, "z80dma")
-		, m_dma8257(*this, "dma8257")
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
 	{
@@ -162,9 +163,22 @@ public:
 
 	void dk_braze_a15(int state);
 
-private:
+protected:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	optional_device<i8257_device> m_dma8257;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	void dkong_videoram_w(offs_t offset, uint8_t data);
+	void dkong_flipscreen_w(uint8_t data);
+	void dkong_spritebank_w(uint8_t data);
+	void dkong_palettebank_w(offs_t offset, uint8_t data);
+	void nmi_mask_w(uint8_t data);
+	void p8257_drq_w(uint8_t data);
+
+private:
+	/* devices */
 	optional_device<mcs48_cpu_device> m_soundcpu;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<rp2a03_device> m_dev_rp2a03a; /* dkong3 */
@@ -246,11 +260,8 @@ private:
 	/* reverse address lookup map - hunchbkd */
 	int16_t           m_rev_map[0x200] = { };
 
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 	optional_device<z80dma_device> m_z80dma;
-	optional_device<i8257_device> m_dma8257;
 	memory_bank_creator m_bank1;
 	memory_bank_creator m_bank2;
 	memory_passthrough_handler m_dkong3_tap[2];
@@ -267,21 +278,15 @@ private:
 	void dkong3_2a03_reset_w(uint8_t data);
 	uint8_t strtheat_inputport_0_r();
 	uint8_t strtheat_inputport_1_r();
-	void nmi_mask_w(uint8_t data);
 	void dk_braze_a15_w(uint8_t data);
-	void dkong_videoram_w(offs_t offset, uint8_t data);
 	void dkongjr_gfxbank_w(uint8_t data);
 	void dkong3_gfxbank_w(uint8_t data);
-	void dkong_palettebank_w(offs_t offset, uint8_t data);
 	void radarscp_grid_enable_w(uint8_t data);
 	void radarscp_grid_color_w(uint8_t data);
-	void dkong_flipscreen_w(uint8_t data);
-	void dkong_spritebank_w(uint8_t data);
 	void dkong_voice_w(uint8_t data);
 	void dkong_audio_irq_w(uint8_t data);
 	uint8_t p8257_ctl_r();
 	void p8257_ctl_w(uint8_t data);
-	void p8257_drq_w(uint8_t data);
 	void dkong_z80dma_rdy_w(uint8_t data);
 	uint8_t braze_eeprom_r();
 	void braze_eeprom_w(uint8_t data);
@@ -344,6 +349,23 @@ private:
 	void check_palette(void);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t mask_bank, uint32_t shift_bits);
 	void radarscp_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
+};
+
+class jammin_state : public dkong_state
+{
+public:
+	jammin_state(const machine_config &mconfig, device_type type, const char *tag)
+		: dkong_state(mconfig, type, tag)
+		, m_ym2151(*this, "ym2151")
+	{
+	}
+
+	void jammin(machine_config &config);
+
+private:
+	void jammin_map(address_map &map) ATTR_COLD;
+
+	required_device<ym2151_device> m_ym2151;
 };
 
 #endif // MAME_NINTENDO_DKONG_H

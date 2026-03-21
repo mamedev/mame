@@ -25,7 +25,7 @@ public:
 protected:
 	w65c02s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint8_t read_vector(uint16_t adr) { return mintf->read_arg(adr); }
+	virtual uint8_t read_vector(uint16_t adr) { return m_mintf->read_arg(adr); }
 	virtual void end_interrupt() { }
 
 #define O(o) void o ## _full(); void o ## _partial()

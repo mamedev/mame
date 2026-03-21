@@ -3183,6 +3183,47 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- this one has some songs programmed into it:
+	     アイアイ                                                          童謡                                Aye-aye                             Dōyō
+	     いちねんせいになったら                                            童謡                                Ichinensei ni Nattara               Dōyō
+	     大きな栗の木の下で                                                童謡                                Ōkina Kuri no Ki no Shita de        Dōyō
+	     大きな古時計                                                      童謡                                Ōkina Furudokei                     Dōyō
+	     おべんとうばこのうた                                              童謡                                O-Bentō Bako no uta                 Dōyō
+	     幸せなら手をたたこう                                              童謡                                Shiawasenara Te o Taktakō           Dōyō
+	     スキップ ステップ アイランド                                      しましまとらのしまじろう            Skip Step Island                    Shima Shima Tora no Shimajirō
+	     ふしぎなポケット                                                  童謡                                Fushigina Pocket                    Dōyō
+	     もりのくまさん                                                    童謡                                Mori no Kuma-san                    Dōyō
+	     いぬのおまわりさん                                                童謡                                Inu no Omawari-san                  Dōyō
+	     涙そうそう                                                        夏川りみ                            Nada Sōsō                           Natsukawa Rimi
+	     さくらんぼ〈きらりんVer.〉                                        大塚愛                              Sakuranbo <Kirarin Ver.>            Ōtsuka Ai
+	     CHA-LA HEAD-CHA-LA                                                影山ヒロノブ                        Cha-La Head-Cha-La                  Kageyama Hironobu
+	     スーパーマン                                                      大塚愛                              Super Man                           Ōtsuka Ai
+	     Strawberry Jam                                                    大塚愛                              Strawberry Jam                      Ōtsuka Ai
+	     青春アミーゴ                                                      修二と彰                            Seishun Amigo                       Shūji to Akira
+	     かたつむり                                                        童謡                                Katatsumuri                         Dōyō
+	     にんげんっていいな                                                中嶋義実、ヤング・フレッシュ        Ningentte Īna                       Nakajima Yoshimi, Young Fresh
+	     ハグしちゃお                                                      夏川りみ                            Hug-shichao                         Natsukawa Rimi
+	     Dragostea Din Tei 【ドラゴステア・ディン・テイ〜恋のマイアヒ〜】  O-ZONE                              Dragostea Din Tei (Koi no Maiahi)   O-Zone
+	     まかせて★スプラッシュ☆スター★                                     うちやえゆか with Splash Stars      Makasete ★Splash☆Star★              Uchiyae Yuka with Splash Stars
+	     フレンジャー                                                      大塚愛                              Frienger                            Ōtsuka Ai
+	     オトメロディー                                                    高橋美佳子                          Otomelody                           Takahashi Mikako
+	     勇気りんりん                                                      ドリーミング                        Yūkirinrin                          Dreaming
+	     アンパンマンたいそう                                              ドリーミング                        Anpanman Taisō                      Dreaming
+	     アンパンマンのマーチ                                              ドリーミング                        Anpanman no March                   Dreaming
+	     キューティーハニー                                                倖田來未                            Cutie Honey                         Kōda Kumi
+	     勇気１００％（２００２）                                          Ya-Ya-yah                           Yūki 100% (2002)                    Ya-Ya-yah -->
+	<software name="ekaraweb28b" cloneof="ekaraweb28">
+		<description>e-kara Web cartridge 28M (used, with 28 songs) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="ekara_user_red.bin" size="0x200000" crc="2acf2b95" sha1="100106cf9da486fcc5dae328721feb2ffba74b3b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ekaraweb12">
 		<description>e-kara Web cartridge 12M (blank) (Japan)</description>
 		<year>2003</year>
@@ -3196,13 +3237,13 @@ license:CC0-1.0
 	</software>
 
 	<!-- this one has some songs programmed into it:
-	     河内おとこ節                  中村美律子          Kawachi Otokobushi                         Nakamura Mitsuko
-	     珍島(チンド)物語              天童よしみ          Chindo Monogatari                          Tendō Yoshimi
-	     こころ酒                      藤あや子            Kokoro Sake                                Fuji Ayako
-	     夜桜お七                      坂本冬美            Yozakura O-shichi                          Sakamoto Fuyumi
-	     愛燦燦(あいさんさん)          美空ひばり          Ai Sansan                                  Misora Hibari
-	     川の流れのように              美空ひばり          Kawa no Nagare no Yō ni                    Misora Hibari
-	     真赤な太陽                    美空ひばり          Makkana TaiYō                              Misora Hibari -->
+	     河内おとこ節                  中村美律子          Kawachi Otokobushi                          Nakamura Mitsuko
+	     珍島(チンド)物語              天童よしみ          Chindo Monogatari                           Tendō Yoshimi
+	     こころ酒                      藤あや子            Kokoro Sake                                 Fuji Ayako
+	     夜桜お七                      坂本冬美            Yozakura O-shichi                           Sakamoto Fuyumi
+	     愛燦燦(あいさんさん)          美空ひばり          Ai Sansan                                   Misora Hibari
+	     川の流れのように              美空ひばり          Kawa no Nagare no Yō ni                     Misora Hibari
+	     真赤な太陽                    美空ひばり          Makkana TaiYō                               Misora Hibari -->
 	<software name="ekaraweb12a" cloneof="ekaraweb12">
 		<description>e-kara Web cartridge 12M (used, with 7 songs) (Japan)</description>
 		<year>2003</year>
@@ -3216,18 +3257,18 @@ license:CC0-1.0
 	</software>
 
 	<!-- this one has some songs programmed into it:
-	     さくらんぼ                    大塚愛              Sakuranbo                                  Ōtsuka Ai
-	     花                            ORANGE RANGE        Hana                                       Orange Range
-	     ロコローション                ORANGE RANGE        Locolotion                                 Orange Range
-	     solitude～真実のサヨナラ～    KinKi Kids          Solitude - Shinjitsu no Sayonara           KinKi Kids
-	     薄荷キャンディー              KinKi Kids          Hakka Candy                                KinKi Kids
-	     ボクの背中には羽根がある      KinKi Kids          Boku no Senaka ni wa Hane ga Aru           KinKi Kids
-	     愛の温度℃                     ぴちぴちピッチ      Ai no Ondo °C                              Pichi Pichi Pitch
-	     世界で一番早く朝が来る場所    ぴちぴちピッチ      Sekai de Ichiban Hayaku Asa ga Kuru Basho  Pichi Pichi Pitch
-	     YUME日和                      島谷ひとみ          Yume Biyori                                Shimatani Hitomi
-	     LOVE LOVE LOVE                DREAMS COME TRUE    Love Love Love                             Dreams Come True
-	     キラリ☆セーラードリーム       小枝(さえ)          Kirari ☆ Sailor Dream                      Koeda (Sae)
-	     夏祭り                        Whiteberry          Natsu Matsuri                              Whiteberry -->
+	     さくらんぼ                    大塚愛              Sakuranbo                                   Ōtsuka Ai
+	     花                            ORANGE RANGE        Hana                                        Orange Range
+	     ロコローション                ORANGE RANGE        Locolotion                                  Orange Range
+	     solitude～真実のサヨナラ～    KinKi Kids          Solitude - Shinjitsu no Sayonara            KinKi Kids
+	     薄荷キャンディー              KinKi Kids          Hakka Candy                                 KinKi Kids
+	     ボクの背中には羽根がある      KinKi Kids          Boku no Senaka ni wa Hane ga Aru            KinKi Kids
+	     愛の温度℃                     ぴちぴちピッチ      Ai no Ondo °C                               Pichi Pichi Pitch
+	     世界で一番早く朝が来る場所    ぴちぴちピッチ      Sekai de Ichiban Hayaku Asa ga Kuru Basho   Pichi Pichi Pitch
+	     YUME日和                      島谷ひとみ          Yume Biyori                                 Shimatani Hitomi
+	     LOVE LOVE LOVE                DREAMS COME TRUE    Love Love Love                              Dreams Come True
+	     キラリ☆セーラードリーム       小枝(さえ)          Kirari ☆ Sailor Dream                       Koeda (Sae)
+	     夏祭り                        Whiteberry          Natsu Matsuri                               Whiteberry -->
 	<software name="ekaraweb12b" cloneof="ekaraweb12">
 		<description>e-kara Web cartridge 12M (used, with 12 songs, set 1) (Japan)</description>
 		<year>2003</year>
@@ -3455,6 +3496,55 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraweb_12m_12_set9.u1" size="0x100000" crc="52535bbf" sha1="598734744c661226e4be79ec44d75ad556c05262"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     おもちゃのチャチャチャ                    童謡                        Omacha no Cha Cha Cha                       Dōyō
+	     キラキラぼし                              童謡                        Kirakira Boshi                              Dōyō
+	     ドラえもんのうた                          大杉久美子                  Doraemon no Uta                             Ōsuki Kumiko
+	     DANZEN!ふたりはプリキュアVer.MaxHeart     五條真由美                  DANZEN! Futari wa PreCure Ver.MaxHeart      Gojō Mayumi
+	     マツケンサンバⅡ                           松平健                      Matsuken Samba II                           Matsudairi Ken
+	     ハム太郎とっとこうた                      ハムちゃんず                Hamtaro Tottokōta                           Hamuchans
+	     サザエさん                                宇野ゆう子                  Sazae-san                                   Uno Yūko
+	     世界に一つだけの花                        SMAP                        Sekai ni Hitotsu Dake no Hana               SMAP
+	     アイ〜ン!ダンスの唄                       バカ殿様とミニモニ姫。      Ai~n! Dance no Uta                          Bakatonosama to mini-moni-hime
+	     きよしのズンドコ節                        氷川きよし                  Kiyoshi no Zundoko-Bushi                    Hikawa Kiyoshi
+	     おさかな天国                              柴矢裕美                    O-Sakana no Tengoku                         Shibaya Hiromi
+	     さんぽ                                    井上あずみ                  Sanpo                                       Inoue Azumi -->
+	<software name="ekaraweb12l" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 10) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekara_user_blue.bin" size="0x100000" crc="2d36538d" sha1="455a16aea46e710a1a1f58b31341a5fc647426fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     Venus                         タッキー&翼                                     Venus                   Tackey & Tsubasa
+	     SMILY                         大塚愛                                          SMILY                   Ōtsuka Ai
+	     恋☆カナ                       月島きらりstarring久住小春(モーニング娘。)      Koi☆Kana                Tsukishima Kirari starring Kusumi Koharu (Morning Musume)
+	     宙船（そらふね）              ΤΟΚΙΟ                                           Sorafune                Tokio
+	     粉雪                          レミオロメン                                    Konayuki                Remioromen
+	     YUME日和                      島谷ひとみ                                      Yume Biyori             Shimatani Hitomi
+	     ありがとう                    SMAP                                            Arigatō                 SMAP
+	     おどるポンポコリン            B.B.クィーンズ                                  Odoru Pompokolin        B.B.QUEENS
+	     夢をあきらめないで            岡村孝子                                        Yume o Akiramenaide     Okamura Takako
+	     永遠にともに                  コブクロ                                        Towa ni Tomo ni         KOBUKURO
+	     羞恥心                        羞恥心                                          Shūchishin              Shūchishin -->
+	<software name="ekaraweb12m" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 11 songs) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekara_user_orange.bin" size="0x100000" crc="5614327d" sha1="5c415fe2529f0ee084914fe0ddb35d2ef161c939"/>
 			</dataarea>
 		</part>
 	</software>

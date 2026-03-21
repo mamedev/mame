@@ -10,71 +10,41 @@
 #include "emu.h"
 #include "mb86235fe.h"
 
-#include "mb86235defs.h"
+#include "cpu/drcfe.ipp"
 
 
-#define AA_USED(desc,x)             do { (desc).regin[0] |= 1 << (x); } while(0)
-#define AA_MODIFIED(desc,x)         do { (desc).regout[0] |= 1 << (x); } while(0)
-#define AB_USED(desc,x)             do { (desc).regin[0] |= 1 << (8+(x)); } while(0)
-#define AB_MODIFIED(desc,x)         do { (desc).regout[0] |= 1 << (8+(x)); } while(0)
-#define MA_USED(desc,x)             do { (desc).regin[0] |= 1 << (16+(x)); } while(0)
-#define MA_MODIFIED(desc,x)         do { (desc).regout[0] |= 1 << (16+(x)); } while(0)
-#define MB_USED(desc,x)             do { (desc).regin[0] |= 1 << (24+(x)); } while(0)
-#define MB_MODIFIED(desc,x)         do { (desc).regout[0] |= 1 << (24+(x)); } while(0)
-#define AR_USED(desc,x)             do { (desc).regin[1] |= 1 << (24+(x)); } while(0)
-#define AR_MODIFIED(desc,x)         do { (desc).regout[1] |= 1 << (24+(x)); } while(0)
-
-#define AZ_USED(desc)               do { (desc).regin[1] |= 1 << 0; } while (0)
-#define AZ_MODIFIED(desc)           do { (desc).regout[1] |= 1 << 0; } while (0)
-#define AN_USED(desc)               do { (desc).regin[1] |= 1 << 1; } while (0)
-#define AN_MODIFIED(desc)           do { (desc).regout[1] |= 1 << 1; } while (0)
-#define AV_USED(desc)               do { (desc).regin[1] |= 1 << 2; } while (0)
-#define AV_MODIFIED(desc)           do { (desc).regout[1] |= 1 << 2; } while (0)
-#define AU_USED(desc)               do { (desc).regin[1] |= 1 << 3; } while (0)
-#define AU_MODIFIED(desc)           do { (desc).regout[1] |= 1 << 3; } while (0)
-#define AD_USED(desc)               do { (desc).regin[1] |= 1 << 4; } while (0)
-#define AD_MODIFIED(desc)           do { (desc).regout[1] |= 1 << 4; } while (0)
-#define ZC_USED(desc)               do { (desc).regin[1] |= 1 << 5; } while (0)
-#define ZC_MODIFIED(desc)           do { (desc).regout[1] |= 1 << 5; } while (0)
-#define IL_USED(desc)               do { (desc).regin[1] |= 1 << 6; } while (0)
-#define IL_MODIFIED(desc)           do { (desc).regout[1] |= 1 << 6; } while (0)
-#define NR_USED(desc)               do { (desc).regin[1] |= 1 << 7; } while (0)
-#define NR_MODIFIED(desc)           do { (desc).regout[1] |= 1 << 7; } while (0)
-#define ZD_USED(desc)               do { (desc).regin[1] |= 1 << 8; } while (0)
-#define ZD_MODIFIED(desc)           do { (desc).regout[1] |= 1 << 8; } while (0)
-#define MN_USED(desc)               do { (desc).regin[1] |= 1 << 9; } while (0)
-#define MN_MODIFIED(desc)           do { (desc).regout[1] |= 1 << 9; } while (0)
-#define MZ_USED(desc)               do { (desc).regin[1] |= 1 << 10; } while (0)
-#define MZ_MODIFIED(desc)           do { (desc).regout[1] |= 1 << 10; } while (0)
-#define MV_USED(desc)               do { (desc).regin[1] |= 1 << 11; } while (0)
-#define MV_MODIFIED(desc)           do { (desc).regout[1] |= 1 << 11; } while (0)
-#define MU_USED(desc)               do { (desc).regin[1] |= 1 << 12; } while (0)
-#define MU_MODIFIED(desc)           do { (desc).regout[1] |= 1 << 12; } while (0)
-#define MD_USED(desc)               do { (desc).regin[1] |= 1 << 13; } while (0)
-#define MD_MODIFIED(desc)           do { (desc).regout[1] |= 1 << 13; } while (0)
-
-
-mb86235_frontend::mb86235_frontend(mb86235_device *core, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
-	: drc_frontend(*core, window_start, window_end, max_sequence),
+mb86235_device::frontend::frontend(mb86235_device *core, uint32_t window_start, uint32_t window_end, uint32_t max_sequence) :
+	drc_frontend_base(core->space_config(AS_PROGRAM)->page_shift(), window_start, window_end, max_sequence),
 	m_core(core)
 {
 }
 
-
-bool mb86235_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
+mb86235_device::frontend::~frontend()
 {
-	uint64_t opcode = desc.opptr.q[0] = m_core->m_pcache.read_qword(desc.pc, 0);
+}
+
+
+mb86235_device::opcode_desc const *mb86235_device::frontend::describe_code(offs_t startpc)
+{
+	return do_describe_code(
+			[this] (opcode_desc &desc, opcode_desc const *prev) { return describe(desc, prev); },
+			startpc);
+}
+
+
+bool mb86235_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
+{
+	uint64_t opcode = desc.opptr = m_core->m_pcache.read_qword(desc.pc, 0);
 
 	desc.length = 1;
-	desc.cycles = 1;
 
 	// repeatable instruction needs an entry point
 	if (prev != nullptr)
 	{
-		if (prev->userflags & OP_USERFLAG_REPEAT)
+		if (prev->repeat())
 		{
-			desc.flags |= OPFLAG_IS_BRANCH_TARGET;
-			desc.userflags |= OP_USERFLAG_REPEATED_OP;
+			desc.set_is_branch_target();
+			desc.set_repeated_op();
 		}
 	}
 
@@ -127,32 +97,29 @@ bool mb86235_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 	return true;
 }
 
-void mb86235_frontend::describe_alu_input(opcode_desc &desc, int reg)
+void mb86235_device::frontend::describe_alu_input(opcode_desc &desc, int reg)
 {
 	switch (reg)
 	{
 		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
-			AA_USED(desc, reg & 7);
+			desc.set_aa_used(reg & 7);
 			break;
 
 		case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-			AB_USED(desc, reg & 7);
+			desc.set_ab_used(reg & 7);
 			break;
 
 		case 0x10:  // PR
 			break;
 
 		case 0x11:  // PR++
-			desc.userflags &= ~OP_USERFLAG_PR_MASK;
-			desc.userflags |= OP_USERFLAG_PR_INC;
+			desc.set_pr_inc();
 			break;
 		case 0x12:  // PR--
-			desc.userflags &= ~OP_USERFLAG_PR_MASK;
-			desc.userflags |= OP_USERFLAG_PR_DEC;
+			desc.set_pr_dec();
 			break;
 		case 0x13:  // PR#0
-			desc.userflags &= ~OP_USERFLAG_PR_MASK;
-			desc.userflags |= OP_USERFLAG_PR_ZERO;
+			desc.set_pr_zero();
 			break;
 
 
@@ -161,37 +128,37 @@ void mb86235_frontend::describe_alu_input(opcode_desc &desc, int reg)
 	}
 }
 
-void mb86235_frontend::describe_mul_input(opcode_desc &desc, int reg)
+void mb86235_device::frontend::describe_mul_input(opcode_desc &desc, int reg)
 {
 	switch (reg)
 	{
 		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
-			MA_USED(desc, reg & 7);
+			desc.set_ma_used(reg & 7);
 			break;
 
 		case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-			MB_USED(desc, reg & 7);
+			desc.set_mb_used(reg & 7);
 			break;
 
 		case 0x10:  // PR
 			break;
 
 		case 0x11:  // PR++
-			if ((desc.userflags & OP_USERFLAG_PR_MASK) == 0)    // ALU PR update has higher priority
+			if (desc.pr() == 0)    // ALU PR update has higher priority
 			{
-				desc.userflags |= OP_USERFLAG_PR_INC;
+				desc.set_pr_inc();
 			}
 			break;
 		case 0x12:  // PR--
-			if ((desc.userflags & OP_USERFLAG_PR_MASK) == 0)    // ALU PR update has higher priority
+			if (desc.pr() == 0)    // ALU PR update has higher priority
 			{
-				desc.userflags |= OP_USERFLAG_PR_DEC;
+				desc.set_pr_dec();
 			}
 			break;
 		case 0x13:  // PR#0
-			if ((desc.userflags & OP_USERFLAG_PR_MASK) == 0)    // ALU PR update has higher priority
+			if (desc.pr() == 0)    // ALU PR update has higher priority
 			{
-				desc.userflags |= OP_USERFLAG_PR_ZERO;
+				desc.set_pr_zero();
 			}
 			break;
 
@@ -200,24 +167,24 @@ void mb86235_frontend::describe_mul_input(opcode_desc &desc, int reg)
 	}
 }
 
-void mb86235_frontend::describe_alumul_output(opcode_desc &desc, int reg)
+void mb86235_device::frontend::describe_alumul_output(opcode_desc &desc, int reg)
 {
 	switch (reg >> 3)
 	{
 		case 0:
-			MA_MODIFIED(desc, reg & 7);
+			desc.set_ma_modified(reg & 7);
 			break;
 
 		case 1:
-			MB_MODIFIED(desc, reg & 7);
+			desc.set_mb_modified(reg & 7);
 			break;
 
 		case 2:
-			AA_MODIFIED(desc, reg & 7);
+			desc.set_aa_modified(reg & 7);
 			break;
 
 		case 3:
-			AB_MODIFIED(desc, reg & 7);
+			desc.set_ab_modified(reg & 7);
 			break;
 
 		default:
@@ -225,34 +192,34 @@ void mb86235_frontend::describe_alumul_output(opcode_desc &desc, int reg)
 	}
 }
 
-void mb86235_frontend::describe_reg_read(opcode_desc &desc, int reg)
+void mb86235_device::frontend::describe_reg_read(opcode_desc &desc, int reg)
 {
 	switch (reg)
 	{
 		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
 			// MA0-7
-			MA_USED(desc, reg & 7);
+			desc.set_ma_used(reg & 7);
 			break;
 		case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 			// AA0-7
-			AA_USED(desc, reg & 7);
+			desc.set_aa_used(reg & 7);
 			break;
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 			// AR0-7
-			AR_USED(desc, reg & 7);
+			desc.set_ar_used(reg & 7);
 			break;
 		case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
 			// MB0-7
-			MB_USED(desc, reg & 7);
+			desc.set_mb_used(reg & 7);
 			break;
 		case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
 			// AB0-7
-			AB_USED(desc, reg & 7);
+			desc.set_ab_used(reg & 7);
 			break;
 
 		case 0x31:      // FI
-			desc.userflags |= OP_USERFLAG_FIFOIN;
-			desc.flags |= OPFLAG_IS_BRANCH_TARGET;      // fifo check makes this a branch target
+			desc.set_fifoin();
+			desc.set_is_branch_target();      // fifo check makes this a branch target
 			break;
 
 		case 0x32:      // FO0
@@ -273,37 +240,37 @@ void mb86235_frontend::describe_reg_read(opcode_desc &desc, int reg)
 			break;
 
 		case 0x30:      // PR
-			if ((desc.userflags & OP_USERFLAG_PR_MASK) == 0)        // ALU and MUL PR updates have higher priority
+			if (desc.pr() == 0)        // ALU and MUL PR updates have higher priority
 			{
-				desc.userflags |= OP_USERFLAG_PR_INC;
+				desc.set_pr_inc();
 			}
 			break;
 	}
 }
 
-void mb86235_frontend::describe_reg_write(opcode_desc &desc, int reg)
+void mb86235_device::frontend::describe_reg_write(opcode_desc &desc, int reg)
 {
 	switch (reg)
 	{
 		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
 			// MA0-7
-			MA_MODIFIED(desc, reg & 7);
+			desc.set_ma_modified(reg & 7);
 			break;
 		case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 			// AA0-7
-			AA_MODIFIED(desc, reg & 7);
+			desc.set_aa_modified(reg & 7);
 			break;
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 			// AR0-7
-			AR_MODIFIED(desc, reg & 7);
+			desc.set_ar_modified(reg & 7);
 			break;
 		case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
 			// MB0-7
-			MB_MODIFIED(desc, reg & 7);
+			desc.set_mb_modified(reg & 7);
 			break;
 		case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
 			// AB0-7
-			AB_MODIFIED(desc, reg & 7);
+			desc.set_ab_modified(reg & 7);
 			break;
 
 		case 0x31:      // FI
@@ -311,8 +278,8 @@ void mb86235_frontend::describe_reg_write(opcode_desc &desc, int reg)
 
 		case 0x32:      // FO0
 		case 0x33:      // FO1
-			desc.userflags |= OP_USERFLAG_FIFOOUT;
-			desc.flags |= OPFLAG_IS_BRANCH_TARGET;      // fifo check makes this a branch target
+			desc.set_fifoout();
+			desc.set_is_branch_target();      // fifo check makes this a branch target
 			break;
 
 		case 0x10:      // EB
@@ -329,14 +296,13 @@ void mb86235_frontend::describe_reg_write(opcode_desc &desc, int reg)
 			break;
 
 		case 0x30:      // PR
-			desc.userflags &= ~OP_USERFLAG_PW_MASK;
-			desc.userflags |= OP_USERFLAG_PW_INC;
+			desc.set_pw_inc();
 			break;
 	}
 }
 
 
-void mb86235_frontend::describe_alu(opcode_desc &desc, uint32_t aluop)
+void mb86235_device::frontend::describe_alu(opcode_desc &desc, uint32_t aluop)
 {
 	int i1 = (aluop >> 10) & 0xf;
 	int i2 = (aluop >> 5) & 0x1f;
@@ -347,218 +313,218 @@ void mb86235_frontend::describe_alu(opcode_desc &desc, uint32_t aluop)
 	{
 		case 0x00:      // FADD
 			describe_alu_input(desc, i1); describe_alu_input(desc, i2); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
-			AU_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
+			desc.set_au_modified();
 			break;
 		case 0x01:      // FADDZ
 			describe_alu_input(desc, i1); describe_alu_input(desc, i2); describe_alumul_output(desc, io);
-			ZC_MODIFIED(desc);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
-			AU_MODIFIED(desc);
-			AD_MODIFIED(desc);
+			desc.set_zc_modified();
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
+			desc.set_au_modified();
+			desc.set_ad_modified();
 			break;
 		case 0x02:      // FSUB
 			describe_alu_input(desc, i1); describe_alu_input(desc, i2); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
-			AU_MODIFIED(desc);
-			AD_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
+			desc.set_au_modified();
+			desc.set_ad_modified();
 			break;
 		case 0x03:      // FSUBZ
 			describe_alu_input(desc, i1); describe_alu_input(desc, i2); describe_alumul_output(desc, io);
-			ZC_MODIFIED(desc);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
-			AU_MODIFIED(desc);
-			AD_MODIFIED(desc);
+			desc.set_zc_modified();
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
+			desc.set_au_modified();
+			desc.set_ad_modified();
 			break;
 		case 0x04:      // FCMP
 			describe_alu_input(desc, i1); describe_alu_input(desc, i2);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
-			AU_MODIFIED(desc);
-			AD_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
+			desc.set_au_modified();
+			desc.set_ad_modified();
 			break;
 		case 0x05:      // FABS
 			describe_alu_input(desc, i1); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AD_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_ad_modified();
 			break;
 		case 0x06:      // FABC
 			describe_alu_input(desc, i1); describe_alu_input(desc, i2); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AU_MODIFIED(desc);
-			AD_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_au_modified();
+			desc.set_ad_modified();
 			break;
 		case 0x07:      // NOP
 			break;
 		case 0x08:      // FEA
 			describe_alu_input(desc, i1); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
-			AD_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
+			desc.set_ad_modified();
 			break;
 		case 0x09:      // FES
 			describe_alu_input(desc, i1); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AU_MODIFIED(desc);
-			AD_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_au_modified();
+			desc.set_ad_modified();
 			break;
 		case 0x0a:      // FRCP
 			describe_alu_input(desc, i1); describe_alumul_output(desc, io);
-			ZD_MODIFIED(desc);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AU_MODIFIED(desc);
-			AD_MODIFIED(desc);
+			desc.set_zd_modified();
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_au_modified();
+			desc.set_ad_modified();
 			break;
 		case 0x0b:      // FRSQ
 			describe_alu_input(desc, i1); describe_alumul_output(desc, io);
-			NR_MODIFIED(desc);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AU_MODIFIED(desc);
-			AD_MODIFIED(desc);
+			desc.set_nr_modified();
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_au_modified();
+			desc.set_ad_modified();
 			break;
 		case 0x0c:      // FLOG
 			describe_alu_input(desc, i1); describe_alumul_output(desc, io);
-			IL_MODIFIED(desc);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AD_MODIFIED(desc);
+			desc.set_il_modified();
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_ad_modified();
 			break;
 		case 0x0d:      // CIF
 			describe_alu_input(desc, i1); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
 			break;
 		case 0x0e:      // CFI
 			describe_alu_input(desc, i1); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
-			AD_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
+			desc.set_ad_modified();
 			break;
 		case 0x0f:      // CFIB
 			describe_alu_input(desc, i1); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
-			AD_MODIFIED(desc);
-			AU_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
+			desc.set_ad_modified();
+			desc.set_au_modified();
 			break;
 		case 0x10:      // ADD
 			describe_alu_input(desc, i1); describe_alu_input(desc, i2); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
 			break;
 		case 0x11:      // ADDZ
 			describe_alu_input(desc, i1); describe_alu_input(desc, i2); describe_alumul_output(desc, io);
-			ZC_MODIFIED(desc);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
+			desc.set_zc_modified();
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
 			break;
 		case 0x12:      // SUB
 			describe_alu_input(desc, i1); describe_alu_input(desc, i2); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
 			break;
 		case 0x13:      // SUBZ
 			describe_alu_input(desc, i1); describe_alu_input(desc, i2); describe_alumul_output(desc, io);
-			ZC_MODIFIED(desc);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
+			desc.set_zc_modified();
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
 			break;
 		case 0x14:      // CMP
 			describe_alu_input(desc, i1); describe_alu_input(desc, i2);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
 			break;
 		case 0x15:      // ABS
 			describe_alu_input(desc, i1); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
 			break;
 		case 0x16:      // ATR
 			describe_alu_input(desc, i1); describe_alumul_output(desc, io);
 			break;
 		case 0x17:      // ATRZ
 			describe_alu_input(desc, i1); describe_alumul_output(desc, io);
-			ZC_MODIFIED(desc);
+			desc.set_zc_modified();
 			break;
 		case 0x18:      // AND
 			describe_alu_input(desc, i1); describe_alu_input(desc, i2); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
-			AU_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
+			desc.set_au_modified();
 			break;
 		case 0x19:      // OR
 			describe_alu_input(desc, i1); describe_alu_input(desc, i2); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
-			AU_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
+			desc.set_au_modified();
 			break;
 		case 0x1a:      // XOR
 			describe_alu_input(desc, i1); describe_alu_input(desc, i2); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
-			AU_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
+			desc.set_au_modified();
 			break;
 		case 0x1b:      // NOT
 			describe_alu_input(desc, i1); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
-			AU_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
+			desc.set_au_modified();
 			break;
 		case 0x1c:      // LSR
 			describe_alu_input(desc, i1); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
-			AU_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
+			desc.set_au_modified();
 			break;
 		case 0x1d:      // LSL
 			describe_alu_input(desc, i1); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
-			AV_MODIFIED(desc);
-			AU_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
+			desc.set_av_modified();
+			desc.set_au_modified();
 			break;
 		case 0x1e:      // ASR
 			describe_alu_input(desc, i1); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
 			break;
 		case 0x1f:      // ASL
 			describe_alu_input(desc, i1); describe_alumul_output(desc, io);
-			AN_MODIFIED(desc);
-			AZ_MODIFIED(desc);
+			desc.set_an_modified();
+			desc.set_az_modified();
 			break;
 	}
 }
 
-void mb86235_frontend::describe_mul(opcode_desc &desc, uint32_t mulop)
+void mb86235_device::frontend::describe_mul(opcode_desc &desc, uint32_t mulop)
 {
 	int i1 = (mulop >> 10) & 0xf;
 	int i2 = (mulop >> 5) & 0x1f;
@@ -572,78 +538,78 @@ void mb86235_frontend::describe_mul(opcode_desc &desc, uint32_t mulop)
 	if (m)
 	{
 		// FMUL
-		MN_MODIFIED(desc);
-		MZ_MODIFIED(desc);
-		MV_MODIFIED(desc);
-		MU_MODIFIED(desc);
-		MD_MODIFIED(desc);
+		desc.set_mn_modified();
+		desc.set_mz_modified();
+		desc.set_mv_modified();
+		desc.set_mu_modified();
+		desc.set_md_modified();
 	}
 	else
 	{
 		// MUL
-		MN_MODIFIED(desc);
-		MZ_MODIFIED(desc);
-		MV_MODIFIED(desc);
+		desc.set_mn_modified();
+		desc.set_mz_modified();
+		desc.set_mv_modified();
 	}
 }
 
-void mb86235_frontend::describe_ea(opcode_desc &desc, int md, int arx, int ary, int disp)
+void mb86235_device::frontend::describe_ea(opcode_desc &desc, int md, int arx, int ary, int disp)
 {
 	switch (md)
 	{
 		case 0x0:       // @ARx
-			AR_USED(desc, arx);
+			desc.set_ar_used(arx);
 			break;
 		case 0x1:       // @ARx++
-			AR_USED(desc, arx); AR_MODIFIED(desc, arx);
+			desc.set_ar_used(arx); desc.set_ar_modified(arx);
 			break;
 		case 0x2:       // @ARx--
-			AR_USED(desc, arx); AR_MODIFIED(desc, arx);
+			desc.set_ar_used(arx); desc.set_ar_modified(arx);
 			break;
 		case 0x3:       // @ARx++disp
-			AR_USED(desc, arx); AR_MODIFIED(desc, arx);
+			desc.set_ar_used(arx); desc.set_ar_modified(arx);
 			break;
 		case 0x4:       // @ARx+ARy
-			AR_USED(desc, arx); AR_USED(desc, ary);
+			desc.set_ar_used(arx); desc.set_ar_used(ary);
 			break;
 		case 0x5:       // @ARx+ARy++
-			AR_USED(desc, arx); AR_USED(desc, ary); AR_MODIFIED(desc, ary);
+			desc.set_ar_used(arx); desc.set_ar_used(ary); desc.set_ar_modified(ary);
 			break;
 		case 0x6:       // @ARx+ARy--
-			AR_USED(desc, arx); AR_USED(desc, ary); AR_MODIFIED(desc, ary);
+			desc.set_ar_used(arx); desc.set_ar_used(ary); desc.set_ar_modified(ary);
 			break;
 		case 0x7:       // @ARx+ARy++disp
-			AR_USED(desc, arx); AR_USED(desc, ary); AR_MODIFIED(desc, ary);
+			desc.set_ar_used(arx); desc.set_ar_used(ary); desc.set_ar_modified(ary);
 			break;
 		case 0x8:       // @ARx+ARyU
-			AR_USED(desc, arx); AR_USED(desc, ary);
+			desc.set_ar_used(arx); desc.set_ar_used(ary);
 			break;
 		case 0x9:       // @ARx+ARyL
-			AR_USED(desc, arx); AR_USED(desc, ary);
+			desc.set_ar_used(arx); desc.set_ar_used(ary);
 			break;
 		case 0xa:       // @ARx+disp
-			AR_USED(desc, arx);
+			desc.set_ar_used(arx);
 			break;
 		case 0xb:       // @ARx+ARy+disp
-			AR_USED(desc, arx); AR_USED(desc, ary);
+			desc.set_ar_used(arx); desc.set_ar_used(ary);
 			break;
 		case 0xc:       // @disp
 			break;
 		case 0xd:       // @ARx+[ARy++]
-			AR_USED(desc, arx); AR_USED(desc, ary); AR_MODIFIED(desc, ary);
+			desc.set_ar_used(arx); desc.set_ar_used(ary); desc.set_ar_modified(ary);
 			break;
 		case 0xe:       // @ARx+[ARy--]
-			AR_USED(desc, arx); AR_USED(desc, ary); AR_MODIFIED(desc, ary);
+			desc.set_ar_used(arx); desc.set_ar_used(ary); desc.set_ar_modified(ary);
 			break;
 		case 0xf:       // @ARx+[ARy++disp]
-			AR_USED(desc, arx); AR_USED(desc, ary); AR_MODIFIED(desc, ary);
+			desc.set_ar_used(arx); desc.set_ar_used(ary); desc.set_ar_modified(ary);
 			break;
 	}
 }
 
-void mb86235_frontend::describe_xfer1(opcode_desc &desc)
+void mb86235_device::frontend::describe_xfer1(opcode_desc &desc)
 {
-	uint64_t opcode = desc.opptr.q[0];
+	uint64_t opcode = desc.opptr;
 
 	int dr = (opcode >> 12) & 0x7f;
 	int sr = (opcode >> 19) & 0x7f;
@@ -666,7 +632,7 @@ void mb86235_frontend::describe_xfer1(opcode_desc &desc)
 		else
 		{
 			describe_ea(desc, md, sr & 7, ary, disp5);
-			desc.flags |= OPFLAG_READS_MEMORY;
+			desc.set_reads_memory();
 		}
 
 		if ((dr & 0x40) == 0)
@@ -676,7 +642,7 @@ void mb86235_frontend::describe_xfer1(opcode_desc &desc)
 		else
 		{
 			describe_ea(desc, md, dr & 7, ary, disp5);
-			desc.flags |= OPFLAG_WRITES_MEMORY;
+			desc.set_writes_memory();
 		}
 	}
 	else
@@ -685,26 +651,26 @@ void mb86235_frontend::describe_xfer1(opcode_desc &desc)
 		if (dir == 0)
 		{
 			describe_reg_read(desc, dr & 0x3f);
-			desc.flags |= OPFLAG_WRITES_MEMORY;
+			desc.set_writes_memory();
 		}
 		else
 		{
 			describe_reg_write(desc, dr & 0x3f);
-			desc.flags |= OPFLAG_READS_MEMORY;
+			desc.set_reads_memory();
 		}
 	}
 }
 
-void mb86235_frontend::describe_double_xfer1(opcode_desc &desc)
+void mb86235_device::frontend::describe_double_xfer1(opcode_desc &desc)
 {
-	uint64_t opcode = desc.opptr.q[0];
+	uint64_t opcode = desc.opptr;
 
-	fatalerror("mb86235_frontend: describe_double_xfer1 at %08X (%08X%08X)", desc.pc, (uint32_t)(opcode >> 32), (uint32_t)(opcode));
+	fatalerror("mb86235_device::frontend: describe_double_xfer1 at %08X (%08X%08X)", desc.pc, (uint32_t)(opcode >> 32), (uint32_t)(opcode));
 }
 
-void mb86235_frontend::describe_xfer2(opcode_desc &desc)
+void mb86235_device::frontend::describe_xfer2(opcode_desc &desc)
 {
-	uint64_t opcode = desc.opptr.q[0];
+	uint64_t opcode = desc.opptr;
 
 	int op = (opcode >> 39) & 3;
 	int trm = (opcode >> 38) & 1;
@@ -730,7 +696,7 @@ void mb86235_frontend::describe_xfer2(opcode_desc &desc)
 			else
 			{
 				describe_ea(desc, md, sr & 7, ary, disp14);
-				desc.flags |= OPFLAG_READS_MEMORY;
+				desc.set_reads_memory();
 			}
 
 			if ((dr & 0x40) == 0)
@@ -740,7 +706,7 @@ void mb86235_frontend::describe_xfer2(opcode_desc &desc)
 			else
 			{
 				describe_ea(desc, md, dr & 7, ary, disp14);
-				desc.flags |= OPFLAG_WRITES_MEMORY;
+				desc.set_writes_memory();
 			}
 		}
 		else
@@ -749,31 +715,31 @@ void mb86235_frontend::describe_xfer2(opcode_desc &desc)
 			if (dir == 0)
 			{
 				describe_reg_read(desc, dr & 0x3f);
-				desc.flags |= OPFLAG_WRITES_MEMORY;
+				desc.set_writes_memory();
 			}
 			else
 			{
 				describe_reg_write(desc, dr & 0x3f);
-				desc.flags |= OPFLAG_READS_MEMORY;
+				desc.set_reads_memory();
 			}
 		}
 	}
 	else if (op == 2)   // MOV4
 	{
-		fatalerror("mb86235_frontend: describe_xfer2 MOV4 at %08X (%08X%08X)", desc.pc, (uint32_t)(opcode >> 32), (uint32_t)(opcode));
+		fatalerror("mb86235_device::frontend: describe_xfer2 MOV4 at %08X (%08X%08X)", desc.pc, (uint32_t)(opcode >> 32), (uint32_t)(opcode));
 	}
 
 }
 
-void mb86235_frontend::describe_double_xfer2(opcode_desc &desc)
+void mb86235_device::frontend::describe_double_xfer2(opcode_desc &desc)
 {
-	uint64_t opcode = desc.opptr.q[0];
-	fatalerror("mb86235_frontend: describe_double_xfer2 at %08X (%08X%08X)", desc.pc, (uint32_t)(opcode >> 32), (uint32_t)(opcode));
+	uint64_t opcode = desc.opptr;
+	fatalerror("mb86235_device::frontend: describe_double_xfer2 at %08X (%08X%08X)", desc.pc, (uint32_t)(opcode >> 32), (uint32_t)(opcode));
 }
 
-void mb86235_frontend::describe_xfer3(opcode_desc &desc)
+void mb86235_device::frontend::describe_xfer3(opcode_desc &desc)
 {
-	uint64_t opcode = desc.opptr.q[0];
+	uint64_t opcode = desc.opptr;
 
 	int dr = (opcode >> 19) & 0x7f;
 	int disp = (opcode >> 7) & 0xfff;
@@ -789,18 +755,18 @@ void mb86235_frontend::describe_xfer3(opcode_desc &desc)
 
 		case 2:     // RAM-A
 		case 3:     // RAM-B
-			desc.flags |= OPFLAG_WRITES_MEMORY;
+			desc.set_writes_memory();
 			describe_ea(desc, md, dr & 7, ary, disp);
 			break;
 	}
 }
 
-void mb86235_frontend::describe_control(opcode_desc &desc)
+void mb86235_device::frontend::describe_control(opcode_desc &desc)
 {
-	int ef1 = (desc.opptr.q[0] >> 16) & 0x3f;
-	int ef2 = desc.opptr.q[0] & 0xffff;
-	int cop = (desc.opptr.q[0] >> 22) & 0x1f;
-	int rel12 = util::sext<int>(desc.opptr.q[0], 12);
+	int ef1 = (desc.opptr >> 16) & 0x3f;
+	int ef2 = desc.opptr & 0xffff;
+	int cop = (desc.opptr >> 22) & 0x1f;
+	int rel12 = util::sext<unsigned>(desc.opptr, 12);
 
 	switch (cop)
 	{
@@ -808,13 +774,13 @@ void mb86235_frontend::describe_control(opcode_desc &desc)
 			break;
 		case 0x01:      // REP
 			if (ef1 != 0)   // ARx
-				AR_USED(desc, (ef2 >> 12) & 7);
+				desc.set_ar_used((ef2 >> 12) & 7);
 
-			desc.userflags |= OP_USERFLAG_REPEAT;
+			desc.set_repeat();
 			break;
 		case 0x02:      // SETL
 			if (ef1 != 0)   // ARx
-				AR_USED(desc, (ef2 >> 12) & 7);
+				desc.set_ar_used((ef2 >> 12) & 7);
 			break;
 		case 0x03:      // CLRFI/CLRFO/CLRF
 			break;
@@ -837,24 +803,25 @@ void mb86235_frontend::describe_control(opcode_desc &desc)
 		case 0x0d:      // SETM #imm1, WAIT
 			break;
 		case 0x13:      // DBLP rel12
-			desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
+			desc.set_is_conditional_branch();
 			desc.targetpc = desc.pc + rel12;
 			desc.delayslots = 1;
 			break;
 		case 0x14:      // DBBC ARx:y, rel12
-			desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
+			desc.set_is_conditional_branch();
 			desc.targetpc = desc.pc + rel12;
 			desc.delayslots = 1;
-			AR_USED(desc, ((desc.opptr.q[0] >> 13) & 7));
+			desc.set_ar_used(((desc.opptr >> 13) & 7));
 			break;
 		case 0x15:      // DBBS ARx:y, rel12
-			desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
+			desc.set_is_conditional_branch();
 			desc.targetpc = desc.pc + rel12;
 			desc.delayslots = 1;
-			AR_USED(desc, ((desc.opptr.q[0] >> 13) & 7));
+			desc.set_ar_used(((desc.opptr >> 13) & 7));
 			break;
 		case 0x1b:      // DRET
-			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			desc.set_is_unconditional_branch();
+			desc.set_end_sequence();
 			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.delayslots = 1;
 			break;
@@ -864,7 +831,7 @@ void mb86235_frontend::describe_control(opcode_desc &desc)
 		case 0x18:      // DCcc
 		case 0x19:      // DCNcc
 		{
-			switch ((desc.opptr.q[0] >> 12) & 0xf)
+			switch ((desc.opptr >> 12) & 0xf)
 			{
 				case 0x0: desc.targetpc = ef2 & 0xfff; break;
 				case 0x1: desc.targetpc = desc.pc + rel12; break;
@@ -884,7 +851,7 @@ void mb86235_frontend::describe_control(opcode_desc &desc)
 				case 0xf: desc.targetpc = BRANCH_TARGET_DYNAMIC; describe_reg_read(desc, (ef2 >> 6) & 0x3f); break;
 			}
 
-			desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
+			desc.set_is_conditional_branch();
 			desc.delayslots = 1;
 			break;
 		}
@@ -892,7 +859,7 @@ void mb86235_frontend::describe_control(opcode_desc &desc)
 		case 0x1a:      // DCALL
 		case 0x12:      // DJMP
 		{
-			switch ((desc.opptr.q[0] >> 12) & 0xf)
+			switch ((desc.opptr >> 12) & 0xf)
 			{
 				case 0x0: desc.targetpc = ef2 & 0xfff; break;
 				case 0x1: desc.targetpc = desc.pc + rel12; break;
@@ -912,7 +879,8 @@ void mb86235_frontend::describe_control(opcode_desc &desc)
 				case 0xf: desc.targetpc = BRANCH_TARGET_DYNAMIC; describe_reg_read(desc, (ef2 >> 6) & 0x3f); break;
 			}
 
-			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			desc.set_is_unconditional_branch();
+			desc.set_end_sequence();
 			desc.delayslots = 1;
 			break;
 		}

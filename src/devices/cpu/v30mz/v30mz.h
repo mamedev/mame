@@ -132,10 +132,10 @@ protected:
 	inline void i_popf();
 
 	// sub implementations
-	inline void add_byte();
-	inline void add_word();
-	inline void sub_byte();
-	inline void sub_word();
+	inline void add_byte(uint8_t c = 0);
+	inline void add_word(uint8_t c = 0);
+	inline void sub_byte(uint8_t c = 0);
+	inline void sub_word(uint8_t c = 0);
 	inline void or_byte();
 	inline void or_word();
 	inline void and_byte();

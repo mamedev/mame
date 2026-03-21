@@ -1,27 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:m1macrophage
-/*
-Virtual analog filters:
-
-* VA_LPF4 / va_lpf4_device
-
-    An ideal (linear) 4th order, resonant low-pass filter.
-
-    Cutoff frequency and resonance can either be provided by calling class
-    methods, or via input streams.
-
-    The frequency CV is in Hz, and the resonance CV is the feedback gain (0-4).
-    The meaning of CV can be different in subclasses: it will typically match
-    the type of inputs in the emulated hardware.
-
-* CEM3320_LPF4 / cem3320_lpf4_device:
-
-    A CEM3320 configured as a 4th order low-pass filter, with optional resonance
-    control.
-
-    The frequency CV is the voltage applied to pin 12. The resonance CV is the
-    voltage applied to resistor R_RC, connected to pin 9.
-*/
 
 #ifndef MAME_SOUND_VA_VCF_H
 #define MAME_SOUND_VA_VCF_H
@@ -29,8 +7,15 @@ Virtual analog filters:
 #pragma once
 
 DECLARE_DEVICE_TYPE(VA_LPF4, va_lpf4_device)
-DECLARE_DEVICE_TYPE(CEM3320_LPF4, cem3320_lpf4_device)
 
+// A 4th order resonant low-pass filter.
+//
+// Cutoff frequency and resonance can either be provided by calling class
+// methods, or via input streams.
+//
+// The frequency CV is in Hz, and the resonance CV is the feedback gain (0-4).
+// The meaning of CV can be different in subclasses: it will typically match
+// the type of inputs in the emulated hardware.
 class va_lpf4_device : public device_t, public device_sound_interface
 {
 public:
@@ -43,10 +28,42 @@ public:
 
 	va_lpf4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
 
-	// The meaning of "CV" depends on the class being instantiated. See the
-	// overview at the top of the file.
-	void set_fixed_freq_cv(float freq_cv);
-	void set_fixed_res_cv(float res_cv);
+	// Disables streams. Intended for using this filter in sound_stream_update()
+	// of other devices. The device that embeds this should call process_sample()
+	// for each sample in its stream, possibly after calling set_fixed_freq_cv()
+	// and set_fixed_res_cv().
+	va_lpf4_device &configure_streamless(u32 sample_rate) ATTR_COLD;
+
+	va_lpf4_device &configure_input_gain(float gain) ATTR_COLD;
+
+	// Bass gain compensation vs. resonance.
+	// 0 - No compensation. Gain at lower frequencies will drop as resonance increases.
+	// 1 - Gain at lower frequencies will remain constant as resonance increases.
+	// The value, which can be between 0 and 1, will depend on the device being
+	// emulated. The original moog filter and older ICs (e.g. CEM3320) do not
+	// compensate. Newer designs and ICs (e.g. CEM3394, CEM3328) provide fixed
+	// or configurable compensation.
+	va_lpf4_device &configure_bass_gain_comp(float comp) ATTR_COLD;
+
+	// Larger values result in more distortion and more of the (filtered)
+	// signal making it through at full resonance. The "correct" value will
+	// depend on the device being emulated, and finding it might require
+	// experimentation. A decent starting point is: 1 / (PP / 2), where PP is
+	// the peak-to-peak magnitude of the input signal.
+	// TODO: Revisit and/or find a better way to determine this.
+	va_lpf4_device &configure_drive(float drive) ATTR_COLD;
+
+	// Note that the meaning of "CV" can change depending on the subclass being
+	// instantiated.
+	void set_fixed_freq_cv(float freq_cv);  // frequency in Hz
+	void set_fixed_res_cv(float res_cv);  // feedback gain (typically 0-4, but can go over 4)
+
+	float get_freq();  // Returns the cutoff frequency, in Hz.
+	float get_res();  // Returns the feedback gain (0-4).
+
+	// Processes a sample through the filter.
+	// This only works when in "streamless" mode. See configure_streamless().
+	sound_stream::sample_t process_sample(sound_stream::sample_t s);
 
 protected:
 	va_lpf4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
@@ -58,68 +75,33 @@ protected:
 	void sound_stream_update(sound_stream &stream) override;
 
 private:
+	sound_stream::sample_t process_sample_internal(sound_stream::sample_t s);
+
+	u32 sample_rate() const;
+	void recalc_res();
 	void recalc_filter();
 
 	sound_stream *m_stream;
 
+	// Configuration, not needed in save state.
+	u32 m_streamless_sample_rate;  // Ignored (and 0) when in streaming mode.
+	float m_input_gain;
+	float m_gain_comp;
+	float m_drive;
+
+	// Filter state.
 	float m_fc;  // Cutoff frequency in Hz.
 	float m_res;  // Feedback gain.
-	std::array<float, 5> m_a;
-	std::array<float, 5> m_b;
-	std::array<float, 4> m_x;
-	std::array<float, 4> m_y;
-};
-
-
-// A CEM3320 configured as a 4th order lowpass filter, with optional resonance.
-// freq CV: Voltage applied to pin 12.
-// res CV: Voltage applied to resistor R_RC connected to pin 9.
-
-// Known inaccuracies:
-// - Filter implementation is linear.
-// - On the actual device, once self-oscillation is achieved, increasing the
-//   resonance CV will increase the amplitude of the oscillation (up to a limit).
-//   This is not modeled here. The maximum resonance is capped for filter stability.
-// - The resonance CV response was eyeballed from a graph on the datasheet, and
-//   is approximate. Furthermore, that graph only goes up to a control current
-//   of 300 uA. The implementation here extrapolates linearly beyond that.
-class cem3320_lpf4_device : public va_lpf4_device
-{
-public:
-	// c_p: pole capacitor. The value of the capacitors connected to pins 4, 5, 11, 16.
-	// r_f: feedback resistor. The value of the resistors connecting pins 1 and 7,
-	//      2 and 6, 17 and 15, and 18 and 10.
-	cem3320_lpf4_device(const machine_config &mconfig, const char *tag, device_t *owner, float c_p, float r_f) ATTR_COLD;
-	cem3320_lpf4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
-
-	// Enable resonance (pin 10 connected to pin 8, via passive components)
-	// using the configuration in the datasheet.
-	// r_rc: The resistor connected to the resonance control input (pin 9).
-	//       R_RC in the datasheet.
-	// r_ri: The resistor between the filter output and the resonance signal
-	//       input (pin 8). R_RI in the datasheet.
-	cem3320_lpf4_device &configure_resonance(float r_rc, float r_ri) ATTR_COLD;
-
-	// Similar to the above, but accommodates additional external circuitry that
-	// affects the filter's coefficients.
-	// r_ri_gnd: Some designs add a resistor from the resonance signal input
-	//           (pin 8) to ground, possibly via a DC-blocking capacitor. Set
-	//           to a negative number if no such resistor exists.
-	// external_gain: Gain applied to the filter output (pin 10) before routing
-	//                to the resonance signal input (pin 8).
-	cem3320_lpf4_device &configure_resonance(float r_rc, float r_ri, float r_ri_gnd, float external_gain) ATTR_COLD;
-
-protected:
-	float cv_to_freq(float freq_cv) const override;
-	float cv_to_res(float res_cv) const override;
-
-private:
-	// Configuration, not needed in save state.
-	float m_r_eq;  // R_EQ in the datasheet.
-	float m_cv2freq;  // Cached computation for frequency calculations.
-	bool m_res_enabled;
-	float m_r_rc;  // R_RC in the datasheet.
-	float m_res_a;  // Cached computation for resonance calculations.
+	struct filter_stage
+	{
+		float alpha = 1;
+		float beta = 0;
+		float state = 0;
+	};
+	std::array<filter_stage, 4> m_stages;
+	float m_alpha0;
+	float m_G4;
+	float m_gain_comp_scale;
 };
 
 #endif  // MAME_SOUND_VA_VCF_H

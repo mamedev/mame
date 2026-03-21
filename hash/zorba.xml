@@ -101,7 +101,7 @@ oracle24.td0    1986-05-01  192K    Oracle of Zeus Vol.2 No.4
 	</software>
 
 	<software name="cpm16a" cloneof="cpm" supported="no">
-		<description>58K CP/M (v2.2, BIOS v1.6, Alt)</description>
+		<description>58K CP/M (v2.2, BIOS v1.6, alt)</description>
 		<year>1984</year>
 		<publisher>Telcon</publisher>
 

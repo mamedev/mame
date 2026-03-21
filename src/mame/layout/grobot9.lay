@@ -95,14 +95,13 @@ authors:hap
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="1" right="50" top="2.5" bottom="63.4" />
+		<bounds left="0" right="51" top="2.5" bottom="63.4" />
 
-		<element ref="text_u1"><bounds x="0" y="3.5" width="52" height="1.5" /></element>
-		<element ref="text_u2"><bounds x="0" y="5.0" width="52" height="1.5" /></element>
-		<element ref="text_u3"><bounds x="0" y="6.5" width="52" height="1.5" /></element>
+		<element ref="text_u1"><bounds x="0" y="3.5" width="51" height="1.5" /></element>
+		<element ref="text_u2"><bounds x="0" y="5.0" width="51" height="1.5" /></element>
+		<element ref="text_u3"><bounds x="0" y="6.5" width="51" height="1.5" /></element>
 
-	<!-- misc buttons -->
-
+		<!-- misc buttons -->
 		<element ref="static_yellow"><bounds x="43" y="16" width="5" height="5" /></element>
 		<element ref="static_yellow"><bounds x="43" y="31" width="5" height="5" /></element>
 		<element ref="static_yellow"><bounds x="43" y="46" width="5" height="5" /></element>
@@ -114,7 +113,6 @@ authors:hap
 		<element ref="text_r1"><bounds x="39" y="21.4" width="13" height="2" /></element>
 		<element ref="text_r2"><bounds x="39" y="36.4" width="13" height="2" /></element>
 		<element ref="text_r3"><bounds x="39" y="51.4" width="13" height="2" /></element>
-
 
 		<element ref="static_white"><bounds x="18" y="55" width="5" height="5" /></element>
 		<element ref="static_white"><bounds x="26" y="55" width="5" height="5" /></element>
@@ -128,10 +126,8 @@ authors:hap
 		<element ref="text_d2"><bounds x="24" y="60.4" width="9" height="2" /></element>
 		<element ref="text_d3"><bounds x="32" y="60.4" width="9" height="2" /></element>
 
-
-	<!-- coloured lighted buttons -->
-	<!-- row 1 2 3 -->
-
+		<!-- coloured lighted buttons -->
+		<!-- row 1 2 3 -->
 		<element ref="button1">
 			<bounds x="3" y="9" width="10" height="12" />
 		</element>
@@ -186,8 +182,7 @@ authors:hap
 			<bounds x="29" y="9" width="10" height="12" />
 		</element>
 
-	<!-- row 8 9 4 -->
-
+		<!-- row 8 9 4 -->
 		<element ref="button8">
 			<bounds x="3" y="24" width="10" height="12" />
 		</element>
@@ -242,8 +237,7 @@ authors:hap
 			<bounds x="29" y="24" width="10" height="12" />
 		</element>
 
-	<!-- row 7 6 5 -->
-
+		<!-- row 7 6 5 -->
 		<element ref="button7">
 			<bounds x="3" y="39" width="10" height="12" />
 		</element>
@@ -298,8 +292,7 @@ authors:hap
 			<bounds x="29" y="39" width="10" height="12" />
 		</element>
 
-	<!-- number labels -->
-
+		<!-- number labels -->
 		<element ref="text_1"><bounds x="3" y="21.4" width="9" height="2" /></element>
 		<element ref="text_2"><bounds x="16" y="21.4" width="9" height="2" /></element>
 		<element ref="text_3"><bounds x="29" y="21.4" width="9" height="2" /></element>

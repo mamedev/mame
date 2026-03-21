@@ -54,7 +54,7 @@ void ultra24f_device::uscpu_map(address_map &map)
 	map(0x000000, 0x00ffff).rom().region("firmware", 0);
 	map(0xa00000, 0xa00001).nopr();
 	map(0xff8001, 0xff8001).select(0x18).rw(FUNC(ultra24f_device::bmic_r), FUNC(ultra24f_device::bmic_w));
-	map(0xff9000, 0xff901f).m("scsi:7:scsic", FUNC(ncr53cf94_device::map)).umask16(0x00ff);
+	map(0xff9000, 0xff901f).m("scsic", FUNC(ncr53cf94_device::map)).umask16(0x00ff);
 	map(0xffc000, 0xffffff).ram();
 }
 
@@ -71,7 +71,7 @@ void ultra24f_device::device_add_mconfig(machine_config &config)
 
 	I82355(config, m_bmic, 0);
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
@@ -79,8 +79,10 @@ void ultra24f_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("scsic", NCR53CF94) // Emulex FAS216
-		.machine_config([this] (device_t *device) { scsic_config(device); });
+
+	auto &scsic(NCR53CF94(config, "scsic", 40_MHz_XTAL));
+	scsi.set_external_device(7, scsic);
+	//scsic.irq_handler_cb().set_inputline(m_uscpu, M68K_IRQ_1);
 
 	DP8473(config, m_fdc, 24_MHz_XTAL); // custom-marked as USC020-1-24
 }

@@ -422,6 +422,7 @@ protected:
 	u8 downtown_ip_r(offs_t offset);
 	void calibr50_sub_bankswitch_w(u8 data);
 	void calibr50_soundlatch2_w(u8 data);
+	void calibr50_sub_reset_w(u8 data);
 	void twineagl_ctrl_w(u8 data);
 	u16 twineagl_debug_r();
 	u16 twineagl_200100_r(offs_t offset);
@@ -756,20 +757,20 @@ void downtown_state::ipl2_ack_w(u16 data)
 
 void tndrcade_state::tndrcade_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                             // ROM
+	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x200001).w(FUNC(tndrcade_state::ipl1_ack_w));
-	map(0x280000, 0x280001).nopw();                        // ? 0 / 1 (sub cpu related?)
-	map(0x300000, 0x300001).nopw();                        // ? 0 / 1
-	map(0x380000, 0x3803ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // Palette
+	map(0x280000, 0x280001).nopw(); // ? 0 / 1 (sub cpu related?)
+	map(0x300000, 0x300001).nopw(); // ? 0 / 1
+	map(0x380000, 0x3803ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x400000, 0x400000).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8));
-	map(0x600000, 0x6005ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r16), FUNC(x1_001_device::spriteylow_w16));     // Sprites Y
+	map(0x600000, 0x6005ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r16), FUNC(x1_001_device::spriteylow_w16));
 	map(0x600600, 0x600607).ram().rw(m_spritegen, FUNC(x1_001_device::spritectrl_r16), FUNC(x1_001_device::spritectrl_w16));
 
-	map(0x800000, 0x800007).w(FUNC(tndrcade_state::sub_ctrl_w)).umask16(0x00ff);               // Sub CPU Control?
-	map(0xa00000, 0xa00fff).rw(FUNC(tndrcade_state::sharedram_68000_r), FUNC(tndrcade_state::sharedram_68000_w)).umask16(0x00ff);  // Shared RAM
-	map(0xc00000, 0xc03fff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecode_r16), FUNC(x1_001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xe00000, 0xe03fff).ram().share("mainram");                  // RAM (Mirrored?)
-	map(0xffc000, 0xffffff).ram().share("mainram");                  // RAM (Mirrored?)
+	map(0x800000, 0x800007).w(FUNC(tndrcade_state::sub_ctrl_w)).umask16(0x00ff); // Sub CPU Control?
+	map(0xa00000, 0xa00fff).rw(FUNC(tndrcade_state::sharedram_68000_r), FUNC(tndrcade_state::sharedram_68000_w)).umask16(0x00ff);
+	map(0xc00000, 0xc03fff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecode_r16), FUNC(x1_001_device::spritecode_w16));
+	map(0xe00000, 0xe03fff).ram().share("mainram"); // Mirrored?
+	map(0xffc000, 0xffffff).ram().share("mainram"); // Mirrored?
 }
 
 
@@ -789,24 +790,24 @@ void downtown_state::twineagl_ctrl_w(u8 data)
 
 void downtown_state::downtown_map(address_map &map)
 {
-	map(0x000000, 0x09ffff).rom();                             // ROM
-	map(0x100000, 0x103fff).rw(m_x1snd, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-	map(0x200000, 0x200001).noprw();                             // watchdog? (twineagl)
+	map(0x000000, 0x09ffff).rom();
+	map(0x100000, 0x103fff).rw(m_x1snd, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));
+	map(0x200000, 0x200001).noprw(); // watchdog? (twineagl)
 	map(0x300000, 0x300001).w(FUNC(downtown_state::ipl1_ack_w));
-	map(0x400000, 0x400007).w(FUNC(downtown_state::twineagl_tilebank_w)).umask16(0x00ff);      // special tile banking to animate water in twineagl
+	map(0x400000, 0x400007).w(FUNC(downtown_state::twineagl_tilebank_w)).umask16(0x00ff); // special tile banking to animate water in twineagl
 	map(0x500001, 0x500001).w(FUNC(downtown_state::twineagl_ctrl_w));
 	map(0x600001, 0x600001).r(FUNC(downtown_state::dsw1_r));
 	map(0x600003, 0x600003).r(FUNC(downtown_state::dsw2_r));
-	map(0x700000, 0x7003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
-	map(0x800000, 0x800005).w(m_tiles, FUNC(x1_012_device::vctrl_w));// VRAM Ctrl
-	map(0x900000, 0x903fff).ram().w(m_tiles, FUNC(x1_012_device::vram_w)).share("tiles"); // VRAM
-	map(0xa00000, 0xa00007).w(FUNC(downtown_state::sub_ctrl_w)).umask16(0x00ff);               // Sub CPU Control?
-	map(0xb00000, 0xb00fff).rw(FUNC(downtown_state::sharedram_68000_r), FUNC(downtown_state::sharedram_68000_w)).umask16(0x00ff);  // Shared RAM
+	map(0x700000, 0x7003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x800000, 0x800005).w(m_tiles, FUNC(x1_012_device::vctrl_w));
+	map(0x900000, 0x903fff).ram().w(m_tiles, FUNC(x1_012_device::vram_w)).share("tiles");
+	map(0xa00000, 0xa00007).w(FUNC(downtown_state::sub_ctrl_w)).umask16(0x00ff);
+	map(0xb00000, 0xb00fff).rw(FUNC(downtown_state::sharedram_68000_r), FUNC(downtown_state::sharedram_68000_w)).umask16(0x00ff);
 	map(0xc00000, 0xc00000).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8));
-	map(0xd00000, 0xd005ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r16), FUNC(x1_001_device::spriteylow_w16));     // Sprites Y
+	map(0xd00000, 0xd005ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r16), FUNC(x1_001_device::spriteylow_w16));
 	map(0xd00600, 0xd00607).ram().rw(m_spritegen, FUNC(x1_001_device::spritectrl_r16), FUNC(x1_001_device::spritectrl_w16));
-	map(0xe00000, 0xe03fff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecode_r16), FUNC(x1_001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xf00000, 0xffffff).ram();                             // RAM
+	map(0xe00000, 0xe03fff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecode_r16), FUNC(x1_001_device::spritecode_w16));
+	map(0xf00000, 0xffffff).ram();
 }
 
 
@@ -816,30 +817,30 @@ void downtown_state::downtown_map(address_map &map)
 
 void downtown_state::calibr50_map(address_map &map)
 {
-	map(0x000000, 0x09ffff).rom();                             // ROM
+	map(0x000000, 0x09ffff).rom();
 	map(0x100000, 0x100001).r(FUNC(downtown_state::ipl2_ack_r));
-	map(0x200000, 0x200fff).ram().share("nvram");              // NVRAM (battery backed)
+	map(0x200000, 0x200fff).ram().share("nvram");
 	map(0x300000, 0x300001).rw(FUNC(downtown_state::ipl1_ack_r), FUNC(downtown_state::ipl1_ack_w));
 	map(0x400000, 0x400001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0x500000, 0x500001).nopw();                        // ?
+	map(0x500001, 0x500001).w(FUNC(downtown_state::calibr50_sub_reset_w));
 	map(0x600001, 0x600001).r(FUNC(downtown_state::dsw1_r));
 	map(0x600003, 0x600003).r(FUNC(downtown_state::dsw2_r));
-	map(0x700000, 0x7003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
-	map(0x800000, 0x800005).w(FUNC(downtown_state::vram_layer0_vctrl_raster_trampoline_w));// VRAM Ctrl
-	map(0x900000, 0x903fff).ram().w(m_tiles, FUNC(x1_012_device::vram_w)).share("tiles"); // VRAM
-	map(0x904000, 0x904fff).ram();                             //
-	map(0xa00000, 0xa00001).portr("P1");                 // X1-004
-	map(0xa00002, 0xa00003).portr("P2");                 // X1-004
-	map(0xa00008, 0xa00009).portr("COINS");              // X1-004
+	map(0x700000, 0x7003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x800000, 0x800005).w(FUNC(downtown_state::vram_layer0_vctrl_raster_trampoline_w));
+	map(0x900000, 0x903fff).ram().w(m_tiles, FUNC(x1_012_device::vram_w)).share("tiles");
+	map(0x904000, 0x904fff).ram();
+	map(0xa00000, 0xa00001).portr("P1");    // X1-004
+	map(0xa00002, 0xa00003).portr("P2");    // X1-004
+	map(0xa00008, 0xa00009).portr("COINS"); // X1-004
 	map(0xa00010, 0xa00017).r("upd4701", FUNC(upd4701_device::read_xy)).umask16(0x00ff);
 	map(0xa00019, 0xa00019).r("upd4701", FUNC(upd4701_device::reset_xy_r));
-	map(0xb00001, 0xb00001).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)); // From Sub CPU
-	map(0xb00001, 0xb00001).w(m_soundlatch[0], FUNC(generic_latch_8_device::write)); // To Sub CPU
+	map(0xb00001, 0xb00001).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
+	map(0xb00001, 0xb00001).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0xc00000, 0xc00000).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8));
-	map(0xd00000, 0xd005ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r16), FUNC(x1_001_device::spriteylow_w16));     // Sprites Y
+	map(0xd00000, 0xd005ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r16), FUNC(x1_001_device::spriteylow_w16));
 	map(0xd00600, 0xd00607).ram().rw(m_spritegen, FUNC(x1_001_device::spritectrl_r16), FUNC(x1_001_device::spritectrl_w16));
-	map(0xe00000, 0xe03fff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecode_r16), FUNC(x1_001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xff0000, 0xffffff).ram();                             // RAM
+	map(0xe00000, 0xe03fff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecode_r16), FUNC(x1_001_device::spritecode_w16));
+	map(0xff0000, 0xffffff).ram();
 }
 
 
@@ -895,25 +896,25 @@ void usclssic_state::lockout_w(u8 data)
 
 void usclssic_state::usclssic_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                                 // ROM
-	map(0x800000, 0x8005ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r16), FUNC(x1_001_device::spriteylow_w16)); // Sprites Y
+	map(0x000000, 0x07ffff).rom();
+	map(0x800000, 0x8005ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r16), FUNC(x1_001_device::spriteylow_w16));
 	map(0x800600, 0x800607).ram().rw(m_spritegen, FUNC(x1_001_device::spritectrl_r16), FUNC(x1_001_device::spritectrl_w16));
 	map(0x900000, 0x900000).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8));
-	map(0xa00000, 0xa00005).rw(m_tiles, FUNC(x1_012_device::vctrl_r), FUNC(x1_012_device::vctrl_w));         // VRAM Ctrl
-	map(0xb00000, 0xb003ff).ram().share(m_paletteram);  // Palette
+	map(0xa00000, 0xa00005).rw(m_tiles, FUNC(x1_012_device::vctrl_r), FUNC(x1_012_device::vctrl_w));
+	map(0xb00000, 0xb003ff).ram().share(m_paletteram);
 	map(0xb40000, 0xb40007).r(m_upd4701, FUNC(upd4701_device::read_xy)).umask16(0x00ff);
-	map(0xb40001, 0xb40001).w(FUNC(usclssic_state::lockout_w));  // Coin Lockout + Tiles Banking
+	map(0xb40001, 0xb40001).w(FUNC(usclssic_state::lockout_w)); // Coin Lockout + Tiles Banking
 	map(0xb4000a, 0xb4000b).w(FUNC(usclssic_state::ipl1_ack_w));
-	map(0xb40010, 0xb40011).portr("COINS");                  // Coins
-	map(0xb40011, 0xb40011).w(m_soundlatch[0], FUNC(generic_latch_8_device::write)); // To Sub CPU
-	map(0xb40018, 0xb4001f).r(FUNC(usclssic_state::dsw_r));                // 2 DSWs
+	map(0xb40010, 0xb40011).portr("COINS");
+	map(0xb40011, 0xb40011).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
+	map(0xb40018, 0xb4001f).r(FUNC(usclssic_state::dsw_r)); // 2 DSWs
 	map(0xb40018, 0xb40019).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0xb80000, 0xb80001).r(FUNC(usclssic_state::ipl2_ack_r));
-	map(0xc00000, 0xc03fff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecode_r16), FUNC(x1_001_device::spritecode_w16));         // Sprites Code + X + Attr
-	map(0xd00000, 0xd03fff).ram().w(m_tiles, FUNC(x1_012_device::vram_w)).share("tiles"); // VRAM
-	map(0xd04000, 0xd04fff).ram();                                 //
-	map(0xe00000, 0xe00fff).ram();                                 // NVRAM? (odd bytes)
-	map(0xff0000, 0xffffff).ram();                                 // RAM
+	map(0xc00000, 0xc03fff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecode_r16), FUNC(x1_001_device::spritecode_w16));
+	map(0xd00000, 0xd03fff).ram().w(m_tiles, FUNC(x1_012_device::vram_w)).share("tiles");
+	map(0xd04000, 0xd04fff).ram();
+	map(0xe00000, 0xe00fff).ram(); // NVRAM? (odd bytes)
+	map(0xff0000, 0xffffff).ram();
 }
 
 
@@ -946,20 +947,20 @@ u8 tndrcade_state::ff_r(){return 0xff;}
 
 void tndrcade_state::tndrcade_sub_map(address_map &map)
 {
-	map(0x0000, 0x01ff).ram();                             // RAM
-	map(0x0800, 0x0800).r(FUNC(tndrcade_state::ff_r));                      // ? (bits 0/1/2/3: 1 -> do test 0-ff/100-1e0/5001-57ff/banked rom)
-	//map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));             //
-	//map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
-	map(0x1000, 0x1000).portr("P1");                 // P1
-	map(0x1000, 0x1000).w(FUNC(tndrcade_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
-	map(0x1001, 0x1001).portr("P2");                 // P2
-	map(0x1002, 0x1002).portr("COINS");              // Coins
+	map(0x0000, 0x01ff).ram();
+	map(0x0800, 0x0800).r(FUNC(tndrcade_state::ff_r)); // ? (bits 0/1/2/3: 1 -> do test 0-ff/100-1e0/5001-57ff/banked rom)
+	//map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+	//map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
+	map(0x1000, 0x1000).portr("P1");
+	map(0x1000, 0x1000).w(FUNC(tndrcade_state::sub_bankswitch_lockout_w));
+	map(0x1001, 0x1001).portr("P2");
+	map(0x1002, 0x1002).portr("COINS");
 	map(0x2000, 0x2001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x3000, 0x3001).w("ym2", FUNC(ym3812_device::write));
-	map(0x5000, 0x57ff).ram().share(m_sharedram);       // Shared RAM
-	map(0x6000, 0x7fff).rom();                             // ROM
-	map(0x8000, 0xbfff).bankr(m_subbank);                        // Banked ROM
-	map(0xc000, 0xffff).rom();                             // ROM
+	map(0x5000, 0x57ff).ram().share(m_sharedram);
+	map(0x6000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr(m_subbank);
+	map(0xc000, 0xffff).rom();
 }
 
 
@@ -969,17 +970,17 @@ void tndrcade_state::tndrcade_sub_map(address_map &map)
 
 void downtown_state::twineagl_sub_map(address_map &map)
 {
-	map(0x0000, 0x01ff).ram();                         // RAM
-	map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));         //
-	map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
-	map(0x1000, 0x1000).portr("P1");             // P1
-	map(0x1000, 0x1000).w(FUNC(downtown_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
-	map(0x1001, 0x1001).portr("P2");             // P2
-	map(0x1002, 0x1002).portr("COINS");          // Coins
-	map(0x5000, 0x57ff).ram().share(m_sharedram);       // Shared RAM
-	map(0x7000, 0x7fff).rom();                         // ROM
-	map(0x8000, 0xbfff).bankr(m_subbank);                    // Banked ROM
-	map(0xc000, 0xffff).rom();                         // ROM
+	map(0x0000, 0x01ff).ram();
+	map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+	map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
+	map(0x1000, 0x1000).portr("P1");
+	map(0x1000, 0x1000).w(FUNC(downtown_state::sub_bankswitch_lockout_w));
+	map(0x1001, 0x1001).portr("P2");
+	map(0x1002, 0x1002).portr("COINS");
+	map(0x5000, 0x57ff).ram().share(m_sharedram);
+	map(0x7000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr(m_subbank);
+	map(0xc000, 0xffff).rom();
 }
 
 
@@ -999,11 +1000,11 @@ u8 downtown_state::downtown_ip_r(offs_t offset)
 	{
 		case 0: return (m_coins->read() & 0xf0) + (dir1 >> 8);  // upper 4 bits of p1 rotation + coins
 		case 1: return (dir1 & 0xff);                   // lower 8 bits of p1 rotation
-		case 2: return m_p1->read();    // p1
+		case 2: return m_p1->read();                    // p1
 		case 3: return 0xff;                            // ?
 		case 4: return (dir2 >> 8);                     // upper 4 bits of p2 rotation + ?
 		case 5: return (dir2 & 0xff);                   // lower 8 bits of p2 rotation
-		case 6: return m_p2->read();    // p2
+		case 6: return m_p2->read();                    // p2
 		case 7: return 0xff;                            // ?
 	}
 
@@ -1012,15 +1013,15 @@ u8 downtown_state::downtown_ip_r(offs_t offset)
 
 void downtown_state::downtown_sub_map(address_map &map)
 {
-	map(0x0000, 0x01ff).ram();                         // RAM
-	map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));         //
-	map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
-	map(0x1000, 0x1007).r(FUNC(downtown_state::downtown_ip_r));         // Input Ports
-	map(0x1000, 0x1000).w(FUNC(downtown_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
-	map(0x5000, 0x57ff).ram().share(m_sharedram);       // Shared RAM
-	map(0x7000, 0x7fff).rom();                         // ROM
-	map(0x8000, 0xbfff).bankr(m_subbank);                    // Banked ROM
-	map(0xc000, 0xffff).rom();                         // ROM
+	map(0x0000, 0x01ff).ram();
+	map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+	map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
+	map(0x1000, 0x1007).r(FUNC(downtown_state::downtown_ip_r));
+	map(0x1000, 0x1000).w(FUNC(downtown_state::sub_bankswitch_lockout_w));
+	map(0x5000, 0x57ff).ram().share(m_sharedram);
+	map(0x7000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr(m_subbank);
+	map(0xc000, 0xffff).rom();
 }
 
 
@@ -1056,16 +1057,21 @@ void downtown_state::calibr50_soundlatch2_w(u8 data)
 	m_subcpu->spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
 }
 
+void downtown_state::calibr50_sub_reset_w(u8 data)
+{
+	m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
+}
+
 void downtown_state::calibr50_sub_map(address_map &map)
 {
 	map(0x0000, 0x1fff).lrw8(
-								 NAME([this](offs_t offset) { return m_x1snd->read(offset ^ 0x1000); }),
-								 NAME([this](offs_t offset, u8 data) { m_x1snd->write(offset ^ 0x1000, data); })); // Sound
-	map(0x4000, 0x4000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));             // From Main CPU
-	map(0x4000, 0x4000).w(FUNC(downtown_state::calibr50_sub_bankswitch_w));        // Bankswitching
-	map(0x8000, 0xbfff).bankr(m_subbank);                        // Banked ROM
-	map(0xc000, 0xffff).rom();                             // ROM
-	map(0xc000, 0xc000).w(FUNC(downtown_state::calibr50_soundlatch2_w));   // To Main CPU
+			NAME([this] (offs_t offset) { return m_x1snd->read(offset ^ 0x1000); }),
+			NAME([this] (offs_t offset, u8 data) { m_x1snd->write(offset ^ 0x1000, data); }));
+	map(0x4000, 0x4000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+	map(0x4000, 0x4000).w(FUNC(downtown_state::calibr50_sub_bankswitch_w));
+	map(0x8000, 0xbfff).bankr(m_subbank);
+	map(0xc000, 0xffff).rom();
+	map(0xc000, 0xc000).w(FUNC(downtown_state::calibr50_soundlatch2_w));
 }
 
 
@@ -1075,18 +1081,18 @@ void downtown_state::calibr50_sub_map(address_map &map)
 
 void downtown_state::metafox_sub_map(address_map &map)
 {
-	map(0x0000, 0x01ff).ram();                         // RAM
-	map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));         //
-	map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
-	map(0x1000, 0x1000).portr("COINS");          // Coins
-	map(0x1000, 0x1000).w(FUNC(downtown_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
-	map(0x1002, 0x1002).portr("P1");             // P1
-	//map(0x1004, 0x1004).nopr();                // ?
-	map(0x1006, 0x1006).portr("P2");             // P2
-	map(0x5000, 0x57ff).ram().share(m_sharedram);       // Shared RAM
-	map(0x7000, 0x7fff).rom();                         // ROM
-	map(0x8000, 0xbfff).bankr(m_subbank);                    // Banked ROM
-	map(0xc000, 0xffff).rom();                         // ROM
+	map(0x0000, 0x01ff).ram();
+	map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+	map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
+	map(0x1000, 0x1000).portr("COINS");
+	map(0x1000, 0x1000).w(FUNC(downtown_state::sub_bankswitch_lockout_w));
+	map(0x1002, 0x1002).portr("P1");
+	//map(0x1004, 0x1004).nopr(); // ?
+	map(0x1006, 0x1006).portr("P2");
+	map(0x5000, 0x57ff).ram().share(m_sharedram);
+	map(0x7000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr(m_subbank);
+	map(0xc000, 0xffff).rom();
 }
 
 

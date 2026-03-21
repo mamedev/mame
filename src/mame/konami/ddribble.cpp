@@ -349,8 +349,7 @@ uint8_t ddribble_state::vlm5030_busy_r()
 	return machine().rand(); // patch
 	// FIXME: remove ?
 #if 0
-	if (m_vlm->bsy()) return 1;
-	else return 0;
+	return m_vlm->bsy_r();
 #endif
 }
 
@@ -359,13 +358,13 @@ void ddribble_state::vlm5030_ctrl_w(uint8_t data)
 	// b7 : vlm data bus OE
 
 	// b6 : VLM5030-RST
-	m_vlm->rst(BIT(data, 6));
+	m_vlm->rst_w(BIT(data, 6));
 
 	// b5 : VLM5030-ST
-	m_vlm->st(BIT(data, 5));
+	m_vlm->st_w(BIT(data, 5));
 
 	// b4 : VLM5300-VCU
-	m_vlm->vcu(BIT(data, 4));
+	m_vlm->vcu_w(BIT(data, 4));
 
 	// b3 : ROM bank select
 	m_vlmbank->set_entry(BIT(data, 3));

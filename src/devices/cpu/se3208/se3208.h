@@ -11,14 +11,17 @@ enum
 	SE3208_R0, SE3208_R1, SE3208_R2, SE3208_R3, SE3208_R4, SE3208_R5, SE3208_R6, SE3208_R7
 };
 
-#define SE3208_INT  0
 
 
 class se3208_device :  public cpu_device
 {
 public:
+	enum
+	{
+		SE3208_INT = 0
+	};
 	// construction/destruction
-	se3208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	se3208_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// callback configuration
 	auto machinex_cb() { return m_machinex_cb.bind(); }
@@ -30,8 +33,8 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface implementation
-	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
-	virtual uint32_t execute_max_cycles() const noexcept override { return 1; }
+	virtual u32 execute_min_cycles() const noexcept override { return 1; }
+	virtual u32 execute_max_cycles() const noexcept override { return 1; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -52,126 +55,128 @@ private:
 	devcb_read8 m_iackx_cb;
 
 	//GPR
-	uint32_t m_R[8];
+	u32 m_R[8]{};
 	//SPR
-	uint32_t m_PC;
-	uint32_t m_SR;
-	uint32_t m_SP;
-	uint32_t m_ER;
-	uint32_t m_PPC;
+	u32 m_PC;
+	u32 m_SR;
+	u32 m_SP;
+	u32 m_ER;
+	u32 m_PPC;
 
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_program;
-	uint8_t m_IRQ;
-	uint8_t m_NMI;
+	u8 m_IRQ;
+	u8 m_NMI;
 
 	int m_icount;
 
-	inline void CLRFLAG(uint32_t f) { m_SR&=~f; }
-	inline void SETFLAG(uint32_t f) { m_SR|=f; }
-	inline bool TESTFLAG(uint32_t f) const { return m_SR&f; }
+	typedef void (se3208_device::*OP)(u16 opcode);
+	OP m_optable[0x10000];
 
-	inline uint8_t SE3208_Read8(uint32_t addr);
-	inline uint16_t SE3208_Read16(uint32_t addr);
-	inline uint32_t SE3208_Read32(uint32_t addr);
-	inline void SE3208_Write8(uint32_t addr,uint8_t val);
-	inline void SE3208_Write16(uint32_t addr,uint16_t val);
-	inline void SE3208_Write32(uint32_t addr,uint32_t val);
-	inline uint32_t AddWithFlags(uint32_t a,uint32_t b);
-	inline uint32_t SubWithFlags(uint32_t a,uint32_t b);
-	inline uint32_t AdcWithFlags(uint32_t a,uint32_t b);
-	inline uint32_t SbcWithFlags(uint32_t a,uint32_t b);
-	inline uint32_t MulWithFlags(uint32_t a,uint32_t b);
-	inline uint32_t NegWithFlags(uint32_t a);
-	inline uint32_t AsrWithFlags(uint32_t Val, uint8_t By);
-	inline uint32_t LsrWithFlags(uint32_t Val, uint8_t By);
-	inline uint32_t AslWithFlags(uint32_t Val, uint8_t By);
-	inline void PushVal(uint32_t Val);
-	inline uint32_t PopVal();
-	inline void TakeExceptionVector(uint8_t vector);
+	inline void CLRFLAG(u32 f) { m_SR &= ~f; }
+	inline void SETFLAG(u32 f) { m_SR |= f; }
+	inline bool TESTFLAG(u32 f) const { return m_SR & f; }
 
-	typedef void (se3208_device::*OP)(uint16_t Opcode);
-	OP OpTable[0x10000];
+	inline u8 read8(u32 addr);
+	inline u16 read16(u32 addr);
+	inline u32 read32(u32 addr);
+	inline void write8(u32 addr, u8 val);
+	inline void write16(u32 addr, u16 val);
+	inline void write32(u32 addr, u32 val);
+	inline u32 add_with_lfags(u32 a, u32 b);
+	inline u32 sub_with_lfags(u32 a, u32 b);
+	inline u32 adc_with_lfags(u32 a, u32 b);
+	inline u32 sbc_with_lfags(u32 a, u32 b);
+	inline u32 mul_with_lfags(u32 a, u32 b);
+	inline u32 neg_with_lfags(u32 a);
+	inline u32 asr_with_lfags(u32 Val, u8 By);
+	inline u32 lsr_with_lfags(u32 Val, u8 By);
+	inline u32 asl_with_lfags(u32 Val, u8 By);
+	inline u32 get_index(u32 index);
+	inline u32 get_extended_operand(u32 imm, u8 shift);
+	inline void push_val(u32 Val);
+	inline u32 pop_val();
+	inline void take_exception_vector(u8 vector);
 
-	void INVALIDOP(uint16_t Opcode);
-	void LDB(uint16_t Opcode);
-	void STB(uint16_t Opcode);
-	void LDS(uint16_t Opcode);
-	void STS(uint16_t Opcode);
-	void LD(uint16_t Opcode);
-	void ST(uint16_t Opcode);
-	void LDBU(uint16_t Opcode);
-	void LDSU(uint16_t Opcode);
-	void LERI(uint16_t Opcode);
-	void LDSP(uint16_t Opcode);
-	void STSP(uint16_t Opcode);
-	void PUSH(uint16_t Opcode);
-	void POP(uint16_t Opcode);
-	void LEATOSP(uint16_t Opcode);
-	void LEAFROMSP(uint16_t Opcode);
-	void LEASPTOSP(uint16_t Opcode);
-	void MOV(uint16_t Opcode);
-	void LDI(uint16_t Opcode);
-	void LDBSP(uint16_t Opcode);
-	void STBSP(uint16_t Opcode);
-	void LDSSP(uint16_t Opcode);
-	void STSSP(uint16_t Opcode);
-	void LDBUSP(uint16_t Opcode);
-	void LDSUSP(uint16_t Opcode);
-	void ADDI(uint16_t Opcode);
-	void SUBI(uint16_t Opcode);
-	void ADCI(uint16_t Opcode);
-	void SBCI(uint16_t Opcode);
-	void ANDI(uint16_t Opcode);
-	void ORI(uint16_t Opcode);
-	void XORI(uint16_t Opcode);
-	void CMPI(uint16_t Opcode);
-	void TSTI(uint16_t Opcode);
-	void ADD(uint16_t Opcode);
-	void SUB(uint16_t Opcode);
-	void ADC(uint16_t Opcode);
-	void SBC(uint16_t Opcode);
-	void AND(uint16_t Opcode);
-	void OR(uint16_t Opcode);
-	void XOR(uint16_t Opcode);
-	void CMP(uint16_t Opcode);
-	void TST(uint16_t Opcode);
-	void MULS(uint16_t Opcode);
-	void NEG(uint16_t Opcode);
-	void CALL(uint16_t Opcode);
-	void JV(uint16_t Opcode);
-	void JNV(uint16_t Opcode);
-	void JC(uint16_t Opcode);
-	void JNC(uint16_t Opcode);
-	void JP(uint16_t Opcode);
-	void JM(uint16_t Opcode);
-	void JNZ(uint16_t Opcode);
-	void JZ(uint16_t Opcode);
-	void JGE(uint16_t Opcode);
-	void JLE(uint16_t Opcode);
-	void JHI(uint16_t Opcode);
-	void JLS(uint16_t Opcode);
-	void JGT(uint16_t Opcode);
-	void JLT(uint16_t Opcode);
-	void JMP(uint16_t Opcode);
-	void JR(uint16_t Opcode);
-	void CALLR(uint16_t Opcode);
-	void ASR(uint16_t Opcode);
-	void LSR(uint16_t Opcode);
-	void ASL(uint16_t Opcode);
-	void EXTB(uint16_t Opcode);
-	void EXTS(uint16_t Opcode);
-	void SET(uint16_t Opcode);
-	void CLR(uint16_t Opcode);
-	void SWI(uint16_t Opcode);
-	void HALT(uint16_t Opcode);
-	void MVTC(uint16_t Opcode);
-	void MVFC(uint16_t Opcode);
+	void INVALIDOP(u16 opcode);
+	void LDB(u16 opcode);
+	void STB(u16 opcode);
+	void LDS(u16 opcode);
+	void STS(u16 opcode);
+	void LD(u16 opcode);
+	void ST(u16 opcode);
+	void LDBU(u16 opcode);
+	void LDSU(u16 opcode);
+	void LERI(u16 opcode);
+	void LDSP(u16 opcode);
+	void STSP(u16 opcode);
+	void PUSH(u16 opcode);
+	void POP(u16 opcode);
+	void LEATOSP(u16 opcode);
+	void LEAFROMSP(u16 opcode);
+	void LEASPTOSP(u16 opcode);
+	void MOV(u16 opcode);
+	void LDI(u16 opcode);
+	void LDBSP(u16 opcode);
+	void STBSP(u16 opcode);
+	void LDSSP(u16 opcode);
+	void STSSP(u16 opcode);
+	void LDBUSP(u16 opcode);
+	void LDSUSP(u16 opcode);
+	void ADDI(u16 opcode);
+	void SUBI(u16 opcode);
+	void ADCI(u16 opcode);
+	void SBCI(u16 opcode);
+	void ANDI(u16 opcode);
+	void ORI(u16 opcode);
+	void XORI(u16 opcode);
+	void CMPI(u16 opcode);
+	void TSTI(u16 opcode);
+	void ADD(u16 opcode);
+	void SUB(u16 opcode);
+	void ADC(u16 opcode);
+	void SBC(u16 opcode);
+	void AND(u16 opcode);
+	void OR(u16 opcode);
+	void XOR(u16 opcode);
+	void CMP(u16 opcode);
+	void TST(u16 opcode);
+	void MULS(u16 opcode);
+	void NEG(u16 opcode);
+	void CALL(u16 opcode);
+	void JV(u16 opcode);
+	void JNV(u16 opcode);
+	void JC(u16 opcode);
+	void JNC(u16 opcode);
+	void JP(u16 opcode);
+	void JM(u16 opcode);
+	void JNZ(u16 opcode);
+	void JZ(u16 opcode);
+	void JGE(u16 opcode);
+	void JLE(u16 opcode);
+	void JHI(u16 opcode);
+	void JLS(u16 opcode);
+	void JGT(u16 opcode);
+	void JLT(u16 opcode);
+	void JMP(u16 opcode);
+	void JR(u16 opcode);
+	void CALLR(u16 opcode);
+	void ASR(u16 opcode);
+	void LSR(u16 opcode);
+	void ASL(u16 opcode);
+	void EXTB(u16 opcode);
+	void EXTS(u16 opcode);
+	void SET(u16 opcode);
+	void CLR(u16 opcode);
+	void SWI(u16 opcode);
+	void HALT(u16 opcode);
+	void MVTC(u16 opcode);
+	void MVFC(u16 opcode);
 
-	void BuildTable(void);
-	OP DecodeOp(uint16_t Opcode);
-	void SE3208_NMI();
-	void SE3208_Interrupt();
+	void build_table();
+	OP decode_op(u16 opcode);
+	void nmi_execute();
+	void interrupt_execute();
 
 };
 

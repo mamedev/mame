@@ -2,6 +2,11 @@
 // copyright-holders:
 /**************************************************************************************************
 
+3Dlabs Permedia 2
+
+TODO:
+- placeholder for roms;
+- black screen when mounted;
 
 **************************************************************************************************/
 
@@ -22,7 +27,7 @@ DEFINE_DEVICE_TYPE(PERMEDIA2, permedia2_device,   "permedia2",   "3Dlabs Permedi
 permedia2_device::permedia2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_card_device(mconfig, type, tag, owner, clock)
 	, m_vga(*this, "vga")
-	, m_vga_rom(*this, "vga_rom")
+	, m_bios(*this, "bios")
 {
 	// TODO: can change class code
 	set_ids(0x104c3d07, 0x01, 0x030100, 0x104c3d07);
@@ -35,7 +40,7 @@ permedia2_device::permedia2_device(const machine_config &mconfig, const char *ta
 }
 
 ROM_START( permedia2 )
-	ROM_REGION32_LE( 0x20000, "vga_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x20000, "bios", ROMREGION_ERASEFF )
 	// TODO: 4 other dumps available on VGALegacyMK3, separate Sun versions to own subclass
 	ROM_SYSTEM_BIOS( 0, "creative",   "03/03/98 Creative Graphics Blaster Exxtreme" )
 	ROMX_LOAD( "creative.vbi",  0x00000, 0x08000, CRC(3e622da7) SHA1(b06f89777badfdb7cd4c76b414ba19fcaed243c9), ROM_BIOS(0) )
@@ -82,7 +87,7 @@ void permedia2_device::device_start()
 	add_map(8*1024*1024, M_MEM, FUNC(permedia2_device::aperture1_map));
 	add_map(8*1024*1024, M_MEM, FUNC(permedia2_device::aperture2_map));
 
-	add_rom((u8 *)m_vga_rom->base(), 128*1024 );
+	add_rom((u8 *)m_bios->base(), 128*1024 );
 	expansion_rom_base = 0xc0000;
 
 	// INTA#
@@ -139,7 +144,7 @@ void permedia2_device::legacy_memory_map(address_map &map)
 
 void permedia2_device::legacy_io_map(address_map &map)
 {
-	map(0, 0x02f).m(m_vga, FUNC(vga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(vga_device::io_map));
 }
 
 uint8_t permedia2_device::vram_r(offs_t offset)
@@ -155,12 +160,10 @@ void permedia2_device::vram_w(offs_t offset, uint8_t data)
 void permedia2_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-	if (command & 7)
-	{
+	if (BIT(command, 1))
 		memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(permedia2_device::vram_r)), write8sm_delegate(*this, FUNC(permedia2_device::vram_w)));
 
-		io_space->install_device(0x03b0, 0x03df, *this, &permedia2_device::legacy_io_map);
-		//memory_space->install_rom(0xc0000, 0xcffff, (void *)expansion_rom);
-	}
+	if (BIT(command, 0))
+		io_space->install_device(0x0000, 0xffff, *this, &permedia2_device::legacy_io_map);
 }
 

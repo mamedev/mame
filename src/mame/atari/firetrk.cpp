@@ -55,7 +55,7 @@ public:
 		, m_p1gear(*this, "P1gear")
 	{ }
 
-	void firetrk(machine_config &config);
+	void firetrk(machine_config &config) ATTR_COLD;
 
 	template <int P> int steer_dir_r();
 	template <int P> int steer_flag_r();
@@ -132,7 +132,7 @@ private:
 	void draw_car(bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flash);
 	void set_service_mode(int enable);
 
-	void palette(palette_device &palette);
+	void palette(palette_device &palette) ATTR_COLD;
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 
@@ -144,7 +144,7 @@ class montecar_state : public firetrk_state
 public:
 	using firetrk_state::firetrk_state;
 
-	void montecar(machine_config &config);
+	void montecar(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -160,8 +160,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_car(bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int is_collision_detection);
 
-	void prom_to_palette(int number, uint8_t val);
-	void palette(palette_device &palette);
+	void prom_to_palette(int number, uint8_t val) ATTR_COLD;
+	void palette(palette_device &palette) ATTR_COLD;
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 
@@ -173,7 +173,7 @@ class superbug_state : public firetrk_state
 public:
 	using firetrk_state::firetrk_state;
 
-	void superbug(machine_config &config);
+	void superbug(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -810,8 +810,8 @@ void firetrk_state::machine_reset()
 
 uint8_t firetrk_state::dip_r(offs_t offset)
 {
-	uint8_t val0 = m_dips[0]->read();
-	uint8_t const val1 = m_dips[1]->read();
+	uint8_t val0 = m_dips[1]->read();
+	uint8_t const val1 = m_dips[0]->read();
 
 	if (val1 & (1 << (2 * offset + 0))) val0 |= 1;
 	if (val1 & (1 << (2 * offset + 1))) val0 |= 2;
@@ -822,8 +822,8 @@ uint8_t firetrk_state::dip_r(offs_t offset)
 
 uint8_t montecar_state::dip_r(offs_t offset)
 {
-	uint8_t val0 = m_dips[0]->read();
-	uint8_t const val1 = m_dips[1]->read();
+	uint8_t val0 = m_dips[1]->read();
+	uint8_t const val1 = m_dips[0]->read();
 
 	if (val1 & (1 << (3 - offset))) val0 |= 1;
 	if (val1 & (1 << (7 - offset))) val0 |= 2;
@@ -1039,37 +1039,43 @@ static INPUT_PORTS_START( firetrk )
 	PORT_START("STEER_2")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("DIP_0")
+	PORT_START("DIP_1") // 4-position DIP Switch SW3
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // other DIPs connect here
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // other DIPs connect here
-	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Coinage ))
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Coinage ))       PORT_DIPLOCATION("SW3:3,4")
 	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ))
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ))
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ))
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ))        PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ))
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ))        PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 
-	PORT_START("DIP_1")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Language ) )
+	PORT_START("DIP_0") // 8-position DIP Switch SW2
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Language ) )     PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( French ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Spanish ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( German ) )
-	PORT_DIPNAME( 0x0c, 0x04, "Play Time" )
+	PORT_DIPNAME( 0x0c, 0x04, "Play Time" )             PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x00, "60 Seconds" )
 	PORT_DIPSETTING(    0x04, "90 Seconds" )
 	PORT_DIPSETTING(    0x08, "120 Seconds" )
 	PORT_DIPSETTING(    0x0c, "150 Seconds" )
-	PORT_DIPNAME( 0x30, 0x20, "Extended Play" )
+	PORT_DIPNAME( 0x30, 0x20, "Extended Play" )         PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x10, "Liberal" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x30, "Conservative" )
 	PORT_DIPSETTING(    0x00, "Never" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ))        PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ))        PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 
 	PORT_START("BIT_0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1115,27 +1121,27 @@ static INPUT_PORTS_START( superbug )
 	PORT_START("STEER_1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
-	PORT_START("DIP_0")
+	PORT_START("DIP_1") // not present on PCB
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // other DIPs connect here
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // other DIPs connect here
 
-	PORT_START("DIP_1")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ))
+	PORT_START("DIP_0") // 8-position DIP Switch
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ))       PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ))
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ))
-	PORT_DIPNAME( 0x0c, 0x04, "Play Time" )
+	PORT_DIPNAME( 0x0c, 0x04, "Play Time" )             PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x00, "60 seconds" )
 	PORT_DIPSETTING(    0x04, "90 seconds" )
 	PORT_DIPSETTING(    0x08, "120 seconds" )
 	PORT_DIPSETTING(    0x0c, "150 seconds" )
-	PORT_DIPNAME( 0x30, 0x20, "Extended Play" )
+	PORT_DIPNAME( 0x30, 0x20, "Extended Play" )         PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x10, "Liberal" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x30, "Conservative" )
 	PORT_DIPSETTING(    0x00, "Never" )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Language ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Language ) )     PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( French ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Spanish ) )
@@ -1176,38 +1182,38 @@ static INPUT_PORTS_START( montecar )
 	PORT_START("STEER_1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("DIP_0")
+	PORT_START("DIP_1") // 4-position DIP Switch SW3
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // other DIPs connect here
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // other DIPs connect here
-	PORT_DIPNAME( 0x0c, 0x0c, "Coin 3 Multiplier" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Coin 3 Multiplier" )     PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x04, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x10, 0x10, "Coin 2 Multiplier" )
+	PORT_DIPNAME( 0x10, 0x10, "Coin 2 Multiplier" )     PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ))
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ))        PORT_DIPLOCATION("SW3:4")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 
-	PORT_START("DIP_1")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ))
+	PORT_START("DIP_0") // 8-position DIP Switch SW2
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ))       PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ))
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ))
 	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ))
-	PORT_DIPNAME( 0x0c, 0x08, "Extended Play" )
+	PORT_DIPNAME( 0x0c, 0x08, "Extended Play" )         PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x04, "Liberal" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x00, "Conservative" )
 	PORT_DIPSETTING(    0x0c, "Never" )
-	PORT_DIPNAME( 0x30, 0x20, "Play Time" )
+	PORT_DIPNAME( 0x30, 0x20, "Play Time" )             PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, "60 Seconds" )
 	PORT_DIPSETTING(    0x10, "90 Seconds" )
 	PORT_DIPSETTING(    0x20, "120 Seconds" )
 	PORT_DIPSETTING(    0x00, "150 Seconds" )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Language ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Language ) )     PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0xc0, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Spanish ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( French ) )
@@ -1385,7 +1391,7 @@ static const gfx_layout montecar_car_layout =
 	8,      // total
 	2,      // planes
 			// plane offsets
-	{ 1, 0 },
+	{ 0, 1 },
 	{
 		0x00, 0x02, 0x04, 0x06, 0x08, 0x0a, 0x0c, 0x0e,
 		0x10, 0x12, 0x14, 0x16, 0x18, 0x1a, 0x1c, 0x1e,

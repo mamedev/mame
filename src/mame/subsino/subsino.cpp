@@ -299,7 +299,7 @@ public:
 	void init_tisub() ATTR_COLD;
 	void init_grndprix() ATTR_COLD;
 	void init_mtrainnv() ATTR_COLD;
-	void init_trsocean() ATTR_COLD;
+	template <offs_t Offset> void init_trsocean() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -4363,6 +4363,28 @@ ROM_START( trsocean ) // all labels removed or hand-written. YM3812 not populate
 	ROM_LOAD( "u53", 0x00000, 0x40000, CRC(943ac197) SHA1(4880aca75a135d1932eb8c4de05013b0b60069e9) )
 ROM_END
 
+// Heavily corroded SN01256-2 PCB. All labels removed. YM3812 not populated
+// Boots to Tetris.
+ROM_START( trsoceana )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u12", 0x00000, 0x10000, CRC(f12a207c) SHA1(1a7227c7c56e5cbbeaae2f8193db2979a29b9c46) )
+
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD( "u30", 0x00000, 0x40000, CRC(d3615409) SHA1(bed033b758d37e6fc405cd37d3be9d0c634b7042) )
+	ROM_LOAD( "u29", 0x40000, 0x40000, CRC(26956a75) SHA1(fb036c41c22ac1f8e8ba4a0270556aa879097fc5) )
+	ROM_LOAD( "u28", 0x80000, 0x40000, CRC(7192ae88) SHA1(12cac06433702352a6200e4cf57ff128cce00bca) )
+	ROM_LOAD( "u27", 0xc0000, 0x40000, CRC(8c29176f) SHA1(abcdddd97c0c2d877f8effda4ad91f4fc83a8fef) )
+
+	ROM_REGION( 0x80000, "reels", 0 )
+	ROM_LOAD( "u25", 0x00000, 0x20000, CRC(62f9cdb0) SHA1(00dd5178c2f50d94ef4a9d872c711ac2ee21ed19) )
+	ROM_LOAD( "u24", 0x20000, 0x20000, CRC(7d5f3b62) SHA1(cb5641ca69d502d2192409c9b9da4d9ef2211695) )
+	ROM_LOAD( "u23", 0x40000, 0x20000, CRC(20f70e29) SHA1(fd04296de9ac2943e0276c30c22187ded1269177) )
+	ROM_LOAD( "u22", 0x60000, 0x20000, CRC(13d1bba9) SHA1(e85fa2e052d9cea89cf93740c2b110aac9825a46) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "u53", 0x00000, 0x40000, CRC(1c8a886d) SHA1(faa983801b368a6d04ef80e359c6fb67b240c60d) )
+ROM_END
+
 /***************************************************************************
 *                        Driver Init / Decryption                          *
 ***************************************************************************/
@@ -4546,11 +4568,12 @@ void subsino_state::init_mtrainnv()
 	}
 }
 
+template <offs_t Offset>
 void subsino_state::init_trsocean()
 {
 
 	uint8_t *rom = memregion( "maincpu" )->base();
-	rom[0x933] = 0x00; //patch protection check ("ERROR 08073")
+	rom[Offset] = 0x00; //patch protection check ("ERROR 08073")
 
 	//TODO:
 	//rom[0x7ab] = 0x18; //patch "winning protection" check
@@ -4571,51 +4594,52 @@ void subsino_state::init_trsocean()
 *                               Game Drivers                               *
 ***************************************************************************/
 
-//     YEAR  NAME         PARENT   MACHINE     INPUT     CLASS          INIT              ROT   COMPANY              FULLNAME                                       FLAGS                LAYOUT
-GAMEL( 1990, victor21,    0,       victor21,   victor21, subsino_state, init_victor21,    ROT0, "Subsino / Buffy",   "Victor 21",                                   0,                   layout_victor21 )
+//     YEAR  NAME         PARENT    MACHINE     INPUT     CLASS          INIT                  ROT   COMPANY              FULLNAME                                       FLAGS                LAYOUT
+GAMEL( 1990, victor21,    0,        victor21,   victor21, subsino_state, init_victor21,        ROT0, "Subsino / Buffy",   "Victor 21",                                   0,                   layout_victor21 )
 
-GAMEL( 1991, victor5,     0,       victor5,    victor5,  subsino_state, init_victor5,     ROT0, "Subsino / Buffy",   "Victor 5",                                    0,                   layout_victor5  ) // Original PCB and game from Subsino.
-GAMEL( 1991, victor5a,    victor5, victor5,    victor5,  subsino_state, init_victor5,     ROT0, "Subsino",           "G.E.A.",                                      0,                   layout_victor5  ) // PCB black-box was marked 'victor 5' - in-game says G.E.A with no manufacturer info?
+GAMEL( 1991, victor5,     0,        victor5,    victor5,  subsino_state, init_victor5,         ROT0, "Subsino / Buffy",   "Victor 5",                                    0,                   layout_victor5  ) // Original PCB and game from Subsino.
+GAMEL( 1991, victor5a,    victor5,  victor5,    victor5,  subsino_state, init_victor5,         ROT0, "Subsino",           "G.E.A.",                                      0,                   layout_victor5  ) // PCB black-box was marked 'victor 5' - in-game says G.E.A with no manufacturer info?
 
-GAMEL( 1992, tisub,       0,       tisub,      tisub,    subsino_state, init_tisub,       ROT0, "Subsino",           "Treasure Island (Subsino, set 1)",            0,                   layout_tisub    )
-GAMEL( 1992, tisuba,      tisub,   tisub,      tisub,    subsino_state, init_tisub,       ROT0, "Subsino",           "Treasure Island (Subsino, set 2)",            0,                   layout_tisub    )
-GAMEL( 1992, tisubb,      tisub,   tisub,      tisubb,   subsino_state, init_tisubb,      ROT0, "American Alpha",    "Treasure Island (American Alpha, v3.0N)",     0,                   layout_tisubb   )
+GAMEL( 1992, tisub,       0,        tisub,      tisub,    subsino_state, init_tisub,           ROT0, "Subsino",           "Treasure Island (Subsino, set 1)",            0,                   layout_tisub    )
+GAMEL( 1992, tisuba,      tisub,    tisub,      tisub,    subsino_state, init_tisub,           ROT0, "Subsino",           "Treasure Island (Subsino, set 2)",            0,                   layout_tisub    )
+GAMEL( 1992, tisubb,      tisub,    tisub,      tisubb,   subsino_state, init_tisubb,          ROT0, "American Alpha",    "Treasure Island (American Alpha, v3.0N)",     0,                   layout_tisubb   )
 
 // tilemaps, lamps and inputs troubles.
-GAMEL( 1992, newhunter,   tisub,   tisub,      tisub,    subsino_state, init_tisubb,      ROT0, "Karam",             "New HUNTer",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_tisubb   ) // 1989 on screen, but this bootleg is from 1992
-GAMEL( 1993, newhunterb,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterb,  ROT0, "bootleg",           "New HUNTer (bootleg, set 1)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_tisubb   )
+GAMEL( 1992, newhunter,   tisub,    tisub,      tisub,    subsino_state, init_tisubb,          ROT0, "Karam",             "New HUNTer",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_tisubb   ) // 1989 on screen, but this bootleg is from 1992
+GAMEL( 1993, newhunterb,  tisub,    newhunterb, tisub,    subsino_state, init_newhunterb,      ROT0, "bootleg",           "New HUNTer (bootleg, set 1)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_tisubb   )
 
-GAMEL( 1993, newhunterc,  tisub,   newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "bootleg",           "New HUNTer (bootleg, set 2)",                 MACHINE_NOT_WORKING, layout_tisubb   ) // 1989 on screen, but "Copyright 1993 SubSino Corp. Taipei, Taiwan." on program ROM
-GAMEL( 1993, newhunterd,  tisub,   newhunterd, tisub,    subsino_state, empty_init,       ROT0, "bootleg",           "New HUNTer (bootleg, set 3)",                 MACHINE_NOT_WORKING, layout_tisubb   ) // reel GFX don't appear, inputs
-GAMEL( 1998, ndongmul,    0,       newhunterb, tisub,    subsino_state, init_newhunterc,  ROT0, "Hyoja Game",        "New DongmulDongmul",                          MACHINE_NOT_WORKING, layout_tisubb   ) // hangs after a while, bad reels GFX loading / decode
+GAMEL( 1993, newhunterc,  tisub,    newhunterb, tisub,    subsino_state, init_newhunterc,      ROT0, "bootleg",           "New HUNTer (bootleg, set 2)",                 MACHINE_NOT_WORKING, layout_tisubb   ) // 1989 on screen, but "Copyright 1993 SubSino Corp. Taipei, Taiwan." on program ROM
+GAMEL( 1993, newhunterd,  tisub,    newhunterd, tisub,    subsino_state, empty_init,           ROT0, "bootleg",           "New HUNTer (bootleg, set 3)",                 MACHINE_NOT_WORKING, layout_tisubb   ) // reel GFX don't appear, inputs
+GAMEL( 1998, ndongmul,    0,        newhunterb, tisub,    subsino_state, init_newhunterc,      ROT0, "Hyoja Game",        "New DongmulDongmul",                          MACHINE_NOT_WORKING, layout_tisubb   ) // hangs after a while, bad reels GFX loading / decode
 
 
-GAMEL( 1991, crsbingo,    0,       crsbingo,   crsbingo, subsino_state, init_crsbingo,    ROT0, "Subsino",           "Poker Carnival",                              0,                   layout_crsbingo )
+GAMEL( 1991, crsbingo,    0,        crsbingo,   crsbingo, subsino_state, init_crsbingo,        ROT0, "Subsino",           "Poker Carnival",                              0,                   layout_crsbingo )
 
-GAMEL( 1994, dinofmly,    0,       dinofmly,   sharkpy,  subsino_state, empty_init,       ROT0, "Subsino",           "Dino Family",                                 MACHINE_NOT_WORKING, layout_sharkpy  ) // stops with 'error password' message during boot
-GAMEL( 1995, dinofmlya,   dinofmly,dinofmly,   sharkpy,  subsino_state, empty_init,       ROT0, "Tangasoft",         "Dino Family (Portuguese, Tangasoft license)", MACHINE_NOT_WORKING, layout_sharkpy  ) // stops with 'error password' message during boot
+GAMEL( 1994, dinofmly,    0,        dinofmly,   sharkpy,  subsino_state, empty_init,           ROT0, "Subsino",           "Dino Family",                                 MACHINE_NOT_WORKING, layout_sharkpy  ) // stops with 'error password' message during boot
+GAMEL( 1995, dinofmlya,   dinofmly, dinofmly,   sharkpy,  subsino_state, empty_init,           ROT0, "Tangasoft",         "Dino Family (Portuguese, Tangasoft license)", MACHINE_NOT_WORKING, layout_sharkpy  ) // stops with 'error password' message during boot
 
-GAMEL( 1995, stbsub,      0,       stbsub,     stbsub,   subsino_state, init_stbsub,      ROT0, "American Alpha",    "Treasure Bonus (Subsino, v1.6)",              0,                   layout_stisub   ) // board CPU module marked 'Super Treasure Island' (alt title?)
-GAMEL( 1995, stisub,      stbsub,  stbsub,     stbsub,   subsino_state, init_stisub,      ROT0, "Subsino",           "Super Treasure Island (Italy, v1.6)",         0,                   layout_stisub   )
-GAMEL( 1995, tesorone,    stbsub,  stbsub,     tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",           "Tesorone Dell'Isola (Italy, v2.41)",          0,                   layout_stisub   )
-GAMEL( 1995, tesorone240, stbsub,  stbsub,     tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",           "Tesorone Dell'Isola (Italy, v2.40)",          0,                   layout_stisub   )
-GAMEL( 1995, tesorone230, stbsub,  stbsub,     tesorone, subsino_state, init_tesorone230, ROT0, "Subsino",           "Tesorone Dell'Isola (Italy, v2.30)",          0,                   layout_stisub   )
-GAMEL( 1995, sevenlnd,    stbsub,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg",           "Seven Land",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_stisub   )
-GAMEL( 1995, luckyseven,  stbsub,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "bootleg",           "Lucky Seven",                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_stisub   )
-GAMEL( 1995, grndprix,    stbsub,  mtrainnv,   stbsub,   subsino_state, init_grndprix,    ROT0, "bootleg",           "Grand Prix (Treasure Bonus bootleg)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_stisub   ) // bad dump of a GFX ROM
+GAMEL( 1995, stbsub,      0,        stbsub,     stbsub,   subsino_state, init_stbsub,          ROT0, "American Alpha",    "Treasure Bonus (Subsino, v1.6)",              0,                   layout_stisub   ) // board CPU module marked 'Super Treasure Island' (alt title?)
+GAMEL( 1995, stisub,      stbsub,   stbsub,     stbsub,   subsino_state, init_stisub,          ROT0, "Subsino",           "Super Treasure Island (Italy, v1.6)",         0,                   layout_stisub   )
+GAMEL( 1995, tesorone,    stbsub,   stbsub,     tesorone, subsino_state, init_tesorone,        ROT0, "Subsino",           "Tesorone Dell'Isola (Italy, v2.41)",          0,                   layout_stisub   )
+GAMEL( 1995, tesorone240, stbsub,   stbsub,     tesorone, subsino_state, init_tesorone,        ROT0, "Subsino",           "Tesorone Dell'Isola (Italy, v2.40)",          0,                   layout_stisub   )
+GAMEL( 1995, tesorone230, stbsub,   stbsub,     tesorone, subsino_state, init_tesorone230,     ROT0, "Subsino",           "Tesorone Dell'Isola (Italy, v2.30)",          0,                   layout_stisub   )
+GAMEL( 1995, sevenlnd,    stbsub,   mtrainnv,   stbsub,   subsino_state, init_mtrainnv,        ROT0, "bootleg",           "Seven Land",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_stisub   )
+GAMEL( 1995, luckyseven,  stbsub,   mtrainnv,   stbsub,   subsino_state, init_mtrainnv,        ROT0, "bootleg",           "Lucky Seven",                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_stisub   )
+GAMEL( 1995, grndprix,    stbsub,   mtrainnv,   stbsub,   subsino_state, init_grndprix,        ROT0, "bootleg",           "Grand Prix (Treasure Bonus bootleg)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_stisub   ) // bad dump of a GFX ROM
 
-GAME(  1996, trsocean,    0,       trsocean,   stbsub,   subsino_state, init_trsocean,    ROT0, "Subsino / Sunwise", "Treasure Ocean (v1.5A)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // "reels" decoding, inputs/outputs
+GAME(  1996, trsocean,    0,        trsocean,   stbsub,   subsino_state, init_trsocean<0x933>, ROT0, "Subsino / Sunwise", "Treasure Ocean (v1.5A)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // "reels" decoding, inputs/outputs
+GAME(  1996, trsoceana,   trsocean, trsocean,   stbsub,   subsino_state, init_trsocean<0xe1f>, ROT0, "Subsino",           "Treasure Ocean (v1.2)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // "reels" decoding, inputs/outputs
 
-GAMEL( 1996, sharkpy,     0,       sharkpy,    sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",           "Shark Party (Italy, v1.3)",                   0,                   layout_sharkpy  ) // missing POST messages?
-GAMEL( 1996, sharkpya,    sharkpy, sharkpy,    sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",           "Shark Party (Italy, v1.6)",                   0,                   layout_sharkpy  ) // missing POST messages?
-GAMEL( 1995, sharkpye,    sharkpy, sharkpy,    sharkpye, subsino_state, init_sharkpye,    ROT0, "American Alpha",    "Shark Party (English, Alpha license)",        0,                   layout_sharkpye ) // PCB black-box was marked 'victor 6'
+GAMEL( 1996, sharkpy,     0,        sharkpy,    sharkpy,  subsino_state, init_sharkpy,         ROT0, "Subsino",           "Shark Party (Italy, v1.3)",                   0,                   layout_sharkpy  ) // missing POST messages?
+GAMEL( 1996, sharkpya,    sharkpy,  sharkpy,    sharkpy,  subsino_state, init_sharkpy,         ROT0, "Subsino",           "Shark Party (Italy, v1.6)",                   0,                   layout_sharkpy  ) // missing POST messages?
+GAMEL( 1995, sharkpye,    sharkpy,  sharkpy,    sharkpye, subsino_state, init_sharkpye,        ROT0, "American Alpha",    "Shark Party (English, Alpha license)",        0,                   layout_sharkpye ) // PCB black-box was marked 'victor 6'
 
-GAMEL( 1995, victor6,     0,       sharkpy,    victor6,  subsino_state, init_sharkpye,    ROT0, "American Alpha",    "Victor 6 (v2.3N)",                            0,                   layout_sharkpye ) // ^^
-GAMEL( 1995, victor6a,    victor6, sharkpy,    victor6a, subsino_state, init_sharkpye,    ROT0, "American Alpha",    "Victor 6 (v2.3)",                             0,                   layout_sharkpye ) // ^^
-GAMEL( 1995, victor6b,    victor6, sharkpy,    victor6b, subsino_state, init_sharkpye,    ROT0, "American Alpha",    "Victor 6 (v1.2)",                             0,                   layout_sharkpye ) // ^^ Version # according to label, not displayed
+GAMEL( 1995, victor6,     0,        sharkpy,    victor6,  subsino_state, init_sharkpye,        ROT0, "American Alpha",    "Victor 6 (v2.3N)",                            0,                   layout_sharkpye ) // ^^
+GAMEL( 1995, victor6a,    victor6,  sharkpy,    victor6a, subsino_state, init_sharkpye,        ROT0, "American Alpha",    "Victor 6 (v2.3)",                             0,                   layout_sharkpye ) // ^^
+GAMEL( 1995, victor6b,    victor6,  sharkpy,    victor6b, subsino_state, init_sharkpye,        ROT0, "American Alpha",    "Victor 6 (v1.2)",                             0,                   layout_sharkpye ) // ^^ Version # according to label, not displayed
 
-GAMEL( 1996, smoto20,     0,       srider,     smoto20,  subsino_state, init_smoto20,     ROT0, "Subsino",           "Super Rider (Italy, v2.0)",                   0,                   layout_smoto    )
-GAMEL( 1996, smoto16,     smoto20, srider,     smoto16,  subsino_state, init_smoto16,     ROT0, "Subsino",           "Super Moto (Italy, v1.6)",                    0,                   layout_smoto    )
-GAMEL( 1996, smoto13,     smoto20, srider,     smoto16,  subsino_state, init_smoto13,     ROT0, "Subsino",           "Super Rider (v1.3)",                          0,                   layout_smoto    )
+GAMEL( 1996, smoto20,     0,        srider,     smoto20,  subsino_state, init_smoto20,         ROT0, "Subsino",           "Super Rider (Italy, v2.0)",                   0,                   layout_smoto    )
+GAMEL( 1996, smoto16,     smoto20,  srider,     smoto16,  subsino_state, init_smoto16,         ROT0, "Subsino",           "Super Moto (Italy, v1.6)",                    0,                   layout_smoto    )
+GAMEL( 1996, smoto13,     smoto20,  srider,     smoto16,  subsino_state, init_smoto13,         ROT0, "Subsino",           "Super Rider (v1.3)",                          0,                   layout_smoto    )
 
-GAME(  1996, mtrainnv,    mtrain,  mtrainnv,   stbsub,   subsino_state, init_mtrainnv,    ROT0, "Subsino",           "Magic Train (Clear NVRAM ROM?)",              MACHINE_NOT_WORKING )
+GAME(  1996, mtrainnv,    mtrain,   mtrainnv,   stbsub,   subsino_state, init_mtrainnv,        ROT0, "Subsino",           "Magic Train (Clear NVRAM ROM?)",              MACHINE_NOT_WORKING )

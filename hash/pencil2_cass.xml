@@ -1,0 +1,183 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="pencil2_cass" description="Hanimex Pencil II cassettes">
+
+	<software name="expolib" supported="partial">
+		<description>Application Software Library</description>
+		<year>1984</year>
+		<publisher>Expo</publisher>
+
+		<part name="cass1" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 1: INSTRUCT"/>
+			<dataarea name="cass" size="5187616">
+				<rom name="1a_INSTRUCT.wav" size="5187616" crc="8b527136" sha1="44db75ac5961bf8a55075cb82177ebc3e7c8a9ea"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 1: TEST"/>
+			<dataarea name="cass" size="8564772">
+				<rom name="1b_TEST.wav" size="8564772" crc="1b396acc" sha1="57088a510284b6106cbca79b8afc60b5002a7056"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 1: EDPRAC"/>
+			<dataarea name="cass" size="9033760">
+				<rom name="1c_EDPRAC.wav" size="9033760" crc="9b6b1e2e" sha1="396dda417a808114751c567d28df2b1626f7aef3"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 2: INFORM2"/>
+			<dataarea name="cass" size="4614180">
+				<rom name="2a_INFORM2.wav" size="4614180" crc="b04475fb" sha1="f528196f49929171f64c872417b6b994b30c6447"/>
+			</dataarea>
+		</part>
+		<part name="cass5" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 2: MATHVADR"/>
+			<dataarea name="cass" size="9058340">
+				<rom name="2b_MATHVADR.wav" size="9058340" crc="fe08bb71" sha1="11ca9deab19308cede508232a78475246d2ebddd"/>
+			</dataarea>
+		</part>
+		<part name="cass6" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 2: MATHTASK"/>
+			<dataarea name="cass" size="8990756">
+				<rom name="2c_MATHTASK.wav" size="8990756" crc="6423d2ae" sha1="a2505420a60b8e44b9b05c468c832ce0ff026989"/>
+			</dataarea>
+		</part>
+		<part name="cass7" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 2: MUSIC"/>
+			<dataarea name="cass" size="3815460">
+				<rom name="2d_MUSIC.wav" size="3815460" crc="9db12cb6" sha1="cf6643a18161915a7e4e6e6f3536ba7bf51f7f3a"/>
+			</dataarea>
+		</part>
+		<part name="cass8" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 2: MOOG"/>
+			<dataarea name="cass" size="3854372">
+				<rom name="2e_MOOG.wav" size="3854372" crc="463a6306" sha1="cb2e9b7444fc3ecd38b6c79ac99b44e65f0ed55b"/>
+			</dataarea>
+		</part>
+
+		<part name="cass9" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 3: INFORM3"/>
+			<dataarea name="cass" size="3258408">
+				<rom name="3a_INFORM3.wav" size="3258408" crc="a1a08c84" sha1="e809ead835822d0db3a02eb64359ed146ddedc2c"/>
+			</dataarea>
+		</part>
+		<part name="cass10" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 3: NUMWORD"/>
+			<dataarea name="cass" size="8564772">
+				<rom name="3b_NUMWORD.wav" size="8564772" crc="97856cb4" sha1="35dc23fff6212f52f305ee6bbff9374b02ba5a6c"/>
+			</dataarea>
+		</part>
+		<part name="cass11" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 3: NUMSIZE"/>
+			<dataarea name="cass" size="7696420">
+				<rom name="3c_NUMSIZE.wav" size="7696420" crc="910b55f4" sha1="d316274f7f5eda17be357e324332785ce6c3ea0a"/>
+			</dataarea>
+		</part>
+		<part name="cass12" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 3: PENMIND"/>
+			<dataarea name="cass" size="6137892">
+				<rom name="3d_PENMIND.wav" size="6137892" crc="26675836" sha1="ab2b1dec05063533e599580662d6cd497c40fa82"/>
+			</dataarea>
+		</part>
+		<part name="cass13" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 3: CALENDAR"/>
+			<dataarea name="cass" size="6461476">
+				<rom name="3e_CALENDAR.wav" size="6461476" crc="53012fcc" sha1="54d36d8b84e79fa5f571c17d0d573056a68799cb"/>
+			</dataarea>
+		</part>
+
+		<part name="cass14" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 4: INFORM4"/>
+			<dataarea name="cass" size="4206628">
+				<rom name="4a_INFORM4.wav" size="4206628" crc="1be78901" sha1="55881cd0d6233bb691725698262e164a19f06ec7"/>
+			</dataarea>
+		</part>
+		<part name="cass15" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 4: SPELLER"/>
+			<dataarea name="cass" size="8939556">
+				<rom name="4b_SPELLER.wav" size="8939556" crc="2423d706" sha1="51fba5aad21624f076497b28a33f15ba0201e16f"/>
+			</dataarea>
+		</part>
+		<part name="cass16" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 4: GEOGRPHY"/>
+			<dataarea name="cass" size="8992804">
+				<rom name="4c_GEOGRPHY.wav" size="8992804" crc="dbf49abc" sha1="f7b53f6f838aa93db8b86ef33e8c938e54be8463"/>
+			</dataarea>
+		</part>
+		<part name="cass17" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 4: HISTORY"/>
+			<dataarea name="cass" size="7559204">
+				<rom name="4d_HISTORY.wav" size="7559204" crc="9700ed93" sha1="cd99e240296578e5b7027b95aaaf5de84dffb535"/>
+			</dataarea>
+		</part>
+
+		<part name="cass18" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 5: INFORM5"/>
+			<dataarea name="cass" size="7397412">
+				<rom name="5a_INFORM5.wav" size="7397412" crc="f125c190" sha1="c89c2c0c38b8b901775bac70f1be8122e6648114"/>
+			</dataarea>
+		</part>
+		<part name="cass19" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 5: CHEQUE"/>
+			<dataarea name="cass" size="11073568">
+				<rom name="5b_CHEQUE_16k_bad.wav" size="11073568" crc="22fe0e11" sha1="243c5384a831ecc77c4179482a935a26406950c0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="cass20" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 5: EXPENSES"/>
+			<dataarea name="cass" size="11012132">
+				<rom name="5c_EXPENSES_16k.wav" size="11012132" crc="498d5519" sha1="6361341693fd36c4787c3ee56abe06ebc94d3d8e"/>
+			</dataarea>
+		</part>
+		<part name="cass21" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 5: INVENTRY"/>
+			<dataarea name="cass" size="8884260">
+				<rom name="5d_INVENTRY.wav" size="8884260" crc="b01ecd22" sha1="6527c4f877608c50a7e7f4848e88159b43cf8ab4"/>
+			</dataarea>
+		</part>
+		<part name="cass22" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 5: LETTER"/>
+			<dataarea name="cass" size="6002724">
+				<rom name="5e_LETTER.wav" size="6002724" crc="462fae86" sha1="c72a4d020dc4fb27cfdb3bd220f764da4fa45bea"/>
+			</dataarea>
+		</part>
+
+		<part name="cass23" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 6: INFORM6"/>
+			<dataarea name="cass" size="4118564">
+				<rom name="6a_INFORM6.wav" size="4118564" crc="19595c34" sha1="6a19d478c4d228e723265dd20377569063b365e4"/>
+			</dataarea>
+		</part>
+		<part name="cass24" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 6: NAUGHTS"/>
+			<dataarea name="cass" size="8552484">
+				<rom name="6b_NAUGHTS.wav" size="8552484" crc="acc91f3f" sha1="06480f838a20bf717019f33daffd47b35b86b177"/>
+			</dataarea>
+		</part>
+		<part name="cass25" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 6: BATLSHIP"/>
+			<dataarea name="cass" size="8941604">
+				<rom name="6c_BATLSHIP.wav" size="8941604" crc="3d63ff89" sha1="8fcf013d278af1144d14477aec4cbaa051c63813"/>
+			</dataarea>
+		</part>
+		<part name="cass26" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 6: TANK"/>
+			<dataarea name="cass" size="8980516">
+				<rom name="6d_TANK.wav" size="8980516" crc="494d9600" sha1="8191370a08422c66759c7e4deb28db4c4d9b400d"/>
+			</dataarea>
+		</part>
+		<part name="cass27" interface="pencil2_cass">
+			<feature name="part_id" value="Tape 6: LOGIC"/>
+			<dataarea name="cass" size="8032292">
+				<rom name="6e_LOGIC.wav" size="8032292" crc="dd8d67d4" sha1="277b9a28f4df35845f4931f77cfd7ff06beb6475"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

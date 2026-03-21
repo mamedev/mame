@@ -62,7 +62,7 @@ protected:
 	required_device<palette_device> m_palette;
 
 private:
-	u32 screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void batsugun_68k_mem(address_map &map) ATTR_COLD;
 	void v25_mem(address_map &map) ATTR_COLD;
@@ -79,7 +79,6 @@ private:
 	optional_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
 	required_device<toaplan_coincounter_device> m_coincounter;
-	bitmap_ind8 m_custom_priority_bitmap;
 	bitmap_ind16 m_secondary_render_bitmap;
 };
 
@@ -128,15 +127,15 @@ void batsugun_bootleg_state::video_start()
 }
 
 // renders to 2 bitmaps, and mixes output
-u32 batsugun_state::screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 batsugun_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp[0]->render_vdp(bitmap, cliprect);
+	screen.priority().fill(0, cliprect);
+	m_vdp[0]->render_vdp(bitmap, cliprect, screen.priority());
 
 	m_secondary_render_bitmap.fill(0, cliprect);
-	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp[1]->render_vdp(m_secondary_render_bitmap, cliprect);
+	screen.priority().fill(0, cliprect);
+	m_vdp[1]->render_vdp(m_secondary_render_bitmap, cliprect, screen.priority());
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -203,11 +202,8 @@ void batsugun_state::machine_reset()
 
 void batsugun_state::video_start()
 {
-	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
 	m_secondary_render_bitmap.reset();
-	m_vdp[0]->custom_priority_bitmap = &m_custom_priority_bitmap;
 	m_screen->register_screen_bitmap(m_secondary_render_bitmap);
-	m_vdp[1]->custom_priority_bitmap = &m_custom_priority_bitmap;
 }
 
 void batsugun_bootleg_state::fixeightbl_oki(address_map &map)
@@ -403,7 +399,7 @@ void batsugun_state::batsugun(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(batsugun_state::screen_update_batsugun));
+	m_screen->set_screen_update(FUNC(batsugun_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(batsugun_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 

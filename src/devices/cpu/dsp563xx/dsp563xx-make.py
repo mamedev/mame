@@ -168,7 +168,7 @@ class Function:
             for v in idxs:
                 r.append(v | (i1 << bit1) | (i2 << bit2))
         return r
-        
+
     def expand_idxs(self, params, idxs):
         if len(params) != abs(self.pcount):
             print("Incorrect number of parameters on %s call, expected %d, got %d" % (self.name, abs(self.pcount), len(params)))
@@ -187,7 +187,7 @@ class Function:
 
     def get_slot_count(self):
         if self.svals == None or self.pcount < 0:
-            return 1        
+            return 1
         return len(self.svals[0])
 
     def get_val_idxs_slotted(self, slot, params, idxs):
@@ -291,7 +291,7 @@ class Function:
                 for i in range(4):
                     s += ' "(r%d)",' % i
                 count += 4
-            else:                
+            else:
                 s += ' "%s",' % e
                 count += 1
         print("const char *const dsp563xx_disassembler::ts_%s[%d] = {%s };" % (self.name, count, s[:-1]), file=f)
@@ -310,7 +310,7 @@ class Function:
             elif mode == 'bit' or mode == 'shift':
                 return '%d'
             elif mode == 'asap' or mode == 'asaq' or mode == 'pcrel' or mode == 'abs':
-                return '$%06x'                
+                return '$%06x'
         if self.name == 'exabs' or self.name == 'expcrel' or self.name == 'eximm' or self.name == 'exco' or self.name == 'eam1a' or self.name == 'eam1i':
             return '$%06x'
         elif self.name == 'exoff':
@@ -375,7 +375,7 @@ class Function:
         else:
             print('unsupported get_value_expression on %s %s' % (self.values[0], self.name))
         return ''
-        
+
     def param(self, params):
         if self.values[0] == "single":
             return ', ts_%s[BIT(opcode, %d, %d)]' % (self.name, params[0], self.bcount)
@@ -400,7 +400,7 @@ class Function:
             elif mode == 'asap':
                 return ', 0xffffc0 + BIT(opcode, %d, %d)' % (params[0], self.bcount)
             elif mode == 'asaq':
-                return ', 0xffff80 + BIT(opcode, %d, %d)' % (params[0], self.bcount)                
+                return ', 0xffff80 + BIT(opcode, %d, %d)' % (params[0], self.bcount)
             elif mode == 'pcrel':
                 return ', (pc + BIT(opcode, %d, %d)) & 0xffffff' % (params[0], self.bcount)
         elif self.values[0] == 'split-range':
@@ -424,7 +424,7 @@ class Function:
         elif self.name == 'expcrel':
             return ', (pc+exv) & 0xffffff'
         return ''
-                
+
 Function("acc", 1, ["single", ['a', 'b']])
 Function("nacc", -1, ["single", ['b', 'a']])
 Function("xyr", 1, ["single", ['x', 'y']])
@@ -577,7 +577,7 @@ class Source:
     def parse(self, line):
         r = []
         isa = lambda c: (c >= 'a' and c <= 'z') or (c >= '0' and c <= '9')
-        isp = lambda c: c == '+'        
+        isp = lambda c: c == '+'
         pos = 0
         while True:
             spos = pos
@@ -634,7 +634,7 @@ class Source:
                 sub = self.parse(line[spos:pos-1])
             r.append([sname, smode_id, schange_id, sub])
         return r
-                
+
     def add(self, line):
         self.text.append(self.parse(line))
 
@@ -712,7 +712,7 @@ class Source:
                         print("unhandled SlotChange %d" % e[2])
             if type(e) == list:
                 self.ab_scan_gen(f, slot, inst, e[3], changes)
-        
+
     def gen(self, f, slots, islots):
         for slot, sinfo in self.slots.items():
             if sinfo[SlotMode.read]:
@@ -760,7 +760,7 @@ class Source:
                         print("instanciated slot (read)", slot, inst)
                 else:
                     print('\t\tu32 %s = %s;' % (slot, islots[slot].get_value_expression()), file=f)
-                    
+
         for line in self.text:
             s = '\t\t' + self.expand(line, slots, islots)
             print(s, file=f)
@@ -843,7 +843,7 @@ class Instruction:
                     pos += 1
                 if nb == '':
                     print("Unexpected character in function parameters of %s [%s]" % (fname, head[0]))
-                    sys.exit(1)                    
+                    sys.exit(1)
                 sinfo.add_param(int(nb))
                 while pos != len(head) and head[pos] == ' ':
                     pos += 1
@@ -992,7 +992,7 @@ class Instruction:
                 indexes[si] = 0
                 si -= 1
             if si == -1:
-                break            
+                break
 
 class ISA:
     def __init__(self):
@@ -1060,7 +1060,7 @@ class ISA:
         print("c ipar = %4d (%5.2f%%     %02x-    %02x %6x)" % (len(self.cipars), *self.coverage(self.cipar)))
         print("c npar = %4d (%5.2f%% %06x-%06x %6x)" % (len(self.cnpars), *self.coverage(self.cnpar)))
         print("c move = %4d (%5.2f%%   %04x-  %04x %6x)" % (len(self.cmoves), *self.coverage(self.cmove)))
-                    
+
 
     def check_move_npar_collisions(self):
         for i in range(0x1000000):
@@ -1123,7 +1123,7 @@ class ISA:
                 insts[i].generate_code(f, post);
                 print("\t\tbreak;", file=f)
                 print("\t\t}", file=f)
-                       
+
     def gen_disasm(self, fname):
         f = open(fname, "wt")
         print("// license:BSD-3-Clause", file=f)
@@ -1253,7 +1253,7 @@ class ISA:
         self.gen_interp_switch(f, self.cnpars, False)
         print("\t}", file=f)
         print("}", file=f)
-        
+
 isa = ISA()
 isa.load("dsp563xx.lst")
 isa.check_move_npar_collisions()

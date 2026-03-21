@@ -390,32 +390,31 @@ authors:hap
 
 		<repeat count="6">
 			<param name="i" start="0" increment="1" />
-			<param name="xt" start="5" increment="4" />
-			<param name="xl" start="8" increment="4" />
+			<param name="x" start="8.75" increment="4" />
 
-			<element ref="text_u~i~"><bounds x="~xt~" y="10.45" width="7.5" height="1.4" /></element>
-			<element name="8.~i~" ref="led2"><bounds x="~xl~" y="12" width="1.5" height="1.5" /></element>
+			<element ref="text_u~i~"><bounds xc="~x~" y="10.45" width="3.5" height="1.4" /></element>
+			<element name="8.~i~" ref="led2"><bounds xc="~x~" y="12" width="1.5" height="1.5" /></element>
 		</repeat>
-		<element ref="text_u1a"><bounds x="9" y="9.2" width="7.5" height="1.4" /></element>
+		<element ref="text_u1a"><bounds xc="12.75" y="9.2" width="3.5" height="1.4" /></element>
 
 		<repeat count="6">
 			<param name="i" start="1" increment="1" />
-			<param name="x" start="7.5" increment="4" />
+			<param name="x" start="8.75" increment="4" />
 
-			<element ref="text_p~i~"><bounds x="~x~" y="17.4" width="2.5" height="2.5" /><color alpha="0.83" /></element>
+			<element ref="text_p~i~"><bounds xc="~x~" y="17.4" width="2.5" height="2.5" /><color alpha="0.83" /></element>
 		</repeat>
 
 		<repeat count="10">
 			<param name="i" start="0" increment="1" />
-			<param name="x" start="29" increment="4" />
+			<param name="x" start="32.75" increment="4" />
 
-			<element ref="text_l~i~"><bounds x="~x~" y="18.45" width="7.5" height="1.4" /></element>
+			<element ref="text_l~i~"><bounds xc="~x~" y="18.45" width="3.5" height="1.4" /></element>
 		</repeat>
-		<element ref="text_l0a"><bounds x="29" y="17.2" width="7.5" height="1.4" /></element>
-		<element ref="text_l1a"><bounds x="33" y="17.2" width="7.5" height="1.4" /></element>
-		<element ref="text_l2a"><bounds x="37" y="17.2" width="7.5" height="1.4" /></element>
-		<element ref="text_l3a"><bounds x="41" y="17.2" width="7.5" height="1.4" /></element>
-		<element ref="text_l5a"><bounds x="49" y="25.1" width="7.5" height="1.4" /></element>
+		<element ref="text_l0a"><bounds xc="32.75" y="17.2" width="3.5" height="1.4" /></element>
+		<element ref="text_l1a"><bounds xc="36.75" y="17.2" width="3.5" height="1.4" /></element>
+		<element ref="text_l2a"><bounds xc="40.75" y="17.2" width="3.5" height="1.4" /></element>
+		<element ref="text_l3a"><bounds xc="44.75" y="17.2" width="3.5" height="1.4" /></element>
+		<element ref="text_l5a"><bounds xc="52.75" y="25.1" width="3.5" height="1.4" /></element>
 
 		<element ref="but" inputtag="IN.0" inputmask="0x04"><bounds x="8"  y="20" width="1.5" height="5" /></element>
 		<element ref="but" inputtag="IN.0" inputmask="0x08"><bounds x="12" y="20" width="1.5" height="5" /></element>

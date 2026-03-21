@@ -31,8 +31,7 @@ authors:hap
 	<view name="Internal Layout">
 		<bounds left="26" right="124" top="5" bottom="85.5" />
 
-	<!-- field, goal -->
-
+		<!-- field, goal -->
 		<element ref="static_yellow"><bounds x="25" y="4" width="100" height="22.1" /></element>
 		<element ref="static_white"><bounds x="33" y="14" width="18" height="12.1" /></element>
 		<element ref="static_black"><bounds x="34" y="15" width="16" height="12.1" /></element>
@@ -69,8 +68,7 @@ authors:hap
 		<element name="3.3" ref="led"><bounds x="79" y="25" width="4" height="4" /></element>
 		<element name="3.4" ref="led"><bounds x="84" y="21" width="4" height="4" /></element>
 
-	<!-- men -->
-
+		<!-- men -->
 		<element ref="disk_white"><bounds x="72" y="54" width="6" height="6" /></element>
 		<element name="8.0" ref="led"><bounds x="73" y="55" width="4" height="4" /></element>
 
@@ -88,8 +86,7 @@ authors:hap
 		<element name="10.0" ref="led"><bounds x="90" y="75" width="4" height="4" /></element>
 		<element ref="text_away"><bounds x="86" y="80.5" width="12" height="3" /></element>
 
-	<!-- defense leds -->
-
+		<!-- defense leds -->
 		<repeat count="41">
 			<param name="x" start="45.1" increment="0.05" />
 			<param name="y" start="39.6" increment="0.048" />
@@ -120,8 +117,7 @@ authors:hap
 			<element name="2.3" ref="led"><bounds x="~x~" y="~y~" width="1" height="1" /></element>
 		</repeat>
 
-	<!-- small leds -->
-
+		<!-- small leds -->
 		<!-- the leds marked "x", sometimes seen unpopulated, maybe cutting costs in some of the production batches -->
 		<element name="11.1" ref="led"><bounds x="57.1" y="29.1" width="1" height="1" /></element>
 		<element name="11.2" ref="led"><bounds x="52.7" y="33.7" width="1" height="1" /></element>

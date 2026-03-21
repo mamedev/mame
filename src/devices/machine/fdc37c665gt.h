@@ -110,8 +110,8 @@ private:
 	devcb_write_line m_fintr_callback;
 	devcb_write_line m_fdrq_callback;
 	devcb_write_line m_pintr1_callback; // Parallel
-	devcb_write_line m_irq3_callback; // Serial Port COM1/COM3
-	devcb_write_line m_irq4_callback; // Serial Port COM2/COM4
+	devcb_write_line m_irq3_callback; // Serial Port COM2/COM4
+	devcb_write_line m_irq4_callback; // Serial Port COM1/COM3
 
 	devcb_write_line m_txd1_callback;
 	devcb_write_line m_ndtr1_callback;

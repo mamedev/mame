@@ -7,7 +7,9 @@
 
 #include "machine/rescap.h"
 
+#include <iosfwd>
 #include <memory>
+#include <utility>
 #include <vector>
 
 
@@ -4208,7 +4210,12 @@ public:
 	void process(int samples);
 
 	/* access to the discrete_logging facility */
-	void CLIB_DECL discrete_log(const char *text, ...) const ATTR_PRINTF(2,3);
+	void discrete_vlog(util::format_argument_pack<char> &&args);
+	template <typename Format, typename... Params>
+	void discrete_log(Format &&fmt, Params &&... args)
+	{
+		discrete_vlog(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+	}
 
 	/* get pointer to a info struct node ref */
 	const double *node_output_ptr(int onode);
@@ -4262,7 +4269,7 @@ private:
 	task_list_t             task_list;      /* discrete_task_context * */
 
 	/* debugging statistics */
-	FILE *                  m_disclogfile;
+	std::unique_ptr<std::ostream> m_disclogfile;
 
 	/* parallel tasks */
 	osd_work_queue *        m_queue;

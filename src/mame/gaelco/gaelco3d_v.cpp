@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "gaelco3d.h"
 
-#include "cpu/tms32031/tms32031.h"
+#include "cpu/tms320c3x/tms320c3x.h"
 
 #include "video/rgbutil.h"
 
@@ -116,16 +116,16 @@ void gaelco3d_state::gaelco3d_renderer::render_poly(screen_device &screen, uint3
 {
 	float const midx = screen.width() / 2;
 	float const midy = screen.height() / 2;
-	float const z0 = tms3203x_device::fp_to_float(polydata[0]);
-	float const voz_dy = tms3203x_device::fp_to_float(polydata[1]) * 256.0f;
-	float const voz_dx = tms3203x_device::fp_to_float(polydata[2]) * 256.0f;
-	float const ooz_dy = tms3203x_device::fp_to_float(polydata[3]);
-	float const ooz_dx = tms3203x_device::fp_to_float(polydata[4]);
-	float const uoz_dy = tms3203x_device::fp_to_float(polydata[5]) * 256.0f;
-	float const uoz_dx = tms3203x_device::fp_to_float(polydata[6]) * 256.0f;
-	float const voz_base = tms3203x_device::fp_to_float(polydata[7]) * 256.0f - midx * voz_dx - midy * voz_dy;
-	float const ooz_base = tms3203x_device::fp_to_float(polydata[8]) - midx * ooz_dx - midy * ooz_dy;
-	float const uoz_base = tms3203x_device::fp_to_float(polydata[9]) * 256.0f - midx * uoz_dx - midy * uoz_dy;
+	float const z0 = tms320c3x_device::fp_to_float(polydata[0]);
+	float const voz_dy = tms320c3x_device::fp_to_float(polydata[1]) * 256.0f;
+	float const voz_dx = tms320c3x_device::fp_to_float(polydata[2]) * 256.0f;
+	float const ooz_dy = tms320c3x_device::fp_to_float(polydata[3]);
+	float const ooz_dx = tms320c3x_device::fp_to_float(polydata[4]);
+	float const uoz_dy = tms320c3x_device::fp_to_float(polydata[5]) * 256.0f;
+	float const uoz_dx = tms320c3x_device::fp_to_float(polydata[6]) * 256.0f;
+	float const voz_base = tms320c3x_device::fp_to_float(polydata[7]) * 256.0f - midx * voz_dx - midy * voz_dy;
+	float const ooz_base = tms320c3x_device::fp_to_float(polydata[8]) - midx * ooz_dx - midy * ooz_dy;
+	float const uoz_base = tms320c3x_device::fp_to_float(polydata[9]) * 256.0f - midx * uoz_dx - midy * uoz_dy;
 	gaelco3d_object_data &object = object_data().next();
 	int const color = (polydata[10] & 0x7f) << 8;
 	vertex_t vert[MAX_VERTICES];
@@ -134,23 +134,23 @@ void gaelco3d_state::gaelco3d_renderer::render_poly(screen_device &screen, uint3
 	{
 		int t;
 		m_state.logerror("poly: %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %08X %08X (%4d,%4d) %08X",
-				(double)tms3203x_device::fp_to_float(polydata[0]),
-				(double)tms3203x_device::fp_to_float(polydata[1]),
-				(double)tms3203x_device::fp_to_float(polydata[2]),
-				(double)tms3203x_device::fp_to_float(polydata[3]),
-				(double)tms3203x_device::fp_to_float(polydata[4]),
-				(double)tms3203x_device::fp_to_float(polydata[5]),
-				(double)tms3203x_device::fp_to_float(polydata[6]),
-				(double)tms3203x_device::fp_to_float(polydata[7]),
-				(double)tms3203x_device::fp_to_float(polydata[8]),
-				(double)tms3203x_device::fp_to_float(polydata[9]),
+				double(tms320c3x_device::fp_to_float(polydata[0])),
+				double(tms320c3x_device::fp_to_float(polydata[1])),
+				double(tms320c3x_device::fp_to_float(polydata[2])),
+				double(tms320c3x_device::fp_to_float(polydata[3])),
+				double(tms320c3x_device::fp_to_float(polydata[4])),
+				double(tms320c3x_device::fp_to_float(polydata[5])),
+				double(tms320c3x_device::fp_to_float(polydata[6])),
+				double(tms320c3x_device::fp_to_float(polydata[7])),
+				double(tms320c3x_device::fp_to_float(polydata[8])),
+				double(tms320c3x_device::fp_to_float(polydata[9])),
 				polydata[10],
 				polydata[11],
-				(int16_t)(polydata[12] >> 16), (int16_t)(polydata[12] << 2) >> 2, polydata[12]);
+				int16_t(polydata[12] >> 16), int16_t(polydata[12] << 2) >> 2, polydata[12]);
 
-		m_state.logerror(" (%4d,%4d) %08X %08X", (int16_t)(polydata[13] >> 16), (int16_t)(polydata[13] << 2) >> 2, polydata[13], polydata[14]);
+		m_state.logerror(" (%4d,%4d) %08X %08X", int16_t(polydata[13] >> 16), int16_t(polydata[13] << 2) >> 2, polydata[13], polydata[14]);
 		for (t = 15; !IS_POLYEND(polydata[t - 2]); t += 2)
-			m_state.logerror(" (%4d,%4d) %08X %08X", (int16_t)(polydata[t] >> 16), (int16_t)(polydata[t] << 2) >> 2, polydata[t], polydata[t+1]);
+			m_state.logerror(" (%4d,%4d) %08X %08X", int16_t(polydata[t] >> 16), int16_t(polydata[t] << 2) >> 2, polydata[t], polydata[t+1]);
 		m_state.logerror("\n");
 	}
 

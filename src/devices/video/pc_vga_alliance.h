@@ -14,7 +14,8 @@
 class promotion_vga_device :  public svga_device
 {
 public:
-	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+	// preliminary, doesn't boot if mounted
+	static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
 
 	promotion_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

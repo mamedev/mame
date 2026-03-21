@@ -10,7 +10,9 @@ Keyboard is separate, and the key layout is very similar to the fm7.
 TODO:
 - Kanji text is cutted in half when font_size is 1 / interlace is disabled, different ROM used?
   (check Back to the Future);
-- Add remaining missing peripherals, SIO, HDD and w1300a network;
+- Add remaining missing peripherals, SIO, HDD;
+- WIZnet W3100A/W5100 ethernet boards
+  cfr. https://cwaweb.bai.ne.jp/~ohishi/zakki/mzlan_final.htm
 - reverse / blanking tvram attributes;
 - Implement backward compatibility with MZ-2000/MZ-80B;
 - Implement expansion box unit;
@@ -1201,8 +1203,7 @@ void mz2500_state::bank_window_map(address_map &map)
 void mz2500_state::z80_io(address_map &map)
 {
 	map.unmap_value_high();
-//  map(0x60, 0x63).mirror(0xff00).w(FUNC(mz2500_state::w3100a_w));
-//  map(0x63, 0x63).mirror(0xff00).r(FUNC(mz2500_state::w3100a_r));
+//  map(0x6x, 0x6x) WIZnet W3100A ethernet (DIY)
 //  map(0x98, 0x99) MZ-1E35 ADPCM
 	map(0xa0, 0xa3).mirror(0xff00).rw(FUNC(mz2500_state::sio_access_r<0>), FUNC(mz2500_state::sio_access_w<0>));
 	map(0xb0, 0xb3).mirror(0xff00).rw(FUNC(mz2500_state::sio_access_r<1>), FUNC(mz2500_state::sio_access_w<1>));

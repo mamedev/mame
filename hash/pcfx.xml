@@ -2,129 +2,208 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
+
+TODO:
+- add remaining SWs;
+- filter for PC-FXGA;
+- rename to pcfx_cdrom, assuming that anyone ever released anything workable from FX-BMP interface;
+
 -->
 <softwarelist name="pcfx" description="NEC PC-FX CD-ROMs">
 
-	<!-- Sourced from Redump -->
+	<!-- Unless otherwise noted, all dumps comes from redump.org -->
 
-	<software name="amateur" supported="no">
-		<description>Amateur Teikyou CD-ROM</description>
-		<year>1994</year>
-		<publisher>NEC</publisher>
-		<part name="cdrom" interface="pcfx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amateur teikyou cd-rom (japan)" sha1="ce2f6509a2bebcd36a1063ca6233d3d6150b7419"/>
-			</diskarea>
-		</part>
-	</software>
-	<software name="angeliq" supported="no">
-		<description>Fushigi no Kuni no Angelique</description>
-		<year>1996</year>
-		<publisher>Koei</publisher>
-		<part name="cdrom" interface="pcfx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="fushigi no kuni no angelique (japan)" sha1="4d838cd6b5123d86b415bc4ab405714a16bacfad"/>
-			</diskarea>
-		</part>
-	</software>
+<!-- !Games -->
+
 	<software name="batlheat" supported="no">
 		<description>Battle Heat</description>
 		<year>1994</year>
 		<publisher>Hudson Soft</publisher>
-		<part name="cdrom" interface="pcfx_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="battle heat (japan)" sha1="1a73ab8064ddfaebd5e555f51e4c153da6027fd7"/>
 			</diskarea>
 		</part>
 	</software>
+
 	<software name="cancandx" supported="no">
 		<description>Can Can Bunny Extra DX</description>
 		<year>1996</year>
 		<publisher>Cocktail Soft</publisher>
-		<part name="cdrom" interface="pcfx_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="can can bunny extra dx (japan)" sha1="9153147469b2b9ecadebb9990c707f4c3d3f6587"/>
 			</diskarea>
 		</part>
 	</software>
-	<software name="carrot" supported="no">
-		<description>Pia Carrot e Youkuso!! - We've Been Waiting for You</description>
-		<year>1997</year>
-		<publisher>Cocktail Soft</publisher>
-		<part name="cdrom" interface="pcfx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="pia carrot e youkoso weve been waiting for you (japan)" sha1="95a5c2f20d406dcaa0ab5e0ff692e3ee2cd4ad76"/>
-			</diskarea>
-		</part>
-	</software>
-	<software name="dknight4" supported="no">
-		<description>Dragon Knight IV</description>
-		<year>1997</year>
-		<publisher>NEC</publisher>
-		<part name="cdrom" interface="pcfx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="dragon knight 4 (japan)" sha1="c0a81f9b38f6acbccc03c0d5fdad39e1bc834122"/>
-			</diskarea>
-		</part>
-	</software>
-	<software name="doukyuu2" supported="no">
-		<description>Doukyuusei 2</description>
-		<year>1996</year>
-		<publisher>ELF</publisher>
-		<part name="cdrom" interface="pcfx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="doukyuusei 2 (japan)" sha1="b20af9f1d3d2abad58656efcafa4f981f6bdb22b"/>
-			</diskarea>
-		</part>
-	</software>
-	<software name="farland" supported="no">
-		<description>Farland Story FX</description>
-		<year>1996</year>
-		<publisher>NEC</publisher>
-		<part name="cdrom" interface="pcfx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="farland story fx (japan)" sha1="9c9689a0d06a9276bb87a2f1a616bc6e93334b75"/>
-			</diskarea>
-		</part>
-	</software>
-	<software name="firewomn" supported="no">
-		<description>Fire Woman Matoigumi</description>
-		<year>1996</year>
-		<publisher>Tokuma Shoten</publisher>
-		<part name="cdrom" interface="pcfx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="fire woman matoigumi (japan)" sha1="1e31207f18c16ea61b9485d99fe9af3da0a3e2d0"/>
-			</diskarea>
-		</part>
-	</software>
+
 	<software name="langriss" supported="no">
 		<description>Der Langrisser FX</description>
 		<year>1996</year>
 		<publisher>NCS</publisher>
-		<part name="cdrom" interface="pcfx_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="langrisser fx, der (japan)" sha1="15e757fa66c46570f038a27d59b0709d1cf9d4bf"/>
 			</diskarea>
 		</part>
 	</software>
+
+	<software name="doukyuu2" supported="no">
+		<description>Doukyuusei 2</description>
+		<year>1996</year>
+		<publisher>ELF</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="doukyuusei 2 (japan)" sha1="b20af9f1d3d2abad58656efcafa4f981f6bdb22b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dknight4" supported="no">
+		<description>Dragon Knight IV</description>
+		<year>1997</year>
+		<publisher>NEC</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dragon knight 4 (japan)" sha1="c0a81f9b38f6acbccc03c0d5fdad39e1bc834122"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="farland" supported="no">
+		<description>Farland Story FX</description>
+		<year>1996</year>
+		<publisher>NEC</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="farland story fx (japan)" sha1="9c9689a0d06a9276bb87a2f1a616bc6e93334b75"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="firewomn" supported="no">
+		<description>Fire Woman Matoigumi</description>
+		<year>1996</year>
+		<publisher>Tokuma Shoten</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fire woman matoigumi (japan)" sha1="1e31207f18c16ea61b9485d99fe9af3da0a3e2d0"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="angeliq" supported="no">
+		<description>Fushigi no Kuni no Angelique</description>
+		<year>1996</year>
+		<publisher>Koei</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fushigi no kuni no angelique (japan)" sha1="4d838cd6b5123d86b415bc4ab405714a16bacfad"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="megamip2" supported="no">
 		<description>Megami Paradise II</description>
 		<year>1996</year>
 		<publisher>NEC</publisher>
-		<part name="cdrom" interface="pcfx_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="megami paradise ii (japan)" sha1="86ac2e526c9c7821708b0e47e9ebb317b79c790b"/>
 			</diskarea>
 		</part>
 	</software>
+
+	<software name="carrot" supported="no">
+		<description>Pia Carrot e Youkuso!! - We've Been Waiting for You</description>
+		<year>1997</year>
+		<publisher>Cocktail Soft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pia carrot e youkoso weve been waiting for you (japan)" sha1="95a5c2f20d406dcaa0ab5e0ff692e3ee2cd4ad76"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="sotsugy2" supported="no">
 		<description>Sotsugyou II FX - Neo Generation</description>
 		<year>1994</year>
 		<publisher>Riverhill Soft</publisher>
-		<part name="cdrom" interface="pcfx_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sotsugyou ii fx - neo generation (japan)" sha1="8a9e5f269c854d1daa4114ba68a3e89598f26e81"/>
 			</diskarea>
 		</part>
 	</software>
+
+<!-- !PC-FXGA software and games -->
+
+	<software name="amateur" supported="no">
+		<description>Amateur Teikyou CD-ROM (PC-98 C-Bus)</description>
+		<year>1995</year>
+		<publisher>NEC / Hudson Soft</publisher>
+		<notes><![CDATA[
+GMAKER (v1.0) for PC-FXGA C-Bus
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="amateur teikyou cd-rom (japan)" sha1="ce2f6509a2bebcd36a1063ca6233d3d6150b7419"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="amateurv" cloneof="amateur" supported="no">
+		<description>Amateur Teikyou CD-ROM (ISA DOS/V-you)</description>
+		<year>1996</year>
+		<publisher>NEC / Hudson Soft</publisher>
+		<notes><![CDATA[
+GMAKER (v1.1) for PC-FXGA ISA
+]]></notes>
+		<info name="serial" value="79753618"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="amateur teikyou cd-rom (japan) (dos-v-you) (nec pc-fxga)" sha1="30f21880f75ee3be6c9dd1b747c5e2df2ba582ca"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nnyuu" supported="no">
+		<description>N-nyuu: PC-FXGA Game ga Asoberu Tsukureru Hon</description>
+		<year>1996</year>
+		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+Disc 2 requires a Win32 OS on PC-98 or DOS/V machines
+]]></notes>
+		<info name="barcode" value="4904323270170"/>
+		<info name="serial" value="08486501"/>
+		<!-- GANHE001A + GANHE001B -->
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="n-nyuu - pc-fxga game ga asoberu tsukureru hon (japan) (disc 1) (n-nyuu)" sha1="ebafc3236d5085d5b293805e0b33f6706b47979c"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="n-nyuu - pc-fxga game ga asoberu tsukureru hon (japan) (disc 2)" sha1="6e9c966126c1fcf97c8cb8112a3880dd33c4798e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="samegame" supported="no">
+		<!-- http://redump.org/disc/46445/ -->
+		<description>Same Game FX</description>
+		<year>1995</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+Bundled with PC-FXGA
+]]></notes>
+		<info name="barcode" value="4904323240074"/>
+		<info name="serial" value="79753599"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="same game fx (japan) (nec pc-fxga)" sha1="940b7c0400fa617794764aa9d6dee60e002337be"/>
+			</diskarea>
+		</part>
+	</software>
+
 </softwarelist>

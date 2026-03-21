@@ -81,9 +81,10 @@ hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const ch
 	, m_icount(0)
 	, m_kol_cb(*this)
 	, m_koh_cb(*this)
-	, m_port_cb(*this)
+	, m_port_w_cb(*this)
 	, m_opt_cb(*this)
 	, m_ki_cb(*this, 0)
+	, m_port_r_cb(*this, 0)
 	, m_in0_cb(*this, 0)
 	, m_input_flag_cb(*this, 0)
 {
@@ -1902,7 +1903,12 @@ void hcd62121_cpu_device::execute_run()
 			m_kol_cb(read_op());
 			break;
 
-		case 0xB9:      /* unk_B9 reg/i8 - timer/irq related? */
+		case 0xB8:      /* unk_B8 reg - timer/irq related? */
+			logerror("%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op);
+			read_op();
+			break;
+
+		case 0xB9:      /* unk_B9 i8 - timer/irq related? */
 			logerror("%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op);
 			read_op();
 			break;
@@ -2159,7 +2165,7 @@ void hcd62121_cpu_device::execute_run()
 			break;
 
 		case 0xE6:      /* movb reg,PORT */
-			set_reg(read_op() & 0x7f, m_port);
+			set_reg(read_op() & 0x7f, m_port_r_cb());
 			break;
 
 		case 0xE8:      /* movw r1,lar */
@@ -2208,7 +2214,7 @@ void hcd62121_cpu_device::execute_run()
 
 		case 0xF2:      /* movb PORT,reg */
 			m_port = m_reg[read_op() & 0x7f];
-			m_port_cb(m_port);
+			m_port_w_cb(m_port);
 			break;
 
 		case 0xF5:      /* unk_F5 reg/i8 (out?) */

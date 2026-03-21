@@ -28,8 +28,6 @@ public:
 	// construction/destruction
 	dio16_98265a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void mb87030(device_t *device);
-
 protected:
 	dio16_98265a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -58,7 +56,6 @@ private:
 	static constexpr int REG_CONTROL_DE0 = (1 << 0);
 	static constexpr int REG_CONTROL_DE1 = (1 << 1);
 
-	static void mb87030_scsi_adapter(device_t *device);
 	required_ioport m_sw1;
 	required_ioport m_sw2;
 	int get_int_level();
@@ -71,18 +68,9 @@ private:
 	bool m_dmar0;
 };
 
-void dio16_98265a_device::mb87030_scsi_adapter(device_t *device)
-{
-	mb87030_device &spc = downcast<mb87030_device &>(*device);
-	spc.set_clock(8_MHz_XTAL);
-
-	spc.out_irq_callback().set("^^", FUNC(dio16_98265a_device::irq_w));
-	spc.out_dreq_callback().set("^^", FUNC(dio16_98265a_device::dmar0_w));
-}
-
 void dio16_98265a_device::device_add_mconfig(machine_config &config)
 {
-	NSCSI_BUS(config, m_scsibus, 0);
+	auto &scsi(NSCSI_BUS(config, m_scsibus));
 	nscsi_connector &scsicon0(NSCSI_CONNECTOR(config, "scsibus:0", 0));
 	default_scsi_devices(scsicon0);
 	scsicon0.set_default_option("harddisk");
@@ -97,11 +85,11 @@ void dio16_98265a_device::device_add_mconfig(machine_config &config)
 	scsicon5.set_default_option("cdrom");
 
 	default_scsi_devices(NSCSI_CONNECTOR(config, "scsibus:6", 0));
-	nscsi_connector &scsicon7(NSCSI_CONNECTOR(config, "scsibus:7", 0));
-	scsicon7.option_add_internal("mb87030", MB87030);
-	scsicon7.set_default_option("mb87030");
-	scsicon7.set_fixed(true);
-	scsicon7.set_option_machine_config("mb87030", mb87030_scsi_adapter);
+
+	MB87030(config, m_spc, 8_MHz_XTAL);
+	scsi.set_external_device(7, m_spc);
+	m_spc->out_irq_callback().set(DEVICE_SELF, FUNC(dio16_98265a_device::irq_w));
+	m_spc->out_dreq_callback().set(DEVICE_SELF, FUNC(dio16_98265a_device::dmar0_w));
 }
 
 dio16_98265a_device::dio16_98265a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -113,7 +101,7 @@ dio16_98265a_device::dio16_98265a_device(const machine_config &mconfig, device_t
 	device_t(mconfig, type, tag, owner, clock),
 	device_dio32_card_interface(mconfig, *this),
 	m_scsibus(*this, "scsibus"),
-	m_spc(*this, "scsibus:7:mb87030"),
+	m_spc(*this, "mb87030"),
 	m_sw1(*this, "SW1"),
 	m_sw2(*this, "SW2"),
 	m_installed_io(false),
@@ -276,18 +264,18 @@ void dio16_98265a_device::io_w(offs_t offset, uint16_t data)
 	case 2:
 		uint8_t val = 0;
 		if (data & 0x80)
-			val |= nscsi_device::S_REQ;
+			val |= nscsi_device_interface::S_REQ;
 		if (data & 0x40)
-			val |= nscsi_device::S_ACK;
+			val |= nscsi_device_interface::S_ACK;
 		if (data & 0x08)
-			val |= nscsi_device::S_BSY;
+			val |= nscsi_device_interface::S_BSY;
 		if (data & 0x04)
-			val |= nscsi_device::S_MSG;
+			val |= nscsi_device_interface::S_MSG;
 		if (data & 0x02)
-			val |= nscsi_device::S_CTL;
+			val |= nscsi_device_interface::S_CTL;
 		if (data & 0x01)
-			val |= nscsi_device::S_INP;
-		m_spc->ctrl_write(val, nscsi_device::S_ALL);
+			val |= nscsi_device_interface::S_INP;
+		m_spc->ctrl_write(val, nscsi_device_interface::S_ALL);
 		break;
 	}
 }

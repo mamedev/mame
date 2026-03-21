@@ -494,6 +494,7 @@ std::string machine_info::game_info_string() const
 					count++;
 		}
 
+		// determine clock frequency
 		std::string hz(std::to_string(clock));
 		int d = (clock >= 1'000'000'000) ? 9 : (clock >= 1'000'000) ? 6 : (clock >= 1000) ? 3 : 0;
 		if (d > 0)
@@ -504,7 +505,7 @@ std::string machine_info::game_info_string() const
 			hz = hz.substr(0, last + (last != dpos ? 1 : 0));
 		}
 
-		// if more than one, prepend a #x in front of the CPU name and display clock
+		// if more than one, prepend a #x in front of the CPU name, also display clock if it has one
 		util::stream_format(buf,
 				(count > 1)
 					? ((clock != 0) ? u8"%1$d×%2$s %3$s\u00a0%4$s\n" : u8"%1$d×%2$s\n")
@@ -527,15 +528,28 @@ std::string machine_info::game_info_string() const
 			buf << _("\nSound:\n");
 		found_sound = true;
 
+		// number of speaker (or microphone) channels (0 when not applicable)
+		int io_channels = 0;
+		if (sound_io_device *speaker = dynamic_cast<sound_io_device *>(&sound.device()))
+			io_channels = speaker->channels();
+
 		// count how many identical sound chips we have
 		int count = 1;
 		for (device_sound_interface &scan : snditer)
 		{
 			if (sound.device().type() == scan.device().type() && sound.device().clock() == scan.device().clock())
+			{
+				// speakers are only identical if they have the same number of channels
+				if (sound_io_device *speaker = dynamic_cast<sound_io_device *>(&scan.device()); speaker && io_channels)
+					if (io_channels != speaker->channels())
+						continue;
+
 				if (soundtags.insert(scan.device().tag()).second)
 					count++;
+			}
 		}
 
+		// determine clock frequency
 		const u32 clock = sound.device().clock();
 		std::string hz(std::to_string(clock));
 		int d = (clock >= 1'000'000'000) ? 9 : (clock >= 1'000'000) ? 6 : (clock >= 1000) ? 3 : 0;
@@ -547,13 +561,30 @@ std::string machine_info::game_info_string() const
 			hz = hz.substr(0, last + (last != dpos ? 1 : 0));
 		}
 
-		// if more than one, prepend a #x in front of the soundchip name and display clock
+		// if more than one, prepend a #x in front of the soundchip name, also display clock if it has one
 		util::stream_format(buf,
 				(count > 1)
-					? ((clock != 0) ? u8"%1$d×%2$s %3$s\u00a0%4$s\n" : u8"%1$d×%2$s\n")
-					: ((clock != 0) ? u8"%2$s %3$s\u00a0%4$s\n" : "%2$s\n"),
+					? ((clock != 0) ? u8"%1$d×%2$s %3$s\u00a0%4$s" : u8"%1$d×%2$s")
+					: ((clock != 0) ? u8"%2$s %3$s\u00a0%4$s" : "%2$s"),
 				count, sound.device().name(), hz,
 				(d == 9) ? _("GHz") : (d == 6) ? _("MHz") : (d == 3) ? _("kHz") : _("Hz"));
+
+		// append basic speaker information
+		switch (io_channels)
+		{
+		case 0:
+			buf << "\n";
+			break;
+		case 1:
+			buf << _(" (Mono)\n");
+			break;
+		case 2:
+			buf << _(" (Stereo)\n");
+			break;
+		default:
+			buf << util::string_format(_(u8" (%d\u00a0channels)\n"), io_channels);
+			break;
+		}
 	}
 
 	// display screen information

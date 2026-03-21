@@ -125,7 +125,7 @@ namespace
 			m_scc_peripheral(*this, "scc_peripheral"),
 			m_net(*this, "net"),
 			m_fdc(*this, "fdc"),
-			m_scsi(*this, "scsi:7:am5380"),
+			m_scsi(*this, "am5380"),
 			m_scsi_dma(*this, "scsi_dma"),
 			m_dip_switch(*this, "FRONT_PANEL"),
 			m_serial(*this, "serial%u", 0U),
@@ -1019,7 +1019,7 @@ namespace
 		// Early (pre-OS-3) bootloaders are extremely picky about IDNT data and reported capacity; ensure you are using IDNT data and the matching size reported
 		// from an actual CDC drive if dealing with early versions.
 		// Note: Only the NWS-891 came with a CD-ROM as a default option, others required an external CD-ROM drive
-		NSCSI_BUS(config, "scsi");
+		auto &scsi(NSCSI_BUS(config, "scsi"));
 		NSCSI_CONNECTOR(config, "scsi:0", news_scsi_devices, "harddisk");
 		NSCSI_CONNECTOR(config, "scsi:1", news_scsi_devices, nullptr);
 		NSCSI_CONNECTOR(config, "scsi:2", news_scsi_devices, nullptr);
@@ -1029,12 +1029,10 @@ namespace
 		NSCSI_CONNECTOR(config, "scsi:6", news_scsi_devices, nullptr);
 
 		// AMD Am5380PC SCSI interface
-		NSCSI_CONNECTOR(config, "scsi:7").option_set("am5380", NCR5380).machine_config([this] (device_t *device)
-		{
-			ncr5380_device &adapter = downcast<ncr5380_device &>(*device);
-			adapter.irq_handler().set([this] (int state){ m_scsi_dma->irq_w(state); });
-			adapter.drq_handler().set(*this, FUNC(news_iop_state::scsi_drq_handler));
-		});
+		NCR5380(config, m_scsi);
+		scsi.set_external_device(7, m_scsi);
+		m_scsi->irq_handler().set([this] (int state){ m_scsi_dma->irq_w(state); });
+		m_scsi->drq_handler().set(DEVICE_SELF, FUNC(news_iop_state::scsi_drq_handler));
 
 		// Virtual device for handling SCSI DMA
 		// (workaround for 68k bus access limitiations; normally iopboot's BERR handler would deal with SCSI DMA stuff)
