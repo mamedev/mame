@@ -4,7 +4,7 @@
 /*
     Cirsa 860607 hardware for slot machines.
     Known games on this hardware:
-      -Mini Bar (c) 1985 Cirsa
+      -Mini Bar (c) 1989 Cirsa
       -Mini Guay (c) 1986 Cirsa
 
     Main components:
@@ -204,7 +204,7 @@ void miniguay_state::miniguay(machine_config &config)
 
 /* Mini Guay - 860607-2A PCB
    The dumped version (Mini Guay VD) uses plastic displays with light bulbs, but there's a different
-   one (undumped) called "Mini Guay VR" (VR stands for "Version Rodillos") or just "Mini Guay" with
+   one (undumped) called "Mini Guay VR" (VR stands for "Versión Rodillos") or just "Mini Guay" with
    reels instead, with an additional PCB for reels control (8031 + 2764 EPROM). */
 ROM_START( miniguay )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -226,5 +226,5 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1986, miniguay, 0, miniguay, miniguay, miniguay_state, empty_init, ROT0, "Cirsa", "Mini Guay VD", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // VD stands for "Version Displays".
-GAME( 1985, minibar,  0, miniguay, miniguay, miniguay_state, empty_init, ROT0, "Cirsa", "Mini Bar",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1986, miniguay, 0, miniguay, miniguay, miniguay_state, empty_init, ROT0, "Cirsa", "Mini Guay VD", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // VD stands for "Versión Displays".
+GAME( 1989, minibar,  0, miniguay, miniguay, miniguay_state, empty_init, ROT0, "Cirsa", "Mini Bar",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
