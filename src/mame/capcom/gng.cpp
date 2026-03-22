@@ -1168,10 +1168,10 @@ GAME( 1985, gngprot,     gng, gng,     gng,      gng_state, empty_init, ROT0, "C
 GAME( 1985, gngbl,       gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (bootleg with Cross)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gngbla,      gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (bootleg)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gngblita,    gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (Italian bootleg, harder)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimurg,   gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan revision G)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimurc,   gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan revision C)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimurb,   gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan revision B)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimurbbl, gng, gng,     makaimur, gng_state, empty_init, ROT0, "bootleg",  "Makaimura (Japan revision B bootleg)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurg,   gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan revision G)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurc,   gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan revision C)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurb,   gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan revision B)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurbbl, gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Makaimura (Japan revision B bootleg)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1985, makaimur,    gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan revision A?)",               MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, diamrun,     0,   diamrun, diamrun,  gng_state, empty_init, ROT0, "KH Video", "Diamond Run",                                 MACHINE_SUPPORTS_SAVE ) // Kyle Hodgetts
