@@ -2980,16 +2980,16 @@ void specnext_state::map_mem(address_map &map)
 		// bank5
 		views[i].get()[0x2a](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lrw8(
 			NAME([this](offs_t offset) { return m_bram_bank5[offset & 0x1fff]; }),
-			NAME([this](offs_t offset, u8 data) { m_bram_bank5[offset & 0x1fff] = data; })
+			NAME([this](offs_t offset, u8 data) { m_screen->update_now(); m_bram_bank5[offset & 0x1fff] = data; })
 		);
 		views[i].get()[0x2b](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lrw8(
 			NAME([this](offs_t offset) { return m_bram_bank5[0x2000 + (offset & 0x1fff)]; }),
-			NAME([this](offs_t offset, u8 data) { m_bram_bank5[0x2000 + (offset & 0x1fff)] = data; })
+			NAME([this](offs_t offset, u8 data) { m_screen->update_now(); m_bram_bank5[0x2000 + (offset & 0x1fff)] = data; })
 		);
 		// bank7
 		views[i].get()[0x2e](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).lrw8(
 			NAME([this](offs_t offset) { return m_bram_bank7[offset & 0x1fff]; }),
-			NAME([this](offs_t offset, u8 data) { m_bram_bank7[offset & 0x1fff] = data; })
+			NAME([this](offs_t offset, u8 data) { m_screen->update_now(); m_bram_bank7[offset & 0x1fff] = data; })
 		);
 	}
 	views[0].get()[2](0x0000, 0x1fff).bankr(m_bank_boot_rom);
@@ -4018,6 +4018,7 @@ void specnext_state::tbblue(machine_config &config)
 	m_maincpu->in_nextreg_cb().set([this](offs_t offset) { return m_next_regs.read_byte(offset); });
 	m_maincpu->out_retn_seen_cb().set(FUNC(specnext_state::leave_nmi));
 	m_maincpu->busack_cb().set(m_dma, FUNC(specnext_dma_device::bai_w));
+	m_maincpu->irqack_cb().set([this](int) { m_screen->update_now(); });
 
 	SPECNEXT_IM2(config, m_im2_line);
 	m_im2_line->irq_callback().set(FUNC(specnext_state::irq_w));
