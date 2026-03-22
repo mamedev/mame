@@ -1278,7 +1278,7 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 		util::stream_format(title_buf,
 				((gfx.origwidth() == gfx.width()) && (gfx.origheight() == gfx.height())) ? 
 				_("gfxview", u8" %1$d\u00d7%2$d color %7$X/%8$X") :
-				_("gfxview", u8" %1$d\u00d7%2$d (clipped to %3$d:%4$d\u00d7%5$d:%6$d) color %7$X/%8$X"),
+				_("gfxview", u8" %1$d\u00d7%2$d (clip: %3$d:%4$d\u00d7%5$d:%6$d) color %7$X/%8$X"),
 				gfx.origwidth(), gfx.origheight(),
 				gfx.startx(), gfx.width(), gfx.starty(), gfx.height(),
 				set.m_color, set.m_color_count);
