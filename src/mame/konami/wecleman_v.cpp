@@ -579,13 +579,13 @@ void wecleman_state::wecleman_draw_road(bitmap_rgb32 &bitmap, const rectangle &c
 			road &= YMASK;
 
 			uint8_t const *const src_ptr = m_gfxdecode->gfx(1)->get_data((road << 3));
-			m_gfxdecode->gfx(1)->get_data((road << 3) + 1);
-			m_gfxdecode->gfx(1)->get_data((road << 3) + 2);
-			m_gfxdecode->gfx(1)->get_data((road << 3) + 3);
-			m_gfxdecode->gfx(1)->get_data((road << 3) + 4);
-			m_gfxdecode->gfx(1)->get_data((road << 3) + 5);
-			m_gfxdecode->gfx(1)->get_data((road << 3) + 6);
-			m_gfxdecode->gfx(1)->get_data((road << 3) + 7);
+			m_gfxdecode->gfx(1)->clear_dirty((road << 3) + 1);
+			m_gfxdecode->gfx(1)->clear_dirty((road << 3) + 2);
+			m_gfxdecode->gfx(1)->clear_dirty((road << 3) + 3);
+			m_gfxdecode->gfx(1)->clear_dirty((road << 3) + 4);
+			m_gfxdecode->gfx(1)->clear_dirty((road << 3) + 5);
+			m_gfxdecode->gfx(1)->clear_dirty((road << 3) + 6);
+			m_gfxdecode->gfx(1)->clear_dirty((road << 3) + 7);
 			int mdy = ((road * MIDCURB_DY) >> 8) * bitmap.rowpixels();
 			int tdy = ((road * TOPCURB_DY) >> 8) * bitmap.rowpixels();
 

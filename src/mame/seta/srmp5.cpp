@@ -248,7 +248,7 @@ uint32_t srmp5_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			if (m_tileduty[i] == 1)
 			{
 				m_gfxdecode->gfx(0)->mark_dirty(i);
-				m_gfxdecode->gfx(0)->get_data(i);
+				m_gfxdecode->gfx(0)->clear_dirty(i);
 				m_tileduty[i] = 0;
 			}
 		}

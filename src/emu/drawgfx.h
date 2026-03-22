@@ -166,6 +166,12 @@ public:
 	bool has_pen_usage() const { return !m_pen_usage.empty(); }
 	bool has_palette() const { return m_palette; }
 
+	// used by gfx viewer, get original size regardless source clip
+	u16 origwidth() const { return m_origwidth; }
+	u16 origheight() const { return m_origheight; }
+	u16 startx() const { return m_startx; }
+	u16 starty() const { return m_starty; }
+
 	// used by tilemaps
 	u32 dirtyseq() const { return m_dirtyseq; }
 
@@ -185,10 +191,24 @@ public:
 	void mark_dirty(u32 code) { if (code < elements()) { m_dirty[code] = 1; m_dirtyseq++; } }
 	void mark_all_dirty() { memset(&m_dirty[0], 1, elements()); }
 
-	const u8 *get_data(u32 code)
+	void clear_dirty(u32 code)
 	{
 		assert(code < elements());
-		if (code < m_dirty.size() && m_dirty[code]) decode(code);
+		if (code < m_dirty.size() && m_dirty[code])
+			decode(code);
+	}
+
+	void clear_all_dirty()
+	{
+		for (int i = 0; i < elements(); i++)
+		{
+			clear_dirty(i);
+		}
+	}
+
+	const u8 *get_data(u32 code)
+	{
+		clear_dirty(code);
 		return m_gfxdata + code * m_char_modulo + m_starty * m_line_modulo + m_startx;
 	}
 
@@ -197,6 +217,13 @@ public:
 		assert(code < m_pen_usage.size());
 		if (m_dirty[code]) decode(code);
 		return m_pen_usage[code];
+	}
+
+	// used by gfx viewer, get original data regardless source clip
+	const u8 *get_origdata(u32 code)
+	{
+		clear_dirty(code);
+		return m_gfxdata + code * m_char_modulo;
 	}
 
 	// ----- core graphics drawing -----
