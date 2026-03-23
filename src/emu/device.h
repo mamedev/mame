@@ -243,7 +243,7 @@ public:
 		: m_creator(&create_device<DeviceClass>)
 		, m_type(typeid(DeviceClass))
 		, m_shortname(Traits::shortname)
-		, m_fullname(Traits::fullname)
+		, m_fullname((char const *)Traits::fullname)
 		, m_source(Traits::source)
 		, m_emulation_flags(DeviceClass::emulation_flags())
 		, m_unemulated_features(DeviceClass::unemulated_features())
@@ -258,7 +258,7 @@ public:
 		: m_creator(&create_driver<DriverClass>)
 		, m_type(typeid(DriverClass))
 		, m_shortname(Traits::shortname)
-		, m_fullname(Traits::fullname)
+		, m_fullname((char const *)Traits::fullname)
 		, m_source(Traits::source)
 		, m_emulation_flags(DriverClass::emulation_flags() | Flags)
 		, m_unemulated_features(DriverClass::unemulated_features() | Unemulated)
@@ -404,7 +404,7 @@ extern emu::detail::device_registrar const registered_device_types;
 			{ \
 				static inline constexpr char const *const shortname = (ShortName); \
 				static inline constexpr char const *const source = __FILE__; \
-				static constexpr char const fullname[] = (FullName); \
+				static constexpr std::remove_reference_t<decltype((FullName)[0])> const fullname[] = (FullName); \
 			}; \
 			constexpr decltype(Type##_device_traits::fullname) Type##_device_traits::fullname; \
 		} \
@@ -446,7 +446,7 @@ extern emu::detail::device_registrar const registered_device_types;
 			{ \
 				static inline constexpr char const *const shortname = (ShortName); \
 				static inline constexpr char const *const source = __FILE__; \
-				static constexpr char const fullname[] = (FullName); \
+				static constexpr std::remove_reference_t<decltype((FullName)[0])> const fullname[] = (FullName); \
 			}; \
 			constexpr decltype(Type##_device_traits::fullname) Type##_device_traits::fullname; \
 		} \
