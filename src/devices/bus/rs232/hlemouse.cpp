@@ -226,7 +226,7 @@ void hle_msmouse_device_base::device_start()
 	save_item(NAME(m_rts));
 	save_item(NAME(m_enable));
 
-	set_data_frame(1, 7, PARITY_NONE, STOP_BITS_1);
+	set_data_frame(1, 7, PARITY_NONE, STOP_BITS_2);
 	set_rate(1'200);
 	receive_register_reset();
 	transmit_register_reset();
