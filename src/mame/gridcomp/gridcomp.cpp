@@ -157,8 +157,6 @@ private:
 	void grid_dma_w(offs_t offset, uint8_t data);
 	uint8_t grid_dma_r(offs_t offset);
 
-	void timer2_w(int state);
-
 	template <int Width>
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -279,12 +277,6 @@ uint8_t gridcomp_state::grid_dma_r(offs_t offset)
 	return ret;
 }
 
-void gridcomp_state::timer2_w(int state)
-{
-	m_uart8274->rxca_w(state);
-	m_uart8274->txca_w(state);
-}
-
 template <int Width>
 uint32_t gridcomp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -395,7 +387,8 @@ void gridcomp_state::grid1101(machine_config &config)
 
 	I80130(config, m_osp, XTAL(15'000'000)/3);
 	m_osp->irq().set_inputline("maincpu", 0);
-	m_osp->baud().set(FUNC(gridcomp_state::timer2_w));
+	m_osp->baud().set(m_uart8274, FUNC(i8274_device::rxca_w));
+	m_osp->baud().append(m_uart8274, FUNC(i8274_device::txca_w));
 
 	MM58174(config, m_rtc, 32.768_kHz_XTAL);
 
@@ -455,9 +448,9 @@ void gridcomp_state::grid1101(machine_config &config)
 	m_uart8274->out_int_callback().set(I80130_TAG, FUNC(i80130_device::ir0_w));
 
 	rs232_port_device &rs232_port(RS232_PORT(config, "rs232_port", rs232_devices, nullptr));
-	rs232_port.rxd_handler().set("uart8274", FUNC(i8274_device::rxa_w));
-	rs232_port.dcd_handler().set("uart8274", FUNC(i8274_device::dcda_w));
-	rs232_port.cts_handler().set("uart8274", FUNC(i8274_device::ctsa_w));
+	rs232_port.rxd_handler().set(m_uart8274, FUNC(i8274_device::rxa_w));
+	rs232_port.dcd_handler().set(m_uart8274, FUNC(i8274_device::dcda_w));
+	rs232_port.cts_handler().set(m_uart8274, FUNC(i8274_device::ctsa_w));
 
 	I8255(config, "modem", 0);
 
