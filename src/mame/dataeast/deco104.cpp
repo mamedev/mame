@@ -1050,7 +1050,7 @@ DEFINE_DEVICE_TYPE(DECO104PROT, deco104_device, "deco104", "DECO 104 Protection"
 
 
 deco104_device::deco104_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: deco_146_base_device(mconfig, DECO104PROT, tag, owner, clock, 0x66, 0x2a4, 0x42, 0xee, 0xa8, 0xc, port104_table)
+	: deco_146_base_device(mconfig, DECO104PROT, tag, owner, clock, 0x66, 0x2a4, 0x42, 0xee, 0xa8, /*0xc,*/ port104_table)
 {
 }
 
