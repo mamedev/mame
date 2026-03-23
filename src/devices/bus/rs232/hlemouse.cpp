@@ -231,9 +231,6 @@ void hle_msmouse_device_base::device_start()
 	receive_register_reset();
 	transmit_register_reset();
 
-	output_dcd(0);
-	output_cts(0);
-
 	m_x_delta = m_y_delta = 0;
 	m_x_val = m_y_val = 0U;
 	m_btn_val = m_btn_sent = 0x00U;
