@@ -74,7 +74,6 @@
 #include "machine/i80130.h"
 #include "machine/i8087.h"
 #include "machine/i8255.h"
-#include "machine/clock.h"
 #include "machine/mm58174.h"
 #include "machine/ram.h"
 #include "machine/tms9914.h"
@@ -83,7 +82,6 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
 #include "speaker.h"
 
 #define LOG_KEYBOARD  (1U << 1)
