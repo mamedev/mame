@@ -345,9 +345,9 @@ void a7800_state::a7800_mem(address_map &map)
 								// and even then with inconsistent and unreliable results.
 	map(0x4000, 0xffff).w(m_cart, FUNC(a78_cart_slot_device::write_40xx));
 	map(0x4000, 0xffff).r(m_cart, FUNC(a78_cart_slot_device::read_40xx));
-    // TODO: actually 0x8000-0xffff?
-    map(0xc000, 0xffff).view(m_bios_view);    // here also the BIOS can be accessed
-    m_bios_view[0](0xc000, 0xffff).rom().region("maincpu", 0);
+	// TODO: actually 0x8000-0xffff?
+	map(0xc000, 0xffff).view(m_bios_view);    // here also the BIOS can be accessed
+	m_bios_view[0](0xc000, 0xffff).rom().region("maincpu", 0);
 }
 
 
