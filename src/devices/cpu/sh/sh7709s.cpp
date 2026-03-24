@@ -7,8 +7,7 @@
 // for cv1k emulation specifically
 
 // Unimplemented functionality:
-// - Cache invalidation and write locking of cache lines
-// - Uncached access penalty
+// - Write locking of cache lines
 // - Prefix instruction fetch timing + cache handling
 // - Checks for certain area specifics : bank mode timing for sdram access, area check for sdram, area check for burst mode + burst size
 // - TLB simulation + timing and lookups
@@ -68,13 +67,29 @@ void sh7709s_device::device_start()
 	save_item(NAME(m_precharge_remaining_cycles));
 }
 
-static bool is_cacheable(uint32_t address)
+bool is_cacheable(uint32_t address)
 {
 	// 0x00000000 - 0x80000000 2GB cacheable virtual space
 	// 0x80000000 - 0xA0000000 0.5GB fixed physical cacheable space
 	// 0xC0000000 - 0xE0000000 0.5GB virtual cacheable space
 	uint8_t region = address >> 29;
 	return region != 0x5 && region != 0x7;
+}
+
+unsigned int get_area(uint32_t address)
+{
+	// Mask to 29 bit physical space
+	uint32_t phys_mask = address & SH34_AM;
+
+	return phys_mask >> 26;
+}
+
+static bool is_sdram_region(uint32_t address)
+{
+	unsigned int area = get_area(address);
+
+	// Hardcoded for cv1k, assumes 3 mapped to SDRAM
+	return area == 3;
 }
 
 // Returns true on cache hit, false if there was a miss cache miss and updates the cache state to reflect the access
@@ -130,22 +145,6 @@ bool sh7709s_device::cache_access(uint32_t address, bool write)
 	}
 
 	return false;
-}
-
-unsigned int get_area(uint32_t address)
-{
-	// Mask to 29 bit physical space
-	uint32_t phys_mask = address & SH34_AM;
-
-	return phys_mask >> 26;
-}
-
-static bool is_sdram_region(uint32_t address)
-{
-	unsigned int area = get_area(address);
-
-	// Hardcoded for now, assumes area 2 and 3 are both mapped to SDRAM
-	return area == 2 || area == 3;
 }
 
 bool can_use_burst(uint32_t address)
@@ -280,28 +279,41 @@ unsigned int cache_line_fetch_count(uint32_t address, uint16_t bcr2)
 // cpu->bus cycle conversion hardcoded to 2x as cv1k sh3 runs the bus at 50mhz
 unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 {
-	// Ignore non SDRAM regions for now, there aren't too many accesses to those
-	// that would affect slowdown
-	// Area0 contains the code so we would just be slowing down the code copy
-	// to main memory even more
-	if (!is_sdram_region(address))
-		return 0;
+	unsigned int area = get_area(address);
 
 	bool is_in_cache = cache_access(address, write);
 
 	if (is_in_cache)
 		return 0;
 
+	// Penalty calculations for SDRAM access
 	unsigned int bus_penalty = BUS_ACCESS_PENALTY + BURST_READ_WORD_PENALTY + mcr_rcd(m_mcr) + get_wcr2_timing(address, m_wcr2);
 	unsigned int cpu_penalty = CACHE_MISS_STALL;
 	unsigned int page_read = address / SDRAM_PAGE_SIZE;
 
+	// Penalty calculations for non-sdram access
+	if (!is_sdram_region(address))
+	{
+		cpu_penalty = 0;
+		// If it's not cacheable we're going to just do the single access
+		if (!is_cacheable(address))
+			bus_penalty = BUS_ACCESS_PENALTY + get_wcr2_timing(address, m_wcr2);
+		else // Cacheable access, fetch the whole cache line
+			bus_penalty = (BUS_ACCESS_PENALTY + get_wcr2_timing(address, m_wcr2)) * cache_line_fetch_count(address, m_bcr2);
+	}
+
+	if (area != m_last_area_accessed)
+		bus_penalty += get_wcr1_timing(address, m_wcr1);
+
+	m_last_area_accessed = area;
+
 	// CPU is in auto precharge mode, since we hit a bank conflict and the last precharge isn't done we stall
-	if (page_read == m_last_sdram_page && m_precharge_remaining_cycles > 0)
+	if (is_sdram_region(address) && page_read == m_last_sdram_page && m_precharge_remaining_cycles > 0)
 		cpu_penalty += m_precharge_remaining_cycles;
+
 	m_precharge_remaining_cycles = 0;
 
-	// We hit another miss before a writeback eviction finished, stall until that's done
+	// We hit another bus operation before a writeback eviction finished, stall until that's done
 	// We already account for the precharge bank conflict above
 	if (m_wb_active_cycles > 0)
 	{
@@ -309,20 +321,30 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 		m_wb_active_cycles = 0;
 	}
 
-	m_last_sdram_page = page_read;
+	if (is_sdram_region(address))
+		m_last_sdram_page = page_read;
 
 	// We had a dirty writeback eviction, total up the background cost penalty we'll pay on subsequent cycles
 	if (m_wb_address != 0)
 	{
-		unsigned int page_write = m_wb_address / SDRAM_PAGE_SIZE;
-		// Bank collision in auto precharge mode, we have to wait for precharge to finish before starting
-		if (page_read == page_write)
-			m_wb_active_cycles += mcr_tpc(m_mcr) * 2;
-		m_wb_active_cycles += (BUS_ACCESS_PENALTY + get_wcr1_timing(address, m_wcr1) + BURST_WRITE_WORD_PENALTY + mcr_rcd(m_mcr) + mcr_trwl(m_mcr)) * 2;
+		if (is_sdram_region(address))
+		{
+			unsigned int page_write = m_wb_address / SDRAM_PAGE_SIZE;
+			// Bank collision in auto precharge mode, we have to wait for precharge to finish before starting
+			if (page_read == page_write)
+				m_wb_active_cycles += mcr_tpc(m_mcr) * 2;
+			m_wb_active_cycles += (BUS_ACCESS_PENALTY + get_wcr1_timing(address, m_wcr1) + BURST_WRITE_WORD_PENALTY + mcr_rcd(m_mcr) + mcr_trwl(m_mcr)) * 2;
+			m_last_sdram_page = page_write;
+		}
+		else
+		{
+			m_wb_active_cycles += get_wcr1_timing(address, m_wcr1) * 2;
+			m_wb_active_cycles += ((BUS_ACCESS_PENALTY + get_wcr2_timing(address, m_wcr2)) * cache_line_fetch_count(address, m_bcr2)) * 2;
+		}
+
 		m_wb_address = 0;
-		m_last_sdram_page = page_write;
 	}
-	else // Account for the read close after burst read if we hit the same bank, writebacks include the cost in the background cycles if there is a conflict
+	else if (is_sdram_region(address)) // Account for the read close after burst read if we hit the same bank, writebacks include the cost in the background cycles if there is a conflict
 		m_precharge_remaining_cycles = mcr_tpc(m_mcr) * 2;
 
 	return cpu_penalty + (bus_penalty * 2);
@@ -537,6 +559,80 @@ void sh7709s_device::static_generate_memory_accessor(int size, int iswrite, cons
 	block.end();
 }
 
+uint32_t sh7709s_device::ccr_r(offs_t offset, uint32_t mem_mask)
+{
+	logerror("'%s' (%08x): CCN unmapped internal read mask %08x (CCR) %08x\n", tag(), m_sh2_state->pc, mem_mask, m_ccr);
+	return m_ccr;
+}
+
+void sh7709s_device::ccr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	// Don't write the CF bit into ccr as that's only used for cache invalidate
+	mem_mask &= ~0b1000;
+	if (data & 0b1000)
+	{
+		// We're going to invalidate the whole cache but we don't really handle throwing out any dirty data
+		// this just assumes that the game is correct in flushing all the data it needs or doesn't rely on
+		// throwing out some data
+		// After cache invalidation the cpu requires 4 NOP's for the cache state to settle, these are software
+		// enforced and not handled by the hardware
+		memset(m_cache, 0, sizeof(m_cache));
+		LOG("SH7709S cache invalidate\n");
+	}
+	COMBINE_DATA(&m_ccr);
+	logerror("'%s' (%08x): CCN unmapped internal write %08x & %08x (CCR)\n", tag(), m_sh2_state->pc, data, mem_mask);
+}
+
+constexpr uint32_t CACHE_MAPPING_BASE = 0xF0000000;
+constexpr uint32_t CACHE_MAPPING_END = 0xF0FFFFFF;
+
+uint32_t sh7709s_device::cache_address_array_r(offs_t offset, uint32_t mem_mask)
+{
+	// TODO : LRU bits
+	// This is unused by cv1k but just added for some extra info
+	uint32_t cache_entry_index = offset / 4;
+	unsigned int entry_block = cache_entry_index % SH7709S_CACHE_BLOCKS;
+	unsigned int way = cache_entry_index / SH7709S_CACHE_BLOCKS;
+	struct sh7709s_cache_entry* entry = &m_cache[entry_block][way];
+	int v = entry->tag != 0;
+	int u = entry->dirty;
+	uint32_t ret = (entry->tag << 10) | (u << 1) | v;
+	logerror("Cache address array unmapped access read: index %u data %u\n", cache_entry_index, ret);
+	return ret;
+}
+
+void sh7709s_device::cache_address_array_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	// Only handle U bit writes to flush the entry for now
+	uint32_t cache_entry_index = offset / 4;
+	// cv1k doesn't even bother to read the entry values, it just writes 0 to every entry to flush them
+	bool is_flush = (data & 0x2) == 0;
+	if (is_flush)
+	{
+		unsigned int entry_block = cache_entry_index % SH7709S_CACHE_BLOCKS;
+		unsigned int way = cache_entry_index / SH7709S_CACHE_BLOCKS;
+		if (m_cache[entry_block][way].dirty)
+		{
+			uint32_t wb_address = m_cache[entry_block][way].tag * SH7709S_CACHE_LINE_SIZE;
+			m_cache[entry_block][way].dirty = 0;
+			// Always add wcr1 timing here, accesses to the cache address mappings have to be done via instruction from an uncached region
+			m_sh2_state->icount -= (BUS_ACCESS_PENALTY + BURST_WRITE_WORD_PENALTY + get_wcr1_timing(wb_address, m_wcr1) + mcr_rcd(m_mcr) + mcr_trwl(m_mcr)) * 2;
+			// Followup access is likely to area swap as well so those will also need to pay the wait state cost in wcr1 on the instruction fetch
+			m_last_area_accessed = get_area(wb_address);
+			LOG("Flushing dirty cache entry idx: %u\n", cache_entry_index);
+		}
+	}
+	logerror("Cache address array unmapped access write: %u data: %u\n", cache_entry_index, data);
+}
+
+// SH7709S memory mapped cache area
+void sh7709s_device::cache_7709s_map(address_map& map)
+{
+	// TODO : LRU bits should also be tracked/mapped for titles that change the LRU way replacement bits
+	// Not sure if other titles attempt to access the data array mapped section
+	map(CACHE_MAPPING_BASE, CACHE_MAPPING_END).rw(FUNC(sh7709s_device::cache_address_array_r), FUNC(sh7709s_device::cache_address_array_w));
+}
+
 void sh7709s_device::sh3_register_map(address_map& map)
 {
 	ccn_7709s_map(map);
@@ -555,4 +651,5 @@ void sh7709s_device::sh3_register_map(address_map& map)
 	irda_7709_map(map);
 	scif_7709_map(map);
 	udi_7709s_map(map);
+	cache_7709s_map(map);
 }

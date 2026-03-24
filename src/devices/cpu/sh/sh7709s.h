@@ -35,10 +35,18 @@ protected:
 	virtual void sh3_register_map(address_map& map) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+
 	virtual void static_generate_memory_accessor(int size, int iswrite, const char* name, uml::code_handle*& handleptr) override;
 	virtual bool generate_group_0(drcuml_block& block, compiler_state& compiler, const opcode_desc* desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
 	virtual bool generate_group_4(drcuml_block& block, compiler_state& compiler, const opcode_desc* desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
 	virtual bool generate_group_15(drcuml_block& block, compiler_state& compiler, const opcode_desc* desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc) override;
+
+	virtual uint32_t ccr_r(offs_t offset, uint32_t mem_mask) override;
+	virtual void ccr_w(offs_t offset, uint32_t data, uint32_t mem_mask) override;
+
+	void cache_7709s_map(address_map& map);
+	uint32_t cache_address_array_r(offs_t offset, uint32_t mem_mask);
+	void cache_address_array_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
 private:
 	// Cache state tracking
