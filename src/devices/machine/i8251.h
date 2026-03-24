@@ -136,6 +136,7 @@ private:
 	void sync2_w(uint8_t data);
 	uint8_t m_sync8;
 	uint16_t m_sync16;
+	uint8_t m_tx_sync_shift;  // alternates between 8 and 0 for 2-byte sync idle transmission
 	// 1 = ext sync enabled via command
 	bool m_syndet_pin;
 	bool m_hunt_on;

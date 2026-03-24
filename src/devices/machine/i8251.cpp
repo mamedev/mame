@@ -15,8 +15,6 @@ TODO:
           the SYNDET pin & status must go high. It will go low upon a
           status read, same as what happens with sync.
 
-- SYNC/BISYNC with PARITY is not tested, and therefore possibly buggy.
-
 *********************************************************************/
 
 #include "emu.h"
@@ -100,6 +98,7 @@ void i8251_device::device_start()
 	save_item(NAME(m_sync2));
 	save_item(NAME(m_sync8));
 	save_item(NAME(m_sync16));
+	save_item(NAME(m_tx_sync_shift));
 	save_item(NAME(m_cts));
 	save_item(NAME(m_dsr));
 	save_item(NAME(m_rxd));
@@ -187,7 +186,9 @@ void i8251_device::sync1_rxc()
 	// see about parity
 	if (need_parity && (m_rxd_bits == m_data_bits_count))
 	{
-		if ((population_count_32(m_sync1) & 1) != m_rxd)
+		// bit 5: 0 = odd parity, 1 = even parity.
+		// Total 1-bits (data + received parity + parity_type) must be odd for a correct frame.
+		if (((population_count_32(m_sync1) + m_rxd + BIT(m_mode_byte, 5)) & 1) == 0)
 			m_status |= I8251_STATUS_PARITY_ERROR;
 		// and then continue on as if everything was ok
 	}
@@ -205,6 +206,16 @@ void i8251_device::sync1_rxc()
 	{
 		if (m_sync1 == m_sync8)
 		{
+                        if (need_parity && (m_rxd_bits < m_data_bits_count))
+                        {
+                                //   Set m_rxd_bits so that the next call's parity-check 
+								// branch fires, then wait.
+                                m_rxd_bits = m_data_bits_count;
+                                return;
+                        }
+                        // Either parity is not used, or we already processed the parity
+                        // bit (m_rxd_bits == m_data_bits_count from the previous return).
+
 			m_rxd_bits = m_data_bits_count;
 			m_hunt_on = false;
 			was_in_hunt_mode = true;
@@ -248,7 +259,9 @@ void i8251_device::sync2_rxc()
 	// see about parity
 	if (need_parity && (m_rxd_bits == m_data_bits_count))
 	{
-		if ((population_count_32(m_sync1) & 1) != m_rxd)
+		// bit 5: 0 = odd parity, 1 = even parity.
+		// Total 1-bits (data + received parity + parity_type) must be odd for a correct frame.
+		if (((population_count_32(m_sync1) + m_rxd + BIT(m_mode_byte, 5)) & 1) == 0)
 			m_status |= I8251_STATUS_PARITY_ERROR;
 		// and then continue on as if everything was ok
 	}
@@ -267,6 +280,14 @@ void i8251_device::sync2_rxc()
 	{
 		if (m_sync2 == m_sync16)
 		{
+           if (need_parity && (m_rxd_bits < m_data_bits_count))
+			{
+				// All data bits of the sync byte have been received and match,
+				// but the parity bit has not arrived yet.  Set m_rxd_bits so
+				// that the next call's parity-check branch fires, then wait.
+				m_rxd_bits = m_data_bits_count;
+				return;
+			}
 			m_rxd_bits = m_data_bits_count;
 			m_hunt_on = false;
 			was_in_hunt_mode = true;
@@ -395,8 +416,23 @@ void i8251_device::update_tx_empty()
 {
 	if (m_status & I8251_STATUS_TX_EMPTY)
 	{
-		// return TxD to marking state (high) if not sending break character
-		m_txd_handler(!BIT(m_command, 3));
+		if (m_sync_byte_count > 0 && is_tx_enabled())
+		{
+			// In synchronous mode, transmit sync character(s) during idle instead of mark state
+			if (m_sync_byte_count == 2)
+			{
+				transmit_register_setup(uint8_t(m_sync16 >> m_tx_sync_shift));
+				m_tx_sync_shift ^= 8;  // alternate between high byte (sync1) and low byte (sync2)
+			}
+			else
+				transmit_register_setup(m_sync8);
+			m_status &= ~I8251_STATUS_TX_EMPTY;
+		}
+		else
+		{
+			// return TxD to marking state (high) if not sending break character
+			m_txd_handler(!BIT(m_command, 3));
+		}
 	}
 
 	m_txempty_handler((m_status & I8251_STATUS_TX_EMPTY) != 0);
@@ -452,7 +488,6 @@ void i8251_device::device_reset()
 	receive_register_reset();
 	/* expecting mode byte */
 	m_flags = I8251_NEXT_MODE;
-	m_sync_byte_count = 0;
 
 	/* no character to read by cpu */
 	/* transmitter is ready and is empty */
@@ -464,7 +499,6 @@ void i8251_device::device_reset()
 	m_tx_data = 0;
 	m_rxc_count = m_txc_count = 0;
 	m_br_factor = 1;
-	m_hunt_on = false;
 
 	/* update tx empty pin output */
 	update_tx_empty();
@@ -657,6 +691,7 @@ void i8251_device::mode_w(uint8_t data)
 		m_syndet_pin = BIT(data, 6);
 		m_sync8 = 0;
 		m_sync16 = 0;
+		m_tx_sync_shift = 8;
 		m_rxd_bits = 0;
 		m_sync1 = 0;
 	}
