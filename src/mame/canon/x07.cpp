@@ -1204,7 +1204,7 @@ void x07_state::x07_io_w(offs_t offset, uint8_t data)
 		break;
 
 	case 0xbb:
-		// Missing IRQ control
+		// TODO: Missing IRQ/RST control (User manual page 108)
 		break;
 	}
 }
