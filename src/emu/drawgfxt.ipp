@@ -198,6 +198,18 @@ do                                                                              
 	}                                                                               \
 }                                                                                   \
 while (0)
+#define PIXEL_OP_REMAP_TRANSPEN_PRIORITY_PALWRAPS(DEST, PRIORITY, SOURCE)           \
+do                                                                                  \
+{                                                                                   \
+	u32 srcdata = (SOURCE);                                                         \
+	if (srcdata != trans_pen)                                                       \
+	{                                                                               \
+		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                              \
+			(DEST) = paldata[(srcdata + paloffset) % palsize];                      \
+		(PRIORITY) = 31;                                                            \
+	}                                                                               \
+}                                                                                   \
+while (0)
 
 /*-------------------------------------------------
     PIXEL_OP_REBASE_TRANSPEN - render all pixels
@@ -221,6 +233,18 @@ do                                                                              
 	{                                                                               \
 		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                              \
 			(DEST) = color + srcdata;                                               \
+		(PRIORITY) = 31;                                                            \
+	}                                                                               \
+}                                                                                   \
+while (0)
+#define PIXEL_OP_REBASE_TRANSPEN_PRIORITY_COLORWRAPS(DEST, PRIORITY, SOURCE)        \
+do                                                                                  \
+{                                                                                   \
+	u32 srcdata = (SOURCE);                                                         \
+	if (srcdata != trans_pen)                                                       \
+	{                                                                               \
+		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                              \
+			(DEST) = clrbase + ((clroffset + srcdata) % clrsize);                   \
 		(PRIORITY) = 31;                                                            \
 	}                                                                               \
 }                                                                                   \

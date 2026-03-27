@@ -92,7 +92,7 @@ void specnext_sprites_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, 
 			, destx, desty
 			, 0x20000 << spr.xscale, 0x10000 << spr.yscale
 			, screen.priority(), pmask
-			, m_transp_colour & (spr.h ? 0x0f : 0xff));
+			, m_transp_colour & (spr.h ? 0x0f : 0xff), true);
 	}
 }
 

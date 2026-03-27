@@ -1198,7 +1198,7 @@ void gfx_element::prio_zoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect
 void gfx_element::prio_zoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect,
 		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
 		u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask,
-		u32 trans_pen)
+		u32 trans_pen, bool colorwraps)
 {
 	// non-zoom case
 	if (scalex == 0x10000 && scaley == 0x10000)
@@ -1226,14 +1226,24 @@ void gfx_element::prio_zoom_transpen(bitmap_ind16 &dest, const rectangle &clipre
 	pmask |= 1 << 31;
 
 	// render
-	color = colorbase() + granularity() * (color % colors());
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_pen, color](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN_PRIORITY(destp, pri, srcp); });
+	if (!colorwraps)
+	{
+		color = colorbase() + granularity() * (color % colors());
+		drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_pen, color](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN_PRIORITY(destp, pri, srcp); });
+	}
+	else
+	{
+		const u32 clrbase = colorbase();
+		const u32 clroffset = granularity() * color;
+		const u32 clrsize = colors();
+		drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_pen, clrbase, clroffset, clrsize	](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN_PRIORITY_COLORWRAPS(destp, pri, srcp); });
+	}
 }
 
 void gfx_element::prio_zoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect,
 		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
 		u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask,
-		u32 trans_pen)
+		u32 trans_pen, bool colorwraps)
 {
 	// non-zoom case
 	if (scalex == 0x10000 && scaley == 0x10000)
@@ -1261,8 +1271,18 @@ void gfx_element::prio_zoom_transpen(bitmap_rgb32 &dest, const rectangle &clipre
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_pen, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN_PRIORITY(destp, pri, srcp); });
+	if (!colorwraps)
+	{
+		const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
+		drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_pen, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN_PRIORITY(destp, pri, srcp); });
+	}
+	else
+	{
+		const pen_t *paldata = m_palette->pens() + colorbase();
+		const u32 paloffset = granularity() * color;
+		const u32 palsize = colors();
+		drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_pen, paldata, paloffset, palsize](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN_PRIORITY_PALWRAPS(destp, pri, srcp); });
+	}
 }
 
 
