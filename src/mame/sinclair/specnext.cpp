@@ -3328,6 +3328,9 @@ void specnext_state::machine_start()
 
 	m_regs_map->space(AS_PROGRAM).specific(m_next_regs);
 
+	for (int addr = 0; addr < m_ram->size(); ++addr)
+		m_ram->pointer()[addr] = machine().rand();
+
 	m_ram_pages = m_ram->size() / 0x2000;
 	for (auto i = 0; i < 8; i++)
 		m_bank_ram[i]->configure_entries(0, m_ram->size() / 0x2000, m_ram->pointer(), 0x2000);
