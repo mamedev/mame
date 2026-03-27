@@ -33,15 +33,12 @@ knightsb3:       OK.
 #include "fcrash.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/msm5205.h"
 #include "sound/ymopm.h"
 #include "speaker.h"
 
 
 namespace {
 
-#define CPS1_ROWSCROLL_OFFS  (0x20/2)    /* base of row scroll offsets in other RAM */
 #define CODE_SIZE            0x400000
 
 
@@ -144,23 +141,24 @@ void cps1bl_5205_state::captcommb2_soundlatch_w(offs_t offset, uint16_t data, ui
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_soundlatch->write(data & 0xff);
+		m_soundlatch[0]->write(data & 0xff);
 		m_audiocpu->set_input_line(0, ASSERT_LINE);
 	}
 }
 
 uint8_t cps1bl_5205_state::captcommb2_soundlatch_r()
 {
-	uint8_t latch = m_soundlatch->read();
-	m_audiocpu->set_input_line(0, CLEAR_LINE);
+	const uint8_t latch = m_soundlatch[0]->read();
+	if (!machine().side_effects_disabled())
+		m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return latch;
 }
 
 void cps1bl_5205_state::captcommb2_snd_bankswitch_w(uint8_t data)
 {
-	m_msm_1->reset_w(BIT(data, 5));
-	m_msm_2->reset_w(BIT(data, 4));
-	membank("bank1")->set_entry(data & 0x0f);
+	m_msm[0]->reset_w(BIT(data, 5));
+	m_msm[1]->reset_w(BIT(data, 4));
+	m_audiobank->set_entry(data & 0x0f);
 }
 
 void cps1bl_5205_state::captcommb2_mux_select_w(int state)
@@ -227,7 +225,7 @@ void cps1bl_5205_state::knightsb_layer_w(offs_t offset, uint16_t data)
 				data = 0x1380;
 				break;
 			default:
-				logerror("Unknown control word = %X\n", data);
+				logerror("%s: knightsb_layer_w write %X: %X\n", machine().describe_context(), offset, data);
 				data = 0x12c0;
 			}
 		m_cps_b_regs[m_layer_enable_reg / 2] = data;
@@ -241,6 +239,9 @@ void cps1bl_5205_state::knightsb_layer_w(offs_t offset, uint16_t data)
 		break;
 	case 0x12:
 		m_cps_b_regs[m_layer_mask_reg[3] / 2] = data;
+		break;
+	default:
+		logerror("%s: knightsb_layer_w write %X:%X\n", machine().describe_context(), offset, data);
 	}
 }
 
@@ -271,7 +272,7 @@ void cps1bl_5205_state::sf2b_layer_w(offs_t offset, uint16_t data)
 		m_cps_b_regs[m_layer_enable_reg / 2] = data;
 		break;
 	default:
-		logerror("%X:%X ", offset,data);
+		logerror("%s: Unknown sf2b_layer_w write %X:%X ", machine().describe_context(), offset, data);
 	}
 }
 
@@ -311,7 +312,7 @@ void cps1bl_5205_state::sf2mdt_soundlatch_w(offs_t offset, uint16_t data, uint16
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		m_soundlatch->write(data >> 8);
+		m_soundlatch[0]->write(data >> 8);
 		m_audiocpu->set_input_line(0, ASSERT_LINE);
 	}
 }
@@ -373,7 +374,7 @@ void cps1bl_5205_state::captcommb2(machine_config &config)
 	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
 
 	SPEAKER(config, "mono").front_center();
-	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
 
 	ym2151_device &ym2151(YM2151(config, "2151", 30000000 / 8));  // 3.75MHz measured on pcb
 	// IRQ pin not used
@@ -386,22 +387,22 @@ void cps1bl_5205_state::captcommb2(machine_config &config)
 	LS157(config, m_msm_mux[1], 0);
 	m_msm_mux[1]->out_callback().set("msm2", FUNC(msm5205_device::data_w));
 
-	MSM5205(config, m_msm_1, 400000);  // 400kHz measured on pcb
-	m_msm_1->vck_callback().set(FUNC(cps1bl_5205_state::captcommb2_mux_select_w));
-	m_msm_1->vck_callback().append(m_msm_2, FUNC(msm5205_device::vclk_w));
-	m_msm_1->set_prescaler_selector(msm5205_device::S96_4B);
-	m_msm_1->add_route(ALL_OUTPUTS, "mono", 0.25);
+	MSM5205(config, m_msm[0], 400000);  // 400kHz measured on pcb
+	m_msm[0]->vck_callback().set(FUNC(cps1bl_5205_state::captcommb2_mux_select_w));
+	m_msm[0]->vck_callback().append(m_msm[1], FUNC(msm5205_device::vclk_w));
+	m_msm[0]->set_prescaler_selector(msm5205_device::S96_4B);
+	m_msm[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MSM5205(config, m_msm_2, 400000);
-	m_msm_2->set_prescaler_selector(msm5205_device::SEX_4B);
-	m_msm_2->add_route(ALL_OUTPUTS, "mono", 0.25);
+	MSM5205(config, m_msm[1], 400000);
+	m_msm[1]->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_msm[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void cps1bl_5205_state::knightsb(machine_config &config)
 {
 	captcommb2(config);
-	m_msm_1->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.5);
-	m_msm_2->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.5);
+	m_msm[0]->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.5);
+	m_msm[1]->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void cps1bl_5205_state::sf2b(machine_config &config)
@@ -437,7 +438,7 @@ void cps1bl_5205_state::sf2mdt(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
 
 	YM2151(config, "2151", 3750000).add_route(0, "mono", 0.35).add_route(1, "mono", 0.35);
 
@@ -447,15 +448,15 @@ void cps1bl_5205_state::sf2mdt(machine_config &config)
 	LS157(config, m_msm_mux[1], 0);
 	m_msm_mux[1]->out_callback().set("msm2", FUNC(msm5205_device::data_w));
 
-	MSM5205(config, m_msm_1, 400000);  // 400kHz ?
-	m_msm_1->vck_callback().set(FUNC(cps1bl_5205_state::captcommb2_mux_select_w));
-	m_msm_1->vck_callback().append(m_msm_2, FUNC(msm5205_device::vclk_w));
-	m_msm_1->set_prescaler_selector(msm5205_device::S96_4B);
-	m_msm_1->add_route(ALL_OUTPUTS, "mono", 0.25);
+	MSM5205(config, m_msm[0], 400000);  // 400kHz ?
+	m_msm[0]->vck_callback().set(FUNC(cps1bl_5205_state::captcommb2_mux_select_w));
+	m_msm[0]->vck_callback().append(m_msm[1], FUNC(msm5205_device::vclk_w));
+	m_msm[0]->set_prescaler_selector(msm5205_device::S96_4B);
+	m_msm[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MSM5205(config, m_msm_2, 400000);
-	m_msm_2->set_prescaler_selector(msm5205_device::SEX_4B);
-	m_msm_2->add_route(ALL_OUTPUTS, "mono", 0.25);
+	MSM5205(config, m_msm[1], 400000);
+	m_msm[1]->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_msm[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 
@@ -468,17 +469,17 @@ void cps1bl_5205_state::captcommb2_map(address_map &map)
 	map(0x800006, 0x800007).w(FUNC(cps1bl_5205_state::captcommb2_soundlatch_w));
 	map(0x800018, 0x80001f).r(FUNC(cps1bl_5205_state::cps1_dsw_r));
 	map(0x800030, 0x800031).nopw();       // coinctrl
-	map(0x800100, 0x80013f).ram().share("cps_a_regs");
-	map(0x800140, 0x80017f).ram().share("cps_b_regs");
+	map(0x800100, 0x80013f).ram().share(m_cps_a_regs);
+	map(0x800140, 0x80017f).ram().share(m_cps_b_regs);
 	map(0x800180, 0x800181).nopw();       // original sound latch, not used
 	map(0x880000, 0x880001).nopw();       // ?
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps1bl_5205_state::cps1_gfxram_w)).share("gfxram");
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps1bl_5205_state::cps1_gfxram_w)).share(m_gfxram);
 	map(0x980000, 0x980023).w(FUNC(cps1bl_5205_state::captcommb2_layer_w));
 	//  0x990000, 0x993fff  spriteram
 	//  0x990000, 0x990001  sprite buffer flip
 	//  0x991000, 0x9917ff  sprite buffer #1
 	//  0x993000, 0x9937ff  sprite buffer #2
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0xff0000, 0xffffff).ram().share(m_mainram);
 }
 
 void cps1bl_5205_state::sf2b_map(address_map &map)
@@ -491,10 +492,10 @@ void cps1bl_5205_state::sf2b_map(address_map &map)
 	map(0x70c106, 0x70c107).w(FUNC(cps1bl_5205_state::sf2mdt_soundlatch_w));
 	map(0x70d000, 0x70d001).nopw(); // writes FFFF
 	//map(0x800030, 0x800031).w(FUNC(cps1bl_5205_state::cps1_coinctrl_w));
-	map(0x800100, 0x80013f).ram().share("cps_a_regs");  /* CPS-A custom */
-	map(0x800140, 0x80017f).rw(FUNC(cps1bl_5205_state::cps1_cps_b_r), FUNC(cps1bl_5205_state::cps1_cps_b_w)).share("cps_b_regs");  /* CPS-B custom */
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps1bl_5205_state::cps1_gfxram_w)).share("gfxram");
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0x800100, 0x80013f).ram().share(m_cps_a_regs);  /* CPS-A custom */
+	map(0x800140, 0x80017f).rw(FUNC(cps1bl_5205_state::cps1_cps_b_r), FUNC(cps1bl_5205_state::cps1_cps_b_w)).share(m_cps_b_regs);  /* CPS-B custom */
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps1bl_5205_state::cps1_gfxram_w)).share(m_gfxram);
+	map(0xff0000, 0xffffff).ram().share(m_mainram);
 }
 
 void cps1bl_5205_state::sf2mdt_map(address_map &map)
@@ -507,10 +508,10 @@ void cps1bl_5205_state::sf2mdt_map(address_map &map)
 	map(0x70c106, 0x70c107).w(FUNC(cps1bl_5205_state::sf2mdt_soundlatch_w));
 	map(0x70d000, 0x70d001).nopw(); // writes FFFF
 	//map(0x800030, 0x800031).w(FUNC(cps1bl_5205_state::cps1_coinctrl_w));
-	map(0x800100, 0x80013f).ram().share("cps_a_regs");  /* CPS-A custom */
-	map(0x800140, 0x80017f).ram().share("cps_b_regs");  /* CPS-B custom */
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps1bl_5205_state::cps1_gfxram_w)).share("gfxram");
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0x800100, 0x80013f).ram().share(m_cps_a_regs);  /* CPS-A custom */
+	map(0x800140, 0x80017f).ram().share(m_cps_b_regs);  /* CPS-B custom */
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps1bl_5205_state::cps1_gfxram_w)).share(m_gfxram);
+	map(0xff0000, 0xffffff).ram().share(m_mainram);
 }
 
 /*
@@ -529,7 +530,7 @@ void cps1bl_5205_state::sf2mdt_map(address_map &map)
 void cps1bl_5205_state::captcommb2_z80map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_audiobank);
 	map(0xd000, 0xd7ff).ram();
 	map(0xd800, 0xd801).rw("2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xdc00, 0xdc00).r(FUNC(cps1bl_5205_state::captcommb2_soundlatch_r));   // clear /int here
@@ -541,7 +542,7 @@ void cps1bl_5205_state::captcommb2_z80map(address_map &map)
 
 MACHINE_START_MEMBER(cps1bl_5205_state, captcommb2)
 {
-	membank("bank1")->configure_entries(0, 16, memregion("audiocpu")->base() + 0x10000, 0x4000);
+	m_audiobank->configure_entries(0, 16, memregion("audiocpu")->base() + 0x10000, 0x4000);
 
 	m_layer_enable_reg = 0x28;
 	m_layer_mask_reg[0] = 0x26;
@@ -565,7 +566,7 @@ MACHINE_RESET_MEMBER(cps1bl_5205_state, captcommb2)
 
 MACHINE_START_MEMBER(cps1bl_5205_state, sf2mdt)
 {
-	membank("bank1")->configure_entries(0, 8, memregion("audiocpu")->base() + 0x10000, 0x4000);
+	m_audiobank->configure_entries(0, 8, memregion("audiocpu")->base() + 0x10000, 0x4000);
 
 	m_layer_enable_reg = 0x26;
 	m_layer_mask_reg[0] = 0x28;
@@ -860,14 +861,12 @@ static INPUT_PORTS_START( sf2mdtb )
 INPUT_PORTS_END
 
 
-void captcommb2_state::bootleg_render_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void captcommb2_state::bootleg_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int pos;
 	int last_sprite_offset = 0;
-	uint16_t tileno, colour, xpos, ypos;
-	bool flipx, flipy;
-	uint16_t *sprite_ram = m_bootleg_sprite_ram.get();
-	int base = (sprite_ram[0] ? 0x3000 : 0x1000) / 2;  // writes sprite buffer flip here instead of obj_base register
+	uint16_t const *const sprite_ram = m_bootleg_sprite_ram.get();
+	const int base = (sprite_ram[0] ? 0x3000 : 0x1000) / 2;  // writes sprite buffer flip here instead of obj_base register
 
 	// end of sprite table marker is 0x8000
 	// 1st sprite always 0x100e/0x300e
@@ -882,12 +881,12 @@ void captcommb2_state::bootleg_render_sprites( screen_device &screen, bitmap_ind
 
 	for (pos = last_sprite_offset - base; pos >= 0; pos -= 4)
 	{
-		tileno = sprite_ram[base + pos] & 0x7fff;      // see below
-		xpos   = sprite_ram[base + pos + 2] & 0x1ff;
-		ypos   = sprite_ram[base + pos - 1] & 0x1ff;
-		flipx  = BIT(sprite_ram[base + pos + 1], 5);
-		flipy  = BIT(sprite_ram[base + pos + 1], 6);
-		colour = sprite_ram[base + pos + 1] & 0x1f;
+		const uint32_t tileno = sprite_ram[base + pos] & 0x7fff;      // see below
+		int xpos              = sprite_ram[base + pos + 2] & 0x1ff;
+		int ypos              = sprite_ram[base + pos - 1] & 0x1ff;
+		const bool flipx      = BIT(sprite_ram[base + pos + 1], 5);
+		const bool flipy      = BIT(sprite_ram[base + pos + 1], 6);
+		const uint32_t colour = sprite_ram[base + pos + 1] & 0x1f;
 		ypos   = 256 - ypos - 16;
 		xpos   = xpos + m_sprite_x_offset + 49;
 
