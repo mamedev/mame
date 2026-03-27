@@ -54,42 +54,40 @@ void abc1600_mover_device::vram_map(address_map &map)
 
 void abc1600_mover_device::crtc_map(address_map &map)
 {
-	map(0x00, 0x00).mirror(0xfe).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
-	map(0x01, 0x01).mirror(0xfe).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x00, 0x00).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x01, 0x01).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
 
 void abc1600_mover_device::iowr0_map(address_map &map)
 {
-	map(0x00, 0x00).mirror(0xff).r(FUNC(abc1600_mover_device::iord0_r));
-	map(0x00, 0x00).mirror(0xf8).w(FUNC(abc1600_mover_device::ldsx_hb_w));
-	map(0x01, 0x01).mirror(0xf8).w(FUNC(abc1600_mover_device::ldsx_lb_w));
-	map(0x02, 0x02).mirror(0xf8).w(FUNC(abc1600_mover_device::ldsy_hb_w));
-	map(0x03, 0x03).mirror(0xf8).w(FUNC(abc1600_mover_device::ldsy_lb_w));
-	map(0x04, 0x04).mirror(0xf8).w(FUNC(abc1600_mover_device::ldtx_hb_w));
-	map(0x05, 0x05).mirror(0xf8).w(FUNC(abc1600_mover_device::ldtx_lb_w));
-	map(0x06, 0x06).mirror(0xf8).w(FUNC(abc1600_mover_device::ldty_hb_w));
-	map(0x07, 0x07).mirror(0xf8).w(FUNC(abc1600_mover_device::ldty_lb_w));
+	map(0x00, 0x00).r(FUNC(abc1600_mover_device::iord0_r));
+	map(0x00, 0x00).w(FUNC(abc1600_mover_device::ldsx_hb_w));
+	map(0x01, 0x01).w(FUNC(abc1600_mover_device::ldsx_lb_w));
+	map(0x02, 0x02).w(FUNC(abc1600_mover_device::ldsy_hb_w));
+	map(0x03, 0x03).w(FUNC(abc1600_mover_device::ldsy_lb_w));
+	map(0x04, 0x04).w(FUNC(abc1600_mover_device::ldtx_hb_w));
+	map(0x05, 0x05).w(FUNC(abc1600_mover_device::ldtx_lb_w));
+	map(0x06, 0x06).w(FUNC(abc1600_mover_device::ldty_hb_w));
+	map(0x07, 0x07).w(FUNC(abc1600_mover_device::ldty_lb_w));
 }
 
 void abc1600_mover_device::iowr1_map(address_map &map)
 {
-	map(0x00, 0x00).mirror(0xff).nopr();
-	map(0x00, 0x00).mirror(0xf8).w(FUNC(abc1600_mover_device::ldfx_hb_w));
-	map(0x01, 0x01).mirror(0xf8).w(FUNC(abc1600_mover_device::ldfx_lb_w));
-	map(0x02, 0x02).mirror(0xf8).w(FUNC(abc1600_mover_device::ldfy_hb_w));
-	map(0x03, 0x03).mirror(0xf8).w(FUNC(abc1600_mover_device::ldfy_lb_w));
-	map(0x05, 0x05).mirror(0xf8).w(FUNC(abc1600_mover_device::wrml_w));
-	map(0x07, 0x07).mirror(0xf8).w(FUNC(abc1600_mover_device::wrdl_w));
+	map(0x00, 0x00).w(FUNC(abc1600_mover_device::ldfx_hb_w));
+	map(0x01, 0x01).w(FUNC(abc1600_mover_device::ldfx_lb_w));
+	map(0x02, 0x02).w(FUNC(abc1600_mover_device::ldfy_hb_w));
+	map(0x03, 0x03).w(FUNC(abc1600_mover_device::ldfy_lb_w));
+	map(0x05, 0x05).w(FUNC(abc1600_mover_device::wrml_w));
+	map(0x07, 0x07).w(FUNC(abc1600_mover_device::wrdl_w));
 }
 
 void abc1600_mover_device::iowr2_map(address_map &map)
 {
-	map(0x00, 0x00).mirror(0xff).nopr();
-	map(0x00, 0x00).mirror(0xf8).w(FUNC(abc1600_mover_device::wrmask_strobe_hb_w));
-	map(0x01, 0x01).mirror(0xf8).w(FUNC(abc1600_mover_device::wrmask_strobe_lb_w));
-	map(0x02, 0x02).mirror(0xf8).w(FUNC(abc1600_mover_device::enable_clocks_w));
-	map(0x03, 0x03).mirror(0xf8).w(FUNC(abc1600_mover_device::flag_strobe_w));
-	map(0x04, 0x04).mirror(0xf8).w(FUNC(abc1600_mover_device::endisp_w));
+	map(0x00, 0x00).w(FUNC(abc1600_mover_device::wrmask_strobe_hb_w));
+	map(0x01, 0x01).w(FUNC(abc1600_mover_device::wrmask_strobe_lb_w));
+	map(0x02, 0x02).w(FUNC(abc1600_mover_device::enable_clocks_w));
+	map(0x03, 0x03).w(FUNC(abc1600_mover_device::flag_strobe_w));
+	map(0x04, 0x04).w(FUNC(abc1600_mover_device::endisp_w));
 }
 
 

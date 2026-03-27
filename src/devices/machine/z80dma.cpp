@@ -894,10 +894,10 @@ void z80dma_device::write(u8 data)
 TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
 {
 	// normalize state
-	m_rdy = param;
-	m_status = (m_status & 0xfd) | (!is_ready() << 1);
+	const bool is_ready = m_force_ready || (param == READY_ACTIVE_HIGH);
+	m_status = (m_status & 0xfd) | (!is_ready << 1);
 
-	if (is_ready() && INT_ON_READY)
+	if (is_ready && INT_ON_READY)
 	{
 		trigger_interrupt(INT_RDY);
 	}
@@ -909,6 +909,11 @@ TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
 void z80dma_device::rdy_w(int state)
 {
 	LOGLINE("Z80DMA RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH);
+
+	// update RDY immediately so the state machine can react to it
+	m_rdy = state;
+
+	// synchronize the side effects
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(z80dma_device::rdy_write_callback), this), state);
 }
 

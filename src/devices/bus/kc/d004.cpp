@@ -467,7 +467,7 @@ void kc_d004_gide_device::gide_w(offs_t offset, uint8_t data)
 		uint8_t rtc_addr = (offset >> 8) & 0x0f;
 
 		// TODO RTC-72421
-		logerror("GIDE %s wrire RTC 0x%02x 0x%02x\n", tag(), rtc_addr, data);
+		logerror("GIDE %s write RTC 0x%02x 0x%02x\n", tag(), rtc_addr, data);
 	}
 	else
 	{

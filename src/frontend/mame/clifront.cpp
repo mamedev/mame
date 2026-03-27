@@ -670,7 +670,7 @@ void cli_frontend::listbios(const std::vector<std::string> &args)
 		{
 			if (firstbios)
 			{
-				osd_printf_info("BIOS options for system %s (%s):\n", root.name(), root.shortname());
+				osd_printf_info("BIOS options for system %s (%s -bios X):\n", root.name(), root.shortname());
 				firstbios = false;
 			}
 			osd_printf_info("    %-16s %s\n", bios.get_name(), bios.get_description());
@@ -692,7 +692,7 @@ void cli_frontend::listbios(const std::vector<std::string> &args)
 			{
 				if (firstcard)
 				{
-					osd_printf_info("\n  BIOS options for device %s (-%s %s):\n", card->name(), slot.device().tag() + 1, card->basetag());
+					osd_printf_info("\n  BIOS options for device %s (-%s %s,bios=X):\n", card->name(), slot.device().tag() + 1, card->basetag());
 					firstcard = false;
 				}
 				osd_printf_info("      %-16s %s\n", bios.get_name(), bios.get_description());

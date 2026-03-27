@@ -27,6 +27,9 @@
  * TODO (ga6vx)
  * - Has SMI problems, doesn't set m_shadow_ram_control[2] at all (?)
  *
+ * TODO (ct6vta2)
+ * - Currently maps a keyboard from southbridge and from Super I/O, clashing each other;
+ *
  */
 
 #include "emu.h"
@@ -63,6 +66,7 @@ public:
 	void mvp3(machine_config &config) ATTR_COLD;
 	void apollopro(machine_config &config) ATTR_COLD;
 	void ga6vx(machine_config &config) ATTR_COLD;
+	void ct6vta2(machine_config &config) ATTR_COLD;
 
 protected:
 	void x86_softlists(machine_config &config);
@@ -112,6 +116,7 @@ static void isa_com(device_slot_interface &device)
 static void isa_internal_devices(device_slot_interface &device)
 {
 	device.option_add("it8661f",  IT8661F);
+	device.option_add("it8671f",  IT8671F);
 	device.option_add("w83877tf", W83877TF);
 }
 
@@ -303,16 +308,16 @@ void mvp3_state::ga6vx(machine_config &config)
 	//isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 
 	vt82c586b_ide_device &ide(VT82C586B_IDE(config, "pci:07.1", 0, "maincpu"));
-	ide.irq_pri().set("pci:07.0", FUNC(vt82c586b_isa_device::pc_ide0_w));
-	ide.irq_sec().set("pci:07.0", FUNC(vt82c586b_isa_device::pc_ide1_w));
+	ide.irq_pri().set("pci:07.0", FUNC(vt82c596b_isa_device::pc_ide0_w));
+	ide.irq_sec().set("pci:07.0", FUNC(vt82c596b_isa_device::pc_ide1_w));
 
 	VT82C586B_USB (config, "pci:07.2", 0);
 
-	vt82c596b_acpi_device &acpi_pci(VT82C596B_ACPI(config, "pci:07.3", 0));
-	acpi_pci.sci_pin_cb().set("pci:07.0", FUNC(vt82c586b_isa_device::acpi_pin_config_w));
+	vt82c596_acpi_device &acpi_pci(VT82C596_ACPI(config, "pci:07.3", 0));
+	acpi_pci.sci_pin_cb().set("pci:07.0", FUNC(vt82c596b_isa_device::acpi_pin_config_w));
 	acpi_pipc_device &acpi_dev(ACPI_PIPC(config, "pci:07.3:acpi"));
 	acpi_dev.smi().set_inputline("maincpu", INPUT_LINE_SMI);
-	acpi_dev.sci().set("pci:07.0", FUNC(vt82c586b_isa_device::pc_acpi_w));
+	acpi_dev.sci().set("pci:07.0", FUNC(vt82c596b_isa_device::pc_acpi_w));
 	SMBUS_PIPC(config, "pci:07.3:smbus", 0);
 
 	PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, nullptr);
@@ -346,6 +351,75 @@ void mvp3_state::ga6vx(machine_config &config)
 	x86_softlists(config);
 }
 
+void mvp3_state::ct6vta2(machine_config &config)
+{
+	// Slot 1 (Slot-242)
+	pentium3_device &maincpu(PENTIUM3(config, "maincpu", 100'000'000));
+	maincpu.set_addrmap(AS_PROGRAM, &mvp3_state::main_map);
+	maincpu.set_addrmap(AS_IO, &mvp3_state::main_io);
+	maincpu.set_irq_acknowledge_callback("pci:07.0:pic0", FUNC(pic8259_device::inta_cb));
+	maincpu.smiact().set("pci:00.0", FUNC(vt82c691_host_device::smi_act_w));
+
+	// TODO: config space not known
+	PCI_ROOT(config, "pci", 0);
+	// Max 384 MB
+	// TODO: bump to VT82C693
+	VT82C691_HOST(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
+	VT82C691_BRIDGE(config, "pci:01.0", 0 );
+
+	vt82c596b_isa_device &isa(VT82C596B_ISA(config, "pci:07.0", XTAL(33'000'000), "maincpu"));
+	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
+	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
+	isa.cpureset().set_inputline("maincpu", INPUT_LINE_RESET);
+	isa.pcirst().set([this] (int state) {
+		if (state)
+			machine().schedule_soft_reset();
+	});
+	//isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+
+	vt82c586b_ide_device &ide(VT82C586B_IDE(config, "pci:07.1", 0, "maincpu"));
+	ide.irq_pri().set("pci:07.0", FUNC(vt82c596b_isa_device::pc_ide0_w));
+	ide.irq_sec().set("pci:07.0", FUNC(vt82c596b_isa_device::pc_ide1_w));
+
+	VT82C586B_USB (config, "pci:07.2", 0);
+
+	vt82c596b_acpi_device &acpi_pci(VT82C596B_ACPI(config, "pci:07.3", 0));
+	acpi_pci.sci_pin_cb().set("pci:07.0", FUNC(vt82c596b_isa_device::acpi_pin_config_w));
+	acpi_pipc_device &acpi_dev(ACPI_PIPC(config, "pci:07.3:acpi"));
+	acpi_dev.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	acpi_dev.sci().set("pci:07.0", FUNC(vt82c596b_isa_device::pc_acpi_w));
+	SMBUS_PIPC(config, "pci:07.3:smbus", 0);
+
+	PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, nullptr);
+
+	// TODO: add on-board Yamaha YMF740C DS-1L
+	// 8~11 is trusted, otherwise BIOS won't map intr_line(s) properly
+	PCI_SLOT(config, "pci:1", pci_cards, 8,  0, 1, 2, 3, "sis6326_pci");
+	PCI_SLOT(config, "pci:2", pci_cards, 9,  1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards, 10, 2, 3, 0, 1, nullptr);
+	PCI_SLOT(config, "pci:4", pci_cards, 11, 3, 0, 1, 2, nullptr);
+
+	// TODO: bump option_machine_config for the internal keyboard (and remove from PIPC)
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "it8671f", true).set_option_machine_config("it8671f", ite_superio_config);
+	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
+	serport0.rxd_handler().set("board4:it8671f", FUNC(it8671f_device::rxd1_w));
+	serport0.dcd_handler().set("board4:it8671f", FUNC(it8671f_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:it8671f", FUNC(it8671f_device::ndsr1_w));
+	serport0.ri_handler().set("board4:it8671f", FUNC(it8671f_device::nri1_w));
+	serport0.cts_handler().set("board4:it8671f", FUNC(it8671f_device::ncts1_w));
+
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("board4:it8671f", FUNC(it8671f_device::rxd2_w));
+	serport1.dcd_handler().set("board4:it8671f", FUNC(it8671f_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:it8671f", FUNC(it8671f_device::ndsr2_w));
+	serport1.ri_handler().set("board4:it8671f", FUNC(it8671f_device::nri2_w));
+	serport1.cts_handler().set("board4:it8671f", FUNC(it8671f_device::ncts2_w));
+
+	x86_softlists(config);
+}
 
 ROM_START( ls5amvp3 )
 	ROM_REGION32_LE(0x20000, "pci:07.0", 0)
@@ -382,6 +456,17 @@ ROM_START( ga6vx )
 	ROMX_LOAD("6vx.11" , 0x00000, 0x40000, CRC(1d47d1e5) SHA1(03238c7b99e1276f270568c6c0cc10b7317f2661), ROM_BIOS(4))
 ROM_END
 
+ROM_START( ct6vta2 )
+	ROM_REGION32_LE(0x40000, "pci:07.0", 0)
+	ROM_SYSTEM_BIOS(0, "v0c18",  "0c18 (12/18/2000)")
+	ROMX_LOAD("6vta2c18.bin" , 0x00000, 0x40000, CRC(fc995c9f) SHA1(204ee0d546fad2ddf8077eb35daeb2b34e26b09c), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v2602",  "2602 (06/02/2000)")
+	ROMX_LOAD("6vta2602.bin", 0x00000, 0x40000, CRC(f43a229c) SHA1(28a8d43cd20072214eff139734327379c49e0f55), ROM_BIOS(1))
+	// 0707 and 0610 versions known to exist,
+	// also a Commodore Schneider PC (where Commodore logo replaces Energy Star)
+	// https://x.com/oerg866/status/2036292898988114178
+ROM_END
+
 } // anonymous namespace
 
 
@@ -394,3 +479,5 @@ COMP(1998, zidabx98,    0,     0, apollopro,   0, mvp3_state, empty_init, "Zida"
 // Apollo Pro chipset + 596
 COMP(1998, ga6vx,       0,     0, ga6vx,       0, mvp3_state, empty_init, "Gigabyte",   "GA-6VX (VIA Apollo Pro chipset)", MACHINE_NOT_WORKING )
 
+// Apollo Pro+ chipset + 596
+COMP(1999, ct6vta2,     0,     0, ct6vta2,  0, mvp3_state, empty_init, "Chaintech",  "CT-6VTA2 (VIA Apollo Pro+ chipset)", MACHINE_NOT_WORKING ) // a.k.a. Houston M869C

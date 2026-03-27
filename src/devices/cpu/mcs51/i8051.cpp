@@ -147,14 +147,7 @@ void mcs51_cpu_device::sfr_map(address_map &map)
 	map(0xf0, 0xf0).rw(FUNC(mcs51_cpu_device::b_r   ), FUNC(mcs51_cpu_device::b_w   ));
 }
 
-void mcs51_cpu_device::intd_map(address_map &map)
-{
-	map(0x00, m_ram_mask).ram().share(m_internal_ram);
-	map(0x80, 0xff).unmaprw();
-	sfr_map(map);
-}
-
-void mcs51_cpu_device::inti_map(address_map &map)
+void mcs51_cpu_device::idata_map(address_map &map)
 {
 	map(0x00, m_ram_mask).ram().share(m_internal_ram);
 }
@@ -381,9 +374,9 @@ void mcs51_cpu_device::th1_w(u8 data)
 mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, int io_width)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(mcs51_cpu_device::program_map), this))
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0)
-	, m_intd_config("internal_direct", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(mcs51_cpu_device::intd_map), this))
-	, m_inti_config("internal_indirect", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(mcs51_cpu_device::inti_map), this))
+	, m_xdata_config("xdata", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_sfr_config("sfr", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(mcs51_cpu_device::sfr_map), this))
+	, m_idata_config("idata", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(mcs51_cpu_device::idata_map), this))
 	, m_pc(0)
 	, m_has_pd(false)
 	, m_inst_cycles(0)
@@ -454,9 +447,9 @@ device_memory_interface::space_config_vector mcs51_cpu_device::memory_space_conf
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_DATA,    &m_data_config),
-		std::make_pair(AS_INTD,    &m_intd_config),
-		std::make_pair(AS_INTI,    &m_inti_config)
+		std::make_pair(AS_DATA,    &m_xdata_config),
+		std::make_pair(AS_SFR,     &m_sfr_config),
+		std::make_pair(AS_IDATA,   &m_idata_config)
 	};
 }
 
@@ -1207,9 +1200,9 @@ void mcs51_cpu_device::execute_run()
 void mcs51_cpu_device::device_start()
 {
 	space(AS_PROGRAM).cache(m_program);
-	space(AS_DATA).specific(m_data);
-	space(AS_INTD).specific(m_intd);
-	space(AS_INTI).specific(m_inti);
+	space(AS_DATA).specific(m_xdata);
+	space(AS_SFR).specific(m_sfr);
+	space(AS_IDATA).specific(m_idata);
 
 	// Save states
 	save_item(NAME(m_ppc));
