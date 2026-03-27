@@ -1645,7 +1645,6 @@ void bosco_state::bosco(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32);
-	m_namco_sound->set_voices(3);
 	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0);
 
 	/* discrete circuit on the 54XX outputs */
@@ -1722,7 +1721,6 @@ void galaga_state::galaga(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32);
-	m_namco_sound->set_voices(3);
 	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0);
 
 	/* discrete circuit on the 54XX outputs */
@@ -1834,7 +1832,6 @@ void xevious_state::xevious(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32);
-	m_namco_sound->set_voices(3);
 	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0);
 
 	/* discrete circuit on the 54XX outputs */
@@ -1952,7 +1949,6 @@ void digdug_state::digdug(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32);
-	m_namco_sound->set_voices(3);
 	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0);
 }
 

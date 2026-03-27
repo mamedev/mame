@@ -3756,7 +3756,6 @@ void pacman_state::pacman(machine_config &config, bool latch)
 	SPEAKER(config, "mono").front_center();
 
 	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32);
-	m_namco_sound->set_voices(3);
 	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

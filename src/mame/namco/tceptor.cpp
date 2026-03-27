@@ -106,7 +106,7 @@ void tceptor_state::m6809_map(address_map &map)
 	map(0x1800, 0x1bff).ram().w(FUNC(tceptor_state::tceptor_tile_ram_w)).share("tile_ram");
 	map(0x1c00, 0x1fff).ram().w(FUNC(tceptor_state::tceptor_tile_attr_w)).share("tile_attr");
 	map(0x2000, 0x3fff).ram().w(FUNC(tceptor_state::tceptor_bg_ram_w)).share("bg_ram"); // background (VIEW RAM)
-	map(0x4000, 0x43ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));
+	map(0x4000, 0x43ff).m(m_cus30, FUNC(namco_cus30_device::amap));
 	map(0x4800, 0x4800).w(FUNC(tceptor_state::tceptor2_shutter_w));
 	map(0x4f00, 0x4f07).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w));
 	map(0x5000, 0x5006).w(FUNC(tceptor_state::tceptor_bg_scroll_w));
@@ -155,7 +155,7 @@ void tceptor_state::m68k_map(address_map &map)
 
 void tceptor_state::mcu_map(address_map &map)
 {
-	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));
+	map(0x1000, 0x13ff).m(m_cus30, FUNC(namco_cus30_device::amap));
 	map(0x1400, 0x154d).ram();
 	map(0x17c0, 0x17ff).ram();
 	map(0x2000, 0x20ff).ram().share("share3");
@@ -340,7 +340,6 @@ void tceptor_state::tceptor(machine_config &config)
 	ym.add_route(1, "speaker", 1.0, 1);
 
 	NAMCO_CUS30(config, m_cus30, XTAL(49'152'000)/2048);
-	m_cus30->set_voices(8);
 	m_cus30->set_stereo(true);
 	m_cus30->add_route(0, "speaker", 0.40, 0);
 	m_cus30->add_route(1, "speaker", 0.40, 1);

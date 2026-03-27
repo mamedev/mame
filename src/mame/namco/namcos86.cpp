@@ -331,7 +331,7 @@ void namcos86_state::cpu1_map(address_map &map)
 	map(0x4000, 0x57ff).ram().share("sharedram");
 	map(0x5800, 0x5fff).m(m_spritegen, FUNC(namcos1_sprite_device::spriteram_map));
 
-	map(0x4000, 0x43ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); // PSG device, shared RAM
+	map(0x4000, 0x43ff).m(m_cus30, FUNC(namco_cus30_device::amap)); // PSG device, shared RAM
 
 	// ROM & Voice expansion board - only some games have it
 	map(0x6000, 0x7fff).bankr(m_mainbank);
@@ -414,7 +414,7 @@ void namcos86_state::wndrmomo_cpu2_map(address_map &map)
 
 void namcos86_state::common_mcu_map(address_map &map)
 {
-	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));
+	map(0x1000, 0x13ff).m(m_cus30, FUNC(namco_cus30_device::amap));
 	map(0x1400, 0x1fff).ram();
 }
 
@@ -1079,7 +1079,6 @@ void namcos86_state::hopmappy(machine_config &config)
 	ymsnd.add_route(0, "mono", 0.0).add_route(1, "mono", 0.60); // only right channel is connected
 
 	NAMCO_CUS30(config, m_cus30, 49.152_MHz_XTAL/2048);
-	m_cus30->set_voices(8);
 	m_cus30->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 

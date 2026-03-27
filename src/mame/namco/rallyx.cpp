@@ -869,7 +869,6 @@ void rallyx_state::rallyx(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32); // 96 KHz
-	m_namco_sound->set_voices(3);
 	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	SAMPLES(config, m_samples);
