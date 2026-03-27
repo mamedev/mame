@@ -2589,10 +2589,8 @@ void cps_state::video_start()
 	// these do not need to be saved, because they are recovered from cps_a_regs in cps1_postload
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
-	save_item(NAME(m_starsx[0]));
-	save_item(NAME(m_starsy[0]));
-	save_item(NAME(m_starsx[1]));
-	save_item(NAME(m_starsy[1]));
+	save_item(NAME(m_starsx));
+	save_item(NAME(m_starsy));
 	save_item(NAME(m_stars_enabled));
 #endif
 }
