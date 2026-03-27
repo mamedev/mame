@@ -27,14 +27,29 @@ ensoniq_vfx_cartridge::~ensoniq_vfx_cartridge()
 void ensoniq_vfx_cartridge::device_start()
 {
 	m_storage = std::make_unique<uint8_t []>(SIZE);
+	m_byte_load_cycle_timer = timer_alloc(FUNC(ensoniq_vfx_cartridge::byte_load_cycle_elapsed), this);
+}
+
+TIMER_CALLBACK_MEMBER(ensoniq_vfx_cartridge::byte_load_cycle_elapsed)
+{
+	LOG("T_BLC expired\n");
+	m_state = state::IDLE;
 }
 
 u8 ensoniq_vfx_cartridge::read(offs_t offset)
 {
-	m_state = state::IDLE;
 	auto v = m_storage[offset & MASK];
 	if (offset > 0x7f00)
 		LOG("R %04x -> %02x\n", offset, v);
+
+	if (m_state == state::WR)
+	{
+		// A read is interrupting the byte load cycle; cancel the timer.
+		m_byte_load_cycle_timer->enable(false);
+	}
+
+	m_state = state::IDLE;
+
 	return v;
 }
 
@@ -61,6 +76,11 @@ void ensoniq_vfx_cartridge::write(offs_t offset, u8 data)
 	// byte until the byte has been successfully written.
 	// Here, we can actually immediately write any written bytes to storage, and use
 	// the client's reading of the value to signal the end of the write cycle.
+	// For safety (to guard against if there is anything that interrupts the keyboard's
+	// software in such a way that a write is _not_ followed by a read before the next
+	// write) we also have a timer that will expire after T_BLC and conclude the write
+	// cycle by resetting the state to IDLE.
+
 	switch (m_state)
 	{
 		case state::IDLE:
@@ -85,7 +105,8 @@ void ensoniq_vfx_cartridge::write(offs_t offset, u8 data)
 		case state::WR:
 			if (offset > 0x7f00)
 				LOG("W %04x :  %02x\n", offset, data);
-			m_storage[offset] = data;
+			m_storage[offset & MASK] = data;
+			m_byte_load_cycle_timer->adjust(ensoniq_vfx_cartridge::T_BLC);
 			break;
 	}
 }

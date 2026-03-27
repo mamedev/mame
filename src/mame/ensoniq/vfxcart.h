@@ -47,6 +47,8 @@ private:
 
 	static constexpr uint32_t SIZE = 32 * 1024;
 	static constexpr uint32_t MASK = SIZE - 1;
+	// Byte Load Cycle Time, per Xicor X27C256 datasheet.
+	static constexpr attotime T_BLC = attotime::from_usec(100);
 
 	enum class state : int {
 		IDLE,
@@ -60,6 +62,9 @@ private:
 
 	load_cb m_load_cb;
 	unload_cb m_unload_cb;
+
+	emu_timer *m_byte_load_cycle_timer;
+	TIMER_CALLBACK_MEMBER(byte_load_cycle_elapsed);
 };
 
 
