@@ -33,6 +33,7 @@
 #include "specnext_tiles.h"
 #include "specnext_uart.h"
 
+#include "bus/midi/midi.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/null_modem.h"
 #include "bus/rs232/pty.h"
@@ -131,6 +132,7 @@ public:
 		, m_dma(*this, "dma")
 		, m_i2c(*this, "i2c")
 		, m_uart(*this, "uart%u", 0U)
+		, m_midi_out(*this, "mdout")
 		, m_sdcards(*this, "sdcard%u", 0U)
 		, m_ay(*this, "ay%u", 0U)
 		, m_dac(*this, "dac%u", 0U)
@@ -190,6 +192,8 @@ protected:
 	void i2c_scl_w(u8 data);
 	template <u8 Reg> u8 uart_reg_r();
 	template <u8 Reg> void uart_reg_w(u8 data);
+	template <u8 Uart> void txd_w(int state);
+	void rxd_w(int state);
 	void palette_val_w(u8 nr_palette_priority, u16 nr_palette_value);
 	u8 port_ff_r();
 	void port_ff_w(u8 data);
@@ -372,6 +376,7 @@ private:
 	required_device<specnext_dma_device> m_dma;
 	optional_device<i2c_ds1307_device> m_i2c;
 	optional_device_array<specnext_uart_device, 2> m_uart;
+	optional_device<midi_port_device> m_midi_out;
 	required_device_array<spi_sdcard_device, 2> m_sdcards;
 	required_device_array<ym2149_device, 3> m_ay;
 	required_device_array<dac_byte_interface, 4> m_dac;
@@ -1237,6 +1242,18 @@ template <u8 Reg> void specnext_state::uart_reg_w(u8 data)
 		m_uart_select = BIT(data, 6);
 
 	m_uart[m_uart_select]->reg_w(Reg, data);
+}
+
+template <u8 Uart> void specnext_state::txd_w(int state)
+{
+	if (m_nr_0b_joy_iomode_en && BIT(m_nr_0b_joy_iomode, 1) && (Uart == m_nr_0b_joy_iomode_0))
+		m_midi_out->write_txd(state);
+}
+
+void specnext_state::rxd_w(int state)
+{
+	if (m_nr_0b_joy_iomode_en && BIT(m_nr_0b_joy_iomode, 1))
+		m_uart[m_nr_0b_joy_iomode_0]->rx_w(state);
 }
 
 void specnext_state::turbosound_address_w(u8 data)
@@ -4062,6 +4079,7 @@ void specnext_state::tbblue(machine_config &config)
 
 	SPECNEXT_UART(config, m_uart[0], 28_MHz_XTAL);
 	m_uart[0]->out_txd_callback().set("rs232_esp", FUNC(rs232_port_device::write_txd));
+	m_uart[0]->out_txd_callback().append(FUNC(specnext_state::txd_w<0>));
 	m_uart[0]->out_rx_full_near_callback().set(m_im2_uart0_rx, FUNC(specnext_im2_device::irq_w));
 	m_uart[0]->out_tx_empty_callback().set(m_im2_uart0_tx, FUNC(specnext_im2_device::irq_w));
 	rs232_port_device &rs232_esp(RS232_PORT(config, "rs232_esp", rs232_devices, nullptr));
@@ -4077,12 +4095,19 @@ void specnext_state::tbblue(machine_config &config)
 
 	SPECNEXT_UART(config, m_uart[1], 28_MHz_XTAL);
 	m_uart[1]->out_txd_callback().set("rs232_rpi", FUNC(rs232_port_device::write_txd));
+	m_uart[1]->out_txd_callback().append(FUNC(specnext_state::txd_w<1>));
 	m_uart[1]->out_rx_full_near_callback().set(m_im2_uart1_rx, FUNC(specnext_im2_device::irq_w));
 	m_uart[1]->out_tx_empty_callback().set(m_im2_uart1_tx, FUNC(specnext_im2_device::irq_w));
 	rs232_port_device &rs232_rpi(RS232_PORT(config, "rs232_rpi", rs232_devices, nullptr));
 	rs232_rpi.rxd_handler().set(m_uart[1], FUNC(specnext_uart_device::rx_w));
 	rs232_rpi.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(rs232_baud));
 	rs232_rpi.set_option_device_input_defaults("pty", DEVICE_INPUT_DEFAULTS_NAME(rs232_baud));
+
+	auto &mdin(MIDI_PORT(config, "mdin", midiin_slot, "midiin"));
+	mdin.rxd_handler().set("mdthru", FUNC(midi_port_device::write_txd));
+	mdin.rxd_handler().append(FUNC(specnext_state::rxd_w));
+	MIDI_PORT(config, "mdthru", midiout_slot, "midiout");
+	MIDI_PORT(config, m_midi_out, midiout_slot, "midiout");
 
 	SPI_SDCARD(config, m_sdcards[0], 0);
 	m_sdcards[0]->set_prefer_sdhc();
