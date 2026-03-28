@@ -24,6 +24,7 @@
 #include "machine/input_merger.h"
 #include "machine/nmc9306.h"
 #include "machine/ns32081.h"
+#include "machine/watchdog.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80scc.h"
 #include "machine/z8536.h"
@@ -58,11 +59,17 @@ public:
 		m_scc(*this, {Z8530A_0_TAG, Z8530A_1_TAG, Z8530A_2_TAG}),
 		m_fdc(*this, FD1797_TAG),
 		m_floppy(*this, FD1797_TAG":%u", 0U),
+		m_watchdog(*this, "watchdog"),
+		m_ram(*this, "ram", 0x400000, ENDIANNESS_LITTLE),
 		m_segment_ram(*this, "segment_ram", 0x1000, ENDIANNESS_LITTLE),
-		m_page_ram(*this, "page_ram", 0x1000*2, ENDIANNESS_LITTLE)
+		m_page_ram(*this, "page_ram", 0x1000*2, ENDIANNESS_LITTLE),
+		m_boot_rom(*this, MC68010_TAG)
 	{ }
 
 	void x37(machine_config &config);
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<m68000_base_device> m_cpu;
@@ -74,8 +81,11 @@ private:
 	required_device_array<scc8530_device, 3> m_scc;
 	required_device<fd1797_device> m_fdc;
 	required_device_array<floppy_connector, 3> m_floppy;
+	required_device<watchdog_timer_device> m_watchdog;
+	memory_share_creator<u16> m_ram;
 	memory_share_creator<u8> m_segment_ram;
 	memory_share_creator<u16> m_page_ram;
+	required_memory_region m_boot_rom;
 
 	u8 m_cb = 0;
 
@@ -87,10 +97,12 @@ private:
 	int get_task();
 	uint16_t mapper_r(offs_t offset);
 	void mapper_w(offs_t offset, uint16_t data);
+	uint16_t ram_r(offs_t offset, uint16_t mem_mask);
+	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	uint16_t edc_status_r(offs_t offset);
 
-	void cio_pb_w(uint8_t data) { logerror("CB %02x\n", data); m_cb = data; };
+	void cio_pb_w(uint8_t data);
 	uint8_t cio_pc_r();
 	void cio_pc_w(uint8_t data);
 
@@ -107,18 +119,17 @@ void x37_state::program_map(address_map &map)
 	// map(0xc10000, 0xc1ffff) MASS MEMORY GROUP
 	// map(0xc20000, 0xc2ffff) 4680 BUS
 
-	map(0x000000, 0x3fffff).ram();
-	map(0x000000, 0x007fff).rom().region(MC68010_TAG, 0);
-	/*map(0x400000, 0x47ffff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::vram_map)).umask16(0xffff);
-	map(0x480100, 0x4801ff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::crtc_map)).umask16(0xff00);
-	map(0x480800, 0x4808ff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr0_map)).umask16(0xff00);
-	map(0x480900, 0x4809ff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr1_map)).umask16(0xff00);
-	map(0x480a00, 0x480aff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr2_map)).umask16(0xff00);*/
+	map(0x000000, 0x3fffff).rw(FUNC(x37_state::ram_r), FUNC(x37_state::ram_w));
+	map(0x400000, 0x47ffff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::vram_map)).umask16(0xffff);
+	map(0x480100, 0x4801ff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::crtc_map)).umask16(0xffff);
+	map(0x480800, 0x480807).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr0_map)).umask16(0xffff);
+	map(0x480900, 0x480907).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr1_map)).umask16(0xffff);
+	map(0x480a00, 0x480a07).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr2_map)).umask16(0xffff);
 	map(0x800000, 0xbfffff).rw(FUNC(x37_state::mapper_r), FUNC(x37_state::mapper_w));
-	//map(0x800100, 0x8001ff).rw(m_cio, FUNC(z8536_device::read), FUNC(z8536_device::write));
+	map(0x800100, 0x8001ff).rw(m_cio, FUNC(z8536_device::read), FUNC(z8536_device::write));
 	map(0x810100, 0x810101).r(FUNC(x37_state::edc_status_r));
 	//map(0x820100, 0x82010f).rw(m_fpu, FUNC(ns32081_device::read), FUNC(ns32081_device::write));
-	//map(0x830100, 0x8301ff).rw(m_dmac, FUNC(hd63450_device::read), FUNC(hd63450_device::write));
+	map(0x830100, 0x8301ff).rw(m_dmac, FUNC(hd63450_device::read), FUNC(hd63450_device::write));
 	map(0xc00000, 0xc00007).mirror(0x3c0000).rw(m_scc[0], FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0x00ff);
 	map(0xc00010, 0xc00017).mirror(0x3c0000).rw(m_scc[1], FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0x00ff);
 	map(0xc00020, 0xc00027).mirror(0x3c0000).rw(m_scc[2], FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0x00ff);
@@ -138,7 +149,53 @@ void x37_state::cpu_space_map(address_map &map)
 }
 
 static INPUT_PORTS_START( x37 )
+	// keyboard inputs defined in devices/bus/abckb/abc99.cpp
 INPUT_PORTS_END
+
+uint16_t x37_state::ram_r(offs_t offset, uint16_t mem_mask)
+{
+	u16 data = 0;
+
+	if (BIT(m_cb, 7) && (offset < 0x20000)) {
+		offs_t boot_offset = offset << 1;
+		if (ACCESSING_BITS_0_7)
+			data |= m_boot_rom->base()[boot_offset & 0x7fff];
+		if (ACCESSING_BITS_8_15)
+			data |= m_boot_rom->base()[(boot_offset + 1) & 0x7fff] << 8;
+	} else {
+		offs_t sega = ((offset & 0x1fc000) >> 10) | get_task();
+		u8 segd = m_segment_ram[sega];
+		offs_t pga = ((offset & 0x3c00) >> 2) | segd;
+		u16 pgd = m_page_ram[pga];
+		offs_t ma = ((pgd & 0xfff) << 11) | (offset & 0x7ff);
+
+		if (ma < 0x400000) {
+			data = m_ram[ma];
+		} else {
+			data = m_cpu->space(AS_PROGRAM).read_word(ma);
+		}
+	}
+
+	return data;
+}
+
+void x37_state::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	offs_t sega = ((offset & 0x1fc000) >> 10) | get_task();
+	u8 segd = m_segment_ram[sega];
+	offs_t pga = ((offset & 0x3c00) >> 2) | segd;
+	u16 pgd = m_page_ram[pga];
+	offs_t ma = ((pgd & 0xfff) << 11) | (offset & 0x7ff);
+
+	if (ma < 0x400000) {
+		if (ACCESSING_BITS_0_7)
+			m_ram[ma] = (m_ram[ma] & 0xff00) | (data & 0x00ff);
+		if (ACCESSING_BITS_8_15)
+			m_ram[ma] = (m_ram[ma] & 0x00ff) | (data & 0xff00);
+	} else {
+		m_cpu->space(AS_PROGRAM).write_word(ma, data, mem_mask);
+	}
+}
 
 int x37_state::get_task()
 {
@@ -200,7 +257,17 @@ uint16_t x37_state::edc_status_r(offs_t offset)
 
 	*/
 
+	if (!machine().side_effects_disabled())
+	{
+		m_watchdog->watchdog_reset();
+	}
+
 	return 0;
+}
+
+void x37_state::cio_pb_w(uint8_t data)
+{
+	m_cb = data;
 }
 
 uint8_t x37_state::cio_pc_r()
@@ -303,12 +370,19 @@ void x37_state::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_ABC1600_FORMAT);
 }
 
+void x37_state::machine_reset()
+{
+	m_cb = 0xff;
+}
+
 void x37_state::x37(machine_config &config)
 {
 	// basic machine hardware
 	M68010(config, m_cpu, XTAL(20'000'000)/2);
 	m_cpu->set_addrmap(AS_PROGRAM, &x37_state::program_map);
 	m_cpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &x37_state::cpu_space_map);
+
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1000000)); // TODO timeout
 
 	NS32081(config, m_fpu, XTAL(20'000'000)/2);
 

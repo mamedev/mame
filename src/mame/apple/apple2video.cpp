@@ -100,7 +100,7 @@ void a2_video_device::device_reset()
 	m_monohgr = false;
 	m_newvideo = 0x01;
 	m_rgbmode = 3;  // default to color DHGR
-	m_monochrome = 0; // TODO: never set, but if left uninitialized could cause the emulation to start in monochrome by accident. Default to color for now
+	m_monochrome = 0; // TODO: only affects IIgs composite output
 }
 
 void a2_video_device::txt_w(int state)
@@ -684,8 +684,8 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	int const startcol = (cliprect.left() / 14);
 	int const stopcol = (cliprect.right() / 14) + 1;
 
-	// B&W/Green/Amber monitor, CEC/tk2000 mono HGR mode, or IIgs $C021 monochrome HGR
-	bool const monochrome = monochrome_monitor() || m_monohgr || (m_monochrome & 0x80);
+	// B&W/Green/Amber monitor, CEC/tk2000 mono HGR mode, or IIgs force-monochrome-DHR and 7M
+	bool const monochrome = monochrome_monitor() || m_monohgr || ((m_newvideo & 0x20) && m_dhires);
 
 	// verified on h/w: setting dhires w/o 80col emulates a rev. 0 Apple ][ with no orange/blue
 	uint8_t const bit7_mask = m_dhires ? 0 : 0x80;
