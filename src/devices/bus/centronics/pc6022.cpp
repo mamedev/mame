@@ -72,7 +72,7 @@ void pc6022_device::io_map(address_map &map)
 {
 	map.global_mask(0x00ff);
 	// TODO: does the address actually matter?
-	map(0x00, 0x00).r(NAME(pc6022_device::data_r));
+	map(0x00, 0x00).r(FUNC(pc6022_device::data_r));
 }
 
 void pc6022_device::device_add_mconfig(machine_config &config)
