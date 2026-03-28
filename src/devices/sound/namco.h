@@ -117,8 +117,8 @@ class namco_15xx_device : public namco_audio_device<8, false>
 public:
 	namco_15xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void namco_15xx_w(offs_t offset, uint8_t data);
 	uint8_t namco_15xx_r(offs_t offset);
+	void namco_15xx_w(offs_t offset, uint8_t data);
 
 	void amap(address_map &map) ATTR_COLD;
 
