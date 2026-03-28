@@ -685,150 +685,87 @@ void namco_cus30_device::sound_stream_update(sound_stream &stream)
 	if (!m_sound_enable)
 		return;
 
-	if (m_stereo)
+	// loop over each voice and add its contribution
+	for (auto &voice : m_channel_list)
 	{
-		// loop over each voice and add its contribution
-		for (auto &voice : m_channel_list)
+		const int lv = voice.volume[0];
+		const int rv = voice.volume[1];
+
+		if (voice.noise_sw)
 		{
-			const int lv = voice.volume[0];
-			const int rv = voice.volume[1];
+			const int f = voice.frequency & 0xff;
 
-			if (voice.noise_sw)
+			// only update if we have non-zero volume
+			if (lv || rv)
 			{
-				const int f = voice.frequency & 0xff;
+				const int hold_time = 1 << (m_f_fracbits - 16);
+				int hold = voice.noise_hold;
+				const uint32_t delta = f << 4;
+				uint32_t c = voice.noise_counter;
+				const int16_t l_noise_data = 0x07 * (lv >> 1);
+				const int16_t r_noise_data = m_stereo ? (0x07 * (rv >> 1)) : 0;
 
-				// only update if we have non-zero volume
-				if (lv || rv)
+				// add our contribution
+				for (int i = 0; i < stream.samples(); i++)
 				{
-					const int hold_time = 1 << (m_f_fracbits - 16);
-					int hold = voice.noise_hold;
-					const uint32_t delta = f << 4;
-					uint32_t c = voice.noise_counter;
-					const int16_t l_noise_data = 0x07 * (lv >> 1);
-					const int16_t r_noise_data = 0x07 * (rv >> 1);
-
-					// add our contribution
-					for (int i = 0; i < stream.samples(); i++)
+					if (voice.noise_state)
 					{
-						if (voice.noise_state)
-						{
-							stream.add_int(0, i, l_noise_data, MIX_RES);
+						stream.add_int(0, i, l_noise_data, MIX_RES);
+						if (m_stereo)
 							stream.add_int(1, i, r_noise_data, MIX_RES);
-						}
-						else
-						{
-							stream.add_int(0, i, -l_noise_data, MIX_RES);
+					}
+					else
+					{
+						stream.add_int(0, i, -l_noise_data, MIX_RES);
+						if (m_stereo)
 							stream.add_int(1, i, -r_noise_data, MIX_RES);
-						}
-
-						if (hold)
-						{
-							hold--;
-							continue;
-						}
-
-						hold =  hold_time;
-
-						c += delta;
-						int cnt = (c >> 12);
-						c &= (1 << 12) - 1;
-						for ( ;cnt > 0; cnt--)
-						{
-							if ((voice.noise_seed + 1) & 2) voice.noise_state ^= 1;
-							if (voice.noise_seed & 1) voice.noise_seed ^= 0x28000;
-							voice.noise_seed >>= 1;
-						}
 					}
 
-					// update the counter and hold time for this voice
-					voice.noise_counter = c;
-					voice.noise_hold = hold;
-				}
-			}
-			else
-			{
-				// save the counter for this voice
-				uint32_t c = voice.counter;
+					if (hold)
+					{
+						hold--;
+						continue;
+					}
 
-				// only update if we have non-zero left volume
-				if (lv)
-				{
-					// generate sound into the buffer
-					c = namco_update_one(stream, 0, voice.waveform_select, lv, voice.counter, voice.frequency);
-				}
+					hold =  hold_time;
 
-				// only update if we have non-zero right volume
-				if (rv)
-				{
-					// generate sound into the buffer
-					c = namco_update_one(stream, 1, voice.waveform_select, rv, voice.counter, voice.frequency);
+					c += delta;
+					int cnt = (c >> 12);
+					c &= (1 << 12) - 1;
+					for ( ;cnt > 0; cnt--)
+					{
+						if ((voice.noise_seed + 1) & 2) voice.noise_state ^= 1;
+						if (voice.noise_seed & 1) voice.noise_seed ^= 0x28000;
+						voice.noise_seed >>= 1;
+					}
 				}
 
-				// update the counter for this voice
-				voice.counter = c;
+				// update the counter and hold time for this voice
+				voice.noise_counter = c;
+				voice.noise_hold = hold;
 			}
 		}
-	}
-	else
-	{
-		// loop over each voice and add its contribution
-		for (auto &voice : m_channel_list)
+		else
 		{
-			const int v = voice.volume[0];
-			if (voice.noise_sw)
+			// save the counter for this voice
+			uint32_t c = voice.counter;
+
+			// only update if we have non-zero left volume
+			if (lv)
 			{
-				const int f = voice.frequency & 0xff;
-
-				// only update if we have non-zero volume
-				if (v)
-				{
-					const int hold_time = 1 << (m_f_fracbits - 16);
-					int hold = voice.noise_hold;
-					const uint32_t delta = f << 4;
-					uint32_t c = voice.noise_counter;
-					const int16_t noise_data = 0x07 * (v >> 1);
-
-					// add our contribution
-					for (int i = 0; i < stream.samples(); i++)
-					{
-						if (voice.noise_state)
-							stream.add_int(0, i, noise_data, MIX_RES);
-						else
-							stream.add_int(0, i, -noise_data, MIX_RES);
-
-						if (hold)
-						{
-							hold--;
-							continue;
-						}
-
-						hold =  hold_time;
-
-						c += delta;
-						int cnt = (c >> 12);
-						c &= (1 << 12) - 1;
-						for ( ;cnt > 0; cnt--)
-						{
-							if ((voice.noise_seed + 1) & 2) voice.noise_state ^= 1;
-							if (voice.noise_seed & 1) voice.noise_seed ^= 0x28000;
-							voice.noise_seed >>= 1;
-						}
-					}
-
-					// update the counter and hold time for this voice
-					voice.noise_counter = c;
-					voice.noise_hold = hold;
-				}
+				// generate sound into the buffer
+				c = namco_update_one(stream, 0, voice.waveform_select, lv, voice.counter, voice.frequency);
 			}
-			else
+
+			// only update if we have non-zero right volume
+			if (rv && m_stereo)
 			{
-				// only update if we have non-zero volume
-				if (v)
-				{
-					// generate sound into buffer and update the counter for this voice
-					voice.counter = namco_update_one(stream, 0, voice.waveform_select, v, voice.counter, voice.frequency);
-				}
+				// generate sound into the buffer
+				c = namco_update_one(stream, 1, voice.waveform_select, rv, voice.counter, voice.frequency);
 			}
+
+			// update the counter for this voice
+			voice.counter = c;
 		}
 	}
 }
