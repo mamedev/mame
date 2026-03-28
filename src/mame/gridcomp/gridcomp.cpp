@@ -98,6 +98,7 @@
 namespace {
 
 #define I80130_TAG      "osp"
+#define NUMBER_OF_ROMS  4
 
 class gridcomp_state : public driver_device
 {
@@ -147,6 +148,9 @@ private:
 	bool m_video_chip_activated = false;
 	bool m_widescreen_activated = false;
 
+	bool m_roms_enabled = false;
+	std::array<size_t, NUMBER_OF_ROMS> m_active_slots = {};
+
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	uint8_t grid_modem_r(offs_t offset);
@@ -158,6 +162,10 @@ private:
 	uint8_t grid_dma_r(offs_t offset);
 
 	void split_board_w(offs_t offset, uint8_t data);
+
+	void app_rom_slot_mapper_w(offs_t offset, uint8_t data);
+	uint8_t app_rom_r(offs_t offset);
+	void app_rom_activator_w(offs_t offset, uint8_t data);
 
 	template <int Width>
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -244,6 +252,54 @@ void gridcomp_state::split_board_w(offs_t offset, uint8_t data)
 	}
 }
 
+void gridcomp_state::app_rom_slot_mapper_w(offs_t offset, uint8_t data)
+{
+	// LOG("ROM SLOT MAPPER %02x <- %02x\n", offset, data);
+
+	// The Compass only has 4 slots for ROMs.
+	// TODO: How does the real laptop handle this situation?
+	if (data >= NUMBER_OF_ROMS)
+		return;
+
+	// 4 slot selection registers are located at addresses:
+	// DFE0:8, DFE0:A, DFE0:C, and DFE0:E.
+	m_active_slots[offset] = data;
+}
+
+uint8_t gridcomp_state::app_rom_r(offs_t offset)
+{
+	if (!m_roms_enabled)
+		return 0xFF;
+
+	// The address space of the ROM is divided into 4 "windows".
+	const uint32_t window_size = 0x8000;
+
+	// Calculate the quarter number from which we are reading.
+	const size_t quarter = offset / window_size;
+
+	// And look up which ROM slot is mapped to this window.
+	const size_t slot = m_active_slots[quarter];
+	const auto& rom = m_app_roms[slot];
+
+	// It does not matter what is returned if the ROM is not present because
+	// CCPROM checks the 0xBB66 marker at offset 9FF0:0,
+	// and then also verifies the checksum and other things.
+	if (!rom->exists())
+		return 0xFF;
+
+	return rom->read_rom(offset % rom->get_rom_size());
+}
+
+void gridcomp_state::app_rom_activator_w(offs_t offset, uint8_t data)
+{
+	// LOG("ROM ACTIVATOR %02x <- %02x\n", offset, data);
+
+	// TODO: Handle 32KB flag at offset 2.
+
+	if (offset == 8)
+		m_roms_enabled = data == 1;
+}
+
 template <int Width>
 uint32_t gridcomp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -316,6 +372,10 @@ void gridcomp_state::machine_start()
 
 	m_videoram = (uint16_t *)m_maincpu->space(AS_PROGRAM).get_write_ptr(0x400);
 
+void gridcomp_state::machine_reset()
+{
+	m_roms_enabled = false;
+	m_active_slots = {};
 }
 
 IRQ_CALLBACK_MEMBER(gridcomp_state::irq_callback)
@@ -343,15 +403,15 @@ void gridcomp_state::grid1101_map(address_map &map)
 void gridcomp_state::grid1121_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x80000, 0x9ffff).unmapr(); // Application ROM
+	map(0x80000, 0x9ffff).r(FUNC(gridcomp_state::app_rom_r));
 	map(0xc0000, 0xcffff).r(m_test_rom, FUNC(gridrom_socket_device::read));
 	map(0xdfa00, 0xdfdff).rw(FUNC(gridcomp_state::grid_dma_r), FUNC(gridcomp_state::grid_dma_w)); // DMA
 	map(0xdfe00, 0xdfe07).w(FUNC(gridcomp_state::split_board_w));
-	map(0xdfe08, 0xdfe0f).unmaprw();  // Application ROM
+	map(0xdfe08, 0xdfe0f).w(FUNC(gridcomp_state::app_rom_slot_mapper_w)).umask16(0x00ff);
 	map(0xdfe10, 0xdfe1f).unmapw(); // .rw(FUNC(gridcomp_state::uart_pal_r), FUNC(gridcomp_state::uart_pal_w));
 	map(0xdfe40, 0xdfe4f).w(FUNC(gridcomp_state::grid_sound_w));  // modem controller??
 	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
-	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
+	map(0xdfea0, 0xdfeaf).w(FUNC(gridcomp_state::app_rom_activator_w));
 	map(0xdfec0, 0xdfecf).rw(FUNC(gridcomp_state::grid_modem_r), FUNC(gridcomp_state::grid_modem_w)).umask16(0x00ff); // incl. DTMF generator
 	map(0xdff00, 0xdff1f).rw(m_uart8274, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
 	map(0xdff40, 0xdff5f).rw(m_rtc, FUNC(mm58174_device::read), FUNC(mm58174_device::write)).umask16(0xff00);
