@@ -63,7 +63,7 @@ void namco_cus30_device::amap(address_map &map)
 	map(0x140, 0x3ff).ram().share(m_sharedram);
 }
 
-DEFINE_DEVICE_TYPE(NAMCO,       namco_device,       "namco",       "Namco WSG")
+DEFINE_DEVICE_TYPE(NAMCO_WSG,   namco_wsg_device,   "namco_wsg",   "Namco WSG")
 DEFINE_DEVICE_TYPE(POLEPOS_WSG, polepos_wsg_device, "polepos_wsg", "Namco Pole Position WSG")
 DEFINE_DEVICE_TYPE(NAMCO_15XX,  namco_15xx_device,  "namco_15xx",  "Namco 15xx")
 DEFINE_DEVICE_TYPE(NAMCO_CUS30, namco_cus30_device, "namco_cus30", "Namco CUS30")
@@ -84,8 +84,8 @@ namco_audio_device<Voices, Packed>::namco_audio_device(const machine_config &mco
 {
 }
 
-namco_device::namco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: namco_audio_device<3, false>(mconfig, NAMCO, tag, owner, clock)
+namco_wsg_device::namco_wsg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: namco_audio_device<3, false>(mconfig, NAMCO_WSG, tag, owner, clock)
 {
 }
 
@@ -161,7 +161,7 @@ void namco_audio_device<Voices, Packed>::device_start()
 }
 
 
-void namco_device::device_start()
+void namco_wsg_device::device_start()
 {
 	namco_audio_device::device_start();
 
@@ -291,7 +291,7 @@ void namco_audio_device<Voices, Packed>::sound_enable_w(int state)
     0x1f:       ch 2    volume
 */
 
-void namco_device::pacman_sound_w(offs_t offset, uint8_t data)
+void namco_wsg_device::pacman_sound_w(offs_t offset, uint8_t data)
 {
 	int ch;
 
@@ -618,7 +618,7 @@ void namco_audio_device<Voices, Packed>::sound_stream_update(sound_stream &strea
 	}
 }
 
-void namco_device::sound_stream_update(sound_stream &stream)
+void namco_wsg_device::sound_stream_update(sound_stream &stream)
 {
 	namco_audio_device::sound_stream_update(stream);
 }

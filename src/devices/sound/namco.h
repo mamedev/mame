@@ -78,10 +78,10 @@ protected:
 
 };
 
-class namco_device : public namco_audio_device<3, false>
+class namco_wsg_device : public namco_audio_device<3, false>
 {
 public:
-	namco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namco_wsg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void pacman_sound_w(offs_t offset, uint8_t data);
 
@@ -162,7 +162,7 @@ extern template class namco_audio_device<3, false>;
 extern template class namco_audio_device<8, false>;
 extern template class namco_audio_device<8, true>;
 
-DECLARE_DEVICE_TYPE(NAMCO,       namco_device)
+DECLARE_DEVICE_TYPE(NAMCO_WSG,   namco_wsg_device)
 DECLARE_DEVICE_TYPE(POLEPOS_WSG, polepos_wsg_device)
 DECLARE_DEVICE_TYPE(NAMCO_15XX,  namco_15xx_device)
 DECLARE_DEVICE_TYPE(NAMCO_CUS30, namco_cus30_device)

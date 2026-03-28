@@ -211,7 +211,7 @@ void _20pacgal_state::_20pacgal_map(address_map &map)
 	map(0x10000, 0x3ffff).rom();
 	map(0x44000, 0x447ff).ram().share("video_ram");
 	map(0x44800, 0x45eff).ram();
-	map(0x45040, 0x4505f).w("namco", FUNC(namco_device::pacman_sound_w));
+	map(0x45040, 0x4505f).w("namco", FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x45f00, 0x45fff).writeonly().share("waveram");
 	map(0x46000, 0x46fff).writeonly().share("char_gfx_ram");
 	map(0x47100, 0x47100).ram(); // leftover from original Galaga code
@@ -438,7 +438,7 @@ void _20pacgal_state::_20pacgal(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	namco_device &namco(NAMCO(config, "namco", 73.728_MHz_XTAL / 4 / 6 / 32));
+	namco_wsg_device &namco(NAMCO_WSG(config, "namco", 73.728_MHz_XTAL / 4 / 6 / 32));
 	namco.set_addrmap(0, &_20pacgal_state::waveram_map);
 	namco.add_route(ALL_OUTPUTS, "speaker", 0.5);
 
