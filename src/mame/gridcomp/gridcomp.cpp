@@ -142,9 +142,11 @@ private:
 
 	uint16_t *m_videoram = nullptr;
 
+	bool m_video_chip_selected = false;
+	bool m_widescreen_activated = false;
+
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	uint16_t grid_9ff0_r(offs_t offset);
 	uint16_t grid_keyb_r(offs_t offset);
 	uint8_t grid_modem_r(offs_t offset);
 	void grid_keyb_w(offs_t offset, uint16_t data);
@@ -155,7 +157,9 @@ private:
 	void grid_dma_w(offs_t offset, uint8_t data);
 	uint8_t grid_dma_r(offs_t offset);
 
-	template <int Width>
+	void rom_dfe0_w(offs_t offset, uint8_t data);
+	uint8_t rom_dfe0_r(offs_t offset);
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void kbd_put(u16 data);
@@ -179,23 +183,6 @@ static void rs232_devices(device_slot_interface &device)
 	*/
 
 	device.option_add("printer", SERIAL_PRINTER);
-}
-
-
-[[maybe_unused]] uint16_t gridcomp_state::grid_9ff0_r(offs_t offset)
-{
-	uint16_t data = 0;
-
-	switch (offset)
-	{
-	case 0:
-		data = 0xbb66;
-		break;
-	}
-
-	LOGDBG("9FF0: %02x == %02x\n", 0x9ff00 + (offset << 1), data);
-
-	return data;
 }
 
 uint16_t gridcomp_state::grid_keyb_r(offs_t offset)
@@ -275,16 +262,39 @@ uint8_t gridcomp_state::grid_dma_r(offs_t offset)
 	return ret;
 }
 
-template <int Width>
+void gridcomp_state::rom_dfe0_w(offs_t offset, uint8_t data)
+{
+	// LOG("ROMS/SCREEN PAL %02x <- %02x\n", offset, data);
+
+	if (offset == 0)
+		m_video_chip_selected = data == 1;
+
+	if (offset == 4 && data == 0x0B && m_video_chip_selected)
+		m_widescreen_activated = true;
+}
+
+uint8_t gridcomp_state::rom_dfe0_r(offs_t offset)
+{
+	// LOG("ROMS/SCREEN PAL %02x == %02x\n", offset, ret);
+	return 0xFF;
+}
+
 uint32_t gridcomp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	const int width = m_widescreen_activated ? 512 : 320;
+	const int x_padding = (cliprect.width() - width) / 2;
+
+	const int height = m_widescreen_activated ? 256 : 240;
+	const int y_padding = (cliprect.height() - height) / 2;
+
+	for (int y = cliprect.top(); y <= cliprect.bottom() - y_padding; y++)
 	{
-		uint16_t *p = &bitmap.pix(y);
+		uint16_t *p = &bitmap.pix(y + y_padding);
+		p += x_padding;
 
-		int const offset = y * (Width / 16);
+		int const offset = y * (width / 16);
 
-		for (int x = offset; x < offset + Width / 16; x++)
+		for (int x = offset; x < offset + width / 16; x++)
 		{
 			uint16_t const gfx = m_videoram[x];
 
@@ -336,14 +346,14 @@ void gridcomp_state::grid1101_map(address_map &map)
 void gridcomp_state::grid1121_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x90000, 0x97fff).unmaprw(); // ?? ROM slot
-	map(0x9ff00, 0x9ff0f).unmaprw(); // .r(FUNC(gridcomp_state::grid_9ff0_r)); // ?? ROM?
+	map(0x80000, 0x9ffff).unmapr(); // Active application ROM
 	map(0xc0000, 0xcffff).unmaprw(); // ?? ROM slot -- signature expected: 0x4554, 0x5048
 	map(0xdfa00, 0xdfdff).rw(FUNC(gridcomp_state::grid_dma_r), FUNC(gridcomp_state::grid_dma_w)); // DMA
-	map(0xdfe00, 0xdfe1f).unmaprw(); // ??
+	map(0xdfe00, 0xdfe0f).rw(FUNC(gridcomp_state::rom_dfe0_r), FUNC(gridcomp_state::rom_dfe0_w));
+	map(0xdfe10, 0xdfe1f).unmapw(); // .rw(FUNC(gridcomp_state::uart_pal_r), FUNC(gridcomp_state::uart_pal_w));
 	map(0xdfe40, 0xdfe4f).w(FUNC(gridcomp_state::grid_sound_w));  // modem controller??
 	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
-	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
+	map(0xdfea0, 0xdfeaf).unmaprw(); // Related to application ROM
 	map(0xdfec0, 0xdfecf).rw(FUNC(gridcomp_state::grid_modem_r), FUNC(gridcomp_state::grid_modem_w)).umask16(0x00ff); // incl. DTMF generator
 	map(0xdff00, 0xdff1f).rw(m_uart8274, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
 	map(0xdff40, 0xdff5f).rw(m_rtc, FUNC(mm58174_device::read), FUNC(mm58174_device::write)).umask16(0xff00);
@@ -395,7 +405,7 @@ void gridcomp_state::grid1101(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD)); // actually a kind of EL display
 	screen.set_color(rgb_t::amber());
-	screen.set_screen_update(FUNC(gridcomp_state::screen_update<320>));
+	screen.set_screen_update(FUNC(gridcomp_state::screen_update));
 	screen.set_raw(XTAL(15'000'000)/2, 424, 0, 320, 262, 0, 240); // XXX 66 Hz refresh
 	screen.screen_vblank().set(m_osp, FUNC(i80130_device::ir3_w));
 	screen.set_palette("palette");
@@ -477,7 +487,7 @@ void gridcomp_state::grid1129(machine_config &config)
 void gridcomp_state::grid1131(machine_config &config)
 {
 	grid1121(config);
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(gridcomp_state::screen_update<512>));
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(gridcomp_state::screen_update));
 	subdevice<screen_device>("screen")->set_raw(XTAL(15'000'000)/2, 720, 0, 512, 262, 0, 256);
 }
 
