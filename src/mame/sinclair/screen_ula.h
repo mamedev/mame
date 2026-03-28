@@ -53,7 +53,7 @@ protected:
 	ula_type m_ula_type;
 
 private:
-	static inline constexpr u16 UTM_FALLBACK_PEN = 0x800;
+	static inline constexpr u16 UTM_FALLBACK_PEN = 0xa00;
 
 	u16 m_offset_h, m_offset_v;
 	const u8 *m_bram_bank5_ptr;

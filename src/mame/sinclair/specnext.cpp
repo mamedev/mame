@@ -213,7 +213,7 @@ private:
 	static const u8 G_VERSION = 0x32; // 3.02
 	static const u8 G_SUB_VERSION = 0x04;
 	static const u8 G_VIDEO_INC = 0b11;
-	static const u16 UTM_FALLBACK_PEN = 0x800;
+	static const u16 UTM_FALLBACK_PEN = 0xa00;
 
 	virtual TIMER_CALLBACK_MEMBER(irq_off) override;
 	virtual TIMER_CALLBACK_MEMBER(irq_on) override;
@@ -1108,6 +1108,9 @@ u16 specnext_state::nr_palette_dat()
 	if ((BIT(m_nr_43_palette_write_select, 1) != BIT(m_nr_43_palette_write_select, 0)))
 		nr_palette_index |= 0x400;
 
+	if (nr_palette_index >= 0x600) // sprites palette
+		nr_palette_index += 0x100;
+
 	rgb_t rgb = m_palette->pen_color(nr_palette_index);
 	return ((rgb.r() >> 5) << 6) | ((rgb.g() >> 5) << 3) | ((rgb.b() >> 5) << 0);
 }
@@ -1119,8 +1122,21 @@ void specnext_state::palette_val_w(u8 nr_palette_priority, u16 nr_palette_value)
 	if ((BIT(m_nr_43_palette_write_select, 1) xor BIT(m_nr_43_palette_write_select, 0)))
 		nr_palette_index |= 0x400;
 
-	m_palette->set_pen_color(nr_palette_index, rgbexpand<3,3,3>(nr_palette_value, 6, 3, 0));
 	m_layer2->pen_priority_w(nr_palette_index, BIT(nr_palette_priority, 1));
+	if (nr_palette_index < 0x600)
+	{
+		m_palette->set_pen_color(nr_palette_index, rgbexpand<3,3,3>(nr_palette_value, 6, 3, 0));
+	}
+	else if (nr_palette_index < 0x700) // 6xx: sprites palette - duplicated at 6xx + 7xx
+	{
+		m_palette->set_pen_color(nr_palette_index, rgbexpand<3,3,3>(nr_palette_value, 6, 3, 0));
+		m_palette->set_pen_color(nr_palette_index + 0x100, rgbexpand<3,3,3>(nr_palette_value, 6, 3, 0));
+	}
+	else // 7xx: sprites (alt) palette - duplicated at 8xx + 9xx
+	{
+		m_palette->set_pen_color(nr_palette_index + 0x100, rgbexpand<3,3,3>(nr_palette_value, 6, 3, 0));
+		m_palette->set_pen_color(nr_palette_index + 0x200, rgbexpand<3,3,3>(nr_palette_value, 6, 3, 0));
+	}
 }
 
 u8 specnext_state::port_ff_r()
@@ -4120,7 +4136,7 @@ void specnext_state::tbblue(machine_config &config)
 	m_screen->set_screen_update(FUNC(specnext_state::screen_update));
 	m_screen->set_no_palette();
 
-	PALETTE(config.replace(), m_palette, palette_device::BLACK, 512 * 4 + 1); // ulatm, l2s, +1 == fallback
+	PALETTE(config.replace(), m_palette, palette_device::BLACK, 512 * (3 + 1 * 2) + 1); // ula tm l2 s*2 +1 == fallback
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_tbblue);
 	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
@@ -4128,7 +4144,10 @@ void specnext_state::tbblue(machine_config &config)
 	SPECNEXT_LORES  (config, m_lores,   0).set_palette(m_palette->device().tag(), 0x000, 0x100);
 	SPECNEXT_TILES  (config, m_tiles,   0).set_palette(m_palette->device().tag(), 0x200, 0x300);
 	SPECNEXT_LAYER2 (config, m_layer2,  0).set_palette(m_palette->device().tag(), 0x400, 0x500);
-	SPECNEXT_SPRITES(config, m_sprites, 0).set_palette(m_palette->device().tag(), 0x600, 0x700);
+
+	// drawgfx doesn't allow to mask palette access and in case of 256-color sprite does use offset, the index overflow palette boundries.
+	// We are duplicating palletes to imitate mask on palette index which required by sprites device.
+	SPECNEXT_SPRITES(config, m_sprites, 0).set_palette(m_palette->device().tag(), 0x600, 0x800);
 
 	SPECNEXT_COPPER(config, m_copper, 28_MHz_XTAL);
 	m_copper->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_copper_req = 1; m_next_regs.write_byte(offset, data); });
