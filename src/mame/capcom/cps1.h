@@ -173,27 +173,24 @@ protected:
 	static constexpr uint32_t CPS1_PALETTE_ENTRIES = 32 * 6;      // Number colour schemes in palette
 
 	// CPS-A registers
-	enum cps_a_regs
-	{
-		CPS1_OBJ_BASE        = 0x00/2,    // Base address of objects
-		CPS1_SCROLL1_BASE    = 0x02/2,    // Base address of scroll 1
-		CPS1_SCROLL2_BASE    = 0x04/2,    // Base address of scroll 2
-		CPS1_SCROLL3_BASE    = 0x06/2,    // Base address of scroll 3
-		CPS1_OTHER_BASE      = 0x08/2,    // Base address of other video
-		CPS1_PALETTE_BASE    = 0x0a/2,    // Base address of palette
-		CPS1_SCROLL1_SCROLLX = 0x0c/2,    // Scroll 1 X
-		CPS1_SCROLL1_SCROLLY = 0x0e/2,    // Scroll 1 Y
-		CPS1_SCROLL2_SCROLLX = 0x10/2,    // Scroll 2 X
-		CPS1_SCROLL2_SCROLLY = 0x12/2,    // Scroll 2 Y
-		CPS1_SCROLL3_SCROLLX = 0x14/2,    // Scroll 3 X
-		CPS1_SCROLL3_SCROLLY = 0x16/2,    // Scroll 3 Y
-		CPS1_STARS1_SCROLLX  = 0x18/2,    // Stars 1 X
-		CPS1_STARS1_SCROLLY  = 0x1a/2,    // Stars 1 Y
-		CPS1_STARS2_SCROLLX  = 0x1c/2,    // Stars 2 X
-		CPS1_STARS2_SCROLLY  = 0x1e/2,    // Stars 2 Y
-		CPS1_ROWSCROLL_OFFS  = 0x20/2,    // base of row scroll offsets in other RAM
-		CPS1_VIDEOCONTROL    = 0x22/2     // flip screen, rowscroll enable
-	};
+	static constexpr unsigned CPS1_OBJ_BASE        = 0x00 / 2;    // Base address of objects
+	static constexpr unsigned CPS1_SCROLL1_BASE    = 0x02 / 2;    // Base address of scroll 1
+	static constexpr unsigned CPS1_SCROLL2_BASE    = 0x04 / 2;    // Base address of scroll 2
+	static constexpr unsigned CPS1_SCROLL3_BASE    = 0x06 / 2;    // Base address of scroll 3
+	static constexpr unsigned CPS1_OTHER_BASE      = 0x08 / 2;    // Base address of other video
+	static constexpr unsigned CPS1_PALETTE_BASE    = 0x0a / 2;    // Base address of palette
+	static constexpr unsigned CPS1_SCROLL1_SCROLLX = 0x0c / 2;    // Scroll 1 X
+	static constexpr unsigned CPS1_SCROLL1_SCROLLY = 0x0e / 2;    // Scroll 1 Y
+	static constexpr unsigned CPS1_SCROLL2_SCROLLX = 0x10 / 2;    // Scroll 2 X
+	static constexpr unsigned CPS1_SCROLL2_SCROLLY = 0x12 / 2;    // Scroll 2 Y
+	static constexpr unsigned CPS1_SCROLL3_SCROLLX = 0x14 / 2;    // Scroll 3 X
+	static constexpr unsigned CPS1_SCROLL3_SCROLLY = 0x16 / 2;    // Scroll 3 Y
+	static constexpr unsigned CPS1_STARS1_SCROLLX  = 0x18 / 2;    // Stars 1 X
+	static constexpr unsigned CPS1_STARS1_SCROLLY  = 0x1a / 2;    // Stars 1 Y
+	static constexpr unsigned CPS1_STARS2_SCROLLX  = 0x1c / 2;    // Stars 2 X
+	static constexpr unsigned CPS1_STARS2_SCROLLY  = 0x1e / 2;    // Stars 2 Y
+	static constexpr unsigned CPS1_ROWSCROLL_OFFS  = 0x20 / 2;    // base of row scroll offsets in other RAM
+	static constexpr unsigned CPS1_VIDEOCONTROL    = 0x22 / 2;    // flip screen, rowscroll enable
 
 	virtual void device_post_load() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;

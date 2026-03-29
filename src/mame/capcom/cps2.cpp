@@ -678,15 +678,12 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	enum cps2_obj_regs
-	{
-		CPS2_OBJ_BASE  = 0x00,    // Unknown (not base address of objects). Could be base address of bank used when object swap bit set?
-		CPS2_OBJ_UNK1  = 0x02,    // Unknown (nearly always 0x807d, or 0x808e when screen flipped)
-		CPS2_OBJ_PRI   = 0x04,    // Layer priorities
-		CPS2_OBJ_UNK2  = 0x06,    // Unknown (usually 0x0000, 0x1101 in ssf2, 0x0001 in 19XX)
-		CPS2_OBJ_XOFFS = 0x08,    // X offset (usually 0x0040)
-		CPS2_OBJ_YOFFS = 0x0a     // Y offset (always 0x0010)
-	};
+	static constexpr unsigned CPS2_OBJ_BASE  = 0x00 / 2;    // Unknown (not base address of objects). Could be base address of bank used when object swap bit set?
+	static constexpr unsigned CPS2_OBJ_UNK1  = 0x02 / 2;    // Unknown (nearly always 0x807d, or 0x808e when screen flipped)
+	static constexpr unsigned CPS2_OBJ_PRI   = 0x04 / 2;    // Layer priorities
+	static constexpr unsigned CPS2_OBJ_UNK2  = 0x06 / 2;    // Unknown (usually 0x0000, 0x1101 in ssf2, 0x0001 in 19XX)
+	static constexpr unsigned CPS2_OBJ_XOFFS = 0x08 / 2;    // X offset (usually 0x0040)
+	static constexpr unsigned CPS2_OBJ_YOFFS = 0x0a / 2;    // Y offset (always 0x0010)
 
 	void init_digital_volume();
 	uint16_t gigaman2_dummyqsound_r(offs_t offset);
@@ -886,8 +883,8 @@ void cps2_state::cps2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 	uint16_t const *const base = m_cps2_buffered_obj.get();
-	const int xoffs = 64 - m_output[CPS2_OBJ_XOFFS / 2];
-	const int yoffs = 16 - m_output[CPS2_OBJ_YOFFS / 2];
+	const int xoffs = 64 - m_output[CPS2_OBJ_XOFFS];
+	const int yoffs = 16 - m_output[CPS2_OBJ_YOFFS];
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed(KEYCODE_Z) && machine().input().code_pressed(KEYCODE_R))
@@ -909,8 +906,8 @@ void cps2_state::cps2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap
 
 		if (BIT(colour, 7))
 		{
-			x += m_output[CPS2_OBJ_XOFFS / 2]; /* fix the offset of some games */
-			y += m_output[CPS2_OBJ_YOFFS / 2]; /* like Marvel vs. Capcom ending credits */
+			x += m_output[CPS2_OBJ_XOFFS]; /* fix the offset of some games */
+			y += m_output[CPS2_OBJ_YOFFS]; /* like Marvel vs. Capcom ending credits */
 		}
 
 		if (colour & 0xff00)
@@ -1025,14 +1022,14 @@ void cps2_state::render_layers(screen_device &screen, bitmap_ind16 &bitmap, cons
 	uint8_t l3pri = (m_pri_ctrl >> 4 * l3) & 0x0f;
 
 #if 0
-	if ((m_output[CPS2_OBJ_BASE / 2] != 0x7080 && m_output[CPS2_OBJ_BASE / 2] != 0x7000) ||
-			m_output[CPS2_OBJ_UNK1 / 2] != 0x807d ||
-			(m_output[CPS2_OBJ_UNK2 / 2] != 0x0000 && m_output[CPS2_OBJ_UNK2 / 2] != 0x1101 && m_output[CPS2_OBJ_UNK2 / 2] != 0x0001))
+	if ((m_output[CPS2_OBJ_BASE] != 0x7080 && m_output[CPS2_OBJ_BASE] != 0x7000) ||
+			m_output[CPS2_OBJ_UNK1] != 0x807d ||
+			(m_output[CPS2_OBJ_UNK2] != 0x0000 && m_output[CPS2_OBJ_UNK2] != 0x1101 && m_output[CPS2_OBJ_UNK2] != 0x0001))
 	{
 		popmessage("base %04x uk1 %04x uk2 %04x",
-				m_output[CPS2_OBJ_BASE / 2],
-				m_output[CPS2_OBJ_UNK1 / 2],
-				m_output[CPS2_OBJ_UNK2 / 2]);
+				m_output[CPS2_OBJ_BASE],
+				m_output[CPS2_OBJ_UNK1],
+				m_output[CPS2_OBJ_UNK2]);
 	}
 
 	if (0 && machine().input().code_pressed(KEYCODE_Z))
@@ -1077,7 +1074,7 @@ void cps2_state::cps2_objram_latch(int state)
 {
 	if (state)
 	{
-		m_pri_ctrl = m_output[CPS2_OBJ_PRI / 2];
+		m_pri_ctrl = m_output[CPS2_OBJ_PRI];
 		memcpy(m_cps2_buffered_obj.get(), cps2_objbase(), m_cps2_obj_size);
 	}
 }
