@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "machine/x28.h"
+
 class ensoniq_vfx_cartridge:
 	public device_t,
 	public device_image_interface
@@ -42,29 +44,20 @@ public:
 
 protected:
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 
-	static constexpr uint32_t SIZE = 32 * 1024;
-	static constexpr uint32_t MASK = SIZE - 1;
-	// Byte Load Cycle Time, per Xicor X28C256 datasheet.
-	static constexpr attotime T_BLC = attotime::from_usec(100);
+	required_device<x28f256_device> m_eeprom;
 
-	enum class state : int {
-		IDLE,
-		CMD1,
-		CMD2,
-		WR
-	};
-	state m_state;
-	std::unique_ptr<uint8_t []> m_storage;
+	static constexpr uint32_t SIZE = x28f256_device::TOTAL_SIZE_BYTES;
+	static constexpr uint32_t MASK = SIZE - 1;
+
+	bool m_is_loaded;
 	bool m_is_writeable;
 
 	load_cb m_load_cb;
 	unload_cb m_unload_cb;
-
-	emu_timer *m_byte_load_cycle_timer;
-	TIMER_CALLBACK_MEMBER(byte_load_cycle_elapsed);
 };
 
 
