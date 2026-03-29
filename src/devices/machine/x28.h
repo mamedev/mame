@@ -101,10 +101,7 @@ public:
 	// construction/destruction
 	x28_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	x28_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
-	virtual ~x28_device() {
-		if (m_start_programming_timer) timer_delete(m_start_programming_timer);
-		if (m_programming_completed_timer) timer_delete(m_programming_completed_timer);
-	}
+	virtual ~x28_device() {}
 
 	void write(uint32_t offset, uint8_t data);
 	uint8_t read(uint32_t offset);
