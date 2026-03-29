@@ -2,11 +2,11 @@
 // copyright-holders:Christian Brunschen
 /***************************************************************************
 
-	Xicor 28-series Parallel EEPROM read and write logic,
-	including write protection command sequences.
-	Caters for different speeds such as X28C256, X28HC256, etc.
-	Caters for different storage sizes such as X28C64, X28C256, X28C010,
-	XM28C020, etc.
+  Xicor 28-series Parallel EEPROM read and write logic,
+  including write protection command sequences.
+  Caters for different speeds such as X28C256, X28HC256, etc.
+  Caters for different storage sizes such as X28C64, X28C256, X28C010,
+  XM28C020, etc.
 
 ***************************************************************************/
 
@@ -28,21 +28,21 @@
 
 /**
  * Template parameters
- * 
+ *
  * AddressBits:
- *   The number of bits in the address bus. 
+ *   The number of bits in the address bus.
  *   _28_64 EEPROMs store 64 kbits = 8 kbytes = 13 address bits,
  *   _28_256 ones store 256 kbits = 32 kbytes = 15 address bits,
  *   _28_512 EEPROMs store 512 kbits = 64 kbytes = 16 address bits,
  *   _28_010 ones store 1024 kbits = 128 kbytes = 17 address bits.
- * 
+ *
  * PageSizeBytes:
  *   These EEPROMs support writing an entire page at a time. These page sizes vary
  *   by EEPROM size and by manufacturer. 64 and 128 byte page sizes are both common.
- * 
+ *
  * TBLCUsec:
  *   The EEPROM's T_BLC, the "Byte Load Cycle Time", in microseconds.
- *   After a byte write, if another byte on the same page is written within T_BLC, 
+ *   After a byte write, if another byte on the same page is written within T_BLC,
  *   those writes will be combined in a single programming cycle. Or in other words,
  *   the programming cycle starts T_BLC after the most recent write.
  *   Xicor X28C256 has T_BLC = 100 microseconds.
@@ -50,16 +50,16 @@
  *   _must_ trigger programming in some other way. The only way to do that is to triggger
  *   programming on read(), so that is what we do. See also ProgramOnRead below, for
  *   explicitly enabling this behaviour.
- * 
+ *
  * TWCUsec:
  *   The EEPROM's T_WC, the "Write Cycle Time", in microseconds. This is the amount
  *   of time it takes for the EEPROM to complete is programming cycle.
  *   Xicor X28C256 has T_WC typ = 5ms = 5000 microseconds, max = 10ms = 10000 microseconds.
  *   Xicor X28HC256 has T_WC typ = 3ms = 3000 microseconds, max = 5ms = 5000 microseconds.
- * 
+ *
  * ProgramOnRead:
  *   Instead of waiting for the TBLCUsec interval to elapse, whenever a Read hapens,
- *   immediately start any pending programming cycle. 
+ *   immediately start any pending programming cycle.
  *   This is not present on real devices but here it allows us to create a 'fast' eeprom.
  *   In particular, if we know that the client always follows writes with reads to verify
  *   that the programming cycle completes, then we can set TBLCUsec to 0 and thus implicitly
@@ -67,19 +67,19 @@
  *   protection commands but does not have to wait for T_BLC to expire before writing the
  *   buffered data to storage.
  *   If we then also set TWCUsec to 0, we have a device that also immediately writes the
- *   buffered data to storage, giving us a very fast EEPROM device. 
+ *   buffered data to storage, giving us a very fast EEPROM device.
  *   This can be used for example for external EEPROM cartridges, where emulating the precise
  *   timing of a particular chip is unlikely to be very important, and instead, allowing
  *   that cartridge to be as quick as possible may give a more pleasant user experience.
  */
 template<
-	int AddressBits, 
-	uint32_t PageSizeBytes, 
-	uint32_t TBLCUsec, 
+	int AddressBits,
+	uint32_t PageSizeBytes,
+	uint32_t TBLCUsec,
 	uint32_t TWCUsec,
 	bool ProgramOnRead = false
 >
-class x28_device : 
+class x28_device :
 	public device_t
 {
 public:
@@ -140,8 +140,8 @@ protected:
 		// idle state: reads work as normal, writes will succeed or fail depending on
 		// m_write_enabled - except for those writes that are part of one of the protection
 		// enable or disable sequences.
-		STATE_IDLE,  
-	
+		STATE_IDLE,
+
 		// After detecting the third write that initiates a protection enable sequence,
 		// writing A0 to address 5555 (1555 on X28C64).
 		// At this point the device will accept one page write, before then going into
@@ -152,7 +152,7 @@ protected:
 		// and writes the byte to an internal buffer.
 		// As long as the next write is to the same page (higher address bits remain
 		// the same) and the next write is initiated within T_BLC, more bytes can be
-		// written, and those too will be written to the internal buffer. 
+		// written, and those too will be written to the internal buffer.
 		// If no more writes happen within T_BLC, thw programming cycle starts,
 		// during which time the buffer will be saved to the corresponding page in
 		// the persistent EEPROM storage.
@@ -194,7 +194,7 @@ protected:
 		// writing 55 to address 2AAA (0AAA on X28C64)
 		COMMAND_STATE_PROTECION_DISABLE_5,
 
-		// after detecting the sixth write in the protection disable command sequence, 
+		// after detecting the sixth write in the protection disable command sequence,
 		// writing 20 to address 5555 (1555 on X28C64),
 		// the device will return to COMMAND_STATE_NONE and STATE_IDLE with m_write_enabled = false.
 	};
@@ -253,7 +253,7 @@ public:
 
 // a 256 kbit == 32 kbyte "fast timed" that uses only the Byte Load Cycle timer and
 // also programs immediately on reading; where the Write Cycle is effectively
-// infinitely quick and any pending writes are immediately committed and ready, 
+// infinitely quick and any pending writes are immediately committed and ready,
 // and returned without Toggle Bit polling or /DATA polling
 class x28f256_device : public x28_device<15, 64, 100, 0, true> {
 public:
