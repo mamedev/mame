@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Christian Brunschen
 /***************************************************************************
 
 	Xicor 28-series Parallel EEPROM read and write logic,

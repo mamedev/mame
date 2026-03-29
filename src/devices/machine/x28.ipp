@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Christian Brunschen
 /***************************************************************************
 
     28-series Parallel EEPROM sich as Xicor X28 etc.
@@ -313,7 +315,7 @@ void x28_device<AddressBits, PageSizeBytes, TBLCUsec, TWCUsec, ProgramOnRead>::r
 
 	if (m_programming_completed_timer)
 		m_programming_completed_timer->enable(false);
-		
+
 	change_to_state(COMMAND_STATE_NONE);
 	change_to_state(STATE_IDLE);
 }
