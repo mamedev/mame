@@ -452,8 +452,8 @@ protected:
 		auto devinfo = m_dinput_helper->create_device<dinput_joystick_device>(
 				*this,
 				instance,
+				&c_dfDIJoystick2,
 				&c_dfDIJoystick,
-				nullptr,
 				background_input() ? dinput_cooperative_level::BACKGROUND : dinput_cooperative_level::FOREGROUND,
 				[] (auto const &device, auto const &format) -> bool
 				{
@@ -560,7 +560,7 @@ dinput_joystick_device::dinput_joystick_device(
 	// cap the number of axes, POVs, and buttons based on the format
 	m_caps.dwAxes = std::min(m_caps.dwAxes, DWORD(8));
 	m_caps.dwPOVs = std::min(m_caps.dwPOVs, DWORD(4));
-	m_caps.dwButtons = std::min(m_caps.dwButtons, DWORD(128));
+	m_caps.dwButtons = std::min(m_caps.dwButtons, DWORD((m_format == &c_dfDIJoystick) ? 32 : 128));
 }
 
 void dinput_joystick_device::reset()

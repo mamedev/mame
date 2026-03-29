@@ -174,7 +174,7 @@ private:
 	// state information for a joystick; DirectInput state must be first element
 	struct dinput_joystick_state
 	{
-		DIJOYSTATE  state;
+		DIJOYSTATE2 state;
 		LONG        rangemin[8];
 		LONG        rangemax[8];
 	};
