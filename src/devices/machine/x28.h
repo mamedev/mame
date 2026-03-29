@@ -212,52 +212,68 @@ protected:
 	void programming_cycle_complete(s32 param = 0);
 };
 
+// Concrete devices
+
+// Real devices:
+
+// X28C64: 64kbit == 8k bytes, 64 bytes per page
 class x28c64_device : public x28_device<13, 64, 100, 5000>
 {
 public:
 	x28c64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+// X28C256: 256kbit == 32k bytes, 64 bytes per page
 class x28c256_device : public x28_device<15, 64, 100, 5000>
 {
 public:
 	x28c256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+// X28HC256: 256kbit == 32k bytes, 64 bytes per page, T_WC = 3 ms.
 class x28hc256_device : public x28_device<15, 64, 100, 3000>
 {
 public:
 	x28hc256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+// X28C512: 512kbit == 64k bytes, 128 bytes per page
 class x28c512_device : public x28_device<16, 128, 100, 5000>
 {
 public:
 	x28c512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+// X28C010: 1Mbit = 128k bytes, 256 bytes per page
 class x28c010_device : public x28_device<17, 256, 100, 5000>
 {
 public:
 	x28c010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+// XM28C020: 2Mbit = 256 kbytes, 128 bytes per page;
+// comprised of 4 X28C513LCC:s on a single substrate
 class xm28c020_device : public x28_device<18, 128, 100, 5000>
 {
 public:
 	xm28c020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+// XM28C040: 4Mbit = 512 kbytes, 256 bytes per page;
+// comprised of 4 X28C010:s on a single substrate
 class xm28c040_device : public x28_device<19, 256, 100, 5000>
 {
 public:
 	xm28c040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
-// a 256 kbit == 32 kbyte "fast timed" that uses only the Byte Load Cycle timer and
-// also programs immediately on reading; where the Write Cycle is effectively
-// infinitely quick and any pending writes are immediately committed and ready,
-// and returned without Toggle Bit polling or /DATA polling
+// Better-than-real devices:
+
+// X28F256: 256kbit = 32k bytes, 64 bytes per page, like the X25C256, but 
+// with T_WC=0, i.e., an infinitely fast write cycle.
+// This uses only the Byte Load Cycle timer and also programs immediately on reading;
+// The Write Cycle is infinitely quick, any pending writes are immediately committed
+// and ready to be returned without needing Toggle Bit polling or /DATA polling.
 class x28f256_device : public x28_device<15, 64, 100, 0, true>
 {
 public:
