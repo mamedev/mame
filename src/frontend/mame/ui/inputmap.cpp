@@ -19,6 +19,13 @@
 
 namespace ui {
 
+constexpr unsigned INPUT_TYPE_DIGITAL = 0;
+constexpr unsigned INPUT_TYPE_ANALOG = 1;
+constexpr unsigned INPUT_TYPE_ANALOG_DEC = INPUT_TYPE_ANALOG + SEQ_TYPE_DECREMENT;
+constexpr unsigned INPUT_TYPE_ANALOG_INC = INPUT_TYPE_ANALOG + SEQ_TYPE_INCREMENT;
+constexpr unsigned INPUT_TYPE_TOTAL = INPUT_TYPE_ANALOG + SEQ_TYPE_TOTAL;
+
+
 /*-------------------------------------------------
     menu_input_groups - handle the input groups
     menu

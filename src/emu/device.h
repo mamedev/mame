@@ -177,9 +177,9 @@ private:
 };
 
 
-template <class DeviceClass, char const *ShortName, char const *FullName, char const *Source>
+template <class DeviceClass, typename Traits>
 struct device_tag_struct { typedef DeviceClass type; };
-template <class DriverClass, char const *ShortName, char const *FullName, char const *Source, device_flags::type Flags, device_feature::type Unemulated, device_feature::type Imperfect>
+template <class DriverClass, typename Traits, device_flags::type Flags, device_feature::type Unemulated, device_feature::type Imperfect>
 struct driver_tag_struct { typedef DriverClass type; };
 
 class device_type_impl_base
@@ -238,13 +238,13 @@ public:
 	{
 	}
 
-	template <class DeviceClass, char const *ShortName, char const *FullName, char const *Source>
-	device_type_impl_base(device_tag_struct<DeviceClass, ShortName, FullName, Source>)
+	template <class DeviceClass, typename Traits>
+	device_type_impl_base(device_tag_struct<DeviceClass, Traits>)
 		: m_creator(&create_device<DeviceClass>)
 		, m_type(typeid(DeviceClass))
-		, m_shortname(ShortName)
-		, m_fullname(FullName)
-		, m_source(Source)
+		, m_shortname(Traits::shortname)
+		, m_fullname(Traits::fullname)
+		, m_source(Traits::source)
 		, m_emulation_flags(DeviceClass::emulation_flags())
 		, m_unemulated_features(DeviceClass::unemulated_features())
 		, m_imperfect_features(DeviceClass::imperfect_features())
@@ -253,13 +253,13 @@ public:
 	{
 	}
 
-	template <class DriverClass, char const *ShortName, char const *FullName, char const *Source, device_flags::type Flags, device_feature::type Unemulated, device_feature::type Imperfect>
-	device_type_impl_base(driver_tag_struct<DriverClass, ShortName, FullName, Source, Flags, Unemulated, Imperfect>)
+	template <class DriverClass, typename Traits, device_flags::type Flags, device_feature::type Unemulated, device_feature::type Imperfect>
+	device_type_impl_base(driver_tag_struct<DriverClass, Traits, Flags, Unemulated, Imperfect>)
 		: m_creator(&create_driver<DriverClass>)
 		, m_type(typeid(DriverClass))
-		, m_shortname(ShortName)
-		, m_fullname(FullName)
-		, m_source(Source)
+		, m_shortname(Traits::shortname)
+		, m_fullname(Traits::fullname)
+		, m_source(Traits::source)
 		, m_emulation_flags(DriverClass::emulation_flags() | Flags)
 		, m_unemulated_features(DriverClass::unemulated_features() | Unemulated)
 		, m_imperfect_features((DriverClass::imperfect_features() & ~Unemulated) | Imperfect)
@@ -400,10 +400,15 @@ extern emu::detail::device_registrar const registered_device_types;
 ///   DEFINE_DEVICE_TYPE_PRIVATE
 #define DEFINE_DEVICE_TYPE(Type, Class, ShortName, FullName) \
 		namespace { \
-			struct Type##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
-			constexpr char const Type##_device_traits::shortname[], Type##_device_traits::fullname[], Type##_device_traits::source[]; \
+			struct Type##_device_traits \
+			{ \
+				static inline constexpr char const *const shortname = (ShortName); \
+				static inline constexpr char const *const source = __FILE__; \
+				static constexpr char const fullname[] = (FullName); \
+			}; \
+			constexpr decltype(Type##_device_traits::fullname) Type##_device_traits::fullname; \
 		} \
-		emu::detail::device_type_impl<Class> const Type = emu::detail::device_tag_struct<Class, (Type##_device_traits::shortname), (Type##_device_traits::fullname), (Type##_device_traits::source)>{ }; \
+		emu::detail::device_type_impl<Class> const Type = emu::detail::device_tag_struct<Class, Type##_device_traits>{ }; \
 		template class device_finder<Class, false>; \
 		template class device_finder<Class, true>;
 
@@ -437,10 +442,15 @@ extern emu::detail::device_registrar const registered_device_types;
 #define DEFINE_DEVICE_TYPE_PRIVATE(Type, Base, Class, ShortName, FullName) \
 		namespace { \
 			static_assert(std::is_convertible_v<Class &, Base &>, "Device implementation class must be convertible to exposed class."); \
-			struct Type##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
-			constexpr char const Type##_device_traits::shortname[], Type##_device_traits::fullname[], Type##_device_traits::source[]; \
+			struct Type##_device_traits \
+			{ \
+				static inline constexpr char const *const shortname = (ShortName); \
+				static inline constexpr char const *const source = __FILE__; \
+				static constexpr char const fullname[] = (FullName); \
+			}; \
+			constexpr decltype(Type##_device_traits::fullname) Type##_device_traits::fullname; \
 		} \
-		emu::detail::device_type_impl<Base> const Type = emu::detail::device_tag_struct<Class, (Type##_device_traits::shortname), (Type##_device_traits::fullname), (Type##_device_traits::source)>{ };
+		emu::detail::device_type_impl<Base> const Type = emu::detail::device_tag_struct<Class, Type##_device_traits>{ };
 
 /// \}
 

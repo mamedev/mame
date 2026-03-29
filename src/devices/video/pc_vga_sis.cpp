@@ -1160,7 +1160,7 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			const bool latch_address = offset == 2;
 			const u8 mask = latch_address ? 0x0f : 0xff;
 			m_fast_page_address_latch[offset] = data & mask;
-			LOG("SR30: Fast Page Flip Starting Address [%d] %02x\n", offset, data);
+			LOG("SR%02X: Fast Page Flip Starting Address [%d] %02x\n", offset + 0x30, offset, data);
 			// TODO: Direct Draw obviously uses this
 			//if (BIT(m_dram_fb_size, 4) && latch_address)
 			//{
@@ -1424,9 +1424,11 @@ std::tuple<u8, u8> sis6326_vga_device::flush_true_color_mode()
 	if ((m_ramdac_mode & 0x12) != 0x12)
 		return std::make_tuple(0, 0);
 
-	const u8 res = !BIT(m_ext_sr07, 2);
+	// whatever is this doesn't seem related to the actual video format output
+	// win98se has it enabled, SDD doesn't, both use 24-bit depth anyway
+//	const u8 res = !BIT(m_ext_sr07, 2);
 
-	return std::make_tuple(res, 0);
+	return std::make_tuple(1, 0);
 }
 
 void sis6326_vga_device::recompute_params()
@@ -1478,6 +1480,24 @@ u16 sis6326_vga_device::line_compare_mask()
 	// trick to make line compare to never occur
 	// (assuming it's true, cfr. above)
 	return 0x3ff | (vga.crtc.line_compare & 0xfc00);
+}
+
+uint8_t sis6326_vga_device::get_video_depth()
+{
+	switch(pc_vga_choosevideomode())
+	{
+		case VGA_MODE:
+		case RGB8_MODE:
+			return 8;
+		case RGB15_MODE:
+		case RGB16_MODE:
+			return 16;
+		case RGB24_MODE:
+			return 24;
+		case RGB32_MODE:
+			return 32;
+	}
+	return 0;
 }
 
 uint8_t sis6326_vga_device::mem_r(offs_t offset)

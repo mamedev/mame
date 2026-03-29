@@ -107,12 +107,14 @@ private:
 
 class smbus_pipc_device;
 
-class vt82c596b_acpi_device : public vt82c586b_acpi_device
+class vt82c596_acpi_device : public vt82c586b_acpi_device
 {
 public:
-	vt82c596b_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vt82c596_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	vt82c596_acpi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -120,6 +122,11 @@ protected:
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+
+	u32 smbus_iobase_r(offs_t offset);
+	void smbus_iobase_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u8 smbus_control_r(offs_t offset);
+	void smbus_control_w(offs_t offset, u8 data);
 private:
 	required_device<smbus_pipc_device> m_smbus;
 
@@ -133,6 +140,15 @@ private:
 	u32 m_gp2_timer_control;
 	u16 m_smbus_iobase;
 	u8 m_smbus_control;
+};
+
+class vt82c596b_acpi_device : public vt82c596_acpi_device
+{
+public:
+	vt82c596b_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void config_map(address_map &map) override ATTR_COLD;
 };
 
 class smbus_pipc_device : public lpc_device
@@ -172,6 +188,7 @@ private:
 
 DECLARE_DEVICE_TYPE(VT82C586B_ACPI, vt82c586b_acpi_device)
 DECLARE_DEVICE_TYPE(ACPI_PIPC,      acpi_pipc_device)
+DECLARE_DEVICE_TYPE(VT82C596_ACPI,  vt82c596_acpi_device)
 DECLARE_DEVICE_TYPE(VT82C596B_ACPI, vt82c596b_acpi_device)
 DECLARE_DEVICE_TYPE(SMBUS_PIPC,     smbus_pipc_device)
 

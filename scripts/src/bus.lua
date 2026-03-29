@@ -1608,6 +1608,8 @@ if BUSES["CENTRONICS"] then
 		MAME_DIR .. "src/devices/bus/centronics/nec_p72.h",
 		MAME_DIR .. "src/devices/bus/centronics/nlq401.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/nlq401.h",
+		MAME_DIR .. "src/devices/bus/centronics/pc6022.cpp",
+		MAME_DIR .. "src/devices/bus/centronics/pc6022.h",
 		MAME_DIR .. "src/devices/bus/centronics/printer.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/printer.h",
 		MAME_DIR .. "src/devices/bus/centronics/samdac.cpp",

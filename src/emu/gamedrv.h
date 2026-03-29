@@ -176,21 +176,25 @@ public:
 
 // wrappers for declaring and defining game drivers
 #define GAME_NAME(name)         driver_##name
-#define GAME_TRAITS_NAME(name)  driver_##name##traits
+#define GAME_TRAITS_NAME(name)  driver_##name##_traits
 #define GAME_EXTERN(name)       extern game_driver const GAME_NAME(name)
 
 // static game traits
-#define GAME_DRIVER_TRAITS(NAME, FULLNAME) \
+#define GAME_DRIVER_TRAITS(NAME, FULLNAME, COMPANY) \
 		namespace { \
-			struct GAME_TRAITS_NAME(NAME) { static constexpr char const shortname[] = #NAME, fullname[] = FULLNAME, source[] = __FILE__; }; \
-			constexpr char const GAME_TRAITS_NAME(NAME)::shortname[], GAME_TRAITS_NAME(NAME)::fullname[], GAME_TRAITS_NAME(NAME)::source[]; \
+			struct GAME_TRAITS_NAME(NAME) \
+			{ \
+				static inline constexpr char const *const shortname = #NAME; \
+				static inline constexpr char const *const source = __FILE__; \
+				static inline constexpr char const *manufacturer = (COMPANY); \
+				static constexpr char const fullname[] = (FULLNAME); \
+			}; \
+			constexpr decltype(GAME_TRAITS_NAME(NAME)::fullname) GAME_TRAITS_NAME(NAME)::fullname; \
 		}
 #define GAME_DRIVER_TYPE(NAME, CLASS, FLAGS) \
 		emu::detail::driver_tag_struct< \
 				CLASS, \
-				(GAME_TRAITS_NAME(NAME)::shortname), \
-				(GAME_TRAITS_NAME(NAME)::fullname), \
-				(GAME_TRAITS_NAME(NAME)::source), \
+				GAME_TRAITS_NAME(NAME), \
 				game_driver::emulation_flags(FLAGS), \
 				game_driver::unemulated_features(FLAGS), \
 				game_driver::imperfect_features(FLAGS)>{ }
@@ -247,13 +251,13 @@ public:
 ///   avoid repetition.
 /// \sa GAMEL SYST
 #define GAME(YEAR, NAME, PARENT, MACHINE, INPUT, CLASS, INIT, MONITOR, COMPANY, FULLNAME, FLAGS) \
-GAME_DRIVER_TRAITS(NAME, FULLNAME)                                      \
+GAME_DRIVER_TRAITS(NAME, FULLNAME, COMPANY)                             \
 extern game_driver const GAME_NAME(NAME)                                \
 {                                                                       \
 	GAME_DRIVER_TYPE(NAME, CLASS, FLAGS),                               \
 	#PARENT,                                                            \
 	#YEAR,                                                              \
-	COMPANY,                                                            \
+	GAME_TRAITS_NAME(NAME)::manufacturer,                               \
 	[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
 	INPUT_PORTS_NAME(INPUT),                                            \
 	[] (device_t &owner) { downcast<CLASS &>(owner).INIT(); },          \
@@ -319,13 +323,13 @@ extern game_driver const GAME_NAME(NAME)                                \
 ///   internal artwork for the system.
 /// \sa GAME SYST
 #define GAMEL(YEAR, NAME, PARENT, MACHINE, INPUT, CLASS, INIT, MONITOR, COMPANY, FULLNAME, FLAGS, LAYOUT) \
-GAME_DRIVER_TRAITS(NAME, FULLNAME)                                      \
+GAME_DRIVER_TRAITS(NAME, FULLNAME, COMPANY)                             \
 extern game_driver const GAME_NAME(NAME)                                \
 {                                                                       \
 	GAME_DRIVER_TYPE(NAME, CLASS, FLAGS),                               \
 	#PARENT,                                                            \
 	#YEAR,                                                              \
-	COMPANY,                                                            \
+	GAME_TRAITS_NAME(NAME)::manufacturer,                               \
 	[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
 	INPUT_PORTS_NAME(INPUT),                                            \
 	[] (device_t &owner) { downcast<CLASS &>(owner).INIT(); },          \
@@ -385,13 +389,13 @@ extern game_driver const GAME_NAME(NAME)                                \
 ///   avoid repetition.  Screen orientation flags may be included here.
 /// \sa GAME GAMEL
 #define SYST(YEAR, NAME, PARENT, COMPAT, MACHINE, INPUT, CLASS, INIT, COMPANY, FULLNAME, FLAGS) \
-		GAME_DRIVER_TRAITS(NAME, FULLNAME)                                      \
+		GAME_DRIVER_TRAITS(NAME, FULLNAME, COMPANY)                             \
 		extern game_driver const GAME_NAME(NAME)                                \
 		{                                                                       \
 			GAME_DRIVER_TYPE(NAME, CLASS, FLAGS),                               \
 			#PARENT,                                                            \
 			#YEAR,                                                              \
-			COMPANY,                                                            \
+			GAME_TRAITS_NAME(NAME)::manufacturer,                               \
 			[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
 			INPUT_PORTS_NAME(INPUT),                                            \
 			[] (device_t &owner) { downcast<CLASS &>(owner).INIT(); },          \

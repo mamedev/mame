@@ -705,19 +705,25 @@ void acpi_pipc_device::gp_sci_enable_w(offs_t offset, u8 data)
  * '596B overrides
  */
 
+DEFINE_DEVICE_TYPE(VT82C596_ACPI,  vt82c596_acpi_device,  "vt82c596_acpi",  "VT82C596 \"PIPC\" Power Management, ACPI and SMBus")
 DEFINE_DEVICE_TYPE(VT82C596B_ACPI, vt82c596b_acpi_device, "vt82c596b_acpi", "VT82C596B \"PIPC\" Power Management, ACPI and SMBus")
 DEFINE_DEVICE_TYPE(SMBUS_PIPC, smbus_pipc_device, "smbus_pipc", "SMBus PIPC")
 
-vt82c596b_acpi_device::vt82c596b_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: vt82c586b_acpi_device(mconfig, VT82C596B_ACPI, tag, owner, clock)
+vt82c596_acpi_device::vt82c596_acpi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: vt82c586b_acpi_device(mconfig, type, tag, owner, clock)
 	, m_smbus(*this, "smbus")
 {
-	// minimum revision 0x20, Rev. 30 is from neomania detlog.txt
-	// pclass writeable thru registers $61 ~ $63
-	set_ids(0x11063050, 0x30, 0x068000, 0x00000000);
 }
 
-void vt82c596b_acpi_device::device_start()
+vt82c596_acpi_device::vt82c596_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vt82c596_acpi_device(mconfig, VT82C596_ACPI, tag, owner, clock)
+{
+	// minimum revision 0x20
+	// pclass writeable thru registers $61 ~ $63
+	set_ids(0x11063050, 0x20, 0x068000, 0x00000000);
+}
+
+void vt82c596_acpi_device::device_start()
 {
 	vt82c586b_acpi_device::device_start();
 
@@ -733,7 +739,7 @@ void vt82c596b_acpi_device::device_start()
 	save_item(NAME(m_smbus_control));
 }
 
-void vt82c596b_acpi_device::device_reset()
+void vt82c596_acpi_device::device_reset()
 {
 	m_debounce_control = false;
 	// undefined, 0 is <reserved>
@@ -749,7 +755,7 @@ void vt82c596b_acpi_device::device_reset()
 	vt82c586b_acpi_device::device_reset();
 }
 
-void vt82c596b_acpi_device::config_map(address_map &map)
+void vt82c596_acpi_device::config_map(address_map &map)
 {
 	vt82c586b_acpi_device::config_map(map);
 	map(0x40, 0x40).lrw8(
@@ -814,33 +820,42 @@ void vt82c596b_acpi_device::config_map(address_map &map)
 			);
 		})
 	);
-	// TODO: datasheet claims SMBus I/O base at 90h and Control at D2h
-	// - ga6vx actually maps it at 80h and 84h instead ('596 vs. 596B actual difference?)
-	map(0x80, 0x83).lrw32(
-		NAME([this] () { return m_smbus_iobase | 1; }),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			COMBINE_DATA(&m_smbus_iobase);
-			m_smbus_iobase &= 0xfff0;
-			if (ACCESSING_BITS_8_15)
-			{
-				LOG("80h: SMBus IOBASE %04x\n", m_smbus_iobase);
-				remap_cb();
-			}
-		})
-	);
-	map(0x84, 0x84).lrw8(
-		NAME([this] (offs_t offset) {
-			return m_smbus_control;
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			LOG("84h: SMBus Control %02x\n", data);
-			m_smbus_control = data & 9;
-			remap_cb();
-		})
-	);
+	// - ga6vx actually maps SMbus at 80h and 84h instead of 90h and d2h
+	//   Seemingly a '596 vs. 596B actual difference
+	map(0x80, 0x83).rw(FUNC(vt82c596_acpi_device::smbus_iobase_r), FUNC(vt82c596_acpi_device::smbus_iobase_w));
+	map(0x84, 0x87).rw(FUNC(vt82c596_acpi_device::smbus_control_r), FUNC(vt82c596_acpi_device::smbus_control_w)).umask32(0x0000'00ff);
 }
 
-void vt82c596b_acpi_device::map_extra(
+u32 vt82c596_acpi_device::smbus_iobase_r(offs_t offset)
+{
+	return m_smbus_iobase | 1;
+}
+
+void vt82c596_acpi_device::smbus_iobase_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_smbus_iobase);
+	m_smbus_iobase &= 0xfff0;
+	if (ACCESSING_BITS_8_15)
+	{
+		LOG("80h: SMBus IOBASE %04x\n", m_smbus_iobase);
+		remap_cb();
+	}
+}
+
+u8 vt82c596_acpi_device::smbus_control_r(offs_t offset)
+{
+	return m_smbus_control;
+}
+
+void vt82c596_acpi_device::smbus_control_w(offs_t offset, u8 data)
+{
+	LOG("84h: SMBus Control %02x\n", data);
+	m_smbus_control = data & 9;
+	remap_cb();
+}
+
+
+void vt82c596_acpi_device::map_extra(
 		uint64_t memory_window_start,
 		uint64_t memory_window_end,
 		uint64_t memory_offset,
@@ -857,6 +872,29 @@ void vt82c596b_acpi_device::map_extra(
 		m_smbus->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, m_smbus_iobase, io_space);
 	}
 }
+
+/*
+ * '596B overrides
+ */
+
+vt82c596b_acpi_device::vt82c596b_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vt82c596_acpi_device(mconfig, VT82C596B_ACPI, tag, owner, clock)
+{
+	// minimum revision 0x20, Rev. 30 is from neomania detlog.txt
+	// pclass writeable thru registers $61 ~ $63
+	// device ID may be 0x3051, pci-ids has both values for '596 Power Management
+	set_ids(0x11063050, 0x30, 0x068000, 0x00000000);
+}
+
+void vt82c596b_acpi_device::config_map(address_map &map)
+{
+	vt82c596_acpi_device::config_map(map);
+	map(0x80, 0x87).unmaprw();
+
+	map(0x90, 0x93).rw(FUNC(vt82c596b_acpi_device::smbus_iobase_r), FUNC(vt82c596b_acpi_device::smbus_iobase_w));
+	map(0xd0, 0xd3).rw(FUNC(vt82c596b_acpi_device::smbus_control_r), FUNC(vt82c596b_acpi_device::smbus_control_w)).umask32(0x00ff'0000);
+}
+
 
 /*
  * '596 SMBus internals

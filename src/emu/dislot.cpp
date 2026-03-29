@@ -59,6 +59,14 @@ device_slot_interface::~device_slot_interface()
 
 void device_slot_interface::interface_validity_check(validity_checker &valid) const
 {
+	// prohibit tags for driver-level slot devices from clashing with image instance names to prevent errors when adding options
+	if (device().owner() != nullptr && device().owner()->owner() == nullptr)
+	{
+		device_image_interface const *image;
+		if (device().interface(image) && (device().basetag() == image->instance_name() || device().basetag() == image->brief_instance_name()))
+			osd_printf_error("Slot device tag conflicts with image instance name\n");
+	}
+
 	// TODO: cast m_default_option to std::string_view when we have C++20
 	if (m_default_option && (m_options.find(m_default_option) == m_options.end()))
 		osd_printf_error("Default option '%s' does not correspond to any configured option\n", m_default_option);

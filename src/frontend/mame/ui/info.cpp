@@ -509,7 +509,7 @@ std::string machine_info::game_info_string() const
 		util::stream_format(buf,
 				(count > 1)
 					? ((clock != 0) ? u8"%1$d×%2$s %3$s\u00a0%4$s\n" : u8"%1$d×%2$s\n")
-					: ((clock != 0) ? u8"%2$s %3$s\u00a0%4$s\n" : "%2$s\n"),
+					: ((clock != 0) ? u8"%2$s %3$s\u00a0%4$s\n" : u8"%2$s\n"),
 				count, name, hz,
 				(d == 9) ? _("GHz") : (d == 6) ? _("MHz") : (d == 3) ? _("kHz") : _("Hz"));
 	}
@@ -565,7 +565,7 @@ std::string machine_info::game_info_string() const
 		util::stream_format(buf,
 				(count > 1)
 					? ((clock != 0) ? u8"%1$d×%2$s %3$s\u00a0%4$s" : u8"%1$d×%2$s")
-					: ((clock != 0) ? u8"%2$s %3$s\u00a0%4$s" : "%2$s"),
+					: ((clock != 0) ? u8"%2$s %3$s\u00a0%4$s" : u8"%2$s"),
 				count, sound.device().name(), hz,
 				(d == 9) ? _("GHz") : (d == 6) ? _("MHz") : (d == 3) ? _("kHz") : _("Hz"));
 

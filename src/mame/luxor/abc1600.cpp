@@ -34,7 +34,6 @@
 
     TODO:
 
-    - write to floppy fails with status 0x04 (lost byte) after commit 339bb2758640202e5378a1c2b1c19b2ef46fa1d9
     - systest1600 failures
         - CIO timer (works if CIO clock is 4219000)
         - DMA (expects to read 0xff from 0x18000..)
@@ -1215,4 +1214,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME    FLAGS
-COMP( 1985, abc1600, 0,      0,      abc1600, abc1600, abc1600_state, empty_init, "Luxor", "ABC 1600", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, abc1600, 0,      0,      abc1600, abc1600, abc1600_state, empty_init, "Luxor", "ABC 1600", MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
