@@ -16,10 +16,10 @@ public:
 	using unload_cb = delegate<void (ensoniq_vfx_cartridge *)>;
 
 	ensoniq_vfx_cartridge(
-			const machine_config &mconfig,
-			const char *tag,
-			device_t *owner,
-			u32 clock = 0);
+		const machine_config &mconfig,
+		const char *tag,
+		device_t *owner,
+		u32 clock = 0);
 
 	virtual ~ensoniq_vfx_cartridge();
 
@@ -43,6 +43,7 @@ public:
 	virtual char const *image_brief_type_name()         const noexcept override { return "cart"; }
 
 protected:
+	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 

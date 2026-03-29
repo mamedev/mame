@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Christian Brunschen
 /***************************************************************************
-    Xicor X28 EEPROMs
+  Xicor X28 EEPROMs
 ***************************************************************************/
 
 #include "emu.h"
@@ -18,25 +18,41 @@ DEFINE_DEVICE_TYPE(XM28C040, xm28c040_device, "xm28c040", "XM28C040 512Kx8 EEPRO
 DEFINE_DEVICE_TYPE(X28F256, x28f256_device, "x28f256", "Fast X28F256 8Kx8 EEPROM")
 
 x28c64_device::x28c64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: x28_device(mconfig, X28C64, tag, owner, clock) {}
+: x28_device(mconfig, X28C64, tag, owner, clock)
+{
+}
 
 x28c256_device::x28c256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: x28_device(mconfig, X28C256, tag, owner, clock) {}
+: x28_device(mconfig, X28C256, tag, owner, clock)
+{
+}
 
 x28hc256_device::x28hc256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: x28_device(mconfig, X28HC256, tag, owner, clock) {}
+: x28_device(mconfig, X28HC256, tag, owner, clock)
+{
+}
 
 x28c512_device::x28c512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: x28_device(mconfig, X28C512, tag, owner, clock) {}
+: x28_device(mconfig, X28C512, tag, owner, clock)
+{
+}
 
 x28c010_device::x28c010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: x28_device(mconfig, X28C010, tag, owner, clock) {}
+: x28_device(mconfig, X28C010, tag, owner, clock)
+{
+}
 
 xm28c020_device::xm28c020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: x28_device(mconfig, XM28C020, tag, owner, clock) {}
+: x28_device(mconfig, XM28C020, tag, owner, clock)
+{
+}
 
 xm28c040_device::xm28c040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: x28_device(mconfig, XM28C040, tag, owner, clock) {}
+: x28_device(mconfig, XM28C040, tag, owner, clock)
+{
+}
 
 x28f256_device::x28f256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: x28_device(mconfig, X28F256, tag, owner, clock) {}
+: x28_device(mconfig, X28F256, tag, owner, clock)
+{
+}

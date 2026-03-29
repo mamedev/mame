@@ -79,8 +79,7 @@ template<
 	uint32_t TWCUsec,
 	bool ProgramOnRead = false
 >
-class x28_device :
-	public device_t
+class x28_device : public device_t
 {
 public:
 
@@ -213,37 +212,44 @@ protected:
 	void programming_cycle_complete(s32 param = 0);
 };
 
-class x28c64_device : public x28_device<13, 64, 100, 5000> {
+class x28c64_device : public x28_device<13, 64, 100, 5000>
+{
 public:
 	x28c64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
-class x28c256_device : public x28_device<15, 64, 100, 5000> {
+class x28c256_device : public x28_device<15, 64, 100, 5000>
+{
 public:
 	x28c256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
-class x28hc256_device : public x28_device<15, 64, 100, 3000> {
+class x28hc256_device : public x28_device<15, 64, 100, 3000>
+{
 public:
 	x28hc256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
-class x28c512_device : public x28_device<16, 128, 100, 5000> {
+class x28c512_device : public x28_device<16, 128, 100, 5000>
+{
 public:
 	x28c512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
-class x28c010_device : public x28_device<17, 256, 100, 5000> {
+class x28c010_device : public x28_device<17, 256, 100, 5000>
+{
 public:
 	x28c010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
-class xm28c020_device : public x28_device<18, 128, 100, 5000> {
+class xm28c020_device : public x28_device<18, 128, 100, 5000>
+{
 public:
 	xm28c020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
-class xm28c040_device : public x28_device<19, 256, 100, 5000> {
+class xm28c040_device : public x28_device<19, 256, 100, 5000>
+{
 public:
 	xm28c040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
@@ -252,7 +258,8 @@ public:
 // also programs immediately on reading; where the Write Cycle is effectively
 // infinitely quick and any pending writes are immediately committed and ready,
 // and returned without Toggle Bit polling or /DATA polling
-class x28f256_device : public x28_device<15, 64, 100, 0, true> {
+class x28f256_device : public x28_device<15, 64, 100, 0, true>
+{
 public:
 	x28f256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
@@ -266,7 +273,6 @@ DECLARE_DEVICE_TYPE(X28C010, x28c010_device)
 DECLARE_DEVICE_TYPE(XM28C020, xm28c020_device)
 DECLARE_DEVICE_TYPE(XM28C040, xm28c040_device)
 DECLARE_DEVICE_TYPE(X28F256, x28f256_device)
-
 
 #include "x28.ipp"
 
