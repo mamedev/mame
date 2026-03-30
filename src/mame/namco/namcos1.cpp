@@ -1056,7 +1056,7 @@ void namcos1_state::ns1(machine_config &config)
 
 	NAMCO_C123TMAP(config, m_c123tmap, 0);
 	m_c123tmap->set_palette(m_c116);
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos1_state::TilemapCB, this));
+	m_c123tmap->set_tile_callback(FUNC(namcos1_state::TilemapCB));
 	m_c123tmap->set_color_base(0x0800);
 	m_c123tmap->set_offset(73, 16);
 	m_c123tmap->set_tmap3_half_height();

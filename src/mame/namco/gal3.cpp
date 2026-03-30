@@ -667,7 +667,6 @@ void gal3_state::gal3(machine_config &config)
 	m_c355spr[0]->set_screen("lscreen");
 	m_c355spr[0]->set_palette(m_palette[0]);
 	m_c355spr[0]->set_scroll_offsets(0x26, 0x19);
-	m_c355spr[0]->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
 	m_c355spr[0]->set_mix_callback(FUNC(gal3_state::sprite_mix_callback));
 	m_c355spr[0]->set_color_base(0x1000); // TODO : verify palette offset
 	m_c355spr[0]->set_external_prifill(true);
@@ -697,7 +696,6 @@ void gal3_state::gal3(machine_config &config)
 	m_c355spr[1]->set_screen("rscreen");
 	m_c355spr[1]->set_palette(m_palette[1]);
 	m_c355spr[1]->set_scroll_offsets(0x26, 0x19);
-	m_c355spr[1]->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
 	m_c355spr[1]->set_mix_callback(FUNC(gal3_state::sprite_mix_callback));
 	m_c355spr[1]->set_color_base(0x1000); // TODO : verify palette offset
 	m_c355spr[1]->set_external_prifill(true);

@@ -200,7 +200,6 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_palette(m_palette);
 	m_c355spr->set_scroll_offsets(0x26, 0x19);
-	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
 	m_c355spr->set_mix_callback(FUNC(namco_de_pcbstack_device::sprite_mix_callback));
 	m_c355spr->set_color_base(0x1000);
 	m_c355spr->set_external_prifill(true);

@@ -1754,7 +1754,7 @@ void namcos2_base_state::configure_c123tmap_standard(machine_config &config)
 {
 	NAMCO_C123TMAP(config, m_c123tmap);
 	m_c123tmap->set_palette(m_c116);
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos2_base_state::TilemapCB, this));
+	m_c123tmap->set_tile_callback(FUNC(namcos2_base_state::TilemapCB));
 	m_c123tmap->set_color_base(16*256);
 }
 
@@ -1773,7 +1773,6 @@ void sgunner_state::configure_c355spr_standard(machine_config &config)
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_palette(m_c116);
 	m_c355spr->set_scroll_offsets(0x26, 0x19);
-	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
 	m_c355spr->set_mix_callback(FUNC(sgunner_state::sprite_mix_callback_c355));
 	m_c355spr->set_color_base(0);
 }
@@ -1925,14 +1924,14 @@ void finallap_state::finalap2(machine_config &config)
 {
 	base_fl(config);
 
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&finallap_state::TilemapCB_finalap2, this));
+	m_c123tmap->set_tile_callback(FUNC(finallap_state::TilemapCB_finalap2));
 }
 
 void finallap_state::finalap3(machine_config &config)
 {
 	finallap_c68(config);
 
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&finallap_state::TilemapCB_finalap2, this));
+	m_c123tmap->set_tile_callback(FUNC(finallap_state::TilemapCB_finalap2));
 }
 
 
@@ -2030,7 +2029,7 @@ void sgunner_state::luckywld(machine_config &config)
 	m_slave->set_addrmap(AS_PROGRAM, &sgunner_state::slave_luckywld_am);
 
 	configure_c169roz_standard(config);
-	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&sgunner_state::RozCB_luckywld, this));
+	m_c169roz->set_tile_callback(FUNC(sgunner_state::RozCB_luckywld));
 }
 
 void metlhawk_state::metlhawk(machine_config &config)
@@ -2059,7 +2058,7 @@ void metlhawk_state::metlhawk(machine_config &config)
 
 	configure_c123tmap_standard(config);
 	configure_c169roz_standard(config);
-	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&metlhawk_state::RozCB_metlhawk, this));
+	m_c169roz->set_tile_callback(FUNC(metlhawk_state::RozCB_metlhawk));
 
 	m_c140->add_route(0, "speaker", 1.0, 0);
 	m_c140->add_route(1, "speaker", 1.0, 1);
