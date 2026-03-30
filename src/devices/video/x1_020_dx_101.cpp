@@ -16,6 +16,7 @@
     used by:
     - namco/namcoeva.cpp
     - namco/funcube.cpp
+    - namco/sg_vga.cpp
     - seta/seta2.cpp
 
     TODO:

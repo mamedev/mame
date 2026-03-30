@@ -116,12 +116,11 @@ Notes:
   TD62083 - Toshiba TD62083 8-Channel Darlington Sink Driver
     PC410 - Sharp PC410 Photocoupler
    PS2801 - NEC PS2801-4 Photocoupler
-   DX-102 - NEC DX-102 custom chip used for graphics generation
+   DX-102 - NEC DX-102 custom chip (unknown usage)
    DX-101 - NEC DX-101 custom chip used for graphics generation
 
 TODO:
 - everything, driver-wise
-- device-fy DX-101 / DX-102 emulation found in seta/seta2_v.cpp
 ***********************************************************************************/
 
 
@@ -129,6 +128,7 @@ TODO:
 
 #include "cpu/sh/sh7042.h"
 #include "sound/x1_010.h"
+#include "video/x1_020_dx_101.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -143,24 +143,18 @@ class sg_vga_state : public driver_device
 public:
 	sg_vga_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_video(*this, "video")
 	{ }
 
 	void sg_vga(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<sh7043a_device> m_maincpu;
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<x1_020_dx_101_device> m_video;
 
 	void program_map(address_map &map) ATTR_COLD;
 };
-
-
-uint32_t sg_vga_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
 
 
 void sg_vga_state::program_map(address_map &map)
@@ -168,9 +162,9 @@ void sg_vga_state::program_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x200000, 0x27ffff).rom().region("external_prg", 0);
 	map(0x4e0000, 0x4effff).ram();
-	map(0x800000, 0x83ffff).ram().share("spriteram"); // ?
-	map(0x840000, 0x84ffff).ram().share("palette"); // ?
-	map(0x860000, 0x86003f).ram().share("vregs"); // ?
+	map(0x800000, 0x83ffff).rw(m_video, FUNC(x1_020_dx_101_device::spriteram_r), FUNC(x1_020_dx_101_device::spriteram_w)); // ?
+	map(0x840000, 0x84ffff).ram().w("palette", FUNC(palette_device::write32)).share("palette"); // ?
+	map(0x860000, 0x86003f).rw(m_video, FUNC(x1_020_dx_101_device::vregs_r), FUNC(x1_020_dx_101_device::vregs_w)); // ?
 }
 
 
@@ -223,25 +217,6 @@ static INPUT_PORTS_START( hplanet )
 INPUT_PORTS_END
 
 
-static const gfx_layout tile_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(7*8, -8) },
-	{ STEP8(0, 1) },
-	{ STEP8(0, 8*8) },
-	8*8*8
-};
-
-
-/*  Tiles are 8bpp, but the hardware is additionally able to discard
-    some bitplanes and use the low 4 bits only, or the high 4 bits only */
-static GFXDECODE_START( gfx_dx_10x )
-	GFXDECODE_ENTRY( "sprites", 0, tile_layout, 0, 0x8000 / 16 )   // 8bpp, but 4bpp color granularity
-GFXDECODE_END
-
-
 void sg_vga_state::sg_vga(machine_config &config)
 {
 	// basic machine hardware
@@ -253,11 +228,19 @@ void sg_vga_state::sg_vga(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(0x200, 0x100);
 	screen.set_visarea(0x00, 0x140-1, 0x00, 0xe0-1);
-	screen.set_screen_update(FUNC(sg_vga_state::screen_update));
+	screen.set_screen_update(m_video, FUNC(x1_020_dx_101_device::screen_update));
+	screen.screen_vblank().set(m_video, FUNC(x1_020_dx_101_device::screen_vblank));
 	screen.set_palette("palette");
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_dx_10x);
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x8000 + 0xf0); // extra 0xf0 because we might draw 256-color object with 16-color granularity
+
+	X1_020_DX_101(config, m_video, XTAL(60'000'000)); // or 70MHz? unverified
+	m_video->set_palette("palette");
+	m_video->set_screen("screen");
+	//m_video->raster_irq_callback().set_inputline(m_maincpu, 1, HOLD_LINE);
+	m_video->flip_screen_callback().set(FUNC(sg_vga_state::flip_screen_set));
+	m_video->flip_screen_x_callback().set(FUNC(sg_vga_state::flip_screen_x_set));
+	m_video->flip_screen_y_callback().set(FUNC(sg_vga_state::flip_screen_y_set));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -274,13 +257,13 @@ ROM_START( hplanet )
 	ROM_REGION32_BE( 0x80000, "external_prg", 0 )
 	ROM_LOAD16_WORD_SWAP( "hp1_mpr-0a.u02", 0x00000, 0x80000, CRC(83dd903f) SHA1(37ca41f8423bcf6e7ae422a5a6e1aef0e52a38cc) )
 
-	ROM_REGION( 0x2000000, "sprites", 0 )
+	ROM_REGION( 0x2000000, "video", 0 )
 	ROM_LOAD64_WORD( "hp1_obj-1a.u01", 0x000000, 0x800000, CRC(124f99b9) SHA1(41970a06a95875688f8bc21465a5bbd80b8cf8ce) )
 	ROM_LOAD64_WORD( "hp1_obj-0a.u02", 0x000002, 0x800000, CRC(597e179c) SHA1(5130c5f4f7f8b3c730363ff843440fa5f059663c) )
 	ROM_LOAD64_WORD( "hp1_obj-3a.u03", 0x000004, 0x800000, CRC(17eeb4fd) SHA1(3bc30cd8f6a43d4aee9cd2da119dbab66c99565e) )
 	ROM_LOAD64_WORD( "hp1_obj-2a.u04", 0x000006, 0x800000, CRC(31f71432) SHA1(b572045af0c0ad54df72d9396168be004c07f7f7) )
 
-	ROM_REGION( 0x400000, "x1snd", 0 )
+	ROM_REGION( 0x400000, "x1snd", 0 ) // TODO: bankswitched?
 	ROM_LOAD( "hp1_snd-0a.u42", 0x000000, 0x400000, CRC(a78b01e5) SHA1(20e904a2e01a7e40c037a7c4ab9bd1b4e9054c4d) )
 ROM_END
 
