@@ -7,18 +7,24 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "tmp94c241.h"
 #include "tmp94c241_serial.h"
 
 #define LOG_SERIAL (1U << 1)
 
 #include "logmacro.h"
 
+
 DEFINE_DEVICE_TYPE(TMP94C241_SERIAL, tmp94c241_serial_device, "tmp94c241_serial", "TMP94C241 Serial Channel")
 
-tmp94c241_serial_device::tmp94c241_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint8_t channel, uint32_t clock) :
+tmp94c241_serial_device::tmp94c241_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TMP94C241_SERIAL, tag, owner, clock),
-	m_channel(channel),
+	m_setint_cb(*this),
+	m_txd_cb(*this),
+	m_sclk_in_cb(*this),
+	m_sclk_out_cb(*this),
+	m_tx_start_cb(*this),
+	m_timer(nullptr),
+	m_pffc_sclk(0),
 	m_serial_control(0),
 	m_serial_mode(0),
 	m_baud_rate(0),
@@ -36,12 +42,7 @@ tmp94c241_serial_device::tmp94c241_serial_device(const machine_config &mconfig, 
 	m_tx_skip_first_falling(false),
 	m_tx_needs_trailing_edge(false),
 	m_tx_buffer(0),
-	m_tx_buffer_full(false),
-	m_txd_cb(*this),
-	m_sclk_in_cb(*this),
-	m_sclk_out_cb(*this),
-	m_tx_start_cb(*this),
-	m_cpu(*this, DEVICE_SELF_OWNER)
+	m_tx_buffer_full(false)
 {
 }
 
@@ -49,6 +50,7 @@ void tmp94c241_serial_device::device_start()
 {
 	m_timer = timer_alloc(FUNC(tmp94c241_serial_device::timer_callback), this);
 
+	save_item(NAME(m_pffc_sclk));
 	save_item(NAME(m_serial_control));
 	save_item(NAME(m_serial_mode));
 	save_item(NAME(m_baud_rate));
@@ -121,8 +123,7 @@ void tmp94c241_serial_device::sioclk(int state)
 		if (m_tx_needs_trailing_edge)
 		{
 			m_tx_needs_trailing_edge = false;
-			m_cpu->m_int_reg[(m_channel == 0) ? tmp94c241_device::INTES0 : tmp94c241_device::INTES1] |= 0x80;
-			m_cpu->m_check_irqs = 1;
+			m_setint_cb(0x80);
 
 			// Auto-load from TX buffer if data is pending (TX double buffering).
 			// On TMP94C241, when the shift register finishes and the buffer
@@ -134,8 +135,8 @@ void tmp94c241_serial_device::sioclk(int state)
 				m_tx_clock_count = 7;
 
 				// Signal start of new byte transmission with current PFFC state
-				bool pffc_sclk = BIT(m_cpu->m_port_function[PORT_F], m_channel == 0 ? 2 : 6);
-				m_tx_start_cb(pffc_sclk ? 1 : 0);
+				// FIXME: data shouldn't be output at all if the pin is high-impedance
+				m_tx_start_cb(m_pffc_sclk);
 
 				// Pre-output bit 0 — receiver will sample it on the next rising edge
 				m_txd_cb(m_tx_shift_register & 1);
@@ -146,7 +147,8 @@ void tmp94c241_serial_device::sioclk(int state)
 			}
 		}
 
-		if (m_rx_clock_count){
+		if (m_rx_clock_count)
+		{
 			m_rx_clock_count--;
 
 			m_rx_shift_register >>= 1;
@@ -156,9 +158,7 @@ void tmp94c241_serial_device::sioclk(int state)
 			{
 				m_rx_clock_count = 8;
 				m_rx_buffer = m_rx_shift_register;
-				uint8_t int_reg_idx = (m_channel == 0) ? tmp94c241_device::INTES0 : tmp94c241_device::INTES1;
-				m_cpu->m_int_reg[int_reg_idx] |= 0x08;
-				m_cpu->m_check_irqs = 1;
+				m_setint_cb(0x08);
 			}
 		}
 	}
@@ -226,8 +226,8 @@ void tmp94c241_serial_device::scNbuf_w(uint8_t data)
 	// (PFFC enabled, SCLK pin driven → data reaches panel on real hardware)
 	// or "phantom" (PFFC disabled, pin is high-impedance → data never
 	// reaches the panel on real hardware, but MAME still forwards SCLK).
-	bool pffc_sclk = BIT(m_cpu->m_port_function[PORT_F], m_channel == 0 ? 2 : 6);
-	m_tx_start_cb(pffc_sclk ? 1 : 0);
+	// FIXME: data shouldn't be output at all if the pin is high-impedance
+	m_tx_start_cb(m_pffc_sclk);
 
 	// Pre-output first bit immediately so slave can sample it on the first rising edge
 	m_txd_cb(m_tx_shift_register & 1);
@@ -303,17 +303,19 @@ uint8_t tmp94c241_serial_device::brNcr_r()
 void tmp94c241_serial_device::brNcr_w(uint8_t data)
 {
 	m_baud_rate = data;
-	uint8_t divisor = data & 0x0f;
-	uint8_t input_clocks[] = {0, 2, 8, 32};
-	uint8_t shift_amount = (((data >> 4) & 3) + 1) * 2;
+	const uint16_t divisor = data & 0x0f;
+	constexpr uint8_t input_clocks[] = {0, 2, 8, 32};
+	const uint8_t shift_amount = (((data >> 4) & 3) + 1) * 2;
 	LOGMASKED(LOG_SERIAL,"baud rate: Divisor=%d  Internal Clock T%d\n", divisor, input_clocks[(data >> 4) & 3]);
 	if (divisor)
 	{
-		uint32_t fc = m_cpu->clock();
-		m_hz = (fc >> shift_amount) / divisor;
+		uint32_t fc = clock();
+		m_hz = fc / (divisor << shift_amount);
 		m_timer->adjust(attotime::from_hz(m_hz), 0, attotime::from_hz(m_hz));
 		LOGMASKED(LOG_SERIAL,"timer set to %d Hz.\n", m_hz);
-	} else {
+	}
+	else
+	{
 		m_timer->reset(attotime::never);
 		m_hz = 0;
 		LOGMASKED(LOG_SERIAL,"timer disabled.\n");

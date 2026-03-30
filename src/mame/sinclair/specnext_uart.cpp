@@ -26,6 +26,9 @@ specnext_uart_device::specnext_uart_device(const machine_config &mconfig, const 
 	, m_out_txd_cb(*this)
 	, m_out_rx_full_near_cb(*this)
 	, m_out_tx_empty_cb(*this)
+	, m_rx_head(0), m_rx_tail(0)
+	, m_rx_empty(true)
+	, m_rx_full_near(false)
 {
 }
 

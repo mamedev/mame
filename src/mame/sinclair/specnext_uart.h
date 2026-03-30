@@ -7,12 +7,9 @@
 
 #include "diserial.h"
 
+//static constexpr unsigned TX_FIFO_SIZE = 64; name too generic for global namespace
 
-static constexpr unsigned TX_FIFO_SIZE = 64;
-static constexpr unsigned RX_FIFO_SIZE = 512;
-
-
-class specnext_uart_device : public device_t, public device_buffered_serial_interface<TX_FIFO_SIZE>
+class specnext_uart_device : public device_t, public device_buffered_serial_interface<64>
 {
 public:
 	specnext_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -31,6 +28,8 @@ protected:
 	virtual void received_byte(u8 byte) override;
 
 private:
+	static constexpr unsigned RX_FIFO_SIZE = 512;
+
 	devcb_write_line    m_out_txd_cb;
 	devcb_write_line    m_out_rx_full_near_cb;
 	devcb_write_line    m_out_tx_empty_cb;
@@ -39,9 +38,9 @@ private:
 	u8 m_prescalar_msb; // u3
 	u16 m_prescalar_lsb; // u14
 	u8 m_rx_fifo[RX_FIFO_SIZE];
-	u16 m_rx_head = 0, m_rx_tail = 0;
-	bool m_rx_empty = true;
-	bool m_rx_full_near = false; // 3/4+
+	u16 m_rx_head, m_rx_tail;
+	bool m_rx_empty;
+	bool m_rx_full_near; // 3/4+
 
 	u8 dat_r();
 	u8 status_reg_r();

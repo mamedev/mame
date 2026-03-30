@@ -15,7 +15,7 @@ Chou Zetsurinjin Berabowman        (c) 1988 Namco
 Alice In Wonderland / Marchen Maze (c) 1988 Namco
 Bakutotsu Kijuutei                 (c) 1988 Namco
 Pro Tennis World Court             (c) 1988 Namco
-Splatter House                     (c) 1988 Namco
+Splatterhouse                      (c) 1988 Namco
 Face Off                           (c) 1988 Namco
 Rompers                            (c) 1989 Namco
 Blast Off                          (c) 1989 Namco
@@ -316,7 +316,7 @@ Date  Name                                  Key  Screen
  7/88 Marchen Maze / Alice In Wonderland    152  H
  8/88 Bakutotsu Kijuutei / Baraduke 2       155  H
 10/88 Pro Tennis World Court                143  H
-11/88 Splatter House                        181  H
+11/88 Splatterhouse                         181  H
 12/88 Face Off                              C    H
  2/89 Rompers                               182  V
  3/89 Blast Off                             183  V
@@ -2053,7 +2053,7 @@ ROM_START( wldcourt )
 ROM_END
 
 /*
-Splatter House
+Splatterhouse
 Namco, 1988
 
 This game runs on Namco System 1 hardware
@@ -2112,7 +2112,7 @@ Notes:
 
       Namco Custom ICs -
                         123 (QFP80)
-                        181 (DIP28, KEYCUS, Splatter House)
+                        181 (DIP28, KEYCUS, Splatterhouse)
                         64A1 (DIP40, 63701 MCU)
 
 
@@ -2919,9 +2919,9 @@ GAME( 1988, mmaze,     0,        ns1,     mmaze,    namcos1_state, init_alice,  
 GAME( 1988, mmaze2,    mmaze,    ns1,     mmaze,    namcos1_state, init_alice,    ROT180, "Namco", "Marchen Maze (Japan, hack?)", MACHINE_SUPPORTS_SAVE ) // removed copyright screen, hacked for export? But still has and requires MCU
 GAME( 1988, bakutotu,  0,        ns1,     bakutotu, namcos1_state, init_bakutotu, ROT180, "Namco", "Bakutotsu Kijuutei", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, wldcourt,  0,        ns1,     wldcourt, namcos1_state, init_wldcourt, ROT180, "Namco", "Pro Tennis World Court (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, splatter,  0,        ns1,     splatter3,namcos1_state, init_splatter, ROT180, "Namco", "Splatter House (World, new version (SH3))", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, splatter2, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatter House (World, old version (SH2))", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, splatterj, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatter House (Japan, SH1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, splatter,  0,        ns1,     splatter3,namcos1_state, init_splatter, ROT180, "Namco", "Splatterhouse (World, new version (SH3))", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, splatter2, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatterhouse (World, old version (SH2))", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, splatterj, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatterhouse (Japan, SH1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, faceoff,   0,        ns1,     faceoff,  namcos1_state, init_faceoff,  ROT180, "Namco", "Face Off (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, rompers,   0,        ns1,     ns1,      namcos1_state, init_rompers,  ROT90,  "Namco", "Rompers (Japan, new version (Rev B))", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, romperso,  rompers,  ns1,     ns1,      namcos1_state, init_rompers,  ROT90,  "Namco", "Rompers (Japan, old version)", MACHINE_SUPPORTS_SAVE )
