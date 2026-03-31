@@ -68,6 +68,7 @@ public:
 	{ }
 
 	void matmania(machine_config &config);
+	int vblank_r();
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -154,6 +155,13 @@ private:
   bit 0 -- 2.2kohm resistor  -- BLUE
 
 ***************************************************************************/
+
+int matmania_state::vblank_r()
+{
+	// vblank is active for most of the frame, only deasserted for scanlines 128-131
+	int vpos = m_screen->vpos();
+	return (vpos < 128 || vpos >= 132) ? 1 : 0;
+}
 
 void matmania_state::palette(palette_device &palette) const
 {
@@ -487,7 +495,7 @@ static INPUT_PORTS_START( matmania )
 	PORT_DIPSETTING(   0x00, DEF_STR( Upright ) )       // The default setting should be cocktail.
 	PORT_DIPSETTING(   0x20, DEF_STR( Cocktail ) )
 	PORT_SERVICE_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW1:7" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))      // Listed as always ON among DIPs in the manual
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(matmania_state::vblank_r))      // active except during scanlines 128-131, verified on PCB
 
 	PORT_START("DSW2")
 	PORT_DIPNAME(0x03, 0x02, DEF_STR( Difficulty ) )    PORT_DIPLOCATION("SW2:1,2")
@@ -621,10 +629,7 @@ void matmania_state::matmania(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 264, 8, 248);
 	m_screen->set_screen_update(FUNC(matmania_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -658,10 +663,7 @@ void maniach_state::maniach(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 264, 8, 248);
 	m_screen->set_screen_update(FUNC(maniach_state::screen_update));
 	m_screen->set_palette(m_palette);
 
