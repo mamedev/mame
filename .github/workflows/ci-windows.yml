@@ -1,6 +1,7 @@
 name: CI (Windows)
 
 on:
+  workflow_dispatch:
   push:
     paths:
     - '.github/workflows/**'
