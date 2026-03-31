@@ -15,6 +15,7 @@ public:
 	void dma_mode_w(bool dma_mode) { m_dma_mode = dma_mode; }
 	void dma_delay_w(bool dma_delay) { m_dma_delay = dma_delay; }
 
+	virtual u8 read() override;
 	virtual void write(u8 data) override;
 
 protected:

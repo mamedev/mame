@@ -42,6 +42,20 @@ specnext_dma_device::specnext_dma_device(const machine_config &mconfig, const ch
 {
 }
 
+u8 specnext_dma_device::read()
+{
+	const bool is_count_natural = m_dma_mode == 0 && m_byte_counter > 0;
+	if (is_count_natural)
+		m_byte_counter--;
+
+	const u8 res = z80dma_device::read();
+
+	if (is_count_natural)
+		m_byte_counter++;
+
+	return res;
+}
+
 void specnext_dma_device::write(u8 data)
 {
 	if (num_follow() == 0)

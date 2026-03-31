@@ -60,7 +60,7 @@ public:
 	auto in_iorq_callback() { return m_in_iorq_cb.bind(); }
 	auto out_iorq_callback() { return m_out_iorq_cb.bind(); }
 
-	u8 read();
+	virtual u8 read();
 	virtual void write(u8 data);
 
 	void iei_w(int state) { m_iei = state; interrupt_check(); }
