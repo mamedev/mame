@@ -179,20 +179,6 @@ ROM_START( epson_mx80 )
 	ROM_LOAD("8041_mx80.bin", 0x0000, 0x400, CRC(5844ef51) SHA1(1025d34b3ab684a06589b5890c604ce114399d23))
 ROM_END
 
-uint8_t epson_mx80_device::prog_mem_r(offs_t offset)
-{
-	u8 *mx80_rom_ptr = memregion("mx80_rom")->base();
-
-	[[maybe_unused]] auto offset_low = offset & ((1 << 11) - 1); // get low 11 bits  not 1<<12 - 1 but 1<<11 - 1
-	auto offset_upper = (offset & (0xf800)) >> 11;
-
-	u8 retval = (offset_upper == 0) ?
-		mx80_rom_ptr[ offset_low | (0x800 * 2)] :
-			(m_8049_p2 & 0x10) ?
-				mx80_rom_ptr[offset_low | 0x0] : mx80_rom_ptr[offset_low | 0x800];
-	return retval;
-}
-
 ROM_START( epson_mx80_iii )
 
 	ROM_REGION(0x1800, "mx80_rom", 0)
@@ -211,13 +197,6 @@ ROM_START( epson_mx80_dots )
 	ROM_REGION(0x400, "i8041_slave", 0)
 	ROM_LOAD("8041_mx80.bin", 0x0000, 0x400, CRC(5844ef51) SHA1(1025d34b3ab684a06589b5890c604ce114399d23))
 ROM_END
-
-uint8_t epson_mx80_dots_device::dots_perfect_prog_mem_r(offs_t offset)
-{
-	u8 *dots_ptr = memregion("dots_perfect")->base();
-	u8 retval = dots_ptr[offset | (m_dots_bank * 0x1000)];
-	return retval;
-}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -255,6 +234,16 @@ void epson_mx80_device::mx80_prog_mem(address_map &map)
 void epson_mx80_dots_device::mx80dots_prog_mem(address_map &map)
 {
 	map(0x000, 0xfff).r(FUNC(epson_mx80_dots_device::dots_perfect_prog_mem_r));
+}
+
+uint8_t epson_mx80_device::prog_mem_r(offs_t offset)
+{
+	return 0;
+}
+
+uint8_t epson_mx80_dots_device::dots_perfect_prog_mem_r(offs_t offset)
+{
+	return 0;
 }
 
 //-------------------------------------------------
