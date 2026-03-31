@@ -1,7 +1,6 @@
 name: CI (macOS)
 
 on:
-  workflow_dispatch:
   push:
     paths:
     - '.github/workflows/**'

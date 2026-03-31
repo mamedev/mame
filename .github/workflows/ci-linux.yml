@@ -1,7 +1,6 @@
 name: CI (Linux)
 
 on:
-  workflow_dispatch:
   push:
     paths:
     - '.github/workflows/**'
