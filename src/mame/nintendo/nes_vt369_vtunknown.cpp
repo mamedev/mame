@@ -1536,7 +1536,7 @@ CONS( 200?, lpgm240,    0,        0,  vt36x_swap_8mb,        vt369, vt36x_state,
 CONS( 200?, tup240,     lpgm240,  0,  vt36x_swap_8mb,        vt369, vt36x_state, empty_init, "Thumbs Up", "Thumbs Up 240-in-1 Mini Arcade Machine", MACHINE_NOT_WORKING )
 CONS( 201?, orb240,     lpgm240,  0,  vt36x_swap_8mb,        vt369, vt36x_state, empty_init, "Orb Gaming", "Orb Gaming 240-in-1 Handheld", MACHINE_NOT_WORKING ) // silver handheld
 // different encryption? 
-CONS( 201?, tui240,     0,        0,  vt36x_8mb,             vt369, vt36x_state, empty_init, "<unknown>",  "Tui 240-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 201?, tui240,     0,        0,  vt36x_8mb,             vt369, vt36x_state, empty_init, "<unknown>",  "Tui 240-in-1", MACHINE_NOT_WORKING )
 
 // VT369, but doesn't use most features
 CONS( 201?, unkra200,   mc_tv200, 0,  vt36x_8mb, vt369, vt36x_state, empty_init, "<unknown>",    "200 in 1 Retro Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
