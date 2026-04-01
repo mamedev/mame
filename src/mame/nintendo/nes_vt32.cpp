@@ -455,6 +455,16 @@ ROM_START( lxpcgp )
 	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(2ae7a6f6) SHA1(c16fcf28fad85799fa331ca4ff3c4a1d3560d3f1) )
 ROM_END
 
+ROM_START( lxpcfz )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(6756a5f4) SHA1(fa79e132c4b7b8e7a551e741006a3cb2c51c73a7) )
+ROM_END
+
+ROM_START( lxpcfzcz )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(8b8ed07e) SHA1(4f215765c21c36163cb30f1bf195376e46a6c73f) )
+ROM_END
+
 ROM_START( lxpcsp )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(113e22f2) SHA1(c57184131db3f3c82d09d7757f0977223698f62c) )
@@ -562,8 +572,8 @@ CONS( 2020, lxpcpp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, e
 // Power Console - Paw Patrol (JCG100PAi5, English/Italian)
 CONS( 2020, lxpcdp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Disney Princess (JCG100DPi1, English/French)", MACHINE_NOT_WORKING )
 CONS( 2020, lxpcgp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Gabby's Dollhouse (JCG100GDHi1, English/French)", MACHINE_NOT_WORKING )
-// Power Console - Frozen (JCG100FZi1, English/French)
-// Power Console - Frozen (JCG100FZi12, English/Czech)
+CONS( 2020, lxpcfz,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Frozen (JCG100GFZi1, English/French)", MACHINE_NOT_WORKING )
+CONS( 2020, lxpcfzcz,  0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Frozen (JCG100GFZi12, English/Czech)", MACHINE_NOT_WORKING )
 
 // unclear SoC types maybe even different
 // Rush'n Attack has the raster split in the wrong place on the 5 language version (mountains in first stage) when using real hardware

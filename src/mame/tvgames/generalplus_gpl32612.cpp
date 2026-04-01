@@ -344,6 +344,11 @@ ROM_START( bandolap )
 	ROM_LOAD( "gpr25l64.u3", 0x0000, 0x800000, CRC(d9b1cb41) SHA1(03d550138973519522746298bce2865d85a5c4f2) )
 ROM_END
 
+ROM_START( disbestf )
+	ROM_REGION(  0x1000000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25l128.u6", 0x0000, 0x1000000, CRC(c1aed384) SHA1(4f555427241231c15626392a49ef3c06ccafe7f4) )
+ROM_END
+
 ROM_START( chiikpc )
 	ROM_REGION(  0x1000000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25l12833f.u6", 0x0000, 0x1000000, CRC(bde74209) SHA1(8a91554ae653f4ed54fd354049c32b545e4d359d) )
@@ -354,9 +359,26 @@ ROM_START( saikyopc )
 	ROM_LOAD( "25l12833f.u6", 0x0000, 0x1000000, CRC(5b870182) SHA1(909d2834875484f8369cfbce2c51fa27c0a3d973) )
 ROM_END
 
+ROM_START( displpc )
+	ROM_REGION(  0x1000000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "fm25w128.u6", 0x0000, 0x1000000, CRC(0f3996ce) SHA1(2c0ae0ade87d6f97882d82ca265f3ef77587db5c) )
+ROM_END
+
+
+ROM_START( doralpc )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l640.u6", 0x0000, 0x800000, CRC(8ce9d41a) SHA1(84fb258faf93039644807cde73ca635b99c5c9c1) )
+ROM_END
+
 ROM_START( tmydistb )
 	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "gpr25l64.u5", 0x0000, 0x800000, CRC(01e5a892) SHA1(b9164173e707eb69cd7d50ce69f3368de7e7390f) )
+ROM_END
+
+ROM_START( anp2020t )
+	ROM_REGION( 0x1000000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "is25lp128.u1", 0x0000, 0x1000000, CRC(96573b66) SHA1(6229d51d39665db48d36eb8fb313c03d0c3fbbe7) )
+	ROM_IGNORE(0x50) // 'config' bytes
 ROM_END
 
 ROM_START( banaquap )
@@ -394,6 +416,14 @@ ROM_START( intrtvg )
 
 	DISK_REGION( "sdcard" ) // 4GB SD Card
 	DISK_IMAGE( "interactivetv", 0, SHA1(7061e28c4560b763bda1157036b79c726387e430) )
+ROM_END
+
+ROM_START( bodygun )
+	ROM_REGION(  0x100000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(5aa91972) SHA1(296108e8683063c16951ff326e6ff3d63d9ed5b8) )
+
+	DISK_REGION( "sdcard" ) // 4GB SD Card
+	DISK_IMAGE( "bodygun", 0, SHA1(3e41a2ba9b86fb6b155c1c82a7612458c3555a64) )
 ROM_END
 
 ROM_START( arb605 )
@@ -609,6 +639,11 @@ CONS( 2014, bananlapa,       bananlap, 0,      gpl32612, gpl32612, generalplus_g
 // ドラえもんステップアップパソコン
 CONS( 2014, bandolap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon Step Up PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
+CONS( 2018, disbestf,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney & Disney/Pixar Characters Best Friends PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses GPL32630A
+CONS( 2020, anp2020t,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman Tablet (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
 // uses GPL32630A has GPspispi header  マーメイドアクアポット
 CONS( 2021, banaquap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Tropical Rouge! PreCure: Mermaid Aqua Pot (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
@@ -636,6 +671,8 @@ CONS( 202?, intrtvg,         0,        0,      gpl32612, gpl32612, generalplus_g
 CONS( 202?, ardancem,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Dance Mat (Model DM02, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // likewise
 CONS( 202?, arb605,          0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Game Console (Model B605, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 202?, bodygun,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Body Gun (Model GC05, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
 
 // unknown (uses a glob) but it's GeneralPlus and ARM based, so put in here for now
 // ROM has 'GPNandTag2' header rather than the usual
@@ -677,6 +714,12 @@ CONS( 2021, chiikpc,            0,        0,      gpl32612, gpl32612, generalplu
 // uses a glob CPU
 // 学びの最強王になれ! 最強王図鑑パソコン
 CONS( 2020, saikyopc,           0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Manabi no Sai-Kyo-Oh ni Nare! Sai-Kyo-Oh Zukan PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses a glob CPU
+CONS( 2022, doralpc,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon Learning Personal Computer (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses a glob CPU
+CONS( 2020, displpc,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney Princess Learning Personal Computer (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32600A
 // マウスできせかえ! すみっコぐらしパソコンプラス

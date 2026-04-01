@@ -191,6 +191,11 @@ ROM_START( tomyegga ) // might just be different user data (or factory defaults)
 	ROM_IGNORE(0x50) // 'config' data
 ROM_END
 
+ROM_START( tomyeggb ) // might just be different user data (or factory defaults)
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "mintblue_gpr25l640.u1", 0x0000, 0x800000, CRC(045c378d) SHA1(fcb33474c293ac45851755dc9a2f961889ec0168) )
+ROM_END
+
 ROM_START( chikawac )
 	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "xm25qh64c.u1", 0x0000, 0x800000, CRC(88c984aa) SHA1(6e176960b64fc3576efaa40dfe2ff0a6dcea3c3f) )
@@ -227,10 +232,11 @@ CONS( 2021, smkmikkea,       smkmikke, 0,      gp327902, gp327902, generalplus_g
 // other devices on the same Soc
 
 // キラッとプリ☆チャン プリたまGO ミスティパープル
+// the product page seems to indicate that the different colours get different bonus items but the main code looks the same
+// so it could be different factory default data
 CONS( 2019, tomyegg,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Kiratto Pri-Chan - PritamaGO: Misty Purple (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS( 2019, tomyegga,        tomyegg,  0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Kiratto Pri-Chan - PritamaGO: Powder Pink (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-// these also exist, are they the same software or different versions?
-// Mint Blue (ミントブルー).
+CONS( 2019, tomyeggb,        tomyegg,  0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Kiratto Pri-Chan - PritamaGO: Mint Blue (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 CONS( 2021, chikawac,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Chiikawa Camera De Ya-! (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 

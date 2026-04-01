@@ -708,6 +708,14 @@ ROM_START( taturtf )
 	ROM_LOAD16_WORD_SWAP( "tinyarcadeturtlefighter_25q32bst16_684016.bin", 0x000000, 0x400000, CRC(8e046f2d) SHA1(e48492cf953f22a47fa2b88a8f96a1e459b8c487) )
 ROM_END
 
+ROM_START( digicolr )
+	ROM_REGION16_BE( 0x18000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x18000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x800000, "spi", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "mx25l6433f.u2", 0x000000, 0x800000, CRC(9999e2a0) SHA1(4af880e5e2bb1c820b0ec19acf1b5f858bfa1ab0) )
+ROM_END
+
 ROM_START( siddr )
 	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
@@ -734,4 +742,6 @@ CONS( 2019, taturtf,       0,       0,      generalplus_gpl_unknown,   generalpl
 
 // Probably not identical hardware, but still not direct mapped SPI.  External ROM after 0x3000 is encrypted (maybe decrypted in software) seems to have jumps to internal ROM
 CONS( 2021, siddr,         0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, init_siddr, "Super Impulse", "Dance Dance Revolution - Broadwalk Arcade", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+CONS( 2021, digicolr,      0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, empty_init, "Bandai", "Digimon Color", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
