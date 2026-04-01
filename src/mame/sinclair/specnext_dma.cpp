@@ -42,18 +42,9 @@ specnext_dma_device::specnext_dma_device(const machine_config &mconfig, const ch
 {
 }
 
-u8 specnext_dma_device::read()
+void specnext_dma_device::reset_byte_counter()
 {
-	const bool is_count_natural = m_dma_mode == 0 && m_byte_counter > 0;
-	if (is_count_natural)
-		m_byte_counter--;
-
-	const u8 res = z80dma_device::read();
-
-	if (is_count_natural)
-		m_byte_counter++;
-
-	return res;
+	m_byte_counter = m_dma_mode ? 0 : 1;
 }
 
 void specnext_dma_device::write(u8 data)
@@ -66,7 +57,7 @@ void specnext_dma_device::write(u8 data)
 			switch (data)
 			{
 			case COMMAND_ENABLE_DMA:
-				m_byte_counter = 0;
+				reset_byte_counter();
 				break;
 			case COMMAND_RESET:
 				m_r2_portB_preescaler_s = 0;
@@ -90,14 +81,6 @@ void specnext_dma_device::write(u8 data)
 		}
 		z80dma_device::write(data);
 	}
-}
-
-void specnext_dma_device::do_read()
-{
-	z80dma_device::do_read();
-	// zxnDMA?
-	if (m_dma_mode == 0 && (m_byte_counter + 1) == m_count)
-		m_byte_counter++;
 }
 
 TIMER_CALLBACK_MEMBER(specnext_dma_device::clock_w)
@@ -125,7 +108,10 @@ TIMER_CALLBACK_MEMBER(specnext_dma_device::clock_w)
 	}
 
 	const bool may_prescaled = m_dma_seq == SEQ_TRANS1_WRITE_DEST && m_r2_portB_preescaler_s;
-	z80dma_device::clock_w(param);
+	if (m_dma_mode == 0 && m_dma_seq == SEQ_WAIT_READY && is_ready() && m_byte_counter == 1)
+		m_dma_seq = SEQ_REQUEST_BUS;
+	else
+		z80dma_device::clock_w(param);
 
 	if (may_prescaled && m_dma_seq != SEQ_FINISH)
 	{

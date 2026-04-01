@@ -15,14 +15,13 @@ public:
 	void dma_mode_w(bool dma_mode) { m_dma_mode = dma_mode; }
 	void dma_delay_w(bool dma_delay) { m_dma_delay = dma_delay; }
 
-	virtual u8 read() override;
 	virtual void write(u8 data) override;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	virtual void do_read() override;
+	virtual void reset_byte_counter() override;
 
 	virtual TIMER_CALLBACK_MEMBER(clock_w) override;
 

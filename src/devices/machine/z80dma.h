@@ -60,7 +60,7 @@ public:
 	auto in_iorq_callback() { return m_in_iorq_cb.bind(); }
 	auto out_iorq_callback() { return m_out_iorq_cb.bind(); }
 
-	virtual u8 read();
+	u8 read();
 	virtual void write(u8 data);
 
 	void iei_w(int state) { m_iei = state; interrupt_check(); }
@@ -118,14 +118,15 @@ protected:
 	void enable();
 	void disable();
 	u8 num_follow() const noexcept { return m_num_follow; }
-	virtual int is_ready();
+	int is_ready();
 	void interrupt_check();
 	void trigger_interrupt(int level);
-	virtual void do_read();
+	void do_read();
 	void do_write();
 	void do_transfer_write();
 	void do_search();
 	void setup_next_read(int rr);
+	virtual void reset_byte_counter() { m_byte_counter = 0; };
 
 	virtual TIMER_CALLBACK_MEMBER(clock_w);
 
