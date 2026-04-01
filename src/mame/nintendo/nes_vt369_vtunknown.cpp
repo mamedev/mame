@@ -922,6 +922,16 @@ ROM_START( tup240 )
 	VT3XX_INTERNAL_OPCODE_SWAP
 ROM_END
 
+ROM_START( orb240 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "w25q64jv.u1", 0x00000, 0x800000, CRC(bcd5ebda) SHA1(2f46ae1ac1426df30fdb99724ea3a9d94c26db42) )
+ROM_END
+
+ROM_START( tui240 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "s29gl064n90tfi04.u2", 0x00000, 0x800000, CRC(f590949e) SHA1(3f2722aa0e4e041f052cebc693561dddd0c06604) )
+ROM_END
+
 ROM_START( sy889 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "sy889_w25q64.bin", 0x00000, 0x800000, CRC(fcdaa6fc) SHA1(0493747facf2172b8af22010851668bb18cbb3e4) )
@@ -1015,6 +1025,11 @@ ROM_START( mog_m320 )
 	ROM_LOAD( "w25q64fv.bin", 0x00000, 0x800000, CRC(3c5e1b36) SHA1(4bcbf35ebf2b1714ccde5de758a89a6a39528f89) )
 ROM_END
 
+ROM_START( pixel246 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "g25q64.u2", 0x00000, 0x800000, CRC(0020f766) SHA1(a460387bcdc6b545619dfc63fa4acc8b3b53a546) )
+ROM_END
+
 ROM_START( otrail )
 	ROM_REGION( 0x100000, "mainrom", 0 )
 	ROM_LOAD( "g25q80cw.bin", 0x00000, 0x100000, CRC(b20a03ba) SHA1(c4ca8e590b07baaebed747537bc8f92e44bdd219) ) // dumped as QD25Q80C
@@ -1057,8 +1072,7 @@ ROM_END
 ROM_START( vibes240 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	// wouldn't read consistently
-	ROM_LOAD( "s29gl128p11tfi01.bin", 0x000000, 0x1000000, BAD_DUMP CRC(7244d6e9) SHA1(951052f6cd8c873f85f79be9d64498a43e92fd10) )
-	ROM_IGNORE(0x100)
+	ROM_LOAD( "s29gl128p11tfi01.bin", 0x000000, 0x1000000, BAD_DUMP CRC(c04c5527) SHA1(58737084e1b1a2862f50f07feeab79593ca13862) )
 ROM_END
 
 ROM_START( retro620 )
@@ -1087,14 +1101,12 @@ ROM_END
 
 ROM_START( matet10 )
 	ROM_REGION( 0x200000, "mainrom", 0 )
-	ROM_LOAD( "tetriskeychain_p25q16sh_856015.bin", 0x00000, 0x200000, CRC(7a7251ea) SHA1(7ace8482a54f6b06982a90328779c21266d864fa) )
-	ROM_IGNORE(0x300)
+	ROM_LOAD( "tetriskeychain_p25q16sh_856015.bin", 0x00000, 0x200000, CRC(e7e11945) SHA1(5ab07ae80d554cc423497230c736fdaae5c98d23) )
 ROM_END
 
 ROM_START( matetsl )
 	ROM_REGION( 0x80000, "mainrom", 0 )
-	ROM_LOAD( "slurpeetetris_p25q40sh_856013.bin", 0x00000, 0x80000, CRC(d3b68de8) SHA1(97bcdfcd31bc536b626f9a369afe18de60a399da) )
-	ROM_IGNORE(0x300)
+	ROM_LOAD( "slurpeetetris_p25q40sh_856013.bin", 0x00000, 0x80000, CRC(67691f19) SHA1(7ad7787ec907019b1e4ea64698e598f555cabeeb) )
 ROM_END
 
 ROM_START( nesvt270 )
@@ -1202,14 +1214,12 @@ ROM_END
 
 ROM_START( tiger108 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "p25d32sh.u3", 0x00000, 0x400000, CRC(9d5112a3) SHA1(96a66b5b2c4e1fdc00b54951f867f7cc2a1a2a4a) )
-	ROM_IGNORE(0x300)
+	ROM_LOAD( "p25d32sh.u3", 0x00000, 0x400000, CRC(50f036f6) SHA1(f7744585869406ad6068b89b13bd7972b161862b) )
 ROM_END
 
 ROM_START( gon100 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "p25d32sh.bin", 0x00000, 0x400000, CRC(cd8a07c3) SHA1(4f5afc711eb214fbaad95b71087b9f50cf31345f) )
-	ROM_IGNORE(0x300)
+	ROM_LOAD( "p25d32sh.bin", 0x00000, 0x400000, CRC(6d852ab0) SHA1(4e90054d4632581f15aafff9e950f80d6bbcb1d5) )
 ROM_END
 
 ROM_START( d12power )
@@ -1225,6 +1235,11 @@ ROM_END
 ROM_START( zl383 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "s29gl064n90tfi04.u2", 0x00000, 0x800000, CRC(58e0011e) SHA1(38a3ed236f055b1a73cbb9582fc5ea151a296ba9) )
+ROM_END
+
+ROM_START( unk198vt )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "w25q640.ic3", 0x00000, 0x800000, CRC(a5a3537d) SHA1(43b1883c20a33e370951d466c5b9f3e4a9c82dca) )
 ROM_END
 
 ROM_START( dgun2572 )
@@ -1277,6 +1292,11 @@ ROM_END
 ROM_START( f5_620 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "f5_620in1.u4", 0x00000, 0x1000000, CRC(e3ec27c8) SHA1(d377ccf9bdbe60f6d484360b4b13c3b132628676) )
+ROM_END
+
+ROM_START( unk300vt )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl128p10tfi01.u2", 0x00000, 0x1000000, CRC(77c0a7fc) SHA1(dde5f24596d34e0a1305df92ba267a868bd386d4) )
 ROM_END
 
 void vt369_state::init_lxcmcypp()
@@ -1492,6 +1512,9 @@ CONS( 202?, f5_620,    0,  0,  vt36x_16mb,        vt369, vt36x_state, init_f5_62
 // banking(?) issues, some games don't boot (writes data to ALU mirror, then some other ports)
 CONS( 202?, h12p1000,  0,        0,  vt36x,     vt369, vt36x_state, empty_init, "<unknown>", "H12 Pro 1000 in 1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
+// different encryption?
+CONS( 202?, unk300vt,  0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init,   "<unknown>", "300-in-1 Handheld Game",  MACHINE_NOT_WORKING )
+
 /*****************************************************************************
 * below are VT369 games that use SQI / SPI ROM
 *****************************************************************************/
@@ -1503,12 +1526,17 @@ CONS( 2016, sy888b,     0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init,
 // Same hardware as SY-889
 CONS( 201?, mc_cb280,   0,        0,  vt36x_swap_4mb, vt369, vt36x_state, empty_init, "CoolBoy",   "Coolboy RS-18 (280 in 1)", MACHINE_IMPERFECT_GRAPHICS )
 
+// this is similar to mog_m320 below, but gets to the menu (still has chr banking issues)
+CONS( 201?, pixel246,   0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init, "Shanghai Weimeng Network Technology Co.,Ltd / dreamhax", "Pixels 246-in-1 Game Player (DH-628)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 // Plays intro music but then crashes. same hardware as SY-88x but uses more features
-CONS( 2016, mog_m320,   0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
+CONS( 2016, mog_m320,   pixel246, 0,  vt36x_8mb, vt369, vt36x_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
 
 // VT369, but doesn't use most features
 CONS( 200?, lpgm240,    0,        0,  vt36x_swap_8mb,        vt369, vt36x_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
 CONS( 200?, tup240,     lpgm240,  0,  vt36x_swap_8mb,        vt369, vt36x_state, empty_init, "Thumbs Up", "Thumbs Up 240-in-1 Mini Arcade Machine", MACHINE_NOT_WORKING )
+CONS( 201?, orb240,     lpgm240,  0,  vt36x_swap_8mb,        vt369, vt36x_state, empty_init, "Orb Gaming", "Orb Gaming 240-in-1 Handheld", MACHINE_NOT_WORKING ) // silver handheld
+// different encryption? 
+CONS( 201?, tui240,     0,        0,  vt36x_8mb,             vt369, vt36x_state, empty_init, "<unknown>",  "Tui 240-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // VT369, but doesn't use most features
 CONS( 201?, unkra200,   mc_tv200, 0,  vt36x_8mb, vt369, vt36x_state, empty_init, "<unknown>",    "200 in 1 Retro Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
@@ -1582,3 +1610,6 @@ CONS( 2019, gb50_150,  0,        0,  vt36x_16mb_sdcard, vt369, vt36x_state, empt
 // Games are stored on an SD card (outside of the filesystem?)
 // 8Bt is as printed on the box, not a typo
 CONS( 202?, a6plus,    0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init, "<unknown>", "Retro Arcade FC A6Plus - 8Bt Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// available in red and white cases, ROM is the same, uploads sound prog so definitely 36x
+CONS( 202?, unk198vt, 0,        0,  vt36x_8mb,  vt369, vt36x_state, empty_init, "<unknown>", "198-in-1 Handheld Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

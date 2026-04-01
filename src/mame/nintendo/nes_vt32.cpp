@@ -388,8 +388,7 @@ ROM_END
 
 ROM_START( dgunl3202 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "dg308n1_s29gl256p90tfcr1_0001227e.bin", 0x00000, 0x2000000, CRC(489c806f) SHA1(979b2c00eec459646de5a658863aff0eaacc2402) )
-	ROM_IGNORE(0x100)
+	ROM_LOAD( "dg308n1_s29gl256p90tfcr1_0001227e.bin", 0x00000, 0x2000000, CRC(bd5e084d) SHA1(84bd4094e0f484f7bbbf3f5277ca24a09feca45d) )
 ROM_END
 
 ROM_START( myaass )
@@ -404,8 +403,7 @@ ROM_END
 
 ROM_START( mymman )
 	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "megaman_s29gl064n90tfi04_0001227e.bin", 0x00000, 0x800000, CRC(1954cc95) SHA1(be20d42d32d625ec7b3c5db983850763c0ceff73) )
-	ROM_IGNORE(0x100)
+	ROM_LOAD( "megaman_s29gl064n90tfi04_0001227e.bin", 0x00000, 0x800000, CRC(66bba477) SHA1(b16d303caa15bcfa8f18da99f2a3fe29a8a640b8) )
 ROM_END
 
 ROM_START( fcpocket )
@@ -420,14 +418,12 @@ ROM_END
 
 ROM_START( matet220 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "gamervtetris_s29gl128n10tfi01_0001227e.bin", 0x00000, 0x1000000, CRC(ac244e56) SHA1(89897f5f65f55a46bf0d6b5ca534ca31c79a0658) )
-	ROM_IGNORE(0x100)
+	ROM_LOAD( "gamervtetris_s29gl128n10tfi01_0001227e.bin", 0x00000, 0x1000000, CRC(e15b6a48) SHA1(1b0b4f3034ef5e88ae5fd91987d3d4e6539999b0) )
 ROM_END
 
 ROM_START( matet100 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "picotetris_s29gl064n90tfi04_0001227e.bin", 0x00000, 0x800000, CRC(7d9296f2) SHA1(0db5883028d14783d0abff1f7672e59534b0e513) )
-	ROM_IGNORE(0x100)
+	ROM_LOAD( "picotetris_s29gl064n90tfi04_0001227e.bin", 0x00000, 0x800000, CRC(4a774c02) SHA1(1219acbd2b95160f7ed54efb44b368d893e48077) )
 ROM_END
 
 ROM_START( lxpc )
@@ -453,6 +449,16 @@ ROM_END
 ROM_START( lxpcgp )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(2ae7a6f6) SHA1(c16fcf28fad85799fa331ca4ff3c4a1d3560d3f1) )
+ROM_END
+
+ROM_START( lxpcfz )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(6756a5f4) SHA1(fa79e132c4b7b8e7a551e741006a3cb2c51c73a7) )
+ROM_END
+
+ROM_START( lxpcfzcz )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(8b8ed07e) SHA1(4f215765c21c36163cb30f1bf195376e46a6c73f) )
 ROM_END
 
 ROM_START( lxpcsp )
@@ -482,8 +488,7 @@ ROM_END
 
 ROM_START( k10_5l )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "js28f128m29ewh.u4", 0x00000, 0x1000000, CRC(69dba082) SHA1(bd6829b0339795876dd5b4eb5de8bbd124c64f77) )
-	ROM_IGNORE(0x100)
+	ROM_LOAD( "js28f128m29ewh.u4", 0x00000, 0x1000000, CRC(b1f23cb6) SHA1(0491f855a89fc1e2d5a6e9ecf47a816e83d2896f) )
 ROM_END
 
 ROM_START( k10_2l )
@@ -562,8 +567,8 @@ CONS( 2020, lxpcpp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, e
 // Power Console - Paw Patrol (JCG100PAi5, English/Italian)
 CONS( 2020, lxpcdp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Disney Princess (JCG100DPi1, English/French)", MACHINE_NOT_WORKING )
 CONS( 2020, lxpcgp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Gabby's Dollhouse (JCG100GDHi1, English/French)", MACHINE_NOT_WORKING )
-// Power Console - Frozen (JCG100FZi1, English/French)
-// Power Console - Frozen (JCG100FZi12, English/Czech)
+CONS( 2020, lxpcfz,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Frozen (JCG100GFZi1, English/French)", MACHINE_NOT_WORKING )
+CONS( 2020, lxpcfzcz,  lxpcfz,0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Frozen (JCG100GFZi12, English/Czech)", MACHINE_NOT_WORKING )
 
 // unclear SoC types maybe even different
 // Rush'n Attack has the raster split in the wrong place on the 5 language version (mountains in first stage) when using real hardware

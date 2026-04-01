@@ -83,8 +83,11 @@ ROM_START( lx_jg7420 )
 	ROM_REGION( 0x10000, "boot", ROMREGION_ERASEFF )
 	ROM_LOAD( "internal.bin", 0x00000, 0x10000, NO_DUMP ) // unknown size/capacity/type (internal?)
 
-	ROM_REGION( 0x100000, "spi", ROMREGION_ERASEFF ) // probably undumped for this unit
-	ROM_LOAD( "spi_boot", 0x00000, 0x100000, NO_DUMP )
+	ROM_REGION( 0x100000, "spi", ROMREGION_ERASEFF )
+	ROM_LOAD( "25d80.u6", 0x00000, 0x100000, CRC(6916409d) SHA1(80dbdc568547cc347a8aca0d530ac25e20b08e34) )
+
+	ROM_REGION( 0x80000, "spi2", ROMREGION_ERASEFF ) // does it boot from this if no card is present?
+	ROM_LOAD( "fm25q04.u14", 0x00000, 0x80000, CRC(f6410672) SHA1(3ccce8e5ef1bfd08c90d90d2efdb646d2af9fba7) )
 
 	DISK_REGION( "sdcard" ) // 4GB SD Card
 	DISK_IMAGE( "jg7420", 0, SHA1(214a1686c7eefdb4cb5d723e98957600c8cb138d) )

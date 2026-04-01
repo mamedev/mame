@@ -19577,7 +19577,12 @@ yuleyuan
 gamekin3
 gameking
 
+
+@source:handheld/generalplus_gp3x_unknown.cpp
+gp3x788
+
 @source:handheld/generalplus_gpce4.cpp
+digicolr
 mapacman
 parcade
 siddr
@@ -19593,6 +19598,7 @@ gmaster
 
 @source:handheld/gw35th.cpp
 gwsmb35
+gwzeldan
 
 @source:handheld/hh_cop400.cpp
 bshipg
@@ -35949,6 +35955,7 @@ dnce2000
 nytsudo
 papsudok
 pjoypj001
+pv95in1
 racechl8
 vtvppong
 vtvsocr
@@ -36086,6 +36093,8 @@ k10_2l
 k10_5l
 lxpc
 lxpcdp
+lxpcfz
+lxpcfzcz
 lxpcg
 lxpcgp
 lxpcli
@@ -36174,8 +36183,10 @@ mog_m320
 myarccn
 nesvt270
 nubsupmf
+orb240
 otrail
 pactin
+pixel246
 rbbrite
 rd5_240
 red5mam
@@ -36194,8 +36205,11 @@ sy889
 t3_630
 tetrtin
 tiger108
+tui240
 tup240
 unk128vt
+unk198vt
+unk300vt
 unkra200
 vibes240
 zl383
@@ -41041,6 +41055,7 @@ mdhh100
 msi_sf2
 mygalag
 mygalaga
+mygalagb
 mympac
 mympaca
 mypac
@@ -41048,6 +41063,7 @@ mypaca
 mypacgld
 mysf2
 mysinv
+mysinva
 reactmd
 sarc110
 sarc110a
@@ -47537,6 +47553,7 @@ smkmikke
 smkmikkea
 tomyegg
 tomyegga
+tomyeggb
 
 @source:tvgames/generalplus_gpl16250_mobigo.cpp
 mobigo
@@ -47573,6 +47590,7 @@ gameu50
 gameu90
 gameu108
 gormiti
+gp230
 imgame
 jak_bj
 jak_prr
@@ -47615,6 +47633,7 @@ pokegac2
 pokegac2y
 pokegach
 prailpls
+starbuck
 vmastspi
 
 @source:tvgames/generalplus_gpl951xx.cpp
@@ -47660,6 +47679,7 @@ bkid218
 
 @source:tvgames/generalplus_gpl32612.cpp
 airobo
+anp2020t
 anpanm19
 anpncp17
 anpntb18
@@ -47673,10 +47693,14 @@ bandolap
 bandplap
 bandslap
 banpear
+bodygun
 chiikpc
 dinopc
+disbestf
+displpc
 dmnslayg
 doraet17
+doralpc
 froz2dct
 intrtvg
 jak_dchp

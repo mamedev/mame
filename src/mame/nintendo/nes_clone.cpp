@@ -1442,6 +1442,15 @@ ROM_START( racechl8 )
 	ROM_LOAD( "ppu 401 0517.u5", 0x00000, 0x80000, CRC(51c6d44b) SHA1(6a48ea1185cf0d2d0bcf9a1b2a8cc881e318d978) )
 ROM_END
 
+ROM_START( pv95in1 )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx29f1610atc.ic1a", 0x00000, 0x200000, CRC(920f123c) SHA1(52f495916662d42a8f1ee2150ae970ddf18b7e5d) )
+
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx29f1610atc.ic2a", 0x00000, 0x200000, CRC(347dee4a) SHA1(4e01624ed4a5afd928b2fddca6b0946a680274aa) )
+ROM_END
+
+
 void nes_clone_state::init_nes_clone()
 {
 }
@@ -1496,3 +1505,6 @@ CONS( 200?, digezlg, 0, 0, nes_clone_dnce2000, digezlg, nes_clone_dnce2000_state
 
 // 2005-04-03 date on PCB
 CONS( 2005, racechl8, 0, 0, nes_clone_afbm7800, nes_clone, nes_clone_taikee_new_state, init_nes_clone, "Play Vision / Taikee", "Racing Challenge - 8 Games In 1", 0 )
+
+// probably not VT based
+CONS( 200?, pv95in1, 0, 0, nes_clone_afbm7800, nes_clone, nes_clone_taikee_new_state, init_nes_clone, "Play Vision", "Play Vision 95 Games in 1", 0 )
