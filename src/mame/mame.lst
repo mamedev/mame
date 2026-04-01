@@ -19529,9 +19529,6 @@ newbrain
 newbraina
 newbrainmd
 
-@source:handheld/bzyasmin.cpp
-bzyasmin
-
 @source:handheld/st2302u_bbl_rom.cpp
 bbl338
 class200
