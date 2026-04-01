@@ -671,7 +671,7 @@ CONS( 202?, intrtvg,         0,        0,      gpl32612, gpl32612, generalplus_g
 CONS( 202?, ardancem,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Dance Mat (Model DM02, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // likewise
 CONS( 202?, arb605,          0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Game Console (Model B605, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS( 202?, bodygun,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Body Gun (Model GC05, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 202?, bodygun,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology", "Body Gun Game Console (Model GC05, Damcoola)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 
 // unknown (uses a glob) but it's GeneralPlus and ARM based, so put in here for now

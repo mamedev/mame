@@ -1507,4 +1507,4 @@ CONS( 200?, digezlg, 0, 0, nes_clone_dnce2000, digezlg, nes_clone_dnce2000_state
 CONS( 2005, racechl8, 0, 0, nes_clone_afbm7800, nes_clone, nes_clone_taikee_new_state, init_nes_clone, "Play Vision / Taikee", "Racing Challenge - 8 Games In 1", 0 )
 
 // probably not VT based
-CONS( 200?, pv95in1, 0, 0, nes_clone_afbm7800, nes_clone, nes_clone_taikee_new_state, init_nes_clone, "Play Vision", "Play Vision 95-in1", 0 )
+CONS( 200?, pv95in1, 0, 0, nes_clone_afbm7800, nes_clone, nes_clone_taikee_new_state, init_nes_clone, "Play Vision", "Play Vision 95 Games in 1", 0 )
