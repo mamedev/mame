@@ -1434,8 +1434,7 @@ ROM_END
 
 ROM_START( dgun2869 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "myarcaderetromicro_s29gl128p11tfiv1_0001227e.bin", 0x00000, 0x1000000, CRC(5e7fded2) SHA1(cf55ae7a128e3254a22933150caf94e269303ffb) ) // 29GL128
-	ROM_IGNORE(0x100)
+	ROM_LOAD( "myarcaderetromicro_s29gl128p11tfiv1_0001227e.bin", 0x00000, 0x1000000, CRC(bd43b1ba) SHA1(81ffbcdb264e61ed385cc0ee748241a759b3f2b5) ) // 29GL128
 ROM_END
 
 ROM_START( dgun2959 )
