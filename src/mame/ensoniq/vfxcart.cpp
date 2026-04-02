@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "vfxcart.h"
 
-//#define VERBOSE 1
+// #define VERBOSE 1
 #include "logmacro.h"
 
 
@@ -16,7 +16,7 @@ ensoniq_vfx_cartridge::ensoniq_vfx_cartridge(
 		u32 clock)
 	: device_t(mconfig, ENSONIQ_VFX_CARTRIDGE, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
-	, m_state(state::IDLE)
+	, m_eeprom(*this, "eeprom")
 {
 }
 
@@ -26,20 +26,26 @@ ensoniq_vfx_cartridge::~ensoniq_vfx_cartridge()
 
 void ensoniq_vfx_cartridge::device_start()
 {
-	m_storage = std::make_unique<uint8_t []>(SIZE);
+}
+
+void ensoniq_vfx_cartridge::device_add_mconfig(machine_config &config)
+{
+	X28F256(config, m_eeprom);
 }
 
 u8 ensoniq_vfx_cartridge::read(offs_t offset)
 {
-	m_state = state::IDLE;
-	auto v = m_storage[offset & MASK];
-	if (offset > 0x7f00)
-		LOG("R %04x -> %02x\n", offset, v);
-	return v;
+	if (!m_is_loaded)
+		return 0xff;
+
+	return m_eeprom->read(offset & MASK);
 }
 
 void ensoniq_vfx_cartridge::write(offs_t offset, u8 data)
 {
+	if (!m_is_loaded)
+		return;
+
 	if (!m_is_writeable)
 	{
 		if (offset > 0x7f00)
@@ -47,47 +53,7 @@ void ensoniq_vfx_cartridge::write(offs_t offset, u8 data)
 		return;
 	}
 
-	// The Ensoniq VFX family use the common EEPROM software write protection scheme
-	// to protect their EEPROM cartridges from accidental writes.
-	// But they do it in a simplistic way:
-	// Each byte is written individually using a separate Enable Write Protection
-	// command sequence.
-	// This means that in a real EEPROM, writing each byte takes an additional
-	// T_BLC + T_WC ~= 5ms - for each byte. Writing an entire cartridge thus will take
-	// approximately 32000 * 5ms = 160 seconds = 3 minutes.
-	// However, to determine when they can write the next byte, the VFX family also
-	// read the just-written byte back: The EEPROM's "Toggle Bit Polling"
-	// and "/DATA Polling" facilities will keep returning something other than the written
-	// byte until the byte has been successfully written.
-	// Here, we can actually immediately write any written bytes to storage, and use
-	// the client's reading of the value to signal the end of the write cycle.
-	switch (m_state)
-	{
-		case state::IDLE:
-			if (offset == 0x5555 && data == 0xaa)
-				m_state = state::CMD1;
-			else
-				m_state = state::IDLE;
-			break;
-		case state::CMD1:
-			if (offset == 0x2aaa && data == 0x55)
-				m_state = state::CMD2;
-			else
-				m_state = state::IDLE;
-			break;
-		case state::CMD2:
-			if (offset == 0x5555 && data == 0xa0)
-				m_state = state::WR;
-			else
-				m_state = state::IDLE;
-			break;
-
-		case state::WR:
-			if (offset > 0x7f00)
-				LOG("W %04x :  %02x\n", offset, data);
-			m_storage[offset] = data;
-			break;
-	}
+	m_eeprom->write(offset & MASK, data);
 }
 
 void ensoniq_vfx_cartridge::setup_load_cb(load_cb cb)
@@ -102,10 +68,13 @@ void ensoniq_vfx_cartridge::setup_unload_cb(unload_cb cb)
 
 std::pair<std::error_condition, std::string> ensoniq_vfx_cartridge::call_load()
 {
-	std::fill_n(&m_storage[0], SIZE, 0);
+	m_eeprom->reset();
+
+	auto &storage = m_eeprom->data();
+	std::fill_n(&storage[0], SIZE, 0);
 
 	LOG("Loading cartridge data from '%s'\n", filename());
-	auto n = fread(&m_storage[0], SIZE);
+	auto n = fread(&storage[0], SIZE);
 	fseek(0, SEEK_END);
 	if (n < SIZE || ftell() != SIZE)
 		return std::make_pair(image_error::INVALIDLENGTH, "Invalid size, must be 32KiB");
@@ -117,8 +86,12 @@ std::pair<std::error_condition, std::string> ensoniq_vfx_cartridge::call_load()
 	m_is_writeable = !is_readonly() && (filetype() == "eeprom" || filetype() == "sc32"); // Ensoniq StorCart-32
 	LOG("- loaded %d bytes, cartridge is %s\n", n, m_is_writeable ? "Writeable" : "Read-Only");
 
-	if (!m_load_cb.isnull())
+	if (!m_load_cb.isnull()) {
+		LOG("- calling load callback\n");
 		m_load_cb(this);
+	}
+
+	m_is_loaded = true;
 
 	return std::make_pair(std::error_condition(), std::string());
 }
@@ -126,11 +99,14 @@ std::pair<std::error_condition, std::string> ensoniq_vfx_cartridge::call_load()
 std::pair<std::error_condition, std::string> ensoniq_vfx_cartridge::call_create(int format_type, util::option_resolution *format_options)
 {
 	LOG("Creating empty cartridge data in '%s'\n", filename());
-	std::fill_n(&m_storage[0], SIZE, 0);
-	m_storage[0x7ffe] = 0x05;
-	m_storage[0x7fff] = 0x01;
+	m_eeprom->reset();
+
+	auto &storage = m_eeprom->data();
+	std::fill_n(&storage[0], SIZE, 0);
+	storage[0x7ffe] = 0x05;
+	storage[0x7fff] = 0x01;
 	fseek(0, SEEK_SET);
-	fwrite(&m_storage[0], SIZE);
+	fwrite(&storage[0], SIZE);
 
 	// By definition, if we create a cartridge image, is kind of has to be a writable one: a completely empty
 	// read-only cartridge makes no sense!
@@ -140,25 +116,36 @@ std::pair<std::error_condition, std::string> ensoniq_vfx_cartridge::call_create(
 	m_is_writeable = true;
 
 	// Creating a cartridge also loads it.
-	if (!m_load_cb.isnull())
+	if (!m_load_cb.isnull()) {
+		LOG("- calling load callback\n");
 		m_load_cb(this);
+	}
+
+	m_is_loaded = true;
 
 	return std::make_pair(std::error_condition(), std::string());
 }
 
 void ensoniq_vfx_cartridge::call_unload()
 {
+	m_eeprom->reset();
+	auto &storage = m_eeprom->data();
+
 	// If the current file is writable and is a writeable (EEPROM) file, write the data back
 	LOG("Unloading cartridge '%s'\n", filename());
 	if (!is_readonly() && m_is_writeable)
 	{
 		LOG("Writing cartridge data to '%s'\n", filename());
 		fseek(0, SEEK_SET);
-		fwrite(&m_storage[0], SIZE);
+		fwrite(&storage[0], SIZE);
 	}
 
-	if (!m_unload_cb.isnull())
+	if (!m_unload_cb.isnull()) {
+		LOG("- calling unload callback\n");
 		m_unload_cb(this);
+	}
 
-	std::fill_n(&m_storage[0], SIZE, 0);
+	m_is_loaded = false;
+
+	std::fill_n(&storage[0], SIZE, 0xff);
 }

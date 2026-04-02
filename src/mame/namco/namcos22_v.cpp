@@ -342,10 +342,11 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
-	const int color = node->data.quad.color;
 	const int cz_value = node->data.quad.cz_value;
 	const int cz_type = node->data.quad.cz_type;
 	const int cz_adjust = node->data.quad.cz_adjust;
+	const int color2 = cz_adjust >> 16 & 0xff;
+	const int color = node->data.quad.color | color2;
 	const int objectflags = node->data.quad.objectflags;
 
 	namcos22_object_data &extra = object_data().next();
@@ -437,17 +438,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 			extra.shade_enabled = false;
 		}
 		else
-		{
-			// unknown masking? timecris sets pen to 0x3a at the helicopter when it definitely wants 0x1a
-			extra.pens += (cz_adjust >> 16 & 0x7f) & (color | 0x1f);
-		}
-	}
-
-	// disable poly fog
-	if (BIT(cz_adjust, 23))
-	{
-		extra.zfog_enabled = false;
-		extra.fogfactor = 0;
+			extra.pens += color2;
 	}
 
 	if (m_state.m_is_ss22)
@@ -1256,7 +1247,7 @@ void namcos22_state::blit_polyobject(int code, float m[4][4])
 		blit_quads(object_addr, chunklength, m);
 	}
 
-	// flag applies to single object (see timecris stage 1-3 car)
+	// flag applies to single object (see timecris stage 1-3 car bonnet)
 	m_objectflags &= ~2;
 }
 

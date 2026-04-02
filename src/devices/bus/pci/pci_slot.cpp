@@ -11,6 +11,8 @@
 #include "clgd543x_alpine.h"
 #include "clgd5446.h"
 #include "clgd546x_laguna.h"
+#include "cmi8738.h"
+#include "cs4281.h"
 #include "ds2416.h"
 #include "ess_maestro.h"
 #include "geforce.h"
@@ -35,6 +37,7 @@
 #include "vision.h"
 #include "vt6306.h"
 #include "wd9710_pci.h"
+#include "ymf740c.h"
 #include "zr36057.h"
 
 
@@ -145,11 +148,16 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("wd9710",         WD9710_PCI);
 
 	// 0x04 - multimedia controllers
+	// sound cards
 	device.option_add("sw1000xg",       SW1000XG);
 	device.option_add("ds2416",         DS2416);
+	device.option_add("ymf740c",        YMF740C);
 	device.option_add("sonicvibes",     SONICVIBES);
 	device.option_add("ess_solo1",      ES1946_SOLO1E);
 	device.option_add("4dwavedx",       TRIDENT_4DWAVEDX);
+	device.option_add("cmi8738",        CMI8738);
+	device.option_add("cs4281",         CS4281);
+	// non-sound
 	device.option_add("zr36057",        ZR36057_PCI);
 	device.option_add("audiowerk2",     AUDIOWERK2);
 

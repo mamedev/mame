@@ -19,6 +19,8 @@
 #include "debug/textbuf.h"
 #include "debugger.h"
 
+#include <span>
+
 
 namespace {
 
@@ -293,18 +295,7 @@ void lua_engine::initialize_debug(sol::table &emu)
 						maxparams,
 						[this, cb = sol::protected_function(m_lua_state, execute)] (int numparams, u64 const *paramlist) -> u64
 						{
-							// TODO: C++20 will make this obsolete
-							class helper
-							{
-							private:
-								u64 const *b, *e;
-							public:
-								helper(int n, u64 const *p) : b(p), e(p + n) { }
-								auto begin() const { return b; }
-								auto end() const { return e; }
-							};
-
-							auto status(invoke(cb, sol::as_args(helper(numparams, paramlist))));
+							auto status(invoke(cb, sol::as_args(std::span<u64 const>(paramlist, paramlist + numparams))));
 							if (status.valid())
 							{
 								auto result = status.get<std::optional<u64> >();

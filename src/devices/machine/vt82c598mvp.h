@@ -42,6 +42,8 @@ protected:
 	required_device<cpu_device> m_host_cpu;
 	std::vector<uint32_t> m_ram;
 
+	virtual u8 smi_bank() const { return 3; }
+
 private:
 	virtual uint8_t capptr_r() override;
 
@@ -106,6 +108,8 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	virtual void config_map(address_map &map) override ATTR_COLD;
+
+	virtual u8 smi_bank() const override { return 0; }
 
 private:
 	u8 m_bios_scratch[8];

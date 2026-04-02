@@ -249,9 +249,9 @@ void validate_inlines()
 		osd_printf_error("Error testing mulu_32x32_shift (%08X x %08X) >> 7 = %08X (expected %08X)\n", u32(testu32a), u32(testu32b), resultu32, expectedu32);
 
 	while (s64(testi32a) * s64(0x7fffffff) < testi64a)
-		testi64a /= 2;
+		testi64a = testi64a / 2;
 	while (u64(testu32a) * u64(bigu32) < testu64a)
-		testu64a /= 2;
+		testu64a = testu64a / 2;
 
 	resulti32 = div_64x32(testi64a, testi32a);
 	expectedi32 = testi64a / s64(testi32a);
@@ -286,9 +286,9 @@ void validate_inlines()
 		osd_printf_error("Error testing modu_64x32 (%16X / %08X) = %08X (expected %08X)\n", u64(testu64a), u32(testu32a), resultu32, expectedu32);
 
 	while (s64(testi32a) * s64(0x7fffffff) < (s32(testi64a) << 3))
-		testi64a /= 2;
+		testi64a = testi64a / 2;
 	while (u64(testu32a) * u64(0xffffffff) < (u32(testu64a) << 3))
-		testu64a /= 2;
+		testu64a = testu64a / 2;
 
 	resulti32 = div_32x32_shift(s32(testi64a), testi32a, 3);
 	expectedi32 = (s64(s32(testi64a)) << 3) / s64(testi32a);
@@ -327,7 +327,7 @@ void validate_inlines()
 		if (resultu32l != expected32)
 			osd_printf_error("Error testing rotl_32 %08x, %d=%08x (expected %08x)\n", u32(testu32a), -i, resultu32l, expected32);
 
-		expected32 = expected32 >> 1 | expected32 << 31;
+		expected32 = (expected32 >> 1) | (expected32 << 31);
 	}
 
 	u64 expected64 = testu64a << 1 | testu64a >> 63;
@@ -341,7 +341,7 @@ void validate_inlines()
 		if (resultu64l != expected64)
 			osd_printf_error("Error testing rotl_64 %016x, %d=%016x (expected %016x)\n", u64(testu64a), -i, resultu64l, expected64);
 
-		expected64 = expected64 >> 1 | expected64 << 63;
+		expected64 = (expected64 >> 1) | (expected64 << 63);
 	}
 }
 

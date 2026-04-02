@@ -549,15 +549,13 @@ void cio_base_device::write_register(offs_t offset, u8 data)
 		break;
 
 	case PORT_A_DATA:
-		// TODO: take data path polarity into account
 		m_output[PORT_A] = data;
-		m_write_pa(data);
+		m_write_pa(data ^ m_register[PORT_A_DATA_PATH_POLARITY]);
 		break;
 
 	case PORT_B_DATA:
-		// TODO: take data path polarity into account
 		m_output[PORT_B] = data;
-		m_write_pb(data);
+		m_write_pb(data ^ m_register[PORT_B_DATA_PATH_POLARITY]);
 		break;
 
 	case PORT_C_DATA:
@@ -566,8 +564,7 @@ void cio_base_device::write_register(offs_t offset, u8 data)
 
 		m_output[PORT_C] = (m_output[PORT_C] & mask) | ((data & 0x0f) & (mask ^ 0xff));
 
-		// TODO: take data path polarity into account
-		m_write_pc(m_output[PORT_C]);
+		m_write_pc(m_output[PORT_C] ^ m_register[PORT_C_DATA_PATH_POLARITY]);
 		}
 		break;
 
@@ -866,12 +863,15 @@ void cio_base_device::match_pattern(int port)
 	u8 pt = m_register[PORT_A_PATTERN_TRANSITION + (port << 3)];
 	u8 pp = m_register[PORT_A_PATTERN_POLARITY + (port << 3)];
 
+	u8 dpp = m_register[PORT_A_DATA_PATH_POLARITY + (port << 3)];
+
 	if (pt) {
 		logerror("%s: Z8536 Port %c Pattern Transition mode not implemented\n", machine().describe_context(), 'A' + port);
 		return;
 	}
 
 	u8 data = (m_input[port] & ddr) | (m_output[port] & ~ddr);
+	data ^= dpp;
 	u8 match = 0;
 
 	for (int bit = 0; bit < 8; bit++) {

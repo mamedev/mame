@@ -4171,6 +4171,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/x28.h,MACHINES["X28"] = true
+---------------------------------------------------
+
+if MACHINES["X28"] then
+	files {
+		MAME_DIR .. "src/devices/machine/x28.cpp",
+		MAME_DIR .. "src/devices/machine/x28.ipp",
+		MAME_DIR .. "src/devices/machine/x28.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/x76f041.h,MACHINES["X76F041"] = true
 ---------------------------------------------------
 

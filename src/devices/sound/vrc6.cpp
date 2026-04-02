@@ -8,8 +8,8 @@
     Emulation by R. Belmont
 
     References:
-    http://wiki.nesdev.com/w/index.php/VRC6_audio
-    http://nesdev.com/vrcvi.txt
+    https://www.nesdev.org/wiki/VRC6_audio
+    https://www.nesdev.org/vrcvi.txt
 
 ***************************************************************************/
 

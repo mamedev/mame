@@ -34,7 +34,6 @@ TODO:
 - find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
 - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
 - propcycl attract mode, when the altar button is pressed, global fade should affect the background sprite
-- slavesim_handle_233002 is not fully understood, objectshift and the flag to disable fog are obvious, the others are unclear
 - polygon position problems? (also has glitches on real hw, but not as bad)
   + timecris stage 1-2 start, beam appears through platform
   + timecris stage 2-1 final section, steel beam appears through plank

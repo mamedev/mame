@@ -19,6 +19,10 @@
     0000 0001               reset (keyboard responds with self test pass/fail)
     0000 0010               bell on (480us period)
     0000 0011               bell off
+    0000 0100               turn on LED 1 (type 2 only?)
+    0000 0101               turn off LED 1 (type 2 only?)
+    0000 0110               turn on LED 2 (type 2 only?)
+    0000 0111               turn off LED 2 (type 2 only?)
     0000 1010               enable keyclick (5ms duration 480us period on make)
     0000 1011               disable keyclick
     0000 1110  ---k lscn    LED (1 = on: k = kana, l = caps lock, s = scroll lock, c = compose, n = num lock)
@@ -737,6 +741,44 @@ private:
 
 
 /***************************************************************************
+    TYPE 2 HLE KEYBOARD DEVICE
+***************************************************************************/
+
+class hle_type2_device : public hle_device_base
+{
+public:
+	hle_type2_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			uint32_t clock)
+		: hle_device_base(
+				mconfig,
+				SUN_TYPE2_HLE_KEYBOARD,
+				tag,
+				owner,
+				clock)
+	{
+	}
+
+protected:
+	virtual ioport_constructor device_input_ports() const override
+	{
+		// TODO: are type 2 and 3 identical?
+		return INPUT_PORTS_NAME(hle_type3_device);
+	}
+
+private:
+	// return identification byte for self test pass response
+	virtual uint8_t ident_byte() override
+	{
+		return 0x02U;
+	}
+};
+
+
+
+/***************************************************************************
     TYPE 3 HLE KEYBOARD DEVICE
 ***************************************************************************/
 
@@ -1227,6 +1269,7 @@ void hle_device_base::received_byte(uint8_t byte)
     DEVICE TYPE GLOBALS
 ***************************************************************************/
 
+DEFINE_DEVICE_TYPE_PRIVATE(SUN_TYPE2_HLE_KEYBOARD,    bus::sunkbd::hle_device_base, bus::sunkbd::hle_type2_device,    "kbd_type2_hle",    "Sun Type 2 Keyboard (HLE)")
 DEFINE_DEVICE_TYPE_PRIVATE(SUN_TYPE3_HLE_KEYBOARD,    bus::sunkbd::hle_device_base, bus::sunkbd::hle_type3_device,    "kbd_type3_hle",    "Sun Type 3 Keyboard (HLE)")
 DEFINE_DEVICE_TYPE_PRIVATE(SUN_TYPE4_HLE_KEYBOARD,    bus::sunkbd::hle_device_base, bus::sunkbd::hle_type4_device,    "kbd_type4_hle",    "Sun Type 4 Keyboard (HLE)")
 DEFINE_DEVICE_TYPE_PRIVATE(SUN_TYPE5_HLE_KEYBOARD,    bus::sunkbd::hle_device_base, bus::sunkbd::hle_type5_device,    "kbd_type5_hle_us", "Sun Type 5 Keyboard (U.S.A. - HLE)")

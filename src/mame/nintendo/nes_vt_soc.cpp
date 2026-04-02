@@ -328,7 +328,9 @@ u8 nes_vt02_vt03_soc_device::vt03_410x_r(offs_t offset)
 }
 
 
-// Source: https://wiki.nesdev.com/w/index.php/NES_2.0_submappers/Proposals#NES_2.0_Mapper_256
+// Source:
+// - https://www.nesdev.org/wiki/NES_2.0_submappers#NES_2.0_Mapper_256
+// - https://www.nesdev.org/wiki/NES_2.0_Mapper_256
 
 void nes_vt02_vt03_soc_device::scrambled_410x_w(u16 offset, u8 data)
 {

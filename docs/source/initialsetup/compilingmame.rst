@@ -8,9 +8,9 @@ Compiling MAME
 All Platforms
 -------------
 
-* To compile MAME, you need a C++17 compiler and runtime library.  We
-  support building with GCC version 10.3 or later and clang version 11
-  or later.  MAME should run with GNU libstdc++ version 10.3 or later or
+* To compile MAME, you need a C++20 compiler and runtime library.  We
+  support building with GCC version 11 or later and clang version 11 or
+  later.  MAME should run with GNU libstdc++ version 11 or later or
   libc++ version 11 or later.  The initial release of any major version
   of GCC should be avoided.  For example, if you want to compile MAME
   with GCC 12, you should use version 12.1 or later.
@@ -83,17 +83,11 @@ sources in parallel::
 Microsoft Windows
 -----------------
 
-MAME for Windows is built using the MSYS2 environment.  You will need Windows 7
-or later and a reasonably up-to-date MSYS2 installation.  We strongly recommend
-building MAME on a 64-bit system.  Instructions may need to be adjusted for
-32-bit systems.  Building for 64-bit ARM (AArch64) requires a 64-bit ARM system
-running Windows 11 or later.
+MAME for Windows is built using the MSYS2 environment.  You will need a 64-bit
+version of Windows 10 or later and a reasonably up-to-date MSYS2 installation.
+Building for 64-bit ARM (AArch64) requires a 64-bit ARM system running
+Windows 11 or later.
 
-* A pre-packaged MSYS2 installation including the prerequisites for building
-  MAME for 64-bit x86-64 can be downloaded from the `MAME Build Tools
-  <http://mamedev.org/tools/>`_ page.
-* After initial installation, you can update the MSYS2 environment using the
-  **pacman** (Arch package manage) command.
 * By default, MAME will be built using native Windows OS interfaces for
   window management, audio/video output, font rendering, etc.  If you want to
   use the portable SDL (Simple DirectMedia Layer) interfaces instead, you can
@@ -107,20 +101,22 @@ running Windows 11 or later.
 Using a standard MSYS2 installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You may also build MAME using a standard MSYS2 installation and adding the tools
-needed for building MAME.  These instructions assume you have some familiarity
-with MSYS2 and the **pacman** package manager.
+MAME is built for Windows using a standard MSYS2 installation with additional
+packages installed to provide the development tools needed for building MAME.
+These instructions assume you have some familiarity with MSYS2 and the
+**pacman** package manager.
 
 * Install the MSYS2 environment from  the `MSYS2 homepage
   <https://www.msys2.org/>`_.
-* Download the latest version of the ``mame-essentials`` package from the
-  `MAME package repository <https://repo.mamedev.org/x86_64/>`_ and install it
-  using the **pacman** command.
-* Add the ``mame`` package repository to ``/etc/pacman.conf`` using
-  ``/etc/pacman.d/mirrorlist.mame`` for locations, and disable signature
-  verification for this repository (``SigLevel = Never``).
+* Optionally download the latest version of the ``mame-essentials`` package from
+  the `MAME package repository <https://repo.mamedev.org/x86_64/>`_ and install
+  it using the **pacman** command.
+* If you installed the ``mame-essentials`` package, add the ``mame`` package
+  repository to ``/etc/pacman.conf`` using ``/etc/pacman.d/mirrorlist.mame`` for
+  locations, and disable signature verification for this repository
+  (``SigLevel = Never``).
 * Install packages necessary to build MAME.  At the very least, you’ll need
-  ``bash``, ``git``, ``make``.
+  ``bash``, ``git`` and ``make``.
 * For debugging you may want to install ``gdb``.
 * To build the HTML user/developer documentation, you’ll need
   ``mingw-w64-x86_64-librsvg``, ``mingw-w64-x86_64-python-sphinx``,
@@ -142,7 +138,7 @@ with MSYS2 and the **pacman** package manager.
 The additional packages you’ll need depend on the CPU architecture you’re
 building for.
 
-**64-bit x86-64**
+**64-bit x86-64 (libstdc++/MSVCRT)**
 
 * You’ll need ``mingw-w64-x86_64-gcc`` and ``mingw-w64-x86_64-python``.
 * To link using the LLVM linker (generally much faster than the GNU linker),
@@ -155,7 +151,35 @@ building for.
   **MSYS2 MinGW 64-bit** shortcut from the start menu to start a Bash shell
   configured with the correct paths and environment variables.
 
-**32-bit x86**
+**64-bit x86-64 (libc++/ucrt)**
+
+* You’ll need ``mingw-w64-clang-x86_64-clang``,
+  ``mingw-w64-clang-x86_64-python`` and ``mingw-w64-clang-x86_64-gcc-compat``.
+* To link using the LLVM linker (generally much faster than the GNU linker),
+  you’ll need ``mingw-w64-clang-x86_64-lld``, ``mingw-w64-clang-x86_64-llvm``
+  and ``mingw-w64-clang-x86_64-libc++``.
+* To build against the portable SDL interfaces, you’ll need
+  ``mingw-w64-clang-x86_64-SDL2`` and ``mingw-w64-clang-x86_64-SDL2_ttf``.
+* To build the Qt debugger, you’ll need ``mingw-w64-clang-x86_64-qt5``.
+* Open the **clang64.exe** helper from the **msys64** installation folder or use
+  the **MSYS2 CLANG64** shortcut to start a Bash shell configured with the
+  correct paths and environment variables.
+
+**64-bit ARM (libc++/ucrt)**
+
+* You’ll need ``mingw-w64-clang-aarch64-clang``,
+  ``mingw-w64-clang-aarch64-python`` and ``mingw-w64-clang-aarch64-gcc-compat``.
+* To link using the LLVM linker (generally much faster than the GNU linker),
+  you’ll need ``mingw-w64-clang-aarch64-lld``, ``mingw-w64-clang-aarch64-llvm``
+  and ``mingw-w64-clang-aarch64-libc++``.
+* To build against the portable SDL interfaces, you’ll need
+  ``mingw-w64-clang-aarch64-SDL2`` and ``mingw-w64-clang-aarch64-SDL2_ttf``.
+* To build the Qt debugger, you’ll need ``mingw-w64-clang-aarch64-qt5``.
+* Open the **clangarm64.exe** helper from the **msys64** installation folder or
+  use the **MSYS2 CLANGARM64** shortcut to start a Bash shell configured with
+  the correct paths and environment variables.
+
+**32-bit x86 (libstdc++/MSVCRT)**
 
 * You’ll need ``mingw-w64-i686-gcc`` and ``mingw-w64-i686-python``.
 * To link using the LLVM linker (generally much faster than the GNU linker),
@@ -167,20 +191,6 @@ building for.
 * Open the **mingw32.exe** helper from the **msys64** installation folder or the
   **MSYS2 MinGW 32-bit** shortcut from the start menu to start a Bash shell
   configured with the correct paths and environment variables.
-
-**64-bit ARM (AArch64)**
-
-* You’ll need ``mingw-w64-clang-aarch64-clang``,
-  ``mingw-w64-clang-aarch64-python`` and ``mingw-w64-clang-aarch64-gcc-compat``.
-* To link using the LLVM linker (generally much faster than the GNU linker),
-  you’ll need ``mingw-w64-clang-aarch64-lld``, ``mingw-w64-clang-aarch64-llvm``
-  and ``mingw-w64-clang-aarch64-libc++``.
-* To build against the portable SDL interfaces, you’ll need
-  ``mingw-w64-clang-aarch64-SDL2`` and ``mingw-w64-clang-aarch64-SDL2_ttf``.
-* To build the Qt debugger, you’ll need ``mingw-w64-clang-aarch64-qt5``.
-* Open the **clangarm64.exe** helper from the **msys64** installation folder to
-  start a Bash shell configured with the correct paths and environment
-  variables.
 
 For example you could use these commands to ensure you have the packages you
 need to compile MAME, omitting the ones for configurations you don’t plan to
@@ -795,23 +805,6 @@ omitted).
 Issues affecting Microsoft Visual Studio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Microsoft introduced a new version of XAudio2 with Windows 8 that’s incompatible
-with the version included with DirectX for prior Windows versions at the API
-level.  Newer versions of the Microsoft Windows SDK include headers and libraries
-for the new version of XAudio2.  By default, the target Windows version is set to
-Windows Vista (6.0) when compiling MAME, which prevents the use of this version
-of the XAudio2 headers and libraries.  To build MAME with XAudio2 support using
-the Microsoft Windows SDK, you must do one of the following:
-
-* Add ``MODERN_WIN_API=1`` to the options passed to make when generating the
-  Visual Studio project files.  This will set the target Windows version to
-  Windows 8 (6.2).  The resulting binaries may not run on earlier versions of
-  Windows.
-* Install the `DirectX SDK <https://www.microsoft.com/en-US/download/details.aspx?id=6812>`_ (already included since Windows 8.0 SDK and
-  automatically installed with Visual Studio 2013 and later).  Configure the
-  **osd_windows** project to search the DirectX header/library paths before
-  searching the Microsoft Windows SDK paths.
-
 The MSVC compiler produces spurious warnings about potentially uninitialised
 local variables.  You currently need to add ``NOWERROR=1`` to the options passed
 to make when generating the Visual Studio project files.  This stops warnings
@@ -873,7 +866,7 @@ Using a GCC/GNU libstdc++ installation in a non-standard location on Linux
 GCC may be built and installed to a custom location, typically by supplying the
 **--prefix=** option to the **configure** command.  This may be useful if you
 want to build MAME on a Linux distribution that still uses a version of GNU
-libstdC++ that predates C++17 support.  To use an alternate GCC installation to,
+libstdc++ that predates C++20 support.  To use an alternate GCC installation to
 build MAME, set the C and C++ compilers to the full paths to the **gcc** and
 **g++** commands, and add the library path to the run-time search path.  If you
 installed GCC in /opt/local/gcc72, you might use a command like this::

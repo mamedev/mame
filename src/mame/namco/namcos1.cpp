@@ -410,7 +410,7 @@ void namcos1_state::virtual_map(address_map &map)
 	map(0x2fc000, 0x2fc7ff).ram().share("scratchpad");
 	map(0x2fc800, 0x2fcfff).m(m_spritegen, FUNC(namcos1_sprite_device::spriteram_map));
 	map(0x2fd000, 0x2fd01f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control8_r), FUNC(namco_c123tmap_device::control8_w)).mirror(0xfe0);
-	map(0x2fe000, 0x2fe3ff).rw("namco", FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)).mirror(0xc00); /* PSG ( Shared ) */
+	map(0x2fe000, 0x2fe3ff).m("namco", FUNC(namco_cus30_device::amap)).mirror(0xc00); /* PSG ( Shared ) */
 	map(0x2ff000, 0x2ff7ff).ram().share(m_triram).mirror(0x800);
 	map(0x300000, 0x307fff).ram();
 	map(0x400000, 0x7fffff).rom().region("mainrom", 0);
@@ -421,7 +421,7 @@ void namcos1_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).bankr(m_soundbank); /* Banked ROMs */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::write));
-	map(0x5000, 0x53ff).rw("namco", FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)).mirror(0xc00); /* PSG ( Shared ) */
+	map(0x5000, 0x53ff).m("namco", FUNC(namco_cus30_device::amap)).mirror(0xc00); /* PSG ( Shared ) */
 	map(0x7000, 0x77ff).ram().share(m_triram).mirror(0x800);
 	map(0x8000, 0x9fff).ram(); /* Sound RAM 3 */
 	map(0xa000, 0xa000).nopr();
@@ -1056,7 +1056,7 @@ void namcos1_state::ns1(machine_config &config)
 
 	NAMCO_C123TMAP(config, m_c123tmap, 0);
 	m_c123tmap->set_palette(m_c116);
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos1_state::TilemapCB, this));
+	m_c123tmap->set_tile_callback(FUNC(namcos1_state::TilemapCB));
 	m_c123tmap->set_color_base(0x0800);
 	m_c123tmap->set_offset(73, 16);
 	m_c123tmap->set_tmap3_half_height();
@@ -1070,8 +1070,7 @@ void namcos1_state::ns1(machine_config &config)
 	ymsnd.add_route(1, "speaker", 0.50, 1);
 
 	namco_cus30_device &cus30(NAMCO_CUS30(config, "namco", XTAL(49'152'000)/2048/2));
-	cus30.set_voices(8);
-	cus30.set_stereo(1);
+	cus30.set_stereo(true);
 	cus30.add_route(0, "speaker", 0.50, 0);
 	cus30.add_route(1, "speaker", 0.50, 1);
 

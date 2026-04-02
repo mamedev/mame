@@ -186,8 +186,8 @@ public:
 			{ \
 				static inline constexpr char const *const shortname = #NAME; \
 				static inline constexpr char const *const source = __FILE__; \
-				static inline constexpr char const *manufacturer = (COMPANY); \
-				static constexpr char const fullname[] = (FULLNAME); \
+				static inline constexpr auto const *const manufacturer = (COMPANY); \
+				static constexpr std::remove_reference_t<decltype((FULLNAME)[0])> const fullname[] = (FULLNAME); \
 			}; \
 			constexpr decltype(GAME_TRAITS_NAME(NAME)::fullname) GAME_TRAITS_NAME(NAME)::fullname; \
 		}
@@ -257,7 +257,7 @@ extern game_driver const GAME_NAME(NAME)                                \
 	GAME_DRIVER_TYPE(NAME, CLASS, FLAGS),                               \
 	#PARENT,                                                            \
 	#YEAR,                                                              \
-	GAME_TRAITS_NAME(NAME)::manufacturer,                               \
+	(const char *)GAME_TRAITS_NAME(NAME)::manufacturer,                 \
 	[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
 	INPUT_PORTS_NAME(INPUT),                                            \
 	[] (device_t &owner) { downcast<CLASS &>(owner).INIT(); },          \
@@ -329,7 +329,7 @@ extern game_driver const GAME_NAME(NAME)                                \
 	GAME_DRIVER_TYPE(NAME, CLASS, FLAGS),                               \
 	#PARENT,                                                            \
 	#YEAR,                                                              \
-	GAME_TRAITS_NAME(NAME)::manufacturer,                               \
+	(const char *)GAME_TRAITS_NAME(NAME)::manufacturer,                 \
 	[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
 	INPUT_PORTS_NAME(INPUT),                                            \
 	[] (device_t &owner) { downcast<CLASS &>(owner).INIT(); },          \
@@ -395,7 +395,7 @@ extern game_driver const GAME_NAME(NAME)                                \
 			GAME_DRIVER_TYPE(NAME, CLASS, FLAGS),                               \
 			#PARENT,                                                            \
 			#YEAR,                                                              \
-			GAME_TRAITS_NAME(NAME)::manufacturer,                               \
+			(const char *)GAME_TRAITS_NAME(NAME)::manufacturer,                 \
 			[] (machine_config &config, device_t &owner) { downcast<CLASS &>(owner).MACHINE(config); }, \
 			INPUT_PORTS_NAME(INPUT),                                            \
 			[] (device_t &owner) { downcast<CLASS &>(owner).INIT(); },          \
