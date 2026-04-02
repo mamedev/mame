@@ -124,7 +124,6 @@ TODO:
 
 #include "emu.h"
 #include "sprite013.h"
-#include "screen.h"
 
 DEFINE_DEVICE_TYPE(SPRITE013, sprite013_device, "sprite013", "013 Sprite generator")
 
@@ -215,17 +214,21 @@ void sprite013_device::videoregs_w(offs_t offset, u16 data, u16 mem_mask)
 	// offset 0x6c or 0x7c is encryption key or CRTC or something else?
 	// offset 0x6e is commonly communication when sound CPU exists
 	// other registers unknown
-	if (offset != 0x00 &&
-		offset != 0x02 &&
-		offset != 0x04 &&
-		offset != 0x06 &&
-		offset != 0x08 &&
-		offset != 0x0a &&
-		offset != 0x68 &&
-		offset != 0x6e &&
-		offset != 0x78)
-		logerror("%s: Unknown videoregs written %04X = %04X & %04X\n",
-			machine().describe_context(), offset, data, mem_mask);
+	switch (offset)
+	{
+	case 0x00:
+	case 0x02:
+	case 0x04:
+	case 0x06:
+	case 0x08:
+	case 0x0a:
+	case 0x68:
+	case 0x6e:
+	case 0x78:
+		break;
+	default:
+		logerror("%s: Unknown videoregs written %04X = %04X & %04X\n", machine().describe_context(), offset, data, mem_mask);
+	}
 }
 
 void sprite013_device::get_sprite_info(const rectangle &cliprect)
