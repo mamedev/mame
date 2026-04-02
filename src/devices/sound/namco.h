@@ -16,9 +16,9 @@ public:
 	void sound_enable_w(int state);
 
 protected:
-	static constexpr unsigned MAX_VOICES = Voices;
-	static constexpr unsigned MAX_VOLUME = 16;
-	static constexpr int32_t MIX_RES = 128 * MAX_VOICES;
+	static inline constexpr unsigned MAX_VOICES = Voices;
+	static inline constexpr unsigned MAX_VOLUME = 16;
+	static inline constexpr int32_t MIX_RES = 128 * MAX_VOICES;
 
 	// this structure defines the parameters for a channel
 	struct sound_channel
@@ -36,12 +36,12 @@ protected:
 
 	namco_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	// device_memory_interface overrides
-	virtual space_config_vector memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
 
 	virtual void sound_stream_update(sound_stream &stream) override;
 
@@ -86,7 +86,7 @@ public:
 	void pacman_sound_w(offs_t offset, uint8_t data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	virtual void sound_stream_update(sound_stream &stream) override;
@@ -105,7 +105,7 @@ public:
 	void polepos_sound_w(offs_t offset, uint8_t data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	virtual void sound_stream_update(sound_stream &stream) override;
@@ -123,7 +123,7 @@ public:
 	void amap(address_map &map) ATTR_COLD;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	virtual void sound_stream_update(sound_stream &stream) override;
@@ -147,7 +147,7 @@ public:
 	void amap(address_map &map) ATTR_COLD;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	virtual void sound_stream_update(sound_stream &stream) override;
