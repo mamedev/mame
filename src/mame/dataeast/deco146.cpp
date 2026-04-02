@@ -1201,7 +1201,7 @@ void deco_146_base_device::write_data(u16 address, u16 data, u16 mem_mask, u8 &c
 u16 deco_146_base_device::read_protport(u16 address)
 {
 	// if we read the last written address immediately after then ignore all other logic and just return what was written unmodified
-	if (((address == m_latchaddr) && (m_latchflag == 1)))
+	if ((address == m_latchaddr) && (m_latchflag == 1))
 	{
 		if (!machine().side_effects_disabled())
 		{
@@ -1214,12 +1214,13 @@ u16 deco_146_base_device::read_protport(u16 address)
 	if (!machine().side_effects_disabled())
 		m_latchflag = 0;
 
-	if (m_magic_read_address_xor_enabled) address ^= m_magic_read_address_xor;
+	if (m_magic_read_address_xor_enabled)
+		address ^= m_magic_read_address_xor;
 
 	int location = 0;
 	u16 realret = read_data_getloc(address, location);
 
-	if ((location == m_bankswitch_swap_read_address) && (!machine().side_effects_disabled())) // this has a special meaning
+	if ((location == m_bankswitch_swap_read_address) && !machine().side_effects_disabled()) // this has a special meaning
 	{
 		//LOGPROT("%s: (bankswitch) %04x\n", machine().describe_context(), address);
 
