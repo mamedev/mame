@@ -342,10 +342,11 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
-	const int color = node->data.quad.color;
 	const int cz_value = node->data.quad.cz_value;
 	const int cz_type = node->data.quad.cz_type;
 	const int cz_adjust = node->data.quad.cz_adjust;
+	const int color2 = cz_adjust >> 16 & 0xff;
+	const int color = node->data.quad.color | color2;
 	const int objectflags = node->data.quad.objectflags;
 
 	namcos22_object_data &extra = object_data().next();
@@ -430,28 +431,14 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		extra.texture_enabled = false;
 		extra.cmode = 0;
 
-		// pen is from cz_adjust
-		const u8 shift = (objectflags & 4) ? 0 : (objectflags & 2) ? 8 : 16;
-		u8 pen = cz_adjust >> shift;
-
 		if (objectflags & 6)
 		{
-			// absolute pen, and shading is disabled
-			extra.pens = &m_state.m_palette->pen(pen);
+			// absolute pen from cz_adjust, and shading is disabled
+			extra.pens = &m_state.m_palette->pen(cz_adjust & 0x7fff);
 			extra.shade_enabled = false;
 		}
 		else
-		{
-			// unknown masking? timecris sets pen to 0x3a at the helicopter when it definitely wants 0x1a
-			extra.pens += pen & 0x7f & (color | 0x1f);
-		}
-	}
-
-	// disable poly fog
-	if (BIT(cz_adjust, 23))
-	{
-		extra.zfog_enabled = false;
-		extra.fogfactor = 0;
+			extra.pens += color2;
 	}
 
 	if (m_state.m_is_ss22)
@@ -1260,7 +1247,7 @@ void namcos22_state::blit_polyobject(int code, float m[4][4])
 		blit_quads(object_addr, chunklength, m);
 	}
 
-	// flag applies to single object (see timecris stage 1-3 car)
+	// flag applies to single object (see timecris stage 1-3 car bonnet)
 	m_objectflags &= ~2;
 }
 
@@ -1416,8 +1403,7 @@ void namcos22_state::slavesim_handle_233002(const s32 *src)
 	    00800000: alpinr2b cancel fogging on selection screen
 	    00800000: raverace cancel fogging on sky in attract mode
 		--xx----: pen when textures are disabled with objectflags 003fffff
-		----xx--: pen when textures are disabled with objectflags 005fffff?
-		------xx: pen when textures are disabled with objectflags 009fffff
+		----xxxx: pen when textures are disabled with objectflags 005fffff / 009fffff
 
 	    objectshift:
         00800000: set at same time as objectflags 009fffff
@@ -1430,7 +1416,7 @@ void namcos22_state::slavesim_handle_233002(const s32 *src)
 	    003fffff: timecris shoot helicopter (white, but shading enabled)
 	    005fffff: timecris shoot other destructible object (opaque white, 1 object)
 	    009fffff: cybrcomm shoot enemy with machine gun (opaque white)
-	    009fffff: acedrive name entry screen (opaque color from cz_adjust lower bits)
+	    009fffff: acedrive/victlap name entry screen (opaque color from cz_adjust lower bits)
 	*/
 	m_cz_adjust = src[1] & 0xffffff;
 	m_objectshift = src[2] & 0xffffff;

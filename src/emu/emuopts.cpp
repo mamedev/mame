@@ -357,7 +357,7 @@ namespace
 	class existing_option_tracker
 	{
 	public:
-		existing_option_tracker(const std::unordered_map<std::string, T> &map)
+		existing_option_tracker(const util::transparent_string_unordered_map<std::string, T> &map)
 		{
 			m_vec.reserve(map.size());
 			for (const auto &entry : map)
@@ -1027,15 +1027,13 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 
 const slot_option *emu_options::find_slot_option(std::string_view device_name) const
 {
-	// TODO: get rid of temporary std::string when we have C++20
-	auto const iter = m_slot_options.find(std::string(device_name));
+	auto const iter = m_slot_options.find(device_name);
 	return (iter != m_slot_options.end()) ? &iter->second : nullptr;
 }
 
 slot_option *emu_options::find_slot_option(std::string_view device_name)
 {
-	// TODO: get rid of temporary std::string when we have C++20
-	auto const iter = m_slot_options.find(std::string(device_name));
+	auto const iter = m_slot_options.find(device_name);
 	return (iter != m_slot_options.end()) ? &iter->second : nullptr;
 }
 
@@ -1066,16 +1064,14 @@ slot_option &emu_options::slot_option(std::string_view device_name)
 
 const image_option &emu_options::image_option(std::string_view device_name) const
 {
-	// TODO: get rid of temporary std::string when we have C++20
-	auto const iter = m_image_options.find(std::string(device_name));
+	auto const iter = m_image_options.find(device_name);
 	assert(iter != m_image_options.end() && "Attempt to access non-existent image option");
 	return *iter->second;
 }
 
 image_option &emu_options::image_option(std::string_view device_name)
 {
-	// TODO: get rid of temporary std::string when we have C++20
-	auto const iter = m_image_options.find(std::string(device_name));
+	auto const iter = m_image_options.find(device_name);
 	assert(iter != m_image_options.end() && "Attempt to access non-existent image option");
 	return *iter->second;
 }

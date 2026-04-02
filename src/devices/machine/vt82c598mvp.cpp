@@ -452,7 +452,9 @@ void vt82c598mvp_host_device::map_extra(
 	// 01 SMI DRAM always mapped (overlays VGA)
 	// 10 <reserved>
 	// 11 SMI DRAM on SMM
-	if ((smi_mapping == 3 && m_smiact == 0) || smi_mapping == 1)
+	// HACK: function is for '691, that actually uses code/data separation for SMI DRAM
+	// (never setup shadow RAM control[2] bits 0-1)
+	if ((smi_mapping == smi_bank() && m_smiact == 0) || smi_mapping == 1)
 	{
 		memory_space->install_ram      (0x000a0000, 0x000bffff, &m_ram[0x000a0000/4]);
 	}

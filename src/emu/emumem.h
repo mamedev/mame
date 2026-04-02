@@ -18,10 +18,12 @@
 #define MAME_EMU_EMUMEM_H
 
 #include "notifier.h"
+#include "coretmpl.h"
 
 #include <cstdlib>
 #include <optional>
 #include <set>
+#include <string_view>
 #include <type_traits>
 
 using s8 = std::int8_t;
@@ -2714,24 +2716,24 @@ public:
 	running_machine &machine() const { return m_machine; }
 
 	// used for the debugger interface memory views
-	const std::unordered_map<std::string, std::unique_ptr<memory_bank>> &banks() const { return m_banklist; }
-	const std::unordered_map<std::string, std::unique_ptr<memory_region>> &regions() const { return m_regionlist; }
-	const std::unordered_map<std::string, std::unique_ptr<memory_share>> &shares() const { return m_sharelist; }
+	const util::transparent_string_unordered_map<std::string, std::unique_ptr<memory_bank>> &banks() const { return m_banklist; }
+	const util::transparent_string_unordered_map<std::string, std::unique_ptr<memory_region>> &regions() const { return m_regionlist; }
+	const util::transparent_string_unordered_map<std::string, std::unique_ptr<memory_share>> &shares() const { return m_sharelist; }
 
 	// anonymous memory zones
 	void *anonymous_alloc(address_space &space, size_t bytes, u8 width, offs_t start, offs_t end, const std::string &key = "");
 
 	// shares
 	memory_share *share_alloc(device_t &dev, std::string name, u8 width, size_t bytes, endianness_t endianness);
-	memory_share *share_find(std::string name);
+	memory_share *share_find(std::string_view name);
 
 	// banks
 	memory_bank *bank_alloc(device_t &device, std::string tag);
-	memory_bank *bank_find(std::string tag);
+	memory_bank *bank_find(std::string_view tag);
 
 	// regions
 	memory_region *region_alloc(std::string name, u32 length, u8 width, endianness_t endian);
-	memory_region *region_find(std::string name);
+	memory_region *region_find(std::string_view name);
 	void region_free(std::string name);
 
 private:
@@ -2740,10 +2742,10 @@ private:
 	// internal state
 	running_machine &           m_machine;              // reference to the machine
 
-	std::vector<std::unique_ptr<void, stdlib_deleter>>               m_datablocks;           // list of memory blocks to free on exit
-	std::unordered_map<std::string, std::unique_ptr<memory_bank>>    m_banklist;             // map of banks
-	std::unordered_map<std::string, std::unique_ptr<memory_share>>   m_sharelist;            // map of shares
-	std::unordered_map<std::string, std::unique_ptr<memory_region>>  m_regionlist;           // map of memory regions
+	std::vector<std::unique_ptr<void, stdlib_deleter>>                                   m_datablocks;           // list of memory blocks to free on exit
+	util::transparent_string_unordered_map<std::string, std::unique_ptr<memory_bank>>    m_banklist;             // map of banks
+	util::transparent_string_unordered_map<std::string, std::unique_ptr<memory_share>>   m_sharelist;            // map of shares
+	util::transparent_string_unordered_map<std::string, std::unique_ptr<memory_region>>  m_regionlist;           // map of memory regions
 
 	// Allocate the address spaces
 	void allocate(device_memory_interface &memory);

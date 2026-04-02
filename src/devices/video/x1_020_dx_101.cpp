@@ -16,6 +16,7 @@
     used by:
     - namco/namcoeva.cpp
     - namco/funcube.cpp
+    - namco/sg_vga.cpp
     - seta/seta2.cpp
 
     TODO:
@@ -256,22 +257,27 @@ uint16_t x1_020_dx_101_device::vregs_r(offs_t offset)
 	return m_vregs[offset];
 }
 
+/*
+   00 horizontal sync
+   02/04 = horizontal display start/end
+           mj4simai = 0065/01E5 (0180 visible area)
+           myangel =  005D/01D5 (0178 visible area)
+           pzlbowl =  0058/01D8 (0180 visible area)
+           penbros =  0065/01A5 (0140 visible area)
+           grdians =  0059/0188 (012f visible area)
+   06    = horizontal total?
+           mj4simai = 0204
+           myangel =  0200
+           pzlbowl =  0204
+           penbros =  01c0
+           grdians =  019a
+   08 = vertical sync
+   0a/0c = vertical display start/end
+   0e = vertical total
+   cfr. "Monitor Position Set" in hplanet analyzer
+*/
 void x1_020_dx_101_device::vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	/* 02/04 = horizontal display start/end
-	           mj4simai = 0065/01E5 (0180 visible area)
-	           myangel =  005D/01D5 (0178 visible area)
-	           pzlbowl =  0058/01D8 (0180 visible area)
-	           penbros =  0065/01A5 (0140 visible area)
-	           grdians =  0059/0188 (012f visible area)
-	   06    = horizontal total?
-	           mj4simai = 0204
-	           myangel =  0200
-	           pzlbowl =  0204
-	           penbros =  01c0
-	           grdians =  019a
-	*/
-
 	const uint16_t olddata = m_vregs[offset];
 
 	COMBINE_DATA(&m_vregs[offset]);
@@ -455,7 +461,7 @@ inline void x1_020_dx_101_device::drawgfx_line(
 		{ 0xff, 0, 0 }, // 3: unverified case, mimic old driver behavior of only using lowest bit  (staraudi question bubble: pen %00011000 with shadow on!)
 		{ 0x0f, 0, 3 }, // 4: eagle shot 4bpp birdie text
 		{ 0xf0, 4, 4 }, // 5: eagle shot 4bpp japanese text
-		{ 0x3f, 0, 5 }, // 6: common 6bpp case + keithlcy (logo), drifto94 (wheels) masking  ) (myangel sliding blocks test)
+		{ 0x3f, 0, 5 }, // 6: common 6bpp case + keithlcy (logo), drifto94 (wheels masking), myangel (sliding blocks test)
 		{ 0xff, 0, 8 }, // 7: common 8bpp case
 	};
 

@@ -250,13 +250,15 @@ void gridcomp_state::grid_modem_w(offs_t offset, uint8_t data)
 
 void gridcomp_state::grid_sound_w(offs_t offset, uint8_t data)
 {
-	if (offset & 0b01) {
+	if (offset & 0b0001)
+	{
 		LOG("VOLUME DAC <- %02x\n", data);
 		// Not supported.
 	}
 
 	// GRiD makes sounds when writing to dfe4:2 or dfe4:4.
-	if (offset & 0b110) {
+	if (offset & 0b0110)
+	{
 		LOG("SOUND DAC <- %02x\n", data);
 		m_dac->write(data);
 	}

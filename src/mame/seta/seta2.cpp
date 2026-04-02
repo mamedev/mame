@@ -3828,7 +3828,7 @@ Inputs: Allumer X1-004 546100    (SDIP52)
         3.6v Battery (@ BT1)
         93C46 EEPROM (@ U101)
         SW1 Push Button Reset
-        NEC DX-102               (52 Pin PQFP @ U8)
+        NEC DX-102 (52 Pin PQFP @ U8)
 
 Memory:
 M1 are TC551001BFL-70L at U56 & U57

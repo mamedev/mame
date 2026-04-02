@@ -116,12 +116,11 @@ Notes:
   TD62083 - Toshiba TD62083 8-Channel Darlington Sink Driver
     PC410 - Sharp PC410 Photocoupler
    PS2801 - NEC PS2801-4 Photocoupler
-   DX-102 - NEC DX-102 custom chip used for graphics generation
+   DX-102 - NEC DX-102 custom chip (unknown usage)
    DX-101 - NEC DX-101 custom chip used for graphics generation
 
 TODO:
 - everything, driver-wise
-- device-fy DX-101 / DX-102 emulation found in seta/seta2_v.cpp
 ***********************************************************************************/
 
 
@@ -129,6 +128,7 @@ TODO:
 
 #include "cpu/sh/sh7042.h"
 #include "sound/x1_010.h"
+#include "video/x1_020_dx_101.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -143,60 +143,115 @@ class sg_vga_state : public driver_device
 public:
 	sg_vga_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_video(*this, "video"),
+		m_in(*this, "IN%u", 0U)
 	{ }
 
 	void sg_vga(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<sh7043a_device> m_maincpu;
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<x1_020_dx_101_device> m_video;
+	required_ioport_array<6> m_in;
 
 	void program_map(address_map &map) ATTR_COLD;
 };
-
-
-uint32_t sg_vga_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
 
 
 void sg_vga_state::program_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x200000, 0x27ffff).rom().region("external_prg", 0);
+	// initializes in $42xxxx, reads in $43xxxx in "backup ram test"
+	map(0x420000, 0x427fff).mirror(0x8000).ram().share("nvram");
+	map(0x430000, 0x437fff).mirror(0x8000).ram().share("nvram");
+	map(0x440000, 0x440003).lr32(
+		NAME([this] () { return 0xff00ff00 | (m_in[1]->read() << 16) | m_in[0]->read(); })
+	);
+	// RMW, unknown purpose
+//	map(0x440004, 0x440007).lr32(NAME([] () { return 0xffff'ffff; }));
+	map(0x460000, 0x460003).lr32(
+		NAME([this] () { return 0xff00ff00 | (m_in[3]->read() << 16) | m_in[2]->read(); })
+	);
+	map(0x460004, 0x460007).lr32(
+		NAME([this] () { return 0xff00ff00 | (m_in[5]->read() << 16) | m_in[4]->read(); })
+	);
 	map(0x4e0000, 0x4effff).ram();
-	map(0x800000, 0x83ffff).ram().share("spriteram"); // ?
-	map(0x840000, 0x84ffff).ram().share("palette"); // ?
-	map(0x860000, 0x86003f).ram().share("vregs"); // ?
+	map(0x500000, 0x503fff).rw("x1snd", FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));
+	map(0x800000, 0x83ffff).rw(m_video, FUNC(x1_020_dx_101_device::spriteram_r), FUNC(x1_020_dx_101_device::spriteram_w)); // ?
+	map(0x840000, 0x84ffff).ram().w("palette", FUNC(palette_device::write32)).share("palette"); // ?
+	map(0x860000, 0x86003f).rw(m_video, FUNC(x1_020_dx_101_device::vregs_r), FUNC(x1_020_dx_101_device::vregs_w)); // ?
 }
 
 
 static INPUT_PORTS_START( hplanet )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x01, 0x01, "IN0" ) // used in sound test (?)
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) // analyzer, needs being held
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("White Button (Choose)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Red Button (Enter)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Gun") // TODO: intelligible
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) // hopper
+	PORT_DIPNAME( 0x20, 0x20, "IN1" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) // ticket
 
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW01:1")
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x01, 0x01, "IN3-DSW" ) PORT_DIPLOCATION("DSW01:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW01:2")
@@ -217,47 +272,93 @@ static INPUT_PORTS_START( hplanet )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW01:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW01:8")
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "DSW01:8" )
+
+	PORT_START("IN4")
+	PORT_DIPNAME( 0x01, 0x01, "IN4" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN5")
+	PORT_DIPNAME( 0x01, 0x01, "IN5" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-
-static const gfx_layout tile_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(7*8, -8) },
-	{ STEP8(0, 1) },
-	{ STEP8(0, 8*8) },
-	8*8*8
-};
-
-
-/*  Tiles are 8bpp, but the hardware is additionally able to discard
-    some bitplanes and use the low 4 bits only, or the high 4 bits only */
-static GFXDECODE_START( gfx_dx_10x )
-	GFXDECODE_ENTRY( "sprites", 0, tile_layout, 0, 0x8000 / 16 )   // 8bpp, but 4bpp color granularity
-GFXDECODE_END
-
-
+// 3 irqs:
+// 0 vblank
+// 1 may be raster irq like other Namco games (unused?)
+// 2 unknown
 void sg_vga_state::sg_vga(machine_config &config)
 {
 	// basic machine hardware
 	SH7043A(config, m_maincpu, 7.3728_MHz_XTAL * 4); // actually SH7045
 	m_maincpu->set_addrmap(AS_PROGRAM, &sg_vga_state::program_map);
+//	m_maincpu->read_portd().set_constant(0xffff'ffff);
+//	m_maincpu->read_porte().set_constant(0xffff);
+//	m_maincpu->read_portf().set_constant(0xffff);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(0x200, 0x100);
-	screen.set_visarea(0x00, 0x140-1, 0x00, 0xe0-1);
-	screen.set_screen_update(FUNC(sg_vga_state::screen_update));
+	screen.set_size(0x25a, 0x1b6); // 0x2c 0x58 0x22a 0x25a / 0x06 0x21 0x191 0x1b6
+	screen.set_visarea(0x00, 0x1d2-1, 0x00, 0x170-1);
+	screen.set_screen_update(m_video, FUNC(x1_020_dx_101_device::screen_update));
+	screen.screen_vblank().set(m_video, FUNC(x1_020_dx_101_device::screen_vblank));
+	screen.screen_vblank().append_inputline(m_maincpu, 0);
 	screen.set_palette("palette");
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_dx_10x);
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x8000 + 0xf0); // extra 0xf0 because we might draw 256-color object with 16-color granularity
+
+	X1_020_DX_101(config, m_video, XTAL(60'000'000)); // or 70MHz? unverified
+	m_video->set_palette("palette");
+	m_video->set_screen("screen");
+	//m_video->raster_irq_callback().set_inputline(m_maincpu, 1, HOLD_LINE);
+	m_video->flip_screen_callback().set(FUNC(sg_vga_state::flip_screen_set));
+	m_video->flip_screen_x_callback().set(FUNC(sg_vga_state::flip_screen_x_set));
+	m_video->flip_screen_y_callback().set(FUNC(sg_vga_state::flip_screen_y_set));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -274,17 +375,17 @@ ROM_START( hplanet )
 	ROM_REGION32_BE( 0x80000, "external_prg", 0 )
 	ROM_LOAD16_WORD_SWAP( "hp1_mpr-0a.u02", 0x00000, 0x80000, CRC(83dd903f) SHA1(37ca41f8423bcf6e7ae422a5a6e1aef0e52a38cc) )
 
-	ROM_REGION( 0x2000000, "sprites", 0 )
-	ROM_LOAD64_WORD( "hp1_obj-1a.u01", 0x000000, 0x800000, CRC(124f99b9) SHA1(41970a06a95875688f8bc21465a5bbd80b8cf8ce) )
-	ROM_LOAD64_WORD( "hp1_obj-0a.u02", 0x000002, 0x800000, CRC(597e179c) SHA1(5130c5f4f7f8b3c730363ff843440fa5f059663c) )
-	ROM_LOAD64_WORD( "hp1_obj-3a.u03", 0x000004, 0x800000, CRC(17eeb4fd) SHA1(3bc30cd8f6a43d4aee9cd2da119dbab66c99565e) )
-	ROM_LOAD64_WORD( "hp1_obj-2a.u04", 0x000006, 0x800000, CRC(31f71432) SHA1(b572045af0c0ad54df72d9396168be004c07f7f7) )
+	ROM_REGION( 0x2000000, "video", 0 )
+	ROM_LOAD64_WORD( "hp1_obj-1a.u01", 0x000002, 0x800000, CRC(124f99b9) SHA1(41970a06a95875688f8bc21465a5bbd80b8cf8ce) )
+	ROM_LOAD64_WORD( "hp1_obj-0a.u02", 0x000000, 0x800000, CRC(597e179c) SHA1(5130c5f4f7f8b3c730363ff843440fa5f059663c) )
+	ROM_LOAD64_WORD( "hp1_obj-3a.u03", 0x000006, 0x800000, CRC(17eeb4fd) SHA1(3bc30cd8f6a43d4aee9cd2da119dbab66c99565e) )
+	ROM_LOAD64_WORD( "hp1_obj-2a.u04", 0x000004, 0x800000, CRC(31f71432) SHA1(b572045af0c0ad54df72d9396168be004c07f7f7) )
 
-	ROM_REGION( 0x400000, "x1snd", 0 )
+	ROM_REGION( 0x400000, "x1snd", 0 ) // TODO: bankswitched?
 	ROM_LOAD( "hp1_snd-0a.u42", 0x000000, 0x400000, CRC(a78b01e5) SHA1(20e904a2e01a7e40c037a7c4ab9bd1b4e9054c4d) )
 ROM_END
 
 } // anonymous namespace
 
 
-GAME( 2001, hplanet, 0, sg_vga, hplanet, sg_vga_state, empty_init, ROT0, "Namco", "Happy Planet", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, hplanet, 0, sg_vga, hplanet, sg_vga_state, empty_init, ROT0, "Namco", "Happy Planet (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

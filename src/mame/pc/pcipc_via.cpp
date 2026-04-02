@@ -25,7 +25,7 @@
  *   (don't want long memory test);
  *
  * TODO (ga6vx)
- * - Has SMI problems, doesn't set m_shadow_ram_control[2] at all (?)
+ * - Has SMI problems, doesn't set m_shadow_ram_control[2] at all (worked around in chipset)
  *
  * TODO (ct6vta2)
  * - Currently maps a keyboard from southbridge and from Super I/O, clashing each other;
@@ -480,4 +480,4 @@ COMP(1998, zidabx98,    0,     0, apollopro,   0, mvp3_state, empty_init, "Zida"
 COMP(1998, ga6vx,       0,     0, ga6vx,       0, mvp3_state, empty_init, "Gigabyte",   "GA-6VX (VIA Apollo Pro chipset)", MACHINE_NOT_WORKING )
 
 // Apollo Pro+ chipset + 596
-COMP(1999, ct6vta2,     0,     0, ct6vta2,  0, mvp3_state, empty_init, "Chaintech",  "CT-6VTA2 (VIA Apollo Pro+ chipset)", MACHINE_NOT_WORKING ) // a.k.a. Houston M869C
+COMP(1999, ct6vta2,     0,     0, ct6vta2,     0, mvp3_state, empty_init, "Chaintech",  "CT-6VTA2 (VIA Apollo Pro+ chipset)", MACHINE_NOT_WORKING ) // a.k.a. Houston M869C

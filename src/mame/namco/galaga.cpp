@@ -615,7 +615,7 @@ Notes:
   other sets have autofire built-in.
 
 - the bosconian video system is (apart from the starfield) almost identical functionally
-  to Rally X, but the hardware is quite different: Rally X has no custom ICs.
+  to Rally-X, but the hardware is quite different: Rally-X has no custom ICs.
 
 - digdug: if you enter service mode and press press service coin something like
   the following is written at the bottom of the screen:

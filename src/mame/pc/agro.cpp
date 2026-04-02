@@ -12,7 +12,7 @@ DOS 6.21 on El Torito CD
 - PCChips/Hsin Tech M590 motherboard;
 - SiS5591 + SiS5595;
 - SiS 3D Pro on-board (SiS6326 equivalent);
-- SoundPro HT1869 on-board, CMI8330A/C3D equivalent;
+- SoundPro HT1869 on-board, CMI8330A/C3D equivalent (ISA PnP);
 - ITE IT8770F Super I/O, seems a minor undocumented upgrade from IT8661F (cfr. BIOS at $ffe90);
 - Unspecified RAM size, 384MB is the max;
 - 3x PCI + 2x ISA card slots;

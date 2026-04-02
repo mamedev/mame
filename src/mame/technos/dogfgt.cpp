@@ -357,7 +357,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dogfgt_state::interrupt)
 	const int scanline = param;
 
 	// 16 interrupts per frame
-	if ((scanline & 0xf) == 8 && scanline <= 248)
+	if (scanline < 256)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -545,7 +545,7 @@ void dogfgt_state::dogfgt(machine_config &config)
 	// basic machine hardware
 	M6502(config, m_maincpu, 12_MHz_XTAL / 8); // 1.5MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &dogfgt_state::main_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(dogfgt_state::interrupt), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(dogfgt_state::interrupt), "screen", 8, 16);
 
 	M6502(config, m_subcpu, 12_MHz_XTAL / 8); // 1.5MHz?
 	m_subcpu->set_addrmap(AS_PROGRAM, &dogfgt_state::sub_map);

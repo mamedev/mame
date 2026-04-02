@@ -2661,7 +2661,7 @@ void ioport_manager::load_system_config(
 					if (parent_device)
 					{
 						device_slot_interface const *slot;
-						if (parent_device->interface(slot) && (slot->option_list().find(std::string(child_tag)) != slot->option_list().end()))
+						if (parent_device->interface(slot) && (slot->option_list().find(child_tag) != slot->option_list().end()))
 						{
 							if (!m_deselected_card_config)
 								m_deselected_card_config = util::xml::file::create();

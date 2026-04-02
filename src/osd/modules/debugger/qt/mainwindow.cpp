@@ -67,7 +67,7 @@ MainWindow::MainWindow(DebuggerQt &debugger, QWidget *parent) :
 	m_breakpointEnableAct = new QAction("Disable Breakpoint at Cursor", this);
 	m_runToCursorAct = new QAction("Run to Cursor", this);
 	m_breakpointToggleAct->setShortcut(Qt::Key_F9);
-	m_breakpointEnableAct->setShortcut(Qt::SHIFT | Qt::Key_F9);
+	m_breakpointEnableAct->setShortcut(0 | Qt::SHIFT | Qt::Key_F9); // zero because C++20 doesn't allow arithmetic between different enums
 	m_runToCursorAct->setShortcut(Qt::Key_F4);
 	connect(m_breakpointToggleAct, &QAction::triggered, this, &MainWindow::toggleBreakpointAtCursor);
 	connect(m_breakpointEnableAct, &QAction::triggered, this, &MainWindow::enableBreakpointAtCursor);

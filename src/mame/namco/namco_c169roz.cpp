@@ -28,6 +28,7 @@ DEFINE_DEVICE_TYPE(NAMCO_C169ROZ, namco_c169roz_device, "namco_c169roz", "Namco 
 namco_c169roz_device::namco_c169roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NAMCO_C169ROZ, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
+	m_c169_cb(*this),
 	m_color_base(0),
 	m_is_namcofl(false),
 	m_mask(*this, "mask")
@@ -36,6 +37,8 @@ namco_c169roz_device::namco_c169roz_device(const machine_config &mconfig, const 
 
 void namco_c169roz_device::device_start()
 {
+	m_c169_cb.resolve_safe();
+
 	m_videoram.resize(m_ramsize);
 	std::fill(std::begin(m_videoram), std::end(m_videoram), 0x0000);
 

@@ -2194,7 +2194,7 @@ void dragngun_state::lockloadu(machine_config &config)
 void dragngun_state::namco_sprites(machine_config &config)
 {
 	NAMCO_C355SPR(config, m_sprgenzoom, 0);
-	m_sprgenzoom->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&dragngun_state::sprite_bank_callback, this));
+	m_sprgenzoom->set_tile_callback(FUNC(dragngun_state::sprite_bank_callback));
 	m_sprgenzoom->set_palette(m_palette);
 	m_sprgenzoom->set_transparent_pen(15);
 	m_sprgenzoom->set_colors(32);

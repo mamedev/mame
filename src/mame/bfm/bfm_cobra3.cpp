@@ -10,6 +10,7 @@
 
 
 #include "emu.h"
+
 #include "bus/nscsi/cd.h"
 #include "machine/68340.h"
 #include "machine/meters.h"
@@ -21,6 +22,7 @@
 #include "machine/scc66470.h"
 #include "machine/watchdog.h"
 #include "sound/ymz280b.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -30,36 +32,26 @@ namespace {
 class bfm_cobra3_state : public driver_device
 {
 public:
-	bfm_cobra3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_cpuregion(*this, "maincpu"),
-			m_nvram(*this, "nvram"),
-			m_ymz(*this, "ymz280b"),
-			m_palette(*this, "palette"),
-			m_ramdac(*this, "ramdac"),
-			m_scc66470(*this, "scc66470"),
-			m_strobein(*this, "STROBE%u", 0),
-			m_meters(*this, "meters"),
-			m_lamps(*this, "lamp%u", 0U),
-			m_scsibus(*this, "scsi"),
-			m_scsic(*this, "ncr5380"),
-			m_watchdog(*this, "watchdog")
+	bfm_cobra3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_cpuregion(*this, "maincpu"),
+		m_nvram(*this, "nvram"),
+		m_ymz(*this, "ymz280b"),
+		m_palette(*this, "palette"),
+		m_ramdac(*this, "ramdac"),
+		m_scc66470(*this, "scc66470"),
+		m_strobein(*this, "STROBE%u", 0),
+		m_meters(*this, "meters"),
+		m_lamps(*this, "lamp%u", 0U),
+		m_scsibus(*this, "scsi"),
+		m_scsic(*this, "ncr5380"),
+		m_watchdog(*this, "watchdog")
 	{ }
 
-	std::unique_ptr<uint16_t[]> m_mainram;
+	void bfm_cobra3(machine_config &config) ATTR_COLD;
 
-	void volume_control(uint8_t direction, uint8_t clock);
-	uint16_t mem_r(offs_t offset, uint16_t mem_mask = ~0);
-	void mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	void bfm_cobra3(machine_config &config);
-	void ramdac_map(address_map &map);
-	void bfm_cobra3_map(address_map &map) ATTR_COLD;
 protected:
-
 	// devices
 	required_device<m68340_cpu_device> m_maincpu;
 	required_region_ptr<uint16_t> m_cpuregion;
@@ -75,40 +67,53 @@ protected:
 	required_device<ncr5380_device> m_scsic;
 	required_device<watchdog_timer_device> m_watchdog;
 
+	std::unique_ptr<uint16_t[]> m_mainram;
+
 	uint8_t m_active_strobe;
 	uint8_t m_triac_latch;
 	uint8_t m_vol_clock;
 	uint8_t m_volume;
 
 	virtual void machine_start() override ATTR_COLD;
+
+	void volume_control(uint8_t direction, uint8_t clock);
+	uint16_t mem_r(offs_t offset, uint16_t mem_mask = ~0);
+	void mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	void dma1_drq(int state);
-	void scc66470_map(address_map &map);
 	void scc66470_irq(int state);
 
+	void bfm_cobra3_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void scc66470_map(address_map &map) ATTR_COLD;
 };
 
 void bfm_cobra3_state::volume_control(uint8_t direction, uint8_t clock)
 {
-	int clock_changed = m_vol_clock^clock;
+	int clock_changed = m_vol_clock ^ clock;
 
 	m_vol_clock = clock;
-	if ( clock_changed )
+	if (clock_changed)
 	{ // digital volume clock line changed
-		if ( !(clock) )
+		if (!clock)
 		{ // changed from high to low,
-			if ( !(direction) )
+			if (!direction)
 			{
-				if ( m_volume < 31 ) m_volume++; //0-31 expressed as 1-32
+				if (m_volume < 31)
+					m_volume++; //0-31 expressed as 1-32
 			}
 			else
 			{
-				if ( m_volume > 0  ) m_volume--;
+				if (m_volume > 0)
+					m_volume--;
 			}
 
-			float percent = (64 - m_volume) / 64.0f;
+			float fraction = (64 - m_volume) / 64.0f;
 
-			m_ymz->set_output_gain(0, percent);
-			m_ymz->set_output_gain(1, percent);
+			m_ymz->set_output_gain(0, fraction);
+			m_ymz->set_output_gain(1, fraction);
 		}
 	}
 }
@@ -117,7 +122,7 @@ uint16_t bfm_cobra3_state::mem_r(offs_t offset, uint16_t mem_mask)
 {
 	int cs = m_maincpu->get_cs(offset * 2);
 
-	switch ( cs )
+	switch (cs)
 	{
 		case 1: // ROM
 			return m_cpuregion[offset & 0x7ffff];
@@ -129,10 +134,10 @@ uint16_t bfm_cobra3_state::mem_r(offs_t offset, uint16_t mem_mask)
 				offset &= 0x7ff;
 				offs_t cs_addr_8_11 = (offset * 2) & 0xf00;
 
-				switch(cs_addr_8_11)
+				switch (cs_addr_8_11)
 				{
 					case 0x300: //YMZ stereo sound accesses
-						if(ACCESSING_BITS_0_7)
+						if (ACCESSING_BITS_0_7)
 						{
 							return m_ymz->read(offset & 1);
 						}
@@ -144,16 +149,16 @@ uint16_t bfm_cobra3_state::mem_r(offs_t offset, uint16_t mem_mask)
 							return m_strobein[m_active_strobe]->read();
 						}
 					case 0x500: //SCSI DMA
-						if(ACCESSING_BITS_8_15)
+						if (ACCESSING_BITS_8_15)
 						{
 							return m_scsic->dma_r() << 8;
 						}
 						break;
 
 					case 0x600: //Looks like the RAMDAC hookup
-						if(ACCESSING_BITS_0_7)
+						if (ACCESSING_BITS_0_7)
 						{
-							if((offset & 7) == 1)
+							if ((offset & 7) == 1)
 							{
 								return m_ramdac->pal_r();
 							}
@@ -168,14 +173,14 @@ uint16_t bfm_cobra3_state::mem_r(offs_t offset, uint16_t mem_mask)
 			break;
 
 		case 4: // SCSI controller
-				if(ACCESSING_BITS_8_15)
-				{
-					return(m_scsic->read(offset & 0x0f) << 8);
-				}
-				break;
+			if (ACCESSING_BITS_8_15)
+			{
+				return m_scsic->read(offset & 0x0f) << 8;
+			}
+			break;
 
 		default:
-				logerror("%s maincpu read access offset %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, mem_mask, cs);
+			logerror("%s maincpu read access offset %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, mem_mask, cs);
 	}
 
 	return 0x0000;
@@ -199,7 +204,7 @@ void bfm_cobra3_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			{
 				offset &= 0x7ff;
 				offs_t cs_addr_8_11 = (offset * 2) & 0xf00;
-				switch(cs_addr_8_11)
+				switch (cs_addr_8_11)
 				{
 					case 0x000:
 						logerror("%s maincpu write access lamp drive io latch offset %08x data %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, data, mem_mask, cs);
@@ -240,21 +245,21 @@ void bfm_cobra3_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 						break;
 
 					case 0x300:
-						if(ACCESSING_BITS_0_7)
+						if (ACCESSING_BITS_0_7)
 						{
 							m_ymz->write(offset & 1, data);
 						}
 						break;
 
 					case 0x500: // SCSI DMA
-						if(ACCESSING_BITS_8_15)
+						if (ACCESSING_BITS_8_15)
 						{
 							m_scsic->dma_w(data >> 8);
 						}
 						break;
 
 					case 0x700: // RAMDAC for palettes
-						if(ACCESSING_BITS_0_7)
+						if (ACCESSING_BITS_0_7)
 						{
 							offset &= 7;
 							switch (offset)
@@ -285,7 +290,7 @@ void bfm_cobra3_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 		case 4: // SCSI controller
 			offset &= 0x0f;
-			if(ACCESSING_BITS_8_15)
+			if (ACCESSING_BITS_8_15)
 			{
 				m_scsic->write(offset, data >> 8);
 			}
@@ -306,7 +311,7 @@ void bfm_cobra3_state::bfm_cobra3_map(address_map &map)
 
 void bfm_cobra3_state::ramdac_map(address_map &map)
 {
-	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+	map(0x000, 0x3ff).rw(m_ramdac, FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
 void bfm_cobra3_state::scc66470_map(address_map &map)
@@ -390,9 +395,9 @@ void bfm_cobra3_state::scc66470_irq(int state)
 
 uint32_t bfm_cobra3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if(m_scc66470->display_enabled())
+	if (m_scc66470->display_enabled())
 	{
-		if(cliprect.min_y == cliprect.max_y)
+		if (cliprect.min_y == cliprect.max_y)
 		{
 			uint32_t *dest = &bitmap.pix(cliprect.min_y);
 			uint8_t buffer[768];
@@ -401,7 +406,7 @@ uint32_t bfm_cobra3_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 
 			src = buffer;
 
-			if(*src == 254)
+			if (*src == 254)
 			{
 				// Other implementations suggest leaving transparency / MPEG border colour here to ease blending
 				src += 32;
@@ -416,9 +421,9 @@ uint32_t bfm_cobra3_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 
 			Just crop it out to fit, presume the chip does this IRL */
 
-			for(int x = 0 ; x < 352 ; x++)
+			for (int x = 0 ; x < 352 ; x++)
 			{
-				if(*src == 254)
+				if (*src == 254)
 				{
 					*dest++ = 0; // Will allow MPEG to be drawn i.e. transparent
 					src++;
@@ -428,7 +433,7 @@ uint32_t bfm_cobra3_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 					*dest++ = m_palette->pen(*src++);
 				}
 
-				if(*src == 254)
+				if (*src == 254)
 				{
 					*dest++ = 0; // This should be mpeg video pixel i.e. transparent
 					src++;
@@ -440,7 +445,7 @@ uint32_t bfm_cobra3_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 			}
 			// TODO: MPEG image will write a border of 32 pixels of mpeg border colour here when it's mixed in, see above.
 
-			if(*src != 254)
+			if (*src != 254)
 			{
 				std::fill_n(dest, 32, m_palette->pen(*src));
 			}
@@ -488,7 +493,7 @@ void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 	scsi.set_external_device(6, m_scsic);
 	m_scsic->drq_handler().set(DEVICE_SELF, FUNC(bfm_cobra3_state::dma1_drq));
 
-	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9)); //TODO: Check timings
+	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9)); //TODO: Check timings
 	METERS(config, m_meters, 0).set_number(4);
 }
 
@@ -585,7 +590,7 @@ ROM_START( c3_ppays )
 	DISK_IMAGE_READONLY( "95100315", 0, SHA1(fc76d3ab5ff38c2dc4f06399f5399a1ae3c136e9) )
 ROM_END
 
-}
+} // anonymous namespace
 
 GAME( 1995, c3_telly,  0, bfm_cobra3, bfm_cobra3, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (Bellfruit) (Cobra 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1995, c3_tellyns,0, bfm_cobra3, bfm_cobra3, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (New Series) (Bellfruit) (Cobra 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

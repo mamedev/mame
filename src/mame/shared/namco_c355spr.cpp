@@ -71,6 +71,7 @@ namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, device
 	device_t(mconfig, type, tag, owner, clock),
 	device_gfx_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
+	m_code2tile(*this, DEVICE_SELF, FUNC(namco_c355spr_device::default_code2tile)),
 	m_pri_cb(*this, DEVICE_SELF, FUNC(namco_c355spr_device::default_priority)),
 	m_mix_cb(*this, DEVICE_SELF, FUNC(namco_c355spr_device::default_mix)),
 	m_read_spritetile(*this, DEVICE_SELF, FUNC(namco_c355spr_device::read_spritetile)),
@@ -257,6 +258,7 @@ void namco_c355spr_device::device_start()
 	gfx(0)->set_colorbase(m_colbase);
 	gfx(0)->set_granularity(m_granularity);
 
+	m_code2tile.resolve();
 	m_pri_cb.resolve();
 
 	screen().register_screen_bitmap(m_renderbitmap);

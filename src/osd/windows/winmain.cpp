@@ -204,16 +204,11 @@ int main(int argc, char *argv[])
 	if (!isatty(fileno(stderr)))
 		setvbuf(stderr, (char *) nullptr, _IOFBF, 64);
 
-	{
-		// Disable legacy mouse to pointer event translation - it's broken:
-		// * No WM_POINTERLEAVE event when mouse pointer moves directly to an
-		//   overlapping window from the same process.
-		// * Still receive occasional WM_MOUSEMOVE events.
-		OSD_DYNAMIC_API(user32, "User32.dll", "User32.dll");
-		OSD_DYNAMIC_API_FN(user32, BOOL, WINAPI, EnableMouseInPointer, BOOL);
-		if (OSD_DYNAMIC_API_TEST(EnableMouseInPointer))
-			OSD_DYNAMIC_CALL(EnableMouseInPointer, FALSE);
-	}
+	// Disable legacy mouse to pointer event translation - it's broken:
+	// * No WM_POINTERLEAVE event when mouse pointer moves directly to an
+	//   overlapping window from the same process.
+	// * Still receive occasional WM_MOUSEMOVE events.
+	EnableMouseInPointer(FALSE);
 
 	// initialize common controls
 	InitCommonControls();

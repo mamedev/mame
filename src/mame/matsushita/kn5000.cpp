@@ -579,11 +579,11 @@ void kn5000_state::kn5000(machine_config &config)
 
 	// RX1/TX1 = CPDATA, SCLK1 = CPSCK — wired to control panel HLE
 	auto &cpanel(KN5000_CPANEL(config, "cpanel"));
-	m_maincpu->m_serial[1].lookup()->txd().set(cpanel, FUNC(kn5000_cpanel_device::rxd));
-	m_maincpu->m_serial[1].lookup()->sclk_out().set(cpanel, FUNC(kn5000_cpanel_device::sioclk));
-	m_maincpu->m_serial[1].lookup()->tx_start().set(cpanel, FUNC(kn5000_cpanel_device::tx_start));
-	cpanel.txd().set(m_maincpu->m_serial[1], FUNC(tmp94c241_serial_device::rxd));
-	cpanel.sclk_out().set(m_maincpu->m_serial[1], FUNC(tmp94c241_serial_device::sioclk));
+	m_maincpu->txd1().set(cpanel, FUNC(kn5000_cpanel_device::rxd));
+	m_maincpu->sclk1_out().set(cpanel, FUNC(kn5000_cpanel_device::sioclk));
+	m_maincpu->tx1_start().set(cpanel, FUNC(kn5000_cpanel_device::tx_start));
+	cpanel.txd().set(m_maincpu, FUNC(tmp94c241_device::rxd1));
+	cpanel.sclk_out().set(m_maincpu, FUNC(tmp94c241_device::sioclk1));
 	cpanel.inta().set([this] (int state) {
 		m_cpanel_inta = state;
 		m_maincpu->set_input_line(TLCS900_INTA, state ? ASSERT_LINE : CLEAR_LINE);

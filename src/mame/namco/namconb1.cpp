@@ -998,7 +998,7 @@ void namconb1_state::namconb1(machine_config &config)
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_palette(m_c116);
 	m_c355spr->set_scroll_offsets(0x26, 0x19);
-	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB1objcode2tile, this));
+	m_c355spr->set_tile_callback(FUNC(namconb1_state::NB1objcode2tile));
 	m_c355spr->set_mix_callback(FUNC(namconb1_state::sprite_mix_callback));
 	m_c355spr->set_buffer(2); // triple buffered
 	m_c355spr->set_color_base(0);
@@ -1006,7 +1006,7 @@ void namconb1_state::namconb1(machine_config &config)
 
 	NAMCO_C123TMAP(config, m_c123tmap);
 	m_c123tmap->set_palette(m_c116);
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namconb1_state::NB1TilemapCB, this));
+	m_c123tmap->set_tile_callback(FUNC(namconb1_state::NB1TilemapCB));
 	m_c123tmap->set_color_base(0x1000);
 
 	NAMCO_C116(config, m_c116);
@@ -1046,22 +1046,22 @@ void namconb2_state::machbrkr(machine_config &config)
 {
 	namconb2(config);
 
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namconb2_state::NB2TilemapCB_machbrkr, this));
+	m_c123tmap->set_tile_callback(FUNC(namconb2_state::NB2TilemapCB_machbrkr));
 
-	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namconb2_state::NB2RozCB_machbrkr, this));
+	m_c169roz->set_tile_callback(FUNC(namconb2_state::NB2RozCB_machbrkr));
 
-	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb2_state::NB2objcode2tile_machbrkr, this));
+	m_c355spr->set_tile_callback(FUNC(namconb2_state::NB2objcode2tile_machbrkr));
 }
 
 void namconb2_state::outfxies(machine_config &config)
 {
 	namconb2(config);
 
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namconb2_state::NB2TilemapCB_outfxies, this));
+	m_c123tmap->set_tile_callback(FUNC(namconb2_state::NB2TilemapCB_outfxies));
 
-	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namconb2_state::NB2RozCB_outfxies, this));
+	m_c169roz->set_tile_callback(FUNC(namconb2_state::NB2RozCB_outfxies));
 
-	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb2_state::NB2objcode2tile_outfxies, this));
+	m_c355spr->set_tile_callback(FUNC(namconb2_state::NB2objcode2tile_outfxies));
 }
 
 

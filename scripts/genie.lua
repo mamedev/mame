@@ -475,7 +475,6 @@ language "C++"
 
 flags {
 	"StaticRuntime",
-	"Cpp17",
 }
 
 	if not _OPTIONS["NOWERROR"] then
@@ -713,11 +712,11 @@ end
 
 local version = str_to_version(_OPTIONS["gcc_version"])
 	buildoptions_cpp {
-		"-std=c++17",
+		"-std=c++20",
 	}
 
 	buildoptions_objcpp {
-		"-std=c++17",
+		"-std=c++20",
 	}
 -- this speeds it up a bit by piping between the preprocessor/compiler/assembler
 	buildoptions {
@@ -1040,8 +1039,8 @@ end
 				}
 			end
 		else
-			if version < 100300 then
-				print("GCC version 10.3 or later needed")
+			if version < 110000 then
+				print("GCC version 11 or later needed")
 				os.exit(-1)
 			end
 			buildoptions_cpp {
@@ -1108,7 +1107,7 @@ configuration { "asmjs" }
 		"-s USE_SDL_TTF=2",
 	}
 	buildoptions_cpp {
-		"-std=c++17",
+		"-std=c++20",
 		"-s EXCEPTION_CATCHING_ALLOWED=\"['_ZN15running_machine17start_all_devicesEv','_ZN12cli_frontend7executeEiPPc','_ZN8chd_file11open_commonEb','_ZN8chd_file13read_metadataEjjRNSt3__212basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE','_ZN8chd_file13read_metadataEjjRNSt3__26vectorIhNS0_9allocatorIhEEEE','_ZNK19netlist_mame_device19base_validity_checkER16validity_checker']\"",
 	}
 	defines {
@@ -1295,6 +1294,7 @@ if _OPTIONS["vs"]==nil then
 
 		buildoptions_cpp {
 			"/Zc:__cplusplus",
+			"/std:c++20",
 		}
 
 		flags {
