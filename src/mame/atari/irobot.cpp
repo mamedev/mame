@@ -92,7 +92,7 @@
  *
  *************************************/
 
- template <int Line>
+template <int Line>
 void irobot_state::clearirq_w(u8 data)
 {
 	m_maincpu->set_input_line(Line, CLEAR_LINE);
