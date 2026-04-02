@@ -87,7 +87,7 @@ protected:
 			u8 xor_port,
 			u8 mask_port,
 			u8 sound_port,
-			/*u8 configregion,*/
+			u8 configregion,
 			deco146port_xx const *lookup_table);
 
 	virtual void device_start() override ATTR_COLD;
@@ -107,14 +107,14 @@ private:
 	u8 m_xor_port;
 	u8 m_mask_port;
 	u8 m_soundlatch_port;
-	//u8 m_configregion; // which value of upper 4 address lines accesses the config region
+	[[maybe_unused]] u8 m_configregion; // which value of upper 4 address lines accesses the config region
 
 	deco146port_xx const *m_lookup_table;
 
 	u8 m_external_addrswap[10];
 
 	// internal states
-	std::unique_ptr<u16[]> m_rambank[2];
+	u16 m_rambank[2][0x80];
 
 	u8 m_current_rambank;
 
