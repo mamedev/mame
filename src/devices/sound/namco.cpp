@@ -124,8 +124,6 @@ void namco_audio_device<Voices, Packed>::device_start()
 	// start with sound enabled, many games don't have a sound enable register
 	m_sound_enable = true;
 
-	save_item(NAME(m_sound_enable));
-
 	// reset all the voices
 	for (auto &voice : m_channel_list)
 	{
@@ -141,15 +139,17 @@ void namco_audio_device<Voices, Packed>::device_start()
 	}
 
 	// register with the save state system
-	save_pointer(STRUCT_MEMBER(m_channel_list, frequency), MAX_VOICES);
-	save_pointer(STRUCT_MEMBER(m_channel_list, counter), MAX_VOICES);
-	save_pointer(STRUCT_MEMBER(m_channel_list, volume), MAX_VOICES);
-	save_pointer(STRUCT_MEMBER(m_channel_list, noise_sw), MAX_VOICES);
-	save_pointer(STRUCT_MEMBER(m_channel_list, noise_state), MAX_VOICES);
-	save_pointer(STRUCT_MEMBER(m_channel_list, noise_seed), MAX_VOICES);
-	save_pointer(STRUCT_MEMBER(m_channel_list, noise_hold), MAX_VOICES);
-	save_pointer(STRUCT_MEMBER(m_channel_list, noise_counter), MAX_VOICES);
-	save_pointer(STRUCT_MEMBER(m_channel_list, waveform_select), MAX_VOICES);
+	save_item(NAME(m_sound_enable));
+
+	save_item(STRUCT_MEMBER(m_channel_list, frequency));
+	save_item(STRUCT_MEMBER(m_channel_list, counter));
+	save_item(STRUCT_MEMBER(m_channel_list, volume));
+	save_item(STRUCT_MEMBER(m_channel_list, noise_sw));
+	save_item(STRUCT_MEMBER(m_channel_list, noise_state));
+	save_item(STRUCT_MEMBER(m_channel_list, noise_seed));
+	save_item(STRUCT_MEMBER(m_channel_list, noise_hold));
+	save_item(STRUCT_MEMBER(m_channel_list, noise_counter));
+	save_item(STRUCT_MEMBER(m_channel_list, waveform_select));
 }
 
 
