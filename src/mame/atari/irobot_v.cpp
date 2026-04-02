@@ -11,8 +11,6 @@
 
 #include <algorithm>
 
-static constexpr u32 BITMAP_WIDTH = 256;
-
 #define LOG_VG    (1 << 1)
 
 #define VERBOSE (0)
@@ -20,6 +18,8 @@ static constexpr u32 BITMAP_WIDTH = 256;
 #include "logmacro.h"
 
 #define LOGVG(...)    LOGMASKED(LOG_VG, __VA_ARGS__)
+
+static constexpr u32 BITMAP_WIDTH = 256;
 
 /***************************************************************************
 
@@ -189,7 +189,7 @@ TILE_GET_INFO_MEMBER(irobot_state::get_tile_info)
 
 ***************************************************************************/
 
-static inline const offs_t get_bitmap_addr(int x, int y)
+constexpr offs_t get_bitmap_addr(int x, int y)
 {
 	return (y << 8) + x;
 }
@@ -247,7 +247,7 @@ void irobot_state::draw_line(u8 *polybitmap, int x1, int y1, int x2, int y2, int
 }
 
 
-static inline const int ROUND_TO_PIXEL(int x) { return (x >> 7) - 128; }
+constexpr int ROUND_TO_PIXEL(int x) { return (x >> 7) - 128; }
 
 void irobot_state::run_video()
 {
