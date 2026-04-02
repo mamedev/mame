@@ -42,14 +42,6 @@
 // quality parameter: internal sample rate is 192 KHz, output is 48 KHz
 static constexpr uint32_t INTERNAL_RATE = 192000;
 
-// constants
-template <unsigned Voices, bool Packed>
-constexpr unsigned namco_audio_device<Voices, Packed>::MAX_VOICES;
-template <unsigned Voices, bool Packed>
-constexpr unsigned namco_audio_device<Voices, Packed>::MAX_VOLUME;
-template <unsigned Voices, bool Packed>
-constexpr int32_t namco_audio_device<Voices, Packed>::MIX_RES;
-
 void namco_15xx_device::amap(address_map &map)
 {
 	map(0x000, 0x03f).rw(FUNC(namco_15xx_device::namco_15xx_r), FUNC(namco_15xx_device::namco_15xx_w));
@@ -319,27 +311,27 @@ void namco_wsg_device::pacman_sound_w(offs_t offset, uint8_t data)
 	sound_channel &voice = m_channel_list[ch];
 	switch (offset - ch * 5)
 	{
-		case 0x05:
-			voice.waveform_select = data & 7;
-			break;
+	case 0x05:
+		voice.waveform_select = data & 7;
+		break;
 
-		case 0x10:
-		case 0x11:
-		case 0x12:
-		case 0x13:
-		case 0x14:
-			// the frequency has 20 bits
-			// the first voice has extra frequency bits
-			voice.frequency = (ch == 0) ? m_soundregs[0x10] : 0;
-			voice.frequency += (m_soundregs[ch * 5 + 0x11] << 4);
-			voice.frequency += (m_soundregs[ch * 5 + 0x12] << 8);
-			voice.frequency += (m_soundregs[ch * 5 + 0x13] << 12);
-			voice.frequency += (m_soundregs[ch * 5 + 0x14] << 16); // always 0
-			break;
+	case 0x10:
+	case 0x11:
+	case 0x12:
+	case 0x13:
+	case 0x14:
+		// the frequency has 20 bits
+		// the first voice has extra frequency bits
+		voice.frequency = (ch == 0) ? m_soundregs[0x10] : 0;
+		voice.frequency += (m_soundregs[ch * 5 + 0x11] << 4);
+		voice.frequency += (m_soundregs[ch * 5 + 0x12] << 8);
+		voice.frequency += (m_soundregs[ch * 5 + 0x13] << 12);
+		voice.frequency += (m_soundregs[ch * 5 + 0x14] << 16); // always 0
+		break;
 
-		case 0x15:
-			voice.volume[0] = data;
-			break;
+	case 0x15:
+		voice.volume[0] = data;
+		break;
 	}
 }
 
@@ -401,29 +393,29 @@ void polepos_wsg_device::polepos_sound_w(offs_t offset, uint8_t data)
 	sound_channel &voice = m_channel_list[ch];
 	switch (offset & 0x23)
 	{
-		case 0x00:
-		case 0x01:
-			// the frequency has 16 bits
-			voice.frequency = m_soundregs[ch * 4 + 0x00];
-			voice.frequency += m_soundregs[ch * 4 + 0x01] << 8;
-			break;
+	case 0x00:
+	case 0x01:
+		// the frequency has 16 bits
+		voice.frequency = m_soundregs[ch * 4 + 0x00];
+		voice.frequency += m_soundregs[ch * 4 + 0x01] << 8;
+		break;
 
-		case 0x23:
-			voice.waveform_select = data & 7;
-			[[fallthrough]];
-		case 0x02:
-		case 0x03:
-			// front speakers ?
-			voice.volume[0] = m_soundregs[ch * 4 + 0x03] >> 4;
-			voice.volume[1] = m_soundregs[ch * 4 + 0x03] & 0x0f;
-			// rear speakers ?
-			voice.volume[2] = m_soundregs[ch * 4 + 0x23] >> 4;
-			voice.volume[3] = m_soundregs[ch * 4 + 0x02] >> 4;
+	case 0x23:
+		voice.waveform_select = data & 7;
+		[[fallthrough]];
+	case 0x02:
+	case 0x03:
+		// front speakers ?
+		voice.volume[0] = m_soundregs[ch * 4 + 0x03] >> 4;
+		voice.volume[1] = m_soundregs[ch * 4 + 0x03] & 0x0f;
+		// rear speakers ?
+		voice.volume[2] = m_soundregs[ch * 4 + 0x23] >> 4;
+		voice.volume[3] = m_soundregs[ch * 4 + 0x02] >> 4;
 
-			// if 54XX or 52XX selected, silence this voice
-			if (m_soundregs[ch * 4 + 0x23] & 8)
-				voice.volume[0] = voice.volume[1] = voice.volume[2] = voice.volume[3] = 0;
-			break;
+		// if 54XX or 52XX selected, silence this voice
+		if (m_soundregs[ch * 4 + 0x23] & 8)
+			voice.volume[0] = voice.volume[1] = voice.volume[2] = voice.volume[3] = 0;
+		break;
 	}
 }
 
@@ -472,25 +464,25 @@ void namco_15xx_device::namco_15xx_w(offs_t offset, uint8_t data)
 	sound_channel &voice = m_channel_list[ch];
 	switch (offset & 7)
 	{
-		case 0x02:
-			voice.counter &= util::make_bitmask<uint32_t>(m_f_fracbits);
-			voice.counter |= uint32_t(data & 0x1f) << m_f_fracbits;
-			break;
+	case 0x02:
+		voice.counter &= util::make_bitmask<uint32_t>(m_f_fracbits);
+		voice.counter |= uint32_t(data & 0x1f) << m_f_fracbits;
+		break;
 
-		case 0x03:
-			voice.volume[0] = data & 0x0f;
-			break;
+	case 0x03:
+		voice.volume[0] = data & 0x0f;
+		break;
 
-		case 0x06:
-			voice.waveform_select = (data >> 4) & 7;
-			[[fallthrough]];
-		case 0x04:
-		case 0x05:
-			// the frequency has 20 bits
-			voice.frequency = m_soundregs[ch * 8 + 0x04];
-			voice.frequency += m_soundregs[ch * 8 + 0x05] << 8;
-			voice.frequency += (m_soundregs[ch * 8 + 0x06] & 15) << 16; // high bits are from here
-			break;
+	case 0x06:
+		voice.waveform_select = (data >> 4) & 7;
+		[[fallthrough]];
+	case 0x04:
+	case 0x05:
+		// the frequency has 20 bits
+		voice.frequency = m_soundregs[ch * 8 + 0x04];
+		voice.frequency += m_soundregs[ch * 8 + 0x05] << 8;
+		voice.frequency += (m_soundregs[ch * 8 + 0x06] & 15) << 16; // high bits are from here
+		break;
 	}
 }
 
@@ -551,29 +543,29 @@ void namco_cus30_device::cus30_w(offs_t offset, uint8_t data)
 	sound_channel &voice = m_channel_list[ch];
 	switch (offset & 7)
 	{
-		case 0x00:
-			voice.volume[0] = data & 0x0f;
-			break;
+	case 0x00:
+		voice.volume[0] = data & 0x0f;
+		break;
 
-		case 0x01:
-			voice.waveform_select = (data >> 4) & 15;
-			[[fallthrough]];
-		case 0x02:
-		case 0x03:
-			// the frequency has 20 bits
-			voice.frequency = (m_soundregs[ch * 8 + 0x01] & 15) << 16; // high bits are from here
-			voice.frequency += m_soundregs[ch * 8 + 0x02] << 8;
-			voice.frequency += m_soundregs[ch * 8 + 0x03];
-			break;
+	case 0x01:
+		voice.waveform_select = (data >> 4) & 15;
+		[[fallthrough]];
+	case 0x02:
+	case 0x03:
+		// the frequency has 20 bits
+		voice.frequency = (m_soundregs[ch * 8 + 0x01] & 15) << 16; // high bits are from here
+		voice.frequency += m_soundregs[ch * 8 + 0x02] << 8;
+		voice.frequency += m_soundregs[ch * 8 + 0x03];
+		break;
 
-		case 0x04:
+	case 0x04:
 		{
 			voice.volume[1] = data & 0x0f;
 
 			sound_channel &voice2 = m_channel_list[(ch + 1) & 7];
 			voice2.noise_sw = BIT(data, 7);
-			break;
 		}
+		break;
 	}
 }
 
@@ -770,7 +762,7 @@ void namco_cus30_device::sound_stream_update(sound_stream &stream)
 	}
 }
 
-// template class definition
+// template class instantiation
 template class namco_audio_device<3, false>;
 template class namco_audio_device<8, false>;
 template class namco_audio_device<8, true>;
