@@ -129,10 +129,6 @@ private:
 	void copybitmap(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, int pri = 0);
 	void copybitmap(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, int pri = 0);
 
-	// C355 Motion Object Emulation
-	// for pal_xor, supply either 0x0 (normal) or 0xf (palette mapping reversed)
-	int default_code2tile(int code);
-
 	// C355 Motion Object internals
 	void get_single_sprite(u16 which, c355_sprite *sprite_ptr, int no);
 	template<class BitmapClass> void draw_sprites(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri = 0);

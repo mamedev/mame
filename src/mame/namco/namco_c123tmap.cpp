@@ -34,7 +34,7 @@ namco_c123tmap_device::namco_c123tmap_device(const machine_config &mconfig, cons
 
 void namco_c123tmap_device::device_start()
 {
-	m_tilemapinfo.cb.resolve_safe();
+	m_tilemapinfo.cb.resolve();
 
 	const int size = m_tmap3_half_height ? 0x8000 : 0x10000;
 	m_tilemapinfo.videoram = std::make_unique<uint16_t[]>(size);
@@ -95,9 +95,13 @@ void namco_c123tmap_device::mark_all_dirty(void)
 template<int Offset>
 TILE_GET_INFO_MEMBER(namco_c123tmap_device::get_tile_info)
 {
-	const uint16_t *vram = &m_tilemapinfo.videoram[Offset];
+	const uint16_t data = m_tilemapinfo.videoram[Offset + tile_index];
 	int tile = 0, mask = 0;
-	m_tilemapinfo.cb(vram[tile_index], tile, mask);
+	if (m_tilemapinfo.cb.isnull())
+		tile = mask = data;
+	else
+		m_tilemapinfo.cb(data, tile, mask);
+
 	tileinfo.mask_data = m_mask + mask * 8;
 	tileinfo.set(0, tile, 0, 0);
 }
