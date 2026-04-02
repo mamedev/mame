@@ -1326,7 +1326,7 @@ deco_146_base_device::deco_146_base_device(const machine_config &mconfig,
 		u8 xor_port,
 		u8 mask_port,
 		u8 sound_port,
-		/*u8 configregion,*/
+		u8 configregion,
 		deco146port_xx const *lookup_table) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_bankswitch_swap_read_address(bankswap_read_addr),
@@ -1335,7 +1335,7 @@ deco_146_base_device::deco_146_base_device(const machine_config &mconfig,
 	m_xor_port(xor_port),
 	m_mask_port(mask_port),
 	m_soundlatch_port(sound_port),
-	//m_configregion(configregion),
+	m_configregion(configregion),
 	m_lookup_table(lookup_table),
 	m_current_rambank(0),
 	m_nand(0),
@@ -1364,14 +1364,13 @@ deco_146_base_device::deco_146_base_device(const machine_config &mconfig,
 
 void deco_146_base_device::device_start()
 {
-	for (int bank = 0; bank < 2; bank++)
+	for (auto &bank : m_rambank)
 	{
-		m_rambank[bank] = std::make_unique<u16[]>(0x80);
 		// the mutant fighter old sim assumes 0x0000
-		std::fill_n(&m_rambank[bank][0], 0x80, 0xffff);
-		save_pointer(NAME(m_rambank[bank]), 0x80, bank);
+		std::fill(std::begin(bank), std::end(bank), 0xffff);
 	}
 
+	save_item(NAME(m_rambank));
 	save_item(NAME(m_current_rambank));
 
 	save_item(NAME(m_nand));
@@ -1446,6 +1445,6 @@ DEFINE_DEVICE_TYPE(DECO146PROT, deco146_device, "deco146", "DECO 146 Protection"
 
 
 deco146_device::deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: deco_146_base_device(mconfig, DECO146PROT, tag, owner, clock, 0x78, 0x44a, 0x2c, 0x36, 0x64, /*0x8,*/ port_table)
+	: deco_146_base_device(mconfig, DECO146PROT, tag, owner, clock, 0x78, 0x44a, 0x2c, 0x36, 0x64, 0x8, port_table)
 {
 }
