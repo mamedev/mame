@@ -26,18 +26,26 @@ namespace fs {
     Floppy drive sound
 
     MZ, August 2015
-       Updated March 2026
+       Updated April 2026
 
     In order to activate floppy drive sounds with predefined samples for 3.5"
     and 5.25" drives, call
 
-    * enable_sound() or enable_sound(true)
+    * enable_sound() or enable_sound(true) or enable_sound(nullptr)
 
     on the instances of floppy_connector, usually appearing in device_add_mconfig
     of the device where the drives are connected. If you prefer custom sounds
-    for the drive, create an instance of floppy_sound_samples (providing the
-    subdirectory name of the samples directory where the samples are located),
-    and register samples on it as follows:
+    for the drive, create an instance of floppy_sound_samples, and register
+    samples on it as follows:
+
+    * clear()
+        Clear the sample list. Recommended to use at code locations that
+        may be called several times (like device_add_mconfig).
+
+    * set_form_factor(form_factor, directory)
+        All following add operations will use the given form factor and
+        assume that the samples are found in the provided directory. May be
+        called several times in order to add samples for different form factors.
 
     * add_spin_sample(filename, type):
         For spinning motor samples. See the enum below for type values.
@@ -56,36 +64,49 @@ namespace fs {
         than the actual rate, and if its range contains the current track number.
         When not specified, the range covers the whole disk (0..99).
 
-    For an example, see the predefined samples in floppy_connector::enable_sound.
+    For an example, see the predefined sample list in the constructor of
+    floppy_sound_device.
 
-    Pass the address of the custom floppy_sound_samples instances to enable_sound:
-        enable_sound(&floppysamp3, &floppysamp35, &floppysamp525, &floppysamp8);
+    For custom samples, pass the address of the specific floppy_sound_samples
+    instance as
 
-    If there are no samples for the actual form factor, samples for other
-    form factors are used:
+    *  enable_sound(&myfloppysamples);
 
-    * floppysamp35 samples are used for missing floppysamp3 samples
-    * floppysamp525 samples are used for any missing form factor
-      (serving as default)
+    If the custom samples cannot be found, the default samples are used. If
+    those cannmot found either, sound is disabled.
 
-    If there is only one form factor, use enable_sound(&floppysamp)
-    which actually calls enable_sound(nullptr, nullptr, &floppysamp, nullptr).
+    If the samples list does not contain a matching form factor, the following
+    replacement strategy is used:
+
+    * If 3" samples are requested but not found, 3.5" samples are used.
+    * If 3.5" or 8" samples are requested but not found, 5.25" samples are used.
 */
 struct floppy_sound_entry
 {
 	int index = 0;
+	int type = 0;        // type: SPIN, STEP, SEEK
+	int form_factor;     // indicates the form factor of the drive
 	int mintrack = 0;    // valid from here (including), meaningless for spin entries
 	int maxtrack = 99;   // to here (including), meaningless for spin entries
 	int rate = 0;        // rate of the seek sample
 	int maxrate = 0;     // max rate for pitching up the seek sample
-	int type = 0;        // type for spin entries
+	int spintype = 0;    // type for spin entries
+	const char *directory;  // directory where the sample is stored
 	const char *filename;
 };
 
 class floppy_sound_samples
 {
 public:
-	floppy_sound_samples(const char* dir);
+	floppy_sound_samples() { };
+
+	/* Clear the list. */
+	void clear() { m_fulllist.clear(); }
+
+	/* Set the form factor for the following add operations. */
+	void set_form_factor(int form_factor, const char* dir);
+
+	/* Add spin, step, and seek samples. */
 	void add_spin_sample(const char* filename, int type);
 	void add_step_sample(const char* filename, int start=0, int end=99);
 	void add_seek_sample(const char* filename, int nominal_rate, int max_rate, int mintrack=0, int maxtrack=99);
@@ -105,7 +126,18 @@ public:
 		END_LOADED              // Stop spinning with disk
 	};
 
-	/* Search for a suitable spinning sample. Return the index in the
+	enum
+	{
+		SPIN = 0,
+		STEP,
+		SEEK
+	};
+
+	/* Selects the matching form factor and prepares the samples list. */
+	void select(int form_factor);
+	int get_assumed_form_factor() { return m_current_form_factor; }
+
+	/* Search for a suitable spinning sample. Return the index into the
 	   samples list. */
 	int find_spin(int kind) const;
 
@@ -116,13 +148,14 @@ public:
 	int find_seek(double rate, int track, double& pitch) const;
 
 private:
-	std::string m_dir;          // Subdirectory which contains the samples
+	std::string m_basedir;          // Subdirectory which contains the samples
 	std::vector<const char*> m_samplenames;
-	std::vector<floppy_sound_entry> m_seeklist;
-	std::vector<floppy_sound_entry> m_steplist;
-	std::vector<floppy_sound_entry> m_spinlist;
+
+	std::vector<floppy_sound_entry> m_fulllist;
 
 	int m_index;
+	int m_current_form_factor;
+	const char* m_current_dir;
 };
 
 class floppy_sound_device : public samples_device
@@ -134,7 +167,7 @@ public:
 	void unload() { m_firstturn = true; }
 	bool samples_loaded() { return m_samples_available; }
 	void register_for_save_states();
-	void set_samples(floppy_sound_samples *samples);
+	void set_samples(floppy_sound_samples *samples, int form_factor);
 
 protected:
 	void device_start() override ATTR_COLD;
@@ -145,8 +178,8 @@ private:
 	sound_stream*   m_sound;
 
 	floppy_sound_samples* m_samplelist;
+	floppy_sound_samples m_default_samples;
 
-	std::string m_dir;          // Subdirectory which contains the samples
 	bool   m_motor_on;
 	bool   m_with_disk;
 	int    m_spin_kind;
@@ -159,9 +192,9 @@ private:
 	double m_seek_pitch;
 	int    m_seek_sound_timeout;
 	attotime m_last_step_time;
-	bool m_firstturn;           // see START_LOADED_INITIAL
-	bool m_samples_available;
-	bool m_in_seek;
+	bool   m_firstturn;           // see START_LOADED_INITIAL
+	bool   m_samples_available;
+	bool   m_in_seek;
 	double m_step_rate;
 };
 
@@ -411,7 +444,7 @@ protected:
 	void cache_fill(const attotime &when);
 	void cache_weakness_setup();
 
-	// Sound
+	// Sound support
 	bool m_make_sound;
 	const floppy_sound_samples *m_samples;
 	required_device<floppy_sound_device> m_sound_out;
@@ -564,18 +597,16 @@ public:
 	virtual ~floppy_connector();
 
 	template <typename T> void set_formats(T &&_formats) { formats = std::forward<T>(_formats); }
-	void enable_sound(bool doit = true);
-	void enable_sound(floppy_sound_samples *samples);
-	void enable_sound(floppy_sound_samples *samples3,
-						floppy_sound_samples *samples35,
-						floppy_sound_samples *samples525,
-						floppy_sound_samples *samples8 );
-
-	floppy_sound_samples *get_samples(uint32_t form_factor);
 
 	void set_sectoring_type(uint32_t sectoring_type) { m_sectoring_type = sectoring_type; }
 
 	floppy_image_device *get_device();
+
+	// Sound support
+	bool use_sound() { return m_use_sound; }
+	void enable_sound(bool doit = true);
+	void enable_sound(floppy_sound_samples *samples);
+	floppy_sound_samples *get_samples() { return m_samples; }
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -584,14 +615,8 @@ protected:
 private:
 	std::function<void (format_registration &fr)> formats;
 
-	// Default lists
-	floppy_sound_samples m_floppy35;
-	floppy_sound_samples m_floppy525;
-
-	floppy_sound_samples *m_samples3;
-	floppy_sound_samples *m_samples35;
-	floppy_sound_samples *m_samples525;
-	floppy_sound_samples *m_samples8;
+	bool m_use_sound;
+	floppy_sound_samples *m_samples;
 
 	uint32_t m_sectoring_type;
 };
