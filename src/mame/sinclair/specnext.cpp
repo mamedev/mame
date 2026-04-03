@@ -2645,7 +2645,6 @@ void specnext_state::nr_07_cpu_speed_w(u8 data)
 {
 	m_nr_07_cpu_speed = data & 3;
 	m_maincpu->set_clock_scale(1 << m_nr_07_cpu_speed);
-	m_ctc->set_clock_scale(1 << m_nr_07_cpu_speed);
 	m_dma->set_clock_scale(1 << m_nr_07_cpu_speed);
 	m_im2_line->set_clock_scale(1 << m_nr_07_cpu_speed);
 	m_im2_ula->set_clock_scale(1 << m_nr_07_cpu_speed);
@@ -4056,7 +4055,7 @@ void specnext_state::tbblue(machine_config &config)
 	SPECNEXT_IM2(config, m_im2_ula);
 	m_im2_ula->irq_callback().set(FUNC(specnext_state::irq_w));
 
-	SPECNEXT_CTC(config, m_ctc, 28_MHz_XTAL / 8);
+	SPECNEXT_CTC(config, m_ctc, 28_MHz_XTAL);
 	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 	m_ctc->zc_callback<1>().set(m_ctc, FUNC(z80ctc_device::trg2));
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
