@@ -71,6 +71,7 @@ namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, device
 	device_t(mconfig, type, tag, owner, clock),
 	device_gfx_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
+	m_code2tile(*this),
 	m_pri_cb(*this, DEVICE_SELF, FUNC(namco_c355spr_device::default_priority)),
 	m_mix_cb(*this, DEVICE_SELF, FUNC(namco_c355spr_device::default_mix)),
 	m_read_spritetile(*this, DEVICE_SELF, FUNC(namco_c355spr_device::read_spritetile)),
@@ -257,6 +258,7 @@ void namco_c355spr_device::device_start()
 	gfx(0)->set_colorbase(m_colbase);
 	gfx(0)->set_granularity(m_granularity);
 
+	m_code2tile.resolve();
 	m_pri_cb.resolve();
 
 	screen().register_screen_bitmap(m_renderbitmap);
@@ -409,11 +411,6 @@ u16 namco_c355spr_device::read_spritelist(int entry, int whichlist)
 }
 
 
-int namco_c355spr_device::default_code2tile(int code)
-{
-	return code;
-}
-
 void namco_c355spr_device::build_sprite_list(int no)
 {
 	/* draw the sprites */
@@ -470,11 +467,15 @@ void namco_c355spr_device::render_sprites(const rectangle cliprect)
 							sprite_screen_width = (sprite_ptr->zoomx[ind] * 16 + 0x8000) >> 16;
 						}
 
+						// TODO: offset is also affected?
+						int tile = sprite_ptr->tile[ind];
+						if (!m_code2tile.isnull())
+							tile = m_code2tile(tile);
 						zdrawgfxzoom(
 							m_renderbitmap,
 							clip,
 							gfx(0),
-							m_code2tile(sprite_ptr->tile[ind]) + sprite_ptr->offset,
+							tile + sprite_ptr->offset,
 							sprite_ptr->color,
 							sprite_ptr->flipx, sprite_ptr->flipy,
 							sprite_ptr->x[ind] >> 16, sprite_ptr->y[ind] >> 16,

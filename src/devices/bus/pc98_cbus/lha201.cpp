@@ -49,7 +49,7 @@ void lha201_device::device_add_mconfig(machine_config &config)
 	// two xtals, 28 MHz (MX2) and 20 MHz (MX1)
 
 	// FIXME: check frequency select in wd core
-	WD33C93B(config, m_wdc, 20'000'000 / 4);
+	WD33C93B(config.replace(), m_wdc, 20'000'000 / 4);
 	m_scsi_bus->set_external_device(7, m_wdc);
 	m_wdc->irq_cb().set(DEVICE_SELF, FUNC(lha201_device::scsi_irq_w));
 	m_wdc->drq_cb().set(DEVICE_SELF, FUNC(lha201_device::scsi_drq_w));

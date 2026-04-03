@@ -290,7 +290,7 @@ void luxor_4105_device::scsi_ctrl_changed()
 		m_scsi_bus->data_w(m_scsi_refid, 0);
 	else
 		m_scsi_bus->data_w(m_scsi_refid, m_data_out);
-	
+
 	update_ack();
 	update_dma();
 }

@@ -1,9 +1,23 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski, Tomasz Slanina
-/**************************************************************************************
+/*******************************************************************************
 
-Space Guerrilla PCB Layout
---------------------------
+Omori Space Guerrilla 『スペースゲリラ』, aka "Color Space Guerrilla"
+
+TODO:
+- improve sound
+- blitter sometimes leaves junk behind
+- upright/cocktail flag is not from an input port, does the upright version have
+  wire mods to allow 2 players with a single joystick or is it a different romset?
+
+BTANB:
+- attract mode peeing alien leaves behind light green footprints on the hill,
+  similar 'color clash' glitches happen when enemy bullets hit the red line at
+  the bottom of the screen
+
+
+PCB Layout
+----------
 
 All PCBs slot into a metal frame. Each PCB is joined by the 14way/28way edge connectors
 on one side, and the 50 pin connectors via flat cables on the other side.
@@ -93,7 +107,8 @@ CRTC1-A          |-----------------------------|
       50 pin                 50 pin                50 pin
 
 Notes:
-      4027 - MOSTEK MK4027-4 RAM (DIP16)
+      82S09- Signetics 576-bit(64x9) Bipolar RAM
+      4027 - MOSTEK MK4027-4 4Kx1 RAM (DIP16)
       DIP16- Unpopulated position for DIP16 IC
 
 
@@ -125,7 +140,7 @@ CRTC2-A          |-----------------------------|
 
 Notes:
       74S288 - 32bytes x8 Bipolar PROM (DIP16, both PROMs contain identical contents)
-      4027   - MOSTEK MK4027-4 RAM (DIP16)
+      4027   - MOSTEK MK4027-4 4Kx1 RAM (DIP16)
 
 
 
@@ -155,13 +170,13 @@ SBC-A            |-----------------------------|
       50 pin                 50 pin
 
 Notes:
-      4045 - TMS4045-45NL RAM (DIP18)
-      8216 - Mitsubishi M5L8216 RAM (DIP16)
+      4045 - TMS4045-45NL 1Kx4 RAM (DIP18)
+      8216 - Mitsubishi M5L8216 4-bit bidirectional bus driver (DIP16)
       DIP18- Unpopulated position for DIP18 IC
       DIP24- Unpopulated position for DIP24 IC
       All ROMs type 2708 (DIP24)
 
-**************************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -187,17 +202,13 @@ class spaceg_state : public driver_device
 public:
 	spaceg_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_colorram(*this, "colorram"),
-		m_videoram(*this, "videoram"),
-		m_io9400(*this, "io9400"),
-		m_io9401(*this, "io9401"),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_samples(*this, "samples"),
 		m_sn(*this, "snsnd"),
-		m_sound1(0),
-		m_sound2(0),
-		m_sound3(0)
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	void spaceg(machine_config &config);
@@ -206,22 +217,31 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	required_shared_ptr<uint8_t> m_colorram;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_io9400;
-	required_shared_ptr<uint8_t> m_io9401;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<samples_device> m_samples;
 	required_device<sn76477_device> m_sn;
 
-	uint8_t m_sound1;
-	uint8_t m_sound2;
-	uint8_t m_sound3;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	output_finder<2> m_lamps;
 
+	uint8_t m_clatch = 0;
+	uint8_t m_platch = 0;
+	uint8_t m_shift = 0;
+	uint8_t m_gfxctrl = 0;
+	uint8_t m_sound1 = 0;
+	uint8_t m_sound2 = 0;
+	uint8_t m_sound3 = 0;
+
+	uint8_t palette_r(offs_t offset);
+	void palette_w(offs_t offset, uint8_t data) { m_platch = data; }
+	void clatch_w(uint8_t data) { m_clatch = data & 0x1f; }
 	void zvideoram_w(offs_t offset, uint8_t data);
-	uint8_t colorram_r(offs_t offset);
+
+	void shift_w(uint8_t data) { m_shift = data >> 5; }
+	void gfxctrl_w(uint8_t data) { m_gfxctrl = data; }
+	void output_w(uint8_t data);
 	void sound1_w(uint8_t data);
 	void sound2_w(uint8_t data);
 	void sound3_w(uint8_t data);
@@ -233,6 +253,12 @@ private:
 
 void spaceg_state::machine_start()
 {
+	m_lamps.resolve();
+
+	save_item(NAME(m_clatch));
+	save_item(NAME(m_platch));
+	save_item(NAME(m_shift));
+	save_item(NAME(m_gfxctrl));
 	save_item(NAME(m_sound1));
 	save_item(NAME(m_sound2));
 	save_item(NAME(m_sound3));
@@ -247,27 +273,22 @@ void spaceg_state::machine_start()
 
 void spaceg_state::zvideoram_w(offs_t offset, uint8_t data)
 {
-	int col = m_colorram[0x400];
-	int xoff = *m_io9400 >> 5 & 7;
-	uint16_t offset2 = (offset + 0x100) & 0x1fff;
-	uint16_t sdata = data << (8 - xoff);
+	const uint16_t offset2 = (offset + 0x100) & 0x1fff;
+	const uint16_t sdata = data << (8 - m_shift);
 	uint16_t vram_data = m_videoram[offset] << 8 | (m_videoram[offset2]);
 
-	if (col > 0x0f) logerror("color > 0x0f = %2d\n", col);
-	col &= 0x0f;
-
-	switch (*m_io9401)
+	switch (m_gfxctrl & 0xf)
 	{
 		// draw
 		case 0:
-			vram_data &= ~(0xff00 >> xoff);
+			vram_data &= ~(0xff00 >> m_shift);
 			[[fallthrough]];
 		case 1:
 			vram_data |= sdata;
 
 			// update colorram
-			if (sdata & 0xff00) m_colorram[offset] = col;
-			if (sdata & 0x00ff) m_colorram[offset2] = col;
+			if (sdata & 0xff00) m_colorram[offset] = m_clatch;
+			if (sdata & 0x00ff) m_colorram[offset2] = m_clatch;
 			break;
 
 		// erase
@@ -276,7 +297,7 @@ void spaceg_state::zvideoram_w(offs_t offset, uint8_t data)
 			break;
 
 		default:
-			logerror("mode = %02x pc = %04x\n", *m_io9401, m_maincpu->pc());
+			logerror("mode = %02x pc = %04x\n", m_gfxctrl & 0xf, m_maincpu->pc());
 			return;
 	}
 
@@ -285,44 +306,57 @@ void spaceg_state::zvideoram_w(offs_t offset, uint8_t data)
 }
 
 
-uint8_t spaceg_state::colorram_r(offs_t offset)
+uint8_t spaceg_state::palette_r(offs_t offset)
 {
-	if (!machine().side_effects_disabled())
+	if (!machine().side_effects_disabled() && m_gfxctrl & 0x40)
 	{
-		if (offset < 0x400)
-		{
-			if ((offset & 0xff) < 0x20)
-			{
-				const int rgbcolor = (m_colorram[offset] << 1) | ((offset & 0x100) >> 8);
-				const int index = (offset & 0x1f) | (~offset >> 4 & 0x20);
-				m_palette->set_pen_color(index, pal3bit(rgbcolor >> 0), pal3bit(rgbcolor >> 6), pal3bit(rgbcolor >> 3));
-			}
-			else
-				logerror("palette? read from colorram offset = %04x\n", offset);
-		}
-
-		if (*m_io9401 != 0x40)
-			logerror("colorram read in mode: 9401 = %02x (offset = %04x)\n", *m_io9401, offset);
+		// write to palette RAM
+		const int index = (offset & 0x1f) | (offset >> 4 & 0x20);
+		const int rgbcolor = (m_platch << 1) | ((offset & 0x100) >> 8);
+		m_palette->set_pen_color(index, pal3bit(rgbcolor >> 0), pal3bit(rgbcolor >> 6), pal3bit(rgbcolor >> 3));
 	}
 
-	return m_colorram[offset];
+	return 0;
+}
+
+
+void spaceg_state::output_w(uint8_t data)
+{
+	// bits 0 and 1: start button lamps
+	m_lamps[0] = BIT(data, 0);
+	m_lamps[1] = BIT(data, 1);
+
+	// bit 2: high score signal according to schematics, N/C or for bookkeeping?
+	// (see unknown SW7,8)
+
+	// bit 3: flip screen
+	flip_screen_set(BIT(data, 3));
+
+	// bit 7: unknown, set at same time as flip screen, but not unset
+	// other: unused
 }
 
 
 uint32_t spaceg_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (offs_t offs = 0; offs < 0x2000; offs++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint8_t data = m_videoram[offs];
-		int y = offs & 0xff;
-		int x = (offs >> 8) << 3;
-
-		for (int i = 0; i < 8; i++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			bitmap.pix(y, x) = (data & 0x80) ? (m_colorram[offs] & 0x0f) : 0x20;
+			uint8_t sx = x;
+			uint8_t sy = y;
 
-			x++;
-			data <<= 1;
+			if (flip_screen())
+			{
+				sx = ~sx;
+				sy = ~sy + 32;
+			}
+
+			const uint16_t offset = (sx << 5 & 0x1f00) | sy;
+			const uint8_t pixel = BIT(m_videoram[offset], ~sx & 7);
+			const uint8_t color = (m_colorram[offset] & 0x1f) | pixel << 5;
+
+			bitmap.pix(y, x) = color;
 		}
 	}
 
@@ -406,18 +440,15 @@ void spaceg_state::spaceg_map(address_map &map)
 	map(0x3000, 0x3fff).rom();
 	map(0x7000, 0x77ff).ram();
 
-	map(0xa000, 0xbfff).ram().r(FUNC(spaceg_state::colorram_r)).share("colorram");
+	map(0xa000, 0xbfff).writeonly().share("colorram");
+	map(0xa000, 0xa000).mirror(0x1f1f).unmaprw();
+	map(0xa000, 0xa01f).select(0x0300).rw(FUNC(spaceg_state::palette_r), FUNC(spaceg_state::palette_w));
+	map(0xa400, 0xa400).w(FUNC(spaceg_state::clatch_w));
 	map(0xc000, 0xdfff).ram().w(FUNC(spaceg_state::zvideoram_w)).share("videoram");
 
-	map(0x9400, 0x9400).writeonly().share("io9400"); /* gfx ctrl */
-	map(0x9401, 0x9401).writeonly().share("io9401"); /* gfx ctrl */
-	/* 9402 -
-	    bits 0 and 1 probably control the lamps under the player 1 and player 2 start buttons
-	    bit 2 - unknown -
-	    bit 3 is probably a flip screen
-	    bit 7 - unknown - set to 1 during the gameplay (coinlock ?)
-	*/
-	map(0x9402, 0x9402).nopw();
+	map(0x9400, 0x9400).w(FUNC(spaceg_state::shift_w));
+	map(0x9401, 0x9401).w(FUNC(spaceg_state::gfxctrl_w));
+	map(0x9402, 0x9402).w(FUNC(spaceg_state::output_w));
 	map(0x9405, 0x9405).w(FUNC(spaceg_state::sound1_w));
 	map(0x9406, 0x9406).w(FUNC(spaceg_state::sound2_w));
 	map(0x9407, 0x9407).w(FUNC(spaceg_state::sound3_w));
@@ -454,29 +485,29 @@ static INPUT_PORTS_START( spaceg )
 	PORT_DIPSETTING(    0x20, "30000" )
 	PORT_DIPSETTING(    0x10, "40000" )
 	PORT_DIPSETTING(    0x30, "50000" )
-	// SW7,8: Unlisted in manual, set bit 2 of 0x9402 depending on score - previously 2nd bonus life?
+	// SW7,8: Unlisted in manual, set bit 2 of 0x9402 depending on score
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:7,8")
 	PORT_DIPSETTING(    0x00, "10000" )
-	PORT_DIPSETTING(    0x80, "30000" )
-	PORT_DIPSETTING(    0x40, "40000" )
+	PORT_DIPSETTING(    0x40, "30000" )
+	PORT_DIPSETTING(    0x80, "40000" )
 	PORT_DIPSETTING(    0xc0, "50000" )
 
 	PORT_START("9801")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 
 	PORT_START("9802")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
 
 	PORT_START("9805")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 
 	PORT_START("9806")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 INPUT_PORTS_END
 
 
@@ -488,14 +519,14 @@ INPUT_PORTS_END
 
 void spaceg_state::spaceg(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 2500000);         /* 2.5 MHz */
+	// basic machine hardware
+	Z80(config, m_maincpu, 20_MHz_XTAL / 8); // 2.5 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &spaceg_state::spaceg_map);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 255, 32, 255);
 	screen.set_screen_update(FUNC(spaceg_state::screen_update));
@@ -504,7 +535,7 @@ void spaceg_state::spaceg(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::BLACK, 0x40);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	// HACK: SN76477 parameters copied from space invaders

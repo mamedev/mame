@@ -808,11 +808,11 @@ void cosmic_state::machine_reset()
 void cosmic_state::cosmic(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, Z80_MASTER_CLOCK/6); // 1.8026 MHz
+	Z80(config, m_maincpu, 10.816_MHz_XTAL/6); // 1.8026 MHz
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(Z80_MASTER_CLOCK/2, 44*8, 0*8, 32*8, 32*8+6, 4*8, 28*8);
+	m_screen->set_raw(10.816_MHz_XTAL/2, 44*8, 0*8, 32*8, 32*8+6, 4*8, 28*8);
 	m_screen->set_palette(m_palette);
 }
 
@@ -880,7 +880,7 @@ void cosmic_state::magspot(machine_config &config)
 	cosmic(config);
 
 	// basic machine hardware
-	Z80(config.replace(), m_maincpu, Z80_MASTER_CLOCK/4); // 2.704 MHz, verified via schematics
+	m_maincpu->set_clock(10.816_MHz_XTAL/4); // 2.704 MHz, verified via schematics
 	m_maincpu->set_addrmap(AS_PROGRAM, &cosmic_state::magspot_map);
 
 	// video hardware
@@ -898,28 +898,13 @@ void cosmic_state::magspot(machine_config &config)
 void cosmic_state::devzone(machine_config &config)
 {
 	magspot(config);
-
-	// video hardware
 	m_screen->set_screen_update(FUNC(cosmic_state::screen_update_devzone));
 }
 
 void cosmic_state::nomnlnd(machine_config &config)
 {
-	cosmic(config);
-
-	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &cosmic_state::magspot_map);
-
-	// video hardware
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_panic);
-	PALETTE(config, m_palette, FUNC(cosmic_state::nomnlnd_palette), 16 + 8*4, 16);
-
+	magspot(config);
 	m_screen->set_screen_update(FUNC(cosmic_state::screen_update_nomnlnd));
-
-	// sound hardware
-	SPEAKER(config, "speaker").front_center();
-
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 

@@ -436,6 +436,7 @@ upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, 
 	, m_pf_out_cb(*this)
 	, m_pt_in_cb(*this, 0) // TODO: uPD7807 only
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_ram_view(*this, "ram_view")
 	, m_pa_pullups(0xff)
 	, m_pb_pullups(0xff)
@@ -565,6 +566,14 @@ device_memory_interface::space_config_vector upd7810_device::memory_space_config
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
+device_memory_interface::space_config_vector upd7801_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO, &m_io_config)
 	};
 }
 
@@ -1670,6 +1679,8 @@ void upd7810_device::base_device_start()
 {
 	space(AS_PROGRAM).specific(m_program);
 	space(AS_PROGRAM).cache(m_opcodes);
+	if (has_space(AS_IO))
+		space(AS_IO).specific(m_io);
 
 	configure_ops();
 

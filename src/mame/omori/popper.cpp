@@ -540,7 +540,7 @@ void popper_state::popper(machine_config &config)
 	Z80(config, m_subcpu, XTAL(18'432'000)/3/2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &popper_state::sub_map);
 
-	config.set_perfect_quantum(m_maincpu);
+	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4));
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
 	outlatch.q_out_cb<0>().set(FUNC(popper_state::nmi_control_w));

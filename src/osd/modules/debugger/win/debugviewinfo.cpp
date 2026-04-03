@@ -503,7 +503,8 @@ void debugview_info::draw_contents(HDC windc)
 			COLORREF bgcolor = metrics().view_colors(DCA_NORMAL).second;
 			HBRUSH bgbrush = nullptr;
 			int last_attrib = -1;
-			TCHAR buffer[256];
+			const int buffer_size = 512;
+			TCHAR buffer[buffer_size];
 			int count = 0;
 			RECT bounds;
 
@@ -551,7 +552,7 @@ void debugview_info::draw_contents(HDC windc)
 						}
 						else
 						{
-							ExtTextOut(dc, bounds.left, bounds.top, 0, nullptr, buffer, count, nullptr);
+							ExtTextOut(dc, bounds.left, bounds.top, 0, nullptr, buffer, std::min(count, buffer_size), nullptr);
 						}
 						bounds.left = bounds.right;
 						count = 0;
@@ -571,7 +572,9 @@ void debugview_info::draw_contents(HDC windc)
 				}
 
 				// add this character to the buffer
-				buffer[count++] = viewdata[col].byte;
+				if (count < buffer_size)
+					buffer[count] = viewdata[col].byte;
+				count++;
 			}
 
 			// flush any remaining stuff
@@ -597,7 +600,7 @@ void debugview_info::draw_contents(HDC windc)
 			}
 			else if (count > 0)
 			{
-				ExtTextOut(dc, bounds.left, bounds.top, 0, nullptr, buffer, count, nullptr);
+				ExtTextOut(dc, bounds.left, bounds.top, 0, nullptr, buffer, std::min(count, buffer_size), nullptr);
 			}
 		}
 

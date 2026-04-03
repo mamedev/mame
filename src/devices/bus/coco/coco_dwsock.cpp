@@ -3,13 +3,16 @@
 #include "emu.h"
 #include "coco_dwsock.h"
 
-#include <cstdio>
 #include <cstdlib>
+
 #ifdef __GNUC__
 #include <unistd.h>
 #endif
 #include <fcntl.h>
 #include <sys/types.h>
+
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 //**************************************************************************
@@ -110,7 +113,7 @@ void beckerport_device::device_stop()
 {
 	if (m_pSocket)
 	{
-		printf("%s: Closing connection to Drivewire server\n", tag());
+		osd_printf_verbose("%s: Closing connection to Drivewire server\n", tag());
 		m_pSocket.reset();
 	}
 }
@@ -144,11 +147,11 @@ u8 beckerport_device::read(offs_t offset)
 				// Try to read from dws
 				std::error_condition filerr = m_pSocket->read(m_buf, 0, sizeof(m_buf), m_rx_pending);
 				if (filerr && (std::errc::operation_would_block != filerr))
-					osd_printf_error("%s: coco_dwsock.c: beckerport_device::read() socket read operation failed with error %s:%d %s\n", tag(), filerr.category().name(), filerr.value(), filerr.message());
+					osd_printf_error("%s: beckerport_device::read() socket read operation failed with error %s:%d %s\n", tag(), filerr.category().name(), filerr.value(), filerr.message());
 				else
 					m_head = 0;
 			}
-			//logerror("beckerport_device: status read. %i bytes remaining.\n", m_rx_pending);
+			LOG("status read. %d bytes remaining.\n", m_rx_pending);
 			data = (m_rx_pending > 0) ? 2 : 0;
 			break;
 		case DWS_DATA:
@@ -162,7 +165,7 @@ u8 beckerport_device::read(offs_t offset)
 			//logerror("beckerport_device: data read 1 byte (0x%02x).  %i bytes remaining.\n", data&0xff, m_rx_pending);
 			break;
 		default:
-			fprintf(stderr, "%s: read from bad offset %d\n", __FILE__, offset);
+			logerror("read from bad offset %u\n", offset);
 	}
 
 	return data;
@@ -184,16 +187,16 @@ void beckerport_device::write(offs_t offset, u8 data)
 	switch (offset)
 	{
 		case DWS_STATUS:
-			//logerror("beckerport_write: error: write (0x%02x) to status register\n", d);
+			LOG("beckerport_write: error: write (0x%02x) to status register\n", data);
 			break;
 		case DWS_DATA:
 			filerr = m_pSocket->write(&d, 0, 1, written);
 			if (filerr)
 				osd_printf_error("%s: coco_dwsock.c: beckerport_device::write() socket write operation failed with error %s:%d %s\n", tag(), filerr.category().name(), filerr.value(), filerr.message());
-			//logerror("beckerport_write: data write one byte (0x%02x)\n", d & 0xff);
+			LOG("beckerport_write: data write one byte (0x%02x)\n", data);
 			break;
 		default:
-			fprintf(stderr, "%s: write to bad offset %d\n", __FILE__, offset);
+			logerror("write to bad offset %u\n", offset);
 	}
 }
 

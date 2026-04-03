@@ -1076,7 +1076,7 @@ void i80186_cpu_device::update_interrupt_state()
 					const int irq_map[2] = {0x08, 0x04};
 					irq = irq_map[int_num];
 				}
-			
+
 				/* if we're already servicing something at this level, don't generate anything new */
 				if (m_intr.in_service & irq)
 					return;
@@ -1162,7 +1162,7 @@ void i80186_cpu_device::handle_eoi(int data)
 	{
 		int level = data & 0x07;
 
-		for (int int_num = 0; int_num < 3 && !handled; int_num++) 
+		for (int int_num = 0; int_num < 3 && !handled; int_num++)
 		{
 			const int irq_map[3] = {0x01, 0x10, 0x20};
 			const int mask = irq_map[int_num];
@@ -1174,7 +1174,7 @@ void i80186_cpu_device::handle_eoi(int data)
 				handled = true;
 			}
 		}
-	
+
 		for (int int_num = 0; int_num < 2 && !handled; int_num++)
 		{
 			const int irq_map[2] = {0x08, 0x04};

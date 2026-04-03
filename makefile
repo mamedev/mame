@@ -149,6 +149,8 @@ ifeq ($(MSYSTEM),MINGW32)
 PLATFORM := x86
 else ifeq ($(MSYSTEM),MINGW64)
 PLATFORM := x86
+else ifeq ($(MSYSTEM),CLANG64)
+PLATFORM := x86
 else ifeq ($(MSYSTEM),CLANGARM64)
 PLATFORM := arm64
 else # MSYSTEM
@@ -246,6 +248,8 @@ ifeq ($(MSYSTEM),MINGW32)
 	MINGW32 := $(MINGW_PREFIX)
 else ifeq ($(MSYSTEM),MINGW64)
 	MINGW64 := $(MINGW_PREFIX)
+else ifeq ($(MSYSTEM),CLANG64)
+	MINGW64 := $(MINGW_PREFIX)
 else ifeq ($(MSYSTEM),CLANGARM64)
 	MINGW64 := $(MINGW_PREFIX)
 endif # MSYSTEM
@@ -316,6 +320,8 @@ TARGETOS := windows
 ifeq ($(MSYSTEM),MINGW32)
 ARCHITECTURE = _x86
 else ifeq ($(MSYSTEM),MINGW64)
+ARCHITECTURE := _x64
+else ifeq ($(MSYSTEM),CLANG64)
 ARCHITECTURE := _x64
 else ifeq ($(MSYSTEM),CLANGARM64)
 ARCHITECTURE := _x64
@@ -1537,7 +1543,7 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.286"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.287"' > $@
 	@echo '#define BARE_VCS_REVISION "$(NEW_GIT_VERSION)"' >> $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char bare_vcs_revision[];' >> $@
@@ -1547,7 +1553,7 @@ $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " (" BARE_VCS_REVISION ")";' >> $@
 else
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo #define BARE_BUILD_VERSION "0.286" > $@
+	@echo #define BARE_BUILD_VERSION "0.287" > $@
 	@echo #define BARE_VCS_REVISION "$(NEW_GIT_VERSION)" >> $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char bare_vcs_revision[]; >> $@

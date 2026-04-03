@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf, R. Belmont
 /***************************************************************************
+
     ATMEL AT28C64B
 
     64K ( 8K x 8 ) Parallel EEPROM with flash-like in-band signalling
@@ -163,11 +164,11 @@ void at28c64b_device::write(offs_t offset, uint8_t data)
 
 	if( m_last_write >= 0 )
 	{
-//      logerror( "%s: AT28C64B: write( %04x, %02x ) busy\n", machine().describe_context(), offset, data );
+		//logerror( "%s: AT28C64B: write( %04x, %02x ) busy\n", machine().describe_context(), offset, data );
 	}
 	else if( m_oe_12v )
 	{
-//      logerror( "%s: AT28C64B: write( %04x, %02x ) erase\n", machine().describe_context(), offset, data );
+		//logerror( "%s: AT28C64B: write( %04x, %02x ) erase\n", machine().describe_context(), offset, data );
 		if( m_last_write < 0 )
 		{
 			for( offs_t offs = 0; offs < AT28C64B_TOTAL_BYTES; offs++ )
@@ -226,7 +227,7 @@ uint8_t at28c64b_device::read(offs_t offset)
 	if( m_last_write >= 0 )
 	{
 		uint8_t data = m_last_write ^ 0x80;
-//      logerror( "%s: AT28C64B: read( %04x ) write status %02x\n", machine().describe_context(), offset, data );
+		//logerror( "%s: AT28C64B: read( %04x ) write status %02x\n", machine().describe_context(), offset, data );
 		return data;
 	}
 	else
@@ -237,7 +238,7 @@ uint8_t at28c64b_device::read(offs_t offset)
 		}
 
 		uint8_t data = this->space(AS_PROGRAM).read_byte( offset );
-//      logerror( "%s: AT28C64B: read( %04x ) data %02x\n", machine().describe_context(), offset, data );
+		//logerror( "%s: AT28C64B: read( %04x ) data %02x\n", machine().describe_context(), offset, data );
 		return data;
 	}
 }
@@ -248,7 +249,7 @@ void at28c64b_device::set_a9_12v(int state)
 	state &= 1;
 	if( m_a9_12v != state )
 	{
-//      logerror( "%s: AT28C64B: set_a9_12v( %d )\n", machine().describe_context(), state );
+		//logerror( "%s: AT28C64B: set_a9_12v( %d )\n", machine().describe_context(), state );
 		m_a9_12v = state;
 	}
 }
@@ -259,7 +260,7 @@ void at28c64b_device::set_oe_12v(int state)
 	state &= 1;
 	if( m_oe_12v != state )
 	{
-//      logerror( "%s: AT28C64B: set_oe_12v( %d )\n", machine().describe_context(), state );
+		//logerror( "%s: AT28C64B: set_oe_12v( %d )\n", machine().describe_context(), state );
 		m_oe_12v = state;
 	}
 }

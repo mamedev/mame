@@ -43,6 +43,8 @@ public:
 		vga.memory[address % vga.svga_intf.vram_size] = data;
 	}
 
+	virtual uint8_t get_video_depth() override;
+
 protected:
 	sis6326_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

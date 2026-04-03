@@ -37,7 +37,7 @@ TODO (sis630):
 
 #define LOG_SEQ    (1U << 1) // extended sequencer register descriptions
 #define LOG_CRTC   (1U << 2) // extended CRTC registers (overlay)
-
+#define LOG_PLL    (1U << 3) // PLL calculation (verbose, needs dirty flag)
 #define LOG_LOCKED (1U << 4) // log lock/unlock sequences
 
 #define VERBOSE (LOG_GENERAL | LOG_CRTC)
@@ -45,7 +45,7 @@ TODO (sis630):
 
 #define LOGSEQ(...)       LOGMASKED(LOG_SEQ, __VA_ARGS__)
 #define LOGCRTC(...)      LOGMASKED(LOG_CRTC, __VA_ARGS__)
-
+#define LOGPLL(...)       LOGMASKED(LOG_PLL, __VA_ARGS__)
 #define LOGLOCKED(...)    LOGMASKED(LOG_LOCKED, __VA_ARGS__)
 
 #include "logmacro.h"
@@ -202,7 +202,7 @@ void sis6326_vga_device::device_reset()
 	// irrelevant really
 	m_crtc_hcounter_latch = m_crtc_vcounter_latch = 0xffff;
 
-	// everything else shouldn't matter for cursor
+	// everything else shouldn't matter for cursor (enable disabled with RAMDAC mode above)
 	// initialize fixed part here: HW cannot set any other bit beyond 21 ~ 18.
 	// On win98se this will map at bottom of VRAM i.e. at $3f'fc00 on 4MiB cards
 	m_cursor.address_base = 0x03'fc00;
@@ -577,43 +577,43 @@ void sis6326_vga_device::crtc_map(address_map &map)
 			);
 		})
 	);
-//	map(0x99, 0x99) Video Control Misc. 1
-//	map(0x9a, 0x9a) Video Chroma B/Y Low
-//	map(0x9b, 0x9b) Video Chroma G/U Low
-//	map(0x9c, 0x9c) Video Chroma R/V Low
+//  map(0x99, 0x99) Video Control Misc. 1
+//  map(0x9a, 0x9a) Video Chroma B/Y Low
+//  map(0x9b, 0x9b) Video Chroma G/U Low
+//  map(0x9c, 0x9c) Video Chroma R/V Low
 	// NOTE: there's no Video Control Misc. 2
-//	map(0x9d, 0x9d) Video Control Misc. 3
-//	map(0x9e, 0x9e) Video Playback Threshold Low
-//	map(0x9f, 0x9f) Video Playback Threshold High
-//	map(0xa0, 0xa0) Line Buffer Size
-//	map(0xa1, 0xa1) Color Key Blue High
-//	map(0xa2, 0xa2) Color Key Green High
-//	map(0xa3, 0xa3) Color Key Red High
-//	map(0xa4, 0xa4) Video Chroma B/Y High
-//	map(0xa5, 0xa5) Video Chroma G/U High
-//	map(0xa6, 0xa6) Video Chroma R/V High
-//	map(0xa7, 0xa7) Graphics Data Alpha
-//	map(0xa8, 0xa8) Video Data Alpha
-//	map(0xa9, 0xa9) Key Overlay Op Mode
-//	map(0xaa, 0xaa) Video Capture Horizontal Start
-//	map(0xab, 0xab) Video Capture Horizontal End
-//	map(0xac, 0xac) Video Capture Vertical Start
-//	map(0xad, 0xad) Video Capture Vertical End
-//	map(0xae, 0xae) Video Capture Horizontal Overflow
-//	map(0xaf, 0xaf) Video Capture Vertical Overflow (+ Input Delay Compensation)
-//	map(0xb0, 0xb1) System Memory Video FB Setting 1/2 (<reserved>)
-//	map(0xb2, 0xb2) System Memory Video FB Setting 3 and Video Control
-//	map(0xb3, 0xb3) Contrast Enhancement Mean Value Sampling Rate Factor
-//	map(0xb4, 0xb4) Brightness
-//	map(0xb5, 0xb5) Contrast Enhancement Control
-//	map(0xb6, 0xb6) Video Control Misc. 4
-//	map(0xb7, 0xb7) Video U Plane Starting Address Low
-//	map(0xb8, 0xb8) Video U Plane Starting Address Middle
-//	map(0xb9, 0xb9) Video UV Plane Starting Address High
-//	map(0xba, 0xba) Video V Plane Starting Address Low
-//	map(0xbb, 0xbb) Video V Plane Starting Address Middle
-//	map(0xbc, 0xbc) Video UV Plane Offset Low
-//	map(0xbd, 0xbd) Video UV Plane Offset High
+//  map(0x9d, 0x9d) Video Control Misc. 3
+//  map(0x9e, 0x9e) Video Playback Threshold Low
+//  map(0x9f, 0x9f) Video Playback Threshold High
+//  map(0xa0, 0xa0) Line Buffer Size
+//  map(0xa1, 0xa1) Color Key Blue High
+//  map(0xa2, 0xa2) Color Key Green High
+//  map(0xa3, 0xa3) Color Key Red High
+//  map(0xa4, 0xa4) Video Chroma B/Y High
+//  map(0xa5, 0xa5) Video Chroma G/U High
+//  map(0xa6, 0xa6) Video Chroma R/V High
+//  map(0xa7, 0xa7) Graphics Data Alpha
+//  map(0xa8, 0xa8) Video Data Alpha
+//  map(0xa9, 0xa9) Key Overlay Op Mode
+//  map(0xaa, 0xaa) Video Capture Horizontal Start
+//  map(0xab, 0xab) Video Capture Horizontal End
+//  map(0xac, 0xac) Video Capture Vertical Start
+//  map(0xad, 0xad) Video Capture Vertical End
+//  map(0xae, 0xae) Video Capture Horizontal Overflow
+//  map(0xaf, 0xaf) Video Capture Vertical Overflow (+ Input Delay Compensation)
+//  map(0xb0, 0xb1) System Memory Video FB Setting 1/2 (<reserved>)
+//  map(0xb2, 0xb2) System Memory Video FB Setting 3 and Video Control
+//  map(0xb3, 0xb3) Contrast Enhancement Mean Value Sampling Rate Factor
+//  map(0xb4, 0xb4) Brightness
+//  map(0xb5, 0xb5) Contrast Enhancement Control
+//  map(0xb6, 0xb6) Video Control Misc. 4
+//  map(0xb7, 0xb7) Video U Plane Starting Address Low
+//  map(0xb8, 0xb8) Video U Plane Starting Address Middle
+//  map(0xb9, 0xb9) Video UV Plane Starting Address High
+//  map(0xba, 0xba) Video V Plane Starting Address Low
+//  map(0xbb, 0xbb) Video V Plane Starting Address Middle
+//  map(0xbc, 0xbc) Video UV Plane Offset Low
+//  map(0xbd, 0xbd) Video UV Plane Offset High
 
 	map(0xe0, 0xe0).lrw8(
 		NAME([this] (offs_t offset) -> u8 {
@@ -1160,7 +1160,7 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			const bool latch_address = offset == 2;
 			const u8 mask = latch_address ? 0x0f : 0xff;
 			m_fast_page_address_latch[offset] = data & mask;
-			LOG("SR30: Fast Page Flip Starting Address [%d] %02x\n", offset, data);
+			LOG("SR%02X: Fast Page Flip Starting Address [%d] %02x\n", offset + 0x30, offset, data);
 			// TODO: Direct Draw obviously uses this
 			//if (BIT(m_dram_fb_size, 4) && latch_address)
 			//{
@@ -1271,10 +1271,6 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			LOG("SR38: Misc. Control 7 %02x\n", data);
-			//if ((m_ext_sr38 & 3) != (data & 3))
-			//{
-			//	recompute_params();
-			//}
 			m_ext_sr38 = data;
 			m_cursor.address_base &= ~0x3c'0000;
 			m_cursor.address_base |= (data >> 4) << 18;
@@ -1282,6 +1278,7 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			// testable at 1600x1200, needs HW test
 			vga.crtc.line_compare = (vga.crtc.line_compare & 0x3ff) | (BIT(data, 2) * 0xfc00);
 			//vga.crtc.line_compare = (vga.crtc.line_compare & 0x3ff) | (BIT(data, 2) << 10);
+			recompute_params();
 		})
 	);
 
@@ -1427,9 +1424,11 @@ std::tuple<u8, u8> sis6326_vga_device::flush_true_color_mode()
 	if ((m_ramdac_mode & 0x12) != 0x12)
 		return std::make_tuple(0, 0);
 
-	const u8 res = !BIT(m_ext_sr07, 2);
+	// whatever is this doesn't seem related to the actual video format output
+	// win98se has it enabled, SDD doesn't, both use 24-bit depth anyway
+//	const u8 res = !BIT(m_ext_sr07, 2);
 
-	return std::make_tuple(res, 0);
+	return std::make_tuple(1, 0);
 }
 
 void sis6326_vga_device::recompute_params()
@@ -1444,8 +1443,26 @@ void sis6326_vga_device::recompute_params()
 		// TODO: stub, barely enough to make BeOS 5 to set ~60 Hz for 640x480x16
 		case 2:
 		default:
-			xtal = XTAL(25'174'800).value();
+		{
+			// TODO: setting 2 is external (all available card pics shows a 14 MHz XTAL anyway)
+			// TODO: PLL calculation is not necessarily correct or even confirmed
+			// - shutms11 beos5 expects a 25 MHz base clock for getting ~60 Hz
+			// - SDD tests, particularly stuff that enables interlace (tbd)
+			const int clock_select[] = { 25'174'800, 28'636'363, 14'318'181, 14'318'181 };
+
+			float numerator = (m_vclk_int[0] & 0x7f) + 1;
+			float denominator = (m_vclk_int[1] & 0x1f) + 1;
+			const u8 postscale_types[] = { 1, 2, 3, 4, 1, 1, 6, 8 };
+			// assume doc mistake for bit 6 (claims bit 7 that is MCLK related instead)
+			float postscale = postscale_types[((m_vclk_int[1] & 0x60) >> 5) | BIT(m_ext_sr13, 6) << 2];
+			float div = BIT(m_vclk_int[0], 7) + 1;
+			float raw_xtal = ((XTAL(clock_select[m_ext_sr38 & 3]).value() / 2) * (numerator / denominator) * (div / postscale));
+			xtal = (int)raw_xtal;
+			LOGPLL("SR13 %02x SR2A %02x SR2B %02x SR38[0:1] %01x\n", m_ext_sr13, m_vclk_int[0], m_vclk_int[1], m_ext_sr38 & 3);
+			LOGPLL("num %f dem %f postscale %f div %f ->\n", numerator, denominator, postscale, div);
+			LOGPLL("%f %d\n", raw_xtal, xtal);
 			break;
+		}
 	}
 
 	recompute_params_clock(1, xtal);
@@ -1463,6 +1480,24 @@ u16 sis6326_vga_device::line_compare_mask()
 	// trick to make line compare to never occur
 	// (assuming it's true, cfr. above)
 	return 0x3ff | (vga.crtc.line_compare & 0xfc00);
+}
+
+uint8_t sis6326_vga_device::get_video_depth()
+{
+	switch(pc_vga_choosevideomode())
+	{
+		case VGA_MODE:
+		case RGB8_MODE:
+			return 8;
+		case RGB15_MODE:
+		case RGB16_MODE:
+			return 16;
+		case RGB24_MODE:
+			return 24;
+		case RGB32_MODE:
+			return 32;
+	}
+	return 0;
 }
 
 uint8_t sis6326_vga_device::mem_r(offs_t offset)
@@ -1518,13 +1553,13 @@ u32 sis6326_vga_device::yuvtorgb32(u8 y, u8 u, u8 v)
 
 void sis6326_vga_device::draw_overlay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-//	popmessage("(H %d %d V %d %d) %08x %d %06x"
-//		, m_overlay.h_display_start, m_overlay.h_display_end
-//		, m_overlay.v_display_start, m_overlay.v_display_end
-//		, m_overlay.display_fb_addr
-//		, m_overlay.fb_offset
-//		, m_overlay.color_key
-//	);
+//  popmessage("(H %d %d V %d %d) %08x %d %06x"
+//      , m_overlay.h_display_start, m_overlay.h_display_end
+//      , m_overlay.v_display_start, m_overlay.v_display_end
+//      , m_overlay.display_fb_addr
+//      , m_overlay.fb_offset
+//      , m_overlay.color_key
+//  );
 
 	for (int y = 0; y < 240; y++)
 	{

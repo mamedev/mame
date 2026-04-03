@@ -393,7 +393,7 @@ ROM_START( dreamcha )
 	ROM_LOAD( "dhc3.u15", 0x180000, 0x80000, CRC(36686061) SHA1(dab490fafe886d05af1308d8ffd977e1aaf04ada) )
 
 	ROM_REGION( 0x100000, "tiles2", 0 ) // TODO: verify ROM loading
-	ROM_LOAD16_BYTE( "dhdc0.u16", 0x00000, 0x80000, CRC(f62cfca5) SHA1(76e89baebabe22b48db723d02504036cccc2286c) ) // FIXED BITS (0xxxxxxx). Is this correct? Dumps always the same
+	ROM_LOAD16_BYTE( "dhdc0.u16", 0x00000, 0x80000, CRC(f62cfca5) SHA1(76e89baebabe22b48db723d02504036cccc2286c) ) // FIXED BITS (0xxxxxxx). Is this correct? Dumps always the same on 2 different programmers
 	ROM_LOAD16_BYTE( "dhdc1.u17", 0x00001, 0x80000, CRC(1b11fa22) SHA1(57af78e979a50201d89ebdefe076cf538fc1d2dd) )
 
 	ROM_REGION( 0x100000, "oki", 0 ) // TODO: verify how it's banked and adjust ROM loading accordingly

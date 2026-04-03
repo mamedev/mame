@@ -39,7 +39,7 @@ public:
 	void reset_w(int state);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_stop() override ATTR_COLD;
 
@@ -79,15 +79,12 @@ public:
 		: adamnet_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		set_bus(std::forward<T>(bus));
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 	}
 	adamnet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	// configuration
@@ -114,7 +111,7 @@ protected:
 };
 
 
-// device type definitions
+// device type declarations
 DECLARE_DEVICE_TYPE(ADAMNET,      adamnet_device)
 DECLARE_DEVICE_TYPE(ADAMNET_SLOT, adamnet_slot_device)
 

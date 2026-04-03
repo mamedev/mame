@@ -115,7 +115,7 @@ protected:
 	public:
 		virtual u8 read_vector(u16 adr) = 0;
 
-		memory_access<26, 0, 0, ENDIANNESS_LITTLE>::cache m_dcache;
+		memory_access<26, 0, 0, ENDIANNESS_LITTLE>::specific m_dcache;
 		memory_access<26, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 
 		bool m_irq_service;

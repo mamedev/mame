@@ -78,8 +78,8 @@ void xavix_device::device_start()
 
 	init();
 
-	m_lowbus_space = &space(5);
-	m_extbus_space = &space(6);
+	space(5).specific(m_lowbus);
+	space(6).specific(m_extbus);
 
 	state_add(XAVIX_DATABANK, "DATBNK", m_databank).callimport().formatstr("%2s");
 	state_add(XAVIX_CODEBANK, "CODBNK", m_codebank).callimport().formatstr("%2s");
@@ -176,16 +176,16 @@ inline uint8_t xavix_device::read_full_data(uint8_t databank, uint16_t adr)
 				return m_databank;
 			}
 
-			return m_lowbus_space->read_byte(adr);
+			return m_lowbus.read_interruptible(adr);
 		}
 		else
 		{
-			return m_extbus_space->read_byte(((databank << 16) | adr) & 0x7fffff );
+			return m_extbus.read_interruptible(((databank << 16) | adr) & 0x7fffff);
 		}
 	}
 	else
 	{
-		return m_extbus_space->read_byte(((databank << 16) | adr) & 0x7fffff );
+		return m_extbus.read_interruptible(((databank << 16) | adr) & 0x7fffff);
 	}
 }
 
@@ -199,13 +199,13 @@ inline uint8_t xavix_device::mi_xavix::read(uint16_t adr)
 // opcode reads
 uint8_t xavix_device::mi_xavix::read_sync(uint16_t adr)
 {
-	return m_csprogram.read_byte(m_base->adr_with_codebank(adr));
+	return m_csprogram.read_interruptible(m_base->adr_with_codebank(adr));
 }
 
 // oprand reads
 uint8_t xavix_device::mi_xavix::read_arg(uint16_t adr)
 {
-	return m_cprogram.read_byte(m_base->adr_with_codebank(adr));
+	return m_cprogram.read_interruptible(m_base->adr_with_codebank(adr));
 }
 
 // data writes
@@ -217,13 +217,13 @@ void xavix_device::write_full_data(uint32_t addr, uint8_t val)
 uint8_t xavix_device::read_stack(uint32_t addr)
 {
 	// address is always 0x100-0x1ff
-	return m_lowbus_space->read_byte((addr & 0xff)+0x100);
+	return m_lowbus.read_interruptible((addr & 0xff) + 0x100);
 }
 
 void xavix_device::write_stack(uint32_t addr, uint8_t val)
 {
 	// address is always 0x100-0x1ff
-	m_lowbus_space->write_byte((addr & 0xff)+0x100, val);
+	m_lowbus.write_interruptible((addr & 0xff) + 0x100, val);
 }
 
 uint8_t xavix_device::read_zeropage(uint32_t addr)
@@ -240,7 +240,7 @@ uint8_t xavix_device::read_zeropage(uint32_t addr)
 		return m_databank;
 	}
 
-	return m_lowbus_space->read_byte(addr);
+	return m_lowbus.read_interruptible(addr);
 }
 
 void xavix_device::write_zeropage(uint32_t addr, uint8_t val)
@@ -259,7 +259,7 @@ void xavix_device::write_zeropage(uint32_t addr, uint8_t val)
 		return;
 	}
 
-	m_lowbus_space->write_byte(addr, val);
+	m_lowbus.write_interruptible(addr, val);
 }
 
 
@@ -281,16 +281,16 @@ inline void xavix_device::write_full_data(uint8_t databank, uint16_t adr, uint8_
 				return;
 			}
 
-			m_lowbus_space->write_byte(adr, val);
+			m_lowbus.write_interruptible(adr, val);
 		}
 		else
 		{
-			m_extbus_space->write_byte(((databank << 16) | adr) & 0x7fffff, val);
+			m_extbus.write_interruptible(((databank << 16) | adr) & 0x7fffff, val);
 		}
 	}
 	else
 	{
-		m_extbus_space->write_byte(((databank << 16) | adr) & 0x7fffff, val);
+		m_extbus.write_interruptible(((databank << 16) | adr) & 0x7fffff, val);
 	}
 }
 

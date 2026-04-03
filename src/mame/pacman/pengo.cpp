@@ -149,7 +149,7 @@ void pengo_state::pengo_map(address_map &map)
 	map(0x8400, 0x87ff).ram().w(FUNC(pengo_state::pacman_colorram_w)).share("colorram");
 	map(0x8800, 0x8fef).ram().share("mainram");
 	map(0x8ff0, 0x8fff).ram().share("spriteram");
-	map(0x9000, 0x901f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x9000, 0x901f).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x9020, 0x902f).writeonly().share("spriteram2");
 	map(0x9000, 0x903f).portr("DSW1");
 	map(0x9040, 0x907f).portr("DSW0");
@@ -174,7 +174,7 @@ void pengo_state::jrpacmbl_map(address_map &map)
 	map(0x8000, 0x87ff).ram().w(FUNC(pengo_state::jrpacman_videoram_w)).share("videoram");
 	map(0x8800, 0x8fef).ram();
 	map(0x8ff0, 0x8fff).ram().share("spriteram");
-	map(0x9000, 0x901f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x9000, 0x901f).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x9020, 0x902f).writeonly().share("spriteram2");
 	map(0x9030, 0x9030).w(FUNC(pengo_state::jrpacman_scroll_w));
 	map(0x9040, 0x904f).portr("DSW");
@@ -381,7 +381,7 @@ void pengo_state::pengo(machine_config &config)
 
 	LS259(config, m_latch); // U27
 	m_latch->q_out_cb<0>().set(FUNC(pengo_state::irq_mask_w));
-	m_latch->q_out_cb<1>().set("namco", FUNC(namco_device::sound_enable_w));
+	m_latch->q_out_cb<1>().set("namco", FUNC(namco_wsg_device::sound_enable_w));
 	m_latch->q_out_cb<2>().set(FUNC(pengo_state::pengo_palettebank_w));
 	m_latch->q_out_cb<3>().set(FUNC(pengo_state::flipscreen_w));
 	m_latch->q_out_cb<4>().set(FUNC(pengo_state::coin_counter_w<0>));
@@ -406,8 +406,7 @@ void pengo_state::pengo(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32);
-	m_namco_sound->set_voices(3);
+	NAMCO_WSG(config, m_namco_sound, MASTER_CLOCK/6/32);
 	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

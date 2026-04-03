@@ -601,7 +601,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 			m_addressA = PORTA_ADDRESS;
 			m_addressB = PORTB_ADDRESS;
 			m_count = BLOCKLEN;
-			m_byte_counter = 0;
+			reset_byte_counter();
 			m_status |= 0x30;
 			enable();
 		}
@@ -792,7 +792,7 @@ void z80dma_device::write(u8 data)
 				m_addressA = PORTA_ADDRESS;
 				m_addressB = PORTB_ADDRESS;
 				m_count = BLOCKLEN;
-				m_byte_counter = 0;
+				reset_byte_counter();
 				m_status |= 0x30;
 
 				LOGREGS("CMD Load A: %x B: %x N: %x\n", m_addressA, m_addressB, m_count);
@@ -812,7 +812,7 @@ void z80dma_device::write(u8 data)
 			case COMMAND_CONTINUE:
 				LOGREGS("CMD Continue\n");
 				m_count = BLOCKLEN;
-				m_byte_counter = 0;
+				reset_byte_counter();
 				//enable(); //???m_dma_enabled = 1;
 				//"match not found" & "end of block" status flags zeroed here
 				m_status |= 0x30;
@@ -894,10 +894,10 @@ void z80dma_device::write(u8 data)
 TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
 {
 	// normalize state
-	m_rdy = param;
-	m_status = (m_status & 0xfd) | (!is_ready() << 1);
+	const bool is_ready = m_force_ready || (param == READY_ACTIVE_HIGH);
+	m_status = (m_status & 0xfd) | (!is_ready << 1);
 
-	if (is_ready() && INT_ON_READY)
+	if (is_ready && INT_ON_READY)
 	{
 		trigger_interrupt(INT_RDY);
 	}
@@ -909,6 +909,11 @@ TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
 void z80dma_device::rdy_w(int state)
 {
 	LOGLINE("Z80DMA RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH);
+
+	// update RDY immediately so the state machine can react to it
+	m_rdy = state;
+
+	// synchronize the side effects
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(z80dma_device::rdy_write_callback), this), state);
 }
 

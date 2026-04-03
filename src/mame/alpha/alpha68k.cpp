@@ -1271,7 +1271,7 @@ static constexpr u32 ALPHA68K_HTOTAL = 384;
 
 void alpha68k_state::set_screen_raw_params(machine_config &config)
 {
-//  TODO: Same as snk/snk68.cpp, which in turn is awfully similar to NeoGeo CRTC parameters
+	// Same as snk/snk68.cpp, which in turn is awfully similar to NeoGeo CRTC parameters
 	m_screen->set_raw(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,0,256,264,16,240);
 }
 

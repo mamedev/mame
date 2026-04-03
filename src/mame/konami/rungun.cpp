@@ -66,13 +66,13 @@ public:
 		m_palette2(*this, "palette2"),
 		m_screen(*this, "screen"),
 		m_k054321(*this, "k054321"),
+		m_eeprom(*this, "eeprom"),
 		m_sysreg(*this, "sysreg"),
 		m_bank2(*this, "bank2"),
 		m_spriteram_bank(*this, "spriteram_bank"),
 		m_p_inputs(*this, "P%u", 1U),
 		m_dsw(*this, "DSW"),
-		m_system(*this, "SYSTEM"),
-		m_eepromout(*this, "EEPROMOUT")
+		m_system(*this, "SYSTEM")
 	{ }
 
 	void rng(machine_config &config);
@@ -96,6 +96,7 @@ private:
 	optional_device<palette_device> m_palette2;
 	required_device<screen_device> m_screen;
 	required_device<k054321_device> m_k054321;
+	required_device<eeprom_serial_er5911_device> m_eeprom;
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_sysreg;
@@ -106,7 +107,6 @@ private:
 	required_ioport_array<4> m_p_inputs;
 	required_ioport m_dsw;
 	required_ioport m_system;
-	required_ioport m_eepromout;
 
 	/* video-related */
 	tilemap_t   *m_ttl_tilemap[2]{};
@@ -219,12 +219,15 @@ void rungun_state::sysregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			*/
 			if (ACCESSING_BITS_0_7)
 			{
-				m_spriteram_bank->set_entry(BIT(data, 7));
-				m_video_mux_bank = BIT(data, 7) ^ 1;
-				m_eepromout->write(data, 0xff);
+				m_eeprom->di_write(BIT(data, 0));
+				m_eeprom->cs_write(BIT(data, 1));
+				m_eeprom->clk_write(BIT(data, 2));
 
 				machine().bookkeeping().coin_counter_w(0, BIT(data, 3));
 				machine().bookkeeping().coin_counter_w(1, BIT(data, 4));
+
+				m_spriteram_bank->set_entry(BIT(data, 7));
+				m_video_mux_bank = BIT(data, 7) ^ 1;
 			}
 			if (ACCESSING_BITS_8_15)
 			{
@@ -246,6 +249,7 @@ void rungun_state::sysregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			    bit 7-4: base address for 53936 ROM readback.
 			*/
 			m_k055673->k053246_set_objcha_line(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
+			machine().sound().system_mute(!BIT(data, 3));
 			m_roz_rombase = (data & 0xf0) >> 4;
 			break;
 	}
@@ -409,7 +413,6 @@ void rungun_state::video_start()
 		m_936_tilemap[screen_num] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rungun_state::get_936_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
 		m_936_tilemap[screen_num]->set_user_data((void *)(uintptr_t)(screen_num * 0x80000));
 		m_936_tilemap[screen_num]->set_transparent_pen(0);
-
 	}
 	m_sprite_colorbase = 0x20;
 
@@ -565,11 +568,6 @@ static INPUT_PORTS_START( rng )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
-
 	PORT_START("P1")
 	KONAMI8_B123_START(1)
 
@@ -636,9 +634,10 @@ void rungun_state::machine_start()
 
 void rungun_state::machine_reset()
 {
-	memset(m_sysreg, 0, 0x20);
-	m_sound_ctrl = 0;
-	m_irq5_enable = false;
+	for (int i = 0; i < 0x10; i++)
+		sysregs_w(i, 0);
+
+	sound_ctrl_w(0);
 }
 
 void rungun_state::rng(machine_config &config)
@@ -655,7 +654,7 @@ void rungun_state::rng(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rungun);
 
-	EEPROM_ER5911_8BIT(config, "eeprom");
+	EEPROM_ER5911_8BIT(config, m_eeprom);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

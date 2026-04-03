@@ -16576,7 +16576,7 @@ ROM_START( jungsub )
 
 	/* There is twice as much GFX data here as an original 'Jungler'
 
-	   This appears to be because the Rally X / Jungler hardware supports both X and Y tile flipping, a feature
+	   This appears to be because the Rally-X / Jungler hardware supports both X and Y tile flipping, a feature
 	   which Jungler needs.  Galaxian / Scramble hardware does not support tile flipping.
 
 	   Adding flipped copies of all the tiles would require 4x ROM capacity (normal, Flip X, Flip Y, Flip XY)

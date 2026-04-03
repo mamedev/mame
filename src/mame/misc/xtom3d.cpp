@@ -153,7 +153,7 @@ HS3PIN  Unpopulated header near A40MX04
 #define LOG_FLASH     (1U << 1)
 
 #define VERBOSE (LOG_GENERAL | LOG_FLASH)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 

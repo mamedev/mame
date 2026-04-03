@@ -42,7 +42,6 @@
 #define OPTION_SKIP_WARNINGS          "skip_warnings"
 #define OPTION_UNTHROTTLE_MUTE        "unthrottle_mute"
 
-
 // core UI options
 #define OPTION_INFOS_SIZE             "infos_text_size"
 #define OPTION_FONT_ROWS              "font_rows"

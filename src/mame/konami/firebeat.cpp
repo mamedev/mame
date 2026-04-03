@@ -199,13 +199,11 @@ protected:
 	void sound_stream_update(sound_stream &stream) override;
 
 private:
-	enum {
-		TOTAL_BUFFERS = 2,
-		TOTAL_CHANNELS = 2,
-		TOTAL_BARS = 6,
+	static constexpr int TOTAL_BUFFERS = 2;
+	static constexpr int TOTAL_CHANNELS = 2;
+	static constexpr int TOTAL_BARS = 6;
 
-		FFT_LENGTH = 512
-	};
+	static constexpr int FFT_LENGTH = 512;
 
 	void update_fft();
 	void apply_fft(uint32_t buf_index);
@@ -276,7 +274,7 @@ void firebeat_extend_spectrum_analyzer_device::sound_stream_update(sound_stream 
 		int cur_notch = 0;
 
 		for (int i = 0; i <= FFT_LENGTH / 2; i++) {
-			const double freq = (double)i / FFT_LENGTH * srate;
+			const double freq = double(i) / FFT_LENGTH * srate;
 
 			if (freq < NOTCHES[cur_notch])
 				continue;

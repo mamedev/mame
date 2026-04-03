@@ -239,6 +239,7 @@ protected:
 	static const struct opcode_s s_opXX_78c06[256];
 
 	address_space_config m_program_config;
+	address_space_config m_io_config; // 7800/01/02 only
 	memory_view m_ram_view;
 
 	PAIR    m_ppc;    /* previous program counter */
@@ -344,6 +345,7 @@ protected:
 	const struct opcode_s *m_op74;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_opcodes;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 	int m_icount;
 
 	uint8_t RP(offs_t port);
@@ -1418,6 +1420,7 @@ protected:
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
 	virtual void execute_set_input(int inputnum, int state) override;
+	virtual space_config_vector memory_space_config() const override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void handle_timers(int cycles) override;
 	virtual void upd7810_take_irq() override;

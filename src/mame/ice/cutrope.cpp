@@ -3,7 +3,7 @@
 /***********************************************************************************************************
 
 Skeleton driver for "Cut The Rope", by Innovative Concepts in Entertainment, Inc. (ICE).
-Redemption game with a vertical touch sceen and ticket payout, from 2016.
+Redemption game with a vertical touch screen and ticket payout, from 2016.
 ICE also produced a "Cut the Rope" electromechanical crane arcade machine in 2013, with a suction
 cup rather than a claw.
 
@@ -24,41 +24,39 @@ And an external PCB for I/O, connected by USB to the motherboard:
 
 namespace {
 
-class cuttherope_state : public driver_device
+class cutrope_state : public driver_device
 {
 public:
-	cuttherope_state(const machine_config &mconfig, device_type type, const char *tag)
+	cutrope_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 	{ }
 
 
-	void cuttherope(machine_config &config);
+	void cutrope(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void cuttherope_io(address_map &map) ATTR_COLD;
-	void cuttherope_map(address_map &map) ATTR_COLD;
+	void cutrope_io(address_map &map) ATTR_COLD;
+	void cutrope_map(address_map &map) ATTR_COLD;
 };
 
 
-void cuttherope_state::cuttherope_map(address_map &map)
+void cutrope_state::cutrope_map(address_map &map)
 {
 }
 
-void cuttherope_state::cuttherope_io(address_map &map)
+void cutrope_state::cutrope_io(address_map &map)
 {
 }
 
-static INPUT_PORTS_START(cuttherope)
-INPUT_PORTS_END
-
-void cuttherope_state::cuttherope(machine_config &config)
+void cutrope_state::cutrope(machine_config &config)
 {
+	// Socket H2 (!)
 	PENTIUM4(config, m_maincpu, 100'000'000); // Exact CPU and frequency unknown
-	m_maincpu->set_addrmap(AS_PROGRAM, &cuttherope_state::cuttherope_map);
-	m_maincpu->set_addrmap(AS_IO, &cuttherope_state::cuttherope_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cutrope_state::cutrope_map);
+	m_maincpu->set_addrmap(AS_IO, &cutrope_state::cutrope_io);
 
 	PCI_ROOT(config, "pci", 0);
 	// ...
@@ -73,10 +71,10 @@ ROM_START(cutrope)
 	ROM_LOAD("mcf51jm32vlk", 0x00000, 0x40000, NO_DUMP) // On the I/O PCB
 
 	DISK_REGION("ide:0:hdd")
-	DISK_IMAGE("cuttherope", 0, SHA1(25be8285ca75d759962f4b59b313a97d9077747e))
+	DISK_IMAGE("cutrope", 0, SHA1(25be8285ca75d759962f4b59b313a97d9077747e))
 ROM_END
 
 } // anonymous namespace
 
 
-GAME(2016, cutrope, 0, cuttherope, cuttherope, cuttherope_state, empty_init, ROT90, "ICE", "Cut The Rope", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(2016, cutrope, 0, cutrope, 0, cutrope_state, empty_init, ROT90, "ICE", "Cut The Rope", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

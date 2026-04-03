@@ -16,7 +16,6 @@ public:
 		T &&cpu_tag, int ram_size
 	) : vt82c598mvp_host_device(mconfig, tag, owner, clock)
 	{
-		set_ids(0x11060598, 0x00, 0x060000, 0x00);
 		//set_multifunction_device(true);
 		m_host_cpu.set_tag(std::forward<T>(cpu_tag));
 		set_ram_size(ram_size);
@@ -28,6 +27,8 @@ public:
 	void smi_act_w(int state);
 
 protected:
+	vt82c598mvp_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -38,10 +39,12 @@ protected:
 
 	virtual bool map_first() const override { return true; }
 
-private:
 	required_device<cpu_device> m_host_cpu;
 	std::vector<uint32_t> m_ram;
 
+	virtual u8 smi_bank() const { return 3; }
+
+private:
 	virtual uint8_t capptr_r() override;
 
 	u32 m_ram_size = 0;
@@ -85,6 +88,33 @@ private:
 	int m_smiact;
 };
 
+class vt82c691_host_device : public vt82c598mvp_host_device
+{
+public:
+	template <typename T> vt82c691_host_device(
+		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
+		T &&cpu_tag, int ram_size
+	) : vt82c691_host_device(mconfig, tag, owner, clock)
+	{
+		//set_multifunction_device(true);
+		m_host_cpu.set_tag(std::forward<T>(cpu_tag));
+		set_ram_size(ram_size);
+	}
+
+	vt82c691_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual void config_map(address_map &map) override ATTR_COLD;
+
+	virtual u8 smi_bank() const override { return 0; }
+
+private:
+	u8 m_bios_scratch[8];
+};
+
 class vt82c598mvp_bridge_device : public pci_bridge_device
 {
 public:
@@ -101,7 +131,7 @@ public:
 	vt82c598mvp_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	//vt82c598mvp_bridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	vt82c598mvp_bridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -119,8 +149,16 @@ private:
 	u8 m_pci2_master_control;
 };
 
+class vt82c691_bridge_device : public vt82c598mvp_bridge_device
+{
+public:
+	vt82c691_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
 DECLARE_DEVICE_TYPE(VT82C598MVP_HOST,   vt82c598mvp_host_device)
+DECLARE_DEVICE_TYPE(VT82C691_HOST,      vt82c691_host_device)
 DECLARE_DEVICE_TYPE(VT82C598MVP_BRIDGE, vt82c598mvp_bridge_device)
+DECLARE_DEVICE_TYPE(VT82C691_BRIDGE,    vt82c691_bridge_device)
+
 
 #endif // MAME_MACHINE_VT82C598MVP_H

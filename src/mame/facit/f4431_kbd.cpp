@@ -4,7 +4,7 @@
 
     Facit F4431 keyboard
 
-    TOOD:
+    TODO:
     - Speaker sounds weird
     - Verify country codes
 

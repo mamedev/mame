@@ -778,7 +778,7 @@ protected:
 	template<unsigned N>
 	uint16_t trackball()
 	{
-		// TOOD: figure out how each game balances the controls
+		// TODO: figure out how each game balances the controls
 		m_trackball[N] += ((uint8_t(m_handle[N]->read()) - 0x80) * (N ? -193 : 256)) / 256;
 		return m_trackball[N];
 	}

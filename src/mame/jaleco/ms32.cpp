@@ -486,7 +486,7 @@ Notes from Charles MacDonald
 
 ioport_value ms32_state::mahjong_ctrl_r()
 {
-	u32 mj_input = 0xff;
+	u32 mj_input = 0x3f;
 
 	for (int i = 0; i < m_io_mj.size(); i++)
 	{
@@ -494,7 +494,8 @@ ioport_value ms32_state::mahjong_ctrl_r()
 			mj_input &= m_io_mj[i]->read();
 	}
 
-	return bitswap<8>(mj_input, 6, 5, 4, 2, 3, 1, 0, 7);
+	// rotated one bit left so the Start column is the least significant bit
+	return bitswap<6>(mj_input, 4, 2, 3, 1, 0, 5) | 0xc0;
 }
 
 void ms32_base_state::sound_command_w(u32 data)
@@ -963,22 +964,6 @@ static INPUT_PORTS_START( ms32_mahjong )
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_INCLUDE(mahjong_matrix_1p)
-
-	PORT_MODIFY("KEY0")
-	PORT_BIT( 0x00000060, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_START1 ) // rotated into LSB
-
-	PORT_MODIFY("KEY1")
-	PORT_BIT( 0x000000c0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("KEY2")
-	PORT_BIT( 0x000000c0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("KEY3")
-	PORT_BIT( 0x000000c0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("KEY4")
-	PORT_BIT( 0x000000c0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 /*************************************

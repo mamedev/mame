@@ -99,7 +99,7 @@ private:
 		std::vector<float> m_volumes;
 		abuffer m_buffer;
 
-		stream_info(sound_pipewire *wire, bool is_output, uint32_t osdid, uint32_t channels) : m_wire(wire), m_is_output(is_output), m_wait_stream(true), m_osdid(osdid), m_channels(channels), m_stream(nullptr), m_buffer(channels) {}
+		stream_info(sound_pipewire *wire, bool is_output, uint32_t osdid, uint32_t channels, uint32_t rate) : m_wire(wire), m_is_output(is_output), m_wait_stream(true), m_osdid(osdid), m_channels(channels), m_stream(nullptr), m_buffer(channels, rate) {}
 	};
 
 	static const pw_core_events     core_events;
@@ -680,7 +680,7 @@ uint32_t sound_pipewire::stream_sink_open(uint32_t node, std::string name, uint3
 	node_info &snode = m_nodes.find(ni->second)->second;
 
 	uint32_t id = m_stream_current_id++;
-	auto &stream = m_streams.emplace(id, stream_info(this, true, id, snode.m_sinks)).first->second;
+	auto &stream = m_streams.emplace(id, stream_info(this, true, id, snode.m_sinks, rate)).first->second;
 
 	stream.m_stream = pw_stream_new_simple(pw_thread_loop_get_loop(m_loop),
 										   name.c_str(),
@@ -733,7 +733,7 @@ uint32_t sound_pipewire::stream_source_open(uint32_t node, std::string name, uin
 	node_info &snode = m_nodes.find(ni->second)->second;
 
 	uint32_t id = m_stream_current_id++;
-	auto &stream = m_streams.emplace(id, stream_info(this, false, id, snode.m_sources)).first->second;
+	auto &stream = m_streams.emplace(id, stream_info(this, false, id, snode.m_sources, rate)).first->second;
 
 	stream.m_stream = pw_stream_new_simple(pw_thread_loop_get_loop(m_loop),
 										   name.c_str(),

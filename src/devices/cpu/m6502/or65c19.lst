@@ -429,7 +429,7 @@ sbc_ipx
 		read(set_l(m_TMP, m_TMP+m_X));
 	}
 	m_TMP2 = read(m_TMP+m_X);
-	do_sbc(m_TMP2);
+	do_sbc_c(m_TMP2);
 	if(m_P & F_D) {
 		read_pc();
 		set_nz(m_A);

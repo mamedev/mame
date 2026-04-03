@@ -1556,7 +1556,7 @@ static INPUT_PORTS_START( norautp )
 
 	PORT_START("IN2")   // Only 3 lines: PPI-2; PC0-PC2
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_J) PORT_NAME("IN2-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Readout")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )    PORT_NAME("Readout")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )       PORT_CODE(KEYCODE_L) PORT_NAME("Low Level Hopper")
 
 	PORT_START("DSW1")
@@ -1594,7 +1594,7 @@ static INPUT_PORTS_START( norautrh )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_NAME("Bet / Change Card")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  // Coin A
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  // Coin B
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Readout")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )    PORT_NAME("Readout")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Hi")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Lo")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
@@ -1652,7 +1652,7 @@ static INPUT_PORTS_START( norautpn )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_NAME("Bet / Change Card")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  // Coin A
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  // Coin B
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Readout")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )    PORT_NAME("Readout")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Hi")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Lo")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
@@ -4567,6 +4567,42 @@ ROM_START( dphljp )  // close to GTI Poker
 	ROM_LOAD( "japan_6301.u51", 0x0000, 0x0100, CRC(88302127) SHA1(aed1273974917673405f1234ab64e6f8b3856c34) )
 ROM_END
 
+
+/*
+PCB:
+
+"AMERICADE
+S2507 DOMINO
+HI/LO DOUBLE UP"
+
+Smaller PCB:
+
+AMERICADE 3523
+
+8080A CPU
+
+2716 EPROMs
+
+Two 2111 SRAM
+
+Two 5101 SRAM
+*/
+ROM_START( dphlac )  // close to dphljp. Only first program ROM and PROM differ.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "hilob.u6",  0x0000, 0x0800, CRC(b87134a7) SHA1(598115ee2f2f653cc10b24db160ecb2f43a90dd0) )
+	ROM_RELOAD(            0x0800, 0x0800 )
+	ROM_LOAD( "hiloa.u9",  0x1000, 0x0800, CRC(ccaad5cb) SHA1(5f6ca497ccb7c535714a6e24df00f2831a7840c1) )
+	ROM_RELOAD(            0x1800, 0x0800 )
+	ROM_LOAD( "hiloc.u11", 0x2000, 0x0800, CRC(9f9c67d5) SHA1(cd11849b245406821af7ac3554805c9dd89645b2) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(                  0x0000, 0x0800, 0xff )
+	ROM_LOAD( "colorhilo.new", 0x0800, 0x0800, CRC(412fc492) SHA1(094ea0ffd0c22274cfe164f07c009ffe022331fd) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "82s129.u17", 0x0000, 0x0100, CRC(e4b8c299) SHA1(deda332faf02e15b16df1cbe86ba689ee9dd8035) )
+ROM_END
+
 /*
 
   Kimble Double HI-LO (8080).
@@ -6766,6 +6802,7 @@ GAMEL( 1997, ddellf97e, ddellf97, norautxp, delv18ap, norautp_state, empty_init,
 GAMEL( 1982, dphl,      0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",       0,                          layout_noraut10 )
 GAMEL( 1983, dphla,     0,        dphla,     dphla,     norautp_state, empty_init, ROT0, "<unknown>",                   "Joker Poker (Kramer, alt)",         0,                          layout_noraut10 )
 GAMEL( 1983, dphljp,    0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",       0,                          layout_noraut10 )
+GAMEL( 1983, dphlac,    0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "Americade",                   "Draw Poker HI-LO (Americade)",      MACHINE_NOT_WORKING,        layout_noraut10 )
 GAMEL( 198?, newhilop,  0,        dphl,      newhilop,  norautp_state, empty_init, ROT0, "Song Won?",                   "New Hi-Low Poker",                  0,                          layout_noraut10 )
 GAMEL( 198?, pkii_dm,   0,        dphl,      newhilop,  norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (PKII/DM)",        0,                          layout_noraut10 )
 GAMEL( 1983, krampcb2,  0,        dphl,      dphla,     norautp_state, empty_init, ROT0, "bootleg",                     "Draw Poker HI-LO (bootleg, set 1)", 0,                          layout_noraut10 )

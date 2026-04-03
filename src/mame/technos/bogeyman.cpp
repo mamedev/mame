@@ -15,11 +15,15 @@
     2008-07
     Dip Locations added based on crazykong BogeyManor.txt
 
+    TODO:
+    - verify vcount chain (exact interrupt timing and vblank flag on P2.7)
+
 ***************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/m6502/m6502.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 
 #include "emupal.h"
@@ -38,6 +42,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
 		m_ay(*this, "ay%u", 1U),
 		m_videoram(*this, "videoram%u", 1U),
 		m_colorram(*this, "colorram%u", 1U),
@@ -56,6 +61,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	required_device_array<ay8910_device, 2> m_ay;
 
 	// memory pointers
@@ -77,6 +83,7 @@ private:
 	template <uint8_t Which> void videoram_w(offs_t offset, uint8_t data);
 	template <uint8_t Which> void colorram_w(offs_t offset, uint8_t data);
 	void colbank_w(uint8_t data);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -188,15 +195,14 @@ void bogeyman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				flipy = !flipy;
 			}
 
-
-				m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
 				code, color,
 				flipx, flipy,
 				sx, sy, 0);
 
 			if (multi)
 			{
-					m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+				m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
 					code + 1, color,
 					flipx, flipy,
 					sx, sy + (flip_screen() ? -16 : 16), 0);
@@ -422,24 +428,27 @@ void bogeyman_state::colbank_w(uint8_t data)
 	}
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(bogeyman_state::interrupt)
+{
+	const int scanline = param;
+
+	// 16 interrupts per frame
+	if (scanline < 256)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+}
+
 void bogeyman_state::bogeyman(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, XTAL(12'000'000) / 8); // Verified
+	M6502(config, m_maincpu, 12_MHz_XTAL / 8); // Verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &bogeyman_state::prg_map);
-	m_maincpu->set_periodic_int(FUNC(bogeyman_state::irq0_line_hold), attotime::from_hz(16 * 60)); // Controls sound
+	TIMER(config, "scantimer").configure_scanline(FUNC(bogeyman_state::interrupt), "screen", 8, 16);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-//  screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-//  screen.set_size(32*8, 32*8);
-//  screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	// DECO video CRTC, unverified
-	screen.set_raw(XTAL(12'000'000) / 2, 384, 0, 256, 272, 8, 248);
-	screen.set_screen_update(FUNC(bogeyman_state::screen_update));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 8, 248); // DECO video CRTC, unverified
+	m_screen->set_screen_update(FUNC(bogeyman_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bogeyman);
 	PALETTE(config, m_palette, FUNC(bogeyman_state::palette)).set_format(palette_device::BGR_233_inverted, 16 + 256);
@@ -448,11 +457,11 @@ void bogeyman_state::bogeyman(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	// verified to be YM2149s from PCB pic. Another PCB had 2 AY-8910s
-	YM2149(config, m_ay[0], XTAL(12'000'000) / 8);  // Verified
+	YM2149(config, m_ay[0], 12_MHz_XTAL / 8); // Verified
 	m_ay[0]->port_a_write_callback().set(FUNC(bogeyman_state::colbank_w));
 	m_ay[0]->add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	YM2149(config, m_ay[1], XTAL(12'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.30);  // Verified
+	YM2149(config, m_ay[1], 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.30); // Verified
 }
 
 // ROMs

@@ -234,7 +234,13 @@ void nss_tvinterface_device::device_add_mconfig(machine_config &config)
 
 ROM_START(nss_tvinterface)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("tvgr_011091", 0xe000, 0x2000, CRC(0ff64cec) SHA1(d35881111cdf8e85a843e3b085447d07244d8d70) )
+
+	ROM_DEFAULT_BIOS("de")
+	ROM_SYSTEM_BIOS(0, "de", "German")
+	ROM_SYSTEM_BIOS(1, "fr", "French")
+
+	ROMX_LOAD("tvgr_011091",  0xe000, 0x2000, CRC(0ff64cec) SHA1(d35881111cdf8e85a843e3b085447d07244d8d70), ROM_BIOS(0) )
+	ROMX_LOAD("white_27c64a", 0xe000, 0x2000, CRC(3eefa63d) SHA1(2e6e0abb50f5722c81baedfd514d660f9c1c814e), ROM_BIOS(1) ) // no label
 
 	ROM_REGION( 0x2000, "cg_rom", 0 )
 	ROM_LOAD("cg_930", 0x0000, 0x2000, CRC(98287b9d) SHA1(b20d7856e4739bafcd66434adf9881824f8a611b) )

@@ -208,14 +208,14 @@ void validate_inlines()
 	u32 uremainder, expuremainder, bigu32 = 0xffffffff;
 
 	// use only non-zero, positive numbers
-	if (testu64a == 0) testu64a++;
-	if (testi64a == 0) testi64a++;
+	if (testu64a == 0) testu64a = testu64a + 1;
+	if (testi64a == 0) testi64a = testi64a + 1;
 	else if (testi64a < 0) testi64a = -testi64a;
-	if (testu32a == 0) testu32a++;
-	if (testu32b == 0) testu32b++;
-	if (testi32a == 0) testi32a++;
+	if (testu32a == 0) testu32a = testu32a + 1;
+	if (testu32b == 0) testu32b = testu32b + 1;
+	if (testi32a == 0) testi32a = testi32a + 1;
 	else if (testi32a < 0) testi32a = -testi32a;
-	if (testi32b == 0) testi32b++;
+	if (testi32b == 0) testi32b = testi32b + 1;
 	else if (testi32b < 0) testi32b = -testi32b;
 
 	resulti64 = mul_32x32(testi32a, testi32b);
@@ -249,9 +249,9 @@ void validate_inlines()
 		osd_printf_error("Error testing mulu_32x32_shift (%08X x %08X) >> 7 = %08X (expected %08X)\n", u32(testu32a), u32(testu32b), resultu32, expectedu32);
 
 	while (s64(testi32a) * s64(0x7fffffff) < testi64a)
-		testi64a /= 2;
+		testi64a = testi64a / 2;
 	while (u64(testu32a) * u64(bigu32) < testu64a)
-		testu64a /= 2;
+		testu64a = testu64a / 2;
 
 	resulti32 = div_64x32(testi64a, testi32a);
 	expectedi32 = testi64a / s64(testi32a);
@@ -286,9 +286,9 @@ void validate_inlines()
 		osd_printf_error("Error testing modu_64x32 (%16X / %08X) = %08X (expected %08X)\n", u64(testu64a), u32(testu32a), resultu32, expectedu32);
 
 	while (s64(testi32a) * s64(0x7fffffff) < (s32(testi64a) << 3))
-		testi64a /= 2;
+		testi64a = testi64a / 2;
 	while (u64(testu32a) * u64(0xffffffff) < (u32(testu64a) << 3))
-		testu64a /= 2;
+		testu64a = testu64a / 2;
 
 	resulti32 = div_32x32_shift(s32(testi64a), testi32a, 3);
 	expectedi32 = (s64(s32(testi64a)) << 3) / s64(testi32a);
@@ -327,7 +327,7 @@ void validate_inlines()
 		if (resultu32l != expected32)
 			osd_printf_error("Error testing rotl_32 %08x, %d=%08x (expected %08x)\n", u32(testu32a), -i, resultu32l, expected32);
 
-		expected32 = expected32 >> 1 | expected32 << 31;
+		expected32 = (expected32 >> 1) | (expected32 << 31);
 	}
 
 	u64 expected64 = testu64a << 1 | testu64a >> 63;
@@ -341,7 +341,7 @@ void validate_inlines()
 		if (resultu64l != expected64)
 			osd_printf_error("Error testing rotl_64 %016x, %d=%016x (expected %016x)\n", u64(testu64a), -i, resultu64l, expected64);
 
-		expected64 = expected64 >> 1 | expected64 << 63;
+		expected64 = (expected64 >> 1) | (expected64 << 63);
 	}
 }
 
@@ -440,13 +440,17 @@ void validate_rgb()
 	check_expected("rgbaint_t assignment");
 
 	// check piecewise set
-	rgb.set_a(expected_a = random_i32());
+	expected_a = random_i32();
+	rgb.set_a(expected_a);
 	check_expected("rgbaint_t::set_a");
-	rgb.set_r(expected_r = random_i32());
+	expected_r = random_i32();
+	rgb.set_r(expected_r);
 	check_expected("rgbaint_t::set_r");
-	rgb.set_g(expected_g = random_i32());
+	expected_g = random_i32();
+	rgb.set_g(expected_g);
 	check_expected("rgbaint_t::set_g");
-	rgb.set_b(expected_b = random_i32());
+	expected_b = random_i32();
+	rgb.set_b(expected_b);
 	check_expected("rgbaint_t::set_b");
 
 	// test merge_alpha
@@ -455,85 +459,113 @@ void validate_rgb()
 	check_expected("rgbaint_t::merge_alpha");
 
 	// test RGB addition (method)
-	expected_a += actual_a = random_i32();
-	expected_r += actual_r = random_i32();
-	expected_g += actual_g = random_i32();
-	expected_b += actual_b = random_i32();
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = expected_a + actual_a;
+	expected_r = expected_r + actual_r;
+	expected_g = expected_g + actual_g;
+	expected_b = expected_b + actual_b;
 	rgb.add(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
 	check_expected("rgbaint_t::add");
 
 	// test RGB addition (operator)
-	expected_a += actual_a = random_i32();
-	expected_r += actual_r = random_i32();
-	expected_g += actual_g = random_i32();
-	expected_b += actual_b = random_i32();
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = expected_a + actual_a;
+	expected_r = expected_r + actual_r;
+	expected_g = expected_g + actual_g;
+	expected_b = expected_b + actual_b;
 	rgb += rgbaint_t(actual_a, actual_r, actual_g, actual_b);
 	check_expected("rgbaint_t::operator+=");
 
 	// test offset addition (method)
 	imm = random_i32();
-	expected_a += imm;
-	expected_r += imm;
-	expected_g += imm;
-	expected_b += imm;
+	expected_a = expected_a + imm;
+	expected_r = expected_r + imm;
+	expected_g = expected_g + imm;
+	expected_b = expected_b + imm;
 	rgb.add_imm(imm);
 	check_expected("rgbaint_t::add_imm");
 
 	// test offset addition (operator)
 	imm = random_i32();
-	expected_a += imm;
-	expected_r += imm;
-	expected_g += imm;
-	expected_b += imm;
+	expected_a = expected_a + imm;
+	expected_r = expected_r + imm;
+	expected_g = expected_g + imm;
+	expected_b = expected_b + imm;
 	rgb += imm;
 	check_expected("rgbaint_t::operator+=");
 
 	// test immediate RGB addition
-	expected_a += actual_a = random_i32();
-	expected_r += actual_r = random_i32();
-	expected_g += actual_g = random_i32();
-	expected_b += actual_b = random_i32();
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = expected_a + actual_a;
+	expected_r = expected_r + actual_r;
+	expected_g = expected_g + actual_g;
+	expected_b = expected_b + actual_b;
 	rgb.add_imm_rgba(actual_a, actual_r, actual_g, actual_b);
 	check_expected("rgbaint_t::add_imm_rgba");
 
 	// test RGB subtraction (method)
-	expected_a -= actual_a = random_i32();
-	expected_r -= actual_r = random_i32();
-	expected_g -= actual_g = random_i32();
-	expected_b -= actual_b = random_i32();
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = expected_a - actual_a;
+	expected_r = expected_r - actual_r;
+	expected_g = expected_g - actual_g;
+	expected_b = expected_b - actual_b;
 	rgb.sub(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
 	check_expected("rgbaint_t::sub");
 
 	// test RGB subtraction (operator)
-	expected_a -= actual_a = random_i32();
-	expected_r -= actual_r = random_i32();
-	expected_g -= actual_g = random_i32();
-	expected_b -= actual_b = random_i32();
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = expected_a - actual_a;
+	expected_r = expected_r - actual_r;
+	expected_g = expected_g - actual_g;
+	expected_b = expected_b - actual_b;
 	rgb -= rgbaint_t(actual_a, actual_r, actual_g, actual_b);
 	check_expected("rgbaint_t::operator-=");
 
 	// test offset subtraction
 	imm = random_i32();
-	expected_a -= imm;
-	expected_r -= imm;
-	expected_g -= imm;
-	expected_b -= imm;
+	expected_a = expected_a - imm;
+	expected_r = expected_r - imm;
+	expected_g = expected_g - imm;
+	expected_b = expected_b - imm;
 	rgb.sub_imm(imm);
 	check_expected("rgbaint_t::sub_imm");
 
 	// test immediate RGB subtraction
-	expected_a -= actual_a = random_i32();
-	expected_r -= actual_r = random_i32();
-	expected_g -= actual_g = random_i32();
-	expected_b -= actual_b = random_i32();
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = expected_a - actual_a;
+	expected_r = expected_r - actual_r;
+	expected_g = expected_g - actual_g;
+	expected_b = expected_b - actual_b;
 	rgb.sub_imm_rgba(actual_a, actual_r, actual_g, actual_b);
 	check_expected("rgbaint_t::sub_imm_rgba");
 
 	// test reversed RGB subtraction
-	expected_a = (actual_a = random_i32()) - expected_a;
-	expected_r = (actual_r = random_i32()) - expected_r;
-	expected_g = (actual_g = random_i32()) - expected_g;
-	expected_b = (actual_b = random_i32()) - expected_b;
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = actual_a - expected_a;
+	expected_r = actual_r - expected_r;
+	expected_g = actual_g - expected_g;
+	expected_b = actual_b - expected_b;
 	rgb.subr(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
 	check_expected("rgbaint_t::subr");
 
@@ -547,26 +579,38 @@ void validate_rgb()
 	check_expected("rgbaint_t::subr_imm");
 
 	// test reversed immediate RGB subtraction
-	expected_a = (actual_a = random_i32()) - expected_a;
-	expected_r = (actual_r = random_i32()) - expected_r;
-	expected_g = (actual_g = random_i32()) - expected_g;
-	expected_b = (actual_b = random_i32()) - expected_b;
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = actual_a - expected_a;
+	expected_r = actual_r - expected_r;
+	expected_g = actual_g - expected_g;
+	expected_b = actual_b - expected_b;
 	rgb.subr_imm_rgba(actual_a, actual_r, actual_g, actual_b);
 	check_expected("rgbaint_t::subr_imm_rgba");
 
 	// test RGB multiplication (method)
-	expected_a *= actual_a = random_i32();
-	expected_r *= actual_r = random_i32();
-	expected_g *= actual_g = random_i32();
-	expected_b *= actual_b = random_i32();
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = expected_a * actual_a;
+	expected_r = expected_r * actual_r;
+	expected_g = expected_g * actual_g;
+	expected_b = expected_b * actual_b;
 	rgb.mul(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
 	check_expected("rgbaint_t::mul");
 
 	// test RGB multiplication (operator)
-	expected_a *= actual_a = random_i32();
-	expected_r *= actual_r = random_i32();
-	expected_g *= actual_g = random_i32();
-	expected_b *= actual_b = random_i32();
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = expected_a * actual_a;
+	expected_r = expected_r * actual_r;
+	expected_g = expected_g * actual_g;
+	expected_b = expected_b * actual_b;
 	rgb *= rgbaint_t(actual_a, actual_r, actual_g, actual_b);
 	check_expected("rgbaint_t::operator*=");
 
@@ -581,82 +625,106 @@ void validate_rgb()
 
 	// test factor multiplication (operator)
 	imm = random_i32();
-	expected_a *= imm;
-	expected_r *= imm;
-	expected_g *= imm;
-	expected_b *= imm;
+	expected_a = expected_a * imm;
+	expected_r = expected_r * imm;
+	expected_g = expected_g * imm;
+	expected_b = expected_b * imm;
 	rgb *= imm;
 	check_expected("rgbaint_t::operator*=");
 
 	// test immediate RGB multiplication
-	expected_a *= actual_a = random_i32();
-	expected_r *= actual_r = random_i32();
-	expected_g *= actual_g = random_i32();
-	expected_b *= actual_b = random_i32();
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = expected_a * actual_a;
+	expected_r = expected_r * actual_r;
+	expected_g = expected_g * actual_g;
+	expected_b = expected_b * actual_b;
 	rgb.mul_imm_rgba(actual_a, actual_r, actual_g, actual_b);
 	check_expected("rgbaint_t::mul_imm_rgba");
 
 	// test select alpha element multiplication
-	expected_a *= actual_a = random_i32();
-	expected_r *= actual_a;
-	expected_g *= actual_a;
-	expected_b *= actual_a;
+	actual_a = random_i32();
+	expected_a = expected_a * actual_a;
+	expected_r = expected_r * actual_a;
+	expected_g = expected_g * actual_a;
+	expected_b = expected_b * actual_a;
 	rgb.mul(rgbaint_t(actual_a, actual_r, actual_g, actual_b).select_alpha32());
 	check_expected("rgbaint_t::mul(select_alpha32)");
 
 	// test select red element multiplication
-	expected_a *= actual_r = random_i32();
-	expected_r *= actual_r;
-	expected_g *= actual_r;
-	expected_b *= actual_r;
+	actual_r = random_i32();
+	expected_a = expected_a * actual_r;
+	expected_r = expected_r * actual_r;
+	expected_g = expected_g * actual_r;
+	expected_b = expected_b * actual_r;
 	rgb.mul(rgbaint_t(actual_a, actual_r, actual_g, actual_b).select_red32());
 	check_expected("rgbaint_t::mul(select_red32)");
 
 	// test select green element multiplication
-	expected_a *= actual_g = random_i32();
-	expected_r *= actual_g;
-	expected_g *= actual_g;
-	expected_b *= actual_g;
+	actual_g = random_i32();
+	expected_a = expected_a * actual_g;
+	expected_r = expected_r * actual_g;
+	expected_g = expected_g * actual_g;
+	expected_b = expected_b * actual_g;
 	rgb.mul(rgbaint_t(actual_a, actual_r, actual_g, actual_b).select_green32());
 	check_expected("rgbaint_t::mul(select_green32)");
 
 	// test select blue element multiplication
-	expected_a *= actual_b = random_i32();
-	expected_r *= actual_b;
-	expected_g *= actual_b;
-	expected_b *= actual_b;
+	actual_b = random_i32();
+	expected_a = expected_a * actual_b;
+	expected_r = expected_r * actual_b;
+	expected_g = expected_g * actual_b;
+	expected_b = expected_b * actual_b;
 	rgb.mul(rgbaint_t(actual_a, actual_r, actual_g, actual_b).select_blue32());
 	check_expected("rgbaint_t::mul(select_blue32)");
 
 	// test RGB and not
-	expected_a &= ~(actual_a = random_i32());
-	expected_r &= ~(actual_r = random_i32());
-	expected_g &= ~(actual_g = random_i32());
-	expected_b &= ~(actual_b = random_i32());
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = expected_a & ~actual_a;
+	expected_r = expected_r & ~actual_r;
+	expected_g = expected_g & ~actual_g;
+	expected_b = expected_b & ~actual_b;
 	rgb.andnot_reg(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
 	check_expected("rgbaint_t::andnot_reg");
 
 	// test RGB or
-	expected_a |= actual_a = random_i32();
-	expected_r |= actual_r = random_i32();
-	expected_g |= actual_g = random_i32();
-	expected_b |= actual_b = random_i32();
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = expected_a | actual_a;
+	expected_r = expected_r | actual_r;
+	expected_g = expected_g | actual_g;
+	expected_b = expected_b | actual_b;
 	rgb.or_reg(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
 	check_expected("rgbaint_t::or_reg");
 
 	// test RGB and
-	expected_a &= actual_a = random_i32();
-	expected_r &= actual_r = random_i32();
-	expected_g &= actual_g = random_i32();
-	expected_b &= actual_b = random_i32();
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = expected_a & actual_a;
+	expected_r = expected_r & actual_r;
+	expected_g = expected_g & actual_g;
+	expected_b = expected_b & actual_b;
 	rgb.and_reg(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
 	check_expected("rgbaint_t::and_reg");
 
 	// test RGB xor
-	expected_a ^= actual_a = random_i32();
-	expected_r ^= actual_r = random_i32();
-	expected_g ^= actual_g = random_i32();
-	expected_b ^= actual_b = random_i32();
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = expected_a ^ actual_a;
+	expected_r = expected_r ^ actual_r;
+	expected_g = expected_g ^ actual_g;
+	expected_b = expected_b ^ actual_b;
 	rgb.xor_reg(rgbaint_t(actual_a, actual_r, actual_g, actual_b));
 	check_expected("rgbaint_t::xor_reg");
 
@@ -688,26 +756,38 @@ void validate_rgb()
 	check_expected("rgbaint_t::xor_imm");
 
 	// test immediate RGB or
-	expected_a |= actual_a = random_i32();
-	expected_r |= actual_r = random_i32();
-	expected_g |= actual_g = random_i32();
-	expected_b |= actual_b = random_i32();
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = expected_a | actual_a;
+	expected_r = expected_r | actual_r;
+	expected_g = expected_g | actual_g;
+	expected_b = expected_b | actual_b;
 	rgb.or_imm_rgba(actual_a, actual_r, actual_g, actual_b);
 	check_expected("rgbaint_t::or_imm_rgba");
 
 	// test immediate RGB and
-	expected_a &= actual_a = random_i32();
-	expected_r &= actual_r = random_i32();
-	expected_g &= actual_g = random_i32();
-	expected_b &= actual_b = random_i32();
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = expected_a & actual_a;
+	expected_r = expected_r & actual_r;
+	expected_g = expected_g & actual_g;
+	expected_b = expected_b & actual_b;
 	rgb.and_imm_rgba(actual_a, actual_r, actual_g, actual_b);
 	check_expected("rgbaint_t::and_imm_rgba");
 
 	// test immediate RGB xor
-	expected_a ^= actual_a = random_i32();
-	expected_r ^= actual_r = random_i32();
-	expected_g ^= actual_g = random_i32();
-	expected_b ^= actual_b = random_i32();
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = expected_a ^ actual_a;
+	expected_r = expected_r ^ actual_r;
+	expected_g = expected_g ^ actual_g;
+	expected_b = expected_b ^ actual_b;
 	rgb.xor_imm_rgba(actual_a, actual_r, actual_g, actual_b);
 	check_expected("rgbaint_t::xor_imm_rgba");
 
@@ -820,172 +900,248 @@ void validate_rgb()
 	check_expected("rgbaint_t::clamp_to_uint8");
 
 	// test shift left
-	expected_a = (actual_a = random_i32()) << 19;
-	expected_r = (actual_r = random_i32()) << 3;
-	expected_g = (actual_g = random_i32()) << 21;
-	expected_b = (actual_b = random_i32()) << 6;
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = actual_a << 19;
+	expected_r = actual_r << 3;
+	expected_g = actual_g << 21;
+	expected_b = actual_b << 6;
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.shl(rgbaint_t(19, 3, 21, 6));
 	check_expected("rgbaint_t::shl");
 
 	// test shift left out of range
-	expected_a = (actual_a = random_i32()) & 0;
-	expected_r = (actual_r = random_i32()) & 0;
-	expected_g = (actual_g = random_i32()) & 0;
-	expected_b = (actual_b = random_i32()) & 0;
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = actual_a & 0;
+	expected_r = actual_r & 0;
+	expected_g = actual_g & 0;
+	expected_b = actual_b & 0;
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.shl(rgbaint_t(-19, 32, -21, 38));
 	check_expected("rgbaint_t::shl");
 
 	// test shift left immediate
-	expected_a = (actual_a = random_i32()) << 7;
-	expected_r = (actual_r = random_i32()) << 7;
-	expected_g = (actual_g = random_i32()) << 7;
-	expected_b = (actual_b = random_i32()) << 7;
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = actual_a << 7;
+	expected_r = actual_r << 7;
+	expected_g = actual_g << 7;
+	expected_b = actual_b << 7;
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.shl_imm(7);
 	check_expected("rgbaint_t::shl_imm");
 
 	// test shift left immediate out of range
-	expected_a = (actual_a = random_i32()) & 0;
-	expected_r = (actual_r = random_i32()) & 0;
-	expected_g = (actual_g = random_i32()) & 0;
-	expected_b = (actual_b = random_i32()) & 0;
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = actual_a & 0;
+	expected_r = actual_r & 0;
+	expected_g = actual_g & 0;
+	expected_b = actual_b & 0;
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.shl_imm(32);
 	check_expected("rgbaint_t::shl_imm");
 
 	// test logical shift right
-	expected_a = s32(u32(actual_a = random_i32()) >> 8);
-	expected_r = s32(u32(actual_r = random_i32()) >> 18);
-	expected_g = s32(u32(actual_g = random_i32()) >> 26);
-	expected_b = s32(u32(actual_b = random_i32()) >> 4);
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = s32(u32(actual_a) >> 8);
+	expected_r = s32(u32(actual_r) >> 18);
+	expected_g = s32(u32(actual_g) >> 26);
+	expected_b = s32(u32(actual_b) >> 4);
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.shr(rgbaint_t(8, 18, 26, 4));
 	check_expected("rgbaint_t::shr");
 
 	// test logical shift right with opposite signs
-	expected_a = s32(u32(actual_a = -actual_a) >> 21);
-	expected_r = s32(u32(actual_r = -actual_r) >> 13);
-	expected_g = s32(u32(actual_g = -actual_g) >> 11);
-	expected_b = s32(u32(actual_b = -actual_b) >> 17);
+	actual_a = -actual_a;
+	actual_r = -actual_r;
+	actual_g = -actual_g;
+	actual_b = -actual_b;
+	expected_a = s32(u32(actual_a) >> 21);
+	expected_r = s32(u32(actual_r) >> 13);
+	expected_g = s32(u32(actual_g) >> 11);
+	expected_b = s32(u32(actual_b) >> 17);
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.shr(rgbaint_t(21, 13, 11, 17));
 	check_expected("rgbaint_t::shr");
 
 	// test logical shift right out of range
-	expected_a = (actual_a = random_i32()) & 0;
-	expected_r = (actual_r = random_i32()) & 0;
-	expected_g = (actual_g = random_i32()) & 0;
-	expected_b = (actual_b = random_i32()) & 0;
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = actual_a & 0;
+	expected_r = actual_r & 0;
+	expected_g = actual_g & 0;
+	expected_b = actual_b & 0;
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.shr(rgbaint_t(40, -18, -26, 32));
 	check_expected("rgbaint_t::shr");
 
 	// test logical shift right immediate
-	expected_a = s32(u32(actual_a = random_i32()) >> 5);
-	expected_r = s32(u32(actual_r = random_i32()) >> 5);
-	expected_g = s32(u32(actual_g = random_i32()) >> 5);
-	expected_b = s32(u32(actual_b = random_i32()) >> 5);
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = s32(u32(actual_a) >> 5);
+	expected_r = s32(u32(actual_r) >> 5);
+	expected_g = s32(u32(actual_g) >> 5);
+	expected_b = s32(u32(actual_b) >> 5);
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.shr_imm(5);
 	check_expected("rgbaint_t::shr_imm");
 
 	// test logical shift right immediate with opposite signs
-	expected_a = s32(u32(actual_a = -actual_a) >> 15);
-	expected_r = s32(u32(actual_r = -actual_r) >> 15);
-	expected_g = s32(u32(actual_g = -actual_g) >> 15);
-	expected_b = s32(u32(actual_b = -actual_b) >> 15);
+	actual_a = -actual_a;
+	actual_r = -actual_r;
+	actual_g = -actual_g;
+	actual_b = -actual_b;
+	expected_a = s32(u32(actual_a) >> 15);
+	expected_r = s32(u32(actual_r) >> 15);
+	expected_g = s32(u32(actual_g) >> 15);
+	expected_b = s32(u32(actual_b) >> 15);
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.shr_imm(15);
 	check_expected("rgbaint_t::shr_imm");
 
 	// test logical shift right immediate out of range
-	expected_a = (actual_a = random_i32()) & 0;
-	expected_r = (actual_r = random_i32()) & 0;
-	expected_g = (actual_g = random_i32()) & 0;
-	expected_b = (actual_b = random_i32()) & 0;
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = actual_a & 0;
+	expected_r = actual_r & 0;
+	expected_g = actual_g & 0;
+	expected_b = actual_b & 0;
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.shr_imm(35);
 	check_expected("rgbaint_t::shr_imm");
 
 	// test arithmetic shift right
-	expected_a = (actual_a = random_i32()) >> 16;
-	expected_r = (actual_r = random_i32()) >> 20;
-	expected_g = (actual_g = random_i32()) >> 14;
-	expected_b = (actual_b = random_i32()) >> 2;
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = actual_a >> 16;
+	expected_r = actual_r >> 20;
+	expected_g = actual_g >> 14;
+	expected_b = actual_b >> 2;
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.sra(rgbaint_t(16, 20, 14, 2));
 	check_expected("rgbaint_t::sra");
 
 	// test arithmetic shift right with opposite signs
-	expected_a = (actual_a = -actual_a) >> 1;
-	expected_r = (actual_r = -actual_r) >> 29;
-	expected_g = (actual_g = -actual_g) >> 10;
-	expected_b = (actual_b = -actual_b) >> 22;
+	actual_a = -actual_a;
+	actual_r = -actual_r;
+	actual_g = -actual_g;
+	actual_b = -actual_b;
+	expected_a = actual_a >> 1;
+	expected_r = actual_r >> 29;
+	expected_g = actual_g >> 10;
+	expected_b = actual_b >> 22;
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.sra(rgbaint_t(1, 29, 10, 22));
 	check_expected("rgbaint_t::sra");
 
 	// test arithmetic shift right out of range
-	expected_a = (actual_a = random_i32()) >> 31;
-	expected_r = (actual_r = random_i32()) >> 31;
-	expected_g = (actual_g = random_i32()) >> 31;
-	expected_b = (actual_b = random_i32()) >> 31;
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = actual_a >> 31;
+	expected_r = actual_r >> 31;
+	expected_g = actual_g >> 31;
+	expected_b = actual_b >> 31;
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.sra(rgbaint_t(-16, -20, 46, 32));
 	check_expected("rgbaint_t::sra");
 
 	// test arithmetic shift right immediate (method)
-	expected_a = (actual_a = random_i32()) >> 12;
-	expected_r = (actual_r = random_i32()) >> 12;
-	expected_g = (actual_g = random_i32()) >> 12;
-	expected_b = (actual_b = random_i32()) >> 12;
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = actual_a >> 12;
+	expected_r = actual_r >> 12;
+	expected_g = actual_g >> 12;
+	expected_b = actual_b >> 12;
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.sra_imm(12);
 	check_expected("rgbaint_t::sra_imm");
 
 	// test arithmetic shift right immediate with opposite signs (method)
-	expected_a = (actual_a = -actual_a) >> 9;
-	expected_r = (actual_r = -actual_r) >> 9;
-	expected_g = (actual_g = -actual_g) >> 9;
-	expected_b = (actual_b = -actual_b) >> 9;
+	actual_a = -actual_a;
+	actual_r = -actual_r;
+	actual_g = -actual_g;
+	actual_b = -actual_b;
+	expected_a = actual_a >> 9;
+	expected_r = actual_r >> 9;
+	expected_g = actual_g >> 9;
+	expected_b = actual_b >> 9;
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.sra_imm(9);
 	check_expected("rgbaint_t::sra_imm");
 
 	// test arithmetic shift right immediate out of range (method)
-	expected_a = (actual_a = random_i32()) >> 31;
-	expected_r = (actual_r = random_i32()) >> 31;
-	expected_g = (actual_g = random_i32()) >> 31;
-	expected_b = (actual_b = random_i32()) >> 31;
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = actual_a >> 31;
+	expected_r = actual_r >> 31;
+	expected_g = actual_g >> 31;
+	expected_b = actual_b >> 31;
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.sra_imm(38);
 	check_expected("rgbaint_t::sra_imm");
 
 	// test arithmetic shift right immediate (operator)
-	expected_a = (actual_a = random_i32()) >> 7;
-	expected_r = (actual_r = random_i32()) >> 7;
-	expected_g = (actual_g = random_i32()) >> 7;
-	expected_b = (actual_b = random_i32()) >> 7;
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = actual_a >> 7;
+	expected_r = actual_r >> 7;
+	expected_g = actual_g >> 7;
+	expected_b = actual_b >> 7;
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb >>= 7;
 	check_expected("rgbaint_t::operator>>=");
 
 	// test arithmetic shift right immediate with opposite signs (operator)
-	expected_a = (actual_a = -actual_a) >> 11;
-	expected_r = (actual_r = -actual_r) >> 11;
-	expected_g = (actual_g = -actual_g) >> 11;
-	expected_b = (actual_b = -actual_b) >> 11;
+	actual_a = -actual_a;
+	actual_r = -actual_r;
+	actual_g = -actual_g;
+	actual_b = -actual_b;
+	expected_a = actual_a >> 11;
+	expected_r = actual_r >> 11;
+	expected_g = actual_g >> 11;
+	expected_b = actual_b >> 11;
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb >>= 11;
 	check_expected("rgbaint_t::operator>>=");
 
 	// test arithmetic shift right immediate out of range (operator)
-	expected_a = (actual_a = random_i32()) >> 31;
-	expected_r = (actual_r = random_i32()) >> 31;
-	expected_g = (actual_g = random_i32()) >> 31;
-	expected_b = (actual_b = random_i32()) >> 31;
+	actual_a = random_i32();
+	actual_r = random_i32();
+	actual_g = random_i32();
+	actual_b = random_i32();
+	expected_a = actual_a >> 31;
+	expected_r = actual_r >> 31;
+	expected_g = actual_g >> 31;
+	expected_b = actual_b >> 31;
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb >>= 41;
 	check_expected("rgbaint_t::operator>>=");
@@ -2730,7 +2886,7 @@ void validity_checker::validate_devices(machine_config &config)
 				device_t *card;
 				{
 					machine_config::token const tok(config.begin_configuration(slot->device()));
-					card = config.device_add(option.second->name(), option.second->devtype(), option.second->clock());
+					card = config.device_add(std::string(option.second->name()).c_str(), option.second->devtype(), option.second->clock()); // TODO: support string_view tags
 
 					const char *const def_bios = option.second->default_bios();
 					if (def_bios)
@@ -2745,14 +2901,14 @@ void validity_checker::validate_devices(machine_config &config)
 
 				for (device_slot_interface &subslot : slot_interface_enumerator(*card))
 				{
-					if (subslot.fixed())
+					if (subslot.fixed() && subslot.default_option())
 					{
 						// TODO: make this self-contained so it can apply itself
-						device_slot_interface::slot_option const *suboption = subslot.option(subslot.default_option());
+						device_slot_interface::slot_option const *const suboption = subslot.option(subslot.default_option());
 						if (suboption)
 						{
 							machine_config::token const tok(config.begin_configuration(subslot.device()));
-							device_t *const sub_card = config.device_add(suboption->name(), suboption->devtype(), suboption->clock());
+							device_t *const sub_card = config.device_add(std::string(suboption->name()).c_str(), suboption->devtype(), suboption->clock()); // TODO: support string_view tags
 							const char *const sub_bios = suboption->default_bios();
 							if (sub_bios)
 								sub_card->set_default_bios_tag(sub_bios);
@@ -2778,7 +2934,7 @@ void validity_checker::validate_devices(machine_config &config)
 				}
 
 				machine_config::token const tok(config.begin_configuration(slot->device()));
-				config.device_remove(option.second->name());
+				config.device_remove(std::string(option.second->name()).c_str()); // TODO: support string_view tags
 				m_checking_card = false;
 			}
 		}

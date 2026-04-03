@@ -2963,7 +2963,6 @@ u8 apple2gs_state::b0ram0800_r(offs_t offset)  { return m_ram_ptr[offset+0x800];
 void apple2gs_state::b0ram0800_w(offs_t offset, u8 data)
 {
 	m_ram_ptr[offset+0x800] = data;
-
 	if (offset < 0x400)
 	{
 		if ((!(m_shadow & SHAD_TXTPG2)) && (m_is_rom3))
@@ -3017,8 +3016,11 @@ void apple2gs_state::b1ram0800_w(offs_t offset, u8 data)
 	m_ram_ptr[offset+0x10800] = data;
 	if (offset < 0x400)
 	{
-		slow_cycle();
-		m_megaii_ram[offset+0x10800] = data;
+		if ((!(m_shadow & SHAD_TXTPG2)) && (m_is_rom3))
+		{
+			slow_cycle();
+			m_megaii_ram[offset+0x10800] = data;
+		}
 	}
 }
 u8 apple2gs_state::b1ram2000_r(offs_t offset)  { return m_ram_ptr[offset+0x12000]; }
@@ -3803,7 +3805,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::default_options, nullptr);
 
 	// HBL is positioned to the right of active video here, but to the left on hardware.
-	// the left border is positioned to the left here, but to the far right on hardware.
+	// the borders are counted as active video here, but as HBL on hardware.
 	// these must be compensated for in any use of hpos/vpos/hblank/vblank.
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(A2GS_1M.value() * 16, 65 * 16, 0, BORDER_LEFT + 40 * 16 + BORDER_RIGHT, 262, 0, 231);

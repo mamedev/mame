@@ -10,8 +10,8 @@ driver by Angelo Salese & Grull Osgo
 
 Hardware is known as "AUSCOM System 1" hardware.
 
-Other games known to be on this hardware (if ever finished):
-- Agro (c) The Game Room
+Other games that may be on this hardware (if ever finished):
+- Agro (c) The Game Room (prototype v1 perhaps?)
 - Tiger Odds (c) The Game Room
 - one other unnamed/unfinished game
 

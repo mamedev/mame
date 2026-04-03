@@ -7,6 +7,8 @@
 
 #include "cpu/drcuml.h"
 
+#include <utility>
+
 
 class sharc_disassembler;
 
@@ -388,7 +390,19 @@ private:
 	void sharcop_nop();
 	void sharcop_idle();
 	[[noreturn]] void sharcop_unimplemented() ATTR_COLD;
-	inline uint32_t SCALB(SHARC_REG rx, int ry);
+
+	// ALU helpers
+	inline SHARC_REG FADD(int fx, int fy);
+	inline SHARC_REG FSUB(int fx, int fy);
+	inline SHARC_REG FAVG(int fx, int fy);
+	inline SHARC_REG FABS(int fx);
+	inline SHARC_REG FMIN(int fx, int fy);
+	inline SHARC_REG FMAX(int fx, int fy);
+	inline std::pair<SHARC_REG, SHARC_REG> FADD_FSUB(int fx, int fy);
+	inline uint32_t SCALB(SHARC_REG fx, int ry);
+
+	// Multiplier helpers
+	inline SHARC_REG FMUL(int fx, int fy);
 
 	// ALU fixed-point
 	inline void compute_add(int rn, int rx, int ry);
@@ -412,52 +426,54 @@ private:
 	inline void compute_clip(int rn, int rx, int ry);
 
 	// ALU floating-point
-	inline void compute_fadd(int rn, int rx, int ry);
-	inline void compute_fsub(int rn, int rx, int ry);
-	inline void compute_fadd_abs(int rn, int rx, int ry);
-	inline void compute_fsub_abs(int rn, int rx, int ry);
-	inline void compute_favg(int rn, int rx, int ry);
-	inline void compute_fcomp(int rx, int ry);
-	inline void compute_fneg(int rn, int rx);
-	inline void compute_fabs(int rn, int rx);
-	inline void compute_fpass(int rn, int rx);
-	inline void compute_scalb(int rn, int rx, int ry);
-	inline void compute_logb(int rn, int rx);
-	inline void compute_fix_scaled(int rn, int rx, int ry);
-	inline void compute_fix(int rn, int rx);
-	inline void compute_float_scaled(int rn, int rx, int ry);
-	inline void compute_float(int rn, int rx);
-	inline void compute_recips(int rn, int rx);
-	inline void compute_rsqrts(int rn, int rx);
-	inline void compute_fcopysign(int rn, int rx, int ry);
-	inline void compute_fmin(int rn, int rx, int ry);
-	inline void compute_fmax(int rn, int rx, int ry);
-	inline void compute_fclip(int rn, int rx, int ry);
+	inline void compute_fadd(int fn, int fx, int fy);
+	inline void compute_fsub(int fn, int fx, int fy);
+	inline void compute_fadd_abs(int fn, int fx, int fy);
+	inline void compute_fsub_abs(int fn, int fx, int fy);
+	inline void compute_favg(int fn, int fx, int fy);
+	inline void compute_fcomp(int fx, int fy);
+	inline void compute_fneg(int fn, int fx);
+	inline void compute_fabs(int fn, int fx);
+	inline void compute_fpass(int fn, int fx);
+	inline void compute_scalb(int fn, int fx, int ry);
+	inline void compute_logb(int rn, int fx);
+	inline void compute_fix_scaled(int rn, int fx, int ry);
+	inline void compute_fix(int rn, int fx);
+	inline void compute_float_scaled(int fn, int rx, int ry);
+	inline void compute_float(int fn, int rx);
+	inline void compute_recips(int fn, int fx);
+	inline void compute_rsqrts(int fn, int fx);
+	inline void compute_fcopysign(int fn, int fx, int fy);
+	inline void compute_fmin(int fn, int fx, int fy);
+	inline void compute_fmax(int fn, int fx, int fy);
+	inline void compute_fclip(int fn, int fx, int fy);
 
 	// Multiplier
 	inline void compute_mul_uuin(int rn, int rx, int ry);
 	inline void compute_mul_ssin(int rn, int rx, int ry);
 	inline uint32_t compute_mrf_plus_mul_ssin(int rx, int ry);
 	inline uint32_t compute_mrb_plus_mul_ssin(int rx, int ry);
-	inline void compute_fmul(int rn, int rx, int ry);
+	inline void compute_fmul(int fn, int fx, int fy);
 
 	// Dual add/subtract
 	inline void compute_dual_add_sub(int ra, int rs, int rx, int ry);
-	inline void compute_dual_fadd_fsub(int ra, int rs, int rx, int ry);
+	inline void compute_dual_fadd_fsub(int fa, int fs, int fx, int fy);
 
-	// Parallel multiplier and ALU
+	// Fixed-Point multiply/accumulate and add, subtract or average
 	inline void compute_mul_ssfr_add(int rm, int rxm, int rym, int ra, int rxa, int rya);
 	inline void compute_mul_ssfr_sub(int rm, int rxm, int rym, int ra, int rxa, int rya);
+
+	// Floating-Point multiplication and ALU operation
 	inline void compute_fmul_fadd(int fm, int fxm, int fym, int fa, int fxa, int fya);
 	inline void compute_fmul_fsub(int fm, int fxm, int fym, int fa, int fxa, int fya);
-	inline void compute_fmul_float_scaled(int fm, int fxm, int fym, int fa, int fxa, int fya);
-	inline void compute_fmul_fix_scaled(int fm, int fxm, int fym, int fa, int fxa, int fya);
-	inline void compute_fmul_avg(int fm, int fxm, int fym, int fa, int fxa, int fya);
-	inline void compute_fmul_abs(int fm, int fxm, int fym, int fa, int fxa, int fya);
+	inline void compute_fmul_float_scaled(int fm, int fxm, int fym, int fa, int rxa, int rya);
+	inline void compute_fmul_fix_scaled(int fm, int fxm, int fym, int ra, int fxa, int rya);
+	inline void compute_fmul_favg(int fm, int fxm, int fym, int fa, int fxa, int fya);
+	inline void compute_fmul_fabs(int fm, int fxm, int fym, int fa, int fxa);
 	inline void compute_fmul_fmax(int fm, int fxm, int fym, int fa, int fxa, int fya);
 	inline void compute_fmul_fmin(int fm, int fxm, int fym, int fa, int fxa, int fya);
 
-	// Parallel multiplier and dual add/subtract
+	// Multiplication and dual add/subtract
 	inline void compute_fmul_dual_fadd_fsub(int fm, int fxm, int fym, int fa, int fs, int fxa, int fya);
 
 	inline void compute_multi_mr_to_reg(int ai, int rk);

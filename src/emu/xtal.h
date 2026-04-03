@@ -39,9 +39,12 @@ Usage:
 #ifndef MAME_EMU_XTAL_H
 #define MAME_EMU_XTAL_H
 
+#pragma once
+
 #include "emucore.h"
 
-#pragma once
+#include <string_view>
+
 
 class XTAL
 {
@@ -59,8 +62,7 @@ public:
 	friend constexpr XTAL operator *(unsigned int mult, const XTAL &xtal);
 	friend constexpr XTAL operator *(double       mult, const XTAL &xtal);
 
-	void validate(const char *message) const;
-	void validate(const std::string &message) const;
+	void validate(std::string_view message) const;
 
 private:
 	double m_base_clock, m_current_clock;
@@ -69,7 +71,7 @@ private:
 
 	static const double known_xtals[];
 	static double last_correct_value, xtal_error_low, xtal_error_high;
-	static void fail(double base_clock, const std::string &message);
+	static void fail(double base_clock, std::string_view message);
 	static bool validate(double base_clock);
 	static void check_ordering();
 };

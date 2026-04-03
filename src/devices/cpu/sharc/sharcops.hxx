@@ -754,71 +754,51 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 			case 0x01:      compute_multi_reg_to_mr(op & 0xf, rn); break;
 
 			case 0x04:      /* Rm = Rxm * Rym (SSFR),   Ra = Rxa + Rya */
-			{
 				compute_mul_ssfr_add(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
 			case 0x05:      /* Rm = Rxm * Rym (SSFR),   Ra = Rxa - Rya */
-			{
 				compute_mul_ssfr_sub(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
 			case 0x18:      /* Fm = Fxm * Fym,   Fa = Fxa + Fya */
-			{
 				compute_fmul_fadd(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
 			case 0x19:      /* Fm = Fxm * Fym,   Fa = Fxa - Fya */
-			{
 				compute_fmul_fsub(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
-			case 0x1a:      /* Fm = Fxm * Fym,   Fa = FLOAT Fxa BY Fya */
-			{
+			case 0x1a:      /* Fm = Fxm * Fym,   Fa = FLOAT Fxa BY Rya */
 				compute_fmul_float_scaled(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
-			case 0x1b:      /* Fm = Fxm * Fym,   Fa = FIX Fxa BY Fya */
-			{
+			case 0x1b:      /* Fm = Fxm * Fym,   Ra = FIX Fxa BY Rya */
 				compute_fmul_fix_scaled(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
 			case 0x1c:      /* Fm = Fxm * Fym,   Fa = (Fxa + Fya) / 2 */
-			{
-				compute_fmul_avg(fm, fxm, fym, fa, fxa, fya);
+				compute_fmul_favg(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
 			case 0x1d:      /* Fm = Fxm * Fym,   Fa = ABS Fxa */
-			{
-				compute_fmul_abs(fm, fxm, fym, fa, fxa, fya);
+				compute_fmul_fabs(fm, fxm, fym, fa, fxa);
 				break;
-			}
 
 			case 0x1e:      /* Fm = Fxm * Fym,   Fa = MAX(Fxa, Fya) */
-			{
 				compute_fmul_fmax(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
 			case 0x1f:      /* Fm = Fxm * Fym,   Fa = MIN(Fxa, Fya) */
-			{
 				compute_fmul_fmin(fm, fxm, fym, fa, fxa, fya);
 				break;
-			}
 
 			case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
 			case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 			{
 				/* Parallel Multiplier & Dual Add/Subtract */
 				/* Floating-point */
-				int fs = (opcode >> 16) & 0xf;
+				int const fs = (opcode >> 16) & 0xf;
 				compute_fmul_dual_fadd_fsub(fm, fxm, fym, fa, fs, fxa, fya);
 				break;
 			}

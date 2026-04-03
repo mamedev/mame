@@ -2,7 +2,7 @@
 // copyright-holders:Brad Oliver, Nicola Salmoria
 /*************************************************************************
 
-    Atari Battle Zone hardware
+    Atari Battlezone hardware
 
 *************************************************************************/
 #ifndef MAME_ATARI_BZONE_H

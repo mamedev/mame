@@ -30,10 +30,7 @@ public:
 	apricot_video_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, const char *dflt)
 		: apricot_video_slot_device(mconfig, tag, owner, uint32_t(0))
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 	apricot_video_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -52,7 +49,7 @@ public:
 	bool io_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 private:
@@ -80,7 +77,7 @@ protected:
 	apricot_video_slot_device *m_slot;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(APRICOT_VIDEO_SLOT, apricot_video_slot_device)
 
 // include here so drivers don't need to

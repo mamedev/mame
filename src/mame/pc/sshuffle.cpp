@@ -4,7 +4,7 @@
 
 Skeleton driver for Arachnid "Super Shuffle" (electromechanical + video).
 
-Based on an Asus "M2N68-AM PLUS" PCB:
+Based on an Asus M2N68-AM PLUS PCB:
 - AMD Sempron SDX140HBK13GQ CPU.
 - Nvidia MCP68S
 - Realtek ALC662 audio

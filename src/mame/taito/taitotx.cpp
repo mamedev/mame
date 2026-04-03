@@ -10,12 +10,13 @@
 
 TODO:
  - Undumped custom BIOSes, at least regular Type X uses a Springdale spinoff.
-   Type X: Intel 865G
-   Type X+: as above plus better PCI video/sound cards
-   Type X7: Intel 855GME + ICH4
-   Type X2 & Satellite Terminal: Intel Q965 + ICH8
-   Type X Zero: MCP7A-ION
-   Type X3: Intel Q67 express
+   \- Type X: Intel 865G "TAITO BIOS 1.19" 10/14/2005-Springdale-G-6A79AD4FC-00
+      a.k.a. DFI ITOX G7S620-N-G
+   \- Type X+: as above plus better PCI video/sound cards
+   \- Type X7: Intel 855GME + ICH4
+   \- Type X2 & Satellite Terminal: Intel Q965 + ICH8
+   \- Type X Zero: MCP7A-ION
+   \- Type X3: Intel Q67 express
 
  - GPUs also uses custom BIOSes, again undumped;
 
@@ -183,8 +184,8 @@ INPUT_PORTS_END
 // todo: different configs for the different machine types.
 void taito_type_x_state::taito_type_x(machine_config &config)
 {
-	// Socket 478
-	PENTIUM4(config, m_maincpu, 100'000'000); /* Wrong, much newer processors, much faster. */
+	// Socket T LGA775
+	PENTIUM4(config, m_maincpu, 100'000'000); // TODO: Celeron (D?) @ 2.5 GHz with at least 533 MHz FSB
 	m_maincpu->set_addrmap(AS_PROGRAM, &taito_type_x_state::taito_type_x_map);
 	m_maincpu->set_disable();
 

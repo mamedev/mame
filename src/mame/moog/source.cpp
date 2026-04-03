@@ -43,6 +43,7 @@ interactive layout, and is intended as an educational tool.
 #include "machine/rescap.h"
 #include "machine/timer.h"
 #include "sound/va_eg.h"
+#include "sound/va_ops.h"
 
 #include "moog_source.lh"
 
@@ -74,6 +75,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, MAINCPU_TAG)
 		, m_contour(*this, "contour_%d", 0)
+		, m_contour_comp(*this, "contour_comp_%d", 0)
 		, m_contour_rate(*this, "source_nl:cntr_rate_%d", 0)
 		, m_contour_range(*this, "contour_range_%d",0)
 		, m_lfo_timer(*this, "lfo_timer")
@@ -120,7 +122,6 @@ private:
 	void cassette_w(u8 data);
 	void cv_w(offs_t offset, u8 data);
 
-	bool contour_peaked(const va_rc_eg_device &eg) const;
 	float get_keyboard_v() const;
 	u8 keyboard_r();
 	u8 buttons_r(const required_ioport_array<6> &button_io, const char *name) const;
@@ -140,7 +141,8 @@ private:
 
 	required_device<z80_device> m_maincpu;
 
-	required_device_array<va_rc_eg_device, 2> m_contour;
+	required_device_array<va_ota_eg_device, 2> m_contour;
+	required_device_array<va_comparator_device, 2> m_contour_comp;
 	required_device_array<netlist_mame_analog_input_device, 2> m_contour_rate;
 	required_ioport_array<2> m_contour_range;
 
@@ -225,7 +227,6 @@ private:
 	static inline constexpr float VMINUS = -15;  // In Volts.
 	static inline constexpr float MAX_CV = 10;  // In Volts.
 	static inline constexpr float CA3080_VABC = VMINUS + 0.7;  // 1 diode drop above -15.
-	static inline constexpr float CONTOUR_C = CAP_U(0.047);  // C57 (filter), C56 (loudness).
 	static inline constexpr u8 PATTERNS_7447[16] =
 	{
 		0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07,
@@ -435,50 +436,6 @@ void source_state::cv_w(offs_t offset, u8 data)
 		LOGMASKED(LOG_CV, "CV %d: 0x%02x, %f\n", offset, data, cv);
 }
 
-bool source_state::contour_peaked(const va_rc_eg_device &eg) const
-{
-	// The peak detector circuits for the filter and loudness contour generators
-	// are identical. They are located on board 2, and based on an LM393 comparator
-	// (U41B and U41A respectively). The threshold is set to ~9.984V, with a
-	// +-0.005V hysteresis. The EG output is connected to the inverting input.
-	// The comparator output is 0V when the EG output is above the threshold, and
-	// 5V otherwise (open collector output pulled to 5V via 10K resistors, R193
-	// and R190 respectively).
-
-	constexpr float R192 = RES_M(4.7);  // R188 for loudness EG.
-	constexpr float R191 = RES_K(10);   // R189 for loudness EG.
-	constexpr float RISING_THRESHOLD = 5 * RES_VOLTAGE_DIVIDER(R191, R192) + 5;
-	constexpr float FALLING_THRESHOLD = 10 * RES_VOLTAGE_DIVIDER(R191, R192);
-	static_assert(RISING_THRESHOLD > FALLING_THRESHOLD);
-
-	const float eg_v = eg.get_v();
-	if (eg_v > RISING_THRESHOLD)
-	{
-		return true;
-	}
-	else if (eg_v < FALLING_THRESHOLD)
-	{
-		return false;
-	}
-	else  // eg_v is within the hysteresis range.
-	{
-		// Proper emulation of hysteresis would require a streaming (or otherwise
-		// stateful) comparator. But a heuristic tailored to this use case works
-		// fine: if the EG voltage is falling, assume we hit the 'rising' threshold
-		// in the past, so the 'falling' threshold is the active one.
-
-		// This heuristic will pick the wrong threshold if a key is released while
-		// the EG is within the hysteresis range. But that should be rare (the
-		// hysteresis range is ~0.01V), and inconsequential. The difference in
-		// thresholds is very small, and the firmware is the one that initiates
-		// the EG release and is probably ignoring this input until the next
-		// attack.
-
-		const float future_eg_v = eg.get_v(machine().time() + attotime::from_msec(1));
-		return future_eg_v < eg_v;
-	}
-}
-
 float source_state::get_keyboard_v() const
 {
 	// *** Detect which key is pressed.
@@ -550,11 +507,11 @@ u8 source_state::keyboard_r()
 
 	// D1 - Filter contour peak reached (active low).
 	// D1 <- U32, FILT CNTR <- S22-11 <- Comparator (U41B, LM393).
-	const u8 d1 = contour_peaked(*m_contour[FILTER_CONTOUR]) ? 0 : 1;
+	const u8 d1 = m_contour_comp[FILTER_CONTOUR]->state() ? 1 : 0;
 
 	// D2 - Loudness contour peak reached (active low).
 	// D2 <- U32, LOUD CNTR <- S22-10 <- Comparator (U41A, LM393).
-	const u8 d2 = contour_peaked(*m_contour[LOUDNESS_CONTOUR]) ? 0 : 1;
+	const u8 d2 = m_contour_comp[LOUDNESS_CONTOUR]->state() ? 1 : 0;
 
 	// D3: Octave. <- U32, OCT (P34-2 (octave 0 button) and P34-1 (octave +1
 	//                button) via U2B and U2C).
@@ -668,17 +625,6 @@ template<int Which> TIMER_CALLBACK_MEMBER(source_state::update_contour)
 	constexpr int LEVEL_CV_INDEX =
 		(Which == FILTER_CONTOUR) ? int(CV::FILTER_CONTOUR_LEVEL) : int(CV::LOUDNESS_CONTOUR_LEVEL);
 
-	// All componets are on board 2. All resistors have 1% tolerance.
-	//                           Filter contour          Loudness contour
-	constexpr float R196 = RES_K(18.2);  // R183
-	constexpr float R197 = RES_R(100);   // R184
-	constexpr float R195 = RES_K(20);    // R187
-	constexpr float R194 = RES_R(100);   // R182
-
-	// Voltage dividers at the OTA's + and - inputs.
-	constexpr float OTA_DIVIDER_PLUS = RES_VOLTAGE_DIVIDER(R196, R197);
-	constexpr float OTA_DIVIDER_MINUS = RES_VOLTAGE_DIVIDER(R195, R194);
-
 	if (m_contour_cc[Which] <= 0)
 	{
 		// The netlist solver might transiently send negative values.
@@ -686,20 +632,11 @@ template<int Which> TIMER_CALLBACK_MEMBER(source_state::update_contour)
 		return;
 	}
 
-	// Ideal OTA transconductance at room temparature.
-	const float g = 19.2F * m_contour_cc[Which];
-	// Note the sligh difference in the calculations below, compared to the video
-	// linked above, due to the resistive dividers at the two OTA inputs not
-	// being identical.
-	const float effective_r = 1.0F / (g * OTA_DIVIDER_MINUS);
-	m_contour[Which]->set_r(effective_r);
+	m_contour[Which]->set_iabc(m_contour_cc[Which]);
+	m_contour[Which]->set_target_v(m_cv[LEVEL_CV_INDEX]);
 
-	const float level_cv = m_cv[LEVEL_CV_INDEX];  // 0V - 10V.
-	const float target_v = level_cv * OTA_DIVIDER_PLUS / OTA_DIVIDER_MINUS;  // 0V - ~10.98V.
-	m_contour[Which]->set_target_v(target_v);
-
-	LOGMASKED(LOG_CONTOUR, "%s EG update - Level CV: %f, target_v: %f, R: %f, tau: %f\n",
-			  CONTOUR_NAME, level_cv, target_v, effective_r, effective_r * CONTOUR_C);
+	LOGMASKED(LOG_CONTOUR, "%s EG update - Level CV: %f, Rate CC: %f\n",
+			  CONTOUR_NAME, m_cv[LEVEL_CV_INDEX], m_contour_cc[Which]);
 }
 
 NETDEV_ANALOG_CALLBACK_MEMBER(source_state::lfo_cv_changed)
@@ -864,11 +801,34 @@ void source_state::source(machine_config &config)
 
 	NVRAM(config, NVRAM_TAG, nvram_device::DEFAULT_ALL_0);  // 2x6514: U27, U28.
 
-	VA_RC_EG(config, m_contour[FILTER_CONTOUR]).set_c(CONTOUR_C);  // C57 (Board 2).
-	VA_RC_EG(config, m_contour[LOUDNESS_CONTOUR]).set_c(CONTOUR_C);  // C56 (Board 2).
+	config.set_default_layout(layout_moog_source);
+
+
 	TIMER(config, m_lfo_timer).configure_generic(FUNC(source_state::lfo_timer_tick));
 
-	config.set_default_layout(layout_moog_source);
+	constexpr va_comparator_device::comp_oc_hyst_config comp_config =
+	{
+		.v_minus    = 0,
+		.v_pullup   = 5,
+		.r_pullup   = RES_K(10),   // filter: R193, loudness: R190
+		.v_thresh   = 10,
+		.r_thresh   = RES_K(10),   // filter: R191, loudness: R189
+		.r_feedback = RES_M(4.7),  // filter: R192, loudness, R188
+	};
+
+	for (int i = 0; i < m_contour.size(); ++i)  // All components on board 2.
+	{
+		// Filter: U44, C57, loudness: U42, C56.
+		VA_OTA_EG(config, m_contour[i], va_ota_eg_device::ota_type::CA3080, CAP_U(0.047))
+			// Filter: R196, R197, loudness: R183, R184, all 1%
+			.configure_plus_divider(RES_K(18.2), RES_R(100))
+			// Filter: R195, R194, loudness: R187, R182, all 1%
+			.configure_minus_divider(RES_K(20), RES_R(100))
+			.add_route(0, m_contour_comp[i], 1.0);
+
+		// Threshold is ~9.984V, with a +-0.005V hysteresis.
+		VA_COMPARATOR(config, m_contour_comp[i]).configure(comp_config);
+	}
 
 
 	NETLIST_CPU(config, "source_nl", netlist::config::DEFAULT_CLOCK()).set_source(NETLIST_NAME(moogsource));
@@ -1063,7 +1023,7 @@ INPUT_PORTS_START(source)
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_FS3
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_G3
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_GS3
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A3
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A3 PORT_CODE(KEYCODE_Z)
 	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_AS3
 	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_B3
 

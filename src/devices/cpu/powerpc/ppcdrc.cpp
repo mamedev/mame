@@ -1975,16 +1975,15 @@ bool ppc_device::generate_opcode(drcuml_block &block, compiler_state *compiler, 
 		case 0x9:  /* DOZI (POWER) */
 			assert(m_cap & PPCCAP_LEGACY_POWER);
 
-			UML_AND(block, I0, op, 0xffff);
-			UML_CMP(block, R32(G_RA(op)), I0); // cmp ra, I0
-			UML_JMPc(block, COND_B, compiler->labelnum);  // bae 0:
+			UML_MOV(block, I0, (int32_t)(int16_t)G_SIMM(op));   // I0 = sign extend of the SIMM field
+			UML_CMP(block, R32(G_RA(op)), I0);            // cmp ra, SIMM
+			UML_JMPc(block, COND_L, compiler->labelnum); // bl 0:
 
 			UML_XOR(block, R32(G_RD(op)), R32(G_RD(op)), R32(G_RD(op))); // xor rd, rd, rd (rd = 0)
 			UML_JMP(block, compiler->labelnum + 1);                      // jmp 1:
 
 			UML_LABEL(block, compiler->labelnum++); // 0:
-			UML_ADD(block, R32(G_RD(op)), R32(G_RA(op)), I0);
-			UML_ADD(block, R32(G_RD(op)), R32(G_RD(op)), 0x1);
+			UML_SUB(block, R32(G_RD(op)), I0, R32(G_RA(op))); // rd = SIMM - ra
 
 			UML_LABEL(block, compiler->labelnum++); // 1:
 			return true;
@@ -2752,7 +2751,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 		case 0x3eb: /* DIVWOx */
 			UML_CMP(block, R32(G_RB(op)), 0x0);                 // cmp rb, #0
 			UML_JMPc(block, COND_NZ, compiler->labelnum);       // bne 0:
-			UML_CMP(block, R32(G_RA(op)), 0x80000000);          // cmp rb, #80000000
+			UML_CMP(block, R32(G_RA(op)), 0x80000000);          // cmp ra, #80000000
 			UML_JMPc(block, COND_AE, compiler->labelnum);       // bae 0:
 
 			UML_MOV(block, R32(G_RD(op)), 0x0);                 // move rd, #0
@@ -2805,14 +2804,13 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			assert(m_cap & PPCCAP_LEGACY_POWER);
 
 			UML_CMP(block, R32(G_RA(op)), R32(G_RB(op)));   // cmp ra, rb
-			UML_JMPc(block, COND_B, compiler->labelnum); // bae 0:
+			UML_JMPc(block, COND_L, compiler->labelnum); // bl 0:
 
 			UML_XOR(block, R32(G_RD(op)), R32(G_RD(op)), R32(G_RD(op)));    // xor rd, rd, rd (rd = 0)
 			UML_JMP(block, compiler->labelnum+1); // jmp 1:
 
 			UML_LABEL(block, compiler->labelnum++); // 0:
-			UML_ADD(block, R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));
-			UML_ADD(block, R32(G_RD(op)), R32(G_RD(op)), 0x1);
+			UML_SUB(block, R32(G_RD(op)), R32(G_RB(op)), R32(G_RA(op))); // rd = rb - ra
 
 			UML_LABEL(block, compiler->labelnum++); // 1:
 			if (op & M_OE)
@@ -2854,10 +2852,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			{
 				UML_GETFLGS(block, I0, FLAG_Z | FLAG_V | FLAG_C | FLAG_S);     // getflgs i0,zvcs
 				UML_LOAD(block, I0, m_cmp_cr_table, I0, SIZE_DWORD, SCALE_x4); // load    i0,cmp_cr_table,i0,dword
-			}
-			if (op & M_OE)
-			{
-				UML_OR(block, CR32(G_CRFD(op)), I0, XERSO32); // or      [crn],i0,[xerso]
+				UML_OR(block, CR32(0), I0, XERSO32);                           // or      [cr0],i0,[xerso]
 			}
 			return true;
 
@@ -2868,8 +2863,9 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			UML_OR(block, R32(G_RA(op)), I0, I1);               // or ra, i0, i1
 			if (op & M_RC)
 			{
-				UML_GETFLGS(block, R32(G_RA(op)), FLAG_Z | FLAG_V | FLAG_C | FLAG_S);      // getflgs i0,zvcs
+				UML_GETFLGS(block, I0, FLAG_Z | FLAG_V | FLAG_C | FLAG_S);      // getflgs i0,zvcs
 				UML_LOAD(block, I0, m_cmp_cr_table, I0, SIZE_DWORD, SCALE_x4); // load    i0,cmp_cr_table,i0,dword
+				UML_OR(block, CR32(0), I0, XERSO32);                            // or      [cr0],i0,[xerso]
 			}
 			return true;
 

@@ -270,7 +270,7 @@ static INPUT_PORTS_START( thedealr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5   ) // HL5 (hold 5)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HALF   ) // 1/2 (half gamble)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW    ) PORT_NAME("Small") // SML (small)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Attendant Reset") // RST (reset: clears tilt condition)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1      ) PORT_NAME("Attendant Reset") // RST (reset: clears tilt condition)
 
 	PORT_START("IOX1")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED        )

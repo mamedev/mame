@@ -471,7 +471,7 @@ inline save_error save_manager::do_read(T check_length, U read_block, V start_he
 
 	// verify the header and report an error if it doesn't match
 	u32 sig = signature();
-	if (validate_header(header, machine().system().name, sig, nullptr, "Error: ")  != STATERR_NONE)
+	if (validate_header(header, machine().system().name, sig, nullptr, "Error: ") != STATERR_NONE)
 		return STATERR_INVALID_HEADER;
 
 	// determine whether or not to flip the data when done

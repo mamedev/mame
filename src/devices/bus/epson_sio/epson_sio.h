@@ -28,10 +28,7 @@ public:
 	epson_sio_device(machine_config const &mconfig, char const *tag, device_t *owner, char const *dflt)
 		: epson_sio_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		epson_sio_devices(*this);
 		set_default_option(dflt);
-		set_fixed(false);
 	}
 
 	epson_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -50,7 +47,7 @@ public:
 	void pin_w(int state) { m_write_pin(state); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	device_epson_sio_interface *m_cart;
@@ -78,7 +75,7 @@ protected:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(EPSON_SIO, epson_sio_device)
 
 #endif // MAME_BUS_EPSON_SIO_EPSON_SIO_H

@@ -41,9 +41,8 @@ All of the games communicate with their I/O boards serially.
 Quicksilver II hardware:
 - Main CPU: Intel Celeron (Pentium II) 333/366MHz
 - Motherboard: Intel SE440BX-2 "4S4EB2X0.86A.0017.P10"
-https://theretroweb.com/motherboards/s/intel-se440bx-2-seattle-2
 - RAM: 64MB PC100-222-620 non-ecc
-- Sound: Integrated YMF740G
+- Sound: Integrated YMF740C (DS-1L) (XG PCI version)
 - Networking: SMC EZ Card 10 / SMC1208T (probably 10ec:8029 1113:1208)
 - Video Card: Quantum Obsidian 3DFX Voodoo 2 (CPLD protected)
 - Storage: Hard Drive
@@ -62,7 +61,8 @@ Graphite hardware:
 - Motherboard: BCM GT694VP
 - RAM: 128MB PC100/133
 - Sound: Integrated AC'97 Controller on VT82C686A Southbridge
-    -or ES1373/CT5880 Audio Chip
+    + ES1373/CT5880 Audio Chip
+	or CMI8738/8768 driver with PCIR 13f6:0111, as per XP-2K-ME folder (?)
 - Networking: SMC EZ Card 10 / SMC1208T (probably 10ec:8029 1113:1208)
 - Video Card: 3DFX Voodoo 3
 - Storage: Hard Drive (copy protected)
