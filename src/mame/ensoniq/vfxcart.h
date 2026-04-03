@@ -45,20 +45,23 @@ public:
 protected:
 	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 
-	required_device<x28f256_device> m_eeprom;
+	required_device<x28c256_device> m_eeprom;
 
-	static constexpr uint32_t SIZE = x28f256_device::TOTAL_SIZE_BYTES;
+	static constexpr uint32_t SIZE = x28c256_device::TOTAL_SIZE_BYTES;
 	static constexpr uint32_t MASK = SIZE - 1;
 
-	bool m_is_loaded;
-	bool m_is_writeable;
+	bool m_is_loaded = false;
+	bool m_is_writeable = false;
 
 	load_cb m_load_cb;
 	unload_cb m_unload_cb;
+	required_ioport m_input_config;
 };
 
 
