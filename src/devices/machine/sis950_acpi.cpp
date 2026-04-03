@@ -17,7 +17,7 @@ TODO:
 #include "sis950_acpi.h"
 
 #define VERBOSE (LOG_GENERAL)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(SIS950_ACPI, sis950_acpi_device, "sis950_acpi", "SiS 950 ACPI
 sis950_acpi_device::sis950_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: lpc_device(mconfig, SIS950_ACPI, tag, owner, clock)
 	, m_write_smi(*this)
-//	, m_write_sci(*this)
+//  , m_write_sci(*this)
 {
 }
 

@@ -132,10 +132,7 @@ public:
 	mikromikko2_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&bus_tag, U &&opts, const char *dflt, bool fixed)
 		: mikromikko2_expansion_bus_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<U>(opts), dflt, fixed);
 		m_bus.set_tag(std::forward<T>(bus_tag));
 	}
 	mikromikko2_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

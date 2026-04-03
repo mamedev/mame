@@ -60,10 +60,7 @@ public:
 	mpf1_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
 		: mpf1_exp_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 	mpf1_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -82,7 +79,7 @@ public:
 	void wait_w(int state) { m_wait_handler(state); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_config_complete() override;
 	virtual void device_start() override ATTR_COLD;
 
@@ -111,7 +108,7 @@ protected:
 	mpf1_exp_device *m_slot;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(MPF1_EXP, mpf1_exp_device)
 
 // supported devices

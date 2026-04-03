@@ -97,8 +97,11 @@ void adsp21062_device::data_2m(address_map &map)
 	map(0x00000, 0x000ff).rw(FUNC(adsp21062_device::iop_r), FUNC(adsp21062_device::iop_w));
 	map(0x20000, 0x27fff).mirror(0x18000).ram().share(m_blocks[1]);
 	map(0x20000, 0x27fff).ram().share(m_blocks[0]);
-	map(0x40000, 0x4ffff).mirror(0x30000).rw(FUNC(adsp21062_device::dmw_r<1>), FUNC(adsp21062_device::dmw_w<1>));
-	map(0x40000, 0x4ffff).rw(FUNC(adsp21062_device::dmw_r<0>), FUNC(adsp21062_device::dmw_w<0>));
+	map(0x40000, 0x4ffff).mirror(0x30000).rw(FUNC(adsp21062_device::dm_short_r<1>), FUNC(adsp21062_device::dm_short_w<1>));
+	map(0x40000, 0x4ffff).rw(FUNC(adsp21062_device::dm_short_r<0>), FUNC(adsp21062_device::dm_short_w<0>));
+	map(0x40000, 0x7ffff).view(m_dm_short_view);
+	m_dm_short_view[0](0x40000, 0x4ffff).mirror(0x30000).r(FUNC(adsp21062_device::dm_short_se_r<1>));
+	m_dm_short_view[0](0x40000, 0x4ffff).r(FUNC(adsp21062_device::dm_short_se_r<0>));
 }
 
 void adsp21062_device::data_4m(address_map &map)
@@ -106,8 +109,11 @@ void adsp21062_device::data_4m(address_map &map)
 	map(0x00000, 0x000ff).rw(FUNC(adsp21062_device::iop_r), FUNC(adsp21062_device::iop_w));
 	map(0x20000, 0x2ffff).ram().share(m_blocks[0]);
 	map(0x30000, 0x3ffff).ram().share(m_blocks[1]);
-	map(0x40000, 0x5ffff).rw(FUNC(adsp21062_device::dmw_r<0>), FUNC(adsp21062_device::dmw_w<0>));
-	map(0x60000, 0x7ffff).rw(FUNC(adsp21062_device::dmw_r<1>), FUNC(adsp21062_device::dmw_w<1>));
+	map(0x40000, 0x5ffff).rw(FUNC(adsp21062_device::dm_short_r<0>), FUNC(adsp21062_device::dm_short_w<0>));
+	map(0x60000, 0x7ffff).rw(FUNC(adsp21062_device::dm_short_r<1>), FUNC(adsp21062_device::dm_short_w<1>));
+	map(0x40000, 0x7ffff).view(m_dm_short_view);
+	m_dm_short_view[0](0x40000, 0x5ffff).r(FUNC(adsp21062_device::dm_short_se_r<0>));
+	m_dm_short_view[0](0x60000, 0x7ffff).r(FUNC(adsp21062_device::dm_short_se_r<1>));
 }
 
 adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -171,6 +177,7 @@ adsp21062_device::adsp21062_device(
 	, m_swap_dag2_4_7(nullptr)
 	, m_swap_r0_7(nullptr)
 	, m_swap_r8_15(nullptr)
+	, m_dm_short_view(*this, "short_words")
 	, m_flag_out_cb(*this)
 	, m_blocks(*this, "block%u", 0U)
 	, m_flag_pending_val{ 0, 0, 0, 0 }
@@ -327,13 +334,19 @@ void adsp21062_device::pm_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 }
 
 template <unsigned N>
-uint32_t adsp21062_device::dmw_r(offs_t offset)
+uint32_t adsp21062_device::dm_short_r(offs_t offset)
 {
 	return util::little_endian_cast<uint16_t const>(&m_blocks[N][0])[offset];
 }
 
 template <unsigned N>
-void adsp21062_device::dmw_w(offs_t offset, uint32_t data)
+uint32_t adsp21062_device::dm_short_se_r(offs_t offset)
+{
+	return uint32_t(int32_t(util::little_endian_cast<int16_t const>(&m_blocks[N][0])[offset]));
+}
+
+template <unsigned N>
+void adsp21062_device::dm_short_w(offs_t offset, uint32_t data)
 {
 	util::little_endian_cast<uint16_t>(&m_blocks[N][0])[offset] = uint16_t(data);
 }
@@ -850,21 +863,21 @@ void adsp21062_device::device_start()
 	save_item(NAME(m_core->astat_old_old));
 	save_item(NAME(m_core->astat_old_old_old));
 
-	state_add( SHARC_PC,     "PC", m_core->pc).mask(0x00ffffff).formatstr("%06X");
-	state_add( SHARC_PCSTK,  "PCSTK", m_core->pcstk).mask(0x00ffffff).formatstr("%06X");
-	state_add( SHARC_PCSTKP, "PCSTKP", m_core->pcstkp).mask(0x1f).formatstr("%02X");
-	state_add( SHARC_LSTKP,  "LSTKP", m_core->lstkp).mask(0x07).formatstr("%01X");
-	state_add( SHARC_FADDR,  "FADDR", m_core->faddr).formatstr("%08X");
-	state_add( SHARC_DADDR,  "DADDR", m_core->daddr).formatstr("%08X");
-	state_add( SHARC_MODE1,  "MODE1", m_core->mode1).formatstr("%08X");
-	state_add( SHARC_MODE2,  "MODE2", m_core->mode2).formatstr("%08X");
-	state_add( SHARC_ASTAT,  "ASTAT", m_core->astat).formatstr("%08X").callimport().callexport();
-	state_add( SHARC_IRPTL,  "IRPTL", m_core->irptl).formatstr("%08X");
-	state_add( SHARC_IMASK,  "IMASK", m_core->imask).formatstr("%08X");
-	state_add( SHARC_USTAT1, "USTAT1", m_core->ustat1).formatstr("%08X");
-	state_add( SHARC_USTAT2, "USTAT2", m_core->ustat2).formatstr("%08X");
-	state_add( SHARC_CURLCNTR, "CURLCNTR", m_core->curlcntr).formatstr("%08X");
-	state_add( SHARC_STSTKP, "STSTKP", m_core->status_stkp).formatstr("%08X");
+	state_add(SHARC_PC,     "PC", m_core->pc).mask(0x00ffffff).formatstr("%06X");
+	state_add(SHARC_PCSTK,  "PCSTK", m_core->pcstk).mask(0x00ffffff).formatstr("%06X");
+	state_add(SHARC_PCSTKP, "PCSTKP", m_core->pcstkp).mask(0x1f).formatstr("%02X");
+	state_add(SHARC_LSTKP,  "LSTKP", m_core->lstkp).mask(0x07).formatstr("%01X");
+	state_add(SHARC_FADDR,  "FADDR", m_core->faddr).formatstr("%08X");
+	state_add(SHARC_DADDR,  "DADDR", m_core->daddr).formatstr("%08X");
+	state_add(SHARC_MODE1,  "MODE1", m_core->mode1).formatstr("%08X");
+	state_add(SHARC_MODE2,  "MODE2", m_core->mode2).formatstr("%08X");
+	state_add(SHARC_ASTAT,  "ASTAT", m_core->astat).formatstr("%08X").callimport().callexport();
+	state_add(SHARC_IRPTL,  "IRPTL", m_core->irptl).formatstr("%08X");
+	state_add(SHARC_IMASK,  "IMASK", m_core->imask).formatstr("%08X");
+	state_add(SHARC_USTAT1, "USTAT1", m_core->ustat1).formatstr("%08X");
+	state_add(SHARC_USTAT2, "USTAT2", m_core->ustat2).formatstr("%08X");
+	state_add(SHARC_CURLCNTR, "CURLCNTR", m_core->curlcntr).formatstr("%08X");
+	state_add(SHARC_STSTKP, "STSTKP", m_core->status_stkp).formatstr("%08X");
 
 	char namebuf[8];
 	for (int i = 0; 16 > i; ++i)
@@ -876,29 +889,37 @@ void adsp21062_device::device_start()
 	{
 		std::snprintf(namebuf, std::size(namebuf), "I%d", i);
 		auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
-		state_add(SHARC_I0 + i, namebuf, dag.i[i]).formatstr("%08X");
+		auto const mask((i < 8) ? 0xffffffff : 0x00ffffff);
+		auto const format((i < 8) ? "%08X" : "%06X");
+		state_add(SHARC_I0 + i, namebuf, dag.i[i & 0x7]).mask(mask).formatstr(format);
 	}
 	for (int i = 0; 16 > i; ++i)
 	{
 		std::snprintf(namebuf, std::size(namebuf), "M%d", i);
 		auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
-		state_add(SHARC_M0 + i, namebuf, dag.m[i]).formatstr("%08X");
+		auto const mask((i < 8) ? 0xffffffff : 0x00ffffff);
+		auto const format((i < 8) ? "%08X" : "%06X");
+		state_add(SHARC_M0 + i, namebuf, dag.m[i & 0x7]).mask(mask).formatstr(format);
 	}
 	for (int i = 0; 16 > i; ++i)
 	{
 		std::snprintf(namebuf, std::size(namebuf), "L%d", i);
 		auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
-		state_add(SHARC_L0 + i, namebuf, dag.l[i]).formatstr("%08X");
+		auto const mask((i < 8) ? 0xffffffff : 0x00ffffff);
+		auto const format((i < 8) ? "%08X" : "%06X");
+		state_add(SHARC_L0 + i, namebuf, dag.l[i & 0x7]).mask(mask).formatstr(format);
 	}
 	for (int i = 0; 16 > i; ++i)
 	{
 		std::snprintf(namebuf, std::size(namebuf), "B%d", i);
 		auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
-		state_add(SHARC_B0 + i, namebuf, dag.b[i]).formatstr("%08X");
+		auto const mask((i < 8) ? 0xffffffff : 0x00ffffff);
+		auto const format((i < 8) ? "%08X" : "%06X");
+		state_add(SHARC_B0 + i, namebuf, dag.b[i & 0x7]).mask(mask).formatstr(format);
 	}
 
-	state_add( STATE_GENPC, "GENPC", m_core->pc).noshow();
-	state_add( STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
+	state_add(STATE_GENPC,     "GENPC", m_core->pc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
 
 	set_icountptr(m_core->icount);
 }

@@ -4668,8 +4668,8 @@ ROM_END
 
 ROM_START( pwrinst2j )
 	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 code */
-	ROM_LOAD16_BYTE( "g02j.u45", 0x000000, 0x80000, CRC(42d0abd7) SHA1(c58861d43c4539ccc8b2f93eabc56aab37d3aa34))
-	ROM_LOAD16_BYTE( "g02j.u44", 0x000001, 0x80000, CRC(362b7af3) SHA1(2d15611530cef76f0f9c82ee0411966079ae19c3))
+	ROM_LOAD16_BYTE( "g02j.u45", 0x000000, 0x80000, CRC(42d0abd7) SHA1(c58861d43c4539ccc8b2f93eabc56aab37d3aa34) )
+	ROM_LOAD16_BYTE( "g02j.u44", 0x000001, 0x80000, CRC(362b7af3) SHA1(2d15611530cef76f0f9c82ee0411966079ae19c3) )
 	ROM_LOAD16_BYTE( "g02j.u43", 0x100000, 0x80000, CRC(c94c596b) SHA1(ee755a344f769e3ed05d8ca57f517b9e8c02f22e) )
 	ROM_LOAD16_BYTE( "g02j.u42", 0x100001, 0x80000, CRC(4f4c8270) SHA1(1fa964f5646bd1d078e3661c21e191b0789c05c9) )
 
@@ -4699,6 +4699,54 @@ ROM_START( pwrinst2j )
 
 	ROM_REGION( 0x080000, "layer3", 0 )
 	ROM_LOAD( "g02j.82a", 0x000000, 0x080000, CRC(3be86fe1) SHA1(313bfe5fb8dc5fee4462db259738e079759f9390) )
+
+	ROM_REGION( 0x400000, "oki1", 0 )   /* OKIM6295 #1 Samples */
+	ROM_LOAD( "g02.u53", 0x000000, 0x200000, CRC(c4bdd9e0) SHA1(a938a831e789ddf6f3cc5f3e5f3877ec7bd62d4e) )
+	ROM_LOAD( "g02.u54", 0x200000, 0x200000, CRC(1357d50e) SHA1(433766177ce9d6933f90de85ba91bfc6d8d5d664) )
+
+	ROM_REGION( 0x400000, "oki2", 0 )   /* OKIM6295 #2 Samples */
+	ROM_LOAD( "g02.u55", 0x000000, 0x200000, CRC(2d102898) SHA1(bd81f4cd2ba100707db0c5bb1419f0b23c998574) )
+	ROM_LOAD( "g02.u56", 0x200000, 0x200000, CRC(9ff50dda) SHA1(1121685e387c20e228032f2b0f5cbb606376fc15) )
+
+	ROM_REGION( 0x03ff, "pal", 0 )
+	ROM_LOAD( "peel18cv8p-15.u7",  0x0000, 0x0155, CRC(e02b2d2b) SHA1(26293538ca17674e1b249ed82a6df2570c6e5155) ) /* PEEL18CV8P-15 */
+	ROM_LOAD( "peel18cv8p-15.u21", 0x0155, 0x0155, CRC(7ca78400) SHA1(1cebdd64e08bbc535f23592daf9380696bd2c281) ) /* PEEL18CV8P-15 */
+	ROM_LOAD( "peel18cv8p-15.u25", 0x02aa, 0x0155, CRC(61b414df) SHA1(f12c5e62f83114f83108895ee58ceea31cdcb9fd) ) /* PEEL18CV8P-15 */
+ROM_END
+
+ROM_START( pwrinst2ja ) // only the first 2 program ROMs differ from the other Japanese set
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 code */
+	ROM_LOAD16_BYTE( "g02_u45-j.u45", 0x000000, 0x80000, CRC(0dc8a37b) SHA1(241b171517f437620fd6144b91e0a9305a7ae46a) )
+	ROM_LOAD16_BYTE( "g02_u44-j.u44", 0x000001, 0x80000, CRC(42b35ec5) SHA1(ba923e838e4bcd2271f178be7f9c7068103d6d03) )
+	ROM_LOAD16_BYTE( "g02_u43-j.u43", 0x100000, 0x80000, CRC(c94c596b) SHA1(ee755a344f769e3ed05d8ca57f517b9e8c02f22e) )
+	ROM_LOAD16_BYTE( "g02_u42-j.u42", 0x100001, 0x80000, CRC(4f4c8270) SHA1(1fa964f5646bd1d078e3661c21e191b0789c05c9) )
+
+	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* 68000 extra data roms */
+	/* not used */
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 code */
+	ROM_LOAD( "g02_u3-j.u3", 0x00000, 0x20000, CRC(eead01f1) SHA1(0ced6755e471e0303fe397b3d54a5c799762ebd8) )
+
+	ROM_REGION( 0xe00000, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_LOAD( "g02.u61", 0x000000, 0x200000, CRC(91e30398) SHA1(2b59a5e40bed2a988382054fe30d92808dad3348) )
+	ROM_LOAD( "g02.u62", 0x200000, 0x200000, CRC(d9455dd7) SHA1(afa69fe9a540cd78b8cfecf09cffa1401c01141a) )
+	ROM_LOAD( "g02.u63", 0x400000, 0x200000, CRC(4d20560b) SHA1(ceaee8cf0b69cc366b95ddcb689a5594d79e5114) )
+	ROM_LOAD( "g02.u64", 0x600000, 0x200000, CRC(b17b9b6e) SHA1(fc6213d8322cda4c7f653e2d7d6d314ce84c97b7) )
+	ROM_LOAD( "g02.u65", 0x800000, 0x200000, CRC(08541878) SHA1(138cf077a49a26440a3da1bdc2c399a208359e57) )
+	ROM_LOAD( "g02.u66", 0xa00000, 0x200000, CRC(becf2a36) SHA1(f8b386d0292b1dc745b7253a3df51d1aa8d5e9db) )
+	ROM_LOAD( "g02.u67", 0xc00000, 0x200000, CRC(52fe2b8b) SHA1(dd50aa62f7db995e28f47de9b3fb749aeeaaa5b0) )
+
+	ROM_REGION( 0x200000, "layer0", 0 )
+	ROM_LOAD( "g02.u78", 0x000000, 0x200000, CRC(1eca63d2) SHA1(538942b43301f950e3d5139461331c54dc90129d) )
+
+	ROM_REGION( 0x100000, "layer1", 0 )
+	ROM_LOAD( "g02.u81", 0x000000, 0x100000, CRC(8a3ff685) SHA1(4a59ec50ec4470453374fe10f76d3e894494b49f) )
+
+	ROM_REGION( 0x100000, "layer2", 0 )
+	ROM_LOAD( "g02.u89", 0x000000, 0x100000, CRC(373e1f73) SHA1(ec1ae9fab37eee41be8e1bc6dad03809b62fdbce) )
+
+	ROM_REGION( 0x080000, "layer3", 0 )
+	ROM_LOAD( "g02_u82-j.u82", 0x000000, 0x080000, CRC(3be86fe1) SHA1(313bfe5fb8dc5fee4462db259738e079759f9390) )
 
 	ROM_REGION( 0x400000, "oki1", 0 )   /* OKIM6295 #1 Samples */
 	ROM_LOAD( "g02.u53", 0x000000, 0x200000, CRC(c4bdd9e0) SHA1(a938a831e789ddf6f3cc5f3e5f3877ec7bd62d4e) )
@@ -5673,10 +5721,11 @@ void cave_state::init_korokoro()
 
 
 ***************************************************************************/
-//    YEAR  NAME        PARENT    MACHINE   INPUT      CLASS      INIT            ROT     COMPANY                                   FULLNAME                                        FLAGS
-GAME( 1994, pwrinst2,   0,        pwrinst2, metmqstr, cave_z80_state, init_pwrinst2,  ROT0,   "Atlus",                                  "Power Instinct 2 (US, Ver. 94.04.08, set 1)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1994, pwrinst2a,  pwrinst2, pwrinst2, metmqstr, cave_z80_state, init_pwrinst2a, ROT0,   "Atlus",                                  "Power Instinct 2 (US, Ver. 94.04.08, set 2)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, cave_z80_state, init_pwrinst2,  ROT0,   "Atlus",                                  "Gouketsuji Ichizoku 2 (Japan, Ver. 94.04.08)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT    MACHINE   INPUT     CLASS           INIT            ROT     COMPANY                                   FULLNAME                                               FLAGS
+GAME( 1994, pwrinst2,   0,        pwrinst2, metmqstr, cave_z80_state, init_pwrinst2,  ROT0,   "Atlus",                                  "Power Instinct 2 (US, Ver. 94.04.08, set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pwrinst2a,  pwrinst2, pwrinst2, metmqstr, cave_z80_state, init_pwrinst2a, ROT0,   "Atlus",                                  "Power Instinct 2 (US, Ver. 94.04.08, set 2)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, cave_z80_state, init_pwrinst2,  ROT0,   "Atlus",                                  "Gouketsuji Ichizoku 2 (Japan, Ver. 94.04.08, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pwrinst2ja, pwrinst2, pwrinst2, metmqstr, cave_z80_state, init_pwrinst2,  ROT0,   "Atlus",                                  "Gouketsuji Ichizoku 2 (Japan, Ver. 94.04.08, set 2)", MACHINE_SUPPORTS_SAVE )
 
 // Version/Date string is stored at 68000 ROM 0x1200-0x121f
 // The EEPROM determines the region, program roms are the same between sets

@@ -76,7 +76,7 @@ void rp2a03_device::apu_irq(int state)
 
 uint8_t rp2a03_device::apu_read_mem(offs_t offset)
 {
-	return m_mintf->m_program.read_byte(offset);
+	return m_mintf->m_program.read_interruptible(offset);
 }
 
 void rp2a03_device::device_add_mconfig(machine_config &config)

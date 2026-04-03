@@ -54,10 +54,12 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 
 		machine_config &mconfig(const_cast<machine_config &>(machine().config()));
 		machine_config::token const tok(mconfig.begin_configuration(mconfig.root_device()));
-		device_t *const dev = mconfig.device_add(m_option->name(), m_option->devtype(), 0);
+		device_t *const dev = mconfig.device_add(std::string(m_option->name()).c_str(), m_option->devtype(), 0); // TODO: support string_view tags
 		for (device_t &d : device_enumerator(*dev))
+		{
 			if (!d.configured())
 				d.config_complete();
+		}
 
 		// get decimal separator
 		std::string point;
@@ -115,7 +117,7 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 						util::string_format(
 							(count > 1)
 								? ((clock != 0) ? u8"  %1$d×%2$s %3$s\u00a0%4$s\n" : u8"  %1$d×%2$s\n")
-								: ((clock != 0) ? u8"  %2$s %3$s\u00a0%4$s\n" : "  %2$s\n"),
+								: ((clock != 0) ? u8"  %2$s %3$s\u00a0%4$s\n" : u8"  %2$s\n"),
 							count, name, hz,
 							(d == 9) ? _("GHz") : (d == 6) ? _("MHz") : (d == 3) ? _("kHz") : _("Hz")),
 						color);
@@ -210,7 +212,7 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 						util::string_format(
 							(count > 1)
 								? ((clock != 0) ? u8"  %1$d×%2$s %3$s\u00a0%4$s" : u8"  %1$d×%2$s")
-								: ((clock != 0) ? u8"  %2$s %3$s\u00a0%4$s" : "  %2$s"),
+								: ((clock != 0) ? u8"  %2$s %3$s\u00a0%4$s" : u8"  %2$s"),
 							count, sound.device().name(), hz,
 							(d == 9) ? _("GHz") : (d == 6) ? _("MHz") : (d == 3) ? _("kHz") : _("Hz")),
 						color);
@@ -393,7 +395,7 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 				+ input + input_mj + input_hana + input_gamble + input_analog + input_adjust + input_keypad + input_keyboard) == 0)
 			layout->add_text(_("[None]\n"), color);
 
-		mconfig.device_remove(m_option->name());
+		mconfig.device_remove(std::string(m_option->name()).c_str()); // TODO: support string_view tags
 		lines = layout->lines();
 	}
 	width = layout->actual_width();

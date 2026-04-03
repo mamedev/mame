@@ -7,15 +7,18 @@ Trident 4DWAVE-DX / 4DWAVE-NX
 AC'97 v1.x (fixed 48 kHz)
 
 TODO:
-- Fix loop repeats in wave engine (busmastering and/or actual FIFO);
-- Add delta sample rate;
-- Add mono, 8-bit and unsigned modes;
+- dxdiag: sound test don't playback on lower modes;
+- diablo: dungeon ambient BGM and townspeople speech doesn't work
+  \- streaming LBA bank from .mpq is empty in both cases (?)
 - Missing features in Bank A (testable in dxdiag -> Music -> Trident PCI WaveTable MIDI);
-- winamp has encoding issues with negative numbers (CPU core bug?);
-- Mix-in wave engine output to AC'97 input, upsample to 48 kHz there;
+- Move DMA reading out of sound_stream_update;
+- Mix-in wave engine output to AC'97 input;
 - wavetsr.com can't find a free IRQ for SB emulation under DOS;
 - Soundblaster, FM and MPU-401 are emulated by the 4dwave sound engine;
 - Support for 4DWAVE-NX (minor upgrade with extra TLB, scatter-gather and SPDIF interface)
+
+Notes:
+- 66 MHz CPU is too slow for winamp, will hiccup a ton on "serious" playback;
 
 **************************************************************************************************/
 
@@ -28,6 +31,8 @@ TODO:
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
+
+#define LIVE_AUDIO_VIEW 0
 
 
 DEFINE_DEVICE_TYPE(TRIDENT_4DWAVEDX, trident_4dwavedx_device,   "trident_4dwavedx",   "Trident 4D Wave-DX sound card")
@@ -61,7 +66,7 @@ void trident_4dwavedx_device::device_add_mconfig(machine_config &config)
 		irq_pin_w(0, state);
 		//irq_pin_w(0, 0);
 		//if (state)
-		//	irq_pin_w(0, 1);
+		//  irq_pin_w(0, 1);
 	});
 	m_pcm->add_route(0, m_ac97, 1.00, 0);
 	m_pcm->add_route(1, m_ac97, 1.00, 1);
@@ -151,9 +156,9 @@ void trident_4dwavedx_device::config_map(address_map &map)
 				, m_ddma_config & ~0xf, BIT(m_ddma_config, 3), BIT(m_ddma_config, 0));
 		})
 	);
-//	map(0x44, 0x44) Legacy I/O Base
-//	map(0x45, 0x45) Legacy DMA
-//	map(0x46, 0x46) Legacy Control
+//  map(0x44, 0x44) Legacy I/O Base
+//  map(0x45, 0x45) Legacy DMA
+//  map(0x46, 0x46) Legacy Control
 	map(0x44, 0x47).lrw32(
 		NAME([this] (offs_t offset, u32 mem_mask) {
 			LOG("PCI 44h: Legacy control read (mask %08x)\n", mem_mask);
@@ -207,22 +212,22 @@ void trident_4dwavedx_device::config_map(address_map &map)
 
 void trident_4dwavedx_device::io_map(address_map &map)
 {
-//	map(0x00, 0x0f) Legacy DMA
-//	map(0x10, 0x1f) Legacy SB mapping
+//  map(0x00, 0x0f) Legacy DMA
+//  map(0x10, 0x1f) Legacy SB mapping
 
-//	map(0x20, 0x23) Legacy MPU-401
+//  map(0x20, 0x23) Legacy MPU-401
 
-//	map(0x30, 0x31) Legacy Game Port
-//	map(0x34, 0x37) Enhanced Game Port 1
-//	map(0x38, 0x3b) Enhanced Game Port 2
+//  map(0x30, 0x31) Legacy Game Port
+//  map(0x34, 0x37) Enhanced Game Port 1
+//  map(0x38, 0x3b) Enhanced Game Port 2
 
 	map(0x40, 0x43).rw(m_ac97, FUNC(ac97_stac9704_device::codec_write_r), FUNC(ac97_stac9704_device::codec_write_w));
 	map(0x44, 0x47).rw(m_ac97, FUNC(ac97_stac9704_device::codec_read_r), FUNC(ac97_stac9704_device::codec_read_w));
-//	map(0x48, 0x4b) AC'97 Command/Status
+//  map(0x48, 0x4b) AC'97 Command/Status
 
-//	map(0x50, 0x50) 4DWAVE-DX Status (r/o)
-//	map(0x54, 0x55) Legacy SB Frequency (r/o)
-//	map(0x57, 0x57) Legacy SB Time Constant (r/o)
+//  map(0x50, 0x50) 4DWAVE-DX Status (r/o)
+//  map(0x54, 0x55) Legacy SB Frequency (r/o)
+//  map(0x57, 0x57) Legacy SB Time Constant (r/o)
 	map(0x58, 0x5b).lrw32(
 		NAME([this] (offs_t offset) {
 			return m_asr3;
@@ -251,46 +256,46 @@ void trident_4dwavedx_device::io_map(address_map &map)
 			}
 		})
 	);
-//	map(0x60, 0x63) OPL3 Emulation Channel Key on/off Trace
+//  map(0x60, 0x63) OPL3 Emulation Channel Key on/off Trace
 
-//	map(0x70, 0x73) Record Channel index 2 (chorus) / 1 (reverb) / 0 (mixer)
-//	map(0x78, 0x7b) Bank A PCI Stream Buffer Valid flags (testing only)
-//	map(0x7c, 0x7f) Bank B PCI Stream Buffer Valid flags (testing only)
+//  map(0x70, 0x73) Record Channel index 2 (chorus) / 1 (reverb) / 0 (mixer)
+//  map(0x78, 0x7b) Bank A PCI Stream Buffer Valid flags (testing only)
+//  map(0x7c, 0x7f) Bank B PCI Stream Buffer Valid flags (testing only)
 
-//	map(0x80, 0xff) Wave Engine
+//  map(0x80, 0xff) Wave Engine
 	map(0x80, 0x83).rw(m_pcm, FUNC(t4dwave_pcm_device::banka_status_r), FUNC(t4dwave_pcm_device::starta_w));
 	map(0x84, 0x87).rw(m_pcm, FUNC(t4dwave_pcm_device::banka_status_r), FUNC(t4dwave_pcm_device::stopa_w));
-//	map(0x88, 0x8b) DLYA
-//	map(0x8c, 0x8f) SIGNCSOA
-//	map(0x90, 0x93) CSPFA
-//	map(0x94, 0x97) CEBCA
+//  map(0x88, 0x8b) DLYA
+//  map(0x8c, 0x8f) SIGNCSOA
+//  map(0x90, 0x93) CSPFA
+//  map(0x94, 0x97) CEBCA
 	map(0x98, 0x9b).rw(m_pcm, FUNC(t4dwave_pcm_device::aina_r), FUNC(t4dwave_pcm_device::aina_w));
-//	map(0x9c, 0x9f) EINTA
+//  map(0x9c, 0x9f) EINTA
 	map(0xa0, 0xa3).rw(m_pcm, FUNC(t4dwave_pcm_device::global_control_r), FUNC(t4dwave_pcm_device::global_control_w));
 	map(0xa4, 0xa7).rw(m_pcm, FUNC(t4dwave_pcm_device::aintena_r), FUNC(t4dwave_pcm_device::aintena_w));
 	map(0xa8, 0xab).rw(m_pcm, FUNC(t4dwave_pcm_device::wavevol_r), FUNC(t4dwave_pcm_device::wavevol_w));
-//	map(0xac, 0xaf) DELTAR
-	map(0xb0, 0xb3).r(m_pcm, FUNC(t4dwave_pcm_device::miscint_r));
+//  map(0xac, 0xaf) DELTAR
+	map(0xb0, 0xb3).rw(m_pcm, FUNC(t4dwave_pcm_device::miscint_r), FUNC(t4dwave_pcm_device::miscint_w));
 	map(0xb4, 0xb7).rw(m_pcm, FUNC(t4dwave_pcm_device::bankb_status_r), FUNC(t4dwave_pcm_device::startb_w));
 	map(0xb8, 0xbb).rw(m_pcm, FUNC(t4dwave_pcm_device::bankb_status_r), FUNC(t4dwave_pcm_device::stopb_w));
-//	map(0xbc, 0xbf) CSPFB
-//	map(0xc0, 0xc3) SBBL/SBCL
-//	map(0xc4, 0xc7) SBE2R/SBDD/SBCTRL
-//	map(0xc8, 0xcb) STIMER (r/o)
-//	map(0xcc, 0xcd) ROM Test
-//	map(0xce, 0xcf) LFOB
-//	map(0xd0, 0xd3) Test Mixer FIFO
-//	map(0xd4, 0xd7) Test Mixer Accumulator
+//  map(0xbc, 0xbf) CSPFB
+//  map(0xc0, 0xc3) SBBL/SBCL
+//  map(0xc4, 0xc7) SBE2R/SBDD/SBCTRL
+//  map(0xc8, 0xcb) STIMER (r/o)
+//  map(0xcc, 0xcd) ROM Test
+//  map(0xce, 0xcf) LFOB
+//  map(0xd0, 0xd3) Test Mixer FIFO
+//  map(0xd4, 0xd7) Test Mixer Accumulator
 	map(0xd8, 0xdb).rw(m_pcm, FUNC(t4dwave_pcm_device::ainb_r), FUNC(t4dwave_pcm_device::ainb_w));
 	map(0xdc, 0xdf).rw(m_pcm, FUNC(t4dwave_pcm_device::aintenb_r), FUNC(t4dwave_pcm_device::aintenb_w));
 
 	map(0xe0, 0xe3).rw(m_pcm, FUNC(t4dwave_pcm_device::cso_r), FUNC(t4dwave_pcm_device::cso_w));
 	map(0xe4, 0xe7).w(m_pcm, FUNC(t4dwave_pcm_device::lba_w));
 	map(0xe8, 0xeb).rw(m_pcm, FUNC(t4dwave_pcm_device::eso_r), FUNC(t4dwave_pcm_device::eso_w));
-//	map(0xec, 0xef) FMC/RVOL/CVOL
+//  map(0xec, 0xef) FMC/RVOL/CVOL
 	map(0xf0, 0xf3).rw(m_pcm, FUNC(t4dwave_pcm_device::gvsel_r), FUNC(t4dwave_pcm_device::gvsel_w));
-//	map(0xf4, 0xf7) EBUF1 (bank A only)
-//	map(0xf8, 0xfb) EBUF2 (bank A only)
+//  map(0xf4, 0xf7) EBUF1 (bank A only)
+//  map(0xf8, 0xfb) EBUF2 (bank A only)
 }
 
 void trident_4dwavedx_device::mmio_map(address_map &map)
@@ -358,7 +363,7 @@ t4dwave_pcm_device::t4dwave_pcm_device(const machine_config &mconfig, const char
 
 void t4dwave_pcm_device::device_start()
 {
-	m_stream = stream_alloc(0, 2, 44100 / 2);
+	m_stream = stream_alloc(0, 2, 48000);
 
 	save_item(NAME(m_global_control));
 	save_item(NAME(m_cir));
@@ -371,6 +376,8 @@ void t4dwave_pcm_device::device_start()
 	save_item(NAME(m_aintenb));
 	save_item(NAME(m_bankB_keyon));
 
+	save_item(NAME(m_miscint));
+
 	save_item(NAME(m_vol_cache));
 	save_item(NAME(m_volL));
 	save_item(NAME(m_volR));
@@ -379,18 +386,24 @@ void t4dwave_pcm_device::device_start()
 	save_item(STRUCT_MEMBER(m_channel, cso));
 	save_item(STRUCT_MEMBER(m_channel, hso));
 	save_item(STRUCT_MEMBER(m_channel, eso));
+	save_item(STRUCT_MEMBER(m_channel, eso_cache));
 	save_item(STRUCT_MEMBER(m_channel, delta));
 	save_item(STRUCT_MEMBER(m_channel, gvsel_cache));
 	save_item(STRUCT_MEMBER(m_channel, gvsel));
 	save_item(STRUCT_MEMBER(m_channel, pan_control));
 	save_item(STRUCT_MEMBER(m_channel, pan_vol));
 	save_item(STRUCT_MEMBER(m_channel, vol));
-	save_item(STRUCT_MEMBER(m_channel, is_16bit));
-	save_item(STRUCT_MEMBER(m_channel, is_stereo));
-	save_item(STRUCT_MEMBER(m_channel, is_signed));
+	save_item(STRUCT_MEMBER(m_channel, play_mode));
+//  save_item(STRUCT_MEMBER(m_channel, is_16bit));
+//  save_item(STRUCT_MEMBER(m_channel, is_stereo));
+//  save_item(STRUCT_MEMBER(m_channel, is_signed));
 	save_item(STRUCT_MEMBER(m_channel, loop_enable));
 	save_item(STRUCT_MEMBER(m_channel, ec_envelope));
 	save_item(STRUCT_MEMBER(m_channel, pci_buf));
+
+	save_item(STRUCT_MEMBER(m_channel, ticks));
+	save_item(STRUCT_MEMBER(m_channel, sample_data));
+	save_item(STRUCT_MEMBER(m_channel, dma_fetch));
 }
 
 void t4dwave_pcm_device::device_reset()
@@ -398,8 +411,32 @@ void t4dwave_pcm_device::device_reset()
 	m_global_control = 0;
 	m_cir = 0;
 
+	m_miscint = 0;
 	m_aina = m_aintena = m_ainb = m_aintenb = 0;
 	m_bankA_keyon = m_bankB_keyon = 0;
+
+	for (int i = 0; i < 64; i++)
+	{
+		m_channel[i].lba = 0;
+		m_channel[i].cso = 0;
+		m_channel[i].eso_cache = 0;
+		std::fill(std::begin(m_channel[i].hso), std::end(m_channel[i].hso), 0);
+		std::fill(std::begin(m_channel[i].eso), std::end(m_channel[i].eso), 0);
+		m_channel[i].delta = 0;
+		m_channel[i].gvsel_cache = 0;
+		m_channel[i].gvsel = false;
+		m_channel[i].pan_control = false;
+		m_channel[i].pan_vol = 0;
+		m_channel[i].vol = 0;
+		m_channel[i].play_mode = 0;
+		m_channel[i].loop_enable = 0;
+		m_channel[i].ec_envelope = 0;
+		m_channel[i].pci_buf = 0;
+
+		m_channel[i].ticks = 0;
+		m_channel[i].sample_data = 0;
+		m_channel[i].dma_fetch = false;
+	}
 }
 
 // START_A & STOP_A
@@ -467,18 +504,48 @@ void t4dwave_pcm_device::global_control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_global_control);
 
-	LOG("WAVE A0: Global Control %08x & %08x\n", data, mem_mask);
+	if (mem_mask & 0xffff'ff00)
+		LOG("WAVE A0: Global Control %08x & %08x\n", data, mem_mask);
 
 	if (ACCESSING_BITS_0_7)
 		m_cir = data & 0x3f;
 }
 
+// ---- ---- ---- --x- ---- ---- ---- ---- opltimer_ie
+// ---- ---- ---- ---x ---- ---- ---- ---- pb_24k_mode
+// ---- ---- ---- ---- ---x ---- ---- ---- SB Record Interrupt Control
+// ---- ---- ---- ---- ---- x--- ---- ---- mixer overflow flag (wc)
+// ---- ---- ---- ---- ---- -x-- ---- ---- mixer underflow flag (wc)
+// ---- ---- ---- ---- ---- --x- ---- ---- rec overrun status (wc)
+// ---- ---- ---- ---- ---- ---x ---- ---- playback underrun (wc)
+// ---- ---- ---- ---- ---- ---- -x-- ---- envelope irq (ro)
+// ---- ---- ---- ---- ---- ---- --x- ---- address irq (ro)
+// ---- ---- ---- ---- ---- ---- ---x ---- opl3 irq (ro)
+// ---- ---- ---- ---- ---- ---- ---- x--- mpu401 irq (ro)
+// ---- ---- ---- ---- ---- ---- ---- -x-- sb irq (ro)
+// ---- ---- ---- ---- ---- ---- ---- --x- rec overrun irq (ro)
+// ---- ---- ---- ---- ---- ---- ---- ---x playback overrun irq (ro)
 u32 t4dwave_pcm_device::miscint_r(offs_t offset)
 {
-	u32 res = 0;
-	if ((m_aina & m_aintena) || (m_ainb & m_aintenb))
-		res |= (1 << 5);
+	u32 res = m_miscint & 0x0003'1f7f;
 	return res;
+}
+
+void t4dwave_pcm_device::miscint_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (ACCESSING_BITS_16_23)
+	{
+		m_miscint &= 0xff00'ffff;
+		m_miscint |= (data & 0x0003'0000);
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		m_miscint &= ~(1 << 12);
+		m_miscint |= BIT(data, 12) << 12;
+		// apply write clear flags
+		m_miscint &= ~(data & 0x0f00);
+	}
 }
 
 // START_B / STOP_B
@@ -527,7 +594,7 @@ u32 t4dwave_pcm_device::cso_r(offs_t offset)
 
 	if (!machine().side_effects_disabled())
 		m_stream->update();
-	return (channel.cso >> 2) << 16;
+	return (channel.cso) << 16;
 }
 
 void t4dwave_pcm_device::cso_w(offs_t offset, u32 data, u32 mem_mask)
@@ -535,7 +602,7 @@ void t4dwave_pcm_device::cso_w(offs_t offset, u32 data, u32 mem_mask)
 	channel_t &channel = m_channel[m_cir];
 
 	if (ACCESSING_BITS_16_31)
-		channel.cso = (data >> 16) << 2;
+		channel.cso = (data >> 16);
 }
 
 void t4dwave_pcm_device::lba_w(offs_t offset, u32 data, u32 mem_mask)
@@ -553,7 +620,7 @@ u32 t4dwave_pcm_device::eso_r(offs_t offset)
 {
 	channel_t &channel = m_channel[m_cir];
 
-	return ((channel.eso >> 2) << 16) | (channel.delta & 0xffff);
+	return (channel.eso_cache << 16) | (channel.delta & 0xffff);
 }
 
 void t4dwave_pcm_device::eso_w(offs_t offset, u32 data, u32 mem_mask)
@@ -562,11 +629,29 @@ void t4dwave_pcm_device::eso_w(offs_t offset, u32 data, u32 mem_mask)
 
 	if (ACCESSING_BITS_16_31)
 	{
-		channel.eso = ((data >> 16) + 1) << 2;
-		channel.hso = channel.eso >> 1;
+		channel.eso_cache = (data >> 16);
+		const u32 eso_shift_table[4] = { 2, 1, 1, 0 };
+
+		// prepare ESO/HSO table here, actual range depends on mode used
+		for (int i = 0; i < 8; i += 2)
+		{
+			const u32 eso_shift = eso_shift_table[i >> 1];
+			// TODO: on 16-bit stereo loops clearly ends at +1, others apparently don't
+			channel.eso[i + 0] = (channel.eso_cache + 1) >> eso_shift;
+			channel.eso[i + 1] = channel.eso[i + 0];
+
+			channel.hso[i + 0] = channel.eso[i + 0] >> 1;
+			channel.hso[i + 1] = channel.hso[i + 0];
+		}
 	}
 	if (ACCESSING_BITS_0_15)
+	{
 		channel.delta = data & 0xffff;
+		// internal variables init-ed here for convenience
+		channel.ticks = 0;
+		channel.sample_data = 0;
+		channel.dma_fetch = true;
+	}
 	m_stream->update();
 }
 
@@ -584,9 +669,10 @@ void t4dwave_pcm_device::gvsel_w(offs_t offset, u32 data, u32 mem_mask)
 	channel.pan_control = !!BIT(channel.gvsel_cache, 30);
 	channel.pan_vol =     (channel.gvsel_cache >> 24) & 0x3f;
 	channel.vol =         (channel.gvsel_cache >> 16) & 0xff;
-	channel.is_16bit =    !!BIT(channel.gvsel_cache, 15);
-	channel.is_stereo =   !!BIT(channel.gvsel_cache, 14);
-	channel.is_signed =   !!BIT(channel.gvsel_cache, 13);
+	channel.play_mode =   (channel.gvsel_cache >> 13) & 7;
+//  channel.is_16bit =    !!BIT(channel.gvsel_cache, 15);
+//  channel.is_stereo =   !!BIT(channel.gvsel_cache, 14);
+//  channel.is_signed =   !!BIT(channel.gvsel_cache, 13);
 	channel.loop_enable = !!BIT(channel.gvsel_cache, 12);
 	channel.ec_envelope = channel.gvsel_cache & 0xfff;
 
@@ -599,73 +685,208 @@ void t4dwave_pcm_device::gvsel_w(offs_t offset, u32 data, u32 mem_mask)
 
 void t4dwave_pcm_device::update_irq_state()
 {
-	m_irq_cb(((m_aina & m_aintena) || (m_ainb & m_aintenb)) ? 1 : 0);
+	const u32 irq_state = (m_aina & m_aintena) || (m_ainb & m_aintenb);
+	m_miscint &= ~(1 << ADDRESS_IRQ);
+
+	if (irq_state)
+	{
+		m_miscint |= 1 << ADDRESS_IRQ;
+		m_irq_cb(1);
+	}
+	else
+		m_irq_cb(0);
 }
 
 /*
  * Sound Stream
  */
 
-void t4dwave_pcm_device::sound_stream_update(sound_stream &stream)
+std::string t4dwave_pcm_device::print_audio_state(u64 keyon)
 {
-	if (!m_bankA_keyon && !m_bankB_keyon)
-		return;
+	std::map<u8, std::string> sample_modes = {
+		{ 0, "u8  mono  " },
+		{ 1, "s8  mono  " },
+		{ 2, "u8  stereo" },
+		{ 3, "s8  stereo" },
+		{ 4, "u16 mono  " },
+		{ 5, "s16 mono  " },
+		{ 6, "u16 stereo" },
+		{ 7, "s16 stereo" }
+	};
+
+	std::ostringstream outbuffer;
+
+	util::stream_format(outbuffer, "LFO_A & GC & CIR %08x | MISCINT %08x\n", m_global_control, m_miscint);
 
 	for (int ch = 0; ch < 64; ch ++)
 	{
 		channel_t &channel = m_channel[ch];
 
-		const bool is_bankB = !!BIT(ch, 5);
-		const u8 chB = ch - 32;
-		if ((!is_bankB && !BIT(m_bankA_keyon, ch)) || (is_bankB && !BIT(m_bankB_keyon, chB)) || channel.cso >= channel.eso)
+		if (!BIT(keyon, ch) || channel.cso >= channel.eso[channel.play_mode])
 			continue;
 
-		s16 left = 0, right = 0;
+		util::stream_format(outbuffer, "%d: LBA %08x -> CSO %05x ESO %05x DELTA %04x |%s loop %d\n",
+			ch, channel.lba, channel.cso, channel.eso[channel.play_mode], channel.delta,
+			sample_modes.at(channel.play_mode), channel.loop_enable);
+	}
 
-		//popmessage("%d: %08x -> %04x %04x delta %04x |16-bit %d sign %d stereo %d| control: %08x %d", ch, channel.lba, channel.cso, channel.eso, channel.delta, channel.is_16bit, channel.is_signed, channel.is_stereo, m_global_control, stream.samples());
+	return outbuffer.str();
+}
+
+const t4dwave_pcm_device::get_sample_func t4dwave_pcm_device::get_sample_table[8] =
+{
+	&t4dwave_pcm_device::get_sample_u8_mono,
+	&t4dwave_pcm_device::get_sample_s8_mono,
+	&t4dwave_pcm_device::get_sample_u8_stereo,
+	&t4dwave_pcm_device::get_sample_s8_stereo,
+	&t4dwave_pcm_device::get_sample_u16_mono,
+	&t4dwave_pcm_device::get_sample_s16_mono,
+	&t4dwave_pcm_device::get_sample_u16_stereo,
+	&t4dwave_pcm_device::get_sample_s16_stereo
+};
+
+std::tuple<s16, s16> t4dwave_pcm_device::get_sample_u8_mono(u32 sample_data)
+{
+	u16 sample = (sample_data & 0xff) ^ 0x80;
+	s16 out = (s16)(sample << 8);
+	return std::make_tuple(out, out);
+}
+
+std::tuple<s16, s16> t4dwave_pcm_device::get_sample_s8_mono(u32 sample_data)
+{
+	u16 sample = (sample_data & 0xff);
+	s16 out = (s16)(sample << 8);
+	return std::make_tuple(out, out);
+}
+
+std::tuple<s16, s16> t4dwave_pcm_device::get_sample_u8_stereo(u32 sample_data)
+{
+	u16 sample = (sample_data & 0xffff) ^ 0x8080;
+	return std::make_tuple((s16)(sample & 0xff00), (s16)((sample & 0x00ff) << 8));
+}
+
+std::tuple<s16, s16> t4dwave_pcm_device::get_sample_s8_stereo(u32 sample_data)
+{
+	u16 sample = (sample_data & 0xffff);
+	return std::make_tuple((s16)(sample & 0xff00), (s16)((sample & 0x00ff) << 8));
+}
+
+std::tuple<s16, s16> t4dwave_pcm_device::get_sample_u16_mono(u32 sample_data)
+{
+	u16 sample = (sample_data & 0xffff) ^ 0x8000;
+	s16 out = (s16)sample;
+	return std::make_tuple(out, out);
+}
+
+std::tuple<s16, s16> t4dwave_pcm_device::get_sample_s16_mono(u32 sample_data)
+{
+	u16 sample = (sample_data & 0xffff);
+	s16 out = (s16)sample;
+	return std::make_tuple(out, out);
+}
+
+std::tuple<s16, s16> t4dwave_pcm_device::get_sample_u16_stereo(u32 sample_data)
+{
+	u16 lsample = (sample_data >> 16) ^ 0x8000;
+	u16 rsample = (sample_data & 0xffff) ^ 0x8000;
+	return std::make_tuple((s16)lsample, (s16)rsample);
+}
+
+std::tuple<s16, s16> t4dwave_pcm_device::get_sample_s16_stereo(u32 sample_data)
+{
+	return std::make_tuple((s16)(sample_data >> 16), (s16)(sample_data & 0xffff));
+}
+
+void t4dwave_pcm_device::sound_stream_update(sound_stream &stream)
+{
+	const u32 cso_increment_table[8] = { 1, 1, 2, 2, 2, 2, 4, 4 };
+	const u32 sample_shift[8] = { 8, 8, 16, 16, 16, 16, 32, 32 };
+
+	const u64 keyon = m_bankA_keyon | ((u64)m_bankB_keyon << 32);
+
+	if (!keyon)
+		return;
+
+	if (LIVE_AUDIO_VIEW)
+		popmessage(print_audio_state(keyon));
+
+	for (int ch = 0; ch < 64; ch ++)
+	{
+		channel_t &channel = m_channel[ch];
+		const u8 play_mode = channel.play_mode;
+
+		if (!BIT(keyon, ch) || channel.cso >= channel.eso[play_mode])
+			continue;
+
+		const bool is_bankB = !!BIT(ch, 5);
+		const u8 chB = ch - 32;
 
 		for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 		{
-			u32 sample_data = m_datain_cb(channel.lba + channel.cso);
+			if (channel.dma_fetch)
+			{
+				if (channel.pci_buf)
+					channel.sample_data >>= sample_shift[channel.play_mode];
+				else
+					channel.sample_data = m_datain_cb(channel.lba + (channel.cso << 2));
+				channel.dma_fetch = false;
+			}
 
-			left  = (s16)(sample_data >> 16);
-			right = (s16)(sample_data & 0xffff);
+			auto [left, right] = (this->*get_sample_table[channel.play_mode])(channel.sample_data);
 
 			stream.add_int(0, sampindex, left  * m_volL[channel.gvsel], 32768 << 6);
 			stream.add_int(1, sampindex, right * m_volR[channel.gvsel], 32768 << 6);
 
-			channel.cso += 4;
-			if (channel.cso >= channel.hso * 4)
+			channel.ticks += channel.delta;
+			if (channel.ticks & 0x1000)
 			{
-				// MIDLP_IE
-				if (BIT(m_global_control, 13))
+				channel.dma_fetch = true;
+				channel.ticks -= 0x1000;
+
+				channel.pci_buf += cso_increment_table[channel.play_mode];
+				channel.pci_buf &= 3;
+				if (channel.pci_buf == 0)
 				{
-					if (is_bankB)
-						m_ainb |= 1 << chB;
-					else
-						m_aina |= 1 << ch;
-					update_irq_state();
-				}
-			}
-			if (channel.cso >= channel.eso)
-			{
-				channel.cso = 0;
-				// ENDLP_IE
-				if (BIT(m_global_control, 12))
-				{
-					if (is_bankB)
-						m_ainb |= 1 << chB;
-					else
-						m_aina |= 1 << ch;
-					update_irq_state();
-				}
-				if (!channel.loop_enable)
-				{
-					if (is_bankB)
-						m_bankB_keyon &= ~(1 << chB);
-					else
-						m_bankA_keyon &= ~(1 << ch);
-					continue;
+					channel.cso ++;
+					if (channel.cso >= channel.hso[play_mode])
+					{
+						// MIDLP_IE
+						if (BIT(m_global_control, 13))
+						{
+							if (is_bankB)
+								m_ainb |= 1 << chB;
+							else
+								m_aina |= 1 << ch;
+							update_irq_state();
+						}
+					}
+					if (channel.cso >= channel.eso[play_mode])
+					{
+						// ENDLP_IE
+						if (BIT(m_global_control, 12))
+						{
+							if (is_bankB)
+								m_ainb |= 1 << chB;
+							else
+								m_aina |= 1 << ch;
+							update_irq_state();
+						}
+						if (!channel.loop_enable)
+						{
+							if (is_bankB)
+								m_bankB_keyon &= ~(1 << chB);
+							else
+								m_bankA_keyon &= ~(1 << ch);
+							// TODO: not entirely correct
+							// diablo: really wants CSO granularity being different depending on play mode
+							channel.cso = 0xffff;
+							continue;
+						}
+						else
+						{
+							channel.cso = 0;
+						}
+					}
 				}
 			}
 		}

@@ -54,13 +54,15 @@ protected:
 	virtual void abcbus_tren(uint8_t data) override;
 	virtual void abcbus_prac(int state) override;
 
+	// nscsi_device_interface overrides
+	virtual void scsi_ctrl_changed() override;
+
 private:
 	void internal_reset();
 	void update_ack();
 	void update_dma();
 	void write_dma_register(uint8_t data);
 	void write_sasi_data(uint8_t data);
-	virtual void scsi_ctrl_changed() override;
 
 	required_ioport m_1e;
 	required_ioport m_5e;

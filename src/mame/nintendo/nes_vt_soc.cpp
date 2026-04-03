@@ -351,7 +351,7 @@ void nes_vt02_vt03_soc_device::scrambled_410x_w(u16 offset, u8 data)
 		m_410x[0x2] = data; // value doesn't matter?
 		m_timer_val = m_410x[0x1];
 
-		// HACK for some one line errors in various games and completely broken rasters in msifrog, TOOD: find real source of issue (bad timing of interrupt or counter changes, or latching of data?)
+		// HACK for some one line errors in various games and completely broken rasters in msifrog, TODO: find real source of issue (bad timing of interrupt or counter changes, or latching of data?)
 		if (m_use_raster_timing_hack)
 			if (m_ppu->in_vblanking())
 				m_timer_val--;

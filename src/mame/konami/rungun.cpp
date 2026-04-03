@@ -39,6 +39,7 @@
 #include "machine/k054321.h"
 #include "sound/k054539.h"
 #include "video/k053936.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -65,13 +66,13 @@ public:
 		m_palette2(*this, "palette2"),
 		m_screen(*this, "screen"),
 		m_k054321(*this, "k054321"),
+		m_eeprom(*this, "eeprom"),
 		m_sysreg(*this, "sysreg"),
 		m_bank2(*this, "bank2"),
 		m_spriteram_bank(*this, "spriteram_bank"),
 		m_p_inputs(*this, "P%u", 1U),
 		m_dsw(*this, "DSW"),
-		m_system(*this, "SYSTEM"),
-		m_eepromout(*this, "EEPROMOUT")
+		m_system(*this, "SYSTEM")
 	{ }
 
 	void rng(machine_config &config);
@@ -95,6 +96,7 @@ private:
 	optional_device<palette_device> m_palette2;
 	required_device<screen_device> m_screen;
 	required_device<k054321_device> m_k054321;
+	required_device<eeprom_serial_er5911_device> m_eeprom;
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_sysreg;
@@ -105,7 +107,6 @@ private:
 	required_ioport_array<4> m_p_inputs;
 	required_ioport m_dsw;
 	required_ioport m_system;
-	required_ioport m_eepromout;
 
 	/* video-related */
 	tilemap_t   *m_ttl_tilemap[2]{};
@@ -120,14 +121,15 @@ private:
 	uint8_t     *m_roz_rom = nullptr;
 	uint8_t     m_roz_rombase = 0;
 
-	/* sound */
-	uint8_t     m_sound_ctrl = 0;
-	uint8_t     m_sound_nmi_clk = 0;
-
 	bool        m_video_priority_mode = false;
 	std::unique_ptr<uint16_t[]> m_banked_ram;
 	bool        m_single_screen_mode = false;
 	uint8_t     m_video_mux_bank = 0;
+
+	/* misc */
+	uint8_t     m_sound_ctrl = 0;
+	uint8_t     m_sound_nmi_clk = 0;
+	bool        m_irq5_enable = false;
 
 	uint16_t sysregs_r(offs_t offset, uint16_t mem_mask = ~0);
 	void sysregs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -173,7 +175,6 @@ uint16_t rungun_state::sysregs_r(offs_t offset, uint16_t mem_mask)
 		case 0x02/2:
 			return (m_p_inputs[1]->read() | m_p_inputs[3]->read() << 8);
 
-
 		case 0x04/2:
 			/*
 			    bit0-7: coin mechs and services
@@ -212,37 +213,43 @@ void rungun_state::sysregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			    bit3  : coin counter #1
 			    bit4  : coin counter #2 (when coin slot "common" is selected)
 			    bit7  : set before massive memory writes (video chip select?)
-			    bit10 : IRQ5 ACK
+			    bit10 : IRQ5 enable
 			    bit12 : if set, forces screen output to 1 monitor.
 			    bit14 : (0) sprite on top of PSAC2 layer (1) other way around (title screen)
 			*/
 			if (ACCESSING_BITS_0_7)
 			{
-				m_spriteram_bank->set_entry((data & 0x80) >> 7);
-				m_video_mux_bank = ((data & 0x80) >> 7) ^ 1;
-				m_eepromout->write(data, 0xff);
+				m_eeprom->di_write(BIT(data, 0));
+				m_eeprom->cs_write(BIT(data, 1));
+				m_eeprom->clk_write(BIT(data, 2));
 
-				machine().bookkeeping().coin_counter_w(0, data & 0x08);
-				machine().bookkeeping().coin_counter_w(1, data & 0x10);
+				machine().bookkeeping().coin_counter_w(0, BIT(data, 3));
+				machine().bookkeeping().coin_counter_w(1, BIT(data, 4));
+
+				m_spriteram_bank->set_entry(BIT(data, 7));
+				m_video_mux_bank = BIT(data, 7) ^ 1;
 			}
 			if (ACCESSING_BITS_8_15)
 			{
-				m_single_screen_mode = (data & 0x1000) == 0x1000;
-				m_video_priority_mode = (data & 0x4000) == 0x4000;
-				if (!(data & 0x400)) // actually a 0 -> 1 transition
+				m_irq5_enable = BIT(data, 10);
+				if (!m_irq5_enable)
 					m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
+
+				m_single_screen_mode = BIT(data, 12);
+				m_video_priority_mode = BIT(data, 14);
 			}
 			break;
 
 		case 0x0c/2:
 			/*
-			    bit 0  : also enables IRQ???
-			    bit 1  : disable PSAC2 input?
+			    bit 0  : screen field selection (FSEL)
+			    bit 1  : screen field mode      (FMODE)
 			    bit 2  : OBJCHA
-			    bit 3  : enable IRQ 5
+			    bit 3  : MUTE
 			    bit 7-4: base address for 53936 ROM readback.
 			*/
-			m_k055673->k053246_set_objcha_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+			m_k055673->k053246_set_objcha_line(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
+			machine().sound().system_mute(!BIT(data, 3));
 			m_roz_rombase = (data & 0xf0) >> 4;
 			break;
 	}
@@ -260,7 +267,7 @@ INTERRUPT_GEN_MEMBER(rungun_state::rng_interrupt)
 	// TODO: firing this in screen update causes sprites to desync badly ...
 	sprite_dma_trigger();
 
-	if (m_sysreg[0x0c / 2] & 0x09)
+	if (m_irq5_enable)
 		device.execute().set_input_line(M68K_IRQ_5, ASSERT_LINE);
 }
 
@@ -406,7 +413,6 @@ void rungun_state::video_start()
 		m_936_tilemap[screen_num] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rungun_state::get_936_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
 		m_936_tilemap[screen_num]->set_user_data((void *)(uintptr_t)(screen_num * 0x80000));
 		m_936_tilemap[screen_num]->set_transparent_pen(0);
-
 	}
 	m_sprite_colorbase = 0x20;
 
@@ -488,7 +494,7 @@ void rungun_state::sound_ctrl_w(uint8_t data)
 
 	m_bank2->set_entry(data & 0x07);
 
-	if (!(data & 0x10))
+	if (!BIT(data, 4))
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	m_sound_ctrl = data;
@@ -496,13 +502,11 @@ void rungun_state::sound_ctrl_w(uint8_t data)
 
 void rungun_state::k054539_nmi_gen(int state)
 {
-	if (m_sound_ctrl & 0x10)
+	if (BIT(m_sound_ctrl, 4))
 	{
 		// Trigger an /NMI on the rising edge
 		if (!m_sound_nmi_clk && state)
-		{
 			m_soundcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		}
 	}
 
 	m_sound_nmi_clk = state;
@@ -563,11 +567,6 @@ static INPUT_PORTS_START( rng )
 	PORT_DIPNAME( 0x80, 0x80, "Bit7 (Unknown)" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
 
 	PORT_START("P1")
 	KONAMI8_B123_START(1)
@@ -630,12 +629,15 @@ void rungun_state::machine_start()
 
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_nmi_clk));
+	save_item(NAME(m_irq5_enable));
 }
 
 void rungun_state::machine_reset()
 {
-	memset(m_sysreg, 0, 0x20);
-	m_sound_ctrl = 0;
+	for (int i = 0; i < 0x10; i++)
+		sysregs_w(i, 0);
+
+	sound_ctrl_w(0);
 }
 
 void rungun_state::rng(machine_config &config)
@@ -652,7 +654,7 @@ void rungun_state::rng(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rungun);
 
-	EEPROM_ER5911_8BIT(config, "eeprom");
+	EEPROM_ER5911_8BIT(config, m_eeprom);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

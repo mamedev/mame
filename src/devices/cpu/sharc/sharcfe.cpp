@@ -14,6 +14,133 @@
 
 #include "cpu/drcfe.ipp"
 
+#include <iostream>
+
+
+void adsp21062_device::opcode_desc::log_flags(std::ostream &stream) const
+{
+	// branches
+	if (is_unconditional_branch())
+		stream << 'U';
+	else if (is_conditional_branch())
+		stream << 'C';
+	else
+		stream << '.';
+
+	// intrablock branches
+	stream << (intrablock_branch() ? 'i' : '.');
+
+	// branch targets
+	stream << (is_branch_target() ? 'B' : '.');
+
+	// delay slots
+	stream << (in_delay_slot() ? 'D' : '.');
+
+	// exceptions
+	if (will_cause_exception())
+		stream << 'E';
+	else if (can_cause_exception())
+		stream << 'e';
+	else
+		stream << '.';
+
+	// read/write
+	if (reads_memory())
+		stream << (writes_memory() ? '+' : 'R');
+	else if (writes_memory())
+		stream << 'W';
+	else
+		stream << '.';
+
+	// TLB validation
+	stream << (validate_tlb() ? 'V' : '.');
+
+	// redispatch
+	stream << (redispatch() ? 'R' : '.');
+}
+
+void adsp21062_device::opcode_desc::log_registers_used(std::ostream &stream) const
+{
+	stream << "[use:";
+	log_register_list(stream, regin, nullptr);
+	stream << ']';
+}
+
+void adsp21062_device::opcode_desc::log_registers_modified(std::ostream &stream) const
+{
+	stream << "[mod:";
+	log_register_list(stream, regout, &regreq);
+	stream << ']';
+}
+
+void adsp21062_device::opcode_desc::log_register_list(std::ostream &stream, const regmask &reglist, const regmask *regnostarlist)
+{
+	int count = 0;
+
+	for (int regnum = 0; regnum < 16; regnum++)
+	{
+		if (reglist[REG_R0 + regnum])
+		{
+			if (count++)
+				stream << ',';
+			stream << 'R' << regnum;
+			if (regnostarlist && !(*regnostarlist)[REG_R0 + regnum])
+				stream << '*';
+		}
+	}
+
+	const auto log_bit =
+			[&stream, &count, &reglist, &regnostarlist] (size_t bit, const char *name)
+			{
+				if (reglist[bit])
+				{
+					if (count++)
+						stream << ',';
+					stream << name;
+					if (regnostarlist && !(*regnostarlist)[bit])
+						stream << '*';
+				}
+			};
+
+	log_bit(REG_AZ,  "AZ");
+	log_bit(REG_AV,  "AV");
+	log_bit(REG_AN,  "AN");
+	log_bit(REG_AC,  "AC");
+	log_bit(REG_AS,  "AS");
+	log_bit(REG_AI,  "AI");
+	log_bit(REG_MN,  "MN");
+	log_bit(REG_MV,  "MV");
+	log_bit(REG_MU,  "MU");
+	log_bit(REG_MI,  "MI");
+	log_bit(REG_AF,  "AF");
+	log_bit(REG_SV,  "SV");
+	log_bit(REG_SZ,  "SZ");
+	log_bit(REG_SS,  "SS");
+	log_bit(REG_BTF, "BTF");
+
+	auto const log_dag =
+			[&stream, &count, &reglist, &regnostarlist] (size_t d, size_t p, char name)
+			{
+				for (int regnum = 0; regnum < 16; regnum++)
+				{
+					size_t const bit = ((regnum < 8) ? d : p) + (regnum & 0x7);
+					if (reglist[bit])
+					{
+						if (count++)
+							stream << ',';
+						stream << name << regnum;
+						if (regnostarlist && !(*regnostarlist)[bit])
+							stream << '*';
+					}
+				}
+			};
+
+	log_dag(REG_DM_I0, REG_PM_I0, 'I');
+	log_dag(REG_DM_M0, REG_PM_M0, 'M');
+	log_dag(REG_DM_L0, REG_PM_L0, 'L');
+	log_dag(REG_DM_B0, REG_PM_B0, 'B');
+}
+
 
 adsp21062_device::frontend::frontend(adsp21062_device *sharc, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
 	: drc_frontend_base(sharc->space_config(AS_PROGRAM)->page_shift(), window_start, window_end, max_sequence)
@@ -66,18 +193,41 @@ void adsp21062_device::frontend::insert_loop(const LOOP_DESCRIPTOR &loopdesc)
 	add_loop_entry(loopdesc.end_pc, LOOP_ENTRY_EVALUATION, 0);
 	if (loopdesc.astat_check_pc != 0xffffffff)
 	{
-		uint32_t flags = m_sharc->do_condition_astat_bits(loopdesc.condition);
 		opcode_desc::extra_flags userflags;
 		userflags.reset();
-		if (flags & AZ) { userflags.set(opcode_desc::ASTAT_DELAY_COPY_AZ); }
-		if (flags & AN) { userflags.set(opcode_desc::ASTAT_DELAY_COPY_AN); }
-		if (flags & AV) { userflags.set(opcode_desc::ASTAT_DELAY_COPY_AV); }
-		if (flags & AC) { userflags.set(opcode_desc::ASTAT_DELAY_COPY_AC); }
-		if (flags & MN) { userflags.set(opcode_desc::ASTAT_DELAY_COPY_MN); }
-		if (flags & MV) { userflags.set(opcode_desc::ASTAT_DELAY_COPY_MV); }
-		if (flags & SV) { userflags.set(opcode_desc::ASTAT_DELAY_COPY_SV); }
-		if (flags & SZ) { userflags.set(opcode_desc::ASTAT_DELAY_COPY_SZ); }
-		if (flags & BTF) { userflags.set(opcode_desc::ASTAT_DELAY_COPY_BTF); }
+		switch (loopdesc.condition)
+		{
+		case 0x00: case 0x10:                       // EQ  NE
+			userflags.set(opcode_desc::ASTAT_DELAY_COPY_AZ);
+			break;
+		case 0x01: case 0x11: case 0x02: case 0x12: // LT  GE  LE  GT
+			userflags.set(opcode_desc::ASTAT_DELAY_COPY_AZ);
+			userflags.set(opcode_desc::ASTAT_DELAY_COPY_AV);
+			userflags.set(opcode_desc::ASTAT_DELAY_COPY_AN);
+			userflags.set(opcode_desc::ASTAT_DELAY_COPY_AF);
+			break;
+		case 0x03: case 0x13:                       // AC  NOT AC
+			userflags.set(opcode_desc::ASTAT_DELAY_COPY_AC);
+			break;
+		case 0x04: case 0x14:                       // AV  NOT AV
+			userflags.set(opcode_desc::ASTAT_DELAY_COPY_AV);
+			break;
+		case 0x05: case 0x15:                       // MV  NOT MV
+			userflags.set(opcode_desc::ASTAT_DELAY_COPY_MV);
+			break;
+		case 0x06: case 0x16:                       // MS  NOT MS
+			userflags.set(opcode_desc::ASTAT_DELAY_COPY_MN);
+			break;
+		case 0x07: case 0x17:                       // SV  NOT SV
+			userflags.set(opcode_desc::ASTAT_DELAY_COPY_SV);
+			break;
+		case 0x08: case 0x18:                       // SZ  NOT SZ
+			userflags.set(opcode_desc::ASTAT_DELAY_COPY_SZ);
+			break;
+		case 0x0d: case 0x1d:                       // TF  NOT TF
+			userflags.set(opcode_desc::ASTAT_DELAY_COPY_BTF);
+			break;
+		}
 		add_loop_entry(loopdesc.astat_check_pc, LOOP_ENTRY_ASTAT_CHECK, userflags);
 	}
 }
@@ -141,11 +291,12 @@ bool adsp21062_device::frontend::describe(opcode_desc &desc, const opcode_desc *
 		int index = desc.pc & 0x1ffff;
 		desc.set_extra_flags(map[index].userflags);
 		if (map[index].userflags[opcode_desc::ASTAT_DELAY_COPY_AZ]) { desc.set_az_used(); }
-		if (map[index].userflags[opcode_desc::ASTAT_DELAY_COPY_AN]) { desc.set_an_used(); }
 		if (map[index].userflags[opcode_desc::ASTAT_DELAY_COPY_AV]) { desc.set_av_used(); }
+		if (map[index].userflags[opcode_desc::ASTAT_DELAY_COPY_AN]) { desc.set_an_used(); }
 		if (map[index].userflags[opcode_desc::ASTAT_DELAY_COPY_AC]) { desc.set_ac_used(); }
-		if (map[index].userflags[opcode_desc::ASTAT_DELAY_COPY_MN]) { desc.set_mn_used(); }
 		if (map[index].userflags[opcode_desc::ASTAT_DELAY_COPY_MV]) { desc.set_mv_used(); }
+		if (map[index].userflags[opcode_desc::ASTAT_DELAY_COPY_MN]) { desc.set_mn_used(); }
+		if (map[index].userflags[opcode_desc::ASTAT_DELAY_COPY_AF]) { desc.set_af_used(); }
 		if (map[index].userflags[opcode_desc::ASTAT_DELAY_COPY_SV]) { desc.set_sv_used(); }
 		if (map[index].userflags[opcode_desc::ASTAT_DELAY_COPY_SZ]) { desc.set_sz_used(); }
 		if (map[index].userflags[opcode_desc::ASTAT_DELAY_COPY_BTF]) { desc.set_btf_used(); }
@@ -513,76 +664,31 @@ bool adsp21062_device::frontend::describe(opcode_desc &desc, const opcode_desc *
 								if (data & MV) desc.set_mv_modified();
 								if (data & MU) desc.set_mu_modified();
 								if (data & MI) desc.set_mi_modified();
+								if (data & AF) desc.set_af_modified();
 								if (data & SV) desc.set_sv_modified();
 								if (data & SZ) desc.set_sz_modified();
 								if (data & SS) desc.set_ss_modified();
 								if (data & BTF) desc.set_btf_modified();
-								if (data & AF) desc.set_af_modified();
 							}
 							break;
 						case 2:     // TOGGLE
 							if (sreg == 0x7c)   // ASTAT
 							{
-								if (data & AZ)
-								{
-									desc.set_az_used(); desc.set_az_modified();
-								}
-								if (data & AV)
-								{
-									desc.set_av_used(); desc.set_av_modified();
-								}
-								if (data & AN)
-								{
-									desc.set_an_used(); desc.set_an_modified();
-								}
-								if (data & AC)
-								{
-									desc.set_ac_used(); desc.set_ac_modified();
-								}
-								if (data & AS)
-								{
-									desc.set_as_used(); desc.set_as_modified();
-								}
-								if (data & AI)
-								{
-									desc.set_ai_used(); desc.set_ai_modified();
-								}
-								if (data & MN)
-								{
-									desc.set_mn_used(); desc.set_mn_modified();
-								}
-								if (data & MV)
-								{
-									desc.set_mv_used(); desc.set_mv_modified();
-								}
-								if (data & MU)
-								{
-									desc.set_mu_used(); desc.set_mu_modified();
-								}
-								if (data & MI)
-								{
-									desc.set_mi_used(); desc.set_mi_modified();
-								}
-								if (data & SV)
-								{
-									desc.set_sv_used(); desc.set_sv_modified();
-								}
-								if (data & SZ)
-								{
-									desc.set_sz_used(); desc.set_sz_modified();
-								}
-								if (data & SS)
-								{
-									desc.set_ss_used(); desc.set_ss_modified();
-								}
-								if (data & BTF)
-								{
-									desc.set_btf_used(); desc.set_btf_modified();
-								}
-								if (data & AF)
-								{
-									desc.set_af_used(); desc.set_af_modified();
-								}
+								if (data & AZ) { desc.set_az_used(); desc.set_az_modified(); }
+								if (data & AV) { desc.set_av_used(); desc.set_av_modified(); }
+								if (data & AN) { desc.set_an_used(); desc.set_an_modified(); }
+								if (data & AC) { desc.set_ac_used(); desc.set_ac_modified(); }
+								if (data & AS) { desc.set_as_used(); desc.set_as_modified(); }
+								if (data & AI) { desc.set_ai_used(); desc.set_ai_modified(); }
+								if (data & MN) { desc.set_mn_used(); desc.set_mn_modified(); }
+								if (data & MV) { desc.set_mv_used(); desc.set_mv_modified(); }
+								if (data & MU) { desc.set_mu_used(); desc.set_mu_modified(); }
+								if (data & MI) { desc.set_mi_used(); desc.set_mi_modified(); }
+								if (data & AF) { desc.set_af_used(); desc.set_af_modified(); }
+								if (data & SV) { desc.set_sv_used(); desc.set_sv_modified(); }
+								if (data & SZ) { desc.set_sz_used(); desc.set_sz_modified(); }
+								if (data & SS) { desc.set_ss_used(); desc.set_ss_modified(); }
+								if (data & BTF) { desc.set_btf_used(); desc.set_btf_modified(); }
 							}
 							break;
 
@@ -1376,7 +1482,6 @@ bool adsp21062_device::frontend::describe_compute(opcode_desc &desc, uint64_t op
 					case 0xb6:      // MRB = MRB + Rx * Ry (SSI)
 					case 0xbe:      // MRB = MRB + Rx * Ry (SSF)
 					case 0xbf:      // MRB = MRB + Rx * Ry (SSFR)
-						break;
 						// TODO: track MRB?
 						desc.set_reg_used(rx);
 						desc.set_reg_used(ry);
@@ -1690,8 +1795,8 @@ bool adsp21062_device::frontend::describe_ureg_access(opcode_desc &desc, int reg
 			if (access == UREG_READ)
 			{
 				desc.set_az_used();
-				desc.set_an_used();
 				desc.set_av_used();
+				desc.set_an_used();
 				desc.set_ac_used();
 				desc.set_as_used();
 				desc.set_ai_used();
@@ -1699,11 +1804,11 @@ bool adsp21062_device::frontend::describe_ureg_access(opcode_desc &desc, int reg
 				desc.set_mv_used();
 				desc.set_mu_used();
 				desc.set_mi_used();
+				desc.set_af_used();
 				desc.set_sv_used();
 				desc.set_sz_used();
 				desc.set_ss_used();
 				desc.set_btf_used();
-				desc.set_af_used();
 			}
 			else
 			{
@@ -1711,7 +1816,6 @@ bool adsp21062_device::frontend::describe_ureg_access(opcode_desc &desc, int reg
 				desc.set_mult_flags_modified();
 				desc.set_shift_flags_modified();
 				desc.set_btf_modified();
-				desc.set_af_modified();
 			}
 			break;
 
@@ -1782,8 +1886,8 @@ void adsp21062_device::frontend::describe_if_condition(opcode_desc &desc, int co
 	switch (condition)
 	{
 		case 0x00:  desc.set_az_used(); break;                     // EQ
-		case 0x01:  desc.set_az_used(); desc.set_an_used(); break; // LT
-		case 0x02:  desc.set_az_used(); desc.set_an_used(); break; // LE
+		case 0x01:  desc.set_az_used(); desc.set_av_used(); desc.set_an_used(); desc.set_af_used(); break; // LT
+		case 0x02:  desc.set_az_used(); desc.set_av_used(); desc.set_an_used(); desc.set_af_used(); break; // LE
 		case 0x03:  desc.set_ac_used(); break;                     // AC
 		case 0x04:  desc.set_av_used(); break;                     // AV
 		case 0x05:  desc.set_mv_used(); break;                     // MV
@@ -1792,8 +1896,8 @@ void adsp21062_device::frontend::describe_if_condition(opcode_desc &desc, int co
 		case 0x08:  desc.set_sz_used(); break;                     // SZ
 		case 0x0d:  desc.set_btf_used(); break;                    // TF
 		case 0x10:  desc.set_az_used(); break;                     // NOT EQUAL
-		case 0x11:  desc.set_az_used(); desc.set_an_used(); break; // GE
-		case 0x12:  desc.set_az_used(); desc.set_an_used(); break; // GT
+		case 0x11:  desc.set_az_used(); desc.set_av_used(); desc.set_an_used(); desc.set_af_used(); break; // GE
+		case 0x12:  desc.set_az_used(); desc.set_av_used(); desc.set_an_used(); desc.set_af_used(); break; // GT
 		case 0x13:  desc.set_ac_used(); break;                     // NOT AC
 		case 0x14:  desc.set_av_used(); break;                     // NOT AV
 		case 0x15:  desc.set_mv_used(); break;                     // NOT MV

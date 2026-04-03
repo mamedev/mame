@@ -13,7 +13,7 @@
     TODO: emulate joystick port (wired to KBIN and KBOUT)
     TODO: emulate cassette MOTOR softswitch
     TODO: emulate dual RESET keys
-    TODO: correct PAL colors
+    TODO: correct PAL colors and XTAL
 
     $C05A - banks RAM from c100-ffff
     $C05B - banks ROM from c100-ffff
@@ -558,7 +558,7 @@ INPUT_PORTS_END
 void tk2000_state::tk2000(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 1021800);     /* close to actual CPU frequency of 1.020484 MHz */
+	M6502(config, m_maincpu, 1021800); // FIXME 14.30244 MHz XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &tk2000_state::apple2_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(tk2000_state::apple2_interrupt), "screen", 0, 1);
@@ -567,10 +567,7 @@ void tk2000_state::tk2000(machine_config &config)
 	APPLE2_VIDEO_COMPOSITE(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(280*2, 262);
-	m_screen->set_visarea(0, (280*2)-1,0,192-1);
+	m_screen->set_raw(1021800 * 14, 65 * 14, 0, 40 * 14, 262, 0, 192);
 	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, false, false>)));
 	m_screen->set_palette(m_video);
 

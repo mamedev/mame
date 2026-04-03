@@ -93,9 +93,6 @@ void cavepc_state::cavepc_io(address_map &map)
 /*****************************************************************************/
 
 
-static INPUT_PORTS_START(cavepc)
-INPUT_PORTS_END
-
 
 void cavepc_state::cavepc(machine_config &config)
 {
@@ -154,4 +151,4 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME(2009, deathsm2, 0, cavepc, cavepc, cavepc_state, empty_init, ROT0, "Cave", "Deathsmiles II: Makai no Merry Christmas (2009/10/14 MASTER VER 4.00)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(2009, deathsm2, 0, cavepc, 0, cavepc_state, empty_init, ROT0, "Cave", "Deathsmiles II: Makai no Merry Christmas (2009/10/14 MASTER VER 4.00)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

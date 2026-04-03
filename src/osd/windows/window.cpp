@@ -2179,7 +2179,7 @@ std::vector<win_window_info::win_pointer_info>::iterator win_window_info::map_po
 	assert(!BIT(m_pointer_mask, m_next_pointer));
 
 	POINTER_INFO info = { 0 };
-	if (!OSD_DYNAMIC_CALL(GetPointerInfo, ptrid, &info))
+	if (!GetPointerInfo(ptrid, &info))
 	{
 		osd_printf_error("win_window_info: failed to get info for pointer ID %u\n", ptrid);
 		return m_active_pointers.end();

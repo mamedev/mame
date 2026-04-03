@@ -180,6 +180,8 @@ void luxor_4105_device::internal_reset()
 
 	m_scsi_bus->ctrl_w(m_scsi_refid, S_RST, S_RST);
 	m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_RST);
+
+	m_scsi_bus->ctrl_wait(m_scsi_refid, S_BSY|S_REQ|S_CTL|S_MSG|S_INP, S_ALL);
 }
 
 
@@ -277,9 +279,10 @@ void luxor_4105_device::write_sasi_data(uint8_t data)
 
 void luxor_4105_device::scsi_ctrl_changed()
 {
-	if(m_scsi_bus->ctrl_r() & S_BSY)
+	if (m_scsi_bus->ctrl_r() & S_BSY)
 		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_SEL);
-	if(!(m_scsi_bus->ctrl_r() & S_REQ))
+
+	if (!(m_scsi_bus->ctrl_r() & S_REQ))
 		// reset REQ FF
 		m_req = 0;
 
@@ -287,7 +290,7 @@ void luxor_4105_device::scsi_ctrl_changed()
 		m_scsi_bus->data_w(m_scsi_refid, 0);
 	else
 		m_scsi_bus->data_w(m_scsi_refid, m_data_out);
-	
+
 	update_ack();
 	update_dma();
 }

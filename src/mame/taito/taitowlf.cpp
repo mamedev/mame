@@ -77,7 +77,7 @@ Taito W Rom Board:
 #include "bus/rs232/sun_kbd.h"
 #include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
-//#include "machine/w83977tf.h"
+#include "machine/w83877tf.h"
 #include "machine/8042kbdc.h"
 #include "machine/ds128x.h"
 #include "machine/i82371sb.h"
@@ -418,6 +418,8 @@ void isa16_p5txla_mb::device_add_mconfig(machine_config &config)
 	m_kbdc->system_reset_callback().set_inputline(":maincpu", INPUT_LINE_RESET);
 	m_kbdc->gate_a20_callback().set_inputline(":maincpu", INPUT_LINE_A20);
 	m_kbdc->input_buffer_full_callback().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
+
+	// TODO: above doesn't work, try with LLE core instead
 }
 
 
@@ -465,7 +467,7 @@ private:
 	void p5txla_io(address_map &map) ATTR_COLD;
 	void p5txla_map(address_map &map) ATTR_COLD;
 
-//  static void winbond_superio_config(device_t *device);
+	static void winbond_superio_config(device_t *device);
 };
 
 class taitowlf_state : public p5txla_state
@@ -543,30 +545,40 @@ void p5txla_state::p5txla_io(address_map &map)
 
 static void isa_internal_devices(device_slot_interface &device)
 {
-	// TODO: w83877tf
-	// It actually don't seem to access any kind of Super I/O, wtf
-//  device.option_add("w83977tf", W83977TF);
+	// NOTE: pf2012 doesn't seem to access any Super I/O
+	device.option_add("w83877tf", W83877TF);
 	device.option_add_internal("taito_romdisk", ISA16_TAITO_ROM_DISK);
 	device.option_add_internal("p5txla_mb", ISA16_P5TXLA_MB);
 }
 
-#if 0
+static void isa_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+	device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("null_modem", NULL_MODEM);
+	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
+}
+
+
 void p5txla_state::winbond_superio_config(device_t *device)
 {
-	w83977tf_device &fdc = *downcast<w83977tf_device *>(device);
-//  fdc.set_sysopt_pin(1);
-	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
-	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
-	fdc.irq1().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
-	fdc.irq8().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq8n_w));
-//  fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
-//  fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
-//  fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
-//  fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
-//  fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
-//  fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+	w83877tf_device &winb = *downcast<w83877tf_device *>(device);
+	winb.set_por_hefras(1);
+	winb.set_por_hefere(1);
+	winb.irq1().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
+	winb.irq8().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq8n_w));
+	winb.irq9().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq9_w));
+	winb.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	winb.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	winb.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	winb.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	winb.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	winb.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
-#endif
 
 // TODO: PCI address mapping is unconfirmed
 void p5txla_state::p5txla(machine_config &config)
@@ -593,7 +605,7 @@ void p5txla_state::p5txla(machine_config &config)
 	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
 
-//  ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
+	ISA16_SLOT(config, "board1", 0, "pci:07.0:isabus", isa_internal_devices, "w83877tf", true).set_option_machine_config("w83877tf", winbond_superio_config);
 	ISA16_SLOT(config, "board2", 0, "pci:07.0:isabus", isa_internal_devices, "p5txla_mb", true);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
@@ -601,21 +613,19 @@ void p5txla_state::p5txla(machine_config &config)
 	ISA16_SLOT(config, "isa4", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa5", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
-#if 0
 	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr)); // "microsoft_mouse"));
-	serport0.rxd_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::rxd1_w));
-	serport0.dcd_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ndcd1_w));
-	serport0.dsr_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ndsr1_w));
-	serport0.ri_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::nri1_w));
-	serport0.cts_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ncts1_w));
+	serport0.rxd_handler().set("board1:w83877tf", FUNC(w83877tf_device::rxd1_w));
+	serport0.dcd_handler().set("board1:w83877tf", FUNC(w83877tf_device::ndcd1_w));
+	serport0.dsr_handler().set("board1:w83877tf", FUNC(w83877tf_device::ndsr1_w));
+	serport0.ri_handler().set("board1:w83877tf", FUNC(w83877tf_device::nri1_w));
+	serport0.cts_handler().set("board1:w83877tf", FUNC(w83877tf_device::ncts1_w));
 
 	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
-	serport1.rxd_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::rxd2_w));
-	serport1.dcd_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ndcd2_w));
-	serport1.dsr_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ndsr2_w));
-	serport1.ri_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::nri2_w));
-	serport1.cts_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ncts2_w));
-#endif
+	serport1.rxd_handler().set("board1:w83877tf", FUNC(w83877tf_device::rxd2_w));
+	serport1.dcd_handler().set("board1:w83877tf", FUNC(w83877tf_device::ndcd2_w));
+	serport1.dsr_handler().set("board1:w83877tf", FUNC(w83877tf_device::ndsr2_w));
+	serport1.ri_handler().set("board1:w83877tf", FUNC(w83877tf_device::nri2_w));
+	serport1.cts_handler().set("board1:w83877tf", FUNC(w83877tf_device::ncts2_w));
 
 	// on-board
 	ATI_RAGEIIDVD(config, PCI_VIDEO_ID, 0);
@@ -634,7 +644,7 @@ void taitowlf_state::taitowlf(machine_config &config)
 
 	m_maincpu->set_clock(200'000'000);
 
-	ISA16_SLOT(config, "board1", 0, "pci:07.0:isabus", isa_internal_devices, "taito_romdisk", true).set_option_machine_config("taito_romdisk", romdisk_config);
+	ISA16_SLOT(config, "board3", 0, "pci:07.0:isabus", isa_internal_devices, "taito_romdisk", true).set_option_machine_config("taito_romdisk", romdisk_config);
 	// TODO: remove keyboard slot option
 
 	VOODOO_1_PCI(config.replace(), m_voodoo, 0, m_maincpu, m_screen);
@@ -664,11 +674,11 @@ ROM_START(pf2012)
 	// TAITO Ver1.0 1998/5/7
 	ROM_LOAD("p5tx-la_861.u16", 0x20000, 0x20000, CRC(a4d4a0fc) SHA1(af3a49a1bee416b58a61af28473f3dac0a4160c8))
 
-	ROM_REGION16_LE(0x400000, "board1:program_rom", 0) // Program ROM (FAT12)
+	ROM_REGION16_LE(0x400000, "board3:program_rom", 0) // Program ROM (FAT12)
 	ROM_LOAD("u1.bin", 0x000000, 0x200000, CRC(8f4c09cb) SHA1(0969a92fec819868881683c580f9e01cbedf4ad2))
 	ROM_LOAD("u2.bin", 0x200000, 0x200000, CRC(59881781) SHA1(85ff074ab2a922eac37cf96f0bf153a2dac55aa4))
 
-	ROM_REGION16_LE(0x4000000, "board1:data_rom", 0) // Data ROM (FAT12)
+	ROM_REGION16_LE(0x4000000, "board3:data_rom", 0) // Data ROM (FAT12)
 	ROM_LOAD("e59-01.u20", 0x0000000, 0x800000, CRC(60f2ce4a) SHA1(322dd62022527997ecc655347fdf75a092aefa8a) )
 	ROM_LOAD("e59-02.u23", 0x0800000, 0x800000, CRC(626df682) SHA1(35bb4f91201734ce7ccdc640a75030aaca3d1151) )
 	ROM_LOAD("e59-03.u26", 0x1000000, 0x800000, CRC(74e4efde) SHA1(630235c2e4a11f615b5f3b8c93e1e645da09eefe) )
@@ -678,13 +688,13 @@ ROM_START(pf2012)
 	ROM_LOAD("e59-07.u22", 0x3000000, 0x800000, CRC(1f0ddcdc) SHA1(72ffe08f5effab093bdfe9863f8a11f80e914272) )
 	ROM_LOAD("e59-08.u25", 0x3800000, 0x800000, CRC(8db38ffd) SHA1(4b71ea86fb774ba6a8ac45abf4191af64af007e7) )
 
-	ROM_REGION(0x180000, "board1:taito_zoom:mn10200", 0) // MN10200 program
+	ROM_REGION(0x180000, "board3:taito_zoom:mn10200", 0) // MN10200 program
 	ROM_LOAD("e59-12.u13", 0x000000, 0x80000, CRC(9a473a7e) SHA1(b0ec7b0ae2b33a32da98899aa79d44e8e318ceb7) )
 	ROM_LOAD("e59-13.u15", 0x080000, 0x80000, CRC(77719880) SHA1(8382dd2dfb0dae60a3831ed6d3ff08539e2d94eb) )
 	ROM_LOAD("e59-14.u14", 0x100000, 0x40000, CRC(d440887c) SHA1(d965871860d757bc9111e9adb2303a633c662d6b) )
 	ROM_LOAD("e59-15.u16", 0x140000, 0x40000, CRC(eae8e523) SHA1(8a054d3ded7248a7906c4f0bec755ddce53e2023) )
 
-	ROM_REGION(0x1400000, "board1:taito_zoom:zsg2", 0) // ZOOM sample data
+	ROM_REGION(0x1400000, "board3:taito_zoom:zsg2", 0) // ZOOM sample data
 	ROM_LOAD("e59-09.u29", 0x0000000, 0x800000, CRC(d0da5c50) SHA1(56fb3c38f35244720d32a44fed28e6b58c7851f7) )
 	ROM_LOAD("e59-10.u32", 0x0800000, 0x800000, CRC(4c0e0a5c) SHA1(6454befa3a1dd532eb2a760129dcd7e611508730) )
 	ROM_LOAD("e59-11.u33", 0x1000000, 0x400000, CRC(c90a896d) SHA1(2b62992f20e4ca9634e7953fe2c553906de44f04) )
@@ -700,4 +710,4 @@ ROM_END
 
 COMP(1997, p5txla, 0,   0, p5txla, 0, p5txla_state,   empty_init, "ECS",    "P5TX-LA (i430TX)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 
-GAME(1998, pf2012, 0,   taitowlf, 0,  taitowlf_state, empty_init, ROT0, "Taito",  "Psychic Force 2012 (Ver 2.04J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // 1998/05/07 18:30:00
+GAME(1998, pf2012, 0,   taitowlf,  0, taitowlf_state, empty_init, ROT0, "Taito",  "Psychic Force 2012 (Ver 2.04J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // 1998/05/07 18:30:00

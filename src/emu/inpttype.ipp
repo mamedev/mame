@@ -100,11 +100,10 @@ namespace {
 
 #define CORE_INPUT_TYPES_GAMBLE \
 		CORE_INPUT_TYPES_BEGIN(gamble) \
-		INPUT_PORT_DIGITAL_TYPE(  1, PLAYER1,  GAMBLE_KEYIN,        N_p("input-name", "Key In"),                 input_seq(KEYCODE_Q) ) \
-		INPUT_PORT_DIGITAL_TYPE(  1, PLAYER1,  GAMBLE_KEYOUT,       N_p("input-name", "Key Out"),                input_seq(KEYCODE_W) ) \
-		INPUT_PORT_DIGITAL_TYPE(  1, PLAYER1,  GAMBLE_SERVICE,      N_p("input-name", "Service"),                input_seq(KEYCODE_9) ) \
-		INPUT_PORT_DIGITAL_TYPE(  1, PLAYER1,  GAMBLE_BOOK,         N_p("input-name", "Book-Keeping"),           input_seq(KEYCODE_0) ) \
-		INPUT_PORT_DIGITAL_TYPE(  1, PLAYER1,  GAMBLE_PAYOUT,       N_p("input-name", "Payout"),                 input_seq(KEYCODE_4) ) \
+		INPUT_PORT_DIGITAL_TYPE(  1, OTHER,    GAMBLE_KEYIN,        N_p("input-name", "Key In"),                 input_seq(KEYCODE_Q) ) \
+		INPUT_PORT_DIGITAL_TYPE(  1, OTHER,    GAMBLE_KEYOUT,       N_p("input-name", "Key Out"),                input_seq(KEYCODE_W) ) \
+		INPUT_PORT_DIGITAL_TYPE(  1, OTHER,    GAMBLE_BOOK,         N_p("input-name", "Bookkeeping"),            input_seq(KEYCODE_0) ) \
+		INPUT_PORT_DIGITAL_TYPE(  1, OTHER,    GAMBLE_PAYOUT,       N_p("input-name", "Payout"),                 input_seq(KEYCODE_4) ) \
 		INPUT_PORT_DIGITAL_TYPE(  1, PLAYER1,  GAMBLE_BET,          N_p("input-name", "Bet"),                    input_seq(KEYCODE_M) ) \
 		INPUT_PORT_DIGITAL_TYPE(  1, PLAYER1,  GAMBLE_DEAL,         N_p("input-name", "Deal"),                   input_seq(KEYCODE_2) ) \
 		INPUT_PORT_DIGITAL_TYPE(  1, PLAYER1,  GAMBLE_STAND,        N_p("input-name", "Stand"),                  input_seq(KEYCODE_L) ) \
@@ -283,6 +282,20 @@ namespace {
 		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_LAST_CHANCE, N_p("input-name", "%p Mahjong Last Chance"), input_seq(KEYCODE_RALT_INDEXED(2)) ) \
 		CORE_INPUT_TYPES_END()
 
+#define CORE_INPUT_TYPES_P3_HANAFUDA \
+		CORE_INPUT_TYPES_BEGIN(p3_hanafuda) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  HANAFUDA_A,          N_p("input-name", "%p Hanafuda A/1"),        input_seq(KEYCODE_A_INDEXED(2)) ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  HANAFUDA_B,          N_p("input-name", "%p Hanafuda B/2"),        input_seq(KEYCODE_B_INDEXED(2)) ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  HANAFUDA_C,          N_p("input-name", "%p Hanafuda C/3"),        input_seq(KEYCODE_C_INDEXED(2)) ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  HANAFUDA_D,          N_p("input-name", "%p Hanafuda D/4"),        input_seq(KEYCODE_D_INDEXED(2)) ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  HANAFUDA_E,          N_p("input-name", "%p Hanafuda E/5"),        input_seq(KEYCODE_E_INDEXED(2)) ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  HANAFUDA_F,          N_p("input-name", "%p Hanafuda F/6"),        input_seq(KEYCODE_F_INDEXED(2)) ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  HANAFUDA_G,          N_p("input-name", "%p Hanafuda G/7"),        input_seq(KEYCODE_G_INDEXED(2)) ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  HANAFUDA_H,          N_p("input-name", "%p Hanafuda H/8"),        input_seq(KEYCODE_H_INDEXED(2)) ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  HANAFUDA_YES,        N_p("input-name", "%p Hanafuda Yes"),        input_seq(KEYCODE_M_INDEXED(2)) ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  HANAFUDA_NO,         N_p("input-name", "%p Hanafuda No"),         input_seq(KEYCODE_N_INDEXED(2)) ) \
+		CORE_INPUT_TYPES_END()
+
 #define CORE_INPUT_TYPES_P4 \
 		CORE_INPUT_TYPES_BEGIN(p4) \
 		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  JOYSTICK_UP,         N_p("input-name", "%p Up"),                  input_seq(KEYCODE_8_PAD) ) \
@@ -348,6 +361,20 @@ namespace {
 		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_BIG,         N_p("input-name", "%p Mahjong Big"),         input_seq(KEYCODE_ENTER_INDEXED(3)) ) \
 		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_SMALL,       N_p("input-name", "%p Mahjong Small"),       input_seq(KEYCODE_BACKSPACE_INDEXED(3)) ) \
 		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_LAST_CHANCE, N_p("input-name", "%p Mahjong Last Chance"), input_seq(KEYCODE_RALT_INDEXED(3)) ) \
+		CORE_INPUT_TYPES_END()
+
+#define CORE_INPUT_TYPES_P4_HANAFUDA \
+		CORE_INPUT_TYPES_BEGIN(p4_hanafuda) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  HANAFUDA_A,          N_p("input-name", "%p Hanafuda A/1"),        input_seq(KEYCODE_A_INDEXED(3)) ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  HANAFUDA_B,          N_p("input-name", "%p Hanafuda B/2"),        input_seq(KEYCODE_B_INDEXED(3)) ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  HANAFUDA_C,          N_p("input-name", "%p Hanafuda C/3"),        input_seq(KEYCODE_C_INDEXED(3)) ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  HANAFUDA_D,          N_p("input-name", "%p Hanafuda D/4"),        input_seq(KEYCODE_D_INDEXED(3)) ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  HANAFUDA_E,          N_p("input-name", "%p Hanafuda E/5"),        input_seq(KEYCODE_E_INDEXED(3)) ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  HANAFUDA_F,          N_p("input-name", "%p Hanafuda F/6"),        input_seq(KEYCODE_F_INDEXED(3)) ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  HANAFUDA_G,          N_p("input-name", "%p Hanafuda G/7"),        input_seq(KEYCODE_G_INDEXED(3)) ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  HANAFUDA_H,          N_p("input-name", "%p Hanafuda H/8"),        input_seq(KEYCODE_H_INDEXED(3)) ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  HANAFUDA_YES,        N_p("input-name", "%p Hanafuda Yes"),        input_seq(KEYCODE_M_INDEXED(3)) ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  HANAFUDA_NO,         N_p("input-name", "%p Hanafuda No"),         input_seq(KEYCODE_N_INDEXED(3)) ) \
 		CORE_INPUT_TYPES_END()
 
 #define CORE_INPUT_TYPES_P5 \
@@ -983,8 +1010,10 @@ CORE_INPUT_TYPES_P2_MAHJONG
 CORE_INPUT_TYPES_P2_HANAFUDA
 CORE_INPUT_TYPES_P3
 CORE_INPUT_TYPES_P3_MAHJONG
+CORE_INPUT_TYPES_P3_HANAFUDA
 CORE_INPUT_TYPES_P4
 CORE_INPUT_TYPES_P4_MAHJONG
+CORE_INPUT_TYPES_P4_HANAFUDA
 CORE_INPUT_TYPES_P5
 CORE_INPUT_TYPES_P6
 CORE_INPUT_TYPES_P7
@@ -1042,8 +1071,10 @@ constexpr size_t core_input_types_count()
 			CORE_INPUT_TYPES_P2_HANAFUDA
 			CORE_INPUT_TYPES_P3
 			CORE_INPUT_TYPES_P3_MAHJONG
+			CORE_INPUT_TYPES_P3_HANAFUDA
 			CORE_INPUT_TYPES_P4
 			CORE_INPUT_TYPES_P4_MAHJONG
+			CORE_INPUT_TYPES_P4_HANAFUDA
 			CORE_INPUT_TYPES_P5
 			CORE_INPUT_TYPES_P6
 			CORE_INPUT_TYPES_P7
@@ -1099,8 +1130,10 @@ ATTR_COLD inline void emplace_core_types(std::vector<input_type_entry> &typelist
 	emplace_core_types_p2_hanafuda(typelist);
 	emplace_core_types_p3(typelist);
 	emplace_core_types_p3_mahjong(typelist);
+	emplace_core_types_p3_hanafuda(typelist);
 	emplace_core_types_p4(typelist);
 	emplace_core_types_p4_mahjong(typelist);
+	emplace_core_types_p4_hanafuda(typelist);
 	emplace_core_types_p5(typelist);
 	emplace_core_types_p6(typelist);
 	emplace_core_types_p7(typelist);

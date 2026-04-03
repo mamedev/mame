@@ -1788,6 +1788,7 @@ void namcos2_base_state::configure_c45road_standard(machine_config &config)
 void finallap_state::configure_namcos2_sprite_standard(machine_config &config)
 {
 	NAMCOS2_SPRITE(config, m_ns2sprite, 0, m_c116, gfx_namcos2_spr);
+	m_ns2sprite->set_screen(m_screen);
 	m_ns2sprite->set_spriteram_tag("spriteram");
 	m_ns2sprite->set_priority_callback(FUNC(finallap_state::sprite_pri_callback_ns2));
 	m_ns2sprite->set_mix_callback(FUNC(finallap_state::sprite_mix_callback_ns2));
@@ -1905,6 +1906,7 @@ void finallap_state::finallap(machine_config &config)
 	base_fl(config);
 
 	NAMCOS2_SPRITE_FINALLAP(config.replace(), m_ns2sprite, 0, m_c116, gfx_namcos2_spr);
+	m_ns2sprite->set_screen(m_screen);
 	m_ns2sprite->set_spriteram_tag("spriteram");
 	m_ns2sprite->set_priority_callback(FUNC(finallap_state::sprite_pri_callback_ns2));
 	m_ns2sprite->set_mix_callback(FUNC(finallap_state::sprite_mix_callback_ns2));
@@ -2050,6 +2052,7 @@ void metlhawk_state::metlhawk(machine_config &config)
 	m_screen->set_screen_update(FUNC(metlhawk_state::screen_update_metlhawk));
 
 	NAMCOS2_SPRITE_METALHAWK(config, m_ns2sprite, 0, m_c116, gfx_metlhawk_spr);
+	m_ns2sprite->set_screen(m_screen);
 	m_ns2sprite->set_spriteram_tag("spriteram");
 	m_ns2sprite->set_priority_callback(FUNC(metlhawk_state::sprite_pri_callback_ns2));
 	m_ns2sprite->set_mix_callback(FUNC(metlhawk_state::sprite_mix_callback_ns2));

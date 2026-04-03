@@ -33,12 +33,11 @@ protected:
 		m_videoram(*this, "videoram%u", 1U),
 		m_colorram(*this, "colorram%u", 1U),
 		m_spriteram(*this, "spriteram"),
-		m_io_in3(*this, "IN3"),
+		m_io_in(*this, "IN%u", 0),
 		m_io_wheel(*this, "WHEEL")
 	{ }
 
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	/* devices */
@@ -57,7 +56,7 @@ protected:
 	required_shared_ptr_array<uint16_t, 2> m_colorram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	optional_ioport m_io_in3;
+	optional_ioport_array<4> m_io_in;
 	optional_ioport m_io_wheel;
 
 	/* video-related */
@@ -68,17 +67,29 @@ protected:
 	uint8_t   m_blank_tile[8*8]{};
 
 	/* misc */
-	bool      m_irq_on = false;
+	bool      m_irq1_on = false;
 	bool      m_irq2_on = false;
+	bool      m_irq4_on = false;
+	bool      m_sound_irq_clk = false;
 
+	void irq1_enable_w(int state);
 	void irq2_enable_w(int state);
+	void irq4_enable_w(int state);
+	void gfx_flipx_w(int state);
+	void gfx_flipy_w(int state);
+	void coin1_lockout_w(int state);
+	void coin2_lockout_w(int state);
+	void sound_irq_w(int state);
+	void sound_nmi_w(int state);
+
 	uint16_t konamigt_input_word_r();
 	template <unsigned Which> void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	template <unsigned Which> void colorram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void charram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	template <unsigned Which> TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void nemesis_vblank_irq(int state);
+	void vblank_irq1(int state);
+	void vblank_irq2(int state);
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_screen_raw_params(machine_config &config);
@@ -98,20 +109,17 @@ public:
 	void blkpnthr(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 	/* devices */
 	required_device<k007232_device> m_k007232;
 
-	/* misc */
-	uint8_t   m_irq_port_last = 0;
-
-	void control_port_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void salamand_intlatch_w(uint8_t data);
+	void blkpnthr_intlatch_w(uint8_t data);
+	void outlatch_w(uint8_t data);
 	void speech_start_w(uint8_t data);
 	uint8_t speech_busy_r();
 	void city_sound_bank_w(uint8_t data);
-	void blkpnthr_vblank_irq(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(hcrash_interrupt);
 	void volume_callback(uint8_t data);
@@ -146,7 +154,7 @@ private:
 
 	uint8_t   m_selected_ip = 0; // needed for Hyper Crash
 
-	void citybomb_control_port_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void citybomb_outlatch_w(uint8_t data);
 	void selected_ip_w(uint8_t data);
 	uint8_t selected_ip_r();
 
@@ -190,22 +198,10 @@ protected:
 	uint8_t   m_palette_lookup[32]{};
 
 	/* misc */
-	bool      m_irq1_on = false;
-	bool      m_irq4_on = false;
-	//int32_t   m_gx400_irq1_cnt = 0;
 	uint32_t  m_speech_offset = 0;
 
-	void irq_enable_w(int state);
-	void irq1_enable_w(int state);
-	void irq4_enable_w(int state);
-	void coin1_lockout_w(int state);
-	void coin2_lockout_w(int state);
-	void sound_irq_w(int state);
-	void sound_nmi_w(int state);
 	uint16_t sound_sharedram_word_r(offs_t offset);
 	void sound_sharedram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void gfx_flipx_w(int state);
-	void gfx_flipy_w(int state);
 	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void nemesis_filter_w(offs_t offset, uint8_t data);
 	void speech_w(offs_t offset, uint8_t data);
@@ -253,7 +249,6 @@ private:
 	uint16_t  m_scanline_counter = 0;
 
 	void bubsys_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void bubsys_vblank_irq(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(bubsys_interrupt);
 

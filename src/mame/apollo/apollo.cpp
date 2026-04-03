@@ -672,142 +672,141 @@ void apollo_state::apollo_f8_w(offs_t offset, uint32_t data, uint32_t mem_mask){
 
 void apollo_state::dn3500_map(address_map &map)
 {
-		map(0x00000000, 0xffffffff).rw(FUNC(apollo_state::apollo_unmapped_r), FUNC(apollo_state::apollo_unmapped_w));
+	map(0x00000000, 0xffffffff).rw(FUNC(apollo_state::apollo_unmapped_r), FUNC(apollo_state::apollo_unmapped_w));
 
-		map(0x000000, 0x00ffff).rom(); /* boot ROM  */
-		map(0x000000, 0x00ffff).w(FUNC(apollo_state::apollo_rom_w));
-		map(0x010000, 0x0100ff).rw(FUNC(apollo_state::apollo_csr_status_register_r), FUNC(apollo_state::apollo_csr_status_register_w));
-		map(0x010100, 0x0101ff).rw(FUNC(apollo_state::apollo_csr_control_register_r), FUNC(apollo_state::apollo_csr_control_register_w));
-		map(0x010200, 0x0102ff).rw(FUNC(apollo_state::cache_status_register_r), FUNC(apollo_state::cache_control_register_w));
-		map(0x010300, 0x0103ff).rw(FUNC(apollo_state::task_alias_register_r), FUNC(apollo_state::task_alias_register_w));
-		map(0x010400, 0x0104ff).rw(m_sio, FUNC(apollo_sio::read), FUNC(apollo_sio::write));
-		map(0x010500, 0x0105ff).rw(m_sio2, FUNC(apollo_sio::read), FUNC(apollo_sio::write));
-		map(0x010800, 0x0108ff).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
-		map(0x010900, 0x0109ff).rw(FUNC(apollo_state::apollo_rtc_r), FUNC(apollo_state::apollo_rtc_w));
-		map(0x010c00, 0x010cff).rw(FUNC(apollo_state::/*"dma1",*/apollo_dma_1_r), FUNC(apollo_state::apollo_dma_1_w));
-		map(0x010d00, 0x010dff).rw(FUNC(apollo_state::/*"dma2",*/apollo_dma_2_r), FUNC(apollo_state::apollo_dma_2_w));
-		map(0x011000, 0x0110ff).rw(m_pic8259_master, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-		map(0x011100, 0x0111ff).rw(m_pic8259_slave, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-		map(0x011200, 0x0112ff).rw(m_node_id, FUNC(apollo_ni::read), FUNC(apollo_ni::write));
-		map(0x011300, 0x0113ff).rw(FUNC(apollo_state::latch_page_on_parity_error_register_r), FUNC(apollo_state::latch_page_on_parity_error_register_w));
-		map(0x011600, 0x0116ff).rw(FUNC(apollo_state::master_req_register_r), FUNC(apollo_state::master_req_register_w));
+	map(0x000000, 0x00ffff).rom(); /* boot ROM  */
+	map(0x000000, 0x00ffff).w(FUNC(apollo_state::apollo_rom_w));
+	map(0x010000, 0x0100ff).rw(FUNC(apollo_state::apollo_csr_status_register_r), FUNC(apollo_state::apollo_csr_status_register_w));
+	map(0x010100, 0x0101ff).rw(FUNC(apollo_state::apollo_csr_control_register_r), FUNC(apollo_state::apollo_csr_control_register_w));
+	map(0x010200, 0x0102ff).rw(FUNC(apollo_state::cache_status_register_r), FUNC(apollo_state::cache_control_register_w));
+	map(0x010300, 0x0103ff).rw(FUNC(apollo_state::task_alias_register_r), FUNC(apollo_state::task_alias_register_w));
+	map(0x010400, 0x0104ff).rw(m_sio, FUNC(apollo_sio::read), FUNC(apollo_sio::write));
+	map(0x010500, 0x0105ff).rw(m_sio2, FUNC(apollo_sio::read), FUNC(apollo_sio::write));
+	map(0x010800, 0x0108ff).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
+	map(0x010900, 0x0109ff).rw(FUNC(apollo_state::apollo_rtc_r), FUNC(apollo_state::apollo_rtc_w));
+	map(0x010c00, 0x010cff).rw(FUNC(apollo_state::/*"dma1",*/apollo_dma_1_r), FUNC(apollo_state::apollo_dma_1_w));
+	map(0x010d00, 0x010dff).rw(FUNC(apollo_state::/*"dma2",*/apollo_dma_2_r), FUNC(apollo_state::apollo_dma_2_w));
+	map(0x011000, 0x0110ff).rw(m_pic8259_master, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x011100, 0x0111ff).rw(m_pic8259_slave, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x011200, 0x0112ff).rw(m_node_id, FUNC(apollo_ni::read), FUNC(apollo_ni::write));
+	map(0x011300, 0x0113ff).rw(FUNC(apollo_state::latch_page_on_parity_error_register_r), FUNC(apollo_state::latch_page_on_parity_error_register_w));
+	map(0x011600, 0x0116ff).rw(FUNC(apollo_state::master_req_register_r), FUNC(apollo_state::master_req_register_w));
 
-		map(0x016400, 0x0164ff).rw(FUNC(apollo_state::selective_clear_locations_r), FUNC(apollo_state::selective_clear_locations_w));
-		map(0x017000, 0x017fff).rw(FUNC(apollo_state::apollo_address_translation_map_r), FUNC(apollo_state::apollo_address_translation_map_w));
+	map(0x016400, 0x0164ff).rw(FUNC(apollo_state::selective_clear_locations_r), FUNC(apollo_state::selective_clear_locations_w));
+	map(0x017000, 0x017fff).rw(FUNC(apollo_state::apollo_address_translation_map_r), FUNC(apollo_state::apollo_address_translation_map_w));
 
-		map(ATBUS_IO_BASE, ATBUS_IO_END).rw(FUNC(apollo_state::apollo_atbus_io_r), FUNC(apollo_state::apollo_atbus_io_w));
-		map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
+	map(ATBUS_IO_BASE, ATBUS_IO_END).rw(FUNC(apollo_state::apollo_atbus_io_r), FUNC(apollo_state::apollo_atbus_io_w));
+	map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
-		// FIXME: must match with RAM size in driver/apollo_sio.c
-		// map(DN3500_RAM_BASE, DN3500_RAM_END).ram(); /* 8MB RAM */
-		map(DN3500_RAM_BASE, DN3500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
+	// FIXME: must match with RAM size in driver/apollo_sio.c
+	// map(DN3500_RAM_BASE, DN3500_RAM_END).ram(); /* 8MB RAM */
+	map(DN3500_RAM_BASE, DN3500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
-		map(0x05d800, 0x05dc07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
-		map(0xfa0000, 0xfdffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mgm_r), FUNC(apollo_graphics_15i::apollo_mgm_w));
+	map(0x05d800, 0x05dc07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
+	map(0xfa0000, 0xfdffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mgm_r), FUNC(apollo_graphics_15i::apollo_mgm_w));
 
-		map(0x05e800, 0x05ec07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
-		map(0x0a0000, 0x0bffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
+	map(0x05e800, 0x05ec07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
+	map(0x0a0000, 0x0bffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
 
-//      map(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
-//      map(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
-//      map(0x0e000000, 0x0fffffff) FPA address space
+//  map(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
+//  map(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
+//  map(0x0e000000, 0x0fffffff) FPA address space
 
-//      map(0xf8000000, 0xffffffff).rw(FUNC(apollo_state::apollo_f8_r), FUNC(apollo_state::apollo_f8_w));
+//  map(0xf8000000, 0xffffffff).rw(FUNC(apollo_state::apollo_f8_r), FUNC(apollo_state::apollo_f8_w));
 }
 
 void apollo_state::dsp3500_map(address_map &map)
 {
-		map(0x00000000, 0xffffffff).rw(FUNC(apollo_state::apollo_unmapped_r), FUNC(apollo_state::apollo_unmapped_w));
-		map(0x000000, 0x00ffff).rom(); /* boot ROM  */
-		map(0x000000, 0x00ffff).w(FUNC(apollo_state::apollo_rom_w));
-		map(0x010000, 0x0100ff).rw(FUNC(apollo_state::apollo_csr_status_register_r), FUNC(apollo_state::apollo_csr_status_register_w));
-		map(0x010100, 0x0101ff).rw(FUNC(apollo_state::apollo_csr_control_register_r), FUNC(apollo_state::apollo_csr_control_register_w));
-		map(0x010200, 0x0102ff).rw(FUNC(apollo_state::cache_status_register_r), FUNC(apollo_state::cache_control_register_w));
-		map(0x010300, 0x0103ff).rw(FUNC(apollo_state::task_alias_register_r), FUNC(apollo_state::task_alias_register_w));
-		map(0x010400, 0x0104ff).rw(m_sio, FUNC(apollo_sio::read), FUNC(apollo_sio::write));
-		map(0x010500, 0x0105ff).rw(m_sio2, FUNC(apollo_sio::read), FUNC(apollo_sio::write));
-		map(0x010800, 0x0108ff).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
-		map(0x010900, 0x0109ff).rw(FUNC(apollo_state::apollo_rtc_r), FUNC(apollo_state::apollo_rtc_w));
-		map(0x010c00, 0x010cff).rw(FUNC(apollo_state::/*"dma1",*/apollo_dma_1_r), FUNC(apollo_state::apollo_dma_1_w));
-		map(0x010d00, 0x010dff).rw(FUNC(apollo_state::/*"dma2",*/apollo_dma_2_r), FUNC(apollo_state::apollo_dma_2_w));
-		map(0x011000, 0x0110ff).rw(m_pic8259_master, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-		map(0x011100, 0x0111ff).rw(m_pic8259_slave, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-		map(0x011200, 0x0112ff).rw(m_node_id, FUNC(apollo_ni::read), FUNC(apollo_ni::write));
-		map(0x011300, 0x0113ff).rw(FUNC(apollo_state::latch_page_on_parity_error_register_r), FUNC(apollo_state::latch_page_on_parity_error_register_w));
-		map(0x011600, 0x0116ff).rw(FUNC(apollo_state::master_req_register_r), FUNC(apollo_state::master_req_register_w));
+	map(0x00000000, 0xffffffff).rw(FUNC(apollo_state::apollo_unmapped_r), FUNC(apollo_state::apollo_unmapped_w));
+	map(0x000000, 0x00ffff).rom(); /* boot ROM  */
+	map(0x000000, 0x00ffff).w(FUNC(apollo_state::apollo_rom_w));
+	map(0x010000, 0x0100ff).rw(FUNC(apollo_state::apollo_csr_status_register_r), FUNC(apollo_state::apollo_csr_status_register_w));
+	map(0x010100, 0x0101ff).rw(FUNC(apollo_state::apollo_csr_control_register_r), FUNC(apollo_state::apollo_csr_control_register_w));
+	map(0x010200, 0x0102ff).rw(FUNC(apollo_state::cache_status_register_r), FUNC(apollo_state::cache_control_register_w));
+	map(0x010300, 0x0103ff).rw(FUNC(apollo_state::task_alias_register_r), FUNC(apollo_state::task_alias_register_w));
+	map(0x010400, 0x0104ff).rw(m_sio, FUNC(apollo_sio::read), FUNC(apollo_sio::write));
+	map(0x010500, 0x0105ff).rw(m_sio2, FUNC(apollo_sio::read), FUNC(apollo_sio::write));
+	map(0x010800, 0x0108ff).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
+	map(0x010900, 0x0109ff).rw(FUNC(apollo_state::apollo_rtc_r), FUNC(apollo_state::apollo_rtc_w));
+	map(0x010c00, 0x010cff).rw(FUNC(apollo_state::/*"dma1",*/apollo_dma_1_r), FUNC(apollo_state::apollo_dma_1_w));
+	map(0x010d00, 0x010dff).rw(FUNC(apollo_state::/*"dma2",*/apollo_dma_2_r), FUNC(apollo_state::apollo_dma_2_w));
+	map(0x011000, 0x0110ff).rw(m_pic8259_master, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x011100, 0x0111ff).rw(m_pic8259_slave, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x011200, 0x0112ff).rw(m_node_id, FUNC(apollo_ni::read), FUNC(apollo_ni::write));
+	map(0x011300, 0x0113ff).rw(FUNC(apollo_state::latch_page_on_parity_error_register_r), FUNC(apollo_state::latch_page_on_parity_error_register_w));
+	map(0x011600, 0x0116ff).rw(FUNC(apollo_state::master_req_register_r), FUNC(apollo_state::master_req_register_w));
 
-		map(0x016400, 0x0164ff).rw(FUNC(apollo_state::selective_clear_locations_r), FUNC(apollo_state::selective_clear_locations_w));
-		map(0x017000, 0x017fff).rw(FUNC(apollo_state::apollo_address_translation_map_r), FUNC(apollo_state::apollo_address_translation_map_w));
+	map(0x016400, 0x0164ff).rw(FUNC(apollo_state::selective_clear_locations_r), FUNC(apollo_state::selective_clear_locations_w));
+	map(0x017000, 0x017fff).rw(FUNC(apollo_state::apollo_address_translation_map_r), FUNC(apollo_state::apollo_address_translation_map_w));
 
-		map(ATBUS_IO_BASE, ATBUS_IO_END).rw(FUNC(apollo_state::apollo_atbus_io_r), FUNC(apollo_state::apollo_atbus_io_w));
+	map(ATBUS_IO_BASE, ATBUS_IO_END).rw(FUNC(apollo_state::apollo_atbus_io_r), FUNC(apollo_state::apollo_atbus_io_w));
 
-		map(DN3500_RAM_BASE, DN3500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
+	map(DN3500_RAM_BASE, DN3500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
-		map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
+	map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
-//      map(0xf8000000, 0xffffffff).rw(FUNC(apollo_state::apollo_f8_r), FUNC(apollo_state::apollo_f8_w));
+//  map(0xf8000000, 0xffffffff).rw(FUNC(apollo_state::apollo_f8_r), FUNC(apollo_state::apollo_f8_w));
 }
 
 void apollo_state::dn3000_map(address_map &map)
 {
-		map(0x000000, 0xffffff).rw(FUNC(apollo_state::apollo_unmapped_r), FUNC(apollo_state::apollo_unmapped_w));
+	map(0x000000, 0xffffff).rw(FUNC(apollo_state::apollo_unmapped_r), FUNC(apollo_state::apollo_unmapped_w));
 
-		map(0x000000, 0x007fff).rom(); /* boot ROM  */
-		map(0x000000, 0x007fff).w(FUNC(apollo_state::apollo_rom_w));
-		map(0x008000, 0x0080ff).rw(FUNC(apollo_state::apollo_csr_status_register_r), FUNC(apollo_state::apollo_csr_status_register_w));
-		map(0x008100, 0x0081ff).rw(FUNC(apollo_state::apollo_csr_control_register_r), FUNC(apollo_state::apollo_csr_control_register_w));
-		map(0x008400, 0x0087ff).rw(m_sio, FUNC(apollo_sio::read), FUNC(apollo_sio::write));
-		map(0x008800, 0x0088ff).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
-		map(0x008900, 0x0089ff).rw(FUNC(apollo_state::apollo_rtc_r), FUNC(apollo_state::apollo_rtc_w));
-		map(0x009000, 0x0090ff).rw(FUNC(apollo_state::/*"dma1",*/apollo_dma_1_r), FUNC(apollo_state::apollo_dma_1_w));
-		map(0x009100, 0x0091ff).rw(FUNC(apollo_state::/*"dma2",*/apollo_dma_2_r), FUNC(apollo_state::apollo_dma_2_w));
-		map(0x009200, 0x0092ff).rw(FUNC(apollo_state::apollo_dma_page_register_r), FUNC(apollo_state::apollo_dma_page_register_w));
-		map(0x009300, 0x0093ff).rw(FUNC(apollo_state::latch_page_on_parity_error_register_r), FUNC(apollo_state::latch_page_on_parity_error_register_w));
-		map(0x009400, 0x0094ff).rw(m_pic8259_master, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-		map(0x009500, 0x0095ff).rw(m_pic8259_slave, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-		map(0x009600, 0x0096ff).rw(m_node_id, FUNC(apollo_ni::read), FUNC(apollo_ni::write));
+	map(0x000000, 0x007fff).rom(); /* boot ROM  */
+	map(0x000000, 0x007fff).w(FUNC(apollo_state::apollo_rom_w));
+	map(0x008000, 0x0080ff).rw(FUNC(apollo_state::apollo_csr_status_register_r), FUNC(apollo_state::apollo_csr_status_register_w));
+	map(0x008100, 0x0081ff).rw(FUNC(apollo_state::apollo_csr_control_register_r), FUNC(apollo_state::apollo_csr_control_register_w));
+	map(0x008400, 0x0087ff).rw(m_sio, FUNC(apollo_sio::read), FUNC(apollo_sio::write));
+	map(0x008800, 0x0088ff).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
+	map(0x008900, 0x0089ff).rw(FUNC(apollo_state::apollo_rtc_r), FUNC(apollo_state::apollo_rtc_w));
+	map(0x009000, 0x0090ff).rw(FUNC(apollo_state::/*"dma1",*/apollo_dma_1_r), FUNC(apollo_state::apollo_dma_1_w));
+	map(0x009100, 0x0091ff).rw(FUNC(apollo_state::/*"dma2",*/apollo_dma_2_r), FUNC(apollo_state::apollo_dma_2_w));
+	map(0x009200, 0x0092ff).rw(FUNC(apollo_state::apollo_dma_page_register_r), FUNC(apollo_state::apollo_dma_page_register_w));
+	map(0x009300, 0x0093ff).rw(FUNC(apollo_state::latch_page_on_parity_error_register_r), FUNC(apollo_state::latch_page_on_parity_error_register_w));
+	map(0x009400, 0x0094ff).rw(m_pic8259_master, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x009500, 0x0095ff).rw(m_pic8259_slave, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x009600, 0x0096ff).rw(m_node_id, FUNC(apollo_ni::read), FUNC(apollo_ni::write));
 
-		map(ATBUS_IO_BASE, ATBUS_IO_END).rw(FUNC(apollo_state::apollo_atbus_io_r), FUNC(apollo_state::apollo_atbus_io_w));
-		map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
+	map(ATBUS_IO_BASE, ATBUS_IO_END).rw(FUNC(apollo_state::apollo_atbus_io_r), FUNC(apollo_state::apollo_atbus_io_w));
+	map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
-		// FIXME: must match with RAM size in driver/apollo_sio.c
-		// map(DN3000_RAM_BASE, DN3000_RAM_END).ram();  /* 8MB RAM */
-		map(DN3000_RAM_BASE, DN3000_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
+	// FIXME: must match with RAM size in driver/apollo_sio.c
+	// map(DN3000_RAM_BASE, DN3000_RAM_END).ram();  /* 8MB RAM */
+	map(DN3000_RAM_BASE, DN3000_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
-		map(0x05d800, 0x05dc07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
-		map(0xfa0000, 0xfdffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mgm_r), FUNC(apollo_graphics_15i::apollo_mgm_w));
+	map(0x05d800, 0x05dc07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
+	map(0xfa0000, 0xfdffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mgm_r), FUNC(apollo_graphics_15i::apollo_mgm_w));
 
-		map(0x05e800, 0x05ec07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
-		map(0x0a0000, 0x0bffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
+	map(0x05e800, 0x05ec07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
+	map(0x0a0000, 0x0bffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
 }
 
 void apollo_state::dsp3000_map(address_map &map)
 {
-		map(0x000000, 0xffffff).rw(FUNC(apollo_state::apollo_unmapped_r), FUNC(apollo_state::apollo_unmapped_w));
+	map(0x000000, 0xffffff).rw(FUNC(apollo_state::apollo_unmapped_r), FUNC(apollo_state::apollo_unmapped_w));
 
-		map(0x000000, 0x007fff).rom(); /* boot ROM  */
-		map(0x000000, 0x007fff).w(FUNC(apollo_state::apollo_rom_w));
-		map(0x008000, 0x0080ff).rw(FUNC(apollo_state::apollo_csr_status_register_r), FUNC(apollo_state::apollo_csr_status_register_w));
-		map(0x008100, 0x0081ff).rw(FUNC(apollo_state::apollo_csr_control_register_r), FUNC(apollo_state::apollo_csr_control_register_w));
-		map(0x008400, 0x0087ff).rw(m_sio, FUNC(apollo_sio::read), FUNC(apollo_sio::write));
-		map(0x008800, 0x0088ff).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
-		map(0x008900, 0x0089ff).rw(FUNC(apollo_state::apollo_rtc_r), FUNC(apollo_state::apollo_rtc_w));
+	map(0x000000, 0x007fff).rom(); /* boot ROM  */
+	map(0x000000, 0x007fff).w(FUNC(apollo_state::apollo_rom_w));
+	map(0x008000, 0x0080ff).rw(FUNC(apollo_state::apollo_csr_status_register_r), FUNC(apollo_state::apollo_csr_status_register_w));
+	map(0x008100, 0x0081ff).rw(FUNC(apollo_state::apollo_csr_control_register_r), FUNC(apollo_state::apollo_csr_control_register_w));
+	map(0x008400, 0x0087ff).rw(m_sio, FUNC(apollo_sio::read), FUNC(apollo_sio::write));
+	map(0x008800, 0x0088ff).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
+	map(0x008900, 0x0089ff).rw(FUNC(apollo_state::apollo_rtc_r), FUNC(apollo_state::apollo_rtc_w));
 
-		map(0x009000, 0x0090ff).rw(FUNC(apollo_state::/*"dma1",*/apollo_dma_1_r), FUNC(apollo_state::apollo_dma_1_w));
-		map(0x009100, 0x0091ff).rw(FUNC(apollo_state::/*"dma2",*/apollo_dma_2_r), FUNC(apollo_state::apollo_dma_2_w));
-		map(0x009200, 0x0092ff).rw(FUNC(apollo_state::apollo_dma_page_register_r), FUNC(apollo_state::apollo_dma_page_register_w));
-		map(0x009300, 0x0093ff).rw(FUNC(apollo_state::latch_page_on_parity_error_register_r), FUNC(apollo_state::latch_page_on_parity_error_register_w));
-		map(0x009400, 0x0094ff).rw(m_pic8259_master, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-		map(0x009500, 0x0095ff).rw(m_pic8259_slave, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-		map(0x009600, 0x0096ff).rw(m_node_id, FUNC(apollo_ni::read), FUNC(apollo_ni::write));
+	map(0x009000, 0x0090ff).rw(FUNC(apollo_state::/*"dma1",*/apollo_dma_1_r), FUNC(apollo_state::apollo_dma_1_w));
+	map(0x009100, 0x0091ff).rw(FUNC(apollo_state::/*"dma2",*/apollo_dma_2_r), FUNC(apollo_state::apollo_dma_2_w));
+	map(0x009200, 0x0092ff).rw(FUNC(apollo_state::apollo_dma_page_register_r), FUNC(apollo_state::apollo_dma_page_register_w));
+	map(0x009300, 0x0093ff).rw(FUNC(apollo_state::latch_page_on_parity_error_register_r), FUNC(apollo_state::latch_page_on_parity_error_register_w));
+	map(0x009400, 0x0094ff).rw(m_pic8259_master, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x009500, 0x0095ff).rw(m_pic8259_slave, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x009600, 0x0096ff).rw(m_node_id, FUNC(apollo_ni::read), FUNC(apollo_ni::write));
 
-		map(ATBUS_IO_BASE, ATBUS_IO_END).rw(FUNC(apollo_state::apollo_atbus_io_r), FUNC(apollo_state::apollo_atbus_io_w));
-		map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
+	map(ATBUS_IO_BASE, ATBUS_IO_END).rw(FUNC(apollo_state::apollo_atbus_io_r), FUNC(apollo_state::apollo_atbus_io_w));
+	map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
-		// FIXME: must match with RAM size in driver/apollo_sio.c
-		// map(DN3000_RAM_BASE, DN3000_RAM_END).ram();  /* 8MB RAM */
-		map(DN3000_RAM_BASE, DN3000_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
-
+	// FIXME: must match with RAM size in driver/apollo_sio.c
+	// map(DN3000_RAM_BASE, DN3000_RAM_END).ram();  /* 8MB RAM */
+	map(DN3000_RAM_BASE, DN3000_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 }
 
 
@@ -944,7 +943,8 @@ void apollo_state::apollo_reset_instr_callback(int state)
  Machine Start
  ***************************************************************************/
 
-void apollo_state::machine_start(){
+void apollo_state::machine_start()
+{
 	memory_share *messram = memshare(RAM_TAG);
 	//MLOG1(("machine_start_dn3500: ram size is %d MB", (int)messram->bytes()/(1024*1024)));
 

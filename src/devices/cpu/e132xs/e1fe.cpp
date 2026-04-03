@@ -15,6 +15,8 @@
 
 #include "cpu/drcfe.ipp"
 
+#include <iostream>
+
 
 
 void hyperstone_device::opcode_desc::log_flags(std::ostream &stream) const

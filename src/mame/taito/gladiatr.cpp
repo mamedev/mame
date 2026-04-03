@@ -496,7 +496,7 @@ u8 ppking_state::ppking_qx0_r(offs_t offset)
 			m_mcu[0].rxd |= 0x40;
 	}
 
-	//printf("%04x rst %d\n",m_maincpu->pc(),m_mcu[0].rst);
+	//logerror("%04x rst %d\n", m_maincpu->pc(),m_mcu[0].rst);
 
 	return m_mcu[0].rxd;
 }
@@ -536,8 +536,7 @@ void ppking_state::ppking_qx0_w(offs_t offset, u8 data)
 				break;
 
 			default:
-				printf("%02x %02x\n",offset,data);
-				break;
+				logerror("ppking_qx0_w: %02x %02x\n", offset, data);
 		}
 	}
 	else

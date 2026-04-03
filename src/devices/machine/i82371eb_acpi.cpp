@@ -19,7 +19,7 @@
 #define LOG_ACPIEX (1U << 5) // verbose ACPI internals
 
 #define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO | LOG_ACPI | LOG_ACPIEX)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 

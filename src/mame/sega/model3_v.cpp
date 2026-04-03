@@ -1655,18 +1655,12 @@ void model3_state::draw_model(uint32_t addr)
 			{
 				float dot = dot_product3(n, m_parallel_light);
 
-				if (header[1] & 0x10)
-					dot = fabs(dot);
+				// apply sun clamp
+				// TODO: lamachin and daytona2 disables this thru JTAG
+				dot = std::max(dot, 0.0f);
 
 				intensity = ((dot * m_parallel_light_intensity) + m_ambient_light_intensity) * 255.0f;
-				if (intensity > 255.0f)
-				{
-					intensity = 255.0f;
-				}
-				if (intensity < 0.0f)
-				{
-					intensity = 0.0f;
-				}
+				intensity = std::clamp(intensity, 0.0f, 255.0f);
 			}
 			else
 			{

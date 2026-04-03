@@ -21,7 +21,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	virtual void do_read() override;
+	virtual void reset_byte_counter() override;
 
 	virtual TIMER_CALLBACK_MEMBER(clock_w) override;
 

@@ -213,7 +213,7 @@ void pci_device::command_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	mem_mask &= command_mask;
 	COMBINE_DATA(&command);
-	logerror("command = %04x\n", command);
+	logerror("command = %04x (%04x & %04x)\n", command, data, command_mask);
 	if ((old ^ command) & 3)
 		remap_cb();
 }

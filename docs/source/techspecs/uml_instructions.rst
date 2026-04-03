@@ -616,7 +616,9 @@ Simplification rules
 CALLC
 ~~~~~
 
-Call a C function with the signature ``void (*)(void *)``.
+Call a C function with the signature ``void (*)(T *)`` or
+``void (*)(T &)`` (i.e. a function with a single pointer or reference
+parameter that does not return a value).
 
 +---------------------------+-----------------------------------------+
 | Disassembly               | Usage                                   |

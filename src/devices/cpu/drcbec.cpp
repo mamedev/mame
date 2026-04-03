@@ -609,27 +609,27 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_
 
 				// pre-expand opcodes that encode size/scale in them
 				if (opcode == OP_LOAD)
-					opcode = opcode_t(OP_LOAD1 + inst.param(3).size() * 4 + inst.param(3).scale());
+					opcode = opcode_t(OP_LOAD1 + unsigned(inst.param(3).size() * 4 + inst.param(3).scale()));
 				if (opcode == OP_LOADS)
-					opcode = opcode_t(OP_LOADS1 + inst.param(3).size() * 4 + inst.param(3).scale());
+					opcode = opcode_t(OP_LOADS1 + unsigned(inst.param(3).size() * 4 + inst.param(3).scale()));
 				if (opcode == OP_STORE)
-					opcode = opcode_t(OP_STORE1 + inst.param(3).size() * 4 + inst.param(3).scale());
+					opcode = opcode_t(OP_STORE1 + unsigned(inst.param(3).size() * 4 + inst.param(3).scale()));
 				if (opcode == OP_READ)
-					opcode = opcode_t(OP_READ1 + inst.param(2).size());
+					opcode = opcode_t(OP_READ1 + unsigned(inst.param(2).size()));
 				if (opcode == OP_READM)
-					opcode = opcode_t(OP_READM1 + inst.param(3).size());
+					opcode = opcode_t(OP_READM1 + unsigned(inst.param(3).size()));
 				if (opcode == OP_WRITE)
-					opcode = opcode_t(OP_WRITE1 + inst.param(2).size());
+					opcode = opcode_t(OP_WRITE1 + unsigned(inst.param(2).size()));
 				if (opcode == OP_WRITEM)
-					opcode = opcode_t(OP_WRITEM1 + inst.param(3).size());
+					opcode = opcode_t(OP_WRITEM1 + unsigned(inst.param(3).size()));
 				if (opcode == OP_SEXT)
-					opcode = opcode_t(OP_SEXT1 + inst.param(2).size());
+					opcode = opcode_t(OP_SEXT1 + unsigned(inst.param(2).size()));
 				if (opcode == OP_FTOINT)
-					opcode = opcode_t(OP_FTOI4T + 5 * (inst.param(2).size() - 2) + inst.param(3).rounding());
+					opcode = opcode_t(OP_FTOI4T + unsigned(5 * (inst.param(2).size() - 2) + inst.param(3).rounding()));
 				if (opcode == OP_FFRINT)
-					opcode = opcode_t(OP_FFRI4 + (inst.param(2).size() - 2));
+					opcode = opcode_t(OP_FFRI4 + unsigned(inst.param(2).size() - 2));
 				if (opcode == OP_FFRFLT)
-					opcode = opcode_t(OP_FFRFS + (inst.param(2).size() - 2));
+					opcode = opcode_t(OP_FFRFS + unsigned(inst.param(2).size() - 2));
 
 				// count how many bytes of immediates we need
 				int immedbytes = 0;

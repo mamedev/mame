@@ -4415,18 +4415,18 @@ ROM_START( pacmansp )
 ROM_END
 
 /*
-Ms.Pacman Bootleg Later Jamma Board
+Ms.Pacman Bootleg Later JAMMA Board
 
-The game looks like the original, but the board is smallest than the original and only use two bigger 27256 eproms.
+The game looks like the original, but the board is smaller than the original and only uses two bigger 27256 EPROMs.
 
-There are 4 proms in the board, one of them is a color prom that is different from the other sets, this cause a little different colors, but almost the same.
+There are 4 PROMs on the board, one of them is a color PROM that is different from the other sets. This causes slightly different colors, but almost the same.
 
 82s123  different from other sets
-82s129-1.a9 == Ms. Pacman prom 82s126.1m
-82s129-2.c9 == Ms. Pacman prom 82s126.3m
-82s129-3.d1 == Ms. Pacman prom 82s126.4a
+82s129-1.a9 == Ms. Pacman PROM 82s126.1m
+82s129-2.c9 == Ms. Pacman PROM 82s126.3m
+82s129-3.d1 == Ms. Pacman PROM 82s126.4a
 
-If you need more info about the board please write contact ricky2001 at AUMAP
+If you need more info about the board please contact ricky2001 at AUMAP
 */
 ROM_START( mspacmanbg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -4661,6 +4661,34 @@ ROM_START( mspacmanbgc )
 	ROM_REGION( 0x0200, "namco", 0 ) // Sound PROMs
 	ROM_LOAD( "82s129-1.a9",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) ) // == 82s126.1m
 	ROM_LOAD( "82s129-2.c9",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // Timing - not used // == 82s126.3m
+ROM_END
+
+ROM_START( mspacmanbpl ) // on a PCB marked 28-09-93, with Playmark labels on ROMs
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "playmark.ic12", 0x0000, 0x8000, CRC(31e24ca4) SHA1(843bdbaa15786974d8c7b466f02bd579ada688ee) ) // 0xxxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(              0x0000, 0x4000 )
+	ROM_CONTINUE(              0x8000, 0x4000 )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "playmark.ic13", 0x0000, 0x2000, CRC(3944ea2d) SHA1(2e764cef63a0492bf9e1d0391bec402bc2930e83) ) // xx-xxxxxxxxxxxxx
+	ROM_CONTINUE(              0x0000, 0x2000 )
+	ROM_CONTINUE(              0x0000, 0x2000 )
+	ROM_CONTINUE(              0x0000, 0x2000 )
+	ROM_CONTINUE(              0x0000, 0x2000 )
+	ROM_CONTINUE(              0x0000, 0x2000 )
+	ROM_CONTINUE(              0x0000, 0x0800 )
+	ROM_CONTINUE(              0x1000, 0x0800 )
+	ROM_CONTINUE(              0x0800, 0x0800 )
+	ROM_CONTINUE(              0x1800, 0x0800 )
+	ROM_IGNORE(                        0x2000 )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "82s123.h7",    0x0000, 0x0020, CRC(3545e7e9) SHA1(b866b02579438afb11296e5c53a32c6425bd044d) )
+	ROM_LOAD( "82s129-3.d1",  0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) ) // == 82s126.4a
+
+	ROM_REGION( 0x0200, "namco", 0 ) // Sound PROMs
+	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // Timing - not used
 ROM_END
 
 /*
@@ -9038,6 +9066,7 @@ GAME( 1991, mspacmanbhe,  mspacman, woodpek,     mspacman, pacman_state,  empty_
 GAME( 1992, mspacmanbco,  mspacman, woodpek_rbg, mspacman, pacman_state,  empty_init,   ROT90,  "bootleg (Cocamatic)",     "Come-Cocos (Ms. Pac-Man) (Cocamatic bootleg)",                       MACHINE_SUPPORTS_SAVE ) // this PCB have swapped Blue and Green color lines (Ms.Pac-Man sprite should be pink), no "MADE IN GREECE" text at PCB
 GAME( 1993, mspacmanbi,   mspacman, woodpek,     mspacman, pacman_state,  empty_init,   ROT90,  "bootleg (Impeuropex)",    "Ms. Pac-Man (Impeuropex bootleg)",                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1992, mspacmanbgc,  mspacman, woodpek,     mspacman, pacman_state,  empty_init,   ROT90,  "bootleg (Enavi)",         "Ms. Pac-Man ('Made in Greece' Enavi bootleg)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mspacmanbpl,  mspacman, woodpek,     mspacman, pacman_state,  empty_init,   ROT90,  "bootleg (Playmark)",      "Ms. Pac-Man (Playmark bootleg)",                                     MACHINE_SUPPORTS_SAVE )
 GAME( 198?, pacmansp,     puckman,  pacman,      pacmansp, pacman_state,  empty_init,   ROT90,  "bootleg (Video Game SA)", "Puck Man (Spanish, 'Made in Greece' bootleg)",                       MACHINE_SUPPORTS_SAVE ) // probably a further conversion of the mspacmanbg bootleg, still has some MS Pacman code + extra features
 
 GAME( 1992, mspactwin,   0,         mspactwin, mspactwin, mspactwin_state, init_mspactwin, ROT90,  "hack (Susilu)",   "Ms Pac Man Twin (Argentina, set 1)",     MACHINE_SUPPORTS_SAVE )

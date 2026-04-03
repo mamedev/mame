@@ -218,10 +218,9 @@ void yiear_state::palette(palette_device &palette) const
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
-		bit0 = 0;
-		bit1 = BIT(*color_prom, 6);
-		bit2 = BIT(*color_prom, 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(*color_prom, 6);
+		bit1 = BIT(*color_prom, 7);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r,g,b));
 		color_prom++;
@@ -297,8 +296,7 @@ void yiear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			sy++;   // fix title screen & garbage at the bottom of the screen
 		}
 
-
-			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -315,17 +313,14 @@ uint32_t yiear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 uint8_t yiear_state::speech_r()
 {
-	if (m_vlm->bsy())
-		return 1;
-	else
-		return 0;
+	return m_vlm->bsy_r();
 }
 
 void yiear_state::vlm5030_control_w(uint8_t data)
 {
 	// bit 0 is latch direction
-	m_vlm->st((data >> 1) & 1);
-	m_vlm->rst((data >> 2) & 1);
+	m_vlm->st_w(BIT(data, 1));
+	m_vlm->rst_w(BIT(data, 2));
 }
 
 void yiear_state::vblank_irq(int state)

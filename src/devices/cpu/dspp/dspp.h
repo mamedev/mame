@@ -36,7 +36,7 @@ public:
 
 	uint16_t read_output_fifo();
 
-	void dump_state(); // TODO: DEBUG REMOVE ME
+	void dump_state(std::ostream &str); // TODO: DEBUG REMOVE ME
 
 	// Internal registers
 	uint16_t input_r();

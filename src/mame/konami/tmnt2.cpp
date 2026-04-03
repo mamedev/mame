@@ -2398,12 +2398,9 @@ void tmnt2_base_state::machine_reset()
 {
 	m_lastirq = 0;
 
+	// Z80 _NMI goes low at same time as reset
 	if (m_audiocpu && m_k053260)
-	{
-		// Z80 _NMI goes low at same time as reset
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-	}
 }
 
 void punkshot_state::punkshot(machine_config &config)

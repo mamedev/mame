@@ -228,7 +228,7 @@ public:
 	void set_default_card_software(std::string &&s);
 
 	// instantiates an option entry (don't call outside of emuopts.cpp)
-	core_options::entry::shared_ptr setup_option_entry(const char *name);
+	core_options::entry::shared_ptr setup_option_entry(std::string &&name);
 
 private:
 	void possibly_changed(const std::string &old_value);
@@ -483,16 +483,15 @@ public:
 	short http_port() const { return int_value(OPTION_HTTP_PORT); }
 	const char *http_root() const { return value(OPTION_HTTP_ROOT); }
 
-	// slots and devices - the values for these are stored outside of the core_options
-	// structure
-	const ::slot_option &slot_option(const std::string &device_name) const;
-	::slot_option &slot_option(const std::string &device_name);
-	const ::slot_option *find_slot_option(const std::string &device_name) const;
-	::slot_option *find_slot_option(const std::string &device_name);
-	bool has_slot_option(const std::string &device_name) const { return find_slot_option(device_name) ? true : false; }
-	const ::image_option &image_option(const std::string &device_name) const;
-	::image_option &image_option(const std::string &device_name);
-	bool has_image_option(const std::string &device_name) const { return m_image_options.find(device_name) != m_image_options.end(); }
+	// slots and devices - the values for these are stored outside of the core_options structure
+	const ::slot_option &slot_option(std::string_view device_name) const;
+	::slot_option &slot_option(std::string_view device_name);
+	const ::slot_option *find_slot_option(std::string_view device_name) const;
+	::slot_option *find_slot_option(std::string_view device_name);
+	bool has_slot_option(std::string_view device_name) const { return bool(find_slot_option(std::string(device_name))); } // TODO: get rid of temporary std::string when we have C++20
+	const ::image_option &image_option(std::string_view device_name) const;
+	::image_option &image_option(std::string_view device_name);
+	bool has_image_option(std::string_view device_name) const { return m_image_options.find(std::string(device_name)) != m_image_options.end(); } // TODO: get rid of temporary std::string when we have C++20
 
 protected:
 	virtual void command_argument_processed() override;

@@ -282,13 +282,11 @@ void gaelco_serial_device::set_status(uint8_t mask, uint8_t set, int wait)
 
 void gaelco_serial_device::process_in()
 {
-	int t;
-
 	if ((m_in_ptr->stat & GAELCOSER_STATUS_RESET) != 0)
 		m_out_ptr->cnt = 0;
 
 	/* new data available ? */
-	t = m_in_ptr->data_cnt;
+	const int t = m_in_ptr->data_cnt;
 	if (t != m_last_in_msg_cnt)
 	{
 		m_last_in_msg_cnt = t;
@@ -335,7 +333,7 @@ void gaelco_serial_device::sync_link()
 TIMER_CALLBACK_MEMBER( gaelco_serial_device::link_cb )
 {
 	std::lock_guard<std::mutex> guard(m_mutex);
-	m_out_ptr->cnt++;
+	m_out_ptr->cnt = m_out_ptr->cnt + 1;
 	sync_link();
 }
 
@@ -372,7 +370,7 @@ void gaelco_serial_device::data_w(uint8_t data)
 
 	m_out_ptr->data = data;
 	m_status &= ~GAELCOSER_STATUS_READY;
-	m_out_ptr->data_cnt++;
+	m_out_ptr->data_cnt = m_out_ptr->data_cnt + 1;
 
 	set_status( ~GAELCOSER_STATUS_READY, GAELCOSER_STATUS_READY, LINK_FREQ );
 

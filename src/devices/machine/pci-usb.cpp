@@ -4,7 +4,7 @@
 #include "pci-usb.h"
 
 #define VERBOSE (LOG_GENERAL)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -102,6 +102,9 @@ void usb_uhci_device::map(address_map &map)
 				, BIT(data, 1)
 				, BIT(data, 0)
 			);
+			// set HCHalted if Run/Stop bit is clear
+			if (!BIT(data, 0))
+				m_usbsts |= (1 << 5);
 			if (mem_mask != 0xffff)
 				LOG("\tnon-word access!\n");
 		})

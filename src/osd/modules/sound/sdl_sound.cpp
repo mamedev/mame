@@ -66,7 +66,7 @@ private:
 		uint32_t m_id;
 		SDL_AudioDeviceID m_sdl_id;
 		abuffer m_buffer;
-		stream_info(uint32_t id, uint8_t channels) : m_id(id), m_sdl_id(0), m_buffer(channels) {}
+		stream_info(uint32_t id, uint8_t channels, uint32_t rate) : m_id(id), m_sdl_id(0), m_buffer(channels, rate) {}
 	};
 
 	std::vector<device_info> m_devices;
@@ -202,7 +202,7 @@ osd::audio_info sound_sdl::get_information()
 uint32_t sound_sdl::stream_sink_open(uint32_t node, std::string name, uint32_t rate)
 {
 	device_info &dev = m_devices[node-1];
-	std::unique_ptr<stream_info> stream = std::make_unique<stream_info>(m_stream_next_id ++, dev.m_channels);
+	std::unique_ptr<stream_info> stream = std::make_unique<stream_info>(m_stream_next_id ++, dev.m_channels, rate);
 
 	SDL_AudioSpec dspec, ospec;
 	dspec.freq = rate;

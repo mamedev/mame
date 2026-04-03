@@ -233,7 +233,7 @@ void taitoair_state::lineram_w(offs_t offset, u16 data, u16 mem_mask)
 		m_line_ram[offset] = data;
 
 	//if (offset == 0x3fff)
-	//  printf("LineRAM go %d\n",(int)m_screen->frame_number());
+	//  logerror("LineRAM go %d\n", m_screen->frame_number());
 }
 
 u16 taitoair_state::dspram_r(offs_t offset)
@@ -346,7 +346,7 @@ void taitoair_state::sound_bankswitch_w(u8 data)
 */
 void taitoair_state::dma_regs_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	printf("%08x %04x\n",offset,data);
+	logerror("dma_regs_w: %08x %04x\n", offset, data);
 
 	if (offset == 0 && ACCESSING_BITS_8_15)
 	{

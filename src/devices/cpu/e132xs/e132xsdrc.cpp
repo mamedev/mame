@@ -70,65 +70,60 @@ public:
 struct hyperstone_device::c_funcs
 {
 
-	static void unimplemented(void *param)
+	static void unimplemented(hyperstone_device &that)
 	{
-		auto &that = *reinterpret_cast<hyperstone_device *>(param);
 		fatalerror("PC=%08X: Unimplemented op %08X\n", that.PC, that.m_core->arg0);
 	}
 
-	static void print(void *param)
+	static void print(hyperstone_device &that)
 	{
-		auto &that = *reinterpret_cast<hyperstone_device *>(param);
 		printf("%c: %08x\n", (char)that.m_core->arg0, that.m_core->arg1);
 	}
 
-	static void standard_irq_callback(void *param)
+	static void standard_irq_callback(hyperstone_device &that)
 	{
-		auto &that = *reinterpret_cast<hyperstone_device *>(param);
 		that.standard_irq_callback(that.m_core->arg0, that.m_core->global_regs[0]);
 	}
 
-	static void debugger_exception_hook(void *param)
+	static void debugger_exception_hook(hyperstone_device &that)
 	{
-		auto &that = *reinterpret_cast<hyperstone_device *>(param);
 		that.debugger_exception_hook(int32_t(that.m_core->arg0));
 	}
 
-	static void adjust_timer_interrupt(void *param)
+	static void adjust_timer_interrupt(hyperstone_device &that)
 	{
-		reinterpret_cast<hyperstone_device *>(param)->adjust_timer_interrupt();
+		that.adjust_timer_interrupt();
 	}
 
-	static void compute_tr(void *param)
+	static void compute_tr(hyperstone_device &that)
 	{
-		reinterpret_cast<hyperstone_device *>(param)->compute_tr();
+		that.compute_tr();
 	}
 
-	static void update_timer_prescale(void *param)
+	static void update_timer_prescale(hyperstone_device &that)
 	{
-		reinterpret_cast<hyperstone_device *>(param)->update_timer_prescale();
+		that.update_timer_prescale();
 	}
 
-	static void update_bus_control(void *param)
+	static void update_bus_control(hyperstone_device &that)
 	{
-		reinterpret_cast<hyperstone_device *>(param)->update_bus_control();
+		that.update_bus_control();
 	}
 
-	static void update_memory_control(void *param)
+	static void update_memory_control(hyperstone_device &that)
 	{
-		reinterpret_cast<hyperstone_device *>(param)->update_memory_control();
+		that.update_memory_control();
 	}
 
 #if E132XS_LOG_DRC_REGS || E132XS_LOG_INTERPRETER_REGS
-	static void dump_registers(void *param)
+	static void dump_registers(hyperstone_device &that)
 	{
-		reinterpret_cast<hyperstone_device *>(param)->dump_registers();
+		that.dump_registers();
 	}
 #endif
 
-	static void total_cycles(void *param)
+	static void total_cycles(hyperstone_device &that)
 	{
-		auto &that = *reinterpret_cast<hyperstone_device *>(param);
 		that.m_core->numcycles = that.total_cycles();
 	}
 };
@@ -268,8 +263,6 @@ void hyperstone_device::generate_get_trap_addr(drcuml_block &block, uml::code_la
 void hyperstone_device::code_compile_block(uint8_t mode, offs_t pc)
 {
 	compiler_state compiler(mode);
-	const opcode_desc *seqhead, *seqlast;
-	bool override = false;
 
 	auto profile = g_profiler.start(PROFILER_DRC_COMPILE);
 
@@ -278,6 +271,7 @@ void hyperstone_device::code_compile_block(uint8_t mode, offs_t pc)
 	if (m_drcuml->logging())
 		log_descriptions(desclist, 0);
 
+	bool override = false;
 	bool succeeded = false;
 	while (!succeeded)
 	{
@@ -287,14 +281,15 @@ void hyperstone_device::code_compile_block(uint8_t mode, offs_t pc)
 			drcuml_block &block(m_drcuml->begin_block(8192));
 
 			/* loop until we get through all instruction sequences */
-			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
+			const opcode_desc *seqlast = nullptr;
+			for (const opcode_desc *seqhead = desclist; seqhead; seqhead = seqlast->next())
 			{
 				/* add a code log entry */
 				if (m_drcuml->logging())
 					block.append_comment("-------------------------");
 
 				/* determine the last instruction in this sequence */
-				for (seqlast = seqhead; seqlast != nullptr; seqlast = seqlast->next())
+				for (seqlast = seqhead; seqlast; seqlast = seqlast->next())
 					if (seqlast->end_sequence())
 						break;
 				assert(seqlast != nullptr);

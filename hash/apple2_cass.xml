@@ -18,7 +18,9 @@ license:CC0-1.0
 	<software name="3dartgra">
 		<description>3D Art Graphics</description>
 		<year>1978</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Kazuyama Miyazawa" />
+		<info name="required_ram" value="16K" />
 		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="3D Art Graphics" />
@@ -29,13 +31,16 @@ license:CC0-1.0
 	</software>
 
 	<software name="3ddockin">
-		<description>3D-Docking</description>
+		<description>3-D Docking</description>
 		<year>1978</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="author" value="Chris Oberth" />
+		<info name="partno" value="AP125" />
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="00345" />
-		<info name="usage" value="*200.2000R 16K" />
+		<info name="usage" value="*200.2000R" />
 		<part name="cass" interface="apple2_cass">
-			<feature name="part_id" value="3D-Docking" />
+			<feature name="part_id" value="3-D Docking" />
 			<dataarea name="cass" size="4876844">
 				<rom name="3d-docking (1978)(programma international, inc.).wav" size="4876844" crc="eb124a5d" sha1="8d6c6d971611caf5fc4c3bb0e64e24768cb1785c"/>
 			</dataarea>
@@ -43,12 +48,13 @@ license:CC0-1.0
 	</software>
 
 	<software name="3dstarfi">
-		<description>3D Star Fire</description>
-		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<description>3-D Star Fire</description>
+		<year>1980</year>
+		<publisher>Tsukumo Original Software</publisher>
+		<info name="required_ram" value="24K" />
 		<info name="usage" value="*30.3FR" />
 		<part name="cass" interface="apple2_cass">
-			<feature name="part_id" value="3D Star Fire" />
+			<feature name="part_id" value="3-D Star Fire" />
 			<dataarea name="cass" size="8052074">
 				<rom name="3-d star fire (1980)(tukumo original software).wav" size="8052074" crc="6ab161f2" sha1="504cdfbd49686afa542e03db7315803b40699877"/>
 			</dataarea>
@@ -59,7 +65,10 @@ license:CC0-1.0
 		<description>Ack-Ack</description>
 		<year>1978</year>
 		<publisher>Programma International, Inc.</publisher>
-		<info name="usage" value="*200.2000R 8K" />
+		<info name="author" value="Jim Anderson" />
+		<info name="required_ram" value="8K" />
+		<info name="serial" value="AP001" />
+		<info name="usage" value="*200.2000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Ack-Ack" />
 			<dataarea name="cass" size="5661708">
@@ -72,8 +81,9 @@ license:CC0-1.0
 		<description>Computer Acquire</description>
 		<year>1982</year>
 		<publisher>Microcomputer Games</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="4060102" />
-		<info name="usage" value="*800.3FA4R 0800G 16K" />
+		<info name="usage" value="*800.3FA4R 0800G" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Computer Acquire" />
 			<dataarea name="cass" size="8344952">
@@ -86,8 +96,9 @@ license:CC0-1.0
 		<description>Computer Acquire (original)</description>
 		<year>1980</year>
 		<publisher>Microcomputer Games</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="4006002" />
-		<info name="usage" value="*280.3E9R 800.3F19R 0800G 16K" />
+		<info name="usage" value="*280.3E9R 800.3F19R 0800G" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Computer Acquire" />
 			<dataarea name="cass" size="4781660">
@@ -101,7 +112,8 @@ license:CC0-1.0
 		<year>1979</year>
 		<publisher>Adventure International</publisher>
 		<info name="programmer" value="Scott Adams" />
-		<info name="usage" value="*800.5777R 800G 24K" />
+		<info name="required_ram" value="24K" />
+		<info name="usage" value="*800.5777R 800G" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Adventure Sampler" />
 			<dataarea name="cass" size="2646052">
@@ -115,7 +127,8 @@ license:CC0-1.0
 		<year>1979</year>
 		<publisher>Adventure International</publisher>
 		<info name="programmer" value="Scott Adams" />
-		<info name="usage" value="*800.5777R 800G 24K" />
+		<info name="required_ram" value="24K" />
+		<info name="usage" value="*800.5777R 800G" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Adventure Land" />
 			<dataarea name="cass" size="5705366">
@@ -129,7 +142,8 @@ license:CC0-1.0
 		<year>1979</year>
 		<publisher>Adventure International</publisher>
 		<info name="programmer" value="Scott Adams" />
-		<info name="usage" value="*800.5777R 800G 24K" />
+		<info name="required_ram" value="24K" />
+		<info name="usage" value="*800.5777R 800G" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Mission Impossible" />
 			<dataarea name="cass" size="11143724">
@@ -143,7 +157,8 @@ license:CC0-1.0
 		<year>1979</year>
 		<publisher>Adventure International</publisher>
 		<info name="programmer" value="Alexis Adams" />
-		<info name="usage" value="*800.5777R 800G 24K" />
+		<info name="required_ram" value="24K" />
+		<info name="usage" value="*800.5777R 800G" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Voodoo Castle" />
 			<dataarea name="cass" size="2693420">
@@ -157,8 +172,10 @@ license:CC0-1.0
 		<description>Alignment Test Tone / Renumber</description>
 		<year>1979</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="600-2024-00" />
-		<info name="usage" value="cass1 audio, cass2 ]Load 16K" />
+		<info name="usage" value="cass1: audio" />
+		<info name="usage" value="cass2: ]Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Alignment Test Tone" />
 			<dataarea name="cass" size="5677100">
@@ -178,8 +195,11 @@ license:CC0-1.0
 		<description>Alignment Test Tone / Sampler</description>
 		<year>1979</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="author" value="B. Tognazzini (Sampler)" />
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="600-0002-02" />
-		<info name="usage" value="cass1 >Load 16K, cass2 >HIMEM:16384 >Load 16K" />
+		<info name="usage" value="cass1: >Load" />
+		<info name="usage" value="cass2: >HIMEM:16384 >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Alignment Test Tone" />
 			<dataarea name="cass" size="5677100">
@@ -198,8 +218,9 @@ license:CC0-1.0
 		<description>Andromeda Conquest</description>
 		<year>1982</year>
 		<publisher>Microcomputer Games</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="4200102" />
-		<info name="usage" value="]Load 16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Andromeda Conquest" />
 			<dataarea name="cass" size="3811372">
@@ -212,7 +233,8 @@ license:CC0-1.0
 		<description>Apple-2 Trek</description>
 		<year>1977</year>
 		<publisher>Apple Computer, Inc.</publisher>
-		<info name="usage" value=">HIMEM:16384 >Load 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value=">HIMEM:16384 >Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Apple-2 Trek" />
 			<dataarea name="cass" size="8449462">
@@ -225,8 +247,11 @@ license:CC0-1.0
 		<description>Apple Bowl</description>
 		<year>1979</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="required_ram" value="cass1: 16K" />
+		<info name="required_ram" value="cass2: 32K" />
 		<info name="serial" value="600-2022-00" />
-		<info name="usage" value="cass1 PROGRAMMERS AID #1 >Load 16K, cass2 >Load 32K" />
+		<info name="usage" value="cass1: >Load (requires Programmer's Aid #1)" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Apple Bowl 16K" />
 			<dataarea name="cass" size="3903776">
@@ -245,8 +270,9 @@ license:CC0-1.0
 		<description>Apple Casino</description>
 		<year>1978</year>
 		<publisher>Powersoft, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="ADG0108" />
-		<info name="usage" value=">Load 16K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Apple Casino" />
 			<dataarea name="cass" size="5349420">
@@ -259,8 +285,9 @@ license:CC0-1.0
 		<description>Apple Derby</description>
 		<year>1978</year>
 		<publisher>Powersoft, Inc.</publisher>
+		<info name="required_ram" value="12K" />
 		<info name="serial" value="ACG0107" />
-		<info name="usage" value=">Load 12K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Apple Derby" />
 			<dataarea name="cass" size="8189852">
@@ -273,8 +300,9 @@ license:CC0-1.0
 		<description>Apple ][ Organ</description>
 		<year>1978</year>
 		<publisher>Powersoft, Inc.</publisher>
+		<info name="required_ram" value="32K" />
 		<info name="serial" value="AHG0112" />
-		<info name="usage" value="]Load 32K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Apple ][ Organ" />
 			<dataarea name="cass" size="4191276">
@@ -287,9 +315,10 @@ license:CC0-1.0
 		<description>Applesoft IIa</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="002-0007-01" />
 		<info name="partno" value="A2T0004X" />
-		<info name="usage" value=">Load 16K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Applesoft IIa" />
 			<dataarea name="cass" size="9322474">
@@ -303,8 +332,9 @@ license:CC0-1.0
 		<description>Apple Stock Quote Reporter</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="000-0017-00" />
-		<info name="usage" value="]Load 16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Apple Stock Quote Reporter" />
 			<dataarea name="cass" size="6640828">
@@ -317,8 +347,9 @@ license:CC0-1.0
 		<description>Apple Trek</description>
 		<year>1977</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="600-2013-01" />
-		<info name="usage" value=">Load 16K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Apple Trek" />
 			<dataarea name="cass" size="3996802">
@@ -331,8 +362,11 @@ license:CC0-1.0
 		<description>Apple-Vision / Biorhythms</description>
 		<year>1979</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="author" value="R. Bishop (Applevision)" />
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="685-0005-00" />
-		<info name="usage" value="cass1 >HIMEM:16384 >Load 16K, cass2 Load 16K" />
+		<info name="usage" value="cass1: >HIMEM:16384 >Load" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Applevision" />
 			<dataarea name="cass" size="2063394">
@@ -351,9 +385,11 @@ license:CC0-1.0
 		<description>Applesoft ][ Floating Point BASIC / Floating Point BASIC Demo</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="600-2006-00" />
 		<info name="partno" value="A2T0004X" />
-		<info name="usage" value="cass1 >Load 16K, cass2 ]Load 16K" />
+		<info name="usage" value="cass1: >Load" />
+		<info name="usage" value="cass2: ]Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Applesoft ][ floating point BASIC" />
 			<dataarea name="cass" size="3260004">
@@ -372,8 +408,9 @@ license:CC0-1.0
 		<description>Assembler</description>
 		<year>1978</year>
 		<publisher>Powersoft, Inc.</publisher>
+		<info name="required_ram" value="8K" />
 		<info name="serial" value="ABS0110" />
-		<info name="usage" value=">Load 8K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Assembler" />
 			<dataarea name="cass" size="5953068">
@@ -386,8 +423,9 @@ license:CC0-1.0
 		<description>Applesoft Utility Programs</description>
 		<year>1979</year>
 		<publisher>Hayden Book Company</publisher>
+		<info name="required_ram" value="24K" />
 		<info name="serial" value="03504" />
-		<info name="usage" value="]Load 24K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Applesoft Utilities" />
 			<dataarea name="cass" size="1634092">
@@ -400,8 +438,9 @@ license:CC0-1.0
 		<description>Air Traffic Controller</description>
 		<year>1980</year>
 		<publisher>Creative Computing Software</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="CS-4008" />
-		<info name="usage" value="*2400.3340R 2400G 16K" />
+		<info name="usage" value="*2400.3340R 2400G" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Air Traffic Controller" />
 			<dataarea name="cass" size="1483820">
@@ -414,8 +453,9 @@ license:CC0-1.0
 		<description>B-1 Nuclear Bomber</description>
 		<year>1980</year>
 		<publisher>Microcomputer Games</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="4000002" />
-		<info name="usage" value="]Load 16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="B-1 Nuclear Bomber" />
 			<dataarea name="cass" size="3018500">
@@ -428,15 +468,16 @@ license:CC0-1.0
 		<description>Beneath Apple Manor</description>
 		<year>1978</year>
 		<publisher>The Software Factory</publisher>
-		<info name="usage" value="cass1 *800.B00R then cass2 >LOAD, LOMEM:2816, RUN, after CHAIN BAM1 >LOAD, GOTO0 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="cass1 *800.B00R then cass2 >LOAD, LOMEM:2816, RUN, after CHAIN BAM1 >LOAD, GOTO0" />
 		<part name="cass1" interface="apple2_cass">
-			<feature name="part_id" value="Beneath Apple Manor load 1" />
+			<feature name="part_id" value="Side A" />
 			<dataarea name="cass" size="8260652">
 				<rom name="beneath apple manor (1978)(software factory) side A.wav" size="8260652" crc="21685790" sha1="21a7000cc0d8e751602bf7e57b9094281f42695e"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
-			<feature name="part_id" value="Beneath Apple Manor load 2" />
+			<feature name="part_id" value="Side B" />
 			<dataarea name="cass" size="15841288">
 				<rom name="beneath apple manor (1978)(software factory) side B.wav" size="15841288" crc="0388b520" sha1="dffb5e885a4c77f3d95cd29ef1573feea8d6f85f"/>
 			</dataarea>
@@ -447,8 +488,10 @@ license:CC0-1.0
 		<description>Baseball</description>
 		<year>1979</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="author" value="Charles Sullivan" />
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="00124" />
-		<info name="usage" value="*200.4000R 16K" />
+		<info name="usage" value="*200.4000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Baseball" />
 			<dataarea name="cass" size="10511916">
@@ -461,8 +504,11 @@ license:CC0-1.0
 		<description>Battlestar I</description>
 		<year>1979</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="author" value="Richard Kaplan" />
+		<info name="partno" value="AP024" />
+		<info name="required_ram" value="32K" />
 		<info name="serial" value="00393" />
-		<info name="usage" value="*200.8000R 32K" />
+		<info name="usage" value="*200.8000R" />
 		<!-- program doesn't load if tape started at beginning so start at 0:20 -->
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Battlestar I" />
@@ -476,8 +522,10 @@ license:CC0-1.0
 		<description>Black Jack / Slot Machine</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="required_ram" value="8K" />
 		<info name="serial" value="002-0011-00" />
-		<info name="usage" value="cass1 >Load 8K, cass2 >Load 8K" />
+		<info name="usage" value="cass1: >Load" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Black Jack" />
 			<dataarea name="cass" size="9268268">
@@ -509,7 +557,10 @@ license:CC0-1.0
 		<description>Bomber</description>
 		<year>1978</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value=">Load 16K" />
+		<info name="author" value="Bob Bishop" />
+		<info name="required_ram" value="16K" />
+		<info name="serial" value="BBB-878" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Bomber" />
 			<dataarea name="cass" size="2072620">
@@ -522,16 +573,19 @@ license:CC0-1.0
 		<description>Bowling / Trilogy</description>
 		<year>1979</year>
 		<publisher>Instant Software, Inc.</publisher>
+		<info name="required_ram" value="cass1: 20K" />
+		<info name="required_ram" value="cass2: 8K" />
 		<info name="serial" value="0040A" />
-		<info name="usage" value="cass1 ]Load 20K, cass2 >Load 8K" />
+		<info name="usage" value="cass1: ]Load" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
-			<feature name="part_id" value="Bowling" />
+			<feature name="part_id" value="Side A: Bowling" />
 			<dataarea name="cass" size="8120876">
 				<rom name="bowling (1979)(instant software).wav" size="8120876" crc="98f1a8f5" sha1="4b45badbc712d9ebefd0f1fb03f5e077af82123e"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
-			<feature name="part_id" value="Trilogy" />
+			<feature name="part_id" value="Side B: Trilogy" />
 			<dataarea name="cass" size="13566128">
 				<rom name="trilogy (1979)(instant software).wav" size="13566128" crc="24e01f0f" sha1="7200180beb402d089f7dbc13a4d921cdcb269aa0"/>
 			</dataarea>
@@ -542,8 +596,10 @@ license:CC0-1.0
 		<description>Brian's Theme / Phone List</description>
 		<year>1979</year>
 		<publisher>Apple Computer, Inc.</publisher>
-		<info name="serial" value="600-2027-00"/>
-		<info name="usage" value="cass1 ]Load 16K, cass2 ]Load16K" />
+		<info name="required_ram" value="16K" />
+		<info name="serial" value="600-2027-00" />
+		<info name="usage" value="cass1: ]Load" />
+		<info name="usage" value="cass2: ]Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Brian's Theme" />
 			<dataarea name="cass" size="1075026">
@@ -562,8 +618,10 @@ license:CC0-1.0
 		<description>Brick Out / Color Demonstration Programs</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="685-0003-00" />
-		<info name="usage" value="cass1 >Load 16K, cass2 >Load 16K" />
+		<info name="usage" value="cass1: >Load" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Brick Out" />
 			<dataarea name="cass" size="4003116">
@@ -582,7 +640,8 @@ license:CC0-1.0
 		<description>Bridge Challenger</description>
 		<year>1978</year>
 		<publisher>Personal Software</publisher>
-		<info name="usage" value="*30.3FFFR 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="*30.3FFFR" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Bridge Challenger" />
 			<dataarea name="cass" size="2265644">
@@ -595,7 +654,9 @@ license:CC0-1.0
 		<description>Breakout / Color Demos</description>
 		<year>1977</year>
 		<publisher>Apple Computer, Inc.</publisher>
-		<info name="usage" value="cass1 >Load 4K, cass2 >Load 4K" />
+		<info name="required_ram" value="4K" />
+		<info name="usage" value="cass1: >Load" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Breakout" />
 			<dataarea name="cass" size="1409068">
@@ -614,8 +675,11 @@ license:CC0-1.0
 		<description>Breakout / Color Graphics</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="partno" value="A2T0003X" />
+		<info name="required_ram" value="4K" />
 		<info name="serial" value="600-2014-00" />
-		<info name="usage" value="cass1 >Load 4K, cass2 >Load 4K" />
+		<info name="usage" value="cass1: >Load" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Breakout" />
 			<dataarea name="cass" size="1127548">
@@ -634,8 +698,11 @@ license:CC0-1.0
 		<description>Canter Downs</description>
 		<year>1979</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="author" value="Harry Tarnoff" />
+		<info name="partno" value="AP031" />
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="00438" />
-		<info name="usage" value="*200.2000R 16K" />
+		<info name="usage" value="*200.2000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Canter Downs" />
 			<dataarea name="cass" size="4652588">
@@ -648,7 +715,9 @@ license:CC0-1.0
 		<description>Checkbook 1</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
-		<info name="usage" value=">Load 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="serial" value="002-0005-01" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Checkbook 1" />
 			<dataarea name="cass" size="3815212">
@@ -661,8 +730,10 @@ license:CC0-1.0
 		<description>Color Demosoft / Little Brickout</description>
 		<year>1979</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="600-2023-00" />
-		<info name="usage" value="cass1 ]Load 16K, cass2 ]Load 16K" />
+		<info name="usage" value="cass1: ]Load" />
+		<info name="usage" value="cass2: ]Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Color Demosoft" />
 			<dataarea name="cass" size="1391234">
@@ -681,8 +752,11 @@ license:CC0-1.0
 		<description>Color Sketch / Supermath</description>
 		<year>1979</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="author" value="R. Graff (Supermath)" />
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="685-0004-00" />
-		<info name="usage" value="cass1 >Load 16K, cass2 >Load 16K" />
+		<info name="usage" value="cass1: >Load" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Colorsketch" />
 			<dataarea name="cass" size="4058668">
@@ -701,8 +775,9 @@ license:CC0-1.0
 		<description>Complex Mathematics</description>
 		<year>1979</year>
 		<publisher>Hayden Book Company</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="01204" />
-		<info name="usage" value="]Load 16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Complex Mathematics" />
 			<dataarea name="cass" size="1499948">
@@ -715,8 +790,9 @@ license:CC0-1.0
 		<description>Conflict 2500</description>
 		<year>1981</year>
 		<publisher>Microcomputer Games</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="40007001" />
-		<info name="usage" value="]Load 16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Conflict 2500" />
 			<dataarea name="cass" size="4012332">
@@ -726,19 +802,22 @@ license:CC0-1.0
 	</software>
 
 	<software name="craps" supported="partial">
-		<!-- cass2 requires light pen -->
 		<description>Craps / Bright Pen Craps</description>
 		<year>1979</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value="cass1 >Load 24K, cass2 >Load 24K" />
+		<info name="author" value="Roger Walker" />
+		<info name="serial" value="ACW-479" />
+		<info name="required_ram" value="24K" />
+		<info name="usage" value="cass1: >Load" />
+		<info name="usage" value="cass2: >Load (requires light pen)" />
 		<part name="cass1" interface="apple2_cass">
-			<feature name="part_id" value="Craps" />
+			<feature name="part_id" value="Side 1: Craps" />
 			<dataarea name="cass" size="3705900">
 				<rom name="craps (1979)(softape) side 1.wav" size="3705900" crc="1453953e" sha1="53f560ddffeabb16ff55b3c3145a33af53693422"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
-			<feature name="part_id" value="Bright Pen Craps" />
+			<feature name="part_id" value="Side 2: Bright Pen Craps" />
 			<dataarea name="cass" size="3719724">
 				<rom name="craps (1979)(softape) side 2.wav" size="3719724" crc="f9906e12" sha1="2a9b4f3f922f91417d610973e55e5099e8544c97"/>
 			</dataarea>
@@ -762,7 +841,10 @@ license:CC0-1.0
 		<description>Crazy Eights</description>
 		<year>1979</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value=">Load 24K" />
+		<info name="author" value="William Smith" />
+		<info name="required_ram" value="24K" />
+		<info name="serial" value="ACW-479" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Crazy Eights" />
 			<dataarea name="cass" size="3120684">
@@ -775,8 +857,9 @@ license:CC0-1.0
 		<description>Cubik</description>
 		<year>1978</year>
 		<publisher>Powersoft, Inc.</publisher>
+		<info name="required_ram" value="24K" />
 		<info name="serial" value="ADG0113" />
-		<info name="usage" value=">Load 24K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Cubik" />
 			<dataarea name="cass" size="4861228">
@@ -792,7 +875,8 @@ license:CC0-1.0
 		<info name="programmer" value="Jeffrey A. Johnson" />
 		<info name="programmer" value="Jon Freeman" />
 		<info name="programmer" value="Jim Connelley" />
-		<info name="usage" value="]Load 32K" />
+		<info name="required_ram" value="32K" />
+		<info name="usage" value="]Load" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- role-playing game -->
 		<part name="cass" interface="apple2_cass">
@@ -808,8 +892,11 @@ license:CC0-1.0
 		<description>Datamover / Telepong</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="partno" value="A2T0012X" />
+		<info name="required_ram" value="4K" />
 		<info name="serial" value="002-0016-00" />
-		<info name="usage" value="cass1 *800.A4FR >LOMEM:2700 4K, cass2 >Load 4K" />
+		<info name="usage" value="cass1: *800.A4FR >LOMEM:2700" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Datamover" />
 			<dataarea name="cass" size="456748">
@@ -828,8 +915,11 @@ license:CC0-1.0
 		<description>Depth Charge</description>
 		<year>1978</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="author" value="Chris Oberth" />
+		<info name="partno" value="AP045" />
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="00628" />
-		<info name="usage" value="*200.2000R 16K" />
+		<info name="usage" value="*200.2000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Depth Charge" />
 			<dataarea name="cass" size="8130604">
@@ -842,7 +932,8 @@ license:CC0-1.0
 		<description>Disk-O-Tape</description>
 		<year>1980</year>
 		<publisher>Dann McCreary</publisher>
-		<info name="usage" value="Load DOS 3.3 then *200.240R 32K" />
+		<info name="required_ram" value="32K" />
+		<info name="usage" value="Load DOS 3.3 then *200.240R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Disk-O-Tape" />
 			<dataarea name="cass" size="3544108">
@@ -855,8 +946,9 @@ license:CC0-1.0
 		<description>Dnieper River Line</description>
 		<year>1982</year>
 		<publisher>Microcomputer Games</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="4170101" />
-		<info name="usage" value="]Load 16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Dnieper River Line" />
 			<dataarea name="cass" size="2866988">
@@ -869,7 +961,8 @@ license:CC0-1.0
 		<description>Don't Fall</description>
 		<year>1980</year>
 		<publisher>Innerglo</publisher>
-		<info name="usage" value=">Load 8K" />
+		<info name="required_ram" value="8K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Don't Fall" />
 			<dataarea name="cass" size="4988972">
@@ -882,8 +975,11 @@ license:CC0-1.0
 		<description>Echo</description>
 		<year>1979</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="author" value="David Kalmich" />
+		<info name="partno" value="AP049" />
+		<info name="required_ram" value="8K" />
 		<info name="serial" value="00432" />
-		<info name="usage" value="*200.2000R 8K" />
+		<info name="usage" value="*200.2000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Echo" />
 			<dataarea name="cass" size="3164460">
@@ -896,7 +992,10 @@ license:CC0-1.0
 		<description>Electronic Index-Card File</description>
 		<year>1978</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value=">Load 16K" />
+		<info name="author" value="Bob Bishop" />
+		<info name="required_ram" value="16K" />
+		<info name="serial" value="ECF-878" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Electronic Index-Card File" />
 			<dataarea name="cass" size="1962284">
@@ -909,7 +1008,9 @@ license:CC0-1.0
 		<description>Enchanted Island</description>
 		<year>1980</year>
 		<publisher>Mad Hatter Software</publisher>
-		<info name="usage" value="]Load 16K" />
+		<info name="author" value="Greg Hassett" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Enchanted Island" />
 			<dataarea name="cass" size="7966252">
@@ -922,8 +1023,9 @@ license:CC0-1.0
 		<description>Engineering Mathematics - 1</description>
 		<year>1979</year>
 		<publisher>Hayden Book Company</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="01304" />
-		<info name="usage" value="]Load 16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Engineering Mathematics 1" />
 			<dataarea name="cass" size="1662508">
@@ -936,7 +1038,9 @@ license:CC0-1.0
 		<description>Escape!</description>
 		<year>1978</year>
 		<publisher>Micro Users Software Exchange</publisher>
-		<info name="usage" value=">Load 16K" />
+		<info name="author" value="Silas S. Warner" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Escape" />
 			<dataarea name="cass" size="1820204">
@@ -963,8 +1067,9 @@ license:CC0-1.0
 		<description>Financial Wizard 2</description>
 		<year>1978</year>
 		<publisher>Powersoft, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="ADF0114" />
-		<info name="usage" value="]Load 16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Financial Wizard 2" />
 			<dataarea name="cass" size="3562540">
@@ -977,8 +1082,9 @@ license:CC0-1.0
 		<description>Financial Wizard 3</description>
 		<year>1978</year>
 		<publisher>Powersoft, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="ADF0115" />
-		<info name="usage" value="]Load 16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Financial Wizard 3" />
 			<dataarea name="cass" size="2872364">
@@ -991,8 +1097,9 @@ license:CC0-1.0
 		<description>Financial Wizard 4</description>
 		<year>1978</year>
 		<publisher>Powersoft, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="ADF0118" />
-		<info name="usage" value="]Load 16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Financial Wizard 4" />
 			<dataarea name="cass" size="2769964">
@@ -1005,8 +1112,10 @@ license:CC0-1.0
 		<description>Basic Finance I / Penny Arcade</description>
 		<year>1979</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="600-2025-00" />
-		<info name="usage" value="cass1 ]Load 16K, cass2 ]Load 16K" />
+		<info name="usage" value="cass1: ]Load" />
+		<info name="usage" value="cass2: ]Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Finance I" />
 			<dataarea name="cass" size="2721326">
@@ -1025,8 +1134,9 @@ license:CC0-1.0
 		<description>Football Predictions</description>
 		<year>1979</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="00184" />
-		<info name="usage" value="*200.4000R 16K" />
+		<info name="usage" value="*200.4000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Football Predictions" />
 			<dataarea name="cass" size="8885164">
@@ -1036,19 +1146,23 @@ license:CC0-1.0
 	</software>
 
 	<software name="forte">
-		<description>Forte / Forte Music</description>
+		<description>Forté</description>
 		<year>1979</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value="cass1 >Load 16K, cass2 2 programs after loading Forte 0:08 0:30 %Load" />
+		<info name="author" value="Gary J. Shannon" />
+		<info name="required_ram" value="16K" />
+		<info name="serial" value="FES-279" />
+		<info name="usage" value="cass1: >Load" />
+		<info name="usage" value="cass2: 2 programs after loading Forte 0:08 0:30 %Load" />
 		<!-- first music program doesn't load if tape started at beginning -->
 		<part name="cass1" interface="apple2_cass">
-			<feature name="part_id" value="Forte" />
+			<feature name="part_id" value="Side 1: Forté" />
 			<dataarea name="cass" size="2882604">
 				<rom name="forte (1979)(softape).wav" size="2882604" crc="8a397319" sha1="ca4d838645d0d3af8817bd375ebe4ecf0829a6c2"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
-			<feature name="part_id" value="Forte Music" />
+			<feature name="part_id" value="Side 2: Forté Music" />
 			<dataarea name="cass" size="2872364">
 				<rom name="forte music (1979)(softape).wav" size="2872364" crc="50aaa2a6" sha1="f2ef9dd28676d424b7140044217d67ee3cc3b023"/>
 			</dataarea>
@@ -1058,7 +1172,8 @@ license:CC0-1.0
 	<software name="funpaki">
 		<description>Funpak I</description>
 		<year>1978</year>
-		<publisher>System Design Lab</publisher>
+		<publisher>Systems Design Lab</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Funpak I" />
@@ -1072,6 +1187,7 @@ license:CC0-1.0
 		<description>Galaxian</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
+		<info name="required_ram" value="24K" />
 		<info name="usage" value="*800.1FFFR 1000G" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Galaxian" />
@@ -1085,8 +1201,9 @@ license:CC0-1.0
 		<description>Galaxy</description>
 		<year>1982</year>
 		<publisher>Microcomputer Games</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="4190101" />
-		<info name="usage" value="]Load 16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Galaxy" />
 			<dataarea name="cass" size="2049644">
@@ -1099,6 +1216,7 @@ license:CC0-1.0
 		<description>Galaxy Travel</description>
 		<year>1980</year>
 		<publisher>Tsukumo Original Software</publisher>
+		<info name="alt_title" value="ギャラクシートラベル" />
 		<info name="usage" value="*0200.6000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Galaxy Travel" />
@@ -1109,11 +1227,12 @@ license:CC0-1.0
 	</software>
 
 	<software name="gamepwb2">
-		<description>A Beginner's Guide to Game Prgrams and Number Programs (Tape 2)</description>
+		<description>A Beginner's Guide to Game Programs and Number Programs (Tape 2)</description>
 		<year>1977</year>
 		<publisher>Hayden Book Company</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="00304" />
-		<info name="usage" value="]Load 16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Beginner's Guide 2" />
 			<dataarea name="cass" size="1500972">
@@ -1126,8 +1245,9 @@ license:CC0-1.0
 		<description>A Beginner's Guide to Game Programs (Tape 3)</description>
 		<year>1977</year>
 		<publisher>Hayden Book Company</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="00404" />
-		<info name="usage" value="]Load 16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Beginner's Guide 3" />
 			<dataarea name="cass" size="1954604">
@@ -1140,7 +1260,9 @@ license:CC0-1.0
 		<description>Gammon Gambler</description>
 		<year>1979</year>
 		<publisher>Personal Software</publisher>
-		<info name="usage" value="]HGR ]POKE34,20 *30.3FFFR 16K" />
+		<info name="author" value="Willy Chaplin" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="]HGR ]POKE34,20 *30.3FFFR" />
 		<!-- 32k version on side B not dumped -->
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Gammon Gambler" />
@@ -1154,7 +1276,9 @@ license:CC0-1.0
 		<description>Global War</description>
 		<year>1979</year>
 		<publisher>Micro Users Software Exchange</publisher>
-		<info name="usage" value="]Load 32K" />
+		<info name="author" value="Alan Boyd" />
+		<info name="required_ram" value="32K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Global War" />
 			<dataarea name="cass" size="8757292">
@@ -1167,8 +1291,9 @@ license:CC0-1.0
 		<description>Guns of Fort Defiance</description>
 		<year>1981</year>
 		<publisher>Microcomputer Games</publisher>
+		<info name="required_ram" value="48K" />
 		<info name="serial" value="4130101" />
-		<info name="usage" value="]Load 48K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Guns of Fort Defiance" />
 			<dataarea name="cass" size="4169460">
@@ -1181,8 +1306,9 @@ license:CC0-1.0
 		<description>Haunted House</description>
 		<year>1978</year>
 		<publisher>Creative Computing Software</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="CS-4005" />
-		<info name="usage" value=">Load 16K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Haunted House" />
 			<dataarea name="cass" size="2004524">
@@ -1195,8 +1321,10 @@ license:CC0-1.0
 		<description>Hires Boxing</description>
 		<year>1979</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="partno" value="AP061" />
+		<info name="required_ram" value="24K" />
 		<info name="serial" value="00508" />
-		<info name="usage" value="*200.6000R 24K" />
+		<info name="usage" value="*200.6000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Hires Boxing" />
 			<dataarea name="cass" size="13711404">
@@ -1209,8 +1337,9 @@ license:CC0-1.0
 		<description>High Resolution Graphics</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="600-2016-00" />
-		<info name="usage" value="*C00.FFFR >Load >HIMEM:8192 16K" />
+		<info name="usage" value="*C00.FFFR >Load >HIMEM:8192" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="High Resolution Graphics" />
 			<dataarea name="cass" size="2788396">
@@ -1220,12 +1349,13 @@ license:CC0-1.0
 	</software>
 
 	<software name="hiresgrp">
-		<description>Highres Graphic Printer</description>
+		<description>Hires Graphic Printer</description>
 		<year>1979</year>
-		<publisher>System Design Lab</publisher>
+		<publisher>Systems Design Lab</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
-			<feature name="part_id" value="Highres Graphic Printer" />
+			<feature name="part_id" value="Hires Graphic Printer" />
 			<dataarea name="cass" size="2644780">
 				<rom name="hires graphic printer (1979)(systems design lab).wav" size="2644780" crc="59f0f006" sha1="1f1d1ca6389fcb797756adfcd5b4b6d9979f4e60"/>
 			</dataarea>
@@ -1233,12 +1363,13 @@ license:CC0-1.0
 	</software>
 
 	<software name="hirespla">
-		<description>Highres Playground</description>
+		<description>Hires Playground</description>
 		<year>1979</year>
-		<publisher>System Design Lab</publisher>
+		<publisher>Systems Design Lab</publisher>
+		<info name="required_ram" value="16K" /><!-- 24K required to use page 2 -->
 		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
-			<feature name="part_id" value="Highres Playground" />
+			<feature name="part_id" value="Hires Playground" />
 			<dataarea name="cass" size="2646572">
 				<rom name="hires playground (1979)(systems design lab).wav" size="2646572" crc="272178d3" sha1="6f56e644c9d093dac663735aa35bbd94df1aeb52"/>
 			</dataarea>
@@ -1249,8 +1380,11 @@ license:CC0-1.0
 		<description>Hangman / Color Math</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="partno" value="A2T0007X" />
+		<info name="required_ram" value="4K" />
 		<info name="serial" value="002-0010-00" />
-		<info name="usage" value="cass1 >Load 4K, cass2 >Load 4K" />
+		<info name="usage" value="cass1: >Load" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Hangman" />
 			<dataarea name="cass" size="1365000">
@@ -1269,8 +1403,9 @@ license:CC0-1.0
 		<description>Hopalong Cassidy / Lemonade Stand</description>
 		<year>1979</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="600-2026-00" />
-		<info name="usage" value="]Load 16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Hopalong Cassidy" />
 			<dataarea name="cass" size="4846636">
@@ -1289,7 +1424,11 @@ license:CC0-1.0
 		<description>House of Seven Gables / Journey to the Center of the Earth</description>
 		<year>19??</year>
 		<publisher>Compu-Things</publisher>
-		<info name="usage" value="cass1 ]Load 16K, cass2 ]Load 16K" />
+		<!-- May have been previously and separately released by Mad Hatter Software -->
+		<info name="author" value="Greg Hassett" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="cass1: ]Load" />
+		<info name="usage" value="cass2: ]Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="House of Seven Gables" />
 			<dataarea name="cass" size="11567148">
@@ -1308,7 +1447,9 @@ license:CC0-1.0
 		<description>I Got Mine</description>
 		<year>1978</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value=">Himem:8192 >Load 24K" />
+		<info name="author" value="Bill Depew" />
+		<info name="required_ram" value="24K" />
+		<info name="usage" value=">Himem:8192 >Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="I Got Mine" />
 			<dataarea name="cass" size="1796652">
@@ -1321,7 +1462,9 @@ license:CC0-1.0
 		<description>Journey to Atlantis</description>
 		<year>1979</year>
 		<publisher>Mad Hatter Software</publisher>
-		<info name="usage" value="]Load 16K" />
+		<info name="author" value="Greg Hassett" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Journey to Atlantis" />
 			<dataarea name="cass" size="7323180">
@@ -1334,6 +1477,9 @@ license:CC0-1.0
 		<description>Jupiter Express</description>
 		<year>1979</year>
 		<publisher>Softape</publisher>
+		<info name="author" value="Gary J. Shannon" />
+		<info name="required_ram" value="16K" />
+		<info name="serial" value="JES-179" />
 		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Jupiter Express" />
@@ -1347,8 +1493,11 @@ license:CC0-1.0
 		<description>Kaleidoscope</description>
 		<year>1978</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="author" value="Chris Oberth" />
+		<info name="partno" value="AP074" />
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="00435" />
-		<info name="usage" value="*200.2000R 16K" />
+		<info name="usage" value="*200.2000R" />
 		<!-- program doesn't load if tape started at beginning so start at 0:04 -->
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Kaleidoscope" />
@@ -1362,8 +1511,9 @@ license:CC0-1.0
 		<description>Lords of Karma</description>
 		<year>1980</year>
 		<publisher>Microcomputer Games</publisher>
+		<info name="required_ram" value="32K" />
 		<info name="serial" value="4005002" />
-		<info name="usage" value="*0800.7FFFR 0800G 32K" />
+		<info name="usage" value="*0800.7FFFR 0800G" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Lords of Karma" />
 			<dataarea name="cass" size="8095936">
@@ -1376,7 +1526,8 @@ license:CC0-1.0
 		<description>Kidstuff</description>
 		<year>1978</year>
 		<publisher>Speakeasy Software Ltd.</publisher>
-		<info name="usage" value=">Load 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Kidstuff" />
 			<dataarea name="cass" size="4413484">
@@ -1389,8 +1540,10 @@ license:CC0-1.0
 		<description>Laserblast</description>
 		<year>1979</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="partno" value="AP076" />
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="00034" />
-		<info name="usage" value="*200.2000R 16K" />
+		<info name="usage" value="*200.2000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Laserblast" />
 			<dataarea name="cass" size="2503468">
@@ -1403,7 +1556,9 @@ license:CC0-1.0
 		<description>Learning BASIC, Pt. 1 &amp; 2</description>
 		<year>1980</year>
 		<publisher>Innerglo</publisher>
-		<info name="usage" value="cass1 >Load 16K, cass2 >Load 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="cass1: >Load" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Learning BASIC part 1" />
 			<dataarea name="cass" size="9259564">
@@ -1422,7 +1577,8 @@ license:CC0-1.0
 		<description>Learning BASIC, Pt. 3</description>
 		<year>1980</year>
 		<publisher>Innerglo</publisher>
-		<info name="usage" value=">Load 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Learning BASIC part 3" />
 			<dataarea name="cass" size="9042988">
@@ -1435,8 +1591,10 @@ license:CC0-1.0
 		<description>Leases / Loans</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="002-0014-00" />
-		<info name="usage" value="cass1 ]Load 16K, cass2 ]Load 16K" />
+		<info name="usage" value="cass1: ]Load" />
+		<info name="usage" value="cass2: ]Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Leases" />
 			<dataarea name="cass" size="1874784">
@@ -1455,8 +1613,10 @@ license:CC0-1.0
 		<description>Lunar Lander</description>
 		<year>1979</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="partno" value="AP081" />
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="00393" />
-		<info name="usage" value="*200.2000R 16K" />
+		<info name="usage" value="*200.2000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Lunar Lander" />
 			<dataarea name="cass" size="4652332">
@@ -1469,7 +1629,8 @@ license:CC0-1.0
 		<description>Lunar Lander II</description>
 		<year>19??</year>
 		<publisher>Sensible Software</publisher>
-		<info name="usage" value="]Load 24K" />
+		<info name="required_ram" value="24K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Lunar Lander" />
 			<dataarea name="cass" size="2448940">
@@ -1482,8 +1643,11 @@ license:CC0-1.0
 		<description>Magic Squares</description>
 		<year>1979</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="author" value="David Kalmick" />
+		<info name="partno" value="AP083" />
+		<info name="required_ram" value="32K" />
 		<info name="serial" value="00193" />
-		<info name="usage" value="*200.6000R 32K" />
+		<info name="usage" value="*200.6000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Magic Squares" />
 			<dataarea name="cass" size="6194220">
@@ -1496,8 +1660,11 @@ license:CC0-1.0
 		<description>Match Wits</description>
 		<year>1978</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="author" value="R. J. Nitto" />
+		<info name="partno" value="AP085" />
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="00193" />
-		<info name="usage" value="*200.4000R 16K" />
+		<info name="usage" value="*200.4000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Match Wits" />
 			<dataarea name="cass" size="4586540">
@@ -1523,7 +1690,9 @@ license:CC0-1.0
 		<description>Maze Game</description>
 		<year>1978</year>
 		<publisher>Micro Users Software Exchange</publisher>
-		<info name="usage" value=">Load 16K" />
+		<info name="author" value="Silas S. Warner" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Maze Game" />
 			<dataarea name="cass" size="9117740">
@@ -1536,15 +1705,16 @@ license:CC0-1.0
 		<description>Memory Builder</description>
 		<year>1978</year>
 		<publisher>Program Design, Inc.</publisher>
-		<info name="usage" value="cass1 >Load, cass2 >Load" />
+		<info name="usage" value="cass1: >Load" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
-			<feature name="part_id" value="Memory Builder 1 &amp; 2" />
+			<feature name="part_id" value="Side A: Memory Builder 1 &amp; 2" />
 			<dataarea name="cass" size="4521260">
 				<rom name="memory builder (1978)(program design) side a.wav" size="4521260" crc="15211b88" sha1="49ffd89eea719bd99bb1ffa8221b511aefd5e973"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
-			<feature name="part_id" value="Memory Builder 3 &amp; 4" />
+			<feature name="part_id" value="Side B: Memory Builder 3 &amp; 4" />
 			<dataarea name="cass" size="4507180">
 				<rom name="memory builder (1978)(program design) side b.wav" size="4507180" crc="9b994c4e" sha1="e564271c02fe61dfbf4cf7d55e0525acbc827de9"/>
 			</dataarea>
@@ -1555,6 +1725,7 @@ license:CC0-1.0
 		<description>Memory Check</description>
 		<year>19??</year>
 		<publisher>Tsukumo Original Software</publisher>
+		<info name="alt_title" value="メモリーチェック" />
 		<info name="usage" value="*0030.03FFR" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Memory Check" />
@@ -1568,7 +1739,8 @@ license:CC0-1.0
 		<description>Microchess 2.0</description>
 		<year>1978</year>
 		<publisher>Personal Software</publisher>
-		<info name="usage" value="*2000.2200R 2000G 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="*2000.2200R 2000G" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Microchess 2.0" />
 			<dataarea name="cass" size="4349366">
@@ -1581,7 +1753,10 @@ license:CC0-1.0
 		<description>Microgammon 1.0</description>
 		<year>1979</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value=">Load 16K" />
+		<info name="author" value="Steve Baker" />
+		<info name="required_ram" value="16K" />
+		<info name="serial" value="MGB-279" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Microgammon 1.0" />
 			<dataarea name="cass" size="4144428">
@@ -1594,8 +1769,10 @@ license:CC0-1.0
 		<description>Micro Invaders</description>
 		<year>1979</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="author" value="ESD Laboratory Co." />
+		<info name="required_ram" value="24K" />
 		<info name="serial" value="01301" />
-		<info name="usage" value="*200.4000R 24K" />
+		<info name="usage" value="*200.4000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Micro Invaders" />
 			<dataarea name="cass" size="8362028">
@@ -1608,7 +1785,8 @@ license:CC0-1.0
 		<description>microtrivia</description>
 		<year>1978</year>
 		<publisher>Speakeasy Software Ltd.</publisher>
-		<info name="usage" value=">Load 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Microtrivia" />
 			<dataarea name="cass" size="3970604">
@@ -1621,8 +1799,9 @@ license:CC0-1.0
 		<description>Midway Campaign</description>
 		<year>1980</year>
 		<publisher>Microcomputer Games</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="4001002" />
-		<info name="usage" value="]Load 16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Midway Campaign" />
 			<dataarea name="cass" size="4139402">
@@ -1635,6 +1814,8 @@ license:CC0-1.0
 		<description>Missile Command v1.2</description>
 		<year>1981</year>
 		<publisher>Urban E. Soft</publisher>
+		<info name="required_ram" value="48K" />
+		<info name="serial" value="APMG-02" />
 		<info name="usage" value="*30.7FFFR" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Missile Command" />
@@ -1649,7 +1830,12 @@ license:CC0-1.0
 		<description>Don't Fall! / Memory Aide</description>
 		<year>1978</year>
 		<publisher>Magnemedia Inc.</publisher>
-		<info name="usage" value="cass1 audio, cass2 >Load 8K, cass3 audio, cass4 >Load 8K" />
+		<info name="required_ram" value="cass2: 8K" />
+		<info name="required_ram" value="cass4: 8K" />
+		<info name="usage" value="cass1: audio" />
+		<info name="usage" value="cass2: >Load" />
+		<info name="usage" value="cass3: audio" />
+		<info name="usage" value="cass4: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Don't Fall Instructions" />
 			<dataarea name="cass" size="9620780">
@@ -1681,7 +1867,12 @@ license:CC0-1.0
 		<description>Grading Routine / Drawing</description>
 		<year>1978</year>
 		<publisher>Magnemedia Inc.</publisher>
-		<info name="usage" value="cass1 audio, cass2 >Load 16K, cass3 audio, cass4 >Load 4K" />
+		<info name="required_ram" value="cass2: 16K" />
+		<info name="required_ram" value="cass4: 4K" />
+		<info name="usage" value="cass1: audio" />
+		<info name="usage" value="cass2: >Load" />
+		<info name="usage" value="cass3: audio" />
+		<info name="usage" value="cass4: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Grading Routine Instructions" />
 			<dataarea name="cass" size="9923116">
@@ -1713,7 +1904,12 @@ license:CC0-1.0
 		<description>Study Aide / Keyboard Organ</description>
 		<year>1978</year>
 		<publisher>Magnemedia Inc.</publisher>
-		<info name="usage" value="cass1 audio, cass2 >Load 8K, cass3 audio, cass4 >Load 4K" />
+		<info name="required_ram" value="cass2: 8K" />
+		<info name="required_ram" value="cass4: 4K" />
+		<info name="usage" value="cass1: audio" />
+		<info name="usage" value="cass2: >Load" />
+		<info name="usage" value="cass3: audio" />
+		<info name="usage" value="cass4: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Study Aide Instructions" />
 			<dataarea name="cass" size="15785516">
@@ -1745,7 +1941,12 @@ license:CC0-1.0
 		<description>Super Math / True/False Quiz</description>
 		<year>1978</year>
 		<publisher>Magnemedia Inc.</publisher>
-		<info name="usage" value="cass1 audio, cass2 >Load 16K, cass3 audio, cass4 >Load 4K" />
+		<info name="required_ram" value="cass2: 16K" />
+		<info name="required_ram" value="cass4: 4K" />
+		<info name="usage" value="cass1: audio" />
+		<info name="usage" value="cass2: >Load" />
+		<info name="usage" value="cass3: audio" />
+		<info name="usage" value="cass4: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Supermath Instructions" />
 			<dataarea name="cass" size="10584108">
@@ -1777,7 +1978,12 @@ license:CC0-1.0
 		<description>Variable Message / Matching Quiz</description>
 		<year>1978</year>
 		<publisher>Magnemedia Inc.</publisher>
-		<info name="usage" value="cass1 audio, cass2 >Load 8K, cass3 audio, cass4 >Load 4K" />
+		<info name="required_ram" value="cass2: 8K" />
+		<info name="required_ram" value="cass4: 4K" />
+		<info name="usage" value="cass1: audio" />
+		<info name="usage" value="cass2: >Load" />
+		<info name="usage" value="cass3: audio" />
+		<info name="usage" value="cass4: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Variable Message Instructions" />
 			<dataarea name="cass" size="19404332">
@@ -1805,10 +2011,11 @@ license:CC0-1.0
 	</software>
 
 	<software name="module1">
-		<description>Module 1</description>
+		<description>Instant Library: Module 1</description>
 		<year>1978</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value="*30.3FFFR 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="*30.3FFFR" />
 		<!-- side 2 not dumped -->
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Module 1: Advanced Dragon Maze, Digital Derby, Saucer War" />
@@ -1819,10 +2026,11 @@ license:CC0-1.0
 	</software>
 
 	<software name="module2">
-		<description>Module 2</description>
+		<description>Instant Library: Module 2</description>
 		<year>1978</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value="*30.3FFFR 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="*30.3FFFR" />
 		<!-- program doesn't load if tape started at beginning so start at 0:08 or second copy at 1:10 -->
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Module 2: 3-D plot, Etch-A-Sketch, Star" />
@@ -1833,10 +2041,11 @@ license:CC0-1.0
 	</software>
 
 	<software name="module3">
-		<description>Module 3</description>
+		<description>Instant Library: Module 3</description>
 		<year>1978</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value="*30.3FFFR 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="*30.3FFFR" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Module 3: Othello, Mastermind, Seven" />
 			<dataarea name="cass" size="5348396">
@@ -1846,10 +2055,11 @@ license:CC0-1.0
 	</software>
 
 	<software name="module4">
-		<description>Module 4</description>
+		<description>Instant Library: Module 4</description>
 		<year>1978</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value="*30.3FFFR 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="*30.3FFFR" />
 		<!-- program doesn't load if tape started at beginning so start at second copy at 1:50 -->
 		<!-- side 2 not dumped -->
 		<part name="cass" interface="apple2_cass">
@@ -1861,10 +2071,11 @@ license:CC0-1.0
 	</software>
 
 	<software name="module5">
-		<description>Module 5</description>
+		<description>Instant Library: Module 5</description>
 		<year>1978</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value="*30.3FFFR 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="*30.3FFFR" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Module 5: Awari, Towers of Hanoi, Hex-Pawn" />
 			<dataarea name="cass" size="5303340">
@@ -1874,10 +2085,11 @@ license:CC0-1.0
 	</software>
 
 	<software name="module6">
-		<description>Module 6</description>
+		<description>Instant Library: Module 6</description>
 		<year>1978</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value="*30.3FFFR 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="*30.3FFFR" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Module 6: Apple '21'" />
 			<dataarea name="cass" size="5631020">
@@ -1887,10 +2099,11 @@ license:CC0-1.0
 	</software>
 
 	<software name="module7">
-		<description>Module 7</description>
+		<description>Instant Library: Module 7</description>
 		<year>1978</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value="*30.3FFFR 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="*30.3FFFR" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Module 7: Hyper-Life, 8 Color Demos" />
 			<dataarea name="cass" size="5633068">
@@ -1900,10 +2113,11 @@ license:CC0-1.0
 	</software>
 
 	<software name="module8">
-		<description>Module 8</description>
+		<description>Instant Library: Module 8</description>
 		<year>1978</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value="*30.3FFFR 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="*30.3FFFR" />
 		<!-- program doesn't load if tape started at beginning so start at 0:05 second copy at 1:50 -->
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Module 8: UFO, Clean Sweep/Pong Practice, Star Wars, Luner Lander" />
@@ -1917,7 +2131,8 @@ license:CC0-1.0
 		<description>Dunjonquest: Morloc's Tower</description>
 		<year>1979</year>
 		<publisher>Automated Simulations</publisher>
-		<info name="usage" value="]Load 48K" />
+		<info name="required_ram" value="48K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Dunjonquest Morloc's Tower" />
 			<dataarea name="cass" size="8045612">
@@ -1930,8 +2145,11 @@ license:CC0-1.0
 		<description>Moto-Cross</description>
 		<year>1979</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="author" value="Chris Oberth" />
+		<info name="partno" value="AP087" />
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="00194" />
-		<info name="usage" value="*200.2000R 16K" />
+		<info name="usage" value="*200.2000R" />
 		<!-- program doesn't load if tape started at beginning so start at 0:06 -->
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Moto-Cross" />
@@ -1945,7 +2163,9 @@ license:CC0-1.0
 		<description>Music Box and Kaleidoscope</description>
 		<year>1978</year>
 		<publisher>Micro Users Software Exchange</publisher>
-		<info name="usage" value=">*300.1B00R 8K" />
+		<info name="author" value="E. Zaron" />
+		<info name="required_ram" value="8K" />
+		<info name="usage" value=">*300.1B00R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Music Box" />
 			<dataarea name="cass" size="2036268">
@@ -1958,15 +2178,19 @@ license:CC0-1.0
 		<description>Music Kaleidoscope</description>
 		<year>1979</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value="cass1 >Load 4K, cass2 ]Load 4K" />
+		<info name="author" value="Bob Bishop" />
+		<info name="required_ram" value="4K" />
+		<info name="serial" value="COB-878" />
+		<info name="usage" value="cass1: >Load" />
+		<info name="usage" value="cass2: ]Load" />
 		<part name="cass1" interface="apple2_cass">
-			<feature name="part_id" value="Music Kaleidoscope" />
+			<feature name="part_id" value="Side 1: Music Kaleidoscope (Integer BASIC)" />
 			<dataarea name="cass" size="2955820">
 				<rom name="music kaleidoscope (1979)(softape) side 1.wav" size="2955820" crc="9ef30815" sha1="d4fe23e351110d4dd7930dfab0b10851357344dc"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
-			<feature name="part_id" value="Music Kaleidoscope" />
+			<feature name="part_id" value="Side 2: Music Kaleidoscope (Applesoft)" />
 			<dataarea name="cass" size="7469612">
 				<rom name="music kaleidoscope (1979)(softape) side 2.wav" size="7469612" crc="a5d03e48" sha1="81fb90cd5b30cd7fa8c6f169e6d234dd96b90656"/>
 			</dataarea>
@@ -1977,8 +2201,9 @@ license:CC0-1.0
 		<description>North Atlantic Convoy Raider</description>
 		<year>1980</year>
 		<publisher>Microcomputer Games</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="4002002" />
-		<info name="usage" value="]Load 16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="North Atlantic Convoy Raider" />
 			<dataarea name="cass" size="2596010">
@@ -1991,8 +2216,9 @@ license:CC0-1.0
 		<description>Oil Tycoon</description>
 		<year>1980</year>
 		<publisher>Instant Software, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="0079A" />
-		<info name="usage" value="]Load 16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Oil Tycoon" />
 			<dataarea name="cass" size="6613036">
@@ -2018,15 +2244,20 @@ license:CC0-1.0
 		<description>Othello</description>
 		<year>1979</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value="cass1 >Load 16K, cass2 ]Load 16K" />
+		<info name="alt_title" value="Super Othello" />
+		<info name="author" value="Gary Shannon" />
+		<info name="required_ram" value="16K" />
+		<info name="serial" value="OHS-279" />
+		<info name="usage" value="cass1: >Load" />
+		<info name="usage" value="cass2: ]Load" />
 		<part name="cass1" interface="apple2_cass">
-			<feature name="part_id" value="Othello" />
+			<feature name="part_id" value="Side 1: Othello (Integer BASIC)" />
 			<dataarea name="cass" size="4076588">
 				<rom name="othello (1979)(softape) side 1.wav" size="4076588" crc="55e45fe2" sha1="ffa69cefa9b0cbe3e3e583301b75f0eb5f0317e5"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
-			<feature name="part_id" value="Othello" />
+			<feature name="part_id" value="Side 2: Othello (Applesoft)" />
 			<dataarea name="cass" size="4403756">
 				<rom name="othello (1979)(softape) side 2.wav" size="4403756" crc="6b81866b" sha1="430b5c4ec8f93f9e21a5dd964f62abf3a525cb8c"/>
 			</dataarea>
@@ -2037,7 +2268,8 @@ license:CC0-1.0
 		<description>The Patient Professor 16K</description>
 		<year>1980</year>
 		<publisher>Innerglo</publisher>
-		<info name="usage" value=">Load 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Patient Professor" />
 			<dataarea name="cass" size="9436716">
@@ -2050,7 +2282,8 @@ license:CC0-1.0
 		<description>The Patient Professor 24K</description>
 		<year>1980</year>
 		<publisher>Innerglo</publisher>
-		<info name="usage" value=">Load 24K" />
+		<info name="required_ram" value="24K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Patient Professor" />
 			<dataarea name="cass" size="13443116">
@@ -2063,7 +2296,9 @@ license:CC0-1.0
 		<description>Peg Jump</description>
 		<year>1979</year>
 		<publisher>Programma International, Inc.</publisher>
-		<info name="usage" value="*200.2000R 16K" />
+		<info name="partno" value="AP090" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="*200.2000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Peg Jump" />
 			<dataarea name="cass" size="4906388">
@@ -2076,8 +2311,11 @@ license:CC0-1.0
 		<description>Phasor Zap</description>
 		<year>1978</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="author" value="Chris Oberth" />
+		<info name="partno" value="AP093" />
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="00097" />
-		<info name="usage" value="*200.2000R 16K" />
+		<info name="usage" value="*200.2000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Phasor Zap" />
 			<dataarea name="cass" size="5661020">
@@ -2090,8 +2328,11 @@ license:CC0-1.0
 		<description>Pinball / Infinite Number of Monkeys</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="author" value="C. Kellner (Pinball)" />
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="685-0006-00" />
-		<info name="usage" value="cass1 >Load 16K, cass2 >Load 16K" />
+		<info name="usage" value="cass1: >Load" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Pinball" />
 			<dataarea name="cass" size="5128556">
@@ -2107,13 +2348,15 @@ license:CC0-1.0
 	</software>
 
 	<software name="pirates">
-		<description>Pirates!</description>
+		<description>Pirates</description>
 		<year>1978</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="author" value="Don Graham" />
+		<info name="required_ram" value="8K" />
 		<info name="serial" value="00189" />
-		<info name="usage" value="*200.4000R 8K" />
+		<info name="usage" value="*200.4000R" />
 		<part name="cass" interface="apple2_cass">
-			<feature name="part_id" value="Pirates!" />
+			<feature name="part_id" value="Pirates" />
 			<dataarea name="cass" size="5294124">
 				<rom name="pirates (1978)(programma international, inc.).wav" size="5294124" crc="400133d2" sha1="f8b3269b4995bfc113bdcef8d2a18683f6349e03"/>
 			</dataarea>
@@ -2124,8 +2367,9 @@ license:CC0-1.0
 		<description>Planet Miners</description>
 		<year>1981</year>
 		<publisher>Microcomputer Games</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="4004001" />
-		<info name="usage" value="]Load 16K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Planet Miners" />
 			<dataarea name="cass" size="4165402">
@@ -2139,7 +2383,8 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Adventure International</publisher>
 		<info name="programmer" value="Marc Goodman" />
-		<info name="usage" value="*800.1E66R 800G 24K" />
+		<info name="required_ram" value="24K" />
+		<info name="usage" value="*800.1E66R 800G" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Planetoids" />
 			<dataarea name="cass" size="4227450">
@@ -2152,15 +2397,16 @@ license:CC0-1.0
 		<description>Preschool IQ-Builder</description>
 		<year>1978</year>
 		<publisher>Program Design, Inc.</publisher>
-		<info name="usage" value="cass1 >Load 6 programs 0:00 0:48 1:47 2:46 3:36 4:36, cass2 >Load" />
+		<info name="usage" value="cass1: >Load 6 programs 0:00 0:48 1:47 2:46 3:36 4:36" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
-			<feature name="part_id" value="Same and Different" />
+			<feature name="part_id" value="Side A: Same and Different" />
 			<dataarea name="cass" size="6924332">
 				<rom name="preschool iq builder (1978)(program design, inc.) side 1.wav" size="6924332" crc="e29302ae" sha1="e99e8452651dee538fad6bf18bcba9a347c4c1a9"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
-			<feature name="part_id" value="Letter Builder" />
+			<feature name="part_id" value="Side B: Letter Builder" />
 			<dataarea name="cass" size="720172">
 				<rom name="preschool iq builder (1978)(program design, inc.) side 2.wav" size="720172" crc="d1fe773c" sha1="896a0ea693c2753ea1180b27aaa8de47edf51ca1"/>
 			</dataarea>
@@ -2168,9 +2414,12 @@ license:CC0-1.0
 	</software>
 
 	<software name="puckman">
-		<description>Puck Man</description>
+		<description>Apple Puck Man</description>
 		<year>1981</year>
 		<publisher>Star Craft</publisher>
+		<info name="programmer" value="Jun Wada" />
+		<info name="required_ram" value="48K" />
+		<info name="serial" value="AG-018" />
 		<info name="usage" value="*200.1200R" />
 		<part name="cass" interface="apple2_cass">
 			<dataarea name="cass" size="13283372">
@@ -2183,7 +2432,8 @@ license:CC0-1.0
 		<description>Quiz Baseball</description>
 		<year>1980</year>
 		<publisher>Innerglo</publisher>
-		<info name="usage" value=">Load 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Quiz Baseball" />
 			<dataarea name="cass" size="8737324">
@@ -2196,15 +2446,18 @@ license:CC0-1.0
 		<description>Racer</description>
 		<year>1979</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value="cass1 >Load 24K, cass2 ]Load 24K" />
+		<info name="author" value="Lou Haehn" />
+		<info name="required_ram" value="24K" />
+		<info name="usage" value="cass1: >Load" />
+		<info name="usage" value="cass2: ]Load" />
 		<part name="cass1" interface="apple2_cass">
-			<feature name="part_id" value="Racer" />
+			<feature name="part_id" value="Side 1: Racer (Integer BASIC)" />
 			<dataarea name="cass" size="1743916">
 				<rom name="racer (1979)(softape) side 1.wav" size="1743916" crc="9fa3e14d" sha1="5a6239e82e28caf066b493807f7fbc45cd258ff1"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
-			<feature name="part_id" value="Racer" />
+			<feature name="part_id" value="Side 2: Racer (Applesoft)" />
 			<dataarea name="cass" size="2028076">
 				<rom name="racer (1979)(softape) side 2.wav" size="2028076" crc="6759ee32" sha1="19c9745ad458d7aed5007c3d008e84559b4d9a4c"/>
 			</dataarea>
@@ -2215,8 +2468,9 @@ license:CC0-1.0
 		<description>Radar Interceptor</description>
 		<year>1978</year>
 		<publisher>Powersoft, Inc.</publisher>
+		<info name="required_ram" value="32K" />
 		<info name="serial" value="AHG0125" />
-		<info name="usage" value=">Load 32K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Radar Interceptor" />
 			<dataarea name="cass" size="10623600">
@@ -2229,9 +2483,10 @@ license:CC0-1.0
 		<description>RAM Test</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
-		<info name="serial" value="600-2003-00" />
 		<info name="partno" value="A2T0006X" />
-		<info name="usage" value="*280.3FFR start.length CTRL+Y 4K" />
+		<info name="required_ram" value="4K" />
+		<info name="serial" value="600-2003-00" />
+		<info name="usage" value="*280.3FFR start.length CTRL+Y" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="RAM Test" />
 			<dataarea name="cass" size="1430664">
@@ -2257,6 +2512,8 @@ license:CC0-1.0
 		<description>Renju</description>
 		<year>1980</year>
 		<publisher>Tsukumo Electronics</publisher>
+		<info name="alt_title" value="連珠" />
+		<info name="required_ram" value="24K" />
 		<info name="usage" value="*200.3FFR" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Renju" />
@@ -2270,7 +2527,10 @@ license:CC0-1.0
 		<description>Retreat</description>
 		<year>1978</year>
 		<publisher>Programma International, Inc.</publisher>
-		<info name="usage" value="*200.2000R 8K" />
+		<info name="author" value="Don Graham" />
+		<info name="partno" value="AP101" />
+		<info name="required_ram" value="8K" />
+		<info name="usage" value="*200.2000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Retreat" />
 			<dataarea name="cass" size="5260494">
@@ -2283,8 +2543,9 @@ license:CC0-1.0
 		<description>Revive - A Utility Program for the Apple</description>
 		<year>1979</year>
 		<publisher>Hayden Book Company</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="03604" />
-		<info name="usage" value="*300.3CFR 16K" />
+		<info name="usage" value="*300.3CFR" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Revive" />
 			<dataarea name="cass" size="944428">
@@ -2297,8 +2558,9 @@ license:CC0-1.0
 		<description>Rocket Pilot</description>
 		<year>1978</year>
 		<publisher>Powersoft, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="ADG0101" />
-		<info name="usage" value="*4A.FFR800.1FFFR Ctrl+C 16K" />
+		<info name="usage" value="*4A.FFR800.1FFFR Ctrl+C" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Rocket Pilot" />
 			<dataarea name="cass" size="7916076">
@@ -2311,7 +2573,9 @@ license:CC0-1.0
 		<description>Road Race / Saucer War</description>
 		<year>19??</year>
 		<publisher>Wise Owl Workshop</publisher>
-		<info name="usage" value="cass1 *800.2000R Ctrl+B LOMEM:8000 >Load, cass2 >Load" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="cass1: *800.2000R Ctrl+B LOMEM:8000 >Load" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Road Race" />
 			<dataarea name="cass" size="6708268">
@@ -2330,7 +2594,9 @@ license:CC0-1.0
 		<description>Roulette</description>
 		<year>1979</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value=">Load 24K" />
+		<info name="author" value="Roger Walker" />
+		<info name="required_ram" value="24K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Roulette" />
 			<dataarea name="cass" size="3073068">
@@ -2343,8 +2609,10 @@ license:CC0-1.0
 		<description>Sahara Warriors Commando / French Foreign Legion</description>
 		<year>1979</year>
 		<publisher>Instant Software, Inc.</publisher>
+		<info name="required_ram" value="8K" />
 		<info name="serial" value="0080A" />
-		<info name="usage" value="cass1 >Load 8K, cass2 >Load 8K" />
+		<info name="usage" value="cass1: >Load" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Sahara Warriors Commando" />
 			<dataarea name="cass" size="3418412">
@@ -2363,8 +2631,9 @@ license:CC0-1.0
 		<description>Sargon I</description>
 		<year>1979</year>
 		<publisher>Hayden Book Company</publisher>
+		<info name="required_ram" value="24K" />
 		<info name="serial" value="00604" />
-		<info name="usage" value="*800.2CFFR 800G 24K" />
+		<info name="usage" value="*800.2CFFR 800G" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Sargon I" />
 			<dataarea name="cass" size="3535916">
@@ -2377,8 +2646,9 @@ license:CC0-1.0
 		<description>Sargon II</description>
 		<year>1979</year>
 		<publisher>Hayden Book Company</publisher>
+		<info name="required_ram" value="24K" />
 		<info name="serial" value="03404" />
-		<info name="usage" value="*30.3FFR 24K" />
+		<info name="usage" value="*30.3FFR" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Sargon II" />
 			<dataarea name="cass" size="3978796">
@@ -2391,8 +2661,9 @@ license:CC0-1.0
 		<description>Saucer Invasion</description>
 		<year>1978</year>
 		<publisher>Powersoft, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="ADG0102" />
-		<info name="usage" value="*4A.FFR800.1FFFR Ctrl+C 16K" />
+		<info name="usage" value="*4A.FFR800.1FFFR Ctrl+C" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Saucer Invasion" />
 			<dataarea name="cass" size="7673900">
@@ -2406,7 +2677,10 @@ license:CC0-1.0
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
 		<info name="serial" value="002-0015-00" />
-		<info name="usage" value="cass1 ]Load 16K, cass2 ]Load 20K" />
+		<info name="required_ram" value="cass1: 16K" />
+		<info name="required_ram" value="cass2: 20K" />
+		<info name="usage" value="cass1: ]Load" />
+		<info name="usage" value="cass2: ]Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Savings" />
 			<dataarea name="cass" size="3288108">
@@ -2422,10 +2696,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="soft8103">
-		<description>Softside Mar 1981</description>
+		<description>SoftSide March 1981 (V3N6)</description>
 		<year>1981</year>
-		<publisher>Softside</publisher>
-		<info name="usage" value="]Load 4 programs: Title 0:00, Minigolf 0:33, Strategy Strike 1:40, Math Decathlon 2:40" />
+		<publisher>SoftSide Publications</publisher>
+		<info name="usage" value="]Load 4 programs: Title 0:00, Mini Golf 0:33, Strategy Strike 1:40, Math Decathlon 2:40" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide Mar 1981" />
 			<dataarea name="cass" size="9112502">
@@ -2435,9 +2709,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="soft8105">
-		<description>Softside May 1981</description>
+		<description>SoftSide May 1981 (V4N8)</description>
 		<year>1981</year>
-		<publisher>Softside</publisher>
+		<publisher>SoftSide Publications</publisher>
 		<info name="usage" value="]Load 4 programs: Title 0:00, Math Decathlon 0:37, Galaxia 2:18, Trivia 3:28" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide May 1981" />
@@ -2448,9 +2722,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="soft8106">
-		<description>Softside June 1981</description>
+		<description>SoftSide June 1981 (V4N9)</description>
 		<year>1981</year>
-		<publisher>Softside</publisher>
+		<publisher>SoftSide Publications</publisher>
 		<info name="usage" value="]Load 3 programs: 0:00 Hexadecimal Puzzle, 0:48 Old Glory, 1:30 Math Decathlon" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide June 1981" />
@@ -2461,9 +2735,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="soft8107">
-		<description>Softside July 1981</description>
+		<description>SoftSide July 1981 (V4N10)</description>
 		<year>1981</year>
-		<publisher>Softside</publisher>
+		<publisher>SoftSide Publications</publisher>
 		<info name="usage" value="]Load 4 programs: 0:00 Kidnapped, 1:49 4-Player Volleyball, 2:44 Micro-Drafter, 3:51 Chemistry Drill" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide July 1981" />
@@ -2474,9 +2748,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="soft8108">
-		<description>Softside August 1981</description>
+		<description>SoftSide August 1981 (V4N11)</description>
 		<year>1981</year>
-		<publisher>Softside</publisher>
+		<publisher>SoftSide Publications</publisher>
 		<info name="usage" value="]Load 3 programs: 0:00 Shark, 0:52 Quest 1, 2:30 Battlefield" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide August 1981" />
@@ -2487,9 +2761,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="soft8109">
-		<description>Softside September 1981</description>
+		<description>SoftSide September 1981 (V4N12)</description>
 		<year>1981</year>
-		<publisher>Softside</publisher>
+		<publisher>SoftSide Publications</publisher>
 		<info name="usage" value="]Load 3 programs: 0:00 Orienteering at Jacque's Coulee, 2:00 Challenge!, 3:27 Mixed Graphics and Text" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide September 1981" />
@@ -2500,9 +2774,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="soft8110">
-		<description>Softside October 1981</description>
+		<description>SoftSide October 1981 (V5N1)</description>
 		<year>1981</year>
-		<publisher>Softside</publisher>
+		<publisher>SoftSide Publications</publisher>
 		<info name="usage" value="]Load 2 programs: 0:00 Leyte, 1:06 The Arena of the Octos" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide October 1981" />
@@ -2513,9 +2787,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="soft8112">
-		<description>Softside December 1981</description>
+		<description>SoftSide December 1981 (V5N3)</description>
 		<year>1981</year>
-		<publisher>Softside</publisher>
+		<publisher>SoftSide Publications</publisher>
 		<info name="usage" value="]Load 3 programs: 0:00 Titan, 1:42 Microtext 1.0, 2:33 Aircraft Commander" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide December 1981" />
@@ -2526,9 +2800,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="soft8201">
-		<description>Softside January 1982</description>
+		<description>SoftSide January 1982 (V5N4)</description>
 		<year>1982</year>
-		<publisher>Softside</publisher>
+		<publisher>SoftSide Publications</publisher>
 		<info name="usage" value="]Load 4 programs: 0:00 Gambler, 1:40 Word Wars, 3:05 Microtext 1.1, 4:03 Apple Capture" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide January 1982" />
@@ -2539,9 +2813,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="soft8205">
-		<description>Softside May 1982</description>
+		<description>SoftSide May 1982 (V5N8)</description>
 		<year>1982</year>
-		<publisher>Softside</publisher>
+		<publisher>SoftSide Publications</publisher>
 		<info name="usage" value="]Load 4 programs: 0:00 and 0:50 Solitaire, 1:43 Micro-Man, 2:43 Remark Writer-Formatter, 3:13 April F.O.O.L.S." />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SoftSide May 1982" />
@@ -2552,12 +2826,12 @@ license:CC0-1.0
 	</software>
 
 	<software name="soft8207">
-		<description>Softside July 1982</description>
+		<description>SoftSide June/July 1982 (V5N9, #30)</description>
 		<year>1982</year>
-		<publisher>Softside</publisher>
-		<info name="usage" value="]Load 5 programs: 0:00 Escape from the Dungeon of the Gods, 1:35 Swat, 2:08 Code Breaker, 3:03 Defined Function, 3:38 Space Float" />
+		<publisher>SoftSide Publications</publisher>
+		<info name="usage" value="]Load 5 programs: 0:00 Escape from the Dungeon of the Gods, 1:35 SWAT, 2:08 Code Breaker, 3:03 Defined Function, 3:38 Space Float" />
 		<part name="cass" interface="apple2_cass">
-			<feature name="part_id" value="SoftSide July 1982" />
+			<feature name="part_id" value="SoftSide Issue 30" />
 			<dataarea name="cass" size="5479212">
 				<rom name="softside jul 1982 (1982)(softside).wav" size="5479212" crc="4c4363e4" sha1="f3cd6557ed709c13555b0cc67091fdbf40026104"/>
 			</dataarea>
@@ -2565,12 +2839,12 @@ license:CC0-1.0
 	</software>
 
 	<software name="soft820a">
-		<description>Softside July 1982 Computers in Education</description>
+		<description>SoftSide August 1982 (V5N10, #31)</description>
 		<year>1982</year>
-		<publisher>Softside</publisher>
-		<info name="usage" value="]Load 3 programs: 0:00 Cats, 1:02 Snake Scramble, 1:33 Puzzle Jumble" />
+		<publisher>SoftSide Publications</publisher>
+		<info name="usage" value="]Load 3 programs: 0:00 C.A.T.S., 1:02 Snake Scramble, 1:33 Puzzle Jumble" />
 		<part name="cass" interface="apple2_cass">
-			<feature name="part_id" value="SoftSide July 1982 Computers in Education" />
+			<feature name="part_id" value="SoftSide Issue 31" />
 			<dataarea name="cass" size="3550764">
 				<rom name="softside jul 1982 computers in education (1982)(softside).wav" size="3550764" crc="6ae8be1c" sha1="b712888c96329b2c3c9a0c50b2bac98d4b784e5e"/>
 			</dataarea>
@@ -2581,8 +2855,9 @@ license:CC0-1.0
 		<description>Songs in the Key of Apple</description>
 		<year>1979</year>
 		<publisher>Hayden Book Company</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="03304" />
-		<info name="usage" value=">Load 16K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Songs in the Key of Apple" />
 			<dataarea name="cass" size="1653036">
@@ -2595,8 +2870,9 @@ license:CC0-1.0
 		<description>Space Maze</description>
 		<year>1978</year>
 		<publisher>Powersoft, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="ADG0104" />
-		<info name="usage" value="*4A.FFR800.1FFFR Ctrl+C 16K" />
+		<info name="usage" value="*4A.FFR800.1FFFR Ctrl+C" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Space Maze" />
 			<dataarea name="cass" size="7637548">
@@ -2609,8 +2885,9 @@ license:CC0-1.0
 		<description>Space War</description>
 		<year>1979</year>
 		<publisher>Instant Software, Inc.</publisher>
+		<info name="required_ram" value="8K" />
 		<info name="serial" value="0096A" />
-		<info name="usage" value=">Load 8K" />
+		<info name="usage" value=">Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Space War" />
 			<dataarea name="cass" size="1437740">
@@ -2623,8 +2900,11 @@ license:CC0-1.0
 		<description>Speedway</description>
 		<year>1979</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="author" value="Bob Flannagan" />
+		<info name="partno" value="AP109" />
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="00190" />
-		<info name="usage" value="*200.2000R 16K" />
+		<info name="usage" value="*200.2000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Speedway" />
 			<dataarea name="cass" size="2460716">
@@ -2637,8 +2917,9 @@ license:CC0-1.0
 		<description>Spider Tag</description>
 		<year>1980</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="00125" />
-		<info name="usage" value="*200.2000R 16K" />
+		<info name="usage" value="*200.2000R" />
 		<!-- program doesn't load if tape started at beginning so start at 0:17 -->
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Spider Tag" />
@@ -2652,7 +2933,9 @@ license:CC0-1.0
 		<description>Star Blazer</description>
 		<year>1981</year>
 		<publisher>Star Craft</publisher>
-		<info name="usage" value="*30.3FFR 48K" />
+		<info name="author" value="Tony Suzuki" />
+		<info name="required_ram" value="48K" />
+		<info name="usage" value="*30.3FFR" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Star Blazer" />
 			<dataarea name="cass" size="3793196">
@@ -2665,7 +2948,8 @@ license:CC0-1.0
 		<description>Starquest: Rescue at Rigel</description>
 		<year>1980</year>
 		<publisher>Automated Simulations</publisher>
-		<info name="usage" value="]Load 32K" />
+		<info name="required_ram" value="32K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Star Quest Rescue at Rigel" />
 			<dataarea name="cass" size="25599020">
@@ -2678,8 +2962,9 @@ license:CC0-1.0
 		<description>Star Wars</description>
 		<year>1978</year>
 		<publisher>Powersoft, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="ADG0103" />
-		<info name="usage" value="*4A.FFR800.1FFFR Ctrl+C 16K" />
+		<info name="usage" value="*4A.FFR800.1FFFR Ctrl+C" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Star Wars" />
 			<dataarea name="cass" size="4311084">
@@ -2692,8 +2977,11 @@ license:CC0-1.0
 		<description>Statistics</description>
 		<year>1979</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="author" value="Sherwin Steffin" />
+		<info name="partno" value="AP113" />
+		<info name="required_ram" value="24K" />
 		<info name="serial" value="00162" />
-		<info name="usage" value="]Load 24K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Statistics" />
 			<dataarea name="cass" size="4048940">
@@ -2706,8 +2994,9 @@ license:CC0-1.0
 		<description>Stocks &amp; Bonds</description>
 		<year>1982</year>
 		<publisher>Microcomputer Games</publisher>
+		<info name="required_ram" value="32K" />
 		<info name="serial" value="4096101" />
-		<info name="usage" value="]Load 32K" />
+		<info name="usage" value="]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Stocks &amp; Bonds" />
 			<dataarea name="cass" size="3417644">
@@ -2720,15 +3009,16 @@ license:CC0-1.0
 		<description>Story Builder</description>
 		<year>1978</year>
 		<publisher>Program Design, Inc.</publisher>
-		<info name="usage" value="cass1 Story Builder 0:00, Fractured Nursery Rhymes 0:45, More Fractured Nursery Rhymes 1:25, cass2 >Load" />
+		<info name="usage" value="cass1: Story Builder 0:00, Fractured Nursery Rhymes 0:45, More Fractured Nursery Rhymes 1:25" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
-			<feature name="part_id" value="Story Builder" />
+			<feature name="part_id" value="Side A: Story Builder" />
 			<dataarea name="cass" size="2804268">
 				<rom name="story builder (1978)(program design, inc.).wav" size="2804268" crc="0f426918" sha1="5e71e374f35f222c981daebf801f1069ace1b728"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
-			<feature name="part_id" value="Word Master" />
+			<feature name="part_id" value="Side B: Word Master" />
 			<dataarea name="cass" size="804140">
 				<rom name="word master (1978)(program design, inc.).wav" size="804140" crc="36b3c41c" sha1="e8880e7541d143ae18876cba2e9f3278e211ebe9"/>
 			</dataarea>
@@ -2740,8 +3030,10 @@ license:CC0-1.0
 		<description>Startrek / Starwars</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="002-0006-00" />
-		<info name="usage" value="cass1 >Load 16K, cass2 >Load 16K" />
+		<info name="usage" value="cass1: >Load" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Startrek" />
 			<dataarea name="cass" size="4134574">
@@ -2761,7 +3053,9 @@ license:CC0-1.0
 		<description>Study Aide</description>
 		<year>1980</year>
 		<publisher>Innerglo</publisher>
-		<info name="usage" value="cass1 audio, cass2 >Load 8K" />
+		<info name="required_ram" value="8K" />
+		<info name="usage" value="cass1: audio" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Study Aide Instructions" />
 			<dataarea name="cass" size="8520748">
@@ -2780,7 +3074,8 @@ license:CC0-1.0
 		<description>Super Arithmetica</description>
 		<year>1980</year>
 		<publisher>Innerglo</publisher>
-		<info name="usage" value=">Load 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Super Arithmetica" />
 			<dataarea name="cass" size="9414188">
@@ -2806,8 +3101,10 @@ license:CC0-1.0
 		<description>Super Othello</description>
 		<year>1979</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="partno" value="AP120" />
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="00261" />
-		<info name="usage" value="*200.2000R 16K" />
+		<info name="usage" value="*200.2000R" />
 		<!-- program doesn't load if tape started at beginning so start at 0:20 -->
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Super Othello" />
@@ -2821,8 +3118,10 @@ license:CC0-1.0
 		<description>Super Starwars</description>
 		<year>1978</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="partno" value="AP121" />
+		<info name="required_ram" value="32K" />
 		<info name="serial" value="00327" />
-		<info name="usage" value="*200.6000R 32K" />
+		<info name="usage" value="*200.6000R" />
 		<!-- program doesn't load if tape started at beginning so start at 0:25 -->
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Super Starwars" />
@@ -2836,7 +3135,8 @@ license:CC0-1.0
 		<description>SuperMath</description>
 		<year>1980</year>
 		<publisher>Innerglo</publisher>
-		<info name="usage" value=">Load 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="SuperMath" />
 			<dataarea name="cass" size="8937516">
@@ -2863,7 +3163,10 @@ license:CC0-1.0
 		<description>The Talking Calculator</description>
 		<year>1978</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value=">Load 16K" />
+		<info name="author" value="Bob Bishop" />
+		<info name="required_ram" value="16K" />
+		<info name="serial" value="TCB-978" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Talking Calculator" />
 			<dataarea name="cass" size="4154412">
@@ -2876,8 +3179,9 @@ license:CC0-1.0
 		<description>Tanktics</description>
 		<year>1981</year>
 		<publisher>Microcomputer Games</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="4012001" />
-		<info name="usage" value="]Load stop tape ]RUN play tape 16K" />
+		<info name="usage" value="]Load stop tape ]RUN play tape" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Tanktics" />
 			<dataarea name="cass" size="3308844">
@@ -2890,7 +3194,9 @@ license:CC0-1.0
 		<description>Tank War</description>
 		<year>1978</year>
 		<publisher>Micro Users Software Exchange</publisher>
-		<info name="usage" value="*3F0.2000R 16K" />
+		<info name="author" value="E. Zaron" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="*3F0.2000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Tank War" />
 			<dataarea name="cass" size="3493676">
@@ -2906,7 +3212,8 @@ license:CC0-1.0
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
 		<info name="serial" value="685-0001-00" />
-		<info name="usage" value="cass1 use with PROM card in slot 1, *C100G; cass2 audio" />
+		<info name="usage" value="cass1: *C100G (Use with PROM card in slot 1)" />
+		<info name="usage" value="cass2: audio" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Tape Measure" />
 			<dataarea name="cass" size="5863468">
@@ -2926,15 +3233,20 @@ license:CC0-1.0
 		<description>Tic-Tac-Talker / Spectrum Analysis</description>
 		<year>1978</year>
 		<publisher>Softape</publisher>
-		<info name="usage" value="cass1 >Load 24K, cass2 >Load 4K" />
+		<info name="author" value="Bill Depew" />
+		<info name="required_ram" value="cass1: 24K" />
+		<info name="required_ram" value="cass2: 4K" />
+		<info name="serial" value="TTT-978" />
+		<info name="usage" value="cass1: >Load" />
+		<info name="usage" value="cass2: >Load" />
 		<part name="cass1" interface="apple2_cass">
-			<feature name="part_id" value="Tic-Tac-Talker" />
+			<feature name="part_id" value="Side A: Tic-Tac-Talker" />
 			<dataarea name="cass" size="5725228">
 				<rom name="tic-tac-talker (1978)(softape).wav" size="5725228" crc="47ff1faa" sha1="77baa051d6dfdc8b3287c41f2907e3aa0756d37f"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="apple2_cass">
-			<feature name="part_id" value="Spectrum Analysis" />
+			<feature name="part_id" value="Side B: Spectrum Analysis" />
 			<dataarea name="cass" size="1769516">
 				<rom name="spectrum analysis (1978)(softape).wav" size="1769516" crc="f728971a" sha1="281b8ee1096fc1017efbc1572fbb187f5a3082e0"/>
 			</dataarea>
@@ -2945,8 +3257,11 @@ license:CC0-1.0
 		<description>Time Clock</description>
 		<year>1978</year>
 		<publisher>Programma International, Inc.</publisher>
+		<info name="author" value="Harry Tarnoff" />
+		<info name="partno" value="AP126" />
+		<info name="required_ram" value="8K" />
 		<info name="serial" value="00097" />
-		<info name="usage" value="*200.2000R 8K" />
+		<info name="usage" value="*200.2000R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Time Clock" />
 			<dataarea name="cass" size="5442092">
@@ -2959,8 +3274,9 @@ license:CC0-1.0
 		<description>Typing Tutor</description>
 		<year>1979</year>
 		<publisher>Microsoft Consumer Products</publisher>
+		<info name="required_ram" value="16K" />
 		<info name="serial" value="24B02" />
-		<info name="usage" value=">Load 16K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Typing Tutor" />
 			<dataarea name="cass" size="1951788">
@@ -2973,6 +3289,7 @@ license:CC0-1.0
 		<description>U-Draw</description>
 		<year>1978</year>
 		<publisher>Micro Users Software Exchange</publisher>
+		<info name="author" value="E. Zaron" />
 		<info name="usage" value="*300.1B00R" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="U-Draw" />
@@ -2986,8 +3303,9 @@ license:CC0-1.0
 		<description>Voyager I</description>
 		<year>1981</year>
 		<publisher>Microcomputer Games</publisher>
+		<info name="required_ram" value="32K" />
 		<info name="serial" value="41801011" />
-		<info name="usage" value="*1000.1300R stop tape ]POKE104,64:POKE 103,1:POKE16384,0 ]Load 32K" />
+		<info name="usage" value="*1000.1300R stop tape ]POKE104,64:POKE 103,1:POKE16384,0 ]Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Voyager I" />
 			<dataarea name="cass" size="2204716">
@@ -3000,7 +3318,8 @@ license:CC0-1.0
 		<description>Warlords</description>
 		<year>1978</year>
 		<publisher>Speakeasy Software Ltd.</publisher>
-		<info name="usage" value=">Load 16K" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value=">Load" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Warlords" />
 			<dataarea name="cass" size="3660844">
@@ -3014,8 +3333,9 @@ license:CC0-1.0
 		<year>1978</year>
 		<publisher>Speakeasy Software</publisher>
 		<info name="programmer" value="Danielle Bunten Berry" />
-		<info name="usage" value="Requires a 16K Apple ][ or later. Shipped with special hardware controllers, but joystick or paddeles can be used by defining directional movement (not button press) to each player." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="Shipped with special hardware controllers, but joystick or paddeles can be used by defining directional movement (not button press) to each player." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE" />
 		<!-- Dump released: 2024-05-09 -->
 		<!-- simulation game -->
 		<part name="cass" interface="apple2_cass">

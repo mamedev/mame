@@ -374,7 +374,7 @@ void hd63450_device::single_transfer(int x)
 		{
 		case 0x00:  // 8 bit
 		case 0x30:  // 8 bit unpacked
-			if (m_reg[x].dcr & 0x20)
+			if (!m_dma8_read[x].isunset())
 			{
 				data = m_dma8_read[x](m_reg[x].mar);
 				if (data == -1)

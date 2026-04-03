@@ -72,8 +72,8 @@ void st2204_device::device_start()
 {
 	std::unique_ptr<mi_st2204> intf = std::make_unique<mi_st2204>();
 
-	space(AS_DATA).cache(intf->m_dcache);
 	space(AS_DATA).specific(intf->m_data);
+	intf->m_dcache = intf->m_data;
 	intf->m_irr_enable = false;
 	intf->m_irr = 0;
 	intf->m_prr = 0;
@@ -202,55 +202,55 @@ const char *st2204_device::st2xxx_irq_name(int i) const
 u8 st2204_device::mi_st2204::pread(u16 adr)
 {
 	u16 bank = m_irq_service && m_irr_enable ? m_irr : m_prr;
-	return m_data.read_byte(u32(bank ^ 1) << 14 | (adr & 0x3fff));
+	return m_data.read_interruptible(u32(bank ^ 1) << 14 | (adr & 0x3fff));
 }
 
 u8 st2204_device::mi_st2204::preadc(u16 adr)
 {
 	u16 bank = m_irq_service && m_irr_enable ? m_irr : m_prr;
-	return m_dcache.read_byte(u32(bank ^ 1) << 14 | (adr & 0x3fff));
+	return m_dcache.read_interruptible(u32(bank ^ 1) << 14 | (adr & 0x3fff));
 }
 
 void st2204_device::mi_st2204::pwrite(u16 adr, u8 val)
 {
 	u16 bank = m_irq_service && m_irr_enable ? m_irr : m_prr;
-	m_data.write_byte(u32(bank ^ 1) << 14 | (adr & 0x3fff), val);
+	m_data.write_interruptible(u32(bank ^ 1) << 14 | (adr & 0x3fff), val);
 }
 
 u8 st2204_device::mi_st2204::dread(u16 adr)
 {
-	return m_data.read_byte(u32(m_drr) << 15 | (adr & 0x7fff));
+	return m_data.read_interruptible(u32(m_drr) << 15 | (adr & 0x7fff));
 }
 
 u8 st2204_device::mi_st2204::dreadc(u16 adr)
 {
-	return m_dcache.read_byte(u32(m_drr) << 15 | (adr & 0x7fff));
+	return m_dcache.read_interruptible(u32(m_drr) << 15 | (adr & 0x7fff));
 }
 
 void st2204_device::mi_st2204::dwrite(u16 adr, u8 val)
 {
-	m_data.write_byte(u32(m_drr) << 15 | (adr & 0x7fff), val);
+	m_data.write_interruptible(u32(m_drr) << 15 | (adr & 0x7fff), val);
 }
 
 u8 st2204_device::mi_st2204::read(u16 adr)
 {
-	return m_program.read_byte(adr);
+	return m_program.read_interruptible(adr);
 }
 
 u8 st2204_device::mi_st2204::read_sync(u16 adr)
 {
-	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : m_cprogram.read_byte(adr);
+	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : m_cprogram.read_interruptible(adr);
 }
 
 u8 st2204_device::mi_st2204::read_arg(u16 adr)
 {
-	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : m_cprogram.read_byte(adr);
+	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : m_cprogram.read_interruptible(adr);
 }
 
 u8 st2204_device::mi_st2204::read_dma(u16 adr)
 {
 	if (BIT(adr, 15))
-		return m_dcache.read_byte(u32(m_dmr) << 15 | (adr & 0x7fff));
+		return m_dcache.read_interruptible(u32(m_dmr) << 15 | (adr & 0x7fff));
 	else
 		return read(adr);
 }
@@ -262,7 +262,7 @@ u8 st2204_device::mi_st2204::read_vector(u16 adr)
 
 void st2204_device::mi_st2204::write(u16 adr, u8 val)
 {
-	m_program.write_byte(adr, val);
+	m_program.write_interruptible(adr, val);
 }
 
 unsigned st2204_device::st2xxx_bt_divider(int n) const

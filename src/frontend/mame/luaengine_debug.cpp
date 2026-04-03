@@ -339,7 +339,7 @@ void lua_engine::initialize_debug(sol::table &emu)
 			});
 	symbol_table_type.set_function("read_memory", &symbol_table_wrapper::read_memory);
 	symbol_table_type.set_function("write_memory", &symbol_table_wrapper::write_memory);
-	symbol_table_type["entries"] = sol::property([] (symbol_table_wrapper const &st) { return standard_tag_object_ptr_map<symbol_entry>(st.table().entries()); });
+	symbol_table_type["entries"] = sol::property([] (symbol_table_wrapper const &st) { return make_tag_object_ptr_map(st.table().entries()); });
 	symbol_table_type["parent"] = sol::property(&symbol_table_wrapper::parent);
 
 

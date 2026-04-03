@@ -202,7 +202,7 @@ u32 galpani3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 			const u8  pridat = priline[prioffs];
 
-			auto const sprite_draw_pixel = 
+			auto const sprite_draw_pixel =
 					[paldata] (u32 &dst, u16 sprdat, u16 pri)
 					{
 						if (((sprdat & 0xc000) == pri) && ((sprdat & 0xff) != 0))

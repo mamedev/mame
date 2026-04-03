@@ -1044,13 +1044,43 @@ void mcpx_apu_device::apu_mmio(address_map &map)
 
 void mcpx_apu_device::p_map(address_map &map)
 {
-	map(0xc00000, 0xc01fff).ram();
-	//map(0x002000, 0x002fff).r(FUNC(mcpx_apu_device::test_r));
+	map(0x000c00, 0x003fff).ram();
+	map(0x100000, 0x02fffff).r(FUNC(mcpx_apu_device::program_memory_r));
+}
+
+// a routine to help you look at the contents of the scatter-gather memories
+// for the global and encode processor dsps
+uint32_t mcpx_apu_device::program_memory_r(offs_t offset)
+{
+	offs_t sub;
+	offs_t page;
+	u32 *sgblocks, *sgaddress;
+
+	if (~offset & 0x100000) {
+		sub = 0;
+		sgblocks = &apust.gpdsp_sgblocks;
+		sgaddress = &apust.gpdsp_sgaddress;
+	}
+	else if (offset & 0x100000) {
+		sub = 0x100000;
+		sgblocks = &apust.epdsp_sgblocks;
+		sgaddress = &apust.epdsp_sgaddress;
+	}
+	else
+		return 0x0bad;
+	offset -= sub;
+	page = offset >> 10;
+	if (page >= *sgblocks)
+		return 0;
+	u32 page_address = apust.space->read_dword(*sgaddress + page * 2 * 4);
+	u32 opcode_dword = apust.space->read_dword(page_address + (offset & 0x3ff) * 4);
+	return opcode_dword & 0xffffff;
 }
 
 mcpx_apu_device::mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pci_device(mconfig, MCPX_APU, tag, owner, clock),
 	gpdsp(*this, "gpdsp"),
+	epdsp(*this, "epdsp"),
 	cpu(*this, finder_base::DUMMY_TAG)
 {
 }
@@ -1078,6 +1108,7 @@ void mcpx_apu_device::device_start()
 	apust.timer = timer_alloc(FUNC(mcpx_apu_device::audio_update), this);
 	apust.timer->enable(false);
 	gpdsp->set_disable();
+	epdsp->set_disable();
 }
 
 void mcpx_apu_device::device_reset()
@@ -1090,8 +1121,9 @@ void mcpx_apu_device::device_add_mconfig(machine_config &config)
 	DSP56362(config, gpdsp, 10'000'000);
 	gpdsp->set_hard_omr(0); // try to reset at 0xc00000
 	gpdsp->set_addrmap(dsp56362_device::AS_P, &mcpx_apu_device::p_map);
-	//m_dsp->set_addrmap(dsp56364_device::AS_X, &mcpx_apu_device::x_map);
-	//m_dsp->set_addrmap(dsp56364_device::AS_Y, &mcpx_apu_device::y_map);
+	DSP56362(config, epdsp, 10'000'000);
+	//epdsp->set_addrmap(dsp56364_device::AS_X, &mcpx_apu_device::x_map);
+	//epdsp->set_addrmap(dsp56364_device::AS_Y, &mcpx_apu_device::y_map);
 }
 
 TIMER_CALLBACK_MEMBER(mcpx_apu_device::audio_update)
@@ -1142,6 +1174,10 @@ void mcpx_apu_device::apu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		apust.timer->enable();
 		apust.timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 	}
+	if (offset == 0x02044 / 4) // address of memory area with information about blocks
+		apust.gpdsp_sgaddress2 = data;
+	if (offset == 0x020d8 / 4) // block count - 1
+		apust.gpdsp_sgblocks2 = data;
 	if (offset == 0x02048 / 4) // (epdsp scratch dma)
 		apust.epdsp_sgaddress = data;
 	if (offset == 0x020dc / 4) // (epdsp)
@@ -1197,7 +1233,7 @@ void mcpx_apu_device::apu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		int16_t v0 = (int16_t)(data >> 16); // upper 16 bits as a signed 16 bit value
 		float vv = ((float)v0) / 4096.0f; // divide by 4096
 		float vvv = powf(2, vv); // two to the vv
-		int f = vvv*48000.0f; // sample rate
+		int f = vvv * 48000.0f; // sample rate
 		apust.voices_frequency[apust.voice_number] = f;
 		return;
 	}
@@ -1231,6 +1267,35 @@ void mcpx_apu_device::apu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		return;
 	if (offset == 0x20280 / 4) // hrtf headroom ?
 		return;
+	if (offset == 0x3fffc / 4) { // some reset ?
+		LOGMASKED(LOG_AUDIO, "Audio_APU: reset %08X\n", data);
+		data = data & 0xf;
+		if (data == 3)
+			// copy 24 bit words from processor ram into dsp program ram
+			for (int b = 0; b < apust.gpdsp_sgblocks; b++) {
+				uint32_t page = apust.space->read_dword(apust.gpdsp_sgaddress + b * 8);
+				for (int w = 0; w < 1024; w++) {
+					v = apust.space->read_dword(page + w * 4);
+					v = v & 0xffffff;
+					gpdsp->space(dsp563xx_device::AS_P).write_dword(b * 1024 + w, v);
+				}
+			}
+		return;
+	}
+	if (offset == 0x5fffc / 4) {
+		LOGMASKED(LOG_AUDIO, "Audio_APU: reset %08X\n", data);
+		data = data & 0xf;
+		if (data == 3)
+			// copy 24 bit words from processor ram into dsp program ram
+			for (int b = 0; b < apust.epdsp_sgblocks; b++) {
+				uint32_t page = apust.space->read_dword(apust.epdsp_sgaddress + b * 8);
+				for (int w = 0; w < 1024; w++) {
+					v = apust.space->read_dword(page + w * 4);
+					v = v & 0xffffff;
+					epdsp->space(dsp563xx_device::AS_P).write_dword(b * 1024 + w, v);
+				}
+			}
+	}
 }
 
 /*

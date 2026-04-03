@@ -49,7 +49,7 @@ void specnext_lores_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, co
 	u16 pen_base = (m_lores_palette_select ? m_palette_alt_offset : m_palette_base_offset);
 	if (m_mode) pen_base |= (((m_ulap_en ? 0b1100 : 0) | m_lores_palette_offset) << 4);
 
-	const u8 *screen_location = m_host_ram_ptr + (5 << 14);
+	const u8 *screen_location = m_bram_bank5_ptr;
 
 	const u16 x4_min = (clip.left() - m_offset_h + (m_scroll_x << 1) + (SCREEN_AREA.width() << 1)) % (SCREEN_AREA.width() << 1);
 	for (u16 vpos = clip.top(); vpos <= clip.bottom(); ++vpos)

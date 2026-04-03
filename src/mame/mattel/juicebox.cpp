@@ -9,16 +9,19 @@
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/arm7/arm7.h"
 #include "machine/s3c44b0.h"
 #include "machine/smartmed.h"
 #include "sound/dac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#include <cstdarg>
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 namespace {
@@ -39,9 +42,9 @@ public:
 		, m_port_g(*this, "PORTG")
 	{ }
 
-	void juicebox(machine_config &config);
+	void juicebox(machine_config &config) ATTR_COLD;
 
-	void init_juicebox();
+	void init_juicebox() ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
 
@@ -50,13 +53,6 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_maincpu;
-	required_device<s3c44b0_device> m_s3c44b0;
-	required_device<smartmedia_image_device> m_smartmedia;
-	required_ioport m_port_g;
-
-	uint32_t port[9];
-
 	struct jb_smc_t
 	{
 		int add_latch;
@@ -64,14 +60,21 @@ private:
 		int busy;
 	};
 
+	required_device<cpu_device> m_maincpu;
+	required_device<s3c44b0_device> m_s3c44b0;
+	required_device<smartmedia_image_device> m_smartmedia;
+	required_ioport m_port_g;
+
+	uint32_t port[9];
+
 	jb_smc_t smc;
 
-	#if defined(JUICEBOX_ENTER_DEBUG_MENU) || defined(JUICEBOX_DISPLAY_ROM_ID)
+#if defined(JUICEBOX_ENTER_DEBUG_MENU) || defined(JUICEBOX_DISPLAY_ROM_ID)
 	int port_g_read_count;
-	#endif
+#endif
+
 	uint32_t juicebox_nand_r(offs_t offset, uint32_t mem_mask = ~0);
 	void juicebox_nand_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	void smc_reset();
 	void smc_init();
 	uint8_t smc_read();
@@ -81,19 +84,6 @@ private:
 	//void s3c44b0_i2s_data_w(offs_t offset, uint16_t data);
 	void juicebox_map(address_map &map) ATTR_COLD;
 };
-
-inline void juicebox_state::verboselog(int n_level, const char *s_fmt, ...)
-{
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[32768];
-		va_start( v, s_fmt);
-		vsprintf( buf, s_fmt, v);
-		va_end( v);
-		logerror( "%s: %s", machine().describe_context(), buf);
-	}
-}
 
 
 /***************************************************************************
@@ -105,7 +95,7 @@ inline void juicebox_state::verboselog(int n_level, const char *s_fmt, ...)
 
 void juicebox_state::smc_reset( )
 {
-	verboselog(5, "smc_reset\n");
+	LOG("smc_reset\n");
 	smc.add_latch = 0;
 	smc.cmd_latch = 0;
 	smc.busy = 0;
@@ -113,7 +103,7 @@ void juicebox_state::smc_reset( )
 
 void juicebox_state::smc_init( )
 {
-	verboselog(5, "smc_init\n");
+	LOG("smc_init\n");
 	smc_reset();
 }
 
@@ -126,30 +116,30 @@ uint8_t juicebox_state::smc_read( )
 	}
 	else
 	{
-		data = 0xFF;
+		data = 0xff;
 	}
-	verboselog(5, "smc_read %08X\n", data);
+	LOG("smc_read %08X\n", data);
 	return data;
 }
 
 void juicebox_state::smc_write( uint8_t data)
 {
-	verboselog(5, "smc_write %08X\n", data);
+	LOG("smc_write %08X\n", data);
 	if (m_smartmedia->is_present())
 	{
 		if (smc.cmd_latch)
 		{
-			verboselog(5, "smartmedia_command_w %08X\n", data);
+			LOG("smartmedia_command_w %08X\n", data);
 			m_smartmedia->command_w(data);
 		}
 		else if (smc.add_latch)
 		{
-			verboselog(5, "smartmedia_address_w %08X\n", data);
+			LOG("smartmedia_address_w %08X\n", data);
 			m_smartmedia->address_w(data);
 		}
 		else
 		{
-			verboselog(5, "smartmedia_data_w %08X\n", data);
+			LOG("smartmedia_data_w %08X\n", data);
 			m_smartmedia->data_w(data);
 		}
 	}
@@ -174,7 +164,7 @@ uint32_t juicebox_state::s3c44b0_gpio_port_r(offs_t offset)
 		{
 			// 0C0062C4 -> bit 8 is turned on
 			//data |= 1 << 13;
-			data = 0x0000FF15;
+			data = 0x0000ff15;
 			data &= (1 << 2) | (1 << 9) | (1 << 10) | (1 << 11);
 			data |= (1 << 2) | (1 << 9) | (1 << 10) | (1 << 11);
 		}
@@ -186,14 +176,14 @@ uint32_t juicebox_state::s3c44b0_gpio_port_r(offs_t offset)
 		break;
 		case S3C44B0_GPIO_PORT_E :
 		{
-			data = 0x000000DF;
+			data = 0x000000df;
 		}
 		break;
 		case S3C44B0_GPIO_PORT_F :
 		{
 			data = data | (0 << 7);
-			data = 0x0000009F;
-			data &= ~0xE0;
+			data = 0x0000009f;
+			data &= ~0xe0;
 			if (smc.cmd_latch) data = data | 0x00000020;
 			if (smc.add_latch) data = data | 0x00000040;
 			if (!smc.busy) data = data | 0x00000080;
@@ -201,8 +191,8 @@ uint32_t juicebox_state::s3c44b0_gpio_port_r(offs_t offset)
 		break;
 		case S3C44B0_GPIO_PORT_G :
 		{
-			data = 0x0000009F;
-			data = (data & ~0x1F) | (m_port_g->read() & 0x1F);
+			data = 0x0000009f;
+			data = (data & ~0x1f) | (m_port_g->read() & 0x1f);
 			#if defined(JUICEBOX_ENTER_DEBUG_MENU)
 			if (port_g_read_count++ < 1)
 			{
@@ -211,13 +201,13 @@ uint32_t juicebox_state::s3c44b0_gpio_port_r(offs_t offset)
 			#elif defined(JUICEBOX_DISPLAY_ROM_ID)
 			if (port_g_read_count++ < 3)
 			{
-				data = 0x0000008A; // RETURN + FORWARD + STAR
+				data = 0x0000008a; // RETURN + FORWARD + STAR
 			}
 			#endif
 		}
 		break;
 	}
-//  data = ((machine().rand() & 0xFF) << 24) | ((machine().rand() & 0xFF) << 16) | ((machine().rand() & 0xFF) << 8) | ((machine().rand() & 0xFF) << 0);
+	//data = ((machine().rand() & 0xff) << 24) | ((machine().rand() & 0xff) << 16) | ((machine().rand() & 0xff) << 8) | ((machine().rand() & 0xff) << 0);
 	return data;
 }
 
@@ -230,7 +220,7 @@ void juicebox_state::s3c44b0_gpio_port_w(offs_t offset, uint32_t data)
 		{
 			smc.cmd_latch = ((data & 0x00000020) != 0);
 			smc.add_latch = ((data & 0x00000040) != 0);
-			verboselog( 5, "s3c44b0_gpio_port_w - nand cle %d ale %d\n", (data & 0x20) ? 1 : 0, (data & 0x40) ? 1 : 0);
+			LOG("s3c44b0_gpio_port_w - nand cle %d ale %d\n", (data & 0x20) ? 1 : 0, (data & 0x40) ? 1 : 0);
 		}
 		break;
 	}
@@ -245,17 +235,17 @@ uint32_t juicebox_state::juicebox_nand_r(offs_t offset, uint32_t mem_mask)
 	if (ACCESSING_BITS_8_15) data = data | (smc_read() <<  8);
 	if (ACCESSING_BITS_16_23) data = data | (smc_read() << 16);
 	if (ACCESSING_BITS_24_31) data = data | (smc_read() << 24);
-	verboselog( 5, "juicebox_nand_r %08X %08X %08X\n", offset, mem_mask, data);
+	LOG("juicebox_nand_r %08X %08X %08X\n", offset, mem_mask, data);
 	return data;
 }
 
 void juicebox_state::juicebox_nand_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	verboselog( 5, "juicebox_nand_w %08X %08X %08X\n", offset, mem_mask, data);
-	if (ACCESSING_BITS_0_7) smc_write((data >>  0) & 0xFF);
-	if (ACCESSING_BITS_8_15) smc_write((data >>  8) & 0xFF);
-	if (ACCESSING_BITS_16_23) smc_write((data >> 16) & 0xFF);
-	if (ACCESSING_BITS_24_31) smc_write((data >> 24) & 0xFF);
+	LOG("juicebox_nand_w %08X %08X %08X\n", offset, mem_mask, data);
+	if (ACCESSING_BITS_0_7) smc_write((data >>  0) & 0xff);
+	if (ACCESSING_BITS_8_15) smc_write((data >>  8) & 0xff);
+	if (ACCESSING_BITS_16_23) smc_write((data >> 16) & 0xff);
+	if (ACCESSING_BITS_24_31) smc_write((data >> 24) & 0xff);
 }
 
 // ...
@@ -365,9 +355,9 @@ ROM_START( juicebox )
 	ROM_SYSTEM_BIOS( 0, "juicebox", "Juice Box v.28 08242004" )
 	ROMX_LOAD( "juicebox.rom", 0, 0x800000, CRC(ac731197) SHA1(8278891c3531b3b6b5fec2a97a3ef6f0de1ac81d), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "uclinuxp", "uClinux 2.4.24-uc0 (patched)" )
-	ROMX_LOAD( "newboot.rom", 0, 0x1A0800, CRC(443f48b7) SHA1(38f0dc07b5cf02b972a851aa9e87f5d93d03f629), ROM_BIOS(1) )
+	ROMX_LOAD( "newboot.rom", 0, 0x1a0800, CRC(443f48b7) SHA1(38f0dc07b5cf02b972a851aa9e87f5d93d03f629), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "uclinux", "uClinux 2.4.24-uc0" )
-	ROMX_LOAD( "image.rom", 0, 0x19E400, CRC(6c0308bf) SHA1(5fe21a38a4cd0d86bb60920eb100138b0e924d90), ROM_BIOS(2) )
+	ROMX_LOAD( "image.rom", 0, 0x19e400, CRC(6c0308bf) SHA1(5fe21a38a4cd0d86bb60920eb100138b0e924d90), ROM_BIOS(2) )
 ROM_END
 
 } // Anonymous namespace

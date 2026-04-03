@@ -9,6 +9,13 @@
 #ifndef MAME_EMU_DISLOT_H
 #define MAME_EMU_DISLOT_H
 
+#include <functional>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <unordered_map>
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -17,7 +24,9 @@ class get_default_card_software_hook
 {
 	// goofy "hook" to pass to device_slot_interface::get_default_card_software
 public:
-	get_default_card_software_hook(const std::string &path, std::function<bool(util::core_file &, std::string&)> &&get_hashfile_extrainfo);
+	using get_hashfile_extrainfo_func = std::function<bool (util::core_file &, std::string &)>;
+
+	get_default_card_software_hook(std::string const &path, get_hashfile_extrainfo_func &&get_hashfile_extrainfo);
 
 	// accesses the image file to be scrutinized by get_default_card_software(); is
 	// nullptr in the case of images loaded by software list
@@ -30,12 +39,12 @@ public:
 	bool hashfile_extrainfo(std::string &extrainfo);
 
 private:
-	util::core_file::ptr                                    m_image_file;
-	std::string                                             m_file_type;
-	std::function<bool(util::core_file &, std::string&)>    m_get_hashfile_extrainfo;
-	bool                                                    m_called_get_hashfile_extrainfo;
-	bool                                                    m_has_hash_extrainfo;
-	std::string                                             m_hash_extrainfo;
+	util::core_file::ptr        m_image_file;
+	std::string                 m_file_type;
+	get_hashfile_extrainfo_func m_get_hashfile_extrainfo;
+	bool                        m_called_get_hashfile_extrainfo;
+	bool                        m_has_hash_extrainfo;
+	std::string                 m_hash_extrainfo;
 };
 
 
@@ -46,9 +55,9 @@ public:
 	class slot_option
 	{
 	public:
-		slot_option(char const *name, device_type devtype, bool selectable);
+		slot_option(std::string_view name, device_type devtype, bool selectable);
 
-		char const *name() const { return m_name; }
+		std::string_view name() const { return m_name; }
 		device_type devtype() const { return m_devtype; }
 		bool selectable() const { return m_selectable; }
 		char const *default_bios() const { return m_default_bios; }
@@ -60,11 +69,11 @@ public:
 		template <typename Object> slot_option &machine_config(Object &&cb) { m_machine_config = std::forward<Object>(cb); return *this; }
 		slot_option &input_device_defaults(input_device_default const *dev_inp_def) { m_input_device_defaults = dev_inp_def; return *this; }
 		slot_option &clock(u32 clock) { m_clock = clock; return *this; }
-		slot_option &clock(XTAL clock) { clock.validate(std::string("Configuring slot option ") + m_name); m_clock = clock.value(); return *this; }
+		slot_option &clock(XTAL clock);
 
 	private:
 		// internal state
-		char const *const m_name;
+		std::string_view const m_name;
 		device_type const m_devtype;
 		bool const m_selectable;
 		char const *m_default_bios;
@@ -72,6 +81,9 @@ public:
 		input_device_default const *m_input_device_defaults;
 		u32 m_clock;
 	};
+
+	using slot_option_ptr = std::unique_ptr<slot_option>;
+	using slot_option_map = std::unordered_map<std::string, slot_option_ptr>;
 
 	virtual ~device_slot_interface();
 
@@ -97,7 +109,7 @@ public:
 	///   valid for the lifetime of the device (or until another default
 	///   option is configured).
 	/// \sa default_option
-	device_slot_interface &set_default_option(const char *option) { m_default_option = option; return *this; }
+	device_slot_interface &set_default_option(char const *option) { m_default_option = option; return *this; }
 
 	/// \brief Clear options
 	///
@@ -116,7 +128,7 @@ public:
 	///   description is used in the user interface.
 	/// \return A reference to the added option for additional
 	///   configuration.
-	slot_option &option_add(char const *option, device_type devtype);
+	slot_option &option_add(std::string_view option, device_type devtype) { return do_add_option(option, devtype, true); }
 
 	/// \brief Add an internal option
 	///
@@ -130,15 +142,42 @@ public:
 	///   description is used in the user interface.
 	/// \return A reference to the added option for additional
 	///   configuration.
-	slot_option &option_add_internal(const char *option, device_type devtype);
+	slot_option &option_add_internal(std::string_view option, device_type devtype) { return do_add_option(option, devtype, false); }
 
-	slot_option &option_replace(const char *option, device_type devtype);
-	slot_option &option_replace_internal(const char *option, device_type devtype);
-	void option_remove(const char *option);
+	slot_option &option_replace(std::string_view option, device_type devtype) { return do_replace_option(option, devtype, true); }
+	slot_option &option_replace_internal(std::string_view option, device_type devtype) { return do_replace_option(option, devtype, false); }
+	void option_remove(std::string_view option);
 
-	void set_option_default_bios(const char *option, const char *default_bios) { config_option(option)->default_bios(default_bios); }
-	template <typename T> void set_option_machine_config(const char *option, T &&machine_config) { config_option(option)->machine_config(std::forward<T>(machine_config)); }
-	void set_option_device_input_defaults(const char *option, const input_device_default *default_input) { config_option(option)->input_device_defaults(default_input); }
+	/// \brief Set options
+	///
+	/// Removes all previously added options, calls a functoid to add
+	/// options, sets the default option, and sets whether the slot can
+	/// only be configured programmatically.
+	/// \param [in] options The functoid to call to add options, with a
+	///   reference to the slot interface passed as the only argument.
+	///   Should call #option_add or #option_add_internal to add
+	///   options.
+	/// \param [in] default_option The name of the default option.  This
+	///   must be correspond to an option added using #option_add or
+	///   #option_add_internal, or be nullptr to not load any card
+	///   device by default.  The string is not copied and must remain
+	///   valid for the lifetime of the device (or until another default
+	///   option is configured).
+	/// \param [in] fixed True to mark the slot as fixed, or false to
+	///   mark it user-configurable.
+	/// \sa option_add option_add_internal set_default_option set_fixed
+	template <typename Object>
+	void set_options(Object &&options, char const *default_option, bool fixed)
+	{
+		option_reset();
+		std::forward<Object>(options)(*this);
+		set_default_option(default_option);
+		set_fixed(fixed);
+	}
+
+	void set_option_default_bios(std::string_view option, char const *default_bios) { config_option(option).default_bios(default_bios); }
+	template <typename T> void set_option_machine_config(std::string_view option, T &&machine_config) { config_option(option).machine_config(std::forward<T>(machine_config)); }
+	void set_option_device_input_defaults(std::string_view option, input_device_default const *default_input) { config_option(option).input_device_defaults(default_input); }
 
 	/// \brief Returns whether the slot is fixed
 	///
@@ -159,14 +198,14 @@ public:
 	///   otherwise.
 	bool has_selectable_options() const;
 
-	const char *default_option() const { return m_default_option; }
-	const std::unordered_map<std::string, std::unique_ptr<slot_option>> &option_list() const { return m_options; }
-	const slot_option *option(const char *name) const;
+	char const *default_option() const { return m_default_option; }
+	slot_option_map const &option_list() const { return m_options; }
+	slot_option const *option(std::string_view name) const;
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const { return std::string(); }
 	device_t *get_card_device() const { return m_card_device; }
 	void set_card_device(device_t *dev) { m_card_device = dev; }
-	const char *slot_name() const { return device().tag() + 1; }
-	slot_option &option_set(const char *tag, device_type devtype) { m_default_option = tag; m_fixed = true; return option_add_internal(tag, devtype); }
+	std::string_view slot_name() const { return device().tag() + 1; }
+	slot_option &option_set(char const *tag, device_type devtype) { m_default_option = tag; m_fixed = true; return option_add_internal(tag, devtype); }
 
 protected:
 	device_slot_interface(machine_config const &mconfig, device_t &device);
@@ -175,13 +214,15 @@ protected:
 
 private:
 	// internal state
-	std::unordered_map<std::string, std::unique_ptr<slot_option>> m_options;
+	slot_option_map m_options;
 	u32 m_default_clock;
 	char const *m_default_option;
 	bool m_fixed;
 	device_t *m_card_device;
 
-	slot_option *config_option(char const *option);
+	slot_option &do_add_option(std::string_view option, device_type devtype, bool selectable);
+	slot_option &do_replace_option(std::string_view option, device_type devtype, bool selectable);
+	slot_option &config_option(std::string_view option);
 };
 
 

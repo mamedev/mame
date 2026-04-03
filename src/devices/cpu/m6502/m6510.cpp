@@ -111,7 +111,7 @@ m6510_device::mi_6510::mi_6510(m6510_device *_base)
 
 uint8_t m6510_device::mi_6510::read(uint16_t adr)
 {
-	uint8_t res = m_program.read_byte(adr);
+	uint8_t res = m_program.read_interruptible(adr);
 	if(adr == 0x0000)
 		res = m_base->dir_r();
 	else if(adr == 0x0001)
@@ -121,7 +121,7 @@ uint8_t m6510_device::mi_6510::read(uint16_t adr)
 
 uint8_t m6510_device::mi_6510::read_sync(uint16_t adr)
 {
-	uint8_t res = m_csprogram.read_byte(adr);
+	uint8_t res = m_csprogram.read_interruptible(adr);
 	if(adr == 0x0000)
 		res = m_base->dir_r();
 	else if(adr == 0x0001)
@@ -131,7 +131,7 @@ uint8_t m6510_device::mi_6510::read_sync(uint16_t adr)
 
 uint8_t m6510_device::mi_6510::read_arg(uint16_t adr)
 {
-	uint8_t res = m_cprogram.read_byte(adr);
+	uint8_t res = m_cprogram.read_interruptible(adr);
 	if(adr == 0x0000)
 		res = m_base->dir_r();
 	else if(adr == 0x0001)
@@ -141,7 +141,7 @@ uint8_t m6510_device::mi_6510::read_arg(uint16_t adr)
 
 void m6510_device::mi_6510::write(uint16_t adr, uint8_t val)
 {
-	m_program.write_byte(adr, val);
+	m_program.write_interruptible(adr, val);
 	if(adr == 0x0000)
 		m_base->dir_w(val);
 	else if(adr == 0x0001)
@@ -173,7 +173,7 @@ m6508_device::mi_6508::mi_6508(m6508_device *_base)
 
 uint8_t m6508_device::mi_6508::read(uint16_t adr)
 {
-	uint8_t res = m_program.read_byte(adr);
+	uint8_t res = m_program.read_interruptible(adr);
 	if(adr == 0x0000)
 		res = m_base->dir_r();
 	else if(adr == 0x0001)
@@ -185,7 +185,7 @@ uint8_t m6508_device::mi_6508::read(uint16_t adr)
 
 uint8_t m6508_device::mi_6508::read_sync(uint16_t adr)
 {
-	uint8_t res = m_csprogram.read_byte(adr);
+	uint8_t res = m_csprogram.read_interruptible(adr);
 	if(adr == 0x0000)
 		res = m_base->dir_r();
 	else if(adr == 0x0001)
@@ -197,7 +197,7 @@ uint8_t m6508_device::mi_6508::read_sync(uint16_t adr)
 
 uint8_t m6508_device::mi_6508::read_arg(uint16_t adr)
 {
-	uint8_t res = m_cprogram.read_byte(adr);
+	uint8_t res = m_cprogram.read_interruptible(adr);
 	if(adr == 0x0000)
 		res = m_base->dir_r();
 	else if(adr == 0x0001)
@@ -209,7 +209,7 @@ uint8_t m6508_device::mi_6508::read_arg(uint16_t adr)
 
 void m6508_device::mi_6508::write(uint16_t adr, uint8_t val)
 {
-	m_program.write_byte(adr, val);
+	m_program.write_interruptible(adr, val);
 	if(adr == 0x0000)
 		m_base->dir_w(val);
 	else if(adr == 0x0001)

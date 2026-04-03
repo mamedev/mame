@@ -127,7 +127,9 @@
 #include "qs1000.h"
 
 
-#define LOGGING_ENABLED     0
+//#define VERBOSE 1
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
 
 
 // device type definition
@@ -357,8 +359,7 @@ void qs1000_device::wave_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 
-	if (LOGGING_ENABLED)
-		printf("QS1000 W[%x] %x\n", 0x200 + offset, data);
+	LOG("QS1000 W[%x] %x\n", 0x200 + offset, data);
 
 	switch (offset)
 	{
@@ -527,8 +528,7 @@ void qs1000_device::start_voice(int ch)
 	uint16_t word1 = (read_byte(table_addr + 2) << 8) | read_byte(table_addr + 3);
 	uint16_t base = (read_byte(table_addr + 4) << 8) | read_byte(table_addr + 5);
 
-	if (LOGGING_ENABLED)
-		printf("[%.6x] Freq:%.4x  ????:%.4x  Addr:%.4x\n", table_addr, freq, word1, base);
+	LOG("[%.6x] Freq:%.4x  ????:%.4x  Addr:%.4x\n", table_addr, freq, word1, base);
 
 	// See Raccoon World and Wyvern Wings nullptr sound
 	if (freq == 0)
@@ -562,7 +562,7 @@ void qs1000_device::start_voice(int ch)
 
 	uint8_t byte8 = read_byte(base + 8);
 
-	if (LOGGING_ENABLED)
+	if (VERBOSE & LOG_GENERAL)
 	{
 		uint8_t byte9 = read_byte(base + 9);
 		uint8_t byte10 = read_byte(base + 10);
@@ -572,7 +572,7 @@ void qs1000_device::start_voice(int ch)
 		uint8_t byte14 = read_byte(base + 14);
 		uint8_t byte15 = read_byte(base + 15);
 
-		printf("[%.6x] Sample Start:%.6x  Loop Start:%.6x  Loop End:%.6x  Params: %.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x\n", base, start_addr, loop_start, loop_end, byte8, byte9, byte10, byte11, byte12, byte13, byte14, byte15);
+		LOG("[%.6x] Sample Start:%.6x  Loop Start:%.6x  Loop End:%.6x  Params: %.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x\n", base, start_addr, loop_start, loop_end, byte8, byte9, byte10, byte11, byte12, byte13, byte14, byte15);
 	}
 
 	m_channels[ch].m_acc = 0;

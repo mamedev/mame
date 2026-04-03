@@ -1710,9 +1710,9 @@ void sunplus_gcm394_base_device::videoirq_w(int state)
 	set_state_unsynced(UNSP_IRQ5_LINE, state);
 }
 
-uint16_t sunplus_gcm394_base_device::read_space(uint32_t offset)
+uint16_t sunplus_gcm394_base_device::read_space(offs_t offset)
 {
-	address_space& space = this->space(AS_PROGRAM);
+	address_space &space = this->space(AS_PROGRAM);
 	uint16_t val;
 	if (offset < m_csbase)
 	{
@@ -1720,7 +1720,7 @@ uint16_t sunplus_gcm394_base_device::read_space(uint32_t offset)
 	}
 	else
 	{
-		val = m_cs_space->read_word(offset-m_csbase);
+		val = m_cs_space->read_word(offset - m_csbase);
 	}
 
 	return val;
@@ -1728,16 +1728,16 @@ uint16_t sunplus_gcm394_base_device::read_space(uint32_t offset)
 
 
 
-void sunplus_gcm394_base_device::write_space(uint32_t offset, uint16_t data)
+void sunplus_gcm394_base_device::write_space(offs_t offset, uint16_t data)
 {
-	address_space& space = this->space(AS_PROGRAM);
+	address_space &space = this->space(AS_PROGRAM);
 	if (offset < m_csbase)
 	{
 		space.write_word(offset, data);
 	}
 	else
 	{
-		m_cs_space->write_word(offset-m_csbase, data);
+		m_cs_space->write_word(offset - m_csbase, data);
 	}
 }
 

@@ -102,7 +102,9 @@ void specnext_tiles_device::tilemap_update()
 {
 	if (gfx(0) == nullptr) return;
 
-	const u8 *tiles_offset = m_host_ram_ptr + ((BIT(m_tm_tile_base, 6) ? 7 : 5) << 14) + ((m_tm_tile_base & 0x3f) << 8);
+	const u8 *tiles_offset = BIT(m_tm_tile_base, 6)
+		? m_bram_bank7_ptr + ((m_tm_tile_base & 0x1f) << 8)
+		: m_bram_bank5_ptr + ((m_tm_tile_base & 0x3f) << 8);
 	for (auto i = 0; i < 6; ++i)
 	{
 		gfx(i)->set_source(tiles_offset);
@@ -133,11 +135,9 @@ void specnext_tiles_device::tilemap_update()
 		}
 	}
 
-	m_tiles_info = m_host_ram_ptr;
-	if (BIT(m_tm_map_base, 6))
-		m_tiles_info += (7 << 14) + ((m_tm_map_base & 0x1f) << 8);
-	else
-		m_tiles_info += (5 << 14) + ((m_tm_map_base & 0x3f) << 8);
+	m_tiles_info = BIT(m_tm_map_base, 6)
+		? m_bram_bank7_ptr + ((m_tm_map_base & 0x1f) << 8)
+		: m_bram_bank5_ptr + ((m_tm_map_base & 0x3f) << 8);
 }
 
 void specnext_tiles_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u8 pcode, u8 priority_mask)

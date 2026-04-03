@@ -7207,6 +7207,23 @@ ROM_START( tarzan201fa )
 	ROM_LOAD( "tarzan201fa_string.key", 0x00, 0xec, CRC(b33f5050) SHA1(900d3c48944dbdd95d9e48d74c355e82e00ac012) )
 ROM_END
 
+ROM_START( tarzan201faa ) // IGS PCB NO-0230-1 (IGS025 stickered X7). This set uses alt encryption and the Amazonia sprite ROM.
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "tarzan_v-201fa.u9", 0x00000, 0x40000, CRC(f313df5a) SHA1(04883e388ee6722c3ceee74a21e6a79f73ea8b7d) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_a2107.u3", 0x000000, 0x400000, CRC(d8dadfd7) SHA1(b40a46d56ff46d91e3377be8616c3eed321f7db4) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+	// empty u2 socket
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "igs_t2105.u11", 0x00000, 0x80000, CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s2102.u8", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "tarzan201fa_string.key", 0x00, 0xec, CRC(b33f5050) SHA1(900d3c48944dbdd95d9e48d74c355e82e00ac012) )
+ROM_END
 
 ROM_START( tarzan202fa ) // IGS PCB NO-0230-1 (IGS025 stickered X7)
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -7492,6 +7509,7 @@ GAMEL( 1999,  jking200pr,  starzan,  starzan,    tarzan202fa, igs017_state, init
 GAMEL( 1999?, tarzan103m,  tarzanc,  starzan,    tarzan103m,  igs017_state, init_starzan,    ROT0, "IGS", "Tarzan (V103M)",                                                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION, layout_tarzan103m ) // always gives ASIC31 error after double up game
 GAMEL( 1999?, tarzan106fa, tarzanc,  starzan,    tarzan202fa, igs017_state, init_jking103a,  ROT0, "IGS", "Tarzan (V106FA)",                                                    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION, layout_starzan )
 GAMEL( 1999?, tarzan201fa, tarzanc,  starzan,    tarzan202fa, igs017_state, init_jking200pr, ROT0, "IGS", "Tarzan (V201FA)",                                                    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION, layout_starzan )
+GAMEL( 1999?, tarzan201faa,tarzanc,  starzan,    tarzan202fa, igs017_state, init_jking103a,  ROT0, "IGS", "Tarzan (V201FA, alt encryption)",                                    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION, layout_starzan )
 GAMEL( 1999?, tarzan202fa, tarzanc,  starzan,    tarzan202fa, igs017_state, init_jking103a,  ROT0, "IGS", "Tarzan (V202FA)",                                                    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION, layout_starzan )
 GAMEL( 2000?, happyskl,    0,        happyskl,   happyskl,    igs017_state, init_happyskl,   ROT0, "IGS", "Happy Skill (Italy, V611IT)",                                        0, layout_igspoker )
 GAMEL( 2000?, cpoker2,     0,        cpoker2,    cpoker2,     igs017_state, init_cpoker2,    ROT0, "IGS", "Champion Poker 2 (V100A)",                                           0, layout_igspoker )

@@ -291,8 +291,8 @@ namespace
 	class slot_option_entry : public core_options::entry
 	{
 	public:
-		slot_option_entry(const char *name, slot_option &host)
-			: entry(name)
+		slot_option_entry(std::string &&name, slot_option &host)
+			: entry(std::move(name))
 			, m_host(host)
 		{
 		}
@@ -566,7 +566,7 @@ bool emu_options::add_and_remove_slot_options()
 		for (const device_slot_interface &slot : slot_interface_enumerator(config.root_device()))
 		{
 			// come up with the canonical name of the slot
-			const char *slot_option_name = slot.slot_name();
+			const std::string_view slot_option_name = slot.slot_name();
 
 			// erase this option from existing (so we don't purge it later)
 			existing.remove(slot_option_name);
@@ -588,7 +588,7 @@ bool emu_options::add_and_remove_slot_options()
 						add_header(header);
 
 					// create a new entry in the options
-					auto new_entry = new_option.setup_option_entry(slot_option_name);
+					auto new_entry = new_option.setup_option_entry(std::string(slot_option_name));
 
 					// and add it
 					add_entry(std::move(new_entry), header);
@@ -1025,16 +1025,18 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 //  find_slot_option
 //-------------------------------------------------
 
-const slot_option *emu_options::find_slot_option(const std::string &device_name) const
+const slot_option *emu_options::find_slot_option(std::string_view device_name) const
 {
-	auto iter = m_slot_options.find(device_name);
-	return iter != m_slot_options.end() ? &iter->second : nullptr;
+	// TODO: get rid of temporary std::string when we have C++20
+	auto const iter = m_slot_options.find(std::string(device_name));
+	return (iter != m_slot_options.end()) ? &iter->second : nullptr;
 }
 
-slot_option *emu_options::find_slot_option(const std::string &device_name)
+slot_option *emu_options::find_slot_option(std::string_view device_name)
 {
-	auto iter = m_slot_options.find(device_name);
-	return iter != m_slot_options.end() ? &iter->second : nullptr;
+	// TODO: get rid of temporary std::string when we have C++20
+	auto const iter = m_slot_options.find(std::string(device_name));
+	return (iter != m_slot_options.end()) ? &iter->second : nullptr;
 }
 
 
@@ -1043,16 +1045,16 @@ slot_option *emu_options::find_slot_option(const std::string &device_name)
 //  slot_option
 //-------------------------------------------------
 
-const slot_option &emu_options::slot_option(const std::string &device_name) const
+const slot_option &emu_options::slot_option(std::string_view device_name) const
 {
-	const ::slot_option *opt = find_slot_option(device_name);
+	::slot_option const *const opt = find_slot_option(device_name);
 	assert(opt && "Attempt to access non-existent slot option");
 	return *opt;
 }
 
-slot_option &emu_options::slot_option(const std::string &device_name)
+slot_option &emu_options::slot_option(std::string_view device_name)
 {
-	::slot_option *opt = find_slot_option(device_name);
+	::slot_option *const opt = find_slot_option(device_name);
 	assert(opt && "Attempt to access non-existent slot option");
 	return *opt;
 }
@@ -1062,16 +1064,18 @@ slot_option &emu_options::slot_option(const std::string &device_name)
 //  image_option
 //-------------------------------------------------
 
-const image_option &emu_options::image_option(const std::string &device_name) const
+const image_option &emu_options::image_option(std::string_view device_name) const
 {
-	auto iter = m_image_options.find(device_name);
+	// TODO: get rid of temporary std::string when we have C++20
+	auto const iter = m_image_options.find(std::string(device_name));
 	assert(iter != m_image_options.end() && "Attempt to access non-existent image option");
 	return *iter->second;
 }
 
-image_option &emu_options::image_option(const std::string &device_name)
+image_option &emu_options::image_option(std::string_view device_name)
 {
-	auto iter = m_image_options.find(device_name);
+	// TODO: get rid of temporary std::string when we have C++20
+	auto const iter = m_image_options.find(std::string(device_name));
 	assert(iter != m_image_options.end() && "Attempt to access non-existent image option");
 	return *iter->second;
 }
@@ -1266,13 +1270,13 @@ void slot_option::set_bios(std::string &&text)
 //  slot_option::setup_option_entry
 //-------------------------------------------------
 
-core_options::entry::shared_ptr slot_option::setup_option_entry(const char *name)
+core_options::entry::shared_ptr slot_option::setup_option_entry(std::string &&name)
 {
 	// this should only be called once
 	assert(m_entry.expired());
 
 	// create the entry and return it
-	core_options::entry::shared_ptr entry = std::make_shared<slot_option_entry>(name, *this);
+	auto entry = std::make_shared<slot_option_entry>(std::move(name), *this);
 	m_entry = entry;
 	return entry;
 }

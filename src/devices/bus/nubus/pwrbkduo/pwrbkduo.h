@@ -42,9 +42,7 @@ public:
 	pwrbkduo_slot_device(const machine_config &mconfig, T &&tag, device_t *owner, const char *nbtag, U &&opts, const char *dflt)
 		: pwrbkduo_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
+		set_options(std::forward<U>(opts), dflt, false);
 		set_pwrbkduo_slot(std::forward<T>(nbtag), tag);
 		m_nubus_tag = nbtag;
 	}

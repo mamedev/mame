@@ -36,6 +36,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/imageutl.cpp",
 		MAME_DIR .. "src/lib/formats/imageutl.h",
 
+		MAME_DIR .. "src/lib/formats/aiffile.cpp",
+		MAME_DIR .. "src/lib/formats/aiffile.h",
 		MAME_DIR .. "src/lib/formats/cassimg.cpp",
 		MAME_DIR .. "src/lib/formats/cassimg.h",
 		MAME_DIR .. "src/lib/formats/flacfile.cpp",

@@ -347,13 +347,14 @@ protected:
 	uint8_t m_irq_state;
 	address_space *m_program;
 	address_space *m_io;
-	uint32_t m_a20_mask;
+	offs_t m_a20_mask;
 	memory_access<32, 1, 0, ENDIANNESS_LITTLE>::cache macache16;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache macache32;
 
 	int m_cpuid_max_input_value_eax; // Highest CPUID standard function available
 	uint32_t m_cpuid_id0, m_cpuid_id1, m_cpuid_id2;
 	uint32_t m_cpu_version;
+	uint32_t m_brand_id;
 	uint32_t m_feature_flags;
 	uint64_t m_tsc;
 	uint64_t m_perfctr[2];
@@ -438,7 +439,7 @@ protected:
 	uint32_t i386_translate(int segment, uint32_t ip, int rwn, int size = 1);
 	inline vtlb_entry get_permissions(uint32_t pte, int wp);
 	bool i386_translate_address(int intention, bool debug, offs_t *address, vtlb_entry *entry);
-	bool translate_address(int pl, int type, uint32_t *address, uint32_t *error);
+	bool translate_address(int pl, int type, offs_t *address, uint32_t *error);
 	void CHANGE_PC(uint32_t pc);
 	inline void NEAR_BRANCH(int32_t offs);
 	inline uint8_t FETCH();

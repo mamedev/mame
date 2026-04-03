@@ -19,7 +19,7 @@ TODO:
 #include "bus/nscsi/devices.h"
 #include "machine/nscsi_bus.h"
 
-DEFINE_DEVICE_TYPE(ISA8_RT1000B, isa8_rt1000b_device, "rt1000b", " Rancho Technology RT1000B SCSI controller")
+DEFINE_DEVICE_TYPE(ISA8_RT1000B, isa8_rt1000b_device, "rt1000b", "Rancho Technology RT1000B SCSI controller")
 
 isa8_rt1000b_device::isa8_rt1000b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ISA8_RT1000B, tag, owner, clock)

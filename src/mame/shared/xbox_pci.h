@@ -372,13 +372,16 @@ protected:
 	TIMER_CALLBACK_MEMBER(audio_update);
 
 private:
-	required_device<dsp56362_device> gpdsp;
+	required_device<dsp56362_device> gpdsp; // global processor
+	required_device<dsp56362_device> epdsp; // encode processor
 	required_device<device_memory_interface> cpu;
 	// APU contains 3 dsps: voice processor (VP) global processor (GP) encode processor (EP)
 	struct apu_state {
 		uint32_t memory[0x60000 / 4]{};
 		uint32_t gpdsp_sgaddress = 0; // global processor scatter-gather
 		uint32_t gpdsp_sgblocks = 0;
+		uint32_t gpdsp_sgaddress2 = 0;
+		uint32_t gpdsp_sgblocks2 = 0;
 		uint32_t gpdsp_address = 0;
 		uint32_t epdsp_sgaddress = 0; // encoder processor scatter-gather
 		uint32_t epdsp_sgblocks = 0;
@@ -398,6 +401,7 @@ private:
 	} apust;
 	void apu_mmio(address_map &map) ATTR_COLD;
 	void p_map(address_map &map) ATTR_COLD;
+	uint32_t program_memory_r(offs_t offset);
 };
 
 DECLARE_DEVICE_TYPE(MCPX_APU, mcpx_apu_device)

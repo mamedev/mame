@@ -309,6 +309,7 @@
 #pragma once
 
 #include "memarray.h"
+#include <algorithm>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -473,8 +474,8 @@ public:
 	void set_scrolldy(int dy, int dy_flipped) { m_dy = dy; m_dy_flipped = dy_flipped; }
 	void set_scrollx(int which, int value) { if (which < m_scrollrows) m_rowscroll[which] = value; }
 	void set_scrolly(int which, int value) { if (which < m_scrollcols) m_colscroll[which] = value; }
-	void set_scrollx(int value) { set_scrollx(0, value); }
-	void set_scrolly(int value) { set_scrolly(0, value); }
+	void set_scrollx(int value) { std::fill_n(m_rowscroll.begin(), m_scrollrows, value); }
+	void set_scrolly(int value) { std::fill_n(m_colscroll.begin(), m_scrollcols, value); }
 	void set_scroll_rows(u32 scroll_rows) { assert(scroll_rows > 0 && scroll_rows <= m_height); m_scrollrows = scroll_rows; }
 	void set_scroll_cols(u32 scroll_cols) { assert(scroll_cols > 0 && scroll_cols <= m_width); m_scrollcols = scroll_cols; }
 	void set_flip(u32 attributes) { if (m_attributes != attributes) { m_attributes = attributes; mappings_update(); } }

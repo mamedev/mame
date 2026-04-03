@@ -8,9 +8,9 @@ Compiling MAME
 All Platforms
 -------------
 
-* To compile MAME, you need a C++17 compiler and runtime library.  We
-  support building with GCC version 10.3 or later and clang version 11
-  or later.  MAME should run with GNU libstdc++ version 10.3 or later or
+* To compile MAME, you need a C++20 compiler and runtime library.  We
+  support building with GCC version 11 or later and clang version 11 or
+  later.  MAME should run with GNU libstdc++ version 11 or later or
   libc++ version 11 or later.  The initial release of any major version
   of GCC should be avoided.  For example, if you want to compile MAME
   with GCC 12, you should use version 12.1 or later.
@@ -795,23 +795,6 @@ omitted).
 Issues affecting Microsoft Visual Studio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Microsoft introduced a new version of XAudio2 with Windows 8 that’s incompatible
-with the version included with DirectX for prior Windows versions at the API
-level.  Newer versions of the Microsoft Windows SDK include headers and libraries
-for the new version of XAudio2.  By default, the target Windows version is set to
-Windows Vista (6.0) when compiling MAME, which prevents the use of this version
-of the XAudio2 headers and libraries.  To build MAME with XAudio2 support using
-the Microsoft Windows SDK, you must do one of the following:
-
-* Add ``MODERN_WIN_API=1`` to the options passed to make when generating the
-  Visual Studio project files.  This will set the target Windows version to
-  Windows 8 (6.2).  The resulting binaries may not run on earlier versions of
-  Windows.
-* Install the `DirectX SDK <https://www.microsoft.com/en-US/download/details.aspx?id=6812>`_ (already included since Windows 8.0 SDK and
-  automatically installed with Visual Studio 2013 and later).  Configure the
-  **osd_windows** project to search the DirectX header/library paths before
-  searching the Microsoft Windows SDK paths.
-
 The MSVC compiler produces spurious warnings about potentially uninitialised
 local variables.  You currently need to add ``NOWERROR=1`` to the options passed
 to make when generating the Visual Studio project files.  This stops warnings
@@ -873,7 +856,7 @@ Using a GCC/GNU libstdc++ installation in a non-standard location on Linux
 GCC may be built and installed to a custom location, typically by supplying the
 **--prefix=** option to the **configure** command.  This may be useful if you
 want to build MAME on a Linux distribution that still uses a version of GNU
-libstdC++ that predates C++17 support.  To use an alternate GCC installation to,
+libstdc++ that predates C++20 support.  To use an alternate GCC installation to
 build MAME, set the C and C++ compilers to the full paths to the **gcc** and
 **g++** commands, and add the library path to the run-time search path.  If you
 installed GCC in /opt/local/gcc72, you might use a command like this::

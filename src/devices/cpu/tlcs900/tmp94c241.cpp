@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "tmp94c241.h"
+
 #include "dasm900.h"
 
 #define LOG_DMA    (1U << 1)
@@ -24,41 +25,36 @@
 // device type definition
 DEFINE_DEVICE_TYPE(TMP94C241, tmp94c241_device, "tmp94c241", "Toshiba TMP94C241")
 
-enum
+enum : uint8_t
 {
-	INTE45,
-	INTE67,
-	INTE89,
-	INTEAB,
-	INTET01,
-	INTET23,
-	INTET45,
-	INTET67,
-	INTET89,
-	INTETAB,
-	INTES0,
-	INTES1,
-	INTETC01,
-	INTETC23,
-	INTETC45,
-	INTETC67,
-	INTE0AD,
-	INTNMWDT
+	INTE45   = 0,
+	INTE67   = 1,
+	INTE89   = 2,
+	INTEAB   = 3,
+	INTET01  = 4,
+	INTET23  = 5,
+	INTET45  = 6,
+	INTET67  = 7,
+	INTET89  = 8,
+	INTETAB  = 9,
+	INTES0   = 10,
+	INTES1   = 11,
+	INTETC01 = 12,
+	INTETC23 = 13,
+	INTETC45 = 14,
+	INTETC67 = 15,
+	INTE0AD  = 16,
+	INTNMWDT = 17,
 };
 
-static const struct {
-	uint8_t reg;
-	uint8_t iff;
-	uint8_t vector;
-	uint8_t dma_start_vector;
-} tmp94c241_irq_vector_map[] =
+const tmp94c241_device::irq_vector_entry tmp94c241_device::irq_vector_map[] =
 {
 	{ INTE0AD,  0x08, 0x28, 0x0a},  // INT0 Pin
 	{ INTE45,   0x08, 0x2c, 0x0b},  // INT4 Pin
 	{ INTE45,   0x80, 0x30, 0x0c},  // INT5 Pin
 	{ INTE67,   0x08, 0x34, 0x0d},  // INT6 Pin
 	{ INTE67,   0x80, 0x38, 0x0e},  // INT7 Pin
-									// 0x3c - reserved
+									 // 0x3c - reserved
 	{ INTE89,   0x08, 0x40, 0x10},  // INT8 Pin
 	{ INTE89,   0x80, 0x44, 0x11},  // INT9 Pin
 	{ INTEAB,   0x08, 0x48, 0x12},  // INTA Pin
@@ -88,9 +84,8 @@ static const struct {
 	{ INTETC45, 0x80, 0xa8, 0x2a},  // INTTC5: micro-DMA completion Ch.5
 	{ INTETC67, 0x08, 0xac, 0x2b},  // INTTC6: micro-DMA completion Ch.6
 	{ INTETC67, 0x80, 0xb0, 0x2c},  // INTTC7: micro-DMA completion Ch.7
-									/* 0xb4 ... 0xfc (Reserved) */
+									 /* 0xb4 ... 0xfc (Reserved) */
 };
-static constexpr u8 NUM_MASKABLE_IRQS = sizeof(tmp94c241_irq_vector_map) / 4;
 
 
 //**************************************************************************
@@ -103,6 +98,7 @@ static constexpr u8 NUM_MASKABLE_IRQS = sizeof(tmp94c241_irq_vector_map) / 4;
 
 tmp94c241_device::tmp94c241_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	tlcs900h_device(mconfig, TMP94C241, tag, owner, clock),
+	m_serial(*this, "serial%u", 0U),
 	m_an_read(*this, 0),
 	m_port_read(*this, 0),
 	m_port_write(*this),
@@ -129,9 +125,6 @@ tmp94c241_device::tmp94c241_device(const machine_config &mconfig, const char *ta
 	m_t16_cap{ 0, 0, 0, 0, 0, 0, 0, 0 },
 	m_timer_16{ 0, 0, 0, 0 },
 	m_watchdog_mode(0),
-	m_serial_control{ 0, 0 },
-	m_serial_mode{ 0, 0 },
-	m_baud_rate{ 0, 0 },
 	m_od_enable(0),
 	m_ad_mode1(0),
 	m_ad_mode2(0),
@@ -201,9 +194,6 @@ void tmp94c241_device::device_start()
 	save_item(NAME(m_taffcr));
 	save_item(NAME(m_t16run));
 	save_item(NAME(m_watchdog_mode));
-	save_item(NAME(m_serial_control));
-	save_item(NAME(m_serial_mode));
-	save_item(NAME(m_baud_rate));
 	save_item(NAME(m_od_enable));
 	save_item(NAME(m_ad_mode1));
 	save_item(NAME(m_ad_mode2));
@@ -286,12 +276,6 @@ void tmp94c241_device::device_reset()
 	std::fill_n(&m_timer_8[0], 4, 0x00);
 	std::fill_n(&m_timer_16[0], 4, 0x00);
 	m_watchdog_mode = 0x80;
-	for (int i = 0; i < 2; i++)
-	{
-		m_serial_control[i] &= 0x80;
-		m_serial_mode[i] &= 0x80;
-		m_baud_rate[i] = 0x00;
-	}
 	m_od_enable = 0x00;
 	m_ad_mode1 = 0x00;
 	m_ad_mode2 = 0x00;
@@ -310,6 +294,13 @@ void tmp94c241_device::device_reset()
 	std::fill_n(&m_dram_refresh[0], 2, 0x00);
 	std::fill_n(&m_dram_access[0], 2, 0x80);
 	m_da_drive = 0x00;
+
+	m_int_reg[INTES0] |= 0x80;
+	m_int_reg[INTES1] |= 0x80;
+	m_check_irqs = 1;
+
+	m_serial[0]->pffc_sclk_w(0);
+	m_serial[1]->pffc_sclk_w(0);
 }
 
 uint8_t tmp94c241_device::inte_r(offs_t offset)
@@ -352,12 +343,12 @@ void tmp94c241_device::iimc_w(uint8_t data)
 
 void tmp94c241_device::intclr_w(uint8_t data)
 {
-	for (int i = 0; i < NUM_MASKABLE_IRQS; i++)
+	for (int i = 0; i < std::size(irq_vector_map); i++)
 	{
-		if (data == tmp94c241_irq_vector_map[i].dma_start_vector)
+		if (data == irq_vector_map[i].dma_start_vector)
 		{
 			// clear interrupt request
-			m_int_reg[tmp94c241_irq_vector_map[i].reg] &= ~ tmp94c241_irq_vector_map[i].iff;
+			m_int_reg[irq_vector_map[i].reg] &= ~ irq_vector_map[i].iff;
 			return;
 		}
 	}
@@ -718,61 +709,6 @@ void tmp94c241_device::wdcr_w(uint8_t data)
 {
 }
 
-template <uint8_t Channel>
-uint8_t tmp94c241_device::scNbuf_r()
-{
-	return 0;
-}
-
-template <uint8_t Channel>
-void tmp94c241_device::scNbuf_w(uint8_t data)
-{
-	// Fake finish sending data
-	m_int_reg[(Channel == 0) ? INTES0 : INTES1] |= 0x80;
-	m_check_irqs = 1;
-	LOGMASKED(LOG_SERIAL, "sc%dbuf write: %02X\n", Channel, data);
-	//machine().debugger().debug_break();
-}
-
-template <uint8_t Channel>
-uint8_t tmp94c241_device::scNcr_r()
-{
-	uint8_t reg = m_serial_control[Channel];
-	if (!machine().side_effects_disabled())
-		m_serial_control[Channel] &= 0xe3;
-	return reg;
-}
-
-template <uint8_t Channel>
-void tmp94c241_device::scNcr_w(uint8_t data)
-{
-	m_serial_control[Channel] = data;
-}
-
-template <uint8_t Channel>
-uint8_t tmp94c241_device::scNmod_r()
-{
-	return m_serial_mode[Channel];
-}
-
-template <uint8_t Channel>
-void tmp94c241_device::scNmod_w(uint8_t data)
-{
-	m_serial_mode[Channel] = data;
-}
-
-template <uint8_t Channel>
-uint8_t tmp94c241_device::brNcr_r()
-{
-	return m_baud_rate[Channel];
-}
-
-template <uint8_t Channel>
-void tmp94c241_device::brNcr_w(uint8_t data)
-{
-	m_baud_rate[Channel] = data;
-}
-
 uint8_t tmp94c241_device::ode_r()
 {
 	return m_od_enable;
@@ -871,7 +807,19 @@ template <uint8_t P>
 void tmp94c241_device::port_fc_w(uint8_t data)
 {
 	m_port_function[P] = data;
+	if (P == PORT_F)
+	{
+		m_serial[0]->pffc_sclk_w(BIT(data, 2));
+		m_serial[1]->pffc_sclk_w(BIT(data, 6));
+	}
 }
+
+void tmp94c241_device::device_add_mconfig(machine_config &mconfig)
+{
+	TMP94C241_SERIAL(mconfig, m_serial[0], DERIVED_CLOCK(1, 1), 0).setint_cb().set(FUNC(tmp94c241_device::set_intreg<INTES0>));
+	TMP94C241_SERIAL(mconfig, m_serial[1], DERIVED_CLOCK(1, 1), 1).setint_cb().set(FUNC(tmp94c241_device::set_intreg<INTES1>));
+}
+
 
 //**************************************************************************
 //  INTERNAL REGISTERS
@@ -967,14 +915,14 @@ void tmp94c241_device::internal_mem(address_map &map)
 	map(0x0000c6, 0x0000c7).r(FUNC(tmp94c241_device::cap_r<CAPB>));
 	map(0x0000c8, 0x0000c8).rw(FUNC(tmp94c241_device::tamod_r), FUNC(tmp94c241_device::tamod_w));
 	map(0x0000c9, 0x0000c9).rw(FUNC(tmp94c241_device::taffcr_r), FUNC(tmp94c241_device::taffcr_w));
-	map(0x0000d0, 0x0000d0).rw(FUNC(tmp94c241_device::scNbuf_r<0>), FUNC(tmp94c241_device::scNbuf_w<0>));
-	map(0x0000d1, 0x0000d1).rw(FUNC(tmp94c241_device::scNcr_r<0>), FUNC(tmp94c241_device::scNcr_w<0>));
-	map(0x0000d2, 0x0000d2).rw(FUNC(tmp94c241_device::scNmod_r<0>), FUNC(tmp94c241_device::scNmod_w<0>));
-	map(0x0000d3, 0x0000d3).rw(FUNC(tmp94c241_device::brNcr_r<0>), FUNC(tmp94c241_device::brNcr_w<0>));
-	map(0x0000d4, 0x0000d4).rw(FUNC(tmp94c241_device::scNbuf_r<1>), FUNC(tmp94c241_device::scNbuf_w<1>));
-	map(0x0000d5, 0x0000d5).rw(FUNC(tmp94c241_device::scNcr_r<1>), FUNC(tmp94c241_device::scNcr_w<1>));
-	map(0x0000d6, 0x0000d6).rw(FUNC(tmp94c241_device::scNmod_r<1>), FUNC(tmp94c241_device::scNmod_w<1>));
-	map(0x0000d7, 0x0000d7).rw(FUNC(tmp94c241_device::brNcr_r<1>), FUNC(tmp94c241_device::brNcr_w<1>));
+	map(0x0000d0, 0x0000d0).rw(m_serial[0], FUNC(tmp94c241_serial_device::scNbuf_r), FUNC(tmp94c241_serial_device::scNbuf_w));
+	map(0x0000d1, 0x0000d1).rw(m_serial[0], FUNC(tmp94c241_serial_device::scNcr_r), FUNC(tmp94c241_serial_device::scNcr_w));
+	map(0x0000d2, 0x0000d2).rw(m_serial[0], FUNC(tmp94c241_serial_device::scNmod_r), FUNC(tmp94c241_serial_device::scNmod_w));
+	map(0x0000d3, 0x0000d3).rw(m_serial[0], FUNC(tmp94c241_serial_device::brNcr_r), FUNC(tmp94c241_serial_device::brNcr_w));
+	map(0x0000d4, 0x0000d4).rw(m_serial[1], FUNC(tmp94c241_serial_device::scNbuf_r), FUNC(tmp94c241_serial_device::scNbuf_w));
+	map(0x0000d5, 0x0000d5).rw(m_serial[1], FUNC(tmp94c241_serial_device::scNcr_r), FUNC(tmp94c241_serial_device::scNcr_w));
+	map(0x0000d6, 0x0000d6).rw(m_serial[1], FUNC(tmp94c241_serial_device::scNmod_r), FUNC(tmp94c241_serial_device::scNmod_w));
+	map(0x0000d7, 0x0000d7).rw(m_serial[1], FUNC(tmp94c241_serial_device::brNcr_r), FUNC(tmp94c241_serial_device::brNcr_w));
 	map(0x0000e0, 0x0000f0).rw(FUNC(tmp94c241_device::inte_r), FUNC(tmp94c241_device::inte_w));
 	map(0x0000f6, 0x0000f6).w(FUNC(tmp94c241_device::iimc_w));
 	map(0x0000f7, 0x0000f7).rw(FUNC(tmp94c241_device::intnmwdt_r), FUNC(tmp94c241_device::intnmwdt_w));
@@ -1009,6 +957,18 @@ void tmp94c241_device::internal_mem(address_map &map)
 	map(0x000400, 0x000bff).ram();
 }
 
+//-------------------------------------------------
+//  set_intreg - callback to set interrupt bits
+//  for peripheral
+//-------------------------------------------------
+
+template <uint8_t IntReg>
+void tmp94c241_device::set_intreg(uint8_t data)
+{
+	m_int_reg[IntReg] |= data;
+	m_check_irqs = 1;
+}
+
 //**************************************************************************
 //  EXECUTION CALLBACKS
 //**************************************************************************
@@ -1027,9 +987,9 @@ int tmp94c241_device::tlcs900_process_hdma(int channel)
 
 	// Find which interrupt this start vector corresponds to
 	int irq = -1;
-	for (int i = 0; i < NUM_MASKABLE_IRQS; i++)
+	for (int i = 0; i < std::size(irq_vector_map); i++)
 	{
-		if (tmp94c241_irq_vector_map[i].dma_start_vector == start_vector)
+		if (irq_vector_map[i].dma_start_vector == start_vector)
 		{
 			irq = i;
 			break;
@@ -1040,7 +1000,7 @@ int tmp94c241_device::tlcs900_process_hdma(int channel)
 		return 0;  // No matching interrupt found
 
 	// Check if the interrupt flag is set (DMA trigger condition)
-	if (!(m_int_reg[tmp94c241_irq_vector_map[irq].reg] & tmp94c241_irq_vector_map[irq].iff))
+	if (!(m_int_reg[irq_vector_map[irq].reg] & irq_vector_map[irq].iff))
 		return 0;  // Interrupt not pending
 
 	// Decode DMAM mode register
@@ -1164,7 +1124,7 @@ int tmp94c241_device::tlcs900_process_hdma(int channel)
 	}
 
 	// Clear the triggering interrupt flag
-	m_int_reg[tmp94c241_irq_vector_map[irq].reg] &= ~tmp94c241_irq_vector_map[irq].iff;
+	m_int_reg[irq_vector_map[irq].reg] &= ~irq_vector_map[irq].iff;
 
 	return 1;  // Transfer performed
 }
@@ -1307,9 +1267,9 @@ void tmp94c241_device::tlcs900_check_irqs()
 	/* Check regular IRQs
 	   The smaller the vector value, the higher the priority. */
 	int irq_vectors[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };
-	for (int i = NUM_MASKABLE_IRQS - 1; i >= 0; i--)
+	for (int i = std::size(irq_vector_map) - 1; i >= 0; i--)
 	{
-		if (m_int_reg[tmp94c241_irq_vector_map[i].reg] & tmp94c241_irq_vector_map[i].iff)
+		if (m_int_reg[irq_vector_map[i].reg] & irq_vector_map[i].iff)
 		{
 			// HDMA priority: skip interrupts targeted by active HDMA channels.
 			// On real hardware, HDMA consumes the interrupt trigger instead of
@@ -1317,7 +1277,7 @@ void tmp94c241_device::tlcs900_check_irqs()
 			bool hdma_targeted = false;
 			for (int ch = 0; ch < 4; ch++)
 			{
-				if (m_dma_vector[ch] == tmp94c241_irq_vector_map[i].dma_start_vector)
+				if (m_dma_vector[ch] == irq_vector_map[i].dma_start_vector)
 				{
 					hdma_targeted = true;
 					break;
@@ -1326,13 +1286,13 @@ void tmp94c241_device::tlcs900_check_irqs()
 			if (hdma_targeted)
 				continue;
 
-			switch (tmp94c241_irq_vector_map[i].iff)
+			switch (irq_vector_map[i].iff)
 			{
 				case 0x80:
-					irq_vectors[(m_int_reg[tmp94c241_irq_vector_map[i].reg] >> 4) & 0x07] = i;
+					irq_vectors[(m_int_reg[irq_vector_map[i].reg] >> 4) & 0x07] = i;
 					break;
 				case 0x08:
-					irq_vectors[m_int_reg[tmp94c241_irq_vector_map[i].reg] & 0x07] = i;
+					irq_vectors[m_int_reg[irq_vector_map[i].reg] & 0x07] = i;
 					break;
 			}
 		}
@@ -1353,7 +1313,7 @@ void tmp94c241_device::tlcs900_check_irqs()
 	// Take IRQ
 	if (irq >= 0)
 	{
-		uint8_t vector = tmp94c241_irq_vector_map[irq].vector;
+		uint8_t vector = irq_vector_map[irq].vector;
 
 		// Log only DMA completion interrupts (INTTC0/INTTC2) — key milestones
 		if (vector == 0x94)
@@ -1377,14 +1337,14 @@ void tmp94c241_device::tlcs900_check_irqs()
 		m_halted = 0;
 
 		// Clear taken IRQ
-		m_int_reg[tmp94c241_irq_vector_map[irq].reg] &= ~ tmp94c241_irq_vector_map[irq].iff;
+		m_int_reg[irq_vector_map[irq].reg] &= ~ irq_vector_map[irq].iff;
 
 		// Level-detect re-assertion: Level-triggered interrupt
 		// flags are continuously driven by the input level. Clearing the flag
 		// during dispatch has no lasting effect if the input is still asserted.
 		// Re-assert INT0 flag if input is still active in level-detect mode.
-		if (tmp94c241_irq_vector_map[irq].reg == INTE0AD &&
-			tmp94c241_irq_vector_map[irq].iff == 0x08 &&
+		if (irq_vector_map[irq].reg == INTE0AD &&
+			irq_vector_map[irq].iff == 0x08 &&
 			!(m_iimc & 0x02) &&
 			m_level[TLCS900_INT0] == ASSERT_LINE)
 		{

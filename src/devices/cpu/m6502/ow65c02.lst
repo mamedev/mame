@@ -646,7 +646,7 @@ sbc_c_aba
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	m_TMP2 = read(m_TMP);
-	do_sbc(m_TMP2);
+	do_sbc_c(m_TMP2);
 	if(m_P & F_D) {
 		read_pc();
 		set_nz(m_A);
@@ -663,7 +663,7 @@ sbc_c_abx
 	}
 	m_TMP += m_X;
 	m_TMP2 = read(m_TMP);
-	do_sbc(m_TMP2);
+	do_sbc_c(m_TMP2);
 	if(m_P & F_D) {
 		read_pc();
 		set_nz(m_A);
@@ -680,7 +680,7 @@ sbc_c_aby
 	}
 	m_TMP += m_Y;
 	m_TMP2 = read(m_TMP);
-	do_sbc(m_TMP2);
+	do_sbc_c(m_TMP2);
 	if(m_P & F_D) {
 		read_pc();
 		set_nz(m_A);
@@ -695,7 +695,7 @@ sbc_c_idx
 	m_TMP = read(m_TMP2 & 0xff);
 	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
 	m_TMP2 = read(m_TMP);
-	do_sbc(m_TMP2);
+	do_sbc_c(m_TMP2);
 	if(m_P & F_D) {
 		read_pc();
 		set_nz(m_A);
@@ -711,7 +711,7 @@ sbc_c_idy
 		read(set_l(m_TMP, m_TMP+m_Y));
 	}
 	m_TMP2 = read(m_TMP+m_Y);
-	do_sbc(m_TMP2);
+	do_sbc_c(m_TMP2);
 	if(m_P & F_D) {
 		read_pc();
 		set_nz(m_A);
@@ -721,7 +721,7 @@ sbc_c_idy
 sbc_c_imm
 	m_TMP = read_pc();
 	m_PC++;
-	do_sbc(m_TMP);
+	do_sbc_c(m_TMP);
 	if(m_P & F_D) {
 		read_pc();
 		set_nz(m_A);
@@ -732,7 +732,7 @@ sbc_c_zpg
 	m_TMP = read_pc();
 	m_PC++;
 	m_TMP2 = read(m_TMP);
-	do_sbc(m_TMP2);
+	do_sbc_c(m_TMP2);
 	if(m_P & F_D) {
 		read_pc();
 		set_nz(m_A);
@@ -745,7 +745,7 @@ sbc_c_zpi
 	m_TMP = read(m_TMP2 & 0xff);
 	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
 	m_TMP2 = read(m_TMP);
-	do_sbc(m_TMP2);
+	do_sbc_c(m_TMP2);
 	if(m_P & F_D) {
 		read_pc();
 		set_nz(m_A);
@@ -757,7 +757,7 @@ sbc_c_zpx
 	m_PC++;
 	read(m_TMP);
 	m_TMP2 = read(uint8_t(m_TMP+m_X));
-	do_sbc(m_TMP2);
+	do_sbc_c(m_TMP2);
 	if(m_P & F_D) {
 		read_pc();
 		set_nz(m_A);
