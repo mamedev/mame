@@ -13,7 +13,6 @@ public:
 	// construction/destruction
 	z80n_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	auto nmiack_cb() { return m_nmiack_cb.bind(); }
 	auto in_nextreg_cb() { return m_in_nextreg_cb.bind(); }
 	auto out_nextreg_cb() { return m_out_nextreg_cb.bind(); }
 	auto out_retn_seen_cb() { return m_out_retn_seen_cb.bind(); }
@@ -28,7 +27,6 @@ protected:
 	// device_execute_interface implementation
 	virtual void execute_run() override;
 
-	devcb_write_line m_nmiack_cb;
 	devcb_write8 m_out_retn_seen_cb;
 	devcb_read8 m_in_nextreg_cb;
 	devcb_write8 m_out_nextreg_cb;

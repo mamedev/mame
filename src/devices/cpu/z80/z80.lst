@@ -902,7 +902,6 @@ macro   take_nmi
 macro   z80n:take_nmi
 	leave_halt();
 	m_iff1 = 0;
-	m_nmiack_cb(1);
 	m_r++;
 	+ 5
 	if (m_stackless) {

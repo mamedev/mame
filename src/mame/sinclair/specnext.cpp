@@ -169,7 +169,6 @@ protected:
 
 	u8 do_m1(offs_t offset);
 	void nmi_rq();
-	void nmi_ack(int state);
 	void leave_nmi(int state);
 	void map_fetch(address_map &map) ATTR_COLD;
 	void map_mem(address_map &map) ATTR_COLD;
@@ -2737,18 +2736,10 @@ void specnext_state::nmi_rq()
 			LOGINTVVV("NMI: on (%s)\n", nmi_assert_mf() ? "MF" : "DivMMC");
 			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 			m_maincpu->abort_timeslice();
-		}
-	}
-}
 
-void specnext_state::nmi_ack(int state)
-{
-	if (state)
-	{
-		LOGINTVVV("NMI: ack\n");
-		m_im2_int_status |= 1 << INT_PRIORITY_NMI;
-		update_dma_delay();
-		bank_update(0, 2);
+			m_im2_int_status |= 1 << INT_PRIORITY_NMI;
+			update_dma_delay();
+		}
 	}
 }
 
@@ -3976,7 +3967,6 @@ void specnext_state::tbblue(machine_config &config)
 	m_maincpu->set_io_map(&specnext_state::map_io);
 	m_maincpu->set_vblank_int("screen", FUNC(specnext_state::specnext_interrupt));
 	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return 0xff; }));
-	m_maincpu->nmiack_cb().set(FUNC(specnext_state::nmi_ack));
 	m_maincpu->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_next_regs.write_byte(offset, data); });
 	m_maincpu->in_nextreg_cb().set([this](offs_t offset) { return m_next_regs.read_byte(offset); });
 	m_maincpu->out_retn_seen_cb().set(FUNC(specnext_state::leave_nmi));
