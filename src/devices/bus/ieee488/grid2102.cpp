@@ -12,6 +12,71 @@
 #include "emu.h"
 #include "grid2102.h"
 
+#include "harddisk.h"
+
+#include <algorithm>
+#include <cstring>
+
+static const grid210x_disk_status fdd_status
+{
+	512,
+	504,
+	360 * 1024 / 512,  // 360KiB, 5.25  DS/DD
+	1,  // ok
+	0x120,
+	0x121,
+	1,
+	0,
+	"48 TPI DS DD FLOPPY 30237-00",
+	512,
+	9,
+	2,
+};
+
+static const grid210x_disk_status hdd_status
+{
+	512,
+	504,
+	(10 * 1024 * 1024) / 512,  // 10 MB by default
+	1,  // ok
+	0x2400,
+	0x2420,
+	10,
+	0,
+	"MAME HARD DISK DRIVE",
+	512,
+	10,
+	4,
+};
+
+std::array<uint8_t, 52> grid210x_disk_status::serialize() const
+{
+	std::array<uint8_t, 52> out{};
+	out[0] = uint8_t(sector_size);
+	out[1] = uint8_t(sector_size >> 8);
+	out[2] = uint8_t(logical_sector_size);
+	out[3] = uint8_t(logical_sector_size >> 8);
+	out[4] = uint8_t(sector_count);
+	out[5] = uint8_t(sector_count >> 8);
+	out[6] = drive_status;
+	out[7] = uint8_t(bitmap_fid);
+	out[8] = uint8_t(bitmap_fid >> 8);
+	out[9] = uint8_t(superblock_fid);
+	out[10] = uint8_t(superblock_fid >> 8);
+	out[11] = uint8_t(min_dir_pages);
+	out[12] = uint8_t(min_dir_pages >> 8);
+	out[13] = flush;
+	std::memset(&out[14], ' ', 32);
+	std::memcpy(&out[14], name.data(), std::min<size_t>(name.length(), 32));
+	out[46] = uint8_t(bytes_per_sector);
+	out[47] = uint8_t(bytes_per_sector >> 8);
+	out[48] = uint8_t(sectors_per_track);
+	out[49] = uint8_t(sectors_per_track >> 8);
+	out[50] = uint8_t(tracks_per_cylinder);
+	out[51] = uint8_t(tracks_per_cylinder >> 8);
+	return out;
+}
+
 // device type definition
 DEFINE_DEVICE_TYPE(GRID2102, grid2102_device, "grid2102", "GRID2102")
 DEFINE_DEVICE_TYPE(GRID2101_FLOPPY, grid2101_floppy_device, "grid2101_floppy", "GRID2101_FLOPPY")
@@ -52,44 +117,7 @@ DEFINE_DEVICE_TYPE(GRID2101_HDD, grid2101_hdd_device, "grid2101_hdd", "GRID2101_
 #define GRID210X_STATE_WRITING_DATA_WAIT 3
 #define GRID210X_STATE_FORMATTING 4
 
-static const uint8_t fdd_identity_response[52] = {
-	0x00, 0x02,  // sector_size
-	0xf8, 0x01,  // logical_sector_size
-	0xD0, 0x02,  // sector_count
-	0x01,        // drive_status
-	0x20, 0x01,  // bitmap_fid
-	0x21, 0x01,  // superblock_fid
-	0x01, 0x00,  // min_dir_pages
-	0x00,        // flush
-	'4', '8', ' ', 'T', 'P', 'I', ' ', 'D',
-	'S', ' ', 'D', 'D', ' ', 'F', 'L', 'O',
-	'P', 'P', 'Y', ' ', ' ', ' ', ' ', '3',
-	'0', '2', '3', '7', '-', '0', '0', '\0',
-	0x00, 0x02,  // bytes_per_sector
-	0x00, 0x00,  // sectors_per_track
-	0x00, 0x00,  // tracks_per_cylinder
-};
-
-static const uint8_t hdd_identity_response[52] = {
-	0x00, 0x02,   // sector_size
-	0xF8, 0x01,   // logical_sector_size
-	0x8C, 0x51,   // sector_count
-	0x01,         // drive_status
-	0x00, 0x24,   // bitmap_fid
-	0x20, 0x24,   // superblock_fid
-	0x01, 0x00,   // min_dir_pages
-	0x00,         // flush
-	'M', 'A', 'M', 'E', ' ', 'H', 'A', 'R',
-	'D', 'D', 'I', 'S', 'K', ' ', 'D', 'R',
-	'I', 'V', 'E', ' ', ' ', ' ', ' ', ' ',
-	'G', 'R', 'I', 'D', '2', '1', '0', '1',
-	0x00, 0x02,   // bytes_per_sector
-	0x00, 0x00,   // sectors_per_track
-	0x00, 0x00,   // tracks_per_cylinder
-};
-
-
-grid210x_device::grid210x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int bus_addr, const uint8_t *identify_response, attotime read_delay)
+grid210x_device::grid210x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int bus_addr, attotime read_delay)
 	: device_t(mconfig, type, tag, owner, clock),
 	  device_ieee488_interface(mconfig, *this),
 	  device_image_interface(mconfig, *this),
@@ -101,7 +129,6 @@ grid210x_device::grid210x_device(const machine_config &mconfig, device_type type
 	  has_srq(false),
 	  serial_poll_byte(0),
 	  bus_addr(bus_addr),
-	  identify_response_ptr(identify_response),
 	  read_delay(read_delay)
 {
 
@@ -122,7 +149,7 @@ TIMER_CALLBACK_MEMBER(grid210x_device::delay_tick) {
 			m_output_data_buffer.push(data[i]);
 		}
 	} else if (m_floppy_loop_state == GRID210X_STATE_FORMATTING) {
-		const uint32_t sector_total = GRID2102_FETCH16(identify_response_ptr, 4);
+		const uint32_t sector_total = get_status().sector_count;
 
 		uint8_t buf[512];
 		std::memset(buf, 0xff, 8);
@@ -166,8 +193,8 @@ void grid210x_device::accept_transfer() {
 					m_output_data_buffer.push(0);
 				}
 			} else if (command == 0x1) { // ddGetStatus
-				for (int i = 0; i < 52; i++) {
-					m_output_data_buffer.push(identify_response_ptr[i]);
+				for (uint8_t b : get_status().serialize()) {
+					m_output_data_buffer.push(b);
 				}
 			} else if (command == 0x4) { // ddRead
 				floppy_sector_number = sector_number;
@@ -342,17 +369,37 @@ void grid210x_device::ieee488_ren(int state) {
 }
 
 grid2101_hdd_device::grid2101_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: grid210x_device(mconfig, GRID2101_HDD, tag, owner, clock, 4, hdd_identity_response, attotime::from_usec(150))
-{
+	: grid210x_device(mconfig, GRID2101_HDD, tag, owner, clock, 4, attotime::from_usec(150)) { }
 
+grid2101_floppy_device::grid2101_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	grid210x_device(mconfig, GRID2101_FLOPPY, tag, owner, clock, 5) { }
+
+grid2102_device::grid2102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	grid210x_device(mconfig, GRID2102, tag, owner, clock, 6) { }
+
+grid210x_disk_status grid2101_hdd_device::get_status()
+{
+	grid210x_disk_status status = hdd_status;
+
+	if (is_open())
+	{
+		hard_disk_file hd(image_core_file(), 0);
+		const hard_disk_file::info &info = hd.get_info();
+
+		status.sector_count = u16(std::min<u64>(length() / u64(status.sector_size), 0xffffU));
+		status.sectors_per_track = u16(std::min<u32>(info.sectors, 0xffffU));
+		status.tracks_per_cylinder = u16(std::min<u32>(info.heads, 0xffffU));
+	}
+
+	return status;
 }
 
-grid2101_floppy_device::grid2101_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : grid210x_device(mconfig, GRID2101_FLOPPY, tag, owner, clock, 5, fdd_identity_response)
+grid210x_disk_status grid2101_floppy_device::get_status()
 {
-
+	return fdd_status;
 }
 
-grid2102_device::grid2102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : grid210x_device(mconfig, GRID2102, tag, owner, clock, 6, fdd_identity_response)
+grid210x_disk_status grid2102_device::get_status()
 {
-
+	return fdd_status;
 }

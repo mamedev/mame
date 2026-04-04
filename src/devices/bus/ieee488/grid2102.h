@@ -13,14 +13,33 @@
 
 #include "ieee488.h"
 
+#include <array>
 #include <queue>
+#include <string>
 #include <vector>
-#include <cstring>
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+struct grid210x_disk_status
+{
+	uint16_t sector_size;
+	uint16_t logical_sector_size;
+	uint16_t sector_count;
+	uint8_t drive_status;
+	uint16_t bitmap_fid;
+	uint16_t superblock_fid;
+	uint16_t min_dir_pages;
+	uint8_t flush;
+	std::string name;
+	uint16_t bytes_per_sector;
+	uint16_t sectors_per_track;
+	uint16_t tracks_per_cylinder;
+
+	std::array<uint8_t, 52> serialize() const;
+};
 
 // ======================> grid210x_device
 class grid210x_device :  public device_t,
@@ -28,8 +47,7 @@ class grid210x_device :  public device_t,
 						public device_image_interface
 {
 public:
-	// construction/destruction
-	grid210x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int bus_addr, const uint8_t *identify_response, attotime read_delay = attotime::from_msec(5));
+	grid210x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int bus_addr, attotime read_delay = attotime::from_msec(5));
 
 protected:
 	// device-level overrides
@@ -57,6 +75,8 @@ protected:
 	void accept_transfer();
 	void update_ndac(int atn);
 
+	virtual grid210x_disk_status get_status() = 0;
+
 private:
 	TIMER_CALLBACK_MEMBER(delay_tick);
 
@@ -72,7 +92,6 @@ private:
 	uint8_t serial_poll_byte;
 	uint32_t floppy_sector_number;
 	int bus_addr;
-	const uint8_t *identify_response_ptr;
 	std::vector<uint8_t> m_data_buffer;
 	std::queue<uint8_t> m_output_data_buffer;
 	uint16_t io_size;
@@ -84,24 +103,29 @@ protected:
 
 class grid2102_device : public grid210x_device {
 public:
-	// construction/destruction
 	grid2102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual grid210x_disk_status get_status() override;
 };
 
 class grid2101_floppy_device : public grid210x_device {
 public:
-	// construction/destruction
 	grid2101_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual grid210x_disk_status get_status() override;
 };
 
 class grid2101_hdd_device : public grid210x_device {
 public:
-	// construction/destruction
 	grid2101_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
 	virtual const char *image_type_name() const noexcept override { return "harddisk"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "hard"; }
+
+protected:
+	virtual grid210x_disk_status get_status() override;
 };
 
 // device type definition
