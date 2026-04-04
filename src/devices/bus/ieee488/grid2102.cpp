@@ -19,6 +19,10 @@ DEFINE_DEVICE_TYPE(GRID2101_HDD, grid2101_hdd_device, "grid2101_hdd", "GRID2101_
 
 #define LOG_BYTES_MASK    (LOG_GENERAL << 1)
 #define LOG_BYTES(...)    LOGMASKED(LOG_BYTES_MASK, __VA_ARGS__)
+
+#define LOG_GPIB_ADDR_MASK (LOG_GENERAL << 2)
+#define LOG_GPIB_ADDR(...) LOGMASKED(LOG_GPIB_ADDR_MASK, __VA_ARGS__)
+
 #define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
@@ -180,21 +184,21 @@ void grid210x_device::ieee488_dav(int state) {
 				if ((m_last_recv_byte & 0x1F) == bus_addr) {
 					// dev-id = 5
 					listening = true;
-					LOG("grid210x_device now listening\n");
+					LOG_GPIB_ADDR("grid210x_device now listening\n");
 				} else if((m_last_recv_byte & 0x1F) == 0x1F) {
 					// reset listen
 					listening = false;
-					LOG("grid210x_device now not listening\n");
+					LOG_GPIB_ADDR("grid210x_device now not listening\n");
 				}
 			} else if ((m_last_recv_byte & 0xE0) == 0x40) {
 				if ((m_last_recv_byte & 0x1F) == bus_addr) {
 					// dev-id = 5
 					talking = true;
-					LOG("grid210x_device now talking\n");
+					LOG_GPIB_ADDR("grid210x_device now talking\n");
 				} else {
 					// reset talk
 					talking = false;
-					LOG("grid210x_device now not talking\n");
+					LOG_GPIB_ADDR("grid210x_device now not talking\n");
 				}
 			} else if (m_last_recv_byte == 0x18) {
 				// serial poll enable
