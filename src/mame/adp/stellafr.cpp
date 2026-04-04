@@ -92,6 +92,7 @@ Connectors:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
+#include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -204,6 +205,7 @@ public:
 	{ }
 
 	void stellafr(machine_config &config);
+	void stellafr_sus(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -236,6 +238,7 @@ private:
 	void lamps_w(uint8_t row, uint16_t data);
 
 	void mem_map(address_map &map) ATTR_COLD;
+	void sus_mem_map(address_map &map) ATTR_COLD;
 	void fc7_map(address_map &map) ATTR_COLD;
 
 };
@@ -350,6 +353,23 @@ void stellafr_state::mem_map(address_map &map)
 	map(0xff0000, 0xffffff).ram().share("nvram");
 }
 
+void stellafr_state::sus_mem_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x400000, 0x40001f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
+	// controlled by U17 74HC138
+	map(0x800001, 0x800001).w(m_dac, FUNC(dac_byte_interface::data_w)); // Y0
+	// Y1 device on cpu board
+	// Y2 device on cpu board
+	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::mux2_w)); // Y3 SP/ME II out
+	map(0x800100, 0x800101).rw(FUNC(stellafr_state::mux_r), FUNC(stellafr_state::mux_w)); // Y4 SP/ME I out / Inputs
+	map(0x800141, 0x800141).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)); // Y5
+	map(0x800143, 0x800143).w("aysnd", FUNC(ay8910_device::data_w)); // Y5
+	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff); // Y6
+	// Y7 NC
+	map(0xfc0000, 0xffffff).ram().share("nvram");
+}
+
 void stellafr_state::fc7_map(address_map &map)
 {
 	map(0xfffff5, 0xfffff5).r(m_duart, FUNC(mc68681_device::get_irq_vector));
@@ -389,6 +409,29 @@ void stellafr_state::stellafr(machine_config &config)
 	m_duart->outport_cb().set(FUNC(stellafr_state::duart_output_w));
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
+
+	AD7224(config, m_dac, 0);
+
+	SPEAKER(config, "mono").front_center();
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1'000'000));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.85);
+	aysnd.port_a_read_callback().set_ioport("IN0");
+	aysnd.port_b_write_callback().set(FUNC(stellafr_state::ay8910_portb_w));
+}
+
+void stellafr_state::stellafr_sus(machine_config &config)
+{
+	M68000(config, m_maincpu, 10'000'000 ); //?
+	m_maincpu->set_addrmap(AS_PROGRAM, &stellafr_state::sus_mem_map);
+	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &stellafr_state::fc7_map);
+
+	MC68681(config, m_duart, 3'686'400);
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2); // ?
+	m_duart->outport_cb().set(FUNC(stellafr_state::duart_output_w));
+
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
+
+	MSM6242(config, "rtc", XTAL(32'768));
 
 	AD7224(config, m_dac, 0);
 
@@ -633,5 +676,5 @@ GAMEL(1998, allfred,  0,        stellafr, stellafr, stellafr_state, empty_init, 
 GAMEL(1998, grnada,   0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Granada",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, taipan,   0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Nova",   "Tai Pan Money",         MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, bigwinnr, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Nova",   "Big Winner",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(2001, kleoptra, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Asterix und Kleopatra", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(2001, kleoptra, 0,        stellafr_sus, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Asterix und Kleopatra", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(2001, turbosun, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Turbo Sunny",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
