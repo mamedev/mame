@@ -11,14 +11,12 @@
 #include "esq1by22.lh"
 #include "esq2by40.lh"
 
-
 #define LOG_DISPLAY_COMMANDS (1U << 1)
 #define LOGDC(...) LOGMASKED(LOG_DISPLAY_COMMANDS, __VA_ARGS__)
 
 // #define VERBOSE LOG_DISPLAY_COMMANDS
 
 #include "logmacro.h"
-
 
 DEFINE_DEVICE_TYPE(ESQ1X22,     esq1x22_device,     "esq1x22",     "Ensoniq 1x22 VFD")
 DEFINE_DEVICE_TYPE(ESQ2X40,     esq2x40_device,     "esq2x40",     "Ensoniq 2x40 VFD")
@@ -324,6 +322,7 @@ void esq2x40_device::write_char(uint8_t data)
 			case 0xf5:  // save cursor position
 				m_savedx = m_cursx;
 				m_savedy = m_cursy;
+				m_curattr = 0;
 				LOGDC("save cursor position (%d,%d)\n", m_cursy, m_cursx);
 				break;
 
