@@ -50,6 +50,7 @@ DEFINE_DEVICE_TYPE(GRID2101_HDD, grid2101_hdd_device, "grid2101_hdd", "GRID2101_
 #define GRID210X_STATE_READING_DATA 1
 #define GRID210X_STATE_WRITING_DATA 2
 #define GRID210X_STATE_WRITING_DATA_WAIT 3
+#define GRID210X_STATE_FORMATTING 4
 
 static const uint8_t fdd_identity_response[52] = {
 	0x00, 0x02,  // sector_size
@@ -120,20 +121,32 @@ TIMER_CALLBACK_MEMBER(grid210x_device::delay_tick) {
 		for (int i = 0; i < io_size; i++) {
 			m_output_data_buffer.push(data[i]);
 		}
-		serial_poll_byte = 0x0F;
-		has_srq = true;
-		m_bus->srq_w(this, 0);
-		m_floppy_loop_state = GRID210X_STATE_IDLE;
-	} else if (m_floppy_loop_state == GRID210X_STATE_WRITING_DATA_WAIT) {
-		// send an srq as success flag
-		for (int i = 0; i < 7; i++) { // FIXME:
+	} else if (m_floppy_loop_state == GRID210X_STATE_FORMATTING) {
+		const uint32_t sector_total = GRID2102_FETCH16(identify_response_ptr, 4);
+
+		uint8_t buf[512];
+		std::memset(buf, 0xff, 8);
+		std::memset(buf + 8, 0xe5, 512 - 8);
+		for (uint32_t sec = 0; sec < sector_total; sec++) {
+			fseek(s64(sec) * 512, SEEK_SET);
+			fwrite(buf, 512);
+		}
+
+		for (int i = 0; i < 7; i++) {
 			m_output_data_buffer.push(0);
 		}
-		serial_poll_byte = 0x0F;
-		has_srq = true;
-		m_bus->srq_w(this, 0);
-		m_floppy_loop_state = GRID210X_STATE_IDLE;
+	} else if (m_floppy_loop_state == GRID210X_STATE_WRITING_DATA_WAIT) {
+		for (int i = 0; i < 7; i++) {
+			m_output_data_buffer.push(0);
+		}
+	} else {
+		return;
 	}
+
+	serial_poll_byte = 0x0F;
+	has_srq = true;
+	m_bus->srq_w(this, 0);
+	m_floppy_loop_state = GRID210X_STATE_IDLE;
 }
 
 void grid210x_device::ieee488_eoi(int state) {
@@ -148,8 +161,12 @@ void grid210x_device::accept_transfer() {
 			uint16_t data_size = GRID2102_FETCH16(m_data_buffer, 7);
 			LOG("grid210x_device command %u, data size %u, sector no %u\n", (unsigned)command, (unsigned)data_size, (unsigned)sector_number);
 			(void)(sector_number);
-			if (command == 0x1) { // ddGetStatus
-				for (int i = 0; i < 56 && i < data_size; i++) {
+			if (command == 0x0) { // ddInitialize
+				for (int i = 0; i < 7; i++) { // just OK
+					m_output_data_buffer.push(0);
+				}
+			} else if (command == 0x1) { // ddGetStatus
+				for (int i = 0; i < 52; i++) {
 					m_output_data_buffer.push(identify_response_ptr[i]);
 				}
 			} else if (command == 0x4) { // ddRead
@@ -161,11 +178,14 @@ void grid210x_device::accept_transfer() {
 				floppy_sector_number = sector_number;
 				io_size = data_size;
 				m_floppy_loop_state = GRID210X_STATE_WRITING_DATA;
+			} else if (command == 0x11) { // ddFormat
+				m_floppy_loop_state = GRID210X_STATE_FORMATTING;
+				m_delay_timer->adjust(read_delay);
 			}
 		} // else something is wrong, ignore
 	} else if (m_floppy_loop_state == GRID210X_STATE_WRITING_DATA) {
 		// write
-		if (floppy_sector_number != 0xFFFFFFFF) {
+		if (floppy_sector_number < 0xFFFF) {
 			fseek(floppy_sector_number * 512, SEEK_SET);
 			fwrite(m_data_buffer.data(), m_data_buffer.size());
 		} else {
