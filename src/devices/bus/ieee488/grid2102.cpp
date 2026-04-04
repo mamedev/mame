@@ -51,25 +51,44 @@ DEFINE_DEVICE_TYPE(GRID2101_HDD, grid2101_hdd_device, "grid2101_hdd", "GRID2101_
 #define GRID210X_STATE_WRITING_DATA 2
 #define GRID210X_STATE_WRITING_DATA_WAIT 3
 
-uint8_t grid2102_device::identify_response[56] = {0x00, 0x02, 0xf8, 0x01, 0xD0, 0x02, 0x01, 0x20, 0x01, 0x21, 0x01, 0x01, 0x00, 0x00,
-				 0x34, 0x38, 0x20, 0x54, 0x50, 0x49, 0x20, 0x44, 0x53, 0x20, 0x44, 0x44, 0x20, 0x46,
-				 0x4c, 0x4f, 0x50, 0x50, 0x59, 0x20, 0x20, 0x20, 0x20, 0x33, 0x30, 0x32, 0x33, 0x37,
-				 0x2d, 0x30, 0x30, 0x00, 0x02, 0x09, 0x00};
+static const uint8_t fdd_identity_response[52] = {
+	0x00, 0x02,  // sector_size
+	0xf8, 0x01,  // logical_sector_size
+	0xD0, 0x02,  // sector_count
+	0x01,        // drive_status
+	0x20, 0x01,  // bitmap_fid
+	0x21, 0x01,  // superblock_fid
+	0x01, 0x00,  // min_dir_pages
+	0x00,        // flush
+	'4', '8', ' ', 'T', 'P', 'I', ' ', 'D',
+	'S', ' ', 'D', 'D', ' ', 'F', 'L', 'O',
+	'P', 'P', 'Y', ' ', ' ', ' ', ' ', '3',
+	'0', '2', '3', '7', '-', '0', '0', '\0',
+	0x00, 0x02,  // bytes_per_sector
+	0x00, 0x00,  // sectors_per_track
+	0x00, 0x00,  // tracks_per_cylinder
+};
 
-uint8_t grid2101_floppy_device::identify_response[56] = {0x00, 0x02, 0xf8, 0x01, 0xD0, 0x02, 0x01, 0x20, 0x01, 0x21, 0x01, 0x01, 0x00, 0x00,
-				 0x34, 0x38, 0x20, 0x54, 0x50, 0x49, 0x20, 0x44, 0x53, 0x20, 0x44, 0x44, 0x20, 0x46,
-				 0x4c, 0x4f, 0x50, 0x50, 0x59, 0x20, 0x20, 0x20, 0x20, 0x33, 0x30, 0x32, 0x33, 0x37,
-				 0x2d, 0x30, 0x30, 0x00, 0x02, 0x09, 0x00};
-
-uint8_t grid2101_hdd_device::identify_response[56] = {
-	0x00, 0x02, 0xF8, 0x01, 0x8C, 0x51, 0x01, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x4D, 0x41,
-	0x4D, 0x45, 0x20, 0x48, 0x41, 0x52, 0x44, 0x44, 0x49, 0x53, 0x4B, 0x20, 0x44, 0x52, 0x49, 0x56,
-	0x45, 0x20, 0x20, 0x20, 0x20, 0x20, 0x47, 0x52, 0x49, 0x44, 0x32, 0x31, 0x30, 0x31, 0x00, 0x02,
-	0x11, 0x00, 0x33, 0x01, 0x00, 0x00, 0x04, 0x00
+static const uint8_t hdd_identity_response[52] = {
+	0x00, 0x02,   // sector_size
+	0xF8, 0x01,   // logical_sector_size
+	0x8C, 0x51,   // sector_count
+	0x01,         // drive_status
+	0x00, 0x24,   // bitmap_fid
+	0x20, 0x24,   // superblock_fid
+	0x01, 0x00,   // min_dir_pages
+	0x00,         // flush
+	'M', 'A', 'M', 'E', ' ', 'H', 'A', 'R',
+	'D', 'D', 'I', 'S', 'K', ' ', 'D', 'R',
+	'I', 'V', 'E', ' ', ' ', ' ', ' ', ' ',
+	'G', 'R', 'I', 'D', '2', '1', '0', '1',
+	0x00, 0x02,   // bytes_per_sector
+	0x00, 0x00,   // sectors_per_track
+	0x00, 0x00,   // tracks_per_cylinder
 };
 
 
-grid210x_device::grid210x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int bus_addr, uint8_t *identify_response, attotime read_delay)
+grid210x_device::grid210x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int bus_addr, const uint8_t *identify_response, attotime read_delay)
 	: device_t(mconfig, type, tag, owner, clock),
 	  device_ieee488_interface(mconfig, *this),
 	  device_image_interface(mconfig, *this),
@@ -303,17 +322,17 @@ void grid210x_device::ieee488_ren(int state) {
 }
 
 grid2101_hdd_device::grid2101_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: grid210x_device(mconfig, GRID2101_HDD, tag, owner, clock, 4, identify_response, attotime::from_usec(150))
+	: grid210x_device(mconfig, GRID2101_HDD, tag, owner, clock, 4, hdd_identity_response, attotime::from_usec(150))
 {
 
 }
 
-grid2101_floppy_device::grid2101_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : grid210x_device(mconfig, GRID2101_FLOPPY, tag, owner, clock, 5, identify_response)
+grid2101_floppy_device::grid2101_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : grid210x_device(mconfig, GRID2101_FLOPPY, tag, owner, clock, 5, fdd_identity_response)
 {
 
 }
 
-grid2102_device::grid2102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : grid210x_device(mconfig, GRID2102, tag, owner, clock, 6, identify_response)
+grid2102_device::grid2102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : grid210x_device(mconfig, GRID2102, tag, owner, clock, 6, fdd_identity_response)
 {
 
 }
