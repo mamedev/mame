@@ -143,6 +143,7 @@ public:
 	void vt36x_gbox2020_8mb(machine_config& config);
 	void vt36x_gbox2020_16mb(machine_config& config);
 	void vt36x_s10swap_8mb(machine_config& config);
+	void vt36x_rsps300swap_16mb(machine_config& config);
 
 	void vt369_unk(machine_config& config);
 	void vt369_unk_1mb(machine_config& config);
@@ -504,6 +505,18 @@ void vt36x_state::vt36x_s10swap_8mb(machine_config &config)
 	m_soc->force_bad_dma();
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_8mbyte);
 }
+
+void vt36x_state::vt36x_rsps300swap_16mb(machine_config &config)
+{
+	vt36x_swap_16mb(config);
+
+	VT369_SOC_INTROM_RSPS300SWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
+	//m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
+	m_soc->force_bad_dma();
+	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
+}
+
 
 
 void vt36x_state::vt36x_1mb(machine_config& config)
@@ -1302,7 +1315,7 @@ ROM_START( f5_620 )
 	ROM_LOAD( "f5_620in1.u4", 0x00000, 0x1000000, CRC(e3ec27c8) SHA1(d377ccf9bdbe60f6d484360b4b13c3b132628676) )
 ROM_END
 
-ROM_START( unk300vt )
+ROM_START( rsps300 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl128p10tfi01.u2", 0x00000, 0x1000000, CRC(77c0a7fc) SHA1(dde5f24596d34e0a1305df92ba267a868bd386d4) )
 ROM_END
@@ -1492,10 +1505,16 @@ CONS( 202?, 36pcase,    0,      0,  vt36x_altswap_2mb, vt369, vt36x_state, empty
 
 /*****************************************************************************
 * below are VT369? games that use flash ROM
+
+  some of these might be closer to VT32 (due to requiring different default
+  palette mode, and having encryption where 369 has 6000 bank enable)
 *****************************************************************************/
 
 // different SoC (and language select music) from 2019 version, opcodes are scrambled
 CONS( 2020, gbox2020, gbox2019, 0, vt36x_gbox2020_16mb, vt369, vt36x_state, empty_init, "Sup", "Game Box 400 in 1 (2020 PCB)", MACHINE_NOT_WORKING )
+
+// GB-40-36V1.2 and 20180825 on PCB, assuming to be from Sup although unit wasn't branded
+CONS( 2018, rsps300,  0,        0,  vt36x_rsps300swap_16mb, vt369, vt36x_state, empty_init,   "Sup", "Retro Station Pocket System GB-40 300 in 1",  MACHINE_NOT_WORKING )
 
 // unknown tech, probably from 2021, probably VT369, ROM wouldn't read consistently
 CONS( 202?, vibes240, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
@@ -1533,9 +1552,6 @@ CONS( 202?, f5_620,    0,  0,  vt36x_16mb,        vt369, vt36x_state, init_f5_62
 
 // banking(?) issues, some games don't boot (writes data to ALU mirror, then some other ports)
 CONS( 202?, h12p1000,  0,        0,  vt36x,     vt369, vt36x_state, empty_init, "<unknown>", "H12 Pro 1000 in 1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-
-// different encryption?
-CONS( 202?, unk300vt,  0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init,   "<unknown>", "300-in-1 Handheld Game",  MACHINE_NOT_WORKING )
 
 /*****************************************************************************
 * below are VT369 games that use SQI / SPI ROM
