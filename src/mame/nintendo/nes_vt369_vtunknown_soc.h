@@ -172,7 +172,13 @@ public:
 	vt369_soc_introm_gbox2020_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
 
 protected:
+	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
+
+private:
+	void gbox_411c_w(u8 data);
+
+	void nes_vt_gbox_map(address_map &map) ATTR_COLD;
 };
 
 class vt369_soc_introm_s10swap_device : public vt369_soc_introm_vibesswap_device

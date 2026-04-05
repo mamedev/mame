@@ -889,6 +889,33 @@ void vt369_soc_introm_vibesswap_device::nes_vt_vibes_map(address_map &map)
 	map(0x411c, 0x411c).w(FUNC(vt369_soc_introm_vibesswap_device::vibes_411c_w));
 }
 
+void vt369_soc_introm_gbox2020_device::gbox_411c_w(u8 data)
+{
+	if (m_encryption_allowed)
+	{
+		if (data == 0x05)
+			downcast<rp2a03_core_swap_op_d5_d6&>(*m_maincpu).set_encryption_state(false);
+		else if (data == 0xc5)
+			downcast<rp2a03_core_swap_op_d5_d6&>(*m_maincpu).set_encryption_state(true);
+		else
+			logerror("%s: gbox_411c_w %02x (unknown)\n", machine().describe_context(), data);
+	}
+}
+
+void vt369_soc_introm_gbox2020_device::nes_vt_gbox_map(address_map &map)
+{
+	vt3xx_soc_base_device::vt369_map(map);
+	map(0x411c, 0x411c).w(FUNC(vt369_soc_introm_gbox2020_device::gbox_411c_w));
+}
+
+void vt369_soc_introm_gbox2020_device::device_add_mconfig(machine_config& config)
+{
+	vt369_soc_introm_noswap_device::device_add_mconfig(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt369_soc_introm_gbox2020_device::nes_vt_gbox_map);
+}
+
+
 /***********************************************************************************************************************************************************/
 /* this might also just be the same as vt369 but with the games not using all features */
 /***********************************************************************************************************************************************************/

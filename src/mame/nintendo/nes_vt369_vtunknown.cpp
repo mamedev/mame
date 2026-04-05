@@ -99,6 +99,7 @@ public:
 	void init_dgun2572();
 	void init_s10fake();
 	void init_f5_620();
+	void init_tui240();
 
 protected:
 	u8 vt_rom_banked_r(offs_t offset);
@@ -139,6 +140,7 @@ public:
 
 	void vt36x_vibesswap_8mb(machine_config& config);
 	void vt36x_vibesswap_16mb(machine_config& config);
+	void vt36x_gbox2020_8mb(machine_config& config);
 	void vt36x_gbox2020_16mb(machine_config& config);
 	void vt36x_s10swap_8mb(machine_config& config);
 
@@ -475,15 +477,21 @@ void vt36x_state::vt36x_vibesswap_8mb(machine_config &config)
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_8mbyte);
 }
 
-void vt36x_state::vt36x_gbox2020_16mb(machine_config &config)
+void vt36x_state::vt36x_gbox2020_8mb(machine_config &config)
 {
 	vt36x_swap_16mb(config);
 
 	VT369_SOC_INTROM_GBOX2020(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
+	//m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
 	m_soc->force_bad_dma();
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
+}
+
+void vt36x_state::vt36x_gbox2020_16mb(machine_config &config)
+{
+	vt36x_gbox2020_8mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_8mbyte);
 }
 
 void vt36x_state::vt36x_s10swap_8mb(machine_config &config)
@@ -1347,6 +1355,18 @@ void vt369_state::init_f5_620()
 	}
 }
 
+void vt369_state::init_tui240()
+{
+	uint8_t *romdata = memregion("mainrom")->base();
+	int size = memregion("mainrom")->bytes();
+	for (offs_t i = 0; i < size; i += 2)
+	{
+		uint16_t w = get_u16le(&romdata[i]);
+		put_u16le(&romdata[i], (w & 0xf9f9) | (w & 0x0200) >> 7 | (w & 0x0004) << 7 | (w & 0x0400) >> 9 | (w & 0x0002) << 9);
+	}
+}
+
+
 } // anonymous namespace
 
 
@@ -1478,8 +1498,10 @@ CONS( 202?, 36pcase,    0,      0,  vt36x_altswap_2mb, vt369, vt36x_state, empty
 CONS( 2020, gbox2020, gbox2019, 0, vt36x_gbox2020_16mb, vt369, vt36x_state, empty_init, "Sup", "Game Box 400 in 1 (2020 PCB)", MACHINE_NOT_WORKING )
 
 // unknown tech, probably from 2021, probably VT369, ROM wouldn't read consistently
-// boots with bad colors
 CONS( 202?, vibes240, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// has TUI (holiday company) logo on packaging, no other manufacturer details
+CONS( 201?, tui240,     0,        0,  vt36x_gbox2020_8mb,    vt369, vt36x_state, init_tui240, "<unknown>",  "TUI 240-in-1", MACHINE_NOT_WORKING )
 
 // boots and runs, but not all games have been tested
 CONS( 202?, t3_630,   0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "630 Games in 1 Handheld (T3)", MACHINE_NOT_WORKING )
@@ -1535,8 +1557,6 @@ CONS( 2016, mog_m320,   pixel246, 0,  vt36x_8mb, vt369, vt36x_state, empty_init,
 CONS( 200?, lpgm240,    0,        0,  vt36x_swap_8mb,        vt369, vt36x_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
 CONS( 200?, tup240,     lpgm240,  0,  vt36x_swap_8mb,        vt369, vt36x_state, empty_init, "Thumbs Up", "Thumbs Up 240-in-1 Mini Arcade Machine", MACHINE_NOT_WORKING )
 CONS( 201?, orb240,     lpgm240,  0,  vt36x_swap_8mb,        vt369, vt36x_state, empty_init, "Orb Gaming", "Orb Gaming 240-in-1 Handheld", MACHINE_NOT_WORKING ) // silver handheld
-// different encryption? 
-CONS( 201?, tui240,     0,        0,  vt36x_8mb,             vt369, vt36x_state, empty_init, "<unknown>",  "Tui 240-in-1", MACHINE_NOT_WORKING )
 
 // VT369, but doesn't use most features
 CONS( 201?, unkra200,   mc_tv200, 0,  vt36x_8mb, vt369, vt36x_state, empty_init, "<unknown>",    "200 in 1 Retro Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
