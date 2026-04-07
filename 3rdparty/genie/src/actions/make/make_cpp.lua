@@ -583,15 +583,13 @@
 
 		_p('ifneq (,$(OBJRESP))')
 		_p('$(OBJRESP): $(OBJECTS) | $(TARGETDIR) $(OBJDIRS)')
-		_p('\t$(SILENT) echo $^')
-		_p('\t$(SILENT) echo $^ > $@')
+		_p('\t$(file >$@,$^)')
 		_p('endif')
 		_p('')
 
 		_p('ifneq (,$(LDRESP))')
 		_p('$(LDRESP): $(LDDEPS) | $(TARGETDIR) $(OBJDIRS)')
-		_p('\t$(SILENT) echo $^')
-		_p('\t$(SILENT) echo $^ > $@')
+		_p('\t$(file >$@,$^)')
 		_p('endif')
 		_p('')
 

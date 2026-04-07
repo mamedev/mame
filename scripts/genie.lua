@@ -1200,6 +1200,8 @@ configuration { "mingw*" }
 		}
 		flags {
 			"LinkSupportCircularDependencies",
+			"UseLDResponseFile",
+			"UseObjectResponseFile",
 		}
 		links {
 			"user32",
