@@ -405,38 +405,6 @@ ROM_START( banpear )
 	ROM_LOAD( "25l643.u5", 0x0000, 0x800000, CRC(67169ccd) SHA1(2ddf0c00d60552c19a24a64f75b7227d404a0afe) )
 ROM_END
 
-ROM_START( intrtvg )
-	ROM_REGION( 0x100000, "spi", ROMREGION_ERASE00 )
-	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(5aa91972) SHA1(296108e8683063c16951ff326e6ff3d63d9ed5b8) )
-
-	DISK_REGION( "sdcard" ) // 4GB SD Card
-	DISK_IMAGE( "interactivetv", 0, SHA1(7061e28c4560b763bda1157036b79c726387e430) )
-ROM_END
-
-ROM_START( bodygun )
-	ROM_REGION( 0x100000, "spi", ROMREGION_ERASE00 )
-	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(5aa91972) SHA1(296108e8683063c16951ff326e6ff3d63d9ed5b8) )
-
-	DISK_REGION( "sdcard" ) // 4GB SD Card
-	DISK_IMAGE( "bodygun", 0, SHA1(3e41a2ba9b86fb6b155c1c82a7612458c3555a64) )
-ROM_END
-
-ROM_START( arb605 )
-	ROM_REGION( 0x100000, "spi", ROMREGION_ERASE00 )
-	ROM_LOAD( "25q80.u6", 0x0000, 0x100000, CRC(ba2cdacd) SHA1(d47829ee5310140665146262a44e0ba91942f25c) )
-
-	DISK_REGION( "sdcard" ) // 4GB SD Card
-	DISK_IMAGE( "ar_game_console_b605", 0, SHA1(433d354529e262de9d833a7a423a37915ba3362c) )
-ROM_END
-
-ROM_START( ardancem )
-	ROM_REGION( 0x100000, "spi", ROMREGION_ERASE00 )
-	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(ba2cdacd) SHA1(d47829ee5310140665146262a44e0ba91942f25c) )
-
-	DISK_REGION( "sdcard" ) // 16GB SD Card
-	DISK_IMAGE( "ardancemat", 0, SHA1(df8cb065f5ce0ca863b205549ecc4c27647f9954) )
-ROM_END
-
 ROM_START( pdcm2 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
@@ -656,17 +624,6 @@ CONS( 2017, doraet17,        0,        0,      gpl32612, gpl32612, generalplus_g
 // uses a glob, has GPspispi header, "Pear 265077A. 2022 11 22" on PCB
 // めざせ！あこがれのわたし♡プリキュアミラーパッド！オールスター
 CONS( 2022, banpear,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "PreCure Mirror Pad! All Star (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-
-// company is called 深圳市飞讯互动科技有限公司
-// surface details erased on SoC for both of these
-// very generic packaging, boots from SPI, has game data on SD card (mostly NES games)
-CONS( 202?, intrtvg,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "Interactive Game Console (Model B608, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-// also very generic packaging, similar SD card content to above, including NES games, but with some extra music/videos for the dance part
-CONS( 202?, ardancem,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Dance Mat (Model DM02, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-// likewise
-CONS( 202?, arb605,          0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Game Console (Model B605, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS( 202?, bodygun,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology", "Body Gun Game Console (Model GC05, Damcoola)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-
 
 // unknown (uses a glob) but it's GeneralPlus and ARM based, so put in here for now
 // ROM has 'GPNandTag2' header rather than the usual
