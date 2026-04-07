@@ -34,7 +34,7 @@ void ensoniq_vfx_cartridge::device_reset()
 	// Ensoniq SC-32 cartridges are write protected.
 	// Any byte written will be preceded by a corresponding
 	// write protection command sequence.
-	m_eeprom->set_write_enabled(false);
+	m_eeprom->set_software_data_protection_enabled(false);
 
 	// Configure the speed of the eeprom.
 	ioport_value const cfg = m_input_config->read();

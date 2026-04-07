@@ -113,15 +113,15 @@ public:
 		return m_storage;
 	}
 
-	// Allow access to the current write-protection status
-	bool is_write_enabled()
+	// Allow access to the current software data protection status
+	bool is_software_data_protection_enabled()
 	{
-		return m_write_enabled;
+		return m_software_data_protection_enabled;
 	}
 
-	void set_write_enabled(bool write_enabled)
+	void set_software_data_protection_enabled(bool software_data_protection_enabled)
 	{
-		m_write_enabled = write_enabled;
+		m_software_data_protection_enabled = software_data_protection_enabled;
 	}
 
 	// Allow users to override device timing.
@@ -161,7 +161,7 @@ protected:
 		save_item(NAME(m_toggle_bit));
 		save_item(NAME(m_state));
 		save_item(NAME(m_command_state));
-		save_item(NAME(m_write_enabled));
+		save_item(NAME(m_software_data_protection_enabled));
 		save_item(NAME(m_buffering_page));
 		save_item(NAME(m_page_buffer));
 
@@ -182,7 +182,7 @@ protected:
 		change_to_state(STATE_IDLE);
 
 		m_last_written_offset = -1;
-		m_write_enabled = true;
+		m_software_data_protection_enabled = false;
 		m_buffering_page = 0;
 	}
 
@@ -196,7 +196,7 @@ protected:
 	// Error in the internal state machine, return to the correct idle internal state
 	void state_machine_error()
 	{
-		change_to_state(m_write_enabled ? STATE_BUFFERING : STATE_IDLE);
+		change_to_state(m_software_data_protection_enabled ? STATE_IDLE : STATE_BUFFERING);
 	}
 
 	// Change State to a new command processing state
@@ -215,8 +215,8 @@ protected:
 	// internal state
 	enum {
 		// idle state: reads work as normal, writes will succeed or fail depending on
-		// m_write_enabled - except for those writes that are part of one of the protection
-		// enable or disable sequences.
+		// m_software_data_protection_enabled - except for those writes that are part of one
+		// of the protection enable or disable sequences.
 		STATE_IDLE,
 
 		// After detecting the third write that initiates a protection enable sequence,
@@ -230,7 +230,7 @@ protected:
 		// As long as the next write is to the same page (higher address bits remain
 		// the same) and the next write is initiated within T_BLC, more bytes can be
 		// written, and those too will be written to the internal buffer.
-		// If no more writes happen within T_BLC, thw programming cycle starts,
+		// If no more writes happen within T_BLC, the programming cycle starts,
 		// during which time the buffer will be saved to the corresponding page in
 		// the persistent EEPROM storage.
 		STATE_BUFFERING,
@@ -254,7 +254,8 @@ protected:
 		// If in this state the client writes A0 to 5555 (1555 on X28C64),
 		// that concludes the Protection Enable command sequence and enters
 		// the Protected Write state: allowing writes to one page, at the end of which
-		// the device will enter the Write Protected state.
+		// the device will enter the Write Protected state, setting
+		// m_write_protecion_enabled = true.
 		// If instead the client writes  80 to 5555 (1555 on X28C64), this continues
 		// the Protection Disable command sequence.
 
@@ -273,7 +274,8 @@ protected:
 
 		// after detecting the sixth write in the protection disable command sequence,
 		// writing 20 to address 5555 (1555 on X28C64),
-		// the device will return to COMMAND_STATE_NONE and STATE_IDLE with m_write_enabled = false.
+		// the device will return to COMMAND_STATE_NONE and STATE_IDLE with
+		// m_software_data_protection_enabled = false.
 	};
 
 	std::array<uint8_t, TOTAL_SIZE_BYTES> m_storage {};
@@ -284,7 +286,7 @@ protected:
 	uint8_t m_toggle_bit = 0;
 	int m_state = STATE_IDLE;
 	int m_command_state = COMMAND_STATE_NONE;
-	bool m_write_enabled = true;
+	bool m_software_data_protection_enabled = false;
 	int m_buffering_page = 0;
 	std::array<uint8_t, PAGE_SIZE_BYTES> m_page_buffer;
 
