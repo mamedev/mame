@@ -6,6 +6,7 @@
 // which has an identical case
 // 
 // they've been rebuilt for a different (unknown) tech level
+// (but still unSP2.0 based, even if they have GP3x in the header)
 //
 // they probably have undumped internal ROM
 //
@@ -90,7 +91,18 @@ ROM_START( gp3x788 )
 	ROM_LOAD16_WORD_SWAP( "p25d32sh.u2", 0x000000, 0x400000, CRC(a90f18f1) SHA1(48fc2809750529b54db0e4033530c4eafb5033d4) )
 ROM_END
 
+ROM_START( 100in1rg )
+	ROM_REGION16_BE( 0x100000, "spi1", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "by25q80awt.bin", 0x000000, 0x100000, CRC(18db16f2) SHA1(d87ad433b4c5552ae6f2e8dd9c7a8dc8b2027a23) )
+
+	ROM_REGION16_BE( 0x400000, "spi2", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "p25d32.bin", 0x000000, 0x400000, CRC(25e81e82) SHA1(137e29b004bada3b53d1355929cbfc5491399976) )
+ROM_END
+
+
+
 
 } // anonymous namespace
 
 CONS( 202?, gp3x788,      0,       0,      generalplus_gp3x,   generalplus_gp3x, generalplus_gp3x_state, empty_init, "Prince Electronics", "GM-1417 - HD 360 Degrees Rocker Palm Eyecare Console - 788 in 1", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 202?, 100in1rg,     0,       0,      generalplus_gp3x,   generalplus_gp3x, generalplus_gp3x_state, empty_init, "<unknown>", "100-in-1 Retro Gaming Console (SY-909)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
