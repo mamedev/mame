@@ -1448,7 +1448,7 @@ ROM_START( pv95in1 )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
 	// probably higher banks, not just gfx, as also contains code
-	ROM_LOAD( "mx29f1610atc.ic2a", 0x00000, 0x200000, BAD_DUMP CRC(347dee4a) SHA1(4e01624ed4a5afd928b2fddca6b0946a680274aa) ) // FIXED BITS (xxx1xxxxxxxxxxxx)
+	ROM_LOAD( "mx29f1610atc.ic2a", 0x00000, 0x200000, CRC(ca88e21c) SHA1(559d13806c9539f983ae929a0132af8ef381bd12) )
 ROM_END
 
 

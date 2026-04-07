@@ -7,6 +7,8 @@
 // 
 // they've been rebuilt for a different (unknown) tech level
 // (but still unSP2.0 based, even if they have GP3x in the header)
+// register use (in the tiny bit of code) looks similar to generalplus_gpce4.cpp
+// so could be related to that, with most of the system code in internal ROM
 //
 // they probably have undumped internal ROM
 //
@@ -84,6 +86,9 @@ void generalplus_gp3x_state::generalplus_gp3x(machine_config &config)
 }
 
 ROM_START( gp3x788 )
+	ROM_REGION16_BE( 0x18000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x18000, NO_DUMP ) // uncertain size
+
 	ROM_REGION16_BE( 0x100000, "spi1", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "w25q81dv.u3", 0x000000, 0x100000, CRC(d7801e04) SHA1(4d3e9ffb9e5eb2d790267ec7c57aec975f35ee88) )
 
@@ -92,6 +97,9 @@ ROM_START( gp3x788 )
 ROM_END
 
 ROM_START( 100in1rg )
+	ROM_REGION16_BE( 0x18000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x18000, NO_DUMP ) // uncertain size
+
 	ROM_REGION16_BE( 0x100000, "spi1", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "by25q80awt.bin", 0x000000, 0x100000, CRC(18db16f2) SHA1(d87ad433b4c5552ae6f2e8dd9c7a8dc8b2027a23) )
 
