@@ -1608,7 +1608,7 @@ floppy_sound_device::floppy_sound_device(const machine_config &mconfig, const ch
 	// "floppy" is the subdirectory in the samples path where the following samples are stored
 
 	m_default_samples.clear();
-	m_default_samples.set_form_factor(floppy_image::FF_35, "floppy35");
+	m_default_samples.set_form_factor(floppy_image::FF_35, "floppy");
 	m_default_samples.add_spin_sample("35_spin_start_empty", floppy_sound_samples::START_EMPTY);
 	m_default_samples.add_spin_sample("35_spin_start_loaded", floppy_sound_samples::START_LOADED);
 	m_default_samples.add_spin_sample("35_spin_empty", floppy_sound_samples::SPIN_EMPTY);
@@ -1620,7 +1620,7 @@ floppy_sound_device::floppy_sound_device(const machine_config &mconfig, const ch
 	m_default_samples.add_seek_sample("35_seek_12ms", 12, 15);
 	m_default_samples.add_seek_sample("35_seek_20ms", 20, 50);
 
-	m_default_samples.set_form_factor(floppy_image::FF_525, "floppy525");
+	m_default_samples.set_form_factor(floppy_image::FF_525, "floppy");
 	m_default_samples.add_spin_sample("525_spin_start_empty", floppy_sound_samples::START_EMPTY);
 	m_default_samples.add_spin_sample("525_spin_start_loaded", floppy_sound_samples::START_LOADED);
 	m_default_samples.add_spin_sample("525_spin_empty", floppy_sound_samples::SPIN_EMPTY);
