@@ -1153,6 +1153,12 @@ ROM_START( vibes240 )
 	ROM_LOAD( "s29gl128p11tfi01.bin", 0x000000, 0x1000000, BAD_DUMP CRC(c04c5527) SHA1(58737084e1b1a2862f50f07feeab79593ca13862) )
 ROM_END
 
+ROM_START( vibes240a )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	// wouldn't read consistently
+	ROM_LOAD( "vibes.u2", 0x000000, 0x1000000, BAD_DUMP CRC(a747971a) SHA1(2399d4f32d0054a06397bead069b498e634dbe37) )
+ROM_END
+
 ROM_START( retro620 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "620in1_retrofc.bin", 0x00000, 0x1000000, CRC(2698f4e5) SHA1(8b9551c22071c48a7ebc1635ca37ebe7a3b33c4b) ) // BGA on subboard
@@ -1583,7 +1589,10 @@ CONS( 2020, gbox2020, gbox2019, 0, vt36x_gbox2020_16mb, vt369, vt36x_state, empt
 CONS( 2018, rsps300,  0,        0,  vt36x_rsps300swap_16mb, vt369, vt36x_state, empty_init,   "Sup", "Retro Station Pocket System GB-40 300 in 1",  MACHINE_NOT_WORKING )
 
 // unknown tech, probably from 2021, probably VT369, ROM wouldn't read consistently
-CONS( 202?, vibes240, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+// several games don't work (eg. Curly Monkey 2, maybe due to bad dump?)
+CONS( 202?, vibes240, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1 (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+// also a bad dump, different encryption, but Curly Monkey 2 works here, only first 2 opcodes are encrypted
+CONS( 202?, vibes240a,vibes240, 0,  vt36x_gbox2020_16mb,  vt369, vt36x_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1 (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // has TUI (holiday company) logo on packaging, no other manufacturer details
 CONS( 201?, tui240,     0,        0,  vt36x_gbox2020_8mb,    vt369, vt36x_state, init_tui240, "<unknown>",  "TUI 240-in-1", MACHINE_NOT_WORKING )
