@@ -25,27 +25,6 @@
 
 // Spectrum crystals
 
-#define X1 14_MHz_XTAL          // Main clock (48k Spectrum)
-#define X2 XTAL(4'433'619)      // PAL color subcarrier
-
-// Spectrum screen size in pixels
-#define SPEC_UNSEEN_LINES  16   // Non-visible scanlines before first border line. Some of these may be vertical retrace.
-#define SPEC_TOP_BORDER    48   // Number of border lines before actual screen
-#define SPEC_DISPLAY_YSIZE 192  // Vertical screen resolution
-#define SPEC_BOTTOM_BORDER 56   // Number of border lines at bottom of screen
-#define SPEC_SCREEN_HEIGHT (SPEC_TOP_BORDER + SPEC_DISPLAY_YSIZE + SPEC_BOTTOM_BORDER)
-
-#define SPEC_LEFT_BORDER   48   // Number of left hand border pixels
-#define SPEC_DISPLAY_XSIZE 256  // Horizontal screen resolution
-#define SPEC_RIGHT_BORDER  48   // Number of right hand border pixels
-#define SPEC_SCREEN_WIDTH (SPEC_LEFT_BORDER + SPEC_DISPLAY_XSIZE + SPEC_RIGHT_BORDER)
-
-#define SPEC_LEFT_BORDER_CYCLES   24   // Cycles to display left hand border
-#define SPEC_DISPLAY_XSIZE_CYCLES 128  // Horizontal screen resolution
-#define SPEC_RIGHT_BORDER_CYCLES  24   // Cycles to display right hand border
-#define SPEC_RETRACE_CYCLES       48   // Cycles taken for horizontal retrace
-#define SPEC_CYCLES_PER_LINE      224  // Number of cycles to display a single line
-
 class spectrum_state : public driver_device
 {
 public:
@@ -87,6 +66,27 @@ public:
 	void init_spectrum();
 
 protected:
+	static inline constexpr XTAL X1 = 14_MHz_XTAL;          // Main clock (48k Spectrum)
+	static inline constexpr XTAL X2 = XTAL(4'433'619);      // PAL color subcarrier
+
+	// Spectrum screen size in pixels
+	static inline constexpr int SPEC_UNSEEN_LINES  = 16;   // Non-visible scanlines before first border line. Some of these may be vertical retrace.
+	static inline constexpr int SPEC_TOP_BORDER    = 48;   // Number of border lines before actual screen
+	static inline constexpr int SPEC_DISPLAY_YSIZE = 192;  // Vertical screen resolution
+	static inline constexpr int SPEC_BOTTOM_BORDER = 56;   // Number of border lines at bottom of screen
+	static inline constexpr int SPEC_SCREEN_HEIGHT = (SPEC_TOP_BORDER + SPEC_DISPLAY_YSIZE + SPEC_BOTTOM_BORDER);
+
+	static inline constexpr int SPEC_LEFT_BORDER   = 48;   // Number of left hand border pixels
+	static inline constexpr int SPEC_DISPLAY_XSIZE = 256;  // Horizontal screen resolution
+	static inline constexpr int SPEC_RIGHT_BORDER  = 48;   // Number of right hand border pixels
+	static inline constexpr int SPEC_SCREEN_WIDTH  = (SPEC_LEFT_BORDER + SPEC_DISPLAY_XSIZE + SPEC_RIGHT_BORDER);
+
+	static inline constexpr int SPEC_LEFT_BORDER_CYCLES   = 24;   // Cycles to display left hand border
+	static inline constexpr int SPEC_DISPLAY_XSIZE_CYCLES = 128;  // Horizontal screen resolution
+	static inline constexpr int SPEC_RIGHT_BORDER_CYCLES  = 24;   // Cycles to display right hand border
+	static inline constexpr int SPEC_RETRACE_CYCLES       = 48;   // Cycles taken for horizontal retrace
+	static inline constexpr int SPEC_CYCLES_PER_LINE      = 224;  // Number of cycles to display a single line
+
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 

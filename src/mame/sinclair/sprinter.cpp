@@ -175,24 +175,24 @@ private:
 		ACCEL_ON
 	};
 
-	static constexpr XTAL X_SP                 = 42_MHz_XTAL; // TODO X1 after spectrumless
+	static inline constexpr XTAL X_SP                 = 42_MHz_XTAL; // TODO X1 after spectrumless
 
-	static constexpr u16  SPRINT_WIDTH         = 896;
-	static constexpr u16  SPRINT_BORDER_RIGHT  = 48;
-	static constexpr u16  SPRINT_SCREEN_XSIZE  = 640;
-	static constexpr u16  SPRINT_BORDER_LEFT   = 48;
-	static constexpr u16  SPRINT_XVIS          = SPRINT_BORDER_RIGHT + SPRINT_SCREEN_XSIZE + SPRINT_BORDER_LEFT;
+	static inline constexpr u16  SPRINT_WIDTH         = 896;
+	static inline constexpr u16  SPRINT_BORDER_RIGHT  = 48;
+	static inline constexpr u16  SPRINT_SCREEN_XSIZE  = 640;
+	static inline constexpr u16  SPRINT_BORDER_LEFT   = 48;
+	static inline constexpr u16  SPRINT_XVIS          = SPRINT_BORDER_RIGHT + SPRINT_SCREEN_XSIZE + SPRINT_BORDER_LEFT;
 
-	static constexpr u16  SPRINT_HEIGHT        = 320;
-	static constexpr u16  SPRINT_BORDER_TOP    = 16;
-	static constexpr u16  SPRINT_SCREEN_YSIZE  = 256;
-	static constexpr u16  SPRINT_BORDER_BOTTOM = 16;
-	static constexpr u16  SPRINT_YVIS          = SPRINT_BORDER_TOP + SPRINT_SCREEN_YSIZE + SPRINT_BORDER_BOTTOM;
+	static inline constexpr u16  SPRINT_HEIGHT        = 320;
+	static inline constexpr u16  SPRINT_BORDER_TOP    = 16;
+	static inline constexpr u16  SPRINT_SCREEN_YSIZE  = 256;
+	static inline constexpr u16  SPRINT_BORDER_BOTTOM = 16;
+	static inline constexpr u16  SPRINT_YVIS          = SPRINT_BORDER_TOP + SPRINT_SCREEN_YSIZE + SPRINT_BORDER_BOTTOM;
 
-	static constexpr u16 BANK_RAM_MASK         = 1 << 8;
-	static constexpr u16 BANK_FASTRAM_MASK     = 1 << 9;
-	static constexpr u16 BANK_ISA_MASK         = 1 << 10;
-	static constexpr u16 BANK_WRDISBL_MASK     = 1 << 12;
+	static inline constexpr u16 BANK_RAM_MASK         = 1 << 8;
+	static inline constexpr u16 BANK_FASTRAM_MASK     = 1 << 9;
+	static inline constexpr u16 BANK_ISA_MASK         = 1 << 10;
+	static inline constexpr u16 BANK_WRDISBL_MASK     = 1 << 12;
 
 	bool acc_ena()     const { return BIT(m_all_mode, 0); }
 	bool cbl_mode()    const { return BIT(m_cbl_xx, 7); }
