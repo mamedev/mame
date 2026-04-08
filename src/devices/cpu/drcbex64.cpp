@@ -206,7 +206,7 @@
 
 #include "mfpresolve.h"
 
-#include "asmjit/src/asmjit/x86.h"
+#include "asmjit/asmjit/x86.h"
 
 #include <cstddef>
 #include <cstdio>
