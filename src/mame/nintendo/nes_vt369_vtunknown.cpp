@@ -23,8 +23,6 @@
 #include "emu.h"
 #include "nes_vt369_vtunknown_soc.h"
 
-//#include "machine/eepromser.h"
-
 #include "multibyte.h"
 
 namespace {
@@ -160,7 +158,6 @@ class vt36x_gtct885_state : public vt36x_state
 public:
 	vt36x_gtct885_state(const machine_config& mconfig, device_type type, const char* tag) :
 		vt36x_state(mconfig, type, tag)
-		//m_eeprom(*this, "eeprom")
 	{ }
 
 	void vt36x_8mb_gtct885(machine_config& config);
@@ -169,8 +166,6 @@ private:
 
 	u8 gtct885_prot_r();
 	void gtct885_prot_w(u8 data);
-
-	//required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 class vt36x_tetrtin_state : public vt36x_state
@@ -607,9 +602,6 @@ void vt36x_gtct885_state::vt36x_8mb_gtct885(machine_config& config)
 	vt36x_8mb(config);
 	m_soc->io_4153_read_callback().set(FUNC(vt36x_gtct885_state::gtct885_prot_r));
 	m_soc->io_4152_write_callback().set(FUNC(vt36x_gtct885_state::gtct885_prot_w));
-
-	// doesn't seem to be a standard EEPROM, but whatever is there must supply 0x100 bytes?
-	//EEPROM_93C56_8BIT(config, m_eeprom).default_value(1);
 }
 
 void vt36x_state::vt36x_h12p1000(machine_config& config)
@@ -1036,7 +1028,7 @@ ROM_START( gtct885 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "ct-885 g25q64c.bin", 0x00000, 0x800000, CRC(a5b2b568) SHA1(79de79364fa731e421627ec68e3bfa9d311aa7fc) )
 
-	ROM_REGION( 0x100, "eeprom", 0 ) // data from additional 8-pin chip for protection (might not be an eeprom) (copied to 0xe01 - 0xeff)
+	ROM_REGION( 0x100, "extra", 0 ) // data from additional 8-pin chip for protection (might not be an eeprom) (copied to 0xe01 - 0xeff)
 	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, CRC(8173c1c2) SHA1(7521a4676166a81a79209638491026b2d8e32895) )
 ROM_END
 
@@ -1438,19 +1430,22 @@ void vt369_state::init_tui240()
 }
 
 
+// unknown protection device supplying ~0x100 bytes of code (currently in "extra" region)
 void vt36x_gtct885_state::gtct885_prot_w(u8 data)
 {
 	logerror("%s: gtct885_prot_w %02x\n", machine().describe_context(), data);
-	//m_eeprom->di_write((data & 0x20) ? 1 : 0);
-	//m_eeprom->cs_write((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-	//m_eeprom->clk_write((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	// direction is set to 0x38 before writing here
+	// so 0x20, 0x10, and 0x08 are outputs
+	// some kind of serial device
 }
 
 u8 vt36x_gtct885_state::gtct885_prot_r()
 {
 	logerror("%s: gtct885_prot_r\n", machine().describe_context());
-	u8 bit = 0;//  m_eeprom->do_read();
-	return (bit << 5);
+	// direction is set to 0x18 before reading here
+	// 0x20 is input (gets shifted into carry, then rotated into RAM)
+	u8 bit = 0;
+	return bit << 5;
 }
 
 } // anonymous namespace
