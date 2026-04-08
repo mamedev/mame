@@ -89,7 +89,6 @@ nes_vt02_vt03_soc_device::nes_vt02_vt03_soc_device(const machine_config& mconfig
 	m_initial_e000_bank(0xff),
 	m_ntram(nullptr),
 	m_chrram(nullptr),
-	m_4150_write_cb(*this),
 	m_411e_write_cb(*this),
 	m_41e6_write_cb(*this),
 	m_space_config("program", ENDIANNESS_LITTLE, 8, 25, 0, address_map_constructor(FUNC(nes_vt02_vt03_soc_device::program_map), this)),
