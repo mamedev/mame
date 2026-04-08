@@ -46,7 +46,7 @@
 		}
 
 		buildoptions {
-			"-m64",
+			"$(MPARAM)",
 		}
 
 		configuration "Debug"

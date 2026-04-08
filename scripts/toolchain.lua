@@ -206,6 +206,12 @@ function toolchain(_buildDir, _subDir)
 			premake.vstudio.toolset = ("ClangCL")
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-clang")
 		end
+	elseif _ACTION == "vs2026" then
+
+		if "clangcl" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = ("ClangCL")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-clang")
+		end
 	end
 
 	if (_OPTIONS["CC"] ~= nil) then

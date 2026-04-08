@@ -1136,6 +1136,24 @@ ifdef MSBUILD
 endif
 
 #-------------------------------------------------
+# Visual Studio 2026
+#-------------------------------------------------
+
+.PHONY: vs2026
+vs2026: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2026
+ifdef MSBUILD
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2026/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+.PHONY: vs2026_clang
+vs2026_clang: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=clangcl vs2026
+ifdef MSBUILD
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2026-clang/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+#-------------------------------------------------
 # android-ndk
 #-------------------------------------------------
 
