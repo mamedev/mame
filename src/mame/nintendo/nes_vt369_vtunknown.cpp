@@ -465,6 +465,11 @@ void vt36x_state::vt36x_altswap_16mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
 }
 
+void vt369_base_state::extbank_w(u8 data)
+{
+	m_ahigh = (data & 0x01) ? (1 << 25) : 0x0;
+}
+
 void vt369_base_state::extbank_red5mam_w(u8 data)
 {
 	m_ahigh = ((data & 0x03) << 25);
@@ -475,7 +480,23 @@ void vt369_base_state::extbank_h12p1000_w(u8 data)
 	m_ahigh = ((data & 0x02) << 23);
 }
 
+// unknown protection device supplying ~0x100 bytes of code (currently in "extra" region)
+void vt36x_gtct885_state::gtct885_prot_w(u8 data)
+{
+	logerror("%s: gtct885_prot_w %02x\n", machine().describe_context(), data);
+	// direction is set to 0x38 before writing here
+	// so 0x20, 0x10, and 0x08 are outputs
+	// some kind of serial device
+}
 
+u8 vt36x_gtct885_state::gtct885_prot_r()
+{
+	logerror("%s: gtct885_prot_r\n", machine().describe_context());
+	// direction is set to 0x18 before reading here
+	// 0x20 is input (gets shifted into carry, then rotated into RAM)
+	u8 bit = 0;
+	return bit << 5;
+}
 
 void vt36x_state::vt36x_altswap_32mb_4banks_red5mam(machine_config& config)
 {
@@ -578,11 +599,6 @@ void vt36x_state::vt36x_32mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_32mbyte);
 }
 
-void vt369_base_state::extbank_w(u8 data)
-{
-	m_ahigh = (data & 0x01) ? (1 << 25) : 0x0;
-}
-
 void vt36x_state::vt36x_32mb_2banks_lexi(machine_config& config)
 {
 	vt36x_32mb(config);
@@ -608,7 +624,7 @@ void vt36x_state::vt36x_h12p1000(machine_config& config)
 {
 	vt36x_16mb(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte_bank);
-	m_soc->io_4139_write_callback().set(FUNC(vt36x_gtct885_state::extbank_h12p1000_w));
+	m_soc->io_4139_write_callback().set(FUNC(vt36x_state::extbank_h12p1000_w));
 }
 
 
@@ -1429,24 +1445,6 @@ void vt369_state::init_tui240()
 	}
 }
 
-
-// unknown protection device supplying ~0x100 bytes of code (currently in "extra" region)
-void vt36x_gtct885_state::gtct885_prot_w(u8 data)
-{
-	logerror("%s: gtct885_prot_w %02x\n", machine().describe_context(), data);
-	// direction is set to 0x38 before writing here
-	// so 0x20, 0x10, and 0x08 are outputs
-	// some kind of serial device
-}
-
-u8 vt36x_gtct885_state::gtct885_prot_r()
-{
-	logerror("%s: gtct885_prot_r\n", machine().describe_context());
-	// direction is set to 0x18 before reading here
-	// 0x20 is input (gets shifted into carry, then rotated into RAM)
-	u8 bit = 0;
-	return bit << 5;
-}
 
 } // anonymous namespace
 
