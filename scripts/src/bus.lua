@@ -2525,6 +2525,8 @@ if BUSES["HP_DIO"] then
 	files {
 		MAME_DIR .. "src/devices/bus/hp_dio/hp_dio.cpp",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp_dio.h",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98259.cpp",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98259.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98265a.cpp",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98265a.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98543.cpp",
