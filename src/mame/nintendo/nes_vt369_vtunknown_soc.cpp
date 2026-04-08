@@ -51,7 +51,9 @@ vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config& mconfig, devi
 	m_leftdac(*this, "leftdac"),
 	m_rightdac(*this, "rightdac"),
 	m_io_415x_write_callback(*this),
-	m_io_415x_read_callback(*this, 0xff)
+	m_io_415x_read_callback(*this, 0xff),
+	m_io_413x_write_callback(*this),
+	m_io_413x_read_callback(*this, 0xff)
 {
 }
 
@@ -300,7 +302,11 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 
 	// the ALU is not VT1682 compatible
 	map(0x4130, 0x4137).rw(FUNC(vt3xx_soc_base_device::alu_r), FUNC(vt3xx_soc_base_device::alu_w));
-	map(0x4138, 0x413d).rw(FUNC(vt3xx_soc_base_device::alu_r), FUNC(vt3xx_soc_base_device::alu_w)); // mirror or 2nd ALU?
+	//map(0x4138, 0x413d).rw(FUNC(vt3xx_soc_base_device::alu_r), FUNC(vt3xx_soc_base_device::alu_w)); // mirror or 2nd ALU? (probably not, see below)
+
+	map(0x4138, 0x4138).rw(FUNC(vt3xx_soc_base_device::vt_413x_port_direction_r), FUNC(vt3xx_soc_base_device::vt_413x_port_direction_w));
+	map(0x4139, 0x4139).rw(FUNC(vt3xx_soc_base_device::vt_415x_port_in_r), FUNC(vt3xx_soc_base_device::vt_413x_port_out_w));
+	// 413f is also written, could config the port?
 
 	// 4144
 	// 4147
@@ -377,8 +383,17 @@ void vt3xx_soc_base_device::vt_dma_w(u8 data)
 
 // 4150 - direction port (high = write)
 // this gets changed before writes to 4152, or reads from 4153
-u8 vt3xx_soc_base_device::vt_415x_port_direction_r() { logerror("%s: vt_415x_port_direction_r (port 4152/3 direction)\n", machine().describe_context()); return m_415x_port_direction; }
-void vt3xx_soc_base_device::vt_415x_port_direction_w(u8 data) { logerror("%s: vt_415x_port_direction_w %02x (port 4152/3 direction)\n", machine().describe_context(), data); m_415x_port_direction = data; }
+u8 vt3xx_soc_base_device::vt_415x_port_direction_r()
+{
+	logerror("%s: vt_415x_port_direction_r (port 4152/3 direction)\n", machine().describe_context());
+	return m_415x_port_direction;
+}
+
+void vt3xx_soc_base_device::vt_415x_port_direction_w(u8 data)
+{
+	logerror("%s: vt_415x_port_direction_w %02x (port 4152/3 direction)\n", machine().describe_context(), data);
+	m_415x_port_direction = data;
+}
 
 // 4152 - write port (can also read last thing written?)
 u8 vt3xx_soc_base_device::vt_415x_port_out_r()
@@ -409,6 +424,38 @@ void vt3xx_soc_base_device::vt_415x_port_in_w(u8 data)
 	// write to the in port, might not exist / not be used at all
 	logerror("%s: vt_415x_port_in_w %02x (writing to input port?!) (with direction register %02x)\n", machine().describe_context(), data, m_415x_port_direction);
 }
+
+// goretrop seems to use a port with 4138 as direction, and 4139 as data for a similar protection
+
+u8 vt3xx_soc_base_device::vt_413x_port_direction_r()
+{
+	logerror("%s: vt_413x_port_direction_r (port 4139 direction)\n", machine().describe_context());
+	return m_413x_port_direction;
+}
+
+void vt3xx_soc_base_device::vt_413x_port_direction_w(u8 data)
+{
+	logerror("%s: vt_413x_port_direction_w %02x (port 4139 direction)\n", machine().describe_context(), data);
+	m_413x_port_direction = data;
+}
+
+void vt3xx_soc_base_device::vt_413x_port_out_w(u8 data)
+{
+	logerror("%s: vt_413x_port_out_w %02x (with direction register %02x)\n", machine().describe_context(), data, m_413x_port_direction);
+	// TODO: pass direction register
+	m_413x_port_data = data;
+	m_io_413x_write_callback(data & m_413x_port_direction);
+}
+
+u8 vt3xx_soc_base_device::vt_413x_port_in_r()
+{
+	logerror("%s: vt_413x_port_in_r (with direction register %02x)\n", machine().describe_context(), m_413x_port_direction);
+	// TODO: pass the direction register
+	u8 ret = m_io_413x_read_callback();
+	return (ret & ~m_413x_port_direction) | (m_413x_port_data & m_413x_port_direction);
+}
+
+
 
 void vt3xx_soc_base_device::extra_io_41e6_w(u8 data) { logerror("%s: extra_io_41e6_w %02x (external banking?)\n", machine().describe_context(), data); m_41e6_write_cb(data); }
 
@@ -735,6 +782,8 @@ void vt3xx_soc_base_device::device_start()
 
 	save_item(NAME(m_415x_port_direction));
 	save_item(NAME(m_415x_port_data));
+	save_item(NAME(m_413x_port_direction));
+	save_item(NAME(m_413x_port_data));
 
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x3c00, 0x3fff, read8sm_delegate(*this, FUNC(vt3xx_soc_base_device::vt3xx_palette_r)), write8sm_delegate(*this, FUNC(vt3xx_soc_base_device::vt3xx_palette_w)));
 }
@@ -766,6 +815,8 @@ void vt3xx_soc_base_device::device_reset()
 
 	m_415x_port_direction = 0x00;
 	m_415x_port_data = 0x00;
+	m_413x_port_direction = 0x00;
+	m_413x_port_data = 0x00;
 }
 
 

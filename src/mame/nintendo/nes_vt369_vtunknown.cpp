@@ -73,6 +73,7 @@ protected:
 
 	void extbank_w(u8 data);
 	void extbank_red5mam_w(u8 data);
+	void extbank_h12p1000_w(u8 data);
 
 private:
 	/* Extra IO */
@@ -90,6 +91,7 @@ public:
 	void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_32mbyte_bank(address_map &map) ATTR_COLD;
 	void vt_external_space_map_16mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_16mbyte_bank(address_map &map) ATTR_COLD;
 	void vt_external_space_map_8mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_4mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_2mbyte(address_map &map) ATTR_COLD;
@@ -125,7 +127,8 @@ public:
 	void vt36x_32mb(machine_config& config);
 	void vt36x_32mb_2banks_lexi(machine_config& config);
 	void vt36x_32mb_2banks_lexi300(machine_config& config);
-
+	void vt36x_h12p1000(machine_config& config);
+	
 	void vt36x_swap(machine_config& config);
 	void vt36x_swap_2mb(machine_config& config);
 	void vt36x_swap_4mb(machine_config& config);
@@ -236,6 +239,11 @@ u8 vt369_state::vt_rom_banked_r(offs_t offset)
 void vt369_state::vt_external_space_map_32mbyte(address_map &map)
 {
 	map(0x0000000, 0x1ffffff).rom().region("mainrom", 0);
+}
+
+void vt369_state::vt_external_space_map_16mbyte_bank(address_map &map)
+{
+	map(0x0000000, 0x0ffffff).r(FUNC(vt369_state::vt_rom_banked_r));
 }
 
 void vt369_state::vt_external_space_map_32mbyte_bank(address_map &map)
@@ -464,9 +472,15 @@ void vt36x_state::vt36x_altswap_16mb(machine_config& config)
 
 void vt369_base_state::extbank_red5mam_w(u8 data)
 {
-//  printf("extbank_red5mam_w %02x\n", data);
 	m_ahigh = ((data & 0x03) << 25);
 }
+
+void vt369_base_state::extbank_h12p1000_w(u8 data)
+{
+	m_ahigh = ((data & 0x02) << 23);
+}
+
+
 
 void vt36x_state::vt36x_altswap_32mb_4banks_red5mam(machine_config& config)
 {
@@ -596,6 +610,13 @@ void vt36x_gtct885_state::vt36x_8mb_gtct885(machine_config& config)
 
 	// doesn't seem to be a standard EEPROM, but whatever is there must supply 0x100 bytes?
 	//EEPROM_93C56_8BIT(config, m_eeprom).default_value(1);
+}
+
+void vt36x_state::vt36x_h12p1000(machine_config& config)
+{
+	vt36x_16mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte_bank);
+	m_soc->io_4139_write_callback().set(FUNC(vt36x_gtct885_state::extbank_h12p1000_w));
 }
 
 
@@ -925,6 +946,9 @@ ROM_END
 ROM_START( 36pcase )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "25q16.ic3", 0x00000, 0x200000, CRC(a8edb73e) SHA1(1028656530e411607ffa3b63788b42e41bf971d7) )
+
+	ROM_REGION( 0x100, "extra", 0 ) // data from additional 8-pin chip for protection (put at 0xe01 in RAM) (checks for something before this)
+	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
 ROM_END
 
 
@@ -1163,6 +1187,9 @@ ROM_END
 ROM_START( rbbrite )
 	ROM_REGION( 0x100000, "mainrom", 0 )
 	ROM_LOAD( "coleco_rainbowbrite_29dl800ba_000422cb.bin", 0x00000, 0x100000, CRC(d2ad0d7d) SHA1(4423a5aa2eda20b3621ab46e951ac08dc2d24789) )
+
+	ROM_REGION( 0x100, "extra", 0 ) // data from additional 8-pin chip for protection (put at 0x701 in RAM)
+	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
@@ -1545,7 +1572,7 @@ CONS( 201?, 240in1ar,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_s
 // portable fan + famiclone combo handheld, very similar to 240in1ar
 CONS( 2020, nubsupmf,   0,      0,  vt36x_altswap_4mb, vt369, vt36x_state, empty_init, "<unknown>", "NubSup Mini Game Fan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-// protected?
+// protected
 CONS( 202?, 36pcase,    0,      0,  vt36x_altswap_2mb, vt369, vt36x_state, empty_init, "<unknown>", "36-in-1 Classic Games phone case", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 
@@ -1575,13 +1602,6 @@ CONS( 202?, zl383,    0,        0,  vt36x_vibesswap_8mb,  vt369, vt36x_state, em
 
 CONS( 202?, retro620, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "Retro FC 620-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-// has extra protection?
-CONS( 2018, rbbrite,    0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
-
-// there's also a 250+ version of the unit below at least; protection(?) is similar to rbbrite
-CONS( 2018, goretrop,  0,         0,  vt369_unk_32mb, vt369, vt36x_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games", MACHINE_NOT_WORKING )
-CONS( 2018, goretropa, goretrop,  0,  vt369_unk_32mb, vt369, vt36x_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games (older)", MACHINE_NOT_WORKING ) // doesn't have commando or higemaru
-
 // all games after the first 180 listed on the menu are duplicates. BTANB: games 501-520 are mislabeled duplicates: e.g., "511. Exerion" actually loads Pac-Man.
 // unused routines suggest this was originally developed for nes_vt42xx.cpp hardware (cf. g9_666, g5_500 with the same bitswap)
 // there are other S10 units available
@@ -1596,8 +1616,7 @@ CONS( 202?, 500in1hh,  0,  0,  vt36x_gbox2020_16mb, vt369, vt36x_state, empty_in
 // there were also 'F1' units, shaped like a car, ROM may or may not be the same
 CONS( 202?, f5_620,    0,  0,  vt36x_16mb,        vt369, vt36x_state, init_f5_620,   "<unknown>", "F5 Handheld Game Console (620-in-1)",  MACHINE_NOT_WORKING )
 
-// banking(?) issues, some games don't boot (writes data to ALU mirror, then some other ports)
-CONS( 202?, h12p1000,  0,        0,  vt36x,     vt369, vt36x_state, empty_init, "<unknown>", "H12 Pro 1000 in 1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 202?, h12p1000,  0,        0,  vt36x_h12p1000,     vt369, vt36x_state, empty_init, "<unknown>", "H12 Pro 1000 in 1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 /*****************************************************************************
 * below are VT369 games that use SQI / SPI ROM
@@ -1695,3 +1714,12 @@ CONS( 202?, a6plus,    0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init, 
 
 // available in red and white cases, ROM is the same, uploads sound prog so definitely 36x
 CONS( 202?, unk198vt, 0,        0,  vt36x_8mb,  vt369, vt36x_state, empty_init, "<unknown>", "198-in-1 Handheld Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// has extra protection (using ports at 4138 / 4139, copied to 0x701)
+CONS( 2018, rbbrite,    0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
+
+// there's also a 250+ version of the unit below at least
+// has extra protection (using ports at 4138 / 4139, copied to 0x701)
+CONS( 2018, goretrop,  0,         0,  vt369_unk_32mb, vt369, vt36x_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games", MACHINE_NOT_WORKING )
+CONS( 2018, goretropa, goretrop,  0,  vt369_unk_32mb, vt369, vt36x_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games (older)", MACHINE_NOT_WORKING ) // doesn't have commando or higemaru
+
