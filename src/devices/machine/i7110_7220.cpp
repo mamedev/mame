@@ -43,9 +43,9 @@
 #define LOGFSA(...)     LOGMASKED(LOG_FSA,    __VA_ARGS__)
 
 // Device type definition
-DEFINE_DEVICE_TYPE(FSA_CHANNEL, fsa_channel_device, "FSA channel", "i7242 FSA channel")
-DEFINE_DEVICE_TYPE(IBUBBLE, ibubble_device, "intel MBM", "Intel i7110 bubble chipset")
-DEFINE_DEVICE_TYPE(I7220_1, i7220_1_device, "i7220-1", "Intel i7220-1 bubble memory controller")
+DEFINE_DEVICE_TYPE(FSA_CHANNEL, fsa_channel_device, "fsa_channel", "i7242 FSA channel")
+DEFINE_DEVICE_TYPE(IBUBBLE, ibubble_device, "intel_mbm", "Intel i7110 bubble chipset")
+DEFINE_DEVICE_TYPE(I7220_1, i7220_1_device, "i7220_1", "Intel i7220-1 bubble memory controller")
 
 // Bit manipulation
 template<typename T> constexpr T BIT_MASK(unsigned n)
@@ -320,7 +320,7 @@ void fsa_channel_device::shiftclk()
 	case FSA_CMD_WRITE_DATA: {
 		bool gen = false;
 		// Writing to a good loop?
-		LOGFSA("WR blr @%u=%u\n", get_blr_idx(), m_blr[ get_blr_idx() ]);
+		// LOGFSA("WR blr @%u=%u\n", get_blr_idx(), m_blr[ get_blr_idx() ]);
 		if (m_blr[ get_blr_idx() ]) {
 			gen = fifo_dequeue();
 		}
@@ -335,7 +335,7 @@ void fsa_channel_device::shiftclk()
 	case FSA_CMD_READ_DATA: {
 		bool bit = detector_r();
 		// Reading from a good loop?
-		LOGFSA("RD blr @%u=%u\n", get_blr_idx(), m_blr[ get_blr_idx() ]);
+		// LOGFSA("RD blr @%u=%u\n", get_blr_idx(), m_blr[ get_blr_idx() ]);
 		if (m_blr[ get_blr_idx() ]) {
 			fifo_enqueue(bit);
 			if (BIT(m_status, STAT_ECF)) {
