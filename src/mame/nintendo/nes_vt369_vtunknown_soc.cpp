@@ -305,7 +305,7 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	//map(0x4138, 0x413d).rw(FUNC(vt3xx_soc_base_device::alu_r), FUNC(vt3xx_soc_base_device::alu_w)); // mirror or 2nd ALU? (probably not, see below)
 
 	map(0x4138, 0x4138).rw(FUNC(vt3xx_soc_base_device::vt_413x_port_direction_r), FUNC(vt3xx_soc_base_device::vt_413x_port_direction_w));
-	map(0x4139, 0x4139).rw(FUNC(vt3xx_soc_base_device::vt_415x_port_in_r), FUNC(vt3xx_soc_base_device::vt_413x_port_out_w));
+	map(0x4139, 0x4139).rw(FUNC(vt3xx_soc_base_device::vt_413x_port_in_r), FUNC(vt3xx_soc_base_device::vt_413x_port_out_w));
 	// 413f is also written, could config the port?
 
 	// 4144
