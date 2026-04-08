@@ -32,7 +32,7 @@ public:
 	void ula_fine_scroll_x_w (bool ula_fine_scroll_x) { m_ula_fine_scroll_x = ula_fine_scroll_x; }
 
 	void draw_border(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 border_color, u8 pcode = 0);
-	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool flash = 0, u8 pcode = 0);
+	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 pcode = 0);
 
 protected:
 	screen_ula_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -54,6 +54,7 @@ protected:
 
 private:
 	static inline constexpr u16 UTM_FALLBACK_PEN = 0xa00;
+	static inline constexpr u8 FLASH_FRAME_INVERT_COUNT = 16;
 
 	u16 m_offset_h, m_offset_v;
 	const u8 *m_bram_bank5_ptr;

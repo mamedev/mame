@@ -1005,7 +1005,6 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	const bool layer2_en = m_port_123b_layer2_en && BIT(layers_dev, 2);
 	const bool sprites_en = m_nr_15_sprite_en && BIT(layers_dev, 3);
 
-	const bool flash = u64(screen.frame_number() / m_frame_invert_count) & 1;
 	// background
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen_color(UTM_FALLBACK_PEN), cliprect);
@@ -1030,7 +1029,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		{
 			m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07);
 			if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, l[0]);
-			else m_ula_scr->draw(screen, bitmap, clip256x192, flash, l[0]);
+			else m_ula_scr->draw(screen, bitmap, clip256x192, l[0]);
 		}
 		if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), l[0]);
 		if (layer2_en) m_layer2->draw(screen, bitmap, clip320x256, l[1], l[2]);
@@ -1043,7 +1042,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			{
 				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07, 1);
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
-				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 1);
+				else m_ula_scr->draw(screen, bitmap, clip256x192, 1);
 			}
 			if (layer2_en) m_layer2->draw_mix(screen, bitmap, m_blendprio_bitmap, clip320x256, m_nr_15_layer_priority & 1);
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_ALL_CATEGORIES);
@@ -1056,7 +1055,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			{
 				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07, 1);
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
-				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 1);
+				else m_ula_scr->draw(screen, bitmap, clip256x192, 1);
 			}
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 1);
 			if (layer2_en) m_layer2->draw_mix(screen, bitmap, bitmap, clip320x256, m_nr_15_layer_priority & 1);
@@ -1069,7 +1068,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			{
 				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07);
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192);
-				else m_ula_scr->draw(screen, bitmap, clip256x192, flash);
+				else m_ula_scr->draw(screen, bitmap, clip256x192);
 			}
 			if (layer2_en) m_layer2->copyprio(screen, bitmap, m_blendprio_bitmap, clip320x256);
 		}
@@ -1080,7 +1079,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			{
 				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07);
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 2);
-				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 2);
+				else m_ula_scr->draw(screen, bitmap, clip256x192, 2);
 			}
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 2);
 			if (layer2_en) m_layer2->draw_mix(screen, bitmap, bitmap, clip320x256, m_nr_15_layer_priority & 1);
@@ -1573,7 +1572,7 @@ u8 specnext_state::reg_r(offs_t nr_register)
 		port_253b_dat = (0b0000 << 4) | g_board_issue();
 		break;
 	case 0x10:
-		port_253b_dat = (0 << 7) | (m_nr_10_coreid << 2) | 0b00;// | i_SPKEY_BUTTONS(1 downto 0);
+		port_253b_dat = (0 << 7) | (m_nr_10_coreid << 2) | (m_io_nmi->read() & 3);
 		break;
 	case 0x11:
 		port_253b_dat = (0b00000 << 3) | m_nr_11_video_timing;
@@ -2083,15 +2082,25 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_nr_10_flashboot = BIT(nr_wr_dat, 7);
 		if (m_nr_03_config_mode)
 		{
-			if (g_board_issue() != 2)
+			if (g_board_issue() <= 1)
 			{
 				m_nr_10_coreid = BIT(nr_wr_dat, 0, 5);
 			}
-			else if (g_board_issue() == 2)
+			else if (g_board_issue() >= 2)
 			{
 				if (BIT(~nr_wr_dat, 4) && BIT(nr_wr_dat, 0, 4) != 0b1111)
 					m_nr_10_coreid = BIT(nr_wr_dat, 0, 4);
 			}
+		}
+		if (m_nr_10_flashboot)
+		{
+			// At this point (used by Anti-Brick), requested core start loading by FPGA:
+			// 0 - Anti-Brick, 1 - Next (only one MAME emulates), 2+ - others
+			LOG("Loading CORE: %d\n", m_nr_10_coreid);
+			// ... must reboot after loading
+			//m_nr_02_hard_reset = 1;
+			//machine().schedule_soft_reset();
+			// ... but we simulate "failure" and allow Antibrick rom to reach waiting timeout.
 		}
 		break;
 	case 0x11:
@@ -3976,6 +3985,8 @@ void specnext_state::video_start()
 			m_maincpu->adjust_icount(-1);
 		}
 	});
+
+	update_video_mode();
 }
 
 static DEVICE_INPUT_DEFAULTS_START(rs232_baud)
@@ -4166,16 +4177,15 @@ ROM_START(tbblue)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_DEFAULT_BIOS("v30204")
 
-	ROM_SYSTEM_BIOS(0, "v30100", "v3.01.00")
+	ROM_SYSTEM_BIOS(0, "v30100", "Next Core v3.01.00")
 	ROMX_LOAD( "boot-30100.bin", 0x0000, 0x2000, CRC(ccbd55ba) SHA1(8b3c2a301f486904d1c74929b94845a7731bf230), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "v30200ab", "v3.02.00 (AntiBrick)")
+	ROM_SYSTEM_BIOS(1, "v30200ab", "Anti-Brick Core v3.02.00")
 	ROMX_LOAD( "boot-30200-ab.bin", 0x0000, 0x2000, CRC(1d16e9d4) SHA1(6f9c8771e5a9ef5a6b52a31b2e65f0698f0f5cfa), ROM_BIOS(1))
 
-	ROM_SYSTEM_BIOS(2, "v30204", "v3.02.04")
+	ROM_SYSTEM_BIOS(2, "v30204", "Next Core v3.02.04")
 	ROMX_LOAD( "boot-30204.bin", 0x0000, 0x2000, CRC(95118eb6) SHA1(acf5112e831be8c73952b8513fab33a427e88cf8), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(3, "v30204ab", "v3.02.04 (AntiBrick)")
+	ROM_SYSTEM_BIOS(3, "v30204ab", "Anti-Brick Core v3.02.04")
 	ROMX_LOAD( "boot-30204-ab.bin", 0x0000, 0x2000, CRC(96c32007) SHA1(6c9fcbd282f7a18fb5a726386ac6fb9df209c36b), ROM_BIOS(3))
-
 ROM_END
 
 #define rom_specnext_ks1    rom_tbblue
@@ -4185,9 +4195,9 @@ ROM_START(specnext_ks3)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_DEFAULT_BIOS("v30204")
 
-	ROM_SYSTEM_BIOS(0, "v30204", "v3.02.04")
+	ROM_SYSTEM_BIOS(0, "v30204", "Next Core v3.02.04")
 	ROMX_LOAD( "boot-30204.bin", 0x0000, 0x2000, CRC(95118eb6) SHA1(acf5112e831be8c73952b8513fab33a427e88cf8), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "v30204ab", "v3.02.04 (AntiBrick)")
+	ROM_SYSTEM_BIOS(1, "v30204ab", "Anti-Brick Core v3.02.04")
 	ROMX_LOAD( "boot-30204-ab.bin", 0x0000, 0x2000, CRC(96c32007) SHA1(6c9fcbd282f7a18fb5a726386ac6fb9df209c36b), ROM_BIOS(1))
 ROM_END
 

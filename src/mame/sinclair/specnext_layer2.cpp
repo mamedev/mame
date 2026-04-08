@@ -177,8 +177,9 @@ void specnext_layer2_device::do_draw(screen_device &screen, bitmap_rgb32 &bitmap
 		return;
 
 	const u16 pen_base = m_layer2_palette_select ? m_palette_alt_offset : m_palette_base_offset;
-	const u16 x_min = (((clip.left() - offset_h) >> 1) + m_scroll_x) % info[0];
-	const bool x_overscan = m_scroll_x >= info[0] && info[3] == 256;
+	u16 x_min = ((clip.left() - offset_h) >> 1) + m_scroll_x;
+	const bool x_scrollover = m_scroll_x >= info[0] && info[3] == 256;
+	if (x_scrollover) x_min -= info[0];
 	for (u16 vpos = clip.top(); vpos <= clip.bottom(); vpos++)
 	{
 		const u16 y = (vpos - offset_v + m_scroll_y) % info[1];
@@ -192,7 +193,7 @@ void specnext_layer2_device::do_draw(screen_device &screen, bitmap_rgb32 &bitmap
 			plot_op(pen_base, scr, pix, prio, bprio, hpos, vpos);
 
 			++x %= info[0];
-			if (x == 0  && !x_overscan)
+			if (x == 0  && !x_scrollover)
 				scr = m_host_ram_ptr + (m_layer2_active_bank << 14) + (y * info[4]);
 			else
 				scr += info[3];

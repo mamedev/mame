@@ -23,29 +23,28 @@
 #include "screen.h"
 #include "cpu/z80/z80.h"
 
-/* Spectrum crystals */
+// Spectrum crystals
 
 #define X1 14_MHz_XTAL          // Main clock (48k Spectrum)
 #define X2 XTAL(4'433'619)      // PAL color subcarrier
 
-/* Spectrum screen size in pixels */
-#define SPEC_UNSEEN_LINES  16   /* Non-visible scanlines before first border
-                                   line. Some of these may be vertical retrace. */
-#define SPEC_TOP_BORDER    48   /* Number of border lines before actual screen */
-#define SPEC_DISPLAY_YSIZE 192  /* Vertical screen resolution */
-#define SPEC_BOTTOM_BORDER 56   /* Number of border lines at bottom of screen */
+// Spectrum screen size in pixels
+#define SPEC_UNSEEN_LINES  16   // Non-visible scanlines before first border line. Some of these may be vertical retrace.
+#define SPEC_TOP_BORDER    48   // Number of border lines before actual screen
+#define SPEC_DISPLAY_YSIZE 192  // Vertical screen resolution
+#define SPEC_BOTTOM_BORDER 56   // Number of border lines at bottom of screen
 #define SPEC_SCREEN_HEIGHT (SPEC_TOP_BORDER + SPEC_DISPLAY_YSIZE + SPEC_BOTTOM_BORDER)
 
-#define SPEC_LEFT_BORDER   48   /* Number of left hand border pixels */
-#define SPEC_DISPLAY_XSIZE 256  /* Horizontal screen resolution */
-#define SPEC_RIGHT_BORDER  48   /* Number of right hand border pixels */
+#define SPEC_LEFT_BORDER   48   // Number of left hand border pixels
+#define SPEC_DISPLAY_XSIZE 256  // Horizontal screen resolution
+#define SPEC_RIGHT_BORDER  48   // Number of right hand border pixels
 #define SPEC_SCREEN_WIDTH (SPEC_LEFT_BORDER + SPEC_DISPLAY_XSIZE + SPEC_RIGHT_BORDER)
 
-#define SPEC_LEFT_BORDER_CYCLES   24   /* Cycles to display left hand border */
-#define SPEC_DISPLAY_XSIZE_CYCLES 128  /* Horizontal screen resolution */
-#define SPEC_RIGHT_BORDER_CYCLES  24   /* Cycles to display right hand border */
-#define SPEC_RETRACE_CYCLES       48   /* Cycles taken for horizontal retrace */
-#define SPEC_CYCLES_PER_LINE      224  /* Number of cycles to display a single line */
+#define SPEC_LEFT_BORDER_CYCLES   24   // Cycles to display left hand border
+#define SPEC_DISPLAY_XSIZE_CYCLES 128  // Horizontal screen resolution
+#define SPEC_RIGHT_BORDER_CYCLES  24   // Cycles to display right hand border
+#define SPEC_RETRACE_CYCLES       48   // Cycles taken for horizontal retrace
+#define SPEC_CYCLES_PER_LINE      224  // Number of cycles to display a single line
 
 class spectrum_state : public driver_device
 {
@@ -111,12 +110,12 @@ protected:
 
 	int m_port_fe_data;
 	int m_port_7ffd_data;
-	int m_port_1ffd_data;   /* scorpion and plus3 */
-	int m_port_ff_data; /* Display enhancement control */
-	int m_port_f4_data; /* Horizontal Select Register */
+	int m_port_1ffd_data; // scorpion and plus3
+	int m_port_ff_data;   // Display enhancement control
+	int m_port_f4_data;   // Horizontal Select Register
 
-	/* video support */
-	int m_frame_invert_count; /* Used for handling FLASH 1 */
+	// video support
+	int m_frame_invert_count; // Used for handling FLASH 1
 	optional_shared_ptr<uint8_t> m_video_ram;
 	uint8_t *m_screen_location;
 
@@ -214,7 +213,7 @@ protected:
 	void setup_raw(const uint8_t *quickdata, uint32_t quicksize);
 };
 
-/*----------- defined in drivers/spectrum.cpp -----------*/
+//----------- defined in drivers/spectrum.cpp -----------
 
 INPUT_PORTS_EXTERN( spectrum );
 INPUT_PORTS_EXTERN( spec128 );
