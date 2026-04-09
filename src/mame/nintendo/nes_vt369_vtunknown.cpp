@@ -150,7 +150,6 @@ public:
 	void vt36x_rsps300swap_16mb(machine_config& config);
 
 	void vt369_unk(machine_config& config);
-	void vt369_unk_1mb(machine_config& config);
 	void vt369_unk_16mb(machine_config& config);
 };
 
@@ -180,6 +179,7 @@ public:
 	{ }
 
 	void vt36x_32mb_goretrop(machine_config& config);
+	void vt36x_1mb_rbbrite(machine_config& config);
 
 private:
 	u8 goretrop_prot_r();
@@ -396,12 +396,6 @@ void vt36x_state::vt369_unk_16mb(machine_config& config)
 {
 	vt369_unk(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
-}
-
-void vt36x_state::vt369_unk_1mb(machine_config& config)
-{
-	vt369_unk(config);
-	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_1mbyte);
 }
 
 // New mystery handheld architecture, VTxx derived
@@ -661,6 +655,12 @@ void vt36x_goretrop_state::vt36x_32mb_goretrop(machine_config& config)
 	m_soc->io_4139_write_callback().set(FUNC(vt36x_goretrop_state::goretrop_prot_w));
 
 	VT_MENU_PROTECTION(config, m_protection, 0);
+}
+
+void vt36x_goretrop_state::vt36x_1mb_rbbrite(machine_config& config)
+{
+	vt36x_32mb_goretrop(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_1mbyte);
 }
 
 void vt36x_state::vt36x_h12p1000(machine_config& config)
@@ -1246,8 +1246,15 @@ ROM_START( rbbrite )
 	ROM_REGION( 0x100000, "mainrom", 0 )
 	ROM_LOAD( "coleco_rainbowbrite_29dl800ba_000422cb.bin", 0x00000, 0x100000, CRC(d2ad0d7d) SHA1(4423a5aa2eda20b3621ab46e951ac08dc2d24789) )
 
-	ROM_REGION( 0x100, "extra", 0 ) // data from additional 8-pin chip for protection (put at 0x701 in RAM)
+	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (put at 0x701 in RAM)
 	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
+	ROM_FILL( 0x000, 0x100, 0x60) // wants actual code here, just RTS opcodes don't work
+	// jumps to 0706
+	// jumps to 072b
+	// jumps to 072f
+	// jumps to 0743
+	// jumps to 07d9
+	// (same addresses as goretrop, maybe same data is expected)
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
@@ -1310,6 +1317,9 @@ ROM_START( goretrop )
 	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
 	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
 	ROM_FILL( 0x000, 0x100, 0x60) // wants actual code here, just RTS opcodes don't work
+	// jumps to 072b
+	// jumps to 072f after putting a value in a
+	// jumps to 0743 after putting a value in x
 ROM_END
 
 ROM_START( goretropa )
@@ -1763,7 +1773,7 @@ CONS( 202?, a6plus,    0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init, 
 CONS( 202?, unk198vt, 0,        0,  vt36x_8mb,  vt369, vt36x_state, empty_init, "<unknown>", "198-in-1 Handheld Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // has extra protection (using ports at 4138 / 4139, copied to 0x701)
-CONS( 2018, rbbrite,    0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
+CONS( 2018, rbbrite,    0,        0,  vt36x_1mb_rbbrite, vt369, vt36x_goretrop_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
 
 // there's also a 250+ version of the unit below at least
 // has extra protection (using ports at 4138 / 4139, copied to 0x701)
