@@ -31,7 +31,6 @@ private:
 	u16 m_protreadposition;
 	bool m_data;
 	bool m_enable;
-	bool m_state;
 
 	required_memory_region m_extrarom;
 };
