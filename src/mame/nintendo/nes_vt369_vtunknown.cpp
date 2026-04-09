@@ -157,15 +157,26 @@ class vt36x_gtct885_state : public vt36x_state
 {
 public:
 	vt36x_gtct885_state(const machine_config& mconfig, device_type type, const char* tag) :
-		vt36x_state(mconfig, type, tag)
+		vt36x_state(mconfig, type, tag),
+		m_extrarom(*this, "extra")
 	{ }
 
 	void vt36x_8mb_gtct885(machine_config& config);
 
 private:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u8 gtct885_prot_r();
 	void gtct885_prot_w(u8 data);
+	u8 m_command;
+	u8 m_commandbits;
+	u8 m_protectionstate;
+	u8 m_protold;
+	u8 m_protlatch;
+	u16 m_protreadposition;
+
+	required_region_ptr<uint8_t> m_extrarom;
 };
 
 class vt36x_tetrtin_state : public vt36x_state
@@ -480,13 +491,99 @@ void vt369_base_state::extbank_h12p1000_w(u8 data)
 	m_ahigh = ((data & 0x02) << 23);
 }
 
-// unknown protection device supplying ~0x100 bytes of code (currently in "extra" region)
+
+
+
+// has an unknown protection device supplying ~0x100 bytes of code (currently in "extra" region)
+
+void vt36x_gtct885_state::machine_start()
+{
+	vt36x_state::machine_start();
+	save_item(NAME(m_command));
+	save_item(NAME(m_commandbits));
+	save_item(NAME(m_protectionstate));
+	save_item(NAME(m_protold));
+	save_item(NAME(m_protlatch));;
+	save_item(NAME(m_protreadposition));
+}
+
+void vt36x_gtct885_state::machine_reset()
+{
+	vt36x_state::machine_reset();
+	m_command = 0;
+	m_commandbits = 0;
+	m_protectionstate = 0;
+	m_protold = 0;
+	m_protlatch = 0;
+	m_protreadposition = 0;
+}
+
 void vt36x_gtct885_state::gtct885_prot_w(u8 data)
 {
 	logerror("%s: gtct885_prot_w %02x\n", machine().describe_context(), data);
 	// direction is set to 0x38 before writing here
 	// so 0x20, 0x10, and 0x08 are outputs
 	// some kind of serial device
+
+	if ((data & 0x10) != (m_protold & 0x10))
+	{
+		if (!(data & 0x10))
+		{
+			m_protectionstate = 1; // ready to get command
+			m_commandbits = 8;
+			logerror("protection state ready\n");
+		}
+		else
+		{
+			m_protectionstate = 0; // device not selected?
+			logerror("protection state deselect\n");
+		}
+	}
+
+	if ((data & 0x08) != (m_protold & 0x08))
+	{
+		if (data & 0x08)
+		{
+			if (m_protectionstate == 1)
+			{
+				m_command = (m_command << 1) | ((data & 0x20) >> 5);
+				m_commandbits--;
+
+				logerror("a %02x\n", m_commandbits);
+
+				if (m_commandbits == 0)
+				{
+					logerror("got command %02x\n", m_command);
+
+					if (m_command == 0x30)
+					{
+						logerror("(read bytes)\n");
+						m_protectionstate = 2;
+						m_protreadposition = 0;
+					}
+					else
+					{
+						logerror("(unknown command)\n");
+						m_protectionstate = 0;
+					}
+				}
+			}
+			else if (m_protectionstate == 2)
+			{
+				u8 readdat = m_extrarom[m_protreadposition >> 3];
+				u8 readbit = readdat >> (7 - (m_protreadposition & 7));
+				readbit &= 1;
+
+				logerror("reading bit at byte %02x bit %1x (byte is %02x bit read is %1x)\n", m_protreadposition >> 3, m_protreadposition & 7, readdat, readbit);
+
+				m_protlatch = readbit;
+
+				m_protreadposition++;
+			}
+		}
+	}
+
+	m_protold = data;
 }
 
 u8 vt36x_gtct885_state::gtct885_prot_r()
@@ -494,8 +591,7 @@ u8 vt36x_gtct885_state::gtct885_prot_r()
 	logerror("%s: gtct885_prot_r\n", machine().describe_context());
 	// direction is set to 0x18 before reading here
 	// 0x20 is input (gets shifted into carry, then rotated into RAM)
-	u8 bit = 0;
-	return bit << 5;
+	return m_protlatch << 5;
 }
 
 void vt36x_state::vt36x_altswap_32mb_4banks_red5mam(machine_config& config)
