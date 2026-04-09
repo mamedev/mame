@@ -1150,6 +1150,7 @@ ROM_START( rd5_240 )
 
 	ROM_REGION( 0x100, "extra", 0 ) // data from additional 8-pin chip for protection
 	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
+	ROM_FILL(           0x000, 0x100, 0x60) // RTS opcodes work
 ROM_END
 
 ROM_START( myarccn )
@@ -1744,7 +1745,7 @@ CONS( 201?, lxcyber,    mc_tv200, 0,  vt36x_8mb, vt369, vt36x_state, empty_init,
  // menu is protected with code from extra ROM
 CONS( 201?, gtct885,    mc_tv200, 0,  vt36x_8mb_gtct885, vt369, vt36x_gtct885_state, empty_init, "Gaming Tech",  "Gaming Tech CT-885", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
  // similar to above, but with 40 extra games, menu is protected with code from extra ROM (although RTS opcodes seem to work)
-CONS( 201?, rd5_240,    0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init, "Red5",         "Mini Arcade Machine 240-in-1 (Red5)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, rd5_240,    0,        0,  vt36x_8mb_gtct885, vt369, vt36x_gtct885_state, empty_init, "Red5",         "Mini Arcade Machine 240-in-1 (Red5)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 201?, hkb502,   0,      0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<unknown>", "HKB-502 268-in-1 (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 201?, hkb502a,  hkb502, 0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<unknown>", "HKB-502 268-in-1 (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
