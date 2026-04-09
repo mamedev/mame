@@ -128,7 +128,7 @@ public:
 	void vt36x_32mb_2banks_lexi(machine_config& config);
 	void vt36x_32mb_2banks_lexi300(machine_config& config);
 	void vt36x_h12p1000(machine_config& config);
-	
+
 	void vt36x_swap(machine_config& config);
 	void vt36x_swap_2mb(machine_config& config);
 	void vt36x_swap_4mb(machine_config& config);
@@ -152,7 +152,6 @@ public:
 	void vt369_unk(machine_config& config);
 	void vt369_unk_1mb(machine_config& config);
 	void vt369_unk_16mb(machine_config& config);
-	void vt369_unk_32mb(machine_config& config);
 };
 
 class vt36x_gtct885_state : public vt36x_state
@@ -166,11 +165,25 @@ public:
 	void vt36x_8mb_gtct885(machine_config& config);
 
 private:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-
 	u8 gtct885_prot_r();
 	void gtct885_prot_w(u8 data);
+
+	required_device<vt_menu_protection_device> m_protection;
+};
+
+class vt36x_goretrop_state : public vt36x_state
+{
+public:
+	vt36x_goretrop_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt36x_state(mconfig, type, tag),
+		m_protection(*this, "protection")
+	{ }
+
+	void vt36x_32mb_goretrop(machine_config& config);
+
+private:
+	u8 goretrop_prot_r();
+	void goretrop_prot_w(u8 data);
 
 	required_device<vt_menu_protection_device> m_protection;
 };
@@ -391,13 +404,6 @@ void vt36x_state::vt369_unk_1mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_1mbyte);
 }
 
-void vt36x_state::vt369_unk_32mb(machine_config& config)
-{
-	vt369_unk(config);
-	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_32mbyte);
-}
-
-
 // New mystery handheld architecture, VTxx derived
 void vt36x_state::vt36x(machine_config &config)
 {
@@ -492,16 +498,6 @@ void vt369_base_state::extbank_h12p1000_w(u8 data)
 
 // has an unknown protection device supplying ~0x100 bytes of code (currently in "extra" region)
 
-void vt36x_gtct885_state::machine_start()
-{
-	vt36x_state::machine_start();
-}
-
-void vt36x_gtct885_state::machine_reset()
-{
-	vt36x_state::machine_reset();
-}
-
 void vt36x_gtct885_state::gtct885_prot_w(u8 data)
 {
 	// direction is set to 0x38 before writing here
@@ -518,6 +514,20 @@ u8 vt36x_gtct885_state::gtct885_prot_r()
 	// direction is set to 0x18 before reading here
 	// 0x20 is input (gets shifted into carry, then rotated into RAM)
 	return m_protection->read() ? 0x20 : 0x00;
+}
+
+void vt36x_goretrop_state::goretrop_prot_w(u8 data)
+{
+	// direction is set to 0x0e before writing here
+	m_protection->write_data((data & 0x08) ? true : false);
+	m_protection->write_enable((data & 0x04) ? true : false);
+	m_protection->write_clock((data & 0x02) ? false : true);
+}
+
+u8 vt36x_goretrop_state::goretrop_prot_r()
+{
+	// direction set to 0x06 before reading
+	return (m_protection->read() ? 0x08 : 0x00);
 }
 
 void vt36x_state::vt36x_altswap_32mb_4banks_red5mam(machine_config& config)
@@ -640,6 +650,15 @@ void vt36x_gtct885_state::vt36x_8mb_gtct885(machine_config& config)
 	vt36x_8mb(config);
 	m_soc->io_4153_read_callback().set(FUNC(vt36x_gtct885_state::gtct885_prot_r));
 	m_soc->io_4152_write_callback().set(FUNC(vt36x_gtct885_state::gtct885_prot_w));
+
+	VT_MENU_PROTECTION(config, m_protection, 0);
+}
+
+void vt36x_goretrop_state::vt36x_32mb_goretrop(machine_config& config)
+{
+	vt36x_32mb(config);
+	m_soc->io_4139_read_callback().set(FUNC(vt36x_goretrop_state::goretrop_prot_r));
+	m_soc->io_4139_write_callback().set(FUNC(vt36x_goretrop_state::goretrop_prot_w));
 
 	VT_MENU_PROTECTION(config, m_protection, 0);
 }
@@ -1078,7 +1097,7 @@ ROM_START( rd5_240 )
 
 	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection
 	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
-	ROM_FILL(           0x000, 0x100, 0x60) // RTS opcodes work
+	ROM_FILL( 0x000, 0x100, 0x60) // RTS opcodes work
 ROM_END
 
 ROM_START( myarccn )
@@ -1288,15 +1307,16 @@ ROM_START( goretrop )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "goretroportable.bin", 0x00000, 0x2000000, CRC(e7279dd3) SHA1(5f096ce22e46f112c2cc6588cb1c527f4f0430b5) )
 
-	ROM_REGION( 0x100, "extra", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
+	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
 	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
+	ROM_FILL( 0x000, 0x100, 0x60) // wants actual code here, just RTS opcodes don't work
 ROM_END
 
 ROM_START( goretropa )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "goretro.bin", 0x00000, 0x2000000, CRC(e2c579cc) SHA1(b5cb8883d1f0b238fc9966ac635583dd5c66bcfe) )
 
-	ROM_REGION( 0x100, "extra", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
+	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
 	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
 ROM_END
 
@@ -1747,6 +1767,6 @@ CONS( 2018, rbbrite,    0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_i
 
 // there's also a 250+ version of the unit below at least
 // has extra protection (using ports at 4138 / 4139, copied to 0x701)
-CONS( 2018, goretrop,  0,         0,  vt369_unk_32mb, vt369, vt36x_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games", MACHINE_NOT_WORKING )
-CONS( 2018, goretropa, goretrop,  0,  vt369_unk_32mb, vt369, vt36x_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games (older)", MACHINE_NOT_WORKING ) // doesn't have commando or higemaru
+CONS( 2018, goretrop,  0,         0,  vt36x_32mb_goretrop, vt369, vt36x_goretrop_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games", MACHINE_NOT_WORKING )
+CONS( 2018, goretropa, goretrop,  0,  vt36x_32mb_goretrop, vt369, vt36x_goretrop_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games (older)", MACHINE_NOT_WORKING ) // doesn't have commando or higemaru
 
