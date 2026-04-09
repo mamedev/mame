@@ -5,12 +5,12 @@
  * includes/tsconfig.h
  *
  ****************************************************************************/
-#ifndef MAME_SINCLAIR_TSCONF_H
-#define MAME_SINCLAIR_TSCONF_H
+#ifndef MAME_SINCLAIR_EVO_TSCONF_H
+#define MAME_SINCLAIR_EVO_TSCONF_H
 
 #pragma once
 
-#include "spec128.h"
+#include "../spec128.h"
 
 #include "glukrs.h"
 #include "tsconf_beta.h"
@@ -256,4 +256,4 @@ private:
 
 INPUT_PORTS_EXTERN(tsconf);
 
-#endif // MAME_SINCLAIR_TSCONF_H
+#endif // MAME_SINCLAIR_EVO_TSCONF_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrei I. Holub
-#ifndef MAME_SINCLAIR_SPECNEXT_COPPER_H
-#define MAME_SINCLAIR_SPECNEXT_COPPER_H
+#ifndef MAME_SINCLAIR_NEXT_SPECNEXT_COPPER_H
+#define MAME_SINCLAIR_NEXT_SPECNEXT_COPPER_H
 
 #pragma once
 
@@ -44,4 +44,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SPECNEXT_COPPER, specnext_copper_device)
 
-#endif // MAME_SINCLAIR_SPECNEXT_COPPER_H
+#endif // MAME_SINCLAIR_NEXT_SPECNEXT_COPPER_H

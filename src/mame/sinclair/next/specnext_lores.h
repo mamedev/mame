@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrei I. Holub
-#ifndef MAME_SINCLAIR_SPECNEXT_LORES_H
-#define MAME_SINCLAIR_SPECNEXT_LORES_H
+#ifndef MAME_SINCLAIR_NEXT_SPECNEXT_LORES_H
+#define MAME_SINCLAIR_NEXT_SPECNEXT_LORES_H
 
 #pragma once
 
@@ -62,4 +62,4 @@ private:
 
 
 DECLARE_DEVICE_TYPE(SPECNEXT_LORES, specnext_lores_device)
-#endif // MAME_SINCLAIR_SPECNEXT_LORES_H
+#endif // MAME_SINCLAIR_NEXT_SPECNEXT_LORES_H

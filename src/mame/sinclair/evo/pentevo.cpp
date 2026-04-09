@@ -30,7 +30,8 @@ TODO:
 *******************************************************************************************/
 
 #include "emu.h"
-#include "atm.h"
+
+#include "../atm.h"
 #include "glukrs.h"
 
 #include "bus/spectrum/ay/slot.h"

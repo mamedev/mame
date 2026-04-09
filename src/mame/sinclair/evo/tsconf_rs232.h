@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrei I. Holub
-#ifndef MAME_SINCLAIR_TSCONF_RS232_H
-#define MAME_SINCLAIR_TSCONF_RS232_H
+#ifndef MAME_SINCLAIR_EVO_TSCONF_RS232_H
+#define MAME_SINCLAIR_EVO_TSCONF_RS232_H
 
 #pragma once
 
@@ -78,4 +78,4 @@ private:
 
 DECLARE_DEVICE_TYPE(TSCONF_RS232, tsconf_rs232_device)
 
-#endif // MAME_SINCLAIR_TSCONF_RS232_H
+#endif // MAME_SINCLAIR_EVO_TSCONF_RS232_H

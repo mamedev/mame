@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrei I. Holub
-#ifndef MAME_SINCLAIR_SPECNEXT_LAYER2_H
-#define MAME_SINCLAIR_SPECNEXT_LAYER2_H
+#ifndef MAME_SINCLAIR_NEXT_SPECNEXT_LAYER2_H
+#define MAME_SINCLAIR_NEXT_SPECNEXT_LAYER2_H
 
 #pragma once
 
@@ -75,4 +75,4 @@ private:
 
 
 DECLARE_DEVICE_TYPE(SPECNEXT_LAYER2, specnext_layer2_device)
-#endif // MAME_SINCLAIR_SPECNEXT_LAYER2_H
+#endif // MAME_SINCLAIR_NEXT_SPECNEXT_LAYER2_H

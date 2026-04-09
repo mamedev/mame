@@ -19,8 +19,8 @@
 
 #include "emu.h"
 
-#include "screen_ula.h"
-#include "spec128.h"
+#include "../screen_ula.h"
+#include "../spec128.h"
 #include "specnext_copper.h"
 #include "specnext_ctc.h"
 #include "specnext_divmmc.h"

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrei I. Holub
-#ifndef MAME_SINCLAIR_SPECNEXT_CTC_H
-#define MAME_SINCLAIR_SPECNEXT_CTC_H
+#ifndef MAME_SINCLAIR_NEXT_SPECNEXT_CTC_H
+#define MAME_SINCLAIR_NEXT_SPECNEXT_CTC_H
 
 #pragma once
 
@@ -24,4 +24,4 @@ protected:
 };
 
 DECLARE_DEVICE_TYPE(SPECNEXT_CTC, specnext_ctc_device)
-#endif // MAME_SINCLAIR_SPECNEXT_CTC_H
+#endif // MAME_SINCLAIR_NEXT_SPECNEXT_CTC_H

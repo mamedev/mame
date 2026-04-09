@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrei I. Holub
 
-#ifndef MAME_SINCLAIR_GLUKRS_H
-#define MAME_SINCLAIR_GLUKRS_H
+#ifndef MAME_SINCLAIR_EVO_GLUKRS_H
+#define MAME_SINCLAIR_EVO_GLUKRS_H
 
 #pragma once
 
@@ -35,4 +35,4 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(GLUKRS, glukrs_device)
-#endif // MAME_SINCLAIR_GLUKRS_H
+#endif // MAME_SINCLAIR_EVO_GLUKRS_H

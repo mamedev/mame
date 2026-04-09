@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrei I. Holub
-#ifndef MAME_SINCLAIR_SPECNEXT_SPRITES_H
-#define MAME_SINCLAIR_SPECNEXT_SPRITES_H
+#ifndef MAME_SINCLAIR_NEXT_SPECNEXT_SPRITES_H
+#define MAME_SINCLAIR_NEXT_SPECNEXT_SPRITES_H
 
 #pragma once
 
@@ -96,4 +96,4 @@ private:
 
 
 DECLARE_DEVICE_TYPE(SPECNEXT_SPRITES, specnext_sprites_device)
-#endif // MAME_SINCLAIR_SPECNEXT_SPRITES_H
+#endif // MAME_SINCLAIR_NEXT_SPECNEXT_SPRITES_H
