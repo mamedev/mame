@@ -1645,13 +1645,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/i7110_7220.h,MACHINES["I7110_7220"] = true
+--@src/devices/machine/i7110.h,MACHINES["I7110"] = true
 ---------------------------------------------------
 
-if (MACHINES["I7110_7220"]~=null) then
+if (MACHINES["I7110"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/machine/i7110_7220.cpp",
-		MAME_DIR .. "src/devices/machine/i7110_7220.h",
+		MAME_DIR .. "src/devices/machine/i7110.cpp",
+		MAME_DIR .. "src/devices/machine/i7110.h",
 	}
 end
 

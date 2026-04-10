@@ -6,13 +6,13 @@
     Intel 1 Mbit magnetic bubble memory subsystem
 
     **** TODO ****
-    - Commands to be tested: WR_BLR, WR_BL, RD_FSA_STAT
+    - Commands to be tested: WR_BLR, WR_BL, RD_FSA_STAT, RCD
     - More than 1 MBM
 
 *********************************************************************/
 
 #include "emu.h"
-#include "i7110_7220.h"
+#include "i7110.h"
 
 #include "machine/timer.h"
 
@@ -47,20 +47,22 @@ DEFINE_DEVICE_TYPE(FSA_CHANNEL, fsa_channel_device, "fsa_channel", "i7242 FSA ch
 DEFINE_DEVICE_TYPE(IBUBBLE, ibubble_device, "intel_mbm", "Intel i7110 bubble chipset")
 DEFINE_DEVICE_TYPE(I7220_1, i7220_1_device, "i7220_1", "Intel i7220-1 bubble memory controller")
 
-// Bit manipulation
-template<typename T> constexpr T BIT_MASK(unsigned n)
-{
-	return (T)1U << n;
-}
+namespace {
+	// Bit manipulation
+	template<typename T> constexpr T BIT_MASK(unsigned n)
+	{
+		return (T)1U << n;
+	}
 
-template<typename T> void BIT_CLR(T& w , unsigned n)
-{
-	w &= ~BIT_MASK<T>(n);
-}
+	template<typename T> void BIT_CLR(T& w , unsigned n)
+	{
+		w &= ~BIT_MASK<T>(n);
+	}
 
-template<typename T> void BIT_SET(T& w , unsigned n)
-{
-	w |= BIT_MASK<T>(n);
+	template<typename T> void BIT_SET(T& w , unsigned n)
+	{
+		w |= BIT_MASK<T>(n);
+	}
 }
 
 // +--------------------+
@@ -754,18 +756,14 @@ void fsa_channel_device::decode_loop(std::vector<uint8_t>::const_iterator& in, s
 	}
 }
 
-// Tag of A & B FSA channels
-#define CHA_TAG "cha"
-#define CHB_TAG "chb"
-
 // +----------------+
 // | ibubble_device |
 // +----------------+
 ibubble_device::ibubble_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, IBUBBLE, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
-	, m_chA(*this, CHA_TAG)
-	, m_chB(*this, CHB_TAG)
+	, m_chA(*this, "cha")
+	, m_chB(*this, "chb")
 	, select_w_cb(*this)
 	, dio_w_cb(*this)
 	, dio_r_cb(*this, 0)
@@ -3440,3 +3438,4 @@ uint16_t i7220_1_device::fsa_ch_mask(unsigned n_ch, uint8_t mbm_select)
 	res <<= (mbm_select * n_ch);
 	return res;
 }
+

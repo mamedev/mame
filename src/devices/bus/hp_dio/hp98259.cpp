@@ -25,7 +25,7 @@
 #include "emu.h"
 #include "hp98259.h"
 
-#include "machine/i7110_7220.h"
+#include "machine/i7110.h"
 
 // Debugging
 #define VERBOSE 0

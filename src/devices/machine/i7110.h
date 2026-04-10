@@ -110,8 +110,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_I7110_7220_H
-#define MAME_MACHINE_I7110_7220_H
+#ifndef MAME_MACHINE_I7110_H
+#define MAME_MACHINE_I7110_H
 
 #pragma once
 
@@ -764,4 +764,4 @@ private:
 DECLARE_DEVICE_TYPE(IBUBBLE, ibubble_device)
 DECLARE_DEVICE_TYPE(I7220_1, i7220_1_device)
 
-#endif /* MAME_MACHINE_I7110_7220_H */
+#endif /* MAME_MACHINE_I7110_H */
