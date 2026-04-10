@@ -31,7 +31,7 @@ static const gfx_layout gfx_8x8x4_r =
 
 static const gfx_layout gfx_text =
 {
-	8, 8, 256 * 2, 1,
+	8, 8, 256 * 2 * 4, 1,
 	{ 0 },
 	{ STEP8(0, 1) },
 	{ STEP8(0, 8) },
@@ -66,9 +66,12 @@ specnext_tiles_device &specnext_tiles_device::set_palette(const char *tag, u16 b
 TILE_GET_INFO_MEMBER(specnext_tiles_device::get_tile_info)
 {
 	const bool strip_flags_n = BIT(~m_control, 5);
-	const u8 *data = &m_tiles_info[tile_index << (strip_flags_n ? 1 : 0)];
-	u8 attr = strip_flags_n ? data[strip_flags_n] : m_default_flags;
-	u16 code = data[0];
+	const u8 *tile_info = BIT(m_tm_map_base, 6)
+		? m_bram_bank7_ptr + (((m_tm_map_base << 8) + (tile_index << (strip_flags_n ? 1 : 0))) & 0x1fff)
+		: m_bram_bank5_ptr + (((m_tm_map_base << 8) + (tile_index << (strip_flags_n ? 1 : 0))) & 0x3fff);
+
+	u8 attr = strip_flags_n ? tile_info[strip_flags_n] : m_default_flags;
+	u16 code = tile_info[0];
 	u32 category = 1;
 
 	if (BIT(m_control, 1))
@@ -78,6 +81,10 @@ TILE_GET_INFO_MEMBER(specnext_tiles_device::get_tile_info)
 
 	const bool tm_on_top = BIT(m_control, 0); // tilemap always on top of ula
 	tileinfo.category = tm_on_top ? 2 : category;
+
+	const int size = BIT(m_control, 3) ? 3 : 5; // 32 bytes or 8 for text mode.
+	const int addr = ((code << size) + (m_tm_tile_base << 8)) & (BIT(m_tm_tile_base, 6) ? 0x1fff : 0x3fff);
+	code = addr >> size;
 
 	if (BIT(m_control, 3)) // textmode
 	{
@@ -102,9 +109,7 @@ void specnext_tiles_device::tilemap_update()
 {
 	if (gfx(0) == nullptr) return;
 
-	const u8 *tiles_offset = BIT(m_tm_tile_base, 6)
-		? m_bram_bank7_ptr + ((m_tm_tile_base & 0x1f) << 8)
-		: m_bram_bank5_ptr + ((m_tm_tile_base & 0x3f) << 8);
+	const u8 *tiles_offset = BIT(m_tm_tile_base, 6) ? m_bram_bank7_ptr : m_bram_bank5_ptr;
 	for (auto i = 0; i < 6; ++i)
 	{
 		gfx(i)->set_source(tiles_offset);
@@ -134,10 +139,6 @@ void specnext_tiles_device::tilemap_update()
 			m_tilemap[i]->set_transparent_pen(m_transp_colour);
 		}
 	}
-
-	m_tiles_info = BIT(m_tm_map_base, 6)
-		? m_bram_bank7_ptr + ((m_tm_map_base & 0x1f) << 8)
-		: m_bram_bank5_ptr + ((m_tm_map_base & 0x3f) << 8);
 }
 
 void specnext_tiles_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u8 pcode, u8 priority_mask)

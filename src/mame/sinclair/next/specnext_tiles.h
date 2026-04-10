@@ -49,7 +49,6 @@ protected:
 
 	const u8 *m_bram_bank5_ptr;
 	const u8 *m_bram_bank7_ptr;
-	const u8 *m_tiles_info;
 	tilemap_t *m_tilemap[2];
 
 private:
