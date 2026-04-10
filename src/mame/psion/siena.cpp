@@ -4,6 +4,10 @@
 
     Psion Siena
 
+    TODO:
+    - Siena (US) should report USA instead of English, the locale switch is
+      unknown.
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -86,7 +90,7 @@ static INPUT_PORTS_START( siena )
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1')                  PORT_NAME("1 Min")
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0')
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME)                                                       PORT_NAME("On/CE")           PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(siena_state::wakeup), 0)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNKNOWN) // Reset ?
 
 	PORT_START("COL1")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)          PORT_CHAR('w')  PORT_CHAR('W') PORT_CHAR('"')
@@ -320,12 +324,18 @@ ROM_START(siena)
 	ROM_REGION16_LE(0x100000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "420f", "V4.20F/ENG")
 	ROMX_LOAD("vine_v4.20f_eng.bin", 0x00000, 0x100000, CRC(641f8e7c) SHA1(fe0e46540e0aac5aabb2dd1b96689da41e8f55fb), ROM_BIOS(0))
-ROM_END
+	ROM_END
 
 ROM_START(siena_fr)
 	ROM_REGION16_LE(0x100000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "421f", "V4.21F/FRN")
 	ROMX_LOAD("vine_v4.21f_frn.bin", 0x00000, 0x100000, CRC(104691d6) SHA1(d1e12b305cd2de7dbf6b1a342adb7bf196d7abcb), ROM_BIOS(0))
+ROM_END
+
+ROM_START(siena_us)
+	ROM_REGION16_LE(0x100000, "rom", 0)
+	ROM_SYSTEM_BIOS(0, "408f", "V4.08F/ENG")
+	ROMX_LOAD("vine_v4.08f_eng.bin", 0x00000, 0x100000, CRC(222a7fd4) SHA1(250f43d327fbd5eea0b6ac4a7d7f514072b738f4), ROM_BIOS(0))
 ROM_END
 
 } // anonymous namespace
@@ -334,3 +344,4 @@ ROM_END
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT      CLASS          INIT         COMPANY   FULLNAME           FLAGS
 COMP( 1996, siena,    0,      0,      siena,    siena,     siena_state,   empty_init,  "Psion",  "Siena",           MACHINE_SUPPORTS_SAVE )
 COMP( 1996, siena_fr, siena,  0,      siena,    siena_fr,  siena_state,   empty_init,  "Psion",  "Siena (French)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1996, siena_us, siena,  0,      siena,    siena,     siena_state,   empty_init,  "Psion",  "Siena (US)",      MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

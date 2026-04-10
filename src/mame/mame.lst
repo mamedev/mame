@@ -40384,6 +40384,7 @@ psionhc120
 @source:psion/siena.cpp
 siena
 siena_fr
+siena_us
 
 @source:psion/workabout.cpp
 psionwa
