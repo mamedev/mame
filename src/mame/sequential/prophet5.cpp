@@ -105,6 +105,32 @@ double normalized(const required_ioport &input)
 	return double(input->read()) / double(input->field(1)->maxval());
 }
 
+// Returns the Thevenin-equivalent resistance (Req) and voltage (Veq) looking
+// from point X to the circuit on the left.
+//
+// +15V
+//   |
+//  Rtrim---Rwiper---+---X      ----->      Veq---Req---X
+//   |               |
+//   |              Rgnd
+//   |               |
+// -15V             GND
+//
+// This circuit is used for balance and offset trimming on OTAs and op-amps.
+std::pair<double, double> balance_rveq(const required_ioport &trimmer, double r_wiper, double r_gnd)
+{
+	constexpr double TRIMMER_R_MAX = RES_K(100);
+	const double r_bottom = normalized(trimmer) * TRIMMER_R_MAX;
+	const double r_top = TRIMMER_R_MAX - r_bottom;
+
+	const double v_top = VPLUS * RES_VOLTAGE_DIVIDER(r_top, RES_2_PARALLEL(r_bottom, r_wiper + r_gnd));
+	const double v_bottom = VMINUS * RES_VOLTAGE_DIVIDER(r_bottom, RES_2_PARALLEL(r_top, r_wiper + r_gnd));
+	const double v_eq = (v_top + v_bottom) * RES_VOLTAGE_DIVIDER(r_wiper, r_gnd);
+	const double r_eq = RES_2_PARALLEL(r_gnd, r_wiper + RES_2_PARALLEL(r_top, r_bottom));
+
+	return std::pair<double, double>(r_eq, v_eq);
+}
+
 // A voltage-to-current converter based on a PNP transistor. Converts control
 // voltages to control currents for CA3280 OTAs.
 //
@@ -222,10 +248,13 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(filter_trimmer_changed) { update_filter_freq_calibration(); }
 	DECLARE_INPUT_CHANGED_MEMBER(volume_trimmer_changed) { m_volume_changed_cb(0); }
+	DECLARE_INPUT_CHANGED_MEMBER(voice_balance_trimmer_changed) { voice_update_balance_calibration(); }
 
 	const char *trimmer_name_volume() const ATTR_COLD { return m_volume_name.c_str(); }
 	const char *trimmer_name_filt_scale() const ATTR_COLD { return m_filt_scale_name.c_str(); }
 	const char *trimmer_name_filt_offset() const ATTR_COLD { return m_filt_offset_name.c_str(); }
+	const char *trimmer_name_filt_env_bal() const ATTR_COLD { return m_filt_env_bal_name.c_str(); }
+	const char *trimmer_name_vca_bal() const ATTR_COLD { return m_vca_bal_name.c_str(); }
 
 protected:
 	void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -237,10 +266,13 @@ protected:
 
 private:
 	void update_filter_freq_calibration();
+	void voice_update_balance_calibration();
 
 	const std::string m_volume_name;
 	const std::string m_filt_scale_name;
 	const std::string m_filt_offset_name;
+	const std::string m_filt_env_bal_name;
+	const std::string m_vca_bal_name;
 
 	device_sound_interface *const m_filt_sum_cv;
 	device_sound_interface *const m_noise;
@@ -259,11 +291,13 @@ private:
 	required_device<va_scale_offset_device> m_filt_freq_offset;
 	required_device<cem3320_lpf4_device> m_vcf;  // U469
 
-	required_ioport m_volume;  // R4529
 	devcb_write8 m_volume_changed_cb;
 
+	required_ioport m_volume;  // R4529
 	required_ioport m_filt_scale;  // R4133
 	required_ioport m_filt_offset;  // R4501
+	required_ioport m_filt_env_bal;  // R495
+	required_ioport m_vca_bal;  // R4520
 };
 
 INPUT_PORTS_START(prophet5_voice_trimmers)
@@ -282,6 +316,14 @@ INPUT_PORTS_START(prophet5_voice_trimmers)
 	PORT_START("trimmer_filt_offset")
 	PORT_ADJUSTER(82, voice.trimmer_name_filt_offset())
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_voice_device::filter_trimmer_changed), 0)
+
+	PORT_START("trimmer_filt_env_balance")
+	PORT_ADJUSTER(69, voice.trimmer_name_filt_env_bal())
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_voice_device::voice_balance_trimmer_changed), 0);
+
+	PORT_START("trimmer_vca_balance")
+	PORT_ADJUSTER(64, voice.trimmer_name_vca_bal())
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_voice_device::voice_balance_trimmer_changed), 0);
 INPUT_PORTS_END
 
 }  // anonymous namespace
@@ -299,6 +341,8 @@ prophet5_voice_device::prophet5_voice_device(
 	, m_volume_name(util::string_format("%s TRIMMER: VOLUME", strmakeupper(basetag())))
 	, m_filt_scale_name(util::string_format("%s TRIMMER: FILT SCALE", strmakeupper(basetag())))
 	, m_filt_offset_name(util::string_format("%s TRIMMER: FILT OFFSET", strmakeupper(basetag())))
+	, m_filt_env_bal_name(util::string_format("%s TRIMMER: FILT ENV BALANCE", strmakeupper(basetag())))
+	, m_vca_bal_name(util::string_format("%s TRIMMER: VCA BALANCE", strmakeupper(basetag())))
 	, m_filt_sum_cv(filt_sum_cv)
 	, m_noise(noise)
 	, m_stream(nullptr)
@@ -311,10 +355,12 @@ prophet5_voice_device::prophet5_voice_device(
 	, m_filt_freq_smr_lpf(*this, "filt_freq_summer_lpf")
 	, m_filt_freq_offset(*this, "filt_freq_offset")
 	, m_vcf(*this, "vcf")
-	, m_volume(*this, "trimmer_volume")
 	, m_volume_changed_cb(*this)
+	, m_volume(*this, "trimmer_volume")
 	, m_filt_scale(*this, "trimmer_filt_scale")
 	, m_filt_offset(*this, "trimmer_filt_offset")
+	, m_filt_env_bal(*this, "trimmer_filt_env_balance")
+	, m_vca_bal(*this, "trimmer_vca_balance")
 {
 }
 
@@ -348,12 +394,13 @@ void prophet5_voice_device::device_add_mconfig(machine_config &config)
 		m_filt_sum_cv->add_route(0, m_filt_freq_smr, 1.0 / RES_K(100));  // R4143 (1%)
 
 	// The filter has its own ADSR envelope generator. Its voltage output is fed
-	// to a VCA, which controls the envelope amount applied to the filter's
-	// cutoff frequency. The output of the VCA is a current.
+	// to a VCA ("filt env amt"), which controls the envelope amount applied to
+	// the filter's cutoff frequency. The output of the VCA is a current.
 	CEM3310(config, m_filt_eg, RES_K(24.3), CAP_U(0.039))  // U417, R440 (1%), C443 (5%)
 		.add_route(0, m_filt_eg_vca, 1.0);
 	CA3280_VCA_LIN(config, m_filt_eg_vca, RES_K(121), VPLUS, VMINUS)  // U422B, R451 (1%)
-		.configure_voltage_input(RES_K(47.5))  // R452 (1%)
+		.set_rplus(RES_K(47.5))  // R452 (1%)
+		// rminus is set in voice_update_balance_calibration().
 		.add_route(0, m_filt_freq_smr, 1.0);
 
 	// TODO: Emulate the "polymod" filter modulation source.
@@ -385,7 +432,8 @@ void prophet5_voice_device::device_add_mconfig(machine_config &config)
 		.add_route(0, m_vca, VCF_OUT_GAIN);
 
 	CA3280_VCA_LIN(config, m_vca, RES_K(68), VPLUS, VMINUS)  // R4546
-		.configure_voltage_input(RES_K(20))  // R4548
+		.set_rplus(RES_K(20))  // R4548
+		// r_minus is set in voice_update_balance_calibration().
 		.add_route(0, *this, 1.0);
 }
 
@@ -402,6 +450,7 @@ void prophet5_voice_device::device_start()
 void prophet5_voice_device::device_reset()
 {
 	update_filter_freq_calibration();
+	voice_update_balance_calibration();
 }
 
 void prophet5_voice_device::sound_stream_update(sound_stream &stream)
@@ -462,6 +511,23 @@ void prophet5_voice_device::update_filter_freq_calibration()
 	LOGMASKED(LOG_CALIBRATION | LOG_FILTER, "%s: Filter frequency: %f\n", tag(), m_vcf->get_freq());
 }
 
+void prophet5_voice_device::voice_update_balance_calibration()
+{
+	std::pair<double, double> rv_equiv;
+
+	rv_equiv = balance_rveq(m_filt_env_bal, RES_K(475), RES_K(47.5));  // R453 (1%), R450 (1%)
+	m_filt_eg_vca->set_rminus(rv_equiv.first);
+	m_filt_eg_vca->set_fixed_inv_input(rv_equiv.second);
+	LOGMASKED(LOG_CALIBRATION, "%s: Filt env balance R: %f, V-: %f - Idiff: %e\n",
+			  tag(), rv_equiv.first, rv_equiv.second, m_filt_eg_vca->diff(0, rv_equiv.second));
+
+	rv_equiv = balance_rveq(m_vca_bal, RES_K(200), RES_K(20));  // R4536, R4547
+	m_vca->set_rminus(rv_equiv.first);
+	m_vca->set_fixed_inv_input(rv_equiv.second);
+	LOGMASKED(LOG_CALIBRATION, "%s: VCA balance R: %f, V-: %f - Idiff: %e\n",
+			  tag(), rv_equiv.first, rv_equiv.second, m_vca->diff(0, rv_equiv.second));
+}
+
 
 namespace {
 
@@ -487,6 +553,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(mod_wheel_changed) { update_wmod_amount(); }
 	DECLARE_INPUT_CHANGED_MEMBER(filter_cv_in_changed) { update_filter_fixed_cvs(); }
 	DECLARE_INPUT_CHANGED_MEMBER(master_volume_changed) { update_master_volume(); }
+	DECLARE_INPUT_CHANGED_MEMBER(balance_trimmer_changed) { update_balance_calibration(); }
 
 protected:
 	void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -506,6 +573,7 @@ private:
 	void update_filter_fixed_cvs();
 	void update_voice_volume();
 	void update_master_volume();
+	void update_balance_calibration();
 
 	required_device<va_ota_eg_device> m_glide_eg;  // U381A (CA3280) + surrounding components.
 	required_device<ca3280_vca_device> m_mod_noise_vca;  // U378B
@@ -529,6 +597,7 @@ private:
 	required_ioport m_amp_cv_in;  // J7
 	required_ioport m_filter_cv_in;  // J6
 	required_ioport m_mod_wheel;  // R2
+	required_ioport m_lfo_bal;  // R3141
 
 	bool m_lfo_ramp_s;  // U377A pin 13
 	bool m_lfo_sqr_s;  // U377B pin 5
@@ -588,6 +657,7 @@ prophet5_audio_device::prophet5_audio_device(const machine_config &mconfig, cons
 	, m_amp_cv_in(*this, ":cv_in_amp")
 	, m_filter_cv_in(*this, ":cv_in_filter")
 	, m_mod_wheel(*this, ":wheel_mod")
+	, m_lfo_bal(*this, ":trimmer_lfo_balance")
 	, m_lfo_ramp_s(false)
 	, m_lfo_sqr_s(false)
 	, m_lfo_tri_s(false)
@@ -639,7 +709,7 @@ void prophet5_audio_device::device_add_mconfig(machine_config &config)
 		.set_lowpass(R393, CAP_U(0.01))  // C372
 		.add_route(0, m_mod_noise_vca, 1.0);
 	CA3280_VCA(config, m_mod_noise_vca)  // U378B
-		.configure_input_divider(RES_K(20), RES_R(330))  // R3119, R3120
+		.configure_plus_divider(RES_K(20), RES_R(330))  // R3119, R3120
 		.add_route(0, m_wmod, 1.0);
 
 	// LFO modulation source.
@@ -705,7 +775,7 @@ void prophet5_audio_device::device_add_mconfig(machine_config &config)
 		.set_rc(filter_rc_device::HIGHPASS, R4131 + R4132, 0, 0, CAP_U(0.1))  // C458
 		.add_route(0, m_noise_vca, 1.0);
 	CA3280_VCA(config, m_noise_vca)
-		.configure_input_divider(R4131, R4132)  // Scaled amplitude: +/- ~0.36V.
+		.configure_plus_divider(R4131, R4132)  // Scaled amplitude: +/- ~0.36V.
 		.configure_voltage_output(RES_K(10));  // R4129
 
 	// The 5 voices. The output of each voice device is a current, but it is
@@ -745,8 +815,9 @@ void prophet5_audio_device::device_add_mconfig(machine_config &config)
 	// the master volume knob and, if connected, the external AMPLIFIER CV IN
 	// input (J7). See update_master_volume().
 	CA3280_VCA_LIN(config, m_master_vol_vca, RES_K(68), VPLUS, VMINUS)  // R4561
-		.configure_voltage_input(RES_K(15))  // R4564
 		.configure_voltage_output(RES_K(20))  // R4562
+		.set_rplus(RES_K(15))  // R4564
+		.set_rminus(RES_K(15))  // R4563 - from parts list. Value in the schematic is unclear.
 		.add_route(0, "dcblock", 1.0);
 
 	// Output stage.
@@ -778,6 +849,7 @@ void prophet5_audio_device::device_reset()
 	update_filter_fixed_cvs();
 	update_voice_volume();
 	update_master_volume();
+	update_balance_calibration();
 }
 
 void prophet5_audio_device::select_a440_w(int state)
@@ -1327,6 +1399,14 @@ void prophet5_audio_device::update_master_volume()
 
 	LOGMASKED(LOG_CV, "Master volume changed. Pot: %f, CV in connected: %d, Max CV: %f, VOL CV: %f, VOL CC: %f\n",
 			  volume, cv_in_connected, max_vol_cv, vol_cv, vol_cc);
+}
+
+void prophet5_audio_device::update_balance_calibration()
+{
+	const std::pair<double, double> rv_equiv = balance_rveq(m_lfo_bal, RES_M(2.2), RES_R(330));  // R3151, R3152
+	m_lfo_vca->set_fixed_inv_input(rv_equiv.second);
+	LOGMASKED(LOG_CALIBRATION, "LFO Balance V-: %f, Vdiff: %f\n",
+			  rv_equiv.second, m_lfo_vca->diff(0, rv_equiv.second));
 }
 
 
@@ -2261,6 +2341,10 @@ INPUT_PORTS_START(prophet5)
 	// An input of 0V has the same effect as the input not being connected.
 	PORT_ADJUSTER(0, "CV IN: FILTER")
 		PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(prophet5_audio_device::filter_cv_in_changed), 0)
+
+	PORT_START("trimmer_lfo_balance")
+	PORT_ADJUSTER(50, "TRIMMER: LFO BALANCE")
+		PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(prophet5_audio_device::balance_trimmer_changed), 0)
 INPUT_PORTS_END
 
 ROM_START(prophet5rev30)
