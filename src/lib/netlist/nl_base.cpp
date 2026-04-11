@@ -40,7 +40,6 @@ namespace netlist
 			|| plib::dynamic_downcast<const analog_output_t *>(this))
 			return terminal_type::OUTPUT;
 
-		state().log().fatal(MF_UNKNOWN_TYPE_FOR_OBJECT(name()));
 		throw nl_exception(MF_UNKNOWN_TYPE_FOR_OBJECT(name()));
 		// return terminal_type::TERMINAL; // please compiler
 	}
@@ -526,7 +525,6 @@ namespace netlist
 			{
 				if (ret != nullptr)
 				{
-					m_log.fatal(MF_MORE_THAN_ONE_1_DEVICE_FOUND(classname));
 					throw nl_exception(
 						MF_MORE_THAN_ONE_1_DEVICE_FOUND(classname));
 				}
@@ -727,8 +725,6 @@ namespace netlist
 		for (detail::core_terminal_t *t : m_core_terms)
 			if (t == &terminal)
 			{
-				state().log().fatal(
-					MF_NET_1_DUPLICATE_TERMINAL_2(this->name(), t->name()));
 				throw nl_exception(
 					MF_NET_1_DUPLICATE_TERMINAL_2(this->name(), t->name()));
 			}
@@ -761,8 +757,6 @@ namespace netlist
 		for (detail::core_terminal_t *t : core_terms_ref())
 			if (t == &terminal)
 			{
-				state().log().fatal(
-					MF_NET_1_DUPLICATE_TERMINAL_2(this->name(), t->name()));
 				throw nl_exception(
 					MF_NET_1_DUPLICATE_TERMINAL_2(this->name(), t->name()));
 			}
@@ -1011,7 +1005,6 @@ namespace netlist
 		if (plib::dynamic_downcast<const param_ptr_t *>(this))
 			return POINTER;
 
-		state().log().fatal(MF_UNKNOWN_PARAM_TYPE(name()));
 		throw nl_exception(MF_UNKNOWN_PARAM_TYPE(name()));
 	}
 

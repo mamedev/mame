@@ -60,7 +60,6 @@ namespace netlist::factory
 	{
 		if (exists(factory->name()))
 		{
-			m_log.fatal(MF_FACTORY_ALREADY_CONTAINS_1(factory->name()));
 			throw nl_exception(MF_FACTORY_ALREADY_CONTAINS_1(factory->name()));
 		}
 		push_back(std::move(factory));
@@ -74,7 +73,6 @@ namespace netlist::factory
 				return e.get();
 		}
 
-		m_log.fatal(MF_CLASS_1_NOT_FOUND(devname));
 		throw nl_exception(MF_CLASS_1_NOT_FOUND(devname));
 	}
 

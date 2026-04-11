@@ -174,7 +174,6 @@ namespace netlist
 				if (d.first == name)
 				{
 					dev.release();
-					log().fatal(MF_DUPLICATE_NAME_DEVICE_LIST(name));
 					throw nl_exception(MF_DUPLICATE_NAME_DEVICE_LIST(name));
 				}
 			// m_devices.push_back(std::move(dev));

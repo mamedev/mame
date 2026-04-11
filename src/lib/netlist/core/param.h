@@ -311,8 +311,6 @@ namespace netlist
 			bool ok = temp.set_from_string(p);
 			if (!ok)
 			{
-				device.state().log().fatal(
-					MF_INVALID_ENUM_CONVERSION_1_2(name, p));
 				throw nl_exception(MF_INVALID_ENUM_CONVERSION_1_2(name, p));
 			}
 			m_param = temp;
