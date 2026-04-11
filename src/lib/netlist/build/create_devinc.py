@@ -35,20 +35,28 @@ def process_entry_external(srcfile, name):
 
 def process_entry(srcfile, name, params):
     process_srcfile(srcfile)
-    p = re.sub("\+","",params)
-    ps = p.split(",")
     pusage = ""
     pauto = ""
-    for x in ps:
-        if x[0:1] == "@":
+    pcount = 0
+    immediate_params = True
+    for x in params.split(","):
+        if x.startswith('@'):
             pauto = pauto + ", " + x[1:]
-        else:
+        elif len(x) > 0:
+            if x.startswith('+'):
+                immediate_params = False
+                x = x[1:]
+                if x[0].isdigit():
+                    x = '_'+x
             pusage = pusage + ", " + x
+            pcount += 1
     print("// usage       : {}(name{})".format(name, pusage))
     if len(pauto) > 0:
         print("// auto connect: {}".format(pauto[2:]))
-    print("#define {}(...)                                                   \\".format(name))
-    print("\tNET_REGISTER_DEVEXT({}, __VA_ARGS__)".format(name))
+    print("#define {}(name{})                                                   \\".format(name, pusage if immediate_params else ", ..."))
+    if pcount > 0 and not immediate_params:
+        print("\t__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == {}, \"{}: Mismatched number of parameters passed, expected {} but got \" PSTRINGIFY(PNARGS(__VA_ARGS__)));) \\".format(pcount, name, pcount))
+    print("\tNET_REGISTER_DEV({}, name{})".format(name, pusage if immediate_params else " __VA_OPT__(,) __VA_ARGS__"))
     print("")
 
 
