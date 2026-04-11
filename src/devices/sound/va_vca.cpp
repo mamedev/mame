@@ -37,8 +37,6 @@ void va_vca_device::update()
 
 void va_vca_device::set_fixed_gain_cv(float gain_cv)
 {
-	if (!m_stream)
-		fatalerror("%s: set_fixed_gain_cv() cannot be called before device_start()\n", tag());
 	if (BIT(get_sound_requested_inputs_mask(), INPUT_GAIN))
 		fatalerror("%s: Cannot set a fixed gain CV when streaming it.\n", tag());
 
@@ -46,19 +44,19 @@ void va_vca_device::set_fixed_gain_cv(float gain_cv)
 	if (gain == m_fixed_gain)
 		return;
 
-	m_stream->update();
+	update();
 	m_fixed_gain = gain;
 }
 
 void va_vca_device::set_fixed_inv_input(float x)
 {
-	if (!m_stream)
-		fatalerror("%s: set_fixed_signal_neg() cannot be called before device_start()\n", tag());
 	if (BIT(get_sound_requested_inputs_mask(), INPUT_AUDIO_INV))
 		fatalerror("%s: Cannot set the inverting input when streaming it.\n", tag());
+
 	if (x == m_fixed_inv_input)
 		return;
-	m_stream->update();
+
+	update();
 	m_fixed_inv_input = x;
 }
 
