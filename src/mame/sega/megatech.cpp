@@ -278,7 +278,7 @@ static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_DIPSETTING(    0x0d, "1 Coin/13 Credits" )
 	PORT_DIPSETTING(    0x0e, "1 Coin/14 Credits" )
 	PORT_DIPSETTING(    0x0f, "1 Coin/15 Credits" )
-	PORT_DIPNAME( 0xf0, 0xa0, "Time Per Credit" ) PORT_DIPLOCATION("SW2:5,6,7,8)
+	PORT_DIPNAME( 0xf0, 0xa0, "Time Per Credit" ) PORT_DIPLOCATION("SW2:5,6,7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x10, "7:30" )
 	PORT_DIPSETTING(    0x20, "7:00" )
