@@ -61,35 +61,38 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ndcs0(*this, "ndcs0")
 		, m_internal_sram(*this, "internal_sram")
-		, m_apb(*this, "apb", 0x27000, ENDIANNESS_LITTLE)
+		, m_clkrst(*this, "clkrst", 0x1000, ENDIANNESS_LITTLE)
+		, m_bootctl(*this, "bootctl", 0x1000, ENDIANNESS_LITTLE)
 		, m_remap_view(*this, "remap")
 	{ }
 
 	void pixter_multimedia(machine_config &config);
 
 private:
-	// Remap Control, mapped at 0xfffe2008, offset 0x22008/4
-	static inline constexpr uint32_t APB_REMAP = 34818;
-	// Power-up Boot Configuration, mapped at 0xfffe6000, offset 0x26000/4
-	static inline constexpr uint32_t APB_PBC = 38912;
-	// nCS1 Override, mapped at 0xfffe6004, offset 0x26004/4
-	static inline constexpr uint32_t APB_CS1OV = 38913;
-	// External Peripheral Mapping, mapped at 0xfffe6008, offset 0x26008/4
-	static inline constexpr uint32_t APB_EPM = 38914;
+	// Remap Control, mapped at 0xfffe2008, offset 0x0008/4
+	static inline constexpr uint32_t CLKRST_REMAP = 2;
+	// Power-up Boot Configuration, mapped at 0xfffe6000, offset 0x0000/4
+	static inline constexpr uint32_t BOOTCTL_PBC = 0;
+	// nCS1 Override, mapped at 0xfffe6004, offset 0x0004/4
+	static inline constexpr uint32_t BOOTCTL_CS1OV = 1;
+	// External Peripheral Mapping, mapped at 0xfffe6008, offset 0x0008/4
+	static inline constexpr uint32_t BOOTCTL_EPM = 2;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 	DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	void arm7_map(address_map &map) ATTR_COLD;
-	void apb_bridge_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	void clkrst_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	void bootctl_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	void apb_remap(uint32_t data);
 
 	required_device<generic_slot_device> m_cart;
 	required_device<arm7_cpu_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_ndcs0;
 	required_shared_ptr<uint32_t> m_internal_sram;
-	memory_share_creator<uint32_t> m_apb;
+	memory_share_creator<uint32_t> m_clkrst;
+	memory_share_creator<uint32_t> m_bootctl;
 	memory_view m_remap_view;
 };
 
@@ -97,7 +100,7 @@ void pixter_multimedia_state::apb_remap(uint32_t data)
 {
 	// User's Guide - 1.6 Memory Interface Architecture
 	if (data == 0) {
-		m_remap_view.select((m_apb[APB_PBC] & 0b0100) && (m_apb[APB_CS1OV] & 0b1) ? 0 : 3);
+		m_remap_view.select((m_bootctl[BOOTCTL_PBC] & 0b0100) && (m_bootctl[BOOTCTL_CS1OV] & 0b1) ? 0 : 3);
 	} else if (data < 3) {
 		m_remap_view.select(data);
 	} else {
@@ -122,12 +125,12 @@ void pixter_multimedia_state::machine_start()
 
 void pixter_multimedia_state::machine_reset()
 {
-	m_apb[APB_PBC] = 0b0000; // Boot from NOR Flash or SRAM, 16-bit data bus width, nBLEx LOW for reads
-	m_apb[APB_CS1OV] = 0b0; // nCS1 is routed for normal operation
-	m_apb[APB_EPM] = 0b1111; // All external devices are accessible following reset
+	m_bootctl[BOOTCTL_PBC] = 0b0000; // Boot from NOR Flash or SRAM, 16-bit data bus width, nBLEx LOW for reads
+	m_bootctl[BOOTCTL_CS1OV] = 0b0; // nCS1 is routed for normal operation
+	m_bootctl[BOOTCTL_EPM] = 0b1111; // All external devices are accessible following reset
 
-	m_apb[APB_REMAP] = 0b00; // Map nCS1
-	apb_remap(m_apb[APB_REMAP]);
+	m_clkrst[CLKRST_REMAP] = 0b00; // Map nCS1
+	apb_remap(m_clkrst[CLKRST_REMAP]);
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(pixter_multimedia_state::cart_load)
@@ -197,8 +200,14 @@ void pixter_multimedia_state::arm7_map(address_map &map)
 	// Boot ROM
 	map(0x8000'0000, 0x8000'1fff).rom().region("bootrom", 0);
 
-	// APB Bridge
-	map(0xfffc'0000, 0xfffe'6fff).ram().share("apb").w(FUNC(pixter_multimedia_state::apb_bridge_w));
+	// APB Peripherals
+
+	// Reset Clock and Power Controller
+	map(0xfffe'2000, 0xfffe'2fff).ram().share("clkrst").w(FUNC(pixter_multimedia_state::clkrst_w));
+	// Boot Controller
+	map(0xfffe'6000, 0xfffe'6fff).ram().share("bootctl").w(FUNC(pixter_multimedia_state::bootctl_w));
+
+
 	// External Memory Control
 	map(0xffff'1000, 0xffff'1fff).ram();
 	// Color LCD Control
@@ -209,14 +218,20 @@ void pixter_multimedia_state::arm7_map(address_map &map)
 	map(0xffff'f000, 0xffff'ffff).ram();
 }
 
-void pixter_multimedia_state::apb_bridge_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void pixter_multimedia_state::clkrst_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if (offset == m_apb[APB_REMAP]) {
+	if (offset == CLKRST_REMAP) {
 		apb_remap(data);
 	}
 
-	COMBINE_DATA(&m_apb[offset]);
+	COMBINE_DATA(&m_clkrst[offset]);
 }
+
+void pixter_multimedia_state::bootctl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	COMBINE_DATA(&m_bootctl[offset]);
+}
+
 
 static INPUT_PORTS_START( pixter_multimedia )
 INPUT_PORTS_END
