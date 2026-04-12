@@ -42,18 +42,27 @@ Language:
 *******?? = Finland
 *******?? = China
 
-VTech V.Baby cartridges.
+VTech V.Baby/VTech Baby: BabyTime Centre/VTech Baby: TiviBoo cartridges
+
+The European version has the VTech Baby branding
+
+Like the V.Smile Baby, In countries where the original V.Smile is 3-8 years, the V.Baby is 12-36 months.
+
 +========+===================+============================================================================+
 | Dumped |      Serial       |                                    Name                                    |
 +========+===================+============================================================================+
 |        | 80-107100-001(US) | Meet Me at the Zoo                                                         |
+|        | 80-107103-003(UK) | Meet Me at the Zoo                                                         |
+|        | 80-107105-005(FR) | Promenade au Zoo                                                           |
 |   NA   | 80-107122-022(SP) | Aventuras en el Zoo (cart without ROM)                                     |
 +========+===================+============================================================================+
 |        | 80-220000(US)     | The World of Eric Carle - The Very Hungry Caterpillar                      |
 +========+===================+============================================================================+
-|  YES   | 80-220507-022(SP) | El Jardín de los Sueños...                                                 |
+|        | 80-220503-003(UK) | In the Night Garden...                                                     |
+|        | 80-220505-005(FR) | Dans le Jardin des Rêves...                                                |
+|   XX   | 80-220507-022(SP) | El Jardín de los Sueños...                                                 |
 +========+===================+============================================================================+
-|        | 80-220600(US)     | Backyardigans                                                              |
+|        | 80-220600(US)     | Nickelodeon The Backyardigans - Big Backyard Adventures                    |
 +========+===================+============================================================================+
 |        | 80-220700(US)     | Noah's Ark - Animal Adventures                                             |
 +========+===================+============================================================================+
@@ -66,10 +75,10 @@ VTech V.Baby cartridges.
 	<!-- note these are NAND parts.
 	     the dump doesn't contain GPNANDNAND strings so probably not booted from? -->
 
-	<software name="eljardin" supported="no">
+	<software name="nightgardsp" supported="no">
 		<description>El Jardín de los Sueños... (Spain)</description>
-		<year>2007</year>
-		<publisher>VTech</publisher>
+		<year>2009</year>
+		<publisher>VTech Baby</publisher>
 		<info name="serial" value="52-220507(SP)" />
 		<part name="cart" interface="vbaby_cart"> <!-- dumped as hy27us08121a, ident returned C2 5A -->
 			<dataarea name="rom" size="0x4200000">
