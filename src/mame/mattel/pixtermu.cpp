@@ -48,6 +48,8 @@
 #include "bus/generic/slot.h"
 #include "cpu/arm7/arm7.h"
 
+#include "machine/lh79524_timer.h"
+
 #include "softlist_dev.h"
 
 namespace {
@@ -61,6 +63,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ndcs0(*this, "ndcs0")
 		, m_internal_sram(*this, "internal_sram")
+		, m_timers(*this, "timer%u", 0U)
 		, m_clkrst(*this, "clkrst", 0x1000, ENDIANNESS_LITTLE)
 		, m_bootctl(*this, "bootctl", 0x1000, ENDIANNESS_LITTLE)
 		, m_remap_view(*this, "remap")
@@ -91,6 +94,8 @@ private:
 	required_device<arm7_cpu_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_ndcs0;
 	required_shared_ptr<uint32_t> m_internal_sram;
+	required_device_array<lh79524_timer_device, 3> m_timers;
+
 	memory_share_creator<uint32_t> m_clkrst;
 	memory_share_creator<uint32_t> m_bootctl;
 	memory_view m_remap_view;
@@ -202,6 +207,10 @@ void pixter_multimedia_state::arm7_map(address_map &map)
 
 	// APB Peripherals
 
+	// Timers
+	map(0xfffc'4000, 0xfffc'402f).rw(m_timers[0], FUNC(lh79524_timer_device::read), FUNC(lh79524_timer_device::write));
+	map(0xfffc'4030, 0xfffc'404f).rw(m_timers[1], FUNC(lh79524_timer_device::read), FUNC(lh79524_timer_device::write));
+	map(0xfffc'4050, 0xfffc'406f).rw(m_timers[2], FUNC(lh79524_timer_device::read), FUNC(lh79524_timer_device::write));
 	// Reset Clock and Power Controller
 	map(0xfffe'2000, 0xfffe'2fff).ram().share("clkrst").w(FUNC(pixter_multimedia_state::clkrst_w));
 	// Boot Controller
@@ -241,6 +250,12 @@ void pixter_multimedia_state::pixter_multimedia(machine_config &config)
 	// User's Guide - 1.3 Clock Strategy - AHB Fast CPU Clock (FCLK)
 	ARM7(config, m_maincpu, 76'205'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pixter_multimedia_state::arm7_map);
+
+	for (int i=0; i<3; i++)
+	{
+		LH79524_TIMER(config, m_timers[i], 76'205'000);
+		m_timers[i]->set_timer_index(i);
+	}
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pixter_cart");
 	m_cart->set_endian(ENDIANNESS_LITTLE);

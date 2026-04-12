@@ -2180,6 +2180,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/lh79524_timer.h,MACHINES["LH79524"] = true
+---------------------------------------------------
+
+if MACHINES["LH79524"] then
+	files {
+		MAME_DIR .. "src/devices/machine/lh79524_timer.cpp",
+		MAME_DIR .. "src/devices/machine/lh79524_timer.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/locomo.h,MACHINES["LOCOMO"] = true
 ---------------------------------------------------
 
