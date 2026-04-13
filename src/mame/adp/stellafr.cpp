@@ -399,7 +399,7 @@ INPUT_PORTS_END
 
 void stellafr_state::sus_tk(machine_config &config)
 {
-	M68000(config, m_maincpu, 10'000'000 ); //?
+	M68000(config, m_maincpu, 8'000'000 ); //?
 	m_maincpu->set_addrmap(AS_PROGRAM, &stellafr_state::mem_map_tk);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &stellafr_state::fc7_map);
 
@@ -420,7 +420,7 @@ void stellafr_state::sus_tk(machine_config &config)
 
 void stellafr_state::sus_rtc(machine_config &config)
 {
-	M68000(config, m_maincpu, 10'000'000 ); //?
+	M68000(config, m_maincpu, 12'000'000 ); //?
 	m_maincpu->set_addrmap(AS_PROGRAM, &stellafr_state::mem_map_rtc);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &stellafr_state::fc7_map);
 
