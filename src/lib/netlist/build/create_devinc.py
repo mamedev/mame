@@ -38,25 +38,21 @@ def process_entry(srcfile, name, params):
     pusage = ""
     pauto = ""
     pcount = 0
-    immediate_params = True
     for x in params.split(","):
         if x.startswith('@'):
             pauto = pauto + ", " + x[1:]
         elif len(x) > 0:
             if x.startswith('+'):
-                immediate_params = False
                 x = x[1:]
-                if x[0].isdigit():
-                    x = '_'+x
             pusage = pusage + ", " + x
             pcount += 1
     print("// usage       : {}(name{})".format(name, pusage))
     if len(pauto) > 0:
         print("// auto connect: {}".format(pauto[2:]))
-    print("#define {}(name{})                                                   \\".format(name, pusage if immediate_params else ", ..."))
-    if pcount > 0 and not immediate_params:
+    print("#define {}(name{})                                                   \\".format(name, ", ..." if pcount > 0 else ""))
+    if pcount > 0:
         print("\t__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == {}, \"{}: Mismatched number of parameters passed, expected {} but got \" PSTRINGIFY(PNARGS(__VA_ARGS__)));) \\".format(pcount, name, pcount))
-    print("\tNET_REGISTER_DEV({}, name{})".format(name, pusage if immediate_params else " __VA_OPT__(,) __VA_ARGS__"))
+    print("\tNET_REGISTER_DEV({}, name{})".format(name, " __VA_OPT__(,) __VA_ARGS__" if pcount > 0 else ""))
     print("")
 
 

@@ -14,28 +14,32 @@
 // ---------------------------------------------------------------------
 
 // usage       : QBJT_EB(name, MODEL)
-#define QBJT_EB(name, MODEL)                                                   \
-	NET_REGISTER_DEV(QBJT_EB, name, MODEL)
+#define QBJT_EB(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "QBJT_EB: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(QBJT_EB, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : QBJT_SW(name, MODEL)
-#define QBJT_SW(name, MODEL)                                                   \
-	NET_REGISTER_DEV(QBJT_SW, name, MODEL)
+#define QBJT_SW(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "QBJT_SW: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(QBJT_SW, name __VA_OPT__(,) __VA_ARGS__)
 
 // ---------------------------------------------------------------------
 // Source: ../analog/nld_mosfet.cpp
 // ---------------------------------------------------------------------
 
 // usage       : MOSFET(name, MODEL)
-#define MOSFET(name, MODEL)                                                   \
-	NET_REGISTER_DEV(MOSFET, name, MODEL)
+#define MOSFET(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "MOSFET: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(MOSFET, name __VA_OPT__(,) __VA_ARGS__)
 
 // ---------------------------------------------------------------------
 // Source: ../analog/nld_opamps.cpp
 // ---------------------------------------------------------------------
 
 // usage       : OPAMP(name, MODEL)
-#define OPAMP(name, MODEL)                                                   \
-	NET_REGISTER_DEV(OPAMP, name, MODEL)
+#define OPAMP(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "OPAMP: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(OPAMP, name __VA_OPT__(,) __VA_ARGS__)
 
 // ---------------------------------------------------------------------
 // Source: ../analog/nld_switches.cpp
@@ -54,20 +58,24 @@
 // ---------------------------------------------------------------------
 
 // usage       : VCVS(name, G)
-#define VCVS(name, G)                                                   \
-	NET_REGISTER_DEV(VCVS, name, G)
+#define VCVS(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "VCVS: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(VCVS, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : VCCS(name, G)
-#define VCCS(name, G)                                                   \
-	NET_REGISTER_DEV(VCCS, name, G)
+#define VCCS(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "VCCS: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(VCCS, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : CCCS(name, G)
-#define CCCS(name, G)                                                   \
-	NET_REGISTER_DEV(CCCS, name, G)
+#define CCCS(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "CCCS: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(CCCS, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : CCVS(name, G)
-#define CCVS(name, G)                                                   \
-	NET_REGISTER_DEV(CCVS, name, G)
+#define CCVS(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "CCVS: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(CCVS, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : LVCCS(name)
 #define LVCCS(name)                                                   \
@@ -78,40 +86,49 @@
 // ---------------------------------------------------------------------
 
 // usage       : RES(name, R)
-#define RES(name, R)                                                   \
-	NET_REGISTER_DEV(RES, name, R)
+#define RES(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "RES: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(RES, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : POT(name, R)
-#define POT(name, R)                                                   \
-	NET_REGISTER_DEV(POT, name, R)
+#define POT(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "POT: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(POT, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : POT2(name, R)
-#define POT2(name, R)                                                   \
-	NET_REGISTER_DEV(POT2, name, R)
+#define POT2(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "POT2: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(POT2, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : CAP(name, C)
-#define CAP(name, C)                                                   \
-	NET_REGISTER_DEV(CAP, name, C)
+#define CAP(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "CAP: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(CAP, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : IND(name, L)
-#define IND(name, L)                                                   \
-	NET_REGISTER_DEV(IND, name, L)
+#define IND(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "IND: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(IND, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : DIODE(name, MODEL)
-#define DIODE(name, MODEL)                                                   \
-	NET_REGISTER_DEV(DIODE, name, MODEL)
+#define DIODE(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "DIODE: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(DIODE, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : ZDIODE(name, MODEL)
-#define ZDIODE(name, MODEL)                                                   \
-	NET_REGISTER_DEV(ZDIODE, name, MODEL)
+#define ZDIODE(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "ZDIODE: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(ZDIODE, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : VS(name, V)
-#define VS(name, V)                                                   \
-	NET_REGISTER_DEV(VS, name, V)
+#define VS(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "VS: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(VS, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : CS(name, I)
-#define CS(name, I)                                                   \
-	NET_REGISTER_DEV(CS, name, I)
+#define CS(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "CS: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(CS, name __VA_OPT__(,) __VA_ARGS__)
 
 // ---------------------------------------------------------------------
 // Source: ../devices/nld_2102a.cpp
@@ -554,8 +571,9 @@
 
 // usage       : SN74LS629(name, CAP)
 // auto connect: VCC, GND
-#define SN74LS629(name, CAP)                                                   \
-	NET_REGISTER_DEV(SN74LS629, name, CAP)
+#define SN74LS629(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "SN74LS629: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(SN74LS629, name __VA_OPT__(,) __VA_ARGS__)
 
 // ---------------------------------------------------------------------
 // Source: ../devices/nld_8277.cpp
@@ -705,8 +723,9 @@
 // ---------------------------------------------------------------------
 
 // usage       : R2R_DAC(name, VIN, R, N)
-#define R2R_DAC(name, VIN, R, N)                                                   \
-	NET_REGISTER_DEV(R2R_DAC, name, VIN, R, N)
+#define R2R_DAC(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 3, "R2R_DAC: Mismatched number of parameters passed, expected 3 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(R2R_DAC, name __VA_OPT__(,) __VA_ARGS__)
 
 // ---------------------------------------------------------------------
 // Source: ../devices/nld_roms.cpp
@@ -753,8 +772,9 @@
 // ---------------------------------------------------------------------
 
 // usage       : SCHMITT_TRIGGER(name, STMODEL)
-#define SCHMITT_TRIGGER(name, STMODEL)                                                   \
-	NET_REGISTER_DEV(SCHMITT_TRIGGER, name, STMODEL)
+#define SCHMITT_TRIGGER(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "SCHMITT_TRIGGER: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(SCHMITT_TRIGGER, name __VA_OPT__(,) __VA_ARGS__)
 
 // ---------------------------------------------------------------------
 // Source: ../devices/nld_system.cpp
@@ -774,26 +794,31 @@
 	NET_REGISTER_DEV(FRONTIER_DEV, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : AFUNC(name, N, FUNC)
-#define AFUNC(name, N, FUNC)                                                   \
-	NET_REGISTER_DEV(AFUNC, name, N, FUNC)
+#define AFUNC(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 2, "AFUNC: Mismatched number of parameters passed, expected 2 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(AFUNC, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : ANALOG_INPUT(name, IN)
-#define ANALOG_INPUT(name, IN)                                                   \
-	NET_REGISTER_DEV(ANALOG_INPUT, name, IN)
+#define ANALOG_INPUT(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "ANALOG_INPUT: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(ANALOG_INPUT, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : CLOCK(name, FREQ)
-#define CLOCK(name, FREQ)                                                   \
-	NET_REGISTER_DEV(CLOCK, name, FREQ)
+#define CLOCK(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "CLOCK: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(CLOCK, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : VARCLOCK(name, N, FUNC)
-#define VARCLOCK(name, N, FUNC)                                                   \
-	NET_REGISTER_DEV(VARCLOCK, name, N, FUNC)
+#define VARCLOCK(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 2, "VARCLOCK: Mismatched number of parameters passed, expected 2 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(VARCLOCK, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : EXTCLOCK(name, FREQ, PATTERN)
-#define EXTCLOCK(name, FREQ, PATTERN)                                                   \
-	NET_REGISTER_DEV(EXTCLOCK, name, FREQ, PATTERN)
+#define EXTCLOCK(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 2, "EXTCLOCK: Mismatched number of parameters passed, expected 2 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(EXTCLOCK, name __VA_OPT__(,) __VA_ARGS__)
 
-// usage       : SYS_DSW(name, I, _1, _2)
+// usage       : SYS_DSW(name, I, 1, 2)
 #define SYS_DSW(name, ...)                                                   \
 	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 3, "SYS_DSW: Mismatched number of parameters passed, expected 3 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
 	NET_REGISTER_DEV(SYS_DSW, name __VA_OPT__(,) __VA_ARGS__)
@@ -807,36 +832,43 @@
 	NET_REGISTER_DEV(SYS_COMPD, name)
 
 // usage       : SYS_PULSE(name, DELAY, DURATION, INVERT_INPUT, INVERT_OUTPUT)
-#define SYS_PULSE(name, DELAY, DURATION, INVERT_INPUT, INVERT_OUTPUT)                                                   \
-	NET_REGISTER_DEV(SYS_PULSE, name, DELAY, DURATION, INVERT_INPUT, INVERT_OUTPUT)
+#define SYS_PULSE(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 4, "SYS_PULSE: Mismatched number of parameters passed, expected 4 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(SYS_PULSE, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : SYS_NOISE_MT_U(name, SIGMA)
-#define SYS_NOISE_MT_U(name, SIGMA)                                                   \
-	NET_REGISTER_DEV(SYS_NOISE_MT_U, name, SIGMA)
+#define SYS_NOISE_MT_U(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "SYS_NOISE_MT_U: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(SYS_NOISE_MT_U, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : SYS_NOISE_MT_N(name, SIGMA)
-#define SYS_NOISE_MT_N(name, SIGMA)                                                   \
-	NET_REGISTER_DEV(SYS_NOISE_MT_N, name, SIGMA)
+#define SYS_NOISE_MT_N(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "SYS_NOISE_MT_N: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(SYS_NOISE_MT_N, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : MAINCLOCK(name, FREQ)
-#define MAINCLOCK(name, FREQ)                                                   \
-	NET_REGISTER_DEV(MAINCLOCK, name, FREQ)
+#define MAINCLOCK(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "MAINCLOCK: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(MAINCLOCK, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : GNDA(name)
 #define GNDA(name)                                                   \
 	NET_REGISTER_DEV(GNDA, name)
 
 // usage       : LOGIC_INPUT8(name, IN, MODEL)
-#define LOGIC_INPUT8(name, IN, MODEL)                                                   \
-	NET_REGISTER_DEV(LOGIC_INPUT8, name, IN, MODEL)
+#define LOGIC_INPUT8(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 2, "LOGIC_INPUT8: Mismatched number of parameters passed, expected 2 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(LOGIC_INPUT8, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : LOGIC_INPUT(name, IN, MODEL)
-#define LOGIC_INPUT(name, IN, MODEL)                                                   \
-	NET_REGISTER_DEV(LOGIC_INPUT, name, IN, MODEL)
+#define LOGIC_INPUT(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 2, "LOGIC_INPUT: Mismatched number of parameters passed, expected 2 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(LOGIC_INPUT, name __VA_OPT__(,) __VA_ARGS__)
 
 // usage       : TTL_INPUT(name, IN)
-#define TTL_INPUT(name, IN)                                                   \
-	NET_REGISTER_DEV(TTL_INPUT, name, IN)
+#define TTL_INPUT(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "TTL_INPUT: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(TTL_INPUT, name __VA_OPT__(,) __VA_ARGS__)
 
 // ---------------------------------------------------------------------
 // Source: ../devices/nld_tms4800.cpp
@@ -1708,8 +1740,9 @@ NETLIST_EXTERNAL(ttl74xx_lib)
 // ---------------------------------------------------------------------
 
 // usage       : SOLVER(name, FREQ)
-#define SOLVER(name, FREQ)                                                   \
-	NET_REGISTER_DEV(SOLVER, name, FREQ)
+#define SOLVER(name, ...)                                                   \
+	__VA_OPT__(static_assert(PNARGS(__VA_ARGS__) == 1, "SOLVER: Mismatched number of parameters passed, expected 1 but got " PSTRINGIFY(PNARGS(__VA_ARGS__)));) \
+	NET_REGISTER_DEV(SOLVER, name __VA_OPT__(,) __VA_ARGS__)
 
 #endif // __PLIB_PREPROCESSOR__
 
