@@ -162,6 +162,7 @@ public:
 	{ }
 
 	void vt36x_8mb_gtct885(machine_config& config);
+	void vt36x_altswap_2mb_36pcase(machine_config& config);
 
 private:
 	u8 gtct885_prot_r();
@@ -648,6 +649,16 @@ void vt36x_gtct885_state::vt36x_8mb_gtct885(machine_config& config)
 	VT_MENU_PROTECTION(config, m_protection, 0);
 }
 
+void vt36x_gtct885_state::vt36x_altswap_2mb_36pcase(machine_config& config)
+{
+	vt36x_altswap_2mb(config);
+
+	m_soc->io_4153_read_callback().set(FUNC(vt36x_gtct885_state::gtct885_prot_r));
+	m_soc->io_4152_write_callback().set(FUNC(vt36x_gtct885_state::gtct885_prot_w));
+
+	VT_MENU_PROTECTION(config, m_protection, 0);
+}
+
 void vt36x_goretrop_state::vt36x_32mb_goretrop(machine_config& config)
 {
 	vt36x_32mb(config);
@@ -998,7 +1009,7 @@ ROM_START( 36pcase )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "25q16.ic3", 0x00000, 0x200000, CRC(a8edb73e) SHA1(1028656530e411607ffa3b63788b42e41bf971d7) )
 
-	ROM_REGION( 0x100, "extra", 0 ) // data from additional 8-pin chip for protection (put at 0xe01 in RAM) (checks for something before this)
+	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (put at 0xe01 in RAM) (checks for something before this)
 	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
 ROM_END
 
@@ -1642,8 +1653,8 @@ CONS( 201?, 240in1ar,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_s
 // portable fan + famiclone combo handheld, very similar to 240in1ar
 CONS( 2020, nubsupmf,   0,      0,  vt36x_altswap_4mb, vt369, vt36x_state, empty_init, "<unknown>", "NubSup Mini Game Fan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-// protected
-CONS( 202?, 36pcase,    0,      0,  vt36x_altswap_2mb, vt369, vt36x_state, empty_init, "<unknown>", "36-in-1 Classic Games phone case", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+// protected both with accesses involving 41e7 / 41eb / 414f (probably more IO ports, to get 2 bytes in RAM) and the serial devices to get ~0x100 bytes of code
+CONS( 202?, 36pcase,    0,      0,  vt36x_altswap_2mb_36pcase, vt369, vt36x_gtct885_state, empty_init, "<unknown>", "36-in-1 Classic Games phone case", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 
 /*****************************************************************************
