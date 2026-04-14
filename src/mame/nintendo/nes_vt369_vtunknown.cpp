@@ -1330,6 +1330,22 @@ ROM_START( goretropa )
 	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
 ROM_END
 
+ROM_START( goretropu13 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "goretroportable250p_v13.bin", 0x00000, 0x2000000, CRC(b2a94173) SHA1(e64989f4b0a29820b0dce5e0ca91abb8f247c269) )
+
+	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
+	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
+ROM_END
+
+ROM_START( goretropu12 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "goretroportable250p_v12.bin", 0x00000, 0x2000000, CRC(fda93863) SHA1(75e48ac27e5520953676894747d6d06307cdc1af) )
+
+	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
+	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
+ROM_END
+
 ROM_START( s10fake )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "s29gl064a90tfir4.bin", 0x00000, 0x800000, CRC(8ba78851) SHA1(d482fc56efbbdf6ff890b775144fd49ecaa1b539) )
@@ -1775,8 +1791,9 @@ CONS( 202?, unk198vt, 0,        0,  vt36x_8mb,  vt369, vt36x_state, empty_init, 
 // has extra protection (using ports at 4138 / 4139, copied to 0x701)
 CONS( 2018, rbbrite,    0,        0,  vt36x_1mb_rbbrite, vt369, vt36x_goretrop_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
 
-// there's also a 250+ version of the unit below at least
 // has extra protection (using ports at 4138 / 4139, copied to 0x701)
 CONS( 2018, goretrop,  0,         0,  vt36x_32mb_goretrop, vt369, vt36x_goretrop_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games", MACHINE_NOT_WORKING )
 CONS( 2018, goretropa, goretrop,  0,  vt36x_32mb_goretrop, vt369, vt36x_goretrop_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games (older)", MACHINE_NOT_WORKING ) // doesn't have commando or higemaru
-
+// these US versions have 1.2 and 1.3 printed on the packaging
+CONS( 2018, goretropu13,goretrop, 0,  vt36x_32mb_goretrop, vt369, vt36x_goretrop_state, empty_init,    "Retro-Bit", "Go Retro Portable 250+ Games (US, V1.3)", MACHINE_NOT_WORKING )
+CONS( 2018, goretropu12,goretrop, 0,  vt36x_32mb_goretrop, vt369, vt36x_goretrop_state, empty_init,    "Retro-Bit", "Go Retro Portable 250+ Games (US, V1.2)", MACHINE_NOT_WORKING )
