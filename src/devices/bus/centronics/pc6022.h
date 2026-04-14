@@ -20,6 +20,7 @@ public:
 	pc6022_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void ack_w(int state);
+	void pen_ctrl_w(int state);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
@@ -45,12 +46,11 @@ private:
 
 	void io_map(address_map &map) ATTR_COLD;
 
-	void pa_w(u8 data);
-
 	u8 data_r();
 
 	u8 m_data;
-	u8 m_last_pa;
+	u8 m_pen_ctrl;
+	u8 m_pen_down;
 	u8 m_ack;
 	u8 m_strobe;
 };
