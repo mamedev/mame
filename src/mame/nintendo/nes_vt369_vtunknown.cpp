@@ -1139,6 +1139,10 @@ ROM_START( lxcap )
 	VT3XX_INTERNAL_NO_SWAP // verified for this set
 
 	ROM_REGION( 0x100, "extra", 0 ) // data from additional 8-pin chip for protection
+	// This table is just (0x100 - offset) & 0xff with a nibble swap applied at the end
+	// 
+	// The chip here (which is accessed in a different way to gtct885 etc.) might not
+	// be fetching data from a table, but doing a calculation
 	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, CRC(491d206b) SHA1(a5411a7afe3b4df93b1b22e5533f5010bd3aaa93) )
 ROM_END
 
