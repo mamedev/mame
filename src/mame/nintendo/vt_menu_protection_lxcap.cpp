@@ -8,7 +8,7 @@
 
 #include "vt_menu_protection_lxcap.h"
 
-DEFINE_DEVICE_TYPE(VT_MENU_PROTECTION_LXCAP, vt_menu_protection_lxcap_device, "vtmenuprot", "VT Menu Protection (lxcap)")
+DEFINE_DEVICE_TYPE(VT_MENU_PROTECTION_LXCAP, vt_menu_protection_lxcap_device, "vtmenuprot_lxcap", "VT Menu Protection (lxcap)")
 
 vt_menu_protection_lxcap_device::vt_menu_protection_lxcap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VT_MENU_PROTECTION_LXCAP, tag, owner, clock)
