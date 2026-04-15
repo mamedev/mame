@@ -10,8 +10,8 @@ Used by:
 - igs/igs_m027_023vid.cpp
 
 TODO:
-- Interrupt handling and background scaling is not implemented
-- Video register area is mirrored?
+- Interrupt handling and background scaling are not implemented
+- Is video register area mirrored?
 
 */
 
@@ -794,7 +794,7 @@ u32 igs023_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 bool igs023_video_device::sprite_dma()
 {
 	// verified on hardware
-	static const u16 ram_mask[5] = { 0xffff, 0xfbff, 0x7fff, 0xffff, 0xffff };
+	constexpr u16 ram_mask[5] = { 0xffff, 0xfbff, 0x7fff, 0xffff, 0xffff };
 	if (BIT(~m_ctrl, 0))
 		return false;
 
