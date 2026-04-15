@@ -507,7 +507,6 @@ void vt3xx_soc_base_device::vt_414a_port_out_w(u8 data)
 u8 vt3xx_soc_base_device::vt_414a_port_in_r()
 {
 	logerror("%s: vt_414a_port_in_r (with direction register %02x)\n", machine().describe_context(), m_414x_port_direction);
-	// this is a read from an output port? (or the ports can be configured)
 	u8 ret = m_io_414a_read_callback();
 	return (ret & ~m_414x_port_direction) | (m_414a_port_data & m_414x_port_direction);
 }
@@ -516,7 +515,7 @@ void vt3xx_soc_base_device::vt_414b_port_out_w(u8 data)
 {
 	logerror("%s: vt_414b_port_out_w %02x (with direction register %02x)\n", machine().describe_context(), data, m_414x_port_direction);
 	m_414b_port_data = data;
-	// this is a write to an input port? (or the ports can be configured)
+	m_io_414b_write_callback(data & m_414x_port_direction);
 }
 
 u8 vt3xx_soc_base_device::vt_414b_port_in_r()

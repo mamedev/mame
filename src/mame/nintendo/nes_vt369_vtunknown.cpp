@@ -207,13 +207,15 @@ public:
 	void vt36x_1mb_tetrtin(machine_config& config) ATTR_COLD;
 	void vt36x_8mb_lxcap(machine_config &config) ATTR_COLD;
 	void vt36x_8mb_pixel(machine_config &config) ATTR_COLD;
-	void vt36x_1mb_otrail(machine_config &config) ATTR_COLD;
+	void vt36x_16mb_nesvt270(machine_config &config) ATTR_COLD;
 
 protected:
 	u8 lxcap_prot_r();
 	void lxcap_prot_w(u8 data);
 	u8 pixel_prot_r();
 	void pixel_prot_w(u8 data);
+	u8 nesvt270_prot_r();
+	void nesvt270_prot_w(u8 data);
 
 	required_device<vt_menu_protection_lxcap_device> m_protection;
 };
@@ -573,6 +575,17 @@ u8 vt36x_tetrtin_state::pixel_prot_r()
 	return (m_protection->read() ? 0x10 : 0x00);
 }
 
+u8 vt36x_tetrtin_state::nesvt270_prot_r()
+{
+	return 0x00;// (m_protection->read() ? 0x40 : 0x00);
+}
+
+void vt36x_tetrtin_state::nesvt270_prot_w(u8 data)
+{
+	//m_protection->write_data((data & 0x40) ? true : false);
+	//m_protection->write_clock((data & 0x80) ? true : false);
+}
+
 void vt36x_otrail_state::otrail_seeprom_w(u8 data)
 {
 	m_i2cmem->write_scl((data & 0x04) ? true : false);
@@ -779,6 +792,16 @@ void vt36x_tetrtin_state::vt36x_8mb_pixel(machine_config &config)
 	m_soc->io_414b_read_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_r));
 	m_soc->io_414a_write_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_w));
 }
+
+void vt36x_tetrtin_state::vt36x_16mb_nesvt270(machine_config &config)
+{
+	vt36x_16mb(config);
+	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0); // might not be this device
+
+	m_soc->io_414b_read_callback().set(FUNC(vt36x_tetrtin_state::nesvt270_prot_r));
+	m_soc->io_414b_write_callback().set(FUNC(vt36x_tetrtin_state::nesvt270_prot_w));
+}
+
 
 void vt36x_otrail_state::vt36x_1mb_otrail(machine_config &config)
 {
@@ -1879,7 +1902,7 @@ CONS( 2021, pactin,     0,        0,  vt36x_1mb_tetrtin, vt369, vt36x_tetrtin_st
 CONS( 2021, tetrtin,    0,        0,  vt36x_1mb_tetrtin, vt369, vt36x_tetrtin_state, empty_init, "Fizz Creations", "Tetris Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // 2022 date on 'BL-867 PCB03' PCB, has extra protection?
-CONS( 2022, nesvt270,    0,  0,  vt36x_16mb, vt369, vt36x_state, empty_init, "<unknown>", "unknown VT3xx based 270-in-1 (BL-867 PCB03)", MACHINE_NOT_WORKING )
+CONS( 2022, nesvt270,    0,  0,  vt36x_16mb_nesvt270, vt369, vt36x_tetrtin_state, empty_init, "<unknown>", "unknown VT3xx based 270-in-1 (BL-867 PCB03)", MACHINE_NOT_WORKING )
 
 // VT369, but doesn't use most features
 CONS( 201?, myarccn,   0, 0,  vt36x_1mb, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Caveman Ninja", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
