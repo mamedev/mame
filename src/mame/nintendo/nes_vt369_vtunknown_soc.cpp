@@ -497,7 +497,7 @@ u8 vt3xx_soc_base_device::vt_414a_port_out_r()
 {
 	logerror("%s: vt_414a_port_out_r (with direction register %02x)\n", machine().describe_context(), m_414x_port_direction);
 	// this is a read from an output port? (or the ports can be configured)
-	return 0x80;
+	return m_414x_port_data;
 }
 
 void vt3xx_soc_base_device::vt_414b_port_in_w(u8 data)

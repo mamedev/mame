@@ -202,10 +202,13 @@ public:
 
 	void vt36x_1mb_tetrtin(machine_config& config) ATTR_COLD;
 	void vt36x_8mb_lxcap(machine_config &config) ATTR_COLD;
+	void vt36x_8mb_pixel(machine_config &config) ATTR_COLD;
 
 private:
 	u8 lxcap_prot_r();
 	void lxcap_prot_w(u8 data);
+	u8 pixel_prot_r();
+	void pixel_prot_w(u8 data);
 
 	required_device<vt_menu_protection_lxcap_device> m_protection;
 };
@@ -532,6 +535,19 @@ u8 vt36x_tetrtin_state::lxcap_prot_r()
 }
 
 
+
+void vt36x_tetrtin_state::pixel_prot_w(u8 data)
+{
+	m_protection->write_data((data & 0x10) ? true : false);
+	m_protection->write_clock((data & 0x20) ? true : false);
+}
+
+u8 vt36x_tetrtin_state::pixel_prot_r()
+{
+	return (m_protection->read() ? 0x10 : 0x00);
+}
+
+
 void vt36x_state::vt36x_altswap_32mb_4banks_red5mam(machine_config &config)
 {
 	vt36x_altswap(config);
@@ -706,6 +722,16 @@ void vt36x_tetrtin_state::vt36x_8mb_lxcap(machine_config &config)
 	m_soc->io_4153_read_callback().set(FUNC(vt36x_tetrtin_state::lxcap_prot_r));
 	m_soc->io_4152_write_callback().set(FUNC(vt36x_tetrtin_state::lxcap_prot_w));
 }
+
+void vt36x_tetrtin_state::vt36x_8mb_pixel(machine_config &config)
+{
+	vt36x_8mb(config);
+	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
+
+	m_soc->io_414b_read_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_r));
+	m_soc->io_414b_write_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_w));
+}
+
 
 static INPUT_PORTS_START( vt369 )
 	PORT_START("IO0")
@@ -1745,9 +1771,9 @@ CONS( 2016, sy888b,     0,        0,  vt36x_4mb, vt369, vt36x_state, empty_init,
 CONS( 201?, mc_cb280,   0,        0,  vt36x_swap_4mb, vt369, vt36x_state, empty_init, "CoolBoy",   "Coolboy RS-18 (280 in 1)", MACHINE_IMPERFECT_GRAPHICS )
 
 // this is similar to mog_m320 below, but gets to the menu (still has chr banking issues)
-CONS( 201?, pixel246,   0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init, "Shanghai Weimeng Network Technology Co.,Ltd / dreamhax", "Pixels 246-in-1 Game Player (DH-628)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-// Plays intro music but then crashes. same hardware as SY-88x but uses more features
-CONS( 2016, mog_m320,   pixel246, 0,  vt36x_8mb, vt369, vt36x_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
+// both of these access a protection device (same as lxcap but on a different port?) but only mog_m320 cares about the result?
+CONS( 201?, pixel246,   0,        0,  vt36x_8mb_pixel, vt369, vt36x_tetrtin_state, empty_init, "Shanghai Weimeng Network Technology Co.,Ltd / dreamhax", "Pixels 246-in-1 Game Player (DH-628)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2016, mog_m320,   pixel246, 0,  vt36x_8mb_pixel, vt369, vt36x_tetrtin_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
 
 // VT369, but doesn't use most features
 CONS( 200?, lpgm240,    0,        0,  vt36x_swap_8mb,        vt369, vt36x_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
