@@ -26,6 +26,9 @@
 #include "vt_menu_protection.h"
 #include "vt_menu_protection_lxcap.h"
 
+#include "machine/eepromser.h"
+#include "machine/i2cmem.h"
+
 #include "multibyte.h"
 
 namespace {
@@ -205,7 +208,7 @@ public:
 	void vt36x_8mb_pixel(machine_config &config) ATTR_COLD;
 	void vt36x_1mb_otrail(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	u8 lxcap_prot_r();
 	void lxcap_prot_w(u8 data);
 	u8 pixel_prot_r();
@@ -213,6 +216,24 @@ private:
 
 	required_device<vt_menu_protection_lxcap_device> m_protection;
 };
+
+class vt36x_otrail_state : public vt36x_tetrtin_state
+{
+public:
+	vt36x_otrail_state(const machine_config &mconfig, device_type type, const char *tag) :
+		vt36x_tetrtin_state(mconfig, type, tag),
+		m_i2cmem(*this, "i2cmem")
+	{ }
+
+	void vt36x_1mb_otrail(machine_config &config) ATTR_COLD;
+
+private:
+	void otrail_seeprom_w(u8 data);
+	u8 otrail_seeprom_r();
+
+	required_device<i2cmem_device> m_i2cmem;
+};
+
 
 u8 vt369_state::vt_rom_banked_r(offs_t offset)
 {
@@ -548,6 +569,18 @@ u8 vt36x_tetrtin_state::pixel_prot_r()
 	return (m_protection->read() ? 0x10 : 0x00);
 }
 
+void vt36x_otrail_state::otrail_seeprom_w(u8 data)
+{
+	m_i2cmem->write_scl((data & 0x04) ? true : false);
+	m_i2cmem->write_sda((data & 0x08) ? true : false);
+}
+
+u8 vt36x_otrail_state::otrail_seeprom_r()
+{
+	return (m_i2cmem->read_sda() ? 0xff : 0xf7);
+}
+
+
 
 void vt36x_state::vt36x_altswap_32mb_4banks_red5mam(machine_config &config)
 {
@@ -733,13 +766,18 @@ void vt36x_tetrtin_state::vt36x_8mb_pixel(machine_config &config)
 	m_soc->io_414b_write_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_w));
 }
 
-void vt36x_tetrtin_state::vt36x_1mb_otrail(machine_config &config)
+void vt36x_otrail_state::vt36x_1mb_otrail(machine_config &config)
 {
 	vt36x_1mb(config);
 	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
 
-	m_soc->io_414b_read_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_r));
-	m_soc->io_414b_write_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_w));
+	I2C_24C04(config, "i2cmem", 0);
+
+	m_soc->io_414b_read_callback().set(FUNC(vt36x_otrail_state::pixel_prot_r));
+	m_soc->io_414b_write_callback().set(FUNC(vt36x_otrail_state::pixel_prot_w));
+
+	m_soc->io_4153_read_callback().set(FUNC(vt36x_otrail_state::otrail_seeprom_r));
+	m_soc->io_4152_write_callback().set(FUNC(vt36x_otrail_state::otrail_seeprom_w));
 }
 
 
@@ -1235,8 +1273,10 @@ ROM_START( otrail )
 	ROM_REGION( 0x100000, "mainrom", 0 )
 	ROM_LOAD( "g25q80cw.bin", 0x00000, 0x100000, CRC(b20a03ba) SHA1(c4ca8e590b07baaebed747537bc8f92e44bdd219) ) // dumped as QD25Q80C
 
-	ROM_REGION( 0x200, "seeprom", 0 )
-	ROM_LOAD( "t24c04a.bin", 0x000, 0x200, CRC(ce1fad6f) SHA1(82878996765739edba42042b6336460d5c8f8096) )
+	//VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+
+	//ROM_REGION( 0x200, "seeprom", 0 )
+	//ROM_LOAD( "t24c04a.bin", 0x000, 0x200, CRC(ce1fad6f) SHA1(82878996765739edba42042b6336460d5c8f8096) )
 ROM_END
 
 ROM_START( pactin )
@@ -1830,7 +1870,7 @@ CONS( 201?, denv150,   0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init, 
 CONS( 201?, egame150,  denv150,  0,  vt36x_swap_8mb, vt369, vt36x_state, empty_init, "<unknown>", "E-Game! 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // uncertain, uses SPI ROM so probably VT369, has extra protection? (but RAM test goes up to 0x2000, over the internal ROM area?)
-CONS( 2017, otrail,     0,        0,  vt36x_1mb_otrail, vt369, vt36x_tetrtin_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2017, otrail,    0,        0,  vt36x_1mb_otrail, vt369, vt36x_otrail_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // uses a low res display (so vt3xx?)
 CONS( 2021, matet10,   0,        0,  vt36x_swap_2mb, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7083, Pixel Pocket, with 10 bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
