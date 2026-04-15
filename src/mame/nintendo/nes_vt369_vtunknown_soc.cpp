@@ -463,7 +463,14 @@ u8 vt3xx_soc_base_device::vt_413x_port_in_r()
 
 // nesvt270 uses 4148 and 414b like they're a port and direction register
 // input doesn't appear to require clocking?
-// 41e7 / 4147 / 414f also get used in some cases in code near these accesses
+// 41e7 / 4147 / / 414a / 414f also get used in some cases in code near these accesses
+
+// code in otrail sets vt_414x_port_direction_w 0x30 (0011 0000)
+// then writes to 414a using bits 0011 0000
+// it then sets vt_414x_port_direction_w to 0x20 (0010 0000)
+// and reads from 414b masking with 0x10
+
+// maybe the port can be configured in different modes?
 
 u8 vt3xx_soc_base_device::vt_414x_port_direction_r()
 {
