@@ -56,8 +56,10 @@ vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config &mconfig, devi
 	m_io_4153_write_callback(*this),
 	m_io_413x_write_callback(*this),
 	m_io_413x_read_callback(*this, 0xff),
-	m_io_414x_write_callback(*this),
-	m_io_414x_read_callback(*this, 0xff)
+	m_io_414a_read_callback(*this, 0xff),
+	m_io_414a_write_callback(*this),
+	m_io_414b_read_callback(*this, 0xff),
+	m_io_414b_write_callback(*this)
 {
 }
 
@@ -317,8 +319,8 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 
 	// based on nesvt270, otrail, pixel246 this looks like another I/O port?
 	map(0x4148, 0x4148).rw(FUNC(vt3xx_soc_base_device::vt_414x_port_direction_r), FUNC(vt3xx_soc_base_device::vt_414x_port_direction_w));
-	map(0x414a, 0x414a).rw(FUNC(vt3xx_soc_base_device::vt_414a_port_out_r), FUNC(vt3xx_soc_base_device::vt_414a_port_out_w));
-	map(0x414b, 0x414b).rw(FUNC(vt3xx_soc_base_device::vt_414b_port_in_r), FUNC(vt3xx_soc_base_device::vt_414b_port_in_w));
+	map(0x414a, 0x414a).rw(FUNC(vt3xx_soc_base_device::vt_414a_port_in_r), FUNC(vt3xx_soc_base_device::vt_414a_port_out_w));
+	map(0x414b, 0x414b).rw(FUNC(vt3xx_soc_base_device::vt_414b_port_in_r), FUNC(vt3xx_soc_base_device::vt_414b_port_out_w));
 
 	map(0x414f, 0x414f).r(FUNC(vt3xx_soc_base_device::vt369_414f_r));
 
@@ -498,21 +500,22 @@ void vt3xx_soc_base_device::vt_414x_port_direction_w(u8 data)
 void vt3xx_soc_base_device::vt_414a_port_out_w(u8 data)
 {
 	logerror("%s: vt_414a_port_out_w %02x (with direction register %02x)\n", machine().describe_context(), data, m_414x_port_direction);
-	m_414x_port_data = data;
-	m_io_414x_write_callback(data & m_414x_port_direction);
+	m_414a_port_data = data;
+	m_io_414a_write_callback(data & m_414x_port_direction);
 }
 
-u8 vt3xx_soc_base_device::vt_414a_port_out_r()
+u8 vt3xx_soc_base_device::vt_414a_port_in_r()
 {
-	logerror("%s: vt_414a_port_out_r (with direction register %02x)\n", machine().describe_context(), m_414x_port_direction);
+	logerror("%s: vt_414a_port_in_r (with direction register %02x)\n", machine().describe_context(), m_414x_port_direction);
 	// this is a read from an output port? (or the ports can be configured)
-	return m_414x_port_data;
+	u8 ret = m_io_414a_read_callback();
+	return (ret & ~m_414x_port_direction) | (m_414a_port_data & m_414x_port_direction);
 }
 
-void vt3xx_soc_base_device::vt_414b_port_in_w(u8 data)
+void vt3xx_soc_base_device::vt_414b_port_out_w(u8 data)
 {
-	logerror("%s: vt_414b_port_in_w %02x (with direction register %02x)\n", machine().describe_context(), data, m_414x_port_direction);
-	m_414x_port_data = data;
+	logerror("%s: vt_414b_port_out_w %02x (with direction register %02x)\n", machine().describe_context(), data, m_414x_port_direction);
+	m_414b_port_data = data;
 	// this is a write to an input port? (or the ports can be configured)
 }
 
@@ -520,8 +523,8 @@ u8 vt3xx_soc_base_device::vt_414b_port_in_r()
 {
 	logerror("%s: vt_414b_port_in_r (with direction register %02x)\n", machine().describe_context(), m_414x_port_direction);
 	// TODO: pass the direction register
-	u8 ret = m_io_414x_read_callback();
-	return (ret & ~m_414x_port_direction) | (m_414x_port_data & m_414x_port_direction);
+	u8 ret = m_io_414b_read_callback();
+	return (ret & ~m_414x_port_direction) | (m_414b_port_data & m_414x_port_direction);
 }
 
 
@@ -855,7 +858,8 @@ void vt3xx_soc_base_device::device_start()
 	save_item(NAME(m_413x_port_direction));
 	save_item(NAME(m_413x_port_data));
 	save_item(NAME(m_414x_port_direction));
-	save_item(NAME(m_414x_port_data));
+	save_item(NAME(m_414a_port_data));
+	save_item(NAME(m_414b_port_data));
 
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x3c00, 0x3fff, read8sm_delegate(*this, FUNC(vt3xx_soc_base_device::vt3xx_palette_r)), write8sm_delegate(*this, FUNC(vt3xx_soc_base_device::vt3xx_palette_w)));
 }
@@ -891,7 +895,8 @@ void vt3xx_soc_base_device::device_reset()
 	m_413x_port_direction = 0x00;
 	m_413x_port_data = 0x00;
 	m_414x_port_direction = 0x00;
-	m_414x_port_data = 0x00;
+	m_414a_port_data = 0x00;
+	m_414b_port_data = 0x00;
 }
 
 

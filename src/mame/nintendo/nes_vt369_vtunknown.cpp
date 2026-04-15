@@ -582,6 +582,10 @@ void vt36x_otrail_state::otrail_seeprom_w(u8 data)
 void vt36x_otrail_state::otrail_sound_w(u8 data)
 {
 	// is this really a DAC?
+	// 
+	// it might be an another chip playing samples from an internal ROM
+	// as there are longer sound clips and only short bursts of writes that
+	// look more like commands
 	m_dac->write(data & 0x07);
 }
 
@@ -773,7 +777,7 @@ void vt36x_tetrtin_state::vt36x_8mb_pixel(machine_config &config)
 	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
 
 	m_soc->io_414b_read_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_r));
-	m_soc->io_414b_write_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_w));
+	m_soc->io_414a_write_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_w));
 }
 
 void vt36x_otrail_state::vt36x_1mb_otrail(machine_config &config)
@@ -788,7 +792,7 @@ void vt36x_otrail_state::vt36x_1mb_otrail(machine_config &config)
 	DAC_3BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "internal", 0.15); // unknown sound device (maybe a DAC)
 
 	m_soc->io_414b_read_callback().set(FUNC(vt36x_otrail_state::pixel_prot_r));
-	m_soc->io_414b_write_callback().set(FUNC(vt36x_otrail_state::pixel_prot_w));
+	m_soc->io_414a_write_callback().set(FUNC(vt36x_otrail_state::pixel_prot_w));
 
 	m_soc->io_4153_read_callback().set(FUNC(vt36x_otrail_state::otrail_seeprom_r));
 	m_soc->io_4152_write_callback().set(FUNC(vt36x_otrail_state::otrail_seeprom_w));
