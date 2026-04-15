@@ -52,7 +52,7 @@ protected:
 
 	required_region_ptr<uint8_t> m_prgrom;
 
-	void configure_soc(nes_vt02_vt03_soc_device* soc);
+	void configure_soc(nes_vt02_vt03_soc_device *soc);
 
 	uint8_t upper_412c_r();
 	uint8_t upper_412d_r();
@@ -249,7 +249,7 @@ void nes_vt42xx_fapocket_state::machine_reset()
 	m_ahigh = 0;
 }
 
-void nes_vt42xx_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
+void nes_vt42xx_base_state::configure_soc(nes_vt02_vt03_soc_device *soc)
 {
 	soc->set_addrmap(AS_PROGRAM, &nes_vt42xx_state::vt_external_space_map_16mbyte);
 	soc->read_0_callback().set(FUNC(nes_vt42xx_base_state::in0_r));

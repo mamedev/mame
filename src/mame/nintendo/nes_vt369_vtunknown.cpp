@@ -70,7 +70,7 @@ protected:
 
 	required_region_ptr<u8> m_prgrom;
 
-	void configure_soc(nes_vt02_vt03_soc_device* soc);
+	void configure_soc(vt3xx_soc_base_device *soc);
 
 	void extbank_w(u8 data);
 	void extbank_red5mam_w(u8 data);
@@ -79,6 +79,7 @@ protected:
 private:
 	/* Extra IO */
 	template <u8 NUM> u8 extrain_r();
+	u8 default_4139_r();
 };
 
 class vt369_state : public vt369_base_state
@@ -324,6 +325,11 @@ template <u8 NUM> u8 vt369_base_state::extrain_r()
 	return 0x00;
 }
 
+u8 vt369_base_state::default_4139_r()
+{
+	logerror("%s: default_4139_r (not hooked up)\n", machine().describe_context());
+	return 0x00;
+}
 
 /* Standard I/O handlers (NES Controller clone) */
 
@@ -386,7 +392,7 @@ void vt369_base_state::machine_reset()
 	m_ahigh = 0;
 }
 
-void vt369_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
+void vt369_base_state::configure_soc(vt3xx_soc_base_device *soc)
 {
 	soc->set_addrmap(AS_PROGRAM, &vt369_state::vt_external_space_map_32mbyte);
 	soc->read_0_callback().set(FUNC(vt369_base_state::in0_r));
@@ -397,6 +403,8 @@ void vt369_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
 	soc->extra_read_1_callback().set(FUNC(vt369_base_state::extrain_r<1>));
 	soc->extra_read_2_callback().set(FUNC(vt369_base_state::extrain_r<2>));
 	soc->extra_read_3_callback().set(FUNC(vt369_base_state::extrain_r<3>));
+
+	soc->io_4139_read_callback().set(FUNC(vt369_base_state::default_4139_r));
 }
 
 

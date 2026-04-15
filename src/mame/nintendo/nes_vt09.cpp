@@ -57,7 +57,7 @@ protected:
 
 	optional_ioport_array<4> m_exin;
 
-	void configure_soc(nes_vt02_vt03_soc_device* soc);
+	void configure_soc(nes_vt02_vt03_soc_device *soc);
 
 	uint8_t upper_412c_r();
 	uint8_t upper_412d_r();
@@ -264,7 +264,7 @@ void nes_vt09_common_base_state::machine_reset()
 {
 }
 
-void nes_vt09_common_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
+void nes_vt09_common_base_state::configure_soc(nes_vt02_vt03_soc_device *soc)
 {
 	soc->set_addrmap(AS_PROGRAM, &nes_vt09_common_state::vt_external_space_map_32mbyte);
 	soc->read_0_callback().set(FUNC(nes_vt09_common_base_state::in0_r));
