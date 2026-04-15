@@ -138,7 +138,7 @@ private:
 
 	void rom_map(address_map &map) ATTR_COLD;
 	void nes_sh6578_map(address_map &map) ATTR_COLD;
-	void ppu_map(address_map &map);
+	void ppu_map(address_map &map) ATTR_COLD;
 
 	//uint16_t get_tileaddress(uint8_t x, uint8_t y, bool ishigh);
 

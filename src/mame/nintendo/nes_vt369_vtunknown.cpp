@@ -201,8 +201,11 @@ public:
 	void vt36x_1mb_tetrtin(machine_config& config) ATTR_COLD;
 	void vt36x_8mb_lxcap(machine_config &config) ATTR_COLD;
 
-protected:
+private:
 	virtual void machine_reset() override ATTR_COLD;
+
+	u8 lxcap_prot_r();
+	void lxcap_prot_w(u8 data);
 
 	required_device<vt_menu_protection_lxcap_device> m_protection;
 };
@@ -210,6 +213,7 @@ protected:
 void vt36x_tetrtin_state::machine_reset()
 {
 	vt36x_state::machine_reset();
+#if 1
 	// the game appears to require code/data from an additional device (not just the standard internal ROM)
 	// there's an 8-pin chip on the PCB which is likely responsible
 
@@ -250,6 +254,7 @@ void vt36x_tetrtin_state::machine_reset()
 		gamerom[patchaddress+1] = 0x2a;
 		gamerom[patchaddress+2] = 0xed;
 	}
+#endif
 }
 
 u8 vt369_state::vt_rom_banked_r(offs_t offset)
@@ -531,6 +536,21 @@ u8 vt36x_goretrop_state::goretrop_prot_r()
 	return (m_protection->read() ? 0x08 : 0x00);
 }
 
+
+void vt36x_tetrtin_state::lxcap_prot_w(u8 data)
+{
+	// direction is set to 0x03 before writing
+	m_protection->write_data((data & 0x02) ? true : false);
+	m_protection->write_clock((data & 0x01) ? true : false);
+}
+
+u8 vt36x_tetrtin_state::lxcap_prot_r()
+{
+	// direction set to 0x01 before reading (making 0x02 the input)
+	return (m_protection->read() ? 0x02 : 0x00);
+}
+
+
 void vt36x_state::vt36x_altswap_32mb_4banks_red5mam(machine_config &config)
 {
 	vt36x_altswap(config);
@@ -691,12 +711,18 @@ void vt36x_tetrtin_state::vt36x_1mb_tetrtin(machine_config &config)
 {
 	vt36x_1mb(config);
 	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
+
+	m_soc->io_4153_read_callback().set(FUNC(vt36x_tetrtin_state::lxcap_prot_r));
+	m_soc->io_4152_write_callback().set(FUNC(vt36x_tetrtin_state::lxcap_prot_w));
 }
 
 void vt36x_tetrtin_state::vt36x_8mb_lxcap(machine_config &config)
 {
 	vt36x_8mb(config);
 	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
+
+	m_soc->io_4153_read_callback().set(FUNC(vt36x_tetrtin_state::lxcap_prot_r));
+	m_soc->io_4152_write_callback().set(FUNC(vt36x_tetrtin_state::lxcap_prot_w));
 }
 
 static INPUT_PORTS_START( vt369 )

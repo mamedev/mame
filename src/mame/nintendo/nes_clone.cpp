@@ -147,8 +147,8 @@ public:
 		nes_clone_state(mconfig, type, tag)
 	{ }
 
-	void nes_clone_vtvsocr(machine_config &config);
-	void nes_clone_danzkara_pal(machine_config &config);
+	void nes_clone_vtvsocr(machine_config &config) ATTR_COLD;
+	void nes_clone_danzkara_pal(machine_config &config) ATTR_COLD;
 
 private:
 	void nes_clone_vtvsocr_map(address_map &map) ATTR_COLD;

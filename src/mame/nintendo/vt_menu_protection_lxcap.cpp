@@ -23,11 +23,27 @@ uint8_t vt_menu_protection_lxcap_device::read()
 
 void vt_menu_protection_lxcap_device::write_clock(bool state)
 {
+	if (state != m_clock)
+	{
+		if (state)
+			logerror("%s vt_menu_protection_lxcap_device::write_clock HIGH\n", machine().describe_context());
+		else
+			logerror("%s vt_menu_protection_lxcap_device::write_clock LOW\n", machine().describe_context());
+	}
+
 	m_clock = state;
 }
 
 void vt_menu_protection_lxcap_device::write_data(bool state)
 {
+	if (state != m_data)
+	{
+		if (state)
+			logerror("%s vt_menu_protection_lxcap_device::write_data HIGH\n", machine().describe_context());
+		else
+			logerror("%s vt_menu_protection_lxcap_device::write_data LOW\n", machine().describe_context());
+	}
+
 	m_data = state;
 }
 
