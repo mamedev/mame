@@ -542,9 +542,22 @@ u8 vt36x_goretrop_state::goretrop_prot_r()
 }
 
 
+
 void vt36x_tetrtin_state::lxcap_prot_w(u8 data)
 {
-	// direction is set to 0x03 before writing
+	/*
+	direction is set to 0x03 before writing
+
+	uses the following RAM addresses while accessing device
+	(lxcap / pactin / tetrtin)
+
+	dad / e40 / e42 (80 - command)
+	daf / e42 / e44 (xx - param)
+	db1 / e44 / e46 (direction register?)
+	db3 / e46 / e48 (data bits)
+
+	*/
+
 	m_protection->write_data((data & 0x02) ? true : false);
 	m_protection->write_clock((data & 0x01) ? true : false);
 }
@@ -712,6 +725,7 @@ void vt36x_state::vt36x_h12p1000(machine_config &config)
 	m_soc->io_4139_write_callback().set(FUNC(vt36x_state::extbank_h12p1000_w));
 }
 
+// there are also accesses to 4158 and 4151 which may be related to the I/O ports
 void vt36x_tetrtin_state::vt36x_1mb_tetrtin(machine_config &config)
 {
 	vt36x_1mb(config);
