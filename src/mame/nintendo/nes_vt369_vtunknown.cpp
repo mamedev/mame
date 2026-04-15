@@ -203,65 +203,11 @@ public:
 	void vt36x_8mb_lxcap(machine_config &config) ATTR_COLD;
 
 private:
-	virtual void machine_reset() override ATTR_COLD;
-
 	u8 lxcap_prot_r();
 	void lxcap_prot_w(u8 data);
 
-	// allows tetrtin, pactin and lxcap to boot without the protection hookup, although lxcap menu doesn't work
-	static constexpr bool BYPASS_PROTECTION = true;
-
 	required_device<vt_menu_protection_lxcap_device> m_protection;
 };
-
-void vt36x_tetrtin_state::machine_reset()
-{
-	vt36x_state::machine_reset();
-
-	if (!BYPASS_PROTECTION)
-		return;
-
-	// the game appears to require code/data from an additional device (not just the standard internal ROM)
-	// there's an 8-pin chip on the PCB which is likely responsible
-
-	// simulate what that code might be doing
-	// copy VT369 internal ROM 0x0000 to 0x4ff4 in CPU space (copying boot vectors for sound CPU, as other games do in code)
-	int src = 0;
-	u8 *introm = memregion("soc:internal")->base();
-	for (int i = 0x4ff4; i < 0x5000; i++)
-	{
-		m_soc->write_byte_to_cpu(i, introm[src++]);
-	}
-	u8* gamerom = memregion("mainrom")->base();
-
-	int patchaddress;
-
-
-	// tetrtin - jump over a whole lot of code, this is crude, there might be other code still in the startup we could be executing
-	patchaddress = 0x7f675;
-	if ((gamerom[patchaddress] == 0x20) && (gamerom[patchaddress+1] == 0xcb) && (gamerom[patchaddress+2] == 0xf5))
-	{
-		gamerom[patchaddress] = 0x4c;
-		gamerom[patchaddress+1] = 0xcb;
-		gamerom[patchaddress+2] = 0xf6;
-	}
-	// same for pactin
-	patchaddress = 0x7f5a3;
-	if ((gamerom[patchaddress] == 0x20) && (gamerom[patchaddress+1] == 0x04) && (gamerom[patchaddress+2] == 0xf5))
-	{
-		gamerom[patchaddress] = 0x4c;
-		gamerom[patchaddress+1] = 0xf9;
-		gamerom[patchaddress+2] = 0xf5;
-	}
-	// lxcap (will show menu, but accesses device again afterwards)
-	patchaddress = 0x7ecd4;
-	if ((gamerom[patchaddress] == 0x20) && (gamerom[patchaddress+1] == 0x96) && (gamerom[patchaddress+2] == 0xeb))
-	{
-		gamerom[patchaddress] = 0x4c;
-		gamerom[patchaddress+1] = 0x2a;
-		gamerom[patchaddress+2] = 0xed;
-	}
-}
 
 u8 vt369_state::vt_rom_banked_r(offs_t offset)
 {
@@ -1208,12 +1154,14 @@ ROM_START( lxcap )
 
 	VT3XX_INTERNAL_NO_SWAP // verified for this set
 
-	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection
+	//ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection
 	// This table is just (0x100 - offset) & 0xff with a nibble swap applied at the end
 	// 
 	// The chip here (which is accessed in a different way to gtct885 etc.) might not
 	// be fetching data from a table, but doing a calculation
-	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, CRC(491d206b) SHA1(a5411a7afe3b4df93b1b22e5533f5010bd3aaa93) )
+	//
+	// we just do the calculation instead
+	//ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, CRC(491d206b) SHA1(a5411a7afe3b4df93b1b22e5533f5010bd3aaa93) )
 ROM_END
 
 ROM_START( denv150 )
@@ -1250,9 +1198,6 @@ ROM_START( pactin )
 	ROM_LOAD( "25q80a.u3", 0x00000, 0x100000, CRC(92935759) SHA1(2333e7dcab51fa34c8d875374371854121fff27a) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
-
-	ROM_REGION( 0x100, "protection", ROMREGION_ERASEFF )
-	// see note in lxcap, not clear if there's a ROM table involved or not
 ROM_END
 
 ROM_START( tetrtin )
@@ -1260,9 +1205,6 @@ ROM_START( tetrtin )
 	ROM_LOAD( "25q80.u3", 0x00000, 0x100000, CRC(017a99b9) SHA1(e7f891762bbc3b80ae0f177654d8d066b7524bcd) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
-
-	ROM_REGION( 0x100, "protection", ROMREGION_ERASEFF )
-	// see note in lxcap, not clear if there's a ROM table involved or not
 ROM_END
 
 
@@ -1825,9 +1767,9 @@ CONS( 202?, 168pcase, 0,      0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<u
 CONS( 201?, lxcap,    0,      0,  vt36x_8mb_lxcap, vt369, vt36x_tetrtin_state, empty_init, "Lexibook", "Cyber Arcade Pocket (JL1895)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // seems to be running the NES version of Pac-Man with some extra splash screens, has extra protection
-// (protection looks similar to lxcap, currently crudely bypassed)
+// (protection is the same as lxcap)
 CONS( 2021, pactin,     0,        0,  vt36x_1mb_tetrtin, vt369, vt36x_tetrtin_state, empty_init, "Fizz Creations", "Pac-Man Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-// similar protection to pactin
+// (protection is the same as lxcap)
 CONS( 2021, tetrtin,    0,        0,  vt36x_1mb_tetrtin, vt369, vt36x_tetrtin_state, empty_init, "Fizz Creations", "Tetris Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // 2022 date on 'BL-867 PCB03' PCB, has extra protection?

@@ -26,7 +26,11 @@ private:
 	bool m_clock;
 	bool m_data;
 
-	required_memory_region m_extrarom;
+	u8 m_bitcount;
+	u32 m_command;
+	u8 m_phase;
+	u8 m_retdat;
+	u8 m_outlatch;
 };
 
 #endif // MAME_NINTENDO_VT_MENU_PROTECTION_LXCAP_H
