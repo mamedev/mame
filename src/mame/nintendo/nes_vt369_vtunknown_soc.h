@@ -50,8 +50,10 @@ protected:
 
 	u8 vt_414x_port_direction_r();
 	void vt_414x_port_direction_w(u8 data);
-	void vt_414b_port_out_w(u8 data);
+	void vt_414b_port_in_w(u8 data);
 	u8 vt_414b_port_in_r();
+	void vt_414a_port_out_w(u8 data);
+	u8 vt_414a_port_out_r();
 
 	void extra_io_41e6_w(u8 data);
 

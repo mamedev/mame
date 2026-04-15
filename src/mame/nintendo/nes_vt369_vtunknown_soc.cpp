@@ -313,9 +313,10 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	// 4144
 	// 4147
 
-	// based on nesvt270 this looks like another I/O port?
+	// based on nesvt270, otrail, pixel246 this looks like another I/O port?
 	map(0x4148, 0x4148).rw(FUNC(vt3xx_soc_base_device::vt_414x_port_direction_r), FUNC(vt3xx_soc_base_device::vt_414x_port_direction_w));
-	map(0x414b, 0x414b).rw(FUNC(vt3xx_soc_base_device::vt_414b_port_in_r), FUNC(vt3xx_soc_base_device::vt_414b_port_out_w));
+	map(0x414a, 0x414a).rw(FUNC(vt3xx_soc_base_device::vt_414a_port_out_r), FUNC(vt3xx_soc_base_device::vt_414a_port_out_w));
+	map(0x414b, 0x414b).rw(FUNC(vt3xx_soc_base_device::vt_414b_port_in_r), FUNC(vt3xx_soc_base_device::vt_414b_port_in_w));
 
 	map(0x414f, 0x414f).r(FUNC(vt3xx_soc_base_device::vt369_414f_r));
 
@@ -469,7 +470,8 @@ u8 vt3xx_soc_base_device::vt_413x_port_in_r()
 // then writes to 414a using bits 0011 0000
 // it then sets vt_414x_port_direction_w to 0x20 (0010 0000)
 // and reads from 414b masking with 0x10
-
+// pixel246 does similar.  (of note, both otrail and pixel246 test more RAM than usual too)
+// 
 // maybe the port can be configured in different modes?
 
 u8 vt3xx_soc_base_device::vt_414x_port_direction_r()
@@ -484,12 +486,25 @@ void vt3xx_soc_base_device::vt_414x_port_direction_w(u8 data)
 	m_414x_port_direction = data;
 }
 
-void vt3xx_soc_base_device::vt_414b_port_out_w(u8 data)
+void vt3xx_soc_base_device::vt_414a_port_out_w(u8 data)
 {
-	logerror("%s: vt_414b_port_out_w %02x (with direction register %02x)\n", machine().describe_context(), data, m_414x_port_direction);
-	// TODO: pass direction register
+	logerror("%s: vt_414a_port_out_w %02x (with direction register %02x)\n", machine().describe_context(), data, m_414x_port_direction);
 	m_414x_port_data = data;
 	m_io_414x_write_callback(data & m_414x_port_direction);
+}
+
+u8 vt3xx_soc_base_device::vt_414a_port_out_r()
+{
+	logerror("%s: vt_414a_port_out_r (with direction register %02x)\n", machine().describe_context(), m_414x_port_direction);
+	// this is a read from an output port? (or the ports can be configured)
+	return 0x80;
+}
+
+void vt3xx_soc_base_device::vt_414b_port_in_w(u8 data)
+{
+	logerror("%s: vt_414b_port_in_w %02x (with direction register %02x)\n", machine().describe_context(), data, m_414x_port_direction);
+	m_414x_port_data = data;
+	// this is a write to an input port? (or the ports can be configured)
 }
 
 u8 vt3xx_soc_base_device::vt_414b_port_in_r()
@@ -936,21 +951,12 @@ void vt369_soc_introm_noswap_device::device_start()
 	m_encryption_allowed = false;
 }
 
-
-u8 vt369_soc_introm_noswap_device::vthh_414a_r()
-{
-	return 0x80;
-}
-
-
 void vt369_soc_introm_noswap_device::vt369_introm_map(address_map &map)
 {
 	vt3xx_soc_base_device::vt369_map(map);
 
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1fff).r(FUNC(vt369_soc_introm_noswap_device::read_internal));
-
-	map(0x414a, 0x414a).r(FUNC(vt369_soc_introm_noswap_device::vthh_414a_r));
 
 	map(0x4169, 0x4169).w(FUNC(vt369_soc_introm_noswap_device::encryption_4169_w));
 }
