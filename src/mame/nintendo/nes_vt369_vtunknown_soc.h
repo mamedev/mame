@@ -15,8 +15,10 @@ class vt3xx_soc_base_device : public nes_vt02_vt03_soc_device
 public:
 	vt3xx_soc_base_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	auto io_4153_read_callback() { return m_io_415x_read_callback.bind(); }
-	auto io_4152_write_callback() { return m_io_415x_write_callback.bind(); }
+	auto io_4153_read_callback() { return m_io_4153_read_callback.bind(); }
+	auto io_4153_write_callback() { return m_io_4153_write_callback.bind(); }
+	auto io_4152_read_callback() { return m_io_4152_read_callback.bind(); }
+	auto io_4152_write_callback() { return m_io_4152_write_callback.bind(); }
 	auto io_4139_read_callback() { return m_io_413x_read_callback.bind(); }
 	auto io_4139_write_callback() { return m_io_413x_write_callback.bind(); }
 	auto io_414b_read_callback() { return m_io_414x_read_callback.bind(); }
@@ -37,11 +39,11 @@ protected:
 	u8 vt369_414f_r();
 
 	u8 vt_415x_port_direction_r();
-	u8 vt_415x_port_out_r();
-	u8 vt_415x_port_in_r();
+	u8 vt_4152_port_in_r();
+	u8 vt_4153_port_in_r();
 	void vt_415x_port_direction_w(u8 data);
-	void vt_415x_port_out_w(u8 data);
-	void vt_415x_port_in_w(u8 data);
+	void vt_4152_port_out_w(u8 data);
+	void vt_4153_port_out_w(u8 data);
 
 	u8 vt_413x_port_direction_r();
 	void vt_413x_port_direction_w(u8 data);
@@ -115,7 +117,8 @@ private:
 	u8 m_bank6000_enable = 0;
 
 	u8 m_415x_port_direction;
-	u8 m_415x_port_data;
+	u8 m_4152_port_data;
+	u8 m_4153_port_data;
 
 	u8 m_413x_port_direction;
 	u8 m_413x_port_data;
@@ -139,8 +142,10 @@ private:
 	required_device<vt369_adpcm_decoder_device> m_vt369adpcm;
 	required_device<dac_16bit_r2r_twos_complement_device> m_leftdac;
 	required_device<dac_16bit_r2r_twos_complement_device> m_rightdac;
-	devcb_write8 m_io_415x_write_callback;
-	devcb_read8 m_io_415x_read_callback;
+	devcb_read8 m_io_4152_read_callback;
+	devcb_write8 m_io_4152_write_callback;
+	devcb_read8 m_io_4153_read_callback;
+	devcb_write8 m_io_4153_write_callback;
 	devcb_write8 m_io_413x_write_callback;
 	devcb_read8 m_io_413x_read_callback;
 	devcb_write8 m_io_414x_write_callback;

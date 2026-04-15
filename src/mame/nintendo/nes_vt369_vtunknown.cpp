@@ -30,6 +30,7 @@
 #include "machine/i2cmem.h"
 
 #include "multibyte.h"
+#include "speaker.h"
 
 namespace {
 
@@ -222,7 +223,8 @@ class vt36x_otrail_state : public vt36x_tetrtin_state
 public:
 	vt36x_otrail_state(const machine_config &mconfig, device_type type, const char *tag) :
 		vt36x_tetrtin_state(mconfig, type, tag),
-		m_i2cmem(*this, "i2cmem")
+		m_i2cmem(*this, "i2cmem"),
+		m_dac(*this, "dac")
 	{ }
 
 	void vt36x_1mb_otrail(machine_config &config) ATTR_COLD;
@@ -230,8 +232,10 @@ public:
 private:
 	void otrail_seeprom_w(u8 data);
 	u8 otrail_seeprom_r();
+	void otrail_sound_w(u8 data);
 
 	required_device<i2cmem_device> m_i2cmem;
+	required_device<dac_byte_interface> m_dac;
 };
 
 
@@ -575,6 +579,12 @@ void vt36x_otrail_state::otrail_seeprom_w(u8 data)
 	m_i2cmem->write_sda((data & 0x08) ? true : false);
 }
 
+void vt36x_otrail_state::otrail_sound_w(u8 data)
+{
+	// is this really a DAC?
+	m_dac->write(data & 0x07);
+}
+
 u8 vt36x_otrail_state::otrail_seeprom_r()
 {
 	return (m_i2cmem->read_sda() ? 0xff : 0xf7);
@@ -773,11 +783,16 @@ void vt36x_otrail_state::vt36x_1mb_otrail(machine_config &config)
 
 	I2C_24C04(config, "i2cmem", 0);
 
+	SPEAKER(config, "internal").front_center();
+
+	DAC_3BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "internal", 0.15); // unknown sound device (maybe a DAC)
+
 	m_soc->io_414b_read_callback().set(FUNC(vt36x_otrail_state::pixel_prot_r));
 	m_soc->io_414b_write_callback().set(FUNC(vt36x_otrail_state::pixel_prot_w));
 
 	m_soc->io_4153_read_callback().set(FUNC(vt36x_otrail_state::otrail_seeprom_r));
 	m_soc->io_4152_write_callback().set(FUNC(vt36x_otrail_state::otrail_seeprom_w));
+	m_soc->io_4153_write_callback().set(FUNC(vt36x_otrail_state::otrail_sound_w));
 }
 
 

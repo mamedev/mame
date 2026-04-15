@@ -50,8 +50,10 @@ vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config &mconfig, devi
 	m_vt369adpcm(*this, "vt369adpcm"),
 	m_leftdac(*this, "leftdac"),
 	m_rightdac(*this, "rightdac"),
-	m_io_415x_write_callback(*this),
-	m_io_415x_read_callback(*this, 0xff),
+	m_io_4152_read_callback(*this, 0xff),
+	m_io_4152_write_callback(*this),
+	m_io_4153_read_callback(*this, 0xff),
+	m_io_4153_write_callback(*this),
 	m_io_413x_write_callback(*this),
 	m_io_413x_read_callback(*this, 0xff),
 	m_io_414x_write_callback(*this),
@@ -323,8 +325,8 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	// several games use these addresses for what seem to be extra protection data
 	map(0x4150, 0x4150).rw(FUNC(vt3xx_soc_base_device::vt_415x_port_direction_r), FUNC(vt3xx_soc_base_device::vt_415x_port_direction_w));
 	// 4151 also sometimes written
-	map(0x4152, 0x4152).rw(FUNC(vt3xx_soc_base_device::vt_415x_port_out_r), FUNC(vt3xx_soc_base_device::vt_415x_port_out_w));
-	map(0x4153, 0x4153).rw(FUNC(vt3xx_soc_base_device::vt_415x_port_in_r), FUNC(vt3xx_soc_base_device::vt_415x_port_in_w));
+	map(0x4152, 0x4152).rw(FUNC(vt3xx_soc_base_device::vt_4152_port_in_r), FUNC(vt3xx_soc_base_device::vt_4152_port_out_w));
+	map(0x4153, 0x4153).rw(FUNC(vt3xx_soc_base_device::vt_4153_port_in_r), FUNC(vt3xx_soc_base_device::vt_4153_port_out_w));
 	// 0x4158 is written before the above
 
 	map(0x415c, 0x415c).r(FUNC(vt3xx_soc_base_device::vt369_415c_r)); // related to getting into menus in some games
@@ -385,7 +387,7 @@ void vt3xx_soc_base_device::vt_dma_w(u8 data)
 }
 
 // this reads from the 'extra ROM' area (serial style protocol) and code is copied on gtct885 to e00 in RAM, jumps to it at EDF9: jsr $0e1c
-// vt_415x_port_in_r is used by lxccminn, lxccplan and dgun2561 to check battery state instead? reports low battery and does nothing else if unhappy
+// vt_4153_port_in_r is used by lxccminn, lxccplan and dgun2561 to check battery state instead? reports low battery and does nothing else if unhappy
 // pactin and tetrtin use these for something similar, seems to want code/data for jumps?
 
 // 4150 - direction port (high = write)
@@ -403,33 +405,40 @@ void vt3xx_soc_base_device::vt_415x_port_direction_w(u8 data)
 }
 
 // 4152 - write port (can also read last thing written?)
-u8 vt3xx_soc_base_device::vt_415x_port_out_r()
+u8 vt3xx_soc_base_device::vt_4152_port_in_r()
 {
 	// return the last write
-	logerror("%s: vt_415x_port_out_r\n", machine().describe_context());
-	return m_415x_port_data;
+	logerror("%s: vt_4152_port_in_r\n", machine().describe_context());
+
+	u8 dat = m_io_4152_read_callback() & ~m_415x_port_direction;
+	dat |= m_4152_port_data & m_415x_port_direction;
+	return dat;
 }
 
-void vt3xx_soc_base_device::vt_415x_port_out_w(u8 data)
+void vt3xx_soc_base_device::vt_4152_port_out_w(u8 data)
 {
-	logerror("%s: vt_415x_port_out_w %02x (with direction register %02x)\n", machine().describe_context(), data, m_415x_port_direction);
-	m_415x_port_data = data;
+	logerror("%s: vt_4152_port_out_w %02x (with direction register %02x)\n", machine().describe_context(), data, m_415x_port_direction);
+	m_4152_port_data = data;
 	// TODO: use direction register
-	m_io_415x_write_callback(data);
+	m_io_4152_write_callback(data);
 }
 
 // 4153
-u8 vt3xx_soc_base_device::vt_415x_port_in_r()
+u8 vt3xx_soc_base_device::vt_4153_port_in_r()
 {
-	logerror("%s: vt_415x_port_in_r (with direction register %02x)\n", machine().describe_context(), m_415x_port_direction);
+	logerror("%s: vt_4153_port_in_r (with direction register %02x)\n", machine().describe_context(), m_415x_port_direction);
 	// TODO: use the direction register
-	return m_io_415x_read_callback();
+	u8 dat = m_io_4153_read_callback() & ~m_415x_port_direction;
+	dat |= m_4153_port_data & m_415x_port_direction;
+	return dat;
 }
 
-void vt3xx_soc_base_device::vt_415x_port_in_w(u8 data)
+void vt3xx_soc_base_device::vt_4153_port_out_w(u8 data)
 {
-	// write to the in port, might not exist / not be used at all
-	logerror("%s: vt_415x_port_in_w %02x (writing to input port?!) (with direction register %02x)\n", machine().describe_context(), data, m_415x_port_direction);
+	// otrail writes here (for sound?)
+	logerror("%s: vt_4153_port_out_w %02x (writing to input port?!) (with direction register %02x)\n", machine().describe_context().c_str(), data, m_415x_port_direction);
+	m_4153_port_data = data;
+	m_io_4153_write_callback(data);
 }
 
 // goretrop seems to use a port with 4138 as direction, and 4139 as data for a similar protection
@@ -841,7 +850,8 @@ void vt3xx_soc_base_device::device_start()
 	save_item(NAME(m_sound_dac));
 
 	save_item(NAME(m_415x_port_direction));
-	save_item(NAME(m_415x_port_data));
+	save_item(NAME(m_4152_port_data));
+	save_item(NAME(m_4153_port_data));
 	save_item(NAME(m_413x_port_direction));
 	save_item(NAME(m_413x_port_data));
 	save_item(NAME(m_414x_port_direction));
@@ -876,7 +886,8 @@ void vt3xx_soc_base_device::device_reset()
 	m_sound_timer->adjust(attotime::never);
 
 	m_415x_port_direction = 0x00;
-	m_415x_port_data = 0x00;
+	m_4152_port_data = 0x00;
+	m_4153_port_data = 0x00;
 	m_413x_port_direction = 0x00;
 	m_413x_port_data = 0x00;
 	m_414x_port_direction = 0x00;
