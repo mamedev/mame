@@ -203,6 +203,7 @@ public:
 	void vt36x_1mb_tetrtin(machine_config& config) ATTR_COLD;
 	void vt36x_8mb_lxcap(machine_config &config) ATTR_COLD;
 	void vt36x_8mb_pixel(machine_config &config) ATTR_COLD;
+	void vt36x_1mb_otrail(machine_config &config) ATTR_COLD;
 
 private:
 	u8 lxcap_prot_r();
@@ -731,6 +732,16 @@ void vt36x_tetrtin_state::vt36x_8mb_pixel(machine_config &config)
 	m_soc->io_414b_read_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_r));
 	m_soc->io_414b_write_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_w));
 }
+
+void vt36x_tetrtin_state::vt36x_1mb_otrail(machine_config &config)
+{
+	vt36x_1mb(config);
+	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
+
+	m_soc->io_414b_read_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_r));
+	m_soc->io_414b_write_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_w));
+}
+
 
 
 static INPUT_PORTS_START( vt369 )
@@ -1819,7 +1830,7 @@ CONS( 201?, denv150,   0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init, 
 CONS( 201?, egame150,  denv150,  0,  vt36x_swap_8mb, vt369, vt36x_state, empty_init, "<unknown>", "E-Game! 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // uncertain, uses SPI ROM so probably VT369, has extra protection? (but RAM test goes up to 0x2000, over the internal ROM area?)
-CONS( 2017, otrail,     0,        0,  vt36x_1mb, vt369, vt36x_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2017, otrail,     0,        0,  vt36x_1mb_otrail, vt369, vt36x_tetrtin_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // uses a low res display (so vt3xx?)
 CONS( 2021, matet10,   0,        0,  vt36x_swap_2mb, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7083, Pixel Pocket, with 10 bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
