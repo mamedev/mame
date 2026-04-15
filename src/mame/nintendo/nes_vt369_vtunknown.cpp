@@ -80,6 +80,7 @@ private:
 	/* Extra IO */
 	template <u8 NUM> u8 extrain_r();
 	u8 default_4139_r();
+	u8 default_414b_r();
 };
 
 class vt369_state : public vt369_base_state
@@ -277,6 +278,13 @@ u8 vt369_base_state::default_4139_r()
 	return 0x00;
 }
 
+u8 vt369_base_state::default_414b_r()
+{
+	// pixel246 and mog_m320 at least require something to be here
+	logerror("%s: default_414b_r (not hooked up)\n", machine().describe_context());
+	return 0x00;
+}
+
 /* Standard I/O handlers (NES Controller clone) */
 
 u8 vt369_base_state::in0_r()
@@ -351,6 +359,7 @@ void vt369_base_state::configure_soc(vt3xx_soc_base_device *soc)
 	soc->extra_read_3_callback().set(FUNC(vt369_base_state::extrain_r<3>));
 
 	soc->io_4139_read_callback().set(FUNC(vt369_base_state::default_4139_r));
+	soc->io_414b_read_callback().set(FUNC(vt369_base_state::default_414b_r));
 }
 
 
