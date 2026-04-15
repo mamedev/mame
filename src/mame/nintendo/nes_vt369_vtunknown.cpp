@@ -207,13 +207,19 @@ private:
 	u8 lxcap_prot_r();
 	void lxcap_prot_w(u8 data);
 
+	// allows tetrtin, pactin and lxcap to boot without the protection hookup, although lxcap menu doesn't work
+	static constexpr bool BYPASS_PROTECTION = true;
+
 	required_device<vt_menu_protection_lxcap_device> m_protection;
 };
 
 void vt36x_tetrtin_state::machine_reset()
 {
 	vt36x_state::machine_reset();
-#if 1
+
+	if (!BYPASS_PROTECTION)
+		return;
+
 	// the game appears to require code/data from an additional device (not just the standard internal ROM)
 	// there's an 8-pin chip on the PCB which is likely responsible
 
@@ -254,7 +260,6 @@ void vt36x_tetrtin_state::machine_reset()
 		gamerom[patchaddress+1] = 0x2a;
 		gamerom[patchaddress+2] = 0xed;
 	}
-#endif
 }
 
 u8 vt369_state::vt_rom_banked_r(offs_t offset)
