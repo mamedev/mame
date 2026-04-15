@@ -24,6 +24,7 @@
 
 #include "nes_vt369_vtunknown_soc.h"
 #include "vt_menu_protection.h"
+#include "vt_menu_protection_lxcap.h"
 
 #include "multibyte.h"
 
@@ -32,7 +33,7 @@ namespace {
 class vt369_base_state : public driver_device
 {
 public:
-	vt369_base_state(const machine_config& mconfig, device_type type, const char* tag) :
+	vt369_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_io0(*this, "IO0"),
 		m_io1(*this, "IO1"),
@@ -83,7 +84,7 @@ private:
 class vt369_state : public vt369_base_state
 {
 public:
-	vt369_state(const machine_config& mconfig, device_type type, const char* tag) :
+	vt369_state(const machine_config &mconfig, device_type type, const char *tag) :
 		vt369_base_state(mconfig, type, tag),
 		m_soc(*this, "soc")
 	{ }
@@ -114,55 +115,55 @@ protected:
 class vt36x_state : public vt369_state
 {
 public:
-	vt36x_state(const machine_config& mconfig, device_type type, const char* tag) :
+	vt36x_state(const machine_config &mconfig, device_type type, const char *tag) :
 		vt369_state(mconfig, type, tag)
 	{ }
 
-	void vt36x(machine_config& config);
-	void vt36x_1mb(machine_config& config);
-	void vt36x_4mb(machine_config& config);
-	void vt36x_8mb(machine_config& config);
-	void vt36x_16mb(machine_config& config);
-	void vt36x_16mb_sdcard(machine_config& config);
-	void vt36x_32mb(machine_config& config);
-	void vt36x_32mb_2banks_lexi(machine_config& config);
-	void vt36x_32mb_2banks_lexi300(machine_config& config);
-	void vt36x_h12p1000(machine_config& config);
+	void vt36x(machine_config &config) ATTR_COLD;
+	void vt36x_1mb(machine_config &config) ATTR_COLD;
+	void vt36x_4mb(machine_config &config) ATTR_COLD;
+	void vt36x_8mb(machine_config &config) ATTR_COLD;
+	void vt36x_16mb(machine_config &config) ATTR_COLD;
+	void vt36x_16mb_sdcard(machine_config &config) ATTR_COLD;
+	void vt36x_32mb(machine_config &config) ATTR_COLD;
+	void vt36x_32mb_2banks_lexi(machine_config &config) ATTR_COLD;
+	void vt36x_32mb_2banks_lexi300(machine_config &config) ATTR_COLD;
+	void vt36x_h12p1000(machine_config &config) ATTR_COLD;
 
-	void vt36x_swap(machine_config& config);
-	void vt36x_swap_2mb(machine_config& config);
-	void vt36x_swap_4mb(machine_config& config);
-	void vt36x_swap_8mb(machine_config& config);
-	void vt36x_swap_16mb(machine_config& config);
-	void vt36x_swap_512kb(machine_config& config);
+	void vt36x_swap(machine_config &config) ATTR_COLD;
+	void vt36x_swap_2mb(machine_config &config) ATTR_COLD;
+	void vt36x_swap_4mb(machine_config &config) ATTR_COLD;
+	void vt36x_swap_8mb(machine_config &config) ATTR_COLD;
+	void vt36x_swap_16mb(machine_config &config) ATTR_COLD;
+	void vt36x_swap_512kb(machine_config &config) ATTR_COLD;
 
-	void vt36x_altswap(machine_config& config);
-	void vt36x_altswap_2mb(machine_config& config);
-	void vt36x_altswap_4mb(machine_config& config);
-	void vt36x_altswap_16mb(machine_config& config);
-	void vt36x_altswap_32mb_4banks_red5mam(machine_config& config);
+	void vt36x_altswap(machine_config &config) ATTR_COLD;
+	void vt36x_altswap_2mb(machine_config &config) ATTR_COLD;
+	void vt36x_altswap_4mb(machine_config &config) ATTR_COLD;
+	void vt36x_altswap_16mb(machine_config &config) ATTR_COLD;
+	void vt36x_altswap_32mb_4banks_red5mam(machine_config &config) ATTR_COLD;
 
-	void vt36x_vibesswap_8mb(machine_config& config);
-	void vt36x_vibesswap_16mb(machine_config& config);
-	void vt36x_gbox2020_8mb(machine_config& config);
-	void vt36x_gbox2020_16mb(machine_config& config);
-	void vt36x_s10swap_8mb(machine_config& config);
-	void vt36x_rsps300swap_16mb(machine_config& config);
+	void vt36x_vibesswap_8mb(machine_config &config) ATTR_COLD;
+	void vt36x_vibesswap_16mb(machine_config &config) ATTR_COLD;
+	void vt36x_gbox2020_8mb(machine_config &config) ATTR_COLD;
+	void vt36x_gbox2020_16mb(machine_config &config) ATTR_COLD;
+	void vt36x_s10swap_8mb(machine_config &config) ATTR_COLD;
+	void vt36x_rsps300swap_16mb(machine_config &config) ATTR_COLD;
 
-	void vt369_unk(machine_config& config);
-	void vt369_unk_16mb(machine_config& config);
+	void vt369_unk(machine_config &config) ATTR_COLD;
+	void vt369_unk_16mb(machine_config &config) ATTR_COLD;
 };
 
 class vt36x_gtct885_state : public vt36x_state
 {
 public:
-	vt36x_gtct885_state(const machine_config& mconfig, device_type type, const char* tag) :
+	vt36x_gtct885_state(const machine_config &mconfig, device_type type, const char *tag) :
 		vt36x_state(mconfig, type, tag),
 		m_protection(*this, "protection")
 	{ }
 
-	void vt36x_8mb_gtct885(machine_config& config);
-	void vt36x_altswap_2mb_36pcase(machine_config& config);
+	void vt36x_8mb_gtct885(machine_config &config) ATTR_COLD;
+	void vt36x_altswap_2mb_36pcase(machine_config &config) ATTR_COLD;
 
 private:
 	u8 gtct885_prot_r();
@@ -174,13 +175,13 @@ private:
 class vt36x_goretrop_state : public vt36x_state
 {
 public:
-	vt36x_goretrop_state(const machine_config& mconfig, device_type type, const char* tag) :
+	vt36x_goretrop_state(const machine_config &mconfig, device_type type, const char *tag) :
 		vt36x_state(mconfig, type, tag),
 		m_protection(*this, "protection")
 	{ }
 
-	void vt36x_32mb_goretrop(machine_config& config);
-	void vt36x_1mb_rbbrite(machine_config& config);
+	void vt36x_32mb_goretrop(machine_config &config) ATTR_COLD;
+	void vt36x_1mb_rbbrite(machine_config &config) ATTR_COLD;
 
 private:
 	u8 goretrop_prot_r();
@@ -192,13 +193,18 @@ private:
 class vt36x_tetrtin_state : public vt36x_state
 {
 public:
-	vt36x_tetrtin_state(const machine_config& mconfig, device_type type, const char* tag) :
-		vt36x_state(mconfig, type, tag)
+	vt36x_tetrtin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		vt36x_state(mconfig, type, tag),
+		m_protection(*this, "protection")
 	{ }
 
-protected:
-	virtual void machine_reset() override;
+	void vt36x_1mb_tetrtin(machine_config& config) ATTR_COLD;
+	void vt36x_8mb_lxcap(machine_config &config) ATTR_COLD;
 
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+
+	required_device<vt_menu_protection_lxcap_device> m_protection;
 };
 
 void vt36x_tetrtin_state::machine_reset()
@@ -393,7 +399,7 @@ void vt36x_state::vt369_unk(machine_config &config)
 	m_soc->force_bad_dma();
 }
 
-void vt36x_state::vt369_unk_16mb(machine_config& config)
+void vt36x_state::vt369_unk_16mb(machine_config &config)
 {
 	vt369_unk(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
@@ -467,7 +473,7 @@ void vt36x_state::vt36x_altswap_4mb(machine_config &config)
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_4mbyte);
 }
 
-void vt36x_state::vt36x_altswap_16mb(machine_config& config)
+void vt36x_state::vt36x_altswap_16mb(machine_config &config)
 {
 	vt36x_altswap(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
@@ -525,7 +531,7 @@ u8 vt36x_goretrop_state::goretrop_prot_r()
 	return (m_protection->read() ? 0x08 : 0x00);
 }
 
-void vt36x_state::vt36x_altswap_32mb_4banks_red5mam(machine_config& config)
+void vt36x_state::vt36x_altswap_32mb_4banks_red5mam(machine_config &config)
 {
 	vt36x_altswap(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_32mbyte_bank);
@@ -590,57 +596,57 @@ void vt36x_state::vt36x_rsps300swap_16mb(machine_config &config)
 
 
 
-void vt36x_state::vt36x_1mb(machine_config& config)
+void vt36x_state::vt36x_1mb(machine_config &config)
 {
 	vt36x(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_1mbyte);
 }
 
-void vt36x_state::vt36x_4mb(machine_config& config)
+void vt36x_state::vt36x_4mb(machine_config &config)
 {
 	vt36x(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_4mbyte);
 }
 
-void vt36x_state::vt36x_8mb(machine_config& config)
+void vt36x_state::vt36x_8mb(machine_config &config)
 {
 	vt36x(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_8mbyte);
 }
 
-void vt36x_state::vt36x_16mb(machine_config& config)
+void vt36x_state::vt36x_16mb(machine_config &config)
 {
 	vt36x(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
 }
 
-void vt36x_state::vt36x_16mb_sdcard(machine_config& config)
+void vt36x_state::vt36x_16mb_sdcard(machine_config &config)
 {
 	vt36x(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
 }
 
-void vt36x_state::vt36x_32mb(machine_config& config)
+void vt36x_state::vt36x_32mb(machine_config &config)
 {
 	vt36x(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_32mbyte);
 }
 
-void vt36x_state::vt36x_32mb_2banks_lexi(machine_config& config)
+void vt36x_state::vt36x_32mb_2banks_lexi(machine_config &config)
 {
 	vt36x_32mb(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_32mbyte_bank);
 	m_soc->io_4152_write_callback().set(FUNC(vt36x_state::extbank_w));
 }
 
-void vt36x_state::vt36x_32mb_2banks_lexi300(machine_config& config)
+void vt36x_state::vt36x_32mb_2banks_lexi300(machine_config &config)
 {
 	vt36x_32mb(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_32mbyte_bank);
 	m_soc->set_411e_write_cb().set(FUNC(vt36x_state::extbank_w)); // could be on 411d
 }
 
-void vt36x_gtct885_state::vt36x_8mb_gtct885(machine_config& config)
+void vt36x_gtct885_state::vt36x_8mb_gtct885(machine_config &config)
 {
 	vt36x_8mb(config);
 	m_soc->io_4153_read_callback().set(FUNC(vt36x_gtct885_state::gtct885_prot_r));
@@ -649,7 +655,7 @@ void vt36x_gtct885_state::vt36x_8mb_gtct885(machine_config& config)
 	VT_MENU_PROTECTION(config, m_protection, 0);
 }
 
-void vt36x_gtct885_state::vt36x_altswap_2mb_36pcase(machine_config& config)
+void vt36x_gtct885_state::vt36x_altswap_2mb_36pcase(machine_config &config)
 {
 	vt36x_altswap_2mb(config);
 
@@ -659,7 +665,7 @@ void vt36x_gtct885_state::vt36x_altswap_2mb_36pcase(machine_config& config)
 	VT_MENU_PROTECTION(config, m_protection, 0);
 }
 
-void vt36x_goretrop_state::vt36x_32mb_goretrop(machine_config& config)
+void vt36x_goretrop_state::vt36x_32mb_goretrop(machine_config &config)
 {
 	vt36x_32mb(config);
 	m_soc->io_4139_read_callback().set(FUNC(vt36x_goretrop_state::goretrop_prot_r));
@@ -668,19 +674,30 @@ void vt36x_goretrop_state::vt36x_32mb_goretrop(machine_config& config)
 	VT_MENU_PROTECTION(config, m_protection, 0);
 }
 
-void vt36x_goretrop_state::vt36x_1mb_rbbrite(machine_config& config)
+void vt36x_goretrop_state::vt36x_1mb_rbbrite(machine_config &config)
 {
 	vt36x_32mb_goretrop(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_1mbyte);
 }
 
-void vt36x_state::vt36x_h12p1000(machine_config& config)
+void vt36x_state::vt36x_h12p1000(machine_config &config)
 {
 	vt36x_16mb(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte_bank);
 	m_soc->io_4139_write_callback().set(FUNC(vt36x_state::extbank_h12p1000_w));
 }
 
+void vt36x_tetrtin_state::vt36x_1mb_tetrtin(machine_config &config)
+{
+	vt36x_1mb(config);
+	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
+}
+
+void vt36x_tetrtin_state::vt36x_8mb_lxcap(machine_config &config)
+{
+	vt36x_8mb(config);
+	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
+}
 
 static INPUT_PORTS_START( vt369 )
 	PORT_START("IO0")
@@ -1138,7 +1155,7 @@ ROM_START( lxcap )
 
 	VT3XX_INTERNAL_NO_SWAP // verified for this set
 
-	ROM_REGION( 0x100, "extra", 0 ) // data from additional 8-pin chip for protection
+	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection
 	// This table is just (0x100 - offset) & 0xff with a nibble swap applied at the end
 	// 
 	// The chip here (which is accessed in a different way to gtct885 etc.) might not
@@ -1180,6 +1197,9 @@ ROM_START( pactin )
 	ROM_LOAD( "25q80a.u3", 0x00000, 0x100000, CRC(92935759) SHA1(2333e7dcab51fa34c8d875374371854121fff27a) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+
+	ROM_REGION( 0x100, "protection", ROMREGION_ERASEFF )
+	// see note in lxcap, not clear if there's a ROM table involved or not
 ROM_END
 
 ROM_START( tetrtin )
@@ -1187,6 +1207,9 @@ ROM_START( tetrtin )
 	ROM_LOAD( "25q80.u3", 0x00000, 0x100000, CRC(017a99b9) SHA1(e7f891762bbc3b80ae0f177654d8d066b7524bcd) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+
+	ROM_REGION( 0x100, "protection", ROMREGION_ERASEFF )
+	// see note in lxcap, not clear if there's a ROM table involved or not
 ROM_END
 
 
@@ -1746,7 +1769,13 @@ CONS( 202?, 168pcase, 0,      0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<u
 
 // uses a LCD with resolution of 160x128 (image scaled to fit for some games, others run natively at 160x128)
 // contains a protection chip, command 80 XX returns a byte
-CONS( 201?, lxcap,    0,      0,  vt36x_8mb, vt369, vt36x_tetrtin_state, empty_init, "Lexibook", "Cyber Arcade Pocket (JL1895)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, lxcap,    0,      0,  vt36x_8mb_lxcap, vt369, vt36x_tetrtin_state, empty_init, "Lexibook", "Cyber Arcade Pocket (JL1895)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// seems to be running the NES version of Pac-Man with some extra splash screens, has extra protection
+// (protection looks similar to lxcap, currently crudely bypassed)
+CONS( 2021, pactin,     0,        0,  vt36x_1mb_tetrtin, vt369, vt36x_tetrtin_state, empty_init, "Fizz Creations", "Pac-Man Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+// similar protection to pactin
+CONS( 2021, tetrtin,    0,        0,  vt36x_1mb_tetrtin, vt369, vt36x_tetrtin_state, empty_init, "Fizz Creations", "Tetris Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // 2022 date on 'BL-867 PCB03' PCB, has extra protection?
 CONS( 2022, nesvt270,    0,  0,  vt36x_16mb, vt369, vt36x_state, empty_init, "<unknown>", "unknown VT3xx based 270-in-1 (BL-867 PCB03)", MACHINE_NOT_WORKING )
@@ -1760,11 +1789,6 @@ CONS( 201?, egame150,  denv150,  0,  vt36x_swap_8mb, vt369, vt36x_state, empty_i
 
 // uncertain, uses SPI ROM so probably VT369, has extra protection? (but RAM test goes up to 0x2000, over the internal ROM area?)
 CONS( 2017, otrail,     0,        0,  vt36x_1mb, vt369, vt36x_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-
-// seems to be running the NES version of Pac-Man with some extra splash screens, has extra protection
-CONS( 2021, pactin,     0,        0,  vt36x_1mb, vt369, vt36x_tetrtin_state, empty_init, "Fizz Creations", "Pac-Man Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-// has extra protection
-CONS( 2021, tetrtin,    0,        0,  vt36x_1mb, vt369, vt36x_tetrtin_state, empty_init, "Fizz Creations", "Tetris Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // uses a low res display (so vt3xx?)
 CONS( 2021, matet10,   0,        0,  vt36x_swap_2mb, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7083, Pixel Pocket, with 10 bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

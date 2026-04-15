@@ -31,7 +31,7 @@ namespace {
 class nes_vt09_common_base_state : public driver_device
 {
 public:
-	nes_vt09_common_base_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt09_common_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_io0(*this, "IO0"),
 		m_io1(*this, "IO1"),
@@ -71,7 +71,7 @@ private:
 class nes_vt09_common_state : public nes_vt09_common_base_state
 {
 public:
-	nes_vt09_common_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt09_common_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_vt09_common_base_state(mconfig, type, tag),
 		m_soc(*this, "soc")
 	{ }
@@ -92,17 +92,17 @@ protected:
 class nes_vt09_state : public nes_vt09_common_state
 {
 public:
-	nes_vt09_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt09_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_vt09_common_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt09(machine_config& config);
-	void nes_vt09_1mb(machine_config& config);
-	void nes_vt09_2mb(machine_config& config);
-	void nes_vt09_4mb(machine_config& config);
-	void nes_vt09_4mb_rasterhack(machine_config& config);
-	void nes_vt09_8mb(machine_config& config);
-	void nes_vt09_16mb(machine_config& config);
+	void nes_vt09(machine_config &config);
+	void nes_vt09_1mb(machine_config &config);
+	void nes_vt09_2mb(machine_config &config);
+	void nes_vt09_4mb(machine_config &config);
+	void nes_vt09_4mb_rasterhack(machine_config &config);
+	void nes_vt09_8mb(machine_config &config);
+	void nes_vt09_16mb(machine_config &config);
 
 private:
 };
@@ -110,14 +110,14 @@ private:
 class nes_vt09_cart_state : public nes_vt09_state
 {
 public:
-	nes_vt09_cart_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt09_cart_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_vt09_state(mconfig, type, tag),
 		m_bank(*this, "cartbank"),
 		m_cart(*this, "cartslot"),
 		m_cart_region(nullptr)
 	{ }
 
-	void nes_vt09_cart(machine_config& config);
+	void nes_vt09_cart(machine_config &config);
 
 protected:
 	void machine_start() override ATTR_COLD;
@@ -310,43 +310,43 @@ void nes_vt09_state::nes_vt09(machine_config &config)
 	m_soc->force_bad_dma();
 }
 
-void nes_vt09_state::nes_vt09_16mb(machine_config& config)
+void nes_vt09_state::nes_vt09_16mb(machine_config &config)
 {
 	nes_vt09(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_16mbyte);
 }
 
-void nes_vt09_state::nes_vt09_8mb(machine_config& config)
+void nes_vt09_state::nes_vt09_8mb(machine_config &config)
 {
 	nes_vt09(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_8mbyte);
 }
 
-void nes_vt09_state::nes_vt09_1mb(machine_config& config)
+void nes_vt09_state::nes_vt09_1mb(machine_config &config)
 {
 	nes_vt09(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_1mbyte);
 }
 
-void nes_vt09_state::nes_vt09_2mb(machine_config& config)
+void nes_vt09_state::nes_vt09_2mb(machine_config &config)
 {
 	nes_vt09(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_2mbyte);
 }
 
-void nes_vt09_state::nes_vt09_4mb(machine_config& config)
+void nes_vt09_state::nes_vt09_4mb(machine_config &config)
 {
 	nes_vt09(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_4mbyte);
 }
 
-void nes_vt09_state::nes_vt09_4mb_rasterhack(machine_config& config)
+void nes_vt09_state::nes_vt09_4mb_rasterhack(machine_config &config)
 {
 	nes_vt09_4mb(config);
 	m_soc->force_raster_timing_hack();
 }
 
-void nes_vt09_cart_state::nes_vt09_cart(machine_config& config)
+void nes_vt09_cart_state::nes_vt09_cart(machine_config &config)
 {
 	nes_vt09(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_cart_state::vt_external_space_map_cart);

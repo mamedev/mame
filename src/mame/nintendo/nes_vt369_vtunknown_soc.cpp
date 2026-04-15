@@ -36,12 +36,12 @@ DEFINE_DEVICE_TYPE(VT3XX_SOC, vt3xx_soc_base_device,          "vt3xx_unknown_soc
 DEFINE_DEVICE_TYPE(VT3XX_SOC_UNK_DG, vt3xx_soc_unk_dg_device, "vt3xx_unknown_soc_dg", "VT3xx series System on a Chip (DG)")
 
 
-vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	vt3xx_soc_base_device(mconfig, VT3XX_SOC, tag, owner, clock)
 {
 }
 
-vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
+vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	nes_vt02_vt03_soc_device(mconfig, type, tag, owner, clock),
 	m_soundcpu(*this, "soundcpu"),
 	m_sound_timer(nullptr),
@@ -58,57 +58,57 @@ vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config& mconfig, devi
 }
 
 
-vt369_soc_introm_noswap_device::vt369_soc_introm_noswap_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
+vt369_soc_introm_noswap_device::vt369_soc_introm_noswap_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	vt3xx_soc_base_device(mconfig, type, tag, owner, clock)
 {
 }
 
-vt369_soc_introm_noswap_device::vt369_soc_introm_noswap_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+vt369_soc_introm_noswap_device::vt369_soc_introm_noswap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	vt369_soc_introm_noswap_device(mconfig, VT369_SOC_INTROM_NOSWAP, tag, owner, clock)
 {
 }
 
-vt369_soc_introm_swap_device::vt369_soc_introm_swap_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+vt369_soc_introm_swap_device::vt369_soc_introm_swap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	vt369_soc_introm_noswap_device(mconfig, VT369_SOC_INTROM_SWAP, tag, owner, clock)
 {
 }
 
-vt369_soc_introm_altswap_device::vt369_soc_introm_altswap_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+vt369_soc_introm_altswap_device::vt369_soc_introm_altswap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	vt369_soc_introm_noswap_device(mconfig, VT369_SOC_INTROM_ALTSWAP, tag, owner, clock)
 {
 }
 
-vt369_soc_introm_vibesswap_device::vt369_soc_introm_vibesswap_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
+vt369_soc_introm_vibesswap_device::vt369_soc_introm_vibesswap_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	vt369_soc_introm_noswap_device(mconfig, type, tag, owner, clock)
 {
 }
 
-vt369_soc_introm_vibesswap_device::vt369_soc_introm_vibesswap_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+vt369_soc_introm_vibesswap_device::vt369_soc_introm_vibesswap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	vt369_soc_introm_vibesswap_device(mconfig, VT369_SOC_INTROM_VIBESSWAP, tag, owner, clock)
 {
 }
 
-vt369_soc_introm_gbox2020_device::vt369_soc_introm_gbox2020_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+vt369_soc_introm_gbox2020_device::vt369_soc_introm_gbox2020_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	vt369_soc_introm_vibesswap_device(mconfig, VT369_SOC_INTROM_GBOX2020, tag, owner, clock)
 {
 }
 
-vt369_soc_introm_s10swap_device::vt369_soc_introm_s10swap_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+vt369_soc_introm_s10swap_device::vt369_soc_introm_s10swap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	vt369_soc_introm_vibesswap_device(mconfig, VT369_SOC_INTROM_S10SWAP, tag, owner, clock)
 {
 }
 
-vt369_soc_introm_rsps300swap_device::vt369_soc_introm_rsps300swap_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+vt369_soc_introm_rsps300swap_device::vt369_soc_introm_rsps300swap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	vt369_soc_introm_noswap_device(mconfig, VT369_SOC_INTROM_RSPS300SWAP, tag, owner, clock)
 {
 }
 
-vt3xx_soc_unk_dg_device::vt3xx_soc_unk_dg_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
+vt3xx_soc_unk_dg_device::vt3xx_soc_unk_dg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	vt3xx_soc_base_device(mconfig, type, tag, owner, clock)
 {
 }
 
-vt3xx_soc_unk_dg_device::vt3xx_soc_unk_dg_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+vt3xx_soc_unk_dg_device::vt3xx_soc_unk_dg_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	vt3xx_soc_unk_dg_device(mconfig, VT3XX_SOC_UNK_DG, tag, owner, clock)
 {
 }
@@ -117,7 +117,7 @@ vt3xx_soc_unk_dg_device::vt3xx_soc_unk_dg_device(const machine_config& mconfig, 
 /* VT369? */
 /***********************************************************************************************************************************************************/
 
-void vt3xx_soc_base_device::device_add_mconfig(machine_config& config)
+void vt3xx_soc_base_device::device_add_mconfig(machine_config &config)
 {
 	nes_vt02_vt03_soc_device::device_add_mconfig(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt3xx_soc_base_device::vt369_map);
@@ -872,7 +872,7 @@ u8 vt3xx_soc_base_device::read_onespace_bus_with_relative_offset(offs_t offset)
 /* this might just be the same as vt369 but with the games not using all features */
 /***********************************************************************************************************************************************************/
 
-void vt369_soc_introm_noswap_device::device_add_mconfig(machine_config& config)
+void vt369_soc_introm_noswap_device::device_add_mconfig(machine_config &config)
 {
 	vt3xx_soc_base_device::device_add_mconfig(config);
 
@@ -937,7 +937,7 @@ void vt369_soc_introm_altswap_device::device_start()
 	m_encryption_allowed = true;
 }
 
-void vt369_soc_introm_vibesswap_device::device_add_mconfig(machine_config& config)
+void vt369_soc_introm_vibesswap_device::device_add_mconfig(machine_config &config)
 {
 	vt369_soc_introm_noswap_device::device_add_mconfig(config);
 
@@ -1014,7 +1014,7 @@ void vt369_soc_introm_gbox2020_device::nes_vt_gbox_map(address_map &map)
 	map(0x411c, 0x411c).w(FUNC(vt369_soc_introm_gbox2020_device::gbox_411c_w));
 }
 
-void vt369_soc_introm_gbox2020_device::device_add_mconfig(machine_config& config)
+void vt369_soc_introm_gbox2020_device::device_add_mconfig(machine_config &config)
 {
 	vt369_soc_introm_noswap_device::device_add_mconfig(config);
 
@@ -1040,7 +1040,7 @@ void vt369_soc_introm_rsps300swap_device::nes_vt_rsps_map(address_map &map)
 	map(0x411c, 0x411c).w(FUNC(vt369_soc_introm_rsps300swap_device::rsps_411c_w));
 }
 
-void vt369_soc_introm_rsps300swap_device::device_add_mconfig(machine_config& config)
+void vt369_soc_introm_rsps300swap_device::device_add_mconfig(machine_config &config)
 {
 	vt369_soc_introm_noswap_device::device_add_mconfig(config);
 
@@ -1051,7 +1051,7 @@ void vt369_soc_introm_rsps300swap_device::device_add_mconfig(machine_config& con
 /* this might also just be the same as vt369 but with the games not using all features */
 /***********************************************************************************************************************************************************/
 
-void vt3xx_soc_unk_dg_device::device_add_mconfig(machine_config& config)
+void vt3xx_soc_unk_dg_device::device_add_mconfig(machine_config &config)
 {
 	vt3xx_soc_base_device::device_add_mconfig(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt3xx_soc_unk_dg_device::nes_vt_dg_map);

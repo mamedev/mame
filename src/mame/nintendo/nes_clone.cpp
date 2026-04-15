@@ -106,10 +106,10 @@ private:
 class nes_clone_dnce2000_state : public nes_clone_state
 {
 public:
-	nes_clone_dnce2000_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_clone_dnce2000_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_clone_state(mconfig, type, tag)
 	{ }
-	void nes_clone_dnce2000(machine_config& config) ATTR_COLD;
+	void nes_clone_dnce2000(machine_config &config) ATTR_COLD;
 
 private:
 	void nes_clone_dnce2000_map(address_map &map) ATTR_COLD;
@@ -123,13 +123,13 @@ private:
 class nes_clone_sudoku_state : public nes_clone_state
 {
 public:
-	nes_clone_sudoku_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_clone_sudoku_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_clone_state(mconfig, type, tag)
 	{ }
 
 	void init_sudoku() ATTR_COLD;
 
-	void nes_clone_sudoku(machine_config& config) ATTR_COLD;
+	void nes_clone_sudoku(machine_config &config) ATTR_COLD;
 
 private:
 	void nes_clone_sudoku_map(address_map &map) ATTR_COLD;
@@ -143,12 +143,12 @@ private:
 class nes_clone_vtvsocr_state : public nes_clone_state
 {
 public:
-	nes_clone_vtvsocr_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_clone_vtvsocr_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_clone_state(mconfig, type, tag)
 	{ }
 
-	void nes_clone_vtvsocr(machine_config& config);
-	void nes_clone_danzkara_pal(machine_config& config);
+	void nes_clone_vtvsocr(machine_config &config);
+	void nes_clone_danzkara_pal(machine_config &config);
 
 private:
 	void nes_clone_vtvsocr_map(address_map &map) ATTR_COLD;
@@ -164,7 +164,7 @@ private:
 class nes_clone_afbm7800_state : public nes_clone_state
 {
 public:
-	nes_clone_afbm7800_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_clone_afbm7800_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_clone_state(mconfig, type, tag),
 		m_prgbank(*this, "prgbank%u", 0),
 		m_cbank(*this, "cbank%u", 0),
@@ -172,7 +172,7 @@ public:
 		m_charbank(*this, "charbank"),
 		m_rom_solderpad_bank(*this, "rom_sldpad_bank")
 	{ }
-	void nes_clone_afbm7800(machine_config& config) ATTR_COLD;
+	void nes_clone_afbm7800(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -316,7 +316,7 @@ void nes_clone_state::in0_w(uint8_t data)
 }
 
 
-void nes_clone_state::nes_clone_basemap(address_map& map)
+void nes_clone_state::nes_clone_basemap(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
@@ -327,7 +327,7 @@ void nes_clone_state::nes_clone_basemap(address_map& map)
 	map(0x4017, 0x4017).r(FUNC(nes_clone_state::in1_r));
 }
 
-void nes_clone_state::nes_clone_map(address_map& map)
+void nes_clone_state::nes_clone_map(address_map &map)
 {
 	nes_clone_basemap(map);
 	map(0x8000, 0xffff).rom();
@@ -647,13 +647,13 @@ void nes_clone_dancexpt_state::nes_clone_dancexpt_map(address_map &map)
  Dance 2000 Specifics
 **************************************************/
 
-void nes_clone_dnce2000_state::nes_clone_dnce2000(machine_config& config)
+void nes_clone_dnce2000_state::nes_clone_dnce2000(machine_config &config)
 {
 	nes_clone_pal(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_dnce2000_state::nes_clone_dnce2000_map);
 }
 
-void nes_clone_dnce2000_state::nes_clone_dnce2000_map(address_map& map)
+void nes_clone_dnce2000_state::nes_clone_dnce2000_map(address_map &map)
 {
 	nes_clone_basemap(map);
 	map(0x8000, 0xffff).rw(FUNC(nes_clone_dnce2000_state::rom_r), FUNC(nes_clone_dnce2000_state::bank_w));
@@ -685,7 +685,7 @@ void nes_clone_dnce2000_state::bank_w(uint8_t data)
  Atari Flashback Specifics
 **************************************************/
 
-void nes_clone_afbm7800_state::nes_clone_afbm7800(machine_config& config)
+void nes_clone_afbm7800_state::nes_clone_afbm7800(machine_config &config)
 {
 	nes_clone_pal(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_afbm7800_state::nes_clone_afbm7800_map);
@@ -1090,7 +1090,7 @@ void nes_clone_afbm7800_state::vram_map(address_map &map)
 	map(0x3800, 0x3fff).bankrw("cbank1");
 }
 
-void nes_clone_afbm7800_state::ntram_map(address_map& map)
+void nes_clone_afbm7800_state::ntram_map(address_map &map)
 {
 	map(0x0000, 0x03ff).bankrw("nametable0");
 	map(0x0400, 0x07ff).bankrw("nametable1");
@@ -1229,13 +1229,13 @@ void nes_clone_sudoku_state::machine_start()
 	save_item(NAME(m_rombase));
 }
 
-void nes_clone_sudoku_state::nes_clone_sudoku(machine_config& config)
+void nes_clone_sudoku_state::nes_clone_sudoku(machine_config &config)
 {
 	nes_clone(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_sudoku_state::nes_clone_sudoku_map);
 }
 
-void nes_clone_sudoku_state::nes_clone_sudoku_map(address_map& map)
+void nes_clone_sudoku_state::nes_clone_sudoku_map(address_map &map)
 {
 	nes_clone_basemap(map);
 	map(0x8000, 0xffff).rw(FUNC(nes_clone_sudoku_state::rom_r), FUNC(nes_clone_sudoku_state::bank_w));
@@ -1295,19 +1295,19 @@ void nes_clone_vtvsocr_state::machine_start()
 	save_item(NAME(m_bankregs));
 }
 
-void nes_clone_vtvsocr_state::nes_clone_vtvsocr(machine_config& config)
+void nes_clone_vtvsocr_state::nes_clone_vtvsocr(machine_config &config)
 {
 	nes_clone(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_vtvsocr_state::nes_clone_vtvsocr_map);
 }
 
-void nes_clone_vtvsocr_state::nes_clone_danzkara_pal(machine_config& config)
+void nes_clone_vtvsocr_state::nes_clone_danzkara_pal(machine_config &config)
 {
 	nes_clone_pal(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_vtvsocr_state::nes_clone_vtvsocr_map);
 }
 
-void nes_clone_vtvsocr_state::nes_clone_vtvsocr_map(address_map& map)
+void nes_clone_vtvsocr_state::nes_clone_vtvsocr_map(address_map &map)
 {
 	nes_clone_basemap(map);
 	map(0x4800, 0x4803).w(FUNC(nes_clone_vtvsocr_state::bank_w));
