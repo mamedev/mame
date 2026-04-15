@@ -1329,8 +1329,8 @@ ROM_START( matetsl )
 ROM_END
 
 ROM_START( nesvt270 )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "w25q128jvs.u3", 0x00000, 0x1000300, CRC(fe189a90) SHA1(7f07ae89ae7ff49f139e936b08c9ef2a3467ea92) )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "w25q128jvs.u3", 0x00000, 0x1000000, CRC(8ff28dcc) SHA1(ea1aab0beb54c0b5a9a79211542f8f0f7fce676d) )
 ROM_END
 
 ROM_START( rbbrite )
