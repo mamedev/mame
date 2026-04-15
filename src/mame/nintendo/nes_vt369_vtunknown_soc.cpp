@@ -53,7 +53,9 @@ vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config &mconfig, devi
 	m_io_415x_write_callback(*this),
 	m_io_415x_read_callback(*this, 0xff),
 	m_io_413x_write_callback(*this),
-	m_io_413x_read_callback(*this, 0xff)
+	m_io_413x_read_callback(*this, 0xff),
+	m_io_414x_write_callback(*this),
+	m_io_414x_read_callback(*this, 0xff)
 {
 }
 
@@ -311,6 +313,10 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	// 4144
 	// 4147
 
+	// based on nesvt270 this looks like another I/O port?
+	map(0x4148, 0x4148).rw(FUNC(vt3xx_soc_base_device::vt_414x_port_direction_r), FUNC(vt3xx_soc_base_device::vt_414x_port_direction_w));
+	map(0x414b, 0x414b).rw(FUNC(vt3xx_soc_base_device::vt_414b_port_in_r), FUNC(vt3xx_soc_base_device::vt_414b_port_out_w));
+
 	map(0x414f, 0x414f).r(FUNC(vt3xx_soc_base_device::vt369_414f_r));
 
 	// several games use these addresses for what seem to be extra protection data
@@ -453,6 +459,38 @@ u8 vt3xx_soc_base_device::vt_413x_port_in_r()
 	// TODO: pass the direction register
 	u8 ret = m_io_413x_read_callback();
 	return (ret & ~m_413x_port_direction) | (m_413x_port_data & m_413x_port_direction);
+}
+
+// nesvt270 uses 4148 and 414b like they're a port and direction register
+// input doesn't appear to require clocking?
+// 41e7 / 4147 / 414f also get used in some cases in code near these accesses
+
+u8 vt3xx_soc_base_device::vt_414x_port_direction_r()
+{
+	logerror("%s: vt_414x_port_direction_r (reg 4148 - port 414b direction)\n", machine().describe_context());
+	return m_414x_port_direction;
+}
+
+void vt3xx_soc_base_device::vt_414x_port_direction_w(u8 data)
+{
+	logerror("%s: vt_414x_port_direction_w %02x (reg 4148 - port 414b direction)\n", machine().describe_context(), data);
+	m_414x_port_direction = data;
+}
+
+void vt3xx_soc_base_device::vt_414b_port_out_w(u8 data)
+{
+	logerror("%s: vt_414b_port_out_w %02x (with direction register %02x)\n", machine().describe_context(), data, m_414x_port_direction);
+	// TODO: pass direction register
+	m_414x_port_data = data;
+	m_io_414x_write_callback(data & m_414x_port_direction);
+}
+
+u8 vt3xx_soc_base_device::vt_414b_port_in_r()
+{
+	logerror("%s: vt_414b_port_in_r (with direction register %02x)\n", machine().describe_context(), m_414x_port_direction);
+	// TODO: pass the direction register
+	u8 ret = m_io_414x_read_callback();
+	return (ret & ~m_414x_port_direction) | (m_414x_port_data & m_414x_port_direction);
 }
 
 
@@ -784,6 +822,8 @@ void vt3xx_soc_base_device::device_start()
 	save_item(NAME(m_415x_port_data));
 	save_item(NAME(m_413x_port_direction));
 	save_item(NAME(m_413x_port_data));
+	save_item(NAME(m_414x_port_direction));
+	save_item(NAME(m_414x_port_data));
 
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x3c00, 0x3fff, read8sm_delegate(*this, FUNC(vt3xx_soc_base_device::vt3xx_palette_r)), write8sm_delegate(*this, FUNC(vt3xx_soc_base_device::vt3xx_palette_w)));
 }
@@ -817,6 +857,8 @@ void vt3xx_soc_base_device::device_reset()
 	m_415x_port_data = 0x00;
 	m_413x_port_direction = 0x00;
 	m_413x_port_data = 0x00;
+	m_414x_port_direction = 0x00;
+	m_414x_port_data = 0x00;
 }
 
 
