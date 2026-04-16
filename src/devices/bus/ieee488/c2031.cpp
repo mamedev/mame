@@ -9,17 +9,22 @@
 #include "emu.h"
 #include "c2031.h"
 
+#include "cpu/m6502/m6502.h"
+#include "imagedev/floppy.h"
+#include "machine/64h156.h"
+#include "machine/6522via.h"
+
 #include "formats/d64_dsk.h"
 #include "formats/g64_dsk.h"
 
+
+namespace {
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
 
 #define M6502_TAG       "ucd5"
-#define M6522_0_TAG     "uab1"
-#define M6522_1_TAG     "ucd4"
 #define C64H156_TAG     "64h156"
 
 
@@ -32,10 +37,65 @@ enum
 
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C2031, c2031_device, "c2031", "Commodore 2031")
+// ======================> c2031_device
+
+class c2031_device :  public device_t,
+						public device_ieee488_interface
+{
+public:
+	// construction/destruction
+	c2031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	// device_ieee488_interface implementation
+	virtual void ieee488_atn(int state) override;
+	virtual void ieee488_ifc(int state) override;
+
+private:
+	inline int get_device_number();
+
+	void via0_irq_w(int state);
+	uint8_t via0_pa_r();
+	void via0_pa_w(uint8_t data);
+	uint8_t via0_pb_r();
+	void via0_pb_w(uint8_t data);
+	void via1_irq_w(int state);
+	uint8_t via1_pb_r();
+	void via1_pb_w(uint8_t data);
+	void byte_w(int state);
+
+	void c2031_mem(address_map &map) ATTR_COLD;
+
+	static void floppy_formats(format_registration &fr);
+
+	required_device<m6502_device> m_maincpu;
+	required_device<via6522_device> m_via0;
+	required_device<via6522_device> m_via1;
+	required_device<c64h156_device> m_ga;
+	required_device<floppy_image_device> m_floppy;
+	required_ioport m_address;
+	output_finder<2> m_leds;
+
+	// IEEE-488 bus
+	int m_nrfd_out;             // not ready for data
+	int m_ndac_out;             // not data accepted
+	int m_atna;                 // attention acknowledge
+	int m_ifc;
+
+	// interrupts
+	int m_via0_irq;             // VIA #0 interrupt request
+	int m_via1_irq;             // VIA #1 interrupt request
+};
 
 
 //-------------------------------------------------
@@ -66,8 +126,8 @@ const tiny_rom_entry *c2031_device::device_rom_region() const
 void c2031_device::c2031_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x6000).ram();
-	map(0x1800, 0x180f).mirror(0x63f0).m(M6522_0_TAG, FUNC(via6522_device::map));
-	map(0x1c00, 0x1c0f).mirror(0x63f0).m(M6522_1_TAG, FUNC(via6522_device::map));
+	map(0x1800, 0x180f).mirror(0x63f0).m(m_via0, FUNC(via6522_device::map));
+	map(0x1c00, 0x1c0f).mirror(0x63f0).m(m_via1, FUNC(via6522_device::map));
 	map(0x8000, 0xbfff).mirror(0x4000).rom().region(M6502_TAG, 0);
 }
 
@@ -388,11 +448,11 @@ inline int c2031_device::get_device_number()
 //-------------------------------------------------
 
 c2031_device::c2031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, C2031, tag, owner, clock)
+	: device_t(mconfig, GPIB_C2031, tag, owner, clock)
 	, device_ieee488_interface(mconfig, *this)
 	, m_maincpu(*this, M6502_TAG)
-	, m_via0(*this, M6522_0_TAG)
-	, m_via1(*this, M6522_1_TAG)
+	, m_via0(*this, "uab1")
+	, m_via1(*this, "ucd4")
 	, m_ga(*this, C64H156_TAG)
 	, m_floppy(*this, C64H156_TAG":0:525ssqd")
 	, m_address(*this, "ADDRESS")
@@ -473,3 +533,12 @@ void c2031_device::ieee488_ifc(int state)
 
 	m_ifc = state;
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(GPIB_C2031, device_ieee488_interface, c2031_device, "c2031", "Commodore 2031 single disk drive")

@@ -39,6 +39,7 @@ TODO (sis630):
 #define LOG_CRTC   (1U << 2) // extended CRTC registers (overlay)
 #define LOG_PLL    (1U << 3) // PLL calculation (verbose, needs dirty flag)
 #define LOG_LOCKED (1U << 4) // log lock/unlock sequences
+#define LOG_DDRAW  (1U << 5) // log (verbose) DirectDraw specifics
 
 #define VERBOSE (LOG_GENERAL | LOG_CRTC)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -47,6 +48,7 @@ TODO (sis630):
 #define LOGCRTC(...)      LOGMASKED(LOG_CRTC, __VA_ARGS__)
 #define LOGPLL(...)       LOGMASKED(LOG_PLL, __VA_ARGS__)
 #define LOGLOCKED(...)    LOGMASKED(LOG_LOCKED, __VA_ARGS__)
+#define LOGDDRAW(...)     LOGMASKED(LOG_DDRAW, __VA_ARGS__)
 
 #include "logmacro.h"
 
@@ -89,6 +91,8 @@ device_memory_interface::space_config_vector sis6326_vga_device::memory_space_co
 	return r;
 }
 
+ALLOW_SAVE_TYPE(sis6326_vga_device::FAST_PAGE);
+
 void sis6326_vga_device::device_start()
 {
 	svga_device::device_start();
@@ -124,6 +128,7 @@ void sis6326_vga_device::device_start()
 	save_item(NAME(m_page_size_select));
 	save_item(NAME(m_dram_fb_size));
 	save_item(NAME(m_fast_page_address_latch));
+	save_item(NAME(m_fast_page_address));
 	save_item(NAME(m_ext_sr33));
 	save_item(NAME(m_ext_sr34));
 	save_item(NAME(m_ext_sr35));
@@ -198,7 +203,7 @@ void sis6326_vga_device::device_reset()
 	m_vclk_int[0] = m_vclk_int[1] = 0;
 	m_page_size_select = 0;
 	m_dram_fb_size = 0;
-	m_fast_page_address_latch[0] = m_fast_page_address_latch[1] = m_fast_page_address_latch[2] = 0;
+	m_fast_page_address_latch.u = m_fast_page_address = 0;
 	// irrelevant really
 	m_crtc_hcounter_latch = m_crtc_vcounter_latch = 0xffff;
 
@@ -283,14 +288,14 @@ void sis6326_vga_device::crtc_map(address_map &map)
 		NAME([this] (offs_t offset) {
 			if (!machine().side_effects_disabled())
 			{
-				LOG("CR20: Counter trigger read\n");
+				LOGDDRAW("CR20: Counter trigger read\n");
 				crtc_strobe_latch();
 			}
 			return 0xff;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			(void)data;
-			LOG("CR20: Counter trigger write\n");
+			LOGDDRAW("CR20: Counter trigger write\n");
 			crtc_strobe_latch();
 		})
 	);
@@ -1155,16 +1160,17 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 
 	// Fast Page Flip Starting Address
 	map(0x30, 0x32).lrw8(
-		NAME([this] (offs_t offset) { return m_fast_page_address_latch[offset]; }),
+		NAME([this] (offs_t offset) { return m_fast_page_address_latch.b[offset]; }),
 		NAME([this] (offs_t offset, u8 data) {
 			const bool latch_address = offset == 2;
 			const u8 mask = latch_address ? 0x0f : 0xff;
-			m_fast_page_address_latch[offset] = data & mask;
-			LOG("SR%02X: Fast Page Flip Starting Address [%d] %02x\n", offset + 0x30, offset, data);
-			// TODO: Direct Draw obviously uses this
-			//if (BIT(m_dram_fb_size, 4) && latch_address)
-			//{
-			//}
+			m_fast_page_address_latch.b[offset] = data & mask;
+			LOGDDRAW("SR%02X: Fast Page Flip Starting Address [%d] %02x\n", offset + 0x30, offset, data);
+			// testable in dxdiag full screen test & any Direct Draw app (except diablo?)
+			if (BIT(m_dram_fb_size, 4) && latch_address)
+			{
+				m_fast_page_address = m_fast_page_address_latch.u;
+			}
 		})
 	);
 
@@ -1517,9 +1523,13 @@ void sis6326_vga_device::mem_w(offs_t offset, uint8_t data)
 	svga_device::mem_w(offset, data);
 }
 
-// TODO: similar to S3 variant, is there an enable bit?
 uint32_t sis6326_vga_device::latch_start_addr()
 {
+	if (BIT(m_dram_fb_size, 4))
+	{
+		return m_fast_page_address;
+	}
+	// TODO: similar to S3 variant, is there an enable bit?
 	return vga.crtc.start_addr_latch << (svga.rgb8_en ? 2 : 0);
 }
 

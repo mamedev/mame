@@ -13,8 +13,7 @@
 
 	TODO
 
-	- trap 46 on boot
-	- SASI
+	- trap on boot
 	- tst.w 0xfffffc
 	- SCC interrupt acknowledge
 
@@ -43,7 +42,7 @@
 
 namespace {
 
-//#define VERBOSE 0
+//#define VERBOSE 1
 #include "logmacro.h"
 
 #define MC68010_TAG  "14m"
@@ -150,7 +149,7 @@ void x37_state::program_map(address_map &map)
 	map(0xfc0000, 0xfc0007).rw(m_scc[0], FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0x00ff);
 	map(0xfc0010, 0xfc0017).rw(m_scc[1], FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0x00ff);
 	map(0xfc0020, 0xfc0027).rw(m_scc[2], FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0x00ff);
-	map(0xfd5000, 0xfd5001).rw(m_sasi, FUNC(luxor_x37_sasi_device::tre_r), FUNC(luxor_x37_sasi_device::tre_w));
+	map(0xfd5000, 0xfd501f).rw(m_sasi, FUNC(luxor_x37_sasi_device::tre_r), FUNC(luxor_x37_sasi_device::tre_w));
 	map(0xfd5080, 0xfd509f).rw(m_sasi, FUNC(luxor_x37_sasi_device::stat_r), FUNC(luxor_x37_sasi_device::ctrl_w));
 	map(0xfdb040, 0xfdb041).rw(m_fdc, FUNC(fd1797_device::status_r), FUNC(fd1797_device::cmd_w)).umask16(0x00ff);
 	map(0xfdb042, 0xfdb043).rw(m_fdc, FUNC(fd1797_device::track_r), FUNC(fd1797_device::track_w)).umask16(0x00ff);
@@ -503,6 +502,12 @@ void x37_state::x37(machine_config &config)
 	NS32081(config, m_fpu, XTAL(20'000'000)/2);
 
 	HD63450(config, m_dmac, XTAL(20'000'000)/2, m_cpu, AS_PROGRAM);
+	m_dmac->set_burst_clocks(
+		attotime::from_nsec(120),  // ch0
+		attotime::zero,
+		attotime::zero,
+		attotime::zero
+	);
 
 	Z8536(config, m_cio, XTAL(20'000'000)/4);
 	m_cio->irq_wr_cb().set_inputline(m_cpu, M68K_IRQ_3);

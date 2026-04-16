@@ -3076,7 +3076,10 @@ void specnext_state::map_io(address_map &map)
 	}), NAME([this](offs_t offset, u8 data) {
 		u8 chanel = offset >> 8;
 		if (port_ctc_io_en() && (chanel < 4))
+		{
 			m_ctc->write(chanel, data);
+			m_maincpu->abort_timeslice(); // TODO: Must the CTC take care of this?
+		}
 	}));
 	map(0x123b, 0x123b).lrw8(NAME([this]() {
 		return (m_port_123b_layer2_map_segment << 6) | (0b00 << 4) | (m_port_123b_layer2_map_shadow << 3) | (m_port_123b_layer2_map_rd_en << 2) | (m_port_123b_layer2_en << 1) | m_port_123b_layer2_map_wr_en;

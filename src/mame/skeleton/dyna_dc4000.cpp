@@ -276,7 +276,7 @@ ROM_START( cmast92 ) // DYNA D9106B PCB
 
 	// the rest of the PROMs were dumped for V1.1D, adding them as bad until it can be verified they're good for this newer version, too
 	ROM_REGION( 0x120000, "gfx", 0 )
-	ROM_LOAD( "dyna dm9105.2h", 0x000000, 0x100000, NO_DUMP )
+	ROM_LOAD( "dyna dm9105.2h", 0x000000, 0x100000, CRC(800c6c8d) SHA1(bf8d8f05b21e6cd4f0efed1ae7b66c2d9d8f43ee) )
 	ROM_LOAD( "1h",             0x000000, 0x020000, BAD_DUMP CRC(2ca1ba89) SHA1(dec50bb0f68f03d3433cc3a09eec5ee60f2d096c) )
 
 	ROM_REGION( 0x300, "proms", 0 )
@@ -385,6 +385,19 @@ ROM_START( eldoraddod )  // String "DYNA ELD3 V1.1U" in program ROM, DYNA D9105B
 	ROM_LOAD( "pal16l8.e11", 0x200, 0x104, NO_DUMP )
 ROM_END
 
+ROM_START( dynamj ) // DYNA D9106C PCB
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "15d", 0x00000, 0x10000, CRC(34007d38) SHA1(f33c1b99df6d3048fd6e1d870f7d407a1e0cc4fb) )  // DYNA MAH-1 V1.60, but also DYNA QLL2 V4.1D? Is it a multigame?
+
+	ROM_REGION( 0x140000, "gfx", 0 )
+	ROM_LOAD( "dyna dm9105.2h", 0x000000, 0x100000, CRC(800c6c8d) SHA1(bf8d8f05b21e6cd4f0efed1ae7b66c2d9d8f43ee) )
+	ROM_LOAD( "1h",             0x100000, 0x040000, CRC(2d98366b) SHA1(462bac759e79d8429c0b69fc903edb15f4ee6325) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s135.15h", 0x000, 0x100, CRC(ac2c0cc2) SHA1(8dc81ea1b258b19c6840a23eac4a363a848ff008) )
+	ROM_LOAD( "82s135.15g", 0x100, 0x100, CRC(2686eec2) SHA1(8965af1f57041a8eb2e07a611128223f988b8569) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -394,6 +407,7 @@ GAME(  1991, aladdin,    0,        d9106, default, dyna_dc4000_state, empty_init
 GAME(  1991, aladdina,   aladdin,  d9106, default, dyna_dc4000_state, empty_init, ROT0, "Dyna", "The Aladdin (V1.1A)",               MACHINE_NOT_WORKING )
 GAME(  1992, cmast92,    0,        d9106, default, dyna_dc4000_state, empty_init, ROT0, "Dyna", "Cherry Master '92 (V1.2D)",         MACHINE_NOT_WORKING )
 GAME(  1992, cmast92a,   cmast92,  d9106, default, dyna_dc4000_state, empty_init, ROT0, "Dyna", "Cherry Master '92 (V1.1D)",         MACHINE_NOT_WORKING )
+GAME(  199?, dynamj,     0,        d9106, default, dyna_dc4000_state, empty_init, ROT0, "Dyna", "unknown Dyna mahjong game (V1.60)", MACHINE_NOT_WORKING )
 
 // Dyna D9105 PCB
 GAME(  1991, eldoraddo,  eldoradd, d9106, default, dyna_dc4000_state, empty_init, ROT0, "Dyna", "El Dorado (Dyna D9105 HW, V1.1TA)", MACHINE_NOT_WORKING )

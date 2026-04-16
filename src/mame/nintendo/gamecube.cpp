@@ -12,6 +12,7 @@
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
 
+#include "screen.h"
 
 namespace {
 
@@ -29,26 +30,44 @@ public:
 
 	void gc(machine_config &config);
 	void ppc_mem(address_map &map) ATTR_COLD;
+
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void decrypt(uint8_t *data, unsigned size);
 
-	required_device<cpu_device> m_cpu;
+	required_device<ppc_device> m_cpu;
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
+void gamecube_state::video_start()
+{
+}
+
+uint32_t gamecube_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
 
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
+// 8000'0000 cached logical access
+// c000'0000 non cached logical access
+// c800'0000 EFB logical access
+// cc00'0000 HW regs logical access
 void gamecube_state::ppc_mem(address_map &map)
 {
-	map(0x00000000, 0x017fffff).ram(); // 24 MB main memory
-	map(0x08000000, 0x081fffff).ram(); //  2 MB embedded framebuffer
-	map(0xfff00000, 0xffffffff).bankr("boot");
+	map(0x0000'0000, 0x017f'ffff).ram().share("workram"); // 24 MB main memory (physical)
+	map(0x0800'0000, 0x081f'ffff).ram(); //  2 MB embedded framebuffer (EFB)
+	map(0x0c00'6800, 0x0c00'683f).lr8(NAME([] () { return 0; })).nopw(); // EXI External Interface
+//	map(0xe000'0000, 0xe000'3fff).ram(); // L2 cache
+	map(0xfff0'0000, 0xffff'ffff).bankr("boot");
 }
 
 
@@ -56,7 +75,7 @@ void gamecube_state::ppc_mem(address_map &map)
 //  INPUTS
 //**************************************************************************
 
-INPUT_PORTS_START( gc )
+static INPUT_PORTS_START( gc )
 INPUT_PORTS_END
 
 
@@ -119,6 +138,8 @@ void gamecube_state::decrypt(uint8_t *data, unsigned size)
 
 void gamecube_state::machine_start()
 {
+	m_cpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
+
 	decrypt(memregion("ipl")->base() + 0x100, 0x1afe00);
 
 	// swap endianess after decryption
@@ -146,8 +167,15 @@ void gamecube_state::machine_reset()
 
 void gamecube_state::gc(machine_config &config)
 {
-	PPC603(config, m_cpu, 485000000 / 100); // 485 MHz IBM "Gekko" (750CXe/750FX based)
+	PPC603(config, m_cpu, 485'000'000); // 485 MHz IBM "Gekko" (750CXe/750FX based)
+	m_cpu->set_bus_frequency(200'000'000); // 200 MHz 64-bit bus width to main memory
 	m_cpu->set_addrmap(AS_PROGRAM, &gamecube_state::ppc_mem);
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 639, 0, 479);
+	screen.set_screen_update(FUNC(gamecube_state::screen_update));
 }
 
 
