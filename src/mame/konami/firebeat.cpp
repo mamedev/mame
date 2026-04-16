@@ -676,14 +676,35 @@ class firebeat_popn_state : public firebeat_spu_state
 {
 public:
 	firebeat_popn_state(const machine_config &mconfig, device_type type, const char *tag) :
-		firebeat_spu_state(mconfig, type, tag)
+		firebeat_spu_state(mconfig, type, tag),
+		m_button_leds(*this, "button_led_%u", 0U),
+		m_side_leds(*this, "side_led_%u", 0U),
+		m_top_leds(*this, "top_led_%u", 0U)
 	{ }
 
 	void firebeat_popn(machine_config &config);
 	void init_popn_base();
 	void init_popn_jp();
 	void init_popn_rental();
+
+private:
+	virtual void device_resolve_objects() override ATTR_COLD;
+
+	void lamp_output_popn_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+
+	output_finder<9> m_button_leds;
+	output_finder<4> m_side_leds;
+	output_finder<5> m_top_leds;
 };
+
+void firebeat_popn_state::device_resolve_objects()
+{
+	firebeat_spu_state::device_resolve_objects();
+
+	m_button_leds.resolve();
+	m_side_leds.resolve();
+	m_top_leds.resolve();
+}
 
 /*****************************************************************************/
 
@@ -1552,7 +1573,7 @@ void firebeat_popn_state::firebeat_popn(machine_config &config)
 void firebeat_popn_state::init_popn_base()
 {
 	init_firebeat();
-	init_lights(write32s_delegate(*this), write32s_delegate(*this), write32s_delegate(*this));
+	init_lights(write32s_delegate(*this, FUNC(firebeat_popn_state::lamp_output_popn_w)), write32s_delegate(*this), write32s_delegate(*this));
 }
 
 void firebeat_popn_state::init_popn_jp()
@@ -1571,6 +1592,55 @@ void firebeat_popn_state::init_popn_rental()
 	// bits 1 and 2 to designate a rental cabinet. Rental data does not seem to care about
 	// the region bit, so will accept value 0x6 or 0x7. Arbitrarily choose "JP".
 	m_cabinet_info = 0x6;
+}
+
+void firebeat_popn_state::lamp_output_popn_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	lamp_output_w(offset, data, mem_mask);
+
+	// 0x00010000 Marquee Lamp?
+	// 0x00080000 Top Led 0 (Topmost)
+	// 0x00100000 Top Led 1
+	// 0x00200000 Top Led 2
+	// 0x00400000 Top Led 3
+	// 0x00800000 Top Led 4
+	// 0x08000000 Pillar Lamp 0 (Left Red?)
+	// 0x10000000 Pillar Lamp 1 (Left Blue?)
+	// 0x20000000 Pillar Lamp 2 (Right Blue?)
+	// 0x40000000 Pillar Lamp 3 (Right Red?)
+	// 0x00000100 Button LED 0
+	// 0x00000200 Button LED 1
+	// 0x00000400 Button LED 2
+	// 0x00000800 Button LED 3
+	// 0x00001000 Button LED 4
+	// 0x00002000 Button LED 5
+	// 0x00004000 Button LED 6
+	// 0x00008000 Button LED 7
+	// 0x80000000 Button LED 8
+	if (ACCESSING_BITS_8_15) {
+		m_button_leds[0] = BIT(data, 8);
+		m_button_leds[1] = BIT(data, 9);
+		m_button_leds[2] = BIT(data, 10);
+		m_button_leds[3] = BIT(data, 11);
+		m_button_leds[4] = BIT(data, 12);
+		m_button_leds[5] = BIT(data, 13);
+		m_button_leds[6] = BIT(data, 14);
+		m_button_leds[7] = BIT(data, 15);
+	}
+	if (ACCESSING_BITS_16_23) {
+		m_top_leds[0] = BIT(data, 19);
+		m_top_leds[1] = BIT(data, 20);
+		m_top_leds[2] = BIT(data, 21);
+		m_top_leds[3] = BIT(data, 22);
+		m_top_leds[4] = BIT(data, 23);
+	}
+	if (ACCESSING_BITS_24_31) {
+		m_side_leds[0] = BIT(data, 27);
+		m_side_leds[1] = BIT(data, 28);
+		m_side_leds[2] = BIT(data, 29);
+		m_side_leds[3] = BIT(data, 30);
+		m_button_leds[8] = BIT(data, 31);
+	}
 }
 
 
