@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, ElSemi, Xing Xing
+#ifndef MAME_IGS_PGMPROT_IGS027A_TYPE1_H
+#define MAME_IGS_PGMPROT_IGS027A_TYPE1_H
+
+#pragma once
+
 #include "pgm.h"
 
 class pgm_arm_type1_state : public pgm_state
@@ -45,7 +50,7 @@ private:
 	u16 m_valuekey = 0;
 	u16 m_ddp3lastcommand = 0;
 	u32 m_valueresponse = 0;
-	int m_curslots = 0;
+	s32 m_curslots = 0;
 	u32 m_slots[0x100]{};
 
 	// pstars / oldsplus / kov
@@ -99,31 +104,31 @@ private:
 	void arm7_type1_sim_w(offs_t offset, u16 data);
 	u16 arm7_type1_sim_protram_r(offs_t offset);
 	u16 pstars_arm7_type1_sim_protram_r(offs_t offset);
-	int m_simregion = 0;
+	s32 m_simregion = 0;
 
 	/* puzzli2 protection internal state stuff */
-	int stage = 0;
-	int tableoffs = 0;
-	int tableoffs2 = 0;
-	int entries_left = 0;
-	int currentcolumn = 0;
-	int currentrow = 0;
-	int num_entries = 0;
-	int full_entry = 0;
-	int prev_tablloc = 0;
-	int numbercolumns = 0;
-	int depth = 0;
+	s32 stage = 0;
+	s32 tableoffs = 0;
+	s32 tableoffs2 = 0;
+	s32 entries_left = 0;
+	s32 currentcolumn = 0;
+	s32 currentrow = 0;
+	s32 num_entries = 0;
+	s32 full_entry = 0;
+	s32 prev_tablloc = 0;
+	s32 numbercolumns = 0;
+	s32 depth = 0;
 	u16 m_row_bitmask = 0;
-	int hackcount = 0;
-	int hackcount2 = 0;
-	int hack_47_value = 0;
-	int hack_31_table_offset = 0;
-	int hack_31_table_offset2 = 0;
-	int p2_31_retcounter = 0;
+	s32 hackcount = 0;
+	s32 hackcount2 = 0;
+	s32 hack_47_value = 0;
+	s32 hack_31_table_offset = 0;
+	s32 hack_31_table_offset2 = 0;
+	s32 p2_31_retcounter = 0;
 
 	u8 coverage[256]{}; // coverage is how much of the table we've managed to verify using known facts about the table structure
 
-	int command_31_write_type = 0;
+	s32 command_31_write_type = 0;
 
 	// py2k2 protection related
 	u16 m_py2k2_sprite_pos = 0;
@@ -153,3 +158,5 @@ INPUT_PORTS_EXTERN( puzzli2 );
 INPUT_PORTS_EXTERN( kovsh );
 INPUT_PORTS_EXTERN( ddp3 );
 INPUT_PORTS_EXTERN( espgal );
+
+#endif // MAME_IGS_PGMPROT_IGS027A_TYPE1_H

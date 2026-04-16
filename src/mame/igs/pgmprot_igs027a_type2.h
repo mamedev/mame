@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, ElSemi, Xing Xing
+#ifndef MAME_IGS_PGMPROT_IGS027A_TYPE2_H
+#define MAME_IGS_PGMPROT_IGS027A_TYPE2_H
+
+#pragma once
 
 class pgm_arm_type2_state : public pgm_state
 {
@@ -62,3 +66,5 @@ INPUT_PORTS_EXTERN( ddp2 );
 INPUT_PORTS_EXTERN( kov2 );
 INPUT_PORTS_EXTERN( martmast );
 INPUT_PORTS_EXTERN( dw2001 );
+
+#endif // MAME_IGS_PGMPROT_IGS027A_TYPE2_H
