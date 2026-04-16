@@ -120,7 +120,7 @@ uint16_t aliencha_state::aliencha_protection_r(offs_t offset)
 {
 	switch (offset & 0x60)
 	{
-		case 0x00/2: // de-increment counter
+		case 0x00/2: // decrement counter
 		{
 			if (!machine().side_effects_disabled())
 			{
@@ -201,7 +201,7 @@ void aliencha_state::aliencha_eeprom_w(uint8_t data)
 {
 	if (~data & 7)
 	{
-//      popmessage("EE: %02x", data);
+		//popmessage("EE: %02x", data);
 		logerror("%s: Unknown EEPROM bit written %02X\n", machine().describe_context(), data);
 	}
 
@@ -215,26 +215,20 @@ void aliencha_state::aliencha_eeprom_w(uint8_t data)
 	m_eeprom->di_write(BIT(data, 7));
 
 	// reset line asserted: reset.
-	m_eeprom->cs_write(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->cs_write(BIT(data, 5));
 
 	// clock line asserted: write latch or select next bit to read
-	m_eeprom->clk_write(BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->clk_write(BIT(data, 6));
 }
 
 
 uint8_t aliencha_state::dip_r()
 {
-	switch (m_dip_sel & 0x70)
-	{
-		case 0x30:  return m_in_dip[0]->read();
-		case 0x60:  return m_in_dip[1]->read();
-		case 0x50:  return m_in_dip[2]->read();
-
-		default:
-			if (!machine().side_effects_disabled())
-				logerror("%s: dip_r with unknown dip_sel = %02X\n", machine().describe_context(), m_dip_sel);
-			return 0xff;
-	}
+	uint8_t result = 0xff;
+	if (!BIT(m_dip_sel, 6)) result &= m_in_dip[0]->read();
+	if (!BIT(m_dip_sel, 5)) result &= m_in_dip[2]->read();
+	if (!BIT(m_dip_sel, 4)) result &= m_in_dip[1]->read();
+	return result;
 }
 
 void aliencha_state::dip_w(uint8_t data)
