@@ -5,6 +5,11 @@
                       -= IGS Lord Of Gun =-
 
 *************************************************************************/
+#ifndef MAME_IGS_LORDGUN_H
+#define MAME_IGS_LORDGUN_H
+
+#pragma once
+
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
@@ -36,6 +41,20 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
+	void priority_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template<int Layer> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void fake_w(uint8_t data);
+	void fake2_w(uint8_t data);
+
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void common_map(address_map &map) ATTR_COLD;
+	void soundmem_map(address_map &map) ATTR_COLD;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device_array<okim6295_device, 2> m_oki;
@@ -58,20 +77,6 @@ protected:
 	bitmap_ind16 m_bitmaps[5];
 
 	uint16_t m_protection_data = 0U;
-
-	void priority_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	template<int Layer> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void fake_w(uint8_t data);
-	void fake2_w(uint8_t data);
-
-	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void common_map(address_map &map) ATTR_COLD;
-	void soundmem_map(address_map &map) ATTR_COLD;
 };
 
 // with multiplexed DIP switch
@@ -89,10 +94,6 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
-	required_ioport_array<3> m_in_dip;
-
-	uint8_t m_dip_sel = 0U;
-
 	void aliencha_protection_w(offs_t offset, uint16_t data);
 	uint16_t aliencha_protection_r(offs_t offset);
 
@@ -103,6 +104,10 @@ private:
 	void aliencha_map(address_map &map) ATTR_COLD;
 	void aliencha_soundio_map(address_map &map) ATTR_COLD;
 	void ymf278_map(address_map &map) ATTR_COLD;
+
+	required_ioport_array<3> m_in_dip;
+
+	uint8_t m_dip_sel = 0U;
 };
 
 // with lightguns
@@ -123,17 +128,11 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
-	required_ioport_array<2> m_in_lightgun_x;
-	required_ioport_array<2> m_in_lightgun_y;
-
 	struct lordgun_gun_data
 	{
-		int32_t scr_x, scr_y;
-		uint16_t hw_x, hw_y;
+		int32_t scr_x = 0, scr_y = 0;
+		uint16_t hw_x = 0U, hw_y = 0U;
 	};
-
-	lordgun_gun_data m_gun[2]{};
-	uint8_t m_old = 0U;
 
 	void lordgun_protection_w(offs_t offset, uint16_t data);
 	uint16_t lordgun_protection_r(offs_t offset);
@@ -147,4 +146,12 @@ private:
 	void update_gun(int i);
 	void lordgun_map(address_map &map) ATTR_COLD;
 	void lordgun_soundio_map(address_map &map) ATTR_COLD;
+
+	required_ioport_array<2> m_in_lightgun_x;
+	required_ioport_array<2> m_in_lightgun_y;
+
+	lordgun_gun_data m_gun[2];
+	uint8_t m_old = 0U;
 };
+
+#endif // MAME_IGS_LORDGUN_H
