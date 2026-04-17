@@ -18,18 +18,6 @@ if sys.version_info > (3, ):
 
 # globals
 
-linewidth = 100
-tabwidth = 4
-def mac_out(text):
-    global linewidth
-    temp = text.replace('\t'," "*tabwidth)
-    padding = linewidth-len(temp)
-    if padding < 0:
-        linewidth = len(temp)+5
-        padding = 5
-
-    print(text + " "*padding + "\\")
-
 last_src = ""
 
 def process_srcfile(srcfile):
@@ -61,9 +49,9 @@ def process_entry(srcfile, name, params):
     print("// usage       : {}(name{})".format(name, pusage))
     if len(pauto) > 0:
         print("// auto connect: {}".format(pauto[2:]))
-    mac_out("#define {}(name{})".format(name, ", ..." if pcount > 0 else ""))
+    print("#define {}(name{}) \\".format(name, ", ..." if pcount > 0 else ""))
     if pcount > 0:
-        mac_out("\t__VA_OPT__(CHECK_PARAM_COUNT({}, PNARGS(__VA_ARGS__), {}))".format(name, pcount))
+        print("\t__VA_OPT__(NET_CHECK_PARAM_COUNT({}, PNARGS(__VA_ARGS__), {})) \\".format(name, pcount))
     print("\tNET_REGISTER_DEV({}, name{})".format(name, " __VA_OPT__(,) __VA_ARGS__" if pcount > 0 else ""))
     print("")
 
@@ -114,8 +102,8 @@ def file_header():
     print("")
     print("#include \"../nl_setup.h\"")
     print("")
-    print("#define CHECK_PARAM_COUNT(dev, nargs, N) \\")
-    print("\tstatic_assert(nargs == N, #dev\": Mismatched number of parameters passed, expected \" #N \" but got \" #nargs);")
+    print("#define NET_CHECK_PARAM_COUNT(dev, nargs, N) \\")
+    print("\tstatic_assert(nargs == N, #dev\": Mismatched number of parameters passed, expected \" #N \" but got \" PSTRINGIFY(nargs));")
     print("")
 
 def file_footer():
