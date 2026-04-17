@@ -71,6 +71,7 @@ public:
 		, m_inputs(*this, { "KEYS1", "KEYS2", "DSW", "PUSHBUTTONS" })
 		, m_oki(*this, "oki")
 		, m_hopper(*this, "hopper")
+		, m_p1(*this, "P1")
 
 	{ }
 
@@ -87,15 +88,17 @@ private:
 	void ay1_port_b_w(uint8_t data);
 	void ay2_port_a_w(uint8_t data);
 	void ay2_port_b_w(uint8_t data);
-	void p3_port_w(uint8_t data);
-	void p1_port_w(uint8_t data);
 
+    void p1_port_w(uint8_t data);
+    void p3_port_w(uint8_t data);
+    uint8_t p1_port_r();
 	uint8_t keyboard_r();
 	void mscbar_data_map(address_map &map) ATTR_COLD;
 	void mscbar_program_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_selected_7seg_module = 0;
-    
+    uint8_t m_p1_out = 0xff;
+
     output_finder<32> m_digits;
 	output_finder<34> m_leds;
 	required_ioport_array<4> m_inputs;
@@ -174,11 +177,26 @@ void mscbar_state::ay2_port_b_w(uint8_t data)
 	for (uint8_t i = 0; i < 6; i++)
     m_leds[i + 24] = BIT(~data, i);
 }
+
+uint8_t mscbar_state::p1_port_r()
+{
+	// meter feedback is read here. Fails with error 02 if it doesn't get the expected value.
+	uint8_t const ioport_val = m_p1->read();
+	uint8_t meter_fb = 0x00;
+
+	if (!BIT(m_p1_out, 0))
+		meter_fb = (BIT(m_p1_out, 1) << 4) | (BIT(m_p1_out, 2) << 5);
+
+	return (ioport_val & 0xcf) | meter_fb;
+}
+
 void mscbar_state::p1_port_w(uint8_t data)
 {
 
 m_hopper->motor_w(BIT(data, 3));
-machine().bookkeeping().coin_counter_w(0, data & 0x80);  
+// machine().bookkeeping().coin_counter_w(0, data & 0x80);  
+m_p1_out = data;
+	
 }
 
 void mscbar_state::p3_port_w(uint8_t data)  // bit 3 and 5 are used.
@@ -246,10 +264,14 @@ void mscbar_state::mscbar(machine_config &config)
 	i80c51_device &maincpu(I80C51(config, "maincpu", XTAL(10'738'000))); // actual cpu is at89c51
 	maincpu.set_addrmap(AS_PROGRAM, &mscbar_state::mscbar_program_map);
 	maincpu.set_addrmap(AS_DATA, &mscbar_state::mscbar_data_map);
+
+	
 	maincpu.port_in_cb<1>().set_ioport("P1");
+	maincpu.port_in_cb<1>().set(FUNC(mscbar_state::p1_port_r));
     maincpu.port_out_cb<1>().set(FUNC(mscbar_state::p1_port_w));
-    maincpu.port_out_cb<3>().set(FUNC(mscbar_state::p3_port_w));
 	maincpu.port_in_cb<3>().set_ioport("P3");
+	maincpu.port_out_cb<3>().set(FUNC(mscbar_state::p3_port_w));
+
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
     HOPPER(config, m_hopper, attotime::from_msec(100));
@@ -282,6 +304,8 @@ void mscbar_state::machine_start()
 {
 	m_digits.resolve();
 	m_leds.resolve();
+	save_item(NAME(m_selected_7seg_module));
+	save_item(NAME(m_p1_out));
 
 }
 
