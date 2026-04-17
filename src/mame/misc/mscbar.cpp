@@ -104,6 +104,7 @@ private:
 	required_ioport_array<4> m_inputs;
 	optional_device<okim6295_device> m_oki;
 	required_device<hopper_device> m_hopper;
+	required_ioport m_p1;
 
 };
 
