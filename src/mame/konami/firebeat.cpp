@@ -425,8 +425,6 @@ protected:
 
 	void firebeat_map(address_map &map) ATTR_COLD;
 	void ymz280b_map(address_map &map) ATTR_COLD;
-
-	void init_lights(write32s_delegate out1, write32s_delegate out2, write32s_delegate out3);
 	void lamp_output_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void lamp_output2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void lamp_output3_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -690,6 +688,8 @@ public:
 private:
 	virtual void device_resolve_objects() override ATTR_COLD;
 
+	void firebeat_popn_map(address_map &map) ATTR_COLD;
+
 	void lamp_output_popn_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	output_finder<9> m_button_leds;
@@ -748,8 +748,6 @@ void firebeat_state::init_firebeat()
 	m_cabinet_info = 0;
 
 	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(firebeat_state::security_w)));
-
-	init_lights(write32s_delegate(*this), write32s_delegate(*this), write32s_delegate(*this));
 }
 
 void firebeat_state::firebeat(machine_config &config)
@@ -801,9 +799,12 @@ void firebeat_state::firebeat_map(address_map &map)
 	map(0x7000a000, 0x7000a003).r(FUNC(firebeat_state::extend_board_irq_r));
 	map(0x74000000, 0x740003ff).noprw(); // SPU shared RAM
 	map(0x7d000200, 0x7d00021f).r(FUNC(firebeat_state::cabinet_r));
+	map(0x7d000320, 0x7d000323).w(FUNC(firebeat_state::lamp_output2_w));
+	map(0x7d000324, 0x7d000327).w(FUNC(firebeat_state::lamp_output3_w));
 	map(0x7d000400, 0x7d000401).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
 	map(0x7d000500, 0x7d000501).w(FUNC(firebeat_state::control_w));
 	map(0x7d000800, 0x7d000803).r(FUNC(firebeat_state::input_r));
+	map(0x7d000804, 0x7d000807).w(FUNC(firebeat_state::lamp_output_w));
 	map(0x7d400000, 0x7d5fffff).rw("flash_main", FUNC(fujitsu_29f016a_device::read), FUNC(fujitsu_29f016a_device::write));
 	map(0x7d800000, 0x7d9fffff).rw("flash_snd1", FUNC(fujitsu_29f016a_device::read), FUNC(fujitsu_29f016a_device::write));
 	map(0x7da00000, 0x7dbfffff).rw("flash_snd2", FUNC(fujitsu_29f016a_device::read), FUNC(fujitsu_29f016a_device::write));
@@ -1134,17 +1135,6 @@ static void comm_uart_irq_callback(running_machine &machine, int channel, int va
 
 
 /*****************************************************************************/
-
-void firebeat_state::init_lights(write32s_delegate out1, write32s_delegate out2, write32s_delegate out3)
-{
-	if (out1.isnull()) out1 = write32s_delegate(*this, FUNC(firebeat_state::lamp_output_w));
-	if (out2.isnull()) out2 = write32s_delegate(*this, FUNC(firebeat_state::lamp_output2_w));
-	if (out3.isnull()) out3 = write32s_delegate(*this, FUNC(firebeat_state::lamp_output3_w));
-
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x7d000804, 0x7d000807, out1);
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x7d000320, 0x7d000323, out2);
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x7d000324, 0x7d000327, out3);
-}
 
 void firebeat_state::lamp_output_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
@@ -1483,7 +1473,6 @@ void firebeat_bm3_state::firebeat_bm3(machine_config &config)
 void firebeat_bm3_state::init_bm3()
 {
 	init_firebeat();
-	init_lights(write32s_delegate(*this), write32s_delegate(*this), write32s_delegate(*this));
 
 	// No cabinet info changes for BMIII are needed at this point. All sourced data is for JP region
 	// non-rental firebeat stacks. So, no region-specific overrides are present for BMIII. If we
@@ -1554,6 +1543,8 @@ void firebeat_popn_state::firebeat_popn(machine_config &config)
 {
 	firebeat_spu_base(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_popn_state::firebeat_popn_map);
+
 	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "dvdrom", nullptr, true);
 	m_spuata->irq_handler().set(FUNC(firebeat_popn_state::spu_ata_interrupt));
 	m_spuata->dmarq_handler().set(FUNC(firebeat_popn_state::spu_ata_dmarq));
@@ -1573,7 +1564,6 @@ void firebeat_popn_state::firebeat_popn(machine_config &config)
 void firebeat_popn_state::init_popn_base()
 {
 	init_firebeat();
-	init_lights(write32s_delegate(*this, FUNC(firebeat_popn_state::lamp_output_popn_w)), write32s_delegate(*this), write32s_delegate(*this));
 }
 
 void firebeat_popn_state::init_popn_jp()
@@ -1592,6 +1582,12 @@ void firebeat_popn_state::init_popn_rental()
 	// bits 1 and 2 to designate a rental cabinet. Rental data does not seem to care about
 	// the region bit, so will accept value 0x6 or 0x7. Arbitrarily choose "JP".
 	m_cabinet_info = 0x6;
+}
+
+void firebeat_popn_state::firebeat_popn_map(address_map &map)
+{
+	firebeat_spu_map(map);
+	map(0x7d000804, 0x7d000807).w(FUNC(firebeat_popn_state::lamp_output_popn_w));
 }
 
 void firebeat_popn_state::lamp_output_popn_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -1669,7 +1665,6 @@ void firebeat_ppp_state::firebeat_ppp(machine_config &config)
 void firebeat_ppp_state::init_ppp_base()
 {
 	init_firebeat();
-	init_lights(write32s_delegate(*this, FUNC(firebeat_ppp_state::lamp_output_ppp_w)), write32s_delegate(*this, FUNC(firebeat_ppp_state::lamp_output2_ppp_w)), write32s_delegate(*this, FUNC(firebeat_ppp_state::lamp_output3_ppp_w)));
 }
 
 void firebeat_ppp_state::init_ppp_jp()
@@ -1693,7 +1688,10 @@ void firebeat_ppp_state::init_ppp_overseas()
 void firebeat_ppp_state::firebeat_ppp_map(address_map &map)
 {
 	firebeat_map(map);
+	map(0x7d000320, 0x7d000323).w(FUNC(firebeat_ppp_state::lamp_output2_ppp_w));
+	map(0x7d000324, 0x7d000327).w(FUNC(firebeat_ppp_state::lamp_output3_ppp_w));
 	map(0x7d000340, 0x7d00035f).r(FUNC(firebeat_ppp_state::sensor_r));
+	map(0x7d000804, 0x7d000807).w(FUNC(firebeat_ppp_state::lamp_output_ppp_w));
 }
 
 uint16_t firebeat_ppp_state::sensor_r(offs_t offset)
@@ -1815,7 +1813,6 @@ void firebeat_kbm_state::device_resolve_objects()
 void firebeat_kbm_state::init_kbm_base()
 {
 	init_firebeat();
-	init_lights(write32s_delegate(*this, FUNC(firebeat_kbm_state::lamp_output_kbm_w)), write32s_delegate(*this), write32s_delegate(*this));
 	init_keyboard();
 
 //  pc16552d_init(machine(), 1, 24000000, midi_uart_irq_callback, 0);     // MIDI UART
@@ -1919,6 +1916,7 @@ void firebeat_kbm_state::firebeat_kbm_map(address_map &map)
 	firebeat_map(map);
 	map(0x70000000, 0x70000fff).rw(FUNC(firebeat_kbm_state::midi_uart_r), FUNC(firebeat_kbm_state::midi_uart_w)).umask32(0xff000000);
 	map(0x70008000, 0x7000800f).r(FUNC(firebeat_kbm_state::keyboard_wheel_r));
+	map(0x7d000804, 0x7d000807).w(FUNC(firebeat_kbm_state::lamp_output_kbm_w));
 	map(0x7e800100, 0x7e8001ff).rw(m_gcu_sub, FUNC(k057714_device::read), FUNC(k057714_device::write));
 }
 
