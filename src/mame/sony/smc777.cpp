@@ -19,6 +19,7 @@ TODO:
 
 #include "emu.h"
 
+#include "bus/msx/ctrl/ctrl.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
@@ -69,6 +70,8 @@ public:
 		, m_beeper(*this, "beeper")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		// "JOY STICK#" dual DE-9 ports, on the right side of body chassis (near the volume knob)
+		, m_joystick_port(*this, "joystick%u", 1U)
 	{ }
 
 	void smc777(machine_config &config);
@@ -102,7 +105,7 @@ private:
 	void sound_out_w(int state);
 	void printer_strb_w(int state);
 	void cas_out_w(int state);
-	void color_mode_w(uint8_t data);
+	void color_mode_w(offs_t offset, uint8_t data);
 	void ramdac_w(offs_t offset, uint8_t data);
 	uint8_t gcw_r();
 	void gcw_w(uint8_t data);
@@ -136,6 +139,7 @@ private:
 	required_device<beep_device> m_beeper;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device_array<msx_general_purpose_port_device, 2> m_joystick_port;
 
 	uint8_t *m_ipl_rom = nullptr;
 	std::unique_ptr<uint8_t[]> m_work_ram;
@@ -169,62 +173,67 @@ private:
 
 void smc777_state::video_start()
 {
+	m_vram = make_unique_clear<uint8_t[]>(0x800);
+	m_attr = make_unique_clear<uint8_t[]>(0x800);
+	m_gvram = make_unique_clear<uint8_t[]>(0x8000);
+	m_pcg = make_unique_clear<uint8_t[]>(0x800);
+
+	save_pointer(NAME(m_vram), 0x800);
+	save_pointer(NAME(m_attr), 0x800);
+	save_pointer(NAME(m_gvram), 0x8000);
+	save_pointer(NAME(m_pcg), 0x800);
+	save_item(NAME(m_crtc_vreg));
 }
 
+// TODO: cleanup, move to device, honor cliprect
 uint32_t smc777_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t count;
-
-//  popmessage("%d %d %d %d",mc6845_v_char_total,mc6845_v_total_adj,mc6845_v_display,mc6845_v_sync_pos);
-
 	bitmap.fill(m_palette->pen(m_backdrop_pen), cliprect);
 
-	int x_width = ((m_display_reg & 0x80) >> 7);
+	int x_width = BIT(m_display_reg, 7);
 
-	count = 0x0000;
+	const u16 bitmap_pitch = mc6845_h_display * 2;
 
-	for(int yi=0;yi<8;yi++)
+	for(int y = 0; y < mc6845_v_display; y++)
 	{
-		for(int y=0;y<200;y+=8)
+		// comp2:HETZER uses start address for double buffering
+		const u32 base_address = y * bitmap_pitch + mc6845_start_addr * 2;
+		for(int x = 0; x < bitmap_pitch; x++)
 		{
-			for(int x=0;x<160;x++)
+			for(int yi = 0; yi < 8; yi++)
 			{
-				uint16_t color = (m_gvram[count] & 0xf0) >> 4;
+				u8 color = (m_gvram[base_address + x + yi * 0x1000] & 0xf0) >> 4;
 
-				/* todo: clean this up! */
 				//if(x_width)
 				{
-					bitmap.pix(y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = m_palette->pen(color);
-					bitmap.pix(y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = m_palette->pen(color);
+					bitmap.pix(y * 8 + yi + CRTC_MIN_Y, x * 4 + 0 + CRTC_MIN_X) = m_palette->pen(color);
+					bitmap.pix(y * 8 + yi + CRTC_MIN_Y, x * 4 + 1 + CRTC_MIN_X) = m_palette->pen(color);
 				}
 				//else
 				//{
 				//  bitmap.pix(y+yi+CRTC_MIN_Y, x*2+0+CRTC_MIN_X) = m_palette->pen(color);
 				//}
 
-				color = (m_gvram[count] & 0x0f) >> 0;
+				color = (m_gvram[base_address + x + yi * 0x1000] & 0x0f) >> 0;
 				//if(x_width)
 				{
-					bitmap.pix(y+yi+CRTC_MIN_Y, x*4+2+CRTC_MIN_X) = m_palette->pen(color);
-					bitmap.pix(y+yi+CRTC_MIN_Y, x*4+3+CRTC_MIN_X) = m_palette->pen(color);
+					bitmap.pix(y * 8 + yi + CRTC_MIN_Y, x * 4 + 2 + CRTC_MIN_X) = m_palette->pen(color);
+					bitmap.pix(y * 8 + yi + CRTC_MIN_Y, x * 4 + 3 + CRTC_MIN_X) = m_palette->pen(color);
 				}
 				//else
 				//{
 				//  bitmap.pix(y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = m_palette->pen(color);
 				//}
 
-				count++;
-
 			}
 		}
-		count+= 0x60;
 	}
 
-	count = 0x0000;
+	u16 count = 0x0000;
 
-	for(int y=0;y<25;y++)
+	for(int y = 0; y < mc6845_v_display; y++)
 	{
-		for(int x=0;x<80/(x_width+1);x++)
+		for(int x = 0; x < mc6845_h_display / (x_width + 1); x++)
 		{
 			/*
 			-x-- ---- blink
@@ -249,21 +258,21 @@ uint32_t smc777_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			if(blink && m_screen->frame_number() & 0x10) //blinking, used by Dragon's Alphabet
 				color = bk_pen;
 
-			for(int yi=0;yi<8;yi++)
+			for(int yi = 0; yi < 8; yi++)
 			{
-				for(int xi=0;xi<8;xi++)
+				for(int xi = 0; xi < 8; xi++)
 				{
-					int pen = ((m_pcg[tile*8+yi]>>(7-xi)) & 1) ? (color+m_pal_mode) : bk_pen;
+					int pen = ((m_pcg[tile * 8 + yi] >> (7 - xi)) & 1) ? (color + m_pal_mode) : bk_pen;
 
 					if (pen != -1)
 					{
 						if(x_width)
 						{
-							bitmap.pix(y*8+CRTC_MIN_Y+yi, (x*8+xi)*2+0+CRTC_MIN_X) = m_palette->pen(pen);
-							bitmap.pix(y*8+CRTC_MIN_Y+yi, (x*8+xi)*2+1+CRTC_MIN_X) = m_palette->pen(pen);
+							bitmap.pix(y * 8 + CRTC_MIN_Y + yi, (x * 8 + xi) * 2 + 0 + CRTC_MIN_X) = m_palette->pen(pen);
+							bitmap.pix(y * 8 + CRTC_MIN_Y + yi, (x * 8 + xi) * 2 + 1 + CRTC_MIN_X) = m_palette->pen(pen);
 						}
 						else
-							bitmap.pix(y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = m_palette->pen(pen);
+							bitmap.pix(y * 8 + CRTC_MIN_Y + yi, x * 8 + CRTC_MIN_X + xi) = m_palette->pen(pen);
 					}
 				}
 			}
@@ -276,20 +285,20 @@ uint32_t smc777_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(m_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(m_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+					case 0x40: if(m_screen->frame_number() & 0x10) { cursor_on = 1; } break; // fast blink
+					case 0x60: if(m_screen->frame_number() & 0x20) { cursor_on = 1; } break; // slow blink
 				}
 
 				if(cursor_on)
 				{
-					for(int yc=0;yc<(8-(mc6845_cursor_y_start & 7));yc++)
+					for(int yc = 0; yc < (8 - (mc6845_cursor_y_start & 7)); yc++)
 					{
-						for(int xc=0;xc<8;xc++)
+						for(int xc = 0; xc < 8; xc++)
 						{
 							if(x_width)
 							{
-								bitmap.pix(y*8+CRTC_MIN_Y-yc+7, (x*8+xc)*2+0+CRTC_MIN_X) = m_palette->pen(0x7);
-								bitmap.pix(y*8+CRTC_MIN_Y-yc+7, (x*8+xc)*2+1+CRTC_MIN_X) = m_palette->pen(0x7);
+								bitmap.pix(y * 8 + CRTC_MIN_Y - yc + 7, (x * 8 + xc) * 2 + 0 + CRTC_MIN_X) = m_palette->pen(0x7);
+								bitmap.pix(y * 8 + CRTC_MIN_Y - yc + 7, (x * 8 + xc) * 2 + 1 + CRTC_MIN_X) = m_palette->pen(0x7);
 							}
 							else
 								bitmap.pix(y*8+CRTC_MIN_Y-yc+7, x*8+CRTC_MIN_X+xc) = m_palette->pen(0x7);
@@ -298,7 +307,7 @@ uint32_t smc777_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				}
 			}
 
-			(m_display_reg & 0x80) ? count+=2 : count++;
+			count += x_width + 1;
 		}
 	}
 
@@ -401,55 +410,6 @@ void smc777_state::fbuf_w(offs_t offset, uint8_t data)
 	m_gvram[vram_index] = data;
 }
 
-
-/***********************************************************
-
-    Quickload
-
-    This loads a .COM file to address 0x100 then jumps
-    there. Sometimes .COM has been renamed to .CPM to
-    prevent windows going ballistic. These can be loaded
-    as well.
-
-************************************************************/
-
-QUICKLOAD_LOAD_MEMBER(smc777_state::quickload_cb)
-{
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-
-	// Avoid loading a program if CP/M-80 is not in memory
-	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
-	{
-		machine_reset();
-		return std::make_pair(image_error::UNSUPPORTED, "CP/M must already be running");
-	}
-
-	// Check for sufficient RAM based on position of CPM
-	const int mem_avail = 256 * prog_space.read_byte(7) + prog_space.read_byte(6) - 512;
-	if (mem_avail < image.length())
-		return std::make_pair(image_error::UNSPECIFIED, "Insufficient memory available");
-
-	// Load image to the TPA (Transient Program Area)
-	uint16_t quickload_size = image.length();
-	for (uint16_t i = 0; i < quickload_size; i++)
-	{
-		uint8_t data;
-		if (image.fread(&data, 1) != 1)
-			return std::make_pair(image_error::UNSPECIFIED, "Problem reading the image at offset " + std::to_string(i));
-		prog_space.write_byte(i + 0x100, data);
-	}
-
-	// clear out command tail
-	prog_space.write_byte(0x80, 0);
-	prog_space.write_byte(0x81, 0);
-
-	// Roughly set SP basing on the BDOS position
-	m_maincpu->set_state_int(Z80_SP, mem_avail + 384);
-	m_maincpu->set_pc(0x100); // start program
-
-	return std::make_pair(std::error_condition(), std::string());
-}
-
 uint8_t smc777_state::fdc_r(offs_t offset)
 {
 	return m_fdc->read(offset) ^ 0xff;
@@ -549,37 +509,35 @@ void smc777_state::border_col_w(uint8_t data)
 	m_backdrop_pen = data & 0xf;
 }
 
-
+/*
+ * RES     x--- ---- Power On bit (1=reset switch)
+ * HiZ     -x-- ---- [SMC-70] no drive (always '1'?)
+ * LPH     --x- ---- [SMC-70] light pen H position
+ * CP      ---x ---- [SMC-777] color board (active low)
+ * LPV     ---x x--- [SMC-70] light pen V position
+ * ID      ---- -x-- 0=SMC-777 1=SMC-70
+ * MD      ---- --xx [SMC-70] boot mode (00=DISK; 10=ROM; 11=EXT)
+ */
 uint8_t smc777_state::io_status_1c_r()
 {
-	/*
-	 * RES     x--- ---- Power On bit (1=reset switch)
-	 * HiZ     -x-- ---- [SMC-70] no drive (always '1'?)
-	 * LPH     --x- ---- [SMC-70] light pen H position
-	 * CP      ---x ---- [SMC-777] color board (active low)
-	 * LPV     ---x x--- [SMC-70] light pen V position
-	 * ID      ---- -x-- 0=SMC-777 1=SMC-70
-	 * MD      ---- --xx [SMC-70] boot mode (00=DISK; 10=ROM; 11=EXT)
-	 */
 	logerror("System R\n");
 
 	return 0;
 }
 
+/*
+ * TCIN    x--- ---- CMT read data
+ * HiZ     -x-- ---- [SMC-70] no drive (always '1'?)
+ * LPIN    --x- ---- [SMC-70] light pen input
+ * PR_BUSY ---x ---- printer busy
+ * PR_ACK  ---- x--- printer ACK
+ * ID      ---- -x-- 0=SMC-777 1=SMC-70
+ * MD      ---- --xx [SMC-70] boot mode (00=DISK; 10=ROM; 11=EXT)
+ */
 uint8_t smc777_state::io_status_1d_r()
 {
-	/*
-	 * TCIN    x--- ---- CMT read data
-	 * HiZ     -x-- ---- [SMC-70] no drive (always '1'?)
-	 * LPIN    --x- ---- [SMC-70] light pen input
-	 * PR_BUSY ---x ---- printer busy
-	 * PR_ACK  ---- x--- printer ACK
-	 * ID      ---- -x-- 0=SMC-777 1=SMC-70
-	 * MD      ---- --xx [SMC-70] boot mode (00=DISK; 10=ROM; 11=EXT)
-	 */
 	return 0;
 }
-
 
 void smc777_state::io_control_w(uint8_t data)
 {
@@ -629,17 +587,18 @@ void smc777_state::cas_out_w(int state)
 	logerror("%s: Cassette write %d\n", machine().describe_context(), state);
 }
 
-void smc777_state::color_mode_w(uint8_t data)
+/*
+ * ---x -111 gfx palette select
+ * ---x -110 text palette select
+ * ---x -101 joy 2 out
+ * ...
+ * ---x -000 joy 2 out
+ */
+void smc777_state::color_mode_w(offs_t offset, uint8_t data)
 {
-	/*
-	 * ---x -111 gfx palette select
-	 * ---x -110 text palette select
-	 * ---x -101 joy 2 out
-	 * ...
-	 * ---x -000 joy 2 out
-	 */
 	switch(data & 0x07)
 	{
+		case 0x05: m_joystick_port[BIT(offset, 8)]->pin_8_w(BIT(data, 4)); break;
 		case 0x06: m_pal_mode = (data & 0x10) ^ 0x10; break;
 		default: logerror("Color FF %02x\n",data); break;
 	}
@@ -773,8 +732,9 @@ void smc777_state::io_map(address_map &map)
 //  map(0x40, 0x47) ieee-488 / TMS9914A I/F
 	map(0x44, 0x44).mirror(0xff00).portr("GPDSW"); // normally unmapped in GPIB interface
 //  map(0x48, 0x49) hdd (winchester)
-	// TODO: address bit 8 selects joy port 2
-	map(0x51, 0x51).mirror(0xff00).portr("JOY_1P").w(FUNC(smc777_state::color_mode_w));
+	map(0x51, 0x51).select(0xff00).lr8(NAME([this] (offs_t offset) {
+		return m_joystick_port[BIT(offset, 8)]->read() & 0x7f;
+	})).w(FUNC(smc777_state::color_mode_w));
 	map(0x52, 0x52).select(0xff00).w(FUNC(smc777_state::ramdac_w));
 	map(0x53, 0x53).mirror(0xff00).w("sn1", FUNC(sn76489a_device::write));
 //  map(0x54, 0x59) vrt controller
@@ -910,16 +870,6 @@ static INPUT_PORTS_START( smc777 )
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_")
 	#endif
 
-	PORT_START("JOY_1P")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_UNKNOWN ) //status?
-
 	PORT_START("GPDSW")
 	PORT_DIPNAME( 0x01, 0x00, "GPDSW" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -1013,8 +963,7 @@ static const uint8_t smc777_keytable[2][0xa0] =
 		0x38, 0x39, 0x3b, 0x5c, 0x2c, 0x2e, 0x2f, 0xff, /* 8 - 9 */
 		0x0d, 0x20, 0x08, 0x09, 0x1b, 0x0f, 0x11, 0xff,
 		0x17, 0x1c, 0x16, 0x19, 0x14, 0x0e, 0x12, 0x03,
-		0x01, 0x02, 0x04, 0x06, 0x0b, 0xff, 0xff, 0xff,
-
+		0x01, 0x02, 0x04, 0x06, 0x0b, 0xff, 0xff, 0xff
 	},
 	/* shift */
 	{
@@ -1028,19 +977,19 @@ static const uint8_t smc777_keytable[2][0xa0] =
 		0x2a, 0x28, 0x3a, 0x7c, 0x3c, 0x3e, 0x3f, 0xff,
 		0x0d, 0x20, 0x08, 0x09, 0x1b, 0x0f, 0x11, 0xff,
 		0x17, 0x1c, 0x16, 0x19, 0x14, 0x0e, 0x12, 0x03,
-		0x15, 0x18, 0x12, 0x05, 0x03, 0xff, 0xff, 0xff, /* F1 - F5 */
+		0x15, 0x18, 0x12, 0x05, 0x03, 0xff, 0xff, 0xff /* F1 - F5 */
 	}
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(smc777_state::keyboard_callback)
 {
 	static const char *const portnames[11] = { "key0","key1","key2","key3","key4","key5","key6","key7", "key8", "key9", "keya" };
-	int i,port_i,scancode;
+	int i, port_i, scancode;
 	uint8_t shift_mod = ioport("key_mod")->read() & 1;
 	uint8_t kana_mod = ioport("key_mod")->read() & 0x10;
 	scancode = 0;
 
-	for(port_i=0;port_i<11;port_i++)
+	for(port_i = 0; port_i < 11; port_i++)
 	{
 		for(i=0;i<8;i++)
 		{
@@ -1072,16 +1021,8 @@ void smc777_state::machine_start()
 {
 	m_ipl_rom = memregion("ipl")->base();
 	m_work_ram = make_unique_clear<uint8_t[]>(0x10000);
-	m_vram = make_unique_clear<uint8_t[]>(0x800);
-	m_attr = make_unique_clear<uint8_t[]>(0x800);
-	m_gvram = make_unique_clear<uint8_t[]>(0x8000);
-	m_pcg = make_unique_clear<uint8_t[]>(0x800);
 
 	save_pointer(NAME(m_work_ram), 0x10000);
-	save_pointer(NAME(m_vram), 0x800);
-	save_pointer(NAME(m_attr), 0x800);
-	save_pointer(NAME(m_gvram), 0x8000);
-	save_pointer(NAME(m_pcg), 0x800);
 
 	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, smc777_charlayout, m_pcg.get(), 0, 8, 0));
 }
@@ -1117,17 +1058,63 @@ void smc777_state::vsync_w(int state)
 {
 	if (state && m_vsync_ief)
 	{
-		m_maincpu->set_input_line(0,HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 		m_vsync_idf = true;
 	}
 }
 
+/***********************************************************
+
+    Quickload
+
+    This loads a .COM file to address 0x100 then jumps
+    there. Sometimes .COM has been renamed to .CPM to
+    prevent windows going ballistic. These can be loaded
+    as well.
+
+************************************************************/
+
+QUICKLOAD_LOAD_MEMBER(smc777_state::quickload_cb)
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+
+	// Avoid loading a program if CP/M-80 is not in memory
+	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
+	{
+		machine_reset();
+		return std::make_pair(image_error::UNSUPPORTED, "CP/M must already be running");
+	}
+
+	// Check for sufficient RAM based on position of CPM
+	const int mem_avail = 256 * prog_space.read_byte(7) + prog_space.read_byte(6) - 512;
+	if (mem_avail < image.length())
+		return std::make_pair(image_error::UNSPECIFIED, "Insufficient memory available");
+
+	// Load image to the TPA (Transient Program Area)
+	uint16_t quickload_size = image.length();
+	for (uint16_t i = 0; i < quickload_size; i++)
+	{
+		uint8_t data;
+		if (image.fread(&data, 1) != 1)
+			return std::make_pair(image_error::UNSPECIFIED, "Problem reading the image at offset " + std::to_string(i));
+		prog_space.write_byte(i + 0x100, data);
+	}
+
+	// clear out command tail
+	prog_space.write_byte(0x80, 0);
+	prog_space.write_byte(0x81, 0);
+
+	// Roughly set SP basing on the BDOS position
+	m_maincpu->set_state_int(Z80_SP, mem_avail + 384);
+	m_maincpu->set_pc(0x100); // start program
+
+	return std::make_pair(std::error_condition(), std::string());
+}
 
 static void smc777_floppies(device_slot_interface &device)
 {
 	device.option_add("ssdd", FLOPPY_35_SSDD);
 }
-
 
 void smc777_state::smc777(machine_config &config)
 {
@@ -1181,6 +1168,12 @@ void smc777_state::smc777(machine_config &config)
 
 	SOFTWARE_LIST(config, "flop_list").set_original("smc777");
 	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(smc777_state::quickload_cb));
+
+	// No clue about bundled defaults but:
+	// - dragon expects joystick in port 2
+	// - comp2:SMCPAINT expects mouse in port 1
+	MSX_GENERAL_PURPOSE_PORT(config, m_joystick_port[0], msx_general_purpose_port_devices, "mouse");
+	MSX_GENERAL_PURPOSE_PORT(config, m_joystick_port[1], msx_general_purpose_port_devices, "joystick");
 
 	SPEAKER(config, "mono").front_center();
 

@@ -7,18 +7,24 @@ F1 Dream       (C) 1988 Capcom
 
 cloned hardware:
 Pushman        (C) 1990 Comad
-Bouncing Balls (c) 1991 Comad
+Bouncing Balls (C) 1991 Comad
 
 Please contact Phil Stroffolino (phil@maya.com) if there are any questions
 regarding this driver.
 
+Video timing: measured 60.08Hz on Tiger Road, and 60.096Hz with 260 scanlines
+on F1 Dream. Pixel clock is 6MHz like other Capcom games.
+
 TODO:
-- F1 Dream throws an address error if player wins all the races (i.e. when the
-  game is supposed to give an ending):
+- F1 Dream throws an address error if player wins all the races in the highest
+  tier (when the game is supposed to show the ranking and highscore table):
   010C68: 102E 001C      move.b  ($1c,A6), D0       ; reads 0xf from work RAM (misaligned)
   010C6C: 207B 000E      movea.l ($e,PC,D0.w), A0   ; table from 0x10c7c onward
   010C70: 4E90           jsr     (A0)               ; throws address error here
-  None of the available 5 vectors seems to fit here, btanb?
+  None of the available 5 vectors seems to fit here.
+  A full playthrough takes about half an hour. A faster way to test it is by
+  enabling all the cheats while running MAME unthrottled, and 'play' by looking
+  at the minimap. This comes with the risk that cheats might affect the bug.
 
 BTANB:
 - race track fg tiles have priority over minimap in f1dream
@@ -32,7 +38,7 @@ Memory Overview:
     0xfe4002    protection (F1 Dream only)
     0xfe8000    scroll registers
     0xff8200    palette
-    0xffC000    working RAM
+    0xffc000    working RAM
 
 **************************************************************************
 
@@ -57,11 +63,25 @@ single plane board.
 #include "emu.h"
 #include "tigeroad.h"
 
-#include "machine/gen_latch.h"
-
 #include "screen.h"
 #include "speaker.h"
 
+
+void f1dream_state::machine_start()
+{
+	save_item(NAME(m_mcu_p3));
+	save_item(NAME(m_soundlatch_data));
+}
+
+void pushman_state::machine_start()
+{
+	save_item(NAME(m_host_semaphore));
+	save_item(NAME(m_mcu_semaphore));
+	save_item(NAME(m_host_latch));
+	save_item(NAME(m_mcu_latch));
+	save_item(NAME(m_mcu_output));
+	save_item(NAME(m_mcu_latch_ctl));
+}
 
 void tigeroad_state::msm5205_w(u8 data)
 {
@@ -71,108 +91,114 @@ void tigeroad_state::msm5205_w(u8 data)
 	m_msm->data_w(data & 0xf);
 }
 
-void f1dream_state::out3_w(u8 data)
+TIMER_DEVICE_CALLBACK_MEMBER(tigeroad_state::scanline)
 {
-	if ((m_old_p3 & 0x20) != (data & 0x20))
+	const int scanline = param;
+
+	// vblank interrupt is on IRQ2
+	if (scanline == 240)
+		m_maincpu->set_input_line(2, HOLD_LINE);
+
+	// IRQ4 112 scanlines before IRQ2
+	if (scanline == 128)
+		m_maincpu->set_input_line(4, HOLD_LINE);
+}
+
+
+// F1 Dream protection
+
+u8 f1dream_state::mcu_shared_r(offs_t offset)
+{
+	if (!BIT(m_mcu_p3, 5))
+		return m_maincpu->space(AS_PROGRAM).read_byte(0xfffe0 | offset << 1 | 1);
+	else
+		return 0xff;
+}
+
+void f1dream_state::mcu_shared_w(offs_t offset, u8 data)
+{
+	if (!BIT(m_mcu_p3, 5))
+		m_maincpu->space(AS_PROGRAM).write_byte(0xfffe0 | offset << 1 | 1, data);
+}
+
+void f1dream_state::mcu_out3_w(u8 data)
+{
+	// toggles at the end of interrupt
+	if (BIT(m_mcu_p3, 0) && !BIT(data, 0))
 	{
-		// toggles at the start and end of interrupt
+		m_mcu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
+		m_maincpu->resume(SUSPEND_REASON_HALT);
 	}
 
-	if ((m_old_p3 & 0x01) != (data & 0x01))
-	{
-		// toggles at the end of interrupt
-		if (!(data & 0x01))
-		{
-			m_maincpu->resume(SUSPEND_REASON_HALT);
-		}
-	}
+	if (BIT(m_mcu_p3, 6) && !BIT(data, 6))
+		m_soundlatch->write(m_soundlatch_data);
 
-	m_old_p3 = data;
+	m_mcu_p3 = data;
 }
 
 void f1dream_state::to_mcu_w(u16 data)
 {
-	m_mcu->set_input_line(MCS51_INT0_LINE, HOLD_LINE);
+	m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
 
-	/* after triggering this address there are one or two NOPs in the 68k code, then it expects the response to be ready
-	   the MCU isn't that fast, so either the CPU is suspended on write, or when bit 0x20 of MCU Port 3 toggles in the
-	   MCU interrupt code, however no combination of increasing the clock / boosting interleave etc. allows the MCU code
-	   to get there in time before the 68k is already expecting a result */
+	// after triggering this address there are one or two NOPs in the 68k code, then it expects the response to be ready
 	m_maincpu->suspend(SUSPEND_REASON_HALT, true);
+
+	// enough time for the MCU interrupt routine to finish
+	machine().scheduler().perfect_quantum(attotime::from_usec(500));
 }
+
 
 /***************************************************************************/
 
 void tigeroad_state::main_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();
+	map.global_mask(0xfffff);
+	map(0x00000, 0x3ffff).rom();
 
-	map(0xfe0800, 0xfe0cff).ram().share("spriteram");
-	map(0xfe0d00, 0xfe1807).ram();     // still part of OBJ RAM
-	map(0xfe4000, 0xfe4001).portr("P1_P2");
-	map(0xfe4000, 0xfe4000).w(FUNC(tigeroad_state::videoctrl_w));   // char bank, coin counters, + ?
-	map(0xfe4002, 0xfe4003).portr("SYSTEM");
-	map(0xfe4002, 0xfe4002).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xfe4004, 0xfe4005).portr("DSW");
-	map(0xfe8000, 0xfe8003).w(FUNC(tigeroad_state::scroll_w));
-	map(0xfe800e, 0xfe800f).nopw();    // fe800e = watchdog or IRQ acknowledge
-	map(0xfec000, 0xfec7ff).ram().w(FUNC(tigeroad_state::videoram_w)).share("videoram");
+	// valid sprite data from 0x800-0xcff (sprite DMA only copies that section)
+	map(0xe0000, 0xe07ff).mirror(0x3000).ram();
+	map(0xe0800, 0xe0cff).mirror(0x3000).ram().share("spriteram");
+	map(0xe0d00, 0xe0fff).mirror(0x3000).ram();
 
-	map(0xff8000, 0xff87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xffc000, 0xffffff).ram().share("ram16");
-}
+	map(0xe4000, 0xe4001).portr("P1_P2");
+	map(0xe4000, 0xe4000).w(FUNC(tigeroad_state::videoctrl_w)); // char bank, coin counters, + ?
+	map(0xe4002, 0xe4003).portr("SYSTEM");
+	map(0xe4002, 0xe4002).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xe4004, 0xe4005).portr("DSW");
+	map(0xe8000, 0xe8003).w(FUNC(tigeroad_state::scroll_w));
+	map(0xe800e, 0xe800f).w(m_spriteram, FUNC(buffered_spriteram16_device::write)); // should only work in vblank
+	map(0xec000, 0xec7ff).ram().w(FUNC(tigeroad_state::videoram_w)).share("videoram");
 
-
-u8 f1dream_state::mcu_shared_r(offs_t offset)
-{
-	u8 ret = m_ram16[(0x3fe0 / 2) + offset];
-	return ret;
-}
-
-void f1dream_state::mcu_shared_w(offs_t offset, u8 data)
-{
-	m_ram16[(0x3fe0 / 2) + offset] = (m_ram16[(0x3fe0 / 2) + offset] & 0xff00) | data;
+	map(0xf8000, 0xf87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xfc000, 0xfffff).ram();
 }
 
 void f1dream_state::f1dream_map(address_map &map)
 {
 	main_map(map);
-	map(0xfe4002, 0xfe4003).portr("SYSTEM").w(FUNC(f1dream_state::to_mcu_w));
+	map(0xe4002, 0xe4003).w(FUNC(f1dream_state::to_mcu_w));
 }
 
 void f1dream_state::f1dream_mcu_data(address_map &map)
 {
+	// never accesses under 0x7f0
 	map(0x7f0, 0x7ff).rw(FUNC(f1dream_state::mcu_shared_r), FUNC(f1dream_state::mcu_shared_w));
 }
-
 
 void pushman_state::pushman_map(address_map &map)
 {
 	main_map(map);
 
-	map(0x060000, 0x060007).r(FUNC(pushman_state::mcu_comm_r));
-	map(0x060000, 0x060003).w(FUNC(pushman_state::pushman_mcu_comm_w));
+	map(0x60000, 0x60007).r(FUNC(pushman_state::mcu_comm_r));
+	map(0x60000, 0x60003).w(FUNC(pushman_state::pushman_mcu_comm_w));
 }
 
 void pushman_state::bballs_map(address_map &map)
 {
-	map.global_mask(0xfffff);
-	map(0x00000, 0x3ffff).rom();
-	map(0x60000, 0x60007).r(FUNC(pushman_state::mcu_comm_r));
-	map(0x60000, 0x60001).w(FUNC(pushman_state::bballs_mcu_comm_w));
-	// are these mirror addresses or does this PCB have a different addressing?
-	map(0xe0800, 0xe17ff).ram().share("spriteram");
-	map(0xe4000, 0xe4001).portr("P1_P2");
-	map(0xe4000, 0xe4000).w(FUNC(pushman_state::videoctrl_w));
-	map(0xe4002, 0xe4003).portr("SYSTEM");
-	map(0xe4002, 0xe4002).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xe4004, 0xe4005).portr("DSW");
-	map(0xe8000, 0xe8003).w(FUNC(pushman_state::scroll_w));
-	map(0xe800e, 0xe800f).nopw(); // ?
-	map(0xec000, 0xec7ff).ram().w(FUNC(pushman_state::videoram_w)).share("videoram");
+	pushman_map(map);
 
-	map(0xf8000, 0xf87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xfc000, 0xfffff).ram().share("ram16");
+	map(0x60000, 0x60001).w(FUNC(pushman_state::bballs_mcu_comm_w));
+	map(0x60002, 0x60003).unmapw();
 }
 
 // Capcom games ONLY
@@ -182,7 +208,7 @@ void tigeroad_state::sound_map(address_map &map)
 	map(0x8000, 0x8001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xa000, 0xa001).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xc000, 0xc7ff).ram();
-	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
 void tigeroad_state::sound_port_map(address_map &map)
@@ -209,7 +235,7 @@ void tigeroad_state::comad_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
 void tigeroad_state::comad_sound_io_map(address_map &map)
@@ -247,7 +273,7 @@ static INPUT_PORTS_START( tigeroad )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2 )
 
@@ -323,7 +349,7 @@ static INPUT_PORTS_START( toramich )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2 )
 
@@ -400,7 +426,7 @@ static INPUT_PORTS_START( f1dream )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2 )
 
@@ -626,22 +652,18 @@ void tigeroad_state::tigeroad(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, 10_MHz_XTAL); // verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &tigeroad_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tigeroad_state::irq2_line_hold));
 
 	Z80(config, m_audiocpu, 3.579545_MHz_XTAL); // verified on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tigeroad_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &tigeroad_state::sound_port_map);
 
-	// IRQs are triggered by the YM2203
+	TIMER(config, "scantimer").configure_scanline(FUNC(tigeroad_state::scanline), "screen", 128, 112);
 
 	// video hardware
 	BUFFERED_SPRITERAM16(config, "spriteram");
 
-	// Timings may be different, driver originally had 60.08Hz vblank.
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 260, 16, 240);
 	screen.set_screen_update(FUNC(tigeroad_state::screen_update));
-	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tigeroad);
@@ -655,8 +677,7 @@ void tigeroad_state::tigeroad(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
-	GENERIC_LATCH_8(config, "soundlatch2");
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	ym2203_device &ym1(YM2203(config, "ym1", 3.579545_MHz_XTAL)); // verified on pcb
 	ym1.irq_handler().set_inputline(m_audiocpu, 0);
@@ -666,21 +687,21 @@ void tigeroad_state::tigeroad(machine_config &config)
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-void f1dream_state::machine_start()
-{
-	save_item(NAME(m_old_p3));
-}
-
 void f1dream_state::f1dream(machine_config &config)
 {
 	tigeroad(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &f1dream_state::f1dream_map);
 
-	I8751(config, m_mcu, 10_MHz_XTAL); // 8MHz rated chip, 10MHz or 6MHz(24/4)?
+	I8751(config, m_mcu, 24_MHz_XTAL / 4); // 6MHz
 	m_mcu->set_addrmap(AS_DATA, &f1dream_state::f1dream_mcu_data);
-	m_mcu->port_out_cb<1>().set("soundlatch", FUNC(generic_latch_8_device::write));
-	m_mcu->port_out_cb<3>().set(FUNC(f1dream_state::out3_w));
+	m_mcu->port_out_cb<1>().set([this](u8 data) { m_soundlatch_data = data; });
+	m_mcu->port_out_cb<3>().set(FUNC(f1dream_state::mcu_out3_w));
+
+	// make sure audiocpu is CPU #3, so soundlatch gets synchronized correctly
+	config.device_remove("audiocpu");
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &f1dream_state::sound_map);
 }
 
 // same as above but with additional Z80 for samples playback
@@ -689,11 +710,15 @@ void tigeroad_state::toramich(machine_config &config)
 	tigeroad(config);
 
 	// basic machine hardware
+	m_audiocpu->set_addrmap(AS_IO, &tigeroad_state::sound_port_map);
+
 	z80_device &sample(Z80(config, "sample", 3.579545_MHz_XTAL));
 	sample.set_addrmap(AS_PROGRAM, &tigeroad_state::sample_map);
 	sample.set_addrmap(AS_IO, &tigeroad_state::sample_port_map);
 
 	// sound hardware
+	GENERIC_LATCH_8(config, "soundlatch2");
+
 	MSM5205(config, m_msm, 384_kHz_XTAL);
 	m_msm->vck_callback().set_inputline("sample", 0, HOLD_LINE);
 	m_msm->set_prescaler_selector(msm5205_device::S96_4B); // 4 KHz
@@ -705,21 +730,19 @@ void tigeroad_state::f1dream_comad(machine_config &config) // COMAD-01 PCB with 
 	// basic machine hardware
 	M68000(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tigeroad_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tigeroad_state::irq2_line_hold));
 
 	Z80(config, m_audiocpu, 8_MHz_XTAL / 2); // 4MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tigeroad_state::comad_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &tigeroad_state::comad_sound_io_map);
 
-	config.set_maximum_quantum(attotime::from_hz(3600));
+	TIMER(config, "scantimer").configure_scanline(FUNC(tigeroad_state::scanline), "screen", 128, 112);
 
 	// video hardware
 	BUFFERED_SPRITERAM16(config, "spriteram");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 260, 16, 240); // assume same as tigeroad
 	screen.set_screen_update(FUNC(tigeroad_state::screen_update));
-	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tigeroad);
@@ -733,7 +756,7 @@ void tigeroad_state::f1dream_comad(machine_config &config) // COMAD-01 PCB with 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	ym2203_device &ym1(YM2203(config, "ym1", 8_MHz_XTAL / 4)); // 2MHz
 	ym1.irq_handler().set_inputline("audiocpu", 0);
@@ -743,20 +766,11 @@ void tigeroad_state::f1dream_comad(machine_config &config) // COMAD-01 PCB with 
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
-
-void pushman_state::machine_start()
-{
-	save_item(NAME(m_host_semaphore));
-	save_item(NAME(m_mcu_semaphore));
-	save_item(NAME(m_host_latch));
-	save_item(NAME(m_mcu_latch));
-	save_item(NAME(m_mcu_output));
-	save_item(NAME(m_mcu_latch_ctl));
-}
-
 void pushman_state::pushman(machine_config &config) // all clocks measured on PCB
 {
 	f1dream_comad(config);
+
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &pushman_state::pushman_map);
 	m_maincpu->set_clock(8_MHz_XTAL);
 
@@ -766,6 +780,8 @@ void pushman_state::pushman(machine_config &config) // all clocks measured on PC
 	m_mcu->porta_w().set(FUNC(pushman_state::mcu_pa_w));
 	m_mcu->portb_w().set(FUNC(pushman_state::mcu_pb_w));
 	m_mcu->portc_w().set(FUNC(pushman_state::mcu_pc_w));
+
+	config.set_maximum_quantum(attotime::from_hz(3600));
 }
 
 void pushman_state::bballs(machine_config &config)
@@ -1087,6 +1103,41 @@ ROM_START( tigeroadba )
 ROM_END
 
 ROM_START( f1dream ) // N86614A-5 + N86614B-6 board combo
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 256K for 68000 code
+	ROM_LOAD16_BYTE( "f1_hi.6j", 0x00000, 0x20000, CRC(c94f9c7d) SHA1(bf0f5c9ebb8b9db0365a5e8c315e83e007b9d224) )
+	ROM_LOAD16_BYTE( "f1_lo.6k", 0x00001, 0x20000, CRC(28bb2b3d) SHA1(f31b0b7a4725fab852d5f29a094b152ab0b8a8b4) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "f1_04.12k", 0x0000, 0x8000, CRC(4b9a7524) SHA1(19004958c19ac0af35f2c97790b0082ee2c15bc4) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
+	ROM_LOAD( "f1.9j", 0x0000, 0x1000, CRC(c8e6075c) SHA1(d98bd358d30d22a8009cd2728dde1871a8140c23) ) // labeled F1
+
+	ROM_REGION( 0x008000, "text", 0 )
+	ROM_LOAD( "f1_01.10d", 0x00000, 0x08000, CRC(361caf00) SHA1(8a109e4e116d0c5eea86f9c57c05359754daa5b9) ) // 8x8 text
+
+	ROM_REGION( 0x060000, "tiles", 0 )
+	ROM_LOAD( "f1_12.3f",  0x00000, 0x10000, CRC(bc13e43c) SHA1(f9528839858d7a45395062a43b71d80400c73173) )
+	ROM_LOAD( "f1_10.1f",  0x10000, 0x10000, CRC(f7617ad9) SHA1(746a0ec433d5246ac4dbae17d6498e3d154e2df1) )
+	ROM_LOAD( "f1_14.3h",  0x20000, 0x10000, CRC(e33cd438) SHA1(89a6faea19e8a01b38ba45413609603e559877e9) )
+	ROM_LOAD( "f1_11.2f",  0x30000, 0x10000, CRC(4aa49cd7) SHA1(b7052d51a3cb570299f4db1492a1293c4d8b067f) )
+	ROM_LOAD( "f1_09.17f", 0x40000, 0x10000, CRC(ca622155) SHA1(00ae4a8e9cad2c42a10b410b594b0e414ada6cfe) )
+	ROM_LOAD( "f1_13.2h",  0x50000, 0x10000, CRC(2a63961e) SHA1(a35e9bf0408716f460487a8d2ae336572a98d2fb) )
+
+	ROM_REGION( 0x040000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "f1_06.3b", 0x00003, 0x10000, CRC(5e54e391) SHA1(475c968bfeb41b0448e621f59724c7b70d184d36) )
+	ROM_LOAD32_BYTE( "f1_05.2b", 0x00002, 0x10000, CRC(cdd119fd) SHA1(e279ada53f5a1e2ada0195b93399731af213f518) )
+	ROM_LOAD32_BYTE( "f1_08.3d", 0x00001, 0x10000, CRC(811f2e22) SHA1(cca7e8cc43408c2c3067a731a98a8a6418a000aa) )
+	ROM_LOAD32_BYTE( "f1_07.2d", 0x00000, 0x10000, CRC(aa9a1233) SHA1(c2079ad81d67b54483ea5f69ac2edf276ad58ca9) )
+
+	ROM_REGION16_LE( 0x08000, "bgmap", 0 )
+	ROM_LOAD16_WORD( "f1_15.7l", 0x0000, 0x8000, CRC(978758b7) SHA1(ebd415d70e2f1af3b1bd51f40e7d60f22369638c) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tr.9e", 0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) ) // priority (not used) - N82S129A or compatible
+ROM_END
+
+ROM_START( f1dreama ) // N86614A-5 + N86614B-6 board combo
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 256K for 68000 code
 	ROM_LOAD16_BYTE( "f1_02.6j", 0x00000, 0x20000, CRC(3c2ec697) SHA1(bccb431ad92455484420f91770e91db6d69b09ec) )
 	ROM_LOAD16_BYTE( "f1_03.6k", 0x00001, 0x20000, CRC(85ebad91) SHA1(000f5c617417ff20ee9b378166776fecfacdff95) )
@@ -1416,15 +1467,16 @@ GAME( 1987, tigeroadb,  tigeroad, tigeroad, tigeroad, tigeroad_state, init_tiger
 GAME( 1987, tigeroadba, tigeroad, tigeroad, tigeroad, tigeroad_state, empty_init,     ROT0, "bootleg",                  "Tiger Road (US bootleg, set 2)",   MACHINE_SUPPORTS_SAVE )
 
 // F1 Dream has an Intel 8751 microcontroller for protection
-GAME( 1988, f1dream,  0,       f1dream,  f1dream, f1dream_state,  empty_init, ROT0, "Capcom (Romstar license)", "F-1 Dream",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, f1dreamb, f1dream, tigeroad, f1dream, tigeroad_state, empty_init, ROT0, "bootleg",                  "F-1 Dream (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, f1dreamba,f1dream, tigeroad, f1dream, tigeroad_state, empty_init, ROT0, "bootleg",                  "F-1 Dream (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, f1dream,    0,        f1dream,  f1dream,  f1dream_state,  empty_init,     ROT0, "Capcom (Romstar license)", "F-1 Dream (set 1)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, f1dreama,   f1dream,  f1dream,  f1dream,  f1dream_state,  empty_init,     ROT0, "Capcom (Romstar license)", "F-1 Dream (set 2)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, f1dreamb,   f1dream,  tigeroad, f1dream,  tigeroad_state, empty_init,     ROT0, "bootleg",                  "F-1 Dream (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, f1dreamba,  f1dream,  tigeroad, f1dream,  tigeroad_state, empty_init,     ROT0, "bootleg",                  "F-1 Dream (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 
 // This Comad hardware is based around the F1 Dream design
-GAME( 1990, pushman,  0,       pushman, pushman, pushman_state, empty_init, ROT0, "Comad",                          "Pushman (Korea, set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pushmana, pushman, pushman, pushman, pushman_state, empty_init, ROT0, "Comad",                          "Pushman (Korea, set 2)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pushmans, pushman, pushman, pushman, pushman_state, empty_init, ROT0, "Comad (American Sammy license)", "Pushman (American Sammy license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pushmant, pushman, pushman, pushman, pushman_state, empty_init, ROT0, "Comad (Top Tronic license)",     "Pushman (Top Tronic license)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pushman,    0,        pushman,  pushman,  pushman_state,  empty_init,     ROT0, "Comad",                          "Pushman (Korea, set 1)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pushmana,   pushman,  pushman,  pushman,  pushman_state,  empty_init,     ROT0, "Comad",                          "Pushman (Korea, set 2)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pushmans,   pushman,  pushman,  pushman,  pushman_state,  empty_init,     ROT0, "Comad (American Sammy license)", "Pushman (American Sammy license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pushmant,   pushman,  pushman,  pushman,  pushman_state,  empty_init,     ROT0, "Comad (Top Tronic license)",     "Pushman (Top Tronic license)",     MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, bballs,  0,      bballs, bballs, pushman_state, empty_init, ROT0, "Comad", "Bouncing Balls",         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, bballsa, bballs, bballs, bballs, pushman_state, empty_init, ROT0, "Comad", "Bouncing Balls (Adult)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bballs,     0,        bballs,   bballs,   pushman_state,  empty_init,     ROT0, "Comad", "Bouncing Balls",         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bballsa,    bballs,   bballs,   bballs,   pushman_state,  empty_init,     ROT0, "Comad", "Bouncing Balls (Adult)", MACHINE_SUPPORTS_SAVE )

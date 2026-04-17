@@ -197,7 +197,7 @@ private:
 		MSEL = 0x40,
 		MBSY = 0x80,
 	};
-	enum scsi_id_mask : u8
+	enum scsi_idr_mask : u8
 	{
 		OID  = 0x07, // owner id
 		SMOD = 0x10, // single initiator mode
@@ -243,7 +243,7 @@ private:
 	u8 m_environ;
 	unsigned m_sel_time;
 	unsigned m_rst_time;
-	u8 m_scsi_id;
+	u8 m_scsi_idr;
 	u8 m_int_auth[2];
 	u8 m_mode;
 	u32 m_count;

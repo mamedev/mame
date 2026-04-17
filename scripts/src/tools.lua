@@ -730,48 +730,6 @@ configuration { }
 strip()
 
 --------------------------------------------------
--- aueffectutil
---------------------------------------------------
-
-if _OPTIONS["targetos"] == "macosx" then
-	project("aueffectutil")
-		uuid ("3db8316d-fad7-4f5b-b46a-99373c91550e")
-		kind "ConsoleApp"
-
-		flags {
-			"Symbols", -- always include minimum symbols for executables
-		}
-
-		if _OPTIONS["SEPARATE_BIN"]~="1" then
-			targetdir(MAME_DIR)
-		end
-
-		linkoptions {
-			"-sectcreate __TEXT __info_plist " .. _MAKE.esc(MAME_DIR) .. "src/tools/aueffectutil-Info.plist",
-		}
-
-		dependency {
-			{ "aueffectutil", MAME_DIR .. "src/tools/aueffectutil-Info.plist", true },
-		}
-
-		links {
-			"AudioUnit.framework",
-			"AudioToolbox.framework",
-			"CoreAudio.framework",
-			"CoreAudioKit.framework",
-			"CoreServices.framework",
-		}
-
-		files {
-			MAME_DIR .. "src/tools/aueffectutil.mm",
-		}
-
-		configuration { }
-
-		strip()
-end
-
---------------------------------------------------
 -- testkeys
 --------------------------------------------------
 
@@ -816,6 +774,13 @@ if (_OPTIONS["osd"] == "sdl") or (_OPTIONS["osd"] == "sdl3") then
 				end
 				links {
 					libsdl,
+					"gdi32",
+					"imm32",
+					"ole32",
+					"oleaut32",
+					"setupapi",
+					"uuid",
+					"version",
 				}
 			configuration { "vs*" }
 				links {

@@ -633,7 +633,7 @@ private:
 		s8  currkey[MAX_KEYS];
 	};
 
-	SDL_KeyboardID m_keyboard_id;
+	[[maybe_unused]] SDL_KeyboardID m_keyboard_id;
 	keyboard_trans_table const &m_trans_table;
 	keyboard_state m_keyboard;
 	std::chrono::steady_clock::time_point m_capslock_pressed;

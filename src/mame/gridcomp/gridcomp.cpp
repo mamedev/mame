@@ -64,6 +64,7 @@
 #include "emu.h"
 
 #include "gridkeyb.h"
+#include "gridrom.h"
 
 #include "bus/ieee488/ieee488.h"
 #include "bus/rs232/rs232.h"
@@ -112,6 +113,8 @@ public:
 		, m_dac(*this, "dac0832")
 		, m_ram(*this, RAM_TAG)
 		, m_tms9914(*this, "hpib")
+		, m_test_rom(*this, "test_rom")
+		, m_app_roms(*this, "app_rom%u", 0U)
 	{ }
 
 	static constexpr feature_type unemulated_features() { return feature::WAN; }
@@ -136,6 +139,8 @@ private:
 	required_device<dac0832_device> m_dac;
 	required_device<ram_device> m_ram;
 	required_device<tms9914_device> m_tms9914;
+	required_device<gridrom_socket_device> m_test_rom;
+	optional_device_array<gridrom_socket_device, 4> m_app_roms;
 
 	bool m_kbd_ready = false;
 	uint16_t m_kbd_data = 0;
@@ -323,6 +328,7 @@ IRQ_CALLBACK_MEMBER(gridcomp_state::irq_callback)
 void gridcomp_state::grid1101_map(address_map &map)
 {
 	map.unmap_value_high();
+	map(0xc0000, 0xcffff).r(m_test_rom, FUNC(gridrom_socket_device::read));
 	map(0xdfe40, 0xdfe4f).w(FUNC(gridcomp_state::grid_sound_w));  // modem controller??
 	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
@@ -340,7 +346,7 @@ void gridcomp_state::grid1121_map(address_map &map)
 	map.unmap_value_high();
 	map(0x90000, 0x97fff).unmaprw(); // ?? ROM slot
 	map(0x9ff00, 0x9ff0f).unmaprw(); // .r(FUNC(gridcomp_state::grid_9ff0_r)); // ?? ROM?
-	map(0xc0000, 0xcffff).unmaprw(); // ?? ROM slot -- signature expected: 0x4554, 0x5048
+	map(0xc0000, 0xcffff).r(m_test_rom, FUNC(gridrom_socket_device::read));
 	map(0xdfa00, 0xdfdff).rw(FUNC(gridcomp_state::grid_dma_r), FUNC(gridcomp_state::grid_dma_w)); // DMA
 	map(0xdfe00, 0xdfe1f).unmaprw(); // ??
 	map(0xdfe40, 0xdfe4f).w(FUNC(gridcomp_state::grid_sound_w));  // modem controller??
@@ -455,6 +461,13 @@ void gridcomp_state::grid1101(machine_config &config)
 	I8255(config, "modem", 0);
 
 	RAM(config, m_ram).set_default_size("256K").set_default_value(0);
+
+	// It is unknown how much address space is allocated for the test ROM on real Compass.
+	// Based on the assumption that the test ROM should be no larger than 64KB (C000:0 to CFFF:F),
+	// the image size limitation is identical to the allocated space.
+	GRIDROM_SOCKET(config, m_test_rom, gridrom_slot, "test_rom");
+	m_test_rom->set_image_names("test-rom", "test-rom");
+	m_test_rom->set_acceptable_sizes({64*1024});
 }
 
 void gridcomp_state::grid1109(machine_config &config)
@@ -468,6 +481,13 @@ void gridcomp_state::grid1121(machine_config &config)
 	grid1101(config);
 	// m_maincpu->set_clock(XTAL(24'000'000) / 3); // XXX
 	m_maincpu->set_addrmap(AS_PROGRAM, &gridcomp_state::grid1121_map);
+
+	for (int i = 0; i < 4; i++)
+	{
+		GRIDROM_SOCKET(config, m_app_roms[i], gridrom_slot, "app_rom");
+		m_app_roms[i]->set_image_names("app-rom", "app-rom");
+		m_app_roms[i]->set_acceptable_sizes({32*1024, 64*1024, 128*1024});
+	}
 }
 
 void gridcomp_state::grid1129(machine_config &config)

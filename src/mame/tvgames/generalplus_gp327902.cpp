@@ -160,46 +160,49 @@ void generalplus_gp327902_game_state::init_spi()
 }
 
 ROM_START( smksagas )
-	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25l64.u1", 0x0000, 0x800000, CRC(f28b9fd3) SHA1(8ed4668f271cbe01065bc0836e49ce70faf10834) )
 ROM_END
 
 ROM_START( smksagasa ) // code is the same, some data area differs, could be different factory defaults, or user data, remove later if redundant
-	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "gpr25l64.u1", 0x0000, 0x800000, CRC(5dee73ea) SHA1(ff0302a479f0a1a0a6dc605e18f6389f6244922f) )
 ROM_END
 
 ROM_START( smkmikke ) // DX version
-	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "gpr25l6403f.u1", 0x0000, 0x800000, CRC(cb5dc7b6) SHA1(425c4d01b56784278b77824a354d9efa46e1a74e) )
 ROM_END
 
 ROM_START( smkmikkea ) // different code revision (non-DX)
-	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "gpr25l64.u1", 0x0000, 0x800000, CRC(af900ab7) SHA1(c2cb0d37acf94edd150e6ef4f987f66b2306b97e) )
 ROM_END
 
 
 ROM_START( tomyegg )
-	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "gpr25l6403f.u1", 0x0000, 0x800000, CRC(2acd6752) SHA1(85e59546a1af4618c75c275cead7ef0f5e3faa44) )
 ROM_END
 
 ROM_START( tomyegga ) // might just be different user data (or factory defaults)
-	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
-	ROM_LOAD( "gpr25l640.u1", 0x0000, 0x800000, CRC(dfcbc66d) SHA1(a192d0682a078197b7f97ef36f35a7e3ee539855) )
-	ROM_IGNORE(0x50) // 'config' data
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l640.u1", 0x0000, 0x800000, CRC(a3ea7918) SHA1(722effd07251e83058383ac06fc329d45e8b5ce3) )
+ROM_END
+
+ROM_START( tomyeggb ) // might just be different user data (or factory defaults)
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "mintblue_gpr25l640.u1", 0x0000, 0x800000, CRC(045c378d) SHA1(fcb33474c293ac45851755dc9a2f961889ec0168) )
 ROM_END
 
 ROM_START( chikawac )
-	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "xm25qh64c.u1", 0x0000, 0x800000, CRC(88c984aa) SHA1(6e176960b64fc3576efaa40dfe2ff0a6dcea3c3f) )
 ROM_END
 
 ROM_START( fairicam )
-	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
-	ROM_LOAD( "mx25l3225.ic3", 0x0000, 0x400000, CRC(49e8f8d7) SHA1(de37967f317884eeb3b95a9d7b94b776995a7a90) )
-	ROM_IGNORE(0x50) // 'config' bytes
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx25l3225.ic3", 0x0000, 0x400000, CRC(b6d85a31) SHA1(3599f53a1f2c93856461ab187274c4978f84ec96) )
 ROM_END
 
 
@@ -227,10 +230,11 @@ CONS( 2021, smkmikkea,       smkmikke, 0,      gp327902, gp327902, generalplus_g
 // other devices on the same Soc
 
 // キラッとプリ☆チャン プリたまGO ミスティパープル
+// the product page seems to indicate that the different colours get different bonus items but the main code looks the same
+// so it could be different factory default data
 CONS( 2019, tomyegg,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Kiratto Pri-Chan - PritamaGO: Misty Purple (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS( 2019, tomyegga,        tomyegg,  0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Kiratto Pri-Chan - PritamaGO: Powder Pink (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-// these also exist, are they the same software or different versions?
-// Mint Blue (ミントブルー).
+CONS( 2019, tomyeggb,        tomyegg,  0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Kiratto Pri-Chan - PritamaGO: Mint Blue (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 CONS( 2021, chikawac,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Chiikawa Camera De Ya-! (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 

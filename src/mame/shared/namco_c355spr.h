@@ -11,6 +11,14 @@
 class namco_c355spr_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
+	using c355_obj_code2tile_delegate = device_delegate<int (int)>;
+	using c355_obj_entry_attr_delegate = device_delegate<u16(int, u8)>;
+	using c355_obj_entry_attr_which_delegate = device_delegate<u16(int, u8, int)>;
+	using c355_obj_entry_delegate = device_delegate<u16(int)>;
+	using c355_obj_entry_which_delegate = device_delegate<u16(int, int)>;
+	using c355_priority_delegate = device_delegate<int(int)>;
+	using c355_mix_delegate = device_delegate<bool (u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri)>;
+
 	// construction/destruction
 	namco_c355spr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
@@ -28,6 +36,7 @@ public:
 	// the Namco code currently requires us to allocate memory in the device, the Data East hookup uses access callbacks
 	void set_device_allocates_spriteram(bool allocate_memory) { m_device_allocates_spriteram = allocate_memory;  }
 
+	template <typename... T> void set_tile_callback(T &&... args) { m_code2tile.set(std::forward<T>(args)...); }
 	template <typename... T> void set_priority_callback(T &&... args) { m_pri_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_mix_callback(T &&... args) { m_mix_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_read_spritetile(T &&... args) { m_read_spritetile.set(std::forward<T>(args)...); }
@@ -41,23 +50,6 @@ public:
 	u16 position_r(offs_t offset);
 	void position_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void vblank(int state);
-
-	typedef delegate<int (int)> c355_obj_code2tile_delegate;
-	typedef device_delegate<u16(int, u8)> c355_obj_entry_attr_delegate;
-	typedef device_delegate<u16(int, u8, int)> c355_obj_entry_attr_which_delegate;
-	typedef device_delegate<u16(int)> c355_obj_entry_delegate;
-	typedef device_delegate<u16(int, int)> c355_obj_entry_which_delegate;
-	typedef device_delegate<int(int)> c355_priority_delegate;
-	typedef device_delegate<bool (u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri)> c355_mix_delegate;
-
-	void set_tile_callback(c355_obj_code2tile_delegate cb)
-	{
-		if (!cb.isnull())
-			m_code2tile = cb;
-		else
-			m_code2tile = c355_obj_code2tile_delegate(&namco_c355spr_device::default_code2tile, this);
-	}
-
 
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri = 0);
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri = 0);
@@ -136,10 +128,6 @@ protected:
 private:
 	void copybitmap(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, int pri = 0);
 	void copybitmap(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, int pri = 0);
-
-	// C355 Motion Object Emulation
-	// for pal_xor, supply either 0x0 (normal) or 0xf (palette mapping reversed)
-	int default_code2tile(int code);
 
 	// C355 Motion Object internals
 	void get_single_sprite(u16 which, c355_sprite *sprite_ptr, int no);

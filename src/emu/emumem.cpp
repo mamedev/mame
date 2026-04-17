@@ -349,10 +349,10 @@ memory_region *memory_manager::region_alloc(std::string name, u32 length, u8 wid
 //  region_find - find a region by name
 //-------------------------------------------------
 
-memory_region *memory_manager::region_find(std::string name)
+memory_region *memory_manager::region_find(std::string_view name)
 {
-	auto i = m_regionlist.find(name);
-	return i != m_regionlist.end() ? i->second.get() : nullptr;
+	auto const i = m_regionlist.find(name);
+	return (i != m_regionlist.end()) ? i->second.get() : nullptr;
 }
 
 
@@ -399,10 +399,10 @@ memory_share *memory_manager::share_alloc(device_t &dev, std::string name, u8 wi
 //  share_find - find a share by name
 //-------------------------------------------------
 
-memory_share *memory_manager::share_find(std::string name)
+memory_share *memory_manager::share_find(std::string_view name)
 {
-	auto i = m_sharelist.find(name);
-	return i != m_sharelist.end() ? i->second.get() : nullptr;
+	auto const i = m_sharelist.find(name);
+	return (i != m_sharelist.end()) ? i->second.get() : nullptr;
 }
 
 
@@ -428,10 +428,10 @@ memory_bank *memory_manager::bank_alloc(device_t &device, std::string name)
 //  bank_find - find a bank by name
 //-------------------------------------------------
 
-memory_bank *memory_manager::bank_find(std::string name)
+memory_bank *memory_manager::bank_find(std::string_view name)
 {
-	auto i = m_banklist.find(name);
-	return i != m_banklist.end() ? i->second.get() : nullptr;
+	auto const i = m_banklist.find(name);
+	return (i != m_banklist.end()) ? i->second.get() : nullptr;
 }
 
 

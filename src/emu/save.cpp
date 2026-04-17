@@ -218,7 +218,7 @@ void save_manager::save_memory(device_t *device, const char *module, const char 
 //  state
 //-------------------------------------------------
 
-save_error save_manager::check_file(running_machine &machine, util::core_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...))
+std::pair<save_error, std::string> save_manager::check_file(running_machine &machine, util::core_file &file, const char *gamename)
 {
 	// if we want to validate the signature, compute it
 	u32 sig;
@@ -229,14 +229,10 @@ save_error save_manager::check_file(running_machine &machine, util::core_file &f
 	u8 header[HEADER_SIZE];
 	auto const [err, actual] = read(file, header, sizeof(header));
 	if (err || (actual != sizeof(header)))
-	{
-		if (errormsg != nullptr)
-			(*errormsg)("Could not read %s save file header", emulator_info::get_appname());
-		return STATERR_READ_ERROR;
-	}
+		return std::make_pair(STATERR_READ_ERROR, util::string_format("Could not read %s save file header", emulator_info::get_appname()));
 
 	// let the generic header check work out the rest
-	return validate_header(header, gamename, sig, errormsg, "");
+	return validate_header(header, gamename, sig);
 }
 
 
@@ -470,8 +466,8 @@ inline save_error save_manager::do_read(T check_length, U read_block, V start_he
 		return STATERR_READ_ERROR;
 
 	// verify the header and report an error if it doesn't match
-	u32 sig = signature();
-	if (validate_header(header, machine().system().name, sig, nullptr, "Error: ") != STATERR_NONE)
+	u32 const sig = signature();
+	if (validate_header(header, machine().system().name, sig).first != STATERR_NONE)
 		return STATERR_INVALID_HEADER;
 
 	// determine whether or not to flip the data when done
@@ -541,45 +537,28 @@ void save_manager::dump_registry() const
 //  header
 //-------------------------------------------------
 
-save_error save_manager::validate_header(const u8 *header, const char *gamename, u32 signature,
-	void (CLIB_DECL *errormsg)(const char *fmt, ...), const char *error_prefix)
+std::pair<save_error, std::string> save_manager::validate_header(const u8 *header, const char *gamename, u32 signature)
 {
 	// check magic number
 	if (memcmp(header, STATE_MAGIC_NUM, 8))
-	{
-		if (errormsg != nullptr)
-			(*errormsg)("%sThis is not a %s save file", error_prefix, emulator_info::get_appname());
-		return STATERR_INVALID_HEADER;
-	}
+		return std::make_pair(STATERR_INVALID_HEADER, util::string_format("This is not a %s save file", emulator_info::get_appname()));
 
 	// check save state version
 	if (header[8] != SAVE_VERSION)
-	{
-		if (errormsg != nullptr)
-			(*errormsg)("%sWrong version in save file (version %d, expected %d)", error_prefix, header[8], SAVE_VERSION);
-		return STATERR_INVALID_HEADER;
-	}
+		return std::make_pair(STATERR_INVALID_HEADER, util::string_format("Wrong version in save file (version %d, expected %d)", header[8], SAVE_VERSION));
 
 	// check gamename, if we were asked to
-	if (gamename != nullptr && strncmp(gamename, (const char *)&header[0x0a], 0x1c - 0x0a))
-	{
-		if (errormsg != nullptr)
-			(*errormsg)("%s'File is not a valid savestate file for game '%s'.", error_prefix, gamename);
-		return STATERR_INVALID_HEADER;
-	}
+	if (gamename && strncmp(gamename, (const char *)&header[0x0a], 0x1c - 0x0a))
+		return std::make_pair(STATERR_INVALID_HEADER, util::string_format("'File is not a valid savestate file for game '%s'.", gamename));
 
 	// check signature, if we were asked to
 	if (signature != 0)
 	{
-		u32 rawsig = get_u32le(&header[0x1c]);
+		u32 const rawsig = get_u32le(&header[0x1c]);
 		if (signature != rawsig)
-		{
-			if (errormsg != nullptr)
-				(*errormsg)("%sIncompatible save file (signature %08x, expected %08x)", error_prefix, rawsig, signature);
-			return STATERR_INVALID_HEADER;
-		}
+			return std::make_pair(STATERR_INVALID_HEADER, util::string_format("Incompatible save file (signature %08x, expected %08x)", rawsig, signature));
 	}
-	return STATERR_NONE;
+	return std::make_pair(STATERR_NONE, std::string());
 }
 
 

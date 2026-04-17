@@ -83,7 +83,13 @@ function maintargetosdoptions(_target,_subtarget)
 
 		links {
 			"dinput8",
+			"gdi32",
+			"imm32",
+			"ole32",
 			"psapi",
+			"setupapi",
+			"uuid",
+			"version",
 		}
 	elseif _OPTIONS["targetos"]=="haiku" then
 		links {

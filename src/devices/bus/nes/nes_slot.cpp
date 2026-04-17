@@ -48,7 +48,7 @@
  You can find the latest version of the doc at http://www.romhacking.net/docs/362/
 
  A lot of details have been based on the researches carried on at NesDev forums (by Blargg, Quietust and many more)
- and collected on the NesDev Wiki http://wiki.nesdev.com/
+ and collected on the NesDev Wiki https://www.nesdev.org/wiki
 
  Particular thanks go to
  - Martin Freij for his work on NEStopia

@@ -260,7 +260,6 @@ private:
 		uint8_t y = 0;
 		uint8_t on = 0;
 	};
-	lcd_position m_locate;
 	lcd_position m_cursor;
 
 	/* keyboard */

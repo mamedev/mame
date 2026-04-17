@@ -4228,6 +4228,18 @@ The program ROMs are labelled "JALECO EXPORT P-47 #".
 Extra EPROM labelled "JALECO EXPORT 17".
 It contains enemy sprites without the German "Iron Cross" emblem.
 
+The same set was also seen on bootleg hardware, just with smaller program ROMs:
+
+1a-down.BIN             export_p-47_1.rom1 [1/2]      IDENTICAL
+1b-down.BIN             export_p-47_3.rom2 [1/2]      IDENTICAL
+2a-down.BIN             export_p-47_1.rom1 [2/2]      IDENTICAL
+2b-down.BIN             export_p-47_3.rom2 [2/2]      IDENTICAL
+
+ROM_LOAD16_BYTE( "1b-down.BIN", 0x00000, 0x10000, CRC(5a6ecf39) SHA1(81c9eef85eec47782c627e3b75723aa867ae3bec) )
+ROM_LOAD16_BYTE( "1a-down.BIN", 0x00001, 0x10000, CRC(fc57ae41) SHA1(25ca3db68b6ab7c1d45089cd5c98f9c55d599f96) )
+ROM_LOAD16_BYTE( "2b-down.BIN", 0x20000, 0x10000, CRC(89ec2c38) SHA1(3cedce66090c2c9cc2fb242304a3461edb3ecdeb) )
+ROM_LOAD16_BYTE( "2a-down.BIN", 0x20001, 0x10000, CRC(654c2675) SHA1(ec609c695a683007c7dc1c03e9958b70065a5c66) )
+
 ***************************************************************************/
 
 ROM_START( p47je )

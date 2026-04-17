@@ -1032,9 +1032,9 @@ ROM_START(brailab4)
 	// brl1 to 5 merged, with small changes
 	// 00BF: 28 18 87 -> 30 30 0c
 	// 0138: 07 0a 06 0b -> 0c 06 07 0a (keyboard assignments)
-	ROM_LOAD_OPTIONAL("brl.rom", 0x0000, 0x5000, CRC(54af5d30) SHA1(d1e7b7f5866acba0503d47f610456f396526240b))
+	ROM_LOAD("brl.rom",    0x0000, 0x5000, CRC(54af5d30) SHA1(d1e7b7f5866acba0503d47f610456f396526240b))
 	// a small prom
-	ROM_LOAD_OPTIONAL("brlcpm.rom", 0x5000, 0x0020, CRC(b936d568) SHA1(150330eccbc4b664eba4103f051d6e932038e9e8))
+	ROM_LOAD("brlcpm.rom", 0x5000, 0x0020, CRC(b936d568) SHA1(150330eccbc4b664eba4103f051d6e932038e9e8))
 ROM_END
 
 } // anonymous namespace

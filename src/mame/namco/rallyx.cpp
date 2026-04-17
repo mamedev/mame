@@ -286,7 +286,7 @@ void rallyx_state::rallyx_map(address_map &map)
 	map(0xa100, 0xa100).portr("DSW");
 	map(0xa000, 0xa00f).writeonly().share(m_radarattr);
 	map(0xa080, 0xa080).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xa100, 0xa11f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0xa100, 0xa11f).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0xa130, 0xa130).w(FUNC(rallyx_state::scrollx_w));
 	map(0xa140, 0xa140).w(FUNC(rallyx_state::scrolly_w));
 	map(0xa170, 0xa170).nopw();            // ?
@@ -868,8 +868,7 @@ void rallyx_state::rallyx(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32); // 96 KHz
-	m_namco_sound->set_voices(3);
+	NAMCO_WSG(config, m_namco_sound, MASTER_CLOCK/6/32); // 96 KHz
 	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	SAMPLES(config, m_samples);

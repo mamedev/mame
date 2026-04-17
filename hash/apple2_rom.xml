@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="apple2_rom" description="Apple II ROM images">
+
+	<software name="aid1">
+		<description>Programmer's Aid #1</description>
+		<year>1978</year>
+		<publisher>Apple Computer</publisher>
+		<info name="partno" value="A2M0019" />
+		<!-- This collection of utilities for Integer BASIC programmers was the only software Apple released for the original Apple II's empty ROM sockets. It was included as standard on some later-produced Apple IIs and the Integer BASIC firmware card. -->
+		<part name="d0" interface="apple2_d0_rom">
+			<dataarea name="rom" size="2048">
+				<rom name="341-0016-00.d0" size="2048" crc="4234e88a" sha1="c9a81d704dc2f0c3416c20f9c4ab71fedda937ed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inspect">
+		<description>The Inspector</description>
+		<year>1981</year>
+		<publisher>Omega Software Products</publisher>
+		<part name="d8" interface="apple2_d8_rom">
+			<dataarea name="rom" size="2048">
+				<rom name="inspector.d8" size="2048" crc="20d59f4f" sha1="2d8fdec2d1a28d54ebc218b54a16f0cae33943d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="watson">
+		<description>Watson</description>
+		<year>1982</year>
+		<publisher>Omega Microware</publisher>
+		<info name="usage" value="Requires The Inspector" />
+		<part name="d0" interface="apple2_d0_rom">
+			<dataarea name="rom" size="2048">
+				<rom name="watson.d0" size="2048" crc="c9ecbfc3" sha1="c15390d86bfcad9c03230b3900cdace396d80bf2"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -11,13 +11,9 @@
 
 #include "util/xmlfile.h"
 
-#include <QtGui/QCloseEvent>
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QtGui/QAction>
 #include <QtGui/QActionGroup>
-#else
-#include <QtWidgets/QAction>
-#endif
+#include <QtGui/QCloseEvent>
 #include <QtWidgets/QDockWidget>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMenu>

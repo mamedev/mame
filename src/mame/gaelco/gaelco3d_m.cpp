@@ -176,8 +176,8 @@ void gaelco_serial_device::buf_reset(buf_t *buf)
 {
 	buf->stat = GAELCOSER_STATUS_RTS | GAELCOSER_STATUS_RESET;
 	buf->data = 0;
-	buf->data_cnt = -1;
 	buf->cnt = 0;
+	buf->data_cnt = -1;
 }
 
 DEFINE_DEVICE_TYPE(GAELCO_SERIAL, gaelco_serial_device, "gaelco_serial", "Gaelco 3D Serial Hardware")
@@ -326,7 +326,7 @@ void gaelco_serial_device::sync_link()
 
 	{
 		std::lock_guard<std::mutex> guard(m_mutex);
-		m_out_ptr->stat &= ~GAELCOSER_STATUS_RESET;
+		m_out_ptr->stat = m_out_ptr->stat & ~GAELCOSER_STATUS_RESET;
 	}
 }
 
@@ -407,12 +407,14 @@ void gaelco_serial_device::rts_w(int state)
 	std::lock_guard<std::mutex> guard(m_mutex);
 
 	if (state == 0)
-		m_out_ptr->stat |= GAELCOSER_STATUS_RTS;
+	{
+		m_out_ptr->stat = m_out_ptr->stat | GAELCOSER_STATUS_RTS;
+	}
 	else
 	{
 		//Commented out for now
 		//m_status |= GAELCOSER_STATUS_READY;
-		m_out_ptr->stat &= ~GAELCOSER_STATUS_RTS;
+		m_out_ptr->stat = m_out_ptr->stat & ~GAELCOSER_STATUS_RTS;
 	}
 }
 

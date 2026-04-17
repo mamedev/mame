@@ -220,10 +220,10 @@ Notes:
 
 void pgm_state::coin_counter_w(u16 data)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 0x0001);
-	machine().bookkeeping().coin_counter_w(1, data & 0x0002);
-	machine().bookkeeping().coin_counter_w(2, data & 0x0004);
-	machine().bookkeeping().coin_counter_w(3, data & 0x0008);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 2));
+	machine().bookkeeping().coin_counter_w(3, BIT(data, 3));
 }
 
 bool pgm_state::z80_sync(int which)
@@ -269,7 +269,7 @@ void pgm_state::z80_reset_w(offs_t offset, u16 data, u16 mem_mask)
 		m_soundcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		m_soundcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
-	else
+	else // if (data == 0xa659)
 	{
 		/* this might not be 100% correct, but several of the games (ddp2, puzzli2 etc.) expect the z80 to be turned
 		off during data uploads, they write here before the upload */
@@ -280,6 +280,7 @@ void pgm_state::z80_reset_w(offs_t offset, u16 data, u16 mem_mask)
 void pgm_state::z80_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	LOGZ80("Z80: ctrl %04x @ %04x (%06x)\n", data, mem_mask, m_maincpu->pc());
+	// TODO: hook up Z80 bus request: 68K writes 0x45d3 before access, then 0x0a0a after access
 }
 
 template<int N>
@@ -308,7 +309,7 @@ void pgm_state::z80_latch3_w(u8 data)
 
 void pgm_state::pgm_z80_mem(address_map &map)
 {
-	map(0x0000, 0xffff).ram().share("z80_mainram");
+	map(0x0000, 0xffff).ram().share(m_z80_mainram);
 }
 
 void pgm_state::pgm_z80_io(address_map &map)
@@ -325,18 +326,11 @@ void pgm_state::pgm_base_mem(address_map &map)
 {
 	map(0x700006, 0x700007).nopw(); // Watchdog?
 
-	map(0x800000, 0x81ffff).ram().mirror(0x0e0000).share("sram"); /* Main Ram */
+	map(0x800000, 0x81ffff).ram().mirror(0x0e0000).share(m_mainram); /* Main RAM */
 
-	map(0x900000, 0x907fff).mirror(0x0f8000).rw(m_video, FUNC(igs023_video_device::videoram_r), FUNC(igs023_video_device::videoram_w)); /* IGS023 VIDEO CHIP */
-	map(0xa00000, 0xa011ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xb00000, 0xb0ffff).rw(m_video, FUNC(igs023_video_device::videoregs_r), FUNC(igs023_video_device::videoregs_w)); /* Video Regs inc. Zoom Table */
-	//map(0xb01000, 0xb0103f) Zoom/Shrink table for sprites
-	//map(0xb02000, 0xb02001) Background scroll Y
-	//map(0xb03000, 0xb03001) Background scroll X
-	//map(0xb04000, 0xb04001) Unknown #0
-	//map(0xb05000, 0xb05001) Foreground scroll Y
-	//map(0xb06000, 0xb06001) Foreground scroll X?
-	//map(0xb0e000, 0xb0e001) Unknown #1
+	map(0x900000, 0x907fff).mirror(0x0f8000).m(m_video, FUNC(igs023_video_device::videoram_map)); /* IGS023 VIDEO CHIP */
+	map(0xa00000, 0xa013ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xb00000, 0xb0ffff).m(m_video, FUNC(igs023_video_device::videoregs_map));
 
 	map(0xc00003, 0xc00003).rw(FUNC(pgm_state::m68k_latch_r<0>), FUNC(pgm_state::m68k_latch1_w));
 	map(0xc00005, 0xc00005).r(FUNC(pgm_state::m68k_latch_r<1>)).w(m_soundlatch[1], FUNC(generic_latch_8_device::write));
@@ -522,7 +516,7 @@ void pgm_state::pgmbase(machine_config &config)
 	screen.screen_vblank().set(FUNC(pgm_state::screen_vblank));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xRGB_555, 0x1200/2);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xRGB_555, 0x1400/2);
 
 	/*sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -533,6 +527,7 @@ void pgm_state::pgmbase(machine_config &config)
 
 	IGS023_VIDEO(config, m_video, 0);
 	m_video->set_palette(m_palette);
+	m_video->set_screen("screen");
 	m_video->read_spriteram_callback().set(FUNC(pgm_state::sprites_r));
 
 	ICS2115(config, m_ics, 33.8688_MHz_XTAL);

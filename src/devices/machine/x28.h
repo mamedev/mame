@@ -18,7 +18,6 @@
 #include <algorithm>
 #include <array>
 #include <cstdint>
-#include <cstdio>
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -81,8 +80,9 @@ template<
 >
 class x28_device : public device_t
 {
-public:
+	using self = x28_device<AddressBits, PageSizeBytes, TBLCUsec, TWCUsec, ProgramOnRead>;
 
+public:
 	static constexpr uint32_t ADDRESS_BITS = AddressBits;
 	static constexpr uint32_t TOTAL_SIZE_BYTES = 1 << AddressBits;
 	static constexpr uint32_t ADDRESS_MASK = TOTAL_SIZE_BYTES - 1;
@@ -98,18 +98,46 @@ public:
 	static constexpr uint8_t TOGGLE_BIT = 1 << 6;
 
 	// construction/destruction
-	x28_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	x28_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	x28_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0)
+	: device_t(mconfig, type, tag, owner, clock)
+	{}
+
 	virtual ~x28_device() {}
 
 	void write(uint32_t offset, uint8_t data);
 	uint8_t read(uint32_t offset);
 
-	void reset();
-
 	// Allow clients direct access to stored data.
-	std::array<uint8_t, TOTAL_SIZE_BYTES> &data() {
+	std::array<uint8_t, TOTAL_SIZE_BYTES> &data()
+	{
 		return m_storage;
+	}
+
+	// Allow access to the current software data protection status
+	bool is_software_data_protection_enabled()
+	{
+		return m_software_data_protection_enabled;
+	}
+
+	void set_software_data_protection_enabled(bool software_data_protection_enabled)
+	{
+		m_software_data_protection_enabled = software_data_protection_enabled;
+	}
+
+	// Allow users to override device timing.
+	void override_t_blc_usec(uint32_t t_blc_usec = T_BLC_USEC)
+	{
+		m_t_blc_usec = t_blc_usec;
+	}
+
+	void override_t_wc_usec(uint32_t t_wc_usec = T_WC_USEC)
+	{
+		m_t_wc_usec = t_wc_usec;
+	}
+
+	void override_program_on_read(bool program_on_read = PROGRAM_ON_READ)
+	{
+		m_program_on_read = program_on_read;
 	}
 
 #ifndef X28_VISIBLE_FOR_TESTING
@@ -117,25 +145,78 @@ protected:
 #endif // X28_VISIBLE_FOR_TESTING
 
 	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD
+	{
+		if (m_t_blc_usec > 0 && m_start_programming_timer == nullptr) {
+			m_start_programming_timer = timer_alloc(FUNC(self::start_programming_cycle), this);
+		}
+
+		if (m_t_wc_usec > 0 && m_programming_completed_timer == nullptr) {
+			m_programming_completed_timer = timer_alloc(FUNC(self::programming_cycle_complete), this);
+		}
+
+		save_item(NAME(m_storage));
+		save_item(NAME(m_program_buffer_to_eeprom));
+		save_item(NAME(m_last_written_offset));
+		save_item(NAME(m_toggle_bit));
+		save_item(NAME(m_state));
+		save_item(NAME(m_command_state));
+		save_item(NAME(m_software_data_protection_enabled));
+		save_item(NAME(m_buffering_page));
+		save_item(NAME(m_page_buffer));
+
+		save_item(NAME(m_t_blc_usec));
+		save_item(NAME(m_t_wc_usec));
+		save_item(NAME(m_program_on_read));
+	}
+
+	virtual void device_reset() override ATTR_COLD
+	{
+		if (m_start_programming_timer != nullptr)
+			m_start_programming_timer->enable(false);
+
+		if (m_programming_completed_timer != nullptr)
+			m_programming_completed_timer->enable(false);
+
+		change_to_state(COMMAND_STATE_NONE);
+		change_to_state(STATE_IDLE);
+
+		m_last_written_offset = -1;
+		m_software_data_protection_enabled = false;
+		m_buffering_page = 0;
+	}
 
 	// Change State to a new internal state
-	void change_to_state(int ns);
+	void change_to_state(int ns)
+	{
+		// LOG("Changing state to %d\r\n", ns);
+		m_state = ns;
+	}
 
 	// Error in the internal state machine, return to the correct idle internal state
-	void state_machine_error();
+	void state_machine_error()
+	{
+		change_to_state(m_software_data_protection_enabled ? STATE_IDLE : STATE_BUFFERING);
+	}
 
 	// Change State to a new command processing state
-	void change_to_command_state(int ns);
+	void change_to_command_state(int ns)
+	{
+		// LOG("Changing state to %d\r\n", ns);
+		m_command_state = ns;
+	}
 
 	// Error in the command state machine, return to the correct idle internal state
-	void command_state_machine_error();
+	void command_state_machine_error()
+	{
+		change_to_command_state(COMMAND_STATE_NONE);
+	}
 
 	// internal state
 	enum {
 		// idle state: reads work as normal, writes will succeed or fail depending on
-		// m_write_enabled - except for those writes that are part of one of the protection
-		// enable or disable sequences.
+		// m_software_data_protection_enabled - except for those writes that are part of one
+		// of the protection enable or disable sequences.
 		STATE_IDLE,
 
 		// After detecting the third write that initiates a protection enable sequence,
@@ -149,7 +230,7 @@ protected:
 		// As long as the next write is to the same page (higher address bits remain
 		// the same) and the next write is initiated within T_BLC, more bytes can be
 		// written, and those too will be written to the internal buffer.
-		// If no more writes happen within T_BLC, thw programming cycle starts,
+		// If no more writes happen within T_BLC, the programming cycle starts,
 		// during which time the buffer will be saved to the corresponding page in
 		// the persistent EEPROM storage.
 		STATE_BUFFERING,
@@ -173,7 +254,8 @@ protected:
 		// If in this state the client writes A0 to 5555 (1555 on X28C64),
 		// that concludes the Protection Enable command sequence and enters
 		// the Protected Write state: allowing writes to one page, at the end of which
-		// the device will enter the Write Protected state.
+		// the device will enter the Write Protected state, setting
+		// m_write_protecion_enabled = true.
 		// If instead the client writes  80 to 5555 (1555 on X28C64), this continues
 		// the Protection Disable command sequence.
 
@@ -192,24 +274,50 @@ protected:
 
 		// after detecting the sixth write in the protection disable command sequence,
 		// writing 20 to address 5555 (1555 on X28C64),
-		// the device will return to COMMAND_STATE_NONE and STATE_IDLE with m_write_enabled = false.
+		// the device will return to COMMAND_STATE_NONE and STATE_IDLE with
+		// m_software_data_protection_enabled = false.
 	};
 
-  std::array<uint8_t, TOTAL_SIZE_BYTES> m_storage;
-  bool m_program_buffer_to_eeprom;
-	emu_timer *m_start_programming_timer;
-	emu_timer *m_programming_completed_timer;
-	uint32_t m_last_written_offset;
+	std::array<uint8_t, TOTAL_SIZE_BYTES> m_storage {};
+	bool m_program_buffer_to_eeprom = false;
+	emu_timer *m_start_programming_timer = nullptr;
+	emu_timer *m_programming_completed_timer = nullptr;
+	uint32_t m_last_written_offset = 0;
 	uint8_t m_toggle_bit = 0;
 	int m_state = STATE_IDLE;
 	int m_command_state = COMMAND_STATE_NONE;
-	bool m_write_enabled = true;
+	bool m_software_data_protection_enabled = false;
 	int m_buffering_page = 0;
-	std::array<uint8_t, PageSizeBytes> m_page_buffer;
+	std::array<uint8_t, PAGE_SIZE_BYTES> m_page_buffer;
+
+	// Configurable overrides: initialize per the device's definition.
+	uint32_t m_t_blc_usec = T_BLC_USEC;
+	uint32_t m_t_wc_usec = T_WC_USEC;
+	bool m_program_on_read = PROGRAM_ON_READ;
 
 	// Timer callbacks
-	void start_programming_cycle(s32 param = 0);
-	void programming_cycle_complete(s32 param = 0);
+	void start_programming_cycle(s32 param = 0)
+	{
+		change_to_state(STATE_PROGRAMMING);
+
+		if (m_program_buffer_to_eeprom) {
+			std::copy(std::begin(m_page_buffer), std::end(m_page_buffer), &(m_storage[m_buffering_page]));
+		}
+
+		if (m_t_wc_usec == 0) {
+			programming_cycle_complete();
+		} else if (m_t_wc_usec > 0) {
+			m_programming_completed_timer->adjust(attotime::from_usec(m_t_wc_usec));
+		}
+	}
+
+	void programming_cycle_complete(s32 param = 0)
+	{
+		change_to_state(STATE_IDLE);
+
+		m_program_buffer_to_eeprom = false;
+		// LOG("m_program_buffer_to_eeprom -> %d\r\n", m_program_buffer_to_eeprom);
+	}
 };
 
 // Concrete devices
@@ -267,19 +375,6 @@ public:
 	xm28c040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
-// Better-than-real devices:
-
-// X28F256: 256kbit = 32k bytes, 64 bytes per page, like the X25C256, but 
-// with T_WC=0, i.e., an infinitely fast write cycle.
-// This uses only the Byte Load Cycle timer and also programs immediately on reading;
-// The Write Cycle is infinitely quick, any pending writes are immediately committed
-// and ready to be returned without needing Toggle Bit polling or /DATA polling.
-class x28f256_device : public x28_device<15, 64, 100, 0, true>
-{
-public:
-	x28f256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-};
-
 // device type declarations
 DECLARE_DEVICE_TYPE(X28C64, x28c64_device)
 DECLARE_DEVICE_TYPE(X28C256, x28c256_device)
@@ -288,7 +383,6 @@ DECLARE_DEVICE_TYPE(X28C512, x28c512_device)
 DECLARE_DEVICE_TYPE(X28C010, x28c010_device)
 DECLARE_DEVICE_TYPE(XM28C020, xm28c020_device)
 DECLARE_DEVICE_TYPE(XM28C040, xm28c040_device)
-DECLARE_DEVICE_TYPE(X28F256, x28f256_device)
 
 #include "x28.ipp"
 

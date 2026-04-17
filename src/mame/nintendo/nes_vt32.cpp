@@ -19,13 +19,12 @@ namespace {
 class nes_vt32_base_state : public driver_device
 {
 public:
-	nes_vt32_base_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt32_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_io0(*this, "IO0"),
 		m_io1(*this, "IO1"),
 		m_cartsel(*this, "CARTSEL"),
-		m_exin(*this, "EXTRAIN%u", 0U),
-		m_prgrom(*this, "mainrom")
+		m_exin(*this, "EXTRAIN%u", 0U)
 	{ }
 
 protected:
@@ -49,12 +48,7 @@ protected:
 	/* Misc */
 	uint32_t m_ahigh; // external banking bits
 
-	required_region_ptr<uint8_t> m_prgrom;
-
-	uint8_t vt_rom_r(offs_t offset);
-	[[maybe_unused]] void vtspace_w(offs_t offset, uint8_t data);
-
-	void configure_soc(nes_vt02_vt03_soc_device* soc);
+	void configure_soc(nes_vt02_vt03_soc_device *soc);
 
 	uint8_t upper_412c_r();
 	uint8_t upper_412d_r();
@@ -68,7 +62,7 @@ private:
 class nes_vt32_state : public nes_vt32_base_state
 {
 public:
-	nes_vt32_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt32_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_vt32_base_state(mconfig, type, tag),
 		m_soc(*this, "soc")
 	{ }
@@ -87,22 +81,19 @@ protected:
 class nes_vt32_unk_state : public nes_vt32_state
 {
 public:
-	nes_vt32_unk_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt32_state(mconfig, type, tag)
+	nes_vt32_unk_state(const machine_config &mconfig, device_type type, const char *tag) :
+		nes_vt32_state(mconfig, type, tag),
+		m_prgrom(*this, "mainrom")
 	{ }
 
-	void nes_vt32_fp(machine_config& config);
-	void nes_vt32_2mb(machine_config& config);
-	void nes_vt32_8mb(machine_config& config);
-	void nes_vt32_16mb(machine_config& config);
-	void nes_vt32_32mb(machine_config& config);
-	void nes_vt32_4x16mb(machine_config& config);
+	void nes_vt32_fp(machine_config &config) ATTR_COLD;
+	void nes_vt32_2mb(machine_config &config) ATTR_COLD;
+	void nes_vt32_8mb(machine_config &config) ATTR_COLD;
+	void nes_vt32_16mb(machine_config &config) ATTR_COLD;
+	void nes_vt32_32mb(machine_config &config) ATTR_COLD;
+	void nes_vt32_4x16mb(machine_config &config) ATTR_COLD;
 
-	void nes_vt32_pal_32mb(machine_config& config);
-
-	void init_rfcp168();
-	void init_g9_666();
-	void init_hhgc319();
+	void nes_vt32_pal_32mb(machine_config &config) ATTR_COLD;
 
 protected:
 	uint8_t vt_rom_banked_r(offs_t offset);
@@ -112,47 +103,39 @@ private:
 
 	uint8_t fcpocket_412d_r();
 	void fcpocket_412c_w(uint8_t data);
+
+	required_region_ptr<uint8_t> m_prgrom;
 };
-
-uint8_t nes_vt32_base_state::vt_rom_r(offs_t offset)
-{
-	return m_prgrom[offset];
-}
-
-void nes_vt32_base_state::vtspace_w(offs_t offset, uint8_t data)
-{
-	logerror("%s: vtspace_w %08x : %02x", machine().describe_context(), offset, data);
-}
 
 // VTxx can address 25-bit address space (32MB of ROM) so use maps with mirroring in depending on ROM size
 void nes_vt32_state::vt_external_space_map_1mbyte(address_map &map)
 {
-	map(0x0000000, 0x00fffff).mirror(0x1f00000).r(FUNC(nes_vt32_state::vt_rom_r));
+	map(0x0000000, 0x00fffff).mirror(0x1f00000).rom().region("mainrom", 0);
 }
 
 void nes_vt32_state::vt_external_space_map_2mbyte(address_map &map)
 {
-	map(0x0000000, 0x01fffff).mirror(0x1e00000).r(FUNC(nes_vt32_state::vt_rom_r));
+	map(0x0000000, 0x01fffff).mirror(0x1e00000).rom().region("mainrom", 0);
 }
 
 void nes_vt32_state::vt_external_space_map_4mbyte(address_map &map)
 {
-	map(0x0000000, 0x03fffff).mirror(0x1c00000).r(FUNC(nes_vt32_state::vt_rom_r));
+	map(0x0000000, 0x03fffff).mirror(0x1c00000).rom().region("mainrom", 0);
 }
 
 void nes_vt32_state::vt_external_space_map_8mbyte(address_map &map)
 {
-	map(0x0000000, 0x07fffff).mirror(0x1800000).r(FUNC(nes_vt32_state::vt_rom_r));
+	map(0x0000000, 0x07fffff).mirror(0x1800000).rom().region("mainrom", 0);
 }
 
 void nes_vt32_state::vt_external_space_map_16mbyte(address_map &map)
 {
-	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt32_state::vt_rom_r));
+	map(0x0000000, 0x0ffffff).mirror(0x1000000).rom().region("mainrom", 0);
 }
 
 void nes_vt32_state::vt_external_space_map_32mbyte(address_map &map)
 {
-	map(0x0000000, 0x1ffffff).r(FUNC(nes_vt32_state::vt_rom_r));
+	map(0x0000000, 0x1ffffff).rom().region("mainrom", 0);
 }
 
 
@@ -235,7 +218,7 @@ void nes_vt32_base_state::machine_reset()
 
 }
 
-void nes_vt32_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
+void nes_vt32_base_state::configure_soc(nes_vt02_vt03_soc_device *soc)
 {
 	soc->set_addrmap(AS_PROGRAM, &nes_vt32_state::vt_external_space_map_32mbyte);
 	soc->read_0_callback().set(FUNC(nes_vt32_base_state::in0_r));
@@ -305,7 +288,7 @@ void nes_vt32_unk_state::nes_vt32_fp(machine_config &config)
 	m_soc->force_bad_dma();
 }
 
-void nes_vt32_unk_state::nes_vt32_pal_32mb(machine_config& config)
+void nes_vt32_unk_state::nes_vt32_pal_32mb(machine_config &config)
 {
 	/* basic machine hardware */
 	NES_VT32_SOC_PAL(config, m_soc, NTSC_APU_CLOCK); // TODO, proper clocks etc. for PAL
@@ -321,7 +304,7 @@ void nes_vt32_unk_state::nes_vt32_pal_32mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32_unk_state::vt_external_space_map_32mbyte);
 }
 
-void nes_vt32_unk_state::nes_vt32_4x16mb(machine_config& config)
+void nes_vt32_unk_state::nes_vt32_4x16mb(machine_config &config)
 {
 	nes_vt32_fp(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32_unk_state::vt_external_space_map_fp_2x32mbyte);
@@ -330,25 +313,25 @@ void nes_vt32_unk_state::nes_vt32_4x16mb(machine_config& config)
 	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412d_callback().set(FUNC(nes_vt32_unk_state::fcpocket_412d_r));
 }
 
-void nes_vt32_unk_state::nes_vt32_2mb(machine_config& config)
+void nes_vt32_unk_state::nes_vt32_2mb(machine_config &config)
 {
 	nes_vt32_fp(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32_unk_state::vt_external_space_map_2mbyte);
 }
 
-void nes_vt32_unk_state::nes_vt32_8mb(machine_config& config)
+void nes_vt32_unk_state::nes_vt32_8mb(machine_config &config)
 {
 	nes_vt32_fp(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32_unk_state::vt_external_space_map_8mbyte);
 }
 
-void nes_vt32_unk_state::nes_vt32_16mb(machine_config& config)
+void nes_vt32_unk_state::nes_vt32_16mb(machine_config &config)
 {
 	nes_vt32_fp(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32_unk_state::vt_external_space_map_16mbyte);
 }
 
-void nes_vt32_unk_state::nes_vt32_32mb(machine_config& config)
+void nes_vt32_unk_state::nes_vt32_32mb(machine_config &config)
 {
 	nes_vt32_fp(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32_unk_state::vt_external_space_map_32mbyte);
@@ -388,8 +371,7 @@ ROM_END
 
 ROM_START( dgunl3202 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "dg308n1_s29gl256p90tfcr1_0001227e.bin", 0x00000, 0x2000000, CRC(489c806f) SHA1(979b2c00eec459646de5a658863aff0eaacc2402) )
-	ROM_IGNORE(0x100)
+	ROM_LOAD( "dg308n1_s29gl256p90tfcr1_0001227e.bin", 0x00000, 0x2000000, CRC(bd5e084d) SHA1(84bd4094e0f484f7bbbf3f5277ca24a09feca45d) )
 ROM_END
 
 ROM_START( myaass )
@@ -404,8 +386,7 @@ ROM_END
 
 ROM_START( mymman )
 	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "megaman_s29gl064n90tfi04_0001227e.bin", 0x00000, 0x800000, CRC(1954cc95) SHA1(be20d42d32d625ec7b3c5db983850763c0ceff73) )
-	ROM_IGNORE(0x100)
+	ROM_LOAD( "megaman_s29gl064n90tfi04_0001227e.bin", 0x00000, 0x800000, CRC(66bba477) SHA1(b16d303caa15bcfa8f18da99f2a3fe29a8a640b8) )
 ROM_END
 
 ROM_START( fcpocket )
@@ -420,14 +401,12 @@ ROM_END
 
 ROM_START( matet220 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "gamervtetris_s29gl128n10tfi01_0001227e.bin", 0x00000, 0x1000000, CRC(ac244e56) SHA1(89897f5f65f55a46bf0d6b5ca534ca31c79a0658) )
-	ROM_IGNORE(0x100)
+	ROM_LOAD( "gamervtetris_s29gl128n10tfi01_0001227e.bin", 0x00000, 0x1000000, CRC(e15b6a48) SHA1(1b0b4f3034ef5e88ae5fd91987d3d4e6539999b0) )
 ROM_END
 
 ROM_START( matet100 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "picotetris_s29gl064n90tfi04_0001227e.bin", 0x00000, 0x800000, CRC(7d9296f2) SHA1(0db5883028d14783d0abff1f7672e59534b0e513) )
-	ROM_IGNORE(0x100)
+	ROM_LOAD( "picotetris_s29gl064n90tfi04_0001227e.bin", 0x00000, 0x800000, CRC(4a774c02) SHA1(1219acbd2b95160f7ed54efb44b368d893e48077) )
 ROM_END
 
 ROM_START( lxpc )
@@ -453,6 +432,16 @@ ROM_END
 ROM_START( lxpcgp )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(2ae7a6f6) SHA1(c16fcf28fad85799fa331ca4ff3c4a1d3560d3f1) )
+ROM_END
+
+ROM_START( lxpcfz )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(6756a5f4) SHA1(fa79e132c4b7b8e7a551e741006a3cb2c51c73a7) )
+ROM_END
+
+ROM_START( lxpcfzcz )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(8b8ed07e) SHA1(4f215765c21c36163cb30f1bf195376e46a6c73f) )
 ROM_END
 
 ROM_START( lxpcsp )
@@ -482,8 +471,7 @@ ROM_END
 
 ROM_START( k10_5l )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "js28f128m29ewh.u4", 0x00000, 0x1000000, CRC(69dba082) SHA1(bd6829b0339795876dd5b4eb5de8bbd124c64f77) )
-	ROM_IGNORE(0x100)
+	ROM_LOAD( "js28f128m29ewh.u4", 0x00000, 0x1000000, CRC(b1f23cb6) SHA1(0491f855a89fc1e2d5a6e9ecf47a816e83d2896f) )
 ROM_END
 
 ROM_START( k10_2l )
@@ -562,8 +550,8 @@ CONS( 2020, lxpcpp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, e
 // Power Console - Paw Patrol (JCG100PAi5, English/Italian)
 CONS( 2020, lxpcdp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Disney Princess (JCG100DPi1, English/French)", MACHINE_NOT_WORKING )
 CONS( 2020, lxpcgp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Gabby's Dollhouse (JCG100GDHi1, English/French)", MACHINE_NOT_WORKING )
-// Power Console - Frozen (JCG100FZi1, English/French)
-// Power Console - Frozen (JCG100FZi12, English/Czech)
+CONS( 2020, lxpcfz,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Frozen (JCG100GFZi1, English/French)", MACHINE_NOT_WORKING )
+CONS( 2020, lxpcfzcz,  lxpcfz,0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Frozen (JCG100GFZi12, English/Czech)", MACHINE_NOT_WORKING )
 
 // unclear SoC types maybe even different
 // Rush'n Attack has the raster split in the wrong place on the 5 language version (mountains in first stage) when using real hardware

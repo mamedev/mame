@@ -63,14 +63,12 @@ void lordgun_state::lordgun_protection_w(offs_t offset, uint16_t data)
 		{
 			m_protection_data++;
 			m_protection_data &= 0x1f;
-
 			return;
 		}
 
 		case 0xc0/2: // reset protection device
 		{
 			m_protection_data = 0;
-
 			return;
 		}
 	}
@@ -82,14 +80,16 @@ uint16_t lordgun_state::lordgun_protection_r(offs_t offset)
 	{
 		case 0x40/2: // bitswap and xor counter
 		{
-			uint8_t x = m_protection_data;
+			if (!machine().side_effects_disabled())
+			{
+				const uint8_t x = m_protection_data;
 
-			m_protection_data  = ((( x >> 0) | ( x >> 1)) & 1) << 4;
-			m_protection_data |=  ((~x >> 2) & 1) << 3;
-			m_protection_data |= (((~x >> 4) | ( x >> 0)) & 1) << 2;
-			m_protection_data |=  (( x >> 3) & 1) << 1;
-			m_protection_data |= (((~x >> 0) | ( x >> 2)) & 1) << 0;
-
+				m_protection_data  = ((( x >> 0) | ( x >> 1)) & 1) << 4;
+				m_protection_data |=  ((~x >> 2) & 1) << 3;
+				m_protection_data |= (((~x >> 4) | ( x >> 0)) & 1) << 2;
+				m_protection_data |=  (( x >> 3) & 1) << 1;
+				m_protection_data |= (((~x >> 0) | ( x >> 2)) & 1) << 0;
+			}
 			return 0;
 		}
 
@@ -106,41 +106,42 @@ uint16_t lordgun_state::lordgun_protection_r(offs_t offset)
 	return 0;
 }
 
-void lordgun_state::aliencha_protection_w(offs_t offset, uint16_t data)
+void aliencha_state::aliencha_protection_w(offs_t offset, uint16_t data)
 {
 	switch (offset & 0x60)
 	{
 		case 0xc0/2: // reset protection device
-		{
 			m_protection_data = 0;
-
 			return;
-		}
 	}
 }
 
-uint16_t lordgun_state::aliencha_protection_r(offs_t offset)
+uint16_t aliencha_state::aliencha_protection_r(offs_t offset)
 {
 	switch (offset & 0x60)
 	{
-		case 0x00/2: // de-increment counter
+		case 0x00/2: // decrement counter
 		{
-			m_protection_data--;
-			m_protection_data &= 0x1f;
-
+			if (!machine().side_effects_disabled())
+			{
+				m_protection_data--;
+				m_protection_data &= 0x1f;
+			}
 			return 0;
 		}
 
 		case 0x40/2: // bitswap and xor counter
 		{
-			uint8_t x = m_protection_data;
+			if (!machine().side_effects_disabled())
+			{
+				const uint8_t x = m_protection_data;
 
-			m_protection_data  = (((x >> 3) ^ (x >> 2)) & 1) << 4;
-			m_protection_data |= (((x >> 2) ^ (x >> 1)) & 1) << 3;
-			m_protection_data |= (((x >> 1) ^ (x >> 0)) & 1) << 2;
-			m_protection_data |= (((x >> 4) ^ (x >> 0)) & 1) << 1;
-			m_protection_data |= (((x >> 4) ^ (x >> 3)) & 1) << 0;
-
+				m_protection_data  = (((x >> 3) ^ (x >> 2)) & 1) << 4;
+				m_protection_data |= (((x >> 2) ^ (x >> 1)) & 1) << 3;
+				m_protection_data |= (((x >> 1) ^ (x >> 0)) & 1) << 2;
+				m_protection_data |= (((x >> 4) ^ (x >> 0)) & 1) << 1;
+				m_protection_data |= (((x >> 4) ^ (x >> 3)) & 1) << 0;
+			}
 			return 0;
 		}
 
@@ -157,155 +158,139 @@ uint16_t lordgun_state::aliencha_protection_r(offs_t offset)
 	return 0;
 }
 
-void lordgun_state::fake_w(uint8_t data)
+void lordgun_base_state::fake_w(uint8_t data)
 {
 //  popmessage("%02x",data);
 }
 
-void lordgun_state::fake2_w(uint8_t data)
+void lordgun_base_state::fake2_w(uint8_t data)
 {
 //  popmessage("%02x",data);
 }
 
 void lordgun_state::lordgun_eeprom_w(uint8_t data)
 {
-	int i;
-
-	if (data & 2)
+	if (BIT(data, 1))
 	{
 //      popmessage("EE: %02x", data);
-		logerror("%s: Unknown EEPROM bit written %02X\n",machine().describe_context(),data);
+		logerror("%s: Unknown EEPROM bit written %02X\n", machine().describe_context(), data);
 	}
 
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 
 	// Update light guns positions
-	for (i = 0; i < 2; i++)
-		if ( (data & (0x04 << i)) && !(m_old & (0x04 << i)) )
-			lordgun_update_gun(i);
+	for (int i = 0; i < 2; i++)
+		if ((data & (0x04 << i)) && !(m_old & (0x04 << i)))
+			update_gun(i);
 
 	// latch the bit
 	m_eeprom->di_write(BIT(data, 6));
 
 	// reset line asserted: reset.
-	m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->cs_write(BIT(data, 4) ? ASSERT_LINE : CLEAR_LINE );
 
 	// clock line asserted: write latch or select next bit to read
-	m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->clk_write(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE );
 
-	m_whitescreen = data & 0x80;
+	m_whitescreen = BIT(data, 7);
 
 	m_old = data;
 }
 
-void lordgun_state::aliencha_eeprom_w(uint8_t data)
+void aliencha_state::aliencha_eeprom_w(uint8_t data)
 {
 	if (~data & 7)
 	{
-//      popmessage("EE: %02x", data);
-		logerror("%s: Unknown EEPROM bit written %02X\n",machine().describe_context(),data);
+		//popmessage("EE: %02x", data);
+		logerror("%s: Unknown EEPROM bit written %02X\n", machine().describe_context(), data);
 	}
 
 	// bit 1? cleared during screen transitions
-	m_whitescreen = !(data & 0x02);
+	m_whitescreen = !BIT(data, 1);
 
-	machine().bookkeeping().coin_counter_w(0, data & 0x08);
-	machine().bookkeeping().coin_counter_w(1, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 3));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 4));
 
 	// latch the bit
 	m_eeprom->di_write(BIT(data, 7));
 
 	// reset line asserted: reset.
-	m_eeprom->cs_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->cs_write(BIT(data, 5));
 
 	// clock line asserted: write latch or select next bit to read
-	m_eeprom->clk_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->clk_write(BIT(data, 6));
 }
 
 
-uint8_t lordgun_state::aliencha_dip_r()
+uint8_t aliencha_state::dip_r()
 {
-	switch (m_aliencha_dip_sel & 0x70)
-	{
-		case 0x30:  return ioport("DIP1")->read();
-		case 0x60:  return ioport("DIP2")->read();
-		case 0x50:  return ioport("DIP3")->read();
-
-		default:
-			logerror("%s: dip_r with unknown dip_sel = %02X\n",machine().describe_context(),m_aliencha_dip_sel);
-			return 0xff;
-	}
+	uint8_t result = 0xff;
+	if (!BIT(m_dip_sel, 6)) result &= m_in_dip[0]->read();
+	if (!BIT(m_dip_sel, 5)) result &= m_in_dip[2]->read();
+	if (!BIT(m_dip_sel, 4)) result &= m_in_dip[1]->read();
+	return result;
 }
 
-void lordgun_state::aliencha_dip_w(uint8_t data)
+void aliencha_state::dip_w(uint8_t data)
 {
-	m_aliencha_dip_sel = data;
+	m_dip_sel = data;
 }
 
 // Unknown, always equal to 7 in lordgun, aliencha.
-void lordgun_state::priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void lordgun_base_state::priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_priority);
 }
 
-
-uint16_t lordgun_state::lordgun_gun_0_x_r()
+template <unsigned Which>
+uint16_t lordgun_state::gun_x_r()
 {
-	return m_gun[0].hw_x;
+	return m_gun[Which].hw_x;
 }
 
-uint16_t lordgun_state::lordgun_gun_0_y_r()
+template <unsigned Which>
+uint16_t lordgun_state::gun_y_r()
 {
-	return m_gun[0].hw_y;
+	return m_gun[Which].hw_y;
 }
 
-uint16_t lordgun_state::lordgun_gun_1_x_r()
+void lordgun_base_state::soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	return m_gun[1].hw_x;
-}
-
-uint16_t lordgun_state::lordgun_gun_1_y_r()
-{
-	return m_gun[1].hw_y;
-}
-
-void lordgun_state::soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)     m_soundlatch->write((data >> 0) & 0xff);
-	if (ACCESSING_BITS_8_15)    m_soundlatch2->write((data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7)     m_soundlatch[0]->write((data >> 0) & 0xff);
+	if (ACCESSING_BITS_8_15)    m_soundlatch[1]->write((data >> 8) & 0xff);
 
 	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 template<int Layer>
-void lordgun_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void lordgun_base_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
-	m_tilemap[Layer]->mark_tile_dirty(offset/2);
+	m_tilemap[Layer]->mark_tile_dirty(offset / 2);
 }
 
-void lordgun_state::common_map(address_map &map)
+void lordgun_base_state::common_map(address_map &map)
 {
 	map(0x200000, 0x20ffff).ram();
-	map(0x210000, 0x21ffff).ram().share("priority_ram");                        // PRIORITY
-	map(0x300000, 0x30ffff).ram().w(FUNC(lordgun_state::vram_w<0>)).share("vram.0");  // DISPLAY (BACKGROUND 1 for aliencha)
-	map(0x310000, 0x313fff).ram().w(FUNC(lordgun_state::vram_w<1>)).share("vram.1");  // DISPLAY (BACKGROUND 2 for aliencha)
-	map(0x314000, 0x314fff).ram().w(FUNC(lordgun_state::vram_w<2>)).share("vram.2");  // DISPLAY (BACKGROUND 3 for aliencha)
+	map(0x210000, 0x21ffff).ram().share(m_priority_ram);                        // PRIORITY
+	map(0x300000, 0x30ffff).ram().w(FUNC(lordgun_base_state::vram_w<0>)).share(m_vram[0]);  // DISPLAY (BACKGROUND 1 for aliencha)
+	map(0x310000, 0x313fff).ram().w(FUNC(lordgun_base_state::vram_w<1>)).share(m_vram[1]);  // DISPLAY (BACKGROUND 2 for aliencha)
+	map(0x314000, 0x314fff).ram().w(FUNC(lordgun_base_state::vram_w<2>)).share(m_vram[2]);  // DISPLAY (BACKGROUND 3 for aliencha)
 	map(0x315000, 0x317fff).ram();                                                     //
-	map(0x318000, 0x319fff).ram().w(FUNC(lordgun_state::vram_w<3>)).share("vram.3");  // DISPLAY (TEXT for aliencha)
-	map(0x31c000, 0x31c7ff).ram().share("scrollram");                           // LINE (LINE OFFSET for aliencha)
-	map(0x400000, 0x4007ff).ram().share("spriteram");                       // ANIMATOR (ANIMATE for aliencha)
+	map(0x318000, 0x319fff).ram().w(FUNC(lordgun_base_state::vram_w<3>)).share(m_vram[3]);  // DISPLAY (TEXT for aliencha)
+	map(0x31c000, 0x31c7ff).ram().share(m_scrollram);                           // LINE (LINE OFFSET for aliencha)
+	map(0x400000, 0x4007ff).ram().share(m_spriteram);                       // ANIMATOR (ANIMATE for aliencha)
 	map(0x500000, 0x500fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x502000, 0x502001).writeonly().share("scroll_x.0");
-	map(0x502200, 0x502201).writeonly().share("scroll_x.1");
-	map(0x502400, 0x502401).writeonly().share("scroll_x.2");
-	map(0x502600, 0x502601).writeonly().share("scroll_x.3");
-	map(0x502800, 0x502801).writeonly().share("scroll_y.0");
-	map(0x502a00, 0x502a01).writeonly().share("scroll_y.1");
-	map(0x502c00, 0x502c01).writeonly().share("scroll_y.2");
-	map(0x502e00, 0x502e01).writeonly().share("scroll_y.3");
-	map(0x503000, 0x503001).w(FUNC(lordgun_state::priority_w));
-	map(0x504000, 0x504001).w(FUNC(lordgun_state::soundlatch_w));
+	map(0x502000, 0x502001).writeonly().share(m_scroll_x[0]);
+	map(0x502200, 0x502201).writeonly().share(m_scroll_x[1]);
+	map(0x502400, 0x502401).writeonly().share(m_scroll_x[2]);
+	map(0x502600, 0x502601).writeonly().share(m_scroll_x[3]);
+	map(0x502800, 0x502801).writeonly().share(m_scroll_y[0]);
+	map(0x502a00, 0x502a01).writeonly().share(m_scroll_y[1]);
+	map(0x502c00, 0x502c01).writeonly().share(m_scroll_y[2]);
+	map(0x502e00, 0x502e01).writeonly().share(m_scroll_y[3]);
+	map(0x503000, 0x503001).w(FUNC(lordgun_base_state::priority_w));
+	map(0x504000, 0x504001).w(FUNC(lordgun_base_state::soundlatch_w));
 	map(0x506000, 0x506007).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x508000, 0x508007).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 }
@@ -314,22 +299,22 @@ void lordgun_state::lordgun_map(address_map &map)
 {
 	common_map(map);
 	map(0x000000, 0x0fffff).rom();
-	map(0x503800, 0x503801).r(FUNC(lordgun_state::lordgun_gun_0_x_r));
-	map(0x503a00, 0x503a01).r(FUNC(lordgun_state::lordgun_gun_1_x_r));
-	map(0x503c00, 0x503c01).r(FUNC(lordgun_state::lordgun_gun_0_y_r));
-	map(0x503e00, 0x503e01).r(FUNC(lordgun_state::lordgun_gun_1_y_r));
+	map(0x503800, 0x503801).r(FUNC(lordgun_state::gun_x_r<0>));
+	map(0x503a00, 0x503a01).r(FUNC(lordgun_state::gun_x_r<1>));
+	map(0x503c00, 0x503c01).r(FUNC(lordgun_state::gun_y_r<0>));
+	map(0x503e00, 0x503e01).r(FUNC(lordgun_state::gun_y_r<1>));
 	map(0x50a900, 0x50a9ff).rw(FUNC(lordgun_state::lordgun_protection_r), FUNC(lordgun_state::lordgun_protection_w));
 }
 
 
-void lordgun_state::aliencha_map(address_map &map)
+void aliencha_state::aliencha_map(address_map &map)
 {
 	common_map(map);
 	map(0x000000, 0x1fffff).rom();
-	map(0x50b900, 0x50b9ff).rw(FUNC(lordgun_state::aliencha_protection_r), FUNC(lordgun_state::aliencha_protection_w));
+	map(0x50b900, 0x50b9ff).rw(FUNC(aliencha_state::aliencha_protection_r), FUNC(aliencha_state::aliencha_protection_w));
 }
 
-void lordgun_state::ymf278_map(address_map &map)
+void aliencha_state::ymf278_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 }
@@ -340,15 +325,15 @@ void lordgun_state::ymf278_map(address_map &map)
 
 ***************************************************************************/
 
-void lordgun_state::soundmem_map(address_map &map)
+void lordgun_base_state::soundmem_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xffff).ram();
 }
 
-void lordgun_state::lordgun_okibank_w(uint8_t data)
+void lordgun_state::okibank_w(uint8_t data)
 {
-	m_oki->set_rom_bank((data >> 1) & 1);
+	m_oki[0]->set_rom_bank(BIT(data, 1));
 	if (data & ~3)  logerror("%s: unknown okibank bits %02x\n", machine().describe_context(), data);
 //  popmessage("OKI %x", data);
 }
@@ -356,23 +341,23 @@ void lordgun_state::lordgun_okibank_w(uint8_t data)
 void lordgun_state::lordgun_soundio_map(address_map &map)
 {
 	map(0x1000, 0x1001).w("ymsnd", FUNC(ym3812_device::write));
-	map(0x2000, 0x2000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x3000, 0x3000).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
-	map(0x4000, 0x4000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x2000, 0x2000).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x3000, 0x3000).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
+	map(0x4000, 0x4000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 	map(0x5000, 0x5000).nopr();
-	map(0x6000, 0x6000).w(FUNC(lordgun_state::lordgun_okibank_w));
+	map(0x6000, 0x6000).w(FUNC(lordgun_state::okibank_w));
 }
 
 
-void lordgun_state::aliencha_soundio_map(address_map &map)
+void aliencha_state::aliencha_soundio_map(address_map &map)
 {
-	map(0x3000, 0x3000).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
-	map(0x4000, 0x4000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x3000, 0x3000).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
+	map(0x4000, 0x4000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 	map(0x5000, 0x5000).nopw();    // writes 03 then 07 at end of NMI
 	map(0x7000, 0x7000).r("ymf", FUNC(ymf278b_device::read));
 	map(0x7000, 0x7005).w("ymf", FUNC(ymf278b_device::write));
-	map(0x7400, 0x7400).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x7800, 0x7800).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x7400, 0x7400).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x7800, 0x7800).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
 
@@ -621,11 +606,29 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-void lordgun_state::machine_start()
+void lordgun_base_state::machine_start()
 {
 	save_item(NAME(m_protection_data));
 	save_item(NAME(m_priority));
 	save_item(NAME(m_whitescreen));
+}
+
+void aliencha_state::machine_start()
+{
+	lordgun_base_state::machine_start();
+
+	save_item(NAME(m_dip_sel));
+}
+
+void lordgun_state::machine_start()
+{
+	lordgun_base_state::machine_start();
+
+	save_item(NAME(m_old));
+	save_item(STRUCT_MEMBER(m_gun, scr_x));
+	save_item(STRUCT_MEMBER(m_gun, scr_y));
+	save_item(STRUCT_MEMBER(m_gun, hw_x));
+	save_item(STRUCT_MEMBER(m_gun, hw_y));
 }
 
 void lordgun_state::lordgun(machine_config &config)
@@ -671,41 +674,41 @@ void lordgun_state::lordgun(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	GENERIC_LATCH_8(config, m_soundlatch2);
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.irq_handler().set_inputline("soundcpu", 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, m_oki, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
-	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+	OKIM6295(config, m_oki[0], 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void lordgun_state::aliencha(machine_config &config)
+void aliencha_state::aliencha(machine_config &config)
 {
 	M68000(config, m_maincpu, 20_MHz_XTAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &lordgun_state::aliencha_map);
-	m_maincpu->set_vblank_int("screen", FUNC(lordgun_state::irq4_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &aliencha_state::aliencha_map);
+	m_maincpu->set_vblank_int("screen", FUNC(aliencha_state::irq4_line_hold));
 
 	Z80(config, m_soundcpu, 20_MHz_XTAL / 4);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &lordgun_state::soundmem_map);
-	m_soundcpu->set_addrmap(AS_IO, &lordgun_state::aliencha_soundio_map);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &aliencha_state::soundmem_map);
+	m_soundcpu->set_addrmap(AS_IO, &aliencha_state::aliencha_soundio_map);
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
-	ppi0.in_pa_callback().set(FUNC(lordgun_state::aliencha_dip_r));
-	ppi0.out_pa_callback().set(FUNC(lordgun_state::fake2_w));
-	ppi0.out_pb_callback().set(FUNC(lordgun_state::aliencha_eeprom_w));
+	ppi0.in_pa_callback().set(FUNC(aliencha_state::dip_r));
+	ppi0.out_pa_callback().set(FUNC(aliencha_state::fake2_w));
+	ppi0.out_pb_callback().set(FUNC(aliencha_state::aliencha_eeprom_w));
 	ppi0.in_pc_callback().set_ioport("SERVICE");
-	ppi0.out_pc_callback().set(FUNC(lordgun_state::aliencha_dip_w));
+	ppi0.out_pc_callback().set(FUNC(aliencha_state::dip_w));
 
 	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
 	ppi1.in_pa_callback().set_ioport("P1");
-	ppi1.out_pa_callback().set(FUNC(lordgun_state::fake_w));
+	ppi1.out_pa_callback().set(FUNC(aliencha_state::fake_w));
 	ppi1.in_pb_callback().set_ioport("P2");
-	ppi1.out_pb_callback().set(FUNC(lordgun_state::fake_w));
+	ppi1.out_pb_callback().set(FUNC(aliencha_state::fake_w));
 	ppi1.in_pc_callback().set_ioport("COIN");
-	ppi1.out_pc_callback().set(FUNC(lordgun_state::fake_w));
+	ppi1.out_pc_callback().set(FUNC(aliencha_state::fake_w));
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
@@ -714,7 +717,7 @@ void lordgun_state::aliencha(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(0x200, 0x100);
 	m_screen->set_visarea(0,0x1c0-1, 0,0xe0-1);
-	m_screen->set_screen_update(FUNC(lordgun_state::screen_update));
+	m_screen->set_screen_update(FUNC(aliencha_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lordgun);
@@ -725,18 +728,19 @@ void lordgun_state::aliencha(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	GENERIC_LATCH_8(config, m_soundlatch2);
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	ymf278b_device &ymf(YMF278B(config, "ymf", 33.8688_MHz_XTAL));
-	ymf.set_addrmap(0, &lordgun_state::ymf278_map);
+	ymf.set_addrmap(0, &aliencha_state::ymf278_map);
 	ymf.irq_handler().set_inputline("soundcpu", 0);
 	ymf.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	OKIM6295(config, m_oki, 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
-	m_oki->add_route(ALL_OUTPUTS, "mono", 0.5);
+	OKIM6295(config, m_oki[0], 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	OKIM6295(config, "oki2", 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
+	OKIM6295(config, m_oki[1], 20_MHz_XTAL / 20, okim6295_device::PIN7_HIGH);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
@@ -1019,7 +1023,7 @@ ROM_START( lordgun ) // World set, excluding USA, Canada, Mexico, Japan & Taiwan
 	ROM_LOAD16_BYTE( "lord_gun_u10.u10",  0xb00000, 0x080000, CRC(eea39e5e) SHA1(806a97a08d0108509d30732b507e1064215295c6) )
 	ROM_LOAD16_BYTE( "lord_gun_u3.u3",    0xb00001, 0x080000, CRC(233782f8) SHA1(ef2049aadbcf5c409275ecfbbe75bdade5b087d4) )
 
-	ROM_REGION( 0x080000, "oki", 0 ) // Samples
+	ROM_REGION( 0x080000, "oki1", 0 ) // Samples
 	ROM_LOAD( "lord_gun_u161-3.u161", 0x00000, 0x80000, CRC(b4e0fa07) SHA1(f5f33fe3f3a124f4737751fda3ea409fceeec0be) ) // == lord_gun_u100.u100
 
 	ROM_REGION( 0x80, "eeprom", ROMREGION_LE|ROMREGION_16BIT ) // Default eeprom
@@ -1052,7 +1056,7 @@ ROM_START( lordgunu ) // USA, Canada & Mexico
 	ROM_LOAD( "igs_a003.u3",  0x800000, 0x200000, CRC(649e48d9) SHA1(ce346154024cf13f3e40000ceeb4c2003cd35894) )
 	ROM_LOAD( "igs_a006.u2",  0xa00000, 0x200000, CRC(39288eb6) SHA1(54d157f0e151f6665f4288b4d09bd65571005132) )
 
-	ROM_REGION( 0x080000, "oki", 0 ) // Samples
+	ROM_REGION( 0x080000, "oki1", 0 ) // Samples
 	ROM_LOAD( "lord_gun_u100.u100", 0x00000, 0x80000, CRC(b4e0fa07) SHA1(f5f33fe3f3a124f4737751fda3ea409fceeec0be) ) // labeled as LORD/GUN U100
 
 	ROM_REGION( 0x80, "eeprom", ROMREGION_LE|ROMREGION_16BIT ) // Default eeprom
@@ -1090,7 +1094,7 @@ ROM_START( aliencha )
 	ROM_LOAD( "igsa0102.u2", 0x400000, 0x400000, CRC(dbeee7ac) SHA1(e0eb0d73d9230aa6f69f5ac25d44fa19affebe88) )
 	ROM_LOAD( "igsa0103.u1", 0x800000, 0x400000, CRC(e5f19041) SHA1(c92a29bbbcb9a1f63364c665e3e0f9679add4389) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) // Samples
+	ROM_REGION( 0x40000, "oki1", 0 ) // Samples
 	ROM_LOAD( "hfh_g.u65", 0x00000, 0x40000, CRC(ec469b57) SHA1(ba1668078987ad51f47bcd3e61c51a0cf2545350) )
 
 	ROM_REGION( 0x40000, "oki2", 0 ) // Samples
@@ -1164,7 +1168,7 @@ ROM_START( alienchac )
 	ROM_LOAD( "igsa0102.u2",  0x400000, 0x400000, CRC(dbeee7ac) SHA1(e0eb0d73d9230aa6f69f5ac25d44fa19affebe88) )
 	ROM_LOAD( "igsa0103.u1",  0x800000, 0x400000, CRC(e5f19041) SHA1(c92a29bbbcb9a1f63364c665e3e0f9679add4389) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) // Samples
+	ROM_REGION( 0x40000, "oki1", 0 ) // Samples
 	ROM_LOAD( "alien_u65.u65", 0x00000, 0x40000, CRC(ec469b57) SHA1(ba1668078987ad51f47bcd3e61c51a0cf2545350) ) // labeled as  ALIEN  U65, == hfh_g.u65
 
 	ROM_REGION( 0x40000, "oki2", 0 ) // Samples
@@ -1195,21 +1199,6 @@ void lordgun_state::init_lordgun()
 
 		rom[i] = x;
 	}
-
-	save_item(NAME(m_old));
-
-	for (int i = 0; i < 2; i++)
-	{
-		save_item(NAME(m_gun[i].scr_x), i);
-		save_item(NAME(m_gun[i].scr_y), i);
-		save_item(NAME(m_gun[i].hw_x), i);
-		save_item(NAME(m_gun[i].hw_y), i);
-	}
-}
-
-void lordgun_state::init_aliencha()
-{
-	save_item(NAME(m_aliencha_dip_sel));
 }
 
 /***************************************************************************
@@ -1218,7 +1207,7 @@ void lordgun_state::init_aliencha()
 
 ***************************************************************************/
 
-GAME( 1994, lordgun,   0,        lordgun,  lordgun,  lordgun_state, init_lordgun,  ROT0, "IGS", "Lord of Gun (World)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // Excludes USA, Canada, Mexico, Japan & Taiwan
-GAME( 1994, lordgunu,  lordgun,  lordgun,  lordgun,  lordgun_state, init_lordgun,  ROT0, "IGS", "Lord of Gun (USA)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // USA, Canada & Mexico
-GAME( 1994, aliencha,  0,        aliencha, aliencha, lordgun_state, init_aliencha, ROT0, "IGS", "Alien Challenge (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, alienchac, aliencha, aliencha, aliencha, lordgun_state, init_aliencha, ROT0, "IGS", "Alien Challenge (China)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lordgun,   0,        lordgun,  lordgun,  lordgun_state,  init_lordgun, ROT0, "IGS", "Lord of Gun (World)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // Excludes USA, Canada, Mexico, Japan & Taiwan
+GAME( 1994, lordgunu,  lordgun,  lordgun,  lordgun,  lordgun_state,  init_lordgun, ROT0, "IGS", "Lord of Gun (USA)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // USA, Canada & Mexico
+GAME( 1994, aliencha,  0,        aliencha, aliencha, aliencha_state, empty_init,   ROT0, "IGS", "Alien Challenge (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, alienchac, aliencha, aliencha, aliencha, aliencha_state, empty_init,   ROT0, "IGS", "Alien Challenge (China)", MACHINE_SUPPORTS_SAVE )

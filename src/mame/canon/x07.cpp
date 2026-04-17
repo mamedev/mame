@@ -428,12 +428,9 @@ void x07_state::t6834_cmd (uint8_t cmd)
 
 	case 0x24:  //locate
 		{
-			uint8_t x = m_in.data[m_in.read++];
-			uint8_t y = m_in.data[m_in.read++];
+			const uint8_t x = m_cursor.x = m_in.data[m_in.read++];
+			const uint8_t y = m_cursor.y = m_in.data[m_in.read++];
 			uint8_t char_code = m_in.data[m_in.read++];
-			m_locate.on = (m_locate.x != x || m_locate.y != y);
-			m_locate.x = m_cursor.x = x;
-			m_locate.y = m_cursor.y = y;
 
 			if(char_code)
 				draw_char(x, y, char_code);
@@ -566,7 +563,7 @@ void x07_state::t6834_cmd (uint8_t cmd)
 		}
 		break;
 
-	case 0x41:  //char wrire
+	case 0x41:  //char write
 		{
 			for(int cy = 0; cy < 8; cy++)
 			{
@@ -627,70 +624,39 @@ void x07_state::t6834_r ()
 
 void x07_state::t6834_w ()
 {
+	const uint8_t data = m_regs_w[1];
+
 	if (!m_in.write)
 	{
-		if (m_locate.on && ((m_regs_w[1] & 0x7F) != 0x24) && ((m_regs_w[1]) >= 0x20) && ((m_regs_w[1]) < 0x80))
-		{
-			m_cursor.x++;
-			draw_char(m_cursor.x, m_cursor.y, m_regs_w[1]);
-		}
-		else
-		{
-			m_locate.on = 0;
-
-			if ((m_regs_w[1] & 0x7f) < 0x47)
-			{
-				m_in.data[m_in.write++] = m_regs_w[1] & 0x7f;
-			}
-		}
+		m_in.data[m_in.write++] = data & 0x7f;
 	}
 	else
 	{
-		m_in.data[m_in.write++] = m_regs_w[1];
-
-		if (m_in.write == 2)
-		{
-			if (m_in.data[m_in.read] == 0x0c && m_regs_w [1] == 0xb0)
-			{
-				memset(m_lcd_map, 0, sizeof(m_lcd_map));
-				m_in.write = 0;
-				m_in.read = 0;
-				m_in.data[m_in.write++] = m_regs_w[1] & 0x7f;
-			}
-
-			if (m_in.data[m_in.read] == 0x07 && m_regs_w [1] > 4)
-			{
-				m_in.write = 0;
-				m_in.read = 0;
-				m_in.data[m_in.write++] = m_regs_w[1] & 0x7f;
-			}
-		}
+		m_in.data[m_in.write++] = data;
 	}
 
-	if (m_in.write)
-	{
-		uint8_t cmd_len = t6834_cmd_len[m_in.data[m_in.read]];
-		if(cmd_len & 0x80)
-		{
-			if((cmd_len & 0x7f) < m_in.write && !m_regs_w[1])
-				cmd_len = m_in.write;
-		}
+	uint8_t cmd_len = t6834_cmd_len[m_in.data[m_in.read]];
 
-		if(m_in.write == cmd_len)
+	if(cmd_len & 0x80)
+	{
+		if((cmd_len & 0x7f) < m_in.write && !data)
+			cmd_len = m_in.write;
+	}
+
+	if(m_in.write == cmd_len)
+	{
+		m_out.write = 0;
+		m_out.read = 0;
+		t6834_cmd(m_in.data[m_in.read++]);
+		m_in.write = 0;
+		m_in.read = 0;
+		if(m_out.write)
 		{
-			m_out.write = 0;
-			m_out.read = 0;
-			t6834_cmd(m_in.data[m_in.read++]);
-			m_in.write = 0;
-			m_in.read = 0;
-			if(m_out.write)
-			{
-				m_regs_r[0]  = 0x40;
-				m_regs_r[1] = m_out.data[m_out.read];
-				m_regs_r[2] |= 0x01;
-				m_maincpu->set_input_line(NSC800_RSTA, ASSERT_LINE);
-				m_rsta_clear->adjust(attotime::from_msec(50));
-			}
+			m_regs_r[0]  = 0x40;
+			m_regs_r[1] = m_out.data[m_out.read];
+			m_regs_r[2] |= 0x01;
+			m_maincpu->set_input_line(NSC800_RSTA, ASSERT_LINE);
+			m_rsta_clear->adjust(attotime::from_msec(50));
 		}
 	}
 }
@@ -1236,6 +1202,10 @@ void x07_state::x07_io_w(offs_t offset, uint8_t data)
 
 		m_regs_w[5] = data;
 		break;
+
+	case 0xbb:
+		// TODO: Missing IRQ/RST control (User manual page 108)
+		break;
 	}
 }
 
@@ -1440,9 +1410,6 @@ void x07_state::machine_start()
 	save_item(NAME(m_out.read));
 	save_item(NAME(m_out.write));
 	save_item(NAME(m_out.data));
-	save_item(NAME(m_locate.x));
-	save_item(NAME(m_locate.y));
-	save_item(NAME(m_locate.on));
 	save_item(NAME(m_cursor.x));
 	save_item(NAME(m_cursor.y));
 	save_item(NAME(m_cursor.on));
@@ -1473,7 +1440,6 @@ void x07_state::machine_reset()
 	m_in.read = m_in.write = 0;
 	std::fill(std::begin(m_out.data), std::end(m_out.data), 0);
 	m_out.read = m_out.write = 0;
-	m_locate = lcd_position();
 	m_cursor = lcd_position();
 	memset(m_prn_buffer, 0, sizeof(m_prn_buffer));
 	memset(m_lcd_map, 0, sizeof(m_lcd_map));

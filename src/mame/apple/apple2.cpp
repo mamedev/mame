@@ -55,6 +55,8 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/cards.h"
 #include "bus/a2gameio/gameio.h"
 #include "bus/a2kbd/a2kbd.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"
 #include "machine/74259.h"
@@ -156,6 +158,8 @@ public:
 	void apple2p(machine_config &config);
 	void apple2pe(machine_config &config);
 	void apple2_map(address_map &map) ATTR_COLD;
+
+	template <unsigned Address> std::pair<std::error_condition, std::string> load_rom(device_image_interface &image);
 
 private:
 	int m_speaker_state, m_cassette_state;
@@ -769,6 +773,19 @@ void apple2_state::apple2_map(address_map &map)
 	m_upperbank[1](0xd000, 0xffff).rw(FUNC(apple2_state::inh_r), FUNC(apple2_state::inh_w));
 }
 
+template <unsigned Address>
+std::pair<std::error_condition, std::string> apple2_state::load_rom(device_image_interface &image)
+{
+	generic_slot_device &slot = downcast<generic_slot_device &>(image.device());
+	uint32_t size = slot.common_get_size("rom");
+
+	if (size != 0x800)
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported ROM size (only 2KB allowed)");
+
+	slot.common_load_rom(&memregion("maincpu")->as_u8(Address - 0xc000), size, "rom");
+	return std::make_pair(std::error_condition(), std::string());
+}
+
 /***************************************************************************
     KEYBOARD
 ***************************************************************************/
@@ -903,6 +920,10 @@ void apple2_state::apple2(machine_config &config)
 	apple2_common(config);
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("4K,8K,12K,16K,20K,24K,32K,36K,48K").set_default_value(0x00);
+
+	GENERIC_SOCKET(config, "d0", generic_plain_slot, "apple2_d0_rom", "d0").set_device_load(FUNC(apple2_state::load_rom<0xd000>));
+	GENERIC_SOCKET(config, "d8", generic_plain_slot, "apple2_d8_rom", "d8").set_device_load(FUNC(apple2_state::load_rom<0xd800>));
+	SOFTWARE_LIST(config, "rom_list").set_original("apple2_rom");
 }
 
 void apple2_state::apple2p(machine_config &config)
@@ -992,8 +1013,7 @@ ROM_START(apple2) /* the classic, non-autoboot apple2 with integer basic in rom.
 	ROM_LOAD ( "a2.chr", 0x0000, 0x0800, BAD_DUMP CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659)) /* current dump is 341-0036 which is the appleII+ character generator, not the original appleII one, whose rom number is not yet known! */
 
 	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD_OPTIONAL ( "341-0016-00.d0", 0x1000, 0x0800, CRC(4234e88a) SHA1(c9a81d704dc2f0c3416c20f9c4ab71fedda937ed)) /* 341-0016: Programmer's Aid #1 D0 */
-
+	/* 341-0016: Programmer's Aid #1 D0 (optional; see apple2_rom.xml) */
 	ROM_LOAD ( "341-0001-00.e0", 0x2000, 0x0800, CRC(c0a4ad3b) SHA1(bf32195efcb34b694c893c2d342321ec3a24b98f)) /* Needs verification. From eBay: Label: S7925E // C48077 // 3410001-00 // (C)APPLE78 E0 */
 	ROM_LOAD ( "341-0002-00.e8", 0x2800, 0x0800, CRC(a99c2cf6) SHA1(9767d92d04fc65c626223f25564cca31f5248980)) /* Needs verification. From eBay: Label: S7916E // C48078 // 3410002-00 // (C)APPLE78 E8 */
 	ROM_LOAD ( "341-0003-00.f0", 0x3000, 0x0800, CRC(62230d38) SHA1(f268022da555e4c809ca1ae9e5d2f00b388ff61c)) /* Needs verification. From eBay: Label: S7908E // C48709 // 3410003 // CAPPLE78 F0 */
@@ -1315,7 +1335,7 @@ COMP( 198?, elppa,    apple2, 0,      apple2p,  apple2, apple2_state, empty_init
 COMP( 1982, microeng, apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Spectrum Eletronica (SCOPUS)", "Micro Engenho", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, maxxi,    apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Polymax",             "Maxxi", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, prav82,   apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Pravetz",             "Pravetz 82", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, ace100,   apple2, 0,      apple2,   apple2, apple2_state, empty_init, "Franklin Computer",   "Franklin ACE 100", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, ace100,   apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Franklin Computer",   "Franklin ACE 100", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, ace1000,  apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Franklin Computer",   "Franklin ACE 1000", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, uniap2en, apple2, 0,      uniap2,   apple2, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in English)", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, uniap2pt, apple2, 0,      uniap2,   apple2, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in Brazilian Portuguese)", MACHINE_SUPPORTS_SAVE )
@@ -1326,7 +1346,7 @@ COMP( 1985, prav8m,   apple2, 0,      apple2p,  apple2, apple2_state, empty_init
 COMP( 1985, space84,  apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "ComputerTechnik/IBS", "Space 84",   MACHINE_SUPPORTS_SAVE )
 COMP( 1985, am64,     apple2, 0,      am64,     apple2, apple2_state, empty_init, "ASEM",                "AM 64", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, laser2c,  apple2, 0,      dodo,     apple2, apple2_state, empty_init, "Milmar",              "Laser //c", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, basis108, apple2, 0,      apple2,   apple2, apple2_state, empty_init, "Basis Microcomputer GmbH", "Basis 108", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, basis108, apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Basis Microcomputer GmbH", "Basis 108", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 COMP( 1984, hkc8800a, apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "China HKC",           "HKC 8800A", MACHINE_SUPPORTS_SAVE )
 COMP( 1984, albert,   apple2, 0,      albert,   apple2, apple2_state, empty_init, "Albert Computers, Inc.", "Albert", MACHINE_SUPPORTS_SAVE )
 COMP( 198?, am100,    apple2, 0,      am100,    apple2, apple2_state, empty_init, "ASEM S.p.A.",         "AM100",     MACHINE_SUPPORTS_SAVE )

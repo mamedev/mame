@@ -32,7 +32,8 @@
 // | Correct char. generator              | * | * | N | N |
 // | 5.25 floppy drives                   |   | 1 | 2 | 2 |
 // | RS232 interface                      | * |   |   |   |
-// | Expansion cards (hp98628, hp98629)   | * | * | * | * |
+// | Expansion cards                      | * | * | * | * |
+// | (hp98259, hp98628, hp98629)          |   |   |   |   |
 //
 // What's not in for 9836A/C models:
 // - Correct character generator

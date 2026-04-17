@@ -18,17 +18,20 @@
 #include <array>
 #include <cstddef>
 #include <iterator>
+#include <map>
 #include <numeric>
 #include <stdexcept>
+#include <string>
 #include <string_view>
 #include <type_traits>
+#include <unordered_map>
 #include <utility>
 
 // ======================> simple_list
 
 // a simple_list is a singly-linked list whose 'next' pointer is owned
 // by the object
-template<class ElementType>
+template <class ElementType>
 class simple_list final
 {
 public:
@@ -314,8 +317,6 @@ private:
 };
 
 
-// ======================> contiguous_sequence_wrapper
-
 namespace util {
 
 using osd::u8;
@@ -329,71 +330,96 @@ using osd::s32;
 using osd::s64;
 
 
-// wraps an existing sequence of values
-template<typename T>
-class contiguous_sequence_wrapper
+template <typename CharT, typename Traits = std::char_traits<CharT> >
+struct transparent_string_equal
 {
-public:
-	typedef std::ptrdiff_t difference_type;
-	typedef std::size_t size_type;
-	typedef T value_type;
-	typedef T &reference;
-	typedef const T &const_reference;
-	typedef T *pointer;
-	typedef T *iterator;
-	typedef const T *const_iterator;
-	typedef std::reverse_iterator<iterator> reverse_iterator;
-	typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+	using is_transparent = std::true_type;
 
-	contiguous_sequence_wrapper(T *ptr, std::size_t size)
-		: m_begin(ptr)
-		, m_end(ptr + size)
-	{
-	}
+	template <typename AllocA, typename AllocB>
+	bool operator()(std::basic_string<CharT, Traits, AllocA> const &a, std::basic_string<CharT, Traits, AllocB> const &b) const
+	{ return a == b; }
 
-	contiguous_sequence_wrapper(const contiguous_sequence_wrapper &that) = default;
+	bool operator()(std::basic_string_view<CharT, Traits> const &a, std::basic_string_view<CharT, Traits> const &b) const
+	{ return a == b; }
 
-	// iteration
-	iterator begin() { return m_begin; }
-	const_iterator begin() const { return m_begin; }
-	const_iterator cbegin() const { return m_begin; }
-	iterator end() { return m_end; }
-	const_iterator end() const { return m_end; }
-	const_iterator cend() const { return m_end; }
+	template <typename AllocA>
+	bool operator()(std::basic_string<CharT, Traits, AllocA> const &a, std::basic_string_view<CharT, Traits> const &b) const
+	{ return a == b; }
 
-	// reverse iteration
-	reverse_iterator rbegin() { return std::reverse_iterator<iterator>(end()); }
-	const_reverse_iterator rbegin() const { return std::reverse_iterator<const_iterator>(end()); }
-	const_reverse_iterator crbegin() const { return std::reverse_iterator<const_iterator>(cend()); }
-	reverse_iterator rend() { return std::reverse_iterator<iterator>(begin()); }
-	const_reverse_iterator rend() const { return std::reverse_iterator<iterator>(begin()); }
-	const_reverse_iterator crend() const { return std::reverse_iterator<iterator>(begin()); }
+	template <typename AllocB>
+	bool operator()(std::basic_string_view<CharT, Traits> const &a, std::basic_string<CharT, Traits, AllocB> const &b) const
+	{ return a == b; }
 
-	// capacity
-	size_type size() const { return m_end - m_begin; }
-	size_type max_size() const { return size(); }
-	bool empty() const { return size() == 0; }
+	template <typename AllocA>
+	bool operator()(std::basic_string<CharT, Traits, AllocA> const &a, CharT const *b) const
+	{ return a == b; }
 
-	// element access
-	reference front() { return operator[](0); }
-	const_reference front() const { return operator[](0); }
-	reference back() { return operator[](size() - 1); }
-	const_reference back() const { return operator[](size() - 1); }
-	reference operator[] (size_type n) { return m_begin[n]; }
-	const_reference operator[] (size_type n) const { return m_begin[n]; }
-	reference at(size_type n) { check_in_bounds(n); return operator[](n); }
-	const_reference at(size_type n) const { check_in_bounds(n); return operator[](n); }
+	template <typename AllocB>
+	bool operator()(CharT const *a, std::basic_string<CharT, Traits, AllocB> const &b) const
+	{ return a == b; }
 
-private:
-	iterator m_begin;
-	iterator m_end;
+	bool operator()(std::basic_string_view<CharT, Traits> const &a, CharT const *b) const
+	{ return a == b; }
 
-	void check_in_bounds(size_type n)
-	{
-		if (n < 0 || n >= size())
-			throw std::out_of_range("invalid contiguous_sequence_wrapper<T> subscript");
-	}
+	bool operator()(CharT const *a, std::basic_string_view<CharT, Traits> const &b) const
+	{ return a == b; }
 };
+
+template <typename CharT, typename Traits = std::char_traits<CharT> >
+struct transparent_string_less
+{
+	using is_transparent = std::true_type;
+
+	template <typename AllocA, typename AllocB>
+	bool operator()(std::basic_string<CharT, Traits, AllocA> const &a, std::basic_string<CharT, Traits, AllocB> const &b) const
+	{ return a < b; }
+
+	bool operator()(std::basic_string_view<CharT, Traits> const &a, std::basic_string_view<CharT, Traits> const &b) const
+	{ return a < b; }
+
+	template <typename AllocA>
+	bool operator()(std::basic_string<CharT, Traits, AllocA> const &a, std::basic_string_view<CharT, Traits> const &b) const
+	{ return a < b; }
+
+	template <typename AllocB>
+	bool operator()(std::basic_string_view<CharT, Traits> const &a, std::basic_string<CharT, Traits, AllocB> const &b) const
+	{ return a < b; }
+
+	template <typename AllocA>
+	bool operator()(std::basic_string<CharT, Traits, AllocA> const &a, CharT const *b) const
+	{ return a < b; }
+
+	template <typename AllocB>
+	bool operator()(CharT const *a, std::basic_string<CharT, Traits, AllocB> const &b) const
+	{ return a < b; }
+
+	bool operator()(std::basic_string_view<CharT, Traits> const &a, CharT const *b) const
+	{ return a < b; }
+
+	bool operator()(CharT const *a, std::basic_string_view<CharT, Traits> const &b) const
+	{ return a < b; }
+};
+
+template <typename CharT, typename Traits = std::char_traits<CharT> >
+struct transparent_string_hash : protected std::hash<std::basic_string_view<CharT, Traits> >
+{
+	using is_transparent = std::true_type;
+
+	using std::hash<std::basic_string_view<CharT, Traits> >::operator();
+
+	template <typename Alloc>
+	std::size_t operator()(std::basic_string<CharT, Traits, Alloc> const &a) const
+	{ return std::hash<std::basic_string_view<CharT, Traits> >::operator()(a); }
+
+	std::size_t operator()(CharT const *a) const
+	{ return std::hash<std::basic_string_view<CharT, Traits> >::operator()(a); }
+};
+
+template <typename Key, typename T, typename Allocator = std::allocator<std::pair<Key const, T> > >
+using transparent_string_map = std::map<Key, T, transparent_string_less<typename Key::value_type, typename Key::traits_type>, Allocator>;
+
+template <typename Key, typename T, typename Allocator = std::allocator<std::pair<Key const, T> > >
+using transparent_string_unordered_map = std::unordered_map<Key, T, transparent_string_hash<typename Key::value_type, typename Key::traits_type>, transparent_string_equal<typename Key::value_type, typename Key::traits_type>, Allocator>;
 
 
 template <typename T, std::size_t N, bool WriteWrap = false, bool ReadWrap = WriteWrap>

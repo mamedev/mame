@@ -856,7 +856,7 @@ void bosco_state::bosco_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().nopw();         /* the only area different for each CPU */
 	map(0x6800, 0x6807).r(FUNC(bosco_state::bosco_dsw_r));
-	map(0x6800, 0x681f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x6800, 0x681f).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x6820, 0x6827).w("misclatch", FUNC(ls259_device::write_d0));
 	map(0x6830, 0x6830).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x7000, 0x70ff).rw("06xx_0", FUNC(namco_06xx_device::data_r), FUNC(namco_06xx_device::data_w));
@@ -878,7 +878,7 @@ void galaga_state::galaga_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().nopw();         /* the only area different for each CPU */
 	map(0x6800, 0x6807).r(FUNC(galaga_state::bosco_dsw_r));
-	map(0x6800, 0x681f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x6800, 0x681f).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x6820, 0x6827).w("misclatch", FUNC(ls259_device::write_d0));
 	map(0x6830, 0x6830).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x7000, 0x70ff).rw("06xx", FUNC(namco_06xx_device::data_r), FUNC(namco_06xx_device::data_w));
@@ -901,7 +901,7 @@ void xevious_state::xevious_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().nopw();         /* the only area different for each CPU */
 	map(0x6800, 0x6807).r(FUNC(xevious_state::bosco_dsw_r));
-	map(0x6800, 0x681f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x6800, 0x681f).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x6820, 0x6827).w("misclatch", FUNC(ls259_device::write_d0));
 	map(0x6830, 0x6830).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x7000, 0x70ff).rw("06xx", FUNC(namco_06xx_device::data_r), FUNC(namco_06xx_device::data_w));
@@ -922,7 +922,7 @@ void xevious_state::xevious_map(address_map &map)
 void digdug_state::digdug_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().nopw();         /* the only area different for each CPU */
-	map(0x6800, 0x681f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x6800, 0x681f).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x6820, 0x6827).w("misclatch", FUNC(ls259_device::write_d0));
 	map(0x6830, 0x6830).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x7000, 0x70ff).rw("06xx", FUNC(namco_06xx_device::data_r), FUNC(namco_06xx_device::data_w));
@@ -1644,8 +1644,7 @@ void bosco_state::bosco(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32);
-	m_namco_sound->set_voices(3);
+	NAMCO_WSG(config, m_namco_sound, MASTER_CLOCK/6/32);
 	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0);
 
 	/* discrete circuit on the 54XX outputs */
@@ -1721,8 +1720,7 @@ void galaga_state::galaga(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32);
-	m_namco_sound->set_voices(3);
+	NAMCO_WSG(config, m_namco_sound, MASTER_CLOCK/6/32);
 	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0);
 
 	/* discrete circuit on the 54XX outputs */
@@ -1833,8 +1831,7 @@ void xevious_state::xevious(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32);
-	m_namco_sound->set_voices(3);
+	NAMCO_WSG(config, m_namco_sound, MASTER_CLOCK/6/32);
 	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0);
 
 	/* discrete circuit on the 54XX outputs */
@@ -1951,8 +1948,7 @@ void digdug_state::digdug(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32);
-	m_namco_sound->set_voices(3);
+	NAMCO_WSG(config, m_namco_sound, MASTER_CLOCK/6/32);
 	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0);
 }
 

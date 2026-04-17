@@ -144,7 +144,7 @@ void jrpacman_state::main_map(address_map &map)
 	map(0x5000, 0x503f).portr("P1");
 	map(0x5000, 0x5007).w("latch1", FUNC(ls259_device::write_d0));
 	map(0x5040, 0x507f).portr("P2");
-	map(0x5040, 0x505f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x5040, 0x505f).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x5060, 0x506f).writeonly().share("spriteram2");
 	map(0x5070, 0x5077).w("latch2", FUNC(ls259_device::write_d0));
 	map(0x5080, 0x50bf).portr("DSW");
@@ -272,7 +272,7 @@ void jrpacman_state::jrpacman(machine_config &config)
 
 	ls259_device &latch1(LS259(config, "latch1")); // 5P
 	latch1.q_out_cb<0>().set(FUNC(jrpacman_state::irq_mask_w));
-	latch1.q_out_cb<1>().set("namco", FUNC(namco_device::sound_enable_w));
+	latch1.q_out_cb<1>().set("namco", FUNC(namco_wsg_device::sound_enable_w));
 	latch1.q_out_cb<3>().set(FUNC(jrpacman_state::flipscreen_w));
 	latch1.q_out_cb<7>().set(FUNC(jrpacman_state::coin_counter_w));
 
@@ -303,8 +303,7 @@ void jrpacman_state::jrpacman(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	NAMCO(config, m_namco_sound, 3072000/32);
-	m_namco_sound->set_voices(3);
+	NAMCO_WSG(config, m_namco_sound, 3072000/32);
 	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

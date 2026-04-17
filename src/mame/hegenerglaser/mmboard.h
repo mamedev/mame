@@ -25,7 +25,7 @@ public:
 
 	// configuration helpers
 	void set_disable_leds(bool disable_leds) { m_disable_leds = disable_leds; }
-	void set_delay(attotime sensordelay)     { m_sensordelay = sensordelay; }
+	void set_delay(attotime sensordelay) { m_sensordelay = sensordelay; }
 
 	sensorboard_device *get() { return m_board; }
 

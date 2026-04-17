@@ -142,7 +142,7 @@ elseif _OPTIONS["targetos"]=="linux" then
 		}
 	else
 		buildoptions {
-			backtick(pkgconfigcmd() .. " --cflags Qt5Widgets"),
+			"-I$(shell qmake6 -query QT_INSTALL_HEADERS)",
 		}
 	end
 elseif _OPTIONS["targetos"]=="macosx" then

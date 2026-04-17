@@ -3,34 +3,17 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-Novag Sapphire (model 9304) / Sapphire II (model 38601)
+Novag Sapphire family
 
-Handheld chess computer. It's the successor to Novag Super VIP, whereas Ruby is
-the successor to Novag VIP. The chess engine is by David Kittinger again.
-
-Hardware notes:
-
-Sapphire:
-- PCB label: 100168 REV A
-- Hitachi H8/325 MCU (mode 2), 26.601712MHz XTAL
-- 32KB EPROM (M27C256B-12F1), 128KB SRAM (KM681000ALG-10)
-- LCD with 4 7segs and custom segments, same as Novag VIP
-- RJ-12 port for Novag Super System (always 9600 baud)
-- 24 buttons, piezo
-
-Sapphire II:
-- PCB label: 100209 REV A
-- Hitachi H8/325 MCU (mode 2), 32MHz XTAL
-- 128KB EPROM (27C010), 128KB SRAM (KM681000CLG-7)
-- LCD has more segments, the rest is the same as Sapphire
-
-Sapphire II MCU and EPROM are the same as Diamond II. MCU pin P62 determines
-which hardware it runs on, see diamond.cpp for Diamond II.
+Handheld chess computers. Sapphire is the successor to Novag Super VIP, whereas
+Ruby is the successor to Novag VIP. The chess engine is by David Kittinger again.
 
 TODO:
 - Novag Super System peripherals don't work due to serial clock drift, baud rate
   differs a bit between host and client, m6801 serial emulation issue (to work
   around it, underclock sapphire to exactly 26.4192MHz, sapphire2 to 31.9488MHz)
+- remove chesstea ROM hack (see init_chesstea), and the overclock hack as well,
+  which is there to work around the issue described in the TODO note right above
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
 
@@ -38,6 +21,54 @@ BTANB:
 - Average Time level (AT) does not work properly after a few moves on sapphire,
   this is mentioned in the manual and it suggests to set user programmable time
   control
+
+================================================================================
+
+Novag Sapphire (model 9304)
+---------------------------
+
+Hardware notes:
+- PCB label: 100168 REV A
+- Hitachi H8/325 MCU (mode 2), 26.601712MHz XTAL
+- 32KB EPROM (M27C256B-12F1), 128KB SRAM (KM681000ALG-10)
+- LCD with 4 7segs and custom segments, same as Novag VIP
+- RJ-12 port for Novag Super System (always 9600 baud)
+- 24 buttons, piezo
+
+================================================================================
+
+Novag Chess Teacher (model 9306) (aka Professeur d'Echecs Novag)
+--------------------------------
+
+Unlike references online claiming it's a Sapphire in disguise, Chess Teacher is
+not a full-fledged chess computer. Instead of a chess engine, it includes dozens
+of chess problems for the user to solve. Novag Super System TV Interface was
+included with the system, it's attached by default in MAME.
+
+Conceptualized by Noblet S.A. (Novag's distributor in France at the time). It
+was programmed by Wayne Chow, not David Kittinger.
+
+Hardware notes:
+- PCB label: 100173 REV A
+- Hitachi H8/325 MCU (mode 2), 20MHz XTAL
+- no external EPROM, 8KB SRAM (HY6264LP-85)
+- the rest is the same as Sapphire
+
+For TV Interface, see src/devices/bus/rs232/nss_tvinterface.cpp
+
+================================================================================
+
+Novag Sapphire II (model 38601)
+-------------------------------
+
+Hardware notes:
+- PCB label: 100209 REV A
+- Hitachi H8/325 MCU (mode 2), 32MHz XTAL
+- 128KB EPROM (27C010), 128KB SRAM (KM681000CLG-7)
+- LCD has more segments, the rest is the same as Sapphire
+
+Sapphire II MCU and EPROM are the same as Diamond II. MCU pin P62 determines
+which hardware it runs on, see diamond.cpp for Diamond II.
 
 *******************************************************************************/
 
@@ -53,6 +84,7 @@ BTANB:
 #include "speaker.h"
 
 // internal artwork
+#include "novag_chesstea.lh"
 #include "novag_sapphire.lh"
 #include "novag_sapphire2.lh"
 
@@ -76,8 +108,11 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
+	void init_chesstea();
+
 	void sapphire(machine_config &config);
 	void sapphire2(machine_config &config);
+	void chesstea(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
@@ -90,7 +125,7 @@ private:
 	required_device<h8325_device> m_maincpu;
 	memory_view m_memory;
 	memory_share_creator<u8> m_nvram;
-	required_memory_bank m_rambank;
+	optional_memory_bank m_rambank;
 	optional_memory_bank m_rombank;
 	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<dac_1bit_device> m_dac;
@@ -106,6 +141,7 @@ private:
 
 	void sapphire_map(address_map &map) ATTR_COLD;
 	void sapphire2_map(address_map &map) ATTR_COLD;
+	void chesstea_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void set_power(bool power);
@@ -131,8 +167,11 @@ void sapphire_state::machine_start()
 	if (m_rombank)
 		m_rombank->configure_entries(0, 4, memregion("eprom")->base(), 0x8000);
 
-	m_rambank->configure_entries(0, 4, m_nvram, 0x8000);
-	m_memory.select(0);
+	if (m_rambank)
+	{
+		m_rambank->configure_entries(0, 4, m_nvram, 0x8000);
+		m_memory.select(0);
+	}
 
 	// register for savestates
 	save_item(NAME(m_power));
@@ -140,6 +179,35 @@ void sapphire_state::machine_start()
 	save_item(NAME(m_lcd_sclk));
 	save_item(NAME(m_lcd_data));
 	save_item(NAME(m_lcd_segs2));
+}
+
+void sapphire_state::init_chesstea()
+{
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
+
+	// There's a bug in the serial routine, where it clears SSR TDRE, and then
+	// writes to TDR. The H8 documentation warns not to do this, since the next
+	// serial tick could occur between these 2 writes. In reality the chance for
+	// this to occur is very slim. In MAME it will always happen (so, a bug in
+	// h8_sci.cpp), here's a workaround until that gets fixed.
+
+	// part of the serial routine:
+	// 0F82: 7EDC 7370 btst    #7, @h'ffdc ; test SSR TDRE
+	// 0F86: 47FA      beq     h'0f82
+	// 0F88: 7FDC 7270 bclr    #7, @h'ffdc ; clear SSR TDRE
+	// 0F8C: 4000      bt      h'0f8e
+	// 0F8E: 4000      bt      h'0f90
+	// 0F90: 4000      bt      h'0f92
+	// 0F92: 38DB      mov.b   r0l, @h'ffdb ; write TDR
+
+	// swap SCI0 SSR/TDR write order
+	rom[0x0f8c/2] = rom[0x0f8a/2];
+	rom[0x0f8a/2] = rom[0x0f88/2];
+	rom[0x0f88/2] = rom[0x0f92/2];
+	rom[0x0f92/2] = rom[0x0f90/2];
+
+	// make sure H8 serial interface is 9600bps (see TODO)
+	m_maincpu->set_clock(9600 * 16 * 132);
 }
 
 
@@ -295,6 +363,11 @@ void sapphire_state::sapphire2_map(address_map &map)
 	m_memory[0](0x8000, 0xffff).bankr(m_rombank);
 }
 
+void sapphire_state::chesstea_map(address_map &map)
+{
+	map(0xa000, 0xbfff).ram().share("nvram.u2");
+}
+
 
 
 /*******************************************************************************
@@ -347,6 +420,26 @@ static INPUT_PORTS_START( sapphire )
 	PORT_START("POWER")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_ON) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sapphire_state::power_switch), 1)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sapphire_state::power_switch), 0)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( chesstea )
+	PORT_INCLUDE( sapphire )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COLON) PORT_NAME("Load Game")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("Save Game")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9 / Ver/Set")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_STOP) PORT_NAME("Right")
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Pawn")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Knight")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Bishop")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("Rook")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("Queen")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("King")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COMMA) PORT_NAME("Left")
 INPUT_PORTS_END
 
 
@@ -420,6 +513,28 @@ void sapphire_state::sapphire2(machine_config &config)
 	config.set_default_layout(layout_novag_sapphire2);
 }
 
+void sapphire_state::chesstea(machine_config &config)
+{
+	sapphire(config);
+
+	// basic machine hardware
+	m_maincpu->set_clock(20_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sapphire_state::chesstea_map);
+
+	// no banked RAM
+	m_maincpu->write_port4().set(FUNC(sapphire_state::p4_w));
+	m_maincpu->write_port6().set(FUNC(sapphire_state::s1_lcd_data_w));
+	config.device_remove("nvram");
+
+	NVRAM(config, "nvram.u2", nvram_device::DEFAULT_ALL_0);
+
+	// attach TV Interface
+	RS232_PORT(config.replace(), m_rs232, default_rs232_devices, "nss_tvi");
+	m_rs232->rxd_handler().set(m_maincpu, FUNC(h8325_device::sci_rx_w<0>));
+
+	config.set_default_layout(layout_novag_chesstea);
+}
+
 
 
 /*******************************************************************************
@@ -448,6 +563,14 @@ ROM_START( sapphire2 ) // ID = SAPPHIRE II 1.02
 	ROM_LOAD("sapphire2.svg", 0, 72533, CRC(34944b61) SHA1(4a0536ac07790cced9f9bf15522b17ebc375ff8a) )
 ROM_END
 
+ROM_START( chesstea )
+	ROM_REGION16_BE( 0x8000, "maincpu", 0 )
+	ROM_LOAD("h8_325_hd6473258f10_9306_v118.u1", 0x0000, 0x8000, CRC(3ff73fd6) SHA1(aac82f7f54b83d3bb375dca6395b2129a708addd) )
+
+	ROM_REGION( 36256, "screen", 0 )
+	ROM_LOAD("nvip.svg", 0, 36256, CRC(3373e0d5) SHA1(25bfbf0405017388c30f4529106baccb4723bc6b) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -456,7 +579,8 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1994, sapphire,  0,      0,      sapphire,  sapphire, sapphire_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Sapphire", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT     CLASS           INIT           COMPANY, FULLNAME, FLAGS
+SYST( 1994, sapphire,  0,      0,      sapphire,  sapphire, sapphire_state, empty_init,    "Novag Industries / Intelligent Heuristic Programming", "Sapphire", MACHINE_SUPPORTS_SAVE )
+SYST( 1997, sapphire2, 0,      0,      sapphire2, sapphire, sapphire_state, empty_init,    "Novag Industries / Intelligent Heuristic Programming", "Sapphire II", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1997, sapphire2, 0,      0,      sapphire2, sapphire, sapphire_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Sapphire II", MACHINE_SUPPORTS_SAVE )
+SYST( 1994, chesstea,  0,      0,      chesstea,  chesstea, sapphire_state, init_chesstea, "Novag Industries / Noblot", "Chess Teacher", MACHINE_SUPPORTS_SAVE )

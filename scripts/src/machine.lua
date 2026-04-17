@@ -1645,6 +1645,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/i7110.h,MACHINES["I7110"] = true
+---------------------------------------------------
+
+if (MACHINES["I7110"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/i7110.cpp",
+		MAME_DIR .. "src/devices/machine/i7110.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/i7220.h,MACHINES["I7220"] = true
 ---------------------------------------------------
 
@@ -2247,6 +2259,18 @@ if MACHINES["MACSECONDS"] then
 	files {
 		MAME_DIR .. "src/devices/machine/macseconds.cpp",
 		MAME_DIR .. "src/devices/machine/macseconds.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/gmboard.h,MACHINES["MB_GMBOARD"] = true
+---------------------------------------------------
+
+if MACHINES["MB_GMBOARD"] then
+	files {
+		MAME_DIR .. "src/devices/machine/gmboard.cpp",
+		MAME_DIR .. "src/devices/machine/gmboard.h",
 	}
 end
 

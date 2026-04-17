@@ -8,7 +8,6 @@
 
     Adds 32-bits support and a bunch of other stuff.
 
-
 ***************************************************************************/
 
 #ifndef MAME_CPU_H8_H8H_H

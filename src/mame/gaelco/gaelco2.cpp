@@ -622,7 +622,7 @@ ROM_START( sltpcycla )
 	ROM_LOAD( "bici_u41_1f75_3h_7-4-97_27c010.u41", 0x01a0000, 0x0020000, CRC(c4d24254) SHA1(e6ff7624e628dc6ace11a50b6ff89812844b52c5) )
 	ROM_FILL(                                       0x0220000, 0x0020000, 0x00 )         // to decode GFX as 5bpp
 
-	ROM_REGION( 0x0800, "iomcu", 0 ) // on IO board
+	ROM_REGION( 0x0800, "iomcu", 0 ) // on I/O board
 	ROM_LOAD( "2-st62t15c6", 0x0000, 0x0800, NO_DUMP ) // 2KBytes internal ROM
 
 	ROM_REGION( 0x0104, "pals", 0 )
@@ -646,7 +646,7 @@ ROM_START( sltpcyclb )
 	ROM_LOAD( "bici_u41_1f75_3h_7-4-97_27c010.u41", 0x01a0000, 0x0020000, CRC(c4d24254) SHA1(e6ff7624e628dc6ace11a50b6ff89812844b52c5) )
 	ROM_FILL(                                       0x0220000, 0x0020000, 0x00 )         // to decode GFX as 5bpp
 
-	ROM_REGION( 0x0800, "iomcu", 0 ) // on IO board
+	ROM_REGION( 0x0800, "iomcu", 0 ) // on I/O board
 	ROM_LOAD( "2-st62t15c6", 0x0000, 0x0800, NO_DUMP ) // 2KBytes internal ROM
 
 	ROM_REGION( 0x0104, "pals", 0 )
@@ -749,7 +749,7 @@ ROM_START( sltpstep )
 	ROM_LOAD( "st_u_37.u37", 0x0180000, 0x0080000, CRC(5543d4d1) SHA1(1f9f358dfb252412468ddd68331bda5acbe99329) ) // 27C4000DC
 	ROM_FILL(                0x0200000, 0x0080000, 0x00 )         // to decode GFX as 5bpp
 
-	ROM_REGION( 0x0800, "iomcu", 0 ) // on IO board
+	ROM_REGION( 0x0800, "iomcu", 0 ) // on I/O board
 	ROM_LOAD( "cpu_6022-1-st62t15b6.ic4", 0x0000, 0x0800, NO_DUMP ) // 2KBytes internal ROM
 
 	ROM_REGION( 0x0104, "pals", 0 )
@@ -768,7 +768,7 @@ ROM_START( sltpstepa )
 	ROM_LOAD( "st_u_37.u37", 0x0180000, 0x0080000, CRC(5543d4d1) SHA1(1f9f358dfb252412468ddd68331bda5acbe99329) ) // 27C4000DC
 	ROM_FILL(                0x0200000, 0x0080000, 0x00 )         // to decode GFX as 5bpp
 
-	ROM_REGION( 0x0800, "iomcu", 0 ) // on IO board
+	ROM_REGION( 0x0800, "iomcu", 0 ) // on I/O board
 	ROM_LOAD( "cpu_6022-1-st62t15b6.ic4", 0x0000, 0x0800, NO_DUMP ) // 2KBytes internal ROM
 
 	ROM_REGION( 0x0104, "pals", 0 )
@@ -847,7 +847,7 @@ u16 gaelco2_state::srollnd_share_sim_r(offs_t offset, u16 mem_mask)
 		ret = 0x0000;
 
 
-	// reads a bunch of data (game specific? backup ram? default backup ram?) from device (0x180 words - copied to start of RAM)
+	// reads a bunch of data (game specific? backup RAM? default backup RAM?) from device (0x180 words - copied to start of RAM)
 	if (m_maincpu->pc() == 0x83da)
 	{
 		ret = 0x0000;
@@ -1010,7 +1010,7 @@ REF: 990315
 -----------------------------------------------------------------------------|
 */
 ROM_START( play2000_50i )
-	/*at least 1.u40 is bad, on every 0x40 bytes the first four are always 0xff.*/
+	// At least 1.u40 is bad, on every 0x40 bytes the first four are always 0xff.
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "2.u39", 0x000000, 0x020000, BAD_DUMP CRC(9939299e) SHA1(55303a2adf199f4b5a60f57be7480b0e119f8624) )
 	ROM_LOAD16_BYTE( "1.u40", 0x000001, 0x020000, BAD_DUMP CRC(311c2f94) SHA1(963d6b5f479598145146fcb8b7c6ce77fbc92b07) )
@@ -1033,6 +1033,32 @@ ROM_START( play2000_50i )
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "palce16v8h.u29",  0x0000, 0x0117, BAD_DUMP CRC(4a0a6f39) SHA1(57351e471649391c9abf110828fe2f128fe84eee) )
+ROM_END
+
+// REF: 990315 PCB. This game uses a Touch Screen
+ROM_START( luckyclrs )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "2_nm27c010q.u39", 0x000000, 0x020000, CRC(b53dc48f) SHA1(c5f21f958c936edd58023fe7c5a568fc8fe09a35) )
+	ROM_LOAD16_BYTE( "1_m27c1001.u40",  0x000001, 0x020000, CRC(f49787e9) SHA1(3be6e865e071066b3f53e7f46da3cf7e117913c6) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "ds5002fp_50i.mcu", 0x00000, 0x8000, NO_DUMP )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	DS5002FP_SET_MON( 0x79 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x0a00000, "gfx", 0 ) // GFX + Sound
+	ROM_LOAD( "6_m27c801.u51",  0x0000000, 0x0100000, CRC(51325529) SHA1(160acd76f4f1190287d6ee87a680d4f60c73984f) )
+	ROM_LOAD( "4_m27c2001.u53", 0x0200000, 0x0040000, CRC(3e01f0ab) SHA1(84f89332c87bb9f8239dd3b5893c8d88e3600ed5) )
+	ROM_LOAD( "7_m27c2001.u50", 0x0400000, 0x0040000, CRC(a59915f7) SHA1(c23217863e7c3d930a470f9ede03de45203fe2cb) )
+	ROM_LOAD( "5_m27c2001.u52", 0x0600000, 0x0040000, CRC(9fb7bd98) SHA1(a565a6233424f0b35df9ea4a359f88934b85fd6f) )
+	ROM_LOAD( "3_m27c2001.u54", 0x0800000, 0x0040000, CRC(66c65357) SHA1(28526d210113e2688df733e90799a8109be440ea) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "palce16v8h-25.u28", 0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "palce16v8h-25.u29", 0x0000, 0x0117, NO_DUMP )
 ROM_END
 
 /* Super Roller (Nova Desitec on Gaelco hardware)
@@ -3343,6 +3369,8 @@ GAME( 1999, bangjb,      bang,      bang,             bang,     bang_state,     
 GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state,      init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v7.0i) (Italy)", 0 )
 GAME( 1999, play2000_50i,play2000,  play2000,         play2000, gaelco2_state,      empty_init,     ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.0i) (Italy)", MACHINE_NOT_WORKING ) // bad dump
 GAME( 1999, play2000_40i,play2000,  play2000,         play2000, gaelco2_state,      init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0i) (Italy)", 0 )
+
+GAME( 1999, luckyclrs,   0,         play2000,         play2000, gaelco2_state,      empty_init,     ROT0, "Nova Desitec", "Lucky Colors (v1.1i) (Italy)", MACHINE_NOT_WORKING ) // missing ds5002fp dump
 
 GAME( 1998, srollnd,     0,         srollnd,          play2000, gaelco2_state,      init_play2000,  ROT0, "Nova Desitec", "Super Roller (v7.0)",  MACHINE_NOT_WORKING ) // missing ds5002fp dump
 
