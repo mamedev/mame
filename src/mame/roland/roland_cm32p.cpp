@@ -141,8 +141,7 @@ external internal   external internal
   A17 - - - A17
   A18 - - - A18
 
-Line scramling of A0..A6 and D0..D7 matches the SN-U110 cards.
-For A7..A16 they changed the scrambling.
+Line scramling for the address and data lines matches the SN-U110 cards.
 
 
 PCM ROM Tables
@@ -269,15 +268,11 @@ Some routine locations
 namespace {
 
 // unscramble address: ROM dump offset -> proper (descrambled) offset
-#define UNSCRAMBLE_ADDR_INT(_offset) \
+#define UNSCRAMBLE_ADDR(_offset) \
 	bitswap<19>(_offset,18,17,15,14,16,12,11, 7, 9,13,10, 8, 3, 2, 1, 6, 4, 5, 0)
 // scramble address: proper offset -> ROM dump offset
-#define SCRAMBLE_ADDR_INT(_offset) \
+#define SCRAMBLE_ADDR(_offset) \
 	bitswap<19>(_offset,18,17,14,16,15, 9,13,12, 8,10, 7,11, 3, 1, 2, 6, 5, 4, 0)
-
-// PCM cards use a different address line scrambling
-#define UNSCRAMBLE_ADDR_EXT(_offset) \
-	bitswap<19>(_offset,18,17, 8, 9,16,11,12, 7,14,10,13,15, 3, 2, 1, 6, 4, 5, 0)
 
 #define UNSCRAMBLE_DATA(_data) \
 	bitswap<8>(_data,1,2,7,3,5,0,4,6)
@@ -351,8 +346,7 @@ private:
 
 	void cm32p_map(address_map &map) ATTR_COLD;
 
-	void descramble_rom_internal(u8* dst, const u8* src);
-	void descramble_rom_external(u8* dst, const u8* src);
+	void descramble_pcm_rom(u8* dst, const u8* src);
 
 	bool pcmard_loaded;
 	u8 midi;
@@ -446,7 +440,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cm32p_state::card_load)
 	u8 *dst = reinterpret_cast<u8 *>(memregion("pcm")->base());
 	memcpy(&src[0x080000], base, 0x080000);
 	// descramble PCM card ROM
-	descramble_rom_external(&dst[0x080000], &src[0x080000]);
+	descramble_pcm_rom(&dst[0x080000], &src[0x080000]);
 	pcmard_loaded = true;
 
 	return std::make_pair(std::error_condition(), std::string());
@@ -667,27 +661,18 @@ void cm32p_state::init_cm32p()
 	u8* src = static_cast<u8*>(memregion("pcmorg")->base());
 	u8* dst = static_cast<u8*>(memregion("pcm")->base());
 	// descramble internal ROMs
-	descramble_rom_internal(&dst[0x000000], &src[0x000000]);
-	descramble_rom_internal(&dst[0x100000], &src[0x100000]);
-	descramble_rom_internal(&dst[0x200000], &src[0x200000]);
+	descramble_pcm_rom(&dst[0x000000], &src[0x000000]);
+	descramble_pcm_rom(&dst[0x100000], &src[0x100000]);
+	descramble_pcm_rom(&dst[0x200000], &src[0x200000]);
 	// descramble PCM card ROM
-	descramble_rom_external(&dst[0x080000], &src[0x080000]);
+	descramble_pcm_rom(&dst[0x080000], &src[0x080000]);
 }
 
-void cm32p_state::descramble_rom_internal(u8* dst, const u8* src)
+void cm32p_state::descramble_pcm_rom(u8* dst, const u8* src)
 {
 	for (offs_t srcpos = 0x00; srcpos < 0x80000; srcpos ++)
 	{
-		offs_t dstpos = UNSCRAMBLE_ADDR_INT(srcpos);
-		dst[dstpos] = UNSCRAMBLE_DATA(src[srcpos]);
-	}
-}
-
-void cm32p_state::descramble_rom_external(u8* dst, const u8* src)
-{
-	for (offs_t srcpos = 0x00; srcpos < 0x80000; srcpos ++)
-	{
-		offs_t dstpos = UNSCRAMBLE_ADDR_EXT(srcpos);
+		offs_t dstpos = UNSCRAMBLE_ADDR(srcpos);
 		dst[dstpos] = UNSCRAMBLE_DATA(src[srcpos]);
 	}
 }

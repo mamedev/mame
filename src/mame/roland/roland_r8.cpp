@@ -90,8 +90,8 @@ R8 mkII doesn't seem to store the tone list in the program ROM.
 namespace {
 
 // PCM card address line scrambling
-#define UNSCRAMBLE_ADDR_EXT(_offset) \
-	bitswap<19>(_offset,18,17, 8, 9,16,11,12, 7,14,10,13,15, 3, 2, 1, 6, 4, 5, 0)
+#define UNSCRAMBLE_ADDR(_offset) \
+	bitswap<19>(_offset,18,17,15,14,16,12,11, 7, 9,13,10, 8, 3, 2, 1, 6, 4, 5, 0)
 
 #define UNSCRAMBLE_DATA(_data) \
 	bitswap<8>(_data,1,2,7,3,5,0,4,6)
@@ -120,7 +120,7 @@ protected:
 
 	std::pair<std::error_condition, std::string> pcmrom_load(generic_slot_device* pcmcard, int card_id, device_image_interface &image);
 	void pcmrom_unload(int card_id);
-	void descramble_rom_external(u8* dst, const u8* src);
+	void descramble_pcm_rom(u8* dst, const u8* src);
 
 	required_device<upd78k2_device> m_maincpu;
 	required_device<mb87419_mb87420_device> m_pcm;
@@ -209,7 +209,7 @@ std::pair<std::error_condition, std::string> roland_r8_base_state::pcmrom_load(g
 	u8 *dst = reinterpret_cast<u8 *>(memregion("pcm")->base());
 	memcpy(&src[pcm_addr], base, PCMCARD_SIZE);
 	// descramble PCM card ROM
-	descramble_rom_external(&dst[pcm_addr], &src[pcm_addr]);
+	descramble_pcm_rom(&dst[pcm_addr], &src[pcm_addr]);
 	//pcmard_loaded[card_id] = true;
 
 	return std::make_pair(std::error_condition(), std::string());
@@ -326,18 +326,18 @@ void roland_r8_base_state::init_r8()
 
 	for (offs_t addr = 0; addr < memregion("pcmorg")->bytes(); addr += 0x100000)
 	{
-		// TODO: descramble internal ROMs
-		memcpy(&dst[addr + 0x00000], &src[addr + 0x00000], 0x80000);
+		// descramble internal ROMs
+		descramble_pcm_rom(&dst[addr + 0x00000], &src[addr + 0x00000]);
 		// descramble PCM card ROMs
-		descramble_rom_external(&dst[addr + 0x80000], &src[addr + 0x80000]);
+		descramble_pcm_rom(&dst[addr + 0x80000], &src[addr + 0x80000]);
 	}
 }
 
-void roland_r8_base_state::descramble_rom_external(u8* dst, const u8* src)
+void roland_r8_base_state::descramble_pcm_rom(u8* dst, const u8* src)
 {
 	for (offs_t srcpos = 0x00; srcpos < PCMCARD_SIZE; srcpos ++)
 	{
-		offs_t dstpos = UNSCRAMBLE_ADDR_EXT(srcpos);
+		offs_t dstpos = UNSCRAMBLE_ADDR(srcpos);
 		dst[dstpos] = UNSCRAMBLE_DATA(src[srcpos]);
 	}
 }
