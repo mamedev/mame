@@ -73,7 +73,7 @@ namespace fs {
     *  enable_sound(&myfloppysamples);
 
     If the custom samples cannot be found, the default samples are used. If
-    those cannmot found either, sound is disabled.
+    those cannot be found either, sound is disabled.
 
     If the samples list does not contain a matching form factor, the following
     replacement strategy is used:
@@ -81,19 +81,6 @@ namespace fs {
     * If 3" samples are requested but not found, 3.5" samples are used.
     * If 3.5" or 8" samples are requested but not found, 5.25" samples are used.
 */
-struct floppy_sound_entry
-{
-	int index = 0;
-	int type = 0;        // type: SPIN, STEP, SEEK
-	int form_factor;     // indicates the form factor of the drive
-	int mintrack = 0;    // valid from here (including), meaningless for spin entries
-	int maxtrack = 99;   // to here (including), meaningless for spin entries
-	int rate = 0;        // rate of the seek sample
-	int maxrate = 0;     // max rate for pitching up the seek sample
-	int spintype = 0;    // type for spin entries
-	const char *directory;  // directory where the sample is stored
-	const char *filename;
-};
 
 class floppy_sound_samples
 {
@@ -105,14 +92,6 @@ public:
 
 	/* Set the form factor for the following add operations. */
 	void set_form_factor(int form_factor, const char* dir);
-
-	/* Add spin, step, and seek samples. */
-	void add_spin_sample(const char* filename, int type);
-	void add_step_sample(const char* filename, int start=0, int end=99);
-	void add_seek_sample(const char* filename, int nominal_rate, int max_rate, int mintrack=0, int maxtrack=99);
-
-	/* Deliver the list of names for the parent class samples_device. */
-	const char* const* get_names();
 
 	enum  // spin type
 	{
@@ -126,12 +105,13 @@ public:
 		END_LOADED              // Stop spinning with disk
 	};
 
-	enum
-	{
-		SPIN = 0,
-		STEP,
-		SEEK
-	};
+	/* Add spin, step, and seek samples. */
+	void add_spin_sample(const char* filename, int type);
+	void add_step_sample(const char* filename, int start=0, int end=99);
+	void add_seek_sample(const char* filename, int nominal_rate, int max_rate, int mintrack=0, int maxtrack=99);
+
+	/* Deliver the list of names for the parent class samples_device. */
+	const char* const* get_names();
 
 	/* Selects the matching form factor and prepares the samples list. */
 	void select(int form_factor);
@@ -148,6 +128,27 @@ public:
 	int find_seek(double rate, int track, double& pitch) const;
 
 private:
+	enum
+	{
+		SPIN = 0,
+		STEP,
+		SEEK
+	};
+
+	struct floppy_sound_entry
+	{
+		int index = 0;
+		int type = 0;        // type: SPIN, STEP, SEEK
+		int form_factor;     // indicates the form factor of the drive
+		int mintrack = 0;    // valid from here (including), meaningless for spin entries
+		int maxtrack = 99;   // to here (including), meaningless for spin entries
+		int rate = 0;        // rate of the seek sample
+		int maxrate = 0;     // max rate for pitching up the seek sample
+		int spintype = 0;    // type for spin entries
+		const char *directory;  // directory where the sample is stored
+		const char *filename;
+	};
+
 	std::string m_basedir;          // Subdirectory which contains the samples
 	std::vector<const char*> m_samplenames;
 
