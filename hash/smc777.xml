@@ -41,11 +41,8 @@ SMCゲームパックI
   幻の古代王朝(吉野編)
   幻の古代王朝(飛鳥編)
   無人島脱出
-  デーモンルーレット
-  AZTEC
   チョップリフター
   スターブレーザー
-  バグアタック
   SMC実践囲碁
   SMC将棋
   妖花の謎
@@ -65,16 +62,12 @@ SMCゲームパックI
   妖怪探偵ちまちま
   サラダの国のトマト姫
   野球狂
-  ファイアドラゴン
   信長の野望
-  秘境アマゾンの奥地に・・
-  キャノンショット
   Mario Bros.
 
 Home:
   SMC日本語ワープロ
   ユーカラJJ
-  クッキンキャット
   ニッティンキャド
   Memoland
   聖子の音と絵入門
@@ -90,8 +83,6 @@ Education:
   グラフィックスの世界(入門編)
   グラフィックスの世界(中級編)
   グラフィックスの世界(応用編)
-  クロスワード(入門)
-  クロスワード(初級)
   世界の旗
   まんてん君(数の導入)
   まんてん君(計算力1)
@@ -102,13 +93,8 @@ Education:
   グレイハウンド
   パソコン英和辞典
 
-Other:
-  SONY販促用ディスク1
-  SONY販促用ディスク2
-  SONY販促用ディスク3
-  SONY販促用ディスク4
-
 Known to be dumped, but no longer available: (If you do have any of these please contact the MAME development team)
+Update 2026: these are actually from compilations, and probably tapes?
   SMC Paint
   PIC->BMPコンバータ
   GIFファイルローダー
@@ -134,12 +120,12 @@ Known to be dumped, but no longer available: (If you do have any of these please
 
 <softwarelist name="smc777" description="Sony SMC-777 floppy disks">
 
-	<!-- Commercial Software -->
+<!-- !Operating Systems -->
 
 	<software name="cpm22">
 	<!-- This was originally released for the SMC-70, but also sold for the SMC-777-->
-		<description>CP\M v2.2</description>
-		<year>198?</year>
+		<description>CP/M v2.2 (Release 2.1)</description>
+		<year>1984</year>
 		<publisher>Sony Corp.</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -149,11 +135,29 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		</part>
 	</software>
 
+	<software name="cpm22a" cloneof="cpm22" supported="partial">
+		<description>CP/M v2.2 (Version 1.1J)</description>
+		<year>198?</year>
+		<publisher>Sony Corp.</publisher>
+		<notes><![CDATA[
+Contains Disk Basic
+GOMOKU.COM: "Bdos Err: Select"
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="disk basic.1dd" size="305328" crc="13ee170d" sha1="5af7ef34714ddbf7748bac044947a6ba68ef00b1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="develop" supported="no">
-	<!-- Seems to be Bad. Added as a placeholder-->
 		<description>Develop v1.4</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Boots only if any disk is in drive B (?)
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
@@ -161,6 +165,23 @@ Known to be dumped, but no longer available: (If you do have any of these please
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- TODO: may not be a clone (same behaviour, different utilities) -->
+	<software name="filer14j" cloneof="develop" supported="no">
+		<description>Disk Filer v1.4</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Boots only if any disk is in drive B (?)
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="filer14j.1dd" size="305328" crc="8f9a431a" sha1="06557e474da0c18eea074614d2b375b825951b39" />
+			</dataarea>
+		</part>
+	</software>
+
 
 	<software name="sys12j">
 		<!-- Includes: Dr. Logo, Bird Catch, Mysterious Boy-->
@@ -199,14 +220,232 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		</part>
 	</software>
 
+	<software name="sos20" cloneof="sos22">
+	<!-- Alternate Title S-OS Sword-->
+		<description>S-OS Monitor v2.0</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="s-os sword monitor 2.0.1dd" size="305328" crc="27bc0b34" sha1="18840fab993716e7929b6e0600c446d8fba93059" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sos22">
+	<!-- Alternate Title S-OS Sword-->
+		<description>S-OS Monitor v2.2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="s-os sword monitor 2.2.1dd" size="348848" crc="6e3215ce" sha1="1fffac3db3005e3de750c63ce1285f6b8a40310a" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Games -->
+
+	<software name="ae">
+		<description>A.E.</description>
+		<year>1984</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="エー・イー"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="336608">
+				<rom name="a.e (1984)(broderbund software)(sony)(jun wada)(makato horai).1dd" size="336608" crc="f951407c" sha1="0fb5d68c581203b6544962e19a7c7e8abe0f8282"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amazon" supported="no">
+		<!-- TODO: confirm me -->
+		<description>Hikyou Amazon no Okuchi ni ..</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+[keyboard] tends to stuck, not extensively tested
+]]></notes>
+		<info name="alt_title" value="秘境アマゾンの奥地に・・"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="358848">
+				<rom name="amazon1.1dd" size="358848" crc="e5938949" sha1="edf46ea59b8ed5579f4ccb0965b6dc759da422aa"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="362048">
+				<rom name="amazon2.1dd" size="362048" crc="7853dee0" sha1="04b08c53e54acb4ab9427a80769dee4982d22717"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aztec" supported="no">
+		<description>Aztec</description>
+		<year>1984</year>
+		<publisher>Sony</publisher>
+		<notes><![CDATA[
+Unresponsive [keyboard]
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="aztec (1984)(datamost)(sony)(bear's)(paul stephenson).1dd" size="305328" crc="5977f2b1" sha1="5e60d124c238555887fb6b513ec837e951f2f964"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baicex" supported="no">
+		<!-- TODO: confirm title -->
+		<description>Baikin-kun no Gokiburi Taiji</description>
+		<year>1983</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+[FDC] "LOAD ERROR"
+]]></notes>
+		<info name="alt_title" value="バイキン君のゴキブリ退治"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="baikin-kun's cockroach extermination (1983)(sony creative products.inc).1dd" size="305328" crc="7eef91c0" sha1="1e14a8e9d5abdd885dbfe93d2785f08d6811589e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baidew">
+		<description>Baikin-kun's Dental Walk</description>
+		<year>1985</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+Uneven [MC6845] display during gameplay
+]]></notes>
+		<info name="alt_title" value="バイキン君のデンタルウオー"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="362992">
+				<rom name="baikin-kun's dental wars (1985)(sony creative products.inc).1dd" size="362992" crc="446e3c6b" sha1="4c7f5e4f1be7cda323c0a24b0bf21fd0e8ca79aa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baiswon" supported="no">
+		<description>Baikin-kun no Switch On</description>
+		<year>1984</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+Uses [MC6845] vertical scroll raster effect for score during gameplay
+Uneven [MC6845] display during gameplay
+]]></notes>
+		<info name="alt_title" value="バイキン君のスイッチオン"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="362992">
+				<rom name="baikin-kun's switch on (1984)(sony creative products.inc).1dd" size="362992" crc="57257363" sha1="cece5e8799fd5347eb2055b5faed7ec42994b5a3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bugatk">
+		<description>Bug Attack</description>
+		<year>1983</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="バグ・アタック"/>
+		<info name="developer" value="Bear's"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="bug attack (1983)(cavalier computer)(sony)(bear's)(james nitchals).1dd" size="305328" crc="8ca2bd31" sha1="2482f258b4b7384f8a8e5b24b32fcf74952a5c58"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cloderun" supported="partial">
+		<description>Championship Lode Runner</description>
+		<year>1985</year>
+		<publisher>Sony</publisher>
+		<notes><![CDATA[
+Untested [floppy] saving
+]]></notes>
+		<info name="alt_title" value="チャンピオンシップ・ロードランナー"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="99600">
+				<rom name="championship lode runner (1985)(broderbund software)(sony)(douglas smith).1dd" size="99600" crc="46abd10c" sha1="864e313e0e186cef248b3fb0483be59403efeafd"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="choplift">
 		<description>Choplifter</description>
-		<year>198?</year>
+		<year>1984?</year>
 		<publisher>Sony</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="211808">
 				<rom name="choplifter.1dd" size="211808" crc="bf2ea51c" sha1="4610f7456ca6bd1740b9c98fb3d2bd67aadffb5c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demoroul">
+		<description>Demon Roulette</description>
+		<year>1983</year>
+		<!-- TODO: Comptique on title screen, alias for Comptiq? -->
+		<publisher>Comptique?</publisher>
+		<info name="alt_title" value="デーモンルーレット"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="demon roulette (1983)(comptiq)(takara)(sony).1dd" size="305328" crc="b69d4ab1" sha1="013b57ab1ffd8a397143b940a14d3306a522903d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dokntama" supported="no">
+		<!-- TODO: confirm title -->
+		<description>Uchi no Tama Shirimasenka</description>
+		<year>1985</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+[FDC] "Err(BS) on A:"
+]]></notes>
+		<info name="alt_title" value="うちのタマ知りませんか"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="362992">
+				<rom name="do you know my tama (1985)(sony creative products.inc)(teruhisa kamachi).1dd" size="362992" crc="1e71b001" sha1="df15304c50d57652cb5b5eef46e1c66fcdd00103"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exbillcs">
+		<description>Exciting Billiard Cannon Shot</description>
+		<year>1985</year>
+		<publisher>Enix</publisher>
+		<info name="alt_title" value="キャノンショット"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="52912">
+				<rom name="exciting billiard cannon shot (1985)(enix)(takashi shimizu).1dd" size="52912" crc="d570ec81" sha1="78776b25b3618baaa2469d5d31cce541246d9878"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="firedrag" supported="no">
+		<description>Fire Dragon</description>
+		<year>1984</year>
+		<publisher>Brain Media</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
+		<info name="alt_title" value="ファイアドラゴン"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="298928">
+				<rom name="fire dragon (1984)(brain media).1dd" size="298928" crc="89de13b3" sha1="6490584482c85ac50ed9add535957590eddb009c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -220,19 +459,6 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
 				<rom name="strizbh.1dd" size="305328" crc="efa24635" sha1="c2308afeb555197c6d583e6cd46e6c5c5c9b4ea9" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- which issue of the magazine? -->
-	<software name="flopmag" supported="no">
-		<description>Floppy Magazine</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="305056">
-				<rom name="floppy magazine.1dd" size="305056" crc="44f18e58" sha1="dc4d8bda72d408e53edd4be4f1d9497d9179d35e" />
 			</dataarea>
 		</part>
 	</software>
@@ -251,7 +477,146 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		</part>
 	</software>
 
-	<!-- Homebrew Software-->
+<!-- !Applications (Home) -->
+
+	<software name="cookcat" supported="no">
+		<description>Cookin Cat</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Apparently a cooking application, not extensively tested (language barrier, katakana only)
+]]></notes>
+		<info name="alt_title" value="クッキンキャット"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="283568">
+				<rom name="cookincat.1dd" size="283568" crc="1ba0740a" sha1="bbb0651f9a82de6f899e298b0cf957a36b35c587"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Educational -->
+
+	<software name="crossint" supported="no">
+		<description>Introductory Crosswords</description>
+		<year>1984</year>
+		<!-- CATENA Corporation / Oxford University Press (Tokyo) -->
+		<publisher>Sony</publisher>
+		<notes><![CDATA[
+[keyboard] needs CAPS LOCK, kinda playable by holding shift but game keeps eating inputs
+]]></notes>
+		<info name="alt_title" value="クロスワード(入門)"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="crossword_entry.1dd" size="305328" crc="e2b93c28" sha1="f84da9b9e270ec82248c0f44ea5df4595659b6af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crossjnr" supported="no">
+		<!-- TODO: confirm title -->
+		<description>Junior Crosswords</description>
+		<year>198?</year>
+		<publisher>Sony</publisher>
+		<notes><![CDATA[
+[FDC] Error 161: Bad disk sector
+Verify [keyboard]
+]]></notes>
+		<info name="alt_title" value="クロスワード(初級)"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="crossword_junior.1dd" size="305328" crc="8211fdab" sha1="f33451684b9fda8f75e55b8d91d16187e44a8b28"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Promotional demos -->
+
+	<!-- TODO: really looks a sys10j with extra stuff in it -->
+	<!-- (which don't work, so mark it as no until they do)-->
+	<software name="demofd1" supported="no">
+		<description>Sony Promotional Disc 1</description>
+		<year>198?</year>
+		<publisher>Sony</publisher>
+		<notes><![CDATA[
+BASIC listings all returns "Error(161) Bad Sector"
+]]></notes>
+		<info name="alt_title" value="SONY販促用ディスク1"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="demofd1.1dd" size="305328" crc="bca0caba" sha1="a1603b140143cf9b057e678324fb5fcf8a530a23"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demofd2" supported="no">
+		<description>Sony Promotional Disc 2</description>
+		<year>198?</year>
+		<publisher>Sony</publisher>
+		<notes><![CDATA[
+Calendar application
+How to access months 7-12, [keyboard] bug?
+]]></notes>
+		<info name="alt_title" value="SONY販促用ディスク2"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="demofd2.1dd" size="305328" crc="f7dfd9a1" sha1="3f3192da4c1cd4a43ff9883906b1b0a3c77fd3a7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demofd3" supported="no">
+		<description>Sony Promotional Disc 3</description>
+		<year>198?</year>
+		<publisher>Sony</publisher>
+		<notes><![CDATA[
+[FDC] "Error(14): in 1830: File read error"
+]]></notes>
+		<info name="alt_title" value="SONY販促用ディスク3"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="demofd3.1dd" size="305328" crc="dd8245b9" sha1="c7cefdc828431b2e35cd6bfde9c03936fbab03ca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demofd4" supported="no">
+		<description>Sony Promotional Disc 4</description>
+		<year>198?</year>
+		<publisher>Sony</publisher>
+		<notes><![CDATA[
+"SK Trk Err. Bad Sector"
+]]></notes>
+		<info name="alt_title" value="SONY販促用ディスク4"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="demofd4.1dd" size="305328" crc="6fd01210" sha1="f17cdb9a3eb1785efdb1c3ca5b0b2c72dcd2c4d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Coverdiscs -->
+
+<!-- which issue of the magazine? -->
+	<software name="flopmag" supported="no">
+		<description>Floppy Magazine</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305056">
+				<rom name="floppy magazine.1dd" size="305056" crc="44f18e58" sha1="dc4d8bda72d408e53edd4be4f1d9497d9179d35e" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Homebrew / Doujinshi -->
 
 	<software name="corewars">
 		<description>Corewars</description>
@@ -299,43 +664,19 @@ Known to be dumped, but no longer available: (If you do have any of these please
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
-				<rom name="develop.1dd" size="305328" crc="b7605b47" sha1="927d173f5d08c7a0ad178af1c191cba7d5435a05" />
+				<rom name="zebloc2.1dd" size="305328" crc="b7605b47" sha1="927d173f5d08c7a0ad178af1c191cba7d5435a05" />
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="sos20" cloneof="sos22">
-	<!-- Alternate Title S-OS Sword-->
-		<description>S-OS Monitor v2.0</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="305328">
-				<rom name="s-os sword monitor 2.0.1dd" size="305328" crc="27bc0b34" sha1="18840fab993716e7929b6e0600c446d8fba93059" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sos22">
-	<!-- Alternate Title S-OS Sword-->
-		<description>S-OS Monitor v2.2</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="348848">
-				<rom name="s-os sword monitor 2.2.1dd" size="348848" crc="6e3215ce" sha1="1fffac3db3005e3de750c63ce1285f6b8a40310a" />
-			</dataarea>
-		</part>
-	</software>
-
 
 <!-- It would be nice to find out original releases of some of these, but in the meanwhile let's document what we have -->
-	<software name="comp1">
+	<software name="comp1" supported="partial">
 		<description>Game Compilation 1</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+BR17, FRUIT, GHOST: "Disk read error (Bad Sector)" (bad dump?)
+]]></notes>
 		<info name="usage" value="vortex: remove mouse in joystick port 1" />
 
 		<part name="flop1" interface="floppy_3_5">
@@ -349,6 +690,10 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<description>Game Compilation 2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+HETZER: Uneven [MC6845] display during gameplay
+STRIKER2: "Disk read error (Bad Sector)" (bad dump?)
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="261808">

@@ -836,6 +836,7 @@ INVESTIGATE
 		<year>1984</year>
 		<publisher>コンプティーク (Comptiq)</publisher>
 		<!-- PC8801 -->
+		<info name="alt_title" value="エー・イー"/>
 		<info name="release" value="198404xx"/>
 		<info name="usage" value="Needs BASIC V1"/>
 
@@ -5170,7 +5171,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<software name="bugattac">
+	<software name="bugatk">
 		<description>Bug Attack</description>
 		<year>1984</year>
 		<publisher>コンプティーク (Comptiq)</publisher>
