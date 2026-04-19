@@ -5,20 +5,30 @@ license:CC0-1.0
 -->
 <softwarelist name="tvdear" description="TV Dear Illust-Cassette cartridges">
 	<!--
-
-	Known undumped carts:
-
-	Illust-Cassette No. 1 - Pochacco
-
-	There is also a Memory Cassette that may not contain any ROM.
-
+	There is also a Memory-Cassette (メモソーカセット) for user data.
+	Assembled with an Atmel AT29C256 (256K Flash Memory).
+	PCB Markings: F_MEM / SB1P05A
 	-->
+
+	<software name="illust1" supported="no">
+		<description>Illust-Cassette No. 1 - Pochacco</description>
+		<year>1995</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="イラストカセット No.1 Pochacco"/>
+		<info name="pcb" value="ROM / SB1P04A"/>
+		<part name="cart" interface="tvdear_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="lc371100sm.u15" size="0x20000" crc="ad9f13af" sha1="c7a3c5a72337ec5591992e824cb5623122ebdd51"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="illust2" supported="no">
 		<description>Illust-Cassette No. 2 - Bad Badtz-Maru</description>
 		<year>1995</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="イラストカセット No.2 バッドばつ丸"/>
+		<info name="pcb" value="ROM / SB1P04A"/>
 		<part name="cart" interface="tvdear_cart">
 			<dataarea name="rom" size="0x20000">
 				<rom name="lc371100.u15" size="0x20000" crc="4f13611b" sha1="1b50ef534f9d35eb55850a9b0844d5bf1dec0abc"/>
