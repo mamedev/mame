@@ -15,8 +15,7 @@ DEFINE_DEVICE_TYPE(LH79524_TIMER, lh79524_timer_device, "lh79524_timer", "LH7952
 
 lh79524_timer_device::lh79524_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LH79524_TIMER, tag, owner, clock)
-	, m_irq_cb(*this)
-{
+	, m_irq_cb(*this) {
 }
 
 void lh79524_timer_device::set_timer_index(int index) {
@@ -120,7 +119,6 @@ uint32_t lh79524_timer_device::read(offs_t offset, uint32_t mem_mask) {
 
 	return 0;
 }
-
 
 void lh79524_timer_device::write(offs_t offset, uint32_t data, uint32_t mem_mask) {
 	offs_t addr = offset << 2;

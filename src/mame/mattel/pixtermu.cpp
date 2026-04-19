@@ -2,12 +2,12 @@
 // copyright-holders:QUFB
 /******************************************************************************
 
-    Skeleton driver for Pixter Multi-Media.
+    WIP driver for Pixter Multi-Media.
 
-    Currently hangs after reset:
-
-    - If executing boot ROM, with boot configuration set to load NOR Flash or SRAM, it will reach an infinite loop at 0x1f0;
-    - If executing nCS1 ROM, it will wait indefinitely due to unimplemented timer controls;
+    - The boot ROM is ignored, boot directly from NOR flash
+    - The buttons are not implemented, only the touchscreen input
+    - Audio and SSP DMA is not implemented, the SSP DMA interrupt is fired on Vblank to maintain progress
+    - The soft buttons below the touchscreen are just drawn as rectangles
 
     References:
 
@@ -49,8 +49,12 @@
 #include "cpu/arm7/arm7.h"
 
 #include "machine/lh79524_timer.h"
+#include "machine/vic_pl192.h"
 
 #include "softlist_dev.h"
+
+#include "emupal.h"
+#include "screen.h"
 
 namespace {
 
@@ -59,13 +63,20 @@ class pixter_multimedia_state : public driver_device
 public:
 	pixter_multimedia_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
+		, m_touch(*this, { "TOUCHX", "TOUCHY", "TOUCH" })
 		, m_cart(*this, "cartslot")
 		, m_maincpu(*this, "maincpu")
 		, m_ndcs0(*this, "ndcs0")
 		, m_internal_sram(*this, "internal_sram")
 		, m_timers(*this, "timer%u", 0U)
+		, m_vic(*this, "vic")
 		, m_clkrst(*this, "clkrst", 0x1000, ENDIANNESS_LITTLE)
 		, m_bootctl(*this, "bootctl", 0x1000, ENDIANNESS_LITTLE)
+		, m_lcdc(*this, "lcdc", 0x1000, ENDIANNESS_LITTLE)
+		, m_adc(*this, "adc", 0x100, ENDIANNESS_LITTLE)
+		, m_dma(*this, "dma", 0x100, ENDIANNESS_LITTLE)
 		, m_remap_view(*this, "remap")
 	{ }
 
@@ -89,19 +100,47 @@ private:
 	void clkrst_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	void bootctl_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
+	void lcdc_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t lcdc_r(offs_t offset);
+
+	uint32_t adc_r(offs_t offset);
+	void adc_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+
+	void dma_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+
 	uint32_t ssp_r(offs_t offset);
 	void ssp_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
+	uint32_t gpioab_r(offs_t offset);
+	uint32_t gpiogh_r(offs_t offset);
+	uint32_t gpioij_r(offs_t offset);
+
+
+	int adc_count;
+
 	void apb_remap(uint32_t data);
+
+	uint32_t screen_update_pixtermu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_vblank(int state);
+
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+
+	required_ioport_array<3> m_touch;
 
 	required_device<generic_slot_device> m_cart;
 	required_device<arm7_cpu_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_ndcs0;
 	required_shared_ptr<uint32_t> m_internal_sram;
 	required_device_array<lh79524_timer_device, 3> m_timers;
+	required_device<vic_pl190_device> m_vic;
 
 	memory_share_creator<uint32_t> m_clkrst;
 	memory_share_creator<uint32_t> m_bootctl;
+	memory_share_creator<uint32_t> m_lcdc;
+	memory_share_creator<uint32_t> m_adc;
+	memory_share_creator<uint32_t> m_dma;
+
 	memory_view m_remap_view;
 };
 
@@ -139,6 +178,9 @@ void pixter_multimedia_state::machine_reset()
 	m_bootctl[BOOTCTL_EPM] = 0b1111; // All external devices are accessible following reset
 
 	m_clkrst[CLKRST_REMAP] = 0b00; // Map nCS1
+
+	adc_count = 0;
+
 	apb_remap(m_clkrst[CLKRST_REMAP]);
 }
 
@@ -210,13 +252,23 @@ void pixter_multimedia_state::arm7_map(address_map &map)
 	map(0x8000'0000, 0x8000'1fff).rom().region("bootrom", 0);
 
 	// APB Peripherals
-
+	// ADC
+	map(0xfffc'3000, 0xfffc'30ff).ram().share("adc").r(FUNC(pixter_multimedia_state::adc_r)).w(FUNC(pixter_multimedia_state::adc_w));
 	// Timers
 	map(0xfffc'4000, 0xfffc'402f).rw(m_timers[0], FUNC(lh79524_timer_device::read), FUNC(lh79524_timer_device::write));
 	map(0xfffc'4030, 0xfffc'404f).rw(m_timers[1], FUNC(lh79524_timer_device::read), FUNC(lh79524_timer_device::write));
 	map(0xfffc'4050, 0xfffc'406f).rw(m_timers[2], FUNC(lh79524_timer_device::read), FUNC(lh79524_timer_device::write));
 	// SSP
 	map(0xfffc'6000, 0xfffc'602f).r(FUNC(pixter_multimedia_state::ssp_r)).w(FUNC(pixter_multimedia_state::ssp_w));
+
+	// GPIO I/J
+	map(0xfffd'b000, 0xfffd'b00f).r(FUNC(pixter_multimedia_state::gpioij_r));
+	// GPIO G/H
+	map(0xfffd'c000, 0xfffd'c00f).r(FUNC(pixter_multimedia_state::gpiogh_r));
+	// GPIO A/B
+	map(0xfffd'f000, 0xfffd'f00f).r(FUNC(pixter_multimedia_state::gpioab_r));
+	// DMA
+	map(0xfffe'1000, 0xfffe'10ff).ram().share("dma").w(FUNC(pixter_multimedia_state::dma_w));
 
 	// Reset Clock and Power Controller
 	map(0xfffe'2000, 0xfffe'2fff).ram().share("clkrst").w(FUNC(pixter_multimedia_state::clkrst_w));
@@ -227,11 +279,11 @@ void pixter_multimedia_state::arm7_map(address_map &map)
 	// External Memory Control
 	map(0xffff'1000, 0xffff'1fff).ram();
 	// Color LCD Control
-	map(0xffff'4000, 0xffff'4fff).ram();
+	map(0xffff'4000, 0xffff'4fff).ram().share("lcdc").w(FUNC(pixter_multimedia_state::lcdc_w)).r(FUNC(pixter_multimedia_state::lcdc_r));
 	// USB Device
 	map(0xffff'5000, 0xffff'5fff).ram();
 	// Interrupt Vector Control
-	map(0xffff'f000, 0xffff'ffff).ram();
+	map(0xffff'f000, 0xffff'ffff).m(m_vic, FUNC(vic_pl190_device::map)); // interrupt controller
 }
 
 void pixter_multimedia_state::clkrst_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -248,7 +300,32 @@ void pixter_multimedia_state::bootctl_w(offs_t offset, uint32_t data, uint32_t m
 	COMBINE_DATA(&m_bootctl[offset]);
 }
 
-uint32_t pixter_multimedia_state::ssp_r(offs_t offset) {
+
+void pixter_multimedia_state::lcdc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	offs_t addr = offset << 2;
+	if (addr >= 0x200 && addr <= 0x3fc) {
+		unsigned base = ((addr - 0x200) >> 2) * 2;
+		for (int j = 0; j < 2; j++) {
+			uint16_t ibgr1555 = data >> (16 * j);
+			uint16_t i = ((ibgr1555 >> 15) & 0x1) << 2;
+			uint16_t b = ((ibgr1555 >> 10) & 0x1F) << 3 | i;
+			uint16_t g = ((ibgr1555 >> 5) & 0x1F) << 3 | i;
+			uint16_t r = ((ibgr1555 >> 0) & 0x1F) << 3 | i;
+
+			m_palette->set_pen_color(base + j, r, g, b);
+		}
+	}
+	COMBINE_DATA(&m_lcdc[offset]);
+}
+
+uint32_t pixter_multimedia_state::lcdc_r(offs_t offset)
+{
+	return m_lcdc[offset];
+}
+
+uint32_t pixter_multimedia_state::ssp_r(offs_t offset)
+{
 	switch (offset << 2) {
 		case 0x0C: // status
 			return 1;
@@ -256,11 +333,159 @@ uint32_t pixter_multimedia_state::ssp_r(offs_t offset) {
 			return 0;
 	}
 }
-void pixter_multimedia_state::ssp_w(offs_t offset, uint32_t data, uint32_t mem_mask) {
-	logerror("%s: SSP write 0x%04X 0x%08X\n", machine().describe_context(), offset << 2, data);
+
+void pixter_multimedia_state::ssp_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+}
+
+uint32_t pixter_multimedia_state::adc_r(offs_t offset)
+{
+	switch (offset << 2) {
+		case 0x08: { // result
+				if (adc_count > 0)
+					--adc_count;
+				unsigned index = ((m_adc[0x10 >> 2] & 0xF) -  adc_count);
+				unsigned hc = m_adc[(0x24 >> 2) + index], lc = m_adc[(0x64 >> 2) + index];
+				unsigned result = 0x3ff;
+				if (hc == 0xFF80 && lc == 0x1080) { // touch or no touch
+					result = m_touch[2]->read() ? 0 : 0x3ff;
+				} else if (hc == 0xFFA0 && lc == 0x1080) {
+					result = 0;
+				} else if (hc == 0xFF91 && lc == 0x0015) { // Y position
+					result = (m_touch[1]->read() * 1023) / 176;
+				} else if (hc == 0xFF82 && lc == 0x00A2) { // X position
+					result = 1023 - ((8 + m_touch[0]->read()) * 1023) / 176;
+				}
+				// At least one extra channel is used for battery
+				return (result << 6) | (index & 0xF);
+			}
+		case 0x1C: // IRQ status
+			return (m_touch[2]->read() ? 8 : 0) | 4;
+		case 0x20: // FIFO status
+			if (adc_count == 16)
+				return 8;
+			else if (adc_count == 0)
+				return 4;
+			else
+				return 0;
+		default:
+			return m_adc[offset];
+	}
+}
+
+void pixter_multimedia_state::adc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	switch (offset << 2) {
+		case 0x14:
+			if(data & 0x4) { // start conversion
+				adc_count = (m_adc[0x10 >> 2] & 0xF) + 1;
+			};
+			return;
+		default:
+			break;
+	}
+	COMBINE_DATA(&m_adc[offset]);
+}
+
+uint32_t pixter_multimedia_state::gpioab_r(offs_t offset)
+{
+	switch (offset << 2) {
+		case 0x04: // port B data
+			return 0xFF;
+		default:
+			return 0;
+	}
+}
+
+uint32_t pixter_multimedia_state::gpiogh_r(offs_t offset)
+{
+	// Some of these GPIO are likely used for the buttons, which aren't implemented right now
+	switch (offset << 2) {
+		case 0x00: // port G data
+			return 0x00;
+		case 0x04: // port H data
+			return 0x00;
+		default:
+			return 0;
+	}
+}
+
+
+uint32_t pixter_multimedia_state::gpioij_r(offs_t offset)
+{
+	switch (offset << 2) {
+		case 0x00: // port I data
+			return 0xFF;
+		default:
+			return 0;
+	}
+}
+
+void pixter_multimedia_state::dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	switch (offset << 2) {
+		case 0xF4: // interrupt clear
+			if (data & 0x2) {
+				m_dma[0xF8 >> 2] &= ~0x2;
+			}
+			break;
+		default:
+			COMBINE_DATA(&m_dma[offset]);
+			break;
+	}
+	m_vic->irq_w<21>(((m_dma[0xF0 >> 2] & 0x2) & (m_dma[0xF8 >> 2] & 0x2)) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+uint32_t pixter_multimedia_state::screen_update_pixtermu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (!BIT(m_lcdc[0x01C>>2], 1))
+		return 0;
+	const uint32_t base = (m_lcdc[0x010>>2] >> 2) & 0xfffff;
+
+	for (int y = 0; y < 160; y++) {
+		for (int x = 0; x < 160; x++) {
+			int pixel = (y * 162 + x + 1);
+			uint8_t ind = m_ndcs0[base + pixel / 4] >> ((pixel % 4) * 8);
+			bitmap.pix(y, x) = ind;
+		}
+	}
+
+	// HACK: draw the soft buttons where the touchscreen extends below the LCD as white squares
+	// The label that is used in the physical hardware probably needs to be scanned
+	for (int i = 0; i < 9; i++) {
+		int x0 = (160 * i) / 9;
+		int y0 = 160;
+		for (int y = (y0 + 2); y <= (y0 + 14); y++) {
+			for (int x = (x0 + 2); x <= (x0 + 14); x++) {
+				bitmap.pix(y, x) = 0xFF;
+			}
+		}
+	}
+
+	return 0;
+}
+
+void pixter_multimedia_state::screen_vblank(int state)
+{
+	// Triggering this on vblank is definitely wrong, but it's the best place to set this right now...
+	// The correct solution is to implement the SSP and DMA that drives the audio DAC. But without
+	// this interrupt the system won't run.
+	m_dma[0xF8 >> 2] |= 0x2;
+	m_vic->irq_w<21>(((m_dma[0xF0 >> 2] & 0x2) & (m_dma[0xF8 >> 2] & 0x2)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( pixter_multimedia )
+
+	PORT_START("TOUCHX")
+	PORT_BIT(0x3ff, 80, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0,159) PORT_SENSITIVITY(45) PORT_KEYDELTA(13)
+
+	PORT_START("TOUCHY")
+	PORT_BIT(0x3ff, 80, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0,171) PORT_SENSITIVITY(45) PORT_KEYDELTA(13)
+
+	PORT_START("TOUCH")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Touch")
+	PORT_BIT(0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED)
+
 INPUT_PORTS_END
 
 void pixter_multimedia_state::pixter_multimedia(machine_config &config)
@@ -269,17 +494,39 @@ void pixter_multimedia_state::pixter_multimedia(machine_config &config)
 	ARM7(config, m_maincpu, 76'205'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pixter_multimedia_state::arm7_map);
 
-	for (int i=0; i<3; i++)
-	{
+	PL190_VIC(config, m_vic, 0);
+	m_vic->out_irq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
+	m_vic->out_fiq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_FIRQ_LINE);
+
+	for (int i=0; i<3; i++) {
 		LH79524_TIMER(config, m_timers[i], 76'205'000);
 		m_timers[i]->set_timer_index(i);
 	}
+
+	m_timers[0]->irq_cb().set(m_vic, FUNC(vic_pl190_device::irq_w<4>));
+	m_timers[1]->irq_cb().set(m_vic, FUNC(vic_pl190_device::irq_w<5>));
+	m_timers[2]->irq_cb().set(m_vic, FUNC(vic_pl190_device::irq_w<6>));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pixter_cart");
 	m_cart->set_endian(ENDIANNESS_LITTLE);
 	m_cart->set_width(GENERIC_ROM32_WIDTH);
 	m_cart->set_device_load(FUNC(pixter_multimedia_state::cart_load));
 	m_cart->set_must_be_loaded(false);
+
+	PALETTE(config, m_palette).set_format(palette_device::IRGB_1555, 256);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_palette("palette");
+
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	// The LCD is 160x160 but this is a hack to draw the softbuttons below it
+	m_screen->set_size(160, 176);
+	m_screen->set_visarea(0, 160-1, 0, 176-1);
+	m_screen->set_screen_update(FUNC(pixter_multimedia_state::screen_update_pixtermu));
+
+	m_screen->screen_vblank().set(FUNC(pixter_multimedia_state::screen_vblank));
+
 
 	SOFTWARE_LIST(config, "cart_list").set_original("pixter_cart");
 }
