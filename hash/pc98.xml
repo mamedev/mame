@@ -32641,7 +32641,7 @@ Optional [AMD-98] support, needs PIT for BGM
 		<description>Mario Bros. Special</description>
 		<year>1985</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="alt_title" value="マリオブラザーズスペシャル" />
+		<info name="alt_title" value="マリオブラザーズ スペシャル" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1086448">
 				<rom name="mariosp.d88" size="1086448" crc="2992943f" sha1="735f2bd8127c08ced963071d071634b7df61e13e" offset="0" />

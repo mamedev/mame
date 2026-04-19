@@ -14,6 +14,8 @@ TODO:
 - cursor stuck in Bird Crash;
 - add mc6845 features;
 - interlace (cfr. cpm22 in setup mode);
+- Most often don't survive a soft reset;
+- Hookup Kanji ROM (have dump);
 
 **************************************************************************************************/
 
