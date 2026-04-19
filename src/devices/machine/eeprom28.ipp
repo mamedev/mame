@@ -11,9 +11,9 @@
 #ifndef MAME_MACHINE_EE28_IPP
 #define MAME_MACHINE_EE28_IPP
 
-// Included here to provide context for editors; include guards in ee28.h
+// Included here to provide context for editors; include guards in eeprom28.h
 // prevent this from actually doing anything.
-#include "ee28.h"
+#include "eeprom28.h"
 
 #pragma once
 
@@ -22,7 +22,7 @@ void eeprom28_device<EEPROM28_ARGS>::write(uint32_t offset, uint8_t data)
 {
 	m_toggle_bit = TOGGLE_BIT;
 
-	EE28LOG("%s: ee28.write(%04x, %02x) in state %d\n", machine().describe_context(), offset, data, m_state);
+	EE28LOGMASKED(EE28_LOG_DETAIL, "%s: eeprom28.write(%04x, %02x) in state %d\n", machine().describe_context(), offset, data, m_state);
 	if (m_state == STATE_PROGRAMMING) {
 		// An attempt to write during a programming cycle does nothing.
 		EE28LOG("IN PROGRAMMING CYCLE: writing %02x @ %04x\n", data, offset);
@@ -34,7 +34,6 @@ void eeprom28_device<EEPROM28_ARGS>::write(uint32_t offset, uint8_t data)
 		m_start_programming_timer->adjust(attotime::from_usec(m_t_blc_usec));
 	}
 
-	// EE28LOG("write(%04x, %02x) in state %d\n", offset, data, m_state);
 	if (offset >= TOTAL_SIZE_BYTES) {
 		// Attempting to write outside the range of this device does nothing.
 		return;
@@ -53,7 +52,7 @@ void eeprom28_device<EEPROM28_ARGS>::write(uint32_t offset, uint8_t data)
 				// We're firmly within a protection command sequence.
 				// Inhibit the actual writing of data during the subsequence programming cycle.
 				m_program_buffer_to_eeprom = false;
-				// EE28LOG("m_program_buffer_to_eeprom -> %d\r\n", m_program_buffer_to_eeprom);
+				EE28LOGMASKED(EE28_LOG_DETAIL, "m_program_buffer_to_eeprom -> %d\r\n", m_program_buffer_to_eeprom);
 				change_to_command_state(COMMAND_STATE_2);
 			} else {
 				// Not, after all in a command sequence.
@@ -135,7 +134,7 @@ void eeprom28_device<EEPROM28_ARGS>::write(uint32_t offset, uint8_t data)
 		// so that the command sequence (which will end up in the buffer)
 		// does not get written to storage.
 		m_program_buffer_to_eeprom = (!m_software_data_protection_enabled) || (m_state == STATE_PROTECTED_WRITE);
-		// EE28LOG("m_program_buffer_to_eeprom -> %d\r\n", m_program_buffer_to_eeprom);
+		EE28LOGMASKED(EE28_LOG_DETAIL, "m_program_buffer_to_eeprom -> %d\r\n", m_program_buffer_to_eeprom);
 
 		// We start to buffer a set of writes.
 		// We do this even if we're write protected - m_program_buffer_to_eeprom protects us.
@@ -146,7 +145,7 @@ void eeprom28_device<EEPROM28_ARGS>::write(uint32_t offset, uint8_t data)
 		// to storage during the programming cycle.
 		m_buffering_page = offset & PAGE_MASK;
 		std::memcpy(&m_page_buffer[0], &m_storage[storage_page(m_buffering_page)], PAGE_SIZE_BYTES);
-		EE28LOG("%s: buffering page %04x\n", machine().describe_context(), m_buffering_page);
+		EE28LOGMASKED(EE28_LOG_DETAIL, "%s: buffering page %04x\n", machine().describe_context(), m_buffering_page);
 	}
 
 	// Deliberately falling through after detecting the first write and changing state
@@ -166,16 +165,16 @@ void eeprom28_device<EEPROM28_ARGS>::write(uint32_t offset, uint8_t data)
 		// are ignored, only those within the same page are accepted.
 		if ((offset & PAGE_MASK) == m_buffering_page) {
 			m_page_buffer[offset & PAGE_OFFSET_MASK] = data;
-			EE28LOG("%s: buffer[%02x] = %02x\n", machine().describe_context(), offset & PAGE_OFFSET_MASK, data);
+			EE28LOGMASKED(EE28_LOG_DETAIL, "%s: buffer[%02x] = %02x\n", machine().describe_context(), offset & PAGE_OFFSET_MASK, data);
 		}
 
 		// Note where the last write occurred.
 		m_last_written_offset = offset;
 	}
 
-	// if (m_software_data_protection_enabled) {
-	//   EE28LOG("X28C: write %02x to %x while write protected\n", data, offset);
-	// }
+	if (m_software_data_protection_enabled) {
+		EE28LOGMASKED(EE28_LOG_DETAIL, "X28C: write %02x to %x while write protected\n", data, offset);
+	}
 }
 
 template <EEPROM28_PARAMS>
@@ -226,13 +225,11 @@ uint8_t eeprom28_device<EEPROM28_ARGS>::read(uint32_t offset)
 		m_toggle_bit ^= TOGGLE_BIT;
 	}
 
-#if defined(EE28_VERBOSE) && EE28_VERBOSE
-	EE28LOG("%s: ee28.read(%04x), have %02x in %s, returning %02x\n",
+	EE28LOGMASKED(EE28_LOG_DETAIL, "%s: eeprom28.read(%04x), have %02x in %s, returning %02x\n",
 		machine().describe_context(), offset,
 		read_from_buffer ? m_page_buffer[offset & PAGE_OFFSET_MASK] : m_storage[storage_offset(offset)],
 		read_from_buffer ? "buffer" : "storage",
 		data);
-#endif // EE28_VERBOSE
 
 	return data;
 }

@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "ee28.h"
+#include "eeprom28.h"
 
 // Concrete devices
 

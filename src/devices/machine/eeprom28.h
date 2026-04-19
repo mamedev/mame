@@ -10,8 +10,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_EE28_H
-#define MAME_MACHINE_EE28_H
+#ifndef MAME_MACHINE_EEPROM28_H
+#define MAME_MACHINE_EEPROM28_H
 
 #pragma once
 
@@ -19,11 +19,15 @@
 #include <array>
 #include <cstdint>
 
-// #define EE28_VERBOSE 1
+#define EE28_LOG_GENERAL (1 << 0)
+#define EE28_LOG_DETAIL (1 << 1)
+// #define EE28_VERBOSE (EE28_LOG_GENERAL | EE28_LOG_DETAIL)
 
-#if defined(EE28_VERBOSE) && EE28_VERBOSE
-#define EE28LOG(...) do { logerror(__VA_ARGS__); } while(0)
+#if defined(EE28_VERBOSE) && (EE28_VERBOSE)
+#define EE28LOGMASKED(mask, ...) do { if (EE28_VERBOSE & (mask)) (logerror)(__VA_ARGS__); } while (0)
+#define EE28LOG(...) EE28LOGMASKED(EE28_LOG_GENERAL, __VA_ARGS__)
 #else
+#define EE28LOGMASKED(...)
 #define EE28LOG(...)
 #endif // EE28_VERBOSE
 
@@ -252,7 +256,7 @@ protected:
 	// Change State to a new internal state
 	void change_to_state(int ns)
 	{
-		// EE28LOG("Changing state to %d\r\n", ns);
+		EE28LOGMASKED(EE28_LOG_DETAIL, "Changing state to %d\r\n", ns);
 		m_state = ns;
 	}
 
@@ -265,7 +269,7 @@ protected:
 	// Change State to a new command processing state
 	void change_to_command_state(int ns)
 	{
-		// EE28LOG("Changing state to %d\r\n", ns);
+		EE28LOGMASKED(EE28_LOG_DETAIL, "Changing state to %d\r\n", ns);
 		m_command_state = ns;
 	}
 
@@ -393,7 +397,7 @@ protected:
 		change_to_state(STATE_IDLE);
 
 		m_program_buffer_to_eeprom = false;
-		// EE28LOG("m_program_buffer_to_eeprom -> %d\r\n", m_program_buffer_to_eeprom);
+		EE28LOGMASKED(EE28_LOG_DETAIL, "m_program_buffer_to_eeprom -> %d\r\n", m_program_buffer_to_eeprom);
 	}
 
 	// Software Data Protection Helper
@@ -455,7 +459,7 @@ protected:
 };
 
 // include the implementations for read() and write()
-#include "ee28.ipp"
+#include "eeprom28.ipp"
 
 /*
  * A variant of the eeprom28_device class that implements `device_nvram_interface`
@@ -525,5 +529,7 @@ protected:
 #undef EEPROM28_ARGS
 
 #undef EE28_VERBOSE
+#undef EE28LOG
+#undef EE28LOGMASKED
 
-#endif // MAME_MACHINE_EE28_H
+#endif // MAME_MACHINE_EEPROM28_H
