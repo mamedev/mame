@@ -3564,6 +3564,7 @@ end
 --@src/devices/machine/generalplus_gpl162xx_soc.h,MACHINES["SPG2XX"] = true
 --@src/devices/machine/generalplus_gpl1625x_soc.h,MACHINES["SPG2XX"] = true
 --@src/devices/machine/generalplus_gpl951xx_soc.h,MACHINES["SPG2XX"] = true
+--@src/devices/machine/generalplus_gpce4_soc.h,MACHINES["SPG2XX"] = true
 ---------------------------------------------------
 
 if MACHINES["SPG2XX"] then
@@ -3590,6 +3591,8 @@ if MACHINES["SPG2XX"] then
 		MAME_DIR .. "src/devices/machine/generalplus_gpl162xx_soc_video.h",
 		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_soc.cpp",
 		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_soc.h",
+		MAME_DIR .. "src/devices/machine/generalplus_gpce4_soc.cpp",
+		MAME_DIR .. "src/devices/machine/generalplus_gpce4_soc.h",
 		MAME_DIR .. "src/devices/machine/spg_renderer.cpp",
 		MAME_DIR .. "src/devices/machine/spg_renderer.h",
 		MAME_DIR .. "src/devices/machine/gpl_renderer.cpp",
