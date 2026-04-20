@@ -39824,10 +39824,10 @@ Black screen
 		<description>The Curse of Illmoore Bay</description>
 		<year>2019</year>
 		<publisher>Second Dimension</publisher>
-		<info name="version" value="demo 20191028" />
 		<notes><![CDATA[
 The game freezes when loading the first level
 ]]></notes>
+		<info name="version" value="demo 20191028" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="The Curse of Illmoore Bay (World).bin" size="4194304" crc="c71afaad" sha1="8d70e751e7e76539faed06839eb9b2a5fdf2b6e8"/>
