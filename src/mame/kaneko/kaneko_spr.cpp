@@ -557,17 +557,19 @@ void kaneko16_sprite_device::copybitmap(bitmap_rgb32 &bitmap, const rectangle &c
 template<class BitmapClass>
 void kaneko16_sprite_device::copybitmap_common(BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap)
 {
+	rectangle clip = cliprect;
+	clip &= m_sprites_bitmap[m_buffer].cliprect();
 	pen_t const *const pal = gfx(0)->palette().pens();
 
 	constexpr bool rgb = sizeof(typename BitmapClass::pixel_t) != 2;
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = clip.min_y; y <= clip.max_y; y++)
 	{
 		typename BitmapClass::pixel_t *const dstbitmap = &bitmap.pix(y);
 		u8 *const dstprimap = &priority_bitmap.pix(y);
 		u16 *const srcbitmap = &m_sprites_bitmap[m_buffer].pix(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = clip.min_x; x <= clip.max_x; x++)
 		{
 			const u16 pri = (srcbitmap[x] & 0xc000) >> 14;
 			const u16 pix = srcbitmap[x] & 0x3fff;
@@ -587,15 +589,17 @@ void kaneko16_sprite_device::copybitmap_common(BitmapClass &bitmap, const rectan
 void kaneko16_sprite_device::render_sprites(const rectangle &cliprect, u16* spriteram16, int spriteram16_bytes)
 {
 	m_buffer ^= 1;
+	rectangle clip = cliprect;
+	clip &= m_sprites_bitmap[m_buffer].cliprect();
 	/* Sprites last (rendered with pdrawgfx, so they can slip
 	   in between the layers) */
 
-	m_sprites_maskmap[m_buffer].fill(0, cliprect);
+	m_sprites_maskmap[m_buffer].fill(0, clip);
 	/* keep sprites on screen - used by mgcrystl when you get the first gem and it shows instructions */
 	if (!m_keep_sprites)
-		m_sprites_bitmap[m_buffer].fill(0, cliprect);
+		m_sprites_bitmap[m_buffer].fill(0, clip);
 
-	draw_sprites(cliprect, spriteram16, spriteram16_bytes);
+	draw_sprites(clip, spriteram16, spriteram16_bytes);
 }
 
 kaneko_vu002_sprite_device::kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
