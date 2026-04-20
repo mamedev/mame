@@ -5,6 +5,7 @@ license:CC0-1.0
 
 TODO:
 - split SWs that works on regular SMC-70 once we have a BIOS for that;
+- inherit undumped list from http://www.smc777.com/alllist.htm
 
 Dumps needed: (Info taken from: http://home.pacbell.net/smc777/comsoft.htm )
 
@@ -28,58 +29,49 @@ Magazine:
 
 
 SMCゲームパックI
-  トランジット
-  オセロゲーム
-  九十九 ウルトラ4人麻雀
-  スターブレーザー
-  SMC将棋
-  妖花の謎
-  チェスゲーム
-  徳川風雲録
-  妖怪探偵ちまちま
-  野球狂
   法隆寺の謎 (houryuji?)
   黄金の墓 (ougon?)
   無人島脱出 (mujindas?)
   ムー大陸の謎 (munazo?)
+  チェスゲーム (royalchs?)
+  徳川風雲録 (tokugawa?)
+  妖花の謎 (younazo?)
 
 Home:
-  ユーカラJJ
+  ユーカラJJ - Yukar JJ
   グラフィックエディター(市販版) (one of these should be graphed)
   グラフィックエディター(777C添付版)
-  ラッサピアターE
+  ラッサピアターE - Rassapiator E
 
 
 Education:
   グラフィックスの世界(入門編) - (one of these should be graphw)
   グラフィックスの世界(中級編) /
   グラフィックスの世界(応用編) /
-  世界の旗
-  まんてん君(記憶力)
-  まんてん君(思考力)
-  まんてん君(反射性)
-  グレイハウンド
-  パソコン英和辞典
+  まんてん君(記憶力) - manten4~6
+  まんてん君(思考力) /
+  まんてん君(反射性) /
+  グレイハウンド - Greyhound
+  パソコン英和辞典 - PC English-Japanese Dictionary
 
 Known to be dumped, but no longer available: (If you do have any of these please contact the MAME development team)
 Update 2026: these are actually from compilations, and probably tapes?
-  SMC Paint
-  PIC->BMPコンバータ
-  GIFファイルローダー
-  1ドライブ用PIP
-  フルーツフィールド (Fruit)
+  PIC->BMPコンバータ - PIC->BMP Converter
+  GIFファイルローダー - GIF File Loader
+  1ドライブ用PIP - 1-Drive PIP
+  フルーツフィールド (Fruit) - Fruit Field
   XOR777
   Slip Othello
   Rocker
-  不眠ソリティア (Solit)
+  不眠ソリティア (Solit) - Insomnia
   T.N.T. Bomb Bomb
   Mevious
   Mad Mlash
-  フィネス(BR17)
+  フィネス(BR17) - Finesse
   Hetzer
   Vortex
-  テトリス(TET)
-  ストライカー(Striker)
+  テトリス(TET) - Tetris
+  ストライカー - Striker
   Area-X
   Ghost City
 -->
@@ -132,13 +124,12 @@ Boots only if any disk is in drive B (?)
 		</part>
 	</software>
 
-	<!-- TODO: may not be a clone (same behaviour, different utilities) -->
-	<software name="filer14j" cloneof="develop" supported="no">
-		<description>Disk Filer v1.4</description>
+	<software name="filer14j">
+		<description>Disk Filer (v1.4J)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-Boots only if any disk is in drive B (?)
+File viewer, useful for executing non autobootable disks in drive B:
 ]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -190,6 +181,22 @@ Unreadable graphics, should require [kanji] hookup
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
 				<rom name="kanjicpm2.1dd" size="305328" crc="1f9b7983" sha1="df10766d66f89f2627f84092b5a9ab8caa17f054"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smcdos" supported="partial">
+		<description>SMC-DOS (System Release 1.2)</description>
+		<year>1986</year>
+		<publisher>Tezz</publisher>
+		<notes><![CDATA[
+Not extensively tested, may be incomplete?
+]]></notes>
+
+		<!-- baddump: has a doordoor.com, unlikely from the original media -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="362992">
+				<rom name="smcdos.1dd" size="362992" crc="0410d529" sha1="c29bf8519736ed31ff72abcfd7ad4b4b3118f4f2" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -778,7 +785,7 @@ Unresponsive [keyboard]
 	<software name="nobunaga" supported="no">
 		<description>Nobunaga no Yabou</description>
 		<year>1983</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
 [MC6845] bad colors on graphic layer (similar to kanjicpm)
 ]]></notes>
@@ -903,6 +910,22 @@ Not extensively tested (language barrier)
 		</part>
 	</software>
 
+	<software name="smcshogi" supported="no">
+		<description>SMC Shougi</description>
+		<year>1985</year>
+		<publisher>Sony</publisher>
+		<notes><![CDATA[
+[keyboard] selects "King" even if the intention is to move anything else
+]]></notes>
+		<info name="alt_title" value="SMC将棋"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="smcshogi.1dd" size="305328" crc="cc245456" sha1="d753030a6433991f23e0a230ed76b688c61b14c9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="suprgolf" supported="no">
 		<description>SMC Super Golf</description>
 		<year>1983</year>
@@ -919,6 +942,22 @@ Cannot start a game, [keyboard]?
 		</part>
 	</software>
 
+	<software name="starblaz" supported="no">
+		<description>Star Blazer</description>
+		<year>1984</year>
+		<publisher>Sony</publisher>
+		<notes><![CDATA[
+Unresponsive [keyboard], works with joystick
+]]></notes>
+		<info name="alt_title" value="スターブレーザー"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="283568">
+				<rom name="star blazer (1984)(broderbund software)(sony)(tony suzuki).1dd" size="283568" crc="11824400" sha1="5e0e345dfc19c8268e5d97fae2c0bc0010c315d6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="strizbh">
 		<description>Striz B.H.</description>
 		<year>1984</year>
@@ -928,6 +967,55 @@ Cannot start a game, [keyboard]?
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
 				<rom name="strizbh.1dd" size="305328" crc="efa24635" sha1="c2308afeb555197c6d583e6cd46e6c5c5c9b4ea9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tokugawa" supported="no">
+		<description>Tokugawa Fuunroku</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+[FDC] "Error(161): Bad disk sector"
+]]></notes>
+		<info name="alt_title" value="徳川風雲録"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="tokugawa.1dd" size="305328" crc="cf722de5" sha1="df519635a8c6c0efde1b96d040c3f4a5183dbc05"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transitt" supported="no">
+		<description>Transitt</description>
+		<year>1985</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+[FDC] "Err (BS) on A:"
+]]></notes>
+		<info name="alt_title" value="トランジット"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="362992">
+				<rom name="transitt (1985)(sony creative products inc.).1dd" size="362992" crc="c2793f03" sha1="5e718f097c9fcda3aca0caba29fa23d88d4a20a1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tsu4mj" supported="no">
+		<description>Tsukumo Ultra 4-nin Mahjong</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Unresponsive [keyboard] after first tile discarded
+Standalone version of MAHJONG.COM in compinv
+]]></notes>
+		<info name="alt_title" value="九十九 ウルトラ4人麻雀"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="29200">
+				<rom name="ultra4mahjong.1dd" size="29200" crc="47ab89e2" sha1="7801372770609233579c25d81398bea3efb4a4d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -949,16 +1037,69 @@ Cannot start a game, [keyboard]?
 		</part>
 	</software>
 
-	<software name="yakyuuky" supported="no">
-		<description>Yakyuu-Kyou</description>
+	<software name="yakyukyo" supported="no">
+		<description>Yakyuu Kyou</description>
 		<year>1984</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<notes><![CDATA[
+[FDC] Crashes after displaying "ヤキュウキョウ"
+d88: Floppy disk has excess of heads for this drive that will be discarded (floppy heads=2, drive heads=1)
+]]></notes>
 		<info name="alt_title" value="野球狂" />
-		<!-- Crashes after displaying "ヤキュウキョウ" -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="70352">
 				<rom name="yakyuu-kyou (smc-777) [fd].d88" size="70352" crc="3d92559a" sha1="b1d326a8b8e6cd69723686e3a47474539741d9f8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yakyukyoa" cloneof="yakyukyo" supported="no">
+		<description>Yakyuu Kyou (alt format)</description>
+		<year>1984</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<notes><![CDATA[
+[MC6845] bad colors on graphic layer (same as nobunaga?)
+]]></notes>
+		<info name="alt_title" value="野球狂" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="322208">
+				<rom name="yakyuu kyou (1984)(hudson soft).1dd" size="322208" crc="e8258ba8" sha1="b0e3c64abf8e14961e429d38e184b12df339399b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="younazo" supported="no">
+		<!-- TODO: confirm me -->
+		<description>Youkai no Nazo</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Stuck [buzzer]
+Doesn't clear [MC6845] graphic layer properly ([FDC]?)
+]]></notes>
+		<info name="alt_title" value="妖花の謎"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="youka_nazo.1dd" size="305328" crc="32442475" sha1="40c3f7afea2102fb537a1342127aa71417417caa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chima" supported="no">
+		<description>Youkai Tantei Chima Chima</description>
+		<year>1984</year>
+		<publisher>ボーステック (Bothtec)</publisher>
+		<notes><![CDATA[
+[MC6845] heavy GFX split issues during gameplay
+]]></notes>
+		<info name="alt_title" value="妖怪探偵ちまちま"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="yokai tantei chima chima (1984)(bothtec)(alex bros.).1dd" size="305328" crc="35e3dc28" sha1="615bdb2e4b1a241db9bdc7044ff88c7d4ae6514e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1062,6 +1203,21 @@ Not extensively tested (language barrier)
 		</part>
 	</software>
 
+	<software name="sekaihat" supported="no">
+		<description>Sekai no Hata</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+[FDC] "LOAD ERROR"
+]]></notes>
+		<info name="alt_title" value="世界の旗"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="worldflags.1dd" size="305328" crc="d3687244" sha1="5614358dfe00b1396410ae4fee34ffdd9308c4f2"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="jwproc" supported="no">
 		<description>SMC Japanese Word Processor</description>
@@ -1081,6 +1237,35 @@ Disk 1: [FDC] black screen, fails to bootstrap BIOS.COM
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
 				<rom name="j_wordprocessor_dic.1dd" size="305328" crc="cfcc4768" sha1="9afbba6dd7f7caacc8352278c1598c48104762e9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smcpaint">
+		<!-- Version 2.3? -->
+		<description>SMC Paint</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="smc_paint23.1dd" size="305328" crc="13c6538a" sha1="5cb871442d86fcd7a0ac81596bd694e9226db9a5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprcalc" supported="no">
+		<description>SuperCalc (v1.12)</description>
+		<year>1983</year>
+		<publisher>Sorcim</publisher>
+		<notes><![CDATA[
+[MC6845] invisible cursor? (verify)
+Not extensively tested
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="supercalc.1dd" size="305328" crc="e2ee96ec" sha1="ad95357099e053ea65d15423f268dd50850064cd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1289,7 +1474,7 @@ How to access months 7-12, [keyboard] bug?
 		<year>198?</year>
 		<publisher>Sony</publisher>
 		<notes><![CDATA[
-"SK Trk Err. Bad Sector"
+[FDC] "SK Trk Err. Bad Sector"
 ]]></notes>
 		<info name="alt_title" value="SONY販促用ディスク4"/>
 
@@ -1318,7 +1503,7 @@ How to access months 7-12, [keyboard] bug?
 <!-- !Homebrew / Doujinshi -->
 
 	<software name="corewars">
-		<description>Corewars</description>
+		<description>Core Wars</description>
 		<year>1987</year>
 		<publisher>Y. Sato</publisher>
 
@@ -1356,6 +1541,24 @@ How to access months 7-12, [keyboard] bug?
 	    </part>
 	</software -->
 
+	<!-- TODO: Chess game, but top-left has a "ROYAL" identifier instead. -->
+	<!-- May or may not be チェスゲーム -->
+	<software name="royalchs" supported="no">
+		<description>Royal</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+[keyboard] locks up after few moves
+]]></notes>
+
+		<!-- baddump: contains an arbitrary saved game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="smc_chess.1dd" size="305328" crc="ef1318df" sha1="6ff39106839119042e0bf94edbf508ef59598eb7" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- no explicit title screen, assume unofficial -->
 	<software name="hanafuda">
 		<description>Hanafuda</description>
@@ -1366,6 +1569,38 @@ How to access months 7-12, [keyboard] bug?
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
 				<rom name="hanafuda.1dd" size="305328" crc="705cc6e3" sha1="2a8d4d79dfb654c27783012dc4c1505a8a44f6ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="readrom">
+		<description>SMC Read ROM utility</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Utility to read and dump system ROM, likely unofficial
+]]></notes>
+		<info name="usage" value="Load with filer14j in drive A: and this in B:"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="sony smc-777 - readrom.1dd" size="305328" crc="30d4767d" sha1="96fa4d2424986800b2fbabffbddc1ba0d5c023ca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toshogi" supported="no">
+		<!-- TODO: unconfirmed title, may or may not be official -->
+		<description>Totake Shougi</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Requires a working Disk Basic to be loadable (has only a SHOGI.BAS)
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="totake_shogi.1dd" size="305328" crc="3b936da7" sha1="7d152125591000efcd19adf956c434bac5e72234"/>
 			</dataarea>
 		</part>
 	</software>
