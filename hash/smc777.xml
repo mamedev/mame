@@ -6,6 +6,7 @@ license:CC0-1.0
 TODO:
 - split SWs that works on regular SMC-70 once we have a BIOS for that;
 - inherit undumped list from http://www.smc777.com/alllist.htm
+- Hunt s
 
 Dumps needed: (Info taken from: http://home.pacbell.net/smc777/comsoft.htm )
 
@@ -802,8 +803,8 @@ Unresponsive [keyboard]
 		<description>Othello</description>
 		<year>1983</year>
 		<publisher>Sony</publisher>
-		<!-- TODO: verify boxart, alias オセロゲーム but title screen goes "Othello" -->
 		<info name="alt_title" value="オセロ"/>
+		<info name="serial" value="SMW-G701D"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="63088">
@@ -896,6 +897,28 @@ Not extensively tested (language barrier)
 		</part>
 	</software>
 
+	<software name="compbas" supported="partial">
+		<description>SMC Game Pack 1</description>
+		<year>1983</year>
+		<publisher>Sony</publisher>
+		<notes><![CDATA[
+Collection of SMC-70 games (not entirely compatible with SMC-777?)
+SLOTMAN.BAS: "Error(131) in 500: undefined variable"
+TYPE.BAS: [keyboard] tester
+GAME&TYP.BAS: same as TYPE.BAS with no graphic layer
+]]></notes>
+		<!-- "Programmed by ICHIRO GAERU" on back cover -->
+		<info name="serial" value="SMW-G702D"/>
+		<!-- 43-7904-30 ISBN? -->
+		<info name="usage" value="Load with filer14j in drive A: and this in B:"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="smcgamepack1.1dd" size="305328" crc="2d612699" sha1="87de78587cbd3bdb31abb65f75abd23e99e51853"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="smcigo1">
 		<!-- TODO: complete title -->
 		<description>SMC Jissen Igo (I)</description>
@@ -915,7 +938,8 @@ Not extensively tested (language barrier)
 		<year>1985</year>
 		<publisher>Sony</publisher>
 		<notes><![CDATA[
-[keyboard] selects "King" even if the intention is to move anything else
+[keyboard] selects King even if the intention is to move anything else
+NOTE: in shougi you can move King only on check before checkmate (wtf?)
 ]]></notes>
 		<info name="alt_title" value="SMC将棋"/>
 
@@ -1104,16 +1128,18 @@ Doesn't clear [MC6845] graphic layer properly ([FDC]?)
 		</part>
 	</software>
 
-<!-- !Applications (Home) -->
+<!-- !Applications (Home/Hobby) -->
 
 	<software name="cookcat" supported="no">
-		<description>Cookin Cat</description>
-		<year>198?</year>
+		<description>Cookin' Cat</description>
+		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
 Apparently a cooking application, not extensively tested (language barrier, katakana only)
 ]]></notes>
 		<info name="alt_title" value="クッキンキャット"/>
+		<info name="serial" value="SMW-H703D"/>
+		<!-- 43-6009-30 -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="283568">
@@ -1486,16 +1512,314 @@ How to access months 7-12, [keyboard] bug?
 	</software>
 
 <!-- !Coverdiscs -->
+<!-- Rassel is (presumed) to be the devs behind all official Sony Floppy Magazine releases -->
+<!-- TODO: one between flopmag or flopmagp may be フロッピーマガジン創刊準備号 (a.k.a. Vol. 0) -->
 
-<!-- which issue of the magazine? -->
+	<!-- TODO: which issue of the magazine? Also bad? -->
 	<software name="flopmag" supported="no">
-		<description>Floppy Magazine</description>
+		<description>Floppy Magazine (unknown issue)</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+[FDC] "Error(10): File not found"
+]]></notes>
+		<info name="developer" value="Rassel"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305056">
 				<rom name="floppy magazine.1dd" size="305056" crc="44f18e58" sha1="dc4d8bda72d408e53edd4be4f1d9497d9179d35e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flopmag1" supported="no">
+		<description>Floppy Magazine #1</description>
+		<year>1984?</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+Doesn't have a BASIC compared to most bootable flopmag*, bad? Not really Floppy Magazine?
+]]></notes>
+		<info name="alt_title" value="フロッピーマガジン1"/>
+		<info name="developer" value="Rassel"/>
+		<!--<info name="release" value="19840721?"/>-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="flpmag1.1dd" size="305328" crc="72afcfca" sha1="cdce641fdce3ea9d5e988ab6532aa095f4696b5d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flopmag2" supported="no">
+		<description>Floppy Magazine #2</description>
+		<year>1984</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+Disk A
+3. [FDC] "Error(161) in 1220: Bad disk sector"
+4. [FDC] "Error(161) in 1320: Bad disk sector"
+Disk B
+1. untested (language barrier)
+3. [keyboard] unresponsive
+5. [FDC] "Error(161) in 1400: Bad disk sector" when striking space key
+]]></notes>
+		<info name="alt_title" value="フロッピーマガジン2"/>
+		<info name="developer" value="Rassel"/>
+		<info name="release" value="19840921"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="305328">
+				<rom name="flpmag2a.1dd" size="305328" crc="522d1b09" sha1="3aabbe2e1c807ef55cb8dca244dc2fb372cb5e49"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="305328">
+				<rom name="flpmag2b.1dd" size="305328" crc="d2f72208" sha1="55ff1cca2f01f02036ff5785e947f59ecc8e6175"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flopmag3" supported="no">
+		<description>Floppy Magazine #3</description>
+		<year>1984</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+Disk A
+1. [FDC] "Error(161): Bad disk sector"
+3. [FDC] "Error(161): Bad disk sector"
+4. [FDC] "Error(161): Bad disk sector"
+5. [FDC] "Error(161): Bad disk sector"
+Disk B
+3. [FDC] "Error(161): Bad disk sector"
+4. [FDC] "Error(161): Bad disk sector"
+5. [FDC] "Error(161): Bad disk sector"
+]]></notes>
+
+		<info name="alt_title" value="フロッピーマガジン3"/>
+		<info name="developer" value="Rassel"/>
+		<info name="release" value="19841121"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="305328">
+				<rom name="flpmag3a.1dd" size="305328" crc="2f17f425" sha1="accaeb5c0b14520a376e42054e5436748882f330"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="305328">
+				<rom name="flpmag3b.1dd" size="305328" crc="776a1949" sha1="210385cfe9f1b6768a46fc88f47612e6e9e24867"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flopmag4" supported="no">
+		<description>Floppy Magazine #4</description>
+		<year>1985</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+Disk A
+2. white screen
+3. [keyboard] unresponsive
+4. white screen
+5. untested
+Disk B
+[FDC] "Bad disk sector"
+]]></notes>
+		<info name="alt_title" value="フロッピーマガジン4"/>
+		<info name="developer" value="Rassel"/>
+		<info name="release" value="19850121"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="305328">
+				<rom name="flpmag4a.1dd" size="305328" crc="aa0acd1a" sha1="135c17e69fac2b4a36f5a1fedcf38ddf0ed49b16"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="305328">
+				<rom name="flpmag4b.1dd" size="305328" crc="67fc3423" sha1="0aa3d91445b4147efb7622e53c4daa882b5aaaba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flopmag5" supported="no">
+		<description>Floppy Magazine #5</description>
+		<year>1985</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+Disk A
+2. [FDC] "Error(161) in 660: Bad disk sector"
+3. Untested (language barrier)
+4. Untested (language barrier)
+Disk B
+1. Untested (language barrier)
+2. white screen
+3. [FDC] "Error(161): Bad disk sector"
+4. [FDC] "Error(161): Bad disk sector"
+6. [FDC] "Error(161) in 660: Bad disk sector"
+7. [FDC] "Error(161) in 660: Bad disk sector"
+8. [FDC] "Error(161) in 660: Bad disk sector"
+]]></notes>
+		<info name="alt_title" value="フロッピーマガジン5"/>
+		<info name="developer" value="Rassel"/>
+		<info name="release" value="19850321"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="305328">
+				<rom name="flpmag5a.1dd" size="305328" crc="0dfe723c" sha1="1eae97fdb2a070ca64791a134b12c88f66a4d539"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="305328">
+				<rom name="flpmag5b.1dd" size="305328" crc="c0429b55" sha1="d580d5fca977e67298ac35e6a4e21e6c73afd135"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flopmag6" supported="no">
+		<description>Floppy Magazine #6</description>
+		<year>1985</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+Disk A
+2. white screen
+3. untested (language barrier)
+Disk B
+1. untested (language barrier)
+2. white screen
+3. white screen
+6. [keyboard] unresponsive, prompts for a paddle
+8. eventually black screen
+]]></notes>
+		<info name="alt_title" value="フロッピーマガジン6"/>
+		<info name="developer" value="Rassel"/>
+		<info name="release" value="19850521"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="305328">
+				<rom name="flpmag6a.1dd" size="305328" crc="996ea5d8" sha1="3471e41c9a8953594ada9519d369018384b271e7"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="305328">
+				<rom name="flpmag6b.1dd" size="305328" crc="3bc512b4" sha1="381945d2ed9047c13668ace7a7e4cbc5fad13596"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flopmag7" supported="no">
+		<description>Floppy Magazine #7</description>
+		<year>1985</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+Disk A
+1. white screen
+2. white screen
+3. white screen
+4. white screen
+5. untested (language barrier)
+6. untested (language barrier)
+Disk B
+1. untested (language barrier)
+2. requires base Dizzy Rider (undumped)
+3. [keyboard] cursor unresponsive
+5. white screen
+6. white screen
+7. white screen
+]]></notes>
+		<info name="alt_title" value="フロッピーマガジン7"/>
+		<info name="developer" value="Rassel"/>
+		<info name="release" value="19850721"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="305328">
+				<rom name="flpmag7a.1dd" size="305328" crc="c9e34776" sha1="d72eba31bb66079a017c185aef102e786e147a2e"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="305328">
+				<rom name="flpmag7b.1dd" size="305328" crc="259cff75" sha1="815a680a4bfb6653faea043dd70ee7a82d0c571a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flopmag8" supported="no">
+		<description>Floppy Magazine #8</description>
+		<year>1985</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+[FDC] LOAD ERROR
+]]></notes>
+		<info name="alt_title" value="フロッピーマガジン8"/>
+		<info name="developer" value="Rassel"/>
+		<!-- <info name="release" value="19850921?"/> -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="305328">
+				<rom name="flpmag8a.1dd" size="305328" crc="6282ca73" sha1="56625fa0a2c5d2bf946e42660f9779e97db67422"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="348848">
+				<rom name="flpmag8b.1dd" size="348848" crc="2322dc9b" sha1="ec2829bf80a53e016ca023c567d95e17176412c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flopmagn" supported="no">
+		<description>Floppy Magazine Novelty</description>
+		<year>1984</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+2. untested (language barrier)
+5. [FDC] "Error(161): Bad disk sector"
+6. [FDC] "Error(161) in 1460: Bad disk sector"
+]]></notes>
+		<info name="alt_title" value="フロッピーマガジンノベルティ"/>
+		<info name="developer" value="Rassel"/>
+		<info name="release" value="19841125"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="flopmags.1dd" size="305328" crc="1fcbe333" sha1="31993b2a202f191a49c3363cd77dded57a873283"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flopmagp" supported0="no">
+		<!-- TODO: probably a spinoff release -->
+		<description>Floppy Magazine Prep</description>
+		<year>198?</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
+		<info name="alt_title" value="フロッピーマガジン"/>
+		<info name="developer" value="Rassel"/>
+		<info name="release" value="19841125"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="fpmgprep.1dd" size="305328" crc="13b2eaa7" sha1="d1d191840e3535f9bc0da4eaa5771ca937e2db64"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1663,25 +1987,6 @@ Not extensively tested
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
 				<rom name="games3.1dd" size="305328" crc="82d8d8bc" sha1="f04fdf3c8d336d826b9ce3556d7e38f9b512369a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="compbas" supported="partial">
-		<description>Game Compilation (Basic)</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<notes><![CDATA[
-Collection of SMC-70 games (not entirely compatible with SMC-777?)
-SLOTMAN.BAS: "Error(131) in 500: undefined variable"
-TYPE.BAS: [keyboard] tester
-GAME&TYP.BAS: same as TYPE.BAS with no graphic layer
-]]></notes>
-		<info name="usage" value="Load with filer14j in drive A: and this in B:"/>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="305328">
-				<rom name="smcgamepack1.1dd" size="305328" crc="2d612699" sha1="87de78587cbd3bdb31abb65f75abd23e99e51853"/>
 			</dataarea>
 		</part>
 	</software>
