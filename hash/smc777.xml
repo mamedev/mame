@@ -1805,7 +1805,7 @@ Disk B
 		</part>
 	</software>
 
-	<software name="flopmagp" supported0="no">
+	<software name="flopmagp" supported="no">
 		<!-- TODO: probably a spinoff release -->
 		<description>Floppy Magazine Prep</description>
 		<year>198?</year>
