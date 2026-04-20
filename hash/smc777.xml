@@ -3,6 +3,9 @@
 <!--
 license:CC0-1.0
 
+TODO:
+- split SWs that works on regular SMC-70 once we have a BIOS for that;
+
 Dumps needed: (Info taken from: http://home.pacbell.net/smc777/comsoft.htm )
 
 OS:
@@ -25,51 +28,33 @@ Magazine:
 
 
 SMCゲームパックI
-  ナポレオン
-  ペンジャミン
-  リメインズロボット
   トランジット
-  SMC Super Golf
   オセロゲーム
-  Miner 2049
   九十九 ウルトラ4人麻雀
-  無人島脱出
   スターブレーザー
   SMC将棋
   妖花の謎
-  法隆寺の謎
   チェスゲーム
-  黄金の墓 (unless ougon is this)
-  ムー大陸の謎
-  内藤国雄の詰将棋
   徳川風雲録
   妖怪探偵ちまちま
-  サラダの国のトマト姫
   野球狂
-  信長の野望
+  法隆寺の謎 (houryuji?)
+  黄金の墓 (ougon?)
+  無人島脱出 (mujindas?)
+  ムー大陸の謎 (munazo?)
 
 Home:
-  SMC日本語ワープロ
   ユーカラJJ
-  ニッティンキャド
-  Memoland
-  聖子の音と絵入門
   グラフィックエディター(市販版) (one of these should be graphed)
   グラフィックエディター(777C添付版)
-  ラッサピアター
   ラッサピアターE
 
 
 Education:
-  SMC LOGOの世界(アプリケーション編)
-  SMC LOGOの世界(グラフィック編)
-  グラフィックスの世界(入門編) (one of these should be graphw)
-  グラフィックスの世界(中級編)
-  グラフィックスの世界(応用編)
+  グラフィックスの世界(入門編) - (one of these should be graphw)
+  グラフィックスの世界(中級編) /
+  グラフィックスの世界(応用編) /
   世界の旗
-  まんてん君(数の導入)
-  まんてん君(計算力1)
-  まんてん君(計算力2)
   まんてん君(記憶力)
   まんてん君(思考力)
   まんてん君(反射性)
@@ -97,7 +82,6 @@ Update 2026: these are actually from compilations, and probably tapes?
   ストライカー(Striker)
   Area-X
   Ghost City
-  New Adam & Eve
 -->
 
 <softwarelist name="smc777" description="Sony SMC-777 floppy disks">
@@ -273,7 +257,7 @@ Unreadable graphics, should require [kanji] hookup
 		</part>
 	</software>
 
-<!-- !Games -->
+<!-- !Games (official) -->
 
 	<software name="ae">
 		<description>A.E.</description>
@@ -432,23 +416,6 @@ Untested [floppy] saving
 		</part>
 	</software>
 
-	<software name="dokntama" supported="no">
-		<!-- TODO: confirm title -->
-		<description>Uchi no Tama Shirimasenka</description>
-		<year>1985</year>
-		<publisher>Sony Creative Products</publisher>
-		<notes><![CDATA[
-[FDC] "Err(BS) on A:"
-]]></notes>
-		<info name="alt_title" value="うちのタマ知りませんか"/>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="362992">
-				<rom name="do you know my tama (1985)(sony creative products.inc)(teruhisa kamachi).1dd" size="362992" crc="1e71b001" sha1="df15304c50d57652cb5b5eef46e1c66fcdd00103"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="exbillcs">
 		<description>Exciting Billiard Cannon Shot</description>
 		<year>1985</year>
@@ -478,15 +445,16 @@ Black screen
 		</part>
 	</software>
 
-	<!-- TODO: unknown title, two disks set is assumed -->
+	<!-- TODO: title is guessed, two disks set is assumed -->
 	<software name="houryuji" supported="no">
-		<description>Houryuji?</description>
+		<description>Houryuuji no Nazo</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
 Disk 1: [FDC] Error(161): Bad disk sector"
 Disk 2 is kinda bootable with black screen on title but then asks for a number (manual copy protection)
 ]]></notes>
+		<info name="alt_title" value="法隆寺の謎"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
@@ -712,6 +680,131 @@ Not extensively tested (language barrier)
 		</part>
 	</software>
 
+	<software name="mine2049">
+		<description>Miner 2049er</description>
+		<year>1984</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="マイナー2049er"/>
+		<!-- "Converted by BEAR'S" -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="miner 2049er (1984)(comptiq)(big five software)(sony)(bear's)(bill hogue).1dd" size="305328" crc="ac6176ca" sha1="6072a8ba273dfee3779963a5241d3fc31d077178"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mujindas" supported="no">
+		<!-- TODO: unconfirmed -->
+		<description>Mujintou Dasshutsu</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+[FDC] "LOAD ERROR"
+]]></notes>
+		<info name="alt_title" value="無人島脱出"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="mujintou.1dd" size="305328" crc="9930d331" sha1="a79e04c899ce53e957c48d6f9fdb33394a9532e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="munazo" supported="no">
+		<!-- TODO: unconfirmed -->
+		<description>Muu Tairiku no Nazo</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+[FDC] "LOAD ERROR"
+]]></notes>
+		<info name="alt_title" value="ムー大陸の謎"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="mu_nazo.1dd" size="305328" crc="b74358fb" sha1="bdeb786bc29e87c3b491b4c83a03a2a6290a421c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="naishogi" supported="no">
+		<description>Naito Kunio no Tsumeshougi</description>
+		<year>198?</year>
+		<publisher>アポロテクニカ (Apollo Technica)</publisher>
+		<notes><![CDATA[
+Non functional [keyboard] inputs, only [joystick] works
+]]></notes>
+		<info name="alt_title" value="内藤国雄の詰将棋"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="naito_shogi.1dd" size="305328" crc="9c78243c" sha1="d9923f89ba011208a693b93a72e3bf7755273c1b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="napoleon" supported="no">
+		<description>Napoleon</description>
+		<year>1985</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+Unresponsive [keyboard]
+]]></notes>
+		<info name="alt_title" value="ナポレオン"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="362992">
+				<rom name="napoleon (1985)(sony creative products.inc).1dd" size="362992" crc="f91e870a" sha1="2f9f2a8e2818c26d5e4fb924339c74ce637bfe85"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nadameve" supported="no">
+		<description>New Adam &amp; Eve</description>
+		<year>1983</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+[FDC] crashes when loading the actual game
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="296368">
+				<rom name="new adam &amp; eve (1983)(sony creative products.inc).1dd" size="296368" crc="09cf5d09" sha1="fa7bd74962cc73673c3f9d18492c0e0458f704d4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nobunaga" supported="no">
+		<description>Nobunaga no Yabou</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+[MC6845] bad colors on graphic layer (similar to kanjicpm)
+]]></notes>
+		<info name="alt_title" value="信長の野望"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="nobunaga.1dd" size="305328" crc="c6eb782a" sha1="975604ebfe1347f690074e4fc232690abb2bb819"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="othello">
+		<description>Othello</description>
+		<year>1983</year>
+		<publisher>Sony</publisher>
+		<!-- TODO: verify boxart, alias オセロゲーム but title screen goes "Othello" -->
+		<info name="alt_title" value="オセロ"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="63088">
+				<rom name="othello (1983)(sony).1dd" size="63088" crc="192d460c" sha1="d2a89b5267ffa41baa11a4770a23a662bb02d204"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ougon" supported="no">
 		<!-- TODO: unconfirmed -->
 		<description>Ougon no Haka</description>
@@ -725,6 +818,73 @@ Not extensively tested (language barrier)
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
 				<rom name="gold_tomb.1dd" size="305328" crc="b942894a" sha1="0742c45c3d499d45bc95f915ffc496848110a6f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="penjamin" supported="no">
+		<description>Penjamin</description>
+		<year>1985</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+[FDC] "Err(BS) on A:"
+]]></notes>
+		<info name="alt_title" value="ペンジャミン"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="362992">
+				<rom name="penjamin (1985)(sony creative products.inc).1dd" size="362992" crc="7c18bffd" sha1="79709bda45955758281b4feefc626ad31667414f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="profmj">
+		<description>Professional Mahjong (Ver 2.1)</description>
+		<year>198?</year>
+		<publisher>シャノアール (Chat Noir)</publisher>
+		<info name="alt_title" value="プロフェッショナル麻雀"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="41872">
+				<rom name="pro_mahjong.1dd" size="41872" crc="5a84c787" sha1="7b027246237ad92a9a36f8f49459aea7d829fc0d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="remarobo" supported="no">
+		<description>Remain's Robot</description>
+		<year>1985</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+[FDC] "Err (BS) on A:"
+]]></notes>
+		<info name="alt_title" value="リメインズロボット"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="362992">
+				<rom name="remains robot (1985)(sony creative products inc.) disk a.1dd" size="362992" crc="a423361c" sha1="38ce88b18a5fa2e7f7c221d3a3f1143872343bff"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="362992">
+				<rom name="remains robot (1985)(sony creative products inc.) disk b.1dd" size="362992" crc="47dcb1a1" sha1="21f6620a66e99178bb238b08e722a1e42f22e0bb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomathim" supported="no">
+		<description>Salad no Kuni no Tomato-hime</description>
+		<year>1984</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<notes><![CDATA[
+Not extensively tested (language barrier)
+]]></notes>
+		<info name="alt_title" value="サラダの国のトマト姫"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="salad no kuni no tomato hime (1984)(hudson soft)(takashi takebe).1dd" size="305328" crc="f1fffa92" sha1="4eb0c9569952f5f6f815c379bf6b4a6bca7e0500"/>
 			</dataarea>
 		</part>
 	</software>
@@ -743,6 +903,22 @@ Not extensively tested (language barrier)
 		</part>
 	</software>
 
+	<software name="suprgolf" supported="no">
+		<description>SMC Super Golf</description>
+		<year>1983</year>
+		<publisher>Sony</publisher>
+		<notes><![CDATA[
+Cannot start a game, [keyboard]?
+]]></notes>
+		<info name="developer" value="Avant-Garde Creations"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="supergolf.1dd" size="305328" crc="19a3f84e" sha1="a815e12f25e0e66b8ef9b3af44dc7562b814f4f8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="strizbh">
 		<description>Striz B.H.</description>
 		<year>1984</year>
@@ -752,6 +928,23 @@ Not extensively tested (language barrier)
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
 				<rom name="strizbh.1dd" size="305328" crc="efa24635" sha1="c2308afeb555197c6d583e6cd46e6c5c5c9b4ea9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dokntama" supported="no">
+		<!-- TODO: confirm title -->
+		<description>Uchi no Tama Shirimasenka</description>
+		<year>1985</year>
+		<publisher>Sony Creative Products</publisher>
+		<notes><![CDATA[
+[FDC] "Err(BS) on A:"
+]]></notes>
+		<info name="alt_title" value="うちのタマ知りませんか"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="362992">
+				<rom name="do you know my tama (1985)(sony creative products.inc)(teruhisa kamachi).1dd" size="362992" crc="1e71b001" sha1="df15304c50d57652cb5b5eef46e1c66fcdd00103"/>
 			</dataarea>
 		</part>
 	</software>
@@ -805,14 +998,79 @@ Apparently a cooking application, not extensively tested (language barrier, kata
 		</part>
 	</software>
 
-	<!-- TODO: actual SW title -->
-	<software name="jwproc">
-		<description>J Word Processor (?)</description>
+	<software name="nitcad" supported="no">
+		<description>Nitten CAD</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+[FDC] "Error(161): Bad disk sector"
+]]></notes>
+		<info name="alt_title" value="ニッティンキャド"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="nittencad.1dd" size="305328" crc="a2bfc656" sha1="1b0cf129ee384abbef7218eb5ddf26a43fab0c66"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rassapi" supported="no">
+		<description>Rassapiator</description>
+		<year>198?</year>
+		<publisher>Sony / Kamiya Studio</publisher>
+		<notes><![CDATA[
+[MC6845] missing graphics layer
+]]></notes>
+		<info name="alt_title" value="ラッサピアター"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="rassapiator.1dd" size="305328" crc="ac3888e4" sha1="19f2544bbba33b9e2ca60ad3cc529edb07b283df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seikonyu" supported="no">
+		<description>Seiko no Ototo e Nyuumon</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested (language barrier)
+]]></notes>
+		<info name="alt_title" value="聖子の音と絵入門"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="seiko no e to oto nyuumon (19xx)(-).1dd" size="305328" crc="38133e44" sha1="e4f91de7fe532a4d386b75ae8a47e6eed88e65b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seikonyua" supported="no">
+		<description>Seiko no Ototo e Nyuumon (alt)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested (language barrier)
+]]></notes>
+		<info name="alt_title" value="聖子の音と絵入門"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="283568">
+				<rom name="seiko_sound_pic.1dd" size="283568" crc="1275bd6d" sha1="5bbfe8b1f7bf1889efdc6c22db7bff37c6f7ac91"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="jwproc" supported="no">
+		<description>SMC Japanese Word Processor</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
 Disk 1: [FDC] black screen, fails to bootstrap BIOS.COM
 ]]></notes>
+		<info name="alt_title" value="SMC日本語ワープロ"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
@@ -877,6 +1135,98 @@ Black screen
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="283568">
 				<rom name="graphicsworldapp.1dd" size="283568" crc="81ac73ce" sha1="df633181ac30bb2244c7dc4ec815f29c6339f6b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logoapp" supported="no">
+		<description>SMC Logo no Sekai (Applications-hen)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Collection of logo files, should run from logo executable in sys12j, not autobootable
+TODO: understand how
+]]></notes>
+		<info name="alt_title" value="SMC LOGOの世界(アプリケーション編)"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="279216">
+				<rom name="logo_application.1dd" size="279216" crc="48f5f347" sha1="949d64302412aae279e2efbf688cd20c068ef8b7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logogfx" supported="no">
+		<description>SMC Logo no Sekai (Graphics-hen)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Collection of logo files, should run from logo executable in sys12j, not autobootable
+TODO: understand how
+]]></notes>
+		<info name="alt_title" value="SMC LOGOの世界(グラフィック編)"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="logo_graphics.1dd" size="305328" crc="43c1cee7" sha1="47ab78e0391622ff0eefe79dce5f7aad7be3e664"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manten1">
+		<!-- "Introduction to Numbers" -->
+		<description>Manten-kun (Suu no Dounyuu)</description>
+		<year>1983</year>
+		<publisher>R&amp;D Computer</publisher>
+		<info name="alt_title" value="まんてん君(数の導入)"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="manten kun 1 (1983)(r&amp;d computer co. ltd).1dd" size="305328" crc="f0b4699d" sha1="c738c5d82986dd16fd126e16a38e9193f94e673e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manten2">
+		<!-- "Calculation Skills 1" -->
+		<description>Manten-kun (Keisan Ryoku 1)</description>
+		<year>1983</year>
+		<publisher>R&amp;D Computer</publisher>
+		<info name="alt_title" value=" まんてん君(計算力1)"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="manten kun 2 (1983)(r&amp;d computer co. ltd).1dd" size="305328" crc="87f24bd5" sha1="a2d80e37a21232ac20eb0374fe53885b8ffe44bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manten3">
+		<!-- "Calculation Skills 2" -->
+		<description>Manten-kun (Keisan Ryoku 2)</description>
+		<year>1983</year>
+		<publisher>R&amp;D Computer</publisher>
+		<info name="alt_title" value=" まんてん君(計算力2)"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="manten kun 3 (1983)(r&amp;d computer co. ltd).1dd" size="305328" crc="6618884a" sha1="80a9cf242d445024d59fe01d3d9fda5b4e708db0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="memoland" supported="no">
+		<description>Memoland</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Unresponsive [keyboard] when loading any of mem files
+Not extensively tested
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="memoland.1dd" size="305328" crc="f44caae3" sha1="89a3a93497dfa289d26e7997475b0da412399952"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1049,7 +1399,7 @@ BR17, FRUIT, GHOST: "Disk read error (Bad Sector)" (bad dump?)
 		</part>
 	</software>
 
-	<software name="comp2">
+	<software name="comp2" supported="partial">
 		<description>Game Compilation 2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1082,6 +1432,25 @@ Not extensively tested
 		</part>
 	</software>
 
+	<software name="compbas" supported="partial">
+		<description>Game Compilation (Basic)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Collection of SMC-70 games (not entirely compatible with SMC-777?)
+SLOTMAN.BAS: "Error(131) in 500: undefined variable"
+TYPE.BAS: [keyboard] tester
+GAME&TYP.BAS: same as TYPE.BAS with no graphic layer
+]]></notes>
+		<info name="usage" value="Load with filer14j in drive A: and this in B:"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="305328">
+				<rom name="smcgamepack1.1dd" size="305328" crc="2d612699" sha1="87de78587cbd3bdb31abb65f75abd23e99e51853"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="compinv" supported="no">
 		<description>Game Compilation (Invaders)</description>
 		<year>198?</year>
@@ -1099,5 +1468,20 @@ MAHJONG.COM: Unresponsive [keyboard] after first tile discarded
 		</part>
 	</software>
 
+	<software name="comprf" supported="partial">
+		<description>Game Compilation (Rock Fury)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+GALAXIAN: unresponsive [keyboard], works with joystick
+GUNMAN.BAS: unresponsive [keyboard] F keys
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="352848">
+				<rom name="rockfury.1dd" size="352848" crc="493b5f93" sha1="8ee94baf7a3d373eef3523de6be676c4d25878bc"/>
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
