@@ -98,6 +98,7 @@ private:
 
 	u16 interrupt_ctrl_r();
 	void interrupt_ctrl_w(u16 data);
+	u16 interrupt_status_r();
 	void interrupt_status_w(u16 data);
 	u16 fiq_sel_r();
 	void fiq_sel_w(u16 data);
@@ -143,10 +144,13 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_2hz_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_64hz_cb);
 
 	u16 m_ioa_buffer;
 	u16 m_iob_buffer;
 	u16 m_interrupt_ctrl;
+	u16 m_interrupt2_ctrl;
 	u16 m_timer_ctrl;
 	u16 m_io_ctrl;
 	u16 m_ioa_attribute;

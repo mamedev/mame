@@ -44,6 +44,7 @@ void generalplus_gpce4_soc_device::device_start()
 	save_item(NAME(m_ioa_buffer));
 	save_item(NAME(m_iob_buffer));
 	save_item(NAME(m_interrupt_ctrl));
+	save_item(NAME(m_interrupt2_ctrl));
 	save_item(NAME(m_timer_ctrl));
 	save_item(NAME(m_io_ctrl));
 	save_item(NAME(m_ioa_attribute));
@@ -72,6 +73,7 @@ void generalplus_gpce4_soc_device::device_reset()
 	m_ioa_buffer = 0;
 	m_iob_buffer = 0;
 	m_interrupt_ctrl = 0;
+	m_interrupt2_ctrl = 0;
 	m_timer_ctrl = 0;
 	m_io_ctrl = 0;
 	m_ioa_attribute = 0;
@@ -92,6 +94,8 @@ void generalplus_gpce4_soc_device::device_add_mconfig(machine_config &config)
 {
 	TIMER(config, "timer_c").configure_periodic(FUNC(generalplus_gpce4_soc_device::timer_c_cb), attotime::from_hz(1000)); // game speed?
 	TIMER(config, "timer_a").configure_periodic(FUNC(generalplus_gpce4_soc_device::timer_a_cb), attotime::from_hz(20000)); // audio
+	TIMER(config, "timer_2hz").configure_periodic(FUNC(generalplus_gpce4_soc_device::timer_2hz_cb), attotime::from_hz(2));
+	TIMER(config, "timer_64hz").configure_periodic(FUNC(generalplus_gpce4_soc_device::timer_64hz_cb), attotime::from_hz(64));
 
 	SPEAKER(config, "speaker").front_center();
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
@@ -153,7 +157,7 @@ void generalplus_gpce4_soc_device::internal_map(address_map &map)
 	map(0x003043, 0x003043).w(FUNC(generalplus_gpce4_soc_device::ppam_ctrl_w)); // PPAMCtrl
 
 	map(0x003050, 0x003050).rw(FUNC(generalplus_gpce4_soc_device::interrupt_ctrl_r), FUNC(generalplus_gpce4_soc_device::interrupt_ctrl_w)); // INT_Ctrl
-	map(0x003051, 0x003051).w(FUNC(generalplus_gpce4_soc_device::interrupt_status_w)); // INT_Status
+	map(0x003051, 0x003051).rw(FUNC(generalplus_gpce4_soc_device::interrupt_status_r), FUNC(generalplus_gpce4_soc_device::interrupt_status_w)); // INT_Status
 	map(0x003052, 0x003052).rw(FUNC(generalplus_gpce4_soc_device::fiq_sel_r), FUNC(generalplus_gpce4_soc_device::fiq_sel_w)); // FIQ_SEL
 	map(0x003053, 0x003053).rw(FUNC(generalplus_gpce4_soc_device::interrupt2_ctrl_r), FUNC(generalplus_gpce4_soc_device::interrupt2_ctrl_w)); // INT2_Ctrl
 	map(0x003054, 0x003054).rw(FUNC(generalplus_gpce4_soc_device::interrupt2_status_r), FUNC(generalplus_gpce4_soc_device::interrupt2_status_w)); // INT2_Status
@@ -224,6 +228,16 @@ TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpce4_soc_device::timer_c_cb )
 TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpce4_soc_device::timer_a_cb )
 {
 	request_interrupt(31);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpce4_soc_device::timer_2hz_cb )
+{
+	request_interrupt(0);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpce4_soc_device::timer_64hz_cb )
+{
+	request_interrupt(2);
 }
 
 // IOA
@@ -545,7 +559,6 @@ u16 generalplus_gpce4_soc_device::interrupt_ctrl_r()
 
 void generalplus_gpce4_soc_device::interrupt_ctrl_w(u16 data)
 {
-	//u16 old = m_interrupt_ctrl;
 	m_interrupt_ctrl = data;
 
 	// 15 IRQ0_TMA          -- enabled in mapacman
@@ -571,21 +584,28 @@ void generalplus_gpce4_soc_device::interrupt_ctrl_w(u16 data)
 u16 generalplus_gpce4_soc_device::interrupt2_status_r()
 {
 	LOGMASKED(LOG_IRQ, "%s: interrupt2_status_r\n", machine().describe_context());
-	return machine().rand();
+	return m_interrupt_status & 0xffff;
 }
 
 void generalplus_gpce4_soc_device::interrupt2_status_w(u16 data)
 {
 	LOGMASKED(LOG_IRQ, "%s: interrupt2_status_w %04x\n", machine().describe_context(), data);
+
+	if (data & 0x0004)
+		clear_interrupt(2);
+
+	if (data & 0x0001)
+		clear_interrupt(0);
 }
 
 u16 generalplus_gpce4_soc_device::interrupt2_ctrl_r()
 {
-	return 0x0000;
+	return m_interrupt2_ctrl;
 }
 
 void generalplus_gpce4_soc_device::interrupt2_ctrl_w(u16 data)
 {
+	m_interrupt2_ctrl = data;
 	// 15  ---
 	//     ---
 	//     ---
@@ -704,6 +724,24 @@ void generalplus_gpce4_soc_device::update_interrupts()
 	{
 		set_input_line(UNSP_IRQ3_LINE, CLEAR_LINE);
 	}
+
+	if ((m_interrupt_status & 0x0000'0001) && (m_interrupt2_ctrl & 0x0001))
+	{
+		set_input_line(UNSP_IRQ7_LINE, ASSERT_LINE);
+	}
+	else
+	{
+		set_input_line(UNSP_IRQ7_LINE, CLEAR_LINE);
+	}
+
+	if ((m_interrupt_status & 0x0000'0004) && (m_interrupt2_ctrl & 0x0004))
+	{
+		set_input_line(UNSP_IRQ7_LINE, ASSERT_LINE);
+	}
+	else
+	{
+		set_input_line(UNSP_IRQ7_LINE, CLEAR_LINE);
+	}
 }
 
 void generalplus_gpce4_soc_device::request_interrupt(int which)
@@ -718,6 +756,12 @@ void generalplus_gpce4_soc_device::clear_interrupt(int which)
 	int bit = 1 << which;
 	m_interrupt_status = (m_interrupt_status & ~bit);
 	update_interrupts();
+}
+
+u16 generalplus_gpce4_soc_device::interrupt_status_r()
+{
+	LOGMASKED(LOG_IRQ, "%s: interrupt_status_r\n", machine().describe_context());
+	return (m_interrupt_status >> 16) & 0xffff;
 }
 
 void generalplus_gpce4_soc_device::interrupt_status_w(u16 data)
