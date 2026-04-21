@@ -5,17 +5,21 @@
 SMC-777 (c) 1983 Sony
 
 TODO:
-- Implement SMC-70 specific features;
-- Implement GFX modes other than 160x100x4
-- ROM/RAM bankswitch, it apparently happens after one instruction prefetching.
-  We currently use an hackish implementation until the MAME/MESS framework can
-  support that ...
-- keyboard input is very sluggish, convert to device_matrix_interface;
+- Implement GFX modes other than 160x100x4 (cfr. nobunaga and yakyukyoa)
+- convert video to a proper mc6845, consider this as a good base for new device rewrite;
 - cursor stuck in Bird Crash;
-- add mc6845 features;
 - interlace (cfr. cpm22 in setup mode);
+- ROM/RAM bankswitch, it apparently happens after one instruction prefetching.
+  Hacked around for now;
+- keyboard input is very sluggish, convert to device_matrix_interface;
 - Most often don't survive a soft reset;
 - Hookup Kanji ROM (have dump);
+- tape;
+- far too many floppy load failures;
+- .mfi floppy format throws a crash;
+- Downgrade for SMC-70 (if/when dump is available);
+- Superimposing features (if/when SW dumps arises, cfr. SMC-70G promotional video)
+- Find better reference materials, available one lacks several pages;
 
 **************************************************************************************************/
 

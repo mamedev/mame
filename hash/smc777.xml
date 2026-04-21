@@ -15,19 +15,11 @@ OS:
   SMC-777 System 1.4j
   Sony Disk Basic
   SMC Edit
+  CP/M 2.2 Release 1.0J (SMW-7002)
 
 Magazine:
-  Floppy Magazine #1
-  Floppy Magazine #2
-  Floppy Magazine #3
-  Floppy Magazine #4
-  Floppy Magazine #5
-  Floppy Magazine #6
-  Floppy Magazine #7
-  Floppy Magazine #8
   Floppy Magazine 創刊準備号
   Floppy Magazine 特別号
-
 
 SMCゲームパックI
   法隆寺の謎 (houryuji?)
@@ -55,8 +47,8 @@ Education:
   グレイハウンド - Greyhound
   パソコン英和辞典 - PC English-Japanese Dictionary
 
-Known to be dumped, but no longer available: (If you do have any of these please contact the MAME development team)
-Update 2026: these are actually from compilations, and probably tapes?
+Other misc applications, may really be tapes.
+Some of these are available in the various compilations
   PIC->BMPコンバータ - PIC->BMP Converter
   GIFファイルローダー - GIF File Loader
   1ドライブ用PIP - 1-Drive PIP
@@ -75,17 +67,18 @@ Update 2026: these are actually from compilations, and probably tapes?
   ストライカー - Striker
   Area-X
   Ghost City
+  Rogue for CP/M (dump exists, however in .d88 format that throws read error)
 -->
 
 <softwarelist name="smc777" description="Sony SMC-777 floppy disks">
 
-<!-- !Operating Systems -->
+<!-- !Operating Systems SMW-7* -->
 
 	<software name="cpm22">
 	<!-- This was originally released for the SMC-70, but also sold for the SMC-777-->
 		<description>CP/M v2.2 (Release 2.1)</description>
 		<year>1984</year>
-		<publisher>Sony Corp.</publisher>
+		<publisher>ソニー (Sony)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="121414">
@@ -97,7 +90,7 @@ Update 2026: these are actually from compilations, and probably tapes?
 	<software name="cpm22a" cloneof="cpm22" supported="partial">
 		<description>CP/M v2.2 (Version 1.1J)</description>
 		<year>198?</year>
-		<publisher>Sony Corp.</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 Contains Disk Basic
 GOMOKU.COM: "Bdos Err: Select"
@@ -142,12 +135,13 @@ File viewer, useful for executing non autobootable disks in drive B:
 
 	<!-- TODO: what exactly is this? -->
 	<software name="hellobas" supported="no">
-		<description>Hello Basic</description>
+		<description>Hello! Basic</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
 [FDC] "Error(161): Bad disk sector" on most if not all BASIC programs
 ]]></notes>
+		<info name="serial" value="SMJ-S069D"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
@@ -265,13 +259,15 @@ Not extensively tested, may be incomplete?
 		</part>
 	</software>
 
-<!-- !Games (official) -->
+<!-- !Games (official) SMW-G7* / SMJ-G* (third party) -->
 
 	<software name="ae">
 		<description>A.E.</description>
 		<year>1984</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<info name="alt_title" value="エー・イー"/>
+		<info name="serial" value="SMW-G703D"/>
+		<!-- 43-7908-30 -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="336608">
@@ -281,21 +277,23 @@ Not extensively tested, may be incomplete?
 	</software>
 
 	<software name="amazon" supported="no">
-		<!-- TODO: confirm me -->
-		<description>Hikyou Amazon no Okuchi ni ..</description>
+		<description>Hikyou Amazon no Okuchi ni Kogane Densetsu o Mita</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>データウエスト (Data West)</publisher>
 		<notes><![CDATA[
-[keyboard] tends to stuck, not extensively tested
+[keyboard] tends to stuck
+Not extensively tested
 ]]></notes>
-		<info name="alt_title" value="秘境アマゾンの奥地に・・"/>
+		<info name="alt_title" value="魔境アマゾンの奥地に黄金伝説を見た"/>
 
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="358848">
 				<rom name="amazon1.1dd" size="358848" crc="e5938949" sha1="edf46ea59b8ed5579f4ccb0965b6dc759da422aa"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="362048">
 				<rom name="amazon2.1dd" size="362048" crc="7853dee0" sha1="04b08c53e54acb4ab9427a80769dee4982d22717"/>
 			</dataarea>
@@ -305,7 +303,7 @@ Not extensively tested, may be incomplete?
 	<software name="aztec" supported="no">
 		<description>Aztec</description>
 		<year>1984</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 Unresponsive [keyboard]
 ]]></notes>
@@ -321,7 +319,7 @@ Unresponsive [keyboard]
 		<!-- TODO: confirm title -->
 		<description>Baikin-kun no Gokiburi Taiji</description>
 		<year>1983</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 [FDC] "LOAD ERROR"
 ]]></notes>
@@ -337,7 +335,7 @@ Unresponsive [keyboard]
 	<software name="baidew">
 		<description>Baikin-kun's Dental Walk</description>
 		<year>1985</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 Uneven [MC6845] display during gameplay
 ]]></notes>
@@ -353,7 +351,7 @@ Uneven [MC6845] display during gameplay
 	<software name="baiswon" supported="no">
 		<description>Baikin-kun no Switch On</description>
 		<year>1984</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 Uses [MC6845] vertical scroll raster effect for score during gameplay
 Uneven [MC6845] display during gameplay
@@ -370,7 +368,7 @@ Uneven [MC6845] display during gameplay
 	<software name="bugatk">
 		<description>Bug Attack</description>
 		<year>1983</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<info name="alt_title" value="バグ・アタック"/>
 		<info name="developer" value="Bear's"/>
 
@@ -384,7 +382,7 @@ Uneven [MC6845] display during gameplay
 	<software name="cloderun" supported="partial">
 		<description>Championship Lode Runner</description>
 		<year>1985</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 Untested [floppy] saving
 ]]></notes>
@@ -398,10 +396,12 @@ Untested [floppy] saving
 	</software>
 
 	<software name="choplift">
-		<description>Choplifter</description>
+		<description>Choplifter!</description>
 		<year>1984?</year>
-		<publisher>Sony</publisher>
-		<info name="alt_title" value="チョップリフター"/>
+		<publisher>ソニー (Sony)</publisher>
+		<info name="alt_title" value="チョップリフター!"/>
+		<info name="serial" value="SMW-G708D"/>
+		<!-- 43-7914-30 -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="211808">
@@ -453,17 +453,19 @@ Black screen
 		</part>
 	</software>
 
-	<!-- TODO: title is guessed, two disks set is assumed -->
 	<software name="houryuji" supported="no">
 		<description>Houryuuji no Nazo</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 Disk 1: [FDC] Error(161): Bad disk sector"
 Disk 2 is kinda bootable with black screen on title but then asks for a number (manual copy protection)
 ]]></notes>
 		<info name="alt_title" value="法隆寺の謎"/>
+		<info name="serial" value="SMW-G721D"/>
 
+		<!-- TODO: has Disks marked 1 and 2 but 2 has a CP/M label (?) -->
+		<!-- Needs a better image to pinpoint -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
 				<rom name="houryuji1.1dd" size="305328" crc="fce4e1e9" sha1="aaf22eeee1f325ff85b742f6e6c7394c117ed56e"/>
@@ -566,12 +568,15 @@ All games: claims to hit [keyboard] space for instructions but doesn't work (gam
 		<description>Lode Runner</description>
 		<!-- 1983 on title, 1984 on filename -->
 		<year>1983?</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 [FDC] hang on title screen
 Untested [floppy] saving
 ]]></notes>
 		<info name="alt_title" value="ロードランナー"/>
+		<info name="serial" value="SMW-G712D"/>
+		<!-- Converted by Programmers 3 -->
+		<!-- 43-6006-30 -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="279840">
@@ -583,7 +588,7 @@ Untested [floppy] saving
 	<software name="makoask" supported="no">
 		<description>Maboroshi no Kodai Ouchou (Asuka-hen)</description>
 		<year>198?</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 Not extensively tested (language barrier)
 ]]></notes>
@@ -604,21 +609,25 @@ Not extensively tested (language barrier)
 
 	<software name="makokyo" supported="no">
 		<description>Maboroshi no Kodai Ouchou (Kyoto-hen)</description>
-		<year>198?</year>
-		<publisher>Sony</publisher>
+		<year>1983</year>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 [FDC] "LOAD ERROR"
 Not extensively tested (language barrier)
 ]]></notes>
 		<info name="alt_title" value="幻の古代王朝(京都編)"/>
+		<info name="serial" value="SMW-G704D"/>
+		<!-- (c) 1983 Luna Kikaku (self published or just devs?) -->
 
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="305328">
 				<rom name="kodai_ouchou_kyoto1.1dd" size="305328" crc="973941da" sha1="74025b1fdab1b9c19e52baffc3ac0c159a206a15"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="305328">
 				<rom name="kodai_ouchou_kyoto2.1dd" size="305328" crc="e26ce2f2" sha1="d3aa8f1922440fb63939964b2a794aea41a9f6bc"/>
 			</dataarea>
@@ -628,7 +637,7 @@ Not extensively tested (language barrier)
 	<software name="makokyoa" cloneof="makokyo" supported="no">
 		<description>Maboroshi no Kodai Ouchou (Kyoto-hen, alt)</description>
 		<year>198?</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 [FDC] "LOAD ERROR"
 Not extensively tested (language barrier)
@@ -651,7 +660,7 @@ Not extensively tested (language barrier)
 	<software name="makoyosh" supported="no">
 		<description>Maboroshi no Kodai Ouchou (Yoshino-hen)</description>
 		<year>198?</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 [FDC] "Error(161) in 130: Bad disk sector"
 Not extensively tested (language barrier)
@@ -680,6 +689,9 @@ Not extensively tested (language barrier)
 [keyboard] inputs doesn't work (game is playable with joystick anyway)
 ]]></notes>
 		<info name="alt_title" value="マリオブラザーズ スペシャル"/>
+		<info name="serial" value="SMJ-G043D"/>
+		<!-- (c) Nintendo on assets -->
+		<!-- SC-1006 on floppy -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
@@ -691,7 +703,7 @@ Not extensively tested (language barrier)
 	<software name="mine2049">
 		<description>Miner 2049er</description>
 		<year>1984</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<info name="alt_title" value="マイナー2049er"/>
 		<!-- "Converted by BEAR'S" -->
 
@@ -755,7 +767,7 @@ Non functional [keyboard] inputs, only [joystick] works
 	<software name="napoleon" supported="no">
 		<description>Napoleon</description>
 		<year>1985</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 Unresponsive [keyboard]
 ]]></notes>
@@ -771,10 +783,12 @@ Unresponsive [keyboard]
 	<software name="nadameve" supported="no">
 		<description>New Adam &amp; Eve</description>
 		<year>1983</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 [FDC] crashes when loading the actual game
 ]]></notes>
+		<info name="serial" value="SMW-G706D"/>
+		<!-- 3-773-756-01 (1) -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="296368">
@@ -802,7 +816,7 @@ Unresponsive [keyboard]
 	<software name="othello">
 		<description>Othello</description>
 		<year>1983</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<info name="alt_title" value="オセロ"/>
 		<info name="serial" value="SMW-G701D"/>
 
@@ -833,7 +847,7 @@ Unresponsive [keyboard]
 	<software name="penjamin" supported="no">
 		<description>Penjamin</description>
 		<year>1985</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 [FDC] "Err(BS) on A:"
 ]]></notes>
@@ -862,11 +876,13 @@ Unresponsive [keyboard]
 	<software name="remarobo" supported="no">
 		<description>Remain's Robot</description>
 		<year>1985</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 [FDC] "Err (BS) on A:"
 ]]></notes>
 		<info name="alt_title" value="リメインズロボット"/>
+		<info name="serial" value="SMW-G723D"/>
+		<!-- 43-6040-30 -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="362992">
@@ -900,7 +916,7 @@ Not extensively tested (language barrier)
 	<software name="compbas" supported="partial">
 		<description>SMC Game Pack 1</description>
 		<year>1983</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 Collection of SMC-70 games (not entirely compatible with SMC-777?)
 SLOTMAN.BAS: "Error(131) in 500: undefined variable"
@@ -923,7 +939,7 @@ GAME&TYP.BAS: same as TYPE.BAS with no graphic layer
 		<!-- TODO: complete title -->
 		<description>SMC Jissen Igo (I)</description>
 		<year>1984</year>
-		<publisher>Sony Corporation</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<info name="alt_title" value="SMC実践囲碁"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -936,7 +952,7 @@ GAME&TYP.BAS: same as TYPE.BAS with no graphic layer
 	<software name="smcshogi" supported="no">
 		<description>SMC Shougi</description>
 		<year>1985</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 [keyboard] selects King even if the intention is to move anything else
 NOTE: in shougi you can move King only on check before checkmate (wtf?)
@@ -953,11 +969,13 @@ NOTE: in shougi you can move King only on check before checkmate (wtf?)
 	<software name="suprgolf" supported="no">
 		<description>SMC Super Golf</description>
 		<year>1983</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 Cannot start a game, [keyboard]?
 ]]></notes>
+		<info name="alt_title" value="SMC スーパーゴルフ"/>
 		<info name="developer" value="Avant-Garde Creations"/>
+		<info name="serial" value="SMW-G713D"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
@@ -969,11 +987,16 @@ Cannot start a game, [keyboard]?
 	<software name="starblaz" supported="no">
 		<description>Star Blazer</description>
 		<year>1984</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 Unresponsive [keyboard], works with joystick
+Back cover shows a different palette scheme, undumped alt version?
 ]]></notes>
 		<info name="alt_title" value="スターブレーザー"/>
+		<info name="serial" value="SMW-G709D"/>
+		<!-- Programmed by T.Suzuki -->
+		<!-- Converted by Programmers 3 -->
+		<!-- 43-7915-30 -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="283568">
@@ -985,7 +1008,7 @@ Unresponsive [keyboard], works with joystick
 	<software name="strizbh">
 		<description>Striz B.H.</description>
 		<year>1984</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<info name="alt_title" value="ストリッツ・ベーハー" />
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1014,7 +1037,7 @@ Unresponsive [keyboard], works with joystick
 	<software name="transitt" supported="no">
 		<description>Transitt</description>
 		<year>1985</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 [FDC] "Err (BS) on A:"
 ]]></notes>
@@ -1045,14 +1068,13 @@ Standalone version of MAHJONG.COM in compinv
 	</software>
 
 	<software name="dokntama" supported="no">
-		<!-- TODO: confirm title -->
-		<description>Uchi no Tama Shirimasenka</description>
+		<description>Uchi no Tama Shirimasenka?</description>
 		<year>1985</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 [FDC] "Err(BS) on A:"
 ]]></notes>
-		<info name="alt_title" value="うちのタマ知りませんか"/>
+		<info name="alt_title" value="うちのタマ知りませんか？"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="362992">
@@ -1128,7 +1150,7 @@ Doesn't clear [MC6845] graphic layer properly ([FDC]?)
 		</part>
 	</software>
 
-<!-- !Applications (Home/Hobby) -->
+<!-- !Applications (Home/Hobby) SMW-H7* -->
 
 	<software name="cookcat" supported="no">
 		<description>Cookin' Cat</description>
@@ -1152,7 +1174,7 @@ Apparently a cooking application, not extensively tested (language barrier, kata
 	<software name="graphed" supported="no">
 		<description>777 Graphics Editor (Version 1.0)</description>
 		<year>1984</year>
-		<publisher>Sony Corporation</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 [keyboard] only? Doesn't seem to control right
 ]]></notes>
@@ -1296,17 +1318,18 @@ Not extensively tested
 		</part>
 	</software>
 
-<!-- !Educational -->
+<!-- !Educational SMC-E7* -->
 
 	<software name="crossint" supported="no">
 		<description>Introductory Crosswords</description>
 		<year>1984</year>
 		<!-- CATENA Corporation / Oxford University Press (Tokyo) -->
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 [keyboard] needs CAPS LOCK, kinda playable by holding shift but game keeps eating inputs
 ]]></notes>
 		<info name="alt_title" value="クロスワード(入門)"/>
+		<info name="serial" value="SMW-E704D"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
@@ -1319,7 +1342,7 @@ Not extensively tested
 		<!-- TODO: confirm title -->
 		<description>Junior Crosswords</description>
 		<year>198?</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 [FDC] Error 161: Bad disk sector
 Verify [keyboard]
@@ -1342,6 +1365,7 @@ Verify [keyboard]
 Black screen
 ]]></notes>
 		<info name="alt_title" value="グラフィックスの世界"/>
+		<!-- SMW-E701D *if* this is Nyuumon-hen -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="283568">
@@ -1429,7 +1453,7 @@ TODO: understand how
 	<software name="memoland" supported="no">
 		<description>Memoland</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>アニマルハウス (Animal House)</publisher>
 		<notes><![CDATA[
 Unresponsive [keyboard] when loading any of mem files
 Not extensively tested
@@ -1449,7 +1473,7 @@ Not extensively tested
 	<software name="demofd1" supported="no">
 		<description>Sony Promotional Disc 1</description>
 		<year>198?</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 BASIC listings all returns "Error(161) Bad Sector"
 ]]></notes>
@@ -1465,7 +1489,7 @@ BASIC listings all returns "Error(161) Bad Sector"
 	<software name="demofd2" supported="no">
 		<description>Sony Promotional Disc 2</description>
 		<year>198?</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 Calendar application
 How to access months 7-12, [keyboard] bug?
@@ -1482,7 +1506,7 @@ How to access months 7-12, [keyboard] bug?
 	<software name="demofd3" supported="no">
 		<description>Sony Promotional Disc 3</description>
 		<year>198?</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 [FDC] "Error(14): in 1830: File read error"
 ]]></notes>
@@ -1498,7 +1522,7 @@ How to access months 7-12, [keyboard] bug?
 	<software name="demofd4" supported="no">
 		<description>Sony Promotional Disc 4</description>
 		<year>198?</year>
-		<publisher>Sony</publisher>
+		<publisher>ソニー (Sony)</publisher>
 		<notes><![CDATA[
 [FDC] "SK Trk Err. Bad Sector"
 ]]></notes>
@@ -1519,10 +1543,11 @@ How to access months 7-12, [keyboard] bug?
 	<software name="flopmag" supported="no">
 		<description>Floppy Magazine (unknown issue)</description>
 		<year>198?</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 [FDC] "Error(10): File not found"
 ]]></notes>
+		<info name="alt_title" value="フロッピーマガジン"/>
 		<info name="developer" value="Rassel"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1535,7 +1560,7 @@ How to access months 7-12, [keyboard] bug?
 	<software name="flopmag1" supported="no">
 		<description>Floppy Magazine #1</description>
 		<year>1984?</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 Doesn't have a BASIC compared to most bootable flopmag*, bad? Not really Floppy Magazine?
 ]]></notes>
@@ -1553,7 +1578,7 @@ Doesn't have a BASIC compared to most bootable flopmag*, bad? Not really Floppy 
 	<software name="flopmag2" supported="no">
 		<description>Floppy Magazine #2</description>
 		<year>1984</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 Disk A
 3. [FDC] "Error(161) in 1220: Bad disk sector"
@@ -1585,7 +1610,7 @@ Disk B
 	<software name="flopmag3" supported="no">
 		<description>Floppy Magazine #3</description>
 		<year>1984</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 Disk A
 1. [FDC] "Error(161): Bad disk sector"
@@ -1620,7 +1645,7 @@ Disk B
 	<software name="flopmag4" supported="no">
 		<description>Floppy Magazine #4</description>
 		<year>1985</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 Disk A
 2. white screen
@@ -1652,7 +1677,7 @@ Disk B
 	<software name="flopmag5" supported="no">
 		<description>Floppy Magazine #5</description>
 		<year>1985</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 Disk A
 2. [FDC] "Error(161) in 660: Bad disk sector"
@@ -1689,7 +1714,7 @@ Disk B
 	<software name="flopmag6" supported="no">
 		<description>Floppy Magazine #6</description>
 		<year>1985</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 Disk A
 2. white screen
@@ -1723,7 +1748,7 @@ Disk B
 	<software name="flopmag7" supported="no">
 		<description>Floppy Magazine #7</description>
 		<year>1985</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 Disk A
 1. white screen
@@ -1762,7 +1787,7 @@ Disk B
 	<software name="flopmag8" supported="no">
 		<description>Floppy Magazine #8</description>
 		<year>1985</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 [FDC] LOAD ERROR
 ]]></notes>
@@ -1788,7 +1813,7 @@ Disk B
 	<software name="flopmagn" supported="no">
 		<description>Floppy Magazine Novelty</description>
 		<year>1984</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 2. untested (language barrier)
 5. [FDC] "Error(161): Bad disk sector"
@@ -1809,7 +1834,7 @@ Disk B
 		<!-- TODO: probably a spinoff release -->
 		<description>Floppy Magazine Prep</description>
 		<year>198?</year>
-		<publisher>Sony Creative Products</publisher>
+		<publisher>ソニー・クリエイティブプロダクツ (Sony Creative Products)</publisher>
 		<notes><![CDATA[
 Black screen
 ]]></notes>
