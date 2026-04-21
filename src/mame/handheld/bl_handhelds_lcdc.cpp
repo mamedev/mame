@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+// seems to be a ST7735SV
+
 #include "emu.h"
 #include "bl_handhelds_lcdc.h"
 

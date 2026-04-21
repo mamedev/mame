@@ -30,11 +30,10 @@
 
 #include "machine/generalplus_gpce4_soc.h"
 #include "machine/timer.h"
-#include "sound/dac.h"
 
-#include "emupal.h"
+#include "bl_handhelds_lcdc.h"
+
 #include "screen.h"
-#include "speaker.h"
 
 #include "logmacro.h"
 
@@ -47,8 +46,8 @@ public:
 	generalplus_gpce4_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_lcdc(*this, "lcdc")
 	{ }
 
 	void generalplus_gpce4(machine_config &config);
@@ -59,26 +58,21 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	virtual u32 screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect) = 0;
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void spi_from_soc(u8 data) = 0;
 
 	void portb_from_soc(u16 data);
 	void process_lcdc_command_params(u8 data);
 
-	u16 m_display[0x8000];
-	u16 m_displayposx;
-	u8 m_displayposy;
-
-	u8 m_lcdc_command;
 	u16 m_iob;
 	u8 m_spilatch;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer);
 
 	required_device<generalplus_gpce4_soc_device> m_maincpu;
-
-	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	required_device<bl_handhelds_lcdc_device> m_lcdc;
+
 };
 
 class generalplus_gpce4_mapacman_state : public generalplus_gpce4_state
@@ -88,7 +82,6 @@ public:
 		generalplus_gpce4_state(mconfig, type, tag)
 	{ }
 
-	virtual u32 screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect) override;
 	virtual void spi_from_soc(u8 data) override;
 };
 
@@ -99,48 +92,12 @@ public:
 		generalplus_gpce4_state(mconfig, type, tag)
 	{ }
 
-	virtual u32 screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect) override;
 	virtual void spi_from_soc(u8 data) override;
 };
 
-u32 generalplus_gpce4_mapacman_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 generalplus_gpce4_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int count = 0;
-	for (int y = 0; y < 128; y++)
-	{
-		u16* dst = &bitmap.pix(y);
-
-		for (int x = 0; x < 128; x++)
-		{
-			u8 pix1 = m_display[count++];
-			u8 pix2 = m_display[count++];
-
-			u16 pal = ((pix1<<8) | pix2);
-
-			dst[x] = pal;
-		}
-	}
-	return 0;
-}
-
-u32 generalplus_gpce4_digicolr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int count = 0;
-	for (int y = 0; y < 96; y++)
-	{
-		u16* dst = &bitmap.pix(y);
-
-		for (int x = 0; x < 24; x++)
-		{
-			u8 pix1 = m_display[count++];
-			u8 pix2 = m_display[count++];
-
-			u16 pal = ((pix1<<8) | pix2);
-
-			dst[x] = pal;
-		}
-	}
-	return 0;
+	return m_lcdc->render_to_bitmap(screen, bitmap, cliprect);
 }
 
 static INPUT_PORTS_START( generalplus_gpce4 )
@@ -187,32 +144,12 @@ INPUT_PORTS_END
 
 void generalplus_gpce4_state::machine_start()
 {
-	for (int color = 0; color < 0x10000; color++)
-	{
-		const u8 r = pal5bit(color >> 11);
-		const u8 g = pal6bit(color >> 5);
-		const u8 b = pal5bit(color & 0x1f);
-		m_palette->set_pen_color(color, rgb_t(r, g, b));
-	}
-
-	save_item(NAME(m_display));
-	save_item(NAME(m_displayposx));
-	save_item(NAME(m_displayposy));
-	save_item(NAME(m_lcdc_command));
 	save_item(NAME(m_iob));
 	save_item(NAME(m_spilatch));
 }
 
 void generalplus_gpce4_state::machine_reset()
 {
-	m_displayposx = 0;
-	m_displayposy = 0;
-	m_lcdc_command = 0;
-	m_iob = 0;
-	m_spilatch = 0;
-
-	for (int i = 0; i < 0x8000; i++)
-		m_display[i] = 0;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpce4_state::timer )
@@ -225,53 +162,17 @@ void generalplus_gpce4_state::portb_from_soc(u16 data)
 	m_iob = data;
 }
 
-// this should be a ST7735SV, TODO: complete and turn it into a device
-void generalplus_gpce4_state::process_lcdc_command_params(u8 data)
-{
-	if (m_lcdc_command == 0x2c)
-	{
-		//logerror("lcd command param for 2c %02x\n", data);
-
-		if ((m_displayposx < 256) && (m_displayposy < 128))
-		{
-			m_display[(m_displayposy * 256) + m_displayposx] = data;
-		}
-
-		m_displayposx++;
-
-		if (m_displayposx == 256)
-		{
-			m_displayposx = 0;
-			m_displayposy++;
-		}
-	}
-	else if (m_lcdc_command == 0x2a)
-	{
-		logerror("lcd command param for 2a %02x\n", data);
-		m_displayposx = 0;
-		m_displayposy = 0;
-	}
-	else if (m_lcdc_command == 0x2b)
-	{
-		logerror("lcd command param for 2b %02x\n", data);
-	}
-	else
-	{
-		logerror("lcd command param for other command %02x\n", data);
-	}
-}
-
 void generalplus_gpce4_mapacman_state::spi_from_soc(u8 data)
 {
 	m_spilatch = data;
 
-	if (!(m_iob & 0x1000))
+	if (!(m_iob & 0x0800))
 	{
-		m_lcdc_command = data;
+		m_lcdc->lcdc_command_w(data);
 	}
 	else
 	{
-		process_lcdc_command_params(data);
+		m_lcdc->lcdc_data_w(data);
 	}
 }
 
@@ -281,11 +182,11 @@ void generalplus_gpce4_digicolr_state::spi_from_soc(u8 data)
 
 	if (!(m_iob & 0x0400))
 	{
-		m_lcdc_command = data;
+		m_lcdc->lcdc_command_w(data);
 	}
 	else
 	{
-		process_lcdc_command_params(data);
+		m_lcdc->lcdc_data_w(data);
 	}
 }
 
@@ -302,12 +203,11 @@ void generalplus_gpce4_state::generalplus_gpce4(machine_config &config)
 	m_screen->set_size(128, 128);
 	m_screen->set_visarea(0, 128-1, 0, 128-1);
 	m_screen->set_screen_update(FUNC(generalplus_gpce4_state::screen_update));
-	m_screen->set_palette(m_palette);
 
 	// this triggers the SPI2 interrupt, causing pixels to be pushed to the display
-	TIMER(config, "timer").configure_periodic(FUNC(generalplus_gpce4_state::timer), attotime::from_hz(400000));
+	TIMER(config, "timer").configure_periodic(FUNC(generalplus_gpce4_state::timer), attotime::from_hz(300000));
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
+	BL_HANDHELDS_LCDC(config, m_lcdc, 0);
 }
 
 void generalplus_gpce4_state::init_siddr()
