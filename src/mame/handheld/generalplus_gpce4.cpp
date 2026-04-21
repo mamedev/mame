@@ -65,7 +65,6 @@ protected:
 	void process_lcdc_command_params(u8 data);
 
 	u16 m_iob;
-	u8 m_spilatch;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer);
 
@@ -145,11 +144,11 @@ INPUT_PORTS_END
 void generalplus_gpce4_state::machine_start()
 {
 	save_item(NAME(m_iob));
-	save_item(NAME(m_spilatch));
 }
 
 void generalplus_gpce4_state::machine_reset()
 {
+	m_iob = 0;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpce4_state::timer )
@@ -164,8 +163,6 @@ void generalplus_gpce4_state::portb_from_soc(u16 data)
 
 void generalplus_gpce4_mapacman_state::spi_from_soc(u8 data)
 {
-	m_spilatch = data;
-
 	if (!(m_iob & 0x0800))
 	{
 		m_lcdc->lcdc_command_w(data);
@@ -178,8 +175,6 @@ void generalplus_gpce4_mapacman_state::spi_from_soc(u8 data)
 
 void generalplus_gpce4_digicolr_state::spi_from_soc(u8 data)
 {
-	m_spilatch = data;
-
 	if (!(m_iob & 0x0400))
 	{
 		m_lcdc->lcdc_command_w(data);
