@@ -1,8 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-// seems to be a ST7735S (or ST7735SV)
-
 #include "emu.h"
 #include "st7735s_lcdc.h"
 
