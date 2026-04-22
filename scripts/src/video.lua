@@ -1551,6 +1551,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/st7735s_lcdc.h,VIDEOS["ST7735S"] = true
+--------------------------------------------------
+
+if VIDEOS["ST7735S"] then
+	files {
+		MAME_DIR .. "src/devices/video/st7735s_lcdc.cpp",
+		MAME_DIR .. "src/devices/video/st7735s_lcdc.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/t6963c.h,VIDEOS["T6963C"] = true
 --------------------------------------------------
 

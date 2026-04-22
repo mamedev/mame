@@ -30,8 +30,7 @@
 
 #include "machine/generalplus_gpce4_soc.h"
 #include "machine/timer.h"
-
-#include "bl_handhelds_lcdc.h"
+#include "video/st7735s_lcdc.h"
 
 #include "screen.h"
 
@@ -50,7 +49,7 @@ public:
 		m_lcdc(*this, "lcdc")
 	{ }
 
-	void generalplus_gpce4(machine_config &config);
+	void generalplus_gpce4(machine_config &config) ATTR_COLD;
 
 	void init_siddr();
 
@@ -70,7 +69,7 @@ protected:
 
 	required_device<generalplus_gpce4_soc_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<bl_handhelds_lcdc_device> m_lcdc;
+	required_device<st7735s_lcdc_device> m_lcdc;
 
 };
 
@@ -90,6 +89,8 @@ public:
 	generalplus_gpce4_digicolr_state(const machine_config &mconfig, device_type type, const char *tag) :
 		generalplus_gpce4_state(mconfig, type, tag)
 	{ }
+
+	void digicolr(machine_config &config) ATTR_COLD;
 
 	virtual void spi_from_soc(u8 data) override;
 	ioport_value unk_r();
@@ -257,13 +258,21 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mapacman )
 	PORT_INCLUDE( generalplus_gpce4 )
 
+	PORT_MODIFY("PORTA")
+	PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
 	PORT_MODIFY("PORTB")
+	PORT_BIT(0x0003, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT(0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("PORTC")
+	PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 ioport_value generalplus_gpce4_digicolr_state::unk_r()
@@ -275,8 +284,8 @@ static INPUT_PORTS_START( digicolr )
 	PORT_INCLUDE( generalplus_gpce4 )
 
 	PORT_MODIFY("PORTA")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(generalplus_gpce4_digicolr_state::unk_r))
-	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(generalplus_gpce4_digicolr_state::unk_r)) // unknown, might be a button, but keeps things moving
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) // this will also keep things moving
 INPUT_PORTS_END
 
 void generalplus_gpce4_state::machine_start()
@@ -342,7 +351,13 @@ void generalplus_gpce4_state::generalplus_gpce4(machine_config &config)
 	// this triggers the SPI2 interrupt, causing pixels to be pushed to the display
 	TIMER(config, "timer").configure_periodic(FUNC(generalplus_gpce4_state::timer), attotime::from_hz(300000));
 
-	BL_HANDHELDS_LCDC(config, m_lcdc, 0);
+	ST7735S(config, m_lcdc, 0);
+}
+
+void generalplus_gpce4_digicolr_state::digicolr(machine_config &config)
+{
+	generalplus_gpce4(config);
+	m_screen->set_visarea(0, 96-1, 18, 114-1);
 }
 
 void generalplus_gpce4_state::init_siddr()
@@ -440,7 +455,7 @@ CONS( 2017, parcade,       0,       0,      generalplus_gpce4,   generalplus_gpc
 
 CONS( 2019, taturtf,       0,       0,      generalplus_gpce4,   generalplus_gpce4, generalplus_gpce4_mapacman_state, empty_init, "Super Impulse", "Teenage Mutant Ninja Turtles - Turtle Fighter (Tiny Arcade)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 2021, digicolr,      0,       0,      generalplus_gpce4,   digicolr,          generalplus_gpce4_digicolr_state, empty_init, "Bandai", "Digimon Color", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2021, digicolr,      0,       0,      digicolr,            digicolr,          generalplus_gpce4_digicolr_state, empty_init, "Bandai", "Digimon Color", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // Probably not identical hardware, but still not direct mapped SPI.  External ROM after 0x3000 is encrypted (maybe decrypted in software) seems to have jumps to internal ROM
 CONS( 2021, siddr,         0,       0,      generalplus_gpce4,   generalplus_gpce4, generalplus_gpce4_mapacman_state, init_siddr, "Super Impulse", "Dance Dance Revolution - Broadwalk Arcade", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
