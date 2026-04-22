@@ -2,16 +2,23 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "st7735s_lcdc.h"
+#include "st7735_lcdc.h"
 
-DEFINE_DEVICE_TYPE(ST7735S, st7735s_lcdc_device, "st7735s", "Sitronix ST7735S LCD Controller")
+// The ST7735 does not allow user to upload color conversion table
+// The ST7735S does allow user to upload conversion table (command 2d)
 
-st7735s_lcdc_device::st7735s_lcdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ST7735S, tag, owner, clock)
+// what are the differences with ST7715 and ST7735SV? (and other models)
+// PWCTR1 has only 2 params on the SV at least
+
+
+DEFINE_DEVICE_TYPE(ST7735, st7735_lcdc_device, "st7735", "Sitronix ST7735 LCD Controller")
+
+st7735_lcdc_device::st7735_lcdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ST7735, tag, owner, clock)
 {
 }
 
-u32 st7735s_lcdc_device::render_to_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 st7735_lcdc_device::render_to_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	for (int y = cliprect.min_x; y <= cliprect.max_y; y++)
 	{
@@ -35,7 +42,7 @@ u32 st7735s_lcdc_device::render_to_bitmap(screen_device &screen, bitmap_rgb32 &b
 }
 
 
-void st7735s_lcdc_device::lcdc_command_w(u8 data)
+void st7735_lcdc_device::lcdc_command_w(u8 data)
 {
 	m_command = data;
 	m_commandstep = 0;
@@ -122,12 +129,12 @@ void st7735s_lcdc_device::lcdc_command_w(u8 data)
 	}
 }
 
-u8 st7735s_lcdc_device::lcdc_data_r()
+u8 st7735_lcdc_device::lcdc_data_r()
 {
 	return 0;
 }
 
-void st7735s_lcdc_device::lcdc_data_w(u8 data)
+void st7735_lcdc_device::lcdc_data_w(u8 data)
 {
 	if (m_command == 0x2b)
 	{
@@ -234,7 +241,7 @@ void st7735s_lcdc_device::lcdc_data_w(u8 data)
 		{
 		case 0: logerror("PWCTR1 param 1 set to %02x\n", data); break;
 		case 1: logerror("PWCTR1 param 2 set to %02x\n", data); break;
-		case 2: logerror("PWCTR1 param 3 set to %02x\n", data); break; // ST7735S has a 3rd param here, ST7735SV does not
+		case 2: logerror("PWCTR1 param 3 set to %02x\n", data); break; // ST7735 has a 3rd param here, ST7735V does not
 		default: logerror("unexpected parameter for command %02x (%02x)\n", m_command, data); break;
 		}
 	}
@@ -308,7 +315,7 @@ void st7735s_lcdc_device::lcdc_data_w(u8 data)
 
 }
 
-void st7735s_lcdc_device::device_start()
+void st7735_lcdc_device::device_start()
 {
 	std::fill(std::begin(m_displaybuffer), std::end(m_displaybuffer), 0);
 	m_posx = 0;
@@ -331,6 +338,6 @@ void st7735s_lcdc_device::device_start()
 	save_item(NAME(m_commandstep));
 }
 
-void st7735s_lcdc_device::device_reset()
+void st7735_lcdc_device::device_reset()
 {
 }

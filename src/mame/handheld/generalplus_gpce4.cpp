@@ -30,7 +30,7 @@
 
 #include "machine/generalplus_gpce4_soc.h"
 #include "machine/timer.h"
-#include "video/st7735s_lcdc.h"
+#include "video/st7735_lcdc.h"
 
 #include "screen.h"
 
@@ -69,7 +69,7 @@ protected:
 
 	required_device<generalplus_gpce4_soc_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<st7735s_lcdc_device> m_lcdc;
+	required_device<st7735_lcdc_device> m_lcdc;
 
 };
 
@@ -351,7 +351,7 @@ void generalplus_gpce4_state::generalplus_gpce4(machine_config &config)
 	// this triggers the SPI2 interrupt, causing pixels to be pushed to the display
 	TIMER(config, "timer").configure_periodic(FUNC(generalplus_gpce4_state::timer), attotime::from_hz(300000));
 
-	ST7735S(config, m_lcdc, 0);
+	ST7735(config, m_lcdc, 0);
 }
 
 void generalplus_gpce4_digicolr_state::digicolr(machine_config &config)
@@ -416,7 +416,7 @@ ROM_END
 (this is correct for at least some of the digimon units)
 MCU : Generalplus GPCE4064B
 SPI Flash IC : Macronix MX25L6433F
-LCD Driver : Sitronix ST7735SV
+LCD Driver : Sitronix ST7735V
 LCD module : TCXD011IBLON-3
 Sound unit is a piezo disc.
 

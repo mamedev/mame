@@ -1551,13 +1551,13 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/st7735s_lcdc.h,VIDEOS["ST7735S"] = true
+--@src/devices/video/st7735_lcdc.h,VIDEOS["ST7735"] = true
 --------------------------------------------------
 
-if VIDEOS["ST7735S"] then
+if VIDEOS["ST7735"] then
 	files {
-		MAME_DIR .. "src/devices/video/st7735s_lcdc.cpp",
-		MAME_DIR .. "src/devices/video/st7735s_lcdc.h",
+		MAME_DIR .. "src/devices/video/st7735_lcdc.cpp",
+		MAME_DIR .. "src/devices/video/st7735_lcdc.h",
 	}
 end
 
