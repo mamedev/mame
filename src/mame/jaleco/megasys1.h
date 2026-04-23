@@ -36,7 +36,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
-		m_tmap(*this, "scroll%u", 0),
+		m_tmap(*this, "scroll%u", 1U),
 		m_oki(*this, "oki%u", 1U),
 		m_objectram(*this, "objectram"),
 		m_ram(*this, "ram"),
