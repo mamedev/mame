@@ -2725,7 +2725,7 @@ ffa     e0000<-6 test
 ROM_START( avspirit )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code: 00000-3ffff & 80000-bffff */
 	ROM_LOAD16_BYTE( "spirit05.rom",  0x000000, 0x040000, CRC(b26a341a) SHA1(5ff5b7d3aa73cc7cea7b6e8cc2ba55f4cd9b52e5) )
-	ROM_LOAD16_BYTE(  "spirit06.rom", 0x000001, 0x040000, CRC(609f71fe) SHA1(ab1bfe211763fb855477645267223e7fd4d6b6da) )
+	ROM_LOAD16_BYTE( "spirit06.rom",  0x000001, 0x040000, CRC(609f71fe) SHA1(ab1bfe211763fb855477645267223e7fd4d6b6da) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "spirit01.rom",  0x000000, 0x020000, CRC(d02ec045) SHA1(465b61d89ca06e7e0a42c42efb6919c964ad0f93) )
