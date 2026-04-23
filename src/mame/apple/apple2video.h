@@ -72,6 +72,9 @@ public:
 	void set_char_pointer(u8 *charptr, int size) { m_char_ptr = charptr; m_char_size = size; }
 	void setup_GS_graphics() { m_8bit_graphics = std::make_unique<bitmap_ind16>(560, 192); }
 
+	u16 scanner_address(int h_clock, int v_clock);
+	u32 scanner_address_GS(int h_clock, int v_clock);
+
 	template <model Model, bool Invert, bool Flip>
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

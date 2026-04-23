@@ -113,6 +113,125 @@ void a2_video_device::device_reset()
 	m_monochrome = 0; // TODO: only affects IIgs composite output
 }
 
+/*
+Calculate video scanner address for a given beam position,
+based on the current video mode state.
+Input: h_clock [0...64] with active video from 25,
+       v_clock [0..261/311], active video from 0.
+Callers may apply machine-specific cycle delays to the input,
+and machine-specific ram_size bounds to the output address.
+*/
+u16 a2_video_device::scanner_address(int h_clock, int v_clock)
+{
+	u16 address;
+
+	// vars
+	int Hires, Mixed, Page2,
+		h_state, h_0, h_1, h_2, h_3, h_4, h_5,
+		v_state, v_A, v_B, v_C, v_0, v_1, v_2, v_3, v_4,
+		addend0, addend1, addend2, sum;
+
+	// machine state switches
+	Hires = (m_hires && m_graphics) ? 1 : 0;
+	Mixed = m_mix ? 1 : 0;
+	Page2 = use_page_2() ? 1 : 0;
+
+	// calculate horizontal scanning state
+	h_state = h_clock - (h_clock > 0); // two 0 states: [0, 0...63]
+	h_0 = (h_state >> 0) & 1; // get horizontal state bits
+	h_1 = (h_state >> 1) & 1;
+	h_2 = (h_state >> 2) & 1;
+	h_3 = (h_state >> 3) & 1;
+	h_4 = (h_state >> 4) & 1;
+	h_5 = (h_state >> 5) & 1;
+
+	// calculate vertical scanning state
+	v_state = 256 + v_clock; // V[543210CBA] = 100000000
+	if (v_clock >= 256) // vertical overflow
+	{
+		v_state -= screen().height(); // compensate for preset
+	}
+	v_A = (v_state >> 0) & 1; // get vertical state bits
+	v_B = (v_state >> 1) & 1;
+	v_C = (v_state >> 2) & 1;
+	v_0 = (v_state >> 3) & 1;
+	v_1 = (v_state >> 4) & 1;
+	v_2 = (v_state >> 5) & 1;
+	v_3 = (v_state >> 6) & 1;
+	v_4 = (v_state >> 7) & 1;
+
+	// calculate scanning memory address
+	if (Hires && Mixed && v_4 && v_2)
+	{
+		Hires = 0; // address is in text memory for mixed hires
+	}
+
+	addend0 = 0x0D; // 1            1            0            1
+	addend1 =              (h_5 << 2) | (h_4 << 1) | (h_3 << 0);
+	addend2 = (v_4 << 3) | (v_3 << 2) | (v_4 << 1) | (v_3 << 0);
+	sum     = (addend0 + addend1 + addend2) & 0x0F;
+
+	address  = h_0 << 0; // a0
+	address |= h_1 << 1; // a1
+	address |= h_2 << 2; // a2
+	address |= sum << 3; // a3 - a6
+	address |= v_0 << 7; // a7
+	address |= v_1 << 8; // a8
+	address |= v_2 << 9; // a9
+	if (Hires)
+	{
+		// insert hires-only address bits
+		address |= v_A << 10; // a10
+		address |= v_B << 11; // a11
+		address |= v_C << 12; // a12
+		address |= Page2 ? m_hgr2 : 0x2000; // a13 - a15
+	}
+	else
+	{
+		// insert text-only address bits
+		address |= Page2 ? 0x0800 : 0x0400; // a10 - a11
+
+		if (m_base_model == model::II && (h_clock < 25)) // Apple II HBL
+		{
+			address |= 1 << 12; // a12 (add $1000)
+		}
+	}
+
+	return address;
+}
+
+u32 a2_video_device::scanner_address_GS(int h_clock, int v_clock)
+{
+	u32 address;
+
+	if (BIT(m_newvideo, 7))
+	{
+		// each SHR h_clock reads four bytes, only the last is visible to PH0
+		if (h_clock >= 25) // pixels
+		{
+			const u32 base = 0x16000 - 50 + 1;
+			address = base + (v_clock * 80) + (h_clock * 2);
+		}
+		else if ((h_clock >= 9) && (h_clock <= 16)) // palette
+		{
+			const u32 base = 0x19f00 - 18 + 1;
+			const u32 palette = m_shr_scbs[v_clock] & 0x0f;
+			address = base + (palette * 16) + (h_clock * 2);
+		}
+		else // SCB
+		{
+			const u32 base = 0x19e80;
+			address = base + (v_clock >> 1);
+		}
+	}
+	else // 8-bit modes per Sather, UTAIIe
+	{
+		address = scanner_address(h_clock, v_clock);
+	}
+
+	return address;
+}
+
 void a2_video_device::txt_w(int state)
 {
 	if (m_graphics == state) // avoid flickering from II+ refresh polling
