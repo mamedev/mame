@@ -403,7 +403,7 @@ void a2_video_device::delayed_update(int cycles)
 {
 	int hpos = screen().hpos() + (cycles - m_delay_bias) * m_scanner_period;
 	int vpos = screen().vpos();
-	if (hpos > screen().width())
+	if (hpos >= screen().width())
 	{
 		hpos -= screen().width();
 		vpos++;
