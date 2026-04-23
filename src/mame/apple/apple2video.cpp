@@ -45,6 +45,7 @@ a2_video_device::a2_video_device(const machine_config &mconfig, device_type type
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
+	, m_base_model(model::II)
 	, m_vidconfig(*this, "a2_video_config") {}
 
 a2_video_device::a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -56,11 +57,16 @@ a2_video_device_composite::a2_video_device_composite(const machine_config &mconf
 a2_video_device_composite_rgb::a2_video_device_composite_rgb(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: a2_video_device(mconfig, APPLE2_VIDEO_COMPOSITE_RGB, tag, owner, clock) {}
 
+ALLOW_SAVE_TYPE(a2_video_device::model);
+
 void a2_video_device::device_start()
 {
 	// initialise for device_palette_interface
 	init_palette();
 
+	save_item(NAME(m_base_model));
+	save_item(NAME(m_scanner_period));
+	save_item(NAME(m_delay_bias));
 	save_item(NAME(m_hgr2));
 	save_item(NAME(m_page2));
 	save_item(NAME(m_flash));
@@ -86,6 +92,10 @@ void a2_video_device::device_start()
 
 void a2_video_device::device_reset()
 {
+	// cache derived values for delayed updates
+	m_scanner_period = m_base_model == model::IIGS ? 16 : 14;
+	m_delay_bias = m_base_model == model::IIGS ? 0 : 1;
+
 	// Start in fullscreen hires if there is no character ROM. This is used
 	// by the superga2 and tk2000 drivers, which support no other modes.
 	m_graphics = m_hires = (m_char_ptr == nullptr);
@@ -108,7 +118,7 @@ void a2_video_device::txt_w(int state)
 	if (m_graphics == state) // avoid flickering from II+ refresh polling
 	{
 		// select graphics or text mode
-		screen().update_now();
+		delayed_update(3);
 		m_graphics = !state;
 	}
 }
@@ -118,7 +128,7 @@ void a2_video_device::mix_w(int state)
 	if (m_mix != state)
 	{
 		// select mixed or full mode
-		screen().update_now();
+		delayed_update(3);
 		m_mix = state;
 	}
 }
@@ -127,7 +137,7 @@ void a2_video_device::scr_w(int state)
 {
 	// select primary or secondary page
 	if (!m_80store && (m_page2 != state))
-		screen().update_now();
+		delayed_update(2);
 	m_page2 = state;
 }
 
@@ -136,7 +146,7 @@ void a2_video_device::res_w(int state)
 	if (m_hires != state)
 	{
 		// select lo-res or hi-res
-		screen().update_now();
+		delayed_update(m_base_model == model::IIGS ? 1 : 2);
 		m_hires = state;
 	}
 }
@@ -146,7 +156,7 @@ void a2_video_device::an2_w(int state)
 	if (m_an2 != state)
 	{
 		// select katakana on II_J_PLUS
-		screen().update_now();
+		delayed_update(1);
 		m_an2 = state;
 	}
 }
@@ -154,7 +164,7 @@ void a2_video_device::an2_w(int state)
 void a2_video_device::an3_w(int state)
 {
 	// select double hi-res
-	screen().update_now();
+	delayed_update(1);
 
 	// RGB cards shift in a mode bit on the rising edge
 	if ((m_dhires) && (state))
@@ -171,7 +181,7 @@ void a2_video_device::a80col_w(bool b80Col)
 	if (m_80col != b80Col)
 	{
 		// select 80 or 40 columns
-		screen().update_now();
+		delayed_update(1);
 		m_80col = b80Col;
 	}
 }
@@ -180,7 +190,7 @@ void a2_video_device::a80store_w(bool b80Store)
 {
 	// select PAGE2 aux RAM (displaying PAGE1)
 	if (m_page2 && (m_80store != b80Store))
-		screen().update_now();
+		delayed_update(2);
 	m_80store = b80Store;
 }
 
@@ -189,7 +199,7 @@ void a2_video_device::altcharset_w(bool altch)
 	if (m_altcharset != altch)
 	{
 		// select primary or alternate (MouseText) character set
-		screen().update_now();
+		delayed_update(1);
 		m_altcharset = altch;
 	}
 }
@@ -229,7 +239,7 @@ void a2_video_device::set_GS_langsel(u8 langsel)
 {
 	// select primary language character set
 	if ((m_GS_langsel & 0xe8) != (langsel & 0xe8))
-		screen().update_now();
+		delayed_update(1);
 	m_GS_langsel = langsel;
 }
 
@@ -270,6 +280,17 @@ public:
 
 } reverse_7_bits;
 
+void a2_video_device::delayed_update(int cycles)
+{
+	int hpos = screen().hpos() + (cycles - m_delay_bias) * m_scanner_period;
+	int vpos = screen().vpos();
+	if (hpos > screen().width())
+	{
+		hpos -= screen().width();
+		vpos++;
+	}
+	screen().update_partial(vpos, hpos);
+}
 
 inline bool a2_video_device::use_page_2() const { return m_page2 && !m_80store; }
 

@@ -3795,6 +3795,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_rtc->cko_cb().set(FUNC(apple2gs_state::rtc_vgc));
 
 	APPLE2_VIDEO(config, m_video, A2GS_14M).set_screen(m_screen);
+	m_video->set_base_model(a2_video_device::model::IIGS);
 
 	APPLE2_COMMON(config, m_a2common, A2GS_14M).set_GS_cputag(m_maincpu);
 

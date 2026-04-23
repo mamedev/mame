@@ -5041,6 +5041,7 @@ void apple2e_state::apple2e_common(machine_config &config, bool enhanced, bool r
 	{
 		APPLE2_VIDEO_COMPOSITE(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 	}
+	m_video->set_base_model(a2_video_device::model::IIE);
 
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
