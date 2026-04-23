@@ -1048,7 +1048,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	}
 	else if (scanline == ((256+BORDER_TOP) % m_screen->height()))
 	{
-		// TODO: latch LANGSEL here to toggle NTSC/PAL
+		// LANGSEL is latched when wrapping scanline 256
+		const int height = m_video->is_pal_video_mode() ? 312 : 262;
+		if (height != m_screen->height())
+		{
+			// toggle 50/60 Hz, both use 65 1M cycles per scanline
+			m_screen->configure(m_screen->width(), height, m_screen->visible_area(), HZ_TO_ATTOSECONDS(A2GS_1M.dvalue() / (65 * height)));
+			if (scanline >= height)
+				scanline -= height;
+		}
 
 		// "quarter" second IRQ occurs every 16 frames, ~3.75 Hz
 		if ((m_screen->frame_number() & 0xf) == 0)

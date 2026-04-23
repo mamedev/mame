@@ -1520,7 +1520,7 @@ void apple2e_state::accel_full_speed()
 
 void apple2e_state::accel_normal_speed()
 {
-	m_maincpu->set_unscaled_clock(1021800, true); // re-align to PH0
+	m_maincpu->set_unscaled_clock(m_pal ? 1016966 : 1021800, true); // re-align to PH0
 }
 
 void apple2e_state::accel_slot(int slot)
