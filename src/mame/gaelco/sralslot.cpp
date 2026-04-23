@@ -24,8 +24,6 @@ public:
 	void sralslot(machine_config &config) ATTR_COLD;
 	void init_sral1990() ATTR_COLD;
 
-protected:
-
 private:
 	required_device<cpu_device> m_maincpu;
 
@@ -44,7 +42,7 @@ INPUT_PORTS_END
 // Unknown hardware configuration. Everything is guessed from the ROMs contents.
 void sralslot_state::sralslot(machine_config &config)
 {
-	M68340(config, m_maincpu, 16000000);
+	M68340(config, m_maincpu, 16'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sralslot_state::sralslot_map);
 
 	SPEAKER(config, "speaker", 2).front();
@@ -52,7 +50,7 @@ void sralslot_state::sralslot(machine_config &config)
 
 void sralslot_state::init_sral1990()
 {
-	uint16_t* src = (uint16_t*)memregion("maincpu")->base();
+	uint16_t *src = &memregion("maincpu")->as_u16(); 
 	int srcsize = memregion("maincpu")->bytes();
 	// same basic scramble as pluto5.cpp, astrafr.cpp (also Heber platforms)
 	std::vector<uint16_t> dst(srcsize / 2);
@@ -101,7 +99,7 @@ ROM_END
    1345    3AB-1986    SUPER RALLY    01.01.1990    1EC-00000016    COVIELSA, S.A
 */
 
-GAME( 1996, sralslot,         0, sralslot, sralslot, sralslot_state, init_sral1990, ROT0, "Gaelco / Covielsa", "Super Rally (v0204, 2-Feb-1996)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1996, sralslot,  0,        sralslot, sralslot, sralslot_state, init_sral1990, ROT0, "Gaelco / Covielsa", "Super Rally (v0204, 2-Feb-1996)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 1995, sralslota, sralslot, sralslot, sralslot, sralslot_state, init_sral1990, ROT0, "Gaelco / Covielsa", "Super Rally (v0203, 19-Dec-1995)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 1995, sralslotb, sralslot, sralslot, sralslot, sralslot_state, init_sral1990, ROT0, "Gaelco / Covielsa", "Super Rally (v0201, 6-Nov-1995)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 1995, sralslotc, sralslot, sralslot, sralslot, sralslot_state, init_sral1990, ROT0, "Gaelco / Covielsa", "Super Rally (v0107)",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
