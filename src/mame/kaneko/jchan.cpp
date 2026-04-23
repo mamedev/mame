@@ -155,7 +155,7 @@ JC-301-00  W11 9510K7059    23C16000        U85
 
 #include "emu.h"
 
-#include "kaneko_rle.h"
+#include "kaneko_rlespr.h"
 #include "kaneko_tmap.h"
 #include "kaneko_toybox.h"
 
@@ -204,7 +204,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<palette_device> m_palette;
-	required_device_array<kaneko_rle_device, 2> m_spritegen;
+	required_device_array<kaneko_rlespr_device, 2> m_spritegen;
 	required_device<kaneko_view2_tilemap_device> m_view2;
 
 	required_shared_ptr_array<u16, 2> m_spriteram;
@@ -283,7 +283,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(jchan_state::vblank)
 
 void jchan_state::video_start()
 {
-	/* so we can use kaneko/kaneko_rle.cpp */
+	/* so we can use kaneko/kaneko_rlespr.cpp */
 	for (int chip = 0; chip < 2; chip++)
 	{
 		const u32 size = m_spriteram[chip].bytes() / 4;
@@ -293,9 +293,6 @@ void jchan_state::video_start()
 
 	m_sprite_regs32[0] = std::make_unique<u32[]>(0x40/4);
 	m_sprite_regs32[1] = std::make_unique<u32[]>(0x40/4);
-
-	m_spritegen[0]->set_sprite_kludge(0, 0);
-	m_spritegen[1]->set_sprite_kludge(0, 0);
 
 	save_item(NAME(m_irq_sub_enable));
 	save_pointer(NAME(m_sprite_regs32[0]), 0x40/4);
@@ -614,7 +611,11 @@ void jchan_state::jchan(machine_config &config)
 	m_view2->set_palette(m_palette);
 
 	for (auto &spritegen : m_spritegen)
-		KANEKO_RLE(config, spritegen, 0);
+	{
+		KANEKO_RLESPR(config, spritegen, 0);
+		spritegen->set_screen("screen");
+		spritegen->set_sprite_kludge(0, 0);
+	}
 
 	KANEKO_TOYBOX(config, "toybox", "eeprom", "DSW1", "mcuram", "mcudata");
 

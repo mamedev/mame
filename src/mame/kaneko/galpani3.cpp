@@ -66,7 +66,7 @@ Dumped by Uki
 #include "emu.h"
 
 #include "kaneko_grap2.h"
-#include "kaneko_rle.h"
+#include "kaneko_rlespr.h"
 #include "kaneko_toybox.h"
 
 #include "cpu/m68000/m68000.h"
@@ -106,7 +106,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<kaneko_grap2_device, 3> m_grap2;
 	required_device<palette_device> m_palette;
-	required_device<kaneko_rle_device> m_spritegen;
+	required_device<kaneko_rlespr_device> m_spritegen;
 
 	required_shared_ptr<u16> m_paletteram;
 	required_shared_ptr<u16> m_spriteram;
@@ -154,9 +154,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani3_state::scanline) // 2, 3, 5 ?
 
 void galpani3_state::video_start()
 {
-	/* so we can use kaneko/kaneko_rle.cpp */
-	m_spritegen->set_sprite_kludge(0, 0);
-
+	/* so we can use kaneko/kaneko_rlespr.cpp */
 	m_spriteram32 = make_unique_clear<u32 []>(0x4000 / 4);
 	m_spc_regs = make_unique_clear<u32 []>(0x40 / 4);
 
@@ -466,7 +464,9 @@ void galpani3_state::galpani3(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 0x4000);
 
-	KANEKO_RLE(config, m_spritegen, 0);
+	KANEKO_RLESPR(config, m_spritegen, 0);
+	m_spritegen->set_screen("screen");
+	m_spritegen->set_sprite_kludge(0, 0);
 
 	KANEKO_GRAP2(config, m_grap2[0], 0).set_device_rom_tag("rlebg");
 

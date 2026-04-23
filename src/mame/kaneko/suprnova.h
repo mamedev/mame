@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "kaneko_rle.h"
+#include "kaneko_rlespr.h"
 
 #include "cpu/sh/sh7604.h"
 #include "machine/timer.h"
@@ -85,7 +85,7 @@ private:
 	};
 
 	required_device<sh7604_device> m_maincpu;
-	required_device<kaneko_rle_device> m_spritegen;
+	required_device<kaneko_rlespr_device> m_spritegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
