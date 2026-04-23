@@ -382,7 +382,7 @@ inline void megasys1_state::draw_single_sprite(screen_device &screen, bitmap_ind
 	gfx_element *decodegfx = m_gfxdecode->gfx(0);
 	sy = sy + 16;
 
-	u8 const* gfx = decodegfx->get_data(code);
+	u8 const *const gfx = decodegfx->get_data(code);
 
 	u8 const yxor = flipy ? 0x0f : 0;
 	u8 const xxor = flipx ? 0x0f : 0;
