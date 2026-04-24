@@ -73,6 +73,7 @@ public:
 		m_c2(*this, "c2"),
 		m_row(*this, "ROW%u", 0),
 		m_lock(*this, "LOCK"),
+		m_portswap(*this, "JOYSWAP"),
 		m_addr(0)
 	{ }
 
@@ -100,6 +101,7 @@ protected:
 	optional_memory_region m_c2;
 	required_ioport_array<8> m_row;
 	required_ioport m_lock;
+	optional_ioport m_portswap;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -570,6 +572,11 @@ static INPUT_PORTS_START( plus4 )
 	PORT_START( "LOCK" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START( "JOYSWAP" )
+	PORT_CONFNAME( 0x01, 0x00, "Swap joystick ports" )
+	PORT_CONFSETTING( 0x01, "Joystick in swapped port" )
+	PORT_CONFSETTING( 0x00, "Joystick in assigned port" )
 INPUT_PORTS_END
 
 
@@ -726,11 +733,13 @@ uint8_t plus4_state::ted_k_r(offs_t offset)
 	*/
 
 	uint8_t data = 0xff;
+	vcs_control_port_device *cur1 = m_portswap->read() ? m_joy2 : m_joy1;
+	vcs_control_port_device *cur2 = m_portswap->read() ? m_joy1 : m_joy2;
 
 	// joystick
 	if (!BIT(offset, 2))
 	{
-		uint8_t joy_a = m_joy1->read_joy();
+		uint8_t joy_a = cur1->read_joy();
 
 		data &= (0xf0 | (joy_a & 0x0f));
 		data &= ~(!BIT(joy_a, 5) << 6);
@@ -738,7 +747,7 @@ uint8_t plus4_state::ted_k_r(offs_t offset)
 
 	if (!BIT(offset, 1))
 	{
-		uint8_t joy_b = m_joy2->read_joy();
+		uint8_t joy_b = cur2->read_joy();
 
 		data &= (0xf0 | (joy_b & 0x0f));
 		data &= ~(!BIT(joy_b, 5) << 7);
