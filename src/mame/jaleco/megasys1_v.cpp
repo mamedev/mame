@@ -347,7 +347,7 @@ void megasys1_state::mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitm
 			{
 				u32 const priority = BIT(pixel, 14) ? 0x0c : 0x0a;
 
-				if ((priority & (1 << (prio[x] & 0x1f))) == 0)
+				if (!BIT(priority, prio[x] & 0x1f))
 				{
 					u16 const coldat = pixel & 0x3fff;
 					dstline[x] = coldat + colorbase;
