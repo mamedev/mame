@@ -389,18 +389,18 @@ inline void megasys1_state::draw_single_sprite(screen_device &screen, bitmap_ind
 
 	color <<= 4;
 
-	for (s32 y = 0, dstx_temp = sx; y < 16; y++, sy++)
+	for (s32 y = 0; y < 16; y++, sy++)
 	{
 		if (sy < cliprect.min_y || sy > cliprect.max_y)
 			continue;
 
-	//  u16 *const dest = &bitmap.pix(sy)+ sx;
-	//  u8 *const prio = &screen.priority().pix(sy) + sx;
+	//  u16 *const dest = &bitmap.pix(sy);
+	//  u8 *const prio = &screen.priority().pix(sy);
 		u16 *const dest = &m_sprite_buffer_bitmap.pix(sy);
 		u8 const srcy = y ^ yxor;
 		u8 const *const src = &gfx[(mosaicsol ? (srcy | mosaic) : (srcy & ~mosaic)) * decodegfx->rowbytes()];
 
-		for (s32 x = 0, dstx = dstx_temp; x < 16; x++, dstx++)
+		for (s32 x = 0, dstx = sx; x < 16; x++, dstx++)
 		{
 			if (dstx < cliprect.min_x || dstx > cliprect.max_x)
 				continue;
@@ -479,7 +479,7 @@ void megasys1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		partial_clear_sprite_bitmap(screen, bitmap, cliprect, m_sprite_flag & 0x0f);
 	}
 
-	s32 const color_mask = BIT(m_sprite_flag, 8) ? 0x07 : 0x0f;
+	u32 const color_mask = BIT(m_sprite_flag, 8) ? 0x07 : 0x0f;
 
 	u16 const *const objectram = m_buffer2_objectram.get();
 	u16 const *const spriteram = m_buffer2_spriteram16.get();
