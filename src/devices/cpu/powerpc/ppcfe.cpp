@@ -15,39 +15,169 @@
 
 #include "cpu/drcfe.ipp"
 
+#include <iostream>
 
-//**************************************************************************
-//  MACROS
-//**************************************************************************
 
-#define GPR_USED(desc, x)           do { (desc).regin.set(REG_BIT_R0 + x); } while (0)
-#define GPR_USED_OR_ZERO(desc, x)   do { if (x) GPR_USED((desc), x); } while (0)
-#define GPR_MODIFIED(desc, x)       do { (desc).regout.set(REG_BIT_R0 + x); } while (0)
 
-#define FPR_USED(desc, x)           do { (desc).regin.set(REG_BIT_FR0 + x); } while (0)
-#define FPR_MODIFIED(desc, x)       do { (desc).regout.set(REG_BIT_FR0 + x); } while (0)
+/*-------------------------------------------------
+    log_flags - write a string representing the
+    instruction description flags to a stream
+-------------------------------------------------*/
 
-#define CR_USED(desc, x)            do { CR_BIT_USED((desc), (x * 4) + 0); CR_BIT_USED((desc), (x * 4) + 1); CR_BIT_USED((desc), (x * 4) + 2); CR_BIT_USED((desc), (x * 4) + 3); } while (0)
-#define CR_BIT_USED(desc, x)        do { (desc).regin.set(64 + 31 - x); } while (0)
-#define CR_MODIFIED(desc, x)        do { CR_BIT_MODIFIED((desc), (x * 4) + 0); CR_BIT_MODIFIED((desc), (x * 4) + 1); CR_BIT_MODIFIED((desc), (x * 4) + 2); CR_BIT_MODIFIED((desc), (x * 4) + 3); } while (0)
-#define CR_BIT_MODIFIED(desc, x)    do { (desc).regout.set(64 + 31 - x); } while (0)
+void ppc_device::opcode_desc::log_flags(std::ostream &stream) const
+{
+	// branches
+	if (is_unconditional_branch())
+		stream << 'U';
+	else if (is_conditional_branch())
+		stream << 'C';
+	else
+		stream << '.';
 
-#define XER_CA_USED(desc)           do { (desc).regin.set(REG_BIT_XER_CA); } while (0)
-#define XER_OV_USED(desc)           do { (desc).regin.set(REG_BIT_XER_OV); } while (0)
-#define XER_SO_USED(desc)           do { (desc).regin.set(REG_BIT_XER_SO); } while (0)
-#define XER_COUNT_USED(desc)        do { (desc).regin.set(REG_BIT_XER_COUNT); } while (0)
-#define XER_CA_MODIFIED(desc)       do { (desc).regout.set(REG_BIT_XER_CA); } while (0)
-#define XER_OV_MODIFIED(desc)       do { (desc).regout.set(REG_BIT_XER_OV); } while (0)
-#define XER_SO_MODIFIED(desc)       do { (desc).regout.set(REG_BIT_XER_SO); } while (0)
-#define XER_COUNT_MODIFIED(desc)    do { (desc).regout.set(REG_BIT_XER_COUNT); } while (0)
+	// intrablock branches
+	stream << (intrablock_branch() ? 'i' : '.');
 
-#define CTR_USED(desc)              do { (desc).regin.set(REG_BIT_CTR); } while (0)
-#define CTR_MODIFIED(desc)          do { (desc).regout.set(REG_BIT_CTR); } while (0)
-#define LR_USED(desc)               do { (desc).regin.set(REG_BIT_LR); } while (0)
-#define LR_MODIFIED(desc)           do { (desc).regout.set(REG_BIT_LR); } while (0)
+	// branch targets
+	stream << (is_branch_target() ? 'B' : '.');
 
-#define FPSCR_USED(desc, x)         do { (desc).regin.set(REG_BIT_FPSCR0 + x); } while (0)
-#define FPSCR_MODIFIED(desc, x)     do { (desc).regout.set(REG_BIT_FPSCR0 + x); } while (0)
+	// delay slots
+	stream << (in_delay_slot() ? 'D' : '.');
+
+	// exceptions
+	if (will_cause_exception())
+		stream << 'E';
+	else if (can_cause_exception())
+		stream << 'e';
+	else
+		stream << '.';
+
+	// read/write
+	if (reads_memory())
+		stream << 'R';
+	else if (writes_memory())
+		stream << 'W';
+	else
+		stream << '.';
+
+	// TLB validation
+	stream << (validate_tlb() ? 'V' : '.');
+
+	// redispatch
+	stream << (redispatch() ? 'R' : '.');
+}
+
+
+/*-------------------------------------------------
+    log_register_list - log a list of registers
+-------------------------------------------------*/
+
+void ppc_device::opcode_desc::log_registers_used(std::ostream &stream) const
+{
+	stream << "[use:";
+	log_register_list(stream, regin, nullptr);
+	stream << ']';
+}
+
+void ppc_device::opcode_desc::log_registers_modified(std::ostream &stream) const
+{
+	stream << "[mod:";
+	log_register_list(stream, regout, &regreq);
+	stream << ']';
+}
+
+void ppc_device::opcode_desc::log_register_list(std::ostream &stream, const regmask &reglist, const regmask *regnostarlist)
+{
+	static const char *const crtext[4] = { "lt", "gt", "eq", "so" };
+	int count = 0;
+
+	for (int regnum = 0; regnum < 32; regnum++)
+	{
+		if (reglist[REG_BIT_R0 + regnum])
+		{
+			if (count++)
+				stream << ',';
+			stream << 'r' << regnum;
+			if (regnostarlist && !(*regnostarlist)[REG_BIT_R0 + regnum])
+				stream << '*';
+		}
+	}
+
+	for (int regnum = 0; regnum < 32; regnum++)
+	{
+		if (reglist[REG_BIT_FR0 + regnum])
+		{
+			if (count++)
+				stream << ',';
+			stream << "fr" << regnum;
+			if (regnostarlist && !(*regnostarlist)[REG_BIT_FR0 + regnum])
+				stream << '*';
+		}
+	}
+
+	for (int regnum = 0; regnum < 8; regnum++)
+	{
+		if (!reg_cr(reglist, regnum))
+			continue;
+
+		if (count++)
+			stream << ',';
+		stream << "cr" << regnum;
+		if ((reg_cr(reglist, regnum) == 0x0f) && (!regnostarlist || (reg_cr(*regnostarlist, regnum) == 0x0f) || !reg_cr(*regnostarlist, regnum)))
+		{
+			if (regnostarlist && !reg_cr(*regnostarlist, regnum))
+				stream << '*';
+		}
+		else
+		{
+			int crcount = 0;
+			stream << '[';
+			for (int crnum = 0; crnum < 4; crnum++)
+			{
+				if (reg_cr_bit(reglist, (regnum * 4) + crnum))
+				{
+					if (crcount++)
+						stream << ',';
+					stream << crtext[crnum];
+					if (regnostarlist && !reg_cr_bit(*regnostarlist, (regnum * 4) + crnum))
+						stream << '*';
+				}
+			}
+			stream << ']';
+		}
+	}
+
+	const auto log_bit =
+			[&stream, &count, &reglist, &regnostarlist] (size_t bit, const char *name)
+			{
+				if (reglist[bit])
+				{
+					if (count++)
+						stream << ',';
+					stream << name;
+					if (regnostarlist && !(*regnostarlist)[bit])
+						stream << '*';
+				}
+			};
+
+	log_bit(REG_BIT_XER_CA,     "xer_ca");
+	log_bit(REG_BIT_XER_OV,     "xer_ov");
+	log_bit(REG_BIT_XER_SO,     "xer_so");
+	log_bit(REG_BIT_XER_COUNT,  "xer_count");
+	log_bit(REG_BIT_CTR,        "ctr");
+	log_bit(REG_BIT_LR,         "lr");
+
+	for (int regnum = 0; regnum < 8; regnum++)
+	{
+		if (reglist[REG_BIT_FPSCR0 + regnum])
+		{
+			if (count++)
+				stream << ',';
+			stream << "fpscr" << regnum;
+			if (regnostarlist && !(*regnostarlist)[REG_BIT_FPSCR0 + regnum])
+				stream << '*';
+		}
+	}
+}
 
 
 
@@ -117,15 +247,15 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			return false;
 
 		case 0x03:  // TWI
-			GPR_USED(desc, G_RA(op));
+			desc.set_gpr_used(G_RA(op));
 			desc.set_can_cause_exception();
 			if (is_603_class())
 				desc.cycles = 2;    // 603
 			return true;
 
 		case 0x07:  // MULLI
-			GPR_USED(desc, G_RA(op));
-			GPR_MODIFIED(desc, G_RD(op));
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_modified(G_RD(op));
 			if (is_403_class())
 				desc.cycles = 4;    // 4XX
 			else if (is_601_class())
@@ -142,53 +272,53 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 				return false;
 			}
 
-			GPR_USED_OR_ZERO(desc, G_RA(op));
-			GPR_MODIFIED(desc, G_RD(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_gpr_modified(G_RD(op));
 			return true;
 
 		case 0x0e:  // ADDI
 		case 0x0f:  // ADDIS
-			GPR_USED_OR_ZERO(desc, G_RA(op));
-			GPR_MODIFIED(desc, G_RD(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_gpr_modified(G_RD(op));
 			return true;
 
 		case 0x0a:  // CMPLI
 		case 0x0b:  // CMPI
-			GPR_USED(desc, G_RA(op));
-			XER_SO_USED(desc);
-			CR_MODIFIED(desc, G_CRFD(op));
+			desc.set_gpr_used(G_RA(op));
+			desc.set_xer_so_used();
+			desc.set_cr_modified(G_CRFD(op));
 			return true;
 
 		case 0x08:  // SUBFIC
 		case 0x0c:  // ADDIC
-			GPR_USED(desc, G_RA(op));
-			GPR_MODIFIED(desc, G_RD(op));
-			XER_CA_MODIFIED(desc);
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_modified(G_RD(op));
+			desc.set_xer_ca_modified();
 			return true;
 
 		case 0x0d:  // ADDIC.
-			GPR_USED(desc, G_RA(op));
-			XER_SO_USED(desc);
-			GPR_MODIFIED(desc, G_RT(op));
-			XER_CA_MODIFIED(desc);
-			CR_MODIFIED(desc, 0);
+			desc.set_gpr_used(G_RA(op));
+			desc.set_xer_so_used();
+			desc.set_gpr_modified(G_RT(op));
+			desc.set_xer_ca_modified();
+			desc.set_cr_modified(0);
 			return true;
 
 		case 0x10:  // BCx
 			if (!(G_BO(op) & 0x10))
 			{
-				CR_BIT_USED(desc, G_BI(op));
+				desc.set_cr_bit_used(G_BI(op));
 				// branch folding
-				if (prev == nullptr || REGFLAG_CR(prev->regout) == 0)
+				if (!prev || (prev->cr_modified() == 0))
 					desc.cycles = 0;
 			}
 			if (!(G_BO(op) & 0x04))
 			{
-				CTR_USED(desc);
-				CTR_MODIFIED(desc);
+				desc.set_ctr_used();
+				desc.set_ctr_modified();
 			}
 			if (op & M_LK)
-				LR_MODIFIED(desc);
+				desc.set_lr_modified();
 			if ((G_BO(op) & 0x14) == 0x14)
 			{
 				desc.set_is_unconditional_branch();
@@ -207,6 +337,7 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			if (!(m_ppc.m_cap & (PPCCAP_OEA | PPCCAP_4XX)))
 				return false;
 			desc.set_will_cause_exception();
+			desc.set_end_sequence();
 			if (is_601_class())
 				desc.cycles = 16;   // 601
 			else if (is_603_class())
@@ -217,7 +348,7 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 		case 0x12:  // Bx
 			if (op & M_LK)
-				LR_MODIFIED(desc);
+				desc.set_lr_modified();
 			desc.set_is_unconditional_branch();
 			desc.set_end_sequence();
 			desc.targetpc = ((int32_t)(G_LI(op) << 8) >> 6) + ((op & M_AA) ? 0 : desc.pc);
@@ -230,34 +361,34 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			return describe_13(op, desc, prev);
 
 		case 0x14:  // RLWIMIx
-			GPR_USED(desc, G_RS(op));
-			GPR_USED(desc, G_RA(op));
-			GPR_MODIFIED(desc, G_RA(op));
+			desc.set_gpr_used(G_RS(op));
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_modified(G_RA(op));
 			if (op & M_RC)
 			{
-				XER_SO_USED(desc);
-				CR_MODIFIED(desc, 0);
+				desc.set_xer_so_used();
+				desc.set_cr_modified(0);
 			}
 			return true;
 
 		case 0x15:  // RLWINMx
-			GPR_USED(desc, G_RS(op));
-			GPR_MODIFIED(desc, G_RA(op));
+			desc.set_gpr_used(G_RS(op));
+			desc.set_gpr_modified(G_RA(op));
 			if (op & M_RC)
 			{
-				XER_SO_USED(desc);
-				CR_MODIFIED(desc, 0);
+				desc.set_xer_so_used();
+				desc.set_cr_modified(0);
 			}
 			return true;
 
 		case 0x17:  // RLWNMx
-			GPR_USED(desc, G_RS(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RA(op));
+			desc.set_gpr_used(G_RS(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RA(op));
 			if (op & M_RC)
 			{
-				XER_SO_USED(desc);
-				CR_MODIFIED(desc, 0);
+				desc.set_xer_so_used();
+				desc.set_cr_modified(0);
 			}
 			return true;
 
@@ -265,16 +396,16 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case 0x19:  // ORIS
 		case 0x1a:  // XORI
 		case 0x1b:  // XORIS
-			GPR_USED(desc, G_RS(op));
-			GPR_MODIFIED(desc, G_RA(op));
+			desc.set_gpr_used(G_RS(op));
+			desc.set_gpr_modified(G_RA(op));
 			return true;
 
 		case 0x1c:  // ANDI.
 		case 0x1d:  // ANDIS.
-			GPR_USED(desc, G_RS(op));
-			XER_SO_USED(desc);
-			GPR_MODIFIED(desc, G_RA(op));
-			CR_MODIFIED(desc, 0);
+			desc.set_gpr_used(G_RS(op));
+			desc.set_xer_so_used();
+			desc.set_gpr_modified(G_RA(op));
+			desc.set_cr_modified(0);
 			return true;
 
 		case 0x1f:  // 0x1f group
@@ -284,8 +415,8 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case 0x22:  // LBZ
 		case 0x28:  // LHZ
 		case 0x2a:  // LHA
-			GPR_USED_OR_ZERO(desc, G_RA(op));
-			GPR_MODIFIED(desc, G_RD(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_gpr_modified(G_RD(op));
 			desc.set_reads_memory();
 			return true;
 
@@ -295,17 +426,17 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case 0x2b:  // LHAU
 			if (G_RA(op) == 0 || G_RA(op) == G_RD(op))
 				return false;
-			GPR_USED(desc, G_RA(op));
-			GPR_MODIFIED(desc, G_RD(op));
-			GPR_MODIFIED(desc, G_RA(op));
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_modified(G_RD(op));
+			desc.set_gpr_modified(G_RA(op));
 			desc.set_reads_memory();
 			return true;
 
 		case 0x24:  // STW
 		case 0x26:  // STB
 		case 0x2c:  // STH
-			GPR_USED_OR_ZERO(desc, G_RA(op));
-			GPR_USED(desc, G_RS(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_gpr_used(G_RS(op));
 			desc.set_writes_memory();
 			return true;
 
@@ -314,28 +445,28 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case 0x2d:  // STHU
 			if (G_RA(op) == 0)
 				return false;
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RS(op));
-			GPR_MODIFIED(desc, G_RA(op));
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RS(op));
+			desc.set_gpr_modified(G_RA(op));
 			desc.set_writes_memory();
 			return true;
 
 		case 0x2e:  // LMW
-			GPR_USED_OR_ZERO(desc, G_RA(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
 
 			for (regnum = G_RD(op); regnum < 32; regnum++)
 			{
 				if (regnum != G_RA(op) || ((m_ppc.m_cap & PPCCAP_4XX) && regnum == 31))
-					GPR_MODIFIED(desc, regnum);
+					desc.set_gpr_modified(regnum);
 			}
 			desc.set_reads_memory();
 			desc.cycles = 32 - G_RD(op);
 			return true;
 
 		case 0x2f:  // STMW
-			GPR_USED_OR_ZERO(desc, G_RA(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
 			for (regnum = G_RS(op); regnum < 32; regnum++)
-				GPR_USED(desc, regnum);
+				desc.set_gpr_used(regnum);
 			desc.set_writes_memory();
 			desc.cycles = 32 - G_RS(op);
 			return true;
@@ -344,8 +475,8 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case 0x32:  // LFD
 			if (!(m_ppc.m_cap & PPCCAP_FPU))
 				return false;
-			GPR_USED_OR_ZERO(desc, G_RA(op));
-			FPR_MODIFIED(desc, G_RD(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_fpr_modified(G_RD(op));
 			desc.set_reads_memory();
 			return true;
 
@@ -355,9 +486,9 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 				return false;
 			if (G_RA(op) == 0)
 				return false;
-			GPR_USED(desc, G_RA(op));
-			GPR_MODIFIED(desc, G_RA(op));
-			FPR_MODIFIED(desc, G_RD(op));
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_modified(G_RA(op));
+			desc.set_fpr_modified(G_RD(op));
 			desc.set_reads_memory();
 			return true;
 
@@ -365,8 +496,8 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case 0x36:  // STFD
 			if (!(m_ppc.m_cap & PPCCAP_FPU))
 				return false;
-			GPR_USED_OR_ZERO(desc, G_RA(op));
-			FPR_USED(desc, G_RS(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_fpr_used(G_RS(op));
 			desc.set_writes_memory();
 			return true;
 
@@ -376,9 +507,9 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 				return false;
 			if (G_RA(op) == 0)
 				return false;
-			GPR_USED(desc, G_RA(op));
-			GPR_MODIFIED(desc, G_RA(op));
-			FPR_USED(desc, G_RS(op));
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_modified(G_RA(op));
+			desc.set_fpr_used(G_RS(op));
 			desc.set_writes_memory();
 			return true;
 
@@ -406,24 +537,24 @@ bool ppc_device::frontend::describe_13(uint32_t op, opcode_desc &desc, const opc
 	switch (opswitch)
 	{
 		case 0x000: // MTCRF
-			CR_USED(desc, G_CRFS(op));
-			CR_MODIFIED(desc, G_CRFD(op));
+			desc.set_cr_used(G_CRFS(op));
+			desc.set_cr_modified(G_CRFD(op));
 			// CR logical folding
-			if (prev == nullptr || REGFLAG_CR(prev->regout) == 0)
+			if (!prev || (prev->cr_modified() == 0))
 				desc.cycles = 0;
 			return true;
 
 		case 0x010: // BCLRx
-			LR_USED(desc);
+			desc.set_lr_used();
 			if (!(G_BO(op) & 0x10))
-				CR_BIT_USED(desc, G_BI(op));
+				desc.set_cr_bit_used(G_BI(op));
 			if (!(G_BO(op) & 0x04))
 			{
-				CTR_USED(desc);
-				CTR_MODIFIED(desc);
+				desc.set_ctr_used();
+				desc.set_ctr_modified();
 			}
 			if (op & M_LK)
-				LR_MODIFIED(desc);
+				desc.set_lr_modified();
 			if ((G_BO(op) & 0x14) == 0x14)
 			{
 				desc.set_is_unconditional_branch();
@@ -444,11 +575,11 @@ bool ppc_device::frontend::describe_13(uint32_t op, opcode_desc &desc, const opc
 		case 0x121: // CREQV
 		case 0x1a1: // CRORC
 		case 0x1c1: // CROR
-			CR_BIT_USED(desc, G_CRBA(op));
-			CR_BIT_USED(desc, G_CRBB(op));
-			CR_BIT_MODIFIED(desc, G_CRBD(op));
+			desc.set_cr_bit_used(G_CRBA(op));
+			desc.set_cr_bit_used(G_CRBB(op));
+			desc.set_cr_bit_modified(G_CRBD(op));
 			// CR logical folding
-			if (prev == nullptr || REGFLAG_CR(prev->regout) == 0)
+			if (!prev || (prev->cr_modified() == 0))
 				desc.cycles = 0;
 			return true;
 
@@ -488,13 +619,13 @@ bool ppc_device::frontend::describe_13(uint32_t op, opcode_desc &desc, const opc
 			return true;
 
 		case 0x210: // BCCTRx
-			CTR_USED(desc);
+			desc.set_ctr_used();
 			if (!(G_BO(op) & 0x10))
-				CR_BIT_USED(desc, G_BI(op));
+				desc.set_cr_bit_used(G_BI(op));
 			if (!(G_BO(op) & 0x04))
 				return false;
 			if (op & M_LK)
-				LR_MODIFIED(desc);
+				desc.set_lr_modified();
 			if ((G_BO(op) & 0x14) == 0x14)
 			{
 				desc.set_is_unconditional_branch();
@@ -555,15 +686,15 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 
 		case 0x000: // CMP
 		case 0x020: // CMPL
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			XER_SO_USED(desc);
-			CR_MODIFIED(desc, G_CRFD(op));
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_xer_so_used();
+			desc.set_cr_modified(G_CRFD(op));
 			return true;
 
 		case 0x004: // TW
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
 			desc.set_can_cause_exception();
 			if (is_603_class())
 				desc.cycles = 2;    // 603
@@ -571,28 +702,28 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 
 		case 0x008: // SUBFCx
 		case 0x00a: // ADDCx
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RD(op));
-			XER_CA_MODIFIED(desc);
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RD(op));
+			desc.set_xer_ca_modified();
 			if (op & M_RC)
 			{
-				XER_SO_USED(desc);
-				CR_MODIFIED(desc, 0);
+				desc.set_xer_so_used();
+				desc.set_cr_modified(0);
 			}
 			return true;
 
 		case 0x088: // SUBFEx
 		case 0x08a: // ADDEx
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			XER_CA_USED(desc);
-			GPR_MODIFIED(desc, G_RD(op));
-			XER_CA_MODIFIED(desc);
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_xer_ca_used();
+			desc.set_gpr_modified(G_RD(op));
+			desc.set_xer_ca_modified();
 			if (op & M_RC)
 			{
-				XER_SO_USED(desc);
-				CR_MODIFIED(desc, 0);
+				desc.set_xer_so_used();
+				desc.set_cr_modified(0);
 			}
 			return true;
 
@@ -600,27 +731,27 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x0ca: // ADDZEx
 		case 0x0e8: // SUBFMEx
 		case 0x0ea: // ADDMEx
-			GPR_USED(desc, G_RA(op));
-			XER_CA_USED(desc);
-			GPR_MODIFIED(desc, G_RD(op));
-			XER_CA_MODIFIED(desc);
+			desc.set_gpr_used(G_RA(op));
+			desc.set_xer_ca_used();
+			desc.set_gpr_modified(G_RD(op));
+			desc.set_xer_ca_modified();
 			if (op & M_RC)
 			{
-				XER_SO_USED(desc);
-				CR_MODIFIED(desc, 0);
+				desc.set_xer_so_used();
+				desc.set_cr_modified(0);
 			}
 			return true;
 
 		case 0x00b: // MULHWUx
 		case 0x04b: // MULHWx
 		case 0x0eb: // MULLWx
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RD(op));
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RD(op));
 			if (op & M_RC)
 			{
-				XER_SO_USED(desc);
-				CR_MODIFIED(desc, 0);
+				desc.set_xer_so_used();
+				desc.set_cr_modified(0);
 			}
 			if (is_403_class())
 				desc.cycles = 4;    // 4XX
@@ -634,13 +765,13 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 
 		case 0x1cb: // DIVWUx
 		case 0x1eb: // DIVWx
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RD(op));
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RD(op));
 			if (op & M_RC)
 			{
-				XER_SO_USED(desc);
-				CR_MODIFIED(desc, 0);
+				desc.set_xer_so_used();
+				desc.set_cr_modified(0);
 			}
 			if (is_403_class())
 				desc.cycles = 33;   // 4XX
@@ -654,63 +785,63 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 
 		case 0x028: // SUBFx
 		case 0x10a: // ADDx
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RD(op));
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RD(op));
 			if (op & M_RC)
 			{
-				XER_SO_USED(desc);
-				CR_MODIFIED(desc, 0);
+				desc.set_xer_so_used();
+				desc.set_cr_modified(0);
 			}
 			return true;
 
 		case 0x208: // SUBFCOx
 		case 0x20a: // ADDCOx
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RD(op));
-			XER_OV_MODIFIED(desc);
-			XER_SO_MODIFIED(desc);
-			XER_CA_MODIFIED(desc);
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RD(op));
+			desc.set_xer_ov_modified();
+			desc.set_xer_so_modified();
+			desc.set_xer_ca_modified();
 			if (op & M_RC)
-				CR_MODIFIED(desc, 0);
+				desc.set_cr_modified(0);
 			return true;
 
 		case 0x288: // SUBFEOx
 		case 0x28a: // ADDEOx
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			XER_CA_USED(desc);
-			GPR_MODIFIED(desc, G_RD(op));
-			XER_OV_MODIFIED(desc);
-			XER_SO_MODIFIED(desc);
-			XER_CA_MODIFIED(desc);
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_xer_ca_used();
+			desc.set_gpr_modified(G_RD(op));
+			desc.set_xer_ov_modified();
+			desc.set_xer_so_modified();
+			desc.set_xer_ca_modified();
 			if (op & M_RC)
-				CR_MODIFIED(desc, 0);
+				desc.set_cr_modified(0);
 			return true;
 
 		case 0x2c8: // SUBFZEOx
 		case 0x2ca: // ADDZEOx
 		case 0x2e8: // SUBFMEOx
 		case 0x2ea: // ADDMEOx
-			GPR_USED(desc, G_RA(op));
-			XER_CA_USED(desc);
-			GPR_MODIFIED(desc, G_RD(op));
-			XER_OV_MODIFIED(desc);
-			XER_SO_MODIFIED(desc);
-			XER_CA_MODIFIED(desc);
+			desc.set_gpr_used(G_RA(op));
+			desc.set_xer_ca_used();
+			desc.set_gpr_modified(G_RD(op));
+			desc.set_xer_ov_modified();
+			desc.set_xer_so_modified();
+			desc.set_xer_ca_modified();
 			if (op & M_RC)
-				CR_MODIFIED(desc, 0);
+				desc.set_cr_modified(0);
 			return true;
 
 		case 0x2eb: // MULLWOx
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RD(op));
-			XER_OV_MODIFIED(desc);
-			XER_SO_MODIFIED(desc);
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RD(op));
+			desc.set_xer_ov_modified();
+			desc.set_xer_so_modified();
 			if (op & M_RC)
-				CR_MODIFIED(desc, 0);
+				desc.set_cr_modified(0);
 			if (is_403_class())
 				desc.cycles = 4;    // 4XX
 			else if (is_601_class())
@@ -723,13 +854,13 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 
 		case 0x3cb: // DIVWUOx
 		case 0x3eb: // DIVWOx
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RD(op));
-			XER_OV_MODIFIED(desc);
-			XER_SO_MODIFIED(desc);
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RD(op));
+			desc.set_xer_ov_modified();
+			desc.set_xer_so_modified();
 			if (op & M_RC)
-				CR_MODIFIED(desc, 0);
+				desc.set_cr_modified(0);
 			if (is_403_class())
 				desc.cycles = 33;   // 4XX
 			else if (is_601_class())
@@ -742,25 +873,25 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 
 		case 0x228: // SUBFOx
 		case 0x30a: // ADDOx
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RD(op));
-			XER_OV_MODIFIED(desc);
-			XER_SO_MODIFIED(desc);
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RD(op));
+			desc.set_xer_ov_modified();
+			desc.set_xer_so_modified();
 			if (op & M_RC)
-				CR_MODIFIED(desc, 0);
+				desc.set_cr_modified(0);
 			return true;
 
 		case 0x013: // MFCR
-			CR_USED(desc, 0);
-			CR_USED(desc, 1);
-			CR_USED(desc, 2);
-			CR_USED(desc, 3);
-			CR_USED(desc, 4);
-			CR_USED(desc, 5);
-			CR_USED(desc, 6);
-			CR_USED(desc, 7);
-			GPR_MODIFIED(desc, G_RD(op));
+			desc.set_cr_used(0);
+			desc.set_cr_used(1);
+			desc.set_cr_used(2);
+			desc.set_cr_used(3);
+			desc.set_cr_used(4);
+			desc.set_cr_used(5);
+			desc.set_cr_used(6);
+			desc.set_cr_used(7);
+			desc.set_gpr_modified(G_RD(op));
 			return true;
 
 		case 0x136: // ECIWX
@@ -774,9 +905,9 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x157: // LHAX
 		case 0x216: // LWBRX
 		case 0x316: // LHBRX
-			GPR_USED_OR_ZERO(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RD(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RD(op));
 			desc.set_reads_memory();
 			return true;
 
@@ -789,38 +920,38 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x19c: // ORCx
 		case 0x1bc: // ORx
 		case 0x1dc: // NANDx
-			GPR_USED(desc, G_RS(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RA(op));
+			desc.set_gpr_used(G_RS(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RA(op));
 			if (op & M_RC)
 			{
-				XER_SO_USED(desc);
-				CR_MODIFIED(desc, 0);
+				desc.set_xer_so_used();
+				desc.set_cr_modified(0);
 			}
 			return true;
 
 		case 0x218: // SRWx
 		case 0x318: // SRAWx
-			GPR_USED(desc, G_RS(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RA(op));
-			XER_CA_MODIFIED(desc);
+			desc.set_gpr_used(G_RS(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RA(op));
+			desc.set_xer_ca_modified();
 			if (op & M_RC)
 			{
-				XER_SO_USED(desc);
-				CR_MODIFIED(desc, 0);
+				desc.set_xer_so_used();
+				desc.set_cr_modified(0);
 			}
 			return true;
 
 		case 0x01a: // CNTLZWx
 		case 0x39a: // EXTSHx
 		case 0x3ba: // EXTSBx
-			GPR_USED(desc, G_RS(op));
-			GPR_MODIFIED(desc, G_RA(op));
+			desc.set_gpr_used(G_RS(op));
+			desc.set_gpr_modified(G_RA(op));
 			if (op & M_RC)
 			{
-				XER_SO_USED(desc);
-				CR_MODIFIED(desc, 0);
+				desc.set_xer_so_used();
+				desc.set_cr_modified(0);
 			}
 			return true;
 
@@ -832,15 +963,15 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x3d6: // ICBI
 			if (!(m_ppc.m_cap & (PPCCAP_VEA | PPCCAP_4XX)))
 				return false;
-			GPR_USED_OR_ZERO(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
 			return true;
 
 		case 0x1d6: // DCBI
 			if (!(m_ppc.m_cap & (PPCCAP_OEA | PPCCAP_4XX)))
 				return false;
-			GPR_USED_OR_ZERO(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
 			desc.set_can_cause_exception();
 			desc.set_privileged();
 			return true;
@@ -851,26 +982,26 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x177: // LHAUX
 			if (G_RA(op) == 0 || G_RA(op) == G_RD(op))
 				return false;
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RD(op));
-			GPR_MODIFIED(desc, G_RA(op));
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RD(op));
+			desc.set_gpr_modified(G_RA(op));
 			desc.set_reads_memory();
 			return true;
 
 		case 0x153: // MFSPR
-			GPR_MODIFIED(desc, G_RD(op));
+			desc.set_gpr_modified(G_RD(op));
 			spr = compute_spr(G_SPR(op));
 			if (spr == SPR_LR)
-				LR_USED(desc);
+				desc.set_lr_used();
 			if (spr == SPR_CTR)
-				CTR_USED(desc);
+				desc.set_ctr_used();
 			if (spr == SPR_XER)
 			{
-				XER_COUNT_USED(desc);
-				XER_CA_USED(desc);
-				XER_OV_USED(desc);
-				XER_SO_USED(desc);
+				desc.set_xer_count_used();
+				desc.set_xer_ca_used();
+				desc.set_xer_ov_used();
+				desc.set_xer_so_used();
 			}
 			if (spr & 0x010)
 			{
@@ -886,7 +1017,7 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 			return true;
 
 		case 0x053: // MFMSR
-			GPR_MODIFIED(desc, G_RD(op));
+			desc.set_gpr_modified(G_RD(op));
 			desc.set_can_cause_exception();
 			desc.set_can_expose_external_int();
 			desc.set_privileged();
@@ -895,14 +1026,14 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 			return true;
 
 		case 0x253: // MFSR
-			GPR_MODIFIED(desc, G_RD(op));
+			desc.set_gpr_modified(G_RD(op));
 			desc.set_can_cause_exception();
 			desc.set_privileged();
 			return true;
 
 		case 0x293: // MFSRIN
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RD(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RD(op));
 			desc.set_can_cause_exception();
 			desc.set_privileged();
 			return true;
@@ -910,45 +1041,45 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x173: // MFTB
 			if (!(m_ppc.m_cap & PPCCAP_VEA))
 				return false;
-			GPR_MODIFIED(desc, G_RD(op));
+			desc.set_gpr_modified(G_RD(op));
 			spr = compute_spr(G_SPR(op));
 			if (spr == SPRVEA_TBL_R)
 				desc.cycles = POWERPC_COUNT_READ_TBL;
 			return true;
 
 		case 0x068: // NEGx
-			GPR_USED(desc, G_RA(op));
-			GPR_MODIFIED(desc, G_RD(op));
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_modified(G_RD(op));
 			if (op & M_RC)
 			{
-				XER_SO_USED(desc);
-				CR_MODIFIED(desc, 0);
+				desc.set_xer_so_used();
+				desc.set_cr_modified(0);
 			}
 			return true;
 
 		case 0x268: // NEGOx
-			GPR_USED(desc, G_RA(op));
-			GPR_MODIFIED(desc, G_RD(op));
-			XER_OV_MODIFIED(desc);
-			XER_SO_MODIFIED(desc);
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_modified(G_RD(op));
+			desc.set_xer_ov_modified();
+			desc.set_xer_so_modified();
 			if (op & M_RC)
-				CR_MODIFIED(desc, 0);
+				desc.set_cr_modified(0);
 			return true;
 
 		case 0x090: // MTCRF
-			GPR_USED(desc, G_RS(op));
-			if (G_CRM(op) & 0x80) CR_MODIFIED(desc, 0);
-			if (G_CRM(op) & 0x40) CR_MODIFIED(desc, 1);
-			if (G_CRM(op) & 0x20) CR_MODIFIED(desc, 2);
-			if (G_CRM(op) & 0x10) CR_MODIFIED(desc, 3);
-			if (G_CRM(op) & 0x08) CR_MODIFIED(desc, 4);
-			if (G_CRM(op) & 0x04) CR_MODIFIED(desc, 5);
-			if (G_CRM(op) & 0x02) CR_MODIFIED(desc, 6);
-			if (G_CRM(op) & 0x01) CR_MODIFIED(desc, 7);
+			desc.set_gpr_used(G_RS(op));
+			if (G_CRM(op) & 0x80) desc.set_cr_modified(0);
+			if (G_CRM(op) & 0x40) desc.set_cr_modified(1);
+			if (G_CRM(op) & 0x20) desc.set_cr_modified(2);
+			if (G_CRM(op) & 0x10) desc.set_cr_modified(3);
+			if (G_CRM(op) & 0x08) desc.set_cr_modified(4);
+			if (G_CRM(op) & 0x04) desc.set_cr_modified(5);
+			if (G_CRM(op) & 0x02) desc.set_cr_modified(6);
+			if (G_CRM(op) & 0x01) desc.set_cr_modified(7);
 			return true;
 
 		case 0x092: // MTMSR
-			GPR_USED(desc, G_RS(op));
+			desc.set_gpr_used(G_RS(op));
 			desc.set_can_cause_exception();
 			desc.set_end_sequence();
 			desc.set_privileged();
@@ -962,24 +1093,24 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x0d2: // MTSR
 			if (!(m_ppc.m_cap & PPCCAP_OEA))
 				return false;
-			GPR_USED(desc, G_RS(op));
+			desc.set_gpr_used(G_RS(op));
 			desc.set_can_cause_exception();
 			desc.set_privileged();
 			return true;
 
 		case 0x1d3: // MTSPR
-			GPR_USED(desc, G_RS(op));
+			desc.set_gpr_used(G_RS(op));
 			spr = compute_spr(G_SPR(op));
 			if (spr == SPR_LR)
-				LR_MODIFIED(desc);
+				desc.set_lr_modified();
 			if (spr == SPR_CTR)
-				CTR_MODIFIED(desc);
+				desc.set_ctr_modified();
 			if (spr == SPR_XER)
 			{
-				XER_COUNT_MODIFIED(desc);
-				XER_CA_MODIFIED(desc);
-				XER_OV_MODIFIED(desc);
-				XER_SO_MODIFIED(desc);
+				desc.set_xer_count_modified();
+				desc.set_xer_ca_modified();
+				desc.set_xer_ov_modified();
+				desc.set_xer_so_modified();
 			}
 			if (spr & 0x010)
 			{
@@ -998,9 +1129,9 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x197: // STHX
 		case 0x296: // STWBRX
 		case 0x396: // STHBRX
-			GPR_USED_OR_ZERO(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_USED(desc, G_RS(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_used(G_RS(op));
 			desc.set_writes_memory();
 			return true;
 
@@ -1009,18 +1140,18 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x1b7: // STHUX
 			if (G_RA(op) == 0)
 				return false;
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_USED(desc, G_RS(op));
-			GPR_MODIFIED(desc, G_RA(op));
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_used(G_RS(op));
+			desc.set_gpr_modified(G_RA(op));
 			desc.set_writes_memory();
 			return true;
 
 		case 0x0f2: // MTSRIN
 			if (!(m_ppc.m_cap & PPCCAP_OEA))
 				return false;
-			GPR_USED(desc, G_RS(op));
-			GPR_USED(desc, G_RB(op));
+			desc.set_gpr_used(G_RS(op));
+			desc.set_gpr_used(G_RB(op));
 			desc.set_can_cause_exception();
 			desc.set_privileged();
 			return true;
@@ -1028,7 +1159,7 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x132: // TLBIE
 			if (!(m_ppc.m_cap & PPCCAP_OEA))
 				return false;
-			GPR_USED(desc, G_RB(op));
+			desc.set_gpr_used(G_RB(op));
 			desc.set_can_cause_exception();
 			desc.set_privileged();
 			return true;
@@ -1049,21 +1180,21 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 			return true;
 
 		case 0x200: // MCRXR
-			XER_CA_USED(desc);
-			XER_OV_USED(desc);
-			XER_SO_USED(desc);
-			CR_MODIFIED(desc, G_CRFD(op));
-			XER_CA_MODIFIED(desc);
-			XER_OV_MODIFIED(desc);
-			XER_SO_MODIFIED(desc);
+			desc.set_xer_ca_used();
+			desc.set_xer_ov_used();
+			desc.set_xer_so_used();
+			desc.set_cr_modified(G_CRFD(op));
+			desc.set_xer_ca_modified();
+			desc.set_xer_ov_modified();
+			desc.set_xer_so_modified();
 			return true;
 
 		case 0x215: // LSWX
-			GPR_USED_OR_ZERO(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			XER_COUNT_USED(desc);
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_xer_count_used();
 			for (regnum = 0; regnum < 32; regnum++)
-				GPR_MODIFIED(desc, regnum);
+				desc.set_gpr_modified(regnum);
 			desc.set_reads_memory();
 			return true;
 
@@ -1071,9 +1202,9 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x257: // LFDX
 			if (!(m_ppc.m_cap & PPCCAP_FPU))
 				return false;
-			GPR_USED_OR_ZERO(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			FPR_MODIFIED(desc, G_RD(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_fpr_modified(G_RD(op));
 			desc.set_reads_memory();
 			return true;
 
@@ -1098,34 +1229,34 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 				return false;
 			if (G_RA(op) == 0)
 				return false;
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RA(op));
-			FPR_MODIFIED(desc, G_RD(op));
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RA(op));
+			desc.set_fpr_modified(G_RD(op));
 			desc.set_reads_memory();
 			return true;
 
 		case 0x255: // LSWI
-			GPR_USED_OR_ZERO(desc, G_RA(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
 			for (regnum = 0; regnum < ((G_NB(op) - 1) & 0x1f) + 1; regnum += 4)
-				GPR_MODIFIED(desc, (G_RD(op) + regnum / 4) % 32);
+				desc.set_gpr_modified((G_RD(op) + regnum / 4) % 32);
 			desc.set_reads_memory();
 			desc.cycles = (((G_NB(op) - 1) & 0x1f) + 1 + 3) / 4;
 			return true;
 
 		case 0x295: // STSWX
-			GPR_USED_OR_ZERO(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			XER_COUNT_USED(desc);
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_xer_count_used();
 			for (regnum = 0; regnum < 32; regnum++)
-				GPR_USED(desc, regnum);
+				desc.set_gpr_used(regnum);
 			desc.set_writes_memory();
 			return true;
 
 		case 0x2d5: // STSWI
-			GPR_USED_OR_ZERO(desc, G_RA(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
 			for (regnum = 0; regnum < ((G_NB(op) - 1) & 0x1f) + 1; regnum += 4)
-				GPR_USED(desc, (G_RD(op) + regnum / 4) % 32);
+				desc.set_gpr_used((G_RD(op) + regnum / 4) % 32);
 			desc.set_writes_memory();
 			desc.cycles = (((G_NB(op) - 1) & 0x1f) + 1 + 3) / 4;
 			return true;
@@ -1135,9 +1266,9 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x3d7: // STFIWX
 			if (!(m_ppc.m_cap & PPCCAP_FPU))
 				return false;
-			GPR_USED_OR_ZERO(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			FPR_USED(desc, G_RS(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_fpr_used(G_RS(op));
 			desc.set_writes_memory();
 			return true;
 
@@ -1147,29 +1278,29 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 				return false;
 			if (G_RA(op) == 0)
 				return false;
-			GPR_USED_OR_ZERO(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RA(op));
-			FPR_USED(desc, G_RS(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RA(op));
+			desc.set_fpr_used(G_RS(op));
 			desc.set_writes_memory();
 			return true;
 
 		case 0x338: // SRAWIx
-			GPR_USED(desc, G_RS(op));
-			GPR_MODIFIED(desc, G_RA(op));
-			XER_CA_MODIFIED(desc);
+			desc.set_gpr_used(G_RS(op));
+			desc.set_gpr_modified(G_RA(op));
+			desc.set_xer_ca_modified();
 			if (op & M_RC)
 			{
-				XER_SO_USED(desc);
-				CR_MODIFIED(desc, 0);
+				desc.set_xer_so_used();
+				desc.set_cr_modified(0);
 			}
 			return true;
 
 		case 0x3f6: // DCBZ
 			if (!(m_ppc.m_cap & (PPCCAP_VEA | PPCCAP_4XX)))
 				return false;
-			GPR_USED_OR_ZERO(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
 			desc.set_writes_memory();
 			return true;
 
@@ -1178,8 +1309,8 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x3c6: // ICCCI
 			if (!(m_ppc.m_cap & PPCCAP_4XX))
 				return false;
-			GPR_USED_OR_ZERO(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
 			desc.set_can_cause_exception();
 			desc.set_privileged();
 			return true;
@@ -1188,9 +1319,9 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x3e6: // ICREAD
 			if (!(m_ppc.m_cap & PPCCAP_4XX))
 				return false;
-			GPR_USED_OR_ZERO(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RT(op));
+			desc.set_gpr_used_or_zero(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RT(op));
 			desc.set_can_cause_exception();
 			desc.set_privileged();
 			return true;
@@ -1198,7 +1329,7 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x143: // MFDCR
 			if (!(m_ppc.m_cap & PPCCAP_4XX))
 				return false;
-			GPR_MODIFIED(desc, G_RD(op));
+			desc.set_gpr_modified(G_RD(op));
 			desc.set_can_cause_exception();
 			desc.set_privileged();
 			return true;
@@ -1206,7 +1337,7 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x1c3: // MTDCR
 			if (!(m_ppc.m_cap & PPCCAP_4XX))
 				return false;
-			GPR_USED(desc, G_RS(op));
+			desc.set_gpr_used(G_RS(op));
 			desc.set_can_cause_exception();
 			desc.set_can_expose_external_int();
 			desc.set_privileged();
@@ -1215,7 +1346,7 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x083: // WRTEE
 			if (!(m_ppc.m_cap & PPCCAP_4XX))
 				return false;
-			GPR_USED(desc, G_RS(op));
+			desc.set_gpr_used(G_RS(op));
 			desc.set_can_expose_external_int();
 			return true;
 
@@ -1242,13 +1373,13 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 				return false;
 			}
 
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RD(op));
-			XER_OV_MODIFIED(desc);
-			XER_SO_MODIFIED(desc);
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RD(op));
+			desc.set_xer_ov_modified();
+			desc.set_xer_so_modified();
 			if (op & M_RC)
-				CR_MODIFIED(desc, 0);
+				desc.set_cr_modified(0);
 			return true;
 
 		case 0x6b: // MUL (POWER)
@@ -1257,13 +1388,13 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 				return false;
 			}
 
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RD(op));
-			XER_OV_MODIFIED(desc);
-			XER_SO_MODIFIED(desc);
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RD(op));
+			desc.set_xer_ov_modified();
+			desc.set_xer_so_modified();
 			if (op & M_RC)
-				CR_MODIFIED(desc, 0);
+				desc.set_cr_modified(0);
 			return true;
 
 		case 0x108: // DOZ (POWER)
@@ -1272,13 +1403,13 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 				return false;
 			}
 
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RD(op));
-			XER_OV_MODIFIED(desc);
-			XER_SO_MODIFIED(desc);
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RD(op));
+			desc.set_xer_ov_modified();
+			desc.set_xer_so_modified();
 			if (op & M_RC)
-				CR_MODIFIED(desc, 0);
+				desc.set_cr_modified(0);
 			return true;
 
 		case 0x168: // ABS (POWER)
@@ -1288,13 +1419,13 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 				return false;
 			}
 
-			GPR_USED(desc, G_RA(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RD(op));
-			XER_OV_MODIFIED(desc);
-			XER_SO_MODIFIED(desc);
+			desc.set_gpr_used(G_RA(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RD(op));
+			desc.set_xer_ov_modified();
+			desc.set_xer_so_modified();
 			if (op & M_RC)
-				CR_MODIFIED(desc, 0);
+				desc.set_cr_modified(0);
 			return true;
 
 		case 0x21d: // MASKIR (POWER)
@@ -1303,11 +1434,11 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 				return false;
 			}
 
-			GPR_USED(desc, G_RS(op));
-			GPR_USED(desc, G_RB(op));
-			GPR_MODIFIED(desc, G_RA(op));
+			desc.set_gpr_used(G_RS(op));
+			desc.set_gpr_used(G_RB(op));
+			desc.set_gpr_modified(G_RA(op));
 			if (op & M_RC)
-				CR_MODIFIED(desc, 0);
+				desc.set_cr_modified(0);
 			return true;
 	}
 
@@ -1331,59 +1462,59 @@ bool ppc_device::frontend::describe_3b(uint32_t op, opcode_desc &desc, const opc
 	switch (opswitch)
 	{
 		case 0x12:  // FDIVSx
-			FPR_USED(desc, G_RA(op));
-			FPR_USED(desc, G_RB(op));
-			FPR_MODIFIED(desc, G_RD(op));
+			desc.set_fpr_used(G_RA(op));
+			desc.set_fpr_used(G_RB(op));
+			desc.set_fpr_modified(G_RD(op));
 			if (op & M_RC)
-				CR_MODIFIED(desc, 1);
+				desc.set_cr_modified(1);
 			if (is_601_class())
 				desc.cycles = 17;   // 601
 			else if (is_603_class())
 				desc.cycles = 18;   // 603
 			else
 				desc.cycles = 17;   // ???
-			FPSCR_MODIFIED(desc, 4);
+			desc.set_fpscr_modified(4);
 			return true;
 
 		case 0x14:  // FSUBSx
 		case 0x15:  // FADDSx
-			FPR_USED(desc, G_RA(op));
-			FPR_USED(desc, G_RB(op));
-			FPR_MODIFIED(desc, G_RD(op));
+			desc.set_fpr_used(G_RA(op));
+			desc.set_fpr_used(G_RB(op));
+			desc.set_fpr_modified(G_RD(op));
 			if (op & M_RC)
-				CR_MODIFIED(desc, 1);
-			FPSCR_MODIFIED(desc, 4);
+				desc.set_cr_modified(1);
+			desc.set_fpscr_modified(4);
 			return true;
 
 		case 0x19:  // FMULSx - not the same form as FSUB/FADD!
-			FPR_USED(desc, G_RA(op));
-			FPR_USED(desc, G_REGC(op));
-			FPR_MODIFIED(desc, G_RD(op));
+			desc.set_fpr_used(G_RA(op));
+			desc.set_fpr_used(G_REGC(op));
+			desc.set_fpr_modified(G_RD(op));
 			if (op & M_RC)
-				CR_MODIFIED(desc, 1);
-			FPSCR_MODIFIED(desc, 4);
+				desc.set_cr_modified(1);
+			desc.set_fpscr_modified(4);
 			return true;
 
 		case 0x16:  // FSQRTSx
 		case 0x18:  // FRESx
-			FPR_USED(desc, G_RB(op));
-			FPR_MODIFIED(desc, G_RD(op));
+			desc.set_fpr_used(G_RB(op));
+			desc.set_fpr_modified(G_RD(op));
 			if (op & M_RC)
-				CR_MODIFIED(desc, 1);
-			FPSCR_MODIFIED(desc, 4);
+				desc.set_cr_modified(1);
+			desc.set_fpscr_modified(4);
 			return true;
 
 		case 0x1c:  // FMSUBSx
 		case 0x1d:  // FMADDSx
 		case 0x1e:  // FNMSUBSx
 		case 0x1f:  // FNMADDSx
-			FPR_USED(desc, G_RA(op));
-			FPR_USED(desc, G_RB(op));
-			FPR_USED(desc, G_REGC(op));
-			FPR_MODIFIED(desc, G_RD(op));
+			desc.set_fpr_used(G_RA(op));
+			desc.set_fpr_used(G_RB(op));
+			desc.set_fpr_used(G_REGC(op));
+			desc.set_fpr_modified(G_RD(op));
 			if (op & M_RC)
-				CR_MODIFIED(desc, 1);
-			FPSCR_MODIFIED(desc, 4);
+				desc.set_cr_modified(1);
+			desc.set_fpscr_modified(4);
 			return true;
 	}
 
@@ -1410,56 +1541,56 @@ bool ppc_device::frontend::describe_3f(uint32_t op, opcode_desc &desc, const opc
 		switch (opswitch)
 		{
 			case 0x12:  // FDIVx
-				FPR_USED(desc, G_RA(op));
-				FPR_USED(desc, G_RB(op));
-				FPR_MODIFIED(desc, G_RD(op));
+				desc.set_fpr_used(G_RA(op));
+				desc.set_fpr_used(G_RB(op));
+				desc.set_fpr_modified(G_RD(op));
 				if (op & M_RC)
-					CR_MODIFIED(desc, 1);
+					desc.set_cr_modified(1);
 				if (is_601_class())
 					desc.cycles = 31;   // 601
 				else if (is_603_class())
 					desc.cycles = 33;   // 603
 				else
 					desc.cycles = 31;   // ???
-				FPSCR_MODIFIED(desc, 4);
+				desc.set_fpscr_modified(4);
 				return true;
 
 			case 0x19:  // FMULx
-				FPR_USED(desc, G_RA(op));
-				FPR_USED(desc, G_REGC(op));
-				FPR_MODIFIED(desc, G_RD(op));
+				desc.set_fpr_used(G_RA(op));
+				desc.set_fpr_used(G_REGC(op));
+				desc.set_fpr_modified(G_RD(op));
 				if (op & M_RC)
-					CR_MODIFIED(desc, 1);
+					desc.set_cr_modified(1);
 				desc.cycles = 2;    // 601/603
-				FPSCR_MODIFIED(desc, 4);
+				desc.set_fpscr_modified(4);
 				return true;
 
 			case 0x14:  // FSUBx
 			case 0x15:  // FADDx
-				FPR_USED(desc, G_RA(op));
-				FPR_USED(desc, G_RB(op));
-				FPR_MODIFIED(desc, G_RD(op));
+				desc.set_fpr_used(G_RA(op));
+				desc.set_fpr_used(G_RB(op));
+				desc.set_fpr_modified(G_RD(op));
 				if (op & M_RC)
-					CR_MODIFIED(desc, 1);
-				FPSCR_MODIFIED(desc, 4);
+					desc.set_cr_modified(1);
+				desc.set_fpscr_modified(4);
 				return true;
 
 			case 0x16:  // FSQRTx
 			case 0x1a:  // FSQRTEx
-				FPR_USED(desc, G_RB(op));
-				FPR_MODIFIED(desc, G_RD(op));
+				desc.set_fpr_used(G_RB(op));
+				desc.set_fpr_modified(G_RD(op));
 				if (op & M_RC)
-					CR_MODIFIED(desc, 1);
-				FPSCR_MODIFIED(desc, 4);
+					desc.set_cr_modified(1);
+				desc.set_fpscr_modified(4);
 				return true;
 
 			case 0x17:  // FSELx
-				FPR_USED(desc, G_RA(op));
-				FPR_USED(desc, G_RB(op));
-				FPR_USED(desc, G_REGC(op));
-				FPR_MODIFIED(desc, G_RD(op));
+				desc.set_fpr_used(G_RA(op));
+				desc.set_fpr_used(G_RB(op));
+				desc.set_fpr_used(G_REGC(op));
+				desc.set_fpr_modified(G_RD(op));
 				if (op & M_RC)
-					CR_MODIFIED(desc, 1);
+					desc.set_cr_modified(1);
 				desc.cycles = 2;    // 601/603
 				return true;
 
@@ -1467,14 +1598,14 @@ bool ppc_device::frontend::describe_3f(uint32_t op, opcode_desc &desc, const opc
 			case 0x1d:  // FMADDx
 			case 0x1e:  // FNMSUBx
 			case 0x1f:  // FNMADDx
-				FPR_USED(desc, G_RA(op));
-				FPR_USED(desc, G_RB(op));
-				FPR_USED(desc, G_REGC(op));
-				FPR_MODIFIED(desc, G_RD(op));
+				desc.set_fpr_used(G_RA(op));
+				desc.set_fpr_used(G_RB(op));
+				desc.set_fpr_used(G_REGC(op));
+				desc.set_fpr_modified(G_RD(op));
 				if (op & M_RC)
-					CR_MODIFIED(desc, 1);
+					desc.set_cr_modified(1);
 				desc.cycles = 2;    // 601/603
-				FPSCR_MODIFIED(desc, 4);
+				desc.set_fpscr_modified(4);
 				return true;
 		}
 	}
@@ -1489,62 +1620,62 @@ bool ppc_device::frontend::describe_3f(uint32_t op, opcode_desc &desc, const opc
 
 			case 0x000: // FCMPU
 			case 0x020: // FCMPO
-				FPR_USED(desc, G_RA(op));
-				FPR_USED(desc, G_RB(op));
-				CR_MODIFIED(desc, G_CRFD(op));
+				desc.set_fpr_used(G_RA(op));
+				desc.set_fpr_used(G_RB(op));
+				desc.set_cr_modified(G_CRFD(op));
 				return true;
 
 			case 0x00c: // FRSPx
 			case 0x00e: // FCTIWx
 			case 0x00f: // FCTIWZx
-				FPSCR_MODIFIED(desc, 4);
+				desc.set_fpscr_modified(4);
 				[[fallthrough]];
 			case 0x028: // FNEGx
 			case 0x048: // FMRx
 			case 0x088: // FNABSx
 			case 0x108: // FABSx
-				FPR_USED(desc, G_RB(op));
-				FPR_MODIFIED(desc, G_RD(op));
+				desc.set_fpr_used(G_RB(op));
+				desc.set_fpr_modified(G_RD(op));
 				if (op & M_RC)
-					CR_MODIFIED(desc, 1);
+					desc.set_cr_modified(1);
 				return true;
 
 			case 0x026: // MTFSB1x
 			case 0x046: // MTFSB0x
-				FPSCR_MODIFIED(desc, G_CRBD(op) / 4);
+				desc.set_fpscr_modified(G_CRBD(op) / 4);
 				return true;
 
 			case 0x040: // MCRFS
-				FPSCR_USED(desc, G_CRFS(op));
-				CR_MODIFIED(desc, G_CRFD(op));
+				desc.set_fpscr_used(G_CRFS(op));
+				desc.set_cr_modified(G_CRFD(op));
 				return true;
 
 			case 0x086: // MTFSFIx
-				FPSCR_MODIFIED(desc, G_CRFD(op));
+				desc.set_fpscr_modified(G_CRFD(op));
 				return true;
 
 			case 0x247: // MFFSx
-				FPSCR_USED(desc, 0);
-				FPSCR_USED(desc, 1);
-				FPSCR_USED(desc, 2);
-				FPSCR_USED(desc, 3);
-				FPSCR_USED(desc, 4);
-				FPSCR_USED(desc, 5);
-				FPSCR_USED(desc, 6);
-				FPSCR_USED(desc, 7);
-				FPR_MODIFIED(desc, G_RD(op));
+				desc.set_fpscr_used(0);
+				desc.set_fpscr_used(1);
+				desc.set_fpscr_used(2);
+				desc.set_fpscr_used(3);
+				desc.set_fpscr_used(4);
+				desc.set_fpscr_used(5);
+				desc.set_fpscr_used(6);
+				desc.set_fpscr_used(7);
+				desc.set_fpr_modified(G_RD(op));
 				return true;
 
 			case 0x2c7: // MTFSFx
-				FPR_USED(desc, G_RB(op));
-				if (G_CRM(op) & 0x80) FPSCR_MODIFIED(desc, 0);
-				if (G_CRM(op) & 0x40) FPSCR_MODIFIED(desc, 1);
-				if (G_CRM(op) & 0x20) FPSCR_MODIFIED(desc, 2);
-				if (G_CRM(op) & 0x10) FPSCR_MODIFIED(desc, 3);
-				if (G_CRM(op) & 0x08) FPSCR_MODIFIED(desc, 4);
-				if (G_CRM(op) & 0x04) FPSCR_MODIFIED(desc, 5);
-				if (G_CRM(op) & 0x02) FPSCR_MODIFIED(desc, 6);
-				if (G_CRM(op) & 0x01) FPSCR_MODIFIED(desc, 7);
+				desc.set_fpr_used(G_RB(op));
+				if (G_CRM(op) & 0x80) desc.set_fpscr_modified(0);
+				if (G_CRM(op) & 0x40) desc.set_fpscr_modified(1);
+				if (G_CRM(op) & 0x20) desc.set_fpscr_modified(2);
+				if (G_CRM(op) & 0x10) desc.set_fpscr_modified(3);
+				if (G_CRM(op) & 0x08) desc.set_fpscr_modified(4);
+				if (G_CRM(op) & 0x04) desc.set_fpscr_modified(5);
+				if (G_CRM(op) & 0x02) desc.set_fpscr_modified(6);
+				if (G_CRM(op) & 0x01) desc.set_fpscr_modified(7);
 				return true;
 		}
 	}

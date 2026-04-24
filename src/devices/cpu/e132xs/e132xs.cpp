@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
 /********************************************************************
- Hyperstone cpu emulator
+ Hyperstone E1 CPU emulator
  written by Pierpaolo Prazzoli
 
  Hyperstone models:
@@ -91,9 +91,9 @@
 
 #include "emu.h"
 #include "e132xs.h"
-#include "e132xsfe.h"
 
-#include "32xsdefs.h"
+#include "e1defs.h"
+#include "e1fe.h"
 
 #include "emuopts.h"
 
@@ -160,6 +160,7 @@ hyperstone_device::hyperstone_device(
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map)
 	, m_io_config("io", ENDIANNESS_BIG, io_data_width, io_addr_bits, (io_data_width == 16) ? -1 : -2)
+	, m_disassembler(nullptr) // for logging - pass nullptr so output doesn't depend on state
 	, m_cache(CACHE_SIZE + sizeof(internal_hyperstone_state))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)

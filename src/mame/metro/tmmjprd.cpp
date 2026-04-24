@@ -11,8 +11,8 @@
    (basically the physical tile rom addressing doesn't change between modes even if the data type does)
    (handling this in the tilemap system is very messy, might just be best with custom renderer)
 
- - Rom Test not hooked up (can read the gfx roms via a BANK
-    - should hook this up as a test to help determine if the tmpdoki roms should really be different
+ - ROM Test not hooked up (can read the gfx roms via a BANK
+    - should hook this up as a test to help determine if the tmpdoki ROMs should really be different
 
  - EEPROM might be wrong, pressing what might be coin3 causes the game to hang
    (see input ports)
@@ -27,10 +27,14 @@
 
 
 #include "emu.h"
+
+#include "mahjong.h"
+
 #include "cpu/m68000/m68020.h"
 #include "machine/eepromser.h"
 #include "machine/timer.h"
 #include "sound/i5000.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -58,8 +62,7 @@ public:
 #endif
 		m_spriteram(*this, "spriteram"),
 		m_gfxroms(*this, "gfx2"),
-		m_pl1(*this, "PL1.%u", 1),
-		m_pl2(*this, "PL2.%u", 1),
+		m_pl(*this, "KEY%u", 0),
 		m_system(*this, "SYSTEM")
 	{ }
 
@@ -85,8 +88,7 @@ private:
 
 	required_region_ptr<uint8_t> m_gfxroms;
 
-	required_ioport_array<5> m_pl1;
-	required_ioport_array<5> m_pl2;
+	required_ioport_array<10> m_pl;
 	required_ioport m_system;
 
 	std::unique_ptr<uint32_t[]> m_tilemap_ram[4];
@@ -539,16 +541,14 @@ uint32_t tmmjprd_state::mux_r()
 {
 	m_system_in = m_system->read();
 
-	switch(m_mux_data)
+	uint32_t result = 0xffffff00 | (m_system->read() & 0xff);
+	for (unsigned i = 0; 5 > i; ++i)
 	{
-		case 0x01: return (m_system_in & 0xff) | m_pl1[0]->read()<<8 | m_pl2[0]->read()<<16 | 0xff000000;
-		case 0x02: return (m_system_in & 0xff) | m_pl1[1]->read()<<8 | m_pl2[1]->read()<<16 | 0xff000000;
-		case 0x04: return (m_system_in & 0xff) | m_pl1[2]->read()<<8 | m_pl2[2]->read()<<16 | 0xff000000;
-		case 0x08: return (m_system_in & 0xff) | m_pl1[3]->read()<<8 | m_pl2[3]->read()<<16 | 0xff000000;
-		case 0x10: return (m_system_in & 0xff) | m_pl1[4]->read()<<8 | m_pl2[4]->read()<<16 | 0xff000000;
+		if (BIT(m_mux_data, i))
+			result &= 0xffc0c0ff | (m_pl[i]->read() << 8) | (m_pl[i + 5]->read() << 16);
 	}
 
-	return (m_system_in & 0xff) | 0xffffff00;
+	return result;
 }
 
 static INPUT_PORTS_START( tmmjprd )
@@ -562,79 +562,7 @@ static INPUT_PORTS_START( tmmjprd )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))   // CHECK!
 
-	PORT_START("PL1.1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("PL1.2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) //bet button
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("PL1.3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("PL1.4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(1)
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("PL1.5")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("PL2.1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("PL2.2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) //bet button
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("PL2.3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("PL2.4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("PL2.5")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_INCLUDE(mahjong_matrix_2p)
 INPUT_PORTS_END
 
 

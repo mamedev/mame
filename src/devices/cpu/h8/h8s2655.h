@@ -9,7 +9,6 @@
     They're both H8S/2600-based mcus, with 128K internal rom for the 2655
     and 64K for the 2653.
 
-
 ***************************************************************************/
 
 #ifndef MAME_CPU_H8_H8S2655_H

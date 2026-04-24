@@ -697,7 +697,7 @@ void mpc2000_state::mpc2000(machine_config &config)
 	scsi.set_external_device(7, spc);
 	spc.out_irq_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 	spc.out_dreq_callback().set(m_maincpu, FUNC(v53a_device::dreq_w<0>));
-	
+
 	TIMER(config, "dialtimer").configure_periodic(FUNC(mpc2000_state::dial_timer_tick), attotime::from_hz(60.0));
 
 	SPEAKER(config, "speaker", 2).front();

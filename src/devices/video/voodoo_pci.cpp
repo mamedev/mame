@@ -122,6 +122,8 @@ void voodoo_1_pci_device::device_start()
 	status = 0;
 
 	// no max_gnt / max_lat (hardwired to 0, cannot bus master)
+	minimum_grant = 0x00;
+	maximum_latency = 0x00;
 
 	intr_line = 5;
 	// INTA#

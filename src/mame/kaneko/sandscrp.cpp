@@ -116,10 +116,10 @@ private:
 
 	required_memory_bank m_audiobank;
 
-	u8 m_sprite_irq;
-	u8 m_unknown_irq;
-	u8 m_vblank_irq;
-	bool m_latch_full[2];
+	u8 m_sprite_irq = 0;
+	u8 m_unknown_irq = 0;
+	u8 m_vblank_irq = 0;
+	bool m_latch_full[2]{};
 
 	u8 irq_cause_r();
 	void irq_cause_w(u8 data);
@@ -152,17 +152,17 @@ u32 sandscrp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	m_view2->prepare(bitmap, cliprect);
 
-	for ( int l = 0; l < 4; l++ )
+	for (int l = 0; l < 4; l++)
 	{
-		m_view2->render_tilemap(screen,bitmap,cliprect,l);
+		m_view2->render_tilemap(screen, bitmap, cliprect, l);
 	}
 
 	// copy sprite bitmap to screen
 	m_pandora->update(bitmap, cliprect);
 
-	for ( int h = 4; h < 8; h++ ) // high bit of tile priority : above sprites
+	for (int h = 4; h < 8; h++) // high bit of tile priority : above sprites
 	{
-		m_view2->render_tilemap(screen,bitmap,cliprect,h);
+		m_view2->render_tilemap(screen, bitmap, cliprect, h);
 	}
 
 	return 0;
@@ -212,21 +212,24 @@ void sandscrp_state::screen_vblank(int state)
 /* Reads the cause of the interrupt */
 u8 sandscrp_state::irq_cause_r()
 {
-	return  ( m_sprite_irq  ?  0x08  : 0 ) |
-			( m_unknown_irq ?  0x10  : 0 ) |
-			( m_vblank_irq  ?  0x20  : 0 ) ;
+	return  (m_sprite_irq  ?  0x08  : 0) |
+			(m_unknown_irq ?  0x10  : 0) |
+			(m_vblank_irq  ?  0x20  : 0);
 }
 
 
 /* Clear the cause of the interrupt */
 void sandscrp_state::irq_cause_w(u8 data)
 {
-//  m_sprite_flipx  =   data & 1;
-//  m_sprite_flipy  =   data & 1;
+//  m_sprite_flipx = BIT(data, 0);
+//  m_sprite_flipy = BIT(data, 0);
 
-	if (BIT(data, 3))    m_sprite_irq  = 0;
-	if (BIT(data, 4))    m_unknown_irq = 0;
-	if (BIT(data, 5))    m_vblank_irq  = 0;
+	if (BIT(data, 3))
+		m_sprite_irq  = 0;
+	if (BIT(data, 4))
+		m_unknown_irq = 0;
+	if (BIT(data, 5))
+		m_vblank_irq  = 0;
 
 	update_irq_state();
 }
@@ -246,7 +249,7 @@ void sandscrp_state::coincounter_w(u8 data)
 u8 sandscrp_state::latchstatus_68k_r()
 {
 	return  (m_latch_full[0] ? 0x80 : 0) |
-			(m_latch_full[1] ? 0x40 : 0) ;
+			(m_latch_full[1] ? 0x40 : 0);
 }
 
 void sandscrp_state::latchstatus_68k_w(u8 data)
@@ -275,10 +278,10 @@ void sandscrp_state::sandscrp_mem(address_map &map)
 	map(0x000000, 0x07ffff).rom();     // ROM
 	map(0x100001, 0x100001).w(FUNC(sandscrp_state::irq_cause_w)); // IRQ Ack
 
-	map(0x200000, 0x20001f).rw("calc1_mcu", FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
+	map(0x200000, 0x20001f).rw("calc1", FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
 	map(0x300000, 0x30001f).rw(m_view2, FUNC(kaneko_view2_tilemap_device::regs_r), FUNC(kaneko_view2_tilemap_device::regs_w));
 	map(0x400000, 0x403fff).m(m_view2, FUNC(kaneko_view2_tilemap_device::vram_map));
-	map(0x500000, 0x501fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_LSB_r), FUNC(kaneko_pandora_device::spriteram_LSB_w)); // sprites
+	map(0x500000, 0x501fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_lsb_r), FUNC(kaneko_pandora_device::spriteram_lsb_w)); // sprites
 	map(0x600000, 0x600fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0x700000, 0x70ffff).ram();     // RAM
 	map(0x800001, 0x800001).r(FUNC(sandscrp_state::irq_cause_r));  // IRQ Cause
@@ -305,13 +308,13 @@ void sandscrp_state::bankswitch_w(u8 data)
 u8 sandscrp_state::latchstatus_r()
 {
 	return  (m_latch_full[1] ? 0x80 : 0) |    // swapped!?
-			(m_latch_full[0] ? 0x40 : 0) ;
+			(m_latch_full[0] ? 0x40 : 0);
 }
 
 void sandscrp_state::sandscrp_soundmem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();     // ROM
-	map(0x8000, 0xbfff).bankr("audiobank");    // Banked ROM
+	map(0x8000, 0xbfff).bankr(m_audiobank);    // Banked ROM
 	map(0xc000, 0xdfff).ram();     // RAM
 }
 
@@ -461,7 +464,7 @@ void sandscrp_state::sandscrp(machine_config &config)
 	m_view2->set_offset(0x5b, 0, 256, 224);
 	m_view2->set_palette("palette");
 
-	KANEKO_HIT(config, "calc1_mcu").set_type(0);
+	KANEKO_HIT(config, "calc1").set_type(0);
 
 	KANEKO_PANDORA(config, m_pandora, 0, "palette", gfx_sandscrp_spr);
 

@@ -62,6 +62,11 @@ static INPUT_PORTS_START( v8 )
 	PORT_CONFSETTING( 0x01, "15\" Portrait Display (640x870)")
 	PORT_CONFSETTING( 0x02, "12\" RGB (512x384)")
 	PORT_CONFSETTING( 0x06, "13\" RGB (640x480)")
+
+	PORT_START("config")
+	PORT_CONFNAME(0x01, 0x01, "Diagnostic mode")
+	PORT_CONFSETTING(0x01, "Disabled")
+	PORT_CONFSETTING(0x00, "Enabled")
 INPUT_PORTS_END
 
 //-------------------------------------------------
@@ -82,7 +87,7 @@ void v8_device::map(address_map &map)
 	map(0x000000, 0x0fffff).r(FUNC(v8_device::rom_switch_r));
 
 	map(0x500000, 0x501fff).rw(FUNC(v8_device::mac_via_r), FUNC(v8_device::mac_via_w));
-	map(0x514000, 0x515fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
+	map(0x514000, 0x515fff).rw(m_asc, FUNC(asc_base_device::read), FUNC(asc_base_device::write));
 	map(0x524000, 0x525fff).rw(m_ariel, FUNC(ariel_device::read), FUNC(ariel_device::write));
 	map(0x526000, 0x527fff).rw(m_pseudovia, FUNC(pseudovia_device::read), FUNC(pseudovia_device::write));
 
@@ -109,12 +114,12 @@ void v8_device::device_add_mconfig(machine_config &config)
 	m_via1->cb2_handler().set(FUNC(v8_device::via_out_cb2));
 	m_via1->irq_handler().set(FUNC(v8_device::via1_irq));
 
-	ASC(config, m_asc, 15.6672_MHz_XTAL, asc_device::asc_type::V8);
+	ASC_V8(config, m_asc, 15.6672_MHz_XTAL);
 	m_asc->irqf_callback().set(m_pseudovia, FUNC(pseudovia_device::asc_irq_w));
 	m_asc->add_route(0, tag(), 1.0, 0);
 	m_asc->add_route(1, tag(), 1.0, 1);
 
-	APPLE_PSEUDOVIA(config, m_pseudovia, 15.6672_MHz_XTAL);
+	APPLE_V8_PSEUDOVIA(config, m_pseudovia, 15.6672_MHz_XTAL);
 	m_pseudovia->writepb_handler().set(FUNC(v8_device::via2_pb_w));
 	m_pseudovia->readconfig_handler().set(FUNC(v8_device::via2_config_r));
 	m_pseudovia->writeconfig_handler().set(FUNC(v8_device::via2_config_w));
@@ -142,6 +147,7 @@ v8_device::v8_device(const machine_config &mconfig, device_type type, const char
 	m_ariel(*this, "ramdac"),
 	m_asc(*this, "asc"),
 	m_pseudovia(*this, "pseudovia"),
+	m_config_port(*this, "config"),
 	m_overlay(false),
 	m_video_config(0),
 	write_pb4(*this),
@@ -240,7 +246,7 @@ TIMER_CALLBACK_MEMBER(v8_device::mac_6015_tick)
 
 u8 v8_device::via_in_a()
 {
-	return 0xd5;
+	return 0xd4 | (m_config_port->read() & 1);
 }
 
 u8 v8_device::via_in_b()
@@ -613,6 +619,10 @@ u32 v8_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const 
 // ================ eagle_device
 
 static INPUT_PORTS_START( eagle )
+	PORT_START("config")
+	PORT_CONFNAME(0x01, 0x01, "Diagnostic mode")
+	PORT_CONFSETTING(0x01, "Disabled")
+	PORT_CONFSETTING(0x00, "Enabled")
 INPUT_PORTS_END
 
 //-------------------------------------------------
@@ -629,7 +639,7 @@ void eagle_device::device_add_mconfig(machine_config &config)
 	v8_device::device_add_mconfig(config);
 	m_screen->set_raw(15.6672_MHz_XTAL, 704, 0, 512, 370, 0, 342);
 
-	ASC(config.replace(), m_asc, 15.6672_MHz_XTAL, asc_device::asc_type::EAGLE);
+	ASC_V8(config.replace(), m_asc, 15.6672_MHz_XTAL);
 	m_asc->add_route(0, tag(), 1.0, 0);
 	m_asc->add_route(1, tag(), 1.0, 1);
 	m_asc->irqf_callback().set(m_pseudovia, FUNC(pseudovia_device::asc_irq_w));
@@ -644,7 +654,7 @@ eagle_device::eagle_device(const machine_config &mconfig, const char *tag, devic
 
 u8 eagle_device::via_in_a()
 {
-	return 0x93;
+	return 0x92 | (m_config_port->read() & 1);
 }
 
 u8 eagle_device::via2_video_config_r()
@@ -704,7 +714,7 @@ void spice_device::device_add_mconfig(machine_config &config)
 	v8_device::device_add_mconfig(config);
 	m_screen->set_raw(15.6672_MHz_XTAL, 640, 0, 512, 407, 0, 384);
 
-	ASC(config.replace(), m_asc, 15.6672_MHz_XTAL, asc_device::asc_type::SONORA);
+	ASC_SONORA(config.replace(), m_asc, 15.6672_MHz_XTAL);
 	m_asc->add_route(0, tag(), 1.0, 0);
 	m_asc->add_route(1, tag(), 1.0, 1);
 	m_asc->irqf_callback().set(m_pseudovia, FUNC(pseudovia_device::asc_irq_w));
@@ -742,7 +752,7 @@ void spice_device::device_start()
 
 u8 spice_device::via_in_a()
 {
-	return 0x83;
+	return 0x82;
 }
 
 u8 spice_device::via2_video_config_r()

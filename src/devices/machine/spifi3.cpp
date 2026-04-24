@@ -252,7 +252,6 @@ namespace
 spifi3_device::spifi3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, SPIFI3, tag, owner, clock),
 	nscsi_device_interface(mconfig, *this),
-	nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
 	m_even_fifo(),
 	m_odd_fifo(),
 	m_irq_handler(*this),

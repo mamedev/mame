@@ -40,7 +40,6 @@
 DEFINE_DEVICE_TYPE(SH3, sh3_device,   "sh3", "Hitachi SH-3 (Unidentified)")
 DEFINE_DEVICE_TYPE(SH7708S, sh7708s_device, "sh7708s", "Hitachi SH7708S")
 DEFINE_DEVICE_TYPE(SH7709, sh7709_device, "sh7709", "Hitachi SH7709")
-DEFINE_DEVICE_TYPE(SH7709S, sh7709s_device, "sh7709s", "Hitachi SH7709S")
 DEFINE_DEVICE_TYPE(SH4, sh4_device,   "sh4", "Hitachi SH-4 (Unidentified)")
 DEFINE_DEVICE_TYPE(SH7091, sh7091_device, "sh7091", "Hitachi SH7091")
 DEFINE_DEVICE_TYPE(SH7750, sh7750_device, "sh7750", "Hitachi SH7750")
@@ -574,26 +573,6 @@ void sh7709_device::sh3_register_map(address_map& map)
 	scif_7709_map(map);
 }
 
-void sh7709s_device::sh3_register_map(address_map& map)
-{
-	ccn_7709s_map(map);
-	ubc_7709s_map(map);
-	cpg_7709_map(map);
-	bsc_7709s_map(map);
-	rtc_map(map);
-	intc_7709_map(map);
-	dmac_7709_map(map);
-	tmu_map(map);
-	sci_7709_map(map);
-	cmt_7709_map(map);
-	ad_7709_map(map);
-	da_7709_map(map);
-	port_7709_map(map);
-	irda_7709_map(map);
-	scif_7709_map(map);
-	udi_7709s_map(map);
-}
-
 void sh3_base_device::ccn_map(address_map& map)
 {
 	map(0xfffffff0, 0xfffffff3).rw(FUNC(sh3_base_device::pteh_r), FUNC(sh3_base_device::pteh_w));
@@ -971,12 +950,6 @@ sh7709_device::sh7709_device(const machine_config &mconfig, const char *tag, dev
 	: sh3_base_device(mconfig, SH7709, tag, owner, clock, endianness)
 {
 }
-
-sh7709s_device::sh7709s_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock, endianness_t endianness)
-	: sh3_base_device(mconfig, SH7709S, tag, owner, clock, endianness)
-{
-}
-
 
 sh4_device::sh4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
 	: sh4_base_device(mconfig, SH4, tag, owner, clock, endianness)

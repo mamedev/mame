@@ -3022,11 +3022,11 @@ Core Sound Options
     * - ``wasapi``
       - Windows
       - Yes
-      - Yes [#SoundWASAPIMonitoring]_
+      - Yes
       - Yes
       - Yes
     * - ``xaudio2``
-      - Windows [#SoundXAudio2OS]_
+      - Windows
       - No
       - No
       - Yes
@@ -3064,11 +3064,6 @@ Core Sound Options
 
 
 ..  rubric:: Footnotes
-
-..  [#SoundWASAPIMonitoring] MAME requires Windows 10 1703 or later to use
-    output monitoring with WASAPI.
-
-..  [#SoundXAudio2OS] MAME requires Windows 8 or later to use XAudio2.
 
 ..  [#SoundWinSDL] While SDL is not a supported option on official MAME builds
     for Windows, you can compile MAME with SDL support on Windows.

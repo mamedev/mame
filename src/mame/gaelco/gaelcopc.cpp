@@ -11,9 +11,9 @@ TODO:
   likely gonna play with monitor DDC;
 
 Custom motherboard with
-Intel 82815 (host + bridge + AGP devices)
-Intel 82801 (PCI 2.3 + integrated LAN + IDE + USB 2.0 + AC'97 + LPC +
-             ACPI 2.0 + Flash BIOS control + SMBus + GPIO)
+Intel 82815 GMCH (host + bridge + AGP devices)
+Intel 82801 (ICH*?) (PCI 2.3 + integrated LAN + IDE + USB 2.0 + AC'97 + LPC +
+                     ACPI 2.0 + Flash BIOS control + SMBus + GPIO)
 Intel 82562 (LAN)
 RTM 560-25R (Audio)
 nVidia GeForce 4 TI4200 128Mb AGP
@@ -62,9 +62,6 @@ void gaelcopc_state::gaelcopc_map(address_map &map)
 	map(0x000e0000, 0x000fffff).rom().region("bios", 0x60000);
 	map(0xfff80000, 0xffffffff).rom().region("bios", 0);
 }
-
-static INPUT_PORTS_START( gaelcopc )
-INPUT_PORTS_END
 
 
 void gaelcopc_state::gaelcopc(machine_config &config)
@@ -142,8 +139,8 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2003, tokyocop,  0,        gaelcopc, gaelcopc, gaelcopc_state, empty_init, ROT0, "Gaelco", "Tokyo Cop (US, dedicated version)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2003, tokyocopk, tokyocop, gaelcopc, gaelcopc, gaelcopc_state, empty_init, ROT0, "Gaelco", "Tokyo Cop (US, kit version)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2003, tokyocopi, tokyocop, gaelcopc, gaelcopc, gaelcopc_state, empty_init, ROT0, "Gaelco", "Tokyo Cop (Italy)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2004, rriders,   0,        gaelcopc, gaelcopc, gaelcopc_state, empty_init, ROT0, "Gaelco", "Ring Riders (Software version v2.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2005, tuningrc,  0,        gaelcopc, gaelcopc, gaelcopc_state, empty_init, ROT0, "Gaelco", "Gaelco Championship Tuning Race",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2003, tokyocop,  0,        gaelcopc, 0, gaelcopc_state, empty_init, ROT0, "Gaelco", "Tokyo Cop (US, dedicated version)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2003, tokyocopk, tokyocop, gaelcopc, 0, gaelcopc_state, empty_init, ROT0, "Gaelco", "Tokyo Cop (US, kit version)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2003, tokyocopi, tokyocop, gaelcopc, 0, gaelcopc_state, empty_init, ROT0, "Gaelco", "Tokyo Cop (Italy)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004, rriders,   0,        gaelcopc, 0, gaelcopc_state, empty_init, ROT0, "Gaelco", "Ring Riders (Software version v2.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, tuningrc,  0,        gaelcopc, 0, gaelcopc_state, empty_init, ROT0, "Gaelco", "Gaelco Championship Tuning Race",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -268,20 +268,20 @@ uint32_t jailbrek_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void jailbrek_state::coin_w(uint8_t data)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);
-	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 }
 
 uint8_t jailbrek_state::speech_r()
 {
-	return (m_vlm->bsy() ? 1 : 0);
+	return m_vlm->bsy_r();
 }
 
 void jailbrek_state::speech_w(uint8_t data)
 {
 	// bit 0 is latch direction like in yiear
-	m_vlm->st((data >> 1) & 1);
-	m_vlm->rst((data >> 2) & 1);
+	m_vlm->st_w(BIT(data, 1));
+	m_vlm->rst_w(BIT(data, 2));
 }
 
 void jailbrek_state::prg_map(address_map &map)

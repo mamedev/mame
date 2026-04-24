@@ -1409,7 +1409,7 @@ void cheat_manager::load_cheats(std::string const &filename)
 			osd_printf_verbose("Loading cheats file from %s\n", cheatfile.fullpath());
 
 			// read the XML file into internal data structures
-			util::xml::parse_options options = { nullptr };
+			util::xml::parse_options options;
 			util::xml::parse_error error;
 			options.error = &error;
 			util::xml::file::ptr const rootnode(util::xml::file::read(cheatfile, &options));

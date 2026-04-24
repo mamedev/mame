@@ -445,10 +445,7 @@ public:
 	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, U &&formats, bool fixed = false)
 		: floppy_connector(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<T>(opts), dflt, fixed);
 		set_formats(std::forward<U>(formats));
 	}
 

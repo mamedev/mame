@@ -27,7 +27,6 @@ victor_9000_hdc_device::victor_9000_hdc_device(const machine_config &mconfig, co
 victor_9000_hdc_device::victor_9000_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	nscsi_device_interface(mconfig, *this),
-	nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
 	m_dma_r(*this, 0xff),
 	m_dma_w(*this),
 	m_irq_handler(*this),

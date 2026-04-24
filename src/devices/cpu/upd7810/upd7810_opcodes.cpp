@@ -9404,12 +9404,20 @@ void upd7810_device::CALT_7801()
 
 void upd7810_device::IN()
 {
-	logerror("unimplemented instruction: IN\n");
+	PAIR ea;
+	ea.b.h = B;
+	ea.b.l = OP2;
+
+	A = m_io.read_byte(ea.w.l);
 }
 
 void upd7810_device::OUT()
 {
-	logerror("unimplemented instruction: OUT\n");
+	PAIR ea;
+	ea.b.h = B;
+	ea.b.l = OP2;
+
+	m_io.write_byte(ea.w.l, A);
 }
 
 void upd7810_device::MOV_A_S()

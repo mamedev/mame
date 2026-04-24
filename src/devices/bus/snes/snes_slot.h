@@ -256,10 +256,7 @@ public:
 	sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
 		: sns_cart_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const noexcept override { return "snes_cart"; }
@@ -276,10 +273,7 @@ public:
 	sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: sns_sufami_cart_slot_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const noexcept override { return "st_cart"; }
@@ -296,10 +290,7 @@ public:
 	sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: sns_bsx_cart_slot_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const noexcept override { return "bspack"; }
@@ -307,7 +298,7 @@ public:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(SNS_CART_SLOT,        sns_cart_slot_device)
 DECLARE_DEVICE_TYPE(SNS_SUFAMI_CART_SLOT, sns_sufami_cart_slot_device)
 DECLARE_DEVICE_TYPE(SNS_BSX_CART_SLOT,    sns_bsx_cart_slot_device)

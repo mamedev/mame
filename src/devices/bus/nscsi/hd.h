@@ -11,7 +11,7 @@
 class nscsi_harddisk_device : public nscsi_full_device
 {
 public:
-	nscsi_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nscsi_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	void set_default_model_name(const std::string_view &model);
 
 protected:

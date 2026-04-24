@@ -179,15 +179,9 @@ std::unique_ptr<util::disasm_interface> v810_device::create_disassembler()
 #define SO(opcode) (((opcode)&0xfc00)>>10)
 
 #define CHECK_CY(x) PSW=(PSW & ~8)|(((x) & (((uint64_t)1) << 32)) ? 8 : 0)
-#define CHECK_OVADD(x,y,z)  PSW=(PSW & ~0x00000004) |(( ((x) ^ (z)) & ((y) ^ (z)) & 0x80000000) ? 4: 0)
-#define CHECK_OVSUB(x,y,z)  PSW=(PSW & ~0x00000004) |(( ((y) ^ (z)) & ((x) ^ (y)) & 0x80000000) ? 4: 0)
-#define CHECK_ZS(x) PSW=(PSW & ~3)|((uint32_t)(x)==0)|(((x)&0x80000000) ? 2: 0)
-
-
-#define ADD(dst, src)       { uint64_t res=(uint64_t)(dst)+(uint64_t)(src); SetCF(res); SetOF_Add(res,src,dst); SetSZPF(res); dst=(uint32_t)res; }
-#define SUB(dst, src)       { uint64_t res=(uint64_t)(dst)-(int64_t)(src); SetCF(res); SetOF_Sub(res,src,dst); SetSZPF(res); dst=(uint32_t)res; }
-
-
+#define CHECK_OVADD(x,y,z) PSW=(PSW & ~0x00000004) |(( ((x) ^ (z)) & ((y) ^ (z)) & 0x80000000) ? 4 : 0)
+#define CHECK_OVSUB(x,y,z) PSW=(PSW & ~0x00000004) |(( ((y) ^ (z)) & ((x) ^ (y)) & 0x80000000) ? 4 : 0)
+#define CHECK_ZS(x) PSW=(PSW & ~3)|((uint32_t)(x)==0)|(((x)&0x80000000) ? 2 : 0)
 
 
 // r0 is literally a "register zero", reading returns 0, writing is ignored.

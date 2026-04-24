@@ -111,7 +111,7 @@ public:
 		, m_vram(*this, "vram")
 		, m_mct_adr(*this, "mct_adr")
 		, m_scsibus(*this, "scsi")
-		, m_scsi(*this, "scsi:7:ncr53cf94")
+		, m_scsi(*this, "ncr53cf94")
 		, m_fdc(*this, "fdc")
 		, m_rtc(*this, "rtc")
 		, m_nvram(*this, "nvram")
@@ -311,17 +311,12 @@ void jazz_state::jazz(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", jazz_scsi_devices, "cdrom");
 
 	// scsi host adapter
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53cf94", NCR53CF94).clock(40000000).machine_config(
-		[this] (device_t *device)
-		{
-			ncr53cf94_device &adapter = downcast<ncr53cf94_device &>(*device);
-
-			adapter.irq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::irq<5>));
-			adapter.drq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::drq<0>));
-
-			subdevice<mct_adr_device>(":mct_adr")->dma_r_cb<0>().set(adapter, FUNC(ncr53cf94_device::dma_r));
-			subdevice<mct_adr_device>(":mct_adr")->dma_w_cb<0>().set(adapter, FUNC(ncr53cf94_device::dma_w));
-		});
+	NCR53CF94(config, m_scsi, 40000000);
+	m_scsibus->set_external_device(7, m_scsi);
+	m_scsi->irq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::irq<5>));
+	m_scsi->drq_handler_cb().set(m_mct_adr, FUNC(mct_adr_device::drq<0>));
+	m_mct_adr->dma_r_cb<0>().set(m_scsi, FUNC(ncr53cf94_device::dma_r));
+	m_mct_adr->dma_w_cb<0>().set(m_scsi, FUNC(ncr53cf94_device::dma_w));
 
 	// floppy controller and drive
 	N82077AA(config, m_fdc, 24_MHz_XTAL);

@@ -40,7 +40,6 @@ unsigned constexpr SCSI_SEL_TIMEOUT = 250'000'000;
 ncr5385_device::ncr5385_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NCR5385, tag, owner, clock)
 	, nscsi_device_interface(mconfig, *this)
-	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, m_int(*this)
 	, m_dreq(*this)
 	, m_int_state(false)

@@ -44,8 +44,8 @@ void isa16_fga4he_device::device_add_mconfig(machine_config &config)
 	HT208_VIDEO7_VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(256*1024);
-//	m_vga->setup_rom_bank_cb().set([this] (u8 data) { printf("%02x\n", data); });
-//	m_vga->vsync_cb().set([this](int state) { m_isa->irq2_w(state); });
+//  m_vga->setup_rom_bank_cb().set([this] (u8 data) { printf("%02x\n", data); });
+//  m_vga->vsync_cb().set([this](int state) { m_isa->irq2_w(state); });
 
 	// TODO: TMS34020-32 + Bt459 + Spea "VEMU"
 	// 2MB VRAM + 4MB of DRAM, dual monitor with separate DB9 connector

@@ -52,6 +52,7 @@ public:
 	void mjdialq2(machine_config &config) ATTR_COLD;
 	void sprtmtch(machine_config &config) ATTR_COLD;
 	void qyjdzjp(machine_config &config) ATTR_COLD;
+	void baoqingt(machine_config &config) ATTR_COLD;
 
 	void blitter_ack_w(int state);
 	void sprtmtch_blitter_irq_w(int state);
@@ -233,6 +234,8 @@ private:
 	void mjreachp2_map(address_map &map) ATTR_COLD;
 
 	void qyjdzjp_io_map(address_map &map) ATTR_COLD;
+
+	void baoqingt_io_map(address_map &map) ATTR_COLD;
 
 	// misc
 	int m_rombank = 0;

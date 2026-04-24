@@ -35,7 +35,6 @@ ALLOW_SAVE_TYPE(ncr5380_device::state);
 ncr5380_device::ncr5380_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, bool has_lbs)
 	: device_t(mconfig, type, tag, owner, clock)
 	, nscsi_device_interface(mconfig, *this)
-	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, m_irq_handler(*this)
 	, m_drq_handler(*this)
 	, m_has_lbs(has_lbs)

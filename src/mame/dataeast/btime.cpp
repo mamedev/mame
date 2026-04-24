@@ -450,10 +450,9 @@ void btime_state::btime_palette(palette_device &palette) const
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
-		bit0 = 0;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -495,10 +494,9 @@ void btime_state::lnc_palette(palette_device &palette) const
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
-		bit0 = 0;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 0) & 0x01;
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 1) & 0x01;
+		bit1 = (color_prom[i] >> 0) & 0x01;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -688,10 +686,7 @@ void btime_state::draw_sprites(
 		uint8_t sprite_y_adjust, uint8_t sprite_y_adjust_flip_screen,
 		uint8_t const *sprite_ram, offs_t interleave)
 {
-	int i;
-	offs_t offs;
-
-	for (i = 0, offs = 0; i < 8; i++, offs += 4 * interleave)
+	for (int i = 0, offs = 0; i < 8; i++, offs += 4 * interleave)
 	{
 		if (!(sprite_ram[offs + 0] & 0x01)) continue;
 

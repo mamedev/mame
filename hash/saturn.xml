@@ -38804,6 +38804,48 @@ Doesn't accept any input on System Memory requirement screen
 
 	<!-- Misc Protos -->
 
+	<!-- Released by Josh Fairhurst / Screaming Villains in Bin+Cue format, built from the original source files. -->
+	<software name="prizefhe" supported="no">
+		<description>Prize Fighter: Heavyweight Edition (USA, prototype 19960325)</description>
+		<year>1996</year>
+		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Game will freeze if you let the intro video play and press start. You can skip it at the start or let it finish to play normally.
+]]></notes>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="prize fighter - heavyweight edition (usa) (proto) (1996-03-25) (disc 1)" sha1="dc333b7ea68a9a42f9a0baefe1a6e075ae9b6bee" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="prize fighter - heavyweight edition (usa) (proto) (1996-03-25) (disc 2)" sha1="7ba5aeb6934f4d2c0d964096670e564fe8efe6d7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Released by Josh Fairhurst / Screaming Villains in Bin+Cue format, built from the original source files. -->
+	<software name="prizefhej" cloneof="prizefhe" supported="no">
+		<description>Prize Fighter: Heavyweight Edition (Japan, prototype 19960418)</description>
+		<year>1996</year>
+		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Game will freeze if you let the intro video play and press start. You can skip it at the start or let it finish to play normally.
+]]></notes>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="prize fighter - heavyweight edition (japan) (proto) (1996-04-18) (disc 1)" sha1="04c2357ab28a1842e3c7e9942fd1eb9e233da372" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="prize fighter - heavyweight edition (japan) (proto) (1996-04-18) (disc 2)" sha1="fe5d98f370b0cd1385c121b1a04935a41bd15397" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Identifying major damage 14-06-1996... -->
 	<software name="majordama" cloneof="majordam" supported="no">
 		<description>Major Damage (USA, prototype 19960614)</description>

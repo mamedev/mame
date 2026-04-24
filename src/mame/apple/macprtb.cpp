@@ -128,7 +128,7 @@ public:
 		m_pmu(*this, "pmu"),
 		m_via1(*this, "via1"),
 		m_macadb(*this, "macadb"),
-		m_ncr5380(*this, "scsi:7:ncr5380"),
+		m_ncr5380(*this, "ncr5380"),
 		m_scsihelp(*this, "scsihelp"),
 		m_ram(*this, RAM_TAG),
 		m_swim(*this, "fdc"),
@@ -746,7 +746,7 @@ void macportable_state::macprtb(machine_config &config)
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
@@ -759,12 +759,12 @@ void macportable_state::macprtb(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device) {
-		ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
-		adapter.irq_handler().set(m_via1, FUNC(r65c22_device::write_cb2));
-		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
-		adapter.drq_handler().append(m_via1, FUNC(r65c22_device::write_ca1));
-	});
+
+	NCR53C80(config, m_ncr5380);
+	scsi.set_external_device(7, m_ncr5380);
+	m_ncr5380->irq_handler().set(m_via1, FUNC(r65c22_device::write_cb2));
+	m_ncr5380->drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
+	m_ncr5380->drq_handler().append(m_via1, FUNC(r65c22_device::write_ca1));
 
 	MAC_SCSI_HELPER(config, m_scsihelp);
 	m_scsihelp->scsi_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::read));
@@ -785,7 +785,7 @@ void macportable_state::macprtb(machine_config &config)
 	m_via1->irq_handler().set(FUNC(macportable_state::via_irq_w));
 
 	SPEAKER(config, "speaker", 2).front();
-	ASC(config, m_asc, 15.6672_MHz_XTAL, asc_device::asc_type::ASC);
+	ASC(config, m_asc, 15.6672_MHz_XTAL);
 	m_asc->irqf_callback().set(FUNC(macportable_state::asc_irq_w));
 	m_asc->add_route(0, "speaker", 1.0, 0);
 	m_asc->add_route(1, "speaker", 1.0, 1);

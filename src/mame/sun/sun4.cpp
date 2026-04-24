@@ -556,7 +556,7 @@ public:
 		, m_floppy(*this, "fdc:0")
 		, m_lance(*this, "lance")
 		, m_scsibus(*this, "scsibus")
-		, m_scsi(*this, "scsibus:7:ncr53c90")
+		, m_scsi(*this, "ncr53c90")
 		, m_type1space(*this, "type1")
 		, m_ram(*this, RAM_TAG)
 		, m_rom(*this, "user1")
@@ -598,8 +598,6 @@ protected:
 	template <int Chip> void scc_int(int state);
 
 	void fdc_irq(int state);
-
-	void ncr53c90(device_t *device);
 
 	void debugger_map(address_map &map) ATTR_COLD;
 	void system_asi_map(address_map &map) ATTR_COLD;
@@ -1369,17 +1367,7 @@ static void sun_scsi_devices(device_slot_interface &device)
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	device.option_add("tape", NSCSI_TAPE);
-	device.option_add_internal("ncr53c90", NCR53C90);
 	device.set_option_machine_config("cdrom", sun4_cdrom);
-}
-
-void sun4_base_state::ncr53c90(device_t *device)
-{
-	ncr53c90_device &adapter = downcast<ncr53c90_device &>(*device);
-
-	adapter.set_clock(10000000);
-	adapter.irq_handler_cb().set(*this, FUNC(sun4_base_state::scsi_irq));
-	adapter.drq_handler_cb().set(*this, FUNC(sun4_base_state::scsi_drq));
 }
 
 void sun4_base_state::sun4_base(machine_config &config)
@@ -1435,7 +1423,7 @@ void sun4_base_state::sun4_base(machine_config &config)
 	m_rs232[1]->dcd_handler().set(m_scc[1], FUNC(z80scc_device::dcdb_w));
 	m_rs232[1]->cts_handler().set(m_scc[1], FUNC(z80scc_device::ctsb_w));
 
-	NSCSI_BUS(config, "scsibus");
+	NSCSI_BUS(config, m_scsibus);
 	NSCSI_CONNECTOR(config, "scsibus:0", sun_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsibus:1", sun_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:2", sun_scsi_devices, nullptr);
@@ -1443,7 +1431,11 @@ void sun4_base_state::sun4_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:4", sun_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:5", sun_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", sun_scsi_devices, "cdrom");
-	NSCSI_CONNECTOR(config, "scsibus:7", sun_scsi_devices, "ncr53c90", true).set_option_machine_config("ncr53c90", [this] (device_t *device) { ncr53c90(device); });
+
+	NCR53C90(config, m_scsi, 10000000);
+	m_scsibus->set_external_device(7, m_scsi);
+	m_scsi->irq_handler_cb().set(DEVICE_SELF, FUNC(sun4_base_state::scsi_irq));
+	m_scsi->drq_handler_cb().set(DEVICE_SELF, FUNC(sun4_base_state::scsi_drq));
 }
 
 void sun4_state::sun4(machine_config &config)

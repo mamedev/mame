@@ -84,10 +84,7 @@ public:
 	isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&isa_tag, U &&opts, const char *dflt, bool fixed)
 		: isa8_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<U>(opts), dflt, fixed);
 		m_isa_bus.set_tag(std::forward<T>(isa_tag));
 	}
 	isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -283,10 +280,7 @@ public:
 	isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&isa_tag, U &&opts, const char *dflt, bool fixed)
 		: isa16_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<U>(opts), dflt, fixed);
 		m_isa_bus.set_tag(std::forward<T>(isa_tag));
 	}
 	isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

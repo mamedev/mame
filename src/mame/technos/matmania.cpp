@@ -8,6 +8,10 @@ Memetron, 1985
 
 driver by Brad Oliver
 
+TODO:
+- verify vcount chain (exact interrupt timing and vblank flag on DSW1.7)
+
+
 MAIN BOARD:
 
 0000-0fff RAM
@@ -38,6 +42,7 @@ The driver has been updated accordingly.
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/ymopl.h"
@@ -70,6 +75,7 @@ public:
 	void matmania(machine_config &config);
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	// memory pointers
@@ -87,7 +93,6 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	// video-related
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap[2];
 
 	void paletteram_w(offs_t offset, uint8_t data);
@@ -96,6 +101,11 @@ protected:
 	void main_map(address_map &map) ATTR_COLD;
 
 private:
+	bool m_sound_nmi_enable = false;
+
+	void sound_nmi_enable_w(uint8_t data) { m_sound_nmi_enable = bool(BIT(data, 0)); }
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sound_map(address_map &map) ATTR_COLD;
 };
@@ -118,6 +128,12 @@ private:
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 };
+
+void matmania_state::machine_start()
+{
+	save_item(NAME(m_sound_nmi_enable));
+}
+
 
 /***************************************************************************
 
@@ -185,7 +201,6 @@ void matmania_state::palette(palette_device &palette) const
 		color_prom++;
 	}
 }
-
 
 
 void matmania_state::paletteram_w(offs_t offset, uint8_t data)
@@ -377,16 +392,26 @@ uint32_t maniach_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 /*************************************
  *
- *  Misc Memory handlers
+ *  Misc I/O handlers
  *
  *************************************/
+
+TIMER_DEVICE_CALLBACK_MEMBER(matmania_state::scanline)
+{
+	const int scanline = param;
+
+	// 16 sound NMIs per frame (disabled during DAC voice)
+	if (m_sound_nmi_enable && scanline < 256)
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
 
 uint8_t maniach_state::mcu_status_r()
 {
 	return
-			((CLEAR_LINE == m_mcu->mcu_semaphore_r()) ? 0x01 : 0x00) |
-			((CLEAR_LINE == m_mcu->host_semaphore_r()) ? 0x02 : 0x00);
+			(m_mcu->mcu_semaphore_r() ? 0x00 : 0x01) |
+			(m_mcu->host_semaphore_r() ? 0x00 : 0x02);
 }
+
 
 /*************************************
  *
@@ -428,6 +453,7 @@ void matmania_state::sound_map(address_map &map)
 	map(0x2000, 0x2001).w("ay1", FUNC(ay8910_device::data_address_w));
 	map(0x2002, 0x2003).w("ay2", FUNC(ay8910_device::data_address_w));
 	map(0x2004, 0x2004).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x2005, 0x2005).w(FUNC(matmania_state::sound_nmi_enable_w));
 	map(0x2007, 0x2007).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x8000, 0xffff).rom();
 }
@@ -487,7 +513,7 @@ static INPUT_PORTS_START( matmania )
 	PORT_DIPSETTING(   0x00, DEF_STR( Upright ) )       // The default setting should be cocktail.
 	PORT_DIPSETTING(   0x20, DEF_STR( Cocktail ) )
 	PORT_SERVICE_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW1:7" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))      // Listed as always ON among DIPs in the manual
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) // Listed as always ON among DIPs in the manual
 
 	PORT_START("DSW2")
 	PORT_DIPNAME(0x03, 0x02, DEF_STR( Difficulty ) )    PORT_DIPLOCATION("SW2:1,2")
@@ -609,22 +635,18 @@ GFXDECODE_END
 void matmania_state::matmania(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 12_MHz_XTAL / 8);  // 1.5MHz?
+	M6502(config, m_maincpu, 12_MHz_XTAL / 8); // 1.5MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &matmania_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(matmania_state::irq0_line_hold));
 
-	M6502(config, m_audiocpu, 12_MHz_XTAL / 8); // 1.5MHz?
+	M6502(config, m_audiocpu, 12_MHz_XTAL / 2 / 6); // 1.0MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &matmania_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(matmania_state::nmi_line_pulse), attotime::from_hz(15 * 60)); // ?
 
-	config.set_maximum_quantum(attotime::from_hz(6000));
+	TIMER(config, "scantimer").configure_scanline(FUNC(matmania_state::scanline), "screen", 8, 16);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 8, 248); // measured ~57.45Hz
 	m_screen->set_screen_update(FUNC(matmania_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -636,10 +658,10 @@ void matmania_state::matmania(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 
-	AY8910(config, "ay1", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.3);
-	AY8910(config, "ay2", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.3);
+	AY8910(config, "ay1", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.3); // 1.5MHz
+	AY8910(config, "ay2", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.3); // 1.5MHz
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
 }
 
 void maniach_state::maniach(machine_config &config)
@@ -658,10 +680,7 @@ void maniach_state::maniach(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 8, 248);
 	m_screen->set_screen_update(FUNC(maniach_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -677,7 +696,7 @@ void maniach_state::maniach(machine_config &config)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
 }
 
 

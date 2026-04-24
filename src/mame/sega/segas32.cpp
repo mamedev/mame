@@ -2494,11 +2494,6 @@ void segas32_state::system32_cd_map(address_map &map)
 	map(0xc00060, 0xc0006f).mirror(0x0fff80).rw("cxdio", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff);
 }
 
-static void scsi_devices(device_slot_interface &device)
-{
-	device.option_add("cdrom", NSCSI_CDROM);
-}
-
 void segas32_cd_state::device_add_mconfig(machine_config &config)
 {
 	segas32_state::device_add_mconfig(config);
@@ -2506,18 +2501,11 @@ void segas32_cd_state::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_cd_state::system32_cd_map);
 
 	auto &scsi(NSCSI_BUS(config, "scsi"));
-	NSCSI_CONNECTOR(config, "scsi:0").option_set("cdrom", NSCSI_CDROM).machine_config(
-		[](device_t *device)
-		{
-		  device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
-		  device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
-		});
-	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr);
+
+	auto &cdrom(NSCSI_CDROM(config, "cdrom"));
+	scsi.set_external_device(0, cdrom);
+	cdrom.subdevice<cdda_device>("cdda")->add_route(0, "speaker", 1.0, 0);
+	cdrom.subdevice<cdda_device>("cdda")->add_route(1, "speaker", 1.0, 1);
 
 	auto &spc(MB89352(config, "spc", 8_MHz_XTAL));
 	scsi.set_external_device(7, spc);
@@ -4296,7 +4284,7 @@ ROM_START( kokoroj )
 	ROM_LOAD64_WORD( "mpr-15534.ic25", 0x800006, 0x200000, CRC(4fa5c56d) SHA1(52926bef0f21ef17dc9d49e3137712bf6d8c29af) )
 
 	// Audio CD
-	DISK_REGION( "mainpcb:scsi:0:cdrom" )
+	DISK_REGION( "mainpcb:cdrom" )
 	DISK_IMAGE_READONLY( "kokoroj", 0, NO_DUMP )
 ROM_END
 
@@ -4326,7 +4314,7 @@ ROM_START( kokoroja )
 	ROM_LOAD64_WORD( "mpr-15534.ic25", 0x800006, 0x200000, CRC(4fa5c56d) SHA1(52926bef0f21ef17dc9d49e3137712bf6d8c29af) )
 
 	// Audio CD
-	DISK_REGION( "mainpcb:scsi:0:cdrom" )
+	DISK_REGION( "mainpcb:cdrom" )
 	DISK_IMAGE_READONLY( "kokoroj", 0, NO_DUMP )
 ROM_END
 
@@ -4367,7 +4355,7 @@ ROM_START( kokoroj2 )
 	ROM_LOAD64_WORD( "mpr-16196.ic25", 0x800006, 0x200000, CRC(b8e22e05) SHA1(dd667e2c5d421cba356421825e6aca9b5ca0af45) )
 
 	/* AUDIO CD */
-	DISK_REGION( "mainpcb:scsi:0:cdrom" )
+	DISK_REGION( "mainpcb:cdrom" )
 	DISK_IMAGE_READONLY( "cdp-00146", 0, SHA1(0b37e0ea2380ecd9abef2ccd6a8096d76d2ba344) )
 ROM_END
 
@@ -6047,9 +6035,9 @@ GAME( 1993, jparkj,    jpark,    sega_system32_analog,      jpark,    segas32_ne
 GAME( 1993, jparkja,   jpark,    sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Deluxe)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, jparkjc,   jpark,    sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Conversion)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1992, kokoroj,   0,        sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology (Rev A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER) /* uses an Audio CD */
-GAME( 1992, kokoroja,  kokoroj,  sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER) /* uses an Audio CD */
-GAME( 1993, kokoroj2,  0,        sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology Vol. 2 - Kokoro no Tanteikyoku", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER) /* uses an Audio CD */
+GAME( 1992, kokoroj,   0,        sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology (Rev A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER ) /* uses an Audio CD (undumped, incompatible with kokoroj2) */
+GAME( 1992, kokoroja,  kokoroj,  sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER ) /* uses an Audio CD (undumped, incompatible with kokoroj2) */
+GAME( 1993, kokoroj2,  0,        sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology Vol. 2 - Kokoro no Tanteikyoku", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER ) /* uses an Audio CD */
 
 GAME( 1990, radm,      0,        sega_system32_analog,      radm,     segas32_new_state, init_radm,     ROT0, "Sega",   "Rad Mobile (World)", MACHINE_IMPERFECT_GRAPHICS )  /* Released in 02.1991 */
 GAME( 1990, radmu,     radm,     sega_system32_analog,      radm,     segas32_new_state, init_radm,     ROT0, "Sega",   "Rad Mobile (US)", MACHINE_IMPERFECT_GRAPHICS )

@@ -227,9 +227,7 @@ u32 chloe_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 
 	screen.priority().fill(0, cliprect);
 	m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07);
-
-	const bool flash = u64(screen.frame_number() / m_frame_invert_count) & 1;
-	m_ula_scr->draw(screen, bitmap, clip256x192, flash, 0);
+	m_ula_scr->draw(screen, bitmap, clip256x192, 0);
 
 	return 0;
 }
@@ -840,7 +838,7 @@ void chloe_state::machine_start()
 	save_item(NAME(m_reg_selected));
 	save_item(NAME(m_divmmc_paged));
 	save_item(NAME(m_divmmc_ctrl));
-	save_pointer(NAME(m_uno_regs_data), 256);
+	save_item(NAME(m_uno_regs_data));
 	save_item(NAME(m_palpen_selected));
 	save_item(NAME(m_dma_hilo));
 	save_item(NAME(m_dma_src_latch));
@@ -896,7 +894,8 @@ void chloe_state::video_start()
 	spectrum_128_state::video_start();
 
 	const u8 *ram = m_ram->pointer();
-	m_ula_scr->set_host_ram_ptr(ram);
+	m_ula_scr->set_bram_bank5_ptr(ram + (5 << 14));
+	m_ula_scr->set_bram_bank7_ptr(ram + (7 << 14));
 }
 
 

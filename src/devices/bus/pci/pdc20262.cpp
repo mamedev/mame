@@ -6,6 +6,9 @@ Promise PDC20262 FastTrak66/UDMA66 IDE controller
 
 No documentation, ATA4 compliant
 
+Notes:
+- pdc20268 is El Torito capable
+
 TODO:
 - how it sets compatible/native modes? Subvendor ID list suggests it can switch at will;
 - Install win9x driver causes huge loading hiccups, eventually freezes by accessing drive with
@@ -16,8 +19,6 @@ TODO:
 \- Gets classified as SCSI controller in win9x device manager;
 - ID and hookup Flash ROM type;
 - PME 1.0 support (no low power states D1/D2, no PME#)
-- pdc20268: supposedly El Torito boot capable, but doesn't work (possibly same regression as
-  shutms11)
 
 **************************************************************************************************/
 
@@ -196,11 +197,14 @@ void pdc20262_device::device_reset()
 	remap_cb();
 }
 
+u8 pdc20262_device::latency_timer_r()
+{
+	return 0x01;
+}
+
 void pdc20262_device::config_map(address_map &map)
 {
 	pci_card_device::config_map(map);
-	// latency timer
-	map(0x0d, 0x0d).lr8(NAME([] () { return 0x01; }));
 	// TODO: everything, starting from capptr_r override
 }
 

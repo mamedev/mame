@@ -836,6 +836,7 @@ INVESTIGATE
 		<year>1984</year>
 		<publisher>コンプティーク (Comptiq)</publisher>
 		<!-- PC8801 -->
+		<info name="alt_title" value="エー・イー"/>
 		<info name="release" value="198404xx"/>
 		<info name="usage" value="Needs BASIC V1"/>
 
@@ -5170,7 +5171,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<software name="bugattac">
+	<software name="bugatk">
 		<description>Bug Attack</description>
 		<year>1984</year>
 		<publisher>コンプティーク (Comptiq)</publisher>
@@ -6162,7 +6163,7 @@ erratic sound tempo during gameplay, [OPN] regression (runs on system timer irq)
 		<publisher>システムソフト (System Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198510xx"/>
-		<info name="alt_title" value="チャンピオンシップ・ロードランナー"/>
+		<info name="alt_title" value="チャンピオンシップロードランナー"/>
 		<!-- same content as disk with CRC 1daf195c, only difference in the header -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="352048">    <!-- Data CRC16: 2401 -->
@@ -6177,7 +6178,7 @@ erratic sound tempo during gameplay, [OPN] regression (runs on system timer irq)
 		<publisher>システムソフト (System Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198510xx"/>
-		<info name="alt_title" value="チャンピオンシップ・ロードランナー"/>
+		<info name="alt_title" value="チャンピオンシップロードランナー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="352048">    <!-- Data CRC16: 50509 -->
 				<rom name="championship lode-runner (fixed).d88" size="352048" crc="31c3233d" sha1="a4e941efe14fc366a7c7ab6049f34248858ece92"/>
@@ -29334,7 +29335,7 @@ Start and Program Disks OK, the remaining part is damaged (missing d88 headers?)
 	</software>
 
 	<software name="tomathim" supported="yes">
-		<description>Salad no Kuni no Tomato Hime</description>
+		<description>Salad no Kuni no Tomato-hime</description>
 		<year>1984</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<!-- PC8801 -->
@@ -33776,7 +33777,7 @@ ExtractDisk  [03]"ﾃﾞｰﾀﾃﾞｨｽｸ      " -> "super daisenryaku_03.d8
 		<year>1985?</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<!-- PC8801 -->
-		<info name="alt_title" value="スーパーマリオブラザーズスペシャル"/>
+		<info name="alt_title" value="スーパーマリオブラザーズ スペシャル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348288">
 				<rom name="super_mario_bros._special.d88" size="348288" crc="5ad4fd2e" sha1="3aa5d748f55436ac7fa76f5403c49e9fcd09e6f4"/>
@@ -33789,7 +33790,7 @@ ExtractDisk  [03]"ﾃﾞｰﾀﾃﾞｨｽｸ      " -> "super daisenryaku_03.d8
 		<year>1985?</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<!-- PC8801 -->
-		<info name="alt_title" value="スーパーマリオブラザーズスペシャル"/>
+		<info name="alt_title" value="スーパーマリオブラザーズ スペシャル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348304">
 				<rom name="super mario brothers special (1985)(hudson).d88" size="348304" crc="90a2072d" sha1="f0c2ea7ec64bcd12963ef718ee335d4da29f7a4c"/>
@@ -33802,7 +33803,7 @@ ExtractDisk  [03]"ﾃﾞｰﾀﾃﾞｨｽｸ      " -> "super daisenryaku_03.d8
 		<year>1985?</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<!-- PC8801 -->
-		<info name="alt_title" value="スーパーマリオブラザーズスペシャル"/>
+		<info name="alt_title" value="スーパーマリオブラザーズ スペシャル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="super mario brothers special (1985)(hudson)[a].d88" size="348848" crc="eda544bb" sha1="9e89fe17bf75216e5b4f1d6d2d9d5f3f0c0872c1"/>
@@ -33815,7 +33816,7 @@ ExtractDisk  [03]"ﾃﾞｰﾀﾃﾞｨｽｸ      " -> "super daisenryaku_03.d8
 		<year>1985?</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<!-- PC8801 -->
-		<info name="alt_title" value="スーパーマリオブラザーズスペシャル"/>
+		<info name="alt_title" value="スーパーマリオブラザーズ スペシャル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="super mario brothers special (1985)(hudson)[a2].d88" size="348848" crc="ec5c23ee" sha1="2a6a797d17ed3068dc463b1909d653666a0de0a8"/>
@@ -33828,7 +33829,7 @@ ExtractDisk  [03]"ﾃﾞｰﾀﾃﾞｨｽｸ      " -> "super daisenryaku_03.d8
 		<year>1985?</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<!-- PC8801 -->
-		<info name="alt_title" value="スーパーマリオブラザーズスペシャル"/>
+		<info name="alt_title" value="スーパーマリオブラザーズ スペシャル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348288">
 				<rom name="super mario brothers special.d88" size="348288" crc="e9ebd287" sha1="63265de01cda7f02e56f2ffdf0bc3a569012676c"/>

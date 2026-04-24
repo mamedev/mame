@@ -310,7 +310,7 @@ void s3000_state::cd3000_io_map(address_map &map)
 
 void s3000_state::s3000xl_io_map(address_map &map)
 {
-	map(0x0000, 0x001f).m("scsi:6:spc", FUNC(mb89352_device::map)).umask16(0x00ff);
+	map(0x0000, 0x001f).m("spc", FUNC(mb89352_device::map)).umask16(0x00ff);
 	map(0x0020, 0x0023).m(m_fdc, FUNC(upd72069_device::map)).umask16(0x00ff);
 	map(0x0040, 0x0047).rw(m_klcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0050, 0x0057).rw(m_klcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);

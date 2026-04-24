@@ -12,7 +12,7 @@
 #include "m6502d.h"
 #include "cpu/m6502/m6502d.hxx"
 
-m6502_base_disassembler::m6502_base_disassembler(const disasm_entry *_table) : table(_table)
+m6502_base_disassembler::m6502_base_disassembler(const disasm_entry *_table) : m_table(_table)
 {
 }
 
@@ -28,11 +28,11 @@ u32 m6502_base_disassembler::opcode_alignment() const
 
 offs_t m6502_base_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	const disasm_entry &e = table[opcodes.r8(pc) | get_instruction_bank()];
-	uint32_t flags = e.flags | SUPPORTED;
-	util::stream_format(stream, "%s", e.opcode);
+	const disasm_entry &e = m_table[opcodes.r8(pc) | get_instruction_bank()];
+	uint32_t flags = e.m_flags | SUPPORTED;
+	util::stream_format(stream, "%s", e.m_opcode);
 
-	switch(e.mode) {
+	switch(e.m_mode) {
 	case DASM_non:
 		flags |= 1;
 		break;
@@ -207,7 +207,7 @@ offs_t m6502_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		break;
 
 	default:
-		fprintf(stderr, "Unhandled dasm mode %d\n", e.mode);
+		fprintf(stderr, "Unhandled dasm mode %d\n", e.m_mode);
 		abort();
 	}
 	return flags;

@@ -25,7 +25,6 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	void hpc_map(address_map &map) ATTR_COLD;
-	void scsic_config(device_t *device);
 
 	required_device<hpc46003_device> m_hpc;
 	required_device<aic565_device> m_busaic;

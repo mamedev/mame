@@ -11,18 +11,9 @@ TODO:
 -->
 <softwarelist name="pcfx" description="NEC PC-FX CD-ROMs">
 
-	<!-- Sourced from Redump -->
+	<!-- Unless otherwise noted, all dumps comes from redump.org -->
 
-	<software name="amateur" supported="no">
-		<description>Amateur Teikyou CD-ROM</description>
-		<year>1994</year>
-		<publisher>NEC</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="amateur teikyou cd-rom (japan)" sha1="ce2f6509a2bebcd36a1063ca6233d3d6150b7419"/>
-			</diskarea>
-		</part>
-	</software>
+<!-- !Games -->
 
 	<software name="batlheat" supported="no">
 		<description>Battle Heat</description>
@@ -141,6 +132,76 @@ TODO:
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sotsugyou ii fx - neo generation (japan)" sha1="8a9e5f269c854d1daa4114ba68a3e89598f26e81"/>
+			</diskarea>
+		</part>
+	</software>
+
+<!-- !PC-FXGA software and games -->
+
+	<software name="amateur" supported="no">
+		<description>Amateur Teikyou CD-ROM (PC-98 C-Bus)</description>
+		<year>1995</year>
+		<publisher>NEC / Hudson Soft</publisher>
+		<notes><![CDATA[
+GMAKER (v1.0) for PC-FXGA C-Bus
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="amateur teikyou cd-rom (japan)" sha1="ce2f6509a2bebcd36a1063ca6233d3d6150b7419"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="amateurv" cloneof="amateur" supported="no">
+		<description>Amateur Teikyou CD-ROM (ISA DOS/V-you)</description>
+		<year>1996</year>
+		<publisher>NEC / Hudson Soft</publisher>
+		<notes><![CDATA[
+GMAKER (v1.1) for PC-FXGA ISA
+]]></notes>
+		<info name="serial" value="79753618"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="amateur teikyou cd-rom (japan) (dos-v-you) (nec pc-fxga)" sha1="30f21880f75ee3be6c9dd1b747c5e2df2ba582ca"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nnyuu" supported="no">
+		<description>N-nyuu: PC-FXGA Game ga Asoberu Tsukureru Hon</description>
+		<year>1996</year>
+		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+Disc 2 requires a Win32 OS on PC-98 or DOS/V machines
+]]></notes>
+		<info name="barcode" value="4904323270170"/>
+		<info name="serial" value="08486501"/>
+		<!-- GANHE001A + GANHE001B -->
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="n-nyuu - pc-fxga game ga asoberu tsukureru hon (japan) (disc 1) (n-nyuu)" sha1="ebafc3236d5085d5b293805e0b33f6706b47979c"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="n-nyuu - pc-fxga game ga asoberu tsukureru hon (japan) (disc 2)" sha1="6e9c966126c1fcf97c8cb8112a3880dd33c4798e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="samegame" supported="no">
+		<!-- http://redump.org/disc/46445/ -->
+		<description>Same Game FX</description>
+		<year>1995</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+Bundled with PC-FXGA
+]]></notes>
+		<info name="barcode" value="4904323240074"/>
+		<info name="serial" value="79753599"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="same game fx (japan) (nec pc-fxga)" sha1="940b7c0400fa617794764aa9d6dee60e002337be"/>
 			</diskarea>
 		</part>
 	</software>

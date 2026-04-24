@@ -360,7 +360,6 @@ DEFINE_DEVICE_TYPE(WD33C93B, wd33c93b_device, "wd33c93b", "Western Digital WD33C
 wd33c9x_base_device::wd33c9x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, nscsi_device_interface(mconfig, *this)
-	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, m_addr{ 0 }
 	, m_regs{ 0 }
 	, m_command_length{ 0 }

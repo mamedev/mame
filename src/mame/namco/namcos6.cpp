@@ -16,6 +16,18 @@ R4543 RTC
 Altera MAX EPM3128AT100-10 with KC004B sticker
 2x empty spaces marked for CXD1178Q
 ADM3222 ARU transceiver
+
+List of games in the プチプチメダル (Puchi Puchi Medal) series (so probably all on this system):
+
+1 - ねこショット！ - Neko Shot!
+2 - ぱっくんレストラン - Pakkun Restaurant
+3 - わくわくかんらんしゃ - Wakuwaku Kanransha
+4 - おてんきテンちゃん - Otenki Ten-chan
+5 - ぶんぶんブーメラン - Bunbun Boomerang
+6 - にがおえぴったんこ - Nigaoe Pittanko
+7 - ハッピーおみくじ - Happy Omikuji
+8 - ドキドキ！フラワー - Doki Doki! Flower
+9 - きせかえスタジオ - Kisekae Studio
 */
 
 

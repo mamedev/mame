@@ -45,17 +45,19 @@ PAGE SEL bit in PORT0 set to 1:
 **************************************************************************************************/
 
 #include "emu.h"
-#include "machine/clock.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
-#include "machine/z80daisy.h"
+#include "machine/clock.h"
 #include "machine/keyboard.h"
 #include "machine/timer.h"
-#include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
+#include "machine/z80daisy.h"
+#include "machine/z80sio.h"
 #include "machine/z80sti.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -76,9 +78,9 @@ public:
 		, m_io_dsw(*this, "DSW")
 	{ }
 
-	void ts803(machine_config &config);
+	void ts803(machine_config &config) ATTR_COLD;
 
-	void init_ts803();
+	void init_ts803() ATTR_COLD;
 
 private:
 	uint8_t port10_r(offs_t offset);
@@ -227,7 +229,7 @@ d7 Drive select 3 (active low)
 
 uint8_t ts803_state::disk_0_control_r()
 {
-	printf("Disk0 control register read\n");
+	logerror("Disk0 control register read\n");
 	return 0xff;
 }
 
@@ -237,23 +239,23 @@ uint8_t ts803_state::porta0_r(offs_t offset)
 	switch(offset)
 	{
 		case 0xb2:
-			printf("B2 WDC read\n");
+			logerror("B2 WDC read\n");
 			return 0x11;
 
 		case 0xb3:
-			printf("B3 WDC read\n");
+			logerror("B3 WDC read\n");
 			return 0x15;
 
 		case 0xb4:
-			printf("B4 WDC read\n");
+			logerror("B4 WDC read\n");
 			return 0x55;
 
 		case 0xb5:
-			printf("B5 WDC read\n");
+			logerror("B5 WDC read\n");
 			return 0x01;
 
 		case 0xb6:
-			printf("B6 WDC read\n");
+			logerror("B6 WDC read\n");
 			return 0x25;
 
 	}
@@ -267,7 +269,7 @@ void ts803_state::porta0_w(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0xc4:
-			//printf("Control Register for Alpha or Graphics Mode Selection\n");
+			//logerror("Control Register for Alpha or Graphics Mode Selection\n");
 			break;
 
 		default:
@@ -278,7 +280,7 @@ void ts803_state::porta0_w(offs_t offset, uint8_t data)
 uint8_t ts803_state::port10_r(offs_t offset)
 {
 	offset += 0x10;
-	printf("Port read [%x]\n",offset);
+	logerror("Port read [%x]\n", offset);
 
 	return 0xff;
 }
@@ -290,17 +292,17 @@ void ts803_state::port10_w(offs_t offset, uint8_t data)
 	{
 		case 0x10:
 			data &= 3;
-			printf("Writing to diagnostic indicators 1 & 2: %X\n", data);
+			logerror("Writing to diagnostic indicators 1 & 2: %X\n", data);
 			break;
 
 		case 0x11:
 			data &= 3;
-			printf("Writing to diagnostic indicators 3 & 4: %X\n", data);
+			logerror("Writing to diagnostic indicators 3 & 4: %X\n", data);
 			break;
 
 		case 0x12:
 			data &= 3;
-			printf("RS-422 control: %X\n", data);
+			logerror("RS-422 control: %X\n", data);
 			break;
 
 		case 0x13:
@@ -311,19 +313,19 @@ void ts803_state::port10_w(offs_t offset, uint8_t data)
 				membank("bank4")->set_entry(BIT(data, 0));
 			}
 			else
-				printf("Error: unknown memory config: %X.\n", data);
+				logerror("Error: unknown memory config: %X.\n", data);
 
 			break;
 
 		default:
-			printf("unknown port [%2.2x] write of [%2.2x]\n",offset,data);
+			logerror("unknown port [%2.2x] write of [%2.2x]\n",offset,data);
 			break;
 	}
 }
 
 MC6845_ON_UPDATE_ADDR_CHANGED( ts803_state::crtc_update_addr )
 {
-	//printf("CRTC::address update [%x]\n",address);
+	//logerror("CRTC::address update [%x]\n",address);
 }
 
 MC6845_UPDATE_ROW( ts803_state::crtc_update_row )
@@ -372,7 +374,7 @@ Bit 2 = 0 alpha memory access (round off)
                 1 graphics memory access (normal CPU address)
 */
 
-	//printf("CRTC::c4 write [%2x]\n",data);
+	//logerror("CRTC::c4 write [%2x]\n",data);
 	m_graphics_mode = BIT(data, 0);
 }
 

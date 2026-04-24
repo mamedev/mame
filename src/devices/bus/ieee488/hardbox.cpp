@@ -41,7 +41,15 @@
 #include "emu.h"
 #include "hardbox.h"
 
+#include "cpu/z80/z80.h"
+#include "imagedev/harddriv.h"
+#include "machine/corvushd.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
 
+
+
+namespace {
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -50,15 +58,59 @@
 #define Z80_TAG         "z80"
 #define I8255_0_TAG     "ic17"
 #define I8255_1_TAG     "ic16"
-#define CORVUS_HDC_TAG  "corvus"
 
 
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(HARDBOX, hardbox_device, "hardbox", "SSE HardBox")
+// ======================> hardbox_device
+
+class hardbox_device :  public device_t,
+						public device_ieee488_interface
+{
+public:
+	// construction/destruction
+	hardbox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset_after_children() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	// device_ieee488_interface implementation
+	virtual void ieee488_ifc(int state) override;
+
+private:
+	enum
+	{
+		LED_A = 0,
+		LED_B,
+		LED_READY
+	};
+
+	uint8_t ppi0_pa_r();
+	void ppi0_pb_w(uint8_t data);
+	uint8_t ppi0_pc_r();
+
+	uint8_t ppi1_pa_r();
+	void ppi1_pb_w(uint8_t data);
+	uint8_t ppi1_pc_r();
+	void ppi1_pc_w(uint8_t data);
+
+	void hardbox_io(address_map &map) ATTR_COLD;
+	void hardbox_mem(address_map &map) ATTR_COLD;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<corvus_hdc_device> m_hdc;
+	output_finder<3> m_leds;
+
+	int m_ifc;  // Tracks previous state of IEEE-488 IFC line
+};
 
 
 //-------------------------------------------------
@@ -121,7 +173,7 @@ void hardbox_device::hardbox_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x10, 0x13).rw(I8255_0_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x14, 0x17).rw(I8255_1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x18, 0x18).rw(CORVUS_HDC_TAG, FUNC(corvus_hdc_device::read), FUNC(corvus_hdc_device::write));
+	map(0x18, 0x18).rw(m_hdc, FUNC(corvus_hdc_device::read), FUNC(corvus_hdc_device::write));
 }
 
 
@@ -337,10 +389,10 @@ ioport_constructor hardbox_device::device_input_ports() const
 //-------------------------------------------------
 
 hardbox_device::hardbox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HARDBOX, tag, owner, clock)
+	: device_t(mconfig, GPIB_HARDBOX, tag, owner, clock)
 	, device_ieee488_interface(mconfig, *this)
 	, m_maincpu(*this, Z80_TAG)
-	, m_hdc(*this, CORVUS_HDC_TAG)
+	, m_hdc(*this, "corvus")
 	, m_leds(*this, "led%u", 0U)
 	, m_ifc(0)
 {
@@ -374,6 +426,7 @@ void hardbox_device::device_reset_after_children()
 	   its PC, then the normal map will be restored before the next
 	   instruction fetch.  Here we just set the PC to 0xe000 after the Z80
 	   resets, which has the same effect. */
+	// FIXME: use a memory_view to do this properly
 
 	m_maincpu->set_state_int(Z80_PC, 0xe000);
 }
@@ -392,3 +445,12 @@ void hardbox_device::ieee488_ifc(int state)
 
 	m_ifc = state;
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(GPIB_HARDBOX, device_ieee488_interface, hardbox_device, "gpib_hardbox", "SSE HardBox")

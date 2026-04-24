@@ -163,13 +163,13 @@ std::unique_ptr<util::disasm_interface> v60_device::create_disassembler()
 #define XORW(dst, src)      { (dst) ^= (src); _OV = 0; SetSZPF_Word(dst); }
 #define XORL(dst, src)      { (dst) ^= (src); _OV = 0; SetSZPF_Long(dst); }
 
-#define SUBB(dst, src)      { unsigned res = (dst) - (src); SetCFB(res); SetOFB_Sub(res, src, dst); SetSZPF_Byte(res); dst = (uint8_t)res; }
-#define SUBW(dst, src)      { unsigned res = (dst) - (src); SetCFW(res); SetOFW_Sub(res, src, dst); SetSZPF_Word(res); dst = (uint16_t)res; }
-#define SUBL(dst, src)      { uint64_t res = (uint64_t)(dst) - (int64_t)(src); SetCFL(res); SetOFL_Sub(res, src, dst); SetSZPF_Long(res); dst = (uint32_t)res; }
+#define SUBB(dst, src, c)   { unsigned res = (dst) - (src) - (c); SetCFB(res); SetOFB_Sub(res, src, dst); SetSZPF_Byte(res); dst = (uint8_t)res; }
+#define SUBW(dst, src, c)   { unsigned res = (dst) - (src) - (c); SetCFW(res); SetOFW_Sub(res, src, dst); SetSZPF_Word(res); dst = (uint16_t)res; }
+#define SUBL(dst, src, c)   { uint64_t res = (uint64_t)(dst) - (int64_t)(src) - (c); SetCFL(res); SetOFL_Sub(res, src, dst); SetSZPF_Long(res); dst = (uint32_t)res; }
 
-#define ADDB(dst, src)      { unsigned res = (dst) + (src); SetCFB(res); SetOFB_Add(res, src, dst); SetSZPF_Byte(res); dst = (uint8_t)res; }
-#define ADDW(dst, src)      { unsigned res = (dst) + (src); SetCFW(res); SetOFW_Add(res, src, dst); SetSZPF_Word(res); dst = (uint16_t)res; }
-#define ADDL(dst, src)      { uint64_t res = (uint64_t)(dst) + (uint64_t)(src); SetCFL(res); SetOFL_Add(res, src, dst); SetSZPF_Long(res); dst = (uint32_t)res; }
+#define ADDB(dst, src, c)   { unsigned res = (dst) + (src) + (c); SetCFB(res); SetOFB_Add(res, src, dst); SetSZPF_Byte(res); dst = (uint8_t)res; }
+#define ADDW(dst, src, c)   { unsigned res = (dst) + (src) + (c); SetCFW(res); SetOFW_Add(res, src, dst); SetSZPF_Word(res); dst = (uint16_t)res; }
+#define ADDL(dst, src, c)   { uint64_t res = (uint64_t)(dst) + (uint64_t)(src) + (c); SetCFL(res); SetOFL_Add(res, src, dst); SetSZPF_Long(res); dst = (uint32_t)res; }
 
 #define SETREG8(a, b)       (a) = ((a) & ~0xff) | ((b) & 0xff)
 #define SETREG16(a, b)      (a) = ((a) & ~0xffff) | ((b) & 0xffff)

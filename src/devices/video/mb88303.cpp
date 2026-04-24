@@ -4,7 +4,7 @@
 
     Fujitsu MB88303 NMOS Television Display Controller (TVDC) emulation
 
-    TOOD:
+    TODO:
     - Character-size registers.
     - Proper hsync/vsync emulation.
     - Blinking.

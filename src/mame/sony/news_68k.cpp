@@ -133,6 +133,7 @@ __|              |         |  |ALS05A| |N82077   |   __             6 x 74F00J->
 #include "bus/centronics/ctronics.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
+#include "bus/nscsi/tape.h"
 #include "bus/rs232/rs232.h"
 
 #include "machine/input_merger.h"
@@ -142,7 +143,6 @@ __|              |         |  |ALS05A| |N82077   |   __             6 x 74F00J->
 #define LOG_TIMER (1U << 2)
 #define VERBOSE (LOG_GENERAL|LOG_TIMER)
 #include "logmacro.h"
-#include "bus/nscsi/tape.h"
 
 #define DESKTOP_GRAPHICS 0
 
@@ -162,6 +162,7 @@ public:
 		, m_net(*this, "net")
 		, m_fdc(*this, "fdc")
 		, m_hid(*this, "hid")
+		, m_scsibus(*this, "scsi")
 		, m_serial(*this, "serial%u", 0U)
 		, m_parallel(*this, "parallel")
 		, m_parallel_data(*this, "parallel_data")
@@ -222,6 +223,7 @@ protected:
 	required_device<am7990_device> m_net;
 	required_device<upd765_family_device> m_fdc;
 	required_device<news_hid_hle_device> m_hid;
+	required_device<nscsi_bus_device> m_scsibus;
 
 	required_device_array<rs232_port_device, 2> m_serial;
 	required_device<centronics_device> m_parallel;
@@ -251,7 +253,7 @@ class news_68k_desktop_state : public news_68k_base_state
 public:
 	news_68k_desktop_state(machine_config const &mconfig, device_type type, char const *tag)
 		: news_68k_base_state(mconfig, type, tag)
-		, m_scsi(*this, "scsi:7:cxd1180")
+		, m_scsi(*this, "cxd1180")
 #if DESKTOP_GRAPHICS
 		, m_screen(*this, "screen")
 		, m_ramdac(*this, "ramdac")
@@ -294,7 +296,7 @@ class news_68k_laptop_state : public news_68k_base_state
 public:
 	news_68k_laptop_state(machine_config const &mconfig, device_type type, char const *tag)
 	: news_68k_base_state(mconfig, type, tag)
-	, m_scsi(*this, "scsi:7:cxd1185")
+	, m_scsi(*this, "cxd1185")
 	, m_lcd(*this, "lcd")
 	, m_vram(*this, "vram")
 	{
@@ -748,7 +750,7 @@ void news_68k_base_state::common(machine_config &config)
 	m_net->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_net_ram[(offset >> 1) & 0x1fff]); });
 
 	// scsi bus and devices
-	NSCSI_BUS(config, "scsi");
+	NSCSI_BUS(config, m_scsibus);
 
 	/*
 	 * NWS-1580:
@@ -847,18 +849,13 @@ void news_68k_desktop_state::nws1580(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
 	// scsi host adapter
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("cxd1180", CXD1180).machine_config(
-		[this](device_t *device)
-		{
-			auto &adapter = downcast<cxd1180_device &>(*device);
-
-			adapter.irq_handler().set(*this, FUNC(news_68k_desktop_state::irq_w<SCSI>));
-			adapter.irq_handler().append(m_dma, FUNC(dmac_0266_device::eop_w));
-			adapter.drq_handler().set(m_dma, FUNC(dmac_0266_device::req_w));
-
-			subdevice<dmac_0266_device>(":dma")->dma_r_cb().set(adapter, FUNC(cxd1180_device::dma_r));
-			subdevice<dmac_0266_device>(":dma")->dma_w_cb().set(adapter, FUNC(cxd1180_device::dma_w));
-		});
+	CXD1180(config, m_scsi);
+	m_scsibus->set_external_device(7, m_scsi);
+	m_scsi->irq_handler().set(DEVICE_SELF, FUNC(news_68k_desktop_state::irq_w<SCSI>));
+	m_scsi->irq_handler().append(m_dma, FUNC(dmac_0266_device::eop_w));
+	m_scsi->drq_handler().set(m_dma, FUNC(dmac_0266_device::req_w));
+	m_dma->dma_r_cb().set(m_scsi, FUNC(cxd1180_device::dma_r));
+	m_dma->dma_w_cb().set(m_scsi, FUNC(cxd1180_device::dma_w));
 
 #if DESKTOP_GRAPHICS
 	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(m_irq5, FUNC(input_merger_device::in_w<0>));
@@ -903,20 +900,13 @@ void news_68k_laptop_state::nws1250(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
 	// scsi host adapter
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("cxd1185", CXD1185)
-		.clock(32_MHz_XTAL / 2) // TODO: needs confirmation on hw
-		.machine_config(
-			[this](device_t *device)
-			{
-				auto &adapter = downcast<cxd1185_device &>(*device);
-
-				adapter.irq_out_cb().set(*this, FUNC(news_68k_laptop_state::irq_w<SCSI>));
-				adapter.irq_out_cb().append(m_dma, FUNC(dmac_0266_device::eop_w));
-				adapter.drq_out_cb().set(m_dma, FUNC(dmac_0266_device::req_w));
-
-				subdevice<dmac_0266_device>(":dma")->dma_r_cb().set(adapter, FUNC(cxd1185_device::dma_r));
-				subdevice<dmac_0266_device>(":dma")->dma_w_cb().set(adapter, FUNC(cxd1185_device::dma_w));
-			});
+	CXD1185(config, m_scsi, 32_MHz_XTAL / 2); // TODO: needs confirmation on hw
+	m_scsibus->set_external_device(7, m_scsi);
+	m_scsi->irq_out_cb().set(DEVICE_SELF, FUNC(news_68k_laptop_state::irq_w<SCSI>));
+	m_scsi->irq_out_cb().append(m_dma, FUNC(dmac_0266_device::eop_w));
+	m_scsi->drq_out_cb().set(m_dma, FUNC(dmac_0266_device::req_w));
+	m_dma->dma_r_cb().set(m_scsi, FUNC(cxd1185_device::dma_r));
+	m_dma->dma_w_cb().set(m_scsi, FUNC(cxd1185_device::dma_w));
 
 	// Integrated LCD panel
 	SCREEN(config, m_lcd, SCREEN_TYPE_LCD);

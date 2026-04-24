@@ -7,6 +7,11 @@
 
 #include "cpu/drcuml.h"
 
+#include <utility>
+
+
+class sharc_disassembler;
+
 
 class adsp21062_device : public cpu_device
 {
@@ -38,8 +43,9 @@ public:
 
 	template <unsigned N> uint64_t pm_r(offs_t offset);
 	template <unsigned N> void pm_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	template <unsigned N> uint32_t dmw_r(offs_t offset);
-	template <unsigned N> void dmw_w(offs_t offset, uint32_t data);
+	template <unsigned N> uint32_t dm_short_r(offs_t offset);
+	template <unsigned N> uint32_t dm_short_se_r(offs_t offset);
+	template <unsigned N> void dm_short_w(offs_t offset, uint32_t data);
 	uint32_t iop_r(offs_t offset);
 	void iop_w(offs_t offset, uint32_t data);
 
@@ -130,7 +136,7 @@ private:
 	static constexpr uint32_t MV =              0x0000'0080;    // Multiplier overflow
 	static constexpr uint32_t MU =              0x0000'0100;    // Multiplier underflow
 	static constexpr uint32_t MI =              0x0000'0200;    // Multiplier floating-point invalid operation
-	static constexpr uint32_t AF =              0x0000'0400;
+	static constexpr uint32_t AF =              0x0000'0400;    // Last ALU operation was a floating-point operation
 	static constexpr uint32_t SV =              0x0000'0800;    // Shifter overflow
 	static constexpr uint32_t SZ =              0x0000'1000;    // Shifter result zero
 	static constexpr uint32_t SS =              0x0000'2000;    // Shifter input sign
@@ -187,6 +193,8 @@ private:
 	static constexpr uint32_t MODE2_FLG3O =     0x0004'0000;    // FLAG3 (1) Output / (0) Input
 	static constexpr uint32_t MODE2_CAFRZ =     0x0008'0000;    // Cache freeze
 
+
+	struct cfuncs;
 
 	using opcode_func = void (adsp21062_device::*)();
 	struct SHARC_OP
@@ -283,6 +291,7 @@ private:
 	uml::code_handle *m_swap_r0_7;
 	uml::code_handle *m_swap_r8_15;
 
+	memory_view m_dm_short_view;
 	memory_access<24, 3, -3, ENDIANNESS_LITTLE>::specific m_program;
 	memory_access<32, 2, -2, ENDIANNESS_LITTLE>::specific m_data;
 
@@ -299,6 +308,9 @@ private:
 	bool m_write_stalled_pending;
 	bool m_input_update_pending;
 	bool m_enable_drc;
+
+	static std::string disassemble_one(uint32_t pc, uint64_t opcode) ATTR_COLD;
+	void build_opcode_table() ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(sharc_iop_delayed_write_callback);
 	TIMER_CALLBACK_MEMBER(sharc_dma_callback);
@@ -377,64 +389,95 @@ private:
 	void sharcop_push_pop_stacks();
 	void sharcop_nop();
 	void sharcop_idle();
-	void sharcop_unimplemented();
+	[[noreturn]] void sharcop_unimplemented() ATTR_COLD;
+
+	// ALU helpers
+	inline SHARC_REG FADD(int fx, int fy);
+	inline SHARC_REG FSUB(int fx, int fy);
+	inline SHARC_REG FAVG(int fx, int fy);
+	inline SHARC_REG FABS(int fx);
+	inline SHARC_REG FMIN(int fx, int fy);
+	inline SHARC_REG FMAX(int fx, int fy);
+	inline std::pair<SHARC_REG, SHARC_REG> FADD_FSUB(int fx, int fy);
+	inline uint32_t SCALB(SHARC_REG fx, int ry);
+
+	// Multiplier helpers
+	inline SHARC_REG FMUL(int fx, int fy);
+
+	// ALU fixed-point
 	inline void compute_add(int rn, int rx, int ry);
 	inline void compute_sub(int rn, int rx, int ry);
 	inline void compute_add_ci(int rn, int rx, int ry);
 	inline void compute_sub_ci(int rn, int rx, int ry);
-	inline void compute_and(int rn, int rx, int ry);
 	inline void compute_comp(int rx, int ry);
-	inline void compute_pass(int rn, int rx);
-	inline void compute_xor(int rn, int rx, int ry);
-	inline void compute_or(int rn, int rx, int ry);
+	inline void compute_add_ci(int rn, int rx);
+	inline void compute_sub_ci(int rn, int rx);
 	inline void compute_inc(int rn, int rx);
 	inline void compute_dec(int rn, int rx);
+	inline void compute_neg(int rn, int rx);
+	inline void compute_abs(int rn, int rx);
+	inline void compute_pass(int rn, int rx);
+	inline void compute_and(int rn, int rx, int ry);
+	inline void compute_or(int rn, int rx, int ry);
+	inline void compute_xor(int rn, int rx, int ry);
+	inline void compute_not(int rn, int rx);
 	inline void compute_min(int rn, int rx, int ry);
 	inline void compute_max(int rn, int rx, int ry);
-	inline void compute_neg(int rn, int rx);
-	inline void compute_not(int rn, int rx);
-	inline uint32_t SCALB(SHARC_REG rx, int ry);
-	inline void compute_float(int rn, int rx);
-	inline void compute_fix(int rn, int rx);
-	inline void compute_fix_scaled(int rn, int rx, int ry);
-	inline void compute_float_scaled(int rn, int rx, int ry);
-	inline void compute_logb(int rn, int rx);
-	inline void compute_scalb(int rn, int rx, int ry);
-	inline void compute_fadd(int rn, int rx, int ry);
-	inline void compute_fsub(int rn, int rx, int ry);
-	inline void compute_favg(int rn, int rx, int ry);
-	inline void compute_fneg(int rn, int rx);
-	inline void compute_fcomp(int rx, int ry);
-	inline void compute_fabs_plus(int rn, int rx, int ry);
-	inline void compute_fmax(int rn, int rx, int ry);
-	inline void compute_fmin(int rn, int rx, int ry);
-	inline void compute_fcopysign(int rn, int rx, int ry);
-	inline void compute_fclip(int rn, int rx, int ry);
-	inline void compute_recips(int rn, int rx);
-	inline void compute_rsqrts(int rn, int rx);
-	inline void compute_fpass(int rn, int rx);
-	inline void compute_fabs(int rn, int rx);
+	inline void compute_clip(int rn, int rx, int ry);
+
+	// ALU floating-point
+	inline void compute_fadd(int fn, int fx, int fy);
+	inline void compute_fsub(int fn, int fx, int fy);
+	inline void compute_fadd_abs(int fn, int fx, int fy);
+	inline void compute_fsub_abs(int fn, int fx, int fy);
+	inline void compute_favg(int fn, int fx, int fy);
+	inline void compute_fcomp(int fx, int fy);
+	inline void compute_fneg(int fn, int fx);
+	inline void compute_fabs(int fn, int fx);
+	inline void compute_fpass(int fn, int fx);
+	inline void compute_scalb(int fn, int fx, int ry);
+	inline void compute_logb(int rn, int fx);
+	inline void compute_fix_scaled(int rn, int fx, int ry);
+	inline void compute_fix(int rn, int fx);
+	inline void compute_float_scaled(int fn, int rx, int ry);
+	inline void compute_float(int fn, int rx);
+	inline void compute_recips(int fn, int fx);
+	inline void compute_rsqrts(int fn, int fx);
+	inline void compute_fcopysign(int fn, int fx, int fy);
+	inline void compute_fmin(int fn, int fx, int fy);
+	inline void compute_fmax(int fn, int fx, int fy);
+	inline void compute_fclip(int fn, int fx, int fy);
+
+	// Multiplier
 	inline void compute_mul_uuin(int rn, int rx, int ry);
 	inline void compute_mul_ssin(int rn, int rx, int ry);
 	inline uint32_t compute_mrf_plus_mul_ssin(int rx, int ry);
 	inline uint32_t compute_mrb_plus_mul_ssin(int rx, int ry);
-	inline void compute_fmul(int rn, int rx, int ry);
-	inline void compute_multi_mr_to_reg(int ai, int rk);
-	inline void compute_multi_reg_to_mr(int ai, int rk);
+	inline void compute_fmul(int fn, int fx, int fy);
+
+	// Dual add/subtract
 	inline void compute_dual_add_sub(int ra, int rs, int rx, int ry);
+	inline void compute_dual_fadd_fsub(int fa, int fs, int fx, int fy);
+
+	// Fixed-Point multiply/accumulate and add, subtract or average
 	inline void compute_mul_ssfr_add(int rm, int rxm, int rym, int ra, int rxa, int rya);
 	inline void compute_mul_ssfr_sub(int rm, int rxm, int rym, int ra, int rxa, int rya);
-	inline void compute_dual_fadd_fsub(int ra, int rs, int rx, int ry);
+
+	// Floating-Point multiplication and ALU operation
 	inline void compute_fmul_fadd(int fm, int fxm, int fym, int fa, int fxa, int fya);
 	inline void compute_fmul_fsub(int fm, int fxm, int fym, int fa, int fxa, int fya);
-	inline void compute_fmul_float_scaled(int fm, int fxm, int fym, int fa, int fxa, int fya);
-	inline void compute_fmul_fix_scaled(int fm, int fxm, int fym, int fa, int fxa, int fya);
-	inline void compute_fmul_avg(int fm, int fxm, int fym, int fa, int fxa, int fya);
-	inline void compute_fmul_abs(int fm, int fxm, int fym, int fa, int fxa, int fya);
+	inline void compute_fmul_float_scaled(int fm, int fxm, int fym, int fa, int rxa, int rya);
+	inline void compute_fmul_fix_scaled(int fm, int fxm, int fym, int ra, int fxa, int rya);
+	inline void compute_fmul_favg(int fm, int fxm, int fym, int fa, int fxa, int fya);
+	inline void compute_fmul_fabs(int fm, int fxm, int fym, int fa, int fxa);
 	inline void compute_fmul_fmax(int fm, int fxm, int fym, int fa, int fxa, int fya);
 	inline void compute_fmul_fmin(int fm, int fxm, int fym, int fa, int fxa, int fya);
+
+	// Multiplication and dual add/subtract
 	inline void compute_fmul_dual_fadd_fsub(int fm, int fxm, int fym, int fa, int fs, int fxa, int fya);
-	void build_opcode_table();
+
+	inline void compute_multi_mr_to_reg(int ai, int rk);
+	inline void compute_multi_reg_to_mr(int ai, int rk);
 
 	// internal compiler state
 	struct compiler_state
@@ -451,6 +494,7 @@ private:
 	};
 
 	void execute_run_drc();
+	void log_descriptions(const sharc_disassembler &disassembler, const opcode_desc *desc_list, unsigned indent);
 	void generate_invariant();
 	void flush_drc_cache();
 	void compile_block(offs_t pc);
@@ -473,6 +517,8 @@ private:
 	void static_generate_mode1_ops();
 	void load_fast_iregs(drcuml_block &block);
 	void save_fast_iregs(drcuml_block &block);
+	void update_az_an_fixed(drcuml_block &block, const opcode_desc *desc);
+	void update_az_av_an_ac_fixed(drcuml_block &block, const opcode_desc *desc, bool sub);
 	void generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, bool last_delayslot);
 	void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, bool allow_exception);
 	bool generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
@@ -492,19 +538,6 @@ private:
 	void generate_astat_copy(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
 	bool if_condition_always_true(int condition);
-	uint32_t do_condition_astat_bits(int condition);
-
-	template <unsigned N> static void cfunc_update_flag_out(void *param);
-
-	[[noreturn]] static void cfunc_unimplemented(void *param) ATTR_COLD;
-	[[noreturn]] static void cfunc_unimplemented_compute(void *param) ATTR_COLD;
-	[[noreturn]] static void cfunc_unimplemented_shiftimm(void *param) ATTR_COLD;
-	[[noreturn]] static void cfunc_pcstack_overflow(void *param) ATTR_COLD;
-	[[noreturn]] static void cfunc_pcstack_underflow(void *param) ATTR_COLD;
-	[[noreturn]] static void cfunc_loopstack_overflow(void *param) ATTR_COLD;
-	[[noreturn]] static void cfunc_loopstack_underflow(void *param) ATTR_COLD;
-	[[noreturn]] static void cfunc_statusstack_overflow(void *param) ATTR_COLD;
-	[[noreturn]] static void cfunc_statusstack_underflow(void *param) ATTR_COLD;
 };
 
 

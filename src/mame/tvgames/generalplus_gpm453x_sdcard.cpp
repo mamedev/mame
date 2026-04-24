@@ -83,8 +83,11 @@ ROM_START( lx_jg7420 )
 	ROM_REGION( 0x10000, "boot", ROMREGION_ERASEFF )
 	ROM_LOAD( "internal.bin", 0x00000, 0x10000, NO_DUMP ) // unknown size/capacity/type (internal?)
 
-	ROM_REGION( 0x100000, "spi", ROMREGION_ERASEFF ) // probably undumped for this unit
-	ROM_LOAD( "spi_boot", 0x00000, 0x100000, NO_DUMP )
+	ROM_REGION( 0x100000, "spi", ROMREGION_ERASEFF )
+	ROM_LOAD( "25d80.u6", 0x00000, 0x100000, CRC(6916409d) SHA1(80dbdc568547cc347a8aca0d530ac25e20b08e34) )
+
+	ROM_REGION( 0x80000, "spi2", ROMREGION_ERASEFF ) // does it boot from this if no card is present?
+	ROM_LOAD( "fm25q04.u14", 0x00000, 0x80000, CRC(f6410672) SHA1(3ccce8e5ef1bfd08c90d90d2efdb646d2af9fba7) )
 
 	DISK_REGION( "sdcard" ) // 4GB SD Card
 	DISK_IMAGE( "jg7420", 0, SHA1(214a1686c7eefdb4cb5d723e98957600c8cb138d) )
@@ -112,6 +115,47 @@ ROM_START( rizstals )
 	DISK_IMAGE( "rizstals", 0, SHA1(79462dd4a632d9b9710581ed170a696c059e8a2d) )
 ROM_END
 
+
+ROM_START( intrtvg )
+	ROM_REGION( 0x100000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(5aa91972) SHA1(296108e8683063c16951ff326e6ff3d63d9ed5b8) )
+
+	DISK_REGION( "sdcard" ) // 4GB SD Card
+	DISK_IMAGE( "interactivetv", 0, SHA1(7061e28c4560b763bda1157036b79c726387e430) )
+ROM_END
+
+ROM_START( bodygun )
+	ROM_REGION( 0x100000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(5aa91972) SHA1(296108e8683063c16951ff326e6ff3d63d9ed5b8) )
+
+	DISK_REGION( "sdcard" ) // 4GB SD Card
+	DISK_IMAGE( "bodygun", 0, SHA1(3e41a2ba9b86fb6b155c1c82a7612458c3555a64) )
+ROM_END
+
+ROM_START( kaximond )
+	ROM_REGION( 0x100000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "tj25q08.u6", 0x0000, 0x100000, CRC(83d07dff) SHA1(4d6a3a823686a0955c904cc5f8c3e0e95ec53046) )
+
+	DISK_REGION( "sdcard" ) // 32GB SD Card
+	DISK_IMAGE( "kaximon dance", 0, SHA1(dd041586f8815312e95a4e678d1e292c3407abea) )
+ROM_END
+
+ROM_START( arb605 )
+	ROM_REGION( 0x100000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25q80.u6", 0x0000, 0x100000, CRC(ba2cdacd) SHA1(d47829ee5310140665146262a44e0ba91942f25c) )
+
+	DISK_REGION( "sdcard" ) // 4GB SD Card
+	DISK_IMAGE( "ar_game_console_b605", 0, SHA1(433d354529e262de9d833a7a423a37915ba3362c) )
+ROM_END
+
+ROM_START( ardancem )
+	ROM_REGION( 0x100000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(ba2cdacd) SHA1(d47829ee5310140665146262a44e0ba91942f25c) )
+
+	DISK_REGION( "sdcard" ) // 16GB SD Card
+	DISK_IMAGE( "ardancemat", 0, SHA1(df8cb065f5ce0ca863b205549ecc4c27647f9954) )
+ROM_END
+
 } // anonymous namespace
 
 // JG7420_24 on sticker
@@ -120,3 +164,15 @@ CONS( 201?, lx_jg7420,    0,       0,      gpm4530a_lexibook, gpm4530a_lexibook,
 CONS( 201?, lx_jg7440,    0,       0,      gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init, "Lexibook", "Lexibook JG7440 - TV Game Console (250 Games, 32-bits)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 CONS( 2021, rizstals,     0,       0,      gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init, "Takara Tomy", "RizSta Live Studio", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+// company is called 深圳市飞讯互动科技有限公司
+// surface details erased on SoC for both of these
+// SPI ROMs have GPspispi header, so a GeneralPlus chip, seems to have Thumb-2 instructions only and boot ROMs are similar to lx_jg7420 etc. (so likely a Cortex-M)
+// very generic packaging, boots from SPI, has game data on SD card (mostly NES games)
+CONS( 202?, intrtvg,         0,        0,      gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "Interactive Game Console (Model B608, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// also very generic packaging, similar SD card content to above, including NES games, but with some extra music/videos for the dance part
+CONS( 202?, ardancem,        0,        0,      gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Dance Mat (Model DM02, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// likewise
+CONS( 202?, arb605,          0,        0,      gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Game Console (Model B605, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 202?, bodygun,         0,        0,      gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology", "Body Gun Game Console (Model GC05, Damcoola)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 202?, kaximond,        0,        0,      gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init,  "Kaximon", "Double Dance Mat with HDMI (Kaximon)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

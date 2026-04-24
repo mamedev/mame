@@ -40,10 +40,10 @@ TODO:
 #define LOG_TODO   (1U << 2) // log unimplemented registers
 #define LOG_MAP    (1U << 3) // log full remaps
 #define LOG_LPC    (1U << 4) // log LPC legacy regs
-#define LOG_IRQ    (1U << 5) // log IRQ remaps
+#define LOG_IRQ    (1U << 5) // log IRQ remaps and state
 
 #define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO | LOG_IRQ)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -74,6 +74,14 @@ sis950_lpc_device::sis950_lpc_device(const machine_config &mconfig, const char *
 	, m_smbus(*this, "smbus")
 	, m_fast_reset_cb(*this)
 {
+}
+
+void sis950_lpc_device::device_start()
+{
+	pci_device::device_start();
+
+	m_pci_root->set_pin_mapper(pci_pin_mapper(*this, FUNC(sis950_lpc_device::pin_mapper)));
+	m_pci_root->set_irq_handler(pci_irq_handler(*this, FUNC(sis950_lpc_device::irq_handler)));
 }
 
 void sis950_lpc_device::device_reset()
@@ -863,4 +871,98 @@ void sis950_lpc_device::pc_dack5_w(int state) { pc_select_dma_channel(5, state);
 void sis950_lpc_device::pc_dack6_w(int state) { pc_select_dma_channel(6, state); }
 void sis950_lpc_device::pc_dack7_w(int state) { pc_select_dma_channel(7, state); }
 
+/*
+ * Pin Mapper
+ */
 
+void sis950_lpc_device::redirect_irq(int irq, int state)
+{
+	switch (irq)
+	{
+	case 0:
+	case 1:
+	case 2:
+	case 8:
+	case 13:
+		break;
+	case 3:
+		m_pic_master->ir3_w(state);
+		break;
+	case 4:
+		m_pic_master->ir4_w(state);
+		break;
+	case 5:
+		m_pic_master->ir5_w(state);
+		break;
+	case 6:
+		m_pic_master->ir6_w(state);
+		break;
+	case 7:
+		m_pic_master->ir7_w(state);
+		break;
+	case 9:
+		m_pic_slave->ir1_w(state);
+		break;
+	case 10:
+		m_pic_slave->ir2_w(state);
+		break;
+	case 11:
+		m_pic_slave->ir3_w(state);
+		break;
+	case 12:
+		m_pic_slave->ir4_w(state);
+		break;
+	case 14:
+		m_pic_slave->ir6_w(state);
+		break;
+	case 15:
+		m_pic_slave->ir7_w(state);
+		break;
+	}
+}
+
+
+int sis950_lpc_device::pin_mapper(int pin)
+{
+	if(pin < 0 || pin >= 4 || BIT(m_irq_remap[pin], 7))
+		return -1;
+	return m_irq_remap[pin];
+}
+
+void sis950_lpc_device::irq_handler(int line, int state)
+{
+	if(line < 0 || line >= 16)
+		return;
+
+	LOGIRQ("irq_handler %d %d\n", line, state);
+	redirect_irq(line, state);
+}
+
+// IDE can only redirect one IRQ, bit 4 select between Primary (0) or Secondary (1)
+void sis950_lpc_device::pc_iirqa_w(int state)
+{
+	u8 setting = m_irq_remap[IRQ_IDE];
+
+	if (BIT(setting, 7) || BIT(setting, 4))
+	{
+		redirect_irq(14, state);
+		return;
+	}
+
+	redirect_irq(setting & 0xf, state);
+}
+
+void sis950_lpc_device::pc_iirqb_w(int state)
+{
+	u8 setting = m_irq_remap[IRQ_IDE];
+
+	if (BIT(setting, 7) || !BIT(setting, 4))
+	{
+		redirect_irq(15, state);
+		return;
+	}
+
+	redirect_irq(setting & 0xf, state);
+}
+
+// TODO: public setter for remaining connections (cfr. table in irq_remap_w)

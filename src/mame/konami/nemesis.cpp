@@ -125,22 +125,16 @@ initials
 #include "konamigt.lh"
 
 
-void gx400_base_state::nemesis_vblank_irq(int state)
+void gx400_base_state::vblank_irq1(int state)
 {
-	if (state && m_irq_on)
-		m_maincpu->set_input_line(1, HOLD_LINE);
+	if (state && m_irq1_on)
+		m_maincpu->set_input_line(1, ASSERT_LINE);
 }
 
-void salamand_state::blkpnthr_vblank_irq(int state)
+void gx400_base_state::vblank_irq2(int state)
 {
-	if (state && m_irq_on)
-		m_maincpu->set_input_line(2, HOLD_LINE);
-}
-
-void bubsys_state::bubsys_vblank_irq(int state)
-{
-	if (state && m_irq_on)
-		m_maincpu->set_input_line(4, HOLD_LINE);
+	if (state && m_irq2_on)
+		m_maincpu->set_input_line(2, ASSERT_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(bubsys_state::bubsys_interrupt)
@@ -154,7 +148,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bubsys_state::bubsys_interrupt)
 
 		// the int4 fires every 72 scanlines of a counter that is NOT reset by VBLANK, and acts as a sort of constant timer
 		if (m_irq4_on)
-			m_maincpu->set_input_line(4, HOLD_LINE);
+			m_maincpu->set_input_line(4, ASSERT_LINE);
 	}
 
 	// based on tracing, the VBLANK int rising edge is 16 full scanlines before the rising edge of the VSYNC pulse on CSYNC,
@@ -165,7 +159,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bubsys_state::bubsys_interrupt)
 	// particular frame.
 	// TODO: actually implement this. The behavior may differ in the (unused(?) and untested) 288 scanline mode, as well.
 	if (scanline == 0 && m_irq2_on)
-		m_maincpu->set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, ASSERT_LINE);
 
 	if (scanline == 0 && m_irq1_on && (m_screen->frame_number() & 1) == 0)
 	{
@@ -173,20 +167,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(bubsys_state::bubsys_interrupt)
 		// Its behavior in 288 scanline mode is unknown/untested.
 		m_maincpu->set_input_line(1, ASSERT_LINE);
 	}
-	else if (scanline == 0 && m_irq1_on && (m_screen->frame_number() & 1) != 0)
-		m_maincpu->set_input_line(1, CLEAR_LINE);
-
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(gx400_state::konamigt_interrupt)
 {
 	int const scanline = param;
 
-	if (scanline == 240 && m_irq_on && (m_screen->frame_number() & 1) == 0)
-		m_maincpu->set_input_line(1, HOLD_LINE);
+	if (scanline == 240 && m_irq1_on && (m_screen->frame_number() & 1) == 0)
+		m_maincpu->set_input_line(1, ASSERT_LINE);
 
 	if (scanline == 0 && m_irq2_on)
-		m_maincpu->set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, ASSERT_LINE);
 }
 
 // irq enables in reverse order than Salamander according to the irq routine contents
@@ -194,11 +185,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(hcrash_state::hcrash_interrupt)
 {
 	int const scanline = param;
 
-	if (scanline == 240 && m_irq2_on) //&& (m_screen->frame_number() & 1) == 0)
-		m_maincpu->set_input_line(1, HOLD_LINE);
+	if (scanline == 240 && m_irq1_on) //&& (m_screen->frame_number() & 1) == 0)
+		m_maincpu->set_input_line(1, ASSERT_LINE);
 
-	if (scanline == 0 && m_irq_on)
-		m_maincpu->set_input_line(2, HOLD_LINE);
+	if (scanline == 0 && m_irq2_on)
+		m_maincpu->set_input_line(2, ASSERT_LINE);
 }
 
 
@@ -207,55 +198,59 @@ TIMER_DEVICE_CALLBACK_MEMBER(gx400_state::gx400_interrupt)
 	int const scanline = param;
 
 	if (scanline == 240 && m_irq1_on && (m_screen->frame_number() & 1) == 0)
-		m_maincpu->set_input_line(1, HOLD_LINE);
+		m_maincpu->set_input_line(1, ASSERT_LINE);
 
 	if (scanline == 0 && m_irq2_on)
-		m_maincpu->set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, ASSERT_LINE);
 
 	if (scanline == 120 && m_irq4_on)
-		m_maincpu->set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, ASSERT_LINE);
 }
 
 
-void gx400_state::irq_enable_w(int state)
-{
-	m_irq_on = state;
-}
-
-void gx400_state::irq1_enable_w(int state)
+void gx400_base_state::irq1_enable_w(int state)
 {
 	m_irq1_on = state;
+	if (!state)
+		m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
 void gx400_base_state::irq2_enable_w(int state)
 {
 	m_irq2_on = state;
+	if (!state)
+		m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
-void gx400_state::irq4_enable_w(int state)
+void gx400_base_state::irq4_enable_w(int state)
 {
 	m_irq4_on = state;
+	if (!state)
+		m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
-void gx400_state::coin1_lockout_w(int state)
+void gx400_base_state::coin1_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(0, state);
 }
 
-void gx400_state::coin2_lockout_w(int state)
+void gx400_base_state::coin2_lockout_w(int state)
 {
 	machine().bookkeeping().coin_lockout_w(1, state);
 }
 
-void gx400_state::sound_irq_w(int state)
+void gx400_base_state::sound_irq_w(int state)
 {
-	// This asserts the Z80 /irq pin by setting a 74ls74 latch; the Z80 pulses /IOREQ low during servicing of the interrupt,
-	// which clears the latch automatically, so HOLD_LINE is correct in this case
-	if (state)
-		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	// 7474 to Z80 IRQ; Z80 /IOREQ auto acks the interrupt so HOLD_LINE is correct
+	if (state && !m_sound_irq_clk)
+		m_audiocpu->set_input_line(0, HOLD_LINE);
+
+	// MAME's 74259 device assures that this is only triggered on rising/falling edge,
+	// but sound_irq_w is also called from elsewhere, so we must remember the pin state
+	m_sound_irq_clk = bool(state);
 }
 
-void gx400_state::sound_nmi_w(int state)
+void gx400_base_state::sound_nmi_w(int state)
 {
 	// On Bubble System at least, this goes to an LS02 NOR before the Z80, whose other input is tied to ???, acting as an inverter.
 	// Effectively, if the bit is 1, NMI is asserted, otherwise it is cleared. This is also cleared on reset.
@@ -265,6 +260,35 @@ void gx400_state::sound_nmi_w(int state)
 	// TODO: trace implement the other NMI source; without this, the 'getting ready' pre-bubble-ready countdown in bubble system cannot work,
 	// since it requires a sequence of NMIs in order to function.
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void salamand_state::salamand_intlatch_w(uint8_t data)
+{
+	// direct latch instead of 74259
+	irq1_enable_w(BIT(data, 0));
+	irq2_enable_w(BIT(data, 1));
+	gfx_flipx_w(BIT(data, 2));
+	gfx_flipy_w(BIT(data, 3));
+}
+
+void salamand_state::blkpnthr_intlatch_w(uint8_t data)
+{
+	// irq1/2 swapped
+	salamand_intlatch_w(bitswap<8>(data,7,6,5,4,3,2,0,1));
+}
+
+void salamand_state::outlatch_w(uint8_t data)
+{
+	// direct latch instead of 74259
+	coin1_lockout_w(BIT(data, 1));
+	coin2_lockout_w(BIT(data, 2));
+	sound_irq_w(BIT(data, 3));
+}
+
+void hcrash_state::citybomb_outlatch_w(uint8_t data)
+{
+	outlatch_w(data);
+	m_selected_ip = BIT(~data, 4); // citybomb steering & accel
 }
 
 void bubsys_state::bubsys_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -329,36 +353,37 @@ uint16_t gx400_base_state::konamigt_input_word_r()
     bit 12-15: accel
 */
 
-	int const data = m_io_in3->read();
+	int const data = m_io_in[3]->read();
 	int const data2 = m_io_wheel->read();
 
 	int ret = 0x0000;
 
-//  if (BIT(data, 4)) ret |= 0x0800;          // turbo/gear?
-//  if (BIT(data, 7)) ret |= 0x0400;          // turbo?
+//  if (BIT(data, 4)) ret |= 0x0800; // turbo/gear?
+//  if (BIT(data, 7)) ret |= 0x0400; // turbo?
 	if (BIT(data, 5))
-		ret |= 0x0300;          // brake        (0-3)
+		ret |= 0x0300; // brake (0-3)
 
 	if (BIT(data, 6))
-		ret |= 0xf000;          // accel        (0-f)
+		ret |= 0xf000; // accel (0-f)
 
-	ret |= data2 & 0x7f;                    // steering wheel, not exactly sure if DIAL works ok.
+	ret |= data2 & 0x7f; // steering wheel, not exactly sure if DIAL works ok.
 
 	return ret;
 }
 
 void hcrash_state::selected_ip_w(uint8_t data)
 {
-	m_selected_ip = data;    // latch the value
+	m_selected_ip = data; // latch the value
 }
 
 uint8_t hcrash_state::selected_ip_r()
 {
+	// From WEC Le Mans Schems:
 	switch (m_selected_ip & 0xf)
-	{                                               // From WEC Le Mans Schems:
-		case 0xc:  return m_io_accel->read();  // Accel - Schems: Accelevr
+	{
+		case 0xc:  return m_io_accel->read(); // Accel - Schems: Accelevr
 		case 0:    return m_io_accel->read();
-		case 0xd:  return m_io_wheel->read();  // Wheel - Schems: Handlevr
+		case 0xd:  return m_io_wheel->read(); // Wheel - Schems: Handlevr
 		case 1:    return m_io_wheel->read();
 
 		default: return ~0;
@@ -386,22 +411,22 @@ void gx400_state::speech_w(offs_t offset, uint8_t data)
 		m_vlm->data_w(data);
 
 	// bit 5: ST, bit 6: RST
-	m_vlm->st(BIT(offset, 5));
-	m_vlm->rst(BIT(offset, 6));
+	m_vlm->st_w(BIT(offset, 5));
+	m_vlm->rst_w(BIT(offset, 6));
 
 	m_speech_offset = offset;
 }
 
 void salamand_state::speech_start_w(uint8_t data)
 {
-	m_vlm->rst(BIT(data, 0));
-	m_vlm->st(BIT(data, 1));
+	m_vlm->rst_w(BIT(data, 0));
+	m_vlm->st_w(BIT(data, 1));
 	// bit 2 is OE for VLM data
 }
 
 uint8_t salamand_state::speech_busy_r()
 {
-	return m_vlm->bsy();
+	return m_vlm->bsy_r();
 }
 
 uint8_t gx400_state::nemesis_portA_r()
@@ -416,7 +441,7 @@ uint8_t gx400_state::nemesis_portA_r()
 
 	res |= 0xd0;
 
-	if (m_vlm != nullptr && m_vlm->bsy())
+	if (m_vlm != nullptr && m_vlm->bsy_r())
 		res |= 0x20;
 
 	return res;
@@ -656,7 +681,8 @@ void salamand_state::salamand_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x087fff).ram();
 	map(0x090000, 0x091fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x0a0000, 0x0a0001).w(FUNC(salamand_state::control_port_word_w));     /* irq enable, flipscreen, etc. */
+	map(0x0a0000, 0x0a0000).w(FUNC(salamand_state::outlatch_w));
+	map(0x0a0001, 0x0a0001).w(FUNC(salamand_state::salamand_intlatch_w));
 	map(0x0c0001, 0x0c0001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0c0002, 0x0c0003).portr("DSW0");
 	map(0x0c0004, 0x0c0005).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
@@ -683,7 +709,8 @@ void salamand_state::blkpnthr_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x081fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
 	map(0x090000, 0x097fff).ram();
-	map(0x0a0000, 0x0a0001).ram().w(FUNC(salamand_state::control_port_word_w));     /* irq enable, flipscreen, etc. */
+	map(0x0a0000, 0x0a0000).w(FUNC(salamand_state::outlatch_w));
+	map(0x0a0001, 0x0a0001).w(FUNC(salamand_state::blkpnthr_intlatch_w));
 	map(0x0c0001, 0x0c0001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0c0002, 0x0c0003).portr("DSW0");
 	map(0x0c0004, 0x0c0005).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
@@ -718,7 +745,8 @@ void hcrash_state::citybomb_map(address_map &map)
 	map(0x0f0011, 0x0f0011).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0f0018, 0x0f0019).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
 	map(0x0f0021, 0x0f0021).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));
-	map(0x0f8000, 0x0f8001).w(FUNC(hcrash_state::citybomb_control_port_word_w));     /* irq enable, flipscreen, etc. */
+	map(0x0f8000, 0x0f8000).w(FUNC(hcrash_state::citybomb_outlatch_w));
+	map(0x0f8001, 0x0f8001).w(FUNC(hcrash_state::salamand_intlatch_w));
 	map(0x100000, 0x1bffff).rom();
 	map(0x200000, 0x20ffff).ram().w(FUNC(hcrash_state::charram_w)).share(m_charram);
 	map(0x210000, 0x210fff).ram().w(FUNC(hcrash_state::videoram_w<0>)).share(m_videoram[0]);       /* VRAM */
@@ -746,7 +774,8 @@ void salamand_state::nyanpani_map(address_map &map)
 	map(0x070008, 0x070009).portr("DSW0");
 	map(0x070011, 0x070011).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x070018, 0x070019).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
-	map(0x078000, 0x078001).w(FUNC(salamand_state::control_port_word_w));     /* irq enable, flipscreen, etc. */
+	map(0x078000, 0x078000).w(FUNC(salamand_state::outlatch_w));
+	map(0x078001, 0x078001).w(FUNC(salamand_state::salamand_intlatch_w));
 	map(0x100000, 0x13ffff).rom();
 	map(0x200000, 0x200fff).ram().w(FUNC(salamand_state::videoram_w<0>)).share(m_videoram[0]);       /* VRAM */
 	map(0x201000, 0x201fff).ram().w(FUNC(salamand_state::videoram_w<1>)).share(m_videoram[1]);
@@ -804,7 +833,8 @@ void hcrash_state::hcrash_map(address_map &map)
 	map(0x040000, 0x05ffff).rom();
 	map(0x080000, 0x083fff).ram();
 	map(0x090000, 0x091fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x0a0000, 0x0a0001).w(FUNC(hcrash_state::citybomb_control_port_word_w));     /* irq enable, flipscreen, etc. */
+	map(0x0a0000, 0x0a0000).w(FUNC(hcrash_state::outlatch_w));
+	map(0x0a0001, 0x0a0001).w(FUNC(hcrash_state::blkpnthr_intlatch_w));
 	map(0x0c0001, 0x0c0001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0c0002, 0x0c0003).portr("DSW0");
 	map(0x0c0004, 0x0c0005).portr("DSW1");
@@ -812,7 +842,7 @@ void hcrash_state::hcrash_map(address_map &map)
 	map(0x0c0008, 0x0c0009).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* watchdog probably */
 	map(0x0c000a, 0x0c000b).portr("IN0");
 	map(0x0c2000, 0x0c2001).r(FUNC(hcrash_state::konamigt_input_word_r)); /* Konami GT control */
-	map(0x0c2800, 0x0c280f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff); // ???
+	map(0x0c2800, 0x0c280f).w("unklatch", FUNC(ls259_device::write_d0)).umask16(0x00ff); // ???
 	map(0x0c4000, 0x0c4001).portr("IN1");
 	map(0x0c4001, 0x0c4001).w(FUNC(hcrash_state::selected_ip_w));
 	map(0x0c4003, 0x0c4003).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));    /* WEC Le Mans 24 control */
@@ -1479,15 +1509,21 @@ static INPUT_PORTS_START( hcrash )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CONDITION("DSW1", 0x03, EQUALS, 0x02)        // only in WEC Le Mans 24 cabinets
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CONDITION("DSW1", 0x03, EQUALS, 0x02) // only in WEC Le Mans 24 cabinets
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x02) // player 2?
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   // must be 0 otherwise game freezes when using WEC Le Mans 24 cabinet
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) // must be 0 otherwise game freezes when using WEC Le Mans 24 cabinet
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", FUNC(adc0804_device::intr_r))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN3") // Konami GT cabinet
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01) // only in Konami GT cabinet with brake
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x02)
+//  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 
 	PORT_START("DSW0")
 	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "Invalid", SW1)
@@ -1496,8 +1532,8 @@ static INPUT_PORTS_START( hcrash )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "Konami GT without brake" )
-	PORT_DIPSETTING(    0x02, "WEC Le Mans 24 Upright" )
 	PORT_DIPSETTING(    0x01, "Konami GT with brake" )
+	PORT_DIPSETTING(    0x02, "WEC Le Mans 24 Upright" )
 	// 0x00 WEC Le Mans 24 Upright again
 	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
@@ -1522,22 +1558,12 @@ static INPUT_PORTS_START( hcrash )
 	PORT_DIPSETTING(    0x00, "M.P.H." )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	/* Konami GT specific control */
-	PORT_START("PADDLE")
-	PORT_BIT( 0x7f, 0x40, IPT_PADDLE ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x02)
-
-	PORT_START("IN3")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01)        // only in Konami GT cabinet with brake
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-//  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )
-
-	/* WEC Le Mans 24 specific control */
-	PORT_START("ACCEL")     /* Accelerator */
+	PORT_START("ACCEL") // WEC Le Mans 24 cabinet
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0,0x80) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_CONDITION("DSW1", 0x03, EQUALS, 0x02)
 
-	PORT_START("WHEEL")     /* Steering Wheel */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_CONDITION("DSW1", 0x03, EQUALS, 0x02)
+	PORT_START("WHEEL")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_CONDITION("DSW1", 0x03, EQUALS, 0x02) // WEC Le Mans 24 cabinet
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x02) // Konami GT cabinet
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bubsys )
@@ -1760,16 +1786,13 @@ void salamand_state::volume_callback(uint8_t data)
 
 void gx400_base_state::machine_start()
 {
-	save_item(NAME(m_irq_on));
+	save_item(NAME(m_irq1_on));
 	save_item(NAME(m_irq2_on));
+	save_item(NAME(m_irq4_on));
+	save_item(NAME(m_sound_irq_clk));
+
 	save_item(NAME(m_tilemap_flip));
 	save_item(NAME(m_flipscreen));
-}
-
-void salamand_state::machine_start()
-{
-	gx400_base_state::machine_start();
-	save_item(NAME(m_irq_port_last));
 }
 
 void hcrash_state::machine_start()
@@ -1781,9 +1804,6 @@ void hcrash_state::machine_start()
 void gx400_state::machine_start()
 {
 	gx400_base_state::machine_start();
-	save_item(NAME(m_irq1_on));
-	save_item(NAME(m_irq4_on));
-	//save_item(NAME(m_gx400_irq1_cnt));
 	save_item(NAME(m_speech_offset));
 }
 
@@ -1793,18 +1813,11 @@ void bubsys_state::machine_start()
 	save_item(NAME(m_scanline_counter));
 }
 
-void gx400_base_state::machine_reset()
-{
-	m_irq_on = 0;
-
-	m_flipscreen = 0;
-	m_tilemap_flip = 0;
-}
-
 void salamand_state::machine_reset()
 {
 	gx400_base_state::machine_reset();
-	m_irq_port_last = 0;
+	salamand_intlatch_w(0);
+	outlatch_w(0);
 }
 
 void hcrash_state::machine_reset()
@@ -1816,7 +1829,6 @@ void hcrash_state::machine_reset()
 void gx400_state::machine_reset()
 {
 	gx400_base_state::machine_reset();
-	//m_gx400_irq1_cnt = 0;
 	m_speech_offset = 0;
 }
 
@@ -1848,7 +1860,7 @@ void gx400_state::nemesis(machine_config &config)
 	outlatch.q_out_cb<2>().set(FUNC(gx400_state::sound_irq_w));
 
 	ls259_device &intlatch(LS259(config, "intlatch")); // 11K
-	intlatch.q_out_cb<0>().set(FUNC(gx400_state::irq_enable_w));
+	intlatch.q_out_cb<0>().set(FUNC(gx400_state::irq1_enable_w));
 	intlatch.q_out_cb<2>().set(FUNC(gx400_state::gfx_flipx_w));
 	intlatch.q_out_cb<3>().set(FUNC(gx400_state::gfx_flipy_w));
 
@@ -1859,7 +1871,7 @@ void gx400_state::nemesis(machine_config &config)
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(gx400_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(gx400_state::nemesis_vblank_irq));
+	m_screen->screen_vblank().set(FUNC(gx400_state::vblank_irq1));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
 	PALETTE(config, m_palette).set_entries(2048);
@@ -1979,7 +1991,7 @@ void gx400_state::konamigt(machine_config &config)
 
 	ls259_device &intlatch(LS259(config, "intlatch"));
 	intlatch.q_out_cb<0>().set(FUNC(gx400_state::irq2_enable_w));
-	intlatch.q_out_cb<1>().set(FUNC(gx400_state::irq_enable_w));
+	intlatch.q_out_cb<1>().set(FUNC(gx400_state::irq1_enable_w));
 	intlatch.q_out_cb<2>().set(FUNC(gx400_state::gfx_flipx_w));
 	intlatch.q_out_cb<3>().set(FUNC(gx400_state::gfx_flipy_w));
 
@@ -2108,7 +2120,7 @@ void salamand_state::salamand(machine_config &config)
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(salamand_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(salamand_state::nemesis_vblank_irq));
+	m_screen->screen_vblank().set(FUNC(salamand_state::vblank_irq1));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
@@ -2151,7 +2163,7 @@ void salamand_state::blkpnthr(machine_config &config)
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(salamand_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(salamand_state::blkpnthr_vblank_irq));
+	m_screen->screen_vblank().set(FUNC(salamand_state::vblank_irq2));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
@@ -2192,7 +2204,7 @@ void hcrash_state::citybomb(machine_config &config)
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(hcrash_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(hcrash_state::nemesis_vblank_irq));
+	m_screen->screen_vblank().set(FUNC(hcrash_state::vblank_irq1));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
@@ -2231,7 +2243,7 @@ void salamand_state::nyanpani(machine_config &config)
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(salamand_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(salamand_state::nemesis_vblank_irq));
+	m_screen->screen_vblank().set(FUNC(salamand_state::vblank_irq1));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
@@ -2267,10 +2279,10 @@ void hcrash_state::hcrash(machine_config &config)
 	adc0804_device &adc(ADC0804(config, "adc", 640000)); // unknown clock (doesn't seem to be R/C here)
 	adc.vin_callback().set(FUNC(hcrash_state::selected_ip_r));
 
-	ls259_device &intlatch(LS259(config, "intlatch"));
-	intlatch.q_out_cb<0>().set_nop(); // ?
-	intlatch.q_out_cb<1>().set(FUNC(hcrash_state::irq2_enable_w)); // or at 0x0c2804 ?
-	intlatch.q_out_cb<2>().set_nop(); // ?
+	ls259_device &unklatch(LS259(config, "unklatch"));
+	unklatch.q_out_cb<0>().set_nop(); // ?
+	unklatch.q_out_cb<1>().set_nop(); // ?
+	unklatch.q_out_cb<2>().set_nop(); // ?
 
 	WATCHDOG_TIMER(config, "watchdog");
 

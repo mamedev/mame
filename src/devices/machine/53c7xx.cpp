@@ -90,7 +90,6 @@ DEFINE_DEVICE_TYPE(NCR53C7XX, ncr53c7xx_device, "ncr537xx", "NCR 53C7xx SCSI")
 ncr53c7xx_device::ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NCR53C7XX, tag, owner, clock),
 	nscsi_device_interface(mconfig, *this),
-	nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
 	device_execute_interface(mconfig, *this),
 	m_icount(0),
 	m_irq_handler(*this),

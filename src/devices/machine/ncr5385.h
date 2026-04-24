@@ -43,7 +43,6 @@
 class ncr5385_device
 	: public device_t
 	, public nscsi_device_interface
-	, public nscsi_slot_card_interface
 {
 public:
 	auto irq() { return m_int.bind(); }

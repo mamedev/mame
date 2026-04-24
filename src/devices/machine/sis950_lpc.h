@@ -64,7 +64,12 @@ public:
 	void pc_irq14_w(int state);
 	void pc_irq15_w(int state);
 
+	// IDE Primary/Secondary Channel interrupts
+	void pc_iirqa_w(int state);
+	void pc_iirqb_w(int state);
+
 protected:
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_config_complete() override;
@@ -142,6 +147,11 @@ private:
 		IRQ_SWDOG
 	};
 	u8 m_irq_remap[9]{};
+
+	void redirect_irq(int irq, int state);
+
+	int pin_mapper(int pin);
+	void irq_handler(int line, int state);
 
 	// LPC vendor specific, verify if it's common for all
 	u8 lpc_fast_init_r();

@@ -28,8 +28,6 @@ protected:
 	u8 local_status_r();
 
 	void local_map(address_map &map) ATTR_COLD;
-	void asc_config(device_t *device);
-	void fsc_config(device_t *device);
 	void fsc_base(machine_config &config);
 
 	required_device<i80188_cpu_device> m_mpu;

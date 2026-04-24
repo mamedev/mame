@@ -146,7 +146,7 @@ public:
 		, m_tty(*this, "tty%u", 0U)
 		, m_fdc(*this, "fdc")
 		, m_scsibus(*this, "scsi")
-		, m_scsi(*this, "scsi:7:aic6250")
+		, m_scsi(*this, "aic6250")
 		, m_net(*this, "net")
 		, m_buzzer(*this, "buzzer")
 		, m_screen(*this, "screen")
@@ -590,14 +590,10 @@ void mips_i2000_state::i2000(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", mips_scsi_devices, nullptr);
 
 	// scsi host adapter (clock assumed)
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("aic6250", AIC6250).clock(10_MHz_XTAL).machine_config(
-		[this](device_t *device)
-		{
-			aic6250_device &adapter = downcast<aic6250_device &>(*device);
-
-			adapter.int_cb().set_inputline(m_iop, INPUT_LINE_IRQ7).invert();
-			adapter.breq_cb().set(m_iop, FUNC(v50_device::dreq_w<1>));
-		});
+	AIC6250(config, m_scsi, 10_MHz_XTAL);
+	m_scsibus->set_external_device(7, m_scsi);
+	m_scsi->int_cb().set_inputline(m_iop, INPUT_LINE_IRQ7).invert();
+	m_scsi->breq_cb().set(m_iop, FUNC(v50_device::dreq_w<1>));
 
 	// ethernet
 	AM7990(config, m_net);

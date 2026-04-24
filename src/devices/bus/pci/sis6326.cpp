@@ -4,26 +4,34 @@
 
 SiS 6326
 
+TODO:
+- Move rendering in own unit, as SIS6326_GUI;
+- Fix transparency issues, particularly at 8-bit color depth (Windows start logo);
+- Add Turbo Queue (currently scoring too high in benchmark tests);
+- Make AGP to install properly (bridge fault?);
+- 3d rendering;
+- MPEG acceleration for DVD;
+
 **************************************************************************************************/
 
 #include "emu.h"
 #include "sis6326.h"
 
-#define LOG_WARN      (1U << 1)
+#define LOG_BLIT      (1U << 1)
 #define LOG_AGP       (1U << 2)
 
-#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_AGP)
+#define VERBOSE (LOG_GENERAL | LOG_AGP)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
-#define LOGWARN(...)            LOGMASKED(LOG_WARN, __VA_ARGS__)
+#define LOGBLIT(...)            LOGMASKED(LOG_BLIT, __VA_ARGS__)
 #define LOGAGP(...)             LOGMASKED(LOG_AGP, __VA_ARGS__)
 
 
 DEFINE_DEVICE_TYPE(SIS6326_PCI, sis6326_pci_device,   "sis6326_pci",   "SiS 6326 PCI card")
 DEFINE_DEVICE_TYPE(SIS6326_AGP, sis6326_agp_device,   "sis6326_agp",   "SiS 6326 AGP card")
-
+DEFINE_DEVICE_TYPE(SIS6326_DVD, sis6326_dvd_device,   "sis6326_dvd",   "SiS 6326 DVD card")
 
 
 sis6326_pci_device::sis6326_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -43,8 +51,13 @@ ROM_START( sis6326pci )
 	ROM_REGION32_LE( 0x10000, "bios", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("sis")
 
-	ROM_SYSTEM_BIOS( 0, "sis", "SiS6326 4MB 1.25" )
+	// "12/07/1998-13:01:00" in BIOS header, assume in MM/DD/YYYY format
+	ROM_SYSTEM_BIOS( 0, "sis", "SiS6326 4MB 1.25 (12-07-98)" )
 	ROMX_LOAD( "sis6326_75mhz.vbi", 0x000000, 0x008000, CRC(1c74109d) SHA1(c9180a32e78481c9082ad5bc75082ef4b289ad76), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "3dpro", "3DPro 4MB EDO 1.06 (12-18-97)" )
+	ROMX_LOAD( "3dpro4mbedo.bin", 0x000000, 0x010000, CRC(f04b374c) SHA1(6eb96f7517df6eb566c615c2ab9ec5567035b6a5), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "siso", "SiS6326 4MB 1.21d (08-18-98)" )
+	ROMX_LOAD( "4mb_pci.vbi",  0x000000, 0x00c000, CRC(8fca47be) SHA1(7ce995ec0d8b9ac4f0f40ccd0a61d7fc209d313f), ROM_BIOS(2) )
 ROM_END
 
 const tiny_rom_entry *sis6326_pci_device::device_rom_region() const
@@ -65,6 +78,7 @@ void sis6326_pci_device::device_add_mconfig(machine_config &config)
 	m_vga->md20_cb().set_constant(0);
 	m_vga->md21_cb().set_constant(0);
 	m_vga->md23_cb().set_constant(1);
+	m_vga->md27_cb().set_constant(1);
 }
 
 void sis6326_pci_device::device_start()
@@ -82,8 +96,7 @@ void sis6326_pci_device::device_start()
 
 	// INTA#
 	// TODO: VGA D3/MD27 can strap this to no irq pin
-	// ls5amvp3 goes N/A in Award Config list, assume it's disabled by default
-	intr_pin = 0;
+	intr_pin = 1;
 }
 
 void sis6326_pci_device::device_reset()
@@ -93,7 +106,8 @@ void sis6326_pci_device::device_reset()
 	// doc makes multiple ninja jumps in messing up these defaults
 	// bus master (hardwired)
 	command = 0x0004;
-	command_mask = 0x23;
+	// palette snoop, uses <reserved> bit 7 as r/w buffer
+	command_mask = 0xa3;
 	// medium DEVSEL#
 	// assume capability list & 66 MHz disabled in this variant
 	status = 0x0200;
@@ -157,16 +171,16 @@ void sis6326_pci_device::mmio_map(address_map &map)
 	);
 	map(0x8290, 0x8293).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			COMBINE_DATA(&m_fg_color);
-			m_fg_color &= 0xff'ffff;
+			COMBINE_DATA(&m_fg_color.u);
+			m_fg_color.u &= 0xff'ffff;
 			if (ACCESSING_BITS_24_31)
 				m_fg_rop = data >> 24;
 		})
 	);
 	map(0x8294, 0x8297).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			COMBINE_DATA(&m_bg_color);
-			m_bg_color &= 0xff'ffff;
+			COMBINE_DATA(&m_bg_color.u);
+			m_bg_color.u &= 0xff'ffff;
 			if (ACCESSING_BITS_24_31)
 				m_bg_rop = data >> 24;
 		})
@@ -197,7 +211,7 @@ void sis6326_pci_device::mmio_map(address_map &map)
 		})
 	);
 
-	// HACK: fake Turbo Queue so to not lockup windows
+	// HACK: fake Turbo Queue so to not lockup Windows
 	map(0x82a8, 0x82a9).lr16(
 		NAME([] (offs_t offset) { return 0x0100; })
 	);
@@ -205,6 +219,10 @@ void sis6326_pci_device::mmio_map(address_map &map)
 		NAME([] (offs_t offset) { return 0x8000; }),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
 			COMBINE_DATA(&m_draw_command);
+			// TODO: fix transparency issues from here
+			// "a word write initiates 2d command" according to doc
+			// - win98se actually uses byte writes when initiating a CPU BitBlt anyway,
+			//   where's the trigger for it?
 			if (mem_mask == 0xffff)
 				trigger_2d_command();
 		})
@@ -217,6 +235,8 @@ void sis6326_pci_device::mmio_map(address_map &map)
 	map(0x8378, 0x837f).w(m_vga, FUNC(sis6326_vga_device::cursor_mmio_w));
 	// HACK: Same deal for 3D Engine Status
 	map(0x89fc, 0x89ff).lr32(NAME([] () { return (0x3ff << 16) | 3; }));
+
+	map(0x8afc, 0x8aff).nopw(); // winamp, verbose (TEND dummy register)
 }
 
 void sis6326_pci_device::vmi_map(address_map &map)
@@ -273,23 +293,23 @@ const sis6326_pci_device::get_src_func sis6326_pci_device::get_src_table[4] =
 };
 
 
-u8 sis6326_pci_device::get_src_bgcol(u32 offset_base, u32 x)
+u8 sis6326_pci_device::get_src_bgcol(u32 offset_base, u32 x, u8 shifter)
 {
-	return m_bg_color;
+	return m_bg_color.b[shifter];
 }
 
-u8 sis6326_pci_device::get_src_fgcol(u32 offset_base, u32 x)
+u8 sis6326_pci_device::get_src_fgcol(u32 offset_base, u32 x, u8 shifter)
 {
-	return m_fg_color;
+	return m_fg_color.b[shifter];
 }
 
-u8 sis6326_pci_device::get_src_mem(u32 offset_base, u32 x)
+u8 sis6326_pci_device::get_src_mem(u32 offset_base, u32 x, u8 shifter)
 {
 	return m_vga->read_memory(offset_base + x);
 }
 
 // TODO: no idea about this yet
-u8 sis6326_pci_device::get_src_cpu(u32 offset_base, u32 x)
+u8 sis6326_pci_device::get_src_cpu(u32 offset_base, u32 x, u8 shifter)
 {
 	return x & 1 ? 0x55 : 0xaa;
 }
@@ -302,24 +322,24 @@ const sis6326_pci_device::get_pat_func sis6326_pci_device::get_pat_table[4] =
 	&sis6326_pci_device::get_pat_ddraw
 };
 
-u8 sis6326_pci_device::get_pat_bgcol(u32 y, u32 x)
+u8 sis6326_pci_device::get_pat_bgcol(u32 y, u32 x, u8 shifter)
 {
-	return m_bg_color;
+	return m_bg_color.b[shifter];
 }
 
-u8 sis6326_pci_device::get_pat_fgcol(u32 y, u32 x)
+u8 sis6326_pci_device::get_pat_fgcol(u32 y, u32 x, u8 shifter)
 {
-	return m_fg_color;
+	return m_fg_color.b[shifter];
 }
 
 // testable in win98se shutdown options
-u8 sis6326_pci_device::get_pat_regs(u32 y, u32 x)
+u8 sis6326_pci_device::get_pat_regs(u32 y, u32 x, u8 shifter)
 {
 	return m_pattern_data[((y & 7) << 3) | (x & 7)];
 }
 
 // TODO: this is special, uses regs in a different way
-u8 sis6326_pci_device::get_pat_ddraw(u32 y, u32 x)
+u8 sis6326_pci_device::get_pat_ddraw(u32 y, u32 x, u8 shifter)
 {
 	return x & 1 ? 0x55 : 0xaa;
 }
@@ -355,6 +375,9 @@ uint32_t sis6326_pci_device::GetROP(uint8_t rop, uint32_t src, uint32_t dst, uin
 			break;
 		case 0x88:  // DSa
 			ret = dst & src;
+			break;
+		case 0xa0:  // DPa (win98se help tooltip borders)
+			ret = dst & pat;
 			break;
 		case 0xaa:  // D
 			ret = dst;
@@ -403,32 +426,33 @@ void sis6326_pci_device::trigger_2d_command()
 	const std::string src_types[] = { "bgcol", "fgcol", "memory", "CPU" };
 	// NOTE: pat type 3 may really select Direct Draw mode
 	const std::string pat_types[] = { "bgcol", "fgcol", "pattern", "<reserved>" };
-	LOG("Command: %04x: SRC %s, PAT %s, XY: %d|%d, clip: %d%d\n"
+	LOGBLIT("Command: %04x: SRC %s, PAT %s, XY: %d|%d, clip: %d%d\n"
 		, m_draw_command, src_types[src_select], pat_types[pat_select]
 		, x_dir, y_dir, clip_enable, clip_external
 	);
 	if (clip_enable)
 	{
-		LOG("cliprange X %d %d ~ Y %d %d\n", m_clip_left, m_clip_right, m_clip_top, m_clip_bottom);
+		LOGBLIT("cliprange X %d %d ~ Y %d %d\n", m_clip_left, m_clip_right, m_clip_top, m_clip_bottom);
 		// (a very unlikely) sanity check
 		if (m_dst_pitch == 0)
 		{
-			LOG("\tWarning: dst pitch == 0, ignored!\n");
+			LOGBLIT("\tWarning: dst pitch == 0, ignored!\n");
 			return;
 		}
 	}
+	u8 shifter;
+	const u8 color_depth = m_vga->get_video_depth();
+	const u8 shifter_mask = color_depth >> 3;
 
 	// bits 15-14 are r/o
-	// TODO: currently using 256 colors only
-	// how this even acknowledge a change in color mode?
 	switch(cmd_type)
 	{
 		case 0:
 		{
-			LOG("\tBitBlt\n");
-			LOG("\tSRC Addr %06x DST Addr %06x Sel %02x\n", m_src_start_addr, m_dst_start_addr, m_draw_sel);
-			LOG("\tSRC Pitch %d DST Pitch %d Rect %dx%d\n", m_src_pitch, m_dst_pitch, m_rect_width, m_rect_height);
-			LOG("\tFG ROP %02x Color %06x | BG ROP %02x Color %06x\n", m_fg_rop, m_fg_color, m_bg_rop, m_bg_color);
+			LOGBLIT("\tBitBlt\n");
+			LOGBLIT("\tSRC Addr %06x DST Addr %06x Sel %02x\n", m_src_start_addr, m_dst_start_addr, m_draw_sel);
+			LOGBLIT("\tSRC Pitch %d DST Pitch %d Rect %dx%d\n", m_src_pitch, m_dst_pitch, m_rect_width, m_rect_height);
+			LOGBLIT("\tFG ROP %02x Color %06x | BG ROP %02x Color %06x\n", m_fg_rop, m_fg_color.u, m_bg_rop, m_bg_color.u);
 
 			for (s32 y = 0; y < m_rect_height; y++)
 			{
@@ -443,6 +467,7 @@ void sis6326_pci_device::trigger_2d_command()
 
 				const u32 src_base = (yi * m_src_pitch) + m_src_start_addr;
 				const u32 dst_base = (yi * m_dst_pitch) + m_dst_start_addr;
+
 				for (s32 x = 0; x < m_rect_width; x++)
 				{
 					const s32 xi = x * x_dir;
@@ -454,9 +479,10 @@ void sis6326_pci_device::trigger_2d_command()
 							continue;
 					}
 
-					const u8 src = (this->*get_src_table[src_select])(src_base, xi);
+					shifter = x % shifter_mask;
+					const u8 src = (this->*get_src_table[src_select])(src_base, xi, shifter);
 					const u8 dst = m_vga->read_memory(xi + dst_base);
-					const u8 pat = (this->*get_pat_table[pat_select])(y, x);
+					const u8 pat = (this->*get_pat_table[pat_select])(y, x, shifter);
 					const u8 res = GetROP(m_fg_rop, src, dst, pat) & 0xff;
 					m_vga->write_memory(xi + dst_base, res);
 				}
@@ -466,7 +492,7 @@ void sis6326_pci_device::trigger_2d_command()
 		}
 		case 1:
 		{
-			LOG("\tBitBlt with mask\n");
+			LOGBLIT("\tBitBlt with mask\n");
 			// ...
 			break;
 		}
@@ -474,14 +500,17 @@ void sis6326_pci_device::trigger_2d_command()
 		{
 			const bool color_exp = !!BIT(m_draw_command, 12);
 			const bool font_exp = !!BIT(m_draw_command, 13);
-			LOG("\tColor/Font expansion: Color enhanced %d Font enhanced %d\n", color_exp, font_exp);
-			LOG("\tSRC Addr %06x DST Addr %06x Sel %02x\n", m_src_start_addr, m_dst_start_addr, m_draw_sel);
-			LOG("\tSRC Pitch %d DST Pitch %d Rect %dx%d\n", m_src_pitch, m_dst_pitch, m_rect_width, m_rect_height);
-			LOG("\tFG ROP %02x Color %06x | BG ROP %02x Color %06x\n", m_fg_rop, m_fg_color, m_bg_rop, m_bg_color);
+			// TODO: not yet right for 16-bit color depth and res <= 800x600
+			const u8 pattern_shift = shifter_mask - 1;
+
+			LOGBLIT("\tColor/Font expansion: Color enhanced %d Font enhanced %d\n", color_exp, font_exp);
+			LOGBLIT("\tSRC Addr %06x DST Addr %06x Sel %02x\n", m_src_start_addr, m_dst_start_addr, m_draw_sel);
+			LOGBLIT("\tSRC Pitch %d DST Pitch %d Rect %dx%d\n", m_src_pitch, m_dst_pitch, m_rect_width, m_rect_height);
+			LOGBLIT("\tFG ROP %02x Color %06x | BG ROP %02x Color %06x\n", m_fg_rop, m_fg_color.u, m_bg_rop, m_bg_color.u);
 
 			if (m_rect_width > 8)
 			{
-				LOG("\tWarning: rect width > 8, ignored!\n");
+				LOGBLIT("\tWarning: rect width > 8, ignored!\n");
 				return;
 			}
 
@@ -511,13 +540,14 @@ void sis6326_pci_device::trigger_2d_command()
 							continue;
 					}
 
-					const u8 src = (this->*get_src_table[src_select])(src_base, xi);
+					shifter = x % shifter_mask;
+					const u8 src = (this->*get_src_table[src_select])(src_base, xi, shifter);
 					const u8 dst = m_vga->read_memory(xi + dst_base);
-					const u8 dot = (m_pattern_data[pattern_base] >> (7 - x) & 1);
-					// ROP and pattern depends on pattern
-					// win98se start menu hovering depends on this
-					const u8 res = GetROP(dot ? m_fg_rop : m_bg_rop, src, dst, dot ? m_fg_color : m_bg_color) & 0xff;
-					m_vga->write_memory(xi + dst_base, res & 0xff);
+					const u8 dot = (m_pattern_data[pattern_base] >> (7 - (x >> pattern_shift)) & 1);
+					// ROP and pattern depends on dot output
+					// - win98se start menu hovering
+					const u8 res = GetROP(dot ? m_fg_rop : m_bg_rop, src, dst, dot ? m_fg_color.b[shifter] : m_bg_color.b[shifter]) & 0xff;
+					m_vga->write_memory(xi + dst_base, res);
 				}
 			}
 
@@ -527,8 +557,87 @@ void sis6326_pci_device::trigger_2d_command()
 		{
 			const bool major_axis = !!BIT(m_draw_command, 10);
 			const bool last_pixel = !!BIT(m_draw_command, 11);
-			LOG("\tLine: major axis %s %d\n", major_axis ? "Y" : "X", !last_pixel);
-			// ...
+			const u16 pixel_count = m_rect_width - 1;
+			const u16 half_count = pixel_count / 2;
+			const u16 k1_term = (m_mask[0] | (m_mask[1] << 8)) & 0x3fff;
+			const u16 k2_term = (m_mask[2] | (m_mask[3] << 8)) & 0x3fff;
+			const u16 error_term = (m_mask[4] | (m_mask[5] << 8)) & 0x3fff;
+			const u16 line_style = (m_mask[6] | (m_mask[7] << 8));
+			const u16 xs = m_src_start_addr & 0xfff;
+			const u16 ys = m_dst_start_addr & 0xfff;
+			LOGBLIT("\tLine: major axis %s last pixel %d\n", major_axis ? "Y" : "X", !last_pixel);
+			LOGBLIT("\tX Start %d Y Start %d\n", xs, ys);
+			LOGBLIT("\tMajor Axial Pixel Count %d K1 %d K2 %d error %d style %04x\n", m_rect_width, k1_term, k2_term, error_term, line_style);
+			LOGBLIT("\tFG ROP %02x Color %06x | BG ROP %02x Color %06x\n", m_fg_rop, m_fg_color.u, m_bg_rop, m_bg_color.u);
+
+			// TODO: preliminary, enough for crosshair in Windows Gaming Options and not much else
+			// Standard Bresenham line drawing
+			// - win98se Curves and Colors screensaver requires this for curves;
+			if (major_axis)
+			{
+				const s32 xi = xs + half_count;
+
+				if (clip_enable)
+				{
+					if ((xi == std::clamp<u16>(xi, m_clip_left, m_clip_right)) ^ clip_external)
+						return;
+				}
+
+				// TODO: unverified for lines + color depth >= 16
+				shifter = xs % shifter_mask;
+				for (s32 y = 0; y < pixel_count; y++)
+				{
+					const s32 yi = ys - half_count + y * y_dir;
+
+					if (clip_enable)
+					{
+						if ((yi == std::clamp<u16>(yi, m_clip_top, m_clip_bottom)) ^ clip_external)
+							continue;
+					}
+
+					const u32 src_base = (yi * m_src_pitch);
+					const u32 dst_base = (yi * m_dst_pitch);
+
+					const u8 src = (this->*get_src_table[src_select])(src_base, xi, shifter);
+					const u8 dst = m_vga->read_memory(xi + dst_base);
+					const u16 dot = BIT(line_style, (15 - y) & 0xf);
+					const u8 res = GetROP(dot ? m_fg_rop : m_bg_rop, src, dst, dot ? m_fg_color.b[shifter] : m_bg_color.b[shifter]) & 0xff;
+					m_vga->write_memory(xi + dst_base, res);
+				}
+			}
+			else
+			{
+				const s32 yi = ys + half_count;
+
+				if (clip_enable)
+				{
+					if ((yi == std::clamp<u16>(yi, m_clip_top, m_clip_bottom)) ^ clip_external)
+						return;
+				}
+
+				for (s32 x = 0; x < pixel_count; x++)
+				{
+					const s32 xi = xs - half_count + x * x_dir;
+
+					if (clip_enable)
+					{
+						if ((xi == std::clamp<u16>(xi, m_clip_left, m_clip_right)) ^ clip_external)
+							continue;
+					}
+
+					const u32 src_base = (yi * m_src_pitch);
+					const u32 dst_base = (yi * m_dst_pitch);
+					shifter = x % shifter_mask;
+
+					const u8 src = (this->*get_src_table[src_select])(src_base, xi, shifter);
+					const u8 dst = m_vga->read_memory(xi + dst_base);
+					const u16 dot = BIT(line_style, (15 - x) & 0xf);
+					const u8 res = GetROP(dot ? m_fg_rop : m_bg_rop, src, dst, dot ? m_fg_color.b[shifter] : m_bg_color.b[shifter]) & 0xff;
+					m_vga->write_memory(xi + dst_base, res);
+				}
+			}
+
+
 			break;
 		}
 	}
@@ -539,28 +648,30 @@ void sis6326_pci_device::trigger_2d_command()
  * AGP overrides
  */
 
-sis6326_agp_device::sis6326_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sis6326_pci_device(mconfig, SIS6326_AGP, tag, owner, clock)
+sis6326_agp_device::sis6326_agp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: sis6326_pci_device(mconfig, type, tag, owner, clock)
 {
 }
 
+sis6326_agp_device::sis6326_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sis6326_agp_device(mconfig, SIS6326_AGP, tag, owner, clock)
+{
+}
+
+
 ROM_START( sis6326agp )
 	ROM_REGION32_LE( 0x10000, "bios", ROMREGION_ERASEFF )
-	// Default is AOpen for supporting OpenGL
+	// Default is AOpen for supporting OpenGL in its driver
 	ROM_DEFAULT_BIOS("aopen")
 
-	ROM_SYSTEM_BIOS( 0, "aopen", "AOpen PA50V 2.25" )
+	ROM_SYSTEM_BIOS( 0, "aopen", "AOpen PA50V 4MB 2.25" )
 	ROMX_LOAD( "aopenpa50v.vbi", 0x000000, 0x008000, CRC(6c4c7518) SHA1(36bb29a23d565e34d548701acc248d50c99d7da4), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "3dpro", "3DPro 4MB EDO 1.06" )
-	ROMX_LOAD( "3dpro4mbedo.bin", 0x000000, 0x010000, CRC(f04b374c) SHA1(6eb96f7517df6eb566c615c2ab9ec5567035b6a5), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 2, "siso", "SiS6326 4MB 1.21d" )
-	ROMX_LOAD( "4mbsdr.vbi",   0x000000, 0x00c000, CRC(a5f8c7f7) SHA1(9e5cfcf8d34e0c5829343179c87fb2b97f7a7f9c), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 3, "sis", "SiS6326 4MB 1.25" )
-	ROMX_LOAD( "sis6326agp.bin", 0x000000, 0x010000, CRC(a671255c) SHA1(332ab9499142e8f7a235afe046e8e8d21a28580d), ROM_BIOS(3) )
-
-	// basically identical to siso
-//  ROM_SYSTEM_BIOS( 3, "sisvbi", "SiS6326 4MB PCI 1.21d" )
-//  ROMX_LOAD( "4mb_pci.vbi",  0x000000, 0x00c000, CRC(8fca47be) SHA1(7ce995ec0d8b9ac4f0f40ccd0a61d7fc209d313f), ROM_BIOS(3) )
+	// AGP/PCI
+	ROM_SYSTEM_BIOS( 1, "siso", "SiS6326 4MB 1.21d (08-18-98)" )
+	ROMX_LOAD( "4mbsdr.vbi",   0x000000, 0x00c000, CRC(a5f8c7f7) SHA1(9e5cfcf8d34e0c5829343179c87fb2b97f7a7f9c), ROM_BIOS(1) )
+	// AGP variant of the sis6326pci one
+	ROM_SYSTEM_BIOS( 2, "sis", "SiS6326 4MB 1.25" )
+	ROMX_LOAD( "sis6326agp.bin", 0x000000, 0x010000, CRC(a671255c) SHA1(332ab9499142e8f7a235afe046e8e8d21a28580d), ROM_BIOS(2) )
 ROM_END
 
 const tiny_rom_entry *sis6326_agp_device::device_rom_region() const
@@ -571,9 +682,11 @@ const tiny_rom_entry *sis6326_agp_device::device_rom_region() const
 void sis6326_agp_device::device_add_mconfig(machine_config &config)
 {
 	sis6326_pci_device::device_add_mconfig(config);
+	// TODO: JP1 to MD18 (NTSC/PAL select), JP2 to MD27 (INTA# enable)
 	m_vga->md20_cb().set_constant(1);
 	m_vga->md21_cb().set_constant(1);
 	m_vga->md23_cb().set_constant(1);
+	m_vga->md27_cb().set_constant(1);
 }
 
 void sis6326_agp_device::device_reset()
@@ -583,7 +696,7 @@ void sis6326_agp_device::device_reset()
 	// doc makes multiple ninja jumps in messing up these defaults
 	// bus master (hardwired)
 	command = 0x0004;
-	command_mask = 0x23;
+	command_mask = 0xa3;
 	// medium DEVSEL#, 66 MHz capable, has capabilities list
 	status = 0x0230;
 
@@ -638,5 +751,38 @@ void sis6326_agp_device::config_map(address_map &map)
 	map(0x54, 0x57).lr32(NAME([] () { return 0x01000003; } ));
 	map(0x58, 0x5b).rw(FUNC(sis6326_agp_device::agp_command_r), FUNC(sis6326_agp_device::agp_command_w));
 	map(0x5c, 0x5f).lr32(NAME([] () { return 0x00000000; } )); // NULL terminator
+}
+
+/*
+ * DVD overrides
+ */
+
+sis6326_dvd_device::sis6326_dvd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sis6326_agp_device(mconfig, SIS6326_DVD, tag, owner, clock)
+{
+	set_ids(0x10396326, 0xa0, 0x030000, 0x10924920);
+}
+
+ROM_START( sis6326dvd )
+	ROM_REGION32_LE( 0x10000, "bios", ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("diamond")
+
+	ROM_SYSTEM_BIOS( 0, "diamond", "Diamond SpeedStar A70 (123A0A50)" )
+	ROMX_LOAD( "diamondspeedstar_a70.vbi", 0x000000, 0x00c000, CRC(9501f6fc) SHA1(7566f1483c3e963762ef19b4deeb8fc24ccd217f), ROM_BIOS(0) )
+ROM_END
+
+const tiny_rom_entry *sis6326_dvd_device::device_rom_region() const
+{
+	return ROM_NAME(sis6326dvd);
+}
+
+void sis6326_dvd_device::device_add_mconfig(machine_config &config)
+{
+	sis6326_agp_device::device_add_mconfig(config);
+	// Tip Top 6326AGP-E variant has feature connector, Diamond doesn't (solder pads in its place)
+	// TODO: allegedly a 8MB card but detects as 4 even if properly mapped
+	// (something inside the VGA core?)
+
+	// TODO: extra TV out (by definition)
 }
 

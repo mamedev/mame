@@ -247,10 +247,9 @@ void chaknpop_state::palette(palette_device &palette) const
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
-		bit0 = 0;
-		bit1 = BIT(col, 6);
-		bit2 = BIT(col, 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(col, 6);
+		bit1 = BIT(col, 7);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

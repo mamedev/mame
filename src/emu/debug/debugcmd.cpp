@@ -614,7 +614,7 @@ bool debugger_commands::mini_printf(std::ostream &stream, const std::vector<std:
 							address_space *tspace;
 							std::string s;
 
-							for (u32 address = u32(number), taddress; mintf->translate(spacenum, device_memory_interface::TR_READ, taddress = address, tspace); address++)
+							for (offs_t address = offs_t(number), taddress; mintf->translate(spacenum, device_memory_interface::TR_READ, taddress = address, tspace); address++)
 							{
 								u8 const data = tspace->read_byte(taddress);
 
@@ -4591,57 +4591,51 @@ void debugger_commands::execute_memdump(const std::vector<std::string_view> &par
 
 	using namespace std::literals;
 	std::string filename = params.empty() ? "memdump.log"s : std::string(params[0]);
-	FILE *const file = fopen(filename.c_str(), "w");
-	if (!file)
+	std::ofstream file(filename);
+	if (!file.good())
 	{
 		m_console.printf("Error opening file %s\n", filename);
 		return;
 	}
+	file.imbue(std::locale::classic());
 
 	m_console.printf("Dumping memory maps to %s\n", filename);
 
-	try
+	memory_interface_enumerator iter(*root);
+	std::vector<memory_entry> entries[2];
+	for (device_memory_interface &memory : iter)
 	{
-		memory_interface_enumerator iter(*root);
-		std::vector<memory_entry> entries[2];
-		for (device_memory_interface &memory : iter)
+		for (int space = 0; space != memory.max_space_count(); space++)
 		{
-			for (int space = 0; space != memory.max_space_count(); space++)
-				if (memory.has_space(space))
-				{
-					address_space &sp = memory.space(space);
-					bool octal = sp.is_octal();
-					int nc = octal ? (sp.addr_width() + 2) / 3 : (sp.addr_width() + 3) / 4;
+			if (memory.has_space(space))
+			{
+				address_space &sp = memory.space(space);
+				bool octal = sp.is_octal();
+				int nc = octal ? (sp.addr_width() + 2) / 3 : (sp.addr_width() + 3) / 4;
 
-					sp.dump_maps(entries[0], entries[1]);
-					for (int mode = 0; mode < 2; mode ++)
+				sp.dump_maps(entries[0], entries[1]);
+				for (int mode = 0; mode < 2; mode ++)
+				{
+					util::stream_format(file, "  %s '%s' space %s %s:\n", memory.device().type().fullname(), memory.device().tag(), sp.name(), mode ? "write" : "read");
+					for (memory_entry &entry : entries[mode])
 					{
-						fprintf(file, "  %s '%s' space %s %s:\n", memory.device().type().fullname(), memory.device().tag(), sp.name(), mode ? "write" : "read");
-						for (memory_entry &entry : entries[mode])
-						{
-							if (octal)
-								fprintf(file, "%0*o - %0*o:", nc, entry.start, nc, entry.end);
+						if (octal)
+							util::stream_format(file, "%0*o - %0*o:", nc, entry.start, nc, entry.end);
+						else
+							util::stream_format(file, "%0*x - %0*x:", nc, entry.start, nc, entry.end);
+						for (const auto &c : entry.context)
+							if (c.disabled)
+								util::stream_format(file, " %s[off]", c.view->name());
 							else
-								fprintf(file, "%0*x - %0*x:", nc, entry.start, nc, entry.end);
-							for (const auto &c : entry.context)
-								if (c.disabled)
-									fprintf(file, " %s[off]", c.view->name().c_str());
-								else
-									fprintf(file, " %s[%d]", c.view->name().c_str(), c.slot);
-							fprintf(file, " %s\n", entry.entry->name().c_str());
-						}
-						fprintf(file, "\n");
+								util::stream_format(file, " %s[%d]", c.view->name(), c.slot);
+						util::stream_format(file, " %s\n", entry.entry->name());
 					}
-					entries[0].clear();
-					entries[1].clear();
+					util::stream_format(file, "\n");
 				}
+				entries[0].clear();
+				entries[1].clear();
+			}
 		}
-		fclose(file);
-	}
-	catch (...)
-	{
-		fclose(file);
-		throw;
 	}
 }
 

@@ -1521,7 +1521,7 @@ MC6845_UPDATE_ROW( cbm8296_state::cbm8296_update_row )
 
 void cbm8296d_ieee488_devices(device_slot_interface &device)
 {
-	device.option_add("c8250lp", C8250LP);
+	device.option_add("c8250lp", GPIB_C8250LP);
 }
 
 

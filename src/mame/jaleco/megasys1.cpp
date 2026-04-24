@@ -110,7 +110,7 @@ RAM             RW      0e0000-0effff*        <               <
   bootleg version of rodlandj has one instruction patched out to do exactly
   the same thing that we are doing (ignoring the 6295 status).
 
-- Understand properly how irqs truly works, kazan / iganinju solution seems hacky
+- Understand properly how IRQs truly works, kazan / iganinju solution seems hacky
 
 - P47 intro effect is imperfect ( https://www.youtube.com/watch?v=eozZGcVspVw )
 
@@ -210,20 +210,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys_base_scanline)
 {
 	int scanline = param;
 
-	// stdragon: irq 1 is raster irq ("press start" behaviour), happens at around scanline 90(-16), 2 vblank, 3 is RTE.
-	// p47: irq 2 valid, others RTE
-	// kickoff: irq 3 valid, others RTE
-	// tshingen: irq 3 RTE, irq 1 reads inputs, irq 2 sets vregs values (pending further investigation ...)
-	// kazan: irq 3 disables irq in SW then execute a routine, irq 2 just execute this routine, irq 1 RTR
-	// astyanax: irq 3 RTE, irq 1 sets "ffff0210" OR 2, irq 2 vblank
-	// hachoo: irq 2 vblank, irq 3 & 1 sets 0xf004e buffer with the level number
-	// jitsupro: irq 3 RTE, irq 2 sets palette and vregs, irq 1 reads inputs
-	// plusalph: irq 1 & 3 RTE, irq 2 valid
-	// rodland: irq 1 & 3 RTE, irq 2 valid (sets palette, vregs ...)
-	// soldam: irq 1 & 3 RTE, irq 2 valid
-	// edfp: irq 1?, 2 sets vregs etc, 3 RTE
+	// stdragon: IRQ 1 is raster IRQ ("press start" behaviour), happens at around scanline 90(-16), 2 vblank, 3 is RTE.
+	// p47: IRQ 2 valid, others RTE
+	// kickoff: IRQ 3 valid, others RTE
+	// tshingen: IRQ 3 RTE, IRQ 1 reads inputs, IRQ 2 sets vregs values (pending further investigation ...)
+	// kazan: IRQ 3 disables IRQ in SW then execute a routine, IRQ 2 just execute this routine, IRQ 1 RTR
+	// astyanax: IRQ 3 RTE, IRQ 1 sets "ffff0210" OR 2, IRQ 2 vblank
+	// hachoo: IRQ 2 vblank, IRQ 3 & 1 sets 0xf004e buffer with the level number
+	// jitsupro: IRQ 3 RTE, IRQ 2 sets palette and vregs, IRQ 1 reads inputs
+	// plusalph: IRQ 1 & 3 RTE, IRQ 2 valid
+	// rodland: IRQ 1 & 3 RTE, IRQ 2 valid (sets palette, vregs ...)
+	// soldam: IRQ 1 & 3 RTE, IRQ 2 valid
+	// edfp: IRQ 1?, 2 sets vregs etc, 3 RTE
 
-	if(scanline == 224+16) // vblank-out irq
+	if(scanline == 224+16) // vblank-out IRQ
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
 	if(scanline == 80+16)
@@ -246,7 +246,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_typea_state::megasys1A_iganinju_scanline)
 	if(m_ram[0] == 0)
 		return;
 
-	if(scanline == 240) // vblank-out irq
+	if(scanline == 240) // vblank-out IRQ
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
@@ -4227,6 +4227,18 @@ MB 8843 sub-board with "P-47 (B)TYPE" sticker.
 The program ROMs are labelled "JALECO EXPORT P-47 #".
 Extra EPROM labelled "JALECO EXPORT 17".
 It contains enemy sprites without the German "Iron Cross" emblem.
+
+The same set was also seen on bootleg hardware, just with smaller program ROMs:
+
+1a-down.BIN             export_p-47_1.rom1 [1/2]      IDENTICAL
+1b-down.BIN             export_p-47_3.rom2 [1/2]      IDENTICAL
+2a-down.BIN             export_p-47_1.rom1 [2/2]      IDENTICAL
+2b-down.BIN             export_p-47_3.rom2 [2/2]      IDENTICAL
+
+ROM_LOAD16_BYTE( "1b-down.BIN", 0x00000, 0x10000, CRC(5a6ecf39) SHA1(81c9eef85eec47782c627e3b75723aa867ae3bec) )
+ROM_LOAD16_BYTE( "1a-down.BIN", 0x00001, 0x10000, CRC(fc57ae41) SHA1(25ca3db68b6ab7c1d45089cd5c98f9c55d599f96) )
+ROM_LOAD16_BYTE( "2b-down.BIN", 0x20000, 0x10000, CRC(89ec2c38) SHA1(3cedce66090c2c9cc2fb242304a3461edb3ecdeb) )
+ROM_LOAD16_BYTE( "2a-down.BIN", 0x20001, 0x10000, CRC(654c2675) SHA1(ec609c695a683007c7dc1c03e9958b70065a5c66) )
 
 ***************************************************************************/
 

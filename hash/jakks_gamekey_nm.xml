@@ -25,7 +25,7 @@ license:CC0-1.0
 	<!-- These were both sold bundled with units -->
 
 	<software name="nrxdig"> <!-- has SEEPROM -->
-		<description>New Rally X &amp; Dig Dug (01 APR 2005 A SKU E)</description>
+		<description>New Rally-X &amp; Dig Dug (01 APR 2005 A SKU E)</description>
 		<year>2005</year>
 		<publisher>JAKKS Pacific Inc / Namco / HotGen Ltd</publisher>
 		<part name="cart" interface="jakks_gamekey">
@@ -37,7 +37,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pacbosrx"> <!-- has SEEPROM -->
-		<description>Pac-Man &amp; Bosconian &amp; Rally X (11 JUL 2005 A SKU I)</description>
+		<description>Pac-Man &amp; Bosconian &amp; Rally-X (11 JUL 2005 A SKU I)</description>
 		<year>2005</year>
 		<publisher>JAKKS Pacific Inc / Namco / HotGen Ltd</publisher>
 		<part name="cart" interface="jakks_gamekey">

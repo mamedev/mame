@@ -8,7 +8,7 @@ toys based around the TMS1000 MCU series. Anything more complex or clearly
 part of a series is (or will be) in its own driver, see:
 - atari/hitparade.cpp: Atari Europe Hit Parade jukebox(es)
 - entex/sag.cpp: Entex Select-A-Game Machine (actually most games are on HMCS40)
-- miltonbradley/microvsn.cpp: Milton Bradley Microvision
+- miltonbradley/microvision.cpp: Milton Bradley Microvision
 - misc/eva.cpp: Chrysler EVA-11 (and EVA-24)
 - ti/snspell.cpp: TI Speak & Spell series gen. 1
 - ti/snspellc.cpp: TI Speak & Spell Compact / Touch & Tell
@@ -17526,7 +17526,7 @@ SYST( 1980, liveafb,    0,         0,      liveafb,   liveafb,   liveafb_state, 
 
 SYST( 1980, mega10k,    0,         0,      mega10k,   mega10k,   mega10k_state,   empty_init, "Jeux Nathan", u8"Mega 10.000: L'Encyclopédie Électronique", MACHINE_SUPPORTS_SAVE ) // ***
 
-SYST( 1979, astro,      0,         0,      astro,     astro,     astro_state,     empty_init, "Kosmos", "Astro", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1979, astro,      0,         0,      astro,     astro,     astro_state,     empty_init, "Kosmos", "Astro (Kosmos)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 SYST( 1980, strobe,     0,         0,      strobe,    strobe,    strobe_state,    empty_init, "Lakeside", "Strobe", MACHINE_SUPPORTS_SAVE )
 

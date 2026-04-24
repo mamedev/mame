@@ -870,6 +870,38 @@ ROM_START( glass10d )
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 ROM_END
 
+ROM_START( glass10e )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "pic_3.c23", 0x000000, 0x040000, CRC(96b1e125) SHA1(7934640b80ec73e625317bc49533184b27131330) )
+	ROM_LOAD16_BYTE( "pic_2.c22", 0x000001, 0x040000, CRC(6816d508) SHA1(fb9e5c2281d3b99ffb687e74741365305ef24785) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "glass_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(47c9df4c) SHA1(e0ac4f3d3086a4e8164d42aaae125037c222118a) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	// these are the default states stored in NVRAM
+	DS5002FP_SET_MON( 0x29 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x400000, "gfx", 0 ) // same split format as the development board
+	ROM_LOAD16_BYTE( "al_d0-d7_27c4001.bin",  0x000000, 0x080000, CRC(c668caad) SHA1(742030d27ed5f7f7966d00181e13c7ba9b885df5) )
+	ROM_LOAD16_BYTE( "bl_d8-d15_27c4001.bin", 0x000001, 0x080000, CRC(7a6cb91f) SHA1(2c8592d4f92ea380a85f3a43acef3f3898973963) )
+	ROM_LOAD16_BYTE( "ah_d0-d7_27c4001.bin",  0x100000, 0x080000, CRC(de27b785) SHA1(aa14e33f42039f67fb418ff45b26bef511c9c7c8) )
+	ROM_LOAD16_BYTE( "bh_d8-d15_27c4001.bin", 0x100001, 0x080000, CRC(e9aa45d3) SHA1(a9e09b2e338d75a414eea90672a1a7142e858d84) )
+	ROM_LOAD16_BYTE( "cl_d0-d7_27c4001.bin",  0x200000, 0x080000, CRC(e32639be) SHA1(9c18c871d042fe7c62a344f35968457ae8302fa9) )
+	ROM_LOAD16_BYTE( "dl_d8-d15_27c4001.bin", 0x200001, 0x080000, CRC(b56eb8a4) SHA1(5d647a3ae175051a11a3c496a32b34a368096487) )
+	ROM_LOAD16_BYTE( "ch_d0-d7_27c4001.bin",  0x300000, 0x080000, CRC(1b3f148d) SHA1(b62c5c6fb3f4ad543538764305e2e27b35c37334) )
+	ROM_LOAD16_BYTE( "dh_d8-d15_27c4001.bin", 0x300001, 0x080000, CRC(f3638123) SHA1(60d58608de193c1a3176c95419aa38a66e149e2a) )
+
+	ROM_REGION( 0x100000, "bmap", 0 )   // 16 bitmaps (320x200, indexed colors)
+	ROM_LOAD( "h9.bin", 0x000000, 0x100000, CRC(b9492557) SHA1(3f5c0d696d65e1cd492763dfa749c813dd56a9bf) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "c1.bin", 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
+	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
+ROM_END
+
 ROM_START( glassp )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	// There were 8 x SRM20100LC chips near the CPU and the 2 ROMs below; presumably the game code would have
@@ -940,6 +972,7 @@ GAME( 1993, glass10a,  glass, glass_ds5002fp, glass, glass_state, empty_init, RO
 GAME( 1993, glass10b,  glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (ver 1.0, Break Edition, checksum EBCB0BFE, 22 Nov 1993)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // date from stickers
 GAME( 1993, glass10c,  glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (ver 1.0, Break Edition, checksum 6241CD67, 16 Nov 1993)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // date from stickers
 GAME( 1993, glass10d,  glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (ver 1.0, Break Edition, checksum 2B43D337, 10 Nov 1993)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // date from stickers
+GAME( 1993, glass10e,  glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (ver 1.0, Break Edition, checksum 13BE832C)",                                   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
 // Even older 1.0 version, without the Break Edition subtitle, maybe prototype?
 // Enemies don't move correctly and can't be shot, probably requires a different DS5002FP even if it 'passes' the startup check

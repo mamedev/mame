@@ -3,8 +3,7 @@
 
 /***************************************************************************
 
-X-Men
-
+Konami X-Men
 driver by Nicola Salmoria
 
 notes:
@@ -49,19 +48,8 @@ Reverse-engineered schematics: https://github.com/jotego/jtbin/blob/master/sch/x
 
 #include "layout/generic.h"
 
-
-// configurable logging
-#define LOG_EEPROMW     (1U << 1)
-#define LOG_SOUNDIRQ    (1U << 2)
-#define LOG_OKI         (1U << 3)
-
-//#define VERBOSE (LOG_GENERAL | LOG_EEPROMW | LOG_SOUNDIRQ | LOG_OKI)
-
+//#define VERBOSE 1
 #include "logmacro.h"
-
-#define LOGEEPROMW(...)     LOGMASKED(LOG_EEPROMW,     __VA_ARGS__)
-#define LOGSOUNDIRQ(...)    LOGMASKED(LOG_SOUNDIRQ,    __VA_ARGS__)
-#define LOGOKI(...)         LOGMASKED(LOG_OKI,         __VA_ARGS__)
 
 
 namespace {
@@ -77,23 +65,29 @@ public:
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251"),
 		m_screen(*this, "screen"),
+		m_eeprom(*this, "eeprom"),
 		m_z80bank(*this, "z80bank"),
-		m_okibank(*this, "okibank"),
-		m_eeprom_out(*this, "EEPROMOUT")
+		m_okibank(*this, "okibank")
 	{ }
 
-	void xmen(machine_config &config);
-	void xmenabl(machine_config &config);
+	void xmen(machine_config &config) ATTR_COLD;
+	void xmenabl(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	void base(machine_config &config) ATTR_COLD;
+
 	// video-related
 	uint8_t m_layer_colorbase[3]{};
 	uint8_t m_sprite_colorbase = 0;
 	int32_t m_layerpri[3]{};
-	bool m_tilemap_select;
+	bool m_tilemap_select = false;
+	bool m_irq5_enable = false;
+	bool m_sound_irq = false;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -102,23 +96,9 @@ protected:
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
 	required_device<screen_device> m_screen;
-
-	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void _18fa00_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-	void base(machine_config &config);
-	void sound_hardware(machine_config &config);
+	required_device<eeprom_serial_er5911_device> m_eeprom;
 
 private:
-	optional_memory_bank m_z80bank;
-	optional_memory_bank m_okibank;
-
-	required_ioport m_eeprom_out;
-
-	// misc
-	bool m_irq3_enable = false;
-	bool m_irq5_enable = false;
-
 	void sound_bankswitch_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -132,7 +112,8 @@ private:
 	void oki_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 
-	void bootleg_sound_hardware(machine_config &config);
+	optional_memory_bank m_z80bank;
+	optional_memory_bank m_okibank;
 };
 
 class xmen6p_state : public xmen_state
@@ -144,23 +125,23 @@ public:
 		m_tilemap(*this, "tilemap%u", 0)
 	{ }
 
-	void xmen6p(machine_config &config);
+	void xmen6p(machine_config &config) ATTR_COLD;
 
-	int frame_r();
+	int field_r() { return (m_screen->frame_number() & 1) ^ m_screen->vblank(); }
 
 protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	bitmap_ind16 m_screen_bitmap[2]; // 0 left screen, 1 right screen
-	required_shared_ptr_array<uint16_t, 2> m_spriteram;
-	required_shared_ptr_array<uint16_t, 4> m_tilemap;
-	uint16_t *m_k053247_ram;
-
 	template <uint8_t Which> uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
 	void main_map(address_map &map) ATTR_COLD;
+
+	bitmap_ind16 m_screen_bitmap[2]; // 0 left screen, 1 right screen
+	required_shared_ptr_array<uint16_t, 2> m_spriteram;
+	required_shared_ptr_array<uint16_t, 4> m_tilemap;
+	uint16_t *m_k053247_ram;
 };
 
 
@@ -283,7 +264,7 @@ void xmen6p_state::screen_vblank(int state)
 	// rising edge
 	if (state)
 	{
-		int index = m_screen->frame_number() & 1;
+		int index = field_r();
 		bitmap_ind16 &renderbitmap = m_screen_bitmap[index];
 		rectangle cliprect = m_screen->cliprect();
 
@@ -297,7 +278,7 @@ void xmen6p_state::screen_vblank(int state)
 		index += m_tilemap_select ? 2 : 0;
 		for (int offset = 0; offset < (0xc000 / 2); offset++)
 		{
-			if (index == 0 || (offset != 0x1c00 && offset != 0x1c80 && offset != 0x1e80))
+			if ((index == 0 || (offset != 0x1c00 && offset != 0x1c80 && offset != 0x1e80)) && offset != 0x1d00)
 				m_k052109->write(offset, m_tilemap[index][offset] & 0x00ff);
 		}
 
@@ -341,24 +322,27 @@ void xmen6p_state::screen_vblank(int state)
 
 /***************************************************************************
 
-  EEPROM
+  Control
 
 ***************************************************************************/
 
-void xmen_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void xmen_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	LOGEEPROMW("%06x: write %04x to 108000\n", m_maincpu->pc(), data);
+	LOG("%06x: write %04x mask %04x to 108000\n", m_maincpu->pc(), data, mem_mask);
 	if (ACCESSING_BITS_0_7)
 	{
-		// bit 0 = coin counter
-		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		// bits 0/1 = coin counters
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 1)); // only for 2p version
 
-		// bit 2 is data
-		// bit 3 is clock (active high)
-		// bit 4 is cs (active low)
-		m_eeprom_out->write(data, 0xff);
+		// bit 2 = EEPROM data
+		// bit 3 = EEPROM clock (active high)
+		// bit 4 = EEPROM cs (active low)
+		m_eeprom->di_write(BIT(data, 2));
+		m_eeprom->cs_write(BIT(data, 4));
+		m_eeprom->clk_write(BIT(data, 3));
 
-		// bit 5 is enabled in IRQ3, disabled in IRQ5 (sprite DMA start?)
+		// bit 5 is enabled in IRQ3, disabled in IRQ5 (sprite DMA end)
 		m_irq5_enable = bool(BIT(data, 5));
 		if (!m_irq5_enable)
 			m_maincpu->set_input_line(5, CLEAR_LINE);
@@ -369,27 +353,18 @@ void xmen_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (ACCESSING_BITS_8_15)
 	{
 		// bit 8 = enable sprite ROM reading
-		m_k053246->k053246_set_objcha_line((data & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
-		// bit 9 = enable char ROM reading through the video RAM
-		// bit 10 = sound irq, but with some kind of hold
-		m_k052109->set_rmrd_line((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
-		if (data & 0x400)
-		{
-			LOGSOUNDIRQ("tick!\n");
-			if (m_audiocpu)
-				m_audiocpu->set_input_line(0, HOLD_LINE);
-		}
-	}
-}
+		m_k053246->k053246_set_objcha_line(BIT(data, 8) ? ASSERT_LINE : CLEAR_LINE);
 
-void xmen_state::_18fa00_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		// bit 2 is irq3 interrupt enable
-		m_irq3_enable = bool(BIT(data, 2));
-		if (!m_irq3_enable)
-			m_maincpu->set_input_line(3, CLEAR_LINE);
+		// bit 9 = enable char ROM reading through the video RAM
+		m_k052109->set_rmrd_line(BIT(data, 9) ? ASSERT_LINE : CLEAR_LINE);
+
+		// bit 10 = sound irq flip flop (actually through 054321)
+		if (m_audiocpu && !m_sound_irq && BIT(data, 10))
+			m_audiocpu->set_input_line(0, HOLD_LINE);
+		m_sound_irq = BIT(data, 10);
+
+		// bit 11 = mute
+		machine().sound().system_mute(!BIT(data, 11));
 	}
 }
 
@@ -405,7 +380,7 @@ void xmen_state::base_main_map(address_map &map)
 	map(0x100000, 0x100fff).rw(m_k053246, FUNC(k053247_device::k053247_word_r), FUNC(k053247_device::k053247_word_w));
 	map(0x101000, 0x101fff).ram();
 	map(0x104000, 0x104fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x108000, 0x108001).w(FUNC(xmen_state::eeprom_w));
+	map(0x108000, 0x108001).w(FUNC(xmen_state::control_w));
 	map(0x108020, 0x108027).w(m_k053246, FUNC(k053247_device::k053246_w));
 	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x10a000, 0x10a001).portr("P2_P4").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
@@ -414,7 +389,6 @@ void xmen_state::base_main_map(address_map &map)
 	map(0x10a00c, 0x10a00d).r(m_k053246, FUNC(k053247_device::k053246_r));
 	map(0x110000, 0x113fff).ram();
 	map(0x18c000, 0x197fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write)).umask16(0x00ff);
-	map(0x18fa00, 0x18fa01).w(FUNC(xmen_state::_18fa00_w));
 }
 
 void xmen_state::main_map(address_map &map)
@@ -429,7 +403,7 @@ void xmen_state::bootleg_main_map(address_map &map)
 	base_main_map(map);
 
 	// map(0x103ffe, 0x103fff) // sound related, too?
-	map(0x10804d, 0x10804d).lw8(NAME([this] (uint8_t data) { m_okibank->set_entry(data & 0x0f); LOGOKI("oki bank :%02x\n", data); })); // TODO: verify once oki ROM 1 is redumped / confirmed
+	map(0x10804d, 0x10804d).lw8(NAME([this] (uint8_t data) { m_okibank->set_entry((data + 3) & 0x0f); }));
 	map(0x10804f, 0x10804f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -446,7 +420,7 @@ void xmen_state::sound_map(address_map &map)
 
 void xmen_state::oki_map(address_map &map)
 {
-	map(0x00000, 0x2ffff).rom();
+	map(0x00000, 0x2ffff).rom().region("oki", 0);
 	map(0x30000, 0x3ffff).bankr(m_okibank);
 }
 
@@ -459,7 +433,7 @@ void xmen6p_state::main_map(address_map &map)
 	map(0x102000, 0x102fff).ram().share(m_spriteram[1]); // right screen
 	map(0x103000, 0x103fff).ram();     // 6p - a buffer?
 	map(0x104000, 0x104fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x108000, 0x108001).w(FUNC(xmen6p_state::eeprom_w));
+	map(0x108000, 0x108001).w(FUNC(xmen6p_state::control_w));
 	map(0x108020, 0x108027).w(m_k053246, FUNC(k053247_device::k053246_w)); // sprites
 	map(0x108040, 0x10805f).m("k054321", FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
@@ -471,7 +445,7 @@ void xmen6p_state::main_map(address_map &map)
 	map(0x110000, 0x113fff).ram();     // main RAM
 //  map(0x18c000, 0x197fff).w("k052109", FUNC(k052109_device:write)).umask16(0x00ff).share("tilemapleft");
 	map(0x18c000, 0x197fff).ram().share(m_tilemap[0]); // left screen
-	map(0x18fa00, 0x18fa01).w(FUNC(xmen6p_state::_18fa00_w));
+	map(0x18fa01, 0x18fa01).lw8(NAME([this] (uint8_t data) { m_k052109->write(0x1d00, data); })); // irq enable
 /*
     map(0x1ac000, 0x1af7ff).readonly();
     map(0x1ac000, 0x1af7ff).writeonly();
@@ -531,11 +505,6 @@ static INPUT_PORTS_START( xmen )
 	PORT_BIT( 0x3000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
-
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( xmen2p )
@@ -560,17 +529,7 @@ static INPUT_PORTS_START( xmen2p )
 	PORT_BIT( 0x3000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
-
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
 INPUT_PORTS_END
-
-int xmen6p_state::frame_r()
-{
-	return m_screen->frame_number() & 1;
-}
 
 static INPUT_PORTS_START( xmen6p )
 	PORT_START("P1_P3")
@@ -596,12 +555,7 @@ static INPUT_PORTS_START( xmen6p )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START5 ) // not verified
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START6 ) // not verified
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xmen6p_state::frame_r))  // screen indicator?
-
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xmen6p_state::field_r)) // screen indicator?
 INPUT_PORTS_END
 
 
@@ -616,15 +570,15 @@ void xmen_state::machine_start()
 	if (m_okibank)
 	{
 		m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
-		m_okibank->set_entry(0);
+		m_okibank->set_entry(3);
 	}
 
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_layerpri));
-	save_item(NAME(m_irq3_enable));
-	save_item(NAME(m_irq5_enable));
 	save_item(NAME(m_tilemap_select));
+	save_item(NAME(m_irq5_enable));
+	save_item(NAME(m_sound_irq));
 }
 
 void xmen_state::machine_reset()
@@ -636,23 +590,59 @@ void xmen_state::machine_reset()
 	}
 
 	m_sprite_colorbase = 0;
-	m_irq3_enable = false;
-	m_irq5_enable = false;
+	control_w(0, 0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(xmen_state::scanline)
 {
 	int const scanline = param;
 
-	if (scanline == 240 && m_irq3_enable) // vblank-out irq
-		m_maincpu->set_input_line(3, ASSERT_LINE);
-
-	if (scanline == 0 && m_irq5_enable && m_k053246->k053246_is_irq_enabled()) // sprite DMA irq?
-		m_maincpu->set_input_line(5, ASSERT_LINE);
+	if (scanline == 0)
+	{
+		// sprite DMA end irq
+		if (m_irq5_enable && m_k053246->k053246_is_irq_enabled())
+			m_maincpu->set_input_line(5, ASSERT_LINE);
+	}
 }
 
-void xmen_state::sound_hardware(machine_config &config)
+void xmen_state::base(machine_config &config)
 {
+	// basic machine hardware
+	M68000(config, m_maincpu, 16_MHz_XTAL); // verified on PCB
+	m_maincpu->set_addrmap(AS_PROGRAM, &xmen_state::main_map);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(xmen_state::scanline), "screen", 0, 1);
+
+	EEPROM_ER5911_8BIT(config, m_eeprom);
+
+	WATCHDOG_TIMER(config, "watchdog");
+
+	// video hardware
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240); // correct, same issue as tmnt2
+	m_screen->set_screen_update(FUNC(xmen_state::screen_update));
+	m_screen->set_palette("palette");
+
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
+
+	K052109(config, m_k052109, 24_MHz_XTAL);
+	m_k052109->set_palette("palette");
+	m_k052109->set_screen(m_screen);
+	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback));
+	m_k052109->irq_handler().set_inputline(m_maincpu, M68K_IRQ_3);
+
+	K053246(config, m_k053246, 24_MHz_XTAL);
+	m_k053246->set_sprite_callback(FUNC(xmen_state::sprite_callback));
+	m_k053246->set_config(NORMAL_PLANE_ORDER, -43, -2);
+	m_k053246->set_palette("palette");
+
+	K053251(config, m_k053251, 0);
+}
+
+void xmen_state::xmen(machine_config &config)
+{
+	base(config);
+
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 2); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &xmen_state::sound_map);
 
@@ -670,63 +660,18 @@ void xmen_state::sound_hardware(machine_config &config)
 	k054539.add_route(1, "speaker", 1.00, 0);
 }
 
-void xmen_state::bootleg_sound_hardware(machine_config &config)
-{
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-
-	okim6295_device &oki(OKIM6295(config, "oki", 1'000'000, okim6295_device::PIN7_HIGH)); // clock and pin7 not verified
-	oki.set_addrmap(0, &xmen_state::oki_map);
-	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
-}
-
-void xmen_state::base(machine_config &config)
-{
-	// basic machine hardware
-	M68000(config, m_maincpu, 16_MHz_XTAL); // verified on PCB
-	m_maincpu->set_addrmap(AS_PROGRAM, &xmen_state::main_map);
-
-	TIMER(config, "scantimer").configure_scanline(FUNC(xmen_state::scanline), "screen", 0, 1);
-
-	EEPROM_ER5911_8BIT(config, "eeprom");
-
-	WATCHDOG_TIMER(config, "watchdog");
-
-	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240); // correct, same issue as tmnt2
-	m_screen->set_screen_update(FUNC(xmen_state::screen_update));
-	m_screen->set_palette("palette");
-
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
-
-	K052109(config, m_k052109, 24_MHz_XTAL);
-	m_k052109->set_palette("palette");
-	m_k052109->set_screen(m_screen);
-	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback));
-
-	K053246(config, m_k053246, 24_MHz_XTAL);
-	m_k053246->set_sprite_callback(FUNC(xmen_state::sprite_callback));
-	m_k053246->set_config(NORMAL_PLANE_ORDER, -43, -2);
-	m_k053246->set_palette("palette");
-
-	K053251(config, m_k053251, 0);
-}
-
-void xmen_state::xmen(machine_config &config)
-{
-	base(config);
-
-	sound_hardware(config);
-}
-
 void xmen_state::xmenabl(machine_config &config)
 {
 	base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &xmen_state::bootleg_main_map);
 
-	bootleg_sound_hardware(config);
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+
+	okim6295_device &oki(OKIM6295(config, "oki", 1'000'000, okim6295_device::PIN7_LOW)); // clock and pin7 not verified
+	oki.set_addrmap(0, &xmen_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void xmen6p_state::xmen6p(machine_config &config)
@@ -741,11 +686,11 @@ void xmen6p_state::xmen6p(machine_config &config)
 
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 320-32, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(xmen6p_state::screen_update<0>));
+	m_screen->screen_vblank().set(FUNC(xmen6p_state::screen_vblank));
 
 	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
 	screen2.set_raw(24_MHz_XTAL / 4, 384, 0+32, 320, 264, 16, 240);
 	screen2.set_screen_update(FUNC(xmen6p_state::screen_update<1>));
-	screen2.screen_vblank().set(FUNC(xmen6p_state::screen_vblank));
 	screen2.set_palette("palette");
 
 	m_k053246->set_screen(m_screen);
@@ -1263,7 +1208,7 @@ GAME( 1992, xmenj,   xmen, xmen,    xmen,   xmen_state,   empty_init, ROT0, "Kon
 GAME( 1992, xmenja,  xmen, xmen,    xmen,   xmen_state,   empty_init, ROT0, "Konami",  "X-Men (4 Players ver JEA)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1992, xmena,   xmen, xmen,    xmen,   xmen_state,   empty_init, ROT0, "Konami",  "X-Men (4 Players ver AEA)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1992, xmenaa,  xmen, xmen,    xmen,   xmen_state,   empty_init, ROT0, "Konami",  "X-Men (4 Players ver ADA)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmenabl, xmen, xmenabl, xmen,   xmen_state,   empty_init, ROT0, "bootleg", "X-Men (4 Players ver AEA, bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // sprites are wrong, Oki banking not correct (doubtful it can be this bad, even being a bootleg)
+GAME( 1992, xmenabl, xmen, xmenabl, xmen,   xmen_state,   empty_init, ROT0, "bootleg", "X-Men (4 Players ver AEA, bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // sprites are wrong
 
 GAME( 1992, xmen2pe, xmen, xmen,    xmen2p, xmen_state,   empty_init, ROT0, "Konami",  "X-Men (2 Players ver EAA)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1992, xmen2pu, xmen, xmen,    xmen2p, xmen_state,   empty_init, ROT0, "Konami",  "X-Men (2 Players ver UAB)",          MACHINE_SUPPORTS_SAVE )

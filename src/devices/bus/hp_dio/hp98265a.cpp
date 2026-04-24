@@ -28,8 +28,6 @@ public:
 	// construction/destruction
 	dio16_98265a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void mb87030(device_t *device);
-
 protected:
 	dio16_98265a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -58,7 +56,6 @@ private:
 	static constexpr int REG_CONTROL_DE0 = (1 << 0);
 	static constexpr int REG_CONTROL_DE1 = (1 << 1);
 
-	static void mb87030_scsi_adapter(device_t *device);
 	required_ioport m_sw1;
 	required_ioport m_sw2;
 	int get_int_level();

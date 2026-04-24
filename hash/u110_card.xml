@@ -32,16 +32,16 @@ external internal   external internal
    A4 - - -  A1        D4 - - - D1
    A5 - - -  A2        D5 - - - D3
    A6 - - -  A3        D6 - - - D0
-   A7 - - - A15        D7 - - - D5
-   A8 - - - A13
-   A9 - - - A10
-  A10 - - - A14
+   A7 - - -  A8        D7 - - - D5
+   A8 - - - A10
+   A9 - - - A13
+  A10 - - -  A9
   A11 - - -  A7
-  A12 - - - A12
-  A13 - - - A11
+  A12 - - - A11
+  A13 - - - A12
   A14 - - - A16
-  A15 - - -  A9
-  A16 - - -  A8
+  A15 - - - A14
+  A16 - - - A15
   A17 - - - A17
   A18 - - - A18
 -->
@@ -54,7 +54,7 @@ external internal   external internal
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
 				<!-- Note: The current dump is an overdump due to how address scrambling works. The internal ROM appears to be only 64K. -->
-				<rom name="musitronics_akkordeon.bin" size="0x20000" crc="69e41a1b" sha1="2931181ad60372461e82491a014cb118c68605d8"/>
+				<rom name="musitronics_akkordeon.bin" size="0x20000" crc="12a18917" sha1="6d3f17c44f42b79401416910be624b65b4db8e33"/>
 			</dataarea>
 		</part>
 	</software>
@@ -64,7 +64,7 @@ external internal   external internal
 		<publisher>Roland</publisher>
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
-				<rom name="sn-mv30-01.bin" size="0x80000" crc="9b571919" sha1="873afbac7b1fcd45128952152dc090de48b765c6"/>
+				<rom name="sn-mv30-01.bin" size="0x80000" crc="90ea2ea8" sha1="9f2dced30b9bcc9c4ae841661ee334f1daa6dd68"/>
 			</dataarea>
 		</part>
 	</software>
@@ -74,7 +74,7 @@ external internal   external internal
 		<publisher>Roland</publisher>
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
-				<rom name="sn-mv30-02.bin" size="0x80000" crc="596254dc" sha1="1081973aad7ad5941329d3ab8a20db654c063a2e"/>
+				<rom name="sn-mv30-02.bin" size="0x80000" crc="57c740c9" sha1="bbe0b2aa7badcc5061b648745f1bd957771f134b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -85,7 +85,7 @@ external internal   external internal
 		<!-- Note: The card reports itself with ID 01, which is also used by SN-U110-01. -->
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
-				<rom name="sn-spla-01.bin" size="0x80000" crc="809bb699" sha1="2d2119b2d5f81b973076ed8471f329fc0741eebf"/>
+				<rom name="sn-spla-01.bin" size="0x80000" crc="e51284a1" sha1="c248ba8fcfe79c83339132a855dfe047bfa79983"/>
 			</dataarea>
 		</part>
 	</software>
@@ -95,7 +95,7 @@ external internal   external internal
 		<publisher>Roland</publisher>
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
-				<rom name="sn-u110-01.bin" size="0x80000" crc="71fec2e0" sha1="42440bcf0e025dad9182de0a3231f0e00c3a149d"/>
+				<rom name="sn-u110-01.bin" size="0x80000" crc="8a99cfce" sha1="b57b215828d292505c4d5c3e85aefb3e34086514"/>
 			</dataarea>
 		</part>
 	</software>
@@ -105,7 +105,7 @@ external internal   external internal
 		<publisher>Roland</publisher>
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
-				<rom name="sn-u110-02.bin" size="0x80000" crc="335a67cb" sha1="3e1c2fd64c59474426aa8717eb03240bb8b69730"/>
+				<rom name="sn-u110-02.bin" size="0x80000" crc="7f347263" sha1="5e4edc717adcf7e078ea4bc1ce3bd04eacece672"/>
 			</dataarea>
 		</part>
 	</software>
@@ -115,7 +115,7 @@ external internal   external internal
 		<publisher>Roland</publisher>
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
-				<rom name="sn-u110-03.bin" size="0x80000" crc="20a010db" sha1="2d33603fe3217d44d28aec284216581e581a9981"/>
+				<rom name="sn-u110-03.bin" size="0x80000" crc="7f14c801" sha1="1cb93d7bfeb499f22cba316a5732af97d7311a4e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -125,7 +125,7 @@ external internal   external internal
 		<publisher>Roland</publisher>
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
-				<rom name="sn-u110-04.bin" size="0x80000" crc="2653ac2b" sha1="e856625e9efac8ee4026696f46aad4015fb3c097"/>
+				<rom name="sn-u110-04.bin" size="0x80000" crc="39e0e70b" sha1="a369fbb1874c222a0c9e1066275e3174917b3725"/>
 			</dataarea>
 		</part>
 	</software>
@@ -135,7 +135,7 @@ external internal   external internal
 		<publisher>Roland</publisher>
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
-				<rom name="sn-u110-05.bin" size="0x80000" crc="712aa669" sha1="9d67bd73848c1b6c4a9543b8f4abb5794ac2f951"/>
+				<rom name="sn-u110-05.bin" size="0x80000" crc="844b2456" sha1="b1a59971153e0cc5c4c2631a9bdb57433f47ca0e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -145,7 +145,7 @@ external internal   external internal
 		<publisher>Roland</publisher>
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
-				<rom name="sn-u110-06.bin" size="0x80000" crc="5725360d" sha1="d5a8beece04b6da27c6a6b3bddc808c757168a28"/>
+				<rom name="sn-u110-06.bin" size="0x80000" crc="c715c9aa" sha1="02d8dfb9bd45721e34b0eec3db69b3f5e182e7bc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -155,7 +155,7 @@ external internal   external internal
 		<publisher>Roland</publisher>
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
-				<rom name="sn-u110-07.bin" size="0x80000" crc="7a6319c2" sha1="fdcb923b986805e3671fb0962804315d8287cba5"/>
+				<rom name="sn-u110-07.bin" size="0x80000" crc="6fb3a4f4" sha1="1e16c98cf776598b726d4f48ca3f3d677cd32c54"/>
 			</dataarea>
 		</part>
 	</software>
@@ -165,7 +165,7 @@ external internal   external internal
 		<publisher>Roland</publisher>
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
-				<rom name="sn-u110-08.bin" size="0x80000" crc="fef365d2" sha1="ad3ea185cac7d938a9f7fe17d80cab32881e05d7"/>
+				<rom name="sn-u110-08.bin" size="0x80000" crc="104f3974" sha1="71b6f97df6dd4e573db5743c10c77e86d67965a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -175,7 +175,7 @@ external internal   external internal
 		<publisher>Roland</publisher>
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
-				<rom name="sn-u110-09.bin" size="0x80000" crc="28b03851" sha1="54d07e1b49eedd0f5339999dc0f4690134849f31"/>
+				<rom name="sn-u110-09.bin" size="0x80000" crc="af1c2778" sha1="aea715a0a554c071a2e912894805a8d819802e1d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -185,7 +185,7 @@ external internal   external internal
 		<publisher>Roland</publisher>
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
-				<rom name="sn-u110-10.bin" size="0x80000" crc="7611196a" sha1="056344e4908c2fbde98f77b4d1f5c198c62333e7"/>
+				<rom name="sn-u110-10.bin" size="0x80000" crc="c219c27e" sha1="3249ff037a165e57173bd45c543a665810d2c57b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -195,7 +195,7 @@ external internal   external internal
 		<publisher>Roland</publisher>
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
-				<rom name="sn-u110-11.bin" size="0x80000" crc="57e50aa1" sha1="c15071da567204c84d1a0ae35961caa84ebfa2fc"/>
+				<rom name="sn-u110-11.bin" size="0x80000" crc="0ee5274d" sha1="f5cbe2272d03e21403bfca029476d015f6a34d3a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -205,7 +205,7 @@ external internal   external internal
 		<publisher>Roland</publisher>
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
-				<rom name="sn-u110-12.bin" size="0x80000" crc="4f925426" sha1="c36fb83e720c3bd55d21959927fa616c92105bbc"/>
+				<rom name="sn-u110-12.bin" size="0x80000" crc="39c78747" sha1="bac35550bdd719da4e5dc703d3829523cfee9b8a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -215,7 +215,7 @@ external internal   external internal
 		<publisher>Roland</publisher>
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
-				<rom name="sn-u110-13.bin" size="0x80000" crc="b26fd0b4" sha1="e332d1dd5f0ebf5284501540fdbcc1488e8ef828"/>
+				<rom name="sn-u110-13.bin" size="0x80000" crc="4cbf140a" sha1="4a6ca2b45c83991e62023dfc0114b40baed0e0fd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -225,7 +225,7 @@ external internal   external internal
 		<publisher>Roland</publisher>
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
-				<rom name="sn-u110-14.bin" size="0x80000" crc="7143045d" sha1="b540bd0db7eb2c0914c7cfb5e98ac8c85bd868aa"/>
+				<rom name="sn-u110-14.bin" size="0x80000" crc="cf5e6371" sha1="dfe87d385068201d3a31a55466e171fda614e412"/>
 			</dataarea>
 		</part>
 	</software>
@@ -235,7 +235,7 @@ external internal   external internal
 		<publisher>Roland</publisher>
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
-				<rom name="sn-u110-15.bin" size="0x80000" crc="4e215a4d" sha1="10ad202551632118c5e3bdfb06e6613079217ce9"/>
+				<rom name="sn-u110-15.bin" size="0x80000" crc="2df93109" sha1="56918595d39b480a6a15b7ecc8d1c836cca842a3"/>
 			</dataarea>
 		</part>
 	</software>

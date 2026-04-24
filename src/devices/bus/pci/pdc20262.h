@@ -33,6 +33,8 @@ protected:
 
 	required_memory_region m_bios;
 
+	virtual uint8_t latency_timer_r() override;
+
 private:
 	void ide1_command_map(address_map &map) ATTR_COLD;
 	void ide1_control_map(address_map &map) ATTR_COLD;

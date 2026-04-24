@@ -13,6 +13,7 @@
 
 DECLARE_DEVICE_TYPE(VA_CONST, va_const_device)
 DECLARE_DEVICE_TYPE(VA_SCALE_OFFSET, va_scale_offset_device)
+DECLARE_DEVICE_TYPE(VA_COMPARATOR, va_comparator_device)
 
 
 // Outputs a constant value to a stream. This is meant for things like
@@ -53,6 +54,64 @@ private:
 	sound_stream *m_stream;
 	float m_scale;
 	float m_offset;
+};
+
+
+// Emulates various comparator devices and circuits.
+//
+// The positive- and negative-going thresholds and output type can either be
+// configured directly, or by using one of the helpers for specific circuits.
+//
+// Configuration helpers:
+//
+// * comp_oc_hyst_config: Configuration for an open-collector / open-drain
+//   comparator (LM393 or similar), with hysteresis via positive feedback. Acts
+//   like a Schmitt trigger inverter with configurable thresholds and output levels.
+//
+//                                     ______         Vpullup
+//                                    |      \           |
+//                   Input ---------- |-      \       Rpullup
+//                                    |        \         |
+//                                    |  COMP   > -------+------ Output
+//                                    |        /         |
+//                           +------- |+      /          |
+//                           |        |______/           |
+//                           |                           |
+//    Vthresh --- Rthresh ---+--------- Rfeedback--------+
+//
+class va_comparator_device : public device_t, public device_sound_interface
+{
+public:
+	struct comp_oc_hyst_config
+	{
+		const float v_minus;   // Negative supply voltage (often 0V).
+		const float v_pullup;
+		const float r_pullup;
+		const float v_thresh;
+		const float r_thresh;
+		const float r_feedback;
+	};
+
+	va_comparator_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0) ATTR_COLD;
+
+	va_comparator_device &configure(float thresh_pos, float thresh_neg, bool inverted) ATTR_COLD;
+	va_comparator_device &configure(const comp_oc_hyst_config &c) ATTR_COLD;
+
+	int state();
+
+protected:
+	void device_start() override ATTR_COLD;
+	void sound_stream_update(sound_stream &stream) override;
+
+private:
+	// configuration
+	float m_thresh_pos;
+	float m_thresh_neg;
+	bool m_inverted;
+	sound_stream *m_stream;
+
+	// state
+	bool m_state;
 };
 
 

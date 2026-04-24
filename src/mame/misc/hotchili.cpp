@@ -304,7 +304,7 @@ void hotchili_state::hc_map(address_map &map)
 static INPUT_PORTS_START( hotchili )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("All Clear / Configuration")  // pressed on startup
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("All Clear / Configuration")  // pressed on startup
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unknown
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )  // active: enables RNG and read inputs on secondary buffer (inputs with special timing)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Meter Reading Key") PORT_TOGGLE

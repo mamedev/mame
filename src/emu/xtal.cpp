@@ -50,6 +50,8 @@
 
 #include <cfloat>
 #include <cmath>
+#include <locale>
+#include <sstream>
 
 
 // This array *must* stay in order, it's binary-searched
@@ -597,25 +599,21 @@ bool XTAL::validate(double base_clock)
 	return false;
 }
 
-void XTAL::validate(const char *message) const
+void XTAL::validate(std::string_view message) const
 {
 	if(!validate(m_base_clock))
 		fail(m_base_clock, message);
 }
 
-void XTAL::validate(const std::string &message) const
+void XTAL::fail(double base_clock, std::string_view message)
 {
-	if(!validate(m_base_clock))
-		fail(m_base_clock, message);
-}
-
-void XTAL::fail(double base_clock, const std::string &message)
-{
-	std::string full_message = util::string_format("Unknown crystal value %.0f. ", base_clock);
+	std::ostringstream full_message;
+	full_message.imbue(std::locale::classic());
+	util::stream_format(full_message, "Unknown crystal value %.0f. ", base_clock);
 	if(xtal_error_low && xtal_error_high)
-		full_message += util::string_format(" Did you mean %.0f or %.0f?", xtal_error_low, xtal_error_high);
+		util::stream_format(full_message, " Did you mean %.0f or %.0f?", xtal_error_low, xtal_error_high);
 	else
-		full_message += util::string_format(" Did you mean %.0f?", xtal_error_low ? xtal_error_low : xtal_error_high);
-	full_message += util::string_format(" Context: %s\n", message);
-	fatalerror("%s\n", full_message);
+		util::stream_format(full_message, " Did you mean %.0f?", xtal_error_low ? xtal_error_low : xtal_error_high);
+	util::stream_format(full_message, " Context: %s\n", message);
+	fatalerror("%s", std::move(full_message).str());
 }

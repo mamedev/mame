@@ -148,17 +148,18 @@ void menu_video_options::populate()
 		item_append(menu_item_type::SEPARATOR);
 	}
 
-	const char *subtext = "";
-
-	// add a rotate item
-	switch (m_target.orientation())
 	{
-	case ROT0:      subtext = "None";       break;
-	case ROT90:     subtext = u8"CW 90°";   break;
-	case ROT180:    subtext = u8"180°";     break;
-	case ROT270:    subtext = u8"CCW 90°";  break;
+		// add a rotate item
+		const auto *subtext = u8"";
+		switch (m_target.orientation())
+		{
+		case ROT0:      subtext = u8"None";     break;
+		case ROT90:     subtext = u8"CW 90°";   break;
+		case ROT180:    subtext = u8"180°";     break;
+		case ROT270:    subtext = u8"CCW 90°";  break;
+		}
+		item_append(_("Rotate"), (char const *)subtext, FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, reinterpret_cast<void *>(ITEM_ROTATE));
 	}
-	item_append(_("Rotate"), subtext, FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, reinterpret_cast<void *>(ITEM_ROTATE));
 
 	// cropping
 	bool const canzoom(curview.has_art() && !curview.visible_screens().empty());
@@ -167,6 +168,7 @@ void menu_video_options::populate()
 	if (!m_snapshot)
 	{
 		// uneven stretch
+		const auto *subtext = "";
 		switch (m_target.scale_mode())
 		{
 		case SCALE_FRACTIONAL:

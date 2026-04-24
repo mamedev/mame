@@ -1102,7 +1102,7 @@ int avg_quantum_device::handler_7() // quantum_strobe3
 int avg_bzone_device::handler_1() // bzone_latch1
 {
 	/*
-	 * Battle Zone has clipping hardware. We need to remember the
+	 * Battlezone has clipping hardware. We need to remember the
 	 * position of the beam when the analog switches hst or lst get
 	 * turned off.
 	 */
@@ -1140,7 +1140,7 @@ int avg_bzone_device::handler_6() // bzone_strobe2
 			/*
 			 * If izblank is true the zblank signal gets
 			 * inverted. This behaviour can't be handled with the
-			 * clipping we have right now. Battle Zone doesn't seem to
+			 * clipping we have right now. Battlezone doesn't seem to
 			 * invert zblank so it's no issue.
 			 */
 			m_izblank = m_dvy & 0x100;
@@ -1152,7 +1152,7 @@ int avg_bzone_device::handler_6() // bzone_strobe2
 
 int avg_bzone_device::handler_7() // bzone_strobe3
 {
-	// Battle Zone is B/W
+	// Battlezone is B/W
 	const int cycles = avg_common_strobe3();
 
 	if (!OP0() && !OP2())
@@ -1501,4 +1501,4 @@ DEFINE_DEVICE_TYPE(AVG_TEMPEST,  avg_tempest_device,  "avg_tempest",  "Atari AVG
 DEFINE_DEVICE_TYPE(AVG_MHAVOC,   avg_mhavoc_device,   "avg_mhavoc",   "Atari AVG (Major Havoc)")
 DEFINE_DEVICE_TYPE(AVG_STARWARS, avg_starwars_device, "avg_starwars", "Atari AVG (Star Wars)")
 DEFINE_DEVICE_TYPE(AVG_QUANTUM,  avg_quantum_device,  "avg_quantum",  "Atari AVG (Quantum)")
-DEFINE_DEVICE_TYPE(AVG_BZONE,    avg_bzone_device,    "avg_bzone",    "Atari AVG (Battle Zone)")
+DEFINE_DEVICE_TYPE(AVG_BZONE,    avg_bzone_device,    "avg_bzone",    "Atari AVG (Battlezone)")

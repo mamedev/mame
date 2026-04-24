@@ -26,6 +26,31 @@ YMZ280B-F
 16CKSS4JI XTAL
 3x bank of 8 switches (SW1-SW3)
 test push-button
+
+Siren Kids is part of Fuji Denshi’s (FDEK) Kids Series:
+
+1 - サーカスキッズ - Circus Kids
+2 - でるでるキッズ - Deru Deru Kids
+3 - ビンゴキッズ - Bingo Kids
+4 - いただきニャンドラキッズ - Itadaki Nyandora Kids
+5 - ぱくぱくキッズ - Paku Paku Kids
+6 - ちゃんこキッズ - Chanko Kids
+7 - たこやきキッズ - Takoyaki Kids
+8 - しゅりけんキッズ - Shuriken Kids
+9 - サイレンキッズ - Siren Kids
+
+Later titles weren't numbered anymore and weren't considered part
+of the series
+ドレミファキッズ - Doremi-fa Kids
+バトルキッズ - Battle Kids
+バーガーキッズ - Burger Kids
+たいやきキッズ - Taiyaki Kids
+ダブルスキッズ - Doubles Kids
+
+These have different mechanics:
+ありんこキッズ - Arinko Kids
+うずまキッズ - Uzuma Kids
+くるくるキッズ - Kuru Kuru Kids
 */
 
 

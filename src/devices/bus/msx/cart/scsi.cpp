@@ -39,7 +39,7 @@ public:
 	msx_cart_gouda_scsi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, MSX_CART_GOUDA_SCSI, tag, owner, clock)
 		, msx_cart_interface(mconfig, *this)
-		, m_wd33c93a(*this, "scsi:6:wd33c93a")
+		, m_wd33c93a(*this, "wd33c93a")
 	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
@@ -56,14 +56,16 @@ private:
 
 void msx_cart_gouda_scsi_device::device_add_mconfig(machine_config &config)
 {
-	NSCSI_BUS(config, "scsi", 0);
+	auto &scsi(NSCSI_BUS(config, "scsi", 0));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi:6").option_set("wd33c93a", WD33C93A).clock(10_MHz_XTAL);
+
+	WD33C93A(config, m_wd33c93a, 10_MHz_XTAL);
+	scsi.set_external_device(6, m_wd33c93a);
 }
 
 std::error_condition msx_cart_gouda_scsi_device::initialize_cartridge(std::string &message)

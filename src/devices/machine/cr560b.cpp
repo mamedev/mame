@@ -31,7 +31,7 @@ TODO:
 
 #define VERBOSE (LOG_GENERAL | LOG_TOC | LOG_CMD | LOG_PARAM)
 //#define VERBOSE (LOG_TOC)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #define LOGPARAM LOGMASKED(LOG_PARAM, "-> Param: %02x %02x %02x %02x %02x %02x\n", \
 	m_input_fifo[1], m_input_fifo[2], m_input_fifo[3], \

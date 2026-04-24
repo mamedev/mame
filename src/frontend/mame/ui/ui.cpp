@@ -1753,22 +1753,17 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	if (machine().ui_input().pressed(IPT_UI_SHOW_FPS))
 		set_show_fps(!show_fps());
 
-	// increment frameskip?
+	// increment frameskip
 	if (machine().ui_input().pressed(IPT_UI_FRAMESKIP_INC))
 		increase_frameskip();
 
-	// decrement frameskip?
+	// decrement frameskip
 	if (machine().ui_input().pressed(IPT_UI_FRAMESKIP_DEC))
 		decrease_frameskip();
 
-	// toggle throttle?
+	// toggle throttle
 	if (machine().ui_input().pressed(IPT_UI_THROTTLE))
-	{
-		const bool new_throttle_state = !machine().video().throttled();
-		machine().video().set_throttled(new_throttle_state);
-		if (m_unthrottle_mute)
-			machine().sound().ui_mute(!new_throttle_state);
-	}
+		machine().video().set_throttled(!machine().video().throttled());
 
 	// check for fast forward
 	if (machine().ioport().type_pressed(IPT_UI_FAST_FORWARD))
@@ -1778,6 +1773,10 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	}
 	else
 		machine().video().set_fastforward(false);
+
+	// update mute when unthrottled
+	if (m_unthrottle_mute)
+		machine().sound().ui_mute(machine().video().fastforward() || !machine().video().throttled());
 
 	return 0;
 }

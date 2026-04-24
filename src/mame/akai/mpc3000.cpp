@@ -218,7 +218,7 @@ void mpc3000_state::mpc3000_io_map(address_map &map)
 	map(0x0020, 0x0020).w("hiledlatch", FUNC(hc259_device::write_nibble_d3));
 	map(0x0060, 0x006f).m(m_dsp, FUNC(l7a1045_sound_device::map));
 	map(0x0080, 0x0087).rw("dioexp", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x00a0, 0x00bf).m("scsi:7:spc", FUNC(mb89352_device::map)).umask16(0x00ff);
+	map(0x00a0, 0x00bf).m("spc", FUNC(mb89352_device::map)).umask16(0x00ff);
 	map(0x00c0, 0x00c7).rw("sio", FUNC(te7774_device::read_cs<0>), FUNC(te7774_device::write_cs<0>)).umask16(0x00ff);
 	map(0x00c8, 0x00cf).rw("sio", FUNC(te7774_device::read_cs<1>), FUNC(te7774_device::write_cs<1>)).umask16(0x00ff);
 	map(0x00d0, 0x00d7).rw("sio", FUNC(te7774_device::read_cs<2>), FUNC(te7774_device::write_cs<2>)).umask16(0x00ff);

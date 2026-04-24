@@ -55,6 +55,8 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/cards.h"
 #include "bus/a2gameio/gameio.h"
 #include "bus/a2kbd/a2kbd.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"
 #include "machine/74259.h"
@@ -156,6 +158,8 @@ public:
 	void apple2p(machine_config &config);
 	void apple2pe(machine_config &config);
 	void apple2_map(address_map &map) ATTR_COLD;
+
+	template <unsigned Address> std::pair<std::error_condition, std::string> load_rom(device_image_interface &image);
 
 private:
 	int m_speaker_state, m_cassette_state;
@@ -603,129 +607,18 @@ void apple2_state::inh_w(offs_t offset, u8 data)
 	}
 }
 
-// floating bus code from old machine/apple2: now works reasonably well with French Touch and Deater "vapor lock" stuff
 u8 apple2_state::read_floatingbus()
 {
-	enum
-	{
-		// scanner constants
-		kHBurstClock      =    53, // clock when Color Burst starts
-		kHBurstClocks     =     4, // clocks per Color Burst duration
-		kHClock0State     =  0x18, // H[543210] = 011000
-		kHClocks          =    65, // clocks per horizontal scan (including HBL)
-		kHPEClock         =    40, // clock when HPE (horizontal preset enable) goes low
-		kHPresetClock     =    41, // clock when H state presets
-		kHSyncClock       =    49, // clock when HSync starts
-		kHSyncClocks      =     4, // clocks per HSync duration
-		kNTSCScanLines    =   262, // total scan lines including VBL (NTSC)
-		kNTSCVSyncLine    =   224, // line when VSync starts (NTSC)
-		kPALScanLines     =   312, // total scan lines including VBL (PAL)
-		kPALVSyncLine     =   264, // line when VSync starts (PAL)
-		kVLine0State      = 0x100, // V[543210CBA] = 100000000
-		kVPresetLine      =   256, // line when V state presets
-		kVSyncLines       =     4, // lines per VSync duration
-		kClocksPerVSync   = kHClocks * kNTSCScanLines // FIX: NTSC only?
-	};
+	int h_clock = m_screen->hpos() / 14 + 25; // adjust for set_raw
+	if (h_clock >= 65)
+		h_clock -= 65;
 
-	// vars
-	//
-	int i, Hires, Mixed, Page2, _80Store, ScanLines, /* VSyncLine, ScanCycles,*/
-		h_clock, h_state, h_0, h_1, h_2, h_3, h_4, h_5,
-		v_line, v_state, v_A, v_B, v_C, v_0, v_1, v_2, v_3, v_4, /* v_5, */
-		_hires, addend0, addend1, addend2, sum, address;
+	int v_clock = m_screen->vpos() + (h_clock < 25); // adjust for hpos wrap
+	if (v_clock >= m_screen->height())
+		v_clock -= m_screen->height();
 
-	// video scanner data
-	//
-	i = m_maincpu->total_cycles() % kClocksPerVSync; // cycles into this VSync
-
-	// machine state switches
-	//
-	Hires    = (m_video->get_hires() && m_video->get_graphics()) ? 1 : 0;
-	Mixed    = m_video->get_mix() ? 1 : 0;
-	Page2    = m_video->get_page2() ? 1 : 0;
-	_80Store = 0;
-
-	// calculate video parameters according to display standard
-	//
-	ScanLines  = 1 ? kNTSCScanLines : kPALScanLines; // FIX: NTSC only?
-	// VSyncLine  = 1 ? kNTSCVSyncLine : kPALVSyncLine; // FIX: NTSC only?
-	// ScanCycles = ScanLines * kHClocks;
-
-	// calculate horizontal scanning state
-	h_clock = (i + 63) % kHClocks; // which horizontal scanning clock
-	h_state = kHClock0State + h_clock; // H state bits
-	if (h_clock >= kHPresetClock) // check for horizontal preset
-	{
-		h_state -= 1; // correct for state preset (two 0 states)
-	}
-	h_0 = (h_state >> 0) & 1; // get horizontal state bits
-	h_1 = (h_state >> 1) & 1;
-	h_2 = (h_state >> 2) & 1;
-	h_3 = (h_state >> 3) & 1;
-	h_4 = (h_state >> 4) & 1;
-	h_5 = (h_state >> 5) & 1;
-
-	// calculate vertical scanning state
-	//
-	v_line  = (i / kHClocks) + 192; // which vertical scanning line
-	v_state = kVLine0State + v_line; // V state bits
-	if ((v_line >= kVPresetLine)) // check for previous vertical state preset
-	{
-		v_state -= ScanLines; // compensate for preset
-	}
-	v_A = (v_state >> 0) & 1; // get vertical state bits
-	v_B = (v_state >> 1) & 1;
-	v_C = (v_state >> 2) & 1;
-	v_0 = (v_state >> 3) & 1;
-	v_1 = (v_state >> 4) & 1;
-	v_2 = (v_state >> 5) & 1;
-	v_3 = (v_state >> 6) & 1;
-	v_4 = (v_state >> 7) & 1;
-	//v_5 = (v_state >> 8) & 1;
-
-	// calculate scanning memory address
-	//
-	_hires = Hires;
-	if (Hires && Mixed && (v_4 & v_2))
-	{
-		_hires = 0; // (address is in text memory)
-	}
-
-	addend0 = 0x68; // 1            1            0            1
-	addend1 =              (h_5 << 5) | (h_4 << 4) | (h_3 << 3);
-	addend2 = (v_4 << 6) | (v_3 << 5) | (v_4 << 4) | (v_3 << 3);
-	sum     = (addend0 + addend1 + addend2) & (0x0F << 3);
-
-	address = 0;
-	address |= h_0 << 0; // a0
-	address |= h_1 << 1; // a1
-	address |= h_2 << 2; // a2
-	address |= sum;      // a3 - aa6
-	address |= v_0 << 7; // a7
-	address |= v_1 << 8; // a8
-	address |= v_2 << 9; // a9
-	address |= ((_hires) ? v_A : (1 ^ (Page2 & (1 ^ _80Store)))) << 10; // a10
-	address |= ((_hires) ? v_B : (Page2 & (1 ^ _80Store))) << 11; // a11
-	if (_hires) // hires?
-	{
-		// Y: insert hires only address bits
-		//
-		address |= v_C << 12; // a12
-		address |= (1 ^ (Page2 & (1 ^ _80Store))) << 13; // a13
-		address |= (Page2 & (1 ^ _80Store)) << 14; // a14
-	}
-	else
-	{
-		// N: text, so no higher address bits unless Apple ][, not Apple //e
-		//
-		if ((kHPEClock <= h_clock) && // Y: HBL?
-			(h_clock <= (kHClocks - 1)))
-		{
-			address |= 1 << 12; // Y: a12 (add $1000 to address!)
-		}
-	}
-
-	return m_ram_ptr[address % m_ram_size];
+	const u16 address = m_video->scanner_address(h_clock, v_clock);
+	return ram_r(address);
 }
 
 /***************************************************************************
@@ -767,6 +660,19 @@ void apple2_state::apple2_map(address_map &map)
 	map(0xd000, 0xffff).view(m_upperbank);
 	m_upperbank[0](0xd000, 0xffff).rom().region("maincpu", 0x1000).w(FUNC(apple2_state::inh_w));
 	m_upperbank[1](0xd000, 0xffff).rw(FUNC(apple2_state::inh_r), FUNC(apple2_state::inh_w));
+}
+
+template <unsigned Address>
+std::pair<std::error_condition, std::string> apple2_state::load_rom(device_image_interface &image)
+{
+	generic_slot_device &slot = downcast<generic_slot_device &>(image.device());
+	uint32_t size = slot.common_get_size("rom");
+
+	if (size != 0x800)
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported ROM size (only 2KB allowed)");
+
+	slot.common_load_rom(&memregion("maincpu")->as_u8(Address - 0xc000), size, "rom");
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /***************************************************************************
@@ -841,7 +747,7 @@ void apple2_state::apple2_common(machine_config &config)
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
+	m_screen->set_raw(1021800 * 14, 65 * 14, 0, 40 * 14, 262, 0, 192);
 	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, true, true>)));
 	m_screen->set_palette(m_video);
 
@@ -903,6 +809,10 @@ void apple2_state::apple2(machine_config &config)
 	apple2_common(config);
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("4K,8K,12K,16K,20K,24K,32K,36K,48K").set_default_value(0x00);
+
+	GENERIC_SOCKET(config, "d0", generic_plain_slot, "apple2_d0_rom", "d0").set_device_load(FUNC(apple2_state::load_rom<0xd000>));
+	GENERIC_SOCKET(config, "d8", generic_plain_slot, "apple2_d8_rom", "d8").set_device_load(FUNC(apple2_state::load_rom<0xd800>));
+	SOFTWARE_LIST(config, "rom_list").set_original("apple2_rom");
 }
 
 void apple2_state::apple2p(machine_config &config)
@@ -992,8 +902,7 @@ ROM_START(apple2) /* the classic, non-autoboot apple2 with integer basic in rom.
 	ROM_LOAD ( "a2.chr", 0x0000, 0x0800, BAD_DUMP CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659)) /* current dump is 341-0036 which is the appleII+ character generator, not the original appleII one, whose rom number is not yet known! */
 
 	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD_OPTIONAL ( "341-0016-00.d0", 0x1000, 0x0800, CRC(4234e88a) SHA1(c9a81d704dc2f0c3416c20f9c4ab71fedda937ed)) /* 341-0016: Programmer's Aid #1 D0 */
-
+	/* 341-0016: Programmer's Aid #1 D0 (optional; see apple2_rom.xml) */
 	ROM_LOAD ( "341-0001-00.e0", 0x2000, 0x0800, CRC(c0a4ad3b) SHA1(bf32195efcb34b694c893c2d342321ec3a24b98f)) /* Needs verification. From eBay: Label: S7925E // C48077 // 3410001-00 // (C)APPLE78 E0 */
 	ROM_LOAD ( "341-0002-00.e8", 0x2800, 0x0800, CRC(a99c2cf6) SHA1(9767d92d04fc65c626223f25564cca31f5248980)) /* Needs verification. From eBay: Label: S7916E // C48078 // 3410002-00 // (C)APPLE78 E8 */
 	ROM_LOAD ( "341-0003-00.f0", 0x3000, 0x0800, CRC(62230d38) SHA1(f268022da555e4c809ca1ae9e5d2f00b388ff61c)) /* Needs verification. From eBay: Label: S7908E // C48709 // 3410003 // CAPPLE78 F0 */
@@ -1223,29 +1132,6 @@ ROM_START(laser2c)
 	ROM_LOAD( "mon.bin",      0x003000, 0x001000, CRC(978c083f) SHA1(14e87cb717780b19db75c313004ba4d6ef20bc26) )
 ROM_END
 
-#if 0
-ROM_START(laba2p) /* II Plus clone with on-board Disk II controller and Videx-compatible 80-column card, supposedly from lab equipment */
-	ROM_REGION(0x1000,"gfx1",0)
-	ROM_LOAD( "char.u30",     0x0000, 0x1000, CRC(2dbaef88) SHA1(9834842796132a11facd57923326d6954bcb609f) )
-
-	ROM_REGION(0x4700,"maincpu",0)
-	ROM_LOAD( "maind0.u35",   0x1000, 0x1000, CRC(24d73c7b) SHA1(d17a15868dc875c67061c95ec53a6b2699d3a425) )
-	ROM_LOAD( "maine0.u34",   0x2000, 0x2000, CRC(314462ca) SHA1(5a23616dca14e59b4aca8ff6cfa0d98592a78a79) )
-
-	ROM_REGION(0x1000, "fw80col", 0)
-	ROM_LOAD( "80cfw.u3",     0x0000, 0x1000, CRC(92d2b8b0) SHA1(5149483eb3e550ece1584e85fc821bb04d068dec) )    // firmware for on-board Videx
-
-	ROM_REGION(0x1000, "cg80col", 0)
-	ROM_LOAD( "80ccgv80.u25", 0x0000, 0x1000, CRC(6d5e2707) SHA1(c56f76e8a366fee7374eb09f4866435c692490b2) )    // character generator for on-board Videx
-
-	ROM_REGION(0x800, "diskii", 0)
-	ROM_LOAD( "diskfw.u7",    0x0000, 0x0800, CRC(9207ef4e) SHA1(5fcffa4c68b16a7ef2f62651d4c7470400e5bd35) )    // firmware for on-board Disk II
-
-	ROM_REGION(0x800, "unknown", 0)
-	ROM_LOAD( "unk.u5",       0x0000, 0x0800, CRC(240a1774) SHA1(e6aeb0702dc99d76fd8c5a642fdfbe9ab896acd4) )    // unknown ROM
-ROM_END
-#endif
-
 ROM_START( basis108 )
 	ROM_REGION(0x4000, "maincpu", 0) // all roms overdumped
 	ROM_LOAD( "d0.d83",   0x1000, 0x0800, CRC(bb4ac440) SHA1(7901203845adab588850ae35f81e4ee2a2248686) )
@@ -1338,20 +1224,18 @@ COMP( 198?, elppa,    apple2, 0,      apple2p,  apple2, apple2_state, empty_init
 COMP( 1982, microeng, apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Spectrum Eletronica (SCOPUS)", "Micro Engenho", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, maxxi,    apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Polymax",             "Maxxi", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, prav82,   apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Pravetz",             "Pravetz 82", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, ace100,   apple2, 0,      apple2,   apple2, apple2_state, empty_init, "Franklin Computer",   "Franklin ACE 100", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, ace100,   apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Franklin Computer",   "Franklin ACE 100", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, ace1000,  apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Franklin Computer",   "Franklin ACE 1000", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, uniap2en, apple2, 0,      uniap2,   apple2, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in English)", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, uniap2pt, apple2, 0,      uniap2,   apple2, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in Brazilian Portuguese)", MACHINE_SUPPORTS_SAVE )
-//COMP( 1984, uniap2ti, apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II+ (Teclado Inteligente)", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, craft2p,  apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Craft",               "Craft II+", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 // reverse font direction + wider character cell -\/
 COMP( 1984, ivelultr, apple2, 0,      ivelultr, apple2, apple2_state, empty_init, "Ivasim",              "Ivel Ultra", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, prav8m,   apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Pravetz",             "Pravetz 8M", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, space84,  apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "ComputerTechnik/IBS", "Space 84",   MACHINE_SUPPORTS_SAVE )
 COMP( 1985, am64,     apple2, 0,      am64,     apple2, apple2_state, empty_init, "ASEM",                "AM 64", MACHINE_SUPPORTS_SAVE )
-//COMP( 19??, laba2p,   apple2, 0,      laba2p,   apple2, apple2_state, empty_init, "<unknown>",           "Lab equipment Apple II Plus clone", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, laser2c,  apple2, 0,      dodo,     apple2, apple2_state, empty_init, "Milmar",              "Laser //c", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, basis108, apple2, 0,      apple2,   apple2, apple2_state, empty_init, "Basis Microcomputer GmbH", "Basis 108", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, basis108, apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Basis Microcomputer GmbH", "Basis 108", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 COMP( 1984, hkc8800a, apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "China HKC",           "HKC 8800A", MACHINE_SUPPORTS_SAVE )
 COMP( 1984, albert,   apple2, 0,      albert,   apple2, apple2_state, empty_init, "Albert Computers, Inc.", "Albert", MACHINE_SUPPORTS_SAVE )
 COMP( 198?, am100,    apple2, 0,      am100,    apple2, apple2_state, empty_init, "ASEM S.p.A.",         "AM100",     MACHINE_SUPPORTS_SAVE )

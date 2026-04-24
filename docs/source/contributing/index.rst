@@ -49,7 +49,7 @@ Things that are helpful to include:
   video output bugs, note your video hardware (GPU), driver version, and
   the MAME video output module you’re using.  For input handling bugs,
   include the input peripherals and MAME input modules you’re using.
-* The exact version of MAME you’re using, including a git commit digest
+* The exact version of MAME you’re using, including a Git commit digest
   if it isn’t a tagged release version, and any non-standard build
   options.
 * The exact system and software being emulated (may not be applicable
@@ -79,7 +79,7 @@ source code.  The source code also includes:
   `reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html>`_
   markup.
 * The supplied :ref:`plugins <plugins>`, written in
-  `Lua 5.3 <https://www.lua.org/manual/5.3/>`_.
+  `Lua 5.4 <https://www.lua.org/manual/5.4/>`_.
 * Internal layouts for emulated machines that need to display more than
   a simple video screen.  These are an XML application
   :ref:`described here <layfile>`.
@@ -93,8 +93,8 @@ Our primary source code repository is
 `hosted on GitHub <https://github.com/mamedev/mame/>`_.  We prefer to
 receive source code contributions in the form of
 `pull requests <https://github.com/mamedev/mame/pulls>`_.  You’ll need
-to learn the basics of git distributed version control and familiarise
-yourself with the git tools.  The basic process for creating a pull
+to learn the basics of Git distributed version control and familiarise
+yourself with the Git tools.  The basic process for creating a pull
 request is as follows:
 
 * Sign up for an account on GitHub.
@@ -143,7 +143,8 @@ to all kinds of changes):
 * When submitting any new non-arcade machine, but especially a machine
   which does not auto-boot and requires some interaction to start up
   and be usable, consider adding usage instructions to the
-  `System-Specific Setup and Information <https://wiki.mamedev.org/index.php/System-Specific_Setup_and_Information>`_
+  `System-Specific Setup and Information
+  <https://wiki.mamedev.org/index.php/System-Specific_Setup_and_Information>`_
   page of the `MAME Wiki <https://wiki.mamedev.org>`_.  Anyone can edit
   the wiki after creating an account, and sub-pages for your system
   which discuss technical details of the system are also welcome.

@@ -58,7 +58,7 @@ public:
 		m_scc(*this, "scc"),
 		m_ram(*this, RAM_TAG),
 		m_scsibus(*this, "scsi"),
-		m_ncr1(*this, "scsi:7:ncr53c96")
+		m_ncr1(*this, "ncr53c96")
 	{
 	}
 
@@ -166,20 +166,20 @@ void quadra605_state::macqd605(machine_config &config)
 
 	PRIMETIME(config, m_primetime, 25_MHz_XTAL);
 	m_primetime->set_maincpu_tag("maincpu");
-	m_primetime->set_scsi_tag("scsi:7:ncr53c96");
+	m_primetime->set_scsi_tag(m_ncr1);
 
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(m_primetime, FUNC(primetime_device::scc_irq_w));
-	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
-	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
 
-	rs232_port_device &rs232a(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
 	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 
-	rs232_port_device &rs232b(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	rs232_port_device &rs232b(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
@@ -198,15 +198,12 @@ void quadra605_state::macqd605(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c96", NCR53C96).clock(40_MHz_XTAL).machine_config(
-		[this] (device_t *device)
-		{
-			ncr53c96_device &adapter = downcast<ncr53c96_device &>(*device);
 
-			adapter.set_busmd(ncr53c96_device::BUSMD_1);
-			adapter.irq_handler_cb().set(m_primetime, FUNC(primetime_device::scsi_irq_w));
-			adapter.drq_handler_cb().set(m_primetime, FUNC(primetime_device::scsi_drq_w));
-		});
+	NCR53C96(config, m_ncr1, 40_MHz_XTAL);
+	m_scsibus->set_external_device(7, m_ncr1);
+	m_ncr1->set_busmd(ncr53c96_device::BUSMD_1);
+	m_ncr1->irq_handler_cb().set(m_primetime, FUNC(primetime_device::scsi_irq_w));
+	m_ncr1->drq_handler_cb().set(m_primetime, FUNC(primetime_device::scsi_drq_w));
 
 	MACADB(config, m_macadb, C15M);
 

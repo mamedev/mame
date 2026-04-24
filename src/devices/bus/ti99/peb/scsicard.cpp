@@ -135,7 +135,7 @@
 
 #define BUFFER "ram"
 #define PLD_TAG "pld"
-#define CONTR_TAG "scsibus:7:controller"
+#define CONTR_TAG "controller"
 #define SCSIBUS_TAG "scsibus"
 
 DEFINE_DEVICE_TYPE(TI99_WHTSCSI, bus::ti99::peb::whtech_scsi_card_device, "ti99_whtscsi", "Western Horizon Technologies SCSI host adapter")
@@ -387,11 +387,11 @@ void whtech_scsi_card_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:4", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:6", default_scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:7").option_set("controller", NCR53C80).machine_config([this](device_t *device) {
-		ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
-		adapter.drq_handler().set(*this, FUNC(whtech_scsi_card_device::drq_w));
-		adapter.irq_handler().set(*this, FUNC(whtech_scsi_card_device::irq_w));
-	});
+
+	NCR53C80(config, m_controller);
+	m_scsibus->set_external_device(7, m_controller);
+	m_controller->drq_handler().set(DEVICE_SELF, FUNC(whtech_scsi_card_device::drq_w));
+	m_controller->irq_handler().set(DEVICE_SELF, FUNC(whtech_scsi_card_device::irq_w));
 }
 
 void whtech_scsi_card_device::device_start()

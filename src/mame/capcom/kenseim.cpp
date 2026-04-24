@@ -158,7 +158,7 @@ public:
 		m_to_68k_cmd_low(0),
 		m_to_68k_cmd_d9(0),
 		m_to_68k_cmd_req(0),
-		m_to_68k_cmd_LVm(0),
+		m_to_68k_cmd_lvm(0),
 		m_from68k_ack(0),
 		m_from68k_st4(0),
 		m_from68k_st3(0),
@@ -183,7 +183,7 @@ public:
 	ioport_value cmd_5678_r();
 	int cmd_9_r();
 	int cmd_req_r();
-	int cmd_LVm_r();
+	int cmd_lvm_r();
 
 private:
 	void mole_up(int side, int mole)
@@ -231,19 +231,19 @@ private:
 	uint8_t m_to_68k_cmd_low;
 	uint8_t m_to_68k_cmd_d9;
 	uint8_t m_to_68k_cmd_req;
-	uint8_t m_to_68k_cmd_LVm;
+	uint8_t m_to_68k_cmd_lvm;
 
-	int m_from68k_ack;
-	int m_from68k_st4;
-	int m_from68k_st3;
-	int m_from68k_st2;
+	int32_t m_from68k_ack;
+	int32_t m_from68k_st4;
+	int32_t m_from68k_st3;
+	int32_t m_from68k_st2;
 
-	int m_led_latch = 0;
-	int m_led_serial_data = 0;
-	int m_led_clock = 0;
+	uint8_t m_led_latch = 0;
+	uint32_t m_led_serial_data = 0;
+	uint8_t m_led_clock = 0;
 
-	int mole_state_a[6]{};
-	int mole_state_b[6]{};
+	uint8_t mole_state_a[6]{};
+	uint8_t mole_state_b[6]{};
 	output_finder<20> m_lamps;
 	output_finder<2> m_startlamp;
 	output_finder<6> m_molea;
@@ -268,11 +268,11 @@ void kenseim_state::mb8936_portc_w(uint8_t data)
 
 	//printf("%s mb8936 write %02x to port C but no handler assigned (serial data?)\n", machine().describe_context().c_str(), data);
 
-	if (data & 0x08)
+	if (BIT(data, 3))
 	{
-		if (data & 0x02)
+		if (BIT(data, 1))
 		{
-			if (data & 0x04)
+			if (BIT(data, 2))
 			{
 				// send and reset? maybe?
 				//printf("led write reset?\n");
@@ -280,7 +280,7 @@ void kenseim_state::mb8936_portc_w(uint8_t data)
 				set_leds(m_led_serial_data);
 				m_led_serial_data = 0;
 			}
-			else if (!(m_led_clock & 0x02))
+			else if (!m_led_clock)
 			{
 				//printf("write data bit %d\n", m_led_latch & 1);
 				m_led_serial_data = (m_led_serial_data << 1) | (m_led_latch & 1);
@@ -293,7 +293,7 @@ void kenseim_state::mb8936_portc_w(uint8_t data)
 			//printf("set latch %02x\n", m_led_latch);
 		}
 
-		m_led_clock = data & 0x02;
+		m_led_clock = BIT(data, 1);
 	}
 }
 
@@ -304,7 +304,7 @@ void kenseim_state::mb8936_porta_w(uint8_t data) // maybe molesa output? (6-bits
 
 	for (int i = 0; i < 6; i++)
 	{
-		int bit = (data >> i) & 1;
+		const bool bit = BIT(data, i);
 
 		if (bit)
 			mole_down(0, i);
@@ -321,7 +321,7 @@ void kenseim_state::mb8936_portb_w(uint8_t data) // maybe molesb output? (6-bits
 
 	for (int i = 0; i < 6; i++)
 	{
-		int bit = (data >> i) & 1;
+		const bool bit = BIT(data, i);
 
 		if (bit)
 			mole_down(1, i);
@@ -380,9 +380,9 @@ int kenseim_state::cmd_req_r()
 	return m_to_68k_cmd_req;
 }
 
-int kenseim_state::cmd_LVm_r()
+int kenseim_state::cmd_lvm_r()
 {
-	return m_to_68k_cmd_LVm;
+	return m_to_68k_cmd_lvm;
 }
 
 /* 68k side COMMS writes */
@@ -399,10 +399,10 @@ void kenseim_state::cps1_kensei_w(offs_t offset, uint16_t data, uint16_t mem_mas
 
 		// bit 15 = CPS-A custom reset?
 
-		m_from68k_ack = (data & 0x0100) >> 8;
-		m_from68k_st4 = (data & 0x0200) >> 9;
-		m_from68k_st2 = (data & 0x0400) >> 10;
-		m_from68k_st3 = (data & 0x0800) >> 11;
+		m_from68k_ack = BIT(data, 8);
+		m_from68k_st4 = BIT(data, 9);
+		m_from68k_st2 = BIT(data, 10);
+		m_from68k_st3 = BIT(data, 11);
 	}
 }
 
@@ -428,9 +428,9 @@ void kenseim_state::cpu_portd_w(uint8_t data)
 	// d1: REQ
 	// d2: LVm
 	// d3: N/C
-	m_to_68k_cmd_d9 = data >> 0 & 1;
-	m_to_68k_cmd_req = data >> 1 & 1;
-	m_to_68k_cmd_LVm = data >> 2 & 1;
+	m_to_68k_cmd_d9 = BIT(data, 0);
+	m_to_68k_cmd_req = BIT(data, 1);
+	m_to_68k_cmd_lvm = BIT(data, 2);
 }
 
 void kenseim_state::cpu_porte_w(uint8_t data)
@@ -498,7 +498,7 @@ static INPUT_PORTS_START( kenseim )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(kenseim_state::cmd_9_r)) //   PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) // D9
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(kenseim_state::cmd_req_r)) // PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // REQ
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(kenseim_state::cmd_LVm_r)) // PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) // LVm
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(kenseim_state::cmd_lvm_r)) // PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) // LVm
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // PORT_SERVICE( 0x40, IP_ACTIVE_LOW ) n/c
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
 

@@ -2146,7 +2146,7 @@ void lua_engine::initialize()
 	slot_type["fixed"] = sol::property(&device_slot_interface::fixed);
 	slot_type["has_selectable_options"] = sol::property(&device_slot_interface::has_selectable_options);
 	slot_type["default_option"] = sol::property(&device_slot_interface::default_option);
-	slot_type["options"] = sol::property([] (device_slot_interface const &slot) { return standard_tag_object_ptr_map<device_slot_interface::slot_option>(slot.option_list()); });
+	slot_type["options"] = sol::property([] (device_slot_interface const &slot) { return make_tag_object_ptr_map(slot.option_list()); });
 	slot_type["device"] = sol::property(static_cast<device_t & (device_slot_interface::*)()>(&device_slot_interface::device));
 
 

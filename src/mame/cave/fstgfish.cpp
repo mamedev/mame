@@ -7,11 +7,11 @@ Festival: Goldfish Scoop (c) 2008 CAVE/PLABI/SEVENGEARS/cavia
 PCIe era with Gigabyte GA-G31M-S2L (rev. 1.1/2.0), connected cards doesn't matter as long as the
 CV1000XP/CV2000XP is connected thru USB.
 
-- Intel G31 + ICH7
+- Intel 82G31 (GMCH) + 82801GB (ICH7)
 - IT8718 Super I/O
-GA-G31M-S2L/GA-G31M-S2C datasheet reports these two (mutually exclusive?)
-- RTL8111C (PCIe Integrated Gigabit Ethernet Controller)
-- RTL8102E (PCIe Fast Ethernet NIC)
+- Realtek RTL8111DL (PCIe Integrated Gigabit Ethernet Controller)
+- Realtek ALC662 (HD Audio)
+- Intel GMA 3100 (integrated in northbridge)
 
 Notes:
 - CF card looks sysprep-ed, can't boot in shutms11.
@@ -67,7 +67,7 @@ goldfish.exe and copy in cmd.exe as cvgame.exe will
 get us a command prompt.
 
 PS2 keyboard is working, USB keyboard and mouse have been
-disabled in BIOS. BIOS is easily accessible using: DEL
+disabled in BIOS. BIOS is easily accessible using DEL key
 
 Use portmon to log the serial connection to the CV1000XP (COM3)
 then start up the game. This gives a nice log of the communication.

@@ -188,6 +188,14 @@
 #include <type_traits>
 #include <utility>
 
+#if !defined(MAME_UTIL_STRFORMAT_ALLOW_CHAR8_AS_CHAR)
+#if __cplusplus > 201703L
+#define MAME_UTIL_STRFORMAT_ALLOW_CHAR8_AS_CHAR 1
+#else
+#define MAME_UTIL_STRFORMAT_ALLOW_CHAR8_AS_CHAR 0
+#endif
+#endif
+
 namespace util {
 
 namespace detail {
@@ -591,6 +599,19 @@ private:
 	using unsigned_integer_semantics = std::bool_constant<std::is_integral_v<U> && !std::is_signed_v<U> >;
 
 	template <typename U>
+	static std::enable_if_t<std::is_same_v<typename Stream::char_type, typename U::value_type>, U const &> launder_string(U const &value)
+	{
+		return value;
+	}
+#if MAME_UTIL_STRFORMAT_ALLOW_CHAR8_AS_CHAR
+	template <typename U>
+	static std::enable_if_t<std::is_same_v<typename Stream::char_type, char> && std::is_same_v<typename U::value_type, char8_t>, std::basic_string_view<typename Stream::char_type> > launder_string(U const &value)
+	{
+		return std::basic_string_view<typename Stream::char_type>(reinterpret_cast<typename Stream::char_type const *>(value.data()), value.length());
+	}
+#endif
+
+	template <typename U>
 	static std::enable_if_t<std::is_same_v<std::make_signed_t<U>, std::make_signed_t<char> > || std::is_integral_v<U> > apply_signed(Stream &str, U const &value)
 	{
 		if constexpr (std::is_same_v<std::make_signed_t<U>, std::make_signed_t<char> >)
@@ -626,30 +647,31 @@ public:
 	{
 		if constexpr (string_semantics<U>::value)
 		{
+			auto const &laundered(launder_string(value));
 			int const precision(flags.get_precision());
-			if ((0 <= precision) && (value.size() > unsigned(precision)))
+			if ((0 <= precision) && (laundered.size() > unsigned(precision)))
 			{
-				if constexpr (std::is_same_v<typename U::value_type, typename Stream::char_type>)
+				if constexpr (std::is_same_v<typename std::remove_reference_t<decltype(laundered)>::value_type, typename Stream::char_type>)
 				{
 					unsigned width(flags.get_field_width());
 					bool const pad(unsigned(precision) < width);
 					typename Stream::fmtflags const adjust(str.flags() & Stream::adjustfield);
-					if (!pad || (Stream::left == adjust)) str.write(&*value.begin(), unsigned(precision));
+					if (!pad || (Stream::left == adjust)) str.write(&*laundered.begin(), unsigned(precision));
 					if (pad)
 					{
 						for (width -= precision; 0U < width; --width) str.put(str.fill());
-						if (Stream::left != adjust) str.write(&*value.begin(), unsigned(precision));
+						if (Stream::left != adjust) str.write(&*laundered.begin(), unsigned(precision));
 					}
 					str.width(0);
 				}
 				else
 				{
-					str << value.substr(0, unsigned(precision));
+					str << laundered.substr(0, unsigned(precision));
 				}
 			}
 			else
 			{
-				str << value;
+				str << laundered;
 			}
 		}
 		else if constexpr (signed_integer_semantics<U>::value)
@@ -868,14 +890,31 @@ template <typename Stream, typename T>
 class format_output<Stream, T *>
 {
 protected:
+	template <typename CharT, typename U>
+	struct string_semantics : public std::bool_constant<std::is_same_v<std::remove_const_t<U>, CharT> > { };
+#if MAME_UTIL_STRFORMAT_ALLOW_CHAR8_AS_CHAR
 	template <typename U>
-	using string_semantics = std::bool_constant<std::is_same_v<std::remove_const_t<U>, typename Stream::char_type> >;
+	struct string_semantics<char, U> : public std::bool_constant<std::is_same_v<std::remove_const_t<U>, char> || std::is_same_v<std::remove_const_t<U>, char8_t> > { };
+#endif
+
+	template <typename U>
+	static std::enable_if_t<std::is_same_v<typename Stream::char_type, std::remove_const_t<U> >, T const *> launder_string(U *value)
+	{
+		return value;
+	}
+#if MAME_UTIL_STRFORMAT_ALLOW_CHAR8_AS_CHAR
+	template <typename U>
+	static std::enable_if_t<std::is_same_v<typename Stream::char_type, char> && std::is_same_v<std::remove_const_t<U>, char8_t>, char const *> launder_string(U *value)
+	{
+		return reinterpret_cast<char const *>(value);
+	}
+#endif
 
 public:
 	template <typename U>
 	static void apply(Stream &str, format_flags const &flags, U const *value)
 	{
-		if constexpr (string_semantics<U>::value)
+		if constexpr (string_semantics<typename Stream::char_type, U>::value)
 		{
 			switch (flags.get_conversion())
 			{
@@ -889,17 +928,17 @@ public:
 						unsigned width(flags.get_field_width());
 						bool const pad(std::make_unsigned_t<std::streamsize>(cnt) < width);
 						typename Stream::fmtflags const adjust(str.flags() & Stream::adjustfield);
-						if (!pad || (Stream::left == adjust)) str.write(value, cnt);
+						if (!pad || (Stream::left == adjust)) str.write(launder_string(value), cnt);
 						if (pad)
 						{
 							for (width -= cnt; 0U < width; --width) str.put(str.fill());
-							if (Stream::left != adjust) str.write(value, cnt);
+							if (Stream::left != adjust) str.write(launder_string(value), cnt);
 						}
 						str.width(0);
 					}
 					else
 					{
-						str << value;
+						str << launder_string(value);
 					}
 				}
 				break;
@@ -907,7 +946,7 @@ public:
 				str << reinterpret_cast<void const *>(const_cast<std::remove_volatile_t<U> *>(value));
 				break;
 			default:
-				str << value;
+				str << launder_string(value);
 			}
 		}
 		else
@@ -925,10 +964,10 @@ public:
 	static void apply(Stream &str, format_flags const &flags, U const *value)
 	{
 		static_assert(
-				!format_output::template string_semantics<U>::value || (N <= size_t(unsigned((std::numeric_limits<int>::max)()))),
+				!format_output::template string_semantics<typename Stream::char_type, U>::value || (N <= size_t(unsigned((std::numeric_limits<int>::max)()))),
 				"C string array length must not exceed maximum integer value");
 		format_flags f(flags);
-		if (format_output::template string_semantics<U>::value && ((0 > f.get_precision()) || (N < unsigned(f.get_precision()))))
+		if (format_output::template string_semantics<typename Stream::char_type, U>::value && ((0 > f.get_precision()) || (N < unsigned(f.get_precision()))))
 			f.set_precision(int(unsigned(N)));
 		format_output<Stream, T *>::apply(str, f, value);
 	}
@@ -1096,53 +1135,47 @@ public:
 	}
 
 protected:
+	struct char_launderer
+	{
+	protected:
+		static Character const *launder(Character const *ptr) { return ptr; }
+#if MAME_UTIL_STRFORMAT_ALLOW_CHAR8_AS_CHAR
+		template <typename T>
+		static std::enable_if_t<std::is_same_v<Character, char> && std::is_same_v<T, char8_t>, Character const *> launder(T const *ptr) { return reinterpret_cast<Character const *>(ptr); }
+#endif
+	};
+	template <typename Format>
+	struct format_handling : public char_launderer
+	{
+		static constexpr bool check_nul = false;
+		static Character const *begin(Format const &fmt) { return !fmt.empty() ? char_launderer::launder(&*std::cbegin(fmt)) : nullptr; }
+		static Character const *end(Format const &fmt) { return !fmt.empty() ? char_launderer::launder(&*std::cbegin(fmt) + std::distance(std::cbegin(fmt), std::cend(fmt))) : nullptr; }
+	};
+	template <typename T, std::size_t N>
+	struct format_handling<T [N]> : public char_launderer
+	{
+		static constexpr bool check_nul = true;
+		static Character const *begin(T const (&fmt)[N]) { return char_launderer::launder(&fmt[0]); }
+		static Character const *end(T const (&fmt)[N]) { return char_launderer::launder(&fmt[N]); }
+	};
 	template <typename T>
-	using handle_char_ptr = std::bool_constant<std::is_pointer_v<T> && std::is_same_v<std::remove_cv_t<std::remove_pointer_t<T> >, char_type> >;
-	template <typename T>
-	using handle_char_array = std::bool_constant<std::is_array_v<T> && std::is_same_v<std::remove_cv_t<std::remove_extent_t<T> >, char_type> >;
-	template <typename T>
-	using handle_container = std::bool_constant<!handle_char_ptr<T>::value && !handle_char_array<T>::value>;
+	struct format_handling<T *> : public char_launderer
+	{
+		static constexpr bool check_nul = true;
+		static Character const *begin(T *fmt) { return char_launderer::launder(fmt); }
+		static Character const *end(T *fmt) { return char_launderer::launder(static_cast<T *>(nullptr)); }
+	};
+
+	template <typename Format> struct format_helper : public format_handling<std::remove_cv_t<std::remove_reference_t<Format> > > { };
 
 	template <typename Format>
 	format_argument_pack(
 			Format &&fmt,
 			format_argument<char_type, Traits> const *arguments,
-			std::enable_if_t<handle_char_ptr<std::remove_reference_t<Format> >::value, std::size_t> argument_count)
-		: m_begin(fmt)
-		, m_end(nullptr)
-		, m_check_nul(true)
-		, m_arguments(arguments)
-		, m_argument_count(argument_count)
-	{
-		assert(m_begin);
-		assert(m_end || m_check_nul);
-		assert(!m_end || (m_end > m_begin));
-		assert(m_arguments || !m_argument_count);
-	}
-	template <typename Format>
-	format_argument_pack(
-			Format &&fmt,
-			format_argument<char_type, Traits> const *arguments,
-			std::enable_if_t<handle_char_array<std::remove_reference_t<Format> >::value, std::size_t> argument_count)
-		: m_begin(std::cbegin(fmt))
-		, m_end(std::cend(fmt))
-		, m_check_nul(true)
-		, m_arguments(arguments)
-		, m_argument_count(argument_count)
-	{
-		assert(m_begin);
-		assert(m_end || m_check_nul);
-		assert(!m_end || (m_end > m_begin));
-		assert(m_arguments || !m_argument_count);
-	}
-	template <typename Format>
-	format_argument_pack(
-			Format &&fmt,
-			format_argument<char_type, Traits> const *arguments,
-			std::enable_if_t<handle_container<std::remove_reference_t<Format> >::value, std::size_t> argument_count)
-		: m_begin(fmt.empty() ? nullptr : &*std::cbegin(fmt))
-		, m_end(fmt.empty() ? nullptr : (m_begin + std::distance(std::cbegin(fmt), std::cend(fmt))))
-		, m_check_nul(true)
+			std::size_t argument_count)
+		: m_begin(format_helper<Format>::begin(fmt))
+		, m_end(format_helper<Format>::end(fmt))
+		, m_check_nul(format_helper<Format>::check_nul)
 		, m_arguments(arguments)
 		, m_argument_count(argument_count)
 	{

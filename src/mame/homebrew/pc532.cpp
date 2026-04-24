@@ -49,8 +49,8 @@ public:
 		, m_fpu(*this, "fpu")
 		, m_icu(*this, "icu")
 		, m_rtc(*this, "rtc")
-		, m_dp8490(*this, "slot:7:dp8490")
-		, m_aic6250(*this, "scsi:0:aic6250")
+		, m_dp8490(*this, "dp8490")
+		, m_aic6250(*this, "aic6250")
 		, m_duart(*this, "duart%u", 0U)
 		, m_serial(*this, "serial%u", 0U)
 		, m_duar(*this, "duar%u", 0U)
@@ -311,31 +311,25 @@ void pc532_state::pc532(machine_config &config)
 
 	DS1216E(config, m_rtc);
 
-	NSCSI_BUS(config, "slot");
+	auto &slot(NSCSI_BUS(config, "slot"));
 	NSCSI_CONNECTOR(config, "slot:0", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "slot:1", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "slot:2", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "slot:3", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "slot:7").option_set("dp8490", DP8490).machine_config( // DP8490V
-		[this](device_t *device)
-		{
-			dp8490_device &dp8490(downcast<dp8490_device &>(*device));
 
-			dp8490.drq_handler().set(*this, FUNC(pc532_state::drq_w));
-			dp8490.irq_handler().append(m_icu, FUNC(ns32202_device::ir_w<4>));
-			dp8490.irq_handler().append(*this, FUNC(pc532_state::irq_w));
-		});
+	DP8490(config, m_dp8490);
+	slot.set_external_device(7, m_dp8490);
+	m_dp8490->drq_handler().set(DEVICE_SELF, FUNC(pc532_state::drq_w));
+	m_dp8490->irq_handler().append(m_icu, FUNC(ns32202_device::ir_w<4>));
+	m_dp8490->irq_handler().append(DEVICE_SELF, FUNC(pc532_state::irq_w));
 
-	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0").option_set("aic6250", AIC6250).machine_config(
-		[this](device_t *device)
-		{
-			aic6250_device &aic6250(downcast<aic6250_device &>(*device));
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 
-			aic6250.set_clock(20_MHz_XTAL);
-			aic6250.int_cb().set(m_icu, FUNC(ns32202_device::ir_w<5>));
-			// TODO: drq
-		});
+	AIC6250(config, m_aic6250, 20_MHz_XTAL);
+	scsi.set_external_device(0, m_aic6250);
+	m_aic6250->int_cb().set(m_icu, FUNC(ns32202_device::ir_w<5>));
+	// TODO: drq
+
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr, false);

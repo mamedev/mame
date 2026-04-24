@@ -16,24 +16,13 @@
 
 #include "cpu/drcfe.h"
 
+#include <cassert>
+#include <iosfwd>
+
 
 class sh_common_execution::opcode_desc : public opcode_desc_base<opcode_desc, 32>
 {
 public:
-	enum
-	{
-		REG_R0 = 0,
-
-		REG_PR = REG_R0 + 16,
-		REG_SR,
-		REG_MACL,
-		REG_MACH,
-		REG_GBR,
-		REG_VBR,
-
-		REG_COUNT
-	};
-
 	offs_t          physpc;                 // physical PC of this opcode
 
 	uint16_t        opptr;                  // copy of opcode
@@ -83,7 +72,27 @@ public:
 		m_can_expose_external_int = false;
 	}
 
+	void log_flags(std::ostream &stream) const;
+	void log_registers_used(std::ostream &stream) const;
+	void log_registers_modified(std::ostream &stream) const;
+
 private:
+	enum
+	{
+		REG_R0 = 0,
+
+		REG_PR = REG_R0 + 16,
+		REG_SR,
+		REG_MACL,
+		REG_MACH,
+		REG_GBR,
+		REG_VBR,
+
+		REG_COUNT
+	};
+
+	static void log_register_list(std::ostream &stream, const regmask &reglist, const regmask *regnostarlist);
+
 	bool m_reads_memory;
 	bool m_writes_memory;
 	bool m_can_expose_external_int;

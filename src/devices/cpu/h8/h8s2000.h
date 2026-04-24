@@ -9,7 +9,6 @@
     Adds the exr register, the move multiple instructions, the shifts by
     two, tas and optionally the trace mode.
 
-
 ***************************************************************************/
 
 #ifndef MAME_CPU_H8_H8S2000_H

@@ -24,6 +24,7 @@ protected:
 
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
+	virtual uint8_t latency_timer_r() override;
 private:
 	u8 m_misc_control[2];
 };

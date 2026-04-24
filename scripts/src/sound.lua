@@ -111,6 +111,18 @@ if SOUNDS["AC97"] then
 	}
 end
 
+---------------------------------------------------
+-- SigmaTel STAC9704
+--@src/devices/sound/ac97_stac9704.h,SOUNDS["AC97_STAC9704"] = true
+---------------------------------------------------
+
+if SOUNDS["AC97_STAC9704"] then
+	files {
+		MAME_DIR .. "src/devices/sound/ac97_stac9704.cpp",
+		MAME_DIR .. "src/devices/sound/ac97_stac9704.h",
+	}
+end
+
 
 ---------------------------------------------------
 -- Apple custom sound chips
@@ -204,6 +216,18 @@ if SOUNDS["CEM3320"] then
 	files {
 		MAME_DIR .. "src/devices/sound/cem3320.cpp",
 		MAME_DIR .. "src/devices/sound/cem3320.h",
+	}
+end
+
+---------------------------------------------------
+-- CEM 3340 voltage-controlled oscillator chip
+--@src/devices/sound/cem3340.h,SOUNDS["CEM3340"] = true
+---------------------------------------------------
+
+if SOUNDS["CEM3340"] then
+	files {
+		MAME_DIR .. "src/devices/sound/cem3340.cpp",
+		MAME_DIR .. "src/devices/sound/cem3340.h",
 	}
 end
 

@@ -726,7 +726,7 @@ ROM_START( lisa ) /* with twiggy drives, io40 i/o rom; technically any of the bo
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
 	ROM_REGION(0x4000,"profile", 0)     // Profile/5 HDD
-	ROM_LOAD_OPTIONAL("341-0080-b", 0x0000, 0x800, CRC(26df0b8d) SHA1(08f6689afb517e0a2bdaa48433003e62a66ae3c7)) // 341-0080-B z8 MCU piggyback ROM
+	ROM_LOAD("341-0080-b", 0x0000, 0x800, CRC(26df0b8d) SHA1(08f6689afb517e0a2bdaa48433003e62a66ae3c7)) // 341-0080-B z8 MCU piggyback ROM (optional)
 
 	// TODO: the 341-0193-A parallel interface card rom should be loaded here as well for the lisa 1 and 2/5?
 ROM_END
@@ -762,7 +762,7 @@ ROM_START( lisa2 ) /* internal apple codename was 'pepsi'; has one SSDD 400K dri
 	ROM_LOAD("341-0064a.u9f", 0x000, 0x400, CRC(e6849910) SHA1(d46e67df75c9e3e773d20542fb9d5b1d2ac0fb9b))
 
 	ROM_REGION(0x4000,"profile", 0)     // Profile/5 HDD
-	ROM_LOAD_OPTIONAL("341-0080-b", 0x0000, 0x800, CRC(26df0b8d) SHA1(08f6689afb517e0a2bdaa48433003e62a66ae3c7)) // 341-0080-B z8 MCU piggyback ROM
+	ROM_LOAD("341-0080-b", 0x0000, 0x800, CRC(26df0b8d) SHA1(08f6689afb517e0a2bdaa48433003e62a66ae3c7)) // 341-0080-B z8 MCU piggyback ROM (optional)
 
 	// TODO: the 341-0193-A parallel interface card rom should be loaded here as well for the lisa 1 and 2/5?
 ROM_END
