@@ -123,6 +123,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/output/network.cpp",
 		MAME_DIR .. "src/osd/modules/output/none.cpp",
 		MAME_DIR .. "src/osd/modules/output/output_module.h",
+		MAME_DIR .. "src/osd/modules/output/serial.cpp",
 		MAME_DIR .. "src/osd/modules/output/win32_output.cpp",
 		MAME_DIR .. "src/osd/modules/output/win32_output.h",
 		MAME_DIR .. "src/osd/modules/render/blit13.ipp",
