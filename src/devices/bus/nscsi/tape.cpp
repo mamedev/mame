@@ -48,20 +48,24 @@ DEFINE_DEVICE_TYPE(NSCSI_TAPE_NEWS, nscsi_tape_news_device, "scsi_tape_news", "S
 
 // construction
 
-nscsi_tape_device::nscsi_tape_device(const machine_config &config, device_type type, const char *tag, device_t *owner, u32 clock)
+nscsi_tape_device::nscsi_tape_device(const machine_config &config, device_type type, const char *tag, device_t *owner,
+	u32 clock, const std::string_view manufacturer, const std::string_view product, const std::string_view revision)
 	: nscsi_full_device(config, type, tag, owner, clock)
 	, m_image(*this, "image")
 	, m_sequence_counter(0)
 	, m_has_tape(false)
 	, m_tape_changed(false)
 	, m_fixed_block_len(TAPE_DEFAULT_FIXED_BLOCK_LEN)
+	, manufacturer(manufacturer)
+	, product(product)
+	, revision(revision)
 	, m_rw_buf_size(m_fixed_block_len)
 	, m_rw_pending(false)
 {
 }
 
 nscsi_tape_device::nscsi_tape_device(const machine_config &config, const char *tag, device_t *owner, u32 clock)
-	: nscsi_tape_device(config, NSCSI_TAPE, tag, owner, clock)
+	: nscsi_tape_device(config, NSCSI_TAPE, tag, owner, clock, "MAME", "SCSI tape drive", "1.0")
 {
 }
 
@@ -258,9 +262,9 @@ void nscsi_tape_device::handle_inquiry(const u8 lun) // mandatory; SCSI-2 sectio
 	m_scsi_cmdbuf[2] = 0x02; // we're compliant with SCSI-2 only
 	m_scsi_cmdbuf[3] = 0x02; // we use SCSI-2 response format
 	m_scsi_cmdbuf[4] = 32; // additional length
-	strncpy((char *)&m_scsi_cmdbuf[8], manufacturer, 8);
-	strncpy((char *)&m_scsi_cmdbuf[16], product, 16);
-	strncpy((char *)&m_scsi_cmdbuf[32], revision, 4);
+	std::copy_n(manufacturer.data(), std::min(manufacturer.size(),  static_cast<size_t>(8)), &m_scsi_cmdbuf[8]); // drive manufacturer
+	std::copy_n(product.data(), std::min(product.size(),  static_cast<size_t>(16)), &m_scsi_cmdbuf[16]); // product code
+	std::copy_n(revision.data(), std::min(revision.size(),  static_cast<size_t>(4)), &m_scsi_cmdbuf[32]); // product/firmware revision
 	for (u32 i = 8; i < 36; i++) {
 		if (m_scsi_cmdbuf[i] == 0)
 			m_scsi_cmdbuf[i] = ' '; // pad strings with spaces

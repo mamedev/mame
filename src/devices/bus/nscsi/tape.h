@@ -21,14 +21,7 @@ public:
 	nscsi_tape_device(const machine_config &config, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	nscsi_tape_device(const machine_config &config, device_type type, const char *tag, device_t *owner, u32 clock);
-	nscsi_tape_device(const machine_config &config, device_type type, const char *tag, device_t *owner, u32 clock, const char *manufacturer, const char *product, const char *revision)
-		: nscsi_tape_device(config, type, tag, owner, clock)
-	{
-		strncpy(this->manufacturer, manufacturer, 8);
-		strncpy(this->product, product, 16);
-		strncpy(this->revision, revision, 4);
-	}
+	nscsi_tape_device(const machine_config &config, device_type type, const char *tag, device_t *owner, u32 clock, const std::string_view manufacturer, const std::string_view product, const std::string_view revision);
 
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -71,9 +64,9 @@ protected:
 	u32 m_fixed_block_len; // fixed-length block length
 
 	// INQUIRY data
-	char manufacturer[8]; // drive manufacturer
-	char product[16]; // product code
-	char revision[4]; // product/firmware revision
+	const std::string_view manufacturer;
+	const std::string_view product;
+	const std::string_view revision;
 
 	// state for READ and WRITE
 	u32 m_rw_buf_size; // size of read/write buffer
