@@ -665,25 +665,7 @@ ROM_START(mpc60)
 	ROM_LOAD16_BYTE("mpc60_voice_2_v1-0.ic18", 0x00001, 0x08000, CRC(42f8e0a6) SHA1(a22dbefb9dafbb0c4095fd0bf4e63e67b5ec3b95))
 
 	ROM_REGION(0x1000, "panelcpu", 0)
-	ROM_LOAD("upd78c11g-044-36.ic1", 0x0000, 0x1000, NO_DUMP)
-	ROM_FILL(0x0000, 1, 0x54) // dummy reset vector
-	ROM_FILL(0x0001, 1, 0x00)
-	ROM_FILL(0x0002, 1, 0x40)
-	ROM_FILL(0x0018, 1, 0x54) // dummy interrupt vector
-	ROM_FILL(0x0019, 1, 0x18)
-	ROM_FILL(0x001a, 1, 0x40)
-	ROM_FILL(0x0090, 1, 0xca) // dummy CALT vectors
-	ROM_FILL(0x0091, 1, 0x41)
-	ROM_FILL(0x0092, 1, 0xca)
-	ROM_FILL(0x0093, 1, 0x41)
-	ROM_FILL(0x0094, 1, 0xca)
-	ROM_FILL(0x0095, 1, 0x41)
-	ROM_FILL(0x0096, 1, 0xca)
-	ROM_FILL(0x0097, 1, 0x41)
-	ROM_FILL(0x0098, 1, 0xca)
-	ROM_FILL(0x0099, 1, 0x41)
-	ROM_FILL(0x009a, 1, 0xca)
-	ROM_FILL(0x009b, 1, 0x41)
+	ROM_LOAD("upd78c11g-044-36.ic1", 0x0000, 0x1000, CRC(59fee9fa) SHA1(830eea667e46437f9a65280bf59234107abe49c8))
 
 	ROM_REGION(0x2000, "panel", 0)
 	ROM_LOAD("akai mpc60 panel eprom op v1-1 2764.ic2", 0x0000, 0x2000, CRC(f1332f47) SHA1(dd5e917d16941fce3db4bfe21d37f722d6262561))
