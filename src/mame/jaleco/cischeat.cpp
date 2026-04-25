@@ -216,15 +216,15 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{}
 
-	void init_cischeat();
-	void init_bigrun();
-	void init_f1gpstar();
+	void cischeat(machine_config &config) ATTR_COLD;
+	void f1gpstr2(machine_config &config) ATTR_COLD;
+	void f1gpstar(machine_config &config) ATTR_COLD;
+	void bigrun(machine_config &config) ATTR_COLD;
+	void bigrun_d65006(machine_config &config) ATTR_COLD;
 
-	void cischeat(machine_config &config);
-	void f1gpstr2(machine_config &config);
-	void f1gpstar(machine_config &config);
-	void bigrun(machine_config &config);
-	void bigrun_d65006(machine_config &config);
+	void init_cischeat() ATTR_COLD;
+	void init_bigrun() ATTR_COLD;
+	void init_f1gpstar() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -317,7 +317,7 @@ public:
 		, m_io_in1_common(*this, "IN1_COMMON")
 	{}
 
-	void wildplt(machine_config &config);
+	void wildplt(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -362,6 +362,7 @@ void cischeat_state::video_start()
 void wildplt_state::video_start()
 {
 	cischeat_state::video_start();
+
 	m_buffer_spriteram = &m_ram[0x8000 / 2];
 	m_allocated_spriteram = std::make_unique<u16[]>(0x1000 / 2);
 	m_spriteram = m_allocated_spriteram.get();
@@ -373,7 +374,7 @@ void wildplt_state::video_start()
 void wildplt_state::sprite_dma_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// bit 13: 0 -> 1 transition triggers a sprite DMA
-	if (data & 0x2000 && (m_sprite_dma_reg & 0x2000) == 0)
+	if (data & 0x2000 && !(m_sprite_dma_reg & 0x2000))
 	{
 		std::copy_n(&m_buffer_spriteram[0], 0x1000 / 2, &m_allocated_spriteram[0]);
 	}
@@ -602,7 +603,7 @@ void cischeat_state::cischeat_comms_w(u16 data)
 
 u16 cischeat_state::f1gpstar_wheel_r()
 {
-	return (m_io_pedal->read() & 0xff) + ((m_io_in[5]->read() & 0xff) << 8);
+	return (m_io_pedal->read() & 0xff) | ((m_io_in[5]->read() & 0xff) << 8);
 }
 
 
@@ -647,9 +648,9 @@ void cischeat_state::f1gpstr2_io_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		if ((m_io_value & 4) && ((data & 4) == 0))
+		if ((m_io_value & 4) && !(data & 4))
 			m_iocpu->set_input_line(4, HOLD_LINE);
-		if ((m_io_value & 2) && ((data & 2) == 0))
+		if ((m_io_value & 2) && !(data & 2))
 			m_iocpu->set_input_line(2, HOLD_LINE);
 		m_io_value = data & 0xff;
 	}
