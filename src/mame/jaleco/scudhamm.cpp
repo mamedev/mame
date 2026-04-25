@@ -109,12 +109,26 @@ public:
 		, m_ram(*this, "ram")
 		, m_io_in(*this, "IN%u", 0U)
 		, m_leds(*this, "led%u", 0U)
-	{}
+	{
+		
+	}
 
-	void scudhamm(machine_config &config);
+	void scudhamm(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+
+	void scudhamm_motor_command_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void scudhamm_leds_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void scudhamm_enable_w(u16 data);
+	void scudhamm_oki_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 scudhamm_motor_status_r();
+	u16 scudhamm_motor_pos_r();
+	u8 scudhamm_analog_r();
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(scudhamm_scanline);
+
+	void scudhamm_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -132,18 +146,6 @@ protected:
 
 	s32 m_prev = 0;
 	u16 m_scudhamm_motor_command = 0U;
-
-	void scudhamm_motor_command_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void scudhamm_leds_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void scudhamm_enable_w(u16 data);
-	void scudhamm_oki_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 scudhamm_motor_status_r();
-	u16 scudhamm_motor_pos_r();
-	u8 scudhamm_analog_r();
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(scudhamm_scanline);
-
-	void scudhamm_map(address_map &map) ATTR_COLD;
 };
 
 class armchamp2_state : public scudhamm_state
@@ -155,7 +157,7 @@ public:
 	{
 	}
 
-	void armchmp2(machine_config &config);
+	void armchmp2(machine_config &config) ATTR_COLD;
 
 	ioport_value left_sensor_r();
 	ioport_value right_sensor_r();
@@ -165,11 +167,6 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
-	required_ioport m_io_arm;
-
-	u16 m_arm_motor_command = 0;
-	s32 m_armold = 0;
-
 	u16 motor_status_r();
 	void motor_command_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u8 analog_r();
@@ -178,6 +175,11 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(armchamp2_scanline);
 
 	void armchmp2_map(address_map &map) ATTR_COLD;
+
+	required_ioport m_io_arm;
+
+	u16 m_arm_motor_command = 0;
+	s32 m_armold = 0;
 };
 
 class captflag_state : public scudhamm_state
@@ -194,17 +196,29 @@ public:
 	{
 	}
 
-	void captflag(machine_config &config);
+	void captflag(machine_config &config) ATTR_COLD;
 
 	template <int N> int motor_busy_r();
 	template <int N> ioport_value motor_pos_r();
 
-	void init_vscaptfl();
+	void init_vscaptfl() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
+	void motor_command_right_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void motor_command_left_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void motor_move(int side, u16 data);
+	void oki_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	void leds_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(captflag_scanline);
+
+	void captflag_map(address_map &map) ATTR_COLD;
+	template <unsigned Which> void oki_map(address_map &map) ATTR_COLD;
+
 	required_device<ticket_dispenser_device> m_hopper;
 
 	required_device<timer_device> m_motor_left;
@@ -218,18 +232,6 @@ private:
 	u16 m_captflag_leds = 0;
 	u16 m_motor_command[2]{0};
 	u16 m_motor_pos[2]{0};
-
-	void motor_command_right_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void motor_command_left_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void motor_move(int side, u16 data);
-	void oki_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-
-	void leds_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(captflag_scanline);
-
-	void captflag_map(address_map &map) ATTR_COLD;
-	template <unsigned Which> void oki_map(address_map &map) ATTR_COLD;
 };
 
 /***************************************************************************
@@ -1739,7 +1741,7 @@ void captflag_state::init_vscaptfl()
 	space.install_write_handler(0x100050, 0x100051, write16s_delegate(*this, FUNC(captflag_state::motor_command_right_w)));
 }
 
-}; // anonymous namespace 
+} // anonymous namespace 
 
 /***************************************************************************
 
@@ -1756,5 +1758,5 @@ GAME( 1992, armchmp2o, armchmp2, armchmp2, armchmp2, armchamp2_state, empty_init
 GAME( 1993, captflag,  0,        captflag, captflag, captflag_state,  empty_init,    ROT270, "Jaleco", "Captain Flag (Japan)",                   MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, vscaptfl,  0,        captflag, vscaptfl, captflag_state,  init_vscaptfl, ROT270, "Jaleco", "Vs. Super Captain Flag (Japan)",         MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, scudhamm,  0,        scudhamm, scudhamm, scudhamm_state,  empty_init,    ROT270, "Jaleco", "Scud Hammer (Japan, ver 1.4)",           MACHINE_IMPERFECT_GRAPHICS ) // version on program ROMS' labels
-GAME( 1994, scudhamma, scudhamm, scudhamm, scudhamma,scudhamm_state,  empty_init,    ROT270, "Jaleco", "Scud Hammer (Japan, older version?)",    MACHINE_IMPERFECT_GRAPHICS ) // maybe older cause it has one less dip listed?
+GAME( 1994, scudhamm,  0,        scudhamm, scudhamm, scudhamm_state,  empty_init,    ROT270, "Jaleco", "Scud Hammer (Japan, ver 1.4)",           MACHINE_IMPERFECT_GRAPHICS ) // version on program ROMs' labels
+GAME( 1994, scudhamma, scudhamm, scudhamm, scudhamma,scudhamm_state,  empty_init,    ROT270, "Jaleco", "Scud Hammer (Japan, older version?)",    MACHINE_IMPERFECT_GRAPHICS ) // maybe older cause it has one less DIP switch listed?
