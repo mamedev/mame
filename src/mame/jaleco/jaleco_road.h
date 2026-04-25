@@ -15,8 +15,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> jaleco_road_device
-
 class jaleco_road_device : public device_t, public device_gfx_interface
 {
 public:
@@ -40,7 +38,7 @@ public:
 protected:
 	jaleco_road_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -72,7 +70,7 @@ public:
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority1, int priority2, bool transparency) override;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(JALECO_ROAD,      jaleco_road_device)
 DECLARE_DEVICE_TYPE(JALECO_ZOOM_ROAD, jaleco_zoom_road_device)
 
