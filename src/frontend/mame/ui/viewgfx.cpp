@@ -1185,8 +1185,8 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 	float cellboxheight = cellboxbounds.height() * float(targheight);
 
 	// compute the number of source pixels in a cell
-	int const cellxpix = 1 + ((set.m_rotate & ORIENTATION_SWAP_XY) ? gfx.origheight() : gfx.origwidth());
-	int const cellypix = 1 + ((set.m_rotate & ORIENTATION_SWAP_XY) ? gfx.origwidth() : gfx.origheight());
+	int const cellxpix = 1 + ((set.m_rotate & ORIENTATION_SWAP_XY) ? gfx.height() : gfx.width());
+	int const cellypix = 1 + ((set.m_rotate & ORIENTATION_SWAP_XY) ? gfx.width() : gfx.height());
 
 	// compute the largest pixel scale factor that still fits
 	int xcells = set.m_columns;
@@ -1261,11 +1261,11 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 				ypixel = (cellypix - 2) - ypixel;
 			if (set.m_rotate & ORIENTATION_SWAP_XY)
 				std::swap(xpixel, ypixel);
-			uint8_t const pixdata = gfx.get_origdata(code)[xpixel + ypixel * gfx.rowbytes()];
+			uint8_t const pixdata = gfx.get_data(code)[xpixel + ypixel * gfx.rowbytes()];
 			util::stream_format(title_buf,
 					_("gfxview", " #%1$X:%2$X (%3$d %4$d) = %5$X"),
 					code, set.m_color,
-					xpixel, ypixel,
+					gfx.origin_x() + xpixel, gfx.origin_y() + ypixel,
 					gfx.colorbase() + (set.m_color * gfx.granularity()) + pixdata);
 
 			// keep touch pointer displayed after release so they know what it's pointing at
@@ -1276,11 +1276,11 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 	}
 	if (!found_pixel)
 		util::stream_format(title_buf,
-				((gfx.origwidth() == gfx.width()) && (gfx.origheight() == gfx.height())) ? 
+				((gfx.source_width() == gfx.width()) && (gfx.source_height() == gfx.height())) ? 
 				_("gfxview", u8" %1$d\u00d7%2$d color %7$X/%8$X") :
 				_("gfxview", u8" %1$d\u00d7%2$d (clip: %3$d:%4$d\u00d7%5$d:%6$d) color %7$X/%8$X"),
-				gfx.origwidth(), gfx.origheight(),
-				gfx.startx(), gfx.width(), gfx.starty(), gfx.height(),
+				gfx.source_width(), gfx.source_height(),
+				gfx.origin_x(), gfx.width(), gfx.origin_y(), gfx.height(),
 				set.m_color, set.m_color_count);
 
 	float x0, y0;
@@ -1418,10 +1418,9 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_container &cont
 	// figure out the title
 	std::ostringstream title_buf;
 	util::stream_format(title_buf,
-			(m_tilemap.flags() != TILEMAP_DRAW_ALL_CATEGORIES) ? _("gfxview", "Tilemap %1$d/%2$d palette %4$X category %3$u") : _("gfxview", "Tilemap %1$d/%2$d palette %4$X "),
+			(m_tilemap.flags() != TILEMAP_DRAW_ALL_CATEGORIES) ? _("gfxview", "Tilemap %1$d/%2$d category %3$u") : _("gfxview", "Tilemap %1$d/%2$d"),
 			m_tilemap.index() + 1, m_machine.tilemap().count(),
-			m_tilemap.flags(),
-			tilemap.palette_offset());
+			m_tilemap.flags());
 
 	// if the mouse pointer is over a tile, add some info about its coordinates and color
 	float mouse_x, mouse_y;
@@ -1441,9 +1440,10 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_container &cont
 		uint32_t code, color;
 		tilemap.get_info_debug(col, row, gfxnum, code, color);
 		util::stream_format(title_buf,
-				_("gfxview", " (%1$u %2$u) = GFX%3$u #%4$X:%5$X"),
+				_("gfxview", " (%1$u %2$u) = GFX%3$u #%4$X:%5$X palette %6$X"),
 				col * tilemap.tilewidth(), row * tilemap.tileheight(),
-				gfxnum, code, color);
+				gfxnum, code, color,
+				tilemap.palette_offset());
 
 		// keep touch pointer displayed after release so they know what it's pointing at
 		mame_ui_manager::display_pointer pointers[1]{ { m_machine.render().ui_target(), m_pointer_type, m_pointer_x, m_pointer_y } };
@@ -1496,8 +1496,8 @@ void gfx_viewer::update_gfxset_bitmap(int xcells, int ycells, gfx_element &gfx)
 	auto const &set = info.set(m_gfxset.m_set);
 
 	// compute the number of source pixels in a cell
-	int const cellxpix = 1 + ((set.m_rotate & ORIENTATION_SWAP_XY) ? gfx.origheight() : gfx.origwidth());
-	int const cellypix = 1 + ((set.m_rotate & ORIENTATION_SWAP_XY) ? gfx.origwidth() : gfx.origheight());
+	int const cellxpix = 1 + ((set.m_rotate & ORIENTATION_SWAP_XY) ? gfx.height() : gfx.width());
+	int const cellypix = 1 + ((set.m_rotate & ORIENTATION_SWAP_XY) ? gfx.width() : gfx.height());
 
 	// reallocate the bitmap if it is too small
 	resize_bitmap(cellxpix * xcells, cellypix * ycells);
@@ -1566,10 +1566,10 @@ void gfx_viewer::update_tilemap_bitmap(int width, int height)
 
 void gfx_viewer::gfxset_draw_item(gfx_element &gfx, int index, int dstx, int dsty, gfxset::setinfo const &info)
 {
-	int const width = (info.m_rotate & ORIENTATION_SWAP_XY) ? gfx.origheight() : gfx.origwidth();
-	int const height = (info.m_rotate & ORIENTATION_SWAP_XY) ? gfx.origwidth() : gfx.origheight();
+	int const width = (info.m_rotate & ORIENTATION_SWAP_XY) ? gfx.height() : gfx.width();
+	int const height = (info.m_rotate & ORIENTATION_SWAP_XY) ? gfx.width() : gfx.height();
 	rgb_t const *const palette = info.m_palette->palette()->entry_list_raw() + gfx.colorbase() + info.m_color * gfx.granularity();
-	uint8_t const *const src = gfx.get_origdata(index);
+	uint8_t const *const src = gfx.get_data(index);
 
 	// loop over rows in the cell
 	for (int y = 0; y < height; y++)
@@ -1584,16 +1584,16 @@ void gfx_viewer::gfxset_draw_item(gfx_element &gfx, int index, int dstx, int dst
 			if (!(info.m_rotate & ORIENTATION_SWAP_XY))
 			{
 				if (info.m_rotate & ORIENTATION_FLIP_X)
-					effx = gfx.origwidth() - 1 - effx;
+					effx = gfx.width() - 1 - effx;
 				if (info.m_rotate & ORIENTATION_FLIP_Y)
-					effy = gfx.origheight() - 1 - effy;
+					effy = gfx.height() - 1 - effy;
 			}
 			else
 			{
 				if (info.m_rotate & ORIENTATION_FLIP_X)
-					effx = gfx.origheight() - 1 - effx;
+					effx = gfx.height() - 1 - effx;
 				if (info.m_rotate & ORIENTATION_FLIP_Y)
-					effy = gfx.origwidth() - 1 - effy;
+					effy = gfx.width() - 1 - effy;
 				std::swap(effx, effy);
 			}
 

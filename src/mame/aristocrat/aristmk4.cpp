@@ -501,7 +501,7 @@ static const uint8_t cashcade_p[] ={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 
 void aristmk4_state::video_start()
 {
-	m_gfxdecode->gfx(0)->clear_all_dirty();
+	m_gfxdecode->gfx(0)->decode_all();
 }
 
 void aristmk4_state::uBackgroundColour()
