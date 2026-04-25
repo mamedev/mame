@@ -22,7 +22,7 @@
 #include "jaleco_zoomspr.h"
 
 DEFINE_DEVICE_TYPE(JALECO_ZOOMSPR,        jaleco_zoomspr_device,        "jaleco_zoomspr",        "Jaleco Zoomable Sprite Generator")
-DEFINE_DEVICE_TYPE(JALECO_ZOOMSPR_BIGRUN, jaleco_zoomspr_bigrun_device, "jaleco_zoomspr_bigrun", "Jaleco Zoomable Sprite Generator (Big Run Configuration)")
+DEFINE_DEVICE_TYPE(JALECO_ZOOMSPR_BIGRUN, jaleco_zoomspr_bigrun_device, "jaleco_zoomspr_bigrun", "Jaleco Zoomable Sprite Generator (Big Run configuration)")
 
 jaleco_zoomspr_device::jaleco_zoomspr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -105,16 +105,15 @@ constexpr int jaleco_zoomspr_shrink(int org, int fact)
 
 void jaleco_zoomspr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority1, int priority2, const u16 *source, u32 ramsize)
 {
-	const u16 *finish = source + ramsize;
+	u16 const *const finish = source + ramsize;
 
 	/* Move the priority values in place */
 	const bool high_sprites = (priority1 >= 16) | (priority2 >= 16);
 	priority1 &= 0xf;
 	priority2 &= 0xf;
 
-	int min_priority, max_priority;
-	if (priority1 < priority2)  { min_priority = priority1; max_priority = priority2; }
-	else                        { min_priority = priority2; max_priority = priority1; }
+	const int min_priority = std::min(priority1, priority2);
+	const int max_priority = std::max(priority1, priority2);
 
 	for (; source < finish; source += 0x10 / 2)
 	{
@@ -125,7 +124,7 @@ void jaleco_zoomspr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &
 		const u16 attr = source[7];
 		const int pri = (attr & 0x700) >> 8; // (attr & 0xf00) >> 8 ?
 
-		/* high byte is a priority information */
+		/* high byte is priority information */
 		if ((pri < min_priority) || (pri > max_priority))
 			continue;
 
@@ -237,17 +236,15 @@ void jaleco_zoomspr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &
 
 void jaleco_zoomspr_bigrun_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority1, int priority2, const u16 *source, u32 ramsize)
 {
-	const u16 *finish = source + ramsize;
+	u16 const *const finish = source + ramsize;
 
 	/* Move the priority values in place */
 	const bool high_sprites = (priority1 >= 16) | (priority2 >= 16);
 	priority1 &= 0xf;
 	priority2 &= 0xf;
 
-	int min_priority, max_priority;
-
-	if (priority1 < priority2)  { min_priority = priority1; max_priority = priority2; }
-	else                        { min_priority = priority2; max_priority = priority1; }
+	const int min_priority = std::min(priority1, priority2);
+	const int max_priority = std::max(priority1, priority2);
 
 	for (; source < finish; source += 0x10 / 2)
 	{
