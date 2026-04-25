@@ -37,11 +37,11 @@ public:
 protected:
 	jaleco_zoomspr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	u8 m_drawmode_table[16]{};
+	u8 m_drawmode_table[16];
 };
 
 class jaleco_zoomspr_bigrun_device : public jaleco_zoomspr_device
@@ -62,7 +62,7 @@ public:
 	virtual void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority1, int priority2, const u16 *source, u32 ramsize) override;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(JALECO_ZOOMSPR,        jaleco_zoomspr_device)
 DECLARE_DEVICE_TYPE(JALECO_ZOOMSPR_BIGRUN, jaleco_zoomspr_bigrun_device)
 
