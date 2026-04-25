@@ -273,7 +273,8 @@ void firebeat_extend_spectrum_analyzer_device::sound_stream_update(sound_stream 
 		double notch_max[TOTAL_BARS] = { -1, -1, -1, -1, -1, -1 };
 		int cur_notch = 0;
 
-		for (int i = 0; i <= FFT_LENGTH / 2; i++) {
+		for (int i = 0; i <= FFT_LENGTH / 2; i++)
+		{
 			const double freq = double(i) / FFT_LENGTH * srate;
 
 			if (freq < NOTCHES[cur_notch])
@@ -1613,7 +1614,8 @@ void firebeat_popn_state::lamp_output_popn_w(offs_t offset, uint32_t data, uint3
 	// 0x00004000 Button LED 6
 	// 0x00008000 Button LED 7
 	// 0x80000000 Button LED 8
-	if (ACCESSING_BITS_8_15) {
+	if (ACCESSING_BITS_8_15)
+	{
 		m_button_leds[0] = BIT(data, 8);
 		m_button_leds[1] = BIT(data, 9);
 		m_button_leds[2] = BIT(data, 10);
@@ -1623,14 +1625,16 @@ void firebeat_popn_state::lamp_output_popn_w(offs_t offset, uint32_t data, uint3
 		m_button_leds[6] = BIT(data, 14);
 		m_button_leds[7] = BIT(data, 15);
 	}
-	if (ACCESSING_BITS_16_23) {
+	if (ACCESSING_BITS_16_23)
+	{
 		m_top_leds[0] = BIT(data, 19);
 		m_top_leds[1] = BIT(data, 20);
 		m_top_leds[2] = BIT(data, 21);
 		m_top_leds[3] = BIT(data, 22);
 		m_top_leds[4] = BIT(data, 23);
 	}
-	if (ACCESSING_BITS_24_31) {
+	if (ACCESSING_BITS_24_31)
+	{
 		m_side_leds[0] = BIT(data, 27);
 		m_side_leds[1] = BIT(data, 28);
 		m_side_leds[2] = BIT(data, 29);
@@ -1646,6 +1650,7 @@ void firebeat_popn_state::lamp_output_popn_w(offs_t offset, uint32_t data, uint3
 void firebeat_ppp_state::device_resolve_objects()
 {
 	firebeat_state::device_resolve_objects();
+
 	m_stage_leds.resolve();
 	m_top_leds.resolve();
 	m_lamps.resolve();
@@ -1659,6 +1664,7 @@ void firebeat_ppp_state::device_resolve_objects()
 void firebeat_ppp_state::firebeat_ppp(machine_config &config)
 {
 	firebeat(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_ppp_state::firebeat_ppp_map);
 }
 
@@ -1688,6 +1694,7 @@ void firebeat_ppp_state::init_ppp_overseas()
 void firebeat_ppp_state::firebeat_ppp_map(address_map &map)
 {
 	firebeat_map(map);
+
 	map(0x7d000320, 0x7d000323).w(FUNC(firebeat_ppp_state::lamp_output2_ppp_w));
 	map(0x7d000324, 0x7d000327).w(FUNC(firebeat_ppp_state::lamp_output3_ppp_w));
 	map(0x7d000340, 0x7d00035f).r(FUNC(firebeat_ppp_state::sensor_r));
