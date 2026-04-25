@@ -413,19 +413,20 @@ public:
 		m_io_inputs(*this, "IN%u", 0U)
 	{ }
 
-	void firebeat(machine_config &config);
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_resolve_objects() override ATTR_COLD;
 
+	void firebeat(machine_config &config) ATTR_COLD;
+
 	uint32_t screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void init_firebeat();
+	void init_firebeat() ATTR_COLD;
 
 	void firebeat_map(address_map &map) ATTR_COLD;
 	void ymz280b_map(address_map &map) ATTR_COLD;
+
 	void lamp_output_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void lamp_output2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void lamp_output3_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -494,7 +495,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_resolve_objects() override ATTR_COLD;
 
-	void firebeat_spu_base(machine_config &config);
+	void firebeat_spu_base(machine_config &config) ATTR_COLD;
 	void firebeat_spu_map(address_map &map) ATTR_COLD;
 	void spu_map(address_map &map) ATTR_COLD;
 	void rf5c400_map(address_map &map) ATTR_COLD;
@@ -549,14 +550,16 @@ public:
 	{ }
 
 	void firebeat_ppp(machine_config &config);
-	void init_ppp_base();
-	void init_ppp_jp();
-	void init_ppp_overseas();
+
+	void init_ppp_jp() ATR_COLD;
+	void init_ppp_overseas() ATTR_COLD;
 
 private:
 	virtual void device_resolve_objects() override ATTR_COLD;
 
 	void firebeat_ppp_map(address_map &map) ATTR_COLD;
+
+	void init_ppp_base() ATTR_COLD;
 
 	uint16_t sensor_r(offs_t offset);
 
@@ -591,19 +594,20 @@ public:
 		m_io_wheels(*this, "WHEEL_P%u", 1U)
 	{ }
 
-	uint32_t screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void firebeat_kbm(machine_config &config) ATTR_COLD;
 
-	void init_kbm_base();
-	void init_kbm_jp();
-	void init_kbm_overseas();
-	void firebeat_kbm(machine_config &config);
+	void init_kbm_jp() ATTR_COLD;
+	void init_kbm_overseas() ATTR_COLD;
 
 private:
 	virtual void device_resolve_objects() override ATTR_COLD;
 
+	uint32_t screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void firebeat_kbm_map(address_map &map) ATTR_COLD;
 
-	void init_keyboard();
+	void init_kbm_base() ATTR_COLD;
+	void init_keyboard() ATTR_COLD;
 
 	uint8_t keyboard_wheel_r(offs_t offset);
 
@@ -646,7 +650,8 @@ public:
 	{ }
 
 	void firebeat_bm3(machine_config &config);
-	void init_bm3();
+
+	void init_bm3() ATTR_COLD;
 
 private:
 	void firebeat_bm3_map(address_map &map) ATTR_COLD;
@@ -659,6 +664,8 @@ private:
 
 	void midi_st224_irq_callback(int state);
 
+	void floppy_irq_callback(int state);
+
 	required_device<fdc37c665gt_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
 	required_device<firebeat_extend_spectrum_analyzer_device> m_spectrum_analyzer;
@@ -667,8 +674,6 @@ private:
 	required_ioport_array<4> m_io;
 	required_ioport_array<2> m_io_turntables;
 	required_ioport_array<7> m_io_effects;
-
-	void floppy_irq_callback(int state);
 };
 
 class firebeat_popn_state : public firebeat_spu_state
@@ -681,15 +686,17 @@ public:
 		m_top_leds(*this, "top_led_%u", 0U)
 	{ }
 
-	void firebeat_popn(machine_config &config);
-	void init_popn_base();
-	void init_popn_jp();
-	void init_popn_rental();
+	void firebeat_popn(machine_config &config) ATTR_COLD;
+
+	void init_popn_jp() ATTR_COLD;
+	void init_popn_rental() ATTR_COLD;
 
 private:
 	virtual void device_resolve_objects() override ATTR_COLD;
 
 	void firebeat_popn_map(address_map &map) ATTR_COLD;
+
+	void init_popn_base() ATTR_COLD;
 
 	void lamp_output_popn_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
@@ -709,8 +716,8 @@ void firebeat_popn_state::device_resolve_objects()
 
 /*****************************************************************************/
 
-uint32_t firebeat_state::screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return m_gcu->draw(screen, bitmap, cliprect); }
-uint32_t firebeat_kbm_state::screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return m_gcu_sub->draw(screen, bitmap, cliprect); }
+uint32_t firebeat_state::screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return m_gcu->draw(screen, bitmap, cliprect); }
+uint32_t firebeat_kbm_state::screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return m_gcu_sub->draw(screen, bitmap, cliprect); }
 
 void firebeat_state::machine_start()
 {
