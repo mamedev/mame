@@ -883,7 +883,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	for (int row = beginrow; row <= endrow; row++)
 	{
-		uint32_t const address = page + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5)) | ((row & 7) << 10);
+		uint32_t const address = page + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5) | ((row & 7) << 10));
 		uint8_t const *const vram_row = m_ram_ptr + address;
 		uint8_t const *const vaux_row = m_aux_ptr + (address & m_aux_mask);
 
