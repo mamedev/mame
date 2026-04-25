@@ -272,7 +272,7 @@ void megasys1_tilemap_device::scroll_w(offs_t offset, u16 data, u16 mem_mask)
 			}
 			break;
 		default:
-			LOGVIDEO("%s: vreg %04X <- %04X & %04x", machine().describe_context(), offset, data, mem_mask);
+			logerror("%s: vreg %04X <- %04X & %04x", machine().describe_context(), offset, data, mem_mask);
 			break;
 	}
 }
