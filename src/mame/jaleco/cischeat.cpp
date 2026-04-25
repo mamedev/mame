@@ -271,7 +271,6 @@ protected:
 	void wheel_out_w(u16 data);
 	void ip_select_w(u16 data);
 	void ip_select_plus1_w(u16 data);
-	void bigrun_comms_w(u16 data);
 	void active_layers_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 cischeat_ip_select_r();
 	void cischeat_soundlatch_w(u16 data);
@@ -555,14 +554,6 @@ void cischeat_state::ip_select_plus1_w(u16 data)
 	m_ip_select = data + 1;
 }
 
-
-void cischeat_state::bigrun_comms_w(u16 data)
-{
-	/* Not sure about this one.. */
-	m_road1cpu->set_input_line(INPUT_LINE_RESET, BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
-	m_road2cpu->set_input_line(INPUT_LINE_RESET, BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
-	m_soundcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
-}
 
 // TODO: fake port, never written to my knowledge!
 void cischeat_state::active_layers_w(offs_t offset, u16 data, u16 mem_mask)
