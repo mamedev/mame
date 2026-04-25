@@ -33177,7 +33177,7 @@ Freezes at the start of any in-game mode
 	<software name="trgearth">
 		<description>Target Earth (USA)</description>
 		<year>1990</year>
-		<publisher>Dreamworks Games</publisher>
+		<publisher>DreamWorks</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed -->
 			<feature name="pcb" value="171-5703"/>
@@ -33191,7 +33191,7 @@ Freezes at the start of any in-game mode
 	<software name="trgearthp" cloneof="trgearth">
 		<description>Target Earth (USA, prototype 19900216)</description>
 		<year>1990</year>
-		<publisher>Dreamworks Games</publisher>
+		<publisher>DreamWorks</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="target earth (feb 16, 1990 prototype).bin" size="524288" crc="ebaa609d" sha1="6c36c96fd7ecf0cb8a6ef04d28f23729038f6123" />
