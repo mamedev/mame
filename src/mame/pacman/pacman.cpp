@@ -1062,7 +1062,7 @@ void pacman_state::pacman_map(address_map &map)
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(addressable_latch_device::write_d0));
-	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
 	map(0x5080, 0x5080).mirror(0xaf3f).nopw();
@@ -1089,7 +1089,7 @@ void pacman_state::birdiy_map(address_map &map)
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
-	map(0x5080, 0x509f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x5080, 0x509f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x50a0, 0x50af).mirror(0xaf00).writeonly().share("spriteram2");
 //  map(0x5070, 0x507f).mirror(0xaf00).nopw();
 //  map(0x5080, 0x5080).mirror(0xaf3f).nopw();
@@ -1113,7 +1113,7 @@ void pacman_state::mspacman_map(address_map &map)
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
-	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
 	map(0x5080, 0x5080).mirror(0xaf3f).nopw();
@@ -1144,7 +1144,7 @@ void pacman_state::woodpek_map(address_map &map)
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
-	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
 	map(0x5080, 0x5080).mirror(0xaf3f).nopw();
@@ -1166,7 +1166,7 @@ void clubpacm_state::clubpacm_map(address_map &map)
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
-	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
 	map(0x5080, 0x5080).mirror(0xaf3f).w(m_sublatch, FUNC(generic_latch_8_device::write));
@@ -1188,7 +1188,7 @@ void mspactwin_state::mspactwin_map(address_map &map)
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0x0030).w(m_mainlatch, FUNC(ls259_device::write_d0));
-	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
 	map(0x5080, 0x5080).mirror(0xaf3f).w(m_sublatch, FUNC(generic_latch_8_device::write));
@@ -1223,7 +1223,7 @@ void pacman_state::numcrash_map(address_map &map)
 	map(0x4c00, 0x4fef).ram();
 	map(0x4ff0, 0x4fff).ram().share("spriteram");
 	map(0x5000, 0x5007).w(m_mainlatch, FUNC(ls259_device::write_d0));
-	map(0x5040, 0x505f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x5040, 0x505f).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x5060, 0x506f).writeonly().share("spriteram2");
 //  map(0x5070, 0x507f).nopw();
 //  map(0x5080, 0x5080).nopw();
@@ -1271,7 +1271,7 @@ void pacman_state::dremshpr_map(address_map &map)
 	map(0x4800, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
-//  map(0x5040, 0x505f).mirror(0xaf00).w("namco", FUNC(namco_device::pacman_sound_w));
+//  map(0x5040, 0x505f).mirror(0xaf00).w("namco", FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
 	map(0x5080, 0x5080).mirror(0xaf3f).nopw();
@@ -1297,7 +1297,7 @@ void epospm_state::epos_map(address_map &map)
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
-	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
 	map(0x5080, 0x5080).mirror(0xaf3f).nopw();
@@ -1344,7 +1344,7 @@ void pacman_state::rocktrv2_map(address_map &map)
 	map(0x4400, 0x47ff).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
 	map(0x4c00, 0x4fff).ram();
 	map(0x5000, 0x5007).w(m_mainlatch, FUNC(ls259_device::write_d0));
-	map(0x5040, 0x505f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x5040, 0x505f).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x50c0, 0x50c0).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x5fe0, 0x5fe3).w(FUNC(pacman_state::rocktrv2_prot_data_w)).share("rocktrv2_prot");
 	map(0x5ff0, 0x5ff0).w(FUNC(pacman_state::rocktrv2_question_bank_w));
@@ -1369,7 +1369,7 @@ void pacman_state::bigbucks_map(address_map &map)
 	map(0x4400, 0x47ff).ram().w(FUNC(pacman_state::pacman_colorram_w)).share("colorram");
 	map(0x4c00, 0x4fff).ram();
 	map(0x5000, 0x5007).w(m_mainlatch, FUNC(ls259_device::write_d0));
-	map(0x5040, 0x505f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x5040, 0x505f).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x50c0, 0x50c0).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x5000, 0x503f).portr("IN0");
 	map(0x5040, 0x507f).portr("IN1");
@@ -1390,7 +1390,7 @@ void pacman_state::mschamp_map(address_map &map)
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
-	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
 	map(0x5080, 0x5080).mirror(0xaf3f).nopw();
@@ -1412,7 +1412,7 @@ void pacman_state::superabc_map(address_map &map)
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
 	map(0x5000, 0x5007).mirror(0xaf38).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x5002, 0x5002).mirror(0xaf3c).w(FUNC(pacman_state::superabc_bank_w));
-	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
 	map(0x5080, 0x5080).mirror(0xaf3f).nopw();
@@ -1459,7 +1459,7 @@ void pacman_state::pengojpm_map(address_map &map)
 	map(0x8c00, 0x8fef).ram();
 	map(0x8ff0, 0x8fff).ram().share("spriteram");
 	map(0x9000, 0x9007).w(m_mainlatch, FUNC(ls259_device::write_d0));
-	map(0x9040, 0x905f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x9040, 0x905f).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x9060, 0x906f).writeonly().share("spriteram2");
 	map(0x9070, 0x907f).nopw();
 	map(0x9080, 0x9080).nopw();
@@ -3725,7 +3725,7 @@ void pacman_state::pacman(machine_config &config, bool latch)
 	{
 		LS259(config, m_mainlatch); // 74LS259 at 8K or 4099 at 7K
 		m_mainlatch->q_out_cb<0>().set(FUNC(pacman_state::irq_mask_w));
-		m_mainlatch->q_out_cb<1>().set("namco", FUNC(namco_device::sound_enable_w));
+		m_mainlatch->q_out_cb<1>().set("namco", FUNC(namco_wsg_device::sound_enable_w));
 		m_mainlatch->q_out_cb<3>().set(FUNC(pacman_state::flipscreen_w));
 		m_mainlatch->q_out_cb<7>().set(FUNC(pacman_state::coin_counter_w));
 
@@ -3755,8 +3755,7 @@ void pacman_state::pacman(machine_config &config, bool latch)
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32);
-	m_namco_sound->set_voices(3);
+	NAMCO_WSG(config, m_namco_sound, MASTER_CLOCK/6/32);
 	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -3900,7 +3899,7 @@ void alibaba_state::alibaba(machine_config &config)
 	latch1.q_out_cb<7>().set(FUNC(alibaba_state::coin_counter_w));
 
 	ls259_device &latch2(LS259(config, "latch2"));
-	latch2.q_out_cb<0>().set("namco", FUNC(namco_device::sound_enable_w));
+	latch2.q_out_cb<0>().set("namco", FUNC(namco_wsg_device::sound_enable_w));
 	latch2.q_out_cb<1>().set(FUNC(alibaba_state::flipscreen_w));
 	latch2.q_out_cb<2>().set(FUNC(alibaba_state::irq_mask_w));
 

@@ -83,8 +83,9 @@
 
     ***************** read access *******************
     range     short   description
-    0000-9FFF RAM     main memory
-    A000-BFFF RAM/ROM RAM or (banked) ROM cartridges
+    0000-7FFF RAM     main memory
+    8000-9FFF RAM/ROM RAM or (right/banked) ROM cartridges
+    A000-BFFF RAM/ROM RAM or (left/banked) ROM cartridges
     C000-CFFF ROM     unused or monitor ROM
 
     ********* GTIA    ********************************
@@ -528,6 +529,7 @@ void a400_state::area_8000_map(address_map &map)
 	map(0x8000, 0x9fff).view(m_cart_rd4_view);
 	m_cart_rd4_view[0](0x8000, 0x9fff).rw(FUNC(a400_state::ram_r<0x8000>), FUNC(a400_state::ram_w<0x8000>));
 	m_cart_rd4_view[1](0x8000, 0x9fff).rw(m_cartleft, FUNC(a800_cart_slot_device::read_cart<0>), FUNC(a800_cart_slot_device::write_cart<0>));
+	// Right cartridge (a800 specific) is also mapped at 0x8000-0x9fff
 }
 
 void a400_state::area_a000_map(address_map &map)

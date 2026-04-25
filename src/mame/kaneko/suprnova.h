@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "sknsspr.h"
+#include "kaneko_rlespr.h"
 
 #include "cpu/sh/sh7604.h"
 #include "machine/timer.h"
@@ -85,7 +85,7 @@ private:
 	};
 
 	required_device<sh7604_device> m_maincpu;
-	required_device<sknsspr_device> m_spritegen;
+	required_device<kaneko_rle_sprites_device> m_spritegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -105,15 +105,14 @@ private:
 	optional_ioport_array<4> m_paddle;
 
 	hit_t m_hit;
-	bitmap_ind16 m_sprite_bitmap;
 	bitmap_ind16 m_tilemap_bitmap_lower;
 	bitmap_ind8 m_tilemap_bitmapflags_lower;
 	bitmap_ind16 m_tilemap_bitmap_higher;
 	bitmap_ind8 m_tilemap_bitmapflags_higher;
-	int m_depthA = 0;
-	int m_depthB = 0;
-	int m_use_spc_bright = 0;
-	int m_use_v3_bright = 0;
+	int32_t m_depthA = 0;
+	int32_t m_depthB = 0;
+	int32_t m_use_spc_bright = 0;
+	int32_t m_use_v3_bright = 0;
 	uint8_t m_bright_spc_b = 0;
 	uint8_t m_bright_spc_g = 0;
 	uint8_t m_bright_spc_r = 0;
@@ -126,11 +125,11 @@ private:
 	uint8_t m_bright_v3_b_trans = 0;
 	uint8_t m_bright_v3_g_trans = 0;
 	uint8_t m_bright_v3_r_trans = 0;
-	int m_spc_changed = 0;
-	int m_v3_changed = 0;
-	int m_palette_updated = 0;
-	int m_alt_enable_background = 0;
-	int m_alt_enable_sprites = 0;
+	int32_t m_spc_changed = 0;
+	int32_t m_v3_changed = 0;
+	int32_t m_palette_updated = 0;
+	int32_t m_alt_enable_background = 0;
+	int32_t m_alt_enable_sprites = 0;
 	tilemap_t *m_tilemap_A = nullptr;
 	tilemap_t *m_tilemap_B = nullptr;
 	uint8_t *m_btiles = nullptr;

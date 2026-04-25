@@ -15,6 +15,7 @@ TODO:
   It can not be used in CV1K (/SEL pin is NC, internally pulled to VCC), probably
   not used in PGM2 too.
 - Configurable sample clock divider needs more research
+- When starting a new phrase, under which conditions should the decoder be cleared?
 770:
 - Sequencer timers are implemented but seem unused, presumably because of design
   flaws or bugs, likely due to lack of automatic adding of sequencer # to register
@@ -51,14 +52,10 @@ known SPUs in this series:
 DEFINE_DEVICE_TYPE(YMZ770, ymz770_device, "ymz770", "Yamaha YMZ770C AMMS-A")
 DEFINE_DEVICE_TYPE(YMZ774, ymz774_device, "ymz774", "Yamaha YMZ774 AMMS2C")
 
-//-------------------------------------------------
-//  ymz770_device - constructor
-//-------------------------------------------------
 
-ymz770_device::ymz770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ymz770_device(mconfig, YMZ770, tag, owner, clock, 1024)
-{
-}
+//-------------------------------------------------
+//  constructor
+//-------------------------------------------------
 
 ymz770_device::ymz770_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t divider)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -74,6 +71,25 @@ ymz770_device::ymz770_device(const machine_config &mconfig, device_type type, co
 	, m_cpl(0)
 	, m_rom(*this, DEVICE_SELF)
 {
+}
+
+ymz770_device::ymz770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ymz770_device(mconfig, YMZ770, tag, owner, clock, 1024)
+{
+}
+
+ymz774_device::ymz774_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ymz770_device(mconfig, YMZ774, tag, owner, clock, 512)
+	, m_bank(0)
+{
+	// calculate volume increments, fixed point values, fractions of 0x20000
+	for (u32 i = 0; i < 256; i++)
+	{
+		if (i < 0x20)
+			m_volinc[i] = i;
+		else
+			m_volinc[i] = (0x20 | (i & 0x1f)) << ((i >> 5) - 1);
+	}
 }
 
 
@@ -107,24 +123,40 @@ void ymz770_device::device_start()
 	save_item(NAME(m_bsl));
 	save_item(NAME(m_cpl));
 
+	// STRUCT_MEMBER can't be used here?
+	for (int i = 0; i < 16; i++)
+	{
+		save_item(NAME(m_channels[i].current.pan), i);
+		save_item(NAME(m_channels[i].current.pan_delay), i);
+		save_item(NAME(m_channels[i].current.pan1), i);
+		save_item(NAME(m_channels[i].current.pan1_delay), i);
+		save_item(NAME(m_channels[i].current.volume_target), i);
+		save_item(NAME(m_channels[i].current.volume_delay), i);
+		save_item(NAME(m_channels[i].current.volume2), i);
+
+		save_item(NAME(m_channels[i].latch.pan), i);
+		save_item(NAME(m_channels[i].latch.pan_delay), i);
+		save_item(NAME(m_channels[i].latch.pan1), i);
+		save_item(NAME(m_channels[i].latch.pan1_delay), i);
+		save_item(NAME(m_channels[i].latch.volume_target), i);
+		save_item(NAME(m_channels[i].latch.volume_delay), i);
+		save_item(NAME(m_channels[i].latch.volume2), i);
+	}
+
 	save_item(STRUCT_MEMBER(m_channels, phrase));
-	save_item(STRUCT_MEMBER(m_channels, pan));
-	save_item(STRUCT_MEMBER(m_channels, pan_delay));
-	save_item(STRUCT_MEMBER(m_channels, pan1));
-	save_item(STRUCT_MEMBER(m_channels, pan1_delay));
 	save_item(STRUCT_MEMBER(m_channels, volume));
-	save_item(STRUCT_MEMBER(m_channels, volume_target));
-	save_item(STRUCT_MEMBER(m_channels, volume_delay));
-	save_item(STRUCT_MEMBER(m_channels, volume2));
 	save_item(STRUCT_MEMBER(m_channels, loop));
+
+	save_item(STRUCT_MEMBER(m_channels, pending));
 	save_item(STRUCT_MEMBER(m_channels, is_playing));
-	save_item(STRUCT_MEMBER(m_channels, last_block));
 	save_item(STRUCT_MEMBER(m_channels, is_paused));
+	save_item(STRUCT_MEMBER(m_channels, last_block));
+
+	save_item(STRUCT_MEMBER(m_channels, output_data));
 	save_item(STRUCT_MEMBER(m_channels, output_remaining));
 	save_item(STRUCT_MEMBER(m_channels, output_ptr));
 	save_item(STRUCT_MEMBER(m_channels, atbl));
 	save_item(STRUCT_MEMBER(m_channels, pptr));
-	save_item(STRUCT_MEMBER(m_channels, output_data));
 
 	save_item(STRUCT_MEMBER(m_sequences, delay));
 	save_item(STRUCT_MEMBER(m_sequences, sequence));
@@ -143,6 +175,12 @@ void ymz770_device::device_start()
 	save_item(STRUCT_MEMBER(m_sqcs, offset));
 }
 
+void ymz774_device::device_start()
+{
+	ymz770_device::device_start();
+	save_item(NAME(m_bank));
+}
+
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -152,18 +190,24 @@ void ymz770_device::device_reset()
 {
 	for (auto & channel : m_channels)
 	{
+		channel.latch.pan = 64;
+		channel.latch.pan_delay = 0;
+		channel.latch.pan1 = 64;
+		channel.latch.pan1_delay = 0;
+		channel.latch.volume_target = 0;
+		channel.latch.volume_delay = 0;
+		channel.latch.volume2 = 0;
+
+		channel.apply_params();
+
 		channel.phrase = 0;
-		channel.pan = 64;
-		channel.pan_delay = 0;
-		channel.pan1 = 64;
-		channel.pan1_delay = 0;
 		channel.volume = 0;
-		channel.volume_target = 0;
-		channel.volume_delay = 0;
-		channel.volume2 = 0;
 		channel.loop = 0;
+
+		channel.pending = false;
 		channel.is_playing = false;
 		channel.is_paused = false;
+		channel.last_block = false;
 		channel.output_remaining = 0;
 		channel.decoder->clear();
 	}
@@ -174,6 +218,7 @@ void ymz770_device::device_reset()
 		sequence.timer = 0;
 		sequence.stopchan = 0;
 		sequence.loop = 0;
+		sequence.offset = 0;
 		sequence.bank = 0;
 		sequence.is_playing = false;
 		sequence.is_paused = false;
@@ -182,13 +227,12 @@ void ymz770_device::device_reset()
 	{
 		sqc.is_playing = false;
 		sqc.loop = 0;
+		sqc.offset = 0;
+		sqc.is_playing = false;
+		sqc.is_waiting = false;
 	}
 }
 
-TIMER_CALLBACK_MEMBER(ymz770_device::update_sample_rate)
-{
-	m_stream->set_sample_rate(m_sclock);
-}
 
 //-------------------------------------------------
 //  sound_stream_update - handle update requests for
@@ -207,20 +251,7 @@ void ymz770_device::sound_stream_update(sound_stream &stream)
 
 		for (auto & channel : m_channels)
 		{
-			if (channel.output_remaining > 0)
-			{
-				// force finish current block
-				int32_t smpl = ((int32_t)channel.output_data[channel.output_ptr++] * (channel.volume >> 17)) >> 7;   // volume is linear, 0 - 128 (100%)
-				smpl = (smpl * channel.volume2) >> 7;
-				mixr += (smpl * channel.pan) >> 7;  // pan seems linear, 0 - 128, where 0 = 100% left, 128 = 100% right, 64 = 50% left 50% right
-				mixl += (smpl * (128 - channel.pan)) >> 7;
-				channel.output_remaining--;
-
-				if (channel.output_remaining == 0 && !channel.is_playing)
-					channel.decoder->clear();
-			}
-
-			else if (channel.is_playing && !channel.is_paused)
+			if (channel.output_remaining == 0 && channel.is_playing && !channel.is_paused)
 			{
 retry:
 				if (channel.last_block)
@@ -230,9 +261,7 @@ retry:
 						if (channel.loop != 255)
 							--channel.loop;
 						// loop sample
-						int phrase = channel.phrase;
-						channel.atbl = m_rom[(4*phrase)+0] >> 4 & 7;
-						channel.pptr = 8 * get_phrase_offs(phrase);
+						channel.pending = true;
 					}
 					else
 					{
@@ -244,6 +273,20 @@ retry:
 
 				if (channel.is_playing)
 				{
+					// new phrase
+					if (channel.pending)
+					{
+						int phrase = channel.phrase;
+						channel.atbl = m_rom[4 * phrase] >> 4 & 7;
+						channel.pptr = 8 * get_phrase_offs(phrase);
+
+						// phrase transition is seamless most of the time, but AMM buffer 'contamination' should not be noticeable
+						if (!channel.last_block && channel.latch.volume2 != channel.current.volume2)
+							channel.decoder->clear();
+
+						channel.pending = false;
+					}
+
 					// next block
 					int sample_rate = m_sclock, channel_count;
 					if (!channel.decoder->decode_buffer(channel.pptr, m_rom.bytes()*8, channel.output_data, channel.output_remaining, sample_rate, channel_count, channel.atbl) || channel.output_remaining == 0)
@@ -263,41 +306,60 @@ retry:
 					}
 
 					channel.last_block = channel.output_remaining < 1152;
-					channel.output_remaining--;
-					channel.output_ptr = 1;
-
-					int32_t smpl = ((int32_t)channel.output_data[0] * (channel.volume >> 17)) >> 7;
-					smpl = (smpl * channel.volume2) >> 7;
-					mixr += (smpl * channel.pan) >> 7;
-					mixl += (smpl * (128 - channel.pan)) >> 7;
+					channel.output_ptr = 0;
+					channel.apply_params();
 				}
+			}
+
+			if (channel.output_remaining > 0)
+			{
+				// force finish current block
+				int32_t smpl = channel.output_data[channel.output_ptr++];
+
+				// volume is linear, 0 - 128 (100%)
+				smpl = (smpl * (channel.volume >> 17)) >> 7;
+				smpl = (smpl * channel.current.volume2) >> 7;
+
+				// pan seems linear, 0 - 128, where 0 = 100% left, 128 = 100% right, 64 = 50% left 50% right
+				mixr += (smpl * channel.current.pan) >> 7;
+				mixl += (smpl * (128 - channel.current.pan)) >> 7;
+
+				channel.output_remaining--;
+				if (channel.output_remaining == 0 && !channel.is_playing)
+					channel.decoder->clear();
 			}
 		}
 
-		mixr *= m_vlma; // main volume is linear, 0 - 255, where 128 = 100%
-		mixl *= m_vlma;
-		mixr >>= 7 - m_bsl;
-		mixl >>= 7 - m_bsl;
-		// Clip limiter: 0 - off, 1 - 6.02 dB (100%), 2 - 4.86 dB (87.5%), 3 - 3.52 dB (75%)
-		constexpr int32_t ClipMax3 = 32768 * 75 / 100;
-		constexpr int32_t ClipMax2 = 32768 * 875 / 1000;
-		switch (m_cpl)
-		{
-		case 3:
-			mixl = std::clamp(mixl, -ClipMax3, ClipMax3);
-			mixr = std::clamp(mixr, -ClipMax3, ClipMax3);
-			break;
-		case 2:
-			mixl = std::clamp(mixl, -ClipMax2, ClipMax2);
-			mixr = std::clamp(mixr, -ClipMax2, ClipMax2);
-			break;
-		case 1:
-			mixl = std::clamp(mixl, -32768, 32767);
-			mixr = std::clamp(mixr, -32768, 32767);
-			break;
-		}
 		if (m_mute)
 			mixr = mixl = 0;
+		else
+		{
+			// main volume is linear, 0 - 255, where 128 = 100%
+			mixr *= m_vlma;
+			mixl *= m_vlma;
+			mixr >>= 7 - m_bsl;
+			mixl >>= 7 - m_bsl;
+
+			// Clip limiter: 0 - off, 1 - 6.02 dB (100%), 2 - 4.86 dB (87.5%), 3 - 3.52 dB (75%)
+			constexpr int32_t ClipMax3 = 32768 * 75 / 100;
+			constexpr int32_t ClipMax2 = 32768 * 875 / 1000;
+			switch (m_cpl)
+			{
+			case 3:
+				mixl = std::clamp(mixl, -ClipMax3, ClipMax3);
+				mixr = std::clamp(mixr, -ClipMax3, ClipMax3);
+				break;
+			case 2:
+				mixl = std::clamp(mixl, -ClipMax2, ClipMax2);
+				mixr = std::clamp(mixr, -ClipMax2, ClipMax2);
+				break;
+			case 1:
+				mixl = std::clamp(mixl, -32768, 32767);
+				mixr = std::clamp(mixr, -32768, 32767);
+				break;
+			}
+		}
+
 		stream.put_int(0, i, mixl, 32768);
 		stream.put_int(1, i, mixr, 32768);
 	}
@@ -337,6 +399,7 @@ void ymz770_device::sequencer()
 		}
 	}
 }
+
 
 //-------------------------------------------------
 //  write - write to the chip's registers
@@ -394,23 +457,20 @@ void ymz770_device::internal_reg_write(uint8_t reg, uint8_t data)
 				break;
 
 			case 1:
-				m_channels[ch].volume2 = data;
 				m_channels[ch].volume = 128 << 17;
+				m_channels[ch].latch.volume2 = data;
 				break;
 
 			case 2:
-				m_channels[ch].pan = data << 3;
+				m_channels[ch].latch.pan = data << 3;
 				break;
 
 			case 3:
 				if ((data & 6) == 2 || ((data & 6) == 6 && !m_channels[ch].is_playing)) // both KON bits is 1 = "Keep Playing", do not restart channel in this case
 				{
-					uint8_t phrase = m_channels[ch].phrase;
-					m_channels[ch].atbl = m_rom[(4*phrase)+0] >> 4 & 7;
-					m_channels[ch].pptr = 8 * get_phrase_offs(phrase);
-					m_channels[ch].last_block = false;
-
+					m_channels[ch].pending = true;
 					m_channels[ch].is_playing = true;
+					m_channels[ch].last_block = false;
 				}
 				else if ((data & 6) == 0)
 					m_channels[ch].is_playing = false;
@@ -458,7 +518,7 @@ void ymz770_device::internal_reg_write(uint8_t reg, uint8_t data)
 				break;
 			//case 4: // TGST "ON trigger playback channel selection bitmask"
 			//case 5: // TGEN "OFF trigger playback channel selection bitmask"
-			//case 7: // YMZ770: unused, but CV1K games write 1 here, must be game bugs or YMZ770C datasheet is wrong and have messed 7 and 8 registers ? ; YMZ771: SQOF_SSG
+			//case 7: // YMZ770: unused, but CV1K games write 1 here, must be game bugs or YMZ770C datasheet is wrong and has messed 7 and 8 registers? ; YMZ771: SQOF_SSG
 			//case 8: // YMZ770: docs said "set to 01h" but CV1K games never write it, see above. ; YMZ771: TEMPO (wait timer speed control)
 			default:
 				if (data)
@@ -470,22 +530,10 @@ void ymz770_device::internal_reg_write(uint8_t reg, uint8_t data)
 		logerror("unimplemented write %02X %02X\n", reg, data);
 }
 
+
 //-------------------------------------------------
 //  ymz774_device
 //-------------------------------------------------
-
-ymz774_device::ymz774_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ymz770_device(mconfig, YMZ774, tag, owner, clock, 512)
-{
-	// calculate volume increments, fixed point values, fractions of 0x20000
-	for (u32 i = 0; i < 256; i++)
-	{
-		if (i < 0x20)
-			volinc[i] = i;
-		else
-			volinc[i] = (0x20 | (i & 0x1f)) << ((i >> 5) - 1);
-	}
-}
 
 uint8_t ymz774_device::read(offs_t offset)
 {
@@ -523,27 +571,27 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 		switch (reg & 0xf8)
 		{
 		case 0x10: // Volume 1
-			m_channels[ch].volume_target = data;
+			m_channels[ch].latch.volume_target = data;
 			break;
 		case 0x18: // Volume 1 delayed transition
-			m_channels[ch].volume_delay = data;
+			m_channels[ch].latch.volume_delay = data;
 			break;
 		case 0x20: // Volume 2
-			m_channels[ch].volume2 = data;
+			m_channels[ch].latch.volume2 = data;
 			break;
 		case 0x28: // Pan L/R
-			m_channels[ch].pan = data;
+			m_channels[ch].latch.pan = data;
 			break;
 		case 0x30: // Pan L/R delayed transition
 			if (data) logerror("unimplemented write %02X %02X\n", reg, data);
-			m_channels[ch].pan_delay = data;
+			m_channels[ch].latch.pan_delay = data;
 			break;
 		case 0x38: // Pan T/B
-			m_channels[ch].pan1 = data;
+			m_channels[ch].latch.pan1 = data;
 			break;
 		case 0x40: // Pan T/B delayed transition
 			if (data) logerror("unimplemented write %02X %02X\n", reg, data);
-			m_channels[ch].pan1_delay = data;
+			m_channels[ch].latch.pan1_delay = data;
 			break;
 		case 0x48: // Loop
 			m_channels[ch].loop = data;
@@ -551,13 +599,10 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 		case 0x50: // Start / Stop
 			if (data)
 			{
-				int phrase = m_channels[ch].phrase;
-				m_channels[ch].atbl = m_rom[(4 * phrase) + 0] >> 4 & 7;
-				m_channels[ch].pptr = 8 * get_phrase_offs(phrase);
-				m_channels[ch].last_block = false;
-
+				m_channels[ch].pending = true;
 				m_channels[ch].is_playing = true;
 				m_channels[ch].is_paused = false; // checkme, might be not needed
+				m_channels[ch].last_block = false;
 			}
 			else
 				m_channels[ch].is_playing = false;
@@ -695,17 +740,17 @@ void ymz774_device::sequencer()
 {
 	for (auto & chan : m_channels)
 	{
-		if (chan.is_playing && !chan.is_paused && (chan.volume >> 17) != chan.volume_target)
+		if (chan.is_playing && !chan.is_paused && (chan.volume >> 17) != chan.current.volume_target)
 		{
-			if (chan.volume_delay)
+			if (chan.current.volume_delay)
 			{
-				if ((chan.volume >> 17) < chan.volume_target)
-					chan.volume += volinc[chan.volume_delay];
+				if ((chan.volume >> 17) < chan.current.volume_target)
+					chan.volume += m_volinc[chan.current.volume_delay];
 				else
-					chan.volume -= volinc[chan.volume_delay];
+					chan.volume -= m_volinc[chan.current.volume_delay];
 			}
 			else
-				chan.volume = chan.volume_target << 17;
+				chan.volume = chan.current.volume_target << 17;
 		}
 	}
 

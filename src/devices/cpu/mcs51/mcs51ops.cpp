@@ -65,7 +65,7 @@ u8 mcs51_cpu_device::bit_address_r(u8 offset)
 		word = ((offset & 0x78) >> 3) * distance + 0x20;
 		bit_pos = offset & 0x7;
 		mask = (0x1 << bit_pos);
-		return((m_intd.read_byte(word) & mask) >> bit_pos);
+		return((m_idata.read_byte(word) & mask) >> bit_pos);
 	}
 	// SFR bit addressable registers
 	else
@@ -74,7 +74,7 @@ u8 mcs51_cpu_device::bit_address_r(u8 offset)
 		word = ((offset & 0x78) >> 3) * distance + 0x80;
 		bit_pos = offset & 0x7;
 		mask = (0x1 << bit_pos);
-		return ((m_intd.read_byte(word) & mask) >> bit_pos);
+		return ((m_sfr.read_byte(word) & mask) >> bit_pos);
 	}
 }
 
@@ -94,9 +94,9 @@ void mcs51_cpu_device::bit_address_w(u8 offset, u8 bit)
 		bit_pos = offset & 0x7;
 		bit = (bit & 0x1) << bit_pos;
 		mask = ~(1 << bit_pos) & 0xff;
-		result = m_intd.read_byte(word) & mask;
+		result = m_idata.read_byte(word) & mask;
 		result = result | bit;
-		m_intd.write_byte(word, result);
+		m_idata.write_byte(word, result);
 	}
 	// SFR bit addressable registers
 	else
@@ -106,9 +106,9 @@ void mcs51_cpu_device::bit_address_w(u8 offset, u8 bit)
 		bit_pos = offset & 0x7;
 		bit = (bit & 0x1) << bit_pos;
 		mask = ~(1 << bit_pos) & 0xff;
-		result = m_intd.read_byte(word) & mask;
+		result = m_sfr.read_byte(word) & mask;
 		result = result | bit;
-		m_intd.write_byte(word, result);
+		m_sfr.write_byte(word, result);
 	}
 }
 
@@ -154,15 +154,15 @@ void mcs51_cpu_device::do_sub_flags(u8 a, u8 data, u8 c)
 /*Push the current m_pc to the stack*/
 void mcs51_cpu_device::push_pc()
 {
-	m_inti.write_byte(++m_sp, m_pc);        //Store low byte of m_pc to Internal Ram
-	m_inti.write_byte(++m_sp, m_pc >> 8);   //Store hi byte of m_pc to next address in Internal Ram
+	m_idata.write_byte(++m_sp, m_pc);        //Store low byte of m_pc to Internal Ram
+	m_idata.write_byte(++m_sp, m_pc >> 8);   //Store hi byte of m_pc to next address in Internal Ram
 }
 
 /*Pop the current m_pc off the stack and into the pc*/
 void mcs51_cpu_device::pop_pc()
 {
-	m_pc = m_inti.read_byte(m_sp--) << 8;    //Store hi byte to m_pc
-	m_pc = m_pc | m_inti.read_byte(m_sp--);    //Store lo byte to m_pc
+	m_pc = m_idata.read_byte(m_sp--) << 8;   //Store hi byte to m_pc
+	m_pc = m_pc | m_idata.read_byte(m_sp--); //Store lo byte to m_pc
 }
 
 //ACALL code addr                           /* 1: aaa1 0001 */
@@ -187,7 +187,7 @@ void mcs51_cpu_device::add_a_byte(u8 r)
 void mcs51_cpu_device::add_a_mem(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
-	u8 data = m_intd.read_byte(addr);            //Grab data from data address
+	u8 data = read_direct(addr);            //Grab data from data address
 	u8 result = m_acc + data;            //Add data to accumulator
 	do_add_flags(m_acc, data, 0);             //Set Flags
 	acc_w(result);                            //Store 8 bit result of addition in ACC
@@ -196,7 +196,7 @@ void mcs51_cpu_device::add_a_mem(u8 r)
 //ADD A, @R0/@R1                            /* 1: 0010 011i */
 void mcs51_cpu_device::add_a_ir(u8 r)
 {
-	u8 data = m_inti.read_byte(r_reg(r));       //Grab data from memory pointed to by R0 or R1
+	u8 data = m_idata.read_byte(r_reg(r));    //Grab data from memory pointed to by R0 or R1
 	u8 result = m_acc + data;            //Add data to accumulator
 	do_add_flags(m_acc, data, 0);             //Set Flags
 	acc_w(result);                            //Store 8 bit result of addition in ACC
@@ -224,7 +224,7 @@ void mcs51_cpu_device::addc_a_byte(u8 r)
 void mcs51_cpu_device::addc_a_mem(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
-	u8 data = m_intd.read_byte(addr);            //Grab data from data address
+	u8 data = read_direct(addr);            //Grab data from data address
 	u8 result = m_acc + data + BIT(m_psw, PSW_CY);   //Add data + carry flag to accumulator
 	do_add_flags(m_acc, data, BIT(m_psw, PSW_CY));        //Set Flags
 	acc_w(result);                            //Store 8 bit result of addition in ACC
@@ -233,7 +233,7 @@ void mcs51_cpu_device::addc_a_mem(u8 r)
 //ADDC A, @R0/@R1                           /* 1: 0011 011i */
 void mcs51_cpu_device::addc_a_ir(u8 r)
 {
-	u8 data = m_inti.read_byte(r_reg(r));       //Grab data from memory pointed to by R0 or R1
+	u8 data = m_idata.read_byte(r_reg(r));    //Grab data from memory pointed to by R0 or R1
 	u8 result = m_acc + data + BIT(m_psw, PSW_CY);   //Add data + carry flag to accumulator
 	do_add_flags(m_acc, data, BIT(m_psw, PSW_CY));        //Set Flags
 	acc_w(result);                            //Store 8 bit result of addition in ACC
@@ -260,8 +260,8 @@ void mcs51_cpu_device::ajmp(u8 r)
 void mcs51_cpu_device::anl_mem_a(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
-	u8 data = m_intd.read_byte(addr);            //Grab data from data address
-	m_intd.write_byte(addr, data & m_acc);               //Set data address value to it's value Logical AND with m_acc
+	u8 data = read_direct(addr);            //Grab data from data address
+	write_direct(addr, data & m_acc);               //Set data address value to it's value Logical AND with m_acc
 }
 
 //ANL data addr, #data                      /* 1: 0101 0011 */
@@ -269,8 +269,8 @@ void mcs51_cpu_device::anl_mem_byte(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
 	u8 data = m_program.read_byte(m_pc++);           //Grab data
-	u8 srcdata = m_intd.read_byte(addr);         //Grab data from data address
-	m_intd.write_byte(addr, srcdata & data);           //Set data address value to it's value Logical AND with Data
+	u8 srcdata = read_direct(addr);         //Grab data from data address
+	write_direct(addr, srcdata & data);           //Set data address value to it's value Logical AND with Data
 }
 
 //ANL A, #data                              /* 1: 0101 0100 */
@@ -284,14 +284,14 @@ void mcs51_cpu_device::anl_a_byte(u8 r)
 void mcs51_cpu_device::anl_a_mem(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
-	u8 data = m_intd.read_byte(addr);            //Grab data from data address
+	u8 data = read_direct(addr);            //Grab data from data address
 	acc_w(m_acc & data);                    //Set ACC to value of ACC Logical AND with Data
 }
 
 //ANL A, @RO/@R1                            /* 1: 0101 011i */
 void mcs51_cpu_device::anl_a_ir(u8 r)
 {
-	u8 data = m_inti.read_byte(r_reg(r));       //Grab data from address R0 or R1 points to
+	u8 data = m_idata.read_byte(r_reg(r));  //Grab data from address R0 or R1 points to
 	acc_w(m_acc & data);                    //Set ACC to value of ACC Logical AND with Data
 }
 
@@ -339,7 +339,7 @@ void mcs51_cpu_device::cjne_a_mem(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
 	s8 rel_addr = m_program.read_byte(m_pc++);        //Grab relative code address
-	u8 data = m_intd.read_byte(addr);            //Pull value from data address
+	u8 data = read_direct(addr);            //Pull value from data address
 
 	if (m_acc != data)                        //Jump if values are not equal
 	{
@@ -355,7 +355,7 @@ void mcs51_cpu_device::cjne_ir_byte(u8 r)
 {
 	u8 data = m_program.read_byte(m_pc++);           //Grab data
 	s8 rel_addr = m_program.read_byte(m_pc++);        //Grab relative code address
-	u8 srcdata = m_inti.read_byte(r_reg(r));    //Grab value pointed to by R0 or R1
+	u8 srcdata = m_idata.read_byte(r_reg(r));    //Grab value pointed to by R0 or R1
 
 	if (srcdata != data)                    //Jump if values are not equal
 	{
@@ -453,15 +453,15 @@ void mcs51_cpu_device::dec_a(u8 r)
 void mcs51_cpu_device::dec_mem(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
-	u8 data = m_intd.read_byte(addr);
-	m_intd.write_byte(addr, data - 1);
+	u8 data = read_direct(addr);
+	write_direct(addr, data - 1);
 }
 
 //DEC @R0/@R1                               /* 1: 0001 011i */
 void mcs51_cpu_device::dec_ir(u8 r)
 {
-	u8 data = m_inti.read_byte(r_reg(r));
-	m_inti.write_byte(r_reg(r), data - 1);
+	u8 data = m_idata.read_byte(r_reg(r));
+	m_idata.write_byte(r_reg(r), data - 1);
 }
 
 //DEC R0 to R7                              /* 1: 0001 1rrr */
@@ -500,8 +500,9 @@ void mcs51_cpu_device::djnz_mem(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
 	s8 rel_addr = m_program.read_byte(m_pc++);        //Grab relative code address
-	m_intd.write_byte(addr, m_intd.read_byte(addr) - 1);         //Decrement value contained at data address
-	if (m_intd.read_byte(addr) != 0)                  //Branch if contents of data address is not 0
+	u8 data = read_direct(addr) - 1;         //Decrement value contained at data address
+	write_direct(addr, data);
+	if (data != 0)                  //Branch if contents of data address is not 0
 	{
 		m_pc = m_pc + rel_addr;
 	}
@@ -528,15 +529,15 @@ void mcs51_cpu_device::inc_a(u8 r)
 void mcs51_cpu_device::inc_mem(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
-	u8 data = m_intd.read_byte(addr);
-	m_intd.write_byte(addr, data + 1);
+	u8 data = read_direct(addr);
+	write_direct(addr, data + 1);
 }
 
 //INC @R0/@R1                               /* 1: 0000 011i */
 void mcs51_cpu_device::inc_ir(u8 r)
 {
-	u8 data = m_inti.read_byte(r_reg(r));
-	m_inti.write_byte(r_reg(r), data + 1);
+	u8 data = m_idata.read_byte(r_reg(r));
+	m_idata.write_byte(r_reg(r), data + 1);
 }
 
 //INC R0 to R7                              /* 1: 0000 1rrr */
@@ -662,13 +663,13 @@ void mcs51_cpu_device::mov_a_byte(u8 r)
 void mcs51_cpu_device::mov_a_mem(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
-	acc_w(m_intd.read_byte(addr));                  //Store contents of data address to ACC
+	acc_w(read_direct(addr));                  //Store contents of data address to ACC
 }
 
 //MOV A,@RO/@R1                             /* 1: 1110 011i */
 void mcs51_cpu_device::mov_a_ir(u8 r)
 {
-	acc_w(m_inti.read_byte(r_reg(r)));             //Store contents of address pointed by R0 or R1 to ACC
+	acc_w(m_idata.read_byte(r_reg(r)));             //Store contents of address pointed by R0 or R1 to ACC
 }
 
 //MOV A,R0 to R7                            /* 1: 1110 1rrr */
@@ -682,7 +683,7 @@ void mcs51_cpu_device::mov_mem_byte(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
 	u8 data = m_program.read_byte(m_pc++);           //Grab data
-	m_intd.write_byte(addr, data);                     //Store data to data address location
+	write_direct(addr, data);                     //Store data to data address location
 }
 
 //MOV data addr, data addr                  /* 1: 1000 0101 */
@@ -692,14 +693,14 @@ void mcs51_cpu_device::mov_mem_mem(u8 r)
 	u8 src,dst;
 	src = m_program.read_byte(m_pc++);                    //Grab source data address
 	dst = m_program.read_byte(m_pc++);                    //Grab destination data address
-	m_intd.write_byte(dst, m_intd.read_byte(src));               //Read source address contents and store to destination address
+	write_direct(dst, read_direct(src));               //Read source address contents and store to destination address
 }
 
 //MOV @R0/@R1, #data                        /* 1: 0111 011i */
 void mcs51_cpu_device::mov_ir_byte(u8 r)
 {
 	u8 data = m_program.read_byte(m_pc++);           //Grab data
-	m_inti.write_byte(r_reg(r), data);                //Store data to address pointed by R0 or R1
+	m_idata.write_byte(r_reg(r), data);                //Store data to address pointed by R0 or R1
 }
 
 //MOV R0 to R7, #data                       /* 1: 0111 1rrr */
@@ -713,14 +714,14 @@ void mcs51_cpu_device::mov_r_byte(u8 r)
 void mcs51_cpu_device::mov_mem_ir(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
-	m_intd.write_byte(addr, m_inti.read_byte(r_reg(r)));        //Store contents pointed to by R0 or R1 to data address
+	write_direct(addr, m_idata.read_byte(r_reg(r)));        //Store contents pointed to by R0 or R1 to data address
 }
 
 //MOV data addr,R0 to R7                    /* 1: 1000 1rrr */
 void mcs51_cpu_device::mov_mem_r(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
-	m_intd.write_byte(addr, r_reg(r));                 //Store contents of R0 - R7 to data address
+	write_direct(addr, r_reg(r));                 //Store contents of R0 - R7 to data address
 }
 
 //MOV m_dptr, #data16                         /* 1: 1001 0000 */
@@ -743,27 +744,27 @@ void mcs51_cpu_device::mov_bitaddr_c(u8 r)
 void mcs51_cpu_device::mov_ir_mem(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
-	m_inti.write_byte(r_reg(r), m_intd.read_byte(addr));        //Store data from data address to address pointed to by R0 or R1
+	m_idata.write_byte(r_reg(r), read_direct(addr));        //Store data from data address to address pointed to by R0 or R1
 }
 
 //MOV R0 to R7, data addr                   /* 1: 1010 1rrr */
 void mcs51_cpu_device::mov_r_mem(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
-	set_reg(r, m_intd.read_byte(addr));               //Store to R0 - R7
+	set_reg(r, read_direct(addr));               //Store to R0 - R7
 }
 
 //MOV data addr, A                          /* 1: 1111 0101 */
 void mcs51_cpu_device::mov_mem_a(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
-	m_intd.write_byte(addr, m_acc);                      //Store A to data address
+	write_direct(addr, m_acc);                      //Store A to data address
 }
 
 //MOV @R0/@R1, A                            /* 1: 1111 011i */
 void mcs51_cpu_device::mov_ir_a(u8 r)
 {
-	m_inti.write_byte(r_reg(r), m_acc);                 //Store A to location pointed to by R0 or R1
+	m_idata.write_byte(r_reg(r), m_acc);                 //Store A to location pointed to by R0 or R1
 }
 
 //MOV R0 to R7, A                           /* 1: 1111 1rrr */
@@ -798,9 +799,8 @@ void mcs51_cpu_device::movc_a_iadptr(u8 r)
 //(Move External Ram 16 bit address to A)
 void mcs51_cpu_device::movx_a_idptr(u8 r)
 {
-//  u8 byte = m_data.read_byte(R_m_dptr);       //Grab 1 byte from External DATA memory pointed to by dptr
 	u32 addr = external_ram_iaddr(m_dptr, 0xffff);
-	u8 byte = m_data.read_byte(addr);         //Grab 1 byte from External DATA memory pointed to by dptr
+	u8 byte = m_xdata.read_byte(addr);         //Grab 1 byte from External DATA memory pointed to by dptr
 	acc_w(byte);                          //Store to ACC
 }
 
@@ -809,7 +809,7 @@ void mcs51_cpu_device::movx_a_idptr(u8 r)
 void mcs51_cpu_device::movx_a_ir(u8 r)
 {
 	u32 addr = external_ram_iaddr(r_reg(r), 0xff); //Grab address by reading location pointed to by R0 or R1
-	u8 byte = m_data.read_byte(addr);         //Grab 1 byte from External DATA memory pointed to by address
+	u8 byte = m_xdata.read_byte(addr);         //Grab 1 byte from External DATA memory pointed to by address
 	acc_w(byte);                          //Store to ACC
 }
 
@@ -817,9 +817,8 @@ void mcs51_cpu_device::movx_a_ir(u8 r)
 //(Move A to External Ram 16 bit address)
 void mcs51_cpu_device::movx_idptr_a(u8 r)
 {
-//  m_data.write_byte(R_m_dptr, m_acc);                 //Store m_acc to External DATA memory address pointed to by DPTR
 	u32 addr = external_ram_iaddr(m_dptr, 0xffff);
-	m_data.write_byte(addr, m_acc);                   //Store m_acc to External DATA memory address pointed to by DPTR
+	m_xdata.write_byte(addr, m_acc);                   //Store m_acc to External DATA memory address pointed to by DPTR
 }
 
 //MOVX @R0/@R1,A                            /* 1: 1111 001i */
@@ -827,7 +826,7 @@ void mcs51_cpu_device::movx_idptr_a(u8 r)
 void mcs51_cpu_device::movx_ir_a(u8 r)
 {
 	u32 addr = external_ram_iaddr(r_reg(r), 0xff); //Grab address by reading location pointed to by R0 or R1
-	m_data.write_byte(addr, m_acc);                   //Store m_acc to External DATA memory address
+	m_xdata.write_byte(addr, m_acc);                   //Store m_acc to External DATA memory address
 }
 
 //MUL AB                                    /* 1: 1010 0100 */
@@ -851,8 +850,8 @@ void mcs51_cpu_device::nop(u8 r)
 void mcs51_cpu_device::orl_mem_a(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
-	u8 data = m_intd.read_byte(addr);            //Grab data from data address
-	m_intd.write_byte(addr, data | m_acc);               //Set data address value to it's value Logical OR with ACC
+	u8 data = read_direct(addr);            //Grab data from data address
+	write_direct(addr, data | m_acc);               //Set data address value to it's value Logical OR with ACC
 }
 
 //ORL data addr, #data                      /* 1: 0100 0011 */
@@ -860,8 +859,8 @@ void mcs51_cpu_device::orl_mem_byte(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
 	u8 data = m_program.read_byte(m_pc++);           //Grab data
-	u8 srcdata = m_intd.read_byte(addr);         //Grab data from data address
-	m_intd.write_byte(addr, srcdata | data);           //Set data address value to it's value Logical OR with Data
+	u8 srcdata = read_direct(addr);         //Grab data from data address
+	write_direct(addr, srcdata | data);           //Set data address value to it's value Logical OR with Data
 }
 
 //ORL A, #data                              /* 1: 0100 0100 */
@@ -875,14 +874,14 @@ void mcs51_cpu_device::orl_a_byte(u8 r)
 void mcs51_cpu_device::orl_a_mem(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
-	u8 data = m_intd.read_byte(addr);            //Grab data from data address
+	u8 data = read_direct(addr);            //Grab data from data address
 	acc_w(m_acc | data);                    //Set ACC to value of ACC Logical OR with Data
 }
 
 //ORL A, @RO/@R1                            /* 1: 0100 011i */
 void mcs51_cpu_device::orl_a_ir(u8 r)
 {
-	u8 data = m_inti.read_byte(r_reg(r));       //Grab data from address R0 or R1 points to
+	u8 data = m_idata.read_byte(r_reg(r));       //Grab data from address R0 or R1 points to
 	acc_w(m_acc | data);                    //Set ACC to value of ACC Logical OR with Data
 }
 
@@ -914,8 +913,7 @@ void mcs51_cpu_device::orl_c_nbitaddr(u8 r)
 void mcs51_cpu_device::pop(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
-	m_intd.write_byte(addr, m_inti.read_byte(m_sp));              //Store to contents of data addr, data pointed to by Stack - m_inti.read_byte needed to access upper 128 bytes of stack
-	//m_inti.write_byte(addr, m_inti.read_byte(R_m_sp));         //Store to contents of data addr, data pointed to by Stack - doesn't work, sfr's are not restored this way and it's not an indirect access anyway
+	write_direct(addr, m_idata.read_byte(m_sp));              //Store to contents of data addr, data pointed to by Stack - m_idata.read_byte needed to access upper 128 bytes of stack
 	m_sp --;                                  //Decrement m_sp
 }
 
@@ -924,7 +922,7 @@ void mcs51_cpu_device::push(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
 	m_sp ++;                 //Grab and Increment Stack Pointer
-	m_inti.write_byte(m_sp, m_intd.read_byte(addr));           //Store to stack contents of data address - m_inti.write_byte needed to store to upper 128 bytes of stack, however, can't use m_inti.read_byte because that won't store the sfrs and it's not an indirect access anyway
+	m_idata.write_byte(m_sp, read_direct(addr));           //Store to stack contents of data address
 }
 
 //RET                                       /* 1: 0010 0010 */
@@ -1013,7 +1011,7 @@ void mcs51_cpu_device::subb_a_byte(u8 r)
 void mcs51_cpu_device::subb_a_mem(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
-	u8 data = m_intd.read_byte(addr);            //Grab data from data address
+	u8 data = read_direct(addr);            //Grab data from data address
 	u8 result = m_acc - data - BIT(m_psw, PSW_CY);   //Subtract data & carry flag from accumulator
 	do_sub_flags(m_acc, data, BIT(m_psw, PSW_CY));        //Set Flags
 	acc_w(result);                            //Store 8 bit result of addition in ACC
@@ -1022,7 +1020,7 @@ void mcs51_cpu_device::subb_a_mem(u8 r)
 //SUBB A, @R0/@R1                           /* 1: 1001 011i */
 void mcs51_cpu_device::subb_a_ir(u8 r)
 {
-	u8 data = m_inti.read_byte(r_reg(r));       //Grab data from memory pointed to by R0 or R1
+	u8 data = m_idata.read_byte(r_reg(r));       //Grab data from memory pointed to by R0 or R1
 	u8 result = m_acc - data - BIT(m_psw, PSW_CY);   //Subtract data & carry flag from accumulator
 	do_sub_flags(m_acc, data, BIT(m_psw, PSW_CY));        //Set Flags
 	acc_w(result);                            //Store 8 bit result of addition in ACC
@@ -1050,19 +1048,19 @@ void mcs51_cpu_device::swap_a(u8 r)
 void mcs51_cpu_device::xch_a_mem(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
-	u8 data = m_intd.read_byte(addr);            //Grab data
+	u8 data = read_direct(addr);            //Grab data
 	u8 oldacc = m_acc;                   //Hold value of ACC
 	acc_w(data);                              //Sets m_acc to data
-	m_intd.write_byte(addr, oldacc);                     //Sets data address to old value of ACC
+	write_direct(addr, oldacc);                     //Sets data address to old value of ACC
 }
 
 //XCH A, @RO/@R1                            /* 1: 1100 011i */
 void mcs51_cpu_device::xch_a_ir(u8 r)
 {
-	u8 data = m_inti.read_byte(r_reg(r));       //Grab data pointed to by R0 or R1
+	u8 data = m_idata.read_byte(r_reg(r));       //Grab data pointed to by R0 or R1
 	u8 oldacc = m_acc;                   //Hold value of ACC
 	acc_w(data);                              //Sets m_acc to data
-	m_inti.write_byte(r_reg(r), oldacc);                //Sets data address to old value of ACC
+	m_idata.write_byte(r_reg(r), oldacc);                //Sets data address to old value of ACC
 }
 
 //XCH A, RO to R7                           /* 1: 1100 1rrr */
@@ -1078,17 +1076,17 @@ void mcs51_cpu_device::xch_a_r(u8 r)
 void mcs51_cpu_device::xchd_a_ir(u8 r)
 {
 	u8 acc = m_acc;
-	u8 ir_data = m_inti.read_byte(r_reg(r));            //Grab data pointed to by R0 or R1
+	u8 ir_data = m_idata.read_byte(r_reg(r));            //Grab data pointed to by R0 or R1
 	acc_w((acc & 0xf0) | (ir_data & 0x0f)); //Set ACC to lower nibble of data pointed to by R0 or R1
-	m_inti.write_byte(r_reg(r), (ir_data & 0xf0) | (acc & 0x0f)); //Set data pointed to by R0 or R1 to lower nibble of ACC
+	m_idata.write_byte(r_reg(r), (ir_data & 0xf0) | (acc & 0x0f)); //Set data pointed to by R0 or R1 to lower nibble of ACC
 }
 
 //XRL data addr, A                          /* 1: 0110 0010 */
 void mcs51_cpu_device::xrl_mem_a(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
-	u8 data = m_intd.read_byte(addr);            //Grab data from data address
-	m_intd.write_byte(addr, data ^ m_acc);               //Set data address value to it's value Logical XOR with m_acc
+	u8 data = read_direct(addr);            //Grab data from data address
+	write_direct(addr, data ^ m_acc);               //Set data address value to it's value Logical XOR with m_acc
 }
 
 //XRL data addr, #data                      /* 1: 0110 0011 */
@@ -1096,8 +1094,8 @@ void mcs51_cpu_device::xrl_mem_byte(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
 	u8 data = m_program.read_byte(m_pc++);           //Grab data
-	u8 srcdata = m_intd.read_byte(addr);         //Grab data from data address
-	m_intd.write_byte(addr, srcdata ^ data);           //Set data address value to it's value Logical XOR with Data
+	u8 srcdata = read_direct(addr);         //Grab data from data address
+	write_direct(addr, srcdata ^ data);           //Set data address value to it's value Logical XOR with Data
 }
 
 //XRL A, #data                              /* 1: 0110 0100 */
@@ -1111,14 +1109,14 @@ void mcs51_cpu_device::xrl_a_byte(u8 r)
 void mcs51_cpu_device::xrl_a_mem(u8 r)
 {
 	u8 addr = m_program.read_byte(m_pc++);           //Grab data address
-	u8 data = m_intd.read_byte(addr);            //Grab data from data address
+	u8 data = read_direct(addr);            //Grab data from data address
 	acc_w(m_acc ^ data);                    //Set ACC to value of ACC Logical XOR with Data
 }
 
 //XRL A, @R0/@R1                            /* 1: 0110 011i */
 void mcs51_cpu_device::xrl_a_ir(u8 r)
 {
-	u8 data = m_inti.read_byte(r_reg(r));       //Grab data from address R0 or R1 points to
+	u8 data = m_idata.read_byte(r_reg(r));       //Grab data from address R0 or R1 points to
 	acc_w(m_acc ^ data);                    //Set ACC to value of ACC Logical XOR with Data
 }
 

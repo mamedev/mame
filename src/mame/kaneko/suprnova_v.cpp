@@ -3,7 +3,6 @@
 /* Super Kaneko Nova System video */
 
 #include "emu.h"
-#include "sknsspr.h"
 #include "suprnova.h"
 
 
@@ -340,8 +339,6 @@ void skns_state::video_start()
 	m_tilemap_B = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(skns_state::get_tilemap_B_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64,64);
 	m_tilemap_B->set_transparent_pen(0);
 
-	m_sprite_bitmap.allocate(1024,1024);
-
 	m_tilemap_bitmap_lower.allocate(320,240);
 	m_tilemap_bitmapflags_lower.allocate(320,240);
 
@@ -480,7 +477,7 @@ uint32_t skns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 				uint16_t const *const src2 = &m_tilemap_bitmap_higher.pix(y);
 				uint8_t const *const src2flags = &m_tilemap_bitmapflags_higher.pix(y);
 
-				uint16_t const *const src3 = &m_sprite_bitmap.pix(y);
+				uint16_t const *const src3 = &m_spritegen->bitmap().pix(y);
 
 				uint32_t *const dst = &bitmap.pix(y);
 
@@ -609,6 +606,6 @@ void skns_state::screen_vblank(int state)
 {
 	if (state)
 	{
-		m_spritegen->skns_draw_sprites(m_sprite_bitmap, m_screen->visible_area(), m_spriteram, m_spriteram.bytes(), m_spc_regs); // TODO: not all 0x4000 of the sprite RAM area can be displayed on real hardware
+		m_spritegen->draw_sprites(m_screen->visible_area(), m_spriteram, m_spriteram.bytes(), m_spc_regs); // TODO: not all 0x4000 of the sprite RAM area can be displayed on real hardware
 	}
 }

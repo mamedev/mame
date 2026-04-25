@@ -1373,7 +1373,6 @@ sdl_window_info::sdl_window_info(
 	, m_minimum_dim(0, 0)
 	, m_windowed_dim(0, 0)
 	, m_rendered_event(0, 1)
-	, m_extra_flags(0)
 	, m_mouse_captured(false)
 	, m_mouse_hidden(false)
 	, m_pointer_mask(0)

@@ -8,7 +8,8 @@ AC'97 v1.x (fixed 48 kHz)
 
 TODO:
 - dxdiag: sound test don't playback on lower modes;
-- diablo: ambient BGM doesn't work, SFXs don't playback from time to time;
+- diablo: dungeon ambient BGM and townspeople speech doesn't work
+  \- streaming LBA bank from .mpq is empty in both cases (?)
 - Missing features in Bank A (testable in dxdiag -> Music -> Trident PCI WaveTable MIDI);
 - Move DMA reading out of sound_stream_update;
 - Mix-in wave engine output to AC'97 input;
@@ -413,6 +414,29 @@ void t4dwave_pcm_device::device_reset()
 	m_miscint = 0;
 	m_aina = m_aintena = m_ainb = m_aintenb = 0;
 	m_bankA_keyon = m_bankB_keyon = 0;
+
+	for (int i = 0; i < 64; i++)
+	{
+		m_channel[i].lba = 0;
+		m_channel[i].cso = 0;
+		m_channel[i].eso_cache = 0;
+		std::fill(std::begin(m_channel[i].hso), std::end(m_channel[i].hso), 0);
+		std::fill(std::begin(m_channel[i].eso), std::end(m_channel[i].eso), 0);
+		m_channel[i].delta = 0;
+		m_channel[i].gvsel_cache = 0;
+		m_channel[i].gvsel = false;
+		m_channel[i].pan_control = false;
+		m_channel[i].pan_vol = 0;
+		m_channel[i].vol = 0;
+		m_channel[i].play_mode = 0;
+		m_channel[i].loop_enable = 0;
+		m_channel[i].ec_envelope = 0;
+		m_channel[i].pci_buf = 0;
+
+		m_channel[i].ticks = 0;
+		m_channel[i].sample_data = 0;
+		m_channel[i].dma_fetch = false;
+	}
 }
 
 // START_A & STOP_A
@@ -838,7 +862,6 @@ void t4dwave_pcm_device::sound_stream_update(sound_stream &stream)
 					}
 					if (channel.cso >= channel.eso[play_mode])
 					{
-						channel.cso = 0;
 						// ENDLP_IE
 						if (BIT(m_global_control, 12))
 						{
@@ -854,7 +877,14 @@ void t4dwave_pcm_device::sound_stream_update(sound_stream &stream)
 								m_bankB_keyon &= ~(1 << chB);
 							else
 								m_bankA_keyon &= ~(1 << ch);
+							// TODO: not entirely correct
+							// diablo: really wants CSO granularity being different depending on play mode
+							channel.cso = 0xffff;
 							continue;
+						}
+						else
+						{
+							channel.cso = 0;
 						}
 					}
 				}

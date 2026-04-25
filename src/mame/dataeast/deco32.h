@@ -309,8 +309,8 @@ private:
 	int sprite_bank_callback(int sprite);
 	u16 read_spritetile(int lookupram_offset);
 	u16 read_spriteformat(int spriteformatram_offset, u8 attr);
-	u16 read_spritetable(int offs, u8 attr, int whichlist);
-	u16 read_spritelist(int offs, int whichlist);
+	u16 read_spritetable(int offs, u8 attr);
+	u16 read_spritelist(int offs);
 	u16 read_cliptable(int offs, u8 attr);
 	int sprite_priority_callback(int priority);
 

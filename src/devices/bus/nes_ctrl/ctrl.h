@@ -62,10 +62,7 @@ public:
 	nes_control_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: nes_control_port_device(mconfig, tag, owner, (u32)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	nes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual ~nes_control_port_device();
@@ -81,7 +78,7 @@ public:
 	required_device<screen_device> m_screen;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	// devices
@@ -89,7 +86,7 @@ protected:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(NES_CONTROL_PORT, nes_control_port_device)
 
 void nes_control_port1_devices(device_slot_interface &device);

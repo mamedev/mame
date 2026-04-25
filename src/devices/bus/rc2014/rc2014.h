@@ -153,10 +153,7 @@ public:
 		: rc2014_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1,1))
 	{
 		m_bus.set_tag(std::forward<T>(bus_tag));
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(fixed);
+		set_options(std::forward<U>(slot_options), default_option, fixed);
 	}
 
 protected:
@@ -239,10 +236,7 @@ public:
 		: rc2014_ext_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1,1))
 	{
 		m_bus.set_tag(std::forward<T>(bus_tag));
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(fixed);
+		set_options(std::forward<U>(slot_options), default_option, fixed);
 	}
 
 protected:
@@ -304,10 +298,7 @@ public:
 		: rc2014_rc80_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1,1))
 	{
 		m_bus.set_tag(std::forward<T>(bus_tag));
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(fixed);
+		set_options(std::forward<U>(slot_options), default_option, fixed);
 	}
 
 protected:

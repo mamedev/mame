@@ -1580,7 +1580,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="tomathim" supported="no">
-		<description>Salad no Kuni no Tomato Hime</description>
+		<description>Salad no Kuni no Tomato-hime</description>
 		<year>1984?</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="alt_title" value="サラダの国のトマト姫"/>
@@ -1592,7 +1592,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="tomathima" cloneof="tomathim" supported="no">
-		<description>Salad no Kuni no Tomato Hime (alt)</description>
+		<description>Salad no Kuni no Tomato-hime (alt)</description>
 		<year>1984?</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="alt_title" value="サラダの国のトマト姫"/>

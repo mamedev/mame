@@ -354,6 +354,7 @@ protected:
 	int m_cpuid_max_input_value_eax; // Highest CPUID standard function available
 	uint32_t m_cpuid_id0, m_cpuid_id1, m_cpuid_id2;
 	uint32_t m_cpu_version;
+	uint32_t m_brand_id;
 	uint32_t m_feature_flags;
 	uint64_t m_tsc;
 	uint64_t m_perfctr[2];

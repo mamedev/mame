@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "tmp94c241.h"
-#include "tmp94c241_serial.h"
+
 #include "dasm900.h"
 
 #define LOG_DMA    (1U << 1)
@@ -24,6 +24,28 @@
 
 // device type definition
 DEFINE_DEVICE_TYPE(TMP94C241, tmp94c241_device, "tmp94c241", "Toshiba TMP94C241")
+
+enum : uint8_t
+{
+	INTE45   = 0,
+	INTE67   = 1,
+	INTE89   = 2,
+	INTEAB   = 3,
+	INTET01  = 4,
+	INTET23  = 5,
+	INTET45  = 6,
+	INTET67  = 7,
+	INTET89  = 8,
+	INTETAB  = 9,
+	INTES0   = 10,
+	INTES1   = 11,
+	INTETC01 = 12,
+	INTETC23 = 13,
+	INTETC45 = 14,
+	INTETC67 = 15,
+	INTE0AD  = 16,
+	INTNMWDT = 17,
+};
 
 const tmp94c241_device::irq_vector_entry tmp94c241_device::irq_vector_map[] =
 {
@@ -76,6 +98,7 @@ const tmp94c241_device::irq_vector_entry tmp94c241_device::irq_vector_map[] =
 
 tmp94c241_device::tmp94c241_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	tlcs900h_device(mconfig, TMP94C241, tag, owner, clock),
+	m_serial(*this, "serial%u", 0U),
 	m_an_read(*this, 0),
 	m_port_read(*this, 0),
 	m_port_write(*this),
@@ -115,8 +138,7 @@ tmp94c241_device::tmp94c241_device(const machine_config &mconfig, const char *ta
 	m_mamr{ 0, 0, 0, 0, 0, 0 },
 	m_dram_refresh{ 0, 0 },
 	m_dram_access{ 0, 0 },
-	m_da_drive(0),
-	m_serial(*this, "serial%u", 0U)
+	m_da_drive(0)
 {
 }
 
@@ -276,6 +298,9 @@ void tmp94c241_device::device_reset()
 	m_int_reg[INTES0] |= 0x80;
 	m_int_reg[INTES1] |= 0x80;
 	m_check_irqs = 1;
+
+	m_serial[0]->pffc_sclk_w(0);
+	m_serial[1]->pffc_sclk_w(0);
 }
 
 uint8_t tmp94c241_device::inte_r(offs_t offset)
@@ -782,12 +807,17 @@ template <uint8_t P>
 void tmp94c241_device::port_fc_w(uint8_t data)
 {
 	m_port_function[P] = data;
+	if (P == PORT_F)
+	{
+		m_serial[0]->pffc_sclk_w(BIT(data, 2));
+		m_serial[1]->pffc_sclk_w(BIT(data, 6));
+	}
 }
 
 void tmp94c241_device::device_add_mconfig(machine_config &mconfig)
 {
-	TMP94C241_SERIAL(mconfig, m_serial[0], 0, DERIVED_CLOCK(1, 1));
-	TMP94C241_SERIAL(mconfig, m_serial[1], 1, DERIVED_CLOCK(1, 1));
+	TMP94C241_SERIAL(mconfig, m_serial[0], DERIVED_CLOCK(1, 1), 0).setint_cb().set(FUNC(tmp94c241_device::set_intreg<INTES0>));
+	TMP94C241_SERIAL(mconfig, m_serial[1], DERIVED_CLOCK(1, 1), 1).setint_cb().set(FUNC(tmp94c241_device::set_intreg<INTES1>));
 }
 
 
@@ -925,6 +955,18 @@ void tmp94c241_device::internal_mem(address_map &map)
 	map(0x000156, 0x000156).rw(FUNC(tmp94c241_device::mamr_r<5>), FUNC(tmp94c241_device::mamr_w<5>));
 	map(0x000157, 0x000157).rw(FUNC(tmp94c241_device::msar_r<5>), FUNC(tmp94c241_device::msar_w<5>));
 	map(0x000400, 0x000bff).ram();
+}
+
+//-------------------------------------------------
+//  set_intreg - callback to set interrupt bits
+//  for peripheral
+//-------------------------------------------------
+
+template <uint8_t IntReg>
+void tmp94c241_device::set_intreg(uint8_t data)
+{
+	m_int_reg[IntReg] |= data;
+	m_check_irqs = 1;
 }
 
 //**************************************************************************

@@ -24,6 +24,8 @@ TODO:
 #include "cdrom.h"
 #include "sound/cdda.h"
 
+#include <algorithm>
+
 #define LOG_DECODES     (1U << 1)
 #define LOG_SAMPLES     (1U << 2)
 #define LOG_COMMANDS    (1U << 3)
@@ -354,8 +356,8 @@ void cdicdic_device::play_cdda_sector(const uint8_t *data)
 	const uint16_t NUM_SAMPLES = SECTOR_SIZE / 4;
 	for (uint16_t i = 0; i < NUM_SAMPLES; i++)
 	{
-		m_samples[0][i] = (int16_t)((data[(i * 4) + 1] << 8) | data[(i * 4) + 0]);
-		m_samples[1][i] = (int16_t)((data[(i * 4) + 3] << 8) | data[(i * 4) + 2]);
+		m_samples[0][i] = int16_t((data[(i * 4) + 1] << 8) | data[(i * 4) + 0]);
+		m_samples[1][i] = int16_t((data[(i * 4) + 3] << 8) | data[(i * 4) + 2]);
 	}
 
 	m_dmadac[0]->transfer(0, 1, 1, NUM_SAMPLES, &m_samples[0][0]);
@@ -1187,11 +1189,12 @@ void cdicdic_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 }
 
 
-void cdicdic_device::atten_w(uint32_t state) {
-	m_atten[0] = (state & 0xFF000000) >> 24;
-	m_atten[1] = (state & 0x00FF0000) >> 16;
-	m_atten[2] = (state & 0x0000FF00) >> 8;
-	m_atten[3] = (state & 0x000000FF);
+void cdicdic_device::atten_w(uint32_t state)
+{
+	m_atten[0] = (state & 0xff000000) >> 24;
+	m_atten[1] = (state & 0x00ff0000) >> 16;
+	m_atten[2] = (state & 0x0000ff00) >> 8;
+	m_atten[3] = (state & 0x000000ff);
 }
 
 void cdicdic_device::init_disc_read(uint8_t disc_mode)

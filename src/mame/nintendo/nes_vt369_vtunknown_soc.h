@@ -13,12 +13,23 @@
 class vt3xx_soc_base_device : public nes_vt02_vt03_soc_device
 {
 public:
-	vt3xx_soc_base_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+	vt3xx_soc_base_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	auto io_4153_read_callback() { return m_io_4153_read_callback.bind(); }
+	auto io_4153_write_callback() { return m_io_4153_write_callback.bind(); }
+	auto io_4152_read_callback() { return m_io_4152_read_callback.bind(); }
+	auto io_4152_write_callback() { return m_io_4152_write_callback.bind(); }
+	auto io_4139_read_callback() { return m_io_413x_read_callback.bind(); }
+	auto io_4139_write_callback() { return m_io_413x_write_callback.bind(); }
+	auto io_414a_read_callback() { return m_io_414a_read_callback.bind(); }
+	auto io_414a_write_callback() { return m_io_414a_write_callback.bind(); }
+	auto io_414b_read_callback() { return m_io_414b_read_callback.bind(); }
+	auto io_414b_write_callback() { return m_io_414b_write_callback.bind(); }
 
 protected:
-	vt3xx_soc_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock);
+	vt3xx_soc_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	void device_start() override ATTR_COLD;
 	void device_reset() override ATTR_COLD;
 
@@ -29,11 +40,24 @@ protected:
 
 	u8 vt369_414f_r();
 
-	u8 extra_rom_prot_4150_r();
-	u8 extra_rom_prot_4152_r();
-	u8 extra_rom_prot_4153_r();
-	void extra_rom_prot_4150_w(u8 data);
-	void extra_rom_prot_4152_w(u8 data);
+	u8 vt_415x_port_direction_r();
+	u8 vt_4152_port_in_r();
+	u8 vt_4153_port_in_r();
+	void vt_415x_port_direction_w(u8 data);
+	void vt_4152_port_out_w(u8 data);
+	void vt_4153_port_out_w(u8 data);
+
+	u8 vt_413x_port_direction_r();
+	void vt_413x_port_direction_w(u8 data);
+	void vt_413x_port_out_w(u8 data);
+	u8 vt_413x_port_in_r();
+
+	u8 vt_414x_port_direction_r();
+	void vt_414x_port_direction_w(u8 data);
+	void vt_414b_port_out_w(u8 data);
+	u8 vt_414b_port_in_r();
+	void vt_414a_port_out_w(u8 data);
+	u8 vt_414a_port_in_r();
 
 	void extra_io_41e6_w(u8 data);
 
@@ -57,7 +81,7 @@ protected:
 
 private:
 	void vt369_sound_map(address_map &map) ATTR_COLD;
-	void vt369_sound_external_map(address_map& map) ATTR_COLD;
+	void vt369_sound_external_map(address_map &map) ATTR_COLD;
 
 	u8 sound_read_external(offs_t offset) { return this->space(AS_PROGRAM).read_byte(get_relative() + offset); }
 
@@ -94,6 +118,17 @@ private:
 	u8 m_bank6000 = 0;
 	u8 m_bank6000_enable = 0;
 
+	u8 m_415x_port_direction;
+	u8 m_4152_port_data;
+	u8 m_4153_port_data;
+
+	u8 m_413x_port_direction;
+	u8 m_413x_port_data;
+
+	u8 m_414x_port_direction;
+	u8 m_414a_port_data;
+	u8 m_414b_port_data;
+
 	u16 m_timerperiod;
 	u8 m_timercontrol;
 	u8 m_alu_params[8];
@@ -110,18 +145,28 @@ private:
 	required_device<vt369_adpcm_decoder_device> m_vt369adpcm;
 	required_device<dac_16bit_r2r_twos_complement_device> m_leftdac;
 	required_device<dac_16bit_r2r_twos_complement_device> m_rightdac;
+	devcb_read8 m_io_4152_read_callback;
+	devcb_write8 m_io_4152_write_callback;
+	devcb_read8 m_io_4153_read_callback;
+	devcb_write8 m_io_4153_write_callback;
+	devcb_write8 m_io_413x_write_callback;
+	devcb_read8 m_io_413x_read_callback;
+	devcb_read8 m_io_414a_read_callback;
+	devcb_write8 m_io_414a_write_callback;
+	devcb_read8 m_io_414b_read_callback;
+	devcb_write8 m_io_414b_write_callback;
 };
 
 class vt369_soc_introm_noswap_device : public vt3xx_soc_base_device
 {
 public:
-	vt369_soc_introm_noswap_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+	vt369_soc_introm_noswap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	vt369_soc_introm_noswap_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock);
+	vt369_soc_introm_noswap_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void vt369_introm_map(address_map &map) ATTR_COLD;
 
@@ -134,7 +179,7 @@ protected:
 class vt369_soc_introm_swap_device : public vt369_soc_introm_noswap_device
 {
 public:
-	vt369_soc_introm_swap_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+	vt369_soc_introm_swap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -143,7 +188,7 @@ protected:
 class vt369_soc_introm_altswap_device : public vt369_soc_introm_noswap_device
 {
 public:
-	vt369_soc_introm_altswap_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+	vt369_soc_introm_altswap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -152,12 +197,12 @@ protected:
 class vt369_soc_introm_vibesswap_device : public vt369_soc_introm_noswap_device
 {
 public:
-	vt369_soc_introm_vibesswap_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+	vt369_soc_introm_vibesswap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	vt369_soc_introm_vibesswap_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock);
+	vt369_soc_introm_vibesswap_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
 private:
@@ -169,30 +214,51 @@ private:
 class vt369_soc_introm_gbox2020_device : public vt369_soc_introm_vibesswap_device
 {
 public:
-	vt369_soc_introm_gbox2020_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+	vt369_soc_introm_gbox2020_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
+
+private:
+	void gbox_411c_w(u8 data);
+
+	void nes_vt_gbox_map(address_map &map) ATTR_COLD;
 };
 
 class vt369_soc_introm_s10swap_device : public vt369_soc_introm_vibesswap_device
 {
 public:
-	vt369_soc_introm_s10swap_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+	vt369_soc_introm_s10swap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
 };
 
+class vt369_soc_introm_rsps300swap_device : public vt369_soc_introm_noswap_device
+{
+public:
+	vt369_soc_introm_rsps300swap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+
+	void rsps_411c_w(u8 data);
+
+	void nes_vt_rsps_map(address_map &map) ATTR_COLD;
+
+};
+
 class vt3xx_soc_unk_dg_device : public vt3xx_soc_base_device
 {
 public:
-	vt3xx_soc_unk_dg_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+	vt3xx_soc_unk_dg_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	vt3xx_soc_unk_dg_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock);
+	vt3xx_soc_unk_dg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_add_mconfig(machine_config& config) override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	void nes_vt_dg_map(address_map &map) ATTR_COLD;
 
@@ -208,6 +274,7 @@ DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_ALTSWAP,   vt369_soc_introm_altswap_device)
 DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_VIBESSWAP,   vt369_soc_introm_vibesswap_device)
 DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_GBOX2020,   vt369_soc_introm_gbox2020_device)
 DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_S10SWAP,   vt369_soc_introm_s10swap_device)
+DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_RSPS300SWAP,   vt369_soc_introm_rsps300swap_device)
 
 DECLARE_DEVICE_TYPE(VT3XX_SOC_UNK_DG, vt3xx_soc_unk_dg_device)
 

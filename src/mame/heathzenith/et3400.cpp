@@ -256,10 +256,10 @@ void et3400_state::et3400(machine_config &config)
 /* ROM definition */
 ROM_START( et3400 )
 	ROM_REGION( 0x1420, "roms", 0 )
-	ROM_LOAD( "monitor.u105",      0x0000, 0x0800, CRC(e4142682) SHA1(785966018dd6eb097ed9bd5c7def2354ab4347db) )
-	ROM_LOAD( "basic.u106",        0x0800, 0x0800, CRC(bbd6a801) SHA1(088da24bd4d923d4f196b993154c538835d10605) )
-	ROM_LOAD( "et3400.ic12",       0x1000, 0x0400, CRC(2eff1f58) SHA1(38b655de7393d7a92b08276f7c14a99eaa2a4a9f) )
-	ROM_LOAD_OPTIONAL("prom.u108", 0x1400, 0x0020, CRC(273025c3) SHA1(136c1cdce2a4a796c1c46e8ea4f798cdee4b549b) ) // not used
+	ROM_LOAD( "monitor.u105", 0x0000, 0x0800, CRC(e4142682) SHA1(785966018dd6eb097ed9bd5c7def2354ab4347db) )
+	ROM_LOAD( "basic.u106",   0x0800, 0x0800, CRC(bbd6a801) SHA1(088da24bd4d923d4f196b993154c538835d10605) )
+	ROM_LOAD( "et3400.ic12",  0x1000, 0x0400, CRC(2eff1f58) SHA1(38b655de7393d7a92b08276f7c14a99eaa2a4a9f) )
+	ROM_LOAD( "prom.u108",    0x1400, 0x0020, CRC(273025c3) SHA1(136c1cdce2a4a796c1c46e8ea4f798cdee4b549b) ) // not used
 ROM_END
 
 } // Anonymous namespace

@@ -46,7 +46,7 @@
 		}
 
 		buildoptions {
-			"-m64",
+			"$(MPARAM)",
 		}
 
 		configuration "Debug"
@@ -86,8 +86,8 @@
 			links       { "CoreServices.framework" }
 
 		configuration { "macosx", "gmake" }
-			buildoptions { "-mmacosx-version-min=10.6" }
-			linkoptions  { "-mmacosx-version-min=10.6" }
+			buildoptions { "-mmacosx-version-min=11.0" }
+			linkoptions  { "-mmacosx-version-min=11.0" }
 
 		configuration {}
 

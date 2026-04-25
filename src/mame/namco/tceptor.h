@@ -5,8 +5,11 @@
 
 #pragma once
 
-#include "sound/namco.h"
 #include "namco_c45road.h"
+
+#include "sound/namco.h"
+#include "video/bufsprite.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -53,7 +56,7 @@ private:
 	required_shared_ptr<uint8_t> m_tile_attr;
 	required_shared_ptr<uint8_t> m_bg_ram;
 	required_shared_ptr<uint8_t> m_m68k_shared_ram;
-	required_shared_ptr<uint16_t> m_sprite_ram;
+	required_device<buffered_spriteram16_device> m_sprite_ram;
 
 	required_device<namco_c45_road_device> m_c45_road;
 	required_device<screen_device> m_screen;
@@ -75,10 +78,9 @@ private:
 	int32_t m_bg_scroll_x[2]{};
 	int32_t m_bg_scroll_y[2]{};
 	bitmap_ind16 m_temp_bitmap;
-	std::unique_ptr<uint16_t[]> m_sprite_ram_buffered;
 	std::unique_ptr<uint8_t[]> m_decoded_16;
 	std::unique_ptr<uint8_t[]> m_decoded_32;
-	int m_is_mask_spr[1024/16]{};
+	bool m_is_mask_spr[1024/16]{};
 
 	uint8_t m68k_shared_r(offs_t offset);
 	void m68k_shared_w(offs_t offset, uint8_t data);
@@ -102,8 +104,8 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	void tceptor_palette(palette_device &palette);
-	uint32_t screen_update_tceptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_vblank_tceptor(int state);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_vblank(int state);
 	INTERRUPT_GEN_MEMBER(m6809_vb_interrupt);
 	INTERRUPT_GEN_MEMBER(m68k_vb_interrupt);
 	INTERRUPT_GEN_MEMBER(mcu_vb_interrupt);

@@ -293,6 +293,17 @@ void pc6001_state::joystick_out_w(uint8_t data)
 	m_joystick_out = data;
 }
 
+uint8_t pc6001_state::portc0_r()
+{
+	// bit 0: RS232 carrier detect
+	// bit 1: printer ready
+	uint8_t data = 0xfd;
+	if (!m_centronics_busy)
+		data |= 0x02;
+
+	return data;
+}
+
 void pc6001_state::pc6001_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -313,6 +324,7 @@ void pc6001_state::pc6001_io(address_map &map)
 	map(0xa2, 0xa2).mirror(0x0c).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0xa3, 0xa3).mirror(0x0c).nopw();
 	map(0xb0, 0xb0).mirror(0x0f).w(FUNC(pc6001_state::system_latch_w));
+	map(0xc0, 0xc0).mirror(0x0f).r(FUNC(pc6001_state::portc0_r));
 }
 
 /*****************************************
@@ -788,6 +800,7 @@ void pc6001mk2_state::pc6001mk2_io(address_map &map)
 
 	map(0xb0, 0xb0).mirror(0x0f).w(FUNC(pc6001mk2_state::mk2_system_latch_w));
 
+	map(0xc0, 0xc0).mirror(0x0f).r(FUNC(pc6001_state::portc0_r));
 	map(0xc0, 0xc0).w(FUNC(pc6001mk2_state::mk2_col_bank_w));
 	map(0xc1, 0xc1).w(FUNC(pc6001mk2_state::mk2_vram_bank_w));
 	map(0xc2, 0xc2).w(FUNC(pc6001mk2_state::mk2_opt_bank_w));
@@ -1078,6 +1091,7 @@ void pc6001mk2sr_state::pc6001mk2sr_io(address_map &map)
 	map(0xb2, 0xb2).r(FUNC(pc6001mk2sr_state::hw_rev_r));
 
 	map(0xb8, 0xbf).ram().share("irq_vectors");
+	map(0xc0, 0xc0).r(FUNC(pc6001_state::portc0_r));
 //  map(0xc0, 0xc0).w(FUNC(pc6001mk2sr_state::mk2_col_bank_w));
 	map(0xc1, 0xc1).w(FUNC(pc6001mk2sr_state::crt_mode_w));
 //  map(0xc2, 0xc2).w(FUNC(pc6001mk2sr_state::opt_bank_w));
@@ -1352,12 +1366,13 @@ uint8_t pc6001_state::ppi_portb_r()
 
 void pc6001_state::ppi_portb_w(uint8_t data)
 {
-	//printf("ppi_portb_w %02x\n",data);
+	m_cent_data_out->write(~data);
 }
 
 void pc6001_state::ppi_portc_w(uint8_t data)
 {
 	//printf("ppi_portc_w %02x\n",data);
+	m_centronics->write_strobe(BIT(~data, 0));
 }
 
 uint8_t pc6001_state::ppi_portc_r()
@@ -1526,6 +1541,11 @@ void pc6001_state::machine_start()
 inline void pc6001_state::set_videoram_bank(uint32_t offs)
 {
 	m_video_base = m_region_maincpu->base() + offs;
+}
+
+void pc6001_state::write_centronics_busy(int state)
+{
+	m_centronics_busy = state;
 }
 
 inline void pc6001_state::default_cartridge_reset()
@@ -1750,6 +1770,12 @@ void pc6001_state::pc6001(machine_config &config)
 	m_ay->port_b_read_callback().set(FUNC(pc6001_state::joystick_out_r));
 	m_ay->port_b_write_callback().set(FUNC(pc6001_state::joystick_out_w));
 	m_ay->add_route(ALL_OUTPUTS, "mono", 1.00);
+
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(pc6001_state::write_centronics_busy));
+
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	// TODO: accurate timing on this
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(pc6001_state::keyboard_callback), attotime::from_hz(250));

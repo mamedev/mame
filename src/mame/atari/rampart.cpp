@@ -64,10 +64,13 @@ public:
 		m_mob(*this, "mob"),
 		m_oki(*this, "oki"),
 		m_ym2413(*this, "ymsnd"),
+		m_io_p3(*this, "P3"),
 		m_bitmap(*this, "bitmap")
 	{ }
 
-	void rampart(machine_config &config);
+	void rampart(machine_config &config) ATTR_COLD;
+
+	template <unsigned N> ioport_value p3_r() { return BIT(m_io_p3->read(), N); }
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -82,6 +85,7 @@ private:
 	required_device<atari_motion_objects_device> m_mob;
 	required_device<okim6295_device> m_oki;
 	required_device<ym2413_device> m_ym2413;
+	required_ioport m_io_p3;
 
 	required_shared_ptr<u16> m_bitmap;
 
@@ -332,13 +336,14 @@ void rampart_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( rampart )
 	PORT_START("IN0")
-	PORT_BIT( 0x0401, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) // 0x400 is tied to IN0 0x01
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(rampart_state::p3_r<0>));
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(rampart_state::p3_r<1>));
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00f0, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(rampart_state::p3_r<0>));
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -349,9 +354,13 @@ static INPUT_PORTS_START( rampart )
 	PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CONDITION("IN0", 0x02, EQUALS, 0x02) // 0x400 is tied to IN0 0x02
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(rampart_state::p3_r<1>));
 	PORT_SERVICE( 0x0800, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P3") // these are wired in two places
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3) // IN0 0x0001 and IN0 0x0400
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3) // IN0 0x0002 and IN1 0x0400
 
 	PORT_START("TRACK0")
 	PORT_BIT( 0x00ff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(2)
@@ -418,6 +427,9 @@ static INPUT_PORTS_START( rampartj )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("TRACK0")
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )

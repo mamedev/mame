@@ -6695,6 +6695,65 @@ ROM_START( fvipersb ) /* Fighting Vipers Revision B, Model 2B, Sega Game ID# 833
 	ROM_LOAD16_WORD_SWAP("mpr-18632.35", 0x600000, 0x200000, CRC(39da6805) SHA1(9e9523b7c2bc50f869d062f80955da1281951299) )
 ROM_END
 
+ROM_START( fvipersa ) /* Fighting Vipers Revision A, Model 2B, Sega Game ID# 833-12359 FIGHTING VIPERS, ROM board ID# 834-12360 */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_LOAD32_WORD("epr-18606a.15", 0x000000, 0x020000, CRC(5fc2fb9f) SHA1(c377e8ac84ea29871c0c06705f58a34ee6722ef8) )
+	ROM_LOAD32_WORD("epr-18607a.16", 0x000002, 0x020000, CRC(686796ea) SHA1(4746ebb4511a37ae9b91d9977804b0fd8a12b693) )
+	ROM_LOAD32_WORD("epr-18604a.13", 0x040000, 0x020000, CRC(90f2e5Cb) SHA1(e33c7525943e332ea9185850a78851d35a6ee92d) )
+	ROM_LOAD32_WORD("epr-18605a.14", 0x040002, 0x020000, CRC(50d87a6b) SHA1(817d6a607f981c981824ad62b4fb2a9ee70f4153) )
+
+	ROM_REGION32_LE( 0x2000000, "main_data", 0 ) // Data
+	ROM_LOAD32_WORD("mpr-18614.11",    0x0000000, 0x400000, CRC(0ebc899f) SHA1(49c80b11b207cba4ec10fbb7cc140f3a5b039e82) )
+	ROM_LOAD32_WORD("mpr-18615.12",    0x0000002, 0x400000, CRC(018abdb7) SHA1(59e5b6378404e10ace4f3675428d61d3ae9d1963) )
+	ROM_LOAD32_WORD("mpr-18612.9",     0x0800000, 0x400000, CRC(1f174cd1) SHA1(89b56dd2f350edd093dc06f4cc258652c26b1d45) )
+	ROM_LOAD32_WORD("mpr-18613.10",    0x0800002, 0x400000, CRC(f057cdf2) SHA1(e16d5de2a00670aba4fbe0dc88ccf317de9842be) )
+	ROM_LOAD32_WORD("epr-18610a.7",    0x1000000, 0x080000, CRC(d65408a0) SHA1(9ddd15b49f6cd981bcea7776130d96eac59af396) )
+	ROM_LOAD32_WORD("epr-18611a.8",    0x1000002, 0x080000, CRC(d1b0194c) SHA1(1486fd316edc156fda238d2f02f2c4f652e9a589) )
+	ROM_COPY( "main_data", 0x1000000, 0x1100000, 0x100000 )
+	ROM_COPY( "main_data", 0x1000000, 0x1200000, 0x100000 )
+	ROM_COPY( "main_data", 0x1000000, 0x1300000, 0x100000 )
+	ROM_COPY( "main_data", 0x1000000, 0x1400000, 0x100000 )
+	ROM_COPY( "main_data", 0x1000000, 0x1500000, 0x100000 )
+	ROM_COPY( "main_data", 0x1000000, 0x1600000, 0x100000 )
+	ROM_COPY( "main_data", 0x1000000, 0x1700000, 0x100000 )
+	ROM_LOAD32_WORD("epr-18608a.5",    0x1800000, 0x080000, CRC(dd082af6) SHA1(36bd4d2558ba27f52e24dd2c6fdcafdf55943029) )
+	ROM_LOAD32_WORD("epr-18609a.6",    0x1800002, 0x080000, CRC(3f69b77c) SHA1(9f234382847f2ab646d10d7b6160047118d29b09) )
+	ROM_COPY( "main_data", 0x1800000, 0x1900000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1a00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1b00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1c00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1d00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1e00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1f00000, 0x100000 )
+
+	ROM_REGION32_LE( 0x800000, "copro_data", 0 ) // Copro extra data (collision/height map/etc)
+	ROM_LOAD32_WORD("mpr-18622.29", 0x000000, 0x200000, CRC(c74d99e3) SHA1(9914be9925b86af6af670745b5eba3a9e4f24af9) )
+	ROM_LOAD32_WORD("mpr-18623.30", 0x000002, 0x200000, CRC(746ae931) SHA1(a6f0f589ad174a34493ee24dc0cb509ead3aed70) )
+
+	ROM_REGION( 0x1000000, "polygons", 0 ) // Models
+	ROM_LOAD32_WORD("mpr-18616.17", 0x000000, 0x200000, CRC(15a239be) SHA1(1a33c48f99eed20da4b622219d21ec5995acc9aa) )
+	ROM_LOAD32_WORD("mpr-18619.21", 0x000002, 0x200000, CRC(9d5e8e2b) SHA1(f79ae0a7b966ddb0948b464d233845d4f362a2e7) )
+	ROM_LOAD32_WORD("mpr-18617.18", 0x400000, 0x200000, CRC(a62cab7d) SHA1(f20a545148f2a1d6f4f1c897f1ed82ad17429dce) )
+	ROM_LOAD32_WORD("mpr-18620.22", 0x400002, 0x200000, CRC(4d432afd) SHA1(30a1ef1e309a163b2d8756810fc33debf069141c) )
+	ROM_LOAD32_WORD("mpr-18618.19", 0x800000, 0x200000, CRC(adab589f) SHA1(67818ec4185da17f1549fb3a125cade267a46a48) )
+	ROM_LOAD32_WORD("mpr-18621.23", 0x800002, 0x200000, CRC(f5eeaa95) SHA1(38d7019afcef6dbe292354d717fd49da511cbc2b) )
+
+	ROM_REGION( 0x1000000, "textures", 0 ) // Textures
+	ROM_LOAD32_WORD("mpr-18626.27", 0x000000, 0x200000, CRC(9df0a961) SHA1(d8fb4bbbdc00303330047be380a79da7838d4fd5) )
+	ROM_LOAD32_WORD("mpr-18624.25", 0x000002, 0x200000, CRC(1d74433e) SHA1(5b6d2d17609ae741546d99d40f575bb24d62b5d3) )
+	ROM_LOAD32_WORD("mpr-18627.28", 0x800000, 0x200000, CRC(946175a0) SHA1(8b6e5e1342f98c9c6f2f7d61e843275d244f331a) )
+	ROM_LOAD32_WORD("mpr-18625.26", 0x800002, 0x200000, CRC(182fd572) SHA1(b09a682eff7e835ff8c33aaece12f3727a91dd5e) )
+
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-18628.31", 0x000000, 0x080000, CRC(aa7dd79f) SHA1(d8bd1485273652d7c2a303bbdcdf607d3b530283) )
+
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-18629.32", 0x000000, 0x200000, CRC(5d0006cc) SHA1(f6d2552ffc5473836aafb06735b62f65ef8f5ef5) )
+	ROM_LOAD16_WORD_SWAP("mpr-18630.33", 0x200000, 0x200000, CRC(9d405615) SHA1(7e7ffbb4ec080a0815c6ca49b9d8efe1f676203b) )
+	ROM_LOAD16_WORD_SWAP("mpr-18631.34", 0x400000, 0x200000, CRC(9dae5b45) SHA1(055ac989eafb81749326520d0be264f7a984c627) )
+	ROM_LOAD16_WORD_SWAP("mpr-18632.35", 0x600000, 0x200000, CRC(39da6805) SHA1(9e9523b7c2bc50f869d062f80955da1281951299) )
+ROM_END
+
 ROM_START( daytona ) /* Daytona USA (Japan, Revision A), Original Model 2 w/Model 1 sound board, Sega Game ID# 833-10651 DAYTONA TWIN, ROM board ID# 834-10798 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-16722a.12", 0x000000, 0x020000, CRC(48b94318) SHA1(a476a9a3531beef760c88c9634ed4a7d270e8ee7) )
@@ -7625,6 +7684,7 @@ GAME( 1994, vstriker,   0,        model2b,      vstriker,  model2b_state, empty_
 GAME( 1994, vstrikero,  vstriker, model2b,      vstriker,  model2b_state, empty_init,    ROT0, "Sega",   "Virtua Striker", 0 )
 GAME( 1995, fvipers,    0,        model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Fighting Vipers (Revision D)", MACHINE_NOT_WORKING )
 GAME( 1995, fvipersb,   fvipers,  model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Fighting Vipers (Revision B)", MACHINE_NOT_WORKING )
+GAME( 1995, fvipersa,   fvipers,  model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Fighting Vipers (Revision A)", MACHINE_NOT_WORKING )
 GAME( 1995, gunblade,   0,        gunblade,     gunblade,  model2b_state, empty_init,    ROT0, "Sega",   "Gunblade NY (Revision A)", 0 )
 GAMEL(1995, indy500,    0,        indy500,      indy500,   model2b_state, empty_init,    ROT0, "Sega",   "INDY 500 Twin (Revision A, Newer)", MACHINE_NOT_WORKING, layout_vr)
 GAMEL(1995, indy500d,   indy500,  indy500,      indy500,   model2b_state, empty_init,    ROT0, "Sega",   "INDY 500 Deluxe (Revision A)", MACHINE_NOT_WORKING, layout_vr)

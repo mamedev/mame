@@ -220,6 +220,18 @@ if SOUNDS["CEM3320"] then
 end
 
 ---------------------------------------------------
+-- CEM 3340 voltage-controlled oscillator chip
+--@src/devices/sound/cem3340.h,SOUNDS["CEM3340"] = true
+---------------------------------------------------
+
+if SOUNDS["CEM3340"] then
+	files {
+		MAME_DIR .. "src/devices/sound/cem3340.cpp",
+		MAME_DIR .. "src/devices/sound/cem3340.h",
+	}
+end
+
+---------------------------------------------------
 -- CEM 3360 dual voltage-controlled amplifier chip
 --@src/devices/sound/cem3320.h,SOUNDS["CEM3360"] = true
 ---------------------------------------------------

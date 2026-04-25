@@ -77,6 +77,13 @@ void pc_lpt_device::device_add_mconfig(machine_config &config)
 
 uint8_t pc_lpt_device::data_r()
 {
+	// SPP PS/2 bidirectional mode, bit 5 is also known as direction control
+	// cfr. IEEE-1284 1994 spec (page 19) and National "Application Note 062" (page 4)
+	if (!(m_control & CONTROL_OUTPUT_ENABLED))
+	{
+		return m_cent_data_in->read();
+	}
+
 	// pull up mechanism for input lines, zeros are provided by peripheral
 	return m_data & m_cent_data_in->read();
 }

@@ -10,6 +10,8 @@
 
 #include "emu.h"
 
+#include "mahjong.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "video/mc6845.h"
@@ -55,7 +57,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<hd6845s_device> m_crtc;
 	required_device<dac_byte_interface> m_dac;
-	required_ioport_array<6> m_io_key;
+	required_ioport_array<5> m_io_key;
 
 	// memory
 	required_region_ptr<uint8_t> m_samples_region;
@@ -237,14 +239,14 @@ void mjsister_state::input_sel2_w(uint8_t data)
 
 uint8_t mjsister_state::keys_r()
 {
-	uint8_t ret = 0;
 	const uint8_t p = m_input_sel1 & 0x3f;
 	//  p |= ((m_input_sel2 & 8) << 4) | ((m_input_sel2 & 0x20) << 1);
 
-	for (int i = 0; i < 6; i++)
+	uint8_t ret = 0;
+	for (int i = 0; i < 5; i++)
 	{
-		if (BIT(p, i))
-			ret |= m_io_key[i]->read();
+		if ((m_io_key[i]->read() & p) != p)
+			ret |= 1 << i;
 	}
 
 	return ret;
@@ -326,54 +328,7 @@ static INPUT_PORTS_START( mjsister )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper") PORT_CODE(KEYCODE_8) // only tested in service mode?
 
-	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_B )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_C )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_D )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_LAST_CHANCE )
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_E )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_F )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_G )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_H )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_SCORE )
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_I )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_J )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_L )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_DOUBLE_UP )
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_M )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_N )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_PON )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_FLIP_FLOP )
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_RON )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_BIG )
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("KEY5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_BET )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_SMALL )
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
-
+	PORT_INCLUDE(mahjong_matrix_1p_bet_wup);
 INPUT_PORTS_END
 
 /*************************************

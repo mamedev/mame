@@ -171,7 +171,7 @@ private:
 };
 
 hp9133_device::hp9133_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t{mconfig, HP9133, tag, owner, clock},
+	device_t{mconfig, GPIB_HP9133, tag, owner, clock},
 	device_ieee488_interface{mconfig, *this},
 	m_cpu{*this, "cpu"},
 	m_gpib{*this, "i8291a"},
@@ -876,4 +876,4 @@ const tiny_rom_entry *hp9133_device::device_rom_region() const
 
 } // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(HP9133, device_ieee488_interface, hp9133_device, "hp9133", "HP9133 Floppy/Fixed disk drive")
+DEFINE_DEVICE_TYPE_PRIVATE(GPIB_HP9133, device_ieee488_interface, hp9133_device, "hp9133", "HP9133 Floppy/Fixed disk drive")

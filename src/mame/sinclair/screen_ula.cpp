@@ -84,7 +84,7 @@ void screen_ula_device::draw_border(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 }
 
-void screen_ula_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool flash, u8 pcode)
+void screen_ula_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 pcode)
 {
 	rectangle clip = { m_ula_clip_x1 << 1, (m_ula_clip_x2 << 1) | 1, m_ula_clip_y1, m_ula_clip_y2 };
 	clip.offset(m_offset_h, m_offset_v);
@@ -95,7 +95,10 @@ void screen_ula_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const 
 		if (screen_mode() == 6)
 			draw_hires(bitmap, clip, screen.priority(), pcode);
 		else
+		{
+			const bool flash = u64(screen.frame_number() / FLASH_FRAME_INVERT_COUNT) & 1;
 			draw_ula(bitmap, clip, flash, screen.priority(), pcode);
+		}
 	}
 }
 

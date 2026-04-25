@@ -33,6 +33,7 @@ coleco_expansion_device::coleco_expansion_device(const machine_config &mconfig, 
 	m_nmi_handler(*this),
 	m_card(nullptr)
 {
+	set_options(coleco_expansion_cards, nullptr, false);
 }
 
 coleco_expansion_device::~coleco_expansion_device()

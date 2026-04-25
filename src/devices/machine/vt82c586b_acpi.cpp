@@ -41,11 +41,16 @@ TODO:
 DEFINE_DEVICE_TYPE(VT82C586B_ACPI, vt82c586b_acpi_device, "vt82c586b_acpi", "VT82C586B \"PIPC\" Power Management and ACPI")
 DEFINE_DEVICE_TYPE(ACPI_PIPC, acpi_pipc_device, "acpi_pipc", "ACPI PIPC")
 
-vt82c586b_acpi_device::vt82c586b_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, VT82C586B_ACPI, tag, owner, clock)
+vt82c586b_acpi_device::vt82c586b_acpi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, type, tag, owner, clock)
 	, m_acpi(*this, "acpi")
 	, m_sci_pin_cb(*this)
 	, m_general_config(0)
+{
+}
+
+vt82c586b_acpi_device::vt82c586b_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vt82c586b_acpi_device(mconfig, VT82C586B_ACPI, tag, owner, clock)
 {
 	// xxxx ---- Silicon Version Code
 	// ---- xxxx Silicon Revision Code
@@ -61,12 +66,12 @@ void vt82c586b_acpi_device::device_start()
 	pci_device::device_start();
 
 	// undefined, use ls5ampv3 default
-	m_iobase = 0x5000;
+	m_acpi_iobase = 0x5000;
 
 	save_item(NAME(m_pin_config));
 	save_item(NAME(m_general_config));
 	save_item(NAME(m_sci_irq_config));
-	save_item(NAME(m_iobase));
+	save_item(NAME(m_acpi_iobase));
 	save_item(NAME(m_irq_channel));
 }
 
@@ -134,13 +139,13 @@ void vt82c586b_acpi_device::config_map(address_map &map)
 		})
 	);
 	map(0x48, 0x4b).lrw32(
-		NAME([this] () { return m_iobase | 1; }),
+		NAME([this] () { return m_acpi_iobase | 1; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			COMBINE_DATA(&m_iobase);
-			m_iobase &= 0xff00;
+			COMBINE_DATA(&m_acpi_iobase);
+			m_acpi_iobase &= 0xff00;
 			if (ACCESSING_BITS_8_15)
 			{
-				LOG("48h: IOBASE %04x\n", m_iobase);
+				LOG("48h: ACPI IOBASE %04x\n", m_acpi_iobase);
 				remap_cb();
 			}
 		})
@@ -190,8 +195,7 @@ void vt82c586b_acpi_device::map_extra(
 {
 	if (BIT(m_general_config, 7))
 	{
-//      io_space->install_device(m_iobase & 0xfffe, m_iobase | 0xff, *m_acpi, &acpi_pipc_device::map);
-		m_acpi->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, m_iobase, io_space);
+		m_acpi->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, m_acpi_iobase, io_space);
 	}
 }
 
@@ -697,3 +701,341 @@ void acpi_pipc_device::gp_sci_enable_w(offs_t offset, u8 data)
 	}
 }
 
+/*
+ * '596B overrides
+ */
+
+DEFINE_DEVICE_TYPE(VT82C596_ACPI,  vt82c596_acpi_device,  "vt82c596_acpi",  "VT82C596 \"PIPC\" Power Management, ACPI and SMBus")
+DEFINE_DEVICE_TYPE(VT82C596B_ACPI, vt82c596b_acpi_device, "vt82c596b_acpi", "VT82C596B \"PIPC\" Power Management, ACPI and SMBus")
+DEFINE_DEVICE_TYPE(SMBUS_PIPC, smbus_pipc_device, "smbus_pipc", "SMBus PIPC")
+
+vt82c596_acpi_device::vt82c596_acpi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: vt82c586b_acpi_device(mconfig, type, tag, owner, clock)
+	, m_smbus(*this, "smbus")
+{
+}
+
+vt82c596_acpi_device::vt82c596_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vt82c596_acpi_device(mconfig, VT82C596_ACPI, tag, owner, clock)
+{
+	// minimum revision 0x20
+	// pclass writeable thru registers $61 ~ $63
+	set_ids(0x11063050, 0x20, 0x068000, 0x00000000);
+}
+
+void vt82c596_acpi_device::device_start()
+{
+	vt82c586b_acpi_device::device_start();
+
+	save_item(NAME(m_debounce_control));
+	save_item(NAME(m_thm_dty));
+	save_item(NAME(m_sram_zz));
+	save_item(NAME(m_cpu_stop_grant_cycle_select));
+	save_item(NAME(m_clock_stop_control));
+	save_item(NAME(m_gpio_select));
+	save_item(NAME(m_wakeup_control));
+	save_item(NAME(m_gp2_timer_control));
+	save_item(NAME(m_smbus_iobase));
+	save_item(NAME(m_smbus_control));
+}
+
+void vt82c596_acpi_device::device_reset()
+{
+	m_debounce_control = false;
+	// undefined, 0 is <reserved>
+	m_thm_dty = 0xf;
+	m_sram_zz = false;
+	m_cpu_stop_grant_cycle_select = false;
+	m_clock_stop_control = 0;
+	m_gpio_select = 0;
+	m_wakeup_control = 0;
+	m_gp2_timer_control = 0;
+	m_smbus_control = 0;
+
+	vt82c586b_acpi_device::device_reset();
+}
+
+void vt82c596_acpi_device::config_map(address_map &map)
+{
+	vt82c586b_acpi_device::config_map(map);
+	map(0x40, 0x40).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_debounce_control << 5;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			// overwritten vs. '586B
+			LOG("40h: Debounce Control %02x\n", data);
+			m_debounce_control = !!BIT(data, 5);
+		})
+	);
+	// TODO: bit 2 in 41h is now "RTC Enable Signal Gated with PSON (SUSC#) in Soft-Off Mode"
+	// TODO: bits 7,6,4 in 42h are (r/o) power statuses
+	map(0x4c, 0x4c).lrw8(
+		NAME([this] (offs_t offset) {
+			return (m_thm_dty << 4) | (m_sram_zz << 1) | (m_cpu_stop_grant_cycle_select);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("4Ch: Host Bus Power Management Control %02x\n", data);
+			m_thm_dty = (data & 0xf0) >> 4;
+			m_sram_zz = !!BIT(data, 1);
+			m_cpu_stop_grant_cycle_select = !!BIT(data, 0);
+		})
+	);
+	map(0x4d, 0x4d).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_clock_stop_control;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("4Dh: Clock Stop Control %02x\n", data);
+			m_clock_stop_control = data & 7;
+		})
+	);
+	map(0x54, 0x54).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_gpio_select;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("54h: GPIO Select %02x\n", data);
+			m_gpio_select = data;
+		})
+	);
+	map(0x55, 0x55).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_wakeup_control;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("55h: Wakeup Control %02x\n", data);
+			// USB wakeup for STR / STD / Soft Off
+			m_wakeup_control = data & 1;
+		})
+	);
+	map(0x58, 0x5b).lrw32(
+		NAME([this] () { return m_gp2_timer_control; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_gp2_timer_control);
+			m_gp2_timer_control &= 0x00ff'ffff;
+			LOG("58h: GP Timer Control %08x & %08x\n"
+				, data
+				, mem_mask
+			);
+		})
+	);
+	// - ga6vx actually maps SMbus at 80h and 84h instead of 90h and d2h
+	//   Seemingly a '596 vs. 596B actual difference
+	map(0x80, 0x83).rw(FUNC(vt82c596_acpi_device::smbus_iobase_r), FUNC(vt82c596_acpi_device::smbus_iobase_w));
+	map(0x84, 0x87).rw(FUNC(vt82c596_acpi_device::smbus_control_r), FUNC(vt82c596_acpi_device::smbus_control_w)).umask32(0x0000'00ff);
+}
+
+u32 vt82c596_acpi_device::smbus_iobase_r(offs_t offset)
+{
+	return m_smbus_iobase | 1;
+}
+
+void vt82c596_acpi_device::smbus_iobase_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_smbus_iobase);
+	m_smbus_iobase &= 0xfff0;
+	if (ACCESSING_BITS_8_15)
+	{
+		LOG("80h: SMBus IOBASE %04x\n", m_smbus_iobase);
+		remap_cb();
+	}
+}
+
+u8 vt82c596_acpi_device::smbus_control_r(offs_t offset)
+{
+	return m_smbus_control;
+}
+
+void vt82c596_acpi_device::smbus_control_w(offs_t offset, u8 data)
+{
+	LOG("84h: SMBus Control %02x\n", data);
+	m_smbus_control = data & 9;
+	remap_cb();
+}
+
+
+void vt82c596_acpi_device::map_extra(
+		uint64_t memory_window_start,
+		uint64_t memory_window_end,
+		uint64_t memory_offset,
+		address_space *memory_space,
+		uint64_t io_window_start,
+		uint64_t io_window_end,
+		uint64_t io_offset,
+		address_space *io_space)
+{
+	vt82c586b_acpi_device::map_extra(memory_window_start, memory_window_end, memory_offset, memory_space, io_window_start, io_window_end, io_offset, io_space);
+
+	if (BIT(m_smbus_control, 0))
+	{
+		m_smbus->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, m_smbus_iobase, io_space);
+	}
+}
+
+/*
+ * '596B overrides
+ */
+
+vt82c596b_acpi_device::vt82c596b_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vt82c596_acpi_device(mconfig, VT82C596B_ACPI, tag, owner, clock)
+{
+	// minimum revision 0x20, Rev. 30 is from neomania detlog.txt
+	// pclass writeable thru registers $61 ~ $63
+	// device ID may be 0x3051, pci-ids has both values for '596 Power Management
+	set_ids(0x11063050, 0x30, 0x068000, 0x00000000);
+}
+
+void vt82c596b_acpi_device::config_map(address_map &map)
+{
+	vt82c596_acpi_device::config_map(map);
+	map(0x80, 0x87).unmaprw();
+
+	map(0x90, 0x93).rw(FUNC(vt82c596b_acpi_device::smbus_iobase_r), FUNC(vt82c596b_acpi_device::smbus_iobase_w));
+	map(0xd0, 0xd3).rw(FUNC(vt82c596b_acpi_device::smbus_control_r), FUNC(vt82c596b_acpi_device::smbus_control_w)).umask32(0x00ff'0000);
+}
+
+
+/*
+ * '596 SMBus internals
+ */
+
+smbus_pipc_device::smbus_pipc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: lpc_device(mconfig, SMBUS_PIPC, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+{
+	m_space_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(smbus_pipc_device::io_map), this));
+}
+
+void smbus_pipc_device::device_start()
+{
+	save_item(NAME(m_host_status));
+	save_item(NAME(m_slave_status));
+	save_item(NAME(m_host_control));
+	save_item(NAME(m_host_command));
+	save_item(NAME(m_host_address));
+	save_item(NAME(m_host_data));
+	save_item(NAME(m_block_data));
+	save_item(NAME(m_slave_control));
+	save_item(NAME(m_shadow_command));
+}
+
+void smbus_pipc_device::device_reset()
+{
+	m_host_status = 0;
+	m_slave_status = 0;
+	m_host_control = 0;
+	m_host_command = 0;
+	m_host_address = 0;
+	m_host_data[0] = m_host_data[1] = 0;
+	m_block_data = 0;
+	m_slave_control = 0;
+	m_shadow_command = 0;
+}
+
+device_memory_interface::space_config_vector smbus_pipc_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
+}
+
+void smbus_pipc_device::map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
+{
+	io_space->install_device(io_offset, io_window_end, *this, &smbus_pipc_device::map, 0xffffffff);
+}
+
+// FIXME: trampoline to avoid mapping getting confused and overrides nibbles on 32-bit word units
+void smbus_pipc_device::map(address_map &map)
+{
+	map(0x00, 0x0f).lrw8(
+		NAME([this] (offs_t offset) { return space(0).read_byte(offset); }),
+		NAME([this] (offs_t offset, u8 data) { space(0).write_byte(offset, data); })
+	);
+}
+
+void smbus_pipc_device::io_map(address_map &map)
+{
+	map(0x00, 0x00).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_host_status;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("00h: Host Status %02x\n", data);
+			if (data & 0x1e)
+				m_host_status &= ~(data & 0x1e);
+		})
+	);
+	map(0x01, 0x01).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_slave_status;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("01h: Slave Status %02x\n", data);
+			if (data & 0x3c)
+				m_slave_status &= ~(data & 0x3c);
+		})
+	);
+	map(0x02, 0x02).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_host_control;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("02h: Host Control %02x\n", data);
+			m_host_control = data & 0x5f;
+		})
+	);
+	map(0x03, 0x03).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_host_command;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("03h: Host Command %02x\n", data);
+			m_host_command = data;
+		})
+	);
+	map(0x04, 0x04).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_host_address;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("04h: Host Address %02x\n", data);
+			m_host_address = data;
+		})
+	);
+	map(0x05, 0x06).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_host_data[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("%02Xh: Host Data %d %02x\n", offset + 4, offset, data);
+			m_host_data[offset] = data;
+		})
+	);
+	map(0x07, 0x07).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_block_data;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("07h: Block Data %02x\n", data);
+			m_block_data = data;
+		})
+	);
+	map(0x08, 0x08).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_slave_control;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("08h: Slave Control %02x\n", data);
+			m_slave_control = data & 0x0f;
+		})
+	);
+	map(0x09, 0x09).lr8(
+		NAME([this] (offs_t offset) {
+			return m_shadow_command;
+		})
+	);
+	// 0x0a, 0x0b Slave Event (16-bit)
+	// 0x0c, 0x0d Slave Data (16-bit)
+}

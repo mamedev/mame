@@ -140,8 +140,7 @@ ROM_START( vmastspi )
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
 
 	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD16_WORD_SWAP( "mx25l25635f.sfrom1", 0x0000, 0x2000000, CRC(8bb1790e) SHA1(04944b965441c7e87fb2ba399392c25f463b6701) )
-	ROM_IGNORE(0x50) // 'config' bytes
+	ROM_LOAD16_WORD_SWAP( "mx25l25635f.sfrom1", 0x0000, 0x2000000, CRC(f30af4a2) SHA1(99526156c6e72eda9ea1ef93b9e825da069e050f) )
 ROM_END
 
 ROM_START( anpanbd )
@@ -256,6 +255,14 @@ ROM_START( dgun3944 )
 	ROM_LOAD( "by25q128as.bin", 0x0000, 0x1000000, CRC(cf2bfc98) SHA1(f8c984f0278506d74b0b6337d2e96bb9d3a58148) )
 ROM_END
 
+ROM_START( starbuck )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x200000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD( "by25q16est.bin", 0x0000, 0x200000,  CRC(926c1499) SHA1(edd88b11f350e0016ee7dc76e872f9ae8c00aa6c) )
+ROM_END
+
 void generalplus_gpspispi_game_state::init_spi()
 {
 	int vectorbase = 0x2fe0;
@@ -349,3 +356,5 @@ CONS(2021, lxcymsm,   0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_g
 CONS(2021, lxcympp,   0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Motion - Paw Patrol (JL3180PA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2021, lxcymls,   0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Motion - Lilo & Stitch (JL3180D_01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2021, dgun3944,  0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "dreamGEAR", "My Arcade All Star Sports (Pixel Pocket, DGUNL3944)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// sold by Starbucks China, contains a bunch of NES hacks (including a version of Super Mario Bros) probably running on an emulator
+CONS(2022, starbuck,  0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Subor",     "Starbucks x Subor (OEM Q2, China)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

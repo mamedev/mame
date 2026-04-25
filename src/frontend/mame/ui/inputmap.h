@@ -39,14 +39,6 @@ public:
 	virtual ~menu_input() override;
 
 protected:
-	enum {
-		INPUT_TYPE_DIGITAL = 0,
-		INPUT_TYPE_ANALOG = 1,
-		INPUT_TYPE_ANALOG_DEC = INPUT_TYPE_ANALOG + SEQ_TYPE_DECREMENT,
-		INPUT_TYPE_ANALOG_INC = INPUT_TYPE_ANALOG + SEQ_TYPE_INCREMENT,
-		INPUT_TYPE_TOTAL = INPUT_TYPE_ANALOG + SEQ_TYPE_TOTAL
-	};
-
 	// internal input menu item data
 	struct input_item_data
 	{

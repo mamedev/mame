@@ -23,20 +23,22 @@ Oki M6295 (or clone, not readable)
 1 MHz resonator
 3x switch
 
-TODO (both):
+TODO (all):
 - SVG / less simplistic layout?
 
-TODO (panda2):
-- stuck at error 02 (missing meter counter)
+TODO (panda2 and msaiche):
+- inputs aren't verified
 
-Schematics and manual with list of error codes are available.
+For Lan Mao, schematics and manual with list of error codes are available.
 
-Initialization (not necessary in MAME due to pre-initalized NVRAM, unless coinage DIPs are changed):
+Initialization for Lan Mao (not necessary in MAME due to pre-initialized NVRAM, unless coinage DIPs are changed):
 On first power-up the machine must be zeroed:
 - Hold K0 + K3 while switching on
 - Press the Start button once
 - Power-cycle the machine
 After this sequence it will run normally.
+
+panda2 takes roughly 33 emulated seconds to boot.
 */
 
 
@@ -61,7 +63,7 @@ After this sequence it will run normally.
 #define LOG_PORTS8052     (1U << 1)
 #define LOG_PORTS8279     (1U << 2)
 
-#define VERBOSE (LOG_GENERAL | LOG_PORTS8052)
+// #define VERBOSE (LOG_GENERAL | LOG_PORTS8052 | LOG_PORTS8279)
 
 #include "logmacro.h"
 
@@ -79,6 +81,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_hopper(*this, "hopper"),
 		m_inputs(*this, { "KEYS1", "KEYS2", "DSW", "PUSHBUTTONS" }),
+		m_p1(*this, "P1"),
 		m_digits(*this, "digit%u", 0U),
 		m_leds(*this, "led%u", 0U)
 	{ }
@@ -92,15 +95,18 @@ protected:
 	required_device<hopper_device> m_hopper;
 
 	required_ioport_array<4> m_inputs;
+	required_ioport m_p1;
 	output_finder<32> m_digits;
 	output_finder<31> m_leds;
 
 	uint8_t m_kbd_line = 0;
+	uint8_t m_p1_out = 0xff;
 
 	template <uint8_t Which> void leds_w(uint8_t data);
 	void display_w(uint8_t data);
 	uint8_t keyboard_r();
-	void port1_w(uint8_t data);
+	uint8_t i8052_p1_r();
+	void i8052_p1_w(uint8_t data);
 
 	void program_map(address_map &map) ATTR_COLD;
 	void data_map(address_map &map) ATTR_COLD;
@@ -121,7 +127,7 @@ private:
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<okim6295_device> m_oki;
 
-	void port1_w(uint8_t data);
+	void i8052_p1_w(uint8_t data);
 	void port3_w(uint8_t data);
 
 	void data_map(address_map &map) ATTR_COLD;
@@ -134,6 +140,7 @@ void panda2_state::machine_start()
 	m_leds.resolve();
 
 	save_item(NAME(m_kbd_line));
+	save_item(NAME(m_p1_out));
 }
 
 template <uint8_t Which>
@@ -168,15 +175,26 @@ uint8_t panda2_state::keyboard_r()
 	}
 }
 
-void panda2_state::port1_w(uint8_t data)
+uint8_t panda2_state::i8052_p1_r()
+{
+	// meter feedback is read here. Fails with error 02 if it doesn't get the expected value.
+	uint8_t const ioport_val = m_p1->read();
+	uint8_t meter_fb = 0x00;
+
+	if (!BIT(m_p1_out, 0))
+		meter_fb = (BIT(m_p1_out, 1) << 4) | (BIT(m_p1_out, 2) << 5);
+
+	return (ioport_val & 0xcf) | meter_fb;
+}
+
+void panda2_state::i8052_p1_w(uint8_t data)
 {
 	m_hopper->motor_w(BIT(data, 3));
 
-	if ((data & 0xf7) != 0xf7)
-		logerror("unknown port1 write: %02x\n", data);
+	m_p1_out = data;
 }
 
-void lanmao_state::port1_w(uint8_t data)
+void lanmao_state::i8052_p1_w(uint8_t data)
 {
 	m_i2cmem->write_sda(BIT(data, 1));
 	m_i2cmem->write_scl(BIT(data, 2));
@@ -239,7 +257,7 @@ static INPUT_PORTS_START( panda2 ) // TODO: check everything once possible
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Shift Right" )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME( "Shift Left" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME( "Double" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x03, "Running Lights Difficulty" )  PORT_DIPLOCATION("DSW:1,2")
@@ -288,14 +306,24 @@ static INPUT_PORTS_START( panda2 ) // TODO: check everything once possible
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 
 	PORT_START("P3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "P3:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "P3:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "P3:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "P3:4" ) // needs to be low to avoid error 30 (coin acceptor)
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "P3:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "P3:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "P3:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "P3:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "P3:8" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( msaiche )
+	PORT_INCLUDE( panda2 )
+
+	PORT_MODIFY("KEYS2")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME( "Double" )
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lanmao )
@@ -383,11 +411,11 @@ void panda2_state::panda2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &panda2_state::program_map);
 	m_maincpu->set_addrmap(AS_DATA, &panda2_state::data_map);
 	m_maincpu->port_in_cb<0>().set([this] () { LOGPORTS8052("%s CPU port 0 read\n", machine().describe_context()); return 0xff; });
-	m_maincpu->port_in_cb<1>().set_ioport("P1");
+	m_maincpu->port_in_cb<1>().set(FUNC(panda2_state::i8052_p1_r));
 	m_maincpu->port_in_cb<2>().set([this] () { LOGPORTS8052("%s CPU port 2 read\n", machine().describe_context()); return 0xff; });
 	m_maincpu->port_in_cb<3>().set_ioport("P3");
 	m_maincpu->port_out_cb<0>().set([this] (uint8_t data) { LOGPORTS8052("%s CPU port 0 write: %02x\n", machine().describe_context(), data); });
-	m_maincpu->port_out_cb<1>().set(FUNC(panda2_state::port1_w));
+	m_maincpu->port_out_cb<1>().set(FUNC(panda2_state::i8052_p1_w));
 	m_maincpu->port_out_cb<2>().set([this] (uint8_t data) { LOGPORTS8052("%s CPU port 2 write: %02x\n", machine().describe_context(), data); });
 	m_maincpu->port_out_cb<3>().set([this] (uint8_t data) { LOGPORTS8052("%s CPU port 3 write: %02x\n", machine().describe_context(), data); });
 
@@ -430,7 +458,7 @@ void lanmao_state::lanmao(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &lanmao_state::data_map);
 	m_maincpu->port_in_cb<1>().set_ioport("P1");
 	m_maincpu->port_in_cb<3>().set_ioport("P3");
-	m_maincpu->port_out_cb<1>().set(FUNC(lanmao_state::port1_w));
+	m_maincpu->port_out_cb<1>().set(FUNC(lanmao_state::i8052_p1_w));
 	m_maincpu->port_out_cb<3>().set(FUNC(lanmao_state::port3_w));
 
 	i8279_device &kdc(I8279(config, "kdc", 10.738635_MHz_XTAL / 6 )); // TODO: divider
@@ -476,6 +504,17 @@ ROM_START( panda2 )
 	ROM_LOAD( "at28c16.u9", 0x000, 0x800, CRC(bd67af27) SHA1(19d19bf00fbe8573e13fb6026db31889023d4194) )
 ROM_END
 
+ROM_START( msaiche ) // 玛莉赛车 (Mǎlì Sàichē - Mario Racing)
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "w78e065", 0x0000, 0x8000, CRC(dd945526) SHA1(96f6ff1329a90fdfbb276a49bcd1926122da2012) )
+
+	ROM_REGION( 0x800, "at28c16", 0 )
+	ROM_LOAD( "at28c16.u9", 0x000, 0x800, CRC(bd67af27) SHA1(19d19bf00fbe8573e13fb6026db31889023d4194) ) // same as panda2?
+
+	ROM_REGION( 0x800, "nvram", 0 )
+	ROM_LOAD( "nvram", 0x000, 0x800, CRC(eba9271c) SHA1(1c7308f83b7f016c11d83055de09029104702c19) ) // pre-initialized
+ROM_END
+
 ROM_START( lanmao )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "w78e065", 0x00000, 0x10000, CRC(57a89c7f) SHA1(be54c40ae17df1155b2aaa67b4b0bf45d307eba1) ) // 1xxxxxxxxxxxxxxx = 0xFF
@@ -493,5 +532,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1996, panda2, 0, panda2, panda2, panda2_state, empty_init, ROT0, "Kelly",                       "Panda 2", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 2003, lanmao, 0, lanmao, lanmao, lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Lan Mao", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1991, msaiche, 0, panda2, msaiche, panda2_state, empty_init, ROT0, "Hengfa Electronics",          "Mali Saiche", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1996, panda2,  0, panda2, panda2,  panda2_state, empty_init, ROT0, "Kelly",                       "Panda 2",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2003, lanmao,  0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Lan Mao",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )

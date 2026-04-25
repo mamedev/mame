@@ -304,7 +304,7 @@ void omti8621_device::device_reset()
 	LOGMASKED(LOG_LEVEL2, "device_reset\n");
 
 	// setup memory and I/O bases
-	m_bios_enable = !!BIT(m_biosopts->read(), 0);
+	m_bios_enable = BIT(m_biosopts->read(), 0);
 	m_bios_base = BIT(m_biosopts->read(), 1) ? 0xca000 : 0xc8000;
 	m_esdi_base = io_bases[m_iobase->read() & 7];
 	m_fdc_base = BIT(m_iobase->read(), 3) ? 0x0370 : 0x3f0;
@@ -331,7 +331,6 @@ void omti8621_device::sw_reset()
 
 	// default the sector data buffer with model and status information
 	// (i.e. set sector data buffer for cmd=0x0e READ SECTOR BUFFER)
-
 	memset(&m_sector_buffer[0], 0, OMTI_DISK_SECTOR_SIZE);
 	memcpy(&m_sector_buffer[0], "8621VB.4060487xx", 0x10);
 	m_sector_buffer[0x10] = 0; // ROM Checksum error
@@ -358,14 +357,13 @@ void omti8621_device::sw_reset()
 	fd_moten_w(0);
 	fd_rate_w(0);
 	fd_extra_w(0);
-
 }
 
 void omti8621_device::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_PROGRAM)
 	{
-		if (m_bios_enable)
+		if (m_bios_enable && device_rom_region())
 			m_isa->install_rom(this, m_bios_base, m_bios_base | 0x1fff, OMTI_BIOS_REGION);
 	}
 	else if (space_id == AS_IO)
@@ -487,7 +485,7 @@ void omti8621_device::set_configuration_data(uint8_t lun) {
 
 uint8_t omti8621_device::get_lun(const uint8_t * cdb)
 {
-	return   (cdb[1] & 0x20) >> 5;
+	return (cdb[1] & 0x20) >> 5;
 }
 
 /***************************************************************************

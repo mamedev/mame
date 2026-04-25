@@ -3,6 +3,8 @@
 
 #include "emu.h"
 #include "va_ops.h"
+#include "machine/rescap.h"
+
 
 va_const_device::va_const_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, VA_CONST, tag, owner, clock)
@@ -72,5 +74,60 @@ void va_scale_offset_device::sound_stream_update(sound_stream &stream)
 }
 
 
+va_comparator_device::va_comparator_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, VA_COMPARATOR, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_thresh_pos(0.5F)
+	, m_thresh_neg(0.5F)
+	, m_inverted(false)
+	, m_stream(nullptr)
+	, m_state(false)
+{
+}
+
+va_comparator_device &va_comparator_device::configure(float thresh_pos, float thresh_neg, bool inverted)
+{
+	if (thresh_neg > thresh_pos)
+		fatalerror("%s: negative-going threshold needs to be <= positive-going threshold\n", tag());
+	m_thresh_pos = thresh_pos;
+	m_thresh_neg = thresh_neg;
+	m_inverted = inverted;
+	return *this;
+}
+
+va_comparator_device &va_comparator_device::configure(const comp_oc_hyst_config &c)
+{
+	return configure(
+		(c.v_thresh - c.v_pullup) * RES_VOLTAGE_DIVIDER(c.r_thresh, c.r_feedback + c.r_pullup) + c.v_pullup,
+		(c.v_thresh - c.v_minus) * RES_VOLTAGE_DIVIDER(c.r_thresh, c.r_feedback) + c.v_minus, true);
+}
+
+int va_comparator_device::state()
+{
+	m_stream->update();
+	if (m_inverted)
+		return m_state ? 0 : 1;
+	else
+		return m_state ? 1 : 0;
+}
+
+void va_comparator_device::device_start()
+{
+	m_stream = stream_alloc(1, 0, SAMPLE_RATE_INPUT_ADAPTIVE);
+	save_item(NAME(m_state));
+}
+
+void va_comparator_device::sound_stream_update(sound_stream &stream)
+{
+	const int n = stream.samples();
+	for (int i = 0; i < n; ++i)
+	{
+		const float threshold = m_state ? m_thresh_neg : m_thresh_pos;
+		m_state = stream.get(0, i) >= threshold;
+	}
+}
+
+
 DEFINE_DEVICE_TYPE(VA_CONST, va_const_device, "va_const", "Constant value stream")
-DEFINE_DEVICE_TYPE(VA_SCALE_OFFSET, va_scale_offset_device, "va_scale_offset", "Scale and offset")
+DEFINE_DEVICE_TYPE(VA_SCALE_OFFSET, va_scale_offset_device, "va_scale_offset", "Stream scale and offset")
+DEFINE_DEVICE_TYPE(VA_COMPARATOR, va_comparator_device, "va_comparator", "Stream comparator")

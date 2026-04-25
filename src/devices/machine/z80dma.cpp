@@ -601,7 +601,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 			m_addressA = PORTA_ADDRESS;
 			m_addressB = PORTB_ADDRESS;
 			m_count = BLOCKLEN;
-			m_byte_counter = 0;
+			reset_byte_counter();
 			m_status |= 0x30;
 			enable();
 		}
@@ -792,7 +792,7 @@ void z80dma_device::write(u8 data)
 				m_addressA = PORTA_ADDRESS;
 				m_addressB = PORTB_ADDRESS;
 				m_count = BLOCKLEN;
-				m_byte_counter = 0;
+				reset_byte_counter();
 				m_status |= 0x30;
 
 				LOGREGS("CMD Load A: %x B: %x N: %x\n", m_addressA, m_addressB, m_count);
@@ -812,7 +812,7 @@ void z80dma_device::write(u8 data)
 			case COMMAND_CONTINUE:
 				LOGREGS("CMD Continue\n");
 				m_count = BLOCKLEN;
-				m_byte_counter = 0;
+				reset_byte_counter();
 				//enable(); //???m_dma_enabled = 1;
 				//"match not found" & "end of block" status flags zeroed here
 				m_status |= 0x30;

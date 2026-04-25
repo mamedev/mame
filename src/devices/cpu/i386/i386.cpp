@@ -2483,6 +2483,7 @@ void i386_device::zero_state()
 	m_cpuid_id1 = 0;
 	m_cpuid_id2 = 0;
 	m_cpu_version = 0;
+	m_brand_id = 0; // Pentium III model 8 onward
 	m_feature_flags = 0;
 	m_tsc = 0;
 	m_perfctr[0] = m_perfctr[1] = 0;
@@ -3425,6 +3426,7 @@ void pentium3_device::device_reset()
 	// [15:15] CMOV and FCMOV
 	// [18:18] PSN (Processor Serial Number, P3 only)
 	m_feature_flags = 0x0004a111;       // TODO: enable relevant flags here
+	m_brand_id = 0x02;
 
 	CHANGE_PC(m_eip);
 }
@@ -3518,6 +3520,7 @@ void pentium4_device::device_reset()
 	// [ 8:8] CMPXCHG8B instruction
 	// [15:15] CMOV and FCMOV
 	m_feature_flags = 0x00008101;       // TODO: enable relevant flags here
+	m_brand_id = 0x08;
 
 	CHANGE_PC(m_eip);
 }

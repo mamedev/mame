@@ -87,7 +87,7 @@ void cxd1185_device::device_start()
 	save_item(NAME(m_environ));
 	save_item(NAME(m_sel_time));
 	save_item(NAME(m_rst_time));
-	save_item(NAME(m_scsi_id));
+	save_item(NAME(m_scsi_idr));
 	save_item(NAME(m_int_auth));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_count));
@@ -124,7 +124,7 @@ void cxd1185_device::reset_chip()
 	m_int_req[1] = 0;
 	m_sel_time = 0;
 	m_rst_time = 0;
-	m_scsi_id = 0;
+	m_scsi_idr = 0;
 	m_int_auth[0] = 0;
 	m_int_auth[1] = 0;
 	m_mode = 0;
@@ -302,13 +302,13 @@ void cxd1185_device::command_w(u8 data)
 
 	case 0x40: LOGMASKED(LOG_CMD, "reselect\n"); break;
 	case 0x41:
-		LOGMASKED(LOG_CMD, "select target %d without atn\n", (m_scsi_id & TID) >> 5);
+		LOGMASKED(LOG_CMD, "select target %d without atn\n", (m_scsi_idr & TID) >> 5);
 		m_status |= INIT;
 		m_state = ARB_BUS_FREE;
 		m_last_dma_direction = (m_command & DMA) ? DMA_OUT : DMA_NONE;
 		break;
 	case 0x42:
-		LOGMASKED(LOG_CMD, "select target %d with atn\n", (m_scsi_id & TID) >> 5);
+		LOGMASKED(LOG_CMD, "select target %d with atn\n", (m_scsi_idr & TID) >> 5);
 		m_status |= INIT;
 		m_state = ARB_BUS_FREE;
 		m_last_dma_direction = (m_command & DMA) ? DMA_OUT : DMA_NONE;
@@ -508,8 +508,8 @@ int cxd1185_device::state_step()
 {
 	int delay = 0;
 
-	u8 const oid = 1 << ((m_scsi_id & OID) >> 0);
-	u8 const tid = 1 << ((m_scsi_id & TID) >> 5);
+	u8 const oid = 1 << ((m_scsi_idr & OID) >> 0);
+	u8 const tid = 1 << ((m_scsi_idr & TID) >> 5);
 
 	switch (m_state)
 	{

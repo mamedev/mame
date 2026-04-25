@@ -12,8 +12,8 @@
 #pragma once
 
 #include "tlcs900.h"
+#include "tmp94c241_serial.h"
 
-class tmp94c241_serial_device;
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -23,7 +23,6 @@ class tmp94c241_serial_device;
 
 class tmp94c241_device : public tlcs900h_device
 {
-	friend class tmp94c241_serial_device;
 	static constexpr uint8_t PORT_0 = 0; // 8 bit I/O. Shared with d0-d7
 	static constexpr uint8_t PORT_1 = 1; // 8 bit I/O. Shared with d8-d15
 	static constexpr uint8_t PORT_2 = 2; // 8 bit I/O. Shared with d16-d23
@@ -67,27 +66,6 @@ class tmp94c241_device : public tlcs900h_device
 	static constexpr uint8_t CAPB = 7;
 
 public:
-	enum : uint8_t {
-		INTE45   = 0,
-		INTE67   = 1,
-		INTE89   = 2,
-		INTEAB   = 3,
-		INTET01  = 4,
-		INTET23  = 5,
-		INTET45  = 6,
-		INTET67  = 7,
-		INTET89  = 8,
-		INTETAB  = 9,
-		INTES0   = 10,
-		INTES1   = 11,
-		INTETC01 = 12,
-		INTETC23 = 13,
-		INTETC45 = 14,
-		INTETC67 = 15,
-		INTE0AD  = 16,
-		INTNMWDT = 17,
-	};
-
 	// device type constructor
 	tmp94c241_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
@@ -128,6 +106,20 @@ public:
 	auto portz_read()  { return m_port_read[PORT_Z].bind(); }
 	auto portz_write() { return m_port_write[PORT_Z].bind(); }
 
+	auto txd0()      { return m_serial[0].lookup()->txd(); }
+	auto sclk0_in()  { return m_serial[0].lookup()->sclk_in(); }
+	auto sclk0_out() { return m_serial[0].lookup()->sclk_out(); }
+	auto tx0_start() { return m_serial[0].lookup()->tx_start(); }
+	auto txd1()      { return m_serial[1].lookup()->txd(); }
+	auto sclk1_in()  { return m_serial[1].lookup()->sclk_in(); }
+	auto sclk1_out() { return m_serial[1].lookup()->sclk_out(); }
+	auto tx1_start() { return m_serial[1].lookup()->tx_start(); }
+
+	void rxd0(int state) { m_serial[0]->rxd(state); }
+	void sioclk0(int state) { m_serial[0]->sioclk(state); }
+	void rxd1(int state) { m_serial[1]->rxd(state); }
+	void sioclk1(int state) { m_serial[1]->sioclk(state); }
+
 protected:
 	// device_t implementation
 	virtual void device_config_complete() override ATTR_COLD;
@@ -149,7 +141,8 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
-	struct irq_vector_entry {
+	struct irq_vector_entry
+	{
 		uint8_t reg;
 		uint8_t iff;
 		uint8_t vector;
@@ -236,6 +229,10 @@ private:
 
 	void internal_mem(address_map &map);
 
+	template <uint8_t IntReg> void set_intreg(uint8_t data);
+
+	required_device_array<tmp94c241_serial_device, 2> m_serial;
+
 	// analogue inputs, sampled at 10 bits
 	devcb_read16::array<8> m_an_read;
 
@@ -295,9 +292,6 @@ private:
 
 	// D/A Converter Control
 	uint8_t m_da_drive;
-
-public:
-	required_device_array<tmp94c241_serial_device, 2> m_serial;
 };
 
 // device type declaration

@@ -86,41 +86,33 @@
 #include "machine/nvram.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK      12.096_MHz_XTAL
-#define VIDEO_CLOCK     20_MHz_XTAL
-
 /*************************************
  *
  *  IRQ acknowledgement
  *
  *************************************/
 
-void irobot_state::irobot_clearirq_w(uint8_t data)
+template <int Line>
+void irobot_state::clearirq_w(u8 data)
 {
-	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(Line, CLEAR_LINE);
 }
 
 
-void irobot_state::irobot_clearfirq_w(uint8_t data)
+u8 irobot_state::quad_pokeyn_r(offs_t offset)
 {
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
-}
-
-
-uint8_t irobot_state::quad_pokeyn_r(offs_t offset)
-{
-	int pokey_num = (offset >> 3) & ~0x04;
-	int control = (offset & 0x20) >> 2;
-	int pokey_reg = (offset % 8) | control;
+	int const pokey_num = (offset >> 3) & ~0x04;
+	int const control = (offset & 0x20) >> 2;
+	int const pokey_reg = (offset & 7) | control;
 
 	return m_pokey[pokey_num]->read(pokey_reg);
 }
 
-void irobot_state::quad_pokeyn_w(offs_t offset, uint8_t data)
+void irobot_state::quad_pokeyn_w(offs_t offset, u8 data)
 {
-	int pokey_num = (offset >> 3) & ~0x04;
-	int control = (offset & 0x20) >> 2;
-	int pokey_reg = (offset % 8) | control;
+	int const pokey_num = (offset >> 3) & ~0x04;
+	int const control = (offset & 0x20) >> 2;
+	int const pokey_reg = (offset & 7) | control;
 
 	m_pokey[pokey_num]->write(pokey_reg, data);
 }
@@ -132,28 +124,28 @@ void irobot_state::quad_pokeyn_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-void irobot_state::irobot_map(address_map &map)
+void irobot_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x0fff).bankrw("bank2");
+	map(0x0800, 0x0fff).bankrw(m_rambank);
 	map(0x1000, 0x103f).portr("IN0");
 	map(0x1040, 0x1040).portr("IN1");
-	map(0x1080, 0x1080).r(FUNC(irobot_state::irobot_status_r));
+	map(0x1080, 0x1080).r(FUNC(irobot_state::status_r));
 	map(0x10c0, 0x10c0).portr("DSW1");
-	map(0x1100, 0x1100).w(FUNC(irobot_state::irobot_clearirq_w));
-	map(0x1140, 0x1140).w(FUNC(irobot_state::irobot_statwr_w));
-	map(0x1180, 0x1180).w(FUNC(irobot_state::irobot_out0_w));
-	map(0x11c0, 0x11c0).w(FUNC(irobot_state::irobot_rom_banksel_w));
-	map(0x1200, 0x12ff).rw("nvram", FUNC(x2212_device::read), FUNC(x2212_device::write));
+	map(0x1100, 0x1100).w(FUNC(irobot_state::clearirq_w<M6809_IRQ_LINE>));
+	map(0x1140, 0x1140).w(FUNC(irobot_state::statwr_w));
+	map(0x1180, 0x1180).w(FUNC(irobot_state::out0_w));
+	map(0x11c0, 0x11c0).w(FUNC(irobot_state::rom_banksel_w));
+	map(0x1200, 0x12ff).rw(m_novram, FUNC(x2212_device::read), FUNC(x2212_device::write));
 	map(0x1300, 0x1300).mirror(0xff).r("adc", FUNC(adc0809_device::data_r));
 	map(0x1400, 0x143f).rw(FUNC(irobot_state::quad_pokeyn_r), FUNC(irobot_state::quad_pokeyn_w));
-	map(0x1800, 0x18ff).w(FUNC(irobot_state::irobot_paletteram_w));
+	map(0x1800, 0x18ff).w(FUNC(irobot_state::paletteram_w));
 	map(0x1900, 0x19ff).nopw();            /* Watchdog reset */
-	map(0x1a00, 0x1a00).w(FUNC(irobot_state::irobot_clearfirq_w));
+	map(0x1a00, 0x1a00).w(FUNC(irobot_state::clearirq_w<M6809_FIRQ_LINE>));
 	map(0x1b00, 0x1b03).mirror(0xfc).w("adc", FUNC(adc0809_device::address_offset_start_w));
-	map(0x1c00, 0x1fff).ram().share("videoram");
-	map(0x2000, 0x3fff).rw(FUNC(irobot_state::irobot_sharedmem_r), FUNC(irobot_state::irobot_sharedmem_w));
-	map(0x4000, 0x5fff).bankr("bank1");
+	map(0x1c00, 0x1fff).ram().w(FUNC(irobot_state::videoram_w)).share(m_videoram);
+	map(0x2000, 0x3fff).rw(FUNC(irobot_state::sharedmem_r), FUNC(irobot_state::sharedmem_w));
+	map(0x4000, 0x5fff).bankr(m_rombank);
 	map(0x6000, 0xffff).rom();
 }
 
@@ -265,14 +257,14 @@ static const gfx_layout charlayout =
 	64,
 	1,
 	{ 0 },
-	{ 4, 5, 6, 7, 12, 13, 14, 15},
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16},
+	{ 4, 5, 6, 7, 12, 13, 14, 15 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	16*8
 };
 
 
 static GFXDECODE_START( gfx_irobot )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 64, 16 )
+	GFXDECODE_ENTRY( "alpha", 0, charlayout, 64, 16 )
 GFXDECODE_END
 
 
@@ -285,14 +277,14 @@ GFXDECODE_END
 void irobot_state::irobot(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, MAIN_CLOCK / 8);
-	m_maincpu->set_addrmap(AS_PROGRAM, &irobot_state::irobot_map);
+	MC6809E(config, m_maincpu, 12.096_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &irobot_state::main_map);
 
-	adc0809_device &adc(ADC0809(config, "adc", MAIN_CLOCK / 16));
+	adc0809_device &adc(ADC0809(config, "adc", 12.096_MHz_XTAL / 16));
 	adc.in_callback<0>().set_ioport("AN0");
 	adc.in_callback<1>().set_ioport("AN1");
 
-	X2212(config, "nvram").set_auto_save(true);
+	X2212(config, m_novram).set_auto_save(true);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -300,14 +292,14 @@ void irobot_state::irobot(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 29*8-1);
-	m_screen->set_screen_update(FUNC(irobot_state::screen_update_irobot));
+	m_screen->set_screen_update(FUNC(irobot_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_irobot);
-	PALETTE(config, m_palette, FUNC(irobot_state::irobot_palette), 64 + 32); // 64 for polygons, 32 for text
+	PALETTE(config, m_palette, FUNC(irobot_state::palette), 64 + 32); // 64 for polygons, 32 for text
 
-	TIMER(config, "irvg_timer").configure_generic(FUNC(irobot_state::irobot_irvg_done_callback));
-	TIMER(config, "irmb_timer").configure_generic(FUNC(irobot_state::irobot_irmb_done_callback));
+	TIMER(config, "irvg_timer").configure_generic(FUNC(irobot_state::irvg_done_callback));
+	TIMER(config, "irmb_timer").configure_generic(FUNC(irobot_state::irmb_done_callback));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -315,17 +307,17 @@ void irobot_state::irobot(machine_config &config)
 	/* FIXME: I-Robot has all channels of the quad-pokey tied together
 	 *        This needs to be taken into account in the design.
 	 */
-	POKEY(config, m_pokey[0], MAIN_CLOCK / 8);
+	POKEY(config, m_pokey[0], 12.096_MHz_XTAL / 8);
 	m_pokey[0]->allpot_r().set_ioport("DSW2");
 	m_pokey[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	POKEY(config, m_pokey[1], MAIN_CLOCK / 8);
+	POKEY(config, m_pokey[1], 12.096_MHz_XTAL / 8);
 	m_pokey[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	POKEY(config, m_pokey[2], MAIN_CLOCK / 8);
+	POKEY(config, m_pokey[2], 12.096_MHz_XTAL / 8);
 	m_pokey[2]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	POKEY(config, m_pokey[3], MAIN_CLOCK / 8);
+	POKEY(config, m_pokey[3], 12.096_MHz_XTAL / 8);
 	m_pokey[3]->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -338,7 +330,7 @@ void irobot_state::irobot(machine_config &config)
  *************************************/
 
 ROM_START( irobot )
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 48K Banked ROM*/
+	ROM_REGION( 0x1c000, "maincpu", 0 ) /* 64k for code + 48K Banked ROM*/
 	ROM_LOAD( "136029-208.bin",     0x06000, 0x2000, CRC(b4d0be59) SHA1(5b476dbee8b171a96301b2204420161333d4ca97) )
 	ROM_LOAD( "136029-209.bin",     0x08000, 0x4000, CRC(f6be3cd0) SHA1(a88ae0cc9ee22aa5dd3db0173f24313189f894f8) )
 	ROM_LOAD( "136029-210.bin",     0x0c000, 0x4000, CRC(c0eb2133) SHA1(daa77293678b7e822d0672b90789c53098c5451e) )
@@ -346,15 +338,13 @@ ROM_START( irobot )
 	ROM_LOAD( "136029-206.bin",     0x14000, 0x4000, CRC(e114a526) SHA1(bd94ad4d536f681efa81153050a12098a31d79cf) )
 	ROM_LOAD( "136029-207.bin",     0x18000, 0x4000, CRC(b4556cb0) SHA1(2e0c1e4c265e7d232ca86d5c8760e32fc49fe08d) )
 
-	ROM_REGION16_BE( 0x10000, "mathbox", 0 )  /* mathbox region */
+	ROM_REGION16_BE( 0xc000, "mathbox", 0 )  /* mathbox region */
 	ROM_LOAD16_BYTE( "136029-104.bin", 0x0000,  0x2000, CRC(0a6cdcca) SHA1(b9fd76eae8ca24fa3abc30c46bbf30d89943d97d) )
 	ROM_LOAD16_BYTE( "136029-103.bin", 0x0001,  0x2000, CRC(0c83296d) SHA1(c1f4041a58f395e24855254849604dfe3b8b0d71) )  /* ROM data from 0000-bfff */
 	ROM_LOAD16_BYTE( "136029-102.bin", 0x4000,  0x4000, CRC(9d588f22) SHA1(787ec3e642e1dc3417477348afa88c764e1f2a88) )
 	ROM_LOAD16_BYTE( "136029-101.bin", 0x4001,  0x4000, CRC(62a38c08) SHA1(868bb3fe5657a4ce45c3dd04ba26a7fb5a5ded42) )
-	/* RAM data from c000-dfff */
-	/* COMRAM from   e000-ffff */
 
-	ROM_REGION( 0x800, "gfx1", 0 )
+	ROM_REGION( 0x800, "alpha", 0 )
 	ROM_LOAD( "136029-124.bin",     0x0000,  0x0800, CRC(848948b6) SHA1(743c6570c787bc9a2a14716adc66b8e2fe57129f) )
 
 	ROM_REGION( 0x3420, "proms", 0 )
