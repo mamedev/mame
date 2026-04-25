@@ -39,13 +39,8 @@ void dmac_0266_device::map(address_map &map)
 	map(0x04, 0x07).r(FUNC(dmac_0266_device::status_r));
 	map(0x08, 0x0b).rw(FUNC(dmac_0266_device::tcount_r), FUNC(dmac_0266_device::tcount_w));
 	map(0x0c, 0x0f).w(FUNC(dmac_0266_device::tag_w));
-	// TODO: are these r handlers needed?
-	//map(0x10, 0x13).rw(FUNC(dmac_0266_device::offset_r), FUNC(dmac_0266_device::offset_w));
-	//map(0x14, 0x17).rw(FUNC(dmac_0266_device::entry_r), FUNC(dmac_0266_device::entry_w));
-	map(0x10, 0x13).w(FUNC(dmac_0266_device::offset_w));
-	map(0x10, 0x13).r(FUNC(dmac_0266_device::offset_r));
-	map(0x14, 0x17).w(FUNC(dmac_0266_device::entry_w));
-	map(0x14, 0x17).r(FUNC(dmac_0266_device::entry_r));
+	map(0x10, 0x13).rw(FUNC(dmac_0266_device::offset_r), FUNC(dmac_0266_device::offset_w));
+	map(0x14, 0x17).rw(FUNC(dmac_0266_device::entry_r), FUNC(dmac_0266_device::entry_w));
 }
 
 void dmac_0266_device::device_start()
