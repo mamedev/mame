@@ -204,12 +204,12 @@ TILE_GET_INFO_MEMBER(psikyosh_state::get_tile_info)
 	tilemap_info *const layer = (tilemap_info *)tilemap.user_data();
 	u32 const data = m_spriteram[layer->vram_base + tile_index];
 	u32 const tileno = data & 0x0007ffff;
-	u32 const colour = (data & 0xff000000) >> 24;
+	u32 const color  = (data & 0xff000000) >> 24;
 
-	tileinfo.set(Depth, tileno, colour & 0xf0, 0);
+	tileinfo.set(Depth, tileno, color & 0xf0, 0);
 	// store low 4 bit of color in category and mix later
 	// for keep per-pixel alpha blend information
-	tileinfo.category = colour & 0x0f;
+	tileinfo.category = color & 0x0f;
 }
 
 /* Row Scroll/Zoom and/or Column Zoom, has per-column Alpha/Bank/Priority
@@ -1001,7 +1001,7 @@ void psikyosh_state::video_start()
 	m_bg_zoom = std::make_unique<u16[]>(256);
 	m_alphatable = std::make_unique<u8[]>(256);
 
-	/* 256 colour sprites with palette selectable on 16 colour boundaries */
+	/* 256 color sprites with palette selectable on 16 color boundaries */
 	m_gfxdecode->gfx(1)->set_granularity(16); 
 
 	/* Pens 0xc0-0xff have a gradient of alpha values associated with them */
