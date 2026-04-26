@@ -40,10 +40,11 @@
 
 #define LOG_STEP        (1U << 1)
 #define LOG_TRACK       (1U << 2)
-#define LOG_SOUND       (1U << 3)
-#define LOG_SND_DETAIL  (1U << 4)
-#define LOG_MACDRIVE    (1U << 5)
-#define VERBOSE 0
+#define LOG_SND         (1U << 3)
+#define LOG_SND_CONFIG  (1U << 4)
+#define LOG_SND_DETAIL  (1U << 5)
+#define LOG_MACDRIVE    (1U << 6)
+#define VERBOSE ( LOG_SND_CONFIG )
 
 #include "logmacro.h"
 
@@ -1390,27 +1391,33 @@ uint32_t floppy_image_device::get_variant() const
 
 =================================================================== */
 
+floppy_sound_samples::floppy_sound_samples() :
+	m_current_form_factor(floppy_image::FF_UNKNOWN),
+	m_current_dir(nullptr)
+{
+};
+
 void floppy_sound_samples::select(int form_factor)
 {
 	bool found = false;
 
 	while (!found)
 	{
-		m_index = 0; // index of the sample in the sample name list
+		int index = 0; // index of the sample in the sample name list
 
 		for (floppy_sound_entry& entry : m_fulllist)
 		{
-			if (entry.form_factor == form_factor)
+			if (entry.form_factor == form_factor && entry.directory != nullptr)
 			{
-				if (m_index == 0)   // new list
+				if (index == 0)   // new list
 				{
 					// Create the asterisked first entry for the subdirectory
 					m_basedir = "*" + std::string(entry.directory);
 					m_samplenames.push_back(m_basedir.c_str());
-					m_index++;
+					index++;
 					found = true;
 				}
-				entry.index = m_index++;   // keep record of position in the sample list
+				entry.index = index++;   // keep record of position in the sample list
 				m_samplenames.push_back(entry.filename);
 			}
 		}
@@ -1662,7 +1669,7 @@ void floppy_sound_device::device_start()
 		if (m_samplelist->get_assumed_form_factor() != 0)
 		{
 			set_samples_names(m_samplelist->get_names());
-			LOGMASKED(LOG_SOUND, "Loading custom samples\n");
+			LOGMASKED(LOG_SND_CONFIG, "Loading custom samples\n");
 			// Try to read the audio samples.
 			m_samples_available = load_samples();
 		}
@@ -1675,7 +1682,7 @@ void floppy_sound_device::device_start()
 		if (m_default_samples.get_assumed_form_factor() != 0)
 		{
 			set_samples_names(m_default_samples.get_names());
-			LOGMASKED(LOG_SOUND, "Loading default samples\n");
+			LOGMASKED(LOG_SND_CONFIG, "Loading default samples\n");
 			// Try to read the default audio samples
 			m_samples_available = load_samples();
 			m_samplelist = &m_default_samples;
@@ -1745,10 +1752,10 @@ void floppy_sound_device::motor(bool running, bool withdisk)
 		m_spin_sample = (m_spin_kind==floppy_sound_samples::QUIET)? floppy_sound_samples::QUIET : m_samplelist->find_spin(m_spin_kind);
 
 		if (m_spin_sample == floppy_sound_samples::QUIET)
-			LOGMASKED(LOG_SOUND, "Spin off\n");
+			LOGMASKED(LOG_SND, "Spin off\n");
 		else
 			if (m_spin_sample != old_sample)
-				LOGMASKED(LOG_SOUND, "Spin sample = %d\n", m_spin_sample);
+				LOGMASKED(LOG_SND, "Spin sample = %d\n", m_spin_sample);
 	}
 	m_motor_on = running;
 	m_with_disk = withdisk;
@@ -1794,7 +1801,7 @@ void floppy_sound_device::step(int track)
 				if (raterel > 0.10 && m_in_seek)
 				{
 					recalc = true;
-					LOGMASKED(LOG_SOUND, "Step rate has changed from %.1f to %.1f ms\n", m_step_rate, rate);
+					LOGMASKED(LOG_SND, "Step rate has changed from %.1f to %.1f ms\n", m_step_rate, rate);
 				}
 				m_step_rate = rate;
 			}
@@ -1804,7 +1811,7 @@ void floppy_sound_device::step(int track)
 		{
 			if (recalc || !m_in_seek)
 			{
-				LOGMASKED(LOG_SOUND, "Seeking with rate = %.1f ms\n", m_step_rate);
+				LOGMASKED(LOG_SND, "Seeking with rate = %.1f ms\n", m_step_rate);
 
 				int newseek = m_samplelist->find_seek(m_step_rate, track, m_seek_pitch);
 				if (newseek == floppy_sound_samples::QUIET)
@@ -1926,10 +1933,10 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream)
 				m_spin_sample = (m_spin_kind==floppy_sound_samples::QUIET)? floppy_sound_samples::QUIET : m_samplelist->find_spin(m_spin_kind);
 
 				if (m_spin_sample == floppy_sound_samples::QUIET)
-					LOGMASKED(LOG_SOUND, "Spin off\n");
+					LOGMASKED(LOG_SND, "Spin off\n");
 				else
 					if (m_spin_sample != old_sample)
-						LOGMASKED(LOG_SOUND, "Spin sample = %d\n", m_spin_sample);
+						LOGMASKED(LOG_SND, "Spin sample = %d\n", m_spin_sample);
 
 				// Restart the selected sample
 				m_spin_samplepos = 0;

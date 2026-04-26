@@ -85,7 +85,7 @@ namespace fs {
 class floppy_sound_samples
 {
 public:
-	floppy_sound_samples() { };
+	floppy_sound_samples();
 
 	/* Clear the list. */
 	void clear() { m_fulllist.clear(); }
@@ -154,7 +154,6 @@ private:
 
 	std::vector<floppy_sound_entry> m_fulllist;
 
-	int m_index;
 	int m_current_form_factor;
 	const char* m_current_dir;
 };
