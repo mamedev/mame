@@ -27,8 +27,9 @@ namespace {
 
 constexpr u8 sanitise_character(u8 ch)
 {
-	// assume ISO-8859-1 (low 256 Unicode codepoints) - tab, soft hyphen, C0 and C1 cause problems
-	return ('\t' == ch) ? ' ' : (0xadU == ch) ? '-' : ((' ' > ch) || (('~' < ch) && (0xa0U > ch))) ? '.' : ch;
+	// reduce to printable 7-bit ASCII
+	ch &= 0x7f;
+	return ((' ' > ch) || ('~' < ch)) ? '.' : ch;
 }
 
 } // anonymous namespace
