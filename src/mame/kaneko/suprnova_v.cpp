@@ -5,6 +5,7 @@
 #include "emu.h"
 #include "suprnova.h"
 
+#include <algorithm>
 
 /* draws ROZ with linescroll OR columnscroll to 16-bit indexed bitmap */
 void skns_state::draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, const rectangle &cliprect, tilemap_t *tmap, u32 startx, u32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, u32* scrollram)
