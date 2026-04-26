@@ -24,7 +24,7 @@
 #define LOG_SCSI    (1U << 6)
 #define LOG_DMA     (1U << 7)
 
-//#define VERBOSE (LOG_GENERAL|LOG_CMD|LOG_REG|LOG_STATE|LOG_CONFIG|LOG_INT|LOG_SCSI|LOG_DMA)
+#define VERBOSE (LOG_GENERAL|LOG_CMD|LOG_REG|LOG_STATE)
 
 #include "logmacro.h"
 
@@ -69,6 +69,11 @@ void cxd1185_device::map(address_map &map)
 	map(0xd, 0xd).rw(FUNC(cxd1185_device::sync_ctrl_r), FUNC(cxd1185_device::sync_ctrl_w));
 	map(0xe, 0xe).rw(FUNC(cxd1185_device::scsi_ctrl_r), FUNC(cxd1185_device::scsi_ctrl_w));
 	map(0xf, 0xf).rw(FUNC(cxd1185_device::ioport_r), FUNC(cxd1185_device::ioport_w));
+}
+
+void cxd1185_device::log_count_w(unsigned byte, u8 data)
+{
+	LOG("(%s) count_w<%u>(0x%x)\n", machine().describe_context(), byte, data);
 }
 
 void cxd1185_device::device_start()
@@ -910,9 +915,7 @@ void cxd1185_device::dma_w(u8 data)
 		set_drq(false);
 
 		if (m_count)
-		{
 			m_state_timer->adjust(attotime::zero);
-		}
 	}
 }
 

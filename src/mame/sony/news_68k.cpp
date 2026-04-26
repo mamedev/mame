@@ -849,7 +849,7 @@ void news_68k_desktop_state::nws1580(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
 	// scsi host adapter
-	CXD1180(config, m_scsi);
+	CXD1180(config, m_scsi, 20_MHz_XTAL / 2);
 	m_scsibus->set_external_device(7, m_scsi);
 	m_scsi->irq_handler().set(DEVICE_SELF, FUNC(news_68k_desktop_state::irq_w<SCSI>));
 	m_scsi->irq_handler().append(m_dma, FUNC(dmac_0266_device::eop_w));
@@ -900,7 +900,7 @@ void news_68k_laptop_state::nws1250(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
 	// scsi host adapter
-	CXD1185(config, m_scsi, 32_MHz_XTAL / 2); // TODO: needs confirmation on hw
+	CXD1185(config, m_scsi, 20_MHz_XTAL / 2); // TODO: needs confirmation on hw
 	m_scsibus->set_external_device(7, m_scsi);
 	m_scsi->irq_out_cb().set(DEVICE_SELF, FUNC(news_68k_laptop_state::irq_w<SCSI>));
 	m_scsi->irq_out_cb().append(m_dma, FUNC(dmac_0266_device::eop_w));
