@@ -187,7 +187,7 @@ uint8_t phc25_state::port40_r()
 	uint8_t data = 0;
 
 	/* vertical sync */
-	data |= !m_vdg->fs_r() << 4;
+	data |= m_vdg->fs_r() << 4;
 
 	/* cassette read */
 	data |= (m_cassette->input() > +0.3) << 5;
@@ -607,7 +607,7 @@ void phc25_state::fsync_irq_w(int state)
 {
 	if (state == 0)
 	{
-		m_maincpu->pulse_input_line(INPUT_LINE_IRQ0, attotime::from_usec(100));
+		m_maincpu->pulse_input_line(INPUT_LINE_IRQ0, attotime::from_usec(3));
 	}
 }
 
