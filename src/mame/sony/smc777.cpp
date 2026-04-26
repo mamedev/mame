@@ -5,15 +5,20 @@
 SMC-777 (c) 1983 Sony
 
 TODO:
-- Implement SMC-70 specific features;
-- Implement GFX modes other than 160x100x4
-- ROM/RAM bankswitch, it apparently happens after one instruction prefetching.
-  We currently use an hackish implementation until the MAME/MESS framework can
-  support that ...
-- keyboard input is very sluggish, convert to device_matrix_interface;
+- convert video to a proper mc6845, consider this as a good base for new device rewrite;
 - cursor stuck in Bird Crash;
-- add mc6845 features;
 - interlace (cfr. cpm22 in setup mode);
+- ROM/RAM bankswitch, it apparently happens after one instruction prefetching.
+  Hacked around for now;
+- keyboard input is very sluggish, convert to device_matrix_interface;
+- Most often don't survive a soft reset;
+- Hookup Kanji ROM (have dump);
+- tape;
+- far too many floppy load failures (fixed?);
+- .mfi floppy format throws a crash;
+- Downgrade for SMC-70 (if/when dump is available). Has extra GFX modes that 777 dropped;
+- Superimposing features (if/when SW dumps arises, cfr. SMC-70G promotional video)
+- Find better reference materials, available one lacks several pages;
 
 **************************************************************************************************/
 
@@ -27,8 +32,8 @@ TODO:
 #include "machine/74259.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
-#include "sound/beep.h"
 #include "sound/sn76496.h"
+#include "sound/spkrdev.h"
 #include "video/mc6845.h"
 
 #include "emupal.h"
@@ -67,7 +72,7 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:%u", 0U)
 		, m_ioctrl(*this, "ioctrl")
-		, m_beeper(*this, "beeper")
+		, m_dac1bit(*this, "dac1bit")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		// "JOY STICK#" dual DE-9 ports, on the right side of body chassis (near the volume knob)
@@ -114,9 +119,12 @@ private:
 	uint8_t vsync_irq_status_r();
 	void vsync_irq_enable_w(uint8_t data);
 	void palette_init(palette_device &palette) const;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vsync_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void graphic_320x200x4(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void graphic_640x200x2(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, uint8_t data);
@@ -133,10 +141,10 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<mc6845_device> m_crtc;
-	required_device<mb8876_device> m_fdc;
+	required_device<mb8877_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<ls259_device> m_ioctrl;
-	required_device<beep_device> m_beeper;
+	required_device<speaker_sound_device> m_dac1bit;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device_array<msx_general_purpose_port_device, 2> m_joystick_port;
@@ -164,6 +172,7 @@ private:
 	uint8_t m_crtc_addr = 0;
 	bool m_vsync_idf = false;
 	bool m_vsync_ief = false;
+	uint8_t m_de;
 };
 
 
@@ -186,50 +195,78 @@ void smc777_state::video_start()
 }
 
 // TODO: cleanup, move to device, honor cliprect
+void smc777_state::graphic_320x200x4(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const u16 bitmap_pitch = mc6845_h_display * 2;
+
+	for(int y = 0; y < mc6845_v_display; y++)
+	{
+		const u32 base_address = y * bitmap_pitch + mc6845_start_addr * 2;
+		const int res_y = y * 8 + CRTC_MIN_Y;
+
+		for(int x = 0; x < bitmap_pitch; x++)
+		{
+			const int res_x = x * 4 + CRTC_MIN_X;
+			for(int yi = 0; yi < 8; yi++)
+			{
+				const u8 dot = m_gvram[((base_address + x) & 0xfff) + yi * 0x1000];
+				u8 color = (dot & 0xf0) >> 4;
+				bitmap.pix(res_y + yi, res_x + 0) = m_palette->pen(color);
+				bitmap.pix(res_y + yi, res_x + 1) = m_palette->pen(color);
+
+				color = (dot & 0x0f) >> 0;
+				bitmap.pix(res_y + yi, res_x + 2) = m_palette->pen(color);
+				bitmap.pix(res_y + yi, res_x + 3) = m_palette->pen(color);
+			}
+		}
+	}
+}
+
+void smc777_state::graphic_640x200x2(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const u8 color_table[8] = { 0x00, 0x04, 0x02, 0x01, 0x00, 0x04, 0x02, 0x07 };
+	const u16 bitmap_pitch = mc6845_h_display * 2;
+
+	const u8 color_bank = BIT(m_display_reg, 5) << 2;
+
+	for(int y = 0; y < mc6845_v_display; y++)
+	{
+		// comp2:HETZER uses start address for double buffering
+		const u32 base_address = y * bitmap_pitch + mc6845_start_addr * 2;
+		const int res_y = y * 8 + CRTC_MIN_Y;
+
+		for(int x = 0; x < bitmap_pitch; x++)
+		{
+			const int res_x = x * 4 + CRTC_MIN_X;
+			for(int yi = 0; yi < 8; yi++)
+			{
+				const u8 dot = m_gvram[((base_address + x) & 0xfff) + yi * 0x1000];
+				for (int xi = 0; xi < 4; xi++)
+				{
+					u8 color = (dot >> (6 - (xi * 2))) & 3;
+					color |= color_bank;
+					bitmap.pix(res_y + yi, res_x + xi) = m_palette->pen(color_table[color]);
+				}
+			}
+		}
+	}
+}
+
 uint32_t smc777_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(m_backdrop_pen), cliprect);
 
 	int x_width = BIT(m_display_reg, 7);
 
-	const u16 bitmap_pitch = mc6845_h_display * 2;
+	if (BIT(m_display_reg, 3))
+		graphic_640x200x2(bitmap, cliprect);
+	else
+		graphic_320x200x4(bitmap, cliprect);
 
-	for(int y = 0; y < mc6845_v_display; y++)
-	{
-		// comp2:HETZER uses start address for double buffering
-		const u32 base_address = y * bitmap_pitch + mc6845_start_addr * 2;
-		for(int x = 0; x < bitmap_pitch; x++)
-		{
-			for(int yi = 0; yi < 8; yi++)
-			{
-				u8 color = (m_gvram[base_address + x + yi * 0x1000] & 0xf0) >> 4;
-
-				//if(x_width)
-				{
-					bitmap.pix(y * 8 + yi + CRTC_MIN_Y, x * 4 + 0 + CRTC_MIN_X) = m_palette->pen(color);
-					bitmap.pix(y * 8 + yi + CRTC_MIN_Y, x * 4 + 1 + CRTC_MIN_X) = m_palette->pen(color);
-				}
-				//else
-				//{
-				//  bitmap.pix(y+yi+CRTC_MIN_Y, x*2+0+CRTC_MIN_X) = m_palette->pen(color);
-				//}
-
-				color = (m_gvram[base_address + x + yi * 0x1000] & 0x0f) >> 0;
-				//if(x_width)
-				{
-					bitmap.pix(y * 8 + yi + CRTC_MIN_Y, x * 4 + 2 + CRTC_MIN_X) = m_palette->pen(color);
-					bitmap.pix(y * 8 + yi + CRTC_MIN_Y, x * 4 + 3 + CRTC_MIN_X) = m_palette->pen(color);
-				}
-				//else
-				//{
-				//  bitmap.pix(y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = m_palette->pen(color);
-				//}
-
-			}
-		}
-	}
-
-	u16 count = 0x0000;
+	// TODO: remove count usage
+	// - transitt: does horizontal scroll on ranking screen
+	// TODO: transitt itself has sync timing issues there
+	u16 count = mc6845_start_addr;
 
 	for(int y = 0; y < mc6845_v_display; y++)
 	{
@@ -308,6 +345,7 @@ uint32_t smc777_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			}
 
 			count += x_width + 1;
+			count &= 0x7ff;
 		}
 	}
 
@@ -412,12 +450,12 @@ void smc777_state::fbuf_w(offs_t offset, uint8_t data)
 
 uint8_t smc777_state::fdc_r(offs_t offset)
 {
-	return m_fdc->read(offset) ^ 0xff;
+	return m_fdc->read(offset);
 }
 
 void smc777_state::fdc_w(offs_t offset, uint8_t data)
 {
-	m_fdc->write(offset, data ^ 0xff);
+	m_fdc->write(offset, data);
 }
 
 uint8_t smc777_state::fdc1_fast_status_r()
@@ -574,7 +612,7 @@ void smc777_state::mt_on_w(int state)
 
 void smc777_state::sound_out_w(int state)
 {
-	m_beeper->set_state(state);
+	m_dac1bit->level_w(state);
 }
 
 void smc777_state::printer_strb_w(int state)
@@ -598,7 +636,7 @@ void smc777_state::color_mode_w(offs_t offset, uint8_t data)
 {
 	switch(data & 0x07)
 	{
-		case 0x05: m_joystick_port[BIT(offset, 8)]->pin_8_w(BIT(data, 4)); break;
+		case 0x05: m_joystick_port[!BIT(offset, 8)]->pin_8_w(BIT(data, 4)); break;
 		case 0x06: m_pal_mode = (data & 0x10) ^ 0x10; break;
 		default: logerror("Color FF %02x\n",data); break;
 	}
@@ -690,7 +728,7 @@ void smc777_state::vsync_irq_enable_w(uint8_t data)
 		logerror("Irq mask = %02x\n",data & 0xfe);
 
 	// IRQ mask
-	m_vsync_ief = BIT(data,0);
+	m_vsync_ief = BIT(data, 0);
 	// TODO: clear idf on 1->0 irq mask transition?
 }
 
@@ -732,8 +770,18 @@ void smc777_state::io_map(address_map &map)
 //  map(0x40, 0x47) ieee-488 / TMS9914A I/F
 	map(0x44, 0x44).mirror(0xff00).portr("GPDSW"); // normally unmapped in GPIB interface
 //  map(0x48, 0x49) hdd (winchester)
+	// joystick read (all active low)
+	// x--- ---- /BL, in blanking
+	// -x-- ---- /CS, joystick 2 present
+	// --x- ---- /USER, DE-9 port 2 button 2 (unconnected on port 1)
+	// ---x xxxx from DE-9
 	map(0x51, 0x51).select(0xff00).lr8(NAME([this] (offs_t offset) {
-		return m_joystick_port[BIT(offset, 8)]->read() & 0x7f;
+		const u8 joy_select = !BIT(offset, 8);
+		const u8 mask = 0x1f | (joy_select << 5);
+		const u8 joy2_cs = (!m_joystick_port[1]->exists()) << 6;
+		const u8 joy_in = m_joystick_port[!BIT(offset, 8)]->read() & mask;
+
+		return joy_in | joy2_cs | m_de;
 	})).w(FUNC(smc777_state::color_mode_w));
 	map(0x52, 0x52).select(0xff00).w(FUNC(smc777_state::ramdac_w));
 	map(0x53, 0x53).mirror(0xff00).w("sn1", FUNC(sn76489a_device::write));
@@ -1035,7 +1083,7 @@ void smc777_state::machine_reset()
 	m_pal_mode = 0x10;
 	m_vsync_idf = false;
 
-	m_beeper->set_state(0);
+	m_dac1bit->level_w(0);
 }
 
 
@@ -1152,35 +1200,36 @@ void smc777_state::smc777(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
-	HD6845S(config, m_crtc, MASTER_CLOCK / 16); // HD68A45SP; unknown clock, hand tuned to get ~60 fps
+	HD6845S(config, m_crtc, MASTER_CLOCK / 16); // HD46505SP-1 / HD68A45SP; unknown clock, hand tuned to get ~60 fps
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
 	m_crtc->out_vsync_callback().set(FUNC(smc777_state::vsync_w));
+	m_crtc->out_de_callback().set([this] (int state) { m_de = state << 7; });
 
-	MB8876(config, m_fdc, MASTER_CLOCK / 32); // divider not confirmed
+	// Confirmed MB8877A
+	MB8877(config, m_fdc, MASTER_CLOCK / 32); // divider not confirmed
 	m_fdc->intrq_wr_callback().set(FUNC(smc777_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(smc777_state::fdc_drq_w));
 
-	// does it really support 16 of them?
 	FLOPPY_CONNECTOR(config, m_floppy[0], smc777_floppies, "ssdd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], smc777_floppies, "ssdd", floppy_image_device::default_mfm_floppy_formats);
+	// by default it has no 2nd floppy
+	FLOPPY_CONNECTOR(config, m_floppy[1], smc777_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("smc777");
 	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(smc777_state::quickload_cb));
 
 	// No clue about bundled defaults but:
-	// - dragon expects joystick in port 2
-	// - comp2:SMCPAINT expects mouse in port 1
-	MSX_GENERAL_PURPOSE_PORT(config, m_joystick_port[0], msx_general_purpose_port_devices, "mouse");
-	MSX_GENERAL_PURPOSE_PORT(config, m_joystick_port[1], msx_general_purpose_port_devices, "joystick");
+	// - dragon expects joystick in port 1
+	// - comp2:SMCPAINT/smcpaint expects mouse in port 2
+	MSX_GENERAL_PURPOSE_PORT(config, m_joystick_port[0], msx_general_purpose_port_devices, "joystick");
+	MSX_GENERAL_PURPOSE_PORT(config, m_joystick_port[1], msx_general_purpose_port_devices, "mouse");
 
 	SPEAKER(config, "mono").front_center();
 
 	SN76489A(config, "sn1", MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider
 
-	BEEP(config, m_beeper, 300); // TODO: correct frequency
-	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
+	SPEAKER_SOUND(config, m_dac1bit).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(smc777_state::keyboard_callback), attotime::from_hz(240/32));
 }

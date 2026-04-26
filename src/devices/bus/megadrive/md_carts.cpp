@@ -61,7 +61,6 @@ void md_cart(device_slot_interface &device)
 // pirate mappers (protection and/or bankswitch)
 	device.option_add_internal("rom_16mj2",  MD_ROM_16MJ2);
 	device.option_add_internal("rom_bugs",  MD_ROM_BUGSLIFE);
-	device.option_add_internal("rom_chinf3",  MD_ROM_CHINF3);
 	device.option_add_internal("rom_elfwor",  MD_ROM_ELFWOR);
 	device.option_add_internal("rom_yasech",  MD_ROM_YASECH);
 	device.option_add_internal("rom_kof98",  MD_ROM_KOF98);

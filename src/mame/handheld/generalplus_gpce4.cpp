@@ -28,638 +28,341 @@
 
 #include "emu.h"
 
-#include "cpu/unsp/unsp.h"
+#include "machine/generalplus_gpce4_soc.h"
 #include "machine/timer.h"
-#include "sound/dac.h"
+#include "video/st7735_lcdc.h"
 
-#include "emupal.h"
 #include "screen.h"
-#include "speaker.h"
 
 #include "logmacro.h"
 
 
 namespace {
 
-class generalplus_gpl_unknown_state : public driver_device
+class generalplus_gpce4_state : public driver_device
 {
 public:
-	generalplus_gpl_unknown_state(const machine_config &mconfig, device_type type, const char *tag) :
+	generalplus_gpce4_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		//m_mainrom(*this, "maincpu"),
-		//m_mainram(*this, "mainram"),
-		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
-		m_dac(*this, "dac"),
-		m_spirom(*this, "spi"),
-		m_testio(*this, "TEST")
+		m_lcdc(*this, "lcdc")
 	{ }
 
-	void generalplus_gpl_unknown(machine_config &config);
+	void generalplus_gpce4(machine_config &config) ATTR_COLD;
 
 	void init_siddr();
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual void spi_from_soc(u8 data) = 0;
 
-	required_device<unsp_12_device> m_maincpu;
-	//required_region_ptr<uint16_t> m_mainrom;
-	//required_shared_ptr<uint16_t> m_mainram;
+	void portb_from_soc(u16 data);
+	void process_lcdc_command_params(u8 data);
 
-	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;
-	required_device<dac_word_device_base> m_dac;
-
-	required_region_ptr<uint16_t> m_spirom;
-	required_ioport m_testio;
-
-	uint16_t reg3001_r(offs_t offset);
-	void reg3001_w(offs_t offset, uint16_t data);
-	uint16_t reg3002_r(offs_t offset);
-	void reg3002_w(offs_t offset, uint16_t data);
-	uint16_t reg3003_r(offs_t offset);
-	void reg3003_w(offs_t offset, uint16_t data);
-	uint16_t reg3004_r(offs_t offset);
-	uint16_t reg3005_r(offs_t offset);
-	void reg3005_w(offs_t offset, uint16_t data);
-	uint16_t reg3006_r(offs_t offset);
-	uint16_t reg3007_r(offs_t offset);
-
-	uint16_t reg300f_r(offs_t offset);
-
-	uint16_t reg3016_r(offs_t offset);
-
-	void reg3034_w(offs_t offset, uint16_t data);
-	void reg3041_audiodac_w(offs_t offset, uint16_t data);
-
-	uint16_t reg3050_r(offs_t offset);
-	void reg3050_w(offs_t offset, uint16_t data);
-	void reg3051_w(offs_t offset, uint16_t data);
-	uint16_t reg3052_r(offs_t offset);
-	uint16_t reg3053_r(offs_t offset);
-
-	uint16_t reg3090_r(offs_t offset);
-	uint16_t reg3091_r(offs_t offset);
-	void reg3092_lcd_w(offs_t offset, uint16_t data);
-	uint16_t reg3094_r(offs_t offset);
-	uint16_t reg3095_r(offs_t offset);
-
-	void reg30e0_w(offs_t offset, uint16_t data);
-	void reg30e1_w(offs_t offset, uint16_t data);
-	void reg30e2_w(offs_t offset, uint16_t data);
-	void reg30e3_w(offs_t offset, uint16_t data);
-	uint16_t reg30e4_r(offs_t offset);
-	uint16_t reg30e5_r(offs_t offset);
+	u16 m_iob;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer2);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer3);
 
-	uint16_t m_display[128*2 * 128];
-	int m_displayposx;
-	int m_displayposy;
-	uint16_t m_3001;
-	uint16_t m_3003;
-	uint16_t m_3005;
-	uint16_t m_3050;
+	required_device<generalplus_gpce4_soc_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<st7735_lcdc_device> m_lcdc;
 
-	void map(address_map &map) ATTR_COLD;
 };
 
-uint32_t generalplus_gpl_unknown_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+class generalplus_gpce4_mapacman_state : public generalplus_gpce4_state
 {
-	int count = 0;
-	for (int y = 0; y < 128; y++)
-	{
-		u16* dst = &bitmap.pix(y);
+public:
+	generalplus_gpce4_mapacman_state(const machine_config &mconfig, device_type type, const char *tag) :
+		generalplus_gpce4_state(mconfig, type, tag)
+	{ }
 
-		for (int x = 0; x < 128; x++)
-		{
-			uint8_t pix1 = m_display[count++];
-			uint8_t pix2 = m_display[count++];
+	virtual void spi_from_soc(u8 data) override;
+};
 
-			uint16_t pal = ((pix1<<8) | pix2);
+class generalplus_gpce4_digicolr_state : public generalplus_gpce4_state
+{
+public:
+	generalplus_gpce4_digicolr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		generalplus_gpce4_state(mconfig, type, tag)
+	{ }
 
-			dst[x] = pal;
-		}
-	}
-	return 0;
+	void digicolr(machine_config &config) ATTR_COLD;
+
+	virtual void spi_from_soc(u8 data) override;
+	ioport_value unk_r();
+
+private:
+};
+
+u32 generalplus_gpce4_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return m_lcdc->render_to_bitmap(screen, bitmap, cliprect);
 }
 
-
-static INPUT_PORTS_START( generalplus_gpl_unknown )
-	PORT_START("TEST")
-	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) )
+static INPUT_PORTS_START( generalplus_gpce4 )
+	PORT_START("PORTA")
+	PORT_DIPNAME( 0x0001, 0x0001, "PORTA: 0001" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "PORTA: 0002" )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "PORTA: 0004" )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, "PORTA: 0008" )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "PORTA: 0010" )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "PORTA: 0020" )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "PORTA: 0040" )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "PORTA: 0080" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "PORTA: 0100" )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, "PORTA: 0200" )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "PORTA: 0400" )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "PORTA: 0800" )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, "PORTA: 1000" )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, "PORTA: 2000" )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "PORTA: 4000" )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "PORTA: 8000" )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("PORTB")
+	PORT_DIPNAME( 0x0001, 0x0001, "PORTB: 0001" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "PORTB: 0002" )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "PORTB: 0004" )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, "PORTB: 0008" )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "PORTB: 0010" )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "PORTB: 0020" )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "PORTB: 0040" )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "PORTB: 0080" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "PORTB: 0100" )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, "PORTB: 0200" )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "PORTB: 0400" )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "PORTB: 0800" )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, "PORTB: 1000" )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, "PORTB: 2000" )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "PORTB: 4000" )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "PORTB: 8000" )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("PORTC")
+	PORT_DIPNAME( 0x0001, 0x0001, "PORTC: 0001" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "PORTC: 0002" )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "PORTC: 0004" )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, "PORTC: 0008" )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "PORTC: 0010" )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "PORTC: 0020" )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "PORTC: 0040" )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "PORTC: 0080" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "PORTC: 0100" )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, "PORTC: 0200" )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "PORTC: 0400" )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "PORTC: 0800" )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, "PORTC: 1000" )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, "PORTC: 2000" )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "PORTC: 4000" )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "PORTC: 8000" )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mapacman )
+	PORT_INCLUDE( generalplus_gpce4 )
+
+	PORT_MODIFY("PORTA")
+	PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("PORTB")
+	PORT_BIT(0x0003, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT(0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("PORTC")
+	PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-uint16_t generalplus_gpl_unknown_state::reg3001_r(offs_t offset)
+ioport_value generalplus_gpce4_digicolr_state::unk_r()
 {
-	return m_3001;
+	return machine().rand();
 }
 
-void generalplus_gpl_unknown_state::reg3001_w(offs_t offset, uint16_t data)
+static INPUT_PORTS_START( digicolr )
+	PORT_INCLUDE( generalplus_gpce4 )
+
+	PORT_MODIFY("PORTA")
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(generalplus_gpce4_digicolr_state::unk_r)) // unknown, might be a button, but keeps things moving
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) // this will also keep things moving
+INPUT_PORTS_END
+
+void generalplus_gpce4_state::machine_start()
 {
-	m_3001 = data;
-	logerror("%s: reg3001_w %04x\n", machine().describe_context(), data);
+	save_item(NAME(m_iob));
 }
 
-uint16_t generalplus_gpl_unknown_state::reg3002_r(offs_t offset)
+void generalplus_gpce4_state::machine_reset()
 {
-	return 0x0000;//machine().rand();
+	m_iob = 0;
 }
 
-void generalplus_gpl_unknown_state::reg3002_w(offs_t offset, uint16_t data)
+TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpce4_state::timer )
 {
-	//logerror("%s: reg3002_w %04x\n", machine().describe_context(), data);
+	m_maincpu->request_interrupt(24);
 }
 
-uint16_t generalplus_gpl_unknown_state::reg3003_r(offs_t offset)
+void generalplus_gpce4_state::portb_from_soc(u16 data)
 {
-	return m_3003;
+	m_iob = data;
 }
 
-void generalplus_gpl_unknown_state::reg3003_w(offs_t offset, uint16_t data)
+void generalplus_gpce4_mapacman_state::spi_from_soc(u8 data)
 {
-	m_3003 = data;
-	logerror("%s: reg3003_w %04x\n", machine().describe_context(), data);
-}
-
-uint16_t generalplus_gpl_unknown_state::reg3004_r(offs_t offset)
-{
-	return m_testio->read();
-}
-
-uint16_t generalplus_gpl_unknown_state::reg3005_r(offs_t offset)
-{
-	return m_3005;
-}
-
-void generalplus_gpl_unknown_state::reg3005_w(offs_t offset, uint16_t data)
-{
-	m_3005 = data;
-	//logerror("%s: reg3005_w %04x\n", machine().describe_context(), data);
-}
-
-
-uint16_t generalplus_gpl_unknown_state::reg3006_r(offs_t offset)
-{
-	return 0x0000;//machine().rand();
-}
-
-uint16_t generalplus_gpl_unknown_state::reg3007_r(offs_t offset)
-{
-	return 0x0000;//machine().rand();
-}
-
-uint16_t generalplus_gpl_unknown_state::reg300f_r(offs_t offset)
-{
-	return 0x0000;//machine().rand();
-}
-
-uint16_t generalplus_gpl_unknown_state::reg3016_r(offs_t offset)
-{
-	return 0x0000;//machine().rand();
-}
-
-
-
-void generalplus_gpl_unknown_state::reg3034_w(offs_t offset, uint16_t data)
-{
-	// writes a lot of 0x5555 here in a block
-	logerror("%s: reg3034_w %04x\n", machine().describe_context(), data);
-}
-
-void generalplus_gpl_unknown_state::reg3041_audiodac_w(offs_t offset, uint16_t data)
-{
-//  logerror("%s: reg3041_audiodac_w %04x\n", machine().describe_context(), data);
-
-	// mapacman only writes 0000 / 7fff / 8000, but is known to have more limited sound than other units
-
-	m_dac->data_w(data);
-}
-
-uint16_t generalplus_gpl_unknown_state::reg3050_r(offs_t offset)
-{
-	return m_3050;
-}
-
-void generalplus_gpl_unknown_state::reg3050_w(offs_t offset, uint16_t data)
-{
-	uint16_t old = m_3050;
-	m_3050 = data;
-
-	// probably not, but does happen at the end of a line
-	if ((old & 0x0100) != (m_3050 & 0x0100))
+	if (!(m_iob & 0x0800))
 	{
-		if ((m_3050 & 0x0100) == 0x0000)
-		{
-			m_displayposx = 0;
-			m_displayposy++;
-			if (m_displayposy == 128)
-			{
-				m_displayposy = 0;
-			}
-		}
-	}
-
-	//m_displaypos = 0;
-	logerror("%s: reg3050_w %04x\n", machine().describe_context(), data);
-}
-
-uint16_t generalplus_gpl_unknown_state::reg3052_r(offs_t offset)
-{
-	return 0x0000;//machine().rand();
-}
-
-uint16_t generalplus_gpl_unknown_state::reg3053_r(offs_t offset)
-{
-	return 0x0000;//machine().rand();
-}
-
-void generalplus_gpl_unknown_state::reg30e0_w(offs_t offset, uint16_t data)
-{
-	//logerror("%s: reg30e0_w %04x\n", machine().describe_context(), data);
-}
-
-void generalplus_gpl_unknown_state::reg30e1_w(offs_t offset, uint16_t data)
-{
-	//logerror("%s: reg30e1_w %04x\n", machine().describe_context(), data);
-}
-
-void generalplus_gpl_unknown_state::reg30e2_w(offs_t offset, uint16_t data)
-{
-	/* this appears to be querying the SPI Flash, eg.
-	   command 0xab = Read Electonic Signature
-	   command 0x9f = Read ID of the SPI Flash
-
-	[:] ':maincpu' (0075DD): reg3001_w 1c00
-	[:] ':maincpu' (00769B): reg3001_w 0c00
-	[:] ':maincpu' (00769F): reg30e2_w 00ab (WITHOUT m_3001 & 0x1000)
-	[:] ':maincpu' (0076A5): reg3001_w 1c00
-	[:] ':maincpu' (0076A7): reg30e4_r
-	[:] ':maincpu' (0076AF): reg3001_w 0c00
-	[:] ':maincpu' (0076B3): reg30e2_w 009f (WITHOUT m_3001 & 0x1000)
-	[:] ':maincpu' (0076B6): reg30e2_w 0000 (WITHOUT m_3001 & 0x1000)
-	[:] ':maincpu' (0076B8): reg30e2_w 0000 (WITHOUT m_3001 & 0x1000)
-	[:] ':maincpu' (0076BA): reg30e2_w 0000 (WITHOUT m_3001 & 0x1000)
-	[:] ':maincpu' (0076C0): reg30e4_r
-	[:] ':maincpu' (0076C2): reg30e4_r
-	[:] ':maincpu' (0076C4): reg30e4_r
-	[:] ':maincpu' (0076C6): reg30e4_r
-	*/
-	if (!(m_3001 & 0x1000))
-	{
-		logerror("%s: reg30e2_w %04x (WITHOUT m_3001 & 0x1000)\n", machine().describe_context(), data);
+		m_lcdc->lcdc_command_w(data);
 	}
 	else
 	{
-		logerror("%s: reg30e2_w %04x (WITH m_3001 & 0x1000)\n", machine().describe_context(), data);
+		m_lcdc->lcdc_data_w(data);
 	}
 }
 
-void generalplus_gpl_unknown_state::reg30e3_w(offs_t offset, uint16_t data)
+void generalplus_gpce4_digicolr_state::spi_from_soc(u8 data)
 {
-	//logerror("%s: reg30e3_w %04x\n", machine().describe_context(), data);
-}
-
-uint16_t generalplus_gpl_unknown_state::reg30e4_r(offs_t offset)
-{
-	logerror("%s: reg30e4_r\n", machine().describe_context());
-	return machine().rand() & 0x01;
-}
-
-uint16_t generalplus_gpl_unknown_state::reg30e5_r(offs_t offset)
-{
-	// status flag: loops on bit 0x0010 after writes to 0x30e2
-	// and before reading from 0x30e4
-
-	// clrb [3001],12 is also usually executed before write operations
-	// to 0x30e2 and setb [3001],12 befoe the result is read back
-
-	return 0x0000;
-}
-
-/*
-mapacman vectors
-
-004015: 4844        - just reti
-        4845 fiq    - has code, acks by writing 8000 to 3051, very similar to irq0?)
-        4809 boot vector
-        4854 irq 0  - has code, acks by writing 8000 to 3051
-        4863 irq 1  - just acks by writing 4000 to 3051, no payload
-        486A irq 2 (used - needed to pass check on value in RAM changing in boot) acks with 2000 to 3051
-        487D irq 3 (used - needed to pass check on value in RAM changing shortly after) acks with 0100 to 3051?
-        4886 irq 4 - just acks by writing 10 to 3051, no payload
-        488C irq 5 - push/pop/return
-        488F irq 6 - push/pop/return
-        4892 irq 7 - minimal payload, no 3051 ack?
-*/
-
-void generalplus_gpl_unknown_state::reg3051_w(offs_t offset, uint16_t data)
-{
-	if (data & 0x8000)
-		m_maincpu->set_input_line(UNSP_IRQ0_LINE, CLEAR_LINE);
-
-	if (data & 0x2000)
-		m_maincpu->set_input_line(UNSP_IRQ2_LINE, CLEAR_LINE);
-
-	if (data & 0x0100)
-		m_maincpu->set_input_line(UNSP_IRQ3_LINE, CLEAR_LINE);
-
-
-	//logerror("%s: reg3051_w %04x (IRQ Ack?)\n", machine().describe_context(), data);
-}
-
-uint16_t generalplus_gpl_unknown_state::reg3090_r(offs_t offset)
-{
-	return 0x0000;//machine().rand();
-}
-
-uint16_t generalplus_gpl_unknown_state::reg3091_r(offs_t offset)
-{
-	return 0x0000;//machine().rand();
-}
-
-void generalplus_gpl_unknown_state::reg3092_lcd_w(offs_t offset, uint16_t data)
-{
-	if (m_3005 & 0x1000)
+	if (!(m_iob & 0x0400))
 	{
-		//if (m_3005 & 0x0800) // also always set for video writes?
-		{
-			//logerror("%s: reg3092_lcd_w %04x (Video?)\n", machine().describe_context(), data);
-			if ((m_displayposx < 256) && (m_displayposy < 256))
-				m_display[(m_displayposy * 256) + m_displayposx] = data;
-
-			if (data & 0xff00)
-				fatalerror("upper data bits set?\n");
-
-			m_displayposx++;
-
-			/*
-			if (m_displayposx == 256)
-			{
-			    m_displayposy++;
-			    m_displayposx = 0;
-			}
-			*/
-			/*
-			if (m_displayposy == 128)
-			{
-			    m_displayposy = 0;
-			    m_displayposx = 0;
-			}
-			*/
-		}
+		m_lcdc->lcdc_command_w(data);
 	}
-}
-
-uint16_t generalplus_gpl_unknown_state::reg3094_r(offs_t offset)
-{
-	return 0x0000;
-}
-
-uint16_t generalplus_gpl_unknown_state::reg3095_r(offs_t offset)
-{
-	// loops on bit 0x0010 after writing data to 0x3092
-
-	// clrb [3005],12 is used before writing non-pixel data to 0x3092
-	// setb [3005],12 is used after reading from 0x3094
-	return 0x0000;
-}
-
-
-void generalplus_gpl_unknown_state::map(address_map &map)
-{
-	map(0x000000, 0x000fff).ram(); // RAM
-	//map(0x001000, 0x0017ff).ram(); // Cache area, can be configured as RAM instead
-
-	// 3000 - IOA_Data
-	map(0x003001, 0x003001).rw(FUNC(generalplus_gpl_unknown_state::reg3001_r), FUNC(generalplus_gpl_unknown_state::reg3001_w)); // IOA_Buffer
-	map(0x003002, 0x003002).rw(FUNC(generalplus_gpl_unknown_state::reg3002_r), FUNC(generalplus_gpl_unknown_state::reg3002_w)); // IOA_Dir
-	map(0x003003, 0x003003).rw(FUNC(generalplus_gpl_unknown_state::reg3003_r), FUNC(generalplus_gpl_unknown_state::reg3003_w)); // IOA_Attrib
-	map(0x003004, 0x003004).r(FUNC(generalplus_gpl_unknown_state::reg3004_r)); // IOB_Data - input from here is acted upon
-	map(0x003005, 0x003005).rw(FUNC(generalplus_gpl_unknown_state::reg3005_r), FUNC(generalplus_gpl_unknown_state::reg3005_w)); // IOB_Buffer
-	map(0x003006, 0x003006).r(FUNC(generalplus_gpl_unknown_state::reg3006_r)); // IOB_Dir
-	map(0x003007, 0x003007).r(FUNC(generalplus_gpl_unknown_state::reg3007_r)); // IOB_Attrib
-	// 3008 - IOC_Data
-	// 3009 - IOC_Buffer
-	// 300a - IOC_Dir
-	// 300b - IOC_Attrib
-	// 300c - IOA_WakeUp_Mask
-	// 300d - IOB_WakeUp_Mask
-	// 300e - IOC_WakeUp_Mask
-	map(0x00300f, 0x00300f).r(FUNC(generalplus_gpl_unknown_state::reg300f_r)); // IO_Ctrl
-
-	// 3010 - TimerA_Data
-	// 3011 - TimerA_CNTR
-	// 3012 - TimerB_Data
-	// 3013 - TimerB_CNTR
-	// 3014 - TimerC_Data
-	// 3015 - TimerC_CNTR
-	map(0x003016, 0x003016).r(FUNC(generalplus_gpl_unknown_state::reg3016_r)); // 3016 - Timer_Ctrl
-
-	// 3020 - PWM0_Ctrl
-	// 3021 - PWM1_Ctrl
-	// 3022 - PWM2_Ctrl
-	// 3023 - PWM3_Ctrl
-
-	// 3030 - System_Clock
-	// 3031 - System_Reset
-	// 3032 - Reset_LVD_Ctrl
-	// 3033 - Timebase_Clear
-	map(0x003034, 0x003034).w(FUNC(generalplus_gpl_unknown_state::reg3034_w)); // Watchdog_Clear
-	// 3035 - Wait_Ctrl
-	// 3036 - System_Sleep
-
-	// 3039 - Cache_Ctrl
-	// 303a - Cache_Hit_Rate
-	// 303b - Stack_INT_Level
-
-	// 3040 - DAC_Ctrl
-	map(0x003041, 0x003041).w(FUNC(generalplus_gpl_unknown_state::reg3041_audiodac_w)); // DAC_CH1_Data
-	// 3042 - DAC_CH2_Data
-	// 3043 - PPAMCtrl
-
-	map(0x003050, 0x003050).rw(FUNC(generalplus_gpl_unknown_state::reg3050_r), FUNC(generalplus_gpl_unknown_state::reg3050_w)); // INT_Ctrl
-	map(0x003051, 0x003051).w(FUNC(generalplus_gpl_unknown_state::reg3051_w)); // INT_Status
-	map(0x003052, 0x003052).r(FUNC(generalplus_gpl_unknown_state::reg3052_r)); // FIQ_SEL
-	map(0x003053, 0x003053).r(FUNC(generalplus_gpl_unknown_state::reg3053_r)); // INT2_Ctrl
-	// 3054 - INT2_Status
-	// 3055 - FIQ2_SEL
-
-	// 3070 - ADC_Ctrl
-	// 3071 - ADC_Data
-	// 3072 - ADC_LineIn_BitCtrl
-	// 3073 - ADC_PGA_Ctrl
-	// 3074 - ADC_FIFO_Ctrl
-
-	map(0x003090, 0x003090).r(FUNC(generalplus_gpl_unknown_state::reg3090_r)); // SPI2_Ctrl
-	map(0x003091, 0x003091).r(FUNC(generalplus_gpl_unknown_state::reg3091_r)); // SPI2_TXStatus
-	map(0x003092, 0x003092).w(FUNC(generalplus_gpl_unknown_state::reg3092_lcd_w)); // SPI2_TXData
-	// 3093 - SPI2_RXStatus
-	map(0x003094, 0x003094).r(FUNC(generalplus_gpl_unknown_state::reg3094_r)); // SPI2_RXData - potential interesting
-	map(0x003095, 0x003095).r(FUNC(generalplus_gpl_unknown_state::reg3095_r)); // SPI2_Misc - mostly a status flag
-
-	// 309a - SPI2_DMA_Start
-	// 309b - SPI2_DMA_BC
-	// 309c - SPI2_RX_DMA_ADDR
-	// 309d - SPI2_TX_DMA_ADDR
-	// 309e - SPI2_DMA_INT_Ctrl
-	// 309f - SPI2_RX_ICE
-
-	// 30b0 - BUF_ACTIVE
-	// 30b1 - LINK_BUF10
-	// 30b2 - LINK_BUF32
-	// 30b3 - LINK_BUF54
-
-	// 30d0 - CTS_Ctrl0
-	// 30d1 - CTS_Ctrl1
-	// 30d2 - CTS_TMADATA
-	// 30d3 - CTS_TMACNT
-	// 30d4 - CTS_TMBDATA
-	// 30d5 - CTS_TMBCNT
-	// 30d6 - CTS_CAPTMB
-	// 30d7 - CTS_MUTCTRL
-
-	map(0x0030e0, 0x0030e0).w(FUNC(generalplus_gpl_unknown_state::reg30e0_w)); // SPI_Ctrl
-	map(0x0030e1, 0x0030e1).w(FUNC(generalplus_gpl_unknown_state::reg30e1_w)); // SPI_TXStatus
-	map(0x0030e2, 0x0030e2).w(FUNC(generalplus_gpl_unknown_state::reg30e2_w)); // SPI_TXData
-	map(0x0030e3, 0x0030e3).w(FUNC(generalplus_gpl_unknown_state::reg30e3_w)); // SPI_RXStatus
-	map(0x0030e4, 0x0030e4).r(FUNC(generalplus_gpl_unknown_state::reg30e4_r)); // SPI_RXData - potentially interesting (must not return 0x0000 or 'flash error')
-	map(0x0030e5, 0x0030e5).r(FUNC(generalplus_gpl_unknown_state::reg30e5_r)); // SPI_Misc - potentially interesting (also status flag)
-	// 30e6 - SPI_Man_Ctrl
-	// 30e7 - SPI_Auto_Ctrl
-	// 30e8 - SPI_PRGM_BC
-	// 30e9 - SPI_BANK
-	// 30ea - SPI_DMA_Start
-	// 30eb - SPI_DMA_BC
-	// 30ec - SPI_RX_DMA_ADDR
-	// 30ed - SPI_TX_DMA_ADDR
-	// 30ee - SPI_DMA_INT_Ctrl
-	// 30ef - SPI_RX_ICE
-
-	map(0x004000, 0x00bfff).rom().region("maincpu", 0x0000); // 0x4000 - 0x47ff is 'test program'
-	map(0x00c000, 0x00ffff).rom().region("maincpu", 0x0000);
-
-	map(0x200000, 0x3fffff).rom().region("spi", 0x0000); // has direct access to SPI ROM
-}
-
-
-void generalplus_gpl_unknown_state::machine_start()
-{
-	for (int color = 0; color < 0x10000; color++)
+	else
 	{
-		const u8 r = pal5bit(color >> 11);
-		const u8 g = pal6bit(color >> 5);
-		const u8 b = pal5bit(color & 0x1f);
-		m_palette->set_pen_color(color, rgb_t(r, g, b));
+		m_lcdc->lcdc_data_w(data);
 	}
-
-	save_item(NAME(m_display));
-	save_item(NAME(m_displayposx));
-	save_item(NAME(m_displayposy));
-	save_item(NAME(m_3001));
-	save_item(NAME(m_3003));
-	save_item(NAME(m_3005));
-	save_item(NAME(m_3050));
 }
 
-void generalplus_gpl_unknown_state::machine_reset()
+void generalplus_gpce4_state::generalplus_gpce4(machine_config &config)
 {
-	m_displayposx = 0;
-	m_displayposy = 0;
-	m_3001 = 0;
-	m_3003 = 0;
-	m_3005 = 0;
-	m_3050 = 0;
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpl_unknown_state::timer )
-{
-	m_maincpu->set_input_line(UNSP_IRQ3_LINE, ASSERT_LINE);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpl_unknown_state::timer2 )
-{
-	m_maincpu->set_input_line(UNSP_IRQ2_LINE, ASSERT_LINE);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpl_unknown_state::timer3 )
-{
-	m_maincpu->set_input_line(UNSP_IRQ0_LINE, ASSERT_LINE);
-}
-
-
-
-void generalplus_gpl_unknown_state::generalplus_gpl_unknown(machine_config &config)
-{
-	UNSP_20(config, m_maincpu, 96000000); // internal ROM uses unsp2.0 opcodes, should be 48MHz but glitches (due to timer hookups?)
-	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpl_unknown_state::map);
-	m_maincpu->set_vectorbase(0x4010); // there is also a set of vectors for what looks to be a burn-in test at 4000, maybe external pin selects?
+	GPCE4(config, m_maincpu, 96000000); // internal ROM uses unsp2.0 opcodes, should be 48MHz (but unSP2.0 opcode take fewer cycles?)
+	m_maincpu->porta_in().set_ioport("PORTA");
+	m_maincpu->portb_in().set_ioport("PORTB");
+	m_maincpu->portc_in().set_ioport("PORTC");
+	m_maincpu->portb_out().set(FUNC(generalplus_gpce4_state::portb_from_soc));
+	m_maincpu->spi2_out().set(FUNC(generalplus_gpce4_state::spi_from_soc));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
 	m_screen->set_size(128, 128);
-	m_screen->set_visarea(0, 128-1, 0, 128-1); // not the correct resolution
-	m_screen->set_screen_update(FUNC(generalplus_gpl_unknown_state::screen_update));
-	//m_screen->screen_vblank().set(FUNC(generalplus_gpl_unknown_state::screen_vblank));
-	m_screen->set_palette(m_palette);
+	m_screen->set_visarea(0, 128-1, 0, 128-1);
+	m_screen->set_screen_update(FUNC(generalplus_gpce4_state::screen_update));
 
-	SPEAKER(config, "speaker").front_center();
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	// this triggers the SPI2 interrupt, causing pixels to be pushed to the display
+	TIMER(config, "timer").configure_periodic(FUNC(generalplus_gpce4_state::timer), attotime::from_hz(300000));
 
-	TIMER(config, "timer").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer), attotime::from_hz(200000)); // draw timer (pushes pixels to the display in the IRQ)
-	TIMER(config, "timer2").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer2), attotime::from_hz(1000)); // game speed?
-	TIMER(config, "timer3").configure_periodic(FUNC(generalplus_gpl_unknown_state::timer3), attotime::from_hz(20000)); // audio
-
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
+	ST7735(config, m_lcdc, 0);
 }
 
-void generalplus_gpl_unknown_state::init_siddr()
+void generalplus_gpce4_digicolr_state::digicolr(machine_config &config)
 {
-	uint8_t* spirom8 = (uint8_t*)memregion("spi")->base();
+	generalplus_gpce4(config);
+	m_screen->set_visarea(0, 96-1, 18, 114-1);
+}
+
+void generalplus_gpce4_state::init_siddr()
+{
+	u8* spirom8 = (u8*)memregion("maincpu:spi")->base();
 	for (int i = 0x3000; i < 0x400000; i++)
 	{
 		spirom8[i] = bitswap<8>(spirom8[i] ^ 0x68,
@@ -669,58 +372,70 @@ void generalplus_gpl_unknown_state::init_siddr()
 
 
 ROM_START( mapacman ) // this is the single game (no games hidden behind solder pads) release
-	ROM_REGION16_BE( 0x18000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x18000, "maincpu:internal", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "mapacman_internal.rom", 0x000000, 0x10000, CRC(9ea69d2a) SHA1(17f5001794f4454bf5856cfa170834509d68bed0) )
 
-	ROM_REGION16_BE( 0x800000, "spi", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x800000, "maincpu:spi", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "fm25q16a.bin", 0x000000, 0x200000, CRC(aeb472ac) SHA1(500c24b725f6d3308ef8cbdf4259f5be556c7c92) )
 ROM_END
 
 ROM_START( taspinv )
-	ROM_REGION16_BE( 0x18000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x18000, "maincpu:internal", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x18000, NO_DUMP )
 
-	ROM_REGION16_BE( 0x800000, "spi", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x800000, "maincpu:spi", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "tinyarcade_spaceinvaders.bin", 0x000000, 0x200000, CRC(11ac4c77) SHA1(398d5eff83a4e94487ed810819085a0e44582908) )
 ROM_END
 
 ROM_START( tagalaga )
-	ROM_REGION16_BE( 0x18000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x18000, "maincpu:internal", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x18000, NO_DUMP )
 
-	ROM_REGION16_BE( 0x800000, "spi", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x800000, "maincpu:spi", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "tinyarcadegalaga_fm25q16a_a14015.bin", 0x000000, 0x200000, CRC(2a91460c) SHA1(ce297642d2d51ce568e93c0c57432446633b2077) )
 ROM_END
 
 ROM_START( parcade )
-	ROM_REGION16_BE( 0x18000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x18000, "maincpu:internal", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x18000, NO_DUMP )
 
-	ROM_REGION16_BE( 0x800000, "spi", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x800000, "maincpu:spi", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "palacearcade_gpr25l3203_c22016.bin", 0x000000, 0x400000, CRC(98fbd2a1) SHA1(ffc19aadd53ead1f9f3472475606941055ca09f9) )
 ROM_END
 
 ROM_START( taturtf )
-	ROM_REGION16_BE( 0x18000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x18000, "maincpu:internal", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x18000, NO_DUMP )
 
-	ROM_REGION16_BE( 0x800000, "spi", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x800000, "maincpu:spi", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "tinyarcadeturtlefighter_25q32bst16_684016.bin", 0x000000, 0x400000, CRC(8e046f2d) SHA1(e48492cf953f22a47fa2b88a8f96a1e459b8c487) )
 ROM_END
 
-ROM_START( digicolr )
-	ROM_REGION16_BE( 0x18000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x18000, NO_DUMP )
+/*
 
-	ROM_REGION16_BE( 0x800000, "spi", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "mx25l6433f.u2", 0x000000, 0x800000, CRC(9999e2a0) SHA1(4af880e5e2bb1c820b0ec19acf1b5f858bfa1ab0) )
+(this is correct for at least some of the digimon units)
+MCU : Generalplus GPCE4064B
+SPI Flash IC : Macronix MX25L6433F
+LCD Driver : Sitronix ST7735V
+LCD module : TCXD011IBLON-3
+Sound unit is a piezo disc.
+
+*/
+
+ROM_START( digicolr )
+	ROM_REGION16_BE( 0x18000, "maincpu:internal", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "digicolr_unsp.bin", 0x000000, 0x10000, CRC(24815b43) SHA1(d245d1e868d0357f9410cd325a3786b45a8365d2) )
+
+	ROM_REGION16_BE( 0x800000, "maincpu:spi", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "mx25l6433f.u2", 0x000000, 0x800000, CRC(c515cab8) SHA1(a8b04280acae0c4db1a82ea9b46ade398e41f72b) )
+	//ROM_LOAD16_WORD_SWAP( "mx25l6433f.u2", 0x000000, 0x800000, CRC(9999e2a0) SHA1(4af880e5e2bb1c820b0ec19acf1b5f858bfa1ab0) )
 ROM_END
 
 ROM_START( siddr )
-	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
 
-	ROM_REGION16_BE(0x800000, "spi", ROMREGION_ERASE00)
+	ROM_REGION16_BE(0x800000, "maincpu:spi", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "ddr-toy.bin", 0x0000, 0x400000, CRC(873cbcc8) SHA1(bdd3d12adb1284991a3f8aaa8e451e3a55931267) )
 ROM_END
 
@@ -729,19 +444,18 @@ ROM_END
 
 
 // The 'Micro Arcade' units are credit card sized handheld devices
-CONS( 2017, mapacman,      0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, empty_init, "Super Impulse", "Pac-Man (Micro Arcade)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2017, mapacman,      0,       0,      generalplus_gpce4,   mapacman,          generalplus_gpce4_mapacman_state, empty_init, "Super Impulse", "Pac-Man (Micro Arcade)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // The 'Tiny Arcade' units are arcade cabinets on a keyring.
-CONS( 2017, taspinv,       0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, empty_init, "Super Impulse", "Space Invaders (Tiny Arcade)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2017, taspinv,       0,       0,      generalplus_gpce4,   generalplus_gpce4, generalplus_gpce4_mapacman_state, empty_init, "Super Impulse", "Space Invaders (Tiny Arcade)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 2017, tagalaga,      0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, empty_init, "Super Impulse", "Galaga (Tiny Arcade)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2017, tagalaga,      0,       0,      generalplus_gpce4,   generalplus_gpce4, generalplus_gpce4_mapacman_state, empty_init, "Super Impulse", "Galaga (Tiny Arcade)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 2017, parcade,       0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, empty_init, "Hasbro", "Palace Arcade (Tiny Arcade)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2017, parcade,       0,       0,      generalplus_gpce4,   generalplus_gpce4, generalplus_gpce4_mapacman_state, empty_init, "Hasbro", "Palace Arcade (Tiny Arcade)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 2019, taturtf,       0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, empty_init, "Super Impulse", "Teenage Mutant Ninja Turtles - Turtle Fighter (Tiny Arcade)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2019, taturtf,       0,       0,      generalplus_gpce4,   generalplus_gpce4, generalplus_gpce4_mapacman_state, empty_init, "Super Impulse", "Teenage Mutant Ninja Turtles - Turtle Fighter (Tiny Arcade)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+CONS( 2021, digicolr,      0,       0,      digicolr,            digicolr,          generalplus_gpce4_digicolr_state, empty_init, "Bandai", "Digimon Color", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // Probably not identical hardware, but still not direct mapped SPI.  External ROM after 0x3000 is encrypted (maybe decrypted in software) seems to have jumps to internal ROM
-CONS( 2021, siddr,         0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, init_siddr, "Super Impulse", "Dance Dance Revolution - Broadwalk Arcade", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-
-CONS( 2021, digicolr,      0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, empty_init, "Bandai", "Digimon Color", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-
+CONS( 2021, siddr,         0,       0,      generalplus_gpce4,   generalplus_gpce4, generalplus_gpce4_mapacman_state, init_siddr, "Super Impulse", "Dance Dance Revolution - Broadwalk Arcade", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

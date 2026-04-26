@@ -64,14 +64,17 @@ Dumped by Uki
 */
 
 #include "emu.h"
+
+#include "kaneko_grap2.h"
+#include "kaneko_rlespr.h"
+#include "kaneko_toybox.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
-#include "kaneko_toybox.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ymz280b.h"
-#include "kaneko_grap2.h"
-#include "sknsspr.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -91,8 +94,7 @@ public:
 		m_paletteram(*this, "palette"),
 		m_spriteram(*this, "spriteram"),
 		m_priority_buffer(*this, "priority_buffer"),
-		m_sprregs(*this, "sprregs"),
-		m_sprite_bitmap(1024, 1024)
+		m_sprregs(*this, "sprregs")
 	{ }
 
 	void galpani3(machine_config &config) ATTR_COLD;
@@ -104,21 +106,20 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<kaneko_grap2_device, 3> m_grap2;
 	required_device<palette_device> m_palette;
-	required_device<sknsspr_device> m_spritegen;
+	required_device<kaneko_rle_sprites_device> m_spritegen;
 
 	required_shared_ptr<u16> m_paletteram;
 	required_shared_ptr<u16> m_spriteram;
 	required_shared_ptr<u16> m_priority_buffer;
 	required_shared_ptr<u16> m_sprregs;
 
-	bitmap_ind16 m_sprite_bitmap;
 	u16 m_priority_buffer_scrollx = 0;
 	u16 m_priority_buffer_scrolly = 0;
 	std::unique_ptr<u32 []> m_spriteram32;
 	std::unique_ptr<u32 []> m_spc_regs;
 
-	void sprite32_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void sprite32regs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void spriteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void spriteregs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void priority_buffer_scrollx_w(u16 data);
 	void priority_buffer_scrolly_w(u16 data);
 
@@ -153,9 +154,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani3_state::scanline) // 2, 3, 5 ?
 
 void galpani3_state::video_start()
 {
-	/* so we can use kaneko/sknsspr.cpp */
-	m_spritegen->skns_sprite_kludge(0,0);
-
+	/* so we can use kaneko/kaneko_rlespr.cpp */
 	m_spriteram32 = make_unique_clear<u32 []>(0x4000 / 4);
 	m_spc_regs = make_unique_clear<u32 []>(0x40 / 4);
 
@@ -171,13 +170,13 @@ u32 galpani3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 	bitmap.fill(0, cliprect);
 
-	m_spritegen->skns_draw_sprites(m_sprite_bitmap, cliprect, m_spriteram32.get(), 0x4000, m_spc_regs.get());
+	m_spritegen->draw_sprites(cliprect, m_spriteram32.get(), 0x4000, m_spc_regs.get());
 
 //  popmessage("%02x %02x", m_grap2[0]->framebuffer1_fbbright2_r(), m_grap2[1]->framebuffer1_fbbright2_r());
 
 	for (int drawy = cliprect.min_y; drawy <= cliprect.max_y; drawy++)
 	{
-		u16 const *const sprline  = &m_sprite_bitmap.pix(drawy);
+		u16 const *const sprline  = &m_spritegen->bitmap().pix(drawy);
 		u16 const *const srcline1 = m_grap2[0]->framebuffer() + ((drawy + m_grap2[0]->framebuffer_scrolly() + 11) & 0x1ff) * 0x200;
 		u16 const *const srcline2 = m_grap2[1]->framebuffer() + ((drawy + m_grap2[1]->framebuffer_scrolly() + 11) & 0x1ff) * 0x200;
 		u16 const *const srcline3 = m_grap2[2]->framebuffer() + ((drawy + m_grap2[2]->framebuffer_scrolly() + 11) & 0x1ff) * 0x200;
@@ -379,14 +378,14 @@ static INPUT_PORTS_START( galpani3 )
 INPUT_PORTS_END
 
 
-void galpani3_state::sprite32_w(offs_t offset, u16 data, u16 mem_mask)
+void galpani3_state::spriteram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
 	offset >>= 1;
 	m_spriteram32[offset] = (m_spriteram[offset * 2 + 1] << 16) | (m_spriteram[offset * 2]);
 }
 
-void galpani3_state::sprite32regs_w(offs_t offset, u16 data, u16 mem_mask)
+void galpani3_state::spriteregs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_sprregs[offset]);
 	offset >>= 1;
@@ -411,8 +410,8 @@ void galpani3_state::main_map(address_map &map)
 	map(0x200000, 0x20ffff).ram(); // area [B] - Work RAM
 	map(0x280000, 0x287fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // area [A] - palette for sprites
 
-	map(0x300000, 0x303fff).ram().w(FUNC(galpani3_state::sprite32_w)).share(m_spriteram);
-	map(0x380000, 0x38003f).ram().w(FUNC(galpani3_state::sprite32regs_w)).share(m_sprregs);
+	map(0x300000, 0x303fff).ram().w(FUNC(galpani3_state::spriteram_w)).share(m_spriteram);
+	map(0x380000, 0x38003f).ram().w(FUNC(galpani3_state::spriteregs_w)).share(m_sprregs);
 
 	map(0x400000, 0x40ffff).ram().share("mcuram"); // area [C]
 
@@ -465,7 +464,9 @@ void galpani3_state::galpani3(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 0x4000);
 
-	SKNS_SPRITE(config, m_spritegen, 0);
+	KANEKO_RLE_SPRITES(config, m_spritegen, 0);
+	m_spritegen->set_screen("screen");
+	m_spritegen->set_sprite_kludge(0, 0);
 
 	KANEKO_GRAP2(config, m_grap2[0], 0).set_device_rom_tag("rlebg");
 

@@ -73,6 +73,7 @@ public:
 		m_c2(*this, "c2"),
 		m_row(*this, "ROW%u", 0),
 		m_lock(*this, "LOCK"),
+		m_portswap(*this, "JOYSWAP"),
 		m_addr(0)
 	{ }
 
@@ -100,6 +101,7 @@ protected:
 	optional_memory_region m_c2;
 	required_ioport_array<8> m_row;
 	required_ioport m_lock;
+	optional_ioport m_portswap;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -570,6 +572,11 @@ static INPUT_PORTS_START( plus4 )
 	PORT_START( "LOCK" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START( "JOYSWAP" )
+	PORT_CONFNAME( 0x01, 0x00, "Swap joystick ports" )
+	PORT_CONFSETTING( 0x01, "Joystick in swapped port" )
+	PORT_CONFSETTING( 0x00, "Joystick in assigned port" )
 INPUT_PORTS_END
 
 
@@ -726,11 +733,13 @@ uint8_t plus4_state::ted_k_r(offs_t offset)
 	*/
 
 	uint8_t data = 0xff;
+	vcs_control_port_device *cur1 = m_portswap->read() ? m_joy2 : m_joy1;
+	vcs_control_port_device *cur2 = m_portswap->read() ? m_joy1 : m_joy2;
 
 	// joystick
 	if (!BIT(offset, 2))
 	{
-		uint8_t joy_a = m_joy1->read_joy();
+		uint8_t joy_a = cur1->read_joy();
 
 		data &= (0xf0 | (joy_a & 0x0f));
 		data &= ~(!BIT(joy_a, 5) << 6);
@@ -738,7 +747,7 @@ uint8_t plus4_state::ted_k_r(offs_t offset)
 
 	if (!BIT(offset, 1))
 	{
-		uint8_t joy_b = m_joy2->read_joy();
+		uint8_t joy_b = cur2->read_joy();
 
 		data &= (0xf0 | (joy_b & 0x0f));
 		data &= ~(!BIT(joy_b, 5) << 7);
@@ -812,17 +821,6 @@ void plus4_state::machine_start()
 
 void plus4_state::machine_reset()
 {
-	m_maincpu->reset();
-
-	m_iec->reset();
-
-	if (m_acia)
-	{
-		m_acia->reset();
-	}
-
-	m_exp->reset();
-
 	if (m_user)
 	{
 		m_user->write_3(0);
@@ -849,7 +847,6 @@ void plus4_state::plus4(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &plus4_state::plus4_mem);
 	m_maincpu->read_callback().set(FUNC(plus4_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(plus4_state::cpu_w));
-	m_maincpu->set_pulls(0x00, 0xc0);
 	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m7501_device::IRQ_LINE);
@@ -865,6 +862,7 @@ void plus4_state::plus4(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	MOS7360(config, m_ted, 0);
+	m_ted->set_cpu_tag(m_maincpu);
 	m_ted->set_addrmap(0, &plus4_state::ted_videoram_map);
 	m_ted->set_screen(SCREEN_TAG);
 	m_ted->write_irq_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
@@ -946,7 +944,7 @@ void c16_state::plus4p(machine_config &config)
 {
 	plus4(config);
 	m_maincpu->set_clock(XTAL(17'734'470)/20);
-	m_ted->set_clock(XTAL(17'734'470)/5);
+	m_ted->set_clock(XTAL(17'734'470)/5/4);
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list").set_original("plus4_cart");
@@ -965,7 +963,7 @@ void c16_state::plus4n(machine_config &config)
 {
 	plus4(config);
 	m_maincpu->set_clock(XTAL(14'318'181)/16);
-	m_ted->set_clock(XTAL(14'318'181)/4);
+	m_ted->set_clock(XTAL(14'318'181)/4/4);
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list").set_original("plus4_cart");
@@ -986,7 +984,6 @@ void c16_state::c16n(machine_config &config)
 	plus4n(config);
 	m_maincpu->read_callback().set(FUNC(c16_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(plus4_state::cpu_w));
-	m_maincpu->set_pulls(0x00, 0xc0);
 
 	config.device_remove(MOS6551_TAG);
 	config.device_remove(MOS6529_USER_TAG);
@@ -1007,7 +1004,6 @@ void c16_state::c16p(machine_config &config)
 	plus4p(config);
 	m_maincpu->read_callback().set(FUNC(c16_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(plus4_state::cpu_w));
-	m_maincpu->set_pulls(0x00, 0xc0);
 
 	config.device_remove(MOS6551_TAG);
 	config.device_remove(MOS6529_USER_TAG);

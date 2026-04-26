@@ -250,34 +250,20 @@ static const int hanakanz_commands[8]   = { BLIT_NEXT,    BLIT_CHANGE_PEN, BLIT_
 static const int mjflove_commands[8]    = { BLIT_STOP,    BLIT_CHANGE_PEN, BLIT_CHANGE_NUM, BLIT_UNKNOWN,
 											BLIT_SKIP,    BLIT_COPY,       BLIT_LINE,       BLIT_NEXT   };
 
-void standard_panels(device_slot_interface &device)
-{
-	device.option_add("mj",   MAHJONG_MEDAL_PANEL);
-	device.option_add("mjam", MAHJONG_PANEL);
-	device.option_add("hf",   HANAFUDA_MEDAL_PANEL);
-	device.option_add("hfam", HANAFUDA_PANEL);
-}
-
 void mahjong_medal_panel(device_slot_interface &device)
 {
 	device.option_add("mj",   MAHJONG_MEDAL_PANEL);
 }
 
-void medal_panels(device_slot_interface &device)
-{
-	device.option_add("mj",   MAHJONG_MEDAL_PANEL);
-	device.option_add("hf",   HANAFUDA_MEDAL_PANEL);
-}
-
 void hginga_panels(device_slot_interface &device)
 {
-	medal_panels(device);
+	mahjong_panel_connector_device::medal_panels(device);
 	device.option_add("hr",   HANAROKU_PANEL);
 }
 
 void hgokou_panels(device_slot_interface &device)
 {
-	standard_panels(device);
+	mahjong_panel_connector_device::standard_panels(device);
 	device.option_add("hr",   HANAROKU_PANEL);
 	device.option_add("joy",  HGOKOU_JOYSTICK);
 }
@@ -4773,8 +4759,8 @@ void htengoku_state::htengoku(machine_config &config)
 	m_mainlatch->q_out_cb<2>().set(FUNC(htengoku_state::layer_half2_w));  //
 	m_mainlatch->q_out_cb<5>().set(FUNC(htengoku_state::blitter_ack_w));  // Blitter IRQ Ack
 
-	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], medal_panels, "hf", false);
-	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], medal_panels, "hf", false);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], mahjong_panel_connector_device::medal_panels, "hf", false);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_panel_connector_device::medal_panels, "hf", false);
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
@@ -9755,8 +9741,8 @@ void hanakanz_state::hanakanz(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], standard_panels, "hf", false);
-	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], standard_panels, "hf", false);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], mahjong_panel_connector_device::standard_panels, "hf", false);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_panel_connector_device::standard_panels, "hf", false);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -10046,7 +10032,7 @@ void ddenlovr_state::hginga(machine_config &config)
 	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::hginga_rombank_w));
 
 	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], hginga_panels, "hf", false);
-	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], medal_panels, "hf", false);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_panel_connector_device::medal_panels, "hf", false);
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
@@ -10082,7 +10068,7 @@ void ddenlovr_state::hgokou(machine_config &config)
 	subdevice<msm6242_device>("rtc")->out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::pa7_w)).invert();
 
 	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], hgokou_panels, "hf", false);
-	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], standard_panels, "hf", false);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_panel_connector_device::standard_panels, "hf", false);
 
 	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
 	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));
@@ -10323,8 +10309,8 @@ void hanakanz_state::htsubaki(machine_config &config)
 {
 	jongtei(config);
 
-	m_key_matrix[0]->set_options(medal_panels, "hf", false);
-	m_key_matrix[1]->set_options(medal_panels, "hf", false);
+	m_key_matrix[0]->set_options(mahjong_panel_connector_device::medal_panels, "hf", false);
+	m_key_matrix[1]->set_options(mahjong_panel_connector_device::medal_panels, "hf", false);
 }
 
 /***************************************************************************
@@ -10607,8 +10593,8 @@ void hanakanz_state::hnrose(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::hnrose_portmap);
 
-	m_key_matrix[0]->set_options(standard_panels, "hf", false);
-	m_key_matrix[1]->set_options(standard_panels, "hf", false);
+	m_key_matrix[0]->set_options(mahjong_panel_connector_device::standard_panels, "hf", false);
+	m_key_matrix[1]->set_options(mahjong_panel_connector_device::standard_panels, "hf", false);
 }
 
 /***************************************************************************

@@ -2,12 +2,12 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Luxor 4105 SASI hard disk controller emulation
+    DataBoard 4105 SASI hard disk controller emulation
 
 *********************************************************************/
 
-#ifndef MAME_BUS_ABCBUS_LUX4105_H
-#define MAME_BUS_ABCBUS_LUX4105_H
+#ifndef MAME_BUS_ABCBUS_DB4105_H
+#define MAME_BUS_ABCBUS_DB4105_H
 
 #pragma once
 
@@ -22,15 +22,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> luxor_4105_device
+// ======================> databoard_4105_device
 
-class luxor_4105_device :  public device_t,
-						   public nscsi_device_interface,
-						   public device_abcbus_card_interface
+class databoard_4105_device :  public device_t,
+						   	   public nscsi_device_interface,
+						       public device_abcbus_card_interface
 {
 public:
 	// construction/destruction
-	luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	databoard_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -79,7 +79,7 @@ private:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(LUXOR_4105, luxor_4105_device)
+DECLARE_DEVICE_TYPE(DATABOARD_4105, databoard_4105_device)
 
 
-#endif // MAME_BUS_ABCBUS_LUX4105_H
+#endif // MAME_BUS_ABCBUS_DB4105_H

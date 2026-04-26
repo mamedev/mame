@@ -38,11 +38,6 @@ TODO:
     Suzuka 8 Hours II
     - some sprite cropping issues
 
-    Valkyrie no Densetsu
-    - gives ADSMISS error on startup
-       Does a checksum on area 0x181000 - 0x183fff, in 0x20 bytes block chunks. Game doesn't init it properly so you either have to go into service menu and do
-       an "all data clear" or play once to get rid of the message.
-
     Metal Hawk
     - ROZ wraparound isn't implemented (see large battleship in 2nd stage)
 
@@ -711,7 +706,7 @@ void namcos2_base_state::master_common_am(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x180000, 0x183fff).rw(FUNC(namcos2_base_state::eeprom_r), FUNC(namcos2_base_state::eeprom_w)).umask16(0x00ff);
+	map(0x180000, 0x183fff).rw(FUNC(namcos2_base_state::nvram_r), FUNC(namcos2_base_state::nvram_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
 }
 
@@ -1496,8 +1491,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dirtfox )
 	PORT_START("MCUB")      /* 63B05Z0 - PORT B */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Gear Shift Down")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Gear Shift Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Gear Shift Down")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Gear Shift Up")
 
 	NAMCOS2_MCU_PORT_C_DEFAULT
 
@@ -5006,6 +5001,9 @@ ROM_START( valkyrie )
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 )    /* Sound voices */
 	NAMCOS2_DATA_LOAD_E_256K( "wd1voi1.bin",  0x000000, CRC(f1ace193) SHA1(dd13bdf4b99c6bf4e356d623ff2e3da72db331dd) )
 	NAMCOS2_DATA_LOAD_E_128K( "wd1voi2.bin",  0x100000, CRC(e95c5cf3) SHA1(4bfc7303bde23bcf6739c7877dd87671c33135bc) )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) /* game doesn't auto initialize nvram properly */
+	ROM_LOAD( "valkyrie.nv",  0x000000, 0x2000, CRC(d5ce4069) SHA1(ce01ebbbd8d4e03a7b8e0fa50296d6cc1a978800) )
 ROM_END
 
 /* KYUUKAI DOUCHUUKI */
@@ -5697,8 +5695,6 @@ void gollygho_state::init_bubbletr()
 	m_gametype = NAMCOS2_BUBBLE_TROUBLE;
 }
 
-
-
 void sgunner_state::init_luckywld()
 {
 	u8 *data = (u8 *)memregion("c169roz:mask")->base();
@@ -5714,7 +5710,7 @@ void sgunner_state::init_luckywld()
 /* from sys2c65b to sys2c65c sometime between 1988 and 1990 as mirai ninja    */
 /* and metal hawk have the B version and dragon saber has the C version       */
 
-/*     YEAR, NAME,       PARENT,   MACHINE,  INPUT,    STATE,         INIT,          MONITOR,COMPANY, FULLNAME */
+/*     YEAR, NAME,       PARENT,   MACHINE,  INPUT,    STATE,          INIT,          MONITOR, COMPANY, FULLNAME */
 GAMEL( 1987, finallap,   0,        finallap, finallap, finallap_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev E)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 GAMEL( 1987, finallapd,  finallap, finallap, finallap, finallap_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev D)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 GAMEL( 1987, finallapc,  finallap, finallap, finallap, finallap_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )

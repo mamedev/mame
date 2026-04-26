@@ -49,7 +49,9 @@ TODO:
 - Interrupt controller at 838000 or a38000 (there's a preliminary
   implementation for lhb)
 
-- vbowl, vbowlj: trackball support
+- vbowl, vbowlj: trackball glitches occasionally with "direct"
+  orientation, jumping by exactly 181 in the direction orthogonal to
+  the movement
 
 - xymga: stop during attract mode with 'RECORD ERROR 3'
 
@@ -96,11 +98,6 @@ Original game bugs that are emulated faithfully:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
-#define LOG_BLITTER (1U << 1)
-
-//#define VERBOSE (LOG_GENERAL | LOG_BLITTER)
-#include "logmacro.h"
 
 
 namespace {
@@ -287,6 +284,8 @@ public:
 		, m_ics(*this, "ics")
 		, m_vbowl_trackball(*this, "vbowl_trackball")
 		, m_io_an(*this, "AN%u", 0U)
+		, m_io_conf(*this, "CONF")
+		, m_trackball_count{ 0, 0 }
 	{
 	}
 
@@ -297,10 +296,16 @@ public:
 	void vbowl(machine_config &config) ATTR_COLD;
 	void vbowlhk(machine_config &config) ATTR_COLD;
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	required_device<ics2115_device> m_ics;
 	required_shared_ptr<u16> m_vbowl_trackball;
 	required_ioport_array<2> m_io_an;
+	required_ioport m_io_conf;
+
+	u16 m_trackball_count[2];
 
 	void vbowl_prot_swap_w(u8 data);
 	u16 vbowl_prot_r();
@@ -354,6 +359,13 @@ void igs011_oki_state::machine_start()
 	save_item(NAME(m_lhb_irq_enable));
 }
 
+void vbowl_state::machine_start()
+{
+	igs011_state_base::machine_start();
+
+	save_item(NAME(m_trackball_count));
+}
+
 // Inputs
 
 u16 igs011_oki_state::key_matrix_r()
@@ -381,11 +393,12 @@ u16 igs011_state_base::dips_r()
 
 	u16 ret = 0xff;
 	for (int i = 0; i < Num; i++)
+	{
 		if (BIT(~m_dips_sel, i))
 			ret &= m_io_dsw[i]->read();
+	}
 
-	// 0x0100 is blitter busy
-	return  (ret & 0xff) | 0x0000;
+	return  (ret & 0xff) | (m_igs011->blitter_busy_r() ? 0x0100 : 0x0000);
 }
 
 /***************************************************************************
@@ -2430,7 +2443,25 @@ void vbowl_state::screen_vblank(int state)
 	if (state)
 	{
 		m_vbowl_trackball[0] = m_vbowl_trackball[1];
-		m_vbowl_trackball[1] = (m_io_an[1]->read() << 8) | m_io_an[0]->read();
+
+		// trackball is rotated 45 degrees
+		u8 const x = m_io_an[0]->read();
+		u8 const y = m_io_an[1]->read();
+		if (BIT(m_io_conf->read(), 0))
+		{
+			u8 const dx = x - m_trackball_count[0];
+			u8 const dy = y - m_trackball_count[1];
+			u8 const ax = (m_vbowl_trackball[1] & 0xff) + dx + dy;
+			u8 const ay = (m_vbowl_trackball[1] >> 8) + dy - dx;
+			m_vbowl_trackball[1] = (u16(ay) << 8) | u16(ax);
+		}
+		else
+		{
+			m_vbowl_trackball[1] = (u16(y) << 8) | u16(x);
+		}
+
+		m_trackball_count[0] = x;
+		m_trackball_count[1] = y;
 	}
 }
 
@@ -2442,10 +2473,10 @@ void vbowl_state::vbowl_pen_hi_w(u8 data)
 		logerror("%s: warning, unknown bits written to pen_hi = %02x\n", machine().describe_context(), data);
 }
 
-void vbowl_state::vbowl_link_0_w(u16 data){ }
-void vbowl_state::vbowl_link_1_w(u16 data){ }
-void vbowl_state::vbowl_link_2_w(u16 data){ }
-void vbowl_state::vbowl_link_3_w(u16 data){ }
+void vbowl_state::vbowl_link_0_w(u16 data) { }
+void vbowl_state::vbowl_link_1_w(u16 data) { }
+void vbowl_state::vbowl_link_2_w(u16 data) { }
+void vbowl_state::vbowl_link_3_w(u16 data) { }
 
 void vbowl_state::vbowl_mem(address_map &map)
 {
@@ -3496,6 +3527,8 @@ static INPUT_PORTS_START( vbowlhk )
 
 	PORT_START("AN1")
 	PORT_BIT( 0xff, 0xff, IPT_UNKNOWN )
+
+	PORT_START("CONF")
 INPUT_PORTS_END
 
 
@@ -3523,6 +3556,11 @@ static INPUT_PORTS_START( vbowl )
 
 	PORT_MODIFY("AN1")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
+
+	PORT_MODIFY("CONF")
+	PORT_CONFNAME( 0x01, 0x01, "Trackball Orientation" )
+	PORT_CONFSETTING(    0x00, "Direct" )
+	PORT_CONFSETTING(    0x01, "Natural" )
 INPUT_PORTS_END
 
 
@@ -3534,6 +3572,9 @@ static INPUT_PORTS_START( vbowlj )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Controls ) )      PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Trackball ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )       PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 

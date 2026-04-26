@@ -38,6 +38,12 @@ public:
 
 	u8 read(u8 select) { return m_panel ? m_panel->read(select) : 0x3f; }
 
+	static void standard_panels(device_slot_interface &device) ATTR_COLD;
+	static void mahjong_panels(device_slot_interface &device) ATTR_COLD;
+	static void hanafuda_panels(device_slot_interface &device) ATTR_COLD;
+	static void medal_panels(device_slot_interface &device) ATTR_COLD;
+	static void amusement_panels(device_slot_interface &device) ATTR_COLD;
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 

@@ -9,23 +9,23 @@
     Golden Tee variants & World Class Bowling Deluxe additions by Brian A. Troha
 
     Games supported:
-        * Time Killers (7 sets)
-        * Bloodstorm (5 sets)
-        * Hard Yardage (3 sets)
-        * Pairs (4 sets)
+        * Time Killers
+        * Bloodstorm
+        * Hard Yardage
+        * Pairs
         * Pairs Redemption (Child's version of pairs)
-        * Driver's Edge (1 set)
-        * World Class Bowling (14 sets)
-        * Street Fighter: The Movie (5 sets)
-        * Shuffleshot (5 sets)
-        * Golden Tee 3D Golf (12 sets)
-        * Golden Tee Golf '97 (7 sets)
-        * Golden Tee Golf '98 (7 sets)
-        * Golden Tee Golf '99 (4 sets)
-        * Golden Tee Golf 2K (5 sets)
-        * Golden Tee Classic (3 sets)
-        * Must Shoot TV (prototype) (1 set)
-        * Power Up Baseball (prototype) (1 set)
+        * Driver's Edge
+        * World Class Bowling
+        * Street Fighter: The Movie
+        * Shuffleshot
+        * Golden Tee 3D Golf
+        * Golden Tee Golf '97
+        * Golden Tee Golf '98
+        * Golden Tee Golf '99
+        * Golden Tee Golf 2K
+        * Golden Tee Classic
+        * Must Shoot TV (prototype)
+        * Power Up Baseball (prototype)
 
     Known issues:
         * volume controls do not work in the Golden Tee games
@@ -3884,6 +3884,36 @@ ROM_START( gt3dt231 ) // Version 2.31 Tournament Edition (PCB P/N 1083 Rev 2)
 	ROM_LOAD16_BYTE( "gtg3_srom1_nr.srom1", 0x200000, 0x080000, CRC(1b3f18b6) SHA1(3b65de6a90c5ede183b5f8ca1875736bc1425772) )
 ROM_END
 
+ROM_START( gt3dt230 ) // Version 2.30 Tournament Edition (PCB P/N 1083 Rev 2)
+	ROM_REGION32_BE( CODE_SIZE, "maindata", 0 )
+	ROM_LOAD32_BYTE( "gtg3_prom0_v2.30t.prom0", 0x00000, 0x100000, CRC(4c658915) SHA1(89e09d928121297e2c02116975d48aac3f6d452f) )
+	ROM_LOAD32_BYTE( "gtg3_prom1_v2.30t.prom1", 0x00001, 0x100000, CRC(f79fd0aa) SHA1(94d6f13fd67d89a508eef2278a04ebe2c3c117dc) )
+	ROM_LOAD32_BYTE( "gtg3_prom2_v2.30t.prom2", 0x00002, 0x100000, CRC(372d24d7) SHA1(da5e836fd999345cd446fdd12e7b28712af2de4b) )
+	ROM_LOAD32_BYTE( "gtg3_prom3_v2.30t.prom3", 0x00003, 0x100000, CRC(82392f2c) SHA1(36fbee7434f45a156e5d4dedb170e068eb9e9202) )
+
+	ROM_REGION( 0x28000, "soundcpu", 0 )
+	ROM_LOAD( "gtg3nr_u88_v1.0.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
+	ROM_CONTINUE(                    0x08000, 0x08000 )
+
+	ROM_REGION( 0x600000, "grom", 0 )
+	ROM_LOAD32_BYTE( "gtg3_grom0_0.grm0_0",   0x000000, 0x80000, CRC(1b10379d) SHA1(b6d61771e2bc3909ea4229777867b217a3e9e580) )
+	ROM_LOAD32_BYTE( "gtg3_grom0_1.grm0_1",   0x000001, 0x80000, CRC(3b852e1a) SHA1(4b3653d55c52fc2eb5438d1604247a8e68d569a5) )
+	ROM_LOAD32_BYTE( "gtg3_grom0_2.grm0_2",   0x000002, 0x80000, CRC(d43ffb35) SHA1(748be07e03bbbb40cd7a725c708cacc46f33d9ca) )
+	ROM_LOAD32_BYTE( "gtg3_grom0_3.grm0_3",   0x000003, 0x80000, CRC(2d24e93e) SHA1(505272c1a509d013c2ce9fb8e8e0ac88870d74e7) )
+	ROM_LOAD32_BYTE( "gtg3_grom1_0.grm1_0",   0x200000, 0x80000, CRC(4476b239) SHA1(71b8258ca94859eb4bdf83b855a87aff79d3df2b) )
+	ROM_LOAD32_BYTE( "gtg3_grom1_1.grm1_1",   0x200001, 0x80000, CRC(0aadfad2) SHA1(56a283b30a13b77ec53b7ae2b4129d44b7fa25d4) )
+	ROM_LOAD32_BYTE( "gtg3_grom1_2.grm1_2",   0x200002, 0x80000, CRC(27871980) SHA1(fe473d12cb4805e25dcac8f9ae187891936b961b) )
+	ROM_LOAD32_BYTE( "gtg3_grom1_3.grm1_3",   0x200003, 0x80000, CRC(7dbc242b) SHA1(9aa5074cad633446e0110a1a3d9c6e1f2158070a) )
+	ROM_LOAD32_BYTE( "gtg3_grom2_0_t.grm2_0", 0x400000, 0x80000, CRC(80ae7148) SHA1(e19d3390a2a0dad260d770fdbbb64d1f8e43d53f) ) // actually labeled as "GTG3 GROM2_0 T" ect
+	ROM_LOAD32_BYTE( "gtg3_grom2_1_t.grm2_1", 0x400001, 0x80000, CRC(0f85a618) SHA1(d9ced21c20f9ed6b7f19e7645d75b239ea709b79) )
+	ROM_LOAD32_BYTE( "gtg3_grom2_2_t.grm2_2", 0x400002, 0x80000, CRC(09ca5fbf) SHA1(6a6ed4d5d76035d8acc33c6494fba6012194362e) )
+	ROM_LOAD32_BYTE( "gtg3_grom2_3_t.grm2_3", 0x400003, 0x80000, CRC(d136853a) SHA1(0777d6bfab9e3d57c2a61d058fd185fc1f547698) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "gtg3_srom0_nr.srom0", 0x000000, 0x100000, CRC(44983bd7) SHA1(a6ac966ec113b079434d7f871e4ce7266206d234) )
+	ROM_LOAD16_BYTE( "gtg3_srom1_nr.srom1", 0x200000, 0x080000, CRC(1b3f18b6) SHA1(3b65de6a90c5ede183b5f8ca1875736bc1425772) )
+ROM_END
+
 ROM_START( gt3dt211 ) // Version 2.11 Tournament Edition (PCB P/N 1083 Rev 2)
 	ROM_REGION32_BE( CODE_SIZE, "maindata", 0 )
 	ROM_LOAD32_BYTE( "gtg3_prom0_v2.11t.prom0", 0x00000, 0x100000, CRC(54360fdf) SHA1(05687f7f41f719458ee72b4517c7be3e33ee80cf) )
@@ -5235,6 +5265,7 @@ GAME( 1995, gt3dv16,   gt3d,     sftm,   gt3d,  itech32_state, init_gt3d,      R
 GAME( 1995, gt3dv15,   gt3d,     sftm,   gt3d,  itech32_state, init_gt3d,      ROT0, "Incredible Technologies", "Golden Tee 3D Golf (v1.5)" , MACHINE_SUPPORTS_SAVE ) // PIC 16C54 labeled as ITGF-1
 GAME( 1995, gt3dv14,   gt3d,     sftm,   gt3d,  itech32_state, init_gt3d,      ROT0, "Incredible Technologies", "Golden Tee 3D Golf (v1.4)" , MACHINE_SUPPORTS_SAVE ) // PIC 16C54 labeled as ITGF-1
 GAME( 1995, gt3dt231,  gt3d,     tourny, gt3d,  itech32_state, init_aamat,     ROT0, "Incredible Technologies", "Golden Tee 3D Golf Tournament (v2.31)" , MACHINE_SUPPORTS_SAVE ) // PIC 16C54 labeled as ITGF-2
+GAME( 1995, gt3dt230,  gt3d,     tourny, gt3d,  itech32_state, init_aamat,     ROT0, "Incredible Technologies", "Golden Tee 3D Golf Tournament (v2.30)" , MACHINE_SUPPORTS_SAVE ) // PIC 16C54 labeled as ITGF-2
 GAME( 1995, gt3dt211,  gt3d,     tourny, gt3d,  itech32_state, init_aamat,     ROT0, "Incredible Technologies", "Golden Tee 3D Golf Tournament (v2.11)" , MACHINE_SUPPORTS_SAVE ) // PIC 16C54 labeled as ITGF-2
 
 GAME( 1997, gt97,      0,        sftm,   gt97,  itech32_state, init_aama,      ROT0, "Incredible Technologies", "Golden Tee '97 (v1.30)" , MACHINE_SUPPORTS_SAVE ) // PIC 16C54 labeled as ITGFS-3

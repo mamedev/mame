@@ -1,18 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_HANDHELD_BL_HANDHELDS_LCDC_H
-#define MAME_HANDHELD_BL_HANDHELDS_LCDC_H
+#ifndef MAME_VIDEO_ST7735_LCDC_H
+#define MAME_VIDEO_ST7735_LCDC_H
 
 #pragma once
 
-DECLARE_DEVICE_TYPE(BL_HANDHELDS_LCDC, bl_handhelds_lcdc_device)
+DECLARE_DEVICE_TYPE(ST7735, st7735_lcdc_device)
 
-class bl_handhelds_lcdc_device : public device_t
+class st7735_lcdc_device : public device_t
 {
 public:
 	// construction/destruction
-	bl_handhelds_lcdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	st7735_lcdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void lcdc_command_w(u8 data);
 	u8 lcdc_data_r();
@@ -34,4 +34,4 @@ private:
 
 };
 
-#endif // MAME_HANDHELD_BL_HANDHELDS_LCDC_H
+#endif // MAME_VIDEO_ST7735_LCDC_H

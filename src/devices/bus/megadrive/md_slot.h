@@ -56,7 +56,7 @@ enum
 
 	TILESMJ2,                    /* 16 Mahjong Tiles II */
 	BUGSLIFE,                    /* A Bug's Life */
-	CHINFIGHT3,                  /* Chinese Fighters 3 */
+//	CHINFIGHT3,                  /* Chinese Fighters 3 */
 	ELFWOR,                      /* Linghuan Daoshi Super Magician */
 	KAIJU,                       /* Pokemon Stadium */
 	KOF98,                       /* King of Fighters '98 */

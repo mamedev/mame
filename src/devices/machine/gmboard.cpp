@@ -197,6 +197,112 @@ void gmboard_device::realign_magnet_pos()
 	}
 }
 
+int gmboard_device::check_board(bool magnet, bool sensor)
+{
+	int piece_hand = m_piece_hand;
+
+	double dx, dy;
+	get_scaled_pos(&dx, &dy);
+
+	int mx = dx + 0.5;
+	int my = dy + 0.5;
+
+	// assume that sensor is 1 step above magnet
+	if (sensor && my > 0)
+		my--;
+
+	int gx = mx, gy = my;
+
+	// convert motors position into board coordinates
+	int x = mx / 4 - 2;
+	int y = m_board->height() - 1 - (my / 4);
+
+	if (x < 0)
+		x += m_board->width();
+
+	x = std::clamp(x, 0, m_board->width() - 1);
+	y = std::clamp(y, 0, m_board->height() - 1);
+
+	const bool valid_pos = (mx & 3) == 2 && (my & 3) == 2;
+
+	if (magnet || sensor)
+	{
+		if (valid_pos)
+		{
+			// pick up piece, unless it was picked up by the user
+			const int pos = (y << 4 & 0xf0) | (x & 0x0f);
+			if (pos != m_board->get_handpos())
+			{
+				piece_hand = m_board->read_piece(x, y);
+
+				if (piece_hand && !sensor)
+				{
+					m_board->write_piece(x, y, 0);
+					m_board->refresh();
+				}
+			}
+		}
+
+		if (!piece_hand)
+		{
+			int count = 0;
+
+			// check surrounding area for piece
+			for (int sy = my - 1; sy <= my + 1; sy++)
+				for (int sx = mx - 1; sx <= mx + 1; sx++)
+					if (sy >= 0 && sx >= 0 && m_pieces_map[sy][sx] != 0)
+					{
+						gx = sx; gy = sy;
+						piece_hand = m_pieces_map[sy][sx];
+						if (!sensor)
+							m_pieces_map[sy][sx] = 0;
+						count++;
+					}
+
+			// more than one piece found (shouldn't happen)
+			if (count > 1)
+				popmessage("Internal collision!");
+		}
+
+		if (sensor)
+			return piece_hand;
+	}
+
+	if (piece_hand)
+	{
+		LOGMASKED(LOG_MAGNET, "%s piece %2d @ %2d,%2d (%2d,%2d)\n", magnet ? "grab" : "drop", piece_hand, x, y, gx, gy);
+
+		// drop piece
+		if (!magnet)
+		{
+			if (valid_pos)
+			{
+				// collision with piece on board (user interference)
+				if (m_board->read_piece(x, y) != 0)
+					popmessage("Collision at %c%d!", x + 'A', y + 1);
+				else
+				{
+					m_board->write_piece(x, y, piece_hand);
+					m_board->refresh();
+				}
+			}
+			else
+			{
+				// collision with internal pieces map (shouldn't happen)
+				if (m_pieces_map[my][mx] != 0)
+					popmessage("Internal collision!");
+				else
+					m_pieces_map[my][mx] = piece_hand;
+			}
+
+			piece_hand = 0;
+		}
+	}
+
+	m_piece_hand = piece_hand;
+	return piece_hand;
+}
+
 void gmboard_device::magnet_w(int state)
 {
 	state = state ? 1 : 0;
@@ -209,91 +315,15 @@ void gmboard_device::magnet_w(int state)
 		realign_magnet_pos();
 	output_magnet_pos();
 
-	double dx, dy;
-	get_scaled_pos(&dx, &dy);
+	check_board(state, false);
+}
 
-	int mx = dx + 0.5;
-	int my = dy + 0.5;
-	int gx = mx, gy = my;
-
-	// convert motors position into board coordinates
-	int x = mx / 4 - 2;
-	int y = 7 - (my / 4);
-
-	if (x < 0)
-		x += 12;
-
-	const bool valid_pos = (mx & 3) == 2 && (my & 3) == 2;
-
-	if (state)
-	{
-		if (valid_pos)
-		{
-			// pick up piece, unless it was picked up by the user
-			const int pos = (y << 4 & 0xf0) | (x & 0x0f);
-			if (pos != m_board->get_handpos())
-			{
-				m_piece_hand = m_board->read_piece(x, y);
-
-				if (m_piece_hand)
-				{
-					m_board->write_piece(x, y, 0);
-					m_board->refresh();
-				}
-			}
-		}
-
-		if (!m_piece_hand)
-		{
-			int count = 0;
-
-			// check surrounding area for piece
-			for (int sy = my - 1; sy <= my + 1; sy++)
-				for (int sx = mx - 1; sx <= mx + 1; sx++)
-					if (sy >= 0 && sx >= 0 && m_pieces_map[sy][sx] != 0)
-					{
-						gx = sx; gy = sy;
-						m_piece_hand = m_pieces_map[sy][sx];
-						m_pieces_map[sy][sx] = 0;
-						count++;
-					}
-
-			// more than one piece found (shouldn't happen)
-			if (count > 1)
-				popmessage("Internal collision!");
-		}
-	}
-
+int gmboard_device::magnet_r()
+{
 	if (m_piece_hand)
-	{
-		LOGMASKED(LOG_MAGNET, "%s piece %2d @ %2d,%2d (%2d,%2d)\n", state ? "grab" : "drop", m_piece_hand, x, y, gx, gy);
+		return 1;
 
-		// drop piece
-		if (!state)
-		{
-			if (valid_pos)
-			{
-				// collision with piece on board (user interference)
-				if (m_board->read_piece(x, y) != 0)
-					popmessage("Collision at %c%d!", x + 'A', y + 1);
-				else
-				{
-					m_board->write_piece(x, y, m_piece_hand);
-					m_board->refresh();
-				}
-			}
-			else
-			{
-				// collision with internal pieces map (shouldn't happen)
-				if (m_pieces_map[my][mx] != 0)
-					popmessage("Internal collision!");
-				else
-					m_pieces_map[my][mx] = m_piece_hand;
-			}
-
-			m_piece_hand = 0;
-		}
-	}
+	return check_board(m_magnet, true) ? 1 : 0;
 }
 
 TIMER_CALLBACK_MEMBER(gmboard_device::motor_count)

@@ -89,7 +89,7 @@ E74-06.IC2 is the TMP95C063 program code.
 
 
 
-Rizing Ping Pong
+Raizin Ping Pong
 Taito 2002
 
 This game runs on Taito Type Zero hardware.

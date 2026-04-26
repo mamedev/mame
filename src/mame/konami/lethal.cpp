@@ -263,7 +263,7 @@ BTANB:
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/bankdev.h"
-#include "machine/k054321.h"
+#include "sound/k054321.h"
 #include "sound/k054539.h"
 
 #include "emupal.h"

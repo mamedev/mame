@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Luxor 4105 SASI hard disk controller emulation
+    DataBoard 4105 SASI hard disk controller emulation
 
 *********************************************************************/
 
@@ -38,7 +38,7 @@ Notes:
 */
 
 #include "emu.h"
-#include "lux4105.h"
+#include "db4105.h"
 
 
 
@@ -58,14 +58,14 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(LUXOR_4105, luxor_4105_device, "lux4105", "Luxor 4105")
+DEFINE_DEVICE_TYPE(DATABOARD_4105, databoard_4105_device, "db4105", "DataBoard 4105 SASI controller")
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void luxor_4105_device::device_add_mconfig(machine_config &config)
+void databoard_4105_device::device_add_mconfig(machine_config &config)
 {
 	auto &sasi(NSCSI_BUS(config, "sasi"));
 	NSCSI_CONNECTOR(config, "sasi:0", default_scsi_devices, "s1410");
@@ -74,10 +74,10 @@ void luxor_4105_device::device_add_mconfig(machine_config &config)
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( luxor_4105 )
+//  INPUT_PORTS( databoard_4105 )
 //-------------------------------------------------
 
-INPUT_PORTS_START( luxor_4105 )
+INPUT_PORTS_START( databoard_4105 )
 	PORT_START("1E")
 	PORT_DIPNAME( 0x03, 0x03, "Stepping" ) PORT_DIPLOCATION("1E:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
@@ -97,7 +97,8 @@ INPUT_PORTS_START( luxor_4105 )
 
 	PORT_START("5E")
 	PORT_DIPNAME( 0x3f, 0x25, "Card Address" ) PORT_DIPLOCATION("5E:1,2,3,4,5,6")
-	PORT_DIPSETTING(    0x25, "37" )
+	PORT_DIPSETTING(    0x25, "37" ) // ABC1600 internal
+	PORT_DIPSETTING(    0x26, "38" ) // ABC1656
 	PORT_DIPSETTING(    0x2d, "45" )
 
 	PORT_START("S1")
@@ -111,9 +112,9 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor luxor_4105_device::device_input_ports() const
+ioport_constructor databoard_4105_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( luxor_4105 );
+	return INPUT_PORTS_NAME( databoard_4105 );
 }
 
 
@@ -123,11 +124,11 @@ ioport_constructor luxor_4105_device::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  luxor_4105_device - constructor
+//  databoard_4105_device - constructor
 //-------------------------------------------------
 
-luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, LUXOR_4105, tag, owner, clock),
+databoard_4105_device::databoard_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, DATABOARD_4105, tag, owner, clock),
 	nscsi_device_interface(mconfig, *this),
 	device_abcbus_card_interface(mconfig, *this),
 	m_1e(*this, "1E"),
@@ -145,7 +146,7 @@ luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void luxor_4105_device::device_start()
+void databoard_4105_device::device_start()
 {
 	// state saving
 	save_item(NAME(m_cs));
@@ -162,7 +163,7 @@ void luxor_4105_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void luxor_4105_device::device_reset()
+void databoard_4105_device::device_reset()
 {
 	m_cs = false;
 
@@ -170,7 +171,7 @@ void luxor_4105_device::device_reset()
 }
 
 
-void luxor_4105_device::internal_reset()
+void databoard_4105_device::internal_reset()
 {
 	write_dma_register(0);
 
@@ -185,7 +186,7 @@ void luxor_4105_device::internal_reset()
 }
 
 
-void luxor_4105_device::update_dma()
+void databoard_4105_device::update_dma()
 {
 	// TRRQ
 	bool req = (m_scsi_bus->ctrl_r() & S_REQ) && !m_req;
@@ -227,13 +228,13 @@ void luxor_4105_device::update_dma()
 }
 
 
-void luxor_4105_device::update_ack()
+void databoard_4105_device::update_ack()
 {
 	m_scsi_bus->ctrl_w(m_scsi_refid, (m_scsi_bus->ctrl_r() & S_REQ && (m_scsi_bus->ctrl_r() & S_MSG || m_req)) ? S_ACK : 0, S_ACK);
 }
 
 
-void luxor_4105_device::write_dma_register(uint8_t data)
+void databoard_4105_device::write_dma_register(uint8_t data)
 {
 	/*
 
@@ -261,7 +262,7 @@ void luxor_4105_device::write_dma_register(uint8_t data)
 }
 
 
-void luxor_4105_device::write_sasi_data(uint8_t data)
+void databoard_4105_device::write_sasi_data(uint8_t data)
 {
 	m_data_out = data;
 
@@ -277,7 +278,7 @@ void luxor_4105_device::write_sasi_data(uint8_t data)
 	update_dma();
 }
 
-void luxor_4105_device::scsi_ctrl_changed()
+void databoard_4105_device::scsi_ctrl_changed()
 {
 	if (m_scsi_bus->ctrl_r() & S_BSY)
 		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_SEL);
@@ -300,7 +301,7 @@ void luxor_4105_device::scsi_ctrl_changed()
 //  abcbus_cs -
 //-------------------------------------------------
 
-void luxor_4105_device::abcbus_cs(uint8_t data)
+void databoard_4105_device::abcbus_cs(uint8_t data)
 {
 	m_cs = (data == m_5e->read());
 }
@@ -310,7 +311,7 @@ void luxor_4105_device::abcbus_cs(uint8_t data)
 //  abcbus_csb -
 //-------------------------------------------------
 
-int luxor_4105_device::abcbus_csb()
+int databoard_4105_device::abcbus_csb()
 {
 	return !m_cs;
 }
@@ -320,7 +321,7 @@ int luxor_4105_device::abcbus_csb()
 //  abcbus_stat -
 //-------------------------------------------------
 
-uint8_t luxor_4105_device::abcbus_stat()
+uint8_t databoard_4105_device::abcbus_stat()
 {
 	uint8_t data = 0xff;
 
@@ -359,7 +360,7 @@ uint8_t luxor_4105_device::abcbus_stat()
 //  abcbus_inp -
 //-------------------------------------------------
 
-uint8_t luxor_4105_device::abcbus_inp()
+uint8_t databoard_4105_device::abcbus_inp()
 {
 	uint8_t data = 0xff;
 
@@ -391,7 +392,7 @@ uint8_t luxor_4105_device::abcbus_inp()
 //  abcbus_utp -
 //-------------------------------------------------
 
-void luxor_4105_device::abcbus_out(uint8_t data)
+void databoard_4105_device::abcbus_out(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -406,7 +407,7 @@ void luxor_4105_device::abcbus_out(uint8_t data)
 //  abcbus_c1 -
 //-------------------------------------------------
 
-void luxor_4105_device::abcbus_c1(uint8_t data)
+void databoard_4105_device::abcbus_c1(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -421,7 +422,7 @@ void luxor_4105_device::abcbus_c1(uint8_t data)
 //  abcbus_c3 -
 //-------------------------------------------------
 
-void luxor_4105_device::abcbus_c3(uint8_t data)
+void databoard_4105_device::abcbus_c3(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -436,7 +437,7 @@ void luxor_4105_device::abcbus_c3(uint8_t data)
 //  abcbus_c4 -
 //-------------------------------------------------
 
-void luxor_4105_device::abcbus_c4(uint8_t data)
+void databoard_4105_device::abcbus_c4(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -451,7 +452,7 @@ void luxor_4105_device::abcbus_c4(uint8_t data)
 //  abcbus_tren -
 //-------------------------------------------------
 
-uint8_t luxor_4105_device::abcbus_tren()
+uint8_t databoard_4105_device::abcbus_tren()
 {
 	uint8_t data = 0xff;
 
@@ -479,7 +480,7 @@ uint8_t luxor_4105_device::abcbus_tren()
 //  abcbus_tren -
 //-------------------------------------------------
 
-void luxor_4105_device::abcbus_tren(uint8_t data)
+void databoard_4105_device::abcbus_tren(uint8_t data)
 {
 	if (DMA_O2)
 	{
@@ -494,7 +495,7 @@ void luxor_4105_device::abcbus_tren(uint8_t data)
 //  abcbus_prac -
 //-------------------------------------------------
 
-void luxor_4105_device::abcbus_prac(int state)
+void databoard_4105_device::abcbus_prac(int state)
 {
 	if (LOG) logerror("%s PRAC %u\n", machine().describe_context(), state);
 

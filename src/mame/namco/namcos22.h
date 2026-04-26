@@ -14,9 +14,9 @@
 #include "namcomcu.h"
 
 #include "machine/eeprompar.h"
-#include "machine/mb87078.h"
 #include "machine/timer.h"
 #include "sound/c352.h"
+#include "sound/mb87077.h"
 #include "video/rgbutil.h"
 #include "video/poly.h"
 

@@ -36,11 +36,8 @@
 	setup.register_dip_alias_arr(#pin1 ", " #__VA_ARGS__);
 
 // to be used to reference new library truth table devices
-#define NET_REGISTER_DEV(type, name) setup.register_dev(#type, #name);
-
-// name is first element so that __VA_ARGS__ always has one element
-#define NET_REGISTER_DEVEXT(type, ...)                                         \
-	setup.register_dev(#type, {PSTRINGIFY_VA(__VA_ARGS__)});
+#define NET_REGISTER_DEV(type, name, ...)				       \
+	setup.register_dev(#type, #name __VA_OPT__(, {PSTRINGIFY_VA(__VA_ARGS__)}));
 
 #define NET_CONNECT(name, input, output)                                       \
 	setup.register_link(#name "." #input, #output);
@@ -184,8 +181,6 @@ namespace netlist
 		void register_dev(const pstring &classname, const pstring &name,
 						  const std::vector<pstring> &params_and_connections,
 						  factory::element_t **factory_element = nullptr);
-		void register_dev(const pstring                      &classname,
-						  std::initializer_list<const char *> more_parameters);
 		void register_dev(const pstring &classname, const pstring &name)
 		{
 			register_dev(classname, name, std::vector<pstring>());

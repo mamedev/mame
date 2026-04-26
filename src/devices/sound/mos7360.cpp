@@ -269,7 +269,8 @@ mos7360_device::mos7360_device(const machine_config &mconfig, const char *tag, d
 	m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(mos7360_device::mos7360_videoram_map), this)),
 	m_write_irq(*this),
 	m_read_k(*this, 0xff),
-	m_stream(nullptr)
+	m_stream(nullptr),
+	m_cpu(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -422,11 +423,11 @@ TIMER_CALLBACK_MEMBER(mos7360_device::timer_expired)
 	if (param == TIMER_ID_1)
 	{
 		// proven by digital sound of several intros like eoroidpro
-		m_timer[param]->adjust(clocks_to_attotime(TIMER1), param);
+		m_timer[param]->adjust(attotime::from_ticks(TIMER1, clock()), param);
 	}
 	else
 	{
-		m_timer[param]->adjust(clocks_to_attotime(0x10000), param);
+		m_timer[param]->adjust(attotime::from_ticks(0x10000, clock()), param);
 	}
 
 	m_timer_active[param] = true;
@@ -805,22 +806,22 @@ uint8_t mos7360_device::read(offs_t offset, int &cs0, int &cs1)
 	switch (offset)
 	{
 	case 0xff00:
-		val = attotime_to_clocks(m_timer[0]->remaining()) & 0xff;
+		val = m_timer_active[0] ? (m_timer[0]->remaining().as_ticks(clock()) & 0xff) : m_reg[offset & 0x1f];
 		break;
 	case 0xff01:
-		val = attotime_to_clocks(m_timer[0]->remaining()) >> 8;
+		val = m_timer_active[0] ? (m_timer[0]->remaining().as_ticks(clock()) >> 8) : m_reg[offset & 0x1f];
 		break;
 	case 0xff02:
-		val = attotime_to_clocks(m_timer[1]->remaining()) & 0xff;
+		val = m_timer_active[1] ? (m_timer[1]->remaining().as_ticks(clock()) & 0xff) : m_reg[offset & 0x1f];
 		break;
 	case 0xff03:
-		val = attotime_to_clocks(m_timer[1]->remaining()) >> 8;
+		val = m_timer_active[1] ? (m_timer[1]->remaining().as_ticks(clock()) >> 8) : m_reg[offset & 0x1f];
 		break;
 	case 0xff04:
-		val = attotime_to_clocks(m_timer[2]->remaining()) & 0xff;
+		val = m_timer_active[2] ? (m_timer[2]->remaining().as_ticks(clock()) & 0xff) : m_reg[offset & 0x1f];
 		break;
 	case 0xff05:
-		val = attotime_to_clocks(m_timer[2]->remaining()) >> 8;
+		val = m_timer_active[2] ? (m_timer[2]->remaining().as_ticks(clock()) >> 8) : m_reg[offset & 0x1f];
 		break;
 	case 0xff07:
 		val = (m_reg[offset & 0x1f] & ~0x40);
@@ -904,42 +905,39 @@ void mos7360_device::write(offs_t offset, uint8_t data, int &cs0, int &cs1)
 
 		if (m_timer_active[0])
 		{
-			m_reg[1] = attotime_to_clocks(m_timer[0]->remaining()) >> 8;
 			m_timer[0]->reset();
 			m_timer_active[0] = false;
 		}
 		break;
 	case 0xff01:                        /* start timer 1 */
 		m_reg[offset & 0x1f] = data;
-		m_timer[0]->adjust(clocks_to_attotime(TIMER1), TIMER_ID_1);
+		m_timer[0]->adjust(attotime::from_ticks(TIMER1, clock()), TIMER_ID_1);
 		m_timer_active[0] = true;
 		break;
 	case 0xff02:                        /* stop timer 2 */
 		m_reg[offset & 0x1f] = data;
 		if (m_timer_active[1])
 		{
-			m_reg[3] = attotime_to_clocks(m_timer[1]->remaining()) >> 8;
 			m_timer[1]->reset();
 			m_timer_active[1] = false;
 		}
 		break;
 	case 0xff03:                        /* start timer 2 */
 		m_reg[offset & 0x1f] = data;
-		m_timer[1]->adjust(clocks_to_attotime(TIMER2), TIMER_ID_2);
+		m_timer[1]->adjust(attotime::from_ticks(TIMER2, clock()), TIMER_ID_2);
 		m_timer_active[1] = true;
 		break;
 	case 0xff04:                        /* stop timer 3 */
 		m_reg[offset & 0x1f] = data;
 		if (m_timer_active[2])
 		{
-			m_reg[5] = attotime_to_clocks(m_timer[2]->remaining()) >> 8;
 			m_timer[2]->reset();
 			m_timer_active[2] = false;
 		}
 		break;
 	case 0xff05:                        /* start timer 3 */
 		m_reg[offset & 0x1f] = data;
-		m_timer[2]->adjust(clocks_to_attotime(TIMER3), TIMER_ID_2);
+		m_timer[2]->adjust(attotime::from_ticks(TIMER3, clock()), TIMER_ID_3);
 		m_timer_active[2] = true;
 		break;
 	case 0xff06:
@@ -1038,6 +1036,10 @@ void mos7360_device::write(offs_t offset, uint8_t data, int &cs0, int &cs1)
 			m_reg[offset & 0x1f] = data;
 			m_chargenaddr = CHARGENADDR;
 			DBG_LOG(3, "port_w", ("chargen %.4x %s %d\n", CHARGENADDR, data & 2 ? "" : "doubleclock", data & 1));
+			if (BIT(data, 1))
+				m_cpu->set_clock(clock());
+			else
+				m_cpu->set_clock(clock() * 2);
 		}
 		break;
 	case 0xff14:

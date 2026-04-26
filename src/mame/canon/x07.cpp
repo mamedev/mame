@@ -38,11 +38,165 @@
 #include <algorithm>
 
 
+//default value for user defined keys, taken for official documentation
+static const char *const udk_ini[12] = {
+	"tim?TIME$\r",
+	"cldCLOAD\"",
+	"locLOCATE ",
+	"lstLIST ",
+	"runRUN\r",
+	"",
+	"dat?DATE$\r",
+	"csvCSAVE\"",
+	"prtPRINT ",
+	"slpSLEEP",
+	"cntCONT\r",
+	""
+};
+
+static const uint16_t udk_offset[12] =
+{
+	0x0000, 0x002a, 0x0054, 0x007e, 0x00a8, 0x00d2,
+	0x0100, 0x012a, 0x0154, 0x017e, 0x01a8, 0x01d2
+};
+
+static const uint8_t printer_charcode[256] =
+{
+	0xff, 0x7f, 0xbf, 0x3f, 0xdf, 0x5f, 0x9f, 0x1f,
+	0xef, 0x6f, 0xaf, 0x2f, 0xcf, 0x4f, 0x8f, 0x0f,
+	0xf7, 0x77, 0xb7, 0x37, 0xd7, 0x57, 0x97, 0x17,
+	0xe7, 0x67, 0xa7, 0x27, 0xc7, 0x47, 0x87, 0x07,
+	0xfb, 0x7b, 0xbb, 0x3b, 0xdb, 0x5b, 0x9b, 0x1b,
+	0xeb, 0x6b, 0xab, 0x2b, 0xcb, 0x4b, 0x8b, 0x0b,
+	0xf3, 0x73, 0xb3, 0x33, 0xd3, 0x53, 0x93, 0x13,
+	0xe3, 0x63, 0xa3, 0x23, 0xc3, 0x43, 0x83, 0x03,
+	0xfd, 0x7d, 0xbd, 0x3d, 0xdd, 0x5d, 0x9d, 0x1d,
+	0xed, 0x6d, 0xad, 0x2d, 0xcd, 0x4d, 0x8d, 0x0d,
+	0xf5, 0x75, 0xb5, 0x35, 0xd5, 0x55, 0x95, 0x15,
+	0xe5, 0x65, 0xa5, 0x25, 0xc5, 0x45, 0x85, 0x05,
+	0xf9, 0x79, 0xb9, 0x39, 0xd9, 0x59, 0x99, 0x19,
+	0xe9, 0x69, 0xa9, 0x29, 0xc9, 0x49, 0x89, 0x09,
+	0xf1, 0x71, 0xb1, 0x31, 0xd1, 0x51, 0x91, 0x11,
+	0xe1, 0x61, 0xa1, 0x21, 0xc1, 0x41, 0x81, 0x01,
+	0xfe, 0x7e, 0xbe, 0x3e, 0xde, 0x5e, 0x9e, 0x1e,
+	0xee, 0x6e, 0xae, 0x2e, 0xce, 0x4e, 0x8e, 0x0e,
+	0xf6, 0x76, 0xb6, 0x36, 0xd6, 0x56, 0x96, 0x16,
+	0xe6, 0x66, 0xa6, 0x26, 0xc6, 0x46, 0x86, 0x06,
+	0xfa, 0x7a, 0xba, 0x3a, 0xda, 0x5a, 0x9a, 0x1a,
+	0xea, 0x6a, 0xaa, 0x2a, 0xca, 0x4a, 0x8a, 0x0a,
+	0xf2, 0x72, 0xb2, 0x32, 0xd2, 0x52, 0x92, 0x12,
+	0xe2, 0x62, 0xa2, 0x22, 0xc2, 0x42, 0x82, 0x02,
+	0xfc, 0x7c, 0xbc, 0x3c, 0xdc, 0x5c, 0x9c, 0x1c,
+	0xec, 0x6c, 0xac, 0x2c, 0xcc, 0x4c, 0x8c, 0x0c,
+	0xf4, 0x74, 0xb4, 0x34, 0xd4, 0x54, 0x94, 0x14,
+	0xe4, 0x64, 0xa4, 0x24, 0xc4, 0x44, 0x84, 0x04,
+	0xf8, 0x78, 0xb8, 0x38, 0xd8, 0x58, 0x98, 0x18,
+	0xe8, 0x68, 0xa8, 0x28, 0xc8, 0x48, 0x88, 0x08,
+	0xf0, 0x70, 0xb0, 0x30, 0xd0, 0x50, 0x90, 0x10,
+	0xe0, 0x60, 0xa0, 0x20, 0xc0, 0x40, 0x80, 0x00
+};
+
+static const uint8_t t6834_cmd_len[0x47] =
+{
+	0x01, 0x01, 0x01, 0x01, 0x01, 0x03, 0x04, 0x03,
+	0x01, 0x02, 0x09, 0x01, 0x09, 0x01, 0x01, 0x02,
+	0x03, 0x03, 0x03, 0x03, 0x05, 0x04, 0x82, 0x02,
+	0x01, 0x01, 0x0a, 0x02, 0x01, 0x81, 0x81, 0x01,
+	0x01, 0x01, 0x01, 0x01, 0x04, 0x01, 0x01, 0x03,
+	0x02, 0x01, 0x02, 0x01, 0x01, 0x01, 0x01, 0x01,
+	0x01, 0x01, 0x01, 0x01, 0x01, 0x82, 0x01, 0x01,
+	0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+	0x01, 0x09, 0x01, 0x03, 0x03, 0x01, 0x01
+};
+
+struct x07_kb
+{
+	uint8_t tag;        //input port tag
+	uint8_t mask;       //bit mask
+	uint8_t codes[7];   //port codes
+};
+
+static const x07_kb x07_keycodes[56] =
+{
+	{8, 0x01, {0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b}},
+	{0, 0x01, {0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12}},
+	{0, 0x02, {0x16, 0x16, 0x16, 0x16, 0x16, 0x16, 0x16}},
+	{0, 0x04, {0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c}},
+	{0, 0x08, {0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d}},
+	{0, 0x10, {0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e}},
+	{0, 0x20, {0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f}},
+	{0, 0x40, {0x20, 0x20, 0x20, 0x00, 0x20, 0x20, 0x20}},
+	{1, 0x01, {0x5a, 0x7a, 0x1a, 0x00, 0xc2, 0xaf, 0xe1}},
+	{1, 0x02, {0x58, 0x78, 0x18, 0x00, 0xbb, 0x00, 0x98}},
+	{1, 0x04, {0x43, 0x63, 0x03, 0x00, 0xbf, 0x00, 0xe4}},
+	{1, 0x08, {0x56, 0x76, 0x16, 0x00, 0xcb, 0x00, 0x95}},
+	{1, 0x10, {0x42, 0x62, 0x02, 0x00, 0xba, 0x00, 0xed}},
+	{1, 0x20, {0x4e, 0x6e, 0x0e, 0x00, 0xd0, 0x00, 0x89}},
+	{1, 0x40, {0x4d, 0x6d, 0x0d, 0x30, 0xd3, 0x00, 0xf5}},
+	{1, 0x80, {0x2c, 0x3c, 0x00, 0x00, 0xc8, 0xa4, 0x9c}},
+	{2, 0x01, {0x41, 0x61, 0x01, 0x00, 0xc1, 0x00, 0x88}},
+	{2, 0x02, {0x53, 0x73, 0x13, 0x00, 0xc4, 0x00, 0x9f}},
+	{2, 0x04, {0x44, 0x64, 0x04, 0x00, 0xbc, 0x00, 0xef}},
+	{2, 0x08, {0x46, 0x66, 0x06, 0x00, 0xca, 0x00, 0xfd}},
+	{2, 0x10, {0x47, 0x67, 0x07, 0x00, 0xb7, 0x00, 0x9d}},
+	{2, 0x20, {0x48, 0x68, 0x08, 0x00, 0xb8, 0x00, 0xfe}},
+	{2, 0x40, {0x4a, 0x6a, 0x0a, 0x31, 0xcf, 0x00, 0xe5}},
+	{2, 0x80, {0x4b, 0x6b, 0x0b, 0x32, 0xc9, 0x00, 0x9b}},
+	{3, 0x01, {0x51, 0x71, 0x11, 0x00, 0xc0, 0x00, 0x8b}},
+	{3, 0x02, {0x57, 0x77, 0x17, 0x00, 0xc3, 0x00, 0xfb}},
+	{3, 0x04, {0x45, 0x65, 0x05, 0x00, 0xb2, 0xa8, 0x99}},
+	{3, 0x08, {0x52, 0x72, 0x12, 0x00, 0xbd, 0x00, 0xf6}},
+	{3, 0x10, {0x54, 0x74, 0x14, 0x00, 0xb6, 0x00, 0x97}},
+	{3, 0x20, {0x59, 0x79, 0x19, 0x35, 0xdd, 0x00, 0x96}},
+	{3, 0x40, {0x55, 0x75, 0x15, 0x34, 0xc5, 0x00, 0x94}},
+	{3, 0x80, {0x49, 0x69, 0x09, 0x00, 0xc6, 0x00, 0xf9}},
+	{4, 0x01, {0x31, 0x21, 0x00, 0x00, 0xc7, 0x00, 0xe9}},
+	{4, 0x02, {0x32, 0x22, 0x00, 0x00, 0xcc, 0x00, 0x90}},
+	{4, 0x04, {0x33, 0x23, 0x00, 0x00, 0xb1, 0xa7, 0x91}},
+	{4, 0x08, {0x34, 0x24, 0x00, 0x00, 0xb3, 0xa9, 0x92}},
+	{4, 0x10, {0x35, 0x25, 0x00, 0x00, 0xb4, 0xaa, 0x93}},
+	{4, 0x20, {0x36, 0x26, 0x00, 0x00, 0xb5, 0xab, 0xec}},
+	{4, 0x40, {0x37, 0x27, 0x37, 0x00, 0xd4, 0xac, 0xe0}},
+	{4, 0x80, {0x38, 0x28, 0x37, 0x00, 0xd5, 0xad, 0xf2}},
+	{6, 0x01, {0x2e, 0x3e, 0x00, 0x2e, 0xd9, 0xa1, 0x9a}},
+	{6, 0x02, {0x2f, 0x3f, 0x00, 0x00, 0xd2, 0xa5, 0x80}},
+	{6, 0x04, {0x3f, 0xa5, 0x00, 0x00, 0x00, 0x00, 0x00}},
+	{6, 0x08, {0x0d, 0x0d, 0x0d, 0x0d, 0x0d, 0x0d, 0x0d}},
+	{6, 0x10, {0x4f, 0x6f, 0x0f, 0x36, 0xd7, 0x00, 0x9e}},
+	{6, 0x20, {0x50, 0x70, 0x10, 0x00, 0xbe, 0x00, 0xf7}},
+	{6, 0x40, {0x40, 0x60, 0x00, 0x00, 0xde, 0x00, 0xe7}},
+	{6, 0x80, {0x5b, 0x7b, 0x00, 0x00, 0xdf, 0xa2, 0x84}},
+	{7, 0x01, {0x4c, 0x6c, 0x0c, 0x33, 0xd8, 0x00, 0xf4}},
+	{7, 0x02, {0x3b, 0x2b, 0x00, 0x00, 0xda, 0x00, 0x82}},
+	{7, 0x04, {0x3a, 0x2a, 0x00, 0x00, 0xb9, 0x00, 0x81}},
+	{7, 0x08, {0x5d, 0x7d, 0x00, 0x00, 0xd1, 0xa3, 0x85}},
+	{7, 0x10, {0x39, 0x29, 0x39, 0x00, 0xd6, 0xae, 0xf1}},
+	{7, 0x20, {0x30, 0x7c, 0x00, 0x00, 0xdc, 0xa6, 0x8a}},
+	{7, 0x40, {0x2d, 0x3d, 0x00, 0x00, 0xce, 0x00, 0xf0}},
+	{7, 0x80, {0x3d, 0x7e, 0x00, 0x00, 0xcd, 0x00, 0xfc}}
+};
+
 /***************************************************************************
     T6834 IMPLEMENTATION
 ***************************************************************************/
 
-void x07_state::t6834_cmd (uint8_t cmd)
+static constexpr XTAL X07_CPU_CLOCK = 15.36_MHz_XTAL / 4;
+static constexpr XTAL BRG_INPUT_HZ = X07_CPU_CLOCK / 20; // = 192000 Hz
+
+// HD61L202F write port F4 control bits
+static constexpr uint8_t F4_W_REM   = 0x01;
+static constexpr uint8_t F4_W_BZON  = 0x02; // buzzer sound enable
+static constexpr uint8_t F4_W_MD0   = 0x04; // mode select bit 0
+static constexpr uint8_t F4_W_MD1   = 0x08; // mode select bit 1
+static constexpr uint8_t F4_W_LEO   = 0x10; // 38.4 kHz opto-coupler signal
+static constexpr uint8_t F4_W_CNTR  = 0x20; // parallel port control bit
+static constexpr uint8_t F4_W_BRGST = 0x40; // start baud-rate generator (BRG)
+static constexpr uint8_t F4_W_SETBC = 0x80; // load BRG counter from F2/F3
+
+// BRG is active when running in buzzer mode (MD1=MD0=1) with BRGST set.
+static constexpr uint8_t F4_BRG_ACTIVE = F4_W_BRGST | F4_W_MD1 | F4_W_MD0;
+
+void x07_state::t6834_cmd(uint8_t cmd)
 {
 	switch (cmd)
 	{
@@ -68,7 +222,7 @@ void x07_state::t6834_cmd (uint8_t cmd)
 		{
 			uint8_t data;
 
-			switch (ioport("S1")->read() & 0x3c)
+			switch (m_io_keyboard[0]->read() & 0x3c)
 			{
 				case 0x04:      data = 0x33;    break;  //right
 				case 0x08:      data = 0x37;    break;  //left
@@ -82,13 +236,13 @@ void x07_state::t6834_cmd (uint8_t cmd)
 
 	case 0x03:  //STRIG(0)
 		{
-			m_out.data[m_out.write++] = (ioport("S6")->read() & 0x20 ? 0x00 : 0xff);
+			m_out.data[m_out.write++] = (m_io_keyboard[5]->read() & 0x20) ? 0x00 : 0xff;
 		}
 		break;
 
 	case 0x04:  //STRIG(1)
 		{
-			m_out.data[m_out.write++] = (ioport("S1")->read() & 0x40 ? 0x00 : 0xff);
+			m_out.data[m_out.write++] = (m_io_keyboard[0]->read() & 0x40) ? 0x00 : 0xff;
 		}
 		break;
 
@@ -99,9 +253,9 @@ void x07_state::t6834_cmd (uint8_t cmd)
 			address = m_in.data[m_in.read++];
 			address |= (m_in.data[m_in.read++] << 8);
 
-			if(address == 0xc00e)
+			if (address == 0xc00e)
 				data = 0x0a;
-			else if(address == 0xd000)
+			else if (address == 0xd000)
 				data = ioport("BATTERY")->read();
 			else if (address >= 0xe000 && address < 0xe200 && ((address & 0xf) != 0xf)) // VRAM and col 0-119 ?
 			{
@@ -151,12 +305,12 @@ void x07_state::t6834_cmd (uint8_t cmd)
 
 	case 0x08:  //scroll exec
 		{
-			if(m_scroll_min <= m_scroll_max && m_scroll_max < 4)
+			if (m_scroll_min <= m_scroll_max && m_scroll_max < 4)
 			{
-				for(int i = m_scroll_min * 8; i < m_scroll_max * 8; i++)
+				for (int i = m_scroll_min * 8; i < m_scroll_max * 8; i++)
 					memcpy(&m_lcd_map[i][0], &m_lcd_map[i + 8][0], 120);
 
-				for(int i = m_scroll_max * 8; i < (m_scroll_max + 1) * 8; i++)
+				for (int i = m_scroll_max * 8; i < (m_scroll_max + 1) * 8; i++)
 					memset(&m_lcd_map[i][0], 0, 120);
 			}
 		}
@@ -165,7 +319,7 @@ void x07_state::t6834_cmd (uint8_t cmd)
 	case 0x09:  //line clear
 		{
 			uint8_t line = m_in.data[m_in.read++] & 3;
-			for(uint8_t l = line * 8; l < (line + 1) * 8; l++)
+			for (uint8_t l = line * 8; l < (line + 1) * 8; l++)
 				memset(&m_lcd_map[l][0], 0, 120);
 		}
 		break;
@@ -183,7 +337,7 @@ void x07_state::t6834_cmd (uint8_t cmd)
 
 	case 0x0c:  //ALM$ write
 		{
-			for(auto & elem : m_alarm)
+			for (auto &elem : m_alarm)
 				elem = m_in.data[m_in.read++];
 		}
 		break;
@@ -195,7 +349,7 @@ void x07_state::t6834_cmd (uint8_t cmd)
 	case 0x0f:  //read LCD line
 		{
 			uint8_t line = m_in.data[m_in.read++];
-			for(int i = 0; i < 120; i++)
+			for (int i = 0; i < 120; i++)
 				m_out.data[m_out.write++] = (line < 32) ? m_lcd_map[line][i] : 0;
 		}
 		break;
@@ -204,7 +358,7 @@ void x07_state::t6834_cmd (uint8_t cmd)
 		{
 			uint8_t x = m_in.data[m_in.read++];
 			uint8_t y = m_in.data[m_in.read++];
-			if(x < 120 && y < 32)
+			if (x < 120 && y < 32)
 				m_out.data[m_out.write++] = (m_lcd_map[y][x] ? 0xff : 0);
 			else
 				m_out.data[m_out.write++] = 0;
@@ -231,7 +385,7 @@ void x07_state::t6834_cmd (uint8_t cmd)
 		{
 			uint8_t x = m_in.data[m_in.read++];
 			uint8_t y = m_in.data[m_in.read++];
-			if(x < 120 && y < 32)
+			if (x < 120 && y < 32)
 				m_lcd_map[y][x] = !m_lcd_map[y][x];
 		}
 		break;
@@ -249,12 +403,12 @@ void x07_state::t6834_cmd (uint8_t cmd)
 			step_x = (p3 < p1) ? -1 : 1;
 			step_y = (p4 < p2) ? -1 : 1;
 
-			if(delta_x > delta_y)
+			if (delta_x > delta_y)
 			{
 				frac = delta_y - delta_x / 2;
-				while(next_x != p3)
+				while (next_x != p3)
 				{
-					if(frac >= 0)
+					if (frac >= 0)
 					{
 						next_y += step_y;
 						frac -= delta_x;
@@ -266,9 +420,9 @@ void x07_state::t6834_cmd (uint8_t cmd)
 			}
 			else {
 				frac = delta_x - delta_y / 2;
-				while(next_y != p4)
+				while (next_y != p4)
 				{
-					if(frac >= 0)
+					if (frac >= 0)
 					{
 						next_x += step_x;
 						frac -= delta_y;
@@ -289,13 +443,13 @@ void x07_state::t6834_cmd (uint8_t cmd)
 			uint8_t p2 = m_in.data[m_in.read++];
 			uint8_t p3 = m_in.data[m_in.read++];
 
-			for(int x = 0, y = p3; x <= sqrt((double)(p3 * p3) / 2) ; x++)
+			for (int x = 0, y = p3; x <= sqrt(double(p3 * p3) * 0.5) ; x++)
 			{
 				/*
 				 * The old code produced results most likely not intended:
 				 * uint32_t d1 = (x * x + y * y) - p3 * p3;
 				 * uint32_t d2 = (x * x + (y - 1) * (y - 1)) - p3 * p3;
-				 * if(abs((double)d1) > abs((double)d2))
+				 * if (abs((double)d1) > abs((double)d2))
 				 *
 				 * (double)(-1) = 4294967294.000000
 				 * abs((double)(-1)) = -2147483648;
@@ -323,11 +477,11 @@ void x07_state::t6834_cmd (uint8_t cmd)
 			uint8_t pos = m_in.data[m_in.read++] - 1;
 			uint8_t udk_size = (pos != 5 && pos != 11) ? 0x2a : 0x2e;
 
-			for(int i = 0; i < udk_size; i++)
+			for (int i = 0; i < udk_size; i++)
 			{
 				uint8_t udk_char = m_in.data[m_in.read++];
 				m_t6834_ram[udk_offset[pos] + i] = udk_char;
-				if(!udk_char)   break;
+				if (!udk_char)   break;
 			}
 		}
 		break;
@@ -337,11 +491,11 @@ void x07_state::t6834_cmd (uint8_t cmd)
 			uint8_t pos = m_in.data[m_in.read++] - 1;
 			uint8_t udk_size = (pos != 5 && pos != 11) ? 0x2a : 0x2e;
 
-			for(int i = 0; i < udk_size; i++)
+			for (int i = 0; i < udk_size; i++)
 			{
 				uint8_t udk_char = m_t6834_ram[udk_offset[pos] + i];
 				m_out.data[m_out.write++] = udk_char;
-				if(!udk_char)   break;
+				if (!udk_char)   break;
 			}
 		}
 		break;
@@ -355,11 +509,11 @@ void x07_state::t6834_cmd (uint8_t cmd)
 		{
 			uint8_t udc_code = m_in.data[m_in.read++];
 
-			if(udc_code>=128 && udc_code<=159)
-				for(int i = 0; i < 8; i++)
+			if (udc_code>=128 && udc_code<=159)
+				for (int i = 0; i < 8; i++)
 					m_t6834_ram[(udc_code<<3) + i - 0x200] = m_in.data[m_in.read++];
-			else if(udc_code>=224)
-				for(int i = 0; i < 8; i++)
+			else if (udc_code>=224)
+				for (int i = 0; i < 8; i++)
 					m_t6834_ram[(udc_code<<3) + i - 0x400] = m_in.data[m_in.read++];
 		}
 		break;
@@ -367,7 +521,7 @@ void x07_state::t6834_cmd (uint8_t cmd)
 	case 0x1b:  //UDC read
 		{
 			uint16_t address = m_in.data[m_in.read++] << 3;
-			for(int i = 0; i < 8; i++)
+			for (int i = 0; i < 8; i++)
 				m_out.data[m_out.write++] = get_char(address + i);
 		}
 		break;
@@ -380,7 +534,7 @@ void x07_state::t6834_cmd (uint8_t cmd)
 
 	case 0x1d:  //start program write
 		{
-			for(int i = 0; i < 0x80; i++)
+			for (int i = 0; i < 0x80; i++)
 			{
 				uint8_t sp_char = m_in.data[m_in.read++];
 				m_t6834_ram[0x500 + i] = sp_char;
@@ -391,7 +545,7 @@ void x07_state::t6834_cmd (uint8_t cmd)
 
 	case 0x1e:  //start program write cont
 		{
-			for(int i = (int)strlen((char*)&m_t6834_ram[0x500]); i < 0x80; i++)
+			for (int i = (int)strlen((char*)&m_t6834_ram[0x500]); i < 0x80; i++)
 			{
 				uint8_t sp_char = m_in.data[m_in.read++];
 				m_t6834_ram[0x500 + i] = sp_char;
@@ -407,7 +561,7 @@ void x07_state::t6834_cmd (uint8_t cmd)
 
 	case 0x21:  //start program read
 		{
-			for(int i = 0; i < 0x80; i++)
+			for (int i = 0; i < 0x80; i++)
 			{
 				uint8_t sp_data = m_t6834_ram[0x500 + i];
 				m_out.data[m_out.write++] = sp_data;
@@ -432,7 +586,7 @@ void x07_state::t6834_cmd (uint8_t cmd)
 			const uint8_t y = m_cursor.y = m_in.data[m_in.read++];
 			uint8_t char_code = m_in.data[m_in.read++];
 
-			if(char_code)
+			if (char_code)
 				draw_char(x, y, char_code);
 		}
 		break;
@@ -444,15 +598,13 @@ void x07_state::t6834_cmd (uint8_t cmd)
 
 	case 0x27:  //test key
 		{
-			static const char *const lines[] = {"S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "BZ", "A1"};
-			uint16_t matrix;
-			uint8_t data = 0;
-			matrix = m_in.data[m_in.read++];
+			uint16_t matrix = m_in.data[m_in.read++];
 			matrix |= (m_in.data[m_in.read++] << 8);
 
+			uint8_t data = 0;
 			for (int i=0 ;i<10; i++)
-				if (matrix & (1<<i))
-					data |= ioport(lines[i])->read();
+				if (BIT(matrix, i))
+					data |= m_io_keyboard[i]->read();
 
 			m_out.data[m_out.write++] = data;
 		}
@@ -461,7 +613,7 @@ void x07_state::t6834_cmd (uint8_t cmd)
 	case 0x28:  //test chr
 		{
 			uint8_t idx = kb_get_index(m_in.data[m_in.read++]);
-			m_out.data[m_out.write++] = (ioport(x07_keycodes[idx].tag)->read() & x07_keycodes[idx].mask) ? 0x00 : 0xff;
+			m_out.data[m_out.write++] = (m_io_keyboard[x07_keycodes[idx].tag]->read() & x07_keycodes[idx].mask) ? 0x00 : 0xff;
 		}
 		break;
 
@@ -495,7 +647,7 @@ void x07_state::t6834_cmd (uint8_t cmd)
 			if (m_draw_udk)
 				draw_udk();
 			else
-				for(uint8_t l = 3 * 8; l < (3 + 1) * 8; l++)
+				for (uint8_t l = 3 * 8; l < (3 + 1) * 8; l++)
 					memset(&m_lcd_map[l][0], 0, 120);
 		}
 		break;
@@ -513,18 +665,18 @@ void x07_state::t6834_cmd (uint8_t cmd)
 			uint8_t pos = m_in.data[m_in.read++] - 1;
 			uint8_t udk_size = (pos != 5 && pos != 11) ? 0x2a : 0x2e;
 
-			for(int i = (int)strlen((char*)&m_t6834_ram[udk_offset[pos]]); i < udk_size; i++)
+			for (int i = (int)strlen((char*)&m_t6834_ram[udk_offset[pos]]); i < udk_size; i++)
 			{
 				uint8_t udk_char = m_in.data[m_in.read++];
 				m_t6834_ram[udk_offset[pos] + i] = udk_char;
-				if(!udk_char)   break;
+				if (!udk_char)   break;
 			}
 		}
 		break;
 
 	case 0x36:  //alarm read
 		{
-			for(auto & elem : m_alarm)
+			for (auto &elem : m_alarm)
 				m_out.data[m_out.write++] = elem;
 		}
 		break;
@@ -534,7 +686,11 @@ void x07_state::t6834_cmd (uint8_t cmd)
 		break;
 
 	case 0x38:  //click off
+		m_click_on = 0;
+		break;
+
 	case 0x39:  //click on
+		m_click_on = 1;
 		break;
 
 	case 0x3a:  //Locate Close
@@ -558,18 +714,18 @@ void x07_state::t6834_cmd (uint8_t cmd)
 	case 0x40:  //UDK init
 		{
 			memset(m_t6834_ram, 0, 0x200);
-			for(int i = 0; i < 12; i++)
+			for (int i = 0; i < 12; i++)
 				strcpy((char*)m_t6834_ram + udk_offset[i], udk_ini[i]);
 		}
 		break;
 
 	case 0x41:  //char write
 		{
-			for(int cy = 0; cy < 8; cy++)
+			for (int cy = 0; cy < 8; cy++)
 			{
 				uint8_t cl = m_in.data[m_in.read++];
 
-				for(int cx = 0; cx < 6; cx++)
+				for (int cx = 0; cx < 6; cx++)
 					m_lcd_map[m_cursor.y * 8 + cy][m_cursor.x * 6 + cx] = (cl & (0x80>>cx)) ? 1 : 0;
 			}
 		}
@@ -577,11 +733,11 @@ void x07_state::t6834_cmd (uint8_t cmd)
 
 	case 0x42: //char read
 		{
-			for(int cy = 0; cy < 8; cy++)
+			for (int cy = 0; cy < 8; cy++)
 			{
 				uint8_t cl = 0x00;
 
-				for(int cx = 0; cx < 6; cx++)
+				for (int cx = 0; cx < 6; cx++)
 					cl |= (m_lcd_map[m_cursor.y * 8 + cy][m_cursor.x * 6 + cx] != 0) ? (1<<(7-cx)) : 0;
 
 				m_out.data[m_out.write++] = cl;
@@ -611,7 +767,7 @@ void x07_state::t6834_r ()
 {
 	m_out.read++;
 	m_regs_r[2] &= 0xfe;
-	if(m_out.write > m_out.read)
+	if (m_out.write > m_out.read)
 	{
 		m_regs_r[0]  = 0x40;
 		m_regs_r[1] = m_out.data[m_out.read];
@@ -637,20 +793,20 @@ void x07_state::t6834_w ()
 
 	uint8_t cmd_len = t6834_cmd_len[m_in.data[m_in.read]];
 
-	if(cmd_len & 0x80)
+	if (cmd_len & 0x80)
 	{
-		if((cmd_len & 0x7f) < m_in.write && !data)
+		if ((cmd_len & 0x7f) < m_in.write && !data)
 			cmd_len = m_in.write;
 	}
 
-	if(m_in.write == cmd_len)
+	if (m_in.write == cmd_len)
 	{
 		m_out.write = 0;
 		m_out.read = 0;
 		t6834_cmd(m_in.data[m_in.read++]);
 		m_in.write = 0;
 		m_in.read = 0;
-		if(m_out.write)
+		if (m_out.write)
 		{
 			m_regs_r[0]  = 0x40;
 			m_regs_r[1] = m_out.data[m_out.read];
@@ -813,6 +969,34 @@ void x07_state::receive_bit(int bit)
 	}
 }
 
+void x07_state::t6834_set_audio()
+{
+	const uint16_t div = (m_regs_w[2] | m_regs_w[3] << 8) & 0x0fff;
+	if (div > 0)
+	{
+		const uint32_t freq = BRG_INPUT_HZ.value() / div;
+		m_beep->set_clock(freq);
+
+		const uint32_t adjusted_freq = freq * 2; // empirical to match hardware result
+		m_audio_tick->adjust(attotime::from_hz(adjusted_freq), 0, attotime::from_hz(adjusted_freq));
+	}
+	else
+	{
+		m_beep->set_clock(0);
+		m_audio_tick->reset();
+	}
+	m_beep->set_state((m_regs_w[4] & F4_W_BZON) ? 1 : 0);  // only sound if BZON set
+	m_regs_r[2] |= 0x04;  // signaling generator is running
+}
+
+void x07_state::t6834_reset_audio()
+{
+	m_beep->set_state(0);
+	m_audio_tick->reset();
+	m_regs_r[2] &= ~0x04;  // generator not running
+}
+
+
 
 /****************************************************
     this function emulate the color printer X-710
@@ -881,7 +1065,7 @@ void x07_state::printer_w()
 
 inline uint8_t x07_state::kb_get_index(uint8_t char_code)
 {
-	for(uint8_t i=0 ; i< std::size(x07_keycodes); i++)
+	for (uint8_t i=0 ; i< std::size(x07_keycodes); i++)
 		if (x07_keycodes[i].codes[0] == char_code)
 			return i;
 
@@ -892,11 +1076,11 @@ inline uint8_t x07_state::get_char(uint16_t pos)
 {
 	uint8_t code = pos>>3;
 
-	if(code>=128 && code<=159)      //UDC 0
+	if (code>=128 && code<=159)      //UDC 0
 	{
 		return m_t6834_ram[pos - 0x200];
 	}
-	else if(code>=224)              //UDC 1
+	else if (code>=224)              //UDC 1
 	{
 		return m_t6834_ram[pos - 0x400];
 	}
@@ -913,7 +1097,7 @@ INPUT_CHANGED_MEMBER( x07_state::kb_func_keys )
 
 	if (m_kb_on && newval)
 	{
-		uint8_t shift = (ioport("A1")->read() & 0x01);
+		uint8_t shift = m_io_keyboard[9]->read() & 0x01;
 		uint16_t udk_s = udk_offset[(shift*6) +  idx - 1];
 
 		/* First 3 chars are used for description */
@@ -925,7 +1109,7 @@ INPUT_CHANGED_MEMBER( x07_state::kb_func_keys )
 
 			if (m_kb_size < 0xff && data != 0)
 				m_t6834_ram[0x400 + m_kb_size++] = data;
-		} while(data != 0);
+		} while (data != 0);
 
 		kb_irq();
 	}
@@ -934,8 +1118,8 @@ INPUT_CHANGED_MEMBER( x07_state::kb_func_keys )
 INPUT_CHANGED_MEMBER( x07_state::kb_keys )
 {
 	uint8_t modifier;
-	uint8_t a1 = ioport("A1")->read();
-	uint8_t bz = ioport("BZ")->read();
+	uint8_t a1 = m_io_keyboard[9]->read();
+	uint8_t bz = m_io_keyboard[8]->read();
 	uint8_t keycode = (uint8_t)param;
 
 	if (m_kb_on && !newval)
@@ -1002,6 +1186,15 @@ void x07_state::kb_irq()
 		m_regs_r[2] |= 0x01;
 		m_maincpu->set_input_line(NSC800_RSTA, ASSERT_LINE);
 		m_rsta_clear->adjust(attotime::from_msec(50));
+
+		// Produce a brief click through the buzzer, unless a tone is already playing
+		// The click is a coprocessor feature.
+		if (m_click_on && (m_regs_w[4] & F4_BRG_ACTIVE) != F4_BRG_ACTIVE)
+		{
+			m_beep->set_clock(1200);
+			m_beep->set_state(1);
+			m_click_stop->adjust(attotime::from_msec(10));
+		}
 	}
 }
 
@@ -1012,32 +1205,34 @@ void x07_state::kb_irq()
 
 inline void x07_state::draw_char(uint8_t x, uint8_t y, uint8_t char_pos)
 {
-	if(x < 20 && y < 4)
-		for(int cy = 0; cy < 8; cy++)
-			for(int cx = 0; cx < 6; cx++)
+	if (x < 20 && y < 4)
+	{
+		for (int cy = 0; cy < 8; cy++)
+			for (int cx = 0; cx < 6; cx++)
 				m_lcd_map[y * 8 + cy][x * 6 + cx] = (get_char(((char_pos << 3) + cy) & 0x7ff) & (0x80>>cx)) ? 1 : 0;
+	}
 }
 
 
 inline void x07_state::draw_point(uint8_t x, uint8_t y, uint8_t color)
 {
-	if(x < 120 && y < 32)
+	if (x < 120 && y < 32)
 		m_lcd_map[y][x] = color;
 }
 
 
 inline void x07_state::draw_udk()
 {
-	uint8_t i, x, j;
-
 	if (m_draw_udk)
-		for(i = 0, x = 0; i < 5; i++)
+	{
+		for (int i = 0, x = 0; i < 5; i++)
 		{
-			uint16_t ofs = udk_offset[i + ((ioport("A1")->read()&0x01) ? 6 : 0)];
+			uint16_t ofs = udk_offset[i + ((m_io_keyboard[9]->read()&0x01) ? 6 : 0)];
 			draw_char(x++, 3, 0x83);
-			for(j = 0; j < 3; j++)
+			for (int j = 0; j < 3; j++)
 				draw_char(x++, 3, m_t6834_ram[ofs++]);
 		}
+	}
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( x07_state::card_load )
@@ -1074,14 +1269,22 @@ uint32_t x07_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	if (m_lcd_on)
 	{
-		for(int py = 0; py < 4; py++)
-			for(int px = 0; px < 20; px++)
-				for(int y = 0; y < 8; y++)
+		for (int py = 0; py < 4; py++)
+		{
+			for (int px = 0; px < 20; px++)
+			{
+				for (int y = 0; y < 8; y++)
+				{
 					for (int x=0; x<6; x++)
-						if(m_cursor.on && m_blink && m_cursor.x == px && m_cursor.y == py)
+					{
+						if (m_cursor.on && m_blink && m_cursor.x == px && m_cursor.y == py)
 							bitmap.pix(py * 8 + y, px * 6 + x) = (y == 7) ? 1: 0;
 						else
 							bitmap.pix(py * 8 + y, px * 6 + x) = m_lcd_map[py * 8 + y][px * 6 + x]? 1: 0;
+					}
+				}
+			}
+		}
 
 	}
 
@@ -1097,7 +1300,7 @@ uint8_t x07_state::x07_io_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	switch(offset)
+	switch (offset)
 	{
 	case 0x80:
 	case 0x81:
@@ -1131,7 +1334,7 @@ uint8_t x07_state::x07_io_r(offs_t offset)
 		break;
 
 	case 0xf2:
-		if(m_regs_w[5] & 4)
+		if (m_regs_w[5] & 4)
 			m_regs_r[2] |= 2;
 		else
 			m_regs_r[2] &= 0xfd;
@@ -1145,7 +1348,7 @@ uint8_t x07_state::x07_io_r(offs_t offset)
 
 void x07_state::x07_io_w(offs_t offset, uint8_t data)
 {
-	switch(offset)
+	switch (offset)
 	{
 	case 0x80:
 		m_font_code = data;
@@ -1153,11 +1356,16 @@ void x07_state::x07_io_w(offs_t offset, uint8_t data)
 
 	case 0xf0:
 	case 0xf1:
-	case 0xf2:
-	case 0xf3:
 	case 0xf6:
 	case 0xf7:
 		m_regs_w[offset & 7] = data;
+		break;
+
+	case 0xf2:
+	case 0xf3:
+		m_regs_w[offset & 7] = data;
+		if ((m_regs_w[4] & F4_BRG_ACTIVE) == F4_BRG_ACTIVE)
+			t6834_set_audio();
 		break;
 
 	case 0xf4:
@@ -1176,28 +1384,22 @@ void x07_state::x07_io_w(offs_t offset, uint8_t data)
 			m_cass_tick->reset();
 		}
 
-		if((data & 0x0e) == 0x0e)
-		{
-			uint16_t div = (m_regs_w[2] | m_regs_w[3] << 8) & 0x0fff;
-			m_beep->set_clock((div == 0) ? 0 : 192000 / div);
-			m_beep->set_state(1);
-
-			m_beep_stop->adjust(attotime::from_msec(m_ram->pointer()[0x450] * 0x20));
-		}
+		if ((data & F4_BRG_ACTIVE) == F4_BRG_ACTIVE)
+			t6834_set_audio();
 		else
-			m_beep->set_state(0);
+			t6834_reset_audio();
 		break;
 
 	case 0xf5:
-		if(data & 0x01)
+		if (data & 0x01)
 			t6834_r();
-		if(data & 0x02)
+		if (data & 0x02)
 			t6834_w();
-		if(data & 0x04)
+		if (data & 0x04)
 			cassette_r();
-		if(data & 0x08)
+		if (data & 0x08)
 			cassette_w();
-		if(data & 0x20)
+		if (data & 0x20)
 			printer_w();
 
 		m_regs_w[5] = data;
@@ -1344,9 +1546,17 @@ TIMER_CALLBACK_MEMBER(x07_state::rstb_clear)
 	m_maincpu->set_input_line(NSC800_RSTB, CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(x07_state::beep_stop)
+TIMER_CALLBACK_MEMBER(x07_state::audio_tick)
 {
-	m_beep->set_state(0);
+	m_maincpu->set_input_line(NSC800_RSTB, ASSERT_LINE);
+	m_rstb_clear->adjust(attotime::from_usec(50));
+}
+
+TIMER_CALLBACK_MEMBER(x07_state::click_stop)
+{
+	// Only stop if the F4 buzzer hasn't been activated in the meantime
+	if ((m_regs_w[4] & F4_BRG_ACTIVE) != F4_BRG_ACTIVE)
+		m_beep->set_state(0);
 }
 
 static const gfx_layout x07_charlayout =
@@ -1369,7 +1579,8 @@ void x07_state::machine_start()
 	uint32_t ram_size = m_ram->size();
 	m_rsta_clear = timer_alloc(FUNC(x07_state::rsta_clear), this);
 	m_rstb_clear = timer_alloc(FUNC(x07_state::rstb_clear), this);
-	m_beep_stop = timer_alloc(FUNC(x07_state::beep_stop), this);
+	m_audio_tick = timer_alloc(FUNC(x07_state::audio_tick), this);
+	m_click_stop = timer_alloc(FUNC(x07_state::click_stop), this);
 	m_cass_poll = timer_alloc(FUNC(x07_state::cassette_poll), this);
 	m_cass_tick = timer_alloc(FUNC(x07_state::cassette_tick), this);
 
@@ -1388,6 +1599,7 @@ void x07_state::machine_start()
 	save_item(NAME(m_scroll_max));
 	save_item(NAME(m_blink));
 	save_item(NAME(m_kb_on));
+	save_item(NAME(m_click_on));
 	save_item(NAME(m_repeat_key));
 	save_item(NAME(m_kb_size));
 	save_item(NAME(m_prn_sendbit));
@@ -1454,6 +1666,7 @@ void x07_state::machine_reset()
 	m_scroll_max = 3;
 	m_blink = 0;
 	m_kb_on = 0;
+	m_click_on = 1;
 	m_repeat_key = 0;
 	m_kb_size = 0;
 	m_repeat_key = 0;
@@ -1469,7 +1682,7 @@ void x07_state::machine_reset()
 void x07_state::x07(machine_config &config)
 {
 	/* basic machine hardware */
-	NSC800(config, m_maincpu, 15.36_MHz_XTAL / 4);
+	NSC800(config, m_maincpu, X07_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &x07_state::x07_mem);
 	m_maincpu->set_addrmap(AS_IO, &x07_state::x07_io);
 

@@ -68,6 +68,8 @@
  Columns are usually wired from left to right from least significant to most significant bit.
  Nichibutsu wires the bits in the opposite order.
  The Jaleco MegaSystem 32 has the columns rotated by one position so the Start column is the least significant bit.
+ Various other games (e.g. from Seta) change the order of rows and/or columns.
+ Sega, Sanritsu, Toaplan and some others transposed the rows and columns, producing a 6*4 or 6*5 matrix.
 
  Note that non-standard mahjong/hanafuda keyboards exist:
  * Some Nichibutsu hanafuda games use the Reach/Ron positions for Yes/No (rather than M/N).
@@ -371,6 +373,38 @@ mahjong_panel_connector_device::~mahjong_panel_connector_device()
 void mahjong_panel_connector_device::device_start()
 {
 	m_panel = get_card_device();
+}
+
+void mahjong_panel_connector_device::standard_panels(device_slot_interface &device)
+{
+	device.option_add("mj",   MAHJONG_MEDAL_PANEL);
+	device.option_add("mjam", MAHJONG_PANEL);
+	device.option_add("hf",   HANAFUDA_MEDAL_PANEL);
+	device.option_add("hfam", HANAFUDA_PANEL);
+}
+
+void mahjong_panel_connector_device::mahjong_panels(device_slot_interface &device)
+{
+	device.option_add("mj",   MAHJONG_MEDAL_PANEL);
+	device.option_add("mjam", MAHJONG_PANEL);
+}
+
+void mahjong_panel_connector_device::hanafuda_panels(device_slot_interface &device)
+{
+	device.option_add("hf",   HANAFUDA_MEDAL_PANEL);
+	device.option_add("hfam", HANAFUDA_PANEL);
+}
+
+void mahjong_panel_connector_device::medal_panels(device_slot_interface &device)
+{
+	device.option_add("mj",   MAHJONG_MEDAL_PANEL);
+	device.option_add("hf",   HANAFUDA_MEDAL_PANEL);
+}
+
+void mahjong_panel_connector_device::amusement_panels(device_slot_interface &device)
+{
+	device.option_add("mjam", MAHJONG_PANEL);
+	device.option_add("hfam", HANAFUDA_PANEL);
 }
 
 

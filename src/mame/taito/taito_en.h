@@ -12,11 +12,11 @@
 
 #include "cpu/es5510/es5510.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/mc68681.h"
+#include "machine/mb8421.h"
 #include "sound/es5506.h"
 #include "sound/esqpump.h"
-#include "machine/mc68681.h"
-#include "machine/mb87078.h"
-#include "machine/mb8421.h"
+#include "sound/mb87077.h"
 
 class taito_en_device : public device_t, public device_mixer_interface
 

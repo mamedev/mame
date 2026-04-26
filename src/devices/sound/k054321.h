@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
-#ifndef MAME_MACHINE_K054321_H
-#define MAME_MACHINE_K054321_H
+#ifndef MAME_SOUND_K054321_H
+#define MAME_SOUND_K054321_H
 
 #pragma once
 
@@ -49,4 +49,4 @@ private:
 
 DECLARE_DEVICE_TYPE(K054321, k054321_device)
 
-#endif // MAME_MACHINE_K054321_H
+#endif // MAME_SOUND_K054321_H

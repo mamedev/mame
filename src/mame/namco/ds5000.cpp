@@ -154,40 +154,110 @@ class ds5000_state : public driver_device
 public:
 	ds5000_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "subcpu"),
+		m_sub_intc(*this, "sub_intc"),
+		m_c355spr(*this, "c355spr"),
+		m_dsp_68k_rom(*this, "dsp_68k"),
+		m_dsp_68k_bank(*this, "dsp_bank"),
+		m_shared_ram(*this, "shared_ram")
 	{ }
 
 	void ds5000(machine_config &config) ATTR_COLD;
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<namco_c148_device> m_sub_intc;
+	required_device<namco_c355spr_device> m_c355spr;
+	required_memory_region m_dsp_68k_rom;
+	required_memory_bank m_dsp_68k_bank;
+	required_shared_ptr<u16> m_shared_ram;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_program_map(address_map &map) ATTR_COLD;
-	void sound_program_map(address_map &map) ATTR_COLD;
+	void sub_program_map(address_map &map) ATTR_COLD;
+
+	// temp
+	INTERRUPT_GEN_MEMBER(sub_vblank_cb);
 };
 
 
 uint32_t ds5000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+//	m_c355spr->build_sprite_list_and_render_sprites(cliprect);
+//	m_c355spr->draw(screen, bitmap, cliprect);
 	return 0;
 }
+
+void ds5000_state::machine_start()
+{
+	u8 *ROM = m_dsp_68k_rom->base();
+	m_dsp_68k_bank->configure_entries(0, 0x20, &ROM[0], 0x100000);
+}
+
+void ds5000_state::machine_reset()
+{
+}
+
 
 
 void ds5000_state::main_program_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();
+	map(0x0000'0000, 0x0003'ffff).rom();
+	map(0x5000'0000, 0x5000'0003).nopr(); // & 0xffff0000
+	map(0x6000'0000, 0x6000'ffff).lrw16(
+		NAME([this] (offs_t offset) {
+			return m_shared_ram[offset];
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			COMBINE_DATA(&m_shared_ram[offset]);
+		})
+	);
+	map(0x8000'0000, 0x8003'ffff).ram();
+
+	map(0xf700'0000, 0xf7ff'ffff).rom().region("dsp_020", 0);
 }
 
-void ds5000_state::sound_program_map(address_map &map)
+void ds5000_state::sub_program_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x10ffff).ram(); // stack area
+	map(0x180000, 0x182fff).ram(); // palette triplets?
+	map(0x1c0000, 0x1fffff).m(m_sub_intc, FUNC(namco_c148_device::map));
+	map(0x200000, 0x200fff).ram();
+	map(0x300000, 0x33ffff).ram(); // $300000-$30ffff sound program (8-bit)
+	map(0x340000, 0x343fff).ram();
+	map(0x400000, 0x43ffff).ram(); // code executed from here
+	map(0x480000, 0x4bffff).ram();
+	map(0x500000, 0x50ffff).ram().share(m_shared_ram);
+	map(0x600000, 0x600001).lw16(NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+		if (data & 0xffe0)
+			logerror("%s $600000: write %04x & %04x\n", this->tag(), data, mem_mask);
+		if (ACCESSING_BITS_0_7)
+			m_dsp_68k_bank->set_entry(data & 0x1f);
+	}));
+	// $cxxxxx C355?
+	map(0xc00000, 0xc0000f).ram();
+	map(0xc40000, 0xc43fff).ram();
+	map(0xc80000, 0xc8000f).ram();
+	map(0xcc0000, 0xcc3fff).ram();
+	map(0xd00000, 0xdfffff).bankr(m_dsp_68k_bank);
 }
 
 
 static INPUT_PORTS_START( ds5000 )
 INPUT_PORTS_END
+
+INTERRUPT_GEN_MEMBER(ds5000_state::sub_vblank_cb)
+{
+	m_sub_intc->vblank_irq_trigger();
+}
 
 
 // TODO: all dividers not verified
@@ -197,14 +267,26 @@ void ds5000_state::ds5000(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ds5000_state::main_program_map);
 	m_maincpu->set_vblank_int("screen", FUNC(ds5000_state::irq1_line_hold));
 
-	m68000_device &audiocpu(M68000(config, "audiocpu", 49.152_MHz_XTAL / 4));
-	audiocpu.set_addrmap(AS_PROGRAM, &ds5000_state::sound_program_map);
+	M68000(config, m_subcpu, 49.152_MHz_XTAL / 4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &ds5000_state::sub_program_map);
+	m_subcpu->set_vblank_int("screen", FUNC(ds5000_state::sub_vblank_cb));
 
 	// TODO: HD68B09P
 
 	// TODO: DSPs
 
 	// TODO: Namco customs
+	NAMCO_C148(config, m_sub_intc, 0, m_subcpu, true);
+	m_sub_intc->out_ext1_callback().set_nop(); //(FUNC(namcos2_base_state::sound_reset_w));
+	m_sub_intc->out_ext2_callback().set_nop(); //(FUNC(namcos2_base_state::system_reset_w));
+
+	NAMCO_C355SPR(config, m_c355spr, 0);
+	m_c355spr->set_screen("screen");
+	m_c355spr->set_palette("palette");
+	m_c355spr->set_scroll_offsets(0, 0x20);
+//	m_c355spr->set_mix_callback(FUNC(namcos21_c67_state::sprite_mix_callback));
+	m_c355spr->set_color_base(0x1000);
+//	m_c355spr->set_external_prifill(true);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -229,7 +311,7 @@ ROM_START( ds5000 )
 	ROM_LOAD16_BYTE( "dsk1_prog2.14b", 0x00001, 0x20000, CRC(0245f06f) SHA1(dfd2476aeeba1bd7cd8499762abce00e97c7cca6) ) // 1111xxxxxxxxxxxxx = 0xFF
 	// prog 0-1 and data 0-3 sockets not populated
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) // DS2 93/11/04 20:39:16 string. On CPU68K board
+	ROM_REGION( 0x40000, "subcpu", 0 ) // DS2 93/11/04 20:39:16 string. On CPU68K board
 	ROM_LOAD16_BYTE( "dsk1_prgub.9c", 0x00000, 0x20000, CRC(bd205b6a) SHA1(0f8f3cea06f50b6ecdaf0648b275c657bd133c6b) ) // 1111xxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "dsk1_prglb.9a", 0x00001, 0x20000, CRC(263fc8ac) SHA1(cbb93f3eecbe4f11edf8a03994c391917d965d2c) ) // 1111xxxxxxxxxxxxx = 0xFF
 
@@ -241,12 +323,16 @@ ROM_START( ds5000 )
 	// voice 4-7 sockets are populated with RAM instead of ROM
 
 	ROM_REGION16_BE( 0x200000, "dsp1", 0 ) // on ROM board. TODO: verify ROM loading
+	// CPU68K
 	ROM_LOAD16_BYTE( "dss2_a0u.12a", 0x000000, 0x20000, CRC(55755eb3) SHA1(d75fd9139d0783dc75ca2107cccb2612d427e8ba) )
 	ROM_LOAD16_BYTE( "dss2_a0l.8a",  0x000001, 0x20000, CRC(8b53cbe5) SHA1(0c9dba0949399b7d427a618fa1cd6fa890d2862b) )
+	// CPU020
 	ROM_LOAD16_BYTE( "dss2_a1u.13a", 0x040000, 0x20000, CRC(a10811ff) SHA1(9ae20aa409d04c2c36a13c1b1f2c2570b891cd06) ) // 1xxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "dss2_a1l.9a",  0x040001, 0x20000, CRC(c771e9bf) SHA1(acce88e01142f647ee059b196c5eec7832457ff3) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	// object
 	ROM_LOAD16_BYTE( "dss2_a2u.14a", 0x080000, 0x40000, CRC(30c11b0f) SHA1(2c5ecc52e3373106c2cf6c9ddbe1af07e861a827) )
 	ROM_LOAD16_BYTE( "dss2_a2l.10a", 0x080001, 0x40000, CRC(0e787b6b) SHA1(5ecec393e1629f00ab828f810feb79fb14b80563) )
+	// polygon
 	ROM_LOAD16_BYTE( "dss2_a3u.15a", 0x100000, 0x80000, CRC(067e4890) SHA1(799ec54cf68a6f5cbe1adefb76de8cccb31aa030) )
 	ROM_LOAD16_BYTE( "dss2_a3l.11a", 0x100001, 0x80000, CRC(01d461f5) SHA1(5858e6ec60e339b39e1875853a91776ea5229214) )
 	// a4-7u and a4-7l sockets not populated
@@ -261,6 +347,20 @@ ROM_START( ds5000 )
 	ROM_LOAD16_BYTE( "dsw2_b7u.15f", 0x100000, 0x80000, CRC(db369aef) SHA1(5d1c90a20de02d65904d21bffc68624c08aa433c) )
 	ROM_LOAD16_BYTE( "dsw2_b7l.11f", 0x100001, 0x80000, CRC(3466bea4) SHA1(7f21b7dec83ce3be8a86696d5a97b61438cde2ec) )
 	// b0-3u and b0-3l sockets not populated
+
+	// copy the banks for endianness alignment
+	ROM_REGION32_BE( 0x1000000, "dsp_020", ROMREGION_ERASEFF )
+	ROM_COPY("dsp1", 0x0000000, 0x000000, 0x200000 )
+	ROM_COPY("dsp2", 0x0000000, 0x200000, 0x200000 )
+
+	ROM_REGION16_BE( 0x1000000, "dsp_68k", ROMREGION_ERASEFF )
+	ROM_COPY("dsp1", 0x0000000, 0x000000, 0x200000 )
+	ROM_COPY("dsp2", 0x0000000, 0x200000, 0x200000 )
+
+	// TODO: really looks PCG based
+	ROM_REGION( 0x100000, "c355spr", 0 )
+	ROM_COPY("dsp1", 0x0080000, 0x000000, 0x080000 )
+	ROM_COPY("dsp2", 0x0080000, 0x080000, 0x080000 )
 
 	ROM_REGION( 0x200, "cpu020_plds", ROMREGION_ERASE00 )
 	ROM_LOAD( "3p0201.12r", 0x000, 0x149, NO_DUMP ) // AMPAL18P8BPC

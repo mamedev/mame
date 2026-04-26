@@ -78,6 +78,7 @@ public:
 	mos7360_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
+	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	auto write_irq_callback() { return m_write_irq.bind(); }
 	auto read_k_callback() { return m_read_k.bind(); }
 
@@ -177,6 +178,8 @@ protected:
 
 	emu_timer *m_line_timer;
 	emu_timer *m_frame_timer;
+
+	optional_device<cpu_device> m_cpu;
 };
 
 

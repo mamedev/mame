@@ -110,7 +110,6 @@ public:
 	virtual u8 *get_vram_ptr() = 0;
 	virtual u8 *get_auxbank_ptr() = 0;
 	virtual u16 get_auxbank_mask() = 0;
-	virtual bool allow_dhr() { return true; }
 
 	device_a2eauxslot_card_interface *next() const { return m_next; }
 

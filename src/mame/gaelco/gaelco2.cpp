@@ -1042,7 +1042,7 @@ ROM_START( luckyclrs )
 	ROM_LOAD16_BYTE( "1_m27c1001.u40",  0x000001, 0x020000, CRC(f49787e9) SHA1(3be6e865e071066b3f53e7f46da3cf7e117913c6) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
-	ROM_LOAD( "ds5002fp_50i.mcu", 0x00000, 0x8000, NO_DUMP )
+	ROM_LOAD( "ds5002fp_lucky_1.1i.mcu", 0x00000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	DS5002FP_SET_MON( 0x79 )
@@ -3370,7 +3370,7 @@ GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state,  
 GAME( 1999, play2000_50i,play2000,  play2000,         play2000, gaelco2_state,      empty_init,     ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.0i) (Italy)", MACHINE_NOT_WORKING ) // bad dump
 GAME( 1999, play2000_40i,play2000,  play2000,         play2000, gaelco2_state,      init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0i) (Italy)", 0 )
 
-GAME( 1999, luckyclrs,   0,         play2000,         play2000, gaelco2_state,      empty_init,     ROT0, "Nova Desitec", "Lucky Colors (v1.1i) (Italy)", MACHINE_NOT_WORKING ) // missing ds5002fp dump
+GAME( 1999, luckyclrs,   0,         play2000,         play2000, gaelco2_state,      init_luckyclrs, ROT0, "Nova Desitec", "Lucky Colors (v1.1i) (Italy)", MACHINE_NOT_WORKING ) // missing ds5002fp dump
 
 GAME( 1998, srollnd,     0,         srollnd,          play2000, gaelco2_state,      init_play2000,  ROT0, "Nova Desitec", "Super Roller (v7.0)",  MACHINE_NOT_WORKING ) // missing ds5002fp dump
 

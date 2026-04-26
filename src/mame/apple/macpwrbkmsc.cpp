@@ -900,7 +900,7 @@ void macpbmsc_state::macpd280(machine_config &config)
 
 	m_csc->set_panel_id(4);
 
-	M68040(config.replace(), m_maincpu, 33_MHz_XTAL/2);
+	M68LC040(config.replace(), m_maincpu, 33_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpbmsc_state::macpd280_map);
 }
 

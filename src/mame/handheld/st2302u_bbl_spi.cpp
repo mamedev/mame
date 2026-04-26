@@ -31,7 +31,7 @@
 
 #include "cpu/m6502/st2205u.h"
 #include "machine/bl_handhelds_menucontrol.h"
-#include "bl_handhelds_lcdc.h"
+#include "video/st7735_lcdc.h"
 
 #include "screen.h"
 #include "emupal.h"
@@ -98,7 +98,7 @@ private:
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
 	required_device<bl_handhelds_menucontrol_device> m_menucontrol;
-	required_device<bl_handhelds_lcdc_device> m_lcdc;
+	required_device<st7735_lcdc_device> m_lcdc;
 
 	u8 ff_r() { return 0xff; }
 };
@@ -246,8 +246,8 @@ u8 bbl380_state::spi_r()
 void bbl380_state::bbl380_map(address_map &map)
 {
 	map(0x0002000, 0x0003fff).rom().region("maincpu", 0);
-	map(0x1800000, 0x1800000).w(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_command_w));
-	map(0x1804000, 0x1804000).rw(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_data_r), FUNC(bl_handhelds_lcdc_device::lcdc_data_w));
+	map(0x1800000, 0x1800000).w(m_lcdc, FUNC(st7735_lcdc_device::lcdc_command_w));
+	map(0x1804000, 0x1804000).rw(m_lcdc, FUNC(st7735_lcdc_device::lcdc_data_r), FUNC(st7735_lcdc_device::lcdc_data_w));
 }
 
 static INPUT_PORTS_START(bbl380)
@@ -307,7 +307,7 @@ void bbl380_state::bbl380(machine_config &config)
 	m_screen->set_screen_update(FUNC(bbl380_state::screen_update));
 
 	BL_HANDHELDS_MENUCONTROL(config, m_menucontrol, 0);
-	BL_HANDHELDS_LCDC(config, m_lcdc, 0);
+	ST7735(config, m_lcdc, 0);
 
 	// LCD controller seems to be either Sitronix ST7735R or (if RDDID bytes match) Ilitek ILI9163C
 	// (SoC's built-in LCDC is unused or nonexistent?)
