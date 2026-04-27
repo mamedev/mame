@@ -28,7 +28,7 @@ Puzz Loop is currently the only game dumped for all known regions.  This game is
 
 TODO:
 
-Music timing in some games are incorrect
+Music timing in some games is incorrect
 
 galpanis: Are the priorities correct on the KANEKO logo at the start, the invisible faded logo obscures the rotating white lines
 
@@ -704,7 +704,7 @@ void skns_state::io_w(offs_t offset, u32 data, u32 mem_mask)
 					m_maincpu->set_input_line(15, CLEAR_LINE);*/
 
 				/* idle skip for vblokbrk/sarukani, i can't find a better place to put it :-( but i think it works ok unless its making the game too fast */
-				if (m_maincpu->pc() == 0x04013B42)
+				if (m_maincpu->pc() == 0x04013b42)
 				{
 					if (!strcmp(machine().system().name,"vblokbrk") ||
 						!strcmp(machine().system().name,"sarukani"))
