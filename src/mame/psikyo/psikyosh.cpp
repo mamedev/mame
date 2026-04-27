@@ -58,7 +58,7 @@ TODO:
 |         Tips and Tricks           |
 *-----------------------------------*
 
-Hold Button during booting to test roms (Checksum 16-bit, on Words for gfx and
+Hold Button during booting to test ROMs (Checksum 16-bit, on Words for gfx and
 Bytes for sound) for:
 
 Daraku:           PL1 Button 1 (passes, doesn't test sound)
@@ -343,7 +343,9 @@ ROM Usage
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/ymopl.h"
+
 #include "speaker.h"
+
 
 static constexpr XTAL MASTER_CLOCK = 57.272727_MHz_XTAL;   // main oscillator frequency
 
@@ -359,7 +361,7 @@ void psikyosh_state::eeprom_w(u8 data)
 	m_eeprom->clk_write(BIT(data, 6));
 
 	if (data & ~0xe0)
-		logerror("Unk EEPROM write %x\n", data);
+		logerror("Unknown EEPROM write %x\n", data);
 }
 
 INTERRUPT_GEN_MEMBER(psikyosh_state::interrupt)
@@ -397,7 +399,7 @@ u32 psikyosh_state::mjgtaste_input_r()
 Mahjong keyboard encoder -> JAMMA adapter (SK-G001). Created to allow the use of a Mahjong panel with the existing, recycled Dragon Blaze boards.
 PCB contains what looks like an MCU of some description labeled "TMIBOD 4", undumped
 PCB maps keyboard lines onto JAMMA P1 controls
-Normally the demultiplexing is taken care of in hardware (e.g. metro.c, ssv.c), but here the game code has to do it.
+Normally the demultiplexing is taken care of in hardware (e.g. metro/metro.cpp, seta/ssv.cpp), but here the game code has to do it.
 
 Standard Mahjong keyboard encoder
       /---------------- KEY7
@@ -518,49 +520,49 @@ P1KEY11  29|30  P2KEY11
 // ps3v1
 void psikyosh_state::ps3v1_map(address_map &map)
 {
-// rom mapping
+// ROM mapping
 	map(0x00000000, 0x000fffff).rom(); // program ROM (1 meg)
 	map(0x02000000, 0x020fffff).rom().region("maincpu", 0x100000); // data ROM
 // video chip
-	map(0x03000000, 0x0300ffff).ram().w(FUNC(psikyosh_state::spriteram_w)).share(m_spriteram); // sprite and backgrounds are share this area (video banks 0-1f)
+	map(0x03000000, 0x0300ffff).ram().w(FUNC(psikyosh_state::spriteram_w)).share(m_spriteram); // sprite and backgrounds share this area (video banks 0-1f)
 	map(0x03040000, 0x03044fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette"); // palette..
 	map(0x03050000, 0x030501ff).ram().share(m_zoomram); // sprite zoom lookup table
 	map(0x0305ffdc, 0x0305ffdf).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).w(FUNC(psikyosh_state::irqctrl_w)); // also writes to this address - might be vblank reads?
 	map(0x0305ffe0, 0x0305ffff).ram().w(FUNC(psikyosh_state::vidregs_w)).share(m_vidregs); //  video registers
-	map(0x03060000, 0x0307ffff).bankr(m_gfxrombank); // data for rom tests (gfx), data is controlled by vidreg
-// rom mapping
-	map(0x04060000, 0x0407ffff).bankr(m_gfxrombank); // data for rom tests (gfx) (Mirrored?)
+	map(0x03060000, 0x0307ffff).bankr(m_gfxrombank); // data for ROM tests (gfx), data is controlled by vidreg
+// ROM mapping
+	map(0x04060000, 0x0407ffff).bankr(m_gfxrombank); // data for ROM tests (gfx) (Mirrored?)
 // sound chip
 	map(0x05000000, 0x05000007).rw("ymf", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
 // inputs/eeprom
 	map(0x05800000, 0x05800003).portr("INPUTS");
 	map(0x05800004, 0x05800007).portr("JP4");
 	map(0x05800004, 0x05800004).w(FUNC(psikyosh_state::eeprom_w));
-// ram
+// RAM
 	map(0x06000000, 0x060fffff).ram().share(m_ram); // main RAM (1 meg)
 }
 
 // ps5, ps5v2
 void psikyosh_state::ps5_map(address_map &map)
 {
-// rom mapping
+// ROM mapping
 	map(0x00000000, 0x000fffff).rom(); // program ROM (1 meg)
-// inputs/eeprom
+// inputs/EEPROM
 	map(0x03000000, 0x03000003).portr("INPUTS");
 	map(0x03000004, 0x03000007).portr("JP4");
 	map(0x03000004, 0x03000004).w(FUNC(psikyosh_state::eeprom_w));
 // sound chip
 	map(0x03100000, 0x03100007).rw("ymf", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
 // video chip
-	map(0x04000000, 0x0400ffff).ram().w(FUNC(psikyosh_state::spriteram_w)).share(m_spriteram); // sprite and backgrounds are share this area (video banks 0-1f)
+	map(0x04000000, 0x0400ffff).ram().w(FUNC(psikyosh_state::spriteram_w)).share(m_spriteram); // sprite and backgrounds share this area (video banks 0-1f)
 	map(0x04040000, 0x04044fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x04050000, 0x040501ff).ram().share(m_zoomram); // sprite zoom lookup table
 	map(0x0405ffdc, 0x0405ffdf).nopr().w(FUNC(psikyosh_state::irqctrl_w)); // also writes to this address - might be vblank reads?
 	map(0x0405ffe0, 0x0405ffff).ram().w(FUNC(psikyosh_state::vidregs_w)).share(m_vidregs); // video registers
-	map(0x04060000, 0x0407ffff).bankr(m_gfxrombank); // data for rom tests (gfx), data is controlled by vidreg
-// rom mapping
+	map(0x04060000, 0x0407ffff).bankr(m_gfxrombank); // data for ROM tests (gfx), data is controlled by vidreg
+// ROM mapping
 	map(0x05000000, 0x0507ffff).rom().region("maincpu", 0x100000); // data ROM
-// ram
+// RAM
 	map(0x06000000, 0x060fffff).ram().share(m_ram);
 }
 
