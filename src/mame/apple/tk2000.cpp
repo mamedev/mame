@@ -150,7 +150,7 @@ void tk2000_state::machine_start()
 	save_item(NAME(m_ctrl_key));
 
 	// setup video pointers
-	m_video->set_ram_pointers(m_ram_ptr, m_ram_ptr);
+	m_video->set_ram_pointers(m_ram_ptr, nullptr);
 	m_video->set_char_pointer(nullptr, 0);  // no text modes on this machine
 	m_video->set_hgr2(0xa000);
 }

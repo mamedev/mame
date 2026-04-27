@@ -990,7 +990,7 @@ void apple2e_state::machine_start()
 
 	// setup video pointers
 	m_video->set_ram_pointers(m_ram_ptr, m_aux_ptr);
-	m_video->set_aux_mask(m_aux_mask);
+	m_video->set_ram_masks(0xffff, m_aux_mask);
 	m_video->set_char_pointer(memregion("gfx1")->base(), memregion("gfx1")->bytes());
 
 	// IOU events occur at the rightmost edge of active video

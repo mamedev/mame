@@ -100,7 +100,7 @@ void superga2_state::machine_start()
 	save_item(NAME(m_speaker_state));
 
 	// setup video pointers
-	m_video->set_ram_pointers(m_ram_ptr, m_ram_ptr);
+	m_video->set_ram_pointers(m_ram_ptr, nullptr);
 	m_video->set_char_pointer(nullptr, 0);  // no text modes on this machine
 }
 
