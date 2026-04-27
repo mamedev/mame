@@ -8,7 +8,7 @@
 #include <algorithm>
 
 /* draws ROZ with linescroll OR columnscroll to 16-bit indexed bitmap */
-void skns_state::draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, const rectangle &cliprect, tilemap_t *tmap, u32 startx, u32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, u32* scrollram)
+void skns_state::draw_roz(bitmap_ind16 &bitmap, bitmap_ind8 &bitmapflags, const rectangle &cliprect, tilemap_t *tmap, u32 startx, u32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, u32 *scrollram)
 {
 	//bitmap_ind16 *destbitmap = bitmap;
 	const bitmap_ind16 &srcbitmap = tmap->pixmap();
@@ -17,7 +17,7 @@ void skns_state::draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, const 
 	const int ymask = srcbitmap.height() - 1;
 	const int widthshifted = srcbitmap.width() << 16;
 	const int heightshifted = srcbitmap.height() << 16;
-//  u8 *pri;
+	//u8 *pri;
 	//const u16 *src;
 	//const u8 *maskptr;
 	//int destadvance = destbitmap->bpp / 8;
@@ -47,7 +47,7 @@ void skns_state::draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, const 
 		/* loop over columns */
 		while (x <= ex)
 		{
-			if ((wraparound) || (cx < widthshifted && cy < heightshifted)) // not sure how this will cope with no wraparound, but row/col scroll..
+			if (wraparound || (cx < widthshifted && cy < heightshifted)) // not sure how this will cope with no wraparound, but row/col scroll..
 			{
 				const u32 srcx = cx >> 16;
 				const u32 srcy = cy >> 16;
@@ -67,7 +67,7 @@ void skns_state::draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, const 
 			cx += incxx;
 			cy += incxy;
 			x++;
-//          pri++;
+			//pri++;
 		}
 
 		/* advance in Y */
