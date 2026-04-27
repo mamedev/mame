@@ -14,10 +14,10 @@ only different language support).
 Model   |  SRAM | PCMCIA | FDD   | Language | Branded model
 --------+-------+--------+-------+----------+----------------------
 ES-210N | 128KB | Yes    | No    | German   | Walther ES-210
-ES-220  | 128KB | No     | No    | English  | NTS DreamWriter T100
-ES-220  | 256KB | Yes    | No    | English  | NTS DreamWriter T400
 ES-210N | 128KB | Yes    | No    | Spanish  | Dator 3000
 ES-210N | 128KB | Yes    | No    | English  | NTS DreamWriter 325
+ES-220  | 128KB | No     | No    | English  | NTS DreamWriter T100
+ES-220  | 256KB | Yes    | No    | English  | NTS DreamWriter T400
 ES-250  | 256KB | Yes    | 1.44M | English  | NTS DreamWriter T200
 
 The LCD is driven by 6x Sanyo LC7940 and 1x Sanyo LC7942.
@@ -150,7 +150,7 @@ TODO:
 - Serial port causes source selection to hang on dreamlink
 - Floppy support in drwtr200
 - centronics ack signal is not checked anywhere?
-- Frequncy of the keyboard timer is unknown.
+- Frequency of the keyboard timer is unknown.
 - beeper sound is not verified against a real system.
 
 ******************************************************************************/
