@@ -607,7 +607,7 @@ void phc25_state::fsync_irq_w(int state)
 {
 	if (state == 0)
 	{
-		m_maincpu->pulse_input_line(INPUT_LINE_IRQ0, attotime::from_usec(3));
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 	}
 }
 
