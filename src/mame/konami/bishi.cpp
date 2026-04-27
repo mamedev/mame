@@ -119,6 +119,7 @@ public:
 	{ }
 
 	void bishi(machine_config &config);
+	void bishi2p(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -141,6 +142,7 @@ private:
 	/* misc */
 	uint16_t     m_cur_control = 0U;
 	uint16_t     m_cur_control2 = 0U;
+	bool         m_is_2players = false;
 
 	/* video-related */
 	uint16_t     m_layer_colorbase[4]{};
@@ -238,12 +240,15 @@ void bishi_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 void bishi_state::lamp_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t new_state = ~data & 0xfff;
-	for (int i = 0; i < 3; i++)
+	for (int lamp_index = 0, i = 0; i < 3; i++)
 	{
-		m_red_button_lamps[i] = (new_state >> (i * 3 + 0)) & 1;
-		m_green_button_lamps[i] = (new_state >> (i * 3 + 1)) & 1;
-		m_blue_button_lamps[i] = (new_state >> (i * 3 + 2)) & 1;
-		m_start_button_lamps[i] = (new_state >> (i + 9)) & 1;
+		// Only 1st and 3rd player in the 2 player variant.
+		if (i == 1 && m_is_2players) continue;
+		m_red_button_lamps[lamp_index] = (new_state >> (i * 3 + 0)) & 1;
+		m_green_button_lamps[lamp_index] = (new_state >> (i * 3 + 1)) & 1;
+		m_blue_button_lamps[lamp_index] = (new_state >> (i * 3 + 2)) & 1;
+		m_start_button_lamps[lamp_index] = (new_state >> (i + 9)) & 1;
+		lamp_index++;
 	}
 }
 
@@ -557,6 +562,12 @@ void bishi_state::bishi(machine_config &config)
 	ymz.add_route(1, "speaker", 1.0, 1);
 }
 
+void bishi_state::bishi2p(machine_config &config)
+{
+	bishi(config);
+	m_is_2players = true;
+}
+
 // ROM definitions
 
 
@@ -648,6 +659,6 @@ ROM_END
 } // anonymous namespace
 
 GAME( 1996, bishi,    0,      bishi,    bishi,    bishi_state, empty_init, ROT0, "Konami", "Bishi Bashi Champ Mini Game Senshuken (ver JAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbishi,   0,      bishi,    bishi2p,  bishi_state, empty_init, ROT0, "Konami", "Super Bishi Bashi Champ (ver JAA, 2 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbishi,   0,      bishi2p,  bishi2p,  bishi_state, empty_init, ROT0, "Konami", "Super Bishi Bashi Champ (ver JAA, 2 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, sbishik,  sbishi, bishi,    bishi,    bishi_state, empty_init, ROT0, "Konami", "Super Bishi Bashi Champ (ver KAB, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, sbishika, sbishi, bishi,    bishi,    bishi_state, empty_init, ROT0, "Konami", "Super Bishi Bashi Champ (ver KAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
