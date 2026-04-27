@@ -111,7 +111,11 @@ public:
 		m_k054338(*this, "k054338"),
 		m_k055555(*this, "k055555"),
 		m_palette(*this, "palette"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_red_button_lamps(*this, "player %u red", 1U),
+		m_green_button_lamps(*this, "player %u green", 1U),
+		m_blue_button_lamps(*this, "player %u blue", 1U),
+		m_start_button_lamps(*this, "player %u start", 1U)
 	{ }
 
 	void bishi(machine_config &config);
@@ -125,6 +129,7 @@ private:
 	uint16_t control_r();
 	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void lamp_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t palette_mirror_r(offs_t offset);
 	uint16_t K056832_rom_r(offs_t offset);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -147,6 +152,10 @@ private:
 	required_device<k055555_device> m_k055555;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	output_finder<3> m_red_button_lamps;
+	output_finder<3> m_green_button_lamps;
+	output_finder<3> m_blue_button_lamps;
+	output_finder<3> m_start_button_lamps;
 };
 
 
@@ -226,6 +235,18 @@ void bishi_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	COMBINE_DATA(&m_cur_control2);
 }
 
+void bishi_state::lamp_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	uint16_t new_state = ~data & 0xfff;
+	for (int i = 0; i < 3; i++)
+	{
+		m_red_button_lamps[i] = (new_state >> (i * 3 + 0)) & 1;
+		m_green_button_lamps[i] = (new_state >> (i * 3 + 1)) & 1;
+		m_blue_button_lamps[i] = (new_state >> (i * 3 + 2)) & 1;
+		m_start_button_lamps[i] = (new_state >> (i + 9)) & 1;
+	}
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(bishi_state::scanline)
 {
 	int scanline = param;
@@ -269,7 +290,7 @@ void bishi_state::main_map(address_map &map)
 	map(0x800006, 0x800007).portr("SYSTEM");
 	map(0x800008, 0x800009).portr("INPUTS");
 	map(0x810000, 0x810003).w(FUNC(bishi_state::control2_w));       // bank switch for K056832 character ROM test
-	map(0x820000, 0x820001).nopw();            // lamps (see lamp test in service menu)
+	map(0x820000, 0x820001).w(FUNC(bishi_state::lamp_w));            // lamps (see lamp test in service menu)
 	map(0x830000, 0x83003f).w(m_k056832, FUNC(k056832_device::word_w));
 	map(0x840000, 0x840007).w(m_k056832, FUNC(k056832_device::b_word_w));    // VSCCS
 	map(0x850000, 0x85001f).w(m_k054338, FUNC(k054338_device::word_w));  // CLTC
@@ -482,6 +503,10 @@ void bishi_state::machine_start()
 {
 	save_item(NAME(m_cur_control));
 	save_item(NAME(m_cur_control2));
+	m_red_button_lamps.resolve();
+	m_green_button_lamps.resolve();
+	m_blue_button_lamps.resolve();
+	m_start_button_lamps.resolve();
 }
 
 void bishi_state::machine_reset()
