@@ -11808,6 +11808,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="avoice">
+		<description>Apple Voice (Micom BASIC Magazine 1985-09)</description>
+		<year>1985</year>
+		<publisher>Micom BASIC Magazine</publisher>
+		<info name="programmer" value="Kida Kazushige" />
+		<info name="usage" value="Requires an Apple ][ or later with Applesoft BASIC and cassette input." />
+		<info name="version" value="1985-09" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl0_default" value="romcardfp" />
+		<!-- Dump released: 2022-11-16 -->
+		<!-- audio utility (type-in program) -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="apple voice (kida kazushige).dsk" size="143360" crc="45dc14ec" sha1="31ee896ebbb5c24196454d5f703af635ee39c4ff" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="apvatlan">
 		<description>Apventure to Atlantis</description>
 		<year>1982</year>
@@ -14983,6 +15001,25 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="241424">
 				<rom name="colonial conquest v1.1.woz" size="241424" crc="ca135219" sha1="8a1b3166c6eed95e8a22df95290a03af15c46208" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="combatfig">
+		<description>Combat Fighter (Micom BASIC Magazine 1985-05)</description>
+		<year>1985</year>
+		<publisher>Micom BASIC Magazine</publisher>
+		<info name="programmer" value="Yasushi Souda" />
+		<info name="usage" value="Requires an Apple ][ or later with Applesoft BASIC." />
+		<info name="version" value="1985-05" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="gameio_default" value="paddles" />
+		<sharedfeat name="sl0_default" value="romcardfp" />
+		<!-- Dump released: 2022-11-16 -->
+		<!-- action game (type-in program) -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="combat fighter (yasushi souda).dsk" size="143360" crc="0e7c98cb" sha1="7a12f87c1dc04d5e1daab3824c30185375eb00fc" />
 			</dataarea>
 		</part>
 	</software>
@@ -18584,6 +18621,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="dragdung">
+		<description>Dragon Dungeon (Core Magazine 1983 Volume 1, Issue 3)</description>
+		<year>1983</year>
+		<publisher>Core Magazine</publisher>
+		<info name="programmer" value="Ray Darrah" />
+		<info name="usage" value="Requires an Apple ][ or later with Applesoft BASIC. 'Run Dragon Dungeon'" />
+		<info name="version" value="1983 Volume 1, Issue 3" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl0_default" value="romcardfp" />
+		<!-- Dump released: 2026-02-17 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="dragon dungeon (ray darrah).do" size="163840" crc="5cc63e52" sha1="158faec2349f619523810509735fe00afb20ac74" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dragwars">
 		<description>Dragon Wars</description>
 		<year>1989</year>
@@ -18684,6 +18739,25 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234753">
 				<rom name="drol.woz" size="234753" crc="90f71e85" sha1="0271bfb1d57f0757af8ab4b3a6f112a2a0c0e7da" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="duelthun">
+		<description>Duel of Thunder Planet (Micom BASIC Magazine 1984-11)</description>
+		<year>1984</year>
+		<publisher>Micom BASIC Magazine</publisher>
+		<info name="programmer" value="Apple Bear" />
+		<info name="usage" value="Requires an Apple ][ or later with Applesoft BASIC." />
+		<info name="version" value="1984-11" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="gameio_default" value="paddles" />
+		<sharedfeat name="sl0_default" value="romcardfp" />
+		<!-- Dump released: 2026-02-17 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="duel of thunder planet (apple bear).dsk" size="143360" crc="643b5550" sha1="c79b78daad94c31a7fddcd826dc34f655c56bb80" />
 			</dataarea>
 		</part>
 	</software>
@@ -20791,6 +20865,26 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="forbgame">
+		<description>Forbidden Games (Micom BASIC Magazine 1984-10)</description>
+		<year>1984</year>
+		<publisher>Micom BASIC Magazine</publisher>
+		<info name="alt_title" value="禁じられた遊び" />
+		<info name="programmer" value="Ringo" />
+		<info name="required_ram" value="48K" />
+		<info name="usage" value="Requires a 48K Apple ][ or later with 10K Applesoft BASIC." />
+		<info name="version" value="1984-10" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl0_default" value="romcardfp" />
+		<!-- Dump released: 2024-02-06 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="994304">
+				<rom name="kinaso_trans.woz" size="994304" crc="f9243683" sha1="d17833462619ac3cd21f321a3ceb405f5649429d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fore">
 		<description>Fore (Epyx)</description>
 		<year>1982</year>
@@ -22109,6 +22203,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="graphmaze">
+		<description>Graphic Maze (Micom BASIC Magazine 1985-01)</description>
+		<year>1985</year>
+		<publisher>Micom BASIC Magazine</publisher>
+		<info name="programmer" value="Kida Kazushige" />
+		<info name="usage" value="Requires an Apple ][ or later with Applesoft BASIC and B/W monitor." />
+		<info name="version" value="1985-01" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl0_default" value="romcardfp" />
+		<!-- Dump released: 2022-11-16 -->
+		<!-- puzzle game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="graphic maze (kida kazushige).dsk" size="143360" crc="3c27d7aa" sha1="7bc89ac392828c9f65674bdd4a3cba4246aae533" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="graphing10">
 		<description>Graphing (A-817 version 1.0)</description>
 		<year>1983</year>
@@ -23244,6 +23356,25 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="241445">
 				<rom name="into the eagle's nest.woz" size="241445" crc="65eb8066" sha1="0555eb4c26b06ad98f520ad205f15b13d033242d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invfight">
+		<description>Invader Fight (Micom BASIC Magazine 1983-06)</description>
+		<year>1983</year>
+		<publisher>Micom BASIC Magazine</publisher>
+		<info name="programmer" value="Apple Bear" />
+		<info name="usage" value="Requires an Apple ][ or later with Applesoft BASIC." />
+		<info name="version" value="1983-06" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="gameio_default" value="paddles" />
+		<sharedfeat name="sl0_default" value="romcardfp" />
+		<!-- Dump released: 2024-09-21 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="invader fight.dsk" size="143360" crc="ff04b631" sha1="fe3f6fd2f01ed93326ac85f6dc32affb152e9d31" />
 			</dataarea>
 		</part>
 	</software>
@@ -35626,6 +35757,25 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="redwater">
+		<description>Red Water (Micom BASIC Magazine 1984-12)</description>
+		<year>1984</year>
+		<publisher>Micom BASIC Magazine</publisher>
+		<info name="programmer" value="ROR" />
+		<info name="usage" value="Requires an Apple ][ or later with Applesoft BASIC." />
+		<info name="version" value="1984-12" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="gameio_default" value="paddles" />
+		<sharedfeat name="sl0_default" value="romcardfp" />
+		<!-- Dump released: 2022-10-13 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="red water.dsk" size="143360" crc="5152f49e" sha1="7aef700c706a1b8e14a148f56d59c76a36390fb4" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="regroup">
 		<description>Regrouping (version 27-JUN-1989)</description>
 		<year>1989</year>
@@ -40417,6 +40567,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="actballs">
+		<description>The Active Balls (Micom BASIC Magazine 1986-04)</description>
+		<year>1986</year>
+		<publisher>Micom BASIC Magazine</publisher>
+		<info name="programmer" value="Shinji Minamiyama" />
+		<info name="usage" value="Requires a 64K Apple ][ or later with Applesoft BASIC and lowercase ROM." />
+		<info name="version" value="1986-04" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl0_default" value="romcardfp" />
+		<!-- Dump released: 2022-11-16 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the active balls (shinji minamiyama).dsk" size="143360" crc="5c836e4a" sha1="5b8a766de045cb83794259bacd9e4fe8bf541358" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="buckbanz">
 		<description>The Adventures of Buckaroo Banzai: Across The 8th Dimension! (version G 397)</description>
 		<year>1984</year>
@@ -42608,6 +42776,24 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="241617">
 				<rom name="the newsroom v1987-05-08.woz" size="241617" crc="d9bbac1d" sha1="4a24b09e339e4af042030fe3ca76f8ed5f65377f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="octopus">
+		<description>The Octopus (Micom BASIC Magazine 1985-08)</description>
+		<year>1985</year>
+		<publisher>Micom BASIC Magazine</publisher>
+		<info name="programmer" value="Shinji Minamiyama" />
+		<info name="usage" value="Requires an Apple ][ or later with Applesoft BASIC." />
+		<info name="version" value="1985-08" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl0_default" value="romcardfp" />
+		<!-- Dump released: 2022-11-16 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the octopus (shinji minamiyama).dsk" size="143360" crc="a04b1765" sha1="bc0dec8721c053f34d6d410be0a8e9bcec35a86f" />
 			</dataarea>
 		</part>
 	</software>
