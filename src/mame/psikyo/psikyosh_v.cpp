@@ -827,9 +827,9 @@ void psikyosh_state::get_sprites()
 		sprite_ptr->high    = ((m_spriteram[sprnum + 1] & 0x0f000000) >> 24) + 1;
 		sprite_ptr->wide    = ((m_spriteram[sprnum + 1] & 0x00000f00) >> 8) + 1;
 
-		sprite_ptr->flpy    = BIT(m_spriteram[sprnum + 1], 31) >> 31;
+		sprite_ptr->flpy    = BIT(m_spriteram[sprnum + 1], 31);
 		sprite_ptr->spr_pri = (m_spriteram[sprnum + 1] & 0x30000000) >> 28;
-		sprite_ptr->flpx    = BIT(m_spriteram[sprnum + 1], 15) >> 15;
+		sprite_ptr->flpx    = BIT(m_spriteram[sprnum + 1], 15);
 		sprite_ptr->bg_pri  = (m_spriteram[sprnum + 1] & 0x00003000) >> 12;
 
 		sprite_ptr->zoomy   = (m_spriteram[sprnum + 1] & 0x00ff0000) >> 16;
@@ -996,7 +996,7 @@ void psikyosh_state::video_start()
 		tmap.vram_base = i << 9;
 	}
 
-	m_z_bitmap.allocate(1024, 1024); /* z-buffer */
+	m_screen->register_screen_bitmap(m_z_bitmap); /* z-buffer */
 	m_zoom_bitmap.allocate(16*16, 16*16); /* temp buffer for assembling sprites */
 	m_bg_zoom = std::make_unique<u16[]>(256);
 	m_alphatable = std::make_unique<u8[]>(256);
