@@ -15,8 +15,6 @@
 
 /* Psikyo PS6406B */
 
-
-
 class psikyosh_state : public driver_device
 {
 public:
@@ -135,12 +133,13 @@ private:
 	s16 const alpha, u32 const zoomx, u32 const zoomy, u8 const wide, u8 const high, u16 const z);
 
 	void io_map(address_map &map) ATTR_COLD;
+	void video_map(address_map &map) ATTR_COLD;
+
 	void ps3v1_map(address_map &map) ATTR_COLD;
 	void ps5_map(address_map &map) ATTR_COLD;
 	void ps5_mahjong_map(address_map &map) ATTR_COLD;
 	void s1945iiibl_map(address_map &map) ATTR_COLD;
 	void s1945iiibla_map(address_map &map) ATTR_COLD;
-	void video_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_PSIKYO_PSIKYOSH_H
