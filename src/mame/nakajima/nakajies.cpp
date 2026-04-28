@@ -81,7 +81,7 @@ Hardware:
 - FCC and CSA approved
 
 
-I/O map:
+I/O Map:
 
 0000 - unknown
        0x00 written during boot sequence
@@ -105,8 +105,6 @@ values 10-17 select internal RAM
 values 18-1f select a PC Card card bank
 
 on reset 0017 is set to 0, pointing to last 20000h bytes of ROM containing the boot setup code
-
-I/O Map:
 
 0020 - unknown
        0x00 written during boot sequence
