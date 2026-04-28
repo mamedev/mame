@@ -9,12 +9,14 @@
 #include "emu.h"
 #include "bus/technics/kn5000/hdae5000.h"
 #include "cpu/tlcs900/tmp94c241.h"
+#include "cpu/tlcs900/tmp94c241_serial.h"
 #include "imagedev/floppy.h"
 #include "machine/gen_latch.h"
 #include "machine/upd765.h"
 #include "video/pc_vga.h"
 #include "screen.h"
 #include "kn5000.lh"
+#include "kn5000_cpanel.h"
 
 class mn89304_vga_device : public svga_device
 {
@@ -91,6 +93,7 @@ class kn5000_state : public driver_device
 public:
 	kn5000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_cpanel(*this, "cpanel")
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "subcpu")
 		, m_maincpu_latch(*this, "maincpu_latch")
@@ -102,16 +105,15 @@ public:
 		, m_CPR_SEG(*this, "CPR_SEG%u", 0U)
 		, m_checking_device_led_cn11(*this, "checking_device_led_cn11")
 		, m_checking_device_led_cn12(*this, "checking_device_led_cn12")
-		, m_CPL_LED(*this, "CPL_%u", 0U)
-		, m_CPR_LED(*this, "CPR_%u", 0U)
-		, m_led_row(0)
 		, m_mstat(0)
 		, m_sstat(0)
+		, m_cpanel_inta(0)
 	{ }
 
 	void kn5000(machine_config &config);
 
 private:
+	required_device<kn5000_cpanel_device> m_cpanel;
 	required_device<tmp94c241_device> m_maincpu;
 	required_device<tmp94c241_device> m_subcpu;
 	required_device<generic_latch_8_device> m_maincpu_latch;
@@ -124,18 +126,12 @@ private:
 	required_ioport_array<11> m_CPR_SEG; // buttons on "Control Panel Right" PCB
 	output_finder<> m_checking_device_led_cn11;
 	output_finder<> m_checking_device_led_cn12;
-	output_finder<50> m_CPL_LED;
-	output_finder<69> m_CPR_LED;
-	uint8_t m_led_row;
 	uint8_t m_mstat;
 	uint8_t m_sstat;
+	uint8_t m_cpanel_inta;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-
-	uint8_t cpanel_left_buttons_r(offs_t offset);
-	uint8_t cpanel_right_buttons_r(offs_t offset);
-	void cpanel_leds_w(offs_t offset, uint8_t data);
 
 	void maincpu_mem(address_map &map) ATTR_COLD;
 	void subcpu_mem(address_map &map) ATTR_COLD;
@@ -144,9 +140,7 @@ private:
 void kn5000_state::maincpu_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).ram(); // 1Mbyte = 2 * 4Mbit DRAMs @ IC9, IC10 (CS3)
-	map(0x008e4a, 0x008e54).r(FUNC(kn5000_state::cpanel_right_buttons_r));
-	map(0x008e5a, 0x008e64).r(FUNC(kn5000_state::cpanel_left_buttons_r));
-	map(0x008f38, 0x008f39).w(FUNC(kn5000_state::cpanel_leds_w));
+	// Button states and LED control are handled via serial protocol to cpanel HLE device
 	//FIXME: map(0x110000, 0x11ffff).m(m_fdc, FUNC(upd765a_device::map)); // Floppy Controller @ IC208
 	//FIXME: map(0x120000, 0x12ffff).w(m_fdc, FUNC(upd765a_device::dack_w)); // Floppy DMA Acknowledge
 	map(0x140000, 0x14ffff).r(m_maincpu_latch, FUNC(generic_latch_8_device::read)); // @ IC23
@@ -163,17 +157,16 @@ void kn5000_state::maincpu_mem(address_map &map)
 
 void kn5000_state::subcpu_mem(address_map &map)
 {
-	// There seems to also be devices at 110000, 130000 and 1e0000
-
 	map(0x000000, 0x0fffff).ram(); // 1Mbyte = 2 * 4Mbit DRAMs @ IC28, IC29
-	//map(0x110000, 0x11????).rw(FUNC(kn5000_state::tone_generator_r), FUNC(kn5000_state::tone_generator_w)); // @ IC303
+	map(0x100000, 0x100003).noprw(); // Tone generator @ IC303 (stub)
+	map(0x110000, 0x110003).noprw(); // Tone generator keybed data/status (stub)
 	map(0x120000, 0x12ffff).r(m_subcpu_latch, FUNC(generic_latch_8_device::read)); // @ IC22
 	map(0x120000, 0x12ffff).w(m_maincpu_latch, FUNC(generic_latch_8_device::write)); // @ IC23
-	//map(0x130000, 0x13????).rw(FUNC(kn5000_state::dsp1_r), FUNC(kn5000_state::dsp1_w)); // @ IC311
+	map(0x130000, 0x130003).noprw(); // DSP1 @ IC311 (stub)
+	map(0x1e0000, 0x1effff).noprw(); // Waveform/sample RAM (stub)
 	map(0xfe0000, 0xffffff).rom().region("subcpu", 0); // 1Mbit MASK ROM @ IC30
 
-	//Note:
-	// DSP2 @ IC302 uses a serial #0 pins but I think it is bitbanging those pins.
+	// DSP2 @ IC310 (MN19413) uses GPIO serial: PF.0=SDA, PF.2=SCLK, PE.6=CS2
 }
 
 static void kn5000_floppies(device_slot_interface &device)
@@ -452,182 +445,24 @@ static INPUT_PORTS_START(kn5000)
 INPUT_PORTS_END
 
 
-uint8_t kn5000_state::cpanel_left_buttons_r(offs_t offset)
-{
-	return m_CPL_SEG[offset]->read();
-}
-
-uint8_t kn5000_state::cpanel_right_buttons_r(offs_t offset)
-{
-	return m_CPR_SEG[offset]->read();
-}
-
-
-void kn5000_state::cpanel_leds_w(offs_t offset, uint8_t data)
-{
-	if ((offset & 1) == 0)
-		m_led_row = data;
-
-	if ((offset & 1) == 1)
-	{
-		switch (m_led_row)
-		{
-			case 0x00:
-				m_CPR_LED[1] = BIT(data, 0); // D101 - EFFECT: SUSTAIN
-				m_CPR_LED[2] = BIT(data, 1); // D102 - EFFECT: DIGITAL EFFECT
-				m_CPR_LED[3] = BIT(data, 2); // D103 - EFFECT: DSP EFFECT
-				m_CPR_LED[4] = BIT(data, 3); // D104 - EFFECT: DIGITAL REVERB
-				m_CPR_LED[5] = BIT(data, 4); // D105 - EFFECT: ACCOUSTIC ILLUSION
-				m_CPR_LED[6] = BIT(data, 5); // D106 - SEQUENCER: PLAY
-				m_CPR_LED[7] = BIT(data, 6); // D107 - SEQUENCER: EASY REC
-				m_CPR_LED[8] = BIT(data, 7); // D108 - SEQUENCER: MENU
-				break;
-
-			case 0x01:
-				m_CPR_LED[9] = BIT(data, 0); // D109 - PIANO
-				m_CPR_LED[10] = BIT(data, 1); // D110 - GUITAR
-				m_CPR_LED[11] = BIT(data, 2); // D111 - STRINGS & VOCAL
-				m_CPR_LED[12] = BIT(data, 3); // D112 - BRASS
-				m_CPR_LED[13] = BIT(data, 4); // D113 - FLUTE
-				m_CPR_LED[14] = BIT(data, 5); // D114 - SAX & REED
-				m_CPR_LED[15] = BIT(data, 6); // D115 - MALLET & ORCH PERC
-				m_CPR_LED[16] = BIT(data, 7); // D116 - WORLD PERC
-				break;
-
-			case 0x02:
-				m_CPR_LED[17] = BIT(data, 0); // D117 - ORGAN & ACCORDION
-				m_CPR_LED[18] = BIT(data, 1); // D118 - ORCHESTRAL PAD
-				m_CPR_LED[19] = BIT(data, 2); // D119 - SYNTH
-				m_CPR_LED[20] = BIT(data, 3); // D120 - BASS
-				m_CPR_LED[21] = BIT(data, 4); // D121 - DIGITAL DRAWBAR
-				m_CPR_LED[22] = BIT(data, 5); // D122 - ACCORDION REGISTER
-				m_CPR_LED[23] = BIT(data, 6); // D123 - GM SPECIAL
-				m_CPR_LED[24] = BIT(data, 7); // D124 - DRUM KITS
-				break;
-
-			case 0x03:
-				m_CPR_LED[25] = BIT(data, 0); // D125 - PANEL MEMORY 1
-				m_CPR_LED[26] = BIT(data, 1); // D126 - PANEL MEMORY 2
-				m_CPR_LED[27] = BIT(data, 2); // D127 - PANEL MEMORY 3
-				m_CPR_LED[28] = BIT(data, 3); // D128 - PANEL MEMORY 4
-				m_CPR_LED[29] = BIT(data, 4); // D129 - PANEL MEMORY 5
-				m_CPR_LED[30] = BIT(data, 5); // D130 - PANEL MEMORY 6
-				m_CPR_LED[31] = BIT(data, 6); // D131 - PANEL MEMORY 7
-				m_CPR_LED[32] = BIT(data, 7); // D132 - PANEL MEMORY 8
-				break;
-
-			case 0x04:
-				m_CPR_LED[33] = BIT(data, 0); // D133 - PART SELECT: LEFT
-				m_CPR_LED[34] = BIT(data, 1); // D134 - PART SELECT: RIGHT 2
-				m_CPR_LED[35] = BIT(data, 2); // D135 - PART SELECT: RIGHT 1
-				m_CPR_LED[36] = BIT(data, 3); // D136 - ENTERTAINER
-				m_CPR_LED[37] = BIT(data, 4); // D137 - CONDUCTOR: LEFT
-				m_CPR_LED[38] = BIT(data, 5); // D138 - CONDUCTOR: RIGHT 2
-				m_CPR_LED[39] = BIT(data, 6); // D139 - CONDUCTOR: RIGHT 1
-				m_CPR_LED[40] = BIT(data, 7); // D140 - TECHNI CHORD
-				break;
-
-			case 0x08:
-				m_CPR_LED[49] = BIT(data, 0); // D149 - MENU: SOUND
-				m_CPR_LED[50] = BIT(data, 1); // D150 - MENU: CONTROL
-				m_CPR_LED[51] = BIT(data, 2); // D151 - MENU: MIDI
-				m_CPR_LED[52] = BIT(data, 3); // D152 - MENU: DISK
-				break;
-
-			case 0x0a:
-				m_CPR_LED[57] = BIT(data, 0); // D157 - MEMORY A
-				m_CPR_LED[58] = BIT(data, 1); // D158 - MEMORY B
-				break;
-
-			case 0x0b:
-				m_CPR_LED[61] = BIT(data, 0); // D161 - SYNCHRO & BREAK
-				m_CPR_LED[62] = BIT(data, 1); // D162 - R1/R2 OCTAVE MINUS
-				m_CPR_LED[63] = BIT(data, 2); // D163 - R1/R2 OCTAVE PLUS
-				m_CPR_LED[64] = BIT(data, 3); // D164 - BANK VIEW
-				break;
-
-			case 0x0c:
-				m_CPR_LED[65] = BIT(data, 0); // D165 - START/STOP 1 BEAT
-				m_CPR_LED[66] = BIT(data, 1); // D166 - START/STOP 2 BEAT
-				m_CPR_LED[67] = BIT(data, 2); // D167 - START/STOP 3 BEAT
-				m_CPR_LED[68] = BIT(data, 3); // D168 - START/STOP 4 BEAT
-				break;
-
-			case 0xc0:
-				m_CPL_LED[1] = BIT(data, 0); // D101 - COMPOSER: MEMORY
-				m_CPL_LED[2] = BIT(data, 1); // D102 - COMPOSER: MENU
-				m_CPL_LED[3] = BIT(data, 2); // D103 - SOUND ARRANGER: SET
-				m_CPL_LED[4] = BIT(data, 3); // D104 - SOUND ARRANGER: ON/OFF
-				m_CPL_LED[5] = BIT(data, 4); // D105 - MUSIC STYLIST
-				m_CPL_LED[6] = BIT(data, 5); // D106 - FADE IN
-				m_CPL_LED[7] = BIT(data, 6); // D107 - FADE OUT
-				m_CPL_LED[8] = BIT(data, 7); // D108 - DISPLAY HOLD
-				break;
-
-			case 0xc1:
-				m_CPL_LED[9] = BIT(data, 0); // D109 - U.S. TRAD
-				m_CPL_LED[10] = BIT(data, 1); // D110 - COUNTRY
-				m_CPL_LED[11] = BIT(data, 2); // D111 - LATIN
-				m_CPL_LED[12] = BIT(data, 3); // D112 - MARCH & WALTZ
-				m_CPL_LED[13] = BIT(data, 4); // D113 - PARTY TIME
-				m_CPL_LED[14] = BIT(data, 5); // D114 - SHOW TIME & TRAD DANCE
-				m_CPL_LED[15] = BIT(data, 6); // D115 - WORLD
-				m_CPL_LED[16] = BIT(data, 7); // D116 - CUSTOM
-				break;
-
-			case 0xc2:
-				m_CPL_LED[17] = BIT(data, 0); // D117 - STANDARD ROCK
-				m_CPL_LED[18] = BIT(data, 1); // D118 - R & ROLL & BLUES
-				m_CPL_LED[19] = BIT(data, 2); // D119 - POP & BALLAD
-				m_CPL_LED[20] = BIT(data, 3); // D120 - FUNK & FUSION
-				m_CPL_LED[21] = BIT(data, 4); // D121 - SOUL & MODERN DANCE
-				m_CPL_LED[22] = BIT(data, 5); // D122 - BIG BAND & SWING
-				m_CPL_LED[23] = BIT(data, 6); // D123 - JAZZ COMBO
-				m_CPL_LED[24] = BIT(data, 7); // D124 - MANUAL SEQUENCE PADS: MENU
-				break;
-
-			case 0xc3:
-				m_CPL_LED[25] = BIT(data, 0); // D125 - VARIATION & MSA 1
-				m_CPL_LED[26] = BIT(data, 1); // D126 - VARIATION & MSA 2
-				m_CPL_LED[27] = BIT(data, 2); // D127 - VARIATION & MSA 3
-				m_CPL_LED[28] = BIT(data, 3); // D128 - VARIATION & MSA 4
-				m_CPL_LED[29] = BIT(data, 4); // D129 - MUSIC STYLE ARRANGER
-				m_CPL_LED[30] = BIT(data, 5); // D130 - AUTO PLAY CHORD
-				break;
-
-			case 0xc4:
-				m_CPL_LED[33] = BIT(data, 0); // D133 - FILL IN 1
-				m_CPL_LED[34] = BIT(data, 1); // D134 - FILL IN 2
-				m_CPL_LED[35] = BIT(data, 2); // D135 - INTRO & ENDING 1
-				m_CPL_LED[36] = BIT(data, 3); // D136 - INTRO & ENDING 2
-				m_CPL_LED[37] = BIT(data, 4); // D137 - SPLIT POINT INDICATOR (LEFT)
-				m_CPL_LED[38] = BIT(data, 5); // D138 - SPLIT POINT INDICATOR (CENTER)
-				m_CPL_LED[39] = BIT(data, 6); // D139 - SPLIT POINT INDICATOR (RIGHT)
-				m_CPL_LED[40] = BIT(data, 7); // D140 - TEMPO/PROGRAM
-				break;
-
-			case 0xc8:
-				m_CPL_LED[49] = BIT(data, 0); // D149 - OTHER PARTS/TR
-				break;
-
-			case 0xff:
-				break;
-		}
-	}
-	return;
-}
 
 void kn5000_state::machine_start()
 {
 	save_item(NAME(m_mstat));
 	save_item(NAME(m_sstat));
+	save_item(NAME(m_cpanel_inta));
 
 	m_extension->program_map(m_maincpu->space(AS_PROGRAM));
 
 	m_checking_device_led_cn11.resolve();
 	m_checking_device_led_cn12.resolve();
-	m_CPL_LED.resolve();
-	m_CPR_LED.resolve();
+
+	// Connect button input ports to control panel HLE device
+	for (int i = 0; i < 11; i++)
+	{
+		m_cpanel->set_cpl_port(i, m_CPL_SEG[i].target());
+		m_cpanel->set_cpr_port(i, m_CPR_SEG[i].target());
+	}
 }
 
 void kn5000_state::machine_reset()
@@ -688,13 +523,26 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 0 (input) = +5v
 	//   bit 2 (input) = HDDRDY
 	//   bit 4 (?) = MICSNS
-	m_maincpu->porte_read().set_constant(1); //checked at EF05A6 (v10 ROM)
-	// FIXME: Bit 0 should only be 1 if the
-	// optional hard-drive extension board is disabled;
+	//   bit 5 (input) = INTA (control panel interrupt)
+	m_maincpu->porte_read().set([this] {
+		// Bit 0: +5v (always 1 when no HDD extension)
+		// Bit 5: INTA from control panel (active HIGH — firmware checks BIT 5,(PE); JR NZ)
+		return 0x01 | (m_cpanel_inta ? 0x20 : 0x00);
+	});
 
 
-	// MAINCPU PORT F:
-	//   bit 2 (OUTPUT) = Something related to "RESET CONTROL" circuits?
+	// MAINCPU PORT F: shared with serial interface pins
+	//   bit 0 = TXD0 (MIDI TX)
+	//   bit 1 = RXD0 (MIDI RX)
+	//   bit 2 = SCLK0 (disabled by firmware — MIDI uses no clock)
+	//   bit 4 = TXD1 (control panel data)
+	//   bit 5 = RXD1 (control panel data)
+	//   bit 6 (input) = SCLK1 pin state — a routine in the main CPU's
+	//     implementation of the control panel protocol polls this to confirm
+	//     the serial clock is idle (HIGH) before sending commands.
+	//     Without it, the firmware times out after 200 retries and displays
+	//     "ERROR in CPU data transmission".
+	m_maincpu->portf_read().set_constant(0x40);
 
 
 	// MAINCPU PORT G:
@@ -728,8 +576,18 @@ void kn5000_state::kn5000(machine_config &config)
 
 
 	// RX0/TX0 = MRXD/MTXD
-	// RX1/TX1 = CPDATA
-	// SCLK1   = CPSCK
+
+	// RX1/TX1 = CPDATA, SCLK1 = CPSCK — wired to control panel HLE
+	auto &cpanel(KN5000_CPANEL(config, "cpanel"));
+	m_maincpu->txd1().set(cpanel, FUNC(kn5000_cpanel_device::rxd));
+	m_maincpu->sclk1_out().set(cpanel, FUNC(kn5000_cpanel_device::sioclk));
+	m_maincpu->tx1_start().set(cpanel, FUNC(kn5000_cpanel_device::tx_start));
+	cpanel.txd().set(m_maincpu, FUNC(tmp94c241_device::rxd1));
+	cpanel.sclk_out().set(m_maincpu, FUNC(tmp94c241_device::sioclk1));
+	cpanel.inta().set([this] (int state) {
+		m_cpanel_inta = state;
+		m_maincpu->set_input_line(TLCS900_INTA, state ? ASSERT_LINE : CLEAR_LINE);
+	});
 
 	// AN0 = EXP (expression pedal?)
 	// AN1 = AFT
@@ -837,17 +695,6 @@ ROM_START(kn5000)
 
 	// Note: I've never seen boards with versions 1 or 2.
 
-	// Note: Even though this "subprogram" address range contain executable code for the subcpu, it is actually loaded by the maincpu
-	//       from a flash rom and then transfered to the subcpu RAM via the inter-cpu communications latches at some point during boot.
-	ROM_REGION16_LE(0x30000, "subprogram", 0)
-	ROMX_LOAD("kn5000_subprogram_v142.rom", 0x000000, 0x030000, CRC(fe3b640a) SHA1(5c3a2b9311318c19e1a29ca460dea693bcb2c405), ROM_BIOS(0)) // v10
-	ROMX_LOAD("kn5000_subprogram_v142.rom", 0x000000, 0x030000, CRC(fe3b640a) SHA1(5c3a2b9311318c19e1a29ca460dea693bcb2c405), ROM_BIOS(1)) // v9
-	ROMX_LOAD("kn5000_subprogram_v141.rom", 0x000000, 0x030000, CRC(4f6ea155) SHA1(39b0dd7b23abd3cdfedce65dd4fef0e2ab16ab69), ROM_BIOS(2)) // v8
-	ROMX_LOAD("kn5000_subprogram_v141.rom", 0x000000, 0x030000, CRC(4f6ea155) SHA1(39b0dd7b23abd3cdfedce65dd4fef0e2ab16ab69), ROM_BIOS(3)) // v7
-	ROMX_LOAD("kn5000_subprogram_v140.rom", 0x000000, 0x030000, CRC(d9a537aa) SHA1(b7f471522ab3125e5eb42c7368d57a56084ce32a), ROM_BIOS(4)) // v6
-	ROMX_LOAD("kn5000_subprogram_v140.rom", 0x000000, 0x030000, CRC(d9a537aa) SHA1(b7f471522ab3125e5eb42c7368d57a56084ce32a), ROM_BIOS(5)) // v5
-	ROMX_LOAD("kn5000_subprogram_v139.rom", 0x000000, 0x030000, NO_DUMP, ROM_BIOS(6)) // v4
-
 	ROM_REGION16_LE(0x20000, "subcpu", 0)
 	ROM_LOAD("kn5000_subcpu_boot.ic30", 0x00000, 0x20000, BAD_DUMP CRC(a45ceb77) SHA1(d29429a9a1ef7a718fa88c1aa38d0f7238ba5d94)) // Ranges fe0800-ff7800 and ff9800-fff000 not dumped yet. Assumed here as being filled with 0xFF.
 
@@ -858,7 +705,16 @@ ROM_START(kn5000)
 	ROM_REGION16_LE(0x100000, "custom_data", 0)
 	ROM_LOAD("kn5000_custom_data_rom.ic19", 0x000000, 0x100000, CRC(5de11a6b) SHA1(4709f815d3d03ce749c51f4af78c62bf4a5e3d94))
 	// IC19 is a flash ROM. The contents here were dumped from a system that had it already programmed by the initial data disk.
-	// Maybe it could also be declared as NVRAM here?
+	//
+	// The subcpu payload is stored compressed (LZSS SLIDE4K format) in IC19 flash at address 0x3E0000 (offset 0xE0000).
+	// During boot, the maincpu decompresses it and transfers it to the subcpu RAM via the inter-cpu latches.
+	// The compressed payloads below were extracted from the system update floppy disk images.
+	ROMX_LOAD("kn5000_subprogram_v142_compressed.rom", 0x0e0000, 0x16c13, CRC(f81e598f) SHA1(13718900afd55cb2e5ff0be213ba1f5dd14bc174), ROM_BIOS(0)) // v10
+	ROMX_LOAD("kn5000_subprogram_v142_compressed.rom", 0x0e0000, 0x16c13, CRC(f81e598f) SHA1(13718900afd55cb2e5ff0be213ba1f5dd14bc174), ROM_BIOS(1)) // v9
+	ROMX_LOAD("kn5000_subprogram_v141_compressed.rom", 0x0e0000, 0x16bfd, CRC(c6d4ad98) SHA1(ac9791441ceb13748a2196a0a6a400431d6aed5e), ROM_BIOS(2)) // v8
+	ROMX_LOAD("kn5000_subprogram_v141_compressed.rom", 0x0e0000, 0x16bfd, CRC(c6d4ad98) SHA1(ac9791441ceb13748a2196a0a6a400431d6aed5e), ROM_BIOS(3)) // v7
+	ROMX_LOAD("kn5000_subprogram_v140_compressed.rom", 0x0e0000, 0x16bc4, CRC(5b182629) SHA1(13098dd150c5a6083a5d15a63d5d785802d8e8ae), ROM_BIOS(4)) // v6
+	ROMX_LOAD("kn5000_subprogram_v140_compressed.rom", 0x0e0000, 0x16bc4, CRC(5b182629) SHA1(13098dd150c5a6083a5d15a63d5d785802d8e8ae), ROM_BIOS(5)) // v5
 
 	ROM_REGION16_LE(0x400000, "rhythm_data", 0)
 	ROM_LOAD("kn5000_rhythm_data_rom.ic14", 0x000000, 0x400000, CRC(76d11a5e) SHA1(e4b572d318c9fe7ba00e5b44ea783e89da9c68bd))

@@ -7,8 +7,6 @@ MEDIAGX CPU + 3dFX VooDoo chipset
 
 TODO:
 - convert to new PCI;
-- Uneven animations in places (dgPIX logo animation, flags in Kang stage); (*)
-- Player 1 side serve logic looks broken; (*)
 - Actual timer source;
 - I/Os, and actual test mode (if exists);
 - Hangs when trying to save settings in options menu, or alternatively throws "Erase TIME OUT".
@@ -16,14 +14,13 @@ TODO:
 - Can lockup on soft resets;
 - One H pixel display off in Voodoo screen setup;
 
-(*) https://www.youtube.com/watch?v=VbTskI8E7EY those are regressions, weren't like that in 2021
-
 Notes:
 - dgPIX logo looks odd, but that's a btanb. cfr. https://www.youtube.com/watch?v=T99K9dESszw&t=4658s
 - Branch at PC=CE8A: sets "Timer Divisor 0" in debug strings;
 - UART seems also to be used from terminal to host (with pic[0] ir4_w enabled), is there a verbose/debug
   mode flag disabled somewhere?
 - None of the other irqs seems used, NMI just causes a debug exception (that stops running machine);
+- Reference 2021 MAME video https://www.youtube.com/watch?v=VbTskI8E7EY
 
 ===================================================================================================
 

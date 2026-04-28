@@ -21,12 +21,11 @@
 
     Driver by Takahiro Nogi 2000/12/23 -
 
-******************************************************************************/
-/******************************************************************************
-Memo:
 
-- nyanpai's 2p start does not mean 2p simultaneous or exchanging play.
-  Simply uses controls for 2p side.
+Notes:
+
+- nyanpai's 2P start does not mean 2p simultaneous or alternating play.
+  It simply uses controls for 2P side.
 
 - Some games display "GFXROM BANK OVER!!" or "GFXROM ADDRESS OVER!!"
   in Debug build.
@@ -105,19 +104,16 @@ void musobana_state::machine_start()
 {
 	nyanpai_state::machine_start();
 
-	save_item(NAME(m_input_matrix));
+	save_item(NAME(m_input_select));
 }
 
 u16 musobana_state::input_matrix_r()
 {
-	u16 portdata = 0xffff;
-	for (unsigned i = 0; 5 > i; ++i)
-	{
-		if (!BIT(m_input_matrix, 8 + i))
-			portdata &= m_io_key[i]->read();
-	}
+	u16 const p1data = m_key_matrix[0]->read(m_input_select | ~0x1f);
+	u16 const p2data = m_key_matrix[1]->read(m_input_select | ~0x1f);
 
-	return portdata;
+	// Nichibutsu wires columns in reverse order
+	return 0xc0c0 | (bitswap<6>(p1data, 0, 1, 2, 3, 4, 5) << 8) | bitswap<6>(p2data, 0, 1, 2, 3, 4, 5);
 }
 
 void nyanpai_state::tmp68301_parallel_port_w(u16 data)
@@ -141,7 +137,7 @@ void musobana_state::musobana_tmp68301_parallel_port_w(u16 data)
 
 void musobana_state::input_matrix_w(u16 data)
 {
-	m_input_matrix = data;
+	m_input_select = data;
 }
 
 template <unsigned Layer>
@@ -287,7 +283,7 @@ static INPUT_PORTS_START( nyanpai )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DSWA:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Game Sounds" )       PORT_DIPLOCATION("DSWA:6")
+	PORT_DIPNAME( 0x20, 0x00, "Game Sounds" )           PORT_DIPLOCATION("DSWA:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("DSWA:7")
@@ -298,105 +294,13 @@ static INPUT_PORTS_START( nyanpai )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x00, "Nudity" )            PORT_DIPLOCATION("DSWB:1")
+	PORT_DIPNAME( 0x01, 0x00, "Nudity" )                PORT_DIPLOCATION("DSWB:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x80, 0x80, "Graphic ROM Test" )      PORT_DIPLOCATION("DSWB:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( nbmjctrl_16 )
-	PORT_START("KEY0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( musobana )    // I don't have manual for this game.
@@ -449,16 +353,14 @@ static INPUT_PORTS_START( musobana )    // I don't have manual for this game.
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )            // COIN1
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )            // COIN2
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     // MEMORY RESET
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      // ANALYZER
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )                     // COIN1
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )                     // COIN2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE1 )                  // CREDIT CLEAR
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )              // MEMORY RESET
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  PORT_TOGGLE  // ANALYZER
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                   // TEST
-
-	PORT_INCLUDE( nbmjctrl_16 )
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                            // TEST
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( 4psimasy )
@@ -503,16 +405,14 @@ static INPUT_PORTS_START( 4psimasy )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )            // COIN1
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )            // COIN2
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     // MEMORY RESET
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      // ANALYZER
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )                     // COIN1
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )                     // COIN2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE1 )                  // CREDIT CLEAR
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )              // MEMORY RESET
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  PORT_TOGGLE  // ANALYZER
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                   // TEST
-
-	PORT_INCLUDE( nbmjctrl_16 )
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                            // TEST
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mhhonban )
@@ -572,16 +472,14 @@ static INPUT_PORTS_START( mhhonban )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )            // COIN1
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )            // COIN2
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     // MEMORY RESET
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      // ANALYZER
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )                     // COIN1
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )                     // COIN2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE1 )                  // CREDIT CLEAR
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )              // MEMORY RESET
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  PORT_TOGGLE  // ANALYZER
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                   // TEST
-
-	PORT_INCLUDE( nbmjctrl_16 )
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                            // TEST
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( zokumahj )    // I don't have manual for this game.
@@ -638,16 +536,14 @@ static INPUT_PORTS_START( zokumahj )    // I don't have manual for this game.
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )            // COIN1
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )            // COIN2
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     // MEMORY RESET
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      // ANALYZER
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )                     // COIN1
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )                     // COIN2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE1 )                  // CREDIT CLEAR
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )              // MEMORY RESET
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  PORT_TOGGLE  // ANALYZER
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                   // TEST
-
-	PORT_INCLUDE( nbmjctrl_16 )
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                            // TEST
 INPUT_PORTS_END
 
 
@@ -688,11 +584,22 @@ void musobana_state::musobana(machine_config &config)
 	m_maincpu->parallel_w_cb().set(FUNC(musobana_state::musobana_tmp68301_parallel_port_w));
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
+
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], mahjong_panel_connector_device::standard_panels, "hf", false);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_panel_connector_device::standard_panels, "hf", false);
+}
+
+void musobana_state::_4psimasy(machine_config &config)
+{
+	musobana(config);
+
+	m_key_matrix[0]->set_options(mahjong_panel_connector_device::mahjong_panels, "mjam", false);
+	m_key_matrix[1]->set_options(mahjong_panel_connector_device::mahjong_panels, "mjam", false);
 }
 
 void musobana_state::mhhonban(machine_config &config)
 {
-	musobana(config);
+	_4psimasy(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &musobana_state::mhhonban_map);
@@ -700,7 +607,7 @@ void musobana_state::mhhonban(machine_config &config)
 
 void musobana_state::zokumahj(machine_config &config)
 {
-	musobana(config);
+	_4psimasy(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &musobana_state::zokumahj_map);
@@ -803,8 +710,8 @@ ROM_START( zokumahj )
 ROM_END
 
 
-GAME( 1996, nyanpai,  0,        nyanpai,  nyanpai,  nyanpai_state,  init_nyanpai, ROT0, "Nichibutsu",         "Nyanpai (Japan)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, musobana, 0,        musobana, musobana, musobana_state, init_nyanpai, ROT0, "Nichibutsu / Yubis", "Musoubana (Japan)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1994, 4psimasy, 0,        musobana, 4psimasy, musobana_state, init_nyanpai, ROT0, "Sphinx / AV Japan",  "Mahjong 4P Shimasho (Japan)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mhhonban, 0,        mhhonban, mhhonban, musobana_state, init_nyanpai, ROT0, "Nichibutsu",         "Mahjong Housoukyoku Honbanchuu (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, zokumahj, mhhonban, zokumahj, zokumahj, musobana_state, init_nyanpai, ROT0, "Nichibutsu?",        "Zoku Mahjong Housoukyoku (Japan)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nyanpai,  0,        nyanpai,   nyanpai,  nyanpai_state,  init_nyanpai, ROT0, "Nichibutsu",         "Nyanpai (Japan)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, musobana, 0,        musobana,  musobana, musobana_state, init_nyanpai, ROT0, "Nichibutsu / Yubis", "Musoubana (Japan)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1994, 4psimasy, 0,        _4psimasy, 4psimasy, musobana_state, init_nyanpai, ROT0, "Sphinx / AV Japan",  "Mahjong 4P Shimasho (Japan)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mhhonban, 0,        mhhonban,  mhhonban, musobana_state, init_nyanpai, ROT0, "Nichibutsu",         "Mahjong Housoukyoku Honbanchuu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, zokumahj, mhhonban, zokumahj,  zokumahj, musobana_state, init_nyanpai, ROT0, "Nichibutsu?",        "Zoku Mahjong Housoukyoku (Japan)",       MACHINE_SUPPORTS_SAVE )

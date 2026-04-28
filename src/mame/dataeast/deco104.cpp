@@ -16,8 +16,6 @@
 #include "emu.h"
 #include "deco104.h"
 
-#include "machine/eepromser.h"
-
 
 static deco146port_xx const port104_table[] = {
 	/* 0x000 */ { 0x04,          { NIB3__, NIB0__, NIB1__, NIB2__ } , 1, 1 },
@@ -1052,16 +1050,8 @@ DEFINE_DEVICE_TYPE(DECO104PROT, deco104_device, "deco104", "DECO 104 Protection"
 
 
 deco104_device::deco104_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: deco_146_base_device(mconfig, DECO104PROT, tag, owner, clock)
+	: deco_146_base_device(mconfig, DECO104PROT, tag, owner, clock, 0x66, 0x2a4, 0x42, 0xee, 0xa8, 0xc, port104_table)
 {
-	m_bankswitch_swap_read_address = 0x66;
-	m_magic_read_address_xor = 0x2a4;
-	m_magic_read_address_xor_enabled = 0;
-	m_xor_port = 0x42;
-	m_mask_port = 0xee;
-	m_soundlatch_port = 0xa8;
-	m_lookup_table = port104_table;
-	m_configregion = 0xc;
 }
 
 

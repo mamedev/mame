@@ -19,8 +19,6 @@
     1     on   effects ram                program rom+ram            QY100 main
     3     off? wave rom                   effects ram                PSR540
 
-
-
 ***************************************************************************/
 
 #ifndef MAME_CPU_H8_SWX00_H

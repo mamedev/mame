@@ -27,10 +27,7 @@ public:
 	a1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&a1bus_tag, U &&opts, const char *dflt)
 		: a1bus_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 		m_a1bus.set_tag(std::forward<T>(a1bus_tag));
 	}
 	a1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -46,7 +43,7 @@ protected:
 	required_device<a1bus_device> m_a1bus;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(A1BUS_SLOT, a1bus_slot_device)
 
 
@@ -91,7 +88,7 @@ protected:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(A1BUS, a1bus_device)
 
 // ======================> device_a1bus_card_interface

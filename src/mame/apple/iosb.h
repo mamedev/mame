@@ -12,6 +12,7 @@
 #include "machine/6522via.h"
 #include "machine/applefdintf.h"
 #include "machine/ncr53c90.h"
+#include "machine/pseudovia.h"
 #include "machine/swim2.h"
 #include "sound/asc.h"
 #include "speaker.h"
@@ -77,8 +78,9 @@ protected:
 
 	required_device<m68000_musashi_device> m_maincpu;
 	required_device<ncr53c96_device> m_ncr;
-	required_device<via6522_device> m_via1, m_via2;
-	required_device<asc_device> m_asc;
+	required_device<via6522_device> m_via1;
+	required_device<quadra_pseudovia_device> m_via2;
+	required_device<asc_base_device> m_asc;
 	required_device<applefdintf_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 
@@ -92,7 +94,6 @@ private:
 	floppy_image_device *m_cur_floppy = nullptr;
 	int m_hdsel;
 	int m_adb_interrupt;
-	int m_via2_ca1_hack;
 
 	s32 m_drq, m_scsi_irq, m_asc_irq;
 	u32 m_scsi_read_cycles, m_scsi_write_cycles, m_scsi_dma_read_cycles, m_scsi_dma_write_cycles;
@@ -101,8 +102,8 @@ private:
 
 	u16 mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, u16 data, u16 mem_mask);
-	u16 mac_via2_r(offs_t offset);
-	void mac_via2_w(offs_t offset, u16 data, u16 mem_mask);
+	u8 mac_via2_r(offs_t offset);
+	void mac_via2_w(offs_t offset, u8 data);
 
 	uint8_t via_in_a();
 	uint8_t via2_in_a();

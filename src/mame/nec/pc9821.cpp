@@ -313,14 +313,15 @@ void pc9821_state::ext2_video_ff_w(uint8_t data)
 // (it's seemingly the official NEC naming)
 uint16_t pc9821_state::pc9821_grcg_gvram_r(offs_t offset, uint16_t mem_mask)
 {
-	if (m_ex_video_ff[ANALOG_256_MODE])
+	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
 		int bank_idx = offset >> 14;
-		if (bank_idx > 1) return 0xffff;
-		
+		if (bank_idx > 1)
+			return 0xffff;
+
 		u8 *ext_gvram = (u8 *)m_ext_gvram.target();
 
-		if (m_pegc.packed_mode)
+		if(m_pegc.packed_mode)
 		{
 			// Packed Mode Read
 			//logerror("Packed Mode R Used\n");
@@ -340,24 +341,23 @@ uint16_t pc9821_state::pc9821_grcg_gvram_r(offs_t offset, uint16_t mem_mask)
 			bool shift_dir = BIT(rop, 9);
 			bool pat_update = BIT(rop, 13);
 
-			for (int i = 0; i < 16; i++)
+			for(int i = 0; i < 16; i++)
 			{
 				u32 tmp = (shift_dir ? (addr + 15 - i) : (addr + i)) & 0x7ffff;
 				u8 pixel_data = ext_gvram[tmp];
 
-				if ((pixel_data ^ pal1) & ~plane_mask)
+				if(!((pixel_data ^ pal1) & ~plane_mask))
 					ret |= (1 << i);
 
-				if (pat_update)
-				{
+				if(pat_update && !machine().side_effects_disabled())
 					m_pegc.pattern[tmp & m_pegc.pattern_mask] = pixel_data;
-				}
 			}
 
 			// VRAM to VRAM
-			if (!cpu_data)
+			if(!cpu_data && !machine().side_effects_disabled())
 			{
-				if (m_pegc.remain == 0) {
+				if(m_pegc.remain == 0)
+				{
 					m_pegc.remain = ((m_pegc.regs[0x10] | (m_pegc.regs[0x11] << 8)) & 0x0fff) + 1;
 					m_pegc.first_process_w = true;
 					m_pegc.first_process_r = true;
@@ -367,15 +367,13 @@ uint16_t pc9821_state::pc9821_grcg_gvram_r(offs_t offset, uint16_t mem_mask)
 				u32 src_shift = m_pegc.first_process_r ? (m_pegc.regs[0x12] & 0x1f) : 0;
 				int read_count = m_pegc.first_process_r ? (16 - src_shift) : 16;
 
-				for (int i = 0; i < read_count; i++)
+				for(int i = 0; i < read_count; i++)
 				{
 					u32 tmp = (shift_dir ? (addr + 15 - src_shift - i) : (addr + src_shift + i)) & 0x7ffff;
 					u8 pixel_data = ext_gvram[tmp];
 
-					if (m_pegc.shift_cnt < sizeof(m_pegc.shift_buffer))
-					{
+					if(m_pegc.shift_cnt < std::size(m_pegc.shift_buffer))
 						m_pegc.shift_buffer[m_pegc.shift_cnt++] = pixel_data;
-					}
 				}
 				m_pegc.first_process_r = false;
 			}
@@ -393,10 +391,10 @@ void pc9821_state::pc9821_grcg_gvram_w(offs_t offset, uint16_t data, uint16_t me
 	{
 		int bank_idx = offset >> 14;
 		if (bank_idx > 1) return;
-		
+
 		u8 *ext_gvram = (u8 *)m_ext_gvram.target();
 
-		if (m_pegc.packed_mode)
+		if(m_pegc.packed_mode)
 		{
 			// Packed Mode
 			//logerror("Packed Mode W Used\n");
@@ -410,7 +408,7 @@ void pc9821_state::pc9821_grcg_gvram_w(offs_t offset, uint16_t data, uint16_t me
 			u8 plane_mask = m_pegc.regs[0x04];
 			u16 rop = m_pegc.regs[0x08] | (m_pegc.regs[0x09] << 8);
 			u32 pixel_mask = m_pegc.regs[0x0c] | (m_pegc.regs[0x0d] << 8) | (m_pegc.regs[0x0e] << 16) | (m_pegc.regs[0x0f] << 24);
-			
+
 			bool cpu_data = BIT(rop, 8);
 			bool shift_dir = BIT(rop, 9);
 			u8 ropmethod = (rop >> 10) & 3;
@@ -418,7 +416,8 @@ void pc9821_state::pc9821_grcg_gvram_w(offs_t offset, uint16_t data, uint16_t me
 			u8 pal1 = m_pegc.regs[0x14];
 			u8 pal2 = m_pegc.regs[0x18];
 
-			if (m_pegc.remain == 0) {
+			if(m_pegc.remain == 0)
+			{
 				m_pegc.remain = ((m_pegc.regs[0x10] | (m_pegc.regs[0x11] << 8)) & 0x0fff) + 1;
 				m_pegc.first_process_w = true;
 				m_pegc.first_process_r = true;
@@ -428,18 +427,18 @@ void pc9821_state::pc9821_grcg_gvram_w(offs_t offset, uint16_t data, uint16_t me
 			u32 dst_shift = m_pegc.first_process_w ? (m_pegc.regs[0x13] & 0x1f) : 0;
 			u32 addr = (offset * 16);
 
-			if (cpu_data)
+			if(cpu_data)
 			{
 				u32 src_shift = m_pegc.first_process_w ? (m_pegc.regs[0x12] & 0x1f) : 0;
 				int push_count = m_pegc.first_process_w ? (16 - src_shift) : 16;
-				
-				for (int i = 0; i < push_count; i++) {
+
+				for(int i = 0; i < push_count; i++)
+				{
 					int orig_i = i + src_shift;
-					int bit_idx = ((orig_i / 8) * 8) + (7 - (orig_i % 8)); 
-					
-					if (m_pegc.shift_cnt < sizeof(m_pegc.shift_buffer)) {
+					int bit_idx = ((orig_i / 8) * 8) + (7 - (orig_i % 8));
+
+					if(m_pegc.shift_cnt < sizeof(m_pegc.shift_buffer))
 						m_pegc.shift_buffer[m_pegc.shift_cnt++] = (data & (1 << bit_idx)) ? 0xff : 0x00;
-					}
 				}
 			}
 
@@ -448,26 +447,26 @@ void pc9821_state::pc9821_grcg_gvram_w(offs_t offset, uint16_t data, uint16_t me
 			if (process_count > m_pegc.shift_cnt) process_count = m_pegc.shift_cnt;
 
 			// ROP
-			for (int i = 0; i < process_count; i++)
+			for(int i = 0; i < process_count; i++)
 			{
 				u32 tmp = (shift_dir ? (addr + 15 - dst_shift - i) : (addr + dst_shift + i)) & 0x7ffff;
-				
+
 				int p_idx = i + dst_shift;
 				u32 pixel_mask_pos = 1 << ((p_idx / 8) * 8 + (7 - (p_idx & 7)));
 
-				if (pixel_mask & pixel_mask_pos)
+				if(pixel_mask & pixel_mask_pos)
 				{
 					u8 src = m_pegc.shift_buffer[i];
 					u8 dst = ext_gvram[tmp];
 
-					if (ropupdmode)
+					if(ropupdmode)
 					{
 						ext_gvram[tmp] &= plane_mask;
 
 						u8 c4 = 0, c8 = 0;
-						if (ropmethod == 0) { c4 = c8 = m_pegc.pattern[tmp & m_pegc.pattern_mask]; } 
-						else if (ropmethod == 1) { c4 = c8 = pal2; } 
-						else if (ropmethod == 2) { c4 = c8 = pal1; } 
+						if (ropmethod == 0) { c4 = c8 = m_pegc.pattern[tmp & m_pegc.pattern_mask]; }
+						else if (ropmethod == 1) { c4 = c8 = pal2; }
+						else if (ropmethod == 2) { c4 = c8 = pal1; }
 						else { c4 = pal1; c8 = pal2; }
 
 						u8 res = 0;
@@ -495,7 +494,8 @@ void pc9821_state::pc9821_grcg_gvram_w(offs_t offset, uint16_t data, uint16_t me
 					else
 					{
 						u8 res = 0;
-						for(int j = 0; j < 8; j++) {
+						for(int j = 0; j < 8; j++)
+						{
 							if (src & (1 << j)) res |= (~plane_mask | dst) & (1 << j);
 							else                res |= (plane_mask & dst) & (1 << j);
 						}
@@ -505,17 +505,19 @@ void pc9821_state::pc9821_grcg_gvram_w(offs_t offset, uint16_t data, uint16_t me
 				m_pegc.remain--;
 			}
 
-			if (m_pegc.remain == 0) {
+			if(m_pegc.remain == 0)
+			{
 				m_pegc.first_process_w = true;
 				m_pegc.first_process_r = true;
 				m_pegc.shift_cnt = 0;
-			} else {
+			}
+			else
+			{
 				m_pegc.first_process_w = false;
-				
+
 				int remaining_shift = m_pegc.shift_cnt - process_count;
-				for (int i = 0; i < remaining_shift; i++) {
+				for(int i = 0; i < remaining_shift; i++)
 					m_pegc.shift_buffer[i] = m_pegc.shift_buffer[i + process_count];
-				}
 				m_pegc.shift_cnt = remaining_shift;
 			}
 			return;
@@ -617,7 +619,7 @@ void pc9821_state::pegc_mmio_map(address_map &map)
 			{
 				// Mode 1: 1 palette x 32 pixels
 				int pix_idx = offset;
-				
+
 				if (pix_idx < 32 && ACCESSING_BITS_0_7) {
 					m_pegc.pattern[pix_idx] = data & 0xff;
 				}
@@ -1054,6 +1056,22 @@ MACHINE_START_MEMBER(pc9821_state,pc9821)
 {
 	m_pit_delay = timer_alloc(FUNC(pc9821_state::pit_delay), this);
 	MACHINE_START_CALL_MEMBER(pc9801bx2);
+	save_item(STRUCT_MEMBER(m_pegc, pal_entry));
+	save_pointer(NAME(m_pegc.r), 0x100);
+	save_pointer(NAME(m_pegc.g), 0x100);
+	save_pointer(NAME(m_pegc.b), 0x100);
+	save_item(STRUCT_MEMBER(m_pegc, bank), 2);
+	save_item(STRUCT_MEMBER(m_pegc, packed_mode));
+	save_pointer(NAME(m_pegc.regs), 0x100);
+	save_pointer(NAME(m_pegc.lastdata), 64);
+	save_pointer(NAME(m_pegc.pattern), 32);
+	save_item(STRUCT_MEMBER(m_pegc, pattern_mask));
+	save_item(STRUCT_MEMBER(m_pegc, lastdatalen));
+	save_item(STRUCT_MEMBER(m_pegc, remain));
+	save_item(STRUCT_MEMBER(m_pegc, first_process_w));
+	save_item(STRUCT_MEMBER(m_pegc, first_process_r));
+	save_pointer(NAME(m_pegc.shift_buffer), 64);
+	save_item(STRUCT_MEMBER(m_pegc, shift_cnt));
 
 	// ...
 }

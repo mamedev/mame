@@ -645,7 +645,7 @@ template <unsigned N> void it8661f_device::iorange_check_w(offs_t offset, u8 dat
 			, BIT(data, 1)
 			, BIT(data, 0) ? 0x55 : 0xaa
 		);
-		//	remap(AS_IO, 0, 0xfff);
+		//  remap(AS_IO, 0, 0xfff);
 	}
 }
 

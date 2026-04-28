@@ -65,8 +65,8 @@ private:
 		uint32_t m_devid;
 		abuffer m_buffer;
 
-		stream_info(sound_pa *manager, uint32_t channels, uint32_t id, uint32_t devid) :
-			m_manager(manager), m_stream(nullptr), m_channels(channels), m_id(id), m_devid(devid), m_buffer(channels)
+		stream_info(sound_pa *manager, uint32_t channels, uint32_t rate, uint32_t id, uint32_t devid) :
+			m_manager(manager), m_stream(nullptr), m_channels(channels), m_id(id), m_devid(devid), m_buffer(channels, rate)
 		{ }
 	};
 
@@ -217,7 +217,7 @@ uint32_t sound_pa::stream_sink_open(uint32_t node, std::string name, uint32_t ra
 	op.hostApiSpecificStreamInfo = nullptr;
 
 	uint32_t id = m_stream_id ++;
-	auto si = m_streams.emplace(id, stream_info(this, m_info.m_nodes[node-1].m_sinks, id, node)).first;
+	auto si = m_streams.emplace(id, stream_info(this, m_info.m_nodes[node-1].m_sinks, rate, id, node)).first;
 	si->second.m_buffer.set_latency(op.suggestedLatency / 20e-3);
 
 	PaError err = Pa_OpenStream(&si->second.m_stream, nullptr, &op, rate, paFramesPerBufferUnspecified, 0, s_stream_callback, &si->second);
@@ -248,7 +248,7 @@ uint32_t sound_pa::stream_source_open(uint32_t node, std::string name, uint32_t 
 	ip.hostApiSpecificStreamInfo = nullptr;
 
 	uint32_t id = m_stream_id ++;
-	auto si = m_streams.emplace(id, stream_info(this, m_info.m_nodes[node-1].m_sources, id, node)).first;
+	auto si = m_streams.emplace(id, stream_info(this, m_info.m_nodes[node-1].m_sources, rate, id, node)).first;
 	si->second.m_buffer.set_latency(ip.suggestedLatency / 20e-3);
 
 	PaError err = Pa_OpenStream(&si->second.m_stream, &ip, nullptr, rate, paFramesPerBufferUnspecified, 0, s_stream_callback, &si->second);

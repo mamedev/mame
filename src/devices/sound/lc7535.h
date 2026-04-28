@@ -47,13 +47,13 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
-	float attenuation_to_gain(int attenuation);
+	static float attenuation_to_gain(int attenuation);
 
 	// maximum attenuation is -98 dB for infinity
-	enum { MAX = -98 };
+	static inline constexpr int MAX = -98;
 
-	static constexpr int m_5db[16] = { -75, -70, -65, -60, -55, -50, -45, -40, -35, -30, -25, -20, -15, -10, -5, -0 };
-	static constexpr int m_1db[8] = { MAX, MAX, -4, -3, -2, -1, 0, MAX };
+	static inline constexpr int s_5db[16] = { -75, -70, -65, -60, -55, -50, -45, -40, -35, -30, -25, -20, -15, -10, -5, -0 };
+	static inline constexpr int s_1db[8] = { MAX, MAX, -4, -3, -2, -1, 0, MAX };
 
 	devcb_read_line m_select_cb;
 

@@ -62,7 +62,7 @@ void DeviceInformationWindow::fill_device_information()
 	vLayout->setContentsMargins(2,2,2,2);
 
 	QFrame *primaryFrame = new QFrame(mainWindowFrame);
-	primaryFrame->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+	primaryFrame->setFrameStyle(0 | QFrame::StyledPanel | QFrame::Sunken); // zero because C++20 doesn't allow arithmetic between different enums
 	QGridLayout *gl1 = new QGridLayout(primaryFrame);
 	gl1->addWidget(new QLabel(QString("Tag"), primaryFrame), 0, 0);
 	gl1->addWidget(new QLabel(QString(m_device->tag()), primaryFrame), 0, 1);
@@ -90,7 +90,7 @@ void DeviceInformationWindow::fill_device_information()
 	if (m_device->interface(d_memory))
 	{
 		QFrame *f = new QFrame(mainWindowFrame);
-		f->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+		f->setFrameStyle(0 | QFrame::StyledPanel | QFrame::Sunken); // zero because C++20 doesn't allow arithmetic between different enums
 		QVBoxLayout *vb = new QVBoxLayout(f);
 		bool first = true;
 		for (int i=0; i<d_memory->max_space_count(); i++)

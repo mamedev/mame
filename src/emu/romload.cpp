@@ -1365,7 +1365,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 
 	std::vector<const software_info *> parents;
 	std::vector<std::string> swsearch, disksearch;
-	const software_info *const swinfo = swlist.find(std::string(swname));
+	const software_info *const swinfo = swlist.find(swname);
 	if (swinfo)
 	{
 		// display a warning for unsupported software

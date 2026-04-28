@@ -1915,6 +1915,10 @@ void m68000_musashi_device::init32hmmu(address_space &space, address_space &ospa
 //         do not call set_input_line(M68K_LINE_BUSERROR) when using rerun flag
 void m68000_musashi_device::set_buserror_details(u32 fault_addr, u8 rw, u8 fc, bool rerun)
 {
+	// ignore subsequent bus errors within instruction
+	if (m_mmu_tmp_buserror_occurred)
+		return;
+
 	if (m_can_instruction_restart && rerun) m_mmu_tmp_buserror_occurred = true; // hack for external MMU
 
 	// save values for 68000 specific bus error

@@ -12,6 +12,8 @@
     PCI shadow RAM handling (which causes BIOS to boot in legacy mode);
   - Handle STPCD0166BTC3 SoC properly, including PCI devices connected and SVGA
     mods (wrongly draws only top screen with 640x200 with at486 -isa1 svga_s3);
+  - Pinpoint what VGA core this really uses (some STPC boards uses Chips & Technologies
+    2nd gen family, may be same here)
 
   Hardware:
   - ST STPCD0166BTC3 486/66 + PC + VGA all on one chip
@@ -152,6 +154,7 @@ void fruitpc_state::fruitpc(machine_config &config)
 	PCI_ROOT(config, m_pciroot, 0);
 	// TODO: STPCD0166BTC3 host PCI
 
+	// TODO: should really be ISA16
 	ISA8(config, m_isabus, 0);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
@@ -182,4 +185,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2006, fruitpc, 0, fruitpc, fruitpc, fruitpc_state, empty_init, ROT0, "<unknown>", "Fruit Land", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2006, fruitpc, 0, fruitpc, fruitpc, fruitpc_state, empty_init, ROT0, "<unknown>", "Fruit Land", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

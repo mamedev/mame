@@ -9,16 +9,16 @@
 //
 //============================================================
 
-#ifdef SDLMAME_SDL3
+#if defined(SDLMAME_SDL3)
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#endif
+#endif // defined(SDLMAME_SDL3)
 
 #include "osdcore.h"
 
-#ifndef SDLMAME_SDL3
+#if !defined(SDLMAME_SDL3)
 #include "SDL2/SDL.h"
-#endif
+#endif // !defined(SDLMAME_SDL3)
 
 #include <iostream>
 #include <string>

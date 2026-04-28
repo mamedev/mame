@@ -349,6 +349,8 @@ void fastlane_state::fastlane(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
+	K051733(config, "k051733", 24_MHz_XTAL / 2);
+
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 280, 264, 16, 240);
@@ -362,8 +364,6 @@ void fastlane_state::fastlane(machine_config &config)
 	m_k007121->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
 	m_k007121->set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_k007121->set_flipscreen_cb().set(FUNC(fastlane_state::flipscreen_w));
-
-	K051733(config, "k051733", 24_MHz_XTAL / 2);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

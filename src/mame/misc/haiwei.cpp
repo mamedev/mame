@@ -19,6 +19,14 @@ various jumpers
 bank of 8 switches
 reset push-button
 
+System's promotional flyer claims:
+- Supports touchscreen, mouse, keyboard and other input driver
+- Supports IEEE802.2, RS232, RS485
+- Supports coin in / out, bill acceptor, printer
+- Supports CF card and other storage
+- Supports VGA and LCD (high-resolution) and video-games (low-resolution)
+  and TV (video)
+
 TODO:
 - currently stops at the manufacturer logo (tight loops between two JMPs);
 - transmits to SIO if above is skipped;
@@ -52,18 +60,27 @@ public:
 
 	void init_hqdf() ATTR_COLD;
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
+
+	u32 m_pio = 0;
 
 	void program_map(address_map &map) ATTR_COLD;
 
 	u32 pioldat_r();
 	void pioldat_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 pioedat_r();
-
-	u32 m_pio;
 };
+
+
+void haiwei_state::machine_start()
+{
+	save_item(NAME(m_pio));
+}
 
 u32 haiwei_state::pioldat_r()
 {
@@ -223,8 +240,8 @@ ROM_END
 
 void haiwei_state::init_hqdf() // TODO: verify if it is complete (shouldn't get this far if it weren't complete, though)
 {
-	uint8_t *rom = memregion("maincpu")->base();
-	std::vector<uint8_t> buffer(0x600000);
+	u8 *rom = memregion("maincpu")->base();
+	std::vector<u8> buffer(0x600000);
 
 	memcpy(&buffer[0], rom, 0x600000);
 

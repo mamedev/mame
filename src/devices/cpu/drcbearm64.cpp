@@ -121,7 +121,7 @@ TODO:
 
 #include "mfpresolve.h"
 
-#include "asmjit/src/asmjit/a64.h"
+#include "asmjit/asmjit/a64.h"
 
 #include <cstddef>
 #include <cstdio>
@@ -1758,7 +1758,7 @@ void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uin
 	uintptr_t linemask = 63;
 	if (err)
 	{
-		osd_printf_verbose("Error getting cache line size (%s:%d %s), assuming 64 bytes\n", err.category().name(), err.value(), err.message());
+		osd_printf_verbose("drcbe_arm64(%s): Error getting cache line size (%s:%d %s), assuming 64 bytes\n", m_device.tag(), err.category().name(), err.value(), err.message());
 	}
 	else
 	{
@@ -1842,7 +1842,7 @@ void drcbe_arm64::get_info(drcbe_info &info) const noexcept
 
 [[noreturn]] void drcbe_arm64::end_of_block() const
 {
-	osd_printf_error("drcbe_arm64(%s): fell off the end of a generated code block!\n", m_device.tag());
+	osd_printf_error("drcbe_arm64(%s): Fell off the end of a generated code block!\n", m_device.tag());
 	std::fflush(stdout);
 	std::fflush(stderr);
 	std::abort();

@@ -182,11 +182,11 @@ uint32_t monzagp_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 /*
     for (int i = 0; i < 8; i++)
-        printf("%02x ", m_video_ctrl[0][i]);
-    printf("   ----   ");
+        logerror("%02x ", m_video_ctrl[0][i]);
+    logerror("   ----   ");
     for (int i = 0; i < 8; i++)
-        printf("%02x ", m_video_ctrl[1][i]);
-    printf("\n");
+        logerror("%02x ", m_video_ctrl[1][i]);
+    logerror("\n");
 */
 
 	bitmap.fill(0, cliprect);
@@ -212,9 +212,9 @@ uint32_t monzagp_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		{
 			uint8_t tile_attr = m_tile_attr[((start_x >> 5) & 0x1ff) | ((m_video_ctrl[0][3] & 0x80) ? 0 : 0x200)];
 
-			//if (tile_attr & 0x10)         printf("dark on\n");
-			//if (tile_attr & 0x20)         printf("light on\n");
-			//if (tile_attr & 0x40)         printf("bridge\n");
+			//if (tile_attr & 0x10)         logerror("dark on\n");
+			//if (tile_attr & 0x20)         logerror("light on\n");
+			//if (tile_attr & 0x40)         logerror("bridge\n");
 
 			int const tile_idx = tile_table[((tile_attr & 0x0f) << 4) | (inv ? 0x08 : 0) | ((start_tile >> 5) & 0x07)];
 
@@ -295,42 +295,42 @@ uint8_t monzagp_state::port_r(offs_t offset)
 	uint8_t data = 0xff;
 	if (!(m_p1 & 0x01))             // 8350 videoram
 	{
-		//printf("ext 0 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
+		//logerror("ext 0 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
 		int const addr = ((m_p2 & 0x3f) << 5) | (offset & 0x1f);
 		data = m_vram[addr];
 	}
 	if (!(m_p1 & 0x02))
 	{
-		printf("ext 1 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
+		logerror("ext 1 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
 	}
 	if (!(m_p1 & 0x04))             // GFX
 	{
-		//printf("ext 2 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
+		//logerror("ext 2 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
 		int const addr = ((m_p2 & 0x7f) << 5) | (offset & 0x1f);
 		data = m_gfx[0][addr];
 	}
 	if (!(m_p1 & 0x08))
 	{
-		//printf("ext 3 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
+		//logerror("ext 3 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
 		data = m_in[1]->read();
 	}
 	if (!(m_p1 & 0x10))
 	{
-		//printf("ext 4 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
+		//logerror("ext 4 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
 		data = (m_dsw->read() & 0x1f) | (m_in[0]->read() & 0xe0);
 	}
 	if (!(m_p1 & 0x20))
 	{
-		printf("ext 5 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
+		logerror("ext 5 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
 	}
 	if (!(m_p1 & 0x40))             // digits
 	{
 		data = m_score_ram[bitswap<8>(offset, 3, 2, 1, 0, 7, 6, 5, 4)];
-		//printf("ext 6 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
+		//logerror("ext 6 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
 	}
 	if (!(m_p1 & 0x80))
 	{
-		//printf("ext 7 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
+		//logerror("ext 7 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
 		data = m_collisions_ff | (m_time_tick ? 0x10 : 0);
 	}
 
@@ -341,18 +341,18 @@ void monzagp_state::port_w(offs_t offset, uint8_t data)
 {
 	if (!(m_p1 & 0x01))     // 8350 videoram
 	{
-		//printf("ext 0 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
+		//logerror("ext 0 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
 
 		int const addr = ((m_p2 & 0x3f) << 5) | (offset & 0x1f);
 		m_vram[addr] = data;
 	}
 	if (!(m_p1 & 0x02))
 	{
-		printf("ext 1 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
+		logerror("ext 1 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
 	}
 	if (!(m_p1 & 0x04))    // GFX
 	{
-		//printf("ext 2 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
+		//logerror("ext 2 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
 		int const addr = ((m_p2 & 0x7f) << 5) | (offset & 0x1f);
 		if (addr < 0x400)
 		{
@@ -363,19 +363,19 @@ void monzagp_state::port_w(offs_t offset, uint8_t data)
 	}
 	if (!(m_p1 & 0x08))
 	{
-		//printf("ext 3 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
+		//logerror("ext 3 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
 	}
 	if (!(m_p1 & 0x10))
 	{
-		printf("ext 4 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
+		logerror("ext 4 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
 	}
 	if (!(m_p1 & 0x20))
 	{
-		//printf("ext 5 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
+		//logerror("ext 5 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
 	}
 	if (!(m_p1 & 0x40))    // digits
 	{
-		//printf("ext 6 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
+		//logerror("ext 6 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
 		offs_t const ram_offset = bitswap<8>(offset, 3, 2, 1, 0, 7, 6, 5, 4);
 		m_score_ram[ram_offset] = data & 0x0f;
 
@@ -388,7 +388,7 @@ void monzagp_state::port_w(offs_t offset, uint8_t data)
 	}
 	if (!(m_p1 & 0x80))
 	{
-		//printf("ext 7 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
+		//logerror("ext 7 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
 		m_video_ctrl[0][(offset >> 0) & 0x07] = data;
 		m_video_ctrl[1][(offset >> 3) & 0x07] = data;
 
@@ -412,7 +412,7 @@ void monzagp_state::port_w(offs_t offset, uint8_t data)
 
 void monzagp_state::port1_w(uint8_t data)
 {
-//  printf("P1 %x = %x\n",m_maincpu->pc(),data);
+//  logerror("P1 %x = %x\n",m_maincpu->pc(),data);
 	m_p1 = data;
 }
 
@@ -423,7 +423,7 @@ uint8_t monzagp_state::port2_r()
 
 void monzagp_state::port2_w(uint8_t data)
 {
-//  printf("P2 %x = %x\n",m_maincpu->pc(),data);
+//  logerror("P2 %x = %x\n",m_maincpu->pc(),data);
 	m_p2 = data;
 }
 

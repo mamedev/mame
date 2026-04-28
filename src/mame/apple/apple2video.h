@@ -19,7 +19,7 @@ class a2_video_device : public device_t, public device_palette_interface, public
 {
 public:
 	// Models with different text-mode behavior. II includes the II+ and IIE includes the IIc and IIc Plus.
-	enum class model { II, IIE, PRAVETZ_8C, IIGS, II_J_PLUS, IVEL_ULTRA, DODO };
+	enum class model : u8 { II, II_J_PLUS, IVEL_ULTRA, DODO, IIE, PRAVETZ_8C, IIGS };
 
 	// construction/destruction
 	a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -65,11 +65,15 @@ public:
 	void set_GS_border_color(u8 color, u32 rgb) { m_GSborder_colors[color] = rgb; }
 	void set_SHR_scb(u8 shrline, u8 scb) { m_shr_scbs[shrline] = scb; }
 
+	void set_base_model(model base_model)       { m_base_model = base_model; }
 	void set_ram_pointers(u8 *main, u8 *aux)    { m_ram_ptr = main; m_aux_ptr = aux; }
 	void set_aux_mask(u16 aux_mask)             { m_aux_mask = aux_mask; }
 	void set_hgr2(u16 hgr2)                     { m_hgr2 = hgr2; }
 	void set_char_pointer(u8 *charptr, int size) { m_char_ptr = charptr; m_char_size = size; }
 	void setup_GS_graphics() { m_8bit_graphics = std::make_unique<bitmap_ind16>(560, 192); }
+
+	u16 scanner_address(int h_clock, int v_clock);
+	u32 scanner_address_GS(int h_clock, int v_clock);
 
 	template <model Model, bool Invert, bool Flip>
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -102,6 +106,7 @@ private:
 
 	void render_line(uint16_t *out, uint16_t const *in, int startcol, int stopcol, bool monochrome, bool is_80_column);
 
+	void delayed_update(int cycles);
 	bool use_page_2() const;
 
 	bool composite_monitor();
@@ -131,6 +136,9 @@ private:
 	bool m_monohgr = false;
 	u8 m_GSfg = 0, m_GSbg = 0, m_GSborder = 0, m_newvideo = 0, m_GS_langsel = 0, m_monochrome = 0, m_rgbmode = 0;
 	u8 m_iie_langsw = 0; // language switch/modification on IIe/IIc/IIc+ and clones
+	u8 m_scanner_period;
+	u8 m_delay_bias;
+	model m_base_model;
 	optional_ioport m_vidconfig;
 };
 

@@ -14,7 +14,7 @@
 #define LOG_TASKS  (1U << 3)
 #define LOG_ERRORS (1U << 4)
 
-#define VERBOSE (LOG_MAC|LOG_TASKS)
+//#define VERBOSE (LOG_MAC | LOG_DMA | LOG_TASKS | LOG_ERRORS)
 #include "logmacro.h"
 
 #define PAGE_WP     BIT(page_data, 14)
@@ -47,18 +47,35 @@ void abc1600_mmu_device::boot_map(address_map &map)
 
 void abc1600_mmu_device::mac_map(address_map &map)
 {
-	map(0x80000, 0x80000).mirror(0x006f8).select(0x7f900).rw(FUNC(abc1600_mmu_device::page_hi_r), FUNC(abc1600_mmu_device::page_hi_w));
-	map(0x80001, 0x80001).mirror(0x006f8).select(0x7f900).rw(FUNC(abc1600_mmu_device::page_lo_r), FUNC(abc1600_mmu_device::page_lo_w));
-	map(0x80002, 0x80002).mirror(0x7fff8).noprw();
-	map(0x80003, 0x80003).mirror(0x07ef8).select(0x78100).rw(FUNC(abc1600_mmu_device::segment_r), FUNC(abc1600_mmu_device::segment_w));
-	map(0x80004, 0x80004).mirror(0x7fff8).noprw();
-	map(0x80005, 0x80005).mirror(0x7fff8).nopr().w(FUNC(abc1600_mmu_device::task_w));
-	map(0x80006, 0x80006).mirror(0x7fff8).noprw();
-	map(0x80007, 0x80007).mirror(0x7fff8).r(FUNC(abc1600_mmu_device::cause_r)).nopw();
+	map(0x80000, 0xfffff).rw(FUNC(abc1600_mmu_device::mac_r), FUNC(abc1600_mmu_device::mac_w));
+}
+
+uint8_t abc1600_mmu_device::mac_r(offs_t offset)
+{
+	switch (offset & 0x7)
+	{
+	case 0x0: return page_hi_r(offset);
+	case 0x1: return page_lo_r(offset);
+	case 0x3: return segment_r(offset);
+	case 0x7: return cause_r();
+	default: return 0;
+	}
+}
+
+void abc1600_mmu_device::mac_w(offs_t offset, uint8_t data)
+{
+	switch (offset & 0x7)
+	{
+	case 0x0: page_hi_w(offset, data); break;
+	case 0x1: page_lo_w(offset, data); break;
+	case 0x3: segment_w(offset, data); break;
+	case 0x5: task_w(offset, data); break;
+	default: break;
+	}
 }
 
 abc1600_mmu_device::abc1600_mmu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
-    device_t(mconfig, LUXOR_ABC1600_MMU, tag, owner, clock),
+	device_t(mconfig, LUXOR_ABC1600_MMU, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_state_interface(mconfig, *this),
 	m_read_tren(*this, 0xff),
@@ -74,13 +91,13 @@ abc1600_mmu_device::abc1600_mmu_device(machine_config const &mconfig, char const
 {
 }
 
-abc1600_mmu_device::mmu::mmu(m68008_device *maincpu, address_space &boot, address_space &program, address_space &cpu_space, address_space &mac_space, u8 *segment_ram, u16 *page_ram) : 
-    m_maincpu(maincpu), 
+abc1600_mmu_device::mmu::mmu(m68008_device *maincpu, address_space &boot, address_space &program, address_space &cpu_space, address_space &mac_space, u8 *segment_ram, u16 *page_ram) :
+	m_maincpu(maincpu),
 	m_segment_ram(segment_ram),
 	m_page_ram(page_ram),
 	m_a_boot(boot),
-    m_a_program(program),
-    m_a_cpu_space(cpu_space),
+	m_a_program(program),
+	m_a_cpu_space(cpu_space),
 	m_a_mac_space(mac_space),
 	m_super(false),
 	m_boote(0),
@@ -91,15 +108,18 @@ abc1600_mmu_device::mmu::mmu(m68008_device *maincpu, address_space &boot, addres
 	program.specific(m_program);
 	cpu_space.specific(m_cpu_space);
 	mac_space.specific(m_s_program);
-
-	// HACK fill segment RAM or abcenix won't boot
-	memset(m_segment_ram, 0xff, 0x400);
 }
 
 void abc1600_mmu_device::device_start()
 {
 	m_mmu = std::make_unique<mmu>(m_maincpu.target(), space(AS_BOOT), space(AS_PROGRAM), space(m68000_base_device::AS_CPU_SPACE), space(AS_MAC), m_segment_ram.target(), m_page_ram.target());
 	m_maincpu->set_current_mmu8(m_mmu.get());
+
+	for (auto & s : m_segment_ram)
+		s = 0xff;
+
+	for (auto & s : m_page_ram)
+		s = 0xffff;
 
 	state_add(0, "TASK", m_mmu->m_task).formatstr("%2u");
 	state_add(1, "BOOTE", m_mmu->m_boote).formatstr("%1u");
@@ -125,8 +145,8 @@ device_memory_interface::space_config_vector abc1600_mmu_device::memory_space_co
 {
 	return space_config_vector {
 		std::make_pair(AS_BOOT, &m_boot_config),
-        std::make_pair(AS_PROGRAM, &m_program_config),
-        std::make_pair(m68000_base_device::AS_CPU_SPACE, &m_cpu_space_config),
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(m68000_base_device::AS_CPU_SPACE, &m_cpu_space_config),
 		std::make_pair(AS_MAC, &m_s_program_config)
 	};
 }
@@ -138,15 +158,41 @@ void abc1600_mmu_device::mmu::reset()
 	m_task = 0;
 }
 
-offs_t abc1600_mmu_device::mmu::get_physical_address(offs_t logical, int task, bool &nonx, bool &wp)
+bool abc1600_mmu_device::mmu::ifc2(int intention) const
+{
+	return (m_magic || intention != TR_FETCH) && !m_super;
+}
+
+bool abc1600_mmu_device::mmu::force_task0(offs_t logical, int intention) const
+{
+	const bool a19 = BIT(logical, 19);
+
+	return !(a19 || ifc2(intention));
+}
+
+int abc1600_mmu_device::mmu::get_task(offs_t logical, int intention) const
+{
+	if (force_task0(logical, intention))
+		return 0;
+
+	return m_task;
+}
+
+offs_t abc1600_mmu_device::mmu::get_segment_address(offs_t logical, int intention) const
+{
+	bool sega19 = BIT(logical, 19) && (ifc2(intention) || BIT(logical, 8));
+	return (get_task(logical, intention) << 5) | (sega19 << 4) | ((logical >> 15) & 0xf);
+}
+
+offs_t abc1600_mmu_device::mmu::get_physical_address(offs_t logical, int intention, bool &nonx, bool &wp)
 {
 	// segment
-	offs_t sega = (task << 5) | ((logical >> 15) & 0x1f);
-	uint8_t segd = m_segment_ram[sega];
+	offs_t sega = get_segment_address(logical, intention);
+	u8 segd = m_segment_ram[sega] & 0x3f;
 
 	// page
-	offs_t pga = ((segd & 0x3f) << 4) | ((logical >> 11) & 0x0f);
-	uint16_t page_data = m_page_ram[pga];
+	offs_t pga = (segd << 4) | ((logical >> 11) & 0x0f);
+	u16 page_data = m_page_ram[pga];
 
 	offs_t physical = ((page_data & 0x3ff) << 11) | (logical & 0x7ff);
 
@@ -160,30 +206,26 @@ offs_t abc1600_mmu_device::mmu::get_physical_address(offs_t logical, int task, b
 
 bool abc1600_mmu_device::mmu::translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
- 	if (spacenum == m68000_base_device::AS_CPU_SPACE) {
+	if (spacenum == m68000_base_device::AS_CPU_SPACE) {
 		target_space = &m_a_cpu_space;
 		return true;
 	}
 
-    if (spacenum != AS_PROGRAM)
+	if (spacenum != AS_PROGRAM)
 		return false;
 
 	if (!m_boote && (intention != TR_WRITE) && (address < 0x20000)) {
-	    target_space = &m_a_boot;
+		target_space = &m_a_boot;
 		return true;
 	}
 
-	if (m_super && (address & 0x80000)) {
+	if (!ifc2(intention) && (intention != TR_FETCH) && BIT(address, 19)) {
 		target_space = &m_a_mac_space;
 		return true;
 	}
 
-	int task = m_task;
-	if (m_super || (!m_magic && (intention == TR_FETCH)))
-		task = 0;
-
 	bool nonx, wp;
-	address = get_physical_address(address, task, nonx, wp);
+	address = get_physical_address(address, intention, nonx, wp);
 
 	if (nonx || ((intention == TR_WRITE) && !wp))
 		return false;
@@ -195,17 +237,13 @@ bool abc1600_mmu_device::mmu::translate(int spacenum, int intention, offs_t &add
 u8 abc1600_mmu_device::mmu::mmu_read(offs_t logical, int intention)
 {
 	if (!m_boote && (logical < 0x20000))
-	    return m_boot.read_interruptible(logical);
+		return m_boot.read_interruptible(logical);
 
-	if (m_super && (logical & 0x80000))
+	if (!ifc2(intention) && BIT(logical, 19))
 		return m_s_program.read_interruptible(logical);
-	
-	int task = m_task;
-	if (m_super || (!m_magic && (intention == TR_FETCH)))
-		task = 0;
 
 	bool nonx, wp;
-	offs_t physical = get_physical_address(logical, task, nonx, wp);
+	offs_t physical = get_physical_address(logical, intention, nonx, wp);
 
 	if (nonx) {
 		m_maincpu->trigger_bus_error();
@@ -217,17 +255,13 @@ u8 abc1600_mmu_device::mmu::mmu_read(offs_t logical, int intention)
 
 void abc1600_mmu_device::mmu::mmu_write(offs_t logical, u8 data)
 {
-	if (m_super && (logical & 0x80000)) {
+	if (!ifc2(TR_WRITE) && BIT(logical, 19)) {
 		m_s_program.write_interruptible(logical, data);
 		return;
 	}
 
-	int task = m_task;
-	if (m_super)
-		task = 0;
-
 	bool nonx, wp;
-	offs_t physical = get_physical_address(logical, task, nonx, wp);
+	offs_t physical = get_physical_address(logical, TR_WRITE, nonx, wp);
 
 	if (nonx || !wp) {
 		m_maincpu->trigger_bus_error();
@@ -284,11 +318,11 @@ uint8_t abc1600_mmu_device::cause_r()
 
 	*/
 
-	uint8_t data = m_rstbut;
+	uint8_t data = m_rstbut | 0x02;
 
 	if (!m_partst)
 	{
-		data = 0x02 | m_mmu->m_cause;
+		data |= m_mmu->m_cause;
 	}
 
 	if (!machine().side_effects_disabled())
@@ -340,10 +374,12 @@ uint8_t abc1600_mmu_device::segment_r(offs_t offset)
 
 	*/
 
-	offs_t sega = (m_mmu->m_task << 5) | BIT(offset, 8) << 4 | ((offset >> 15) & 0xf);
-	uint8_t segd = m_segment_ram[sega];
+	offs_t sega = m_mmu->get_segment_address(0x80000 | offset, TR_READ);
+	u8 segd = m_segment_ram[sega];
 
-	return (!m_mmu->m_magic << 7) | (segd & 0x7f);
+	u8 data = (!m_mmu->m_magic << 7) | (segd & 0x7f);
+	LOGMASKED(LOG_MAC, "%s %05x SEG R %03x:%02x\n", machine().describe_context(), offset, sega, data);
+	return data;
 }
 
 void abc1600_mmu_device::segment_w(offs_t offset, uint8_t data)
@@ -358,15 +394,17 @@ void abc1600_mmu_device::segment_w(offs_t offset, uint8_t data)
 	    3       SEGD3
 	    4       SEGD4
 	    5       SEGD5
-	    6       SEGD6
+	    6       SEGD6 (unused)
 	    7       0
 
 	*/
 
-	offs_t sega = (m_mmu->m_task << 5) | BIT(offset, 8) << 4 | ((offset >> 15) & 0xf);
+	int task = m_mmu->get_task(0x80000 | offset, TR_WRITE);
+	offs_t sega = m_mmu->get_segment_address(0x80000 | offset, TR_WRITE);
 	m_segment_ram[sega] = data & 0x7f;
 
-	LOGMASKED(LOG_MAC, "%s SEG W %05x:%02x SEGA %03x SEGD %02x TASK %u\n", machine().describe_context(), offset, data, sega, m_segment_ram[sega], m_mmu->m_task);
+	offs_t physical = (sega & 0x1f) << 15;
+	LOGMASKED(LOG_MAC, "%s %05x SEG W %03x:%02x [T%02u:%05x]\n", machine().describe_context(), offset, sega, data & 0x7f, task, physical);
 }
 
 uint8_t abc1600_mmu_device::page_lo_r(offs_t offset)
@@ -387,13 +425,14 @@ uint8_t abc1600_mmu_device::page_lo_r(offs_t offset)
 	*/
 
 	// segment
-	offs_t sega = (m_mmu->m_task << 5) | BIT(offset, 8) << 4 | ((offset >> 15) & 0xf);
-	uint8_t segd = m_segment_ram[sega];
+	offs_t sega = m_mmu->get_segment_address(0x80000 | offset, TR_READ);
+	u8 segd = m_segment_ram[sega] & 0x3f;
 
 	// page
-	offs_t pga = ((segd & 0x3f) << 4) | ((offset >> 11) & 0xf);
-	uint16_t pgd = m_page_ram[pga];
+	offs_t pga = (segd << 4) | ((offset >> 11) & 0xf);
+	u16 pgd = m_page_ram[pga];
 
+	LOGMASKED(LOG_MAC, "%s %05x PAGE LO R %03x:%02x\n", machine().describe_context(), offset, pga, pgd & 0xff);
 	return pgd & 0xff;
 }
 
@@ -415,16 +454,18 @@ uint8_t abc1600_mmu_device::page_hi_r(offs_t offset)
 	*/
 
 	// segment
-	offs_t sega = (m_mmu->m_task << 5) | BIT(offset, 8) << 4 | ((offset >> 15) & 0xf);
-	uint8_t segd = m_segment_ram[sega];
+	offs_t sega = m_mmu->get_segment_address(0x80000 | offset, TR_READ);
+	u8 segd = m_segment_ram[sega] & 0x3f;
 
 	// page
-	offs_t pga = ((segd & 0x3f) << 4) | ((offset >> 11) & 0xf);
-	uint16_t pgd = m_page_ram[pga];
+	offs_t pga = (segd << 4) | ((offset >> 11) & 0xf);
+	u16 pgd = m_page_ram[pga];
 
 	int x20 = BIT(pgd, 9);
+	u8 data = (pgd >> 8) | (x20 << 2) | (x20 << 3) | (x20 << 4) | (x20 << 5);
 
-	return (pgd >> 8) | (x20 << 2) | (x20 << 3) | (x20 << 4) | (x20 << 5);
+	LOGMASKED(LOG_MAC, "%s %05x PAGE HI R %03x:%02x\n", machine().describe_context(), offset, pga, data);
+	return data;
 }
 
 void abc1600_mmu_device::page_lo_w(offs_t offset, uint8_t data)
@@ -445,14 +486,18 @@ void abc1600_mmu_device::page_lo_w(offs_t offset, uint8_t data)
 	*/
 
 	// segment
-	offs_t sega = (m_mmu->m_task << 5) | BIT(offset, 8) << 4 | ((offset >> 15) & 0xf);
-	uint8_t segd = m_segment_ram[sega];
+	int task = m_mmu->get_task(0x80000 | offset, TR_WRITE);
+	offs_t sega = m_mmu->get_segment_address(0x80000 | offset, TR_WRITE);
+	u8 segd = m_segment_ram[sega] & 0x3f;
 
 	// page
-	offs_t pga = ((segd & 0x3f) << 4) | ((offset >> 11) & 0xf);
-	m_page_ram[pga] = (m_page_ram[pga] & 0xff00) | data;
+	offs_t pga = (segd << 4) | ((offset >> 11) & 0xf);
+	u16 pgd = (m_page_ram[pga] & 0xff00) | data;
+	m_page_ram[pga] = pgd;
 
-	LOGMASKED(LOG_MAC, "%s PAGE W %05x:%02x (SEGA %03x SEGD %02x PGA %03x PGD %04x TASK %u)\n", machine().describe_context(), offset, data, sega, segd, pga, m_page_ram[pga], m_mmu->m_task);
+	offs_t logical = (BIT(offset, 8) << 19) | (offset & 0x7f800);
+	offs_t physical = (pgd & 0x3ff) << 11;
+	LOGMASKED(LOG_MAC, "%s %05x PAGE LO W %03x:..%02x [T%02u:%05x:%06x]\n", machine().describe_context(), offset, pga, data, task, logical, physical);
 }
 
 void abc1600_mmu_device::page_hi_w(offs_t offset, uint8_t data)
@@ -473,12 +518,15 @@ void abc1600_mmu_device::page_hi_w(offs_t offset, uint8_t data)
 	*/
 
 	// segment
-	offs_t sega = (m_mmu->m_task << 5) | BIT(offset, 8) << 4 | ((offset >> 15) & 0xf);
-	uint8_t segd = m_segment_ram[sega];
+	offs_t sega = m_mmu->get_segment_address(0x80000 | offset, TR_WRITE);
+	u8 segd = m_segment_ram[sega] & 0x3f;
 
 	// page
-	offs_t pga = ((segd & 0x3f) << 4) | ((offset >> 11) & 0xf);
-	m_page_ram[pga] = ((data & 0xc3) << 8) | (m_page_ram[pga] & 0xff);
+	offs_t pga = (segd << 4) | ((offset >> 11) & 0xf);
+	u16 pgd = ((data & 0xc3) << 8) | (m_page_ram[pga] & 0xff);
+	m_page_ram[pga] = pgd;
+
+	LOGMASKED(LOG_MAC, "%s %05x PAGE HI W %03x:%02x..\n", machine().describe_context(), offset, pga, data);
 }
 
 offs_t abc1600_mmu_device::get_dma_address(int index, offs_t logical, bool &rw)
@@ -534,7 +582,7 @@ void abc1600_mmu_device::dma_mreq_w(int index, int dmamap, offs_t logical, uint8
 
 	if (!rw)
 	{
-		space().write_byte(physical, data);
+		space(AS_PROGRAM).write_byte(physical, data);
 	}
 }
 

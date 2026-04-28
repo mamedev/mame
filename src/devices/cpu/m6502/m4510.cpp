@@ -130,7 +130,7 @@ m4510_device::mi_4510::mi_4510(m4510_device *_base)
 
 uint8_t m4510_device::mi_4510::read(uint16_t adr)
 {
-	uint8_t res = m_program.read_byte(m_base->map(adr));
+	uint8_t res = m_program.read_interruptible(m_base->map(adr));
 	if(adr == 0x0000)
 		res = m_base->dir_r();
 	else if(adr == 0x0001)
@@ -140,7 +140,7 @@ uint8_t m4510_device::mi_4510::read(uint16_t adr)
 
 uint8_t m4510_device::mi_4510::read_sync(uint16_t adr)
 {
-	uint8_t res = m_csprogram.read_byte(m_base->map(adr));
+	uint8_t res = m_csprogram.read_interruptible(m_base->map(adr));
 	if(adr == 0x0000)
 		res = m_base->dir_r();
 	else if(adr == 0x0001)
@@ -150,7 +150,7 @@ uint8_t m4510_device::mi_4510::read_sync(uint16_t adr)
 
 uint8_t m4510_device::mi_4510::read_arg(uint16_t adr)
 {
-	uint8_t res = m_cprogram.read_byte(m_base->map(adr));
+	uint8_t res = m_cprogram.read_interruptible(m_base->map(adr));
 	if(adr == 0x0000)
 		res = m_base->dir_r();
 	else if(adr == 0x0001)
@@ -160,7 +160,7 @@ uint8_t m4510_device::mi_4510::read_arg(uint16_t adr)
 
 void m4510_device::mi_4510::write(uint16_t adr, uint8_t val)
 {
-	m_program.write_byte(m_base->map(adr), val);
+	m_program.write_interruptible(m_base->map(adr), val);
 	if(adr == 0x0000)
 		m_base->dir_w(val);
 	else if(adr == 0x0001)

@@ -93,7 +93,7 @@ void a2sic_device::device_reset()
 u8 a2sic_device::read_c0nx(u8 offset)
 {
 	u8 result = m_switches->read() | m_rs232->rxd_r() << 7;
- 
+
 	// clock A0 into 74LS109 flip-flop (inverted output)
 	if (!machine().side_effects_disabled())
 		m_rs232->write_txd(!BIT(offset, 0));

@@ -700,12 +700,12 @@ void macio_device::codec_w(offs_t offset, uint32_t data)
 	write_codec(offset, data);
 }
 
-u32 macio_device::codec_dma_read(u32 offset)
+u32 macio_device::codec_dma_read(offs_t offset)
 {
 	return m_dma_audio_out->dma_read(offset);
 }
 
-void macio_device::codec_dma_write(u32 offset, u32 data)
+void macio_device::codec_dma_write(offs_t offset, u32 data)
 {
 	m_dma_audio_in->dma_write(offset, data);
 }

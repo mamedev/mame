@@ -35,13 +35,13 @@
 /*
 
     Installing MS-DOS to hard disk
-	------------------------------
+    ------------------------------
 
     $ ./chdman createhd -chs 306,6,17 -ss 512 -o st412.chd
-	$ printf '\x0f%.0s' {1..256} > nvram/mm2m35d/x2212
-	$ ./mame mm2m35d -rs232b terminal -flop1 msdos221 -hard st412.chd
+    $ printf '\x0f%.0s' {1..256} > nvram/mm2m35d/x2212
+    $ ./mame mm2m35d -rs232b terminal -flop1 msdos221 -hard st412.chd
 
-	Select terminal keyboard in input settings
+    Select terminal keyboard in input settings
 
     Monitor:
 
@@ -49,7 +49,7 @@
     A (abort)
     C (continue)
 
-	Select computer keyboard in input settings
+    Select computer keyboard in input settings
 
     DOS:
 
@@ -82,7 +82,7 @@
     TODO:
 
     - keyboard ROM is not dumped
-	- MPSC (DMA and interrupts)
+    - MPSC (DMA and interrupts)
     - CRTC186 video using CRT9007
     - IOE186 card
 

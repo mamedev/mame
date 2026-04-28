@@ -135,7 +135,7 @@ template<typename S> void emu::detail::output_buffer_flat<S>::register_save_stat
 {
 	auto &save = device.machine().save();
 
-	for(unsigned int i=0; i != m_buffer.size(); i++)
+	for(unsigned int i = 0; i != m_buffer.size(); i++)
 		save.save_item(&device, id1, id2, i, NAME(m_buffer[i]));
 
 	save.save_item(&device, id1, id2, 0, NAME(m_sync_sample));
@@ -403,7 +403,7 @@ void sound_stream::register_state()
 
 	m_output_buffer.register_save_state(m_device, "stream.sound_stream.output_buffer", m_state_tag.c_str());
 
-	for(unsigned int i=0; i != m_bw_routes.size(); i++)
+	for(unsigned int i = 0; i != m_bw_routes.size(); i++)
 		save.save_item(&m_device, "stream.sound_stream", m_state_tag.c_str(), i, m_bw_routes[i].m_gain, "route_gain");
 }
 
@@ -520,7 +520,7 @@ bool sound_stream::try_solving_frequency()
 				freq = r.m_source->sample_rate();
 		}
 		m_sample_rate = freq;
-		return true;
+		return freq != 0;
 
 	} else if(output_adaptive() && !input_adaptive()) {
 		u32 freq = 0;
@@ -531,7 +531,7 @@ bool sound_stream::try_solving_frequency()
 				freq = r.m_target->sample_rate();
 		}
 		m_sample_rate = freq;
-		return true;
+		return freq != 0;
 
 	} else {
 		u32 freqbw = 0;
@@ -1086,7 +1086,7 @@ void sound_manager::run_effects()
 
 		// Apply the effects
 		for(auto &si : m_speakers)
-			for(u32 i=0; i != si.m_effects.size(); i++) {
+			for(u32 i = 0; i != si.m_effects.size(); i++) {
 				auto &source = i ? si.m_effects[i-1].m_buffer : si.m_effects_buffer;
 				si.m_effects[i].m_effect->apply(source, si.m_effects[i].m_buffer);
 				source.sync();
@@ -1261,7 +1261,7 @@ sound_manager::speaker_info::speaker_info(speaker_device &dev, u32 rate, u32 fir
 {
 	m_channels = dev.inputs();
 	m_stream = dev.stream();
-	for(u32 i=0; i != audio_effect::COUNT; i++)
+	for(u32 i = 0; i != audio_effect::COUNT; i++)
 		m_effects.emplace_back(rate, dev.inputs());
 }
 

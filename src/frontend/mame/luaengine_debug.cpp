@@ -19,6 +19,8 @@
 #include "debug/textbuf.h"
 #include "debugger.h"
 
+#include <span>
+
 
 namespace {
 
@@ -293,18 +295,7 @@ void lua_engine::initialize_debug(sol::table &emu)
 						maxparams,
 						[this, cb = sol::protected_function(m_lua_state, execute)] (int numparams, u64 const *paramlist) -> u64
 						{
-							// TODO: C++20 will make this obsolete
-							class helper
-							{
-							private:
-								u64 const *b, *e;
-							public:
-								helper(int n, u64 const *p) : b(p), e(p + n) { }
-								auto begin() const { return b; }
-								auto end() const { return e; }
-							};
-
-							auto status(invoke(cb, sol::as_args(helper(numparams, paramlist))));
+							auto status(invoke(cb, sol::as_args(std::span<u64 const>(paramlist, paramlist + numparams))));
 							if (status.valid())
 							{
 								auto result = status.get<std::optional<u64> >();
@@ -339,7 +330,7 @@ void lua_engine::initialize_debug(sol::table &emu)
 			});
 	symbol_table_type.set_function("read_memory", &symbol_table_wrapper::read_memory);
 	symbol_table_type.set_function("write_memory", &symbol_table_wrapper::write_memory);
-	symbol_table_type["entries"] = sol::property([] (symbol_table_wrapper const &st) { return standard_tag_object_ptr_map<symbol_entry>(st.table().entries()); });
+	symbol_table_type["entries"] = sol::property([] (symbol_table_wrapper const &st) { return make_tag_object_ptr_map(st.table().entries()); });
 	symbol_table_type["parent"] = sol::property(&symbol_table_wrapper::parent);
 
 

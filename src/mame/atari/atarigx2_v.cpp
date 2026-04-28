@@ -49,7 +49,6 @@ TILE_GET_INFO_MEMBER(atarigx2_state::get_playfield_tile_info)
 	int const code = (m_playfield_tile_bank << 12) | (data & 0xfff);
 	int const color = (m_playfield_base >> 5) + ((m_playfield_color_bank << 3) & 0x18) + ((data >> 12) & 7);
 	tileinfo.set(0, code, color, BIT(data, 15));
-	tileinfo.category = (m_playfield_color_bank >> 2) & 7;
 }
 
 
@@ -169,14 +168,7 @@ uint32_t atarigx2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	/* draw the playfield */
 	priority_bitmap.fill(0, cliprect);
-	m_playfield_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_playfield_tilemap->draw(screen, bitmap, cliprect, 1, 1);
-	m_playfield_tilemap->draw(screen, bitmap, cliprect, 2, 2);
-	m_playfield_tilemap->draw(screen, bitmap, cliprect, 3, 3);
-	m_playfield_tilemap->draw(screen, bitmap, cliprect, 4, 4);
-	m_playfield_tilemap->draw(screen, bitmap, cliprect, 5, 5);
-	m_playfield_tilemap->draw(screen, bitmap, cliprect, 6, 6);
-	m_playfield_tilemap->draw(screen, bitmap, cliprect, 7, 7);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 0, (m_playfield_color_bank >> 2) & 7);
 
 	/* copy the motion objects on top */
 	{

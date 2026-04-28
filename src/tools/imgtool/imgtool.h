@@ -80,7 +80,7 @@ struct imgtool_partition_features
 
 /* ----- initialization and basics ----- */
 void imgtool_init(bool omit_untested, void (*warning)(const char *message));
-void imgtool_exit(void);
+void imgtool_exit();
 const imgtool_module *imgtool_find_module(const std::string &modulename);
 const imgtool::library::modulelist &imgtool_get_modules();
 imgtool_module_features imgtool_get_module_features(const imgtool_module *module);
@@ -254,7 +254,7 @@ namespace imgtool
 };
 
 /* ----- special ----- */
-bool imgtool_validitychecks(void);
+bool imgtool_validitychecks();
 void unknown_partition_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info);
 
 char *strncpyz(char *dest, const char *source, size_t len);

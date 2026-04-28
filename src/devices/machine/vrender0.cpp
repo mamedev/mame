@@ -429,8 +429,8 @@ void vrender0soc_device::dmac_w(offs_t offset, u32 data, u32 mem_mask)
 	vr0_dma &dma = m_dma[Which];
 	// Control register format: (per DMA controller)
 	// Bit                                     Description
-	// 1111 1111 1111 1111 0000 0000 0000 0000 
-	// fedc ba98 7654 3210 fedc ba98 7654 3210 
+	// 1111 1111 1111 1111 0000 0000 0000 0000
+	// fedc ba98 7654 3210 fedc ba98 7654 3210
 	// xxxx xxxx xxxx xxxx xxxx x--- ---- ---- Reserved
 	// ---- ---- ---- ---- ---- -x-- ---- ---- DMA enable
 	// ---- ---- ---- ---- ---- --x- ---- ---- DMA request active polarity (0: high, 1: low)

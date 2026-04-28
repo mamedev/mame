@@ -154,8 +154,6 @@ public:
 
 	void astropc(machine_config &config);
 
-	void init_astropc();
-
 private:
 	void main_map(address_map &map) ATTR_COLD;
 	void main_io(address_map &map) ATTR_COLD;
@@ -172,10 +170,6 @@ void astropc_state::main_map(address_map &map)
 void astropc_state::main_io(address_map &map)
 {
 }
-
-
-static INPUT_PORTS_START( astropc )
-INPUT_PORTS_END
 
 
 void astropc_state::astropc(machine_config &config)
@@ -456,34 +450,30 @@ ROM_START( santacl )
 ROM_END
 
 
-void astropc_state::init_astropc()
-{
-}
-
 } // anonymous namespace
 
 
 // Pallas games
 
-GAME( 2005,  blackbd,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Black Beard (Russia, set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005?, blackbda, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Black Beard (Russia, set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005,  blackbdb, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Black Beard (Russia, set 3)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005,  blackbdu, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Black Beard (US.00, 2005/03/14)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005,  blackbd,  0,       astropc, 0, astropc_state, empty_init, ROT0, "Astro Corp.", "Black Beard (Russia, set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005?, blackbda, blackbd, astropc, 0, astropc_state, empty_init, ROT0, "Astro Corp.", "Black Beard (Russia, set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005,  blackbdb, blackbd, astropc, 0, astropc_state, empty_init, ROT0, "Astro Corp.", "Black Beard (Russia, set 3)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005,  blackbdu, blackbd, astropc, 0, astropc_state, empty_init, ROT0, "Astro Corp.", "Black Beard (US.00, 2005/03/14)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2005,  dslayrr,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Dragon Slayer (Russia, v15.B, 2005/08/10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2006,  dslayrra, dslayrr, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Dragon Slayer (Russia, v16.B, 2005/11/10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005,  dslayrr,  0,       astropc, 0, astropc_state, empty_init, ROT0, "Astro Corp.", "Dragon Slayer (Russia, v15.B, 2005/08/10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2006,  dslayrra, dslayrr, astropc, 0, astropc_state, empty_init, ROT0, "Astro Corp.", "Dragon Slayer (Russia, v16.B, 2005/11/10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2005,  hwparty,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Halloween Party (US.23.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005,  hwparty,  0,       astropc, 0, astropc_state, empty_init, ROT0, "Astro Corp.", "Halloween Party (US.23.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2004,  hawaii,   0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Hawaii (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2004,  hawaii,   0,       astropc, 0, astropc_state, empty_init, ROT0, "Astro Corp.", "Hawaii (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2005,  oligam,   0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Olympian Games (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005,  oligam,   0,       astropc, 0, astropc_state, empty_init, ROT0, "Astro Corp.", "Olympian Games (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2005,  rasce,    0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Ra's Scepter (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005,  rasce,    0,       astropc, 0, astropc_state, empty_init, ROT0, "Astro Corp.", "Ra's Scepter (Russia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2005,  treasurh, 0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Treasure Hunting (US.09.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005,  treasurh, 0,       astropc, 0, astropc_state, empty_init, ROT0, "Astro Corp.", "Treasure Hunting (US.09.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 // Artemis II games
-GAME( 2009,  carnivac, 0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Carnival (Astro Corp., US.004.D)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2009,  santacl,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Santa Claus (IN.001.07.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2009,  carnivac, 0,       astropc, 0, astropc_state, empty_init, ROT0, "Astro Corp.", "Carnival (Astro Corp., US.004.D)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2009,  santacl,  0,       astropc, 0, astropc_state, empty_init, ROT0, "Astro Corp.", "Santa Claus (IN.001.07.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

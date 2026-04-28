@@ -3184,6 +3184,9 @@ static INPUT_PORTS_START( gamshara )
 	PORT_DIPNAME( 0x7f, 0x7f, DEF_STR( Region ) ) PORT_DIPLOCATION("SW1:8,7,6,5,4,3,2")
 	PORT_DIPSETTING(0x7f, DEF_STR( Japan ) ) // JPN
 	PORT_DIPSETTING(0x6e, DEF_STR( World ) ) // ETC
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:1") // read on boot / restart only, but if turned you can exit through menu selection (6: Exit Test) - using F2 don't allow this option
+	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( startrgn )
@@ -3444,6 +3447,11 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ptblank3 )
 	PORT_INCLUDE(namcos10)
+
+	PORT_MODIFY("SYSTEM")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0fff6f6f, IP_ACTIVE_LOW, IPT_UNUSED )

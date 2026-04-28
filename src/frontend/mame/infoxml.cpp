@@ -1437,26 +1437,13 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 		CTRL_COUNT
 	};
 
-	enum
-	{
-		CTRL_P1,
-		CTRL_P2,
-		CTRL_P3,
-		CTRL_P4,
-		CTRL_P5,
-		CTRL_P6,
-		CTRL_P7,
-		CTRL_P8,
-		CTRL_P9,
-		CTRL_P10,
-		CTRL_PCOUNT
-	};
+	constexpr unsigned CTRL_PCOUNT = 10;
 
 	// directions
-	const uint8_t DIR_UP = 0x01;
-	const uint8_t DIR_DOWN = 0x02;
-	const uint8_t DIR_LEFT = 0x04;
-	const uint8_t DIR_RIGHT = 0x08;
+	constexpr uint8_t DIR_UP = 0x01;
+	constexpr uint8_t DIR_DOWN = 0x02;
+	constexpr uint8_t DIR_LEFT = 0x04;
+	constexpr uint8_t DIR_RIGHT = 0x08;
 
 	// initialize the list of control types
 	struct
@@ -2173,7 +2160,7 @@ void output_slots(std::ostream &out, machine_config &config, device_t &device, c
 					{
 						util::stream_format(out, "\t\t\t<slotoption name=\"%s\"", normalize_string(option.second->name()));
 						util::stream_format(out, " devname=\"%s\"", normalize_string(dev->shortname()));
-						if (slot.default_option() && !strcmp(slot.default_option(), option.second->name()))
+						if (slot.default_option() && (slot.default_option() == option.second->name()))
 							out << " default=\"yes\"";
 						out << "/>\n";
 					}

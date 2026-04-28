@@ -132,8 +132,6 @@ private:
 	pcap_t *m_p;
 #ifdef SDLMAME_MACOSX
 	pthread_t m_thread;
-	uint8_t *pkt;
-	int len;
 	pcap_t *p;
 	uint8_t m_pktbuf[2048];
 
@@ -242,7 +240,7 @@ int pcap_module::netdev_pcap::recv_dev(uint8_t **buf)
 	return ret;
 #else
 	struct pcap_pkthdr *header;
-	return ((*m_module.pcap_next_ex_dl)(m_p, &header, (const u_char **)buf) == 1)?header->len:0;
+	return ((*m_module.pcap_next_ex_dl)(m_p, &header, (const u_char **)buf) == 1) ? header->len : 0;
 #endif
 }
 

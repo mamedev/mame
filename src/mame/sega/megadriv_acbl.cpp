@@ -186,7 +186,7 @@ public:
 	void init_biohzdmb() ATTR_COLD;
 	template <uint32_t Prot_addr> void init_conny_bit6() ATTR_COLD;
 	template <uint32_t Prot_addr> void init_conny_bit7() ATTR_COLD;
-	void init_contrambc() ATTR_COLD;
+	template <uint32_t Prot_addr> void init_bushack() ATTR_COLD;
 	void init_sonic2mb() ATTR_COLD;
 	void init_twinktmb() ATTR_COLD;
 
@@ -1455,9 +1455,10 @@ void md_boot_state::init_conny_bit7()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(Prot_addr, Prot_addr + 1, read16smo_delegate(*this, NAME([] () { return 0x80; })));
 }
 
-void md_boot_state::init_contrambc()
+template <uint32_t Prot_addr>
+void md_boot_state::init_bushack()
 {
-	init_conny_bit7<0x860000>();
+	init_conny_bit7<Prot_addr>();
 
 	// HACK: gross. The game dislikes megadriv_68k_check_z80_bus(), always expecting bit 8 to be 0. Hacked to boot for now.
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa11100, 0xa11101, read16s_delegate(*this, NAME([this] (uint16_t data, uint16_t mem_mask) { return megadriv_68k_check_z80_bus(data, mem_mask) & 0xfeff; })));
@@ -1675,6 +1676,18 @@ ROM_START( barek3mbc )
 	ROM_LOAD16_BYTE( "rom1.bin", 0x200001, 0x080000, CRC(ade4166b) SHA1(c0c6603fea1c09af597084bcf61035339cd6a012) )
 ROM_END
 
+ROM_START( mickeycmb ) // THE GREAT 鴻運鼠 1996
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rom6.bin", 0x000000, 0x080000, CRC(7baaf248) SHA1(3669c0961d82e6eb266f6e91211d4c9acf67493f) )
+	ROM_LOAD16_BYTE( "rom3.bin", 0x000001, 0x080000, CRC(929b37ab) SHA1(9a54224f984efa67ac58aaac013229385027085f) )
+	ROM_LOAD16_BYTE( "rom5.bin", 0x100000, 0x080000, CRC(12cea2a1) SHA1(75a7534bdeec036bcbdd221d946ba6048bf90a01) )
+	ROM_LOAD16_BYTE( "rom2.bin", 0x100001, 0x080000, CRC(98d40da0) SHA1(b95036fd25d782b9f742ef4b7b3a4b99bc656b43) )
+	// the following 2 ROMs were on the PCB but were probably randomly fitted to make the PCB seem complete on pics
+	// they could almost surely be safely removed from the set
+	ROM_LOAD16_BYTE( "rom4.bin", 0x200000, 0x080000, CRC(4e674e04) SHA1(7c46b849f76ffd8fff9d781515f1a88bf12abe2f) ) // program ROM for TOYOMARU SANGYOU (pachinko)
+	ROM_LOAD16_BYTE( "rom1.bin", 0x200001, 0x080000, CRC(444c1236) SHA1(3693f321382a1d4349f1bdfc479a78c4e540f747) ) // some kind of ADPCM ROM
+ROM_END
+
 } // anonymous namespace
 
 /*************************************
@@ -1707,8 +1720,9 @@ GAME( 1994, barek2ch,  0,        md_bootleg,  barek2ch,  md_boot_state,         
 GAME( 1995, biohzdmb,  0,        megadrvb,    biohzdmb,  md_boot_state,         init_biohzdmb, ROT0, "bootleg / Sega",   "Bio-Hazard Battle (scrambled bootleg of Mega Drive version)",                                              0 )
 
 // Conny bootlegs with Mega Drive bootleg chipset marked TA-04, TA-05 and TA-06. 1 DIP switch bank.
-GAME( 1995, contrambc, 0,        megadrvb,    biohzdmb,  md_boot_state,         init_contrambc,            ROT0, "bootleg / Konami",    "Contra (Conny bootleg of Mega Drive version)",                                                    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // doesn't seem to like megadriv_68k_check_z80_bus(), no coins
+GAME( 1995, contrambc, 0,        megadrvb,    biohzdmb,  md_boot_state,         init_bushack<0x860000>,    ROT0, "bootleg / Konami",    "Contra (Conny bootleg of Mega Drive version)",                                                    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // doesn't seem to like megadriv_68k_check_z80_bus(), no coins
 GAME( 1995, sidepmbc,  0,        megadrvb,    biohzdmb,  md_boot_state,         init_conny_bit7<0x8a0000>, ROT0, "bootleg / Data East", "Side Pocket (Conny bootleg of Mega Drive version)",                                               MACHINE_NOT_WORKING ) // no coins
 GAME( 1995, 3in1mbc,   0,        megadrvb,    biohzdmb,  md_boot_state,         init_conny_bit7<0x880000>, ROT0, "bootleg",             "Gunstar Heroes / Snake Rattle n' Roll / Joe & Mac (Conny bootleg of Mega Drive versions)",        MACHINE_NOT_WORKING ) // no coins, no game switching
 GAME( 1995, barek3mbc, 0,        megadrvb,    biohzdmb,  md_boot_state,         init_conny_bit6<0x820000>, ROT0, "bootleg (Sega)",      "Bare Knuckle III (Conny bootleg of Mega Drive version)",                                          MACHINE_NOT_WORKING ) // no coins
+GAME( 1996, mickeycmb, 0,        megadrvb,    biohzdmb,  md_boot_state,         init_bushack<0x8c0000>,    ROT0, "bootleg (Conny)",     "The Great Hongyun Shu 1996 (Conny bootleg of Mega Drive version)",                                MACHINE_NOT_WORKING ) // no coins
 // Samurai Spirits and Kuhga PCBs have also been seen

@@ -1,17 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:Achim
+// thanks-to:Achim, Berger
 /*******************************************************************************
 
-Novag Super System Peripheral: TV Interface
+Novag Super System peripheral: TV Interface
 
 It's a box that connects to a CRT TV, for showing an in-progress chess game.
 
 It's meant to be connected either like: PC -> Distributor -> TV Interface, or
 like: chesscomputer -> Distributor -> TV Interface. But the distributor is only
-for converting to/from RS-232/TTL voltage, so MAME can ignore it.
+for converting to/from RS-232/TTL voltage, so MAME can ignore it. Outging TxD is
+blocked by the distributor.
 
 It expects a baud rate of 9600, 8 data bits, 1 stop bit, no parity.
+
+Known versions:
+- model 896: PAL system - Antenna output (UHF channel 36)
+- model 910: NTSC system - Antenna output (UHF channel 34)
+- model 914: RGBS output via SCART cable (for France; there is no RF output for SECAM)
 
 Hardware notes:
 - PCB label: 100122 REV C
@@ -21,6 +27,7 @@ Hardware notes:
 
 TODO:
 - dump/add English version
+- figure out unknown_w (need TM6310 datasheet)
 - Currently, MAME only has CGA emulation on ISA cards, but this thing is not an
   ISA card, nor compatible with IBM CGA standard. So if MAME ever adds a more
   generic CGA device, use that.
@@ -64,7 +71,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_shared_ptr<u8> m_vram;
 	required_region_ptr<u8> m_cg_rom;
-	required_ioport m_in;
+	required_ioport m_conf;
 
 	u8 m_rx_state = 0;
 
@@ -91,7 +98,7 @@ nss_tvinterface_device::nss_tvinterface_device(const machine_config &mconfig, co
 	m_screen(*this, "screen"),
 	m_vram(*this, "vram"),
 	m_cg_rom(*this, "cg_rom"),
-	m_in(*this, "IN")
+	m_conf(*this, "CONF")
 { }
 
 void nss_tvinterface_device::device_start()
@@ -152,6 +159,7 @@ void nss_tvinterface_device::cga_color_select_w(u8 data)
 
 void nss_tvinterface_device::unknown_w(u8 data)
 {
+	// chip select?
 }
 
 u8 nss_tvinterface_device::p2_r()
@@ -162,15 +170,15 @@ u8 nss_tvinterface_device::p2_r()
 
 void nss_tvinterface_device::p2_w(u8 data)
 {
-	// P24: serial out
-	output_rxd(BIT(~data, 4));
+	// P24: serial out (blocked by default)
+	output_rxd(BIT(data, 4) | BIT(m_conf->read(), 0));
 }
 
 void nss_tvinterface_device::main_map(address_map &map)
 {
 	map(0x8000, 0x87ff).ram().share(m_vram);
 
-	map(0xa3bd, 0xa3bd).portr(m_in);
+	map(0xa3bd, 0xa3bd).portr("IN"); // actually through TM6310
 	map(0xa3be, 0xa3be).w(FUNC(nss_tvinterface_device::unknown_w));
 
 	map(0xa3d0, 0xa3d0).mirror(0x0006).w(m_crtc, FUNC(mc6845_device::address_w));
@@ -190,9 +198,17 @@ void nss_tvinterface_device::main_map(address_map &map)
 
 static INPUT_PORTS_START( nss_tvinterface )
 	PORT_START("IN")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_CONFNAME( 0x08, 0x00, "Video Mode" )
+	PORT_CONFSETTING(    0x00, "NTSC" )
+	PORT_CONFSETTING(    0x08, "PAL" )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_CUSTOM) // hsync position
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Select")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Change")
+
+	PORT_START("CONF")
+	PORT_CONFNAME( 0x01, 0x01, "Serial TxD" )
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 ioport_constructor nss_tvinterface_device::device_input_ports() const
@@ -234,7 +250,13 @@ void nss_tvinterface_device::device_add_mconfig(machine_config &config)
 
 ROM_START(nss_tvinterface)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("tvgr_011091", 0xe000, 0x2000, CRC(0ff64cec) SHA1(d35881111cdf8e85a843e3b085447d07244d8d70) )
+
+	ROM_DEFAULT_BIOS("de")
+	ROM_SYSTEM_BIOS(0, "de", "German")
+	ROM_SYSTEM_BIOS(1, "fr", "French")
+
+	ROMX_LOAD("tvgr_011091",  0xe000, 0x2000, CRC(0ff64cec) SHA1(d35881111cdf8e85a843e3b085447d07244d8d70), ROM_BIOS(0) )
+	ROMX_LOAD("white_27c64a", 0xe000, 0x2000, CRC(3eefa63d) SHA1(2e6e0abb50f5722c81baedfd514d660f9c1c814e), ROM_BIOS(1) ) // no label
 
 	ROM_REGION( 0x2000, "cg_rom", 0 )
 	ROM_LOAD("cg_930", 0x0000, 0x2000, CRC(98287b9d) SHA1(b20d7856e4739bafcd66434adf9881824f8a611b) )

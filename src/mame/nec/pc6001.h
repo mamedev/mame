@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "bus/centronics/ctronics.h"
 #include "bus/nec_fdd/pc80s31k.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
@@ -48,6 +49,8 @@ public:
 		, m_cas_hack(*this, "cas_hack")
 		, m_cart(*this, "cartslot")
 		, m_ay(*this, "aysnd")
+		, m_centronics(*this, "centronics")
+		, m_cent_data_out(*this, "cent_data_out")
 		, m_region_maincpu(*this, "maincpu")
 		, m_region_gfx1(*this, "gfx1")
 		, m_io_mode4_dsw(*this, "MODE4_DSW")
@@ -83,6 +86,8 @@ public:
 	uint8_t joystick_out_r();
 	void joystick_out_w(uint8_t data);
 
+	uint8_t portc0_r();
+
 	void pc6001(machine_config &config);
 protected:
 	required_device<i8255_device> m_ppi;
@@ -95,6 +100,8 @@ protected:
 	optional_device<generic_slot_device> m_cas_hack;
 	required_device<generic_slot_device> m_cart;
 	optional_device<ay8910_device> m_ay;
+	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
 	optional_memory_region m_region_maincpu;
 	required_memory_region m_region_gfx1;
 	required_ioport m_io_mode4_dsw;
@@ -128,6 +135,7 @@ protected:
 	inline void ppi_control_hack_w(uint8_t data);
 	inline void set_timer_divider();
 	inline void set_videoram_bank(uint32_t offs);
+	void write_centronics_busy(int state);
 
 	// video functions
 	void draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr);
@@ -149,6 +157,7 @@ protected:
 	bool m_timer_irq_mask = false;
 	uint8_t m_port_c_8255 = 0;
 	uint8_t m_cur_keycode = 0;
+	uint8_t m_centronics_busy = 0;
 
 private:
 	uint32_t m_old_key1 = 0;

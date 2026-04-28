@@ -266,7 +266,7 @@ sound_wasapi::stream_info::stream_info(
 		uint32_t rate) :
 	m_host(host),
 	m_event(std::move(event)),
-	m_buffer(channels),
+	m_buffer(channels, rate),
 	m_underflow_fill(channels, 0U),
 	m_client(std::move(client)),
 	m_buffer_frames(buffer_frames),

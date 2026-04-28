@@ -28,6 +28,7 @@ DEFINE_DEVICE_TYPE(NAMCO_C169ROZ, namco_c169roz_device, "namco_c169roz", "Namco 
 namco_c169roz_device::namco_c169roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NAMCO_C169ROZ, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
+	m_c169_cb(*this),
 	m_color_base(0),
 	m_is_namcofl(false),
 	m_mask(*this, "mask")
@@ -36,6 +37,8 @@ namco_c169roz_device::namco_c169roz_device(const machine_config &mconfig, const 
 
 void namco_c169roz_device::device_start()
 {
+	m_c169_cb.resolve();
+
 	m_videoram.resize(m_ramsize);
 	std::fill(std::begin(m_videoram), std::end(m_videoram), 0x0000);
 
@@ -70,14 +73,19 @@ void namco_c169roz_device::mark_all_dirty()
 template<int Which>
 TILE_GET_INFO_MEMBER(namco_c169roz_device::get_info)
 {
+	// need to mask with ramsize because the nb1/fl games have twice as much RAM, presumably the tilemaps mirror in ns2?
+	const uint16_t data = m_videoram[tile_index & (m_ramsize - 1)] & 0x3fff;
 	int tile = 0, mask = 0;
-	m_c169_cb(m_videoram[tile_index & (m_ramsize - 1)] & 0x3fff, tile, mask, Which); // need to mask with ramsize because the nb1/fl games have twice as much RAM, presumably the tilemaps mirror in ns2?
+	if (m_c169_cb.isnull())
+		tile = mask = data;
+	else
+		m_c169_cb(data, tile, mask, Which);
 
 	tileinfo.mask_data = m_mask + 32 * mask;
 	tileinfo.set(0, tile, 0/*color*/, 0/*flag*/);
 }
 
-TILEMAP_MAPPER_MEMBER( namco_c169roz_device::mapper )
+TILEMAP_MAPPER_MEMBER(namco_c169roz_device::mapper)
 {
 	return ((col & 0x80) << 8) | ((row & 0xff) << 7) | (col & 0x7f);
 }

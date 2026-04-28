@@ -207,12 +207,12 @@ void mmodular_state::set_sbtype(ioport_value newval)
 u8 mmodular_state::spawn_cb(offs_t offset)
 {
 	// ignore jokers
-	return (!m_board->get()->is_inductive() && offset > 12) ? 0 : offset;
+	return (!m_board->get()->inductive() && offset > 12) ? 0 : offset;
 }
 
 void mmodular_state::bavaria_w(u8 data)
 {
-	if (!m_board->get()->is_inductive())
+	if (!m_board->get()->inductive())
 		return;
 
 	// d0-d5: select square
@@ -226,7 +226,7 @@ void mmodular_state::bavaria_w(u8 data)
 
 u8 mmodular_state::bavaria1_r()
 {
-	if (!m_board->get()->is_inductive())
+	if (!m_board->get()->inductive())
 		return 0;
 
 	// d0-d3: piece id
@@ -242,7 +242,7 @@ u8 mmodular_state::bavaria1_r()
 
 u8 mmodular_state::bavaria2_r()
 {
-	if (!m_board->get()->is_inductive())
+	if (!m_board->get()->inductive())
 		return 0;
 
 	// d7: busy signal

@@ -829,7 +829,7 @@ static imgtoolerr_t os9_diskimage_create(imgtool::image &img, imgtool::stream::p
 	header[0x1F] = 1 + allocation_bitmap_lsns;
 	header[0x20] = 0xAE;
 	header[0x3F] = 1 + allocation_bitmap_lsns;
-	err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 2 + allocation_bitmap_lsns, 0, &header[0], sector_bytes, 0);   /* TOOD: pass ddam argument from imgtool */
+	err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 2 + allocation_bitmap_lsns, 0, &header[0], sector_bytes, 0);   /* TODO: pass ddam argument from imgtool */
 	if (err)
 		goto done;
 

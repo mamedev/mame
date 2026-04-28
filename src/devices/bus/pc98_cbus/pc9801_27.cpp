@@ -35,7 +35,7 @@ NOTES:
 #define LOG_STATE (1U << 1) // SASI state flags
 
 #define VERBOSE (LOG_GENERAL)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 

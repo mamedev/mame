@@ -1715,12 +1715,12 @@ void floppy_image_format_t::get_geometry_mfm_pc(const floppy_image &image, int c
 }
 
 
-void floppy_image_format_t::get_track_data_mfm_pc(int track, int head, const floppy_image &image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata)
+void floppy_image_format_t::get_track_data_mfm_pc_sectors(int track, int head, const floppy_image &image, int cell_size, int sector_size, int start_sector, int end_sector, uint8_t *sectdata)
 {
 	auto bitstream = generate_bitstream_from_track(track, head, cell_size, image);
 	auto sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
-	for(int sector=1; sector <= sector_count; sector++) {
-		uint8_t *sd = sectdata + (sector-1)*sector_size;
+	for(int sector = start_sector; sector <= end_sector; sector++) {
+		uint8_t *sd = sectdata + (sector - start_sector) * sector_size;
 		if(sector < sectors.size() && !sectors[sector].empty()) {
 			unsigned int asize = sectors[sector].size();
 			if(asize > sector_size)
@@ -1733,6 +1733,10 @@ void floppy_image_format_t::get_track_data_mfm_pc(int track, int head, const flo
 	}
 }
 
+void floppy_image_format_t::get_track_data_mfm_pc(int track, int head, const floppy_image &image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata)
+{
+	get_track_data_mfm_pc_sectors(track, head, image, cell_size, sector_size, 1, sector_count, sectdata);
+}
 
 std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bitstream_fm_pc(const std::vector<bool> &bitstream)
 {

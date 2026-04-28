@@ -1520,7 +1520,7 @@ void apple2e_state::accel_full_speed()
 
 void apple2e_state::accel_normal_speed()
 {
-	m_maincpu->set_unscaled_clock(1021800, true); // re-align to PH0
+	m_maincpu->set_unscaled_clock(m_pal ? 1016966 : 1021800, true); // re-align to PH0
 }
 
 void apple2e_state::accel_slot(int slot)
@@ -3315,118 +3315,18 @@ void apple2e_state::lc_w(offs_t offset, u8 data)
 	}
 }
 
-// floating bus code from old machine/apple2: now works reasonably well with French Touch and Deater "vapor lock" stuff
 u8 apple2e_state::read_floatingbus()
 {
-	enum
-	{
-		// scanner constants
-		kHBurstClock      =    53, // clock when Color Burst starts
-		kHBurstClocks     =     4, // clocks per Color Burst duration
-		kHClock0State     =  0x18, // H[543210] = 011000
-		kHClocks          =    65, // clocks per horizontal scan (including HBL)
-		kHPEClock         =    40, // clock when HPE (horizontal preset enable) goes low
-		kHPresetClock     =    41, // clock when H state presets
-		kHSyncClock       =    49, // clock when HSync starts
-		kHSyncClocks      =     4, // clocks per HSync duration
-		kNTSCScanLines    =   262, // total scan lines including VBL (NTSC)
-		kNTSCVSyncLine    =   224, // line when VSync starts (NTSC)
-		kPALScanLines     =   312, // total scan lines including VBL (PAL)
-		kPALVSyncLine     =   264, // line when VSync starts (PAL)
-		kVLine0State      = 0x100, // V[543210CBA] = 100000000
-		kVPresetLine      =   256, // line when V state presets
-		kVSyncLines       =     4, // lines per VSync duration
-	};
+	int h_clock = m_screen->hpos() / 14 + 25; // adjust for set_raw
+	if (h_clock >= 65)
+		h_clock -= 65;
 
-	const int kClocksPerVSync = kHClocks * (m_pal ? kPALScanLines : kNTSCScanLines);
+	int v_clock = m_screen->vpos() + (h_clock < 25); // adjust for hpos wrap
+	if (v_clock >= m_screen->height())
+		v_clock -= m_screen->height();
 
-	// vars
-	//
-	int i, Hires, Mixed, Page2, _80Store, ScanLines, /* VSyncLine, ScanCycles,*/
-		h_clock, h_state, h_0, h_1, h_2, h_3, h_4, h_5,
-		v_line, v_state, v_A, v_B, v_C, v_0, v_1, v_2, v_3, v_4, /* v_5, */
-		_hires, addend0, addend1, addend2, sum, address;
-
-	// video scanner data
-	//
-	i = m_maincpu->total_cycles() % kClocksPerVSync; // cycles into this VSync
-
-	// machine state switches
-	//
-	Hires = (m_video->get_hires() && m_video->get_graphics()) ? 1 : 0;
-	Mixed = m_video->get_mix() ? 1 : 0;
-	Page2 = m_video->get_page2() ? 1 : 0;
-	_80Store = m_video->get_80store() ? 1 : 0;
-
-	// calculate video parameters according to display standard
-	// we call this "PAL", but it's also for SECAM
-	ScanLines  = m_pal ? kPALScanLines : kNTSCScanLines;
-
-	// calculate horizontal scanning state
-	h_clock = (i + 63) % kHClocks; // which horizontal scanning clock
-	h_state = kHClock0State + h_clock; // H state bits
-	if (h_clock >= kHPresetClock) // check for horizontal preset
-	{
-		h_state -= 1; // correct for state preset (two 0 states)
-	}
-	h_0 = (h_state >> 0) & 1; // get horizontal state bits
-	h_1 = (h_state >> 1) & 1;
-	h_2 = (h_state >> 2) & 1;
-	h_3 = (h_state >> 3) & 1;
-	h_4 = (h_state >> 4) & 1;
-	h_5 = (h_state >> 5) & 1;
-
-	// calculate vertical scanning state
-	//
-	v_line  = (i / kHClocks) + 192; // which vertical scanning line (MAME starts at blank, not the beginning of the scanning area)
-	v_state = kVLine0State + v_line; // V state bits
-	if ((v_line >= kVPresetLine)) // check for previous vertical state preset
-	{
-		v_state -= ScanLines; // compensate for preset
-	}
-	v_A = (v_state >> 0) & 1; // get vertical state bits
-	v_B = (v_state >> 1) & 1;
-	v_C = (v_state >> 2) & 1;
-	v_0 = (v_state >> 3) & 1;
-	v_1 = (v_state >> 4) & 1;
-	v_2 = (v_state >> 5) & 1;
-	v_3 = (v_state >> 6) & 1;
-	v_4 = (v_state >> 7) & 1;
-	//v_5 = (v_state >> 8) & 1;
-
-	// calculate scanning memory address
-	//
-	_hires = Hires;
-	if (Hires && Mixed && (v_4 & v_2))
-	{
-		_hires = 0; // (address is in text memory)
-	}
-
-	addend0 = 0x68; // 1            1            0            1
-	addend1 =              (h_5 << 5) | (h_4 << 4) | (h_3 << 3);
-	addend2 = (v_4 << 6) | (v_3 << 5) | (v_4 << 4) | (v_3 << 3);
-	sum     = (addend0 + addend1 + addend2) & (0x0F << 3);
-
-	address = 0;
-	address |= h_0 << 0; // a0
-	address |= h_1 << 1; // a1
-	address |= h_2 << 2; // a2
-	address |= sum;      // a3 - aa6
-	address |= v_0 << 7; // a7
-	address |= v_1 << 8; // a8
-	address |= v_2 << 9; // a9
-	address |= ((_hires) ? v_A : (1 ^ (Page2 & (1 ^ _80Store)))) << 10; // a10
-	address |= ((_hires) ? v_B : (Page2 & (1 ^ _80Store))) << 11; // a11
-	if (_hires) // hires?
-	{
-		// Y: insert hires only address bits
-		//
-		address |= v_C << 12; // a12
-		address |= (1 ^ (Page2 & (1 ^ _80Store))) << 13; // a13
-		address |= (Page2 & (1 ^ _80Store)) << 14; // a14
-	}
-
-	return m_ram_ptr[address % m_ram_size];
+	const u16 address = m_video->scanner_address(h_clock, v_clock);
+	return m_ram_ptr[address];
 }
 
 /***************************************************************************
@@ -5041,6 +4941,7 @@ void apple2e_state::apple2e_common(machine_config &config, bool enhanced, bool r
 	{
 		APPLE2_VIDEO_COMPOSITE(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 	}
+	m_video->set_base_model(a2_video_device::model::IIE);
 
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 

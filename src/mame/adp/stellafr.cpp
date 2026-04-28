@@ -92,6 +92,7 @@ Connectors:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
+#include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -203,8 +204,8 @@ public:
 		m_in0(*this, "IN0")
 	{ }
 
-	void stellafr(machine_config &config);
-
+	void sus_tk(machine_config &config);
+	void sus_rtc(machine_config &config);
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -235,7 +236,8 @@ private:
 	void ay8910_portb_w(uint8_t data);
 	void lamps_w(uint8_t row, uint16_t data);
 
-	void mem_map(address_map &map) ATTR_COLD;
+	void mem_map_tk(address_map &map) ATTR_COLD;
+	void mem_map_rtc(address_map &map) ATTR_COLD;
 	void fc7_map(address_map &map) ATTR_COLD;
 
 };
@@ -334,7 +336,7 @@ void stellafr_state::ay8910_portb_w(uint8_t data)
 {
 }
 
-void stellafr_state::mem_map(address_map &map)
+void stellafr_state::mem_map_tk(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	// controlled by U17 74HC138
@@ -348,6 +350,23 @@ void stellafr_state::mem_map(address_map &map)
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff); // Y6
 	// Y7 NC
 	map(0xff0000, 0xffffff).ram().share("nvram");
+}
+
+void stellafr_state::mem_map_rtc(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x400000, 0x40001f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
+	// controlled by U17 74HC138
+	map(0x800001, 0x800001).w(m_dac, FUNC(dac_byte_interface::data_w)); // Y0
+	// Y1 device on cpu board
+	// Y2 device on cpu board
+	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::mux2_w)); // Y3 SP/ME II out
+	map(0x800100, 0x800101).rw(FUNC(stellafr_state::mux_r), FUNC(stellafr_state::mux_w)); // Y4 SP/ME I out / Inputs
+	map(0x800141, 0x800141).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)); // Y5
+	map(0x800143, 0x800143).w("aysnd", FUNC(ay8910_device::data_w)); // Y5
+	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff); // Y6
+	// Y7 NC
+	map(0xfc0000, 0xffffff).ram().share("nvram");
 }
 
 void stellafr_state::fc7_map(address_map &map)
@@ -378,10 +397,10 @@ static INPUT_PORTS_START( stellafr )
 INPUT_PORTS_END
 
 
-void stellafr_state::stellafr(machine_config &config)
+void stellafr_state::sus_tk(machine_config &config)
 {
-	M68000(config, m_maincpu, 10'000'000 ); //?
-	m_maincpu->set_addrmap(AS_PROGRAM, &stellafr_state::mem_map);
+	M68000(config, m_maincpu, 8'000'000 ); //?
+	m_maincpu->set_addrmap(AS_PROGRAM, &stellafr_state::mem_map_tk);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &stellafr_state::fc7_map);
 
 	MC68681(config, m_duart, 3'686'400);
@@ -389,6 +408,29 @@ void stellafr_state::stellafr(machine_config &config)
 	m_duart->outport_cb().set(FUNC(stellafr_state::duart_output_w));
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
+
+	AD7224(config, m_dac, 0);
+
+	SPEAKER(config, "mono").front_center();
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1'000'000));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.85);
+	aysnd.port_a_read_callback().set_ioport("IN0");
+	aysnd.port_b_write_callback().set(FUNC(stellafr_state::ay8910_portb_w));
+}
+
+void stellafr_state::sus_rtc(machine_config &config)
+{
+	M68000(config, m_maincpu, 12'000'000 ); //?
+	m_maincpu->set_addrmap(AS_PROGRAM, &stellafr_state::mem_map_rtc);
+	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &stellafr_state::fc7_map);
+
+	MC68681(config, m_duart, 3'686'400);
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2); // ?
+	m_duart->outport_cb().set(FUNC(stellafr_state::duart_output_w));
+
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
+
+	MSM6242(config, "rtc", XTAL(32'768));
 
 	AD7224(config, m_dac, 0);
 
@@ -418,9 +460,9 @@ ROM_START( bigjkpot )
 ROM_END
 
 ROM_START( bigwinnr )
-    ROM_REGION(0x100000, "maincpu", 0)
-    ROM_LOAD16_BYTE("big_winner_f1_1_m27c1001.u2", 0x00000, 0x20000, CRC(3abc347b) SHA1(7f6c570cecdab8e7db070c744b9222f725c7af66))
-    ROM_LOAD16_BYTE("big_winner_f1_2_m27c1001.u6", 0x00001, 0x20000, CRC(7c4f8a70) SHA1(da797544f897ce8ebbc4c3c5277a6fe83c274a9a))
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD16_BYTE("big_winner_f1_1_m27c1001.u2", 0x00000, 0x20000, CRC(3abc347b) SHA1(7f6c570cecdab8e7db070c744b9222f725c7af66))
+	ROM_LOAD16_BYTE("big_winner_f1_2_m27c1001.u6", 0x00001, 0x20000, CRC(7c4f8a70) SHA1(da797544f897ce8ebbc4c3c5277a6fe83c274a9a))
 ROM_END
 
 ROM_START( disc4000 )
@@ -454,9 +496,15 @@ ROM_START( dscjkpot )
 ROM_END
 
 ROM_START( gjubil )
-    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD16_BYTE( "m27c1001_goldenjubilar_f1_1.u2", 0x00000, 0x20000, CRC(5babe5f7) SHA1(75e99203e86c8977fe8363c17dab8324133fe0a8) )
-    ROM_LOAD16_BYTE( "m27c1001_goldenjubilar_f1_2.u6", 0x00001, 0x20000, CRC(25b8691f) SHA1(f28cd4523b387880175b66ee71276f977293b06d) )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "m27c1001_goldenjubilar_f1_1.u2", 0x00000, 0x20000, CRC(5babe5f7) SHA1(75e99203e86c8977fe8363c17dab8324133fe0a8) )
+	ROM_LOAD16_BYTE( "m27c1001_goldenjubilar_f1_2.u6", 0x00001, 0x20000, CRC(25b8691f) SHA1(f28cd4523b387880175b66ee71276f977293b06d) )
+ROM_END
+
+ROM_START( glksstrn )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "glucksstern.u2", 0x00000, 0x20000, CRC(8e969bae) SHA1(bf66d491932b77dab4c6b15ec7fbf470223636ac) )
+	ROM_LOAD16_BYTE( "glucksstern.u6", 0x00001, 0x20000, CRC(f31b860a) SHA1(7b016bb7d0699cfe7165c0abb2c1bbcb944cdc86) )
 ROM_END
 
 ROM_START( grandhnd )
@@ -466,15 +514,15 @@ ROM_START( grandhnd )
 ROM_END
 
 ROM_START( grnada )
-    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD16_BYTE( "m27c1001_granada_f1.u2", 0x00000, 0x20000, CRC(45d080b8) SHA1(1543ee5bb3f0d490744d0d0df852914797902198) )
-    ROM_LOAD16_BYTE( "m27c1001_granada_f1.u6", 0x00001, 0x20000, CRC(8016fc9b) SHA1(3c438701bdb221ab373f3356d95911d8a6568d9a) )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "m27c1001_granada_f1.u2", 0x00000, 0x20000, CRC(45d080b8) SHA1(1543ee5bb3f0d490744d0d0df852914797902198) )
+	ROM_LOAD16_BYTE( "m27c1001_granada_f1.u6", 0x00001, 0x20000, CRC(8016fc9b) SHA1(3c438701bdb221ab373f3356d95911d8a6568d9a) )
 ROM_END
 
 ROM_START( jack4000 )
-    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD16_BYTE( "m27c512_jackpot4000_f2_1.u2", 0x00000, 0x10000, CRC(5abc4d8c) SHA1(87ca16fd23724629b7882068475fe0d479f885bd) )
-    ROM_LOAD16_BYTE( "m27c512_jackpot4000_f2_2.u6", 0x00001, 0x10000, CRC(efcb85e4) SHA1(b6de892cf097fd027a3d7c4bf2d00912fe3e97aa) )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "m27c512_jackpot4000_f2_1.u2", 0x00000, 0x10000, CRC(5abc4d8c) SHA1(87ca16fd23724629b7882068475fe0d479f885bd) )
+	ROM_LOAD16_BYTE( "m27c512_jackpot4000_f2_2.u6", 0x00001, 0x10000, CRC(efcb85e4) SHA1(b6de892cf097fd027a3d7c4bf2d00912fe3e97aa) )
 ROM_END
 
 ROM_START( jkrpoker )
@@ -526,9 +574,9 @@ ROM_START( mdouble )
 ROM_END
 
 ROM_START( moneyf1 )
-    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD16_BYTE( "m27c1001_money_f1_ic1", 0x00000, 0x20000, CRC(5ca79bfa) SHA1(c52b7d2ecd649ccde3457bc922ad05e734fba862) )
-    ROM_LOAD16_BYTE( "m27c1001_money_f1_ic2", 0x00001, 0x20000, CRC(ad95ffc4) SHA1(1062be41a3822efd1d4c848c8ec50488dde42a78) )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "m27c1001_money_f1_ic1", 0x00000, 0x20000, CRC(5ca79bfa) SHA1(c52b7d2ecd649ccde3457bc922ad05e734fba862) )
+	ROM_LOAD16_BYTE( "m27c1001_money_f1_ic2", 0x00001, 0x20000, CRC(ad95ffc4) SHA1(1062be41a3822efd1d4c848c8ec50488dde42a78) )
 ROM_END
 
 ROM_START( multmult )
@@ -541,33 +589,33 @@ ROM_START( multmult )
 ROM_END
 
 ROM_START( multprim )
-    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD16_BYTE( "m27c1001_multi_prima_f1_i.u2", 0x00000, 0x20000, CRC(b873f300) SHA1(4c605ea6337ab3c8eed818b23a9d9979a5047750) )
-    ROM_LOAD16_BYTE( "m27c1001_multi_prima_f1_ii.u6", 0x00001, 0x20000, CRC(2a4e371c) SHA1(02494cab0ff7e4c169383a335169edf76501ed1a) )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "m27c1001_multi_prima_f1_i.u2", 0x00000, 0x20000, CRC(b873f300) SHA1(4c605ea6337ab3c8eed818b23a9d9979a5047750) )
+	ROM_LOAD16_BYTE( "m27c1001_multi_prima_f1_ii.u6", 0x00001, 0x20000, CRC(2a4e371c) SHA1(02494cab0ff7e4c169383a335169edf76501ed1a) )
 ROM_END
 
 ROM_START( multstar )
-    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD16_BYTE( "multi_star_f2_pr_1.u2", 0x00000, 0x20000, CRC(8f63fd16) SHA1(d9b8ef2e1f7616bc0569768af26794fa6166cc0d) )
-    ROM_LOAD16_BYTE( "multi_star_f2_pr_2.u6", 0x00001, 0x20000, CRC(26952bd7) SHA1(20de0d890a91e728776278fb9c8d6de3b65f8703) )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "multi_star_f2_pr_1.u2", 0x00000, 0x20000, CRC(8f63fd16) SHA1(d9b8ef2e1f7616bc0569768af26794fa6166cc0d) )
+	ROM_LOAD16_BYTE( "multi_star_f2_pr_2.u6", 0x00001, 0x20000, CRC(26952bd7) SHA1(20de0d890a91e728776278fb9c8d6de3b65f8703) )
 ROM_END
 
 ROM_START( mystjack )
-    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD16_BYTE( "mystery_jackpot_f4_i.u2", 0x00000, 0x80000, CRC(4ff3ddd7) SHA1(6765628c4858ba78898bad5d3aed6e2e8e651264) )
-    ROM_LOAD16_BYTE( "mystery_jackpot_f4_ii.u6", 0x00001, 0x80000, CRC(96523e1a) SHA1(4f53b454790dab4ce45b1db78bd033c40ce47179) )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "mystery_jackpot_f4_i.u2", 0x00000, 0x80000, CRC(4ff3ddd7) SHA1(6765628c4858ba78898bad5d3aed6e2e8e651264) )
+	ROM_LOAD16_BYTE( "mystery_jackpot_f4_ii.u6", 0x00001, 0x80000, CRC(96523e1a) SHA1(4f53b454790dab4ce45b1db78bd033c40ce47179) )
 ROM_END
 
 ROM_START( nunran )
-    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD16_BYTE( "nun_ran_f1_nr1.u2", 0x00000, 0x20000, CRC(d8eed6de) SHA1(937cf33694a3d3baf1cc0577cef6974e1d99a6c4) )
-    ROM_LOAD16_BYTE( "nun_ran_f1_nr2.u6", 0x00001, 0x20000, CRC(2a7b9cf2) SHA1(bf30d41dd75b4d316f2f24d11886126484b10415) )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "nun_ran_f1_nr1.u2", 0x00000, 0x20000, CRC(d8eed6de) SHA1(937cf33694a3d3baf1cc0577cef6974e1d99a6c4) )
+	ROM_LOAD16_BYTE( "nun_ran_f1_nr2.u6", 0x00001, 0x20000, CRC(2a7b9cf2) SHA1(bf30d41dd75b4d316f2f24d11886126484b10415) )
 ROM_END
 
 ROM_START( suprdisc )
-    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD16_BYTE( "super_disc_f2_pr1.bin", 0x00000, 0x10000, CRC(0e3d67f9) SHA1(19e081ac8e3f0d8d16f67be032ebc788dcb53b26) )
-    ROM_LOAD16_BYTE( "super_disc_f2_pr2.bin", 0x00001, 0x10000, CRC(f5c5f6a4) SHA1(9a19dc12027e1b26160fa20cbd53f96ecd679576) )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "super_disc_f2_pr1.bin", 0x00000, 0x10000, CRC(0e3d67f9) SHA1(19e081ac8e3f0d8d16f67be032ebc788dcb53b26) )
+	ROM_LOAD16_BYTE( "super_disc_f2_pr2.bin", 0x00001, 0x10000, CRC(f5c5f6a4) SHA1(9a19dc12027e1b26160fa20cbd53f96ecd679576) )
 ROM_END
 
 ROM_START( st_ohla )
@@ -602,36 +650,37 @@ ROM_END
 
 } // anonymous namespace
 
-GAMEL(1993, action,   0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Action",                MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1993, disc4000, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Disc 4000",             MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1993, jack4000, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Jackpot 4000",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1993, jumbo400, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Jumbo 400",             MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1994, dscbonus, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Disc Bonus",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1994, grandhnd, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Grand Hand",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1994, jmbojmbo, jmbojmbf, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Jumbo Jumbo",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1994, mdouble,  0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Double",                MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1994, st_vulkn, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Vulkan",                MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1994, suprdisc, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Super Disc",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1995, multmult, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Multi Multi",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1995, dscjkpot, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Disc Jackpot",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1995, sunny,    0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Sunny",                 MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1996, bigjkpot, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Big Jackpot",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1994, jmbojmbf, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Jumbo Jumbo Fun",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1996, discfun,  0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Disc Fun",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1996, multstar, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Multi Star",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1996, st_ohla,  0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Oh La La",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1997, dpplson,  0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Doppel-Sonne",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1997, gjubil,   0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Golden Jubilar",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1997, jkrpoker, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Joker Poker (Merkur)",  MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1997, jumboa,   0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Jumbo Action",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1997, kometf1,  0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Komet",                 MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1997, moneyf1,  0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Money",                 MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1997, multprim, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Multi Prima",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1997, mystjack, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Mystery Jackpot",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1997, nunran,   0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Nun Ran",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1998, allfred,  0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Allfred",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1998, grnada,   0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Granada",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1998, taipan,   0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Nova",   "Tai Pan Money",         MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1998, bigwinnr, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Nova",   "Big Winner",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(2001, kleoptra, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Asterix und Kleopatra", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(2001, turbosun, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Turbo Sunny",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1993, action,   0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Action",                MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1993, disc4000, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Disc 4000",             MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1993, jack4000, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Jackpot 4000",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1993, jumbo400, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Jumbo 400",             MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1994, dscbonus, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Disc Bonus",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1994, grandhnd, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Grand Hand",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1994, jmbojmbo, jmbojmbf, sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Jumbo Jumbo",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1994, mdouble,  0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Double",                MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1994, st_vulkn, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Vulkan",                MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1994, suprdisc, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Super Disc",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1995, multmult, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Multi Multi",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1995, dscjkpot, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Disc Jackpot",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1995, sunny,    0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Sunny",                 MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1996, bigjkpot, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Big Jackpot",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1994, jmbojmbf, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Jumbo Jumbo Fun",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1996, discfun,  0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Disc Fun",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1996, multstar, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Multi Star",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1996, st_ohla,  0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Oh La La",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1997, dpplson,  0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Doppel-Sonne",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1997, gjubil,   0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Golden Jubilar",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1997, jkrpoker, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Joker Poker (Merkur)",  MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1997, jumboa,   0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Jumbo Action",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1997, kometf1,  0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Komet",                 MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1997, moneyf1,  0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Money",                 MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1997, multprim, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Multi Prima",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1997, mystjack, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Mystery Jackpot",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1997, nunran,   0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Nun Ran",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1998, allfred,  0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Allfred",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1998, glksstrn, 0,  		sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    u8"Glücks-Stern",    	   MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1998, grnada,   0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Granada",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1998, taipan,   0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Nova",   "Tai Pan Money",         MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1998, bigwinnr, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Nova",   "Big Winner",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(2001, kleoptra, 0,        sus_rtc, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Asterix und Kleopatra", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(2001, turbosun, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Turbo Sunny",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )

@@ -254,7 +254,7 @@ protected:
 	pci_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	uint32_t config_address_r();
-	void config_address_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	virtual void config_address_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t config_data_r(offs_t offset, uint32_t mem_mask = ~0);
 	void config_data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t config_data_ex_r(offs_t offset, uint32_t mem_mask = ~0);

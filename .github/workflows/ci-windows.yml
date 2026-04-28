@@ -29,16 +29,17 @@ jobs:
         include:
           - compiler: gcc-x64
             os: windows-latest
-            msys: MINGW64
-            slug: mingw-w64-x86_64
+            msys: UCRT64
+            slug: mingw-w64-ucrt-x86_64
             cc: gcc
             cxx: g++
             subtarget: mame
             executable: mame
           - compiler: clang-x64
             os: windows-latest
-            msys: MINGW64
-            slug: mingw-w64-x86_64
+            msys: CLANG64
+            slug: mingw-w64-clang-x86_64
+            extrapkg: mingw-w64-clang-x86_64-gcc-compat
             cc: clang
             cxx: clang++
             subtarget: tiny

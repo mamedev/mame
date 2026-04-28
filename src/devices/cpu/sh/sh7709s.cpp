@@ -96,13 +96,13 @@ bool sh7709s_device::cache_access(uint32_t address, bool write)
 			// If the entry is already the latest in the LRU no need to update anything else
 			if (entry->lru != SH7709S_CACHE_ASSOCIATIVITY - 1)
 			{
-				entry->lru = SH7709S_CACHE_ASSOCIATIVITY - 1;
 				for (int j = 0; j < SH7709S_CACHE_ASSOCIATIVITY; j++)
 				{
 					struct sh7709s_cache_entry* update_entry = &m_cache[cache_block][j];
-					if (i != j && update_entry->lru != 0)
+					if (update_entry->lru > entry->lru)
 						update_entry->lru--;
 				}
+				entry->lru = SH7709S_CACHE_ASSOCIATIVITY - 1;
 			}
 			return true;
 		}

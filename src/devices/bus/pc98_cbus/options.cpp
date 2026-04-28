@@ -16,6 +16,7 @@
 #include "pc9801_55.h"
 #include "pc9801_86.h"
 #include "pc9801_118.h"
+#include "pcfxga.h"
 #include "mif201.h"
 #include "mpu_pc98.h"
 #include "sb16_ct2720.h"
@@ -73,6 +74,9 @@ void pc98_cbus_devices(device_slot_interface &device)
 
 	// Ethernet
 	device.option_add("lgy98", LGY98);
+
+	// Systems on card
+	device.option_add("pcfxga", PCFXGA_CBUS);
 
 	// internal sound options
 	device.option_add_internal("sound_pc9821ce",  SOUND_PC9821CE);

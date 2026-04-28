@@ -8,9 +8,9 @@ Compiling MAME
 All Platforms
 -------------
 
-* To compile MAME, you need a C++17 compiler and runtime library.  We
-  support building with GCC version 10.3 or later and clang version 11
-  or later.  MAME should run with GNU libstdc++ version 10.3 or later or
+* To compile MAME, you need a C++20 compiler and runtime library.  We
+  support building with GCC version 11 or later and clang version 13 or
+  later.  MAME should run with GNU libstdc++ version 11 or later or
   libc++ version 11 or later.  The initial release of any major version
   of GCC should be avoided.  For example, if you want to compile MAME
   with GCC 12, you should use version 12.1 or later.
@@ -83,17 +83,11 @@ sources in parallel::
 Microsoft Windows
 -----------------
 
-MAME for Windows is built using the MSYS2 environment.  You will need Windows 7
-or later and a reasonably up-to-date MSYS2 installation.  We strongly recommend
-building MAME on a 64-bit system.  Instructions may need to be adjusted for
-32-bit systems.  Building for 64-bit ARM (AArch64) requires a 64-bit ARM system
+MAME for Windows is built using the MSYS2 environment.  You will need a 64-bit
+version of Windows 10 1809 or later and a reasonably up-to-date MSYS2
+installation.  Building for 64-bit ARM (AArch64) requires a 64-bit ARM system
 running Windows 11 or later.
 
-* A pre-packaged MSYS2 installation including the prerequisites for building
-  MAME for 64-bit x86-64 can be downloaded from the `MAME Build Tools
-  <http://mamedev.org/tools/>`_ page.
-* After initial installation, you can update the MSYS2 environment using the
-  **pacman** (Arch package manage) command.
 * By default, MAME will be built using native Windows OS interfaces for
   window management, audio/video output, font rendering, etc.  If you want to
   use the portable SDL (Simple DirectMedia Layer) interfaces instead, you can
@@ -102,39 +96,21 @@ running Windows 11 or later.
   will need to install the MSYS2 packages for SDL 2 version 2.0.14 or later.
 * By default, MAME will include the native Windows debugger.  To also include
   the portable Qt debugger, add **USE_QTDEBUG=1** to the make options.  You
-  will need to install the MSYS2 packages for Qt 5.
+  will need to install the MSYS2 packages for Qt 6.
 
 Using a standard MSYS2 installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You may also build MAME using a standard MSYS2 installation and adding the tools
-needed for building MAME.  These instructions assume you have some familiarity
-with MSYS2 and the **pacman** package manager.
+MAME is built for Windows using a standard MSYS2 installation with additional
+packages installed to provide the development tools needed for building MAME.
+These instructions assume you have some familiarity with MSYS2 and the
+**pacman** package manager.
 
 * Install the MSYS2 environment from  the `MSYS2 homepage
   <https://www.msys2.org/>`_.
-* Download the latest version of the ``mame-essentials`` package from the
-  `MAME package repository <https://repo.mamedev.org/x86_64/>`_ and install it
-  using the **pacman** command.
-* Add the ``mame`` package repository to ``/etc/pacman.conf`` using
-  ``/etc/pacman.d/mirrorlist.mame`` for locations, and disable signature
-  verification for this repository (``SigLevel = Never``).
 * Install packages necessary to build MAME.  At the very least, you’ll need
-  ``bash``, ``git``, ``make``.
+  ``bash``, ``git`` and ``make``.
 * For debugging you may want to install ``gdb``.
-* To build the HTML user/developer documentation, you’ll need
-  ``mingw-w64-x86_64-librsvg``, ``mingw-w64-x86_64-python-sphinx``,
-  ``mingw-w64-x86_64-python-sphinx_rtd_theme`` and
-  ``mingw-w64-x86_64-python-sphinxcontrib-svg2pdfconverter`` for a 64-bit MinGW
-  environment (or alternatively ``mingw-w64-i686-librsvg``,
-  ``mingw-w64-i686-python-sphinx``, ``mingw-w64-i686-python-sphinx_rtd_theme``
-  and ``mingw-w64-x86_64-python-sphinxcontrib-svg2pdfconverter`` a 32-bit MinGW
-  environment).
-* To build the PDF documentation, you’ll additionally need
-  ``mingw-w64-x86_64-texlive-latex-extra`` and
-  ``mingw-w64-x86_64-texlive-fonts-recommended`` (or
-  ``mingw-w64-i686-texlive-latex-extra`` and
-  ``mingw-w64-i686-texlive-fonts-recommended`` for a 32-bit MinGW environment).
 * To generate API documentation from source, you’ll need ``doxygen``.
 * If you plan to rebuild bgfx shaders and you want to rebuild the GLSL parser,
   you’ll need ``bison``.
@@ -142,73 +118,85 @@ with MSYS2 and the **pacman** package manager.
 The additional packages you’ll need depend on the CPU architecture you’re
 building for.
 
-**64-bit x86-64**
+**64-bit x86-64 (libstdc++/UCRT)**
 
-* You’ll need ``mingw-w64-x86_64-gcc`` and ``mingw-w64-x86_64-python``.
-* To link using the LLVM linker (generally much faster than the GNU linker),
-  you’ll need ``mingw-w64-x86_64-lld``, ``mingw-w64-x86_64-llvm`` and
-  ``mingw-w64-x86_64-libc++``.
+* You’ll need ``mingw-w64-ucrt-x86_64-gcc`` and
+  ``mingw-w64-ucrt-x86_64-python``.
+* To compile using the clang compiler, you’ll also need
+  ``mingw-w64-ucrt-x86_64-clang``.
+* To use the LLVM linker and archiver (generally much faster than the GNU linker
+  and archiver), you’ll need ``mingw-w64-ucrt-x86_64-lld``,
+  ``mingw-w64-ucrt-x86_64-llvm-tools``, ``mingw-w64-ucrt-x86_64-llvm`` and
+  ``mingw-w64-ucrt-x86_64-libc++``.
 * To build against the portable SDL interfaces, you’ll need
-  ``mingw-w64-x86_64-SDL2`` and ``mingw-w64-x86_64-SDL2_ttf``.
-* To build the Qt debugger, you’ll need ``mingw-w64-x86_64-qt5``.
-* Open the **mingw64.exe** helper from the **msys64** installation folder or the
-  **MSYS2 MinGW 64-bit** shortcut from the start menu to start a Bash shell
-  configured with the correct paths and environment variables.
+  ``mingw-w64-ucrt-x86_64-SDL2`` and ``mingw-w64-ucrt-x86_64-SDL2_ttf``.
+* To build the Qt debugger, you’ll need ``mingw-w64-ucrt-x86_64-qt6-base``.
+* To build the HTML user/developer documentation, you’ll need
+  ``mingw-w64-ucrt-x86_64-librsvg``, ``mingw-w64-ucrt-x86_64-python-sphinx``,
+  ``mingw-w64-ucrt-x86_64-python-sphinx_rtd_theme`` and
+  ``mingw-w64-ucrt-x86_64-python-sphinxcontrib-svg2pdfconverter``.
+* To build the PDF documentation, you’ll additionally need
+  ``mingw-w64-ucrt-x86_64-texlive-latex-extra`` and
+  ``mingw-w64-ucrt-x86_64-texlive-fonts-recommended``.
+* Open the **ucrt64.exe** helper from the **msys64** installation folder or the
+  **MSYS2 UCRT64** shortcut from the start menu to start a Bash shell configured
+  with the correct paths and environment variables.
 
-**32-bit x86**
+**64-bit x86-64 (libc++/UCRT)**
 
-* You’ll need ``mingw-w64-i686-gcc`` and ``mingw-w64-i686-python``.
-* To link using the LLVM linker (generally much faster than the GNU linker),
-  you’ll need ``mingw-w64-i686-lld``, ``mingw-w64-i686-llvm`` and
-  ``mingw-w64-i686-libc++``.
+* You’ll need ``mingw-w64-clang-x86_64-clang``,
+  ``mingw-w64-clang-x86_64-python`` and ``mingw-w64-clang-x86_64-gcc-compat``.
+* To use the LLVM linker and archiver (generally much faster than the GNU linker
+  and archiver), you’ll need ``mingw-w64-clang-x86_64-lld``,
+  ``mingw-w64-clang-x86_64-llvm-tools``, ``mingw-w64-clang-x86_64-llvm`` and
+  ``mingw-w64-clang-x86_64-libc++``.
 * To build against the portable SDL interfaces, you’ll need
-  ``mingw-w64-i686-SDL2`` and ``mingw-w64-i686-SDL2_ttf``.
-* To build the Qt debugger, you’ll need ``mingw-w64-i686-qt5``.
-* Open the **mingw32.exe** helper from the **msys64** installation folder or the
-  **MSYS2 MinGW 32-bit** shortcut from the start menu to start a Bash shell
-  configured with the correct paths and environment variables.
+  ``mingw-w64-clang-x86_64-SDL2`` and ``mingw-w64-clang-x86_64-SDL2_ttf``.
+* To build the Qt debugger, you’ll need ``mingw-w64-clang-x86_64-qt6-base``.
+* To build the HTML user/developer documentation, you’ll need
+  ``mingw-w64-clang-x86_64-librsvg``, ``mingw-w64-clang-x86_64-python-sphinx``,
+  ``mingw-w64-clang-x86_64-python-sphinx_rtd_theme`` and
+  ``mingw-w64-clang-x86_64-python-sphinxcontrib-svg2pdfconverter``.
+* To build the PDF documentation, you’ll additionally need
+  ``mingw-w64-clang-x86_64-texlive-latex-extra`` and
+  ``mingw-w64-clang-x86_64-texlive-fonts-recommended``.
+* Open the **clang64.exe** helper from the **msys64** installation folder or use
+  the **MSYS2 CLANG64** shortcut to start a Bash shell configured with the
+  correct paths and environment variables.
 
-**64-bit ARM (AArch64)**
+**64-bit ARM (libc++/UCRT)**
 
 * You’ll need ``mingw-w64-clang-aarch64-clang``,
   ``mingw-w64-clang-aarch64-python`` and ``mingw-w64-clang-aarch64-gcc-compat``.
-* To link using the LLVM linker (generally much faster than the GNU linker),
-  you’ll need ``mingw-w64-clang-aarch64-lld``, ``mingw-w64-clang-aarch64-llvm``
-  and ``mingw-w64-clang-aarch64-libc++``.
+* To use the LLVM linker and archiver (generally much faster than the GNU linker
+  and archiver), you’ll need ``mingw-w64-clang-aarch64-lld``,
+  ``mingw-w64-clang-aarch64-llvm-tools``, ``mingw-w64-clang-aarch64-llvm`` and
+  ``mingw-w64-clang-aarch64-libc++``.
 * To build against the portable SDL interfaces, you’ll need
   ``mingw-w64-clang-aarch64-SDL2`` and ``mingw-w64-clang-aarch64-SDL2_ttf``.
-* To build the Qt debugger, you’ll need ``mingw-w64-clang-aarch64-qt5``.
-* Open the **clangarm64.exe** helper from the **msys64** installation folder to
-  start a Bash shell configured with the correct paths and environment
-  variables.
+* To build the Qt debugger, you’ll need ``mingw-w64-clang-aarch64-qt6-base``.
+* To build the HTML user/developer documentation, you’ll need
+  ``mingw-w64-clangarm64-x86_64-librsvg``,
+  ``mingw-w64-clangarm64-x86_64-python-sphinx``,
+  ``mingw-w64-clangarm64-x86_64-python-sphinx_rtd_theme`` and
+  ``mingw-w64-clangarm64-x86_64-python-sphinxcontrib-svg2pdfconverter``.
+* It is not currently possible to build the PDF documentation using the
+  CLANGARM64 environment as the TeX Live tools do not work.  You may be able
+  to use the UCRT64 or CLANG64 environment to build the PDF documentation on a
+  64-bit ARM system.
+* Open the **clangarm64.exe** helper from the **msys64** installation folder or
+  use the **MSYS2 CLANGARM64** shortcut to start a Bash shell configured with
+  the correct paths and environment variables.
 
-For example you could use these commands to ensure you have the packages you
-need to compile MAME, omitting the ones for configurations you don’t plan to
-build for or combining multiple **pacman** commands to install more packages at
-once::
+**32-bit x86**
 
-    pacman -Syu
-    pacman -S curl git make
-    pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-python
-    pacman -S mingw-w64-x86_64-llvm mingw-w64-x86_64-libc++ mingw-w64-x86_64-lld
-    pacman -S mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_ttf
-    pacman -S mingw-w64-x86_64-qt5
-    pacman -S mingw-w64-i686-gcc mingw-w64-i686-python
-    pacman -S mingw-w64-i686-llvm mingw-w64-i686-libc++ mingw-w64-i686-lld
-    pacman -S mingw-w64-i686-SDL2 mingw-w64-i686-SDL2_ttf
-    pacman -S mingw-w64-i686-qt5
-    pacman -S mingw-w64-clang-aarch64-clang mingw-w64-clang-aarch64-python mingw-w64-clang-aarch64-gcc-compat
-    pacman -S mingw-w64-clang-aarch64-lld mingw-w64-clang-aarch64-llvm mingw-w64-clang-aarch64-libc++
-    pacman -S mingw-w64-clang-aarch64-SDL2 mingw-w64-clang-aarch64-SDL2_ttf
-    pacman -S mingw-w64-clang-aarch64-qt5
-
-You could use these commands to install the current version of the
-mame-essentials package and add the MAME package repository to your pacman
-configuration::
-
-    curl -O "https://repo.mamedev.org/x86_64/mame-essentials-1.0.6-1-x86_64.pkg.tar.xz"
-    pacman -U mame-essentials-1.0.6-1-x86_64.pkg.tar.xz
-    echo -e '\n[mame]\nInclude = /etc/pacman.d/mirrorlist.mame\nSigLevel = Never' >> /etc/pacman.conf
+It is no longer possible to compile 32-bit x86 MAME build using an MSYS2
+environment.  Up-to-date 32-bit versions of GCC exceed the available address
+space when compiling MAME’s address space classes and Lua bindings.  MSYS2 no
+longer provides 32-bit x86 LLVM and clang packages.  To build MAME for 32-bit
+x86 systems, you must use an environment that allows cross-compiling for a
+32-bit target using 64-bit tools (e.g. using a MinGW environment on  a Linux
+system).
 
 Building with Microsoft Visual Studio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -217,7 +205,7 @@ Building with Microsoft Visual Studio
   solution and project files will be created in
   ``build/projects/windows/mame/vs2022`` by default (the name of the ``build``
   folder can be changed using the ``BUILDDIR`` option).  This will always
-  regenerate the settings, so **REGENIE=1** is *not* needed.
+  regenerate the projects, so **REGENIE=1** is *not* needed.
 * Adding **MSBUILD=1** to the make options will build the solution using
   the Microsoft Build Engine after generating the project files.  Note that this
   requires paths and environment variables to be configured so the correct
@@ -239,8 +227,8 @@ with helpful information on using the pacman package management tool.
 The MSYS2 environment includes two kinds of tools: MSYS2 tools designed to work
 in a UNIX-like environment on top of Windows, and MinGW tools designed to work
 in a more Windows-like environment.  The MSYS2 tools are installed in
-``/usr/bin`` while the MinGW tools are installed in ``/ming64/bin``,
-``/mingw32/bin`` and/or ``/clangarm64/bin`` (relative to the MSYS2 installation
+``/usr/bin`` while the MinGW tools are installed in ``/ucrt64/bin``,
+``/clang64/bin`` and/or ``/clangarm64/bin`` (relative to the MSYS2 installation
 directory).  MSYS2 tools work best in an MSYS2 terminal, while MinGW tools work
 best in a Microsoft command prompt.
 
@@ -259,22 +247,20 @@ MSYS2 gdb may have issues debugging MinGW programs like MAME.  You may get
 better results by installing the MinGW version of gdb and running it from a
 Microsoft command prompt window to debug MAME.
 
-GNU make supports both POSIX-style shells (e.g. bash) and the Microsoft cmd.exe
-shell.  One issue to be aware of when using the cmd.exe shell is that the
-``copy`` command doesn’t provide a useful exit status, so file copy tasks can
-fail silently.  This may cause your build to appear to succeed while producing
-incorrect results.
-
-It is not possible to cross-compile a 32-bit version of MAME using 64-bit MinGW
-tools on Windows, the 32-bit MinGW tools must be used.  This causes issues due
-to the size of MAME.  It’s impossible to make a 32-bit build with full local
-variable symbols.  GCC may run out of memory, and certain source files may
-exceed the limit of 32,768 sections imposed by the PE/COFF object file format.
+GNU Make supports both POSIX-style shells (e.g. bash) and the Microsoft cmd.exe
+shell.  When using the cmd.exe shell, the ``copy`` command doesn’t provide a
+useful exit status, so file copy tasks can fail silently.  This may cause your
+build to appear to succeed while producing incorrect results.  The command to
+link MAME exceeds the maximum command length supported by the cmd.exe shell, so
+you will not be able to produce a complete build of MAME.  As such, we recommend
+that you *do not* install MinGW versions of GNU Make, and use the MSYS2 version
+of GNU Make from the ``make`` package.
 
 A complete build of MAME including line number symbols exceeds the size limit
 imposed by the PE file format and cannot be run.  Workarounds include including
-only a subset of the systems supported by MAME or extracting symbols to a
-separate file and stripping excess symbols from the MAME executable.
+only a subset of the systems supported by MAME, extracting symbols to a separate
+file and stripping excess symbols from the MAME executable, or compiling MAME
+using clang with the option to place symbols in external PDB files.
 
 
 .. _compiling-fedora:
@@ -285,7 +271,7 @@ Fedora Linux
 You’ll need a few prerequisites from your Linux distribution.  Make sure you get
 SDL 2 version 2.0.14 or later as earlier versions lack required functionality::
 
-    sudo dnf install gcc gcc-c++ SDL2-devel SDL2_ttf-devel libXi-devel libXinerama-devel qt5-qtbase-devel qt5-qttools expat-devel fontconfig-devel alsa-lib-devel pulseaudio-libs-devel
+    sudo dnf install git gcc gcc-c++ SDL2-devel SDL2_ttf-devel libXi-devel libXinerama-devel qt6-qtbase-devel expat-devel fontconfig-devel alsa-lib-devel pulseaudio-libs-devel
 
 If you want to use the more efficient LLVM tools for archiving static libraries
 and linking, you’ll need to install the corresponding packages::
@@ -301,7 +287,7 @@ the theme and the SVG converter::
 
 The HTML documentation can be built with this command::
 
-    make -C docs SPHINXBUILD=sphinx-build-3 html
+    make -C docs html
 
 
 .. _compiling-ubuntu:
@@ -312,7 +298,7 @@ Debian and Ubuntu (including Raspberry Pi and ODROID devices)
 You’ll need a few prerequisites from your Linux distribution.  Make sure you get
 SDL 2 version 2.0.14 or later as earlier versions lack required functionality::
 
-    sudo apt-get install git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qtbase5-dev qtbase5-dev-tools qtchooser qt5-qmake
+    sudo apt-get install git build-essential python3 libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qt6-base-dev qt6-base-dev-tools qtchooser
 
 Compilation is exactly as described above in All Platforms.  Note the Ubuntu
 Linux modifies GCC to enable the GNU C Library “fortify source” feature by
@@ -326,7 +312,7 @@ Arch Linux
 
 You’ll need a few prerequisites from your distro::
 
-    sudo pacman -S base-devel git sdl2_ttf python libxinerama libpulse alsa-lib qt5-base
+    sudo pacman -S base-devel git sdl2_ttf python libxinerama libpulse alsa-lib qt6-base
 
 Compilation is exactly as described above in All Platforms.
 
@@ -477,7 +463,7 @@ can install these packages with
     pacman -S mingw-w64-x86_64-librsvg mingw-w64-x86_64-python-sphinx mingw-w64-x86_64-python-sphinxcontrib-svg2pdfconverter
 
 If you intend to make a PDF via LaTeX, you’ll need to install a LaTeX
-distribution such as TeX Live:
+distribution such as TeX Live:
 
 .. code-block:: bash
 
@@ -503,7 +489,7 @@ On Debian, you’ll need to install the **librsvg2-bin** package:
     sudo apt-get install librsvg2-bin
 
 If you intend to make a PDF via LaTeX, you’ll need to install a LaTeX
-distribution such as TeX Live:
+distribution such as TeX Live:
 
 .. code-block:: bash
 
@@ -542,10 +528,10 @@ BUILDDIR
 REGENIE
     Set to **1** to force project files to be regenerated.
 VERBOSE
-    Set to **1** to show full commands when using GNU make as the build tool.
+    Set to **1** to show full commands when using GNU Make as the build tool.
     This option applies immediately without needing regenerate project files.
 IGNORE_GIT
-    Set to **1** to skip the working tree scan and not attempt to embed a git
+    Set to **1** to skip the working tree scan and not attempt to embed a Git
     revision description in the version string.
 
 Tool locations
@@ -561,6 +547,8 @@ OVERRIDE_LD
     Set the linker command.  This is often not necessary or useful because the C
     or C++ compiler command is used to invoke the linker.  (This sets the target
     linker command when cross-compiling.)
+OVERRIDE_AR
+    Set static library archiver command.
 PYTHON_EXECUTABLE
     Set the Python interpreter command.  You need Python 3.2 or later to build
     MAME.
@@ -740,13 +728,6 @@ USE_SYSTEM_LIB_PUGIXML
 Known Issues
 ------------
 
-Issues with specific compiler versions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* GCC 7 for 32-bit x86 targets produces spurious out-of-bounds access warnings.
-  Adding **NOWERROR=1** to your build options works around this by not treating
-  warnings as errors.
-
 GNU C Library fortify source feature
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -795,23 +776,6 @@ omitted).
 Issues affecting Microsoft Visual Studio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Microsoft introduced a new version of XAudio2 with Windows 8 that’s incompatible
-with the version included with DirectX for prior Windows versions at the API
-level.  Newer versions of the Microsoft Windows SDK include headers and libraries
-for the new version of XAudio2.  By default, the target Windows version is set to
-Windows Vista (6.0) when compiling MAME, which prevents the use of this version
-of the XAudio2 headers and libraries.  To build MAME with XAudio2 support using
-the Microsoft Windows SDK, you must do one of the following:
-
-* Add ``MODERN_WIN_API=1`` to the options passed to make when generating the
-  Visual Studio project files.  This will set the target Windows version to
-  Windows 8 (6.2).  The resulting binaries may not run on earlier versions of
-  Windows.
-* Install the `DirectX SDK <https://www.microsoft.com/en-US/download/details.aspx?id=6812>`_ (already included since Windows 8.0 SDK and
-  automatically installed with Visual Studio 2013 and later).  Configure the
-  **osd_windows** project to search the DirectX header/library paths before
-  searching the Microsoft Windows SDK paths.
-
 The MSVC compiler produces spurious warnings about potentially uninitialised
 local variables.  You currently need to add ``NOWERROR=1`` to the options passed
 to make when generating the Visual Studio project files.  This stops warnings
@@ -833,6 +797,16 @@ system operations (e.g. Microsoft Windows, or when compiling on a disk mounted
 over a network).  To use the LLVM linker with GCC, ensure the LLVM linker is
 installed and add ``-fuse-ld=lld`` to the linker options (e.g. in the
 **LDFLAGS** environment variable or in the **ARCHOPTS** setting).
+
+Creating static libraries using the LLVM archiver
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The LLVM archiver is generally faster than the GNU archiver that is used by
+default.  This is more pronounced on systems with a high overhead for file
+system operations (e.g. Microsoft Windows, or when compiling on a disk mounted
+over a network).  To use the LLVM archiver, ensure the LLVM archiver is
+installed and add ``OVERRIDE_AR=llvm-ar`` to the options passed to make when
+generating the project files.
 
 Cross-compiling MAME
 ~~~~~~~~~~~~~~~~~~~~
@@ -873,7 +847,7 @@ Using a GCC/GNU libstdc++ installation in a non-standard location on Linux
 GCC may be built and installed to a custom location, typically by supplying the
 **--prefix=** option to the **configure** command.  This may be useful if you
 want to build MAME on a Linux distribution that still uses a version of GNU
-libstdC++ that predates C++17 support.  To use an alternate GCC installation to,
+libstdc++ that predates C++20 support.  To use an alternate GCC installation to
 build MAME, set the C and C++ compilers to the full paths to the **gcc** and
 **g++** commands, and add the library path to the run-time search path.  If you
 installed GCC in /opt/local/gcc72, you might use a command like this::

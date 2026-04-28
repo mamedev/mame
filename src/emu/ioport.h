@@ -736,7 +736,7 @@ struct ioport_field_live
 // ======================> ioport_list
 
 // class that holds a list of I/O ports
-class ioport_list : public std::map<std::string, std::unique_ptr<ioport_port>>
+class ioport_list : public util::transparent_string_map<std::string, std::unique_ptr<ioport_port> >
 {
 	DISABLE_COPYING(ioport_list);
 
@@ -1075,6 +1075,12 @@ public:
 	// misc helpers
 	ioport_configurer& set_condition(ioport_condition::condition_t condition, const char *tag, ioport_value mask, ioport_value value);
 	ioport_configurer& onoff_alloc(const char *name, ioport_value defval, ioport_value mask, const char *diplocation);
+
+	// allow UTF-8 strings to be used for names transparently
+	ioport_configurer& field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char8_t *name) { return field_alloc(type, defval, mask, reinterpret_cast<const char *>(name)); }
+	ioport_configurer& field_set_name(const char8_t *name) { return field_set_name(reinterpret_cast<const char *>(name)); }
+	ioport_configurer& setting_alloc(ioport_value value, const char8_t *name) { return setting_alloc(value, reinterpret_cast<const char *>(name)); }
+	ioport_configurer& onoff_alloc(const char8_t *name, ioport_value defval, ioport_value mask, const char *diplocation) { return onoff_alloc(reinterpret_cast<const char *>(name), defval, mask, diplocation); }
 
 private:
 	// internal state

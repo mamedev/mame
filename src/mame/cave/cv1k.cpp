@@ -158,15 +158,17 @@ To enter service mode in most cases hold down Service (F2) for a few seconds
 Some games also use the test dipswitch as an alternative method.
 
 Common game codes:
- - During boot hold P1 Right+A+B+C and P2 Left+A+B+C - Forcibly initialise non-volatile data (EEPROM or NAND settings area)
- - During boot hold P1 A and P2 A - Reset random numbers generator at each game start. Probably was used during testing or/and competition events.
+ - During boot hold P1 Right+A+B+C and P2 Left+A+B+C - Forcibly initialise non-volatile data
+   (EEPROM or NAND settings area)
+ - During boot hold P1 A and P2 A - Reset random numbers generator at each game start.
+   Probably was used during testing or/and competition events.
 
 TODO:
 
 Improve Blending precision?
- - I'm not sure what precision the original HW mixes with, source data is 555 RGB with 1 bit transparency (16-bits)
-   and the real VRAM is also clearly in this format.  The Alpha values supplied however are 8bpp, and the 'Tint'
-   values use 0x20 for 'normal' (not 0x1f)
+ - I'm not sure what precision the original HW mixes with, source data is 555 RGB with 1 bit
+   transparency (16-bits) and the real VRAM is also clearly in this format.  The Alpha values
+   supplied however are 8bpp, and the 'Tint' values use 0x20 for 'normal' (not 0x1f)
 
 Overall screen brightness / contrast (see test mode)
  - Could convert ram back to 16-bit and use a palette lookup at the final blit.. probably easiest / quickest.
@@ -175,17 +177,20 @@ Touchscreen
  - Used for mmmbanc, needs SH3 serial support.
 
 Remaining Video issues
- - mmpork startup screen flicker - the FOR USE IN JAPAN screen doesn't appear on the real PCB until after the graphics are fully loaded, it still displays 'please wait' until that point.
- - Sometimes the 'sprites' in mushisam lag by a frame vs the 'backgrounds' is this a timing problem, does the real game do it?
- - End of Blit should send IRQ1. (one game has a valid irq routine that looks like it was used for profiling, but nothing depends on it)
+ - mmpork startup screen flicker - the FOR USE IN JAPAN screen doesn't appear on the real PCB
+   until after the graphics are fully loaded, it still displays 'please wait' until that point.
+ - Sometimes the 'sprites' in mushisam lag by a frame vs the 'backgrounds' is this a timing problem,
+   does the real game do it?
+ - End of Blit should send IRQ1. (one game has a valid irq routine that looks like it was used
+   for profiling, but nothing depends on it)
 
 Timing
  - Experimental SH7709S cache/memory timing
  - Requires to measure screen raw params for correct video timing?
 
-31/12/2021:
-  Akai Katana and Dodonpachi Saidaioujou removed at the request of the
-  current rightholder, exA-Arcadia (legal@exa.ac).
+Removed games
+ - 31/12/2021, Akai Katana and Dodonpachi Saidaioujou were removed at the request of the current
+   rightholder, exA-Arcadia (legal@exa.ac).
 
 */
 
@@ -897,32 +902,34 @@ ROM_START( dfkbl )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(31f9eb0a) SHA1(322158779e969bb321241065dd49c1167b91ff6c) )
 ROM_END
 
-// ROM_START( akatana )
-//  ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-//  ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x400000, CRC(613fd380) SHA1(6e28480eef3b483d00b42d811a9d2c7fa1097924) ) // (2010/ 8/13 MASTER VER.)
+#if 0 // not included in MAME, see driver notes
+ROM_START( akatana )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x400000, CRC(613fd380) SHA1(6e28480eef3b483d00b42d811a9d2c7fa1097924) ) // (2010/ 8/13 MASTER VER.)
 
-//  ROM_REGION( 0x8400000, "nand", ROMREGION_ERASEFF)
-//  ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(89a2e1a5) SHA1(e6f4ec974406283665697fdd52bd606d0337dd11) )
+	ROM_REGION( 0x8400000, "nand", ROMREGION_ERASEFF)
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(89a2e1a5) SHA1(e6f4ec974406283665697fdd52bd606d0337dd11) )
 
-//  ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
-//  ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(34a67e24) SHA1(78a7e82123b86311f1116a80c39f147b8b695549) )
-//  ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(10760fed) SHA1(b70f4506c00f3901ff38f5efd4b897af1afc7a0c) )
-// ROM_END
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(34a67e24) SHA1(78a7e82123b86311f1116a80c39f147b8b695549) )
+	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(10760fed) SHA1(b70f4506c00f3901ff38f5efd4b897af1afc7a0c) )
+ROM_END
 
-// ROM_START( ddpsdoj )
-//  ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-//  ROM_LOAD16_WORD_SWAP("u4", 0x000000, 0x400000, CRC(e2a4411c) SHA1(f8b2b6326dd8eeae99b8b1ab2bd5a3f0b9c7f027) )
-//  ROM_IGNORE( 0x000100 ) // Flash extra bytes
+ROM_START( ddpsdoj )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP("u4", 0x000000, 0x400000, CRC(e2a4411c) SHA1(f8b2b6326dd8eeae99b8b1ab2bd5a3f0b9c7f027) )
+	ROM_IGNORE( 0x000100 ) // Flash extra bytes
 
-//  ROM_REGION( 0x8400000, "nand", ROMREGION_ERASEFF)
-//  ROM_LOAD("u2", 0x000000, 0x8400000, CRC(668e4cd6) SHA1(da0b10865df3a3e46cf8a109ca88a551faba4483) )
+	ROM_REGION( 0x8400000, "nand", ROMREGION_ERASEFF)
+	ROM_LOAD("u2", 0x000000, 0x8400000, CRC(668e4cd6) SHA1(da0b10865df3a3e46cf8a109ca88a551faba4483) )
 
-//  ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
-//  ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(ac94801c) SHA1(cbcc6d5d89860bc961967e1d3b7c329adaf200c5) )
-//  ROM_IGNORE( 0x000100 ) // Flash extra bytes
-//  ROM_LOAD16_WORD_SWAP("u24", 0x400000, 0x400000, CRC(f593045b) SHA1(91b92870d0dd2a7817cb0059cc750e2393686f4c) )
-//  ROM_IGNORE( 0x000100 ) // Flash extra bytes
-// ROM_END
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(ac94801c) SHA1(cbcc6d5d89860bc961967e1d3b7c329adaf200c5) )
+	ROM_IGNORE( 0x000100 ) // Flash extra bytes
+	ROM_LOAD16_WORD_SWAP("u24", 0x400000, 0x400000, CRC(f593045b) SHA1(91b92870d0dd2a7817cb0059cc750e2393686f4c) )
+	ROM_IGNORE( 0x000100 ) // Flash extra bytes
+ROM_END
+#endif
 
 u64 cv1k_state::speedup_r()
 {
@@ -1020,7 +1027,7 @@ GAME( 2006, pinkswts,   0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT27
 GAME( 2006, pinkswtsa,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Pink Sweets: Ibara Sorekara (Japan, 2006/04/06 MASTER VER...)",                        MACHINE_IMPERFECT_TIMING )
 GAME( 2006, pinkswtsb,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Pink Sweets: Ibara Sorekara (Japan, 2006/04/06 MASTER VER.)",                          MACHINE_IMPERFECT_TIMING )
 GAME( 2006, pinkswtsx,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Pink Sweets: Ibara Sorekara (Japan, 2006/xx/xx MASTER VER.)",                          MACHINE_IMPERFECT_TIMING ) // defaults to freeplay, possibly bootlegged from show/dev version?
-GAME( 2017, pinkswtssc, pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "bootleg (Four Horsemen)", "Pink Sweets: Suicide Club (2017/10/31 SUICIDECLUB VER., bootleg)",           MACHINE_IMPERFECT_TIMING ) // dumped from bootleg with pre-patched hack
+GAME( 2017, pinkswtssc, pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "bootleg (Four Horsemen)", "Pink Sweets: Suicide Club (2017/10/31 SUICIDECLUB VER., bootleg)",                  MACHINE_IMPERFECT_TIMING ) // dumped from bootleg with pre-patched hack
 
 // CA015  Mushihime-Sama Futari
 GAME( 2006, futari15,   0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Mushihime-Sama Futari Ver 1.5 (Japan, 2006/12/8.MASTER VER. 1.54.)",                   MACHINE_IMPERFECT_TIMING )
@@ -1048,10 +1055,10 @@ GAME( 2008, ddpdfk10,   ddpdfk,   cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT27
 GAME( 2010, dfkbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",                 "DoDonPachi Dai-Fukkatsu Black Label (Japan, 2010/1/18 BLACK LABEL)",                   MACHINE_IMPERFECT_TIMING )
 
 // CA021  Akai Katana
-//GAME( 2010, akatana,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave",               "Akai Katana (Japan, 2010/ 8/13 MASTER VER.)",                            MACHINE_IMPERFECT_TIMING )
+//GAME( 2010, akatana,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave",                 "Akai Katana (Japan, 2010/ 8/13 MASTER VER.)",                                          MACHINE_IMPERFECT_TIMING )
 
 // CA??? DoDonPachi SaiDaiOuJou
-//GAME( 2012, ddpsdoj,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",               "DoDonPachi SaiDaiOuJou (Japan, 2012/ 4/20)",                             MACHINE_IMPERFECT_TIMING )
+//GAME( 2012, ddpsdoj,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",                 "DoDonPachi SaiDaiOuJou (Japan, 2012/ 4/20)",                                           MACHINE_IMPERFECT_TIMING )
 
 // CMDL01 Medal Mahjong Moukari Bancho
 GAME( 2007, mmmbanc,    0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)",   "Medal Mahjong Moukari Bancho (Japan, 2007/06/05 MASTER VER.)",                         MACHINE_NOT_WORKING )
