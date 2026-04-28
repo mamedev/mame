@@ -155,22 +155,8 @@ i8087_device::i8087_device(const machine_config &mconfig, const char *tag, devic
 
 void i8087_device::device_start()
 {
-	save_item(NAME(m_reg[0].signExp));
-	save_item(NAME(m_reg[0].signif));
-	save_item(NAME(m_reg[1].signExp));
-	save_item(NAME(m_reg[1].signif));
-	save_item(NAME(m_reg[2].signExp));
-	save_item(NAME(m_reg[2].signif));
-	save_item(NAME(m_reg[3].signExp));
-	save_item(NAME(m_reg[3].signif));
-	save_item(NAME(m_reg[4].signExp));
-	save_item(NAME(m_reg[4].signif));
-	save_item(NAME(m_reg[5].signExp));
-	save_item(NAME(m_reg[5].signif));
-	save_item(NAME(m_reg[6].signExp));
-	save_item(NAME(m_reg[6].signif));
-	save_item(NAME(m_reg[7].signExp));
-	save_item(NAME(m_reg[7].signif));
+	save_item(STRUCT_MEMBER(m_reg, signExp));
+	save_item(STRUCT_MEMBER(m_reg, signif));
 
 	save_item(NAME(m_ea));
 	save_item(NAME(m_pc));

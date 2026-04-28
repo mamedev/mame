@@ -25,10 +25,10 @@
 #include "cycles.h"
 #include "i386ops.h"
 
-#include "softfloat3/bochs_ext/softfloat3_ext.h"
-
 #include "debug/debugcpu.h"
 #include "debug/express.h"
+
+#include "softfloat3/bochs_ext/softfloat3_ext.h"
 
 #define LOG_MSR             (1U << 1)
 #define LOG_INVALID_OPCODE  (1U << 2)

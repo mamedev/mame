@@ -5,11 +5,9 @@
 
 #pragma once
 
-#include "softfloat3/source/include/softfloat.h"
-
-#include "divtlb.h"
-
 #include "i386dasm.h"
+#include "divtlb.h"
+#include "softfloat3/source/include/softfloat.h"
 #include <algorithm>
 
 #define INPUT_LINE_A20      1
