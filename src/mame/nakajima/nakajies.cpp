@@ -81,7 +81,7 @@ Hardware:
 - FCC and CSA approved
 
 
-Memory map:
+I/O map:
 
 0000 - unknown
        0x00 written during boot sequence
@@ -143,8 +143,7 @@ I/O Map:
 
 Notes:
 - drwrt200,drwrt400, and drwrt450 only go up to 512KB to initialize pccard card.
-  Very likely BTANB. At least the documentation for the T400 mentions support
-  for 512KB instead of 1MB SRAM card.
+  At least the documentation for the T400 mentions support for 512KB instead of 1MB SRAM card.
 
 TODO:
 - Serial port causes source selection to hang on dreamlink
