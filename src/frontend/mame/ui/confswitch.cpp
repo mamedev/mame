@@ -130,7 +130,7 @@ void menu_confswitch::populate()
 					flags |= FLAG_RIGHT_ARROW;
 
 				if (field.live().value == field.defvalue())
-					flags |= FLAG_AT_DEFAULT;
+					flags |= FLAG_DE_EMPHASIZE;
 
 				// add the menu item
 				item_append(field.name(), field.setting_name(), flags, &field);

@@ -611,7 +611,7 @@ void menu_input::populate_sorted()
 		{
 			// otherwise, generate the sequence name and invert it if same as the default
 			subtext = machine().input().seq_name(item.seq);
-			flags |= (item.seq == *item.defseq) ? FLAG_AT_DEFAULT : 0;
+			flags |= (item.seq == *item.defseq) ? FLAG_DE_EMPHASIZE : 0;
 		}
 
 		// add the item

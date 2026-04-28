@@ -3324,7 +3324,7 @@ void menu_select_launch::draw(u32 flags)
 		}
 		else
 		{
-			bool const item_invert(pitem.flags() & FLAG_INVERT);
+			bool const item_invert(pitem.flags() & FLAG_DE_EMPHASIZE);
 			if (m_has_icons)
 				draw_icon(linenum, pitem.ref(), item_text_left, linetop);
 			if (pitem.subtext().empty())

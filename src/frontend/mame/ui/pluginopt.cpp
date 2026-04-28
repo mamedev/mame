@@ -172,8 +172,8 @@ void menu_plugin_opt::populate()
 				item_flags_or |= FLAG_RIGHT_ARROW;
 			else if (flag == "lr")
 				item_flags_or |= FLAG_RIGHT_ARROW | FLAG_LEFT_ARROW;
-			else if (flag == "invert")
-				item_flags_or |= FLAG_INVERT;
+			else if (flag == "invert") // FIXME: do we need to change this?
+				item_flags_or |= FLAG_DE_EMPHASIZE;
 			else if (flag == "heading")
 				item_flags_or |= FLAG_DISABLE | FLAG_UI_HEADING;
 			else

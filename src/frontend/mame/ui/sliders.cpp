@@ -201,7 +201,7 @@ void menu_sliders::populate()
 				if (curval < slider->maxval)
 					flags |= FLAG_RIGHT_ARROW;
 				if (curval == slider->defval)
-					flags |= FLAG_AT_DEFAULT;
+					flags |= FLAG_DE_EMPHASIZE;
 				item_append(slider->description, tempstring, flags, (void *)slider, menu_item_type::SLIDER);
 			}
 		}
@@ -228,7 +228,7 @@ void menu_sliders::populate()
 			if (curval < slider->maxval)
 				flags |= FLAG_RIGHT_ARROW;
 			if (curval == slider->defval)
-				flags |= FLAG_AT_DEFAULT;
+				flags |= FLAG_DE_EMPHASIZE;
 			item_append(slider->description, tempstring, flags, (void *)slider, menu_item_type::SLIDER);
 		}
 		else

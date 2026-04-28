@@ -838,8 +838,12 @@ void menu::draw(uint32_t flags)
 			else
 			{
 				// otherwise, draw the item on the left and the subitem text on the right
-				bool const subitem_invert(pitem.flags() & FLAG_INVERT);
+				bool const item_disabled(pitem.flags() & FLAG_DISABLE); // item disabled: both item and subitem at 70% brightness
+				bool const subitem_de_emphasized((pitem.flags() & FLAG_DE_EMPHASIZE) && !is_selected(itemnum)); // subitem default: subitem at 70% brightness
 				float item_width, subitem_width;
+
+				if (item_disabled)
+					fgcolor = fgcolor.scale8(0.7f * 256); // 70%
 
 				// draw the left-side text
 				ui().draw_text_full(
@@ -889,9 +893,7 @@ void menu::draw(uint32_t flags)
 					if (!core_stricmp(pitem.subtext(), _("Auto")))
 						fgcolor2 = rgb_t(0xff,0xff,0x00);
 
-					if (subitem_invert) // disabled items are drawn with a dimmer color
-						fgcolor2 = fgcolor2.scale8(0.4f * 256); // 40%
-					else if ((pitem.flags() & FLAG_AT_DEFAULT) && !is_selected(itemnum)) // if at default value and not selected, draw with a dimmer color
+					if (item_disabled || subitem_de_emphasized)
 						fgcolor2 = fgcolor2.scale8(0.7F * 256); // 70%
 
 					// draw the subitem right-justified
@@ -931,7 +933,7 @@ void menu::draw(uint32_t flags)
 	if (selected_subitem_too_big)
 	{
 		menu_item const &pitem = selected_item();
-		bool const subitem_invert(pitem.flags() & FLAG_INVERT);
+		bool const subitem_invert(pitem.flags() & FLAG_DE_EMPHASIZE);
 		auto const linenum = m_selected - top_line;
 		float const line_y = m_items_top + float(linenum) * line_height();
 
