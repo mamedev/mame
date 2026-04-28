@@ -87,24 +87,24 @@ I/O Map:
        0x00 written during boot sequence
 
 0010-0017 - control banking:
-0010 - 00000 - 1ffff
-0011 - 20000 - 3ffff
-0012 - 40000 - 5ffff
-0013 - 60000 - 7ffff
-0014 - 80000 - 9ffff
-0015 - a0000 - bffff
-0016 - c0000 - dffff
-0017 - e0000 - fffff
+  0010 - 00000 - 1ffff
+  0011 - 20000 - 3ffff
+  0012 - 40000 - 5ffff
+  0013 - 60000 - 7ffff
+  0014 - 80000 - 9ffff
+  0015 - a0000 - bffff
+  0016 - c0000 - dffff
+  0017 - e0000 - fffff
 
-values 00-07 select a ROM bank
-      00 - selects last 20000h region of ROM
-      01 - 20000h region before last
-      02 - etc
-values 08-0f select additinal RAM (on models that have 256KB RAM)
-values 10-17 select internal RAM
-values 18-1f select a PC Card card bank
+  values 00-07 select a ROM bank
+        00 - selects last 20000h region of ROM
+        01 - 20000h region before last
+        02 - etc
+  values 08-0f select additinal RAM (on models that have 256KB RAM)
+  values 10-17 select internal RAM
+  values 18-1f select a PC Card card bank
 
-on reset 0017 is set to 0, pointing to last 20000h bytes of ROM containing the boot setup code
+  on reset 0017 is set to 0, pointing to last 20000h bytes of ROM containing the boot setup code
 
 0020 - unknown
        0x00 written during boot sequence
