@@ -367,7 +367,7 @@ u32 menu_audio_effect_eq::flag_mode() const
 {
 	u32 flag = 0;
 	if(!m_effect->isset_mode())
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	if(m_effect->mode() == 1)
 		flag |= FLAG_LEFT_ARROW;
 	if(m_effect->mode() == 0)
@@ -379,7 +379,7 @@ u32 menu_audio_effect_eq::flag_low_shelf() const
 {
 	u32 flag = 0;
 	if(!m_effect->isset_low_shelf())
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	if(m_effect->low_shelf())
 		flag |= FLAG_RIGHT_ARROW;
 	else
@@ -391,7 +391,7 @@ u32 menu_audio_effect_eq::flag_high_shelf() const
 {
 	u32 flag = 0;
 	if(!m_effect->isset_high_shelf())
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	if(m_effect->high_shelf())
 		flag |= FLAG_RIGHT_ARROW;
 	else
@@ -403,7 +403,7 @@ u32 menu_audio_effect_eq::flag_f(u32 band) const
 {
 	u32 flag = 0;
 	if(!m_effect->isset_f(band))
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	u32 f = m_effect->f(band);
 	if(f > FREQ_LIMITS[band][0])
 		flag |= FLAG_LEFT_ARROW;
@@ -416,7 +416,7 @@ u32 menu_audio_effect_eq::flag_q(u32 band) const
 {
 	u32 flag = 0;
 	if(!m_effect->isset_q(band))
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	u32 q = roundf(m_effect->q(band) * 100.0f);
 	if(q > 10)
 		flag |= FLAG_LEFT_ARROW;
@@ -429,7 +429,7 @@ u32 menu_audio_effect_eq::flag_db(u32 band) const
 {
 	u32 flag = 0;
 	if(!m_effect->isset_db(band))
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	s32 db = roundf(m_effect->db(band) * 10.0f);
 	if(db > -120)
 		flag |= FLAG_LEFT_ARROW;

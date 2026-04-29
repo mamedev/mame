@@ -19,6 +19,14 @@
 #include "emu.h"
 #include "ms1_tmap.h"
 
+#define LOG_VIDEO (1 << 1)
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
+
+#define LOGVIDEO(...)   LOGMASKED(LOG_VIDEO, __VA_ARGS__) 
+
 static constexpr int TILES_PER_PAGE_X = 0x20;
 static constexpr int TILES_PER_PAGE_Y = 0x20;
 static constexpr int TILES_PER_PAGE = TILES_PER_PAGE_X * TILES_PER_PAGE_Y;
@@ -45,15 +53,15 @@ static constexpr int TILES_PER_PAGE = TILES_PER_PAGE_X * TILES_PER_PAGE_Y;
 
 DEFINE_DEVICE_TYPE(MEGASYS1_TILEMAP, megasys1_tilemap_device, "ms1_tmap", "Mega System 1 Tilemap")
 
-megasys1_tilemap_device::megasys1_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MEGASYS1_TILEMAP, tag, owner, clock),
-		device_gfx_interface(mconfig, *this),
-		m_scrollram(*this, DEVICE_SELF),
-		m_screen(*this, finder_base::DUMMY_TAG),
-		m_8x8_scroll_factor(1),
-		m_16x16_scroll_factor(4),
-		m_bits_per_color_code(4),
-		m_colorbase(0)
+megasys1_tilemap_device::megasys1_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, MEGASYS1_TILEMAP, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this)
+	, m_scrollram(*this, DEVICE_SELF)
+	, m_screen(*this, finder_base::DUMMY_TAG)
+	, m_8x8_scroll_factor(1)
+	, m_16x16_scroll_factor(4)
+	, m_bits_per_color_code(4)
+	, m_colorbase(0)
 {
 }
 
@@ -109,7 +117,7 @@ void megasys1_tilemap_device::device_start()
 
 	// set transparency
 	for (int i = 0; i < 8; i++)
-		m_tilemap[i/4][i%4]->set_transparent_pen(15);
+		m_tilemap[i >> 2][i & 3]->set_transparent_pen(15);
 
 	m_tmap = m_tilemap[0][0];
 	m_scroll_flag = m_scrollx = m_scrolly = 0;
@@ -125,7 +133,7 @@ void megasys1_tilemap_device::device_reset()
 	// this causes its opaque pen to show up when the game scrolls vertically after a bump.
 	// we initialize the device VRAM to a sane default so that this doesn't occur.
 	// TODO: might be something else (smaller VRAM size?)
-	for(int i=0;i<m_scrollram.bytes()/2;i++)
+	for(int i = 0; i < m_scrollram.bytes() / 2; i++)
 		m_scrollram[i] = 0xffff;
 
 	m_tile_bank = 0;
@@ -133,7 +141,7 @@ void megasys1_tilemap_device::device_reset()
 
 void megasys1_tilemap_device::device_post_load()
 {
-	m_tmap = m_tilemap[(m_scroll_flag >> 4) & 1][m_scroll_flag & 3];
+	m_tmap = m_tilemap[BIT(m_scroll_flag, 4)][m_scroll_flag & 3];
 }
 
 /***************************************************************************
@@ -145,12 +153,12 @@ void megasys1_tilemap_device::device_post_load()
 
 ***************************************************************************/
 
-void megasys1_tilemap_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
+void megasys1_tilemap_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_scrollram[offset]);
-	if (offset < 0x40000/2)
+	if (offset < 0x40000 / 2)
 	{
-		if (m_scroll_flag & 0x10)
+		if (BIT(m_scroll_flag, 4))
 		{
 			// tiles are 8x8
 			m_tmap->mark_tile_dirty(offset);
@@ -158,10 +166,10 @@ void megasys1_tilemap_device::write(offs_t offset, uint16_t data, uint16_t mem_m
 		else
 		{
 			// tiles are 16x16
-			m_tmap->mark_tile_dirty(offset*4 + 0);
-			m_tmap->mark_tile_dirty(offset*4 + 1);
-			m_tmap->mark_tile_dirty(offset*4 + 2);
-			m_tmap->mark_tile_dirty(offset*4 + 3);
+			m_tmap->mark_tile_dirty((offset << 2) + 0);
+			m_tmap->mark_tile_dirty((offset << 2) + 1);
+			m_tmap->mark_tile_dirty((offset << 2) + 2);
+			m_tmap->mark_tile_dirty((offset << 2) + 3);
 		}
 	}
 }
@@ -192,9 +200,9 @@ TILEMAP_MAPPER_MEMBER(megasys1_tilemap_device::scan_8x8)
 
 TILEMAP_MAPPER_MEMBER(megasys1_tilemap_device::scan_16x16)
 {
-	return ( ((col / 2) * (TILES_PER_PAGE_Y / 2)) +
-				((row / 2) / (TILES_PER_PAGE_Y / 2)) * (TILES_PER_PAGE / 4) * (num_cols / TILES_PER_PAGE_X) +
-				((row / 2) % (TILES_PER_PAGE_Y / 2)) )*4 + (row&1) + (col&1)*2;
+	return (((col / 2) * (TILES_PER_PAGE_Y / 2)) +
+			((row / 2) / (TILES_PER_PAGE_Y / 2)) * (TILES_PER_PAGE / 4) * (num_cols / TILES_PER_PAGE_X) +
+			((row / 2) % (TILES_PER_PAGE_Y / 2))) * 4 + (row & 1) + (col & 1) * 2;
 }
 
 /*
@@ -216,21 +224,21 @@ TILEMAP_MAPPER_MEMBER(megasys1_tilemap_device::scan_16x16)
 
 TILE_GET_INFO_MEMBER(megasys1_tilemap_device::get_scroll_tile_info_8x8)
 {
-	uint16_t code = m_scrollram[tile_index];
-	uint16_t tile = ((code & 0xfff) + m_tile_bank) * m_8x8_scroll_factor;
+	const u16 code = m_scrollram[tile_index];
+	const u32 tile = ((code & 0xfff) + m_tile_bank) * m_8x8_scroll_factor;
 	tileinfo.set(0, tile, code >> (16 - m_bits_per_color_code), 0);
 }
 
 TILE_GET_INFO_MEMBER(megasys1_tilemap_device::get_scroll_tile_info_16x16)
 {
-	uint16_t code = m_scrollram[tile_index/4];
-	uint16_t tile = ((code & 0xfff) + m_tile_bank) * m_16x16_scroll_factor;
-	tile+= tile_index & 3;
+	const u16 code = m_scrollram[tile_index >> 2];
+	u32 tile = ((code & 0xfff) + m_tile_bank) * m_16x16_scroll_factor;
+	tile += tile_index & 3;
 
 	tileinfo.set(0, tile, code >> (16 - m_bits_per_color_code), 0);
 }
 
-uint16_t megasys1_tilemap_device::scroll_r(offs_t offset)
+u16 megasys1_tilemap_device::scroll_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -241,7 +249,7 @@ uint16_t megasys1_tilemap_device::scroll_r(offs_t offset)
 	}
 }
 
-void megasys1_tilemap_device::scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void megasys1_tilemap_device::scroll_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (m_screen)
 		m_screen->update_partial(m_screen->vpos()-1);
@@ -249,31 +257,23 @@ void megasys1_tilemap_device::scroll_w(offs_t offset, uint16_t data, uint16_t me
 	switch (offset)
 	{
 		case 0:
-		{
 			COMBINE_DATA(&m_scrollx);
 			break;
-		}
 		case 1:
-		{
 			COMBINE_DATA(&m_scrolly);
 			break;
-		}
 		case 2:
-		{
 			if (((m_scroll_flag ^ data) & mem_mask) != 0)
 			{
 				COMBINE_DATA(&m_scroll_flag);
-				logerror("Setting scroll flag: %02X\n", m_scroll_flag);
-				m_tmap = m_tilemap[(m_scroll_flag >> 4) & 1][m_scroll_flag & 3];
+				LOGVIDEO("%s: Setting scroll flag: %04X\n", machine().describe_context(), m_scroll_flag);
+				m_tmap = m_tilemap[BIT(m_scroll_flag, 4)][m_scroll_flag & 3];
 				m_tmap->mark_all_dirty();
 			}
 			break;
-		}
 		default:
-		{
-			logerror("vreg %04X <- %04X", offset, data);
+			logerror("%s: vreg %04X <- %04X & %04x", machine().describe_context(), offset, data, mem_mask);
 			break;
-		}
 	}
 }
 
@@ -285,7 +285,7 @@ void megasys1_tilemap_device::scroll_w(offs_t offset, uint16_t data, uint16_t me
 
 ***************************************************************************/
 
-void megasys1_tilemap_device::draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority, uint8_t priority_mask)
+void megasys1_tilemap_device::draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, u32 flags, u8 priority, u8 priority_mask)
 {
 	m_tmap->set_scrollx(0, m_scrollx);
 	m_tmap->set_scrolly(0, m_scrolly);
@@ -297,12 +297,12 @@ void megasys1_tilemap_device::enable(bool enable)
 	m_tmap->enable(enable);
 }
 
-void megasys1_tilemap_device::set_flip(uint32_t attributes)
+void megasys1_tilemap_device::set_flip(u32 attributes)
 {
 	m_tmap->set_flip(attributes);
 }
 
-void megasys1_tilemap_device::set_tilebank(uint8_t bank)
+void megasys1_tilemap_device::set_tilebank(u8 bank)
 {
 	m_tile_bank = bank << 12;
 	m_tmap->mark_all_dirty();

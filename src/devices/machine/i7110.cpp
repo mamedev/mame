@@ -603,7 +603,7 @@ template<std::size_t N> void fsa_channel_device::rotate(std::bitset<N>& bits, bo
 
 bool fsa_channel_device::detector_r() const
 {
-	return m_even_out[ EVEN_OUT_DET_POS ] | m_odd_out[ ODD_OUT_DET_POS ];
+	return m_even_out[ EVEN_OUT_DET_POS ] || m_odd_out[ ODD_OUT_DET_POS ];
 }
 
 void fsa_channel_device::generate(bool bit)

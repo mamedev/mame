@@ -12,10 +12,10 @@ Namco System II
 ***************************************************************************/
 
 #include "emu.h"
+#include "namcos2.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6805/m6805.h"
-#include "namcos2.h"
-#include "machine/nvram.h"
 
 
 u16 finallap_state::finallap_prot_r(offs_t offset)
@@ -68,19 +68,12 @@ u16 finallap_state::finallap_prot_r(offs_t offset)
 /* Perform basic machine initialisation                      */
 /*************************************************************/
 
-
-// S2 copy
-
 void namcos2_base_state::machine_start()
 {
-	m_eeprom = std::make_unique<u8[]>(0x2000);
-	subdevice<nvram_device>("nvram")->set_base(m_eeprom.get(), 0x2000);
-
 	const u32 max = memregion("audiocpu")->bytes() / 0x4000;
 	for (int i = 0; i < 0x10; i++)
 		m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
 
-	save_pointer(NAME(m_eeprom), 0x2000);
 	save_item(NAME(m_sendval));
 }
 
@@ -144,20 +137,6 @@ void namcos2_base_state::system_reset_w(u8 data)
 
 	if (data & 0x01)
 		m_maincpu->yield();
-}
-
-/*************************************************************/
-/* EEPROM Load/Save and read/write handling                  */
-/*************************************************************/
-
-void namcos2_base_state::eeprom_w(offs_t offset, u8 data)
-{
-	m_eeprom[offset] = data;
-}
-
-u8 namcos2_base_state::eeprom_r(offs_t offset)
-{
-	return m_eeprom[offset];
 }
 
 /*************************************************************/

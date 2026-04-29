@@ -211,7 +211,7 @@ u32 menu_audio_effects::flag_latency() const
 	if(latency < 0.05f)
 		flag |= FLAG_RIGHT_ARROW;
 	if(machine().sound().resampler_type() != sound_manager::RESAMPLER_HQ)
-		flag |= FLAG_INVERT | FLAG_DISABLE;
+		flag |= FLAG_DEEMPHASIZE | FLAG_DISABLE;
 	return flag;
 }
 
@@ -224,7 +224,7 @@ u32 menu_audio_effects::flag_length() const
 	if(length < 500)
 		flag |= FLAG_RIGHT_ARROW;
 	if(machine().sound().resampler_type() != sound_manager::RESAMPLER_HQ)
-		flag |= FLAG_INVERT | FLAG_DISABLE;
+		flag |= FLAG_DEEMPHASIZE | FLAG_DISABLE;
 	return flag;
 }
 
@@ -237,7 +237,7 @@ u32 menu_audio_effects::flag_phases() const
 	if(phases < 1000)
 		flag |= FLAG_RIGHT_ARROW;
 	if(machine().sound().resampler_type() != sound_manager::RESAMPLER_HQ)
-		flag |= FLAG_INVERT | FLAG_DISABLE;
+		flag |= FLAG_DEEMPHASIZE | FLAG_DISABLE;
 	return flag;
 }
 

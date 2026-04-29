@@ -35,7 +35,7 @@ void sound_module::abuffer::set_latency(float latency)
 
 void sound_module::abuffer::clear()
 {
-	get(m_last_sample.data(), 1, false);
+	get(m_last_sample.data(), 1);
 	m_used_buffers = 0;
 	m_used_buffers_prev = 0;
 	m_overrun = false;
@@ -47,7 +47,7 @@ void sound_module::abuffer::clear()
 	m_overruns = 0;
 }
 
-void sound_module::abuffer::get(int16_t *data, uint32_t samples, bool internal) noexcept
+void sound_module::abuffer::get(int16_t *data, uint32_t samples) noexcept
 {
 	m_delta -= samples;
 	m_delta2 -= samples;
@@ -84,7 +84,7 @@ void sound_module::abuffer::get(int16_t *data, uint32_t samples, bool internal) 
 		pos += avail;
 		data += avail * m_channels;
 	}
-	m_internal_get = internal;
+	m_internal_get = false;
 	//printf("%d -%d +%d # %d %d\n", m_used_buffers, m_underruns, m_overruns, m_delta, m_delta2);
 }
 
@@ -101,7 +101,8 @@ void sound_module::abuffer::flush_buffers(uint32_t remain)
 	// get crossfade source chunk
 	if(!m_internal_get || m_last_fade.size() != samples * m_channels) {
 		m_last_fade.resize(samples * m_channels);
-		get(m_last_fade.data(), samples, true);
+		get(m_last_fade.data(), samples);
+		m_internal_get = true;
 		m_delta += samples;
 		m_delta2 += samples;
 	}

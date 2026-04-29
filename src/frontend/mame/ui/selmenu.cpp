@@ -3264,7 +3264,7 @@ void menu_select_launch::draw(u32 flags)
 		// work out colours
 		rgb_t fgcolor = ui().colors().text_color();
 		rgb_t bgcolor = ui().colors().text_bg_color();
-		rgb_t fgcolor3 = ui().colors().clone_color();
+		rgb_t fgcolor_clone = ui().colors().clone_color();
 		bool const hovered(is_selectable(pitem) && pointer_in_rect(m_primary_items_hbounds.first, linetop, m_primary_items_hbounds.second, linebottom));
 		bool const pointerline((pointer_action::MAIN_TRACK_LINE == m_pointer_action) && (linenum == m_clicked_line));
 		bool const rclickline((pointer_action::MAIN_TRACK_RBUTTON == m_pointer_action) && (linenum == m_clicked_line));
@@ -3273,7 +3273,7 @@ void menu_select_launch::draw(u32 flags)
 			// if we're selected, draw with a different background
 			fgcolor = rgb_t(0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff);
-			fgcolor3 = rgb_t(0xcc, 0xcc, 0x00);
+			fgcolor_clone = rgb_t(0xcc, 0xcc, 0x00);
 			ui().draw_textured_box(
 					container(),
 					m_primary_items_hbounds.first, linetop, m_primary_items_hbounds.second, linebottom,
@@ -3283,20 +3283,20 @@ void menu_select_launch::draw(u32 flags)
 		else if ((pointerline || rclickline) && hovered)
 		{
 			// draw selected highlight for tracked item
-			fgcolor = fgcolor3 = ui().colors().selected_color();
+			fgcolor = fgcolor_clone = ui().colors().selected_color();
 			bgcolor = ui().colors().selected_bg_color();
 			highlight(m_primary_items_hbounds.first, linetop, m_primary_items_hbounds.second, linebottom, bgcolor);
 		}
 		else if (pointerline || rclickline || (!m_ui_error && !(flags & PROCESS_NOINPUT) && hovered && pointer_idle()))
 		{
 			// draw hover highlight when hovered over or dragged off
-			fgcolor = fgcolor3 = ui().colors().mouseover_color();
+			fgcolor = fgcolor_clone = ui().colors().mouseover_color();
 			bgcolor = ui().colors().mouseover_bg_color();
 			highlight(m_primary_items_hbounds.first, linetop, m_primary_items_hbounds.second, linebottom, bgcolor);
 		}
 		else if (pitem.ref() == m_prev_selected)
 		{
-			fgcolor = fgcolor3 = ui().colors().mouseover_color();
+			fgcolor = fgcolor_clone = ui().colors().mouseover_color();
 			bgcolor = ui().colors().mouseover_bg_color();
 			ui().draw_textured_box(
 					container(),
@@ -3324,7 +3324,7 @@ void menu_select_launch::draw(u32 flags)
 		}
 		else
 		{
-			bool const item_invert(pitem.flags() & FLAG_INVERT);
+			bool const item_deemphasize(pitem.flags() & FLAG_DEEMPHASIZE);
 			if (m_has_icons)
 				draw_icon(linenum, pitem.ref(), item_text_left, linetop);
 			if (pitem.subtext().empty())
@@ -3335,7 +3335,7 @@ void menu_select_launch::draw(u32 flags)
 						itemtext,
 						item_text_left + icon_offset, linetop, item_text_width - icon_offset,
 						text_layout::text_justify::LEFT, text_layout::word_wrapping::TRUNCATE,
-						mame_ui_manager::NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor,
+						mame_ui_manager::NORMAL, item_deemphasize ? fgcolor_clone : fgcolor, bgcolor,
 						nullptr, nullptr,
 						line_height());
 			}
@@ -3352,7 +3352,7 @@ void menu_select_launch::draw(u32 flags)
 						itemtext,
 						item_text_left + icon_offset, linetop, item_text_width - icon_offset - subitem_width,
 						text_layout::text_justify::LEFT, text_layout::word_wrapping::TRUNCATE,
-						mame_ui_manager::NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor,
+						mame_ui_manager::NORMAL, item_deemphasize ? fgcolor_clone : fgcolor, bgcolor,
 						&item_width, nullptr,
 						line_height());
 
@@ -3362,7 +3362,7 @@ void menu_select_launch::draw(u32 flags)
 						subitem_text,
 						item_text_left + icon_offset + item_width, linetop, item_text_width - icon_offset - item_width,
 						text_layout::text_justify::RIGHT, text_layout::word_wrapping::NEVER,
-						mame_ui_manager::NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor,
+						mame_ui_manager::NORMAL, item_deemphasize ? fgcolor_clone : fgcolor, bgcolor,
 						nullptr, nullptr,
 						line_height());
 			}

@@ -14,9 +14,9 @@
 #include "namcomcu.h"
 
 #include "machine/eeprompar.h"
-#include "machine/mb87078.h"
 #include "machine/timer.h"
 #include "sound/c352.h"
+#include "sound/mb87077.h"
 #include "video/rgbutil.h"
 #include "video/poly.h"
 
@@ -296,8 +296,8 @@ protected:
 	void point_address_w(u16 data);
 	void point_loword_iw(u16 data);
 	void point_hiword_w(u16 data);
-	u16 point_loword_r();
-	u16 point_hiword_ir();
+	u16 point_loword_ir();
+	u16 point_hiword_r();
 	void dsp_unk2_w(u16 data);
 	u16 dsp_unk_port3_r();
 	void upload_code_to_slave_dsp_w(u16 data);

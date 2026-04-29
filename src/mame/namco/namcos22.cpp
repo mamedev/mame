@@ -2063,28 +2063,28 @@ void namcos22_state::point_address_w(u16 data)
 
 void namcos22_state::point_loword_iw(u16 data)
 {
-	m_point_data |= data;
+	m_point_data = (m_point_data & ~0xffff) | data;
 	point_write(m_point_address++, m_point_data);
 }
 
 void namcos22_state::point_hiword_w(u16 data)
 {
-	m_point_data = data << 16;
+	m_point_data = (m_point_data & 0xffff) | data << 16;
 }
 
-u16 namcos22_state::point_loword_r()
+u16 namcos22_state::point_loword_ir()
 {
-	return point_read(m_point_address) & 0xffff;
-}
-
-u16 namcos22_state::point_hiword_ir()
-{
-	// high bit is unknown busy signal (ridgerac, ridgera2, raverace, cybrcomm)
-	const u16 ret = 0x8000 | (point_read(m_point_address) >> 16 & 0x00ff);
+	m_point_data = point_read(m_point_address);
 	if (!machine().side_effects_disabled())
 		m_point_address++;
 
-	return ret;
+	return m_point_data & 0xffff;
+}
+
+u16 namcos22_state::point_hiword_r()
+{
+	// high bit is unknown busy signal (ridgerac, ridgera2, raverace, cybrcomm)
+	return 0x8000 | (m_point_data >> 16 & 0xff);
 }
 
 
@@ -2456,8 +2456,8 @@ void namcos22_state::master_dsp_data(address_map &map)
 
 void namcos22_state::master_dsp_io(address_map &map)
 {
-	map(0x0, 0x0).rw(FUNC(namcos22_state::point_loword_r), FUNC(namcos22_state::point_loword_iw));
-	map(0x1, 0x1).rw(FUNC(namcos22_state::point_hiword_ir), FUNC(namcos22_state::point_hiword_w));
+	map(0x0, 0x0).rw(FUNC(namcos22_state::point_loword_ir), FUNC(namcos22_state::point_loword_iw));
+	map(0x1, 0x1).rw(FUNC(namcos22_state::point_hiword_r), FUNC(namcos22_state::point_hiword_w));
 	map(0x2, 0x2).rw(FUNC(namcos22_state::pdp_begin_r), FUNC(namcos22_state::dsp_unk2_w));
 	map(0x3, 0x3).rw(FUNC(namcos22_state::dsp_unk_port3_r), FUNC(namcos22_state::point_address_w));
 	map(0x4, 0x4).nopw(); /* unknown */
@@ -2628,7 +2628,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::mcu_irq)
 
 void namcos22s_state::mb87078_gain_changed(offs_t offset, u8 data)
 {
-	m_c352->set_output_gain(offset ^ 3, data / 100.0);
+	m_c352->set_output_gain(offset ^ 3, m_mb87078->gain_factor_r(offset));
 }
 
 /*
@@ -3760,7 +3760,7 @@ void adillor_state::machine_start()
 
 void namcos22_state::namcos22(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68020(config, m_maincpu, 49.152_MHz_XTAL/2); // MC68020RP25E
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos22_state::namcos22_am);
 	m_maincpu->set_vblank_int("screen", FUNC(namcos22_state::namcos22_interrupt));
@@ -3798,7 +3798,7 @@ void namcos22_state::namcos22(machine_config &config)
 
 	EEPROM_2864(config, "eeprom").write_time(attotime::zero);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(namcos22_state::screen_update_namcos22));
@@ -3807,7 +3807,7 @@ void namcos22_state::namcos22(machine_config &config)
 	PALETTE(config, m_palette).set_entries(0x8000);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos22);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
 	C352(config, m_c352, 49.152_MHz_XTAL/2, 288);
@@ -3819,11 +3819,9 @@ void namcos22_state::cybrcomm(machine_config &config)
 {
 	namcos22(config);
 
-	SPEAKER(config, "rear_left").rear_left();
-	SPEAKER(config, "rear_right").rear_right();
-
-	m_c352->add_route(2, "rear_left", 1.0);
-	m_c352->add_route(3, "rear_right", 1.0);
+	SPEAKER(config, "rear", 2).rear();
+	m_c352->add_route(2, "rear", 1.0, 0);
+	m_c352->add_route(3, "rear", 1.0, 1);
 }
 
 // System Super22
@@ -3832,7 +3830,7 @@ void namcos22s_state::namcos22s(machine_config &config)
 {
 	namcos22(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	M68EC020(config.replace(), m_maincpu, 49.152_MHz_XTAL/2); // MC68EC020FG25
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos22s_state::namcos22s_am);
 	m_maincpu->set_vblank_int("screen", FUNC(namcos22s_state::namcos22s_interrupt));
@@ -3854,13 +3852,14 @@ void namcos22s_state::namcos22s(machine_config &config)
 
 	config.device_remove("iomcu");
 
-	MB87078(config, m_mb87078);
-	m_mb87078->gain_changed().set(FUNC(namcos22s_state::mb87078_gain_changed));
-
-	/* video hardware */
+	// video hardware
 	m_screen->set_screen_update(FUNC(namcos22s_state::screen_update_namcos22s));
 
 	GFXDECODE(config.replace(), m_gfxdecode, m_palette, gfx_super);
+
+	// sound hardware
+	MB87078(config, m_mb87078);
+	m_mb87078->gain_changed().set(FUNC(namcos22s_state::mb87078_gain_changed));
 }
 
 void namcos22s_state::airco22b(machine_config &config)

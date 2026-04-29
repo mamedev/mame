@@ -263,7 +263,7 @@ void simple_menu_select_game::populate()
 				item_append(
 						m_drivlist->driver(curmatch).type.fullname(),
 						m_drivlist->driver(curmatch).name,
-						(cloneof == -1) ? 0 : FLAG_INVERT,
+						(cloneof == -1) ? 0 : FLAG_DEEMPHASIZE,
 						(void *)&m_drivlist->driver(curmatch));
 			}
 		}

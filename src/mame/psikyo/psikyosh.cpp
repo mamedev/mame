@@ -32,8 +32,12 @@ There appear to be multiple revisions of this board
  ---------------------------------
  Dragon Blaze (c)2000
  Tetris The Grand Master 2 (c)2000
- Tetris The Grand Master 2 Plus (c)2000 (Confirmed by Japump to be a Dragon Blaze upgraded board)
- GunBarich (c)2001 (Appears to be a Dragon Blaze upgraded board, easily replaced chips have been swapped)
+ Tetris The Grand Master 2 Plus (c)2000 (Confirmed by Japump to be a
+ Dragon Blaze upgraded board)
+
+ GunBarich (c)2001 (Appears to be a Dragon Blaze upgraded board, easily
+ replaced chips have been swapped)
+
  Mahjong G-Taste (c)2002
 
  The PS5v2 board is only different physically.
@@ -46,15 +50,16 @@ YMF278B-F (80 pin PQFP) & YAC513 (16 pin SOIC)
 93C56 EEPROM
 ( 93c56 is a 93c46 with double the address space. )
 
-To Do:
-  - see notes in video file -
+TODO:
+  - see notes in psikyo/psikyosh_v.cpp -
 
 
 *-----------------------------------*
 |         Tips and Tricks           |
 *-----------------------------------*
 
-Hold Button during booting to test roms (Checksum 16-bit, on Words for gfx and Bytes for sound) for:
+Hold Button during booting to test ROMs (Checksum 16-bit, on Words for gfx and
+Bytes for sound) for:
 
 Daraku:           PL1 Button 1 (passes, doesn't test sound)
 Space Bomber:     PL1 Start (passes all, only if bit 0x40 is set. But then EEPROM resets?)
@@ -338,12 +343,15 @@ ROM Usage
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/ymopl.h"
+
 #include "speaker.h"
 
 
+static constexpr XTAL MASTER_CLOCK = 57.272727_MHz_XTAL;   // main oscillator frequency
+
 static GFXDECODE_START( gfx_psikyosh )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_packed_msb, 0x000, 0x100 ) // 4bpp tiles
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x8_raw,        0x000, 0x100 ) // 8bpp tiles
+	GFXDECODE_ENTRY( "gfx", 0, gfx_16x16x4_packed_msb, 0x000, 0x100 ) // 4bpp tiles
+	GFXDECODE_ENTRY( "gfx", 0, gfx_16x16x8_raw,        0x000, 0x100 ) // 8bpp tiles
 GFXDECODE_END
 
 void psikyosh_state::eeprom_w(u8 data)
@@ -353,7 +361,7 @@ void psikyosh_state::eeprom_w(u8 data)
 	m_eeprom->clk_write(BIT(data, 6));
 
 	if (data & ~0xe0)
-		logerror("Unk EEPROM write %x\n", data);
+		logerror("Unknown EEPROM write %x\n", data);
 }
 
 INTERRUPT_GEN_MEMBER(psikyosh_state::interrupt)
@@ -391,7 +399,7 @@ u32 psikyosh_state::mjgtaste_input_r()
 Mahjong keyboard encoder -> JAMMA adapter (SK-G001). Created to allow the use of a Mahjong panel with the existing, recycled Dragon Blaze boards.
 PCB contains what looks like an MCU of some description labeled "TMIBOD 4", undumped
 PCB maps keyboard lines onto JAMMA P1 controls
-Normally the demultiplexing is taken care of in hardware (e.g. metro.c, ssv.c), but here the game code has to do it.
+Normally the demultiplexing is taken care of in hardware (e.g. metro/metro.cpp, seta/ssv.cpp), but here the game code has to do it.
 
 Standard Mahjong keyboard encoder
       /---------------- KEY7
@@ -492,12 +500,12 @@ P1KEY11  29|30  P2KEY11
 		u32 const start_depressed = ~value & 0x01000000;
 		keys |= start_depressed ? 1 << (std::size(key_codes) - 1) : 0; // and bung it in at the end
 
-		value |= 0xFFFF0000; // set top word
+		value |= 0xffff0000; // set top word
 		do {
 			// since we can't handle multiple keys, just return the first one depressed
 			if ((keys & which_key) && (count < std::size(key_codes)))
 			{
-				value &= ~((u32)(key_codes[count]) << 16); // mask in selected word as IP_ACTIVE_LOW
+				value &= ~(u32(key_codes[count]) << 16); // mask in selected word as IP_ACTIVE_LOW
 				break;
 			}
 			which_key <<= 1;
@@ -508,54 +516,58 @@ P1KEY11  29|30  P2KEY11
 	return value;
 }
 
+void psikyosh_state::io_map(address_map &map)
+{
+	map(0x0, 0x3).portr("INPUTS");
+	map(0x4, 0x7).portr("JP4");
+	map(0x4, 0x4).w(FUNC(psikyosh_state::eeprom_w));
+}
+
+void psikyosh_state::video_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram().w(FUNC(psikyosh_state::spriteram_w)).share(m_spriteram); // sprite and backgrounds share this area (video banks 0-1f)
+	map(0x40000, 0x44fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette"); // palette..
+	map(0x50000, 0x501ff).ram().share(m_zoomram); // sprite zoom lookup table
+	map(0x5ffdc, 0x5ffdf).w(FUNC(psikyosh_state::irqctrl_w)); // also writes to this address - might be vblank reads?
+	map(0x5ffe0, 0x5ffff).ram().w(FUNC(psikyosh_state::vidregs_w)).share(m_vidregs); //  video registers
+	map(0x60000, 0x7ffff).bankr(m_gfxrombank); // data for ROM tests (gfx), data is controlled by vidreg
+}
 
 // ps3v1
 void psikyosh_state::ps3v1_map(address_map &map)
 {
-// rom mapping
+// ROM mapping
 	map(0x00000000, 0x000fffff).rom(); // program ROM (1 meg)
 	map(0x02000000, 0x020fffff).rom().region("maincpu", 0x100000); // data ROM
 // video chip
-	map(0x03000000, 0x0300ffff).ram().share("spriteram"); // sprite and backgrounds are share this area (video banks 0-1f)
-	map(0x03040000, 0x03044fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette"); // palette..
-	map(0x03050000, 0x030501ff).ram().share("zoomram"); // sprite zoom lookup table
-	map(0x0305ffdc, 0x0305ffdf).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).w(FUNC(psikyosh_state::irqctrl_w)); // also writes to this address - might be vblank reads?
-	map(0x0305ffe0, 0x0305ffff).ram().w(FUNC(psikyosh_state::vidregs_w)).share("vidregs"); //  video registers
-	map(0x03060000, 0x0307ffff).bankr("gfxbank"); // data for rom tests (gfx), data is controlled by vidreg
-// rom mapping
-	map(0x04060000, 0x0407ffff).bankr("gfxbank"); // data for rom tests (gfx) (Mirrored?)
+	map(0x03000000, 0x0307ffff).m(*this, FUNC(psikyosh_state::video_map));
+	map(0x0305ffdc, 0x0305ffdf).r("watchdog", FUNC(watchdog_timer_device::reset32_r));
+// ROM mapping
+	map(0x04060000, 0x0407ffff).bankr(m_gfxrombank); // data for ROM tests (gfx) (Mirrored?)
 // sound chip
 	map(0x05000000, 0x05000007).rw("ymf", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
 // inputs/eeprom
-	map(0x05800000, 0x05800003).portr("INPUTS");
-	map(0x05800004, 0x05800007).portr("JP4");
-	map(0x05800004, 0x05800004).w(FUNC(psikyosh_state::eeprom_w));
-// ram
-	map(0x06000000, 0x060fffff).ram().share("ram"); // main RAM (1 meg)
+	map(0x05800000, 0x05800007).m(*this, FUNC(psikyosh_state::io_map));
+// RAM
+	map(0x06000000, 0x060fffff).ram().share(m_ram); // main RAM (1 meg)
 }
 
 // ps5, ps5v2
 void psikyosh_state::ps5_map(address_map &map)
 {
-// rom mapping
+// ROM mapping
 	map(0x00000000, 0x000fffff).rom(); // program ROM (1 meg)
-// inputs/eeprom
-	map(0x03000000, 0x03000003).portr("INPUTS");
-	map(0x03000004, 0x03000007).portr("JP4");
-	map(0x03000004, 0x03000004).w(FUNC(psikyosh_state::eeprom_w));
+// inputs/EEPROM
+	map(0x03000000, 0x03000007).m(*this, FUNC(psikyosh_state::io_map));
 // sound chip
 	map(0x03100000, 0x03100007).rw("ymf", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
 // video chip
-	map(0x04000000, 0x0400ffff).ram().share("spriteram"); // sprite and backgrounds are share this area (video banks 0-1f)
-	map(0x04040000, 0x04044fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x04050000, 0x040501ff).ram().share("zoomram"); // sprite zoom lookup table
-	map(0x0405ffdc, 0x0405ffdf).nopr().w(FUNC(psikyosh_state::irqctrl_w)); // also writes to this address - might be vblank reads?
-	map(0x0405ffe0, 0x0405ffff).ram().w(FUNC(psikyosh_state::vidregs_w)).share("vidregs"); // video registers
-	map(0x04060000, 0x0407ffff).bankr("gfxbank"); // data for rom tests (gfx), data is controlled by vidreg
-// rom mapping
+	map(0x04000000, 0x0407ffff).m(*this, FUNC(psikyosh_state::video_map));
+	map(0x0405ffdc, 0x0405ffdf).nopr(); // watchdog?
+// ROM mapping
 	map(0x05000000, 0x0507ffff).rom().region("maincpu", 0x100000); // data ROM
-// ram
-	map(0x06000000, 0x060fffff).ram().share("ram");
+// RAM
+	map(0x06000000, 0x060fffff).ram().share(m_ram);
 }
 
 // mahjong
@@ -571,10 +583,10 @@ void psikyosh_state::s1945iiibl_map(address_map &map)
 	ps5_map(map);
 
 	map(0x00000000, 0x001fffff).rom(); // bootleg has the data both in a separate chip and at the end of the 2 program ROMs. Why?
-	map(0x04003000, 0x040031ff).ram().share("zoomram"); // sprite zoom lookup table is inside of spriteram instead of external like in the original
+	map(0x04003000, 0x040031ff).ram().share(m_zoomram); // sprite zoom lookup table is inside of spriteram instead of external like in the original
 	map(0x04050000, 0x040501ff).unmaprw();
 	map(0x04053fdc, 0x04053fdf).nopr().w(FUNC(psikyosh_state::irqctrl_w));
-	map(0x04053fe0, 0x04053fff).ram().w(FUNC(psikyosh_state::vidregs_w)).share("vidregs");
+	map(0x04053fe0, 0x04053fff).ram().w(FUNC(psikyosh_state::vidregs_w)).share(m_vidregs);
 	map(0x0405ffdc, 0x0405ffdf).unmaprw();
 	map(0x0405ffe0, 0x0405ffff).unmaprw();
 	map(0x05000000, 0x0507ffff).rom().region("maincpu", 0x200000); // data ROM
@@ -584,10 +596,10 @@ void psikyosh_state::s1945iiibla_map(address_map &map)
 {
 	ps5_map(map);
 
-	map(0x04003000, 0x040031ff).ram().share("zoomram");
+	map(0x04003000, 0x040031ff).ram().share(m_zoomram);
 	map(0x04030000, 0x040301ff).ram(); // fails RAM test otherwise
 	map(0x04053fdc, 0x04053fdf).nopr().w(FUNC(psikyosh_state::irqctrl_w));
-	map(0x04053fe0, 0x04053fff).ram().w(FUNC(psikyosh_state::vidregs_w)).share("vidregs");
+	map(0x04053fe0, 0x04053fff).ram().w(FUNC(psikyosh_state::vidregs_w)).share(m_vidregs);
 	map(0x0405ffdc, 0x0405ffdf).unmaprw();
 	map(0x0405ffe0, 0x0405ffff).unmaprw();
 }
@@ -830,7 +842,7 @@ INPUT_PORTS_END
 
 void psikyosh_state::machine_start()
 {
-	m_gfxrombank->configure_entries(0, 0x1000, memregion("gfx1")->base(), 0x20000);
+	m_gfxrombank->configure_entries(0, 0x1000, memregion("gfx")->base(), 0x20000);
 }
 
 
@@ -848,8 +860,8 @@ void psikyosh_state::psikyo3v1(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(0, 40*8-1, 0, 28*8-1);
+	m_screen->set_size(64 * 8, 32 * 8);
+	m_screen->set_visarea(0, 40 * 8 - 1, 0, 28 * 8 - 1);
 	m_screen->set_screen_update(FUNC(psikyosh_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(psikyosh_state::screen_vblank));
 
@@ -886,7 +898,7 @@ void psikyosh_state::psikyo5_240(machine_config &config)
 
 	/* Measured Hsync 16.165 KHz, Vsync 61.68 Hz */
 	/* Ideally this would be driven off the video register. However, it doesn't change at runtime and MAME will pick a better screen resolution if it knows upfront */
-	m_screen->set_raw(MASTER_CLOCK/8, 443, 0, 40*8, 262, 0, 30*8);
+	m_screen->set_raw(MASTER_CLOCK / 8, 443, 0, 40 * 8, 262, 0, 30 * 8);
 }
 
 void psikyosh_state::s1945iiibl(machine_config &config)
@@ -916,7 +928,7 @@ ROM_START( soldivid )
 	ROM_LOAD32_WORD_SWAP( "2-prog_l.u18", 0x000002, 0x080000, CRC(cf179b04) SHA1(343f00a81cffd44334a4db81b6b828b7cf73c1e8) )
 	ROM_LOAD32_WORD_SWAP( "1-prog_h.u17", 0x000000, 0x080000, CRC(f467d1c4) SHA1(a011e6f310a54f09efa0bf4597783cd78c05ad6f) )
 
-	ROM_REGION( 0x3800000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x3800000, "gfx", ROMREGION_ERASE00 )
 	/* This Space Empty! */
 	ROM_LOAD32_WORD_SWAP( "4l.u10", 0x2000000, 0x400000, CRC(9eb9f269) SHA1(4a4d90eefe62b5462f5ed5e062eea7b6b4900f85) )
 	ROM_LOAD32_WORD_SWAP( "4h.u31", 0x2000002, 0x400000, CRC(7c76cfe7) SHA1(14e291e840a4afe3802fe1847615c5e806d7492a) )
@@ -934,7 +946,7 @@ ROM_START( soldividk )
 	ROM_LOAD32_WORD_SWAP( "9-prog_lk.u18", 0x000002, 0x080000, CRC(b534029d) SHA1(a96ca55e6694c5537d489d40bc890c376bbce933) )
 	ROM_LOAD32_WORD_SWAP( "8-prog_hk.u17", 0x000000, 0x080000, CRC(a48e3206) SHA1(d560286972de2a0baa5369672a0190b7bd421843) )
 
-	ROM_REGION( 0x3800000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x3800000, "gfx", ROMREGION_ERASE00 )
 	/* This Space Empty! */
 	ROM_LOAD32_WORD_SWAP( "4l.u10", 0x2000000, 0x400000, CRC(9eb9f269) SHA1(4a4d90eefe62b5462f5ed5e062eea7b6b4900f85) )
 	ROM_LOAD32_WORD_SWAP( "4h.u31", 0x2000002, 0x400000, CRC(7c76cfe7) SHA1(14e291e840a4afe3802fe1847615c5e806d7492a) )
@@ -952,7 +964,7 @@ ROM_START( s1945ii )
 	ROM_LOAD32_WORD_SWAP( "2_prog_l.u18", 0x000002, 0x080000, CRC(20a911b8) SHA1(82ba7b93bd621fc45a4dc2722752077b59a0a233) )
 	ROM_LOAD32_WORD_SWAP( "1_prog_h.u17", 0x000000, 0x080000, CRC(4c0fe85e) SHA1(74f810a1c3e9d629c8b190f68d73ce07b11f77b7) )
 
-	ROM_REGION( 0x2000000, "gfx1", 0 )  /* Tiles */
+	ROM_REGION( 0x2000000, "gfx", 0 )  /* Tiles */
 	ROM_LOAD32_WORD( "0l.u4",    0x0000000, 0x400000, CRC(bfacf98d) SHA1(19954f12881e6e95e808bd1f2c2f5a425786727f) )
 	ROM_LOAD32_WORD( "0h.u13",   0x0000002, 0x400000, CRC(1266f67c) SHA1(cf93423a827aa92aa54afbbecf8509d2590edc9b) )
 	ROM_LOAD32_WORD( "1l.u3",    0x0800000, 0x400000, CRC(2d3332c9) SHA1(f2e54100a48061bfd589e8765f59ca051176a38b) )
@@ -976,7 +988,7 @@ ROM_START( daraku )
 	ROM_LOAD32_WORD_SWAP( "3_prog_h.u17", 0x000000, 0x080000, CRC(7a9cf601) SHA1(8df464ce3fd02b30dd2ab77828594f4916375fd5) )
 	ROM_LOAD16_WORD_SWAP( "prog.u16",     0x100000, 0x100000, CRC(3742e990) SHA1(dd4b8777e57245151b3d520ed1bdab207530420b) )
 
-	ROM_REGION( 0x3400000, "gfx1", 0 )
+	ROM_REGION( 0x3400000, "gfx", 0 )
 	ROM_LOAD32_WORD( "0l.u4",  0x0000000, 0x400000, CRC(565d8427) SHA1(090ce9213c530d29e488cfb89bb39fd7169985d5) )
 	ROM_LOAD32_WORD( "0h.u13", 0x0000002, 0x400000, CRC(9a602630) SHA1(ab176490b36aec7ce30d1cf20b57c02c926c59d3) )
 	ROM_LOAD32_WORD( "1l.u3",  0x0800000, 0x400000, CRC(ac5ce8e1) SHA1(7df6a04ea2530cc669581474e8b8ee6f59caae1b) )
@@ -1004,7 +1016,7 @@ ROM_START( sbomber ) /* Version B - Only shows "Version B" when set to Japan reg
 	ROM_LOAD32_WORD_SWAP( "1-b_pr_l.u18", 0x000002, 0x080000, CRC(52d12225) SHA1(0a31a5d557414e7bf51dc6f7fbdd417a20b78df1) )
 	ROM_LOAD32_WORD_SWAP( "1-b_pr_h.u17", 0x000000, 0x080000, CRC(1bbd0345) SHA1(c6ccb7c97cc9e9ea298c1883d1dd5563907a7255) )
 
-	ROM_REGION( 0x2800000, "gfx1", 0 )
+	ROM_REGION( 0x2800000, "gfx", 0 )
 	ROM_LOAD32_WORD( "0l.u4",  0x0000000, 0x400000, CRC(b7e4ac51) SHA1(70e802b6235932116496a77ee0c78a256e85aff3) )
 	ROM_LOAD32_WORD( "0h.u13", 0x0000002, 0x400000, CRC(235e6c27) SHA1(c597d7b5bef4edac1474ad0024cfb33eb1257106) )
 	ROM_LOAD32_WORD( "1l.u3",  0x0800000, 0x400000, CRC(3c88c48c) SHA1(d1ce4ab60ba18449bbd96e29c310e060a0bb6de6) )
@@ -1028,7 +1040,7 @@ ROM_START( sbombera ) /* Original version */
 	ROM_LOAD32_WORD_SWAP( "2.u18", 0x000002, 0x080000, CRC(57819a26) SHA1(d7a6fc957e39adf97762ab0a35b91aa17ec026e0) )
 	ROM_LOAD32_WORD_SWAP( "1.u17", 0x000000, 0x080000, CRC(c388e847) SHA1(cbf4f2e191894160bdf0290d72cf20c222aaf7a7) )
 
-	ROM_REGION( 0x2800000, "gfx1", 0 )
+	ROM_REGION( 0x2800000, "gfx", 0 )
 	ROM_LOAD32_WORD( "0l.u4",  0x0000000, 0x400000, CRC(b7e4ac51) SHA1(70e802b6235932116496a77ee0c78a256e85aff3) )
 	ROM_LOAD32_WORD( "0h.u13", 0x0000002, 0x400000, CRC(235e6c27) SHA1(c597d7b5bef4edac1474ad0024cfb33eb1257106) )
 	ROM_LOAD32_WORD( "1l.u3",  0x0800000, 0x400000, CRC(3c88c48c) SHA1(d1ce4ab60ba18449bbd96e29c310e060a0bb6de6) )
@@ -1055,7 +1067,7 @@ ROM_START( gunbird2 ) /* Internal date string shows Oct 07 16:05 */
 	ROM_LOAD32_WORD_SWAP( "1_prog_h.u17", 0x000000, 0x080000, CRC(7328d8bf) SHA1(c640de1ab5b32400b2d77e0dc6e3ee0f78ab7803) )
 	ROM_LOAD16_WORD_SWAP( "3_pdata.u1",   0x100000, 0x080000, CRC(a5b697e6) SHA1(947f124fa585c2cf77c6571af7559bd652897b89) )
 
-	ROM_REGION( 0x3800000, "gfx1", 0 )
+	ROM_REGION( 0x3800000, "gfx", 0 )
 	ROM_LOAD32_WORD( "0l.u3",  0x0000000, 0x800000, CRC(5c826bc8) SHA1(74fb6b242b4c5fe5365cfcc3029ed6da4cf3a621) )
 	ROM_LOAD32_WORD( "0h.u10", 0x0000002, 0x800000, CRC(3df0cb6c) SHA1(271d276fa0f63d84e458223316a9517865fc2255) )
 	ROM_LOAD32_WORD( "1l.u4",  0x1000000, 0x800000, CRC(1558358d) SHA1(e3b9c3da4e9b29ffa9568b57d14fe2b600aead68) )
@@ -1093,7 +1105,7 @@ ROM_START( gunbird2a ) /* Internal date string shows Oct 08 17:02 - No specific 
 	ROM_LOAD32_WORD_SWAP( "prog_h.u17", 0x000000, 0x080000, CRC(cb0cb826) SHA1(8827e9ebfedbc63dbf41c6a5c994a691a6d63fdb) )
 	ROM_LOAD16_WORD_SWAP( "pdata.u1",   0x100000, 0x080000, CRC(23751839) SHA1(4762685d1f6843e8e53eae6c014e66b98fa15eb7) )
 
-	ROM_REGION( 0x3800000, "gfx1", 0 )
+	ROM_REGION( 0x3800000, "gfx", 0 )
 	ROM_LOAD32_WORD( "0l.u3",  0x0000000, 0x800000, CRC(5c826bc8) SHA1(74fb6b242b4c5fe5365cfcc3029ed6da4cf3a621) )
 	ROM_LOAD32_WORD( "0h.u10", 0x0000002, 0x800000, CRC(3df0cb6c) SHA1(271d276fa0f63d84e458223316a9517865fc2255) )
 	ROM_LOAD32_WORD( "1l.u4",  0x1000000, 0x800000, CRC(1558358d) SHA1(e3b9c3da4e9b29ffa9568b57d14fe2b600aead68) )
@@ -1116,7 +1128,7 @@ ROM_START( s1945iii )
 	ROM_LOAD32_WORD_SWAP( "1_progh.u17", 0x000000, 0x080000, CRC(1b8a5a18) SHA1(718a176bd48e16f964fcb07c568b5227cfc0515f) )
 	ROM_LOAD16_WORD_SWAP( "3_data.u1",   0x100000, 0x080000, CRC(8ff5f7d3) SHA1(420a3d7f2d5ab6a56789d36b418431f12f5f73f5) )
 
-	ROM_REGION( 0x3800000, "gfx1", 0 )
+	ROM_REGION( 0x3800000, "gfx", 0 )
 	ROM_LOAD32_WORD( "0l.u3",  0x0000000, 0x800000, CRC(70a0d52c) SHA1(c9d9534da59123b577dc22020273b94ccdeeb67d) )
 	ROM_LOAD32_WORD( "0h.u10", 0x0000002, 0x800000, CRC(4dcd22b4) SHA1(2df7a7d08df17d2a62d574fccc8ba40aaae21a13) )
 	ROM_LOAD32_WORD( "1l.u4",  0x1000000, 0x800000, CRC(de1042ff) SHA1(468f6dfd5c1f2084c573b6851e314ff2826dc350) )
@@ -1142,7 +1154,7 @@ ROM_START( s1945iiibl ) // BM1045 PCB - has HD6417098 CPU + YMF268-F sound chip 
 	ROM_LOAD16_WORD_SWAP( "083351_10-01-13.u3", 0x200000, 0x080000, CRC(f76eb183) SHA1(457f6f959c0885b64ec35a3046f2f0b60798a2e0) ) // M27C160, u3 also written with a marker on the label
 	ROM_IGNORE(                                           0x180000 ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x3800000, "gfx1", 0 ) // not dumped for this bootleg, which actually has 4x 26L12811MC-12 MTPs
+	ROM_REGION( 0x3800000, "gfx", 0 ) // not dumped for this bootleg, which actually has 4x 26L12811MC-12 MTPs
 	ROM_LOAD32_WORD( "0l.u3",  0x0000000, 0x800000, BAD_DUMP CRC(70a0d52c) SHA1(c9d9534da59123b577dc22020273b94ccdeeb67d) )
 	ROM_LOAD32_WORD( "0h.u10", 0x0000002, 0x800000, BAD_DUMP CRC(4dcd22b4) SHA1(2df7a7d08df17d2a62d574fccc8ba40aaae21a13) )
 	ROM_LOAD32_WORD( "1l.u4",  0x1000000, 0x800000, BAD_DUMP CRC(de1042ff) SHA1(468f6dfd5c1f2084c573b6851e314ff2826dc350) )
@@ -1165,7 +1177,7 @@ ROM_START( s1945iiibla ) // SK000420 PCB
 	ROM_LOAD32_WORD_SWAP( "u1", 0x000000, 0x080000, CRC(f67016d0) SHA1(3b52690c450524d54a0c74639049f1b648b6ceb9) )
 	ROM_LOAD16_WORD_SWAP( "u2", 0x100000, 0x080000, CRC(4922685b) SHA1(9af39abeed55459981d6dd74aaeff35293c66892) )
 
-	ROM_REGION( 0x3800000, "gfx1", 0 ) // data verified same as original PCB
+	ROM_REGION( 0x3800000, "gfx", 0 ) // data verified same as original PCB
 	ROM_LOAD32_WORD( "0l",  0x0000000, 0x800000, CRC(70a0d52c) SHA1(c9d9534da59123b577dc22020273b94ccdeeb67d) ) // mask ROMs with silkscreened labels
 	ROM_LOAD32_WORD( "0h",  0x0000002, 0x800000, CRC(4dcd22b4) SHA1(2df7a7d08df17d2a62d574fccc8ba40aaae21a13) )
 	ROM_LOAD32_WORD( "1l",  0x1000000, 0x800000, CRC(de1042ff) SHA1(468f6dfd5c1f2084c573b6851e314ff2826dc350) )
@@ -1194,7 +1206,7 @@ ROM_START( dragnblz )
 	ROM_LOAD32_WORD_SWAP( "2prog_h.u21",   0x000000, 0x080000, CRC(fc5eade8) SHA1(e5d05543641e4a3900b0d42e0d5f75734683d635) )
 	ROM_LOAD32_WORD_SWAP( "1prog_l.u22",   0x000002, 0x080000, CRC(95d6fd02) SHA1(2b2830e7fa66cbd13666191762bfddc40571caec) )
 
-	ROM_REGION( 0x2c00000, "gfx1", ROMREGION_ERASE00 )  /* Sprites */
+	ROM_REGION( 0x2c00000, "gfx", ROMREGION_ERASE00 )  /* Sprites */
 	ROM_LOAD32_WORD( "1l.u4",  0x0400000, 0x200000, CRC(c2eb565c) SHA1(07e41b36cc03a87f28d091754fdb0d1a7316a532) )
 	ROM_LOAD32_WORD( "1h.u12", 0x0400002, 0x200000, CRC(23cb46b7) SHA1(005b7cc40eea103688a64a72c219c7535970dbfb) )
 	ROM_LOAD32_WORD( "2l.u5",  0x0800000, 0x200000, CRC(bc256aea) SHA1(1f1d678e8a63513a95f296b8a07d2ea485d1e53f) )
@@ -1236,7 +1248,7 @@ ROM_START( gnbarich )
 	ROM_LOAD32_WORD_SWAP( "2-prog_l.u21",   0x000000, 0x080000, CRC(c136cd9c) SHA1(ab66c4f5196a66a97dbb5832336a203421cf40fa) )
 	ROM_LOAD32_WORD_SWAP( "1-prog_h.u22",   0x000002, 0x080000, CRC(6588fc96) SHA1(3db29fcf17e8b2aee465319b557bd3e45bc966b2) )
 
-	ROM_REGION( 0x2c00000, "gfx1", ROMREGION_ERASE00 )  /* Sprites */
+	ROM_REGION( 0x2c00000, "gfx", ROMREGION_ERASE00 )  /* Sprites */
 //  ROM_LOAD32_WORD( "1l.u4",  0x0400000, 0x200000, CRC(c2eb565c) SHA1(07e41b36cc03a87f28d091754fdb0d1a7316a532) ) /* From Dragon Blaze */
 //  ROM_LOAD32_WORD( "1h.u12", 0x0400002, 0x200000, CRC(23cb46b7) SHA1(005b7cc40eea103688a64a72c219c7535970dbfb) ) /* From Dragon Blaze */
 //  ROM_LOAD32_WORD( "2l.u5",  0x0800000, 0x200000, CRC(bc256aea) SHA1(1f1d678e8a63513a95f296b8a07d2ea485d1e53f) ) /* From Dragon Blaze */
@@ -1270,7 +1282,7 @@ ROM_START( mjgtaste )
 	ROM_LOAD32_WORD_SWAP( "2.u21",   0x000000, 0x080000, CRC(5f2041dc) SHA1(f3862ffdb8df0cf921ce1cb0236935731e7729a7) )
 	ROM_LOAD32_WORD_SWAP( "1.u22",   0x000002, 0x080000, CRC(f5ff7876) SHA1(4c909db9c97f29fd79df6dacd29762688701b973) )
 
-	ROM_REGION( 0x2c00000, "gfx1", ROMREGION_ERASE00 )  /* Sprites */
+	ROM_REGION( 0x2c00000, "gfx", ROMREGION_ERASE00 )  /* Sprites */
 	ROM_LOAD32_WORD( "1l.u4",  0x0400000, 0x200000, CRC(30da42b1) SHA1(8485f2c0e7769b50b95d962afe14fa7ae74cd887) )
 	ROM_LOAD32_WORD( "1h.u12", 0x0400002, 0x200000, CRC(629c1d44) SHA1(61909091328bb7b6d3e6e0bff91e14c9b4b86c2c) )
 	ROM_LOAD32_WORD( "2l.u5",  0x0800000, 0x200000, CRC(1f6126ab) SHA1(e9fc70ca42798c04a4d4e1ef1113a59477c77fdc) )
@@ -1304,7 +1316,7 @@ ROM_START( tgm2 )
 	ROM_LOAD32_WORD_SWAP( "2.u21",   0x000000, 0x080000, CRC(b19f6c31) SHA1(c58346c575db71262aebc3993743cb031c41e4af) )
 	ROM_LOAD32_WORD_SWAP( "1.u22",   0x000002, 0x080000, CRC(c521bf24) SHA1(0ee5b9f74b6b8bcc01b2270c53f30d99e877ed64) )
 
-	ROM_REGION( 0x3000000, "gfx1", ROMREGION_ERASE00 )  /* Sprites */
+	ROM_REGION( 0x3000000, "gfx", ROMREGION_ERASE00 )  /* Sprites */
 	// Lower positions not populated
 	ROM_LOAD32_WORD( "81ts_3l.u6",   0x0c00000, 0x200000, CRC(d77cff9c) SHA1(93ee48c350110ebf9a80cca95c599c90a523147d) )
 	ROM_LOAD32_WORD( "82ts_3h.u14",  0x0c00002, 0x200000, CRC(f012b583) SHA1(907e1c93cbfa6a0285f96c53f5ccb63e313053d7) )
@@ -1336,7 +1348,7 @@ ROM_START( tgm2p )
 	ROM_LOAD32_WORD_SWAP( "2b.u21",   0x000000, 0x080000, CRC(38bc626c) SHA1(783e8413b11f1fa08d331b09ef4ed63f62b87ead) )
 	ROM_LOAD32_WORD_SWAP( "1b.u22",   0x000002, 0x080000, CRC(7599fb19) SHA1(3f7e81756470c173cc17a7e7dee91437571fd0c3) )
 
-	ROM_REGION( 0x3000000, "gfx1", ROMREGION_ERASE00 )  /* Sprites */
+	ROM_REGION( 0x3000000, "gfx", ROMREGION_ERASE00 )  /* Sprites */
 	// Lower positions not populated
 	ROM_LOAD32_WORD( "81ts_3l.u6",   0x0c00000, 0x200000, CRC(d77cff9c) SHA1(93ee48c350110ebf9a80cca95c599c90a523147d) )
 	ROM_LOAD32_WORD( "82ts_3h.u14",  0x0c00002, 0x200000, CRC(f012b583) SHA1(907e1c93cbfa6a0285f96c53f5ccb63e313053d7) )
@@ -1366,7 +1378,6 @@ ROM_END
 void psikyosh_state::init_ps3()
 {
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
-	m_maincpu->sh2drc_add_fastram(0x03000000, 0x0300ffff, 0, &m_spriteram[0]);
 	m_maincpu->sh2drc_add_fastram(0x03050000, 0x030501ff, 0, &m_zoomram[0]);
 	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_ram[0]);
 }
@@ -1374,7 +1385,6 @@ void psikyosh_state::init_ps3()
 void psikyosh_state::init_ps5()
 {
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
-	m_maincpu->sh2drc_add_fastram(0x04000000, 0x0400ffff, 0, &m_spriteram[0]);
 	m_maincpu->sh2drc_add_fastram(0x04050000, 0x040501ff, 0, &m_zoomram[0]);
 	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_ram[0]);
 }
@@ -1382,7 +1392,6 @@ void psikyosh_state::init_ps5()
 void psikyosh_state::init_s1945iiibl()
 {
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
-	m_maincpu->sh2drc_add_fastram(0x04000000, 0x0400ffff, 0, &m_spriteram[0]);
 	m_maincpu->sh2drc_add_fastram(0x04003000, 0x040031ff, 0, &m_zoomram[0]); // zoomram is in spriteram here
 	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_ram[0]);
 }

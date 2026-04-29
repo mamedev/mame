@@ -820,6 +820,7 @@ void menu::draw(uint32_t flags)
 			else if (pitem.subtext().empty())
 			{
 				// if we don't have a subitem, just draw the string centered
+				bool const item_deemphasize(pitem.flags() & FLAG_DEEMPHASIZE);
 				if (pitem.flags() & FLAG_UI_HEADING)
 				{
 					float heading_width = get_string_width(itemtext);
@@ -831,14 +832,15 @@ void menu::draw(uint32_t flags)
 						itemtext,
 						effective_left, line_y0, effective_width,
 						text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE,
-						mame_ui_manager::NORMAL, fgcolor, bgcolor,
+						mame_ui_manager::NORMAL, item_deemphasize ? fgcolor3 : fgcolor, bgcolor,
 						nullptr, nullptr,
 						line_height());
 			}
 			else
 			{
 				// otherwise, draw the item on the left and the subitem text on the right
-				bool const subitem_invert(pitem.flags() & FLAG_INVERT);
+				bool const subitem_deemphasize(pitem.flags() & FLAG_DEEMPHASIZE);
+				bool const item_deemphasize(subitem_deemphasize && (pitem.flags() & FLAG_DISABLE));
 				float item_width, subitem_width;
 
 				// draw the left-side text
@@ -847,7 +849,7 @@ void menu::draw(uint32_t flags)
 						itemtext,
 						effective_left, line_y0, effective_width,
 						text_layout::text_justify::LEFT, text_layout::word_wrapping::TRUNCATE,
-						mame_ui_manager::NORMAL, fgcolor, bgcolor,
+						mame_ui_manager::NORMAL, item_deemphasize ? fgcolor3 : fgcolor, bgcolor,
 						&item_width, nullptr,
 						line_height());
 
@@ -895,7 +897,7 @@ void menu::draw(uint32_t flags)
 							subitem_text,
 							effective_left + item_width, line_y0, effective_width - item_width,
 							text_layout::text_justify::RIGHT, text_layout::word_wrapping::TRUNCATE,
-							mame_ui_manager::NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor,
+							mame_ui_manager::NORMAL, subitem_deemphasize ? fgcolor3 : fgcolor2, bgcolor,
 							&subitem_width, nullptr,
 							line_height());
 				}
@@ -926,7 +928,7 @@ void menu::draw(uint32_t flags)
 	if (selected_subitem_too_big)
 	{
 		menu_item const &pitem = selected_item();
-		bool const subitem_invert(pitem.flags() & FLAG_INVERT);
+		bool const subitem_deemphasize(pitem.flags() & FLAG_DEEMPHASIZE);
 		auto const linenum = m_selected - top_line;
 		float const line_y = m_items_top + float(linenum) * line_height();
 
@@ -947,7 +949,7 @@ void menu::draw(uint32_t flags)
 				container(),
 				target_x - lr_border(), target_y - tb_border(),
 				target_x + target_width + lr_border(), target_y + target_height + tb_border(),
-				subitem_invert ? ui().colors().selected_bg_color() : ui().colors().background_color());
+				subitem_deemphasize ? ui().colors().selected_bg_color() : ui().colors().background_color());
 
 		ui().draw_text_full(
 				container(),

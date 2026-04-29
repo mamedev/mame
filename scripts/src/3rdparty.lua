@@ -236,46 +236,6 @@ end
 
 
 --------------------------------------------------
--- SoftFloat library objects
---------------------------------------------------
-
-project "softfloat"
-	uuid "04fbf89e-4761-4cf2-8a12-64500cf0c5c5"
-	kind "StaticLib"
-
-	options {
-		"ForceCPP",
-	}
-
-	includedirs {
-		MAME_DIR .. "src/osd",
-	}
-
-	configuration { "gmake or ninja" }
-		buildoptions_cpp {
-			"-x c++",
-		}
-
-	configuration { "vs*" }
-if _OPTIONS["vs"]==nil then
-		buildoptions {
-			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
-			"/wd4146", -- warning C4146: unary minus operator applied to unsigned type, result still unsigned
-			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch
-		}
-end
-	configuration { }
-
-	files {
-		MAME_DIR .. "3rdparty/softfloat/softfloat.c",
-		MAME_DIR .. "3rdparty/softfloat/fsincos.c",
-		MAME_DIR .. "3rdparty/softfloat/fpatan.c",
-		MAME_DIR .. "3rdparty/softfloat/fyl2x.c",
-		MAME_DIR .. "3rdparty/softfloat/f2xm1.c",
-	}
-
-
---------------------------------------------------
 -- SoftFloat 3 library objects
 --------------------------------------------------
 
@@ -638,6 +598,7 @@ end
 		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/fyl2x.c",
 		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/poly.c",
 		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/extF80_scale.c",
+		MAME_DIR .. "3rdparty/softfloat3/bochs_ext/isNaN.c",
 	}
 
 

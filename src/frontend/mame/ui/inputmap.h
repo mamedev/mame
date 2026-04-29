@@ -16,6 +16,7 @@
 #include "iptseqpoll.h"
 
 #include <string>
+#include <variant>
 #include <vector>
 
 
@@ -40,9 +41,10 @@ public:
 
 protected:
 	// internal input menu item data
+	using input_item_ref = std::variant<std::nullptr_t, input_type_entry const *, ioport_field *>;
 	struct input_item_data
 	{
-		const void *        ref = nullptr;              // reference to type description for global inputs or field for game inputs
+		input_item_ref      ref = nullptr;              // pointer to type description for global inputs or field for game inputs
 		input_seq_type      seqtype = SEQ_TYPE_INVALID; // sequence type
 		input_seq           seq;                        // copy of the live sequence
 		const input_seq *   defseq = nullptr;           // pointer to the default sequence
@@ -76,7 +78,13 @@ private:
 	input_seq starting_seq;
 
 	virtual bool handle(event const *ev) override;
-	virtual void update_input(input_item_data &seqchangeditem) = 0;
+
+	void update_assignment(input_item_data &item, std::nullptr_t);
+	void update_assignment(input_item_data &item, input_type_entry const *type_entry);
+	void update_assignment(input_item_data &item, ioport_field *field);
+	bool assignment_is_inherited(input_item_data const &item, std::nullptr_t) const;
+	bool assignment_is_inherited(input_item_data const &item, input_type_entry const *type_entry) const;
+	bool assignment_is_inherited(input_item_data const &item, ioport_field *field) const;
 };
 
 
@@ -91,7 +99,6 @@ protected:
 
 private:
 	virtual void populate() override;
-	virtual void update_input(input_item_data &seqchangeditem) override;
 
 	const int group;
 };
@@ -108,7 +115,6 @@ protected:
 
 private:
 	virtual void populate() override;
-	virtual void update_input(input_item_data &seqchangeditem) override;
 };
 
 } // namespace ui

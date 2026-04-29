@@ -573,7 +573,7 @@ void menu_select_software::populate()
 
 		item_append(
 				m_displaylist[curitem].get().longname, m_displaylist[curitem].get().devicetype,
-				m_displaylist[curitem].get().parentname.empty() ? 0 : FLAG_INVERT, (void *)&m_displaylist[curitem].get());
+				m_displaylist[curitem].get().parentname.empty() ? 0 : FLAG_DEEMPHASIZE, (void *)&m_displaylist[curitem].get());
 	}
 
 	m_skip_main_items = 0;

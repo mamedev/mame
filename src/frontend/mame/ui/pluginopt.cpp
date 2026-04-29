@@ -173,7 +173,7 @@ void menu_plugin_opt::populate()
 			else if (flag == "lr")
 				item_flags_or |= FLAG_RIGHT_ARROW | FLAG_LEFT_ARROW;
 			else if (flag == "invert")
-				item_flags_or |= FLAG_INVERT;
+				item_flags_or |= FLAG_DEEMPHASIZE;
 			else if (flag == "heading")
 				item_flags_or |= FLAG_DISABLE | FLAG_UI_HEADING;
 			else

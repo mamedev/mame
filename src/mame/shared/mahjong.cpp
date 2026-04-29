@@ -69,7 +69,7 @@
  Nichibutsu wires the bits in the opposite order.
  The Jaleco MegaSystem 32 has the columns rotated by one position so the Start column is the least significant bit.
  Various other games (e.g. from Seta) change the order of rows and/or columns.
- Sega, Sanritsu, Toaplan and some other transposed the rows and columns, producing a 6*4 or 6*5 matrix.
+ Sega, Sanritsu, Toaplan and some others transposed the rows and columns, producing a 6*4 or 6*5 matrix.
 
  Note that non-standard mahjong/hanafuda keyboards exist:
  * Some Nichibutsu hanafuda games use the Reach/Ron positions for Yes/No (rather than M/N).

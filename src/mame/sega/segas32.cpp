@@ -555,12 +555,12 @@ segas32_state::segas32_state(const machine_config &mconfig, const char *tag, dev
 
 segas32_state::segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_multi32)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_z80_shared_ram(*this,"z80_shared_ram")
-	, m_system32_workram(*this,"workram")
-	, m_videoram(*this,"videoram", 0x20000, ENDIANNESS_LITTLE)
-	, m_spriteram(*this,"spriteram", 0x20000, ENDIANNESS_LITTLE)
+	, m_z80_shared_ram(*this, "z80_shared_ram")
+	, m_system32_workram(*this, "workram")
+	, m_videoram(*this, "videoram", 0x20000, ENDIANNESS_LITTLE)
+	, m_spriteram(*this, "spriteram", 0x20000, ENDIANNESS_LITTLE)
 	, m_soundram(*this, "soundram")
-	, m_paletteram(*this,"paletteram.%u", 0U, 0x10000U, ENDIANNESS_LITTLE)
+	, m_paletteram(*this, "paletteram.%u", 0U, 0x10000U, ENDIANNESS_LITTLE)
 	, m_maincpu(*this, "maincpu")
 	, m_soundcpu(*this, "soundcpu")
 	, m_multipcm(*this, "sega")
@@ -604,14 +604,14 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
  *
  *************************************/
 
-#define MAIN_IRQ_VBSTART    0
-#define MAIN_IRQ_VBSTOP     1
-#define MAIN_IRQ_SOUND      2
-#define MAIN_IRQ_TIMER0     3
-#define MAIN_IRQ_TIMER1     4
+static constexpr int MAIN_IRQ_VBSTART = 0;
+static constexpr int MAIN_IRQ_VBSTOP  = 1;
+static constexpr int MAIN_IRQ_SOUND   = 2;
+static constexpr int MAIN_IRQ_TIMER0  = 3;
+static constexpr int MAIN_IRQ_TIMER1  = 4;
 
-#define SOUND_IRQ_YM3438    0
-#define SOUND_IRQ_V60       1
+static constexpr int SOUND_IRQ_YM3438 = 0;
+static constexpr int SOUND_IRQ_V60    = 1;
 
 
 
@@ -663,13 +663,13 @@ void segas32_state::device_reset()
 
 void segas32_state::update_irq_state()
 {
-	uint8_t effirq = m_v60_irq_control[7] & ~m_v60_irq_control[6] & 0x1f;
+	const uint8_t effirq = m_v60_irq_control[7] & ~m_v60_irq_control[6] & 0x1f;
 	int vector;
 
 	/* loop over interrupt vectors, finding the highest priority one with */
 	/* an unmasked interrupt pending */
 	for (vector = 0; vector < 5; vector++)
-		if (effirq & (1 << vector))
+		if (BIT(effirq, vector))
 		{
 			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector); // V60
 			break;
@@ -746,7 +746,7 @@ void segas32_state::int_control_w(offs_t offset, uint8_t data)
 		case 9:         /* timer 0 count */
 		{
 			m_v60_irq_control[offset] = data;
-			uint16_t duration = m_v60_irq_control[8] | ((m_v60_irq_control[9] << 8) & 0xf00);
+			const uint16_t duration = m_v60_irq_control[8] | ((m_v60_irq_control[9] << 8) & 0xf00);
 			if (duration)
 			{
 				const XTAL xtal = m_is_multi32 ? 32_MHz_XTAL : 32.2159_MHz_XTAL;
@@ -760,7 +760,7 @@ void segas32_state::int_control_w(offs_t offset, uint8_t data)
 		case 11:        /* timer 1 count */
 		{
 			m_v60_irq_control[offset] = data;
-			uint16_t duration = m_v60_irq_control[10] | ((m_v60_irq_control[11] << 8) & 0xf00);
+			const uint16_t duration = m_v60_irq_control[10] | ((m_v60_irq_control[11] << 8) & 0xf00);
 			if (duration)
 			{
 				attotime period = attotime::from_ticks(0x100 * duration, 50_MHz_XTAL / 16);
@@ -810,10 +810,10 @@ void segas32_state::misc_output_0_w(uint8_t data)
 	if (m_sw1_output)
 		(this->*m_sw1_output)(0, data);
 
-	//machine().bookkeeping().coin_lockout_w(1 + 2*0, data & 0x08);
-	//machine().bookkeeping().coin_lockout_w(0 + 2*0, data & 0x04);
-	machine().bookkeeping().coin_counter_w(1 + 2*0, data & 0x02);
-	machine().bookkeeping().coin_counter_w(0 + 2*0, data & 0x01);
+	//machine().bookkeeping().coin_lockout_w(1 + 2*0, BIT(data, 3));
+	//machine().bookkeeping().coin_lockout_w(0 + 2*0, BIT(data, 2));
+	machine().bookkeeping().coin_counter_w(1 + 2*0, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(0 + 2*0, BIT(data, 0));
 }
 
 
@@ -822,10 +822,10 @@ void segas32_state::misc_output_1_w(uint8_t data)
 	if (m_sw1_output)
 		(this->*m_sw1_output)(1, data);
 
-	//machine().bookkeeping().coin_lockout_w(1 + 2*1, data & 0x08);
-	//machine().bookkeeping().coin_lockout_w(0 + 2*1, data & 0x04);
-	machine().bookkeeping().coin_counter_w(1 + 2*1, data & 0x02);
-	machine().bookkeeping().coin_counter_w(0 + 2*1, data & 0x01);
+	//machine().bookkeeping().coin_lockout_w(1 + 2*1, BIT(data, 3));
+	//machine().bookkeeping().coin_lockout_w(0 + 2*1, BIT(data, 2));
+	machine().bookkeeping().coin_counter_w(1 + 2*1, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(0 + 2*1, BIT(data, 0));
 }
 
 
@@ -898,13 +898,13 @@ void segas32_state::shared_ram_w(offs_t offset, uint8_t data)
 
 void segas32_state::update_sound_irq_state()
 {
-	uint8_t effirq = m_sound_irq_input & ~m_sound_irq_control[3] & 0x07;
+	const uint8_t effirq = m_sound_irq_input & ~m_sound_irq_control[3] & 0x07;
 	int vector;
 
 	/* loop over interrupt vectors, finding the highest priority one with */
 	/* an unmasked interrupt pending */
 	for (vector = 0; vector < 3; vector++)
-		if (effirq & (1 << vector))
+		if (BIT(effirq, vector))
 		{
 			m_soundcpu->set_input_line_and_vector(0, ASSERT_LINE, 2 * vector); // Z80
 			break;
@@ -938,14 +938,14 @@ void segas32_state::clear_sound_irq(int which)
 void segas32_state::sound_int_control_lo_w(offs_t offset, uint8_t data)
 {
 	/* odd offsets are interrupt acks */
-	if (offset & 1)
+	if (BIT(offset, 0))
 	{
 		m_sound_irq_input &= data;
 		update_sound_irq_state();
 	}
 
 	/* high offsets signal an IRQ to the v60 */
-	if (offset & 4)
+	if (BIT(offset, 2))
 		signal_v60_irq(MAIN_IRQ_SOUND);
 }
 
@@ -1026,9 +1026,9 @@ void segas32_state::sound_dummy_w(uint8_t data)
 
 inline uint16_t segas32_state::xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(uint16_t value)
 {
-	int r = (value >> 0) & 0x1f;
-	int g = (value >> 5) & 0x1f;
-	int b = (value >> 10) & 0x1f;
+	const int r = (value >> 0) & 0x1f;
+	const int g = (value >> 5) & 0x1f;
+	const int b = (value >> 10) & 0x1f;
 	value = (value & 0x8000) | ((b & 0x01) << 14) | ((g & 0x01) << 13) | ((r & 0x01) << 12);
 	value |= ((b & 0x1e) << 7) | ((g & 0x1e) << 3) | ((r & 0x1e) >> 1);
 	return value;
@@ -1037,9 +1037,9 @@ inline uint16_t segas32_state::xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(uint16_t val
 
 inline uint16_t segas32_state::xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(uint16_t value)
 {
-	int r = ((value >> 12) & 0x01) | ((value << 1) & 0x1e);
-	int g = ((value >> 13) & 0x01) | ((value >> 3) & 0x1e);
-	int b = ((value >> 14) & 0x01) | ((value >> 7) & 0x1e);
+	const int r = ((value >> 12) & 0x01) | ((value << 1) & 0x1e);
+	const int g = ((value >> 13) & 0x01) | ((value >> 3) & 0x1e);
+	const int b = ((value >> 14) & 0x01) | ((value >> 7) & 0x1e);
 	return (value & 0x8000) | (b << 10) | (g << 5) | (r << 0);
 }
 
@@ -1064,13 +1064,11 @@ inline void segas32_state::update_color(int offset, uint16_t data)
 template<int Which>
 uint16_t segas32_state::paletteram_r(offs_t offset)
 {
-	int convert;
-
 	/* the lower half of palette RAM is formatted xBBBBBGGGGGRRRRR */
 	/* the upper half of palette RAM is formatted xBGRBBBBGGGGRRRR */
 	/* we store everything if the first format, and convert accesses to the other format */
 	/* on the fly */
-	convert = (offset & 0x4000);
+	const bool convert = BIT(offset, 14);
 	offset &= 0x3fff;
 
 	if (!convert)
@@ -1082,23 +1080,21 @@ uint16_t segas32_state::paletteram_r(offs_t offset)
 template<int Which>
 void segas32_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t value;
-	int convert;
-
 	/* the lower half of palette RAM is formatted xBBBBBGGGGGRRRRR */
 	/* the upper half of palette RAM is formatted xBGRBBBBGGGGRRRR */
 	/* we store everything if the first format, and convert accesses to the other format */
 	/* on the fly */
-	convert = (offset & 0x4000);
+	const bool convert = BIT(offset, 14);
 	offset &= 0x3fff;
 
+	uint16_t value;
 	/* read, modify, and write the new value, updating the palette */
 	value = m_paletteram[Which][offset];
 	if (convert) value = xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(value);
 	COMBINE_DATA(&value);
 	if (convert) value = xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(value);
 	m_paletteram[Which][offset] = value;
-	update_color(0x4000*Which + offset, value);
+	update_color(0x4000 * Which + offset, value);
 
 	/* if blending is enabled, writes go to both halves of palette RAM */
 	if (m_mixer_control[Which][0x4e/2] & 0x0880)
@@ -1111,7 +1107,7 @@ void segas32_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask
 		COMBINE_DATA(&value);
 		if (convert) value = xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(value);
 		m_paletteram[Which][offset] = value;
-		update_color(0x4000*Which + offset, value);
+		update_color(0x4000 * Which + offset, value);
 	}
 }
 
@@ -1145,16 +1141,16 @@ void segas32_state::system32_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).rom();
-	map(0x200000, 0x20ffff).mirror(0x0f0000).ram().share("workram");
+	map(0x200000, 0x20ffff).mirror(0x0f0000).ram().share(m_system32_workram);
 	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::videoram_r), FUNC(segas32_state::videoram_w));
 	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w));
 	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask16(0x00ff);
 	map(0x600000, 0x60ffff).mirror(0x0e0000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>));
 	map(0x610000, 0x61007f).mirror(0x0eff80).rw(FUNC(segas32_state::mixer_r<0>), FUNC(segas32_state::mixer_w<0>));
 	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
-	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask16(0x00ff);
-	map(0x801000, 0x801000).rw("s32comm", FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
-	map(0x801002, 0x801002).rw("s32comm", FUNC(s32comm_device::fg_r), FUNC(s32comm_device::fg_w));
+	map(0x800000, 0x800fff).rw(m_s32comm, FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask16(0x00ff);
+	map(0x801000, 0x801000).rw(m_s32comm, FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
+	map(0x801002, 0x801002).rw(m_s32comm, FUNC(s32comm_device::fg_r), FUNC(s32comm_device::fg_w));
 	map(0xc00000, 0xc0001f).mirror(0x0fff80).rw("io_chip", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 	// 0xc00040-0xc0007f - I/O expansion area
 	map(0xd00000, 0xd0000f).mirror(0x07fff0).rw(FUNC(segas32_state::int_control_r), FUNC(segas32_state::int_control_w));
@@ -1177,9 +1173,9 @@ void segas32_state::multi32_map(address_map &map)
 	map(0x680000, 0x68ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<1>), FUNC(segas32_state::paletteram_w<1>));
 	map(0x690000, 0x69007f).mirror(0x06ff80).rw(FUNC(segas32_state::mixer_r<1>), FUNC(segas32_state::mixer_w<1>));
 	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
-	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask32(0x00ff00ff);
-	map(0x801000, 0x801000).rw("s32comm", FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
-	map(0x801002, 0x801002).rw("s32comm", FUNC(s32comm_device::fg_r), FUNC(s32comm_device::fg_w));
+	map(0x800000, 0x800fff).rw(m_s32comm, FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask32(0x00ff00ff);
+	map(0x801000, 0x801000).rw(m_s32comm, FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
+	map(0x801002, 0x801002).rw(m_s32comm, FUNC(s32comm_device::fg_r), FUNC(s32comm_device::fg_w));
 	map(0xc00000, 0xc0001f).mirror(0x07ff80).rw("io_chip_0", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask32(0x00ff00ff);
 	// 0xc00040-0xc0007f - I/O expansion area 0
 	map(0xc80000, 0xc8001f).mirror(0x07ff80).rw("io_chip_1", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask32(0x00ff00ff);
@@ -1200,9 +1196,9 @@ void segas32_state::multi32_map(address_map &map)
 void segas32_state::system32_sound_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom().region("soundcpu", 0);
-	map(0xa000, 0xbfff).bankr("soundbank");
+	map(0xa000, 0xbfff).bankr(m_soundrom_bank);
 	map(0xc000, 0xdfff).m("rfsnd", FUNC(rf5c68_device::map));
-	map(0xe000, 0xffff).ram().share("z80_shared_ram");
+	map(0xe000, 0xffff).ram().share(m_z80_shared_ram);
 }
 
 void segas32_state::system32_sound_portmap(address_map &map)
@@ -1221,16 +1217,16 @@ void segas32_state::system32_sound_portmap(address_map &map)
 void segas32_state::rf5c68_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).ram().share("soundram");
+	map(0x0000, 0xffff).ram().share(m_soundram);
 }
 
 
 void segas32_state::multi32_sound_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom().region("soundcpu", 0);
-	map(0xa000, 0xbfff).bankr("soundbank");
-	map(0xc000, 0xdfff).rw("sega", FUNC(multipcm_device::read), FUNC(multipcm_device::write));
-	map(0xe000, 0xffff).ram().share("z80_shared_ram");
+	map(0xa000, 0xbfff).bankr(m_soundrom_bank);
+	map(0xc000, 0xdfff).rw(m_multipcm, FUNC(multipcm_device::read), FUNC(multipcm_device::write));
+	map(0xe000, 0xffff).ram().share(m_z80_shared_ram);
 }
 
 void segas32_state::multi32_sound_portmap(address_map &map)
@@ -1249,8 +1245,8 @@ void segas32_state::multi32_sound_portmap(address_map &map)
 void segas32_state::multipcm_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x17ffff).bankr("multipcmbanklo");
-	map(0x180000, 0x1fffff).bankr("multipcmbankhi");
+	map(0x100000, 0x17ffff).bankr(m_multipcm_bank_lo);
+	map(0x180000, 0x1fffff).bankr(m_multipcm_bank_hi);
 }
 
 
@@ -1345,8 +1341,8 @@ static INPUT_PORTS_START( system32_generic )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( system32_generic_slave )
-	PORT_START("slavepcb:P1_A")
+static INPUT_PORTS_START( system32_generic_sub )
+	PORT_START("subpcb:P1_A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
@@ -1356,7 +1352,7 @@ static INPUT_PORTS_START( system32_generic_slave )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 
-	PORT_START("slavepcb:P2_A")
+	PORT_START("subpcb:P2_A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
@@ -1366,36 +1362,36 @@ static INPUT_PORTS_START( system32_generic_slave )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
 
-	PORT_START("slavepcb:PORTC_A")
+	PORT_START("subpcb:PORTC_A")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("slavepcb:SERVICE12_A")
+	PORT_START("subpcb:SERVICE12_A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F1) PORT_NAME("slavepcb:Service Mode")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F1) PORT_NAME("subpcb:Service Mode")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START4 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("slavepcb:SERVICE34_A")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("slavepcb_SW1:1")
+	PORT_START("subpcb:SERVICE34_A")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("subpcb_SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("slavepcb_SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("subpcb_SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("slavepcb_SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("subpcb_SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("slavepcb_SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("subpcb_SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("slavepcb:Push SW1 (Service)") PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("slavepcb:Push SW2 (Test)") PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("subpcb:Push SW1 (Service)") PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("subpcb:Push SW2 (Test)") PORT_CODE(KEYCODE_CLOSEBRACE)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("slavepcb:eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("subpcb:eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( multi32_generic )
@@ -1460,29 +1456,29 @@ static INPUT_PORTS_START( arescue )
 	PORT_START("mainpcb:ANALOG3")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_INCLUDE( system32_generic_slave )
+	PORT_INCLUDE( system32_generic_sub )
 
-	PORT_MODIFY("slavepcb:P1_A")
+	PORT_MODIFY("subpcb:P1_A")
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
-	PORT_MODIFY("slavepcb:P2_A")
+	PORT_MODIFY("subpcb:P2_A")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("slavepcb:SERVICE12_A")
+	PORT_MODIFY("subpcb:SERVICE12_A")
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("slavepcb:SERVICE34_A")
+	PORT_MODIFY("subpcb:SERVICE34_A")
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("slavepcb:ANALOG1")
+	PORT_START("subpcb:ANALOG1")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_REVERSE  PORT_PLAYER(2)
 
-	PORT_START("slavepcb:ANALOG2")
+	PORT_START("subpcb:ANALOG2")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)  PORT_PLAYER(2)
 
-	PORT_START("slavepcb:ANALOG3")
+	PORT_START("subpcb:ANALOG3")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)  PORT_PLAYER(2)
 
 INPUT_PORTS_END
@@ -1659,29 +1655,29 @@ static INPUT_PORTS_START( f1en )
 	PORT_START("mainpcb:ANALOG3")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("mainpcb:Brake Pedal")
 
-	PORT_INCLUDE( system32_generic_slave )
+	PORT_INCLUDE( system32_generic_sub )
 
-	PORT_MODIFY("slavepcb:P1_A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("slavepcb:Gear Up")  PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("slavepcb:Gear Down") PORT_PLAYER(2)
+	PORT_MODIFY("subpcb:P1_A")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("subpcb:Gear Up")  PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("subpcb:Gear Down") PORT_PLAYER(2)
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("slavepcb:P2_A")
+	PORT_MODIFY("subpcb:P2_A")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("slavepcb:SERVICE12_A")
+	PORT_MODIFY("subpcb:SERVICE12_A")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("slavepcb:ANALOG1")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("slavepcb:Steering Wheel")  PORT_PLAYER(2)
+	PORT_START("subpcb:ANALOG1")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("subpcb:Steering Wheel")  PORT_PLAYER(2)
 
-	PORT_START("slavepcb:ANALOG2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL  ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("slavepcb:Gas Pedal")  PORT_PLAYER(2)
+	PORT_START("subpcb:ANALOG2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL  ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("subpcb:Gas Pedal")  PORT_PLAYER(2)
 
-	PORT_START("slavepcb:ANALOG3")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("slavepcb:Brake Pedal")  PORT_PLAYER(2)
+	PORT_START("subpcb:ANALOG3")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_NAME("subpcb:Brake Pedal")  PORT_PLAYER(2)
 
 INPUT_PORTS_END
 
@@ -2219,7 +2215,13 @@ static const gfx_layout bgcharlayout =
 
 
 static GFXDECODE_START( gfx_segas32 )
-	GFXDECODE_ENTRY( "gfx1", 0, bgcharlayout,   0x00, 0x3ff  )
+	GFXDECODE_ENTRY( "tiles",  0, bgcharlayout,         0, 0x400 )
+	GFXDECODE_RAM( "videoram", 0, gfx_8x8x4_packed_msb, 0, 0x400 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_multi32 )
+	GFXDECODE_ENTRY( "tiles",  0, bgcharlayout,         0, 0x800 )
+	GFXDECODE_RAM( "videoram", 0, gfx_8x8x4_packed_msb, 0, 0x800 )
 GFXDECODE_END
 
 
@@ -2232,18 +2234,18 @@ GFXDECODE_END
 
 void segas32_state::device_add_mconfig(machine_config &config)
 {
-	constexpr XTAL MASTER_CLOCK = 32.2159_MHz_XTAL;
+	constexpr XTAL MAIN_CLOCK = 32.2159_MHz_XTAL;
 
 	/* basic machine hardware */
-	V60(config, m_maincpu, MASTER_CLOCK/2);
+	V60(config, m_maincpu, MAIN_CLOCK/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_state::system32_map);
 	m_maincpu->set_vblank_int("screen", FUNC(segas32_state::start_of_vblank_int));
 
-	Z80(config, m_soundcpu, MASTER_CLOCK/4);
+	Z80(config, m_soundcpu, MAIN_CLOCK/4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segas32_state::system32_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &segas32_state::system32_sound_portmap);
 
-	sega_315_5296_device &io_chip(SEGA_315_5296(config, "io_chip", MASTER_CLOCK/4));
+	sega_315_5296_device &io_chip(SEGA_315_5296(config, "io_chip", MAIN_CLOCK/4));
 	io_chip.in_pa_callback().set_ioport("P1_A");
 	io_chip.in_pb_callback().set_ioport("P2_A");
 	io_chip.in_pc_callback().set_ioport("PORTC_A");
@@ -2276,12 +2278,12 @@ void segas32_state::device_add_mconfig(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
 
-	ym3438_device &ym1(YM3438(config, "ym1", MASTER_CLOCK/4));
+	ym3438_device &ym1(YM3438(config, "ym1", MAIN_CLOCK/4));
 	ym1.irq_handler().set(FUNC(segas32_state::ym3438_irq_handler));
 	ym1.add_route(0, "speaker", 0.30, 0);
 	ym1.add_route(1, "speaker", 0.30, 1);
 
-	ym3438_device &ym2(YM3438(config, "ym2", MASTER_CLOCK/4));
+	ym3438_device &ym2(YM3438(config, "ym2", MAIN_CLOCK/4));
 	ym2.add_route(0, "speaker", 0.30, 0);
 	ym2.add_route(1, "speaker", 0.30, 1);
 
@@ -2442,7 +2444,7 @@ void segas32_upd7725_state::device_add_mconfig(machine_config &config)
 {
 	segas32_analog_state::device_add_mconfig(config);
 
-	// add a upd7725; this is on the 837-8341 daughterboard which plugs into the socket on the master pcb's ROM board where an fd1149 could go
+	// add a upd7725; this is on the 837-8341 daughterboard which plugs into the socket on the main pcb's ROM board where an fd1149 could go
 	upd7725_device &dsp(UPD7725(config, "dsp", 16_MHz_XTAL/2));
 	dsp.set_addrmap(AS_PROGRAM, &segas32_upd7725_state::upd7725_prg_map);
 	dsp.set_addrmap(AS_DATA, &segas32_upd7725_state::upd7725_data_map);
@@ -2530,7 +2532,7 @@ segas32_cd_state::segas32_cd_state(const machine_config &mconfig, const char *ta
 
 void sega_multi32_state::device_add_mconfig(machine_config &config)
 {
-	constexpr XTAL MASTER_CLOCK = 32_MHz_XTAL;
+	constexpr XTAL MAIN_CLOCK = 32_MHz_XTAL;
 	constexpr XTAL MULTI32_CLOCK = 40_MHz_XTAL;
 
 	/* basic machine hardware */
@@ -2538,11 +2540,11 @@ void sega_multi32_state::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sega_multi32_state::multi32_map);
 	m_maincpu->set_vblank_int("screen", FUNC(segas32_state::start_of_vblank_int));
 
-	Z80(config, m_soundcpu, MASTER_CLOCK/4);
+	Z80(config, m_soundcpu, MAIN_CLOCK/4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &sega_multi32_state::multi32_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &sega_multi32_state::multi32_sound_portmap);
 
-	sega_315_5296_device &io_chip_0(SEGA_315_5296(config, "io_chip_0", MASTER_CLOCK/4));
+	sega_315_5296_device &io_chip_0(SEGA_315_5296(config, "io_chip_0", MAIN_CLOCK/4));
 	io_chip_0.in_pa_callback().set_ioport("P1_A");
 	io_chip_0.in_pb_callback().set_ioport("P2_A");
 	io_chip_0.in_pc_callback().set_ioport("PORTC_A");
@@ -2554,7 +2556,7 @@ void sega_multi32_state::device_add_mconfig(machine_config &config)
 	io_chip_0.out_cnt1_callback().set(FUNC(segas32_state::display_enable_w<0>));
 	io_chip_0.out_cnt2_callback().set_inputline(m_soundcpu, INPUT_LINE_RESET).invert();
 
-	sega_315_5296_device &io_chip_1(SEGA_315_5296(config, "io_chip_1", MASTER_CLOCK/4));
+	sega_315_5296_device &io_chip_1(SEGA_315_5296(config, "io_chip_1", MAIN_CLOCK/4));
 	io_chip_1.in_pa_callback().set_ioport("P1_B");
 	io_chip_1.in_pb_callback().set_ioport("P2_B");
 	io_chip_1.in_pc_callback().set_ioport("PORTC_B");
@@ -2573,7 +2575,7 @@ void sega_multi32_state::device_add_mconfig(machine_config &config)
 	TIMER(config, "v60_irq1").configure_generic(FUNC(segas32_state::signal_v60_irq_callback));
 
 	/* video hardware */
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas32);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_multi32);
 	PALETTE(config, m_palette).set_entries(0x8000);
 	config.set_default_layout(layout_dualhsxs);
 
@@ -2594,7 +2596,7 @@ void sega_multi32_state::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "sleft").front_center();
 	SPEAKER(config, "sright").front_center();
 
-	ym3438_device &ymsnd(YM3438(config, "ymsnd", MASTER_CLOCK/4));
+	ym3438_device &ymsnd(YM3438(config, "ymsnd", MAIN_CLOCK/4));
 	ymsnd.irq_handler().set(FUNC(segas32_state::ym3438_irq_handler));
 	ymsnd.add_route(1, "sleft", 0.15);
 	ymsnd.add_route(0, "sright", 0.15);
@@ -2655,7 +2657,7 @@ ioport_value sega_multi32_analog_state::in3_analog_read()
 
 void sega_multi32_analog_state::analog_bank_w(uint8_t data)
 {
-	m_analog_bank = data & 1;
+	m_analog_bank = BIT(data, 0);
 }
 
 DEFINE_DEVICE_TYPE(SEGA_MULTI32_ANALOG_DEVICE, sega_multi32_analog_state, "segas32_pcb_multi_analog", "Sega Multi 32 analog PCB")
@@ -2702,7 +2704,7 @@ public:
 	segas32_new_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_mainpcb(*this, "mainpcb")
-		, m_slavepcb(*this, "slavepcb")
+		, m_subpcb(*this, "subpcb")
 	{ }
 
 	void sega_multi32(machine_config &config);
@@ -2745,13 +2747,13 @@ public:
 
 private:
 	required_device<segas32_state> m_mainpcb;
-	optional_device<segas32_state> m_slavepcb;
+	optional_device<segas32_state> m_subpcb;
 
 	std::unique_ptr<uint16_t[]> m_dual_pcb_comms;
 	void dual_pcb_comms_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t dual_pcb_comms_r(offs_t offset);
-	uint16_t dual_pcb_masterslave();
-	uint16_t dual_pcb_slave();
+	uint16_t dual_pcb_mainsub();
+	uint16_t dual_pcb_sub();
 };
 
 
@@ -2785,14 +2787,14 @@ void segas32_new_state::sega_system32_cd(machine_config &config)
 void segas32_new_state::sega_system32_dual_direct(machine_config &config)
 {
 	SEGA_S32_ANALOG_DEVICE(config, "mainpcb", 0);
-	SEGA_S32_ANALOG_DEVICE(config, "slavepcb", 0);
+	SEGA_S32_ANALOG_DEVICE(config, "subpcb", 0);
 }
 
 // air rescue is like f1en above but also has the 837-8341 DSP daughterboard on the mainpcb side only
 void segas32_new_state::sega_system32_dual_direct_upd7725(machine_config &config)
 {
 	SEGA_S32_UPD7725_DEVICE(config, "mainpcb", 0);
-	SEGA_S32_ANALOG_DEVICE(config, "slavepcb", 0);
+	SEGA_S32_ANALOG_DEVICE(config, "subpcb", 0);
 }
 
 void segas32_new_state::sega_system32_ga2(machine_config &config)
@@ -2928,7 +2930,7 @@ void segas32_new_state::sega_multi32_6p(machine_config &config)
 
     (todo, full layout)
 
-    The left ROM PCB (master?) contains a sub-board on the ROM board with the math DSP, the right ROM PCB does not have this.
+    The left ROM PCB (main?) contains a sub-board on the ROM board with the math DSP, the right ROM PCB does not have this.
 
 */
 ROM_START( arescue )
@@ -2944,7 +2946,7 @@ ROM_START( arescue )
 	ROM_LOAD_x2( "mpr-14511.ic26", 0x200000, 0x80000, CRC(074c53cc) SHA1(9c89843bbe8058123c25b7f8f86de754ddbca2bb) )
 	ROM_LOAD_x2( "mpr-14510.ic22", 0x300000, 0x80000, CRC(5ea6d52d) SHA1(d424082468940bb91ab424ac7812839792ed4e88) )
 
-	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-14496.ic25", 0x000003, 0x080000, CRC(737da16c) SHA1(52247d9bc2924e90d040bef484a541b1f4a9026f) )
 	ROM_LOAD32_BYTE( "mpr-14497.ic29", 0x000001, 0x080000, CRC(ebd7ed17) SHA1(2307dc28501965432d2ff55a21698efdce014401) )
 	ROM_LOAD32_BYTE( "mpr-14498.ic34", 0x000002, 0x080000, CRC(d4a764bd) SHA1(8434a9225ed1e01e8b1cfe169268e42cd3ce6ee3) )
@@ -2967,25 +2969,25 @@ ROM_START( arescue )
 	ROM_REGION16_BE(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
 	ROM_COPY( "mainpcb:dsp", 0x2000, 0x0000, 0x0800 )
 
-	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
+	ROM_REGION( 0x200000, "subpcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14542.ic13",     0x000000, 0x020000, CRC(6d39fc18) SHA1(7fbddfb2605a020331e1e81a7bc4466196df17bd) ) /* 834-8526-05 (Export) */
 	ROM_LOAD_x4( "epr-14541.ic6",      0x080000, 0x020000, CRC(5c3f2ec5) SHA1(d11a24d12917e4c5ac9010ca6db0f1ac9d44475a) )
 	ROM_LOAD16_BYTE( "epr-14509.ic14", 0x100000, 0x080000, CRC(daa5a356) SHA1(ca87242c59de5ab5f9406635bee758a855fe20bc) )
 	ROM_LOAD16_BYTE( "epr-14508.ic7",  0x100001, 0x080000, CRC(6702c14d) SHA1(dc9324f16a3e3238f5ccdade9451d6823a50b563) )
 
-	ROM_REGION( 0x400000, "slavepcb:soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x400000, "subpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-14513.ic35", 0x000000, 0x40000, CRC(f9a884cd) SHA1(73010fff5e0257355e08e78838c74af86ed364ce) )
 	ROM_LOAD_x2( "mpr-14512.ic31", 0x100000, 0x80000, CRC(9da48051) SHA1(2d41148d089a75362ed0fde577eca919213ac666) )
 	ROM_LOAD_x2( "mpr-14511.ic26", 0x200000, 0x80000, CRC(074c53cc) SHA1(9c89843bbe8058123c25b7f8f86de754ddbca2bb) )
 	ROM_LOAD_x2( "mpr-14510.ic22", 0x300000, 0x80000, CRC(5ea6d52d) SHA1(d424082468940bb91ab424ac7812839792ed4e88) )
 
-	ROM_REGION( 0x200000, "slavepcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "subpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-14496.ic25", 0x000003, 0x080000, CRC(737da16c) SHA1(52247d9bc2924e90d040bef484a541b1f4a9026f) )
 	ROM_LOAD32_BYTE( "mpr-14497.ic29", 0x000001, 0x080000, CRC(ebd7ed17) SHA1(2307dc28501965432d2ff55a21698efdce014401) )
 	ROM_LOAD32_BYTE( "mpr-14498.ic34", 0x000002, 0x080000, CRC(d4a764bd) SHA1(8434a9225ed1e01e8b1cfe169268e42cd3ce6ee3) )
 	ROM_LOAD32_BYTE( "mpr-14499.ic38", 0x000000, 0x080000, CRC(fadc4b2b) SHA1(01c02a4dfad1ab19bac8b81b61d37fdc035bc5c5) )
 
-	ROM_REGION32_BE( 0x800000, "slavepcb:sprites", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "subpcb:sprites", 0 ) /* sprites */
 	ROM_LOAD64_BYTE( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) )
 	ROM_LOAD64_BYTE( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) )
 	ROM_LOAD64_BYTE( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) )
@@ -3022,7 +3024,7 @@ ROM_START( arescueu )
 	ROM_LOAD_x2( "mpr-14511.ic26", 0x200000, 0x80000, CRC(074c53cc) SHA1(9c89843bbe8058123c25b7f8f86de754ddbca2bb) )
 	ROM_LOAD_x2( "mpr-14510.ic22", 0x300000, 0x80000, CRC(5ea6d52d) SHA1(d424082468940bb91ab424ac7812839792ed4e88) )
 
-	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-14496.ic25", 0x000003, 0x080000, CRC(737da16c) SHA1(52247d9bc2924e90d040bef484a541b1f4a9026f) )
 	ROM_LOAD32_BYTE( "mpr-14497.ic29", 0x000001, 0x080000, CRC(ebd7ed17) SHA1(2307dc28501965432d2ff55a21698efdce014401) )
 	ROM_LOAD32_BYTE( "mpr-14498.ic34", 0x000002, 0x080000, CRC(d4a764bd) SHA1(8434a9225ed1e01e8b1cfe169268e42cd3ce6ee3) )
@@ -3045,25 +3047,25 @@ ROM_START( arescueu )
 	ROM_REGION16_BE(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
 	ROM_COPY( "mainpcb:dsp", 0x2000, 0x0000, 0x0800 )
 
-	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
+	ROM_REGION( 0x200000, "subpcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14540.ic13",     0x000000, 0x020000, CRC(c2b4e5d0) SHA1(69f8ddded5095df9012663d0ded61b78f1692a8d) )
 	ROM_LOAD_x4( "epr-14539.ic6",      0x080000, 0x020000, CRC(1a1b5532) SHA1(f3651470222036703b7ecedb6e91e4cdb3d20df7) )
 	ROM_LOAD16_BYTE( "epr-14509.ic14", 0x100000, 0x080000, CRC(daa5a356) SHA1(ca87242c59de5ab5f9406635bee758a855fe20bc) )
 	ROM_LOAD16_BYTE( "epr-14508.ic7",  0x100001, 0x080000, CRC(6702c14d) SHA1(dc9324f16a3e3238f5ccdade9451d6823a50b563) )
 
-	ROM_REGION( 0x400000, "slavepcb:soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x400000, "subpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-14513.ic35", 0x000000, 0x40000, CRC(f9a884cd) SHA1(73010fff5e0257355e08e78838c74af86ed364ce) )
 	ROM_LOAD_x2( "mpr-14512.ic31", 0x100000, 0x80000, CRC(9da48051) SHA1(2d41148d089a75362ed0fde577eca919213ac666) )
 	ROM_LOAD_x2( "mpr-14511.ic26", 0x200000, 0x80000, CRC(074c53cc) SHA1(9c89843bbe8058123c25b7f8f86de754ddbca2bb) )
 	ROM_LOAD_x2( "mpr-14510.ic22", 0x300000, 0x80000, CRC(5ea6d52d) SHA1(d424082468940bb91ab424ac7812839792ed4e88) )
 
-	ROM_REGION( 0x200000, "slavepcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "subpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-14496.ic25", 0x000003, 0x080000, CRC(737da16c) SHA1(52247d9bc2924e90d040bef484a541b1f4a9026f) )
 	ROM_LOAD32_BYTE( "mpr-14497.ic29", 0x000001, 0x080000, CRC(ebd7ed17) SHA1(2307dc28501965432d2ff55a21698efdce014401) )
 	ROM_LOAD32_BYTE( "mpr-14498.ic34", 0x000002, 0x080000, CRC(d4a764bd) SHA1(8434a9225ed1e01e8b1cfe169268e42cd3ce6ee3) )
 	ROM_LOAD32_BYTE( "mpr-14499.ic38", 0x000000, 0x080000, CRC(fadc4b2b) SHA1(01c02a4dfad1ab19bac8b81b61d37fdc035bc5c5) )
 
-	ROM_REGION32_BE( 0x800000, "slavepcb:sprites", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "subpcb:sprites", 0 ) /* sprites */
 	ROM_LOAD64_BYTE( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) )
 	ROM_LOAD64_BYTE( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) )
 	ROM_LOAD64_BYTE( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) )
@@ -3100,7 +3102,7 @@ ROM_START( arescuej )
 	ROM_LOAD_x2( "mpr-14511.ic26", 0x200000, 0x80000, CRC(074c53cc) SHA1(9c89843bbe8058123c25b7f8f86de754ddbca2bb) )
 	ROM_LOAD_x2( "mpr-14510.ic22", 0x300000, 0x80000, CRC(5ea6d52d) SHA1(d424082468940bb91ab424ac7812839792ed4e88) )
 
-	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-14496.ic25", 0x000003, 0x080000, CRC(737da16c) SHA1(52247d9bc2924e90d040bef484a541b1f4a9026f) )
 	ROM_LOAD32_BYTE( "mpr-14497.ic29", 0x000001, 0x080000, CRC(ebd7ed17) SHA1(2307dc28501965432d2ff55a21698efdce014401) )
 	ROM_LOAD32_BYTE( "mpr-14498.ic34", 0x000002, 0x080000, CRC(d4a764bd) SHA1(8434a9225ed1e01e8b1cfe169268e42cd3ce6ee3) )
@@ -3123,25 +3125,25 @@ ROM_START( arescuej )
 	ROM_REGION16_BE(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
 	ROM_COPY( "mainpcb:dsp", 0x2000, 0x0000, 0x0800 )
 
-	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
+	ROM_REGION( 0x200000, "subpcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14515.ic13",     0x000000, 0x020000, CRC(fb5eefbd) SHA1(f2739ad2e168843fe992d7fb546ffd859fa6c17a) )
 	ROM_LOAD_x4( "epr-14514.ic6",      0x080000, 0x020000, CRC(ebf6dfc5) SHA1(2146dc23f1268124b6ad3cd00416a71fc56130bf) )
 	ROM_LOAD16_BYTE( "epr-14509.ic14", 0x100000, 0x080000, CRC(daa5a356) SHA1(ca87242c59de5ab5f9406635bee758a855fe20bc) )
 	ROM_LOAD16_BYTE( "epr-14508.ic7",  0x100001, 0x080000, CRC(6702c14d) SHA1(dc9324f16a3e3238f5ccdade9451d6823a50b563) )
 
-	ROM_REGION( 0x400000, "slavepcb:soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x400000, "subpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-14513.ic35", 0x000000, 0x40000, CRC(f9a884cd) SHA1(73010fff5e0257355e08e78838c74af86ed364ce) )
 	ROM_LOAD_x2( "mpr-14512.ic31", 0x100000, 0x80000, CRC(9da48051) SHA1(2d41148d089a75362ed0fde577eca919213ac666) )
 	ROM_LOAD_x2( "mpr-14511.ic26", 0x200000, 0x80000, CRC(074c53cc) SHA1(9c89843bbe8058123c25b7f8f86de754ddbca2bb) )
 	ROM_LOAD_x2( "mpr-14510.ic22", 0x300000, 0x80000, CRC(5ea6d52d) SHA1(d424082468940bb91ab424ac7812839792ed4e88) )
 
-	ROM_REGION( 0x200000, "slavepcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "subpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-14496.ic25", 0x000003, 0x080000, CRC(737da16c) SHA1(52247d9bc2924e90d040bef484a541b1f4a9026f) )
 	ROM_LOAD32_BYTE( "mpr-14497.ic29", 0x000001, 0x080000, CRC(ebd7ed17) SHA1(2307dc28501965432d2ff55a21698efdce014401) )
 	ROM_LOAD32_BYTE( "mpr-14498.ic34", 0x000002, 0x080000, CRC(d4a764bd) SHA1(8434a9225ed1e01e8b1cfe169268e42cd3ce6ee3) )
 	ROM_LOAD32_BYTE( "mpr-14499.ic38", 0x000000, 0x080000, CRC(fadc4b2b) SHA1(01c02a4dfad1ab19bac8b81b61d37fdc035bc5c5) )
 
-	ROM_REGION32_BE( 0x800000, "slavepcb:sprites", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "subpcb:sprites", 0 ) /* sprites */
 	ROM_LOAD64_BYTE( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) )
 	ROM_LOAD64_BYTE( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) )
 	ROM_LOAD64_BYTE( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) )
@@ -3178,7 +3180,7 @@ ROM_START( alien3 )
 	ROM_LOAD( "mpr-15857.ic34",    0x200000, 0x100000, CRC(915c56df) SHA1(7031f937c826af17caf7ec8cbb6155d0a55bd38a) )
 	ROM_LOAD( "mpr-15856.ic24",    0x300000, 0x100000, CRC(a5ef4f1f) SHA1(e8da7a995955e80872a25bd75465c590b649cfab) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15863.ic14", 0x000000, 0x200000, CRC(9d36b645) SHA1(2977047780b615b64c3b4aec78fef0643d40490e) )
 	ROM_LOAD16_BYTE( "mpr-15862.ic5",  0x000001, 0x200000, CRC(9e277d25) SHA1(9f191484a42391268306a8d2d95c340ce8b2d6cd) )
 
@@ -3219,7 +3221,7 @@ ROM_START( alien3u )
 	ROM_LOAD( "mpr-15857.ic34",    0x200000, 0x100000, CRC(915c56df) SHA1(7031f937c826af17caf7ec8cbb6155d0a55bd38a) )
 	ROM_LOAD( "mpr-15856.ic24",    0x300000, 0x100000, CRC(a5ef4f1f) SHA1(e8da7a995955e80872a25bd75465c590b649cfab) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15863.ic14", 0x000000, 0x200000, CRC(9d36b645) SHA1(2977047780b615b64c3b4aec78fef0643d40490e) )
 	ROM_LOAD16_BYTE( "mpr-15862.ic5",  0x000001, 0x200000, CRC(9e277d25) SHA1(9f191484a42391268306a8d2d95c340ce8b2d6cd) )
 
@@ -3260,7 +3262,7 @@ ROM_START( alien3j )
 	ROM_LOAD( "mpr-15857.ic34",    0x200000, 0x100000, CRC(915c56df) SHA1(7031f937c826af17caf7ec8cbb6155d0a55bd38a) )
 	ROM_LOAD( "mpr-15856.ic24",    0x300000, 0x100000, CRC(a5ef4f1f) SHA1(e8da7a995955e80872a25bd75465c590b649cfab) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15863.ic14", 0x000000, 0x200000, CRC(9d36b645) SHA1(2977047780b615b64c3b4aec78fef0643d40490e) )
 	ROM_LOAD16_BYTE( "mpr-15862.ic5",  0x000001, 0x200000, CRC(9e277d25) SHA1(9f191484a42391268306a8d2d95c340ce8b2d6cd) )
 
@@ -3305,7 +3307,7 @@ ROM_START( arabfgt )
 	ROM_REGION( 0x10000, "mainpcb:mcu", 0 ) /* Protection CPU */
 	ROM_LOAD( "epr-14468-01.u3", 0x00000, 0x10000, CRC(c3c591e4) SHA1(53e48066e85b61d0c456618d14334a509b354cb3) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-14599f.ic14", 0x000000, 0x200000, CRC(94f1cf10) SHA1(34ec86487bcb6726c025149c319f00a854eb7a1d) )
 	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(010656f3) SHA1(31619c022cba4f250ce174f186d3e34444f60faf) )
 
@@ -3339,7 +3341,7 @@ ROM_START( arabfgtu )
 	ROM_REGION( 0x10000, "mainpcb:mcu", 0 ) /* Protection CPU */
 	ROM_LOAD( "epr-14468-01.u3", 0x00000, 0x10000, CRC(c3c591e4) SHA1(53e48066e85b61d0c456618d14334a509b354cb3) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-14599f.ic14", 0x000000, 0x200000, CRC(94f1cf10) SHA1(34ec86487bcb6726c025149c319f00a854eb7a1d) )
 	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(010656f3) SHA1(31619c022cba4f250ce174f186d3e34444f60faf) )
 
@@ -3373,7 +3375,7 @@ ROM_START( arabfgtj )
 	ROM_REGION( 0x10000, "mainpcb:mcu", 0 ) /* Protection CPU */
 	ROM_LOAD( "epr-14468-01.u3", 0x00000, 0x10000, CRC(c3c591e4) SHA1(53e48066e85b61d0c456618d14334a509b354cb3) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-14599f.ic14", 0x000000, 0x200000, CRC(94f1cf10) SHA1(34ec86487bcb6726c025149c319f00a854eb7a1d) )
 	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(010656f3) SHA1(31619c022cba4f250ce174f186d3e34444f60faf) )
 
@@ -3407,7 +3409,7 @@ ROM_START( brival )
 	ROM_LOAD( "mpr-15626.ic34",    0x200000, 0x100000, CRC(83306d1e) SHA1(feb08902b51c0013d9417832cdf198e36cdfc28c) )
 	ROM_LOAD( "mpr-15625.ic24",    0x300000, 0x100000, CRC(3ce82932) SHA1(f2107bc2591f46a51c9f0d706933b1ae69db91f9) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15629.ic14", 0x000000, 0x200000, CRC(2c8dd96d) SHA1(4a42a30485c19eb4f4a9d518a3dff3ae11911d01) )
 	ROM_LOAD16_BYTE( "mpr-15628.ic5",  0x000001, 0x200000, CRC(58d4ca40) SHA1(b1633acc803bba7e8283a9663b49abeda662a74d) )
 
@@ -3438,7 +3440,7 @@ ROM_START( brivalj )
 	ROM_LOAD( "mpr-15626.ic34",    0x200000, 0x100000, CRC(83306d1e) SHA1(feb08902b51c0013d9417832cdf198e36cdfc28c) )
 	ROM_LOAD( "mpr-15625.ic24",    0x300000, 0x100000, CRC(3ce82932) SHA1(f2107bc2591f46a51c9f0d706933b1ae69db91f9) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15629.ic14", 0x000000, 0x200000, CRC(2c8dd96d) SHA1(4a42a30485c19eb4f4a9d518a3dff3ae11911d01) )
 	ROM_LOAD16_BYTE( "mpr-15628.ic5",  0x000001, 0x200000, CRC(58d4ca40) SHA1(b1633acc803bba7e8283a9663b49abeda662a74d) )
 
@@ -3470,7 +3472,7 @@ ROM_START( darkedge )
 	ROM_LOAD( "mpr-15241.ic34",    0x200000, 0x100000, CRC(8eccc4fe) SHA1(119724b9b6d2b51ad4f065ebf74d200960090e68) )
 	ROM_LOAD( "mpr-15240.ic24",    0x300000, 0x100000, CRC(867d59e8) SHA1(fb1c0d26dbb1bde9d8bc86419cd911b8e37bf923) )
 
-	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x100000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15248.ic14", 0x000000, 0x080000, CRC(185b308b) SHA1(a49c1b752b3c4355560e0cd712fb9a096140e37b) )
 	ROM_LOAD16_BYTE( "mpr-15247.ic5",  0x000001, 0x080000, CRC(be21548c) SHA1(2e315aadc2a0b781c3ee3fe71c75eb1f43514eff) )
 
@@ -3504,7 +3506,7 @@ ROM_START( darkedgej )
 	ROM_LOAD( "mpr-15241.ic34",    0x200000, 0x100000, CRC(8eccc4fe) SHA1(119724b9b6d2b51ad4f065ebf74d200960090e68) )
 	ROM_LOAD( "mpr-15240.ic24",    0x300000, 0x100000, CRC(867d59e8) SHA1(fb1c0d26dbb1bde9d8bc86419cd911b8e37bf923) )
 
-	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x100000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15248.ic14", 0x000000, 0x080000, CRC(185b308b) SHA1(a49c1b752b3c4355560e0cd712fb9a096140e37b) )
 	ROM_LOAD16_BYTE( "mpr-15247.ic5",  0x000001, 0x080000, CRC(be21548c) SHA1(2e315aadc2a0b781c3ee3fe71c75eb1f43514eff) )
 
@@ -3540,7 +3542,7 @@ ROM_START( dbzvrvs )
 	ROM_LOAD( "mpr-16539",    0x200000, 0x100000, CRC(38c26418) SHA1(2442933e13c83209e904c1dec677aeda91b75290) )
 	ROM_LOAD( "mpr-16538",    0x300000, 0x100000, CRC(4d402c31) SHA1(2df160fd7e70f3d7b52fef2a2082e68966fd1535) )
 
-	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-16545", 0x000000, 0x100000, CRC(51748bac) SHA1(b1cae16b62a8d29117c0adb140eb09c1092f6c37) )
 	ROM_LOAD16_BYTE( "mpr-16544", 0x000001, 0x100000, CRC(f6c93dfc) SHA1(a006cedb7d0151ccc8d22e6588b1c39e099da182) )
 
@@ -3581,7 +3583,7 @@ ROM_START( f1en )
 	ROM_LOAD_x2( "epr-14447.ic26", 0x200000, 0x080000, CRC(db1cfcbd) SHA1(c76eb2ced5571a548ad00709097dd272747127a2) )
 	ROM_LOAD_x2( "epr-14446.ic22", 0x300000, 0x080000, CRC(646ec2cb) SHA1(67e453f128ae227e22c68f55d0d3f5831fbeb2f9) )
 
-	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x100000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-14362.ic38", 0x000000, 0x040000, CRC(fb1c4e79) SHA1(38ee23763b9e5bb62bbc54cab95041415404f0c4) )
 	ROM_LOAD32_BYTE( "mpr-14361.ic34", 0x000002, 0x040000, CRC(e3204bda) SHA1(34157e80edd6d685bd5a5e23b1e0130a5f3d138a) )
 	ROM_LOAD32_BYTE( "mpr-14360.ic29", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
@@ -3597,24 +3599,24 @@ ROM_START( f1en )
 	ROM_LOAD64_BYTE( "mpr-14364.ic28", 0x000006, 0x080000, CRC(0fa12ecd) SHA1(6a34c7718edffbeddded8786e11cac181b485ebd) )
 	ROM_LOAD64_BYTE( "mpr-14363.ic24", 0x000007, 0x080000, CRC(f3427a56) SHA1(6a99d7432dfff35470ddcca5cfde36689a77e706) )
 
-	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
+	ROM_REGION( 0x200000, "subpcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x8( "epr-14452a.ic6",        0x000000, 0x020000, CRC(b5b4a9d9) SHA1(6699c15dc1155c3cee33a06d320acbff0ab5ad11) )
 	ROM_LOAD16_BYTE_x2( "epr-14445.ic14", 0x100000, 0x040000, CRC(d06261ab) SHA1(6e1c4ce4e49a142fd5b1ecac98145960d7afd567) )
 	ROM_LOAD16_BYTE_x2( "epr-14444.ic7",  0x100001, 0x040000, CRC(07724354) SHA1(9d7f64a80553c4ae0e9cf716478fd5c4b8277470) )
 
-	ROM_REGION( 0x400000, "slavepcb:soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x400000, "subpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x8( "epr-14449.ic35", 0x000000, 0x020000, CRC(2d29699c) SHA1(cae02e5533a0edd3b3b4a54a1a43321285e06416) )
 	ROM_LOAD_x2( "epr-14448.ic31", 0x100000, 0x080000, CRC(87ca1e8d) SHA1(739274171c13983a60d061176095645419dade49) )
 	ROM_LOAD_x2( "epr-14447.ic26", 0x200000, 0x080000, CRC(db1cfcbd) SHA1(c76eb2ced5571a548ad00709097dd272747127a2) )
 	ROM_LOAD_x2( "epr-14446.ic22", 0x300000, 0x080000, CRC(646ec2cb) SHA1(67e453f128ae227e22c68f55d0d3f5831fbeb2f9) )
 
-	ROM_REGION( 0x100000, "slavepcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x100000, "subpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-14362.ic38", 0x000000, 0x040000, CRC(fb1c4e79) SHA1(38ee23763b9e5bb62bbc54cab95041415404f0c4) )
 	ROM_LOAD32_BYTE( "mpr-14361.ic34", 0x000002, 0x040000, CRC(e3204bda) SHA1(34157e80edd6d685bd5a5e23b1e0130a5f3d138a) )
 	ROM_LOAD32_BYTE( "mpr-14360.ic29", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
 	ROM_LOAD32_BYTE( "mpr-14359.ic25", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
 
-	ROM_REGION32_BE( 0x800000, "slavepcb:sprites", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "subpcb:sprites", 0 ) /* sprites */
 	ROM_LOAD64_BYTE( "mpr-14370.ic36", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) )
 	ROM_LOAD64_BYTE( "mpr-14369.ic32", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) )
 	ROM_LOAD64_BYTE( "mpr-14368.ic27", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) )
@@ -3648,7 +3650,7 @@ ROM_START( f1enu ) // ROM PCB number is 834-8439-04
 	ROM_LOAD_x2( "epr-14447.ic26", 0x200000, 0x080000, CRC(db1cfcbd) SHA1(c76eb2ced5571a548ad00709097dd272747127a2) )
 	ROM_LOAD_x2( "epr-14446.ic22", 0x300000, 0x080000, CRC(646ec2cb) SHA1(67e453f128ae227e22c68f55d0d3f5831fbeb2f9) )
 
-	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x100000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-14362.ic38", 0x000000, 0x040000, CRC(fb1c4e79) SHA1(38ee23763b9e5bb62bbc54cab95041415404f0c4) )
 	ROM_LOAD32_BYTE( "mpr-14361.ic34", 0x000002, 0x040000, CRC(e3204bda) SHA1(34157e80edd6d685bd5a5e23b1e0130a5f3d138a) )
 	ROM_LOAD32_BYTE( "mpr-14360.ic29", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
@@ -3664,24 +3666,24 @@ ROM_START( f1enu ) // ROM PCB number is 834-8439-04
 	ROM_LOAD64_BYTE( "mpr-14364.ic28", 0x000006, 0x080000, CRC(0fa12ecd) SHA1(6a34c7718edffbeddded8786e11cac181b485ebd) )
 	ROM_LOAD64_BYTE( "mpr-14363.ic24", 0x000007, 0x080000, CRC(f3427a56) SHA1(6a99d7432dfff35470ddcca5cfde36689a77e706) )
 
-	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
+	ROM_REGION( 0x200000, "subpcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x8( "epr-14451a.ic6",        0x000000, 0x020000, CRC(e17259c9) SHA1(be789b7630b7265e19ea2c80f603caff9cec37f8) )
 	ROM_LOAD16_BYTE_x2( "epr-14445.ic14", 0x100000, 0x040000, CRC(d06261ab) SHA1(6e1c4ce4e49a142fd5b1ecac98145960d7afd567) )
 	ROM_LOAD16_BYTE_x2( "epr-14444.ic7",  0x100001, 0x040000, CRC(07724354) SHA1(9d7f64a80553c4ae0e9cf716478fd5c4b8277470) )
 
-	ROM_REGION( 0x400000, "slavepcb:soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x400000, "subpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x8( "epr-14449.ic35", 0x000000, 0x020000, CRC(2d29699c) SHA1(cae02e5533a0edd3b3b4a54a1a43321285e06416) )
 	ROM_LOAD_x2( "epr-14448.ic31", 0x100000, 0x080000, CRC(87ca1e8d) SHA1(739274171c13983a60d061176095645419dade49) )
 	ROM_LOAD_x2( "epr-14447.ic26", 0x200000, 0x080000, CRC(db1cfcbd) SHA1(c76eb2ced5571a548ad00709097dd272747127a2) )
 	ROM_LOAD_x2( "epr-14446.ic22", 0x300000, 0x080000, CRC(646ec2cb) SHA1(67e453f128ae227e22c68f55d0d3f5831fbeb2f9) )
 
-	ROM_REGION( 0x100000, "slavepcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x100000, "subpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-14362.ic38", 0x000000, 0x040000, CRC(fb1c4e79) SHA1(38ee23763b9e5bb62bbc54cab95041415404f0c4) )
 	ROM_LOAD32_BYTE( "mpr-14361.ic34", 0x000002, 0x040000, CRC(e3204bda) SHA1(34157e80edd6d685bd5a5e23b1e0130a5f3d138a) )
 	ROM_LOAD32_BYTE( "mpr-14360.ic29", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
 	ROM_LOAD32_BYTE( "mpr-14359.ic25", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
 
-	ROM_REGION32_BE( 0x800000, "slavepcb:sprites", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "subpcb:sprites", 0 ) /* sprites */
 	ROM_LOAD64_BYTE( "mpr-14370.ic36", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) )
 	ROM_LOAD64_BYTE( "mpr-14369.ic32", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) )
 	ROM_LOAD64_BYTE( "mpr-14368.ic27", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) )
@@ -3715,7 +3717,7 @@ ROM_START( f1enj ) // ROM PCB number is 834-8439-04
 	ROM_LOAD_x2( "epr-14447.ic26", 0x200000, 0x080000, CRC(db1cfcbd) SHA1(c76eb2ced5571a548ad00709097dd272747127a2) )
 	ROM_LOAD_x2( "epr-14446.ic22", 0x300000, 0x080000, CRC(646ec2cb) SHA1(67e453f128ae227e22c68f55d0d3f5831fbeb2f9) )
 
-	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x100000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-14362.ic38", 0x000000, 0x040000, CRC(fb1c4e79) SHA1(38ee23763b9e5bb62bbc54cab95041415404f0c4) )
 	ROM_LOAD32_BYTE( "mpr-14361.ic34", 0x000002, 0x040000, CRC(e3204bda) SHA1(34157e80edd6d685bd5a5e23b1e0130a5f3d138a) )
 	ROM_LOAD32_BYTE( "mpr-14360.ic29", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
@@ -3731,24 +3733,24 @@ ROM_START( f1enj ) // ROM PCB number is 834-8439-04
 	ROM_LOAD64_BYTE( "mpr-14364.ic28", 0x000006, 0x080000, CRC(0fa12ecd) SHA1(6a34c7718edffbeddded8786e11cac181b485ebd) )
 	ROM_LOAD64_BYTE( "mpr-14363.ic24", 0x000007, 0x080000, CRC(f3427a56) SHA1(6a99d7432dfff35470ddcca5cfde36689a77e706) )
 
-	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
+	ROM_REGION( 0x200000, "subpcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x8( "epr-14450a.ic6",        0x000000, 0x020000, CRC(10f62723) SHA1(68fcd6655798f348678e3cc8857c6d1cb46e0987) )
 	ROM_LOAD16_BYTE_x2( "epr-14445.ic14", 0x100000, 0x040000, CRC(d06261ab) SHA1(6e1c4ce4e49a142fd5b1ecac98145960d7afd567) )
 	ROM_LOAD16_BYTE_x2( "epr-14444.ic7",  0x100001, 0x040000, CRC(07724354) SHA1(9d7f64a80553c4ae0e9cf716478fd5c4b8277470) )
 
-	ROM_REGION( 0x400000, "slavepcb:soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x400000, "subpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x8( "epr-14449.ic35", 0x000000, 0x020000, CRC(2d29699c) SHA1(cae02e5533a0edd3b3b4a54a1a43321285e06416) )
 	ROM_LOAD_x2( "epr-14448.ic31", 0x100000, 0x080000, CRC(87ca1e8d) SHA1(739274171c13983a60d061176095645419dade49) )
 	ROM_LOAD_x2( "epr-14447.ic26", 0x200000, 0x080000, CRC(db1cfcbd) SHA1(c76eb2ced5571a548ad00709097dd272747127a2) )
 	ROM_LOAD_x2( "epr-14446.ic22", 0x300000, 0x080000, CRC(646ec2cb) SHA1(67e453f128ae227e22c68f55d0d3f5831fbeb2f9) )
 
-	ROM_REGION( 0x100000, "slavepcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x100000, "subpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-14362.ic38", 0x000000, 0x040000, CRC(fb1c4e79) SHA1(38ee23763b9e5bb62bbc54cab95041415404f0c4) )
 	ROM_LOAD32_BYTE( "mpr-14361.ic34", 0x000002, 0x040000, CRC(e3204bda) SHA1(34157e80edd6d685bd5a5e23b1e0130a5f3d138a) )
 	ROM_LOAD32_BYTE( "mpr-14360.ic29", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
 	ROM_LOAD32_BYTE( "mpr-14359.ic25", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
 
-	ROM_REGION32_BE( 0x800000, "slavepcb:sprites", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "subpcb:sprites", 0 ) /* sprites */
 	ROM_LOAD64_BYTE( "mpr-14370.ic36", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) )
 	ROM_LOAD64_BYTE( "mpr-14369.ic32", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) )
 	ROM_LOAD64_BYTE( "mpr-14368.ic27", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) )
@@ -3782,7 +3784,7 @@ ROM_START( f1lap )
 	ROM_LOAD( "mpr-15594.ic34",    0x200000, 0x100000, CRC(7f4ca3bb) SHA1(dc53a1857d619e574acb4c0587a6ba844df2d283) )
 	ROM_LOAD( "mpr-15595.ic24",    0x300000, 0x100000, CRC(3fbdad9a) SHA1(573ea2242f79c7d3b6bf0e6745f6b07a621834ac) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15608.ic14", 0x000000, 0x200000, CRC(64462c69) SHA1(9501e83c52e3e16f73b94cef975b5a31b2ee5476) )
 	ROM_LOAD16_BYTE( "mpr-15609.ic5",  0x000001, 0x200000, CRC(d586e455) SHA1(aea190d31c590216eb19766ba749b1e9b710bdce) )
 
@@ -3816,7 +3818,7 @@ ROM_START( f1lapt )
 	ROM_LOAD( "mpr-15594.ic34",    0x200000, 0x100000, CRC(7f4ca3bb) SHA1(dc53a1857d619e574acb4c0587a6ba844df2d283) )
 	ROM_LOAD( "mpr-15595.ic24",    0x300000, 0x100000, CRC(3fbdad9a) SHA1(573ea2242f79c7d3b6bf0e6745f6b07a621834ac) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15608.ic14", 0x000000, 0x200000, CRC(64462c69) SHA1(9501e83c52e3e16f73b94cef975b5a31b2ee5476) )
 	ROM_LOAD16_BYTE( "mpr-15609.ic5",  0x000001, 0x200000, CRC(d586e455) SHA1(aea190d31c590216eb19766ba749b1e9b710bdce) )
 
@@ -3855,7 +3857,7 @@ ROM_START( f1lapj )
 	ROM_LOAD( "mpr-15594.ic34",    0x200000, 0x100000, CRC(7f4ca3bb) SHA1(dc53a1857d619e574acb4c0587a6ba844df2d283) )
 	ROM_LOAD( "mpr-15595.ic24",    0x300000, 0x100000, CRC(3fbdad9a) SHA1(573ea2242f79c7d3b6bf0e6745f6b07a621834ac) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15608.ic14", 0x000000, 0x200000, CRC(64462c69) SHA1(9501e83c52e3e16f73b94cef975b5a31b2ee5476) )
 	ROM_LOAD16_BYTE( "mpr-15609.ic5",  0x000001, 0x200000, CRC(d586e455) SHA1(aea190d31c590216eb19766ba749b1e9b710bdce) )
 
@@ -3901,7 +3903,7 @@ ROM_START( ga2 )
 	ROM_REGION( 0x10000, "mainpcb:mcu", 0 ) /* Protection CPU */
 	ROM_LOAD( "epr-14468-02.u3", 0x00000, 0x10000, CRC(77634daa) SHA1(339169d164b9ed7dc3787b084d33effdc8e9efc1) ) /* located on separate sub board */
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-14948.ic14", 0x000000, 0x200000, CRC(75050d4a) SHA1(51d6bc9935abcf30af438e69c2cf4e09f57a803f) )
 	ROM_LOAD16_BYTE( "mpr-14947.ic5",  0x000001, 0x200000, CRC(b53e62f4) SHA1(5aa0f198e6eb070b77b0d180d30c0228a9bc691e) )
 
@@ -3941,7 +3943,7 @@ ROM_START( ga2u )
 	ROM_REGION( 0x10000, "mainpcb:mcu", 0 ) /* Protection CPU */
 	ROM_LOAD( "epr-14468-02.u3", 0x00000, 0x10000, CRC(77634daa) SHA1(339169d164b9ed7dc3787b084d33effdc8e9efc1) ) /* located on separate sub board */
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-14948.ic14", 0x000000, 0x200000, CRC(75050d4a) SHA1(51d6bc9935abcf30af438e69c2cf4e09f57a803f) )
 	ROM_LOAD16_BYTE( "mpr-14947.ic5",  0x000001, 0x200000, CRC(b53e62f4) SHA1(5aa0f198e6eb070b77b0d180d30c0228a9bc691e) )
 
@@ -3979,7 +3981,7 @@ ROM_START( ga2j )
 	ROM_REGION( 0x10000, "mainpcb:mcu", 0 ) /* Protection CPU */
 	ROM_LOAD( "epr-14468-02.u3", 0x00000, 0x10000, CRC(77634daa) SHA1(339169d164b9ed7dc3787b084d33effdc8e9efc1) ) /* located on separate sub board */
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-14948.ic14", 0x000000, 0x200000, CRC(75050d4a) SHA1(51d6bc9935abcf30af438e69c2cf4e09f57a803f) )
 	ROM_LOAD16_BYTE( "mpr-14947.ic5",  0x000001, 0x200000, CRC(b53e62f4) SHA1(5aa0f198e6eb070b77b0d180d30c0228a9bc691e) )
 
@@ -4010,7 +4012,7 @@ ROM_START( harddunk )
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-16505.ic31", 0x00000, 0x20000, CRC(eeb90a07) SHA1(d1c2132897994b2e85fd5a97222b9fcd61bc421e) )
 
-	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x100000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-16503.ic3", 0x000000, 0x080000, CRC(ac1b6f1a) SHA1(56482931adf7fe551acf796b74cd8af3773d4fef) )
 	ROM_LOAD16_BYTE( "mpr-16504.ic11", 0x000001, 0x080000, CRC(7c61fcd8) SHA1(ca4354f90fada752bf11ee22a7798a8aa22b1c61) )
 
@@ -4041,7 +4043,7 @@ ROM_START( harddunkj )
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-16505.ic31", 0x00000, 0x20000, CRC(eeb90a07) SHA1(d1c2132897994b2e85fd5a97222b9fcd61bc421e) )
 
-	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x100000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-16503.ic3", 0x000000, 0x080000, CRC(ac1b6f1a) SHA1(56482931adf7fe551acf796b74cd8af3773d4fef) )
 	ROM_LOAD16_BYTE( "mpr-16504.ic11", 0x000001, 0x080000, CRC(7c61fcd8) SHA1(ca4354f90fada752bf11ee22a7798a8aa22b1c61) )
 
@@ -4083,7 +4085,7 @@ ROM_START( holo )
 	ROM_LOAD( "mpr-14963",    0x200000, 0x100000, CRC(0974a60e) SHA1(87d770edcee9c9e8f37d36ab28c5aa5d685ea849) )
 	ROM_LOAD( "mpr-14962",    0x300000, 0x100000, CRC(6b2e694e) SHA1(7874bdfd534231c7756e0e0d9fc7a3d5bdba74d3) )
 
-	ROM_REGION( 0x000100, "mainpcb:gfx1", ROMREGION_ERASEFF ) /* tiles */
+	ROM_REGION( 0x000100, "mainpcb:tiles", ROMREGION_ERASEFF ) /* tiles */
 	/* game doesn't use bg tilemaps */
 
 	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
@@ -4119,7 +4121,7 @@ ROM_START( jpark )
 	ROM_LOAD( "mpr-16397.ic34",    0x200000, 0x100000, CRC(6e96e0be) SHA1(422b783b72127b80a23043b2dd1c04f5772f436e) )
 	ROM_LOAD( "mpr-16396.ic24",    0x300000, 0x100000, CRC(f69a2dc4) SHA1(3f02b10976852916c58e852f3161a857784fe36b) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-16404.ic14", 0x000000, 0x200000, CRC(11283807) SHA1(99e465c3fc31e640740b8257a349e203f026754a) )
 	ROM_LOAD16_BYTE( "mpr-16403.ic5",  0x000001, 0x200000, CRC(02530a9b) SHA1(b43e1b47f74c801bfc599cbe893fb8dc13453dd0) )
 
@@ -4155,7 +4157,7 @@ ROM_START( jparkj )
 	ROM_LOAD( "mpr-16397.ic34",    0x200000, 0x100000, CRC(6e96e0be) SHA1(422b783b72127b80a23043b2dd1c04f5772f436e) )
 	ROM_LOAD( "mpr-16396.ic24",    0x300000, 0x100000, CRC(f69a2dc4) SHA1(3f02b10976852916c58e852f3161a857784fe36b) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-16404.ic14", 0x000000, 0x200000, CRC(11283807) SHA1(99e465c3fc31e640740b8257a349e203f026754a) )
 	ROM_LOAD16_BYTE( "mpr-16403.ic5",  0x000001, 0x200000, CRC(02530a9b) SHA1(b43e1b47f74c801bfc599cbe893fb8dc13453dd0) )
 
@@ -4191,7 +4193,7 @@ ROM_START( jparkja )
 	ROM_LOAD( "mpr-16397.ic34",    0x200000, 0x100000, CRC(6e96e0be) SHA1(422b783b72127b80a23043b2dd1c04f5772f436e) )
 	ROM_LOAD( "mpr-16396.ic24",    0x300000, 0x100000, CRC(f69a2dc4) SHA1(3f02b10976852916c58e852f3161a857784fe36b) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-16404.ic14", 0x000000, 0x200000, CRC(11283807) SHA1(99e465c3fc31e640740b8257a349e203f026754a) )
 	ROM_LOAD16_BYTE( "mpr-16403.ic5",  0x000001, 0x200000, CRC(02530a9b) SHA1(b43e1b47f74c801bfc599cbe893fb8dc13453dd0) )
 
@@ -4227,7 +4229,7 @@ ROM_START( jparkjc )
 	ROM_LOAD( "mpr-16397.ic34",    0x200000, 0x100000, CRC(6e96e0be) SHA1(422b783b72127b80a23043b2dd1c04f5772f436e) )
 	ROM_LOAD( "mpr-16396.ic24",    0x300000, 0x100000, CRC(f69a2dc4) SHA1(3f02b10976852916c58e852f3161a857784fe36b) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-16404.ic14", 0x000000, 0x200000, CRC(11283807) SHA1(99e465c3fc31e640740b8257a349e203f026754a) )
 	ROM_LOAD16_BYTE( "mpr-16403.ic5",  0x000001, 0x200000, CRC(02530a9b) SHA1(b43e1b47f74c801bfc599cbe893fb8dc13453dd0) )
 
@@ -4269,7 +4271,7 @@ ROM_START( kokoroj )
 	ROM_LOAD_x2( "mpr-15522.ic35", 0x100000, 0x080000, CRC(fb68a351) SHA1(f307c0e4f33786630e8baddbb8c0a5e0f956de76) )
 	// IC24 & IC34 are not populated
 
-	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15526.ic14", 0x000000, 0x100000, CRC(f6907c13) SHA1(d3f65dd02d7cee0fd2f422ba6a54164b2a2b8303) )
 	ROM_LOAD16_BYTE( "mpr-15525.ic5",  0x000001, 0x100000, CRC(8c0c876f) SHA1(e5335fa7a3e4a0e1d79fc7612bf4aaa50224f4ca) )
 
@@ -4299,7 +4301,7 @@ ROM_START( kokoroja )
 	ROM_LOAD_x2( "mpr-15522.ic35", 0x100000, 0x080000, CRC(fb68a351) SHA1(f307c0e4f33786630e8baddbb8c0a5e0f956de76) )
 	// IC24 & IC34 are not populated
 
-	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15526.ic14", 0x000000, 0x100000, CRC(f6907c13) SHA1(d3f65dd02d7cee0fd2f422ba6a54164b2a2b8303) )
 	ROM_LOAD16_BYTE( "mpr-15525.ic5",  0x000001, 0x100000, CRC(8c0c876f) SHA1(e5335fa7a3e4a0e1d79fc7612bf4aaa50224f4ca) )
 
@@ -4340,7 +4342,7 @@ ROM_START( kokoroj2 )
 	ROM_LOAD( "mpr-16184.ic35",    0x100000, 0x100000, CRC(d7a19751) SHA1(8ae9f13689c8f9851e1eea995c51285972bed4a2) )
 	// IC24 & IC34 are not populated
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-16188.ic14", 0x000000, 0x200000, CRC(83a450ab) SHA1(1d0b45512d784ed1d82135b84c7c540f92d789f7) )
 	ROM_LOAD16_BYTE( "mpr-16187.ic5",  0x000001, 0x200000, CRC(98b62f8b) SHA1(eaf98efd9eac7b7c385138a8a4dbc94b0ca38df5) )
 
@@ -4383,7 +4385,7 @@ ROM_START( orunners )
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-15550.ic31", 0x00000, 0x80000, CRC(0205d2ed) SHA1(3475479e1a45fe96eefbe53842758898db7accbf) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15548.ic3", 0x000000, 0x200000, CRC(b6470a66) SHA1(e1544590c02d41f62f82a4d771b893fb0f2734c7) )
 	ROM_LOAD16_BYTE( "mpr-15549.ic11", 0x000001, 0x200000, CRC(81d12520) SHA1(1555893941e832f00ad3d0b3ad0c34a0d3a1c58a) )
 
@@ -4421,7 +4423,7 @@ ROM_START( orunnersu )
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-15550.ic31", 0x00000, 0x80000, CRC(0205d2ed) SHA1(3475479e1a45fe96eefbe53842758898db7accbf) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15548.ic3", 0x000000, 0x200000, CRC(b6470a66) SHA1(e1544590c02d41f62f82a4d771b893fb0f2734c7) )
 	ROM_LOAD16_BYTE( "mpr-15549.ic11", 0x000001, 0x200000, CRC(81d12520) SHA1(1555893941e832f00ad3d0b3ad0c34a0d3a1c58a) )
 
@@ -4459,7 +4461,7 @@ ROM_START( orunnersj )
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-15550.ic31", 0x00000, 0x80000, CRC(0205d2ed) SHA1(3475479e1a45fe96eefbe53842758898db7accbf) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15548.ic3", 0x000000, 0x200000, CRC(b6470a66) SHA1(e1544590c02d41f62f82a4d771b893fb0f2734c7) )
 	ROM_LOAD16_BYTE( "mpr-15549.ic11", 0x000001, 0x200000, CRC(81d12520) SHA1(1555893941e832f00ad3d0b3ad0c34a0d3a1c58a) )
 
@@ -4518,7 +4520,7 @@ ROM_START( radm )
 	ROM_LOAD_x2( "epr-13699.ic20", 0x200000, 0x080000, CRC(33fd2913) SHA1(60b664559b4989446b1c7d875432e53a36fe27df) )
 	ROM_LOAD_x2( "epr-13523.ic22", 0x300000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) /* Deluxe or Upright manuals don't show this ROM */
 
-	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-13519.ic3",  0x000000, 0x080000, CRC(bedc9534) SHA1(7b3f7a47b6c0ca6707dc3c1167f3564d43adb32f) )
 	ROM_LOAD32_BYTE( "mpr-13520.ic7",  0x000002, 0x080000, CRC(3532e91a) SHA1(669c8d27b4b48e1ab9d6d30b0994f5a4e5169118) )
 	ROM_LOAD32_BYTE( "mpr-13521.ic12", 0x000001, 0x080000, CRC(e9bca903) SHA1(18a73c830b9755262a1c525e3ad5ae084117b64d) )
@@ -4557,7 +4559,7 @@ ROM_START( radmu )
 	ROM_LOAD_x2( "epr-13699.ic20", 0x200000, 0x080000, CRC(33fd2913) SHA1(60b664559b4989446b1c7d875432e53a36fe27df) )
 	ROM_LOAD_x2( "epr-13523.ic22", 0x300000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) /* Deluxe or Upright manuals don't show this ROM */
 
-	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-13519.ic3",  0x000000, 0x080000, CRC(bedc9534) SHA1(7b3f7a47b6c0ca6707dc3c1167f3564d43adb32f) )
 	ROM_LOAD32_BYTE( "mpr-13520.ic7",  0x000002, 0x080000, CRC(3532e91a) SHA1(669c8d27b4b48e1ab9d6d30b0994f5a4e5169118) )
 	ROM_LOAD32_BYTE( "mpr-13521.ic12", 0x000001, 0x080000, CRC(e9bca903) SHA1(18a73c830b9755262a1c525e3ad5ae084117b64d) )
@@ -4605,7 +4607,7 @@ ROM_START( radr )
 	ROM_LOAD_x2( "epr-14110.ic20", 0x200000, 0x080000, CRC(33fd2913) SHA1(60b664559b4989446b1c7d875432e53a36fe27df) ) // same as radm, but different epr code
 	ROM_LOAD_x2( "epr-14237.ic22", 0x300000, 0x080000, CRC(0a4b4b29) SHA1(98447a587f903ba03e17d6a145b7c8bfddf25c4d) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x100000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "epr-14102.ic3",  0x000000, 0x040000, CRC(5626e80f) SHA1(9844817295a8cd8a9b09da6681b0c1fbfe82618e) )
 	ROM_LOAD32_BYTE( "epr-14103.ic7",  0x000002, 0x040000, CRC(08c7e804) SHA1(cf45b1934edc43cb3a0ed72159949cb0dd00d701) )
 	ROM_LOAD32_BYTE( "epr-14104.ic12", 0x000001, 0x040000, CRC(b0173646) SHA1(1ba4edc033e0e4f5a1e02987e9f6b8b1650b46d7) )
@@ -4650,7 +4652,7 @@ ROM_START( radru )
 	ROM_LOAD_x2( "epr-14110.ic20", 0x200000, 0x080000, CRC(33fd2913) SHA1(60b664559b4989446b1c7d875432e53a36fe27df) ) // same as radm, but different epr code
 	ROM_LOAD_x2( "epr-14237.ic22", 0x300000, 0x080000, CRC(0a4b4b29) SHA1(98447a587f903ba03e17d6a145b7c8bfddf25c4d) )
 
-	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x100000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "epr-14102.ic3",  0x000000, 0x040000, CRC(5626e80f) SHA1(9844817295a8cd8a9b09da6681b0c1fbfe82618e) )
 	ROM_LOAD32_BYTE( "epr-14103.ic7",  0x000002, 0x040000, CRC(08c7e804) SHA1(cf45b1934edc43cb3a0ed72159949cb0dd00d701) )
 	ROM_LOAD32_BYTE( "epr-14104.ic12", 0x000001, 0x040000, CRC(b0173646) SHA1(1ba4edc033e0e4f5a1e02987e9f6b8b1650b46d7) )
@@ -4695,7 +4697,7 @@ ROM_START( radrj )
 	ROM_LOAD_x2( "epr-14110.ic20", 0x200000, 0x080000, CRC(33fd2913) SHA1(60b664559b4989446b1c7d875432e53a36fe27df) ) // same as radm, but different epr code
 	ROM_LOAD_x2( "epr-14237.ic22", 0x300000, 0x080000, CRC(0a4b4b29) SHA1(98447a587f903ba03e17d6a145b7c8bfddf25c4d) )
 
-	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x100000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "epr-14102.ic3",  0x000000, 0x040000, CRC(5626e80f) SHA1(9844817295a8cd8a9b09da6681b0c1fbfe82618e) )
 	ROM_LOAD32_BYTE( "epr-14103.ic7",  0x000002, 0x040000, CRC(08c7e804) SHA1(cf45b1934edc43cb3a0ed72159949cb0dd00d701) )
 	ROM_LOAD32_BYTE( "epr-14104.ic12", 0x000001, 0x040000, CRC(b0173646) SHA1(1ba4edc033e0e4f5a1e02987e9f6b8b1650b46d7) )
@@ -4739,7 +4741,7 @@ ROM_START( slipstrm )
 	ROM_LOAD_x8( "s32_snd00.ic35", 0x000000, 0x020000, CRC(0fee2278) SHA1(7533a03c3fc46d65dfdd07bddf1e6e0bbc368752) )
 	ROM_LOAD_x2( "s32_snd01.ic31", 0x100000, 0x080000, CRC(ae7be5f2) SHA1(ba089355e64864435bcc3b0c208e4bce1ea66295) )
 
-	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "s32_scr00.ic38", 0x000000, 0x080000, CRC(3cbb2d0b) SHA1(b94006347b72cd60a889b0e279f62f677cedfd2e) )
 	ROM_LOAD32_BYTE( "s32_scr01.ic34", 0x000002, 0x080000, CRC(4167be55) SHA1(96b34d311b318c00c3fad917e341589a70ba0a15) )
 	ROM_LOAD32_BYTE( "s32_scr02.ic29", 0x000001, 0x080000, CRC(52c4bb85) SHA1(4fbee1072a19c75c25b5fd269acc75640923d69c) )
@@ -4774,7 +4776,7 @@ ROM_START( slipstrmh )
 	ROM_LOAD_x8( "s32_snd00.ic35", 0x000000, 0x020000, CRC(0fee2278) SHA1(7533a03c3fc46d65dfdd07bddf1e6e0bbc368752) )
 	ROM_LOAD_x2( "s32_snd01.ic31", 0x100000, 0x080000, CRC(ae7be5f2) SHA1(ba089355e64864435bcc3b0c208e4bce1ea66295) )
 
-	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "s32_scr00.ic38", 0x000000, 0x080000, CRC(3cbb2d0b) SHA1(b94006347b72cd60a889b0e279f62f677cedfd2e) )
 	ROM_LOAD32_BYTE( "s32_scr01.ic34", 0x000002, 0x080000, CRC(4167be55) SHA1(96b34d311b318c00c3fad917e341589a70ba0a15) )
 	ROM_LOAD32_BYTE( "s32_scr02.ic29", 0x000001, 0x080000, CRC(52c4bb85) SHA1(4fbee1072a19c75c25b5fd269acc75640923d69c) )
@@ -4815,7 +4817,7 @@ ROM_START( sonic )
 	ROM_LOAD( "mpr-15783.ic34",    0x200000, 0x100000, CRC(e4220eea) SHA1(a546c8bfc24e0695cf79c49e1a867d2595a1ed7f) )
 	ROM_LOAD( "mpr-15782.ic33",    0x300000, 0x100000, CRC(cf56b5a0) SHA1(5786228aab120c3361524ba93b418b24fd5b8ffb) ) // (this is the only ROM unchanged from the prototype)
 
-	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15789.ic14", 0x000000, 0x100000, CRC(4378f12b) SHA1(826e0550a3c5f2b6e59c6531ac03658a4f826651) )
 	ROM_LOAD16_BYTE( "mpr-15788.ic5",  0x000001, 0x100000, CRC(a6ed5d7a) SHA1(d30f26b452d380e7657e044e144f7dbbc4dc13e5) )
 
@@ -4851,7 +4853,7 @@ ROM_START( sonicp )
 	ROM_LOAD( "sonsnd2.bin",    0x200000, 0x100000, CRC(e1bd45a5) SHA1(b411757853d61588e5223b48b5124cc00b3d65dd) )
 	ROM_LOAD( "sonsnd3.bin",    0x300000, 0x100000, CRC(cf56b5a0) SHA1(5786228aab120c3361524ba93b418b24fd5b8ffb) )
 
-	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "sonscl0.bin", 0x000000, 0x080000, CRC(445e31b9) SHA1(5678dfda74a09b5ac673448b222d11df4ca23aff) )
 	ROM_LOAD32_BYTE( "sonscl1.bin", 0x000002, 0x080000, CRC(3d234181) SHA1(2e8c14ad36be76f5f5fc6a3ee152f1abc8bf0ddd) )
 	ROM_LOAD32_BYTE( "sonscl2.bin", 0x000001, 0x080000, CRC(a5de28b2) SHA1(49a16ac10cf01b5b8802b8b015a2e403086c206a) )
@@ -4895,7 +4897,7 @@ ROM_START( spidman )
 	ROM_LOAD_x2( "mpr-14283.ic26", 0x200000, 0x080000, CRC(c863a91c) SHA1(afdc76bbb9b207cfcb47d437248a757d03212f4e) )
 	ROM_LOAD_x2( "mpr-14282.ic22", 0x300000, 0x080000, CRC(ea20979e) SHA1(9b70ef055da8c7c56da54b7edef2379678e7c50f) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-14291-s.ic38", 0x000000, 0x100000, CRC(490f95a1) SHA1(f220788670b76164ac414ed9b16a422f719be267) )
 	ROM_LOAD32_BYTE( "mpr-14290-s.ic34", 0x000002, 0x100000, CRC(a144162d) SHA1(d43f12dd9f690cdfcebb6c7b515ff7dc7dcaa377) )
 	ROM_LOAD32_BYTE( "mpr-14289-s.ic29", 0x000001, 0x100000, CRC(38570582) SHA1(a9d810a02a1f5a6849c79d65fbebff21a4b82b59) )
@@ -4937,7 +4939,7 @@ ROM_START( spidmanu )
 	ROM_LOAD_x2( "mpr-14283.ic26", 0x200000, 0x080000, CRC(c863a91c) SHA1(afdc76bbb9b207cfcb47d437248a757d03212f4e) )
 	ROM_LOAD_x2( "mpr-14282.ic22", 0x300000, 0x080000, CRC(ea20979e) SHA1(9b70ef055da8c7c56da54b7edef2379678e7c50f) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-14291-s.ic38", 0x000000, 0x100000, CRC(490f95a1) SHA1(f220788670b76164ac414ed9b16a422f719be267) )
 	ROM_LOAD32_BYTE( "mpr-14290-s.ic34", 0x000002, 0x100000, CRC(a144162d) SHA1(d43f12dd9f690cdfcebb6c7b515ff7dc7dcaa377) )
 	ROM_LOAD32_BYTE( "mpr-14289-s.ic29", 0x000001, 0x100000, CRC(38570582) SHA1(a9d810a02a1f5a6849c79d65fbebff21a4b82b59) )
@@ -4978,7 +4980,7 @@ ROM_START( spidmanj )
 	ROM_LOAD_x2( "mpr-14283.ic26", 0x200000, 0x080000, CRC(c863a91c) SHA1(afdc76bbb9b207cfcb47d437248a757d03212f4e) )
 	ROM_LOAD_x2( "mpr-14282.ic22", 0x300000, 0x080000, CRC(ea20979e) SHA1(9b70ef055da8c7c56da54b7edef2379678e7c50f) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-14291-s.ic38", 0x000000, 0x100000, CRC(490f95a1) SHA1(f220788670b76164ac414ed9b16a422f719be267) )
 	ROM_LOAD32_BYTE( "mpr-14290-s.ic34", 0x000002, 0x100000, CRC(a144162d) SHA1(d43f12dd9f690cdfcebb6c7b515ff7dc7dcaa377) )
 	ROM_LOAD32_BYTE( "mpr-14289-s.ic29", 0x000001, 0x100000, CRC(38570582) SHA1(a9d810a02a1f5a6849c79d65fbebff21a4b82b59) )
@@ -5010,7 +5012,7 @@ ROM_START( scross )
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-15192.ic31", 0x00000, 0x20000, CRC(7524290b) SHA1(ee58be2c0c4293ee19622b96ca493f4ce4da0038) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15020.ic3", 0x000000, 0x100000, CRC(de47006a) SHA1(dbef7b9ff8c39992b8596d38985e65c627d6fa79) )
 	ROM_LOAD16_BYTE( "mpr-15021.ic11", 0x000001, 0x100000, CRC(3677db02) SHA1(7aeeb85f1632253fcdc8f7881512066e97837e5e) )
 
@@ -5043,7 +5045,7 @@ ROM_START( scrossa )
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-15192.ic31", 0x00000, 0x20000, CRC(7524290b) SHA1(ee58be2c0c4293ee19622b96ca493f4ce4da0038) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15020.ic3", 0x000000, 0x100000, CRC(de47006a) SHA1(dbef7b9ff8c39992b8596d38985e65c627d6fa79) )
 	ROM_LOAD16_BYTE( "mpr-15021.ic11", 0x000001, 0x100000, CRC(3677db02) SHA1(7aeeb85f1632253fcdc8f7881512066e97837e5e) )
 
@@ -5080,7 +5082,7 @@ ROM_START( scrossu )
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-15192.ic31", 0x00000, 0x20000, CRC(7524290b) SHA1(ee58be2c0c4293ee19622b96ca493f4ce4da0038) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15020.ic3", 0x000000, 0x100000, CRC(de47006a) SHA1(dbef7b9ff8c39992b8596d38985e65c627d6fa79) )
 	ROM_LOAD16_BYTE( "mpr-15021.ic11", 0x000001, 0x100000, CRC(3677db02) SHA1(7aeeb85f1632253fcdc8f7881512066e97837e5e) )
 
@@ -5126,7 +5128,7 @@ ROM_START( svf )
 	ROM_LOAD( "mpr-16778.ic34",    0x200000, 0x100000, CRC(feedaecf) SHA1(25c14ccb85c467dc0c8e85b61f8f86f4396c0cc7) )
 	ROM_LOAD( "mpr-16777.ic24",    0x300000, 0x100000, CRC(14b5d5df) SHA1(1b0b0a31294b1bbc16d2046b374d584a1b00a78c) )
 
-	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-16784.ic14", 0x000000, 0x100000, CRC(4608efe2) SHA1(9b41aa28f50af770e854ef9fdff1a55da7b7b131) )
 	ROM_LOAD16_BYTE( "mpr-16783.ic5",  0x000001, 0x100000, CRC(042eabe7) SHA1(a11df5c21d85f0c96dbdcaf57be37a79658ad648) )
 
@@ -5154,7 +5156,7 @@ ROM_START( svfo )
 	ROM_LOAD( "mpr-16778.ic34",    0x200000, 0x100000, CRC(feedaecf) SHA1(25c14ccb85c467dc0c8e85b61f8f86f4396c0cc7) )
 	ROM_LOAD( "mpr-16777.ic24",    0x300000, 0x100000, CRC(14b5d5df) SHA1(1b0b0a31294b1bbc16d2046b374d584a1b00a78c) )
 
-	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-16784.ic14", 0x000000, 0x100000, CRC(4608efe2) SHA1(9b41aa28f50af770e854ef9fdff1a55da7b7b131) )
 	ROM_LOAD16_BYTE( "mpr-16783.ic5",  0x000001, 0x100000, CRC(042eabe7) SHA1(a11df5c21d85f0c96dbdcaf57be37a79658ad648) )
 
@@ -5186,7 +5188,7 @@ ROM_START( svs )
 	ROM_LOAD( "mpr-16778.ic34",    0x200000, 0x100000, CRC(feedaecf) SHA1(25c14ccb85c467dc0c8e85b61f8f86f4396c0cc7) )
 	ROM_LOAD( "mpr-16777.ic24",    0x300000, 0x100000, CRC(14b5d5df) SHA1(1b0b0a31294b1bbc16d2046b374d584a1b00a78c) )
 
-	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-16784.ic14", 0x000000, 0x100000, CRC(4608efe2) SHA1(9b41aa28f50af770e854ef9fdff1a55da7b7b131) )
 	ROM_LOAD16_BYTE( "mpr-16783.ic5",  0x000001, 0x100000, CRC(042eabe7) SHA1(a11df5c21d85f0c96dbdcaf57be37a79658ad648) )
 
@@ -5223,7 +5225,7 @@ ROM_START( jleague )
 	ROM_LOAD( "mpr-16778.ic34",    0x200000, 0x100000, CRC(feedaecf) SHA1(25c14ccb85c467dc0c8e85b61f8f86f4396c0cc7) )
 	ROM_LOAD( "mpr-16777.ic24",    0x300000, 0x100000, CRC(14b5d5df) SHA1(1b0b0a31294b1bbc16d2046b374d584a1b00a78c) )
 
-	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-16784.ic14", 0x000000, 0x100000, CRC(4608efe2) SHA1(9b41aa28f50af770e854ef9fdff1a55da7b7b131) )
 	ROM_LOAD16_BYTE( "mpr-16783.ic5",  0x000001, 0x100000, CRC(042eabe7) SHA1(a11df5c21d85f0c96dbdcaf57be37a79658ad648) )
 
@@ -5251,7 +5253,7 @@ ROM_START( jleagueo )
 	ROM_LOAD( "mpr-16778.ic34",    0x200000, 0x100000, CRC(feedaecf) SHA1(25c14ccb85c467dc0c8e85b61f8f86f4396c0cc7) )
 	ROM_LOAD( "mpr-16777.ic24",    0x300000, 0x100000, CRC(14b5d5df) SHA1(1b0b0a31294b1bbc16d2046b374d584a1b00a78c) )
 
-	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x200000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-16784.ic14", 0x000000, 0x100000, CRC(4608efe2) SHA1(9b41aa28f50af770e854ef9fdff1a55da7b7b131) )
 	ROM_LOAD16_BYTE( "mpr-16783.ic5",  0x000001, 0x100000, CRC(042eabe7) SHA1(a11df5c21d85f0c96dbdcaf57be37a79658ad648) )
 
@@ -5287,7 +5289,7 @@ ROM_START( titlef )
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-15384.ic31", 0x00000, 0x20000, CRC(0f7d208d) SHA1(5425120480f813210fae28951e8bfd5acb08ca53) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15381.ic3",  0x000000, 0x200000, CRC(162cc4d6) SHA1(2369d3d76ab5ef8f033aa45530ab957f0e5ff028) )
 	ROM_LOAD16_BYTE( "mpr-15382.ic11", 0x000001, 0x200000, CRC(fd03a130) SHA1(040c36383ef5d8298af714958cd5b0a4c7556ae7) )
 
@@ -5323,7 +5325,7 @@ ROM_START( titlefu )
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-15384.ic31", 0x00000, 0x20000, CRC(0f7d208d) SHA1(5425120480f813210fae28951e8bfd5acb08ca53) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15381.ic3",  0x000000, 0x200000, CRC(162cc4d6) SHA1(2369d3d76ab5ef8f033aa45530ab957f0e5ff028) )
 	ROM_LOAD16_BYTE( "mpr-15382.ic11", 0x000001, 0x200000, CRC(fd03a130) SHA1(040c36383ef5d8298af714958cd5b0a4c7556ae7) )
 
@@ -5359,7 +5361,7 @@ ROM_START( titlefj )
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-15384.ic31", 0x00000, 0x20000, CRC(0f7d208d) SHA1(5425120480f813210fae28951e8bfd5acb08ca53) )
 
-	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x400000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15381.ic3",  0x000000, 0x200000, CRC(162cc4d6) SHA1(2369d3d76ab5ef8f033aa45530ab957f0e5ff028) )
 	ROM_LOAD16_BYTE( "mpr-15382.ic11", 0x000001, 0x200000, CRC(fd03a130) SHA1(040c36383ef5d8298af714958cd5b0a4c7556ae7) )
 
@@ -5391,7 +5393,7 @@ ROM_START( as1 ) // 'AS-1 CONTROLLER FOR SYSTEM 32 MULTI'
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-15367.ic31", 0x00000, 0x20000, CRC(0220f078) SHA1(9fab79fc91764ecf678bfa4d38d1b4054e258b76) )
 
-	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x100000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "epr-15422.ic3",  0x000000, 0x080000, CRC(6c61ba6d) SHA1(b41237ced4a2e8741ae0339c333bea4221903690) )
 	ROM_LOAD16_BYTE( "epr-15423.ic11", 0x000001, 0x080000, CRC(5178912a) SHA1(b637451c28877ddc93c9920bea356888b4c8eea3) )
 
@@ -5411,7 +5413,7 @@ ROM_START( as1a ) // 'AS-1 CONTROLLER FOR SYSTEM MULTI 32' 'with Michael Jackson
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-15367.ic31", 0x00000, 0x20000, CRC(0220f078) SHA1(9fab79fc91764ecf678bfa4d38d1b4054e258b76) )
 
-	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x100000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "epr-15422.ic3",  0x000000, 0x080000, CRC(6c61ba6d) SHA1(b41237ced4a2e8741ae0339c333bea4221903690) )
 	ROM_LOAD16_BYTE( "epr-15423.ic11", 0x000001, 0x080000, CRC(5178912a) SHA1(b637451c28877ddc93c9920bea356888b4c8eea3) )
 
@@ -5433,7 +5435,7 @@ ROM_START( as1b ) // 'AS-1 CONTROLLER FOR SYSTEM MULTI 32' 'with Michael Jackson
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-15367.ic31", 0x00000, 0x20000, CRC(0220f078) SHA1(9fab79fc91764ecf678bfa4d38d1b4054e258b76) )
 
-	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x100000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "epr-15363.ic3",  0x000000, 0x080000, CRC(1586b05c) SHA1(053e665afaace36337dc59356d2b81f492440486) )
 	ROM_LOAD16_BYTE( "epr-15364.ic11", 0x000001, 0x080000, CRC(ec751e99) SHA1(09b09ebff5063c7a95b49704f915955fe0f74b04) )
 
@@ -5462,7 +5464,7 @@ ROM_START( as1c ) // 'AS-1 CONTROLLER FOR SYSTEM MULTI 32' ' with Michael Jackso
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-15695.ic31", 0x00000, 0x20000, CRC(a9760b04) SHA1(7a69d80219c3e5817104d5ca8df08796a63b30a0) )
 
-	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x100000, "mainpcb:tiles", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "epr-15363.ic3",  0x000000, 0x080000, CRC(1586b05c) SHA1(053e665afaace36337dc59356d2b81f492440486) )
 	ROM_LOAD16_BYTE( "epr-15364.ic11", 0x000001, 0x080000, CRC(ec751e99) SHA1(09b09ebff5063c7a95b49704f915955fe0f74b04) )
 
@@ -5518,13 +5520,13 @@ void segas32_state::segas32_common_init()
  *      switches we need to fix
  *************************************/
 
-void segas32_state::radm_sw1_output( int which, uint16_t data )
+void segas32_state::radm_sw1_output(int which, uint16_t data)
 {
 	if (which == 0)
 		machine().output().set_value("Start_lamp", BIT(data, 2));
 }
 
-void segas32_state::radm_sw2_output( int which, uint16_t data )
+void segas32_state::radm_sw2_output(int which, uint16_t data)
 {
 	if (which == 0)
 	{
@@ -5533,7 +5535,7 @@ void segas32_state::radm_sw2_output( int which, uint16_t data )
 	}
 }
 
-void segas32_state::radr_sw2_output( int which, uint16_t data )
+void segas32_state::radr_sw2_output(int which, uint16_t data)
 {
 	if (which == 0)
 	{
@@ -5542,7 +5544,7 @@ void segas32_state::radr_sw2_output( int which, uint16_t data )
 	}
 }
 
-void segas32_state::alien3_sw1_output( int which, uint16_t data )
+void segas32_state::alien3_sw1_output(int which, uint16_t data)
 {
 	if (which == 0)
 	{
@@ -5551,7 +5553,7 @@ void segas32_state::alien3_sw1_output( int which, uint16_t data )
 	}
 }
 
-void segas32_state::arescue_sw1_output( int which, uint16_t data )
+void segas32_state::arescue_sw1_output(int which, uint16_t data)
 {
 	if (which == 0)
 	{
@@ -5560,7 +5562,7 @@ void segas32_state::arescue_sw1_output( int which, uint16_t data )
 	}
 }
 
-void segas32_state::f1lap_sw1_output( int which, uint16_t data )
+void segas32_state::f1lap_sw1_output(int which, uint16_t data)
 {
 	if (which == 0)
 	{
@@ -5569,7 +5571,7 @@ void segas32_state::f1lap_sw1_output( int which, uint16_t data )
 	}
 }
 
-void segas32_state::jpark_sw1_output( int which, uint16_t data )
+void segas32_state::jpark_sw1_output(int which, uint16_t data)
 {
 	if (which == 0)
 	{
@@ -5578,7 +5580,7 @@ void segas32_state::jpark_sw1_output( int which, uint16_t data )
 	}
 }
 
-void segas32_state::orunners_sw1_output( int which, uint16_t data )
+void segas32_state::orunners_sw1_output(int which, uint16_t data)
 {
 	/* note ma = monitor A and mb = Monitor B */
 	if (which == 0)
@@ -5595,7 +5597,7 @@ void segas32_state::orunners_sw1_output( int which, uint16_t data )
 	}
 }
 
-void segas32_state::orunners_sw2_output( int which, uint16_t data )
+void segas32_state::orunners_sw2_output(int which, uint16_t data)
 {
 	/* note ma = monitor A and mb = Monitor B */
 	/* also note that the remaining bits are for the game's lcd display */
@@ -5612,7 +5614,7 @@ void segas32_state::orunners_sw2_output( int which, uint16_t data )
 	}
 }
 
-void segas32_state::harddunk_sw1_output( int which, uint16_t data )
+void segas32_state::harddunk_sw1_output(int which, uint16_t data)
 {
 	if (which == 0)
 	{
@@ -5626,7 +5628,7 @@ void segas32_state::harddunk_sw1_output( int which, uint16_t data )
 	}
 }
 
-void segas32_state::harddunk_sw2_output( int which, uint16_t data )
+void segas32_state::harddunk_sw2_output(int which, uint16_t data)
 {
 	if (which == 0)
 		machine().output().set_value("Left_Winner_lamp", BIT(data, 0));
@@ -5634,13 +5636,13 @@ void segas32_state::harddunk_sw2_output( int which, uint16_t data )
 		machine().output().set_value("Right_Winner_lamp", BIT(data, 0));
 }
 
-void segas32_state::harddunk_sw3_output( int which, uint16_t data )
+void segas32_state::harddunk_sw3_output(int which, uint16_t data)
 {
 	machine().output().set_value("3P_Start_lamp", BIT(data, 4));
 	machine().output().set_value("6P_Start_lamp", BIT(data, 5));
 }
 
-void segas32_state::titlef_sw1_output( int which, uint16_t data )
+void segas32_state::titlef_sw1_output(int which, uint16_t data)
 {
 	if (which == 0)
 	{
@@ -5654,7 +5656,7 @@ void segas32_state::titlef_sw1_output( int which, uint16_t data )
 	}
 }
 
-void segas32_state::titlef_sw2_output( int which, uint16_t data )
+void segas32_state::titlef_sw2_output(int which, uint16_t data)
 {
 	if (which == 0)
 		machine().output().set_value("Blue_Corner_lamp", BIT(data, 0));
@@ -5662,7 +5664,7 @@ void segas32_state::titlef_sw2_output( int which, uint16_t data )
 		machine().output().set_value("Red_Corner_lamp", BIT(data, 0));
 }
 
-void segas32_state::scross_sw1_output( int which, uint16_t data )
+void segas32_state::scross_sw1_output(int which, uint16_t data)
 {
 	/* note ma = monitor A and mb = Monitor B */
 	if (which == 0)
@@ -5671,7 +5673,7 @@ void segas32_state::scross_sw1_output( int which, uint16_t data )
 		machine().output().set_value("MB_Start_lamp", BIT(data, 2));
 }
 
-void segas32_state::scross_sw2_output( int which, uint16_t data )
+void segas32_state::scross_sw2_output(int which, uint16_t data)
 {
 	/* Note:  I'm not an expert on digits, so I didn't know the right map to use, I just added it manually and it seems to work fine. */
 	if (which == 0)
@@ -5700,15 +5702,15 @@ uint16_t segas32_new_state::dual_pcb_comms_r(offs_t offset)
 /* There must be something on the comms board for this?
    Probably not a dip/solder link/trace cut, but maybe
    just whichever way the cables are plugged in?
-   Both f1en and arescue master units try to set bit 1... */
-uint16_t segas32_new_state::dual_pcb_masterslave()
+   Both f1en and arescue main units try to set bit 1... */
+uint16_t segas32_new_state::dual_pcb_mainsub()
 {
-	return 0; // 0/1 master/slave
+	return 0; // 0/1 main/sub
 }
 
-uint16_t segas32_new_state::dual_pcb_slave()
+uint16_t segas32_new_state::dual_pcb_sub()
 {
-	return 1; // 0/1 master/slave
+	return 1; // 0/1 main/sub
 }
 
 
@@ -5737,33 +5739,33 @@ void segas32_new_state::init_orunners() {    m_mainpcb->init_orunners(); }
 
 void segas32_new_state::init_arescue()
 {
-	m_mainpcb->init_arescue(1);
-	m_slavepcb->init_arescue(0);
+	m_mainpcb->init_arescue(true);
+	m_subpcb->init_arescue(false);
 
 	m_dual_pcb_comms = std::make_unique<uint16_t[]>(0x1000/2);
 	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x810000, 0x810fff, read16sm_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)));
 	m_mainpcb->maincpu()->space(AS_PROGRAM).install_write_handler(0x810000, 0x810fff, write16s_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
-	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16smo_delegate(*this, FUNC(segas32_new_state::dual_pcb_masterslave)));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16smo_delegate(*this, FUNC(segas32_new_state::dual_pcb_mainsub)));
 
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x810000, 0x810fff, read16sm_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)));
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_write_handler(0x810000, 0x810fff, write16s_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16smo_delegate(*this, FUNC(segas32_new_state::dual_pcb_slave)));
+	m_subpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x810000, 0x810fff, read16sm_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)));
+	m_subpcb->maincpu()->space(AS_PROGRAM).install_write_handler(0x810000, 0x810fff, write16s_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
+	m_subpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16smo_delegate(*this, FUNC(segas32_new_state::dual_pcb_sub)));
 }
 
 void segas32_new_state::init_f1en() {
 	m_mainpcb->init_f1en();
-	m_slavepcb->init_f1en();
+	m_subpcb->init_f1en();
 
 	m_dual_pcb_comms = std::make_unique<uint16_t[]>(0x1000/2);
 	memset(m_dual_pcb_comms.get(), 0xff, 0x1000 / 2);
 
 	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x810000, 0x810fff, read16sm_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)));
 	m_mainpcb->maincpu()->space(AS_PROGRAM).install_write_handler(0x810000, 0x810fff, write16s_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
-	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16smo_delegate(*this, FUNC(segas32_new_state::dual_pcb_masterslave)));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16smo_delegate(*this, FUNC(segas32_new_state::dual_pcb_mainsub)));
 
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x810000, 0x810fff, read16sm_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)));
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_write_handler(0x810000, 0x810fff, write16s_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16smo_delegate(*this, FUNC(segas32_new_state::dual_pcb_slave)));
+	m_subpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x810000, 0x810fff, read16sm_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)));
+	m_subpcb->maincpu()->space(AS_PROGRAM).install_write_handler(0x810000, 0x810fff, write16s_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
+	m_subpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16smo_delegate(*this, FUNC(segas32_new_state::dual_pcb_sub)));
 }
 
 void segas32_new_state::init_f1lap()
@@ -5782,11 +5784,14 @@ void segas32_state::init_alien3()
 	m_sw1_output = &segas32_state::alien3_sw1_output;
 }
 
-void segas32_state::init_arescue(int m_hasdsp)
+void segas32_state::init_arescue(bool hasdsp)
 {
 	segas32_common_init();
-	if (m_hasdsp) m_maincpu->space(AS_PROGRAM).install_read_handler(0xa00000, 0xa00007, read16sm_delegate(*this, FUNC(segas32_state::arescue_dsp_r)));
-	if (m_hasdsp) m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa00007, write16s_delegate(*this, FUNC(segas32_state::arescue_dsp_w)));
+	if (hasdsp)
+	{
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa00000, 0xa00007, read16sm_delegate(*this, FUNC(segas32_state::arescue_dsp_r)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa00007, write16s_delegate(*this, FUNC(segas32_state::arescue_dsp_w)));
+	}
 
 	for (auto & elem : m_arescue_dsp_io)
 		elem = 0x00;
@@ -5996,89 +6001,89 @@ void segas32_state::init_titlef()
  *
  *************************************/
 
-GAME( 1992, arescue,   0,        sega_system32_dual_direct_upd7725, arescue, segas32_new_state, init_arescue, ROT0, "Sega", "Air Rescue (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, arescueu,  arescue,  sega_system32_dual_direct_upd7725, arescue, segas32_new_state, init_arescue, ROT0, "Sega", "Air Rescue (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, arescuej,  arescue,  sega_system32_dual_direct_upd7725, arescue, segas32_new_state, init_arescue, ROT0, "Sega", "Air Rescue (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, arescue,   0,        sega_system32_dual_direct_upd7725, arescue, segas32_new_state, init_arescue, ROT0, "Sega", "Air Rescue (World)", 0 )
+GAME( 1992, arescueu,  arescue,  sega_system32_dual_direct_upd7725, arescue, segas32_new_state, init_arescue, ROT0, "Sega", "Air Rescue (US)", 0 )
+GAME( 1992, arescuej,  arescue,  sega_system32_dual_direct_upd7725, arescue, segas32_new_state, init_arescue, ROT0, "Sega", "Air Rescue (Japan)", 0 )
 
-GAME( 1993, alien3,    0,        sega_system32_analog,      alien3,   segas32_new_state, init_alien3,   ROT0, "Sega",   "Alien3: The Gun (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, alien3u,   alien3,   sega_system32_analog,      alien3,   segas32_new_state, init_alien3,   ROT0, "Sega",   "Alien3: The Gun (US, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, alien3j,   alien3,   sega_system32_analog,      alien3,   segas32_new_state, init_alien3,   ROT0, "Sega",   "Alien3: The Gun (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, alien3,    0,        sega_system32_analog,      alien3,   segas32_new_state, init_alien3,   ROT0, "Sega",   "Alien3: The Gun (World)", 0 )
+GAME( 1993, alien3u,   alien3,   sega_system32_analog,      alien3,   segas32_new_state, init_alien3,   ROT0, "Sega",   "Alien3: The Gun (US, Rev A)", 0 )
+GAME( 1993, alien3j,   alien3,   sega_system32_analog,      alien3,   segas32_new_state, init_alien3,   ROT0, "Sega",   "Alien3: The Gun (Japan)", 0 )
 
-GAME( 1991, arabfgt,   0,        sega_system32_arf,         arabfgt,  segas32_new_state, init_arabfgt,  ROT0, "Sega",   "Arabian Fight (World)", MACHINE_IMPERFECT_GRAPHICS ) /* Released in 03.1992 */
-GAME( 1991, arabfgtu,  arabfgt,  sega_system32_arf,         arabfgtu, segas32_new_state, init_arabfgt,  ROT0, "Sega",   "Arabian Fight (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, arabfgtj,  arabfgt,  sega_system32_arf,         arabfgt,  segas32_new_state, init_arabfgt,  ROT0, "Sega",   "Arabian Fight (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, arabfgt,   0,        sega_system32_arf,         arabfgt,  segas32_new_state, init_arabfgt,  ROT0, "Sega",   "Arabian Fight (World)", 0 ) /* Released in 03.1992 */
+GAME( 1991, arabfgtu,  arabfgt,  sega_system32_arf,         arabfgtu, segas32_new_state, init_arabfgt,  ROT0, "Sega",   "Arabian Fight (US)", 0 )
+GAME( 1991, arabfgtj,  arabfgt,  sega_system32_arf,         arabfgt,  segas32_new_state, init_arabfgt,  ROT0, "Sega",   "Arabian Fight (Japan)", 0 )
 
-GAME( 1992, brival,    0,        sega_system32_4p,          brival,   segas32_new_state, init_brival,   ROT0, "Sega",   "Burning Rival (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, brivalj,   brival,   sega_system32_4p,          brival,   segas32_new_state, init_brival,   ROT0, "Sega",   "Burning Rival (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, brival,    0,        sega_system32_4p,          brival,   segas32_new_state, init_brival,   ROT0, "Sega",   "Burning Rival (World)", 0 )
+GAME( 1992, brivalj,   brival,   sega_system32_4p,          brival,   segas32_new_state, init_brival,   ROT0, "Sega",   "Burning Rival (Japan)", 0 )
 
-GAME( 1992, darkedge,  0,        sega_system32_4p,          darkedge, segas32_new_state, init_darkedge, ROT0, "Sega",   "Dark Edge (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, darkedgej, darkedge, sega_system32_4p,          darkedge, segas32_new_state, init_darkedge, ROT0, "Sega",   "Dark Edge (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, darkedge,  0,        sega_system32_4p,          darkedge, segas32_new_state, init_darkedge, ROT0, "Sega",   "Dark Edge (World)", 0 )
+GAME( 1992, darkedgej, darkedge, sega_system32_4p,          darkedge, segas32_new_state, init_darkedge, ROT0, "Sega",   "Dark Edge (Japan)", 0 )
 
-GAME( 1994, dbzvrvs,   0,        sega_system32_analog,      dbzvrvs,  segas32_new_state, init_dbzvrvs,  ROT0, "Sega / Banpresto", "Dragon Ball Z: V.R. V.S. (Japan, Rev A)", MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1994, dbzvrvs,   0,        sega_system32_analog,      dbzvrvs,  segas32_new_state, init_dbzvrvs,  ROT0, "Sega / Banpresto", "Dragon Ball Z: V.R. V.S. (Japan, Rev A)", 0)
 
-GAME( 1991, f1en,      0,        sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (World, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, f1enu,     f1en,     sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (US, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, f1enj,     f1en,     sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (Japan, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, f1en,      0,        sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (World, Rev A)", 0 )
+GAME( 1991, f1enu,     f1en,     sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (US, Rev A)", 0 )
+GAME( 1991, f1enj,     f1en,     sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (Japan, Rev A)", 0 )
 
-GAME( 1993, f1lap,     0,        sega_system32_analog,      f1lap,    segas32_new_state, init_f1lap,    ROT0, "Sega",   "F1 Super Lap (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, f1lapt,    f1lap,    sega_system32_analog,      f1lap,    segas32_new_state, init_f1lapt,   ROT0, "Sega",   "F1 Super Lap (World, Unprotected)", MACHINE_IMPERFECT_GRAPHICS ) /* Factory unprotected */
-GAME( 1993, f1lapj,    f1lap,    sega_system32_analog,      f1lap,    segas32_new_state, init_f1lap,    ROT0, "Sega",   "F1 Super Lap (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, f1lap,     0,        sega_system32_analog,      f1lap,    segas32_new_state, init_f1lap,    ROT0, "Sega",   "F1 Super Lap (World)", 0 )
+GAME( 1993, f1lapt,    f1lap,    sega_system32_analog,      f1lap,    segas32_new_state, init_f1lapt,   ROT0, "Sega",   "F1 Super Lap (World, Unprotected)", 0 ) /* Factory unprotected */
+GAME( 1993, f1lapj,    f1lap,    sega_system32_analog,      f1lap,    segas32_new_state, init_f1lap,    ROT0, "Sega",   "F1 Super Lap (Japan)", 0 )
 
-GAME( 1992, ga2,       0,        sega_system32_ga2,         ga2,      segas32_new_state, init_ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (World, Rev B)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, ga2u,      ga2,      sega_system32_ga2,         ga2u,     segas32_new_state, init_ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (US, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, ga2j,      ga2,      sega_system32_ga2,         ga2,      segas32_new_state, init_ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, ga2,       0,        sega_system32_ga2,         ga2,      segas32_new_state, init_ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (World, Rev B)", 0 )
+GAME( 1992, ga2u,      ga2,      sega_system32_ga2,         ga2u,     segas32_new_state, init_ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (US, Rev A)", 0 )
+GAME( 1992, ga2j,      ga2,      sega_system32_ga2,         ga2,      segas32_new_state, init_ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (Japan)", 0 )
 
-GAME( 1992, holo,      0,        sega_system32,             holo,     segas32_new_state, init_holo,     ORIENTATION_FLIP_Y, "Sega",   "Holosseum (US, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, holo,      0,        sega_system32,             holo,     segas32_new_state, init_holo,     ORIENTATION_FLIP_Y, "Sega",   "Holosseum (US, Rev A)", 0 )
 
-GAME( 1993, jpark,     0,        sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (World, Rev A)", MACHINE_IMPERFECT_GRAPHICS )  /* Released in 02.1994 */
-GAME( 1993, jparkj,    jpark,    sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Deluxe)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, jparkja,   jpark,    sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Deluxe)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, jparkjc,   jpark,    sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Conversion)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, jpark,     0,        sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (World, Rev A)", 0 )  /* Released in 02.1994 */
+GAME( 1993, jparkj,    jpark,    sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Deluxe)", 0 )
+GAME( 1993, jparkja,   jpark,    sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Deluxe)", 0 )
+GAME( 1993, jparkjc,   jpark,    sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Conversion)", 0 )
 
-GAME( 1992, kokoroj,   0,        sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology (Rev A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER ) /* uses an Audio CD (undumped, incompatible with kokoroj2) */
-GAME( 1992, kokoroja,  kokoroj,  sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER ) /* uses an Audio CD (undumped, incompatible with kokoroj2) */
-GAME( 1993, kokoroj2,  0,        sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology Vol. 2 - Kokoro no Tanteikyoku", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER ) /* uses an Audio CD */
+GAME( 1992, kokoroj,   0,        sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology (Rev A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER ) /* uses an Audio CD (undumped, incompatible with kokoroj2) */
+GAME( 1992, kokoroja,  kokoroj,  sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER ) /* uses an Audio CD (undumped, incompatible with kokoroj2) */
+GAME( 1993, kokoroj2,  0,        sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology Vol. 2 - Kokoro no Tanteikyoku", MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER ) /* uses an Audio CD */
 
-GAME( 1990, radm,      0,        sega_system32_analog,      radm,     segas32_new_state, init_radm,     ROT0, "Sega",   "Rad Mobile (World)", MACHINE_IMPERFECT_GRAPHICS )  /* Released in 02.1991 */
-GAME( 1990, radmu,     radm,     sega_system32_analog,      radm,     segas32_new_state, init_radm,     ROT0, "Sega",   "Rad Mobile (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, radm,      0,        sega_system32_analog,      radm,     segas32_new_state, init_radm,     ROT0, "Sega",   "Rad Mobile (World)", 0 )  /* Released in 02.1991 */
+GAME( 1990, radmu,     radm,     sega_system32_analog,      radm,     segas32_new_state, init_radm,     ROT0, "Sega",   "Rad Mobile (US)", 0 )
 
-GAMEL(1991, radr,      0,        sega_system32_analog,      radr,     segas32_new_state, init_radr,     ROT0, "Sega",   "Rad Rally (World)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
-GAMEL(1991, radru,     radr,     sega_system32_analog,      radr,     segas32_new_state, init_radr,     ROT0, "Sega",   "Rad Rally (US)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
-GAMEL(1991, radrj,     radr,     sega_system32_analog,      radr,     segas32_new_state, init_radr,     ROT0, "Sega",   "Rad Rally (Japan)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1991, radr,      0,        sega_system32_analog,      radr,     segas32_new_state, init_radr,     ROT0, "Sega",   "Rad Rally (World)", 0, layout_radr )
+GAMEL(1991, radru,     radr,     sega_system32_analog,      radr,     segas32_new_state, init_radr,     ROT0, "Sega",   "Rad Rally (US)", 0, layout_radr )
+GAMEL(1991, radrj,     radr,     sega_system32_analog,      radr,     segas32_new_state, init_radr,     ROT0, "Sega",   "Rad Rally (Japan)", 0, layout_radr )
 
-GAMEL(1995, slipstrm,  0,        sega_system32_analog,      slipstrm, segas32_new_state, init_slipstrm, ROT0, "Capcom", "Slip Stream (Brazil 950515)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
-GAMEL(1995, slipstrmh, slipstrm, sega_system32_analog,      slipstrm, segas32_new_state, init_slipstrm, ROT0, "Capcom", "Slip Stream (Hispanic 950515)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1995, slipstrm,  0,        sega_system32_analog,      slipstrm, segas32_new_state, init_slipstrm, ROT0, "Capcom", "Slip Stream (Brazil 950515)", 0, layout_radr )
+GAMEL(1995, slipstrmh, slipstrm, sega_system32_analog,      slipstrm, segas32_new_state, init_slipstrm, ROT0, "Capcom", "Slip Stream (Hispanic 950515)", 0, layout_radr )
 
-GAME( 1992, sonic,     0,        sega_system32_track,       sonic,    segas32_new_state, init_sonic,    ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, rev. C)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, sonicp,    sonic,    sega_system32_track,       sonic,    segas32_new_state, init_sonicp,   ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, sonic,     0,        sega_system32_track,       sonic,    segas32_new_state, init_sonic,    ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, rev. C)", 0 )
+GAME( 1992, sonicp,    sonic,    sega_system32_track,       sonic,    segas32_new_state, init_sonicp,   ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, prototype)", 0 )
 
-GAME( 1991, spidman,   0,        sega_system32_4p,          spidman,  segas32_new_state, init_spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, spidmanu,  spidman,  sega_system32_4p,          spidmanu, segas32_new_state, init_spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (US, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, spidmanj,  spidman,  sega_system32_4p,          spidman,  segas32_new_state, init_spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, spidman,   0,        sega_system32_4p,          spidman,  segas32_new_state, init_spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (World)", 0 )
+GAME( 1991, spidmanu,  spidman,  sega_system32_4p,          spidmanu, segas32_new_state, init_spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (US, Rev A)", 0 )
+GAME( 1991, spidmanj,  spidman,  sega_system32_4p,          spidman,  segas32_new_state, init_spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (Japan)", 0 )
 
-GAME( 1994, svf,       0,        sega_system32,             svf,      segas32_new_state, init_svf,      ROT0, "Sega",   "Super Visual Football: European Sega Cup (Rev A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, svfo,      svf,      sega_system32,             svf,      segas32_new_state, init_svf,      ROT0, "Sega",   "Super Visual Football: European Sega Cup", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, svs,       svf,      sega_system32,             svf,      segas32_new_state, init_svf,      ROT0, "Sega",   "Super Visual Soccer: Sega Cup (US, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, jleague,   svf,      sega_system32,             svf,      segas32_new_state, init_jleague,  ROT0, "Sega",   "The J.League 1994 (Japan, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, jleagueo,  svf,      sega_system32,             svf,      segas32_new_state, init_jleague,  ROT0, "Sega",   "The J.League 1994 (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, svf,       0,        sega_system32,             svf,      segas32_new_state, init_svf,      ROT0, "Sega",   "Super Visual Football: European Sega Cup (Rev A)", 0 )
+GAME( 1994, svfo,      svf,      sega_system32,             svf,      segas32_new_state, init_svf,      ROT0, "Sega",   "Super Visual Football: European Sega Cup", 0 )
+GAME( 1994, svs,       svf,      sega_system32,             svf,      segas32_new_state, init_svf,      ROT0, "Sega",   "Super Visual Soccer: Sega Cup (US, Rev A)", 0 )
+GAME( 1994, jleague,   svf,      sega_system32,             svf,      segas32_new_state, init_jleague,  ROT0, "Sega",   "The J.League 1994 (Japan, Rev A)", 0 )
+GAME( 1994, jleagueo,  svf,      sega_system32,             svf,      segas32_new_state, init_jleague,  ROT0, "Sega",   "The J.League 1994 (Japan)", 0 )
 
 // System Multi32
-GAME( 1994, harddunk,  0,        sega_multi32_6p,           harddunk, segas32_new_state, init_harddunk, ROT0, "Sega",   "Hard Dunk (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, harddunkj, harddunk, sega_multi32_6p,           harddunk, segas32_new_state, init_harddunk, ROT0, "Sega",   "Hard Dunk (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, harddunk,  0,        sega_multi32_6p,           harddunk, segas32_new_state, init_harddunk, ROT0, "Sega",   "Hard Dunk (World)", 0 )
+GAME( 1994, harddunkj, harddunk, sega_multi32_6p,           harddunk, segas32_new_state, init_harddunk, ROT0, "Sega",   "Hard Dunk (Japan)", 0 )
 
-GAME( 1992, orunners,  0,        sega_multi32_analog,       orunners, segas32_new_state, init_orunners, ROT0, "Sega", "OutRunners (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, orunnersu, orunners, sega_multi32_analog,       orunners, segas32_new_state, init_orunners, ROT0, "Sega", "OutRunners (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, orunnersj, orunners, sega_multi32_analog,       orunners, segas32_new_state, init_orunners, ROT0, "Sega", "OutRunners (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, orunners,  0,        sega_multi32_analog,       orunners, segas32_new_state, init_orunners, ROT0, "Sega", "OutRunners (World)", 0 )
+GAME( 1992, orunnersu, orunners, sega_multi32_analog,       orunners, segas32_new_state, init_orunners, ROT0, "Sega", "OutRunners (US)", 0 )
+GAME( 1992, orunnersj, orunners, sega_multi32_analog,       orunners, segas32_new_state, init_orunners, ROT0, "Sega", "OutRunners (Japan)", 0 )
 
-GAME( 1992, scross,    0,        sega_multi32_analog,       scross,   segas32_new_state, init_scross,   ROT0, "Sega", "Stadium Cross (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, scrossa,   scross,   sega_multi32_analog,       scross,   segas32_new_state, init_scross,   ROT0, "Sega", "Stadium Cross (World, linkable)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, scrossu,   scross,   sega_multi32_analog,       scross,   segas32_new_state, init_scross,   ROT0, "Sega", "Stadium Cross (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, scross,    0,        sega_multi32_analog,       scross,   segas32_new_state, init_scross,   ROT0, "Sega", "Stadium Cross (World)", 0 )
+GAME( 1992, scrossa,   scross,   sega_multi32_analog,       scross,   segas32_new_state, init_scross,   ROT0, "Sega", "Stadium Cross (World, linkable)", 0 )
+GAME( 1992, scrossu,   scross,   sega_multi32_analog,       scross,   segas32_new_state, init_scross,   ROT0, "Sega", "Stadium Cross (US)", 0 )
 
-GAME( 1992, titlef,    0,        sega_multi32,              titlef,   segas32_new_state, init_titlef,   ROT0, "Sega",   "Title Fight (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, titlefu,   titlef,   sega_multi32,              titlef,   segas32_new_state, init_titlef,   ROT0, "Sega",   "Title Fight (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, titlefj,   titlef,   sega_multi32,              titlef,   segas32_new_state, init_titlef,   ROT0, "Sega",   "Title Fight (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, titlef,    0,        sega_multi32,              titlef,   segas32_new_state, init_titlef,   ROT0, "Sega",   "Title Fight (World)", 0 )
+GAME( 1992, titlefu,   titlef,   sega_multi32,              titlef,   segas32_new_state, init_titlef,   ROT0, "Sega",   "Title Fight (US)", 0 )
+GAME( 1992, titlefj,   titlef,   sega_multi32,              titlef,   segas32_new_state, init_titlef,   ROT0, "Sega",   "Title Fight (Japan)", 0 )
 
-GAME( 1993, as1,       0,        sega_multi32,              multi32_generic,  segas32_new_state, init_holo, ROT0, "Sega",   "AS-1 Controller (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // needs laserdisc emulation
-GAME( 1993, as1a,      as1,      sega_multi32,              multi32_generic,  segas32_new_state, init_holo, ROT0, "Sega",   "AS-1 Controller (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // needs laserdisc emulation
-GAME( 1993, as1b,      as1,      sega_multi32,              multi32_generic,  segas32_new_state, init_holo, ROT0, "Sega",   "AS-1 Controller (set 3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // needs laserdisc emulation
-GAME( 1993, as1c,      as1,      sega_multi32,              multi32_generic,  segas32_new_state, init_holo, ROT0, "Sega",   "AS-1 Controller (set 4)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // needs laserdisc emulation
+GAME( 1993, as1,       0,        sega_multi32,              multi32_generic,  segas32_new_state, init_holo, ROT0, "Sega",   "AS-1 Controller (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // needs laserdisc emulation
+GAME( 1993, as1a,      as1,      sega_multi32,              multi32_generic,  segas32_new_state, init_holo, ROT0, "Sega",   "AS-1 Controller (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // needs laserdisc emulation
+GAME( 1993, as1b,      as1,      sega_multi32,              multi32_generic,  segas32_new_state, init_holo, ROT0, "Sega",   "AS-1 Controller (set 3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // needs laserdisc emulation
+GAME( 1993, as1c,      as1,      sega_multi32,              multi32_generic,  segas32_new_state, init_holo, ROT0, "Sega",   "AS-1 Controller (set 4)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // needs laserdisc emulation

@@ -143,7 +143,7 @@ void menu_video_options::populate()
 			bool eclipsed(false);
 			for (auto it = toggles.begin(); !eclipsed && (toggle != it); ++it)
 				eclipsed = ((current_mask & it->mask()) != it->mask()) && ((toggle_mask & it->mask()) == it->mask());
-			item_append_on_off(toggle->name(), enabled, eclipsed ? (FLAG_INVERT | FLAG_DISABLE) : 0U, reinterpret_cast<void *>(ITEM_TOGGLE_FIRST + ref));
+			item_append_on_off(toggle->name(), enabled, eclipsed ? (FLAG_DEEMPHASIZE | FLAG_DISABLE) : 0U, reinterpret_cast<void *>(ITEM_TOGGLE_FIRST + ref));
 		}
 		item_append(menu_item_type::SEPARATOR);
 	}
@@ -163,7 +163,7 @@ void menu_video_options::populate()
 
 	// cropping
 	bool const canzoom(curview.has_art() && !curview.visible_screens().empty());
-	item_append_on_off(_("Zoom to Screen Area"), m_target.zoom_to_screen(), canzoom ? 0U : (FLAG_INVERT | FLAG_DISABLE), reinterpret_cast<void *>(ITEM_ZOOM));
+	item_append_on_off(_("Zoom to Screen Area"), m_target.zoom_to_screen(), canzoom ? 0U : (FLAG_DEEMPHASIZE | FLAG_DISABLE), reinterpret_cast<void *>(ITEM_ZOOM));
 
 	if (!m_snapshot)
 	{

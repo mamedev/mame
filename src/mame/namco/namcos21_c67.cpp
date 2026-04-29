@@ -8,11 +8,10 @@ TODO:
 - lamp/vibration outputs, from MCU? (particularly starblad);
 - verify DSP clocks, they should be 40MHz, currently underclocked on purpose on MAME, otherwise polygons
   may disappear on some frames (try playing starblad until after the asteroids), tightening quantum by
-  a factor of 40/24 does not fix it;
+  a factor of 40/24 does not fix it (actually it also happens when underclocked, but less);
 - verify video timing, pixel clock is from 38.76922?;
-- verify audiocpu irq frequency;
-- is m_layer0_pivot software-controlled and if so, where? (solvalou sprite layer 0 is further back than
-  starblad and cybsled);
+- mix_layer0_sprites can be improved when namcos21_3d_device removes the z-buffer, there are currently
+  glitches in cybsled, eg. missile pickups behind pillars;
 - wrong global sprite layer offsets in service mode for all games except aircomb, it's fine in-game though;
 - aircomb: z-fighting issue on attract mode with the plane renders (after the first title screen),
   and on pilot parachuting with a time over;
@@ -27,8 +26,8 @@ BTANB:
 - aircomb: intro cockpit closure is one pixel off on left edge;
 - solvalou: sprites on top of foreground polygons (eg. explosions, water splash)
 
-Reversed AD Stick Y control in starblad/solvalou is correct (just like aircomb). It may seem backwards when
-playing it on an MAME (eg. with mouse), in that case just change the analog reverse setting in the UI.
+Reversed AD Stick Y control in solvalou is correct (just like aircomb). It may seem backwards when
+playing it on an MAME (eg. with mouse), in that case just flip the analog reverse setting in the UI.
 
 ---------------------------------------------------------------------------
 
@@ -50,29 +49,32 @@ The memory map below reflects DSP RAM as seen by the 68000 CPUs.
     0x2000a0: B-M:
     0x2000b0: P-M:
     0x2000c0: S-M:
-    0x200100    status: 2=upload needed, 4=error (abort)
-    0x200102    status
-    0x200104    0x0002
-    0x200106    addr written by main cpu
-    0x20010a    point rom checksum (starblade expects 0xed53)
-    0x20010c    point rom checksum (starblade expects 0xd5df)
-    0x20010e    1: upload-code-to-dsp request trigger
-    0x200110    status
-    0x200112    status
-    0x200114    master dsp code size
-    0x200116    slave dsp code size
-    0x200120    upload source1 addr hi
-    0x200122    upload source1 addr lo
-    0x200124    upload source2 addr hi
-    0x200126    upload source2 addr lo
-    0x200200    enable
-    0x200202    status
-    0x200206    work page select
-    0x200208   0xa2c2 (air combat)
-    0x208000..0x2080ff  camera attributes for page#0
-    0x208200..0x208fff  3d object attribute display list for page#0
-    0x20c000..0x20c0ff  camera attributes for page#1
-    0x20c200..0x20cfff  3d object attribute display list for page#1
+
+    0x200100: status: 2=upload needed, 4=error (abort)
+    0x200102: status
+    0x200104: 0x0002
+    0x200106: addr written by main cpu
+    0x20010a: point rom checksum (starblade expects 0xed53)
+    0x20010c: point rom checksum (starblade expects 0xd5df)
+    0x20010e: 1: upload-code-to-dsp request trigger
+    0x200110: status
+    0x200112: status
+    0x200114: master dsp code size
+    0x200116: slave dsp code size
+    0x200120: upload source1 addr hi
+    0x200122: upload source1 addr lo
+    0x200124: upload source2 addr hi
+    0x200126: upload source2 addr lo
+
+    0x200200: enable
+    0x200202: status
+    0x200206: work page select
+    0x200208: 0xa2c2 (air combat)
+
+    0x208000..0x2080ff: camera attributes for page#0
+    0x208200..0x208fff: 3d object attribute display list for page#0
+    0x20c000..0x20c0ff: camera attributes for page#1
+    0x20c200..0x20cfff: 3d object attribute display list for page#1
 
        Starblade Cybersled AirCombat22 Solvalou
 [400]:= 00 0000   00 0000   00 0000    00 0000
@@ -307,7 +309,9 @@ public:
 		m_sci(*this, "sci"),
 		m_master_intc(*this, "master_intc"),
 		m_slave_intc(*this, "slave_intc"),
+		m_nvram(*this, "nvram", 0x2000, ENDIANNESS_BIG),
 		m_c140(*this, "c140"),
+		m_ym2151(*this, "ym2151"),
 		m_c355spr(*this, "c355spr"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
@@ -327,6 +331,7 @@ public:
 	void init_solvalou();
 
 protected:
+	virtual void video_start() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
@@ -338,7 +343,9 @@ private:
 	required_device<namco_c139_device> m_sci;
 	required_device<namco_c148_device> m_master_intc;
 	required_device<namco_c148_device> m_slave_intc;
+	memory_share_creator<u8> m_nvram;
 	required_device<c140_device> m_c140;
+	required_device<ym2151_device> m_ym2151;
 	required_device<namco_c355spr_device> m_c355spr;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -348,8 +355,8 @@ private:
 	required_device<namcos21_3d_device> m_namcos21_3d;
 	required_device<namcos21_dsp_c67_device> m_namcos21_dsp_c67;
 
-	u16 m_layer0_pivot = 0x800;
 	u16 m_video_enable = 0;
+	bitmap_ind16 m_mix_layer0_bitmap;
 
 	u16 video_enable_r();
 	void video_enable_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -359,8 +366,8 @@ private:
 	u8 dpram_byte_r(offs_t offset);
 	void dpram_byte_w(offs_t offset, u8 data);
 
-	void eeprom_w(offs_t offset, u8 data);
-	u8 eeprom_r(offs_t offset);
+	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }
+	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
 
 	void sound_bankselect_w(u8 data);
 
@@ -368,14 +375,11 @@ private:
 	void system_reset_w(u8 data);
 	void reset_all_subcpus(int state);
 
-	std::unique_ptr<u8[]> m_eeprom;
-
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
 	bool sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri);
+	void mix_layer0_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void configure_c68_namcos21(machine_config &config);
 
 	void common_map(address_map &map) ATTR_COLD;
 	void master_map(address_map &map) ATTR_COLD;
@@ -385,6 +389,13 @@ private:
 	void c140_map(address_map &map) ATTR_COLD;
 };
 
+
+void namcos21_c67_state::video_start()
+{
+	m_screen->register_screen_bitmap(m_mix_layer0_bitmap);
+
+	save_item(NAME(m_video_enable));
+}
 
 bool namcos21_c67_state::sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri)
 {
@@ -425,14 +436,45 @@ bool namcos21_c67_state::sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase
 	return false;
 }
 
+void namcos21_c67_state::mix_layer0_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	copybitmap(m_mix_layer0_bitmap, bitmap, 0, 0, 0, 0, cliprect);
+	m_c355spr->draw(screen, m_mix_layer0_bitmap, cliprect, 0);
+
+	assert(cliprect.bottom() < m_namcos21_3d->height() && cliprect.right() < m_namcos21_3d->width());
+
+	// create priority table, this is not accurate
+	u16 pri[0x10];
+	for (int i = 0; i < 0x10; i++)
+		pri[i] = (i == 0) ? 0x7fc0 : pri[i - 1] / 1.24;
+
+	// mix layer 0 sprites with polygons
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		const u16 *z = m_namcos21_3d->get_visible_zbuffer() + m_namcos21_3d->width() * y;
+		const u16 *src = &m_mix_layer0_bitmap.pix(y);
+		u16 *dest = &bitmap.pix(y);
+
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		{
+			// priority is from sprite high palette bits
+			if ((src[x] & 0x5000 && pri[src[x] >> 8 & 0xf] <= z[x]) || src[x] < 0x1000)
+				dest[x] = src[x];
+		}
+	}
+}
+
 u32 namcos21_c67_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0xff, cliprect);
-	screen.priority().fill(0, cliprect);
-
 	// solvalou after POST, definitely blanks screen
 	if (!BIT(m_video_enable, 6))
+	{
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
+	}
+
+	bitmap.fill(0xff, cliprect);
+	screen.priority().fill(0, cliprect);
 
 	// draw low priority 2d sprites
 	m_c355spr->build_sprite_list_and_render_sprites(cliprect); // TODO : buffered?
@@ -450,9 +492,8 @@ u32 namcos21_c67_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			break;
 		case 4: // default gameplay for all games, aircomb attract mode
 		default:
-			m_namcos21_3d->copy_visible_poly_framebuffer(bitmap, cliprect, m_layer0_pivot, 0x7ffe);
-			m_c355spr->draw(screen, bitmap, cliprect, 0);
-			m_namcos21_3d->copy_visible_poly_framebuffer(bitmap, cliprect, 0, m_layer0_pivot - 1);
+			m_namcos21_3d->copy_visible_poly_framebuffer(bitmap, cliprect, 0, 0x7ffe);
+			mix_layer0_sprites(screen, bitmap, cliprect);
 			break;
 	}
 
@@ -532,7 +573,7 @@ void namcos21_c67_state::master_map(address_map &map)
 	common_map(map);
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram(); // private work RAM
-	map(0x180000, 0x183fff).rw(FUNC(namcos21_c67_state::eeprom_r), FUNC(namcos21_c67_state::eeprom_w)).umask16(0x00ff);
+	map(0x180000, 0x183fff).rw(FUNC(namcos21_c67_state::nvram_r), FUNC(namcos21_c67_state::nvram_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
 	map(0x200000, 0x20ffff).rw(m_namcos21_dsp_c67, FUNC(namcos21_dsp_c67_device::dspram16_r), FUNC(namcos21_dsp_c67_device::dspram16_w));
 }
@@ -553,17 +594,16 @@ void namcos21_c67_state::slave_map(address_map &map)
 void namcos21_c67_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).bankr("audiobank"); // banked
-	map(0x3000, 0x3003).nopw(); // ?
-	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x4000, 0x4001).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x5000, 0x51ff).mirror(0x0e00).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
-	map(0x6000, 0x61ff).mirror(0x0e00).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w)); // mirrored
+	map(0x6000, 0x6fff).nopw(); // unused MB87077?
 	map(0x7000, 0x77ff).mirror(0x0800).rw(FUNC(namcos21_c67_state::dpram_byte_r), FUNC(namcos21_c67_state::dpram_byte_w)).share("dpram");
 	map(0x8000, 0x9fff).ram();
-	map(0xa000, 0xbfff).nopw(); // amplifier enable on 1st write
-	map(0xc000, 0xffff).nopw(); // avoid debug log noise; games write frequently to 0xe000
-	map(0xc000, 0xc001).w(FUNC(namcos21_c67_state::sound_bankselect_w));
+	map(0xa000, 0xbfff).noprw(); // amplifier enable on 1st write
+	map(0xc000, 0xffff).rom().region("audiocpu", 0);
+	map(0xc001, 0xc001).w(FUNC(namcos21_c67_state::sound_bankselect_w));
 	map(0xd001, 0xd001).nopw(); // watchdog
-	map(0xd000, 0xffff).rom().region("audiocpu", 0x01000);
+	map(0xe000, 0xe000).nopw();
 }
 
 void namcos21_c67_state::c140_map(address_map &map)
@@ -571,33 +611,6 @@ void namcos21_c67_state::c140_map(address_map &map)
 	map.global_mask(0x7fffff);
 	// TODO: LSB not used? verify from schematics/real hardware
 	map(0x000000, 0x7fffff).lr16([this](offs_t offset) { return m_c140_region[((offset & 0x300000) >> 1) | (offset & 0x7ffff)]; }, "c140_rom_r");
-}
-
-/*************************************************************/
-/* I/O HD63705 MCU Memory declarations                       */
-/*************************************************************/
-
-void namcos21_c67_state::configure_c68_namcos21(machine_config &config)
-{
-	NAMCOC68(config, m_c68, 8000000);
-	m_c68->in_pb_callback().set_ioport("MCUB");
-	m_c68->in_pc_callback().set_ioport("MCUC");
-	m_c68->in_ph_callback().set_ioport("MCUH");
-	m_c68->in_pdsw_callback().set_ioport("DSW");
-	m_c68->di0_in_cb().set_ioport("MCUDI0");
-	m_c68->di1_in_cb().set_ioport("MCUDI1");
-	m_c68->di2_in_cb().set_ioport("MCUDI2");
-	m_c68->di3_in_cb().set_ioport("MCUDI3");
-	m_c68->an0_in_cb().set_ioport("AN0");
-	m_c68->an1_in_cb().set_ioport("AN1");
-	m_c68->an2_in_cb().set_ioport("AN2");
-	m_c68->an3_in_cb().set_ioport("AN3");
-	m_c68->an4_in_cb().set_ioport("AN4");
-	m_c68->an5_in_cb().set_ioport("AN5");
-	m_c68->an6_in_cb().set_ioport("AN6");
-	m_c68->an7_in_cb().set_ioport("AN7");
-	m_c68->dp_in_callback().set(FUNC(namcos21_c67_state::dpram_byte_r));
-	m_c68->dp_out_callback().set(FUNC(namcos21_c67_state::dpram_byte_w));
 }
 
 
@@ -620,21 +633,21 @@ static INPUT_PORTS_START( starblad )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Service Button") PORT_TOGGLE // alt test mode switch
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_START("AN0")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 0 */
+	PORT_START("AN0")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 0 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("AN1")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 1 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x60,0xa0) PORT_SENSITIVITY(25) PORT_KEYDELTA(4)
-	PORT_START("AN2")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 2 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x60,0xa0) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_REVERSE
-	PORT_START("AN3")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 3 */
+	PORT_START("AN1")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 1 */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(16)
+	PORT_START("AN2")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 2 */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x18,0xe8) PORT_SENSITIVITY(25) PORT_KEYDELTA(16)
+	PORT_START("AN3")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 3 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("AN4")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
+	PORT_START("AN4")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("AN5")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 5 */
+	PORT_START("AN5")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 5 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("AN6")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 6 */
+	PORT_START("AN6")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 6 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("AN7")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 7 */
+	PORT_START("AN7")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 7 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("MCUH")     /* 63B05Z0 - PORT H */
@@ -646,7 +659,7 @@ static INPUT_PORTS_START( starblad )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")       /* 63B05Z0 - $2000 DIP SW */
+	PORT_START("DSW")      /* 63B05Z0 - $2000 DIP SW */
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x02, 0x02, "DSW2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
@@ -670,56 +683,45 @@ static INPUT_PORTS_START( starblad )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("MCUDI0")     /* 63B05Z0 - $3000 */
+	PORT_START("MCUDI0")   /* 63B05Z0 - $3000 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("MCUDI1")     /* 63B05Z0 - $3001 */
+	PORT_START("MCUDI1")   /* 63B05Z0 - $3001 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("MCUDI2")     /* 63B05Z0 - $3002 */
+	PORT_START("MCUDI2")   /* 63B05Z0 - $3002 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("MCUDI3")     /* 63B05Z0 - $3003 */
+	PORT_START("MCUDI3")   /* 63B05Z0 - $3003 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( solvalou )
 	PORT_INCLUDE(starblad)
 
-	PORT_MODIFY("MCUB")     /* 63B05Z0 - PORT B */
+	PORT_MODIFY("AN2")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(16)
+
+	PORT_MODIFY("MCUB")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Debug Freeze")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Debug Change View")
-
-	PORT_MODIFY("AN1")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 1 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x60,0xa0) PORT_SENSITIVITY(25) PORT_KEYDELTA(4)
-	PORT_MODIFY("AN2")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 2 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x60,0xa0) PORT_SENSITIVITY(25) PORT_KEYDELTA(4)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( aircomb )
 	PORT_INCLUDE(starblad)
 
-	PORT_MODIFY("AN0")      /* IN#2: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 0 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_MODIFY("AN1")      /* IN#3: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 1 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x40,0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
-	PORT_MODIFY("AN2")      /* IN#4: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 2 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x08,0xf8) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
-	PORT_MODIFY("AN3")      /* IN#5: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 3 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x40,0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
-	PORT_MODIFY("AN4")      /* IN#6: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_MODIFY("AN5")      /* IN#7: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 5 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_MODIFY("AN6")      /* IN#8: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 6 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_MODIFY("AN7")      /* IN#9: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 7 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("AN1")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x40,0xc0) PORT_SENSITIVITY(25) PORT_KEYDELTA(16)
+	PORT_MODIFY("AN2")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x08,0xf8) PORT_SENSITIVITY(25) PORT_KEYDELTA(16)
+	PORT_MODIFY("AN3")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x40,0xc0) PORT_SENSITIVITY(25) PORT_KEYDELTA(16)
+	PORT_MODIFY("AN4")
 
-	PORT_MODIFY("DSW")      /* 63B05Z0 - $2000 DIP SW */
+	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "DSW1") // not test mode on this game
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_MODIFY("MCUH")        /* IN#10: 63B05Z0 - PORT H */
+	PORT_MODIFY("MCUH")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) ///???
@@ -736,24 +738,16 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( cybsled )
 	PORT_INCLUDE(starblad)
 
-	PORT_MODIFY("AN0")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 0 */
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x3f,0xbf) /* using 0x00 / 0xff causes controls to malfunction */ PORT_CODE_DEC(KEYCODE_I) PORT_CODE_INC(KEYCODE_K) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_PLAYER(2) /* right joystick: vertical */
-	PORT_MODIFY("AN1")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 1 */
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x3f,0xbf) /* using 0x00 / 0xff causes controls to malfunction */ PORT_CODE_DEC(KEYCODE_E) PORT_CODE_INC(KEYCODE_D) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_PLAYER(1) /* left joystick: vertical */
-	PORT_MODIFY("AN2")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 2 */
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x3f,0xbf) /* using 0x00 / 0xff causes controls to malfunction */ PORT_CODE_DEC(KEYCODE_J) PORT_CODE_INC(KEYCODE_L) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_PLAYER(2) /* right joystick: horizontal */
-	PORT_MODIFY("AN3")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 3 */
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x3f,0xbf) /* using 0x00 / 0xff causes controls to malfunction */ PORT_CODE_DEC(KEYCODE_S) PORT_CODE_INC(KEYCODE_F) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_PLAYER(1) /* left joystick: horizontal */
-	PORT_MODIFY("AN4")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_MODIFY("AN5")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 5 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_MODIFY("AN6")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 6 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_MODIFY("AN7")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 7 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("AN0")
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x3f,0xbf) /* using 0x00 / 0xff causes controls to malfunction */ PORT_CODE_DEC(KEYCODE_I) PORT_CODE_INC(KEYCODE_K) PORT_SENSITIVITY(25) PORT_KEYDELTA(16) PORT_PLAYER(2) /* right joystick: vertical */
+	PORT_MODIFY("AN1")
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x3f,0xbf) /* using 0x00 / 0xff causes controls to malfunction */ PORT_CODE_DEC(KEYCODE_E) PORT_CODE_INC(KEYCODE_D) PORT_SENSITIVITY(25) PORT_KEYDELTA(16) PORT_PLAYER(1) /* left joystick: vertical */
+	PORT_MODIFY("AN2")
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x3f,0xbf) /* using 0x00 / 0xff causes controls to malfunction */ PORT_CODE_DEC(KEYCODE_J) PORT_CODE_INC(KEYCODE_L) PORT_SENSITIVITY(25) PORT_KEYDELTA(16) PORT_PLAYER(2) /* right joystick: horizontal */
+	PORT_MODIFY("AN3")
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x3f,0xbf) /* using 0x00 / 0xff causes controls to malfunction */ PORT_CODE_DEC(KEYCODE_S) PORT_CODE_INC(KEYCODE_F) PORT_SENSITIVITY(25) PORT_KEYDELTA(16) PORT_PLAYER(1) /* left joystick: horizontal */
 
-	PORT_MODIFY("MCUH")        /* 63B05Z0 - PORT H */
+	PORT_MODIFY("MCUH")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Viewport Change Button")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -801,39 +795,23 @@ void namcos21_c67_state::reset_all_subcpus(int state)
 	m_namcos21_dsp_c67->reset_dsps(state);
 }
 
-void namcos21_c67_state::eeprom_w(offs_t offset, u8 data)
-{
-	m_eeprom[offset] = data;
-}
-
-u8 namcos21_c67_state::eeprom_r(offs_t offset)
-{
-	return m_eeprom[offset];
-}
-
 void namcos21_c67_state::machine_reset()
 {
 	// Initialise the bank select in the sound CPU
 	m_audiobank->set_entry(0); // Page in bank 0
 
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Place CPU2 & CPU3 into the reset condition
 	reset_all_subcpus(ASSERT_LINE);
 }
 
 
-
 void namcos21_c67_state::machine_start()
 {
-	m_eeprom = std::make_unique<u8[]>(0x2000);
-	subdevice<nvram_device>("nvram")->set_base(m_eeprom.get(), 0x2000);
-
 	u32 max = memregion("audiocpu")->bytes() / 0x4000;
 	for (int i = 0; i < 0x10; i++)
 		m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
-
-	save_item(NAME(m_video_enable));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos21_c67_state::screen_scanline)
@@ -851,6 +829,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_c67_state::screen_scanline)
 // starblad, solvalou, aircomb, cybsled base state
 void namcos21_c67_state::namcos21(machine_config &config)
 {
+	// basic machine hardware
 	M68000(config, m_maincpu, 49.152_MHz_XTAL / 4); // Master
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos21_c67_state::master_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(namcos21_c67_state::screen_scanline), "screen", 0, 1);
@@ -860,17 +839,35 @@ void namcos21_c67_state::namcos21(machine_config &config)
 
 	MC6809E(config, m_audiocpu, 49.152_MHz_XTAL / 24); // Sound
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos21_c67_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(namcos21_c67_state::irq0_line_hold), attotime::from_hz(2*60));
 
-	configure_c68_namcos21(config);
+	NAMCOC68(config, m_c68, 8000000);
+	m_c68->in_pb_callback().set_ioport("MCUB");
+	m_c68->in_pc_callback().set_ioport("MCUC");
+	m_c68->in_ph_callback().set_ioport("MCUH");
+	m_c68->in_pdsw_callback().set_ioport("DSW");
+	m_c68->di0_in_cb().set_ioport("MCUDI0");
+	m_c68->di1_in_cb().set_ioport("MCUDI1");
+	m_c68->di2_in_cb().set_ioport("MCUDI2");
+	m_c68->di3_in_cb().set_ioport("MCUDI3");
+	m_c68->an0_in_cb().set_ioport("AN0");
+	m_c68->an1_in_cb().set_ioport("AN1");
+	m_c68->an2_in_cb().set_ioport("AN2");
+	m_c68->an3_in_cb().set_ioport("AN3");
+	m_c68->an4_in_cb().set_ioport("AN4");
+	m_c68->an5_in_cb().set_ioport("AN5");
+	m_c68->an6_in_cb().set_ioport("AN6");
+	m_c68->an7_in_cb().set_ioport("AN7");
+	m_c68->dp_in_callback().set(FUNC(namcos21_c67_state::dpram_byte_r));
+	m_c68->dp_out_callback().set(FUNC(namcos21_c67_state::dpram_byte_w));
 
 	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67, 0);
 	m_namcos21_dsp_c67->set_renderer_tag("namcos21_3d");
 
 	config.set_maximum_quantum(attotime::from_hz(12000));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
 	m_screen->set_raw(49.152_MHz_XTAL / 4 * 2, 768, 0, 496, 264*2, 0, 480);
@@ -902,6 +899,7 @@ void namcos21_c67_state::namcos21(machine_config &config)
 	m_c355spr->set_color_base(0x1000);
 	m_c355spr->set_external_prifill(true);
 
+	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
 	C140(config, m_c140, 49.152_MHz_XTAL / 384 / 6);
@@ -910,7 +908,9 @@ void namcos21_c67_state::namcos21(machine_config &config)
 	m_c140->add_route(0, "speaker", 0.50, 0);
 	m_c140->add_route(1, "speaker", 0.50, 1);
 
-	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "speaker", 0.30, 0).add_route(1, "speaker", 0.30, 1);
+	YM2151(config, m_ym2151, 3.579545_MHz_XTAL);
+	m_ym2151->add_route(0, "speaker", 0.30, 0);
+	m_ym2151->add_route(1, "speaker", 0.30, 1);
 }
 
 void namcos21_c67_state::aircomb(machine_config &config)
@@ -929,6 +929,17 @@ void namcos21_c67_state::cybsled(machine_config &config)
 {
 	namcos21(config);
 	m_namcos21_dsp_c67->set_gametype(namcos21_dsp_c67_device::NAMCOS21_CYBERSLED);
+
+	// speaker placement is front/back instead of left/right
+	SPEAKER(config.replace(), "speaker", 2).front_center(0).rear_center(1);
+
+	m_c140->reset_routes();
+	m_c140->add_route(0, "speaker", 0.25, 1);
+	m_c140->add_route(1, "speaker", 0.25, 0);
+
+	m_ym2151->reset_routes();
+	m_ym2151->add_route(0, "speaker", 0.15, 1);
+	m_ym2151->add_route(1, "speaker", 0.15, 0);
 }
 
 void namcos21_c67_state::solvalou(machine_config &config)
@@ -938,7 +949,6 @@ void namcos21_c67_state::solvalou(machine_config &config)
 
 	m_namcos21_3d->set_fixed_palbase(0x3f00);
 	m_namcos21_3d->set_zz_shift_mult(10, 0x100);
-	m_layer0_pivot = 0x7fc0;
 }
 
 
@@ -983,8 +993,8 @@ ROM_START( starblad )
 	ROM_LOAD16_BYTE("st1-voi2.bin", 0x200000, 0x80000,CRC(067d0720) SHA1(a853b2d43027a46c5e707fc677afdaae00f450c7) )
 	ROM_LOAD16_BYTE("st1-voi3.bin", 0x300000, 0x80000,CRC(8b5aa45f) SHA1(e1214e639200758ad2045bde0368a2d500c1b84a) )
 
-	ROM_REGION( 0x2000, "nvram", ROMREGION_ERASE00)
-	// starblad needs default NVRAM to be all 0
+	ROM_REGION( 0x2000, "nvram", 0) /* default settings, including calibration */
+	ROM_LOAD( "starblad.nv", 0x0000, 0x2000, CRC(1532b04c) SHA1(b71e0940129ff028dae82a4dba7502870b656000) )
 ROM_END
 
 ROM_START( starbladj )
@@ -1028,8 +1038,8 @@ ROM_START( starbladj )
 	ROM_LOAD16_BYTE("st1-voi2.bin", 0x200000, 0x80000,CRC(067d0720) SHA1(a853b2d43027a46c5e707fc677afdaae00f450c7) )
 	ROM_LOAD16_BYTE("st1-voi3.bin", 0x300000, 0x80000,CRC(8b5aa45f) SHA1(e1214e639200758ad2045bde0368a2d500c1b84a) )
 
-	ROM_REGION( 0x2000, "nvram", ROMREGION_ERASE00)
-	// starblad needs default NVRAM to be all 0
+	ROM_REGION( 0x2000, "nvram", 0) /* default settings, including calibration */
+	ROM_LOAD( "starblad.nv", 0x0000, 0x2000, CRC(1532b04c) SHA1(b71e0940129ff028dae82a4dba7502870b656000) )
 ROM_END
 
 ROM_START( solvalou )
@@ -1073,6 +1083,9 @@ ROM_START( solvalou )
 	ROM_LOAD16_BYTE("sv1-voi1.bin", 0x100000, 0x80000,CRC(c732e66c) SHA1(14e75dd9bea4055f85eb2bcbf69cf6695a3f7ec4) )
 	ROM_LOAD16_BYTE("sv1-voi2.bin", 0x200000, 0x80000,CRC(51076298) SHA1(ec52c9ae3029118f3ea3732948d6de28f5fba561) )
 	ROM_LOAD16_BYTE("sv1-voi3.bin", 0x300000, 0x80000,CRC(33085ff3) SHA1(0a30b91618c250a5e7bd896a8ceeb3d16da178a9) )
+
+	ROM_REGION( 0x2000, "nvram", 0) /* default settings, including calibration */
+	ROM_LOAD( "solvalou.nv", 0x0000, 0x2000, CRC(21ecc33a) SHA1(52d99fba450f15c639abc232f52ecff872a47438) )
 ROM_END
 
 

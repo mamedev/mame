@@ -684,7 +684,7 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		/* calculate address */
 		uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5));
 		uint8_t const *const vram = m_ram_ptr + address;
-		uint8_t const *const vaux = Double ? (m_aux_ptr + address) : nullptr;
+		uint8_t const *const vaux = Double ? (m_aux_ptr + (address & m_aux_mask)) : nullptr;
 		auto const NIBBLE = [&row] (auto byte) { return ((byte) >> (row & 4)) & 0x0f; };
 		if (render_perfect_blocks)
 		{
@@ -870,7 +870,7 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	int const page = use_page_2() ? m_hgr2 : 0x2000;
+	uint32_t const page = use_page_2() ? m_hgr2 : 0x2000;
 	int const rgbmode = rgb_monitor() ? m_rgbmode : -1;
 
 	beginrow = (std::max)(beginrow, cliprect.top());
@@ -881,14 +881,11 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	// B&W/Green/Amber monitor, IIgs force-monochrome-DHR setting, or IIe RGB card monochrome DHR
 	bool const monochrome = monochrome_monitor() || (m_newvideo & 0x20) || rgbmode == 0;
 
-	uint8_t const *const vram = &m_ram_ptr[page];
-	uint8_t const *const vaux = (m_aux_ptr ? m_aux_ptr : vram) + page;
-
 	for (int row = beginrow; row <= endrow; row++)
 	{
-		int const offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5)) | ((row & 7) << 10);
-		uint8_t const *const vram_row = vram + offset;
-		uint8_t const *const vaux_row = vaux + offset;
+		uint32_t const address = page + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5) | ((row & 7) << 10));
+		uint8_t const *const vram_row = m_ram_ptr + address;
+		uint8_t const *const vaux_row = m_aux_ptr + (address & m_aux_mask);
 
 		uint16_t *p = &bitmap.pix(row);
 

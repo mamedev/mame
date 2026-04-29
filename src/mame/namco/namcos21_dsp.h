@@ -16,20 +16,20 @@ public:
 	static constexpr unsigned PTRAM_SIZE = 0x20000;
 	static constexpr unsigned WINRUN_MAX_POLY_PARAM = 1+256*3;
 
-	namcos21_dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namcos21_dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// config
 	template <typename T> void set_renderer_tag(T &&tag) { m_renderer.set_tag(std::forward<T>(tag)); }
 
-	void winrun_dspbios_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t winrun_68k_dspcomram_r(offs_t offset);
-	void winrun_68k_dspcomram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t winrun_dspcomram_control_r(offs_t offset);
-	void winrun_dspcomram_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void winrun_dspbios_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 winrun_68k_dspcomram_r(offs_t offset);
+	void winrun_68k_dspcomram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 winrun_dspcomram_control_r(offs_t offset);
+	void winrun_dspcomram_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	void pointram_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t pointram_data_r();
-	void pointram_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void pointram_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 pointram_data_r();
+	void pointram_data_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 protected:
 	// device-level overrides
@@ -44,34 +44,34 @@ protected:
 
 private:
 	required_device<cpu_device> m_dsp;
-	required_shared_ptr<uint16_t> m_winrun_dspbios;
-	required_shared_ptr<uint16_t> m_winrun_polydata;
-	required_region_ptr<uint16_t> m_ptrom16;
+	required_shared_ptr<u16> m_winrun_dspbios;
+	required_shared_ptr<u16> m_winrun_polydata;
+	required_region_ptr<u16> m_ptrom16;
 
 	required_device<namcos21_3d_device> m_renderer;
-	std::unique_ptr<uint8_t[]> m_pointram;
+	std::unique_ptr<u8[]> m_pointram;
 	int m_pointram_idx;
-	uint16_t m_pointram_control;
+	u16 m_pointram_control;
 
-	uint16_t m_winrun_dspcomram_control[8];
-	std::unique_ptr<uint16_t[]> m_winrun_dspcomram;
-	uint16_t m_winrun_poly_buf[WINRUN_MAX_POLY_PARAM]{};
+	u16 m_winrun_dspcomram_control[8];
+	std::unique_ptr<u16[]> m_winrun_dspcomram;
+	u16 m_winrun_poly_buf[WINRUN_MAX_POLY_PARAM]{};
 	int m_winrun_poly_index;
-	uint32_t m_winrun_pointrom_addr;
+	u32 m_winrun_pointrom_addr;
 	int m_winrun_dsp_alive;
 
 	void winrun_flush_poly();
 
-	uint16_t winrun_cuskey_r();
-	void winrun_cuskey_w(uint16_t data);
-	uint16_t winrun_dspcomram_r(offs_t offset);
-	void winrun_dspcomram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t winrun_table_r(offs_t offset);
-	void winrun_dsp_complete_w(uint16_t data);
-	void winrun_dsp_render_w(uint16_t data);
-	uint16_t winrun_poly_reset_r();
-	void winrun_dsp_pointrom_addr_w(offs_t offset, uint16_t data);
-	uint16_t winrun_dsp_pointrom_data_r();
+	u16 winrun_cuskey_r();
+	void winrun_cuskey_w(u16 data);
+	u16 winrun_dspcomram_r(offs_t offset);
+	void winrun_dspcomram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 winrun_table_r(offs_t offset);
+	void winrun_dsp_complete_w(u16 data);
+	void winrun_dsp_render_w(u16 data);
+	u16 winrun_poly_reset_r();
+	void winrun_dsp_pointrom_addr_w(offs_t offset, u16 data);
+	u16 winrun_dsp_pointrom_data_r();
 
 	TIMER_CALLBACK_MEMBER(suspend_callback);
 	emu_timer *m_suspend_timer;

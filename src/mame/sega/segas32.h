@@ -23,8 +23,10 @@ class segas32_state : public device_t
 public:
 	segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 	void init_alien3();
-	void init_arescue(int m_hasdsp);
+	void init_arescue(bool hasdsp);
 	void init_arabfgt();
 	void init_brival();
 	void init_darkedge();
@@ -69,6 +71,10 @@ protected:
 	segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_multi32);
 
 	typedef void (segas32_state::*sys32_output_callback)(int which, uint16_t data);
+
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	struct layer_info
 	{
@@ -130,6 +136,7 @@ protected:
 	void scross_bank_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(get_text_tile_info);
 
 	TIMER_CALLBACK_MEMBER(end_of_vblank_int);
 	TIMER_CALLBACK_MEMBER(update_sprites);
@@ -155,24 +162,24 @@ protected:
 	void signal_v60_irq(int which);
 	void update_sound_irq_state();
 	void segas32_common_init();
-	void radm_sw1_output( int which, uint16_t data );
-	void radm_sw2_output( int which, uint16_t data );
-	void radr_sw2_output( int which, uint16_t data );
-	void alien3_sw1_output( int which, uint16_t data );
-	void arescue_sw1_output( int which, uint16_t data );
-	void f1lap_sw1_output( int which, uint16_t data );
-	void jpark_sw1_output( int which, uint16_t data );
-	void orunners_sw1_output( int which, uint16_t data );
-	void orunners_sw2_output( int which, uint16_t data );
-	void harddunk_sw1_output( int which, uint16_t data );
-	void harddunk_sw2_output( int which, uint16_t data );
-	void harddunk_sw3_output( int which, uint16_t data );
-	void titlef_sw1_output( int which, uint16_t data );
-	void titlef_sw2_output( int which, uint16_t data );
-	void scross_sw1_output( int which, uint16_t data );
-	void scross_sw2_output( int which, uint16_t data );
-	int compute_clipping_extents(screen_device &screen, int enable, int clipout, int clipmask, const rectangle &cliprect, extents_list *list);
-	void compute_tilemap_flips(int bgnum, int &flipx, int &flipy);
+	void radm_sw1_output(int which, uint16_t data);
+	void radm_sw2_output(int which, uint16_t data);
+	void radr_sw2_output(int which, uint16_t data);
+	void alien3_sw1_output(int which, uint16_t data);
+	void arescue_sw1_output(int which, uint16_t data);
+	void f1lap_sw1_output(int which, uint16_t data);
+	void jpark_sw1_output(int which, uint16_t data);
+	void orunners_sw1_output(int which, uint16_t data);
+	void orunners_sw2_output(int which, uint16_t data);
+	void harddunk_sw1_output(int which, uint16_t data);
+	void harddunk_sw2_output(int which, uint16_t data);
+	void harddunk_sw3_output(int which, uint16_t data);
+	void titlef_sw1_output(int which, uint16_t data);
+	void titlef_sw2_output(int which, uint16_t data);
+	void scross_sw1_output(int which, uint16_t data);
+	void scross_sw2_output(int which, uint16_t data);
+	bool compute_clipping_extents(screen_device &screen, bool enable, bool clipout, int clipmask, const rectangle &cliprect, extents_list *list);
+	void compute_tilemap_flips(int bgnum, bool &flipx, bool &flipy);
 	void update_tilemap_zoom(screen_device &screen, layer_info &layer, const rectangle &cliprect, int bgnum);
 	void update_tilemap_rowscroll(screen_device &screen, layer_info &layer, const rectangle &cliprect, int bgnum);
 	void update_tilemap_text(screen_device &screen, layer_info &layer, const rectangle &cliprect);
@@ -200,10 +207,6 @@ protected:
 	void upd7725_data_map(address_map &map) ATTR_COLD;
 	void upd7725_prg_map(address_map &map) ATTR_COLD;
 	void v25_map(address_map &map) ATTR_COLD;
-
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_z80_shared_ram;
 	optional_shared_ptr<uint16_t> m_system32_workram;
@@ -249,6 +252,7 @@ protected:
 	// video-related
 	uint16_t m_system32_displayenable[2]{};
 	uint16_t m_system32_tilebank_external = 0;
+	tilemap_t *m_text_tilemap = nullptr;
 	std::unique_ptr<cache_entry[]> m_tmap_cache;
 	cache_entry *m_cache_head = nullptr;
 	layer_info m_layer_data[11];

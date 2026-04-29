@@ -53,7 +53,7 @@ private:
 
 	required_device<x28c256_device> m_eeprom;
 
-	static constexpr uint32_t SIZE = x28c256_device::TOTAL_SIZE_BYTES;
+	static constexpr uint32_t SIZE = x28c256_device::DATA_SIZE_BYTES;
 	static constexpr uint32_t MASK = SIZE - 1;
 
 	bool m_is_loaded = false;

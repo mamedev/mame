@@ -131,7 +131,7 @@ void menu_input_general::populate()
 	{
 		for (input_item_data &item : data)
 		{
-			const input_type_entry &entry(*reinterpret_cast<const input_type_entry *>(item.ref));
+			const input_type_entry &entry(*std::get<input_type_entry const *>(item.ref));
 			item.seq = machine().ioport().type_seq(entry.type(), entry.player(), item.seqtype);
 		}
 	}
@@ -139,13 +139,6 @@ void menu_input_general::populate()
 	// populate the menu in a standard fashion
 	populate_sorted();
 	item_append(menu_item_type::SEPARATOR);
-}
-
-void menu_input_general::update_input(input_item_data &seqchangeditem)
-{
-	const input_type_entry &entry = *reinterpret_cast<const input_type_entry *>(seqchangeditem.ref);
-	machine().ioport().set_type_seq(entry.type(), entry.player(), seqchangeditem.seqtype, seqchangeditem.seq);
-	seqchangeditem.seq = machine().ioport().type_seq(entry.type(), entry.player(), seqchangeditem.seqtype);
 }
 
 
@@ -224,8 +217,8 @@ void menu_input_specific::populate()
 						return true;
 					if (i1.group > i2.group)
 						return false;
-					const ioport_field &field1 = *reinterpret_cast<const ioport_field *>(i1.ref);
-					const ioport_field &field2 = *reinterpret_cast<const ioport_field *>(i2.ref);
+					const ioport_field &field1 = *std::get<ioport_field *>(i1.ref);
+					const ioport_field &field2 = *std::get<ioport_field *>(i2.ref);
 					if (field1.type() < field2.type())
 						return true;
 					if (field1.type() > field2.type())
@@ -248,7 +241,7 @@ void menu_input_specific::populate()
 	{
 		for (input_item_data &item : data)
 		{
-			const ioport_field &field(*reinterpret_cast<const ioport_field *>(item.ref));
+			const ioport_field &field(*std::get<ioport_field *>(item.ref));
 			item.seq = field.seq(item.seqtype);
 		}
 	}
@@ -260,24 +253,6 @@ void menu_input_specific::populate()
 		item_append(_("[no assignable inputs are enabled]"), FLAG_DISABLE, nullptr);
 
 	item_append(menu_item_type::SEPARATOR);
-}
-
-void menu_input_specific::update_input(input_item_data &seqchangeditem)
-{
-	ioport_field::user_settings settings;
-
-	// yeah, the const_cast is naughty, but we know we stored a non-const reference in it
-	ioport_field const &field(*reinterpret_cast<ioport_field const *>(seqchangeditem.ref));
-	field.get_user_settings(settings);
-	settings.seq[seqchangeditem.seqtype] = seqchangeditem.seq;
-	if (seqchangeditem.seq.is_default())
-		settings.cfg[seqchangeditem.seqtype].clear();
-	else if (!seqchangeditem.seq.length())
-		settings.cfg[seqchangeditem.seqtype] = "NONE";
-	else
-		settings.cfg[seqchangeditem.seqtype] = machine().input().seq_to_tokens(seqchangeditem.seq);
-	const_cast<ioport_field &>(field).set_user_settings(settings);
-	seqchangeditem.seq = field.seq(seqchangeditem.seqtype);
 }
 
 
@@ -315,6 +290,50 @@ void menu_input::toggle_none_default(input_seq &selected_seq, input_seq &origina
 		selected_seq.set_default();
 	else // otherwise, toggle to "none"
 		selected_seq.reset();
+}
+
+
+void menu_input::update_assignment(input_item_data &item, std::nullptr_t)
+{
+	throw std::invalid_argument("Input type or I/O port field not set in input item data.");
+}
+
+void menu_input::update_assignment(input_item_data &item, input_type_entry const *entry)
+{
+	machine().ioport().set_type_seq(entry->type(), entry->player(), item.seqtype, item.seq);
+	item.seq = machine().ioport().type_seq(entry->type(), entry->player(), item.seqtype);
+}
+
+void menu_input::update_assignment(input_item_data &item, ioport_field *field)
+{
+	ioport_field::user_settings settings;
+
+	field->get_user_settings(settings);
+	settings.seq[item.seqtype] = item.seq;
+	if (item.seq.is_default())
+		settings.cfg[item.seqtype].clear();
+	else if (!item.seq.length())
+		settings.cfg[item.seqtype] = "NONE";
+	else
+		settings.cfg[item.seqtype] = machine().input().seq_to_tokens(item.seq);
+	field->set_user_settings(settings);
+	item.seq = field->seq(item.seqtype);
+}
+
+
+bool menu_input::assignment_is_inherited(input_item_data const &item, std::nullptr_t) const
+{
+	throw std::invalid_argument("Input type or I/O port field not set in input item data.");
+}
+
+bool menu_input::assignment_is_inherited(input_item_data const &item, input_type_entry const *entry) const
+{
+	return entry->cfg(item.seqtype).empty();
+}
+
+bool menu_input::assignment_is_inherited(input_item_data const &item, ioport_field *field) const
+{
+	return field->live().cfg[item.seqtype].empty();
 }
 
 
@@ -551,7 +570,7 @@ bool menu_input::handle(event const *ev)
 	// if the sequence changed, update it
 	if (seqchangeditem)
 	{
-		update_input(*seqchangeditem);
+		std::visit([this, seqchangeditem] (auto &&ref) { update_assignment(*seqchangeditem, ref); }, seqchangeditem->ref);
 
 		// invalidate the menu to force an update
 		invalidate = true;
@@ -609,9 +628,9 @@ void menu_input::populate_sorted()
 		}
 		else
 		{
-			// otherwise, generate the sequence name and invert it if different from the default
+			// otherwise, generate the sequence name and de-emphasise it if it isn't set at this level
 			subtext = machine().input().seq_name(item.seq);
-			flags |= (item.seq != *item.defseq) ? FLAG_INVERT : 0;
+			flags |= std::visit([this, &item] (auto &&ref) { return assignment_is_inherited(item, ref); }, item.ref) ? FLAG_DEEMPHASIZE : 0;
 		}
 
 		// add the item

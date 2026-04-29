@@ -294,7 +294,7 @@ int taitosj_state::check_sprite_sprite_bitpattern(int sx1, int sy1, int which1, 
 
 	// draw the sprites into separate bitmaps and check overlapping region
 	m_sprite_sprite_collbitmap1.fill(TRANSPARENT_PEN);
-		get_sprite_gfx_element(which1)->transpen(m_sprite_sprite_collbitmap1, m_sprite_sprite_collbitmap1.cliprect(),
+	get_sprite_gfx_element(which1)->transpen(m_sprite_sprite_collbitmap1, m_sprite_sprite_collbitmap1.cliprect(),
 			m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs1 + 3] & 0x3f,
 			0,
 			m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs1 + 2] & 0x01,
@@ -302,7 +302,7 @@ int taitosj_state::check_sprite_sprite_bitpattern(int sx1, int sy1, int which1, 
 			sx1, sy1, 0);
 
 	m_sprite_sprite_collbitmap2.fill(TRANSPARENT_PEN);
-		get_sprite_gfx_element(which2)->transpen(m_sprite_sprite_collbitmap2, m_sprite_sprite_collbitmap2.cliprect(),
+	get_sprite_gfx_element(which2)->transpen(m_sprite_sprite_collbitmap2, m_sprite_sprite_collbitmap2.cliprect(),
 			m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs2 + 3] & 0x3f,
 			0,
 			m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs2 + 2] & 0x01,
@@ -313,7 +313,7 @@ int taitosj_state::check_sprite_sprite_bitpattern(int sx1, int sy1, int which1, 
 		for (int x = minx; x < maxx; x++)
 			if ((m_sprite_sprite_collbitmap1.pix(y, x) != TRANSPARENT_PEN) &&
 				(m_sprite_sprite_collbitmap2.pix(y, x) != TRANSPARENT_PEN))
-				return 1;  /* collided */
+				return 1; // collided
 
 	return 0;
 }
@@ -336,7 +336,7 @@ void taitosj_state::check_sprite_sprite_collision()
 			{
 				uint8_t sx2, sy2;
 
-				if ((which2 >= 0x10) && (which2 <= 0x17)) continue;   // no sprites here
+				if ((which2 >= 0x10) && (which2 <= 0x17)) continue; // no sprites here
 
 				if (!get_sprite_xy(which2, &sx2, &sy2)) continue;
 
@@ -346,7 +346,7 @@ void taitosj_state::check_sprite_sprite_collision()
 				{
 					int reg;
 
-					if (!check_sprite_sprite_bitpattern(sx1, sy1, which1, sx2, sy2, which2))  continue;
+					if (!check_sprite_sprite_bitpattern(sx1, sy1, which1, sx2, sy2, which2)) continue;
 
 					/* mark sprite as collided
 					   note that only the sprite with the higher number is marked
@@ -357,14 +357,14 @@ void taitosj_state::check_sprite_sprite_collision()
 					if (which2 == 0x1f)
 					{
 						reg = which1 >> 3;
-						if (reg == 3)  reg = 2;
+						if (reg == 3) reg = 2;
 
 						m_collision_reg[reg] |= (1 << (which1 & 0x07));
 					}
 					else
 					{
 						reg = which2 >> 3;
-						if (reg == 3)  reg = 2;
+						if (reg == 3) reg = 2;
 
 						m_collision_reg[reg] |= (1 << (which2 & 0x07));
 					}
@@ -381,7 +381,7 @@ void taitosj_state::calculate_sprite_areas(int *sprites_on, rectangle *sprite_ar
 	{
 		uint8_t sx, sy;
 
-		if ((which >= 0x10) && (which <= 0x17)) continue;   // no sprites here
+		if ((which >= 0x10) && (which <= 0x17)) continue; // no sprites here
 
 		if (get_sprite_xy(which, &sx, &sy))
 		{
@@ -411,7 +411,7 @@ void taitosj_state::calculate_sprite_areas(int *sprites_on, rectangle *sprite_ar
 			sprites_on[which] = 0;
 
 		// check for bitmap bounds to avoid illegal memory access
-		sprite_areas[which] &= m_sprite_sprite_collbitmap1.cliprect();
+		sprite_areas[which] &= m_sprite_layer_collbitmap2[0].cliprect();
 	}
 }
 
@@ -446,13 +446,13 @@ int taitosj_state::check_sprite_layer_bitpattern(int which, rectangle *sprite_ar
 			if (m_sprite_layer_collbitmap1.pix(y - miny, x - minx) != TRANSPARENT_PEN) // is there anything to check for ?
 			{
 				if (check_layer_1 && (m_sprite_layer_collbitmap2[0].pix(y, x) != TRANSPARENT_PEN))
-					result |= 0x01;  // collided with layer 1
+					result |= 0x01; // collided with layer 1
 
 				if (check_layer_2 && (m_sprite_layer_collbitmap2[1].pix(y, x) != TRANSPARENT_PEN))
-					result |= 0x02;  // collided with layer 2
+					result |= 0x02; // collided with layer 2
 
 				if (check_layer_3 && (m_sprite_layer_collbitmap2[2].pix(y, x) != TRANSPARENT_PEN))
-					result |= 0x04;  // collided with layer 3
+					result |= 0x04; // collided with layer 3
 			}
 
 	return result;
@@ -466,7 +466,7 @@ void taitosj_state::check_sprite_layer_collision(int *sprites_on, rectangle *spr
 		// check each sprite
 		for (int which = 0; which < 0x20; which++)
 		{
-			if ((which >= 0x10) && (which <= 0x17)) continue;   // no sprites here
+			if ((which >= 0x10) && (which <= 0x17)) continue; // no sprites here
 
 			if (sprites_on[which])
 				m_collision_reg[3] |= check_sprite_layer_bitpattern(which, sprite_areas);
