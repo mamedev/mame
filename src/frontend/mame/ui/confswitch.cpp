@@ -129,6 +129,9 @@ void menu_confswitch::populate()
 				if (field.has_next_setting())
 					flags |= FLAG_RIGHT_ARROW;
 
+				if (field.live().value == field.defvalue())
+					flags |= FLAG_DEEMPHASIZE;
+
 				// add the menu item
 				item_append(field.name(), field.setting_name(), flags, &field);
 			}
