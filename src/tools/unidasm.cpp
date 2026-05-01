@@ -1165,7 +1165,7 @@ void unidasm_data_buffer::decrypt(const unidasm_data_buffer &buffer, bool opcode
 	abort();
 }
 
-static int parse_number(const char *curarg, const char *default_format, u32 *value)
+static int parse_number(const char *curarg, const char *default_format, u64 *value)
 {
 	int result;
 	if(curarg[0] == '0' && curarg[1] != '\0') {
