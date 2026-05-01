@@ -61,7 +61,8 @@ std::pair<std::error_condition, std::string> hp_ipc_optrom_device::call_load()
 		return std::make_pair(image_error::BADSOFTWARE, "Software item is missing 'base' feature");
 	}
 
-	if (base_feature[ 0 ] != '0' || base_feature[ 1 ] != 'x' || sscanf(&base_feature[ 2 ] , "%x" , &m_base) != 1) {
+	u32 base;
+	if (base_feature[ 0 ] != '0' || base_feature[ 1 ] != 'x' || sscanf(&base_feature[ 2 ] , "%x" , &base) != 1) {
 		return std::make_pair(image_error::BADSOFTWARE, "Can't parse software item 'base' feature");
 	}
 
@@ -72,6 +73,7 @@ std::pair<std::error_condition, std::string> hp_ipc_optrom_device::call_load()
 				util::string_format("Illegal base address (%x)", m_base));
 	}
 
+	m_base = base;
 	LOG("hp_ipc_optrom: loaded base=0x%06x\n" , m_base);
 	return std::make_pair(std::error_condition(), std::string());
 }

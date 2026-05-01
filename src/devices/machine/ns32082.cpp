@@ -374,7 +374,7 @@ void ns32082_device::set_msr(u32 data)
 	m_msr = (m_msr & ~MSR_WM) | (data & MSR_WM);
 }
 
-ns32082_device::translate_result ns32082_device::translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool pfs, bool suppress)
+ns32082_device::translate_result ns32082_device::translate(address_space &space, unsigned st, offs_t &address, bool user, bool write, bool pfs, bool suppress)
 {
 	// update program flow trace state
 	if (pfs && (m_msr & MSR_FT))
@@ -382,7 +382,7 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 		if (st == ns32000::ST_NIF)
 		{
 			m_pf[1] = m_pf[0];
-			m_pf[0] = address;
+			m_pf[0] = (u32)address;
 
 			m_sc = m_sc << 16;
 		}

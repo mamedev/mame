@@ -296,6 +296,8 @@ to the same bank as defined through A20.
 
 #include "aquastge.lh"
 
+#include <iostream>
+
 
 namespace {
 
@@ -2631,26 +2633,18 @@ void coolridr_state::unk_blit_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	switch(offset)
 	{
 		default:
-		{
-			printf("sysh1_unk_blit_w unhandled offset %04x %08x %08x\n", offset, data, mem_mask);
-		}
+		util::stream_format(std::cerr, "sysh1_unk_blit_w unhandled offset %04x %08x %08x\n", offset, data, mem_mask);
 		break;
 
 		case 0x01:
-		{
-			// writes on startup
-			// sysh1_unk_blit_w unhandled offset 0001 01010101 ffffffff
-		}
+		// writes on startup
+		// sysh1_unk_blit_w unhandled offset 0001 01010101 ffffffff
 		break;
 
 		case 0x02:
-		{
-			// writes 3d0dxxxx / 3d0exxxx before a level start.. offset for a transfer read at 0x400000c, stored in work RAM H
+		// writes 3d0dxxxx / 3d0exxxx before a level start.. offset for a transfer read at 0x400000c, stored in work RAM H
 
-			//printf("sysh1_unk_blit_w unhandled offset %04x %08x %08x\n", offset, data, mem_mask);
-
-
-		}
+		//printf("sysh1_unk_blit_w unhandled offset %04x %08x %08x\n", offset, data, mem_mask);
 		break;
 
 	}
@@ -2859,7 +2853,7 @@ uint32_t coolridr_state::sound_dma_r(offs_t offset)
 	if(offset == 2 || offset == 6) // DMA status
 		return 0;
 
-	printf("%08x\n",offset);
+	util::stream_format(std::cout, "%08x\n",offset);
 
 	return m_sound_dma[offset];
 }

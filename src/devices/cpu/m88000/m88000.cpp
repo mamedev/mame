@@ -136,7 +136,7 @@ enum dmt_mask : u32
 constexpr static u32 DMT_EN() { return (DMT_EN3 | DMT_EN2 | DMT_EN1 | DMT_EN0); }
 
 // return data memory transaction byte enables given data width and address
-template <typename T> static u32 DMT_EN(u32 const address)
+template <typename T> static u32 DMT_EN(offs_t const address)
 {
 	return (((DMT_EN() << (4 - sizeof(T))) & DMT_EN()) >> (address & 3));
 }
@@ -1537,7 +1537,7 @@ void mc88100_device::fetch(u32 &address, u32 &inst)
 		inst = m_code_space.read_dword(address & IP_A);
 }
 
-template <typename T, bool Usr> void mc88100_device::ld(u32 address, unsigned const reg)
+template <typename T, bool Usr> void mc88100_device::ld(offs_t address, unsigned const reg)
 {
 	// alignment check
 	if (address & (sizeof(T) - 1))
@@ -1658,7 +1658,7 @@ template <typename T, bool Usr> void mc88100_device::ld(u32 address, unsigned co
 	}
 }
 
-template <typename T, bool Usr> void mc88100_device::st(u32 address, unsigned const reg)
+template <typename T, bool Usr> void mc88100_device::st(offs_t address, unsigned const reg)
 {
 	// alignment check
 	if (address & (sizeof(T) - 1))
@@ -1748,7 +1748,7 @@ template <typename T, bool Usr> void mc88100_device::st(u32 address, unsigned co
 	}
 }
 
-template <typename T, bool Usr> void mc88100_device::xmem(u32 address, unsigned const reg)
+template <typename T, bool Usr> void mc88100_device::xmem(offs_t address, unsigned const reg)
 {
 	// alignment check
 	if (address & (sizeof(T) - 1))

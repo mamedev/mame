@@ -87,7 +87,7 @@ class ns32000_mmu_interface : public ns32000_slave_interface
 {
 public:
 	enum translate_result : unsigned { COMPLETE, CANCEL, ABORT };
-	virtual translate_result translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool flag = false, bool suppress = false) = 0;
+	virtual translate_result translate(address_space &space, unsigned st, offs_t &address, bool user, bool write, bool flag = false, bool suppress = false) = 0;
 
 protected:
 	ns32000_mmu_interface(machine_config const &mconfig, device_t &device)

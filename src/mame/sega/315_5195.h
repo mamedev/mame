@@ -116,7 +116,7 @@ private:
 	};
 
 	// internal helpers
-	void compute_region(region_info &info, u8 index, u32 length, u32 mirror, u32 offset = 0);
+	void compute_region(region_info &info, u8 index, u64 length, u64 mirror, u64 offset = 0ULL);
 	void update_mapping();
 	void fd1094_state_change(u8 state);
 

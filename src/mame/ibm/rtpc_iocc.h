@@ -76,25 +76,25 @@ public:
 	using rsc_mode = rsc_bus_interface::rsc_mode;
 
 	// rsc_bus_interface overrides
-	virtual bool mem_load(u32 address, u8 &data, rsc_mode const mode, bool sp) override { return mem_load<u8>(address, data, mode); }
-	virtual bool mem_load(u32 address, u16 &data, rsc_mode const mode, bool sp) override { return mem_load<u16>(address, data, mode); }
-	virtual bool mem_load(u32 address, u32 &data, rsc_mode const mode, bool sp) override { return mem_load<u32>(address, data, mode); }
-	virtual bool mem_store(u32 address, u8 data, rsc_mode const mode, bool sp) override { return mem_store<u8>(address, data, mode); }
-	virtual bool mem_store(u32 address, u16 data, rsc_mode const mode, bool sp) override { return mem_store<u16>(address, data, mode); }
-	virtual bool mem_store(u32 address, u32 data, rsc_mode const mode, bool sp) override { return mem_store<u32>(address, data, mode); }
-	virtual bool mem_modify(u32 address, std::function<u8(u8)> f, rsc_mode const mode) override { return mem_modify<u8>(address, f, mode); }
-	virtual bool mem_modify(u32 address, std::function<u16(u16)> f, rsc_mode const mode) override { return mem_modify<u16>(address, f, mode); }
-	virtual bool mem_modify(u32 address, std::function<u32(u32)> f, rsc_mode const mode) override { return mem_modify<u32>(address, f, mode); }
+	virtual bool mem_load(offs_t address, u8 &data, rsc_mode const mode, bool sp) override { return mem_load<u8>(address, data, mode); }
+	virtual bool mem_load(offs_t address, u16 &data, rsc_mode const mode, bool sp) override { return mem_load<u16>(address, data, mode); }
+	virtual bool mem_load(offs_t address, u32 &data, rsc_mode const mode, bool sp) override { return mem_load<u32>(address, data, mode); }
+	virtual bool mem_store(offs_t address, u8 data, rsc_mode const mode, bool sp) override { return mem_store<u8>(address, data, mode); }
+	virtual bool mem_store(offs_t address, u16 data, rsc_mode const mode, bool sp) override { return mem_store<u16>(address, data, mode); }
+	virtual bool mem_store(offs_t address, u32 data, rsc_mode const mode, bool sp) override { return mem_store<u32>(address, data, mode); }
+	virtual bool mem_modify(offs_t address, std::function<u8(u8)> f, rsc_mode const mode) override { return mem_modify<u8>(address, f, mode); }
+	virtual bool mem_modify(offs_t address, std::function<u16(u16)> f, rsc_mode const mode) override { return mem_modify<u16>(address, f, mode); }
+	virtual bool mem_modify(offs_t address, std::function<u32(u32)> f, rsc_mode const mode) override { return mem_modify<u32>(address, f, mode); }
 
-	virtual bool pio_load(u32 address, u8 &data, rsc_mode const mode) override { return pio_load<u8>(address, data, mode); }
-	virtual bool pio_load(u32 address, u16 &data, rsc_mode const mode) override { return pio_load<u16>(address, data, mode); }
-	virtual bool pio_load(u32 address, u32 &data, rsc_mode const mode) override { return pio_load<u32>(address, data, mode); }
-	virtual bool pio_store(u32 address, u8 data, rsc_mode const mode) override { return pio_store<u8>(address, data, mode); }
-	virtual bool pio_store(u32 address, u16 data, rsc_mode const mode) override { return pio_store<u16>(address, data, mode); }
-	virtual bool pio_store(u32 address, u32 data, rsc_mode const mode) override { return pio_store<u32>(address, data, mode); }
-	virtual bool pio_modify(u32 address, std::function<u8(u8)> f, rsc_mode const mode) override { return pio_modify<u8>(address, f, mode); }
-	virtual bool pio_modify(u32 address, std::function<u16(u16)> f, rsc_mode const mode) override { return pio_modify<u16>(address, f, mode); }
-	virtual bool pio_modify(u32 address, std::function<u32(u32)> f, rsc_mode const mode) override { return pio_modify<u32>(address, f, mode); }
+	virtual bool pio_load(offs_t address, u8 &data, rsc_mode const mode) override { return pio_load<u8>(address, data, mode); }
+	virtual bool pio_load(offs_t address, u16 &data, rsc_mode const mode) override { return pio_load<u16>(address, data, mode); }
+	virtual bool pio_load(offs_t address, u32 &data, rsc_mode const mode) override { return pio_load<u32>(address, data, mode); }
+	virtual bool pio_store(offs_t address, u8 data, rsc_mode const mode) override { return pio_store<u8>(address, data, mode); }
+	virtual bool pio_store(offs_t address, u16 data, rsc_mode const mode) override { return pio_store<u16>(address, data, mode); }
+	virtual bool pio_store(offs_t address, u32 data, rsc_mode const mode) override { return pio_store<u32>(address, data, mode); }
+	virtual bool pio_modify(offs_t address, std::function<u8(u8)> f, rsc_mode const mode) override { return pio_modify<u8>(address, f, mode); }
+	virtual bool pio_modify(offs_t address, std::function<u16(u16)> f, rsc_mode const mode) override { return pio_modify<u16>(address, f, mode); }
+	virtual bool pio_modify(offs_t address, std::function<u32(u32)> f, rsc_mode const mode) override { return pio_modify<u32>(address, f, mode); }
 
 	u8 ccr_r() { return m_ccr; }
 	void ccr_w(u8 data) { m_ccr = data; }
@@ -123,12 +123,12 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 	//virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
-	template <typename T> bool mem_load(u32 address, T &data, rsc_mode const mode);
-	template <typename T> bool mem_store(u32 address, T data, rsc_mode const mode);
-	template <typename T> bool mem_modify(u32 address, std::function<T(T)> f, rsc_mode const mode);
-	template <typename T> bool pio_load(u32 address, T &data, rsc_mode const mode);
-	template <typename T> bool pio_store(u32 address, T data, rsc_mode const mode);
-	template <typename T> bool pio_modify(u32 address, std::function<T(T)> f, rsc_mode const mode);
+	template <typename T> bool mem_load(offs_t address, T &data, rsc_mode const mode);
+	template <typename T> bool mem_store(offs_t address, T data, rsc_mode const mode);
+	template <typename T> bool mem_modify(offs_t address, std::function<T(T)> f, rsc_mode const mode);
+	template <typename T> bool pio_load(offs_t address, T &data, rsc_mode const mode);
+	template <typename T> bool pio_store(offs_t address, T data, rsc_mode const mode);
+	template <typename T> bool pio_modify(offs_t address, std::function<T(T)> f, rsc_mode const mode);
 
 	void set_int(bool state)
 	{
