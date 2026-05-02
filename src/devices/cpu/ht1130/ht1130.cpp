@@ -24,6 +24,15 @@ TODO:
 #define VERBOSE (LOG_UNHANDLED_OPS)
 #include "logmacro.h"
 
+// 7-bit LFSR to divisor table from BrickEmuPy
+static const u8 ht1130_lfsr2div[128] = {
+	0, 2, 123, 3, 124, 75, 117, 4, 125, 101, 111, 76, 118, 42, 69, 5, 126, 66, 63, 102, 112, 86, 36, 77, 119,
+	21, 95, 43, 70, 25, 105, 6, 127, 115, 99, 67, 64, 34, 19, 103, 113, 17, 15, 87, 37, 55, 89, 78, 120, 39,
+	60, 22, 96, 52, 57, 44, 71, 91, 30, 26, 106, 47, 80, 7, 1, 122, 74, 116, 100, 110, 41, 68, 65, 62, 85, 35,
+	20, 94, 24, 104, 114, 98, 33, 18, 16, 14, 54, 88, 38, 59, 51, 56, 90, 29, 46, 79, 121, 73, 109, 40, 61, 84,
+	93, 23, 97, 32, 13, 53, 58, 50, 28, 45, 72, 108, 83, 92, 31, 12, 49, 27, 107, 82, 11, 48, 81, 10, 9, 8
+};
+
 // device type definitions
 DEFINE_DEVICE_TYPE(HT1130, ht1130_device, "ht1130", "Holtek HT1130")
 DEFINE_DEVICE_TYPE(HT1190, ht1190_device, "ht1190", "Holtek HT1190")
@@ -32,6 +41,7 @@ DEFINE_DEVICE_TYPE(HT1190, ht1190_device, "ht1190", "Holtek HT1190")
 
 ht1130_device::ht1130_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data)
 	: cpu_device(mconfig, type, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
 	, m_tempram(*this, "tempram")
 	, m_displayram(*this, "displayram")
 	, m_space_config("program", ENDIANNESS_LITTLE, 8, 12, 0, address_map_constructor(FUNC(ht1130_device::internal_map), this))
@@ -41,6 +51,9 @@ ht1130_device::ht1130_device(const machine_config &mconfig, device_type type, co
 	, m_port_in_pp(*this, 0xff)
 	, m_port_out_pa(*this)
 	, m_segment_out(*this)
+	, m_sound_effect(*this, finder_base::DUMMY_TAG)
+	, m_sound_speed_div(*this, finder_base::DUMMY_TAG)
+	, m_melody_rom(*this, "melody")
 {
 }
 
@@ -65,6 +78,67 @@ device_memory_interface::space_config_vector ht1130_device::memory_space_config(
 		std::make_pair(AS_PROGRAM, &m_space_config),
 		std::make_pair(AS_DATA, &m_data_config)
 	};
+}
+
+void ht1130_device::sound_stream_update(sound_stream &stream)
+{
+	if (!m_sound_on || !m_melody_rom || !m_melody_rom.found())
+	{
+		stream.fill(0, 0);
+		return;
+	}
+
+	u32 offset;
+	if (m_sound_channel < 12)
+		offset = m_sound_channel * 32 + (m_note_counter & 31);
+	else
+		offset = 12 * 32 + (m_sound_channel - 12) * 64 + (m_note_counter & 63);
+
+	if (offset >= m_melody_rom.bytes())
+	{
+		stream.fill(0, 0);
+		return;
+	}
+
+	u8 note = m_melody_rom[offset];
+	if (note == 0)
+	{
+		stream.fill(0, 0);
+		return;
+	}
+
+	u32 div = ht1130_lfsr2div[note & 0x7f];
+	if (div == 0)
+	{
+		stream.fill(0, 0);
+		return;
+	}
+
+	u32 period = clock() / m_sound_freq_div / div / 2;
+	if (period == 0) period = 1;
+
+	bool noise = m_sound_effect && m_sound_effect.found() && (m_sound_channel < m_sound_effect.bytes()) && m_sound_effect[m_sound_channel];
+
+	for (int i = 0; i < stream.samples(); i++)
+	{
+		if (m_sound_pos >= period)
+		{
+			m_sound_pos -= period;
+			m_sound_signal = !m_sound_signal;
+
+			if (noise)
+			{
+				m_sound_rand = (m_sound_rand << 1) | (((m_sound_rand >> 14) ^ (m_sound_rand >> 13)) & 1);
+			}
+		}
+
+		if (noise)
+			stream.put(0, i, (m_sound_rand & 1) ? 1.0 : -1.0);
+		else
+			stream.put(0, i, m_sound_signal ? 1.0 : -1.0);
+
+		m_sound_pos++;
+	}
 }
 
 void ht1130_device::internal_map(address_map &map)
@@ -258,6 +332,16 @@ void ht1130_device::init_common()
 	m_timer = 0;
 	m_comcount = 0;
 
+	m_sound_freq_div = 64;
+	m_sound_on = false;
+	m_sound_repeat = false;
+	m_sound_channel = 0;
+	m_note_counter = 0;
+	m_sound_clock_counter = 0;
+	m_sound_pos = 0;
+	m_sound_signal = 0;
+	m_sound_rand = 1;
+
 	// savestates
 	save_item(NAME(m_pc));
 	save_item(NAME(m_regs));
@@ -272,18 +356,31 @@ void ht1130_device::init_common()
 	save_item(NAME(m_comcount));
 	save_item(NAME(m_stackaddr));
 	save_item(NAME(m_stackcarry));
+
+	save_item(NAME(m_sound_on));
+	save_item(NAME(m_sound_repeat));
+	save_item(NAME(m_sound_channel));
+	save_item(NAME(m_note_counter));
+	save_item(NAME(m_sound_clock_counter));
+	save_item(NAME(m_sound_pos));
+	save_item(NAME(m_sound_signal));
+	save_item(NAME(m_sound_rand));
 }
 
 void ht1130_device::device_start()
 {
 	init_common();
 	init_lcd(4); // 4 COM pins
+
+	m_stream = stream_alloc(0, 1, clock());
 }
 
 void ht1190_device::device_start()
 {
 	init_common();
 	init_lcd(8); // 8 COM pins
+
+	m_stream = stream_alloc(0, 1, clock());
 }
 
 void ht1130_device::device_reset()
@@ -1027,37 +1124,50 @@ void ht1130_device::do_op()
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////
-	// SOUND Ops (unimplemented)
+	// SOUND Ops
 	///////////////////////////////////////////////////////////////////////////////////////
 
 	case 0b01001011: // SOUND A : Activate sound channel with accumulator
 	{
-		LOGMASKED(LOG_UNHANDLED_SOUND_OPS, "SOUND A");
+		m_stream->update();
+		m_sound_channel = getacc();
+		m_note_counter = 0;
+		m_sound_on = true;
+		m_sound_pos = 0;
+		u8 speed_idx = (m_sound_speed_div && m_sound_speed_div.found() && m_sound_speed_div.bytes() > 0) ? m_sound_speed_div[m_sound_channel % m_sound_speed_div.bytes()] : 1;
+		m_sound_clock_counter = (u32)ht1130_lfsr2div[speed_idx & 0x7f] * m_sound_freq_div * 16;
 		return;
 	}
 
 	case 0b01001001: // SOUND LOOP : Turn on sound repeat cycle
 	{
-		LOGMASKED(LOG_UNHANDLED_SOUND_OPS, "SOUND LOOP");
+		m_sound_repeat = true;
 		return;
 	}
 
 	case 0b01001010: // SOUND OFF : Turn off sound
 	{
-		LOGMASKED(LOG_UNHANDLED_SOUND_OPS, "SOUND OFF");
+		m_stream->update();
+		m_sound_on = false;
 		return;
 	}
 
 	case 0b01001000: // SOUND ONE : Turn on sound 1 cycle
 	{
-		LOGMASKED(LOG_UNHANDLED_SOUND_OPS, "SOUND ONE");
+		m_sound_repeat = false;
 		return;
 	}
 
 	case 0b01000101: // (with 4 bit immediate) : SOUND n : Activate sound channel n
 	{
 		u8 operand = fetch() & 0x0f;
-		LOGMASKED(LOG_UNHANDLED_SOUND_OPS, "SOUND %d", operand);
+		m_stream->update();
+		m_sound_channel = operand;
+		m_note_counter = 0;
+		m_sound_on = true;
+		m_sound_pos = 0;
+		u8 speed_idx = (m_sound_speed_div && m_sound_speed_div.found() && m_sound_speed_div.bytes() > 0) ? m_sound_speed_div[m_sound_channel % m_sound_speed_div.bytes()] : 1;
+		m_sound_clock_counter = (u32)ht1130_lfsr2div[speed_idx & 0x7f] * m_sound_freq_div * 16;
 		return;
 	}
 
@@ -1102,12 +1212,46 @@ void ht1130_device::execute_run()
 	{
 		debugger_instruction_hook(m_pc);
 
+		s32 prev_icount = m_icount;
 		do_op();
+		s32 diff = prev_icount - m_icount;
 
 		if (m_timer & 0x100)
 		{
 			m_timer -= 0x100;
 			m_timerover = 1; // can also generate an interrupt
+		}
+
+		if (m_sound_on)
+		{
+			if (m_sound_clock_counter <= (u32)diff)
+			{
+				m_stream->update();
+
+				m_note_counter++;
+				u8 limit = (m_sound_channel < 12) ? 32 : 64;
+				if (m_note_counter >= limit)
+				{
+					if (m_sound_repeat)
+					{
+						m_note_counter = 0;
+					}
+					else
+					{
+						m_sound_on = false;
+					}
+				}
+
+				if (m_sound_on)
+				{
+					u8 speed_idx = (m_sound_speed_div && m_sound_speed_div.found() && m_sound_speed_div.bytes() > 0) ? m_sound_speed_div[m_sound_channel % m_sound_speed_div.bytes()] : 1;
+					m_sound_clock_counter = (u32)ht1130_lfsr2div[speed_idx & 0x7f] * m_sound_freq_div * 16;
+				}
+			}
+			else
+			{
+				m_sound_clock_counter -= diff;
+			}
 		}
 	}
 }
