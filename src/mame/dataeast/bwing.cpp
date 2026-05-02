@@ -52,7 +52,6 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_paletteram(*this, "paletteram", 0x80, ENDIANNESS_BIG),
 		m_fgscrollram(*this, "fgscrollram"),
 		m_bgscrollram(*this, "bgscrollram"),
 		m_gfxram(*this, "gfxram", 0x6000, ENDIANNESS_BIG),
@@ -80,7 +79,6 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
-	memory_share_creator<uint16_t> m_paletteram;
 	required_shared_ptr<uint8_t> m_fgscrollram;
 	required_shared_ptr<uint8_t> m_bgscrollram;
 	memory_share_creator<uint8_t> m_gfxram;
@@ -95,36 +93,36 @@ private:
 	uint8_t m_mapmask = 0U;
 
 	// sound-related
-	uint8_t m_p3_nmimask = 0U;
-	uint8_t m_p3_u8f_d = 0U;
+	uint8_t m_sound_nmimask = 0U;
+	uint8_t m_sound_u8f_d = 0U;
 
-	void p3_u8f_w(uint8_t data);
-	void p3_nmimask_w(uint8_t data);
-	void p3_nmiack_w(uint8_t data);
-	void p1_ctrl_w(offs_t offset, uint8_t data);
-	void p2_ctrl_w(offs_t offset, uint8_t data);
+	void sound_u8f_w(uint8_t data);
+	void sound_nmimask_w(uint8_t data);
+	void sound_nmiack_w(uint8_t data);
+	void main_ctrl_w(offs_t offset, uint8_t data);
+	void sub_ctrl_w(offs_t offset, uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);
 	void fgscrollram_w(offs_t offset, uint8_t data);
 	void bgscrollram_w(offs_t offset, uint8_t data);
 	template <uint8_t Which> void gfxram_w(offs_t offset, uint8_t data);
 	void scrollreg_w(offs_t offset, uint8_t data);
 	void paletteram_w(offs_t offset, uint8_t data);
-	uint8_t paletteram_r(offs_t offset);
 
+	static rgb_t b3g3r3_inv(uint32_t raw);
 	TILE_GET_INFO_MEMBER(get_fgtileinfo);
 	TILE_GET_INFO_MEMBER(get_bgtileinfo);
 	TILE_GET_INFO_MEMBER(get_charinfo);
 	TILEMAP_MAPPER_MEMBER(scan_cols);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bmp, const rectangle &clip, uint8_t *ram, int pri);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bmp, const rectangle &clip);
 
-	INTERRUPT_GEN_MEMBER(p3_interrupt);
+	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	void bank_map(address_map &map) ATTR_COLD;
-	void p1_map(address_map &map) ATTR_COLD;
-	void p2_map(address_map &map) ATTR_COLD;
-	void p3_io_map(address_map &map) ATTR_COLD;
-	void p3_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -157,7 +155,7 @@ void bwing_state::gfxram_w(offs_t offset, uint8_t data)
 {
 	offset += (Which * 0x2000);
 	m_gfxram[offset] = data;
-	int whichgfx = (offset & 0x1000) ? 3 : 2;
+	int const whichgfx = BIT(offset, 12) ? 3 : 2;
 	m_gfxdecode->gfx(whichgfx)->mark_dirty((offset & 0xfff) / 32);
 }
 
@@ -180,25 +178,19 @@ void bwing_state::scrollreg_w(offs_t offset, uint8_t data)
 	}
 }
 
+rgb_t bwing_state::b3g3r3_inv(uint32_t raw)
+{
+	uint8_t const r = ~raw & 7;
+	uint8_t const g = (~raw >> 4) & 7;
+	uint8_t const b = (~raw >> 8) & 7;
+	return rgb_t(pal3bit(r), pal3bit(g), pal3bit(b));
+}
 
 void bwing_state::paletteram_w(offs_t offset, uint8_t data)
 {
-	const uint8_t r = ~data & 7;
-	const uint8_t g = ~data >> 4 & 7;
-	const uint8_t b = ~m_palatch & 7;
-
 	// write to MB7063 (64x9) RAM and update palette
-	m_paletteram[offset] = b << 6 | g << 3 | r;
-	m_palette->set_pen_color(offset, rgb_t(pal3bit(r), pal3bit(g), pal3bit(b)));
-}
-
-uint8_t bwing_state::paletteram_r(offs_t offset)
-{
-	const uint8_t r = ~m_paletteram[offset] & 7;
-	const uint8_t g = ~m_paletteram[offset] >> 3 & 7;
-	const uint8_t b = ~m_paletteram[offset] >> 6 & 7;
-
-	return (offset & 0x40) ? b : (g << 4 | r);
+	m_palette->write8(offset, data & 0x77);
+	m_palette->write8_ext(offset, m_palatch & 0x7);
 }
 
 
@@ -207,12 +199,12 @@ uint8_t bwing_state::paletteram_r(offs_t offset)
 
 TILE_GET_INFO_MEMBER(bwing_state::get_fgtileinfo)
 {
-	tileinfo.set(2, m_fgscrollram[tile_index] & 0x7f, m_fgscrollram[tile_index] >> 7, 0);
+	tileinfo.set(2, m_fgscrollram[tile_index] & 0x7f, BIT(m_fgscrollram[tile_index], 7), 0);
 }
 
 TILE_GET_INFO_MEMBER(bwing_state::get_bgtileinfo)
 {
-	tileinfo.set(3, m_bgscrollram[tile_index] & 0x7f, m_bgscrollram[tile_index] >> 7, 0);
+	tileinfo.set(3, m_bgscrollram[tile_index] & 0x7f, BIT(m_bgscrollram[tile_index], 7), 0);
 }
 
 TILE_GET_INFO_MEMBER(bwing_state::get_charinfo)
@@ -243,30 +235,32 @@ void bwing_state::video_start()
 //****************************************************************************
 // Screen Update
 
-void bwing_state::draw_sprites(bitmap_ind16 &bmp, const rectangle &clip, uint8_t *ram, int pri)
+void bwing_state::draw_sprites(screen_device &screen, bitmap_ind16 &bmp, const rectangle &clip)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 
-	for (int i = 0; i < 0x200; i += 4)
+	for (int i = m_spriteram.length() - 4; i >= 0; i -= 4)
 	{
-		int const attrib = ram[i];
-		int code = ram[i + 1];
-		int y = ram[i + 2];
-		int x = ram[i + 3];
-		int const color  = (attrib >> 3) & 1;
+		int const attrib = m_spriteram[i];
 
-		if (!(attrib & 1) || color != pri)
+		if (!BIT(attrib, 0))
 			continue;
+
+		int code = m_spriteram[i + 1];
+		int y = m_spriteram[i + 2];
+		int x = m_spriteram[i + 3];
+		int const color = BIT(attrib, 3);
+		uint32_t const primask = GFX_PMASK_4 | (color ? 0 : GFX_PMASK_2);
 
 		code += (attrib << 3) & 0x100;
 		y -= (attrib << 1) & 0x100;
 		x -= (attrib << 2) & 0x100;
 
-		int fx = attrib & 0x04;
-		int fy = ~attrib & 0x02;
+		bool fx = BIT(attrib, 2);
+		bool fy = BIT(~attrib, 1);
 
 		// normal/cocktail
-		if (m_mapmask & 0x20)
+		if (BIT(m_mapmask, 5))
 		{
 			fx = !fx;
 			fy = !fy;
@@ -275,19 +269,28 @@ void bwing_state::draw_sprites(bitmap_ind16 &bmp, const rectangle &clip, uint8_t
 		}
 
 		// single/double
-		if (!(attrib & 0x10))
-			gfx->transpen(bmp, clip, code, color, fx, fy, x, y, 0);
+		if (!BIT(attrib, 4))
+			gfx->prio_transpen(bmp, clip,
+					code, color,
+					fx, fy,
+					x, y,
+					screen.priority(), primask, 0);
 		else
-			gfx->zoom_transpen(bmp, clip, code, color, fx, fy, x, y, 1 << 16, 2 << 16, 0);
+			gfx->prio_zoom_transpen(bmp, clip,
+					code, color,
+					fx, fy,
+					x, y,
+					1 << 16, 2 << 16,
+					screen.priority(), primask, 0);
 	}
 }
 
 
 uint32_t bwing_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	unsigned flip, x, y, shiftx;
+	u32 flip, x, y, shiftx;
 
-	if (m_mapmask & 0x20)
+	if (BIT(m_mapmask, 5))
 	{
 		flip = TILEMAP_FLIPX;
 		shiftx = -8;
@@ -298,42 +301,42 @@ uint32_t bwing_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		shiftx = 8;
 	}
 
+	screen.priority().fill(0, cliprect);
+
 	// draw background
-	if (!(m_mapmask & 1))
+	if (!BIT(m_mapmask, 0))
 	{
 		m_bgmap->set_flip(flip);
 		x = ((m_sreg[1] << 2 & 0x300) + m_sreg[2] + shiftx) & 0x3ff;
 		m_bgmap->set_scrollx(0, x);
 		y = (m_sreg[1] << 4 & 0x300) + m_sreg[3];
 		m_bgmap->set_scrolly(0, y);
-		m_bgmap->draw(screen, bitmap, cliprect, 0, 0);
+		m_bgmap->draw(screen, bitmap, cliprect, 0, 1);
 	}
 	else
 		bitmap.fill(0x30, cliprect);
 
-	// draw low priority sprites
-	draw_sprites(bitmap, cliprect, m_spriteram, 0);
-
 	// draw foreground
-	if (!(m_mapmask & 2))
+	if (!BIT(m_mapmask, 1))
 	{
 		m_fgmap->set_flip(flip);
 		x = ((m_sreg[1] << 6 & 0x300) + m_sreg[4] + shiftx) & 0x3ff;
 		m_fgmap->set_scrollx(0, x);
 		y = (m_sreg[1] << 8 & 0x300) + m_sreg[5];
 		m_fgmap->set_scrolly(0, y);
-		m_fgmap->draw(screen, bitmap, cliprect, 0, 0);
+		m_fgmap->draw(screen, bitmap, cliprect, 0, 2);
 	}
-
-	// draw high priority sprites
-	draw_sprites(bitmap, cliprect, m_spriteram, 1);
 
 	// draw text layer
-//  if (m_mapmask & 4)
+//  if (BIT(m_mapmask, 2))
 	{
 		m_charmap->set_flip(flip);
-		m_charmap->draw(screen, bitmap, cliprect, 0, 0);
+		m_charmap->draw(screen, bitmap, cliprect, 0, 4);
 	}
+
+	// draw sprites
+	draw_sprites(screen, bitmap, cliprect);
+
 	return 0;
 }
 
@@ -341,9 +344,9 @@ uint32_t bwing_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 //****************************************************************************
 // Interrupt Handlers
 
-INTERRUPT_GEN_MEMBER(bwing_state::p3_interrupt)
+INTERRUPT_GEN_MEMBER(bwing_state::sound_interrupt)
 {
-	if (!m_p3_nmimask)
+	if (!m_sound_nmimask)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -351,23 +354,23 @@ INTERRUPT_GEN_MEMBER(bwing_state::p3_interrupt)
 //****************************************************************************
 // Memory and I/O Handlers
 
-void bwing_state::p3_u8f_w(uint8_t data)
+void bwing_state::sound_u8f_w(uint8_t data)
 {
-	m_p3_u8f_d = data; // prepares custom chip for various operations
+	m_sound_u8f_d = data; // prepares custom chip for various operations
 }
 
-void bwing_state::p3_nmimask_w(uint8_t data)
+void bwing_state::sound_nmimask_w(uint8_t data)
 {
-	m_p3_nmimask = data & 0x80;
+	m_sound_nmimask = BIT(data, 7);
 }
 
-void bwing_state::p3_nmiack_w(uint8_t data)
+void bwing_state::sound_nmiack_w(uint8_t data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
-void bwing_state::p1_ctrl_w(offs_t offset, uint8_t data)
+void bwing_state::main_ctrl_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -406,7 +409,7 @@ void bwing_state::p1_ctrl_w(offs_t offset, uint8_t data)
 }
 
 
-void bwing_state::p2_ctrl_w(offs_t offset, uint8_t data)
+void bwing_state::sub_ctrl_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -425,22 +428,22 @@ void bwing_state::p2_ctrl_w(offs_t offset, uint8_t data)
 // CPU Memory Maps
 
 // Main CPU
-void bwing_state::p1_map(address_map &map)
+void bwing_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("sharedram");
 	map(0x0800, 0x0fff).ram();
 	map(0x1000, 0x13ff).ram().w(FUNC(bwing_state::videoram_w)).share(m_videoram);
 	map(0x1400, 0x17ff).ram();
 	map(0x1800, 0x19ff).ram().share(m_spriteram);
-	map(0x1a00, 0x1a3f).w(FUNC(bwing_state::paletteram_w));
-	map(0x1a00, 0x1a7f).r(FUNC(bwing_state::paletteram_r));
+	map(0x1a00, 0x1a3f).ram().w(FUNC(bwing_state::paletteram_w)).share("palette");
+	map(0x1a40, 0x1a7f).readonly().share("palette_ext");
 	map(0x1b00, 0x1b00).portr("DSW0");
 	map(0x1b01, 0x1b01).portr("DSW1");
 	map(0x1b02, 0x1b02).portr("IN0");
 	map(0x1b03, 0x1b03).portr("IN1");
 	map(0x1b04, 0x1b04).portr("IN2");
 	map(0x1b00, 0x1b07).w(FUNC(bwing_state::scrollreg_w));
-	map(0x1c00, 0x1c07).ram().w(FUNC(bwing_state::p1_ctrl_w));
+	map(0x1c00, 0x1c07).ram().w(FUNC(bwing_state::main_ctrl_w));
 	map(0x2000, 0x3fff).view(m_vramview);
 	m_vramview[0](0x2000, 0x2fff).ram().w(FUNC(bwing_state::fgscrollram_w)).share(m_fgscrollram);
 	m_vramview[0](0x3000, 0x3fff).ram().w(FUNC(bwing_state::bgscrollram_w)).share(m_bgscrollram);
@@ -451,34 +454,34 @@ void bwing_state::p1_map(address_map &map)
 }
 
 // Sub CPU
-void bwing_state::p2_map(address_map &map)
+void bwing_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("sharedram");
 	map(0x0800, 0x0fff).ram();
-	map(0x1800, 0x1803).w(FUNC(bwing_state::p2_ctrl_w));
+	map(0x1800, 0x1803).w(FUNC(bwing_state::sub_ctrl_w));
 	map(0xa000, 0xffff).rom();
 }
 
 
 // Sound CPU
-void bwing_state::p3_map(address_map &map)
+void bwing_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x0200).w("dac", FUNC(dac_byte_interface::data_w));
-	map(0x1000, 0x1000).w(FUNC(bwing_state::p3_nmiack_w));
+	map(0x1000, 0x1000).w(FUNC(bwing_state::sound_nmiack_w));
 	map(0x2000, 0x2000).w("ay1", FUNC(ay8912_device::data_w));
 	map(0x4000, 0x4000).w("ay1", FUNC(ay8912_device::address_w));
 	map(0x6000, 0x6000).w("ay2", FUNC(ay8912_device::data_w));
 	map(0x8000, 0x8000).w("ay2", FUNC(ay8912_device::address_w));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xd000, 0xd000).w(FUNC(bwing_state::p3_nmimask_w));
+	map(0xd000, 0xd000).w(FUNC(bwing_state::sound_nmimask_w));
 	map(0xe000, 0xffff).rom().region("audiocpu", 0);
 }
 
 
-void bwing_state::p3_io_map(address_map &map)
+void bwing_state::sound_io_map(address_map &map)
 {
-	map(0x00, 0x00).portr("VBLANK").w(FUNC(bwing_state::p3_u8f_w));
+	map(0x00, 0x00).portr("VBLANK").w(FUNC(bwing_state::sound_u8f_w));
 }
 
 
@@ -636,8 +639,8 @@ void bwing_state::machine_start()
 {
 	save_item(NAME(m_palatch));
 	save_item(NAME(m_mapmask));
-	save_item(NAME(m_p3_nmimask));
-	save_item(NAME(m_p3_u8f_d));
+	save_item(NAME(m_sound_nmimask));
+	save_item(NAME(m_sound_u8f_d));
 
 	save_item(NAME(m_sreg));
 }
@@ -647,8 +650,8 @@ void bwing_state::machine_reset()
 	m_palatch = 0;
 	m_mapmask = 0;
 
-	m_p3_nmimask = 0;
-	m_p3_u8f_d = 0;
+	m_sound_nmimask = 0;
+	m_sound_u8f_d = 0;
 }
 
 
@@ -656,15 +659,15 @@ void bwing_state::bwing(machine_config &config)
 {
 	// basic machine hardware
 	MC6809E(config, m_maincpu, 24_MHz_XTAL / 16); // MC68A09E
-	m_maincpu->set_addrmap(AS_PROGRAM, &bwing_state::p1_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bwing_state::main_map);
 
 	MC6809E(config, m_subcpu, 24_MHz_XTAL / 16); // MC68A09E
-	m_subcpu->set_addrmap(AS_PROGRAM, &bwing_state::p2_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &bwing_state::sub_map);
 
 	DECO16(config, m_audiocpu, 24_MHz_XTAL / 16);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &bwing_state::p3_map);
-	m_audiocpu->set_addrmap(AS_IO, &bwing_state::p3_io_map);
-	m_audiocpu->set_periodic_int(FUNC(bwing_state::p3_interrupt), attotime::from_hz(1'000));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bwing_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &bwing_state::sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(bwing_state::sound_interrupt), attotime::from_hz(1'000));
 
 	config.set_maximum_quantum(attotime::from_hz(18'000)); // high enough?
 
@@ -676,7 +679,7 @@ void bwing_state::bwing(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bwing);
-	PALETTE(config, m_palette).set_entries(64);
+	PALETTE(config, m_palette).set_format(2, &bwing_state::b3g3r3_inv, 64);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -775,6 +778,7 @@ ROM_START( bwingsa )
 	ROM_LOAD( "bw_bv-09.1h",  0x08000, 0x04000, CRC(a14c0b57) SHA1(5033354793d77922f5ef7f268cbe212e551efadf) )
 ROM_END
 
+
 ROM_START( zaviga )
 	// Top Board(DE-0169-0)
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -835,7 +839,7 @@ ROM_END
 void bwing_state::init_bwing()
 {
 	uint8_t *rom = memregion("audiocpu")->base();
-	int j = memregion("audiocpu")->bytes();
+	int const j = memregion("audiocpu")->bytes();
 
 	// swap nibbles
 	for (int i = 0; i < j; i++)
