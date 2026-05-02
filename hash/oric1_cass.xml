@@ -487,12 +487,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="bunker">
-		<description>Bunker</description>
+		<description>Bunker (type-in)</description>
 		<year>19??</year>
 		<publisher>Hebdogiciel</publisher>
-		<notes><![CDATA[
-Type-in from magazine
-]]></notes>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="13561">
 				<rom name="Bunker (19xx)(-)(fr).tap" size="13561" crc="4aa32409" sha1="0e3808f50613ca3dbe444b535c1b865d7f8c797e"/>
@@ -2631,9 +2628,53 @@ The cassette stops during the game loading
 	</software>
 
 	<software name="manoir">
-		<description>Le Manoir du Dr.Genius</description>
+		<description>Le Manoir du Dr. Genius (release 3) (Oric-1 / Atmos)</description>
+		<year>1984</year>
+		<publisher>Loriciels</publisher>
+		<info name="language" value="French" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="35441">
+				<rom name="genius-v3.tap" size="35441" crc="ac28d253" sha1="1880b76cd5e89992b6a62a95cb7e5d679b58c4f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manoir_r1" cloneof="manoir">
+		<description>Le Manoir du Dr. Genius (release 1) (Oric-1 only)</description>
 		<year>1983</year>
 		<publisher>Loriciels</publisher>
+		<info name="language" value="French" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="33145">
+				<rom name="genius-v1.tap" size="33145" crc="668c8f3a" sha1="3ecd7a7ea21e00698a21b0f10f7eb9a7bd3b1ee3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manoir_r2" cloneof="manoir">
+		<description>Le Manoir du Dr. Genius (release 2) (Oric-1 only)</description>
+		<year>1983</year>
+		<publisher>Loriciels</publisher>
+		<info name="language" value="French" />
+		<part name="cass" interface="oric1_cass">
+			<feature name="part_id" value="Lent" />
+			<dataarea name="cass" size="34848">
+				<rom name="genius-v2s.tap" size="34848" crc="2afe317e" sha1="d243e0438eb4d5a1fd5eb087da2a3515d6a22e3e"/>
+			</dataarea>
+		</part>
+		<part name="cass" interface="oric1_cass">
+			<feature name="part_id" value="Rapide" />
+			<dataarea name="cass" size="35110">
+				<rom name="genius-v2f.tap" size="35110" crc="84afde0a" sha1="10170b10f8e9b00845a89cfdcbc497473ad5c638"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manoir_a" cloneof="manoir">
+		<description>Le Manoir du Dr. Genius (alt)</description>
+		<year>1983</year>
+		<publisher>Loriciels</publisher>
+		<info name="language" value="French" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="33146">
 				<rom name="Manoir Du Dr.Genius, Le (1983)(Loriciels)(FR).tap" size="33146" crc="333afe1f" sha1="5e82ccc774c6c179ec3b2f64bdbfa11e4b88836b"/>
@@ -2907,9 +2948,47 @@ The cassette stops during the game loading
 	</software>
 
 	<software name="mystere">
-		<description>Le Mystère de Kikekankoi</description>
+		<description>Le Mystère de Kikekankoi (release 2)</description>
 		<year>1983</year>
 		<publisher>Loriciels</publisher>
+		<info name="language" value="French" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="47324">
+				<rom name="kikekan.tap" size="47324" crc="e139bd5d" sha1="1792b5e67243d3a018dfcf1f2dd0584123511329"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- The first release contains spelling mistakes -->
+	<software name="mystere_a" cloneof="mystere">
+		<description>Le Mystère de Kikekankoi (release 1)</description>
+		<year>1983</year>
+		<publisher>Loriciels</publisher>
+		<info name="language" value="French" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="47325">
+				<rom name="kikekan-sp.tap" size="47325" crc="0bd3bc87" sha1="469c5b626a14988c07f9519f75295e0152e27ac1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mystere_b" cloneof="mystere">
+		<description>Le Mystère de Kikekankoi (Oric-1 / Atmos release)</description>
+		<year>1983</year>
+		<publisher>Loriciels</publisher>
+		<info name="language" value="French" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="47625">
+				<rom name="kikekan-a.tap" size="47625" crc="556703ab" sha1="dcd596e1aab917b98282ec16f9ae19659caf80d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mystere_c" cloneof="mystere">
+		<description>Le Mystère de Kikekankoi (alt)</description>
+		<year>1983</year>
+		<publisher>Loriciels</publisher>
+		<info name="language" value="French" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="43942">
 				<rom name="Mystere De Kikekankoi, Le (1983)(Loriciels)(Atmos)(FR).tap" size="43942" crc="cc14a0cf" sha1="f02002d309c7d5bbca946c546510a1458ec8eb69"/>
@@ -3755,6 +3834,48 @@ The cassette stops during the game loading
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="13829">
 				<rom name="Scuba Dive (1984)(Durell Software)(GB).tap" size="13829" crc="1029f874" sha1="3895d29b25ae9177b2d7efe6452574c6ece63da2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kaipur">
+		<description>Le Secret de Kaïpur</description>
+		<year>1984</year>
+		<publisher>France Loriciel</publisher>
+		<info name="language" value="French" />
+		<part name="cass1" interface="oric1_cass">
+			<dataarea name="cass" size="31221">
+				<rom name="kaipur.tap" size="31221" crc="b4f9e746" sha1="6098028719884e0d47a473993c7ed9d376e3e9a9"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="oric1_cass">
+			<dataarea name="cass" size="36820">
+				<rom name="sk1.tap" size="36820" crc="e2f45c5e" sha1="5b8bf2019cb0e7e50a3b3c5f312260d44868b47b"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="oric1_cass">
+			<dataarea name="cass" size="26230">
+				<rom name="sk2.tap" size="26230" crc="8f86fd4d" sha1="2811adbc9bfa942706b04e43d44a05f4a09e170c"/>
+			</dataarea>
+		</part>
+		<part name="cass4" interface="oric1_cass">
+			<dataarea name="cass" size="36830">
+				<rom name="sk3.tap" size="36830" crc="a091f0b8" sha1="51052e8cffe0b3ca60e5cd99f0314d8da5d4ceb0"/>
+			</dataarea>
+		</part>
+		<part name="cass5" interface="oric1_cass">
+			<dataarea name="cass" size="14493">
+				<rom name="sk4.tap" size="14493" crc="eabcd2f3" sha1="fd261adb13dd2bd83fb5455e5ff71fc8d4a6166a"/>
+			</dataarea>
+		</part>
+		<part name="cass6" interface="oric1_cass">
+			<dataarea name="cass" size="36586">
+				<rom name="sk5.tap" size="36586" crc="03dad95c" sha1="ba06a41fe89baaafb7dd1ba39f45550636f9ada7"/>
+			</dataarea>
+		</part>
+		<part name="cass7" interface="oric1_cass">
+			<dataarea name="cass" size="36418">
+				<rom name="sk6.tap" size="36418" crc="e3772a87" sha1="b378563a2fbd8be9ba2bad170c3be0b5e8ff03c0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4829,6 +4950,32 @@ Works only on Oric Atmos
 
 <!-- Homebrews -->
 
+	<software name="2048" supported="no">
+		<description>2048</description>
+		<year>2026</year>
+		<publisher>Raxiss</publisher>
+		<notes><![CDATA[
+Keyboard input not detected
+]]></notes>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="27870">
+				<rom name="2048-v1.01.tap" size="27870" crc="ace2d1f4" sha1="b39746cf009ba68c06170f9b601945195940d16e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3kfreecl">
+		<description>3K FreeCell</description>
+		<year>2013</year>
+		<publisher>Defence Force</publisher>
+		<sharedfeat name="compatibility" value="Atmos"/>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="2954">
+				<rom name="3kfreecell.tap" size="2954" crc="311ece70" sha1="662e30b021b83a54d0c350e3ef72cb0f2d6c9089"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="4kkong">
 		<description>4K Kong</description>
 		<year>2003</year>
@@ -4871,6 +5018,17 @@ Works only on Oric Atmos
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="12072">
 				<rom name="ascend.tap" size="12072" crc="8ffb801b" sha1="ba15eb923ae6b38426f5af0b37e0643e8f520fbe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="awass">
+		<description>Awass</description>
+		<year>2026</year>
+		<publisher>Inufuto</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="13309">
+				<rom name="awass.tap" size="13309" crc="e4da86da" sha1="6f756b36c89226ab042129ce96e2fc6616299c4a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4919,6 +5077,17 @@ Works only on Oric Atmos
 		</part>
 	</software>
 
+	<software name="cc65ches">
+		<description>CC65 Chess</description>
+		<year>2020</year>
+		<publisher>Raxiss</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="43775">
+				<rom name="cc65-Chess-raxiss-1.00.tap" size="43775" crc="e9324209" sha1="dc77b1e59a2cbc4698a12e21cf361c34d42fb60e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cracky">
 		<description>Cracky</description>
 		<year>2023</year>
@@ -4943,6 +5112,102 @@ Works only on Oric Atmos
 		</part>
 	</software>
 
+	<software name="15puzzle">
+		<description>Fifteen Puzzle</description>
+		<year>2020</year>
+		<publisher>Raxiss</publisher>
+		<sharedfeat name="compatibility" value="Atmos"/>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="28688">
+				<rom name="p15v100.tap" size="28688" crc="6370c6e7" sha1="4c87d7fb72d57451e17e3d95916fb214f3c107a5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fire" supported="no">
+		<description>Fire</description>
+		<year>2025</year>
+		<publisher>Raxiss</publisher>
+		<notes><![CDATA[
+Keyboard input partially detected
+]]></notes>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="20647">
+				<rom name="fire-v1.tap" size="20647" crc="1a92e9bf" sha1="cc10d72da26dcaf8f5373968fbca70db2a3f10c0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="floodit" supported="no">
+		<description>Flood-It</description>
+		<year>2026</year>
+		<publisher>Raxiss</publisher>
+		<notes><![CDATA[
+Keyboard input not detected
+]]></notes>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="28213">
+				<rom name="floodit-v1.tap" size="28213" crc="a7a575a4" sha1="dfaac684fd269fe8be6f55862e7cbc012cfd658a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galdeon">
+		<description>The Paths of Galdeon (English)</description>
+		<year>2021</year>
+		<publisher>Defence Force</publisher>
+		<info name="developer" value="Jean-Baptiste Perin" />
+		<info name="language" value="English" />
+		<sharedfeat name="compatibility" value="Atmos"/>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="46326">
+				<rom name="ThePathsOfGaldeon.tap" size="46326" crc="0942400a" sha1="867f34f2f8f9a6020aff6885403a354ab841eb7e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galdeon_fr" cloneof="galdeon">
+		<description>Les Chemins de Galdeon (French)</description>
+		<year>2021</year>
+		<publisher>Defence Force</publisher>
+		<info name="developer" value="Jean-Baptiste Perin" />
+		<info name="language" value="French" />
+		<sharedfeat name="compatibility" value="Atmos"/>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="46697">
+				<rom name="LesCheminsDeGaldeon.tap" size="46697" crc="2fb87362" sha1="199c8dbd23ddbcffd6dd823a2259d749d98e5743"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galdeon_it" cloneof="galdeon">
+		<description>I Sentieri di Galdeon (Italian)</description>
+		<year>2021</year>
+		<publisher>Defence Force</publisher>
+		<info name="developer" value="Jean-Baptiste Perin" />
+		<info name="language" value="Italian" />
+		<sharedfeat name="compatibility" value="Atmos"/>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="46720">
+				<rom name="ISentieriDiGaldeon.tap" size="46720" crc="74acf3f5" sha1="6251fe909d4ee6e8be42dc947295735efc3b1496"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galdeon_es" cloneof="galdeon">
+		<description>Los Camiños de Galdeon (Spanish)</description>
+		<year>2021</year>
+		<publisher>Defence Force</publisher>
+		<info name="developer" value="Jean-Baptiste Perin" />
+		<info name="language" value="Spanish" />
+		<sharedfeat name="compatibility" value="Atmos"/>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="45006">
+				<rom name="LosCaminosDeGaldeon.tap" size="45006" crc="311d08d0" sha1="7c00db5d9e26f264042a57c4b273519ea4c75b1c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="guntus">
 		<description>Guntus</description>
 		<year>2022</year>
@@ -4950,6 +5215,19 @@ Works only on Oric Atmos
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="15757">
 				<rom name="guntus.tap" size="15757" crc="002f2b44" sha1="17c4cc61ab71ef4ecc4273cd2f21699e90ba445e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hnefataf">
+		<description>Hnefatafl</description>
+		<year>2013</year>
+		<publisher>Defence Force</publisher>
+		<info name="language" value="English" />
+		<sharedfeat name="compatibility" value="Atmos"/>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="37449">
+				<rom name="Hnefatafl-Lite.tap" size="37449" crc="c2993775" sha1="ac88a3a39abbafd44bbb5c5f8c73fbd8d671bb4a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5011,6 +5289,50 @@ Works only on Oric Atmos
 		</part>
 	</software>
 
+	<software name="lightsout" supported="no">
+		<description>Lights Out</description>
+		<year>2026</year>
+		<publisher>Raxiss</publisher>
+		<notes><![CDATA[
+Keyboard input not detected
+]]></notes>
+		<sharedfeat name="compatibility" value="Atmos"/>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="26774">
+				<rom name="lightsout-v1.tap" size="26774" crc="f3dab828" sha1="df065b6b3a55ee318a250f92b28c3ad4a991cecd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="line4" supported="no">
+		<description>Line 4</description>
+		<year>2026</year>
+		<publisher>Raxiss</publisher>
+		<notes><![CDATA[
+Keyboard input not detected
+]]></notes>
+		<sharedfeat name="compatibility" value="Atmos"/>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="31836">
+				<rom name="line4-v1.tap" size="31836" crc="398bf3bd" sha1="8c8659d556b27b142a989ab61cdafdb180f28a3a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manhole" supported="no">
+		<description>Manhole</description>
+		<year>2025</year>
+		<publisher>Raxiss</publisher>
+		<notes><![CDATA[
+Keyboard input partially detected
+]]></notes>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="32455">
+				<rom name="manhole-v1.tap" size="32455" crc="2995920e" sha1="82fe32b3dbc330c89340b76d7600cfe93a739286"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mazy">
 		<description>Mazy</description>
 		<year>2022</year>
@@ -5033,6 +5355,33 @@ Works only on Oric Atmos
 		</part>
 	</software>
 
+	<software name="mitosis" supported="no">
+		<description>Mitosis</description>
+		<year>2026</year>
+		<publisher>Raxiss</publisher>
+		<notes><![CDATA[
+Keyboard input not detected
+]]></notes>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="33794">
+				<rom name="mitosis-v1.tap" size="33794" crc="9cc39d6e" sha1="dce24055c2be327ce41f30ea28ca62003338ea81"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mieyen">
+		<description>Mieyen</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<info name="developer" value="Inufuto" />
+		<info name="language" value="English" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="11575">
+				<rom name="mieyen.tap" size="11575" crc="2c08de94" sha1="41ecfd070c39462fa34aba685b75bcc91ef853d2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="neuras">
 		<description>Neuras</description>
 		<year>2022</year>
@@ -5040,6 +5389,20 @@ Works only on Oric Atmos
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="13488">
 				<rom name="neuras.tap" size="13488" crc="e05806a5" sha1="cb6b17052e9ecbd1733dd6683f3e7425a114de17"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neutron" supported="no">
+		<description>Neutron Star</description>
+		<year>2026</year>
+		<publisher>Raxiss</publisher>
+		<notes><![CDATA[
+Keyboard input not detected
+]]></notes>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="32281">
+				<rom name="neutron-v1.tap" size="32281" crc="3f3fbebd" sha1="b120c3473ef04d94788a236827468e283c1f7736"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5067,84 +5430,16 @@ Works only on Oric Atmos
 		</part>
 	</software>
 
-	<software name="galdeon">
-		<description>The Paths of Galdeon (English)</description>
-		<year>2021</year>
-		<publisher>Defence Force</publisher>
-		<info name="developer" value="Jean-Baptiste Perin" />
-		<info name="language" value="English" />
-		<sharedfeat name="compatibility" value="Atmos"/>
+	<software name="othellorx" supported="no">
+		<description>Othello (Raxiss)</description>
+		<year>2026</year>
+		<publisher>Raxiss</publisher>
+		<notes><![CDATA[
+Keyboard input not detected
+]]></notes>
 		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="46326">
-				<rom name="ThePathsOfGaldeon.tap" size="46326" crc="0942400a" sha1="867f34f2f8f9a6020aff6885403a354ab841eb7e"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="galdeon_fr" cloneof="galdeon">
-		<description>Les Chemins de Galdeon (French)</description>
-		<year>2021</year>
-		<publisher>Defence Force</publisher>
-		<info name="developer" value="Jean-Baptiste Perin" />
-		<info name="language" value="French" />
-		<sharedfeat name="compatibility" value="Atmos"/>
-		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="46697">
-				<rom name="LesCheminsDeGaldeon.tap" size="46697" crc="2fb87362" sha1="199c8dbd23ddbcffd6dd823a2259d749d98e5743"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="galdeon_it" cloneof="galdeon">
-		<description>I Sentieri di Galdeon (Italian)</description>
-		<year>2021</year>
-		<publisher>Defence Force</publisher>
-		<info name="developer" value="Jean-Baptiste Perin" />
-		<info name="language" value="Italian" />
-		<sharedfeat name="compatibility" value="Atmos"/>
-		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="46720">
-				<rom name="ISentieriDiGaldeon.tap" size="46720" crc="74acf3f5" sha1="6251fe909d4ee6e8be42dc947295735efc3b1496"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="galdeon_es" cloneof="galdeon">
-		<description>Los Camiños de Galdeon (Spanish)</description>
-		<year>2021</year>
-		<publisher>Defence Force</publisher>
-		<info name="developer" value="Jean-Baptiste Perin" />
-		<info name="language" value="Spanish" />
-		<sharedfeat name="compatibility" value="Atmos"/>
-		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="45006">
-				<rom name="LosCaminosDeGaldeon.tap" size="45006" crc="311d08d0" sha1="7c00db5d9e26f264042a57c4b273519ea4c75b1c"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hnefataf">
-		<description>Hnefatafl</description>
-		<year>2013</year>
-		<publisher>Defence Force</publisher>
-		<info name="language" value="English" />
-		<sharedfeat name="compatibility" value="Atmos"/>
-		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="37449">
-				<rom name="Hnefatafl-Lite.tap" size="37449" crc="c2993775" sha1="ac88a3a39abbafd44bbb5c5f8c73fbd8d671bb4a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mieyen">
-		<description>Mieyen</description>
-		<year>2025</year>
-		<publisher>Inufuto</publisher>
-		<info name="developer" value="Inufuto" />
-		<info name="language" value="English" />
-		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="11575">
-				<rom name="mieyen.tap" size="11575" crc="2c08de94" sha1="41ecfd070c39462fa34aba685b75bcc91ef853d2"/>
+			<dataarea name="cass" size="33994">
+				<rom name="othello-v1.tap" size="33994" crc="7b69253d" sha1="40b7ce02cd498006c8afce96f4c19f97a4c6e146"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5173,6 +5468,20 @@ Works only on Oric Atmos
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="62631">
 				<rom name="pulsoids-uk.tap" size="62631" crc="3fa4cef6" sha1="b45f86981f51f6d9bcfe989fd1e69108375501d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="putup" supported="partial">
+		<description>Put Up</description>
+		<year>2025</year>
+		<publisher>Raxiss</publisher>
+		<notes><![CDATA[
+Keyboard input partially detected during gameplay
+]]></notes>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="34609">
+				<rom name="ptp-v1.tap" size="34609" crc="f27cd7f9" sha1="3782fb31a0e1da2c6b1e72c92d9205e072cab899"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5212,6 +5521,20 @@ Works only on Oric Atmos
 		</part>
 	</software>
 
+	<software name="samegame" supported="no">
+		<description>SameGame</description>
+		<year>2026</year>
+		<publisher>Raxiss</publisher>
+		<notes><![CDATA[
+Keyboard input not detected
+]]></notes>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="31330">
+				<rom name="samegame-v1.tap" size="31330" crc="f705bf2f" sha1="6e8a4ee66f8e4c9b3c1b0415bc65571edd0dda83"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="skoodaze">
 		<description>Skool Daze</description>
 		<year>2012</year>
@@ -5235,13 +5558,25 @@ Works only on Oric Atmos
 	</software>
 
 	<software name="stormlrd_a" cloneof="stormlrd">
-		<description>Stormlord (Atmos)</description>
+		<description>Stormlord (50Hz, Atmos)</description>
 		<year>2010</year>
 		<publisher>Defence Force</publisher>
 		<sharedfeat name="compatibility" value="Atmos"/>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="47254">
 				<rom name="Storm.tap" size="47254" crc="04e4b66e" sha1="6a810866c2ab75e1faca9410e6144729350fb55b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stormlrd_b" cloneof="stormlrd">
+		<description>Stormlord (60Hz, Atmos)</description>
+		<year>2010</year>
+		<publisher>Defence Force</publisher>
+		<sharedfeat name="compatibility" value="Atmos"/>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="47254">
+				<rom name="Storm_60hz_atmos.tap" size="47254" crc="97d9796b" sha1="e76a25f6d7364c4bc3923b1cec1fc4c295584bd3"/>
 			</dataarea>
 		</part>
 	</software>
