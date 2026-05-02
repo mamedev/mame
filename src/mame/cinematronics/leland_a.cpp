@@ -9,7 +9,7 @@
 
     -------------------------------------------------------------------
 
-    1st generation sound hardware was controlled by the master Z80.
+    1st generation sound hardware was controlled by the main Z80.
     It drove either an AY-8910/AY-8912 for music. It also had two DACs
     that were driven by the video refresh. At the end of each scanline
     there are 8-bit DAC samples that can be enabled via the output
@@ -155,7 +155,7 @@ void leland_80186_sound_device::device_add_mconfig(machine_config &config)
 		m_dacvol[i]->add_route(0, m_dac[i], 1.0, DAC_INPUT_RANGE_HI);
 		m_dacvol[i]->add_route(0, m_dac[i], -1.0, DAC_INPUT_RANGE_LO);
 	}
-	AD7533(config, "dac9", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // ad7533.u64
+	AD7533(config, m_dac9, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // ad7533.u64
 
 	PIT8254(config, m_pit[0], 0);
 	m_pit[0]->set_clk<0>(4000000);
@@ -232,7 +232,7 @@ void ataxx_80186_sound_device::device_add_mconfig(machine_config &config)
 		m_dacvol[i]->add_route(0, m_dac[i], 1.0, DAC_INPUT_RANGE_HI);
 		m_dacvol[i]->add_route(0, m_dac[i], -1.0, DAC_INPUT_RANGE_LO);
 	}
-	AD7533(config, "dac9", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	AD7533(config, m_dac9, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 
 	PIT8254(config, m_pit[0], 0);
 	m_pit[0]->set_clk<0>(4000000);
@@ -262,7 +262,7 @@ void wsf_80186_sound_device::device_add_mconfig(machine_config &config)
 		m_dacvol[i]->add_route(0, m_dac[i], 1.0, DAC_INPUT_RANGE_HI);
 		m_dacvol[i]->add_route(0, m_dac[i], -1.0, DAC_INPUT_RANGE_LO); // unknown DAC
 	}
-	AD7533(config, "dac9", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	AD7533(config, m_dac9, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 
 	/* sound hardware */
 	YM2151(config, m_ymsnd, 4000000);
@@ -332,7 +332,7 @@ void leland_80186_sound_device::device_start()
 	m_response_sync = false;
 	m_ext_start = 0;
 	m_ext_stop = 0;
-	m_ext_active = 0;
+	m_ext_active = false;
 }
 
 void leland_80186_sound_device::device_reset()
@@ -343,7 +343,7 @@ void leland_80186_sound_device::device_reset()
 	m_response_sync = false;
 	m_ext_start = 0;
 	m_ext_stop = 0;
-	m_ext_active = 0;
+	m_ext_active = false;
 
 	if (m_type == TYPE_WSF)
 		m_dacvol[3]->write(0xff);  //TODO: determine how to set this if at all
@@ -366,7 +366,17 @@ leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconf
 	, m_pit(*this, "pit%u", 0U)
 	, m_audiocpu(*this, "audiocpu")
 	, m_ymsnd(*this, "ymsnd")
-	, m_master(*this, finder_base::DUMMY_TAG)
+	, m_peripheral(0)
+	, m_last_control(0)
+	, m_clock_active(0)
+	, m_clock_tick(0)
+	, m_sound_command(0)
+	, m_sound_response(0)
+	, m_response_sync(false)
+	, m_ext_start(0)
+	, m_ext_stop(0)
+	, m_ext_active(false)
+	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_ext_base(*this, "ext")
 {
 }
@@ -406,7 +416,7 @@ void leland_80186_sound_device::peripheral_ctrl(offs_t offset, u16 data)
 		case 4:
 		{
 			u32 temp = (m_peripheral & 0xffc0) << 4;
-			if (data & 0x0040)
+			if (BIT(data, 6))
 			{
 				m_audiocpu->space(AS_PROGRAM).install_readwrite_handler(temp, temp + 0x2ff, read16s_delegate(*this, FUNC(leland_80186_sound_device::peripheral_r)), write16s_delegate(*this, FUNC(leland_80186_sound_device::peripheral_w)));
 			}
@@ -434,7 +444,7 @@ void leland_80186_sound_device::peripheral_ctrl(offs_t offset, u16 data)
 void leland_80186_sound_device::leland_80186_control_w(u8 data)
 {
 	/* see if anything changed */
-	int diff = (m_last_control ^ data) & 0xf8;
+	const u8 diff = (m_last_control ^ data) & 0xf8;
 	if (diff == 0)
 		return;
 	m_last_control = data;
@@ -448,20 +458,20 @@ void leland_80186_sound_device::leland_80186_control_w(u8 data)
 			(data & 0x08) ? "" : "  INT1");
 
 	/* /RESET */
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-	m_audiocpu->set_input_line(INPUT_LINE_TEST, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_TEST, BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* /NMI */
-	/*  If the master CPU doesn't get a response by the time it's ready to send
+	/*  If the main CPU doesn't get a response by the time it's ready to send
 	    the next command, it uses an NMI to force the issue; unfortunately, this
 	    seems to really screw up the sound system. It turns out it's better to
 	    just wait for the original interrupt to occur naturally */
 	//m_audiocpu->set_input_line(INPUT_LINE_NMI, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* INT0 */
-	m_audiocpu->int0_w(data & 0x20);
+	m_audiocpu->int0_w(BIT(data, 5));
 	/* INT1 */
-	m_audiocpu->int1_w(data & 0x08);
+	m_audiocpu->int1_w(BIT(data, 3));
 	/* handle reset here */
 	if ((diff & 0x80) && (data & 0x80))
 		reset();
@@ -503,12 +513,12 @@ u8 leland_80186_sound_device::response_r()
 	if (!machine().side_effects_disabled())
 	{
 		/* This is pretty cheesy, but necessary. Since the CPUs run in round-robin order,
-		   synchronizing on the write to this register from the slave side does nothing.
-		   The usual trick with briefly setting perfect quantum on master CPU side write
-		   is also ineffective. In order to make sure the master CPU gets the real response,
+		   synchronizing on the write to this register from the sub side does nothing.
+		   The usual trick with briefly setting perfect quantum on main CPU side write
+		   is also ineffective. In order to make sure the main CPU gets the real response,
 		   we force a synchronize on the read like this. */
 		if (!m_response_sync)
-			m_master->retry_access();
+			m_maincpu->retry_access();
 		else
 			LOGMASKED(LOG_COMM, "%s:Read sound response latch = %02X\n", machine().describe_context(), m_sound_response);
 
@@ -528,7 +538,7 @@ u8 leland_80186_sound_device::response_r()
 
 void leland_80186_sound_device::dac_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	int dac = offset & 7;
+	const int dac = offset & 7;
 
 	/* handle value changes */
 	if (ACCESSING_BITS_0_7)
@@ -558,7 +568,7 @@ void redline_80186_sound_device::redline_dac_w(offs_t offset, u16 data)
 	dac_w(offset, data, 0xffff);
 }
 
-void leland_80186_sound_device::ataxx_dac_control(offs_t offset, u16 data, u16 mem_mask)
+void leland_80186_sound_device::ataxx_dac_control_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -589,11 +599,11 @@ void leland_80186_sound_device::ataxx_dac_control(offs_t offset, u16 data, u16 m
 		switch (offset)
 		{
 		case 0x04:
-			m_ext_active = 1;
+			m_ext_active = true;
 			LOGMASKED(LOG_EXTERN, "External DAC active\n");
 			return;
 		case 0x05:
-			m_ext_active = 0;
+			m_ext_active = false;
 			LOGMASKED(LOG_EXTERN, "External DAC inactive\n");
 			return;
 		case 0x06:
@@ -625,7 +635,7 @@ void leland_80186_sound_device::ataxx_dac_control(offs_t offset, u16 data, u16 m
 
 u16 leland_80186_sound_device::peripheral_r(offs_t offset, u16 mem_mask)
 {
-	int select = offset / 0x40;
+	const int select = offset >> 6;
 	offset &= 0x3f;
 
 	switch (select)
@@ -643,7 +653,8 @@ u16 leland_80186_sound_device::peripheral_r(offs_t offset, u16 mem_mask)
 				return ((m_clock_active << 1) & 0x7e);
 
 		case 1:
-			LOGMASKED(LOG_COMM, "%s:Read sound command latch = %02X\n", machine().describe_context(), m_soundlatch->read());
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_COMM, "%s:Read sound command latch = %02X\n", machine().describe_context(), m_soundlatch->read());
 			return m_soundlatch->read();
 
 		case 2:
@@ -667,12 +678,13 @@ u16 leland_80186_sound_device::peripheral_r(offs_t offset, u16 mem_mask)
 				if (ACCESSING_BITS_0_7)
 					return m_pit[2]->read(offset & 3);
 			}
-			else
+			else if (!machine().side_effects_disabled())
 				LOGMASKED(LOG_WARN, "%s:Unexpected peripheral read %d/%02X\n", machine().describe_context(), select, offset*2);
 			break;
 
 		default:
-			LOGMASKED(LOG_WARN, "%s:Unexpected peripheral read %d/%02X\n", machine().describe_context(), select, offset*2);
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_WARN, "%s:Unexpected peripheral read %d/%02X\n", machine().describe_context(), select, offset*2);
 			break;
 	}
 	return 0xffff;
@@ -681,7 +693,7 @@ u16 leland_80186_sound_device::peripheral_r(offs_t offset, u16 mem_mask)
 
 void leland_80186_sound_device::peripheral_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	int select = offset / 0x40;
+	const int select = offset >> 6;
 	offset &= 0x3f;
 
 	switch (select)
@@ -721,7 +733,7 @@ void leland_80186_sound_device::peripheral_w(offs_t offset, u16 data, u16 mem_ma
 
 		case 5: /* Ataxx/WSF/Indy Heat only */
 			if (m_type > TYPE_REDLINE)
-				ataxx_dac_control(offset, data, mem_mask);
+				ataxx_dac_control_w(offset, data, mem_mask);
 			break;
 
 		default:
@@ -741,7 +753,7 @@ void leland_80186_sound_device::peripheral_w(offs_t offset, u16 data, u16 mem_ma
 void leland_80186_sound_device::ataxx_80186_control_w(u8 data)
 {
 	/* compute the bit-shuffled variants of the bits and then write them */
-	int modified =  ((data & 0x01) << 7) |
+	const u8 modified =  ((data & 0x01) << 7) |
 					((data & 0x02) << 5) |
 					((data & 0x04) << 3) |
 					((data & 0x08) << 1);
