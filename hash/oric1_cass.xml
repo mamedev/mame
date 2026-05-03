@@ -2657,13 +2657,13 @@ The cassette stops during the game loading
 		<year>1983</year>
 		<publisher>Loriciels</publisher>
 		<info name="language" value="French" />
-		<part name="cass" interface="oric1_cass">
+		<part name="cass1" interface="oric1_cass">
 			<feature name="part_id" value="Lent" />
 			<dataarea name="cass" size="34848">
 				<rom name="genius-v2s.tap" size="34848" crc="2afe317e" sha1="d243e0438eb4d5a1fd5eb087da2a3515d6a22e3e"/>
 			</dataarea>
 		</part>
-		<part name="cass" interface="oric1_cass">
+		<part name="cass2" interface="oric1_cass">
 			<feature name="part_id" value="Rapide" />
 			<dataarea name="cass" size="35110">
 				<rom name="genius-v2f.tap" size="35110" crc="84afde0a" sha1="10170b10f8e9b00845a89cfdcbc497473ad5c638"/>
