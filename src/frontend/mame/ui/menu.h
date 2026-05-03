@@ -113,7 +113,7 @@ public:
 	static bool stack_has_special_main_menu(mame_ui_manager &ui) { return get_global_state(ui).stack_has_special_main_menu(); }
 
 	// master handler
-	static delegate<uint32_t ()> get_ui_handler(mame_ui_manager &mui);
+	static delegate<uint32_t ()> get_ui_handler(mame_ui_manager &mui, render_target &target);
 
 	// Used by sliders
 	void validate_selection(int scandir);
@@ -151,14 +151,15 @@ protected:
 		void        *itemref;   // reference for the selected item or nullptr
 		menu_item   *item;      // selected item or nullptr
 		int         iptkey;     // one of the IPT_* values from inpttype.h
-		char32_t    unichar;    // unicode character if iptkey == IPT_SPECIAL
+		char32_t    unichar;    // Unicode character if iptkey == IPT_SPECIAL
 	};
 
-	menu(mame_ui_manager &mui, render_container &container);
+	menu(mame_ui_manager &mui, render_target &target);
 
 	mame_ui_manager &ui() const { return m_ui; }
 	running_machine &machine() const { return m_ui.machine(); }
-	render_container &container() const { return m_container; }
+	render_target &target() const { return *m_target; }
+	render_container &container() const { return *m_target->ui_container(); }
 
 	bool is_special_main_menu() const { return m_special_main_menu; }
 	bool is_one_shot() const { return m_one_shot; }
@@ -216,7 +217,7 @@ protected:
 	float lr_arrow_width() const { return m_lr_arrow_width; }
 	float ud_arrow_width() const { return m_ud_arrow_width; }
 
-	float get_string_width(std::string_view s) { return ui().get_string_width(s, line_height()); }
+	float get_string_width(std::string_view s) { return ui().get_string_width(target(), s, line_height()); }
 	text_layout create_layout(float width = 1.0, text_layout::text_justify justify = text_layout::text_justify::LEFT, text_layout::word_wrapping wrap = text_layout::word_wrapping::WORD);
 
 	void draw_text_normal(
@@ -226,7 +227,7 @@ protected:
 			rgb_t color)
 	{
 		ui().draw_text_full(
-				container(),
+				target(),
 				text,
 				x, y, width, justify, wrap,
 				mame_ui_manager::NORMAL, color, ui().colors().text_bg_color(),
@@ -241,7 +242,7 @@ protected:
 	{
 		float result;
 		ui().draw_text_full(
-				container(),
+				target(),
 				text,
 				x, y, width, justify, wrap,
 				mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
@@ -257,7 +258,7 @@ protected:
 	{
 		std::pair<float, float> result;
 		ui().draw_text_full(
-				container(),
+				target(),
 				text,
 				x, y, width, justify, wrap,
 				mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
@@ -316,7 +317,7 @@ protected:
 		for (Iter it = begin; it != end; ++it)
 		{
 			ui().draw_text_full(
-					container(), std::string_view(*it),
+					target(), std::string_view(*it),
 					textleft, y1, maxwidth, justify, wrap,
 					mame_ui_manager::NORMAL, fgcolor, ui().colors().text_bg_color(),
 					nullptr, nullptr, text_size);
@@ -403,9 +404,9 @@ protected:
 	static T drag_scroll(float location, float base, float &last, float unit, T start, T min, T max)
 	{
 		// set thresholds depending on the direction for hysteresis and clamp to valid range
-		T const target((location - (std::abs(unit) * ((location > last) ? 0.3F : -0.3F)) - base) / unit);
-		last = base + (float(target) * unit);
-		return std::clamp(start + target, min, max);
+		T const targetdelta((location - (std::abs(unit) * ((location > last) ? 0.3F : -0.3F)) - base) / unit);
+		last = base + (float(targetdelta) * unit);
+		return std::clamp(start + targetdelta, min, max);
 	}
 
 private:
@@ -443,6 +444,10 @@ private:
 
 		void hide_menu() { m_hide = true; }
 
+		void set_target(render_target &target)
+		{
+			m_target = &target;
+		}
 		uint32_t ui_handler();
 
 		bool have_pointer() const noexcept
@@ -476,6 +481,7 @@ private:
 
 		bool                            m_hide;
 
+		render_target                   *m_target;
 		s32                             m_current_pointer;      // current active pointer ID or -1 if none
 		osd::ui_event_handler::pointer  m_pointer_type;         // current pointer type
 		u32                             m_pointer_buttons;      // depressed buttons for current pointer
@@ -514,7 +520,7 @@ private:
 
 	void extra_text_draw_box(float origx1, float origx2, float origy, float yspan, std::string_view text, int direction);
 
-	void activate_menu();
+	void activate_menu(render_target &target);
 	bool check_metrics();
 	bool do_rebuild();
 	bool first_item_visible() const { return top_line <= 0; }
@@ -534,7 +540,7 @@ protected: // TODO: remove need to expose these - only used here and in selmenu.
 private:
 	global_state            &m_global_state;        // reference to global state for session
 	mame_ui_manager         &m_ui;                  // UI we are attached to
-	render_container        &m_container;           // render_container we render to
+	render_target           *m_target;              // render_target whose UI container we render into
 	std::unique_ptr<menu>   m_parent;               // pointer to parent menu in the stack
 
 	std::optional<std::string> m_heading;           // menu heading

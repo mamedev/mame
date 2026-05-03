@@ -39,13 +39,14 @@ void namcos21_dsp_device::device_start()
 	m_poly_index = 0;
 	m_poly_size = 0;
 	m_pointrom_addr = 0;
+	m_dsp_busy = 0;
 	m_dsp_complete = 0;
 
 	std::fill(std::begin(m_dspcomram_control), std::end(m_dspcomram_control), 0);
 	std::fill(std::begin(m_poly_buf), std::end(m_poly_buf), 0xffff);
 
-	m_dspcomram = make_unique_clear<u16[]>(0x1000*2);
-	save_pointer(NAME(m_dspcomram), 0x1000*2);
+	m_dspcomram = make_unique_clear<u16[]>(0x800*2);
+	save_pointer(NAME(m_dspcomram), 0x800*2);
 
 	assert((PTRAM_SIZE & (PTRAM_SIZE - 1)) == 0);
 	m_pointram = make_unique_clear<u8[]>(PTRAM_SIZE);
@@ -59,6 +60,7 @@ void namcos21_dsp_device::device_start()
 	save_item(NAME(m_poly_index));
 	save_item(NAME(m_poly_size));
 	save_item(NAME(m_pointrom_addr));
+	save_item(NAME(m_dsp_busy));
 	save_item(NAME(m_dsp_complete));
 }
 
@@ -71,7 +73,6 @@ void namcos21_dsp_device::device_reset()
 {
 	// can't suspend directly from here, needs to be on a timer?
 	m_suspend_timer->adjust(attotime::zero);
-
 	m_poly_index = 0;
 }
 
@@ -79,14 +80,14 @@ void namcos21_dsp_device::device_reset()
 u16 namcos21_dsp_device::dspcomram_r(offs_t offset)
 {
 	int bank = 1 - (m_dspcomram_control[0x4/2] & 1);
-	u16 *mem = &m_dspcomram[0x1000 * bank];
+	u16 *mem = &m_dspcomram[0x800 * bank];
 	return mem[offset];
 }
 
 void namcos21_dsp_device::dspcomram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	int bank = 1 - (m_dspcomram_control[0x4/2] & 1);
-	u16 *mem = &m_dspcomram[0x1000 * bank];
+	u16 *mem = &m_dspcomram[0x800 * bank];
 	COMBINE_DATA(&mem[offset]);
 }
 
@@ -179,13 +180,16 @@ u16 namcos21_dsp_device::dsp_pointrom_data_r()
 	return data;
 }
 
+void namcos21_dsp_device::dsp_busy_w(u16 data)
+{
+	m_dsp_busy = data;
+}
+
 void namcos21_dsp_device::dsp_complete_w(u16 data)
 {
 	if (~m_dsp_complete & data & 1)
 	{
 		m_dsp->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-		m_renderer->swap_and_clear_poly_framebuffer();
-
 		m_poly_index = 0;
 	}
 
@@ -205,33 +209,41 @@ void namcos21_dsp_device::dspbios_w(offs_t offset, u16 data, u16 mem_mask)
 		m_dsp->resume(SUSPEND_REASON_HALT);
 }
 
-// 380000: read : dsp status? 1 = busy
-// 380000: write(0x01) - done before dsp comram init
-// 380004: dspcomram bank, as seen by 68k
-// 380008: read : state?
-
 u16 namcos21_dsp_device::m68k_dspcomram_r(offs_t offset)
 {
 	int bank = m_dspcomram_control[0x4/2] & 1;
-	u16 *mem = &m_dspcomram[0x1000 * bank];
+	u16 *mem = &m_dspcomram[0x800 * bank];
 	return mem[offset];
 }
 
 void namcos21_dsp_device::m68k_dspcomram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	int bank = m_dspcomram_control[0x4/2] & 1;
-	u16 *mem = &m_dspcomram[0x1000 * bank];
+	u16 *mem = &m_dspcomram[0x800 * bank];
 	COMBINE_DATA(&mem[offset]);
 }
 
+// 380000: read: dsp initialising? - 1 = busy
+// 380000: write(0x01): done before dsp comram init
+// 380004: write(bit 0): dspcomram bank, as seen by 68k
+// 380008: read: dsp rendering status - 1 = busy
+
 u16 namcos21_dsp_device::dspcomram_control_r(offs_t offset)
 {
+	if (offset == 0x8/2)
+		return m_dsp_busy;
+
 	return m_dspcomram_control[offset];
 }
 
 void namcos21_dsp_device::dspcomram_control_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	u16 prev = m_dspcomram_control[offset];
 	COMBINE_DATA(&m_dspcomram_control[offset]);
+
+	// also swap poly framebuffer on bankswitch
+	if ((prev ^ m_dspcomram_control[0x4/2]) & 1)
+		m_renderer->swap_and_clear_poly_framebuffer();
 }
 
 
@@ -252,7 +264,7 @@ void namcos21_dsp_device::dsp_io(address_map &map)
 {
 	map(0x08, 0x09).rw(FUNC(namcos21_dsp_device::dsp_pointrom_data_r), FUNC(namcos21_dsp_device::dsp_pointrom_addr_w));
 	map(0x0a, 0x0a).w(FUNC(namcos21_dsp_device::dsp_render_w));
-	map(0x0b, 0x0b).nopw();
+	map(0x0b, 0x0b).w(FUNC(namcos21_dsp_device::dsp_busy_w));
 	map(0x0c, 0x0c).w(FUNC(namcos21_dsp_device::dsp_complete_w));
 }
 

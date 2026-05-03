@@ -26,20 +26,10 @@
 DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_NOSWAP,     vt369_soc_introm_noswap_device,     "vt369_soc",           "VT369 series System on a Chip")
 DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_SWAP,       vt369_soc_introm_swap_device,       "vt369_soc_swap",      "VT369 series System on a Chip (with D5/D6 opcode swapping)")
 DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_ALTSWAP,    vt369_soc_introm_altswap_device,    "vt369_soc_altswap",   "VT369 series System on a Chip (with D1/D4 opcode swapping)")
-DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_VIBESSWAP,  vt369_soc_introm_vibesswap_device,  "vt369_soc_vibesswap", "VT369 series System on a Chip (with D4/D5 opcode swapping)")
-DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_GBOX2020,   vt369_soc_introm_gbox2020_device,   "vt369_soc_gbox2020",  "VT369 series System on a Chip (with D6/D7 + D1/D2 opcode swapping)")
-DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_S10SWAP,    vt369_soc_introm_s10swap_device,    "vt369_soc_s10swap",   "VT369 series System on a Chip (with D4/D5 + D1/D2 opcode swapping)")
-DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_RSPS300SWAP,vt369_soc_introm_rsps300swap_device,"vt369_soc_rsps300",   "VT369 series System on a Chip (with D6/D7 opcode swapping)")
 
 // uncertain
-DEFINE_DEVICE_TYPE(VT3XX_SOC, vt3xx_soc_base_device,          "vt3xx_unknown_soc_cy", "VT3xx series System on a Chip (CY)")
 DEFINE_DEVICE_TYPE(VT3XX_SOC_UNK_DG, vt3xx_soc_unk_dg_device, "vt3xx_unknown_soc_dg", "VT3xx series System on a Chip (DG)")
 
-
-vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	vt3xx_soc_base_device(mconfig, VT3XX_SOC, tag, owner, clock)
-{
-}
 
 vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	nes_vt02_vt03_soc_device(mconfig, type, tag, owner, clock),
@@ -54,8 +44,6 @@ vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config &mconfig, devi
 	m_io_4152_write_callback(*this),
 	m_io_4153_read_callback(*this, 0xff),
 	m_io_4153_write_callback(*this),
-	m_io_413x_write_callback(*this),
-	m_io_413x_read_callback(*this, 0xff),
 	m_io_414a_read_callback(*this, 0xff),
 	m_io_414a_write_callback(*this),
 	m_io_414b_read_callback(*this, 0xff),
@@ -81,31 +69,6 @@ vt369_soc_introm_swap_device::vt369_soc_introm_swap_device(const machine_config 
 
 vt369_soc_introm_altswap_device::vt369_soc_introm_altswap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	vt369_soc_introm_noswap_device(mconfig, VT369_SOC_INTROM_ALTSWAP, tag, owner, clock)
-{
-}
-
-vt369_soc_introm_vibesswap_device::vt369_soc_introm_vibesswap_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
-	vt369_soc_introm_noswap_device(mconfig, type, tag, owner, clock)
-{
-}
-
-vt369_soc_introm_vibesswap_device::vt369_soc_introm_vibesswap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	vt369_soc_introm_vibesswap_device(mconfig, VT369_SOC_INTROM_VIBESSWAP, tag, owner, clock)
-{
-}
-
-vt369_soc_introm_gbox2020_device::vt369_soc_introm_gbox2020_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	vt369_soc_introm_vibesswap_device(mconfig, VT369_SOC_INTROM_GBOX2020, tag, owner, clock)
-{
-}
-
-vt369_soc_introm_s10swap_device::vt369_soc_introm_s10swap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	vt369_soc_introm_vibesswap_device(mconfig, VT369_SOC_INTROM_S10SWAP, tag, owner, clock)
-{
-}
-
-vt369_soc_introm_rsps300swap_device::vt369_soc_introm_rsps300swap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	vt369_soc_introm_noswap_device(mconfig, VT369_SOC_INTROM_RSPS300SWAP, tag, owner, clock)
 {
 }
 
@@ -308,11 +271,7 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 
 	// the ALU is not VT1682 compatible
 	map(0x4130, 0x4137).rw(FUNC(vt3xx_soc_base_device::alu_r), FUNC(vt3xx_soc_base_device::alu_w));
-	//map(0x4138, 0x413d).rw(FUNC(vt3xx_soc_base_device::alu_r), FUNC(vt3xx_soc_base_device::alu_w)); // mirror or 2nd ALU? (probably not, see below)
-
-	map(0x4138, 0x4138).rw(FUNC(vt3xx_soc_base_device::vt_413x_port_direction_r), FUNC(vt3xx_soc_base_device::vt_413x_port_direction_w));
-	map(0x4139, 0x4139).rw(FUNC(vt3xx_soc_base_device::vt_413x_port_in_r), FUNC(vt3xx_soc_base_device::vt_413x_port_out_w));
-	// 413f is also written, could config the port?
+	map(0x4138, 0x413d).rw(FUNC(vt3xx_soc_base_device::alu_r), FUNC(vt3xx_soc_base_device::alu_w)); // mirror or 2nd ALU?
 
 	// 4144
 	// 4147
@@ -340,6 +299,10 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 
 	map(0x418a, 0x418a).r(FUNC(vt3xx_soc_base_device::vt369_418a_r));
 
+	// UART block similar to VT268 (used by gb50_150 for diagnostic output when accessing the SD card)
+	map(0x4199, 0x4199).r(FUNC(vt3xx_soc_base_device::vt369_4199_uart_status_r));
+	map(0x419d, 0x419d).w(FUNC(vt3xx_soc_base_device::vt369_419d_uart_data_w));
+
 	map(0x41b0, 0x41bf).r(FUNC(vt3xx_soc_base_device::vt369_41bx_r)).w(FUNC(vt3xx_soc_base_device::vt369_41bx_w));
 
 	map(0x41e6, 0x41e6).w(FUNC(vt3xx_soc_base_device::extra_io_41e6_w)); // banking on red5mam
@@ -347,6 +310,16 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	map(0x4201, 0x4201).w(FUNC(vt3xx_soc_base_device::highres_sprite_dma_w));
 
 	// 4304
+
+	// 4310-4315 SD Card data out
+	// 4318-431b SD Card data in
+	// 431f
+	// 4322
+	// 4324
+	// 4325
+	map(0x4326, 0x4326).r(FUNC(vt3xx_soc_base_device::vt369_4326_sd_status_r));
+	// 4327
+	// 4328
 
 	map(0x4800, 0x4fff).ram().share("soundram"); // sound program for 2nd CPU is uploaded here, but some sets aren't uploading anything, do they rely on an internal ROM? other DMA? possibility to map ROM?
 
@@ -441,36 +414,6 @@ void vt3xx_soc_base_device::vt_4153_port_out_w(u8 data)
 	logerror("%s: vt_4153_port_out_w %02x (writing to input port?!) (with direction register %02x)\n", machine().describe_context().c_str(), data, m_415x_port_direction);
 	m_4153_port_data = data;
 	m_io_4153_write_callback(data);
-}
-
-// goretrop seems to use a port with 4138 as direction, and 4139 as data for a similar protection
-
-u8 vt3xx_soc_base_device::vt_413x_port_direction_r()
-{
-	logerror("%s: vt_413x_port_direction_r (port 4139 direction)\n", machine().describe_context());
-	return m_413x_port_direction;
-}
-
-void vt3xx_soc_base_device::vt_413x_port_direction_w(u8 data)
-{
-	logerror("%s: vt_413x_port_direction_w %02x (port 4139 direction)\n", machine().describe_context(), data);
-	m_413x_port_direction = data;
-}
-
-void vt3xx_soc_base_device::vt_413x_port_out_w(u8 data)
-{
-	logerror("%s: vt_413x_port_out_w %02x (with direction register %02x)\n", machine().describe_context(), data, m_413x_port_direction);
-	// TODO: pass direction register
-	m_413x_port_data = data;
-	m_io_413x_write_callback(data & m_413x_port_direction);
-}
-
-u8 vt3xx_soc_base_device::vt_413x_port_in_r()
-{
-	logerror("%s: vt_413x_port_in_r (with direction register %02x)\n", machine().describe_context(), m_413x_port_direction);
-	// TODO: pass the direction register
-	u8 ret = m_io_413x_read_callback();
-	return (ret & ~m_413x_port_direction) | (m_413x_port_data & m_413x_port_direction);
 }
 
 // nesvt270 uses 4148 and 414b like they're a port and direction register
@@ -854,8 +797,6 @@ void vt3xx_soc_base_device::device_start()
 	save_item(NAME(m_415x_port_direction));
 	save_item(NAME(m_4152_port_data));
 	save_item(NAME(m_4153_port_data));
-	save_item(NAME(m_413x_port_direction));
-	save_item(NAME(m_413x_port_data));
 	save_item(NAME(m_414x_port_direction));
 	save_item(NAME(m_414a_port_data));
 	save_item(NAME(m_414b_port_data));
@@ -891,8 +832,6 @@ void vt3xx_soc_base_device::device_reset()
 	m_415x_port_direction = 0x00;
 	m_4152_port_data = 0x00;
 	m_4153_port_data = 0x00;
-	m_413x_port_direction = 0x00;
-	m_413x_port_data = 0x00;
 	m_414x_port_direction = 0x00;
 	m_414a_port_data = 0x00;
 	m_414b_port_data = 0x00;
@@ -939,6 +878,24 @@ u8 vt3xx_soc_base_device::vt369_418a_r()
 {
 	logerror("%s: vt369_418a_r (unknown)\n", machine().describe_context());
 	return machine().rand();
+}
+
+u8 vt3xx_soc_base_device::vt369_4199_uart_status_r()
+{
+	return 0x02;
+}
+
+void vt3xx_soc_base_device::vt369_419d_uart_data_w(u8 data)
+{
+	if (data >= 0x20 && data < 0x7f)
+		logerror("%s: vt369_419d_uart_data_w '%c'\n", machine().describe_context(), data);
+	else
+		logerror("%s: vt369_419d_uart_data_w %02x\n", machine().describe_context(), data);
+}
+
+u8 vt3xx_soc_base_device::vt369_4326_sd_status_r()
+{
+	return 0x01;
 }
 
 u8 vt3xx_soc_base_device::read_onespace_bus_with_relative_offset(offs_t offset)
@@ -1005,116 +962,6 @@ void vt369_soc_introm_altswap_device::device_start()
 	vt3xx_soc_base_device::device_start();
 	downcast<rp2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_which_crypt(1);
 	m_encryption_allowed = true;
-}
-
-void vt369_soc_introm_vibesswap_device::device_add_mconfig(machine_config &config)
-{
-	vt369_soc_introm_noswap_device::device_add_mconfig(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &vt369_soc_introm_vibesswap_device::nes_vt_vibes_map);
-}
-
-void vt369_soc_introm_vibesswap_device::device_start()
-{
-	vt3xx_soc_base_device::device_start();
-	downcast<rp2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_which_crypt(2);
-	m_encryption_allowed = true;
-}
-
-void vt369_soc_introm_gbox2020_device::device_start()
-{
-	vt3xx_soc_base_device::device_start();
-	downcast<rp2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_which_crypt(3);
-	m_encryption_allowed = true;
-}
-
-void vt369_soc_introm_s10swap_device::device_start()
-{
-	vt3xx_soc_base_device::device_start();
-	downcast<rp2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_which_crypt(4);
-	m_encryption_allowed = true;
-}
-
-void vt369_soc_introm_rsps300swap_device::device_start()
-{
-	vt3xx_soc_base_device::device_start();
-	downcast<rp2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_which_crypt(5);
-	m_encryption_allowed = true;
-}
-
-/////////
-
-void vt369_soc_introm_vibesswap_device::vibes_411c_w(u8 data)
-{
-	if (m_encryption_allowed)
-	{
-		if (data == 0x05)
-			downcast<rp2a03_core_swap_op_d5_d6&>(*m_maincpu).set_encryption_state(false);
-		else if (data == 0x07 || data == 0x87) // why 0x07 to enable in some cases here?
-			downcast<rp2a03_core_swap_op_d5_d6&>(*m_maincpu).set_encryption_state(true);
-		else
-			logerror("%s: vibes_411c_w %02x (unknown)\n", machine().describe_context(), data);
-	}
-}
-
-void vt369_soc_introm_vibesswap_device::nes_vt_vibes_map(address_map &map)
-{
-	vt3xx_soc_base_device::vt369_map(map);
-	map(0x411c, 0x411c).w(FUNC(vt369_soc_introm_vibesswap_device::vibes_411c_w));
-}
-
-/////////
-
-void vt369_soc_introm_gbox2020_device::gbox_411c_w(u8 data)
-{
-	if (m_encryption_allowed)
-	{
-		if (data == 0x05)
-			downcast<rp2a03_core_swap_op_d5_d6&>(*m_maincpu).set_encryption_state(false);
-		else if (data == 0xc5)
-			downcast<rp2a03_core_swap_op_d5_d6&>(*m_maincpu).set_encryption_state(true);
-		else
-			logerror("%s: gbox_411c_w %02x (unknown)\n", machine().describe_context(), data);
-	}
-}
-
-void vt369_soc_introm_gbox2020_device::nes_vt_gbox_map(address_map &map)
-{
-	vt3xx_soc_base_device::vt369_map(map);
-	map(0x411c, 0x411c).w(FUNC(vt369_soc_introm_gbox2020_device::gbox_411c_w));
-}
-
-void vt369_soc_introm_gbox2020_device::device_add_mconfig(machine_config &config)
-{
-	vt369_soc_introm_noswap_device::device_add_mconfig(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &vt369_soc_introm_gbox2020_device::nes_vt_gbox_map);
-}
-
-/////////
-
-void vt369_soc_introm_rsps300swap_device::rsps_411c_w(u8 data)
-{
-	if (m_encryption_allowed)
-	{
-		if (data == 0x05)
-			downcast<rp2a03_core_swap_op_d5_d6&>(*m_maincpu).set_encryption_state(false);
-		else
-			logerror("%s: gbox_411c_w %02x (unknown)\n", machine().describe_context(), data);
-	}
-}
-
-void vt369_soc_introm_rsps300swap_device::nes_vt_rsps_map(address_map &map)
-{
-	vt3xx_soc_base_device::vt369_map(map);
-	map(0x411c, 0x411c).w(FUNC(vt369_soc_introm_rsps300swap_device::rsps_411c_w));
-}
-
-void vt369_soc_introm_rsps300swap_device::device_add_mconfig(machine_config &config)
-{
-	vt369_soc_introm_noswap_device::device_add_mconfig(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &vt369_soc_introm_rsps300swap_device::nes_vt_rsps_map);
 }
 
 /***********************************************************************************************************************************************************/

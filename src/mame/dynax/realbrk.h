@@ -57,9 +57,9 @@ private:
 	optional_ioport_array<2> m_paddle_io;
 	optional_ioport_array<2> m_player_io;
 
-	std::unique_ptr<bitmap_ind16> m_tmpbitmap0;
-	std::unique_ptr<bitmap_ind16> m_tmpbitmap1;
-	int m_disable_video = 0;
+	bitmap_ind16 m_tmpbitmap0;
+	bitmap_ind16 m_tmpbitmap1;
+	bool m_disable_video = false;
 	tilemap_t *m_tilemap[3]{};
 
 	// common

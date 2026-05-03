@@ -103,7 +103,7 @@ private:
 class menu_game_info : public menu_textbox
 {
 public:
-	menu_game_info(mame_ui_manager &mui, render_container &container);
+	menu_game_info(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_game_info() override;
 
 protected:
@@ -118,7 +118,7 @@ private:
 class menu_warn_info : public menu_textbox
 {
 public:
-	menu_warn_info(mame_ui_manager &mui, render_container &container);
+	menu_warn_info(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_warn_info() override;
 
 protected:
@@ -132,7 +132,7 @@ private:
 class menu_image_info : public menu
 {
 public:
-	menu_image_info(mame_ui_manager &mui, render_container &container);
+	menu_image_info(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_image_info() override;
 
 protected:

@@ -6,7 +6,7 @@ license:CC0-1.0
 TODO:
 - split SWs that works on regular SMC-70 once we have a BIOS for that;
 - inherit undumped list from http://www.smc777.com/alllist.htm
-- Hunt s
+- Fill in missing serial numbers (is an actual catalog available anywhere?)
 
 Dumps needed: (Info taken from: http://home.pacbell.net/smc777/comsoft.htm )
 
@@ -28,8 +28,8 @@ SMCゲームパックI
 Home:
   ユーカラJJ - Yukar JJ
   グラフィックエディター(市販版) (one of these should be graphed)
-  グラフィックエディター(777C添付版)
-  ラッサピアターE - Rassapiator E
+  グラフィックエディター(777C添付版) (SMW-S701D)
+  ラッサピアター - Rassapiator (unless it's available from rassapi)
 
 Education:
   グラフィックスの世界(入門編) - (one of these should be graphw)
@@ -1152,7 +1152,7 @@ Not extensively tested (language barrier)
 		</part>
 	</software>
 
-<!-- !Applications (Home/Hobby) SMW-H7* -->
+<!-- !Applications (Home/Hobby) SMW-H7* / SMJ-S* -->
 
 	<software name="cookcat" supported="no">
 		<description>Cookin' Cat</description>
@@ -1209,15 +1209,18 @@ Not extensively tested (language barrier)
 
 	<software name="rassapi" supported="no">
 		<!-- TODO: this may really be Rassapiator-E (boots as such by default) -->
-		<!-- Unless both versions exist over the same disk? -->
-		<description>Rassapiator</description>
+		<!-- Unless both versions exist over the same disk (unlikely?) -->
+		<description>Rassapiator-E</description>
 		<year>198?</year>
-		<publisher>Sony / Kamiya Studio</publisher>
+		<!-- "Kamiya" on boxart, assume self-published also from SKU pattern. -->
+		<!-- Regular Rassapiator may be Sony published instead. -->
+		<publisher>Kamiya</publisher>
 		<notes><![CDATA[
 [MC6845] missing graphics layer, bad palette?
 Probes if system is in SMC-70 mode a lot
 ]]></notes>
-		<info name="alt_title" value="ラッサピアター"/>
+		<info name="alt_title" value="ラッサピアターE"/>
+		<info name="serial" value="SMJ-S055D"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">

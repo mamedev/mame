@@ -380,8 +380,8 @@ private:
 //  ctor
 //-------------------------------------------------
 
-menu_select_software::menu_select_software(mame_ui_manager &mui, render_container &container, ui_system_info const &system)
-	: menu_select_launch(mui, container, true)
+menu_select_software::menu_select_software(mame_ui_manager &mui, render_target &target, ui_system_info const &system)
+	: menu_select_launch(mui, target, true)
 	, m_icon_paths()
 	, m_system(system)
 	, m_displaylist()
@@ -714,7 +714,7 @@ void menu_select_software::get_selection(ui_software_info const *&software, ui_s
 
 void menu_select_software::show_config_menu(int index)
 {
-	menu::stack_push<menu_machine_configure>(ui(), container(), m_system, nullptr);
+	menu::stack_push<menu_machine_configure>(ui(), target(), m_system, nullptr);
 }
 
 
@@ -747,7 +747,7 @@ void menu_select_software::filter_selected(int index)
 
 	m_data->get_filter(software_filter::type(index)).show_ui(
 			ui(),
-			container(),
+			target(),
 			[this] (software_filter &filter)
 			{
 				software_filter::type const new_type(filter.get_type());

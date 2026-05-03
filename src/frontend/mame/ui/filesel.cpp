@@ -55,7 +55,7 @@ namespace ui {
 
 menu_file_selector::menu_file_selector(
 		mame_ui_manager &mui,
-		render_container &container,
+		render_target &target,
 		device_image_interface *image,
 		std::string_view directory,
 		std::string_view file,
@@ -63,7 +63,7 @@ menu_file_selector::menu_file_selector(
 		bool has_softlist,
 		bool has_create,
 		handler_function &&handler)
-	: menu(mui, container)
+	: menu(mui, target)
 	, m_handler(std::move(handler))
 	, m_image(image)
 	, m_current_directory(directory)
@@ -650,10 +650,10 @@ bool menu_file_selector::handle(event const *ev)
 
 menu_select_rw::menu_select_rw(
 		mame_ui_manager &mui,
-		render_container &container,
+		render_target &target,
 		bool can_in_place,
 		handler_function &&handler)
-	: menu(mui, container)
+	: menu(mui, target)
 	, m_handler(std::move(handler))
 	, m_can_in_place(can_in_place)
 	, m_result(result::INVALID)

@@ -251,6 +251,24 @@ private:
 };
 
 
+
+inline render_target &mame_ui_manager::current_ui_target() const
+{
+	if (m_ui_target)
+	{
+		return *m_ui_target;
+	}
+	else if (m_ui_follow_focus)
+	{
+		render_target *const focused = machine().ui_input().last_focused_target();
+		if (focused)
+			return *focused;
+	}
+	return machine().render().ui_target();
+}
+
+
+
 //-------------------------------------------------
 //  ctor - set up the user interface
 //-------------------------------------------------
@@ -260,7 +278,9 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_font()
 	, m_handler_callback()
 	, m_handler_callback_type(ui_callback_type::NOINPUT)
+	, m_ui_target(nullptr)
 	, m_ui_active(true)
+	, m_paused_for_menu(false)
 	, m_single_step(false)
 	, m_showfps(false)
 	, m_showfps_end(0)
@@ -272,6 +292,7 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_pointers_changed(false)
 	, m_target_font_height(0)
 	, m_unthrottle_mute(false)
+	, m_ui_follow_focus(false)
 	, m_image_display_enabled(true)
 	, m_machine_info()
 	, m_unemulated_features()
@@ -295,16 +316,18 @@ void mame_ui_manager::init()
 	// initialize the other UI bits
 	m_ui_colors.refresh(options());
 
-	// update font row info from setting
+	// cache some options to avoid repeated parsing
 	update_target_font_height();
+	m_unthrottle_mute = options().unthrottle_mute();
+	m_ui_follow_focus = options().ui_follow_focus();
 
 	// more initialization
 	set_handler(
 			ui_callback_type::NOINPUT,
 			handler_callback_func(
-				[this, &container = machine().render().ui_container()] () -> uint32_t
+				[this, &target = machine().render().ui_target()] () -> uint32_t
 				{
-					draw_text_box(container, messagebox_text, ui::text_layout::text_justify::LEFT, 0.5f, 0.5f, colors().background_color());
+					draw_text_box(target, messagebox_text, ui::text_layout::text_justify::LEFT, 0.5F, 0.5F, colors().background_color());
 					return 0;
 				}));
 	m_non_char_keys_down = std::make_unique<uint8_t[]>((std::size(non_char_keys) + 7) / 8);
@@ -335,7 +358,7 @@ void mame_ui_manager::init()
 
 void mame_ui_manager::update_target_font_height()
 {
-	m_target_font_height = 1.0f / options().font_rows();
+	m_target_font_height = 1.0F / options().font_rows();
 }
 
 
@@ -579,7 +602,6 @@ void mame_ui_manager::initialize(running_machine &machine)
 	// handle throttle-related options and initial muting state now that the sound manager has been brought up
 	const bool starting_throttle = machine.options().throttle();
 	machine.video().set_throttled(starting_throttle);
-	m_unthrottle_mute = options().unthrottle_mute();
 	if (!starting_throttle && m_unthrottle_mute)
 		machine.sound().ui_mute(true);
 }
@@ -652,10 +674,10 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	rgb_t warning_color;
 	bool config_menu = false;
 	auto handler_messagebox_anykey =
-		[this, &poller, &warning_text, &warning_color, &config_menu, &container = machine().render().ui_container()] () -> uint32_t
+		[this, &poller, &warning_text, &warning_color, &config_menu, &target = machine().render().ui_target()] () -> uint32_t
 		{
 			// draw a standard message window
-			draw_text_box(container, warning_text, ui::text_layout::text_justify::LEFT, 0.5f, 0.5f, warning_color);
+			draw_text_box(target, warning_text, ui::text_layout::text_justify::LEFT, 0.5F, 0.5F, warning_color);
 
 			if (machine().ui_input().pressed(IPT_UI_CANCEL))
 			{
@@ -821,7 +843,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 						[&warning] (const std::reference_wrapper<const std::string> &img) { warning << '"' << img.get() << '"'; },
 						[&warning] () { warning << ", "; });
 
-				ui::menu_file_manager::force_file_manager(*this, machine().render().ui_container(), std::move(warning).str());
+				ui::menu_file_manager::force_file_manager(*this, machine().render().ui_target(), std::move(warning).str());
 			}
 			break;
 		}
@@ -858,12 +880,14 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	// if we're the empty driver, force the menus on
 	if (ui::menu::stack_has_special_main_menu(*this))
 	{
-		show_menu();
+		m_ui_target = &machine().render().ui_target();
+		activate_menu();
 	}
 	else if (config_menu)
 	{
-		ui::menu::stack_push<ui::menu_main>(*this, machine().render().ui_container());
-		show_menu();
+		m_ui_target = &machine().render().ui_target();
+		ui::menu::stack_push<ui::menu_main>(*this, *m_ui_target);
+		activate_menu();
 
 		// loop while we have a handler
 		while (m_handler_callback_type != ui_callback_type::GENERAL && !machine().scheduled_event_pending())
@@ -899,7 +923,7 @@ void mame_ui_manager::set_startup_text(const char *text, bool force)
 //  render it; called by video.c
 //-------------------------------------------------
 
-bool mame_ui_manager::update_and_render(render_container &container)
+bool mame_ui_manager::update_and_render(render_target &target)
 {
 	// always start clean
 	for (auto &target : machine().render().targets())
@@ -911,22 +935,28 @@ bool mame_ui_manager::update_and_render(render_container &container)
 	// if we're paused, dim the whole screen
 	if (machine().phase() >= machine_phase::RESET && (single_step() || machine().paused()))
 	{
-		int alpha = (1.0f - machine().options().pause_brightness()) * 255.0f;
+		int alpha = (1.0F - machine().options().pause_brightness()) * 255.0F;
 		if (ui::menu::stack_has_special_main_menu(*this))
 			alpha = 255;
 		if (alpha > 255)
 			alpha = 255;
 		if (alpha >= 0)
-			container.add_rect(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(alpha,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		{
+			for (auto &target : machine().render().targets())
+			{
+				if (target.ui_container())
+					target.ui_container()->add_rect(0.0F, 0.0F, 1.0F, 1.0F, rgb_t(alpha,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			}
+		}
 	}
 
 	// render any cheat stuff at the bottom
 	if (machine().phase() >= machine_phase::RESET)
-		mame_machine_manager::instance()->cheat().render_text(*this, container);
+		mame_machine_manager::instance()->cheat().render_text(*this, target);
 
 	// draw the FPS counter if it should be visible
 	if (show_fps_counter())
-		draw_fps_counter(container);
+		draw_fps_counter(current_ui_target());
 
 	// call the current UI handler
 	machine().ui_input().check_ui_inputs();
@@ -934,7 +964,7 @@ bool mame_ui_manager::update_and_render(render_container &container)
 
 	// display any popup messages
 	if (osd_ticks() < m_popup_text_end)
-		draw_text_box(container, messagebox_poptext, ui::text_layout::text_justify::CENTER, 0.5f, 0.9f, colors().background_color());
+		draw_text_box(current_ui_target(), messagebox_poptext, ui::text_layout::text_justify::CENTER, 0.5F, 0.9F, colors().background_color());
 	else
 		m_popup_text_end = 0;
 
@@ -943,14 +973,15 @@ bool mame_ui_manager::update_and_render(render_container &container)
 	m_pointers_changed = false;
 	if (!is_menu_active() || machine().options().ui_mouse())
 	{
-		const float cursor_size = 0.6 * get_line_height();
 		for (auto const &pointer : m_display_pointers)
 		{
-			render_container &container = *pointer.target.get().ui_container();
+			render_target &target = pointer.target;
+			render_container &container = *target.ui_container();
+			const float cursor_size = 0.6 * get_line_height(target);
 			container.add_quad(
 					pointer.x,
 					pointer.y,
-					pointer.x + cursor_size * container.manager().ui_aspect(&container),
+					pointer.x + cursor_size * container.manager().ui_aspect(target),
 					pointer.y + cursor_size,
 					rgb_t::white(),
 					m_mouse_arrow_texture,
@@ -961,6 +992,12 @@ bool mame_ui_manager::update_and_render(render_container &container)
 	// cancel takes us back to the in-game handler
 	if (handler_result & HANDLER_CANCEL)
 	{
+		m_ui_target = nullptr;
+		if (m_paused_for_menu && machine().paused())
+		{
+			machine().resume();
+			m_paused_for_menu = false;
+		}
 		machine().ui_input().reset();
 		set_handler(ui_callback_type::GENERAL, handler_callback_func(&mame_ui_manager::handler_ingame, this));
 	}
@@ -975,7 +1012,7 @@ bool mame_ui_manager::update_and_render(render_container &container)
 
 render_font *mame_ui_manager::get_font()
 {
-	// allocate the font and messagebox string
+	// allocate the font if necessary
 	if (!m_font)
 		m_font = machine().render().font_alloc(machine().options().ui_font());
 	return m_font.get();
@@ -987,10 +1024,10 @@ render_font *mame_ui_manager::get_font()
 //  of a line
 //-------------------------------------------------
 
-float mame_ui_manager::get_line_height(float scale)
+float mame_ui_manager::get_line_height(render_target &target, float scale)
 {
 	int32_t const raw_font_pixel_height = get_font()->pixel_height();
-	float target_pixel_height = machine().render().ui_target().height();
+	float target_pixel_height = target.height();
 
 	// compute the font pixel height at the nominal size
 	float const one_to_one_line_height = float(raw_font_pixel_height) / target_pixel_height;
@@ -1002,10 +1039,10 @@ float mame_ui_manager::get_line_height(float scale)
 	if (raw_font_pixel_height < 24)
 	{
 		// do we want to scale smaller? only do so if we exceed the threshold
-		if (scale_factor <= 1.0f)
+		if (scale_factor <= 1.0F)
 		{
 			if (one_to_one_line_height < UI_MAX_FONT_HEIGHT || raw_font_pixel_height < 12)
-				scale_factor = 1.0f;
+				scale_factor = 1.0F;
 		}
 		else
 		{
@@ -1029,9 +1066,9 @@ float mame_ui_manager::get_line_height(float scale)
 //  single character
 //-------------------------------------------------
 
-float mame_ui_manager::get_char_width(char32_t ch)
+float mame_ui_manager::get_char_width(render_target &target, char32_t ch)
 {
-	return get_font()->char_width(get_line_height(), machine().render().ui_aspect(), ch);
+	return get_font()->char_width(get_line_height(target), machine().render().ui_aspect(target), ch);
 }
 
 
@@ -1040,14 +1077,14 @@ float mame_ui_manager::get_char_width(char32_t ch)
 //  character string
 //-------------------------------------------------
 
-float mame_ui_manager::get_string_width(std::string_view s)
+float mame_ui_manager::get_string_width(render_target &target, std::string_view s)
 {
-	return get_string_width(s, get_line_height());
+	return get_string_width(target, s, get_line_height(target));
 }
 
-float mame_ui_manager::get_string_width(std::string_view s, float text_size)
+float mame_ui_manager::get_string_width(render_target &target, std::string_view s, float text_size)
 {
-	return get_font()->utf8string_width(text_size, machine().render().ui_aspect(), s);
+	return get_font()->utf8string_width(text_size, machine().render().ui_aspect(target), s);
 }
 
 
@@ -1083,12 +1120,12 @@ void mame_ui_manager::draw_outlined_box(render_container &container, float x0, f
 //  draw_text - simple text renderer
 //-------------------------------------------------
 
-void mame_ui_manager::draw_text(render_container &container, std::string_view buf, float x, float y)
+void mame_ui_manager::draw_text(render_target &target, std::string_view buf, float x, float y)
 {
 	draw_text_full(
-			container,
+			target,
 			buf,
-			x, y, 1.0f - x,
+			x, y, 1.0F - x,
 			ui::text_layout::text_justify::LEFT, ui::text_layout::word_wrapping::WORD,
 			mame_ui_manager::NORMAL, colors().text_color(), colors().text_bg_color(), nullptr, nullptr);
 }
@@ -1101,7 +1138,7 @@ void mame_ui_manager::draw_text(render_container &container, std::string_view bu
 //-------------------------------------------------
 
 void mame_ui_manager::draw_text_full(
-		render_container &container,
+		render_target &target,
 		std::string_view origs,
 		float x, float y, float origwrapwidth,
 		ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap,
@@ -1109,13 +1146,32 @@ void mame_ui_manager::draw_text_full(
 		float *totalwidth, float *totalheight)
 {
 	draw_text_full(
-			container,
+			target,
 			origs,
 			x, y, origwrapwidth,
 			justify, wrap,
 			draw, fgcolor, bgcolor,
 			totalwidth, totalheight,
-			get_line_height());
+			get_line_height(target));
+}
+
+void mame_ui_manager::draw_text_full(
+		render_target &target,
+		std::string_view origs,
+		float x, float y, float origwrapwidth,
+		ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap,
+		draw_mode draw, rgb_t fgcolor, rgb_t bgcolor,
+		float *totalwidth, float *totalheight,
+		float text_size)
+{
+	draw_text_full(
+			*target.ui_container(),
+			origs,
+			x, y, origwrapwidth,
+			justify, wrap,
+			draw, fgcolor, bgcolor,
+			totalwidth, totalwidth,
+			text_size, machine().render().ui_aspect(target));
 }
 
 void mame_ui_manager::draw_text_full(
@@ -1127,9 +1183,28 @@ void mame_ui_manager::draw_text_full(
 		float *totalwidth, float *totalheight,
 		float text_size)
 {
+	draw_text_full(
+			container,
+			origs,
+			x, y, origwrapwidth,
+			justify, wrap,
+			draw, fgcolor, bgcolor,
+			totalwidth, totalwidth,
+			text_size, machine().render().ui_aspect(container));
+}
+
+void mame_ui_manager::draw_text_full(
+		render_container &container,
+		std::string_view origs,
+		float x, float y, float origwrapwidth,
+		ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap,
+		draw_mode draw, rgb_t fgcolor, rgb_t bgcolor,
+		float *totalwidth, float *totalheight,
+		float text_size, float aspect)
+{
 	// create the layout
 	ui::text_layout layout(
-			*get_font(), machine().render().ui_aspect(&container) * text_size, text_size,
+			*get_font(), text_size * aspect, text_size,
 			origwrapwidth, justify, wrap);
 
 	// append text to it
@@ -1155,19 +1230,19 @@ void mame_ui_manager::draw_text_full(
 //  message with a box around it
 //-------------------------------------------------
 
-void mame_ui_manager::draw_text_box(render_container &container, std::string_view text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor)
+void mame_ui_manager::draw_text_box(render_target &target, std::string_view text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor)
 {
 	// cap the maximum width
-	float maximum_width = 1.0f - (box_lr_border() * machine().render().ui_aspect(&container) * 2.0f);
+	float maximum_width = 1.0F - (box_lr_border() * machine().render().ui_aspect(target) * 2.0F);
 
 	// create a layout
-	ui::text_layout layout = create_layout(container, maximum_width, justify);
+	ui::text_layout layout = create_layout(target, maximum_width, justify);
 
 	// add text to it
 	layout.add_text(text);
 
 	// and draw the result
-	draw_text_box(container, layout, xpos, ypos, backcolor);
+	draw_text_box(target, layout, xpos, ypos, backcolor);
 }
 
 
@@ -1176,25 +1251,25 @@ void mame_ui_manager::draw_text_box(render_container &container, std::string_vie
 //  message with a box around it
 //-------------------------------------------------
 
-void mame_ui_manager::draw_text_box(render_container &container, ui::text_layout &layout, float xpos, float ypos, rgb_t backcolor)
+void mame_ui_manager::draw_text_box(render_target &target, ui::text_layout &layout, float xpos, float ypos, rgb_t backcolor)
 {
 	// xpos and ypos are where we want to "pin" the layout, but we need to adjust for the actual size of the payload
-	auto const lrborder = box_lr_border() * machine().render().ui_aspect(&container);
+	auto const lrborder = box_lr_border() * machine().render().ui_aspect(target);
 	auto const actual_left = layout.actual_left();
 	auto const actual_width = layout.actual_width();
 	auto const actual_height = layout.actual_height();
-	auto const x = std::clamp(xpos - actual_width / 2, lrborder, 1.0f - actual_width - lrborder);
-	auto const y = std::clamp(ypos - actual_height / 2, box_tb_border(), 1.0f - actual_height - box_tb_border());
+	auto const x = std::clamp(xpos - actual_width / 2, lrborder, 1.0F - actual_width - lrborder);
+	auto const y = std::clamp(ypos - actual_height / 2, box_tb_border(), 1.0F - actual_height - box_tb_border());
 
 	// add a box around that
 	draw_outlined_box(
-			container,
+			*target.ui_container(),
 			x - lrborder, y - box_tb_border(),
 			x + actual_width + lrborder, y + actual_height + box_tb_border(),
 			backcolor);
 
 	// emit the text
-	layout.emit(container, x - actual_left, y);
+	layout.emit(*target.ui_container(), x - actual_left, y);
 }
 
 
@@ -1203,9 +1278,9 @@ void mame_ui_manager::draw_text_box(render_container &container, ui::text_layout
 //  message with a box around it
 //-------------------------------------------------
 
-void mame_ui_manager::draw_message_window(render_container &container, std::string_view text)
+void mame_ui_manager::draw_message_window(render_target &target, std::string_view text)
 {
-	draw_text_box(container, text, ui::text_layout::text_justify::LEFT, 0.5f, 0.5f, colors().background_color());
+	draw_text_box(target, text, ui::text_layout::text_justify::LEFT, 0.5F, 0.5F, colors().background_color());
 }
 
 
@@ -1283,15 +1358,39 @@ bool mame_ui_manager::show_profiler() const
 //  show_menu - show the menus
 //-------------------------------------------------
 
-void mame_ui_manager::show_menu()
+bool mame_ui_manager::show_menu()
 {
+	return show_menu(current_ui_target());
+}
+
+bool mame_ui_manager::show_menu(render_target &target)
+{
+	if (ui_callback_type::GENERAL != m_handler_callback_type)
+		return false;
+
+	m_ui_target = &target;
+	if (ui::menu::stack_empty(*this))
+		ui::menu::stack_push<ui::menu_main>(*this, *m_ui_target);
+	activate_menu();
+	return true;
+}
+
+
+//-------------------------------------------------
+//  activate_menu - show the menus
+//-------------------------------------------------
+
+void mame_ui_manager::activate_menu()
+{
+	assert(m_ui_target);
+
 	for (auto *target = machine().render().first_target(); target; target = target->next())
 	{
 		if (!target->hidden())
 			target->forget_pointers();
 	}
 
-	set_handler(ui_callback_type::MENU, ui::menu::get_ui_handler(*this));
+	set_handler(ui_callback_type::MENU, ui::menu::get_ui_handler(*this, *m_ui_target));
 }
 
 
@@ -1474,12 +1573,12 @@ bool mame_ui_manager::can_paste()
 //  draw_fps_counter
 //-------------------------------------------------
 
-void mame_ui_manager::draw_fps_counter(render_container &container)
+void mame_ui_manager::draw_fps_counter(render_target &target)
 {
 	draw_text_full(
-			container,
+			target,
 			machine().video().speed_text(),
-			0.0f, 0.0f, 1.0f,
+			0.0F, 0.0F, 1.0F,
 			ui::text_layout::text_justify::RIGHT, ui::text_layout::word_wrapping::WORD,
 			OPAQUE_, colors().text_color(), colors().background_color(), nullptr, nullptr);
 }
@@ -1489,13 +1588,13 @@ void mame_ui_manager::draw_fps_counter(render_container &container)
 //  draw_profiler
 //-------------------------------------------------
 
-void mame_ui_manager::draw_profiler(render_container &container)
+void mame_ui_manager::draw_profiler(render_target &target)
 {
 	std::string_view text = g_profiler.text(machine());
 	draw_text_full(
-			container,
+			target,
 			text,
-			0.0f, 0.0f, 1.0f,
+			0.0F, 0.0F, 1.0F,
 			ui::text_layout::text_justify::LEFT, ui::text_layout::word_wrapping::WORD,
 			OPAQUE_, colors().text_color(), colors().background_color(), nullptr, nullptr);
 }
@@ -1511,7 +1610,8 @@ void mame_ui_manager::image_handler_ingame()
 	// run display routine for devices
 	if (m_image_display_enabled && machine().phase() == machine_phase::RUNNING)
 	{
-		auto layout = create_layout(machine().render().ui_container());
+		render_target &target(current_ui_target());
+		auto layout = create_layout(target);
 
 		// loop through all devices, build their text into the layout
 		for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
@@ -1527,9 +1627,9 @@ void mame_ui_manager::image_handler_ingame()
 		// did we actually create anything?
 		if (!layout.empty())
 		{
-			float x = 0.2f;
-			float y = 0.5f * get_line_height() + 2.0f * box_tb_border();
-			draw_text_box(machine().render().ui_container(), layout, x, y, colors().background_color());
+			float x = 0.2F;
+			float y = 0.5F * get_line_height(target) + 2.0F * box_tb_border();
+			draw_text_box(target, layout, x, y, colors().background_color());
 		}
 	}
 }
@@ -1548,7 +1648,7 @@ uint32_t mame_ui_manager::handler_ingame()
 
 	// draw the profiler if visible
 	if (show_profiler())
-		draw_profiler(machine().render().ui_container());
+		draw_profiler(current_ui_target());
 
 	// if we're single-stepping, pause now
 	if (single_step())
@@ -1626,17 +1726,24 @@ uint32_t mame_ui_manager::handler_ingame()
 	// turn on menus if requested
 	if (machine().ui_input().pressed(IPT_UI_MENU))
 	{
+		m_ui_target = &current_ui_target();
+		if (!machine().paused() && options().menu_pause())
+		{
+			machine().pause();
+			m_paused_for_menu = true;
+		}
 		if (ui::menu::stack_empty(*this))
-			ui::menu::stack_push<ui::menu_main>(*this, machine().render().ui_container());
-		show_menu();
+			ui::menu::stack_push<ui::menu_main>(*this, *m_ui_target);
+		activate_menu();
 		return 0;
 	}
 
 	// if the on-screen display isn't up and the user has toggled it, turn it on
 	if (!get_slider_list().empty() && !(machine().debug_flags & DEBUG_FLAG_ENABLED) && machine().ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
 	{
-		ui::menu::stack_push<ui::menu_sliders>(*this, machine().render().ui_container(), true);
-		show_menu();
+		m_ui_target = &current_ui_target();
+		ui::menu::stack_push<ui::menu_sliders>(*this, *m_ui_target, true);
+		activate_menu();
 		return 0;
 	}
 
@@ -1657,13 +1764,13 @@ uint32_t mame_ui_manager::handler_ingame()
 
 		if (!is_paused)
 			machine().pause();
-		using namespace std::placeholders;
+		m_ui_target = &current_ui_target();
 		set_handler(
 				ui_callback_type::MENU,
 				handler_callback_func(
-					[this, is_paused, &container = machine().render().ui_container()] () -> uint32_t
+					[this, is_paused] () -> uint32_t
 					{
-						return ui_gfx_ui_handler(container, *this, is_paused);
+						return ui_gfx_ui_handler(*m_ui_target, *this, is_paused);
 					}));
 		return 0;
 	}
@@ -1689,16 +1796,18 @@ uint32_t mame_ui_manager::handler_ingame()
 	// handle a save state request
 	if (machine().ui_input().pressed(IPT_UI_SAVE_STATE))
 	{
-		ui::menu::stack_push<ui::menu_save_state>(*this, machine().render().ui_container(), true);
-		show_menu();
+		m_ui_target = &current_ui_target();
+		ui::menu::stack_push<ui::menu_save_state>(*this, *m_ui_target, true);
+		activate_menu();
 		return 0;
 	}
 
 	// handle a load state request
 	if (machine().ui_input().pressed(IPT_UI_LOAD_STATE))
 	{
-		ui::menu::stack_push<ui::menu_load_state>(*this, machine().render().ui_container(), true);
-		show_menu();
+		m_ui_target = &current_ui_target();
+		ui::menu::stack_push<ui::menu_load_state>(*this, *m_ui_target, true);
+		activate_menu();
 		return 0;
 	}
 
@@ -1797,8 +1906,14 @@ void mame_ui_manager::request_quit()
 	}
 	else
 	{
-		ui::menu::stack_push<ui::menu_confirm_quit>(*this, machine().render().ui_container());
-		show_menu();
+		m_ui_target = &current_ui_target();
+		if (!machine().paused())
+		{
+			machine().pause();
+			m_paused_for_menu = true;
+		}
+		ui::menu::stack_push<ui::menu_confirm_quit>(*this, *m_ui_target);
+		activate_menu();
 	}
 }
 
@@ -1952,10 +2067,10 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 	screen_device_enumerator scriter(machine.root_device());
 	for (screen_device &screen : scriter)
 	{
-		int defxscale = floorf(screen.xscale() * 1000.0f + 0.5f);
-		int defyscale = floorf(screen.yscale() * 1000.0f + 0.5f);
-		int defxoffset = floorf(screen.xoffset() * 1000.0f + 0.5f);
-		int defyoffset = floorf(screen.yoffset() * 1000.0f + 0.5f);
+		int defxscale = floorf(screen.xscale() * 1000.0F + 0.5F);
+		int defyscale = floorf(screen.yscale() * 1000.0F + 0.5F);
+		int defxoffset = floorf(screen.xoffset() * 1000.0F + 0.5F);
+		int defyoffset = floorf(screen.yoffset() * 1000.0F + 0.5F);
 		std::string screen_desc = machine_info().get_screen_desc(screen);
 
 		// add refresh rate tweaker
@@ -1990,10 +2105,10 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		{
 			laserdisc_overlay_config config;
 			laserdisc.get_overlay_config(config);
-			int defxscale = floorf(config.m_overscalex * 1000.0f + 0.5f);
-			int defyscale = floorf(config.m_overscaley * 1000.0f + 0.5f);
-			int defxoffset = floorf(config.m_overposx * 1000.0f + 0.5f);
-			int defyoffset = floorf(config.m_overposy * 1000.0f + 0.5f);
+			int defxscale = floorf(config.m_overscalex * 1000.0F + 0.5F);
+			int defyscale = floorf(config.m_overscaley * 1000.0F + 0.5F);
+			int defxoffset = floorf(config.m_overposx * 1000.0F + 0.5F);
+			int defyoffset = floorf(config.m_overposy * 1000.0F + 0.5F);
 
 			// add scale and offset controls per-overlay
 			std::string str = string_format(_("Laserdisc '%1$s' Horiz Stretch"), laserdisc.tag());
@@ -2057,16 +2172,16 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 int32_t mame_ui_manager::slider_volume(std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		machine().sound().set_master_gain(newval == -960 ? 0 : osd::db_to_linear(newval * 0.1f));
+		machine().sound().set_master_gain(newval == -960 ? 0 : osd::db_to_linear(newval * 0.1F));
 
-	int curval = machine().sound().master_gain() == 0 ? -960 : floorf(osd::linear_to_db(machine().sound().master_gain()) * 10.0f + 0.5f);
+	int curval = machine().sound().master_gain() == 0 ? -960 : floorf(osd::linear_to_db(machine().sound().master_gain()) * 10.0F + 0.5F);
 
 	if (str)
 	{
 		if (curval == -960)
 			*str = _("Mute");
 		else if (curval % 10)
-			*str = string_format(_(u8"%1$5.1f\u00a0dB"), float(curval) * 0.1f);
+			*str = string_format(_(u8"%1$5.1f\u00a0dB"), float(curval) * 0.1F);
 		else
 			*str = string_format(_(u8"%1$3d\u00a0dB"), curval / 10);
 	}
@@ -2082,16 +2197,16 @@ int32_t mame_ui_manager::slider_volume(std::string *str, int32_t newval)
 int32_t mame_ui_manager::slider_devvol(device_sound_interface *snd, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		snd->set_user_output_gain(newval == -960 ? 0 : osd::db_to_linear(newval * 0.1f));
+		snd->set_user_output_gain(newval == -960 ? 0 : osd::db_to_linear(newval * 0.1F));
 
-	int curval = snd->user_output_gain() == 0 ? -960 : floorf(osd::linear_to_db(snd->user_output_gain()) * 10.0f + 0.5f);
+	int curval = snd->user_output_gain() == 0 ? -960 : floorf(osd::linear_to_db(snd->user_output_gain()) * 10.0F + 0.5F);
 
 	if (str)
 	{
 		if (curval == -960)
 			*str = _("Mute");
 		else if (curval % 10)
-			*str = string_format(_(u8"%1$5.1f\u00a0dB"), float(curval) * 0.1f);
+			*str = string_format(_(u8"%1$5.1f\u00a0dB"), float(curval) * 0.1F);
 		else
 			*str = string_format(_(u8"%1$3d\u00a0dB"), curval / 10);
 	}
@@ -2107,16 +2222,16 @@ int32_t mame_ui_manager::slider_devvol(device_sound_interface *snd, std::string 
 int32_t mame_ui_manager::slider_devvol_chan(device_sound_interface *snd, int channel, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		snd->set_user_output_gain(channel, newval == -960 ? 0 : osd::db_to_linear(newval * 0.1f));
+		snd->set_user_output_gain(channel, newval == -960 ? 0 : osd::db_to_linear(newval * 0.1F));
 
-	int curval = snd->user_output_gain(channel) == 0 ? -960 : floorf(osd::linear_to_db(snd->user_output_gain(channel)) * 10.0f + 0.5f);
+	int curval = snd->user_output_gain(channel) == 0 ? -960 : floorf(osd::linear_to_db(snd->user_output_gain(channel)) * 10.0F + 0.5F);
 
 	if (str)
 	{
 		if (curval == -960)
 			*str = _("Mute");
 		else if (curval % 10)
-			*str = string_format(_(u8"%1$5.1f\u00a0dB"), float(curval) * 0.1f);
+			*str = string_format(_(u8"%1$5.1f\u00a0dB"), float(curval) * 0.1F);
 		else
 			*str = string_format(_(u8"%1$3d\u00a0dB"), curval / 10);
 	}
@@ -2159,7 +2274,7 @@ int32_t mame_ui_manager::slider_speed(std::string *str, int32_t newval)
 	if (str)
 	{
 		if (curval % 10)
-			*str = string_format(_("%1$.1f%%"), float(curval) * 0.1f);
+			*str = string_format(_("%1$.1f%%"), float(curval) * 0.1F);
 		else
 			*str = string_format(_("%1$3d%%"), curval / 10);
 	}
@@ -2182,7 +2297,7 @@ int32_t mame_ui_manager::slider_overclock(device_t &device, std::string *str, in
 	if (str)
 	{
 		if (curval % 10)
-			*str = string_format(_("%1$.1f%%"), float(curval) * 0.1f);
+			*str = string_format(_("%1$.1f%%"), float(curval) * 0.1F);
 		else
 			*str = string_format(_("%1$3d%%"), curval / 10);
 	}
@@ -2224,12 +2339,12 @@ int32_t mame_ui_manager::slider_brightness(screen_device &screen, std::string *s
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_brightness = float(newval) * 0.001f;
+		settings.m_brightness = float(newval) * 0.001F;
 		screen.container().set_user_settings(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_brightness);
-	return floorf(settings.m_brightness * 1000.0f + 0.5f);
+	return floorf(settings.m_brightness * 1000.0F + 0.5F);
 }
 
 
@@ -2243,12 +2358,12 @@ int32_t mame_ui_manager::slider_contrast(screen_device &screen, std::string *str
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_contrast = float(newval) * 0.001f;
+		settings.m_contrast = float(newval) * 0.001F;
 		screen.container().set_user_settings(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_contrast);
-	return floorf(settings.m_contrast * 1000.0f + 0.5f);
+	return floorf(settings.m_contrast * 1000.0F + 0.5F);
 }
 
 
@@ -2261,12 +2376,12 @@ int32_t mame_ui_manager::slider_gamma(screen_device &screen, std::string *str, i
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_gamma = float(newval) * 0.001f;
+		settings.m_gamma = float(newval) * 0.001F;
 		screen.container().set_user_settings(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_gamma);
-	return floorf(settings.m_gamma * 1000.0f + 0.5f);
+	return floorf(settings.m_gamma * 1000.0F + 0.5F);
 }
 
 
@@ -2280,12 +2395,12 @@ int32_t mame_ui_manager::slider_xscale(screen_device &screen, std::string *str, 
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_xscale = float(newval) * 0.001f;
+		settings.m_xscale = float(newval) * 0.001F;
 		screen.container().set_user_settings(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_xscale);
-	return floorf(settings.m_xscale * 1000.0f + 0.5f);
+	return floorf(settings.m_xscale * 1000.0F + 0.5F);
 }
 
 
@@ -2299,12 +2414,12 @@ int32_t mame_ui_manager::slider_yscale(screen_device &screen, std::string *str, 
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_yscale = float(newval) * 0.001f;
+		settings.m_yscale = float(newval) * 0.001F;
 		screen.container().set_user_settings(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_yscale);
-	return floorf(settings.m_yscale * 1000.0f + 0.5f);
+	return floorf(settings.m_yscale * 1000.0F + 0.5F);
 }
 
 
@@ -2318,12 +2433,12 @@ int32_t mame_ui_manager::slider_xoffset(screen_device &screen, std::string *str,
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_xoffset = float(newval) * 0.001f;
+		settings.m_xoffset = float(newval) * 0.001F;
 		screen.container().set_user_settings(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_xoffset);
-	return floorf(settings.m_xoffset * 1000.0f + 0.5f);
+	return floorf(settings.m_xoffset * 1000.0F + 0.5F);
 }
 
 
@@ -2337,12 +2452,12 @@ int32_t mame_ui_manager::slider_yoffset(screen_device &screen, std::string *str,
 	render_container::user_settings settings = screen.container().get_user_settings();
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_yoffset = float(newval) * 0.001f;
+		settings.m_yoffset = float(newval) * 0.001F;
 		screen.container().set_user_settings(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_yoffset);
-	return floorf(settings.m_yoffset * 1000.0f + 0.5f);
+	return floorf(settings.m_yoffset * 1000.0F + 0.5F);
 }
 
 
@@ -2358,12 +2473,12 @@ int32_t mame_ui_manager::slider_overxscale(laserdisc_device &laserdisc, std::str
 	laserdisc.get_overlay_config(settings);
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_overscalex = float(newval) * 0.001f;
+		settings.m_overscalex = float(newval) * 0.001F;
 		laserdisc.set_overlay_config(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_overscalex);
-	return floorf(settings.m_overscalex * 1000.0f + 0.5f);
+	return floorf(settings.m_overscalex * 1000.0F + 0.5F);
 }
 
 
@@ -2379,12 +2494,12 @@ int32_t mame_ui_manager::slider_overyscale(laserdisc_device &laserdisc, std::str
 	laserdisc.get_overlay_config(settings);
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_overscaley = float(newval) * 0.001f;
+		settings.m_overscaley = float(newval) * 0.001F;
 		laserdisc.set_overlay_config(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_overscaley);
-	return floorf(settings.m_overscaley * 1000.0f + 0.5f);
+	return floorf(settings.m_overscaley * 1000.0F + 0.5F);
 }
 
 
@@ -2400,12 +2515,12 @@ int32_t mame_ui_manager::slider_overxoffset(laserdisc_device &laserdisc, std::st
 	laserdisc.get_overlay_config(settings);
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_overposx = float(newval) * 0.001f;
+		settings.m_overposx = float(newval) * 0.001F;
 		laserdisc.set_overlay_config(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_overposx);
-	return floorf(settings.m_overposx * 1000.0f + 0.5f);
+	return floorf(settings.m_overposx * 1000.0F + 0.5F);
 }
 
 
@@ -2421,12 +2536,12 @@ int32_t mame_ui_manager::slider_overyoffset(laserdisc_device &laserdisc, std::st
 	laserdisc.get_overlay_config(settings);
 	if (newval != SLIDER_NOCHANGE)
 	{
-		settings.m_overposy = float(newval) * 0.001f;
+		settings.m_overposy = float(newval) * 0.001F;
 		laserdisc.set_overlay_config(settings);
 	}
 	if (str)
 		*str = string_format(_("%1$.3f"), settings.m_overposy);
-	return floorf(settings.m_overposy * 1000.0f + 0.5f);
+	return floorf(settings.m_overposy * 1000.0F + 0.5F);
 }
 
 
@@ -2438,10 +2553,10 @@ int32_t mame_ui_manager::slider_overyoffset(laserdisc_device &laserdisc, std::st
 int32_t mame_ui_manager::slider_flicker([[maybe_unused]] screen_device &screen, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		vector_options::s_flicker = float(newval) * 0.001f;
+		vector_options::s_flicker = float(newval) * 0.001F;
 	if (str)
 		*str = string_format(_("%1$1.2f"), vector_options::s_flicker);
-	return floorf(vector_options::s_flicker * 1000.0f + 0.5f);
+	return floorf(vector_options::s_flicker * 1000.0F + 0.5F);
 }
 
 
@@ -2453,10 +2568,10 @@ int32_t mame_ui_manager::slider_flicker([[maybe_unused]] screen_device &screen, 
 int32_t mame_ui_manager::slider_beam_width_min([[maybe_unused]] screen_device &screen, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		vector_options::s_beam_width_min = std::min(float(newval) * 0.01f, vector_options::s_beam_width_max);
+		vector_options::s_beam_width_min = std::min(float(newval) * 0.01F, vector_options::s_beam_width_max);
 	if (str != nullptr)
 		*str = string_format(_("%1$1.2f"), vector_options::s_beam_width_min);
-	return floorf(vector_options::s_beam_width_min * 100.0f + 0.5f);
+	return floorf(vector_options::s_beam_width_min * 100.0F + 0.5F);
 }
 
 
@@ -2468,10 +2583,10 @@ int32_t mame_ui_manager::slider_beam_width_min([[maybe_unused]] screen_device &s
 int32_t mame_ui_manager::slider_beam_width_max([[maybe_unused]] screen_device &screen, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		vector_options::s_beam_width_max = std::max(float(newval) * 0.01f, vector_options::s_beam_width_min);
+		vector_options::s_beam_width_max = std::max(float(newval) * 0.01F, vector_options::s_beam_width_min);
 	if (str != nullptr)
 		*str = string_format(_("%1$1.2f"), vector_options::s_beam_width_max);
-	return floorf(vector_options::s_beam_width_max * 100.0f + 0.5f);
+	return floorf(vector_options::s_beam_width_max * 100.0F + 0.5F);
 }
 
 
@@ -2483,10 +2598,10 @@ int32_t mame_ui_manager::slider_beam_width_max([[maybe_unused]] screen_device &s
 int32_t mame_ui_manager::slider_beam_dot_size([[maybe_unused]] screen_device &screen, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		vector_options::s_beam_dot_size = std::max(float(newval) * 0.01f, 0.1f);
+		vector_options::s_beam_dot_size = std::max(float(newval) * 0.01F, 0.1F);
 	if (str != nullptr)
 		*str = string_format(_("%1$1.2f"), vector_options::s_beam_dot_size);
-	return floorf(vector_options::s_beam_dot_size * 100.0f + 0.5f);
+	return floorf(vector_options::s_beam_dot_size * 100.0F + 0.5F);
 }
 
 
@@ -2498,10 +2613,10 @@ int32_t mame_ui_manager::slider_beam_dot_size([[maybe_unused]] screen_device &sc
 int32_t mame_ui_manager::slider_beam_intensity_weight([[maybe_unused]] screen_device &screen, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		vector_options::s_beam_intensity_weight = float(newval) * 0.001f;
+		vector_options::s_beam_intensity_weight = float(newval) * 0.001F;
 	if (str != nullptr)
 		*str = string_format(_("%1$1.2f"), vector_options::s_beam_intensity_weight);
-	return floorf(vector_options::s_beam_intensity_weight * 1000.0f + 0.5f);
+	return floorf(vector_options::s_beam_intensity_weight * 1000.0F + 0.5F);
 }
 
 
@@ -2516,8 +2631,8 @@ int32_t mame_ui_manager::slider_crossscale(ioport_field &field, std::string *str
 	if (newval != SLIDER_NOCHANGE)
 		field.set_crosshair_scale(float(newval) * 0.001);
 	if (str)
-		*str = string_format((field.crosshair_axis() == CROSSHAIR_AXIS_X) ? _("Crosshair Scale X %1$1.3f") :  _("Crosshair Scale Y %1$1.3f"), float(newval) * 0.001f);
-	return floorf(field.crosshair_scale() * 1000.0f + 0.5f);
+		*str = string_format((field.crosshair_axis() == CROSSHAIR_AXIS_X) ? _("Crosshair Scale X %1$1.3f") :  _("Crosshair Scale Y %1$1.3f"), float(newval) * 0.001F);
+	return floorf(field.crosshair_scale() * 1000.0F + 0.5F);
 }
 #endif
 
@@ -2531,9 +2646,9 @@ int32_t mame_ui_manager::slider_crossscale(ioport_field &field, std::string *str
 int32_t mame_ui_manager::slider_crossoffset(ioport_field &field, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		field.set_crosshair_offset(float(newval) * 0.001f);
+		field.set_crosshair_offset(float(newval) * 0.001F);
 	if (str)
-		*str = string_format((field.crosshair_axis() == CROSSHAIR_AXIS_X) ? _("Crosshair Offset X %1$1.3f") :  _("Crosshair Offset Y %1$1.3f"), float(newval) * 0.001f);
+		*str = string_format((field.crosshair_axis() == CROSSHAIR_AXIS_X) ? _("Crosshair Offset X %1$1.3f") :  _("Crosshair Offset Y %1$1.3f"), float(newval) * 0.001F);
 	return field.crosshair_offset();
 }
 #endif
@@ -2543,11 +2658,11 @@ int32_t mame_ui_manager::slider_crossoffset(ioport_field &field, std::string *st
 //  create_layout
 //-------------------------------------------------
 
-ui::text_layout mame_ui_manager::create_layout(render_container &container, float width, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap)
+ui::text_layout mame_ui_manager::create_layout(render_target &target, float width, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap)
 {
 	// determine scale factors
-	float const yscale = get_line_height();
-	float const xscale = yscale * machine().render().ui_aspect(&container);
+	float const yscale = get_line_height(target);
+	float const xscale = yscale * machine().render().ui_aspect(target);
 
 	// create the layout
 	return ui::text_layout(*get_font(), xscale, yscale, width, justify, wrap);

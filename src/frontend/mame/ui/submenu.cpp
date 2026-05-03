@@ -33,6 +33,8 @@ std::vector<submenu::option> submenu::misc_options()
 {
 	return std::vector<option>{
 			{ option_type::HEAD, N_("Miscellaneous Options") },
+			{ option_type::UI,   N_("Automatically pause when showing menus"),                   OPTION_MENU_PAUSE },
+			{ option_type::UI,   N_("Open menus in the active window"),                          OPTION_UI_FOLLOW_FOCUS },
 			{ option_type::UI,   N_("Skip imperfect emulation warnings"),                        OPTION_SKIP_WARNINGS },
 			{ option_type::UI,   N_("Re-select last system launched"),                           OPTION_REMEMBER_LAST },
 			{ option_type::UI,   N_("Enlarge images in the right panel"),                        OPTION_ENLARGE_SNAPS },
@@ -149,13 +151,13 @@ std::vector<submenu::option> submenu::video_options()
 //  ctor / dtor
 //-------------------------------------------------
 
-submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<option> const &suboptions, const game_driver *drv, emu_options *options)
-	: submenu(mui, container, std::vector<option>(suboptions), drv, options)
+submenu::submenu(mame_ui_manager &mui, render_target &target, std::vector<option> const &suboptions, const game_driver *drv, emu_options *options)
+	: submenu(mui, target, std::vector<option>(suboptions), drv, options)
 {
 }
 
-submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<option> &&suboptions, const game_driver *drv, emu_options *options)
-	: menu(mui, container)
+submenu::submenu(mame_ui_manager &mui, render_target &target, std::vector<option> &&suboptions, const game_driver *drv, emu_options *options)
+	: menu(mui, target)
 	, m_options(std::move(suboptions))
 	, m_driver(drv)
 {

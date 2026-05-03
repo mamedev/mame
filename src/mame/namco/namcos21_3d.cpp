@@ -60,7 +60,7 @@ void namcos21_3d_device::swap_and_clear_poly_framebuffer()
 	m_poly_framebuffer_pens.swap(m_poly_framebuffer_pens2);
 
 	// wipe work framebuffers
-	std::fill_n(m_poly_framebuffer_z.get(), m_framebuffer_size, 0x7fff);
+	std::fill_n(m_poly_framebuffer_z.get(), m_framebuffer_size, 0x8000);
 	std::fill_n(m_poly_framebuffer_pens.get(), m_framebuffer_size, 0);
 }
 
@@ -253,7 +253,7 @@ void namcos21_3d_device::blit_single_quad(int sx[4], int sy[4], int zcode[4], u1
 	{
 		v[i].x = sx[i];
 		v[i].y = sy[i];
-		v[i].z = zcode[i] & 0x7fff;
+		v[i].z = zcode[i];
 	}
 
 	rendertri(&v[0], &v[1], &v[2], color);
@@ -268,7 +268,7 @@ void namcos21_3d_device::draw_direct_quad(const u16 *source, u16 color)
 	{
 		sx[i] = m_poly_frame_width / 2 + (s16)*source++;
 		sy[i] = m_poly_frame_height / 2 + (s16)*source++;
-		zcode[i] = *source++;
+		zcode[i] = (s16)*source++;
 	}
 
 	blit_single_quad(sx, sy, zcode, color);
@@ -297,7 +297,7 @@ int namcos21_3d_device::draw_quads(const u16 *source, const u8 *pointram, const 
 
 			sx[i] = m_poly_frame_width / 2 + (s16)source[vi * 3 + 0];
 			sy[i] = m_poly_frame_height / 2 + (s16)source[vi * 3 + 1];
-			zcode[i] = source[vi * 3 + 2];
+			zcode[i] = (s16)source[vi * 3 + 2];
 
 			if (vi > max_vi)
 				max_vi = vi;

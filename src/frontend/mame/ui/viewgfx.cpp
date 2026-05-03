@@ -52,7 +52,7 @@ public:
 			m_machine.render().texture_free(m_texture);
 	}
 
-	uint32_t handle(mame_ui_manager &mui, render_container &container, bool uistate)
+	uint32_t handle(mame_ui_manager &mui, render_target &target, bool uistate)
 	{
 		// implicitly cancel if there's nothing to display
 		if (!is_relevant())
@@ -74,7 +74,6 @@ public:
 			case ui_event::type::POINTER_UPDATE:
 				{
 					// ignore pointer input in windows other than the one that displays the UI
-					render_target &target(m_machine.render().ui_target());
 					if (&target != event.target)
 						break;
 
@@ -86,14 +85,14 @@ public:
 						m_pointer_inside = target.map_point_container(
 								event.pointer_x,
 								event.pointer_y,
-								container,
+								*target.ui_container(),
 								m_pointer_x,
 								m_pointer_y);
 					}
 					else if ((0 > m_current_pointer) || (!m_pointer_buttons && (!m_pointer_inside || event.pointer_buttons)))
 					{
 						float x, y;
-						bool const inside(target.map_point_container(event.pointer_x, event.pointer_y, container, x, y));
+						bool const inside(target.map_point_container(event.pointer_x, event.pointer_y, *target.ui_container(), x, y));
 						if ((0 > m_current_pointer) || event.pointer_buttons || (!m_pointer_inside && inside))
 						{
 							m_current_pointer = event.pointer_id;
@@ -111,7 +110,6 @@ public:
 			case ui_event::type::POINTER_ABORT:
 				{
 					// if this was our pointer, we've lost it
-					render_target &target(m_machine.render().ui_target());
 					if ((&target == event.target) && (event.pointer_id == m_current_pointer))
 					{
 						// keep the pointer position and type so we can show touch locations after release
@@ -120,7 +118,7 @@ public:
 						m_pointer_inside = target.map_point_container(
 								event.pointer_x,
 								event.pointer_y,
-								container,
+								*target.ui_container(),
 								m_pointer_x,
 								m_pointer_y);
 					}
@@ -134,7 +132,7 @@ public:
 		}
 
 		// always draw non-touch pointer
-		mame_ui_manager::display_pointer pointers[1]{ { m_machine.render().ui_target(), m_pointer_type, m_pointer_x, m_pointer_y } };
+		mame_ui_manager::display_pointer pointers[1]{ { target, m_pointer_type, m_pointer_x, m_pointer_y } };
 		if (m_pointer_inside && (0 <= m_current_pointer) && (ui_event::pointer::TOUCH != m_pointer_type))
 			mui.set_pointers(std::begin(pointers), std::end(pointers));
 		else
@@ -147,19 +145,19 @@ public:
 			{
 			case view::PALETTE:
 				if (m_palette.interface())
-					return handle_palette(mui, container, uistate);
+					return handle_palette(mui, target, uistate);
 				m_mode = view::GFXSET;
 				break;
 
 			case view::GFXSET:
 				if (m_gfxset.has_gfx())
-					return handle_gfxset(mui, container, uistate);
+					return handle_gfxset(mui, target, uistate);
 				m_mode = view::TILEMAP;
 				break;
 
 			case view::TILEMAP:
 				if (m_machine.tilemap().count())
-					return handle_tilemap(mui, container, uistate);
+					return handle_tilemap(mui, target, uistate);
 				m_mode = view::PALETTE;
 				break;
 			}
@@ -632,20 +630,20 @@ private:
 		return mame_ui_manager::HANDLER_CANCEL;
 	}
 
-	uint32_t handle_palette(mame_ui_manager &mui, render_container &container, bool uistate);
-	uint32_t handle_gfxset(mame_ui_manager &mui, render_container &container, bool uistate);
-	uint32_t handle_tilemap(mame_ui_manager &mui, render_container &container, bool uistate);
+	uint32_t handle_palette(mame_ui_manager &mui, render_target &target, bool uistate);
+	uint32_t handle_gfxset(mame_ui_manager &mui, render_target &target, bool uistate);
+	uint32_t handle_tilemap(mame_ui_manager &mui, render_target &target, bool uistate);
 
 	void update_gfxset_bitmap(int xcells, int ycells, gfx_element &gfx);
 	void update_tilemap_bitmap(int width, int height);
 
 	void gfxset_draw_item(gfx_element &gfx, int index, int dstx, int dsty, gfxset::setinfo const &info);
 
-	void draw_text(mame_ui_manager &mui, render_container &container, std::string_view str, float x, float y)
+	void draw_text(mame_ui_manager &mui, render_target &target, std::string_view str, float x, float y)
 	{
 		render_font *const font = mui.get_font();
-		float const height = mui.get_line_height();
-		float const aspect = m_machine.render().ui_aspect(&container);
+		float const height = mui.get_line_height(target);
+		float const aspect = m_machine.render().ui_aspect(target);
 		rgb_t const color = mui.colors().text_color();
 
 		int n;
@@ -655,7 +653,7 @@ private:
 			if (0 > n)
 				ch = 0xfffd;
 			str.remove_prefix((0 > n) ? 1 : n);
-			container.add_char(x, y, height, aspect, color, *font, ch);
+			target.ui_container()->add_char(x, y, height, aspect, color, *font, ch);
 			x += font->char_width(height, aspect, ch);
 		}
 	}
@@ -988,7 +986,7 @@ bool gfx_viewer::tilemap::handle_keys(running_machine &machine, float pixelscale
 }
 
 
-uint32_t gfx_viewer::handle_palette(mame_ui_manager &mui, render_container &container, bool uistate)
+uint32_t gfx_viewer::handle_palette(mame_ui_manager &mui, render_target &target, bool uistate)
 {
 	device_palette_interface &palette = *m_palette.interface();
 	palette_device *const paldev = dynamic_cast<palette_device *>(&palette.device());
@@ -999,8 +997,8 @@ uint32_t gfx_viewer::handle_palette(mame_ui_manager &mui, render_container &cont
 
 	// add a half character padding for the box
 	render_font *const ui_font = mui.get_font();
-	float const aspect = m_machine.render().ui_aspect(&container);
-	float const chheight = mui.get_line_height();
+	float const aspect = m_machine.render().ui_aspect(target);
+	float const chheight = mui.get_line_height(target);
 	float const chwidth = ui_font->char_width(chheight, aspect, '0');
 	render_bounds const boxbounds{
 			0.0f + (0.5f * chwidth),
@@ -1033,7 +1031,7 @@ uint32_t gfx_viewer::handle_palette(mame_ui_manager &mui, render_container &cont
 
 	// if the mouse pointer is over one of our cells, add some info about the corresponding palette entry
 	float mouse_x, mouse_y;
-	if (map_mouse(container, cellboxbounds, mouse_x, mouse_y))
+	if (map_mouse(*target.ui_container(), cellboxbounds, mouse_x, mouse_y))
 	{
 		int const index = m_palette.index(int((mouse_x - cellboxbounds.x0) / cellwidth), int((mouse_y - cellboxbounds.y0) / cellheight));
 		if (index < total)
@@ -1062,7 +1060,7 @@ uint32_t gfx_viewer::handle_palette(mame_ui_manager &mui, render_container &cont
 			}
 
 			// keep touch pointer displayed after release so they know what it's pointing at
-			mame_ui_manager::display_pointer pointers[1]{ { m_machine.render().ui_target(), m_pointer_type, m_pointer_x, m_pointer_y } };
+			mame_ui_manager::display_pointer pointers[1]{ { target, m_pointer_type, m_pointer_x, m_pointer_y } };
 			if (ui_event::pointer::TOUCH == m_pointer_type)
 				mui.set_pointers(std::begin(pointers), std::end(pointers));
 		}
@@ -1078,10 +1076,10 @@ uint32_t gfx_viewer::handle_palette(mame_ui_manager &mui, render_container &cont
 		x0 = boxbounds.x0 - (0.5f - 0.5f * (titlewidth + chwidth));
 
 	// go ahead and draw the outer box now
-	mui.draw_outlined_box(container, boxbounds.x0 - x0, boxbounds.y0, boxbounds.x1 + x0, boxbounds.y1, mui.colors().gfxviewer_bg_color());
+	mui.draw_outlined_box(*target.ui_container(), boxbounds.x0 - x0, boxbounds.y0, boxbounds.x1 + x0, boxbounds.y1, mui.colors().gfxviewer_bg_color());
 
 	// draw the title
-	draw_text(mui, container, title, 0.5f - 0.5f * titlewidth, boxbounds.y0 + 0.5f * chheight);
+	draw_text(mui, target, title, 0.5f - 0.5f * titlewidth, boxbounds.y0 + 0.5f * chheight);
 
 	// draw the top column headers
 	int const rowskip = int(chwidth / cellwidth);
@@ -1089,11 +1087,11 @@ uint32_t gfx_viewer::handle_palette(mame_ui_manager &mui, render_container &cont
 	{
 		x0 = boxbounds.x0 + 6.0f * chwidth + float(x) * cellwidth;
 		y0 = boxbounds.y0 + 2.0f * chheight;
-		container.add_char(x0 + 0.5f * (cellwidth - chwidth), y0, chheight, aspect, rgb_t::white(), *ui_font, "0123456789ABCDEF"[(x + m_palette.index(0, 0)) & 0xf]);
+		target.ui_container()->add_char(x0 + 0.5f * (cellwidth - chwidth), y0, chheight, aspect, rgb_t::white(), *ui_font, "0123456789ABCDEF"[(x + m_palette.index(0, 0)) & 0xf]);
 
 		// if we're skipping, draw a point between the character and the box to indicate which one it's referring to
 		if (rowskip)
-			container.add_point(x0 + 0.5f * cellwidth, 0.5f * (y0 + chheight + cellboxbounds.y0), UI_LINE_WIDTH, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			target.ui_container()->add_point(x0 + 0.5f * cellwidth, 0.5f * (y0 + chheight + cellboxbounds.y0), UI_LINE_WIDTH, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
 
 	// draw the side column headers
@@ -1109,14 +1107,14 @@ uint32_t gfx_viewer::handle_palette(mame_ui_manager &mui, render_container &cont
 			x0 = boxbounds.x0 + 5.5f * chwidth;
 			y0 = boxbounds.y0 + 3.5f * chheight + float(y) * cellheight;
 			if (colskip != 0)
-				container.add_point(0.5f * (x0 + cellboxbounds.x0), y0 + 0.5f * cellheight, UI_LINE_WIDTH, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				target.ui_container()->add_point(0.5f * (x0 + cellboxbounds.x0), y0 + 0.5f * cellheight, UI_LINE_WIDTH, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			// draw the row header
 			auto buffer = util::string_format("%5X", index);
 			for (int x = 4; x >= 0; x--)
 			{
 				x0 -= ui_font->char_width(chheight, aspect, buffer[x]);
-				container.add_char(x0, y0 + 0.5f * (cellheight - chheight), chheight, aspect, rgb_t::white(), *ui_font, buffer[x]);
+				target.ui_container()->add_char(x0, y0 + 0.5f * (cellheight - chheight), chheight, aspect, rgb_t::white(), *ui_font, buffer[x]);
 			}
 		}
 	}
@@ -1130,7 +1128,7 @@ uint32_t gfx_viewer::handle_palette(mame_ui_manager &mui, render_container &cont
 			if (index < total)
 			{
 				pen_t const pen = indirect ? palette.indirect_color(index) : raw_color[index];
-				container.add_rect(
+				target.ui_container()->add_rect(
 						cellboxbounds.x0 + x * cellwidth, cellboxbounds.y0 + y * cellheight,
 						cellboxbounds.x0 + (x + 1) * cellwidth, cellboxbounds.y0 + (y + 1) * cellheight,
 						0xff000000 | pen, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -1144,7 +1142,7 @@ uint32_t gfx_viewer::handle_palette(mame_ui_manager &mui, render_container &cont
 }
 
 
-uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &container, bool uistate)
+uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_target &target, bool uistate)
 {
 	// get graphics info
 	auto &info = m_gfxset.m_devices[m_gfxset.m_device];
@@ -1154,10 +1152,10 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 
 	// get some UI metrics
 	render_font *const ui_font = mui.get_font();
-	int const targwidth = m_machine.render().ui_target().width();
-	int const targheight = m_machine.render().ui_target().height();
-	float const aspect = m_machine.render().ui_aspect(&container);
-	float const chheight = mui.get_line_height();
+	int const targwidth = target.width();
+	int const targheight = target.height();
+	float const aspect = m_machine.render().ui_aspect(target);
+	float const chheight = mui.get_line_height(target);
 	float const chwidth = ui_font->char_width(chheight, aspect, '0');
 
 	// add a half character padding for the box
@@ -1247,7 +1245,7 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 	// if the mouse pointer is over a pixel in a tile, add some info about the tile and pixel
 	bool found_pixel = false;
 	float mouse_x, mouse_y;
-	if (map_mouse(container, cellboxbounds, mouse_x, mouse_y))
+	if (map_mouse(*target.ui_container(), cellboxbounds, mouse_x, mouse_y))
 	{
 		int const code = set.m_offset + int((mouse_x - cellboxbounds.x0) / cellwidth) + int((mouse_y - cellboxbounds.y0) / cellheight) * xcells;
 		int xpixel = int((mouse_x - cellboxbounds.x0) / (cellwidth / cellxpix)) % cellxpix;
@@ -1269,7 +1267,7 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 					gfx.colorbase() + (set.m_color * gfx.granularity()) + pixdata);
 
 			// keep touch pointer displayed after release so they know what it's pointing at
-			mame_ui_manager::display_pointer pointers[1]{ { m_machine.render().ui_target(), m_pointer_type, m_pointer_x, m_pointer_y } };
+			mame_ui_manager::display_pointer pointers[1]{ { target, m_pointer_type, m_pointer_x, m_pointer_y } };
 			if (ui_event::pointer::TOUCH == m_pointer_type)
 				mui.set_pointers(std::begin(pointers), std::end(pointers));
 		}
@@ -1290,10 +1288,10 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 		x0 = boxbounds.x0 - (0.5f - 0.5f * (titlewidth + chwidth));
 
 	// go ahead and draw the outer box now
-	mui.draw_outlined_box(container, boxbounds.x0 - x0, boxbounds.y0, boxbounds.x1 + x0, boxbounds.y1, mui.colors().gfxviewer_bg_color());
+	mui.draw_outlined_box(*target.ui_container(), boxbounds.x0 - x0, boxbounds.y0, boxbounds.x1 + x0, boxbounds.y1, mui.colors().gfxviewer_bg_color());
 
 	// draw the title
-	draw_text(mui, container, title, 0.5f - 0.5f * titlewidth, boxbounds.y0 + 0.5f * chheight);
+	draw_text(mui, target, title, 0.5f - 0.5f * titlewidth, boxbounds.y0 + 0.5f * chheight);
 
 	// draw the top column headers
 	int const colskip = int(chwidth / cellwidth);
@@ -1301,11 +1299,11 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 	{
 		x0 = boxbounds.x0 + 6.0f * chwidth + float(x) * cellwidth;
 		y0 = boxbounds.y0 + 2.0f * chheight;
-		container.add_char(x0 + 0.5f * (cellwidth - chwidth), y0, chheight, aspect, rgb_t::white(), *ui_font, "0123456789ABCDEF"[(x + set.m_offset) & 0xf]);
+		target.ui_container()->add_char(x0 + 0.5f * (cellwidth - chwidth), y0, chheight, aspect, rgb_t::white(), *ui_font, "0123456789ABCDEF"[(x + set.m_offset) & 0xf]);
 
 		// if we're skipping, draw a point between the character and the box to indicate which one it's referring to
 		if (colskip)
-			container.add_point(x0 + 0.5f * cellwidth, 0.5f * (y0 + chheight + boxbounds.y0 + 3.5f * chheight), UI_LINE_WIDTH, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			target.ui_container()->add_point(x0 + 0.5f * cellwidth, 0.5f * (y0 + chheight + boxbounds.y0 + 3.5f * chheight), UI_LINE_WIDTH, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
 
 	// draw the side column headers
@@ -1319,14 +1317,14 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 			x0 = boxbounds.x0 + 5.5f * chwidth;
 			y0 = boxbounds.y0 + 3.5f * chheight + float(y) * cellheight;
 			if (rowskip)
-				container.add_point(0.5f * (x0 + boxbounds.x0 + 6.0f * chwidth), y0 + 0.5f * cellheight, UI_LINE_WIDTH, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				target.ui_container()->add_point(0.5f * (x0 + boxbounds.x0 + 6.0f * chwidth), y0 + 0.5f * cellheight, UI_LINE_WIDTH, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			// draw the row header
 			auto buffer = util::string_format("%5X", set.m_offset + (y * xcells));
 			for (int x = 4; x >= 0; x--)
 			{
 				x0 -= ui_font->char_width(chheight, aspect, buffer[x]);
-				container.add_char(x0, y0 + 0.5f * (cellheight - chheight), chheight, aspect, rgb_t::white(), *ui_font, buffer[x]);
+				target.ui_container()->add_char(x0, y0 + 0.5f * (cellheight - chheight), chheight, aspect, rgb_t::white(), *ui_font, buffer[x]);
 			}
 		}
 	}
@@ -1335,7 +1333,7 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 	update_gfxset_bitmap(xcells, ycells, gfx);
 
 	// add the final quad
-	container.add_quad(
+	target.ui_container()->add_quad(
 			cellboxbounds.x0, cellboxbounds.y0, cellboxbounds.x1, cellboxbounds.y1,
 			rgb_t::white(), m_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
@@ -1346,14 +1344,14 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 }
 
 
-uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_container &container, bool uistate)
+uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_target &target, bool uistate)
 {
 	// get some UI metrics
 	render_font *const ui_font = mui.get_font();
-	int const targwidth = m_machine.render().ui_target().width();
-	int const targheight = m_machine.render().ui_target().height();
-	float const aspect = m_machine.render().ui_aspect(&container);
-	float const chheight = mui.get_line_height();
+	int const targwidth = target.width();
+	int const targheight = target.height();
+	float const aspect = m_machine.render().ui_aspect(target);
+	float const chheight = mui.get_line_height(target);
 	float const chwidth = ui_font->char_width(chheight, aspect, '0');
 
 	// get the size of the tilemap itself
@@ -1421,7 +1419,7 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_container &cont
 
 	// if the mouse pointer is over a tile, add some info about its coordinates and color
 	float mouse_x, mouse_y;
-	if (map_mouse(container, mapboxbounds, mouse_x, mouse_y))
+	if (map_mouse(*target.ui_container(), mapboxbounds, mouse_x, mouse_y))
 	{
 		int xpixel = (mouse_x - mapboxbounds.x0) * targwidth;
 		int ypixel = (mouse_y - mapboxbounds.y0) * targheight;
@@ -1442,7 +1440,7 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_container &cont
 				gfxnum, code, color);
 
 		// keep touch pointer displayed after release so they know what it's pointing at
-		mame_ui_manager::display_pointer pointers[1]{ { m_machine.render().ui_target(), m_pointer_type, m_pointer_x, m_pointer_y } };
+		mame_ui_manager::display_pointer pointers[1]{ { target, m_pointer_type, m_pointer_x, m_pointer_y } };
 		if (ui_event::pointer::TOUCH == m_pointer_type)
 			mui.set_pointers(std::begin(pointers), std::end(pointers));
 	}
@@ -1464,16 +1462,16 @@ uint32_t gfx_viewer::handle_tilemap(mame_ui_manager &mui, render_container &cont
 	}
 
 	// go ahead and draw the outer box now
-	mui.draw_outlined_box(container, boxbounds.x0, boxbounds.y0, boxbounds.x1, boxbounds.y1, mui.colors().gfxviewer_bg_color());
+	mui.draw_outlined_box(*target.ui_container(), boxbounds.x0, boxbounds.y0, boxbounds.x1, boxbounds.y1, mui.colors().gfxviewer_bg_color());
 
 	// draw the title
-	draw_text(mui, container, title, 0.5f - 0.5f * titlewidth, boxbounds.y0 + 0.5f * chheight);
+	draw_text(mui, target, title, 0.5f - 0.5f * titlewidth, boxbounds.y0 + 0.5f * chheight);
 
 	// update the bitmap
 	update_tilemap_bitmap(std::lround(mapboxwidth / pixelscale), std::lround(mapboxheight / pixelscale));
 
 	// add the final quad
-	container.add_quad(
+	target.ui_container()->add_quad(
 			mapboxbounds.x0, mapboxbounds.y0,
 			mapboxbounds.x1, mapboxbounds.y1,
 			rgb_t::white(), m_texture,
@@ -1618,7 +1616,7 @@ void gfx_viewer::gfxset_draw_item(gfx_element &gfx, int index, int dstx, int dst
 //  create or modify gfx sets in VIDEO_START
 //-------------------------------------------------
 
-uint32_t ui_gfx_ui_handler(render_container &container, mame_ui_manager &mui, bool uistate)
+uint32_t ui_gfx_ui_handler(render_target &target, mame_ui_manager &mui, bool uistate)
 {
-	return mui.get_session_data<gfx_viewer, gfx_viewer>(mui.machine()).handle(mui, container, uistate);
+	return mui.get_session_data<gfx_viewer, gfx_viewer>(mui.machine()).handle(mui, target, uistate);
 }

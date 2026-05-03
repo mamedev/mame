@@ -25,9 +25,9 @@ namespace ui {
 class menu_plugin : public menu
 {
 public:
-	menu_plugin(mame_ui_manager &mui, render_container &container);
+	menu_plugin(mame_ui_manager &mui, render_target &target);
 
-	static void show_menu(mame_ui_manager &mui, render_container &container, std::string_view menu);
+	static void show_menu(mame_ui_manager &mui, std::string_view menu);
 
 	virtual ~menu_plugin();
 
@@ -42,7 +42,7 @@ private:
 class menu_plugin_opt : public menu
 {
 public:
-	menu_plugin_opt(mame_ui_manager &mui, render_container &container, std::string_view menu, bool one_shot);
+	menu_plugin_opt(mame_ui_manager &mui, render_target &target, std::string_view menu, bool one_shot);
 	virtual ~menu_plugin_opt();
 
 protected:

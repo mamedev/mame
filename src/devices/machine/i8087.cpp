@@ -2137,13 +2137,21 @@ void i8087_device::fprem1(u8 modrm)
 	}
 	else
 	{
-		extFloat80_t a = ST(0);
-		extFloat80_t b = ST(1);
+		uint64_t q;
 
 		m_sw &= ~X87_SW_C2;
 
-		// TODO: Implement Cx bits
-		result = extF80_rem(a, b);
+		if (!extFloat80_ieee754_remainder(ST(0), ST(1), result, q)) {
+			m_sw &= ~(X87_SW_C0|X87_SW_C3|X87_SW_C1);
+			if (q & 1)
+				m_sw |= X87_SW_C1;
+			if (q & 2)
+				m_sw |= X87_SW_C3;
+			if (q & 4)
+				m_sw |= X87_SW_C0;
+		}
+		else
+			m_sw |= X87_SW_C2;
 	}
 
 	if (check_exceptions())

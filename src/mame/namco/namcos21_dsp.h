@@ -60,6 +60,7 @@ private:
 	u32 m_poly_size;
 	u32 m_pointrom_addr;
 	u32 m_pointrom_mask;
+	u16 m_dsp_busy;
 	u16 m_dsp_complete;
 
 	u16 cuskey_r();
@@ -67,6 +68,7 @@ private:
 	u16 dspcomram_r(offs_t offset);
 	void dspcomram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 table_r(offs_t offset);
+	void dsp_busy_w(u16 data);
 	void dsp_complete_w(u16 data);
 	void dsp_render_w(u16 data);
 	void dsp_pointrom_addr_w(offs_t offset, u16 data);

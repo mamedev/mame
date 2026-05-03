@@ -717,18 +717,11 @@ bool debug_view_memory::needs_recompute()
 {
 	bool recompute = m_recompute;
 
-	offs_t val = m_expression.value();
-	// checks if evaluated expression value has changed since last time
-	if (val != m_expression_computed)
-	{
-		m_expression_computed = val;
-		m_expression.mark_dirty();
-	}
-
 	// handle expression changes
-	if (m_expression.dirty())
+	if (m_expression.recompute())
 	{
 		const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
+		offs_t val = m_expression.last_value();
 		if (source.m_memintf)
 		{
 			const address_space_config *config = m_no_translation ? source.m_memintf->space_config(source.m_spacenum) : source.m_memintf->logical_space_config(source.m_spacenum);

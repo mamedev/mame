@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+TODO:
+- Check RAM requirements for each SW;
+- Check if p2000m can really run everything here or it warrants a sharedfeat;
+
+-->
+<softwarelist name="p2000_cart" description="Philips P2000T/P2000M cartridges">
+
+<!-- !Operating Systems -->
+
+	<software name="basicnl">
+		<description>Cassette Basic (v1.1, Netherlands)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="basic.rom" size="0x4000" crc="9d9d38f9" sha1="fb5100436c99634a2592a10dff867f85bcff7aec"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Games -->
+
+	<software name="brkwall" supported="partial">
+		<description>Brick-Wall</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Optional [joystick] support
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x3b67">
+				<rom name="Brick-Wall.bin" size="0x3b67" crc="002713a8" sha1="9ae4ba67c8e9bec1ad444f8c9364eb8ab5baf0c7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doolhof">
+		<description>Doolhof</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x23c1">
+				<rom name="Doolhof.bin" size="0x23c1" crc="ac493cd9" sha1="a4922027d2a4f06fe7aefcbf0d38e7ca29037f53" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fraxxon" supported="partial">
+		<description>Fraxxon: Space Fight II (joystick)</description>
+		<year>19??</year>
+		<publisher>LBK Production</publisher>
+		<notes><![CDATA[
+Optional [joystick] support
+]]></notes>
+		<info name="usage" value="Requires 32KB RAM minimum"/>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x3fbe">
+				<rom name="Fraxxon (joystick).bin" size="0x3fbe" crc="80e38fa5" sha1="732cb508208ff8af157fe1bdfe75f18918f90103" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghosthnt" supported="no">
+		<description>Ghosthunt</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Black screen, [CTC]?
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x3711">
+				<rom name="Ghosthunt.bin" size="0x3711" crc="6d1ad444" sha1="4829e38ffd8d72865e1e70f30199104a92a67e69" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lazybug">
+		<description>Lazy Bug</description>
+		<year>1984</year>
+		<publisher>Double Brain!</publisher>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x2dd7">
+				<rom name="Lazy Bug.bin" size="0x2dd7" crc="dabce382" sha1="c5262af5bd3e9c99e73a7ee04fa2f5f07f2cd5b6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monkong">
+		<description>Monkey Kong</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x29c3">
+				<rom name="Monkey Kong.bin" size="0x29c3" crc="dbc6839a" sha1="1e06f8d8bb18f81f0a327b9b7f0403666d2f1e42" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mulpede">
+		<description>Multipede</description>
+		<year>19??</year>
+		<publisher>Double Brain!</publisher>
+		<!-- PvH, WB Produktions -->
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x2485">
+				<rom name="Multipede.bin" size="0x2485" crc="e6d8d5f9" sha1="d670c730d034c31a6503d39169e1625356ee9d2e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcfight">
+		<description>Space Fight</description>
+		<year>19??</year>
+		<!-- Lucas Benjamin Kruijswijk -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Requires zero fill on unused part otherwise no enemy appear (verify)
+]]></notes>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom value="0x00" size="0x4000" loadflag="fill" />
+				<rom name="Space Fight.bin" size="0x2b65" crc="8f9a815f" sha1="8d4439e0f9ff6fc8bdedfa1a2809ea65387f2e0f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris">
+		<description>Tetris</description>
+		<year>19??</year>
+		<publisher>B.&amp; E. Soft</publisher>
+		<part name="cart" interface="p2000_cart">
+			<dataarea name="rom" size="0x24d6">
+				<rom name="Tetris.bin" size="0x24d6" crc="ed58aece" sha1="43f31d9aeac842d7a93f886cd0814b2d44e9cdbb" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -84,18 +84,24 @@ public:
 	vamphalf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_wram(*this,"wram")
-		, m_wram32(*this,"wram32")
-		, m_qs1000_bank(*this, "qs1000_bank")
-		, m_okibank(*this,"okibank")
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch")
 		, m_eeprom(*this, "eeprom")
+		, m_wram(*this, "wram")
+		, m_wram32(*this, "wram32")
+		, m_okibank(*this, "okibank")
+		, m_qs1000_bank(*this, "qs1000_bank")
+		, m_flip_bit(1)
+		, m_palshift(0)
+		, m_semicom_prot_data{0}
+		, m_semicom_prot_idx(0)
+		, m_semicom_prot_which(0)
 		, m_gfxdecode(*this, "gfxdecode")
-		, m_tiles(*this,"tiles", 0x40000, ENDIANNESS_BIG)
+		, m_tiles(*this, "tiles", 0x40000, ENDIANNESS_BIG)
 		, m_okiregion(*this, "oki%u", 1)
 		, m_photosensors(*this, "PHOTO_SENSORS")
 		, m_has_extra_gfx(false)
+		, m_flipscreen(false)
 	{
 	}
 
@@ -164,28 +170,28 @@ public:
 protected:
 	virtual void video_start() override ATTR_COLD;
 
-	u16 m_flip_bit;
-	u8 m_palshift;
-
 	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<u16> m_wram;
-	optional_shared_ptr<u32> m_wram32;
-
-	memory_bank_creator m_qs1000_bank;
-
-	u16 m_semicom_prot_data[2];
-	int m_semicom_prot_idx;
-	int m_semicom_prot_which;
-
-	bool irq_active();
-
-	optional_memory_bank m_okibank;
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	u32 finalgdr_prot_r();
+	optional_shared_ptr<u16> m_wram;
+	optional_shared_ptr<u32> m_wram32;
+
+	optional_memory_bank m_okibank;
+	memory_bank_creator m_qs1000_bank;
+
+	u16 m_flip_bit;
+	u8 m_palshift;
+
+	u16 m_semicom_prot_data[2];
+	s32 m_semicom_prot_idx;
+	s32 m_semicom_prot_which;
+
+	template <u32 SetValue> u32 prot_r();
 	void finalgdr_prot_w(u32 data);
+
+	bool irq_active();
 
 	template <u32 Pc, u32 Wram_offs> u16 speedup_16_r();
 	template <u32 Pc, u32 Wram_offs> u32 speedup_32_r();
@@ -254,7 +260,6 @@ public:
 private:
 	required_device<i8052_device> m_qdsp_cpu;
 
-	u32 wyvernwg_prot_r();
 	void wyvernwg_prot_w(u32 data);
 
 	void yorijori_eeprom_w(u32 data);
@@ -271,6 +276,7 @@ public:
 	vamphalf_nvram_state(const machine_config &mconfig, device_type type, const char *tag)
 		: vamphalf_state(mconfig, type, tag)
 		, m_nvram(*this, "nvram")
+		, m_finalgdr_backupram_bank(0)
 	{
 	}
 
@@ -281,14 +287,11 @@ public:
 	void init_finalgdr();
 
 private:
-
-	void finalgdr_io(address_map &map) ATTR_COLD;
-	void mrkickera_io(address_map &map) ATTR_COLD;
-
 	required_device<nvram_device> m_nvram;
 
-	u16 m_finalgdr_backupram_bank = 0;
+	u16 m_finalgdr_backupram_bank;
 	std::unique_ptr<u8[]> m_finalgdr_backupram;
+
 	void finalgdr_backupram_bank_w(u32 data);
 	u32 finalgdr_backupram_r(offs_t offset);
 	void finalgdr_backupram_w(offs_t offset, u32 data);
@@ -297,6 +300,9 @@ private:
 	void finalgdr_oki_bank_w(u32 data);
 
 	void finalgdr_eeprom_w(u32 data);
+
+	void finalgdr_io(address_map &map) ATTR_COLD;
+	void mrkickera_io(address_map &map) ATTR_COLD;
 };
 
 u16 vamphalf_state::eeprom_r()
@@ -306,25 +312,25 @@ u16 vamphalf_state::eeprom_r()
 
 void vamphalf_state::eeprom_w(u16 data)
 {
-	m_eeprom->di_write(data & 0x01);
-	m_eeprom->cs_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
-	m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->di_write(BIT(data, 0));
+	m_eeprom->cs_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
 
-	// data & 8?
+	// BIT(data, 3)?
 }
 
 void vamphalf_nvram_state::finalgdr_eeprom_w(u32 data)
 {
-	m_eeprom->di_write((data & 0x4000) >> 14);
-	m_eeprom->cs_write((data & 0x1000) ? ASSERT_LINE : CLEAR_LINE );
-	m_eeprom->clk_write((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->di_write(BIT(data, 14));
+	m_eeprom->cs_write(BIT(data, 12) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write(BIT(data, 13) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void vamphalf_qdsp_state::yorijori_eeprom_w(u32 data)
 {
-	m_eeprom->di_write((data & 0x1000) >> 12);
-	m_eeprom->cs_write((data & 0x4000) ? ASSERT_LINE : CLEAR_LINE );
-	m_eeprom->clk_write((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->di_write(BIT(data, 12));
+	m_eeprom->cs_write(BIT(data, 14) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write(BIT(data, 13) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void vamphalf_state::flipscreen_w(u16 data)
@@ -334,28 +340,21 @@ void vamphalf_state::flipscreen_w(u16 data)
 
 void vamphalf_state::jmpbreak_flipscreen_w(u16 data)
 {
-	m_flipscreen = data & 0x8000;
+	m_flipscreen = BIT(data, 15);
 }
 
-
-u32 vamphalf_qdsp_state::wyvernwg_prot_r()
+template <u32 SetValue>
+u32 vamphalf_state::prot_r()
 {
 	if (!machine().side_effects_disabled())
 		m_semicom_prot_idx--;
-	return (m_semicom_prot_data[m_semicom_prot_which] & (1 << m_semicom_prot_idx)) >> m_semicom_prot_idx;
+	return BIT(m_semicom_prot_data[m_semicom_prot_which], m_semicom_prot_idx) ? SetValue : 0;
 }
 
 void vamphalf_qdsp_state::wyvernwg_prot_w(u32 data)
 {
-	m_semicom_prot_which = data & 1;
+	m_semicom_prot_which = BIT(data, 0);
 	m_semicom_prot_idx = 8;
-}
-
-u32 vamphalf_state::finalgdr_prot_r()
-{
-	if (!machine().side_effects_disabled())
-		m_semicom_prot_idx--;
-	return (m_semicom_prot_data[m_semicom_prot_which] & (1 << m_semicom_prot_idx)) ? 0x8000 : 0;
 }
 
 void vamphalf_state::finalgdr_prot_w(u32 data)
@@ -397,17 +396,17 @@ void vamphalf_nvram_state::finalgdr_backupram_w(offs_t offset, u32 data)
 
 void vamphalf_nvram_state::finalgdr_prize_w(u32 data)
 {
-	if (data & 0x1000000)
+	if (BIT(data, 24))
 	{
 		// prize 1
 	}
 
-	if (data & 0x2000000)
+	if (BIT(data, 25))
 	{
 		// prize 2
 	}
 
-	if (data & 0x4000000)
+	if (BIT(data, 26))
 	{
 		// prize 3
 	}
@@ -471,7 +470,7 @@ void vamphalf_state::qs1000_p3_w(u8 data)
 
 void vamphalf_state::common_map(address_map &map)
 {
-	map(0x00000000, 0x001fffff).ram().share("wram");
+	map(0x00000000, 0x001fffff).ram().share(m_wram);
 	map(0x40000000, 0x4003ffff).rw(FUNC(vamphalf_state::vram_r), FUNC(vamphalf_state::vram_w));
 	map(0x80000000, 0x8000ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff00000, 0xffffffff).rom().region("maincpu", 0);
@@ -479,7 +478,7 @@ void vamphalf_state::common_map(address_map &map)
 
 void vamphalf_state::common_32bit_map(address_map &map)
 {
-	map(0x00000000, 0x001fffff).ram().share("wram32");
+	map(0x00000000, 0x001fffff).ram().share(m_wram32);
 	map(0x40000000, 0x4003ffff).rw(FUNC(vamphalf_state::vram_r), FUNC(vamphalf_state::vram_w));
 	map(0x80000000, 0x8000ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xfff00000, 0xffffffff).rom().region("maincpu", 0);
@@ -487,7 +486,7 @@ void vamphalf_state::common_32bit_map(address_map &map)
 
 void vamphalf_qdsp_state::yorijori_32bit_map(address_map &map)
 {
-	map(0x00000000, 0x001fffff).ram().share("wram32");
+	map(0x00000000, 0x001fffff).ram().share(m_wram32);
 	map(0x40000000, 0x4003ffff).rw(FUNC(vamphalf_state::vram_r), FUNC(vamphalf_state::vram_w));
 	map(0x80000000, 0x8000ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0);
@@ -547,7 +546,7 @@ void vamphalf_state::suplup_io(address_map &map)
 
 void vamphalf_qdsp_state::wyvernwg_io(address_map &map)
 {
-	map(0x0600, 0x0600).rw(FUNC(vamphalf_qdsp_state::wyvernwg_prot_r), FUNC(vamphalf_qdsp_state::wyvernwg_prot_w));
+	map(0x0600, 0x0600).rw(FUNC(vamphalf_qdsp_state::prot_r<0x0001>), FUNC(vamphalf_qdsp_state::wyvernwg_prot_w));
 	map(0x0800, 0x0800).umask32(0x0000ffff).w(FUNC(vamphalf_state::flipscreen_w));
 	map(0x0a00, 0x0a00).portr("P1_P2");
 	map(0x0c00, 0x0c00).portr("SYSTEM");
@@ -558,7 +557,7 @@ void vamphalf_qdsp_state::wyvernwg_io(address_map &map)
 
 void vamphalf_nvram_state::finalgdr_io(address_map &map)
 {
-	map(0x0900, 0x0900).r(FUNC(vamphalf_nvram_state::finalgdr_prot_r));
+	map(0x0900, 0x0900).r(FUNC(vamphalf_nvram_state::prot_r<0x8000>));
 	map(0x0a00, 0x0a00).w(FUNC(vamphalf_nvram_state::finalgdr_backupram_bank_w));
 	map(0x0b00, 0x0b7f).rw(FUNC(vamphalf_nvram_state::finalgdr_backupram_r), FUNC(vamphalf_nvram_state::finalgdr_backupram_w));
 	map(0x0c00, 0x0c01).umask32(0x0000ff00).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
@@ -582,7 +581,7 @@ void vamphalf_nvram_state::mrkickera_io(address_map &map)
 	map(0x1010, 0x1010).w(FUNC(vamphalf_nvram_state::finalgdr_prot_w));
 	map(0x1021, 0x1021).nopw(); //?
 	map(0x1028, 0x1028).w(FUNC(vamphalf_nvram_state::finalgdr_oki_bank_w));
-	map(0x1900, 0x1900).r(FUNC(vamphalf_nvram_state::finalgdr_prot_r));
+	map(0x1900, 0x1900).r(FUNC(vamphalf_nvram_state::prot_r<0x8000>));
 	map(0x1c00, 0x1c01).umask32(0x0000ff00).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x1d00, 0x1d00).umask32(0x0000ff00).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x1e00, 0x1e00).portr("P1_P2");
@@ -638,7 +637,7 @@ void vamphalf_state::mrdig_io(address_map &map)
 
 void vamphalf_state::aoh_map(address_map &map)
 {
-	map(0x00000000, 0x003fffff).ram().share("wram32");
+	map(0x00000000, 0x003fffff).ram().share(m_wram32);
 	map(0x40000000, 0x4003ffff).rw(FUNC(vamphalf_state::vram_r), FUNC(vamphalf_state::vram_w));
 	map(0x80000000, 0x8000ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x80210000, 0x80210003).portr("SYSTEM");
@@ -673,7 +672,7 @@ void vamphalf_state::boonggab_io(address_map &map)
 
 void vamphalf_qdsp_state::yorijori_io(address_map &map)
 {
-	map(0x0900, 0x0900).r(FUNC(vamphalf_qdsp_state::finalgdr_prot_r));
+	map(0x0900, 0x0900).r(FUNC(vamphalf_qdsp_state::prot_r<0x8000>));
 	map(0x0d00, 0x0d00).portr("P1_P2");
 	map(0x0e00, 0x0e00).umask32(0x0000ff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x0f00, 0x0f00).portr("SYSTEM");
@@ -686,7 +685,7 @@ void vamphalf_qdsp_state::yorijori_io(address_map &map)
 void vamphalf_state::banked_oki_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
-	map(0x20000, 0x3ffff).bankr("okibank");
+	map(0x20000, 0x3ffff).bankr(m_okibank);
 }
 
 /*
@@ -714,19 +713,19 @@ void vamphalf_state::video_start()
 {
 	save_item(NAME(m_flipscreen));
 
-	m_flipscreen = 0;
+	m_flipscreen = false;
 }
 
 void vamphalf_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	rectangle clip = cliprect;
-	int block;
 
 	for (int y = (cliprect.min_y & ~15); y <= (cliprect.max_y | 15); y += 16)
 	{
 		clip.min_y = y;
 		clip.max_y = y + 15;
+		int block;
 		if (m_flipscreen)
 		{
 			block = (y / 16) * 0x800;
@@ -746,22 +745,22 @@ void vamphalf_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		{
 			const int offs = (block + cnt) / 2;
 
-			if (m_tiles[offs] & 0x0100) continue;
+			if (BIT(m_tiles[offs], 8)) continue;
 
-			u32 code = m_tiles[offs+1];
-			const u32 color = (m_tiles[offs+2] >> m_palshift) & 0x7f;
+			u32 code = m_tiles[offs + 1];
+			const u32 color = (m_tiles[offs + 2] >> m_palshift) & 0x7f;
 
 			// boonggab
 			if (m_has_extra_gfx)
 			{
-				code |= ((m_tiles[offs+2] & 0x100) << 8);
+				code |= ((m_tiles[offs + 2] & 0x100) << 8);
 			}
 
-			int x = m_tiles[offs+3] & 0x01ff;
+			int x = m_tiles[offs + 3] & 0x01ff;
 			int y = 256 - (m_tiles[offs] & 0x00ff);
 
-			int fx = m_tiles[offs] & 0x8000;
-			int fy = m_tiles[offs] & 0x4000;
+			bool fx = BIT(m_tiles[offs], 15);
+			bool fy = BIT(m_tiles[offs], 14);
 
 			if (m_flipscreen)
 			{
@@ -802,12 +801,12 @@ void vamphalf_state::draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitma
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	rectangle clip = cliprect;
-	int block;
 
 	for (int y = (cliprect.min_y & ~15); y <= (cliprect.max_y | 15); y += 16)
 	{
 		clip.min_y = y;
 		clip.max_y = y + 15;
+		int block;
 		if (m_flipscreen)
 		{
 			block = (y / 16) * 0x800;
@@ -826,14 +825,14 @@ void vamphalf_state::draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitma
 		for (u32 cnt = 0; cnt < 0x800; cnt += 8)
 		{
 			const int offs = (block + cnt) / 2;
-			const u32 code  = (m_tiles[offs+1] & 0xffff) | ((m_tiles[offs] & 0x300) << 8);
-			const u32 color = (m_tiles[offs+2] >> m_palshift) & 0x7f;
+			const u32 code  = (m_tiles[offs + 1] & 0xffff) | ((m_tiles[offs] & 0x300) << 8);
+			const u32 color = (m_tiles[offs + 2] >> m_palshift) & 0x7f;
 
-			int x = m_tiles[offs+3] & 0x01ff;
+			int x = m_tiles[offs + 3] & 0x01ff;
 			int y = 256 - (m_tiles[offs] & 0x00ff);
 
-			int fx = m_tiles[offs] & 0x400;
-			int fy = 0; // not used ? or it's m_tiles[offs] & 0x800?
+			bool fx = BIT(m_tiles[offs], 10);
+			bool fy = false; // not used ? or it's BIT(m_tiles[offs], 11)?
 
 			if (m_flipscreen)
 			{
@@ -889,7 +888,7 @@ ioport_value vamphalf_state::boonggab_photo_sensors_r()
 	static const u16 photo_sensors_table[8] = { 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 };
 	u8 res = m_photosensors->read();
 
-	switch(res)
+	switch (res)
 	{
 		case 0x01:
 			return photo_sensors_table[1]; // 5 - 7 points
@@ -1387,7 +1386,7 @@ void vamphalf_qdsp_state::yorijori(machine_config &config)
 
 /*
 
-Vamp x1/2 (Danbi, 1999)
+Vamf x1/2 & 뱀프 x1/2(Vamp x1/2) (Danbi, 1999)
 Hardware info by Guru
 
 DANBI (no PCB number)
@@ -1662,10 +1661,10 @@ ROM_END
 
 /*
 
-Jumping Break & Poosho Poosho
+Jumping Break & 뿌셔뿌셔(Poosho Poosho)
 F2 System, 1999
 
-sequel to "Die Break" from the Bestri 3 game collection (see crospang.cpp)
+sequel to "Die Break" from the Bestri 3 game collection (see f32/crospang.cpp)
 
 F-E1-16-002
 +----------------------------------------------+
@@ -1773,7 +1772,7 @@ ROM_END
 New Cross Pang
 F2 System, 1999
 
-sequel to "Cross Pang" (see crospang.cpp)
+sequel to "Cross Pang" (see f32/crospang.cpp)
 
 F-E1-16-002
 +----------------------------------------------+
@@ -2585,7 +2584,7 @@ ROM_END
 
 /*
 
-Yori Jori Kuk Kuk
+요리 조리 쿡쿡(Yori Jori Kuk Kuk)
 
 GOLDEN BELL-002
 +----------------------------------------------+
@@ -2676,7 +2675,7 @@ ROM_END
 
 /*
 
-Final Godori (c) SemiCom
+파이널 고도리(Final Godori) (c) SemiCom
 
 SEMICOM-003a
 +---------------------------------------------+
@@ -3041,7 +3040,7 @@ ROM_END
 bool vamphalf_state::irq_active()
 {
 	const u32 FCR = m_maincpu->state_int(E132XS_FCR);
-	if (!(FCR & (1 << 29))) // int 2 (irq 4)
+	if (!BIT(FCR, 29)) // int 2 (irq 4)
 		return true;
 	else
 		return false;
@@ -3061,7 +3060,7 @@ void vamphalf_state::banked_oki(int chip)
 template <u32 Pc, u32 Wram_offs>
 u16 vamphalf_state::speedup_16_r()
 {
-	if (m_maincpu->pc() == Pc)
+	if ((!machine().side_effects_disabled()) && (m_maincpu->pc() == Pc))
 	{
 		if (irq_active())
 			m_maincpu->spin_until_interrupt();
@@ -3075,7 +3074,7 @@ u16 vamphalf_state::speedup_16_r()
 template <u32 Pc, u32 Wram_offs>
 u32 vamphalf_state::speedup_32_r()
 {
-	if (m_maincpu->pc() == Pc)
+	if ((!machine().side_effects_disabled()) && (m_maincpu->pc() == Pc))
 	{
 		if (irq_active())
 			m_maincpu->spin_until_interrupt();
@@ -3088,7 +3087,8 @@ u32 vamphalf_state::speedup_32_r()
 
 u32 vamphalf_state::aoh_speedup_r()
 {
-	if (m_maincpu->pc() == 0xb994 || m_maincpu->pc() == 0xba40)
+	if ((!machine().side_effects_disabled()) &&
+		(m_maincpu->pc() == 0xb994 || m_maincpu->pc() == 0xba40))
 	{
 		m_maincpu->eat_cycles(500);
 	}
@@ -3214,6 +3214,7 @@ void vamphalf_qdsp_state::init_wyvernwg()
 	m_qdsp_cpu->space(AS_DATA).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
 	m_qs1000_bank->configure_entries(0, 16, memregion("qs1000:cpu")->base() + 0x100, 0x8000-0x100);
 
+	save_item(NAME(m_semicom_prot_data));
 	save_item(NAME(m_semicom_prot_idx));
 	save_item(NAME(m_semicom_prot_which));
 }
@@ -3237,6 +3238,10 @@ void vamphalf_qdsp_state::init_yorijori()
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
 	m_qdsp_cpu->space(AS_DATA).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
 	m_qs1000_bank->configure_entries(0, 16, memregion("qs1000:cpu")->base() + 0x100, 0x8000-0x100);
+
+	save_item(NAME(m_semicom_prot_data));
+	save_item(NAME(m_semicom_prot_idx));
+	save_item(NAME(m_semicom_prot_which));
 }
 
 void vamphalf_nvram_state::init_finalgdr()
@@ -3256,6 +3261,7 @@ void vamphalf_nvram_state::init_finalgdr()
 
 	save_item(NAME(m_finalgdr_backupram_bank));
 	save_pointer(NAME(m_finalgdr_backupram), 0x80*0x100);
+	save_item(NAME(m_semicom_prot_data));
 	save_item(NAME(m_semicom_prot_idx));
 	save_item(NAME(m_semicom_prot_which));
 }
@@ -3276,6 +3282,7 @@ void vamphalf_nvram_state::init_mrkickera()
 	m_semicom_prot_data[0] = 2;
 	m_semicom_prot_data[1] = 3;
 
+	save_item(NAME(m_semicom_prot_data));
 	save_item(NAME(m_semicom_prot_idx));
 	save_item(NAME(m_semicom_prot_which));
 }
@@ -3373,7 +3380,6 @@ void vamphalf_state::init_worldadv()
 
 void vamphalf_state::init_solitaire()
 {
-
 	// TODO: speedup
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x05d1c0, 0x05d1c1, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0x8810, 0x5d1c0>))));
 
@@ -3393,54 +3399,54 @@ void vamphalf_state::init_boonggab()
 } // anonymous namespace
 
 
-GAME( 1999, coolmini,   0,        coolmini,  common,    vamphalf_state,      init_coolmini,  ROT0,   "SemiCom",                       "Cool Minigame Collection", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, coolminii,  coolmini, coolmini,  common,    vamphalf_state,      init_coolminii, ROT0,   "SemiCom",                       "Cool Minigame Collection (Italy)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, coolmini,   0,        coolmini,  common,    vamphalf_state,       init_coolmini,  ROT0,   "SemiCom",                       "Cool Minigame Collection", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, coolminii,  coolmini, coolmini,  common,    vamphalf_state,       init_coolminii, ROT0,   "SemiCom",                       "Cool Minigame Collection (Italy)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, jmpbreak,   0,        jmpbreak,  common,    vamphalf_state,      init_jmpbreak,  ROT0,   "F2 System",                     "Jumping Break (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, jmpbreaka,  jmpbreak, jmpbreak,  common,    vamphalf_state,      init_jmpbreaka, ROT0,   "F2 System",                     "Jumping Break (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jmpbreak,   0,        jmpbreak,  common,    vamphalf_state,       init_jmpbreak,  ROT0,   "F2 System",                     "Jumping Break (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jmpbreaka,  jmpbreak, jmpbreak,  common,    vamphalf_state,       init_jmpbreaka, ROT0,   "F2 System",                     "Jumping Break (set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, poosho,     0,        jmpbreak,  common,    vamphalf_state,      init_poosho,    ROT0,   "F2 System",                     "Poosho Poosho", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, poosho,     0,        jmpbreak,  common,    vamphalf_state,       init_poosho,    ROT0,   "F2 System",                     "Poosho Poosho", MACHINE_SUPPORTS_SAVE ) // This set is English title version, Korean title version exists? (background text in title screen is still Korean)
 
-GAME( 1999, newxpang,   0,        newxpang,  common,    vamphalf_state,      init_newxpang,  ROT0,   "F2 System",                     "New Cross Pang (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, newxpanga,  newxpang, jmpbreak,  common,    vamphalf_state,      init_newxpanga, ROT0,   "F2 System",                     "New Cross Pang (set 2)", MACHINE_SUPPORTS_SAVE ) // TODO: speed up for this set
+GAME( 1999, newxpang,   0,        newxpang,  common,    vamphalf_state,       init_newxpang,  ROT0,   "F2 System",                     "New Cross Pang (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, newxpanga,  newxpang, jmpbreak,  common,    vamphalf_state,       init_newxpanga, ROT0,   "F2 System",                     "New Cross Pang (set 2)", MACHINE_SUPPORTS_SAVE ) // TODO: speed up for this set
 
-GAME( 1999, worldadv,   0,        worldadv,  common,    vamphalf_state,      init_worldadv,  ROT0,   "Logic / F2 System",             "World Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // game starts to stall for several seconds at a time after it's been running for a certain amount of time
+GAME( 1999, worldadv,   0,        worldadv,  common,    vamphalf_state,       init_worldadv,  ROT0,   "Logic / F2 System",             "World Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // game starts to stall for several seconds at a time after it's been running for a certain amount of time
 
-GAME( 1999, solitaire,  0,        solitaire, solitaire, vamphalf_state,      init_solitaire, ROT0,   "F2 System",                     "Solitaire (version 2.5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, solitaire,  0,        solitaire, solitaire, vamphalf_state,       init_solitaire, ROT0,   "F2 System",                     "Solitaire (version 2.5)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, suplup,     0,        suplup,    common,    vamphalf_state,      init_suplup,    ROT0,   "Omega System",                  "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, luplup,     suplup,   suplup,    common,    vamphalf_state,      init_luplup,    ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1999, luplup29,   suplup,   suplup,    common,    vamphalf_state,      init_luplup29,  ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1999, luplup10,   suplup,   suplup,    common,    vamphalf_state,      init_luplup10,  ROT0,   "Omega System (Adko license)",   "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 1.05 / 981214)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1999, puzlbang,   suplup,   suplup,    common,    vamphalf_state,      init_puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.9 / 990108)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1999, puzlbanga,  suplup,   suplup,    common,    vamphalf_state,      init_puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.8 / 990106)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1999, suplup,     0,        suplup,    common,    vamphalf_state,       init_suplup,    ROT0,   "Omega System",                  "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, luplup,     suplup,   suplup,    common,    vamphalf_state,       init_luplup,    ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1999, luplup29,   suplup,   suplup,    common,    vamphalf_state,       init_luplup29,  ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1999, luplup10,   suplup,   suplup,    common,    vamphalf_state,       init_luplup10,  ROT0,   "Omega System (Adko license)",   "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 1.05 / 981214)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1999, puzlbang,   suplup,   suplup,    common,    vamphalf_state,       init_puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.9 / 990108)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1999, puzlbanga,  suplup,   suplup,    common,    vamphalf_state,       init_puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.8 / 990106)",                   MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, vamphalf,   0,        vamphalf,  common,    vamphalf_state,      init_vamphalf,  ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.1.0908)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, vamphalfr1, vamphalf, vamphalf,  common,    vamphalf_state,      init_vamphalfr1,ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.0.0903)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, vamphalfk,  vamphalf, vamphalf,  common,    vamphalf_state,      init_vamphafk,  ROT0,   "Danbi / F2 System",             "Vamp x1/2 (Korea, version 1.1.0908)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1999, vamphalf,   0,        vamphalf,  common,    vamphalf_state,       init_vamphalf,  ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.1.0908)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, vamphalfr1, vamphalf, vamphalf,  common,    vamphalf_state,       init_vamphalfr1,ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.0.0903)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, vamphalfk,  vamphalf, vamphalf,  common,    vamphalf_state,       init_vamphafk,  ROT0,   "Danbi / F2 System",             "Vamp x1/2 (Korea, version 1.1.0908)",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, dquizgo2,   0,        coolmini,  common,    vamphalf_state,      init_dquizgo2,  ROT0,   "SemiCom",                       "Date Quiz Go Go Episode 2", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, dquizgo2,   0,        coolmini,  common,    vamphalf_state,       init_dquizgo2,  ROT0,   "SemiCom",                       "Date Quiz Go Go Episode 2", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, misncrft,   0,        misncrft,  common,    vamphalf_qdsp_state, init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.7)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // game starts to stall for several seconds at a time after it's been running for a certain amount of time (you can usually complete 1 loop)
-GAME( 2000, misncrfta,  misncrft, misncrft,  common,    vamphalf_qdsp_state, init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.4)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 2000, misncrft,   0,        misncrft,  common,    vamphalf_qdsp_state,  init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.7)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // game starts to stall for several seconds at a time after it's been running for a certain amount of time (you can usually complete 1 loop)
+GAME( 2000, misncrfta,  misncrft, misncrft,  common,    vamphalf_qdsp_state,  init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.4)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-GAME( 2000, mrdig,      0,        mrdig,     common,    vamphalf_state,      init_mrdig,     ROT0,   "Sun",                           "Mr. Dig", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mrdig,      0,        mrdig,     common,    vamphalf_state,       init_mrdig,     ROT0,   "Sun",                           "Mr. Dig", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, dtfamily,   0,        mrkicker,  common,    vamphalf_state,      init_dtfamily,  ROT0,   "SemiCom",                       "Diet Family", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, dtfamily,   0,        mrkicker,  common,    vamphalf_state,       init_dtfamily,  ROT0,   "SemiCom",                       "Diet Family", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, finalgdr,   0,        finalgdr,  finalgdr,  vamphalf_nvram_state,init_finalgdr,  ROT0,   "SemiCom",                       "Final Godori (Korea, version 2.20.5915)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, finalgdr,   0,        finalgdr,  finalgdr,  vamphalf_nvram_state, init_finalgdr,  ROT0,   "SemiCom",                       "Final Godori (Korea, version 2.20.5915)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, mrkicker,   0,        mrkicker,  common,    vamphalf_state,      init_mrkicker,  ROT0,   "SemiCom",                       "Mr. Kicker (F-E1-16-010 PCB)",  MACHINE_SUPPORTS_SAVE )
-GAME( 2001, mrkickera,  mrkicker, mrkickera, finalgdr,  vamphalf_nvram_state,init_mrkickera, ROT0,   "SemiCom",                       "Mr. Kicker (SEMICOM-003b PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // if you allow EEPROM saving, then this set corrupts the EEPROM and then won't boot
+GAME( 2001, mrkicker,   0,        mrkicker,  common,    vamphalf_state,       init_mrkicker,  ROT0,   "SemiCom",                       "Mr. Kicker (F-E1-16-010 PCB)",  MACHINE_SUPPORTS_SAVE )
+GAME( 2001, mrkickera,  mrkicker, mrkickera, finalgdr,  vamphalf_nvram_state, init_mrkickera, ROT0,   "SemiCom",                       "Mr. Kicker (SEMICOM-003b PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // if you allow EEPROM saving, then this set corrupts the EEPROM and then won't boot
 
-GAME( 2001, toyland,    0,        coolmini,  common,    vamphalf_state,      init_toyland,   ROT0,   "SemiCom",                       "Toy Land Adventure", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, toyland,    0,        coolmini,  common,    vamphalf_state,       init_toyland,   ROT0,   "SemiCom",                       "Toy Land Adventure", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, wivernwg,   0,        wyvernwg,  common,    vamphalf_qdsp_state, init_wyvernwg,  ROT270, "SemiCom",                       "Wivern Wings",         MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // gives a protection error after a certain number of plays / coins?
-GAME( 2001, wyvernwg,   wivernwg, wyvernwg,  common,    vamphalf_qdsp_state, init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2001, wyvernwga,  wivernwg, wyvernwg,  common,    vamphalf_qdsp_state, init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, wivernwg,   0,        wyvernwg,  common,    vamphalf_qdsp_state,  init_wyvernwg,  ROT270, "SemiCom",                       "Wivern Wings",         MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // gives a protection error after a certain number of plays / coins?
+GAME( 2001, wyvernwg,   wivernwg, wyvernwg,  common,    vamphalf_qdsp_state,  init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, wyvernwga,  wivernwg, wyvernwg,  common,    vamphalf_qdsp_state,  init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 
-GAME( 2001, aoh,        0,        aoh,       aoh,       vamphalf_state,      init_aoh,       ROT0,   "Unico",                         "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, aoh,        0,        aoh,       aoh,       vamphalf_state,       init_aoh,       ROT0,   "Unico",                         "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, boonggab,   0,        boonggab,  boonggab,  vamphalf_state,      init_boonggab,  ROT270, "Taff System",                   "Boong-Ga Boong-Ga (Spank'em!)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, boonggab,   0,        boonggab,  boonggab,  vamphalf_state,       init_boonggab,  ROT270, "Taff System",                   "Boong-Ga Boong-Ga (Spank'em!)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2002, yorijori,   0,        yorijori,  yorijori,  vamphalf_qdsp_state, init_yorijori,  ROT0,   "Golden Bell Entertainment",     "Yori Jori Kuk Kuk", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ROM patch needed to boot
+GAME( 2002, yorijori,   0,        yorijori,  yorijori,  vamphalf_qdsp_state,  init_yorijori,  ROT0,   "Golden Bell Entertainment",     "Yori Jori Kuk Kuk", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ROM patch needed to boot

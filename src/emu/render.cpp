@@ -3443,66 +3443,51 @@ render_target *render_manager::target_by_index(int index) const
 //  fonts
 //-------------------------------------------------
 
-float render_manager::ui_aspect(render_container *rc)
+float render_manager::ui_aspect(render_target &target)
 {
-	// work out if this is a UI container
-	render_target *target = nullptr;
-	if (!rc)
-	{
-		target = &ui_target();
-		rc = target->ui_container();
-		assert(rc);
-	}
-	else
-	{
-		for (render_target &t : m_targetlist)
-		{
-			if (t.ui_container() == rc)
-			{
-				target = &t;
-				break;
-			}
-		}
-	}
+	assert(target.ui_container());
 
+	// based on the orientation of the target, compute height/width or width/height
+	int const orient = orientation_add(target.orientation(), target.ui_container()->orientation());
 	float aspect;
-
-	if (target)
-	{
-		// UI container, aggregated multi-screen target
-
-		// based on the orientation of the target, compute height/width or width/height
-		int const orient = orientation_add(target->orientation(), rc->orientation());
-		if (!(orient & ORIENTATION_SWAP_XY))
-			aspect = float(target->height()) / float(target->width());
-		else
-			aspect = float(target->width()) / float(target->height());
-
-		// if we have a valid pixel aspect, apply that and return
-		if (target->pixel_aspect() != 0.0f)
-		{
-			float pixel_aspect = target->pixel_aspect();
-
-			if (orient & ORIENTATION_SWAP_XY)
-				pixel_aspect = 1.0f / pixel_aspect;
-
-			return aspect /= pixel_aspect;
-		}
-	}
+	if (!(orient & ORIENTATION_SWAP_XY))
+		aspect = float(target.height()) / float(target.width());
 	else
-	{
-		// single screen container
+		aspect = float(target.width()) / float(target.height());
 
-		// based on the orientation of the target, compute height/width or width/height
-		int const orient = rc->orientation();
-		if (!(orient & ORIENTATION_SWAP_XY))
-			aspect = (float)rc->screen()->visible_area().height() / (float)rc->screen()->visible_area().width();
-		else
-			aspect = (float)rc->screen()->visible_area().width() / (float)rc->screen()->visible_area().height();
+	// if we have a valid pixel aspect, apply that and return
+	if (target.pixel_aspect() != 0.0F)
+	{
+		float pixel_aspect = target.pixel_aspect();
+
+		if (orient & ORIENTATION_SWAP_XY)
+			pixel_aspect = 1.0F / pixel_aspect;
+
+		return aspect / pixel_aspect;
 	}
 
 	// clamp for extreme proportions
-	return std::clamp(aspect, 0.66f, 1.5f);
+	return std::clamp(aspect, 0.66F, 1.5F);
+}
+
+float render_manager::ui_aspect(render_container &rc)
+{
+	// deal with UI containers
+	for (render_target &target : m_targetlist)
+	{
+		if (target.ui_container() == &rc)
+			return ui_aspect(target);
+	}
+
+	// based on the orientation of the target, compute height/width or width/height
+	assert(rc.screen());
+	int const orient = rc.orientation();
+	float const viswidth = rc.screen()->visible_area().width();
+	float const visheight = rc.screen()->visible_area().height();
+	float const aspect = !(orient & ORIENTATION_SWAP_XY) ? (visheight / viswidth) : (viswidth / visheight);
+
+	// clamp for extreme proportions
+	return std::clamp(aspect, 0.66F, 1.5F);
 }
 
 

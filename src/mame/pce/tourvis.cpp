@@ -178,10 +178,7 @@ http://blog.system11.org/?p=1943
 #include "emu.h"
 #include "pcecommn.h"
 
-#include "cpu/h6280/h6280.h"
 #include "cpu/i8085/i8085.h"
-#include "video/huc6260.h"
-#include "video/huc6270.h"
 #include "machine/i8155.h"
 
 #include "bus/generic/slot.h"

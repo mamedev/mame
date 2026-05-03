@@ -39,8 +39,8 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, render_container &container, device_image_interface &image)
-	: menu(mui, container)
+menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, render_target &target, device_image_interface &image)
+	: menu(mui, target)
 	, m_image(image)
 	, m_create_ok(false)
 	, m_create_confirmed(false)
@@ -247,7 +247,7 @@ void menu_control_device_image::menu_activated()
 	{
 	case START_FILE:
 		menu::stack_push<menu_file_selector>(
-				ui(), container(),
+				ui(), target(),
 				&m_image,
 				m_current_directory,
 				m_current_file,
@@ -270,7 +270,7 @@ void menu_control_device_image::menu_activated()
 						break;
 
 					case menu_file_selector::result::CREATE:
-						menu::stack_push<menu_file_create>(ui(), container(), &m_image, m_current_directory, m_current_file, m_create_ok);
+						menu::stack_push<menu_file_create>(ui(), target(), &m_image, m_current_directory, m_current_file, m_create_ok);
 						m_state = CHECK_CREATE;
 						break;
 
@@ -291,13 +291,13 @@ void menu_control_device_image::menu_activated()
 
 	case START_SOFTLIST:
 		m_sld = nullptr;
-		menu::stack_push<menu_software>(ui(), container(), m_image.image_interface(), &m_sld);
+		menu::stack_push<menu_software>(ui(), target(), m_image.image_interface(), &m_sld);
 		m_state = SELECT_SOFTLIST;
 		break;
 
 	case START_MIDI:
 		m_midi = "";
-		menu::stack_push<menu_midi_inout>(ui(), container(), m_image.device().type() == MIDIIN, &m_midi);
+		menu::stack_push<menu_midi_inout>(ui(), target(), m_image.device().type() == MIDIIN, &m_midi);
 		m_state = SELECT_MIDI;
 		break;
 
@@ -313,7 +313,7 @@ void menu_control_device_image::menu_activated()
 
 	case START_OTHER_PART:
 		m_submenu_result.swparts = menu_software_parts::result::INVALID;
-		menu::stack_push<menu_software_parts>(ui(), container(), m_swi, m_image.image_interface(), &m_swp, true, m_submenu_result.swparts);
+		menu::stack_push<menu_software_parts>(ui(), target(), m_swi, m_image.image_interface(), &m_swp, true, m_submenu_result.swparts);
 		m_state = SELECT_OTHER_PART;
 		break;
 
@@ -325,7 +325,7 @@ void menu_control_device_image::menu_activated()
 		else
 		{
 			m_software_info_name.clear();
-			menu::stack_push<menu_software_list>(ui(), container(), m_sld, m_image.image_interface(), m_software_info_name);
+			menu::stack_push<menu_software_list>(ui(), target(), m_sld, m_image.image_interface(), m_software_info_name);
 			m_state = SELECT_PARTLIST;
 		}
 		break;
@@ -341,7 +341,7 @@ void menu_control_device_image::menu_activated()
 		{
 			m_submenu_result.swparts = menu_software_parts::result::INVALID;
 			m_swp = nullptr;
-			menu::stack_push<menu_software_parts>(ui(), container(), m_swi, m_image.image_interface(), &m_swp, false, m_submenu_result.swparts);
+			menu::stack_push<menu_software_parts>(ui(), target(), m_swi, m_image.image_interface(), &m_swp, false, m_submenu_result.swparts);
 			m_state = SELECT_ONE_PART;
 		}
 		else
@@ -401,7 +401,7 @@ void menu_control_device_image::menu_activated()
 			{
 				if (need_confirm)
 				{
-					menu::stack_push<menu_confirm_save_as>(ui(), container(), m_create_confirmed);
+					menu::stack_push<menu_confirm_save_as>(ui(), target(), m_create_confirmed);
 					m_state = CREATE_CONFIRM;
 				}
 				else

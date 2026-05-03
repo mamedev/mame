@@ -14,6 +14,9 @@
     VSync is low for 4095 master cycles (3 lines).
     VSync changes 30 master cycles after HSync would go low.
 
+	TODO:
+	- any differences between battlera VCE and HuC6260?
+
 **********************************************************************/
 
 #include "emu.h"
@@ -48,11 +51,17 @@ void huc6260_device::palette_init()
 }
 
 
-DEFINE_DEVICE_TYPE(HUC6260, huc6260_device, "huc6260", "Hudson HuC6260 VCE")
+DEFINE_DEVICE_TYPE(HUC6260,      huc6260_device,      "huc6260",      "Hudson HuC6260 VCE")
+DEFINE_DEVICE_TYPE(BATTLERA_VCE, battlera_vce_device, "battlera_vce", "Data East Battle Rangers VCE")
 
 
 huc6260_device::huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, HUC6260, tag, owner, clock),
+	huc6260_device(mconfig, HUC6260, tag, owner, clock)
+{
+}
+
+huc6260_device::huc6260_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_palette_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_next_pixel_data_cb(*this, 0),
@@ -70,6 +79,11 @@ huc6260_device::huc6260_device(const machine_config &mconfig, const char *tag, d
 	m_pixel_data(0),
 	m_pixel_clock(0),
 	m_timer(nullptr)
+{
+}
+
+battlera_vce_device::battlera_vce_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	huc6260_device(mconfig, BATTLERA_VCE, tag, owner, clock)
 {
 }
 
@@ -197,16 +211,16 @@ u32 huc6260_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 
 // the battlera arcade board reads/writes the palette directly
-u8 huc6260_device::palette_direct_read(offs_t offset)
+u8 battlera_vce_device::palette_direct_read(offs_t offset)
 {
-	if (BIT(~offset, 0)) return m_palette[offset >> 1];
-	else return m_palette[offset >> 1] >> 8;
+	const u8 shift = BIT(offset, 0) << 3;
+	return m_palette[offset >> 1] >> shift;
 }
 
-void huc6260_device::palette_direct_write(offs_t offset, u8 data)
+void battlera_vce_device::palette_direct_write(offs_t offset, u8 data)
 {
-	if (BIT(~offset, 0)) m_palette[offset >> 1] = (m_palette[offset >> 1] & 0xff00) | data;
-	else m_palette[offset >> 1] = (m_palette[offset >> 1] & 0x00ff) | (data << 8);
+	const u8 shift = BIT(offset, 0) << 3;
+	m_palette[offset >> 1] = (m_palette[offset >> 1] & ~(0xff << shift)) | (u32(data & 0xff) << shift);
 }
 
 u8 huc6260_device::read(offs_t offset)
@@ -242,19 +256,19 @@ void huc6260_device::write(offs_t offset, u8 data)
 			break;
 
 		case 0x02:  /* Color table address LSB */
-			m_address = ((m_address & 0xff00) | data) & 0x1ff;
+			m_address = (m_address & 0x100) | data;
 			break;
 
 		case 0x03:  /* Color table address MSB */
-			m_address = ((m_address & 0x00ff) | (data << 8)) & 0x1ff;
+			m_address = ((m_address & 0x0ff) | (BIT(data, 0) << 8)) & 0x1ff;
 			break;
 
 		case 0x04:  /* Color table data LSB */
-			m_palette[m_address] = ((m_palette[m_address] & 0xff00) | data) & 0x1ff;
+			m_palette[m_address] = (m_palette[m_address] & 0x100) | data;
 			break;
 
 		case 0x05:  /* Color table data MSB */
-			m_palette[m_address] = ((m_palette[m_address] & 0x00ff) | (data << 8)) & 0x1ff;
+			m_palette[m_address] = ((m_palette[m_address] & 0x0ff) | (BIT(data, 0) << 8)) & 0x1ff;
 
 			/* Increment internal address */
 			m_address = (m_address + 1) & 0x1ff;
