@@ -150,9 +150,10 @@ license:CC0-1.0
 		<description>Adventure Quest</description>
 		<year>1983</year>
 		<publisher>Level 9 Computing</publisher>
+		<info name="language" value="English" />
 		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="30995">
-				<rom name="Adventure Quest (1983)(Level 9 Computing)(GB).tap" size="30995" crc="82fc8b85" sha1="3e10255407efee6907a1bfa31aa0b51f1b169eed"/>
+			<dataarea name="cass" size="30742">
+				<rom name="Adventure Quest (1983)(Level 9 Computing).tap" size="30742" crc="06803969" sha1="f4377be45744dcca12a667de3ab0d877dafc0af0"/>
 			</dataarea>
 		</part>
 	</software>
