@@ -26,13 +26,13 @@ class leland_state : public driver_device
 public:
 	leland_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_sub(*this, "sub")
+		, m_master(*this, "master")
+		, m_slave(*this, "slave")
 		, m_mainram(*this, "mainram")
-		, m_main_bankslot(*this, "mainbank")
-		, m_main_base(*this, "maincpu")
-		, m_sub_bankslot(*this, "subbank")
-		, m_sub_base(*this, "sub")
+		, m_master_bankslot(*this, "masterbank")
+		, m_master_base(*this, "master")
+		, m_slave_bankslot(*this, "slavebank")
+		, m_slave_base(*this, "slave")
 		, m_eeprom(*this, "eeprom")
 		, m_battery_ram(*this, "battery")
 		, m_palette(*this, "palette")
@@ -73,13 +73,13 @@ public:
 	void offroad_bankswitch();
 
 protected:
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_sub;
+	required_device<cpu_device> m_master;
+	required_device<cpu_device> m_slave;
 	required_shared_ptr<u8> m_mainram;
-	required_memory_bank m_main_bankslot;
-	required_region_ptr<u8> m_main_base;
-	required_memory_bank m_sub_bankslot;
-	required_region_ptr<u8> m_sub_base;
+	required_memory_bank m_master_bankslot;
+	required_region_ptr<u8> m_master_base;
+	required_memory_bank m_slave_bankslot;
+	required_region_ptr<u8> m_slave_base;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_shared_ptr<u8> m_battery_ram;
 	required_device<palette_device> m_palette;
@@ -91,7 +91,7 @@ protected:
 	optional_ioport_array<4> m_io_in;
 	optional_ioport_array<6> m_io_an;
 
-	emu_timer *m_main_int_timer = nullptr;
+	emu_timer *m_master_int_timer = nullptr;
 
 	u8 m_dial_last_input[4]{};
 	u8 m_dial_last_result[4]{};
@@ -118,8 +118,8 @@ protected:
 	void rotate_memory(const char *cpuname);
 
 	int dial_compute_value(int new_val, int indx);
-	void init_main_ports(u8 mvram_base, u8 io_base);
-	void (leland_state::*m_update_main_bank)();
+	void init_master_ports(u8 mvram_base, u8 io_base);
+	void (leland_state::*m_update_master_bank)();
 
 	void update_battery_ram_view(bool enable);
 
@@ -128,22 +128,22 @@ protected:
 	int vram_port_r(offs_t offset, int num);
 	void vram_port_w(offs_t offset, u8 data, int num);
 
-	u8 main_analog_key_r(offs_t offset);
-	void main_analog_key_w(offs_t offset, u8 data);
+	u8 master_analog_key_r(offs_t offset);
+	void master_analog_key_w(offs_t offset, u8 data);
 	u8 dangerz_input_y_r();
 	u8 dangerz_input_x_r();
 	u8 dangerz_input_upper_r();
 	void scroll_w(offs_t offset, u8 data);
-	void leland_main_alt_bankswitch_w(u8 data);
+	void leland_master_alt_bankswitch_w(u8 data);
 
 	TIMER_CALLBACK_MEMBER(leland_delayed_mvram_w);
 
 	u8 raster_r();
-	void sub_video_addr_w(offs_t offset, u8 data);
-	void sub_large_banksw_w(u8 data);
-	void main_video_addr_w(offs_t offset, u8 data);
+	void slave_video_addr_w(offs_t offset, u8 data);
+	void slave_large_banksw_w(u8 data);
+	void master_video_addr_w(offs_t offset, u8 data);
 
-	void main_common_map_program(address_map &map) ATTR_COLD;
+	void master_common_map_program(address_map &map) ATTR_COLD;
 
 private:
 	optional_device_array<dac_byte_interface, 2> m_dac;
@@ -170,9 +170,9 @@ private:
 	u8 cerberus_dial_1_r();
 	u8 cerberus_dial_2_r();
 	void alleymas_joystick_kludge_w(u8 data);
-	u8 leland_main_input_r(offs_t offset);
-	void leland_main_output_w(offs_t offset, u8 data);
-	void sub_small_banksw_w(u8 data);
+	u8 leland_master_input_r(offs_t offset);
+	void leland_master_output_w(offs_t offset, u8 data);
+	void slave_small_banksw_w(u8 data);
 	void leland_mvram_port_w(offs_t offset, u8 data);
 	u8 leland_mvram_port_r(offs_t offset);
 	void leland_svram_port_w(offs_t offset, u8 data);
@@ -188,7 +188,7 @@ private:
 	TILEMAP_MAPPER_MEMBER(leland_scan);
 	TILE_GET_INFO_MEMBER(leland_get_tile_info);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(leland_main_interrupt);
+	INTERRUPT_GEN_MEMBER(leland_master_interrupt);
 	TIMER_CALLBACK_MEMBER(leland_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 
@@ -200,10 +200,10 @@ private:
 	void ataxx_init_eeprom(const u16 *data);
 	u8 keycard_r();
 	void keycard_w(u8 data);
-	void main_map_io(address_map &map) ATTR_COLD;
-	void main_map_program(address_map &map) ATTR_COLD;
-	void sub_map_io(address_map &map) ATTR_COLD;
-	void sub_small_map_program(address_map &map) ATTR_COLD;
+	void master_map_io(address_map &map) ATTR_COLD;
+	void master_map_program(address_map &map) ATTR_COLD;
+	void slave_map_io(address_map &map) ATTR_COLD;
+	void slave_small_map_program(address_map &map) ATTR_COLD;
 };
 
 
@@ -239,11 +239,11 @@ private:
 	u8 offroad_wheel_1_r();
 	u8 offroad_wheel_2_r();
 	u8 offroad_wheel_3_r();
-	void redline_main_alt_bankswitch_w(u8 data);
+	void redline_master_alt_bankswitch_w(u8 data);
 
-	void main_redline_map_program(address_map &map) ATTR_COLD;
-	void main_redline_map_io(address_map &map) ATTR_COLD;
-	void sub_large_map_program(address_map &map) ATTR_COLD;
+	void master_redline_map_program(address_map &map) ATTR_COLD;
+	void master_redline_map_io(address_map &map) ATTR_COLD;
+	void slave_large_map_program(address_map &map) ATTR_COLD;
 
 	required_device<leland_80186_sound_device> m_sound;
 };
@@ -284,11 +284,11 @@ private:
 	u8 qram_r(offs_t offset);
 	void qram_w(offs_t offset, u8 data);
 
-	u8 ataxx_main_input_r(offs_t offset);
-	void ataxx_main_output_w(offs_t offset, u8 data);
+	u8 ataxx_master_input_r(offs_t offset);
+	void ataxx_master_output_w(offs_t offset, u8 data);
 	void xrom_w(offs_t offset, u8 data);
 	u8 xrom_r(offs_t offset);
-	void ataxx_sub_banksw_w(u8 data);
+	void ataxx_slave_banksw_w(u8 data);
 	void ataxx_mvram_port_w(offs_t offset, u8 data);
 	void ataxx_svram_port_w(offs_t offset, u8 data);
 	u8 ataxx_mvram_port_r(offs_t offset);
@@ -304,11 +304,11 @@ private:
 
 	void ataxx_video(machine_config &config);
 
-	void asylum_sub_map_program(address_map &map) ATTR_COLD;
-	void main_map_io_2(address_map &map) ATTR_COLD;
-	void main_map_program_2(address_map &map) ATTR_COLD;
-	void sub_map_io_2(address_map &map) ATTR_COLD;
-	void sub_map_program(address_map &map) ATTR_COLD;
+	void asylum_slave_map_program(address_map &map) ATTR_COLD;
+	void master_map_io_2(address_map &map) ATTR_COLD;
+	void master_map_program_2(address_map &map) ATTR_COLD;
+	void slave_map_io_2(address_map &map) ATTR_COLD;
+	void slave_map_program(address_map &map) ATTR_COLD;
 
 	required_device<leland_80186_sound_device> m_sound;
 
@@ -316,7 +316,7 @@ private:
 	memory_share_creator<u8> m_qram;
 	required_shared_ptr<u8> m_tram;
 
-	u8 m_main_bank = 0U;
+	u8 m_master_bank = 0U;
 	u32 m_xrom_addr[2]{};
 };
 

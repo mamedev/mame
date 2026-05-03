@@ -376,7 +376,7 @@ leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconf
 	, m_ext_start(0)
 	, m_ext_stop(0)
 	, m_ext_active(false)
-	, m_maincpu(*this, finder_base::DUMMY_TAG)
+	, m_master(*this, finder_base::DUMMY_TAG)
 	, m_ext_base(*this, "ext")
 {
 }
@@ -451,22 +451,22 @@ void leland_80186_sound_device::leland_80186_control_w(u8 data)
 
 	LOGMASKED(LOG_COMM, "%s:80186 control = %02X%s%s%s%s%s\n",
 			machine().describe_context(), data,
-			(data & 0x80) ? "" : "  /RESET",
-			(data & 0x40) ? "" : "  ZNMI",
-			(data & 0x20) ? "" : "  INT0",
-			(data & 0x10) ? "" : "  /TEST",
-			(data & 0x08) ? "" : "  INT1");
+			BIT(data, 7) ? "" : "  /RESET",
+			BIT(data, 6) ? "" : "  ZNMI",
+			BIT(data, 5) ? "" : "  INT0",
+			BIT(data, 4) ? "" : "  /TEST",
+			BIT(data, 3) ? "" : "  INT1");
 
 	/* /RESET */
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_TEST, BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* /NMI */
-	/*  If the main CPU doesn't get a response by the time it's ready to send
+	/*  If the master CPU doesn't get a response by the time it's ready to send
 	    the next command, it uses an NMI to force the issue; unfortunately, this
 	    seems to really screw up the sound system. It turns out it's better to
 	    just wait for the original interrupt to occur naturally */
-	//m_audiocpu->set_input_line(INPUT_LINE_NMI, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	//m_audiocpu->set_input_line(INPUT_LINE_NMI, BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* INT0 */
 	m_audiocpu->int0_w(BIT(data, 5));
@@ -513,12 +513,12 @@ u8 leland_80186_sound_device::response_r()
 	if (!machine().side_effects_disabled())
 	{
 		/* This is pretty cheesy, but necessary. Since the CPUs run in round-robin order,
-		   synchronizing on the write to this register from the sub side does nothing.
-		   The usual trick with briefly setting perfect quantum on main CPU side write
-		   is also ineffective. In order to make sure the main CPU gets the real response,
+		   synchronizing on the write to this register from the slave side does nothing.
+		   The usual trick with briefly setting perfect quantum on master CPU side write
+		   is also ineffective. In order to make sure the master CPU gets the real response,
 		   we force a synchronize on the read like this. */
 		if (!m_response_sync)
-			m_maincpu->retry_access();
+			m_master->retry_access();
 		else
 			LOGMASKED(LOG_COMM, "%s:Read sound response latch = %02X\n", machine().describe_context(), m_sound_response);
 

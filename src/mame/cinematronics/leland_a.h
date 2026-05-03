@@ -24,7 +24,7 @@ class leland_80186_sound_device : public device_t
 public:
 	leland_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template<class T> void set_main_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+	template<class T> void set_master_cpu_tag(T &&tag) { m_master.set_tag(std::forward<T>(tag)); }
 
 	void peripheral_ctrl(offs_t offset, u16 data);
 	void leland_80186_control_w(u8 data);
@@ -88,7 +88,7 @@ private:
 	u32 m_ext_stop;
 	bool m_ext_active;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_master;
 
 	optional_region_ptr<u8> m_ext_base;
 };

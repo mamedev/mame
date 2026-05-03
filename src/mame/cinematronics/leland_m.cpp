@@ -110,7 +110,7 @@ void leland_state::alleymas_joystick_kludge_w(u8 data)
 {
 	/* catch the case where they clear this memory location at PC $1827 and change */
 	/* the value written to be a 1 */
-	if (m_maincpu->pcbase() == 0x1827)
+	if (m_master->pcbase() == 0x1827)
 		*m_alleymas_kludge_mem = 1;
 	else
 		*m_alleymas_kludge_mem = data;
@@ -301,7 +301,7 @@ void ataxx_state::indyheat_analog_w(offs_t offset, u8 data)
 void leland_state::machine_start()
 {
 	/* start scanline interrupts going */
-	m_main_int_timer = timer_alloc(FUNC(leland_state::leland_interrupt_callback), this);
+	m_master_int_timer = timer_alloc(FUNC(leland_state::leland_interrupt_callback), this);
 
 	save_item(NAME(m_dac_control));
 	save_item(NAME(m_analog_result));
@@ -320,7 +320,7 @@ void leland_state::machine_start()
 
 void leland_state::machine_reset()
 {
-	m_main_int_timer->adjust(m_screen->time_until_pos(8), 8);
+	m_master_int_timer->adjust(m_screen->time_until_pos(8), 8);
 
 	/* reset globals */
 	sound_port_w(0);
@@ -342,12 +342,12 @@ void leland_state::machine_reset()
 	m_sound_port_bank = 0;
 	m_alternate_bank = 0;
 
-	/* initialize the main banks */
-	(this->*m_update_main_bank)();
+	/* initialize the master banks */
+	(this->*m_update_master_bank)();
 
-	/* initialize the sub banks */
-	if (m_sub_base.length() > 0x10000)
-		m_sub_bankslot->set_base(&m_sub_base[0x10000]);
+	/* initialize the slave banks */
+	if (m_slave_base.length() > 0x10000)
+		m_slave_bankslot->set_base(&m_slave_base[0x10000]);
 }
 
 
@@ -355,11 +355,11 @@ void ataxx_state::machine_start()
 {
 	// TODO: further untangle driver so the base class doesn't have stuff that isn't common and this can call the base implementation
 	/* start scanline interrupts going */
-	m_main_int_timer = timer_alloc(FUNC(ataxx_state::ataxx_interrupt_callback), this);
+	m_master_int_timer = timer_alloc(FUNC(ataxx_state::ataxx_interrupt_callback), this);
 
 	save_item(NAME(m_dial_last_input));
 	save_item(NAME(m_dial_last_result));
-	save_item(NAME(m_main_bank));
+	save_item(NAME(m_master_bank));
 	save_item(NAME(m_xrom_addr));
 }
 
@@ -368,7 +368,7 @@ void ataxx_state::machine_reset()
 {
 	// TODO: further untangle driver so the base class doesn't have stuff that isn't common and this can call the base implementation
 	std::fill_n(&m_tram[0], m_tram.length(), 0);
-	m_main_int_timer->adjust(m_screen->time_until_pos(8), 8);
+	m_master_int_timer->adjust(m_screen->time_until_pos(8), 8);
 
 	/* initialize the XROM */
 	m_xrom_addr[0] = 0;
@@ -381,20 +381,20 @@ void ataxx_state::machine_reset()
 	memset(m_dial_last_input, 0, sizeof(m_dial_last_input));
 	memset(m_dial_last_result, 0, sizeof(m_dial_last_result));
 
-	m_main_bank = 0;
+	m_master_bank = 0;
 
-	/* initialize the main banks */
+	/* initialize the master banks */
 	ataxx_bankswitch();
 
-	/* initialize the sub banks */
-	if (m_sub_base.length() > 0x10000)
-		m_sub_bankslot->set_base(&m_sub_base[0x10000]);
+	/* initialize the slave banks */
+	if (m_slave_base.length() > 0x10000)
+		m_slave_bankslot->set_base(&m_slave_base[0x10000]);
 }
 
 
 /*************************************
  *
- *  Main CPU interrupt handling
+ *  Master CPU interrupt handling
  *
  *************************************/
 
@@ -404,11 +404,11 @@ TIMER_CALLBACK_MEMBER(leland_state::leland_interrupt_callback)
 
 	/* interrupts generated on the VA10 line, which is every */
 	/* 16 scanlines starting with scanline #8 */
-	m_maincpu->set_input_line(0, HOLD_LINE);
+	m_master->set_input_line(0, HOLD_LINE);
 
 	/* set a timer for the next one */
 	scanline += 16;
-	m_main_int_timer->adjust(m_screen->time_until_pos(scanline), scanline);
+	m_master_int_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -417,14 +417,14 @@ TIMER_CALLBACK_MEMBER(ataxx_state::ataxx_interrupt_callback)
 	const u8 scanline = param;
 
 	/* interrupts generated according to the interrupt control register */
-	m_maincpu->set_input_line(0, HOLD_LINE);
+	m_master->set_input_line(0, HOLD_LINE);
 
 	/* set a timer for the next one */
-	m_main_int_timer->adjust(m_screen->time_until_pos(scanline), scanline);
+	m_master_int_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 
-INTERRUPT_GEN_MEMBER(leland_state::leland_main_interrupt)
+INTERRUPT_GEN_MEMBER(leland_state::leland_master_interrupt)
 {
 	/* check for coins here */
 	if ((m_io_in[1]->read() & 0x0e) != 0x0e)
@@ -434,23 +434,23 @@ INTERRUPT_GEN_MEMBER(leland_state::leland_main_interrupt)
 
 /*************************************
  *
- *  Main CPU bankswitch handlers
+ *  Master CPU bankswitch handlers
  *
  *************************************/
 
-void leland_state::leland_main_alt_bankswitch_w(u8 data)
+void leland_state::leland_master_alt_bankswitch_w(u8 data)
 {
 	/* update any bankswitching */
 	if ((m_alternate_bank ^ data) & 0x0f)
 		LOGMASKED(LOG_BANKSWITCHING_M, "%s:alternate_bank = %02X\n", machine().describe_context(), data & 0x0f);
 	m_alternate_bank = data & 0x0f;
-	(this->*m_update_main_bank)();
+	(this->*m_update_master_bank)();
 }
 
 
-void redline_state::redline_main_alt_bankswitch_w(u8 data)
+void redline_state::redline_master_alt_bankswitch_w(u8 data)
 {
-	leland_main_alt_bankswitch_w(data);
+	leland_master_alt_bankswitch_w(data);
 
 	/* sound control is in the rest */
 	m_sound->leland_80186_control_w(data);
@@ -469,8 +469,8 @@ void leland_state::mayhem_bankswitch()
 {
 	update_battery_ram_view((m_sound_port_bank & 0x24) == 0);
 
-	u8 *address = (!BIT(m_sound_port_bank, 2)) ? &m_main_base[0x10000] : &m_main_base[0x1c000];
-	m_main_bankslot->set_base(address);
+	u8 *address = (!BIT(m_sound_port_bank, 2)) ? &m_master_base[0x10000] : &m_master_base[0x1c000];
+	m_master_bankslot->set_base(address);
 }
 
 
@@ -479,8 +479,8 @@ void leland_state::dangerz_bankswitch()
 {
 	update_battery_ram_view(BIT(m_top_board_bank, 7));
 
-	u8 *address = (!BIT(m_alternate_bank, 0)) ? &m_main_base[0x02000] : &m_main_base[0x12000];
-	m_main_bankslot->set_base(address);
+	u8 *address = (!BIT(m_alternate_bank, 0)) ? &m_master_base[0x02000] : &m_master_base[0x12000];
+	m_master_bankslot->set_base(address);
 }
 
 
@@ -493,10 +493,10 @@ void leland_state::basebal2_bankswitch()
 	update_battery_ram_view(battery_ram_enable);
 
 	if (!battery_ram_enable)
-		address = (!BIT(m_sound_port_bank, 2)) ? &m_main_base[0x10000] : &m_main_base[0x1c000];
+		address = (!BIT(m_sound_port_bank, 2)) ? &m_master_base[0x10000] : &m_master_base[0x1c000];
 	else
-		address = (!BIT(m_top_board_bank, 6)) ? &m_main_base[0x28000] : &m_main_base[0x30000];
-	m_main_bankslot->set_base(address);
+		address = (!BIT(m_top_board_bank, 6)) ? &m_master_base[0x28000] : &m_master_base[0x30000];
+	m_master_bankslot->set_base(address);
 }
 
 
@@ -507,8 +507,8 @@ void leland_state::redline_bankswitch()
 
 	update_battery_ram_view((m_alternate_bank & 3) == 1);
 
-	u8 *address = &m_main_base[bank_list[m_alternate_bank & 3]];
-	m_main_bankslot->set_base(address);
+	u8 *address = &m_master_base[bank_list[m_alternate_bank & 3]];
+	m_master_bankslot->set_base(address);
 }
 
 
@@ -519,13 +519,13 @@ void leland_state::viper_bankswitch()
 
 	update_battery_ram_view(BIT(m_alternate_bank, 2));
 
-	u8 *address = &m_main_base[bank_list[m_alternate_bank & 3]];
-	if (bank_list[m_alternate_bank & 3] >= m_main_base.length())
+	u8 *address = &m_master_base[bank_list[m_alternate_bank & 3]];
+	if (bank_list[m_alternate_bank & 3] >= m_master_base.length())
 	{
-		LOGMASKED(LOG_WARN, "%s:Main bank %02X out of range!\n", machine().describe_context(), m_alternate_bank & 3);
-		address = &m_main_base[bank_list[0]];
+		LOGMASKED(LOG_WARN, "%s:Master bank %02X out of range!\n", machine().describe_context(), m_alternate_bank & 3);
+		address = &m_master_base[bank_list[0]];
 	}
-	m_main_bankslot->set_base(address);
+	m_master_bankslot->set_base(address);
 }
 
 
@@ -536,13 +536,13 @@ void leland_state::offroad_bankswitch()
 
 	update_battery_ram_view((m_alternate_bank & 7) == 1);
 
-	u8 *address = &m_main_base[bank_list[m_alternate_bank & 7]];
-	if (bank_list[m_alternate_bank & 7] >= m_main_base.length())
+	u8 *address = &m_master_base[bank_list[m_alternate_bank & 7]];
+	if (bank_list[m_alternate_bank & 7] >= m_master_base.length())
 	{
-		LOGMASKED(LOG_WARN, "%s:Main bank %02X out of range!\n", machine().describe_context(), m_alternate_bank & 7);
-		address = &m_main_base[bank_list[0]];
+		LOGMASKED(LOG_WARN, "%s:Master bank %02X out of range!\n", machine().describe_context(), m_alternate_bank & 7);
+		address = &m_master_base[bank_list[0]];
 	}
-	m_main_bankslot->set_base(address);
+	m_master_bankslot->set_base(address);
 }
 
 
@@ -555,22 +555,22 @@ void ataxx_state::ataxx_bankswitch()
 		0x50000, 0x58000, 0x60000, 0x68000, 0x70000, 0x78000, 0x80000, 0x88000
 	};
 
-	u8 *address = &m_main_base[bank_list[m_main_bank & 0x0f]];
-	if (bank_list[m_main_bank & 0x0f] >= m_main_base.length())
+	u8 *address = &m_master_base[bank_list[m_master_bank & 0x0f]];
+	if (bank_list[m_master_bank & 0x0f] >= m_master_base.length())
 	{
-		LOGMASKED(LOG_WARN, "%s:Main bank %02X out of range!\n", machine().describe_context(), m_main_bank & 0x0f);
-		address = &m_main_base[bank_list[0]];
+		LOGMASKED(LOG_WARN, "%s:Master bank %02X out of range!\n", machine().describe_context(), m_master_bank & 0x0f);
+		address = &m_master_base[bank_list[0]];
 	}
-	m_main_bankslot->set_base(address);
+	m_master_bankslot->set_base(address);
 
-	if ((m_main_bank & 0x30) == 0x10)
+	if ((m_master_bank & 0x30) == 0x10)
 		m_battery_ram_view.select(0);
-	else if ((m_main_bank & 0x30) == 0x20)
+	else if ((m_master_bank & 0x30) == 0x20)
 		m_battery_ram_view.select(1);
 	else
 		m_battery_ram_view.disable();
 
-	if ((m_main_bank & 0x30) == 0x30)
+	if ((m_master_bank & 0x30) == 0x30)
 		m_palette_view.select(0);
 	else
 		m_palette_view.disable();
@@ -795,7 +795,7 @@ void leland_state::update_battery_ram_view(bool enable)
 
 /*************************************
  *
- *  Main CPU keycard I/O
+ *  Master CPU keycard I/O
  *
  ************************************/
 
@@ -939,11 +939,11 @@ void leland_state::keycard_w(u8 data)
 
 /*************************************
  *
- *  Main CPU analog and keycard I/O
+ *  Master CPU analog and keycard I/O
  *
  *************************************/
 
-u8 leland_state::main_analog_key_r(offs_t offset)
+u8 leland_state::master_analog_key_r(offs_t offset)
 {
 	u8 result = 0;
 
@@ -969,7 +969,7 @@ u8 leland_state::main_analog_key_r(offs_t offset)
 }
 
 
-void leland_state::main_analog_key_w(offs_t offset, u8 data)
+void leland_state::master_analog_key_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -983,7 +983,7 @@ void leland_state::main_analog_key_w(offs_t offset, u8 data)
 			if ((m_top_board_bank ^ data) & 0xc0)
 				LOGMASKED(LOG_BANKSWITCHING_M, "%s:top_board_bank = %02X\n", machine().describe_context(), data & 0xc0);
 			m_top_board_bank = data & 0xc0;
-			(this->*m_update_main_bank)();
+			(this->*m_update_master_bank)();
 			break;
 
 		case 0x02:  /* FF = keycard data write */
@@ -995,11 +995,11 @@ void leland_state::main_analog_key_w(offs_t offset, u8 data)
 
 /*************************************
  *
- *  Main CPU internal I/O
+ *  Master CPU internal I/O
  *
  *************************************/
 
-u8 leland_state::leland_main_input_r(offs_t offset)
+u8 leland_state::leland_master_input_r(offs_t offset)
 {
 	u8 result = 0xff;
 
@@ -1011,14 +1011,14 @@ u8 leland_state::leland_main_input_r(offs_t offset)
 
 		case 0x01:  /* /GIN1 */
 			result = m_io_in[1]->read();
-			if (m_sub->state_int(Z80_HALT))
+			if (m_slave->state_int(Z80_HALT))
 				result ^= 0x01;
 			break;
 
 		case 0x02:  /* /GIN2 */
 		case 0x12:
 			if (!machine().side_effects_disabled())
-				m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+				m_master->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 0x03:  /* /IGID */
@@ -1042,25 +1042,25 @@ u8 leland_state::leland_main_input_r(offs_t offset)
 
 		default:
 			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_WARN, "Main I/O read offset %02X\n", offset);
+				LOGMASKED(LOG_WARN, "Master I/O read offset %02X\n", offset);
 			break;
 	}
 	return result;
 }
 
 
-void leland_state::leland_main_output_w(offs_t offset, u8 data)
+void leland_state::leland_master_output_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
 		case 0x09:  /* /MCONT */
-			m_sub->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+			m_slave->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 			if (BIT(data, 1))
 				m_palette_view.select(0);
 			else
 				m_palette_view.disable();
-			m_sub->set_input_line(INPUT_LINE_NMI, BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
-			m_sub->set_input_line(0, BIT(data, 3) ? CLEAR_LINE : ASSERT_LINE);
+			m_slave->set_input_line(INPUT_LINE_NMI, BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
+			m_slave->set_input_line(0, BIT(data, 3) ? CLEAR_LINE : ASSERT_LINE);
 
 			LOGMASKED(LOG_EEPROM, "%s:EE write %d%d%d\n", machine().describe_context(),
 					(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
@@ -1086,13 +1086,13 @@ void leland_state::leland_main_output_w(offs_t offset, u8 data)
 			break;
 
 		default:
-			LOGMASKED(LOG_WARN, "Main I/O write offset %02X=%02X\n", offset, data);
+			LOGMASKED(LOG_WARN, "Master I/O write offset %02X=%02X\n", offset, data);
 			break;
 	}
 }
 
 
-u8 ataxx_state::ataxx_main_input_r(offs_t offset)
+u8 ataxx_state::ataxx_master_input_r(offs_t offset)
 {
 	u8 result = 0xff;
 
@@ -1104,20 +1104,20 @@ u8 ataxx_state::ataxx_main_input_r(offs_t offset)
 
 		case 0x07:  /* /SLVBLK */
 			result = m_io_in[1]->read();
-			if (m_sub->state_int(Z80_HALT))
+			if (m_slave->state_int(Z80_HALT))
 				result ^= 0x01;
 			break;
 
 		default:
 			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_WARN, "Main I/O read offset %02X\n", offset);
+				LOGMASKED(LOG_WARN, "Master I/O read offset %02X\n", offset);
 			break;
 	}
 	return result;
 }
 
 
-void ataxx_state::ataxx_main_output_w(offs_t offset, u8 data)
+void ataxx_state::ataxx_master_output_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -1129,27 +1129,27 @@ void ataxx_state::ataxx_main_output_w(offs_t offset, u8 data)
 			break;
 
 		case 0x04:  /* /MBNK */
-			if ((m_main_bank ^ data) & 0xff)
-				LOGMASKED(LOG_BANKSWITCHING_M, "%s:main_bank = %02X\n", machine().describe_context(), data & 0xff);
-			m_main_bank = data;
+			if ((m_master_bank ^ data) & 0xff)
+				LOGMASKED(LOG_BANKSWITCHING_M, "%s:master_bank = %02X\n", machine().describe_context(), data & 0xff);
+			m_master_bank = data;
 			ataxx_bankswitch();
 			break;
 
 		case 0x05:  /* /SLV0 */
-			m_sub->set_input_line(0, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
-			m_sub->set_input_line(INPUT_LINE_NMI, BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
-			m_sub->set_input_line(INPUT_LINE_RESET, BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
+			m_slave->set_input_line(0, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+			m_slave->set_input_line(INPUT_LINE_NMI, BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
+			m_slave->set_input_line(INPUT_LINE_RESET, BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x08:  /*  */
 		{
 			const u8 scanline = data + 1;
-			m_main_int_timer->adjust(m_screen->time_until_pos(scanline), scanline);
+			m_master_int_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 			break;
 		}
 
 		default:
-			LOGMASKED(LOG_WARN, "Main I/O write offset %02X=%02X\n", offset, data);
+			LOGMASKED(LOG_WARN, "Master I/O write offset %02X=%02X\n", offset, data);
 			break;
 	}
 }
@@ -1157,7 +1157,7 @@ void ataxx_state::ataxx_main_output_w(offs_t offset, u8 data)
 
 /*************************************
  *
- *  Main CPU palette gates
+ *  Master CPU palette gates
  *
  *************************************/
 
@@ -1207,47 +1207,47 @@ void leland_state::sound_port_w(u8 data)
 	if ((m_sound_port_bank ^ data) & 0x24)
 		LOGMASKED(LOG_BANKSWITCHING_M, "%s:sound_port_bank = %02X\n", machine().describe_context(), data & 0x24);
 	m_sound_port_bank = data & 0x24;
-	(this->*m_update_main_bank)();
+	(this->*m_update_master_bank)();
 }
 
 
 /*************************************
  *
- *  Sub CPU bankswitching
+ *  Slave CPU bankswitching
  *
  *************************************/
 
-void leland_state::sub_small_banksw_w(u8 data)
+void leland_state::slave_small_banksw_w(u8 data)
 {
 	int bankaddress = 0x10000 + 0xc000 * BIT(data, 0);
 
-	if (bankaddress >= m_sub_base.length())
+	if (bankaddress >= m_slave_base.length())
 	{
-		LOGMASKED(LOG_WARN, "%s:Sub bank %02X out of range!", machine().describe_context(), BIT(data, 0));
+		LOGMASKED(LOG_WARN, "%s:Slave bank %02X out of range!", machine().describe_context(), BIT(data, 0));
 		bankaddress = 0x10000;
 	}
-	m_sub_bankslot->set_base(&m_sub_base[bankaddress]);
+	m_slave_bankslot->set_base(&m_slave_base[bankaddress]);
 
-	LOGMASKED(LOG_BANKSWITCHING_S, "%s:Sub bank = %02X (%05X)\n", machine().describe_context(), BIT(data, 0), bankaddress);
+	LOGMASKED(LOG_BANKSWITCHING_S, "%s:Slave bank = %02X (%05X)\n", machine().describe_context(), BIT(data, 0), bankaddress);
 }
 
 
-void leland_state::sub_large_banksw_w(u8 data)
+void leland_state::slave_large_banksw_w(u8 data)
 {
 	int bankaddress = 0x10000 + 0x8000 * (data & 0x0f);
 
-	if (bankaddress >= m_sub_base.length())
+	if (bankaddress >= m_slave_base.length())
 	{
-		LOGMASKED(LOG_WARN, "%s:Sub bank %02X out of range!", machine().describe_context(), data & 0x0f);
+		LOGMASKED(LOG_WARN, "%s:Slave bank %02X out of range!", machine().describe_context(), data & 0x0f);
 		bankaddress = 0x10000;
 	}
-	m_sub_bankslot->set_base(&m_sub_base[bankaddress]);
+	m_slave_bankslot->set_base(&m_slave_base[bankaddress]);
 
-	LOGMASKED(LOG_BANKSWITCHING_S, "%s:Sub bank = %02X (%05X)\n", machine().describe_context(), data & 0x0f, bankaddress);
+	LOGMASKED(LOG_BANKSWITCHING_S, "%s:Slave bank = %02X (%05X)\n", machine().describe_context(), data & 0x0f, bankaddress);
 }
 
 
-void ataxx_state::ataxx_sub_banksw_w(u8 data)
+void ataxx_state::ataxx_slave_banksw_w(u8 data)
 {
 	int bankaddress, bank = data & 0x0f;
 
@@ -1256,24 +1256,24 @@ void ataxx_state::ataxx_sub_banksw_w(u8 data)
 	else
 	{
 		bankaddress = 0x10000 * bank + 0x8000 * BIT(data, 4);
-		if (m_sub_base.length() > 0x100000)
+		if (m_slave_base.length() > 0x100000)
 			bankaddress += 0x100000 * BIT(data, 5);
 	}
 
-	if (bankaddress >= m_sub_base.length())
+	if (bankaddress >= m_slave_base.length())
 	{
-		LOGMASKED(LOG_WARN, "%s:Sub bank %02X out of range!", machine().describe_context(), data & 0x3f);
+		LOGMASKED(LOG_WARN, "%s:Slave bank %02X out of range!", machine().describe_context(), data & 0x3f);
 		bankaddress = 0x2000;
 	}
-	m_sub_bankslot->set_base(&m_sub_base[bankaddress]);
+	m_slave_bankslot->set_base(&m_slave_base[bankaddress]);
 
-	LOGMASKED(LOG_BANKSWITCHING_S, "%s:Sub bank = %02X (%05X)\n", machine().describe_context(), data, bankaddress);
+	LOGMASKED(LOG_BANKSWITCHING_S, "%s:Slave bank = %02X (%05X)\n", machine().describe_context(), data, bankaddress);
 }
 
 
 /*************************************
  *
- *  Sub CPU I/O
+ *  Slave CPU I/O
  *
  *************************************/
 

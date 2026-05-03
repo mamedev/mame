@@ -91,14 +91,14 @@ TILE_GET_INFO_MEMBER(ataxx_state::ataxx_get_tile_info)
 
 u8 ataxx_state::qram_r(offs_t offset)
 {
-	return m_qram[((m_main_bank & 0xc0) << 8) | offset];
+	return m_qram[((m_master_bank & 0xc0) << 8) | offset];
 }
 
 void ataxx_state::qram_w(offs_t offset, u8 data)
 {
 	m_screen->update_partial(m_screen->vpos() - 1);
-	m_qram[((m_main_bank & 0xc0) << 8) | offset] = data;
-	m_tilemap->mark_tile_dirty(((m_main_bank & 0x80) << 8) | offset);
+	m_qram[((m_master_bank & 0xc0) << 8) | offset] = data;
+	m_tilemap->mark_tile_dirty(((m_master_bank & 0x80) << 8) | offset);
 }
 
 
@@ -261,7 +261,7 @@ int leland_state::vram_port_r(offs_t offset, int num)
 		state.m_addr = addr;
 
 		if (addr >= 0xf000)
-			LOGMASKED(LOG_COMM, "%s:%s comm read %05X = %02X\n", machine().describe_context(), num ? "sub" : "main", (state.m_buffer << 16) | addr, ret);
+			LOGMASKED(LOG_COMM, "%s:%s comm read %05X = %02X\n", machine().describe_context(), num ? "slave" : "master", (state.m_buffer << 16) | addr, ret);
 	}
 
 	return ret;
@@ -284,7 +284,7 @@ void leland_state::vram_port_w(offs_t offset, u8 data, int num)
 	m_screen->update_partial(m_screen->vpos() - 1);
 
 	if (addr >= 0xf000)
-		LOGMASKED(LOG_COMM, "%s:%s comm write %05X = %02X\n", machine().describe_context(), num ? "sub" : "main", (state.m_buffer << 16) | addr, data);
+		LOGMASKED(LOG_COMM, "%s:%s comm write %05X = %02X\n", machine().describe_context(), num ? "slave" : "master", (state.m_buffer << 16) | addr, data);
 
 	/* based on the low 3 bits of the offset, update the destination */
 	switch (offset & 7)
@@ -347,11 +347,11 @@ void leland_state::vram_port_w(offs_t offset, u8 data, int num)
 
 /*************************************
  *
- *  Main video RAM read/write
+ *  Master video RAM read/write
  *
  *************************************/
 
-void leland_state::main_video_addr_w(offs_t offset, u8 data)
+void leland_state::master_video_addr_w(offs_t offset, u8 data)
 {
 	video_addr_w(offset, data, 0);
 }
@@ -380,11 +380,11 @@ u8 leland_state::leland_mvram_port_r(offs_t offset)
 
 /*************************************
  *
- *  Sub video RAM read/write
+ *  Slave video RAM read/write
  *
  *************************************/
 
-void leland_state::sub_video_addr_w(offs_t offset, u8 data)
+void leland_state::slave_video_addr_w(offs_t offset, u8 data)
 {
 	video_addr_w(offset, data, 1);
 }
@@ -404,7 +404,7 @@ u8 leland_state::leland_svram_port_r(offs_t offset)
 
 /*************************************
  *
- *  Ataxx main video RAM read/write
+ *  Ataxx master video RAM read/write
  *
  *************************************/
 
@@ -424,7 +424,7 @@ void ataxx_state::ataxx_svram_port_w(offs_t offset, u8 data)
 
 /*************************************
  *
- *  Ataxx sub video RAM read/write
+ *  Ataxx slave video RAM read/write
  *
  *************************************/
 

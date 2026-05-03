@@ -73,7 +73,7 @@ PART # 80-18002-01
 |-----------------------------------------------|
 Notes:
       80186 - Siemens SAB80186-1-N x86 CPU. Clock input 16MHz, runs at 8MHz with an internal /2 divider.
-        Z80 - Main(1) & Sub(2) Zilog Z0840006 CPU. Clock input 6.000MHz [both, 12/2]
+        Z80 - Master(1) & Slave(2) Zilog Z0840006 CPU. Clock input 6.000MHz [both, 12/2]
       76C88 - Goldstar GM76C88-10 8kBx8-bit SRAM, equivalent to 6264 etc
        BATT - 3.6V AA Lithium Battery. Connected to the 2x 76C88 SRAMs just above U59. Used to hold the book-keeping data and high scores.
               Not required/essential for normal operation.
@@ -92,8 +92,8 @@ Notes:
      AD7524 - Maxim AD7524 8-bit Multiplying D/A Converter. 6 chips: channel 0 U46 to channel 5 U51
      AD7533 - Maxim AD7533 10-bit Multiplying D/A Converter
     ADC0820 - Signetics ADC0820 8-bit A/D Converter
-    U56-U59 - 27C512 program ROMs for main Z80
-      U2-U8 - 27C512 program ROMs for sub Z80. U2 & U3 are empty but are used on the Track-Pak upgrade.
+    U56-U59 - 27C512 program ROMs for master Z80
+      U2-U8 - 27C512 program ROMs for slave Z80. U2 & U3 are empty but are used on the Track-Pak upgrade.
     U24-U27 - 27C512 program ROMs for 80186 CPU
     U12-U15 - 27C512 program ROMs for 80186 CPU
          U9 - PAL20L10 labelled '38-01'
@@ -138,7 +138,7 @@ ASSY: 81-12170-12
 |  U1    14.31818MHz          U67  U89   U99      12MHz    |
 |----------------------------------------------------------|
 Notes:
-      U3 - 27C64 EPROM (first part of sub Z80 program)
+      U3 - 27C64 EPROM (first part of slave Z80 program)
   U1/U99 - 40 pin flat cable joining to top board
  U67-U70 - 27C128 EPROM (graphics). U68 & U70 not populated
  U89-U92 - 27C128 EPROM (graphics). U89 & U91 not populated
@@ -146,7 +146,7 @@ Notes:
  JP1/1/2 - Jumpers all set to 1-2
    LS461 - 74LS461 Octal Counter. These are said to be PALs programmed as LS461 but some appears to be actual LS461 logic chips.
    LS154 - 74LS154 4-Line to 16-Line Decoder/Demultiplexer
-    6116 - 2kBx8-bit SRAM. Chips near P1 are for the sub Z80 program RAM. Chips near P2 are for the main Z80 program RAM.
+    6116 - 2kBx8-bit SRAM. Chips near P1 are for the slave Z80 program RAM. Chips near P2 are for the master Z80 program RAM.
     U101 - Empty socket
     4464 - 4464 64kBx4-bit DRAM (graphics RAM)
     2148 - 1kBx4-bit SRAM (color RAM)
@@ -210,78 +210,78 @@ Notes:
 #include "speaker.h"
 
 
-/* Main Clock2 is for Asylum, Ataxx, Brute Force, Danny Sullivan's Indy Heat, World Soccer Finals */
-//#define MAIN_CLOCK2       XTAL(28'636'363)
+/* Master Clock2 is for Asylum, Ataxx, Brute Force, Danny Sullivan's Indy Heat, World Soccer Finals */
+//#define MASTER_CLOCK2       XTAL(28'636'363)
 
 
 /*************************************
  *
- *  Main CPU memory handlers
+ *  Master CPU memory handlers
  *
  *************************************/
 
-void leland_state::main_common_map_program(address_map &map)
+void leland_state::master_common_map_program(address_map &map)
 {
-	map(0x0000, 0x1fff).rom().region("maincpu", 0);
+	map(0x0000, 0x1fff).rom().region("master", 0);
 	map(0xe000, 0xefff).ram().share(m_mainram);
 	map(0xf000, 0xf3ff).view(m_palette_view);
 	m_palette_view[0](0xf000, 0xf3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xf800, 0xf801).w(FUNC(leland_state::main_video_addr_w));
+	map(0xf800, 0xf801).w(FUNC(leland_state::master_video_addr_w));
 }
 
 
-void leland_state::main_map_program(address_map &map)
+void leland_state::master_map_program(address_map &map)
 {
-	main_common_map_program(map);
-	map(0x2000, 0xdfff).bankr(m_main_bankslot);
+	master_common_map_program(map);
+	map(0x2000, 0xdfff).bankr(m_master_bankslot);
 	map(0xa000, 0xdfff).view(m_battery_ram_view);
 	m_battery_ram_view[0](0xa000, 0xdfff).ram().share(m_battery_ram);
 }
 
-void leland_state::main_map_io(address_map &map)
+void leland_state::master_map_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).w(FUNC(leland_state::leland_main_alt_bankswitch_w));
-	map(0xfd, 0xff).rw(FUNC(leland_state::main_analog_key_r), FUNC(leland_state::main_analog_key_w));
+	map(0xf0, 0xf0).w(FUNC(leland_state::leland_master_alt_bankswitch_w));
+	map(0xfd, 0xff).rw(FUNC(leland_state::master_analog_key_r), FUNC(leland_state::master_analog_key_w));
 }
 
 
-void redline_state::main_redline_map_program(address_map &map)
+void redline_state::master_redline_map_program(address_map &map)
 {
-	main_common_map_program(map);
-	map(0x2000, 0x9fff).bankr(m_main_bankslot);
-	map(0xa000, 0xdfff).rom().region("maincpu", 0xa000);
+	master_common_map_program(map);
+	map(0x2000, 0x9fff).bankr(m_master_bankslot);
+	map(0xa000, 0xdfff).rom().region("master", 0xa000);
 	map(0xa000, 0xdfff).view(m_battery_ram_view);
 	m_battery_ram_view[0](0xa000, 0xdfff).ram().share(m_battery_ram);
 }
 
-void redline_state::main_redline_map_io(address_map &map)
+void redline_state::master_redline_map_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).w(FUNC(redline_state::redline_main_alt_bankswitch_w));
+	map(0xf0, 0xf0).w(FUNC(redline_state::redline_master_alt_bankswitch_w));
 	map(0xf2, 0xf2).rw(m_sound, FUNC(leland_80186_sound_device::response_r), FUNC(leland_80186_sound_device::command_lo_w));
 	map(0xf4, 0xf4).w(m_sound, FUNC(leland_80186_sound_device::command_hi_w));
-	map(0xfd, 0xff).rw(FUNC(redline_state::main_analog_key_r), FUNC(redline_state::main_analog_key_w));
+	map(0xfd, 0xff).rw(FUNC(redline_state::master_analog_key_r), FUNC(redline_state::master_analog_key_w));
 }
 
 
-void ataxx_state::main_map_program_2(address_map &map)
+void ataxx_state::master_map_program_2(address_map &map)
 {
-	map(0x0000, 0x1fff).rom().region("maincpu", 0);
-	map(0x2000, 0x9fff).bankr(m_main_bankslot);
-	map(0xa000, 0xdfff).rom().region("maincpu", 0xa000);
+	map(0x0000, 0x1fff).rom().region("master", 0);
+	map(0x2000, 0x9fff).bankr(m_master_bankslot);
+	map(0xa000, 0xdfff).rom().region("master", 0xa000);
 	map(0xa000, 0xdfff).view(m_battery_ram_view);
 	m_battery_ram_view[0](0xa000, 0xdfff).ram().share(m_battery_ram);
 	m_battery_ram_view[1](0xa000, 0xdfff).rw(FUNC(ataxx_state::qram_r), FUNC(ataxx_state::qram_w));
 	map(0xe000, 0xf7ff).ram().share(m_mainram);
 	map(0xf800, 0xfffb).ram().share(m_tram);
-	map(0xfff8, 0xfff9).w(FUNC(ataxx_state::main_video_addr_w));
+	map(0xfff8, 0xfff9).w(FUNC(ataxx_state::master_video_addr_w));
 	map(0xfffc, 0xffff).rw(FUNC(ataxx_state::xrom_r), FUNC(ataxx_state::xrom_w));
 	map(0xf800, 0xffff).view(m_palette_view);
 	m_palette_view[0](0xf800, 0xffff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
 
-void ataxx_state::main_map_io_2(address_map &map)
+void ataxx_state::master_map_io_2(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x04, 0x04).r(m_sound, FUNC(leland_80186_sound_device::response_r));
@@ -290,64 +290,64 @@ void ataxx_state::main_map_io_2(address_map &map)
 	map(0x0c, 0x0c).w(m_sound, FUNC(leland_80186_sound_device::ataxx_80186_control_w));
 	map(0x20, 0x20).rw(FUNC(ataxx_state::eeprom_r), FUNC(ataxx_state::eeprom_w));
 	map(0xd0, 0xef).rw(FUNC(ataxx_state::ataxx_mvram_port_r), FUNC(ataxx_state::ataxx_mvram_port_w));
-	map(0xf0, 0xff).rw(FUNC(ataxx_state::ataxx_main_input_r), FUNC(ataxx_state::ataxx_main_output_w));
+	map(0xf0, 0xff).rw(FUNC(ataxx_state::ataxx_master_input_r), FUNC(ataxx_state::ataxx_master_output_w));
 }
 
 
 
 /*************************************
  *
- *  Sub CPU memory handlers
+ *  Slave CPU memory handlers
  *
  *************************************/
 
-void leland_state::sub_small_map_program(address_map &map)
+void leland_state::slave_small_map_program(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0xdfff).bankr(m_sub_bankslot);
+	map(0x2000, 0xdfff).bankr(m_slave_bankslot);
 	map(0xe000, 0xefff).ram();
-	map(0xf800, 0xf801).w(FUNC(leland_state::sub_video_addr_w));
+	map(0xf800, 0xf801).w(FUNC(leland_state::slave_video_addr_w));
 	map(0xf802, 0xf802).r(FUNC(leland_state::raster_r));
-	map(0xf803, 0xf803).w(FUNC(leland_state::sub_small_banksw_w));
+	map(0xf803, 0xf803).w(FUNC(leland_state::slave_small_banksw_w));
 }
 
 
-void redline_state::sub_large_map_program(address_map &map)
+void redline_state::slave_large_map_program(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x4000, 0xbfff).bankr(m_sub_bankslot);
-	map(0xc000, 0xc000).w(FUNC(redline_state::sub_large_banksw_w));
+	map(0x4000, 0xbfff).bankr(m_slave_bankslot);
+	map(0xc000, 0xc000).w(FUNC(redline_state::slave_large_banksw_w));
 	map(0xe000, 0xefff).ram();
-	map(0xf800, 0xf801).w(FUNC(redline_state::sub_video_addr_w));
+	map(0xf800, 0xf801).w(FUNC(redline_state::slave_video_addr_w));
 	map(0xf802, 0xf802).r(FUNC(redline_state::raster_r));
 }
 
 
-void leland_state::sub_map_io(address_map &map)
+void leland_state::slave_map_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x1f).mirror(0x40).rw(FUNC(leland_state::leland_svram_port_r), FUNC(leland_state::leland_svram_port_w));
 }
 
 
-void ataxx_state::sub_map_program(address_map &map)
+void ataxx_state::slave_map_program(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x9fff).bankr(m_sub_bankslot);
+	map(0x2000, 0x9fff).bankr(m_slave_bankslot);
 	map(0xa000, 0xdfff).rom();
 	map(0xe000, 0xefff).ram();
-	map(0xfffc, 0xfffd).w(FUNC(ataxx_state::sub_video_addr_w));
+	map(0xfffc, 0xfffd).w(FUNC(ataxx_state::slave_video_addr_w));
 	map(0xfffe, 0xfffe).r(FUNC(ataxx_state::raster_r));
-	map(0xffff, 0xffff).w(FUNC(ataxx_state::ataxx_sub_banksw_w));
+	map(0xffff, 0xffff).w(FUNC(ataxx_state::ataxx_slave_banksw_w));
 }
 
-void ataxx_state::asylum_sub_map_program(address_map &map)
+void ataxx_state::asylum_slave_map_program(address_map &map)
 {
-	sub_map_program(map);
+	slave_map_program(map);
 	map(0xf000, 0xfffb).ram();
 }
 
-void ataxx_state::sub_map_io_2(address_map &map)
+void ataxx_state::slave_map_io_2(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x60, 0x7f).rw(FUNC(ataxx_state::ataxx_svram_port_r), FUNC(ataxx_state::ataxx_svram_port_w));
@@ -392,7 +392,7 @@ Memory configurations:
  *************************************/
 
 /* Helps document the input ports. */
-#define IPT_SUBHALT   IPT_CUSTOM
+#define IPT_SLAVEHALT   IPT_CUSTOM
 
 
 static INPUT_PORTS_START( cerberus )        /* complete, verified from code */
@@ -402,7 +402,7 @@ static INPUT_PORTS_START( cerberus )        /* complete, verified from code */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 
 	PORT_START("IN1")   /* 0x81 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SUBHALT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLAVEHALT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -443,7 +443,7 @@ static INPUT_PORTS_START( mayhem )      /* complete, verified from code */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 
 	PORT_START("IN1")   /* 0xC1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SUBHALT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLAVEHALT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -482,7 +482,7 @@ static INPUT_PORTS_START( wseries )     /* complete, verified from code */
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Go Back") PORT_PLAYER(1)
 
 	PORT_START("IN1")   /* 0x81 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SUBHALT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLAVEHALT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -519,7 +519,7 @@ static INPUT_PORTS_START( alleymas )        /* complete, verified from code */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("IN1")   /* 0xC1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SUBHALT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLAVEHALT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -556,7 +556,7 @@ static INPUT_PORTS_START( upyoural )        /* complete, verified from code */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("IN1")   /* 0xC1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SUBHALT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLAVEHALT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -593,7 +593,7 @@ static INPUT_PORTS_START( dangerz )     /* complete, verified from code */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")   /* 0x81 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SUBHALT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLAVEHALT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -624,7 +624,7 @@ static INPUT_PORTS_START( basebal2 )        /* complete, verified from code */
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Go Back") PORT_PLAYER(1)
 
 	PORT_START("IN1")   /* 0x41/C1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SUBHALT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLAVEHALT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -663,7 +663,7 @@ static INPUT_PORTS_START( redline )     /* complete, verified in code */
 	PORT_BIT( 0xe0, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(64) PORT_PLAYER(1)
 
 	PORT_START("IN1")   /* 0xC1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SUBHALT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLAVEHALT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -696,7 +696,7 @@ static INPUT_PORTS_START( quarterb )        /* complete, verified in code */
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")   /* 0x81 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SUBHALT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLAVEHALT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -738,7 +738,7 @@ static INPUT_PORTS_START( teamqb )      /* complete, verified in code */
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")   /* 0x81 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SUBHALT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLAVEHALT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -799,7 +799,7 @@ static INPUT_PORTS_START( aafb2p )      /* complete, verified in code */
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")   /* 0x81 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SUBHALT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLAVEHALT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -858,7 +858,7 @@ static INPUT_PORTS_START( offroad )     /* complete, verified from code */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")   /* 0xC1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SUBHALT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLAVEHALT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -925,7 +925,7 @@ static INPUT_PORTS_START( pigout )      /* complete, verified from code */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 
 	PORT_START("IN1")   /* 0x41 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SUBHALT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLAVEHALT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* read, but never referenced */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -970,7 +970,7 @@ static INPUT_PORTS_START( ataxx )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
 	PORT_START("IN1")       /* 0xF7 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SUBHALT )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SLAVEHALT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1001,7 +1001,7 @@ static INPUT_PORTS_START( wsf )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 
 	PORT_START("IN1")       /* 0xF7 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SUBHALT )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SLAVEHALT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1053,7 +1053,7 @@ static INPUT_PORTS_START( indyheat )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 
 	PORT_START("IN1")       /* 0xF7 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SUBHALT )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SLAVEHALT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1099,7 +1099,7 @@ static INPUT_PORTS_START( brutforc )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("IN1")       /* 0xF7 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SUBHALT )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SLAVEHALT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1149,14 +1149,14 @@ INPUT_PORTS_END
 void leland_state::leland(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &leland_state::main_map_program);
-	m_maincpu->set_addrmap(AS_IO, &leland_state::main_map_io);
-	m_maincpu->set_vblank_int("screen", FUNC(leland_state::leland_main_interrupt));
+	Z80(config, m_master, XTAL(12'000'000)/2);
+	m_master->set_addrmap(AS_PROGRAM, &leland_state::master_map_program);
+	m_master->set_addrmap(AS_IO, &leland_state::master_map_io);
+	m_master->set_vblank_int("screen", FUNC(leland_state::leland_master_interrupt));
 
-	Z80(config, m_sub, XTAL(12'000'000)/2);
-	m_sub->set_addrmap(AS_PROGRAM, &leland_state::sub_small_map_program);
-	m_sub->set_addrmap(AS_IO, &leland_state::sub_map_io);
+	Z80(config, m_slave, XTAL(12'000'000)/2);
+	m_slave->set_addrmap(AS_PROGRAM, &leland_state::slave_small_map_program);
+	m_slave->set_addrmap(AS_IO, &leland_state::slave_map_io);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 	NVRAM(config, "battery", nvram_device::DEFAULT_ALL_0);
@@ -1191,11 +1191,11 @@ void redline_state::redline(machine_config &config)
 	leland(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &redline_state::main_redline_map_program);
-	m_maincpu->set_addrmap(AS_IO, &redline_state::main_redline_map_io);
+	m_master->set_addrmap(AS_PROGRAM, &redline_state::master_redline_map_program);
+	m_master->set_addrmap(AS_IO, &redline_state::master_redline_map_io);
 
 	/* sound hardware */
-	REDLINE_80186(config, m_sound, 0).set_main_cpu_tag(m_maincpu);
+	REDLINE_80186(config, m_sound, 0).set_master_cpu_tag(m_master);
 }
 
 
@@ -1204,7 +1204,7 @@ void redline_state::quarterb(machine_config &config)
 	redline(config);
 
 	/* sound hardware */
-	LELAND_80186(config.replace(), m_sound, 0).set_main_cpu_tag(m_maincpu);
+	LELAND_80186(config.replace(), m_sound, 0).set_master_cpu_tag(m_master);
 }
 
 
@@ -1213,20 +1213,20 @@ void redline_state::lelandi(machine_config &config)
 	quarterb(config);
 
 	/* basic machine hardware */
-	m_sub->set_addrmap(AS_PROGRAM, &redline_state::sub_large_map_program);
+	m_slave->set_addrmap(AS_PROGRAM, &redline_state::slave_large_map_program);
 }
 
 
 void ataxx_state::ataxx(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 6000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ataxx_state::main_map_program_2);
-	m_maincpu->set_addrmap(AS_IO, &ataxx_state::main_map_io_2);
+	Z80(config, m_master, 6000000);
+	m_master->set_addrmap(AS_PROGRAM, &ataxx_state::master_map_program_2);
+	m_master->set_addrmap(AS_IO, &ataxx_state::master_map_io_2);
 
-	Z80(config, m_sub, 6000000);
-	m_sub->set_addrmap(AS_PROGRAM, &ataxx_state::sub_map_program);
-	m_sub->set_addrmap(AS_IO, &ataxx_state::sub_map_io_2);
+	Z80(config, m_slave, 6000000);
+	m_slave->set_addrmap(AS_PROGRAM, &ataxx_state::slave_map_program);
+	m_slave->set_addrmap(AS_IO, &ataxx_state::slave_map_io_2);
 
 	EEPROM_93C56_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
@@ -1236,7 +1236,7 @@ void ataxx_state::ataxx(machine_config &config)
 	ataxx_video(config);
 
 	/* sound hardware */
-	ATAXX_80186(config, m_sound, 0).set_main_cpu_tag(m_maincpu);
+	ATAXX_80186(config, m_sound, 0).set_master_cpu_tag(m_master);
 }
 
 
@@ -1244,13 +1244,13 @@ void ataxx_state::wsf(machine_config &config)
 {
 	ataxx(config);
 
-	WSF_80186(config.replace(), m_sound, 0).set_main_cpu_tag(m_maincpu);
+	WSF_80186(config.replace(), m_sound, 0).set_master_cpu_tag(m_master);
 }
 
 void ataxx_state::asylum(machine_config &config)
 {
 	wsf(config);
-	m_sub->set_addrmap(AS_PROGRAM, &ataxx_state::asylum_sub_map_program);
+	m_slave->set_addrmap(AS_PROGRAM, &ataxx_state::asylum_slave_map_program);
 }
 
 
@@ -1261,7 +1261,7 @@ void ataxx_state::asylum(machine_config &config)
  *************************************/
 
 ROM_START( cerberus )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "master", 0 )
 	ROM_LOAD( "3-23u101", 0x00000, 0x02000, CRC(d78210df) SHA1(7557bc9da7d7347073cebcc080ff2040184ee77b) )
 	ROM_LOAD( "3-23u102", 0x02000, 0x02000, CRC(eed121ef) SHA1(862c4fee6c4483569aec7969ce797a5c3fbae336) )
 	ROM_LOAD( "3-23u103", 0x04000, 0x02000, CRC(45b82bf7) SHA1(ca239fcb96754c9e388d55eea4974824e6ce4d75) )
@@ -1270,7 +1270,7 @@ ROM_START( cerberus )
 	ROM_LOAD( "3-23u106", 0x0a000, 0x02000, CRC(d64110d2) SHA1(3bd8cda21e848357c84f5064f38e0b9da35051db) )
 	ROM_LOAD( "3-23u107", 0x0c000, 0x02000, CRC(24e41c34) SHA1(b38462593320bd004a24392e0cce7b36fe12434e) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x10000, "slave", 0 )
 	ROM_LOAD( "3-23u3",  0x00000, 0x02000, CRC(b0579138) SHA1(b79888d0c8cc4ecb015e3865df379859e02e2846) )
 	ROM_LOAD( "3-23u4",  0x02000, 0x02000, CRC(ba0dc990) SHA1(836eef85e31b81a4b6f84529ecbe64167a5059dd) )
 	ROM_LOAD( "3-23u5",  0x04000, 0x02000, CRC(f8d6cc5d) SHA1(5b82c722aa6a055d1955f654985b43e114792704) )
@@ -1300,7 +1300,7 @@ ROM_END
 
 
 ROM_START( mayhem )
-	ROM_REGION( 0x28000, "maincpu", 0 )
+	ROM_REGION( 0x28000, "master", 0 )
 	ROM_LOAD( "13208.101",   0x00000, 0x04000, CRC(04306973) SHA1(83e35fa7f2b2c6c1a65ee2f76223e12234eb69ad) )
 	ROM_LOAD( "13215.102",   0x10000, 0x02000, CRC(06e689ae) SHA1(1bf4ae82809eaaf06608d2015bdeceae57a345a1) )
 	ROM_CONTINUE(            0x1c000, 0x02000 )
@@ -1313,7 +1313,7 @@ ROM_START( mayhem )
 	ROM_LOAD( "13219.106",   0x18000, 0x02000, CRC(c0a74d6f) SHA1(c47ff4dc47bea79c76198a677181c92026e8c3db) )
 	ROM_CONTINUE(            0x24000, 0x02000 )
 
-	ROM_REGION( 0x28000, "sub", 0 )
+	ROM_REGION( 0x28000, "slave", 0 )
 	ROM_LOAD( "13207.3",  0x00000, 0x04000, CRC(be1df6aa) SHA1(72e8782a96d598580a13b2183fbdc434f68d490b) ) // DO NOT TRIM THIS ROM
 	ROM_LOAD( "13209.4",  0x10000, 0x02000, CRC(39fcd7c6) SHA1(2064a7caec0753d38a39095492f705a20482eb83) )
 	ROM_CONTINUE(         0x1c000, 0x02000 )
@@ -1349,7 +1349,7 @@ ROM_END
 
 
 ROM_START( powrplay )
-	ROM_REGION( 0x28000, "maincpu", 0 )
+	ROM_REGION( 0x28000, "master", 0 )
 	ROM_LOAD( "13306.101",   0x00000, 0x02000, CRC(981fc215) SHA1(c2ae1ff12f96c713d0dc6f6503ce0ba18ac342c4) )
 	ROM_LOAD( "13307.102",   0x10000, 0x02000, CRC(38a6ddfe) SHA1(a4a4372697e14584c3a6a9a8c94e5a4ee58b3ee6) )
 	ROM_CONTINUE(            0x1c000, 0x02000 )
@@ -1362,7 +1362,7 @@ ROM_START( powrplay )
 	ROM_LOAD( "13311.106",   0x18000, 0x02000, CRC(5e17fe84) SHA1(8f53de9acc08f17dd2bc5a81489d8da86ad3c690) )
 	ROM_CONTINUE(            0x24000, 0x02000 )
 
-	ROM_REGION( 0x28000, "sub", 0 )
+	ROM_REGION( 0x28000, "slave", 0 )
 	ROM_LOAD( "13305.003",  0x00000, 0x02000, CRC(df8fbeed) SHA1(2b5ec692cf90fe66d06a2261d9d56cb88528750d) )
 	ROM_LOAD( "13313.004",  0x10000, 0x02000, CRC(081eb88f) SHA1(97700d9dba05a459fb85911db8f4b4fe1283776b) )
 	ROM_CONTINUE(           0x1c000, 0x02000 )
@@ -1404,7 +1404,7 @@ For World Series: The Season, the label format is:
 ------------------------
 */
 ROM_START( wseries )
-	ROM_REGION( 0x28000, "maincpu", 0 )
+	ROM_REGION( 0x28000, "master", 0 )
 	ROM_LOAD( "02-13409-01.101",   0x00000, 0x02000, CRC(b5eccf5c) SHA1(1ca781245292399d1b573e6be2edbb79daf9b5d6) )
 	ROM_LOAD( "02-13410-01.102",   0x10000, 0x02000, CRC(dd1ec091) SHA1(ef644c49bbe1cc30ecafab928a0715ea3461a1bd) )
 	ROM_CONTINUE(                  0x1c000, 0x02000 )
@@ -1419,7 +1419,7 @@ ROM_START( wseries )
 	ROM_LOAD( "02-13415-01.107",   0x1a000, 0x02000, CRC(20b92eff) SHA1(02156fb36cae6c47b6ae9afcbc27f8f5e9074bbe) )
 	ROM_CONTINUE(                  0x26000, 0x02000 )
 
-	ROM_REGION( 0x28000, "sub", 0 )
+	ROM_REGION( 0x28000, "slave", 0 )
 	ROM_LOAD( "02-13416-00.u3",  0x00000, 0x02000, CRC(37c960cf) SHA1(e18c72cdbd642e8dfa1184814b65770535a469cb) )
 	ROM_LOAD( "02-13417-00.u4",  0x10000, 0x02000, CRC(97f044b5) SHA1(289a9e19ce46dd039c7edc4d78bd07c355da6dad) )
 	ROM_CONTINUE(                0x1c000, 0x02000 )
@@ -1455,7 +1455,7 @@ ROM_END
 
 
 ROM_START( wseries0 )
-	ROM_REGION( 0x28000, "maincpu", 0 )
+	ROM_REGION( 0x28000, "master", 0 )
 	ROM_LOAD( "02-13409-00.101",   0x00000, 0x02000, CRC(a0820663) SHA1(5875248f52990496abfba89b65f6f4b76e00d0ff) )
 	ROM_LOAD( "02-13410-00.102",   0x10000, 0x02000, CRC(b2d71d2d) SHA1(981876058b44c11406975f04e5aab246cb9bc175) )
 	ROM_CONTINUE(                  0x1c000, 0x02000 )
@@ -1470,7 +1470,7 @@ ROM_START( wseries0 )
 	ROM_LOAD( "02-13415-00.107",   0x1a000, 0x02000, CRC(4c4db073) SHA1(3492d8920998c3bad3e9769d5731fc81ca3714a7) )
 	ROM_CONTINUE(                  0x26000, 0x02000 )
 
-	ROM_REGION( 0x28000, "sub", 0 )
+	ROM_REGION( 0x28000, "slave", 0 )
 	ROM_LOAD( "02-13416-00.u3",  0x00000, 0x02000, CRC(37c960cf) SHA1(e18c72cdbd642e8dfa1184814b65770535a469cb) )
 	ROM_LOAD( "02-13417-00.u4",  0x10000, 0x02000, CRC(97f044b5) SHA1(289a9e19ce46dd039c7edc4d78bd07c355da6dad) )
 	ROM_CONTINUE(                0x1c000, 0x02000 )
@@ -1514,7 +1514,7 @@ For Alley Master, the label format is:
 ------------------------
 */
 ROM_START( alleymas )
-	ROM_REGION( 0x28000, "maincpu", 0 )
+	ROM_REGION( 0x28000, "master", 0 )
 	ROM_LOAD( "02-13509-00.u101",  0x00000, 0x02000, CRC(4273e260) SHA1(1b2a726e0a6fe6a60d447c987471a6e1a9e78479) )
 	ROM_LOAD( "02-13510-00.u102",  0x10000, 0x02000, CRC(eb6575aa) SHA1(0876c83d13565937610b5af52aacee1ae6fd59ba) )
 	ROM_CONTINUE(                  0x1c000, 0x02000 )
@@ -1529,7 +1529,7 @@ ROM_START( alleymas )
 	ROM_LOAD( "02-13515-00.u107",  0x1a000, 0x02000, CRC(3ca13e8c) SHA1(34e00a17ce305c8327674bd79347f01cda14bc8b) )
 	ROM_CONTINUE(                  0x26000, 0x02000 )
 
-	ROM_REGION( 0x28000, "sub", 0 )
+	ROM_REGION( 0x28000, "slave", 0 )
 	ROM_LOAD( "02-13516-00.u003",  0x00000, 0x02000, CRC(3fee63ae) SHA1(519fe4981dc2c6d025fc2f27af6682103c99dd5e) )
 	ROM_LOAD( "02-13517-00.u004",  0x10000, 0x02000, CRC(d302b5d1) SHA1(77263944d7b4e335fbc3b91d69def6cc85648ec6) )
 	ROM_CONTINUE(                  0x1c000, 0x02000 )
@@ -1565,7 +1565,7 @@ ROM_END
 
 
 ROM_START( upyoural )
-	ROM_REGION( 0x28000, "maincpu", 0 )
+	ROM_REGION( 0x28000, "master", 0 )
 	ROM_LOAD( "uya-u101.bin", 0x00000, 0x02000, CRC(82bf3b7a) SHA1(1a23da0535c736fa2f49a83fe5e33b8d60117bd1) )
 	ROM_LOAD( "uya-u102.bin", 0x10000, 0x02000, CRC(e1681268) SHA1(205519bf59e3be1ec485de7d81e3c4751e6630f6) )
 	ROM_CONTINUE(             0x1c000, 0x02000 )
@@ -1580,7 +1580,7 @@ ROM_START( upyoural )
 	ROM_LOAD( "uya-u107.bin", 0x1a000, 0x02000, CRC(fd087cc7) SHA1(96b70e94d96baf4ea66d98b225cf67bf69cdd972) )
 	ROM_CONTINUE(             0x26000, 0x02000 )
 
-	ROM_REGION( 0x28000, "sub", 0 )
+	ROM_REGION( 0x28000, "slave", 0 )
 	ROM_LOAD( "uya-u3.bin",  0x00000, 0x02000, CRC(3fee63ae) SHA1(519fe4981dc2c6d025fc2f27af6682103c99dd5e) )
 	ROM_LOAD( "uya-u4.bin",  0x10000, 0x02000, CRC(d302b5d1) SHA1(77263944d7b4e335fbc3b91d69def6cc85648ec6) )
 	ROM_CONTINUE(            0x1c000, 0x02000 )
@@ -1633,11 +1633,11 @@ For Danger Zone revision 2, only 13823 changed: it's label format is:
 ------------------------
 */
 ROM_START( dangerz )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "03-13823-02.u012t",  0x00000, 0x10000, CRC(31604634) SHA1(0b3d4fea91faf41519888954a21a82827eae6e2a) ) // This ROM's checksum is 0208
 	ROM_LOAD( "03-13824-00.u013",   0x10000, 0x10000, CRC(381026c6) SHA1(16c810d162789154e3b5ad38545855370f73b679) ) // 3 PCBs verified as U013 and not "U013T"
 
-	ROM_REGION( 0x28000, "sub", 0 )
+	ROM_REGION( 0x28000, "slave", 0 )
 	ROM_LOAD( "02-13816-00.u003",   0x00000, 0x04000, CRC(71863c5b) SHA1(18fdae631d0990815b07934d9cce73a41df9152f) ) // part numbers here down start with "02", unlike the program ROMs */
 	ROM_LOAD( "02-13817-00.u004",   0x10000, 0x02000, CRC(924bead3) SHA1(ba8dd39db9992b426968e5584c94a8b5ed7c0535) )
 	ROM_CONTINUE(                   0x1c000, 0x02000 )
@@ -1670,11 +1670,11 @@ ROM_START( dangerz )
 ROM_END
 
 ROM_START( dangerz0 )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "03-13823-00.u012",   0x00000, 0x10000, CRC(ffc030b2) SHA1(8281d2e11cfd351a7a9a02db632f544e9d67d192) ) // 3 PCBs verified as U012 and not "U012T"
 	ROM_LOAD( "03-13824-00.u013",   0x10000, 0x10000, CRC(381026c6) SHA1(16c810d162789154e3b5ad38545855370f73b679) ) // 3 PCBs verified as U013 and not "U013T"
 
-	ROM_REGION( 0x28000, "sub", 0 )
+	ROM_REGION( 0x28000, "slave", 0 )
 	ROM_LOAD( "02-13816-00.u003",   0x00000, 0x04000, CRC(71863c5b) SHA1(18fdae631d0990815b07934d9cce73a41df9152f) ) // part numbers here down start with "02", unlike the program ROMs
 	ROM_LOAD( "02-13817-00.u004",   0x10000, 0x02000, CRC(924bead3) SHA1(ba8dd39db9992b426968e5584c94a8b5ed7c0535) )
 	ROM_CONTINUE(                   0x1c000, 0x02000 )
@@ -1716,7 +1716,7 @@ For Baseball: The Season II, the label format is:
 ------------------------
 */
 ROM_START( basebal2 )
-	ROM_REGION( 0x38000, "maincpu", 0 )
+	ROM_REGION( 0x38000, "master", 0 )
 	ROM_LOAD( "03-14115-00.u101",   0x00000, 0x02000, CRC(05231fee) SHA1(d2f4f81309d344576aadb39c209240b901476ac2) )
 	ROM_LOAD( "03-14116-00.u102",   0x10000, 0x02000, CRC(e1482ea3) SHA1(a55b8c99428fefd033ac481944b370a4c82ac134) )
 	ROM_CONTINUE(                   0x1c000, 0x02000 )
@@ -1736,7 +1736,7 @@ ROM_START( basebal2 )
 	ROM_LOAD( "03-14123-01.u3t",    0x2a000, 0x02000, CRC(f9c51e5a) SHA1(a4ed976b9490457b54f2ac6528cf9f4d04732808) )
 	ROM_RELOAD(                     0x32000, 0x02000 )
 
-	ROM_REGION( 0x28000, "sub", 0 )
+	ROM_REGION( 0x28000, "slave", 0 )
 	ROM_LOAD( "03-14100-01.u3",  0x00000, 0x02000, CRC(1dffbdaf) SHA1(15630a84c6034a13449cd481bcb6a93bdf009d1f) )
 	ROM_LOAD( "03-14101-01.u4",  0x10000, 0x02000, CRC(c585529c) SHA1(208807c1f8761675903fcf3c590ba3920e980a8b) )
 	ROM_CONTINUE(                0x1c000, 0x02000 )
@@ -1772,7 +1772,7 @@ ROM_END
 
 
 ROM_START( dblplay )
-	ROM_REGION( 0x38000, "maincpu", 0 )
+	ROM_REGION( 0x38000, "master", 0 )
 	ROM_LOAD( "15018-01.u101",  0x00000, 0x02000, CRC(17b6af29) SHA1(00865927d74f735ed9bbe635bb554d408bf7f856) )
 	ROM_LOAD( "15019-01.u102",  0x10000, 0x02000, CRC(9fc8205e) SHA1(2b783c406539a3d06adacd6b15c8edd86b994561) )
 	ROM_CONTINUE(               0x1c000, 0x02000 )
@@ -1794,7 +1794,7 @@ ROM_START( dblplay )
 	ROM_LOAD( "15027-01.u4t",   0x2c000, 0x02000, CRC(9b1e72e9) SHA1(09609835b6951d3dc271e48c8bf91cbff99b6f50) )
 	ROM_CONTINUE(               0x34000, 0x02000 )
 
-	ROM_REGION( 0x28000, "sub", 0 )
+	ROM_REGION( 0x28000, "slave", 0 )
 	ROM_LOAD( "15000-01.u03",  0x00000, 0x02000, CRC(208a920a) SHA1(3544bd79e008f696a9ff400aad8bf0eb52a42451) )
 	ROM_LOAD( "15001-01.u04",  0x10000, 0x02000, CRC(751c40d6) SHA1(00e0cba02916c641c85748a1b15af192aca5d60f) )
 	ROM_CONTINUE(              0x1c000, 0x02000 )
@@ -1838,7 +1838,7 @@ For Strike Zone, the label format is:
 ------------------------
 */
 ROM_START( strkzone )
-	ROM_REGION( 0x38000, "maincpu", 0 )
+	ROM_REGION( 0x38000, "master", 0 )
 	ROM_LOAD( "strkzone.u101",  0x00000, 0x04000, CRC(8d83a611) SHA1(d17114559c8d60e3107895bdcb1886cc843b624c) )
 	ROM_LOAD( "strkzone.u102",  0x10000, 0x02000, CRC(3859e67d) SHA1(0a0d18c16fa5becae2ecc147dfafadc16dee8d2f) )
 	ROM_CONTINUE(               0x1c000, 0x02000 )
@@ -1860,7 +1860,7 @@ ROM_START( strkzone )
 	ROM_LOAD( "03-15027-01.u4t",   0x2c000, 0x02000, CRC(9b1e72e9) SHA1(09609835b6951d3dc271e48c8bf91cbff99b6f50) )
 	ROM_CONTINUE(                  0x34000, 0x02000 )
 
-	ROM_REGION( 0x28000, "sub", 0 )
+	ROM_REGION( 0x28000, "slave", 0 )
 	ROM_LOAD( "strkzone.u3",  0x00000, 0x02000, CRC(40258fbe) SHA1(4a68dbf050455bf15fadef20f615ab1de194a1c2) )
 	ROM_LOAD( "strkzone.u4",  0x10000, 0x02000, CRC(df7f2604) SHA1(4aed43905fedf84de683dea9785a73d6d9f89713) )
 	ROM_CONTINUE(             0x1c000, 0x02000 )
@@ -1904,11 +1904,11 @@ For Redline Racer, the label format is:
 ------------------------
 */
 ROM_START( redlin2p )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "02-13932-01.u23t", 0x00000, 0x10000, CRC(ecdf0fbe) SHA1(186e1cecadb84b5085d9ccbf6512553a80b9ebfb) )
 	ROM_LOAD( "02-13931-01.u22t", 0x10000, 0x10000, CRC(16d01978) SHA1(6882eac35a54a91f12a8d37a4f83d7ca0dc65ef5) )
 
-	ROM_REGION( 0x80000, "sub", 0 )
+	ROM_REGION( 0x80000, "slave", 0 )
 	ROM_LOAD( "02-13907-01.u3",  0x00000, 0x04000, CRC(b760d63e) SHA1(b117fd1f96b861abefedd049a305b60c964aadad) )
 	ROM_LOAD( "02-13908-01.u4",  0x10000, 0x02000, CRC(a30739d3) SHA1(eefce1f11ead0ca4c7fc3ed3102fbdb8bfbf3cbc) )
 	ROM_CONTINUE(                0x1c000, 0x02000 )
@@ -1960,11 +1960,11 @@ For Quarterback, the label format is:
 ------------------------
 */
 ROM_START( quarterb )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "03-15219-05.u49t", 0x00000, 0x10000, CRC(ff653e4f) SHA1(761e18ccbdc1c559648c47d06ee21a8a4710c5a0) )
 	ROM_LOAD( "03-15218-05.u48t", 0x10000, 0x10000, CRC(34b83d81) SHA1(0425638063872ff562939439871631f7aa642182) )
 
-	ROM_REGION( 0x80000, "sub", 0 )
+	ROM_REGION( 0x80000, "slave", 0 )
 	ROM_LOAD( "03-15200-01.u3",  0x00000, 0x04000, CRC(83297861) SHA1(9d836f647491af945de021fbf8c75159b32c22c9) )
 	ROM_LOAD( "03-15201-01.u4",  0x10000, 0x02000, CRC(af8dbdab) SHA1(663a32b55ef0337074a223288e59b53c4a10b616) )
 	ROM_CONTINUE(                0x1c000, 0x02000 )
@@ -2007,11 +2007,11 @@ ROM_START( quarterb )
 ROM_END
 
 ROM_START( quarterba )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "03-15219-02.u49t",   0x00000, 0x10000, CRC(7fbe1e5a) SHA1(a4af54328935e348f2903fe7f7dea8612660b899) )
 	ROM_LOAD( "03-15218-02.u48t",   0x10000, 0x10000, CRC(6fbd4b27) SHA1(8146f276af5e3ef968851fa95c8f979b8b969ef6) )
 
-	ROM_REGION( 0x80000, "sub", 0 )
+	ROM_REGION( 0x80000, "slave", 0 )
 	ROM_LOAD( "03-15200-01.u3",  0x00000, 0x04000, CRC(83297861) SHA1(9d836f647491af945de021fbf8c75159b32c22c9) )
 	ROM_LOAD( "03-15201-01.u4",  0x10000, 0x02000, CRC(af8dbdab) SHA1(663a32b55ef0337074a223288e59b53c4a10b616) )
 	ROM_CONTINUE(                0x1c000, 0x02000 )
@@ -2062,11 +2062,11 @@ For Quarterback (Cocktail), the label format is:
 ------------------------
 */
 ROM_START( quarterbc )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "03-15506-01.u49t", 0x00000, 0x10000, CRC(d750c5ed) SHA1(ea3389695e96da06e7e5988c3500e953d35f2af1) )
 	ROM_LOAD( "03-15505-01.u48t", 0x10000, 0x10000, CRC(e17b8a92) SHA1(a3ac8be9018b6003624d8aaebd0233059073c6b2) )
 
-	ROM_REGION( 0x80000, "sub", 0 )
+	ROM_REGION( 0x80000, "slave", 0 )
 	ROM_LOAD( "03-15200-01.u3",  0x00000, 0x04000, CRC(83297861) SHA1(9d836f647491af945de021fbf8c75159b32c22c9) )
 	ROM_LOAD( "03-15201-01.u4",  0x10000, 0x02000, CRC(af8dbdab) SHA1(663a32b55ef0337074a223288e59b53c4a10b616) )
 	ROM_CONTINUE(                0x1c000, 0x02000 )
@@ -2118,11 +2118,11 @@ Viper, the label format is:
 ------------------------
 */
 ROM_START( viper )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "03-15617-03.u49t",   0x00000, 0x10000, CRC(7e4688a6) SHA1(282f98d22447b2f93d6f328a351ce1613a33069b) )
 	ROM_LOAD( "03-15616-03.u48t",   0x10000, 0x10000, CRC(3fe2f0bf) SHA1(2a1a7d1654e5f45a5b30374596865006e80928f5) )
 
-	ROM_REGION( 0x80000, "sub", 0 )
+	ROM_REGION( 0x80000, "slave", 0 )
 	ROM_LOAD( "03-15600-02.u3",  0x00000, 0x02000, CRC(0f57f68a) SHA1(2cb132eb41da5f8a90f83e54a6a8c00a62b66949) )
 	ROM_LOAD( "03-15612-02.u2t", 0x10000, 0x10000, CRC(4043d4ee) SHA1(70ebb98444f13a25cdcd8d31ee47a20af7df5613) )
 	ROM_LOAD( "03-15613-02.u3t", 0x20000, 0x10000, CRC(213bc02b) SHA1(53fadd81a0138525d3d39fd9c2ea258f90b2e6e7) )
@@ -2165,11 +2165,11 @@ John Elway's Team Quarterback, the label format is:
 ------------------------
 */
 ROM_START( teamqb )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "03-15618-03.u58t",   0x00000, 0x10000, CRC(b32568dc) SHA1(92fb8dd89cc7838129e7b106bc0e35107372904f) )
 	ROM_LOAD( "03-15619-03.u59t",   0x10000, 0x10000, CRC(40b3319f) SHA1(26c6e26cd440fc7e1ab5ee7536e17a1c00b83f44) )
 
-	ROM_REGION( 0x80000, "sub", 0 )
+	ROM_REGION( 0x80000, "slave", 0 )
 	ROM_LOAD( "03-15600-01.u3",   0x00000, 0x02000, CRC(46615844) SHA1(cb73dd73d389d1f6a5da91d0935b5461649ba706) )
 	ROM_LOAD( "03-15601-01.u2t",  0x10000, 0x10000, CRC(8e523c58) SHA1(7f1133144177c39849fd6355bf9250895b2d597f) )
 	ROM_LOAD( "03-15602-01.u3t",  0x20000, 0x10000, CRC(545b27a1) SHA1(1e8beebc1384cf6513bff7c2381ca214967ff135) )
@@ -2207,11 +2207,11 @@ ROM_START( teamqb )
 ROM_END
 
 ROM_START( teamqb2 )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "03-15618-03.u58t",   0x00000, 0x10000, CRC(b32568dc) SHA1(92fb8dd89cc7838129e7b106bc0e35107372904f) )
 	ROM_LOAD( "03-15619-02.u59t",   0x10000, 0x10000, CRC(6d533714) SHA1(ab177aaa5b034250c85bde0c2441902f72d44f42) )
 
-	ROM_REGION( 0x80000, "sub", 0 )
+	ROM_REGION( 0x80000, "slave", 0 )
 	ROM_LOAD( "03-15600-01.u3",   0x00000, 0x02000, CRC(46615844) SHA1(cb73dd73d389d1f6a5da91d0935b5461649ba706) )
 	ROM_LOAD( "03-15601-01.u2t",  0x10000, 0x10000, CRC(8e523c58) SHA1(7f1133144177c39849fd6355bf9250895b2d597f) )
 	ROM_LOAD( "03-15602-01.u3t",  0x20000, 0x10000, CRC(545b27a1) SHA1(1e8beebc1384cf6513bff7c2381ca214967ff135) )
@@ -2249,11 +2249,11 @@ ROM_START( teamqb2 )
 ROM_END
 
 ROM_START( teamqb1 )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "03-15618-02.u58t",   0x00000, 0x10000, CRC(d175a252) SHA1(f5d38b599ac7a3999dbd7fd60b96c7a48f6288b3) )
 	ROM_LOAD( "03-15619-01.u59t",   0x10000, 0x10000, CRC(6e48c7c5) SHA1(1ad2218c6a09d332a133a84da844a8643074a2a9) )
 
-	ROM_REGION( 0x80000, "sub", 0 )
+	ROM_REGION( 0x80000, "slave", 0 )
 	ROM_LOAD( "03-15600-01.u3",   0x00000, 0x02000, CRC(46615844) SHA1(cb73dd73d389d1f6a5da91d0935b5461649ba706) )
 	ROM_LOAD( "03-15601-01.u2t",  0x10000, 0x10000, CRC(8e523c58) SHA1(7f1133144177c39849fd6355bf9250895b2d597f) )
 	ROM_LOAD( "03-15602-01.u3t",  0x20000, 0x10000, CRC(545b27a1) SHA1(1e8beebc1384cf6513bff7c2381ca214967ff135) )
@@ -2292,11 +2292,11 @@ ROM_END
 
 
 ROM_START( aafb )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "03-28011.u58t",   0x00000, 0x10000, CRC(fa75a4a0) SHA1(ff37d71d8f2776a8ae9b15f95f105f282b079c5b) )
 	ROM_LOAD( "03-28012.u59t",   0x10000, 0x10000, CRC(ab6a606f) SHA1(6c8872c73b26760517884b2996a0f3834b16b480) )
 
-	ROM_REGION( 0x80000, "sub", 0 )
+	ROM_REGION( 0x80000, "slave", 0 )
 	ROM_LOAD( "03-28000.u3",      0x00000, 0x02000, CRC(cb531986) SHA1(e3bc3fdd1471719e0489d9990302a267a2cedc23) )
 	ROM_LOAD( "02-26001-01.u2t",  0x10000, 0x10000, CRC(f118b9b4) SHA1(95d0ae9055cf60e2d0b414ab64632fed1f48bf99) )
 	ROM_LOAD( "02-24002-02.u3t",  0x20000, 0x10000, CRC(bbb92184) SHA1(d9890d1c95fb19e9fff6465c977cabf71e4528b4) )
@@ -2342,11 +2342,11 @@ All American Football, the label format is:
 ------------------------
 */
 ROM_START( aafbb )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "24014-01.u58t",   0x00000, 0x10000, CRC(5db4a3d0) SHA1(f759ab16de48562db1640bc5df68be188725aecf) ) // Need to verify - likely 02-24014-01
 	ROM_LOAD( "24015-01.u59t",   0x10000, 0x10000, BAD_DUMP CRC(f384f716) SHA1(e689ec6b76bfdf58a059409850c397d407740dda) ) // Need to verify - likely 02-24015-01
 
-	ROM_REGION( 0x80000, "sub", 0 )
+	ROM_REGION( 0x80000, "slave", 0 )
 	ROM_LOAD( "02-24000-02.u3",   0x00000, 0x02000, CRC(52df0354) SHA1(a39a2538b733e336eac5a1491c42c89fd4f4d1aa) )
 	ROM_LOAD( "02-24001-02.u2t",  0x10000, 0x10000, CRC(9b20697d) SHA1(ccb9851e5db4360731f19e5446a0ef9205110860) )
 	ROM_LOAD( "02-24002-02.u3t",  0x20000, 0x10000, CRC(bbb92184) SHA1(d9890d1c95fb19e9fff6465c977cabf71e4528b4) )
@@ -2384,11 +2384,11 @@ ROM_START( aafbb )
 ROM_END
 
 ROM_START( aafbc )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "02-24014-02.u58t",   0x00000, 0x10000, CRC(25cc4ccc) SHA1(0fe02e23942a10bb9a46524e75705f10fbb0a79a) ) // 02-24014-02 verified as rev C
 	ROM_LOAD( "02-24015-02.u59t",   0x10000, 0x10000, CRC(bfa1b56f) SHA1(b5dba27bfcd47cfeebdcf99e9d5f978d5d7f4fb3) ) // 02-24015-02 verified as rev C
 
-	ROM_REGION( 0x80000, "sub", 0 )
+	ROM_REGION( 0x80000, "slave", 0 )
 	ROM_LOAD( "02-24000-02.u3",   0x00000, 0x02000, CRC(52df0354) SHA1(a39a2538b733e336eac5a1491c42c89fd4f4d1aa) )
 	ROM_LOAD( "02-24001-02.u2t",  0x10000, 0x10000, CRC(9b20697d) SHA1(ccb9851e5db4360731f19e5446a0ef9205110860) )
 	ROM_LOAD( "02-24002-02.u3t",  0x20000, 0x10000, CRC(bbb92184) SHA1(d9890d1c95fb19e9fff6465c977cabf71e4528b4) )
@@ -2426,11 +2426,11 @@ ROM_START( aafbc )
 ROM_END
 
 ROM_START( aafbd2p )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "02-26014-01.u58t", 0x00000, 0x10000, CRC(79fd14cd) SHA1(1dd75bcecd51d414194ca19381bee0b9f70a8007) )
 	ROM_LOAD( "02-26015-01.u59t", 0x10000, 0x10000, CRC(3b0382f0) SHA1(1b01af999201f202e76da8e445ff986d096103cd) )
 
-	ROM_REGION( 0x80000, "sub", 0 )
+	ROM_REGION( 0x80000, "slave", 0 )
 	ROM_LOAD( "02-26000-01.u3",   0x00000, 0x02000, CRC(98c06c63) SHA1(91922f7e2d4f30018ee7302f3d9b7b6793b43dba) )
 	ROM_LOAD( "02-26001-01.u2t",  0x10000, 0x10000, CRC(f118b9b4) SHA1(95d0ae9055cf60e2d0b414ab64632fed1f48bf99) )
 	ROM_LOAD( "02-24002-02.u3t",  0x20000, 0x10000, CRC(bbb92184) SHA1(d9890d1c95fb19e9fff6465c977cabf71e4528b4) )
@@ -2476,13 +2476,13 @@ For Ironman Ivan Stewart's Super Off-Road, the label format is:
 ------------------------
 */
 ROM_START( offroad )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "master", 0 )
 	ROM_LOAD( "03-22121-04.u58t",   0x00000, 0x10000, CRC(c5790988) SHA1(a6bae6b024d86b49a23805037b77d15a3c7913ef) )
 	ROM_LOAD( "03-22122-03.u59t",   0x10000, 0x10000, CRC(ae862fdc) SHA1(ac31630cff5850409f87bfa5a7303eeedf8a895d) )
 	ROM_LOAD( "03-22120-01.u57t",   0x20000, 0x10000, CRC(e9f0f175) SHA1(db8c55015d1e8230f1fb27dfac6b8b364b0718a2) )
 	ROM_LOAD( "03-22119-02.u56t",   0x30000, 0x10000, CRC(38642f22) SHA1(9167bbc7ed8a8a0b913ead3b8b5a7749a29f15cb) )
 
-	ROM_REGION( 0x80000, "sub", 0 )
+	ROM_REGION( 0x80000, "slave", 0 )
 	ROM_LOAD( "03-22100-02.u3",   0x00000, 0x02000, CRC(08c96a4b) SHA1(7d93dd918a5733c190b2668811d161f5f6339cf0) )
 	ROM_LOAD( "03-22108-02.u4t",  0x30000, 0x10000, CRC(0d72780a) SHA1(634b87e7afff4ac2e8e3b98554364c5f3c4d9176) )
 	ROM_LOAD( "03-22109-02.u5t",  0x40000, 0x10000, CRC(5429ce2c) SHA1(73e543796629ac719928f4fe48442f1975db5092) )
@@ -2518,13 +2518,13 @@ ROM_START( offroad )
 ROM_END
 
 ROM_START( offroad3 )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "master", 0 )
 	ROM_LOAD( "03-22121-03.u58t",   0x00000, 0x10000, CRC(8e3d0da1) SHA1(777f0c35f46d0c341ea535b36077e198da82d3c2) )
 	ROM_LOAD( "03-22122-02.u59t",   0x10000, 0x10000, CRC(37b8a0bd) SHA1(676cee4d9feb217ca6fd9eb500478802a7ea0343) )
 	ROM_LOAD( "03-22120-01.u57t",   0x20000, 0x10000, CRC(e9f0f175) SHA1(db8c55015d1e8230f1fb27dfac6b8b364b0718a2) )
 	ROM_LOAD( "03-22119-01.u56t",   0x30000, 0x10000, CRC(e7d144a8) SHA1(04befee17aa7e941c68d5f42356f370879ce4e51) )
 
-	ROM_REGION( 0x80000, "sub", 0 )
+	ROM_REGION( 0x80000, "slave", 0 )
 	ROM_LOAD( "03-22100-01.u3",   0x00000, 0x02000, CRC(7c959be9) SHA1(3073ba8e282f82983e95807f63f82d714a26c6f2) )
 	ROM_LOAD( "03-22108-01.u4t",  0x30000, 0x10000, CRC(7219f9ed) SHA1(5b0e7e8b92d6e4d4bf1af5bf1d6e3be36e0e410e) )
 	ROM_LOAD( "03-22109-01.u5t",  0x40000, 0x10000, CRC(3d670117) SHA1(c5bf531605a49b991a5533c54698d60a2503bab2) )
@@ -2568,13 +2568,13 @@ For Ironman Ivan Stewart's Super Off-Road Track-Pak, the label format is:
 ------------------------
 */
 ROM_START( offroadt )
-	ROM_REGION( 0x040000, "maincpu", 0 )
+	ROM_REGION( 0x040000, "master", 0 )
 	ROM_LOAD( "03-25016-0x.u58t",  0x00000, 0x10000, CRC(adbc6211) SHA1(cb3181a0dd64754d9a65a7a557e4a183b8d539a2) ) // likely rev 4, like the offroadt2p & offroad sets
 	ROM_LOAD( "03-25017-0x.u59t",  0x10000, 0x10000, CRC(296dd3b6) SHA1(01ae1f2976e2fecc8237fc7b4cf4fb86dd170a70) ) // likely rev 3, like the offroadt2p & offroad sets
 	ROM_LOAD( "03-22120-01.u57t",  0x20000, 0x10000, CRC(e9f0f175) SHA1(db8c55015d1e8230f1fb27dfac6b8b364b0718a2) )
 	ROM_LOAD( "03-25015-01.u56t",  0x30000, 0x10000, CRC(2c1a22b3) SHA1(fb18af5ec873968beab47d163d9ef23532c40771) )
 
-	ROM_REGION( 0x90000, "sub", 0 )
+	ROM_REGION( 0x90000, "slave", 0 )
 	ROM_LOAD( "03-25000-01.u3",   0x00000, 0x02000, CRC(95abb9f1) SHA1(98e9e8f388047d6992a664ae87c50ca65a5db0b1) )
 	ROM_LOAD( "03-25001-01.u2t",  0x10000, 0x10000, CRC(c46c1627) SHA1(1e911bc774cbc0a66b2feb68b600aa5ad272daa6) )
 	ROM_LOAD( "03-25002-01.u3t",  0x20000, 0x10000, CRC(2276546f) SHA1(d19335504a71ccf74864c8e9896347709bf794e4) )
@@ -2628,13 +2628,13 @@ Two player ROM label format:
 Known to exist, a version with 03-27000-03 @ U58T & 03-27001-02 @ U59T
 */
 ROM_START( offroadt2p )
-	ROM_REGION( 0x040000, "maincpu", 0 )
+	ROM_REGION( 0x040000, "master", 0 )
 	ROM_LOAD( "03-27000-04.u58t",  0x00000, 0x10000, CRC(8a785b66) SHA1(a9e369d446eec658294c81223399acc99e4198c2) )
 	ROM_LOAD( "03-27001-03.u59t",  0x10000, 0x10000, CRC(ff553895) SHA1(8d91b46306fa680ea96ebbb76418d7a82ed19568) )
 	ROM_LOAD( "03-22120-01.u57t",  0x20000, 0x10000, CRC(e9f0f175) SHA1(db8c55015d1e8230f1fb27dfac6b8b364b0718a2) )
 	ROM_LOAD( "03-25015-01.u56t",  0x30000, 0x10000, CRC(2c1a22b3) SHA1(fb18af5ec873968beab47d163d9ef23532c40771) )
 
-	ROM_REGION( 0x90000, "sub", 0 )
+	ROM_REGION( 0x90000, "slave", 0 )
 	ROM_LOAD( "03-25000-01.u3",   0x00000, 0x02000, CRC(95abb9f1) SHA1(98e9e8f388047d6992a664ae87c50ca65a5db0b1) )
 	ROM_LOAD( "03-25001-01.u2t",  0x10000, 0x10000, CRC(c46c1627) SHA1(1e911bc774cbc0a66b2feb68b600aa5ad272daa6) )
 	ROM_LOAD( "03-25002-01.u3t",  0x20000, 0x10000, CRC(2276546f) SHA1(d19335504a71ccf74864c8e9896347709bf794e4) )
@@ -2681,12 +2681,12 @@ Pig Out: Dine Like a Swine!, the label format is:
 ------------------------
 */
 ROM_START( pigout ) // To enter service mode, press Service (F2) + either P1 or P2 Start
-	ROM_REGION( 0x040000, "maincpu", 0 )
+	ROM_REGION( 0x040000, "master", 0 )
 	ROM_LOAD( "03-29020-0x.u58t", 0x00000, 0x10000, CRC(8fe4b683) SHA1(6f98a4e54a558a642b7193af85823b29ade46919) ) // likely rev 02
 	ROM_LOAD( "03-29021-0x.u59t", 0x10000, 0x10000, CRC(ab907762) SHA1(971c34ae42c17aa27880665966dc15a98387bebb) ) // likely rev 02
 	ROM_LOAD( "03-29019-01.u57t", 0x20000, 0x10000, CRC(c22be0ff) SHA1(52b76918358046f40ea4b74e53a38d8984125dbb) )
 
-	ROM_REGION( 0x080000, "sub", 0 )
+	ROM_REGION( 0x080000, "slave", 0 )
 	ROM_LOAD( "03-29000-01.u3",   0x00000, 0x02000, CRC(af213cb7) SHA1(cf31ee09ee3685274f5ce1df954e7e87199e2e80) )
 	ROM_LOAD( "03-29001-01.u2t",  0x10000, 0x10000, CRC(b23164c6) SHA1(11edbea7bf54a68cb85df36345f39654d726a7f2) )
 	ROM_LOAD( "03-29002-01.u3t",  0x20000, 0x10000, CRC(d93f105f) SHA1(9fe469d674e84209eb55704fd2ad317d11e4caac) )
@@ -2746,12 +2746,12 @@ ROM_START( pigout ) // To enter service mode, press Service (F2) + either P1 or 
 ROM_END
 
 ROM_START( pigouta ) // To enter service mode, press & hold Service (F2) then press P2 Start
-	ROM_REGION( 0x040000, "maincpu", 0 )
+	ROM_REGION( 0x040000, "master", 0 )
 	ROM_LOAD( "03-29020-01.u58t", 0x00000, 0x10000, CRC(6c815982) SHA1(0720b22afd16e9bdc5d4a9e9a0071674ea46d038) )
 	ROM_LOAD( "03-29021-01.u59t", 0x10000, 0x10000, CRC(9de7a763) SHA1(9a612730a9d80d84114c1afc4a1887277d1ad5bc) )
 	ROM_LOAD( "03-29019-01.u57t", 0x20000, 0x10000, CRC(c22be0ff) SHA1(52b76918358046f40ea4b74e53a38d8984125dbb) )
 
-	ROM_REGION( 0x80000, "sub", 0 )
+	ROM_REGION( 0x80000, "slave", 0 )
 	ROM_LOAD( "03-29000-01.u3",   0x00000, 0x02000, CRC(af213cb7) SHA1(cf31ee09ee3685274f5ce1df954e7e87199e2e80) )
 	ROM_LOAD( "03-29001-01.u2t",  0x10000, 0x10000, CRC(b23164c6) SHA1(11edbea7bf54a68cb85df36345f39654d726a7f2) )
 	ROM_LOAD( "03-29002-01.u3t",  0x20000, 0x10000, CRC(d93f105f) SHA1(9fe469d674e84209eb55704fd2ad317d11e4caac) )
@@ -2820,11 +2820,11 @@ For Ataxx, the label format is:
 ------------------------
 */
 ROM_START( ataxx )
-	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_REGION( 0x30000, "master", 0 )
 	ROM_LOAD( "e-302-31005-05.u38",   0x00000, 0x20000, CRC(3378937d) SHA1(3c62da7e11b2860c7fe3a35c077cadcf4d0272ca) )
 	ROM_RELOAD(                       0x10000, 0x20000 )
 
-	ROM_REGION( 0x60000, "sub", 0 )
+	ROM_REGION( 0x60000, "slave", 0 )
 	ROM_LOAD( "e-302-31012-01.u111",  0x00000, 0x20000, CRC(9a3297cc) SHA1(1dfa0bacd2f2b18d44bfc2d55c40291c1b142f8f) )
 	ROM_LOAD( "e-302-31013-01.u112",  0x20000, 0x20000, CRC(7e7c3e2f) SHA1(a7e31e1f1b09414c40ab9ace5e9bffbdbaee8704) )
 	ROM_LOAD( "e-302-31014-01.u113",  0x40000, 0x20000, CRC(8cf3e101) SHA1(672a3a0ca0f5334cf614bc49cbc1ae5ccea54cbe) )
@@ -2845,7 +2845,7 @@ ROM_START( ataxx )
 	ROM_LOAD( "e-302-31010-01.u102",  0x80000, 0x20000, CRC(a951228c) SHA1(7ec5cf4d0aa3702be9236d155bea373a06c0be03) )
 	ROM_LOAD( "e-302-31011-01.u103",  0xa0000, 0x20000, CRC(ed326164) SHA1(8706192f525ece200587cee7e7beb4a1975bf63e) )
 
-	ROM_REGION16_LE( 0x40000, "xrom", ROMREGION_ERASEFF ) // X-ROM (data used by main processor)
+	ROM_REGION16_LE( 0x40000, "xrom", ROMREGION_ERASEFF ) // X-ROM (data used by master z80)
 	// Empty / not used
 
 	ROM_REGION16_BE( 0x100, "eeprom", 0 )
@@ -2853,11 +2853,11 @@ ROM_START( ataxx )
 ROM_END
 
 ROM_START( ataxxa )
-	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_REGION( 0x30000, "master", 0 )
 	ROM_LOAD( "e-302-31005-04.u38",   0x00000, 0x20000, CRC(e1cf6236) SHA1(fabf423a006b1db22273c6fffa03edc148d7d957) )
 	ROM_RELOAD(                       0x10000, 0x20000 )
 
-	ROM_REGION( 0x60000, "sub", 0 )
+	ROM_REGION( 0x60000, "slave", 0 )
 	ROM_LOAD( "e-302-31012-01.u111",  0x00000, 0x20000, CRC(9a3297cc) SHA1(1dfa0bacd2f2b18d44bfc2d55c40291c1b142f8f) )
 	ROM_LOAD( "e-302-31013-01.u112",  0x20000, 0x20000, CRC(7e7c3e2f) SHA1(a7e31e1f1b09414c40ab9ace5e9bffbdbaee8704) )
 	ROM_LOAD( "e-302-31014-01.u113",  0x40000, 0x20000, CRC(8cf3e101) SHA1(672a3a0ca0f5334cf614bc49cbc1ae5ccea54cbe) )
@@ -2878,7 +2878,7 @@ ROM_START( ataxxa )
 	ROM_LOAD( "e-302-31010-01.u102",  0x80000, 0x20000, CRC(a951228c) SHA1(7ec5cf4d0aa3702be9236d155bea373a06c0be03) )
 	ROM_LOAD( "e-302-31011-01.u103",  0xa0000, 0x20000, CRC(ed326164) SHA1(8706192f525ece200587cee7e7beb4a1975bf63e) )
 
-	ROM_REGION16_LE( 0x40000, "xrom", ROMREGION_ERASEFF ) // X-ROM (data used by main processor)
+	ROM_REGION16_LE( 0x40000, "xrom", ROMREGION_ERASEFF ) // X-ROM (data used by master z80)
 	// Empty / not used
 
 	ROM_REGION16_BE( 0x100, "eeprom", 0 )
@@ -2886,11 +2886,11 @@ ROM_START( ataxxa )
 ROM_END
 
 ROM_START( ataxxe )
-	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_REGION( 0x30000, "master", 0 )
 	ROM_LOAD( "euro_ataxx_u38_3079.u38", 0x00000, 0x20000, CRC(16aef3b7) SHA1(b2de1e3fd032ab8cc5ed995522f528f0b3283d8a) )
 	ROM_RELOAD(                          0x10000, 0x20000 )
 
-	ROM_REGION( 0x60000, "sub", 0 )
+	ROM_REGION( 0x60000, "slave", 0 )
 	ROM_LOAD( "e-302-31012-01.u111",  0x00000, 0x20000, CRC(9a3297cc) SHA1(1dfa0bacd2f2b18d44bfc2d55c40291c1b142f8f) )
 	ROM_LOAD( "e-302-31013-01.u112",  0x20000, 0x20000, CRC(7e7c3e2f) SHA1(a7e31e1f1b09414c40ab9ace5e9bffbdbaee8704) )
 	ROM_LOAD( "e-302-31014-01.u113",  0x40000, 0x20000, CRC(8cf3e101) SHA1(672a3a0ca0f5334cf614bc49cbc1ae5ccea54cbe) )
@@ -2911,7 +2911,7 @@ ROM_START( ataxxe )
 	ROM_LOAD( "e-302-31010-01.u102",  0x80000, 0x20000, CRC(a951228c) SHA1(7ec5cf4d0aa3702be9236d155bea373a06c0be03) )
 	ROM_LOAD( "e-302-31011-01.u103",  0xa0000, 0x20000, CRC(ed326164) SHA1(8706192f525ece200587cee7e7beb4a1975bf63e) )
 
-	ROM_REGION16_LE( 0x40000, "xrom", ROMREGION_ERASEFF ) // X-ROM (data used by main processor)
+	ROM_REGION16_LE( 0x40000, "xrom", ROMREGION_ERASEFF ) // X-ROM (data used by master z80)
 	// Empty / not used
 
 	ROM_REGION16_BE( 0x100, "eeprom", 0 )
@@ -2919,11 +2919,11 @@ ROM_START( ataxxe )
 ROM_END
 
 ROM_START( ataxxj )
-	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_REGION( 0x30000, "master", 0 )
 	ROM_LOAD( "ataxxj.u38", 0x00000, 0x20000, CRC(513fa7d4) SHA1(1aada72214c0165d76667935855bf996a5b3d55b) )
 	ROM_RELOAD(             0x10000, 0x20000 )
 
-	ROM_REGION( 0x60000, "sub", 0 )
+	ROM_REGION( 0x60000, "slave", 0 )
 	ROM_LOAD( "e-302-31012-01.u111",  0x00000, 0x20000, CRC(9a3297cc) SHA1(1dfa0bacd2f2b18d44bfc2d55c40291c1b142f8f) )
 	ROM_LOAD( "e-302-31013-01.u112",  0x20000, 0x20000, CRC(7e7c3e2f) SHA1(a7e31e1f1b09414c40ab9ace5e9bffbdbaee8704) )
 	ROM_LOAD( "e-302-31014-01.u113",  0x40000, 0x20000, CRC(8cf3e101) SHA1(672a3a0ca0f5334cf614bc49cbc1ae5ccea54cbe) )
@@ -2944,7 +2944,7 @@ ROM_START( ataxxj )
 	ROM_LOAD( "e-302-31010-01.u102",  0x80000, 0x20000, CRC(a951228c) SHA1(7ec5cf4d0aa3702be9236d155bea373a06c0be03) )
 	ROM_LOAD( "e-302-31011-01.u103",  0xa0000, 0x20000, CRC(ed326164) SHA1(8706192f525ece200587cee7e7beb4a1975bf63e) )
 
-	ROM_REGION16_LE( 0x40000, "xrom", ROMREGION_ERASEFF ) // X-ROM (data used by main processor)
+	ROM_REGION16_LE( 0x40000, "xrom", ROMREGION_ERASEFF ) // X-ROM (data used by master z80)
 	// Empty / not used
 
 	ROM_REGION16_BE( 0x100, "eeprom", 0 )
@@ -2961,12 +2961,12 @@ For World Soccer Finals, the label format is:
 ------------------------
 */
 ROM_START( wsf )
-	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_REGION( 0x50000, "master", 0 )
 	ROM_LOAD( "e-302-30022-04.u64",  0x00000, 0x20000, CRC(533cc90f) SHA1(44cec1093819dc1eb5c4ed48ac8a666d9601a870) )
 	ROM_RELOAD(                      0x10000, 0x20000 )
 	ROM_LOAD( "e-302-30023-04.u65",  0x30000, 0x20000, CRC(763c6c1b) SHA1(4f0ef31b7ec4b060dac28ebb1dc663f9328c9f97) )
 
-	ROM_REGION( 0x100000, "sub", 0 )
+	ROM_REGION( 0x100000, "slave", 0 )
 	ROM_LOAD( "e-302-30001-01.u151",  0x00000, 0x20000, CRC(31c63af5) SHA1(268093ade200241339b6f60a00123bbf73325e38) )
 	ROM_LOAD( "e-302-30002-01.u152",  0x20000, 0x20000, CRC(a53e88a6) SHA1(0b7748b70d6dd9fcc1a22646e8af20f3baa4aa40) )
 	ROM_LOAD( "e-302-30003-01.u153",  0x40000, 0x20000, CRC(12afad1d) SHA1(848549db714b46497176e42d6f2088ba3d6ab2f4) )
@@ -2992,7 +2992,7 @@ ROM_START( wsf )
 	ROM_LOAD( "e-302-30015-02.u149",  0x40000, 0x10000, CRC(b30c4ff3) SHA1(8bd709bd277584fc32983424873097300eb791c6) )
 	ROM_LOAD( "e-302-30016-02.u150",  0x50000, 0x10000, CRC(3bc8efac) SHA1(78451b935fba519603db0de2e2d06e83b3d4353a) )
 
-	ROM_REGION16_LE( 0x40000, "xrom", ROMREGION_ERASEFF ) // X-ROM (data used by main processor)
+	ROM_REGION16_LE( 0x40000, "xrom", ROMREGION_ERASEFF ) // X-ROM (data used by master z80)
 	ROM_LOAD16_BYTE( "e-302-30009-01.u68",  0x00000, 0x10000, CRC(f2fbfc15) SHA1(712cfa7b11135b1f568f38cc478ef5a3330d0608) )
 	ROM_LOAD16_BYTE( "e-302-30010-01.u69",  0x00001, 0x10000, CRC(b4ed2d3b) SHA1(61c9d86b63cf000187a105c6eed967fecb2f3c1c) )
 
@@ -3004,12 +3004,12 @@ ROM_START( wsf )
 ROM_END
 
 ROM_START( wsf3 )
-	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_REGION( 0x50000, "master", 0 )
 	ROM_LOAD( "e-302-30022-03.u64",  0x00000, 0x20000, CRC(2e7faa96) SHA1(d43915a433133eca650fabece61a4a65642b39f6) )
 	ROM_RELOAD(                      0x10000, 0x20000 )
 	ROM_LOAD( "e-302-30023-03.u65",  0x30000, 0x20000, CRC(7146328f) SHA1(390b98a2cd54a981eb4fafba700ff2fa1e379a32) )
 
-	ROM_REGION( 0x100000, "sub", 0 )
+	ROM_REGION( 0x100000, "slave", 0 )
 	ROM_LOAD( "e-302-30001-01.u151",  0x00000, 0x20000, CRC(31c63af5) SHA1(268093ade200241339b6f60a00123bbf73325e38) )
 	ROM_LOAD( "e-302-30002-01.u152",  0x20000, 0x20000, CRC(a53e88a6) SHA1(0b7748b70d6dd9fcc1a22646e8af20f3baa4aa40) )
 	ROM_LOAD( "e-302-30003-01.u153",  0x40000, 0x20000, CRC(12afad1d) SHA1(848549db714b46497176e42d6f2088ba3d6ab2f4) )
@@ -3035,7 +3035,7 @@ ROM_START( wsf3 )
 	ROM_LOAD( "e-302-30015-01.u149",  0x40000, 0x10000, CRC(5d9064f2) SHA1(7a68a379aa6a6cd0518e8a4107b2e646f5700c2b) )
 	ROM_LOAD( "e-302-30016-01.u150",  0x50000, 0x10000, CRC(d76389cd) SHA1(2b7e6cd662ffde177b110ad0ed2e42fe4ccf811f) )
 
-	ROM_REGION16_LE( 0x40000, "xrom", ROMREGION_ERASEFF ) // X-ROM (data used by main processor)
+	ROM_REGION16_LE( 0x40000, "xrom", ROMREGION_ERASEFF ) // X-ROM (data used by master z80)
 	ROM_LOAD16_BYTE( "e-302-30009-01.u68",  0x00000, 0x10000, CRC(f2fbfc15) SHA1(712cfa7b11135b1f568f38cc478ef5a3330d0608) )
 	ROM_LOAD16_BYTE( "e-302-30010-01.u69",  0x00001, 0x10000, CRC(b4ed2d3b) SHA1(61c9d86b63cf000187a105c6eed967fecb2f3c1c) )
 
@@ -3056,14 +3056,14 @@ For Danny Sullivan's Indy Heat, the label format is:
 ------------------------
 */
 ROM_START( indyheat )
-	ROM_REGION( 0x90000, "maincpu", 0 )
+	ROM_REGION( 0x90000, "master", 0 )
 	ROM_LOAD( "e-302-33019-01.u64",   0x00000, 0x20000, CRC(2b97a347) SHA1(958a774e9ea3678c0fdd2466e578df8267b4413e) )
 	ROM_RELOAD(                       0x10000, 0x20000 )
 	ROM_LOAD( "e-302-33020-01.u65",   0x30000, 0x20000, CRC(71301d74) SHA1(bbabc71aa8d56f6984de573f0fb5d3fea35421a9) )
 	ROM_LOAD( "e-302-33017-01.u66",   0x50000, 0x20000, CRC(c9612072) SHA1(d00bf703ce4ad0a344b3d8afcd1f45c3c82b54fe) )
 	ROM_LOAD( "e-302-33018-01.u67",   0x70000, 0x20000, CRC(4c4b25e0) SHA1(f07d347cc844df2d824853af8dbfc557933e7765) )
 
-	ROM_REGION( 0x160000, "sub", 0 )
+	ROM_REGION( 0x160000, "slave", 0 )
 	ROM_LOAD( "e-302-33007-01.u151",  0x00000, 0x20000, CRC(2622dfa4) SHA1(759e46540ad9f2ed540314b174c88f7365214051) )
 	ROM_LOAD( "e-302-33008-01.u152",  0x20000, 0x20000, CRC(ad40e4e2) SHA1(58c3df82551199fb3f28c6459aedc2117caf520e) )
 	ROM_CONTINUE(                     0x120000, 0x20000 )
@@ -3091,7 +3091,7 @@ ROM_START( indyheat )
 	ROM_LOAD( "e-302-33005-01.u149",  0x80000, 0x20000, CRC(29056791) SHA1(343452b883f139eb09da6b5f384aa680d3a2218c) )
 	ROM_LOAD( "e-302-33006-01.u150",  0xa0000, 0x20000, CRC(cb73dd6a) SHA1(60aabedbab409acaf8ba4f2366125290825971a4) )
 
-	ROM_REGION16_LE( 0x40000, "xrom", 0 ) // X-ROM (data used by main processor)
+	ROM_REGION16_LE( 0x40000, "xrom", 0 ) // X-ROM (data used by master z80)
 	ROM_LOAD16_BYTE( "e-302-33015-01.u68",   0x00000, 0x20000, CRC(9e88efb3) SHA1(983bc22c9401b9d6c959dd211b6b7dfa1a6c14e2) )
 	ROM_LOAD16_BYTE( "e-302-33016-01.u69",   0x00001, 0x20000, CRC(aa39fcb3) SHA1(0cb328d784cda3e0dff3a018f52f9b06bc5d46b8) )
 
@@ -3105,14 +3105,14 @@ ROM_END
 
 
 ROM_START( brutforc )
-	ROM_REGION( 0x90000, "maincpu", 0 )
+	ROM_REGION( 0x90000, "master", 0 )
 	ROM_LOAD( "u64",   0x00000, 0x20000, CRC(008ae3b8) SHA1(bc9fdba761501efeaf665ac33ff1ad6935d70638) )
 	ROM_RELOAD(                 0x10000, 0x20000 )
 	ROM_LOAD( "u65",   0x30000, 0x20000, CRC(6036e3fa) SHA1(eba79e92f3de7afdd6e404cabb4b8cfad09cf50b) )
 	ROM_LOAD( "u66",   0x50000, 0x20000, CRC(7ebf0795) SHA1(6b25ccac88ff61be3c461eb49908fbecf509434f) )
 	ROM_LOAD( "u67",   0x70000, 0x20000, CRC(e3cbf8b4) SHA1(ceaefc454385ee1dfbfe2d211a72af0883967bc0) )
 
-	ROM_REGION( 0x100000, "sub", 0 )
+	ROM_REGION( 0x100000, "slave", 0 )
 	ROM_LOAD( "u151",  0x00000, 0x20000, CRC(bd3b677b) SHA1(8ac32b9598a97d9910ac31948f166e9474df07fa) )
 	ROM_LOAD( "u152",  0x20000, 0x20000, CRC(5f4434e7) SHA1(2b8eb2f6ede328c88b7977e3bea73d00dcaa8f6f) )
 	ROM_LOAD( "u153",  0x40000, 0x20000, CRC(20f7df53) SHA1(6ea4600a9cffbc414f546fcd8c036faaa6d7fffd) )
@@ -3138,7 +3138,7 @@ ROM_START( brutforc )
 	ROM_LOAD( "u149",  0x100000, 0x40000, CRC(cf48401c) SHA1(70ba8f2d5f81795c26c2a552c29c913c5d3bd784) )
 	ROM_LOAD( "u150",  0x140000, 0x40000, CRC(ca9e1e33) SHA1(f9889042b536e1fb5521702bc807d5aa0e6a25d1) )
 
-	ROM_REGION16_LE( 0x40000, "xrom", 0 ) // X-ROM (data used by main processor)
+	ROM_REGION16_LE( 0x40000, "xrom", 0 ) // X-ROM (data used by master z80)
 	ROM_LOAD16_BYTE( "u68",   0x00000, 0x20000, CRC(77c8de62) SHA1(ae15f84b7bf3d6705edf9f41d8de7b6ecab2bcf9) )
 	ROM_LOAD16_BYTE( "u69",   0x00001, 0x20000, CRC(113aa6d5) SHA1(d032a04338e12135ba410afd71cf9538e99eb109) )
 
@@ -3154,14 +3154,14 @@ ROM_END
 
 
 ROM_START( asylum )
-	ROM_REGION( 0x90000, "maincpu", 0 )
+	ROM_REGION( 0x90000, "master", 0 )
 	ROM_LOAD( "asy-m0.64",   0x00000, 0x20000, CRC(f5ca36fd) SHA1(8c36ce3ca1c30ffb0a32ff7e9df61901c1ee6151) )
 	ROM_RELOAD(              0x10000, 0x20000 )
 	ROM_LOAD( "asy-m1.65",   0x30000, 0x20000, CRC(14d91d09) SHA1(ad227e6f5047f43c421773385f441c634af110e6) )
 	ROM_LOAD( "asy-m2.66",   0x50000, 0x20000, CRC(a34a6ef9) SHA1(c90307024039a7809b7fafb019c9ad4636708a88) )
 	ROM_LOAD( "asy-m3.67",   0x70000, 0x20000, CRC(9db4c2b1) SHA1(cfe78e2fe803c816ed2f79250bbbaf293cb5bf2a) )
 
-	ROM_REGION( 0x1e0000, "sub", 0 )
+	ROM_REGION( 0x1e0000, "slave", 0 )
 	ROM_LOAD( "asy-sp0.151",  0x00000, 0x20000, CRC(5ad5e3b0) SHA1(0162b56f63c169825677323dfbbd3ea991a9d9bb) )
 	ROM_LOAD( "asy-sp2.152",  0x20000, 0x20000, CRC(6d2997ec) SHA1(bf97dba0a4a700af0eb753daf598ec8e903dbc7c) )
 	ROM_CONTINUE(            0x120000, 0x20000 )
@@ -3193,7 +3193,7 @@ ROM_START( asylum )
 	ROM_LOAD( "asy-chr4.149",  0x100000, 0x40000, CRC(dbc2b155) SHA1(ba0d90b5a6acc53ecd02317cb82b630451e9d0e9) )
 	ROM_LOAD( "asy-chr5.150",  0x140000, 0x40000, CRC(9675e44f) SHA1(d2633d21fa9e798b8f96d96fdce5bb99a7dc5ba5) )
 
-	ROM_REGION16_LE( 0x40000, "xrom", 0 ) // X-ROM (data used by main processor)
+	ROM_REGION16_LE( 0x40000, "xrom", 0 ) // X-ROM (data used by master z80)
 	ROM_LOAD16_BYTE( "asy-m4.68",   0x00000, 0x20000, CRC(77c8de62) SHA1(ae15f84b7bf3d6705edf9f41d8de7b6ecab2bcf9) )
 	ROM_LOAD16_BYTE( "asy-m5.69",   0x00001, 0x20000, CRC(bfc50d6c) SHA1(3239242358e8336354a9bd35f75f9057f079b298) )
 
@@ -3215,101 +3215,101 @@ ROM_END
  *
  *************************************/
 
-void leland_state::init_main_ports(u8 mvram_base, u8 io_base)
+void leland_state::init_master_ports(u8 mvram_base, u8 io_base)
 {
-	/* set up the main CPU VRAM I/O */
-	m_maincpu->space(AS_IO).install_readwrite_handler(mvram_base, mvram_base + 0x1f, read8sm_delegate(*this, FUNC(leland_state::leland_mvram_port_r)), write8sm_delegate(*this, FUNC(leland_state::leland_mvram_port_w)));
+	/* set up the master CPU VRAM I/O */
+	m_master->space(AS_IO).install_readwrite_handler(mvram_base, mvram_base + 0x1f, read8sm_delegate(*this, FUNC(leland_state::leland_mvram_port_r)), write8sm_delegate(*this, FUNC(leland_state::leland_mvram_port_w)));
 
-	/* set up the main CPU I/O ports */
-	m_maincpu->space(AS_IO).install_read_handler(io_base, io_base + 0x1f, read8sm_delegate(*this, FUNC(leland_state::leland_main_input_r)));
-	m_maincpu->space(AS_IO).install_write_handler(io_base, io_base + 0x0f, write8sm_delegate(*this, FUNC(leland_state::leland_main_output_w)));
+	/* set up the master CPU I/O ports */
+	m_master->space(AS_IO).install_read_handler(io_base, io_base + 0x1f, read8sm_delegate(*this, FUNC(leland_state::leland_master_input_r)));
+	m_master->space(AS_IO).install_write_handler(io_base, io_base + 0x0f, write8sm_delegate(*this, FUNC(leland_state::leland_master_output_w)));
 }
 
 
 void leland_state::init_cerberus()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::cerberus_bankswitch;
-	m_main_bankslot->set_base(memregion("maincpu")->base() + 0x2000);
-	m_sub_bankslot->set_base(memregion("sub")->base() + 0x2000);
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::cerberus_bankswitch;
+	m_master_bankslot->set_base(memregion("master")->base() + 0x2000);
+	m_slave_bankslot->set_base(memregion("slave")->base() + 0x2000);
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x40, 0x80);
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x40, 0x80);
 
 	/* set up additional input ports */
-	m_maincpu->space(AS_IO).install_read_handler(0x80, 0x80, read8smo_delegate(*this, FUNC(leland_state::cerberus_dial_1_r)));
-	m_maincpu->space(AS_IO).install_read_handler(0x90, 0x90, read8smo_delegate(*this, FUNC(leland_state::cerberus_dial_2_r)));
+	m_master->space(AS_IO).install_read_handler(0x80, 0x80, read8smo_delegate(*this, FUNC(leland_state::cerberus_dial_1_r)));
+	m_master->space(AS_IO).install_read_handler(0x90, 0x90, read8smo_delegate(*this, FUNC(leland_state::cerberus_dial_2_r)));
 }
 
 
 void leland_state::init_mayhem()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::mayhem_bankswitch;
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::mayhem_bankswitch;
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x00, 0xc0);
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x00, 0xc0);
 }
 
 
 void leland_state::init_powrplay()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::mayhem_bankswitch;
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::mayhem_bankswitch;
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x40, 0x80);
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x40, 0x80);
 }
 
 
 void leland_state::init_wseries()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::mayhem_bankswitch;
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::mayhem_bankswitch;
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x40, 0x80);
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x40, 0x80);
 }
 
 
 void leland_state::init_alleymas()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::mayhem_bankswitch;
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::mayhem_bankswitch;
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x00, 0xc0);
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x00, 0xc0);
 
 	/* kludge warning: the game uses location E0CA to determine if the joysticks are available */
 	/* it gets cleared by the code, but there is no obvious way for the value to be set to a */
 	/* non-zero value. If the value is zero, the joystick is never read. */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0ca, 0xe0ca, write8smo_delegate(*this, FUNC(leland_state::alleymas_joystick_kludge_w)));
+	m_master->space(AS_PROGRAM).install_write_handler(0xe0ca, 0xe0ca, write8smo_delegate(*this, FUNC(leland_state::alleymas_joystick_kludge_w)));
 	m_alleymas_kludge_mem = m_mainram + (0xe0ca - 0xe000);
 }
 
 
 void leland_state::init_upyoural()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::mayhem_bankswitch;
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::mayhem_bankswitch;
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x00, 0xc0);
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x00, 0xc0);
 }
 
 
 void leland_state::init_dangerz()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::dangerz_bankswitch;
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::dangerz_bankswitch;
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x40, 0x80);
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x40, 0x80);
 
 	/* set up additional input ports */
-	m_maincpu->space(AS_IO).install_read_handler(0xf4, 0xf4, read8smo_delegate(*this, FUNC(leland_state::dangerz_input_upper_r)));
-	m_maincpu->space(AS_IO).install_read_handler(0xf8, 0xf8, read8smo_delegate(*this, FUNC(leland_state::dangerz_input_y_r)));
-	m_maincpu->space(AS_IO).install_read_handler(0xfc, 0xfc, read8smo_delegate(*this, FUNC(leland_state::dangerz_input_x_r)));
+	m_master->space(AS_IO).install_read_handler(0xf4, 0xf4, read8smo_delegate(*this, FUNC(leland_state::dangerz_input_upper_r)));
+	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8smo_delegate(*this, FUNC(leland_state::dangerz_input_y_r)));
+	m_master->space(AS_IO).install_read_handler(0xfc, 0xfc, read8smo_delegate(*this, FUNC(leland_state::dangerz_input_x_r)));
 
 	save_item(NAME(m_dangerz_x));
 	save_item(NAME(m_dangerz_y));
@@ -3318,80 +3318,80 @@ void leland_state::init_dangerz()
 
 void leland_state::init_basebal2()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::basebal2_bankswitch;
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::basebal2_bankswitch;
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x00, 0xc0);
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x00, 0xc0);
 }
 
 
 void leland_state::init_dblplay()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::basebal2_bankswitch;
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::basebal2_bankswitch;
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x80, 0x40);
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x80, 0x40);
 }
 
 
 void leland_state::init_strkzone()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::basebal2_bankswitch;
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::basebal2_bankswitch;
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x00, 0x40);
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x00, 0x40);
 }
 
 
 void redline_state::init_redlin2p()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::redline_bankswitch;
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::redline_bankswitch;
 
-	rotate_memory("maincpu");
+	rotate_memory("master");
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x00, 0xc0);
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x00, 0xc0);
 
 	/* set up additional input ports */
-	m_maincpu->space(AS_IO).install_read_handler(0xc0, 0xc0, read8smo_delegate(*this, FUNC(redline_state::redline_pedal_1_r)));
-	m_maincpu->space(AS_IO).install_read_handler(0xd0, 0xd0, read8smo_delegate(*this, FUNC(redline_state::redline_pedal_2_r)));
-	m_maincpu->space(AS_IO).install_read_handler(0xf8, 0xf8, read8smo_delegate(*this, FUNC(redline_state::redline_wheel_2_r)));
-	m_maincpu->space(AS_IO).install_read_handler(0xfb, 0xfb, read8smo_delegate(*this, FUNC(redline_state::redline_wheel_1_r)));
+	m_master->space(AS_IO).install_read_handler(0xc0, 0xc0, read8smo_delegate(*this, FUNC(redline_state::redline_pedal_1_r)));
+	m_master->space(AS_IO).install_read_handler(0xd0, 0xd0, read8smo_delegate(*this, FUNC(redline_state::redline_pedal_2_r)));
+	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8smo_delegate(*this, FUNC(redline_state::redline_wheel_2_r)));
+	m_master->space(AS_IO).install_read_handler(0xfb, 0xfb, read8smo_delegate(*this, FUNC(redline_state::redline_wheel_1_r)));
 }
 
 
 void redline_state::init_quarterb()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::viper_bankswitch;
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::viper_bankswitch;
 
-	rotate_memory("maincpu");
+	rotate_memory("master");
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x40, 0x80);
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x40, 0x80);
 }
 
 
 void redline_state::init_viper()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::viper_bankswitch;
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::viper_bankswitch;
 
-	rotate_memory("maincpu");
-	rotate_memory("sub");
-	rotate_memory("sub");
+	rotate_memory("master");
+	rotate_memory("slave");
+	rotate_memory("slave");
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x00, 0xc0);
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x00, 0xc0);
 
 	/* set up additional input ports */
-	m_maincpu->space(AS_IO).install_read_handler(0xa4, 0xa4, read8smo_delegate(*this, FUNC(redline_state::dangerz_input_upper_r)));
-	m_maincpu->space(AS_IO).install_read_handler(0xb8, 0xb8, read8smo_delegate(*this, FUNC(redline_state::dangerz_input_y_r)));
-	m_maincpu->space(AS_IO).install_read_handler(0xbc, 0xbc, read8smo_delegate(*this, FUNC(redline_state::dangerz_input_x_r)));
+	m_master->space(AS_IO).install_read_handler(0xa4, 0xa4, read8smo_delegate(*this, FUNC(redline_state::dangerz_input_upper_r)));
+	m_master->space(AS_IO).install_read_handler(0xb8, 0xb8, read8smo_delegate(*this, FUNC(redline_state::dangerz_input_y_r)));
+	m_master->space(AS_IO).install_read_handler(0xbc, 0xbc, read8smo_delegate(*this, FUNC(redline_state::dangerz_input_x_r)));
 
 	save_item(NAME(m_dangerz_x));
 	save_item(NAME(m_dangerz_y));
@@ -3400,192 +3400,192 @@ void redline_state::init_viper()
 
 void redline_state::init_teamqb()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::viper_bankswitch;
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::viper_bankswitch;
 
-	rotate_memory("maincpu");
-	rotate_memory("sub");
-	rotate_memory("sub");
+	rotate_memory("master");
+	rotate_memory("slave");
+	rotate_memory("slave");
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x40, 0x80);
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x40, 0x80);
 
 	/* set up additional input ports */
-	m_maincpu->space(AS_IO).install_read_port(0x7c, 0x7c, "IN4");
-	m_maincpu->space(AS_IO).install_read_port(0x7f, 0x7f, "IN5");
+	m_master->space(AS_IO).install_read_port(0x7c, 0x7c, "IN4");
+	m_master->space(AS_IO).install_read_port(0x7f, 0x7f, "IN5");
 }
 
 
 void redline_state::init_aafb()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::viper_bankswitch;
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::viper_bankswitch;
 
-	rotate_memory("maincpu");
-	rotate_memory("sub");
-	rotate_memory("sub");
+	rotate_memory("master");
+	rotate_memory("slave");
+	rotate_memory("slave");
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x00, 0xc0);
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x00, 0xc0);
 
 	/* set up additional input ports */
-	m_maincpu->space(AS_IO).install_read_port(0x7c, 0x7c, "IN4");
-	m_maincpu->space(AS_IO).install_read_port(0x7f, 0x7f, "IN5");
+	m_master->space(AS_IO).install_read_port(0x7c, 0x7c, "IN4");
+	m_master->space(AS_IO).install_read_port(0x7f, 0x7f, "IN5");
 }
 
 
 void redline_state::init_aafbb()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::viper_bankswitch;
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::viper_bankswitch;
 
-	rotate_memory("maincpu");
-	rotate_memory("sub");
-	rotate_memory("sub");
+	rotate_memory("master");
+	rotate_memory("slave");
+	rotate_memory("slave");
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x80, 0x40);
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x80, 0x40);
 
 	/* set up additional input ports */
-	m_maincpu->space(AS_IO).install_read_port(0x7c, 0x7c, "IN4");
-	m_maincpu->space(AS_IO).install_read_port(0x7f, 0x7f, "IN5");
+	m_master->space(AS_IO).install_read_port(0x7c, 0x7c, "IN4");
+	m_master->space(AS_IO).install_read_port(0x7f, 0x7f, "IN5");
 }
 
 
 void redline_state::init_aafbd2p()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::viper_bankswitch;
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::viper_bankswitch;
 
-	rotate_memory("maincpu");
-	rotate_memory("sub");
-	rotate_memory("sub");
+	rotate_memory("master");
+	rotate_memory("slave");
+	rotate_memory("slave");
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x00, 0x40);
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x00, 0x40);
 
 	/* set up additional input ports */
-	m_maincpu->space(AS_IO).install_read_port(0x7c, 0x7c, "IN4");
-	m_maincpu->space(AS_IO).install_read_port(0x7f, 0x7f, "IN5");
+	m_master->space(AS_IO).install_read_port(0x7c, 0x7c, "IN4");
+	m_master->space(AS_IO).install_read_port(0x7f, 0x7f, "IN5");
 }
 
 
 void redline_state::init_offroad()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::offroad_bankswitch;
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::offroad_bankswitch;
 
-	rotate_memory("maincpu");
-	rotate_memory("sub");
-	rotate_memory("sub");
+	rotate_memory("master");
+	rotate_memory("slave");
+	rotate_memory("slave");
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x00, 0xc0);
-	init_main_ports(0x40, 0x80);   /* yes, this is intentional */
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x00, 0xc0);
+	init_master_ports(0x40, 0x80);   /* yes, this is intentional */
 
 	/* set up additional input ports */
-	m_maincpu->space(AS_IO).install_read_handler(0xf8, 0xf8, read8smo_delegate(*this, FUNC(redline_state::offroad_wheel_3_r)));
-	m_maincpu->space(AS_IO).install_read_handler(0xf9, 0xf9, read8smo_delegate(*this, FUNC(redline_state::offroad_wheel_1_r)));
-	m_maincpu->space(AS_IO).install_read_handler(0xfb, 0xfb, read8smo_delegate(*this, FUNC(redline_state::offroad_wheel_2_r)));
+	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8smo_delegate(*this, FUNC(redline_state::offroad_wheel_3_r)));
+	m_master->space(AS_IO).install_read_handler(0xf9, 0xf9, read8smo_delegate(*this, FUNC(redline_state::offroad_wheel_1_r)));
+	m_master->space(AS_IO).install_read_handler(0xfb, 0xfb, read8smo_delegate(*this, FUNC(redline_state::offroad_wheel_2_r)));
 }
 
 
 void redline_state::init_offroadt()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::offroad_bankswitch;
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::offroad_bankswitch;
 
-	rotate_memory("maincpu");
-	rotate_memory("sub");
-	rotate_memory("sub");
+	rotate_memory("master");
+	rotate_memory("slave");
+	rotate_memory("slave");
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x80, 0x40);
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x80, 0x40);
 
 	/* set up additional input ports */
-	m_maincpu->space(AS_IO).install_read_handler(0xf8, 0xf8, read8smo_delegate(*this, FUNC(redline_state::offroad_wheel_3_r)));
-	m_maincpu->space(AS_IO).install_read_handler(0xf9, 0xf9, read8smo_delegate(*this, FUNC(redline_state::offroad_wheel_1_r)));
-	m_maincpu->space(AS_IO).install_read_handler(0xfb, 0xfb, read8smo_delegate(*this, FUNC(redline_state::offroad_wheel_2_r)));
+	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8smo_delegate(*this, FUNC(redline_state::offroad_wheel_3_r)));
+	m_master->space(AS_IO).install_read_handler(0xf9, 0xf9, read8smo_delegate(*this, FUNC(redline_state::offroad_wheel_1_r)));
+	m_master->space(AS_IO).install_read_handler(0xfb, 0xfb, read8smo_delegate(*this, FUNC(redline_state::offroad_wheel_2_r)));
 }
 
 
 void redline_state::init_pigout()
 {
-	/* main CPU bankswitching */
-	m_update_main_bank = &leland_state::offroad_bankswitch;
+	/* master CPU bankswitching */
+	m_update_master_bank = &leland_state::offroad_bankswitch;
 
-	rotate_memory("maincpu");
-	rotate_memory("sub");
-	rotate_memory("sub");
+	rotate_memory("master");
+	rotate_memory("slave");
+	rotate_memory("slave");
 
-	/* set up the main CPU I/O ports */
-	init_main_ports(0x00, 0x40);
+	/* set up the master CPU I/O ports */
+	init_master_ports(0x00, 0x40);
 
 	/* set up additional input ports */
-	m_maincpu->space(AS_IO).install_read_port(0x7f, 0x7f, "IN4");
+	m_master->space(AS_IO).install_read_port(0x7f, 0x7f, "IN4");
 }
 
 
 void ataxx_state::init_ataxx()
 {
-	rotate_memory("maincpu");
-	rotate_memory("sub");
+	rotate_memory("master");
+	rotate_memory("slave");
 
 	/* set up additional input ports */
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x03, read8sm_delegate(*this, FUNC(ataxx_state::ataxx_trackball_r)));
+	m_master->space(AS_IO).install_read_handler(0x00, 0x03, read8sm_delegate(*this, FUNC(ataxx_state::ataxx_trackball_r)));
 }
 
 
 void ataxx_state::init_wsf()
 {
-	rotate_memory("maincpu");
-	rotate_memory("sub");
+	rotate_memory("master");
+	rotate_memory("slave");
 
 	/* set up additional input ports */
-	m_maincpu->space(AS_IO).install_read_port(0x0d, 0x0d, "P1_P2");
-	m_maincpu->space(AS_IO).install_read_port(0x0e, 0x0e, "P3_P4");
-	m_maincpu->space(AS_IO).install_read_port(0x0f, 0x0f, "BUTTONS");
+	m_master->space(AS_IO).install_read_port(0x0d, 0x0d, "P1_P2");
+	m_master->space(AS_IO).install_read_port(0x0e, 0x0e, "P3_P4");
+	m_master->space(AS_IO).install_read_port(0x0f, 0x0f, "BUTTONS");
 }
 
 
 void ataxx_state::init_indyheat()
 {
-	rotate_memory("maincpu");
-	rotate_memory("sub");
+	rotate_memory("master");
+	rotate_memory("slave");
 
 	/* set up additional input ports */
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x02, read8sm_delegate(*this, FUNC(ataxx_state::ataxx_trackball_r)));
-	m_maincpu->space(AS_IO).install_read_handler(0x08, 0x0b, read8sm_delegate(*this, FUNC(ataxx_state::indyheat_analog_r)));
-	m_maincpu->space(AS_IO).install_read_port(0x0d, 0x0d, "P1");
-	m_maincpu->space(AS_IO).install_read_port(0x0e, 0x0e, "P2");
-	m_maincpu->space(AS_IO).install_read_port(0x0f, 0x0f, "P3");
+	m_master->space(AS_IO).install_read_handler(0x00, 0x02, read8sm_delegate(*this, FUNC(ataxx_state::ataxx_trackball_r)));
+	m_master->space(AS_IO).install_read_handler(0x08, 0x0b, read8sm_delegate(*this, FUNC(ataxx_state::indyheat_analog_r)));
+	m_master->space(AS_IO).install_read_port(0x0d, 0x0d, "P1");
+	m_master->space(AS_IO).install_read_port(0x0e, 0x0e, "P2");
+	m_master->space(AS_IO).install_read_port(0x0f, 0x0f, "P3");
 
 	/* set up additional output ports */
-	m_maincpu->space(AS_IO).install_write_handler(0x08, 0x0b, write8sm_delegate(*this, FUNC(ataxx_state::indyheat_analog_w)));
+	m_master->space(AS_IO).install_write_handler(0x08, 0x0b, write8sm_delegate(*this, FUNC(ataxx_state::indyheat_analog_w)));
 }
 
 
 void ataxx_state::init_brutforc()
 {
-	rotate_memory("maincpu");
-	rotate_memory("sub");
+	rotate_memory("master");
+	rotate_memory("slave");
 
 	/* set up additional input ports */
-	m_maincpu->space(AS_IO).install_read_port(0x0d, 0x0d, "P2");
-	m_maincpu->space(AS_IO).install_read_port(0x0e, 0x0e, "P1");
-	m_maincpu->space(AS_IO).install_read_port(0x0f, 0x0f, "P3");
+	m_master->space(AS_IO).install_read_port(0x0d, 0x0d, "P2");
+	m_master->space(AS_IO).install_read_port(0x0e, 0x0e, "P1");
+	m_master->space(AS_IO).install_read_port(0x0f, 0x0f, "P3");
 }
 
 
 void ataxx_state::init_asylum()
 {
-	rotate_memory("maincpu");
-	rotate_memory("sub");
+	rotate_memory("master");
+	rotate_memory("slave");
 
 	/* set up additional input ports */
-	m_maincpu->space(AS_IO).install_read_port(0x0d, 0x0d, "P2");
-	m_maincpu->space(AS_IO).install_read_port(0x0e, 0x0e, "P1");
-	m_maincpu->space(AS_IO).install_read_port(0x0f, 0x0f, "P3");
+	m_master->space(AS_IO).install_read_port(0x0d, 0x0d, "P2");
+	m_master->space(AS_IO).install_read_port(0x0e, 0x0e, "P1");
+	m_master->space(AS_IO).install_read_port(0x0f, 0x0f, "P3");
 }
 
 
@@ -3596,7 +3596,7 @@ void ataxx_state::init_asylum()
  *
  *************************************/
 
-/* small main banks, small sub banks */
+/* small master banks, small slave banks */
 GAME( 1985, cerberus,   0,        leland,   cerberus,   leland_state,  init_cerberus, ROT0,   "Cinematronics", "Cerberus", 0 )
 GAME( 1985, mayhem,     0,        leland,   mayhem,     leland_state,  init_mayhem,   ROT0,   "Cinematronics", "Mayhem 2002", 0 )
 GAME( 1985, powrplay,   0,        leland,   mayhem,     leland_state,  init_powrplay, ROT0,   "Cinematronics", "Power Play", 0 )
@@ -3605,22 +3605,22 @@ GAME( 1985, wseries0,   wseries,  leland,   wseries,    leland_state,  init_wser
 GAME( 1986, alleymas,   0,        leland,   alleymas,   leland_state,  init_alleymas, ROT270, "Cinematronics", "Alley Master", 0 )
 GAME( 1986, upyoural,   alleymas, leland,   upyoural,   leland_state,  init_upyoural, ROT270, "Cinematronics", "Up Your Alley", 0 ) // prototype of Alley Master?
 
-/* odd main banks, small sub banks */
+/* odd master banks, small slave banks */
 GAME( 1986, dangerz,    0,        leland,   dangerz,    leland_state,  init_dangerz,  ROT0,   "Cinematronics", "Danger Zone (rev 2)", 0 )
 GAME( 1986, dangerz0,   dangerz,  leland,   dangerz,    leland_state,  init_dangerz,  ROT0,   "Cinematronics", "Danger Zone (rev 0)", 0 )
 
-/* small main banks + extra top board, small sub banks */
+/* small master banks + extra top board, small slave banks */
 GAME( 1987, basebal2,   0,        leland,   basebal2,   leland_state,  init_basebal2, ROT0,   "Cinematronics", "Baseball: The Season II", 0 )
 GAME( 1987, dblplay,    0,        leland,   basebal2,   leland_state,  init_dblplay,  ROT0,   "Leland Corporation / Tradewest", "Super Baseball Double Play Home Run Derby", 0 )
 GAME( 1988, strkzone,   0,        leland,   basebal2,   leland_state,  init_strkzone, ROT0,   "Leland Corporation", "Strike Zone Baseball", 0 )
 
-/* large main banks, small sub banks, 80186 sound */
+/* large master banks, small slave banks, 80186 sound */
 GAME( 1987, redlin2p,   0,        redline,  redline,    redline_state, init_redlin2p, ROT270, "Cinematronics (Tradewest license)", "Redline Racer (2 players)", 0 )
 GAME( 1987, quarterb,   0,        quarterb, quarterb,   redline_state, init_quarterb, ROT270, "Leland Corporation", "Quarterback (rev 5)", 0 )
 GAME( 1987, quarterba,  quarterb, quarterb, quarterb,   redline_state, init_quarterb, ROT270, "Leland Corporation", "Quarterback (rev 2)", 0 )
 GAME( 1987, quarterbc,  quarterb, quarterb, quarterb,   redline_state, init_quarterb, ROT270, "Leland Corporation", "Quarterback (rev 1, cocktail)", 0 )
 
-/* large main banks, large sub banks, 80186 sound */
+/* large master banks, large slave banks, 80186 sound */
 GAME( 1988, viper,      0,        lelandi,  dangerz,    redline_state, init_viper,    ROT0,   "Leland Corporation", "Viper (rev 3)", 0 )
 GAME( 1988, teamqb,     0,        lelandi,  teamqb,     redline_state, init_teamqb,   ROT270, "Leland Corporation", "John Elway's Team Quarterback (rev 3)", 0 )
 GAME( 1988, teamqb2,    teamqb,   lelandi,  teamqb,     redline_state, init_teamqb,   ROT270, "Leland Corporation", "John Elway's Team Quarterback (rev 2)", 0 )
@@ -3630,7 +3630,7 @@ GAME( 1989, aafbd2p,    aafb,     lelandi,  aafb2p,     redline_state, init_aafb
 GAME( 1989, aafbc,      aafb,     lelandi,  teamqb,     redline_state, init_aafbb,    ROT270, "Leland Corporation", "All American Football (Leland, rev C)", 0 )
 GAME( 1989, aafbb,      aafb,     lelandi,  teamqb,     redline_state, init_aafbb,    ROT270, "Leland Corporation", "All American Football (Leland, rev B)", MACHINE_NOT_WORKING )
 
-/* huge main banks, large sub banks, 80186 sound */
+/* huge master banks, large slave banks, 80186 sound */
 GAME( 1989, offroad,    0,        lelandi,  offroad,    redline_state, init_offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road (rev 4)", 0 )
 GAME( 1989, offroad3,   offroad,  lelandi,  offroad,    redline_state, init_offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road (rev 3)", 0 )
 GAME( 1989, offroadt,   0,        lelandi,  offroad,    redline_state, init_offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak (rev 4?)", 0 ) // need to verify revision
