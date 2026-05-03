@@ -9,7 +9,7 @@
 
     -------------------------------------------------------------------
 
-    1st generation sound hardware was controlled by the main Z80.
+    1st generation sound hardware was controlled by the master Z80.
     It drove either an AY-8910/AY-8912 for music. It also had two DACs
     that were driven by the video refresh. At the end of each scanline
     there are 8-bit DAC samples that can be enabled via the output
