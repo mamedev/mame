@@ -2952,14 +2952,18 @@ INPUT_PORTS_START(prophet5)
 		PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(prophet5_audio_device::balance_trimmer_changed), 0)
 INPUT_PORTS_END
 
-ROM_START(prophet5rev30)
+ROM_START(prophet5r30)
 	ROM_REGION(0xc00, "maincpu", 0)  // 3 x 2708 1Kbyte ROMS.
 	ROM_LOAD("0.v8.1.u312", 0x000000, 0x000400, CRC(6337d2ae) SHA1(bad79f6475dc0a8bb139ea0a12258cb3e5bfa0be))
 	ROM_LOAD("1.v8.1.u313", 0x000400, 0x000400, CRC(1e334fd3) SHA1(276b7abf4a13fbae0d09e869f786b3073ee82504))
 	ROM_LOAD("2.v8.1.u314", 0x000800, 0x000400, CRC(ffafaa95) SHA1(9d119fb22270d45e34c1f16899453ae7469d7d20))
+
+	ROM_REGION(0x400, "nvram", ROMREGION_ERASE00)
+	// Handcrafted from diagrams in the owner's manual. Won't match factory settings exactly.
+	ROM_LOAD("nvram.bin", 0x000000, 0x000400, CRC(97299128) SHA1(a6b66286b27fc6d28312ad692630b8157beeb78a))
 ROM_END
 
 }  // anonymous namespace
 
 // Prophet 5 Rev 3.0, serial numbers 1301-2285.
-SYST(1980, prophet5rev30, 0, 0, prophet5rev30, prophet5, prophet5_state, empty_init, "Sequential Circuits", "Prophet 5 (Model 1000) Rev 3.0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
+SYST(1980, prophet5r30, 0, 0, prophet5rev30, prophet5, prophet5_state, empty_init, "Sequential Circuits", "Prophet 5 (Model 1000) Rev 3.0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
