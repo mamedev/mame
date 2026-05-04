@@ -2960,7 +2960,7 @@ ROM_START(prophet5r30)
 
 	ROM_REGION(0x400, "nvram", ROMREGION_ERASE00)
 	// Handcrafted from diagrams in the owner's manual. Won't match factory settings exactly.
-	ROM_LOAD("nvram.bin", 0x000000, 0x000400, CRC(42f0ebe4) SHA1(65be6b2d649cbbb0d41f62063322dff5678a6ff0))
+	ROM_LOAD("nvram.bin", 0x000000, 0x000400, BAD_DUMP CRC(42f0ebe4) SHA1(65be6b2d649cbbb0d41f62063322dff5678a6ff0))
 ROM_END
 
 }  // anonymous namespace
