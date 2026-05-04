@@ -179,7 +179,7 @@ void load_driver_image(bitmap_argb32 &bitmap, emu_file &file, game_driver const 
 class menu_select_launch::software_parts : public menu
 {
 public:
-	software_parts(mame_ui_manager &mui, render_container &container, s_parts &&parts, ui_software_info const &ui_info);
+	software_parts(mame_ui_manager &mui, render_target &target, s_parts &&parts, ui_software_info const &ui_info);
 	virtual ~software_parts() override;
 
 private:
@@ -193,12 +193,12 @@ private:
 class menu_select_launch::bios_selection : public menu
 {
 public:
-	bios_selection(mame_ui_manager &mui, render_container &container, s_bios &&biosname, game_driver const &driver, bool inlist);
-	bios_selection(mame_ui_manager &mui, render_container &container, s_bios &&biosname, ui_software_info const &swinfo, bool inlist);
+	bios_selection(mame_ui_manager &mui, render_target &target, s_bios &&biosname, game_driver const &driver, bool inlist);
+	bios_selection(mame_ui_manager &mui, render_target &target, s_bios &&biosname, ui_software_info const &swinfo, bool inlist);
 	virtual ~bios_selection() override;
 
 private:
-	bios_selection(mame_ui_manager &mui, render_container &container, s_bios &&biosname, void const *driver, bool software, bool inlist);
+	bios_selection(mame_ui_manager &mui, render_target &target, s_bios &&biosname, void const *driver, bool software, bool inlist);
 
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
@@ -268,8 +268,8 @@ void menu_select_launch::reselect_last::set_software(game_driver const &driver, 
 //  ctor
 //-------------------------------------------------
 
-menu_select_launch::software_parts::software_parts(mame_ui_manager &mui, render_container &container, s_parts &&parts, ui_software_info const &ui_info)
-	: menu(mui, container)
+menu_select_launch::software_parts::software_parts(mame_ui_manager &mui, render_target &target, s_parts &&parts, ui_software_info const &ui_info)
+	: menu(mui, target)
 	, m_uiinfo(ui_info)
 	, m_parts(std::move(parts))
 {
@@ -327,18 +327,18 @@ bool menu_select_launch::software_parts::handle(event const *ev)
 //  ctor
 //-------------------------------------------------
 
-menu_select_launch::bios_selection::bios_selection(mame_ui_manager &mui, render_container &container, s_bios &&biosname, game_driver const &driver, bool inlist)
-	: bios_selection(mui, container, std::move(biosname), reinterpret_cast<void const *>(&driver), false, inlist)
+menu_select_launch::bios_selection::bios_selection(mame_ui_manager &mui, render_target &target, s_bios &&biosname, game_driver const &driver, bool inlist)
+	: bios_selection(mui, target, std::move(biosname), reinterpret_cast<void const *>(&driver), false, inlist)
 {
 }
 
-menu_select_launch::bios_selection::bios_selection(mame_ui_manager &mui, render_container &container, s_bios &&biosname, ui_software_info const &swinfo, bool inlist)
-	: bios_selection(mui, container, std::move(biosname), reinterpret_cast<void const *>(&swinfo), true, inlist)
+menu_select_launch::bios_selection::bios_selection(mame_ui_manager &mui, render_target &target, s_bios &&biosname, ui_software_info const &swinfo, bool inlist)
+	: bios_selection(mui, target, std::move(biosname), reinterpret_cast<void const *>(&swinfo), true, inlist)
 {
 }
 
-menu_select_launch::bios_selection::bios_selection(mame_ui_manager &mui, render_container &container, s_bios &&biosname, void const *driver, bool software, bool inlist)
-	: menu(mui, container)
+menu_select_launch::bios_selection::bios_selection(mame_ui_manager &mui, render_target &target, s_bios &&biosname, void const *driver, bool software, bool inlist)
+	: menu(mui, target)
 	, m_driver(driver)
 	, m_software(software)
 	, m_inlist(inlist)
@@ -401,7 +401,7 @@ bool menu_select_launch::bios_selection::handle(event const *ev)
 					drivlist.next();
 					software_list_device *swlist = software_list_device::find_by_name(*drivlist.config(), ui_swinfo->listname);
 					const software_info *swinfo = swlist->find(ui_swinfo->shortname);
-					if (!select_part(ui(), container(), *swinfo, *ui_swinfo))
+					if (!select_part(ui(), target(), *swinfo, *ui_swinfo))
 					{
 						reselect_last::reselect(true);
 						launch_system(ui(), drivlist.driver(), ui_swinfo, nullptr, &elem.second);
@@ -441,11 +441,10 @@ menu_select_launch::cache::~cache()
 }
 
 
-void menu_select_launch::cache::cache_toolbar(running_machine &machine, float width, float height)
+void menu_select_launch::cache::cache_toolbar(running_machine &machine, render_target &target, float width, float height)
 {
 	// not bothering to transform for non-square pixels greatly simplifies this
 	render_manager &render(machine.render());
-	render_target const &target(render.ui_target());
 	s32 const pix_size(std::ceil(std::max(width * target.width(), height * target.height())));
 	if (m_toolbar_textures.empty() || (m_toolbar_bitmaps[0].width() != pix_size) || (m_toolbar_bitmaps[0].height() != pix_size))
 	{
@@ -506,8 +505,8 @@ menu_select_launch::~menu_select_launch()
 }
 
 
-menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &container, bool is_swlist)
-	: menu(mui, container)
+menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_target &target, bool is_swlist)
+	: menu(mui, target)
 	, m_skip_main_items(0)
 	, m_prev_selected(nullptr)
 	, m_total_lines(0)
@@ -758,8 +757,7 @@ void menu_select_launch::recompute_metrics(uint32_t width, uint32_t height, floa
 	menu::recompute_metrics(width, height, aspect);
 
 	// calculate icon size in pixels
-	render_target const &target(machine().render().ui_target());
-	bool const rotated((target.orientation() & ORIENTATION_SWAP_XY) != 0);
+	bool const rotated((target().orientation() & ORIENTATION_SWAP_XY) != 0);
 	m_icon_width = int((rotated ? height : width) * line_height() * aspect);
 	m_icon_height = int((rotated ? width : height) * line_height());
 
@@ -772,7 +770,7 @@ void menu_select_launch::recompute_metrics(uint32_t width, uint32_t height, floa
 	m_divider_arrow_height = 0.64F * line_height();
 
 	// calculate info text size
-	m_info_line_height = ui().get_line_height(ui().options().infos_size());
+	m_info_line_height = ui().get_line_height(target(), ui().options().infos_size());
 
 	// invalidate panel metrics
 	m_primary_vbounds = std::make_pair(0.0F, -1.0F);
@@ -1053,9 +1051,9 @@ void menu_select_launch::inkey_dats()
 	ui_system_info const *system;
 	get_selection(software, system);
 	if (software && !software->startempty)
-		menu::stack_push<menu_dats_view>(ui(), container(), *software);
+		menu::stack_push<menu_dats_view>(ui(), target(), *software);
 	else if (system)
-		menu::stack_push<menu_dats_view>(ui(), container(), system);
+		menu::stack_push<menu_dats_view>(ui(), target(), system);
 }
 
 
@@ -1149,7 +1147,7 @@ void menu_select_launch::draw_left_panel(u32 flags, typename Filter::type curren
 	}
 
 	// get the width of the selection indicator glyphs
-	float const checkmark_width = ui().get_string_width(convert_command_glyph("_# "), m_info_line_height);
+	float const checkmark_width = ui().get_string_width(target(), convert_command_glyph("_# "), m_info_line_height);
 
 	if (m_left_items_hbounds.first >= m_left_items_hbounds.second)
 	{
@@ -1168,7 +1166,7 @@ void menu_select_launch::draw_left_panel(u32 flags, typename Filter::type curren
 		// get the maximum filter name width, restricted to a quarter of the target width
 		float line_width(0.0F);
 		for (typename Filter::type x = Filter::FIRST; Filter::COUNT > x; ++x)
-			line_width = std::max(ui().get_string_width(Filter::display_name(x), m_info_line_height) + checkmark_width, line_width);
+			line_width = std::max(ui().get_string_width(target(), Filter::display_name(x), m_info_line_height) + checkmark_width, line_width);
 		line_width = std::min(line_width + (lr_border() * 2.0F), 0.25F);
 		m_left_items_hbounds = std::make_pair(2.0F * lr_border(), (2.0F * lr_border()) + line_width);
 
@@ -1254,7 +1252,7 @@ void menu_select_launch::draw_left_panel(u32 flags, typename Filter::type curren
 				str = Filter::display_name(filter);
 			float const x1t = m_left_items_hbounds.first + lr_border() + ((str == Filter::display_name(filter)) ? checkmark_width : 0.0F);
 			ui().draw_text_full(
-					container(), str,
+					target(), str,
 					x1t, line_top, m_left_items_hbounds.second - x1t - lr_border() + (1.0F / float(target_size().second)),
 					text_layout::text_justify::LEFT, text_layout::word_wrapping::TRUNCATE,
 					mame_ui_manager::NORMAL, fgcolor, bgcolor,
@@ -1400,16 +1398,16 @@ template <typename T> bool menu_select_launch::select_bios(T const &driver, bool
 	if (ui().options().skip_bios_menu() || !has_multiple_bios(driver, biosname))
 		return false;
 
-	menu::stack_push<bios_selection>(ui(), container(), std::move(biosname), driver, inlist);
+	menu::stack_push<bios_selection>(ui(), target(), std::move(biosname), driver, inlist);
 	return true;
 }
 
 bool menu_select_launch::select_part(software_info const &info, ui_software_info const &ui_info)
 {
-	return select_part(ui(), container(), info, ui_info);
+	return select_part(ui(), target(), info, ui_info);
 }
 
-bool menu_select_launch::select_part(mame_ui_manager &mui, render_container &container, software_info const &info, ui_software_info const &ui_info)
+bool menu_select_launch::select_part(mame_ui_manager &mui, render_target &target, software_info const &info, ui_software_info const &ui_info)
 {
 	if (mui.options().skip_parts_menu() || !info.has_multiple_parts(ui_info.interface.c_str()))
 		return false;
@@ -1425,7 +1423,7 @@ bool menu_select_launch::select_part(mame_ui_manager &mui, render_container &con
 			parts.emplace(part.name(), std::move(menu_part_name));
 		}
 	}
-	menu::stack_push<software_parts>(mui, container, std::move(parts), ui_info);
+	menu::stack_push<software_parts>(mui, target, std::move(parts), ui_info);
 	return true;
 }
 
@@ -1455,7 +1453,7 @@ void menu_select_launch::draw_toolbar(u32 flags, float x1, float y1, float x2, f
 		float const total_width((float(toolbar_count) + (float(toolbar_count - 1) * 0.5F)) * m_toolbar_button_width);
 		m_toolbar_backtrack_left = x2 - lr_border() - m_toolbar_button_width;
 		m_toolbar_main_left = (std::min)(m_toolbar_backtrack_left - (float(toolbar_count) * m_toolbar_button_spacing), (x1 + x2 - total_width) * 0.5F);
-		m_cache.cache_toolbar(machine(), m_toolbar_button_width, button_height);
+		m_cache.cache_toolbar(machine(), target(), m_toolbar_button_width, button_height);
 	}
 
 	// tooltip needs to be above for pen/touch to avoid being obscured
@@ -1480,7 +1478,7 @@ void menu_select_launch::draw_toolbar(u32 flags, float x1, float y1, float x2, f
 		if (tracked || (hovered && !(flags & PROCESS_NOINPUT) && pointer_idle()))
 		{
 			ui().draw_text_box(
-					container(),
+					target(),
 					have_parent ? _("Return to Previous Menu") : _("Exit"),
 					text_layout::text_justify::RIGHT, 1.0F - lr_border(), tooltip_pos,
 					ui().colors().background_color());
@@ -1505,7 +1503,7 @@ void menu_select_launch::draw_toolbar(u32 flags, float x1, float y1, float x2, f
 		if (tracked || (hovered && !(flags & PROCESS_NOINPUT) && pointer_idle()))
 		{
 			ui().draw_text_box(
-					container(),
+					target(),
 					_(hover_msg[bitmap]),
 					text_layout::text_justify::CENTER, (button_left + button_right) * 0.5F, tooltip_pos,
 					ui().colors().background_color());
@@ -1528,7 +1526,7 @@ void menu_select_launch::draw_star(float x0, float y0)
 	if (TOOLBAR_BITMAP_FAVORITE < m_cache.toolbar_textures().size())
 	{
 		float const y1 = y0 + line_height();
-		float const x1 = x0 + line_height() * container().manager().ui_aspect(&container());
+		float const x1 = x0 + line_height() * container().manager().ui_aspect(target());
 		container().add_quad(
 				x0, y0, x1, y1,
 				rgb_t::white(),
@@ -1648,7 +1646,7 @@ bool menu_select_launch::handle_events(u32 flags, event &ev)
 
 		// caught scroll event
 		case ui_event::type::MOUSE_WHEEL:
-			if ((&machine().render().ui_target() == local_menu_event.target) && pointer_idle() && !m_ui_error)
+			if ((&target() == local_menu_event.target) && pointer_idle() && !m_ui_error)
 			{
 				// check whether it's over something scrollable
 				float x, y;
@@ -3331,7 +3329,7 @@ void menu_select_launch::draw(u32 flags)
 			{
 				// draw the item left-aligned
 				ui().draw_text_full(
-						container(),
+						target(),
 						itemtext,
 						item_text_left + icon_offset, linetop, item_text_width - icon_offset,
 						text_layout::text_justify::LEFT, text_layout::word_wrapping::TRUNCATE,
@@ -3348,7 +3346,7 @@ void menu_select_launch::draw(u32 flags)
 				// draw the item left-aligned
 				float item_width;
 				ui().draw_text_full(
-						container(),
+						target(),
 						itemtext,
 						item_text_left + icon_offset, linetop, item_text_width - icon_offset - subitem_width,
 						text_layout::text_justify::LEFT, text_layout::word_wrapping::TRUNCATE,
@@ -3358,7 +3356,7 @@ void menu_select_launch::draw(u32 flags)
 
 				// draw the subitem right-aligned
 				ui().draw_text_full(
-						container(),
+						target(),
 						subitem_text,
 						item_text_left + icon_offset + item_width, linetop, item_text_width - icon_offset - item_width,
 						text_layout::text_justify::RIGHT, text_layout::word_wrapping::NEVER,
@@ -3424,7 +3422,7 @@ void menu_select_launch::draw(u32 flags)
 		{
 			// draw the item centred
 			ui().draw_text_full(
-					container(),
+					target(),
 					itemtext,
 					item_text_left, linetop, item_text_width,
 					text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE,
@@ -3445,7 +3443,7 @@ void menu_select_launch::draw(u32 flags)
 	if (m_ui_error)
 	{
 		container().add_rect(0.0F, 0.0F, 1.0F, 1.0F, rgb_t(114, 0, 0, 0), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-		ui().draw_text_box(container(), m_error_text, text_layout::text_justify::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+		ui().draw_text_box(target(), m_error_text, text_layout::text_justify::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 	}
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
@@ -3557,7 +3555,7 @@ void menu_select_launch::draw_right_box_tabs(u32 flags)
 		}
 
 		ui().draw_text_full(
-				container(),
+				target(),
 				buffer[cells],
 				tableft + UI_LINE_WIDTH, m_primary_vbounds.first, tabwidth - UI_LINE_WIDTH,
 				text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
@@ -3617,7 +3615,8 @@ void menu_select_launch::draw_right_box_heading(u32 flags, bool larrow, bool rar
 				hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 	}
 
-	ui().draw_text_full(container(),
+	ui().draw_text_full(
+			target(),
 			text, text_left, m_right_heading_top, text_width,
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor,
 			nullptr, nullptr,
@@ -3749,7 +3748,7 @@ void menu_select_launch::arts_render_images(bitmap_argb32 &&tmp_bitmap)
 	float const panel_height(m_right_content_vbounds.second - m_right_content_vbounds.first);
 
 	auto [screen_width, screen_height] = target_size();
-	if (machine().render().ui_target().orientation() & ORIENTATION_SWAP_XY)
+	if (target().orientation() & ORIENTATION_SWAP_XY)
 	{
 		using std::swap;
 		swap(screen_height, screen_width);

@@ -12,24 +12,10 @@ TODO:
 - in combatscb, wrong sprite/char priority (see cpu head at beginning of arm
   wrestling, and heads in intermission after firing range III)
 - improve sound hook up in bootleg.
-- YM2203 pitch is wrong. Fixing it screws up the tempo.
 
-  Update: 3MHz(24MHz/8) is the more appropriate clock speed for the 2203.
-  It gives the correct pitch(ear subjective) compared to the official
-  soundtrack albeit the music plays slow by about 10%.
-
-  Execution timing of the Z80 is important because it maintains music tempo
-  by polling the 2203's second timer. Even when working alone with no
-  context-switch the chip shouldn't be running at 1.5MHz otherwise it won't
-  keep the right pace. Similar Konami games from the same period(mainevt,
-  battlnts, flkatck...etc.) all have a 3.579545MHz Z80 for sound.
-
-  In spite of adjusting clock speed polling is deemed inaccurate when
-  interleaving is taken into account. A high resolution timer around the
-  poll loop is probably the best bet. The driver sets its timer manually
-  because strange enough, interleaving doesn't occur immediately when
-  perfect_quantum() is called. Speculations are TIME_NOWs could have
-  been used as the timer durations to force instant triggering.
+The sound Z80 runs at 1.5MHz. It maintains music tempo by polling the 2203's
+second timer. The bootleg with the MSM chip can't keep up when the Z80 runs at
+1.5MHz, so it's presumed to have a higher clock.
 
 
 Credits:
@@ -291,11 +277,13 @@ void combatsc_state::portA_w(uint8_t data)
 	// unknown. always write 0
 }
 
-// causes scores to disappear during fire ranges, either sprite busy flag or screen frame number related
 uint8_t combatsc_state::unk_r()
 {
-	return 0; //m_screen->frame_number() & 1;
+	// k007121 unknown register, or unmapped area and it's just a bug in the game
+	// when returned 1, it causes score popups to disappear during fire ranges
+	return 0xff;
 }
+
 
 /*************************************
  *
@@ -305,12 +293,12 @@ uint8_t combatsc_state::unk_r()
 
 void combatsc_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0007).view(m_pf_view);
+	map(0x0000, 0x0007).mirror(0x0180).view(m_pf_view);
 	m_pf_view[0](0x0000, 0x0007).w(m_k007121[0], FUNC(k007121_device::ctrl_w));
 	m_pf_view[1](0x0000, 0x0007).w(m_k007121[1], FUNC(k007121_device::ctrl_w));
 
-	map(0x001f, 0x001f).r(FUNC(combatsc_state::unk_r));
-	map(0x0020, 0x005f).view(m_scroll_view);
+	map(0x001f, 0x001f).mirror(0x0180).r(FUNC(combatsc_state::unk_r));
+	map(0x0020, 0x005f).mirror(0x0180).view(m_scroll_view);
 	m_scroll_view[0](0x0020, 0x005f).rw(m_k007121[0], FUNC(k007121_device::scroll_r), FUNC(k007121_device::scroll_w));
 	m_scroll_view[1](0x0020, 0x005f).rw(m_k007121[1], FUNC(k007121_device::scroll_r), FUNC(k007121_device::scroll_w));
 
@@ -328,7 +316,7 @@ void combatsc_state::main_map(address_map &map)
 	map(0x0418, 0x0418).w(FUNC(combatsc_state::sh_irqtrigger_w));
 	map(0x041c, 0x041c).w("watchdog", FUNC(watchdog_timer_device::reset_w)); // watchdog reset?
 
-	map(0x0600, 0x06ff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
+	map(0x0600, 0x06ff).mirror(0x0100).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
 	map(0x0800, 0x1fff).ram();
 	map(0x2000, 0x3fff).view(m_video_view);
 	m_video_view[0](0x2000, 0x3fff).ram().share(m_videoram[0]).w(FUNC(combatsc_state::videoview0_w));
@@ -343,9 +331,11 @@ void combatscb_state::main_map(address_map &map)
 	map(0x0500, 0x0500).w(FUNC(combatscb_state::bankselect_w));
 	map(0x0600, 0x06ff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
 	map(0x0800, 0x1fff).ram();
+
 	map(0x2000, 0x3fff).view(m_video_view);
 	m_video_view[0](0x2000, 0x3fff).ram().share(m_videoram[0]).w(FUNC(combatscb_state::videoview0_w));
 	m_video_view[1](0x2000, 0x3fff).ram().share(m_videoram[1]).w(FUNC(combatscb_state::videoview1_w));
+
 	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x4000, 0x7fff).view(m_bank_io_view);
 	m_bank_io_view[0](0x4000, 0x7fff).w(FUNC(combatscb_state::io_w));
@@ -356,6 +346,7 @@ void combatscb_state::main_map(address_map &map)
 	m_bank_io_view[0](0x4401, 0x4401).portr("IN1");
 	m_bank_io_view[0](0x4402, 0x4402).portr("DSW1");
 	m_bank_io_view[0](0x4403, 0x4403).portr("DSW2");
+
 	map(0x8000, 0xffff).rom().region("maincpu", 0x28000);
 }
 
@@ -665,13 +656,11 @@ void combatscb_state::machine_reset()
 void combatsc_state::combatsc(machine_config &config)
 {
 	// basic machine hardware
-	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // HD63C09E, 3 MHz?
+	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // HD63C09E, 3 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &combatsc_state::main_map);
 
-	Z80(config, m_audiocpu, 3579545); // 3.579545 MHz??? (no such XTAL on board!)
+	Z80(config, m_audiocpu, 24_MHz_XTAL / 16); // 1.5 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &combatsc_state::sound_map);
-
-	config.set_maximum_quantum(attotime::from_hz(1200));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -701,7 +690,7 @@ void combatsc_state::combatsc(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 24_MHz_XTAL / 8));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 24_MHz_XTAL / 8)); // 3 MHz
 	ymsnd.port_a_write_callback().set(FUNC(combatsc_state::portA_w));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.20);
 
@@ -717,10 +706,8 @@ void combatscb_state::combatscb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &combatscb_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(combatsc_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 3579545);   // 3.579545 MHz
+	Z80(config, m_audiocpu, 3000000); // 3 MHz?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &combatscb_state::sound_map);
-
-	config.set_maximum_quantum(attotime::from_hz(1200));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -746,7 +733,7 @@ void combatscb_state::combatscb(machine_config &config)
 	MSM5205(config, m_msm, 384000);
 	m_msm->vck_callback().set_inputline("audiocpu", 0, ASSERT_LINE);
 	m_msm->set_prescaler_selector(msm5205_device::S96_4B);
-	m_msm->add_route(ALL_OUTPUTS, "mono", 0.30);
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.70);
 }
 
 

@@ -13,7 +13,7 @@ board is not emulated here, additional handlers for it are in the driver.
 *******************************************************************************/
 
 #include "emu.h"
-#include "mmboard.h"
+#include "mboard.h"
 
 
 DEFINE_DEVICE_TYPE(MEPHISTO_SENSORS_BOARD, mephisto_sensors_board_device, "msboard", "Mephisto Sensors Board")

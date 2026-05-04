@@ -17,7 +17,7 @@
     Extra sound chips (YM2203 & Oki M5205), and extra HuC6280 processor to drive them.
     Twice as much VRAM (128kb).
 
-    Todo:
+    TODO:
     - There seems to be a bug with a stuck note from the YM2203 FM channel
       at the start of scene 3 and near the ending when your characters are
       flying over a forest in a helicopter.
@@ -116,7 +116,7 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_msm(*this, "msm")
 		, m_screen(*this, "screen")
-		, m_huc6260(*this, "huc6260")
+		, m_vce(*this, "vce")
 		, m_soundlatch(*this, "soundlatch")
 		, m_inputs(*this, { "IN0", "IN1", "IN2", "DSW2", "DSW1" })
 	{ }
@@ -132,7 +132,7 @@ private:
 	required_device<h6280_device> m_audiocpu;
 	required_device<msm5205_device> m_msm;
 	required_device<screen_device> m_screen;
-	required_device<huc6260_device> m_huc6260;
+	required_device<battlera_vce_device> m_vce;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_ioport_array<5> m_inputs;
 
@@ -190,10 +190,10 @@ void battlera_state::main_prg_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x1e0800, 0x1e0800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x1e1000, 0x1e13ff).rw(m_huc6260, FUNC(huc6260_device::palette_direct_read), FUNC(huc6260_device::palette_direct_write)).share("paletteram");
+	map(0x1e1000, 0x1e13ff).rw(m_vce, FUNC(battlera_vce_device::palette_direct_read), FUNC(battlera_vce_device::palette_direct_write)).share("paletteram");
 	map(0x1f0000, 0x1f1fff).ram(); // Main RAM
 	map(0x1fe000, 0x1fe3ff).rw("huc6270", FUNC(huc6270_device::read8), FUNC(huc6270_device::write8));
-	map(0x1fe400, 0x1fe7ff).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
+	map(0x1fe400, 0x1fe7ff).rw(m_vce, FUNC(battlera_vce_device::read), FUNC(battlera_vce_device::write)); // is game writes here?
 }
 
 void battlera_state::main_portmap(address_map &map)
@@ -318,15 +318,15 @@ void battlera_state::battlera(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(21.477272_MHz_XTAL, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
-	m_screen->set_screen_update(m_huc6260, FUNC(huc6260_device::screen_update));
-	m_screen->set_palette(m_huc6260);
+	m_screen->set_raw(21.477272_MHz_XTAL, battlera_vce_device::WPF, 64, 64 + 1024 + 64, battlera_vce_device::LPF, 18, 18 + 242);
+	m_screen->set_screen_update(m_vce, FUNC(battlera_vce_device::screen_update));
+	m_screen->set_palette(m_vce);
 
-	HUC6260(config, m_huc6260, 21.477272_MHz_XTAL);
-	m_huc6260->next_pixel_data().set("huc6270", FUNC(huc6270_device::next_pixel));
-	m_huc6260->time_til_next_event().set("huc6270", FUNC(huc6270_device::time_until_next_event));
-	m_huc6260->vsync_changed().set("huc6270", FUNC(huc6270_device::vsync_changed));
-	m_huc6260->hsync_changed().set("huc6270", FUNC(huc6270_device::hsync_changed));
+	BATTLERA_VCE(config, m_vce, 21.477272_MHz_XTAL);
+	m_vce->next_pixel_data().set("huc6270", FUNC(huc6270_device::next_pixel));
+	m_vce->time_til_next_event().set("huc6270", FUNC(huc6270_device::time_until_next_event));
+	m_vce->vsync_changed().set("huc6270", FUNC(huc6270_device::vsync_changed));
+	m_vce->hsync_changed().set("huc6270", FUNC(huc6270_device::hsync_changed));
 
 	huc6270_device &huc6270(HUC6270(config, "huc6270", 21.477272_MHz_XTAL));
 	huc6270.set_vram_size(0x20000);

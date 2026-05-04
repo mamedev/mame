@@ -32,7 +32,7 @@ public:
 		ENTRY
 	};
 
-	menu_software_parts(mame_ui_manager &mui, render_container &container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result);
+	menu_software_parts(mame_ui_manager &mui, render_target &target, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result);
 	virtual ~menu_software_parts() override;
 
 private:
@@ -61,7 +61,7 @@ private:
 class menu_software_list : public menu
 {
 public:
-	menu_software_list(mame_ui_manager &mui, render_container &container, software_list_device *swlist, const char *interface, std::string &result);
+	menu_software_list(mame_ui_manager &mui, render_target &target, software_list_device *swlist, const char *interface, std::string &result);
 	virtual ~menu_software_list() override;
 
 protected:
@@ -102,7 +102,7 @@ private:
 class menu_software : public menu
 {
 public:
-	menu_software(mame_ui_manager &mui, render_container &container, const char *interface, software_list_device **result);
+	menu_software(mame_ui_manager &mui, render_target &target, const char *interface, software_list_device **result);
 	virtual ~menu_software() override;
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;

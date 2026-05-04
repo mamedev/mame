@@ -15,8 +15,6 @@
 class namcos21_dsp_c67_device : public device_t
 {
 public:
-	static constexpr unsigned PTRAM_SIZE = 0x20000;
-
 	enum
 	{   /* Namco System21 */
 		NAMCOS21_AIRCOMBAT = 0x4000,
@@ -51,26 +49,31 @@ protected:
 
 private:
 	static constexpr unsigned DSP_BUF_MAX = 4096*12;
+	static constexpr unsigned PTRAM_SIZE = 0x20000;
+
 	struct dsp_state
 	{
 		dsp_state()
 		{
-			std::fill(std::begin(slaveInputBuffer), std::end(slaveInputBuffer), 0);
-			std::fill(std::begin(slaveOutputBuffer), std::end(slaveOutputBuffer), 0);
-			std::fill(std::begin(masterDirectDrawBuffer), std::end(masterDirectDrawBuffer), 0);
+			std::fill(std::begin(master_port_data), std::end(master_port_data), 0);
+			std::fill(std::begin(master_ddraw_buffer), std::end(master_ddraw_buffer), 0);
+			std::fill(std::begin(slave_input_buffer), std::end(slave_input_buffer), 0);
+			std::fill(std::begin(slave_output_buffer), std::end(slave_output_buffer), 0xffff);
 		}
 
-		u32 masterSourceAddr = 0;
-		u16 slaveInputBuffer[DSP_BUF_MAX];
-		u32 slaveBytesAvailable = 0;
-		u32 slaveBytesAdvertised = 0;
-		u32 slaveInputStart = 0;
-		u16 slaveOutputBuffer[DSP_BUF_MAX];
-		u32 slaveOutputSize = 0;
-		u16 masterDirectDrawBuffer[256];
-		u32 masterDirectDrawSize = 0;
-		int masterFinished = 0;
-		int slaveActive = 0;
+		u16 master_port_data[0x10];
+		u32 master_source_address = 0;
+		u16 master_ddraw_buffer[256];
+		u32 master_ddraw_size = 0;
+		int master_finished = 0;
+
+		u16 slave_input_buffer[DSP_BUF_MAX];
+		u32 slave_bytes_available = 0;
+		u32 slave_bytes_advertised = 0;
+		u32 slave_input_start = 0;
+		u16 slave_output_buffer[DSP_BUF_MAX];
+		u32 slave_output_size = 0;
+		int slave_active = 0;
 	};
 
 	required_device<namcos21_3d_device> m_renderer;
@@ -82,7 +85,7 @@ private:
 	required_shared_ptr<u16> m_master_dsp_ram;
 
 	int m_gametype; // hacks
-	std::unique_ptr<dsp_state> m_mpDspState;
+	std::unique_ptr<dsp_state> m_dsp_state;
 
 	std::unique_ptr<u8 []> m_pointram;
 	int m_pointram_idx;
@@ -128,7 +131,7 @@ private:
 	u16 slave_port2_r();
 	u16 slave_port3_r();
 	void slave_port3_w(u16 data);
-	void slave_XF_output_w(u16 data);
+	void slave_xf_output_w(u16 data);
 	u16 slave_portf_r();
 
 	void master_dsp_data(address_map &map) ATTR_COLD;

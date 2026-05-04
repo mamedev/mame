@@ -26,8 +26,6 @@
 #include "machine/msm6242.h"
 #include "sound/okim6295.h"
 #include "video/huc6202.h"
-#include "video/huc6260.h"
-#include "video/huc6270.h"
 
 #include "screen.h"
 #include "speaker.h"

@@ -24,13 +24,13 @@ bool menu_plugin::handle(event const *ev)
 	if (ev && ev->itemref)
 	{
 		if (ev->iptkey == IPT_UI_SELECT)
-			menu::stack_push<menu_plugin_opt>(ui(), container(), (char *)ev->itemref, false);
+			menu::stack_push<menu_plugin_opt>(ui(), target(), (char *)ev->itemref, false);
 	}
 	return false;
 }
 
-menu_plugin::menu_plugin(mame_ui_manager &mui, render_container &container) :
-	menu(mui, container),
+menu_plugin::menu_plugin(mame_ui_manager &mui, render_target &target) :
+	menu(mui, target),
 	m_plugins(mame_machine_manager::instance()->lua()->get_menu())
 {
 	set_heading(_("menu-pluginopts", "Plugin Options"));
@@ -43,10 +43,10 @@ void menu_plugin::populate()
 	item_append(menu_item_type::SEPARATOR);
 }
 
-void menu_plugin::show_menu(mame_ui_manager &mui, render_container &container, std::string_view menu)
+void menu_plugin::show_menu(mame_ui_manager &mui, std::string_view menu)
 {
 	// add the plugin menu entry
-	menu::stack_push<menu_plugin_opt>(mui, container, menu, true);
+	menu::stack_push<menu_plugin_opt>(mui, mui.machine().render().ui_target(), menu, true);
 
 	// force the menus on
 	mui.show_menu();
@@ -56,8 +56,8 @@ menu_plugin::~menu_plugin()
 {
 }
 
-menu_plugin_opt::menu_plugin_opt(mame_ui_manager &mui, render_container &container, std::string_view menu, bool one_shot) :
-	ui::menu(mui, container),
+menu_plugin_opt::menu_plugin_opt(mame_ui_manager &mui, render_target &target, std::string_view menu, bool one_shot) :
+	ui::menu(mui, target),
 	m_menu(menu),
 	m_need_idle(false)
 {

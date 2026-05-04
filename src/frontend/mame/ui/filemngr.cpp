@@ -38,8 +38,8 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_file_manager::menu_file_manager(mame_ui_manager &mui, render_container &container, std::string &&warnings)
-	: menu(mui, container)
+menu_file_manager::menu_file_manager(mame_ui_manager &mui, render_target &target, std::string &&warnings)
+	: menu(mui, target)
 	, m_warnings(std::move(warnings))
 	, m_selected_device(nullptr)
 {
@@ -247,15 +247,15 @@ bool menu_file_manager::handle(event const *ev)
 			{
 				if (m_selected_device->has_preset_images_selection())
 				{
-					menu::stack_push<menu_control_device_preset>(ui(), container(), *m_selected_device);
+					menu::stack_push<menu_control_device_preset>(ui(), target(), *m_selected_device);
 				}
 				else
 				{
 					floppy_image_device *floppy_device = dynamic_cast<floppy_image_device *>(m_selected_device);
 					if (floppy_device)
-						menu::stack_push<menu_control_floppy_image>(ui(), container(), *floppy_device);
+						menu::stack_push<menu_control_floppy_image>(ui(), target(), *floppy_device);
 					else
-						menu::stack_push<menu_control_device_image>(ui(), container(), *m_selected_device);
+						menu::stack_push<menu_control_device_image>(ui(), target(), *m_selected_device);
 				}
 			}
 		}
@@ -274,12 +274,12 @@ bool menu_file_manager::handle(event const *ev)
 }
 
 // force file manager menu
-void menu_file_manager::force_file_manager(mame_ui_manager &mui, render_container &container, std::string &&warnings)
+void menu_file_manager::force_file_manager(mame_ui_manager &mui, render_target &target, std::string &&warnings)
 {
 	// drop any existing menus and start the file manager
 	menu::stack_reset(mui);
-	menu::stack_push_special_main<menu_file_manager>(mui, container, std::move(warnings));
-	mui.show_menu();
+	menu::stack_push_special_main<menu_file_manager>(mui, target, std::move(warnings));
+	mui.show_menu(target);
 
 	// make sure MAME is paused
 	mui.machine().pause();

@@ -25,9 +25,15 @@ public:
 	auto portc_out() { return m_portc_out.bind(); }
 
 	auto spi2_out() { return m_spi2_out.bind(); }
+	auto spi_out() { return m_spi_out.bind(); }
+	auto spi_reset() { return m_spi_reset.bind(); }
 
 	void request_interrupt(int which);
 	void clear_interrupt(int which);
+
+	void recieve_spi_fifo_data(u8 data);
+	u8 *get_spi_romregion();
+	void set_spi_romregion(u8 *region, u32 size) { m_spiregion = region; m_spisize = size; }
 
 protected:
 	// device-level overrides
@@ -78,11 +84,16 @@ private:
 	void timerc_data_w(u16 data);
 	void timerc_counter_w(u16 data);
 
+	u16 pwm0_ctrl_r();
+	u16 pwm1_ctrl_r();
+	u16 pwm2_ctrl_r();
+	u16 pwm3_ctrl_r();
+
 	void pwm0_ctrl_w(u16 data);
 	void pwm1_ctrl_w(u16 data);
 	void pwm2_ctrl_w(u16 data);
 	void pwm3_ctrl_w(u16 data);
-	
+
 	void system_clock_w(u16 data);
 
 	void timebase_clear_w(u16 data);
@@ -120,10 +131,13 @@ private:
 	u16 spi2_misc_r();
 	void spi2_misc_w(u16 data);
 
+	u16 spi_man_ctrl_r();
+	void spi_man_ctrl_w(u16 data);
 	u16 spi_ctrl_r();
 	void spi_ctrl_w(u16 data);
 	void spi_txstatus_w(u16 data);
 	void spi_txdata_w(u16 data);
+	u16 spi_rxstatus_r();
 	void spi_rxstatus_w(u16 data);
 	u16 spi_rxdata_r();
 	u16 spi_misc_r();
@@ -140,12 +154,22 @@ private:
 	u16 adc_linein_bitctrl_r();
 	void adc_linein_bitctrl_w(u16 data);
 
+	u16 spi_direct_r(offs_t offset);
+
 	void update_interrupts();
+
+	void write_to_tx_fifo(u8 data);
+	void reset_spi_fifos();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_2hz_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_64hz_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_2khz_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_spi_tx);
+
+	u8 *m_spiregion;
+	u32 m_spisize;
 
 	u16 m_ioa_buffer;
 	u16 m_iob_buffer;
@@ -165,8 +189,19 @@ private:
 	u16 m_fiq_sel;
 	u16 m_fiq2_sel;
 	u16 m_spi2_ctrl;
+	u16 m_spi_ctrl;
+
+	u16 m_pwm0_ctrl;
+	u16 m_pwm1_ctrl;
+	u16 m_pwm2_ctrl;
+	u16 m_pwm3_ctrl;
 
 	u32 m_interrupt_status;
+
+	u8 m_spi_rx_fifo[8];
+	u8 m_spi_tx_fifo[8];
+	u8 m_rx_fifo_entries;
+	u8 m_tx_fifo_entries;
 
 	devcb_read16 m_porta_in;
 	devcb_read16 m_portb_in;
@@ -177,9 +212,11 @@ private:
 	devcb_write16 m_portc_out;
 
 	devcb_write8 m_spi2_out;
+	devcb_write8 m_spi_out;
+	devcb_write8 m_spi_reset;
 
 	required_device<dac_word_device_base> m_dac;
-	required_memory_bank m_bank;
+	required_device<timer_device> m_spi_tx_timer;
 };
 
 DECLARE_DEVICE_TYPE(GPCE4, generalplus_gpce4_soc_device)

@@ -113,6 +113,17 @@ Undumped carts:
 		</part>
 	</software>
 
+	<software name="poohit" cloneof="pooh" supported="no">
+		<description>Winnie the Pooh - Salta, Tigro, Salta! / Winnie the Pooh - l'orsetto goloso (Italy)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax / Handheld Games</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="telestorypoohit.bin" size="0x800000" crc="ca1cbad1" sha1="70541709d31897619760b577a1cfc29d936968b1"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cinder" supported="no">
 		<description>Cinderella - Cinderella / Beauties in Bloom (USA)</description>
 		<year>2006</year>
@@ -131,6 +142,17 @@ Undumped carts:
 		<part name="cart" interface="telestory_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="telestorylionking.bin" size="0x800000" crc="f8ea0ee9" sha1="f63d9637c3ae715e89760d8a39c828f73d26d397"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingit" cloneof="lionking" supported="no">
+		<description>Il Re Leone / Il Re Leone II - Il Regno Di Simba (Italy)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Toymax / Handheld Games</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="telestorylionkingit.bin" size="0x800000" crc="e9661239" sha1="e3337c9a4ba3a9baa9b175ba3503d867a5141a9e"/>
 			</dataarea>
 		</part>
 	</software>

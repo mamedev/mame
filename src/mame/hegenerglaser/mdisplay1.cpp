@@ -9,10 +9,10 @@ shift registers.
 *******************************************************************************/
 
 #include "emu.h"
-#include "mmdisplay1.h"
+#include "mdisplay1.h"
 
 
-DEFINE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODULE1, mephisto_display1_device, "mdisplay1", "Mephisto Display Module 1")
+DEFINE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODULE1, mephisto_display1_device, "mdisplay1", "Mephisto Display Modul")
 
 //-------------------------------------------------
 //  constructor

@@ -671,9 +671,9 @@ void gal3_state::gal3(machine_config &config)
 	m_c355spr[0]->set_external_prifill(true);
 
 	NAMCOS21_3D(config, m_namcos21_3d[0], 0);
-	m_namcos21_3d[0]->set_zz_shift_mult(11, 0x200);
-	m_namcos21_3d[0]->set_depth_reverse(false);
 	m_namcos21_3d[0]->set_framebuffer_size(496, 480);
+	m_namcos21_3d[0]->set_num_palettes(0x10);
+	m_namcos21_3d[0]->set_depth_reverse(false);
 
 	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67[0], 0);
 	m_namcos21_dsp_c67[0]->set_renderer_tag("namcos21_3d_1");
@@ -699,9 +699,9 @@ void gal3_state::gal3(machine_config &config)
 	m_c355spr[1]->set_external_prifill(true);
 
 	NAMCOS21_3D(config, m_namcos21_3d[1], 0);
-	m_namcos21_3d[1]->set_zz_shift_mult(11, 0x200);
-	m_namcos21_3d[1]->set_depth_reverse(false);
 	m_namcos21_3d[1]->set_framebuffer_size(496, 480);
+	m_namcos21_3d[1]->set_num_palettes(0x10);
+	m_namcos21_3d[1]->set_depth_reverse(false);
 
 	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67[1], 0);
 	m_namcos21_dsp_c67[1]->set_renderer_tag("namcos21_3d_2");

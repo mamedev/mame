@@ -315,7 +315,8 @@ void apple2_state::machine_start()
 	save_item(NAME(m_reset_latch));
 
 	// setup video pointers
-	m_video->set_ram_pointers(m_ram_ptr, m_ram_ptr);
+	m_video->set_ram_pointers(m_ram_ptr, nullptr);
+	m_video->set_ram_masks(m_ram_size-1, 0);
 	m_video->set_char_pointer(memregion("gfx1")->base(), memregion("gfx1")->bytes());
 }
 

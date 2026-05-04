@@ -18,6 +18,12 @@ public:
 	u8 status_r(offs_t offset);
 	void control_w(offs_t offset, u8 data);
 
+	auto caplock_callback() { return m_caplock_cb.bind(); }
+	auto kanalock_callback() { return m_kanalock_cb.bind(); }
+
+	DECLARE_INPUT_CHANGED_MEMBER(cap_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(kana_changed);
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -31,6 +37,8 @@ protected:
 
 private:
 	required_ioport m_key_mod;
+	devcb_write_line m_caplock_cb;
+	devcb_write_line m_kanalock_cb;
 
 	void scan_mode(u8 data);
 	u8 m_command;

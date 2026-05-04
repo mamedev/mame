@@ -6,10 +6,7 @@ Namco System 21 (later hardware with 5 TMS320C25 DSPs)
 
 TODO:
 - lamp/vibration outputs, from MCU? (particularly starblad);
-- verify DSP clocks, they should be 40MHz, currently underclocked on purpose on MAME, otherwise polygons
-  may disappear on some frames (try playing starblad until after the asteroids), tightening quantum by
-  a factor of 40/24 does not fix it (actually it also happens when underclocked, but less);
-- verify video timing, pixel clock is from 38.76922?;
+- verify video timing, it's assumed to be the same as namcos21 with a different XTAL;
 - mix_layer0_sprites can be improved when namcos21_3d_device removes the z-buffer, there are currently
   glitches in cybsled, eg. missile pickups behind pillars;
 - wrong global sprite layer offsets in service mode for all games except aircomb, it's fine in-game though;
@@ -17,10 +14,15 @@ TODO:
   and on pilot parachuting with a time over;
 - aircomb: missing background on attract mode ranking screen (masking? cfr. shared/namco_c355spr.cpp);
 - aircomb: bad sprite colors on debriefing medal screen;
+- aircomb: may show glitches when pressing start at the intro sequence, it forgot to turn off video_enable?
+  namcos21_dsp_c67_device::render_slave_output size mismatch also triggers here (not a regression);
+- aircomb: are the depthcue banks actually used? it looks fine with the depth cue embedded in palette;
+- solvalou: remove the ROM hack;
 - solvalou: service mode polygon test is crashy when testing invalid polygons (the good old IDC overflow);
 - solvalou: sprite blend is wrong during water stages (look at the blaster/score panel), the palette
   bank for the water is at 0x2200, but the blend palette is at 0x6000 instead of 0x6200?;
-- starblad: service mode has heavy sprite glitches if entered from live gameplay (verify)
+- starblad: service mode has heavy sprite glitches if entered from live gameplay (verify);
+- starblad: some models occasionally flicker (eg. large spaceships after asteroid field)
 
 BTANB:
 - aircomb: intro cockpit closure is one pixel off on left edge;
@@ -487,12 +489,12 @@ u32 namcos21_c67_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	{
 		case 0: // aircomb mission select & gameplay
 		case 2: // starblad/solvalou when going in service mode
-			m_namcos21_3d->copy_visible_poly_framebuffer(bitmap, cliprect, 0, 0x7ffe);
+			m_namcos21_3d->copy_visible_poly_framebuffer(bitmap, cliprect);
 			m_c355spr->draw(screen, bitmap, cliprect, 0);
 			break;
 		case 4: // default gameplay for all games, aircomb attract mode
 		default:
-			m_namcos21_3d->copy_visible_poly_framebuffer(bitmap, cliprect, 0, 0x7ffe);
+			m_namcos21_3d->copy_visible_poly_framebuffer(bitmap, cliprect);
 			mix_layer0_sprites(screen, bitmap, cliprect);
 			break;
 	}
@@ -550,6 +552,7 @@ void namcos21_c67_state::dpram_byte_w(offs_t offset, u8 data)
 
 void namcos21_c67_state::common_map(address_map &map)
 {
+	map(0x200000, 0x20ffff).rw(m_namcos21_dsp_c67, FUNC(namcos21_dsp_c67_device::dspram16_r), FUNC(namcos21_dsp_c67_device::dspram16_w));
 	map(0x280000, 0x280001).nopw(); // written once on startup
 	map(0x400000, 0x400001).w(m_namcos21_dsp_c67, FUNC(namcos21_dsp_c67_device::pointram_control_w));
 	map(0x440000, 0x440001).rw(m_namcos21_dsp_c67, FUNC(namcos21_dsp_c67_device::pointram_data_r), FUNC(namcos21_dsp_c67_device::pointram_data_w));
@@ -575,7 +578,6 @@ void namcos21_c67_state::master_map(address_map &map)
 	map(0x100000, 0x10ffff).ram(); // private work RAM
 	map(0x180000, 0x183fff).rw(FUNC(namcos21_c67_state::nvram_r), FUNC(namcos21_c67_state::nvram_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
-	map(0x200000, 0x20ffff).rw(m_namcos21_dsp_c67, FUNC(namcos21_dsp_c67_device::dspram16_r), FUNC(namcos21_dsp_c67_device::dspram16_w));
 }
 
 void namcos21_c67_state::slave_map(address_map &map)
@@ -584,7 +586,6 @@ void namcos21_c67_state::slave_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x13ffff).ram(); // private work RAM
 	map(0x1c0000, 0x1fffff).m(m_slave_intc, FUNC(namco_c148_device::map));
-	map(0x200000, 0x20ffff).rw(m_namcos21_dsp_c67, FUNC(namcos21_dsp_c67_device::dspram16_r), FUNC(namcos21_dsp_c67_device::dspram16_w));
 }
 
 /*************************************************************/
@@ -766,26 +767,15 @@ void namcos21_c67_state::sound_bankselect_w(u8 data)
 
 void namcos21_c67_state::sound_reset_w(u8 data)
 {
-	if (data & 0x01)
-	{
-		// Resume execution
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	}
-	else
-	{
-		// Suspend execution
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	}
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 
-	if (data & 0x04)
-	{
+	if (BIT(data, 2))
 		m_namcos21_dsp_c67->reset_kickstart();
-	}
 }
 
 void namcos21_c67_state::system_reset_w(u8 data)
 {
-	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	reset_all_subcpus(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void namcos21_c67_state::reset_all_subcpus(int state)
@@ -793,6 +783,9 @@ void namcos21_c67_state::reset_all_subcpus(int state)
 	m_slave->set_input_line(INPUT_LINE_RESET, state);
 	m_c68->ext_reset(state);
 	m_namcos21_dsp_c67->reset_dsps(state);
+
+	if (state)
+		m_slave_intc->reset();
 }
 
 void namcos21_c67_state::machine_reset()
@@ -840,7 +833,7 @@ void namcos21_c67_state::namcos21(machine_config &config)
 	MC6809E(config, m_audiocpu, 49.152_MHz_XTAL / 24); // Sound
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos21_c67_state::sound_map);
 
-	NAMCOC68(config, m_c68, 8000000);
+	NAMCOC68(config, m_c68, 49.152_MHz_XTAL / 6);
 	m_c68->in_pb_callback().set_ioport("MCUB");
 	m_c68->in_pc_callback().set_ioport("MCUC");
 	m_c68->in_ph_callback().set_ioport("MCUH");
@@ -863,21 +856,20 @@ void namcos21_c67_state::namcos21(machine_config &config)
 	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67, 0);
 	m_namcos21_dsp_c67->set_renderer_tag("namcos21_3d");
 
-	config.set_maximum_quantum(attotime::from_hz(12000));
+	config.set_maximum_quantum(attotime::from_hz(60000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
-	m_screen->set_raw(49.152_MHz_XTAL / 4 * 2, 768, 0, 496, 264*2, 0, 480);
+	m_screen->set_raw(38.76922_MHz_XTAL / 4 * 2, 616, 0, 496, 262 + 263, 0, 480); // x2 is for interlace
 	m_screen->set_screen_update(FUNC(namcos21_c67_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	NAMCOS21_3D(config, m_namcos21_3d, 0);
-	m_namcos21_3d->set_zz_shift_mult(11, 0x200);
-	m_namcos21_3d->set_depth_reverse(false);
 	m_namcos21_3d->set_framebuffer_size(496, 480);
+	m_namcos21_3d->set_num_palettes(0x10);
+	m_namcos21_3d->set_depth_reverse(false);
 
 	NAMCO_C148(config, m_master_intc, 0, m_maincpu, true);
 	m_master_intc->link_c148_device(m_slave_intc);
@@ -947,8 +939,7 @@ void namcos21_c67_state::solvalou(machine_config &config)
 	namcos21(config);
 	m_namcos21_dsp_c67->set_gametype(namcos21_dsp_c67_device::NAMCOS21_SOLVALOU);
 
-	m_namcos21_3d->set_fixed_palbase(0x3f00);
-	m_namcos21_3d->set_zz_shift_mult(10, 0x100);
+	m_namcos21_3d->set_num_palettes(0x20);
 }
 
 

@@ -39,6 +39,7 @@ public:
 
 	template <typename T> void link_c148_device(T &&tag) { m_linked_c148.set_tag(std::forward<T>(tag)); }
 
+	auto in_ext_callback() { return m_in_ext_cb.bind(); }
 	auto out_ext1_callback() { return m_out_ext1_cb.bind(); }
 	auto out_ext2_callback() { return m_out_ext2_cb.bind(); }
 
@@ -55,6 +56,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
+	devcb_read8 m_in_ext_cb;
 	devcb_write8 m_out_ext1_cb;
 	devcb_write8 m_out_ext2_cb;
 

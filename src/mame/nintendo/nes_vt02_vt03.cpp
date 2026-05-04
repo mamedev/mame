@@ -1292,6 +1292,11 @@ ROM_START( joysti30 )
 	ROM_LOAD( "joystick30.bin", 0x00000, 0x400000, CRC(b3f089af) SHA1(478d53d38eeffdbc4a1271d0e060aeb29e919502) )
 ROM_END
 
+ROM_START( silvlt50 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "silverlit50.u2", 0x00000, 0x400000, CRC(941a3611) SHA1(a9489f0c1dcda55ef106ab213f7bfcf34fe42a41) )
+ROM_END
+
 ROM_START( lxnoddy )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	// PCB had a ROM twice this capacity, but lower half didn't give consistent reads, and upper address line was tied to VCC, making lower half inaccessible anyway
@@ -1571,6 +1576,7 @@ CONS( 2004, polmega,   0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_
 CONS( 200?, dgun851,   0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "dreamGEAR / JungleTac", "Plug 'N' Play 30-in-1 (DGUN-851)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, dgun853,   0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "dreamGEAR / JungleTac", "Plug 'N' Play 50-in-1 (DGUN-853)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, silv35,    0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "SilverLit / JungleTac", "35 in 1 Super Twins", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, silvlt50,  0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "SilverLit / JungleTac", "50 in 1 Arcade Joystick", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) 
 CONS( 2004, vsmaxxvd,  0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx Video Extreme 50-in-1 (with Speed Racer and Snood)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, vsmaxx77,  0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx Wireless 77-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, joysti30,  0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "WinFun / JungleTac",    "Joystick 30", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // doesn't show WinFun onscreen, but packaging does

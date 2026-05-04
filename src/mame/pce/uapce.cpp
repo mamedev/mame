@@ -113,10 +113,7 @@ Alien Crush & Pac_Land: dumps made from PC-Engine dumps of JP versions
 #include "emu.h"
 #include "pcecommn.h"
 
-#include "cpu/h6280/h6280.h"
 #include "cpu/z80/z80.h"
-#include "video/huc6260.h"
-#include "video/huc6270.h"
 #include "sound/discrete.h"
 
 #include "screen.h"

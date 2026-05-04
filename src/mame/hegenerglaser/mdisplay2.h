@@ -6,8 +6,8 @@
 
 *******************************************************************************/
 
-#ifndef MAME_HEGENERGLASER_MMDISPLAY2_H
-#define MAME_HEGENERGLASER_MMDISPLAY2_H
+#ifndef MAME_HEGENERGLASER_MDISPLAY2_H
+#define MAME_HEGENERGLASER_MDISPLAY2_H
 
 #pragma once
 
@@ -49,4 +49,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODULE2, mephisto_display2_device)
 
-#endif // MAME_HEGENERGLASER_MMDISPLAY2_H
+#endif // MAME_HEGENERGLASER_MDISPLAY2_H

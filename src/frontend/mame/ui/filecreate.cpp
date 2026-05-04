@@ -55,8 +55,8 @@ CONFIRM SAVE AS MENU
 //  ctor
 //-------------------------------------------------
 
-menu_confirm_save_as::menu_confirm_save_as(mame_ui_manager &mui, render_container &container, bool &yes)
-	: menu(mui, container)
+menu_confirm_save_as::menu_confirm_save_as(mame_ui_manager &mui, render_target &target, bool &yes)
+	: menu(mui, target)
 	, m_yes(yes)
 {
 	m_yes = false;
@@ -113,8 +113,8 @@ FILE CREATE MENU
 //  ctor
 //-------------------------------------------------
 
-menu_file_create::menu_file_create(mame_ui_manager &mui, render_container &container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool &ok)
-	: menu(mui, container)
+menu_file_create::menu_file_create(mame_ui_manager &mui, render_target &target, device_image_interface *image, std::string &current_directory, std::string &current_file, bool &ok)
+	: menu(mui, target)
 	, m_ok(ok)
 	, m_current_directory(current_directory)
 	, m_current_file(current_file)
@@ -280,8 +280,8 @@ SELECT FORMAT MENU
 //  ctor
 //-------------------------------------------------
 
-menu_select_format::menu_select_format(mame_ui_manager &mui, render_container &container, const std::vector<const floppy_image_format_t *> &formats, int ext_match, const floppy_image_format_t **result)
-	: menu(mui, container)
+menu_select_format::menu_select_format(mame_ui_manager &mui, render_target &target, const std::vector<const floppy_image_format_t *> &formats, int ext_match, const floppy_image_format_t **result)
+	: menu(mui, target)
 {
 	m_formats = formats;
 	m_ext_match = ext_match;
@@ -341,10 +341,10 @@ SELECT FORMAT MENU
 //  ctor
 //-------------------------------------------------
 
-menu_select_floppy_init::menu_select_floppy_init(mame_ui_manager &mui, render_container &container, std::vector<std::reference_wrapper<const floppy_image_device::fs_info>> &&fs, int *result)
-	: menu(mui, container),
-	  m_fs(std::move(fs)),
-	  m_result(result)
+menu_select_floppy_init::menu_select_floppy_init(mame_ui_manager &mui, render_target &target, std::vector<std::reference_wrapper<const floppy_image_device::fs_info>> &&fs, int *result)
+	: menu(mui, target)
+	, m_fs(std::move(fs))
+	, m_result(result)
 
 {
 }

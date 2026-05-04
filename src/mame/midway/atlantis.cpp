@@ -833,6 +833,7 @@ void atlantis_state::mwskins(machine_config &config)
 	m_zeus->irq_callback().set(FUNC(atlantis_state::zeus_irq));
 	m_zeus->vblank_callback().set(FUNC(atlantis_state::vblank_irq));
 	m_zeus->set_screen(m_screen);
+	m_zeus->set_system_type(zeus2_device::MWSKINS);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(ZEUS2_VIDEO_CLOCK / 8, 529, 0, 400, 278, 0, 256);

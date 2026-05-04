@@ -2306,7 +2306,7 @@ void segas1x_bootleg_state::goldnaxeb2(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::goldnaxeb2_map);
-	m_maincpu->set_addrmap(AS_OPCODES, address_map_constructor());
+	m_maincpu->remove_addrmap(AS_OPCODES);
 
 	m_palette->set_entries(0x2000*SHADOW_COLORS_MULTIPLIER);
 
@@ -2328,7 +2328,7 @@ void segas1x_bootleg_state::bayrouteb2(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::bayrouteb2_map);
-	m_maincpu->set_addrmap(AS_OPCODES, address_map_constructor());
+	m_maincpu->remove_addrmap(AS_OPCODES);
 
 	datsu_ym2151_msm5205(config);
 

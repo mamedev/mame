@@ -32,8 +32,10 @@ generalplus_gpce4_soc_device::generalplus_gpce4_soc_device(const machine_config 
 	, m_portb_out(*this)
 	, m_portc_out(*this)
 	, m_spi2_out(*this)
+	, m_spi_out(*this)
+	, m_spi_reset(*this)
 	, m_dac(*this, "dac")
-	, m_bank(*this, "spibank")
+	, m_spi_tx_timer(*this, "timer_spi_tx")
 {
 }
 
@@ -59,11 +61,42 @@ void generalplus_gpce4_soc_device::device_start()
 	save_item(NAME(m_fiq_sel));
 	save_item(NAME(m_fiq2_sel));
 	save_item(NAME(m_spi2_ctrl));
+	save_item(NAME(m_spi_ctrl));
+
+	save_item(NAME(m_spi_rx_fifo));
+	save_item(NAME(m_spi_tx_fifo));
+	save_item(NAME(m_rx_fifo_entries));
+	save_item(NAME(m_tx_fifo_entries));
+
+	save_item(NAME(m_pwm0_ctrl));
+	save_item(NAME(m_pwm1_ctrl));
+	save_item(NAME(m_pwm2_ctrl));
+	save_item(NAME(m_pwm3_ctrl));
 
 	set_vectorbase(0x4010);
 
-	m_bank->configure_entries(0, memregion("spi")->bytes() / 0x400000, memregion("spi")->base(), 0x400000);
-	m_bank->set_entry(0);
+	m_spiregion = 0;
+	m_spisize = 0;
+}
+
+u8 *generalplus_gpce4_soc_device::get_spi_romregion()
+{
+	return m_spiregion;
+}
+
+
+
+void generalplus_gpce4_soc_device::reset_spi_fifos()
+{
+	for (int i = 0; i < 8; i++)
+	{
+		m_spi_rx_fifo[i] = 0;
+		m_spi_tx_fifo[i] = 0;
+	}
+	m_rx_fifo_entries = 0;
+	m_tx_fifo_entries = 0;
+	m_spi_tx_timer->adjust(attotime::never);
+	m_spi_reset(1);
 }
 
 void generalplus_gpce4_soc_device::device_reset()
@@ -88,6 +121,15 @@ void generalplus_gpce4_soc_device::device_reset()
 	m_fiq_sel = 0;
 	m_fiq2_sel = 0;
 	m_spi2_ctrl = 0;
+
+	m_spi_ctrl = 0;
+
+	m_pwm0_ctrl = 0;
+	m_pwm1_ctrl = 0;
+	m_pwm2_ctrl = 0;
+	m_pwm3_ctrl = 0;
+
+	reset_spi_fifos();
 }
 
 void generalplus_gpce4_soc_device::device_add_mconfig(machine_config &config)
@@ -96,6 +138,9 @@ void generalplus_gpce4_soc_device::device_add_mconfig(machine_config &config)
 	TIMER(config, "timer_a").configure_periodic(FUNC(generalplus_gpce4_soc_device::timer_a_cb), attotime::from_hz(20000)); // audio
 	TIMER(config, "timer_2hz").configure_periodic(FUNC(generalplus_gpce4_soc_device::timer_2hz_cb), attotime::from_hz(2));
 	TIMER(config, "timer_64hz").configure_periodic(FUNC(generalplus_gpce4_soc_device::timer_64hz_cb), attotime::from_hz(64));
+	TIMER(config, "timer_2khz").configure_periodic(FUNC(generalplus_gpce4_soc_device::timer_2khz_cb), attotime::from_hz(2000));
+
+	TIMER(config, "timer_spi_tx").configure_generic(FUNC(generalplus_gpce4_soc_device::timer_spi_tx));
 
 	SPEAKER(config, "speaker").front_center();
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
@@ -134,10 +179,10 @@ void generalplus_gpce4_soc_device::internal_map(address_map &map)
 	map(0x003015, 0x003015).w(FUNC(generalplus_gpce4_soc_device::timerc_counter_w)); // TimerC_CNTR
 	map(0x003016, 0x003016).rw(FUNC(generalplus_gpce4_soc_device::timer_ctrl_r), FUNC(generalplus_gpce4_soc_device::timer_ctrl_w)); // Timer_Ctrl
 
-	map(0x003020, 0x003020).w(FUNC(generalplus_gpce4_soc_device::pwm0_ctrl_w)); // PWM0_Ctrl
-	map(0x003021, 0x003021).w(FUNC(generalplus_gpce4_soc_device::pwm1_ctrl_w)); // PWM1_Ctrl
-	map(0x003022, 0x003022).w(FUNC(generalplus_gpce4_soc_device::pwm2_ctrl_w)); // PWM2_Ctrl
-	map(0x003023, 0x003023).w(FUNC(generalplus_gpce4_soc_device::pwm3_ctrl_w)); // PWM3_Ctrl
+	map(0x003020, 0x003020).rw(FUNC(generalplus_gpce4_soc_device::pwm0_ctrl_r), FUNC(generalplus_gpce4_soc_device::pwm0_ctrl_w)); // PWM0_Ctrl
+	map(0x003021, 0x003021).rw(FUNC(generalplus_gpce4_soc_device::pwm1_ctrl_r), FUNC(generalplus_gpce4_soc_device::pwm1_ctrl_w)); // PWM1_Ctrl
+	map(0x003022, 0x003022).rw(FUNC(generalplus_gpce4_soc_device::pwm2_ctrl_r), FUNC(generalplus_gpce4_soc_device::pwm2_ctrl_w)); // PWM2_Ctrl
+	map(0x003023, 0x003023).rw(FUNC(generalplus_gpce4_soc_device::pwm3_ctrl_r), FUNC(generalplus_gpce4_soc_device::pwm3_ctrl_w)); // PWM3_Ctrl
 
 	map(0x003030, 0x003030).w(FUNC(generalplus_gpce4_soc_device::system_clock_w)); // System_Clock
 	// 3031 - System_Reset
@@ -173,7 +218,7 @@ void generalplus_gpce4_soc_device::internal_map(address_map &map)
 	map(0x003091, 0x003091).rw(FUNC(generalplus_gpce4_soc_device::spi2_txstatus_r), FUNC(generalplus_gpce4_soc_device::spi2_txstatus_w)); // SPI2_TXStatus
 	map(0x003092, 0x003092).w(FUNC(generalplus_gpce4_soc_device::spi2_txdata_w)); // SPI2_TXData
 	map(0x003093, 0x003093).rw(FUNC(generalplus_gpce4_soc_device::spi2_rxstatus_r), FUNC(generalplus_gpce4_soc_device::spi2_rxstatus_w)); // SPI2_RXStatus
-	map(0x003094, 0x003094).r(FUNC(generalplus_gpce4_soc_device::spi2_rxdata_r)); // SPI2_RXData 
+	map(0x003094, 0x003094).r(FUNC(generalplus_gpce4_soc_device::spi2_rxdata_r)); // SPI2_RXData
 	map(0x003095, 0x003095).rw(FUNC(generalplus_gpce4_soc_device::spi2_misc_r), FUNC(generalplus_gpce4_soc_device::spi2_misc_w)); // SPI2_Misc
 
 	// 309a - SPI2_DMA_Start
@@ -200,10 +245,10 @@ void generalplus_gpce4_soc_device::internal_map(address_map &map)
 	map(0x0030e0, 0x0030e0).rw(FUNC(generalplus_gpce4_soc_device::spi_ctrl_r), FUNC(generalplus_gpce4_soc_device::spi_ctrl_w)); // SPI_Ctrl
 	map(0x0030e1, 0x0030e1).w(FUNC(generalplus_gpce4_soc_device::spi_txstatus_w)); // SPI_TXStatus
 	map(0x0030e2, 0x0030e2).w(FUNC(generalplus_gpce4_soc_device::spi_txdata_w)); // SPI_TXData
-	map(0x0030e3, 0x0030e3).w(FUNC(generalplus_gpce4_soc_device::spi_rxstatus_w)); // SPI_RXStatus
+	map(0x0030e3, 0x0030e3).rw(FUNC(generalplus_gpce4_soc_device::spi_rxstatus_r), FUNC(generalplus_gpce4_soc_device::spi_rxstatus_w)); // SPI_RXStatus
 	map(0x0030e4, 0x0030e4).r(FUNC(generalplus_gpce4_soc_device::spi_rxdata_r)); // SPI_RXData
 	map(0x0030e5, 0x0030e5).rw(FUNC(generalplus_gpce4_soc_device::spi_misc_r), FUNC(generalplus_gpce4_soc_device::spi_misc_w)); // SPI_Misc
-	// 30e6 - SPI_Man_Ctrl
+	map(0x0030e6, 0x0030e6).rw(FUNC(generalplus_gpce4_soc_device::spi_man_ctrl_r), FUNC(generalplus_gpce4_soc_device::spi_man_ctrl_w)); // 30e6 - SPI_Man_Ctrl
 	map(0x0030e7, 0x0030e7).rw(FUNC(generalplus_gpce4_soc_device::spi_auto_ctrl_r), FUNC(generalplus_gpce4_soc_device::spi_auto_ctrl_w)); //  SPI_Auto_Ctrl
 	// 30e8 - SPI_PRGM_BC
 	map(0x0030e9, 0x0030e9).rw(FUNC(generalplus_gpce4_soc_device::spi_bank_r), FUNC(generalplus_gpce4_soc_device::spi_bank_w)); // SPI_BANK
@@ -217,7 +262,7 @@ void generalplus_gpce4_soc_device::internal_map(address_map &map)
 	map(0x004000, 0x00bfff).rom().region("internal", 0x0000); // 0x4000-0x400f are 'test' vectors, 0x4010 - 0x401f are user vectors, 0x4020 - 0x47ff is 'standard test program' 0x4800+ is custom internal ROM
 	map(0x00c000, 0x00ffff).rom().region("internal", 0x0000);
 
-	map(0x200000, 0x3fffff).bankr("spibank"); // has direct access to SPI ROM
+	map(0x200000, 0x3fffff).r(FUNC(generalplus_gpce4_soc_device::spi_direct_r)); // has direct access to SPI ROM
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpce4_soc_device::timer_c_cb )
@@ -240,11 +285,16 @@ TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpce4_soc_device::timer_64hz_cb )
 	request_interrupt(2);
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpce4_soc_device::timer_2khz_cb )
+{
+	request_interrupt(9);
+}
+
 // IOA
 
 u16 generalplus_gpce4_soc_device::ioa_data_r()
 {
-	LOGMASKED(LOG_IO, "%s: m_porta_in\n", machine().describe_context());
+	LOGMASKED(LOG_IO, "%s: ioa_data_r\n", machine().describe_context());
 	return m_porta_in();
 }
 
@@ -451,6 +501,30 @@ void generalplus_gpce4_soc_device::timerc_counter_w(u16 data)
 
 // PWM
 
+u16 generalplus_gpce4_soc_device::pwm0_ctrl_r()
+{
+	LOGMASKED(LOG_TIMERS, "%s: pwm0_ctrl_r\n", machine().describe_context());
+	return m_pwm0_ctrl;
+}
+
+u16 generalplus_gpce4_soc_device::pwm1_ctrl_r()
+{
+	LOGMASKED(LOG_TIMERS, "%s: pwm1_ctrl_r\n", machine().describe_context());
+	return m_pwm1_ctrl;
+}
+
+u16 generalplus_gpce4_soc_device::pwm2_ctrl_r()
+{
+	LOGMASKED(LOG_TIMERS, "%s: pwm2_ctrl_r\n", machine().describe_context());
+	return m_pwm2_ctrl;
+}
+
+u16 generalplus_gpce4_soc_device::pwm3_ctrl_r()
+{
+	LOGMASKED(LOG_TIMERS, "%s: pwm3_ctrl_r\n", machine().describe_context());
+	return m_pwm3_ctrl;
+}
+
 void generalplus_gpce4_soc_device::pwm0_ctrl_w(u16 data)
 {
 	LOGMASKED(LOG_PWM, "%s: pwm0_ctrl_w %04x\n", machine().describe_context(), data);
@@ -510,7 +584,7 @@ void generalplus_gpce4_soc_device::wait_ctrl_w(u16 data)
 //  6  ---
 //  5  ---
 //  4  ---
-// 
+//
 //  3  ---
 //  2  ---
 //  1  Cache_Clr
@@ -591,11 +665,11 @@ void generalplus_gpce4_soc_device::interrupt2_status_w(u16 data)
 {
 	LOGMASKED(LOG_IRQ, "%s: interrupt2_status_w %04x\n", machine().describe_context(), data);
 
-	if (data & 0x0004)
-		clear_interrupt(2);
-
-	if (data & 0x0001)
-		clear_interrupt(0);
+	for (int i = 0; i < 16; i++)
+	{
+		if (data & (1 << i))
+			clear_interrupt(i);
+	}
 }
 
 u16 generalplus_gpce4_soc_device::interrupt2_ctrl_r()
@@ -631,12 +705,17 @@ void generalplus_gpce4_soc_device::interrupt2_ctrl_w(u16 data)
 u16 generalplus_gpce4_soc_device::spi_ctrl_r()
 {
 	LOGMASKED(LOG_SPI1, "%s: spi_ctrl_r\n", machine().describe_context());
-	return machine().rand();
+	return m_spi_ctrl &~ 0x0800;
 }
 
 void generalplus_gpce4_soc_device::spi_ctrl_w(u16 data)
 {
 	LOGMASKED(LOG_SPI1, "%s: spi_ctrl_w %04x\n", machine().describe_context(), data);
+	m_spi_ctrl = data;
+
+	if (data & 0x0800)
+		reset_spi_fifos();
+
 }
 
 void generalplus_gpce4_soc_device::spi_misc_w(u16 data)
@@ -649,9 +728,76 @@ void generalplus_gpce4_soc_device::spi_txstatus_w(u16 data)
 	LOGMASKED(LOG_SPI1, "%s: spi_txstatus_w %04x\n", machine().describe_context(), data);
 }
 
+
+TIMER_DEVICE_CALLBACK_MEMBER(generalplus_gpce4_soc_device::timer_spi_tx)
+{
+	// will only be called if something is in the tx FIFO
+
+	u8 ret = m_spi_tx_fifo[0];
+
+	for (int i = 1; i < 8; i++)
+	{
+		m_spi_tx_fifo[i - 1] = m_spi_tx_fifo[i];
+	}
+	m_spi_tx_fifo[7] = 0;
+
+	// only 8-bits are written to FIFO
+	// the SoC turns this into actual SPI signals
+	m_spi_out(ret);
+
+	m_tx_fifo_entries--;
+
+	if (m_tx_fifo_entries == 0)
+	{
+		m_spi_tx_timer->enable(false);
+		m_spi_tx_timer->adjust(attotime::never);
+	}
+}
+
+void generalplus_gpce4_soc_device::recieve_spi_fifo_data(u8 data)
+{
+	if (m_rx_fifo_entries < 8)
+	{
+		m_spi_rx_fifo[m_rx_fifo_entries] = data;
+		m_rx_fifo_entries++;
+	}
+	else
+	{
+		fatalerror("RX FIFO OVERFLOW\n");
+	}
+}
+
+void generalplus_gpce4_soc_device::write_to_tx_fifo(u8 data)
+{
+	if (m_tx_fifo_entries == 0)
+	{
+		m_spi_tx_timer->enable(true);
+		m_spi_tx_timer->adjust(attotime::zero, 0, attotime::from_hz(48'000'000));
+	}
+
+	if (m_tx_fifo_entries < 8)
+	{
+		m_spi_tx_fifo[m_tx_fifo_entries] = data;
+		m_tx_fifo_entries++;
+	}
+	else
+	{
+		fatalerror("TX FIFO OVERFLOW\n");
+	}
+}
+
+
+
 void generalplus_gpce4_soc_device::spi_txdata_w(u16 data)
 {
 	LOGMASKED(LOG_SPI1, "%s: spi_txdata_w %04x\n", machine().describe_context(), data);
+	write_to_tx_fifo(data);
+}
+
+u16 generalplus_gpce4_soc_device::spi_rxstatus_r()
+{
+	LOGMASKED(LOG_SPI2, "%s: spi_rxstatus_r\n", machine().describe_context());
+	return 0x8000;
 }
 
 void generalplus_gpce4_soc_device::spi_rxstatus_w(u16 data)
@@ -662,14 +808,60 @@ void generalplus_gpce4_soc_device::spi_rxstatus_w(u16 data)
 u16 generalplus_gpce4_soc_device::spi_rxdata_r()
 {
 	LOGMASKED(LOG_SPI1, "%s: spi_rxdata_r\n", machine().describe_context());
-	return machine().rand() & 0x01;
+
+	if (m_rx_fifo_entries == 0)
+	{
+		printf("rx underflow!\n");
+		return 0;
+	}
+
+	u8 ret = m_spi_rx_fifo[0];
+
+	for (int i = 1; i < 8; i++)
+	{
+		m_spi_rx_fifo[i - 1] = m_spi_rx_fifo[i];
+	}
+	m_spi_rx_fifo[7] = 0;
+	m_rx_fifo_entries--;
+
+	return ret;
 }
+
+u16 generalplus_gpce4_soc_device::spi_man_ctrl_r()
+{
+	LOGMASKED(LOG_SPI1, "%s: spi_man_ctrl_r\n", machine().describe_context());
+	return 0x0000;
+}
+
+void generalplus_gpce4_soc_device::spi_man_ctrl_w(u16 data)
+{
+	LOGMASKED(LOG_SPI1, "%s: spi_man_ctrl_r %04x\n", machine().describe_context(), data);
+}
+
 
 u16 generalplus_gpce4_soc_device::spi_misc_r()
 {
 	LOGMASKED(LOG_SPI1, "%s: spi_misc_r\n", machine().describe_context());
-	return 0x0000;
+	return 0x0004;
 }
+
+// SPI_Auto_CTRL
+// 15  ADDR_LEN
+// 14  ADDR_1BIT
+// 13  AUTO_PRGM
+// 12  AUTO_ENHM
+// 11  AUTO_DUMMY_CYCLE[3]
+// 10  AUTO_DUMMY_CYCLE[2]
+//  9  AUTO_DUMMY_CYCLE[1]
+//  8  AUTO_DUMMY_CYCLE[0]
+//  7  AUTO_CMD[7]
+//  6  AUTO_CMD[6]
+//  5  AUTO_CMD[5]
+//  4  AUTO_CMD[4]
+//  3  AUTO_CMD[3]
+//  2  AUTO_CMD[2]
+//  1  AUTO_CMD[1]
+//  0  AUTO_CMD[0]
 
 u16 generalplus_gpce4_soc_device::spi_auto_ctrl_r()
 {
@@ -683,6 +875,22 @@ void generalplus_gpce4_soc_device::spi_auto_ctrl_w(u16 data)
 	m_spi_auto_ctrl = data;
 }
 
+u16 generalplus_gpce4_soc_device::spi_direct_r(offs_t offset)
+{
+	// The GPCE4 chips can see a bank of SPI memory as a flat space
+	// as log as SPI_Auto_CTRL has been set to 'READ4' mode prior to
+	// accessing it (signals are converted to random access SPI on the
+	// fly)
+	//
+	// Emulating it this way is impractical for emulation (DASM wouldn't
+	// work) so we just present it as a flat space directly.
+	if (!m_spiregion)
+		return 0x0000;
+
+	u16 ret = (m_spiregion[((offset * 2) + 0) + (m_spi_bank * 0x400000)]) | (m_spiregion[((offset * 2) + 1) + (m_spi_bank * 0x400000)] << 8);
+	return ret;
+}
+
 u16 generalplus_gpce4_soc_device::spi_bank_r()
 {
 	LOGMASKED(LOG_SPI1, "%s: spi_bank_r\n", machine().describe_context());
@@ -693,7 +901,6 @@ void generalplus_gpce4_soc_device::spi_bank_w(u16 data)
 {
 	LOGMASKED(LOG_SPI1, "%s: spi_bank_w %04x\n", machine().describe_context(), data);
 	m_spi_bank = data;
-	m_bank->set_entry(data & 0xf);
 }
 
 void generalplus_gpce4_soc_device::update_interrupts()
@@ -723,6 +930,15 @@ void generalplus_gpce4_soc_device::update_interrupts()
 	else
 	{
 		set_input_line(UNSP_IRQ3_LINE, CLEAR_LINE);
+	}
+
+	if ((m_interrupt_status & 0x0000'0200) && (m_interrupt2_ctrl & 0x0200))
+	{
+		set_input_line(UNSP_IRQ6_LINE, ASSERT_LINE);
+	}
+	else
+	{
+		set_input_line(UNSP_IRQ6_LINE, CLEAR_LINE);
 	}
 
 	if ((m_interrupt_status & 0x0000'0001) && (m_interrupt2_ctrl & 0x0001))
@@ -766,14 +982,12 @@ u16 generalplus_gpce4_soc_device::interrupt_status_r()
 
 void generalplus_gpce4_soc_device::interrupt_status_w(u16 data)
 {
-	if (data & 0x8000)
-		clear_interrupt(31);
-
-	if (data & 0x2000)
-		clear_interrupt(29);
-
-	if (data & 0x0100)
-		clear_interrupt(24);
+	LOGMASKED(LOG_IRQ, "%s: interrupt_status_w %04x\n", machine().describe_context(), data);
+	for (int i = 0; i < 16; i++)
+	{
+		if (data & (1 << i))
+			clear_interrupt(i + 16);
+	}
 }
 
 u16 generalplus_gpce4_soc_device::fiq_sel_r()
@@ -811,12 +1025,12 @@ void generalplus_gpce4_soc_device::fiq2_sel_w(u16 data)
 // 10  ---
 //  9  ---
 //  8  MOD
-// 
+//
 //  7  ---
 //  6  ---
 //  5  SCKPHA
 //  4  SCKPOL
-// 
+//
 //  3  ---
 //  2  SCKSEL[2]
 //  1  SCKSEL[1]
@@ -856,12 +1070,12 @@ void generalplus_gpce4_soc_device::spi2_rxstatus_w(u16 data)
 // 10  --
 //  9  --
 //  8  --
-// 
+//
 //  7  TXFLEV[3]
 //  6  TXFLEV[2]
 //  5  TXFLEV[1]
 //  4  TXFLEX[0]
-// 
+//
 //  3  TXFFLAG[3]
 //  2  TXFFLAG[2]
 //  1  TXFFLAG[1]
@@ -892,22 +1106,22 @@ u16 generalplus_gpce4_soc_device::spi2_rxdata_r()
 }
 
 // P_SPI2_MISC
-// 
+//
 // 15  ---
 // 14  ---
 // 13  ---
 // 12  ---
-// 
+//
 // 11  ---
 // 10  ---
 //  9  OVER
 //  8  SMART
-// 
+//
 //  7  ---
 //  6  ---
 //  5  ---
 //  4  BSY
-// 
+//
 //  3  RFF
 //  2  RNE
 //  1  TNF
@@ -955,7 +1169,7 @@ void generalplus_gpce4_soc_device::adc_ctrl_w(u16 data)
 u16 generalplus_gpce4_soc_device::adc_data_r()
 {
 	LOGMASKED(LOG_ADC, "%s: adc_data_r\n", machine().describe_context());
-	return 0x0000;
+	return 0xffff;// 0000;
 }
 
 void generalplus_gpce4_soc_device::adc_data_w(u16 data)

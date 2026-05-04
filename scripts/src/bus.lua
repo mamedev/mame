@@ -4115,8 +4115,6 @@ if BUSES["NUBUS"] then
 		MAME_DIR .. "src/devices/bus/nubus/pds30_cb264.h",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_procolor816.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_procolor816.h",
-		MAME_DIR .. "src/devices/bus/nubus/pds30_sigmalview.cpp",
-		MAME_DIR .. "src/devices/bus/nubus/pds30_sigmalview.h",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_30hr.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_30hr.h",
 		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/cards.cpp",
@@ -4992,6 +4990,8 @@ if BUSES["SAITEK_OSA"] then
 	files {
 		MAME_DIR .. "src/devices/bus/saitek_osa/expansion.cpp",
 		MAME_DIR .. "src/devices/bus/saitek_osa/expansion.h",
+		MAME_DIR .. "src/devices/bus/saitek_osa/bruteforce.cpp",
+		MAME_DIR .. "src/devices/bus/saitek_osa/bruteforce.h",
 		MAME_DIR .. "src/devices/bus/saitek_osa/maestro.cpp",
 		MAME_DIR .. "src/devices/bus/saitek_osa/maestro.h",
 		MAME_DIR .. "src/devices/bus/saitek_osa/maestroa.cpp",

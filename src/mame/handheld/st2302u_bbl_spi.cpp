@@ -25,12 +25,11 @@
    supreme 0x243e
 */
 
-// TODO: convert to use generic_spi_flash.cpp (but there seems to be some buffering of writes / reads?)
-
 #include "emu.h"
 
 #include "cpu/m6502/st2205u.h"
 #include "machine/bl_handhelds_menucontrol.h"
+#include "machine/generic_spi_flash.h"
 #include "video/st7735_lcdc.h"
 
 #include "screen.h"
@@ -51,18 +50,20 @@ public:
 		m_io_p1(*this, "IN0"),
 		m_io_p2(*this, "IN1"),
 		m_menucontrol(*this, "menucontrol"),
-		m_lcdc(*this, "lcdc")
+		m_lcdc(*this, "lcdc"),
+		m_genspi(*this, "spi")
 	{ }
 
-	void bbl380(machine_config &config);
-	void bbl380_menuprot(machine_config &config);
-	void bbl380_24mhz(machine_config &config);
+	void bbl380(machine_config &config) ATTR_COLD;
+	void bbl380_menuprot(machine_config &config) ATTR_COLD;
+	void bbl380_24mhz(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void bbl380_do_maincpu_config();
+private:
+	void bbl380_do_maincpu_config() ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -76,37 +77,34 @@ private:
 
 	u8 m_output2val;
 
-	enum spistate : u8
-	{
-		SPI_STATE_READY = 0,
-		SPI_STATE_WAITING_HIGH_ADDR = 1,
-		SPI_STATE_WAITING_MID_ADDR = 2,
-		SPI_STATE_WAITING_LOW_ADDR = 3,
-		SPI_STATE_WAITING_DUMMY1_ADDR = 4,
-		SPI_STATE_WAITING_DUMMY2_ADDR = 5,
-		SPI_STATE_READING = 6,
-	};
+	void spi10_w(u8 data);
+	void spi11_w(u8 data);
+	u8 spi10_r();
+	u8 spi11_r();
 
-	u8 m_spistate;
-	u32 m_spiaddress;
-	u8 m_delay;
+	u8 m_spi10;
+	u8 m_spi11;
 
-	void spi_w(u8 data);
-	u8 spi_r();
+	u8 m_spi10out;
+	u8 m_spi11out;
+
+	u8 m_spi10out_has_data;
 
 	required_region_ptr<u8> m_spirom;
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
 	required_device<bl_handhelds_menucontrol_device> m_menucontrol;
 	required_device<st7735_lcdc_device> m_lcdc;
+	required_device<generic_spi_flash_device> m_genspi;
 
-	u8 ff_r() { return 0xff; }
+	u8 ff_r() { logerror("%s reading from 0x14\n", machine().describe_context());  return 0xff; }
 };
 
 
 void bbl380_state::output_w(u8 data)
 {
-	m_spistate = SPI_STATE_READY;
+	// probably unrelated as toumapet does it mid-read and then sends invalid commands
+	m_genspi->reset();
 }
 
 void bbl380_state::output2_w(u8 data)
@@ -133,10 +131,16 @@ void bbl380_state::machine_start()
 	// port related
 	save_item(NAME(m_output2val));
 
-	// SPI related
-	save_item(NAME(m_spistate));
-	save_item(NAME(m_spiaddress));
-	save_item(NAME(m_delay));
+	save_item(NAME(m_spi10));
+	save_item(NAME(m_spi11));
+
+	save_item(NAME(m_spi10out));
+	save_item(NAME(m_spi11out));
+
+	save_item(NAME(m_spi10out_has_data));
+
+	m_genspi->set_rom_ptr(memregion("spi")->base());
+	m_genspi->set_rom_size(memregion("spi")->bytes());
 }
 
 
@@ -144,102 +148,56 @@ void bbl380_state::machine_reset()
 {
 	m_output2val = 0;
 
+	m_spi10 = 0;
+	m_spi11 = 0;
+
+	m_spi10out = 0;
+	m_spi11out = 0;
+
+	m_spi10out_has_data = 0;
+
 	// TODO: handle these things in the core via callbacks etc. once correct behavior is agreed upon
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0010, 0x0011, read8smo_delegate(*this, FUNC(bbl380_state::spi_r)), write8smo_delegate(*this, FUNC(bbl380_state::spi_w))); // SPI related
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0010, 0x0010, read8smo_delegate(*this, FUNC(bbl380_state::spi10_r)), write8smo_delegate(*this, FUNC(bbl380_state::spi10_w))); // SPI related
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0011, 0x0011, read8smo_delegate(*this, FUNC(bbl380_state::spi11_r)), write8smo_delegate(*this, FUNC(bbl380_state::spi11_w))); // SPI related
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0014, 0x0014, read8smo_delegate(*this, FUNC(bbl380_state::ff_r))); // SPI related
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0000, 0x0000, write8smo_delegate(*this, FUNC(bbl380_state::output_w))); // Port A output hack, SPI state needs resetting on every port write here or some gfx won't copy fully eg red squares on right of parachute, Soc implementation filters writes
 }
 
-
-void bbl380_state::spi_w(u8 data)
+void bbl380_state::spi10_w(u8 data)
 {
-	switch (m_spistate)
-	{
-	case SPI_STATE_READY:
-	{
-		if (data == 0x03)
-		{
-			m_spistate = SPI_STATE_WAITING_HIGH_ADDR;
-		}
-		else
-		{
-			logerror("%s: invalid state request %02x\n", machine().describe_context(), data);
-		}
-		break;
-	}
-
-	case SPI_STATE_WAITING_HIGH_ADDR:
-	{
-		m_spiaddress = (m_spiaddress & 0xff00ffff) | data << 16;
-		m_spistate = SPI_STATE_WAITING_MID_ADDR;
-		break;
-	}
-
-	case SPI_STATE_WAITING_MID_ADDR:
-	{
-		m_spiaddress = (m_spiaddress & 0xffff00ff) | data << 8;
-		m_spistate = SPI_STATE_WAITING_LOW_ADDR;
-		break;
-	}
-
-	case SPI_STATE_WAITING_LOW_ADDR:
-	{
-		m_spiaddress = (m_spiaddress & 0xffffff00) | data;
-		m_spistate = SPI_STATE_READING;
-		m_delay = 2;
-		break;
-	}
-
-	case SPI_STATE_READING:
-	{
-		// writes when in read mode clock in data?
-		m_delay = 1;
-		break;
-	}
-
-	case SPI_STATE_WAITING_DUMMY1_ADDR:
-	{
-		m_spistate = SPI_STATE_WAITING_DUMMY2_ADDR;
-		break;
-	}
-
-	case SPI_STATE_WAITING_DUMMY2_ADDR:
-	{
-		//  m_spistate = SPI_STATE_READY;
-		break;
-	}
-
-	}
+	m_spi10out = data;
+	m_spi10out_has_data = 1;
+	logerror("%s: spi10_w %02x\n", machine().describe_context(), data);
 }
 
-u8 bbl380_state::spi_r()
+void bbl380_state::spi11_w(u8 data)
 {
-	switch (m_spistate)
+	m_spi11out = data;
+	logerror("%s: spi11_w %02x\n", machine().describe_context(), data);
+}
+
+u8 bbl380_state::spi10_r()
+{
+	u8 ret = m_spi10;
+
+	if (m_spi10out_has_data)
 	{
-	case SPI_STATE_READING:
-	{
-		if (m_delay > 0)
-		{
-			m_delay--;
-			return 0x00;
-		}
-		else
-		{
-			u8 dat = m_spirom[m_spiaddress & 0x3fffff];
-			//logerror("%s: reading SPI %02x from SPI Address %08x\n", machine().describe_context(), dat, m_spiaddress);
-			m_spiaddress++;
-			return dat;
-		}
+		m_genspi->write(m_spi11out);
+		m_spi11 = m_genspi->read();
+
+		m_genspi->write(m_spi10out);
+		m_spi10out_has_data = 0;
+		m_spi10 = m_genspi->read();
 	}
 
-	default:
-	{
-		//logerror("%s: reading FIFO in unknown state\n", machine().describe_context() );
-		return 0x00;
-	}
-	}
+	logerror("%s: spi10_r returning %02x\n", machine().describe_context(), ret);
+	return ret;
+}
 
-	return 0x00;
+u8 bbl380_state::spi11_r()
+{
+	logerror("%s: spi11_r returning %02x\n", machine().describe_context(), m_spi11);
+	return m_spi11;
 }
 
 
@@ -308,6 +266,8 @@ void bbl380_state::bbl380(machine_config &config)
 
 	BL_HANDHELDS_MENUCONTROL(config, m_menucontrol, 0);
 	ST7735(config, m_lcdc, 0);
+
+	GENERIC_SPI_FLASH(config, m_genspi, 0);
 
 	// LCD controller seems to be either Sitronix ST7735R or (if RDDID bytes match) Ilitek ILI9163C
 	// (SoC's built-in LCDC is unused or nonexistent?)
@@ -513,18 +473,22 @@ CONS( 201?, supreme,       0,       0,      bbl380_menuprot,   bbl380_prot, bbl3
 
 CONS( 201?, throwbck,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "Westminster", "Throwback Pocket Video Game Console 150+ 8-Bit Games", MACHINE_IMPERFECT_SOUND )
 
-// releases with different internal ROM, these currently have rendering issues for unknown reasons
+// releases with different internal ROM
 
 // for the UK market, runs at a slightly slower clock
 CONS( 201?, retro150,      0,       0,      bbl380_24mhz,   bbl380, bbl380_state, empty_init, "Red5", "Retro Arcade Game Controller (150-in-1) (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 201?, retro150a,     retro150,0,      bbl380_24mhz,   bbl380, bbl380_state, empty_init, "Red5", "Retro Arcade Game Controller (150-in-1) (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
 // these are for the Japanese market, the ROM is the same between the Pocket Game and Game Computer but the form factor is different.
+// pg118 and table108 have a screen offset issue
 CONS( 2019, pg118,         0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "Pocket Game / Game Computer", "Pocket Game 118-in-1 / Game Computer 118-in-1", MACHINE_NOT_WORKING )
-CONS( 201?, ppg118,        0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "<unknown>", "PPG Play Portable Game 118 Games (HH-0046)", MACHINE_NOT_WORKING )
 CONS( 201?, table108,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "<unknown>", "Table Game Classic 108-in-1 (KTFC-001B)", MACHINE_NOT_WORKING )
+
+CONS( 201?, ppg118,        0,       0,      bbl380_24mhz,   bbl380_prot, bbl380_state, empty_init, "<unknown>", "PPG Play Portable Game 118 Games (HH-0046)", MACHINE_NOT_WORKING )
+
 // it is unclear if dphh8633 refers to the case style, rather than the software, as the dphh8630 set was also noted as previously being found in an 8633 unit
 CONS( 201?, dphh8633,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 268-in-1 - Model 8633", MACHINE_NOT_WORKING )
-CONS( 2016, dphh8661,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 268-in-1 - Model 8661", MACHINE_NOT_WORKING ) // from PCP? (logo on back of console) 2016 date on PCB
+CONS( 2016, dphh8661,      0,       0,      bbl380_24mhz,   bbl380_prot, bbl380_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 268-in-1 - Model 8661", MACHINE_NOT_WORKING ) // from PCP? (logo on back of console) 2016 date on PCB
 
 // also has the 0xE4 XOR, also doesn't currently boot, could be yet another internal ROM
 CONS( 2021, toumapet,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Shenzhen Shiji New Technology", "Tou ma Pet (OK-550)", MACHINE_NOT_WORKING )

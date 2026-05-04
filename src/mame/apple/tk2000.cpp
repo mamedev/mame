@@ -150,7 +150,7 @@ void tk2000_state::machine_start()
 	save_item(NAME(m_ctrl_key));
 
 	// setup video pointers
-	m_video->set_ram_pointers(m_ram_ptr, m_ram_ptr);
+	m_video->set_ram_pointers(m_ram_ptr, nullptr);
 	m_video->set_char_pointer(nullptr, 0);  // no text modes on this machine
 	m_video->set_hgr2(0xa000);
 }
@@ -452,7 +452,7 @@ void tk2000_state::tk2000(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(1021800 * 14, 65 * 14, 0, 40 * 14, 262, 0, 192);
-	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, false, false>)));
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, true, true>)));
 	m_screen->set_palette(m_video);
 
 	/* sound hardware */

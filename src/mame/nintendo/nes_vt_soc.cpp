@@ -60,6 +60,9 @@
 
 #include "speaker.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC,              nes_vt02_vt03_soc_device,              "nes_vt02_vt03_soc",             "VT02/03 series System on a Chip (NTSC)")
 DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_PAL,          nes_vt02_vt03_soc_pal_device,          "nes_vt02_vt03_soc_pal",         "VT02/03 series System on a Chip (PAL)")
@@ -347,7 +350,6 @@ void nes_vt02_vt03_soc_device::scrambled_410x_w(u16 offset, u8 data)
 		break;
 
 	case 0x2:
-		//logerror("vt03_4102_w %02x\n", data);
 		// load latched value and start counting
 		m_410x[0x2] = data; // value doesn't matter?
 		m_timer_val = m_410x[0x1];
@@ -361,7 +363,6 @@ void nes_vt02_vt03_soc_device::scrambled_410x_w(u16 offset, u8 data)
 		break;
 
 	case 0x3:
-		//logerror("vt03_4103_w %02x\n", data);
 		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 		// disable timer irq
 		m_410x[0x3] = data; // value doesn't matter?
@@ -369,14 +370,12 @@ void nes_vt02_vt03_soc_device::scrambled_410x_w(u16 offset, u8 data)
 		break;
 
 	case 0x4:
-		//logerror("vt03_4104_w %02x\n", data);
 		// enable timer irq
 		m_410x[0x4] = data; // value doesn't matter?
 		m_timer_irq_enabled = 1;
 		break;
 
 	case 0x5:
-		logerror("vt03_4105_w %02x\n", data);
 		m_410x[0x5] = data;
 		update_banks();
 		break;
@@ -396,13 +395,11 @@ void nes_vt02_vt03_soc_device::scrambled_410x_w(u16 offset, u8 data)
 		break;
 
 	case 0x9:
-		logerror("vt03_4109_w %02x\n", data);
 		m_410x[0x9] = data;
 		update_banks();
 		break;
 
 	case 0xa:
-		logerror("vt03_410a_w %02x\n", data);
 		m_410x[0xa] = data;
 		update_banks();
 		break;
@@ -419,7 +416,6 @@ void nes_vt02_vt03_soc_device::scrambled_410x_w(u16 offset, u8 data)
 
 		*/
 
-		logerror("vt03_410b_w %02x\n", data);
 		m_410x[0xb] = data;
 		update_banks();
 		break;
@@ -449,7 +445,7 @@ void nes_vt02_vt03_soc_device::chr_w(offs_t offset, u8 data)
 {
 	if (m_4242 & 0x1 || m_411d & 0x04) // newer VT platforms only (not VT03/09), split out
 	{
-		logerror("vram write %04x %02x\n", offset, data);
+		LOG("vram write %04x %02x\n", offset, data);
 		m_chrram[offset] = data;
 	}
 	else
@@ -751,7 +747,7 @@ void nes_vt02_vt03_soc_device::scrambled_8000_w(u16 offset, u8 data)
 	//MMC3 compat
 	if ((addr < 0xa000) && !(addr & 0x01))
 	{
-		logerror("%s: scrambled_8000_w real address: (%04x) translated address: (%04x) %02x (banking)\n",  machine().describe_context(), addr, offset + 0x8000, data);
+		LOG("%s: scrambled_8000_w real address: (%04x) translated address: (%04x) %02x (banking)\n",  machine().describe_context(), addr, offset + 0x8000, data);
 		// Bank select
 		m_8000_addr_latch = data & 0x07;
 		// Bank config
@@ -760,7 +756,7 @@ void nes_vt02_vt03_soc_device::scrambled_8000_w(u16 offset, u8 data)
 	}
 	else if ((addr < 0xa000) && (addr & 0x01))
 	{
-		logerror("%s: scrambled_8000_w real address: (%04x) translated address: (%04x) %02x (other scrambled stuff)\n",  machine().describe_context(), addr, offset + 0x8000, data);
+		LOG("%s: scrambled_8000_w real address: (%04x) translated address: (%04x) %02x (other scrambled stuff)\n",  machine().describe_context(), addr, offset + 0x8000, data);
 
 		switch (m_410x[0x05] & 0x07)
 		{
@@ -901,11 +897,11 @@ void nes_vt02_vt03_soc_device::do_dma(u8 data, bool has_ntsc_bug)
 	}
 
 	u16 src_addr = (data << 8) | (src_nib_74 << 4);
-	logerror("%s: vthh dma start ctrl=%02x addr=%04x\n", machine().describe_context(), m_vdma_ctrl, src_addr);
+	LOG("%s: vthh dma start ctrl=%02x addr=%04x\n", machine().describe_context(), m_vdma_ctrl, src_addr);
 
 	if (dma_mode == 1)
 	{
-		logerror("vdma dest %04x\n", m_ppu->get_vram_dest());
+		LOG("vdma dest %04x\n", m_ppu->get_vram_dest());
 	}
 
 	if (has_ntsc_bug && (dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F00) && !(m_ppu->get_extended_modes2_enable() & 0x80))
@@ -935,14 +931,14 @@ void nes_vt02_vt03_soc_device::do_dma(u8 data, bool has_ntsc_bug)
 // probably VT3xx only, not earlier?
 void nes_vt02_vt03_soc_device::vt3xx_4024_new_dma_middle_w(u8 data)
 {
-	logerror("%s: vt3xx_4024_new_dma_middle_w %02x (VT3xx newer DMA middle bits?)\n", machine().describe_context(), data);
+	LOG("%s: vt3xx_4024_new_dma_middle_w %02x (VT3xx newer DMA middle bits?)\n", machine().describe_context(), data);
 	// can set all 8-bits of the lower address using this register
 	m_4024_newdma = data;
 }
 
 void nes_vt02_vt03_soc_device::vt03_4034_w(u8 data)
 {
-	logerror("%s: vt03_4034_w %02x (2nd APU DMA / new DMA)\n", machine().describe_context(), data);
+	LOG("%s: vt03_4034_w %02x (2nd APU DMA / new DMA)\n", machine().describe_context(), data);
 	m_vdma_ctrl = data;
 
 	// this also sets the lower DMA address under certain conditions, but only 4 bits of it? - needed to stop denv150 corrupting
@@ -985,7 +981,7 @@ void nes_vt02_vt03_soc_device::extra_io_control_w(u8 data)
 	0x80 Extra I/O port 3 enable (1 = enable, 0 = disable)
 	*/
 
-	logerror("%s: extra_io_control_w %02x\n", machine().describe_context(), data);
+	LOG("%s: extra_io_control_w %02x\n", machine().describe_context(), data);
 }
 
 u8 nes_vt02_vt03_soc_device::extrain_01_r()
@@ -1013,13 +1009,13 @@ u8 nes_vt02_vt03_soc_device::extrain_23_r()
 void nes_vt02_vt03_soc_device::extraout_01_w(u8 data)
 {
 	// TODO: use callbacks for this as output can be hooked up to anything
-	logerror("%s: extraout_01_w %02x\n", machine().describe_context(), data);
+	LOG("%s: extraout_01_w %02x\n", machine().describe_context(), data);
 }
 
 void nes_vt02_vt03_soc_device::extraout_23_w(u8 data)
 {
 	// TODO: use callbacks for this as output can be hooked up to anything
-	logerror("%s: extraout_23_w %02x\n", machine().describe_context(), data);
+	LOG("%s: extraout_23_w %02x\n", machine().describe_context(), data);
 }
 
 u8 nes_vt02_vt03_soc_device::rs232flags_region_r()

@@ -811,11 +811,6 @@ void lua_engine::initialize()
  * emu.keypost(keys) - post keys to natural keyboard
  *
  * emu.register_prestart(callback) - register callback before reset
- * emu.register_start(callback) - register callback after reset
- * emu.register_stop(callback) - register callback after stopping
- * emu.register_pause(callback) - register callback at pause
- * emu.register_resume(callback) - register callback at resume
- * emu.register_frame(callback) - register callback at end of frame
  * emu.register_frame_done(callback) - register callback after frame is drawn to screen (for overlays)
  * emu.register_sound_update(callback) - register callback after sound update has generated new samples
  * emu.register_periodic(callback) - register periodic callback while program is running
@@ -933,11 +928,6 @@ void lua_engine::initialize()
 			machine().resume();
 		};
 	emu["register_prestart"] = [this] (sol::function func) { register_function(func, "LUA_ON_PRESTART"); };
-	emu["register_start"] = [this] (sol::function func) { osd_printf_warning("[LUA] emu.register_start is deprecated - please use emu.add_machine_reset_notifier\n"); register_function(func, "LUA_ON_START"); };
-	emu["register_stop"] = [this] (sol::function func) { osd_printf_warning("[LUA] emu.register_stop is deprecated - please use emu.add_machine_stop_notifier\n"); register_function(func, "LUA_ON_STOP"); };
-	emu["register_pause"] = [this] (sol::function func) { osd_printf_warning("[LUA] emu.register_pause is deprecated - please use emu.add_machine_pause_notifier\n"); register_function(func, "LUA_ON_PAUSE"); };
-	emu["register_resume"] = [this] (sol::function func) { osd_printf_warning("[LUA] emu.register_resume is deprecated - please use emu.add_machine_resume_notifier\n"); register_function(func, "LUA_ON_RESUME"); };
-	emu["register_frame"] = [this] (sol::function func) { osd_printf_warning("[LUA] emu.register_frame is deprecated - please use emu.add_machine_frame_notifier\n"); register_function(func, "LUA_ON_FRAME"); };
 	emu["register_frame_done"] = [this] (sol::function func) { register_function(func, "LUA_ON_FRAME_DONE"); };
 	emu["register_sound_update"] = [this] (sol::function func) { register_function(func, "LUA_ON_SOUND_UPDATE"); };
 	emu["register_periodic"] = [this] (sol::function func) { register_function(func, "LUA_ON_PERIODIC"); };
@@ -953,11 +943,10 @@ void lua_engine::initialize()
 			m_menu.push_back(name);
 		};
 	emu["show_menu"] =
-		[this](const char *name)
+		[] (const char *name)
 		{
 			mame_ui_manager &mui = mame_machine_manager::instance()->ui();
-			render_container &container = machine().render().ui_container();
-			ui::menu_plugin::show_menu(mui, container, name);
+			ui::menu_plugin::show_menu(mui, name);
 		};
 	emu["register_callback"] =
 		[this] (sol::function cb, const std::string &name)
@@ -1821,7 +1810,9 @@ void lua_engine::initialize()
 						msg,
 						x, y, (1.0F - x),
 						justify, ui::text_layout::word_wrapping::WORD,
-						mame_ui_manager::OPAQUE_, *fgcolor, *bgcolor);
+						mame_ui_manager::OPAQUE_, *fgcolor, *bgcolor,
+						nullptr, nullptr,
+						ui.get_line_height(ui.machine().render().ui_target())); // FIXME: line height quantisation assumes text is displayed on default UI target
 			});
 	screen_dev_type.set_function(
 			"orientation",
@@ -2234,15 +2225,15 @@ void lua_engine::initialize()
 
 	auto ui_type = sol().registry().new_usertype<mame_ui_manager>("ui", sol::no_constructor);
 	// sol converts char32_t to a string
-	ui_type.set_function("get_char_width", [] (mame_ui_manager &m, uint32_t utf8char) { return m.get_char_width(utf8char); });
-	ui_type.set_function("get_string_width", static_cast<float (mame_ui_manager::*)(std::string_view)>(&mame_ui_manager::get_string_width));
+	ui_type.set_function("get_char_width", [] (mame_ui_manager &m, uint32_t utf8char) { return m.get_char_width(m.machine().render().ui_target(), utf8char); }); // FIXME: allow render target to be supplied
+	ui_type.set_function("get_string_width", [] (mame_ui_manager &m, std::string_view s) { return m.get_string_width(m.machine().render().ui_target(), s); }); // FIXME: allow render target to be supplied
 	ui_type.set_function("set_aggressive_input_focus", [] (mame_ui_manager &m, bool aggressive_focus) { osd_set_aggressive_input_focus(aggressive_focus); });
 	ui_type["get_general_input_setting"] = sol::overload(
 			// TODO: overload with sequence type string - parser isn't available here
 			[] (mame_ui_manager &ui, ioport_type type, int player) { return ui.get_general_input_setting(type, player, SEQ_TYPE_STANDARD); },
 			[] (mame_ui_manager &ui, ioport_type type) { return ui.get_general_input_setting(type, 0, SEQ_TYPE_STANDARD); });
 	ui_type["options"] = sol::property([] (mame_ui_manager &m) { return static_cast<core_options *>(&m.options()); });
-	ui_type["line_height"] = sol::property([] (mame_ui_manager &m) { return m.get_line_height(); });
+	ui_type["line_height"] = sol::property([] (mame_ui_manager &m) { return m.get_line_height(m.machine().render().ui_target()); }); // FIXME: allow render target to be supplied
 	ui_type["menu_active"] = sol::property(&mame_ui_manager::is_menu_active);
 	ui_type["ui_active"] = sol::property(&mame_ui_manager::ui_active, &mame_ui_manager::set_ui_active);
 	ui_type["single_step"] = sol::property(&mame_ui_manager::single_step, &mame_ui_manager::set_single_step);
@@ -2251,7 +2242,7 @@ void lua_engine::initialize()
 	ui_type["image_display_enabled"] = sol::property(&mame_ui_manager::image_display_enabled, &mame_ui_manager::set_image_display_enabled);
 
 	// undocumented/unsupported
-	ui_type["show_menu"] = &mame_ui_manager::show_menu; // FIXME: this is dangerous - it doesn't give a proper chance for the current UI handler to clean up
+	ui_type["show_menu"] = static_cast<bool (mame_ui_manager::*)()>(&mame_ui_manager::show_menu);
 
 
 /* rom_entry library

@@ -27,8 +27,8 @@
     memory mapped ports:
 
     read:
-    9000      DSW1
-    9040      DSW0
+    9000      DSW2
+    9040      DSW1
     9080      IN1
     90c0      IN0
 
@@ -84,7 +84,6 @@ public:
 	pengo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pacman_state(mconfig, type, tag)
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
-		, m_latch(*this, "latch")
 	{ }
 
 	void jrpacmbl(machine_config &config);
@@ -100,34 +99,10 @@ private:
 	void decode_pengo6(int end, int nodecend);
 
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
-	required_device<ls259_device> m_latch;
 	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 	void jrpacmbl_map(address_map &map) ATTR_COLD;
 	void pengo_map(address_map &map) ATTR_COLD;
 };
-
-
-
-
-/*************************************
- *
- *  Constants
- *
- *************************************/
-
-#define MASTER_CLOCK        (18432000)
-
-#define PIXEL_CLOCK         (MASTER_CLOCK/3)
-
-// H counts from 128->511, HBLANK starts at 128+16=144 and ends at 128+64+32+16=240
-#define HTOTAL              (384)
-#define HBEND               (0)     /*(96+16)*/
-#define HBSTART             (288)   /*(16)*/
-
-#define VTOTAL              (264)
-#define VBEND               (0)     /*(16)*/
-#define VBSTART             (224)   /*(224+16)*/
-
 
 
 /*************************************
@@ -151,9 +126,9 @@ void pengo_state::pengo_map(address_map &map)
 	map(0x8ff0, 0x8fff).ram().share("spriteram");
 	map(0x9000, 0x901f).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x9020, 0x902f).writeonly().share("spriteram2");
-	map(0x9000, 0x903f).portr("DSW1");
-	map(0x9040, 0x907f).portr("DSW0");
-	map(0x9040, 0x9047).w(m_latch, FUNC(ls259_device::write_d0));
+	map(0x9000, 0x903f).portr("DSW2");
+	map(0x9040, 0x907f).portr("DSW1");
+	map(0x9040, 0x9047).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x9070, 0x9070).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x9080, 0x90bf).portr("IN1");
 	map(0x90c0, 0x90ff).portr("IN0");
@@ -178,7 +153,7 @@ void pengo_state::jrpacmbl_map(address_map &map)
 	map(0x9020, 0x902f).writeonly().share("spriteram2");
 	map(0x9030, 0x9030).w(FUNC(pengo_state::jrpacman_scroll_w));
 	map(0x9040, 0x904f).portr("DSW");
-	map(0x9040, 0x9047).w(m_latch, FUNC(ls259_device::write_d0));
+	map(0x9040, 0x9047).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x9070, 0x9070).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x9080, 0x90bf).portr("P2");
 	map(0x90c0, 0x90ff).portr("P1");
@@ -218,7 +193,7 @@ static INPUT_PORTS_START( pengo )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
-	PORT_START("DSW0")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "30000" )
 	PORT_DIPSETTING(    0x01, "50000" )
@@ -242,7 +217,7 @@ static INPUT_PORTS_START( pengo )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("DSW1")
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0f, 0x0c, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW2:1,2,3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
@@ -374,52 +349,39 @@ GFXDECODE_END
 
 void pengo_state::pengo(machine_config &config)
 {
+	pacman(config);
+
 	// basic machine hardware
-	Z80(config, m_maincpu, MASTER_CLOCK/6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pengo_state::pengo_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &pengo_state::decrypted_opcodes_map);
+	m_maincpu->remove_addrmap(AS_IO);
+	m_maincpu->remove_irq_acknowledge_callback();
 
-	LS259(config, m_latch); // U27
-	m_latch->q_out_cb<0>().set(FUNC(pengo_state::irq_mask_w));
-	m_latch->q_out_cb<1>().set("namco", FUNC(namco_wsg_device::sound_enable_w));
-	m_latch->q_out_cb<2>().set(FUNC(pengo_state::pengo_palettebank_w));
-	m_latch->q_out_cb<3>().set(FUNC(pengo_state::flipscreen_w));
-	m_latch->q_out_cb<4>().set(FUNC(pengo_state::coin_counter_w<0>));
-	m_latch->q_out_cb<5>().set(FUNC(pengo_state::coin_counter_w<1>));
-	m_latch->q_out_cb<6>().set(FUNC(pengo_state::pengo_colortablebank_w));
-	m_latch->q_out_cb<7>().set(FUNC(pengo_state::pengo_gfxbank_w));
-
-	WATCHDOG_TIMER(config, m_watchdog);
+	m_mainlatch->q_out_cb<2>().set(FUNC(pengo_state::pengo_palettebank_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(pengo_state::coin_counter_w<0>));
+	m_mainlatch->q_out_cb<5>().set(FUNC(pengo_state::coin_counter_w<1>));
+	m_mainlatch->q_out_cb<6>().set(FUNC(pengo_state::pengo_colortablebank_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(pengo_state::pengo_gfxbank_w));
 
 	// video hardware
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pengo);
-	PALETTE(config, m_palette, FUNC(pengo_state::pacman_palette), 128 * 4, 32);
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	m_screen->set_screen_update(FUNC(pengo_state::screen_update_pacman));
-	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(pengo_state::vblank_irq));
+	m_gfxdecode->set_info(gfx_pengo);
 
 	MCFG_VIDEO_START_OVERRIDE(pengo_state,pengo)
-
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-
-	NAMCO_WSG(config, m_namco_sound, MASTER_CLOCK/6/32);
-	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void pengo_state::pengou(machine_config &config)
 {
 	pengo(config);
-	m_maincpu->set_addrmap(AS_OPCODES, address_map_constructor());
+
+	m_maincpu->remove_addrmap(AS_OPCODES);
 }
 
 void pengo_state::pengoe(machine_config &config)
 {
 	pengo(config);
-	sega_315_5010_device &maincpu(SEGA_315_5010(config.replace(), m_maincpu, MASTER_CLOCK/6));
+
+	// basic machine hardware
+	sega_315_5010_device &maincpu(SEGA_315_5010(config.replace(), m_maincpu, 18.432_MHz_XTAL / 6));
 	maincpu.set_addrmap(AS_PROGRAM, &pengo_state::pengo_map);
 	maincpu.set_addrmap(AS_OPCODES, &pengo_state::decrypted_opcodes_map);
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
@@ -427,15 +389,14 @@ void pengo_state::pengoe(machine_config &config)
 
 void pengo_state::jrpacmbl(machine_config &config)
 {
-	pengo(config);
+	pengou(config);
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &pengo_state::jrpacmbl_map);
-	m_maincpu->set_addrmap(AS_OPCODES, address_map_constructor());
 
-	m_latch->q_out_cb<4>().set(FUNC(pengo_state::jrpacman_bgpriority_w));
-	m_latch->q_out_cb<5>().set(FUNC(pengo_state::jrpacman_spritebank_w));
-	m_latch->q_out_cb<7>().set(FUNC(pengo_state::jrpacman_charbank_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(pengo_state::jrpacman_bgpriority_w));
+	m_mainlatch->q_out_cb<5>().set(FUNC(pengo_state::jrpacman_spritebank_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(pengo_state::jrpacman_charbank_w));
 
 	MCFG_VIDEO_START_OVERRIDE(pengo_state,jrpacman)
 }
@@ -827,7 +788,6 @@ GAME( 1982, pengoa,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  RO
 GAME( 1982, pengob,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (World, 315-5010 type, set 2)",    MACHINE_SUPPORTS_SAVE ) // for Bally?
 // this set is closest to the Japanese sets, with longer demo mode, and slower 'curtain draw' before the maze draw
 GAME( 1982, pengoc,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (World, 315-5010 type, set 3)",    MACHINE_SUPPORTS_SAVE ) // Sega game ID# 834-5081 PENGO
-
 
 // Japan releases draw the maze slowly, use the better known 'popcorn' music and have default high score of 20,000. Most bootlegs were based off these versions.
 GAME( 1982, pengoj,   pengo,    pengou,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (Japan, not encrypted)",           MACHINE_SUPPORTS_SAVE ) // Sega game ID# 834-5091 PENGO

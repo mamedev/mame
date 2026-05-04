@@ -9,13 +9,13 @@ module also includes 8KB NVRAM, but that part is emulated in the driver.
 *******************************************************************************/
 
 #include "emu.h"
-#include "mmdisplay2.h"
+#include "mdisplay2.h"
 
 #include "screen.h"
 #include "speaker.h"
 
 
-DEFINE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODULE2, mephisto_display2_device, "mdisplay2", "Mephisto Display Module 2")
+DEFINE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODULE2, mephisto_display2_device, "mdisplay2", "Mephisto 16/32 bit Display Modul")
 
 //-------------------------------------------------
 //  constructor
