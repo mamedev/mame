@@ -1015,7 +1015,7 @@ void rosetta_device::config_map()
 
 void rosetta_device::config_tlb()
 {
-	offs_t const ram_size = std::max(m_control[RAMS] & RAMS_SIZE, 7ULL);
+	offs_t const ram_size = std::max<offs_t>(m_control[RAMS] & RAMS_SIZE, 7ULL);
 
 	if (m_control[TCR] & TCR_S)
 	{

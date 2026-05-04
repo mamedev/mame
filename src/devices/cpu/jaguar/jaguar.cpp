@@ -88,7 +88,7 @@ inline u32 jaguar_cpu_device::READLONG(offs_t a)
 	// - pdrive $580e
 	if (!DWORD_ALIGNED(a))
 	{
-		if (a == std::clamp(a, 0xf00000ULL, 0xf00fffULL) || a == std::clamp(a, 0xf10000ULL, 0xf10fffULL))
+		if (a == std::clamp<offs_t>(a, 0xf00000, 0xf00fff) || a == std::clamp<offs_t>(a, 0xf10000, 0xf10fff))
 		{
 			//printf("%d: %08x R\n", m_isdsp, a);
 			u32 res = m_program.read_word(a) << 0;
@@ -98,7 +98,7 @@ inline u32 jaguar_cpu_device::READLONG(offs_t a)
 			return res;
 		}
 
-		//if (a == std::clamp(a, 0xf03000ULL, 0xf03fffULL) || a == std::clamp(a, 0xf1b000ULL, 0xf1cfffULL))
+		//if (a == std::clamp<offs_t>(a, 0xf03000, 0xf03fff) || a == std::clamp<offs_t>(a, 0xf1b000, 0xf1cfff))
 		//  a &= ~3;
 	}
 
@@ -121,7 +121,7 @@ inline void jaguar_cpu_device::WRITELONG(offs_t a, u32 v)
 	// TODO: verify what happens on other accesses (just rolls over?)
 	if (!DWORD_ALIGNED(a))
 	{
-		if(a == std::clamp(a, 0xf00000ULL, 0xf00fffULL) || a == std::clamp(a, 0xf10000ULL, 0xf10fffULL))
+		if(a == std::clamp<offs_t>(a, 0xf00000, 0xf00fff) || a == std::clamp<offs_t>(a, 0xf10000, 0xf10fff))
 		{
 			//printf("%d: %08x %08x W\n", m_isdsp, a, v);
 			m_program.write_word(a, v & 0xffff);
@@ -129,7 +129,7 @@ inline void jaguar_cpu_device::WRITELONG(offs_t a, u32 v)
 			return;
 		}
 
-		//if (a == std::clamp(a, 0xf03000ULL, 0xf03fffULL) || a == std::clamp(a, 0xf1b000ULL, 0xf1cfffULL))
+		//if (a == std::clamp<offs_t>(a, 0xf03000, 0xf03fff) || a == std::clamp<offs_t>(a, 0xf1b000, 0xf1cfff))
 		//  a &= ~3;
 	}
 
