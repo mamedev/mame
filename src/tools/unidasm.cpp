@@ -1165,7 +1165,7 @@ void unidasm_data_buffer::decrypt(const unidasm_data_buffer &buffer, bool opcode
 	abort();
 }
 
-static int parse_number(const char *curarg, const char *default_format, u64 *value)
+static int parse_number(const char *curarg, const char *default_format, u32 *value)
 {
 	int result;
 	if(curarg[0] == '0' && curarg[1] != '\0') {
@@ -1178,6 +1178,24 @@ static int parse_number(const char *curarg, const char *default_format, u64 *val
 	}
 	else if(curarg[0] == '$')
 		result = sscanf(&curarg[1], "%x", value);
+	else
+		result = sscanf(&curarg[0], default_format, value);
+	return result;
+}
+
+static int parse_number(const char *curarg, const char *default_format, u64 *value)
+{
+	int result;
+	if(curarg[0] == '0' && curarg[1] != '\0') {
+		if(tolower((uint8_t)curarg[1]) == 'x')
+			result = sscanf(&curarg[2], "%lx", value);
+		else if(tolower((uint8_t)curarg[1]) == 'o')
+			result = sscanf(&curarg[2], "%lo", value);
+		else
+			result = sscanf(&curarg[1], "%lo", value);
+	}
+	else if(curarg[0] == '$')
+		result = sscanf(&curarg[1], "%lx", value);
 	else
 		result = sscanf(&curarg[0], default_format, value);
 	return result;
@@ -1226,7 +1244,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 
 		} else if(pending_base) {
 		// base PC
-			if(parse_number(curarg, "%x", &opts->basepc) != 1)
+			if(parse_number(curarg, "%lx", &opts->basepc) != 1)
 				goto usage;
 			pending_base = false;
 
