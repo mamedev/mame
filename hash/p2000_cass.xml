@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="p2000_cass" description="Philips P2000T/P2000M Mini cassettes">
+
+<!-- !Games -->
+
+	<software name="4x4">
+		<description>4 x 4</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0f00">
+				<rom name="4 x 4.cas" size="0x0f00" crc="2e76b755" sha1="2e16444ed25e1c710e613bd447846bc30e4011c9" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

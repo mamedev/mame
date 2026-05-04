@@ -10,6 +10,8 @@
 #include "mdcr.h"
 #include "formats/p2000t_cas.h"
 
+#include "softlist_dev.h"
+
 DEFINE_DEVICE_TYPE(MDCR, mdcr_device, "mdcr", "Philips Mini-DCR")
 
 int mdcr_device::rdc()
@@ -89,6 +91,9 @@ void mdcr_device::device_add_mconfig(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
 	m_cassette->set_interface("p2000_cass");
 	m_cassette->set_formats(p2000t_cassette_formats);
+
+	// FIXME: why this handling doesn't work if hooked up in the driver rather than here?
+	SOFTWARE_LIST(config, "cass_list").set_original("p2000_cass");
 }
 
 mdcr_device::mdcr_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
