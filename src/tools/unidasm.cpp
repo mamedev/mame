@@ -1188,14 +1188,14 @@ static int parse_number(const char *curarg, const char *default_format, u64 *val
 	int result;
 	if(curarg[0] == '0' && curarg[1] != '\0') {
 		if(tolower((uint8_t)curarg[1]) == 'x')
-			result = sscanf(&curarg[2], "%lx", value);
+			result = sscanf(&curarg[2], "%llx", value);
 		else if(tolower((uint8_t)curarg[1]) == 'o')
-			result = sscanf(&curarg[2], "%lo", value);
+			result = sscanf(&curarg[2], "%llo", value);
 		else
-			result = sscanf(&curarg[1], "%lo", value);
+			result = sscanf(&curarg[1], "%llo", value);
 	}
 	else if(curarg[0] == '$')
-		result = sscanf(&curarg[1], "%lx", value);
+		result = sscanf(&curarg[1], "%llx", value);
 	else
 		result = sscanf(&curarg[0], default_format, value);
 	return result;
