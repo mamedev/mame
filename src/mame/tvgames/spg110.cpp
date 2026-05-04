@@ -671,8 +671,8 @@ ROM_END
 
 ROM_START( easports )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "ea.u3", 0x000000, 0x400000, CRC(d750089e) SHA1(426f04c3d841103d434a892561db55ade684db54) )
-	ROM_LOAD16_WORD_SWAP( "ea.u4", 0x400000, 0x200000, CRC(20a63445) SHA1(8c3383a353638c7d6b795d15a751275043eacbd0) )
+	ROM_LOAD16_WORD_SWAP( "12_11.u3", 0x000000, 0x400000, CRC(d750089e) SHA1(426f04c3d841103d434a892561db55ade684db54) )
+	ROM_LOAD16_WORD_SWAP( "12_11.u4", 0x400000, 0x200000, CRC(20a63445) SHA1(8c3383a353638c7d6b795d15a751275043eacbd0) )
 
 	ROM_REGION( 0x20000, "nvram", ROMREGION_ERASE00 )
 	// There is a coin style battery backing up at least some of the RAM.
@@ -682,12 +682,20 @@ ROM_START( easports )
 	ROM_LOAD( "nvram", 0x000000, 0x20000, CRC(bfcbd206) SHA1(0f5b730679762547a0658c2cd0d4fa5169b857af) )
 ROM_END
 
+ROM_START( easportsa )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "11_11.u2", 0x000000, 0x400000, CRC(99e2db01) SHA1(f0231a3bc7df1e18d3308a10ebe5745d12efe3fc) )
+	ROM_LOAD16_WORD_SWAP( "11_11.u3", 0x400000, 0x200000, CRC(4e0a398f) SHA1(94b497c8f050c73ffd970dec863857dbed07a673) )
+
+	ROM_REGION( 0x20000, "nvram", ROMREGION_ERASE00 )
+	// see comment in easports set
+	ROM_LOAD( "nvram", 0x000000, 0x20000, CRC(ac7b4cb7) SHA1(7828552c20090a4dc4ca8b2ea5007e6020b9ffdf) )
+ROM_END
 
 ROM_START( easportsu )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "ea.u2", 0x000000, 0x400000, CRC(ca896683) SHA1(0d655e8a5e07e1259c358328fdc9f0084709ecc3) )
 ROM_END
-
 
 ROM_START( jak_wpt )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -774,5 +782,6 @@ CONS( 200?, conyfght,  0,        0, spg110_base, conyteni,  spg110_game_state, e
 // The unit contains no BIOS ROM, was sold by Taikee as Singing Star Karaoke, but also by Imaginarium / ItsMagical in Spain as Karao Kids.  Cartridges are compatible.
 CONS( 200?, sstarkar,  0,        0, sstarkar, conyteni,  spg110_sstarkar_game_state, empty_init, "Taikee",      "Singing Star Karaoke (World) / Karao Kids (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // "ItsMagical" brand from Imaginarium
 
-CONS( 2004, easports,  0,        0, easports_pal, easports,  spg110_easports_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse",      "EA Sports Classics: NHL 95 & FIFA Soccer 96 (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, easports,  0,        0, easports_pal, easports,  spg110_easports_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse",      "EA Sports Classics: NHL 95 & FIFA Soccer 96 (JAKKS Pacific TV Game, version 12 11 A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, easportsa, easports, 0, easports_pal, easports,  spg110_easports_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse",      "EA Sports Classics: NHL 95 & FIFA Soccer 96 (JAKKS Pacific TV Game, version 11 11 A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2004, easportsu, easports, 0, easports,     easports,  spg110_easports_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse",      "EA Sports Classics: NHL 95 & Madden 95 (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
