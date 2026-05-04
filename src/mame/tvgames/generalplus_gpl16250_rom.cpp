@@ -830,7 +830,7 @@ CONS(200?, dressmtv,  0,       0, base_alt_irq, dressmtv, gcm394_game_state, emp
 CONS(201?, tkmag220,  0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "TaiKee / Senca",         "Mini Arcade Games Console (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // DGUN-2891 or DGUN-2864 ? both look the same, no indication on unboxed unit?
 CONS(201?, myac220,   0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "dreamGEAR / Senca",      "My Arcade Go Gamer Portable (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS(201?, typo176,   0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "Typo / Senca",           "Family Sport 176-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS(201?, typo176,   0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "Typo / Senca",           "Arcade Game 2.0 (model 8052C, Family Sport 176-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // has 227 selectable games, and 3 single game cartridges
 // cartridges have no ROM but launch a single game after the boot screen (Fighter, Baseball or Golf)
