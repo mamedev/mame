@@ -484,7 +484,7 @@ bool pmmu_walk_tables(u32 addr_in, int type, u32 table, const int fc,
 					MMULOG("LONG INDIRECT DESC: %08x%08x\n", tbl_entry, tbl_entry2);
 					addr_out = tbl_entry2 & M68K_MMU_DF_IND_ADDR_MASK;
 					tbl_entry = m_program->read_dword(addr_out);
-					tbl_entry2 = m_program->read_dword(addr_out + 4);
+					tbl_entry2 = m_program->read_dword(addr_out);
 					type = tbl_entry & M68K_MMU_DF_DT;
 				}
 
