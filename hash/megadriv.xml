@@ -33161,7 +33161,7 @@ Freezes at the start of any in-game mode
 	</software>
 
 	<software name="tanzer_dm2" cloneof="tanzer">
-		<description>Tänzer (Mega Cat Studios) (demo)</description>
+		<description>Tänzer (Mega Cat Studios, demo)</description>
 		<year>2019</year>
 		<publisher>Mega Cat Studios</publisher>
 		<info name="developer" value="Johan Agurén"/>
