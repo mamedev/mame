@@ -34,7 +34,7 @@ public:
 	void recieve_spi_fifo_data(u8 data);
 
 protected:
-	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void gpspi_direct_internal_map(address_map &map) ATTR_COLD;
 
@@ -68,7 +68,7 @@ private:
 	void spifc_ctrl2_w(u16 data);
 
 	u16 pllsel_r();
-	void pllsel_w(uint16_t data);
+	void pllsel_w(u16 data);
 
 	// Byte swap etc.
 	u16 byte_swap_r();

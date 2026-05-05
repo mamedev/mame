@@ -316,7 +316,7 @@ u16 generalplus_gpl951xx_device::pllsel_r()
 	return m_pllchange;
 }
 
-void generalplus_gpl951xx_device::pllsel_w(uint16_t data)
+void generalplus_gpl951xx_device::pllsel_w(u16 data)
 {
 	// very similar to pllchange on GPL162xx, but with extra SPI bits
 	logerror("%s: generalplus_gpl951xx_device::pllsel_w %04x\n", machine().describe_context(), data);

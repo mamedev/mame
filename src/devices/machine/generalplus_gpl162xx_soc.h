@@ -22,7 +22,7 @@ typedef device_delegate<void (u16, u16, u16, u16, u16)> sunplus_gcm394_cs_callba
 class sunplus_gcm394_base_device : public unsp_20_device, public device_mixer_interface
 {
 public:
-	sunplus_gcm394_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
+	sunplus_gcm394_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 		sunplus_gcm394_base_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(sunplus_gcm394_base_device::gcm394_internal_map), this))
 	{
 	}
@@ -68,9 +68,9 @@ public:
 	u16 get_ram_addr(u32 addr) { return m_mainram[addr]; }
 
 protected:
-	sunplus_gcm394_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock, address_map_constructor internal);
+	sunplus_gcm394_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal);
 
-	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;

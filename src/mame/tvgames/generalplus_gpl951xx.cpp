@@ -14,7 +14,7 @@ namespace {
 class generalplus_gpl951xx_game_state : public driver_device
 {
 public:
-	generalplus_gpl951xx_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+	generalplus_gpl951xx_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
@@ -38,10 +38,10 @@ protected:
 
 	void gpl951xx(machine_config &config) ATTR_COLD;
 
-	uint16_t porta_r();
-	uint16_t portb_r();
-	uint16_t portc_r();
-	void porta_w(uint16_t data);
+	u16 porta_r();
+	u16 portb_r();
+	u16 portc_r();
+	void porta_w(u16 data);
 
 	void spi_reset(u8 data);
 	void spi_access_from_soc(u8 data);
@@ -54,28 +54,28 @@ protected:
 };
 
 
-uint16_t generalplus_gpl951xx_game_state::porta_r()
+u16 generalplus_gpl951xx_game_state::porta_r()
 {
-	uint16_t data = m_io[0]->read();
+	u16 data = m_io[0]->read();
 	logerror("Port A Read: %04x\n", data);
 	return data;
 }
 
-uint16_t generalplus_gpl951xx_game_state::portb_r()
+u16 generalplus_gpl951xx_game_state::portb_r()
 {
-	uint16_t data = m_io[1]->read();
+	u16 data = m_io[1]->read();
 	logerror("Port B Read: %04x\n", data);
 	return data;
 }
 
-uint16_t generalplus_gpl951xx_game_state::portc_r()
+u16 generalplus_gpl951xx_game_state::portc_r()
 {
-	uint16_t data = m_io[2]->read();
+	u16 data = m_io[2]->read();
 	logerror("Port C Read: %04x\n", data);
 	return data;
 }
 
-void generalplus_gpl951xx_game_state::porta_w(uint16_t data)
+void generalplus_gpl951xx_game_state::porta_w(u16 data)
 {
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
 }
@@ -445,7 +445,7 @@ ROM_END
 
 void generalplus_gpl951xx_game_state::init_fif()
 {
-	u16* spirom16 = (u16*)memregion("spi")->base();
+	u16 *spirom16 = (u16*)memregion("spi")->base();
 	for (int i = 0; i < memregion("spi")->bytes() / 2; i++)
 	{
 		spirom16[i] = bitswap<16>(spirom16[i] ^ 0xdd0d,

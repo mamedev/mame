@@ -8,7 +8,7 @@
 
 #define LOG_SPI (1U << 1)
 
-#define VERBOSE     (LOG_SPI)
+#define VERBOSE     (0)
 
 #include "logmacro.h"
 

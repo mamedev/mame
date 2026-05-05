@@ -41,10 +41,10 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank(int state);
 
-	void write_tmap_scroll(int tmap, u16* regs, int offset, u16 data);
-	void write_tmap_extrascroll(int tmap, u16* regs, int offset, u16 data);
+	void write_tmap_scroll(int tmap, u16 *regs, int offset, u16 data);
+	void write_tmap_extrascroll(int tmap, u16 *regs, int offset, u16 data);
 
-	void write_tmap_regs(int tmap, u16* regs, int offset, u16 data);
+	void write_tmap_regs(int tmap, u16 *regs, int offset, u16 data);
 
 	//void set_paldisplaybank_high(int pal_displaybank_high) { m_pal_displaybank_high = pal_displaybank_high; }
 	void set_legacy_video_mode() { m_use_legacy_mode = true; }
@@ -147,7 +147,7 @@ public:
 	u16 video_70e0_prng_r();
 
 protected:
-	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -157,7 +157,7 @@ protected:
 
 	void unk_vid_regs_w(int which, int offset, u16 data);
 
-	void decodegfx(const char* tag);
+	void decodegfx(const char *tag);
 
 	required_shared_ptr<u16> m_rowscroll;
 	required_shared_ptr<u16> m_rowzoom;

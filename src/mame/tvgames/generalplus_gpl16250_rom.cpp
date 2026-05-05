@@ -21,7 +21,7 @@ namespace {
 class tkmag220_game_state : public gcm394_game_state
 {
 public:
-	tkmag220_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+	tkmag220_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		gcm394_game_state(mconfig, type, tag)
 	{
 	}
@@ -32,9 +32,9 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	virtual uint16_t cs0_r(offs_t offset) override;
+	virtual u16 cs0_r(offs_t offset) override;
 
-	void tkmag220_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tkmag220_portd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	int m_upperbase = 0;
 };
@@ -43,7 +43,7 @@ private:
 class beijuehh_game_state : public gcm394_game_state
 {
 public:
-	beijuehh_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+	beijuehh_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		gcm394_game_state(mconfig, type, tag)
 	{
 	}
@@ -54,28 +54,28 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	virtual uint16_t cs0_r(offs_t offset) override;
+	virtual u16 cs0_r(offs_t offset) override;
 
-	void beijuehh_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void beijuehh_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void beijuehh_portb_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void beijuehh_portd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	int m_upperbase = 0;
 
-	uint16_t m_portb_data = 0U;
-	uint16_t m_portd_data = 0U;
-	uint8_t m_bank = 0U;
+	u16 m_portb_data = 0U;
+	u16 m_portd_data = 0U;
+	u8 m_bank = 0U;
 };
 
 
 class gameu_handheld_game_state : public gcm394_game_state
 {
 public:
-	gameu_handheld_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+	gameu_handheld_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		gcm394_game_state(mconfig, type, tag)
 	{
 	}
 
-	virtual uint16_t cs0_r(offs_t offset) override;
+	virtual u16 cs0_r(offs_t offset) override;
 
 	void gameu(machine_config &config) ATTR_COLD;
 
@@ -88,16 +88,16 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void gameu_porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void gameu_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void gameu_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void gameu_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gameu_porta_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void gameu_portb_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void gameu_portc_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void gameu_portd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	uint32_t m_upperbase;
-	uint16_t m_porta_data;
-	uint16_t m_portb_data;
-	uint16_t m_portc_data;
-	uint16_t m_portd_data;
+	u32 m_upperbase;
+	u16 m_porta_data;
+	u16 m_portb_data;
+	u16 m_portc_data;
+	u16 m_portd_data;
 };
 
 
@@ -547,7 +547,7 @@ void tkmag220_game_state::tkmag220(machine_config &config)
 	m_maincpu->portd_out().set(FUNC(tkmag220_game_state::tkmag220_portd_w));
 }
 
-void tkmag220_game_state::tkmag220_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void tkmag220_game_state::tkmag220_portd_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (m_maincpu->pc() < 0x10000)
 	{
@@ -565,7 +565,7 @@ void tkmag220_game_state::tkmag220_portd_w(offs_t offset, uint16_t data, uint16_
 }
 
 
-uint16_t tkmag220_game_state::cs0_r(offs_t offset)
+u16 tkmag220_game_state::cs0_r(offs_t offset)
 {
 	// [:] installing cs0 handler start_address 00000000 end_address 007fffff
 	return m_romregion[(offset & 0x07fffff) + m_upperbase];
@@ -600,7 +600,7 @@ void beijuehh_game_state::beijuehh(machine_config &config)
 }
 
 
-void beijuehh_game_state::beijuehh_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void beijuehh_game_state::beijuehh_portb_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (m_maincpu->pc() < 0xf000)
 	{
@@ -623,7 +623,7 @@ void beijuehh_game_state::beijuehh_portb_w(offs_t offset, uint16_t data, uint16_
 }
 
 
-void beijuehh_game_state::beijuehh_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void beijuehh_game_state::beijuehh_portd_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (m_maincpu->pc() < 0xf000)
 	{
@@ -646,7 +646,7 @@ void beijuehh_game_state::beijuehh_portd_w(offs_t offset, uint16_t data, uint16_
 }
 
 
-uint16_t beijuehh_game_state::cs0_r(offs_t offset)
+u16 beijuehh_game_state::cs0_r(offs_t offset)
 {
 	// [:] installing cs0 handler start_address 00000000 end_address 003fffff
 	return m_romregion[(offset & 0x03fffff) + m_upperbase];
@@ -690,30 +690,30 @@ void gameu_handheld_game_state::gameu(machine_config &config)
 	m_screen->set_visarea(0, (160)-1, 0, (128)-1); // appears to be the correct resolution for the LCD panel
 }
 
-uint16_t gameu_handheld_game_state::cs0_r(offs_t offset)
+u16 gameu_handheld_game_state::cs0_r(offs_t offset)
 {
 	return m_romregion[(offset & 0x00fffff) + m_upperbase];
 }
 
-void gameu_handheld_game_state::gameu_porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gameu_handheld_game_state::gameu_porta_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	logerror("%s: porta write %04x\n", machine().describe_context(), data);
 	m_porta_data = data;
 }
 
-void gameu_handheld_game_state::gameu_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gameu_handheld_game_state::gameu_portb_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	logerror("%s: portb write %04x\n", machine().describe_context(), data);
 	m_portb_data = data;
 }
 
-void gameu_handheld_game_state::gameu_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gameu_handheld_game_state::gameu_portc_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	logerror("%s: portc write %04x\n", machine().describe_context(), data);
 	m_portc_data = data;
 }
 
-void gameu_handheld_game_state::gameu_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gameu_handheld_game_state::gameu_portd_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// hacky, maybe we need better direction/attribute handling on the ports in the core?
 	m_portd_data = data;
@@ -722,7 +722,7 @@ void gameu_handheld_game_state::gameu_portd_w(offs_t offset, uint16_t data, uint
 	{
 		logerror("%s: portd write %04x %04x\n", machine().describe_context(), data, mem_mask);
 
-		uint8_t bank = (data & 0xfc00) >> 10;
+		u8 bank = (data & 0xfc00) >> 10;
 		m_upperbase = bank * 0x40000;
 	}
 
@@ -752,7 +752,7 @@ void gameu_handheld_game_state::machine_reset()
 
 void gameu_handheld_game_state::init_gameu()
 {
-	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
+	u16 *ROM = (u16*)memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
 
 	for (int i = 0; i < size/2; i++)
@@ -771,7 +771,7 @@ void gameu_handheld_game_state::init_gameu50()
 	init_gameu();
 
 	// why do we need these? it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise, which can't be correct
-	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
+	u16 *ROM = (u16*)memregion("maincpu")->base();
 	int base = 0x19c9a;
 	ROM[(base + 0x00) / 2] = 0xf165;
 	ROM[(base + 0x02) / 2] = 0xf165;
@@ -790,7 +790,7 @@ void gameu_handheld_game_state::init_gameu108()
 {
 	init_gameu();
 
-	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
+	u16 *ROM = (u16*)memregion("maincpu")->base();
 
 	// why do we need these? it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise, which can't be correct
 	ROM[(0x1aa48) / 2] = 0xf165;

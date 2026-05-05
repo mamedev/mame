@@ -31,27 +31,27 @@
 #include "generalplus_gpl16250_nand.h"
 #include "softlist_dev.h"
 
-uint16_t generalplus_gpac800_game_state::cs0_r(offs_t offset)
+u16 generalplus_gpac800_game_state::cs0_r(offs_t offset)
 {
 	return m_sdram2[offset & 0xffff];
 }
 
-void generalplus_gpac800_game_state::cs0_w(offs_t offset, uint16_t data)
+void generalplus_gpac800_game_state::cs0_w(offs_t offset, u16 data)
 {
 	m_sdram2[offset & 0xffff] = data;
 }
 
-uint16_t generalplus_gpac800_game_state::cs1_r(offs_t offset)
+u16 generalplus_gpac800_game_state::cs1_r(offs_t offset)
 {
 	return m_sdram[offset & (m_sdram_kwords-1)];
 }
 
-void generalplus_gpac800_game_state::cs1_w(offs_t offset, uint16_t data)
+void generalplus_gpac800_game_state::cs1_w(offs_t offset, u16 data)
 {
 	m_sdram[offset & (m_sdram_kwords-1)] = data;
 }
 
-uint8_t generalplus_gpac800_game_state::read_nand(offs_t offset)
+u8 generalplus_gpac800_game_state::read_nand(offs_t offset)
 {
 	if (!m_nandregion)
 		return 0x0000;
@@ -132,7 +132,7 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 
 DEVICE_IMAGE_LOAD_MEMBER(generalplus_gpac800_vbaby_game_state::cart_load)
 {
-	uint32_t const size = m_cart->common_get_size("rom");
+	u32 const size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
@@ -715,7 +715,7 @@ void generalplus_gpac800_game_state::machine_start()
 
 void generalplus_gpac800_game_state::nand_create_stripped_region()
 {
-	uint8_t* rom = m_nandregion;
+	u8* rom = m_nandregion;
 	int size = memregion("nandrom")->bytes();
 	m_size = size;
 
@@ -786,7 +786,7 @@ void generalplus_gpac800_game_state::machine_reset()
 		// copy a block of code from the NAND to RAM
 		for (int i = 0; i < m_initial_copy_words; i++)
 		{
-			uint16_t word = m_strippedrom[(i * 2) + 0] | (m_strippedrom[(i * 2) + 1] << 8);
+			u16 word = m_strippedrom[(i * 2) + 0] | (m_strippedrom[(i * 2) + 1] << 8);
 
 			mem.write_word(dest + i, word);
 		}
@@ -797,7 +797,7 @@ void generalplus_gpac800_game_state::machine_reset()
 		   so these must trampoline (although 20xxx currently isn't handled as RAM, so that needs more
 		   thought anyway
 		*/
-		uint16_t* internal = (uint16_t*)memregion("maincpu:internal")->base();
+		u16* internal = (u16*)memregion("maincpu:internal")->base();
 
 		int addr;
 		addr = (m_vectorbase + 0x0a) & 0x000fffff;

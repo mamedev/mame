@@ -49,12 +49,12 @@ gcm394_video_device::gcm394_video_device(const machine_config &mconfig, const ch
 {
 }
 
-void gcm394_base_video_device::decodegfx(const char* tag)
+void gcm394_base_video_device::decodegfx(const char *tag)
 {
 	if (!memregion(tag))
 		return;
 
-	u8* gfxregion = memregion(tag)->base();
+	u8 *gfxregion = memregion(tag)->base();
 	int gfxregionsize = memregion(tag)->bytes();
 
 	if (1)
@@ -413,7 +413,7 @@ u32 gcm394_base_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 }
 
 
-void gcm394_base_video_device::write_tmap_scroll(int tmap, u16* regs, int offset, u16 data)
+void gcm394_base_video_device::write_tmap_scroll(int tmap, u16 *regs, int offset, u16 data)
 {
 	switch (offset)
 	{
@@ -429,7 +429,7 @@ void gcm394_base_video_device::write_tmap_scroll(int tmap, u16* regs, int offset
 	}
 }
 
-void gcm394_base_video_device::write_tmap_regs(int tmap, u16* regs, int offset, u16 data)
+void gcm394_base_video_device::write_tmap_regs(int tmap, u16 *regs, int offset, u16 data)
 {
 	switch (offset)
 	{
@@ -465,7 +465,7 @@ void gcm394_base_video_device::write_tmap_regs(int tmap, u16* regs, int offset, 
 // As the hardware appears to support ROZ these are probably 2 extra tile layers, with the 2 additional words being the ROZ parameters?
 
 
-void gcm394_base_video_device::write_tmap_extrascroll(int tmap, u16* regs, int offset, u16 data)
+void gcm394_base_video_device::write_tmap_extrascroll(int tmap, u16 *regs, int offset, u16 data)
 {
 	switch (offset)
 	{
