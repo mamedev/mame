@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <locale>
 #include <sstream>
+#include <unordered_set>
 
 
 const int core_options::MAX_UNADORNED_OPTIONS;
@@ -977,6 +978,7 @@ void core_options::parse_command_line(const std::vector<std::string> &args, int 
 
 void core_options::parse_ini_file(util::core_file &inifile, int priority, bool ignore_unknown_options, bool always_override)
 {
+	std::unordered_set<entry *> entries_set;
 	std::ostringstream error_stream;
 	condition_type condition = condition_type::NONE;
 
@@ -1035,8 +1037,37 @@ void core_options::parse_ini_file(util::core_file &inifile, int priority, bool i
 			continue;
 		}
 
-		// set the new data
-		do_set_value(*curentry, trim_spaces_and_quotes(optiondata), priority, error_stream, condition, true);
+		// ensure INI files found earlier in the path have priority
+		std::string_view const trimmed = trim_spaces_and_quotes(optiondata);
+		if (entries_set.find(curentry.get()) != entries_set.end())
+		{
+			do_set_value(*curentry, trimmed, priority, error_stream, condition, true);
+		}
+		if (curentry->priority() < priority)
+		{
+			do_set_value(*curentry, trimmed, priority, error_stream, condition, true);
+			entries_set.emplace(curentry.get());
+		}
+		else
+		{
+			// just validate if the entry already has the same or higher priority and we didn't set it
+			try
+			{
+				curentry->validate(trimmed);
+			}
+			catch (options_warning_exception const &ex)
+			{
+				// we want to aggregate option exceptions
+				error_stream << ex.message();
+				condition = std::max(condition, condition_type::WARN);
+			}
+			catch (options_error_exception const &ex)
+			{
+				// we want to aggregate option exceptions
+				error_stream << ex.message();
+				condition = std::max(condition, condition_type::ERR);
+			}
+		}
 	}
 
 	// did we have any errors that may need to be aggregated?
