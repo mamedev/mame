@@ -324,9 +324,10 @@ bool core_options::entry::internal_copy_value(const entry &that)
 //  entry::validate
 //-------------------------------------------------
 
-void core_options::entry::validate(const std::string &data)
+void core_options::entry::validate(std::string_view data)
 {
-	std::istringstream str(data);
+	std::istringstream str;
+	str.str(std::string(data));
 	str.imbue(std::locale::classic());
 
 	switch (type())

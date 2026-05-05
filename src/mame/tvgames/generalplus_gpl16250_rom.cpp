@@ -489,6 +489,11 @@ ROM_START( myac220 )
 	ROM_LOAD16_WORD_SWAP( "myarcadegogamerportable.bin", 0x0000000, 0x8000000, BAD_DUMP CRC(c929a2fa) SHA1(e99007ccc45a268267b4ea0efaf22e3117f5a6bd) ) // several sections seemed to be erased, was repaired with data from tkmag220, likely good but should be verified
 ROM_END
 
+ROM_START( typo176 )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "gl01gp.u2", 0x0000000, 0x8000000, CRC(44b04142) SHA1(f04a6275e4f3010c660699ab83bd78ca73cb3c7b) )
+ROM_END
+
 ROM_START( gp230 )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "s29gl01gp12tfi01.u2", 0x0000000, 0x8000000, CRC(9deb638e) SHA1(d5815135f48178460eee4a3abd45d79fabe1bcfa) )
@@ -825,6 +830,7 @@ CONS(200?, dressmtv,  0,       0, base_alt_irq, dressmtv, gcm394_game_state, emp
 CONS(201?, tkmag220,  0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "TaiKee / Senca",         "Mini Arcade Games Console (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // DGUN-2891 or DGUN-2864 ? both look the same, no indication on unboxed unit?
 CONS(201?, myac220,   0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "dreamGEAR / Senca",      "My Arcade Go Gamer Portable (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS(201?, typo176,   0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "Typo / Senca",           "Arcade Game 2.0 (model 8052C, Family Sport 176-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // has 227 selectable games, and 3 single game cartridges
 // cartridges have no ROM but launch a single game after the boot screen (Fighter, Baseball or Golf)

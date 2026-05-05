@@ -5,7 +5,7 @@
 
 Newcrest CXG Sphinx Royal family
 
-NOTE: Turn the power switch (or button in supra's case) off before exiting MAME,
+NOTE: Turn the power switch off (or button in supra's case) before exiting MAME,
 otherwise NVRAM won't save properly. And only turn the power off when it's the
 user's turn to move, this is warned about in the manual.
 

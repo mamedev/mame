@@ -124,6 +124,17 @@ Undumped carts:
 		</part>
 	</software>
 
+	<software name="poohfr" cloneof="pooh" supported="no">
+		<description>Winnie l'Ourson - Saute, Tigrou, Saute! / Winnie l'Ourson et l'arbre a miel (France)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Lansay / Handheld Games</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="telestorypoohfr.bin" size="0x800000" crc="953dfe3c" sha1="699eefe1ffb3db25282820cd54a4afb2a554d387"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="cinder" supported="no">
 		<description>Cinderella - Cinderella / Beauties in Bloom (USA)</description>
 		<year>2006</year>
@@ -131,6 +142,17 @@ Undumped carts:
 		<part name="cart" interface="telestory_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="telestorycinderella.bin" size="0x800000" crc="c95f6cad" sha1="5f361480cbd4f12aacaaed55da113065fd4308d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderfr" cloneof="cinder" supported="no">
+		<description>Cendrillon - Cendrillon / Beautes en Fleur (France)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Lansay / Handheld Games</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="telestorycinderellafr.bin" size="0x800000" crc="fc4523d3" sha1="38dc35f72223234ef898e97dd93ca9a1f8c45b88"/>
 			</dataarea>
 		</part>
 	</software>
@@ -153,6 +175,17 @@ Undumped carts:
 		<part name="cart" interface="telestory_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="telestorylionkingit.bin" size="0x800000" crc="e9661239" sha1="e3337c9a4ba3a9baa9b175ba3503d867a5141a9e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingfr" cloneof="lionking" supported="no">
+		<description>Le Roi Lion / Le Roi Lion II - L'honneur de la Trieu (France)</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Lansay / Handheld Games</publisher>
+		<part name="cart" interface="telestory_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="telestorylionkingfr.bin" size="0x800000" crc="86b544d9" sha1="5e4e97dab6ecce28869f0eed413d390775f6b4b5"/>
 			</dataarea>
 		</part>
 	</software>
