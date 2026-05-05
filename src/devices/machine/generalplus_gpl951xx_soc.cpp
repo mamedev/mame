@@ -50,17 +50,17 @@ u8 generalplus_gpl951xx_device::get_byte_from_rx_fifo()
 // 14  rx_empty
 // 13
 // 12
-// 
+//
 // 11
 // 10
 // 9   ig_clk
 // 8   manual
-// 
+//
 // 7   cmio[1]
 // 6   cmio[0]
 // 5   amio[1]
 // 4   amio[0]
-// 
+//
 // 3   mio[1]
 // 2   mio[0]
 // 1
@@ -95,12 +95,12 @@ void generalplus_gpl951xx_device::spifc_ctrl_w(u16 data)
 // 10
 //  9  cmd_only
 //  8  wo_cmd
-// 
+//
 //  7  wpif_cmd[7]
 //  6  wpif_cmd[6]
 //  5  wpif_cmd[5]
 //  4  wpif_cmd[4]
-// 
+//
 //  3  wpif_cmd[3]
 //  2  wpif_cmd[2]
 //  1  wpif_cmd[1]
@@ -146,7 +146,7 @@ void generalplus_gpl951xx_device::spifc_cmd_w(u16 data)
 // 6   enhan_by[6]
 // 5   enhan_by[5]
 // 4   enhan_by[4]
-// 
+//
 // 3   enhan_by[4]
 // 2   enhan_by[3]
 // 1   enhan_by[2]
@@ -222,7 +222,7 @@ u16 generalplus_gpl951xx_device::spifc_rxdat_r()
 	after auto command bite spifc_cmd_w is set to 9f (ident)
 
 	at 672 R1 will be xx00 (results from device)
-    R2 will be xxxx (results from device)
+	R2 will be xxxx (results from device)
 
 	continuing to 232 it restores these values and it checks if R1 is 0000 (it shouldn't be)
 
@@ -232,7 +232,7 @@ u16 generalplus_gpl951xx_device::spifc_rxdat_r()
 
 	return m_spifc_rx_read_latch;
 }
-	
+
 
 void generalplus_gpl951xx_device::spifc_rxdat_w(u16 data)
 {
@@ -484,17 +484,17 @@ void generalplus_gpl951xx_device::gpl951xx_timerh_preload_w(u16 data)
 // 14  TMHIE
 // 13  TMHEN
 // 12
-// 
+//
 // 11  EXT0SEL[1]
 // 10  EXT0SEL[0]
 // 9   EXT1SEL[1]
 // 8   EXT1SEL[0]
-// 
+//
 // 7
 // 6   SRCBSEL[2]
 // 5   SRCBSEL[1]
 // 4   SRCBSEL[0]
-// 
+//
 // 3   SRCASEL[3]
 // 2   SRCASEL[2]
 // 1   SRCASEL[1]
@@ -562,7 +562,7 @@ u16 generalplus_gpl951xx_device::spi_direct_r(offs_t offset)
 	// The GPL951xx chips can see a bank of SPI memory as a flat space
 	// as they will automatically generate SPI signals for random memory
 	// access on demand
-	// 
+	//
 	// Emulating it this way is impractical for emulation (DASM wouldn't
 	// work) so we just present it as a flat space directly.
 	if (!m_spiregion)
@@ -603,16 +603,16 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map &map)
 	map(0x007023, 0x007023).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap2_tilebase_lsb_r), FUNC(gcm394_base_video_device::tmap2_tilebase_lsb_w));           // 7023 - Segment_Tx3
 
 	//
-	// 
-	// 
-	// 
+	//
+	//
+	//
 	//
 	map(0x00702a, 0x00702a).w(m_spg_video, FUNC(gcm394_base_video_device::blending_w)); // 702a - Blending
 	map(0x00702b, 0x00702b).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap0_tilebase_msb_r), FUNC(gcm394_base_video_device::tmap0_tilebase_msb_w));           // 702b - Segment_Tx1H
 	map(0x00702c, 0x00702c).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap1_tilebase_msb_r), FUNC(gcm394_base_video_device::tmap1_tilebase_msb_w));           // 702c - Segment_Tx2H
 	map(0x00702d, 0x00702d).rw(m_spg_video, FUNC(gcm394_base_video_device::sprite_702d_gfxbase_msb_r), FUNC(gcm394_base_video_device::sprite_702d_gfxbase_msb_w)); // 702d - Segment_spH
 	map(0x00702e, 0x00702e).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap2_tilebase_msb_r), FUNC(gcm394_base_video_device::tmap2_tilebase_msb_w));           // 702e - Segment_Tx3H
-		
+
 	//
 	map(0x007030, 0x007030).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7030_brightness_r), FUNC(gcm394_base_video_device::video_7030_brightness_w)); // 7030 - Fade_Control
 	//
@@ -776,7 +776,7 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map &map)
 	map(0x007870, 0x007870).rw(FUNC(generalplus_gpl951xx_device::ioc_data_r) ,FUNC(generalplus_gpl951xx_device::ioc_data_w));                     // 7870 - IOC_Data
 	map(0x007871, 0x007871).rw(FUNC(generalplus_gpl951xx_device::ioc_buffer_r), FUNC(generalplus_gpl951xx_device::ioc_buffer_w));       // 7871 - IOC_Buffer
 	map(0x007872, 0x007872).rw(FUNC(generalplus_gpl951xx_device::ioc_dir_r), FUNC(generalplus_gpl951xx_device::ioc_dir_w)); // 7872 - IOC_Dir
-	map(0x007873, 0x007873).rw(FUNC(generalplus_gpl951xx_device::ioc_attrib_r), FUNC(generalplus_gpl951xx_device::ioc_attrib_w)); // 7873 - IOC_Attrib	
+	map(0x007873, 0x007873).rw(FUNC(generalplus_gpl951xx_device::ioc_attrib_r), FUNC(generalplus_gpl951xx_device::ioc_attrib_w)); // 7873 - IOC_Attrib
 	// 7874 - IOC_Drv
 	// 7875 - IOC_Mux
 	// 7876 - IOC_Latch
