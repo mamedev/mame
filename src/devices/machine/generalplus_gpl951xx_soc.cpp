@@ -585,7 +585,7 @@ u16 generalplus_gpl951xx_device::spi_direct_bank_r(offs_t offset)
 
 }
 
-void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
+void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map &map)
 {
 	map(0x000000, 0x0027ff).ram().share("mainram");
 

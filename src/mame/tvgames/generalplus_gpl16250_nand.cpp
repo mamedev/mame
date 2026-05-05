@@ -74,7 +74,7 @@ void generalplus_gpac800_game_state::dma_complete_hacks(int state)
 
 	// note, these patch the code copied to SRAM so the 'PROGRAM ROM' check fails (it passes otherwise)
 
-	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 	//if (mem.read_word(0x4368c) == 0x4846)
 	//  mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
@@ -715,7 +715,7 @@ void generalplus_gpac800_game_state::machine_start()
 
 void generalplus_gpac800_game_state::nand_create_stripped_region()
 {
-	u8* rom = m_nandregion;
+	u8 *rom = m_nandregion;
 	int size = memregion("nandrom")->bytes();
 	m_size = size;
 
@@ -750,7 +750,7 @@ void generalplus_gpac800_game_state::nand_create_stripped_region()
 void generalplus_gpac800_game_state::machine_reset()
 {
 	// configure CS defaults
-	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	mem.write_word(0x007820, 0x0047);
 	mem.write_word(0x007821, 0xff47);
 	mem.write_word(0x007822, 0x00c7);
@@ -767,7 +767,7 @@ void generalplus_gpac800_game_state::machine_reset()
 
 		// simulate bootstrap / internal ROM
 
-		address_space& mem = m_maincpu->space(AS_PROGRAM);
+		address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 		/* Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
 		   00000000 (50 47 61 6E 64 6E 61 6E 64 6E)-- -- -- -- -- --  PGandnandn------
@@ -797,7 +797,7 @@ void generalplus_gpac800_game_state::machine_reset()
 		   so these must trampoline (although 20xxx currently isn't handled as RAM, so that needs more
 		   thought anyway
 		*/
-		u16* internal = (u16*)memregion("maincpu:internal")->base();
+		u16 *internal = (u16*)memregion("maincpu:internal")->base();
 
 		int addr;
 		addr = (m_vectorbase + 0x0a) & 0x000fffff;

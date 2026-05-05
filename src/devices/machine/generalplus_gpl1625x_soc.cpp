@@ -854,7 +854,7 @@ vbaby code is very differet, attempts to load NAND block manually, not with DMA
 
 // all tilemap registers etc. appear to be in the same place as the above system, including the 'extra' ones not on the earlier models
 // so it's likely this is built on top of that just with NAND support
-void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
+void generalplus_gpac800_device::gpac800_internal_map(address_map &map)
 {
 	sunplus_gcm394_base_device::base_internal_map(map);
 
@@ -907,7 +907,7 @@ u16 generalplus_gpspispi_device::spi_unk_7943_r()
 	return 0x0007;
 }
 
-void generalplus_gpspispi_device::gpspispi_internal_map(address_map& map)
+void generalplus_gpspispi_device::gpspispi_internal_map(address_map &map)
 {
 	sunplus_gcm394_base_device::base_internal_map(map);
 

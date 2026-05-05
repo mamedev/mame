@@ -347,7 +347,7 @@ void wrlshunt_game_state::porta_w(u16 data)
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
 
 	// HACK
-	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	if (mem.read_word(0x5b354) == 0xafd0)   // wrlshubt - skip check (EEPROM?)
 		mem.write_word(0x5b354, 0xB403);
 }
@@ -363,7 +363,7 @@ u16 jak_s500_game_state::porta_r()
 	// these are debug helpers to access the test modes while we don't have the
 	// secret codes / controls mapped properly
 
-	//address_space& mem = m_maincpu->space(AS_PROGRAM);
+	//address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 	//if (mem.read_word(0x22b408) == 0x4846)
 	//  mem.write_word(0x22b408, 0x4840);    // jak_s500 force service mode

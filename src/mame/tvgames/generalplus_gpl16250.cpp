@@ -90,7 +90,7 @@ void gcm394_game_state::cs3_w(offs_t offset, u16 data) { logerror("cs3_w %06x %0
 u16 gcm394_game_state::cs4_r(offs_t offset) { logerror("cs4_r %06n", offset); return 0x0000; }
 void gcm394_game_state::cs4_w(offs_t offset, u16 data) { logerror("cs4_w %06x %04x\n", offset, data); }
 
-void gcm394_game_state::cs_map_base(address_map& map)
+void gcm394_game_state::cs_map_base(address_map &map)
 {
 }
 

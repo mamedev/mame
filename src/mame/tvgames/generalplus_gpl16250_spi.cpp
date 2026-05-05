@@ -266,9 +266,9 @@ ROM_END
 void generalplus_gpspispi_game_state::init_spi()
 {
 	int vectorbase = 0x2fe0;
-	u8* spirom = memregion("maincpu")->base();
+	u8 *spirom = memregion("maincpu")->base();
 
-	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 	/*  Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
 
@@ -295,7 +295,7 @@ void generalplus_gpspispi_game_state::init_spi()
 	}
 
 	// these vectors must either directly point to RAM, or at least redirect there after some code
-	u16* internal = (u16*)memregion("maincpu:internal")->base();
+	u16 *internal = (u16*)memregion("maincpu:internal")->base();
 	internal[0x7ff5] = vectorbase + 0x0a;
 	internal[0x7ff6] = vectorbase + 0x0c;
 	internal[0x7ff7] = dest + 0x20; // point boot vector at code in RAM (probably in reality points to internal code that copies the first block)

@@ -607,7 +607,7 @@ void gpl162xx_lcdtype_state::system_dma_params_channel0_w(offs_t offset, u16 dat
 
 			if ((mode == 0x4009) || (mode == 0x6009))
 			{
-				address_space& mem = m_maincpu->space(AS_PROGRAM);
+				address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 				for (int i = 0; i < length; i++)
 				{

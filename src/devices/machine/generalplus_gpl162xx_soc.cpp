@@ -1503,7 +1503,7 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 
 }
 
-void sunplus_gcm394_base_device::gcm394_internal_map(address_map& map)
+void sunplus_gcm394_base_device::gcm394_internal_map(address_map &map)
 {
 	sunplus_gcm394_base_device::base_internal_map(map);
 
@@ -1560,7 +1560,7 @@ u16 sunplus_gcm394_base_device::internalrom_lower32_r(offs_t offset)
 {
 	if (m_boot_mode == 0)
 	{
-		u16* introm = (u16*)m_internalrom->base();
+		u16 *introm = (u16*)m_internalrom->base();
 		return introm[offset];
 	}
 	else
