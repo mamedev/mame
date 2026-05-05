@@ -10,6 +10,7 @@ TODO:
 - Hookup p2000_cass, p2000_flop and p2000_quik SW lists;
 - CTC;
 - Fix RAM hookup (can crash at lower sizes);
+- Ejecting a MDCR cassette while program is loading causes a MAME crash;
 - Joystick (cfr. brkwall)
 - p2000t: GFX offset when no SW is in;
 - p2000m: fix screen size;
