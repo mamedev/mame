@@ -278,13 +278,3 @@ void mbc55x_keyboard_device::device_add_mconfig(machine_config &config)
 	//kbdc.p1_in_cb().set(FUNC(mbc55x_keyboard_device::key_matrix_r));
 	//kbdc.p2_out_cb().set(FUNC(mbc55x_keyboard_device::scan_output_w));
 }
-
-ROM_START(mbc55x_kbd)
-	ROM_REGION(0x0800, "kbdc", 0)
-	ROM_LOAD("d8049hc.m1", 0x0000, 0x0800, NO_DUMP)
-ROM_END
-
-const tiny_rom_entry *mbc55x_keyboard_device::device_rom_region() const
-{
-	return ROM_NAME(mbc55x_kbd);
-}
