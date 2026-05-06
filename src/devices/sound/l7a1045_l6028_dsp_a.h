@@ -4,6 +4,9 @@
 #define MAME_SOUND_L7A1045_L6028_DSP_A_H
 
 #pragma once
+
+#include "machine/timer.h"
+
 class l7a1045_sound_device : public device_t,
 							 public device_sound_interface,
 							 public device_memory_interface
@@ -79,6 +82,8 @@ private:
 	sound_stream    *m_stream;
 	l7a1045_voice   m_voice[NUM_VOICES];
 	uint32_t        m_key;
+	uint16_t        m_control;
+	emu_timer       *m_dma_timer;
 
 	uint8_t m_cur_channel;
 	uint8_t m_cur_register;
@@ -99,6 +104,8 @@ private:
 	void atomic_w(uint16_t data);
 
 	void recalc_loop_start(l7a1045_voice *vptr);
+
+	TIMER_CALLBACK_MEMBER(dma_timer_callback);
 };
 
 DECLARE_DEVICE_TYPE(L7A1045, l7a1045_sound_device)

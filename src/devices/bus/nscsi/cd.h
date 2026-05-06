@@ -78,6 +78,16 @@ private:
 	std::vector<uint8_t> m_xfer_buffer;
 };
 
+class nscsi_cdrom_2x_device : public nscsi_cdrom_device
+{
+public:
+	nscsi_cdrom_2x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual attotime scsi_data_byte_period() override;
+	virtual attotime scsi_data_command_delay() override;
+};
+
 class nscsi_cdrom_sgi_device : public nscsi_cdrom_device
 {
 public:
@@ -165,6 +175,7 @@ protected:
 };
 
 DECLARE_DEVICE_TYPE(NSCSI_CDROM, nscsi_cdrom_device)
+DECLARE_DEVICE_TYPE(NSCSI_CDROM_2X, nscsi_cdrom_2x_device)
 DECLARE_DEVICE_TYPE(NSCSI_CDROM_SGI, nscsi_cdrom_sgi_device)
 DECLARE_DEVICE_TYPE(NSCSI_CDROM_NEWS, nscsi_cdrom_news_device)
 DECLARE_DEVICE_TYPE(NSCSI_RRD45, nscsi_dec_rrd45_device)
