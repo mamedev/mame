@@ -686,20 +686,58 @@ offs_t apple2_common_device::dasm_override(std::ostream &stream, offs_t pc, cons
 
 	switch (opcode)
 	{
-		case 0x0d: // ORA
-			return com_3byte_op(stream, pc, opcodes, "ora");
+		// 6502/65c02 direct page
+		case 0x04: return com_2byte_op(stream, pc, opcodes, "tsb");
+		case 0x05: return com_2byte_op(stream, pc, opcodes, "ora");
+		case 0x06: return com_2byte_op(stream, pc, opcodes, "asl");
+		case 0x14: return com_2byte_op(stream, pc, opcodes, "trb");
+		case 0x24: return com_2byte_op(stream, pc, opcodes, "bit");
+		case 0x25: return com_2byte_op(stream, pc, opcodes, "and");
+		case 0x26: return com_2byte_op(stream, pc, opcodes, "rol");
+		case 0x45: return com_2byte_op(stream, pc, opcodes, "eor");
+		case 0x46: return com_2byte_op(stream, pc, opcodes, "lsr");
+		case 0x64: return com_2byte_op(stream, pc, opcodes, "stz");
+		case 0x65: return com_2byte_op(stream, pc, opcodes, "adc");
+		case 0x66: return com_2byte_op(stream, pc, opcodes, "ror");
+		case 0x84: return com_2byte_op(stream, pc, opcodes, "sty");
+		case 0x85: return com_2byte_op(stream, pc, opcodes, "sta");
+		case 0x86: return com_2byte_op(stream, pc, opcodes, "stx");
+		case 0xa4: return com_2byte_op(stream, pc, opcodes, "ldy");
+		case 0xa5: return com_2byte_op(stream, pc, opcodes, "lda");
+		case 0xa6: return com_2byte_op(stream, pc, opcodes, "ldx");
+		case 0xc4: return com_2byte_op(stream, pc, opcodes, "cpy");
+		case 0xc5: return com_2byte_op(stream, pc, opcodes, "cmp");
+		case 0xc6: return com_2byte_op(stream, pc, opcodes, "dec");
+		case 0xe4: return com_2byte_op(stream, pc, opcodes, "cpx");
+		case 0xe5: return com_2byte_op(stream, pc, opcodes, "sbc");
+		case 0xe6: return com_2byte_op(stream, pc, opcodes, "inc");
 
-		case 0xad: // LDA
-			return com_3byte_op(stream, pc, opcodes, "lda");
-
-		case 0x8d:   // STA
-			return com_3byte_op(stream, pc, opcodes, "sta");
-
-		case 0x2c:   // BIT
-			return com_3byte_op(stream, pc, opcodes, "bit");
-
-		case 0x9c:  // STZ
-			return com_3byte_op(stream, pc, opcodes, "stz");
+		// 6502/65c02 absolute
+		case 0x0c: return com_3byte_op(stream, pc, opcodes, "tsb");
+		case 0x0d: return com_3byte_op(stream, pc, opcodes, "ora");
+		case 0x0e: return com_3byte_op(stream, pc, opcodes, "asl");
+		case 0x1c: return com_3byte_op(stream, pc, opcodes, "trb");
+		case 0x2c: return com_3byte_op(stream, pc, opcodes, "bit");
+		case 0x2d: return com_3byte_op(stream, pc, opcodes, "and");
+		case 0x2e: return com_3byte_op(stream, pc, opcodes, "rol");
+		case 0x4c: return com_3byte_op(stream, pc, opcodes, "jmp");
+		case 0x4d: return com_3byte_op(stream, pc, opcodes, "eor");
+		case 0x4e: return com_3byte_op(stream, pc, opcodes, "lsr");
+		case 0x6d: return com_3byte_op(stream, pc, opcodes, "adc");
+		case 0x6e: return com_3byte_op(stream, pc, opcodes, "ror");
+		case 0x8c: return com_3byte_op(stream, pc, opcodes, "sty");
+		case 0x8d: return com_3byte_op(stream, pc, opcodes, "sta");
+		case 0x8e: return com_3byte_op(stream, pc, opcodes, "stx");
+		case 0x9c: return com_3byte_op(stream, pc, opcodes, "stz");
+		case 0xac: return com_3byte_op(stream, pc, opcodes, "ldy");
+		case 0xad: return com_3byte_op(stream, pc, opcodes, "lda");
+		case 0xae: return com_3byte_op(stream, pc, opcodes, "ldx");
+		case 0xcc: return com_3byte_op(stream, pc, opcodes, "cpy");
+		case 0xcd: return com_3byte_op(stream, pc, opcodes, "cmp");
+		case 0xce: return com_3byte_op(stream, pc, opcodes, "dec");
+		case 0xec: return com_3byte_op(stream, pc, opcodes, "cpx");
+		case 0xed: return com_3byte_op(stream, pc, opcodes, "sbc");
+		case 0xee: return com_3byte_op(stream, pc, opcodes, "inc");
 
 		case 0x20:   // JSR
 			{
@@ -733,33 +771,6 @@ offs_t apple2_common_device::dasm_override(std::ostream &stream, offs_t pc, cons
 			}
 			break;
 
-		case 0x4c:   // JMP
-			return com_3byte_op(stream, pc, opcodes, "jmp");
-
-		case 0x84:  // STY ZP
-			return com_2byte_op(stream, pc, opcodes, "sty");
-
-		case 0x85:  // STA ZP
-			return com_2byte_op(stream, pc, opcodes, "sta");
-
-		case 0xa4:  // LDY ZP
-			return com_2byte_op(stream, pc, opcodes, "ldy");
-
-		case 0xa5:  // LDA ZP
-			return com_2byte_op(stream, pc, opcodes, "lda");
-
-		case 0x65:  // ADC ZP
-			return com_2byte_op(stream, pc, opcodes, "adc");
-
-		case 0xc5:  // CMP ZP
-			return com_2byte_op(stream, pc, opcodes, "cmp");
-
-		case 0xc6:  // DEC ZP
-			return com_2byte_op(stream, pc, opcodes, "dec");
-
-		case 0xe6:  // INC ZP
-			return com_2byte_op(stream, pc, opcodes, "inc");
-
 		default:
 			break;
 	}
@@ -778,8 +789,16 @@ offs_t apple2_common_device::dasm_override_GS(std::ostream &stream, offs_t pc, c
 
 	switch (opcode)
 	{
-		case 0x0c:   // TSB
-			return com_3byte_op(stream, pc, opcodes, "tsb");
+		// 65816 absolute long
+		case 0x0f: return com_long_op(stream, pc, opcodes, "ora");
+		case 0x2f: return com_long_op(stream, pc, opcodes, "and");
+		case 0x4f: return com_long_op(stream, pc, opcodes, "eor");
+		case 0x5c: return com_long_op(stream, pc, opcodes, "jml");
+		case 0x6f: return com_long_op(stream, pc, opcodes, "adc");
+		case 0x8f: return com_long_op(stream, pc, opcodes, "sta");
+		case 0xaf: return com_long_op(stream, pc, opcodes, "lda");
+		case 0xcf: return com_long_op(stream, pc, opcodes, "cmp");
+		case 0xef: return com_long_op(stream, pc, opcodes, "sbc");
 
 		case 0xa2:  // LDX
 			if (opcodes.r32(pc + 3) == 0xe1000022)  // JSL E10000
@@ -835,27 +854,6 @@ offs_t apple2_common_device::dasm_override_GS(std::ostream &stream, offs_t pc, c
 				}
 			}
 			break;
-		case 0x5c: // JML
-			return com_long_op(stream, pc, opcodes, "jml");
-
-		case 0x8f:  // STA long
-			return com_long_op(stream, pc, opcodes, "sta");
-
-		case 0xaf:  // LDA long
-			return com_long_op(stream, pc, opcodes, "lda");
-
-		// on IIgs, this is more likely to refer to some non-Monitor direct page, so don't do these that way
-		// (we need a m_maincpu so we can check the D register for a smarter version of this)
-		case 0x84:  // STY ZP
-		case 0x85:  // STA ZP
-		case 0xa4:  // LDY ZP
-		case 0xa5:  // LDA ZP
-		case 0x65:  // ADC ZP
-		case 0xc5:  // CMP ZP
-		case 0xc6:  // DEC ZP
-		case 0xe6:  // INC ZP
-			return dasm_override(stream, pc, opcodes, params);
-
 
 		case 0x82:  // BRL
 			if (opcodes.r16(pc + 3) == 0x7771)
