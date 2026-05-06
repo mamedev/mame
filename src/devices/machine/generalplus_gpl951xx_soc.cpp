@@ -204,6 +204,7 @@ u16 generalplus_gpl951xx_device::spifc_txdat_r()
 void generalplus_gpl951xx_device::spifc_txdat_w(u16 data)
 {
 	LOGMASKED(LOG_SPIFC, "%s: spifc_txdat_w %04x\n", machine().describe_context(), data);
+	m_spi_out(data & 0xff);
 }
 
 // P_SPIFC_RX_Data

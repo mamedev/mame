@@ -16,7 +16,7 @@ public:
 
 	u8 read()
 	{
-		return m_spilatch;
+		return m_spi_latch;
 	}
 
 	void set_ready()
@@ -97,12 +97,14 @@ private:
 	void process_status_read_command(u8 data);
 	void process_status2_read_command(u8 data);
 	void process_status_rdid_command(u8 data);
+	void process_config_read_command(u8 data);
 
-	u32 m_spiaddr;
+	u32 m_spi_addr;
 	u8 m_spi_state;
-	u8 m_spilatch;
+	u8 m_spi_latch;
 	u8 m_spi_state_step;
 	u8 m_spi_statusreg;
+	u8 m_spi_configreg;
 
 	// config
 	u8 *m_spiptr;
