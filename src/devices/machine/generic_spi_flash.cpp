@@ -27,16 +27,23 @@ generic_spi_flash_device::generic_spi_flash_device(const machine_config &mconfig
 
 void generic_spi_flash_device::device_start()
 {
-	save_item(NAME(m_spiaddr));
+	save_item(NAME(m_spi_addr));
 	save_item(NAME(m_spi_state));
-	save_item(NAME(m_spilatch));
+	save_item(NAME(m_spi_latch));
+	save_item(NAME(m_spi_state_step));
+	save_item(NAME(m_spi_statusreg));
+	save_item(NAME(m_spi_configreg));
+
+	m_spi_statusreg = 0;
+	m_spi_configreg = 0;
+	m_spi_state_step = 0;
 }
 
 void generic_spi_flash_device::device_reset()
 {
-	m_spiaddr = 0;
+	m_spi_addr = 0;
 	m_spi_state = 0;
-	m_spilatch = 0;
+	m_spi_latch = 0;
 }
 
 void generic_spi_flash_device::get_command(u8 data)
@@ -70,26 +77,59 @@ void generic_spi_flash_device::get_command(u8 data)
 	{
 		LOGMASKED(LOG_SPI, "Set SPI to WREN (Write Enable)\n");
 		m_spi_state = READY_FOR_COMMAND;
+		m_spi_statusreg |= 0x02;
 	}
 	else if (data == COMMAND_04_WRDI)
 	{
 		LOGMASKED(LOG_SPI, "Set SPI to WRDI (Write Disable)\n");
 		m_spi_state = READY_FOR_COMMAND;
+		m_spi_statusreg &= ~0x02;
 	}
 	else if (data == COMMAND_02_PP)
 	{
 		LOGMASKED(LOG_SPI, "Set SPI to PP (Page Program)\n");
 		m_spi_state = COMMAND_02_PP;
 	}
+	else if (data == COMMAND_11_UNKNOWN)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to COMMAND_11_UNKNOWN\n");
+		m_spi_state = COMMAND_11_UNKNOWN;
+	}
+	else if (data == COMMAND_15_RDCR)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to COMMAND_15_RDCR (Read Configuration Register)\n");
+		m_spi_state = COMMAND_15_RDCR;
+	}
 	else if (data == COMMAND_20_SE)
 	{
 		LOGMASKED(LOG_SPI, "Set SPI to SE (Sector Erase)\n");
 		m_spi_state = COMMAND_20_SE;
 	}
+	else if (data == COMMAND_31_UNKNOWN)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to COMMAND_31_UNKNOWN\n");
+		m_spi_state = COMMAND_31_UNKNOWN;
+	}
+	else if (data == COMMAND_35_RDSR2)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to COMMAND_35_RDSR2\n");
+		m_spi_state = COMMAND_35_RDSR2;
+	}
+	else if (data == COMMAND_66_ENABLE_RESET)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to ENABLE_RESET\n");
+		m_spi_state = READY_FOR_COMMAND;
+	}
 	else if (data == COMMAND_90_REMS)
 	{
 		LOGMASKED(LOG_SPI, "Set SPI to REMS (Read Electronic Manufacturer & Device ID)\n");
 		m_spi_state = COMMAND_90_REMS;
+	}
+	else if (data == COMMAND_99_RESET)
+	{
+		// must be issued after 66
+		LOGMASKED(LOG_SPI, "Set SPI to RESET\n");
+		m_spi_state = READY_FOR_COMMAND;
 	}
 	else if (data == COMMAND_AB_RDP)
 	{
@@ -106,6 +146,16 @@ void generic_spi_flash_device::get_command(u8 data)
 		LOGMASKED(LOG_SPI, "Set SPI to 4READ (Quad I/O read with configurable dummy bytes)\n");
 		m_spi_state = COMMAND_EB_4READ;
 	}
+	else if (data == COMMAND_EC_UNKNOWN)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to COMMAND_EC_UNKNOWN\n");
+		m_spi_state = COMMAND_EC_UNKNOWN;
+	}
+	else if (data == COMMAND_FF_CRMR)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to CRMR (Continuous Read Mode Reset)\n");
+		m_spi_state = READY_FOR_COMMAND;
+	}
 	else
 	{
 		fatalerror("SPI set to unknown/unhandled command %02x\n", data);
@@ -119,16 +169,16 @@ void generic_spi_flash_device::process_read_command(u8 data)
 	switch (m_spi_state_step)
 	{
 	case 0x00:
-		m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16); m_spi_state_step++;
+		m_spi_addr = (m_spi_addr & 0x00ffff) | (data << 16); m_spi_state_step++;
 		break;
 	case 0x01:
-		m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8); m_spi_state_step++;
+		m_spi_addr = (m_spi_addr & 0xff00ff) | (data << 8); m_spi_state_step++;
 		break;
 	case 0x02:
-		m_spiaddr = (m_spiaddr & 0xffff00) | (data); m_spi_state_step++;
+		m_spi_addr = (m_spi_addr & 0xffff00) | (data); m_spi_state_step++;
 		break;
 	default:
-		m_spilatch = m_spiptr[(m_spiaddr++) & (m_length - 1)];
+		m_spi_latch = m_spiptr[(m_spi_addr++) & (m_length - 1)];
 		break;
 	}
 }
@@ -138,19 +188,19 @@ void generic_spi_flash_device::process_hsread_command(u8 data)
 	switch (m_spi_state_step)
 	{
 	case 0x00:
-		m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16); m_spi_state_step++;
+		m_spi_addr = (m_spi_addr & 0x00ffff) | (data << 16); m_spi_state_step++;
 		break;
 	case 0x01:
-		m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8); m_spi_state_step++;
+		m_spi_addr = (m_spi_addr & 0xff00ff) | (data << 8); m_spi_state_step++;
 		break;
 	case 0x02:
-		m_spiaddr = (m_spiaddr & 0xffff00) | (data); m_spi_state_step++;
+		m_spi_addr = (m_spi_addr & 0xffff00) | (data); m_spi_state_step++;
 		break;
 	case 0x03:
 		/* dummy */  m_spi_state_step++;
 		break;
 	default:
-		m_spilatch = m_spiptr[(m_spiaddr++) & (m_length - 1)];
+		m_spi_latch = m_spiptr[(m_spi_addr++) & (m_length - 1)];
 		break;
 	}
 }
@@ -161,19 +211,19 @@ void generic_spi_flash_device::process_read4_command(u8 data)
 	switch (m_spi_state_step)
 	{
 	case 0x00:
-		m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16); m_spi_state_step++;
+		m_spi_addr = (m_spi_addr & 0x00ffff) | (data << 16); m_spi_state_step++;
 		break;
 	case 0x01:
-		m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8); m_spi_state_step++;
+		m_spi_addr = (m_spi_addr & 0xff00ff) | (data << 8); m_spi_state_step++;
 		break;
 	case 0x02:
-		m_spiaddr = (m_spiaddr & 0xffff00) | (data); m_spi_state_step++;
+		m_spi_addr = (m_spi_addr & 0xffff00) | (data); m_spi_state_step++;
 		break;
 	case 0x03: case 0x04: case 0x05:
 		/* dummy */  m_spi_state_step++;
 		break;
 	default:
-		m_spilatch = m_spiptr[(m_spiaddr++) & (m_length - 1)];
+		m_spi_latch = m_spiptr[(m_spi_addr++) & (m_length - 1)];
 		break;
 	}
 }
@@ -183,17 +233,17 @@ void generic_spi_flash_device::process_write_command(u8 data)
 	switch (m_spi_state_step)
 	{
 	case 0x00:
-		m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16); m_spi_state_step++;
+		m_spi_addr = (m_spi_addr & 0x00ffff) | (data << 16); m_spi_state_step++;
 		break;
 	case 0x01:
-		m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8); m_spi_state_step++;
+		m_spi_addr = (m_spi_addr & 0xff00ff) | (data << 8); m_spi_state_step++;
 		break;
 	case 0x02:
-		m_spiaddr = (m_spiaddr & 0xffff00) | (data); m_spi_state_step++;
+		m_spi_addr = (m_spi_addr & 0xffff00) | (data); m_spi_state_step++;
 		break;
 	default:
 		LOGMASKED(LOG_SPI, "Write SPI data %02x\n", data);
-		m_spiptr[(m_spiaddr++) & (m_length - 1)] = data;
+		m_spiptr[(m_spi_addr++) & (m_length - 1)] = data;
 		break;
 	}
 }
@@ -203,14 +253,14 @@ void generic_spi_flash_device::process_sector_erase_command(u8 data)
 	switch (m_spi_state_step)
 	{
 	case 0x00:
-		m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16); m_spi_state_step++;
+		m_spi_addr = (m_spi_addr & 0x00ffff) | (data << 16); m_spi_state_step++;
 		break;
 	case 0x01:
-		m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8); m_spi_state_step++;
+		m_spi_addr = (m_spi_addr & 0xff00ff) | (data << 8); m_spi_state_step++;
 		break;
 	case 0x02:
-		m_spiaddr = (m_spiaddr & 0xffff00) | (data); m_spi_state_step++;
-		LOGMASKED(LOG_SPI, "SPI set to Erase Sector with address %08x\n", m_spiaddr);
+		m_spi_addr = (m_spi_addr & 0xffff00) | (data); m_spi_state_step++;
+		LOGMASKED(LOG_SPI, "SPI set to Erase Sector with address %08x\n", m_spi_addr);
 		break;
 	default:
 		LOGMASKED(LOG_SPI, "%s unexpected byte %02x when writing sector erase address\n", data);
@@ -223,7 +273,8 @@ void generic_spi_flash_device::process_status_write_command(u8 data)
 	switch (m_spi_state_step)
 	{
 	case 0x00:
-		LOGMASKED(LOG_SPI, "status write step 1\n");
+		LOGMASKED(LOG_SPI, "status write step 1 (config register)\n");
+		m_spi_configreg = data;
 		if (m_multibyte_status_write != 0)
 			m_spi_state_step++;
 		else
@@ -231,7 +282,8 @@ void generic_spi_flash_device::process_status_write_command(u8 data)
 		break;
 
 	case 0x01:
-		LOGMASKED(LOG_SPI, "status write step 2\n");
+		LOGMASKED(LOG_SPI, "status write step 2 (status register)\n");
+		m_spi_statusreg = data;
 		m_spi_state = READY_FOR_COMMAND;
 		break;
 	}
@@ -243,7 +295,8 @@ void generic_spi_flash_device::process_status_read_command(u8 data)
 	{
 	case 0x00:
 		LOGMASKED(LOG_SPI, "status read step 1\n");
-		m_spilatch = 0x00;
+		m_spi_latch = m_spi_statusreg;
+
 		if (m_multibyte_status_read != 0)
 			m_spi_state_step++;
 		else
@@ -252,12 +305,30 @@ void generic_spi_flash_device::process_status_read_command(u8 data)
 
 	case 0x01:
 		LOGMASKED(LOG_SPI, "status read step 2\n");
-		m_spilatch = 0x00;
+		m_spi_latch = 0x00;
 		m_spi_state = READY_FOR_COMMAND;
 		break;
 	}
 }
 
+void generic_spi_flash_device::process_config_read_command(u8 data)
+{
+	switch (m_spi_state_step)
+	{
+	case 0x00:
+		LOGMASKED(LOG_SPI, "process_config_read_command\n");
+		m_spi_latch = m_spi_configreg;
+		m_spi_state = READY_FOR_COMMAND;
+		break;
+	}
+}
+
+void generic_spi_flash_device::process_status2_read_command(u8 data)
+{
+	LOGMASKED(LOG_SPI, "status2 read\n");
+	m_spi_latch = m_spi_statusreg;
+	m_spi_state = READY_FOR_COMMAND;
+}
 
 void generic_spi_flash_device::process_status_rems_command(u8 data)
 {
@@ -295,18 +366,18 @@ void generic_spi_flash_device::process_status_rdid_command(u8 data)
 	switch (m_spi_state_step)
 	{
 	case 0x00:
-		m_spilatch = m_idbytes[0];
+		m_spi_latch = m_idbytes[0];
 		m_spi_state_step++;
 		break;
 
 	case 0x01:
-		m_spilatch = m_idbytes[1];
+		m_spi_latch = m_idbytes[1];
 		m_spi_state_step++;
 		break;
 
 	case 0x02:
-		m_spilatch = m_idbytes[2];
-		m_spi_state = READY_FOR_COMMAND;
+		m_spi_latch = m_idbytes[2];
+		//m_spi_state = READY_FOR_COMMAND; // loops on reading the ID?
 		break;
 	}
 }
@@ -340,8 +411,22 @@ void generic_spi_flash_device::write(u8 data)
 		process_hsread_command(data);
 		break;
 
+	case COMMAND_11_UNKNOWN:
+		break;
+
+	case COMMAND_15_RDCR:
+		process_config_read_command(data);
+		break;
+
 	case COMMAND_20_SE:
 		process_sector_erase_command(data);
+		break;
+
+	case COMMAND_31_UNKNOWN:
+		break;
+
+	case COMMAND_35_RDSR2:
+		process_status2_read_command(data);
 		break;
 
 	case COMMAND_90_REMS:
@@ -354,6 +439,9 @@ void generic_spi_flash_device::write(u8 data)
 
 	case COMMAND_EB_4READ:
 		process_read4_command(data);
+		break;
+
+	case COMMAND_EC_UNKNOWN:
 		break;
 	}
 }

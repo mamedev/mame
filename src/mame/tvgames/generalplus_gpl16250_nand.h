@@ -18,7 +18,7 @@
 class generalplus_gpac800_game_state : public gcm394_game_state
 {
 public:
-	generalplus_gpac800_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+	generalplus_gpac800_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		gcm394_game_state(mconfig, type, tag),
 		m_nandregion(*this, "nandrom"),
 		m_sdram_kwords(0x400000), // 0x400000 words (0x800000 bytes)
@@ -41,24 +41,24 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	uint8_t read_nand(offs_t offset);
+	u8 read_nand(offs_t offset);
 
-	virtual uint16_t cs0_r(offs_t offset) override;
-	virtual void cs0_w(offs_t offset, uint16_t data) override;
-	virtual uint16_t cs1_r(offs_t offset) override;
-	virtual void cs1_w(offs_t offset, uint16_t data) override;
+	virtual u16 cs0_r(offs_t offset) override;
+	virtual void cs0_w(offs_t offset, u16 data) override;
+	virtual u16 cs1_r(offs_t offset) override;
+	virtual void cs1_w(offs_t offset, u16 data) override;
 
-	std::vector<uint16_t> m_sdram;
-	std::vector<uint16_t> m_sdram2;
+	std::vector<u16> m_sdram;
+	std::vector<u16> m_sdram2;
 
 private:
 	void nand_create_stripped_region();
 
 	void dma_complete_hacks(int state);
 
-	optional_region_ptr<uint8_t> m_nandregion;
+	optional_region_ptr<u8> m_nandregion;
 
-	std::vector<uint8_t> m_strippedrom;
+	std::vector<u8> m_strippedrom;
 	int m_strippedsize = 0;
 	int m_size = 0;
 	int m_nandblocksize = 0;
@@ -73,7 +73,7 @@ private:
 class generalplus_gpac800_vbaby_game_state : public generalplus_gpac800_game_state
 {
 public:
-	generalplus_gpac800_vbaby_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+	generalplus_gpac800_vbaby_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		generalplus_gpac800_game_state(mconfig, type, tag),
 		m_cart(*this, "cartslot")
 	{
