@@ -1502,11 +1502,11 @@ ROM_START( goretrop )
 	ROM_LOAD( "goretroportable.bin", 0x00000, 0x2000000, CRC(e7279dd3) SHA1(5f096ce22e46f112c2cc6588cb1c527f4f0430b5) )
 
 	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
-	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
-	ROM_FILL( 0x000, 0x100, 0x60) // wants actual code here, just RTS opcodes don't work
-	// jumps to 072b
-	// jumps to 072f after putting a value in a
-	// jumps to 0743 after putting a value in x
+	// This is a hacked version of the data from gtct885, as the 'jump from ROM' offsets seem to match, but the
+	// code needs to be at a different address, and some of the ports read/written by the code are different too
+	// 
+	// This is functional enough to get the menu running, but the real data still needs extracting.
+	ROM_LOAD( "protection.bin", 0x00000, 0x100, BAD_DUMP CRC(3cd42234) SHA1(3a4afc890d894b4256960150b2729fd5f93555a0) )
 ROM_END
 
 ROM_START( goretropa )
@@ -1514,7 +1514,8 @@ ROM_START( goretropa )
 	ROM_LOAD( "goretro.bin", 0x00000, 0x2000000, CRC(e2c579cc) SHA1(b5cb8883d1f0b238fc9966ac635583dd5c66bcfe) )
 
 	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
-	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
+	// see note in goretrop set
+	ROM_LOAD( "protection.bin", 0x00000, 0x100, BAD_DUMP CRC(3cd42234) SHA1(3a4afc890d894b4256960150b2729fd5f93555a0) )
 ROM_END
 
 ROM_START( goretropu13 )
@@ -1522,7 +1523,8 @@ ROM_START( goretropu13 )
 	ROM_LOAD( "goretroportable250p_v13.bin", 0x00000, 0x2000000, CRC(b2a94173) SHA1(e64989f4b0a29820b0dce5e0ca91abb8f247c269) )
 
 	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
-	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
+	// see note in goretrop set
+	ROM_LOAD( "protection.bin", 0x00000, 0x100, BAD_DUMP CRC(3cd42234) SHA1(3a4afc890d894b4256960150b2729fd5f93555a0) )
 ROM_END
 
 ROM_START( goretropu12 )
@@ -1530,7 +1532,8 @@ ROM_START( goretropu12 )
 	ROM_LOAD( "goretroportable250p_v12.bin", 0x00000, 0x2000000, CRC(fda93863) SHA1(75e48ac27e5520953676894747d6d06307cdc1af) )
 
 	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
-	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, NO_DUMP )
+	// see note in goretrop set
+	ROM_LOAD( "protection.bin", 0x00000, 0x100, BAD_DUMP CRC(3cd42234) SHA1(3a4afc890d894b4256960150b2729fd5f93555a0) )
 ROM_END
 
 ROM_START( s10fake )
