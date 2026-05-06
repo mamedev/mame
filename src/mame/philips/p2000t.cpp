@@ -10,6 +10,7 @@ TODO:
 - Hookup p2000_cass, p2000_flop and p2000_quik SW lists;
 - CTC;
 - Fix RAM hookup (can crash at lower sizes);
+- Ejecting a MDCR cassette while program is loading causes a MAME crash;
 - Joystick (cfr. brkwall)
 - p2000t: GFX offset when no SW is in;
 - p2000m: fix screen size;
@@ -80,12 +81,13 @@ class p2000t_state : public driver_device
 public:
 	p2000t_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_mdcr(*this, "mdcr")
 		, m_ram(*this, RAM_TAG)
 		, m_bank(*this, "bank")
+		, m_videoram(*this, "videoram")
+		, m_screen(*this, "screen")
 		, m_keyboard(*this, "KEY.%u", 0)
 	{
 	}
@@ -109,13 +111,14 @@ protected:
 	void p2000t_mem(address_map &map) ATTR_COLD;
 	void p2000t_io(address_map &map) ATTR_COLD;
 
-	required_shared_ptr<uint8_t> m_videoram;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<mdcr_device> m_mdcr;
 	required_device<ram_device> m_ram;
 	required_memory_bank m_bank;
+
+	required_shared_ptr<uint8_t> m_videoram;
+	required_device<screen_device> m_screen;
 
 private:
 	required_ioport_array<10> m_keyboard;
@@ -554,12 +557,12 @@ void p2000t_state::p2000t(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(p2000t_state::p2000_interrupt));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(40 * 12, 24 * 20);
-	screen.set_visarea(0, 40 * 12 - 1, 0, 24 * 20 - 1);
-	screen.set_screen_update("saa5050", FUNC(saa5050_device::screen_update));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(40 * 12, 24 * 20);
+	m_screen->set_visarea(0, 40 * 12 - 1, 0, 24 * 20 - 1);
+	m_screen->set_screen_update("saa5050", FUNC(saa5050_device::screen_update));
 
 	saa5050_device &saa5050(SAA5050(config, "saa5050", 6000000));
 	saa5050.d_cb().set(FUNC(p2000t_state::videoram_r));
@@ -574,6 +577,7 @@ void p2000t_state::p2000t(machine_config &config)
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "p2000_cart", "bin,rom");
 
 	SOFTWARE_LIST(config, "cart_list").set_original("p2000_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("p2000_cass");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -584,38 +588,20 @@ void p2000t_state::p2000t(machine_config &config)
 /* Machine definition */
 void p2000m_state::p2000m(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 2500000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &p2000m_state::p2000m_mem);
-	m_maincpu->set_addrmap(AS_IO, &p2000m_state::p2000t_io);
-	m_maincpu->set_vblank_int("screen", FUNC(p2000m_state::p2000_interrupt));
-	config.set_maximum_quantum(attotime::from_hz(60));
+	p2000t_state::p2000t(config);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(80 * 12, 24 * 20);
-	screen.set_visarea(0, 80 * 12 - 1, 0, 24 * 20 - 1);
-	screen.set_screen_update(FUNC(p2000m_state::screen_update_p2000m));
-	screen.set_palette(m_palette);
+	m_maincpu->set_addrmap(AS_PROGRAM, &p2000m_state::p2000m_mem);
+
+	// TODO: really dynamically modified by width setting
+	m_screen->set_size(80 * 12, 24 * 20);
+	m_screen->set_visarea(0, 80 * 12 - 1, 0, 24 * 20 - 1);
+	m_screen->set_screen_update(FUNC(p2000m_state::screen_update_p2000m));
+	m_screen->set_palette(m_palette);
+
+	config.device_remove("saa5050");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_p2000m);
 	PALETTE(config, m_palette, FUNC(p2000m_state::p2000m_palette), 4);
-
-	/* the mini cassette driver */
-	MDCR(config, m_mdcr, 0);
-
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("16K").set_extra_options("16K,32K,48K,64K,80K,102K");
-
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "p2000_cart", "bin,rom");
-
-	SOFTWARE_LIST(config, "cart_list").set_original("p2000_cart");
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 } // anonymous namespace
