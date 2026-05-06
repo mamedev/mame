@@ -565,7 +565,7 @@ private:
 // 1 MHz is 14M / 14.  14/5 = 2.8 * 65536 (16.16 fixed point) = 0x2cccd.
 #define slow_cycle() \
 {   \
-	if (!machine().side_effects_disabled() && m_last_speed) \
+	if (m_last_speed && !machine().side_effects_disabled()) \
 	{\
 		m_slow_counter += 0x0002cccd; \
 		int cycles = (m_slow_counter >> 16) & 0xffff; \
@@ -1550,13 +1550,36 @@ u8 apple2gs_state::c000_r(offs_t offset)
 {
 	u8 ret;
 
-	// allow ROM window at C07x to be debugger-visible
-	if ((offset < 0x70) || (offset > 0x7f))
+	if (offset < 0x71)
 	{
-		if(machine().side_effects_disabled()) return read_floatingbus();
+		switch (offset)
+		{
+			// C07x ROM and FPI registers are fast
+			case 0x2d: case 0x35: case 0x36: case 0x37: case 0x68:
+				break;
+			default:
+				slow_cycle();
+		}
 	}
 
-	slow_cycle();
+	if (!machine().side_effects_disabled())
+	{
+		switch (offset)
+		{
+			case 0x38:  // SCCBREG
+				return m_scc->cb_r(0);
+
+			case 0x39:  // SCCAREG
+				return m_scc->ca_r(0);
+
+			case 0x3a:  // SCCBDATA
+				return m_scc->db_r(0);
+
+			case 0x3b:  // SCCADATA
+				return m_scc->da_r(0);
+		}
+	}
+
 	const u8 uFloatingBus = read_floatingbus(); // video side-effects latch after reading
 	const u8 uFloatingBus7 = uFloatingBus & 0x7f;
 	const u8 uKeyboard = keyglu_816_read(GLU_C000);
@@ -1570,7 +1593,8 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return uKeyboard;
 
 		case 0x10:  // read any key down, reset keyboard strobe
-			keyglu_816_write(GLU_C010, 0);
+			if (!machine().side_effects_disabled())
+				keyglu_816_write(GLU_C010, 0);
 			return keyglu_816_read(GLU_C010) | (uKeyboard & 0x7f);
 
 		case 0x11:  // read LCRAM2 (LC Dxxx bank)
@@ -1647,13 +1671,15 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 		case 0x2e:  // VERTCNT
 			// reading VERTCNT clears SCB status
-			clear_vgcint(~VGCINT_SCANLINE);
+			if (!machine().side_effects_disabled())
+				clear_vgcint(~VGCINT_SCANLINE);
 
 			return get_vpos() >> 1;
 
 		case 0x2f:  // HORIZCNT
 			// reading HORIZCNT clears SCB status
-			clear_vgcint(~VGCINT_SCANLINE);
+			if (!machine().side_effects_disabled())
+				clear_vgcint(~VGCINT_SCANLINE);
 
 			ret = (m_screen->hpos() - BORDER_LEFT) / 16 + (25 + ALIGN_CNT); // adjust for set_raw
 			if (ret >= 65)
@@ -1687,36 +1713,26 @@ u8 apple2gs_state::c000_r(offs_t offset)
 		case 0x36:  // SPEED/CYAREG
 			return m_speed;
 
-		case 0x38:  // SCCBREG
-			return m_scc->cb_r(0);
-
-		case 0x39:  // SCCAREG
-			return m_scc->ca_r(0);
-
-		case 0x3a:  // SCCBDATA
-			return m_scc->db_r(0);
-
-		case 0x3b:  // SCCADATA
-			return m_scc->da_r(0);
-
 		case 0x3c:  // SOUNDCTL
 			return m_sndglu_ctrl;
 
 		case 0x3d:  // SOUNDDATA
 			ret = m_sndglu_dummy_read;
+			if (!machine().side_effects_disabled())
+			{
+				if (m_sndglu_ctrl & 0x40)    // docram access
+				{
+					m_sndglu_dummy_read = m_docram[m_sndglu_addr];
+				}
+				else
+				{
+					m_sndglu_dummy_read = m_doc->read(m_sndglu_addr);
+				}
 
-			if (m_sndglu_ctrl & 0x40)    // docram access
-			{
-				m_sndglu_dummy_read = m_docram[m_sndglu_addr];
-			}
-			else
-			{
-				m_sndglu_dummy_read = m_doc->read(m_sndglu_addr);
-			}
-
-			if (m_sndglu_ctrl & 0x20)    // auto-increment
-			{
-				m_sndglu_addr++;
+				if (m_sndglu_ctrl & 0x20)    // auto-increment
+				{
+					m_sndglu_addr++;
+				}
 			}
 			return ret;
 
@@ -1741,7 +1757,8 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 		case 0x61: // button 0 or Open Apple
 			// HACK/TODO: the 65816 loses a race to the microcontroller on reset
-			if (m_adb_reset_freeze > 0) m_adb_reset_freeze--;
+			if (m_adb_reset_freeze > 0 && !machine().side_effects_disabled())
+				m_adb_reset_freeze--;
 			return ((m_gameio->sw0_r() || (m_adb_p3_last & 0x20)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x62: // button 1 or Option
@@ -1822,7 +1839,14 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 {
 	if(machine().side_effects_disabled()) return;
 
-	slow_cycle();
+	switch (offset)
+	{
+		// FPI registers are fast
+		case 0x35: case 0x36: case 0x37:
+			break;
+		default:
+			slow_cycle();
+	}
 
 	switch (offset)
 	{
@@ -2007,7 +2031,6 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			{
 				m_bank0_atc.select(1);
 				m_bank1_atc.select(1);
-
 			}
 			break;
 
@@ -3103,14 +3126,14 @@ void apple2gs_state::apple2gs_map(address_map &map)
 
 	map(0x00c000, 0x00ffff).view(m_bank0_atc);
 	m_bank0_atc[0](0xc000, 0xffff).rw(FUNC(apple2gs_state::bank0_c000_r), FUNC(apple2gs_state::bank0_c000_w));
-	m_bank0_atc[1](0xc000, 0xffff).rw(FUNC(apple2gs_state::c000_r), FUNC(apple2gs_state::c000_w));
-	m_bank0_atc[1](0xc080, 0xffff).rw(FUNC(apple2gs_state::c080_r), FUNC(apple2gs_state::c080_w));
-	m_bank0_atc[1](0xc100, 0xffff).rw(FUNC(apple2gs_state::c100_r), FUNC(apple2gs_state::c100_w));
-	m_bank0_atc[1](0xc300, 0xffff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
-	m_bank0_atc[1](0xc400, 0xffff).rw(FUNC(apple2gs_state::c400_r), FUNC(apple2gs_state::c400_w));
-	m_bank0_atc[1](0xc800, 0xffff).rw(FUNC(apple2gs_state::c800_r), FUNC(apple2gs_state::c800_w));
-	m_bank0_atc[1](0xd000, 0xffff).view(m_upper00);
+	m_bank0_atc[1](0xc000, 0xc07f).rw(FUNC(apple2gs_state::c000_r), FUNC(apple2gs_state::c000_w));
+	m_bank0_atc[1](0xc080, 0xc0ff).rw(FUNC(apple2gs_state::c080_r), FUNC(apple2gs_state::c080_w));
+	m_bank0_atc[1](0xc100, 0xc2ff).rw(FUNC(apple2gs_state::c100_r), FUNC(apple2gs_state::c100_w));
+	m_bank0_atc[1](0xc300, 0xc3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
+	m_bank0_atc[1](0xc400, 0xc7ff).rw(FUNC(apple2gs_state::c400_r), FUNC(apple2gs_state::c400_w));
+	m_bank0_atc[1](0xc800, 0xcfff).rw(FUNC(apple2gs_state::c800_r), FUNC(apple2gs_state::c800_w));
 
+	m_bank0_atc[1](0xd000, 0xffff).view(m_upper00);
 	m_upper00[0](0xd000, 0xffff).view(m_lc00);
 	m_upper00[1](0xd000, 0xffff).rw(FUNC(apple2gs_state::inh_r), FUNC(apple2gs_state::inh_w));
 
@@ -3136,6 +3159,8 @@ void apple2gs_state::apple2gs_map(address_map &map)
 
 	m_lc01[0](0x1d000, 0x1ffff).rom().region("maincpu", 0x3d000).w(FUNC(apple2gs_state::lc_01_w));
 	m_lc01[1](0x1d000, 0x1ffff).rw(FUNC(apple2gs_state::lc_01_r), FUNC(apple2gs_state::lc_01_w));
+
+	map(0x020000, 0xdfffff).rw(FUNC(apple2gs_state::expandedram_r), FUNC(apple2gs_state::expandedram_w));
 
 	/* "Mega II side" - this is basically a 128K IIe on a chip that runs merrily at 1 MHz */
 	/* Unfortunately all I/O happens here, including new IIgs-specific stuff */
@@ -3172,8 +3197,6 @@ void apple2gs_state::apple2gs_map(address_map &map)
 	m_e0_4000bank[1](0xe04000, 0xe0bfff).rw(FUNC(apple2gs_state::e1ram_r<0x4000>), FUNC(apple2gs_state::e0ram_w<0x4000>));
 	m_e0_4000bank[2](0xe04000, 0xe0bfff).rw(FUNC(apple2gs_state::e0ram_r<0x4000>), FUNC(apple2gs_state::e1ram_w<0x4000>));
 	m_e0_4000bank[3](0xe04000, 0xe0bfff).rw(FUNC(apple2gs_state::e1ram_r<0x4000>), FUNC(apple2gs_state::e1ram_w<0x4000>));
-
-	map(0x020000, 0xdfffff).rw(FUNC(apple2gs_state::expandedram_r), FUNC(apple2gs_state::expandedram_w));
 
 	map(0xe0c000, 0xe0c07f).rw(FUNC(apple2gs_state::c000_r), FUNC(apple2gs_state::c000_w));
 	map(0xe0c080, 0xe0c0ff).rw(FUNC(apple2gs_state::c080_r), FUNC(apple2gs_state::c080_w));
@@ -3464,13 +3487,17 @@ u8 apple2gs_state::keyglu_816_read(u8 offset)
 		case GLU_MOUSEY:
 			if (!m_glu_mouse_read_stat)
 			{
-				m_glu_mouse_read_stat = true;
+				if (!machine().side_effects_disabled())
+					m_glu_mouse_read_stat = true;
 				return m_glu_regs[GLU_MOUSEX];
 			}
-			m_glu_mouse_read_stat = false;
-			m_glu_regs[GLU_KG_STATUS] &= ~KGS_MOUSEX_FULL;
-			m_glu_regs[GLU_SYSSTAT] &= ~GLU_STATUS_MOUSEIRQ;
-			keyglu_regen_irqs();
+			if (!machine().side_effects_disabled())
+			{
+				m_glu_mouse_read_stat = false;
+				m_glu_regs[GLU_KG_STATUS] &= ~KGS_MOUSEX_FULL;
+				m_glu_regs[GLU_SYSSTAT] &= ~GLU_STATUS_MOUSEIRQ;
+				keyglu_regen_irqs();
+			}
 			return m_glu_regs[GLU_MOUSEY];
 
 		case GLU_SYSSTAT:
@@ -3497,13 +3524,14 @@ u8 apple2gs_state::keyglu_816_read(u8 offset)
 				{
 					sysstat |= GLU_STATUS_MOUSEIRQ;
 				}
-				m_glu_816_read_dstat = true;
+				if (!machine().side_effects_disabled())
+					m_glu_816_read_dstat = true;
 				//printf("Read SYSSTAT %02x (PC=%x)\n", sysstat, m_maincpu->pc());
 				return sysstat;
 			}
 
 		case GLU_DATA:
-			if (m_glu_816_read_dstat)
+			if (m_glu_816_read_dstat && !machine().side_effects_disabled())
 			{
 				m_glu_816_read_dstat = false;
 				m_glu_regs[GLU_KG_STATUS] &= ~KGS_DATA_FULL;
