@@ -37,12 +37,12 @@ Notes:
 
 	<software name="alice" supported="no">
 		<description>Alice's Wonderland</description>
-		<year>198?</year>
+		<year>1988?</year>
 		<publisher>Peter's Data Productions</publisher>
 		<notes><![CDATA[
 Stuck on title screen, [CTC]?
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum" />
+		<info name="usage" value="Requires 32KB RAM minimum, press # to start game" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x5a00">
@@ -532,7 +532,7 @@ Stuck on title, [CTC]?
 		<description>Flight Simulator</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires 64KB RAM minimum" />
+		<info name="usage" value="Requires 32KB RAM minimum" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x9100">
@@ -550,7 +550,7 @@ Stuck on title, [CTC]?
 		<notes><![CDATA[
 Optional [joystick] support
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
+		<info name="usage" value="Requires 32KB RAM minimum" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass1" interface="p2000_cass">
 			<dataarea name="cass" size="0x9b00">
@@ -571,7 +571,7 @@ Optional [joystick] support
 		<notes><![CDATA[
 Maps right movement to up key (verify)
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
+		<info name="usage" value="Requires 32KB RAM minimum" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass1" interface="p2000_cass">
 			<dataarea name="cass" size="0x7800">
@@ -682,7 +682,7 @@ Black screen
 		<description>Go spel</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires 64KB RAM minimum" />
+		<info name="usage" value="Requires 32KB RAM minimum" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x2d00">
@@ -857,7 +857,7 @@ Black screen
 		<year>1986</year>
 		<!-- P. Hoogendijk / J. Nieuwenhuizen -->
 		<publisher>Flower Soft</publisher>
-		<info name="usage" value="Requires 64KB RAM minimum" />
+		<info name="usage" value="Requires 32KB RAM minimum" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x7800">
@@ -1333,11 +1333,11 @@ Requires [display] scroll
 		<year>198?</year>
 		<!-- "Written by: Loek Hilgersom / Ralph Moonen" -->
 		<publisher>Errorsoft</publisher>
-		<info name="usage" value="Press M or Z if wanting borders or not"/>
+		<info name="usage" value="Press M or Z if wanting borders or not" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x1400">
-				<rom name="Racen 2.1.cas" size="0x1400" crc="a22319b7" sha1="daed0f25b75aae795a94f737cbc64f8c95d66b51" />
+				<rom name="Racen 2.1.cas" size="0x1400" crc="a22319b7" sha1="daed0f25b75aae795a94f737cbc64f8c95d66b51"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1350,7 +1350,7 @@ Requires [display] scroll
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x1400">
-				<rom name="Racen 2.0.cas" size="0x1400" crc="b48dc30d" sha1="90e777f96d527334b4831a591769580ecb35fe0c" />
+				<rom name="Racen 2.0.cas" size="0x1400" crc="b48dc30d" sha1="90e777f96d527334b4831a591769580ecb35fe0c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1362,7 +1362,7 @@ Requires [display] scroll
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x0a00">
-				<rom name="Racen.cas" size="0x0a00" crc="a167d5ae" sha1="902d96a9092dd7c34deae9b9131dcb42366d3627" />
+				<rom name="Racen.cas" size="0x0a00" crc="a167d5ae" sha1="902d96a9092dd7c34deae9b9131dcb42366d3627"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1376,7 +1376,7 @@ Requires [display] scroll
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x3200">
-				<rom name="Wegversmalling.cas" size="0x3200" crc="c6e8bb4a" sha1="18ffa0eb85be4aafb2b5da29ff60a7f78512e8ea" />
+				<rom name="Wegversmalling.cas" size="0x3200" crc="c6e8bb4a" sha1="18ffa0eb85be4aafb2b5da29ff60a7f78512e8ea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1388,7 +1388,7 @@ Requires [display] scroll
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x0f00">
-				<rom name="Racetrack.cas" size="0x0f00" crc="6935dc54" sha1="af0dbe0e412819e881d6f6ea7762d3bf38150c1b" />
+				<rom name="Racetrack.cas" size="0x0f00" crc="6935dc54" sha1="af0dbe0e412819e881d6f6ea7762d3bf38150c1b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1403,17 +1403,18 @@ Unresponsive [keyboard] on instruction screens
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x1900">
-				<rom name="Red de muis.cas" size="0x1900" crc="b0ada1cb" sha1="3f14100dd8bdf224d6155e536583c11deed90260" />
+				<rom name="Red de muis.cas" size="0x1900" crc="b0ada1cb" sha1="3f14100dd8bdf224d6155e536583c11deed90260"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="rijsim">
+		<!-- "Distributed via Simpeltel" -->
 		<description>Rijsimulator</description>
 		<year>198?</year>
 		<!-- "by Rob Masseurs / Adri Gabriëls" -->
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires 64KB RAM minimum" />
+		<info name="usage" value="Requires 32KB RAM minimum"/>
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x7300">
@@ -1528,7 +1529,7 @@ Black screen, [CTC]?
 		<year>198?</year>
 		<!-- "Programmed by Thomas Hofmeister" -->
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Need to set screen to a meaningful value (like 20 lines, 40 characters), requires 64KB of RAM minimum" />
+		<info name="usage" value="Need to set screen to a meaningful value (like 20 lines, 40 characters), requires 32KB of RAM minimum" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x1e00">
@@ -1556,7 +1557,7 @@ Black screen, [CTC]?
 		<year>1987</year>
 		<!-- "Authors: Geert-Jan v. Glabbeek / Rob Meulendijks" -->
 		<publisher>SGP / Soft 2000</publisher>
-		<info name="usage" value="Requires 64KB RAM minimum" />
+		<info name="usage" value="Requires 32KB RAM minimum" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x6900">
@@ -1594,7 +1595,7 @@ Black screen, [CTC]?
 		<description>Space-Mission</description>
 		<year>1984</year>
 		<publisher>PvH</publisher>
-		<info name="usage" value="Requires 64KB RAM minimum" />
+		<info name="usage" value="Requires 32KB RAM minimum" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x5a00">
@@ -1866,7 +1867,7 @@ All of the above doesn't translate well with the actual p2000 keyboard but btanb
 		<notes><![CDATA[
 Unresponsive [keyboard] during gameplay
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum" />
+		<info name="usage" value="Requires 32KB RAM minimum" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x5f00">

@@ -5,20 +5,21 @@
 Philips P2000T/P2000M
 
 TODO:
-- Floppy drive (unknown type);
+- Floppy drive (uPD765, from expansion slot);
 - Second cart slot (no ROM, auxiliary I/O map for first cart slot);
-- Hookup p2000_cass, p2000_flop and p2000_quik SW lists;
+- Hookup p2000_flop and p2000_quik SW lists;
 - CTC;
-- Fix RAM hookup (can crash at lower sizes);
+- NMI (tied to reset button?)
 - Ejecting a MDCR cassette while program is loading causes a MAME crash;
 - Joystick (cfr. brkwall)
-- p2000t: GFX offset when no SW is in;
+- 80 char width mode;
+- p2000t: GFX offset when no SW is in (goofy scroll default rather than 80 char width?);
 - p2000m: fix screen size;
 - QA testing;
 
 ===================================================================================================
 
-Philips P2000 1 Memory map
+Philips P2000T Memory map
 
     CPU: Z80
         0000-0fff   ROM
@@ -96,6 +97,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t p2000t_port_000f_r(offs_t offset);
 	uint8_t p2000t_port_202f_r();
@@ -160,6 +162,8 @@ private:
 
 void p2000m_state::video_start()
 {
+	// TODO: what this variable is supposed to do?
+	// below doesn't seem right, it causes Cass`e`tte blinking in basicnl at best.
 	m_frame_count = 0;
 }
 
@@ -333,9 +337,14 @@ void p2000t_state::p2000t_port_707f_w(uint8_t data) { m_port_707f = data; }
 
 void p2000t_state::p2000t_port_9494_w(uint8_t data) {
 	//  The memory region E000-FFFF (8k) is bank switched
-	int available_banks = (m_ram->size() - 0xe000) / 0x2000;
-	if (data < available_banks)
-		m_bank->set_entry(data);
+	const u32 ram_size = m_ram->size();
+
+	if (ram_size > 0x8000)
+	{
+		const u8 max_entries = (ram_size - 0x8000) / 0x2000;
+		if (data < max_entries)
+			m_bank->set_entry(data);
+	}
 }
 
 void p2000t_state::p2000t_mem(address_map &map)
@@ -361,10 +370,12 @@ void p2000t_state::p2000t_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x0f).r(FUNC(p2000t_state::p2000t_port_000f_r));
+//	map(0x00, 0x0f).w bit 0: enables 80 width mode
 	map(0x10, 0x1f).w(FUNC(p2000t_state::p2000t_port_101f_w));
 	map(0x20, 0x2f).r(FUNC(p2000t_state::p2000t_port_202f_r));
 	map(0x30, 0x3f).w(FUNC(p2000t_state::p2000t_port_303f_w));
 	map(0x50, 0x5f).w(FUNC(p2000t_state::p2000t_port_505f_w));
+//	map(0x70, 0x7f).r read back 80 width setting, P2000T only
 	map(0x70, 0x7f).w(FUNC(p2000t_state::p2000t_port_707f_w));
 //  map(0x88, 0x8b) CTC
 //  map(0x8c, 0x90) FDC
@@ -525,29 +536,41 @@ void p2000t_state::machine_start()
 		default: // more.. (48kb, 64kb, 102kb)
 			// In this case we have a set of 8kb memory banks.
 			uint8_t *ram = m_ram->pointer();
-			auto available_banks = (ramsize - 0xe000) / 0x2000;
+			auto available_banks = (ramsize - 0x8000) / 0x2000;
 			for(int i = 0; i < available_banks; i++)
 				m_bank->configure_entry(i, ram + (i * 0x2000));
 			break;
 	}
+
+	save_item(NAME(m_port_303f));
+}
+
+void p2000t_state::machine_reset()
+{
+	m_port_303f = 0;
 }
 
 // TODO: vblank can't be keyboard source
+// - p2000t: "keyboard irq generated every 20 ms"
+// - p2000m: "signal R2425 Row 24/25"
 INTERRUPT_GEN_MEMBER(p2000t_state::p2000_interrupt)
 {
 	if (m_keyboard_int_enable)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
+// TODO: can't scroll with 80 char width
 uint8_t p2000t_state::videoram_r(offs_t offset)
 {
-	return m_videoram[offset];
+	if (BIT(m_port_303f, 7))
+		return 0;
+
+	return m_videoram[(offset + m_port_303f) & 0x0fff];
 }
 
 
 
 /* Machine definition */
-// TODO: merge defs
 void p2000t_state::p2000t(machine_config &config)
 {
 	/* basic machine hardware */

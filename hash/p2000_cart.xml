@@ -45,7 +45,6 @@ TODO:
 		<notes><![CDATA[
 PDOS implications untested
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x4000">
 				<rom name="BASICNL1.1A2.bin" size="0x4000" crc="0d5239ff" sha1="a6313ab7cc2d052427ba852f3035377bbf76bf63" />
@@ -123,7 +122,6 @@ Requires [SLOT2] I/O module (dual RS-232)
 Requires [FDC]
 https://retroordenadoresorty.blogspot.com/2024/09/interface-bildschirmtext-io-modul-p2171.html
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
 
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x4000">
@@ -139,7 +137,6 @@ https://retroordenadoresorty.blogspot.com/2024/09/interface-bildschirmtext-io-mo
 		<notes><![CDATA[
 (same as parent)
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
 
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x4000">
@@ -229,7 +226,6 @@ Pressing '?' on [keyboard] doesn't bring information screen
 		<notes><![CDATA[
 Not extensively tested
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
 
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x4000">
@@ -245,7 +241,6 @@ Not extensively tested
 		<notes><![CDATA[
 Not extensively tested
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
 
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x4000">
@@ -412,7 +407,6 @@ Not extensively tested
 		<notes><![CDATA[
 Not extensively tested
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
 
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x4000">
