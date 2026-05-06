@@ -35393,6 +35393,27 @@ ms5pcb
 svcpcb
 svcpcba
 
+@source:neogeo/neoprint.cpp
+98best44
+neoprint
+npcartv1
+npcramen
+npeurver
+npeurver2
+npfpit
+npft
+npmillen
+npotogib
+nppopeye
+nprsp
+npspscv
+npscv1
+npskv
+npsprg98
+npsprgv4
+npssr2
+npusagif
+
 @source:netronics/elf.cpp
 elf2
 
@@ -44802,27 +44823,6 @@ mnchmobl
 
 @source:snk/neocrnvl.cpp
 neocrnvl
-
-@source:snk/neoprint.cpp
-98best44
-neoprint
-npcartv1
-npcramen
-npeurver
-npeurver2
-npfpit
-npft
-npmillen
-npotogib
-nppopeye
-nprsp
-npspscv
-npscv1
-npskv
-npsprg98
-npsprgv4
-npssr2
-npusagif
 
 @source:snk/ngp.cpp
 ngp

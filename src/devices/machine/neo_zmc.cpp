@@ -10,7 +10,7 @@
     - NEO-CMC (with (optional) Z80 ROM encryption).
 
     Used by:
-    - snk/neoprint.cpp
+    - neogeo/neoprint.cpp
 
     - neogeo/neogeo.cpp should be used in cartridge if chip exists
 
