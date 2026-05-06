@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(MBC55X_KEYBOARD, mbc55x_keyboard_device, "mbc55x_kbd", "MBC-5
 
 mbc55x_keyboard_device::mbc55x_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MBC55X_KEYBOARD, tag, owner, clock)
-	, device_matrix_keyboard_interface(mconfig, *this, "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11")
+	, device_matrix_keyboard_interface(mconfig, *this, "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12", "Y13", "Y14", "Y15")
 	, device_serial_interface(mconfig, *this)
 	, m_modifiers(*this, "BUS")
 	, m_txd_callback(*this)
@@ -49,7 +49,7 @@ static INPUT_PORTS_START(mbc55x_kbd)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR('1') PORT_CHAR('!') PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR('q') PORT_CHAR('Q') PORT_CODE(KEYCODE_Q)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR('a') PORT_CHAR('A') PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR('<') PORT_CHAR('>') PORT_CODE(KEYCODE_BACKSLASH2)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR('<') PORT_CHAR('>')
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("PF1  PF6") PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR(UCHAR_MAMEKEY(F6)) PORT_CODE(KEYCODE_F1)
 
 	PORT_START("Y1")
@@ -128,7 +128,7 @@ static INPUT_PORTS_START(mbc55x_kbd)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR('9') PORT_CHAR('(') PORT_CODE(KEYCODE_9)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR('o') PORT_CHAR('O') PORT_CODE(KEYCODE_O)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR('l') PORT_CHAR('L') PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",  ,") PORT_CHAR(',') PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",  <") PORT_CHAR(',') PORT_CHAR('<') PORT_CODE(KEYCODE_COMMA)
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_F15)
 
 	PORT_START("Y9")
@@ -138,7 +138,7 @@ static INPUT_PORTS_START(mbc55x_kbd)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR('0') PORT_CHAR(')') PORT_CODE(KEYCODE_0)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR('p') PORT_CHAR('P') PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR(';') PORT_CHAR(':') PORT_CODE(KEYCODE_COLON)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".  .") PORT_CHAR('.') PORT_CODE(KEYCODE_STOP)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".  >") PORT_CHAR('.') PORT_CHAR('>') PORT_CODE(KEYCODE_STOP)
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) PORT_CODE(KEYCODE_F15)
 
 	PORT_START("Y10")
@@ -155,6 +155,22 @@ static INPUT_PORTS_START(mbc55x_kbd)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR('`') PORT_CHAR('~') PORT_CODE(KEYCODE_TILDE) // to right of quote
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHAR('*') PORT_CODE(KEYCODE_RCONTROL) // between slash and right shift
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) /*PORT_NAME(u8"Keypad \u23ce")*/ PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_CODE(KEYCODE_ENTER_PAD) // ⏎
+
+	PORT_START("Y12")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Left") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("Y13")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Right") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("Y14")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Up") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("Y15")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("BUS")
 	PORT_BIT(0x8f, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -199,7 +215,7 @@ void mbc55x_keyboard_device::tra_complete()
 //  KEYBOARD SCAN AND DECODING
 //**************************************************************************
 
-const u8 mbc55x_keyboard_device::s_code_table[2][12][8] =
+const u8 mbc55x_keyboard_device::s_code_table[2][16][8] =
 {
 	{
 		{ 0x15, '>',  'A',  'Q',  '!',  0x00, 0x1b, '|'  },
@@ -210,10 +226,14 @@ const u8 mbc55x_keyboard_device::s_code_table[2][12][8] =
 		{ '=',  'B',  'H',  'Y',  '^',  '0',  '5',  0x00 },
 		{ '/',  'N',  'J',  'U',  '&',  '.',  '6',  0x00 },
 		{ '*',  'M',  'K',  'I',  '*',  '1',  '7',  0x00 },
-		{ 0x03, ',',  'L',  'O',  '(',  '2',  '8',  0x00 },
-		{ '-',  '.',  ':',  'P',  ')',  '3',  '9',  0x00 },
+		{ 0x03, '<',  'L',  'O',  '(',  '2',  '8',  0x00 },
+		{ '-',  '>',  ':',  'P',  ')',  '3',  '9',  0x00 },
 		{ '+',  '?',  '"',  '{',  '_',  0x00, 0x00, 0x00 },
-		{ 0x0d, '*',  '~',  '}',  '+',  0x00, 0x00, 0x00 }
+		{ 0x0d, '*',  '~',  '}',  '+',  0x00, 0x00, 0x00 },
+		{ 0x1c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+		{ 0x1d, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+		{ 0x1e, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+		{ 0x1f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
 	},
 	{
 		{ 0x10, '<',  'a',  'q',  '1',  0x00, 0x1b, '\\' },
@@ -227,7 +247,11 @@ const u8 mbc55x_keyboard_device::s_code_table[2][12][8] =
 		{ 0x03, ',',  'l',  'o',  '9',  '2',  '8',  0x00 },
 		{ '-',  '.',  ';',  'p',  '0',  '3',  '9',  0x00 },
 		{ '+',  '/',  '\'', '[',  '-',  0x00, 0x00, 0x00 },
-		{ 0x0d, '*',  '`',  ']',  '=',  0x00, 0x00, 0x00 }
+		{ 0x0d, '*',  '`',  ']',  '=',  0x00, 0x00, 0x00 },
+		{ 0x1c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+		{ 0x1d, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+		{ 0x1e, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+		{ 0x1f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
 	}
 };
 
@@ -278,6 +302,7 @@ void mbc55x_keyboard_device::device_add_mconfig(machine_config &config)
 	//kbdc.p1_in_cb().set(FUNC(mbc55x_keyboard_device::key_matrix_r));
 	//kbdc.p2_out_cb().set(FUNC(mbc55x_keyboard_device::scan_output_w));
 }
+
 ROM_START(mbc55x_kbd)
 	ROM_REGION(0x0800, "kbdc", 0)
 	ROM_LOAD("d8049hc.m1", 0x0000, 0x0800, NO_DUMP)
@@ -287,4 +312,3 @@ const tiny_rom_entry *mbc55x_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME(mbc55x_kbd);
 }
-

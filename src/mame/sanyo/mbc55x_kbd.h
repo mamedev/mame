@@ -19,9 +19,9 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class mbc55x_keyboard_device : public device_t, public device_matrix_keyboard_interface<12U>, public device_serial_interface
+class mbc55x_keyboard_device : public device_t, public device_matrix_keyboard_interface<16U>, public device_serial_interface
 {
-	static const u8 s_code_table[2][12][8];
+	static const u8 s_code_table[2][16][8];
 
 public:
 	// construction/destruction
@@ -34,9 +34,9 @@ protected:
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// device_matrix_keyboard_interface implementation
 	virtual void key_make(u8 row, u8 column) override;
