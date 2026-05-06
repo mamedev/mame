@@ -987,7 +987,7 @@ void apple2gs_state::update_speed()
 
 void apple2gs_state::accel_slot(int slot)
 {
-	if ((m_accel_present) && (m_accel_slotspk & (1 << slot)))
+	if ((m_accel_present) && (m_accel_slotspk & (1 << slot)) && !machine().side_effects_disabled())
 	{
 		m_accel_temp_slowdown = true;
 		m_acceltimer->adjust(attotime::from_msec(52));
@@ -2200,10 +2200,7 @@ u8 apple2gs_state::c080_r(offs_t offset)
 		}
 		else
 		{
-			if (m_accel_present)
-			{
-				accel_slot(slot);
-			}
+			accel_slot(slot);
 
 			if (slot >= 4)
 			{
@@ -2341,9 +2338,8 @@ u8 apple2gs_state::c100_r(offs_t offset)
 {
 	const int slot = ((offset>>8) & 0xf) + 1;
 
-	slow_cycle();
-
 	accel_slot(slot);
+	slow_cycle();
 
 	// SETSLOTCXROM is disabled, so the $C02D SLOT register controls what's in each slot
 	if (!(m_slotromsel & (1 << slot)))
@@ -2359,7 +2355,6 @@ void apple2gs_state::c100_w(offs_t offset, u8 data)
 	const int slot = ((offset>>8) & 0xf) + 1;
 
 	accel_slot(slot);
-
 	slow_cycle();
 
 	if ((m_slotromsel & (1 << slot)))
@@ -2377,7 +2372,6 @@ u8 apple2gs_state::c400_r(offs_t offset)
 	const int slot = ((offset>>8) & 0xf) + 4;
 
 	accel_slot(slot);
-
 	slow_cycle();
 
 	if (!(m_slotromsel & (1 << slot)))
@@ -2393,7 +2387,6 @@ void apple2gs_state::c400_w(offs_t offset, u8 data)
 	const int slot = ((offset>>8) & 0xf) + 4;
 
 	accel_slot(slot);
-
 	slow_cycle();
 
 	if ((m_slotromsel & (1 << slot)))
@@ -2752,9 +2745,9 @@ u8 apple2gs_state::read_floatingbus()
 	during these PH1 cycles (and everywhere after scanline 199) nothing is put
 	onto the data bus.  The floating value is instead the last byte fetched
 	during PH0, of the instruction which invoked this read.  For example:
-		LDA C050 returns C0 (typical softswitch)
-		LDA C250 returns C2 (ROM of a Your Card slot with no card)
-		LDA 50   returns 50 (with direct page C000)
+	    LDA C050 returns C0 (typical softswitch)
+	    LDA C250 returns C2 (ROM of a Your Card slot with no card)
+	    LDA 50   returns 50 (with direct page C000)
 	*/
 	static bool recurse = false; // no recursion, single thread
 	if (!recurse && ((h_clock < 5) || (v_clock > 199)))
