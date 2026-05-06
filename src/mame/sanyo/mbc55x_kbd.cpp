@@ -28,6 +28,20 @@
 
 DEFINE_DEVICE_TYPE(MBC55X_KEYBOARD, mbc55x_keyboard_device, "mbc55x_kbd", "MBC-55x Keyboard")
 
+namespace {
+
+attotime mbc55x_key_repeat_delay()
+{
+	return attotime::from_msec(500);
+}
+
+attotime mbc55x_key_repeat_rate()
+{
+	return attotime::from_hz(20);
+}
+
+}
+
 mbc55x_keyboard_device::mbc55x_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MBC55X_KEYBOARD, tag, owner, clock)
 	, device_matrix_keyboard_interface(mconfig, *this, "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12", "Y13", "Y14", "Y15")
@@ -258,6 +272,9 @@ const u8 mbc55x_keyboard_device::s_code_table[2][16][8] =
 void mbc55x_keyboard_device::key_make(u8 row, u8 column)
 {
 	send_translated(row, column);
+	// The original keyboard generates typematic repeat itself.
+	if (!((row == 8U) && (column == 0U)))
+		typematic_start(row, column, mbc55x_key_repeat_delay(), mbc55x_key_repeat_rate());
 }
 
 void mbc55x_keyboard_device::key_repeat(u8 row, u8 column)
