@@ -2066,8 +2066,8 @@ GAME( 1984, marsarf,  mars,     mars,     mars,     scramble_state, empty_init, 
 
 GAME( 1982, devilfsh, 0,        devilfsh, devilfsh, scramble_state, init_devilfsh,     ROT90, "Artic",                "Devil Fish (Mars hardware)",        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, newsin7,  0,        newsin7,  newsin7,  scramble_state, init_mars,         ROT90, "ATW USA, Inc.",        "New Sinbad 7 (set 1)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1982, newsin7a, newsin7,  newsin7,  newsin7,  scramble_state, init_newsin7a,     ROT90, "ATW USA, Inc.",        "New Sinbad 7 (set 2)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1983, newsin7,  0,        newsin7,  newsin7,  scramble_state, init_mars,         ROT90, "ATW USA",              "New Sinbad 7 (set 1)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1982, newsin7a, newsin7,  newsin7,  newsin7,  scramble_state, init_newsin7a,     ROT90, "ATW USA",              "New Sinbad 7 (set 2)",              MACHINE_SUPPORTS_SAVE )
 
 GAME( 1984, mrkougar, 0,        mrkougar, mrkougar, scramble_state, init_mrkougar,     ROT90, "ATW",                  "Mr. Kougar",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mrkougar2,mrkougar, mrkougar, mrkougar, scramble_state, init_mrkougar,     ROT90, "ATW",                  "Mr. Kougar (earlier)",              MACHINE_SUPPORTS_SAVE )
