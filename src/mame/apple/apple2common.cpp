@@ -820,7 +820,7 @@ offs_t apple2_common_device::dasm_override_GS(std::ostream &stream, offs_t pc, c
 		case 0x22:  // JSL
 			{
 				u32 operand = opcodes.r32(pc) >> 8;
-				if (operand == 0xe100a8)
+				if (operand == 0xe100a8) // ProDOS 16
 				{
 					u16 call = opcodes.r8(pc + 4);
 					u32 params = opcodes.r32(pc + 6) & 0xffffff;
@@ -841,6 +841,7 @@ offs_t apple2_common_device::dasm_override_GS(std::ostream &stream, offs_t pc, c
 				if (rv > 0)
 					return rv | util::disasm_interface::STEP_OVER;
 
+#if 0 // very slow in debug_data_buffer::fill()
 				// jsl to inline debug name?
 				if (opcodes.r8(operand) == 0x82 && opcodes.r16(operand + 3) == 0x7771)
 				{
@@ -852,13 +853,14 @@ offs_t apple2_common_device::dasm_override_GS(std::ostream &stream, offs_t pc, c
 					util::stream_format(stream, "jsl %s (%06x)", name.c_str(), operand);
 					return 4 | util::disasm_interface::SUPPORTED | util::disasm_interface::STEP_OVER;
 				}
+#endif
 			}
 			break;
 
 		case 0x82:  // BRL
 			if (opcodes.r16(pc + 3) == 0x7771)
 			{
-				// inline debug name format:
+				// inline debug name format (Apple IIGS Technical Note #103):
 				// 82 xx xx      brl past name
 				// 71 77         signature
 				// nn xx xx xxx  pascal string
