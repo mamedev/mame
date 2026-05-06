@@ -12,7 +12,7 @@ All PlayCenter machines:
           VT82C686A, built-in SoundBlaster Pro with AC'97 codec support).
          -128MB RAM PC133, AMD K6-2 processor (K6-2/500(100*5)).
          -PCI Ethernet card (RTL8029AS chipset, PCI).
-         -Trident Blade3D/MVP4 AGP video.
+         -Trident Blade3D/MVP4 AGP video. (CyberBlade/i7, PCIR 1023:8400)
          -56K Modem (S56MR, HAMR5603 + Si3014-KS).
          -Elo Touch CTR-231000 touch screen (87C51-based, undumped) or custom touch I/O PCB named
           "Touch Presas" with unknown (and undumped) MCU.

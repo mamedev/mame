@@ -31,7 +31,7 @@ public:
 protected:
 	menu_load_save_state_base(
 			mame_ui_manager &mui,
-			render_container &container,
+			render_target &target,
 			std::string_view header,
 			std::string_view footer,
 			bool must_exist,
@@ -93,7 +93,7 @@ private:
 class menu_load_state : public menu_load_save_state_base
 {
 public:
-	menu_load_state(mame_ui_manager &mui, render_container &container, bool one_shot);
+	menu_load_state(mame_ui_manager &mui, render_target &target, bool one_shot);
 
 protected:
 	virtual void process_file(std::string &&file_name) override;
@@ -103,7 +103,7 @@ protected:
 class menu_save_state : public menu_load_save_state_base
 {
 public:
-	menu_save_state(mame_ui_manager &mui, render_container &container, bool one_shot);
+	menu_save_state(mame_ui_manager &mui, render_target &target, bool one_shot);
 
 protected:
 	virtual void process_file(std::string &&file_name) override;

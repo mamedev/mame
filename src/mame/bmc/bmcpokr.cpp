@@ -18,6 +18,8 @@ TODO:
    dispensed" than the number of coins/tickets the games are supposed to
    pay out.
  * dbshahb: Implement different video chip, different memory map
+ * fengyunz: Stops with linking error (bypassed for now).
+   Also needs DSW definitions
  * xyddzhh: Improve DSW definitions
 
 ***************************************************************************/
@@ -56,6 +58,7 @@ public:
 		m_priority(*this, "priority"),
 		m_layerctrl(*this, "layerctrl"),
 		m_backpen(*this, "backpen"),
+		m_nvram(*this, "nvram"),
 		m_dsw(*this, "DSW%u", 1U),
 		m_key(*this, "KEY%u", 1U),
 		m_inputs(*this, "INPUTS")
@@ -65,6 +68,7 @@ public:
 
 	void bmcpokr(machine_config &config) ATTR_COLD;
 	void fengyunh(machine_config &config) ATTR_COLD;
+	void fengyunz(machine_config &config) ATTR_COLD;
 	void mjmaglmp(machine_config &config) ATTR_COLD;
 	void shendeng(machine_config &config) ATTR_COLD;
 	void xyddzhh(machine_config &config) ATTR_COLD;
@@ -87,6 +91,7 @@ private:
 	required_shared_ptr<uint16_t> m_priority;
 	required_shared_ptr<uint16_t> m_layerctrl;
 	required_shared_ptr<uint16_t> m_backpen;
+	required_shared_ptr<uint16_t> m_nvram;
 
 	required_ioport_array<4> m_dsw;
 	optional_ioport_array<5> m_key;
@@ -103,6 +108,7 @@ private:
 	// Protection
 	uint16_t bmcpokr_prot_r();
 	uint16_t fengyunh_prot_r();
+	uint16_t fengyunz_prot_r();
 	uint16_t shendeng_prot_r();
 	uint16_t xyddzhh_prot_r();
 	void prot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -133,6 +139,7 @@ private:
 
 	void bmcpokr_mem(address_map &map) ATTR_COLD;
 	void fengyunh_map(address_map &map) ATTR_COLD;
+	void fengyunz_map(address_map &map) ATTR_COLD;
 	void mjmaglmp_map(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
 	void shendeng_map(address_map &map) ATTR_COLD;
@@ -351,6 +358,19 @@ uint16_t bmcpokr_state::fengyunh_prot_r()
 	return 0x00 << 8;
 }
 
+uint16_t bmcpokr_state::fengyunz_prot_r()
+{
+	logerror("prot r %x %x\n", m_prot_val, m_maincpu->pcbase());
+
+	switch (m_prot_val >> 8)
+	{
+		case 0x00:  return 0x46 << 8;
+		// TODO: other cases, if they exist
+	}
+
+	return 0x00 << 8;
+}
+
 uint16_t bmcpokr_state::shendeng_prot_r()
 {
 	logerror("unk prot r %x %x\n", m_prot_val, m_maincpu->pcbase());
@@ -426,7 +446,7 @@ void bmcpokr_state::irq_ack_w(uint8_t data)
 void bmcpokr_state::bmcpokr_mem(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x210000, 0x21ffff).ram().share("nvram");
+	map(0x210000, 0x21ffff).ram().share(m_nvram);
 
 	map(0x280000, 0x287fff).ram().w(FUNC(bmcpokr_state::videoram_w<0>)).share(m_videoram[0]);
 	map(0x288000, 0x28ffff).ram().w(FUNC(bmcpokr_state::videoram_w<1>)).share(m_videoram[1]);
@@ -485,6 +505,20 @@ void bmcpokr_state::xyddzhh_map(address_map &map)
 	map(0x370000, 0x370001).r(FUNC(bmcpokr_state::mahjong_key_r));
 }
 
+void bmcpokr_state::fengyunz_map(address_map &map)
+{
+	xyddzhh_map(map);
+
+	// TODO: this is a gigantic hack. It forces the linking status test to pass (bit 0 mustn't be set)
+	map(0x2115b0, 0x2115b0).lr8(NAME([this] (offs_t offset) -> uint8_t { return m_nvram[offset] & 0xfe; }));
+
+	// TODO: There are many reads and writes in the 0x320000-0x32000f range. They seem related to linking.
+	//       This is also the only currently dumped game to enable IRQ 7, and it does it while reading from
+	//       and writing to this area.
+
+	map(0x330000, 0x330001).r(FUNC(bmcpokr_state::fengyunz_prot_r));
+}
+
 
 uint16_t bmcpokr_state::mjmaglmp_dsw_r()
 {
@@ -515,7 +549,7 @@ uint16_t bmcpokr_state::mahjong_key_r()
 void bmcpokr_state::mjmaglmp_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x210000, 0x21ffff).ram().share("nvram");
+	map(0x210000, 0x21ffff).ram().share(m_nvram);
 
 	map(0x280000, 0x287fff).ram().w(FUNC(bmcpokr_state::videoram_w<0>)).share(m_videoram[0]);
 	map(0x288000, 0x28ffff).ram().w(FUNC(bmcpokr_state::videoram_w<1>)).share(m_videoram[1]);
@@ -557,7 +591,7 @@ void bmcpokr_state::mjmaglmp_map(address_map &map)
 void bmcpokr_state::shendeng_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x210000, 0x21ffff).ram().share("nvram");
+	map(0x210000, 0x21ffff).ram().share(m_nvram);
 
 	map(0x280000, 0x287fff).ram().w(FUNC(bmcpokr_state::videoram_w<0>)).share(m_videoram[0]);
 	map(0x288000, 0x28ffff).ram().w(FUNC(bmcpokr_state::videoram_w<1>)).share(m_videoram[1]);
@@ -1312,6 +1346,12 @@ void bmcpokr_state::fengyunh(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bmcpokr_state::fengyunh_map);
 }
 
+void bmcpokr_state::fengyunz(machine_config &config)
+{
+	bmcpokr(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bmcpokr_state::fengyunz_map);
+}
+
 void bmcpokr_state::mjmaglmp(machine_config &config)
 {
 	bmcpokr(config);
@@ -1548,6 +1588,26 @@ ROM_START( xyddzhh )
 	ROM_LOAD( "c4-a-701.u10", 0x00000, 0x80000, CRC(f22dacfe) SHA1(0a085419b04a6eba0d30064fae4678e1523e4e15) )
 ROM_END
 
+/*
+风云争霸 (Fēngyún Zhēngbà)
+PCB Number: BMC-A81210
+PCB is identical to BMC-A81212 (documented)
+*/
+ROM_START( fengyunz )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "ta-a-602.u13", 0x000000, 0x20000, CRC(7814da43) SHA1(2d7a7b82fe68d8f44f6a6bc8274e59202b830720) )
+	ROM_LOAD16_BYTE( "ta-a-502.u12", 0x000001, 0x20000, CRC(9439cf3a) SHA1(71401a74ccbe9f51c2a510d4f4e01c575dfba8b4) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "ta-a-101.u39", 0x000000, 0x80000, CRC(30effa9d) SHA1(714e49b6d6a467440c22270b5b92c6a785d77741) )
+	ROM_LOAD16_BYTE( "ta-a-201.u40", 0x000001, 0x80000, CRC(bfe2d95a) SHA1(112ecb82ba9c39a87be0d8a1415571de579d0731) )
+	ROM_LOAD16_BYTE( "ta-a-301.u45", 0x100000, 0x80000, CRC(04568a6a) SHA1(06d6878c54d5611f2409507569e5e684c47b2dce) )
+	ROM_LOAD16_BYTE( "ta-a-401.u38", 0x100001, 0x80000, CRC(f7ace5ea) SHA1(386c4ecf9a0d8b1683ab8d2b5b00e2f05571d909) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // Samples
+	ROM_LOAD( "ta-a-701.u10", 0x00000, 0x40000,  CRC(ef806c1b) SHA1(11479817d91e580b0c6796f46d2823f62a1a6833) )
+ROM_END
+
 /***************************************************************************
 
 Mahou no Lamp (BMC, 2000)
@@ -1622,6 +1682,7 @@ ROM_END
 
 GAME( 1998, fengyunh, 0,        fengyunh, fengyunh, bmcpokr_state, empty_init, ROT0, "BMC",       "Fengyun Hui",              MACHINE_SUPPORTS_SAVE )
 GAME( 1998, shendeng, mjmaglmp, shendeng, shendeng, bmcpokr_state, empty_init, ROT0, "BMC",       "Pili Shen Deng",           MACHINE_SUPPORTS_SAVE )
+GAME( 1998, fengyunz, 0,        fengyunz, xyddzhh,  bmcpokr_state, empty_init, ROT0, "BMC",       "Fengyun Zhengba",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1999, bmcpokr,  0,        bmcpokr,  bmcpokr,  bmcpokr_state, empty_init, ROT0, "BMC",       "Dongfang Shenlong",        MACHINE_SUPPORTS_SAVE )
 GAME( 2000, mjmaglmp, 0,        mjmaglmp, mjmaglmp, bmcpokr_state, empty_init, ROT0, "BMC",       "Mahou no Lamp (v. JAA02)", MACHINE_SUPPORTS_SAVE )
 GAME( 2006, xyddzhh,  0,        xyddzhh,  xyddzhh,  bmcpokr_state, empty_init, ROT0, "Herb Home", "Xingyun Dou Dizhu",        MACHINE_SUPPORTS_SAVE )

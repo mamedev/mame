@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: David Haywood
 
 /*
 Fruit Dream 2
@@ -18,6 +18,18 @@ MAX695CPE Microprocessor Supervisory IC
 YM2203C sound chip
 28.0000 MHz XTAL
 bank of 8 switches
+
+NOTES:
+
+- appears to be ported from the version on tc009xlvc hardware, with some of the features
+  of that SoC reproduced here;
+- while the game has DIPs, most configuration options are found in service mode.
+
+TODO:
+- complete I/O
+- IRQ handling may be incomplete
+- hopper hookup may be imperfect
+- various unknown reads / writes
 */
 
 #include "emu.h"
@@ -28,6 +40,8 @@ bank of 8 switches
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/ticket.h"
+#include "machine/timer.h"
 #include "sound/ymopn.h"
 
 #include "emupal.h"
@@ -44,25 +58,34 @@ public:
 	dfruit2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_hopper(*this, "hopper"),
+		m_palette(*this, "palette"),
 		m_deco_tilegen(*this, "tilegen"),
 		m_sprgen(*this, "sprgen"),
-		m_spriteram(*this, "spriteram", 0x1000, ENDIANNESS_BIG)
+		m_spriteram(*this, "spriteram", 0xe00, ENDIANNESS_BIG),
+		m_mainbank(*this, "mainbank")
 	{ }
 
 	void dfruit2(machine_config &config) ATTR_COLD;
 
 	void init_dfruit2() ATTR_COLD;
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<hopper_device> m_hopper;
+	required_device<palette_device> m_palette;
 	required_device<deco16ic_device> m_deco_tilegen;
 	required_device<decospr_device> m_sprgen;
 
 	memory_share_creator<u16> m_spriteram;
+	required_memory_bank m_mainbank;
 
-	uint16_t m_pf_control = 0;
-	uint16_t m_pf1_data = 0;
-	uint16_t m_pf2_data = 0;
+	uint8_t m_rombank = 0;
+	uint8_t m_b109 = 0;
+	uint8_t m_irq_source = 0;
 
 	uint8_t spriteram_r(offs_t offset);
 	void spriteram_w(offs_t offset, uint8_t data);
@@ -73,18 +96,26 @@ private:
 	void tilegen_control_w(offs_t offset, uint8_t data);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
+	uint8_t bank_r();
+	void bank_w(uint8_t data);
+	void b109_w(uint8_t data);
+	void counters_w(uint8_t data);
 	void program_map(address_map &map) ATTR_COLD;
 };
 
 
 uint32_t dfruit2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
+
 	m_sprgen->set_flip_screen(true); // sprites are flipped relative to tilemaps
+	m_deco_tilegen->pf_update(nullptr, nullptr);
 
 	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0xe00 / 2);
 	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x1000);
 
 	return 0;
 }
@@ -124,11 +155,9 @@ void dfruit2_state::tilegen_pf1_data_w(offs_t offset, uint8_t data)
 	int const offs = offset >> 1;
 
 	if (!BIT(offset, 0))
-		m_pf1_data = (m_pf1_data & 0xff00) | data;
+		m_deco_tilegen->pf1_data_w(offs, data, 0x00ff);
 	else
-		m_pf1_data = (m_pf1_data & 0x00ff) | (data << 8);
-
-	m_deco_tilegen->pf1_data_w(offs, m_pf1_data, 0xffff);
+		m_deco_tilegen->pf1_data_w(offs, data << 8, 0xff00);
 }
 
 uint8_t dfruit2_state::tilegen_pf2_data_r(offs_t offset)
@@ -146,11 +175,9 @@ void dfruit2_state::tilegen_pf2_data_w(offs_t offset, uint8_t data)
 	int const offs = offset >> 1;
 
 	if (!BIT(offset, 0))
-		m_pf2_data = (m_pf2_data & 0xff00) | data;
+		m_deco_tilegen->pf2_data_w(offs, data, 0x00ff);
 	else
-		m_pf2_data = (m_pf2_data & 0x00ff) | (data << 8);
-
-	m_deco_tilegen->pf2_data_w(offs, m_pf2_data, 0xffff);
+		m_deco_tilegen->pf2_data_w(offs, data << 8, 0xff00);
 }
 
 void dfruit2_state::tilegen_control_w(offs_t offset, uint8_t data)
@@ -158,16 +185,62 @@ void dfruit2_state::tilegen_control_w(offs_t offset, uint8_t data)
 	int const offs = offset >> 1;
 
 	if (!BIT(offset, 0))
-		m_pf_control = (m_pf_control & 0xff00) | data;
+		m_deco_tilegen->pf_control_w(offs, data, 0x00ff);
 	else
-		m_pf_control = (m_pf_control & 0x00ff) | (data << 8);
+		m_deco_tilegen->pf_control_w(offs, data << 8, 0xff00);
 
-	m_deco_tilegen->pf_control_w(offs, m_pf_control, 0xffff);
 }
 
 DECO16IC_BANK_CB_MEMBER(dfruit2_state::bank_callback)
 {
-	return (bank & 0xf0) << 8; // TODO: not verified
+	return (bank & 0xf0) << 8;
+}
+
+
+uint8_t dfruit2_state::bank_r()
+{
+	return m_rombank;
+}
+
+void dfruit2_state::bank_w(uint8_t data)
+{
+	m_rombank = data;
+	m_mainbank->set_entry(m_rombank & 0x1f);
+}
+
+void dfruit2_state::b109_w(uint8_t data)
+{
+	m_b109 = data;
+	if (m_b109 & 0xfe)
+		logerror("%s b109_w: %02x\n", machine().describe_context(), data);
+
+	// TODO: bit 1 seems to be set only during double up game. What is it used for?
+}
+
+void dfruit2_state::counters_w(uint8_t data)
+{
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+
+	m_hopper->motor_w(BIT(data, 2)); // or maybe 3?
+
+	if (data & 0x0c)
+		logerror("%s output_w: %02x\n", machine().describe_context(), data);
+
+	// 0xf0 always on?
+}
+
+void dfruit2_state::machine_start()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	m_mainbank->configure_entries(0, 32, &rom[0x00000], 0x2000);
+
+	m_rombank = 0x1f;
+	m_mainbank->set_entry(m_rombank);
+
+	save_item(NAME(m_rombank));
+	save_item(NAME(m_b109));
+	save_item(NAME(m_irq_source));
 }
 
 
@@ -175,35 +248,39 @@ void dfruit2_state::program_map(address_map &map)
 {
 	map.unmap_value_high();
 
-	map(0x0000, 0x7fff).rom();
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0x9fff).ram(); // WORK RAM CHECK NG if this range isn't mapped. TODO: probably battery backed by the MAX695CPE
-	map(0xa000, 0xa003).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)); // probably
-	map(0xa004, 0xa005).rw("ym", FUNC(ym2203_device::read), FUNC(ym2203_device::write)); // probably
+	map(0xa000, 0xa003).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa004, 0xa005).rw("ym", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	// map(0xa008, 0xa008).r(); // watchdog?
 	// map(0xa028, 0xa028).w(); // MAX695CPE??
 	// map(0xa029, 0xa029).w(); // MAX695CPE??
-	map(0xa02b, 0xa02b).lr8(NAME([]( ) -> uint8_t { return 0x00; })); // MAX695CPE?? VBLANK / IRQ?
-	map(0xb000, 0xb00f).w(FUNC(dfruit2_state::tilegen_control_w)); // probably
+	map(0xa02a, 0xa02a).lr8(NAME([this]() -> uint8_t { logerror("%s: a02a read\n", machine().describe_context()); return 0x00; }));
+	map(0xa02b, 0xa02b).lr8(NAME([this]() -> uint8_t { logerror("%s: a02b read\n", machine().describe_context()); return m_irq_source; })); // MAX695CPE?? VBLANK / IRQ? (checked in IRQ)
+	map(0xb000, 0xb00f).w(FUNC(dfruit2_state::tilegen_control_w));
 	// map(0xb100, 0xb100).w();
 	// map(0xb101, 0xb101).w();
-	// map(0xb109, 0xb109).w();
-	map(0xc000, 0xc1ff).ram(); // COLOR RAM CHECK NG if this range isn't mapped
-	map(0xd000, 0xdfff).rw(FUNC(dfruit2_state::tilegen_pf1_data_r), FUNC(dfruit2_state::tilegen_pf1_data_w)); // SCREEN RAM CHECK NG if this range isn't mapped
-	map(0xe000, 0xefff).rw(FUNC(dfruit2_state::tilegen_pf2_data_r), FUNC(dfruit2_state::tilegen_pf2_data_w));
-	map(0xf000, 0xffff).rw(FUNC(dfruit2_state::spriteram_r), FUNC(dfruit2_state::spriteram_w)); // maybe not the whole range
+	map(0xb109, 0xb109).w(FUNC(dfruit2_state::b109_w));
+	map(0xc000, 0xc1ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xd000, 0xdfff).rw(FUNC(dfruit2_state::tilegen_pf2_data_r), FUNC(dfruit2_state::tilegen_pf2_data_w)); // SCREEN RAM CHECK NG if this range isn't mapped
+	map(0xe000, 0xefff).rw(FUNC(dfruit2_state::tilegen_pf1_data_r), FUNC(dfruit2_state::tilegen_pf1_data_w));
+	map(0xf000, 0xfdff).rw(FUNC(dfruit2_state::spriteram_r), FUNC(dfruit2_state::spriteram_w));
+	map(0xff08, 0xff08).rw(FUNC(dfruit2_state::bank_r), FUNC(dfruit2_state::bank_w));
+	map(0xfff0, 0xffff).ram();
 }
 
 
 static INPUT_PORTS_START( dfruit2 )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) // no coin counter, so assume service
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW ) // or book-keeping?
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) // also service / book-keeping
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -215,15 +292,41 @@ static INPUT_PORTS_START( dfruit2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // by default only works with at least 300 credits, changeable in service mode
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop Reel 1 / Double Up")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop Reel 3 / Black")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start / Stop All Reels")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop Reel 2 / Red")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 	PORT_START("DSW")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW:8" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -238,55 +341,71 @@ static const gfx_layout tile_8x8_layout =
 	16*8
 };
 
-// TODO: wrong? see missing parts of the disclaimer text at 0x700-0x752 in the GFX viewer
 static const gfx_layout _16x16_layout =
 {
 	16,16,
 	RGN_FRAC(1,2),
 	4,
-	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
+	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0, 8, 0 },
 	{ STEP8(16*8*2,1), STEP8(0,1) },
 	{ STEP16(0,8*2) },
 	64*8
 };
 
-static GFXDECODE_START( gfx_dfruit2 ) // TODO
-	GFXDECODE_ENTRY( "tiles", 0, tile_8x8_layout, 0, 32 )
-	GFXDECODE_ENTRY( "tiles", 0, _16x16_layout, 0, 32 )
+static GFXDECODE_START( gfx_dfruit2 )
+	GFXDECODE_ENTRY( "tiles", 0, tile_8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, _16x16_layout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( gfx_dfruit2_spr ) // TODO
-	GFXDECODE_ENTRY( "sprites", 0, _16x16_layout, 0, 32 )
+static GFXDECODE_START( gfx_dfruit2_spr )
+	GFXDECODE_ENTRY( "sprites", 0, _16x16_layout, 0, 16 )
 GFXDECODE_END
+
+
+TIMER_DEVICE_CALLBACK_MEMBER(dfruit2_state::scanline_cb)
+{
+	int const scanline = param;
+
+	if (BIT(m_b109, 0))
+		m_irq_source = 0x10;
+	else
+		m_irq_source = 0x00;
+
+	if (scanline == 240)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+}
 
 
 void dfruit2_state::dfruit2(machine_config &config)
 {
 	Z80(config, m_maincpu, 28_MHz_XTAL / 4); // divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &dfruit2_state::program_map);
-	m_maincpu->set_vblank_int("screen", FUNC(dfruit2_state::irq0_line_hold));
 
-	i8255_device &ppi(I8255A(config, "ppi")); // initialized with 0x9b (mode 0 all reads). TODO: ports are just guessed
+	TIMER(config, "scantimer").configure_scanline(FUNC(dfruit2_state::scanline_cb), "screen", 0, 1);
+
+	i8255_device &ppi(I8255A(config, "ppi")); // initialized with 0x9b (mode 0 all reads)
 	ppi.in_pa_callback().set_ioport("IN0");
 	ppi.in_pb_callback().set_ioport("IN1");
-	ppi.in_pc_callback().set_ioport("DSW");
+	ppi.in_pc_callback().set_ioport("IN2");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
+	HOPPER(config, m_hopper, attotime::from_msec(200)); // TODO: probably wrong period
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(dfruit2_state::screen_update));
 
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 0x200 / 2); // TODO
+	PALETTE(config, m_palette).set_format(palette_device::xBGRBBBBGGGGRRRR_bit0, 0x200 / 2);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_dfruit2);
 
-	DECO16IC(config, m_deco_tilegen, 0); // TODO: everything
+	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_col_bank(0x00);
-	m_deco_tilegen->set_pf2_col_bank(0x10);
+	m_deco_tilegen->set_pf2_col_bank(0x00);
 	m_deco_tilegen->set_pf1_col_mask(0x0f);
 	m_deco_tilegen->set_pf2_col_mask(0x0f);
 	m_deco_tilegen->set_bank1_callback(FUNC(dfruit2_state::bank_callback));
@@ -300,6 +419,8 @@ void dfruit2_state::dfruit2(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ym2203_device &ym(YM2203(config, "ym", 28_MHz_XTAL / 8));
+	ym.port_a_write_callback().set(FUNC(dfruit2_state::counters_w));
+	ym.port_b_read_callback().set_ioport("DSW");
 	ym.add_route(ALL_OUTPUTS, "mono", 1.00); // divider not verified
 }
 
@@ -309,8 +430,8 @@ ROM_START( dfruit2 )
 	ROM_LOAD( "nn_002.b4", 0x00000, 0x40000, CRC(bab4fa47) SHA1(d9b4ecaf72ced54a1a7f1de7036efe3d939306cf) )
 
 	ROM_REGION( 0x80000, "sprites", 0 )
-	ROM_LOAD( "nn_010.b10", 0x00000, 0x40000, CRC(1ae3c63f) SHA1(c9940c50bfdacf9bbaf823e48abe249b992f74d9) )
-	ROM_LOAD( "nn_020.b11", 0x40000, 0x40000, CRC(8e5ebdb8) SHA1(a44c055cd33921561f4b2e1906186d16bfc64783) )
+	ROM_LOAD( "nn_020.b11", 0x00000, 0x40000, CRC(8e5ebdb8) SHA1(a44c055cd33921561f4b2e1906186d16bfc64783) )
+	ROM_LOAD( "nn_010.b10", 0x40000, 0x40000, CRC(1ae3c63f) SHA1(c9940c50bfdacf9bbaf823e48abe249b992f74d9) )
 
 	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "nn_030.h2", 0x00000, 0x80000, CRC(8f9183af) SHA1(e756306755aed15f40cffcdeedea030c5da9ffb3) )
@@ -325,4 +446,4 @@ void dfruit2_state::init_dfruit2()
 } // anonymous namespace
 
 
-GAME( 1994, dfruit2, 0, dfruit2, dfruit2, dfruit2_state, init_dfruit2, ROT0, "Nippon Data Kiki / Star Fish", "Fruit Dream II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, dfruit2, 0, dfruit2, dfruit2, dfruit2_state, init_dfruit2, ROT0, "Nippon Data Kiki / Star Fish", "Fruit Dream II", MACHINE_NOT_WORKING )

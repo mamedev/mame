@@ -22,6 +22,7 @@
 #include <memory>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 
@@ -300,7 +301,7 @@ public:
 	{ save_pointer(nullptr, "global", nullptr, index, std::forward<ItemType>(value), element, valname, count); }
 
 	// file processing
-	static save_error check_file(running_machine &machine, util::core_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
+	static std::pair<save_error, std::string> check_file(running_machine &machine, util::core_file &file, const char *gamename);
 	save_error write_file(util::core_file &file);
 	save_error read_file(util::core_file &file);
 
@@ -328,7 +329,7 @@ private:
 	save_error do_read(T check_length, U read_block, V start_header, W start_data);
 	u32 signature() const;
 	void dump_registry() const;
-	static save_error validate_header(const u8 *header, const char *gamename, u32 signature, void (CLIB_DECL *errormsg)(const char *fmt, ...), const char *error_prefix);
+	static std::pair<save_error, std::string> validate_header(const u8 *header, const char *gamename, u32 signature);
 
 	// internal state
 	running_machine &         m_machine;              // reference to our machine

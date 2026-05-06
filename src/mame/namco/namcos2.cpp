@@ -38,11 +38,6 @@ TODO:
     Suzuka 8 Hours II
     - some sprite cropping issues
 
-    Valkyrie no Densetsu
-    - gives ADSMISS error on startup
-       Does a checksum on area 0x181000 - 0x183fff, in 0x20 bytes block chunks. Game doesn't init it properly so you either have to go into service menu and do
-       an "all data clear" or play once to get rid of the message.
-
     Metal Hawk
     - ROZ wraparound isn't implemented (see large battleship in 2nd stage)
 
@@ -711,7 +706,7 @@ void namcos2_base_state::master_common_am(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x180000, 0x183fff).rw(FUNC(namcos2_base_state::eeprom_r), FUNC(namcos2_base_state::eeprom_w)).umask16(0x00ff);
+	map(0x180000, 0x183fff).rw(FUNC(namcos2_base_state::nvram_r), FUNC(namcos2_base_state::nvram_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
 }
 
@@ -743,7 +738,7 @@ void finallap_state::common_finallap_am(address_map &map)
 	map(0x300000, 0x33ffff).r(FUNC(finallap_state::finallap_prot_r));
 	map(0x800000, 0x80ffff).ram().share(m_spriteram);
 	map(0x840000, 0x840001).rw(FUNC(finallap_state::gfx_ctrl_r), FUNC(finallap_state::gfx_ctrl_w));
-	map(0x880000, 0x89ffff).rw(m_c45_road, FUNC(namco_c45_road_device::read), FUNC(namco_c45_road_device::write));
+	map(0x880000, 0x89ffff).m(m_c45_road, FUNC(namco_c45_road_device::map));
 	map(0x8c0000, 0x8c0001).nopw();
 }
 
@@ -814,7 +809,7 @@ void sgunner_state::common_suzuka8h_am(address_map &map)
 	map(0x81a000, 0x81a001).nopw(); /* enable? - or maybe sprite DMA / buffering which is currently done automatically by setting m_c355spr->set_buffer(1); */
 	map(0x840000, 0x840001).nopr();
 	map(0x900000, 0x900007).rw(m_c355spr, FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
-	map(0xa00000, 0xa1ffff).rw(m_c45_road, FUNC(namco_c45_road_device::read), FUNC(namco_c45_road_device::write));
+	map(0xa00000, 0xa1ffff).m(m_c45_road, FUNC(namco_c45_road_device::map));
 	map(0xf00000, 0xf00007).rw(FUNC(sgunner_state::namcos2_68k_key_r), FUNC(sgunner_state::namcos2_68k_key_w));
 }
 
@@ -871,10 +866,10 @@ void namcos2_base_state::sound_default_am(address_map &map)
 	map(0x7000, 0x77ff).mirror(0x0800).rw(FUNC(namcos2_base_state::dpram_byte_r), FUNC(namcos2_base_state::dpram_byte_w)).share("dpram");
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xbfff).nopw(); /* Amplifier enable on 1st write */
+	map(0xc000, 0xffff).rom().region("audiocpu", 0);
 	map(0xc000, 0xc001).w(FUNC(namcos2_base_state::sound_bankselect_w));
 	map(0xd001, 0xd001).nopw(); /* Watchdog */
 	map(0xe000, 0xe000).nopw();
-	map(0xd000, 0xffff).rom().region("audiocpu", 0x01000);
 }
 
 void namcos2_base_state::c140_default_am(address_map &map)
@@ -1496,8 +1491,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dirtfox )
 	PORT_START("MCUB")      /* 63B05Z0 - PORT B */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Gear Shift Down")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Gear Shift Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Gear Shift Down")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Gear Shift Up")
 
 	NAMCOS2_MCU_PORT_C_DEFAULT
 
@@ -1512,11 +1507,11 @@ static INPUT_PORTS_START( dirtfox )
 	PORT_START("AN4")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("AN5")       /* Steering Wheel */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(70) PORT_KEYDELTA(50)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(8)
 	PORT_START("AN6")       /* Brake pedal */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x40) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_NAME("Brake")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x40) PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_NAME("Brake")
 	PORT_START("AN7")       /* Accelerator pedal */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x80) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_NAME("Accelerator")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x80) PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_NAME("Accelerator")
 
 	PORT_START("MCUH")      /* 63B05Z0 - PORT H */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1543,11 +1538,11 @@ static INPUT_PORTS_START( metlhawk )
 	PORT_START("AN4")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("AN5")       /* Joystick Y */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(50) PORT_KEYDELTA(8)
 	PORT_START("AN6")       /* Joystick X */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(50) PORT_KEYDELTA(8)
 	PORT_START("AN7")       /* Lever */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(50) PORT_KEYDELTA(8)
 
 	PORT_START("MCUH")      /* 63B05Z0 - PORT H */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -1754,7 +1749,7 @@ void namcos2_base_state::configure_c123tmap_standard(machine_config &config)
 {
 	NAMCO_C123TMAP(config, m_c123tmap);
 	m_c123tmap->set_palette(m_c116);
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos2_base_state::TilemapCB, this));
+	m_c123tmap->set_tile_callback(FUNC(namcos2_base_state::TilemapCB));
 	m_c123tmap->set_color_base(16*256);
 }
 
@@ -1773,7 +1768,6 @@ void sgunner_state::configure_c355spr_standard(machine_config &config)
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_palette(m_c116);
 	m_c355spr->set_scroll_offsets(0x26, 0x19);
-	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
 	m_c355spr->set_mix_callback(FUNC(sgunner_state::sprite_mix_callback_c355));
 	m_c355spr->set_color_base(0);
 }
@@ -1788,6 +1782,7 @@ void namcos2_base_state::configure_c45road_standard(machine_config &config)
 void finallap_state::configure_namcos2_sprite_standard(machine_config &config)
 {
 	NAMCOS2_SPRITE(config, m_ns2sprite, 0, m_c116, gfx_namcos2_spr);
+	m_ns2sprite->set_screen(m_screen);
 	m_ns2sprite->set_spriteram_tag("spriteram");
 	m_ns2sprite->set_priority_callback(FUNC(finallap_state::sprite_pri_callback_ns2));
 	m_ns2sprite->set_mix_callback(FUNC(finallap_state::sprite_mix_callback_ns2));
@@ -1905,6 +1900,7 @@ void finallap_state::finallap(machine_config &config)
 	base_fl(config);
 
 	NAMCOS2_SPRITE_FINALLAP(config.replace(), m_ns2sprite, 0, m_c116, gfx_namcos2_spr);
+	m_ns2sprite->set_screen(m_screen);
 	m_ns2sprite->set_spriteram_tag("spriteram");
 	m_ns2sprite->set_priority_callback(FUNC(finallap_state::sprite_pri_callback_ns2));
 	m_ns2sprite->set_mix_callback(FUNC(finallap_state::sprite_mix_callback_ns2));
@@ -1923,14 +1919,14 @@ void finallap_state::finalap2(machine_config &config)
 {
 	base_fl(config);
 
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&finallap_state::TilemapCB_finalap2, this));
+	m_c123tmap->set_tile_callback(FUNC(finallap_state::TilemapCB_finalap2));
 }
 
 void finallap_state::finalap3(machine_config &config)
 {
 	finallap_c68(config);
 
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&finallap_state::TilemapCB_finalap2, this));
+	m_c123tmap->set_tile_callback(FUNC(finallap_state::TilemapCB_finalap2));
 }
 
 
@@ -2028,7 +2024,7 @@ void sgunner_state::luckywld(machine_config &config)
 	m_slave->set_addrmap(AS_PROGRAM, &sgunner_state::slave_luckywld_am);
 
 	configure_c169roz_standard(config);
-	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&sgunner_state::RozCB_luckywld, this));
+	m_c169roz->set_tile_callback(FUNC(sgunner_state::RozCB_luckywld));
 }
 
 void metlhawk_state::metlhawk(machine_config &config)
@@ -2050,13 +2046,14 @@ void metlhawk_state::metlhawk(machine_config &config)
 	m_screen->set_screen_update(FUNC(metlhawk_state::screen_update_metlhawk));
 
 	NAMCOS2_SPRITE_METALHAWK(config, m_ns2sprite, 0, m_c116, gfx_metlhawk_spr);
+	m_ns2sprite->set_screen(m_screen);
 	m_ns2sprite->set_spriteram_tag("spriteram");
 	m_ns2sprite->set_priority_callback(FUNC(metlhawk_state::sprite_pri_callback_ns2));
 	m_ns2sprite->set_mix_callback(FUNC(metlhawk_state::sprite_mix_callback_ns2));
 
 	configure_c123tmap_standard(config);
 	configure_c169roz_standard(config);
-	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&metlhawk_state::RozCB_metlhawk, this));
+	m_c169roz->set_tile_callback(FUNC(metlhawk_state::RozCB_metlhawk));
 
 	m_c140->add_route(0, "speaker", 1.0, 0);
 	m_c140->add_route(1, "speaker", 1.0, 1);
@@ -3263,7 +3260,7 @@ ROM_START( finalap3bl ) // bootleg set
 	NAMCOS2_DATA_LOAD_E_128K( "flt1d0.13s",  0x000000, CRC(80004966) SHA1(112b2a9b0ea792d5dbff1b9cf904da788aeede29) )
 	NAMCOS2_DATA_LOAD_O_128K( "flt1d1.13p",  0x000000, CRC(a2e93e8c) SHA1(9c8a5431a79153a70eb6939d16e0a5a6be235e75) )
 
-	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* PROM for road colors */
 	ROM_LOAD( "fl1-3.5b", 0, 0x100, CRC(d179d99a) SHA1(4e64f284c74d2b77f893bd28aaa6489084056aa2) )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
@@ -3541,7 +3538,7 @@ ROM_START( fourtrax )
 	NAMCOS2_DATA_LOAD_E_256K( "fx_dat2.13r", 0x100000, CRC(71e4a5a0) SHA1(a0188c920a43c5e69e25464627094b6b6ed26a59) )
 	NAMCOS2_DATA_LOAD_O_256K( "fx_dat3.13n", 0x100000, CRC(605725f7) SHA1(b94ce0ec37f879a5e46a097058cb2dd57e2281f1) )
 
-	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* PROM for road colors */
 	ROM_LOAD( "fx1_1.5b", 0, 0x100, CRC(85ffd753) SHA1(7dbc8c295204877f41289141a146aa4f5f9f9c96) )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
@@ -3600,7 +3597,7 @@ ROM_START( fourtraxj )
 	NAMCOS2_DATA_LOAD_E_256K( "fx_dat2.13r", 0x100000, CRC(71e4a5a0) SHA1(a0188c920a43c5e69e25464627094b6b6ed26a59) )
 	NAMCOS2_DATA_LOAD_O_256K( "fx_dat3.13n", 0x100000, CRC(605725f7) SHA1(b94ce0ec37f879a5e46a097058cb2dd57e2281f1) )
 
-	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* PROM for road colors */
 	ROM_LOAD( "fx1_1.5b", 0, 0x100, CRC(85ffd753) SHA1(7dbc8c295204877f41289141a146aa4f5f9f9c96) )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
@@ -3670,7 +3667,7 @@ ROM_START( fourtraxa )
 	NAMCOS2_DATA_LOAD_E_256K( "fx_dat2.13r", 0x100000, CRC(71e4a5a0) SHA1(a0188c920a43c5e69e25464627094b6b6ed26a59) )
 	NAMCOS2_DATA_LOAD_O_256K( "fx_dat3.13n", 0x100000, CRC(605725f7) SHA1(b94ce0ec37f879a5e46a097058cb2dd57e2281f1) )
 
-	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* PROM for road colors */
 	ROM_LOAD( "fx1_1.5b", 0, 0x100, CRC(85ffd753) SHA1(7dbc8c295204877f41289141a146aa4f5f9f9c96) )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
@@ -4793,7 +4790,7 @@ ROM_START( suzuka8h )
 	NAMCOS2_DATA_LOAD_O_256K( "eh1-d1.13p",  0x000000, CRC(9825d5bf) SHA1(720f0e90c69a2e0c48889d510a15102768226a67) )
 	NAMCOS2_DATA_LOAD_O_256K( "eh1-d3.13n",  0x100000, CRC(f46d301f) SHA1(70797fd584735844539553efcad53e11239ec10e) )
 
-	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* PROM for road colors */
 	ROM_LOAD( "ehs1_landdt.10w", 0, 0x100, CRC(cde7e8a6) SHA1(860273daf2e649418746adf50a67ae33f9f3740c) )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
@@ -4840,7 +4837,7 @@ ROM_START( suzuka8hj )
 	NAMCOS2_DATA_LOAD_O_256K( "eh1-d1.13p",  0x000000, CRC(9825d5bf) SHA1(720f0e90c69a2e0c48889d510a15102768226a67) )
 	NAMCOS2_DATA_LOAD_O_256K( "eh1-d3.13n",  0x100000, CRC(f46d301f) SHA1(70797fd584735844539553efcad53e11239ec10e) )
 
-	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* PROM for road colors */
 	ROM_LOAD( "ehs1_landdt.10w", 0, 0x100, CRC(cde7e8a6) SHA1(860273daf2e649418746adf50a67ae33f9f3740c) )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
@@ -4893,7 +4890,7 @@ ROM_START( suzuk8h2 )
 	NAMCOS2_DATA_LOAD_E_512K( "ehs1-dat2.13r",  0x100000, CRC(087da1f3) SHA1(e9c4ba0383e883502c0f45ae6e6d5daba4eccb01) )
 	NAMCOS2_DATA_LOAD_O_512K( "ehs1-dat3.13n",  0x100000, CRC(85aecb3f) SHA1(00ab6104dee0cd0fbdb0235b88b41e4d26794f98) )
 
-	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* PROM for road colors */
 	ROM_LOAD( "ehs1-landdt.10w", 0, 0x100, CRC(cde7e8a6) SHA1(860273daf2e649418746adf50a67ae33f9f3740c) )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
@@ -4946,7 +4943,7 @@ ROM_START( suzuk8h2j )
 	NAMCOS2_DATA_LOAD_E_512K( "ehs1-dat2.13r",  0x100000, CRC(087da1f3) SHA1(e9c4ba0383e883502c0f45ae6e6d5daba4eccb01) )
 	NAMCOS2_DATA_LOAD_O_512K( "ehs1-dat3.13n",  0x100000, CRC(85aecb3f) SHA1(00ab6104dee0cd0fbdb0235b88b41e4d26794f98) )
 
-	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* PROM for road colors */
 	ROM_LOAD( "ehs1-landdt.10w", 0, 0x100, CRC(cde7e8a6) SHA1(860273daf2e649418746adf50a67ae33f9f3740c) )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
@@ -5004,6 +5001,9 @@ ROM_START( valkyrie )
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 )    /* Sound voices */
 	NAMCOS2_DATA_LOAD_E_256K( "wd1voi1.bin",  0x000000, CRC(f1ace193) SHA1(dd13bdf4b99c6bf4e356d623ff2e3da72db331dd) )
 	NAMCOS2_DATA_LOAD_E_128K( "wd1voi2.bin",  0x100000, CRC(e95c5cf3) SHA1(4bfc7303bde23bcf6739c7877dd87671c33135bc) )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) /* game doesn't auto initialize nvram properly */
+	ROM_LOAD( "valkyrie.nv",  0x000000, 0x2000, CRC(d5ce4069) SHA1(ce01ebbbd8d4e03a7b8e0fa50296d6cc1a978800) )
 ROM_END
 
 /* KYUUKAI DOUCHUUKI */
@@ -5401,7 +5401,7 @@ ROM_START( luckywld )
 	ROM_LOAD16_BYTE( "lw1voi1.3m",  0x000000, 0x080000, CRC(b3e57993) SHA1(ff7071fc2e2c00f0cf819860c2a9be353474920a) )
 	ROM_LOAD16_BYTE( "lw1voi2.3l",  0x100000, 0x080000, CRC(cd8b86a2) SHA1(54bbc91e995ea0c33874ce6fe5c3f014e173da07) )
 
-	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* PROM for road colors */
 	ROM_LOAD( "lw1ld8.10w", 0, 0x100, CRC(29058c73) SHA1(4916d6bdb7f78e6803698cab32d1586ea457dfc8) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration - see notes with inputs */
@@ -5463,7 +5463,7 @@ ROM_START( luckywldj )
 	ROM_LOAD16_BYTE( "lw1voi1.3m",  0x000000, 0x080000, CRC(b3e57993) SHA1(ff7071fc2e2c00f0cf819860c2a9be353474920a) )
 	ROM_LOAD16_BYTE( "lw1voi2.3l",  0x100000, 0x080000, CRC(cd8b86a2) SHA1(54bbc91e995ea0c33874ce6fe5c3f014e173da07) )
 
-	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* PROM for road colors */
 	ROM_LOAD( "lw1ld8.10w", 0, 0x100, CRC(29058c73) SHA1(4916d6bdb7f78e6803698cab32d1586ea457dfc8) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration - see notes with inputs */
@@ -5695,8 +5695,6 @@ void gollygho_state::init_bubbletr()
 	m_gametype = NAMCOS2_BUBBLE_TROUBLE;
 }
 
-
-
 void sgunner_state::init_luckywld()
 {
 	u8 *data = (u8 *)memregion("c169roz:mask")->base();
@@ -5712,7 +5710,7 @@ void sgunner_state::init_luckywld()
 /* from sys2c65b to sys2c65c sometime between 1988 and 1990 as mirai ninja    */
 /* and metal hawk have the B version and dragon saber has the C version       */
 
-/*     YEAR, NAME,       PARENT,   MACHINE,  INPUT,    STATE,         INIT,          MONITOR,COMPANY, FULLNAME */
+/*     YEAR, NAME,       PARENT,   MACHINE,  INPUT,    STATE,          INIT,          MONITOR, COMPANY, FULLNAME */
 GAMEL( 1987, finallap,   0,        finallap, finallap, finallap_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev E)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 GAMEL( 1987, finallapd,  finallap, finallap, finallap, finallap_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev D)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 GAMEL( 1987, finallapc,  finallap, finallap, finallap, finallap_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )

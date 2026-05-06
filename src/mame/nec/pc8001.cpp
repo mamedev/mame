@@ -855,7 +855,7 @@ ROM_START( pc8001 )
 	ROM_SYSTEM_BIOS( 2, "v110", "N-BASIC v1.10" )
 	ROMX_LOAD( "n80v110.rom", 0x00000, 0x6000, BAD_DUMP CRC(1e02d93f) SHA1(4603cdb7a3833e7feb257b29d8052c872369e713), ROM_BIOS(2) )
 	// empty socket, cfr. notes in header for usage instructions
-	ROM_LOAD_OPTIONAL( "exprom.ic13", 0x6000, 0x2000, NO_DUMP )
+	ROM_LOAD( "exprom.ic13", 0x6000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x800, CGROM_TAG, 0)
 	ROM_LOAD( "font.rom", 0x000, 0x800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )

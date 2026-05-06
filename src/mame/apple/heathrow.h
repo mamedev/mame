@@ -39,14 +39,14 @@ public:
 
 	template <int bit> void set_irq_line(int state);
 
-	u32 codec_dma_read(u32 offset);
-	void codec_dma_write(u32 offset, u32 data);
+	u32 codec_dma_read(offs_t offset);
+	void codec_dma_write(offs_t offset, u32 data);
 
 	u32 codec_r(offs_t offset);
 	void codec_w(offs_t offset, u32 data);
 
 protected:
-	// device-level overrides
+	// device_t implementattion
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 

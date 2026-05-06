@@ -272,7 +272,6 @@ protected:
 	static inline constexpr unsigned GOTTLIEB_VIDEO_VBLANK = 240;
 
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	void analog_reset_w(u8 data);
@@ -445,13 +444,6 @@ void gottlieb_ld_state::machine_start()
 	save_item(NAME(m_laserdisc_zero_seen));
 	save_item(NAME(m_laserdisc_audio_bits));
 	save_item(NAME(m_laserdisc_audio_bit_count));
-}
-
-
-void gottlieb_state::machine_reset()
-{
-	// HACK: prevent NMI immediately after soft reset
-	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 

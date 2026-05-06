@@ -22,7 +22,7 @@
 #include "emu.h"
 #include "a2sd.h"
 
-#include "machine/at28c64b.h"
+#include "machine/at28.h"
 #include "machine/spi_sdcard.h"
 
 #define LOG_SPI     (1U << 1)
@@ -87,7 +87,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(shift_tick);
 
 private:
-	required_device<at28c64b_device> m_flash;
+	required_device<at28c64b_nvram_device> m_flash;
 	required_device<spi_sdcard_device> m_sdcard;
 
 	u8 m_datain, m_in_latch, m_out_latch;
@@ -107,7 +107,7 @@ private:
 //-------------------------------------------------
 void a2bus_a2sd_device::device_add_mconfig(machine_config &config)
 {
-	AT28C64B(config, m_flash, 0);
+	AT28C64B_NVRAM(config, m_flash, 0);
 
 	SPI_SDCARD(config, m_sdcard, 0);
 	m_sdcard->set_prefer_sdhc();

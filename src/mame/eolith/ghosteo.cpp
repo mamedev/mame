@@ -62,6 +62,8 @@ TODO:
 
 #include "emu.h"
 
+#include "mahjong.h"
+
 #include "cpu/arm7/arm7.h"
 #include "machine/gen_latch.h"
 #include "machine/i2cmem.h"
@@ -103,7 +105,7 @@ public:
 		, m_system_memory(*this, "systememory")
 		, m_flash(*this, "flash")
 		, m_qs1000_bank(*this, "qs1000_bank")
-		, m_mj_input(*this, { "10000000-08", "10000000-09","10000000-0A", "10000000-0B", "10000000-0C" })
+		, m_mj_input(*this, "KEY%u", 0U)
 	{
 	}
 
@@ -392,17 +394,17 @@ void ghosteo_state::s3c2410_nand_data_w(uint8_t data)
 uint32_t ghosteo_state::touryuu_port_10000000_r()
 {
 	uint32_t const port_g = m_bballoon_port[S3C2410_GPIO_PORT_G];
-	uint32_t data = 0xffffffff;
+	uint32_t data = 0x1f;
 	switch (port_g)
 	{
-		case 0x8 : data = m_mj_input[0]->read(); break;
-		case 0x9 : data = m_mj_input[1]->read(); break;
-		case 0xa : data = m_mj_input[2]->read(); break;
-		case 0xb : data = m_mj_input[3]->read(); break;
-		case 0xc : data = m_mj_input[4]->read(); break;
+		case 0x8 : data = m_mj_input[4]->read(); break;
+		case 0x9 : data = m_mj_input[2]->read(); break;
+		case 0xa : data = m_mj_input[3]->read(); break;
+		case 0xb : data = m_mj_input[0]->read(); break;
+		case 0xc : data = m_mj_input[1]->read(); break;
 	}
 	LOGMJINPUT("touryuu_port_10000000_r (%08X) -> %08X\n", port_g, data);
-	return data;
+	return 0xffffffe0 | bitswap<5>(data, 0, 1, 2, 3, 4);
 }
 
 
@@ -484,11 +486,13 @@ static INPUT_PORTS_START( bballoon )
 INPUT_PORTS_END
 
 /*
-
   Touryuumon
 
+  Uses a non-standard mahjong matrix:
+  Start column is not present, start inputs are read on a different port
+  Bet moved to the unused space adjacent to Pon
   +----+----+----+----+----+
-  | 1  | 1  | 1  | FF | 1  |
+  | *  | 1  | 1  | FF | 1  |
   +----+----+----+----+----+
   | C  | G  | K  | Ti | Rn |
   +----+----+----+----+----+
@@ -500,47 +504,31 @@ INPUT_PORTS_END
   +----+----+----+----+----+----+----+
   | Sv | Ts | Be | 2s | 1s | 2c | 1c |
   +----+----+----+----+----+----+----+
-
+  * Last Chance exits the input test and hence isn't displayed
 */
 
 static INPUT_PORTS_START( touryuu )
-	PORT_START("10000000-08")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1 (5)")
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1 (3)")
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1 (2)")
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
-	PORT_BIT( 0xffffffe0, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("10000000-09")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) // labeled "Ti" in test mode
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0xffffffe0, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("10000000-0A")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0xffffffe0, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("10000000-0B")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0xffffffe0, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("10000000-0C")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0xffffffe0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_INCLUDE(mahjong_matrix_1p_bet)
+
+	PORT_MODIFY("KEY0") // 10000000-0B
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("KEY1") // 10000000-0C
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("KEY2") // 10000000-09
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("KEY3") // 10000000-0A
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("KEY4") // 10000000-08
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("10100000")
 	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("10200000")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )

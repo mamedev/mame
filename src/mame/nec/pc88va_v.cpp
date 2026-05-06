@@ -154,7 +154,7 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 				switch(cur_pri_lv & 3) // (palette color mode)
 				{
 					case 0: draw_text(bitmap, cliprect); break;
-					case 1: draw_sprites(bitmap,cliprect); break;
+					case 1: draw_sprites(bitmap, cliprect); break;
 					/* A = graphic 0 */
 					case 2:
 						draw_graphic_layer(bitmap, cliprect, 0);
@@ -180,12 +180,16 @@ inline u8 pc88va_state::get_layer_pal_bank(u8 which)
 	if (!(BIT(m_pltm, 1)))
 		return (m_pltm & 1) << 4;
 
+	// N/A for 32 color mode
 	if (m_pltm == 3)
 		return 0;
 
-	// TODO: text and sprites may be joined when either one is selected in PLTP
-	// olteus sets sprite = 1, wants text to follow with the other bank too
-	// ballbrkr goes the other way around: writes 0, wants sprites to be 1
+	// HW quirk: text and sprites colors will be joined when either one is selected in PLTP
+	// - olteus sets PLTM = 6 / PLTP = 1, wants text to follow with the other bank too
+	// - ballbrkr & hatisora goes the other way around: writes PLTM = 6 / PLTP = 0, wants sprites to follow
+	if (!BIT(which, 1) && !BIT(m_pltp, 1))
+		return 0x10;
+
 	return (m_pltp == which) << 4;
 }
 

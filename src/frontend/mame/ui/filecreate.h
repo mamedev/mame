@@ -27,7 +27,7 @@ namespace ui {
 class menu_confirm_save_as : public menu
 {
 public:
-	menu_confirm_save_as(mame_ui_manager &mui, render_container &container, bool &yes);
+	menu_confirm_save_as(mame_ui_manager &mui, render_target &target, bool &yes);
 	virtual ~menu_confirm_save_as() override;
 
 private:
@@ -43,7 +43,7 @@ private:
 class menu_file_create : public menu
 {
 public:
-	menu_file_create(mame_ui_manager &mui, render_container &container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool &ok);
+	menu_file_create(mame_ui_manager &mui, render_target &target, device_image_interface *image, std::string &current_directory, std::string &current_file, bool &ok);
 	virtual ~menu_file_create() override;
 
 protected:
@@ -68,7 +68,7 @@ private:
 class menu_select_format : public menu
 {
 public:
-	menu_select_format(mame_ui_manager &mui, render_container &container,
+	menu_select_format(mame_ui_manager &mui, render_target &target,
 					   const std::vector<const floppy_image_format_t *> &formats, int ext_match, const floppy_image_format_t **result);
 	virtual ~menu_select_format() override;
 
@@ -87,7 +87,7 @@ private:
 class menu_select_floppy_init : public menu
 {
 public:
-	menu_select_floppy_init(mame_ui_manager &mui, render_container &container,
+	menu_select_floppy_init(mame_ui_manager &mui, render_target &target,
 		std::vector<std::reference_wrapper<const floppy_image_device::fs_info>> &&fs, int *result);
 	virtual ~menu_select_floppy_init() override;
 

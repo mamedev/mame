@@ -4249,18 +4249,18 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 			}
 
 			int zsort = 0;
-            switch (h & 0x300)
-            {
-            case 0x000:
-                zsort = minz + 0.5f;
-                break;
-            case 0x100:
-                zsort = maxz + 0.5f;
-                break;
-            default:
-                zsort = 0.5f * (minz + maxz) + 0.5f;
-                break;
-            }
+			switch (h & 0x300)
+			{
+			case 0x000:
+				zsort = minz + 0.5f;
+				break;
+			case 0x100:
+				zsort = maxz + 0.5f;
+				break;
+			default:
+				zsort = 0.5f * (minz + maxz) + 0.5f;
+				break;
+			}
 			if (zsort > 0x1fffff) zsort = 0x1fffff;
 
 			int absolute_priority = re->absolute_priority & 7;

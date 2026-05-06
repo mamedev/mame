@@ -50,6 +50,13 @@
 #include "emu.h"
 #include "c2040.h"
 
+#include "c2040fdc.h"
+
+#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m6504.h"
+#include "machine/6522via.h"
+#include "machine/mos6530.h"
+
 #include "formats/c3040_dsk.h"
 #include "formats/c4040_dsk.h"
 #include "formats/d64_dsk.h"
@@ -57,13 +64,13 @@
 
 
 
+namespace {
+
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
 
 #define M6502_TAG       "un1"
-#define M6532_0_TAG     "uc1"
-#define M6532_1_TAG     "ue1"
 #define M6504_TAG       "uh3"
 #define M6522_TAG       "um3"
 #define M6530_TAG       "uk3"
@@ -72,12 +79,109 @@
 
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C2040, c2040_device, "c2040", "Commodore 2040")
-DEFINE_DEVICE_TYPE(C3040, c3040_device, "c3040", "Commodore 3040")
-DEFINE_DEVICE_TYPE(C4040, c4040_device, "c4040", "Commodore 4040")
+// ======================> c2040_device
+
+class c2040_device : public device_t, public device_ieee488_interface
+{
+public:
+	// construction/destruction
+	c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	c2040_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	// device_ieee488_interface implementation
+	virtual void ieee488_atn(int state) override;
+	virtual void ieee488_ifc(int state) override;
+
+	enum
+	{
+		LED_POWER = 0,
+		LED_ACT0,
+		LED_ACT1,
+		LED_ERR
+	};
+
+	void add_common_devices(machine_config &config);
+	inline void update_ieee_signals();
+
+	uint8_t dio_r() { return m_bus->dio_r(); };
+	void dio_w(uint8_t data) { m_bus->dio_w(this, data); };
+	uint8_t riot1_pa_r();
+	void riot1_pa_w(uint8_t data);
+	uint8_t riot1_pb_r();
+	void riot1_pb_w(uint8_t data);
+	void via_pb_w(uint8_t data);
+
+	static void floppy_formats(format_registration &fr);
+
+	required_device<m6502_device> m_maincpu;
+	required_device<m6504_device> m_fdccpu;
+	required_device<mos6532_device> m_riot0;
+	required_device<mos6532_device> m_riot1;
+	required_device<mos6530_device> m_miot;
+	required_device<via6522_device> m_via;
+	required_device<floppy_image_device> m_floppy0;
+	optional_device<floppy_image_device> m_floppy1;
+	required_device<c2040_fdc_device> m_fdc;
+	required_ioport m_address;
+	output_finder<4> m_leds;
+
+	void c2040_fdc_mem(address_map &map) ATTR_COLD;
+	void c2040_main_mem(address_map &map) ATTR_COLD;
+
+	// IEEE-488 bus
+	int m_rfdo;                         // not ready for data output
+	int m_daco;                         // not data accepted output
+	int m_atna;                         // attention acknowledge
+	int m_ifc;
+};
+
+
+// ======================> c3040_device
+
+class c3040_device :  public c2040_device
+{
+public:
+	// construction/destruction
+	c3040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_t implementation
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	static void floppy_formats(format_registration &fr);
+};
+
+
+// ======================> c4040_device
+
+class c4040_device :  public c2040_device
+{
+public:
+	// construction/destruction
+	c4040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_t implementation
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	static void floppy_formats(format_registration &fr);
+};
 
 
 //-------------------------------------------------
@@ -171,10 +275,10 @@ const tiny_rom_entry *c4040_device::device_rom_region() const
 void c2040_device::c2040_main_mem(address_map &map)
 {
 	map.global_mask(0x7fff);
-	map(0x0000, 0x007f).mirror(0x0100).m(M6532_0_TAG, FUNC(mos6532_device::ram_map));
-	map(0x0080, 0x00ff).mirror(0x0100).m(M6532_1_TAG, FUNC(mos6532_device::ram_map));
-	map(0x0200, 0x021f).mirror(0x0d60).m(M6532_0_TAG, FUNC(mos6532_device::io_map));
-	map(0x0280, 0x029f).mirror(0x0d60).m(M6532_1_TAG, FUNC(mos6532_device::io_map));
+	map(0x0000, 0x007f).mirror(0x0100).m(m_riot0, FUNC(mos6532_device::ram_map));
+	map(0x0080, 0x00ff).mirror(0x0100).m(m_riot1, FUNC(mos6532_device::ram_map));
+	map(0x0200, 0x021f).mirror(0x0d60).m(m_riot0, FUNC(mos6532_device::io_map));
+	map(0x0280, 0x029f).mirror(0x0d60).m(m_riot1, FUNC(mos6532_device::io_map));
 	map(0x1000, 0x13ff).mirror(0x0c00).ram().share("share1");
 	map(0x2000, 0x23ff).mirror(0x0c00).ram().share("share2");
 	map(0x3000, 0x33ff).mirror(0x0c00).ram().share("share3");
@@ -533,8 +637,8 @@ c2040_device::c2040_device(const machine_config &mconfig, device_type type, cons
 	device_ieee488_interface(mconfig, *this),
 	m_maincpu(*this, M6502_TAG),
 	m_fdccpu(*this, M6504_TAG),
-	m_riot0(*this, M6532_0_TAG),
-	m_riot1(*this, M6532_1_TAG),
+	m_riot0(*this, "uc1"),
+	m_riot1(*this, "ue1"),
 	m_miot(*this, M6530_TAG),
 	m_via(*this, M6522_TAG),
 	m_floppy0(*this, FDC_TAG":0:525ssqd"),
@@ -550,7 +654,7 @@ c2040_device::c2040_device(const machine_config &mconfig, device_type type, cons
 }
 
 c2040_device::c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	c2040_device(mconfig, C2040, tag, owner, clock)
+	c2040_device(mconfig, GPIB_C2040, tag, owner, clock)
 {
 }
 
@@ -560,7 +664,7 @@ c2040_device::c2040_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c3040_device::c3040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	c2040_device(mconfig, C3040, tag, owner, clock)
+	c2040_device(mconfig, GPIB_C3040, tag, owner, clock)
 {
 }
 
@@ -570,7 +674,7 @@ c3040_device::c3040_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c4040_device::c4040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	c2040_device(mconfig, C4040, tag, owner, clock)
+	c2040_device(mconfig, GPIB_C4040, tag, owner, clock)
 {
 }
 
@@ -637,3 +741,14 @@ void c2040_device::ieee488_ifc(int state)
 
 	m_ifc = state;
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(GPIB_C2040, device_ieee488_interface, c2040_device, "c2040", "Commodore 2040 disk drive")
+DEFINE_DEVICE_TYPE_PRIVATE(GPIB_C3040, device_ieee488_interface, c3040_device, "c3040", "Commodore 3040 disk drive")
+DEFINE_DEVICE_TYPE_PRIVATE(GPIB_C4040, device_ieee488_interface, c4040_device, "c4040", "Commodore 4040 disk drive")

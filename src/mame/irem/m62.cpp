@@ -2046,6 +2046,91 @@ ROM_START( yanchamr )
 	ROM_LOAD( "dr33.6f",      0x000, 0x100, CRC(34d88d3c) SHA1(727f4c5cfff33538886fa0a29fd119aa085d7008) )    // video timing - common to the other games
 ROM_END
 
+// 3 PCB stack
+ROM_START( yanjamar )
+	ROM_REGION( 0x30000, "maincpu", 0 ) // main CPU
+	ROM_LOAD( "1_rom_1-d.e4",      0x00000, 0x8000, CRC(461e1625) SHA1(6c568c589af345314dc327c7b189a00758bf4465) )
+	ROM_LOAD( "2_rom-1-e_0.k8",    0x10000, 0x8000, CRC(e967de88) SHA1(75c0890eb98feb882fe01de5e93e228690e00904) ) // banked at 8000-9fff
+	ROM_LOAD( "2_rom-1-f_1.l8",    0x18000, 0x8000, CRC(a929110b) SHA1(87334f946e14c79426bc7a14e8da984bb8ef9cfc) )
+	//  ROM_CONTINUE(              0x28000, 0x8000 )
+
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   // sound CPU
+	ROM_LOAD( "1_rom_1-a.a3",      0x04000, 0x4000, CRC(cb365f3b) SHA1(fefad25459eb00d228ee29931c5714ae895b76c7) )
+	ROM_LOAD( "1_rom_1-b.d3",      0x08000, 0x4000, CRC(e66897bd) SHA1(04ea4a857a94d4e884fb28623ec6195dae701e25) )
+	ROM_LOAD( "1_rom_1-c.f3",      0x0c000, 0x4000, CRC(f9e31e26) SHA1(712b1bde4b3c18c9ac26d58ade48316af004e733) ) // 6803 code
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "2_rom_1-l_1.d1",    0x00000, 0x8000, CRC(cb9761fc) SHA1(3eaf289ebd4ee1b1659dda0804fc0597ccc76218) ) // tiles
+	ROM_LOAD( "2_rom_1-k_0.c1",    0x08000, 0x8000, CRC(59732741) SHA1(e77fbe3b0cd57a6a3fea7da46d8f23a4bcc7b583) )
+	ROM_LOAD( "2_rom_1-j_2.b1",    0x10000, 0x8000, CRC(0370fd82) SHA1(0ddad9638b778f5651fccbec9b2c711c8ad07098) )
+
+	ROM_REGION( 0x30000, "gfx2", 0 ) // identical
+	ROM_LOAD( "3_rom_1-p_ic77.c6", 0x00000, 0x4000, CRC(454017f3) SHA1(35ebcf0337720bffbc855b733b9a6643d37d59c4) ) // sprites
+	ROM_CONTINUE(                  0x0c000, 0x4000 )
+	ROM_LOAD( "3_rom_1-o_ic76.d6", 0x08000, 0x4000, CRC(a9a9ab62) SHA1(8eb905c1555f7e3c45dca26a03c560d2d59f9370) )
+	ROM_CONTINUE(                  0x04000, 0x4000 )
+	ROM_LOAD( "3_rom_1-r_ic79.a6", 0x10000, 0x4000, CRC(5cd4a019) SHA1(5c658e85fe3ed6c85dfaee9c78ac86bc09dab3c5) )
+	ROM_CONTINUE(                  0x1c000, 0x4000 )
+	ROM_LOAD( "3_rom_1-q_ic78.b6", 0x18000, 0x4000, CRC(90fab5e7) SHA1(66e60801c46424fe2b01bc18ce72280ca532ca51) )
+	ROM_CONTINUE(                  0x14000, 0x4000 )
+	ROM_LOAD( "3_rom_1-n_ic75.f6", 0x20000, 0x4000, CRC(44a978f2) SHA1(cf6644a6ff9ff39ecd2a126fcdbed96222c44756) )
+	ROM_CONTINUE(                  0x2c000, 0x4000 )
+	ROM_LOAD( "3_rom_1-m_ic74.g6", 0x28000, 0x4000, CRC(5eb4b1b1) SHA1(04daa4ccfe2fb707424dd557fb698bdc4950648d) )
+	ROM_CONTINUE(                  0x24000, 0x4000 )
+
+	ROM_REGION( 0x0c000, "gfx3", 0 )
+	ROM_LOAD( "2_rom_1-i_0.n4",    0x00000, 0x4000, CRC(7da0f27b) SHA1(49e54f08dfbca09fdb8b4438ee77a879758a6d16) ) // chars
+	ROM_LOAD( "2_rom_1-h_1.m4",    0x04000, 0x4000, CRC(6498e4ea) SHA1(a37c69be084cb9865a0be3753d9f3b93b9e9792e) )
+	ROM_LOAD( "2_rom_1-g_2.l4",    0x08000, 0x4000, CRC(c499c816) SHA1(f3cb0bf994d65d999c490ef6e6aea9d75e10b4fd) )
+
+	ROM_REGION( 0x20, "spr_height_prom", 0 )
+	ROM_LOAD( "dr32.5p",           0x00000, 0x0020, BAD_DUMP CRC(11cd1f2e) SHA1(45ceb84ff373127ff370610c1ce8d83fc6045bcb) ) // sprite height, one entry per 32
+
+	ROM_REGION( 0x300, "spr_color_proms", 0 )
+	ROM_LOAD( "dr30.1m",           0x00000, 0x0100, BAD_DUMP CRC(28c73263) SHA1(ffeb8d1310759bf20b1624ab92fc91078726679c) ) // sprite palette red component
+	ROM_LOAD( "dr31.1n",           0x00100, 0x0100, BAD_DUMP CRC(3529210e) SHA1(3042ec941bdcb873077e77cffe36d4a28298bbbb) ) // sprite palette green component
+	ROM_LOAD( "dr29.1l",           0x00200, 0x0100, BAD_DUMP CRC(1173a754) SHA1(dbb7d02b72ae1842e0d17aee324a5b85ff2a2178) ) // sprite palette blue component
+
+	ROM_REGION( 0x300, "chr_color_proms", 0 )
+	ROM_LOAD( "dr25.3f",           0x00000, 0x0100, BAD_DUMP CRC(8e91430b) SHA1(a7a1567a0fd31cd65260f3ddb5280368704378bd) ) // character palette red component
+	ROM_LOAD( "dr26.3h",           0x00100, 0x0100, BAD_DUMP CRC(b563b93f) SHA1(86aefdaa63b35fe82f9f70eff3e4c14629f7a184) ) // character palette green component
+	ROM_LOAD( "dr27.3j",           0x00200, 0x0100, BAD_DUMP CRC(70d668ef) SHA1(2cc647f2708932105bb9a5130aacc5a8a160e418) ) // character palette blue component
+
+	/* The PCBs have a total of 25 PROMs, all of them were soldered and none of them were dumped.
+           The previous seven PROMs (sprite height, sprite palette, and character palette) should be some of the following NO_DUMP declaratios, but
+           is difficult to determine which is which. */
+	ROM_REGION( 0x200, "other_proms", 0 )
+	ROM_LOAD( "2_ic25_n82s129n.d7", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "2_ic29_n82s129n.d8", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "2_ic30_n82s129n.e8", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "2_n82s129n.e3",      0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "2_n82s147n.f8",      0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "2_tbp24s10n.g3",     0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "2_tbp24s10n.h3",     0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "2a_n82s123n.bin",    0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "2b_d_n82s129n.bin",  0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "2b_e_n82s129n.bin",  0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "2b_tbp24s10n.bin",   0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "3_ic3_n82s129n.l1",  0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "3_ic4_n82s129n.k1",  0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "3_ic5_n82s129n.j1",  0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "3_ic36_n82s129n.c3", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "3_ic37_n82s129n.b3", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "3_ic38_n82s129n.a3", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "3_ic64_n82s129n.n6", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "3_ic65_n82s129n.m6", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "3_ic67_n82s129n.k6", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "3_ic68_n82s129n.j6", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "3_ic70_n82s123n.m7", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "3_ic73_n82s123n.j7", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "3_ic92_n82s123n.a8", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "3_ic98_n82s129n.g9", 0x0000, 0x0100, NO_DUMP )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "2_pal16l8acn.f4",   0x00000, 0x0117, NO_DUMP )
+	ROM_LOAD( "2_pal16l8acn.m7",   0x00000, 0x0117, NO_DUMP )
+ROM_END
+
 ROM_START( lithero )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // main CPU
 	ROM_LOAD( "4.bin",        0x00000, 0x08000, CRC(80903766) SHA1(f16d603798f8a9ad62df8d89334758326257201a) )
@@ -2479,6 +2564,7 @@ GAME( 1986, kidniki,   0,        kidniki,  kidniki,  m62_state, init_kidniki,  R
 GAME( 1986, kidnikiu,  kidniki,  kidniki,  kidniki,  m62_state, init_kidniki,  ROT0,   "Irem (Data East USA license)", "Kid Niki - Radical Ninja (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1986, kidnikib,  kidniki,  kidniki,  kidniki,  m62_state, init_kidniki,  ROT0,   "bootleg",                      "Kid Niki (bootleg)",               MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1986, yanchamr,  kidniki,  kidniki,  kidniki,  m62_state, init_kidniki,  ROT0,   "Irem",                         "Kaiketsu Yanchamaru (Japan)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, yanjamar,  kidniki,  kidniki,  kidniki,  m62_state, init_kidniki,  ROT0,   "bootleg",                      "Yanjamaru",                        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1987, lithero,   kidniki,  kidniki,  kidniki,  m62_state, init_kidniki,  ROT0,   "bootleg",                      "Little Hero",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1985, spelunkr,  0,        spelunkr, spelunkr, m62_state, init_spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker",         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

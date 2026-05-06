@@ -949,7 +949,7 @@ void news_38xx_state::common(machine_config &config)
 
 	// scsi bus 1 host adapter
 	CXD1180(config, m_scsi[1], 20_MHz_XTAL / 2);
-	m_scsibus[1]->set_external_device(7, m_scsi[0]);
+	m_scsibus[1]->set_external_device(7, m_scsi[1]);
 	m_scsi[1]->irq_handler().set(DEVICE_SELF, FUNC(news_38xx_state::irq_w<iop_irq::SCSI1>));
 	m_scsi[1]->irq_handler().append(m_dma[1], FUNC(dmac_0266_device::eop_w));
 	m_scsi[1]->drq_handler().set(m_dma[1], FUNC(dmac_0266_device::req_w));

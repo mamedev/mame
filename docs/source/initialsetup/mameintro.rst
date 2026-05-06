@@ -75,8 +75,7 @@ Windows-based systems. The minimum requirements are:
   ``lahf``/``sahf`` instructions in long mode, population count instruction and
   SSE 4.2), or
 * An Arm CPU implementing the ARMv8.2-A feature set
-* A 64-bit edition of Windows 7 or later for x86-64 or Windows 10 or later for
-  Arm
+* A 64-bit edition of Windows 10 or later
 * 4 GB RAM
 * DirectX 9.0c for Windows
 * A Direct3D or OpenGL capable GPU with support for non-power-of-two texture

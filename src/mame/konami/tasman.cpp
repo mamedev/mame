@@ -127,7 +127,7 @@ uint32_t kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_in
 		{
 			uint32_t tile = m_vram[count] & 0xffff;
 
-			if(m_screen->visible_area().contains(x*8, y*8))
+			if (m_screen->visible_area().contains(x*8, y*8))
 				gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
 
 			count++;
@@ -142,7 +142,7 @@ uint32_t kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_in
 		{
 			uint32_t tile = m_vram[count] & 0xffff;
 
-			if(m_screen->visible_area().contains(x*8, y*8))
+			if (m_screen->visible_area().contains(x*8, y*8))
 				gfx->transpen(bitmap,cliprect,tile,0,0,0,x*8,y*8,0);
 
 			count++;
@@ -180,7 +180,7 @@ uint32_t kongambl_state::eeprom_r(offs_t offset, uint32_t mem_mask)
 		retval |= (ioport("SYSTEM")->read());
 
 
-//  printf("%08x\n",mem_mask);
+//  logerror("%08x\n",mem_mask);
 
 	return retval;
 }
@@ -191,13 +191,13 @@ void kongambl_state::eeprom_w(offs_t offset, uint8_t data)
 	if (offset == 2)
 	{
 		ioport("EEPROMOUT")->write(data&0x7, 0xff);
-		if(data & 0xf8)
-			printf("Unused EEPROM bits %02x %02x\n",offset,data);
+		if (data & 0xf8)
+			logerror("Unused EEPROM bits %02x %02x\n",offset,data);
 	}
 	else
-		printf("%02x %02x\n",offset,data);
+		logerror("%02x %02x\n",offset,data);
 
-	if(offset == 0)
+	if (offset == 0)
 		m_irq_mask = data;
 }
 
@@ -219,7 +219,7 @@ void kongambl_state::kongambl_ff_w(uint8_t data)
 	/* ---- x--- (related to OBJ ROM) */
 	/* ---- -x-- k056832 upper ROM bank */
 	/* ---- --x- k056832 related (enabled when testing ROM area) */
-//  printf("%02x\n",data);
+//  logerror("%02x\n",data);
 }
 
 void kongambl_state::kongambl_map(address_map &map)
@@ -638,16 +638,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(kongambl_state::kongambl_vblank)
 	int scanline = param;
 
 	// disabled for now since it interferes with the ROM tests
-	if(scanline == 384 && m_irq_mask & 1)
+	if (scanline == 384 && m_irq_mask & 1)
 		m_maincpu->set_input_line(1, HOLD_LINE); // vblank?
 
-	//if(scanline == 256 && m_irq_mask & 2)
+	//if (scanline == 256 && m_irq_mask & 2)
 	//  m_maincpu->set_input_line(2, HOLD_LINE); // unknown (jumps to work RAM via a branch or returns lv 2 exception error, extension board?)
 
-	if(scanline == 0 && m_irq_mask & 4)
+	if (scanline == 0 && m_irq_mask & 4)
 		m_maincpu->set_input_line(3, HOLD_LINE); // sprite irq?
 
-	if(scanline == 128 && m_irq_mask & 8)
+	if (scanline == 128 && m_irq_mask & 8)
 		m_maincpu->set_input_line(4, HOLD_LINE); // sound irq
 
 }

@@ -15,7 +15,7 @@ Chou Zetsurinjin Berabowman        (c) 1988 Namco
 Alice In Wonderland / Marchen Maze (c) 1988 Namco
 Bakutotsu Kijuutei                 (c) 1988 Namco
 Pro Tennis World Court             (c) 1988 Namco
-Splatter House                     (c) 1988 Namco
+Splatterhouse                      (c) 1988 Namco
 Face Off                           (c) 1988 Namco
 Rompers                            (c) 1989 Namco
 Blast Off                          (c) 1989 Namco
@@ -316,7 +316,7 @@ Date  Name                                  Key  Screen
  7/88 Marchen Maze / Alice In Wonderland    152  H
  8/88 Bakutotsu Kijuutei / Baraduke 2       155  H
 10/88 Pro Tennis World Court                143  H
-11/88 Splatter House                        181  H
+11/88 Splatterhouse                         181  H
 12/88 Face Off                              C    H
  2/89 Rompers                               182  V
  3/89 Blast Off                             183  V
@@ -410,7 +410,7 @@ void namcos1_state::virtual_map(address_map &map)
 	map(0x2fc000, 0x2fc7ff).ram().share("scratchpad");
 	map(0x2fc800, 0x2fcfff).m(m_spritegen, FUNC(namcos1_sprite_device::spriteram_map));
 	map(0x2fd000, 0x2fd01f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control8_r), FUNC(namco_c123tmap_device::control8_w)).mirror(0xfe0);
-	map(0x2fe000, 0x2fe3ff).rw("namco", FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)).mirror(0xc00); /* PSG ( Shared ) */
+	map(0x2fe000, 0x2fe3ff).m("namco", FUNC(namco_cus30_device::amap)).mirror(0xc00); /* PSG ( Shared ) */
 	map(0x2ff000, 0x2ff7ff).ram().share(m_triram).mirror(0x800);
 	map(0x300000, 0x307fff).ram();
 	map(0x400000, 0x7fffff).rom().region("mainrom", 0);
@@ -421,7 +421,7 @@ void namcos1_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).bankr(m_soundbank); /* Banked ROMs */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::write));
-	map(0x5000, 0x53ff).rw("namco", FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)).mirror(0xc00); /* PSG ( Shared ) */
+	map(0x5000, 0x53ff).m("namco", FUNC(namco_cus30_device::amap)).mirror(0xc00); /* PSG ( Shared ) */
 	map(0x7000, 0x77ff).ram().share(m_triram).mirror(0x800);
 	map(0x8000, 0x9fff).ram(); /* Sound RAM 3 */
 	map(0xa000, 0xa000).nopr();
@@ -1056,7 +1056,7 @@ void namcos1_state::ns1(machine_config &config)
 
 	NAMCO_C123TMAP(config, m_c123tmap, 0);
 	m_c123tmap->set_palette(m_c116);
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos1_state::TilemapCB, this));
+	m_c123tmap->set_tile_callback(FUNC(namcos1_state::TilemapCB));
 	m_c123tmap->set_color_base(0x0800);
 	m_c123tmap->set_offset(73, 16);
 	m_c123tmap->set_tmap3_half_height();
@@ -1070,8 +1070,7 @@ void namcos1_state::ns1(machine_config &config)
 	ymsnd.add_route(1, "speaker", 0.50, 1);
 
 	namco_cus30_device &cus30(NAMCO_CUS30(config, "namco", XTAL(49'152'000)/2048/2));
-	cus30.set_voices(8);
-	cus30.set_stereo(1);
+	cus30.set_stereo(true);
 	cus30.add_route(0, "speaker", 0.50, 0);
 	cus30.add_route(1, "speaker", 0.50, 1);
 
@@ -2053,7 +2052,7 @@ ROM_START( wldcourt )
 ROM_END
 
 /*
-Splatter House
+Splatterhouse
 Namco, 1988
 
 This game runs on Namco System 1 hardware
@@ -2112,7 +2111,7 @@ Notes:
 
       Namco Custom ICs -
                         123 (QFP80)
-                        181 (DIP28, KEYCUS, Splatter House)
+                        181 (DIP28, KEYCUS, Splatterhouse)
                         64A1 (DIP40, 63701 MCU)
 
 
@@ -2919,9 +2918,9 @@ GAME( 1988, mmaze,     0,        ns1,     mmaze,    namcos1_state, init_alice,  
 GAME( 1988, mmaze2,    mmaze,    ns1,     mmaze,    namcos1_state, init_alice,    ROT180, "Namco", "Marchen Maze (Japan, hack?)", MACHINE_SUPPORTS_SAVE ) // removed copyright screen, hacked for export? But still has and requires MCU
 GAME( 1988, bakutotu,  0,        ns1,     bakutotu, namcos1_state, init_bakutotu, ROT180, "Namco", "Bakutotsu Kijuutei", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, wldcourt,  0,        ns1,     wldcourt, namcos1_state, init_wldcourt, ROT180, "Namco", "Pro Tennis World Court (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, splatter,  0,        ns1,     splatter3,namcos1_state, init_splatter, ROT180, "Namco", "Splatter House (World, new version (SH3))", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, splatter2, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatter House (World, old version (SH2))", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, splatterj, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatter House (Japan, SH1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, splatter,  0,        ns1,     splatter3,namcos1_state, init_splatter, ROT180, "Namco", "Splatterhouse (World, new version (SH3))", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, splatter2, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatterhouse (World, old version (SH2))", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, splatterj, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatterhouse (Japan, SH1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, faceoff,   0,        ns1,     faceoff,  namcos1_state, init_faceoff,  ROT180, "Namco", "Face Off (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, rompers,   0,        ns1,     ns1,      namcos1_state, init_rompers,  ROT90,  "Namco", "Rompers (Japan, new version (Rev B))", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, romperso,  rompers,  ns1,     ns1,      namcos1_state, init_rompers,  ROT90,  "Namco", "Rompers (Japan, old version)", MACHINE_SUPPORTS_SAVE )

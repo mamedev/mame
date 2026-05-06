@@ -490,7 +490,7 @@ int renderer_sdl2::draw(int update)
 	float vofs, hofs;
 	int blit_pixels = 0;
 
-	osd_dim wdim = window().get_size();
+	osd_dim wdim = window().get_size_pixels();
 
 	if (has_flags(FI_CHANGED) || (wdim.width() != m_width) || (wdim.height() != m_height))
 	{
@@ -918,7 +918,7 @@ texture_info * renderer_sdl2::texture_update(const render_primitive &prim)
 
 render_primitive_list *renderer_sdl2::get_primitives()
 {
-	osd_dim nd = window().get_size();
+	osd_dim nd = window().get_size_pixels();
 	if (nd != m_blit_dim)
 	{
 		m_blit_dim = nd;

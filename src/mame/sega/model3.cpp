@@ -16,7 +16,7 @@
 
     Game status:
     vf3/vf3a/vf3tb - crashes sometimes, performance dips at startup (illegal polygons filling the
-	                 pipeline?), runs too slow during gameplay
+                     pipeline?), runs too slow during gameplay
     getbassur - works
     basssdx/getbass/getbassdx - I/O board error (?)
 

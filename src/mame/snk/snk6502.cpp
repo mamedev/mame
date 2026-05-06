@@ -812,7 +812,7 @@ void snk6502_state::sasuke(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(11.289_MHz_XTAL / 2, 360, 256, 0, 262, 0, 224); // from crtc
+	screen.set_raw(11.289_MHz_XTAL / 2, 360, 0, 256, 262, 0, 224); // from crtc
 	screen.set_screen_update(FUNC(snk6502_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sasuke);
@@ -856,7 +856,7 @@ void vanguard_state::vanguard(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(11.289_MHz_XTAL / 2, 360, 256, 0, 262, 0, 224); // from crtc
+	screen.set_raw(11.289_MHz_XTAL / 2, 360, 0, 256, 262, 0, 224); // from crtc
 	screen.set_screen_update(FUNC(vanguard_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vanguard);

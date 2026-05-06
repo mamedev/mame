@@ -92,8 +92,8 @@ It also has a Plextor PX-40TSi SCSI CD-ROM drive
 #include "cpu/m68000/m68020.h"
 #include "cpu/m68000/tmp68301.h"
 #include "machine/eeprompar.h"
-#include "machine/mb87078.h"
 #include "sound/c352.h"
+#include "sound/mb87077.h"
 
 #include "emupal.h"
 #include "screen.h"

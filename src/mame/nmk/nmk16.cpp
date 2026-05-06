@@ -9743,6 +9743,27 @@ ROM_START( redhawkk )
 	ROM_LOAD( "5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
+ROM_START( redhawkc ) // China & Hong Kong
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "afega_2.bin", 0x000000, 0x020000, CRC(34356a0f) SHA1(480a0d616d2e9ffe2b620a7815a0e4ceeccc9533) )
+	ROM_LOAD16_BYTE( "afega_3.bin", 0x000001, 0x020000, CRC(cbaa0229) SHA1(567ee30fb02fe4988ce62c81b9fa45c6e341df1e) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code
+	ROM_LOAD( "afega_1.bin", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) // same as all Red Hawk sets
+
+	ROM_REGION( 0x100000, "sprites", 0 ) // Sprites, 16x16x4
+	ROM_LOAD16_BYTE( "afega_6.bin", 0x000001, 0x080000, CRC(5a505a56) SHA1(d44f6ac41ee31da820490cb90424d598c103de69) )
+	ROM_LOAD16_BYTE( "afega_7.bin", 0x000000, 0x080000, CRC(45d000e6) SHA1(1bf29a0a08698d4162c2a42d9fb3b363d3079e5a) )
+
+	ROM_REGION( 0x080000, "bgtile", 0 ) // Layer 0, 16x16x8
+	ROM_LOAD( "afega_4.bin", 0x000000, 0x080000, CRC(d6427b8a) SHA1(556de1b5ce29d1c3c54bb315dcaa4dd0848ca462) ) // == 4 from redhawk (US)
+
+	ROM_REGION( 0x00100, "fgtile", ROMREGION_ERASEFF ) // Layer 1, 8x8x4
+	// Unused
+
+	ROM_REGION( 0x40000, "oki1", 0 ) // Samples
+	ROM_LOAD( "afega_5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) ) // same as all Red Hawk sets
+ROM_END
 
 
 /***************************************************************************
@@ -10768,6 +10789,7 @@ GAME( 1997, redhawksa,  stagger1, redhawki,     stagger1,     afega_state, init_
 GAME( 1997, redhawkg,   stagger1, redhawki,     stagger1,     afega_state, init_redhawkg,        ROT0,               "Afega",                             "Red Hawk (horizontal, Greece)", 0 )
 GAME( 1997, redhawke,   stagger1, stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega (Excellent Co. license)",     "Red Hawk (Excellent Co., Ltd)", 0 ) // earlier revision? different afega logo and score and credit number fonts compared to other sets
 GAME( 1997, redhawkk,   stagger1, stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega",                             "Red Hawk (Korea)", 0 )
+GAME( 1997, redhawkc,   stagger1, stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega (Zhuojia Co. license)",       "Red Hawk (China & Hong Kong)", 0 )
 GAME( 1997, redhawkb,   stagger1, redhawkb,     redhawkb,     afega_state, empty_init,           ROT0,               "bootleg (Vince)",                   "Red Hawk (horizontal, bootleg)", 0 )
 
 GAME( 1998, grdnstrm,   0,        grdnstrm,     grdnstrm,     afega_state, empty_init,           ORIENTATION_FLIP_Y, "Afega (Apples Industries license)", "Guardian Storm (horizontal, not encrypted)", 0 ) // flip-screen doesn't work on sprites for all sets

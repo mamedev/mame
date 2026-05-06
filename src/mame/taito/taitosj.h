@@ -155,7 +155,7 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap);
 	void check_collision(int *sprites_on, rectangle *sprite_areas);
 	int check_sprite_sprite_bitpattern(int sx1, int sy1, int which1, int sx2, int sy2, int which2);
-	void copy_layer(bitmap_ind16 &bitmap, const rectangle &cliprect,int which, int *sprites_on, rectangle *sprite_areas);
+	void copy_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int *sprites_on, rectangle *sprite_areas);
 	void kikstart_copy_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int *sprites_on, rectangle *sprite_areas);
 	void copy_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, copy_layer_func_t copy_layer_func, int which, int *sprites_on, rectangle *sprite_areas);
 	void copy_layers(bitmap_ind16 &bitmap, const rectangle &cliprect, copy_layer_func_t copy_layer_func, int *sprites_on, rectangle *sprite_areas);

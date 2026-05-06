@@ -40,7 +40,6 @@ public:
 	template <typename T> struct devenum;
 	template <typename T> struct simple_list_wrapper;
 	template <typename T> struct tag_object_ptr_map;
-	template <typename T> using standard_tag_object_ptr_map = tag_object_ptr_map<std::unordered_map<std::string, std::unique_ptr<T> > >;
 	template <typename T> struct immutable_container_helper;
 	template <typename T, typename C, typename I = typename C::iterator> struct immutable_collection_helper;
 	template <typename T, typename C, typename I = typename C::iterator> struct immutable_sequence_helper;
@@ -181,6 +180,8 @@ private:
 	std::vector<int> m_update_tasks;
 	std::vector<int> m_frame_tasks;
 
+	template <typename T>
+	static auto make_tag_object_ptr_map(T &map);
 	template <typename... T>
 	auto make_notifier_adder(util::notifier<T...> &notifier, const char *desc);
 	template <typename T, typename D, typename R, typename... A>

@@ -51,7 +51,13 @@ private:
 	u8 m_draw_sel;
 	u16 m_src_pitch, m_dst_pitch;
 	u16 m_rect_width, m_rect_height;
-	u32 m_fg_color, m_bg_color;
+
+	union COLOR_DRAW {
+		u8 b[4];
+		u32 u;
+	};
+
+	COLOR_DRAW m_fg_color, m_bg_color;
 	u8 m_fg_rop, m_bg_rop;
 	u8 m_mask[8];
 	u16 m_clip_top, m_clip_left, m_clip_bottom, m_clip_right;
@@ -59,19 +65,19 @@ private:
 	u16 m_draw_command;
 	u8 m_pattern_data[128];
 
-	typedef u8 (sis6326_pci_device::*get_src_func)(u32 offset_base, u32 x);
+	typedef u8 (sis6326_pci_device::*get_src_func)(u32 offset_base, u32 x, u8 shifter);
 	static const get_src_func get_src_table[4];
-	u8 get_src_bgcol(u32 offset_base, u32 x);
-	u8 get_src_fgcol(u32 offset_base, u32 x);
-	u8 get_src_mem(u32 offset_base, u32 x);
-	u8 get_src_cpu(u32 offset_base, u32 x);
+	u8 get_src_bgcol(u32 offset_base, u32 x, u8 shifter);
+	u8 get_src_fgcol(u32 offset_base, u32 x, u8 shifter);
+	u8 get_src_mem(u32 offset_base, u32 x, u8 shifter);
+	u8 get_src_cpu(u32 offset_base, u32 x, u8 shifter);
 
-	typedef u8 (sis6326_pci_device::*get_pat_func)(u32 offset_base, u32 x);
+	typedef u8 (sis6326_pci_device::*get_pat_func)(u32 offset_base, u32 x, u8 shifter);
 	static const get_pat_func get_pat_table[4];
-	u8 get_pat_bgcol(u32 y, u32 x);
-	u8 get_pat_fgcol(u32 y, u32 x);
-	u8 get_pat_regs(u32 y, u32 x);
-	u8 get_pat_ddraw(u32 y, u32 x);
+	u8 get_pat_bgcol(u32 y, u32 x, u8 shifter);
+	u8 get_pat_fgcol(u32 y, u32 x, u8 shifter);
+	u8 get_pat_regs(u32 y, u32 x, u8 shifter);
+	u8 get_pat_ddraw(u32 y, u32 x, u8 shifter);
 	u32 GetROP(u8 rop, u32 src, u32 dst, u32 pat);
 
 };

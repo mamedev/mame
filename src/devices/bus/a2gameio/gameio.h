@@ -32,10 +32,7 @@ public:
 	apple2_gameio_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: apple2_gameio_device(mconfig, tag, owner, 0U)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 	template <typename T, typename U>
@@ -80,7 +77,7 @@ public:
 	bool is_device_connected() { return (m_intf != nullptr); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_config_complete() override;
 	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;

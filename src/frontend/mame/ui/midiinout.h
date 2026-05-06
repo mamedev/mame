@@ -21,7 +21,7 @@ namespace ui {
 class menu_midi_inout : public menu
 {
 public:
-	menu_midi_inout(mame_ui_manager &mui, render_container &container, bool is_input, std::string *channel);
+	menu_midi_inout(mame_ui_manager &mui, render_target &target, bool is_input, std::string *channel);
 	virtual ~menu_midi_inout() override;
 
 protected:

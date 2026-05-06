@@ -448,7 +448,7 @@ u8 um8498f_device::dma_read_word(offs_t offset)
 	if (m_dma_channel == -1)
 		return 0xff;
 
-	uint16_t result = m_space_mem->read_word((page_offset() & 0xfe0000) | (offset << 1));
+	u16 result = m_space_mem->read_word((page_offset() & 0xfe0000) | (offset << 1));
 	m_dma_high_byte = result >> 8;
 
 	return result;

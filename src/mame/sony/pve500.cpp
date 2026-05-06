@@ -409,7 +409,8 @@ void pve500_state::pve500(machine_config &config)
 	/* The EEPROM stores the setup data */
 	EEPROM_MSM16911_8BIT(config, "eeprom");
 
-	/* FIX-ME: These are actually RS422 ports (except EDL IN/OUT which is indeed an RS232 port)*/
+	// FIXME: These are actually RS422 ports
+	// (except EDL IN/OUT which is indeed an RS232 port)
 	rs232_port_device &recorder(RS232_PORT(config, "recorder", default_rs232_devices, nullptr));
 	recorder.rxd_handler().set(m_maincpu, FUNC(tmpz84c015_device::rxa_w));
 

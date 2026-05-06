@@ -17,8 +17,8 @@
 
 namespace ui {
 
-menu_midi_inout::menu_midi_inout(mame_ui_manager &mui, render_container &container, bool is_input, std::string *channel)
-	: menu(mui, container)
+menu_midi_inout::menu_midi_inout(mame_ui_manager &mui, render_target &target, bool is_input, std::string *channel)
+	: menu(mui, target)
 	, m_channel(channel)
 	, m_is_input(is_input)
 {

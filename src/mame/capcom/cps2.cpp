@@ -627,7 +627,6 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
-#include "sound/qsound.h"
 
 #include "speaker.h"
 
@@ -652,16 +651,13 @@ class cps2_state : public cps_state
 public:
 	cps2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cps_state(mconfig, type, tag)
+		, m_objram(*this, "objram%u", 1U)
+		, m_output(*this, "output")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 		, m_region_key(*this, "key")
-		, m_qsound(*this, "qsound")
 		, m_comm(*this, "comm")
-		, m_objram1(*this, "objram1")
-		, m_objram2(*this, "objram2")
-		, m_output(*this, "output")
-		, m_io_in0(*this, "IN0")
-		, m_io_in1(*this, "IN1")
-		, m_dsw(*this, "DSW%c", 'A')
+		, m_digitalvol(*this, "DIGITALVOL")
+		, m_paddle(*this, "PADDLE%u", 1U)
 	{ }
 
 	void cps2(machine_config &config) ATTR_COLD;
@@ -682,6 +678,13 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	static constexpr unsigned CPS2_OBJ_BASE  = 0x00 / 2;    // Unknown (not base address of objects). Could be base address of bank used when object swap bit set?
+	static constexpr unsigned CPS2_OBJ_UNK1  = 0x02 / 2;    // Unknown (nearly always 0x807d, or 0x808e when screen flipped)
+	static constexpr unsigned CPS2_OBJ_PRI   = 0x04 / 2;    // Layer priorities
+	static constexpr unsigned CPS2_OBJ_UNK2  = 0x06 / 2;    // Unknown (usually 0x0000, 0x1101 in ssf2, 0x0001 in 19XX)
+	static constexpr unsigned CPS2_OBJ_XOFFS = 0x08 / 2;    // X offset (usually 0x0040)
+	static constexpr unsigned CPS2_OBJ_YOFFS = 0x0a / 2;    // Y offset (always 0x0010)
+
 	void init_digital_volume();
 	uint16_t gigaman2_dummyqsound_r(offs_t offset);
 	void gigaman2_dummyqsound_w(offs_t offset, uint16_t data);
@@ -693,61 +696,55 @@ private:
 	TIMER_CALLBACK_MEMBER(cps2_update_digital_volume);
 
 	void cps2_objram_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	[[maybe_unused]] uint16_t cps2_objram1_r(offs_t offset);
-	uint16_t cps2_objram2_r(offs_t offset);
-	void cps2_objram1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void cps2_objram2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template <unsigned Xor> uint16_t cps2_objram_r(offs_t offset);
+	template <unsigned Xor> void cps2_objram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void unshuffle(uint64_t *buf, int len);
 	void cps2_gfx_decode();
 	virtual void find_last_sprite() override;
-	void cps2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks);
+	void cps2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t *primasks);
 	void cps2_objram_latch(int state);
 	uint16_t *cps2_objbase();
 	virtual void render_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
-	void cps2_map(address_map &map) ATTR_COLD;
+	void cps2_base_map(address_map &map) ATTR_COLD;
+	void cps2_comm_base_map(address_map &map) ATTR_COLD;
 	void cps2_comm_map(address_map &map) ATTR_COLD;
-	void dead_cps2_map(address_map &map) ATTR_COLD;
+	void cps2_map(address_map &map) ATTR_COLD;
 	void dead_cps2_comm_map(address_map &map) ATTR_COLD;
+	void dead_cps2_map(address_map &map) ATTR_COLD;
 	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
-	void init_cps2_video();
-	void init_cps2crypt();
+	void init_cps2_video() ATTR_COLD;
+	void init_cps2crypt() ATTR_COLD;
+
+	required_shared_ptr_array<uint16_t, 2> m_objram;
+	required_shared_ptr<uint16_t> m_output;
 
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
 	optional_memory_region m_region_key;
 
-	optional_device<qsound_device> m_qsound;
 	optional_device<cps2_comm_device> m_comm;
 
-	required_shared_ptr<uint16_t> m_objram1;
-	required_shared_ptr<uint16_t> m_objram2;
-	required_shared_ptr<uint16_t> m_output;
-
-	optional_ioport m_io_in0;
-	optional_ioport m_io_in1;
-	optional_ioport_array<3> m_dsw;
-
-	std::unique_ptr<uint16_t[]> m_cps2_buffered_obj;
-	std::unique_ptr<uint16_t[]> m_gigaman2_dummyqsound_ram;
+	optional_ioport m_digitalvol;
+	optional_ioport_array<2> m_paddle;
 
 	// video-related
-	int m_cps2_last_sprite_offset = 0; // Offset of the last sprite
-	int m_pri_ctrl = 0; // Sprite layer priorities
-	int m_objram_bank = 0;
-	int m_cps2_obj_size = 0;
+	std::unique_ptr<uint16_t[]> m_cps2_buffered_obj;
+	int32_t m_cps2_last_sprite_offset = 0; // Offset of the last sprite
+	int32_t m_pri_ctrl = 0; // Sprite layer priorities
+	int32_t m_objram_bank = 0;
+	int32_t m_cps2_obj_size = 0;
 
 	// misc
-	int m_readpaddle = 0; // pzloop2
-	int m_cps2digitalvolumelevel = 0;
-	int m_cps2disabledigitalvolume = 0;
+	std::unique_ptr<uint16_t[]> m_gigaman2_dummyqsound_ram;
+	int32_t m_readpaddle = 0; // pzloop2
+	int32_t m_cps2digitalvolumelevel = 0;
+	int32_t m_cps2disabledigitalvolume = 0;
 	emu_timer *m_digital_volume_timer = nullptr;
-	int m_cps2_dial_type = 0;
-	int m_ecofghtr_dial_direction0 = 0;
-	int m_ecofghtr_dial_direction1 = 0;
-	int m_ecofghtr_dial_last0 = 0;
-	int m_ecofghtr_dial_last1 = 0;
+	int32_t m_cps2_dial_type = 0;
+	int32_t m_ecofghtr_dial_direction[2]{};
+	int32_t m_ecofghtr_dial_last[2]{};
 };
 
 
@@ -756,13 +753,6 @@ private:
  *  Video
  *
  *************************************/
-
-#define CPS2_OBJ_BASE   0x00    // Unknown (not base address of objects). Could be base address of bank used when object swap bit set?
-#define CPS2_OBJ_UNK1   0x02    // Unknown (nearly always 0x807d, or 0x808e when screen flipped)
-#define CPS2_OBJ_PRI    0x04    // Layer priorities
-#define CPS2_OBJ_UNK2   0x06    // Unknown (usually 0x0000, 0x1101 in ssf2, 0x0001 in 19XX)
-#define CPS2_OBJ_XOFFS  0x08    // X offset (usually 0x0040)
-#define CPS2_OBJ_YOFFS  0x0a    // Y offset (always 0x0010)
 
 
 void cps2_state::unshuffle(uint64_t *buf, int len)
@@ -803,8 +793,8 @@ void cps2_state::video_start()
 	m_cps2_obj_size = 0x2000;
 	m_cps2_buffered_obj = make_unique_clear<uint16_t[]>(m_cps2_obj_size / 2);
 
-	memset(m_objram1, 0, m_cps2_obj_size);
-	memset(m_objram2, 0, m_cps2_obj_size);
+	memset(m_objram[0], 0, m_cps2_obj_size);
+	memset(m_objram[1], 0, m_cps2_obj_size);
 
 	save_item(NAME(m_cps2_last_sprite_offset));
 	save_pointer(NAME(m_cps2_buffered_obj), m_cps2_obj_size / 2);
@@ -817,55 +807,34 @@ void cps2_state::video_start()
 void cps2_state::cps2_objram_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		m_objram_bank = data & 1;
+		m_objram_bank = BIT(data, 0);
 }
 
-uint16_t cps2_state::cps2_objram1_r(offs_t offset)
+template <unsigned Xor>
+uint16_t cps2_state::cps2_objram_r(offs_t offset)
 {
-	if (m_objram_bank & 1)
-		return m_objram2[offset];
-	else
-		return m_objram1[offset];
+	return m_objram[m_objram_bank ^ Xor][offset];
 }
 
-uint16_t cps2_state::cps2_objram2_r(offs_t offset)
+template <unsigned Xor>
+void cps2_state::cps2_objram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (m_objram_bank & 1)
-		return m_objram1[offset];
-	else
-		return m_objram2[offset];
-}
-
-void cps2_state::cps2_objram1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (m_objram_bank & 1)
-		COMBINE_DATA(&m_objram2[offset]);
-	else
-		COMBINE_DATA(&m_objram1[offset]);
-}
-
-void cps2_state::cps2_objram2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (m_objram_bank & 1)
-		COMBINE_DATA(&m_objram1[offset]);
-	else
-		COMBINE_DATA(&m_objram2[offset]);
+	COMBINE_DATA(&m_objram[m_objram_bank ^ Xor][offset]);
 }
 
 uint16_t *cps2_state::cps2_objbase()
 {
-	int baseptr;
-	baseptr = 0x7000;
+	int baseptr = 0x7000;
 
-	if (m_objram_bank & 1)
+	if (BIT(m_objram_bank, 0))
 		baseptr ^= 0x0080;
 
-	//popmessage("%04x %d", cps2_port(machine, CPS2_OBJ_BASE), m_objram_bank & 1);
+	//popmessage("%04x %d", cps2_port(machine, CPS2_OBJ_BASE), BIT(m_objram_bank, 0));
 
 	if (baseptr == 0x7000)
-		return m_objram1;
+		return m_objram[0];
 	else //if (baseptr == 0x7080)
-		return m_objram2;
+		return m_objram[1];
 }
 
 
@@ -874,7 +843,7 @@ void cps2_state::find_last_sprite()    /* Find the offset of last sprite */
 	cps_state::find_last_sprite();
 
 	int offset = 0;
-	uint16_t *base = m_cps2_buffered_obj.get();
+	uint16_t const *const base = m_cps2_buffered_obj.get();
 
 	/* Locate the end of table marker */
 	while (offset < m_cps2_obj_size / 2)
@@ -893,7 +862,7 @@ void cps2_state::find_last_sprite()    /* Find the offset of last sprite */
 	m_cps2_last_sprite_offset = m_cps2_obj_size / 2 - 4;
 }
 
-void cps2_state::cps2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks)
+void cps2_state::cps2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t *primasks)
 {
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)                                    \
 {                                                                                   \
@@ -913,9 +882,9 @@ void cps2_state::cps2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap
 				SX,SY, screen.priority(),primasks[priority],15);                 \
 }
 
-	uint16_t *base = m_cps2_buffered_obj.get();
-	int xoffs = 64 - m_output[CPS2_OBJ_XOFFS / 2];
-	int yoffs = 16 - m_output[CPS2_OBJ_YOFFS / 2];
+	uint16_t const *const base = m_cps2_buffered_obj.get();
+	const int xoffs = 64 - m_output[CPS2_OBJ_XOFFS];
+	const int yoffs = 16 - m_output[CPS2_OBJ_YOFFS];
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed(KEYCODE_Z) && machine().input().code_pressed(KEYCODE_R))
@@ -928,15 +897,17 @@ void cps2_state::cps2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap
 	{
 		int x = base[i + 0];
 		int y = base[i + 1];
-		int priority = (x >> 13) & 0x07;
-		int code = base[i + 2] + ((y & 0x6000) << 3);
-		int colour = base[i + 3];
-		int col = colour & 0x1f;
+		const int priority = (x >> 13) & 0x07;
+		const int code = base[i + 2] + ((y & 0x6000) << 3);
+		const int colour = base[i + 3];
+		const int col = colour & 0x1f;
+		const bool flipx = BIT(colour, 5);
+		const bool flipy = BIT(colour, 6);
 
-		if (colour & 0x80)
+		if (BIT(colour, 7))
 		{
-			x += m_output[CPS2_OBJ_XOFFS / 2]; /* fix the offset of some games */
-			y += m_output[CPS2_OBJ_YOFFS / 2]; /* like Marvel vs. Capcom ending credits */
+			x += m_output[CPS2_OBJ_XOFFS]; /* fix the offset of some games */
+			y += m_output[CPS2_OBJ_YOFFS]; /* like Marvel vs. Capcom ending credits */
 		}
 
 		if (colour & 0xff00)
@@ -944,81 +915,77 @@ void cps2_state::cps2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap
 			/* handle blocked sprites */
 			int nx = (colour & 0x0f00) >> 8;
 			int ny = (colour & 0xf000) >> 12;
-			int nxs, nys, sx, sy;
 			nx++;
 			ny++;
 
-			if (colour & 0x40)
+			if (flipy)
 			{
 				/* Y flip */
-				if (colour & 0x20)
+				if (flipx)
 				{
-					for (nys = 0; nys < ny; nys++)
+					for (int nys = 0; nys < ny; nys++)
 					{
-						for (nxs = 0; nxs < nx; nxs++)
+						const int sy = (y + nys * 16 + yoffs) & 0x3ff;
+						for (int nxs = 0; nxs < nx; nxs++)
 						{
-							sx = (x + nxs * 16 + xoffs) & 0x3ff;
-							sy = (y + nys * 16 + yoffs) & 0x3ff;
+							const int sx = (x + nxs * 16 + xoffs) & 0x3ff;
 							DRAWSPRITE(
 									code + (nx - 1) - nxs + 0x10 * (ny - 1 - nys),
-									(col & 0x1f),
-									1,1,
-									sx,sy);
+									col,
+									1, 1,
+									sx, sy);
 						}
 					}
 				}
 				else
 				{
-					for (nys = 0; nys < ny; nys++)
+					for (int nys = 0; nys < ny; nys++)
 					{
-						for (nxs = 0; nxs < nx; nxs++)
+						const int sy = (y + nys * 16 + yoffs) & 0x3ff;
+						for (int nxs = 0; nxs < nx; nxs++)
 						{
-							sx = (x + nxs * 16 + xoffs) & 0x3ff;
-							sy = (y + nys * 16 + yoffs) & 0x3ff;
-
+							const int sx = (x + nxs * 16 + xoffs) & 0x3ff;
 							DRAWSPRITE(
 									code + nxs + 0x10 * (ny - 1 - nys),
-									(col & 0x1f),
-									0,1,
-									sx,sy);
+									col,
+									0, 1,
+									sx, sy);
 						}
 					}
 				}
 			}
 			else
 			{
-				if (colour & 0x20)
+				if (flipx)
 				{
-					for (nys = 0; nys < ny; nys++)
+					for (int nys = 0; nys < ny; nys++)
 					{
-						for (nxs = 0; nxs < nx; nxs++)
+						const int sy = (y + nys * 16 + yoffs) & 0x3ff;
+						for (int nxs = 0; nxs < nx; nxs++)
 						{
-							sx = (x + nxs * 16 + xoffs) & 0x3ff;
-							sy = (y + nys * 16 + yoffs) & 0x3ff;
-
+							const int sx = (x + nxs * 16 + xoffs) & 0x3ff;
 							DRAWSPRITE(
 									code + (nx - 1) - nxs + 0x10 * nys,
-									(col & 0x1f),
-									1,0,
-									sx,sy);
+									col,
+									1, 0,
+									sx, sy);
 						}
 					}
 				}
 				else
 				{
-					for (nys = 0; nys < ny; nys++)
+					for (int nys = 0; nys < ny; nys++)
 					{
-						for (nxs = 0; nxs < nx; nxs++)
+						const int sy = (y + nys * 16 + yoffs) & 0x3ff;
+						for (int nxs = 0; nxs < nx; nxs++)
 						{
-							sx = (x + nxs * 16 + xoffs) & 0x3ff;
-							sy = (y + nys * 16 + yoffs) & 0x3ff;
-
+							const int sx = (x + nxs * 16 + xoffs) & 0x3ff;
 							DRAWSPRITE(
 									//code + nxs + 0x10 * nys,
-									(code & ~0xf) + ((code + nxs) & 0xf) + 0x10 * nys, // pgear fix
-									(col & 0x1f),
-									0,0,
-									sx,sy);
+									(code & ~0xf) + ((code + nxs) & 0xf) + 0x10 * nys, // pgear fix, same as CPS1?
+									col,
+									0, 0,
+									sx, sy);
 						}
 					}
 				}
@@ -1029,39 +996,40 @@ void cps2_state::cps2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap
 			/* Simple case... 1 sprite */
 			DRAWSPRITE(
 					code,
-					(col & 0x1f),
-					colour&0x20,colour&0x40,
-					(x+xoffs) & 0x3ff,(y+yoffs) & 0x3ff);
+					col,
+					flipx, flipy,
+					(x + xoffs) & 0x3ff, (y + yoffs) & 0x3ff);
 		}
 	}
+#undef DRAWSPRITE
 }
 
 
 void cps2_state::render_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* Draw layers (0 = sprites, 1-3 = tilemaps) */
-	int layercontrol = m_cps_b_regs[m_game_config->layer_control / 2];
-	int l0 = (layercontrol >> 0x06) & 0x03;
-	int l1 = (layercontrol >> 0x08) & 0x03;
-	int l2 = (layercontrol >> 0x0a) & 0x03;
-	int l3 = (layercontrol >> 0x0c) & 0x03;
+	const uint16_t layercontrol = m_cps_b_regs[m_game_config->layer_control / 2];
+	uint8_t l0 = (layercontrol >> 0x06) & 0x03;
+	uint8_t l1 = (layercontrol >> 0x08) & 0x03;
+	uint8_t l2 = (layercontrol >> 0x0a) & 0x03;
+	uint8_t l3 = (layercontrol >> 0x0c) & 0x03;
 	screen.priority().fill(0, cliprect);
 
-	int primasks[8];
-	int l0pri = (m_pri_ctrl >> 4 * l0) & 0x0f;
-	int l1pri = (m_pri_ctrl >> 4 * l1) & 0x0f;
-	int l2pri = (m_pri_ctrl >> 4 * l2) & 0x0f;
-	int l3pri = (m_pri_ctrl >> 4 * l3) & 0x0f;
+	uint32_t primasks[8]{};
+	uint8_t l0pri = (m_pri_ctrl >> 4 * l0) & 0x0f;
+	uint8_t l1pri = (m_pri_ctrl >> 4 * l1) & 0x0f;
+	uint8_t l2pri = (m_pri_ctrl >> 4 * l2) & 0x0f;
+	uint8_t l3pri = (m_pri_ctrl >> 4 * l3) & 0x0f;
 
 #if 0
-	if ((m_output[CPS2_OBJ_BASE / 2] != 0x7080 && m_output[CPS2_OBJ_BASE / 2] != 0x7000) ||
-			m_output[CPS2_OBJ_UNK1 / 2] != 0x807d ||
-			(m_output[CPS2_OBJ_UNK2 / 2] != 0x0000 && m_output[CPS2_OBJ_UNK2 / 2] != 0x1101 && m_output[CPS2_OBJ_UNK2 / 2] != 0x0001))
+	if ((m_output[CPS2_OBJ_BASE] != 0x7080 && m_output[CPS2_OBJ_BASE] != 0x7000) ||
+			m_output[CPS2_OBJ_UNK1] != 0x807d ||
+			(m_output[CPS2_OBJ_UNK2] != 0x0000 && m_output[CPS2_OBJ_UNK2] != 0x1101 && m_output[CPS2_OBJ_UNK2] != 0x0001))
 	{
 		popmessage("base %04x uk1 %04x uk2 %04x",
-				m_output[CPS2_OBJ_BASE / 2],
-				m_output[CPS2_OBJ_UNK1 / 2],
-				m_output[CPS2_OBJ_UNK2 / 2]);
+				m_output[CPS2_OBJ_BASE],
+				m_output[CPS2_OBJ_UNK1],
+				m_output[CPS2_OBJ_UNK2]);
 	}
 
 	if (0 && machine().input().code_pressed(KEYCODE_Z))
@@ -1074,8 +1042,8 @@ void cps2_state::render_layers(screen_device &screen, bitmap_ind16 &bitmap, cons
 	if (l2 == 0) { l2 = l3; l3 = 0; l2pri = l3pri; }
 
 	{
-		int mask0 = 0xaa;
-		int mask1 = 0xcc;
+		uint32_t mask0 = 0xaa;
+		uint32_t mask1 = 0xcc;
 		if (l0pri > l1pri) mask0 &= ~0x88;
 		if (l0pri > l2pri) mask0 &= ~0xa0;
 		if (l1pri > l2pri) mask1 &= ~0xc0;
@@ -1106,7 +1074,7 @@ void cps2_state::cps2_objram_latch(int state)
 {
 	if (state)
 	{
-		m_pri_ctrl = m_output[CPS2_OBJ_PRI / 2];
+		m_pri_ctrl = m_output[CPS2_OBJ_PRI];
 		memcpy(m_cps2_buffered_obj.get(), cps2_objbase(), m_cps2_obj_size);
 	}
 }
@@ -1132,17 +1100,17 @@ void cps2_state::cps2_eeprom_port_w(offs_t offset, uint16_t data, uint16_t mem_m
 		/* bit 7 - */
 
 		// EEPROM
-		ioport("EEPROMOUT")->write(data, 0xffff);
+		m_eepromout->write(data, 0xffff);
 		if (m_cps2_dial_type == 2) // ecofghtr
 		{
-			m_readpaddle = (data & 0x0100);
+			m_readpaddle = BIT(data, 8);
 		}
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 - coin counter 1 */
-		/* bit 0 - coin counter 2 */
+		/* bit 1 - coin counter 2 */
 		/* bit 2 - Unused */
 		/* bit 3 - Allows access to Z80 address space (Z80 reset) */
 		/* bit 4 - lock 1  */
@@ -1152,32 +1120,32 @@ void cps2_state::cps2_eeprom_port_w(offs_t offset, uint16_t data, uint16_t mem_m
 
 		// Z80 Reset
 		if (m_audiocpu != nullptr)
-			m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
+			m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(data, 3) ? CLEAR_LINE : ASSERT_LINE);
 
-		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 		if (m_cps2_dial_type == 1) // pzloop2
 		{
 			// Puzz Loop 2 uses coin counter 2 input to switch between stick and paddle controls
-			m_readpaddle = data & 0x0002;
+			m_readpaddle = BIT(data, 1);
 		}
 		else
 		{
-			machine().bookkeeping().coin_counter_w(1, data & 0x0002);
+			machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 		}
 
 		if (strncmp(machine().system().name, "mmatrix", 7) == 0) // Mars Matrix seems to require the coin lockout bit to be reversed
 		{
-			machine().bookkeeping().coin_lockout_w(0, data & 0x0010);
-			machine().bookkeeping().coin_lockout_w(1, data & 0x0020);
-			machine().bookkeeping().coin_lockout_w(2, data & 0x0040);
-			machine().bookkeeping().coin_lockout_w(3, data & 0x0080);
+			machine().bookkeeping().coin_lockout_w(0, BIT(data, 4));
+			machine().bookkeeping().coin_lockout_w(1, BIT(data, 5));
+			machine().bookkeeping().coin_lockout_w(2, BIT(data, 6));
+			machine().bookkeeping().coin_lockout_w(3, BIT(data, 7));
 		}
 		else
 		{
-			machine().bookkeeping().coin_lockout_w(0, ~data & 0x0010);
-			machine().bookkeeping().coin_lockout_w(1, ~data & 0x0020);
-			machine().bookkeeping().coin_lockout_w(2, ~data & 0x0040);
-			machine().bookkeeping().coin_lockout_w(3, ~data & 0x0080);
+			machine().bookkeeping().coin_lockout_w(0, BIT(~data, 4));
+			machine().bookkeeping().coin_lockout_w(1, BIT(~data, 5));
+			machine().bookkeeping().coin_lockout_w(2, BIT(~data, 6));
+			machine().bookkeeping().coin_lockout_w(3, BIT(~data, 7));
 		}
 
 		/*
@@ -1197,10 +1165,10 @@ void cps2_state::cps2_eeprom_port_w(offs_t offset, uint16_t data, uint16_t mem_m
 
 TIMER_CALLBACK_MEMBER(cps2_state::cps2_update_digital_volume)
 {
-	int vol_button_state = ioport("DIGITALVOL")->read();
+	const int vol_button_state = m_digitalvol->read();
 
-	if (vol_button_state & 0x01) m_cps2digitalvolumelevel -= 1;
-	if (vol_button_state & 0x02) m_cps2digitalvolumelevel += 1;
+	if (BIT(vol_button_state, 0)) m_cps2digitalvolumelevel -= 1;
+	if (BIT(vol_button_state, 1)) m_cps2digitalvolumelevel += 1;
 
 	if (m_cps2digitalvolumelevel > 39) m_cps2digitalvolumelevel = 39;
 	if (m_cps2digitalvolumelevel < 0) m_cps2digitalvolumelevel = 0;
@@ -1219,7 +1187,7 @@ uint16_t cps2_state::cps2_qsound_volume_r()
 		0xe050, 0xe048, 0xe044, 0xe042, 0xe041, 0xe030, 0xe028, 0xe024, 0xe022, 0xe021
 	};
 
-	uint16_t result = cps2_vol_states[m_cps2digitalvolumelevel];
+	const uint16_t result = cps2_vol_states[m_cps2digitalvolumelevel];
 
 	// Extra adapter memory (0x660000-0x663fff) available when bit 14 = 0
 	// Network adapter (ssf2tb) present when bit 15 = 0
@@ -1244,71 +1212,59 @@ uint16_t cps2_state::joy_or_paddle_r()
 {
 	if (m_readpaddle != 0)
 	{
-		return (ioport("IN0")->read());
+		return m_io_in[0]->read();
 	}
 	else
 	{
-		return (ioport("PADDLE1")->read() & 0xff) | (ioport("PADDLE2")->read() << 8);
+		return (m_paddle[0]->read() & 0xff) | (m_paddle[1]->read() << 8);
 	}
 }
 
 uint16_t cps2_state::joy_or_paddle_ecofghtr_r()
 {
-	if (m_readpaddle == 0 || (m_io_in1->read() & 0x10) == 0x10) // Ignore bit if spinner not enabled
+	if (m_readpaddle == 0 || (m_io_in[1]->read() & 0x10) == 0x10) // Ignore bit if spinner not enabled
 	{
-		uint16_t ret = m_io_in0->read();
+		uint16_t ret = m_io_in[0]->read();
 
-		if ((m_io_in1->read() & 0x10) == 0x00)
+		if ((m_io_in[1]->read() & 0x10) == 0x00)
 		{
 			ret = ret & 0xdfdf;
 
-			ret |= m_ecofghtr_dial_direction1 << 13;
-			ret |= m_ecofghtr_dial_direction0 << 5;
+			ret |= m_ecofghtr_dial_direction[1] << 13;
+			ret |= m_ecofghtr_dial_direction[0] << 5;
 		}
 
 		return ret;
 	}
 	else
 	{
-		int dial0 = (ioport("DIAL0")->read());
-		int dial1 = (ioport("DIAL1")->read());
+		int dial[2]{};
+		for (int i = 0; i < 2; i++)
+			dial[i] = m_dial[i]->read();
 
-		uint16_t ret = (dial0 & 0xff) | ((dial1 & 0xff) << 8);
+		const uint16_t ret = (dial[0] & 0xff) | ((dial[1] & 0xff) << 8);
 
-		// 1st dial
-		if ((dial0 & 0x800) == (m_ecofghtr_dial_last0 & 0x800))
+		if (!machine().side_effects_disabled())
 		{
-			if (dial0 > m_ecofghtr_dial_last0) m_ecofghtr_dial_direction0 = 1;
-			else  m_ecofghtr_dial_direction0 = 0;
+			for (int i = 0; i < 2; i++)
+			{
+				if ((dial[i] & 0x800) == (m_ecofghtr_dial_last[i] & 0x800))
+				{
+					if (dial[i] > m_ecofghtr_dial_last[i]) m_ecofghtr_dial_direction[i] = 1;
+					else  m_ecofghtr_dial_direction[i] = 0;
+				}
+				// catch wraparound of value
+				else if ((dial[i] & 0x800) > (m_ecofghtr_dial_last[i] & 0x800)) // value gone from 0x000 to 0xfff
+				{
+					m_ecofghtr_dial_direction[i] = 0;
+				}
+				else if ((dial[i] & 0x800) < (m_ecofghtr_dial_last[i] & 0x800)) // value gone from 0xfff to 0x000
+				{
+					m_ecofghtr_dial_direction[i] = 1;
+				}
+				m_ecofghtr_dial_last[i] = dial[i];
+			}
 		}
-		// catch wraparound of value
-		else if ((dial0 & 0x800) > (m_ecofghtr_dial_last0 & 0x800)) // value gone from 0x000 to 0xfff
-		{
-			m_ecofghtr_dial_direction0 = 0;
-		}
-		else if ((dial0 & 0x800) < (m_ecofghtr_dial_last0 & 0x800)) // value gone from 0xfff to 0x000
-		{
-			m_ecofghtr_dial_direction0 = 1;
-		}
-
-		// 2nd dial
-		if ((dial1 & 0x800) == (m_ecofghtr_dial_last1 & 0x800))
-		{
-			if (dial1 > m_ecofghtr_dial_last1) m_ecofghtr_dial_direction1 = 1;
-			else  m_ecofghtr_dial_direction1 = 0;
-		}
-		// catch wraparound of value
-		else if ((dial1 & 0x800) > (m_ecofghtr_dial_last1 & 0x800)) // value gone from 0x000 to 0xfff
-		{
-			m_ecofghtr_dial_direction1 = 0;
-		}
-		else if ((dial1 & 0x800) < (m_ecofghtr_dial_last1 & 0x800)) // value gone from 0xfff to 0x000
-		{
-			m_ecofghtr_dial_direction1 = 1;
-		}
-
-		m_ecofghtr_dial_last0 = dial0;
-		m_ecofghtr_dial_last1 = dial1;
 
 		return ret;
 	}
@@ -1321,17 +1277,17 @@ uint16_t cps2_state::joy_or_paddle_ecofghtr_r()
  *
  *************************************/
 
-void cps2_state::cps2_map(address_map &map)
+void cps2_state::cps2_base_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();                                                                                                    // 68000 ROM
-	map(0x400000, 0x40000b).ram().share("output");                                                                                    // CPS2 object output
-	map(0x618000, 0x619fff).rw(FUNC(cps2_state::qsound_sharedram1_r), FUNC(cps2_state::qsound_sharedram1_w));                         // Q RAM
+	map(0x400000, 0x40000b).ram().share(m_output);                                                                                    // CPS2 object output
+	map(0x618000, 0x619fff).rw(FUNC(cps2_state::qsound_sharedram_r<0>), FUNC(cps2_state::qsound_sharedram_w<0>));                         // Q RAM
 	map(0x660000, 0x663fff).ram();                                                                                                    // When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available.
 	map(0x664000, 0x664001).ram();                                                                                                    // Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?)
-	map(0x700000, 0x701fff).w(FUNC(cps2_state::cps2_objram1_w)).share("objram1");                                                     // Object RAM, no game seems to use it directly
-	map(0x708000, 0x709fff).mirror(0x006000).rw(FUNC(cps2_state::cps2_objram2_r), FUNC(cps2_state::cps2_objram2_w)).share("objram2"); // Object RAM
-	map(0x800100, 0x80013f).w(FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                                                    // Mirror (sfa)
-	map(0x800140, 0x80017f).rw(FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w)).share("cps_b_regs");                   // Mirror (sfa)
+	map(0x700000, 0x701fff).w(FUNC(cps2_state::cps2_objram_w<0>)).share(m_objram[0]);                                                     // Object RAM, no game seems to use it directly
+	map(0x708000, 0x709fff).mirror(0x006000).rw(FUNC(cps2_state::cps2_objram_r<1>), FUNC(cps2_state::cps2_objram_w<1>)).share(m_objram[1]); // Object RAM
+	map(0x800100, 0x80013f).w(FUNC(cps2_state::cps1_cps_a_w)).share(m_cps_a_regs);                                                    // Mirror (sfa)
+	map(0x800140, 0x80017f).rw(FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w)).share(m_cps_b_regs);                   // Mirror (sfa)
 	map(0x804000, 0x804001).portr("IN0");                                                                                             // IN0
 	map(0x804010, 0x804011).portr("IN1");                                                                                             // IN1
 	map(0x804020, 0x804021).portr("IN2");                                                                                             // IN2 + EEPROM
@@ -1340,60 +1296,47 @@ void cps2_state::cps2_map(address_map &map)
 	map(0x8040a0, 0x8040a1).nopw();                                                                                                   // Unknown (reset once on startup)
 	map(0x8040b0, 0x8040b2).lr8(NAME([this](offs_t offset) { return m_dsw[offset]->read(); }));                                       // DIP switches (only present on development hardware)
 	map(0x8040e0, 0x8040e1).w(FUNC(cps2_state::cps2_objram_bank_w));                                                                  // bit 0 = Object ram bank swap
-	map(0x804100, 0x80413f).w(FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                                                    // CPS-A custom
+	map(0x804100, 0x80413f).w(FUNC(cps2_state::cps1_cps_a_w)).share(m_cps_a_regs);                                                    // CPS-A custom
 	map(0x804140, 0x80417f).rw(FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w));                                       // CPS-B custom
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps2_state::cps1_gfxram_w)).share("gfxram");                                                 // Video RAM
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps2_state::cps1_gfxram_w)).share(m_gfxram);                                                 // Video RAM
+}
+
+void cps2_state::cps2_comm_base_map(address_map &map)
+{
+	map(0x620000, 0x620001).rw(m_comm, FUNC(cps2_comm_device::usart_data_r), FUNC(cps2_comm_device::usart_data_w));                   // D71051C data (C/D = 1)
+	map(0x620008, 0x620009).w(m_comm, FUNC(cps2_comm_device::route_w));                                                               // PAL16L8 used to route signals
+	map(0x620020, 0x620021).rw(m_comm, FUNC(cps2_comm_device::usart_status_r), FUNC(cps2_comm_device::usart_control_w));              // D71051C control (C/D = 0)
+}
+
+void cps2_state::cps2_map(address_map &map)
+{
+	cps2_base_map(map);
 	map(0xff0000, 0xffffff).ram();                                                                                                    // RAM
 }
 
 void cps2_state::cps2_comm_map(address_map &map)
 {
 	cps2_map(map);
-
-	map(0x620000, 0x620001).rw(m_comm, FUNC(cps2_comm_device::usart_data_r), FUNC(cps2_comm_device::usart_data_w));                   // D71051C data (C/D = 1)
-	map(0x620008, 0x620009).w(m_comm, FUNC(cps2_comm_device::route_w));                                                               // PAL16L8 used to route signals
-	map(0x620020, 0x620021).rw(m_comm, FUNC(cps2_comm_device::usart_status_r), FUNC(cps2_comm_device::usart_control_w));              // D71051C control (C/D = 0)
+	cps2_comm_base_map(map);
 }
 
 void cps2_state::decrypted_opcodes_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rom().share("decrypted_opcodes"); // 68000 ROM
+	map(0x000000, 0x3fffff).rom().share(m_decrypted_opcodes); // 68000 ROM
 }
 
 void cps2_state::dead_cps2_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rom();                                                                                                    // 68000 ROM
-	map(0x400000, 0x40000b).ram().share("output");                                                                                    // CPS2 object output
-	map(0x618000, 0x619fff).rw(FUNC(cps2_state::qsound_sharedram1_r), FUNC(cps2_state::qsound_sharedram1_w));                         // Q RAM
-	map(0x660000, 0x663fff).ram();                                                                                                    // When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available.
-	map(0x664000, 0x664001).ram();                                                                                                    // Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?)
-	map(0x700000, 0x701fff).w(FUNC(cps2_state::cps2_objram1_w)).share("objram1");                                                     // Object RAM, no game seems to use it directly
-	map(0x708000, 0x709fff).mirror(0x006000).rw(FUNC(cps2_state::cps2_objram2_r), FUNC(cps2_state::cps2_objram2_w)).share("objram2"); // Object RAM
-	map(0x800100, 0x80013f).w(FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                                                    // Mirror (sfa)
-	map(0x800140, 0x80017f).rw(FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w)).share("cps_b_regs");                   // Mirror (sfa)
-	map(0x804000, 0x804001).portr("IN0");                                                                                             // IN0
-	map(0x804010, 0x804011).portr("IN1");                                                                                             // IN1
-	map(0x804020, 0x804021).portr("IN2");                                                                                             // IN2 + EEPROM
-	map(0x804030, 0x804031).r(FUNC(cps2_state::cps2_qsound_volume_r));                                                                // Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present.
-	map(0x804040, 0x804041).w(FUNC(cps2_state::cps2_eeprom_port_w));                                                                  // EEPROM
-	map(0x8040a0, 0x8040a1).nopw();                                                                                                   // Unknown (reset once on startup)
-	map(0x8040b0, 0x8040b2).lr8(NAME([this](offs_t offset) { return m_dsw[offset]->read(); }));                                       // DIP switches (only present on development hardware)
-	map(0x8040e0, 0x8040e1).w(FUNC(cps2_state::cps2_objram_bank_w));                                                                  // bit 0 = Object ram bank swap
-	map(0x804100, 0x80413f).w(FUNC(cps2_state::cps1_cps_a_w)).share("cps_a_regs");                                                    // CPS-A custom
-	map(0x804140, 0x80417f).rw(FUNC(cps2_state::cps1_cps_b_r), FUNC(cps2_state::cps1_cps_b_w));                                       // CPS-B custom
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps2_state::cps1_gfxram_w)).share("gfxram");                                                 // Video RAM
+	cps2_base_map(map);
 	map(0xff0000, 0xffffef).ram();                                                                                                    // RAM
-	map(0xfffff0, 0xfffffb).ram().share("output");                                                                                    // CPS2 output
+	map(0xfffff0, 0xfffffb).ram().share(m_output);                                                                                    // CPS2 output
 	map(0xfffffc, 0xffffff).ram();
 }
 
 void cps2_state::dead_cps2_comm_map(address_map &map)
 {
 	dead_cps2_map(map);
-
-	map(0x620000, 0x620001).rw(m_comm, FUNC(cps2_comm_device::usart_data_r), FUNC(cps2_comm_device::usart_data_w));                   // D71051C data (C/D = 1)
-	map(0x620008, 0x620009).w(m_comm, FUNC(cps2_comm_device::route_w));                                                               // PAL16L8 used to route signals
-	map(0x620020, 0x620021).rw(m_comm, FUNC(cps2_comm_device::usart_status_r), FUNC(cps2_comm_device::usart_control_w));              // D71051C control (C/D = 0)
+	cps2_comm_base_map(map);
 }
 
 
@@ -1794,7 +1737,7 @@ INPUT_PORTS_END
 void cps2_state::machine_start()
 {
 	if (m_audiocpu != nullptr) // gigaman2 has an AT89C4051 (8051) MCU as an audio cpu, no qsound.
-		membank("bank1")->configure_entries(0, (QSOUND_SIZE - 0x10000) / 0x4000, memregion("audiocpu")->base() + 0x10000, 0x4000);
+		m_audiobank->configure_entries(0, (QSOUND_SIZE - 0x10000) / 0x4000, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -10942,13 +10885,15 @@ void cps2_state::init_digital_volume()
 	// create a timer to update our volume state from the fake switches - read it every 6 frames or so to enable some granularity
 	m_digital_volume_timer = timer_alloc(FUNC(cps2_state::cps2_update_digital_volume), this);
 	m_digital_volume_timer->adjust(attotime::from_msec(100), 0, attotime::from_msec(100));
+
+	save_item(NAME(m_cps2digitalvolumelevel));
 }
 
 
 void cps2_state::init_cps2_video()
 {
 	cps2_gfx_decode();
-	init_rasters(); // cps1.cpp
+	init_rasters(); // capcom/cps1.cpp
 }
 
 
@@ -10956,7 +10901,7 @@ void cps2_state::init_cps2crypt()
 {
 	if (m_region_key)
 	{
-		unsigned short decoded[10] = { 0 };
+		uint16_t decoded[10] = { 0 };
 		for (int b = 0; b < 10 * 16; b++)
 		{
 			int bit = (317 - b) % 160;
@@ -10966,7 +10911,7 @@ void cps2_state::init_cps2crypt()
 			}
 		}
 
-		uint32_t key[2] = { ((uint32_t)decoded[0] << 16) | decoded[1], ((uint32_t)decoded[2] << 16) | decoded[3] };
+		const uint32_t key[2] = { ((uint32_t)decoded[0] << 16) | decoded[1], ((uint32_t)decoded[2] << 16) | decoded[3] };
 		// decoded[4] == watchdog instruction third word
 		// decoded[5] == watchdog instruction second word
 		// decoded[6] == watchdog instruction first word
@@ -10998,7 +10943,7 @@ void cps2_state::init_cps2crypt()
 
 void cps2_state::init_cps2()
 {
-	// Decrypt the game - see machine/cps2crypt.cpp
+	// Decrypt the game - see capcom/cps2crypt.cpp
 	init_cps2crypt();
 	init_cps2nc();
 }
@@ -11054,7 +10999,7 @@ void cps2_state::gigaman2_gfx_reorder()
 
 	memcpy(&buf[0], rom, length);
 
-	for (int i = 0; i < length/2; i++)
+	for (int i = 0; i < length / 2; i++)
 		rom[i] = buf[((i & ~7) >> 2) | ((i & 4) << 18) | ((i & 2) >> 1) | ((i & 1) << 21)];
 }
 
@@ -11066,12 +11011,12 @@ void cps2_state::init_gigaman2()
 
 	init_cps2nc();
 
-	m_gigaman2_dummyqsound_ram = std::make_unique<uint16_t[]>(0x20000 / 2);
-	save_pointer(NAME(m_gigaman2_dummyqsound_ram), 0x20000 / 2);
+	m_gigaman2_dummyqsound_ram = std::make_unique<uint16_t[]>(0x2000 / 2);
+	save_pointer(NAME(m_gigaman2_dummyqsound_ram), 0x2000 / 2);
 
 	space.install_readwrite_handler(0x618000, 0x619fff, read16sm_delegate(*this, FUNC(cps2_state::gigaman2_dummyqsound_r)), write16sm_delegate(*this, FUNC(cps2_state::gigaman2_dummyqsound_w))); // no qsound..
 
-	memcpy(m_decrypted_opcodes, memregion("maincpu")->base()+0x200000, 0x200000);
+	memcpy(m_decrypted_opcodes, memregion("maincpu")->base() + 0x200000, 0x200000);
 
 	// No digital volume switches on this?
 	m_digital_volume_timer->adjust(attotime::never, 0, attotime::never);
@@ -11084,10 +11029,11 @@ void cps2_state::init_ecofghtr()
 	m_readpaddle = 0;
 	m_cps2_dial_type = 2;
 
-	save_item(NAME(m_readpaddle));
-
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x804000, 0x804001, read16smo_delegate(*this, FUNC(cps2_state::joy_or_paddle_ecofghtr_r)));
 
+	save_item(NAME(m_readpaddle));
+	save_item(NAME(m_ecofghtr_dial_direction));
+	save_item(NAME(m_ecofghtr_dial_last));
 }
 
 

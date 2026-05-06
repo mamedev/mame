@@ -34,8 +34,8 @@ namespace {
 //  ctor
 //-------------------------------------------------
 
-menu_about::menu_about(mame_ui_manager &mui, render_container &container)
-	: menu_textbox(mui, container)
+menu_about::menu_about(mame_ui_manager &mui, render_target &target)
+	: menu_textbox(mui, target)
 	, m_header{
 			util::string_format(
 #ifdef MAME_DEBUG

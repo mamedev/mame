@@ -204,9 +204,7 @@ public:
 	h89bus_left_slot_device(const machine_config &mconfig, T &&tag, device_t *owner, const char *sltag, U &&opts, const char *dflt)
 		: h89bus_left_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
+		set_options(std::forward<U>(opts), dflt, false);
 		set_h89bus_slot(std::forward<T>(sltag), tag);
 	}
 
@@ -232,7 +230,7 @@ protected:
 	const char *m_h89bus_slottag;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(H89BUS_LEFT_SLOT, h89bus_left_slot_device)
 
 class h89bus_right_slot_device : public device_t, public device_single_card_slot_interface<device_h89bus_right_card_interface>
@@ -243,9 +241,7 @@ public:
 	h89bus_right_slot_device(const machine_config &mconfig, T &&tag, device_t *owner, const char *sltag, U &&opts, const char *dflt)
 		: h89bus_right_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
+		set_options(std::forward<U>(opts), dflt, false);
 		set_h89bus_slot(std::forward<T>(sltag), tag);
 	}
 
@@ -277,7 +273,7 @@ protected:
 	bool m_p506_signals;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(H89BUS_RIGHT_SLOT, h89bus_right_slot_device)
 
 
@@ -349,6 +345,7 @@ protected:
 	required_region_ptr<uint8_t> m_decode_prom;
 };
 
+// device type declaration
 DECLARE_DEVICE_TYPE(H89BUS_IO_DECODER_444_43,  heath_io_decoder_444_43)
 DECLARE_DEVICE_TYPE(H89BUS_IO_DECODER_444_61,  heath_io_decoder_444_61)
 DECLARE_DEVICE_TYPE(H89BUS_IO_DECODER_MMS_61C, heath_io_decoder_mms_61c)
@@ -363,10 +360,7 @@ public:
 	heath_io_decoder_socket(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, bool fixed = false) :
 		heath_io_decoder_socket(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<T>(opts), dflt, fixed);
 	}
 
 	heath_io_decoder_socket(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -379,6 +373,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 };
 
+// device type declaration
 DECLARE_DEVICE_TYPE(H89BUS_IO_DECODER_SOCKET,  heath_io_decoder_socket)
 
 
@@ -494,7 +489,7 @@ inline void device_h89bus_right_card_interface::set_slot_wait(int state)
 	h89bus().set_wait_line(state);
 }
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(H89BUS, h89bus_device)
 
 #endif  // MAME_BUS_HEATHZENITH_H89_H89BUS_H

@@ -48,10 +48,7 @@ public:
 	psi_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *dflt)
 		: psi_keyboard_bus_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		psi_keyboard_devices(*this);
 		set_default_option(dflt);
-		set_fixed(false);
 	}
 	psi_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~psi_keyboard_bus_device();
@@ -70,7 +67,7 @@ public:
 	uint8_t key_data_r() { return m_key_data; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -99,7 +96,7 @@ protected:
 	psi_keyboard_bus_device *m_host;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(PSI_KEYBOARD_INTERFACE, psi_keyboard_bus_device)
 
 #endif // MAME_BUS_PSI_KBD_PSI_KBD_H

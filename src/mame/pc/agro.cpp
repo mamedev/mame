@@ -12,7 +12,7 @@ DOS 6.21 on El Torito CD
 - PCChips/Hsin Tech M590 motherboard;
 - SiS5591 + SiS5595;
 - SiS 3D Pro on-board (SiS6326 equivalent);
-- SoundPro HT1869 on-board, CMI8330A/C3D equivalent;
+- SoundPro HT1869 on-board, CMI8330A/C3D equivalent (ISA PnP);
 - ITE IT8770F Super I/O, seems a minor undocumented upgrade from IT8661F (cfr. BIOS at $ffe90);
 - Unspecified RAM size, 384MB is the max;
 - 3x PCI + 2x ISA card slots;
@@ -75,7 +75,7 @@ ROM_START( agro )
 	ROM_REGION32_LE( 0x100000, "bios", 0 )
 	// BADADDR    -x-xxxxxxxxxxxxxxxxx, oversized?
 	ROM_LOAD( "du98504.u38", 0, 0x100000, CRC(f0d44dbe) SHA1(e66e1c4839ef6595e4ced6ac0f3651291abb0b28) )
-//	ROM_LOAD( "5901202s.rom", 0xe0000, 0x20000, CRC(2ccdef7a) SHA1(ce2a62540e253679c31dbebd0a9bee7ff0afdeec) )
+//  ROM_LOAD( "5901202s.rom", 0xe0000, 0x20000, CRC(2ccdef7a) SHA1(ce2a62540e253679c31dbebd0a9bee7ff0afdeec) )
 
 	DISK_REGION( "pci:07.0:ide1:0:cdrom" )
 	DISK_IMAGE( "agro", 0, SHA1(edf27fd243944c0ff1468b532874f15346f74442) )

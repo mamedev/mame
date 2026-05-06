@@ -567,7 +567,6 @@ TILE_GET_INFO_MEMBER(mysticm_state::get_tile_info)
 
 	//gfx_element *gfx = tileinfo.decoder->gfx(0);
 	//printf("%d %d %d %d\n", gfx->elements(), gfx->colorbase(), gfx->granularity(), gfx->colors());
-
 }
 
 TILE_GET_INFO_MEMBER(joust2_state::get_tile_info)

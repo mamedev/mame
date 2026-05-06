@@ -44,4 +44,4 @@ private:
 
 DECLARE_DEVICE_TYPE(GD5446_PCI, cirrus_gd5446_pci_device)
 
-#endif // MAME_BUS_PCI_CLGD546X_LAGUNA_H
+#endif // MAME_BUS_PCI_CLGD5446_H

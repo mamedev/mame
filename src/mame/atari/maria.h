@@ -8,14 +8,17 @@
 
 // ======================> atari_maria_device
 
-class atari_maria_device :  public device_t
+class atari_maria_device :  public device_t, public device_video_interface
 {
 public:
 	// construction/destruction
 	atari_maria_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_dmacpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_dmaspace_tag(T &&tag, int spacenum) { m_dmaspace.set_tag(std::forward<T>(tag), spacenum); }
+
+	auto dma_wait_callback() { return m_dma_wait_cb.bind(); }
+	auto halt_callback() { return m_halt_cb.bind(); }
+	auto dli_callback() { return m_dli_cb.bind(); }
 
 	void interrupt(int lines);
 	void startdma(int lines);
@@ -31,34 +34,40 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-
-	int m_maria_palette[32]{};
-	int m_line_ram[2][160]{};
-	int m_active_buffer = 0;
-	int m_write_mode = 0;
-	unsigned int m_dll = 0;
-	unsigned int m_dl = 0;
-	int m_holey = 0;
-	int m_offset = 0;
-	int m_vblank = 0;
-	int m_dmaon = 0;
-	int m_dpp = 0;
-	int m_wsync = 0;
-	int m_color_kill = 0;
-	int m_cwidth = 0;
-	int m_bcntl = 0;
-	int m_kangaroo = 0;
-	int m_rm = 0;
-	int m_nmi = 0;
-	unsigned int m_charbase = 0;
-	bitmap_ind16 m_bitmap;
+	static constexpr uint32_t LINERAM_SIZE = 160;
 
 	void draw_scanline();
-	int is_holey(unsigned int addr);
-	int write_line_ram(int addr, uint8_t offset, int pal);
+	bool is_holey(offs_t addr);
+	int write_line_ram(offs_t addr, uint8_t offset, uint8_t pal);
 
-	required_device<cpu_device> m_cpu; // CPU whose space(AS_PROGRAM) serves as DMA source
-	required_device<screen_device> m_screen;
+	uint8_t read_byte(offs_t addr) const { return m_dmaspace->read_byte(addr); }
+
+	uint8_t m_maria_palette[32];
+	std::unique_ptr<uint8_t []> m_line_ram[2];
+	uint8_t m_active_buffer;
+	bool m_write_mode;
+	uint32_t m_dll;
+	uint32_t m_dl;
+	uint8_t m_holey;
+	int32_t m_offset;
+	uint8_t m_vblank;
+	bool m_dmaon;
+	uint16_t m_dpp;
+	bool m_wsync;
+	bool m_color_kill;
+	bool m_cwidth;
+	bool m_bcntl;
+	bool m_kangaroo;
+	uint8_t m_rm;
+	bool m_dli;
+	uint32_t m_charbase;
+	bitmap_ind16 m_bitmap;
+
+	required_address_space m_dmaspace;
+
+	devcb_write64 m_dma_wait_cb;
+	devcb_write_line m_halt_cb;
+	devcb_write_line m_dli_cb;
 };
 
 

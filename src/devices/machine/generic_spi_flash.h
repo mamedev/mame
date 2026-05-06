@@ -9,12 +9,12 @@ class generic_spi_flash_device : public device_t,
 							  public device_nvram_interface
 {
 public:
-	generic_spi_flash_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	generic_spi_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void set_rom_ptr(uint8_t* rom) { m_spiptr = rom; }
+	void set_rom_ptr(u8 *rom) { m_spiptr = rom; }
 	void set_rom_size(size_t size) { m_length = size; }
 
-	uint8_t read()
+	u8 read()
 	{
 		return m_spilatch;
 	}
@@ -24,12 +24,10 @@ public:
 		m_spi_state = READY_FOR_COMMAND;
 	}
 
-	void dir_w(int state)
-	{
-		m_spidir = state;
-	}
+	void write(u8 data);
 
-	void write(uint8_t data);
+	void set_single_byte_status_read() { m_multibyte_status_read = 0; };
+	void set_single_byte_status_writes() { m_multibyte_status_write = 0; };
 
 protected:
 	// device-level overrides
@@ -46,36 +44,49 @@ private:
 	{
 		READY_FOR_COMMAND = 0x00,
 
-		READY_FOR_ADDRESS2 = 0x01,
-		READY_FOR_ADDRESS1 = 0x02,
-		READY_FOR_ADDRESS0 = 0x03,
+		COMMAND_01_WRSR = 0x01,
+		COMMAND_02_PP = 0x02,
+		COMMAND_03_READ = 0x03,
+		COMMAND_04_WRDI = 0x04,
+		COMMAND_05_RDSR = 0x05,
+		COMMAND_06_WREN = 0x06,
 
-		READY_FOR_HSADDRESS2 = 0x04,
-		READY_FOR_HSADDRESS1 = 0x05,
-		READY_FOR_HSADDRESS0 = 0x06,
-		READY_FOR_HSDUMMY = 0x07,
+		COMMAND_0B_FAST_READ = 0x0b,
 
-		READY_FOR_WRITEADDRESS2 = 0x08,
-		READY_FOR_WRITEADDRESS1 = 0x09,
-		READY_FOR_WRITEADDRESS0 = 0x0a,
+		COMMAND_20_SE = 0x20,
 
-		READY_FOR_SECTORERASEADDRESS2 = 0x0b,
-		READY_FOR_SECTORERASEADDRESS1 = 0x0c,
-		READY_FOR_SECTORERASEADDRESS0 = 0x0d,
+		COMMAND_90_REMS = 0x90,
+		COMMAND_9F_RDID = 0x9f,
 
-		READY_FOR_WRITE = 0x0e,
+		COMMAND_AB_RDP = 0xab,
 
-		READY_FOR_READ = 0x0f,
-		READY_FOR_STATUS_READ = 0x10,
+		COMMAND_B9_DP = 0xb9,
+
+		COMMAND_EB_4READ = 0xeb,
 	};
 
-	uint32_t m_spiaddr;
-	uint8_t m_spi_state;
-	uint8_t m_spilatch;
-	bool m_spidir;
+	void get_command(u8 data);
+	void process_hsread_command(u8 data);
+	void process_read_command(u8 data);
+	void process_read4_command(u8 data);
+	void process_write_command(u8 data);
+	void process_sector_erase_command(u8 data);
+	void process_status_write_command(u8 data);
+	void process_status_rems_command(u8 data);
+	void process_status_read_command(u8 data);
+	void process_status_rdid_command(u8 data);
 
-	uint8_t* m_spiptr;
+	u32 m_spiaddr;
+	u8 m_spi_state;
+	u8 m_spilatch;
+	u8 m_spi_state_step;
+
+	// config
+	u8 *m_spiptr;
 	size_t m_length;
+	u8 m_multibyte_status_read;
+	u8 m_multibyte_status_write;
+	u8 m_idbytes[3];
 };
 
 DECLARE_DEVICE_TYPE(GENERIC_SPI_FLASH, generic_spi_flash_device)

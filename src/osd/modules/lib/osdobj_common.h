@@ -81,9 +81,6 @@
 #define OSDOPTION_SOUND                 "sound"
 #define OSDOPTION_AUDIO_LATENCY         "audio_latency"
 
-#define OSDOPTION_AUDIO_OUTPUT          "audio_output"
-#define OSDOPTION_AUDIO_EFFECT          "audio_effect"
-
 #define OSDOPTION_MIDI_PROVIDER         "midiprovider"
 
 #define OSDOPTION_NETWORK_PROVIDER      "networkprovider"
@@ -164,10 +161,6 @@ public:
 	// sound options
 	const char *sound() const { return value(OSDOPTION_SOUND); }
 	float audio_latency() const { return float_value(OSDOPTION_AUDIO_LATENCY); }
-
-	// CoreAudio specific options
-	const char *audio_output() const { return value(OSDOPTION_AUDIO_OUTPUT); }
-	const char *audio_effect(int index) const { return value(util::string_format("%s%d", OSDOPTION_AUDIO_EFFECT, index)); }
 
 	// BGFX specific options
 	const char *bgfx_path() const { return value(OSDOPTION_BGFX_PATH); }

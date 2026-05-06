@@ -53,8 +53,15 @@ static bool is_valid_softlist_part_char(char32_t ch)
 //  ctor
 //-------------------------------------------------
 
-menu_software_parts::menu_software_parts(mame_ui_manager &mui, render_container &container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result)
-	: menu(mui, container)
+menu_software_parts::menu_software_parts(
+		mame_ui_manager &mui,
+		render_target &target,
+		const software_info *info,
+		const char *interface,
+		const software_part **part,
+		bool other_opt,
+		result &result)
+	: menu(mui, target)
 	, m_result(result)
 {
 	m_info = info;
@@ -146,8 +153,8 @@ bool menu_software_parts::handle(event const *ev)
 //  ctor
 //-------------------------------------------------
 
-menu_software_list::menu_software_list(mame_ui_manager &mui, render_container &container, software_list_device *swlist, const char *interface, std::string &result)
-	: menu(mui, container), m_result(result)
+menu_software_list::menu_software_list(mame_ui_manager &mui, render_target &target, software_list_device *swlist, const char *interface, std::string &result)
+	: menu(mui, target), m_result(result)
 {
 	set_heading(swlist->description());
 
@@ -385,8 +392,8 @@ bool menu_software_list::handle(event const *ev)
 //  ctor
 //-------------------------------------------------
 
-menu_software::menu_software(mame_ui_manager &mui, render_container &container, const char *interface, software_list_device **result)
-	: menu(mui, container)
+menu_software::menu_software(mame_ui_manager &mui, render_target &target, const char *interface, software_list_device **result)
+	: menu(mui, target)
 {
 	set_heading(_("Software List"));
 
@@ -464,7 +471,7 @@ bool menu_software::handle(event const *ev)
 {
 	if (ev && (ev->iptkey == IPT_UI_SELECT))
 	{
-		//menu::stack_push<menu_software_list>(ui(), container(), (software_list_config *)ev->itemref, image);
+		//menu::stack_push<menu_software_list>(ui(), target(), (software_list_config *)ev->itemref, image);
 		*m_result = reinterpret_cast<software_list_device *>(ev->itemref);
 		stack_pop();
 	}

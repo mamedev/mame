@@ -60,6 +60,7 @@ public:
 	void notify_changed();
 
 	osd_dim get_size() override;
+	osd_dim get_size_pixels() override;
 
 	int xy_to_render_target(int x, int y, int *xt, int *yt);
 
@@ -116,8 +117,6 @@ private:
 
 	// Original display_mode
 	SDL_DisplayMode     m_original_mode;
-
-	int                 m_extra_flags;
 
 	// monitor info
 	bool                m_mouse_captured;

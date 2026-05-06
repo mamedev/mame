@@ -339,8 +339,8 @@ private:
 
 	TIMER_CALLBACK_MEMBER(unknown_tick);
 
-	inline uint16_t read_space(uint32_t offset);
-	inline void write_space(uint32_t offset, uint16_t data);
+	inline uint16_t read_space(offs_t offset);
+	inline void write_space(offs_t offset, uint16_t data);
 
 	bool m_alt_periodic_irq; // might be multiple timers, might be a register to configure, currently a config option.
 

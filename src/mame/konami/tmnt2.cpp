@@ -69,10 +69,10 @@ Uncertain bugs:
 #include "cpu/z80/z80.h"
 #include "machine/adc0804.h"
 #include "machine/eepromser.h"
-#include "machine/k054321.h"
 #include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/k053260.h"
+#include "sound/k054321.h"
 #include "sound/k054539.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
@@ -2398,12 +2398,9 @@ void tmnt2_base_state::machine_reset()
 {
 	m_lastirq = 0;
 
+	// Z80 _NMI goes low at same time as reset
 	if (m_audiocpu && m_k053260)
-	{
-		// Z80 _NMI goes low at same time as reset
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-	}
 }
 
 void punkshot_state::punkshot(machine_config &config)

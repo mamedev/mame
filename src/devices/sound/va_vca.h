@@ -44,6 +44,9 @@ DECLARE_DEVICE_TYPE(CA3280_VCA_LIN, ca3280_vca_lin_device)
 // (input 1), by a device in va_eg.h, for example. When the cv is provided via a
 // stream, this is also a ring modulator.
 //
+// This can also emulate a differential amplifier, by supplying a fixed or
+// streaming inverting input.
+//
 // The CV for this device is simply the gain (output = gain * input).
 class va_vca_device : public device_t, public device_sound_interface
 {
@@ -52,6 +55,7 @@ public:
 	{
 		INPUT_AUDIO = 0,
 		INPUT_GAIN,
+		INPUT_AUDIO_INV,
 	};
 
 	va_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
@@ -60,12 +64,24 @@ public:
 	// each (sub)class documentation.
 	void set_fixed_gain_cv(float gain_cv);
 
+	// Sets the inverting (-) input to a fixed value. Defaults to 0.
+	void set_fixed_inv_input(float x);
+
+	// Applies input differencing. This happens before gain is applied.
+	// Subclasses can override diff() to apply additional processing such as
+	// prescaling and distortion.
+	// Public because it is useful for calibrating and debugging.
+	// p ~ non-inverting input ("plus").
+	// m ~ inverting input ("minus").
+	virtual float diff(float p, float m) const;
+
 protected:
 	va_vca_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
 
+	void update();
+
 	virtual float cv_to_gain(float cv) const;
-	virtual float distorted(float s) const;
-	virtual bool has_distortion() const { return false; }
+	virtual u32 preferred_sample_rate() const;
 
 	void device_start() override ATTR_COLD;
 	void sound_stream_update(sound_stream &stream) override;
@@ -73,6 +89,7 @@ protected:
 private:
 	sound_stream *m_stream;
 	float m_fixed_gain;
+	float m_fixed_inv_input;
 };
 
 
@@ -84,27 +101,30 @@ private:
 // considered linear for very small input voltages (~[-0.02 - 0.02]). See
 // figure 3B in the datasheet.
 //
-//                          ______    Iabc
-//                         |      \    |
-// A --- Rin ---+--- B --- |+      \   |
-//              |          |        \  |
-//             Rgnd        |         \ |
-//              |          |          OO---- C ----+
-//             GND         |         /             |
-//                         |        /             Rout
-//              +--------- |-  Id  /               |
-//              |          |___|__/               GND
-//             Rgnd            |
-//              |              |
-//             GND             V-
+//                           ______    Iabc
+//                          |      \    |
+// A --- Rin+ ---+--- B --- |+      \   |
+//               |          |        \  |
+//             Rgnd+        |         \ |
+//               |          |          OO---- F ----+
+//              GND         |         /             |
+//                          |        /             Rout
+// [D -- Rin- --]+--- E --- |-  Id  /               |
+//               |          |___|__/               GND
+//             Rgnd-            |
+//               |              |
+//              GND             V-
 //
 // The streaming input should either be the voltage at point B, or at point A,
 // depending on how the object is configured.
 //
+// An (optional) inverting input (fixed or streaming) is also supported. It
+// should be the voltage at point E, or at point D, depending on configuration.
+//
 // The gain CV (fixed or streaming) should be the control current (Iabc), in
 // Amperes.
 //
-// The streaming output will be the output current at point C (the CA3280 is a
+// The streaming output will be the output current at point F (the CA3280 is a
 // current source), but the object can be configured to output a voltage instead.
 //
 class ca3280_vca_device : public va_vca_device
@@ -112,22 +132,27 @@ class ca3280_vca_device : public va_vca_device
 public:
 	ca3280_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
 
-	// By default, the streaming input should be the voltage at point B.
-	// This method will configure the input to be the voltage at point A.
-	ca3280_vca_device &configure_input_divider(float r_in, float r_gnd) ATTR_COLD;
+	// By default, the inputs should be the voltages at points B and E.
+	// A common setup is to have voltage dividers at the input(s), which can be
+	// configured by these methods. If dividers are configured, the inputs
+	// should be the voltages at points A and D.
+	ca3280_vca_device &configure_plus_divider(float r_in, float r_gnd) ATTR_COLD;
+	ca3280_vca_device &configure_minus_divider(float r_in, float r_gnd) ATTR_COLD;
 
-	// By default, the streaming output will be the current at point C. This
-	// method will configure the output to be the voltage at point C.
+	// By default, the streaming output will be the current at point F. This
+	// method will configure the output to be the voltage at point F.
 	ca3280_vca_device &configure_voltage_output(float r_out) ATTR_COLD;
+
+	float diff(float p, float m) const override;
 
 protected:
 	float cv_to_gain(float cv) const override;
-	float distorted(float s) const override;
-	bool has_distortion() const override { return true; }
+	u32 preferred_sample_rate() const override;
 
 private:
 	// Configuration. Not needed in save state.
-	float m_input_scale;
+	float m_plus_scale;
+	float m_minus_scale;
 	float m_output_scale;
 };
 
@@ -136,35 +161,30 @@ private:
 // to a current source, often a resistor to the positive supply.
 //
 // In this configuration, the CA3280 is linear for a wide voltage range, but it
-// will hard-clip when Iout approaches Iabc (TODO: clipping is not currently
+// will hard-clip when Iin approaches Id (TODO: clipping is not currently
 // emulated). See figure 3A in the datasheet.
-//
-// Note that, in contrast to the non-linearized configuration above, it is more
-// appropriate to treat the inputs as current inputs, rather than voltage inputs.
 //
 //                       ______    Iabc
 //                      |      \    |
-// A --- Rin+ --- B --- |+      \   |
+//     A ---- Rin+ ---- |+      \   |
 //                      |        \  |
 //                      |         \ |
-//                      |          OO---- C ----+
+//                      |          OO---- F ----+
 //                      |         /             |
 //                      |        /             Rout
-//     GND --- Rin- --- |-  Id  /               |
+//     B ---- Rin- ---- |-  Id  /               |
 //                      |___|__/               GND
 //                          |
 //                          + ---- Rd --- V+
 //
-// The streaming input should be the *current* at point B (the + input is at near
-// ground potential). But it can be configured to be the voltage at point A.
+// Usually, Rin+ = Rin- and B = GND. When that's the case:
+// In = V_A / Rin+ and Iout = In * 0.82 * Iabc / Id.
 //
 // The gain CV (fixed or streaming) should be the control current (Iabc), in
 // Amperes.
 //
-// The streaming output will be the output current at point C (the CA3280 is a
+// The streaming output will be the output current at point F (the CA3280 is a
 // current source), but the object can be configured to output a voltage instead.
-//
-// This implementation assumes Rin- == Rin+, which is typical.
 //
 class ca3280_vca_lin_device : public va_vca_device
 {
@@ -182,16 +202,25 @@ public:
 	// Don't use.
 	ca3280_vca_lin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
 
-	// By default, the streaming input should be the *current* at point B.
-	// This method will configure the input to be the voltage at point A.
-	ca3280_vca_lin_device &configure_voltage_input(float r_in) ATTR_COLD;
-
-	// By default, the streaming output will be the current at point C. This
-	// method will configure the output to be the voltage at point C.
+	// By default, the streaming output will be the current at point F. This
+	// method will configure the output to be the voltage at point F.
 	ca3280_vca_lin_device &configure_voltage_output(float r_out) ATTR_COLD;
+
+	// These set Rin+ and Rin-. They must be called at least once and they
+	// can change at runtime.
+	// If the input voltage is applied though a resistor network, such as a
+	// trimming circuit, use the Thevenin-equivalent resistance. Remember to
+	// also feed the Thevenin-equivalent voltage to the input(s) in that case.
+	ca3280_vca_lin_device &set_rplus(float r);
+	ca3280_vca_lin_device &set_rminus(float r);
+
+	float diff(float p, float m) const override;
 
 protected:
 	float cv_to_gain(float cv) const override;
+
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 
 private:
 	void update_cv_scale();
@@ -199,10 +228,14 @@ private:
 	static float i_d(float r, float v_r, float v_minus) ATTR_COLD;
 
 	// Configuration. Not needed in save state.
-	const float m_i_d_inv;
-	float m_input_scale;
+	const float m_id;
 	float m_output_scale;
 	float m_cv_scale;
+
+	// state
+	float m_rp;
+	float m_rm;
+	float m_r_inv;
 };
 
 #endif  // MAME_SOUND_VA_VCA_H

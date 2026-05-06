@@ -28,7 +28,6 @@ public:
 
 	auto spi_in_cb() { return m_spi_in_cb.bind(); }
 	auto spi_out_cb() { return m_spi_out_cb.bind(); }
-	auto spi_out_dir_cb() { return m_spi_out_dir_cb.bind(); }
 
 	void program_internal(address_map &map) ATTR_COLD;
 	void data_internal(address_map &map) ATTR_COLD;
@@ -109,8 +108,6 @@ protected:
 
 	devcb_read8 m_spi_in_cb;
 	devcb_write8 m_spi_out_cb;
-	devcb_write_line m_spi_out_dir_cb;
-
 
 	// for the debugger
 	uint8_t m_rtemp;

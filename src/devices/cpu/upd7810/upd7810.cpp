@@ -436,6 +436,7 @@ upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, 
 	, m_pf_out_cb(*this)
 	, m_pt_in_cb(*this, 0) // TODO: uPD7807 only
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_ram_view(*this, "ram_view")
 	, m_pa_pullups(0xff)
 	, m_pb_pullups(0xff)
@@ -565,6 +566,14 @@ device_memory_interface::space_config_vector upd7810_device::memory_space_config
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
+device_memory_interface::space_config_vector upd7801_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO, &m_io_config)
 	};
 }
 
@@ -710,9 +719,11 @@ uint8_t upd7810_device::read_pc()
 
 uint8_t upd7801_device::read_pc()
 {
+	const u8 inputs = 0x84 | (m_mc & 0x03);
+
 	if ((m_mc & 0x87) && !m_pc_in_cb.isunset())  // NS20031301 no need to read if the port is set as output
-		m_pc_in = m_pc_in_cb(0, 0x84 | (m_mc & 0x03));
-	uint8_t data = (m_pc_in & 0x87) | (m_pc_out & ~0x87);
+		m_pc_in = m_pc_in_cb(0, inputs);
+	uint8_t data = (m_pc_in & inputs) | (m_pc_out & ~inputs);
 	if (!BIT(m_mc, 2))  /* TODO PC2 = -SCS input */
 		data = (data & ~0x04) | 0x04;
 	if (!BIT(m_mc, 7))  /* TODO PC7 = HOLD input */
@@ -801,12 +812,14 @@ void upd7810_device::write_pc(uint8_t data)
 
 void upd7801_device::write_pc(uint8_t data)
 {
-	data = (data & 0x78) | (m_pc_pullups & ~0x78);
+	const u8 inputs = 0x84 | (m_mc & 0x03);
+
+	data = (data & ~inputs) | (m_pc_pullups & inputs);
 	if (!BIT(m_mc, 3))  /* TODO PC3 = SAK output */
 		data = (data & ~0x08);
 	if (!BIT(m_mc, 4))  /* PC4 = TO output */
 		data = (data & ~0x10) | (m_to & 1 ? 0x10 : 0x00);
-	if (!BIT(m_mc, 5))  /* TODO PC5 = IO/-M input */
+	if (!BIT(m_mc, 5))  /* TODO PC5 = IO/-M output */
 		data = (data & ~0x20);
 	if (!BIT(m_mc, 6))  /* TODO PC6 = HLDA output */
 		data = (data & ~0x40);
@@ -1670,6 +1683,8 @@ void upd7810_device::base_device_start()
 {
 	space(AS_PROGRAM).specific(m_program);
 	space(AS_PROGRAM).cache(m_opcodes);
+	if (has_space(AS_IO))
+		space(AS_IO).specific(m_io);
 
 	configure_ops();
 

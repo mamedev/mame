@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /*
 
-c140.cpp
+Namco C140
 
 Simulator based on AMUSE sources.
 The C140 sound chip is used by Namco System 2 and System 21
@@ -21,7 +21,8 @@ TODO:
 - Acknowledge A9 bit (9th address bit) of host interface
 - Verify data bus bits of C219
 - Verify C219 LFSR algorithm (same as c352.cpp?)
-- Verify unknown mode bits (0x40 for C140, 0x02 for C219)
+- Verify unknown mode bits (eg. Final Lap & Winning Run games)
+- Verify status register (see keyon_status_read)
 
 --------------
 
@@ -459,9 +460,11 @@ inline u8 c140_device::keyon_status_read(u16 offset)
 	m_stream->update();
 	C140_VOICE const &v = m_voi[offset >> 4];
 
-	// suzuka 8 hours and final lap games read from here, expecting bit 6 to be an in-progress sample flag.
-	// four trax also expects bit 4 high for some specific channels to make engine noises to work properly
-	// (sounds kinda bogus when player crashes in an object and jump spin, needs real HW verification)
+	// Suzuka 8 Hours and Final Lap games read from here, expecting bit 6 to be
+	// an in-progress sample flag. Simply returning the register value, even after
+	// clearing the highest 2 bits after keyoff won't work.
+	// Four Trax also expects bit 4 high for some specific channels (the loop flag),
+	// so assume that part of register 0x5 is still returned as normal.
 	return (v.key ? 0x40 : 0x00) | (m_REG[offset] & 0x3f);
 }
 
@@ -499,7 +502,7 @@ void c140_device::c140_w(offs_t offset, u8 data)
 
 		if ((offset & 0xf) == 0x5)
 		{
-			if (data & 0x80)
+			if (data & 0x80 || (data & 0x40 && v->key))
 			{
 				const struct voice_registers *vreg = (struct voice_registers *) &m_REG[offset & 0x1f0];
 				v->key = 1;
@@ -598,7 +601,7 @@ void c219_device::c219_w(offs_t offset, u8 data)
 
 		if ((offset & 0xf) == 0x5)
 		{
-			if (data & 0x80)
+			if (data & 0x80 || (data & 0x40 && v->key))
 			{
 				const struct voice_registers *vreg = (struct voice_registers *) &m_REG[offset & 0x1f0];
 				v->key = 1;

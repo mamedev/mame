@@ -26,8 +26,8 @@ namespace ui {
     IMPLEMENTATION
 ***************************************************************************/
 
-menu_control_floppy_image::menu_control_floppy_image(mame_ui_manager &mui, render_container &container, device_image_interface &image) :
-	menu_control_device_image(mui, container, image),
+menu_control_floppy_image::menu_control_floppy_image(mame_ui_manager &mui, render_target &target, device_image_interface &image) :
+	menu_control_device_image(mui, target, image),
 	fd(dynamic_cast<floppy_image_device &>(image)),
 	input_format(nullptr),
 	output_format(nullptr),
@@ -99,7 +99,7 @@ void menu_control_floppy_image::hook_load(const std::string &filename)
 		}
 		menu::stack_push<menu_select_rw>(
 				ui(),
-				container(),
+				target(),
 				can_in_place,
 				[this] (menu_select_rw::result result)
 				{
@@ -123,7 +123,7 @@ void menu_control_floppy_image::hook_load(const std::string &filename)
 						break;
 
 					case menu_select_rw::result::WRITE_OTHER:
-						menu::stack_push<menu_file_create>(ui(), container(), &m_image, m_current_directory, m_current_file, m_create_ok);
+						menu::stack_push<menu_file_create>(ui(), target(), &m_image, m_current_directory, m_current_file, m_create_ok);
 						m_state = CHECK_CREATE;
 						break;
 
@@ -159,7 +159,7 @@ void menu_control_floppy_image::menu_activated()
 				format_array.push_back(i);
 		}
 		output_format = nullptr;
-		menu::stack_push<menu_select_format>(ui(), container(), format_array, ext_match, &output_format);
+		menu::stack_push<menu_select_format>(ui(), target(), format_array, ext_match, &output_format);
 
 		m_state = SELECT_FORMAT;
 		break;
@@ -184,7 +184,7 @@ void menu_control_floppy_image::menu_activated()
 				stack_pop();
 			} else {
 				m_submenu_result.i = -1;
-				menu::stack_push<menu_select_floppy_init>(ui(), container(), std::move(fs), &m_submenu_result.i);
+				menu::stack_push<menu_select_floppy_init>(ui(), target(), std::move(fs), &m_submenu_result.i);
 				m_state = SELECT_INIT;
 			}
 		}

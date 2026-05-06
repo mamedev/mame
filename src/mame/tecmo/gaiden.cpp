@@ -2001,6 +2001,46 @@ ROM_START( raiga )
 	ROM_LOAD( "a-4a.4",           0x00000, 0x20000, CRC(ef9acdcf) SHA1(8d62a666843f0cb22e8926ae18a961052d4f9ed5) )
 ROM_END
 
+ROM_START( raigaa )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "6299-a.3s", 0x00000, 0x20000, CRC(20d00c38) SHA1(ef4e11309d7478ad7c4048efa4ddedcecc11c59a) )
+	ROM_LOAD16_BYTE( "6299-a.4s", 0x00001, 0x20000, CRC(6f129e5f) SHA1(8fe8bb2b82897da02fa31044e0e19f8ce37bd969) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "6299-a.4b",        0x00000, 0x10000, CRC(18655c95) SHA1(8357e0520565a201bb930cadffc759463931ec41) )
+
+	ROM_REGION( 0x0800, "mcu", 0 )  // protection NEC D8749
+	ROM_LOAD( "6299-a.6v",        0x00000, 0x00800, NO_DUMP )
+
+	ROM_REGION( 0x10000, "txtiles", 0 )
+	ROM_LOAD( "6299-b.7a",        0x00000, 0x10000, CRC(6d2e4bf1) SHA1(edcf96bbcc109da71e3adbb37d119254d3873b29) )
+
+	ROM_REGION( 0x100000, "bgtiles", 0 )
+	ROM_LOAD( "6299-b.3a",        0x00000, 0x20000, CRC(41fee9a9) SHA1(6560c1981553f3f777ce7445404d73a6ceaebcbb) )
+	ROM_LOAD( "6299-b.3c",        0x20000, 0x20000, CRC(365ac6e9) SHA1(bd4d89d6abcf81612842ed171026e29f8c4ae798) )
+	ROM_LOAD( "6299-b.1a",        0x40000, 0x20000, CRC(70939226) SHA1(fb99f7e9aab9b3755b618e31c951c930046550dd) )
+	ROM_LOAD( "6299-b.1c",        0x60000, 0x20000, CRC(118adc77) SHA1(4e9aae117b398f93fc1db6017d4af2ef66e1cca0) )
+
+	ROM_REGION( 0x80000, "fgtiles", 0 )
+	ROM_LOAD( "6299-b.6a",        0x00000, 0x20000, CRC(23531bf0) SHA1(d156e5a56816efa003534ecd74de9a38d56b510b) )
+	ROM_LOAD( "6299-b.6c",        0x20000, 0x20000, CRC(59a1a0ca) SHA1(022a0a9d9dc015cb3cb63b1b518c560e0f557a69) )
+	ROM_LOAD( "6299-b.4a",        0x40000, 0x20000, CRC(1651cf8d) SHA1(7178868f945dc4f113a735a61d63a1e6987a6063) )
+	ROM_LOAD( "6299-b.4c",        0x60000, 0x20000, CRC(bbb38435) SHA1(2850d874bf283a2a08153ea563dfbec5f5f66765) )
+
+	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "6299-b.3m", 0x00000, 0x20000, CRC(1cc5f809) SHA1(38d89cac6962d235f4145e117b2029bce7160d4e) )
+	ROM_LOAD16_BYTE( "6299-b.3p", 0x40000, 0x20000, CRC(2f38d008) SHA1(2ab0b0e7a346d8fca39e5d9280501760bfe1f74d) )
+	ROM_LOAD16_BYTE( "6299-b.3r", 0x80000, 0x20000, CRC(1fbe9e5f) SHA1(eb27433384584a1d1f7c5462077c245671ee4e15) )
+	ROM_LOAD16_BYTE( "6299-b.3t", 0xC0000, 0x20000, CRC(e6c88497) SHA1(047057200aa3df6fc5d17ce5b4cc2aa0ab0e909c) )
+	ROM_LOAD16_BYTE( "6299-b.1m", 0x00001, 0x20000, CRC(a31e251d) SHA1(5ea99292df8a0029075a4bd22ec734a5b0f3c6a8) )
+	ROM_LOAD16_BYTE( "6299-b.1p", 0x40001, 0x20000, CRC(c0d2cf20) SHA1(0d90a910cd76f32bbed33bf98e4089dca111dad3) )
+	ROM_LOAD16_BYTE( "6299-b.1r", 0x80001, 0x20000, CRC(b3ede4fd) SHA1(1e66f4ee961d4c9b605a24faf0fbb047e6f43156) )
+	ROM_LOAD16_BYTE( "6299-b.1t", 0xC0001, 0x20000, CRC(f2480160) SHA1(e95828f99ba1355d77f9c75a057d79209f6669db) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "6299-a.4a",        0x00000, 0x20000, CRC(ef9acdcf) SHA1(8d62a666843f0cb22e8926ae18a961052d4f9ed5) )
+ROM_END
+
 /*
 Dragon Bowl
 Nics, 1992
@@ -2222,4 +2262,5 @@ GAME( 1989, wildfangs, wildfang, wildfang, tknight,  wildfang_state, init_wildfa
 GAME( 1989, tknight,   wildfang, wildfang, tknight,  wildfang_state, init_wildfang,  ROT0,   "Tecmo",   "Tecmo Knight (US)",                                        MACHINE_SUPPORTS_SAVE ) // has WDUD screen during attract, promotional material is in English
 
 GAME( 1991, stratof,   0,        raiga,    raiga,    raiga_state,    init_raiga,     ROT0,   "Tecmo",   "Raiga - Strato Fighter (US)",                              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, raiga,     stratof,  raiga,    raiga,    raiga_state,    init_raiga,     ROT0,   "Tecmo",   "Raiga - Strato Fighter (Japan)",                           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, raiga,     stratof,  raiga,    raiga,    raiga_state,    init_raiga,     ROT0,   "Tecmo",   "Raiga - Strato Fighter (Japan, set 1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, raigaa,    stratof,  raiga,    raiga,    raiga_state,    init_raiga,     ROT0,   "Tecmo",   "Raiga - Strato Fighter (Japan, set 2)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -304,6 +304,12 @@ void sdl_window_info::update_cursor_state()
 
 int sdl_window_info::xy_to_render_target(int x, int y, int *xt, int *yt)
 {
+	osd_dim const logical = get_size();
+	osd_dim const pixel = get_size_pixels();
+	float const x_scale = pixel.width() / logical.width();
+	float const y_scale = pixel.height() / logical.height();
+	x = std::lround(x * x_scale);
+	y = std::lround(y * y_scale);
 	return renderer().xy_to_render_target(x, y, xt, yt);
 }
 
@@ -866,6 +872,7 @@ int sdl_window_info::complete_create()
 		SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, temp.width());
 		SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, temp.height());
 		SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_RESIZABLE_BOOLEAN, true);
+		SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_HIGH_PIXEL_DENSITY_BOOLEAN, true);
 	}
 
 	if (fullscreen())
@@ -1252,6 +1259,18 @@ osd_dim sdl_window_info::get_size()
 
 
 //============================================================
+//  get_size_pixels
+//============================================================
+
+osd_dim sdl_window_info::get_size_pixels()
+{
+	int w = 0, h = 0;
+	SDL_GetWindowSizeInPixels(platform_window(), &w, &h);
+	return osd_dim(w, h);
+}
+
+
+//============================================================
 //  get_max_bounds
 //  (window thread)
 //============================================================
@@ -1354,7 +1373,6 @@ sdl_window_info::sdl_window_info(
 	, m_minimum_dim(0, 0)
 	, m_windowed_dim(0, 0)
 	, m_rendered_event(0, 1)
-	, m_extra_flags(0)
 	, m_mouse_captured(false)
 	, m_mouse_hidden(false)
 	, m_pointer_mask(0)

@@ -706,7 +706,7 @@ static INPUT_PORTS_START( ampoker2 )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Operator Key") PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Operator Key") PORT_TOGGLE
 	PORT_DIPNAME( 0x08, 0x08, "Remote Mode" )
 	PORT_DIPSETTING(    0x08, "Mode 1" )
 	PORT_DIPSETTING(    0x00, "Mode 2" )
@@ -791,7 +791,7 @@ static INPUT_PORTS_START( ampkr95 )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Operator Key") PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Operator Key") PORT_TOGGLE
 	PORT_DIPNAME( 0x08, 0x08, "Remote Mode" )
 	PORT_DIPSETTING(    0x08, "Mode 1" )
 	PORT_DIPSETTING(    0x00, "Mode 2" )
@@ -876,7 +876,7 @@ static INPUT_PORTS_START( sigmapkr )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Operator Key") PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Operator Key") PORT_TOGGLE
 	PORT_DIPNAME( 0x08, 0x08, "Remote Mode" )
 	PORT_DIPSETTING(    0x08, "Mode 1" )
 	PORT_DIPSETTING(    0x00, "Mode 2" )
@@ -960,7 +960,7 @@ static INPUT_PORTS_START( sigma2k )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Operator Key") PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Operator Key") PORT_TOGGLE
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1059,7 +1059,7 @@ static INPUT_PORTS_START( piccolop )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal/Take")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Operator Key") PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Operator Key") PORT_TOGGLE
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1457,6 +1457,10 @@ ROM_START( rabbitpk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "poldi_ren.u6", 0x0000, 0x10000, CRC(ef0d5b47) SHA1(5d209c803ab8ced08953d24202a364ce1aa677c2) )
 
+	ROM_REGION( 0x880, "pic", 0 )
+	ROM_LOAD( "pic16f84_code.u6", 0x000, 0x800, NO_DUMP )
+	ROM_LOAD( "pic16f84_data.u6", 0x800, 0x080, NO_DUMP )
+
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "poldi_graf.u47", 0x0000, 0x4000, CRC(f1807f39) SHA1(631645272c7508104749e0ff1357bd74098851d5) )
 
@@ -1588,7 +1592,7 @@ GAMEL( 1995, ampkr95,    ampoker2, ampoker2, ampkr95,  ampoker2_state, empty_ini
 GAMEL( 1990, pkrdewin,   ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "Poker De Win",                                 MACHINE_SUPPORTS_SAVE,                       layout_ampoker2 )
 GAMEL( 1990, videomat,   ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "Videomat (Polish bootleg)",                    MACHINE_SUPPORTS_SAVE,                       layout_ampoker2 )
 GAME(  1991, piccolop,   ampoker2, ampoker2, piccolop, ampoker2_state, empty_init,    ROT0, "Admiral/Novomatic", "Piccolo Poker 100",                            MACHINE_SUPPORTS_SAVE )
-GAMEL( 1990, rabbitpk,   ampoker2, ampoker2, ampoker2, ampoker2_state, init_rabbitpk, ROT0, "bootleg",           "Rabbit Poker (Arizona Poker v1.1?)",           MACHINE_SUPPORTS_SAVE,                       layout_ampoker2 )
+GAMEL( 1990, rabbitpk,   ampoker2, ampoker2, ampoker2, ampoker2_state, init_rabbitpk, ROT0, "bootleg",           "Rabbit Poker (Arizona Poker v1.1?)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_ampoker2 ) // undumped PIC for protection?
 GAMEL( 1995, arizna10,   ampoker2, ampoker2, ampoker2, ampoker2_state, init_rabbitpk, ROT0, "bootleg (Ri.Bi)",   "Arizona 10 (v1.1)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_ampoker2 ) // undumped PIC for protection?
 
 // different games not based on american poker 2

@@ -21,7 +21,7 @@ namespace ui {
 class menu_audio_effects : public menu
 {
 public:
-	menu_audio_effects(mame_ui_manager &mui, render_container &container);
+	menu_audio_effects(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_audio_effects() override;
 
 protected:

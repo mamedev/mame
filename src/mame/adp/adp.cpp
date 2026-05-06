@@ -640,9 +640,9 @@ ROM_START( quickjac )
 ROM_END
 
 ROM_START(sbsoli)
-    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD16_BYTE( "skat_bierskat_solitaire_f2_i.u2", 0x00000, 0x20000, CRC(314390cf) SHA1(86c2f4e120235eba379ec54f2afea59e68c94e7e))
-    ROM_LOAD16_BYTE( "skat_bierskat_solitaire_f2_ii.u6", 0x00001, 0x20000, CRC(6e7f88cc) SHA1(07e306222cbd94ab7a39be2685941d12c82645fb))
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "skat_bierskat_solitaire_f2_i.u2", 0x00000, 0x20000, CRC(314390cf) SHA1(86c2f4e120235eba379ec54f2afea59e68c94e7e))
+	ROM_LOAD16_BYTE( "skat_bierskat_solitaire_f2_ii.u6", 0x00001, 0x20000, CRC(6e7f88cc) SHA1(07e306222cbd94ab7a39be2685941d12c82645fb))
 
 	ROM_REGION16_BE( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "skat_bier_solitaire_video_f1_i.u2", 0x00000, 0x80000, CRC(3726a21e) SHA1(63fd2f01ce6103ef9a2c585f1045091dfc4b3408))
@@ -745,19 +745,19 @@ ROM_START( funlddlx4 )
 ROM_END
 
 ROM_START( fstation7 )
-    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_f1_i.u2", 0x00000, 0x80000, CRC(bbf4bbd9) SHA1(80e785cb04213f8cc2f580b523e20b4825ba45e5))
-    ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_f1_ii.u6", 0x00001, 0x80000, CRC(cd8ab9e3) SHA1(cb9206d0367f00bec278cee0a4115594ba715fcd))
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_f1_i.u2", 0x00000, 0x80000, CRC(bbf4bbd9) SHA1(80e785cb04213f8cc2f580b523e20b4825ba45e5))
+	ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_f1_ii.u6", 0x00001, 0x80000, CRC(cd8ab9e3) SHA1(cb9206d0367f00bec278cee0a4115594ba715fcd))
 
-    ROM_REGION16_BE( 0x100000, "gfx1", 0)
-    ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_video_f1_i.u2", 0x00000, 0x80000, CRC(dcddb25a) SHA1(7c54bd7a368fd57e3eb995a26462b3d2d589b0db))
-    ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_video_f1_ii.u5", 0x00001, 0x80000, CRC(400f9b8f) SHA1(4c4a9f46016eee805653b5fae65680225ac71436))
+	ROM_REGION16_BE( 0x100000, "gfx1", 0)
+	ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_video_f1_i.u2", 0x00000, 0x80000, CRC(dcddb25a) SHA1(7c54bd7a368fd57e3eb995a26462b3d2d589b0db))
+	ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_video_f1_ii.u5", 0x00001, 0x80000, CRC(400f9b8f) SHA1(4c4a9f46016eee805653b5fae65680225ac71436))
 ROM_END
 
 ROM_START( fstation8 )
-    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD16_BYTE("m27c4001_spielekoffer_8_sp_f1_i.u2", 0x00000, 0x80000, CRC(f9c792ab) SHA1(30ab7352cce22340be87ddae80e4b3c2f69ea778))
-    ROM_LOAD16_BYTE("m27c4001_spielekoffer_8_sp_f1_ii.u5", 0x00001, 0x80000, CRC(0cb7b719) SHA1(e87bc67da903d9514dd97a6abf2d4e2171e15dbd))
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE("m27c4001_spielekoffer_8_sp_f1_i.u2", 0x00000, 0x80000, CRC(f9c792ab) SHA1(30ab7352cce22340be87ddae80e4b3c2f69ea778))
+	ROM_LOAD16_BYTE("m27c4001_spielekoffer_8_sp_f1_ii.u5", 0x00001, 0x80000, CRC(0cb7b719) SHA1(e87bc67da903d9514dd97a6abf2d4e2171e15dbd))
 
 	ROM_REGION16_BE( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "spielekoffer_8_sp_video_1.u2", 0x00000, 0x80000, NO_DUMP )
@@ -775,9 +775,9 @@ ROM_START( fstation )
 ROM_END
 
 ROM_START(trumpfas)
-    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD16_BYTE( "trumpf_as_dm_f2_pr1.u2", 0x00000, 0x20000, CRC(542b1517) SHA1(fcddb31b4b429c8d67161037d356861413567bb8))
-    ROM_LOAD16_BYTE( "trumpf_as_dm_f2_pr2.u6", 0x00001, 0x20000, CRC(d39bbd88) SHA1(64f47fd0076845ed3f9f3e84aca3504c110ad8ad))
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "trumpf_as_dm_f2_pr1.u2", 0x00000, 0x20000, CRC(542b1517) SHA1(fcddb31b4b429c8d67161037d356861413567bb8))
+	ROM_LOAD16_BYTE( "trumpf_as_dm_f2_pr2.u6", 0x00001, 0x20000, CRC(d39bbd88) SHA1(64f47fd0076845ed3f9f3e84aca3504c110ad8ad))
 
 	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "trumpf_as_video_1.u2", 0x00000, 0x20000, NO_DUMP )
@@ -789,7 +789,7 @@ ROM_END
 
 GAME( 1993, quickjac,  0,        quickjac, quickjac, adp_state, empty_init, ROT0, "ADP",     "Quick Jack",                        0 )
 GAME( 1994, skattv,    0,        skattv,   skattv,   adp_state, empty_init, ROT0, "ADP",     "Skat TV",                           0 )
-GAME( 1994, trumpfas,  skattv,   skattv,   skattv,   adp_state, empty_init, ROT0, "ADP",     "Trumpf As",             			  MACHINE_NOT_WORKING ) // throws FOUL error on startup
+GAME( 1994, trumpfas,  skattv,   skattv,   skattv,   adp_state, empty_init, ROT0, "ADP",     "Trumpf As",                         MACHINE_NOT_WORKING ) // throws FOUL error on startup
 GAME( 1995, skattva,   skattv,   skattva,  skattva,  adp_state, empty_init, ROT0, "ADP",     "Skat TV (version TS3)",             0 )
 GAME( 1997, fashiong,  0,        fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Fashion Gambler (set 1)",           0 )
 GAME( 1997, fashiong2, fashiong, fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Fashion Gambler (set 2)",           0 )

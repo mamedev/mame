@@ -13,6 +13,9 @@
     - IC111: NEC D43257AGU-15L (256Kbit Static RAM)
     - IC112: NEC D23C4000GF A69 (4Mbit Mask ROM)
 
+    References:
+    - http://videogamekraken.com/pi-et1-by-nec
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -37,6 +40,7 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_rtc(*this, "rtc")
 		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
 	{ }
 
 	void piet1(machine_config &config) ATTR_COLD;
@@ -50,11 +54,16 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<upd4991a_device> m_rtc;
 	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	void bank_switch(u8 bank, u8 entry);
 	void piet1_io_map(address_map &map) ATTR_COLD;
 	void piet1_map(address_map &map) ATTR_COLD;
-	void piet1_palette(palette_device &palette) const ATTR_COLD { }
+	void palette_init(palette_device &palette) const ATTR_COLD {
+		// TODO: refine
+		palette.set_pen_color(0, rgb_t(160, 168, 160));
+		palette.set_pen_color(1, rgb_t(126, 156, 190));
+	}
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return 0; }
 };
 
@@ -69,6 +78,9 @@ void piet1_state::piet1_io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
+
+//  map(0x00, 0x07).portr PC-88 style keyboard scan?
+	map(0x04, 0x04).portr("IN4");
 	map(0x20, 0x20).lw8(
 		NAME([this](u8 data) {
 			logerror("%s: io_20_w %02x\n", machine().describe_context(), data);
@@ -79,6 +91,8 @@ void piet1_state::piet1_io_map(address_map &map)
 			logerror("%s: io_21_w %02x\n", machine().describe_context(), data);
 			bank_switch(3, data);
 		}));
+//  map(0x30, 0x30).select(6) video index?
+//  map(0x31, 0x31).select(6) video data?
 	map(0x70, 0x70).lr8(
 		NAME([this]() {
 			logerror("%s: io_70_r\n", machine().describe_context());
@@ -93,6 +107,15 @@ void piet1_state::piet1_map(address_map &map)
 	map(0x8000, 0xbfff).bankr(m_banks[2]);
 	map(0xc000, 0xffff).bankr(m_banks[3]);
 }
+
+static INPUT_PORTS_START( piet1 )
+	PORT_START("IN4")
+	// TODO: possibly lock toggle?
+	// Puts the system in sleep mode, disables irq
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 
 void piet1_state::machine_start()
 {
@@ -114,6 +137,8 @@ void piet1_state::piet1(machine_config &config)
 	Z80(config, m_maincpu, 8_MHz_XTAL); // FIXME: Guessed (D70008A-6 = 6MHz).
 	m_maincpu->set_addrmap(AS_PROGRAM, &piet1_state::piet1_map);
 	m_maincpu->set_addrmap(AS_IO, &piet1_state::piet1_io_map);
+	// TODO: should be a periodic int, not vblank
+	m_maincpu->set_vblank_int("screen", FUNC(piet1_state::irq0_line_hold));
 
 	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0x00);
 
@@ -126,11 +151,13 @@ void piet1_state::piet1(machine_config &config)
 	m_screen->set_screen_update(FUNC(piet1_state::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(piet1_state::piet1_palette), 2);
+	PALETTE(config, m_palette, FUNC(piet1_state::palette_init), 2);
+
+	// TODO: sound, likely DAC1BIT
 }
 
 ROM_START( piet1 )
-	ROM_REGION16_LE(0x80000, "mask_rom", 0)
+	ROM_REGION(0x80000, "mask_rom", 0)
 	ROM_LOAD("d23c4000gf-a69.ic112", 0x00000, 0x80000, CRC(e175fb54) SHA1(db5f72904b7f6a82a728a7ce968612673119def4))
 ROM_END
 
@@ -138,4 +165,4 @@ ROM_END
 
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME                  FLAGS
-COMP( 1990, piet1, 0,      0,      piet1,   0,     piet1_state, empty_init, "NEC",   "Electronic Tool PI-ET1", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+COMP( 1990, piet1, 0,      0,      piet1,   piet1, piet1_state, empty_init, "NEC",   "Electronic Tool PI-ET1", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

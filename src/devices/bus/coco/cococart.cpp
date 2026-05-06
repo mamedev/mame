@@ -556,7 +556,7 @@ static std::error_condition read_coco_rpk(std::unique_ptr<util::random_read> &&s
 			return err;
 
 		// copy the bytes
-		offs_t size = (offs_t) std::min(contents.size(), (size_t)cart_length - pos);
+		size_t const size = std::min<size_t>(contents.size(), cart_length - pos);
 		memcpy(&mem[pos], &contents[0], size);
 		pos += size;
 	}
