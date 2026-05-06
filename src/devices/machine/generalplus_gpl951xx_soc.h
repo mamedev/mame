@@ -114,13 +114,11 @@ private:
 	u16 m_spifc_rx_bc;
 	u16 m_spifc_tx_bc;
 	u16 m_spifc_timing;
-	u32 m_spifc_hackident; // hack, this should come from SPI command 9f
-	u8  m_bytes_in_spifc_rx_fifo;
+	u8 m_bytes_in_spifc_rx_fifo;
 	u8 m_spifc_rx_fifo[16 * 2];
 	u16 m_spifc_rx_read_latch;
 
 	u16 m_spi_bank;
-
 
 	// config
 	u8 *m_spiregion;

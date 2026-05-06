@@ -365,7 +365,6 @@ void generalplus_gpl951xx_device::device_start()
 	save_item(NAME(m_spifc_tx_bc));
 	save_item(NAME(m_spifc_timing));
 	save_item(NAME(m_bytes_in_spifc_rx_fifo));
-	save_item(NAME(m_spifc_hackident));
 	save_item(NAME(m_spi_bank));
 	save_item(NAME(m_spifc_rx_fifo));
 	save_item(NAME(m_spifc_rx_read_latch));
