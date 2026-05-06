@@ -13,6 +13,9 @@
 //#define VERBOSE 1
 #include "logmacro.h"
 
+// Transfer delays from the MB89352 datasheet.  In clocks, which are 125 nanoseconds at 8 MHz.
+static constexpr int XFER_DATA_SETUP_CLKS = 2;  // 2tCLF - 80 = 170 nanoseconds, so rounding up
+static constexpr int XFER_HANDSHAKE_CLKS = 1;   // 10 nanoseconds on the datasheet, so 125 is very conservative
 
 DEFINE_DEVICE_TYPE(MB87030, mb87030_device, "mb87030", "Fujitsu MB87030 SCSI controller")
 DEFINE_DEVICE_TYPE(MB89351, mb89351_device, "mb89351", "Fujitsu MB89351 SCSI controller")
@@ -225,6 +228,7 @@ TIMER_CALLBACK_MEMBER(mb87030_device::bus_free_timeout)
 void mb87030_device::scsi_command_complete()
 {
 	LOG("%s\n", __FUNCTION__);
+	m_dreq_handler(false);
 	m_ints |= INTS_COMMAND_COMPLETE;
 	m_ssts &= ~(SSTS_SPC_BUSY|SSTS_XFER_IN_PROGRESS);
 	update_ints();
@@ -234,6 +238,7 @@ void mb87030_device::scsi_command_complete()
 void mb87030_device::scsi_disconnect()
 {
 	LOG("%s: m_tc %d\n", __FUNCTION__, m_tc);
+	m_dreq_handler(false);
 	m_ssts &= ~(SSTS_INIT_CONNECTED|SSTS_TARG_CONNECTED|SSTS_SPC_BUSY|SSTS_XFER_IN_PROGRESS);
 	m_ints = INTS_DISCONNECTED;
 	update_ints();
@@ -400,6 +405,7 @@ void mb87030_device::step(bool timeout)
 
 		if (m_scsi_phase != (ctrl & S_PHASE_MASK)) {
 			LOG("SCSI phase change during transfer\n");
+			m_dreq_handler(false);
 			m_ints |= INTS_SERVICE_REQUIRED;
 			m_ssts &= ~SSTS_SPC_BUSY;
 			m_scsi_bus->data_w(m_scsi_refid, 0);
@@ -418,14 +424,14 @@ void mb87030_device::step(bool timeout)
 		}
 
 		update_state((ctrl & S_INP) ? State::TransferRecvData : State::TransferSendData);
-		if (m_dma_transfer && m_tc && !(ctrl & S_INP) && !m_fifo.full())
+		if (m_dma_transfer && m_tc && !(ctrl & S_INP) && (m_tc > m_fifo.queue_length()))
 			m_dreq_handler(true);
 		step(false);
 		break;
 
 	case State::TransferRecvData:
 		if (!m_tc && (m_scmd & SCMD_TERM_MODE)) {
-			update_state(State::TransferSendAck, 10);
+			update_state(State::TransferSendAck, XFER_DATA_SETUP_CLKS);
 			break;
 		}
 
@@ -456,13 +462,13 @@ void mb87030_device::step(bool timeout)
 		if (m_tc && !m_fifo.empty()) {
 			LOG("pulling write data: %02X (%d left)\n", data, m_fifo.queue_length() - 1);
 			m_scsi_bus->data_w(m_scsi_refid, m_fifo.dequeue());
-			update_state(State::TransferSendAck, 10);
+			update_state(State::TransferSendAck, XFER_DATA_SETUP_CLKS);
 			break;
 		}
 
 		if (!m_tc && (m_scmd & SCMD_TERM_MODE)) {
 			m_scsi_bus->data_w(m_scsi_refid, m_temp);
-			update_state(State::TransferSendAck, 10);
+			update_state(State::TransferSendAck, XFER_DATA_SETUP_CLKS);
 			break;
 		}
 		break;
@@ -473,20 +479,24 @@ void mb87030_device::step(bool timeout)
 
 		scsi_set_ctrl(S_ACK, S_ACK);
 		m_scsi_bus->ctrl_wait(m_scsi_refid, 0, S_REQ);
-		update_state(State::TransferWaitDeassertREQ, 10);
+		update_state(State::TransferWaitDeassertREQ, XFER_HANDSHAKE_CLKS);
 		break;
 
 	case State::TransferWaitDeassertREQ:
 		if (!(ctrl & S_REQ))
-			update_state(State::TransferDeassertACK, 10);
+			update_state(State::TransferDeassertACK, XFER_HANDSHAKE_CLKS);  // minimum is 35 ns, or 3.5 clocks at 8 MHz
 		break;
 
-	case State::TransferDeassertACK:
-		m_tc--;
+	case State::TransferDeassertACK: {
+		const bool is_terminal_byte = !m_tc && (m_scmd & SCMD_TERM_MODE);
+
+		if (!is_terminal_byte)
+			m_tc--;
+
 		if(m_tc)
-			update_state(State::TransferWaitReq, 10);
+			update_state(State::TransferWaitReq, XFER_HANDSHAKE_CLKS);
 		else
-			update_state(State::TransferWaitFifoEmpty, 10);
+			update_state(State::TransferWaitFifoEmpty, XFER_HANDSHAKE_CLKS);
 		m_scsi_bus->ctrl_wait(m_scsi_refid, S_REQ, S_REQ);
 
 		// deassert ATN after last byte of message out phase
@@ -495,6 +505,7 @@ void mb87030_device::step(bool timeout)
 		// deassert ACK except for last byte of message in phase
 		else if (m_tc || (ctrl & S_PHASE_MASK) != S_PHASE_MSG_IN)
 			scsi_set_ctrl(0, S_ACK);
+		}
 		break;
 
 	case State::TransferWaitFifoEmpty:
@@ -564,7 +575,9 @@ void mb87030_device::update_ssts()
 	else
 		m_ssts &= ~SSTS_DREQ_EMPTY;
 
-	if (m_fifo.full())
+	const bool dma_xfer = m_dma_transfer && (m_ssts & SSTS_XFER_IN_PROGRESS);
+
+	if (!dma_xfer && m_fifo.full())
 		m_ssts |= SSTS_DREQ_FULL;
 	else
 		m_ssts &= ~SSTS_DREQ_FULL;
@@ -619,6 +632,16 @@ void mb87030_device::scmd_w(uint8_t data)
 
 	if (!(m_sctl & SCTL_RESET_AND_DISABLE)) {
 		scsi_set_ctrl((m_scmd & SCMD_RST_OUT) ? S_RST : 0, S_RST);
+	}
+
+	if (m_scmd & SCMD_RST_OUT) {
+		m_dreq_handler(false);
+		m_fifo.clear();
+		m_scsi_bus->data_w(m_scsi_refid, 0);
+		m_ssts &= ~(SSTS_INIT_CONNECTED | SSTS_TARG_CONNECTED | SSTS_SPC_BUSY | SSTS_XFER_IN_PROGRESS);
+		update_state(State::Idle);
+		update_ints();
+		return;
 	}
 
 	switch (m_scmd & SCMD_CMD_MASK) {

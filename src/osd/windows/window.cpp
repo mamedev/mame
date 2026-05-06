@@ -372,6 +372,86 @@ inline BOOL handle_mouse_wheel(windows_osd_interface &osd, int v, int h, LPARAM 
 	return handled && !osd.options().lightgun() && !osd.options().mouse();
 }
 
+inline BOOL handle_pointer_update(windows_osd_interface &osd, HWND window, WPARAM wparam, LPARAM lparam)
+{
+	PointerUpdateEventArgs args;
+	args.window = window;
+	args.id = GET_POINTERID_WPARAM(wparam);
+	args.xpos = GET_X_LPARAM(lparam);
+	args.ypos = GET_Y_LPARAM(lparam);
+	args.vdelta = args.hdelta = 0;
+	args.isnew = IS_POINTER_NEW_WPARAM(wparam);
+	args.lost = IS_POINTER_CANCELED_WPARAM(wparam);
+	args.inrange = IS_POINTER_INRANGE_WPARAM(wparam);
+	args.incontact = IS_POINTER_INCONTACT_WPARAM(wparam);
+	args.primary = IS_POINTER_PRIMARY_WPARAM(wparam);
+	args.buttons[0] = IS_POINTER_FIRSTBUTTON_WPARAM(wparam);
+	args.buttons[1] = IS_POINTER_SECONDBUTTON_WPARAM(wparam);
+	args.buttons[2] = IS_POINTER_THIRDBUTTON_WPARAM(wparam);
+	args.buttons[3] = IS_POINTER_FOURTHBUTTON_WPARAM(wparam);
+	args.buttons[4] = IS_POINTER_FIFTHBUTTON_WPARAM(wparam);
+
+	bool const handled = osd.handle_input_event(INPUT_EVENT_POINTER_UPDATE, &args);
+
+	// When in lightgun mode or mouse mode, the pointer may be routed to the input system
+	// because the mouse interactions in the UI are routed from the video_window_proc below
+	// we need to make sure they aren't suppressed in these cases.
+	return handled && !osd.options().lightgun() && !osd.options().mouse();
+}
+
+inline BOOL handle_pointer_leave(windows_osd_interface &osd, HWND window, WPARAM wparam, LPARAM lparam)
+{
+	PointerUpdateEventArgs args;
+	args.window = window;
+	args.id = GET_POINTERID_WPARAM(wparam);
+	args.xpos = GET_X_LPARAM(lparam);
+	args.ypos = GET_Y_LPARAM(lparam);
+	args.vdelta = args.hdelta = 0;
+	args.isnew = false;
+	args.lost = true;
+	args.inrange = IS_POINTER_INRANGE_WPARAM(wparam);
+	args.incontact = IS_POINTER_INCONTACT_WPARAM(wparam);
+	args.primary = false;
+	args.buttons[0] = false;
+	args.buttons[1] = false;
+	args.buttons[2] = false;
+	args.buttons[3] = false;
+	args.buttons[4] = false;
+
+	bool const handled = osd.handle_input_event(INPUT_EVENT_POINTER_UPDATE, &args);
+
+	// When in lightgun mode or mouse mode, the pointer may be routed to the input system
+	// because the mouse interactions in the UI are routed from the video_window_proc below
+	// we need to make sure they aren't suppressed in these cases.
+	return handled && !osd.options().lightgun() && !osd.options().mouse();
+}
+
+inline BOOL handle_pointer_capture_change(windows_osd_interface &osd, HWND window, WPARAM wparam, LPARAM lparam)
+{
+	PointerUpdateEventArgs args;
+	args.window = window;
+	args.id = GET_POINTERID_WPARAM(wparam);
+	args.xpos = args.ypos = 0;
+	args.vdelta = args.hdelta = 0;
+	args.isnew = false;
+	args.lost = true;
+	args.inrange = false;
+	args.incontact = false;
+	args.primary = false;
+	args.buttons[0] = false;
+	args.buttons[1] = false;
+	args.buttons[2] = false;
+	args.buttons[3] = false;
+	args.buttons[4] = false;
+
+	bool const handled = osd.handle_input_event(INPUT_EVENT_POINTER_UPDATE, &args);
+
+	// When in lightgun mode or mouse mode, the pointer may be routed to the input system
+	// because the mouse interactions in the UI are routed from the video_window_proc below
+	// we need to make sure they aren't suppressed in these cases.
+	return handled && !osd.options().lightgun() && !osd.options().mouse();
+}
+
 inline BOOL handle_keypress(windows_osd_interface &osd, int vkey, int down, LPARAM lparam)
 {
 	KeyPressEventArgs args;
@@ -459,6 +539,22 @@ void windows_osd_interface::process_events(bool ingame, bool nodispatch)
 
 					case WM_MOUSEHWHEEL:
 						dispatch = !handle_mouse_wheel(*this, 0, GET_WHEEL_DELTA_WPARAM(message.wParam), message.lParam);
+						break;
+
+					// forward pointer events to the input system
+					case WM_POINTERENTER:
+					case WM_POINTERDOWN:
+					case WM_POINTERUP:
+					case WM_POINTERUPDATE:
+						dispatch = !handle_pointer_update(*this, message.hwnd, message.wParam, message.lParam);
+						break;
+
+					case WM_POINTERLEAVE:
+						dispatch = !handle_pointer_leave(*this, message.hwnd, message.wParam, message.lParam);
+						break;
+
+					case WM_POINTERCAPTURECHANGED:
+						dispatch = !handle_pointer_capture_change(*this, message.hwnd, message.wParam, message.lParam);
 						break;
 
 					// forward keystrokes to the input system

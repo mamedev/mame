@@ -227,9 +227,7 @@ u32 chloe_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 
 	screen.priority().fill(0, cliprect);
 	m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07);
-
-	const bool flash = u64(screen.frame_number() / m_frame_invert_count) & 1;
-	m_ula_scr->draw(screen, bitmap, clip256x192, flash, 0);
+	m_ula_scr->draw(screen, bitmap, clip256x192, 0);
 
 	return 0;
 }

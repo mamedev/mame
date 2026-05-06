@@ -475,17 +475,32 @@ public:
 	void triforcegd(machine_config &config);
 	void triforce_base(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
 private:
+	required_device<ppc_device> m_maincpu;
+
+	void gc_map(address_map &map) ATTR_COLD;
+
 	uint64_t gc_pi_r();
 	void gc_pi_w(uint64_t data);
 	uint64_t gc_exi_r();
 	void gc_exi_w(uint64_t data);
-	virtual void machine_start() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
-	uint32_t screen_update_triforce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	required_device<ppc_device> m_maincpu;
-	void gc_map(address_map &map) ATTR_COLD;
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
+
+void triforce_state::video_start()
+{
+}
+
+uint32_t triforce_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
+
 
 uint64_t triforce_state::gc_pi_r()
 {
@@ -511,16 +526,6 @@ void triforce_state::gc_map(address_map &map)
 	map(0x0c003000, 0x0c003fff).rw(FUNC(triforce_state::gc_pi_r), FUNC(triforce_state::gc_pi_w));
 	map(0x0c006800, 0x0c0068ff).rw(FUNC(triforce_state::gc_exi_r), FUNC(triforce_state::gc_exi_w));
 	map(0xfff00000, 0xffffffff).rom().region("maincpu", 0);  /* Program ROM */
-}
-
-
-void triforce_state::video_start()
-{
-}
-
-uint32_t triforce_state::screen_update_triforce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return 0;
 }
 
 static INPUT_PORTS_START( triforce )
@@ -597,13 +602,12 @@ void triforce_state::triforce_base(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 639, 0, 479);
-	screen.set_screen_update(FUNC(triforce_state::screen_update_triforce));
+	screen.set_screen_update(FUNC(triforce_state::screen_update));
 
 	PALETTE(config, "palette").set_entries(65536);
 }

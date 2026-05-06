@@ -422,7 +422,7 @@ u8 macii_state::iicx_via_in_a()
 
 u8 macii_state::via_in_b()
 {
-	int val = 0;
+	u8 val = 0;
 
 	if (!m_adb_irq_pending)
 	{
@@ -926,7 +926,7 @@ void macii_state::macii(machine_config &config)
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	SPEAKER(config, "speaker", 2).front();
-	ASC(config, m_asc, C15M, asc_device::asc_type::ASC);
+	ASC(config, m_asc, C15M);
 	m_asc->irqf_callback().set(FUNC(macii_state::mac_asc_irq));
 	m_asc->add_route(0, "speaker", 1.0, 0);
 	m_asc->add_route(1, "speaker", 1.0, 1);
@@ -943,15 +943,15 @@ void macii_state::macii(machine_config &config)
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(FUNC(macii_state::set_scc_interrupt));
-	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
-	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
 
-	rs232_port_device &rs232a(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
 	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 
-	rs232_port_device &rs232b(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	rs232_port_device &rs232b(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
@@ -1130,7 +1130,7 @@ void macii_state::macse30(machine_config &config)
 	NUBUS_SLOT(config, "pds030", "pds", mac_pds030_cards, nullptr);
 }
 
-static INPUT_PORTS_START( macadb )
+static INPUT_PORTS_START( macii )
 INPUT_PORTS_END
 
 ROM_START( macii )
@@ -1175,9 +1175,9 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS        INIT        COMPANY           FULLNAME
-COMP( 1987, macii,     0,        0,      macii,    macadb,  macii_state, macii_init, "Apple Computer", "Macintosh II",                 MACHINE_SUPPORTS_SAVE )
-COMP( 1987, maciihmu,  macii,    0,      maciihmu, macadb,  macii_state, macii_init, "Apple Computer", "Macintosh II (w/o 68851 MMU)", MACHINE_SUPPORTS_SAVE )
-COMP( 1988, mac2fdhd,  0,        0,      maciihd,  macadb,  macii_state, macii_init, "Apple Computer", "Macintosh II (FDHD)",          MACHINE_SUPPORTS_SAVE )
-COMP( 1988, maciix,    mac2fdhd, 0,      maciix,   macadb,  macii_state, macii_init, "Apple Computer", "Macintosh IIx",                MACHINE_SUPPORTS_SAVE )
-COMP( 1989, macse30,   mac2fdhd, 0,      macse30,  macadb,  macii_state, macii_init, "Apple Computer", "Macintosh SE/30",              MACHINE_SUPPORTS_SAVE )
-COMP( 1989, maciicx,   mac2fdhd, 0,      maciicx,  macadb,  macii_state, macii_init, "Apple Computer", "Macintosh IIcx",               MACHINE_SUPPORTS_SAVE )
+COMP( 1987, macii,     0,        0,      macii,    macii,   macii_state, macii_init, "Apple Computer", "Macintosh II",                 MACHINE_SUPPORTS_SAVE )
+COMP( 1987, maciihmu,  macii,    0,      maciihmu, macii,   macii_state, macii_init, "Apple Computer", "Macintosh II (w/o 68851 MMU)", MACHINE_SUPPORTS_SAVE )
+COMP( 1988, mac2fdhd,  0,        0,      maciihd,  macii,   macii_state, macii_init, "Apple Computer", "Macintosh II (FDHD)",          MACHINE_SUPPORTS_SAVE )
+COMP( 1988, maciix,    mac2fdhd, 0,      maciix,   macii,   macii_state, macii_init, "Apple Computer", "Macintosh IIx",                MACHINE_SUPPORTS_SAVE )
+COMP( 1989, macse30,   mac2fdhd, 0,      macse30,  macii,   macii_state, macii_init, "Apple Computer", "Macintosh SE/30",              MACHINE_SUPPORTS_SAVE )
+COMP( 1989, maciicx,   mac2fdhd, 0,      maciicx,  macii,   macii_state, macii_init, "Apple Computer", "Macintosh IIcx",               MACHINE_SUPPORTS_SAVE )

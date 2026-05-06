@@ -616,10 +616,10 @@ void validate_rgb()
 
 	// test factor multiplication (method)
 	imm = random_i32();
-	expected_a *= imm;
-	expected_r *= imm;
-	expected_g *= imm;
-	expected_b *= imm;
+	expected_a = expected_a * imm;
+	expected_r = expected_r * imm;
+	expected_g = expected_g * imm;
+	expected_b = expected_b * imm;
 	rgb.mul_imm(imm);
 	check_expected("rgbaint_t::mul_imm");
 
@@ -730,28 +730,28 @@ void validate_rgb()
 
 	// test uniform or
 	imm = random_i32();
-	expected_a |= imm;
-	expected_r |= imm;
-	expected_g |= imm;
-	expected_b |= imm;
+	expected_a = expected_a | imm;
+	expected_r = expected_r | imm;
+	expected_g = expected_g | imm;
+	expected_b = expected_b | imm;
 	rgb.or_imm(imm);
 	check_expected("rgbaint_t::or_imm");
 
 	// test uniform and
 	imm = random_i32();
-	expected_a &= imm;
-	expected_r &= imm;
-	expected_g &= imm;
-	expected_b &= imm;
+	expected_a = expected_a & imm;
+	expected_r = expected_r & imm;
+	expected_g = expected_g & imm;
+	expected_b = expected_b & imm;
 	rgb.and_imm(imm);
 	check_expected("rgbaint_t::and_imm");
 
 	// test uniform xor
 	imm = random_i32();
-	expected_a ^= imm;
-	expected_r ^= imm;
-	expected_g ^= imm;
-	expected_b ^= imm;
+	expected_a = expected_a ^ imm;
+	expected_r = expected_r ^ imm;
+	expected_g = expected_g ^ imm;
+	expected_b = expected_b ^ imm;
 	rgb.xor_imm(imm);
 	check_expected("rgbaint_t::xor_imm");
 

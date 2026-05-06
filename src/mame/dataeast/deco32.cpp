@@ -52,6 +52,8 @@
 
     Z80 Sound cpu version games : Music tempo is unverified (it has external timer / IRQ controller?).
 
+    Dragongun: Sprite flickers during attract demo
+
 
 
 Locked 'n Loaded (US)

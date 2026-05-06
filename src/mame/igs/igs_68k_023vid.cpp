@@ -16,6 +16,7 @@ TODO:
 #include "emu.h"
 
 #include "igs023_video.h"
+//#include "igs025.h"
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m68000/m68000.h"
@@ -130,10 +131,10 @@ void igs_68k_023vid_state::main_program_base_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 
 	map(0x800000, 0x81ffff).ram().share(m_mainram); // RAM test tests the full 0x20000, while in game it only seems to use 0x10000
-	map(0x900000, 0x907fff).mirror(0x0f8000).rw(m_video, FUNC(igs023_video_device::videoram_r), FUNC(igs023_video_device::videoram_w));
-	map(0xa00000, 0xa011ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0xa01200, 0xa023ff).ram(); // palette RAM test fails otherwise
-	map(0xb00000, 0xb0ffff).rw(m_video, FUNC(igs023_video_device::videoregs_r), FUNC(igs023_video_device::videoregs_w));
+	map(0x900000, 0x907fff).mirror(0x0f8000).m(m_video, FUNC(igs023_video_device::videoram_map));
+	map(0xa00000, 0xa013ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0xa01400, 0xa023ff).ram(); // palette RAM test fails otherwise
+	map(0xb00000, 0xb0ffff).m(m_video, FUNC(igs023_video_device::videoregs_map));
 }
 
 void igs_68k_023vid_state::main_program_xypmd_map(address_map &map)
@@ -236,20 +237,20 @@ void igs_68k_023vid_state::xypmd(machine_config &config)
 	m6502_device &subcpu(M6502(config, "subcpu", 8_MHz_XTAL)); // TODO: something M6502 derived (data.u13 is M6502 derived code)
 	subcpu.set_addrmap(AS_PROGRAM, &igs_68k_023vid_state::sub_program_map);
 
+	//IGS025(config, "igs025", 0);
+
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // TODO: verify everything once emulation works
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1000));
-	m_screen->set_size(512, 256);
-	m_screen->set_visarea(0, 448-1, 0, 224-1);
+	m_screen->set_raw(50_MHz_XTAL/5, 640, 0, 448, 264, 0, 224); // copied from igs/pgm.cpp, correct?
 	m_screen->set_screen_update("igs023", FUNC(igs023_video_device::screen_update));
 	m_screen->screen_vblank().set(FUNC(igs_68k_023vid_state::screen_vblank));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x1200 / 2);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x1400 / 2);
 
 	IGS023_VIDEO(config, m_video, 0);
 	m_video->set_palette("palette");
+	m_video->set_screen(m_screen);
 	m_video->read_spriteram_callback().set([this](offs_t offset) { return m_mainram[offset]; });
 
 	// sound hardware

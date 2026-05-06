@@ -719,9 +719,11 @@ uint8_t upd7810_device::read_pc()
 
 uint8_t upd7801_device::read_pc()
 {
+	const u8 inputs = 0x84 | (m_mc & 0x03);
+
 	if ((m_mc & 0x87) && !m_pc_in_cb.isunset())  // NS20031301 no need to read if the port is set as output
-		m_pc_in = m_pc_in_cb(0, 0x84 | (m_mc & 0x03));
-	uint8_t data = (m_pc_in & 0x87) | (m_pc_out & ~0x87);
+		m_pc_in = m_pc_in_cb(0, inputs);
+	uint8_t data = (m_pc_in & inputs) | (m_pc_out & ~inputs);
 	if (!BIT(m_mc, 2))  /* TODO PC2 = -SCS input */
 		data = (data & ~0x04) | 0x04;
 	if (!BIT(m_mc, 7))  /* TODO PC7 = HOLD input */
@@ -810,12 +812,14 @@ void upd7810_device::write_pc(uint8_t data)
 
 void upd7801_device::write_pc(uint8_t data)
 {
-	data = (data & 0x78) | (m_pc_pullups & ~0x78);
+	const u8 inputs = 0x84 | (m_mc & 0x03);
+
+	data = (data & ~inputs) | (m_pc_pullups & inputs);
 	if (!BIT(m_mc, 3))  /* TODO PC3 = SAK output */
 		data = (data & ~0x08);
 	if (!BIT(m_mc, 4))  /* PC4 = TO output */
 		data = (data & ~0x10) | (m_to & 1 ? 0x10 : 0x00);
-	if (!BIT(m_mc, 5))  /* TODO PC5 = IO/-M input */
+	if (!BIT(m_mc, 5))  /* TODO PC5 = IO/-M output */
 		data = (data & ~0x20);
 	if (!BIT(m_mc, 6))  /* TODO PC6 = HLDA output */
 		data = (data & ~0x40);

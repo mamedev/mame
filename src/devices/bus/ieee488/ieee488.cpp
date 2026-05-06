@@ -399,20 +399,20 @@ uint8_t ieee488_device::get_data()
 
 void cbm_ieee488_devices(device_slot_interface &device)
 {
-	device.option_add("c2040", C2040);
-	device.option_add("c3040", C3040);
-	device.option_add("c4040", C4040);
-	device.option_add("c8050", C8050);
-	device.option_add("c8250", C8250);
-	device.option_add("sfd1001", SFD1001);
-	device.option_add("c2031", C2031);
-	device.option_add("c8280", C8280);
-	device.option_add("d9060", D9060);
-	device.option_add("d9090", D9090);
-	device.option_add("softbox", SOFTBOX);
-	device.option_add("hardbox", HARDBOX);
-	device.option_add("shark", MSHARK);
-	device.option_add("c4023", C4023);
+	device.option_add("c2040", GPIB_C2040);
+	device.option_add("c3040", GPIB_C3040);
+	device.option_add("c4040", GPIB_C4040);
+	device.option_add("c8050", GPIB_C8050);
+	device.option_add("c8250", GPIB_C8250);
+	device.option_add("sfd1001", GPIB_SFD1001);
+	device.option_add("c2031", GPIB_C2031);
+	device.option_add("c8280", GPIB_C8280);
+	device.option_add("d9060", GPIB_D9060);
+	device.option_add("d9090", GPIB_D9090);
+	device.option_add("softbox", GPIB_SOFTBOX);
+	device.option_add("hardbox", GPIB_HARDBOX);
+	device.option_add("shark", GPIB_MSHARK);
+	device.option_add("c4023", GPIB_C4023);
 }
 
 //-------------------------------------------------
@@ -426,9 +426,9 @@ void cbm_ieee488_devices(device_slot_interface &device)
 
 void hp_ieee488_devices(device_slot_interface &device)
 {
-	device.option_add("hp9122c", HP9122C);
-	device.option_add("hp9133", HP9133);
-	device.option_add("hp9895", HP9895);
+	device.option_add("hp9122c", GPIB_HP9122C);
+	device.option_add("hp9133", GPIB_HP9133);
+	device.option_add("hp9895", GPIB_HP9895);
 }
 
 //-------------------------------------------------
@@ -440,7 +440,7 @@ void hp_ieee488_devices(device_slot_interface &device)
 
 void remote488_devices(device_slot_interface &device)
 {
-	device.option_add("remote488", REMOTE488);
+	device.option_add("remote488", GPIB_REMOTE488);
 }
 
 
@@ -453,7 +453,7 @@ void remote488_devices(device_slot_interface &device)
 
 void grid_ieee488_devices(device_slot_interface &device)
 {
-	device.option_add("grid2102", GRID2102).clock(XTAL(4'000'000));
-	device.option_add("grid2101_floppy", GRID2101_FLOPPY).clock(XTAL(4'000'000));
-	device.option_add("grid2101_hdd", GRID2101_HDD).clock(XTAL(4'000'000));
+	device.option_add("grid2102", GPIB_GRID2102).clock(XTAL(4'000'000));
+	device.option_add("grid2101_floppy", GPIB_GRID2101_FLOPPY).clock(XTAL(4'000'000));
+	device.option_add("grid2101_hdd", GPIB_GRID2101_HDD).clock(XTAL(4'000'000));
 }

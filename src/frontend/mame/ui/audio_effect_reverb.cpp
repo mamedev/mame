@@ -18,8 +18,8 @@
 
 namespace ui {
 
-menu_audio_effect_reverb::menu_audio_effect_reverb(mame_ui_manager &mui, render_container &container, u16 chain, u16 entry, audio_effect *effect)
-	: menu(mui, container)
+menu_audio_effect_reverb::menu_audio_effect_reverb(mame_ui_manager &mui, render_target &target, u16 chain, u16 entry, audio_effect *effect)
+	: menu(mui, target)
 {
 	m_chain = chain;
 	m_entry = entry;
@@ -537,7 +537,7 @@ u32 menu_audio_effect_reverb::flag_mode() const
 {
 	u32 flag = 0;
 	if(!m_effect->isset_mode())
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	if(m_effect->mode())
 		flag |= FLAG_LEFT_ARROW;
 	else
@@ -549,7 +549,7 @@ u32 menu_audio_effect_reverb::flag_tap_setup() const
 {
 	u32 flag = 0;
 	if(!m_effect->isset_early_tap_setup())
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	if(m_effect->early_tap_setup() != 0)
 		flag |= FLAG_LEFT_ARROW;
 	if(m_effect->early_tap_setup() != audio_effect_reverb::early_tap_setup_count() - 1)
@@ -571,7 +571,7 @@ u32 menu_audio_effect_reverb::flag_percent(double val, bool isset)
 {
 	u32 flag = 0;
 	if(!isset)
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	if(val > 0.0)
 		flag |= FLAG_LEFT_ARROW;
 	if(val < 100.0)
@@ -583,7 +583,7 @@ u32 menu_audio_effect_reverb::flag_freq(double val, bool isset)
 {
 	u32 flag = 0;
 	if(!isset)
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	if(val > 100.0)
 		flag |= FLAG_LEFT_ARROW;
 	if(val < 16000.0)
@@ -595,7 +595,7 @@ u32 menu_audio_effect_reverb::flag_ms(float val, bool isset)
 {
 	u32 flag = 0;
 	if(!isset)
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	if(val > 0.0f)
 		flag |= FLAG_LEFT_ARROW;
 	if(val < 200.0f)
@@ -607,7 +607,7 @@ u32 menu_audio_effect_reverb::flag_decay(float val, bool isset)
 {
 	u32 flag = 0;
 	if(!isset)
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	if(val > 0.1f)
 		flag |= FLAG_LEFT_ARROW;
 	if(val < 30.0f)
@@ -619,7 +619,7 @@ u32 menu_audio_effect_reverb::flag_spin(double val, bool isset)
 {
 	u32 flag = 0;
 	if(!isset)
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	if(val > 0.0)
 		flag |= FLAG_LEFT_ARROW;
 	if(val < 5.0)

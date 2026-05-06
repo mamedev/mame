@@ -1048,7 +1048,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	}
 	else if (scanline == ((256+BORDER_TOP) % m_screen->height()))
 	{
-		// TODO: latch LANGSEL here to toggle NTSC/PAL
+		// LANGSEL is latched when wrapping scanline 256
+		const int height = m_video->is_pal_video_mode() ? 312 : 262;
+		if (height != m_screen->height())
+		{
+			// toggle 50/60 Hz, both use 65 1M cycles per scanline
+			m_screen->configure(m_screen->width(), height, m_screen->visible_area(), HZ_TO_ATTOSECONDS(A2GS_1M.dvalue() / (65 * height)));
+			if (scanline >= height)
+				scanline -= height;
+		}
 
 		// "quarter" second IRQ occurs every 16 frames, ~3.75 Hz
 		if ((m_screen->frame_number() & 0xf) == 0)
@@ -2724,134 +2732,48 @@ void apple2gs_state::lc_01_w(offs_t offset, u8 data)
 	m_ram_ptr[(offset & 0x1fff) + 0x1e000] = data;
 }
 
-// floating bus code from old machine/apple2: needs to be reworked based on real beam position to enable e.g. Bob Bishop's screen splitter
 u8 apple2gs_state::read_floatingbus()
 {
-	enum
+	int h_clock = (m_screen->hpos() - BORDER_LEFT) / 16 + (25 + ALIGN_RFB); // adjust for set_raw
+	if (h_clock >= 65)
+		h_clock -= 65;
+
+	int v_clock = m_screen->vpos();
+	if (v_clock < BORDER_TOP)
+		v_clock += m_screen->height(); // remap top border to bottom of VBL
+	v_clock -= BORDER_TOP;
+	v_clock += (h_clock < (25 - ALIGN_RFB)); // adjust for hpos wrap
+	if (v_clock >= m_screen->height())
+		v_clock -= m_screen->height();
+
+	/*
+	Unlike 8-bit Apples, the IIgs does not redundantly scan video memory during
+	blanking.  The first five HBL cycles are used for Mega II "RAM refresh":
+	during these PH1 cycles (and everywhere after scanline 199) nothing is put
+	onto the data bus.  The floating value is instead the last byte fetched
+	during PH0, of the instruction which invoked this read.  For example:
+		LDA C050 returns C0 (typical softswitch)
+		LDA C250 returns C2 (ROM of a Your Card slot with no card)
+		LDA 50   returns 50 (with direct page C000)
+	*/
+	static bool recurse = false; // no recursion, single thread
+	if (!recurse && ((h_clock < 5) || (v_clock > 199)))
 	{
-		// scanner types
-		kScannerNone = 0, kScannerApple2, kScannerApple2e,
-
-		// scanner constants
-		kHBurstClock      =    53, // clock when Color Burst starts
-		kHBurstClocks     =     4, // clocks per Color Burst duration
-		kHClock0State     =  0x18, // H[543210] = 011000
-		kHClocks          =    65, // clocks per horizontal scan (including HBL)
-		kHPEClock         =    40, // clock when HPE (horizontal preset enable) goes low
-		kHPresetClock     =    41, // clock when H state presets
-		kHSyncClock       =    49, // clock when HSync starts
-		kHSyncClocks      =     4, // clocks per HSync duration
-		kNTSCScanLines    =   262, // total scan lines including VBL (NTSC)
-		kNTSCVSyncLine    =   224, // line when VSync starts (NTSC)
-		kPALScanLines     =   312, // total scan lines including VBL (PAL)
-		kPALVSyncLine     =   264, // line when VSync starts (PAL)
-		kVLine0State      = 0x100, // V[543210CBA] = 100000000
-		kVPresetLine      =   256, // line when V state presets
-		kVSyncLines       =     4, // lines per VSync duration
-		kClocksPerVSync   = kHClocks * kNTSCScanLines // FIX: NTSC only?
-	};
-
-	// vars
-	//
-	int i, Hires, Mixed, Page2, _80Store, ScanLines, /* VSyncLine, ScanCycles,*/
-		h_clock, h_state, h_0, h_1, h_2, h_3, h_4, h_5,
-		v_line, v_state, v_A, v_B, v_C, v_0, v_1, v_2, v_3, v_4, /* v_5, */
-		_hires, addend0, addend1, addend2, sum, address;
-
-	// video scanner data
-	//
-	i = m_maincpu->total_cycles() % kClocksPerVSync; // cycles into this VSync
-
-	// machine state switches
-	//
-	Hires    = (m_video->get_hires() && m_video->get_graphics()) ? 1 : 0;
-	Mixed    = m_video->get_mix() ? 1 : 0;
-	Page2    = m_video->get_page2() ? 1 : 0;
-	_80Store = m_video->get_80store() ? 1 : 0;
-
-	// calculate video parameters according to display standard
-	//
-	ScanLines  = 1 ? kNTSCScanLines : kPALScanLines; // FIX: NTSC only?
-	// VSyncLine  = 1 ? kNTSCVSyncLine : kPALVSyncLine; // FIX: NTSC only?
-	// ScanCycles = ScanLines * kHClocks;
-
-	// calculate horizontal scanning state
-	//
-	h_clock = (i + kHPEClock) % kHClocks; // which horizontal scanning clock
-	h_state = kHClock0State + h_clock; // H state bits
-	if (h_clock >= kHPresetClock) // check for horizontal preset
-	{
-		h_state -= 1; // correct for state preset (two 0 states)
-	}
-	h_0 = (h_state >> 0) & 1; // get horizontal state bits
-	h_1 = (h_state >> 1) & 1;
-	h_2 = (h_state >> 2) & 1;
-	h_3 = (h_state >> 3) & 1;
-	h_4 = (h_state >> 4) & 1;
-	h_5 = (h_state >> 5) & 1;
-
-	// calculate vertical scanning state
-	//
-	v_line  = i / kHClocks; // which vertical scanning line
-	v_state = kVLine0State + v_line; // V state bits
-	if ((v_line >= kVPresetLine)) // check for previous vertical state preset
-	{
-		v_state -= ScanLines; // compensate for preset
-	}
-	v_A = (v_state >> 0) & 1; // get vertical state bits
-	v_B = (v_state >> 1) & 1;
-	v_C = (v_state >> 2) & 1;
-	v_0 = (v_state >> 3) & 1;
-	v_1 = (v_state >> 4) & 1;
-	v_2 = (v_state >> 5) & 1;
-	v_3 = (v_state >> 6) & 1;
-	v_4 = (v_state >> 7) & 1;
-	//v_5 = (v_state >> 8) & 1;
-
-	// calculate scanning memory address
-	//
-	_hires = Hires;
-	if (Hires && Mixed && (v_4 & v_2))
-	{
-		_hires = 0; // (address is in text memory)
-	}
-
-	addend0 = 0x68; // 1            1            0            1
-	addend1 =              (h_5 << 5) | (h_4 << 4) | (h_3 << 3);
-	addend2 = (v_4 << 6) | (v_3 << 5) | (v_4 << 4) | (v_3 << 3);
-	sum     = (addend0 + addend1 + addend2) & (0x0F << 3);
-
-	address = 0;
-	address |= h_0 << 0; // a0
-	address |= h_1 << 1; // a1
-	address |= h_2 << 2; // a2
-	address |= sum;      // a3 - aa6
-	address |= v_0 << 7; // a7
-	address |= v_1 << 8; // a8
-	address |= v_2 << 9; // a9
-	address |= ((_hires) ? v_A : (1 ^ (Page2 & (1 ^ _80Store)))) << 10; // a10
-	address |= ((_hires) ? v_B : (Page2 & (1 ^ _80Store))) << 11; // a11
-	if (_hires) // hires?
-	{
-		// Y: insert hires only address bits
-		//
-		address |= v_C << 12; // a12
-		address |= (1 ^ (Page2 & (1 ^ _80Store))) << 13; // a13
-		address |= (Page2 & (1 ^ _80Store)) << 14; // a14
+		// approximate (for non-flow control instructions) by peeking at PC
+		offs_t pc = m_maincpu->pc();
+		// previous byte, wrapping at bank boundary
+		pc = (pc & 0xFF0000) | ((pc - 1) & 0xFFFF);
+		// prevent recursion via slot firmware or Mega II C07x
+		recurse = true;
+		u8 res = m_maincpu->space(AS_PROGRAM).read_byte(pc);
+		recurse = false;
+		return res;
 	}
 	else
 	{
-		// N: text, so no higher address bits unless Apple ][, not Apple //e
-		//
-		if ((1) && // Apple ][? // FIX: check for Apple ][? (FB is most useful in old games)
-			(kHPEClock <= h_clock) && // Y: HBL?
-			(h_clock <= (kHClocks - 1)))
-		{
-			address |= 1 << 12; // Y: a12 (add $1000 to address!)
-		}
+		const u32 address = m_video->scanner_address_GS(h_clock, v_clock);
+		return m_megaii_ram[address];
 	}
-
-	return m_megaii_ram[address % m_ram_size]; // FIX: this seems to work, but is it right!?
 }
 
 /***************************************************************************
@@ -3795,6 +3717,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_rtc->cko_cb().set(FUNC(apple2gs_state::rtc_vgc));
 
 	APPLE2_VIDEO(config, m_video, A2GS_14M).set_screen(m_screen);
+	m_video->set_base_model(a2_video_device::model::IIGS);
 
 	APPLE2_COMMON(config, m_a2common, A2GS_14M).set_GS_cputag(m_maincpu);
 

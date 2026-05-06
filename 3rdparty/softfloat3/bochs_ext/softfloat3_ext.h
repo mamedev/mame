@@ -19,3 +19,8 @@ extFloat80_t extFloat80_logn(extFloat80_t a);
 extFloat80_t extFloat80_log2(extFloat80_t a);
 extFloat80_t extFloat80_log10(extFloat80_t a);
 extFloat80_t extFloat80_scale(extFloat80_t a, extFloat80_t b);
+bool f16_isNaN(float16_t a);
+bool f32_isNaN(float32_t a);
+bool f64_isNaN(float64_t a);
+bool extF80_isNaN(extFloat80_t a);
+bool f128_isNaN(float128_t a);

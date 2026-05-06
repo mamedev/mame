@@ -344,7 +344,9 @@ void kaypro84_state::kaypro484(machine_config &config)
 	kbd.ser_out_callback().set("sio_1", FUNC(z80sio_device::rxb_w));
 	kbd.ser_out_callback().append("sio_1", FUNC(z80sio_device::syncb_w));
 
-	CLOCK(config, "kbdtxrxc", 16_MHz_XTAL / 16 / 13 / 16).signal_handler().set("sio_1", FUNC(z80sio_device::rxtxcb_w));
+	clock_device &kbdtxrxc(CLOCK(config, "kbdtxrxc"));
+	kbdtxrxc.set_period(attotime::from_hz(16_MHz_XTAL / 16 / 13 / 16));
+	kbdtxrxc.signal_handler().set("sio_1", FUNC(z80sio_device::rxtxcb_w));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(kaypro84_state::write_centronics_busy));

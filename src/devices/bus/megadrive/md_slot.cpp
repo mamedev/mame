@@ -246,7 +246,6 @@ static const md_slot slot_list[] =
 
 	{ TILESMJ2, "rom_16mj2" },
 	{ BUGSLIFE, "rom_bugs" },
-	{ CHINFIGHT3, "rom_chinf3" },
 	{ ELFWOR, "rom_elfwor" },
 	{ KAIJU, "rom_pokestad" },
 	{ KOF98, "rom_kof98" },
@@ -688,7 +687,7 @@ int base_md_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 	smb_sig[]       = { 0x20, 0x4d, 0x41, 0x52, 0x49, 0x4f },
 	smb2_sig[]      = { 0x4e, 0xb9, 0x00, 0x0f, 0x25, 0x84 },
 	kaiju_sig[]     = { 0x19, 0x7c, 0x00, 0x01, 0x00, 0x00 },
-	chifi3_sig[]    = { 0xb6, 0x16, 0x66, 0x00, 0x00, 0x4a },
+//	chifi3_sig[]    = { 0xb6, 0x16, 0x66, 0x00, 0x00, 0x4a },
 	lionk2_sig[]    = { 0x26, 0x79, 0x00, 0xff, 0x00, 0xf4 },
 	rx3_sig[]       = { 0x66, 0x00, 0x00, 0x0e, 0x30, 0x3c },
 	kof98_sig[]     = { 0x9b, 0xfc, 0x00, 0x00, 0x4a, 0x00 },
@@ -774,8 +773,8 @@ int base_md_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 			if (!memcmp(&ROM[0x674e], kaiju_sig, sizeof(kaiju_sig)))
 				type = KAIJU;
 
-			if (!memcmp(&ROM[0x1780], chifi3_sig, sizeof(chifi3_sig)))
-				type = CHINFIGHT3;
+			//if (!memcmp(&ROM[0x1780], chifi3_sig, sizeof(chifi3_sig)))
+			//	type = CHINFIGHT3;
 
 			if (!memcmp(&ROM[0x03c2], lionk2_sig, sizeof(lionk2_sig)))
 				type = LIONK2;

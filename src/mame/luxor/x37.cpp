@@ -13,9 +13,9 @@
 
 	TODO
 
-	- trap 26 on boot (IRQ2 autovector)
-	- SASI
-	- bus errors
+	- trap on boot
+	- tst.w 0xfffffc
+	- SCC interrupt acknowledge
 
 */
 
@@ -42,7 +42,7 @@
 
 namespace {
 
-//#define VERBOSE 0
+//#define VERBOSE 1
 #include "logmacro.h"
 
 #define MC68010_TAG  "14m"
@@ -119,26 +119,16 @@ private:
 	void cio_pb_w(uint8_t data);
 	uint8_t cio_pc_r();
 	void cio_pc_w(uint8_t data);
-	void mint_w(int state) { m_mint = state; };
 	void sasi_int_w(int state) { m_sasi_int = state; }
 
-	void xdck_w(offs_t offset, uint16_t data);
+	void xdck_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	u8 m_cb = 0xff;
-	bool m_mint = 1;
 	bool m_sasi_int = 1;
 };
 
 void x37_state::program_map(address_map &map)
 {
-	// map(0x000000, 0x3fffff) SYSTEM RAM
-	// map(0x400000, 0x7fffff) 16-BIT EXPANSION (I/O, MEMORY, DMA ETC)
-	// map(0x800000, 0xbfffff) SYSTEM CONTROL (MAPPER,DMA,CIO,EDC)
-	// map(0xc00000, 0xffffff) 8-BIT I/O DEVICES (PROT. BY MAPPER)
-	// map(0xc00000, 0xc0ffff) SERIAL COMM. CHANNELS
-	// map(0xc10000, 0xc1ffff) MASS MEMORY GROUP
-	// map(0xc20000, 0xc2ffff) 4680 BUS
-
 	map(0x000000, 0x3fffff).rw(FUNC(x37_state::ram_r), FUNC(x37_state::ram_w));
 	map(0x400000, 0x47ffff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::vram_map)).umask16(0xffff);
 	map(0x480100, 0x480101).mirror(0xfe).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::crtc_map)).umask16(0xffff);
@@ -154,27 +144,24 @@ void x37_state::program_map(address_map &map)
 	}
 	map(0x800100, 0x80017f).rw(m_cio, FUNC(z8536_device::read), FUNC(z8536_device::write)).umask16(0x00ff);
 	map(0x810100, 0x810101).r(FUNC(x37_state::edc_status_r));
-	//map(0x820100, 0x82010f).rw(m_fpu, FUNC(ns32081_device::slow_read), FUNC(ns32081_device::slow_write));
+	map(0x820100, 0x820101).rw(m_fpu, FUNC(ns32081_device::slow_read), FUNC(ns32081_device::slow_write));
 	map(0x830100, 0x8301ff).rw(m_dmac, FUNC(hd63450_device::read), FUNC(hd63450_device::write));
 	map(0xfc0000, 0xfc0007).rw(m_scc[0], FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0x00ff);
 	map(0xfc0010, 0xfc0017).rw(m_scc[1], FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0x00ff);
 	map(0xfc0020, 0xfc0027).rw(m_scc[2], FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0x00ff);
-	map(0xfd5000, 0xfd5001).rw(m_sasi, FUNC(luxor_x37_sasi_device::tre_r), FUNC(luxor_x37_sasi_device::tre_w));
+	map(0xfd5000, 0xfd501f).rw(m_sasi, FUNC(luxor_x37_sasi_device::tre_r), FUNC(luxor_x37_sasi_device::tre_w));
 	map(0xfd5080, 0xfd509f).rw(m_sasi, FUNC(luxor_x37_sasi_device::stat_r), FUNC(luxor_x37_sasi_device::ctrl_w));
 	map(0xfdb040, 0xfdb041).rw(m_fdc, FUNC(fd1797_device::status_r), FUNC(fd1797_device::cmd_w)).umask16(0x00ff);
 	map(0xfdb042, 0xfdb043).rw(m_fdc, FUNC(fd1797_device::track_r), FUNC(fd1797_device::track_w)).umask16(0x00ff);
 	map(0xfdb044, 0xfdb045).rw(m_fdc, FUNC(fd1797_device::sector_r), FUNC(fd1797_device::sector_w)).umask16(0x00ff);
 	map(0xfdb046, 0xfdb047).rw(m_fdc, FUNC(fd1797_device::data_r), FUNC(fd1797_device::data_w)).umask16(0x00ff);
 	map(0xfdb080, 0xfdb081).w(FUNC(x37_state::xdck_w));
-
-	// tst.w 0xfffffc ??
 }
 
 void x37_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_cpu, FUNC(m68010_device::autovectors_map));
 	map(0xfffff7, 0xfffff7).lr8(NAME([this]() -> u8 { return m_cio->intack_r(); }));
-	// IACK4 SCC
 }
 
 static INPUT_PORTS_START( x37 )
@@ -218,7 +205,12 @@ uint16_t x37_state::ram_r(offs_t offset, uint16_t mem_mask)
 		bool at0, at1;
 		offs_t const ma = get_ma(offset, at0, at1);
 
-		if (ma < 0x400000) {
+		if (!machine().side_effects_disabled() && at1 && !at0) {
+			// AT1=1, AT0=0: no access
+			m_cpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+			m_cpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+			logerror("%s: Invalid RAM read at offset %06x (MA %06x, AT1=1, AT0=0)\n", machine().describe_context(), offset<<1, ma);
+		} else if (ma < 0x400000) {
 			if (ACCESSING_BITS_0_7)
 				data |= m_ram[ma & ~1];
 			if (ACCESSING_BITS_8_15)
@@ -235,6 +227,14 @@ void x37_state::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	bool at0, at1;
 	offs_t const ma = get_ma(offset, at0, at1);
+
+	if (!machine().side_effects_disabled() && !at0) {
+		// AT0=0: read-only (AT1=0) or no access (AT1=1)
+		m_cpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+		m_cpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+		logerror("%s: Invalid RAM write at offset %06x (MA %06x, AT1=%d, AT0=0)\n", machine().describe_context(), offset<<1, ma, at1);
+		return;
+	}
 
 	if (ma < 0x400000) {
 		if (ACCESSING_BITS_0_7)
@@ -328,7 +328,7 @@ uint8_t x37_state::cio_pa_r()
 
 		bit		description
 
-		0		*MINT
+		0		FDC INTRQ
 		1		*XIRQ1
 		2		*XIRQ2
 		3		*XIRQ3
@@ -341,7 +341,7 @@ uint8_t x37_state::cio_pa_r()
 
 	u8 data = 0x7e;
 
-	data |= m_mint;
+	data |= m_fdc->intrq_r();
 	data |= m_sasi_int << 7;
 
 	return data;
@@ -415,7 +415,7 @@ void x37_state::cio_pc_w(uint8_t data)
 	m_nvram->sk_w(clock);
 }
 
-void x37_state::xdck_w(offs_t offset, uint16_t data)
+void x37_state::xdck_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 
@@ -440,19 +440,24 @@ void x37_state::xdck_w(offs_t offset, uint16_t data)
 
 	*/
 
-	m_fdc->mr_w(BIT(data, 0));
-	m_fdc->dden_w(BIT(data, 1));
-	m_fdc->hlt_w(BIT(data, 2));
+	LOG("%s XDCK %04x\n", machine().describe_context(), data);
 
-	floppy_image_device *floppy = nullptr;
+	if (ACCESSING_BITS_0_7) {
+		m_fdc->mr_w(BIT(data, 0));
+		m_fdc->dden_w(BIT(data, 1));
+		m_fdc->hlt_w(BIT(data, 2));
+	}
 
-	for (int n = 0; n < 3; n++)
-		if (BIT(data, n + 8))
-			floppy = m_floppy[n]->get_device();
+	if (ACCESSING_BITS_8_15) {
+		floppy_image_device *floppy = nullptr;
 
-	m_fdc->set_floppy(floppy);
+		if (BIT(data, 8)) floppy = m_floppy[0]->get_device();
+		if (BIT(data, 9)) floppy = m_floppy[1]->get_device();
 
-	if (floppy) floppy->mon_w(!BIT(data, 11));
+		m_fdc->set_floppy(floppy);
+
+		if (floppy) floppy->mon_w(!BIT(data, 11));
+	}
 }
 
 static void x37_floppies(device_slot_interface &device)
@@ -475,13 +480,14 @@ void x37_state::machine_start()
 		s = 0xffff;
 
 	save_item(NAME(m_cb));
-	save_item(NAME(m_mint));
 	save_item(NAME(m_sasi_int));
 }
 
 void x37_state::machine_reset()
 {
 	m_cb = 0xff;
+
+	xdck_w(0, 0, 0xffff);
 }
 
 void x37_state::x37(machine_config &config)
@@ -496,8 +502,14 @@ void x37_state::x37(machine_config &config)
 	NS32081(config, m_fpu, XTAL(20'000'000)/2);
 
 	HD63450(config, m_dmac, XTAL(20'000'000)/2, m_cpu, AS_PROGRAM);
+	m_dmac->set_burst_clocks(
+		attotime::from_nsec(120),  // ch0
+		attotime::zero,
+		attotime::zero,
+		attotime::zero
+	);
 
-	Z8536(config, m_cio, XTAL(20'000'000)/5);
+	Z8536(config, m_cio, XTAL(20'000'000)/4);
 	m_cio->irq_wr_cb().set_inputline(m_cpu, M68K_IRQ_3);
 	m_cio->pa_rd_cb().set(FUNC(x37_state::cio_pa_r));
 	m_cio->pb_wr_cb().set(FUNC(x37_state::cio_pb_w));
@@ -512,7 +524,7 @@ void x37_state::x37(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "irq4").output_handler().set_inputline(m_cpu, M68K_IRQ_4);
 	INPUT_MERGER_ANY_HIGH(config, "req3").output_handler().set(m_dmac, FUNC(hd63450_device::drq3_w));
 
-	SCC8530(config, m_scc[0], XTAL(20'000'000)/5);
+	SCC8530(config, m_scc[0], XTAL(20'000'000)/4);
 	m_scc[0]->out_int_callback().set("irq4", FUNC(input_merger_device::in_w<0>));
 	m_scc[0]->out_wreqa_callback().set("req3", FUNC(input_merger_device::in_w<0>));
 	m_scc[0]->out_wreqb_callback().set("req3", FUNC(input_merger_device::in_w<1>));
@@ -531,7 +543,7 @@ void x37_state::x37(machine_config &config)
 	tty01.dcd_handler().set(m_scc[0], FUNC(z80scc_device::dcda_w));
 	tty01.cts_handler().set(m_scc[0], FUNC(z80scc_device::ctsa_w));
 
-	SCC8530(config, m_scc[1], XTAL(20'000'000)/5);
+	SCC8530(config, m_scc[1], XTAL(20'000'000)/4);
 	m_scc[1]->out_int_callback().set("irq4", FUNC(input_merger_device::in_w<1>));
 	m_scc[1]->out_wreqa_callback().set("req3", FUNC(input_merger_device::in_w<2>));
 	m_scc[1]->out_wreqb_callback().set("req3", FUNC(input_merger_device::in_w<3>));
@@ -552,7 +564,7 @@ void x37_state::x37(machine_config &config)
 	tty03.dcd_handler().set(m_scc[1], FUNC(z80scc_device::dcda_w));
 	tty03.cts_handler().set(m_scc[1], FUNC(z80scc_device::ctsa_w));
 
-	SCC8530(config, m_scc[2], XTAL(20'000'000)/5);
+	SCC8530(config, m_scc[2], XTAL(20'000'000)/4);
 	m_scc[2]->out_int_callback().set("irq4", FUNC(input_merger_device::in_w<2>));
 	m_scc[2]->out_wreqa_callback().set("req3", FUNC(input_merger_device::in_w<4>));
 	m_scc[2]->out_wreqb_callback().set("req3", FUNC(input_merger_device::in_w<5>));
@@ -574,12 +586,12 @@ void x37_state::x37(machine_config &config)
 	tty05.cts_handler().set(m_scc[2], FUNC(z80scc_device::ctsa_w));
 
 	FD1797(config, m_fdc, XTAL(16'000'000)/16);
-	m_fdc->intrq_wr_callback().set_inputline(m_cpu, M68K_IRQ_2);
+	m_fdc->intrq_wr_callback().append(m_cio, FUNC(z8536_device::pa0_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(hd63450_device::drq2_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy[0], x37_floppies, nullptr, x37_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], x37_floppies, "525qd", x37_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[1], x37_floppies, nullptr, x37_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[2], x37_floppies, "525qd", x37_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[2], x37_floppies, nullptr, x37_state::floppy_formats).enable_sound(true);
 
 	LUXOR_X37_SASI(config, m_sasi, 0);
 	m_sasi->int_callback().set(m_cio, FUNC(z8536_device::pa7_w));
@@ -587,9 +599,7 @@ void x37_state::x37(machine_config &config)
 	m_sasi->req0_callback().set(m_dmac, FUNC(hd63450_device::drq0_w));
 
 	// video hardware
-	abc1600_mover_device &mover(ABC1600_MOVER(config, ABC1600_MOVER_TAG, XTAL(64'000'000)));
-	mover.amm_callback().set(m_cio, FUNC(z8536_device::pa0_w));
-	mover.amm_callback().append(FUNC(x37_state::mint_w));
+	ABC1600_MOVER(config, ABC1600_MOVER_TAG, XTAL(64'000'000));
 
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("x37_flop");

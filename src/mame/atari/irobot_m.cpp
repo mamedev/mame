@@ -521,14 +521,13 @@ void irobot_state::irmb_run()
 
 	while ((prevop->flags & (FL_DPSEL | FL_CARRY)) != (FL_DPSEL | FL_CARRY))
 	{
-		u32 result;
-		u32 fu;
+		u32 result = 0;
 		u32 tmp;
 
 		icount += curop->cycles;
 
 		/* Get function code */
-		fu = curop->func;
+		u32 fu = curop->func;
 
 		/* Modify function for MULT */
 		if (!(prevop->flags & FL_MULT) || (Q & 1))

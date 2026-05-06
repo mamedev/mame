@@ -2181,9 +2181,7 @@ RAM1 are SEC KM681000BLG-7L RAM chips
 ***************************************************************************/
 
 ROM_START( skilldrp )
-	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "7-skill_drop_g1.01s.u100", 0x00000, 0x40000, CRC(8867df18) SHA1(19ad0104647b6f5c8b6c06749c24defdcacfd54d) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
@@ -2197,9 +2195,7 @@ ROM_START( skilldrp )
 ROM_END
 
 ROM_START( skilldrp_g10s )
-	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "7-skill_drop_g1.0s.u100", 0x00000, 0x40000, CRC(f968b783) SHA1(1d693b1d460e659ca94aae8625ea26e120053f84) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
@@ -2213,9 +2209,7 @@ ROM_START( skilldrp_g10s )
 ROM_END
 
 ROM_START( luckycoin )
-	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "u100", 0x00000, 0x40000, CRC(77bbeebc) SHA1(45f5a18694e2a93d9c299dc1f405df32c9773ce6) ) // label was peeled off
 
 	ROM_REGION( 0x200000, "sprites", 0 )

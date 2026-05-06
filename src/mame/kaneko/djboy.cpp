@@ -15,7 +15,7 @@ Self Test has two parts:
         irq (0x30) - processes sprites
         nmi: wakes up this CPU
 
-- CPU1 manages the protection device, palette, and tilemap(s)
+- CPU1 manages the protection device, coin counters, palette, and tilemap(s)
         nmi: resets this CPU
         irq: game update
 
@@ -24,6 +24,8 @@ Self Test has two parts:
         nmi: handle sound command
 
 - The "BEAST" protection device has access to DIP switches and player inputs.
+  It also counts coins and attempts to manage counters and lockouts much like
+  "MERMAID" (hvyunit), but fails to update corresponding outputs due to a bug.
 
 
 PCB Layout

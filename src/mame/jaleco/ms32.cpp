@@ -475,8 +475,9 @@ Notes from Charles MacDonald
 
 #include "mahjong.h"
 
-#include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
+#include "cpu/z80/z80.h"
+
 #include "speaker.h"
 
 #include "f1superb.lh"

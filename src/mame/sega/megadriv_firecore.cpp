@@ -206,14 +206,12 @@ void megadriv_firecore_state::megadriv_firecore_6button_ntsc(machine_config &con
 
 ROM_START( matet )
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "tetrismyarcade_s29gl032n90tfi04_0001227e.bin", 0x000000, 0x400000, CRC(09b5af89) SHA1(85e506923fd803f05cc8f579f37331b608fea744) )
-	ROM_IGNORE(0x100)
+	ROM_LOAD16_WORD_SWAP( "tetrismyarcade_s29gl032n90tfi04_0001227e.bin", 0x000000, 0x400000, CRC(b6ccb0b2) SHA1(12ee130b7e332910c0bbbedd93d55779c237a66d) )
 ROM_END
 
 ROM_START( mateta )
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "testris_s29gl032m90tfir4_0001227e.bin", 0x000000, 0x400000, CRC(656ffc77) SHA1(da7ca2d4c2bff3e583f5ad30aa4fe722691a03d9) )
-	ROM_IGNORE(0x100)
+	ROM_LOAD16_WORD_SWAP( "testris_s29gl032m90tfir4_0001227e.bin", 0x000000, 0x400000, CRC(5af6c866) SHA1(2988af5c7c0133aeced289d8a0a3b59c9b20a372) )
 ROM_END
 
 ROM_START( mypacgld )
@@ -228,8 +226,7 @@ ROM_END
 
 ROM_START( mypaca )
 	ROM_REGION( 0x800000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "pacmanarcade_s29gl064n90tfi04_0001227e.bin", 0x000000, 0x800000, CRC(41495033) SHA1(219f0bd38b8a646ca43c9679aeed02c121467cd7) )
-	ROM_IGNORE(0x100)
+	ROM_LOAD16_WORD_SWAP( "pacmanarcade_s29gl064n90tfi04_0001227e.bin", 0x000000, 0x800000, CRC(7beb8dd1) SHA1(040d93f392b7c113a812e620641f48998701efba) )
 ROM_END
 
 ROM_START( mympac )
@@ -252,10 +249,23 @@ ROM_START( mygalaga )
 	ROM_LOAD16_WORD_SWAP( "galaga_s29jl032h70tfi01_0001227e.bin", 0x000000, 0x400000, CRC(e775089a) SHA1(0938afa8e92a8c77b4fb86e0ec044fbb2b572570) )
 ROM_END
 
+ROM_START( mygalagb )
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "s29gl032n90tfi03.u2", 0x000000, 0x400000, CRC(b59a22fb) SHA1(55abc30f1502ccdb5b2f3a85b23f7762df3f63c9) )
+
+	// has a P24C64C (for storing scores?)
+ROM_END
+
 ROM_START( mysinv )
 	ROM_REGION( 0x800000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "spaceinvaders_s29gl0640n90tfi04_0001227e.bin", 0x000000, 0x800000, CRC(55e001d1) SHA1(1eaa377bf78a0f1f492565a9f38b2f7d60d0e440) )
-	ROM_IGNORE(0x100)
+	ROM_LOAD16_WORD_SWAP( "spaceinvaders_s29gl0640n90tfi04_0001227e.bin", 0x000000, 0x800000, CRC(1d062cf5) SHA1(bc6bcce398c37e19be0d72e0e8fabb245fb54043) )
+ROM_END
+
+ROM_START( mysinva )
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "s29gl032n90tfi03.u2", 0x000000, 0x400000, CRC(57480d73) SHA1(743b4a56ddbf61eef46ee4b2d4581cd44a67ba9b) )
+
+	// has a P24C64C (for storing scores?)
 ROM_END
 
 ROM_START( mysf2 )
@@ -469,8 +479,10 @@ CONS( 2021, mympaca,   mympac,   0, megadriv_firecore_3button_ntsc,  mympac, meg
 // menu uses unsupported extended mode
 CONS( 2021, mygalag,   0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Galaga (DGUNL-4195, Micro Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 CONS( 2021, mygalaga,  mygalag,  0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Galaga (DGUNL-4199, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2021, mygalagb,  mygalag,  0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Galaga (DGUNL-7132, Pixel Pocket Pro)", MACHINE_NOT_WORKING | ROT270 )
 
 CONS( 2021, mysinv,    0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Space Invaders (DGUNL-7006, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT90 )
+CONS( 2021, mysinva,   mysinv,   0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Space Invaders (DGUNL-7133, Pixel Pocket Pro)", MACHINE_NOT_WORKING | ROT90 )
 
 CONS( 2021, mysf2,     0,        0, megadriv_firecore_6button_ntsc,  msi_6button, megadriv_firecore_state, init_mdhh100,       "dreamGEAR", "My Arcade Street Fighter II (DGUNL-4184, Nano Player Pro)", MACHINE_NOT_WORKING )
 

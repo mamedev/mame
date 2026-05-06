@@ -17,6 +17,7 @@ ensoniq_vfx_cartridge::ensoniq_vfx_cartridge(
 	: device_t(mconfig, ENSONIQ_VFX_CARTRIDGE, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 	, m_eeprom(*this, "eeprom")
+	, m_input_config(*this, "CFG")
 {
 }
 
@@ -28,9 +29,50 @@ void ensoniq_vfx_cartridge::device_start()
 {
 }
 
+void ensoniq_vfx_cartridge::device_reset()
+{
+	// Ensoniq SC-32 cartridges are write protected.
+	// Any byte written will be preceded by a corresponding
+	// write protection command sequence.
+	m_eeprom->set_software_data_protection_enabled(false);
+
+	// Configure the speed of the eeprom.
+	ioport_value const cfg = m_input_config->read();
+	bool fastcart = (cfg & 0x01) != 0;
+	if (fastcart) {
+		// Fast cartridge:
+		// - writes are triggered by reading, without having to wait for T_BLC to expire
+		m_eeprom->override_program_on_read(true);
+
+		// - writes complete immediately
+		m_eeprom->override_t_wc_usec(0);
+	} else {
+		// Original cartridge:
+		// - use the EEPROM's default timing.
+		m_eeprom->override_t_wc_usec();
+		m_eeprom->override_program_on_read();
+	}
+}
+
+namespace {
+
+INPUT_PORTS_START(vfxcart)
+	PORT_START("CFG")
+	PORT_CONFNAME(0x01, 0x01, "Cartridge Speed")
+	PORT_CONFSETTING(0x00, "Original (> 3 minutes for a full write)")
+	PORT_CONFSETTING(0x01, "Fast (~ 1 minute for a full write)")
+INPUT_PORTS_END
+
+}
+
+ioport_constructor ensoniq_vfx_cartridge::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(vfxcart);
+}
+
 void ensoniq_vfx_cartridge::device_add_mconfig(machine_config &config)
 {
-	X28F256(config, m_eeprom);
+	X28C256(config, m_eeprom);
 }
 
 u8 ensoniq_vfx_cartridge::read(offs_t offset)

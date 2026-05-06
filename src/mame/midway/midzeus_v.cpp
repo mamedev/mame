@@ -261,7 +261,7 @@ void midzeus_state::video_start()
 	save_pointer(NAME(m_waveram[0]), WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / sizeof(m_waveram[0][0]));
 	save_pointer(NAME(m_waveram[1]), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 8 / sizeof(m_waveram[1][0]));
 
-	// hack
+	// HACK
 	m_is_mk4b = strcmp(machine().system().name, "mk4b") == 0;
 }
 

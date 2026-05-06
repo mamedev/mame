@@ -5,7 +5,8 @@
     This is a placeholder driver for the Orina Stylish Plus so that a
     Software List for the cartridges can exist.
 
-    Internal hardware of machine is currently unknown
+    There's no external code on either the main board or in the cartridges
+	meaning everything is driven by an MCU in the glob
 */
 
 #include "emu.h"
@@ -53,6 +54,11 @@ void orinasp_state::orinasp(machine_config &config)
 }
 
 ROM_START( orinasp )
+	ROM_REGION( 0x2000, "mcu", ROMREGION_ERASEFF ) // unknown MCU under a glob
+	ROM_LOAD( "glob.mcu", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASEFF ) // just for settings? contains no code
+	ROM_LOAD( "at24c02.ic1", 0x0000, 0x100, CRC(2b895655) SHA1(528031eb0b37770ed43c8cf39805bdcef10cb81f) )
 ROM_END
 
 } // anonymous namespace

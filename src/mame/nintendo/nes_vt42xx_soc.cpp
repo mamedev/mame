@@ -14,17 +14,17 @@
 DEFINE_DEVICE_TYPE(NES_VT42XX_SOC,     nes_vt42xx_soc_device,     "nes_vt42xx_soc", "unknown VT series System on a Chip with $42xx registers (NTSC)")
 DEFINE_DEVICE_TYPE(NES_VT42XX_SOC_PAL, nes_vt42xx_soc_pal_device, "nes_vt42xx_soc_pal", "unknown VT series System on a Chip with $42xx registers (PAL)")
 
-nes_vt42xx_soc_device::nes_vt42xx_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
+nes_vt42xx_soc_device::nes_vt42xx_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	nes_vt09_soc_device(mconfig, type, tag, owner, clock)
 {
 }
 
-nes_vt42xx_soc_device::nes_vt42xx_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+nes_vt42xx_soc_device::nes_vt42xx_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	nes_vt42xx_soc_device(mconfig, NES_VT42XX_SOC, tag, owner, clock)
 {
 }
 
-nes_vt42xx_soc_pal_device::nes_vt42xx_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+nes_vt42xx_soc_pal_device::nes_vt42xx_soc_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	nes_vt42xx_soc_device(mconfig, NES_VT42XX_SOC_PAL, tag, owner, clock)
 {
 }
@@ -37,7 +37,7 @@ u8 nes_vt42xx_soc_device::read_onespace_bus(offs_t offset)
 }
 
 
-void nes_vt42xx_soc_device::device_add_mconfig(machine_config& config)
+void nes_vt42xx_soc_device::device_add_mconfig(machine_config &config)
 {
 	RP2A03_CORE(config, m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt42xx_soc_device::nes_vt42xx_soc_map);
@@ -68,7 +68,7 @@ void nes_vt42xx_soc_device::device_add_mconfig(machine_config& config)
 	m_apu->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void nes_vt42xx_soc_pal_device::do_pal_timings_and_ppu_replacement(machine_config& config)
+void nes_vt42xx_soc_pal_device::do_pal_timings_and_ppu_replacement(machine_config &config)
 {
 	m_maincpu->set_clock(PALC_APU_CLOCK);
 
@@ -86,7 +86,7 @@ void nes_vt42xx_soc_pal_device::do_pal_timings_and_ppu_replacement(machine_confi
 	m_screen->set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);
 }
 
-void nes_vt42xx_soc_pal_device::device_add_mconfig(machine_config& config)
+void nes_vt42xx_soc_pal_device::device_add_mconfig(machine_config &config)
 {
 	nes_vt42xx_soc_device::device_add_mconfig(config);
 	do_pal_timings_and_ppu_replacement(config);

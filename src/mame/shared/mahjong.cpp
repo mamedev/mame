@@ -68,6 +68,8 @@
  Columns are usually wired from left to right from least significant to most significant bit.
  Nichibutsu wires the bits in the opposite order.
  The Jaleco MegaSystem 32 has the columns rotated by one position so the Start column is the least significant bit.
+ Various other games (e.g. from Seta) change the order of rows and/or columns.
+ Sega, Sanritsu, Toaplan and some others transposed the rows and columns, producing a 6*4 or 6*5 matrix.
 
  Note that non-standard mahjong/hanafuda keyboards exist:
  * Some Nichibutsu hanafuda games use the Reach/Ron positions for Yes/No (rather than M/N).
@@ -108,7 +110,7 @@ INPUT_PORTS_START(hanafuda_matrix_bet)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E)           PORT_PLAYER(1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES)         PORT_PLAYER(1)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START)                PORT_PLAYER(1)
 
 	PORT_START("KEY1")
@@ -193,40 +195,6 @@ INPUT_PORTS_START(hanaroku_panel)
 	PORT_BIT(0x38, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-
-
-class mahjong_panel_device_base : public device_t, public device_mahjong_panel_interface
-{
-public:
-	virtual u8 read(u8 select) override
-	{
-		u8 result = 0x3f;
-		for (unsigned i = 0; m_keys.size() > i; ++i)
-		{
-			if (!BIT(select, i))
-				result &= m_keys[i]->read();
-		}
-		return result;
-	}
-
-protected:
-	mahjong_panel_device_base(
-			machine_config const &mconfig,
-			device_type type,
-			char const *tag,
-			device_t *owner,
-			u32 clock) :
-		device_t(mconfig, type, tag, owner, clock),
-		device_mahjong_panel_interface(mconfig, *this),
-		m_keys(*this, "KEY%u", 0U)
-	{
-	}
-
-	virtual void device_start() override ATTR_COLD { }
-
-private:
-	required_ioport_array<6> m_keys;
-};
 
 
 class mahjong_panel_device : public mahjong_panel_device_base
@@ -371,6 +339,66 @@ mahjong_panel_connector_device::~mahjong_panel_connector_device()
 void mahjong_panel_connector_device::device_start()
 {
 	m_panel = get_card_device();
+}
+
+void mahjong_panel_connector_device::standard_panels(device_slot_interface &device)
+{
+	device.option_add("mj",   MAHJONG_MEDAL_PANEL);
+	device.option_add("mjam", MAHJONG_PANEL);
+	device.option_add("hf",   HANAFUDA_MEDAL_PANEL);
+	device.option_add("hfam", HANAFUDA_PANEL);
+}
+
+void mahjong_panel_connector_device::mahjong_panels(device_slot_interface &device)
+{
+	device.option_add("mj",   MAHJONG_MEDAL_PANEL);
+	device.option_add("mjam", MAHJONG_PANEL);
+}
+
+void mahjong_panel_connector_device::hanafuda_panels(device_slot_interface &device)
+{
+	device.option_add("hf",   HANAFUDA_MEDAL_PANEL);
+	device.option_add("hfam", HANAFUDA_PANEL);
+}
+
+void mahjong_panel_connector_device::medal_panels(device_slot_interface &device)
+{
+	device.option_add("mj",   MAHJONG_MEDAL_PANEL);
+	device.option_add("hf",   HANAFUDA_MEDAL_PANEL);
+}
+
+void mahjong_panel_connector_device::amusement_panels(device_slot_interface &device)
+{
+	device.option_add("mjam", MAHJONG_PANEL);
+	device.option_add("hfam", HANAFUDA_PANEL);
+}
+
+
+mahjong_panel_device_base::mahjong_panel_device_base(
+		machine_config const &mconfig,
+		device_type type,
+		char const *tag,
+		device_t *owner,
+		u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_mahjong_panel_interface(mconfig, *this),
+	m_keys(*this, "KEY%u", 0U)
+{
+}
+
+u8 mahjong_panel_device_base::read(u8 select)
+{
+	u8 result = 0x3f;
+	for (unsigned i = 0; m_keys.size() > i; ++i)
+	{
+		if (!BIT(select, i))
+			result &= m_keys[i]->read();
+	}
+	return result;
+}
+
+void mahjong_panel_device_base::device_start()
+{
 }
 
 

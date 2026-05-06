@@ -76,6 +76,7 @@ public:
 		m_easc(*this, "easc"),
 		m_dfac(*this, "dfac"),
 		m_scc(*this, "scc"),
+		m_config(*this, "config"),
 		m_cur_floppy(nullptr),
 		m_hdsel(0),
 		m_adb_irq_pending(0),
@@ -118,9 +119,10 @@ protected:
 	required_device<ncr53c96_device> m_ncr1;
 	required_device<dp83932c_device> m_sonic;
 	required_device<dafb_device> m_dafb;
-	required_device<asc_device> m_easc;
+	required_device<asc_easc_device> m_easc;
 	required_device<dfac_device> m_dfac;
 	required_device<z80scc_device> m_scc;
+	required_ioport m_config;
 
 	floppy_image_device *m_cur_floppy;
 	int m_hdsel;
@@ -562,7 +564,7 @@ void spike_state::quadra700_map(address_map &map)
 	map(0x5000f000, 0x5000f0ff).rw(m_dafb, FUNC(dafb_device::turboscsi_r<0>), FUNC(dafb_device::turboscsi_w<0>)).mirror(0x00fc0000);
 	map(0x5000f100, 0x5000f101).rw(m_dafb, FUNC(dafb_device::turboscsi_dma_r<0>), FUNC(dafb_device::turboscsi_dma_w<0>)).select(0x00fc0000);
 	map(0x5000c000, 0x5000dfff).rw(FUNC(spike_state::scc_r), FUNC(spike_state::scc_w)).mirror(0x00fc0000);
-	map(0x50014000, 0x50015fff).rw(m_easc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00fc0000);
+	map(0x50014000, 0x50015fff).rw(m_easc, FUNC(asc_base_device::read), FUNC(asc_base_device::write)).mirror(0x00fc0000);
 	map(0x5001e000, 0x5001ffff).rw(FUNC(spike_state::swim_r), FUNC(spike_state::swim_w)).mirror(0x00fc0000);
 
 	map(0xf9000000, 0xf91fffff).rw(m_dafb, FUNC(dafb_device::vram_r), FUNC(dafb_device::vram_w));
@@ -584,7 +586,7 @@ void eclipse_state::quadra900_map(address_map &map)
 	map(0x5000f400, 0x5000f4ff).rw(m_dafb, FUNC(dafb_device::turboscsi_r<1>), FUNC(dafb_device::turboscsi_w<1>)).mirror(0x00fc0000);
 	map(0x5000f502, 0x5000f503).rw(m_dafb, FUNC(dafb_device::turboscsi_dma_r<1>), FUNC(dafb_device::turboscsi_dma_w<1>)).select(0x00fc0000);
 
-	map(0x50014000, 0x50015fff).rw(m_easc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00fc0000);
+	map(0x50014000, 0x50015fff).rw(m_easc, FUNC(asc_base_device::read), FUNC(asc_base_device::write)).mirror(0x00fc0000);
 	map(0x5001e000, 0x5001efff).rw(m_swimpic, FUNC(applepic_device::host_r), FUNC(applepic_device::host_w)).mirror(0x00f00000).umask32(0xff00ff00);
 	map(0x5001e000, 0x5001efff).rw(m_swimpic, FUNC(applepic_device::host_r), FUNC(applepic_device::host_w)).mirror(0x00f00000).umask32(0x00ff00ff);
 
@@ -594,7 +596,7 @@ void eclipse_state::quadra900_map(address_map &map)
 
 u8 spike_state::via_in_a()
 {
-	return 0xc1;
+	return 0xc0 | BIT(m_config->read(), 0);
 }
 
 u8 spike_state::via_in_b()
@@ -663,12 +665,12 @@ void eclipse_state::via2_out_b_q900(u8 data)
 
 	u8 eclipse_state::via_in_a()
 	{
-		return 0xd1;
+		return 0xd0 | BIT(m_config->read(), 0);
 	}
 
 	u8 eclipse_state::via_in_a_q950()
 	{
-		return 0x91;
+		return 0x90 | BIT(m_config->read(), 0);
 	}
 
 	u8 eclipse_state::via_in_b()
@@ -715,19 +717,14 @@ void eclipse_state::via2_out_b_q900(u8 data)
 		}
 	}
 
-	/***************************************************************************
-	    DEVICE CONFIG
-	***************************************************************************/
-
 	static INPUT_PORTS_START(macadb)
+		PORT_START("config")
+		PORT_CONFNAME(0x01, 0x01, "Diagnostic Mode")
+		PORT_CONFSETTING(0x00, "Enabled")
+		PORT_CONFSETTING(0x01, "Disabled")
 		INPUT_PORTS_END
 
-		/***************************************************************************
-		    MACHINE DRIVERS
-		***************************************************************************/
-
-		void
-		quadrax00_state::quadra_base(machine_config & config)
+	void quadrax00_state::quadra_base(machine_config & config)
 	{
 		DAFB(config, m_dafb, 50_MHz_XTAL / 2);
 		m_dafb->set_maincpu_tag("maincpu");
@@ -742,15 +739,15 @@ void eclipse_state::via2_out_b_q900(u8 data)
 
 		SCC8530(config, m_scc, C7M);
 		m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
-		m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
-		m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
+		m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
+		m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
 
-		rs232_port_device &rs232a(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+		rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 		rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
 		rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 		rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 
-		rs232_port_device &rs232b(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+		rs232_port_device &rs232b(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
 		rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
 		rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 		rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
@@ -760,10 +757,12 @@ void eclipse_state::via2_out_b_q900(u8 data)
 		NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
 		NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 		NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
-		NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config([](device_t *device)
-																								 {
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1); });
+		NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
+				[] (device_t *device)
+				{
+					device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
+					device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
+				});
 		NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 		NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 		NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
@@ -803,7 +802,7 @@ void eclipse_state::via2_out_b_q900(u8 data)
 		MACADB(config, m_macadb, C15M);
 
 		SPEAKER(config, "speaker", 2).front();
-		ASC(config, m_easc, 22.5792_MHz_XTAL, asc_device::asc_type::EASC);
+		ASC_EASC(config, m_easc, 22.5792_MHz_XTAL);
 		m_easc->irqf_callback().set(m_via2, FUNC(via6522_device::write_cb1)).invert();
 		m_easc->add_route(0, "speaker", 1.0, 0);
 		m_easc->add_route(1, "speaker", 1.0, 1);

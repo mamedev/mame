@@ -975,12 +975,29 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap,
 			// Addressing Mode 2 (plus Inline Header)
 
 			//if (debug_packets) LOG("for tile %04x (at %d %d): ", tile, (((x * 16) + scrollx) & 0xff), (((y * 16) + scrolly) & 0xff));
+			if (tileregs[0x7] == 0x94)
+			{
+				// multiplt uses this for the '3d' driving sections
+				const offs_t realaddress = (tileregs[0x2] << 8) + count;
+				uint8_t extraattr;
 
-			basereg = (tile & 0xf000) >> 12;
-			tile &= 0x0fff;
-			gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
+				if (m_disable_memory_bypass)
+					extraattr = m_maincpu->space(AS_PROGRAM).read_byte(realaddress);
+				else
+					extraattr = read_full_data_sp_bypass(realaddress);
 
-			tile += gfxbase;
+				tile += extraattr << 16;
+			}
+			else // tileregs[0x7] == 0x93
+			{
+				// rad_mtrk uses this
+				basereg = (tile & 0xf000) >> 12;
+				tile &= 0x0fff;
+				gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
+
+				tile += gfxbase;
+			}
+
 			set_data_address(tile, 0);
 
 			decode_inline_header(flipx, flipy, test, pal, debug_packets);

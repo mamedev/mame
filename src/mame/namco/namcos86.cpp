@@ -117,13 +117,15 @@ Address          Dir Data     Name      Description
 
 Notes:
 -----
-- we are using an unusually high CPU interleave factor (800) to avoid hangs
-  in rthunder. The two 6809 in this game synchronize using a semaphore at
-  5606/5607 (CPU1) 1606/1607 (CPU2). CPU1 clears 5606, does some quick things,
-  and then increments 5606. While it does its quick things (which require
-  about 40 clock cycles) it expects CPU2 to clear 5607.
-  Raising the interleave factor to 1000 makes wndrmomo crash during attract
-  mode. I haven't investigated on the cause.
+- We are using an unusually tight CPU quantum to avoid hangs in rthunder.
+  The two 6809 in this game synchronize using a semaphore at CPU1:5606/5607 /
+  CPU2:1606/1607. CPU1 clears 5606, does some quick things, and then increments
+  5606. While it does its quick things (which require about 40 clock cycles)
+  it expects CPU2 to clear 5607.
+  If the quantum is not tight enough, CPU1 will crash in wndrmomo after 10
+  attract mode loops, and there are similar soft crashes in rthunder0 and
+  rthunder1 attract mode. For some reason, if quantum is set to perfect,
+  rthunder1 will still crash (the current quantum of clock/4 works ok).
 
 - There are two watchdogs, one per CPU (or maybe three). Handling them
   separately is necessary to allow entering service mode without manually
@@ -1046,7 +1048,7 @@ void namcos86_state::hopmappy(machine_config &config)
 	m_mcu->out_p2_cb().set(FUNC(namcos86_state::led_w));
 	m_mcu->set_vblank_int("screen", FUNC(namcos86_state::irq0_line_hold)); // ???
 
-	config.set_maximum_quantum(attotime::from_hz(48000)); // heavy interleaving needed to avoid hangs in rthunder
+	config.set_maximum_quantum(attotime::from_hz(m_cpu1->clock() / 4)); // heavy interleaving needed to avoid hangs in rthunder
 
 	WATCHDOG_TIMER(config, m_watchdog);
 

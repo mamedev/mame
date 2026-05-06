@@ -531,6 +531,11 @@ void am9517a_device::device_start()
 
 void am9517a_device::device_reset()
 {
+	soft_reset();
+}
+
+void am9517a_device::soft_reset()
+{
 	m_state = STATE_SI;
 	m_command = 0;
 	m_status &= 0xf0;
@@ -547,7 +552,6 @@ void am9517a_device::device_reset()
 
 	set_dack();
 }
-
 
 //-------------------------------------------------
 //  execute_run -
@@ -1119,10 +1123,15 @@ void v5x_dmau_device::write(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0x00:  // Initialise
-			// TODO: reset (bit 0)
-			//m_buswidth = data & 0x02;
-			//if (data & 0x01)
-			//  soft_reset();
+			// bit 0 = soft reset
+			if (BIT(data, 0))
+			{
+				soft_reset();
+
+				m_selected_channel = 0;
+				m_base = 0;
+			}
+
 			LOG("DMA: Initialise [%02x]\n", data);
 			break;
 		case 0x01:  // Channel

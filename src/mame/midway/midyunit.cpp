@@ -2718,6 +2718,34 @@ ROM_START( shimpact )
 	ROM_LOAD ( "sl1_super_high_impact_u20_sound_rom.u20", 0x50000, 0x20000, CRC(1b4a71c1) SHA1(74b7b4ae76ebe65f1f46b2117970bfefefbb5344) )
 
 	ROM_REGION16_LE( 0x100000, "maindata", 0 ) // 34010 code
+	ROM_LOAD16_BYTE( "la2_super_high_impact_game_rom_u105.u105", 0xc0000, 0x20000, CRC(7f1a1d1c) SHA1(0d4264c28f6ee9692a12b6c871586e8a30ded15d) )
+	ROM_LOAD16_BYTE( "la2_super_high_impact_game_rom_u89.u89",   0xc0001, 0x20000, CRC(a348fcb9) SHA1(b2f8e566b190cf41fc3d69c31bdfed0be027df84) )
+
+	ROM_REGION( 0x800000, "gfx", 0 )
+	ROM_LOAD ( "la1_super_high_impact_game_rom_u111.u111", 0x000000, 0x40000, CRC(80ae2a86) SHA1(1ff76e3064c7636f6877e426f4a88c094d1a6325) )
+	ROM_LOAD ( "la1_super_high_impact_game_rom_u112.u112", 0x040000, 0x40000, CRC(3ffc27e9) SHA1(ec337629c17daaa2445fb344e08243de7f09536e) )
+	ROM_LOAD ( "la1_super_high_impact_game_rom_u113.u113", 0x080000, 0x40000, CRC(01549d00) SHA1(40604e949cef056f90031850bdb91782135e7ec2) )
+	ROM_LOAD ( "la1_super_high_impact_game_rom_u114.u114", 0x0c0000, 0x40000, CRC(a68af319) SHA1(9ed2e620a952dce26e08d0931f52eaeb638fc14d) )
+
+	ROM_LOAD ( "la1_super_high_impact_game_rom_u95.u95",   0x200000, 0x40000, CRC(e8f56ef5) SHA1(7cb0b6bad3f0be822ef9b92e6523572e45776969) )
+	ROM_LOAD ( "la1_super_high_impact_game_rom_u96.u96",   0x240000, 0x40000, CRC(24ed04f9) SHA1(f4e91640713c0c376861652f3f0db33bff32656d) )
+	ROM_LOAD ( "la1_super_high_impact_game_rom_u97.u97",   0x280000, 0x40000, CRC(dd7f41a9) SHA1(a14a285ccc593f8f1d50b0d5574af4845a1e287e) )
+	ROM_LOAD ( "la1_super_high_impact_game_rom_u98.u98",   0x2c0000, 0x40000, CRC(23ef65dd) SHA1(58400c305dfad1de18b84a8c118f72529b507414) )
+
+	ROM_LOAD ( "la1_super_high_impact_game_rom_u106.u106", 0x400000, 0x40000, CRC(6f5bf337) SHA1(5b1a0d927302c7e1727976c2d8c612a80b8f1484) )
+	ROM_LOAD ( "la1_super_high_impact_game_rom_u107.u107", 0x440000, 0x40000, CRC(a8815dad) SHA1(627d916a4b0ab03a943d123ca0eabd514634ad30) )
+	ROM_LOAD ( "la1_super_high_impact_game_rom_u108.u108", 0x480000, 0x40000, CRC(d39685a3) SHA1(84e5da34a9946b954635befd37760683850d310b) )
+	ROM_LOAD ( "la1_super_high_impact_game_rom_u109.u109", 0x4c0000, 0x40000, CRC(36e0b2b2) SHA1(96d76698a09cd884349bf0c4c1b75423b4404432) )
+ROM_END
+
+
+ROM_START( shimpactl1 )
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )    // sound CPU
+	ROM_LOAD ( "sl1_super_high_impact_u4_sound_rom.u4",   0x10000, 0x20000, CRC(1e5a012c) SHA1(4077fc266799a01738b7f88e867535f1fbacd557) )
+	ROM_LOAD ( "sl1_super_high_impact_u19_sound_rom.u19", 0x30000, 0x20000, CRC(10f9684e) SHA1(1fdc5364f87fb65f4f2a438841e0fe847f765aaf) )
+	ROM_LOAD ( "sl1_super_high_impact_u20_sound_rom.u20", 0x50000, 0x20000, CRC(1b4a71c1) SHA1(74b7b4ae76ebe65f1f46b2117970bfefefbb5344) )
+
+	ROM_REGION16_LE( 0x100000, "maindata", 0 ) // 34010 code
 	ROM_LOAD16_BYTE( "la1_super_high_impact_game_rom_u105.u105", 0xc0000, 0x20000, CRC(f2cf8de3) SHA1(97428d05208c18a9fcf8f2e3c6ed2bf6441350c3) )
 	ROM_LOAD16_BYTE( "la1_super_high_impact_game_rom_u89.u89",   0xc0001, 0x20000, CRC(f97d9b01) SHA1(d5f39d6a5db23f5efd123cf9da0d09c84893b9c4) )
 
@@ -3846,7 +3874,8 @@ GAME( 1990, hiimpact2,  hiimpact, yunit_cvsd_6bit_slow,    hiimpact, midyunit_cv
 GAME( 1990, hiimpact1,  hiimpact, yunit_cvsd_6bit_slow,    hiimpact, midyunit_cvsd_state,  init_hiimpact, ROT0,               "Williams",         "High Impact Football (rev LA1 12/16/90)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, hiimpactp,  hiimpact, yunit_cvsd_6bit_slow,    hiimpact, midyunit_cvsd_state,  init_hiimpact, ROT0,               "Williams",         "High Impact Football (prototype, revision0 proto 8.6 12/09/90)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, shimpact,   0,        yunit_cvsd_6bit_slow,    shimpact, midyunit_cvsd_state,  init_shimpact, ROT0,               "Midway",           "Super High Impact (rev LA1 09/30/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, shimpact,   0,        yunit_cvsd_6bit_slow,    shimpact, midyunit_cvsd_state,  init_shimpact, ROT0,               "Midway",           "Super High Impact (rev LA2 10/22/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, shimpactl1, shimpact, yunit_cvsd_6bit_slow,    shimpact, midyunit_cvsd_state,  init_shimpact, ROT0,               "Midway",           "Super High Impact (rev LA1 09/30/91)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, shimpactp6, shimpact, yunit_cvsd_6bit_slow,    shimpact, midyunit_cvsd_state,  init_shimpact, ROT0,               "Midway",           "Super High Impact (prototype, proto 6.0 09/23/91)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, shimpactp5, shimpact, yunit_cvsd_6bit_slow,    shimpact, midyunit_cvsd_state,  init_shimpact, ROT0,               "Midway",           "Super High Impact (prototype, proto 5.0 09/15/91)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, shimpactp4, shimpact, yunit_cvsd_6bit_slow,    shimpact, midyunit_cvsd_state,  init_shimpact, ROT0,               "Midway",           "Super High Impact (prototype, proto 4.0 09/10/91)", MACHINE_SUPPORTS_SAVE ) // See notes about factory restore above

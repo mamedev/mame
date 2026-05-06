@@ -10,14 +10,14 @@
 
 
 Notes:
-- When booting, it does a basic check by writing values 0..0xFF to 0x108A.
+- When booting, it does a basic check by writing values 0..0xff to 0x108a.
   It then expects (value & 0x03) to be read back from 0x1080 and (value) to be read back from 0x1081/0x1082.
   The routine for doing the check begins at 0x4686.
   Succeeding means it ends up at 0x4801.
-- When in test mode, the firmware gets stuck in the loop at 0xBB06, waiting for Interrupt #5 (calls 0x4014) to fire.
-  It gets there by calling function 0xBBBB, which writes text (address w@0x40, num characters b@0x43) to the LCD screen.
+- When in test mode, the firmware gets stuck in the loop at 0xbb06, waiting for Interrupt #5 (calls 0x4014) to fire.
+  It gets there by calling function 0xbbbb, which writes text (address w@0x40, num characters b@0x43) to the LCD screen.
   This can be worked around by setting b@BB2D = 03.
-- The firmware gets also stuck in the loop at 0x7D70, waiting for Interrupt #8 (calls 0x4020).
+- The firmware gets also stuck in the loop at 0x7d70, waiting for Interrupt #8 (calls 0x4020).
   This might be related to finding the best free voice?
   You can exit the loop by setting b@7D80 = 00.
 - Test Mode shows the results of 4 checks:
@@ -28,9 +28,9 @@ Notes:
   Errors in check 2 and 3 are "not abnormal".
   In order to make check 2 pass successfully, you need to connect MIDI Out with MIDI In, creating a loopback.
   Check 3 requires the SN-U110-04 PCM card ("Electric Grand & Clavi") to be inserted in order to succeed.
-- In order to access the built-in PCM ROM (IC18), the CPU asks the sound chip to read offsets 0x000000 .. 0x07FFFF.
-  The PCM card is accessed via offsets 0x080000 .. 0x0FFFFF.
-  The additional PCM ROMs are mapped to 0x100000 .. 0x17FFFF (IC19) and 0x200000 .. 0x27FFFF according to the sample table in IC18.
+- In order to access the built-in PCM ROM (IC18), the CPU asks the sound chip to read offsets 0x000000 .. 0x07ffff.
+  The PCM card is accessed via offsets 0x080000 .. 0x0fffff.
+  The additional PCM ROMs are mapped to 0x100000 .. 0x17ffff (IC19) and 0x200000 .. 0x27ffff according to the sample table in IC18.
 - The sound chip has 32 voices. Voice 0 is reserved by the firmware for reading data from the PCM ROM.
   The firmware allocates voices from back to front, i.e. voice 31 first.
 - The "PCM sound chip" itself doesn't seem to support panning.
@@ -38,7 +38,7 @@ Notes:
 
 
 TODO:
-- figure out how "freeing a voice" works - right now the firmware gets stuck when playing the 32th note.
+- figure out how "freeing a voice" works - right now the firmware gets stuck when playing the 32nd note.
 
 
 PCB Layout
@@ -141,8 +141,7 @@ external internal   external internal
   A17 - - - A17
   A18 - - - A18
 
-Line scramling of A0..A6 and D0..D7 matches the SN-U110 cards.
-For A7..A16 they changed the scrambling.
+Line scrambling for the address and data lines matches the SN-U110 cards.
 
 
 PCM ROM Tables
@@ -203,8 +202,8 @@ CM-32P Firmware Work RAM Layout
 2344..23C1 - Part 1..6 "Patch temporary area" (see manual page 21, 0x15 bytes per partial)
 23C4..23D4 - "System area" settings (see manual page 22, master volume, reverb setting, channel assignments)
   23CE-23D3 - Part 1..6 MIDI channel
-23D6..25B5 - Part 1..6 instrument data (0x50 bytes per partial, from PCM ROM at 0x1000/0x1050/0x10A0/...)
-25B8..2B57 - Part 1..6 sample table data (0xF0 bytes per partial, from PCM ROM at 0x0100/0x010A/0x0114/...)
+23D6..25B5 - Part 1..6 instrument data (0x50 bytes per partial, from PCM ROM at 0x1000/0x1050/0x10a0/...)
+25B8..2B57 - Part 1..6 sample table data (0xf0 bytes per partial, from PCM ROM at 0x0100/0x010a/0x0114/...)
 
 34DC..34E1 - Part 1..6 Modulation (CC #1, initialized with 0)
 34E2..34E7 - Part 1..6 Pitch Bend LSB (initialized with 0)
@@ -212,9 +211,9 @@ CM-32P Firmware Work RAM Layout
 34EE..34F3 - Part 1..6 Expression setting (CC #11, initialized with 100)
 34F4..34F9 - Part 1..6 Sustain setting (CC #64, initialized with 0)
 34FA..34FF - Part 1..6 unused (initialized with 0)
-3500..3505 - Part 1..6 RPN LSB (CC #98, initialized with 0xFF)
-3506..350B - Part 1..6 RPN MSB (CC #99, initialized with 0xFF)
-350C..3511 - Part 1..6 NRPN received (initialized with 0xFF, set to 0 when RPN LSB/MSB is received, set to 0xFF when NRPN is received)
+3500..3505 - Part 1..6 RPN LSB (CC #98, initialized with 0xff)
+3506..350B - Part 1..6 RPN MSB (CC #99, initialized with 0xff)
+350C..3511 - Part 1..6 NRPN received (initialized with 0xff, set to 0 when RPN LSB/MSB is received, set to 0xff when NRPN is received)
 3512..3517 - Part 1..6 ?? (initialized with 0)
 3518..351D - Part 1..6 Instrument setting
 351E - Reverb Mode
@@ -235,31 +234,33 @@ CM-32P Firmware Work RAM Layout
 Some routine locations
 ----------------------
 0x4014  LCD related interrupt handler
-0x401C  serial input (MIDI data) interrupt handler
+0x401c  serial input (MIDI data) interrupt handler
 0x4020  some interrupt handler required while playing notes
-0x45CB  Initialization (memory clear + checks), external memory is checked from 0x4679 on
+0x45cb  Initialization (memory clear + checks), external memory is checked from 0x4679 on
 0x5024  decide whether or not Test Mode is entered (normal boot == jump to 0x502A)
-0x50F5  MIDI handling code
-0x65E8  PCM ROM instrument check
+0x50f5  MIDI handling code
+0x65e8  PCM ROM instrument check
 0x6650  PCM card instrument check (Note: assumes that the SN-U110-04 PCM card is inserted)
-0x6EA4  play a note (parameters: 0040 - part, 0041 = note pitch, 0042 - velocity)
-0xB027  load instrument data from PCM ROM (writes to 23D6 + 50*i)
-0xB12B  load instrument sample data from PCM ROM (reads sample IDs from 23D6+1B + 50*i, writes to 25B8 + F0*i)
-0xB1A0  load secondary instrument sample data from PCM ROM (reads sample IDs from 23D6+3B + 50h*i, writes to 25B8+50 + F0*i)
-0xB1E8  load 1 sample table entry from PCM ROM
+0x6ea4  play a note (parameters: 0040 - part, 0041 = note pitch, 0042 - velocity)
+0xb027  load instrument data from PCM ROM (writes to 23D6 + 50*i)
+0xb12b  load instrument sample data from PCM ROM (reads sample IDs from 23D6+1B + 50*i, writes to 25B8 + F0*i)
+0xb1a0  load secondary instrument sample data from PCM ROM (reads sample IDs from 23D6+3B + 50h*i, writes to 25B8+50 + F0*i)
+0xb1e8  load 1 sample table entry from PCM ROM
 0xB316  PCM ROM signature check
-0xBBBB  write text to LCD
+0xbbbb  write text to LCD
 
 */
 
 #include "emu.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/mcs96/i8x9x.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/roland_lp.h"
 #include "video/msm6222b.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
@@ -269,18 +270,15 @@ Some routine locations
 namespace {
 
 // unscramble address: ROM dump offset -> proper (descrambled) offset
-#define UNSCRAMBLE_ADDR_INT(_offset) \
-	bitswap<19>(_offset,18,17,15,14,16,12,11, 7, 9,13,10, 8, 3, 2, 1, 6, 4, 5, 0)
+template <typename T> constexpr auto UNSCRAMBLE_ADDR(T &&offset)
+{ return bitswap<19>(offset,18,17,15,14,16,12,11, 7, 9,13,10, 8, 3, 2, 1, 6, 4, 5, 0); }
+
 // scramble address: proper offset -> ROM dump offset
-#define SCRAMBLE_ADDR_INT(_offset) \
-	bitswap<19>(_offset,18,17,14,16,15, 9,13,12, 8,10, 7,11, 3, 1, 2, 6, 5, 4, 0)
+template <typename T> constexpr auto SCRAMBLE_ADDR(T &&offset)
+{ return bitswap<19>(offset,18,17,14,16,15, 9,13,12, 8,10, 7,11, 3, 1, 2, 6, 5, 4, 0); }
 
-// PCM cards use a different address line scrambling
-#define UNSCRAMBLE_ADDR_EXT(_offset) \
-	bitswap<19>(_offset,18,17, 8, 9,16,11,12, 7,14,10,13,15, 3, 2, 1, 6, 4, 5, 0)
-
-#define UNSCRAMBLE_DATA(_data) \
-	bitswap<8>(_data,1,2,7,3,5,0,4,6)
+constexpr u8 UNSCRAMBLE_DATA(u8 data)
+{ return bitswap<8>(data,1,2,7,3,5,0,4,6); }
 
 
 static INPUT_PORTS_START( cm32p )
@@ -308,27 +306,18 @@ class cm32p_state : public driver_device
 public:
 	cm32p_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	void cm32p(machine_config &config);
+	void cm32p(machine_config &config) ATTR_COLD;
 
-	void init_cm32p();
+	void init_cm32p() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<i8x9x_device> cpu;
-	required_device<mb87419_mb87420_device> pcm;
-	required_device<generic_slot_device> pcmcard;
-	required_device<msm6222b_device> lcd;
-	required_device<timer_device> midi_timer;
-	required_device<ram_device> some_ram;
-	required_ioport test_sw;
-	required_ioport service_port;
-
 	void mt32_palette(palette_device &palette) const;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void midi_w(u16 data);
 
@@ -351,8 +340,16 @@ private:
 
 	void cm32p_map(address_map &map) ATTR_COLD;
 
-	void descramble_rom_internal(u8* dst, const u8* src);
-	void descramble_rom_external(u8* dst, const u8* src);
+	void descramble_pcm_rom(u8 *dst, const u8 *src);
+
+	required_device<i8x9x_device> cpu;
+	required_device<mb87419_mb87420_device> pcm;
+	required_device<generic_slot_device> pcmcard;
+	required_device<msm6222b_device> lcd;
+	required_device<timer_device> midi_timer;
+	required_device<ram_device> some_ram;
+	required_ioport test_sw;
+	required_ioport service_port;
 
 	bool pcmard_loaded;
 	u8 midi;
@@ -376,7 +373,7 @@ cm32p_state::cm32p_state(const machine_config &mconfig, device_type type, const 
 
 
 // screen update function from Roland D-110
-uint32_t cm32p_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 cm32p_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u16 sy=0;
 	u8 const *const data = lcd->render();
@@ -412,10 +409,10 @@ void cm32p_state::machine_start()
 
 	// TODO: The IC8 gate array has an "LCD INT" line that needs to be emulated. Then, the hack can be removed.
 	// Note: The hack is not necessary when *not* using test mode.
-	rom[0xBB2D] = 0x03; // hack to make test mode not freeze when displaying the LCD text
+	rom[0xbb2d] = 0x03; // hack to make test mode not freeze when displaying the LCD text
 
 	// TODO: remove this hack
-	rom[0x7D80] = 0x00; // hack to exit some loop waiting for interrupt #8
+	rom[0x7d80] = 0x00; // hack to exit some loop waiting for interrupt #8
 }
 
 void cm32p_state::machine_reset()
@@ -426,7 +423,7 @@ void cm32p_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER(cm32p_state::card_load)
 {
-	uint32_t const size = pcmcard->common_get_size("rom");
+	u32 const size = pcmcard->common_get_size("rom");
 	if (size > 0x080000)
 		return std::make_pair(image_error::INVALIDLENGTH, "Invalid size (maximum supported is 512K)");
 
@@ -435,10 +432,10 @@ DEVICE_IMAGE_LOAD_MEMBER(cm32p_state::card_load)
 	u8 *base = pcmcard->get_rom_base();
 	if (size < 0x080000)
 	{
-		uint32_t mirror = (1 << (31 - count_leading_zeros_32(size)));
+		u32 mirror = (1 << (31 - count_leading_zeros_32(size)));
 		if (mirror < 0x020000)  // due to how address descrambling works, we can currently only do mirroring for 128K pages
 			mirror = 0x020000;
-		for (uint32_t ofs = mirror; ofs < 0x080000; ofs += mirror)
+		for (u32 ofs = mirror; ofs < 0x080000; ofs += mirror)
 			memcpy(base + ofs, base, mirror);
 	}
 
@@ -446,7 +443,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cm32p_state::card_load)
 	u8 *dst = reinterpret_cast<u8 *>(memregion("pcm")->base());
 	memcpy(&src[0x080000], base, 0x080000);
 	// descramble PCM card ROM
-	descramble_rom_external(&dst[0x080000], &src[0x080000]);
+	descramble_pcm_rom(&dst[0x080000], &src[0x080000]);
 	pcmard_loaded = true;
 
 	return std::make_pair(std::error_condition(), std::string());
@@ -501,7 +498,7 @@ u16 cm32p_state::port0_r()
 
 u8 cm32p_state::pcmrom_r(offs_t offset)
 {
-	const u8* pcm_rom = memregion("pcm")->base();
+	const u8 *pcm_rom = memregion("pcm")->base();
 	return pcm_rom[offset];
 }
 
@@ -521,16 +518,16 @@ void cm32p_state::dsp_io_w(offs_t offset, u8 data)
 		break;
 	case 0x06:
 		{
-			u8* ram = some_ram->pointer();
+			u8 *ram = some_ram->pointer();
 			offs_t ofs = data;
 			ram[0x000 | ofs] = dsp_io_buffer[0x00] & 0x03;
 			ram[0x100 | ofs] = dsp_io_buffer[0x01];
 			ram[0x200 | ofs] = dsp_io_buffer[0x02];
 		}
 		break;
-	case 0x0A:
+	case 0x0a:
 		{
-			const u8* ram = some_ram->pointer();
+			const u8 *ram = some_ram->pointer();
 			offs_t ofs = data;
 			dsp_io_buffer[0x00] = ram[0x000 | ofs];
 			dsp_io_buffer[0x01] = ram[0x100 | ofs];
@@ -557,18 +554,18 @@ u8 cm32p_state::snd_io_r(offs_t offset)
 
 	if (offset == 0x01)
 	{
-		// code for reading from the PCM sample table is at 0xB027
-		// The code at 0xB0AC writes to 1411/1F (??), then 1403/02 (bank), then 1409/08/0B/0A (address).
-		// It waits a few cycles and at 0xB0F7 it reads the resulting data from 1401.
+		// code for reading from the PCM sample table is at 0xb027
+		// The code at 0xb0ac writes to 1411/1F (??), then 1403/02 (bank), then 1409/08/0B/0A (address).
+		// It waits a few cycles and at 0xb0f7 it reads the resulting data from 1401.
 		offs_t bank = sound_io_buffer[0x03];
-		offs_t addr = (sound_io_buffer[0x09] << 0) | (sound_io_buffer[0x0A] << 8) | (sound_io_buffer[0x0B] << 16);
-		addr = ((addr >> 6) + 2) & 0x3FFFF;
+		offs_t addr = (sound_io_buffer[0x09] << 0) | (sound_io_buffer[0x0a] << 8) | (sound_io_buffer[0x0b] << 16);
+		addr = ((addr >> 6) + 2) & 0x3ffff;
 		addr |= (bank << 16);
 		// write actual ROM address to 1440..1443 for debugging
-		sound_io_buffer[0x43] = (addr >>  0) & 0xFF;
-		sound_io_buffer[0x42] = (addr >>  8) & 0xFF;
-		sound_io_buffer[0x41] = (addr >> 16) & 0xFF;
-		sound_io_buffer[0x40] = (addr >> 24) & 0xFF;
+		sound_io_buffer[0x43] = (addr >>  0) & 0xff;
+		sound_io_buffer[0x42] = (addr >>  8) & 0xff;
+		sound_io_buffer[0x41] = (addr >> 16) & 0xff;
+		sound_io_buffer[0x40] = (addr >> 24) & 0xff;
 		return pcmrom_r(addr);
 	}
 	return sound_io_buffer[offset];
@@ -664,30 +661,21 @@ void cm32p_state::init_cm32p()
 	// Roland did a fair amount of scrambling on the address and data lines.
 	// Only the first 0x80 bytes of the ROMs are readable text in a raw dump.
 	// The CM-32P actually checks some of these header bytes, but it uses post-scrambling variants of offsets/values.
-	u8* src = static_cast<u8*>(memregion("pcmorg")->base());
-	u8* dst = static_cast<u8*>(memregion("pcm")->base());
+	u8 *src = static_cast<u8 *>(memregion("pcmorg")->base());
+	u8 *dst = static_cast<u8 *>(memregion("pcm")->base());
 	// descramble internal ROMs
-	descramble_rom_internal(&dst[0x000000], &src[0x000000]);
-	descramble_rom_internal(&dst[0x100000], &src[0x100000]);
-	descramble_rom_internal(&dst[0x200000], &src[0x200000]);
+	descramble_pcm_rom(&dst[0x000000], &src[0x000000]);
+	descramble_pcm_rom(&dst[0x100000], &src[0x100000]);
+	descramble_pcm_rom(&dst[0x200000], &src[0x200000]);
 	// descramble PCM card ROM
-	descramble_rom_external(&dst[0x080000], &src[0x080000]);
+	descramble_pcm_rom(&dst[0x080000], &src[0x080000]);
 }
 
-void cm32p_state::descramble_rom_internal(u8* dst, const u8* src)
+void cm32p_state::descramble_pcm_rom(u8 *dst, const u8 *src)
 {
 	for (offs_t srcpos = 0x00; srcpos < 0x80000; srcpos ++)
 	{
-		offs_t dstpos = UNSCRAMBLE_ADDR_INT(srcpos);
-		dst[dstpos] = UNSCRAMBLE_DATA(src[srcpos]);
-	}
-}
-
-void cm32p_state::descramble_rom_external(u8* dst, const u8* src)
-{
-	for (offs_t srcpos = 0x00; srcpos < 0x80000; srcpos ++)
-	{
-		offs_t dstpos = UNSCRAMBLE_ADDR_EXT(srcpos);
+		offs_t dstpos = UNSCRAMBLE_ADDR(srcpos);
 		dst[dstpos] = UNSCRAMBLE_DATA(src[srcpos]);
 	}
 }
@@ -699,7 +687,7 @@ ROM_START( cm32p )
 
 	ROM_REGION( 0x400000, "pcmorg", 0 ) // ROMs before descrambling
 	ROM_LOAD( "roland__r15179970__mb834000a-20__3b1_aa__8917_r00.45f.ic18", 0x000000, 0x80000, CRC(8e53b2a3) SHA1(4872530870d5079776e80e477febe425dc0ec1df) ) // markings under chip footprint are "MB834000A-20P-G-3B1"
-	// 0x080000 .. 0x0FFFFF is reserved for the PCM card
+	// 0x080000 .. 0x0fffff is reserved for the PCM card
 	ROM_LOAD( "roland__r15179971__mb834000a-20__3b2_aa__8919_r02.34f.ic19", 0x100000, 0x80000, CRC(c8220761) SHA1(49e55fa672020f95fd9c858ceaae94d6db93df7d) ) // markings under chip footprint are "MB834000A20P-G-3B2" (including the missing dash, which is a typo on the board silkscreen)
 	ROM_LOAD( "roland__r15179972__hn62304bpe98__9d1_japan.3f.ic20", 0x200000, 0x80000, CRC(733c4054) SHA1(9b6b59ab74e5bf838702abb087c408aaa85b7b1f) ) // markings under chip footprint are "HN62304BPE98"
 	ROM_REGION( 0x400000, "pcm", ROMREGION_ERASEFF )    // ROMs after descrambling

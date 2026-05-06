@@ -37,7 +37,8 @@ private:
 
 
 // Scales and offsets the input stream. Useful for emulating certain op-amp and
-// resistor network circuits.
+// resistor network circuits. A common use is as a MIXER with an offset or
+// constant input.
 class va_scale_offset_device :  public device_t, public device_sound_interface
 {
 public:

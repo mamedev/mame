@@ -142,7 +142,7 @@ uint16_t segas32_state::brival_protection_r(offs_t offset, uint16_t mem_mask)
 
 void segas32_state::brival_protection_w(offs_t offset, uint16_t data)
 {
-	static const int protAddress[6][2] =
+	static const int prot_address[6][2] =
 	{
 		{ 0x109517, 0x00/2 },
 		{ 0x109597, 0x10/2 },
@@ -152,28 +152,28 @@ void segas32_state::brival_protection_w(offs_t offset, uint16_t data)
 		{ 0x109617, 0x50/2 },
 	};
 	char ret[32];
-	int curProtType;
+	int cur_prot_type;
 	uint8_t *ROM = m_maincpu_region->base();
 
 	switch (offset)
 	{
 		case 0x800/2:
-			curProtType = 0;
+			cur_prot_type = 0;
 			break;
 		case 0x802/2:
-			curProtType = 1;
+			cur_prot_type = 1;
 			break;
 		case 0x804/2:
-			curProtType = 2;
+			cur_prot_type = 2;
 			break;
 		case 0x806/2:
-			curProtType = 3;
+			cur_prot_type = 3;
 			break;
 		case 0x808/2:
-			curProtType = 4;
+			cur_prot_type = 4;
 			break;
 		case 0x80a/2:
-			curProtType = 5;
+			cur_prot_type = 5;
 			break;
 		default:
 			if (offset >= 0xa00/2 && offset < 0xc00/2)
@@ -182,10 +182,10 @@ void segas32_state::brival_protection_w(offs_t offset, uint16_t data)
 			return;
 	}
 
-	memcpy(ret, &ROM[protAddress[curProtType][0]], 16);
+	memcpy(ret, &ROM[prot_address[cur_prot_type][0]], 16);
 	ret[16] = '\0';
 
-	memcpy(&m_system32_protram[protAddress[curProtType][1]], ret, 16);
+	memcpy(&m_system32_protram[prot_address[cur_prot_type][1]], ret, 16);
 }
 
 
@@ -220,8 +220,11 @@ void segas32_state::darkedge_protection_w(offs_t offset, uint16_t data, uint16_t
 
 uint16_t segas32_state::darkedge_protection_r(offs_t offset, uint16_t mem_mask)
 {
-	logerror("%s:darkedge_prot_r(%06X) & %04X\n",
-		machine().describe_context(), 0xa00000 + 2*offset, mem_mask);
+	if (!machine().side_effects_disabled())
+	{
+		logerror("%s:darkedge_prot_r(%06X) & %04X\n",
+			machine().describe_context(), 0xa00000 + 2*offset, mem_mask);
+	}
 	return 0xffff;
 }
 
@@ -238,7 +241,7 @@ void segas32_state::f1lap_fd1149_vblank()
 	space.write_byte(0x20f7c6, 0);
 
 	// needed to start a game
-	uint8_t val = space.read_byte(0x20ee81);
+	const uint8_t val = space.read_byte(0x20ee81);
 	if (val == 0xff)
 		space.write_byte(0x20ee81,0);
 }
@@ -308,7 +311,8 @@ uint16_t segas32_state::arabfgt_protection_r()
 	}
 	else
 	{
-		popmessage("UNKONWN ARF PROTECTION READ PC=%x\n", PC);
+		if (!machine().side_effects_disabled())
+			popmessage("UNKONWN ARF PROTECTION READ PC=%x\n", PC);
 	}
 
 	return 0;
@@ -378,26 +382,29 @@ uint16_t segas32_state::arescue_dsp_r(offs_t offset)
 {
 	if (offset == 4/2)
 	{
-		switch (m_arescue_dsp_io[0])
+		if (!machine().side_effects_disabled())
 		{
-			case 0:
-			case 1:
-			case 2:
-				break;
+			switch (m_arescue_dsp_io[0])
+			{
+				case 0:
+				case 1:
+				case 2:
+					break;
 
-			case 3:
-				m_arescue_dsp_io[0] = 0x8000;
-				m_arescue_dsp_io[2/2] = 0x0001;
-				break;
+				case 3:
+					m_arescue_dsp_io[0] = 0x8000;
+					m_arescue_dsp_io[2/2] = 0x0001;
+					break;
 
-			case 6:
-				m_arescue_dsp_io[0] = 4 * m_arescue_dsp_io[2/2];
-				break;
+				case 6:
+					m_arescue_dsp_io[0] = 4 * m_arescue_dsp_io[2/2];
+					break;
 
-			default:
-				logerror("Unhandled DSP cmd %04x (%04x).\n", m_arescue_dsp_io[0], m_arescue_dsp_io[1]);
-				break;
-		}
+				default:
+					logerror("Unhandled DSP cmd %04x (%04x).\n", m_arescue_dsp_io[0], m_arescue_dsp_io[1]);
+					break;
+			}
+		}	
 	}
 
 	return m_arescue_dsp_io[offset];

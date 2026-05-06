@@ -41,6 +41,8 @@
 #define OPTION_SYSTEM_NAMES           "system_names"
 #define OPTION_SKIP_WARNINGS          "skip_warnings"
 #define OPTION_UNTHROTTLE_MUTE        "unthrottle_mute"
+#define OPTION_MENU_PAUSE             "menu_pause"
+#define OPTION_UI_FOLLOW_FOCUS        "ui_follow_focus"
 
 // core UI options
 #define OPTION_INFOS_SIZE             "infos_text_size"
@@ -114,6 +116,8 @@ public:
 	bool enlarge_snaps() const { return bool_value(OPTION_ENLARGE_SNAPS); }
 	bool forced_4x3_snapshot() const { return bool_value(OPTION_FORCED4X3); }
 	bool unthrottle_mute() const { return bool_value(OPTION_UNTHROTTLE_MUTE); }
+	bool menu_pause() const { return bool_value(OPTION_MENU_PAUSE); }
+	bool ui_follow_focus() const { return bool_value(OPTION_UI_FOLLOW_FOCUS); }
 
 	// UI options
 	float infos_size() const { return float_value(OPTION_INFOS_SIZE); }

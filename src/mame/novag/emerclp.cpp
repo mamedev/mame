@@ -3,7 +3,18 @@
 // thanks-to:Berger
 /*******************************************************************************
 
+Novag Emerald Classic Plus family
+
+TODO:
+- are Emerald and Emerald Classic on similar hardware? although they have the
+  older LCD from nvip
+- it does a cold boot at every reset, so nvram won't work properly unless MAME
+  adds some kind of auxillary autosave state feature at power-off
+
+================================================================================
+
 Novag Emerald Classic Plus (model 38710)
+----------------------------------------
 
 Hardware notes:
 - PCB label: 100215 A, EMERALD CLASSIC II
@@ -17,15 +28,26 @@ H8/325 C88 MCU is used in:
 - Novag Turquoise (suspected)
 - Excalibur Karpov 2294 (Excalibur brand Emerald Classic Plus)
 
-TODO:
-- are Emerald and Emerald Classic on similar hardware? and Novag Obsidian?
-- it does a cold boot at every reset, so nvram won't work properly unless MAME
-  adds some kind of auxillary autosave state feature at power-off
+================================================================================
+
+Novag (Perfect Technology) Obsidian (model 1016)
+------------------------------------------------
+
+It's a rehash of Emerald Classic Plus without David Kittinger's direct involvement.
+Novag Industries didn't exist anymore in 2003 (see notes in sdiamond.cpp).
+
+Hardware notes:
+- PCB label: SW661MAIN-1.1
+- Hitachi H8/3214 MCU, 16MHz XTAL
+- rest is same as Emerald Classic Plus
+
+There's also a newer version with a H8/3687 MCU.
 
 *******************************************************************************/
 
 #include "emu.h"
 
+#include "cpu/h8/h83217.h"
 #include "cpu/h8/h8325.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
@@ -36,6 +58,7 @@ TODO:
 
 // internal artwork
 #include "novag_emerclp.lh"
+#include "novag_obsidian.lh"
 
 
 namespace {
@@ -54,7 +77,10 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
+	template <typename T> void cpu_config(T &maincpu);
+	void shared(machine_config &config);
 	void emerclp(machine_config &config);
+	void obsidian(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
@@ -64,7 +90,7 @@ protected:
 
 private:
 	// devices/pointers
-	required_device<h8325_device> m_maincpu;
+	required_device<h8_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_led_pwm;
 	required_device<pwm_display_device> m_lcd_pwm;
@@ -250,30 +276,44 @@ static INPUT_PORTS_START( emerclp )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(emerclp_state::power_switch), 0)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( obsidian ) // same buttons but slightly different labels
+	PORT_INCLUDE( emerclp )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Color")
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Ver / Set")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Level")
+INPUT_PORTS_END
+
 
 
 /*******************************************************************************
     Machine Configs
 *******************************************************************************/
 
-void emerclp_state::emerclp(machine_config &config)
+template <typename T>
+void emerclp_state::cpu_config(T &maincpu)
+{
+	maincpu.nvram_enable_backup(true);
+	maincpu.standby_cb().set(maincpu, FUNC(T::nvram_set_battery));
+	maincpu.standby_cb().append(FUNC(emerclp_state::standby));
+	maincpu.write_port1().set(FUNC(emerclp_state::p1_w));
+	maincpu.read_port2().set(FUNC(emerclp_state::p2_r));
+	maincpu.write_port3().set(FUNC(emerclp_state::lcd_com_w));
+	maincpu.read_port4().set(FUNC(emerclp_state::p4_r));
+	maincpu.write_port4().set(FUNC(emerclp_state::p4_w));
+	maincpu.write_port4().append(FUNC(emerclp_state::lcd_segs_w<0>));
+	maincpu.write_port5().set(FUNC(emerclp_state::lcd_segs_w<1>));
+	maincpu.read_port6().set(FUNC(emerclp_state::power_r));
+	maincpu.write_port6().set(m_dac, FUNC(dac_2bit_ones_complement_device::write)).mask(3);
+	maincpu.write_port7().set(FUNC(emerclp_state::lcd_segs_w<2>));
+}
+
+void emerclp_state::shared(machine_config &config)
 {
 	// basic machine hardware
-	H8325(config, m_maincpu, 26.601712_MHz_XTAL);
-	m_maincpu->nvram_enable_backup(true);
-	m_maincpu->standby_cb().set(m_maincpu, FUNC(h8325_device::nvram_set_battery));
-	m_maincpu->standby_cb().append(FUNC(emerclp_state::standby));
-	m_maincpu->write_port1().set(FUNC(emerclp_state::p1_w));
-	m_maincpu->read_port2().set(FUNC(emerclp_state::p2_r));
-	m_maincpu->write_port3().set(FUNC(emerclp_state::lcd_com_w));
-	m_maincpu->read_port4().set(FUNC(emerclp_state::p4_r));
-	m_maincpu->write_port4().set(FUNC(emerclp_state::p4_w));
-	m_maincpu->write_port4().append(FUNC(emerclp_state::lcd_segs_w<0>));
-	m_maincpu->write_port5().set(FUNC(emerclp_state::lcd_segs_w<1>));
-	m_maincpu->read_port6().set(FUNC(emerclp_state::power_r));
-	m_maincpu->write_port6().set(m_dac, FUNC(dac_2bit_ones_complement_device::write)).mask(3);
-	m_maincpu->write_port7().set(FUNC(emerclp_state::lcd_segs_w<2>));
-
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
@@ -289,11 +329,30 @@ void emerclp_state::emerclp(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
-	config.set_default_layout(layout_novag_emerclp);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_2BIT_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.125);
+}
+
+void emerclp_state::emerclp(machine_config &config)
+{
+	H8325(config, m_maincpu, 26.601712_MHz_XTAL);
+	cpu_config<h8325_device>(downcast<h8325_device &>(*m_maincpu));
+
+	shared(config);
+
+	config.set_default_layout(layout_novag_emerclp);
+}
+
+void emerclp_state::obsidian(machine_config &config)
+{
+	H83214(config, m_maincpu, 16_MHz_XTAL);
+	cpu_config<h83214_device>(downcast<h83214_device &>(*m_maincpu));
+
+	shared(config);
+
+	config.set_default_layout(layout_novag_obsidian);
 }
 
 
@@ -310,6 +369,14 @@ ROM_START( emerclp )
 	ROM_LOAD("sapphire2.svg", 0, 72533, CRC(34944b61) SHA1(4a0536ac07790cced9f9bf15522b17ebc375ff8a) )
 ROM_END
 
+ROM_START( obsidian )
+	ROM_REGION16_BE( 0x8000, "maincpu", 0 )
+	ROM_LOAD("novag_010072_hd6433214a56f.u1", 0x0000, 0x8000, CRC(5bb6b6a3) SHA1(0f0df95d5ddc38340dfeea15c90938feb2be4569) )
+
+	ROM_REGION( 72533, "screen", 0 )
+	ROM_LOAD("sapphire2.svg", 0, 72533, CRC(34944b61) SHA1(4a0536ac07790cced9f9bf15522b17ebc375ff8a) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -318,5 +385,7 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT     CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1997, emerclp, 0,      0,      emerclp,  emerclp, emerclp_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Emerald Classic Plus", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS          INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1997, emerclp,  0,      0,      emerclp,  emerclp,  emerclp_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Emerald Classic Plus", MACHINE_SUPPORTS_SAVE )
+
+SYST( 2003, obsidian, 0,      0,      obsidian, obsidian, emerclp_state, empty_init, "Perfect Technology / Intelligent Heuristic Programming", "Obsidian", MACHINE_SUPPORTS_SAVE )

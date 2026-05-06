@@ -58,6 +58,7 @@ public:
 	template <typename T, typename Ret, typename... Params>
 	void set_addrmap(int spacenum, Ret (T::*func)(Params...));
 	void set_addrmap(int spacenum, address_map_constructor map);
+	void remove_addrmap(int spacenum) { set_addrmap(spacenum, address_map_constructor()); }
 
 	// basic information getters
 	bool has_space(int index = 0) const { return index >= 0 && index < int(m_addrspace.size()) && m_addrspace[index]; }

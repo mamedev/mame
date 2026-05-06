@@ -12,13 +12,15 @@
 
 #pragma once
 
+#include "ms1_gatearray.h"
+#include "ms1_tmap.h"
+
 #include "cpu/tlcs90/tlcs90.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
-#include "ms1_gatearray.h"
-#include "ms1_tmap.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -34,8 +36,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
-		m_tmap(*this, "scroll%u", 0),
+		m_tmap(*this, "scroll%u", 1U),
 		m_oki(*this, "oki%u", 1U),
+		m_objectram(*this, "objectram"),
 		m_ram(*this, "ram"),
 		m_io_system(*this, "SYSTEM"),
 		m_io_p1(*this, "P1"),
@@ -45,7 +48,6 @@ public:
 		m_io_dsw2(*this, "DSW2"),
 		m_scantimer(*this, "scantimer"),
 		m_rom_maincpu(*this, "maincpu"),
-		m_objectram(*this, "objectram"),
 		m_ymsnd(*this, "ymsnd")
 	{
 		m_hardware_type_z = 0;
@@ -69,6 +71,7 @@ protected:
 	required_device<screen_device> m_screen;
 	optional_device_array<megasys1_tilemap_device, 3> m_tmap;
 	optional_device_array<okim6295_device, 2> m_oki;
+	required_shared_ptr<u16> m_objectram;
 	required_shared_ptr<u16> m_ram;
 	required_ioport m_io_system;
 	required_ioport m_io_p1;
@@ -95,10 +98,10 @@ protected:
 
 	void megasys1_palette(palette_device &palette);
 
-	virtual void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
+	virtual void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void partial_clear_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 param);
-	inline void draw_16x16_priority_sprite(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect, s32 code, s32 color, s32 sx, s32 sy, s32 flipx, s32 flipy, u8 mosaic, u8 mosaicsol, s32 priority);
+	inline void draw_single_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u32 code, u32 color, s32 sx, s32 sy, bool flipx, bool flipy, u8 mosaic, bool mosaicsol, u32 priority);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sound_irq(int state);
 	void screen_vblank(int state);
@@ -133,11 +136,10 @@ protected:
 	u16 m_sprite_flag = 0;
 
 private:
-	required_shared_ptr<u16> m_objectram;
 	optional_device<device_t> m_ymsnd;
 
 	// configuration
-	int m_layers_order[16]{};
+	u32 m_layers_order[16]{};
 
 	void monkelf_scroll0_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void monkelf_scroll1_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -189,7 +191,6 @@ protected:
 	void megasys1A_sound_map(address_map &map) ATTR_COLD;
 
 	void p47bl_adpcm_w(offs_t offset, u8 data);
-
 
 private:
 	optional_device_array<msm5205_device, 2> m_p47bl_adpcm;
@@ -253,7 +254,7 @@ public:
 	void system_Z(machine_config &config);
 
 protected:
-	virtual void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect) override;
+	virtual void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 private:
 	void soundlatch_z_w(u16 data);
@@ -323,8 +324,8 @@ private:
 	void mcu_port2_w(u8 data);
 	void mcu_port6_w(u8 data);
 
-	u8 m_mcu_input_data;
-	u8 m_mcu_io_data;
+	u8 m_mcu_input_data = 0;
+	u8 m_mcu_io_data = 0;
 
 	void megasys1B_iomcu_map(address_map &map) ATTR_COLD;
 	void megasys1C_iomcu_map(address_map &map) ATTR_COLD;

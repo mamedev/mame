@@ -208,6 +208,9 @@ void rm380z_state::base_configure(machine_config &config)
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rm380z_state::rm380z_mem);
 	m_maincpu->set_addrmap(AS_IO, &rm380z_state::rm380z_io);
+	m_maincpu->z80_set_m1_cycles(4+1);   // 1 wait state per M1 cycle
+	m_maincpu->z80_set_mreq_cycles(3+1); // and also 1 wait state for each MREQ
+	m_maincpu->refresh_cb().set(FUNC(rm380z_state::z80_m1_w));
 
 	/* video hardware */
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);

@@ -18,8 +18,8 @@
 
 namespace ui {
 
-menu_audio_effect_compressor::menu_audio_effect_compressor(mame_ui_manager &mui, render_container &container, u16 chain, u16 entry, audio_effect *effect)
-	: menu(mui, container)
+menu_audio_effect_compressor::menu_audio_effect_compressor(mame_ui_manager &mui, render_target &target, u16 chain, u16 entry, audio_effect *effect)
+	: menu(mui, target)
 {
 	m_chain = chain;
 	m_entry = entry;
@@ -438,7 +438,7 @@ u32 menu_audio_effect_compressor::flag_mode() const
 {
 	u32 flag = 0;
 	if(!m_effect->isset_mode())
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	if(m_effect->mode())
 		flag |= FLAG_LEFT_ARROW;
 	else
@@ -450,7 +450,7 @@ u32 menu_audio_effect_compressor::flag_lim(float value, float min, float max, bo
 {
 	u32 flag = 0;
 	if(!isset)
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	if(value > min)
 		flag |= FLAG_LEFT_ARROW;
 	if(value < max)
@@ -462,7 +462,7 @@ u32 menu_audio_effect_compressor::flag_lim_special(float value, float min, bool 
 {
 	u32 flag = 0;
 	if(!isset)
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	if(value != min)
 		flag |= FLAG_LEFT_ARROW;
 	if(value >= min)

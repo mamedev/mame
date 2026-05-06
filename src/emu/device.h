@@ -21,6 +21,7 @@
 #include <iterator>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <typeinfo>
 #include <unordered_map>
@@ -569,7 +570,7 @@ protected:
 	device_t(
 			const machine_config &mconfig,
 			device_type type,
-			const char *tag,
+			std::string_view tag,
 			device_t *owner,
 			u32 clock);
 

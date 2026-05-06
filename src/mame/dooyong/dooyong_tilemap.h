@@ -13,11 +13,10 @@ DECLARE_DEVICE_TYPE(RSHARK_ROM_TILEMAP,  rshark_rom_tilemap_device)
 DECLARE_DEVICE_TYPE(DOOYONG_RAM_TILEMAP, dooyong_ram_tilemap_device)
 
 
-class dooyong_tilemap_device_base : public device_t
+class dooyong_tilemap_device_base : public device_t, public device_gfx_interface
 {
 public:
-	template <typename T> void set_gfxdecode_tag(T &&gfxdecode_tag) { m_gfxdecode.set_tag(std::forward<T>(gfxdecode_tag)); }
-	void set_gfxnum(int gfxnum) { m_gfxnum = gfxnum; }
+	void set_gfxinfo(const gfx_decode_entry *gfxinfo) { m_gfxinfo = gfxinfo; }
 
 	void draw(screen_device &screen, bitmap_ind16 &dest, rectangle const &cliprect, u32 flags, u8 priority, u8 priority_mask = 0xff);
 
@@ -31,24 +30,23 @@ protected:
 			device_t *owner,
 			u32 clock);
 
-	gfx_element const &gfx() const { return *m_gfxdecode->gfx(m_gfxnum); }
-
-	required_device<gfxdecode_device> m_gfxdecode;
-	int m_gfxnum;
+	gfx_element const &tgfx() const { return *gfx(0); }
 
 	tilemap_t *m_tilemap;
 	u16 m_palette_bank;
+
+	const gfx_decode_entry *m_gfxinfo;
 };
 
 class dooyong_rom_tilemap_device : public dooyong_tilemap_device_base
 {
 public:
 	template <typename T, typename U>
-	dooyong_rom_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&gfxdecode_tag, int gfxnum, U &&tilerom_tag, int tilerom_offset, int tilerom_length)
+	dooyong_rom_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, const gfx_decode_entry *gfxinfo, U &&tilerom_tag, int tilerom_offset, int tilerom_length)
 		: dooyong_rom_tilemap_device(mconfig, tag, owner, 0)
 	{
-		set_gfxdecode_tag(std::forward<T>(gfxdecode_tag));
-		set_gfxnum(gfxnum);
+		set_gfxinfo(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
 		set_tilerom_tag(std::forward<U>(tilerom_tag));
 		set_tilerom_offset(tilerom_offset);
 		set_tilerom_length(tilerom_length);
@@ -59,7 +57,7 @@ public:
 	template <typename U> void set_tilerom_tag(U &&tilerom_tag) { m_tilerom.set_tag(std::forward<U>(tilerom_tag)); }
 	void set_tilerom_offset(int offset) { m_tilerom_offset = offset; }
 	void set_tilerom_length(int length) { m_tilerom_length = length; }
-	void set_transparent_pen(unsigned pen) { m_transparent_pen = pen; }
+	void set_transparent_pen(u32 pen) { m_transparent_pen = pen; }
 
 	typedef device_delegate<void (u16 attr, u32 &code, u32 &color)> dooyong_tmap_cb_delegate;
 	template <typename... T> void set_tile_callback(T &&... args) { m_tmap_cb.set(std::forward<T>(args)...); }
@@ -79,7 +77,7 @@ protected:
 	virtual TILE_GET_INFO_MEMBER(tile_info);
 
 	tilemap_memory_index adjust_tile_index(tilemap_memory_index tile_index) const
-	{ return tile_index + ((unsigned(m_registers[1]) * 256U / gfx().width()) * m_rows); }
+	{ return tile_index + ((u32(m_registers[1]) * 256U / tgfx().width()) * m_rows); }
 
 	int m_rows;
 
@@ -88,7 +86,7 @@ private:
 	dooyong_tmap_cb_delegate m_tmap_cb;
 	int m_tilerom_offset;
 	int m_tilerom_length;
-	unsigned m_transparent_pen;
+	u32 m_transparent_pen;
 
 	u8 m_registers[0x10];
 };
@@ -97,11 +95,11 @@ class rshark_rom_tilemap_device : public dooyong_rom_tilemap_device
 {
 public:
 	template <typename T, typename U, typename V>
-	rshark_rom_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&gfxdecode_tag, int gfxnum, U &&tilerom_tag, int tilerom_offset, int tilerom_length, V &&colorrom_tag, int colorrom_offset, int colorrom_length)
+	rshark_rom_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, const gfx_decode_entry *gfxinfo, U &&tilerom_tag, int tilerom_offset, int tilerom_length, V &&colorrom_tag, int colorrom_offset, int colorrom_length)
 		: rshark_rom_tilemap_device(mconfig, tag, owner, 0)
 	{
-		set_gfxdecode_tag(std::forward<T>(gfxdecode_tag));
-		set_gfxnum(gfxnum);
+		set_gfxinfo(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
 		set_tilerom_tag(std::forward<U>(tilerom_tag));
 		set_tilerom_offset(tilerom_offset);
 		set_tilerom_length(tilerom_length);
@@ -131,11 +129,11 @@ class dooyong_ram_tilemap_device : public dooyong_tilemap_device_base
 {
 public:
 	template <typename T>
-	dooyong_ram_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&gfxdecode_tag, int gfxnum)
+	dooyong_ram_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, const gfx_decode_entry *gfxinfo)
 		: dooyong_ram_tilemap_device(mconfig, tag, owner, 0)
 	{
-		set_gfxdecode_tag(std::forward<T>(gfxdecode_tag));
-		set_gfxnum(gfxnum);
+		set_gfxinfo(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
 	}
 
 	dooyong_ram_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);

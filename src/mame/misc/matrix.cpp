@@ -62,21 +62,27 @@ private:
 	required_device<kbdc8042_device> m_kbdc;
 
 	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 };
 
 
 void matrix_state::main_map(address_map &map)
 {
+	// TODO: pulling high fixes Award screen at the expense of keep looping at $c8000
+//	map.unmap_value_high();
 }
 
-static INPUT_PORTS_START( matrix )
-INPUT_PORTS_END
+void matrix_state::main_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
 
 void matrix_state::matrix(machine_config &config)
 {
 	MEDIAGX(config, m_maincpu, 233'000'000); // Cyrix MediaGX GXm-266GP
 	m_maincpu->set_addrmap(AS_PROGRAM, &matrix_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &matrix_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("pci:12.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	// TODO: from FDC37C93x super I/O?
@@ -162,4 +168,4 @@ void matrix_state::init_decryption() // at least enough to see strings from vari
 } // anonymous namespace
 
 
-GAME( 200?, matrix, 0, matrix, matrix, matrix_state, init_decryption, ROT0, "<unknown>", "Matrix", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, matrix, 0, matrix, 0, matrix_state, init_decryption, ROT0, "<unknown>", "Matrix", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

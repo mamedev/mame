@@ -45,7 +45,7 @@ public:
 
 	menu_file_selector(
 			mame_ui_manager &mui,
-			render_container &container,
+			render_target &target,
 			device_image_interface *image,
 			std::string_view directory,
 			std::string_view file,
@@ -133,7 +133,7 @@ public:
 
 	menu_select_rw(
 			mame_ui_manager &mui,
-			render_container &container,
+			render_target &target,
 			bool can_in_place,
 			handler_function &&handler);
 	virtual ~menu_select_rw() override;

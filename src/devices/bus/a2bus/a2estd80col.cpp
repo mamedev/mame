@@ -4,7 +4,7 @@
 
     a2estd80col.cpp
 
-    Apple IIe Standard 80 Column Card (2K of RAM, no double-hi-res)
+    Apple IIe Standard 80 Column Card (1K of RAM, no double-hi-res)
 
 *********************************************************************/
 

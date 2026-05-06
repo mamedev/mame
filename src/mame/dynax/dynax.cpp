@@ -992,6 +992,13 @@ void dynax_state::qyjdzjp_io_map(address_map &map)
 	map(0xe7, 0xe7).w(FUNC(dynax_state::hnoridur_palbank_w));
 }
 
+void dynax_state::baoqingt_io_map(address_map &map)
+{
+	qyjdzjp_io_map(map);
+
+	map(0x82, 0x82).lr8(NAME([] () -> uint8_t { return 0x80; })); // blitter busy line?
+}
+
 void dynax_adpcm_state::mjembase_io_map(address_map &map)
 {
 	map.global_mask(0xff);
@@ -4384,6 +4391,25 @@ void dynax_state::qyjdzjp(machine_config &config)
 	OKIM6295(config, "oki", 12_MHz_XTAL / 12, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.8);
 }
 
+
+void dynax_state::baoqingt(machine_config &config)
+{
+	qyjdzjp(config);
+
+	Z80(config.replace(), m_maincpu, 21.477272_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dynax_state::nanajign_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &dynax_state::baoqingt_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dynax_state::irq0_line_hold));
+
+	m_screen->screen_vblank().remove();
+
+	m_blitter->ready_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
+
+	subdevice<ay8912_device>("aysnd")->set_clock(21.477272_MHz_XTAL / 16);
+
+	subdevice<okim6295_device>("oki")->set_clock(21.477272_MHz_XTAL / 16);
+}
+
 /***************************************************************************
                                     Neruton
 ***************************************************************************/
@@ -5991,6 +6017,75 @@ ROM_START( qyjdzjp )
 	ROM_LOAD( "oki.u22", 0x00000, 0x40000, CRC(a6340587) SHA1(91f55776fc4f20720f3e3ca965ba9388d3668881) )
 ROM_END
 
+
+/*******************************************************************
+Bao Qing Tian, TIC, 1995
+Hardware Info by Guru
+---------------------
+
+no number (bootleg-like so probably a rip-off of something else)
+|-------------------------------------------------|
+| uPC1241H   VOL1    VOL2          6606    TIC01  |
+|            4558    4558                         |
+|                           95123     3.579545MHz |
+|-|             2018                             8|
+  |                         95101          SCAP  L|
+|-|             2018                             I|
+|                                          6264  N|
+|1                          Z8400A               E|
+|8          |---------|                          R|
+|W          |         |       |------|    TIC2-2  |
+|A          |  95124  |       |PLCC68|            |
+|Y          |         |       |ALTERA|    TIC03   |
+|-|  SW4    |         |       |------|          |-|
+  |         |---------|  21.47727MHz  T518B     |
+|-|  SW3                                  TIC04 |-|
+|          HM53462 HM53462    |----|              |
+|10  SW2   HM53462 HM53462    |TK101      TIC05 10|
+|WAY       HM53462 HM53462    |----|           WAY|
+|                                                 |
+|-|  SW1      JAMMA        |--|           TIC06   |
+  |------------------------|  |-------------------|
+Notes:
+     Z8400A - Z80A CPU. Clock 5.3693175MHz [21.47727/4]
+       6606 - Equivalent to OKI M6295 4-Channel ADPCM Voice Synthesis LSI. Clock input 1.342329375MHz [21.47727/16]. Pin 7 HIGH
+      95123 - DIP18 IC. Could be equivalent to Yamaha YM2413 OPLL FM Synthesis Sound Chip. Clock input 3.579545MHz
+      95101 - Equivalent to AY-3-8910. Clock input 1.342329375MHz [21.47727/16]
+      95124 - Custom Chip (video)
+      TK101 - Custom Chip (I/O?)
+       2018 - 2kB x8-bit SRAM
+       6264 - 8kB x8-bit SRAM (battery-backed)
+    HM53462 - Hitachi HM53462 Multi-Port RAM; 64k-word x4-bit DRAM and 256-word x4-bit Serial Access RAM
+              Seems to be the same type of Multi-Port RAM used on Mortal Kombat.
+      SW1-4 - 8-position DIP Switch
+   uPC1241H - NEC uPC1241H Audio Power Amp
+       VOL1 - Music Volume Pot
+       VOL2 - Voice Volume Pot
+       4558 - Dual Operational Amplifier
+     PLCC68 - Unknown PLCC68 IC. Altera logo partially visible so some kind of Altera CPLD
+      T518B - Mitsumi PST518B Master Reset IC (TO92)
+       SCAP - 5.5V 0.1F Supercap
+      TIC01 - 27C2001 EPROM (oki samples)
+     TIC2-2 - 27C2001 EPROM (main program)
+   TIC03-06 - 27C4001 OTP EPROM (gfx)
+*******************************************************************/
+
+ROM_START( baoqingt )
+	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_LOAD( "tic2-2.u4", 0x00000, 0x40000, CRC(a4d16608) SHA1(254aae41284fae0eeda6ab7f72ec907cd9a5c7e2) )
+	ROM_RELOAD(          0x10000, 0x40000 )
+
+	ROM_REGION( 0x200000, "blitter", ROMREGION_ERASE00 )
+	ROM_LOAD( "tic03.u41", 0x000000, 0x80000, CRC(00c9faf2) SHA1(4eaebfc9506d7e3925e43f44c0d396c1ba38a214) ) // standard mahjong gameplay GFX are here
+	ROM_LOAD( "tic04.u42", 0x080000, 0x80000, CRC(cb8f0831) SHA1(122da594df6b025f96eb30eb0edcdef2c0f59556) ) // bonus game GFX are here
+	ROM_LOAD( "tic06.u44", 0x100000, 0x80000, CRC(a093594e) SHA1(56931c1014a862fa4db2d32eb97deda20e41d92f) ) // title screen
+	ROM_LOAD( "tic05.u43", 0x180000, 0x80000, CRC(5736a700) SHA1(b61e011858a3ee91fd69d49450b48e1d157cb11d) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "tic01.u9", 0x00000, 0x40000, CRC(b16b5dbf) SHA1(0896bb8a32c9a2d9645ce40653549b4ec9ce01a4) )
+ROM_END
+
+
 /***************************************************************************
 
 Mahjong Electromagnetic Base (Dynax, 1989)
@@ -7168,6 +7263,7 @@ GAME( 1990, majxtal7,   7jigen,   neruton,    majxtal7, dynax_adpcm_state, init_
 GAME( 1990, neruton,    0,        neruton,    neruton,  dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro",  "Mahjong Neruton Haikujiradan (Japan, Rev. B?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, nerutona,   neruton,  neruton,    nerutona, dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro",  "Mahjong Neruton Haikujiradan (Japan, Rev. A?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, qyjdzjp,    mjelctrn, qyjdzjp,    mjelct3,  dynax_state,       empty_init,    ROT180, "bootleg (Hom Inn)",         "Que You Ji - Dian Zi Ji Pan Jiaqiang Ban (v201)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1995, baoqingt,   0,        baoqingt,   mjelct3,  dynax_state,       empty_init,    ROT0,   "TIC",                       "Bao Qing Tian",                                                 MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, hanayara,   0,        yarunara,   hanayara, dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Hana wo Yaraneba! (Japan)",                                     MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mjcomv1,    0,        mjangels,   mjcomv1,  dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Mahjong Comic Gekijou Vol.1 (Japan)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tenkai,     0,        tenkai,     tenkai,   dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Tenkaigen (Japan)",                                     MACHINE_SUPPORTS_SAVE )

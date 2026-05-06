@@ -4,125 +4,621 @@
 #include "emu.h"
 #include "generalplus_gpl951xx_soc.h"
 
+#define LOG_SPIFC     (1U << 1)
 
-void generalplus_gpl951xx_device::ramwrite_w(offs_t offset, uint16_t data)
+#define VERBOSE     (LOG_SPIFC)
+
+#include "logmacro.h"
+
+
+// SPIFC - the directly mapped SPI interface
+// provides 'hardware accelerated' SPI features (composing and sending packets to the SPI device)
+// including XIP (eXecute In Place) support for flat view of SPI ROM
+
+void generalplus_gpl951xx_device::recieve_spi_fifo_data(u8 data)
 {
-	m_mainram[offset] = data;
+	if (m_bytes_in_spifc_rx_fifo < (16 * 2))
+	{
+		m_spifc_rx_fifo[m_bytes_in_spifc_rx_fifo] = data;
+		m_bytes_in_spifc_rx_fifo++;
+	}
 }
 
-uint16_t generalplus_gpl951xx_device::ramread_r(offs_t offset)
+u8 generalplus_gpl951xx_device::get_byte_from_rx_fifo()
 {
-	return m_mainram[offset];
+	u8 ret = m_spifc_rx_fifo[0];
+	if (m_bytes_in_spifc_rx_fifo > 0)
+	{
+
+		for (int i = 1; i < (16 * 2); i++)
+		{
+			m_spifc_rx_fifo[i - 1] = m_spifc_rx_fifo[i];
+		}
+		m_spifc_rx_fifo[(16 * 2) - 1] = 0;
+		m_bytes_in_spifc_rx_fifo--;
+	}
+	return ret;
 }
 
-uint16_t generalplus_gpl951xx_device::spi_direct_7b40_r()
+// this provides hardware accelerated SPI support, handling much of the underlying SPI
+// access, allowing 'easier' use of the device, as well as allowing it to run in XIP
+// mode (eXecute In Place) so the CPU can see it as a flat space
+
+// P_SPIFC_Ctrl1
+
+// 15  tx_done
+// 14  rx_empty
+// 13
+// 12
+//
+// 11
+// 10
+// 9   ig_clk
+// 8   manual
+//
+// 7   cmio[1]
+// 6   cmio[0]
+// 5   amio[1]
+// 4   amio[0]
+//
+// 3   mio[1]
+// 2   mio[0]
+// 1
+// 0   back2idle
+
+u16 generalplus_gpl951xx_device::spifc_ctrl_r()
 {
-	return 0xffff; // doesn't care for now
+	LOGMASKED(LOG_SPIFC, "%s: spifc_ctrl_r\n", machine().describe_context());
+	u16 ret = m_spifc_ctrl;
+
+	ret |= 0x8000; // tx_done
+	if (m_bytes_in_spifc_rx_fifo == 0) ret |= 0x4000; // rx_empty
+	ret |= 0x0001; // back2idle
+
+	return ret;
 }
 
-uint16_t generalplus_gpl951xx_device::spi_direct_79f5_r()
+void generalplus_gpl951xx_device::spifc_ctrl_w(u16 data)
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_ctrl_w %04x\n", machine().describe_context(), data);
+	m_spifc_ctrl = data;
+}
+
+// P_SPIFC_CMD
+//
+// 15
+// 14
+// 13  one_cmd
+// 12
+//
+// 11
+// 10
+//  9  cmd_only
+//  8  wo_cmd
+//
+//  7  wpif_cmd[7]
+//  6  wpif_cmd[6]
+//  5  wpif_cmd[5]
+//  4  wpif_cmd[4]
+//
+//  3  wpif_cmd[3]
+//  2  wpif_cmd[2]
+//  1  wpif_cmd[1]
+//  0  wpif_cmd[0]
+
+u16 generalplus_gpl951xx_device::spifc_cmd_r()
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_cmd_r\n", machine().describe_context());
+	return m_spifc_cmd;
+}
+
+void generalplus_gpl951xx_device::spifc_cmd_w(u16 data)
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_cmd_w %02x %02x with param %04x\n", machine().describe_context(), (data & 0xff00) >> 8, data & 0xff, m_spifc_para);
+
+	m_spifc_cmd = data;
+
+	m_spi_reset(1);
+	m_spi_out_cmd(data & 0x00ff);
+
+	// how does byte count work? the FIFO is apparently in words
+	for (int i = 0; i < m_spifc_rx_bc; i++)
+	{
+		// clock it this many times to push data into the fifo?
+		m_spi_out(0x00);
+	}
+
+}
+
+// P_SPIFC_PARA
+//
+// 15
+// 14  wo_enha
+// 13  to_addr
+// 12  wo_addr
+//
+// 11  dummy_ck_cnt[3]
+// 10  dummy_ck_cnt[2]
+// 9   dummy_ck_cnt[1]
+// 8   dummy_ck_cnt[0]
+//
+// 7   enhan_by[7]
+// 6   enhan_by[6]
+// 5   enhan_by[5]
+// 4   enhan_by[4]
+//
+// 3   enhan_by[4]
+// 2   enhan_by[3]
+// 1   enhan_by[2]
+// 0   enhan_by[1]
+
+
+u16 generalplus_gpl951xx_device::spifc_para_r()
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_para_r\n", machine().describe_context());
+	return m_spifc_para;
+}
+
+void generalplus_gpl951xx_device::spifc_para_w(u16 data)
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_para_w %04x\n", machine().describe_context(), data);
+	m_spifc_para = data;
+}
+
+// P_SPIFC_ADDRL
+// 15-0 low 16 bits of SPIF Address
+
+u16 generalplus_gpl951xx_device::spifc_addrl_r()
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_addrl_r\n", machine().describe_context());
+	return m_spifc_addr & 0x0000ffff;
+}
+
+void generalplus_gpl951xx_device::spifc_addrl_w(u16 data)
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_addrl_w %04x\n", machine().describe_context(), data);
+	m_spifc_addr = (m_spifc_addr & 0xffff0000) | data;
+}
+
+// P_SPIFC_ADDRH
+// 15-0  high 16 bits of SPIF Address
+
+u16 generalplus_gpl951xx_device::spifc_addrh_r()
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_addrh_r\n", machine().describe_context());
+	return (m_spifc_addr & 0xffff0000) >> 16;
+}
+
+void generalplus_gpl951xx_device::spifc_addrh_w(u16 data)
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_addrh_w %04x\n", machine().describe_context(), data);
+	m_spifc_addr = (m_spifc_addr & 0x0000ffff) | (data << 16);
+}
+
+u16 generalplus_gpl951xx_device::spifc_txdat_r()
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_txdat_r\n", machine().describe_context());
+	return 0xffff;
+}
+
+void generalplus_gpl951xx_device::spifc_txdat_w(u16 data)
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_txdat_w %04x\n", machine().describe_context(), data);
+	m_spi_out(data & 0xff);
+}
+
+// P_SPIFC_RX_Data
+//
+// 15-0  2 bytes of RX_Data
+//
+// write the register once before reading the register once
+
+u16 generalplus_gpl951xx_device::spifc_rxdat_r()
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_rxdat_r\n", machine().describe_context());
+
+	/*
+	for bfpacman
+
+	after auto command bite spifc_cmd_w is set to 9f (ident)
+
+	at 672 R1 will be xx00 (results from device)
+	R2 will be xxxx (results from device)
+
+	continuing to 232 it restores these values and it checks if R1 is 0000 (it shouldn't be)
+
+	at 237 it gets a value of C814 from 0d69 (RAM) and puts it in R1
+	at 239 is compares R1 with R2
+	*/
+
+	return m_spifc_rx_read_latch;
+}
+
+
+void generalplus_gpl951xx_device::spifc_rxdat_w(u16 data)
+{
+	// write here to latch a word from the fifo into the read register
+	u16 word = get_byte_from_rx_fifo();
+	word = (get_byte_from_rx_fifo() << 8) | word;
+
+	m_spifc_rx_read_latch = word;
+}
+
+
+// P_SPIFC_TX_BC - SPIFC TX byte count register
+//
+// 15-9 unused
+// 8-0  9-bit byte count (TX_BC)
+
+u16 generalplus_gpl951xx_device::spifc_tx_bc_r()
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_tx_bc_r\n", machine().describe_context());
+	return m_spifc_tx_bc;
+}
+
+void generalplus_gpl951xx_device::spifc_tx_bc_w(u16 data)
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_tx_bc_w %04x\n", machine().describe_context(), data);
+	m_spifc_tx_bc = data;
+}
+
+// P_SPIFC_RX_BC - SPIFC RX byte count register
+//
+// 15-9 unused
+// 8-0  9-bit byte count (RX_BC)
+
+u16 generalplus_gpl951xx_device::spifc_rx_bc_r()
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_rx_bc_r\n", machine().describe_context());
+	return m_spifc_rx_bc;
+}
+
+void generalplus_gpl951xx_device::spifc_rx_bc_w(u16 data)
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_rx_bc_w %04x\n", machine().describe_context(), data);
+	m_spifc_rx_bc = data;
+}
+
+u16 generalplus_gpl951xx_device::spifc_timing_r()
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_timing_r\n", machine().describe_context());
+	return m_spifc_timing;
+}
+
+void generalplus_gpl951xx_device::spifc_timing_w(u16 data)
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_timing_w %04x\n", machine().describe_context(), data);
+	m_spifc_timing = data;
+}
+
+// P_SPIFC_Ctrl2
+//
+// 15-8  Ear[7:0] - Extend address range from 24 bits to 32-bits
+// 7-1
+// 0     en - SPF flash controller enable
+
+u16 generalplus_gpl951xx_device::spifc_ctrl2_r()
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_ctrl2_r\n", machine().describe_context());
+	return m_spifc_ctrl2;
+}
+
+void generalplus_gpl951xx_device::spifc_ctrl2_w(u16 data)
+{
+	LOGMASKED(LOG_SPIFC, "%s: spifc_ctrl2_w %04x\n", machine().describe_context(), data);
+	m_spifc_ctrl2 = data;
+}
+
+// Other bits
+
+u16 generalplus_gpl951xx_device::pllsel_r()
+{
+	logerror("%s: pllsel_r\n", machine().describe_context());
+	return m_pllchange;
+}
+
+void generalplus_gpl951xx_device::pllsel_w(u16 data)
+{
+	// very similar to pllchange on GPL162xx, but with extra SPI bits
+	logerror("%s: generalplus_gpl951xx_device::pllsel_w %04x\n", machine().describe_context(), data);
+	m_pllchange = data;
+}
+
+
+u16 generalplus_gpl951xx_device::rtc_readdata_r()
 {
 	return 0xffff; // hangs if returning 0
 }
 
-uint16_t generalplus_gpl951xx_device::spi_direct_7b46_r()
-{
-	int i = machine().rand();
-
-	if (i & 1) return 0x01;
-	else return 0x02;
-}
-
-uint16_t generalplus_gpl951xx_device::spi_direct_79f4_r()
+u16 generalplus_gpl951xx_device::rtc_ready_r()
 {
 	// status bits?
 	return machine().rand();
 }
 
 
-uint16_t generalplus_gpl951xx_device::spi_direct_7af0_r()
+u16 generalplus_gpl951xx_device::byte_swap_r()
 {
-	return m_7af0;
+	return m_byteswap;
 }
 
-void generalplus_gpl951xx_device::spi_direct_7af0_w(uint16_t data)
+void generalplus_gpl951xx_device::byte_swap_w(u16 data)
 {
 	// words read from ROM are written here during the checksum routine in RAM, and must
 	// be shifted for the checksum to pass.
-	m_7af0 = data >> 8;
-}
-
-
-uint16_t generalplus_gpl951xx_device::spi_direct_78e8_r()
-{
-	return machine().rand();
+	m_byteswap = ((data & 0xff00) >> 8) | ((data & 0x00ff) << 8);
 }
 
 void generalplus_gpl951xx_device::device_start()
 {
 	sunplus_gcm394_base_device::device_start();
-	save_item(NAME(m_7af0));
+	save_item(NAME(m_byteswap));
+	save_item(NAME(m_gpl951xx_timerg_ctrl));
+	save_item(NAME(m_gpl951xx_timerg_preload));
+	save_item(NAME(m_gpl951xx_timerh_ctrl));
+	save_item(NAME(m_gpl951xx_timerh_preload));
+	save_item(NAME(m_spifc_ctrl));
+	save_item(NAME(m_spifc_ctrl2));
+	save_item(NAME(m_spifc_addr));
+	save_item(NAME(m_spifc_cmd));
+	save_item(NAME(m_spifc_para));
+	save_item(NAME(m_spifc_rx_bc));
+	save_item(NAME(m_spifc_tx_bc));
+	save_item(NAME(m_spifc_timing));
+	save_item(NAME(m_bytes_in_spifc_rx_fifo));
+	save_item(NAME(m_spi_bank));
+	save_item(NAME(m_spifc_rx_fifo));
+	save_item(NAME(m_spifc_rx_read_latch));
 }
 
 void generalplus_gpl951xx_device::device_reset()
 {
 	sunplus_gcm394_base_device::device_reset();
-	m_7af0 = 0;
+	m_byteswap = 0;
+	m_gpl951xx_timerg_ctrl = 0;
+	m_gpl951xx_timerg_preload = 0;
+	m_gpl951xx_timerh_ctrl = 0;
+	m_gpl951xx_timerh_preload = 0;
+	m_spifc_ctrl = 0;
+	m_spifc_ctrl2 = 0;
+	m_spifc_addr = 0;
+	m_spifc_cmd = 0;
+	m_spifc_para = 0;
+	m_spifc_rx_bc = 0;
+	m_spifc_tx_bc = 0;
+	m_spifc_timing = 0;
+	m_bytes_in_spifc_rx_fifo = 0;
+	m_spifc_rx_read_latch = 0;
+
+	m_spi_bank = 0;
+
+	for (int i = 0; i < 16 * 2; i++)
+		m_spifc_rx_fifo[i] = 0;
 }
 
-void generalplus_gpl951xx_device::spi_direct_78e8_w(uint16_t data)
+// Timers
+
+u16 generalplus_gpl951xx_device::gpl951xx_timerg_preload_r()
 {
-	logerror("%s: spi_direct_78e8_w %04x\n", machine().describe_context(), data);
+	logerror("%s: gpl951xx_timerg_preload_r\n", machine().describe_context());
+	return m_gpl951xx_timerg_preload;
 }
 
-void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
+void generalplus_gpl951xx_device::gpl951xx_timerg_preload_w(u16 data)
 {
-	sunplus_gcm394_base_device::base_internal_map(map);
+	logerror("%s: gpl951xx_timerg_preload_w %04x\n", machine().describe_context(), data);
+	m_gpl951xx_timerg_preload = data;
+}
 
-	map(0x000000, 0x0027ff).rw(FUNC(generalplus_gpl951xx_device::ramread_r), FUNC(generalplus_gpl951xx_device::ramwrite_w));
-	// TODO: RAM is only 0x2800 on this, like earlier SPG2xx models? unmap the extra from the base_internal_map?
+// P_TimerG_Ctrl
 
-	// 7000 - Tx3_X_Position
-	// 7001 - Tx3_Y_Position
-	// 7002 - Tx3_X_Offset
-	// 7003 - Tx3_Y_Offset
-	// 7004 - Tx3_Attribute
-	// 7005 - Tx3_Control
-	// 7006 - Tx3_N_PTR
-	// 7007 - Tx3_A_PTR
+// 15  TMGIF/C
+// 14  TMGIE
+// 13  TMGEN
+// 12
+// 11  EXT0SEL[1]
+// 10  EXT0SEL[0]
+// 9   EXT1SEL[1]
+// 8   EXT1SEL[0]
+// 7
+// 6   SRCBSEL[2]
+// 5   SRCBSEL[1]
+// 4   SRCBSEL[0]
+// 3   SRCASEL[3]
+// 2   SRCASEL[2]
+// 1   SRCASEL[1]
+// 0   SRCASEL[0]
 
-	// 7010 - Tx1_X_Position
-	// 7011 - Tx1_Y_Position
-	// 7012 - Tx1_Attribute
-	// 7013 - Tx1_Control
-	// 7014 - Tx1_N_PTR
-	// 7015 - Tx1_A_PTR
-	// 7016 - Tx2_X_Position
-	// 7017 - Tx2_Y_Position
-	// 7018 - Tx2_Attribute
-	// 7019 - Tx2_Contro
-	// 701a - Tx2_N_PTR
-	// 701b - Tx2_A_PTR
-	// 701c - VComValue
-	// 701d - VComOffset
-	// 701e - VComStep
+u16 generalplus_gpl951xx_device::gpl951xx_timerg_ctrl_r()
+{
+	logerror("%s: gpl951xx_timerg_ctrl_r\n", machine().describe_context());
+	u16 ret = m_gpl951xx_timerg_ctrl;
+	return ret;
+}
 
-	// 7020 - Segment_Tx1
-	// 7021 - Segment_Tx2
-	// 7022 - Segment_sp
-	// 7023 - Segment_Tx3
+void generalplus_gpl951xx_device::gpl951xx_timerg_ctrl_w(u16 data)
+{
+	u8 tmgif_clear = (data & 0x8000) >> 15;
+	u8 tmgie = (data & 0x4000) >> 14;
+	u8 tmgen = (data & 0x2000) >> 13;
+	u8 ext0sel = (data & 0x0c00) >> 10;
+	u8 ext1sel = (data & 0x0300) >> 8;
+	u8 srcbsel = (data & 0x0070) >> 4;
+	u8 srcasel = (data & 0x000f) >> 0;
+
+	logerror("%s: gpl951xx_timerg_ctrl_w %04x (tmgif_clear %01x) (interrupt enabled %01x) (timer enabled %01x) (ext0sel %01x) (ext1sel %01x) (srcbsel %01x) (srcasel %01x)\n", machine().describe_context(), data, tmgif_clear, tmgie, tmgen, ext0sel, ext1sel, srcbsel, srcasel);
+
+	if (data & 0x8000)
+		m_gpl951xx_timerg_ctrl &= 0x7fff;
+
+	if ((data & 0x2000) != (m_gpl951xx_timerg_ctrl & 0x2000))
+	{
+		if (data & 0x2000)
+		{
+			m_timer_g->adjust(attotime::zero, 0, attotime::from_hz(8'000'000));
+		}
+		else
+		{
+			m_timer_g->adjust(attotime::never);
+		}
+	}
+
+	m_gpl951xx_timerg_ctrl = (m_gpl951xx_timerg_ctrl & 0x8000) | (data & 0x7fff);
+}
+
+u16 generalplus_gpl951xx_device::gpl951xx_timerh_preload_r()
+{
+	logerror("%s: gpl951xx_timerh_preload_r\n", machine().describe_context());
+	return m_gpl951xx_timerh_preload;
+}
+
+void generalplus_gpl951xx_device::gpl951xx_timerh_preload_w(u16 data)
+{
+	logerror("%s: gpl951xx_timerh_preload_w %04x\n", machine().describe_context(), data);
+	m_gpl951xx_timerh_preload = data;
+}
+
+// P_TimerH_Ctrl
+
+// 15  TMHIF/C
+// 14  TMHIE
+// 13  TMHEN
+// 12
+//
+// 11  EXT0SEL[1]
+// 10  EXT0SEL[0]
+// 9   EXT1SEL[1]
+// 8   EXT1SEL[0]
+//
+// 7
+// 6   SRCBSEL[2]
+// 5   SRCBSEL[1]
+// 4   SRCBSEL[0]
+//
+// 3   SRCASEL[3]
+// 2   SRCASEL[2]
+// 1   SRCASEL[1]
+// 0   SRCASEL[0]
+
+u16 generalplus_gpl951xx_device::gpl951xx_timerh_ctrl_r()
+{
+	u16 ret = m_gpl951xx_timerh_ctrl;
+	logerror("%s: gpl951xx_timerh_ctrl_r (returning %04x)\n", machine().describe_context(), ret);
+	return ret;
+}
+
+void generalplus_gpl951xx_device::gpl951xx_timerh_ctrl_w(u16 data)
+{
+	u8 tmhif_clear = (data & 0x8000) >> 15;
+	u8 tmhie = (data & 0x4000) >> 14;
+	u8 tmhen = (data & 0x2000) >> 13;
+	u8 ext0sel = (data & 0x0c00) >> 10;
+	u8 ext1sel = (data & 0x0300) >> 8;
+	u8 srcbsel = (data & 0x0070) >> 4;
+	u8 srcasel = (data & 0x000f) >> 0;
+
+	logerror("%s: gpl951xx_timerh_ctrl_w %04x (tmhif_clear %01x) (interrupt enabled %01x) (timer enabled %01x) (ext0sel %01x) (ext1sel %01x) (srcbsel %01x) (srcasel %01x)\n", machine().describe_context(), data, tmhif_clear, tmhie, tmhen, ext0sel, ext1sel, srcbsel, srcasel);
+
+	if (data & 0x8000)
+	{
+		logerror("cleared timerh flag\n");
+		m_gpl951xx_timerh_ctrl &= 0x7fff;
+	}
+
+	if ((data & 0x2000) != (m_gpl951xx_timerh_ctrl & 0x2000))
+	{
+		logerror("changed\n");
+		if (data & 0x2000)
+		{
+			logerror("started timerh\n");
+			m_timer_h->adjust(attotime::zero, 0, attotime::from_hz(8'000'000));
+		}
+		else
+		{
+			m_timer_h->adjust(attotime::never);
+		}
+
+	}
+
+	m_gpl951xx_timerh_ctrl = (m_gpl951xx_timerh_ctrl & 0x8000) | (data & 0x7fff);
+
+}
+
+u16 generalplus_gpl951xx_device::spi_bank_r()
+{
+	LOGMASKED(LOG_SPIFC, "%s: spi_bank_r\n", machine().describe_context());
+	return m_spi_bank;
+}
+
+void generalplus_gpl951xx_device::spi_bank_w(u16 data)
+{
+	LOGMASKED(LOG_SPIFC, "%s: spi_bank_w %04x\n", machine().describe_context(), data);
+	m_spi_bank = data;
+}
+
+
+u16 generalplus_gpl951xx_device::spi_direct_r(offs_t offset)
+{
+	// The GPL951xx chips can see a bank of SPI memory as a flat space
+	// as they will automatically generate SPI signals for random memory
+	// access on demand
 	//
-	// 702a - Blending
-	// 702b - Segment_Tx1H
-	// 702c - Segment_Tx2H
-	// 702d - Segment_spH
-	// 702e - Segment_Tx3H
+	// Emulating it this way is impractical for emulation (DASM wouldn't
+	// work) so we just present it as a flat space directly.
+	if (!m_spiregion)
+		return 0x0000;
+
+	u16 ret = (m_spiregion[((offset * 2) + 0) & (m_spisize-1)]) | (m_spiregion[((offset * 2) + 1) & (m_spisize-1)] << 8);
+	return ret;
+}
+
+u16 generalplus_gpl951xx_device::spi_direct_bank_r(offs_t offset)
+{
+	if (!m_spiregion)
+		return 0x0000;
+
+	offset += 0x1f7000;
+	offset += (m_spi_bank & 0x3f) * 0x200000;
+
+	u16 ret = (m_spiregion[((offset * 2) + 0) & (m_spisize-1)]) | (m_spiregion[((offset * 2) + 1) & (m_spisize-1)] << 8);
+	return ret;
+
+}
+
+void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map &map)
+{
+	map(0x000000, 0x0027ff).ram().share("mainram");
+
+	map(0x007000, 0x007007).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap2_regs_r), FUNC(gcm394_base_video_device::tmap2_regs_w)); // 7000 - Tx3_X_Position
+
+	map(0x007010, 0x007015).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap0_regs_r), FUNC(gcm394_base_video_device::tmap0_regs_w));
+	map(0x007016, 0x00701b).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap1_regs_r), FUNC(gcm394_base_video_device::tmap1_regs_w));
+	map(0x00701c, 0x00701c).w(m_spg_video, FUNC(gcm394_base_video_device::vcomp_value_w)); // 701c - VComValue
+	map(0x00701d, 0x00701d).w(m_spg_video, FUNC(gcm394_base_video_device::vcomp_offset_w)); // 701d - VComOffset
+	map(0x00701e, 0x00701e).w(m_spg_video, FUNC(gcm394_base_video_device::vcomp_step_w)); // 701e - VComStep
+
+	map(0x007020, 0x007020).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap0_tilebase_lsb_r), FUNC(gcm394_base_video_device::tmap0_tilebase_lsb_w));           // 7020 - Segment_Tx1
+	map(0x007021, 0x007021).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap1_tilebase_lsb_r), FUNC(gcm394_base_video_device::tmap1_tilebase_lsb_w));           // 7021 - Segment_Tx2
+	map(0x007022, 0x007022).rw(m_spg_video, FUNC(gcm394_base_video_device::sprite_7022_gfxbase_lsb_r), FUNC(gcm394_base_video_device::sprite_7022_gfxbase_lsb_w)); // 7022 - Segment_sp
+	map(0x007023, 0x007023).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap2_tilebase_lsb_r), FUNC(gcm394_base_video_device::tmap2_tilebase_lsb_w));           // 7023 - Segment_Tx3
+
 	//
-	// 7030 - Fade_Control
 	//
-	// 703a - Palette_Control
 	//
-	// 7042 - SControl
+	//
+	//
+	map(0x00702a, 0x00702a).w(m_spg_video, FUNC(gcm394_base_video_device::blending_w)); // 702a - Blending
+	map(0x00702b, 0x00702b).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap0_tilebase_msb_r), FUNC(gcm394_base_video_device::tmap0_tilebase_msb_w));           // 702b - Segment_Tx1H
+	map(0x00702c, 0x00702c).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap1_tilebase_msb_r), FUNC(gcm394_base_video_device::tmap1_tilebase_msb_w));           // 702c - Segment_Tx2H
+	map(0x00702d, 0x00702d).rw(m_spg_video, FUNC(gcm394_base_video_device::sprite_702d_gfxbase_msb_r), FUNC(gcm394_base_video_device::sprite_702d_gfxbase_msb_w)); // 702d - Segment_spH
+	map(0x00702e, 0x00702e).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap2_tilebase_msb_r), FUNC(gcm394_base_video_device::tmap2_tilebase_msb_w));           // 702e - Segment_Tx3H
+
+	//
+	map(0x007030, 0x007030).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7030_brightness_r), FUNC(gcm394_base_video_device::video_7030_brightness_w)); // 7030 - Fade_Control
+	//
+	map(0x00703a, 0x00703a).rw(m_spg_video, FUNC(gcm394_base_video_device::video_703a_palettebank_r), FUNC(gcm394_base_video_device::video_703a_palettebank_w)); // 703a - Palette_Control
+	//
+	map(0x007042, 0x007042).rw(m_spg_video, FUNC(gcm394_base_video_device::sprite_7042_extra_r), FUNC(gcm394_base_video_device::sprite_7042_extra_w)); // 7042 - SControl
 	//
 	// 7050 - TFT_Ctrl
 	// 7051 - TFT_V_Width
@@ -141,8 +637,8 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 705e - STN_PIC_SEG
 	// 705f - STN_Ctrl1
 	//
-	// 7062 - TFT_INT_EN
-	// 7063 - TFT_INT_CLR
+	map(0x007062, 0x007062).rw(m_spg_video, FUNC(gcm394_base_video_device::videoirq_source_enable_r), FUNC(gcm394_base_video_device::videoirq_source_enable_w));             // 7062 - TFT_INT_EN
+	map(0x007063, 0x007063).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7063_videoirq_source_r), FUNC(gcm394_base_video_device::video_7063_videoirq_source_ack_w)); // 7063 - TFT_INT_CLR
 	// 7064 - US_Ctrl
 	// 7065 - US_Hscaling
 	// 7066 - US_Vscaling
@@ -156,16 +652,16 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 706e - TFT_H_Show_Start
 	// 706f - TFT_H_Show_End
 	//
-	// 7070 - SPDMA_Source
-	// 7071 - SPDMA_Target
-	// 7072 - SPDMA_Number
+	map(0x007070, 0x007070).w(m_spg_video, FUNC(gcm394_base_video_device::video_dma_source_w)); // 7070 - SPDMA_Source
+	map(0x007071, 0x007071).w(m_spg_video, FUNC(gcm394_base_video_device::video_dma_dest_w));   // 7071 - SPDMA_Target
+	map(0x007072, 0x007072).rw(m_spg_video, FUNC(gcm394_base_video_device::video_dma_size_busy_r), FUNC(gcm394_base_video_device::video_dma_size_trigger_w)); // 7072 - SPDMA_Number
 	// 7073 - HB_Ctrl
 	// 7074 - HB_GO
 	//
 	// 707d - BLD_Color
 	//
-	// 707e - PPU_RAM_BANK
-	// 707f - PPU_Enable
+	map(0x00707e, 0x00707e).w(m_spg_video, FUNC(gcm394_base_video_device::ppu_ram_bank_w));    // 707e - PPU_RAM_BANK
+	map(0x00707f, 0x00707f).rw(m_spg_video, FUNC(gcm394_base_video_device::ppu_enable_r), FUNC(gcm394_base_video_device::ppu_enable_w));// 707f - PPU_Enable
 	//
 	// 7080 - STN_SEG
 	// 7081 - STN_COM
@@ -185,13 +681,13 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 70db - Free_Height
 	// 70dc - Free_Width
 	//
-	// 70e0 - Random0 (15-bit)
+	map(0x0070e0, 0x0070e0).r(m_spg_video, FUNC(gcm394_base_video_device::video_70e0_prng_r)); // 70e0 - Random0 (15-bit)
 	// 70e1 - Random1 (15-bit)
 	//
-	// 7100 to 71ff - Tx_Hvoffset
-	// 7200 to 72ff - HCMValue
-	// 7300 to 73ff - Palette (banked)
-	// 7400 to 74ff - Sprite Ram (banked)
+	map(0x007100, 0x0071ff).ram().share("rowscroll"); // 7100 to 71ff - Tx_Hvoffset
+	map(0x007200, 0x0072ff).ram().share("rowzoom"); // 7200 to 72ff - HCMValue
+	map(0x007300, 0x0073ff).rw(m_spg_video, FUNC(gcm394_base_video_device::palette_r), FUNC(gcm394_base_video_device::palette_w)); // 7300 to 73ff - Palette (banked)
+	map(0x007400, 0x0077ff).rw(m_spg_video, FUNC(gcm394_base_video_device::spriteram_r), FUNC(gcm394_base_video_device::spriteram_w)); // 7400 to 74ff - Sprite Ram (banked)
 	//
 	// 7800 - BodyID
 	// 7801 - unused
@@ -200,7 +696,7 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 7804 - CLK_Ctrl0
 	// 7805 - CLK_Ctrl1
 	// 7806 - Reset_Flag
-	// 7807 - Clock_Ctrl
+	map(0x007807, 0x007807).w(FUNC(generalplus_gpl951xx_device::clock_ctrl_w)); // 7807 - Clock_Ctrl
 	// 7808 - LVR_Ctrl
 	// 7809 - PM_Ctrl
 	// 780a - Watchdog_Ctrl
@@ -208,17 +704,17 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 780c - WAIT
 	// 780d - HALT
 	// 780e - unused
-	// 780f - Power_State
-	// 7810 - BankSwitch
+	map(0x00780f, 0x00780f).r(FUNC(generalplus_gpl951xx_device::power_state_r)); // 780f - Power_State
+	map(0x007810, 0x007810).rw(FUNC(generalplus_gpl951xx_device::spi_bank_r), FUNC(generalplus_gpl951xx_device::spi_bank_w)); // 7810 - BankSwitch
 	// 7811 - unused
 	// 7812 - unused
 	// 7813 - unused
 	// 7814 - unused
 	// 7815 - unused
 	// 7816 - unused
-	// 7817 - PLL_Sel
+	map(0x007817, 0x007817).rw(FUNC(generalplus_gpl951xx_device::pllsel_r), FUNC(generalplus_gpl951xx_device::pllsel_w)); // 7817 - PLL_Sel
 	// 7818 - PLLWaitCLK
-	// 7819 - Cache_Ctrl
+	map(0x007819, 0x007819).rw(FUNC(generalplus_gpl951xx_device::cache_ctrl_r), FUNC(generalplus_gpl951xx_device::cache_ctrl_w)); // 7819 - Cache_Ctrl
 	// 781a - Cache_HitRate
 	// 781b - unused
 	// 781c - unused
@@ -259,39 +755,39 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 785e - ECC_ERR0_LB     or BCH_Parity5
 	// 785f - ECC_ERR1_LB     or BCH_Parity6
 
-	// 7860 - IOA_Data
-	// 7861 - IOA_Buffer
-	// 7862 - IOA_Dir
-	// 7863 - IOA_Attrib
+	map(0x007860, 0x007860).rw(FUNC(generalplus_gpl951xx_device::ioa_data_r), FUNC(generalplus_gpl951xx_device::ioa_data_w));                     // 7860 - IOA_Data
+	map(0x007861, 0x007861).rw(FUNC(generalplus_gpl951xx_device::ioa_buffer_r), FUNC(generalplus_gpl951xx_device::ioa_buffer_w));       // 7861 - IOA_Buffer
+	map(0x007862, 0x007862).rw(FUNC(generalplus_gpl951xx_device::ioa_dir_r), FUNC(generalplus_gpl951xx_device::ioa_dir_w)); // 7862 - IOA_Dir
+	map(0x007863, 0x007863).rw(FUNC(generalplus_gpl951xx_device::ioa_attrib_r), FUNC(generalplus_gpl951xx_device::ioa_attrib_w)); // 7863 - IOA_Attrib
 	// 7864 - IOA_Drv
 	// 7865 - IOA_Mux
 	// 7866 - IOA_Latch
 	// 7867 - IOA_KeyEN
 
-	// 7868 - IOB_Data
-	// 7869 - IOB_Buffer
-	// 786a - IOB_Dir
-	// 786b - IOB_Attrib
+	map(0x007868, 0x007868).rw(FUNC(generalplus_gpl951xx_device::iob_data_r), FUNC(generalplus_gpl951xx_device::iob_data_w));                     // 7868 - IOB_Data
+	map(0x007869, 0x007869).rw(FUNC(generalplus_gpl951xx_device::iob_buffer_r), FUNC(generalplus_gpl951xx_device::iob_buffer_w));       // 7869 - IOB_Buffer
+	map(0x00786a, 0x00786a).rw(FUNC(generalplus_gpl951xx_device::iob_dir_r), FUNC(generalplus_gpl951xx_device::iob_dir_w)); // 786a - IOB_Dir
+	map(0x00786b, 0x00786b).rw(FUNC(generalplus_gpl951xx_device::iob_attrib_r), FUNC(generalplus_gpl951xx_device::iob_attrib_w)); // 786b - IOB_Attrib
 	// 786c - IOB_Drv
 	// 786d - IOB_Mux
 	// 786e - IOB_Latch
 	// 786f - IOB_KeyEN
 
-	// 7870 - IOC_Data
-	// 7871 - IOC_Buffer
-	// 7872 - IOC_Dir
-	// 7873 - IOC_Attrib
+	map(0x007870, 0x007870).rw(FUNC(generalplus_gpl951xx_device::ioc_data_r) ,FUNC(generalplus_gpl951xx_device::ioc_data_w));                     // 7870 - IOC_Data
+	map(0x007871, 0x007871).rw(FUNC(generalplus_gpl951xx_device::ioc_buffer_r), FUNC(generalplus_gpl951xx_device::ioc_buffer_w));       // 7871 - IOC_Buffer
+	map(0x007872, 0x007872).rw(FUNC(generalplus_gpl951xx_device::ioc_dir_r), FUNC(generalplus_gpl951xx_device::ioc_dir_w)); // 7872 - IOC_Dir
+	map(0x007873, 0x007873).rw(FUNC(generalplus_gpl951xx_device::ioc_attrib_r), FUNC(generalplus_gpl951xx_device::ioc_attrib_w)); // 7873 - IOC_Attrib
 	// 7874 - IOC_Drv
 	// 7875 - IOC_Mux
 	// 7876 - IOC_Latch
 	// 7877 - IOC_KeyEN
 
-	// 7878 - IOD_Data
-	// 7879 - IOD_Buffer
-	// 787a - IOD_Dir
-	// 787b - IOD_Attrib
-	// 787c - IOD_Drv
-	// 787d - IOD_Mux
+	map(0x007878, 0x007878).rw(FUNC(generalplus_gpl951xx_device::iod_data_r) ,FUNC(generalplus_gpl951xx_device::iod_data_w));                     // 7878 - IOD_Data
+	map(0x007879, 0x007879).rw(FUNC(generalplus_gpl951xx_device::iod_buffer_r), FUNC(generalplus_gpl951xx_device::iod_buffer_w));       // 7879 - IOD_Buffer
+	map(0x00787a, 0x00787a).rw(FUNC(generalplus_gpl951xx_device::iod_dir_r), FUNC(generalplus_gpl951xx_device::iod_dir_w)); // 787a - IOD_Dir
+	map(0x00787b, 0x00787b).rw(FUNC(generalplus_gpl951xx_device::iod_attib_r), FUNC(generalplus_gpl951xx_device::iod_attib_w)); // 787b - IOD_Attrib
+	map(0x00787c, 0x00787c).rw(FUNC(generalplus_gpl951xx_device::iod_drv_r), FUNC(generalplus_gpl951xx_device::iod_drv_w)); // 787c - IOD_Drv
+	map(0x00787d, 0x00787d).rw(FUNC(generalplus_gpl951xx_device::iod_mux_r), FUNC(generalplus_gpl951xx_device::iod_mux_w)); // 787d - IOD_Mux
 
 	// 7880 - IOE_Data
 	// 7881 - IOE_Buffer
@@ -311,15 +807,15 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 788e - IOF_Latch
 	// 788f - IOF_KeyEN
 
-	// 78a0 - INT_Status1
-	// 78a1 - INT_Status2
+	map(0x0078a0, 0x0078a0).rw(FUNC(generalplus_gpl951xx_device::int_status1_r), FUNC(generalplus_gpl951xx_device::int_status1_w)); // 78a0 - INT_Status1
+	map(0x0078a1, 0x0078a1).r(FUNC(generalplus_gpl951xx_device::int_status2_r)); // 78a1 - INT_Status2
 	// 78a2 - INT_Status3
 	// 78a3 - INT_Priority1
-	// 78a4 - INT_Priority2
-	// 78a5 - INT_Priority3
-	// 78a6 - MINT_Ctrl
+	map(0x0078a4, 0x0078a4).w(FUNC(generalplus_gpl951xx_device::int_priority_1_w)); // 78a4 - INT_Priority2
+	map(0x0078a5, 0x0078a5).w(FUNC(generalplus_gpl951xx_device::int_priority_2_w)); // 78a5 - INT_Priority3
+	map(0x0078a6, 0x0078a6).w(FUNC(generalplus_gpl951xx_device::int_priority_3_w)); // 78a6 - MINT_Ctrl
 	// 78a7 - IOAB_KCIEN
-	// 78a8 - IOC_KCIEN
+	map(0x0078a8, 0x0078a8).w(FUNC(generalplus_gpl951xx_device::mint_ctrl_w)); // 78a8 - IOC_KCIEN
 	// 78a9 - IOE_KCIEN
 	// 78aa - IOF_KCIEN
 	// 78ab - IOAB_KCIFC
@@ -327,11 +823,11 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 78ad - IOE_ KCIFC
 	// 78ae - IOF_ KCIFC
 
-	// 78b0 - TimeBaseA_Ctrl
-	// 78b1 - TimeBaseB_Ctrl
-	// 78b2 - TimeBaseC_Ctrl
+	map(0x0078b0, 0x0078b0).w(FUNC(generalplus_gpl951xx_device::timebasea_ctrl_w)); // 78b0 - TimeBaseA_Ctrl
+	map(0x0078b1, 0x0078b1).w(FUNC(generalplus_gpl951xx_device::timebaseb_ctrl_w)); // 78b1 - TimeBaseB_Ctrl
+	map(0x0078b2, 0x0078b2).rw(FUNC(generalplus_gpl951xx_device::timebasec_ctrl_r), FUNC(generalplus_gpl951xx_device::timebasec_ctrl_w)); // 78b2 - TimeBaseC_Ctrl
 
-	// 78b8 - TimeBase_Reset
+	map(0x0078b8, 0x0078b8).w(FUNC(generalplus_gpl951xx_device::timebase_reset_w)); // 78b8 - TimeBase_Reset
 
 	// 78c0 - I2C_Ctrl
 	// 78c1 - I2C_Status
@@ -341,24 +837,24 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 78c5 - I2C_Clk
 	// 78c6 - I2C_MISC
 
-	// 78e0 - TimerG_Ctrl
+	map(0x0078e0, 0x0078e0).rw(FUNC(generalplus_gpl951xx_device::gpl951xx_timerg_ctrl_r), FUNC(generalplus_gpl951xx_device::gpl951xx_timerg_ctrl_w)); // 78e0 - gpl951xx_timerg_Ctrl
 	// 78e1
-	// 78e2 - TimerG_Preload
+	map(0x0078e2, 0x0078e2).rw(FUNC(generalplus_gpl951xx_device::gpl951xx_timerg_preload_r), FUNC(generalplus_gpl951xx_device::gpl951xx_timerg_preload_w)); // 78e2 - gpl951xx_timerg_Preload
 	// 78e3
 	// 78e4 - TimerG_UpCount
 	// 78e5
 	// 78e6
 	// 78e7
-	map(0x0078e8, 0x0078e8).rw(FUNC(generalplus_gpl951xx_device::spi_direct_78e8_r), FUNC(generalplus_gpl951xx_device::spi_direct_78e8_w)); // TimerH_Ctrl
+	map(0x0078e8, 0x0078e8).rw(FUNC(generalplus_gpl951xx_device::gpl951xx_timerh_ctrl_r), FUNC(generalplus_gpl951xx_device::gpl951xx_timerh_ctrl_w)); // gpl951xx_timerh_Ctrl
 	// 78e9
-	// 78ea - TimerH_Preload
+	map(0x0078ea, 0x0078ea).rw(FUNC(generalplus_gpl951xx_device::gpl951xx_timerh_preload_r), FUNC(generalplus_gpl951xx_device::gpl951xx_timerh_preload_w)); // 78ea - gpl951xx_timerh_Preload
 	// 78eb
 	// 78ec - TimerH_UpCount
 	// 78ed
 	// 78ee
 	// 78ef
 
-	// 78f0 - CHA_Ctrl
+	map(0x0078f0, 0x0078f0).rw(FUNC(generalplus_gpl951xx_device::cha_ctrl_r), FUNC(generalplus_gpl951xx_device::cha_ctrl_w)); // 78f0 - CHA_Ctrl
 	// 78f1 - CHA_Data
 	// 78f2 - CHA_FIFO
 	// 78f3
@@ -427,8 +923,8 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 79f1 - RTC_Addr
 	// 79f2 - RTC_WriteData
 	// 79f3 - RTC_Request
-	map(0x0079f4, 0x0079f4).r(FUNC(generalplus_gpl951xx_device::spi_direct_79f4_r)); // RTC_Ready
-	map(0x0079f5, 0x0079f5).r(FUNC(generalplus_gpl951xx_device::spi_direct_79f5_r)); // RTC_ReadData
+	map(0x0079f4, 0x0079f4).r(FUNC(generalplus_gpl951xx_device::rtc_ready_r)); // RTC_Ready
+	map(0x0079f5, 0x0079f5).r(FUNC(generalplus_gpl951xx_device::rtc_readdata_r)); // RTC_ReadData
 	// 79f6
 	// 79f7
 	// 79f8
@@ -513,29 +1009,15 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	//
 	// 7a6c - USBD_INTF
 
-	// 7a80 - DMA_Ctrl0
-	// 7a81 - DMA_SRC_AddrL0
-	// 7a82 - DMA_TAR_AddrL0
-	// 7a83 - DMA_TCountL0
-	// 7a84 - DMA_SRC_AddrH0
-	// 7a85 - DMA_TAR_AddrH0
-	// 7a86 - DMA_TCountH0
-	// 7a87 - DMA_MISC0
-	// 7a88 - DMA_Ctrl1
-	// 7a89 - DMA_SRC_AddrL1
-	// 7a8a - DMA_TAR_AddrL1
-	// 7a8b - DMA_TCountL1
-	// 7a8c - DMA_SRC_AddrH1
-	// 7a8d - DMA_TAR_AddrH1
-	// 7a8e - DMA_TCountH1
-	// 7a8f - DMA_MISC1
+	map(0x007a80, 0x007a87).rw(FUNC(generalplus_gpl951xx_device::system_dma_params_channel0_r), FUNC(generalplus_gpl951xx_device::system_dma_params_channel0_w));
+	map(0x007a88, 0x007a8f).rw(FUNC(generalplus_gpl951xx_device::system_dma_params_channel1_r), FUNC(generalplus_gpl951xx_device::system_dma_params_channel1_w));
 	//
 	// 7ab0 - DMA_SPRISize0
 	// 7ab1 - DMA_SPRISize1
 	//
 	// 7abd - DMA_LineLength
-	// 7abe - DMA_SS
-	// 7abf - DMA_INT
+	map(0x007abe, 0x007abe).rw(FUNC(generalplus_gpl951xx_device::system_dma_memtype_r), FUNC(generalplus_gpl951xx_device::system_dma_memtype_w)); // 7abe - DMA_SS
+	map(0x007abf, 0x007abf).rw(FUNC(generalplus_gpl951xx_device::system_dma_status_r), FUNC(generalplus_gpl951xx_device::system_dma_7abf_unk_w)); // 7abf - DMA_INT
 	//
 	// 7ac0 - CTS_Ctrl1
 	// 7ac1 - CTS_CH
@@ -548,7 +1030,7 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 7ac8 - CTS_FIFOLevel
 	// 7ac9 - CTS_CNT
 
-	map(0x007af0, 0x007af0).rw(FUNC(generalplus_gpl951xx_device::spi_direct_7af0_r), FUNC(generalplus_gpl951xx_device::spi_direct_7af0_w)); // Byte_Swap
+	map(0x007af0, 0x007af0).rw(FUNC(generalplus_gpl951xx_device::byte_swap_r), FUNC(generalplus_gpl951xx_device::byte_swap_w)); // Byte_Swap
 	// 7af1 - Nibble_Swap
 	// 7af2 - TwoBit_Swap
 	// 7af3 - Bit_Reverse
@@ -568,33 +1050,57 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map& map)
 	// 7b31 - KS_Data9
 	// 7b32 - KS_Data10
 
-	map(0x007b40, 0x007b40).r(FUNC(generalplus_gpl951xx_device::spi_direct_7b40_r)).nopw();; // SPIFC_Ctrl1
-	map(0x007b41, 0x007b41).nopw(); // SPIFC_CMD
-	map(0x007b42, 0x007b42).nopw(); // SPIFC_PARA
-	// 7b43 - SPIFC_ADDRL
-	// 7b44 - SPIFC_ADDRH
-	// 7b45 - SPIFC_TX_Dat
-	map(0x007b46, 0x007b46).ram(); // SPIFC_RX_Data - values must be written and read from here, but is there any transformation?
-	map(0x007b47, 0x007b47).nopw(); // SPIFC_TX_BC
-	map(0x007b48, 0x007b48).nopw(); // SPIFC_RX_BC
-	map(0x007b49, 0x007b49).ram(); // SPIFC_TIMING
+	map(0x007b40, 0x007b40).rw(FUNC(generalplus_gpl951xx_device::spifc_ctrl_r), FUNC(generalplus_gpl951xx_device::spifc_ctrl_w)); // SPIFC_Ctrl1
+	map(0x007b41, 0x007b41).rw(FUNC(generalplus_gpl951xx_device::spifc_cmd_r), FUNC(generalplus_gpl951xx_device::spifc_cmd_w)); // SPIFC_CMD
+	map(0x007b42, 0x007b42).rw(FUNC(generalplus_gpl951xx_device::spifc_para_r), FUNC(generalplus_gpl951xx_device::spifc_para_w)); // SPIFC_PARA
+	map(0x007b43, 0x007b43).rw(FUNC(generalplus_gpl951xx_device::spifc_addrl_r), FUNC(generalplus_gpl951xx_device::spifc_addrl_w)); // 7b43 - SPIFC_ADDRL
+	map(0x007b44, 0x007b44).rw(FUNC(generalplus_gpl951xx_device::spifc_addrh_r), FUNC(generalplus_gpl951xx_device::spifc_addrh_w)); // 7b44 - SPIFC_ADDRH
+	map(0x007b45, 0x007b45).rw(FUNC(generalplus_gpl951xx_device::spifc_txdat_r), FUNC(generalplus_gpl951xx_device::spifc_txdat_w)); // 7b45 - SPIFC_TX_Dat
+	map(0x007b46, 0x007b46).rw(FUNC(generalplus_gpl951xx_device::spifc_rxdat_r), FUNC(generalplus_gpl951xx_device::spifc_rxdat_w)); // SPIFC_RX_Data - values must be written and read from here, but is there any transformation?
+	map(0x007b47, 0x007b47).rw(FUNC(generalplus_gpl951xx_device::spifc_tx_bc_r), FUNC(generalplus_gpl951xx_device::spifc_tx_bc_w)); // SPIFC_TX_BC
+	map(0x007b48, 0x007b48).rw(FUNC(generalplus_gpl951xx_device::spifc_rx_bc_r), FUNC(generalplus_gpl951xx_device::spifc_rx_bc_w)); // SPIFC_RX_BC
+	map(0x007b49, 0x007b49).rw(FUNC(generalplus_gpl951xx_device::spifc_timing_r), FUNC(generalplus_gpl951xx_device::spifc_timing_w)); // SPIFC_TIMING
+	// 7b4a
+	map(0x007b4b, 0x007b4b).rw(FUNC(generalplus_gpl951xx_device::spifc_ctrl2_r), FUNC(generalplus_gpl951xx_device::spifc_ctrl2_w)); // 7b4b - SPIFC_Ctrl2
 
-	// 7b4b - SPIFC_Ctrl2
 
-	// 7b80 to 7b9f - Audio
-	// 7c00 to 7cff - Audio
-	// 7e00 to 7eff - Audio
+	map(0x007b80, 0x007bbf).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::control_r), FUNC(sunplus_gcm394_audio_device::control_w));
+	map(0x007c00, 0x007dff).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::audio_r), FUNC(sunplus_gcm394_audio_device::audio_w));
+	map(0x007e00, 0x007fff).rw(m_spg_audio, FUNC(sunplus_gcm394_audio_device::audio_phase_r), FUNC(sunplus_gcm394_audio_device::audio_phase_w));
 
 	// 8000 - 8fff internal boot ROM (same on all devices of the same type, not OTP)
 
-	map(0x009000, 0x3fffff).rom().region("spidirect", 0);
+	map(0x009000, 0x1fffff).r(FUNC(generalplus_gpl951xx_device::spi_direct_r));
+	map(0x200000, 0x3fffff).r(FUNC(generalplus_gpl951xx_device::spi_direct_bank_r));
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpl951xx_device::timer_g_cb )
+{
+	m_gpl951xx_timerg_ctrl |= 0x8000;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpl951xx_device::timer_h_cb )
+{
+	m_gpl951xx_timerh_ctrl |= 0x8000;
+}
+
+void generalplus_gpl951xx_device::device_add_mconfig(machine_config &config)
+{
+	sunplus_gcm394_base_device::device_add_mconfig(config);
+
+	TIMER(config, "timer_g").configure_generic(FUNC(generalplus_gpl951xx_device::timer_g_cb));
+	TIMER(config, "timer_h").configure_generic(FUNC(generalplus_gpl951xx_device::timer_h_cb));
+}
 
 DEFINE_DEVICE_TYPE(GPL951XX, generalplus_gpl951xx_device, "gpl951xx", "GeneralPlus GPL951xx")
 
-generalplus_gpl951xx_device::generalplus_gpl951xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	sunplus_gcm394_base_device(mconfig, GPL951XX, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpl951xx_device::gpspi_direct_internal_map), this))
+generalplus_gpl951xx_device::generalplus_gpl951xx_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	sunplus_gcm394_base_device(mconfig, GPL951XX, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpl951xx_device::gpspi_direct_internal_map), this)),
+	m_spi_out(*this),
+	m_spi_out_cmd(*this),
+	m_spi_reset(*this),
+	m_timer_g(*this, "timer_g"),
+	m_timer_h(*this, "timer_h")
 {
 }
 

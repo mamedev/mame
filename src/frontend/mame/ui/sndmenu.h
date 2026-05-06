@@ -24,7 +24,7 @@ namespace ui {
 class menu_sound_options : public menu
 {
 public:
-	menu_sound_options(mame_ui_manager &mui, render_container &container);
+	menu_sound_options(mame_ui_manager &mui, render_target &target);
 
 protected:
 	virtual void menu_dismissed() override;

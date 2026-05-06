@@ -11,17 +11,13 @@
 
 #include "util/xmlfile.h"
 
-#include <QtGui/QKeyEvent>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QVBoxLayout>
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QtGui/QAction>
 #include <QtGui/QActionGroup>
-#else
-#include <QtWidgets/QAction>
-#endif
+#include <QtGui/QKeyEvent>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QVBoxLayout>
 
 
 namespace osd::debugger::qt {

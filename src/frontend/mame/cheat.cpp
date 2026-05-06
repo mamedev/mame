@@ -1238,21 +1238,25 @@ bool cheat_manager::save_all(std::string const &filename)
 //  render text
 //-------------------------------------------------
 
-void cheat_manager::render_text(mame_ui_manager &mui, render_container &container)
+void cheat_manager::render_text(mame_ui_manager &mui, render_target &target)
 {
 	// render any text and free it along the way
-	for (int linenum = 0; linenum < m_output.size(); linenum++)
+	if (!m_output.size())
 	{
-		if (!m_output[linenum].empty())
+		float const lineheight = mui.get_line_height(target);
+		for (int linenum = 0; linenum < m_output.size(); linenum++)
 		{
-			// output the text
-			mui.draw_text_full(
-					container,
-					m_output[linenum],
-					0.0f, float(linenum) * mui.get_line_height(), 1.0f,
-					m_justify[linenum], ui::text_layout::word_wrapping::NEVER,
-					mame_ui_manager::OPAQUE_, rgb_t::white(), rgb_t::black(),
-					nullptr, nullptr);
+			if (!m_output[linenum].empty())
+			{
+				// output the text
+				mui.draw_text_full(
+						target,
+						m_output[linenum],
+						0.0f, float(linenum) * lineheight, 1.0f,
+						m_justify[linenum], ui::text_layout::word_wrapping::NEVER,
+						mame_ui_manager::OPAQUE_, rgb_t::white(), rgb_t::black(),
+						nullptr, nullptr);
+			}
 		}
 	}
 }
@@ -1371,9 +1375,10 @@ uint64_t cheat_manager::execute_tobcd(int params, const uint64_t *param)
 
 void cheat_manager::frame_update()
 {
+	// FIXME: this assumes the overlay will always be on the default UI target
 	// set up for accumulating output
 	m_lastline = 0;
-	m_numlines = floor(1.0f / mame_machine_manager::instance()->ui().get_line_height());
+	m_numlines = floor(1.0f / mame_machine_manager::instance()->ui().get_line_height(machine().render().ui_target()));
 	m_numlines = std::min<uint8_t>(m_numlines, m_output.size());
 	for (auto & elem : m_output)
 		elem.clear();

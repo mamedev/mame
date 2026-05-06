@@ -42,7 +42,7 @@ TILEMAP_MAPPER_MEMBER(liberate_state::fix_scan)
 
 TILE_GET_INFO_MEMBER(liberate_state::get_back_tile_info)
 {
-	const uint8_t *RAM = memregion("user1")->base();
+	const uint8_t *ROM = memregion("user1")->base();
 	int tile, bank;
 
 	/* Convert tile index of 512x512 to paged format */
@@ -61,7 +61,7 @@ TILE_GET_INFO_MEMBER(liberate_state::get_back_tile_info)
 			tile_index = (tile_index & 0xff) + (m_io_ram[2] << 8); /* Top left */
 	}
 
-	tile = RAM[tile_index];
+	tile = ROM[tile_index];
 	if (tile > 0x7f)
 		bank = 3;
 	else
