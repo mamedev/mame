@@ -9,7 +9,6 @@ TODO:
 - Second cart slot (no ROM, auxiliary I/O map for first cart slot);
 - Hookup p2000_flop and p2000_quik SW lists;
 - CTC;
-- NMI (tied to reset button?)
 - Ejecting a MDCR cassette while program is loading causes a MAME crash;
 - Joystick (cfr. brkwall)
 - 80 char width mode;
@@ -94,6 +93,7 @@ public:
 	}
 
 	void p2000t(machine_config &config) ATTR_COLD;
+	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -182,12 +182,12 @@ void p2000t_state::video_reset()
 	port_0x_w(0);
 }
 
-// p2000_cart:familie4 uses this
+// p2000_cart:familie4 and p2000_cart:zemon uses this at least
 // TODO: use set_raw, should also bump SAA5050 clock to 12 MHz
 void p2000t_state::port_0x_w(uint8_t data)
 {
 	m_width80 = BIT(data, 0);
-    m_screen->set_visarea(0, 40 * (m_width80 + 1) * 12 - 1, 0, 24 * 20 - 1);
+	m_screen->set_visarea(0, 40 * (m_width80 + 1) * 12 - 1, 0, 24 * 20 - 1);
 }
 
 uint8_t p2000t_state::port_7x_r()
@@ -503,7 +503,18 @@ Small note about natural keyboard support: currently,
 - "Clrln" is mapped to 'F2'
 */
 
+// NMI allows break from cassette loads
+// TODO: is this available from factory or a DIY mod? If former, where is actually located on chassis?
+// Schematics shows a connection, doesn't seem optional.
+INPUT_CHANGED_MEMBER(p2000t_state::nmi_reset)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
 static INPUT_PORTS_START (p2000t)
+	PORT_START("FP_SYS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(p2000t_state::nmi_reset), 0) PORT_NAME("NMI soft reset")
+
 	PORT_START("KEY.0")
 	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)        PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)           PORT_CHAR('6') PORT_CHAR('&')
