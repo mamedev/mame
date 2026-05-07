@@ -15,6 +15,7 @@ Altera EPM7032LC44-15T CPLD
 YMZ280B-F
 empty space marked for YM2413
 3.579545 MHz XTAL (near empty YM2413 space)
+AT93C46 EEPROM
 MM1035 Mitsumi System Reset IC with Built-in Watchdog Timer
 bank of 8 DIP switches (3 other spaces not populated)
 memory reset push-button
@@ -266,4 +267,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1997, keirind2, 0, es9606, keirind2, es9606_state, empty_init, ROT0, "Excellent System", "Keirin Derby 2", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, keirind2, 0, es9606, keirind2, es9606_state, empty_init, ROT0, "Excellent System", "Keirin Derby II", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
