@@ -9,7 +9,164 @@ Notes:
 -->
 <softwarelist name="p2000_cass" description="Philips P2000T/P2000M Mini cassettes">
 
-<!-- !Games -->
+<!-- !Graphic Demos / Grafische Demo's -->
+
+	<software name="kaartned">
+		<description>Kaart van Nederland</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1400">
+				<rom name="Kaart van Nederland.cas" size="0x1400" crc="79fab347" sha1="07f4fc1055b91600d612ea0a2a29cc118918b95a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kameleon">
+		<description>Kameleon</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0f00">
+				<rom name="Kameleon.cas" size="0x0f00" crc="052df35d" sha1="271d3ee8cb42f6966ea429b83a914e8a40f530e6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kleurgr">
+		<!-- "Philips P2000 Computer Club" -->
+		<!-- "Programma nr 2" -->
+		<description>Kleuren Demonstraties (version N3.9)</description>
+		<year>1983</year>
+		<!-- "Copyright: Klaas H.J. Robers" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x3c00">
+				<rom name="Kleurengrafiek-demonstraties.cas" size="0x3c00" crc="45dd7e0f" sha1="f75ea81dd6c355c4ed0fd7a1b32374a5f2c00661" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mondrian">
+		<!-- "P2C2" -->
+		<!-- "Programma nr. 94" -->
+		<description>Mondriaan (version N3.3)</description>
+		<year>1984</year>
+		<!-- "Copyright: W.F.K. van den Eijnde" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0f00">
+				<rom name="Mondriaan.cas" size="0x0f00" crc="7bde4fc2" sha1="60a3b301885d394913c9a5627f36f20aae6c6e57" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="patronen">
+		<description>Patronen</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1400">
+				<rom name="Patronen.cas" size="0x1400" crc="1a7ba083" sha1="60396800fa1d5f22d0016e63945fa70d20099d41" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saatst">
+		<description>Teletekst Ceefax Testpagina</description>
+		<year>2023</year>
+		<!-- "Martijn Koch" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1400">
+				<rom name="SAA5050 Test Page.cas" size="0x1400" crc="1239b07b" sha1="619d715414e5d9b9d3609d5cc3d409fe3a8e197c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sterren">
+		<description>Sterren</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x0500">
+				<rom name="Sterren.cas" size="0x0500" crc="11a96a2a" sha1="1e0c0a7486f5a4d9070597d13de9dfac0db3fd9a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="verkeer">
+		<description>Verkeerslichten</description>
+		<year>1985</year>
+		<!-- "Albert de Visser en Henri Faber IV b" -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1400">
+				<rom name="Verkeerslichten.cas" size="0x1400" crc="6c7bfd74" sha1="afcb42684c5628482925832f4b89d5c29f738734" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picart">
+		<description>Art Gallery (pic2cas)</description>
+		<year>2022</year>
+		<publisher>Squirrel Monkey</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x4100">
+				<rom name="pic2cas Art gallery.cas" size="0x4100" crc="509e7f21" sha1="9f42dcb51b9e71e7686d9f13523c40586da617bc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picshin">
+		<description>Shining (pic2cas)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="pic2cas Shining.cas" size="0x1900" crc="594222a8" sha1="bf709437b9e2b2a6df0d30c2119d7aacefb6db22" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picskull" supported="partial">
+		<description>Skull (pic2cas)</description>
+		<year>2022</year>
+		<publisher>Squirrel Monkey</publisher>
+		<notes><![CDATA[
+Runs too fast? (verify)
+]]></notes>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x1900">
+				<rom name="pic2cas Skull.cas" size="0x1900" crc="d62248f7" sha1="a766f4d8f8934ae8f00323b8275b4dc92f9e1ac9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picgfx">
+		<description>Graphics (pic2cas)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
+		<part name="cass" interface="p2000_cass">
+			<dataarea name="cass" size="0x2d00">
+				<rom name="pic2cas graphics.cas" size="0x2d00" crc="0a8ef15c" sha1="dbb4b435ab0d7bc4ffd197b6d671ee6b3245e382" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Games / Spelletjes -->
 
 	<software name="4x4">
 		<description>4 x 4</description>
