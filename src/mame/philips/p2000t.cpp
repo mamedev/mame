@@ -141,6 +141,7 @@ public:
 		: p2000t_state(mconfig, type, tag)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_attrram(*this, "attrram")
 	{
 	}
 
@@ -158,8 +159,8 @@ protected:
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_attrram;
 
-	int8_t m_frame_count = 0;
 	void p2000m_io(address_map &map);
 
 	void port_7x_w(uint8_t data);
@@ -204,7 +205,7 @@ uint8_t p2000t_state::videoram_r(offs_t offset)
 			return 0;
 
 		// adjust for scroll
-		return m_videoram[(offset + m_port_303f) & 0x0fff];
+		return m_videoram[(offset + m_port_303f) & 0x07ff];
 	}
 	return m_videoram[offset];
 }
@@ -216,10 +217,10 @@ uint8_t p2000t_state::videoram_r(offs_t offset)
 
 void p2000m_state::palette_init(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t::white()); // white
-	palette.set_pen_color(1, rgb_t::black()); // black
-	palette.set_pen_color(2, rgb_t::black()); // black
-	palette.set_pen_color(3, rgb_t::white()); // white
+	palette.set_pen_color(0, rgb_t::black()); // black
+	palette.set_pen_color(1, rgb_t::white()); // white
+	palette.set_pen_color(2, rgb_t::white()); // white
+	palette.set_pen_color(3, rgb_t::black()); // black
 }
 
 static const gfx_layout p2000m_charlayout =
@@ -239,12 +240,10 @@ static GFXDECODE_START( gfx_p2000m )
 GFXDECODE_END
 
 // TODO: separate video devices, should be treated as such
-// i.e. should be composed not inherited (leave these two empty with no superclass calls)
+// i.e. should be composed not inherited (leave these two empty with no superclass calls for now)
 void p2000m_state::video_start()
 {
-	// TODO: what this variable is supposed to do?
-	// below doesn't seem right, it causes Cass`e`tte blinking in basicnl at best.
-	m_frame_count = 0;
+
 }
 
 void p2000m_state::video_reset()
@@ -255,19 +254,32 @@ void p2000m_state::video_reset()
 uint32_t p2000m_state::screen_update_p2000m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t const *const videoram = m_videoram;
+	uint8_t const *const attrram = m_attrram;
+	const uint16_t origin_x = 6 * 8;
+	const uint16_t origin_y = 1 * 12;
 
+	bitmap.fill(0, cliprect);
+
+	const u32 is_flash_period = (m_screen->frame_number() % 50) > 25;
+
+	// TODO: kerning and individual chars are guessed over FieldSupportManual diagrams
+	// attributes are testable in main2 special test
 	for (int offs = 0; offs < 80 * 24; offs++)
 	{
-		int sy = (offs / 80) * 20;
-		int sx = (offs % 80) * 12;
+		int sy = (offs / 80) * 12;
+		int sx = (offs % 80) * 8;
 
-		int code;
-		if ((m_frame_count > 25) && (videoram[offs + 2048] & 0x40))
+		uint8_t code;
+		uint8_t attr = attrram[offs];
+		// TODO: was BIT(attr, 6), why?
+		// TODO: causes bogus blinking with basicnl CASS`E`TTE wording (intentionally set too)
+		if (is_flash_period && BIT(attr, 2))
 			code = 32;
 		else
 		{
 			code = videoram[offs];
-			if ((videoram[offs + 2048] & 0x01) && (code & 0x20))
+			// graphics path
+			if (BIT(attr, 0) && (code & 0x20))
 			{
 				code += (code & 0x40) ? 64 : 96;
 			} else {
@@ -276,18 +288,18 @@ uint32_t p2000m_state::screen_update_p2000m(screen_device &screen, bitmap_ind16 
 			if (code < 32) code = 32;
 		}
 
-		// TODO: why it needs zoom_opaque if the size is fixed?
-		m_gfxdecode->gfx(0)->zoom_opaque(bitmap,cliprect, code,
-			videoram[offs + 2048] & 0x08 ? 0 : 1, 0, 0, sx, sy, 0x20000, 0x20000);
+		// bit 3: reverse
+		m_gfxdecode->gfx(0)->opaque(bitmap, cliprect, code,
+			BIT(attr, 3), 0, 0, sx + origin_x, sy + origin_y);
 
-		if (videoram[offs] & 0x80)
-		{
-			for (int loop = 0; loop < 12; loop++)
-			{
-				bitmap.pix(sy + 18, sx + loop) = 0;   /* cursor */
-				bitmap.pix(sy + 19, sx + loop) = 0;   /* cursor */
-			}
-		}
+		// TODO: refine dimensions for both
+		// bit 7 vram high enables cursor (may really be code 0xbf instead)
+		if (BIT(videoram[offs], 7))
+			bitmap.plot_box(sx + origin_x, sy + origin_y, 7, 12, 1);
+
+		// bit 1 of attribute is underline
+		if (BIT(attr, 1))
+			bitmap.plot_box(sx + origin_x, sy + origin_y + 10, 7, 1, 1);
 	}
 
 	return 0;
@@ -436,7 +448,8 @@ void p2000t_state::p2000t_mem(address_map &map)
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x4fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	map(0x5000, 0x57ff).ram().share("videoram");
-	map(0x5800, 0xdfff).ram();
+	map(0x5800, 0x5fff).unmaprw(); // empty in T model
+	map(0x6000, 0xdfff).ram();
 	map(0xe000, 0xffff).bankrw(m_bank);
 }
 
@@ -444,7 +457,8 @@ void p2000m_state::p2000m_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x4fff).r("cartslot", FUNC(generic_slot_device::read_rom));
-	map(0x5000, 0x5fff).ram().share("videoram");
+	map(0x5000, 0x57ff).ram().share("videoram");
+	map(0x5800, 0x5fff).ram().share("attrram");
 	map(0x6000, 0xdfff).ram();
 	map(0xe000, 0xffff).bankrw(m_bank);
 }
@@ -674,9 +688,8 @@ void p2000m_state::p2000m(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &p2000m_state::p2000m_mem);
 	m_maincpu->set_addrmap(AS_IO, &p2000m_state::p2000m_io);
 
-	// TODO: really dynamically modified by width setting
-	m_screen->set_size(80 * 12, 24 * 20);
-	m_screen->set_visarea(0, 80 * 12 - 1, 0, 24 * 20 - 1);
+	SCREEN(config.replace(), m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(6'000'000 * 2, 768, 6 * 8, 86 * 8, 26 * 12, 1 * 12, 25 * 12);
 	m_screen->set_screen_update(FUNC(p2000m_state::screen_update_p2000m));
 	m_screen->set_palette(m_palette);
 
@@ -704,4 +717,4 @@ ROM_END
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY    FULLNAME          FLAGS
 COMP( 1980, p2000t, 0,      0,      p2000t,  p2000t, p2000t_state, empty_init, "Philips", "P2000T", MACHINE_NOT_WORKING )
 COMP( 1980, p2000m, p2000t, 0,      p2000m,  p2000t, p2000m_state, empty_init, "Philips", "P2000M", MACHINE_NOT_WORKING )
-// P2000C, portable version
+// P2000C, 1983 portable version with green monitor and 2x disk drives built-in
