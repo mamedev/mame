@@ -43,7 +43,6 @@ map(0xa000, 0xa003).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::writ
 map(0xB000, 0xB000).noprw(); 
 map(0xD002, 0xD003).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
 map(0xE000, 0xE001).w("opll", FUNC(ym2413_device::write));
-map(0xE000, 0xe0ff).ram(); 
 
 tzwang
 data
