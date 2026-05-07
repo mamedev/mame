@@ -199,7 +199,8 @@ Runs too fast? (verify)
 		<notes><![CDATA[
 Stuck on title screen, [CTC]?
 ]]></notes>
-		<info name="usage" value="Requires 32KB RAM minimum, press # to start game" />
+		<info name="required_ram" value="32KB" />
+		<info name="usage" value="Press # to start game" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x5a00">
@@ -689,7 +690,7 @@ Stuck on title, [CTC]?
 		<description>Flight Simulator</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires 32KB RAM minimum" />
+		<info name="required_ram" value="32KB" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x9100">
@@ -707,7 +708,7 @@ Stuck on title, [CTC]?
 		<notes><![CDATA[
 Optional [joystick] support
 ]]></notes>
-		<info name="usage" value="Requires 32KB RAM minimum" />
+		<info name="required_ram" value="32KB" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass1" interface="p2000_cass">
 			<dataarea name="cass" size="0x9b00">
@@ -728,7 +729,7 @@ Optional [joystick] support
 		<notes><![CDATA[
 Maps right movement to up key (verify)
 ]]></notes>
-		<info name="usage" value="Requires 32KB RAM minimum" />
+		<info name="required_ram" value="32KB" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass1" interface="p2000_cass">
 			<dataarea name="cass" size="0x7800">
@@ -839,7 +840,7 @@ Black screen
 		<description>Go spel</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires 32KB RAM minimum" />
+		<info name="required_ram" value="32KB" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x2d00">
@@ -1014,7 +1015,7 @@ Black screen
 		<year>1986</year>
 		<!-- P. Hoogendijk / J. Nieuwenhuizen -->
 		<publisher>Flower Soft</publisher>
-		<info name="usage" value="Requires 32KB RAM minimum" />
+		<info name="required_ram" value="32KB" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x7800">
@@ -1571,7 +1572,7 @@ Unresponsive [keyboard] on instruction screens
 		<year>198?</year>
 		<!-- "by Rob Masseurs / Adri Gabriëls" -->
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires 32KB RAM minimum"/>
+		<info name="required_ram" value="32KB"/>
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x7300">
@@ -1686,7 +1687,8 @@ Black screen, [CTC]?
 		<year>198?</year>
 		<!-- "Programmed by Thomas Hofmeister" -->
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Need to set screen to a meaningful value (like 20 lines, 40 characters), requires 32KB of RAM minimum" />
+		<info name="required_ram" value="32KB" />
+		<info name="usage" value="Need to set screen to a meaningful value (like 20 lines, 40 characters)" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x1e00">
@@ -1714,7 +1716,7 @@ Black screen, [CTC]?
 		<year>1987</year>
 		<!-- "Authors: Geert-Jan v. Glabbeek / Rob Meulendijks" -->
 		<publisher>SGP / Soft 2000</publisher>
-		<info name="usage" value="Requires 32KB RAM minimum" />
+		<info name="required_ram" value="32KB" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x6900">
@@ -1752,7 +1754,7 @@ Black screen, [CTC]?
 		<description>Space-Mission</description>
 		<year>1984</year>
 		<publisher>PvH</publisher>
-		<info name="usage" value="Requires 32KB RAM minimum" />
+		<info name="required_ram" value="32KB" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x5a00">
@@ -1833,7 +1835,7 @@ Requires 2x [paddle], hangs once ball goes at edge
 		<notes><![CDATA[
 Unresponsive [keyboard]
 ]]></notes>
-		<info name="usage" value="Requires 32KB RAM minimum" />
+		<info name="required_ram" value="32KB" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<!-- TODO: Gather side order -->
 		<part name="cass1" interface="p2000_cass">
@@ -2024,7 +2026,7 @@ All of the above doesn't translate well with the actual p2000 keyboard but btanb
 		<notes><![CDATA[
 Unresponsive [keyboard] during gameplay
 ]]></notes>
-		<info name="usage" value="Requires 32KB RAM minimum" />
+		<info name="required_ram" value="32KB" />
 		<sharedfeat name="requirement" value="p2000_cart:basicnl"/>
 		<part name="cass" interface="p2000_cass">
 			<dataarea name="cass" size="0x5f00">
