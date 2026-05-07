@@ -30,15 +30,15 @@ driver by Bryan McPhail
 
 Boards, from earliest to latest:
 * GX400 PWB(B) 200207F - The Bubble System top board: (DATA VERIFIED THRU TRACING)
-    Uses an 0x800 long block of shared SRAM at 0x000-0x7ff with the bubble K005297 used for block transfers and boot
+    Uses an 0x800 long block of shared SRAM at 0x000-0x7ff with the 005297 used for block transfers and boot
     Uses Program RAM (0x10000-0x1ffff), data uploaded from bubble cart
     Uses 8-bit RAM at (0x20000-0x27fff) on the lower half of the bus (upper half is ???)
     Uses Graphics RAM (0x30000-0x3ffff) data uploaded from bubble cart
     Uses Work RAM at 0x70000-0x73fff
-    Uses an unknown SDIP64 'Bubble K005297' to handle all bubble access and refresh and system init; the bubble K005297
+    Uses an unknown SDIP64 '005297' to handle all bubble access and refresh and system init; the 005297
       uploads a 0x1e0 long BIOS/Bootloader to the shared ram at 0x000-0x800 and controls the 68k /RESET and /BR lines
       and only releases these lines after the bubble memory has warmed up and is ready.
-    Has 4 Interrupts: ODD/EVEN frame, VBLANK, K005297 done, and 220hz timer, through a priority encoder
+    Has 4 Interrupts: ODD/EVEN frame, VBLANK, 005297 done, and 220hz timer, through a priority encoder
     Has VLM5030
     VLM5030 voice data is at ram at Sound CPU 0x8000
     Sound CPU clocked at 1.789772MHz
@@ -76,9 +76,9 @@ TODO: others.
 TODO:
 - exact cycles/scanlines for VBLANK and 256V int assert/clear need to be figured out and implemented.
 - bubble system needs a delay (and auto-sound-nmi hookup) so the 'getting ready... 49...' countdown actually
-  plays before the simulated K005297 releases the 68k and the load (and morning music) begins.
+  plays before the simulated 005297 releases the 68k and the load (and morning music) begins.
 - hcrash: Konami GT-type inputs doesn't work properly.
-- gradiusb: still needs proper K005297 emulation;
+- gradiusb: still needs proper 005297 emulation;
 
 modified by Hau
 03/27/2009
@@ -256,7 +256,7 @@ void gx400_base_state::sound_nmi_w(int state)
 	// Effectively, if the bit is 1, NMI is asserted, otherwise it is cleared. This is also cleared on reset.
 	// The ??? input is likely either tied to VBLANK or 256V, or tied to one of those two through a 74ls74 enable latch, controlled
 	// by something else (probably either the one of the two output/int enable latches of the 68k, or by exx0/exx7 address-latched
-	// accesses from the sound z80, though technically it could be anything, even the /BS signal from the K005297 to the 68k)
+	// accesses from the sound z80, though technically it could be anything, even the /BS signal from the 005297 to the 68k)
 	// TODO: trace implement the other NMI source; without this, the 'getting ready' pre-bubble-ready countdown in bubble system cannot work,
 	// since it requires a sequence of NMIs in order to function.
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
@@ -291,10 +291,10 @@ void hcrash_state::citybomb_outlatch_w(uint8_t data)
 	m_selected_ip = BIT(~data, 4); // citybomb steering & accel
 }
 
-void bubsys_state::bubsys_k005297_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void bubsys_state::bubsys_005297_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bubsys_control_ram[offset]);
-	//logerror("bubsys_k005297_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
+	//logerror("bubsys_005297_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
 
 	if (offset == 1)
 	{
@@ -305,7 +305,7 @@ void bubsys_state::bubsys_k005297_w(offs_t offset, uint16_t data, uint16_t mem_m
 		// Read
 		else if (m_bubsys_control_ram[1] == 1)
 		{
-			// The K005297 copies the requested page of bubble memory to 0xf00 of shared RAM
+			// The 005297 copies the requested page of bubble memory to 0xf00 of shared RAM
 			int page = m_bubsys_control_ram[0] & 0x7ff;
 			//int unknownBit = m_bubsys_control_ram[0] & 0x800;
 
@@ -316,7 +316,7 @@ void bubsys_state::bubsys_k005297_w(offs_t offset, uint16_t data, uint16_t mem_m
 
 			// The last 2 bytes of the block are loaded into the control register
 			m_bubsys_control_ram[0] = src[page * 0x90 + 0x80] | (src[page * 0x90 + 0x81]<<8);
-			m_maincpu->set_input_line(5, HOLD_LINE); // This presumably gets asserted (under K005297 control) whenever the K005297 has completed a command
+			m_maincpu->set_input_line(5, HOLD_LINE); // This presumably gets asserted (under 005297 control) whenever the 005297 has completed a command
 		}
 		// Write?
 		else if (m_bubsys_control_ram[1] == 2)
@@ -326,8 +326,8 @@ void bubsys_state::bubsys_k005297_w(offs_t offset, uint16_t data, uint16_t mem_m
 	}
 	else
 	{
-		//logerror("bubsys_k005297_trigger_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
-		// Not confirmed the clear happens here; clear is done by the K005297 itself, presumably some number of cycles after the assert.
+		//logerror("bubsys_005297_trigger_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
+		// Not confirmed the clear happens here; clear is done by the 005297 itself, presumably some number of cycles after the assert.
 		m_maincpu->set_input_line(5, CLEAR_LINE);
 	}
 }
@@ -533,11 +533,11 @@ void gx400_state::gx400_map(address_map &map)
 
 void bubsys_state::main_map(address_map &map)
 {
-	map(0x000000, 0x000fff).ram().share(m_bubsys_shared_ram); /* Shared with K005297 */
+	map(0x000000, 0x000fff).ram().share(m_bubsys_shared_ram); /* Shared with 005297 */
 	map(0x010000, 0x01ffff).ram(); /* PROGRAM RAM */
 	map(0x020000, 0x027fff).rw(FUNC(bubsys_state::sound_sharedram_word_r), FUNC(bubsys_state::sound_sharedram_word_w));
 	map(0x030000, 0x03ffff).ram().w(FUNC(bubsys_state::charram_w)).share(m_charram);
-	map(0x040000, 0x040007).ram().w(FUNC(bubsys_state::bubsys_k005297_w)).share(m_bubsys_control_ram); // Shared with K005297
+	map(0x040000, 0x040007).ram().w(FUNC(bubsys_state::bubsys_005297_w)).share(m_bubsys_control_ram); // Shared with 005297
 	map(0x050000, 0x0503ff).ram().share(m_xscroll[0]);
 	map(0x050400, 0x0507ff).ram().share(m_xscroll[1]);
 	map(0x050800, 0x050eff).ram();
@@ -3029,7 +3029,7 @@ Manual says SW4, 5, 6, 7 & 8 not used, leave off
 Interrupt source info from ArcadeHacker:
 74LS147 @ 17E
 PIN1 INPUT 4 -> 14H 74LS74 PIN 5
-PIN2 INPUT 5 -> K005297 PIN  31
+PIN2 INPUT 5 -> 005297 PIN  31
 PIN3 INPUT 6 -> VCC
 PIN4 INPUT 7 -> VCC
 PIN5 INPUT 8 -> VCC
@@ -3079,7 +3079,7 @@ void bubsys_state::bubsys(machine_config &config)
 	m_screen->set_palette(m_palette);
 	// TODO: This is supposed to be gated by something on bubble system, unclear what.
 	// it should only be active while the bubble memory is warming up, and disabled after
-	// the bubble K005297 'releases' the 68k from reset.
+	// the bubble 005297 'releases' the 68k from reset.
 	//m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
@@ -3204,13 +3204,13 @@ ROM_END
 void bubsys_state::bubsys_init()
 {
 	/*
-	    The K005297 is the master of the system and controls the /RESET and /BS lines of the 68000.
-	    At boot the K005297 asserts /RESET and /BS of the 68000 and waits for the bubble memory to warm up.
+	    The 005297 is the master of the system and controls the /RESET and /BS lines of the 68000.
+	    At boot the 005297 asserts /RESET and /BS of the 68000 and waits for the bubble memory to warm up.
 	    During this period, the Audio CPU is running and speaking the "Getting ready... Fifty..."
-	    countdown via the vlm5030. Once the bubble memory is ready, the K005297 copies the 68000 boot program
+	    countdown via the vlm5030. Once the bubble memory is ready, the 005297 copies the 68000 boot program
 	    to shared RAM which takes 30.65 milliseconds then releases /RESET and /BS so the 68000 starts execution.
 
-	    As the K005297 is not emulated we effectively start the simulation at the point the 68000
+	    As the 005297 is not emulated we effectively start the simulation at the point the 68000
 	    is released, and manually copy the boot program to 68000 address space.
 
 	    TODO: add a 'delay' (configurable) to simulate the bubble memory 'warming up' and only release the 68k after this is done.
@@ -3220,9 +3220,9 @@ void bubsys_state::bubsys_init()
 	memcpy(m_bubsys_shared_ram, src, 0x1e0);
 
 	/*
-	    The K005297 sets this flag once the boot program is copied.  The 68000 will reset
+	    The 005297 sets this flag once the boot program is copied.  The 68000 will reset
 	    if the value is not correct. Presumably this was done for safety in case somehow the
-	    68000 was released from reset when the K005297 wasn't yet ready.
+	    68000 was released from reset when the 005297 wasn't yet ready.
 	*/
 	m_bubsys_control_ram[3] = 0x240;
 }
