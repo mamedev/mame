@@ -98,20 +98,20 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
-	uint8_t p2000t_port_000f_r(offs_t offset);
-	uint8_t p2000t_port_202f_r();
-	void p2000t_port_101f_w(uint8_t data);
-	void p2000t_port_303f_w(uint8_t data);
-	void p2000t_port_505f_w(uint8_t data);
-	void p2000t_port_707f_w(uint8_t data);
-	void p2000t_port_9494_w(uint8_t data);
-	uint8_t videoram_r(offs_t offset);
+	uint8_t port_0x_r(offs_t offset);
+	uint8_t port_2x_r();
+	void port_1x_w(uint8_t data);
+	void port_3x_w(uint8_t data);
+	void port_5x_w(uint8_t data);
+	void port_94_w(uint8_t data);
 
 	INTERRUPT_GEN_MEMBER(p2000_interrupt);
 
 	void p2000t_mem(address_map &map) ATTR_COLD;
-	void p2000t_io(address_map &map) ATTR_COLD;
+	void base_io(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -123,10 +123,15 @@ protected:
 	required_device<screen_device> m_screen;
 
 private:
+	void p2000t_io(address_map &map) ATTR_COLD;
+	uint8_t videoram_r(offs_t offset);
+	void port_0x_w(uint8_t data);
+	uint8_t port_7x_r();
+
 	required_ioport_array<10> m_keyboard;
 	bool m_keyboard_int_enable;
 	uint8_t m_port_303f;
-	uint8_t m_port_707f;
+	uint8_t m_width80;
 };
 
 class p2000m_state : public p2000t_state
@@ -143,8 +148,9 @@ public:
 
 protected:
 	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
-	void p2000m_palette(palette_device &palette) const ATTR_COLD;
+	void palette_init(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update_p2000m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void p2000m_mem(address_map &map) ATTR_COLD;
@@ -154,12 +160,86 @@ private:
 	required_device<palette_device> m_palette;
 
 	int8_t m_frame_count = 0;
+	void p2000m_io(address_map &map);
+
+	void port_7x_w(uint8_t data);
+	uint8_t m_port_707f;
 };
+
+/*
+ * p2000t video HW
+ */
+
+void p2000t_state::video_start()
+{
+	save_item(NAME(m_width80));
+}
+
+void p2000t_state::video_reset()
+{
+	// reset both width80 and visible area
+	port_0x_w(0);
+}
+
+// p2000_cart:familie4 uses this
+// TODO: use set_raw, should also bump SAA5050 clock to 12 MHz
+void p2000t_state::port_0x_w(uint8_t data)
+{
+	m_width80 = BIT(data, 0);
+    m_screen->set_visarea(0, 40 * (m_width80 + 1) * 12 - 1, 0, 24 * 20 - 1);
+}
+
+uint8_t p2000t_state::port_7x_r()
+{
+	return m_width80;
+}
+
+uint8_t p2000t_state::videoram_r(offs_t offset)
+{
+	// register 3x available only in 40 width mode
+	if (!m_width80)
+	{
+		// screen disabled if high
+		if (BIT(m_port_303f, 7))
+			return 0;
+
+		// adjust for scroll
+		return m_videoram[(offset + m_port_303f) & 0x0fff];
+	}
+	return m_videoram[offset];
+}
+
 
 /*
  * p2000m video HW
  */
 
+void p2000m_state::palette_init(palette_device &palette) const
+{
+	palette.set_pen_color(0, rgb_t::white()); // white
+	palette.set_pen_color(1, rgb_t::black()); // black
+	palette.set_pen_color(2, rgb_t::black()); // black
+	palette.set_pen_color(3, rgb_t::white()); // white
+}
+
+static const gfx_layout p2000m_charlayout =
+{
+	6, 10,
+	256,
+	1,
+	{ 0 },
+	{ 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8,
+		5*8, 6*8, 7*8, 8*8, 9*8 },
+	8 * 10
+};
+
+static GFXDECODE_START( gfx_p2000m )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, p2000m_charlayout, 0, 2 )
+GFXDECODE_END
+
+// TODO: separate video devices, should be treated as such
+// i.e. should be composed not inherited (leave these two empty with no superclass calls)
 void p2000m_state::video_start()
 {
 	// TODO: what this variable is supposed to do?
@@ -167,6 +247,10 @@ void p2000m_state::video_start()
 	m_frame_count = 0;
 }
 
+void p2000m_state::video_reset()
+{
+
+}
 
 uint32_t p2000m_state::screen_update_p2000m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -223,7 +307,7 @@ uint32_t p2000m_state::screen_update_p2000m(screen_device &screen, bitmap_ind16 
     If the keyboard interrupt is disabled, reading one of these ports
     will read the corresponding keyboard matrix row
 */
-uint8_t p2000t_state::p2000t_port_000f_r(offs_t offset)
+uint8_t p2000t_state::port_0x_r(offs_t offset)
 {
 	if (m_keyboard_int_enable)
 	{
@@ -255,7 +339,7 @@ uint8_t p2000t_state::p2000t_port_000f_r(offs_t offset)
 
     Note: bit 6 & 7 are swapped when the cassette is moving in reverse.
 */
-uint8_t p2000t_state::p2000t_port_202f_r()
+uint8_t p2000t_state::port_2x_r()
 {
 	uint8_t data = 0x00;
 	data |= !m_mdcr->wen() << 3;
@@ -279,7 +363,7 @@ uint8_t p2000t_state::p2000t_port_202f_r()
     bit 6 - Keyboard interrupt enable
     bit 7 - Printer output
 */
-void p2000t_state::p2000t_port_101f_w(uint8_t data)
+void p2000t_state::port_1x_w(uint8_t data)
 {
 	m_keyboard_int_enable = BIT(data, 6);
 	m_mdcr->wda(BIT(data, 0));
@@ -300,7 +384,7 @@ void p2000t_state::p2000t_port_101f_w(uint8_t data)
     bit 6 - \
     bit 7 - Video disable (0 = enabled)
 */
-void p2000t_state::p2000t_port_303f_w(uint8_t data) { m_port_303f = data; }
+void p2000t_state::port_3x_w(uint8_t data) { m_port_303f = data; }
 
 /*
     Beeper 0x5x
@@ -314,7 +398,7 @@ void p2000t_state::p2000t_port_303f_w(uint8_t data) { m_port_303f = data; }
     bit 6 - Unused
     bit 7 - Unused
 */
-void p2000t_state::p2000t_port_505f_w(uint8_t data) { m_speaker->level_w(BIT(data, 0)); }
+void p2000t_state::port_5x_w(uint8_t data) { m_speaker->level_w(BIT(data, 0)); }
 
 /*
     DISAS 0x7x (P2000M only)
@@ -332,10 +416,10 @@ void p2000t_state::p2000t_port_505f_w(uint8_t data) { m_speaker->level_w(BIT(dat
     video refresh is disabled when the CPU accesses video memory
 
 */
-void p2000t_state::p2000t_port_707f_w(uint8_t data) { m_port_707f = data; }
+void p2000m_state::port_7x_w(uint8_t data) { m_port_707f = data; }
 
 
-void p2000t_state::p2000t_port_9494_w(uint8_t data) {
+void p2000t_state::port_94_w(uint8_t data) {
 	//  The memory region E000-FFFF (8k) is bank switched
 	const u32 ram_size = m_ram->size();
 
@@ -366,47 +450,32 @@ void p2000m_state::p2000m_mem(address_map &map)
 }
 
 /* port i/o functions */
-void p2000t_state::p2000t_io(address_map &map)
+void p2000t_state::base_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0f).r(FUNC(p2000t_state::p2000t_port_000f_r));
-//	map(0x00, 0x0f).w bit 0: enables 80 width mode
-	map(0x10, 0x1f).w(FUNC(p2000t_state::p2000t_port_101f_w));
-	map(0x20, 0x2f).r(FUNC(p2000t_state::p2000t_port_202f_r));
-	map(0x30, 0x3f).w(FUNC(p2000t_state::p2000t_port_303f_w));
-	map(0x50, 0x5f).w(FUNC(p2000t_state::p2000t_port_505f_w));
-//	map(0x70, 0x7f).r read back 80 width setting, P2000T only
-	map(0x70, 0x7f).w(FUNC(p2000t_state::p2000t_port_707f_w));
+	map(0x00, 0x0f).r(FUNC(p2000t_state::port_0x_r));
+	map(0x10, 0x1f).w(FUNC(p2000t_state::port_1x_w));
+	map(0x20, 0x2f).r(FUNC(p2000t_state::port_2x_r));
+	map(0x30, 0x3f).w(FUNC(p2000t_state::port_3x_w));
+	map(0x50, 0x5f).w(FUNC(p2000t_state::port_5x_w));
 //  map(0x88, 0x8b) CTC
 //  map(0x8c, 0x90) FDC
-	map(0x94, 0x94).w(FUNC(p2000t_state::p2000t_port_9494_w));
+	map(0x94, 0x94).w(FUNC(p2000t_state::port_94_w));
 }
 
-/* graphics output */
-
-static const gfx_layout p2000m_charlayout =
+void p2000t_state::p2000t_io(address_map &map)
 {
-	6, 10,
-	256,
-	1,
-	{ 0 },
-	{ 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8,
-		5*8, 6*8, 7*8, 8*8, 9*8 },
-	8 * 10
-};
-
-void p2000m_state::p2000m_palette(palette_device &palette) const
-{
-	palette.set_pen_color(0, rgb_t::white()); // white
-	palette.set_pen_color(1, rgb_t::black()); // black
-	palette.set_pen_color(2, rgb_t::black()); // black
-	palette.set_pen_color(3, rgb_t::white()); // white
+	base_io(map);
+	map(0x00, 0x0f).w(FUNC(p2000t_state::port_0x_w));
+	map(0x70, 0x7f).r(FUNC(p2000t_state::port_7x_r));
 }
 
-static GFXDECODE_START( gfx_p2000m )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, p2000m_charlayout, 0, 2 )
-GFXDECODE_END
+void p2000m_state::p2000m_io(address_map &map)
+{
+	base_io(map);
+	map(0x70, 0x7f).w(FUNC(p2000m_state::port_7x_w));
+}
+
 
 /* Keyboard input */
 
@@ -559,17 +628,6 @@ INTERRUPT_GEN_MEMBER(p2000t_state::p2000_interrupt)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-// TODO: can't scroll with 80 char width
-uint8_t p2000t_state::videoram_r(offs_t offset)
-{
-	if (BIT(m_port_303f, 7))
-		return 0;
-
-	return m_videoram[(offset + m_port_303f) & 0x0fff];
-}
-
-
-
 /* Machine definition */
 void p2000t_state::p2000t(machine_config &config)
 {
@@ -583,13 +641,13 @@ void p2000t_state::p2000t(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(40 * 12, 24 * 20);
+	m_screen->set_size(80 * 12, 24 * 20);
 	m_screen->set_visarea(0, 40 * 12 - 1, 0, 24 * 20 - 1);
 	m_screen->set_screen_update("saa5050", FUNC(saa5050_device::screen_update));
 
 	saa5050_device &saa5050(SAA5050(config, "saa5050", 6000000));
 	saa5050.d_cb().set(FUNC(p2000t_state::videoram_r));
-	saa5050.set_screen_size(40, 24, 80);
+	saa5050.set_screen_size(80, 24, 80);
 
 	/* the mini cassette driver */
 	MDCR(config, m_mdcr, 0);
@@ -614,6 +672,7 @@ void p2000m_state::p2000m(machine_config &config)
 	p2000t_state::p2000t(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &p2000m_state::p2000m_mem);
+	m_maincpu->set_addrmap(AS_IO, &p2000m_state::p2000m_io);
 
 	// TODO: really dynamically modified by width setting
 	m_screen->set_size(80 * 12, 24 * 20);
@@ -624,7 +683,7 @@ void p2000m_state::p2000m(machine_config &config)
 	config.device_remove("saa5050");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_p2000m);
-	PALETTE(config, m_palette, FUNC(p2000m_state::p2000m_palette), 4);
+	PALETTE(config, m_palette, FUNC(p2000m_state::palette_init), 4);
 }
 
 } // anonymous namespace
