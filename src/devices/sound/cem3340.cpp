@@ -105,11 +105,26 @@ cem3340_device &cem3340_device::set_pw_cv(float pw_cv)
 	return *this;
 }
 
-float cem3340_device::get_freq()
+float cem3340_device::freq()
 {
 	if (BIT(get_sound_requested_inputs_mask(), INPUT_FREQ))
 		m_stream->update();
 	return m_freq;
+}
+
+attotime cem3340_device::ramp_time_to_thresh(float threshold)
+{
+	m_stream->update();
+
+	float remaining = 0.0F;
+	const float thresh_phase = (threshold - RAMP_MIN) / (RAMP_MAX - RAMP_MIN);
+	if (m_phase < thresh_phase)
+		remaining = thresh_phase - m_phase;
+	else
+		remaining = 1.0F - m_phase + thresh_phase;
+
+	const float t = remaining / m_freq;
+	return attotime::from_double(t);
 }
 
 void cem3340_device::device_start()
