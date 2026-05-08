@@ -375,7 +375,7 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(mcs51_cpu_device::program_map), this))
 	, m_xdata_config("xdata", ENDIANNESS_LITTLE, 8, 16, 0)
-	, m_sfr_config("sfr", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(mcs51_cpu_device::sfr_map), this))
+	, m_sfr_config("sfr", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor([this] (address_map &map) { sfr_map(map); }, "sfr_map")) // non-virtual interface
 	, m_idata_config("idata", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(mcs51_cpu_device::idata_map), this))
 	, m_pc(0)
 	, m_has_pd(false)
