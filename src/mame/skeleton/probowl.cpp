@@ -121,7 +121,7 @@ GFXDECODE_END
 
 void probowl_state::probowl(machine_config &config)
 {
-	HD647180X(config, m_maincpu, 12_MHz_XTAL);
+	HD647180X(config, m_maincpu, 24_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &probowl_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &probowl_state::io_map);
 
