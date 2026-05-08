@@ -12,9 +12,12 @@ TODO:
 - Ejecting a MDCR cassette while program is loading causes a MAME crash;
 - Joystick (cfr. brkwall)
 - 80 char width mode;
-- p2000t: GFX offset when no SW is in (goofy scroll default rather than 80 char width?);
 - p2000m: fix screen size;
 - QA testing;
+
+Notes:
+- p2000t: GFX offset when no SW is in. This is because the BIOS expects to read open bus in the
+  $5800-$5fff range.
 
 ===================================================================================================
 
@@ -263,7 +266,7 @@ uint32_t p2000m_state::screen_update_p2000m(screen_device &screen, bitmap_ind16 
 	const u32 is_flash_period = (m_screen->frame_number() % 50) > 25;
 
 	// TODO: kerning and individual chars are guessed over FieldSupportManual diagrams
-	// attributes are testable in main2 special test
+	// attributes are testable in main2 screen special test
 	for (int offs = 0; offs < 80 * 24; offs++)
 	{
 		int sy = (offs / 80) * 12;

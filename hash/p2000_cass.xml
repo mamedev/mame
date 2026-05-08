@@ -3,8 +3,11 @@
 <!--
 license:CC0-1.0
 
+TODO:
+- fill metadata blanks (break thru NMI then issue a LIST command);
+
 Notes:
-- Metadata is usually picked up at the end of BASIC listings (if available);
+- Metadata is usually picked up at the start or end of BASIC listings (if available);
 
 -->
 <softwarelist name="p2000_cass" description="Philips P2000T/P2000M Mini cassettes">
@@ -336,8 +339,11 @@ Stuck on title screen, [CTC]?
 	</software>
 
 	<software name="brkwall" supported="partial">
-		<description>Brick-Wall</description>
-		<year>198?</year>
+		<!-- "Nat.Lab. P2000 Computer Club" -->
+		<!-- "programma Nr. 62" -->
+		<description>Brick-Wall (version Nr. 3.0)</description>
+		<year>1982</year>
+		<!-- "copyright: <blank>" -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
 Optional [joystick] support

@@ -20,9 +20,17 @@ MM1035 Mitsumi System Reset IC with Built-in Watchdog Timer
 bank of 8 DIP switches (3 other spaces not populated)
 memory reset push-button
 
-TODO
-- decode GFX ROMs;
-- everything else.
+TODO:
+- alt input schemes (currently hardwired to Slot Game 1);
+- Imagetek irqs, has code for bits 0-4 but only bit 0 seems used (i.e. irq enable 0x1e ^ 0xff).
+  Also checks bit 5 outside irq routine at PC=11240 (just vblank delay with no irq source?
+  Check other Imagetek games);
+- Whatever the stealth mode is supposed to do, if anything at all.
+  Reads inputs but does nothing with them except throwing a "COIN ERROR" (???)
+- Hopper;
+- Locate "Service B35" pin (for hopper testing);
+- Boots with "Cadence Technology" if EEPROM initialized from test mode, is it possible to make it init as Excellent System mode?
+
 */
 
 #include "emu.h"
@@ -34,6 +42,7 @@ TODO
 //#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ymz280b.h"
+#include "video/imagetek_i4100.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -52,40 +61,25 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_watchdog(*this, "watchdog"),
 		m_screen(*this, "screen"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_vdp2(*this, "vdp2")
 	{ }
 
 	void es9606(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<screen_device> m_screen;
-	required_device<gfxdecode_device> m_gfxdecode;
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<imagetek_i4220_device> m_vdp2;
 
 	void eeprom_w(uint16_t data);
 	void watchdog_w(uint16_t data);
 
 	void program_map(address_map &map) ATTR_COLD;
 };
-
-
-void es9606_state::video_start()
-{
-}
-
-uint32_t es9606_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0, cliprect);
-
-	return 0;
-}
 
 
 void es9606_state::eeprom_w(uint16_t data)
@@ -113,15 +107,11 @@ void es9606_state::program_map(address_map &map)
 	map.unmap_value_high();
 
 	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x171fff).ram(); // tiles?
-	map(0x172000, 0x173fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x174000, 0x177fff).ram(); // sprites?
-	map(0x178000, 0x17ffff).ram(); // ??
-	map(0x1788a3, 0x1788a3).lr8(NAME([this] () -> uint8_t { return m_screen->vblank() ? 0x00df : 0x00ff; })); // TODO: where does this come from?
+	map(0x100000, 0x17ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
 	map(0x400000, 0x400003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);
 	map(0x600000, 0x600001).portr("IN0").w(FUNC(es9606_state::eeprom_w));
 	map(0x600002, 0x600003).portr("IN1").w(FUNC(es9606_state::watchdog_w));
-	map(0x600004, 0x600005).portr("IN2");
+	map(0x600004, 0x600005).portr("DSW");
 	map(0x600006, 0x600007).portr("IN3");
 	map(0xff0000, 0xffffff).ram(); // NVRAM
 }
@@ -129,114 +119,166 @@ void es9606_state::program_map(address_map &map)
 
 static INPUT_PORTS_START( keirind2 )
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) // left cursor
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel / Take Score")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Double Up / Bet All")
+	PORT_DIPNAME( 0x20, 0x20, "IN0" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) // right cursor
+	PORT_DIPNAME( 0x0100, 0x0100, "IN0-1" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) // Analyzer
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) // Hopper Empty
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Service A22")
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "IN1-1" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN3 ) // doesn't have an assigned SFX sample, why?
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Settings Menu")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Service B22")
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Service A35")
 
-	PORT_START("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN3")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
-
-	PORT_START("DSW") // TODO: identify where this is read (one of the hooked up IN% ports)
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x03, 0x03, "Control Panel") PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "Slot Game 2" )
+	PORT_DIPSETTING(    0x01, "Key Matrix" ) // "Matorix" (sic)
+	PORT_DIPSETTING(    0x02, "Joystick" )
+	PORT_DIPSETTING(    0x03, "Slot Game 1" )
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
 	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, "Boot in Stealth Game") PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	// TODO: rename label
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x01, 0x01, "IN3" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "IN3-1" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) ) // enables debug counters during races
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 INPUT_PORTS_END
-
-
-static GFXDECODE_START( gfx_es9606 )// TODO
-GFXDECODE_END
-
 
 void es9606_state::es9606(machine_config &config)
 {
 	M68000(config, m_maincpu, 32_MHz_XTAL / 2); // divider not verified, but CPU is rated for 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &es9606_state::program_map);
-	m_maincpu->set_vblank_int("screen", FUNC(es9606_state::irq1_line_hold));
+//	m_maincpu->set_vblank_int("screen", FUNC(es9606_state::irq1_line_hold));
 
 	EEPROM_93C46_16BIT(config, m_eeprom); // exact model unknown
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1000));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // TODO
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_screen_update(FUNC(es9606_state::screen_update));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
-	m_screen->set_palette("palette");
+	// TODO: copied verbatim from vmetal config, unverified
+	I4220(config, m_vdp2, 26.666_MHz_XTAL);
+	m_vdp2->irq_cb().set_inputline(m_maincpu, M68K_IRQ_1);
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_es9606);
+	m_vdp2->set_vblank_irq_level(0);
+	m_vdp2->set_blit_irq_level(2);
 
-	PALETTE(config, "palette").set_format(palette_device::RRRRGGGGBBBBRGBx, 0x1000); // TODO
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1500));
+	m_screen->set_size(392, 263);
+	m_screen->set_visarea(0, 320-1, 0, 224-1);
+	m_screen->set_screen_update("vdp2", FUNC(imagetek_i4220_device::screen_update));
+	m_screen->screen_vblank().set([this] (int state) {
+		if (state)
+		{
+			m_vdp2->screen_eof(state);
+		}
+	});
 
 	SPEAKER(config, "speaker", 2).front();
 
@@ -251,11 +293,11 @@ ROM_START( keirind2 )
 	ROM_LOAD16_BYTE( "1.u57", 0x00000, 0x80000, CRC(eecbf885) SHA1(fb46b8f24530c08d0b865aa005640ff54ba74ab0) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "5.u59", 0x00001, 0x80000, CRC(da8dabc0) SHA1(e2c055760fa6d6c6022258de3e2292f3e9d409e6) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x800000, "gfx", 0 ) // TODO: correct ROM loading
-	ROM_LOAD( "d23c16000wcz_r52.1.u9",  0x000000, 0x200000, CRC(4e59db08) SHA1(4b79975cd876013d12bb1447c506613098295496) )
-	ROM_LOAD( "d23c16000wcz_r50.2.u18", 0x200000, 0x200000, CRC(3cdb7b33) SHA1(413ca4f711494ff157fa05543d2fe7bd70599983) )
-	ROM_LOAD( "d23c16000wcz_r53.3.u3",  0x400000, 0x200000, CRC(2f3900f2) SHA1(513a5b128009973ed1e488295cecf629729b2b0a) )
-	ROM_LOAD( "d23c16000wcz_r51.4.u14", 0x600000, 0x200000, CRC(9c1b84ae) SHA1(1540f3c7ace06f00ff25d6c4d9c89235cc7221d2) )
+	ROM_REGION( 0x800000, "vdp2", 0 )
+	ROM_LOAD64_WORD( "d23c16000wcz_r52.1.u9",  0x000004, 0x200000, CRC(4e59db08) SHA1(4b79975cd876013d12bb1447c506613098295496) )
+	ROM_LOAD64_WORD( "d23c16000wcz_r50.2.u18", 0x000000, 0x200000, CRC(3cdb7b33) SHA1(413ca4f711494ff157fa05543d2fe7bd70599983) )
+	ROM_LOAD64_WORD( "d23c16000wcz_r53.3.u3",  0x000006, 0x200000, CRC(2f3900f2) SHA1(513a5b128009973ed1e488295cecf629729b2b0a) )
+	ROM_LOAD64_WORD( "d23c16000wcz_r51.4.u14", 0x000002, 0x200000, CRC(9c1b84ae) SHA1(1540f3c7ace06f00ff25d6c4d9c89235cc7221d2) )
 
 	ROM_REGION( 0x200000, "ymz", 0 )
 	ROM_LOAD( "d23c16000wcz_r49.u52", 0x000000, 0x200000, CRC(cc16a9ed) SHA1(c5468cb69eedd3b5a8b1ef20d2cfa34043a43373) )
@@ -267,4 +309,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1997, keirind2, 0, es9606, keirind2, es9606_state, empty_init, ROT0, "Excellent System", "Keirin Derby II", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, keirind2, 0, es9606, keirind2, es9606_state, empty_init, ROT0, "Cadence Technology / Excellent System / Woo Lim Electronics", "Keirin Derby II", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 1997/06/18
