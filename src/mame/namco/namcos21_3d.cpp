@@ -6,7 +6,8 @@ Namco System 21 3D Rasterizer
 
 TODO:
 - it does not have a z-buffer, MAME is more capable than the real hardware, it should be polygon z-sort
-  like namcos22 which would probably get rid of z-fighting issues
+  like namcos22 which would probably get rid of z-fighting issues - what is the poly sort algorithm?
+  zmin? zmax? (zmin+zmax)/2? (all 4 z)/4? none of them look right
 - it does not support per-z fog either, it should be per-poly (see brightness crawling effect in solvalou)
 - any reason it's not using poly.h?
 
