@@ -3842,7 +3842,7 @@ The cassette stops during the game loading
 	<software name="kaipur">
 		<description>Le Secret de Kaïpur</description>
 		<year>1984</year>
-		<publisher>France Loriciel</publisher>
+		<publisher>France Logiciels</publisher>
 		<info name="language" value="French" />
 		<part name="cass1" interface="oric1_cass">
 			<dataarea name="cass" size="31221">
