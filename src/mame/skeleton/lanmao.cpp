@@ -34,15 +34,15 @@ Program map
 map(0x0000, 0xffff).rom();
 
 whujiang
-map(0x0000, 0x0001).noprw(); 
-map(0x7000, 0x7000).nopr(); 
-map(0x7001, 0x7002).nopw(); 
+map(0x0000, 0x0001).noprw(); // unknown
+map(0x7000, 0x7000).nopr();  // unknown
+map(0x7001, 0x7002).nopw();  // unknown
 map(0x8000, 0x87ff).ram().share("nvram");
-map(0x9000, 0x9003).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write)); // ???
-map(0xa000, 0xa003).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write)); // ???
-map(0xb000, 0xb000).noprw(); 
+map(0x9000, 0x9003).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+map(0xa000, 0xa003).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write)); 
+map(0xb000, 0xb000).noprw();  // unknown
 map(0xd002, 0xd003).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-map(0xe000, 0xe001).w("opll", FUNC(ym2413_device::write));
+map(0xE000, 0xE0ff).w("opll", FUNC(ym2413_device::write)); // instead of E000 and E001.
 
 tzwang
 data
@@ -52,8 +52,8 @@ map(0xa000, 0xa003).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::writ
 map(0xb000, 0xb003).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 map(0xc000, 0xc001).w("opll", FUNC(ym2413_device::write));
 map(0xd000, 0xd001).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-map(0xf000, 0xf000).nopr(); 
-map(0xf002, 0xf003).nopw(); 
+map(0xf000, 0xf000).nopr(); // unknown
+map(0xf002, 0xf003).nopw(); // unknown
 
 For Lan Mao, schematics and manual with list of error codes are available.
 
