@@ -530,7 +530,7 @@ ROM_START( lanmao )
 ROM_END
 
 // 挑战王 (Tiǎozhàn Wáng) (Challenge King)
-// on main PCB: W78E065A40DL + 12mhz xtal + TMP82C255AP-10 + U6295 + YM2413 + bank of 4 DIP switches
+// on main PCB: W78E065A40DL + 12mhz? xtal + TMP82C255AP-10 + U6295 + YM2413 + bank of 4 DIP switches
 // on LED PCB: TMP82C255AN-2 + KC89C72 + logic
 ROM_START( tzwang )
 	ROM_REGION( 0x10000, "maincpu", 0 )
