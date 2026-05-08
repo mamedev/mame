@@ -124,6 +124,16 @@ copyright-holders:m1macrophage
 			<color red="0.90" green="0.90" blue="0.90"/>
 		</text>
 	</element>
+	<element name="txt_not_working">
+		<text state="1" string="NOT">
+			<bounds x="0.0" y="0.0" width="1.0" height="0.5"/>
+			<color red="0.71" green="0.46" blue="0.28"/>
+		</text>
+		<text state="1" string="WORKING">
+			<bounds x="0.0" y="0.5" width="1.0" height="0.5"/>
+			<color red="0.71" green="0.46" blue="0.28"/>
+		</text>
+	</element>
 
 	<!-- display elements -->
 	<element name="display"><rect><color red="0.15" green="0.08" blue="0.06"/></rect></element>
@@ -323,7 +333,7 @@ copyright-holders:m1macrophage
 		<text string="2" align="1"><bounds x="2" y="24" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="3" align="1"><bounds x="5" y="12" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="4" align="1"><bounds x="13" y="3" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
-		<text string="5" align="0"><bounds x="25" y="0" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="5" align="0"><bounds x="24" y="0" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="6" align="2"><bounds x="35" y="3" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="7" align="2"><bounds x="43" y="12" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="8" align="2"><bounds x="46" y="24" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
@@ -337,7 +347,7 @@ copyright-holders:m1macrophage
 		<text string="3" align="1"><bounds x="2" y="24" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="2" align="1"><bounds x="5" y="12" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="1" align="1"><bounds x="13" y="3" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
-		<text string="0" align="0"><bounds x="25" y="0" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="0" align="0"><bounds x="24" y="0" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="1" align="2"><bounds x="35" y="3" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="2" align="2"><bounds x="43" y="12" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
 		<text string="3" align="2"><bounds x="46" y="24" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
@@ -553,7 +563,8 @@ copyright-holders:m1macrophage
 		<element ref="panel"><bounds x="14" y="14" width="1372" height="268"/></element>
 		<element ref="line"><bounds x="283" y="42" width="2" height="224"/></element>
 
-		<collection name="script warning">
+		<collection name="warnings">
+			<element ref="txt_not_working" name="led_osc_a_sync"><bounds x="519" y="45" width="38" height="16"/></element>
 			<element ref="script_warning" id="warning"><bounds x="300" y="324" width="800" height="18"/></element>
 		</collection>
 
