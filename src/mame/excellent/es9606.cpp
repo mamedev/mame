@@ -8,7 +8,7 @@ Main components:
 TMP68HC000-P16 CPU
 2x CY7C199-15PC RAM (near CPU)
 32.000 MHz XTAL (near CPU)
-ES9402LA (rebranded TC0090LVC?)
+ES9402LA (same label as the one in lastbank.cpp but actually Imagetek VDP I4220)
 3x CY7C199-15PC RAM (near ES9402LA)
 26.666 MHz XTAL (near ES9402LA)
 Altera EPM7032LC44-15T CPLD
@@ -28,8 +28,9 @@ TODO:
 - Whatever the stealth mode is supposed to do, if anything at all.
   Reads inputs but does nothing with them except throwing a "COIN ERROR" (???)
 - Hopper;
-- Locate "Service B35" pin (for hopper testing);
-- Boots with "Cadence Technology" if EEPROM initialized from test mode, is it possible to make it init as Excellent System mode?
+- Locate "Service B35" pin (for hopper testing) update: seems not really coded?
+- Boots with "Cadence Technology" if EEPROM initialized from test mode,
+  is it possible to make it init as Excellent System mode?
 
 */
 
@@ -37,8 +38,8 @@ TODO:
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
-//#include "machine/nvram.h"
-//#include "machine/ticket.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
 //#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ymz280b.h"
@@ -59,6 +60,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
+		m_hopper(*this,"hopper"),
 		m_watchdog(*this, "watchdog"),
 		m_screen(*this, "screen"),
 		m_vdp2(*this, "vdp2")
@@ -71,6 +73,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<ticket_dispenser_device> m_hopper;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<screen_device> m_screen;
 	required_device<imagetek_i4220_device> m_vdp2;
@@ -100,7 +103,7 @@ void es9606_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		machine().bookkeeping().coin_counter_w(1, BIT(data, 9));
 		machine().bookkeeping().coin_counter_w(2, BIT(data, 10));
 		machine().bookkeeping().coin_counter_w(3, BIT(data, 11)); // key in
-		// bit 12: hopper motor out?
+		m_hopper->motor_w(BIT(data, 12));
 	}
 }
 
@@ -137,7 +140,7 @@ void es9606_state::program_map(address_map &map)
 	map(0x600002, 0x600003).portr("IN1").w(FUNC(es9606_state::watchdog_w));
 	map(0x600004, 0x600005).portr("DSW");
 	map(0x600006, 0x600007).portr("IN3");
-	map(0xf00000, 0xf0ffff).mirror(0x0f0000).ram(); // dword access at $fef172 on win screen, assume same mirror as vmetal
+	map(0xf00000, 0xf0ffff).mirror(0x0f0000).ram().share("nvram"); // dword access at $fef172 on win screen, assume same mirror as vmetal
 }
 
 
@@ -161,7 +164,7 @@ static INPUT_PORTS_START( keirind2 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_CODE(KEYCODE_8) // Analyzer
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) // Hopper Empty
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Service A22")
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
@@ -284,13 +287,18 @@ void es9606_state::es9606(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom); // exact model unknown
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	// hand-tuned timing
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(100));
+
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1000));
 
-	// TODO: copied verbatim from vmetal config, unverified
 	I4220(config, m_vdp2, 26.666_MHz_XTAL);
 	m_vdp2->irq_cb().set_inputline(m_maincpu, M68K_IRQ_1);
 
 	m_vdp2->set_vblank_irq_level(0);
+	// blitter irq unused by the game, assume same config as vmetal
 	m_vdp2->set_blit_irq_level(2);
 
 	m_vdp2->set_tmap_xoffsets(0,0,0);
@@ -299,6 +307,7 @@ void es9606_state::es9606(machine_config &config)
 	m_vdp2->set_tmap_flip_yoffsets(39,39,39);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// TODO: copied verbatim from vmetal config, unverified
 	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1500));
 	m_screen->set_size(392, 263);
@@ -313,7 +322,8 @@ void es9606_state::es9606(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	ymz280b_device &ymz(YMZ280B(config, "ymz", 32_MHz_XTAL / 2)); // TODO: is this the correct XTAL?
+	// Unverified clock, sounds reasonable
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 32_MHz_XTAL / 2));
 	ymz.add_route(0, "speaker", 1.0, 0);
 	ymz.add_route(1, "speaker", 1.0, 1);
 }
