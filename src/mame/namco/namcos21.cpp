@@ -495,11 +495,11 @@ void namcos21_state::bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 	for (int sy = cliprect.top(); sy <= cliprect.bottom(); sy++)
 	{
-		u8 const *const pSource = &m_gpu_videoram[((yscroll + sy) & 0x3ff) * 0x200];
-		u16 *const pDest = &bitmap.pix(sy);
+		u8 const *const source = &m_gpu_videoram[((yscroll + sy) & 0x3ff) * 0x200];
+		u16 *const dest = &bitmap.pix(sy);
 		for (int sx = cliprect.left(); sx <= cliprect.right(); sx++)
 		{
-			int const pen = pSource[(sx + xscroll) & 0x1ff];
+			int const pen = source[(sx + xscroll) & 0x1ff];
 			switch (pen)
 			{
 			case 0xff:
@@ -507,21 +507,21 @@ void namcos21_state::bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 			// NOTE: very similar to namcos21_c67_state::sprite_mix_callback
 			case 0x00:
-				if (pDest[sx] != (base ^ 0x10ff))
-					pDest[sx] = 0x4000 | (pDest[sx] & 0x1fff);
+				if (dest[sx] != (base ^ 0x10ff))
+					dest[sx] = 0x4000 | (dest[sx] & 0x1fff);
 				else
-					pDest[sx] = (base & 0xf00) | 0x00;
+					dest[sx] = (base & 0xf00) | 0x00;
 				break;
 
 			case 0x01:
-				if (pDest[sx] != (base ^ 0x10ff))
-					pDest[sx] = 0x6000 | (pDest[sx] & 0x1fff);
+				if (dest[sx] != (base ^ 0x10ff))
+					dest[sx] = 0x6000 | (dest[sx] & 0x1fff);
 				else
-					pDest[sx] = (base & 0xf00) | 0x01;
+					dest[sx] = (base & 0xf00) | 0x01;
 				break;
 
 			default:
-				pDest[sx] = base | pen;
+				dest[sx] = base | pen;
 				break;
 			}
 		}

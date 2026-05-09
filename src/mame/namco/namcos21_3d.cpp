@@ -5,8 +5,6 @@
 Namco System 21 3D Rasterizer
 
 TODO:
-- it does not have a z-buffer, MAME is more capable than the real hardware, it should be polygon z-sort like namcos22
-- it does not support per-z fog either, it should be per-poly (see brightness crawling effect in solvalou)
 - any reason it's not using poly.h?
 
 */
@@ -84,49 +82,34 @@ void namcos21_3d_device::copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, con
 
 /*********************************************************************************************/
 
-void namcos21_3d_device::renderscanline_flat(const edge *e1, const edge *e2, int sy, u16 color)
+void namcos21_3d_device::renderscanline_flat(const edge *e1, const edge *e2, int sy, u16 color, int zsort)
 {
 	if (e1->x > e2->x)
 		std::swap(e1, e2);
 
-	u16 *pDest = m_poly_framebuffer_pens.get() + sy * m_poly_frame_width;
-	u16 *pZBuf = m_poly_framebuffer_z.get() + sy * m_poly_frame_width;
+	u16 *dest = m_poly_framebuffer_pens.get() + sy * m_poly_frame_width;
+	u16 *zbuf = m_poly_framebuffer_z.get() + sy * m_poly_frame_width;
 	int x0 = (int)e1->x;
 	int x1 = (int)e2->x;
 	int w = x1 - x0;
 
 	if (w)
 	{
-		double z = e1->z;
-		double dz = (e2->z - e1->z) / w;
-		int crop = -x0;
-		if (crop > 0)
-		{
-			z += crop * dz;
-			x0 = 0;
-		}
+		x0 = std::max(x0, 0);
 		x1 = std::min(x1, m_poly_frame_width);
 
 		for (int x = x0; x < x1; x++)
 		{
-			u16 zz = (u16)z;
-			if (zz < pZBuf[x])
+			if (zsort < zbuf[x])
 			{
-				int pen = color;
-				if (zz > 0)
-				{
-					const int depth = zz >> 2 & m_penmask;
-					pen += m_depth_reverse ? depth : -depth;
-				}
-				pDest[x] = pen;
-				pZBuf[x] = zz;
+				dest[x] = color;
+				zbuf[x] = zsort;
 			}
-			z += dz;
 		}
 	}
 }
 
-void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, const n21_vertex *v2, u16 color)
+void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, const n21_vertex *v2, u16 color, int zsort)
 {
 	// first, sort so that v0->y <= v1->y <= v2->y
 	for (;;)
@@ -191,7 +174,7 @@ void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, c
 
 			for (int y = ystart; y < yend; y++)
 			{
-				renderscanline_flat(&e1, &e2, y, color);
+				renderscanline_flat(&e1, &e2, y, color, zsort);
 
 				e2.x += dx2dy;
 				e2.z += dz2dy;
@@ -222,7 +205,7 @@ void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, c
 			yend = std::min(yend, m_poly_frame_height);
 			for (int y = ystart; y < yend; y++)
 			{
-				renderscanline_flat(&e1, &e2, y, color);
+				renderscanline_flat(&e1, &e2, y, color, zsort);
 
 				e2.x += dx2dy;
 				e2.z += dz2dy;
@@ -257,6 +240,18 @@ void namcos21_3d_device::blit_single_quad(int sx[4], int sy[4], int zcode[4], u1
 	if (m_num_palettes == 0x10 && !BIT(code, 1))
 		color |= 0x100;
 
+	// add depth cue
+	int zsort = 0;
+
+	for (int i = 0; i < 4; i++)
+		zsort += zcode[i];
+
+	zsort /= 4;
+	zsort = std::max(zsort, 0);
+
+	const int depth = zsort >> 2 & m_penmask;
+	color += m_depth_reverse ? depth : -depth;
+
 	n21_vertex v[4];
 
 	for (int i = 0; i < 4; i++)
@@ -266,8 +261,8 @@ void namcos21_3d_device::blit_single_quad(int sx[4], int sy[4], int zcode[4], u1
 		v[i].z = zcode[i];
 	}
 
-	rendertri(&v[0], &v[1], &v[2], color);
-	rendertri(&v[2], &v[3], &v[0], color);
+	rendertri(&v[0], &v[1], &v[2], color, zsort);
+	rendertri(&v[2], &v[3], &v[0], color, zsort);
 }
 
 void namcos21_3d_device::draw_direct_quad(const u16 *source, u16 color)
