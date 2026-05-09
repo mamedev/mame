@@ -615,7 +615,7 @@ void menu::draw(uint32_t flags)
 
 	// compute the width and height of the full menu
 	float visible_width = 0;
-	float visible_main_menu_height = 0;
+	float visible_main_menu_height = line_height() * m_items.size();
 	for (auto const &pitem : m_items)
 	{
 		// compute width of left hand side
@@ -629,9 +629,6 @@ void menu::draw(uint32_t flags)
 
 		// track the maximum
 		visible_width = std::max(total_width, visible_width);
-
-		// track the height as well
-		visible_main_menu_height += line_height();
 	}
 
 	// lay out the heading if present
@@ -755,6 +752,7 @@ void menu::draw(uint32_t flags)
 			// work out what we're dealing with
 			bool const uparrow = !linenum && m_show_up_arrow;
 			bool const downarrow = (linenum == (m_visible_lines - 1)) && m_show_down_arrow;
+			bool const hovered = have_pointer() && pointer_in_rect(m_items_left, line_y0, m_items_right, line_y1);
 
 			// highlight if necessary
 			if (is_selected(itemnum))
@@ -772,7 +770,7 @@ void menu::draw(uint32_t flags)
 					fgcolor = fgcolor2 = fgcolor3 = ui().colors().mouseover_color();
 					bgcolor = ui().colors().mouseover_bg_color();
 				}
-				else if (have_pointer() && pointer_in_rect(m_items_left, line_y0, m_items_right, line_y1))
+				else if (hovered)
 				{
 					if ((track_pointer::TRACK_LINE == m_pointer_state) && pointerline)
 					{
@@ -899,21 +897,31 @@ void menu::draw(uint32_t flags)
 				}
 
 				// apply arrows
-				if (is_selected(itemnum) && (pitem.flags() & (FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW)))
+				bool const adjustarrows = is_selectable(pitem) && (pitem.flags() & (FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW));
+				if (adjustarrows && (is_selected(itemnum) || (hovered && (track_pointer::IDLE == m_pointer_state))))
 				{
-					m_adjust_top = line_y0 + (0.1F * line_height());
-					m_adjust_bottom = line_y0 + (0.9F * line_height());
+					float const t = line_y0 + (0.1F * line_height());
+					float const b = line_y0 + (0.9F * line_height());
+					if (hovered)
+					{
+						m_adjust_top = t;
+						m_adjust_bottom = b;
+					}
 					if (pitem.flags() & FLAG_LEFT_ARROW)
 					{
-						m_decrease_left = effective_left + effective_width - subitem_width - gutter_width();
-						float const r = m_decrease_left + lr_arrow_width();
-						draw_arrow(m_decrease_left, m_adjust_top, r, m_adjust_bottom, fgcolor, ROT90 ^ ORIENTATION_FLIP_X);
+						float const l = effective_left + effective_width - subitem_width - gutter_width();
+						float const r = l + lr_arrow_width();
+						draw_arrow(l, t, r, b, fgcolor, ROT90 ^ ORIENTATION_FLIP_X);
+						if (hovered)
+							m_decrease_left = l;
 					}
 					if (pitem.flags() & FLAG_RIGHT_ARROW)
 					{
 						float const r = effective_left + effective_width + gutter_width();
-						m_increase_left = r - lr_arrow_width();
-						draw_arrow(m_increase_left, m_adjust_top, r, m_adjust_bottom, fgcolor, ROT90);
+						float const l = r - lr_arrow_width();
+						draw_arrow(l, t, r, b, fgcolor, ROT90);
+						if (hovered)
+							m_increase_left = l;
 					}
 				}
 			}
@@ -1357,13 +1365,23 @@ std::pair<int, bool> menu::handle_primary_down(uint32_t flags, ui_event const &u
 	// FIXME: should repeat if appropriate
 	if (!is_touch && (y >= m_adjust_top) && (y < m_adjust_bottom))
 	{
+		// work out which line/item it is
+		auto const lineno(int((y - m_items_top) / line_height()));
+		int const itemno(lineno + top_line);
+		assert(lineno >= 0);
+		assert(lineno < m_visible_lines);
+		assert(itemno < m_items.size());
+		assert(is_selectable(m_items[itemno]));
+
 		if ((x >= m_decrease_left) && (x < (m_decrease_left + lr_arrow_width())))
 		{
+			m_selected = itemno;
 			m_pointer_state = track_pointer::COMPLETED;
 			return std::make_pair(IPT_UI_LEFT, false);
 		}
 		else if ((x >= m_increase_left) && (x < (m_increase_left + lr_arrow_width())))
 		{
+			m_selected = itemno;
 			m_pointer_state = track_pointer::COMPLETED;
 			return std::make_pair(IPT_UI_RIGHT, false);
 		}

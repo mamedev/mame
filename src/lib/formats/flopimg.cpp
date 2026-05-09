@@ -183,21 +183,20 @@ bool floppy_image_format_t::supports_save() const noexcept
 	return false;
 }
 
-bool floppy_image_format_t::extension_matches(const char *file_name) const
+bool floppy_image_format_t::extension_matches(std::string_view file_name) const noexcept
 {
-	const char *ext = strrchr(file_name, '.');
-	if(!ext)
+	auto const sep = file_name.rfind('.');
+	if(std::string_view::npos == sep)
 		return false;
-	ext++;
-	int elen = strlen(ext);
-	const char *rext = extensions();
+	auto const ext = file_name.substr(sep + 1);
+	char const *rext = extensions();
 	for(;;) {
-		const char *next_ext = strchr(rext, ',');
-		int rlen = next_ext ? next_ext - rext : strlen(rext);
-		if(rlen == elen && !memcmp(ext, rext, rlen))
+		char const *next_ext = strchr(rext, ',');
+		int const rlen = next_ext ? (next_ext - rext) : strlen(rext);
+		if(std::string_view(rext, rlen) == ext)
 			return true;
 		if(next_ext)
-			rext = next_ext +1;
+			rext = next_ext + 1;
 		else
 			break;
 	}
