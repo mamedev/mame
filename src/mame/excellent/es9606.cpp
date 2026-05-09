@@ -1,8 +1,23 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
+/**************************************************************************************************
 
-/*
 Excellent System's ES-9606-01 PCB
+
+TODO:
+- alt input schemes (currently hardwired to Slot Game 1);
+- Imagetek irqs, has code for bits 0-4 but only bit 0 seems used (i.e. irq enable 0x1e ^ 0xff).
+  Also checks bit 5 outside irq routine at PC=11240 (just vblank delay with no irq source?
+  Check other Imagetek games);
+- Whatever the stealth mode is supposed to do, if anything at all.
+  Reads inputs but does nothing with them except throwing a "COIN ERROR" (???)
+- Locate "Service B35" pin (for hopper testing) update: seems not really coded?
+- Boots with "Cadence Technology" if EEPROM initialized from test mode,
+  is it possible to make it init as Excellent System mode?
+- Has GFX transition issues when coining in (verify, should be just sloppy coding);
+- lamps;
+
+===================================================================================================
 
 Main components:
 TMP68HC000-P16 CPU
@@ -20,19 +35,7 @@ MM1035 Mitsumi System Reset IC with Built-in Watchdog Timer
 bank of 8 DIP switches (3 other spaces not populated)
 memory reset push-button
 
-TODO:
-- alt input schemes (currently hardwired to Slot Game 1);
-- Imagetek irqs, has code for bits 0-4 but only bit 0 seems used (i.e. irq enable 0x1e ^ 0xff).
-  Also checks bit 5 outside irq routine at PC=11240 (just vblank delay with no irq source?
-  Check other Imagetek games);
-- Whatever the stealth mode is supposed to do, if anything at all.
-  Reads inputs but does nothing with them except throwing a "COIN ERROR" (???)
-- Hopper;
-- Locate "Service B35" pin (for hopper testing) update: seems not really coded?
-- Boots with "Cadence Technology" if EEPROM initialized from test mode,
-  is it possible to make it init as Excellent System mode?
-
-*/
+**************************************************************************************************/
 
 #include "emu.h"
 
@@ -40,7 +43,6 @@ TODO:
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
-//#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ymz280b.h"
 #include "video/imagetek_i4100.h"
@@ -350,4 +352,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1997, keirind2, 0, es9606, keirind2, es9606_state, empty_init, ROT0, "Cadence Technology / Excellent System / Woo Lim Electronics", "Keirin Derby II", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 1997/06/18
+GAME( 1997, keirind2, 0, es9606, keirind2, es9606_state, empty_init, ROT0, "Cadence Technology / Excellent System / Woo Lim Electronics", "Keirin Derby II", MACHINE_SUPPORTS_SAVE ) // 1997/06/18
