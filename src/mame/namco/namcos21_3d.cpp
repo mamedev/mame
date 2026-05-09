@@ -5,9 +5,7 @@
 Namco System 21 3D Rasterizer
 
 TODO:
-- it does not have a z-buffer, MAME is more capable than the real hardware, it should be polygon z-sort
-  like namcos22 which would probably get rid of z-fighting issues - what is the poly sort algorithm?
-  zmin? zmax? (zmin+zmax)/2? (all 4 z)/4? none of them look right
+- it does not have a z-buffer, MAME is more capable than the real hardware, it should be polygon z-sort like namcos22
 - it does not support per-z fog either, it should be per-poly (see brightness crawling effect in solvalou)
 - any reason it's not using poly.h?
 
@@ -238,6 +236,17 @@ void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, c
 
 void namcos21_3d_device::blit_single_quad(int sx[4], int sy[4], int zcode[4], u16 color)
 {
+	// backface culling
+	const s64 cross1 =
+			(sx[1] - sx[0]) * (sy[2] - sy[0]) -
+			(sy[1] - sy[0]) * (sx[2] - sx[0]);
+	const s64 cross2 =
+			(sx[3] - sx[2]) * (sy[0] - sy[2]) -
+			(sy[3] - sy[2]) * (sx[0] - sx[2]);
+
+	if (cross1 >= 0LL && cross2 >= 0LL)
+		return;
+
 	const u8 code = color >> 8;
 
 	// polygon colors start at 0x2000
@@ -252,8 +261,8 @@ void namcos21_3d_device::blit_single_quad(int sx[4], int sy[4], int zcode[4], u1
 
 	for (int i = 0; i < 4; i++)
 	{
-		v[i].x = sx[i];
-		v[i].y = sy[i];
+		v[i].x = m_poly_frame_width / 2 + sx[i];
+		v[i].y = m_poly_frame_height / 2 + sy[i];
 		v[i].z = zcode[i];
 	}
 
@@ -267,8 +276,8 @@ void namcos21_3d_device::draw_direct_quad(const u16 *source, u16 color)
 
 	for (int i = 0; i < 4; i++)
 	{
-		sx[i] = m_poly_frame_width / 2 + (s16)*source++;
-		sy[i] = m_poly_frame_height / 2 + (s16)*source++;
+		sx[i] = (s16)*source++;
+		sy[i] = (s16)*source++;
 		zcode[i] = (s16)*source++;
 	}
 
@@ -296,8 +305,8 @@ int namcos21_3d_device::draw_quads(const u16 *source, const u8 *pointram, const 
 			u8 vi = pointram[quad_idx];
 			quad_idx = (quad_idx + 1) & ptram_mask;
 
-			sx[i] = m_poly_frame_width / 2 + (s16)source[vi * 3 + 0];
-			sy[i] = m_poly_frame_height / 2 + (s16)source[vi * 3 + 1];
+			sx[i] = (s16)source[vi * 3 + 0];
+			sy[i] = (s16)source[vi * 3 + 1];
 			zcode[i] = (s16)source[vi * 3 + 2];
 
 			if (vi > max_vi)

@@ -36,7 +36,6 @@ is used to shade quads according to their depth.
 -------------------
 
 TODO:
-- some z-fighting issues, eg. signs and car rearwing (the problem is in namcos21_3d_device)
 - verify video timing, PCB videos do suggest exactly 60Hz
 - is it possible to remove the ROM hacks? see init functions, perfect quantum won't help (winrungp works
   without the hack, but to be on the safe side it's better to keep it unless it can be fixed for real)
