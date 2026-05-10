@@ -598,7 +598,7 @@ void c219_device::c219_w(offs_t offset, u8 data)
 
 		if ((offset & 0xf) == 0x5)
 		{
-			if (data & 0x80 || (data & 0x40 && v->key))
+			if (data & 0x80)
 			{
 				const struct voice_registers *vreg = (struct voice_registers *) &m_REG[offset & 0x1f0];
 				v->key = 1;
