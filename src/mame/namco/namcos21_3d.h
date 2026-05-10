@@ -56,7 +56,6 @@ private:
 	void renderscanline_flat(const edge *e1, const edge *e2, int sy, u16 color, int zsort);
 	void rendertri(const n21_vertex *v0, const n21_vertex *v1, const n21_vertex *v2, u16 color, int zsort);
 	void blit_single_quad(int sx[4], int sy[4], int zcode[4], u16 color);
-	void allocate_poly_framebuffer();
 
 	std::unique_ptr<u16[]> m_poly_framebuffer_pens;
 	std::unique_ptr<u16[]> m_poly_framebuffer_z;

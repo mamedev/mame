@@ -26,11 +26,6 @@ namcos21_3d_device::namcos21_3d_device(const machine_config &mconfig, const char
 
 void namcos21_3d_device::device_start()
 {
-	allocate_poly_framebuffer();
-}
-
-void namcos21_3d_device::allocate_poly_framebuffer()
-{
 	assert(m_num_palettes != 0);
 	assert(m_framebuffer_size > 0);
 
@@ -70,10 +65,10 @@ void namcos21_3d_device::copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, con
 	for (int sy = clip.top(); sy <= clip.bottom(); sy++)
 	{
 		u16 *const dest = &bitmap.pix(sy);
-		const u16 *const pPen = m_poly_framebuffer_pens2.get() + m_poly_frame_width * sy;
+		const u16 *const source = m_poly_framebuffer_pens2.get() + m_poly_frame_width * sy;
 		for (int sx = clip.left(); sx <= clip.right(); sx++)
 		{
-			const u16 pen = pPen[sx];
+			const u16 pen = source[sx];
 			if (pen)
 				dest[sx] = pen;
 		}
@@ -203,6 +198,7 @@ void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, c
 				ystart = 0;
 			}
 			yend = std::min(yend, m_poly_frame_height);
+
 			for (int y = ystart; y < yend; y++)
 			{
 				renderscanline_flat(&e1, &e2, y, color, zsort);
