@@ -654,6 +654,12 @@ ROM_START( turbosun )
 	ROM_LOAD16_BYTE( "turbo_sunny_f1_ii.u6", 0x00001, 0x20000, CRC(4d431ae3) SHA1(bb5ff763b9bbaf4eb15ec3fde643b601421fbde1) )
 ROM_END
 
+ROM_START( viva )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "viva_f1_i.u2", 0x00000, 0x20000, CRC(3fa24273) SHA1(01990504f558c0ad0d6e5e2b7761144fbe314765) )
+	ROM_LOAD16_BYTE( "viva_f1_ii.u6", 0x00001, 0x20000, CRC(da0fab3b) SHA1(ef13ea163c60253e88d200c68a25fe7e4a56a657) )
+ROM_END
+
 } // anonymous namespace
 
 GAMEL(1993, action,   0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Action",                MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
@@ -675,6 +681,7 @@ GAMEL(1994, jmbojmbf, 0,        sus_tk, stellafr, stellafr_state, empty_init, RO
 GAMEL(1996, discfun,  0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Disc Fun",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1996, multstar, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Multi Star",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1996, st_ohla,  0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Oh La La",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1996, viva,     0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Viva",                  MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, dpplson,  0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Doppel-Sonne",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, gjubil,   0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Golden Jubilar",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, jkrpoker, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Joker Poker (Merkur)",  MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
