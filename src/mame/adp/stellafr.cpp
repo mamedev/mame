@@ -636,6 +636,12 @@ ROM_START( sunny )
 	ROM_LOAD16_BYTE( "sunny_f2_ii.u6", 0x00001, 0x20000, CRC(86b3b81d) SHA1(e12a511bbc53e4614bed561c9544f9ac8faa9fd2) )
 ROM_END
 
+ROM_START( swing )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "swing_f1_i.u2", 0x00000, 0x20000, CRC(b7456f2a) SHA1(91866eb8e7124e479388e9f1ef7144752c77b461) )
+	ROM_LOAD16_BYTE( "swing_f1_ii.u6", 0x00001, 0x20000, CRC(a8205180) SHA1(c9b8aeb511d6b181707ecd7ce1606ae658f173d7) )
+ROM_END
+
 ROM_START( taipan )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "taipan_w1_i.u2", 0x00000, 0x20000, CRC(feaf45f9) SHA1(ded06e9536aa69d17a1f6dcd2b84f7ecaed7ad18) )
@@ -663,6 +669,7 @@ GAMEL(1994, suprdisc, 0,        sus_tk, stellafr, stellafr_state, empty_init, RO
 GAMEL(1995, multmult, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Multi Multi",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1995, dscjkpot, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Disc Jackpot",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1995, sunny,    0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Sunny",                 MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1995, swing,    0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Swing",                 MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1996, bigjkpot, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Big Jackpot",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1994, jmbojmbf, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Jumbo Jumbo Fun",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1996, discfun,  0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Disc Fun",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
