@@ -583,7 +583,7 @@ void roland_w30_state::s330(machine_config &config)
 	lcd_screen.set_visarea_full();
 	lcd_screen.set_palette("lcd_palette");
 
-	PALETTE(config, "lcd_palette", palette_device::MONOCHROME_INVERTED/);
+	PALETTE(config, "lcd_palette", palette_device::MONOCHROME_INVERTED);
 
 	TMS3556(config, m_vdp, 14.3496_MHz_XTAL); // TMS3556NL
 	m_vdp->set_addrmap(0, &roland_w30_state::vram_map);
