@@ -44,7 +44,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
 
 #include "taito_en.h"
 #include "taitoio.h"
@@ -61,11 +60,7 @@
 
 // configurable logging
 #define LOG_BADSPRITES	(1U << 1)
-#define LOG_LINKPROC	(1U << 2)
-#define LOG_LINKTX		(1U << 3)
-#define LOG_LINKRX		(1U << 4)
 
-//#define VERBOSE (LOG_GENERAL | LOG_LINKPROC)
 //#define VERBOSE (LOG_GENERAL | LOG_BADSPRITES)
 
 #include "logmacro.h"
