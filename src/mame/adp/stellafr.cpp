@@ -338,7 +338,7 @@ void stellafr_state::ay8910_portb_w(uint8_t data)
 
 void stellafr_state::mem_map_tk(address_map &map)
 {
-	map(0x000000, 0x01ffff).rom();
+	map(0x000000, 0x0fffff).rom();
 	// controlled by U17 74HC138
 	map(0x800001, 0x800001).w(m_dac, FUNC(dac_byte_interface::data_w)); // Y0
 	// Y1 device on cpu board
@@ -442,25 +442,25 @@ void stellafr_state::sus_rtc(machine_config &config)
 }
 
 ROM_START( action )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "action_f2_i.u2", 0x00000, 0x10000, CRC(5ebc8fab) SHA1(3a1e9cfab91af6c1096e464777d12b60d2ab7fb8) )
 	ROM_LOAD16_BYTE( "action_f2_ii.u6", 0x00001, 0x10000, CRC(6f1634cc) SHA1(ad0f3d5d43705c5c3e8bc01a87e8ac328862e277) )
 ROM_END
 
 ROM_START( allfred )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "allfred_w3_i.u2", 0x00000, 0x80000, CRC(f03bdbef) SHA1(8cd32d80d03842d72b096b469a0ec1be5958a6e4) )
 	ROM_LOAD16_BYTE( "allfred_w3_ii.u6", 0x00001, 0x80000, CRC(2f216373) SHA1(71d713b267c21dc0a4e955f422e7102553d16d30) )
 ROM_END
 
 ROM_START( bigjkpot )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "big_jackpot_f1_pr_1.u2", 0x00000, 0x8000, CRC(94a14d8e) SHA1(3c4abdad8e38102278920b0f35a8ab3f7a4f2142) )
 	ROM_LOAD16_BYTE( "big_jackpot_f1_pr_2.u6", 0x00001, 0x8000, CRC(51f8ab0b) SHA1(1cb2aa40922956d93605c77862f0fd6f38595eb8) )
 ROM_END
 
 ROM_START( bigwinnr )
-	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE("big_winner_f1_1_m27c1001.u2", 0x00000, 0x20000, CRC(3abc347b) SHA1(7f6c570cecdab8e7db070c744b9222f725c7af66))
 	ROM_LOAD16_BYTE("big_winner_f1_2_m27c1001.u6", 0x00001, 0x20000, CRC(7c4f8a70) SHA1(da797544f897ce8ebbc4c3c5277a6fe83c274a9a))
 ROM_END
@@ -484,13 +484,13 @@ ROM_START( dpplson )
 ROM_END
 
 ROM_START( dscbonus )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "disc_bonus_f3_1.u2", 0x00000, 0x10000, CRC(6599babf) SHA1(4ba8844ecee15d299e00fff1c5f51d53ce2ccfde) )
 	ROM_LOAD16_BYTE( "disc_bonus_f3_2.u6", 0x00001, 0x10000, CRC(6e7fa161) SHA1(7f0e695ede3ba198cc94f80e72c6cbe41468a970) )
 ROM_END
 
 ROM_START( dscjkpot )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "disc_jackpot_f2_pr.1.u2", 0x00000, 0x8000, CRC(5af04926) SHA1(7e10ddd1f068565854c245e39f73faf0685e4bf3) )
 	ROM_LOAD16_BYTE( "disc_jackpot_f2_pr.2.u6", 0x00001, 0x8000, CRC(95a7f938) SHA1(2d14da419d89fd26ea3245fbe24cafa346fecdca) )
 ROM_END
@@ -508,7 +508,7 @@ ROM_START( glksstrn )
 ROM_END
 
 ROM_START( grandhnd )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "grandhand_f2.u2", 0x00000, 0x10000, CRC(367c86f0) SHA1(c4a42887887614f0d4927b5a36a12b7d88a28e32) )
 	ROM_LOAD16_BYTE( "grandhand_f2.u6", 0x00001, 0x10000, CRC(b0f14dd4) SHA1(f6a713334ed85ecf52e0671aa15c6c43d32db4d2) )
 ROM_END
@@ -532,13 +532,13 @@ ROM_START( jkrpoker )
 ROM_END
 
 ROM_START( jmbojmbo )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "jumbo_jumbo_f2_pr1.u2", 0x00000, 0x10000, CRC(97a04942) SHA1(f512451376697e5d3fd18bfadbe6711b9bfeb74b) )
 	ROM_LOAD16_BYTE( "jumbo_jumbo_f2_pr2.u6", 0x00001, 0x10000, CRC(35acb575) SHA1(88a7cb6397fe031bda0b7dddd1049fb04eba8b40) )
 ROM_END
 
 ROM_START( jmbojmbf )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "jumbo_jumbo_fun_f1_pr1.u2", 0x00000, 0x20000, CRC(93c19377) SHA1(72a2455dc968b605c408cf0d5ed36e25ded55085) )
 	ROM_LOAD16_BYTE( "jumbo_jumbo_fun_f1_pr2.u6", 0x00001, 0x20000, CRC(be428893) SHA1(273a5339201997b6043992e278f262db28fb3bf9) )
 ROM_END
@@ -556,7 +556,7 @@ ROM_START( jumboa )
 ROM_END
 
 ROM_START( kleoptra )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "kleopatra_w4_i.u2", 0x00000, 0x80000, CRC(2035d182) SHA1(683cab310445a6d31f080830a12c07d711119874) )
 	ROM_LOAD16_BYTE( "kleopatra_w4_ii.u6", 0x00001, 0x80000, CRC(fdf02576) SHA1(7750ff6f3611b5c6903cdd3c138e34248ba378be) )
 ROM_END
@@ -580,7 +580,7 @@ ROM_START( moneyf1 )
 ROM_END
 
 ROM_START( multmult )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "multi_multi_f1_i.u2", 0x00000, 0x20000, CRC(6aa663af) SHA1(cfcdf930fa26c06e49b241dbcb520c0c64cc8af0) )
 	ROM_LOAD16_BYTE( "multi_multi_f1_ii.u6", 0x00001, 0x20000, CRC(a7a5ac70) SHA1(38fd3ad4306aa46a1a9414b3ae3d0691c67f0357) )
 
@@ -619,31 +619,31 @@ ROM_START( suprdisc )
 ROM_END
 
 ROM_START( st_ohla )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "oh_la_la_f1_1.bin", 0x00000, 0x10000, CRC(94583885) SHA1(5083d65da0347a37ffbb537f94d3b247241f1e8c) )
 	ROM_LOAD16_BYTE( "oh_la_la_f1_2.bin", 0x00001, 0x10000, CRC(8ac647cd) SHA1(858f67d6121dde28477a5df8569e7ae92db6299e) )
 ROM_END
 
 ROM_START( st_vulkn )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "vulkan_f1_1.bin", 0x00000, 0x10000, CRC(06109bd5) SHA1(78f6b0cb3ae5873350fd50af8990fa38454c1183) )
 	ROM_LOAD16_BYTE( "vulkan_f1_2.bin", 0x00001, 0x10000, CRC(951baf42) SHA1(1346043155ba85926b2bf9eef8136b377953abe1) )
 ROM_END
 
 ROM_START( sunny )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "sunny_f2_i.u2", 0x00000, 0x20000, CRC(49776821) SHA1(d68a9e86ea336c46cc07d7bf6ecc3632930f18b9) )
 	ROM_LOAD16_BYTE( "sunny_f2_ii.u6", 0x00001, 0x20000, CRC(86b3b81d) SHA1(e12a511bbc53e4614bed561c9544f9ac8faa9fd2) )
 ROM_END
 
 ROM_START( taipan )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "taipan_w1_i.u2", 0x00000, 0x20000, CRC(feaf45f9) SHA1(ded06e9536aa69d17a1f6dcd2b84f7ecaed7ad18) )
 	ROM_LOAD16_BYTE( "taipan_w1_ii.u6", 0x00001, 0x20000, CRC(b2c5418a) SHA1(23c542b983325e677cdd9728bb2fce9263793098) )
 ROM_END
 
 ROM_START( turbosun )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "turbo_sunny_f1_i.u2", 0x00000, 0x20000, CRC(763c00e7) SHA1(8bae5206a3ebad6ec552a9714242cebc78819251) )
 	ROM_LOAD16_BYTE( "turbo_sunny_f1_ii.u6", 0x00001, 0x20000, CRC(4d431ae3) SHA1(bb5ff763b9bbaf4eb15ec3fde643b601421fbde1) )
 ROM_END
