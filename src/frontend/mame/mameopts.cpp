@@ -50,6 +50,7 @@ void mame_options::parse_standard_inis(emu_options &options, std::ostream &error
 			}
 			catch (options_exception const &ex)
 			{
+				util::stream_format(error_stream, "While parsing %s:\n%s\n", file.fullpath(), ex.message());
 			}
 		}
 	}
