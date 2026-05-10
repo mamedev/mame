@@ -1,5 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders: Angelo Salese, David Haywood, Lysiwyg, Mark Beckford, Philip Bennett
+// copyright-holders: Angelo Salese, David Haywood, Lysiwyg, Philip Bennett
+/*
+
+Williams The Predators (prototype)
+
+*/
+
 #include "emu.h"
 
 #include "cpu/m6800/m6800.h"
@@ -409,22 +415,21 @@ void predators_state::do_blit(int screen)
 		        line drawing.. it's an actual angle!! upper 4 bits shown in diagram below
 
 		    e     f    0   1      2
-		        -        -        -
-		        \      |      /
+		    . -        -        -
+		    .   \      |      /
 		    d     \    |    /     3
-		            \  |  /
-		                \|/
+		    .       \  |  /
+		    m         \|/
 		    c <------- o -------> 4
-		                /|\
-		            /  |  \
+		    .         /|\
+		    .       /  |  \
 		    b     /    |    \     5
-		        /      |      \
-		        -        -        -
+		    .   /      |      \
+		    . -        -        -
 		    a    9    8    7     6
 
 		    note, the length attribute is NOT in pixels(!) it's the real line length
-
-		    */
+		*/
 
 		int const valctab = m_sincos[screen][(attr & 0xff)];
 		int const valstab = m_sincos[screen][(attr & 0xff) + 0x100];
@@ -562,7 +567,6 @@ static INPUT_PORTS_START( predators )
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)  PORT_PLAYER(1) PORT_NAME("Player 1 (Hawk) Stick X")
 	PORT_START("sticky0") // read at 0x800008, see williams_49way_port_hawk_r
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE  PORT_PLAYER(1) PORT_NAME("Player 1 (Hawk) Stick Y")
-
 
 	PORT_START("general0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("%p (Hawk) Fire")
