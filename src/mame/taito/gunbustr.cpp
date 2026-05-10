@@ -49,6 +49,7 @@
 #include "taito_en.h"
 #include "taitoio.h"
 #include "tc0480scp.h"
+#include "gunbustr_l.h"
 
 #include "cpu/m68000/m68020.h"
 #include "machine/eepromser.h"
@@ -82,7 +83,7 @@ public:
 		m_tc0480scp(*this, "tc0480scp"),
 		m_ram(*this,"ram"),
 		m_spriteram(*this,"spriteram"),
-		m_netram(*this,"netram"),
+		m_link(*this, "link"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -94,7 +95,6 @@ public:
 
 	{
 		m_coin_lockout = true;
-		link_netintf_init(mconfig);
 	}
 
 	void gunbustr(machine_config &config);
@@ -123,7 +123,7 @@ private:
 	required_device<tc0480scp_device> m_tc0480scp;
 	required_shared_ptr<u32> m_ram;
 	required_shared_ptr<u32> m_spriteram;
-	required_shared_ptr<u32> m_netram;
+	required_device<gunbustr_link_device> m_link;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -147,62 +147,6 @@ private:
 	bool m_coin_lockout;
 	std::unique_ptr<gb_tempsprite[]> m_spritelist{};
 	emu_timer *m_interrupt5_timer = nullptr;
-
-	// Networking support below here
-	enum gb_linkcmd_type
-	{
-		LINKCMD_NOP = 0,
-		LINKCMD_SEND_NODE_ID,
-		LINKCMD_SEND_LOCK,
-		LINKCMD_SEND_CTRL,
-		LINKCMD_RECV_DATA,
-		LINKCMD_SEND_DATA,
-	};
-
-	struct gb_linkcmd
-	{
-		u32 type;
-		u32 nodeid;
-		u32 data;
-	};
-
-	emu_timer *m_link_connect_timer;
-	osd_file::ptr m_link_rx;
-	osd_file::ptr m_link_tx;
-	char m_link_localhost[256];
-	char m_link_remotehost[256];
-
-	// Network setup
-	bool link_netintf_init(const machine_config &mconfig);
-	TIMER_CALLBACK_MEMBER(link_netintf_callback);
-	void link_netintf_socket_check(void);
-	void link_begin(void);
-
-	// Raw network interface
-	bool link_netintf_recvblock(void *buf, size_t bytes);
-	bool link_netintf_sendblock(const void *buf, size_t bytes);
-	bool link_netintf_fetch_cmd(gb_linkcmd *cmd);
-	bool link_netintf_send_cmd(const gb_linkcmd *cmd);
-
-	// Network node update
-	void link_update(void);
-
-	// Data transfer
-	void link_send_data(u8 nodeid);
-	void link_recv_data(u8 nodeid);
-	void link_send_lock(u8 nodeid, u16 data);
-	void link_send_id(u8 nodeid, u16 data);
-	void link_send_ctrl(u8 nodeid);
-
-	// Memory handlers
-	void link_ctrl_w(u8 nodeid, u32 data, u32 mem_mask);
-	void link0_ctrl_w(offs_t offset, u32 data, u32 mem_mask = ~u32(0));
-	void link1_ctrl_w(offs_t offset, u32 data, u32 mem_mask = ~u32(0));
-	u32 link_ctrl_r(u8 nodeid);
-	u32 link0_ctrl_r(offs_t offset);
-	u32 link1_ctrl_r(offs_t offset);
-	u32 link_ram_r(offs_t offset);
-	void link_ram_w(offs_t offset, u32 data, u32 mem_mask);
 };
 
 
@@ -483,303 +427,6 @@ void gunbustr_state::gun_w(u32 data)
 	m_interrupt5_timer->adjust(m_maincpu->cycles_to_attotime(10000));
 }
 
-/***********************************************************
-             NETWORK INTERFACE
-***********************************************************/
-bool gunbustr_state::link_netintf_init(const machine_config &mconfig)
-{
-	snprintf(m_link_localhost,sizeof(m_link_localhost), "socket.%s:%s",
-			mconfig.options().comm_localhost(), mconfig.options().comm_localport());
-	snprintf(m_link_remotehost,sizeof(m_link_remotehost), "socket.%s:%s",
-			mconfig.options().comm_remotehost(), mconfig.options().comm_remoteport());
-
-	return true;
-}
-
-void gunbustr_state::link_netintf_socket_check(void)
-{
-	// check rx socket
-	if (!m_link_rx)
-	{
-		LOGMASKED(LOG_LINKPROC, "listen on %s\n", m_link_localhost);
-		uint64_t filesize; // unused
-		osd_file::open(m_link_localhost, OPEN_FLAG_CREATE, m_link_rx, filesize);
-	}
-	// check tx socket
-	if (!m_link_tx)
-	{
-		// TODO: How to make this non-blocking?
-		LOGMASKED(LOG_LINKPROC, "connect to %s\n", m_link_remotehost);
-		uint64_t filesize; // unused
-		osd_file::open(m_link_remotehost, 0, m_link_tx, filesize);
-	}
-}
-
-// TODO: Use a thread instead of a timer so we can avoid blocking emulation...
-TIMER_CALLBACK_MEMBER(gunbustr_state::link_netintf_callback)
-{
-	m_link_connect_timer->adjust(attotime::never);
-	link_netintf_socket_check();
-	m_link_connect_timer->adjust(attotime::from_nsec(1000));
-}
-
-void gunbustr_state::link_begin(void)
-{
-	m_link_connect_timer = timer_alloc(FUNC(gunbustr_state::link_netintf_callback), this);
-	m_link_connect_timer->adjust(attotime::from_hz(100000));
-}
-
-bool gunbustr_state::link_netintf_recvblock(void *buf, size_t bytes)
-{
-	if (!m_link_rx) return false;
-
-	std::uint32_t amt = 0;
-	std::error_condition err = m_link_rx->read(buf, 0, bytes, amt);
-	if (err)
-	{
-		LOGMASKED(LOG_LINKRX, "RX ERROR [%s]\n", err.message().c_str());
-		return false;
-	}
-	if (amt != bytes)
-	{
-		LOGMASKED(LOG_LINKRX, "RX NOT ENOUGH %d => %d\n", bytes, amt);
-		return false;
-	}
-	return true;
-}
-
-bool gunbustr_state::link_netintf_sendblock(const void *buf, size_t bytes)
-{
-	if(!m_link_tx) return false;
-
-	std::uint32_t amt = 0;
-	std::error_condition err = m_link_tx->write(buf, 0, bytes, amt);
-	if (err)
-	{
-		LOGMASKED(LOG_LINKPROC, "TX ERROR [%s]\n", err.message().c_str());
-		m_link_tx = nullptr;
-		return false;
-	}
-	if (amt != bytes)
-	{
-		LOGMASKED(LOG_LINKTX, "TX NOT ENOUGH %d => %d\n", bytes, amt);
-		return false;
-	}
-	return true;
-}
-
-bool gunbustr_state::link_netintf_fetch_cmd(gb_linkcmd *cmd)
-{
-	*cmd = (gb_linkcmd){};
-	u8 cmdpkt[12] = {0};
-	if (!link_netintf_recvblock(cmdpkt, 12))
-	{
-		cmd->type = LINKCMD_NOP;
-		return false;
-	}
-	cmd->type = (cmdpkt[ 3] <<24) |
-				(cmdpkt[ 2] <<16) |
-				(cmdpkt[ 1] << 8) |
-				(cmdpkt[ 0] << 0);
-	cmd->nodeid =	(cmdpkt[ 7] <<24) |
-					(cmdpkt[ 6] <<16) |
-					(cmdpkt[ 5] << 8) |
-					(cmdpkt[ 4] << 0);
-	cmd->data = (cmdpkt[11] <<24) |
-				(cmdpkt[10] <<16) |
-				(cmdpkt[ 9] << 8) |
-				(cmdpkt[ 8] << 0);
-	return true;
-}
-
-bool gunbustr_state::link_netintf_send_cmd(const gb_linkcmd *cmd)
-{
-	const u8 cmdpkt[12] =
-	{
-		(u8)(cmd->type >> 0),
-		(u8)(cmd->type >> 8),
-		(u8)(cmd->type >>16),
-		(u8)(cmd->type >>24),
-		(u8)(cmd->nodeid >> 0),
-		(u8)(cmd->nodeid >> 8),
-		(u8)(cmd->nodeid >>16),
-		(u8)(cmd->nodeid >>24),
-		(u8)(cmd->data >> 0),
-		(u8)(cmd->data >> 8),
-		(u8)(cmd->data >>16),
-		(u8)(cmd->data >>24),
-	};
-	return link_netintf_sendblock(cmdpkt, 12);
-}
-
-/***********************************************************
-             NETWORK PROTOCOL
-***********************************************************/
-void gunbustr_state::link_update(void)
-{
-	gb_linkcmd cmd;
-	while (link_netintf_fetch_cmd(&cmd))
-	{
-		switch (cmd.type)
-		{
-			default:
-				break;
-			case LINKCMD_RECV_DATA:
-				LOGMASKED(LOG_LINKPROC, "[proc] RecvData %d\n", cmd.nodeid);
-				link_netintf_sendblock(&m_netram[0x40*cmd.nodeid], 0xFC);
-				break;
-			case LINKCMD_SEND_DATA:
-				LOGMASKED(LOG_LINKPROC, "[proc] SendData %d\n", cmd.nodeid);
-				link_netintf_recvblock(&m_netram[0x40*cmd.nodeid], 0xFC);
-				break;
-			case LINKCMD_SEND_CTRL:
-				LOGMASKED(LOG_LINKPROC, "[proc] RecvCtrl %d\n", cmd.nodeid);
-				m_netram[0x40*cmd.nodeid+0x3F] = cmd.data;
-				break;
-			case LINKCMD_SEND_LOCK:
-				LOGMASKED(LOG_LINKPROC, "[proc] SendLock %d 0x%X\n", cmd.nodeid, cmd.data);
-				m_netram[0x40*cmd.nodeid+0x3F] &= ~(0xFFFF<<16);
-				m_netram[0x40*cmd.nodeid+0x3F] |= cmd.data << 16;
-				break;
-			case LINKCMD_SEND_NODE_ID:
-				LOGMASKED(LOG_LINKPROC, "[proc] SendNodeId %d 0x%X\n", cmd.nodeid, cmd.data);
-				m_netram[0x40*cmd.nodeid+0x3F] &= ~0xFFFF;
-				m_netram[0x40*cmd.nodeid+0x3F] |= cmd.data;
-				break;
-		}
-	}
-}
-
-void gunbustr_state::link_recv_data(u8 nodeid)
-{
-	gb_linkcmd cmd =
-	{
-		.type = LINKCMD_RECV_DATA,
-		.nodeid = nodeid,
-	};
-	link_netintf_send_cmd(&cmd);
-	link_netintf_recvblock(&m_netram[0x40*nodeid], 0xFC);
-}
-
-void gunbustr_state::link_send_data(u8 nodeid)
-{
-	gb_linkcmd cmd =
-	{
-		.type = LINKCMD_SEND_DATA,
-		.nodeid = nodeid,
-	};
-	link_netintf_send_cmd(&cmd);
-	link_netintf_sendblock(&m_netram[0x40*nodeid], 0xFC);
-}
-
-void gunbustr_state::link_send_lock(u8 nodeid, u16 data)
-{
-	gb_linkcmd cmd =
-	{
-		.type = LINKCMD_SEND_LOCK,
-		.nodeid = nodeid,
-		.data = data,
-	};
-	link_netintf_send_cmd(&cmd);
-}
-
-void gunbustr_state::link_send_id(u8 nodeid, u16 data)
-{
-	gb_linkcmd cmd =
-	{
-		.type = LINKCMD_SEND_NODE_ID,
-		.nodeid = nodeid,
-		.data = data,
-	};
-	link_netintf_send_cmd(&cmd);
-}
-
-void gunbustr_state::link_send_ctrl(u8 nodeid)
-{
-	gb_linkcmd cmd =
-	{
-		.type = LINKCMD_SEND_CTRL,
-		.nodeid = nodeid,
-		.data = m_netram[0x40*nodeid+0x3F],
-	};
-	link_netintf_send_cmd(&cmd);
-}
-
-/***********************************************************
-             NETWORK "REGISTER" INTERFACE
-***********************************************************/
-u32 gunbustr_state::link_ctrl_r(u8 nodeid)
-{
-	link_update();
-	link_send_ctrl(nodeid); // why is this correct?...
-	return m_netram[0x40*nodeid + 0x3F];
-}
-
-void gunbustr_state::link_ctrl_w(u8 nodeid, u32 data, u32 mem_mask)
-{
-	link_update();
-	u32 prev_ctrl = m_netram[0x40*nodeid + 0x3F];
-	COMBINE_DATA(&m_netram[0x40*nodeid + 0x3F]);
-
-	if (ACCESSING_BITS_0_15) // Writing to "ID" port
-	{
-		u16 v = data & 0xFFFF;
-		link_send_id(nodeid, v);
-	}
-
-	if (ACCESSING_BITS_16_31) // Writing to "lock" port
-	{
-		u16 v = (data >> 16);
-		u16 prev = (prev_ctrl >> 16);
-
-		link_send_lock(nodeid, v);
-
-		if ((prev & ~v) & 2) // Write release
-		{
-			link_send_data(nodeid);
-		}
-
-		if ((v & ~prev) & 1) // Read assert
-		{
-			// sync opposite node
-			link_recv_data(nodeid ^ 1);
-		}
-	}
-
-	link_update();
-}
-
-u32 gunbustr_state::link0_ctrl_r(offs_t offset)
-{
-	return link_ctrl_r(0);
-}
-
-void gunbustr_state::link0_ctrl_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	link_ctrl_w(0, data, mem_mask);
-}
-
-u32 gunbustr_state::link1_ctrl_r(offs_t offset)
-{
-	return link_ctrl_r(1);
-}
-
-void gunbustr_state::link1_ctrl_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	link_ctrl_w(1, data, mem_mask);
-}
-
-u32 gunbustr_state::link_ram_r(offs_t offset)
-{
-	link_update();
-	return m_netram[offset];
-}
-
-void gunbustr_state::link_ram_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	link_update();
-	COMBINE_DATA(&m_netram[offset]);
-}
 
 /***********************************************************
              MEMORY STRUCTURES
@@ -797,10 +444,7 @@ void gunbustr_state::prg_map(address_map &map)
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0x900000, 0x901fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0xc00000, 0xc001ff).mirror(0x3e00).rw(FUNC(gunbustr_state::link_ram_r),FUNC(gunbustr_state::link_ram_w)).ram().share(m_netram); // network RAM
-	// These aren't hooked up by hardware, but the networking protocol makes this a perfect hook
-	map(0xc000fc, 0xc000ff).mirror(0x3e00).rw(FUNC(gunbustr_state::link0_ctrl_r),FUNC(gunbustr_state::link0_ctrl_w)); // network control (ID=0)
-	map(0xc001fc, 0xc001ff).mirror(0x3e00).rw(FUNC(gunbustr_state::link1_ctrl_r),FUNC(gunbustr_state::link1_ctrl_w)); // network control (ID=1)
+	map(0xc00000, 0xc001ff).mirror(0x3e00).m(m_link, FUNC(gunbustr_link_device::map));
 }
 
 /***********************************************************
@@ -839,7 +483,7 @@ static INPUT_PORTS_START( gunbustr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
 	PORT_START("PORT03")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) // DMAON (6-A5)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) // DMAON (6-A5)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // OUTPUT 1
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Z0 (Z-3)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Z1 (Z-4)
@@ -929,6 +573,8 @@ void gunbustr_state::gunbustr(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gunbustr);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 4096);
+
+	GUNBUSTR_LINK(config, m_link, 1000); // fake clock
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_palette(m_palette);
@@ -1062,8 +708,6 @@ void gunbustr_state::init_gunbustr()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x203acc, 0x203acf, read32smo_delegate(*this, FUNC(gunbustr_state::main_cycle_r)));
 
 	m_interrupt5_timer = timer_alloc(FUNC(gunbustr_state::trigger_irq5), this);
-
-	link_begin();
 }
 
 void gunbustr_state::init_gunbustrj()
