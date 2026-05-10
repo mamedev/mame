@@ -660,6 +660,18 @@ ROM_START( viva )
 	ROM_LOAD16_BYTE( "viva_f1_ii.u6", 0x00001, 0x20000, CRC(da0fab3b) SHA1(ef13ea163c60253e88d200c68a25fe7e4a56a657) )
 ROM_END
 
+ROM_START( wurfelf2 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "wuerfel_fix_f2_i.u2", 0x00000, 0x80000, CRC(ae2ce7e8) SHA1(05ed1ece7a35f4883b61d30e4076f513d009aa9c) )
+	ROM_LOAD16_BYTE( "wuerfel_fix_f2_ii.u6", 0x00001, 0x80000, CRC(4fad055f) SHA1(68eca493488e7bd17f893e11800b60f2c3a1869d) )
+ROM_END
+
+ROM_START( wurfelf3 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "wuerfel_fix_f3_i.u2", 0x00000, 0x80000, CRC(9608c498) SHA1(6e3a4ac92177d3c8d2c4773e389c13a404961978) )
+	ROM_LOAD16_BYTE( "wuerfel_fix_f3_ii.u6", 0x00001, 0x80000, CRC(3652e163) SHA1(8e4ed9badee4e14d89ce66eaecd218e34539a68b) )
+ROM_END
+
 } // anonymous namespace
 
 GAMEL(1993, action,   0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Action",                MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
@@ -678,6 +690,8 @@ GAMEL(1995, sunny,    0,        sus_tk, stellafr, stellafr_state, empty_init, RO
 GAMEL(1995, swing,    0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Swing",                 MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1996, bigjkpot, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Big Jackpot",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1994, jmbojmbf, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Jumbo Jumbo Fun",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1994, wurfelf2, wurfelf3, sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    u8"Würfel Fix (F2)",     MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1994, wurfelf3, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    u8"Würfel Fix (F3)",     MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1996, discfun,  0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Disc Fun",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1996, multstar, 0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Multi Star",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1996, st_ohla,  0,        sus_tk, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Oh La La",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
