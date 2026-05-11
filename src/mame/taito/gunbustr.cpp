@@ -237,6 +237,10 @@ void gunbustr_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 		y += y_offs;
 
+		// Offset for flip start position
+		// For some reason X doesn't need this
+		if (flipy) { y += 0x80 - zoomy; }
+
 		// treat coords as signed
 		if (x > 0x340) x -= 0x400;
 		if (y > 0x340) y -= 0x400;
@@ -562,7 +566,7 @@ void gunbustr_state::gunbustr(machine_config &config)
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_palette(m_palette);
-	m_tc0480scp->set_offsets(0x20, 0x07);
+	m_tc0480scp->set_offsets(0x20, 0x08);
 	m_tc0480scp->set_offsets_tx(-1, -1);
 	m_tc0480scp->set_offsets_flip(-1, 0);
 
