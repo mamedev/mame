@@ -55,6 +55,7 @@
 TODO:
 - boonggab: simulate photo sensors with a "stroke strength"
 - boonggab: what are sensors bit used for? are they used in the japanese version?
+- misncrft: sound dies during stage 1-5;
 - wyvernsg: fails a protection check after ~1 hour of play?
 - are CRTC parameters software-configurable?
 
@@ -75,6 +76,7 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+#include "vamphalf_prot.h"
 
 namespace {
 
@@ -510,9 +512,11 @@ void vamphalf_qdsp_state::misncrft_io(address_map &map)
 	map(0x040, 0x040).w(FUNC(vamphalf_qdsp_state::flipscreen_w));
 	map(0x080, 0x080).portr("P1_P2");
 	map(0x090, 0x090).portr("SYSTEM");
+	map(0x0d0, 0x0d0).rw("fpga", FUNC(misncrft_fpga_prot_device::data_r), FUNC(misncrft_fpga_prot_device::seed_w<16>));
 	map(0x0f0, 0x0f0).w(FUNC(vamphalf_qdsp_state::eeprom_w));
 	map(0x100, 0x100).umask16(0x00ff).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x160, 0x161).r(FUNC(vamphalf_qdsp_state::eeprom_r));
+	map(0x1a0, 0x1a0).rw("fpga", FUNC(misncrft_fpga_prot_device::data_r), FUNC(misncrft_fpga_prot_device::seed_w<8>));
 }
 
 void vamphalf_state::coolmini_io(address_map &map)
@@ -552,6 +556,7 @@ void vamphalf_qdsp_state::wyvernwg_io(address_map &map)
 	map(0x0a00, 0x0a00).portr("P1_P2");
 	map(0x0c00, 0x0c00).portr("SYSTEM");
 	map(0x1500, 0x1500).umask32(0x000000ff).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x1800, 0x1800).rw("fpga", FUNC(wyvernwg_fpga_prot_device::data_r), FUNC(wyvernwg_fpga_prot_device::seed_w));
 	map(0x1c00, 0x1c00).umask32(0x0000ffff).w(FUNC(vamphalf_qdsp_state::eeprom_w));
 	map(0x1f00, 0x1f00).umask32(0x0000ffff).r(FUNC(vamphalf_qdsp_state::eeprom_r));
 }
@@ -1209,6 +1214,8 @@ void vamphalf_qdsp_state::misncrft(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_qdsp_state::misncrft_io);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
 
+	MISNCRFT_FPGA_PROT(config, "fpga", 0);
+
 	sound_qs1000(config);
 }
 
@@ -1297,6 +1304,8 @@ void vamphalf_qdsp_state::wyvernwg(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_qdsp_state::common_32bit_map);
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_qdsp_state::wyvernwg_io);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
+
+	WYVERNWG_FPGA_PROT(config, "fpga", 0);
 
 	sound_qs1000(config);
 }
