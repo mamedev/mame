@@ -29310,7 +29310,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 	</software>
 
 	<software name="poolrad">
-		<description>Advanced Dungeons &amp; Dragons - Pool of Radiance (USA)</description>
+		<description>Advanced Dungeons &amp; Dragons: Pool of Radiance (USA)</description>
 		<year>1992</year>
 		<publisher>FCI</publisher>
 		<info name="serial" value="NES-QA-USA"/>
@@ -29333,7 +29333,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 	</software>
 
 	<software name="poolradj" cloneof="poolrad">
-		<description>Advanced Dungeons &amp; Dragons - Pool of Radiance (Japan)</description>
+		<description>Advanced Dungeons &amp; Dragons: Pool of Radiance (Japan)</description>
 		<year>1991</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="PNF-QA (R98V5938)"/>
