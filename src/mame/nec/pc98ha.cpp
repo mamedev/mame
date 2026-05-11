@@ -48,12 +48,12 @@ uint32_t pc98lt_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 16)
 		{
-			u16 pen = bitswap<16>(m_gvram[(y*640+x)/16], 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7);
+			u16 pen = bitswap<16>(m_gvram[(y * 640 + x) / 16], 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7);
 
 			for (int xi = 0; xi < 16; xi++)
 			{
 				u8 dot = (pen >> xi) & 1;
-				bitmap.pix(y, x+xi) = m_palette->pen(dot);
+				bitmap.pix(y, x + xi) = m_palette->pen(dot);
 			}
 		}
 

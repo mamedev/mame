@@ -39,7 +39,12 @@ public:
 	cem3340_device &set_freq_cc(float freq_cc);  // Frequency control current.
 	cem3340_device &set_pw_cv(float pw_cv);  // Pulse width control voltage.
 
-	float get_freq();
+	float freq();  // in Hz
+	u32 sample_rate() const { return m_stream->sample_rate(); }
+
+	// Returns the time remaining for the ramp waveform to cross the specified
+	// voltage, in an upwards direction. Also works for 0V.
+	attotime ramp_time_to_thresh(float threshold);
 
 protected:
 	void device_start() override ATTR_COLD;

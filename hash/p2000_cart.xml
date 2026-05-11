@@ -45,7 +45,6 @@ TODO:
 		<notes><![CDATA[
 PDOS implications untested
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x4000">
 				<rom name="BASICNL1.1A2.bin" size="0x4000" crc="0d5239ff" sha1="a6313ab7cc2d052427ba852f3035377bbf76bf63" />
@@ -98,8 +97,8 @@ Disk Basic
 
 <!-- !Operating Systems -->
 
-	<software name="cpmnater">
-		<description>CPM Nater</description>
+	<software name="cpmnater" supported="no">
+		<description>CP/M Nater</description>
 		<year>1987?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
@@ -115,15 +114,14 @@ Disk Basic
 <!-- !Applications -->
 
 	<software name="bis" supported="no">
-		<description>BIS (English)</description>
-		<year>198?</year>
+		<description>BIS Terminal Program (English)</description>
+		<year>1981</year>
 		<publisher>Philips</publisher>
 		<notes><![CDATA[
 Requires [SLOT2] I/O module (dual RS-232)
 Requires [FDC]
 https://retroordenadoresorty.blogspot.com/2024/09/interface-bildschirmtext-io-modul-p2171.html
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
 
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x4000">
@@ -139,7 +137,6 @@ https://retroordenadoresorty.blogspot.com/2024/09/interface-bildschirmtext-io-mo
 		<notes><![CDATA[
 (same as parent)
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
 
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x4000">
@@ -179,7 +176,7 @@ Likely requires a [SLOT2] cart
 
 	<software name="familie4" supported="no">
 		<description>Familiegeheugen (v4.L)</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Philips</publisher>
 		<notes><![CDATA[
 Seems to require a [cassette]
@@ -193,8 +190,8 @@ Pressing '?' on [keyboard] doesn't bring information screen
 	</software>
 
 	<software name="familie3" cloneof="familie4" supported="no">
-		<description>familiegeheugen (v3.L)</description>
-		<year>198?</year>
+		<description>Familiegeheugen (v3.L)</description>
+		<year>1986</year>
 		<publisher>Philips</publisher>
 		<notes><![CDATA[
 (same as parent)
@@ -208,7 +205,7 @@ Pressing '?' on [keyboard] doesn't bring information screen
 
 	<software name="familie2" cloneof="familie4" supported="no">
 		<description>Familiegeheugen (v2.0)</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Philips</publisher>
 		<notes><![CDATA[
 (same as parent)
@@ -229,7 +226,6 @@ Pressing '?' on [keyboard] doesn't bring information screen
 		<notes><![CDATA[
 Not extensively tested
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
 
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x4000">
@@ -239,13 +235,12 @@ Not extensively tested
 	</software>
 
 	<software name="flexbasea" cloneof="flexbase" supported="no">
-		<description>flexbase (Release 1.6)</description>
+		<description>Flexbase (Release 1.6)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
 Not extensively tested
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
 
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x4000">
@@ -256,8 +251,8 @@ Not extensively tested
 
 	<software name="nebocalc" supported="no">
 		<description>NeboCalc</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1980?</year>
+		<publisher>Regents of the University of California</publisher>
 		<notes><![CDATA[
 "LOAD ERROR"
 ]]></notes>
@@ -325,7 +320,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="wordpr2" cloneof="text2de">
+	<software name="wordpr2" cloneof="text2de" supported="no">
 		<description>WordProcessor (v2.0, Dutch?)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -388,7 +383,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="asm56" cloneof="asm56" supported="no">
+	<software name="asm56" cloneof="asm59" supported="no">
 		<description>P2000 Assembler (v5.6)</description>
 		<year>198?</year>
 		<!-- Ron Eijnthoven -->
@@ -412,7 +407,6 @@ Not extensively tested
 		<notes><![CDATA[
 Not extensively tested
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
 
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x4000">
@@ -423,8 +417,8 @@ Not extensively tested
 
 	<software name="ucsdpas" supported="no">
 		<description>UCSD Pascal</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1980?</year>
+		<publisher>Regents of the University of California</publisher>
 		<notes><![CDATA[
 "Pascal Load Error"
 ]]></notes>
@@ -469,7 +463,7 @@ Various unsupported features
 		</part>
 	</software>
 
-	<software name="main1" cloneof="main2">
+	<software name="main1" cloneof="main2" supported="no">
 		<description>Maintenance (Release 1)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -483,7 +477,7 @@ Various unsupported features
 		</part>
 	</software>
 
-	<software name="main1a" cloneof="main1">
+	<software name="main1a" cloneof="main2" supported="no">
 		<description>Maintenance (Release 1, alt)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -502,6 +496,7 @@ Various unsupported features
 
 	<software name="brkwall" supported="partial">
 		<description>Brick-Wall</description>
+		<!-- original is '82, this conversion may be later -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
@@ -532,7 +527,7 @@ Optional [joystick] support
 		<notes><![CDATA[
 Optional [joystick] support
 ]]></notes>
-		<info name="usage" value="Requires 32KB RAM minimum"/>
+		<info name="required_ram" value="32KB" />
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x3fbe">
 				<rom name="Fraxxon (joystick).bin" size="0x3fbe" crc="80e38fa5" sha1="732cb508208ff8af157fe1bdfe75f18918f90103" />

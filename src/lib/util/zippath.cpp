@@ -713,30 +713,29 @@ std::error_condition zippath_fopen(std::string_view filename, uint32_t openflags
 						filerr = std::errc::permission_denied;
 					else
 						filerr = std::errc::no_such_file_or_directory;
-					goto done;
 				}
 				else if (osd::directory::entry::entry_type::DIR == entry_type)
 				{
 					filerr = std::errc::is_a_directory;
-					goto done;
 				}
 				else if (openflags & OPEN_FLAG_WRITE)
 				{
 					filerr = std::errc::permission_denied;
-					goto done;
+				}
+				else
+				{
+					// attempt to read the file
+					filerr = create_core_file_from_zip(*zip, file);
+					if (!filerr)
+					{
+						// update subpath, if appropriate
+						if (subpath.empty())
+							subpath.assign(zip->current_name());
+					}
 				}
 
-				// attempt to read the file
-				filerr = create_core_file_from_zip(*zip, file);
-				if (filerr)
-					goto done;
-
-				// update subpath, if appropriate
-				if (subpath.empty())
-					subpath.assign(zip->current_name());
-
 				// we're done
-				goto done;
+				break;
 			}
 		}
 
@@ -748,6 +747,9 @@ std::error_condition zippath_fopen(std::string_view filename, uint32_t openflags
 		// if we errored, then go up a directory
 		if (filerr)
 		{
+			if (std::errc::no_such_file_or_directory != filerr)
+				break;
+
 			// go up a directory
 			auto temp = zippath_parent(mainpath);
 
@@ -773,7 +775,6 @@ std::error_condition zippath_fopen(std::string_view filename, uint32_t openflags
 		}
 	}
 
-done:
 	// store the revised path
 	revised_path.clear();
 	if (!filerr)

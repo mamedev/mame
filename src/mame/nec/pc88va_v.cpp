@@ -154,7 +154,7 @@ uint32_t pc88va_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 				switch(cur_pri_lv & 3) // (palette color mode)
 				{
 					case 0: draw_text(bitmap, cliprect); break;
-					case 1: draw_sprites(bitmap,cliprect); break;
+					case 1: draw_sprites(bitmap, cliprect); break;
 					/* A = graphic 0 */
 					case 2:
 						draw_graphic_layer(bitmap, cliprect, 0);
@@ -180,12 +180,16 @@ inline u8 pc88va_state::get_layer_pal_bank(u8 which)
 	if (!(BIT(m_pltm, 1)))
 		return (m_pltm & 1) << 4;
 
+	// N/A for 32 color mode
 	if (m_pltm == 3)
 		return 0;
 
-	// TODO: text and sprites may be joined when either one is selected in PLTP
-	// olteus sets sprite = 1, wants text to follow with the other bank too
-	// ballbrkr goes the other way around: writes 0, wants sprites to be 1
+	// HW quirk: text and sprites colors will be joined when either one is selected in PLTP
+	// - olteus sets PLTM = 6 / PLTP = 1, wants text to follow with the other bank too
+	// - ballbrkr & hatisora goes the other way around: writes PLTM = 6 / PLTP = 0, wants sprites to follow
+	if (!BIT(which, 1) && !BIT(m_pltp, 1))
+		return 0x10;
+
 	return (m_pltp == which) << 4;
 }
 
@@ -199,8 +203,10 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	int offs = m_tsp.spr_offset;
 	const u8 layer_pal_bank = get_layer_pal_bank(1);
+	const u64 frame_number = m_screen->frame_number();
 
 	// top to bottom for priority (shanghai menuing)
+	// TODO: pdrawgfx really?
 	for(int i = 0x100 - 8; i >= 0; i -= 8)
 	{
 		int spr_count;
@@ -216,9 +222,9 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		const bool is_cursor_sprite =
 			i == m_tsp.curn
 			&& m_tsp.curn_blink == true
-			&& (m_screen->frame_number() % (m_tsp.blink * 2)) >= m_tsp.blink;
+			&& (frame_number % (m_tsp.blink * 2)) >= m_tsp.blink;
 
-		// assume cursor sprite just going transparent with blink effect
+		// assume cursor sprite just going transparent ("secret" in NEC-ese) with blink effect
 		if(!sw || is_cursor_sprite)
 			continue;
 
@@ -229,33 +235,15 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 		spda <<= 1;
 
-		// TODO: verify this disabled code path
-		// makes more sense without the sign?
-		if(0)
-		{
-			// olteus wants this off
-			if(yp & 0x100)
-			{
-				yp &= 0xff;
-				yp = 0x100 - yp;
-			}
-
-			// TODO: shinraba needs wrap-around during gameplay (touching left edge of screen).
-			if(xp & 0x200)
-			{
-				xp &= 0x1ff;
-				xp = 0x200 - xp;
-			}
-		}
-
 		// TODO: std::function
 		if(md) // 1bpp mode
 		{
-			int fg_col = (tvram[(offs + i + 6) / 2] & 0xf0) >> 4;
-			int bc = (tvram[(offs + i + 6) / 2] & 0x08) >> 3;
+			const u8 color_base = tvram[(offs + i + 6) / 2];
+			const u8 fg_col = (color_base & 0xf0) >> 4;
+			const u8 bc = BIT(color_base, 3);
 
 			// sprites don't draw if color is zero
-			// (shanghai exit from menuing)
+			// - shanghai exit from menuing
 			if (!fg_col && !bc)
 				continue;
 
@@ -270,7 +258,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				{
 					for(int x_s = 0; x_s < 16; x_s++)
 					{
-						int res_x = xp + x_i + x_s;
+						int res_x = (xp + x_i + x_s) & 0x3ff;
 						int res_y = (yp + y_i) << m_tsp.spr_mg;
 
 						const u32 data_offset = ((spda + spr_count) & 0xffff) / 2;
@@ -307,7 +295,9 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				{
 					for(int x_s = 0; x_s < 4; x_s ++)
 					{
-						int res_x = xp + x_i + x_s;
+						// - shinraba player touching left edge of screen requires X wraparound
+						// - olteus doesn't want Y wraparound
+						int res_x = (xp + x_i + x_s) & 0x3ff;
 						int res_y = (yp + y_i) << m_tsp.spr_mg;
 
 						const u32 data_offset = ((spda + spr_count) & 0xffff) / 2;

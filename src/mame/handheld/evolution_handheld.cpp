@@ -125,6 +125,12 @@ ROM_START( hoppech )
 	ROM_LOAD( "25l128.u3", 0x000000, 0x1000000, CRC(4a983ab2) SHA1(d5571cf0f3fcf872826a2ff8b45be69336b117dd) )
 ROM_END
 
+ROM_START( udrive )
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	ROM_LOAD( "udrive.u3", 0x000000, 0x800000, CRC(c7fd123f) SHA1(8b315e594f7bf99544f323e517ccdebf2b1ac8a7) )
+ROM_END
+
+
 void evolution_handheldgame_state::init_yuleyuan()
 {
 	u16 *spi = &memregion("maincpu")->as_u16();
@@ -154,3 +160,7 @@ CONS( 201?, hoppech,     0,       0,      evolhh, evolhh, evolution_handheldgame
 
 // 星座电子宠物机 (virtual pet by 育乐元)
 CONS( 2022, yuleyuan,    0,       0,      evolhh, evolhh, evolution_handheldgame_state, init_yuleyuan, "Yule Yuan", "Xingzuo Dianzi Chongwu Ji", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // dumped from yellow model
+
+// this uses TV output, rather than being a handheld
+// SONIX SNT110FG SoC, test mode shows '4941' as checksum
+CONS( 201?, udrive,     0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "MGA", "Little Tikes Cozy Coupe U-Drive", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

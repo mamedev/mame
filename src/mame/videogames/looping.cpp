@@ -96,6 +96,14 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "tilemap.h"
 
 
+#define LOG_IRQ   (1 << 1U)
+#define LOG_SOUND (2 << 1U)
+
+//#define VERBOSE (LOG_IRQ|LOG_SOUND)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
+
 namespace {
 
 
@@ -137,7 +145,7 @@ private:
 	void flip_screen_y_w(int state);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
-	void level2_irq_set(int state);
+	void level2_irq_en(int state);
 	void main_irq_ack_w(int state);
 	void souint_clr(int state);
 	void balloon_enable_w(int state);
@@ -151,8 +159,9 @@ private:
 	void cop_d_w(uint8_t data);
 	void cop_l_w(uint8_t data);
 	uint8_t protection_r(offs_t offset);
-	[[maybe_unused]] void spcint(int state);
-	void int_update(int state);
+	void souint(int state);
+	void spcint(int state);
+	void int_update();
 	void sound_sw(uint8_t data);
 	void ay_enable_w(int state);
 	void speech_enable_w(int state);
@@ -169,7 +178,7 @@ private:
 
 	// devices
 	required_device<tms9995_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<tms9980a_device> m_audiocpu;
 	required_device<ay8910_device> m_aysnd;
 	required_device<tms5220_device> m_tms;
 	required_device<dac_byte_interface> m_dac;
@@ -184,6 +193,7 @@ private:
 
 	tilemap_t *m_bg_tilemap = nullptr;
 
+	bool m_irq_enable = false;
 	uint8_t m_cop_port_d = 0;
 	uint8_t m_cop_port_l = 0;
 	uint8_t m_cop_latch = 0;
@@ -358,6 +368,7 @@ uint32_t looping_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 void looping_state::machine_start()
 {
+	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_cop_port_d));
 	save_item(NAME(m_cop_port_l));
 	save_item(NAME(m_cop_latch));
@@ -370,6 +381,7 @@ void looping_state::machine_reset()
 	m_maincpu->ready_line(ASSERT_LINE);
 	m_maincpu->reset_line(ASSERT_LINE);
 
+	m_irq_enable = true;
 	m_cop_latch = ~0;
 	m_cop_address = ~0;
 }
@@ -383,15 +395,15 @@ void looping_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(looping_state::interrupt)
 {
-	m_maincpu->set_input_line(INT_9995_INT1, ASSERT_LINE);
+	if (m_irq_enable)
+		m_maincpu->set_input_line(INT_9995_INT1, ASSERT_LINE);
 }
 
 
-void looping_state::level2_irq_set(int state)
+void looping_state::level2_irq_en(int state)
 {
-	logerror("Level 2 int = %d\n", state);
-	if (state == 0)
-		m_maincpu->set_input_line(INT_9995_INT1, ASSERT_LINE);
+	LOGMASKED(LOG_IRQ, "Level 2 int enable = %d\n", state);
+	m_irq_enable = !state;
 }
 
 
@@ -404,34 +416,41 @@ void looping_state::main_irq_ack_w(int state)
 
 void looping_state::souint_clr(int state)
 {
-	logerror("Soundint clr = %d\n", state);
 	if (state == 0)
 		m_soundlatch->acknowledge_w();
 }
 
 
-void looping_state::spcint(int state)
+void looping_state::souint(int state)
 {
-	logerror("Speech /int = %d\n", state == ASSERT_LINE ? 1 : 0);
-	m_audiocpu->set_input_line(INT_9980A_LEVEL4, state == ASSERT_LINE ? CLEAR_LINE : ASSERT_LINE);
+	LOGMASKED(LOG_IRQ, "Sound /int = %d\n", state);
+	int_update();
 }
 
 
-void looping_state::int_update(int state)
+void looping_state::spcint(int state)
 {
-	// hack necessitated by flawed input logic in TMS9980A core
+	LOGMASKED(LOG_IRQ, "Speech /int = %d\n", state);
+	int_update();
+}
+
+
+void looping_state::int_update()
+{
+	// sound interrupt level through 74148 (TMS9980A interrupts are unconventional)
 	if (m_soundlatch->pending_r())
 		m_audiocpu->set_input_line(INT_9980A_LEVEL2, ASSERT_LINE);
 	else if (!m_tms->intq_r())
 		m_audiocpu->set_input_line(INT_9980A_LEVEL4, ASSERT_LINE);
 	else
-		m_audiocpu->set_input_line(INT_9980A_CLEAR, CLEAR_LINE);
+		m_audiocpu->set_input_line(INT_9980A_CLEAR, ASSERT_LINE);
 }
+
 
 
 /*************************************
  *
- *  Custom DAC handling
+ *  Sound controls
  *
  *************************************/
 
@@ -452,13 +471,6 @@ void looping_state::sound_sw(uint8_t data)
 }
 
 
-
-/*************************************
- *
- *  Sound controls
- *
- *************************************/
-
 void looping_state::ay_enable_w(int state)
 {
 	for (int output = 0; output < 3; output++)
@@ -474,7 +486,7 @@ void looping_state::speech_enable_w(int state)
 
 void looping_state::balloon_enable_w(int state)
 {
-	logerror("balloon_enable_w = %d\n", state);
+	LOGMASKED(LOG_SOUND, "balloon_enable_w = %d\n", state);
 }
 
 
@@ -589,9 +601,11 @@ void looping_state::sound_map(address_map &map)
 	map.global_mask(0x3fff);
 	map(0x0000, 0x37ff).rom();
 	map(0x3800, 0x3bff).ram();
+
 	map(0x3c00, 0x3c00).mirror(0x00f4).rw(m_aysnd, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0x3c01, 0x3c01).mirror(0x00f6).noprw();
 	map(0x3c02, 0x3c02).mirror(0x00f4).nopr().w(m_aysnd, FUNC(ay8910_device::data_w));
+
 	map(0x3e00, 0x3e00).mirror(0x00f4).nopr().w(m_tms, FUNC(tms5220_device::data_w));
 	map(0x3e01, 0x3e01).mirror(0x00f6).noprw();
 	map(0x3e02, 0x3e02).mirror(0x00f4).r(m_tms, FUNC(tms5220_device::status_r)).nopw();
@@ -599,8 +613,8 @@ void looping_state::sound_map(address_map &map)
 
 void looping_state::sound_io_map(address_map &map)
 {
-	map(0x0000, 0x000f).w("sen0", FUNC(ls259_device::write_d0));
-	map(0x0010, 0x001f).w("sen1", FUNC(ls259_device::write_d0));
+	map(0x0000, 0x000f).w("sen0", FUNC(ls259_device::write_d0)); // write_a0 according to schematics
+	map(0x0010, 0x001f).w("sen1", FUNC(ls259_device::write_d0)); // "
 }
 
 
@@ -679,7 +693,7 @@ void looping_state::looping(machine_config &config)
 	PALETTE(config, m_palette, FUNC(looping_state::palette_init), 32);
 
 	ls259_device &videolatch(LS259(config, "videolatch")); // E2 on video board
-	videolatch.q_out_cb<1>().set(FUNC(looping_state::level2_irq_set));
+	videolatch.q_out_cb<1>().set(FUNC(looping_state::level2_irq_en));
 	videolatch.q_out_cb<6>().set(FUNC(looping_state::flip_screen_x_w));
 	videolatch.q_out_cb<7>().set(FUNC(looping_state::flip_screen_y_w));
 
@@ -687,8 +701,7 @@ void looping_state::looping(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	//m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INT_9980A_LEVEL2);
-	m_soundlatch->data_pending_callback().set(FUNC(looping_state::int_update));
+	m_soundlatch->data_pending_callback().set(FUNC(looping_state::souint));
 	m_soundlatch->set_separate_acknowledge(true);
 
 	AY8910(config, m_aysnd, 8_MHz_XTAL / 4);
@@ -696,8 +709,7 @@ void looping_state::looping(machine_config &config)
 	m_aysnd->add_route(ALL_OUTPUTS, "speaker", 0.2);
 
 	TMS5220(config, m_tms, 640'000);
-	//m_tms->irq_cb().set(FUNC(looping_state::spcint));
-	m_tms->irq_cb().set(FUNC(looping_state::int_update));
+	m_tms->irq_cb().set(FUNC(looping_state::spcint));
 	m_tms->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
@@ -724,10 +736,10 @@ static INPUT_PORTS_START( looping )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Shoot")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Accelerate?")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 

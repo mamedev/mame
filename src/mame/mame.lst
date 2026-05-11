@@ -18251,6 +18251,9 @@ specd9
 specd9105g
 starball
 
+@source:excellent/es9606.cpp
+keirind2
+
 @source:excellent/gcpinbal.cpp
 gcpinbal
 pwrflip
@@ -19601,6 +19604,7 @@ pokesmqz
 pokexyqz
 smkatsum
 tomyspt
+udrive
 yuleyuan
 
 @source:handheld/gameking.cpp
@@ -20291,6 +20295,9 @@ rebel5
 rebel5a
 rebel5b
 
+@source:hegenerglaser/mm6.cpp
+mm6
+
 @source:hegenerglaser/modena.cpp
 modena
 modenaa
@@ -20959,10 +20966,12 @@ lucky8q
 lucky8r
 lucky8s
 lucky8t
+lucky8tet
 lucky8u
 lucky8v
 lucky8w
-lucky8tet
+lucky8x
+lucky8y
 luckybar
 luckylad
 magodds
@@ -21405,6 +21414,7 @@ ketarrs15
 ketarrs151
 ketb
 ketbl
+ketikd
 killbld
 killbld100
 killbld104
@@ -29029,6 +29039,9 @@ rfmpb
 rfmpbr2
 swe1pb
 
+@source:midway/predators.cpp
+predtors
+
 @source:midway/seattle.cpp
 biofreak
 blitz
@@ -34528,6 +34541,7 @@ dsabera
 dsaberj
 finalap2
 finalap2j
+finalap2jb
 finalap3
 finalap3a
 finalap3bl
@@ -36150,6 +36164,7 @@ micac250
 myaasa
 myaass
 mymman
+orb300
 retror30
 rminitv
 tvkunio1
@@ -36986,6 +37001,7 @@ zodiack
 
 @source:orla/hk1000.cpp
 hk1000
+se41
 
 @source:orla/xm200.cpp
 xm200
@@ -37096,6 +37112,7 @@ mspacmanbhe
 mspacmanbi
 mspacmanblt
 mspacmanblt2
+mspacmanblt3
 mspacmanbpl
 mspacmancr
 mspacmane
@@ -40566,6 +40583,7 @@ s10
 s220
 
 @source:roland/roland_s50.cpp
+s330
 s50
 s550
 w30
@@ -43145,7 +43163,7 @@ wizt
 wizta
 
 @source:sequential/prophet5.cpp
-prophet5rev30
+prophet5r30
 
 @source:sequential/prophet600.cpp
 prpht600
@@ -44054,6 +44072,7 @@ dynasty
 @source:skeleton/dyna_dc4000.cpp
 aladdin
 aladdina
+aladdinb
 cmast92
 cmast92a
 dynamj
@@ -44114,9 +44133,6 @@ waveterm
 
 @source:skeleton/extrema_m27sv.cpp
 multgmxl
-
-@source:skeleton/falconun.cpp
-falconun
 
 @source:skeleton/fanucs15.cpp
 fanucs15
@@ -44273,6 +44289,10 @@ kron180
 lanmao
 msaiche
 panda2
+pkzw
+tzwang
+whujiang
+whujijqb
 
 @source:skeleton/leadsinger2.cpp
 leadsng2
@@ -44476,6 +44496,9 @@ pm68k
 
 @source:skeleton/powerpack.cpp
 powerpack
+
+@source:skeleton/probowl.cpp
+probowl
 
 @source:skeleton/proteus3.cpp
 proteus3
@@ -46767,6 +46790,7 @@ drgnbowla
 gaiden
 mastninj
 raiga
+raigaa
 ryukendn
 ryukendna
 shadoww
@@ -47286,6 +47310,7 @@ tigerhb1
 tigerhb2
 tigerhb3
 tigerhb4
+tigerhbt
 tigerhj
 
 @source:toaplan/slapfght_ms.cpp
@@ -47662,6 +47687,7 @@ smartfp
 smartfpf
 smartfps
 tkmag220
+typo176
 
 @source:tvgames/generalplus_gpl16250_romram.cpp
 jak_pf
@@ -47826,6 +47852,7 @@ conyfght
 conyping
 conyteni
 easports
+easportsa
 easportsu
 jak_blue
 jak_bobb
@@ -48411,6 +48438,7 @@ panic
 panic2
 panic3
 panic4
+panicbl
 panicger
 panich
 
@@ -49153,6 +49181,7 @@ lucky74b
 lucky88w
 
 @source:wing/pinkiri8.cpp
+4jokers
 janmu
 janshi
 pinkiri8

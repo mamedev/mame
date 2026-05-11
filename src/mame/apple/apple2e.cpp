@@ -567,8 +567,11 @@ private:
 
 	u8 laser_motor_r(offs_t offset)
 	{
-		m_laser_fdc_on = (offset == 1);
-		laser_calc_speed();
+		if (!machine().side_effects_disabled())
+		{
+			m_laser_fdc_on = (offset == 1);
+			laser_calc_speed();
+		}
 		return m_iwm->read(offset + 8);
 	}
 
@@ -849,10 +852,14 @@ u8 apple2e_state::memexp_r(offs_t offset)
 		{
 			retval = 0xff;
 		}
-		m_exp_liveptr++;
-		m_exp_regs[0] = m_exp_liveptr & 0xff;
-		m_exp_regs[1] = (m_exp_liveptr>>8) & 0xff;
-		m_exp_regs[2] = ((m_exp_liveptr>>16) & 0xff) | m_exp_bankhior;
+
+		if (!machine().side_effects_disabled())
+		{
+			m_exp_liveptr++;
+			m_exp_regs[0] = m_exp_liveptr & 0xff;
+			m_exp_regs[1] = (m_exp_liveptr>>8) & 0xff;
+			m_exp_regs[2] = ((m_exp_liveptr>>16) & 0xff) | m_exp_bankhior;
+		}
 	}
 
 	return retval;
@@ -1525,7 +1532,7 @@ void apple2e_state::accel_normal_speed()
 
 void apple2e_state::accel_slot(int slot)
 {
-	if ((m_accel_present) && (m_accel_slotspk & (1<<slot)))
+	if ((m_accel_present) && (m_accel_slotspk & (1 << slot)) && !machine().side_effects_disabled())
 	{
 		m_accel_temp_slowdown = true;
 		m_acceltimer->adjust(attotime::from_msec(52));
@@ -2225,11 +2232,13 @@ u8 apple2e_state::c000_iic_r(offs_t offset)
 	switch (offset)
 	{
 		case 0x15:  // read & reset mouse X0 interrupt flag
-			lower_irq(IRQ_MOUSEXY);
+			if (!machine().side_effects_disabled())
+				lower_irq(IRQ_MOUSEXY);
 			return (m_xirq ? 0x80 : 0x00) | m_transchar;
 
 		case 0x17:  // read & reset mouse Y0 interrupt flag
-			lower_irq(IRQ_MOUSEXY);
+			if (!machine().side_effects_disabled())
+				lower_irq(IRQ_MOUSEXY);
 			return (m_yirq ? 0x80 : 0x00) | m_transchar;
 
 		case 0x19:  // read VBLINT (does not reset, see Apple IIc Technical Note #9)
@@ -2376,7 +2385,8 @@ TIMER_CALLBACK_MEMBER(apple2e_state::update_laserprn_strobe)
 
 void apple2e_state::c000_w(offs_t offset, u8 data)
 {
-	if(machine().side_effects_disabled()) return;
+	if (machine().side_effects_disabled())
+		return;
 
 	if ((offset & 0xf0) == 0x10) // clear keyboard latch, $C010 is really 10-1F
 	{
@@ -2781,10 +2791,7 @@ u8 apple2e_state::c080_r(offs_t offset)
 		}
 		else
 		{
-			if (m_accel_present)
-			{
-				accel_slot(slot);
-			}
+			accel_slot(slot);
 
 			if ((m_isiicplus) && (slot == 6))
 			{
@@ -2833,7 +2840,6 @@ void apple2e_state::c080_w(offs_t offset, u8 data)
 		}
 		else
 		{
-			//if ((m_iscec) && (slot == 3))
 			if ((m_iscec) && (!m_iscecm) && (slot == 3))
 			{
 				if (data != m_cec_bank)
@@ -3060,9 +3066,12 @@ u8 apple2e_state::ace500_c0bx_r(offs_t offset)
 		// Alt key status (0=pressed).  Reads as pressed for function keys.
 		case 0x4:
 			{
-				m_strobe = 0;
 				const u8 rv = m_franklin_strobe;
-				m_franklin_strobe = 0x80;
+				if (!machine().side_effects_disabled())
+				{
+					m_strobe = 0;
+					m_franklin_strobe = 0x80;
+				}
 				return rv;
 			}
 			break;
@@ -3183,14 +3192,11 @@ void apple2e_state::c800_w(offs_t offset, u8 data)
 		m_slotdevice[m_cnxx_slot]->write_c800(offset&0xfff, data);
 	}
 
-	if (offset == 0x7ff)
+	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		if (!machine().side_effects_disabled())
-		{
-			m_cnxx_slot = CNXX_UNCLAIMED;
-			m_intc8rom = false;
-			update_slotrom_banks();
-		}
+		m_cnxx_slot = CNXX_UNCLAIMED;
+		m_intc8rom = false;
+		update_slotrom_banks();
 	}
 }
 
