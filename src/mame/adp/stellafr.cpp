@@ -648,6 +648,12 @@ ROM_START( nunran )
 	ROM_LOAD16_BYTE( "nun_ran_f1_nr2.u6", 0x00001, 0x20000, CRC(2a7b9cf2) SHA1(bf30d41dd75b4d316f2f24d11886126484b10415) )
 ROM_END
 
+ROM_START( optmsw1 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "optimus_w1_i.u2", 0x00000, 0x20000, CRC(fd8c9e7a) SHA1(48848b1958ced9dd2c51679961d883eabbcfd558) )
+	ROM_LOAD16_BYTE( "optimus_w1_ii.u6", 0x00001, 0x20000, CRC(7017ac5d) SHA1(bfabccefc283e40fba53ed500e34d547fce9cf0b) )
+ROM_END
+
 ROM_START( suprdisc )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "super_disc_f2_pr1.bin", 0x00000, 0x10000, CRC(0e3d67f9) SHA1(19e081ac8e3f0d8d16f67be032ebc788dcb53b26) )
@@ -773,6 +779,7 @@ GAMEL(1997, multprim, 0,        sus_tk,  stellafr, stellafr_state, empty_init, R
 GAMEL(1997, mystjack, 0,        sus_rtc, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Mystery Jackpot",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, ndiscow1, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Nova",   "Disco (W1)",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, nunran,   0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Nun Ran",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1997, optmsw1,  0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Optimus (W1)",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, vlogo   , 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Logo (W1)",             MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, allfred,  0,        sus_rtc, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Allfred",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, cstliiw1, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Castello II (W1)",      MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
