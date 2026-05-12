@@ -375,8 +375,8 @@ void generalplus_gpl951xx_device::device_start()
 	save_item(NAME(m_memmode_wcmd));
 	save_item(NAME(m_spifc_rx_fifo));
 	save_item(NAME(m_spifc_rx_read_latch));
-	save_item(NAME(m_iof_dir));
-	save_item(NAME(m_iof_attrib));
+	save_item(NAME(m_io_dir));
+	save_item(NAME(m_io_attrib));
 }
 
 void generalplus_gpl951xx_device::device_reset()
@@ -399,8 +399,12 @@ void generalplus_gpl951xx_device::device_reset()
 	m_spifc_rx_read_latch = 0;
 	m_memmode_wcmd = 0;
 	m_spi_bank = 0;
-	m_iof_dir = 0;
-	m_iof_attrib = 0;
+
+	for (int i = 0; i < 6; i++)
+	{
+		m_io_dir[i] = 0;
+		m_io_attrib[i] = 0;
+	}
 
 	for (int i = 0; i < 16 * 2; i++)
 		m_spifc_rx_fifo[i] = 0;
@@ -718,41 +722,115 @@ TIMER_DEVICE_CALLBACK_MEMBER(generalplus_gpl951xx_device::timer_f_cb)
 }
 
 
-u16 generalplus_gpl951xx_device::iof_buffer_r()
+template<int Port>
+u16 generalplus_gpl951xx_device::gp951xx_io_data_r()
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::iof_buffer_r\n", machine().describe_context());
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::gp951xx_io_%s_data_r\n", machine().describe_context(), m_portnames[Port]);
+	return m_port_in[Port]();
+}
+
+template<int Port>
+void generalplus_gpl951xx_device::gp951xx_io_data_w(u16 data)
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::gp951xx_io_%s_data_w %04x\n", machine().describe_context(), m_portnames[Port], data);
+	m_port_out[Port](data);
+}
+
+template<int Port>
+u16 generalplus_gpl951xx_device::gp951xx_io_buffer_r()
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::gp951xx_io_%s_buffer_r\n", machine().describe_context(), m_portnames[Port]);
+	return m_port_in[Port]();
+}
+
+template<int Port>
+void generalplus_gpl951xx_device::gp951xx_io_buffer_w(u16 data)
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::gp951xx_io_%s_buffer_w %04x\n", machine().describe_context(), m_portnames[Port], data);
+	m_port_out[Port](data);
+}
+
+template<int Port>
+u16 generalplus_gpl951xx_device::gp951xx_io_dir_r()
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::gp951xx_io_%s_dir_r\n", machine().describe_context(), m_portnames[Port]);
+	return m_io_dir[Port];
+}
+
+template<int Port>
+void generalplus_gpl951xx_device::gp951xx_io_dir_w(u16 data)
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::gp951xx_io_%s_dir_w %04x\n", machine().describe_context(), m_portnames[Port], data);
+	m_io_dir[Port] = data;
+}
+
+template<int Port>
+u16 generalplus_gpl951xx_device::gp951xx_io_attrib_r()
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::gp951xx_io_%s_attrib_r\n", machine().describe_context(), m_portnames[Port]);
+	return m_io_attrib[Port];
+}
+
+template<int Port>
+void generalplus_gpl951xx_device::gp951xx_io_attrib_w(u16 data)
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::gp951xx_io_%s_attrib_w %04x\n", machine().describe_context(), m_portnames[Port], data);
+	m_io_attrib[Port] = data;
+}
+
+template<int Port>
+u16 generalplus_gpl951xx_device::gp951xx_io_drv_r()
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::gp951xx_io_%s_drv_r\n", machine().describe_context(), m_portnames[Port]);
 	return 0xffff;
 }
 
-void generalplus_gpl951xx_device::iof_buffer_w(u16 data)
+template<int Port>
+void generalplus_gpl951xx_device::gp951xx_io_drv_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::iof_buffer_w %04x\n", machine().describe_context(), data);
-	//m_portf_out(data);
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::gp951xx_io_%s_drv_w %04x\n", machine().describe_context(), m_portnames[Port], data);
 }
 
-u16 generalplus_gpl951xx_device::iof_dir_r()
+template<int Port>
+u16 generalplus_gpl951xx_device::gp951xx_io_mux_r()
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::iof_dir_r\n", machine().describe_context());
-	return m_iof_dir;
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::gp951xx_io_%s_mux_r\n", machine().describe_context(), m_portnames[Port]);
+	return 0xffff;
 }
 
-void generalplus_gpl951xx_device::iof_dir_w(u16 data)
+template<int Port>
+void generalplus_gpl951xx_device::gp951xx_io_mux_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::iof_dir_w %04x\n", machine().describe_context(), data);
-	m_iof_dir = data;
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::gp951xx_io_%s_mux_w %04x\n", machine().describe_context(), m_portnames[Port], data);
 }
 
-u16 generalplus_gpl951xx_device::iof_attrib_r()
+template<int Port>
+u16 generalplus_gpl951xx_device::gp951xx_io_latch_r()
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::iof_attrib_r\n", machine().describe_context());
-	return m_iof_attrib;
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::gp951xx_io_%s_latch_r\n", machine().describe_context(), m_portnames[Port]);
+	return 0xffff;
 }
 
-void generalplus_gpl951xx_device::iof_attrib_w(u16 data)
+template<int Port>
+void generalplus_gpl951xx_device::gp951xx_io_latch_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::iof_attrib_w %04x\n", machine().describe_context(), data);
-	m_iof_attrib = data;
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::gp951xx_io_%s_latch_w %04x\n", machine().describe_context(), m_portnames[Port], data);
 }
+
+template<int Port>
+u16 generalplus_gpl951xx_device::gp951xx_io_keyen_r()
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::gp951xx_io_%s_keyen_r\n", machine().describe_context(), m_portnames[Port]);
+	return 0xffff;
+}
+
+template<int Port>
+void generalplus_gpl951xx_device::gp951xx_io_keyen_w(u16 data)
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::gp951xx_io_%s_keyen_w %04x\n", machine().describe_context(), m_portnames[Port], data);
+}
+
+
 
 u16 generalplus_gpl951xx_device::spi_direct_r(offs_t offset)
 {
@@ -780,6 +858,19 @@ u16 generalplus_gpl951xx_device::spi_direct_bank_r(offs_t offset)
 	u16 ret = (m_spiregion[((offset * 2) + 0) & (m_spisize-1)]) | (m_spiregion[((offset * 2) + 1) & (m_spisize-1)] << 8);
 	return ret;
 
+}
+
+template<int Port>
+void generalplus_gpl951xx_device::add_port(address_map &map, u32 base)
+{
+	map(base + 0x0, base + 0x0).rw(FUNC(generalplus_gpl951xx_device::gp951xx_io_data_r<Port>), FUNC(generalplus_gpl951xx_device::gp951xx_io_data_w<Port>));
+	map(base + 0x1, base + 0x1).rw(FUNC(generalplus_gpl951xx_device::gp951xx_io_buffer_r<Port>), FUNC(generalplus_gpl951xx_device::gp951xx_io_buffer_w<Port>));
+	map(base + 0x2, base + 0x2).rw(FUNC(generalplus_gpl951xx_device::gp951xx_io_dir_r<Port>), FUNC(generalplus_gpl951xx_device::gp951xx_io_dir_w<Port>));
+	map(base + 0x3, base + 0x3).rw(FUNC(generalplus_gpl951xx_device::gp951xx_io_attrib_r<Port>), FUNC(generalplus_gpl951xx_device::gp951xx_io_attrib_w<Port>));
+	map(base + 0x4, base + 0x4).rw(FUNC(generalplus_gpl951xx_device::gp951xx_io_drv_r<Port>), FUNC(generalplus_gpl951xx_device::gp951xx_io_drv_w<Port>));
+	map(base + 0x5, base + 0x5).rw(FUNC(generalplus_gpl951xx_device::gp951xx_io_mux_r<Port>), FUNC(generalplus_gpl951xx_device::gp951xx_io_mux_w<Port>));
+	map(base + 0x6, base + 0x6).rw(FUNC(generalplus_gpl951xx_device::gp951xx_io_latch_r<Port>), FUNC(generalplus_gpl951xx_device::gp951xx_io_latch_w<Port>));
+	map(base + 0x7, base + 0x7).rw(FUNC(generalplus_gpl951xx_device::gp951xx_io_keyen_r<Port>), FUNC(generalplus_gpl951xx_device::gp951xx_io_keyen_w<Port>));
 }
 
 void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map &map)
@@ -957,57 +1048,12 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map &map)
 	// Ports addresses on GPL951xx have more logical arrangement compared to GPL162xx
 	// and there is an additional 'Port F'
 
-	map(0x007860, 0x007860).rw(FUNC(generalplus_gpl951xx_device::ioa_data_r), FUNC(generalplus_gpl951xx_device::ioa_data_w));                     // 7860 - IOA_Data
-	map(0x007861, 0x007861).rw(FUNC(generalplus_gpl951xx_device::ioa_buffer_r), FUNC(generalplus_gpl951xx_device::ioa_buffer_w));       // 7861 - IOA_Buffer
-	map(0x007862, 0x007862).rw(FUNC(generalplus_gpl951xx_device::ioa_dir_r), FUNC(generalplus_gpl951xx_device::ioa_dir_w)); // 7862 - IOA_Dir
-	map(0x007863, 0x007863).rw(FUNC(generalplus_gpl951xx_device::ioa_attrib_r), FUNC(generalplus_gpl951xx_device::ioa_attrib_w)); // 7863 - IOA_Attrib
-	// 7864 - IOA_Drv
-	// 7865 - IOA_Mux
-	// 7866 - IOA_Latch
-	// 7867 - IOA_KeyEN
-
-	map(0x007868, 0x007868).rw(FUNC(generalplus_gpl951xx_device::iob_data_r), FUNC(generalplus_gpl951xx_device::iob_data_w));                     // 7868 - IOB_Data
-	map(0x007869, 0x007869).rw(FUNC(generalplus_gpl951xx_device::iob_buffer_r), FUNC(generalplus_gpl951xx_device::iob_buffer_w));       // 7869 - IOB_Buffer
-	map(0x00786a, 0x00786a).rw(FUNC(generalplus_gpl951xx_device::iob_dir_r), FUNC(generalplus_gpl951xx_device::iob_dir_w)); // 786a - IOB_Dir
-	map(0x00786b, 0x00786b).rw(FUNC(generalplus_gpl951xx_device::iob_attrib_r), FUNC(generalplus_gpl951xx_device::iob_attrib_w)); // 786b - IOB_Attrib
-	// 786c - IOB_Drv
-	// 786d - IOB_Mux
-	// 786e - IOB_Latch
-	// 786f - IOB_KeyEN
-
-	map(0x007870, 0x007870).rw(FUNC(generalplus_gpl951xx_device::ioc_data_r) ,FUNC(generalplus_gpl951xx_device::ioc_data_w));                     // 7870 - IOC_Data
-	map(0x007871, 0x007871).rw(FUNC(generalplus_gpl951xx_device::ioc_buffer_r), FUNC(generalplus_gpl951xx_device::ioc_buffer_w));       // 7871 - IOC_Buffer
-	map(0x007872, 0x007872).rw(FUNC(generalplus_gpl951xx_device::ioc_dir_r), FUNC(generalplus_gpl951xx_device::ioc_dir_w)); // 7872 - IOC_Dir
-	map(0x007873, 0x007873).rw(FUNC(generalplus_gpl951xx_device::ioc_attrib_r), FUNC(generalplus_gpl951xx_device::ioc_attrib_w)); // 7873 - IOC_Attrib
-	// 7874 - IOC_Drv
-	// 7875 - IOC_Mux
-	// 7876 - IOC_Latch
-	// 7877 - IOC_KeyEN
-
-	map(0x007878, 0x007878).rw(FUNC(generalplus_gpl951xx_device::iod_data_r) ,FUNC(generalplus_gpl951xx_device::iod_data_w));                     // 7878 - IOD_Data
-	map(0x007879, 0x007879).rw(FUNC(generalplus_gpl951xx_device::iod_buffer_r), FUNC(generalplus_gpl951xx_device::iod_buffer_w));       // 7879 - IOD_Buffer
-	map(0x00787a, 0x00787a).rw(FUNC(generalplus_gpl951xx_device::iod_dir_r), FUNC(generalplus_gpl951xx_device::iod_dir_w)); // 787a - IOD_Dir
-	map(0x00787b, 0x00787b).rw(FUNC(generalplus_gpl951xx_device::iod_attib_r), FUNC(generalplus_gpl951xx_device::iod_attib_w)); // 787b - IOD_Attrib
-	map(0x00787c, 0x00787c).rw(FUNC(generalplus_gpl951xx_device::iod_drv_r), FUNC(generalplus_gpl951xx_device::iod_drv_w)); // 787c - IOD_Drv
-	map(0x00787d, 0x00787d).rw(FUNC(generalplus_gpl951xx_device::iod_mux_r), FUNC(generalplus_gpl951xx_device::iod_mux_w)); // 787d - IOD_Mux
-
-	// 7880 - IOE_Data
-	map(0x007881, 0x007881).rw(FUNC(generalplus_gpl951xx_device::ioe_buffer_r), FUNC(generalplus_gpl951xx_device::ioe_buffer_w)); // 7881 - IOE_Buffer
-	map(0x007882, 0x007882).rw(FUNC(generalplus_gpl951xx_device::ioe_dir_r), FUNC(generalplus_gpl951xx_device::ioe_dir_w)); // 7882 - IOE_Dir
-	map(0x007883, 0x007883).rw(FUNC(generalplus_gpl951xx_device::ioe_attrib_r), FUNC(generalplus_gpl951xx_device::ioe_attrib_w)); // 7883 - IOE_Attrib
-	// 7884 - IOE_Drv
-	// 7885 - IOE_Mux
-	// 7886 - IOE_Latch
-	// 7877 - IOE_KeyEN
-
-	// 7888 - IOF_Data
-	map(0x007889, 0x007889).rw(FUNC(generalplus_gpl951xx_device::iof_buffer_r), FUNC(generalplus_gpl951xx_device::iof_buffer_w)); // 7889 - IOF_Buffer
-	map(0x00788a, 0x00788a).rw(FUNC(generalplus_gpl951xx_device::iof_dir_r), FUNC(generalplus_gpl951xx_device::iof_dir_w)); // 788a - IOF_Dir
-	map(0x00788b, 0x00788b).rw(FUNC(generalplus_gpl951xx_device::iof_attrib_r), FUNC(generalplus_gpl951xx_device::iof_attrib_w)); // 788b - IOF_Attrib
-	// 788c - IOF_Drv
-	// 788d - IOF_Mux
-	// 788e - IOF_Latch
-	// 788f - IOF_KeyEN
+	add_port<0>(map, 0x007860); // 0x7860 - 0x7867 - Port A
+	add_port<1>(map, 0x007868); // 0x7868 - 0x786f - Port B
+	add_port<2>(map, 0x007870); // 0x7870 - 0x7877 - Port C
+	add_port<3>(map, 0x007878); // 0x7878 - 0x787f - Port D
+	add_port<4>(map, 0x007880); // 0x7880 - 0x7887 - Port E
+	add_port<5>(map, 0x007888); // 0x7888 - 0x788f - Port F
 
 	map(0x0078a0, 0x0078a0).rw(FUNC(generalplus_gpl951xx_device::int_status1_r), FUNC(generalplus_gpl951xx_device::int_status1_w)); // 78a0 - INT_Status1
 	map(0x0078a1, 0x0078a1).rw(FUNC(generalplus_gpl951xx_device::int_status2_r), FUNC(generalplus_gpl951xx_device::int_status2_w)); // 78a1 - INT_Status2
@@ -1322,6 +1368,8 @@ generalplus_gpl951xx_device::generalplus_gpl951xx_device(const machine_config &m
 	m_spi_reset(*this),
 	m_i80_cmd_out(*this),
 	m_i80_data_out(*this),
+	m_port_in(*this, 0),
+	m_port_out(*this),
 	m_timer_g(*this, "timer_g"),
 	m_timer_h(*this, "timer_h"),
 	m_rtc(*this, "rtc")

@@ -36,6 +36,19 @@ public:
 	auto i80_cmd_out() { return m_i80_cmd_out.bind(); }
 	auto i80_data_out() { return m_i80_data_out.bind(); }
 
+	auto gp95_porta_in() { return m_port_in[0].bind(); }
+	auto gp95_portb_in() { return m_port_in[1].bind(); }
+	auto gp95_portc_in() { return m_port_in[2].bind(); }
+	auto gp95_portd_in() { return m_port_in[3].bind(); }
+	auto gp95_porte_in() { return m_port_in[4].bind(); }
+	auto gp95_portf_in() { return m_port_in[5].bind(); }
+
+	auto gp95_porta_out() { return m_port_out[0].bind(); }
+	auto gp95_portb_out() { return m_port_out[1].bind(); }
+	auto gp95_portc_out() { return m_port_out[2].bind(); }
+	auto gp95_portd_out() { return m_port_out[3].bind(); }
+	auto gp95_porte_out() { return m_port_out[4].bind(); }
+	auto gp95_portf_out() { return m_port_out[5].bind(); }
 
 	void recieve_spi_fifo_data(u8 data);
 
@@ -43,6 +56,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void gpspi_direct_internal_map(address_map &map) ATTR_COLD;
+	template<int Port> void add_port(address_map& map, u32 base) ATTR_COLD;
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -99,12 +113,24 @@ private:
 	u16 gpl951xx_timerh_preload_r();
 	void gpl951xx_timerh_preload_w(u16 data);
 
-	u16 iof_buffer_r();
-	void iof_buffer_w(u16 data);
-	u16 iof_dir_r();
-	void iof_dir_w(u16 data);
-	u16 iof_attrib_r();
-	void iof_attrib_w(u16 data);
+	static constexpr std::string m_portnames[6] = { "a", "b", "c", "d", "e", "f" };
+
+	template<int Port> u16 gp951xx_io_data_r();
+	template<int Port> void gp951xx_io_data_w(u16 data);
+	template<int Port> u16 gp951xx_io_buffer_r();
+	template<int Port> void gp951xx_io_buffer_w(u16 data);
+	template<int Port> u16 gp951xx_io_dir_r();
+	template<int Port> void gp951xx_io_dir_w(u16 data);
+	template<int Port> u16 gp951xx_io_attrib_r();
+	template<int Port> void gp951xx_io_attrib_w(u16 data);
+	template<int Port> u16 gp951xx_io_drv_r();
+	template<int Port> void gp951xx_io_drv_w(u16 data);
+	template<int Port> u16 gp951xx_io_mux_r();
+	template<int Port> void gp951xx_io_mux_w(u16 data);
+	template<int Port> u16 gp951xx_io_latch_r();
+	template<int Port> void gp951xx_io_latch_w(u16 data);
+	template<int Port> u16 gp951xx_io_keyen_r();
+	template<int Port> void gp951xx_io_keyen_w(u16 data);
 
 	u16 spi_bank_r();
 	void spi_bank_w(u16 data);
@@ -148,8 +174,8 @@ private:
 	u8 m_spifc_rx_fifo[16 * 2];
 	u16 m_spifc_rx_read_latch;
 
-	u16 m_iof_dir;
-	u16 m_iof_attrib;
+	u16 m_io_dir[6];
+	u16 m_io_attrib[6];
 
 	u16 m_spi_bank;
 
@@ -166,6 +192,8 @@ private:
 	devcb_write16 m_i80_cmd_out;
 	devcb_write16 m_i80_data_out;
 
+	devcb_read16::array<6> m_port_in;
+	devcb_write16::array<6> m_port_out;
 
 	// devices
 	required_device<timer_device> m_timer_g;
