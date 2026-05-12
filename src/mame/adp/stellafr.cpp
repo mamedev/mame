@@ -684,6 +684,12 @@ ROM_START( viva )
 	ROM_LOAD16_BYTE( "viva_f1_ii.u6", 0x00001, 0x20000, CRC(da0fab3b) SHA1(ef13ea163c60253e88d200c68a25fe7e4a56a657) )
 ROM_END
 
+ROM_START( vlogo )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "logo_i.u2", 0x00000, 0x20000, CRC(01ee7a33) SHA1(1976faa9ed7dfbfe46914fa656ba61182bb0b6c1) )
+	ROM_LOAD16_BYTE( "logo_ii.u6", 0x00001, 0x20000, CRC(14f939e5) SHA1(9161c49ebfa9005f6b710c91f1e66eab52c58ed2) )
+ROM_END
+
 ROM_START( vulkanf2 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "vulkan_f2_i.u2", 0x00000, 0x10000, CRC(9b20a948) SHA1(221ae3604752a1db7e73a00d11a90d8b2b242264) )
@@ -733,12 +739,13 @@ GAMEL(1997, dpplson,  0,        sus_tk,  stellafr, stellafr_state, empty_init, R
 GAMEL(1997, gjubil,   0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Golden Jubilar",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, jkrpoker, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Joker Poker (Merkur)",  MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, jumboa,   0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Jumbo Action",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1997, kometf1,  0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Komet (F1)"             MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1997, kometf1,  0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Komet (F1)",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, moneyf1,  0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Money (F1)",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, multprim, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Multi Prima",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, mystjack, 0,        sus_rtc, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Mystery Jackpot",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, ndiscow1, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Nova",   "Disco (W1)",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, nunran,   0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Nun Ran",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1997, vlogo   , 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Logo (W1)",             MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, allfred,  0,        sus_rtc, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Allfred",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, cstliiw1, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Castello II (W1)",      MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, glksstrn, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    u8"Glücks-Stern",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
