@@ -6,7 +6,7 @@
 
 // probably some kind of STxxxx LCDC, but support for 320+ resolutions
 
-DEFINE_DEVICE_TYPE(UNKNOWN_BFTETRIS_LCDC, bftetris_lcdc_device, "st7735", "Sitronix UNKNOWN_BFTETRIS_LCDC LCD Controller")
+DEFINE_DEVICE_TYPE(UNKNOWN_BFTETRIS_LCDC, bftetris_lcdc_device, "bftetris_lcdc", "Unknown STxxxx LCDC (bftetris)")
 
 bftetris_lcdc_device::bftetris_lcdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, UNKNOWN_BFTETRIS_LCDC, tag, owner, clock)

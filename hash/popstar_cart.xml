@@ -5,7 +5,7 @@ license:CC0-1.0
 -->
 <softwarelist name="popstar_cart" description="Cartridges compatible with Popstar Karaoke">
 
-	<software name="5songs"> <!-- this was the pack-in cart -->
+	<software name="5songs" supported="no"> <!-- this was the pack-in cart -->
 		<description>Popstar Karaoke - 5 Songs</description>
 		<year>2002</year>
 		<publisher>unknown</publisher>
@@ -16,7 +16,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="popstar1">
+	<software name="popstar1" supported="no">
 		<description>Popstar Karaoke Vol. 1</description>
 		<year>2002</year>
 		<publisher>unknown</publisher>
@@ -28,7 +28,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="popstar2">
+	<software name="popstar2" supported="no">
 		<description>Popstar Karaoke Vol. 2</description>
 		<year>2002</year>
 		<publisher>unknown</publisher>
