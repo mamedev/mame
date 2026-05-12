@@ -366,11 +366,11 @@ void news_68k_laptop_state::machine_start()
 	news_68k_base_state::machine_start();
 	m_timer = timer_alloc(FUNC(news_68k_laptop_state::timer), this);
 
-	save_item(NAME(m_lcd_enable));
-	save_item(NAME(m_timer_rate));
-
 	m_lcd_enable = false;
 	m_timer_rate = 0;
+
+	save_item(NAME(m_lcd_enable));
+	save_item(NAME(m_timer_rate));
 }
 
 void news_68k_desktop_state::machine_reset()
