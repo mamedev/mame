@@ -197,11 +197,9 @@ void generalplus_gpl951xx_game_state::gpl951xx(machine_config &config)
 	m_maincpu->gp95_portb_in().set(FUNC(generalplus_gpl951xx_game_state::portb_r));
 	m_maincpu->gp95_portc_in().set(FUNC(generalplus_gpl951xx_game_state::portc_r));
 	m_maincpu->gp95_porta_out().set(FUNC(generalplus_gpl951xx_game_state::porta_w));
-	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
+	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(generalplus_gpl951xx_device::irq_vector_cb));
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
-	m_maincpu->set_bootmode(0);
-	m_maincpu->set_cs_space(DEVICE_SELF, 0);
 	m_maincpu->spi_out().set(FUNC(generalplus_gpl951xx_game_state::spi_access_from_soc));
 	m_maincpu->spi_out_cmd().set(FUNC(generalplus_gpl951xx_game_state::spi_cmd_access_from_soc));
 	m_maincpu->spi_reset().set(FUNC(generalplus_gpl951xx_game_state::spi_reset));
@@ -212,9 +210,9 @@ void generalplus_gpl951xx_game_state::gpl951xx(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320*2, 262*2);
 	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
-	m_screen->set_screen_update("maincpu", FUNC(sunplus_gcm394_device::screen_update));
+	m_screen->set_screen_update("maincpu", FUNC(generalplus_gpl951xx_device::screen_update));
 
-	m_screen->screen_vblank().set(m_maincpu, FUNC(sunplus_gcm394_device::vblank));
+	m_screen->screen_vblank().set(m_maincpu, FUNC(generalplus_gpl951xx_device::vblank));
 
 	UNKNOWN_BFTETRIS_LCDC(config, m_lcdc, 0);
 

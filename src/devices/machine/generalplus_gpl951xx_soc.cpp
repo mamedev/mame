@@ -356,7 +356,8 @@ void generalplus_gpl951xx_device::byte_swap_w(u16 data)
 
 void generalplus_gpl951xx_device::device_start()
 {
-	sunplus_gcm394_base_device::device_start();
+	unsp_20_device::device_start();
+
 	save_item(NAME(m_byteswap));
 	save_item(NAME(m_gpl951xx_timerg_ctrl));
 	save_item(NAME(m_gpl951xx_timerg_preload));
@@ -385,11 +386,14 @@ void generalplus_gpl951xx_device::device_start()
 	save_item(NAME(m_gp95_int_priority_3));
 	save_item(NAME(m_gp95_misc_int_ctrl));
 	save_item(NAME(m_gp95_cha_ctrl));
+	save_item(NAME(m_pllchange));
 }
 
 void generalplus_gpl951xx_device::device_reset()
 {
-	sunplus_gcm394_base_device::device_reset();
+	unsp_20_device::device_reset();
+	m_spg_video->reset();
+
 	m_byteswap = 0;
 	m_gpl951xx_timerg_ctrl = 0;
 	m_gpl951xx_timerg_preload = 0;
@@ -415,6 +419,7 @@ void generalplus_gpl951xx_device::device_reset()
 	m_gp95_int_priority_3 = 0;
 	m_gp95_misc_int_ctrl = 0;
 	m_gp95_cha_ctrl = 0;
+	m_pllchange = 0;
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -1519,9 +1524,63 @@ TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpl951xx_device::timer_h_cb )
 	update_interrupts(1);
 }
 
+u16 generalplus_gpl951xx_device::read_space(offs_t offset)
+{
+	address_space &space = this->space(AS_PROGRAM);
+	u16 val = space.read_word(offset);
+	return val;
+}
+
+void generalplus_gpl951xx_device::write_space(offs_t offset, u16 data)
+{
+	address_space &space = this->space(AS_PROGRAM);
+	space.write_word(offset, data);
+}
+
+IRQ_CALLBACK_MEMBER(generalplus_gpl951xx_device::irq_vector_cb)
+{
+	if (irqline == UNSP_IRQ4_LINE)
+		set_state_unsynced(UNSP_IRQ4_LINE, CLEAR_LINE);
+
+	return 0;
+}
+
+void generalplus_gpl951xx_device::audioirq_w(int state)
+{
+	//set_state_unsynced(UNSP_IRQ5_LINE, state);
+}
+
+void generalplus_gpl951xx_device::videoirq_w(int state)
+{
+	set_state_unsynced(UNSP_IRQ5_LINE, state);
+}
+
 void generalplus_gpl951xx_device::device_add_mconfig(machine_config &config)
 {
-	sunplus_gcm394_base_device::device_add_mconfig(config);
+	SUNPLUS_GCM394_AUDIO(config, m_spg_audio, DERIVED_CLOCK(1, 1));
+	m_spg_audio->write_irq_callback().set(FUNC(generalplus_gpl951xx_device::audioirq_w));
+	m_spg_audio->space_read_callback().set(FUNC(generalplus_gpl951xx_device::read_space));
+	m_spg_audio->add_route(0, *this, 1.0, 0);
+	m_spg_audio->add_route(1, *this, 1.0, 1);
+
+	GPL_DMA(config, m_gpl_dma, 0);
+	m_gpl_dma->space_read_callback().set(FUNC(generalplus_gpl951xx_device::read_space));
+	m_gpl_dma->space_write_callback().set(FUNC(generalplus_gpl951xx_device::write_space));
+
+	GPL_TIMEBASE(config, m_gpl_timebase, 0);
+	m_gpl_timebase->updateirqs_callback().set(FUNC(generalplus_gpl951xx_device::update_interrupts));	
+
+	GCM394_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), DEVICE_SELF, m_screen);
+	m_spg_video->write_video_irq_callback().set(FUNC(generalplus_gpl951xx_device::videoirq_w));
+	m_spg_video->space_read_callback().set(FUNC(generalplus_gpl951xx_device::read_space));
+	m_spg_video->set_video_space(DEVICE_SELF, AS_PROGRAM);
+
+	TIMER(config, "timer_a").configure_generic(FUNC(generalplus_gpl951xx_device::timer_a_cb));
+	TIMER(config, "timer_b").configure_generic(FUNC(generalplus_gpl951xx_device::timer_b_cb));
+	TIMER(config, "timer_c").configure_generic(FUNC(generalplus_gpl951xx_device::timer_c_cb));
+	TIMER(config, "timer_d").configure_generic(FUNC(generalplus_gpl951xx_device::timer_d_cb));
+	TIMER(config, "timer_e").configure_generic(FUNC(generalplus_gpl951xx_device::timer_e_cb));
+	TIMER(config, "timer_f").configure_generic(FUNC(generalplus_gpl951xx_device::timer_f_cb));
 
 	TIMER(config, "timer_g").configure_generic(FUNC(generalplus_gpl951xx_device::timer_g_cb));
 	TIMER(config, "timer_h").configure_generic(FUNC(generalplus_gpl951xx_device::timer_h_cb));
@@ -1531,8 +1590,9 @@ void generalplus_gpl951xx_device::device_add_mconfig(machine_config &config)
 
 DEFINE_DEVICE_TYPE(GPL951XX, generalplus_gpl951xx_device, "gpl951xx", "GeneralPlus GPL951xx")
 
-generalplus_gpl951xx_device::generalplus_gpl951xx_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	sunplus_gcm394_base_device(mconfig, GPL951XX, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpl951xx_device::gpspi_direct_internal_map), this)),
+generalplus_gpl951xx_device::generalplus_gpl951xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal) :
+	unsp_20_device(mconfig, type, tag, owner, clock, internal),
+	device_mixer_interface(mconfig, *this),
 	m_spi_out(*this),
 	m_spi_out_cmd(*this),
 	m_spi_reset(*this),
@@ -1542,7 +1602,18 @@ generalplus_gpl951xx_device::generalplus_gpl951xx_device(const machine_config &m
 	m_port_out(*this),
 	m_timer_g(*this, "timer_g"),
 	m_timer_h(*this, "timer_h"),
-	m_rtc(*this, "rtc")
+	m_rtc(*this, "rtc"),
+	m_gpl_dma(*this, "gpl_dma"),
+	m_gpl_timebase(*this, "gpl_timebase"),
+	m_screen(*this, finder_base::DUMMY_TAG),
+	m_spg_video(*this, "spgvideo"),
+	m_spg_audio(*this, "spgaudio"),
+	m_mainram(*this, "mainram")
+{
+}
+
+generalplus_gpl951xx_device::generalplus_gpl951xx_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	generalplus_gpl951xx_device(mconfig, GPL951XX, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpl951xx_device::gpspi_direct_internal_map), this))
 {
 }
 

@@ -6,13 +6,22 @@
 
 #pragma once
 
-#include "generalplus_gpl162xx_soc.h"
 
+
+#include "cpu/unsp/unsp.h"
 #include "machine/timer.h"
 
-#include "generalplus_gpl951xx_rtc.h"
+#include "screen.h"
+#include "emupal.h"
 
-class generalplus_gpl951xx_device : public sunplus_gcm394_base_device
+#include "generalplus_gpl_dma.h"
+#include "generalplus_gpl_timebase.h"
+#include "generalplus_gpl162xx_soc_video.h"
+#include "generalplus_gpl951xx_rtc.h"
+#include "spg2xx_audio.h"
+
+
+class generalplus_gpl951xx_device : public unsp_20_device, public device_mixer_interface
 {
 public:
 	template <typename T>
@@ -20,9 +29,6 @@ public:
 		generalplus_gpl951xx_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
-		//m_csbase = 0x30000;
-		// TODO: cs_space doesn't exist on this type, rework code that depends on it
-		m_csbase = 0xffffffff;
 	}
 
 	generalplus_gpl951xx_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -52,7 +58,13 @@ public:
 
 	void recieve_spi_fifo_data(u8 data);
 
+	IRQ_CALLBACK_MEMBER(irq_vector_cb);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return m_spg_video->screen_update(screen, bitmap, cliprect); }
+	void vblank(int state) { m_spg_video->vblank(state); }
+
 protected:
+	generalplus_gpl951xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal);
+
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void gpspi_direct_internal_map(address_map &map) ATTR_COLD;
@@ -172,17 +184,23 @@ private:
 	u16 gp95_cha_ctrl_r();
 	void gp95_cha_ctrl_w(u16 data);
 
-	virtual void update_interrupts(int state) override;
+	void update_interrupts(int state);
+
+	void audioirq_w(int state);
+	void videoirq_w(int state);
+
+	inline u16 read_space(offs_t offset);
+	inline void write_space(offs_t offset, u16 data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_g_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_h_cb);
 
-	virtual TIMER_DEVICE_CALLBACK_MEMBER(timer_a_cb) override;
-	virtual TIMER_DEVICE_CALLBACK_MEMBER(timer_b_cb) override;
-	virtual TIMER_DEVICE_CALLBACK_MEMBER(timer_c_cb) override;
-	virtual TIMER_DEVICE_CALLBACK_MEMBER(timer_d_cb) override;
-	virtual TIMER_DEVICE_CALLBACK_MEMBER(timer_e_cb) override;
-	virtual TIMER_DEVICE_CALLBACK_MEMBER(timer_f_cb) override;
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_a_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_b_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_c_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_e_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_f_cb);
 
 	u16 m_byteswap;
 
@@ -218,6 +236,8 @@ private:
 
 	u16 m_gp95_cha_ctrl;
 
+	u16 m_pllchange;
+
 	u16 m_spi_bank;
 
 	u16 m_memmode_wcmd;
@@ -240,6 +260,12 @@ private:
 	required_device<timer_device> m_timer_g;
 	required_device<timer_device> m_timer_h;
 	required_device<gpl951xx_rtc_device> m_rtc;
+	required_device<gpl_dma_device> m_gpl_dma;
+	required_device<gpl_timebase_device> m_gpl_timebase;
+	required_device<screen_device> m_screen;
+	required_device<gcm394_video_device> m_spg_video;
+	required_device<sunplus_gcm394_audio_device> m_spg_audio;
+	required_shared_ptr<u16> m_mainram;
 };
 
 DECLARE_DEVICE_TYPE(GPL951XX, generalplus_gpl951xx_device)

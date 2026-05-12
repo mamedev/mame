@@ -1714,10 +1714,6 @@ void sunplus_gcm394_base_device::device_reset()
 {
 	unsp_20_device::device_reset();
 
-
-
-	// 78xx unknown
-
 	m_dac_pga = 0x0000;
 	m_782d = 0x0000;
 
@@ -1763,8 +1759,6 @@ void sunplus_gcm394_base_device::device_reset()
 	m_misc_int_ctrl = 0x0000;
 
 	m_cha_ctrl = 0x0000;
-
-	// 79xx unknown
 
 	m_rtc_ctrl = 0x0000;
 	m_rtc_int_status = 0x0000;
