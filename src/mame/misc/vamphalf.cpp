@@ -612,6 +612,7 @@ void vamphalf_state::worldadv_io(address_map &map)
 	map(0x060, 0x060).w(FUNC(vamphalf_state::eeprom_w));
 	map(0x0a0, 0x0a0).portr("P1_P2");
 	map(0x0d0, 0x0d0).portr("SYSTEM");
+	map(0x160, 0x160).rw("fpga", FUNC(worldadv_fpga_prot_device::data_r), FUNC(worldadv_fpga_prot_device::seed_w));
 	map(0x190, 0x190).umask16(0x00ff).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x1c0, 0x1c0).umask16(0x00ff).w("ymsnd", FUNC(ym2151_device::address_w));
 	map(0x1c1, 0x1c1).umask16(0x00ff).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w));
@@ -1280,6 +1281,8 @@ void vamphalf_state::worldadv(machine_config &config)
 	common(config);
 
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_state::worldadv_io);
+
+	WORLDADV_FPGA_PROT(config, "fpga", 0);
 
 	sound_ym_oki(config);
 }

@@ -7,8 +7,10 @@ Mission Craft / Wivern Wings / World Adventure FPGA (x2) based protection device
 Filename is a misnomer, just to keep it near misc/vamphalf.cpp
 
 TODO:
-- fix wyvernwg (upper limit of credits count not really understood, if any);
-- verify and implement worldadv protection if it really uses this style (smells like it);
+- all games: emulate properly
+\- black boxing close to impossible without the PCB at hand if not straight decap of the FPGA ports;
+- wyvernwg: complete, upper limit of credits count not really understood, if there's any;
+- worldadv: understand if the second FPGA at $0a0 is really used;
 - Deduplicate stuff once everything works correctly;
 
 **************************************************************************************************/
@@ -17,7 +19,9 @@ TODO:
 #include "vamphalf_prot.h"
 
 /*
- * Mission Craft tests protection device on two places:
+ * Mission Craft
+ *
+ * Tests protection device on two places:
  * 1. at POST on $680 (PC=0xf81c)
  * 2. If check one is successful it attempts two new checks after about 15 minutes at $1a0 and $0d0,
  *    both seeds depends on number_of_credits % 3 inserted up to an arbitrary point in time
@@ -157,7 +161,8 @@ template void misncrft_fpga_prot_device::seed_w<16>(offs_t offset, u16 data);
 
 /*
  * Wywern Wings
- * tested with 16 words seed after ~1 hour
+ *
+ * Tested with 16 words seed after ~1 hour
  * Looks a similar pattern to Mission Craft except parallel instead of serial
  */
 
@@ -311,3 +316,105 @@ void wyvernwg_fpga_prot_device::seed_w(offs_t offset, u16 data)
 	}
 }
 
+/*
+ * World Adventure
+ *
+ * Accesses the protection device at ~30 minutes, then every 15 minutes up to 2 hours where
+ * it actually kicks in.
+ * Doesn't seem to be credit affected, it first do a dummy read (for flushing any previous read
+ * sequence?) then write a 0xffff then proceeds to write 33-bits of serial data that are read back
+ * as a 8-bit result.
+ * PC=c55a8 is where the return value comparison happens, more specifically:
+ * bp c55a8,1,{printf "%02x %02x",L3,L6}
+ *
+ * TODO: also access $0a0 I/O after the 2 hours mark (write only? left-over? Extra protection?)
+ * Game has been run for 5 hours straight without any visible issue ...
+ */
+
+ DEFINE_DEVICE_TYPE(WORLDADV_FPGA_PROT, worldadv_fpga_prot_device, "worldadv_fpga_prot", "World Adventure FPGA protection chips")
+
+worldadv_fpga_prot_device::worldadv_fpga_prot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, WORLDADV_FPGA_PROT, tag, owner, clock)
+{
+}
+
+void worldadv_fpga_prot_device::device_start()
+{
+	save_item(NAME(m_read_idx));
+	save_item(NAME(m_write_idx));
+	save_item(NAME(m_seed));
+	save_item(NAME(m_retval));
+}
+
+void worldadv_fpga_prot_device::device_reset()
+{
+	m_read_idx = 0;
+	m_write_idx = 0;
+	m_is_armed = false;
+}
+
+u16 worldadv_fpga_prot_device::data_r(offs_t offset)
+{
+	if (!m_is_armed)
+		return 0;
+
+	u8 retval = (m_retval >> (7 - m_read_idx)) & 1;
+	if (!machine().side_effects_disabled())
+	{
+		m_read_idx ++;
+		if (m_read_idx > 7)
+		{
+			m_is_armed = false;
+		}
+	}
+	return retval ? 0xffff : 0;
+}
+
+void worldadv_fpga_prot_device::seed_w(offs_t offset, u16 data)
+{
+	// bit 15 may just reset while bit 0 is data write
+	if (data == 0xffff)
+	{
+		m_write_idx = 0;
+		m_seed = 0;
+	}
+	else
+	{
+		if (data & 0xfffe)
+			logerror("Warning: unexpected data write %04x at write phase %d\n", data, m_write_idx);
+		m_seed = (m_seed << 1) | (data & 1);
+		m_write_idx ++;
+		if (m_write_idx == 33)
+		{
+			m_is_armed = true;
+			m_read_idx = 0;
+			switch(m_seed)
+			{
+				// ~0:30 minutes
+				// 110001100100101111111011011010111
+				case 0x18c97f6d7: m_retval = 0xa7; break;
+				// ~0:45
+				// 010111010101010011110110111110111
+				case 0x0baa9edf7: m_retval = 0x6d; break;
+				// ~1:00
+				// 000111000111110000011100110111111
+				case 0x038f839bf: m_retval = 0x20; break;
+				// ~1:15
+				// 100010000000000110111111100001111
+				case 0x110037f0f: m_retval = 0x58; break;
+				// ~1:30
+				// 100001010101011001110010110111101
+				case 0x10aace5bd: m_retval = 0x55; break;
+				// ~1:45
+				// 011111000110011101100110010001111
+				case 0x0f8cecc8f: m_retval = 0x74; break;
+				// ~2:00
+				// 110010110011110001011001100010001
+				case 0x19678b311: m_retval = 0xf5; break;
+				default:
+					logerror("Warning: unemulated seed value %09lx\n", m_seed);
+					break;
+			}
+		}
+	}
+}
