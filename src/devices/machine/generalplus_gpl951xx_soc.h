@@ -117,7 +117,7 @@ private:
 	u16 gp951xx_int_status3_r();
 	void gp951xx_int_status3_w(u16 data);
 
-	virtual void update_interrupts() override;
+	virtual void update_interrupts(int state) override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_g_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_h_cb);

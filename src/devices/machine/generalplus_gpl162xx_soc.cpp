@@ -62,9 +62,6 @@ sunplus_gcm394_base_device::sunplus_gcm394_base_device(const machine_config &mco
 	m_dma_complete_cb(*this),
 	m_boot_mode(0),
 	m_cs_callback(*this, DEVICE_SELF, FUNC(sunplus_gcm394_base_device::default_cs_callback)),
-	m_timebase_a(*this, "timebase_a"),
-	m_timebase_b(*this, "timebase_b"),
-	m_timebase_c(*this, "timebase_c"),
 	m_timer_a(*this, "timer_a"),
 	m_timer_b(*this, "timer_b"),
 	m_timer_c(*this, "timer_c"),
@@ -72,6 +69,7 @@ sunplus_gcm394_base_device::sunplus_gcm394_base_device(const machine_config &mco
 	m_timer_e(*this, "timer_e"),
 	m_timer_f(*this, "timer_f"),
 	m_gpl_dma(*this, "gpl_dma"),
+	m_gpl_timebase(*this, "gpl_timebase"),
 	m_disable_timebase_interrupts(false)
 {
 }
@@ -578,15 +576,15 @@ u16 sunplus_gcm394_base_device::int_status2_r()
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::int_status2_r\n", machine().describe_context());
 	u16 ret = 0;
 
-	if (m_timebasea_ctrl & 0x8000)
+	if (m_gpl_timebase->timebasea_irq_flag())
 		ret |= 0x0100;
 
-	if (m_timebaseb_ctrl & 0x8000)
+	if (m_gpl_timebase->timebaseb_irq_flag())
 		ret |= 0x0200;
 
-	if (m_timebasec_ctrl & 0x8000)
+	if (m_gpl_timebase->timebasec_irq_flag())
 		ret |= 0x0400;
-
+	
 	return ret;
 }
 
@@ -653,9 +651,6 @@ void sunplus_gcm394_base_device::mint_ctrl_w(u16 data)
 	m_misc_int_ctrl = data;
 }
 
-// Timebase ('fixed' frequency timers)
-// (each can select from 3 different frequencies, different for each timer)
-
 // FIQ
 // many sources can be set to FIQ
 //
@@ -695,11 +690,11 @@ void sunplus_gcm394_base_device::mint_ctrl_w(u16 data)
 // Hour/Minute/Second/Half-Second interrupt (RTC)
 // Unexpected memory access interrupt
 
-void sunplus_gcm394_base_device::update_interrupts()
+void sunplus_gcm394_base_device::update_interrupts(int state)
 {
 	if (!m_disable_timebase_interrupts)
 	{
-		if ((m_timebasea_ctrl & 0x8000) || (m_timebaseb_ctrl & 0x8000))
+		if (m_gpl_timebase->timebasea_irq_flag() || m_gpl_timebase->timebaseb_irq_flag())
 		{
 			set_state_unsynced(UNSP_IRQ7_LINE, ASSERT_LINE);
 		}
@@ -708,7 +703,7 @@ void sunplus_gcm394_base_device::update_interrupts()
 			set_state_unsynced(UNSP_IRQ7_LINE, CLEAR_LINE);
 		}
 
-		if (m_timebasec_ctrl & 0x8000)
+		if (m_gpl_timebase->timebasec_irq_flag())
 		{
 			set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
 		}
@@ -719,163 +714,6 @@ void sunplus_gcm394_base_device::update_interrupts()
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( sunplus_gcm394_base_device::timebase_a_cb )
-{
-	// sets bit 15 in m_timebasec_ctrl, also visible (as read only) in P_INT_Status2, bit 8
-	// uses IRQ7 (FIQ option not available)
-	m_timebasea_ctrl |= 0x8000;
-	update_interrupts();
-}
-
-// P_TimeBaseA_Ctrl
-//
-// 15  TMBAIF/C
-// 14  TMBAIE
-// 13  TMBAEN
-// 12
-//
-// 11
-// 10
-//  9
-//  8
-//  7
-//  6
-//  5
-//  4
-//  3
-//  2
-//  1  TMBAS[1]
-//  0  TMBAS[0]  00 = Reserved, 01 = 1Hz, 10 = 2Hz, 11 = 4Hz
-
-u16 sunplus_gcm394_base_device::timebasea_ctrl_r()
-{
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::timebasea_ctrl_r\n", machine().describe_context());
-	return m_timebasea_ctrl;
-}
-
-void sunplus_gcm394_base_device::timebasea_ctrl_w(u16 data)
-{
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::timebasea_ctrl_w %04x\n", machine().describe_context(), data);
-
-	if (data & 0x8000)
-	{
-		m_timebasea_ctrl = data & 0x7fff;
-		update_interrupts();
-	}
-	else
-	{
-		m_timebasea_ctrl = data;
-	}
-
-	if ((m_timebasea_ctrl & 0x6000) == 0x6000)
-	{
-		switch (m_timebasea_ctrl & 0x0003)
-		{
-		case 0x00: m_timebase_a->adjust(attotime::never); break; // invalid
-		case 0x01: m_timebase_a->adjust(attotime::from_hz(1)); break;
-		case 0x02: m_timebase_a->adjust(attotime::from_hz(2)); break;
-		case 0x03: m_timebase_a->adjust(attotime::from_hz(4)); break;
-		}
-	}
-	else
-	{
-		m_timebase_a->adjust(attotime::never);
-	}
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER( sunplus_gcm394_base_device::timebase_b_cb )
-{
-	// sets bit 15 in m_timebaseb_ctrl, also visible (as read only) in P_INT_Status2, bit 9
-	// uses IRQ7 (FIQ option not available)
-	m_timebaseb_ctrl |= 0x8000;
-	update_interrupts();
-}
-
-u16 sunplus_gcm394_base_device::timebaseb_ctrl_r()
-{
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::timebaseb_ctrl_r\n", machine().describe_context());
-	return m_timebaseb_ctrl;
-}
-
-void sunplus_gcm394_base_device::timebaseb_ctrl_w(u16 data)
-{
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::timebaseb_ctrl_w %04x\n", machine().describe_context(), data);
-
-	if (data & 0x8000)
-	{
-		m_timebaseb_ctrl = data & 0x7fff;
-		update_interrupts();
-	}
-	else
-	{
-		m_timebaseb_ctrl = data;
-	}
-
-	if ((m_timebaseb_ctrl & 0x6000) == 0x6000)
-	{
-		switch (m_timebaseb_ctrl & 0x0003)
-		{
-		case 0x00: m_timebase_b->adjust(attotime::from_hz(8)); break;
-		case 0x01: m_timebase_b->adjust(attotime::from_hz(16)); break;
-		case 0x02: m_timebase_b->adjust(attotime::from_hz(32)); break;
-		case 0x03: m_timebase_b->adjust(attotime::from_hz(64)); break;
-		}		
-	}
-	else
-	{
-		m_timebase_b->adjust(attotime::never);
-	}
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER( sunplus_gcm394_base_device::timebase_c_cb )
-{
-	// sets bit 15 in m_timebasec_ctrl, also visible (as read only) in P_INT_Status2, bit 10
-	// uses IRQ6 (FIQ option not available)
-	m_timebasec_ctrl |= 0x8000;
-	update_interrupts();
-}
-
-u16 sunplus_gcm394_base_device::timebasec_ctrl_r()
-{
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::timebasec_ctrl_r\n", machine().describe_context());
-	return m_timebasec_ctrl;
-}
-
-void sunplus_gcm394_base_device::timebasec_ctrl_w(u16 data)
-{
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::timebasec_ctrl_w %04x\n", machine().describe_context(), data);
-
-	if (data & 0x8000)
-	{
-		m_timebasec_ctrl = data & 0x7fff;
-		update_interrupts();
-	}
-	else
-	{
-		m_timebasec_ctrl = data;
-	}
-
-	if ((m_timebasec_ctrl & 0x6000) == 0x6000)
-	{
-		switch (m_timebasec_ctrl & 0x0003)
-		{
-		case 0x00: m_timebase_c->adjust(attotime::from_hz(128)); break;
-		case 0x01: m_timebase_c->adjust(attotime::from_hz(256)); break;
-		case 0x02: m_timebase_c->adjust(attotime::from_hz(512)); break;
-		case 0x03: m_timebase_c->adjust(attotime::from_hz(1024)); break;
-		}		
-	}
-	else
-	{
-		m_timebase_c->adjust(attotime::never);
-	}
-}
-
-void sunplus_gcm394_base_device::timebase_reset_w(u16 data)
-{
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::timebase_reset_w %04x\n", machine().describe_context(), data);
-	m_timebase_reset = data;
-}
 
 // programmable timers
 
@@ -1645,11 +1483,11 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	// 78bx - timer control?
 	// ######################################################################################################################################################################################
 
-	map(0x0078b0, 0x0078b0).rw(FUNC(sunplus_gcm394_base_device::timebasea_ctrl_r), FUNC(sunplus_gcm394_base_device::timebasea_ctrl_w));  // 78b0 TimeBase A Control Register (P_TimeBaseA_Ctrl)
-	map(0x0078b1, 0x0078b1).rw(FUNC(sunplus_gcm394_base_device::timebaseb_ctrl_r), FUNC(sunplus_gcm394_base_device::timebaseb_ctrl_w));  // 78b1 TimeBase B Control Register (P_TimeBaseB_Ctrl)
-	map(0x0078b2, 0x0078b2).rw(FUNC(sunplus_gcm394_base_device::timebasec_ctrl_r), FUNC(sunplus_gcm394_base_device::timebasec_ctrl_w));  // 78b2 TimeBase C Control Register (P_TimeBaseC_Ctrl)
+	map(0x0078b0, 0x0078b0).rw(m_gpl_timebase, FUNC(gpl_timebase_device::timebasea_ctrl_r), FUNC(gpl_timebase_device::timebasea_ctrl_w));  // 78b0 TimeBase A Control Register (P_TimeBaseA_Ctrl)
+	map(0x0078b1, 0x0078b1).rw(m_gpl_timebase, FUNC(gpl_timebase_device::timebaseb_ctrl_r), FUNC(gpl_timebase_device::timebaseb_ctrl_w));  // 78b1 TimeBase B Control Register (P_TimeBaseB_Ctrl)
+	map(0x0078b2, 0x0078b2).rw(m_gpl_timebase, FUNC(gpl_timebase_device::timebasec_ctrl_r), FUNC(gpl_timebase_device::timebasec_ctrl_w));  // 78b2 TimeBase C Control Register (P_TimeBaseC_Ctrl)
 
-	map(0x0078b8, 0x0078b8).w(FUNC(sunplus_gcm394_base_device::timebase_reset_w));  // 78b8 TimeBase Counter Reset Register  (P_TimeBase_Reset)
+	map(0x0078b8, 0x0078b8).w(m_gpl_timebase, FUNC(gpl_timebase_device::timebase_reset_w)); // 78b8 - TimeBase_Reset
 
 
 	map(0x0078c0, 0x0078c0).rw(FUNC(sunplus_gcm394_base_device::timera_ctrl_r), FUNC(sunplus_gcm394_base_device::timera_ctrl_w)); // beijuehh
@@ -1859,10 +1697,6 @@ void sunplus_gcm394_base_device::device_start()
 	save_item(NAME(m_int_priority_2));
 	save_item(NAME(m_int_priority_3));
 	save_item(NAME(m_misc_int_ctrl));
-	save_item(NAME(m_timebasea_ctrl));
-	save_item(NAME(m_timebaseb_ctrl));
-	save_item(NAME(m_timebasec_ctrl));
-	save_item(NAME(m_timebase_reset));
 	save_item(NAME(m_cha_ctrl));
 	save_item(NAME(m_dac_pga));
 	save_item(NAME(m_rtc_ctrl));
@@ -1928,11 +1762,6 @@ void sunplus_gcm394_base_device::device_reset()
 
 	m_misc_int_ctrl = 0x0000;
 
-	m_timebasea_ctrl = 0x0000;
-	m_timebaseb_ctrl = 0x0000;
-	m_timebasec_ctrl = 0x0000;
-
-	m_timebase_reset = 0x0000;
 	m_cha_ctrl = 0x0000;
 
 	// 79xx unknown
@@ -2048,14 +1877,13 @@ void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)
 	m_gpl_dma->space_write_callback().set(FUNC(sunplus_gcm394_base_device::write_space));
 	m_gpl_dma->dma_complete_callback().set(FUNC(sunplus_gcm394_base_device::dma_complete));
 
+	GPL_TIMEBASE(config, m_gpl_timebase, 0);
+	m_gpl_timebase->updateirqs_callback().set(FUNC(sunplus_gcm394_base_device::update_interrupts));	
+
 	GCM394_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), DEVICE_SELF, m_screen);
 	m_spg_video->write_video_irq_callback().set(FUNC(sunplus_gcm394_base_device::videoirq_w));
 	m_spg_video->space_read_callback().set(FUNC(sunplus_gcm394_base_device::read_space));
 	m_spg_video->set_video_space(DEVICE_SELF, AS_PROGRAM);
-
-	TIMER(config, "timebase_a").configure_generic(FUNC(sunplus_gcm394_base_device::timebase_a_cb));
-	TIMER(config, "timebase_b").configure_generic(FUNC(sunplus_gcm394_base_device::timebase_b_cb));
-	TIMER(config, "timebase_c").configure_generic(FUNC(sunplus_gcm394_base_device::timebase_c_cb));
 
 	TIMER(config, "timer_a").configure_generic(FUNC(sunplus_gcm394_base_device::timer_a_cb));
 	TIMER(config, "timer_b").configure_generic(FUNC(sunplus_gcm394_base_device::timer_b_cb));

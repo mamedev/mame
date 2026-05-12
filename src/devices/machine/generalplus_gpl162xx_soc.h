@@ -18,6 +18,7 @@
 #include "emupal.h"
 
 #include "generalplus_gpl_dma.h"
+#include "generalplus_gpl_timebase.h"
 #include "generalplus_gpl162xx_soc_video.h"
 #include "spg2xx_audio.h"
 
@@ -147,12 +148,6 @@ protected:
 
 	u16 m_misc_int_ctrl;
 
-	u16 m_timebasea_ctrl;
-	u16 m_timebaseb_ctrl;
-	u16 m_timebasec_ctrl;
-
-	u16 m_timebase_reset;
-
 	u16 m_cha_ctrl;
 
 	u16 m_dac_pga;
@@ -181,10 +176,6 @@ protected:
 	devcb_read16 m_space_read_cb;
 	devcb_write16 m_space_write_cb;
 	devcb_write_line m_dma_complete_cb;
-
-	TIMER_DEVICE_CALLBACK_MEMBER(timebase_a_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(timebase_b_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(timebase_c_cb);
 
 	virtual TIMER_DEVICE_CALLBACK_MEMBER(timer_a_cb);
 	virtual TIMER_DEVICE_CALLBACK_MEMBER(timer_b_cb);
@@ -296,19 +287,8 @@ protected:
 
 	void mint_ctrl_w(u16 data);
 
-	virtual void update_interrupts();
+	virtual void update_interrupts(int state);
 		
-	u16 timebasea_ctrl_r();
-	void timebasea_ctrl_w(u16 data);
-
-	u16 timebaseb_ctrl_r();
-	void timebaseb_ctrl_w(u16 data);
-
-	u16 timebasec_ctrl_r();
-	void timebasec_ctrl_w(u16 data);
-
-	void timebase_reset_w(u16 data);
-
 	u16 timera_ctrl_r();
 	void timera_ctrl_w(u16 data);
 
@@ -358,10 +338,6 @@ protected:
 	int m_boot_mode; // 2 pins determine boot mode, likely only read at power-on
 	sunplus_gcm394_cs_callback_device m_cs_callback;
 
-	required_device<timer_device> m_timebase_a;
-	required_device<timer_device> m_timebase_b;
-	required_device<timer_device> m_timebase_c;
-
 	required_device<timer_device> m_timer_a;
 	required_device<timer_device> m_timer_b;
 	required_device<timer_device> m_timer_c;
@@ -370,6 +346,7 @@ protected:
 	required_device<timer_device> m_timer_f;
 
 	required_device<gpl_dma_device> m_gpl_dma;
+	required_device<gpl_timebase_device> m_gpl_timebase;
 
 	// config/hacks
 	bool m_disable_timebase_interrupts;
