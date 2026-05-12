@@ -465,6 +465,12 @@ ROM_START( bigwinnr )
 	ROM_LOAD16_BYTE("big_winner_f1_2_m27c1001.u6", 0x00001, 0x20000, CRC(7c4f8a70) SHA1(da797544f897ce8ebbc4c3c5277a6fe83c274a9a))
 ROM_END
 
+ROM_START( cstliiw1 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE("castello_ii_w1_i.u2", 0x00000, 0x20000, CRC(0e6602aa) SHA1(618e1cb17a0e238d04b7c9cf099f926744d5206b))
+	ROM_LOAD16_BYTE("castello_ii_w1_ii.u6", 0x00001, 0x20000, CRC(ea75c597) SHA1(57348b0f39376c4dcfcc7822adf105e862fadf9c))
+ROM_END
+
 ROM_START( disc4000 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "disc_4000_f2_1.u2", 0x00000, 0x10000, CRC(ca766804) SHA1(53d338084fe4d3a0d9dd6bd5f6a5541aafc50037) )
@@ -734,6 +740,7 @@ GAMEL(1997, mystjack, 0,        sus_rtc, stellafr, stellafr_state, empty_init, R
 GAMEL(1997, ndiscow1, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Nova",   "Disco (W1)",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, nunran,   0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Nun Ran",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, allfred,  0,        sus_rtc, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Allfred",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1998, cstliiw1, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Castello II (W1)",      MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, glksstrn, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    u8"Glücks-Stern",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, grnada,   0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Granada",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, taipan,   0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Nova",   "Tai Pan Money",         MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
