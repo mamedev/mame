@@ -9,6 +9,8 @@
 #include "machine/generalplus_gpl951xx_soc.h"
 #include "machine/generic_spi_flash.h"
 
+#include "unknown_bftetris_lcdc.h"
+
 namespace {
 
 class generalplus_gpl951xx_game_state : public driver_device
@@ -19,7 +21,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_genspi(*this, "spi"),
-		m_io(*this, "IN%u", 0U)
+		m_io(*this, "IN%u", 0U),
+		m_lcdc(*this, "lcdc")
 	{
 	}
 
@@ -29,6 +32,7 @@ public:
 	void poke(machine_config &config) ATTR_COLD;
 	void flufflav(machine_config &config) ATTR_COLD;
 	void puni(machine_config &config) ATTR_COLD;
+	void bftetris(machine_config &config) ATTR_COLD;
 
 	void init_fif() ATTR_COLD;
 
@@ -37,6 +41,8 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	void gpl951xx(machine_config &config) ATTR_COLD;
+
+	u32 bftetris_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	u16 porta_r();
 	u16 portb_r();
@@ -47,11 +53,20 @@ protected:
 	void spi_access_from_soc(u8 data);
 	void spi_cmd_access_from_soc(u8 data);
 
+	void lcd_i80_cmd(u16 data);
+	void lcd_i80_data(u16 data);
+
 	required_device<generalplus_gpl951xx_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<generic_spi_flash_device> m_genspi;
 	required_ioport_array<3> m_io;
+	required_device<bftetris_lcdc_device> m_lcdc;
 };
+
+u32 generalplus_gpl951xx_game_state::bftetris_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return m_lcdc->render_to_bitmap(screen, bitmap, cliprect);
+}
 
 
 u16 generalplus_gpl951xx_game_state::porta_r()
@@ -161,6 +176,19 @@ void generalplus_gpl951xx_game_state::spi_cmd_access_from_soc(u8 data)
 }
 
 
+void generalplus_gpl951xx_game_state::lcd_i80_cmd(u16 data)
+{
+	logerror("lcd_i80_cmd %02x\n", data);
+	m_lcdc->lcdc_command_w(data);
+}
+
+void generalplus_gpl951xx_game_state::lcd_i80_data(u16 data)
+{
+	logerror("lcd_i80_data %02x\n", data);
+	m_lcdc->lcdc_data_w(data);
+}
+
+
 
 void generalplus_gpl951xx_game_state::gpl951xx(machine_config &config)
 {
@@ -177,15 +205,18 @@ void generalplus_gpl951xx_game_state::gpl951xx(machine_config &config)
 	m_maincpu->spi_out().set(FUNC(generalplus_gpl951xx_game_state::spi_access_from_soc));
 	m_maincpu->spi_out_cmd().set(FUNC(generalplus_gpl951xx_game_state::spi_cmd_access_from_soc));
 	m_maincpu->spi_reset().set(FUNC(generalplus_gpl951xx_game_state::spi_reset));
-;
+	m_maincpu->i80_cmd_out().set(FUNC(generalplus_gpl951xx_game_state::lcd_i80_cmd));
+	m_maincpu->i80_data_out().set(FUNC(generalplus_gpl951xx_game_state::lcd_i80_data));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	//m_screen->set_refresh_hz(20); // 20hz update gives more correct speed (and working inputs) in fixitflx and bfdigdug, but speed should probably be limited in some other way
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320*2, 262*2);
 	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
 	m_screen->set_screen_update("maincpu", FUNC(sunplus_gcm394_device::screen_update));
+
 	m_screen->screen_vblank().set(m_maincpu, FUNC(sunplus_gcm394_device::vblank));
+
+	UNKNOWN_BFTETRIS_LCDC(config, m_lcdc, 0);
 
 	GENERIC_SPI_FLASH(config, m_genspi, 0);
 
@@ -239,6 +270,19 @@ void generalplus_gpl951xx_game_state::puni(machine_config &config)
 	m_genspi->set_jedec_memtype(0x20);
 	m_genspi->set_jedec_capacity(0x17);
 }
+
+void generalplus_gpl951xx_game_state::bftetris(machine_config &config)
+{
+	fixitflx(config);
+
+	// all games have an LCDC, but bftetris programs it manually, while other games
+	// seem to take the GPL95xx output and show that directly
+	m_screen->set_size(320, 262);
+	m_screen->set_visarea(0, (320)-1, 0, (240)-1);
+	m_screen->set_screen_update(FUNC(generalplus_gpl951xx_game_state::bftetris_screen_update));
+}
+
+
 
 // There should be a small internal ROM (0x4000) bytes that does some basic setup
 
@@ -316,6 +360,11 @@ ROM_END
 ROM_START( punirune )
 	ROM_REGION16_BE(0x800000, "spi", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "25l64.ic103", 0x0000, 0x800000, CRC(0737edc0) SHA1(fce19d91a0522a75e676197fb18645b8c6a273b8) )
+ROM_END
+
+ROM_START( punirunea )
+	ROM_REGION16_BE(0x800000, "spi", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "25l64.ic3", 0x0000, 0x800000, CRC(a7a9aad0) SHA1(2c81d9a831360882b79b4dab0966c828ddb5a9e3) )
 ROM_END
 
 ROM_START( punij1m )
@@ -462,13 +511,16 @@ CONS(2017, bfmpac,   0, 0, bfpacman, bfmpac,   generalplus_gpl951xx_game_state, 
 CONS(2017, bfgalaga, 0, 0, bfpacman, bfmpac,   generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Galaga (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2018, bfdigdug, 0, 0, bfpacman, bfmpac,   generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Dig Dug (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2019, bfspyhnt, 0, 0, fixitflx, bfspyhnt, generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Spy Hunter (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2019, bftetris, 0, 0, fixitflx, bfspyhnt, generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Tetris (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2019, bftetris, 0, 0, bftetris, bfspyhnt, generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Tetris (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // games below use GPL95101 series chips, which might be different but are definitely unSP2.0 chips that run from SPI directly
 
 // unclear if colour matches, but there are multiple generations of these at least
 // uses PUNIRUNZU_MAIN_V3 pcb
-CONS(2021, punirune, 0, 0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_V3, pastel blue, Europe)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, punirune,  0,        0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_V3, pastel blue, Europe)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// looks similar to above, but has HXR-1 instead of the usual markings on the PCB
+CONS(2021, punirunea, punirune, 0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (HXR-1 PCB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // the case on these looks like the European release, including English title logo.  CPU is a glob, PUNIRUNZU_MAIN_DICE_V1 on PCB
 CONS(2021, punij1m,  punirune, 0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_DICE_V1, mint, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

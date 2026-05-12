@@ -6,13 +6,17 @@
 */
 
 #include "emu.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/m6502/rp2a03.h"
+#include "machine/bankdev.h"
 #include "video/ppu2c0x.h"
+
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
-#include "machine/bankdev.h"
-
 
 namespace {
 
@@ -118,6 +122,29 @@ private:
 	uint8_t rom_r(offs_t offset);
 	void bank_w(uint8_t data);
 	uint8_t m_rombase = 0;
+};
+
+class nes_clone_popstar_state : public nes_clone_state
+{
+public:
+	nes_clone_popstar_state(const machine_config &mconfig, device_type type, const char *tag) :
+		nes_clone_state(mconfig, type, tag),
+		m_cart(*this, "cartslot"),
+		m_cart_region(nullptr)
+	{ }
+	void nes_clone_popstar(machine_config &config) ATTR_COLD;
+
+private:
+	virtual void machine_start() override ATTR_COLD;
+
+	void nes_clone_popstar_map(address_map &map) ATTR_COLD;
+
+	uint8_t rom_r(offs_t offset);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
+	required_device<generic_slot_device> m_cart;
+	memory_region *m_cart_region;
 };
 
 class nes_clone_sudoku_state : public nes_clone_state
@@ -642,6 +669,65 @@ void nes_clone_dancexpt_state::nes_clone_dancexpt_map(address_map &map)
 	map(0xc000, 0xffff).rom().region("maincpu", 0x1c000);
 }
 
+/**************************************************
+ Popstar Karaoke Specifics
+**************************************************/
+
+void nes_clone_popstar_state::nes_clone_popstar(machine_config &config)
+{
+	nes_clone_pal(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_popstar_state::nes_clone_popstar_map);
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "popstar_cart");
+	m_cart->set_width(GENERIC_ROM8_WIDTH);
+	m_cart->set_device_load(FUNC(nes_clone_popstar_state::cart_load));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("popstar_cart");
+}
+
+
+void nes_clone_popstar_state::nes_clone_popstar_map(address_map &map)
+{
+	nes_clone_basemap(map);
+
+	map(0x8000, 0xffff).r(FUNC(nes_clone_popstar_state::rom_r));
+}
+
+uint8_t nes_clone_popstar_state::rom_r(offs_t offset)
+{
+	if (!m_cart_region)
+		return 0x00;
+
+	return m_cart_region->base()[offset + 0x18000];
+}
+
+
+void nes_clone_popstar_state::machine_start()
+{
+	nes_clone_state::machine_start();
+
+	// if there's a cart, override the standard banking
+	if (m_cart && m_cart->exists())
+	{
+		m_cart_region = memregion(std::string(m_cart->tag()) + GENERIC_ROM_REGION_TAG);
+
+		// wordsum is printed on the ROM globs
+		u16 checksum = 0;
+		for (int i = 0; i < m_cart_region->bytes(); i++)
+		{
+			checksum += m_cart_region->base()[i];
+		}
+		logerror("wordsum was %04x\n", checksum);
+	}
+}
+
+DEVICE_IMAGE_LOAD_MEMBER(nes_clone_popstar_state::cart_load)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+	return std::make_pair(std::error_condition(), std::string());
+}
 
 /**************************************************
  Dance 2000 Specifics
@@ -1451,6 +1537,10 @@ ROM_START( pv95in1 )
 	ROM_LOAD( "mx29f1610atc.ic2a", 0x00000, 0x200000, CRC(ca88e21c) SHA1(559d13806c9539f983ae929a0132af8ef381bd12) )
 ROM_END
 
+ROM_START( popstar )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	// 2 globs in base unit, but neither seems to be a ROM, one might be a sound MCU
+ROM_END
 
 void nes_clone_state::init_nes_clone()
 {
@@ -1509,3 +1599,6 @@ CONS( 2005, racechl8, 0, 0, nes_clone_afbm7800, nes_clone, nes_clone_taikee_new_
 
 // probably not VT based
 CONS( 200?, pv95in1, 0, 0, nes_clone_afbm7800, nes_clone, nes_clone_taikee_new_state, init_nes_clone, "Play Vision", "Play Vision 95 Games in 1", MACHINE_NOT_WORKING )
+
+// mapper at 500x? has custom sound rather than standard NES APU or VTxx sounds, possibly an extra MCU or sound chip in the unit (see https://www.youtube.com/watch?v=OsydFoHW3Lc )
+CONS( 200?, popstar, 0, 0, nes_clone_popstar, nes_clone, nes_clone_popstar_state, init_nes_clone, "<unknown>", "Popstar Karaoke Vol 2", MACHINE_NOT_WORKING )
