@@ -519,10 +519,16 @@ ROM_START( grandhnd )
 	ROM_LOAD16_BYTE( "grandhand_f2.u6", 0x00001, 0x10000, CRC(b0f14dd4) SHA1(f6a713334ed85ecf52e0671aa15c6c43d32db4d2) )
 ROM_END
 
-ROM_START( grnada )
+ROM_START( grnadaf1 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "m27c1001_granada_f1.u2", 0x00000, 0x20000, CRC(45d080b8) SHA1(1543ee5bb3f0d490744d0d0df852914797902198) )
-	ROM_LOAD16_BYTE( "m27c1001_granada_f1.u6", 0x00001, 0x20000, CRC(8016fc9b) SHA1(3c438701bdb221ab373f3356d95911d8a6568d9a) )
+	ROM_LOAD16_BYTE( "granada_i_f1.u2", 0x00000, 0x20000, CRC(45d080b8) SHA1(1543ee5bb3f0d490744d0d0df852914797902198) )
+	ROM_LOAD16_BYTE( "granada_ii_f1.u6", 0x00001, 0x20000, CRC(8016fc9b) SHA1(3c438701bdb221ab373f3356d95911d8a6568d9a) )
+ROM_END
+
+ROM_START( grnadaw1 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "granada_i_w1.u2", 0x00000, 0x20000, CRC(d87abd91) SHA1(153df930b9ef70a64bdf34b6f53016a52d355844) )
+	ROM_LOAD16_BYTE( "granada_ii_w1.u6", 0x00001, 0x20000, CRC(61194912) SHA1(d6aca706a5b69401dfad66130361751b5db95c89) )
 ROM_END
 
 ROM_START( jack4000 )
@@ -771,7 +777,8 @@ GAMEL(1997, vlogo   , 0,        sus_tk,  stellafr, stellafr_state, empty_init, R
 GAMEL(1998, allfred,  0,        sus_rtc, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Allfred",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, cstliiw1, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Castello II (W1)",      MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, glksstrn, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    u8"Glücks-Stern",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1998, grnada,   0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Granada",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1998, grnadaf1, grnadaw1, sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Granada (F1)",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1998, grnadaw1, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Granada (W1)",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, taipan,   0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Nova",   "Tai Pan Money",         MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, bigwinnr, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Nova",   "Big Winner",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(2001, kleoptra, 0,        sus_rtc, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Asterix und Kleopatra", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
