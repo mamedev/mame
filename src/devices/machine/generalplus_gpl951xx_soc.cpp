@@ -377,6 +377,14 @@ void generalplus_gpl951xx_device::device_start()
 	save_item(NAME(m_spifc_rx_read_latch));
 	save_item(NAME(m_io_dir));
 	save_item(NAME(m_io_attrib));
+	save_item(NAME(m_gp95_sys_ctrl));
+	save_item(NAME(m_gp95_clock_ctrl));
+	save_item(NAME(m_gp95_cache_ctrl));
+	save_item(NAME(m_gp95_int_priority_1));
+	save_item(NAME(m_gp95_int_priority_2));
+	save_item(NAME(m_gp95_int_priority_3));
+	save_item(NAME(m_gp95_misc_int_ctrl));
+	save_item(NAME(m_gp95_cha_ctrl));
 }
 
 void generalplus_gpl951xx_device::device_reset()
@@ -399,6 +407,14 @@ void generalplus_gpl951xx_device::device_reset()
 	m_spifc_rx_read_latch = 0;
 	m_memmode_wcmd = 0;
 	m_spi_bank = 0;
+	m_gp95_sys_ctrl = 0;
+	m_gp95_clock_ctrl = 0;
+	m_gp95_cache_ctrl = 0;
+	m_gp95_int_priority_1 = 0;
+	m_gp95_int_priority_2 = 0;
+	m_gp95_int_priority_3 = 0;
+	m_gp95_misc_int_ctrl = 0;
+	m_gp95_cha_ctrl = 0;
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -830,6 +846,144 @@ void generalplus_gpl951xx_device::gp951xx_io_keyen_w(u16 data)
 	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::gp951xx_io_%s_keyen_w %04x\n", machine().describe_context(), m_portnames[Port], data);
 }
 
+// Misc
+
+u16 generalplus_gpl951xx_device::gp95_sys_ctrl_r()
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::sys_ctrl_r\n", machine().describe_context());
+	return m_gp95_sys_ctrl;
+}
+
+void generalplus_gpl951xx_device::gp95_sys_ctrl_w(u16 data)
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::sys_ctrl_w %04x\n", machine().describe_context(), data);
+	m_gp95_sys_ctrl = data;
+}
+
+void generalplus_gpl951xx_device::gp95_clock_ctrl_w(u16 data)
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::clock_ctrl_w %04x\n", machine().describe_context(), data);
+	m_gp95_clock_ctrl = data;
+}
+
+u16 generalplus_gpl951xx_device::gp95_clk_ctrl0_r()
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::clk_ctrl0_r\n", machine().describe_context());
+	return 0x0000;
+}
+
+void generalplus_gpl951xx_device::gp95_clk_ctrl0_w(u16 data)
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::clk_ctrl0 %04x\n", machine().describe_context(), data);
+}
+
+void generalplus_gpl951xx_device::gp95_watchdog_ctrl_w(u16 data)
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::watchdog_ctrl_w %04x\n", machine().describe_context(), data);
+}
+
+u16 generalplus_gpl951xx_device::gp95_power_state_r()
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::power_state_r\n", machine().describe_context());
+	return 0x0002;
+}
+
+u16 generalplus_gpl951xx_device::gp95_pllclkwait_r()
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::pllclkwait_r\n", machine().describe_context());
+	return 0x0000;
+}
+
+void generalplus_gpl951xx_device::gp95_pllclkwait_w(u16 data)
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::pllclkwait_w %04x\n", machine().describe_context(), data);
+}
+
+// sets bit 0x0002 then expects it to have cleared
+u16 generalplus_gpl951xx_device::gp95_cache_ctrl_r()
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::cache_ctrl_r\n", machine().describe_context());
+	return m_gp95_cache_ctrl & ~ 0x0002;
+}
+
+void generalplus_gpl951xx_device::gp95_cache_ctrl_w(u16 data)
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::cache_ctrl_w %04x\n", machine().describe_context(), data);
+	m_gp95_cache_ctrl = data;
+}
+
+u16 generalplus_gpl951xx_device::gp95_int_status1_r()
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::int_status1_r\n", machine().describe_context());
+	return 0x0000;
+}
+
+void generalplus_gpl951xx_device::gp95_int_status1_w(u16 data)
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::int_status1_w %04x\n", machine().describe_context(), data);
+	//m_int_status1 = data;
+}
+
+u16 generalplus_gpl951xx_device::gp95_int_status2_r()
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::int_status2_r\n", machine().describe_context());
+	u16 ret = 0;
+
+	if (m_gpl_timebase->timebasea_irq_flag())
+		ret |= 0x0100;
+
+	if (m_gpl_timebase->timebaseb_irq_flag())
+		ret |= 0x0200;
+
+	if (m_gpl_timebase->timebasec_irq_flag())
+		ret |= 0x0400;
+	
+	return ret;
+}
+
+void generalplus_gpl951xx_device::gp95_int_status2_w(u16 data)
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::int_status2_w %04x\n", machine().describe_context(), data);
+	// none of this bits are listed as writeable for GPL95xx or GPL162xx
+}
+
+void generalplus_gpl951xx_device::gp95_int_priority_1_w(u16 data)
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::int_priority_1_w %04x\n", machine().describe_context(), data);
+	m_gp95_int_priority_1 = data;
+}
+
+void generalplus_gpl951xx_device::gp95_int_priority_2_w(u16 data)
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::int_priority_2_w %04x\n", machine().describe_context(), data);
+	m_gp95_int_priority_2 = data;
+}
+
+void generalplus_gpl951xx_device::gp95_int_priority_3_w(u16 data)
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::int_priority_3_w %04x\n", machine().describe_context(), data);
+	m_gp95_int_priority_3 = data;
+}
+
+void generalplus_gpl951xx_device::gp95_mint_ctrl_w(u16 data)
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::mint_ctrl_w %04x\n", machine().describe_context(), data);
+	m_gp95_misc_int_ctrl = data;
+}
+
+// CHA (for sound output)
+
+u16 generalplus_gpl951xx_device::gp95_cha_ctrl_r()
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::cha_ctrl_r\n", machine().describe_context());
+	return 0xffff;
+}
+
+void generalplus_gpl951xx_device::gp95_cha_ctrl_w(u16 data)
+{
+	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::cha_ctrl_w %04x\n", machine().describe_context(), data);
+	m_gp95_cha_ctrl = data;
+}
 
 
 u16 generalplus_gpl951xx_device::spi_direct_r(offs_t offset)
@@ -980,19 +1134,19 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map &map)
 	// 7800 - BodyID
 	// 7801 - unused
 	// 7802 - PwrKey_State
-	map(0x007803, 0x007803).rw(FUNC(generalplus_gpl951xx_device::sys_ctrl_r), FUNC(generalplus_gpl951xx_device::sys_ctrl_w)); // 7803 - SYS_CTRL (seems quite different between SoCs)
-	map(0x007804, 0x007804).rw(FUNC(generalplus_gpl951xx_device::clk_ctrl0_r), FUNC(generalplus_gpl951xx_device::clk_ctrl0_w)); // 7804 - CLK_Ctrl0
+	map(0x007803, 0x007803).rw(FUNC(generalplus_gpl951xx_device::gp95_sys_ctrl_r), FUNC(generalplus_gpl951xx_device::gp95_sys_ctrl_w)); // 7803 - SYS_CTRL (seems quite different between SoCs)
+	map(0x007804, 0x007804).rw(FUNC(generalplus_gpl951xx_device::gp95_clk_ctrl0_r), FUNC(generalplus_gpl951xx_device::gp95_clk_ctrl0_w)); // 7804 - CLK_Ctrl0
 	// 7805 - CLK_Ctrl1
 	// 7806 - Reset_Flag
-	map(0x007807, 0x007807).w(FUNC(generalplus_gpl951xx_device::clock_ctrl_w)); // 7807 - Clock_Ctrl
+	map(0x007807, 0x007807).w(FUNC(generalplus_gpl951xx_device::gp95_clock_ctrl_w)); // 7807 - Clock_Ctrl
 	// 7808 - LVR_Ctrl
 	map(0x00780a, 0x00780a).w(FUNC(generalplus_gpl951xx_device::pm_ctrl_w)); // 7809 - PM_Ctrl
-	map(0x00780a, 0x00780a).w(FUNC(generalplus_gpl951xx_device::watchdog_ctrl_w)); // 780a - Watchdog_Ctrl
+	map(0x00780a, 0x00780a).w(FUNC(generalplus_gpl951xx_device::gp95_watchdog_ctrl_w)); // 780a - Watchdog_Ctrl
 	map(0x00780b, 0x00780b).nopw(); // Watchdog_Clear
 	// 780c - WAIT
 	// 780d - HALT
 	// 780e - unused
-	map(0x00780f, 0x00780f).r(FUNC(generalplus_gpl951xx_device::power_state_r)); // 780f - Power_State
+	map(0x00780f, 0x00780f).r(FUNC(generalplus_gpl951xx_device::gp95_power_state_r)); // 780f - Power_State
 	map(0x007810, 0x007810).rw(FUNC(generalplus_gpl951xx_device::spi_bank_r), FUNC(generalplus_gpl951xx_device::spi_bank_w)); // 7810 - BankSwitch
 	// 7811 - unused
 	// 7812 - unused
@@ -1001,8 +1155,8 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map &map)
 	// 7815 - unused
 	// 7816 - unused
 	map(0x007817, 0x007817).rw(FUNC(generalplus_gpl951xx_device::pllsel_r), FUNC(generalplus_gpl951xx_device::pllsel_w)); // 7817 - PLL_Sel
-	map(0x007818, 0x007818).rw(FUNC(generalplus_gpl951xx_device::pllclkwait_r), FUNC(generalplus_gpl951xx_device::pllclkwait_w)); // 7818 - PLLWaitCLK
-	map(0x007819, 0x007819).rw(FUNC(generalplus_gpl951xx_device::cache_ctrl_r), FUNC(generalplus_gpl951xx_device::cache_ctrl_w)); // 7819 - Cache_Ctrl
+	map(0x007818, 0x007818).rw(FUNC(generalplus_gpl951xx_device::gp95_pllclkwait_r), FUNC(generalplus_gpl951xx_device::gp95_pllclkwait_w)); // 7818 - PLLWaitCLK
+	map(0x007819, 0x007819).rw(FUNC(generalplus_gpl951xx_device::gp95_cache_ctrl_r), FUNC(generalplus_gpl951xx_device::gp95_cache_ctrl_w)); // 7819 - Cache_Ctrl
 	// 781a - Cache_HitRate
 	// 781b - unused
 	// 781c - unused
@@ -1055,13 +1209,13 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map &map)
 	add_port<4>(map, 0x007880); // 0x7880 - 0x7887 - Port E
 	add_port<5>(map, 0x007888); // 0x7888 - 0x788f - Port F
 
-	map(0x0078a0, 0x0078a0).rw(FUNC(generalplus_gpl951xx_device::int_status1_r), FUNC(generalplus_gpl951xx_device::int_status1_w)); // 78a0 - INT_Status1
-	map(0x0078a1, 0x0078a1).rw(FUNC(generalplus_gpl951xx_device::int_status2_r), FUNC(generalplus_gpl951xx_device::int_status2_w)); // 78a1 - INT_Status2
+	map(0x0078a0, 0x0078a0).rw(FUNC(generalplus_gpl951xx_device::gp95_int_status1_r), FUNC(generalplus_gpl951xx_device::gp95_int_status1_w)); // 78a0 - INT_Status1
+	map(0x0078a1, 0x0078a1).rw(FUNC(generalplus_gpl951xx_device::gp95_int_status2_r), FUNC(generalplus_gpl951xx_device::gp95_int_status2_w)); // 78a1 - INT_Status2
 	map(0x0078a2, 0x0078a2).rw(FUNC(generalplus_gpl951xx_device::gp951xx_int_status3_r), FUNC(generalplus_gpl951xx_device::gp951xx_int_status3_w)); // 78a2 - INT_Status3
-	map(0x0078a3, 0x0078a3).w(FUNC(generalplus_gpl951xx_device::int_priority_1_w)); // 78a3 - INT_Priority1
-	map(0x0078a4, 0x0078a4).w(FUNC(generalplus_gpl951xx_device::int_priority_2_w)); // 78a4 - INT_Priority2
-	map(0x0078a5, 0x0078a5).w(FUNC(generalplus_gpl951xx_device::int_priority_3_w)); // 78a5 - INT_Priority3
-	map(0x0078a6, 0x0078a6).w(FUNC(generalplus_gpl951xx_device::mint_ctrl_w)); // 78a6 - MINT_Ctrl
+	map(0x0078a3, 0x0078a3).w(FUNC(generalplus_gpl951xx_device::gp95_int_priority_1_w)); // 78a3 - INT_Priority1
+	map(0x0078a4, 0x0078a4).w(FUNC(generalplus_gpl951xx_device::gp95_int_priority_2_w)); // 78a4 - INT_Priority2
+	map(0x0078a5, 0x0078a5).w(FUNC(generalplus_gpl951xx_device::gp95_int_priority_3_w)); // 78a5 - INT_Priority3
+	map(0x0078a6, 0x0078a6).w(FUNC(generalplus_gpl951xx_device::gp95_mint_ctrl_w)); // 78a6 - MINT_Ctrl
 	// 78a7 - IOAB_KCIEN
 	// 78a8 - IOC_KCIEN
 	// 78a9 - IOE_KCIEN
@@ -1102,7 +1256,7 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map &map)
 	// 78ee
 	// 78ef
 
-	map(0x0078f0, 0x0078f0).rw(FUNC(generalplus_gpl951xx_device::cha_ctrl_r), FUNC(generalplus_gpl951xx_device::cha_ctrl_w)); // 78f0 - CHA_Ctrl
+	map(0x0078f0, 0x0078f0).rw(FUNC(generalplus_gpl951xx_device::gp95_cha_ctrl_r), FUNC(generalplus_gpl951xx_device::gp95_cha_ctrl_w)); // 78f0 - CHA_Ctrl
 	// 78f1 - CHA_Data
 	// 78f2 - CHA_FIFO
 	// 78f3
@@ -1241,9 +1395,9 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map &map)
 	// 7a55 - USBD_BOBufPointer
 	// 7a56 - USBD_EP0RTR
 	// 7a57 - USBD_EP0RR
-	// 7a58 - USBD_ EP0VR
-	// 7a59 - USBD_ EP0IR
-	// 7a5a - USBD_ EP0LR
+	// 7a58 - USBD_EP0VR
+	// 7a59 - USBD_EP0IR
+	// 7a5a - USBD_EP0LR
 	//
 	// 7a60 - USBD_DMAWrtCountL
 	// 7a61 - USBD_DMAWrtCountH
@@ -1324,7 +1478,23 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map &map)
 
 void generalplus_gpl951xx_device::update_interrupts(int state)
 {
-	sunplus_gcm394_base_device::update_interrupts(1);
+	if (m_gpl_timebase->timebasea_irq_flag() || m_gpl_timebase->timebaseb_irq_flag())
+	{
+		set_state_unsynced(UNSP_IRQ7_LINE, ASSERT_LINE);
+	}
+	else
+	{
+		set_state_unsynced(UNSP_IRQ7_LINE, CLEAR_LINE);
+	}
+
+	if (m_gpl_timebase->timebasec_irq_flag())
+	{
+		set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
+	}
+	else
+	{
+		set_state_unsynced(UNSP_IRQ6_LINE, CLEAR_LINE);
+	}
 
 	if (((m_gpl951xx_timerg_ctrl & 0x8000) && (m_gpl951xx_timerg_ctrl & 0x4000)) || 
 		((m_gpl951xx_timerh_ctrl & 0x8000) && (m_gpl951xx_timerh_ctrl & 0x4000)))

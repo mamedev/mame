@@ -143,6 +143,35 @@ private:
 	u16 gp951xx_int_status3_r();
 	void gp951xx_int_status3_w(u16 data);
 
+	u16 gp95_sys_ctrl_r();
+	void gp95_sys_ctrl_w(u16 data);
+
+	void gp95_clock_ctrl_w(u16 data);
+
+	u16 gp95_clk_ctrl0_r();
+	void gp95_clk_ctrl0_w(u16 data);
+	u16 gp95_power_state_r();
+	void gp95_watchdog_ctrl_w(u16 data);
+
+	u16 gp95_pllclkwait_r();
+	void gp95_pllclkwait_w(u16 data);
+
+	u16 gp95_cache_ctrl_r();
+	void gp95_cache_ctrl_w(u16 data);
+
+	void gp95_int_status1_w(u16 data);
+	void gp95_int_status2_w(u16 data);
+	u16 gp95_int_status1_r();
+	u16 gp95_int_status2_r();
+	void gp95_int_priority_1_w(u16 data);
+	void gp95_int_priority_2_w(u16 data);
+	void gp95_int_priority_3_w(u16 data);
+
+	void gp95_mint_ctrl_w(u16 data);
+
+	u16 gp95_cha_ctrl_r();
+	void gp95_cha_ctrl_w(u16 data);
+
 	virtual void update_interrupts(int state) override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_g_cb);
@@ -176,6 +205,18 @@ private:
 
 	u16 m_io_dir[6];
 	u16 m_io_attrib[6];
+
+	u16 m_gp95_sys_ctrl;
+	u16 m_gp95_clock_ctrl;
+	u16 m_gp95_cache_ctrl;
+
+	u16 m_gp95_int_priority_1;
+	u16 m_gp95_int_priority_2;
+	u16 m_gp95_int_priority_3;
+
+	u16 m_gp95_misc_int_ctrl;
+
+	u16 m_gp95_cha_ctrl;
 
 	u16 m_spi_bank;
 
