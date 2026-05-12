@@ -666,6 +666,12 @@ ROM_START( sunny )
 	ROM_LOAD16_BYTE( "sunny_f2_ii.u6", 0x00001, 0x20000, CRC(86b3b81d) SHA1(e12a511bbc53e4614bed561c9544f9ac8faa9fd2) )
 ROM_END
 
+ROM_START( suntopw1 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "sunny_top_w1_i.u2", 0x00000, 0x20000, CRC(c82a3333) SHA1(1e4f28df6e0841f91ef54f453cb1186d1e532d4c) )
+	ROM_LOAD16_BYTE( "sunny_top_w1_ii.u6", 0x00001, 0x20000, CRC(d503b558) SHA1(882ff19275c6a5a947bf64bdcc595a7449fdeafb) )
+ROM_END
+
 ROM_START( swing )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "swing_f1_i.u2", 0x00000, 0x20000, CRC(b7456f2a) SHA1(91866eb8e7124e479388e9f1ef7144752c77b461) )
@@ -747,6 +753,7 @@ GAMEL(1995, mptschf2, 0,        sus_tk,  stellafr, stellafr_state, empty_init, R
 GAMEL(1996, discfun,  0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Disc Fun",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1996, multstar, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Multi Star",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1996, st_ohla,  0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Stella", "Oh La La",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1996, suntopw1, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Sunny Top (W1)",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1996, trbsunf1, trbsunw1, sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Turbo Sunny (F1)",      MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1996, trbsunw1, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Turbo Sunny (W1)",      MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1996, viva,     0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Viva",                  MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
