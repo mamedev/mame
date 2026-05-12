@@ -1133,7 +1133,7 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map &map)
 	// 79fa
 	// 79fb - RTC_ClkDiv
 
-	// 7a00 - TimerA_Ctr
+	// 7a00 - TimerA_Ctrl
 	// 7a01 - TimerA_CCPB_Ctrl
 	// 7a02 - TimerA_Preload
 	// 7a03 - TimerA_CCPB_Reg

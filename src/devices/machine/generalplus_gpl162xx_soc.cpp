@@ -91,6 +91,9 @@ void sunplus_gcm394_base_device::default_cs_callback(u16 cs0, u16 cs1, u16 cs2, 
 
 // **************************************** SYSTEM DMA device *************************************************
 
+// note, GPL162xx has 4 channels, GPL951xx only has 2
+// sources also differ
+
 u16 sunplus_gcm394_base_device::read_dma_params(int channel, int offset)
 {
 	u16 retdata = m_dma_params[offset][channel];
@@ -202,6 +205,27 @@ void sunplus_gcm394_base_device::system_dma_status_w(u16 data)
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::system_dma_status_w %04x\n", machine().describe_context(), data);
 }
 
+// m_dma_params[0] is P_DMA_Ctrl
+//
+// 15  WriteReq  (0 = request data out, 1 = request data in)
+// 14  TM        (0 = single transfer mode, 1 = demand transfer mode)
+// 13  TARByte   (0 = 16-bit target, 1 = 8-bit targer)
+// 12  SRCByte   (0 = 16-bit source, 1 = 8-bit source)
+
+// 11  TD[1]     (00 = Memory to Memory, 01 = Memory to I/O, 10 = I/O to Memory, 11 = invalid)
+// 10  TD[0]
+//  9  RS        (1 = reset channel)
+//  8  CIE       (1 = enable DMA interrupt)
+
+//  7  SF        (0 = increase/decrease source enabled, 1 = no increment)
+//  6  DF        (0 = increase/decrease dest enabled, 1 = no increment)
+//  5  SD        (0 = increase source, 1 = decrease source)
+//  4  DD        (0 = increase dest, 1 = decrease dest)
+
+//  3  DBF(r)/NORM_I(w)    (DBF: 1 = DMA Double Buffer Full, NORM_I: DMA Normal Interrupt mode)
+//  2  MODE      (0 = Software Mode/Auto Mode, 1 = External Mode request)
+//  1  BS(r/o)   (0 = DMA idle, 1 = DMA busy)
+//  0  CE        (0 = Channel Disabled, 1 = Channel Enabled)
 
 void sunplus_gcm394_base_device::trigger_systemm_dma(int channel)
 {
@@ -279,23 +303,25 @@ u16 sunplus_gcm394_base_device::system_dma_memtype_r()
 
 void sunplus_gcm394_base_device::system_dma_memtype_w(u16 data)
 {
+	// these sources differ between models
 	static char const* const types[16] =
 	{
 		"Unused / USB",
 		"DAC CHA",
 		"UART TX",
 		"UART RX",
-		"SD/MMC",
+		"SDC/MMC 1", // reserved (GPL951xx)
 		"NAND Flash",
-		"Serial Interface",
+		"Serial Interface", // ADC Auto Sample Full (GPL951xx)
 		"DAC CHB",
-		"ADC Audo Sample Full",
+		"ADC Auto Sample Full", // MIC ADC Auto Sample Full (GPL951xx)
 		"SPI TX",
 		"SPI RX",
-		"RESERVED (c)",
-		"RESERVED (d)",
-		"RESERVED (e)",
-		"RESERVED (f)"
+		"USB ISO Out", // reserved (GPL951xx)
+		"USB ISO In", // reserved (GPL951xx)
+		"SDC/MMC 2", // reserved (GPL951xx)
+		"SPUL", // SPI1 TX (GP951xx)
+		"SPUH" // SPI1 RX (GP951xx)
 	};
 
 	m_system_dma_memtype = data;
