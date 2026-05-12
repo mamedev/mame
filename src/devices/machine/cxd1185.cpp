@@ -24,7 +24,7 @@
 #define LOG_SCSI    (1U << 6)
 #define LOG_DMA     (1U << 7)
 
-#define VERBOSE (LOG_GENERAL|LOG_CMD|LOG_REG|LOG_STATE)
+//#define VERBOSE (LOG_GENERAL|LOG_CMD|LOG_REG|LOG_STATE)
 
 #include "logmacro.h"
 
