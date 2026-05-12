@@ -660,6 +660,12 @@ ROM_START( viva )
 	ROM_LOAD16_BYTE( "viva_f1_ii.u6", 0x00001, 0x20000, CRC(da0fab3b) SHA1(ef13ea163c60253e88d200c68a25fe7e4a56a657) )
 ROM_END
 
+ROM_START( vulkanf2 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "vulkan_f2_i.u2", 0x00000, 0x10000, CRC(9b20a948) SHA1(221ae3604752a1db7e73a00d11a90d8b2b242264) )
+	ROM_LOAD16_BYTE( "vulkan_f2_ii.u6", 0x00001, 0x10000, CRC(b7613165) SHA1(05321f5ddd0118eb52df033a9ddcc0a4a092a7b9) )
+ROM_END
+
 ROM_START( wurfelf2 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "wuerfel_fix_f2_i.u2", 0x00000, 0x80000, CRC(ae2ce7e8) SHA1(05ed1ece7a35f4883b61d30e4076f513d009aa9c) )
@@ -678,6 +684,7 @@ GAMEL(1993, action,   0,        sus_tk,  stellafr, stellafr_state, empty_init, R
 GAMEL(1993, disc4000, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Disc 4000",             MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1993, jack4000, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Jackpot 4000",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1993, jumbo400, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Jumbo 400",             MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1993, vulkanf2, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Vulkan F2",             MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1994, dscbonus, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Disc Bonus",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1994, grandhnd, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Stella", "Grand Hand",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1994, jmbojmbo, jmbojmbf, sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Jumbo Jumbo",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
