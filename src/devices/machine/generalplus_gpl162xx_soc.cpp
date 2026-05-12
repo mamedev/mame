@@ -209,7 +209,7 @@ void sunplus_gcm394_base_device::system_dma_status_w(u16 data)
 //
 // 15  WriteReq  (0 = request data out, 1 = request data in)
 // 14  TM        (0 = single transfer mode, 1 = demand transfer mode)
-// 13  TARByte   (0 = 16-bit target, 1 = 8-bit targer)
+// 13  TARByte   (0 = 16-bit target, 1 = 8-bit target)
 // 12  SRCByte   (0 = 16-bit source, 1 = 8-bit source)
 
 // 11  TD[1]     (00 = Memory to Memory, 01 = Memory to I/O, 10 = I/O to Memory, 11 = invalid)

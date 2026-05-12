@@ -511,7 +511,7 @@ CONS(2017, bfmpac,   0, 0, bfpacman, bfmpac,   generalplus_gpl951xx_game_state, 
 CONS(2017, bfgalaga, 0, 0, bfpacman, bfmpac,   generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Galaga (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2018, bfdigdug, 0, 0, bfpacman, bfmpac,   generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Dig Dug (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2019, bfspyhnt, 0, 0, fixitflx, bfspyhnt, generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Spy Hunter (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2019, bftetris, 0, 0, bftetris, bfspyhnt, generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Tetris (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2020, bftetris, 0, 0, bftetris, bfspyhnt, generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Tetris (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // games below use GPL95101 series chips, which might be different but are definitely unSP2.0 chips that run from SPI directly
 
