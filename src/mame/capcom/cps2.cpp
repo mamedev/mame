@@ -1774,7 +1774,7 @@ void cps2_state::cps2(machine_config &config)
 	// Sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	QSOUND(config, m_qsound);
+	CAPCOM_Q1(config, m_qsound, 60_MHz_XTAL);
 	m_qsound->add_route(0, "speaker", 1.0, 0);
 	m_qsound->add_route(1, "speaker", 1.0, 1);
 }

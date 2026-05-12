@@ -2,7 +2,7 @@
 // copyright-holders:superctr, Valley Bell
 /***************************************************************************
 
-  Capcom QSound DL-1425 (HLE)
+  Capcom-Q1 DL 1425 DSP (HLE)
   ===========================
 
   Driver by superctr with thanks to Valley Bell.
@@ -16,13 +16,13 @@
 
 #include "emu.h"
 
-#ifndef QSOUND_LLE
-#define QSOUND_LLE
+#ifndef CAPCOM_Q1_LLE
+#define CAPCOM_Q1_LLE
 #endif
 
-#include "qsoundhle.h"
+#include "capcom_q1_hle.h"
 
-#include "qsound.h"
+#include "capcom_q1.h"
 
 #include <algorithm>
 #include <limits>
@@ -32,16 +32,16 @@
 //  for ROM search
 //-------------------------------------------------
 
-inline auto qsound_hle_device::parent_rom_device_type()
+inline auto capcom_q1_hle_device::parent_rom_device_type()
 {
-	return &QSOUND;
+	return &CAPCOM_Q1;
 }
 
 // device type definition
-DEFINE_DEVICE_TYPE(QSOUND_HLE, qsound_hle_device, "qsound_hle", "QSound (HLE)")
+DEFINE_DEVICE_TYPE(CAPCOM_Q1_HLE, capcom_q1_hle_device, "capcom_q1_hle", "Capcom-Q1 DL 1425 DSP (HLE)")
 
 // DSP internal ROM region
-ROM_START( qsound_hle )
+ROM_START( capcom_q1_hle )
 	ROM_REGION16_LE( 0x2000, "dsp", 0 )
 	// removing WORD_SWAP from original definition
 	ROM_LOAD16_WORD( "dl-1425.bin", 0x0000, 0x2000, CRC(d6cf5ef5) SHA1(555f50fe5cdf127619da7d854c03f4a244a0c501) )
@@ -53,11 +53,11 @@ ROM_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  qsound_hle_device - constructor
+//  capcom_q1_hle_device - constructor
 //-------------------------------------------------
 
-qsound_hle_device::qsound_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, QSOUND_HLE, tag, owner, clock)
+capcom_q1_hle_device::capcom_q1_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, CAPCOM_Q1_HLE, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
 	, m_stream(nullptr)
@@ -71,9 +71,9 @@ qsound_hle_device::qsound_hle_device(const machine_config &mconfig, const char *
 //  internal ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *qsound_hle_device::device_rom_region() const
+const tiny_rom_entry *capcom_q1_hle_device::device_rom_region() const
 {
-	return ROM_NAME( qsound_hle );
+	return ROM_NAME( capcom_q1_hle );
 }
 
 //-------------------------------------------------
@@ -81,7 +81,7 @@ const tiny_rom_entry *qsound_hle_device::device_rom_region() const
 //  ROM banking changes
 //-------------------------------------------------
 
-void qsound_hle_device::rom_bank_pre_change()
+void capcom_q1_hle_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }
@@ -90,7 +90,7 @@ void qsound_hle_device::rom_bank_pre_change()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void qsound_hle_device::device_start()
+void capcom_q1_hle_device::device_start()
 {
 	m_stream = stream_alloc(0, 2, clock() / 2 / 1248); // DSP program uses 1248 machine cycles per iteration
 
@@ -167,7 +167,7 @@ void qsound_hle_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void qsound_hle_device::device_reset()
+void capcom_q1_hle_device::device_reset()
 {
 	m_ready_flag = 0;
 	m_out[0] = m_out[1] = 0;
@@ -179,7 +179,7 @@ void qsound_hle_device::device_reset()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void qsound_hle_device::sound_stream_update(sound_stream &stream)
+void capcom_q1_hle_device::sound_stream_update(sound_stream &stream)
 {
 	for (int i = 0; i < stream.samples(); i ++)
 	{
@@ -190,7 +190,7 @@ void qsound_hle_device::sound_stream_update(sound_stream &stream)
 }
 
 
-void qsound_hle_device::qsound_w(offs_t offset, uint8_t data)
+void capcom_q1_hle_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -208,13 +208,13 @@ void qsound_hle_device::qsound_w(offs_t offset, uint8_t data)
 			break;
 
 		default:
-			logerror("%s: qsound_w %d = %02x\n", machine().describe_context(), offset, data);
+			logerror("%s: write %d = %02x\n", machine().describe_context(), offset, data);
 			break;
 	}
 }
 
 
-uint8_t qsound_hle_device::qsound_r()
+uint8_t capcom_q1_hle_device::read()
 {
 	// ready bit (0x00 = busy, 0x80 == ready)
 	m_stream->update();
@@ -222,7 +222,7 @@ uint8_t qsound_hle_device::qsound_r()
 }
 
 
-void qsound_hle_device::write_data(uint8_t address, uint16_t data)
+void capcom_q1_hle_device::write_data(uint8_t address, uint16_t data)
 {
 	uint16_t *destination = m_register_map[address];
 	if (destination)
@@ -230,7 +230,7 @@ void qsound_hle_device::write_data(uint8_t address, uint16_t data)
 	m_ready_flag = 0;
 }
 
-void qsound_hle_device::init_register_map()
+void capcom_q1_hle_device::init_register_map()
 {
 	// unused registers
 	std::fill(std::begin(m_register_map), std::end(m_register_map), nullptr);
@@ -280,7 +280,7 @@ void qsound_hle_device::init_register_map()
 	}
 }
 
-int16_t qsound_hle_device::read_sample(uint16_t bank, uint16_t address)
+int16_t capcom_q1_hle_device::read_sample(uint16_t bank, uint16_t address)
 {
 	bank &= 0x7fff;
 	const uint32_t rom_addr = (bank << 16) | (address << 0);
@@ -291,7 +291,7 @@ int16_t qsound_hle_device::read_sample(uint16_t bank, uint16_t address)
 /********************************************************************/
 
 // updates one DSP sample
-void qsound_hle_device::update_sample()
+void capcom_q1_hle_device::update_sample()
 {
 	switch (m_state)
 	{
@@ -310,7 +310,7 @@ void qsound_hle_device::update_sample()
 }
 
 // Initialization routine
-void qsound_hle_device::state_init()
+void capcom_q1_hle_device::state_init()
 {
 	int mode = (m_state == STATE_INIT2) ? 1 : 0;
 
@@ -327,13 +327,13 @@ void qsound_hle_device::state_init()
 		return;
 	}
 
-	std::fill(std::begin(m_voice), std::end(m_voice), qsound_voice());
-	std::fill(std::begin(m_adpcm), std::end(m_adpcm), qsound_adpcm());
-	std::fill(std::begin(m_filter), std::end(m_filter), qsound_fir());
-	std::fill(std::begin(m_alt_filter), std::end(m_alt_filter), qsound_fir());
-	std::fill(std::begin(m_wet), std::end(m_wet), qsound_delay());
-	std::fill(std::begin(m_dry), std::end(m_dry), qsound_delay());
-	m_echo = qsound_echo();
+	std::fill(std::begin(m_voice), std::end(m_voice), capcom_q1_voice());
+	std::fill(std::begin(m_adpcm), std::end(m_adpcm), capcom_q1_adpcm());
+	std::fill(std::begin(m_filter), std::end(m_filter), capcom_q1_fir());
+	std::fill(std::begin(m_alt_filter), std::end(m_alt_filter), capcom_q1_fir());
+	std::fill(std::begin(m_wet), std::end(m_wet), capcom_q1_delay());
+	std::fill(std::begin(m_dry), std::end(m_dry), capcom_q1_delay());
+	m_echo = capcom_q1_echo();
 
 	for (int i = 0; i < 19; i++)
 	{
@@ -384,7 +384,7 @@ void qsound_hle_device::state_init()
 }
 
 // Updates filter parameters for mode 1
-void qsound_hle_device::state_refresh_filter_1()
+void capcom_q1_hle_device::state_refresh_filter_1()
 {
 	for (int ch = 0; ch < 2; ch++)
 	{
@@ -399,7 +399,7 @@ void qsound_hle_device::state_refresh_filter_1()
 }
 
 // Updates filter parameters for mode 2
-void qsound_hle_device::state_refresh_filter_2()
+void capcom_q1_hle_device::state_refresh_filter_2()
 {
 	for (int ch = 0; ch < 2; ch++)
 	{
@@ -421,7 +421,7 @@ void qsound_hle_device::state_refresh_filter_2()
 
 // Updates a PCM voice. There are 16 voices, each are updated every sample
 // with full rate and volume control.
-int16_t qsound_hle_device::qsound_voice::update(qsound_hle_device &dsp, int32_t *echo_out)
+int16_t capcom_q1_hle_device::capcom_q1_voice::update(capcom_q1_hle_device &dsp, int32_t *echo_out)
 {
 	// Read sample from rom and apply volume
 	const int16_t output = (m_volume * dsp.read_sample(m_bank, m_addr)) >> 14;
@@ -447,7 +447,7 @@ int16_t qsound_hle_device::qsound_voice::update(qsound_hle_device &dsp, int32_t 
 // The ADPCM algorithm is supposedly similar to Yamaha ADPCM. It also seems
 // like Capcom never used it, so this was not emulated in the earlier QSound
 // emulators.
-int16_t qsound_hle_device::qsound_adpcm::update(qsound_hle_device &dsp, int16_t curr_sample, int nibble)
+int16_t capcom_q1_hle_device::capcom_q1_adpcm::update(capcom_q1_hle_device &dsp, int16_t curr_sample, int nibble)
 {
 	int8_t step;
 	if (!nibble)
@@ -493,7 +493,7 @@ int16_t qsound_hle_device::qsound_adpcm::update(qsound_hle_device &dsp, int16_t 
 
 // The echo effect is pretty simple. A moving average filter is used on
 // the output from the delay line to smooth samples over time.
-int16_t qsound_hle_device::qsound_echo::apply(int32_t input)
+int16_t capcom_q1_hle_device::capcom_q1_echo::apply(int32_t input)
 {
 	// get average of last 2 samples from the delay line
 	int32_t old_sample = m_delay_line[m_delay_pos];
@@ -512,7 +512,7 @@ int16_t qsound_hle_device::qsound_echo::apply(int32_t input)
 }
 
 // Process a sample update
-void qsound_hle_device::state_normal_update()
+void capcom_q1_hle_device::state_normal_update()
 {
 	m_ready_flag = 0x80;
 
@@ -588,7 +588,7 @@ void qsound_hle_device::state_normal_update()
 }
 
 // Apply the FIR filter used as the Q1 transfer function
-int32_t qsound_hle_device::qsound_fir::apply(int16_t input)
+int32_t capcom_q1_hle_device::capcom_q1_fir::apply(int16_t input)
 {
 	int32_t output = 0, tap = 0;
 	for (; tap < (m_tap_count - 1); tap++)
@@ -609,7 +609,7 @@ int32_t qsound_hle_device::qsound_fir::apply(int16_t input)
 }
 
 // Apply delay line and component volume
-int32_t qsound_hle_device::qsound_delay::apply(const int32_t input)
+int32_t capcom_q1_hle_device::capcom_q1_delay::apply(const int32_t input)
 {
 	m_delay_line[m_write_pos++] = input >> 16;
 	if (m_write_pos >= 51)
@@ -623,7 +623,7 @@ int32_t qsound_hle_device::qsound_delay::apply(const int32_t input)
 }
 
 // Update the delay read position to match new delay length
-void qsound_hle_device::qsound_delay::update()
+void capcom_q1_hle_device::capcom_q1_delay::update()
 {
 	const int16_t new_read_pos = (m_write_pos - m_delay) % 51;
 	if (new_read_pos < 0)

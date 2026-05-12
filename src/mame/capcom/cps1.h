@@ -16,8 +16,8 @@
 #include "machine/gen_latch.h"
 #include "machine/timekpr.h"
 #include "machine/timer.h"
+#include "sound/capcom_q1.h"
 #include "sound/okim6295.h"
-#include "sound/qsound.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -335,7 +335,7 @@ protected:
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
-	optional_device<qsound_device> m_qsound;
+	optional_device<capcom_q1_device> m_qsound;
 	optional_device<m48t35_device> m_m48t35;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
