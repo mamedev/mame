@@ -29906,9 +29906,6 @@ suprstar
 @source:misc/amerihok.cpp
 amerihok
 
-@source:misc/amlogic_aml7212.cpp
-popstarz
-
 @source:misc/ampoker2.cpp
 ampkr228
 ampkr2b1
@@ -43878,6 +43875,9 @@ am1000
 @source:skeleton/amcoe_au1250.cpp
 burningr
 creepyrl
+
+@source:skeleton/amlogic_aml7212.cpp
+popstarz
 
 @source:skeleton/amusement_6502.cpp
 unkamus
