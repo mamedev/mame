@@ -51,6 +51,7 @@
 #include "tc0480scp.h"
 
 #include "cpu/m68000/m68020.h"
+#include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/es5506.h"
 
@@ -76,16 +77,16 @@ class gunbustr_state : public driver_device
 public:
 	gunbustr_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
+		m_maincpu(*this, "maincpu"),
 		m_tc0480scp(*this, "tc0480scp"),
-		m_ram(*this,"ram"),
-		m_spriteram(*this,"spriteram"),
+		m_ram(*this, "ram"),
+		m_spriteram(*this, "spriteram"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_spritemap(*this, "spritemap"),
-		m_io_light_x(*this, "LIGHT%u_X", 0U),
-		m_io_light_y(*this, "LIGHT%u_Y", 0U),
+		m_io_light_x(*this, "%uP_VRH", 1U),
+		m_io_light_y(*this, "%uP_VRV", 1U),
 		m_gun_recoil_pl(*this, "Player%u_Gun_Recoil", 1U),
 		m_hit_lamp(*this, "Hit_lamp")
 
@@ -104,11 +105,7 @@ protected:
 private:
 	void prg_map(address_map &map) ATTR_COLD;
 
-	TIMER_CALLBACK_MEMBER(trigger_irq5);
-
 	void motor_control_w(u32 data);
-	u32 gun_r();
-	void gun_w(u32 data);
 	u32 main_cycle_r();
 	void coin_word_w(u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -141,7 +138,6 @@ private:
 
 	bool m_coin_lockout;
 	std::unique_ptr<gb_tempsprite[]> m_spritelist{};
-	emu_timer *m_interrupt5_timer = nullptr;
 };
 
 
@@ -236,6 +232,10 @@ void gunbustr_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		zoomy += 1;
 
 		y += y_offs;
+
+		// Offset for flip start position
+		// For some reason X doesn't need this
+		if (flipy) { y += 0x80 - zoomy; }
 
 		// treat coords as signed
 		if (x > 0x340) x -= 0x400;
@@ -377,14 +377,8 @@ u32 gunbustr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 /*********************************************************************/
 
-TIMER_CALLBACK_MEMBER(gunbustr_state::trigger_irq5)
-{
-	m_maincpu->set_input_line(5, HOLD_LINE);
-}
-
 INTERRUPT_GEN_MEMBER(gunbustr_state::gunbustr_interrupt)
 {
-	m_interrupt5_timer->adjust(m_maincpu->cycles_to_attotime(200000 - 500));
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
@@ -411,20 +405,6 @@ void gunbustr_state::motor_control_w(u32 data)
 }
 
 
-
-u32 gunbustr_state::gun_r()
-{
-	return (m_io_light_x[0]->read() << 24) | (m_io_light_y[0]->read() << 16) |
-			(m_io_light_x[1]->read() << 8)  |  m_io_light_y[1]->read();
-}
-
-void gunbustr_state::gun_w(u32 data)
-{
-	// 10000 cycle delay is arbitrary
-	m_interrupt5_timer->adjust(m_maincpu->cycles_to_attotime(10000));
-}
-
-
 /***********************************************************
              MEMORY STRUCTURES
 ***********************************************************/
@@ -437,7 +417,7 @@ void gunbustr_state::prg_map(address_map &map)
 	map(0x380000, 0x380003).w(FUNC(gunbustr_state::motor_control_w)); // motor, lamps etc.
 	map(0x390000, 0x3907ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)); // Sound shared RAM
 	map(0x400000, 0x400007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
-	map(0x500000, 0x500003).rw(FUNC(gunbustr_state::gun_r), FUNC(gunbustr_state::gun_w));
+	map(0x500000, 0x500007).rw("adc", FUNC(adc0809_device::data_r), FUNC(adc0809_device::address_offset_start_w)).umask32(0xffffffff);
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0x900000, 0x901fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
@@ -491,16 +471,16 @@ static INPUT_PORTS_START( gunbustr )
 
 	// Light gun inputs
 
-	PORT_START("LIGHT0_X")
+	PORT_START("1P_VRH")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
-	PORT_START("LIGHT0_Y")
+	PORT_START("1P_VRV")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("LIGHT1_X")
+	PORT_START("2P_VRH")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(2)
 
-	PORT_START("LIGHT1_Y")
+	PORT_START("2P_VRV")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_REVERSE PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -548,6 +528,19 @@ void gunbustr_state::gunbustr(machine_config &config)
 	tc0510nio.write_4_callback().set(FUNC(gunbustr_state::coin_word_w));
 	tc0510nio.read_7_callback().set_ioport("SYSTEM");
 
+	// TODO: unknown clock, 20 MHz to a F163 output to QD then to ADC CLK
+	adc0809_device &adc(ADC0809(config, "adc", 500'000));
+	adc.eoc_ff_callback().set_inputline("maincpu", 5);
+	adc.in_callback<0>().set_ioport("1P_VRH");
+	adc.in_callback<1>().set_ioport("1P_VRV");
+	adc.in_callback<2>().set_ioport("2P_VRH");
+	adc.in_callback<3>().set_ioport("2P_VRV");
+	// floating on schematics, unused by the game
+	adc.in_callback<4>().set_constant(0xff);
+	adc.in_callback<5>().set_constant(0xff);
+	adc.in_callback<6>().set_constant(0xff);
+	adc.in_callback<7>().set_constant(0xff);
+
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -562,7 +555,7 @@ void gunbustr_state::gunbustr(machine_config &config)
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_palette(m_palette);
-	m_tc0480scp->set_offsets(0x20, 0x07);
+	m_tc0480scp->set_offsets(0x20, 0x08);
 	m_tc0480scp->set_offsets_tx(-1, -1);
 	m_tc0480scp->set_offsets_flip(-1, 0);
 
@@ -690,8 +683,6 @@ void gunbustr_state::init_gunbustr()
 {
 	// Speedup handler
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x203acc, 0x203acf, read32smo_delegate(*this, FUNC(gunbustr_state::main_cycle_r)));
-
-	m_interrupt5_timer = timer_alloc(FUNC(gunbustr_state::trigger_irq5), this);
 }
 
 void gunbustr_state::init_gunbustrj()

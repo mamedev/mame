@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Grull Osgo, Peter Ferrie
-/************************************************************************************
+/**************************************************************************************************
 
 California Chase (c) 1999 The Game Room
 Eggs Playing Chicken (c) 2002 The Game Room
@@ -19,13 +19,18 @@ Notes:
 - calchase: type boot to load game
 
 TODO:
-- get Win 98 to boot (most of Windows 98 copy is damaged inside current HDD dump);
-- Various graphics bugs (title screen uses ROZ?);
-- fix 129 Hz refresh rate bug;
-- inputs (is there a service mode?)
+- Convert to PCI, needs its own Super I/O, pre-AGP VIA chipset (VT82C580VPX Apollo VPX) and
+  TGUI9680 conversion;
+- calchase: needs a redump, most of Win98 is damaged (has no folder structure);
+- calchase: requires franticf style wheel, service mode just black screen, has various gfx bugs
+  during gameplay;
 - hostinv: is an El Torito CD-ROM, can't boot here until PCI section is rewritten;
+- eggsplc: fix input labels (needs card subclassing), ticket dispenser, should require a default
+  NVRAM (has "63" for every winning zone, unlikely), becomes unwinnable after first ticket
+  win (propagates to successive reboots), EMM386 fails during boot, should be heavily idle
+  skippable;
 
-=====================================================================================
+===================================================================================================
 
 California Chase
 The Game Room, 1999
@@ -642,8 +647,6 @@ void calchase_state::calchase_io(address_map &map)
 //  map(0x83c4, 0x83cb).rw("vga", FUNC(trident_vga_device::port_83c6_r), FUNC(trident_vga_device::port_83c6_w));  // Trident LUTDAC
 }
 
-static INPUT_PORTS_START( calchase )
-INPUT_PORTS_END
 
 void calchase_state::machine_start()
 {
@@ -772,6 +775,6 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1998, hostinv,  0, hostinv,  calchase, calchase_state, init_hostinv,  ROT0, "The Game Room", "Host Invaders",        MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, calchase, 0, calchase, calchase, calchase_state, init_calchase, ROT0, "The Game Room", "California Chase",     MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2002, eggsplc,  0, calchase, calchase, calchase_state, init_hostinv,  ROT0, "The Game Room", "Eggs Playing Chicken", 0 )
+GAME( 1998, hostinv,  0, hostinv,  0, calchase_state, init_hostinv,  ROT0, "The Game Room", "Host Invaders",        MACHINE_NOT_WORKING )
+GAME( 1999, calchase, 0, calchase, 0, calchase_state, init_calchase, ROT0, "The Game Room", "California Chase",     MACHINE_NOT_WORKING )
+GAME( 2002, eggsplc,  0, calchase, 0, calchase_state, init_hostinv,  ROT0, "The Game Room", "Eggs Playing Chicken", MACHINE_NOT_WORKING )
