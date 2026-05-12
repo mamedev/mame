@@ -1211,15 +1211,15 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map &map)
 	//
 	// 7a6c - USBD_INTF
 
-	map(0x007a80, 0x007a87).rw(FUNC(generalplus_gpl951xx_device::system_dma_params_channel0_r), FUNC(generalplus_gpl951xx_device::system_dma_params_channel0_w));
-	map(0x007a88, 0x007a8f).rw(FUNC(generalplus_gpl951xx_device::system_dma_params_channel1_r), FUNC(generalplus_gpl951xx_device::system_dma_params_channel1_w));
+	map(0x007a80, 0x007a87).rw(m_gpl_dma, FUNC(gpl_dma_device::system_dma_params_channel0_r), FUNC(gpl_dma_device::system_dma_params_channel0_w));
+	map(0x007a88, 0x007a8f).rw(m_gpl_dma, FUNC(gpl_dma_device::system_dma_params_channel1_r), FUNC(gpl_dma_device::system_dma_params_channel1_w));
 	//
 	// 7ab0 - DMA_SPRISize0
 	// 7ab1 - DMA_SPRISize1
 	//
 	// 7abd - DMA_LineLength
-	map(0x007abe, 0x007abe).rw(FUNC(generalplus_gpl951xx_device::system_dma_memtype_r), FUNC(generalplus_gpl951xx_device::system_dma_memtype_w)); // 7abe - DMA_SS
-	map(0x007abf, 0x007abf).rw(FUNC(generalplus_gpl951xx_device::system_dma_status_r), FUNC(generalplus_gpl951xx_device::system_dma_status_w)); // 7abf - DMA_INT
+	map(0x007abe, 0x007abe).rw(m_gpl_dma, FUNC(gpl_dma_device::system_dma_memtype_r), FUNC(gpl_dma_device::system_dma_memtype_w)); // 7abe - DMA_SS
+	map(0x007abf, 0x007abf).rw(m_gpl_dma, FUNC(gpl_dma_device::system_dma_status_r), FUNC(gpl_dma_device::system_dma_status_w)); // 7abf - DMA_INT
 	//
 	// 7ac0 - CTS_Ctrl1
 	// 7ac1 - CTS_CH

@@ -16,6 +16,8 @@
 
 #include "screen.h"
 #include "emupal.h"
+
+#include "generalplus_gpl_dma.h"
 #include "generalplus_gpl162xx_soc_video.h"
 #include "spg2xx_audio.h"
 
@@ -102,9 +104,6 @@ protected:
 	optional_address_space m_cs_space;
 	u32 m_csbase;
 
-	u16 m_dma_params[8][4];
-	bool m_dma_latched[4];
-
 	// unk 78xx
 	u16 m_sys_ctrl;
 
@@ -169,7 +168,6 @@ protected:
 	u16 m_timera_ctrl;
 	u16 m_timerb_ctrl;
 
-	u16 m_system_dma_memtype;
 
 	u16 internalrom_lower32_r(offs_t offset);
 
@@ -198,22 +196,6 @@ protected:
 	u16 unk_r(offs_t offset);
 	void unk_w(offs_t offset, u16 data);
 
-	void write_dma_params(int channel, int offset, u16 data);
-	u16 read_dma_params(int channel, int offset);
-	void trigger_systemm_dma(int channel);
-
-	u16 system_dma_params_channel0_r(offs_t offset);
-	void system_dma_params_channel0_w(offs_t offset, u16 data);
-	u16 system_dma_params_channel1_r(offs_t offset);
-	void system_dma_params_channel1_w(offs_t offset, u16 data);
-	u16 system_dma_params_channel2_r(offs_t offset);
-	void system_dma_params_channel2_w(offs_t offset, u16 data);
-	u16 system_dma_params_channel3_r(offs_t offset);
-	void system_dma_params_channel3_w(offs_t offset, u16 data);
-	u16 system_dma_status_r();
-	void system_dma_status_w(u16 data);
-	u16 system_dma_memtype_r();
-	void system_dma_memtype_w(u16 data);
 
 	u16 power_state_r();
 	u16 dac_pga_r();
@@ -369,8 +351,6 @@ protected:
 	u16 usb_7a46_r();
 	u16 usb_7a54_r();
 
-	void checkirq6();
-
 	inline u16 read_space(offs_t offset);
 	inline void write_space(offs_t offset, u16 data);
 
@@ -389,8 +369,14 @@ protected:
 	required_device<timer_device> m_timer_e;
 	required_device<timer_device> m_timer_f;
 
+	required_device<gpl_dma_device> m_gpl_dma;
+
 	// config/hacks
 	bool m_disable_timebase_interrupts;
+
+private:
+	void dma_complete(int state);
+
 };
 
 
