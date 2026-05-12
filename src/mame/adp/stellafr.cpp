@@ -573,6 +573,12 @@ ROM_START( kometf1 )
 	ROM_LOAD16_BYTE( "komet_f1_pr2.u6", 0x00001, 0x20000, CRC(86715c37) SHA1(cb986eb50d215294375450c651043e617f66fe21) )
 ROM_END
 
+ROM_START( m55f1 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "mega_fifty_five_i_f1.u2", 0x00000, 0x10000, CRC(03d66f2a) SHA1(e1ad377c47be1c1969a6ac7d0e9cb515bb51496b) )
+	ROM_LOAD16_BYTE( "mega_fifty_five_ii_f1.u6", 0x00001, 0x10000, CRC(2e63e382) SHA1(b6e666b289a4b2ae0bc90a14dbf55a50bf02c12d) )
+ROM_END
+
 ROM_START( mdouble )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "double_f4_1.u2", 0x00000, 0x10000, CRC(0b84c92f) SHA1(818f21d43571a214862e84efd3ee083515ba5860) )
@@ -719,6 +725,7 @@ GAMEL(1993, vulkanf2, 0,        sus_tk,  stellafr, stellafr_state, empty_init, R
 GAMEL(1994, dscbonus, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Disc Bonus",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1994, grandhnd, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Stella", "Grand Hand",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1994, jmbojmbo, jmbojmbf, sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Jumbo Jumbo",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1994, m55f1,    0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Fifty Five (F1)",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1994, mdouble,  0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Double",                MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1994, st_vulkn, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Stella", "Vulkan",                MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1994, suprdisc, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Super Disc",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
