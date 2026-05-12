@@ -678,10 +678,16 @@ ROM_START( taipan )
 	ROM_LOAD16_BYTE( "taipan_w1_ii.u6", 0x00001, 0x20000, CRC(b2c5418a) SHA1(23c542b983325e677cdd9728bb2fce9263793098) )
 ROM_END
 
-ROM_START( turbosun )
+ROM_START( trbsunf1 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "turbo_sunny_f1_i.u2", 0x00000, 0x20000, CRC(763c00e7) SHA1(8bae5206a3ebad6ec552a9714242cebc78819251) )
 	ROM_LOAD16_BYTE( "turbo_sunny_f1_ii.u6", 0x00001, 0x20000, CRC(4d431ae3) SHA1(bb5ff763b9bbaf4eb15ec3fde643b601421fbde1) )
+ROM_END
+
+ROM_START( trbsunw1 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "turbo_sunny_w1_i.u2", 0x00000, 0x20000, CRC(10ff87ec) SHA1(2475966b8ef5e030bb85640dce4bc8d584b59275) )
+	ROM_LOAD16_BYTE( "turbo_sunny_w1_ii.u6", 0x00001, 0x20000, CRC(59b4fdf8) SHA1(0afa7908945e3036820dd9dc3d76a3d4db36766b) )
 ROM_END
 
 ROM_START( viva )
@@ -741,6 +747,8 @@ GAMEL(1995, mptschf2, 0,        sus_tk,  stellafr, stellafr_state, empty_init, R
 GAMEL(1996, discfun,  0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Disc Fun",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1996, multstar, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Multi Star",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1996, st_ohla,  0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Stella", "Oh La La",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1996, trbsunf1, trbsunw1, sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Turbo Sunny (F1)",      MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1996, trbsunw1, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Turbo Sunny (W1)",      MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1996, viva,     0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Viva",                  MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, dpplson,  0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Doppel-Sonne",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, gjubil,   0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Golden Jubilar",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
@@ -760,4 +768,3 @@ GAMEL(1998, grnada,   0,        sus_tk,  stellafr, stellafr_state, empty_init, R
 GAMEL(1998, taipan,   0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Nova",   "Tai Pan Money",         MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, bigwinnr, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Nova",   "Big Winner",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(2001, kleoptra, 0,        sus_rtc, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Asterix und Kleopatra", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(2001, turbosun, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Turbo Sunny",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
