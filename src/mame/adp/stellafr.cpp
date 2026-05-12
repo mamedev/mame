@@ -690,6 +690,7 @@ GAMEL(1993, actionf2, 0,        sus_tk,  stellafr, stellafr_state, empty_init, R
 GAMEL(1993, disc4000, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Disc 4000",             MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1993, jack4000, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Jackpot 4000",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1993, jumbo400, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Jumbo 400",             MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1993, multif2,  0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Multi (F2)",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1993, vulkanf2, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Vulkan F2",             MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1994, dscbonus, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Disc Bonus",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1994, grandhnd, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Stella", "Grand Hand",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
@@ -725,4 +726,3 @@ GAMEL(1998, taipan,   0,        sus_tk,  stellafr, stellafr_state, empty_init, R
 GAMEL(1998, bigwinnr, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Nova",   "Big Winner",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(2001, kleoptra, 0,        sus_rtc, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Asterix und Kleopatra", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(2001, turbosun, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Turbo Sunny",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(2026, multif2,  0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Multi F2",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
