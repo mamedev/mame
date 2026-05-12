@@ -618,6 +618,12 @@ ROM_START( mystjack )
 	ROM_LOAD16_BYTE( "mystery_jackpot_f4_ii.u6", 0x00001, 0x80000, CRC(96523e1a) SHA1(4f53b454790dab4ce45b1db78bd033c40ce47179) )
 ROM_END
 
+ROM_START( ndiscow1 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "nova_disco_w1_i.u2", 0x00000, 0x20000, CRC(790d164b) SHA1(65cf6e6e712818ff12985833b49c1dd9a3e5149f) )
+	ROM_LOAD16_BYTE( "nova_disco_w1_ii.u6", 0x00001, 0x20000, CRC(0204a2b3) SHA1(a434c61237d73a83e11f1a51e7fccc9e3cf3c4e0) )
+ROM_END
+
 ROM_START( nunran )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "nun_ran_f1_nr1.u2", 0x00000, 0x20000, CRC(d8eed6de) SHA1(937cf33694a3d3baf1cc0577cef6974e1d99a6c4) )
@@ -725,6 +731,7 @@ GAMEL(1997, kometf1,  0,        sus_tk,  stellafr, stellafr_state, empty_init, R
 GAMEL(1997, moneyf1,  0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Money",                 MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, multprim, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Multi Prima",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, mystjack, 0,        sus_rtc, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Mystery Jackpot",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1997, ndiscow1, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Nova",   "Disco (W1)",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, nunran,   0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Nun Ran",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, allfred,  0,        sus_rtc, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Allfred",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, glksstrn, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    u8"Glücks-Stern",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
