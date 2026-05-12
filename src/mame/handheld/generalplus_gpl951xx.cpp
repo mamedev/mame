@@ -193,10 +193,10 @@ void generalplus_gpl951xx_game_state::lcd_i80_data(u16 data)
 void generalplus_gpl951xx_game_state::gpl951xx(machine_config &config)
 {
 	GPL951XX(config, m_maincpu, 96000000/2, m_screen);
-	m_maincpu->gp95_porta_in().set(FUNC(generalplus_gpl951xx_game_state::porta_r));
-	m_maincpu->gp95_portb_in().set(FUNC(generalplus_gpl951xx_game_state::portb_r));
-	m_maincpu->gp95_portc_in().set(FUNC(generalplus_gpl951xx_game_state::portc_r));
-	m_maincpu->gp95_porta_out().set(FUNC(generalplus_gpl951xx_game_state::porta_w));
+	m_maincpu->porta_in().set(FUNC(generalplus_gpl951xx_game_state::porta_r));
+	m_maincpu->portb_in().set(FUNC(generalplus_gpl951xx_game_state::portb_r));
+	m_maincpu->portc_in().set(FUNC(generalplus_gpl951xx_game_state::portc_r));
+	m_maincpu->porta_out().set(FUNC(generalplus_gpl951xx_game_state::porta_w));
 	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(generalplus_gpl951xx_device::irq_vector_cb));
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);

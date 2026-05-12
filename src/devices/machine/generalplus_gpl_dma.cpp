@@ -6,7 +6,7 @@
 
 #define LOG_GCM394_SYSDMA (1U << 1)
 
-#define VERBOSE     (0)
+#define VERBOSE     (LOG_GCM394_SYSDMA)
 
 #include "logmacro.h"
 

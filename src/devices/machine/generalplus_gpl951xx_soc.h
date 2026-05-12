@@ -42,19 +42,19 @@ public:
 	auto i80_cmd_out() { return m_i80_cmd_out.bind(); }
 	auto i80_data_out() { return m_i80_data_out.bind(); }
 
-	auto gp95_porta_in() { return m_port_in[0].bind(); }
-	auto gp95_portb_in() { return m_port_in[1].bind(); }
-	auto gp95_portc_in() { return m_port_in[2].bind(); }
-	auto gp95_portd_in() { return m_port_in[3].bind(); }
-	auto gp95_porte_in() { return m_port_in[4].bind(); }
-	auto gp95_portf_in() { return m_port_in[5].bind(); }
+	auto porta_in() { return m_port_in[0].bind(); }
+	auto portb_in() { return m_port_in[1].bind(); }
+	auto portc_in() { return m_port_in[2].bind(); }
+	auto portd_in() { return m_port_in[3].bind(); }
+	auto porte_in() { return m_port_in[4].bind(); }
+	auto portf_in() { return m_port_in[5].bind(); }
 
-	auto gp95_porta_out() { return m_port_out[0].bind(); }
-	auto gp95_portb_out() { return m_port_out[1].bind(); }
-	auto gp95_portc_out() { return m_port_out[2].bind(); }
-	auto gp95_portd_out() { return m_port_out[3].bind(); }
-	auto gp95_porte_out() { return m_port_out[4].bind(); }
-	auto gp95_portf_out() { return m_port_out[5].bind(); }
+	auto porta_out() { return m_port_out[0].bind(); }
+	auto portb_out() { return m_port_out[1].bind(); }
+	auto portc_out() { return m_port_out[2].bind(); }
+	auto portd_out() { return m_port_out[3].bind(); }
+	auto porte_out() { return m_port_out[4].bind(); }
+	auto portf_out() { return m_port_out[5].bind(); }
 
 	void recieve_spi_fifo_data(u8 data);
 
@@ -116,33 +116,33 @@ private:
 	void byte_swap_w(u16 data);
 
 	// Timers (different compared to GPL162xx)
-	u16 gpl951xx_timerg_ctrl_r();
-	void gpl951xx_timerg_ctrl_w(u16 data);
-	u16 gpl951xx_timerg_preload_r();
-	void gpl951xx_timerg_preload_w(u16 data);
-	u16 gpl951xx_timerh_ctrl_r();
-	void gpl951xx_timerh_ctrl_w(u16 data);
-	u16 gpl951xx_timerh_preload_r();
-	void gpl951xx_timerh_preload_w(u16 data);
+	u16 timerg_ctrl_r();
+	void timerg_ctrl_w(u16 data);
+	u16 timerg_preload_r();
+	void timerg_preload_w(u16 data);
+	u16 timerh_ctrl_r();
+	void timerh_ctrl_w(u16 data);
+	u16 timerh_preload_r();
+	void timerh_preload_w(u16 data);
 
 	static constexpr std::string m_portnames[6] = { "a", "b", "c", "d", "e", "f" };
 
-	template<int Port> u16 gp951xx_io_data_r();
-	template<int Port> void gp951xx_io_data_w(u16 data);
-	template<int Port> u16 gp951xx_io_buffer_r();
-	template<int Port> void gp951xx_io_buffer_w(u16 data);
-	template<int Port> u16 gp951xx_io_dir_r();
-	template<int Port> void gp951xx_io_dir_w(u16 data);
-	template<int Port> u16 gp951xx_io_attrib_r();
-	template<int Port> void gp951xx_io_attrib_w(u16 data);
-	template<int Port> u16 gp951xx_io_drv_r();
-	template<int Port> void gp951xx_io_drv_w(u16 data);
-	template<int Port> u16 gp951xx_io_mux_r();
-	template<int Port> void gp951xx_io_mux_w(u16 data);
-	template<int Port> u16 gp951xx_io_latch_r();
-	template<int Port> void gp951xx_io_latch_w(u16 data);
-	template<int Port> u16 gp951xx_io_keyen_r();
-	template<int Port> void gp951xx_io_keyen_w(u16 data);
+	template<int Port> u16 io_data_r();
+	template<int Port> void io_data_w(u16 data);
+	template<int Port> u16 io_buffer_r();
+	template<int Port> void io_buffer_w(u16 data);
+	template<int Port> u16 io_dir_r();
+	template<int Port> void io_dir_w(u16 data);
+	template<int Port> u16 io_attrib_r();
+	template<int Port> void io_attrib_w(u16 data);
+	template<int Port> u16 io_drv_r();
+	template<int Port> void io_drv_w(u16 data);
+	template<int Port> u16 io_mux_r();
+	template<int Port> void io_mux_w(u16 data);
+	template<int Port> u16 io_latch_r();
+	template<int Port> void io_latch_w(u16 data);
+	template<int Port> u16 io_keyen_r();
+	template<int Port> void io_keyen_w(u16 data);
 
 	u16 spi_bank_r();
 	void spi_bank_w(u16 data);
@@ -152,37 +152,35 @@ private:
 
 	u8 get_byte_from_rx_fifo();
 
-	u16 gp951xx_int_status3_r();
-	void gp951xx_int_status3_w(u16 data);
+	u16 sys_ctrl_r();
+	void sys_ctrl_w(u16 data);
 
-	u16 gp95_sys_ctrl_r();
-	void gp95_sys_ctrl_w(u16 data);
+	void clock_ctrl_w(u16 data);
+	u16 clk_ctrl0_r();
+	void clk_ctrl0_w(u16 data);
 
-	void gp95_clock_ctrl_w(u16 data);
+	u16 power_state_r();
+	void watchdog_ctrl_w(u16 data);
 
-	u16 gp95_clk_ctrl0_r();
-	void gp95_clk_ctrl0_w(u16 data);
-	u16 gp95_power_state_r();
-	void gp95_watchdog_ctrl_w(u16 data);
+	u16 pllclkwait_r();
+	void pllclkwait_w(u16 data);
 
-	u16 gp95_pllclkwait_r();
-	void gp95_pllclkwait_w(u16 data);
+	u16 cache_ctrl_r();
+	void cache_ctrl_w(u16 data);
 
-	u16 gp95_cache_ctrl_r();
-	void gp95_cache_ctrl_w(u16 data);
+	void int_status1_w(u16 data);
+	void int_status2_w(u16 data);
+	void int_status3_w(u16 data);
+	u16 int_status1_r();
+	u16 int_status2_r();
+	u16 int_status3_r();
+	void int_priority_1_w(u16 data);
+	void int_priority_2_w(u16 data);
+	void int_priority_3_w(u16 data);
+	void mint_ctrl_w(u16 data);
 
-	void gp95_int_status1_w(u16 data);
-	void gp95_int_status2_w(u16 data);
-	u16 gp95_int_status1_r();
-	u16 gp95_int_status2_r();
-	void gp95_int_priority_1_w(u16 data);
-	void gp95_int_priority_2_w(u16 data);
-	void gp95_int_priority_3_w(u16 data);
-
-	void gp95_mint_ctrl_w(u16 data);
-
-	u16 gp95_cha_ctrl_r();
-	void gp95_cha_ctrl_w(u16 data);
+	u16 cha_ctrl_r();
+	void cha_ctrl_w(u16 data);
 
 	void update_interrupts(int state);
 
@@ -204,10 +202,10 @@ private:
 
 	u16 m_byteswap;
 
-	u16 m_gpl951xx_timerg_preload;
-	u16 m_gpl951xx_timerg_ctrl;
-	u16 m_gpl951xx_timerh_preload;
-	u16 m_gpl951xx_timerh_ctrl;
+	u16 m_timerg_preload;
+	u16 m_timerg_ctrl;
+	u16 m_timerh_preload;
+	u16 m_timerh_ctrl;
 
 	u16 m_spifc_ctrl;
 	u16 m_spifc_ctrl2;
@@ -224,17 +222,17 @@ private:
 	u16 m_io_dir[6];
 	u16 m_io_attrib[6];
 
-	u16 m_gp95_sys_ctrl;
-	u16 m_gp95_clock_ctrl;
-	u16 m_gp95_cache_ctrl;
+	u16 m_sys_ctrl;
+	u16 m_clock_ctrl;
+	u16 m_cache_ctrl;
 
-	u16 m_gp95_int_priority_1;
-	u16 m_gp95_int_priority_2;
-	u16 m_gp95_int_priority_3;
+	u16 m_int_priority_1;
+	u16 m_int_priority_2;
+	u16 m_int_priority_3;
 
-	u16 m_gp95_misc_int_ctrl;
+	u16 m_misc_int_ctrl;
 
-	u16 m_gp95_cha_ctrl;
+	u16 m_cha_ctrl;
 
 	u16 m_pllchange;
 
