@@ -579,6 +579,12 @@ ROM_START( moneyf1 )
 	ROM_LOAD16_BYTE( "m27c1001_money_f1_ic2", 0x00001, 0x20000, CRC(ad95ffc4) SHA1(1062be41a3822efd1d4c848c8ec50488dde42a78) )
 ROM_END
 
+ROM_START( multif2 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "multi_f2_i.u2", 0x00000, 0x10000, CRC(26908481) SHA1(4efedc5b78e877197a5a8c5b358d1918ba031dbc) )
+	ROM_LOAD16_BYTE( "multi_f2_ii.u6", 0x00001, 0x10000, CRC(16fdaadd) SHA1(868a22d5717b287a8d30b340770b5535bc707221) )
+ROM_END
+
 ROM_START( multmult )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "multi_multi_f1_i.u2", 0x00000, 0x20000, CRC(6aa663af) SHA1(cfcdf930fa26c06e49b241dbcb520c0c64cc8af0) )
@@ -719,3 +725,4 @@ GAMEL(1998, taipan,   0,        sus_tk,  stellafr, stellafr_state, empty_init, R
 GAMEL(1998, bigwinnr, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Nova",   "Big Winner",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(2001, kleoptra, 0,        sus_rtc, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Asterix und Kleopatra", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(2001, turbosun, 0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Turbo Sunny",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(2026, multif2,  0,        sus_tk,  stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Multi F2",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
