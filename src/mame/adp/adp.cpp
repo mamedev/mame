@@ -774,6 +774,18 @@ ROM_START( fstation )
 	ROM_LOAD16_BYTE( "spielekoffer_video_9_sp_f1.ii", 0x00001, 0x80000, CRC(64138dcb) SHA1(1b629915cba32f8f6164ae5075c175b522b4a323) )
 ROM_END
 
+ROM_START( kkornf4 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "kimme_und_korn_f4_i.u2", 0x00000, 0x20000, CRC(eb9aca01) SHA1(d38dbe7387824a18c7ba8b70691b7313bd604e28) )
+	ROM_LOAD16_BYTE( "kimme_und_korn_f4_ii.u6", 0x00001, 0x20000, CRC(84940a33) SHA1(efe167d07199d3200915fd355e30946a09c2ed23) )
+
+	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
+
+	ROM_REGION( 0x4000, "nvram", 0 )
+	ROM_LOAD16_BYTE( "mk48t08_i.u5", 0x0000, 0x2000, CRC(a99a0c21) SHA1(d88452bd00e2dba3568f3ad0b73be4c6048a7654) )
+	ROM_LOAD16_BYTE( "mk48t08_ii.u8", 0x0001, 0x2000, CRC(0b5053de) SHA1(ff3d55038322d825d96262ce3f787586bd45fd33) )
+ROM_END
+
 ROM_START(trumpfas)
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "trumpf_as_dm_f2_pr1.u2", 0x00000, 0x20000, CRC(542b1517) SHA1(fcddb31b4b429c8d67161037d356861413567bb8))
@@ -788,6 +800,7 @@ ROM_END
 
 
 GAME( 1993, quickjac,  0,        quickjac, quickjac, adp_state, empty_init, ROT0, "ADP",     "Quick Jack",                        0 )
+GAME( 1993, kkornf4,   0,        skattv,   skattv,   adp_state, empty_init, ROT0, "ADP",     "Kimme und Korn (F4)",               MACHINE_NOT_WORKING ) // lightgun missing
 GAME( 1994, skattv,    0,        skattv,   skattv,   adp_state, empty_init, ROT0, "ADP",     "Skat TV",                           0 )
 GAME( 1994, trumpfas,  skattv,   skattv,   skattv,   adp_state, empty_init, ROT0, "ADP",     "Trumpf As",                         MACHINE_NOT_WORKING ) // throws FOUL error on startup
 GAME( 1995, skattva,   skattv,   skattva,  skattva,  adp_state, empty_init, ROT0, "ADP",     "Skat TV (version TS3)",             0 )
