@@ -397,7 +397,7 @@ u16 namcos2_base_state::c140_rom_r(offs_t offset)
 	const bool lsb_swap = BIT(~offset, 19);
 
 	offset &= 0x7ffff;
-	u16 ret = m_c140_region[(romsel << 19 | offset) + 0x80000] & 0xff00; // voice1 or voice2
+	u16 ret = m_c140_region[romsel << 19 | offset] & 0xff00; // voice1 or voice2
 
 	if (lsb_en)
 	{

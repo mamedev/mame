@@ -544,8 +544,8 @@ ROM_END
 // on main PCB: 8031 (exact model unknown) + 6116P-3 + 10 MHz XTAL + 3.579545 XTAL + YM2413 + bank of 8 DIP switches
 // on LED PCB: 2x D8255AC-2 + M5L8279P-5 + logic
 ROM_START( whujiang )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cpu", 0x00000, 0x10000, CRC(5dcff135) SHA1(67427bccf310d3f51784b568b0c34741a6b7812f) )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "cpu", 0x0000, 0x8000, CRC(2fac1d32) SHA1(543951defb4dccd888480a1ca62d771e62c2e23f) )
 ROM_END
 
 // 五虎将加强版 (Wǔ Hǔjiàng Jiāqiáng Bǎn) (Five Tiger Generals Enhanced Version)
@@ -579,7 +579,7 @@ GAME( 1996, panda2,   0, panda2, panda2,  panda2_state, empty_init, ROT0, "Kelly
 GAME( 2003, lanmao,   0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Lan Mao",                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 
 // for the following sets no effort has been made yet to emulate the different behaviour. Most have also different LED layout
-GAME( 199?, pkzw,     0, panda2, panda2,  panda2_state, empty_init, ROT0, "<unknown>",                   "PK Zhiwang",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 199?, tzwang,   0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "<unknown>",                   "Tiaozhan Wang",           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 199?, whujiang, 0, panda2, panda2,  panda2_state, empty_init, ROT0, "<unknown>",                   "Wu Hujiang",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 199?, whujijqb, 0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "<unknown>",                   "Wu Hujiang Jiaqiang Ban", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1998, pkzw,     0, panda2, panda2,  panda2_state, empty_init, ROT0, "Hengfa Electronics",          "PK Zhiwang",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2000, tzwang,   0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Jindalai Electronics",        "Tiaozhan Wang",           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1991, whujiang, 0, panda2, panda2,  panda2_state, empty_init, ROT0, "Hom Inn",                     "Wu Hujiang",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1998, whujijqb, 0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Hom Inn",                     "Wu Hujiang Jiaqiang Ban", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
