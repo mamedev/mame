@@ -779,7 +779,7 @@ ROM_START( kkornf4 )
 	ROM_LOAD16_BYTE( "kimme_und_korn_f4_i.u2", 0x00000, 0x20000, CRC(eb9aca01) SHA1(d38dbe7387824a18c7ba8b70691b7313bd604e28) )
 	ROM_LOAD16_BYTE( "kimme_und_korn_f4_ii.u6", 0x00001, 0x20000, CRC(84940a33) SHA1(efe167d07199d3200915fd355e30946a09c2ed23) )
 
-	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
+	ROM_REGION16_BE( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "kimme_und_korn_video_i.u2", 0x00000, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "kimme_und_korn_video_ii.u5", 0x00001, 0x80000, NO_DUMP )
 
