@@ -177,12 +177,13 @@ protected:
 	devcb_write16 m_space_write_cb;
 	devcb_write_line m_dma_complete_cb;
 
-	virtual TIMER_DEVICE_CALLBACK_MEMBER(timer_a_cb);
-	virtual TIMER_DEVICE_CALLBACK_MEMBER(timer_b_cb);
-	virtual TIMER_DEVICE_CALLBACK_MEMBER(timer_c_cb);
-	virtual TIMER_DEVICE_CALLBACK_MEMBER(timer_d_cb);
-	virtual TIMER_DEVICE_CALLBACK_MEMBER(timer_e_cb);
-	virtual TIMER_DEVICE_CALLBACK_MEMBER(timer_f_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_a_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_b_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_c_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_e_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_f_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(scheduler_cb);
 
 	u16 unk_r(offs_t offset);
 	void unk_w(offs_t offset, u16 data);
@@ -344,6 +345,7 @@ protected:
 	required_device<timer_device> m_timer_d;
 	required_device<timer_device> m_timer_e;
 	required_device<timer_device> m_timer_f;
+	required_device<timer_device> m_scheduler;
 
 	required_device<gpl_dma_device> m_gpl_dma;
 	required_device<gpl_timebase_device> m_gpl_timebase;

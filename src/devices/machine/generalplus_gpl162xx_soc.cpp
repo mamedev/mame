@@ -68,6 +68,7 @@ sunplus_gcm394_base_device::sunplus_gcm394_base_device(const machine_config &mco
 	m_timer_d(*this, "timer_d"),
 	m_timer_e(*this, "timer_e"),
 	m_timer_f(*this, "timer_f"),
+	m_scheduler(*this, "scheduler"),
 	m_gpl_dma(*this, "gpl_dma"),
 	m_gpl_timebase(*this, "gpl_timebase"),
 	m_disable_timebase_interrupts(false)
@@ -692,25 +693,22 @@ void sunplus_gcm394_base_device::mint_ctrl_w(u16 data)
 
 void sunplus_gcm394_base_device::update_interrupts(int state)
 {
-	if (!m_disable_timebase_interrupts)
+	if ((m_gpl_timebase->timebasea_irq_flag() && !m_disable_timebase_interrupts) || (m_gpl_timebase->timebaseb_irq_flag() && !m_disable_timebase_interrupts))
 	{
-		if (m_gpl_timebase->timebasea_irq_flag() || m_gpl_timebase->timebaseb_irq_flag())
-		{
-			set_state_unsynced(UNSP_IRQ7_LINE, ASSERT_LINE);
-		}
-		else
-		{
-			set_state_unsynced(UNSP_IRQ7_LINE, CLEAR_LINE);
-		}
+		set_state_unsynced(UNSP_IRQ7_LINE, ASSERT_LINE);
+	}
+	else
+	{
+		set_state_unsynced(UNSP_IRQ7_LINE, CLEAR_LINE);
+	}
 
-		if (m_gpl_timebase->timebasec_irq_flag())
-		{
-			set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
-		}
-		else
-		{
-			set_state_unsynced(UNSP_IRQ6_LINE, CLEAR_LINE);
-		}
+	if ((m_gpl_timebase->timebasec_irq_flag() && !m_disable_timebase_interrupts) || (m_rtc_int_status & 0x0100))
+	{
+		set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
+	}
+	else
+	{
+		set_state_unsynced(UNSP_IRQ6_LINE, CLEAR_LINE);
 	}
 }
 
@@ -792,13 +790,58 @@ void sunplus_gcm394_base_device::cha_ctrl_w(u16 data)
 }
 
 
-// **************************************** 793x uknown region stubs *************************************************
+// UART
 
 u16 sunplus_gcm394_base_device::uart_status_r()
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::uart_status_r\n", machine().describe_context());
 	return machine().rand(); // lazertag waits on a bit, status flag for something?
 }
+
+// RTC
+
+TIMER_DEVICE_CALLBACK_MEMBER(sunplus_gcm394_base_device::scheduler_cb)
+{
+	if (m_rtc_int_ctrl & 0x0100)
+	{
+		logerror("scheduler setting\n");
+		m_rtc_int_status |= 0x0100;
+		update_interrupts(1);
+	}
+}
+
+
+// P_RTC_Ctrl
+//
+// 15  RTCEN  - RTC Module Enable
+// 14
+// 13
+// 12
+
+// 11
+// 10  ALMEN  - Alarm Function Enable
+//  9  HMSEN  - Hour/Minute/Second Update Enable
+//  8  SCHEN  - Scheduler Function Enable
+
+//  7
+//  6
+//  5
+//  4
+
+//  3
+//  2  SCHSEL[2] - Secheduler Period
+//  1  SCHSEL[1]
+//  0  SCHSEL[0]
+//
+// Scheduler Periods are
+// 0: 16hz
+// 1: 32Hz
+// 2: 64Hz
+// 3: 128Hz
+// 4: 256Hz
+// 5: 512Hz
+// 6: 1024Hz
+// 7: 2048Hz
 
 u16 sunplus_gcm394_base_device::rtc_ctrl_r()
 {
@@ -809,9 +852,59 @@ u16 sunplus_gcm394_base_device::rtc_ctrl_r()
 
 void sunplus_gcm394_base_device::rtc_ctrl_w(u16 data)
 {
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::rtc_ctrl_w %04x\n", machine().describe_context(), data);
+	u16 no_use = data & 0x78f8;
+	u8 rtcen = (data & 0x8000) >> 15;
+	u8 almen = (data & 0x0400) >> 10;
+	u8 hmsen = (data & 0x0200) >> 9;
+	u8 schen = (data & 0x0100) >> 8;
+	u8 schsel = (data & 0x0007) >> 0;
+
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::rtc_ctrl_w %04x (unused %04x, rtc enable %d, alarm enable %d, hours/min/sec enable %d, scheduler enable %d, schselect %01x)\n", machine().describe_context(), data, no_use, rtcen, almen, hmsen, schen, schsel);
 	m_rtc_ctrl = data;
+
+	if (rtcen)
+	{
+		if (schen)
+		{
+			//logerror("scheduler timer enabled\n");
+			attotime period = attotime::from_hz(1 << (4 + schsel));
+			m_scheduler->adjust(period, 0, period);
+		}
+		else
+		{
+			//logerror("scheduler timer disabled\n");
+			m_scheduler->adjust(attotime::never);
+		}
+	}
+	else
+	{
+		//logerror("scheduler timer disabled\n");
+		m_scheduler->adjust(attotime::never);
+	}
+
 }
+
+// P_RTC_INT_Status
+//
+// 15
+// 14
+// 13
+// 12
+
+// 11
+// 10  ALMIEF/C  - Alarm Interrupt Flag/Clear
+//  9
+//  8  SCHIF/C - Scheduler Interrupt Flag/Clear
+
+//  7
+//  6
+//  5
+//  4
+
+//  3  HRIF/C - Hour Interrupt Flag/Clear
+//  2  MINIF/C - Minute Interrupt Flag/Clear
+//  1  SECIF/C - Second Interrupt Flag/Clear
+//  0  HSECIF/C - Half Second Interrupt Flag/Clear
 
 // value of 7935 is read then written in irq6, nothing happens unless bit 0x0100 was set, which could be some kind of irq source being acked?
 u16 sunplus_gcm394_base_device::rtc_int_status_r()
@@ -824,17 +917,48 @@ void sunplus_gcm394_base_device::rtc_int_status_w(u16 data)
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::rtc_int_status_w %04x\n", machine().describe_context(), data);
 	m_rtc_int_status &= ~data;
+	update_interrupts(1);
 }
+
+// P_RTC_INT_Ctrl
+//
+// 15
+// 14
+// 13
+// 12
+
+// 11
+// 10  ALMIEN   - Alarm Interrupt Enable (IRQ7)
+//  9
+//  8  SCHIEN   - Scheduler Interrupt Enable (IRQ6)
+
+//  7
+//  6
+//  5
+//  4
+
+//  3  HRIEN   - Hour Interrupt Enable
+//  2  MINIEN  - Minute Interrupt Enable
+//  1  SECIEN  - Second Interrupt Enable
+//  0  HSECIEN - Half Second Interrupt Enable
 
 u16 sunplus_gcm394_base_device::rtc_int_ctrl_r()
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::rtc_int_ctrl_r\n", machine().describe_context());
-	return 0x0000;
+	return m_rtc_int_ctrl;
 }
 
 void sunplus_gcm394_base_device::rtc_int_ctrl_w(u16 data)
 {
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::rtc_int_ctrl_w %04x\n", machine().describe_context(), data);
+	u16 no_use = data & 0xfaf0;
+	u8 almien =  (data & 0x0400) >> 10;
+	u8 schien = (data & 0x0100) >> 8;
+	u8 hrien = (data & 0x0008) >> 3;
+	u8 minien = (data & 0x0004) >> 2;
+	u8 secien = (data & 0x0002) >> 1;
+	u8 hsecien = (data & 0x0001) >> 0;
+
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::rtc_int_ctrl_w %04x (unused %04x, alarm irq enable %d, scheduler irq enable %d, hour irq enable %d, minute irq enable %d, second irq enable %d, half-second irq enable %d)\n", machine().describe_context(), data, no_use, almien, schien, hrien, minien, secien, hsecien);
 	m_rtc_int_ctrl = data;
 }
 
@@ -1885,6 +2009,8 @@ void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)
 	TIMER(config, "timer_d").configure_generic(FUNC(sunplus_gcm394_base_device::timer_d_cb));
 	TIMER(config, "timer_e").configure_generic(FUNC(sunplus_gcm394_base_device::timer_e_cb));
 	TIMER(config, "timer_f").configure_generic(FUNC(sunplus_gcm394_base_device::timer_f_cb));
+
+	TIMER(config, "scheduler").configure_generic(FUNC(sunplus_gcm394_base_device::scheduler_cb));
 }
 
 
