@@ -111,17 +111,11 @@ private:
 
 	void gcu_interrupt(int state);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void main_map(address_map &map) ATTR_COLD;
 	void ifu_map(address_map &map) ATTR_COLD;
 	void ymz280b_map(address_map &map) ATTR_COLD;
 };
 
-uint32_t konendev_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return m_gcu->draw(screen, bitmap, cliprect);
-}
 
 uint32_t konendev_state::mcu2_r(offs_t offset, uint32_t mem_mask)
 {
@@ -388,11 +382,12 @@ void konendev_state::konendev(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480); // Based on Firebeat settings
-	screen.set_screen_update(FUNC(konendev_state::screen_update));
+	screen.set_screen_update(m_gcu, FUNC(k057714_device::draw));
 	screen.set_palette("palette");
 	screen.screen_vblank().set(m_gcu, FUNC(k057714_device::vblank_w));
 
-	K057714(config, m_gcu, 0).set_screen("screen");
+	K057714(config, m_gcu, 0);
+	m_gcu->set_screen("screen");
 	m_gcu->irq_callback().set(FUNC(konendev_state::gcu_interrupt));
 
 	RTC62423(config, "rtc", XTAL(32'768));
