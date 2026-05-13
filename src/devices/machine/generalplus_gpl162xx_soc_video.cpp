@@ -312,6 +312,11 @@ void gcm394_base_video_device::device_reset()
 
 	m_sprite_7022_gfxbase_lsb = 0;
 	m_sprite_702d_gfxbase_msb = 0;
+
+	m_page0_addr_lsb = 0;
+	m_page0_addr_msb = 0;
+	m_page1_addr_lsb = 0;
+	m_page1_addr_msb = 0;
 	m_page2_addr_lsb = 0;
 	m_page2_addr_msb = 0;
 	m_page3_addr_lsb = 0;
