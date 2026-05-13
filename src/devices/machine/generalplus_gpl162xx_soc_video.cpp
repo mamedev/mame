@@ -312,6 +312,11 @@ void gcm394_base_video_device::device_reset()
 
 	m_sprite_7022_gfxbase_lsb = 0;
 	m_sprite_702d_gfxbase_msb = 0;
+
+	m_page0_addr_lsb = 0;
+	m_page0_addr_msb = 0;
+	m_page1_addr_lsb = 0;
+	m_page1_addr_msb = 0;
 	m_page2_addr_lsb = 0;
 	m_page2_addr_msb = 0;
 	m_page3_addr_lsb = 0;
@@ -327,7 +332,10 @@ u32 gcm394_base_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 	// The 'bitmap test mode' in jak_car2 requires this to be black instead.
 
 	// jak_s500 briely sets pen 0 of the layer to magenta, but then ends up erasing it
+	bool readfromcsspace = true;
 
+	if (!m_cs_space)
+		readfromcsspace = false;
 
 	if (0)
 	{
@@ -398,12 +406,12 @@ u32 gcm394_base_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 		for (int i = 0; i < 4; i++)
 		{
-			m_renderer->draw_page(true, m_703a_palettebank, cliprect, scanline, i, m_page0_addr_msb, m_page0_addr_lsb, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll, 0);
-			m_renderer->draw_page(true, m_703a_palettebank, cliprect, scanline, i, m_page1_addr_msb, m_page1_addr_lsb, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll, 1);
-			m_renderer->draw_page(true, m_703a_palettebank, cliprect, scanline, i, m_page2_addr_msb, m_page2_addr_lsb, m_tmap2_scroll, m_tmap2_regs, mem, m_paletteram, m_rowscroll, 2);
-			m_renderer->draw_page(true, m_703a_palettebank, cliprect, scanline, i, m_page3_addr_msb, m_page3_addr_lsb, m_tmap3_scroll, m_tmap3_regs, mem, m_paletteram, m_rowscroll, 3);
+			m_renderer->draw_page(readfromcsspace, m_703a_palettebank, cliprect, scanline, i, m_page0_addr_msb, m_page0_addr_lsb, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll, 0);
+			m_renderer->draw_page(readfromcsspace, m_703a_palettebank, cliprect, scanline, i, m_page1_addr_msb, m_page1_addr_lsb, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll, 1);
+			m_renderer->draw_page(readfromcsspace, m_703a_palettebank, cliprect, scanline, i, m_page2_addr_msb, m_page2_addr_lsb, m_tmap2_scroll, m_tmap2_regs, mem, m_paletteram, m_rowscroll, 2);
+			m_renderer->draw_page(readfromcsspace, m_703a_palettebank, cliprect, scanline, i, m_page3_addr_msb, m_page3_addr_lsb, m_tmap3_scroll, m_tmap3_regs, mem, m_paletteram, m_rowscroll, 3);
 
-			m_renderer->draw_sprites(true, m_use_legacy_mode ? 2 : 1, m_703a_palettebank, highres, cliprect, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram);
+			m_renderer->draw_sprites(readfromcsspace, m_use_legacy_mode ? 2 : 1, m_703a_palettebank, highres, cliprect, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram);
 		}
 
 		m_renderer->apply_saturation_and_fade(bitmap, cliprect, scanline);

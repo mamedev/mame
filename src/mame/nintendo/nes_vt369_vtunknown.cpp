@@ -923,6 +923,10 @@ ROM_START( 240in1ar )
 	ROM_LOAD( "mw-106-2g.u3", 0x00000, 0x8000000, CRC(c46d2ca9) SHA1(0fff7d3461ff620c5b5e43f54f9e7badd089b951) )
 ROM_END
 
+ROM_START( urban240 )
+	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_LOAD( "urban240.u3", 0x00000, 0x8000000, CRC(73d03f0d) SHA1(a1615dba39e9114ace7a8ad68f46195da655bf35) )
+ROM_END
 
 ROM_START( rtvgc300 )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
@@ -1820,15 +1824,17 @@ CONS( 201?, dgun2572, 0,  0,  vt36x_32mb, vt369, vt36x_state, init_dgun2572, "dr
 
 // NOT SPI roms, altswap sets code starts with '6a'
 
-CONS( 201?, red5mam,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Red5", "Mini Arcade Machine (Red5, 'Xtra Game')", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+CONS( 201?, red5mam,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Red5", "Mini Arcade Machine (Red5, 'Xtra Game')", MACHINE_NOT_WORKING )
 
-CONS( 2016, dgun2593,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+CONS( 2016, dgun2593,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING )
+
+CONS( 201?, urban240,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Urban Outfitters", "Mini Arcade Machine 240-in-1 (translucent case)", MACHINE_NOT_WORKING ) 
 
 CONS( 200?, gcs2mgp,   0,  0,  vt36x_altswap_16mb, vt369_rot, vt36x_state, empty_init, "Jungle's Soft", "Mini Game Player 48-in-1",  MACHINE_NOT_WORKING | ROT270 )
 
 // Not the same as the other 240-in-1 machine from Thumbs Up below (tup240) This one makes greater use of newer VT features with most games having sampled music, not APU sound.
 // Several of the games contained in here are buggy / broken on real hardware (see https://www.youtube.com/watch?v=-mgGNaDQ1HE )
-CONS( 201?, 240in1ar,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Thumbs Up", "Mini Arcade Machine (Thumbs Up, 240IN1ARC)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+CONS( 201?, 240in1ar,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Thumbs Up", "Mini Arcade Machine (Thumbs Up, 240IN1ARC)", MACHINE_NOT_WORKING )
 // portable fan + famiclone combo handheld, very similar to 240in1ar
 CONS( 2020, nubsupmf,   0,      0,  vt36x_altswap_4mb, vt369, vt36x_state, empty_init, "<unknown>", "NubSup Mini Game Fan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 

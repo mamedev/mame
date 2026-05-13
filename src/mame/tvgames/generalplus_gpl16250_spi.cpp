@@ -175,6 +175,18 @@ ROM_START( jspodred )
 	ROM_LOAD16_WORD_SWAP( "gpr5l322.sfrom1", 0x0000, 0x400000, CRC(5bd08294) SHA1(3a4a76b7b30c0dcf8184cb94d75819c382c1c668) )
 ROM_END
 
+ROM_START( wildking )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "mx25l12835f.sfrom1", 0x0000, 0x1000000, CRC(bc4cace6) SHA1(1fc2e28b194a59ddb1ed9a63978064d2d0a6ab8c) )
+
+	// there was an SD card slot, but the "Power Up Cartridge" included was just a piece of plastic, not a real card
+	// other software may be available for the unit however.
+ROM_END
+
+
 
 ROM_START( pokegach )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
@@ -330,6 +342,8 @@ CONS(2013, anpaneng, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gps
 
 // 甲虫王者ムシキング むしとりバトルずかん  (JS Pod on PCB)
 CONS(201?, jspodred, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Sega Toys", "Kouchuu Ouja Mushiking: Mushitori Battle Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+CONS(201?, wildking, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Sega Toys", "Wild King (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2015, bkrankp,  0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
