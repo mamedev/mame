@@ -1020,12 +1020,8 @@ end
 				"-Wno-unknown-warning-option",
 				"-Wno-unused-value",
 				"-Wno-unused-const-variable",
+				"-Wno-xor-used-as-pow", -- clang 10.0 complains that expressions like 10 ^ 7 look like exponention
 			}
-			if ((version >= 100000) and (_OPTIONS["targetos"] ~= 'macosx')) or (version >= 120000) then
-				buildoptions {
-					"-Wno-xor-used-as-pow", -- clang 10.0 complains that expressions like 10 ^ 7 look like exponention
-				}
-			end
 			if version >= 140000 then
 				buildoptions {
 					"-Wno-bitwise-instead-of-logical", -- clang 14.0 complains about &, | on bools in asmjit
@@ -1049,13 +1045,9 @@ end
 				"-Wno-error=attributes", -- GCC fails to recognize some uses of [[maybe_unused]]
 				"-Wno-error=stringop-truncation", -- ImGui again
 				"-Wno-stringop-overflow", -- generates false positives when assigning an int rvalue to a u8 variable without an explicit cast
+				"-Wno-stringop-overread",       -- machine/bbc.cpp in GCC 11.1
+				"-Wno-nonnull",                 -- luaengine.cpp lambdas do not need "this" captured but GCC 11.1 erroneously insists
 			}
-			if version >= 110000 then
-				buildoptions {
-					"-Wno-nonnull",                 -- luaengine.cpp lambdas do not need "this" captured but GCC 11.1 erroneously insists
-					"-Wno-stringop-overread",       -- machine/bbc.cpp in GCC 11.1
-				}
-			end
 			if version >= 120000 then
 				buildoptions {
 					"-Wno-error=maybe-uninitialized",
@@ -1065,6 +1057,11 @@ end
 			if version >= 130000 then
 				buildoptions_cpp {
 					"-Wno-xor-used-as-pow",
+				}
+			end
+			if version >= 160000 then
+				buildoptions_cpp {
+					"-Wno-sfinae-incomplete",
 				}
 			end
 		end

@@ -7322,12 +7322,18 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( mjmyster )
-	// The manual provides three sets of standard settings:
+	// The Mahjong the Mysterious World manual provides three sets of standard settings:
 	//       標準設定　シングル向け                        標準設定　メダルコーナー向け                 標準設定　アミューズコーナー向け
 	// SW 1  Off Off Off  On  On  On Off  On  On Off       Off Off Off  On  On  On Off  On  On Off        On Off Off  On Off Off  On Off  On Off
 	// SW 2  Off Off Off Off  On  On Off  On  On Off       Off Off Off Off Off Off  On  On  On Off       Off Off Off Off Off Off Off Off Off Off
 	// SW 3  Off Off Off  On  On  On  On  On  On  On       Off Off Off  On  On  On  On  On  On Off       Off  On Off  On  On  On  On  On  On Off
 	// SW 4  Off  On  On  On  On Off Off Off Off Off        On  On  On  On  On Off Off Off Off Off        On  On  On  On  On Off Off Off Off Off
+
+	// The Mahjong the Mysterious Universe manual provides two sets of standard settings, but unfortunately the Chinese text in the scans is illegible:
+	// SW 1  Off Off Off  On  On  On Off  On  On Off        On Off Off  On Off Off  On Off  On Off
+	// SW 2  Off Off Off Off  On  On Off  On  On Off       Off Off Off Off Off Off Off Off Off Off
+	// SW 3  Off Off Off  On  On  On  On  On  On Off       Off  On Off  On  On  On  On  On  On Off
+	// SW 4  Off  On  On  On  On Off Off   On On Off        On  On  On  On  On Off Off  On  On Off
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW3", 0x03, EQUALS, 0x02) // pay
