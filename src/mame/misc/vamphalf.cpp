@@ -3423,7 +3423,7 @@ GAME( 1999, poosho,     0,        jmpbreak,  common,    vamphalf_state,       in
 GAME( 1999, newxpang,   0,        newxpang,  common,    vamphalf_state,       init_newxpang,  ROT0,   "F2 System",                     "New Cross Pang (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, newxpanga,  newxpang, jmpbreak,  common,    vamphalf_state,       init_newxpanga, ROT0,   "F2 System",                     "New Cross Pang (set 2)", MACHINE_SUPPORTS_SAVE ) // TODO: speed up for this set
 
-GAME( 1999, worldadv,   0,        worldadv,  common,    vamphalf_state,       init_worldadv,  ROT0,   "Logic / F2 System",             "World Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // game starts to stall for several seconds at a time after it's been running for a certain amount of time
+GAME( 1999, worldadv,   0,        worldadv,  common,    vamphalf_state,       init_worldadv,  ROT0,   "Logic / F2 System",             "World Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // cfr. vamphalf_prot.cpp
 
 GAME( 1999, solitaire,  0,        solitaire, solitaire, vamphalf_state,       init_solitaire, ROT0,   "F2 System",                     "Solitaire (version 2.5)", MACHINE_SUPPORTS_SAVE )
 
@@ -3440,8 +3440,8 @@ GAME( 1999, vamphalfk,  vamphalf, vamphalf,  common,    vamphalf_state,       in
 
 GAME( 2000, dquizgo2,   0,        coolmini,  common,    vamphalf_state,       init_dquizgo2,  ROT0,   "SemiCom",                       "Date Quiz Go Go Episode 2", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, misncrft,   0,        misncrft,  common,    vamphalf_qdsp_state,  init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.7)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // game starts to stall for several seconds at a time after it's been running for a certain amount of time (you can usually complete 1 loop)
-GAME( 2000, misncrfta,  misncrft, misncrft,  common,    vamphalf_qdsp_state,  init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.4)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 2000, misncrft,   0,        misncrft,  common,    vamphalf_qdsp_state,  init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.7)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // cfr. vamphalf_prot.cpp
+GAME( 2000, misncrfta,  misncrft, misncrft,  common,    vamphalf_qdsp_state,  init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.4)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 
 GAME( 2000, mrdig,      0,        mrdig,     common,    vamphalf_state,       init_mrdig,     ROT0,   "Sun",                           "Mr. Dig", MACHINE_SUPPORTS_SAVE )
 
@@ -3454,7 +3454,7 @@ GAME( 2001, mrkickera,  mrkicker, mrkickera, finalgdr,  vamphalf_nvram_state, in
 
 GAME( 2001, toyland,    0,        coolmini,  common,    vamphalf_state,       init_toyland,   ROT0,   "SemiCom",                       "Toy Land Adventure", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, wivernwg,   0,        wyvernwg,  common,    vamphalf_qdsp_state,  init_wyvernwg,  ROT270, "SemiCom",                       "Wivern Wings",         MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // gives a protection error after a certain number of plays / coins?
+GAME( 2001, wivernwg,   0,        wyvernwg,  common,    vamphalf_qdsp_state,  init_wyvernwg,  ROT270, "SemiCom",                       "Wivern Wings",         MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // cfr. vamphalf_prot.cpp
 GAME( 2001, wyvernwg,   wivernwg, wyvernwg,  common,    vamphalf_qdsp_state,  init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, wyvernwga,  wivernwg, wyvernwg,  common,    vamphalf_qdsp_state,  init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 
