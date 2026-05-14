@@ -385,7 +385,6 @@ void generalplus_gpl951xx_device::device_start()
 	save_item(NAME(m_int_priority_2));
 	save_item(NAME(m_int_priority_3));
 	save_item(NAME(m_misc_int_ctrl));
-	save_item(NAME(m_cha_ctrl));
 	save_item(NAME(m_pllchange));
 }
 
@@ -418,7 +417,6 @@ void generalplus_gpl951xx_device::device_reset()
 	m_int_priority_2 = 0;
 	m_int_priority_3 = 0;
 	m_misc_int_ctrl = 0;
-	m_cha_ctrl = 0;
 	m_pllchange = 0;
 
 	for (int i = 0; i < 6; i++)
@@ -432,6 +430,30 @@ void generalplus_gpl951xx_device::device_reset()
 }
 
 // Timers
+
+void generalplus_gpl951xx_device::dac_0_w(uint16_t data)
+{
+	m_dac0->write(data);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpl951xx_device::timer_g_cb )
+{
+	m_timerg_ctrl |= 0x8000;
+	update_interrupts(1);
+	m_gpl_chx->process_cha_fifo(); // is cha hardwired to timerg overflow?
+}
+
+void generalplus_gpl951xx_device::dac_1_w(uint16_t data)
+{
+	m_dac1->write(data);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpl951xx_device::timer_h_cb )
+{
+	m_timerh_ctrl |= 0x8000;
+	update_interrupts(1);
+	m_gpl_chx->process_chb_fifo(); // is chb hardwired to timerh overflow?
+}
 
 u16 generalplus_gpl951xx_device::timerg_preload_r()
 {
@@ -481,7 +503,7 @@ void generalplus_gpl951xx_device::timerg_ctrl_w(u16 data)
 	u8 srcbsel = (data & 0x0070) >> 4;
 	u8 srcasel = (data & 0x000f) >> 0;
 
-	logerror("%s: timerg_ctrl_w %04x (tmgif_clear %01x) (interrupt enabled %01x) (timer enabled %01x) (ext0sel %01x) (ext1sel %01x) (srcbsel %01x) (srcasel %01x)\n", machine().describe_context(), data, tmgif_clear, tmgie, tmgen, ext0sel, ext1sel, srcbsel, srcasel);
+	logerror("%s: timerg_ctrl_w %04x (tmgif_clear %01x) (interrupt enabled %01x) (timer enabled %01x) (ext0sel %01x) (ext1sel %01x) (srcbsel %s) (srcasel %s)\n", machine().describe_context(), data, tmgif_clear, tmgie, tmgen, ext0sel, ext1sel, m_srcb[srcbsel], m_srca[srcasel]);
 
 	if (data & 0x8000)
 	{
@@ -492,7 +514,7 @@ void generalplus_gpl951xx_device::timerg_ctrl_w(u16 data)
 	{
 		if (data & 0x2000)
 		{
-			m_timer_g->adjust(attotime::zero, 0, attotime::from_hz(2000));
+			m_timer_g->adjust(attotime::zero, 0, attotime::from_hz(8000));
 		}
 		else
 		{
@@ -555,7 +577,7 @@ void generalplus_gpl951xx_device::timerh_ctrl_w(u16 data)
 	u8 srcbsel = (data & 0x0070) >> 4;
 	u8 srcasel = (data & 0x000f) >> 0;
 
-	logerror("%s: timerh_ctrl_w %04x (tmhif_clear %01x) (interrupt enabled %01x) (timer enabled %01x) (ext0sel %01x) (ext1sel %01x) (srcbsel %01x) (srcasel %01x)\n", machine().describe_context(), data, tmhif_clear, tmhie, tmhen, ext0sel, ext1sel, srcbsel, srcasel);
+	logerror("%s: timerh_ctrl_w %04x (tmhif_clear %01x) (interrupt enabled %01x) (timer enabled %01x) (ext0sel %01x) (ext1sel %01x) (srcbsel %01x) (srcasel %01x)\n", machine().describe_context(), data, tmhif_clear, tmhie, tmhen, ext0sel, ext1sel, m_srcb[srcbsel], m_srca[srcasel]);
 
 	if (data & 0x8000)
 	{
@@ -569,7 +591,7 @@ void generalplus_gpl951xx_device::timerh_ctrl_w(u16 data)
 		if (data & 0x2000)
 		{
 			logerror("started timerh\n");
-			m_timer_h->adjust(attotime::zero, 0, attotime::from_hz(2000));
+			m_timer_h->adjust(attotime::zero, 0, attotime::from_hz(1000));
 		}
 		else
 		{
@@ -698,26 +720,6 @@ void generalplus_gpl951xx_device::spi_bank_w(u16 data)
 	m_spi_bank = data;
 }
 
-u16 generalplus_gpl951xx_device::int_status3_r()
-{
-	u16 ret = 0;
-	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::int_status3_r\n", machine().describe_context());
-
-	if (m_timerh_ctrl & 0x8000)
-		ret |= 0x8000;
-
-	if (m_timerg_ctrl & 0x8000)
-		ret |= 0x4000;
-
-	return ret;
-}
-
-void generalplus_gpl951xx_device::int_status3_w(u16 data)
-{
-	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::int_status3_w %04x\n", machine().describe_context(), data);
-	// bit 2 (SPU Beat Interrupt) is listed as R/W for GPL95, but not GPL162? (verify)
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER(generalplus_gpl951xx_device::timer_a_cb)
 {
 }
@@ -746,192 +748,244 @@ TIMER_DEVICE_CALLBACK_MEMBER(generalplus_gpl951xx_device::timer_f_cb)
 template<int Port>
 u16 generalplus_gpl951xx_device::io_data_r()
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::io_%c_data_r\n", machine().describe_context(), 'a' + Port);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::io_%c_data_r\n", machine().describe_context(), 'a' + Port);
 	return m_port_in[Port]();
 }
 
 template<int Port>
 void generalplus_gpl951xx_device::io_data_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::io_%c_data_w %04x\n", machine().describe_context(), 'a' + Port, data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::io_%c_data_w %04x\n", machine().describe_context(), 'a' + Port, data);
 	m_port_out[Port](data);
 }
 
 template<int Port>
 u16 generalplus_gpl951xx_device::io_buffer_r()
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::io_%c_buffer_r\n", machine().describe_context(), 'a' + Port);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::io_%c_buffer_r\n", machine().describe_context(), 'a' + Port);
 	return m_port_in[Port]();
 }
 
 template<int Port>
 void generalplus_gpl951xx_device::io_buffer_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::io_%c_buffer_w %04x\n", machine().describe_context(), 'a' + Port, data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::io_%c_buffer_w %04x\n", machine().describe_context(), 'a' + Port, data);
 	m_port_out[Port](data);
 }
 
 template<int Port>
 u16 generalplus_gpl951xx_device::io_dir_r()
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::io_%c_dir_r\n", machine().describe_context(), 'a' + Port);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::io_%c_dir_r\n", machine().describe_context(), 'a' + Port);
 	return m_io_dir[Port];
 }
 
 template<int Port>
 void generalplus_gpl951xx_device::io_dir_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::io_%c_dir_w %04x\n", machine().describe_context(), 'a' + Port, data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::io_%c_dir_w %04x\n", machine().describe_context(), 'a' + Port, data);
 	m_io_dir[Port] = data;
 }
 
 template<int Port>
 u16 generalplus_gpl951xx_device::io_attrib_r()
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::io_%c_attrib_r\n", machine().describe_context(), 'a' + Port);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::io_%c_attrib_r\n", machine().describe_context(), 'a' + Port);
 	return m_io_attrib[Port];
 }
 
 template<int Port>
 void generalplus_gpl951xx_device::io_attrib_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::io_%c_attrib_w %04x\n", machine().describe_context(), 'a' + Port, data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::io_%c_attrib_w %04x\n", machine().describe_context(), 'a' + Port, data);
 	m_io_attrib[Port] = data;
 }
 
 template<int Port>
 u16 generalplus_gpl951xx_device::io_drv_r()
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::io_%c_drv_r\n", machine().describe_context(), 'a' + Port);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::io_%c_drv_r\n", machine().describe_context(), 'a' + Port);
 	return 0xffff;
 }
 
 template<int Port>
 void generalplus_gpl951xx_device::io_drv_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::io_%c_drv_w %04x\n", machine().describe_context(), 'a' + Port, data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::io_%c_drv_w %04x\n", machine().describe_context(), 'a' + Port, data);
 }
 
 template<int Port>
 u16 generalplus_gpl951xx_device::io_mux_r()
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::io_%c_mux_r\n", machine().describe_context(), 'a' + Port);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::io_%c_mux_r\n", machine().describe_context(), 'a' + Port);
 	return 0xffff;
 }
 
 template<int Port>
 void generalplus_gpl951xx_device::io_mux_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::io_%c_mux_w %04x\n", machine().describe_context(), 'a' + Port, data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::io_%c_mux_w %04x\n", machine().describe_context(), 'a' + Port, data);
 }
 
 template<int Port>
 u16 generalplus_gpl951xx_device::io_latch_r()
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::io_%c_latch_r\n", machine().describe_context(), 'a' + Port);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::io_%c_latch_r\n", machine().describe_context(), 'a' + Port);
 	return 0xffff;
 }
 
 template<int Port>
 void generalplus_gpl951xx_device::io_latch_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::io_%c_latch_w %04x\n", machine().describe_context(), 'a' + Port, data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::io_%c_latch_w %04x\n", machine().describe_context(), 'a' + Port, data);
 }
 
 template<int Port>
 u16 generalplus_gpl951xx_device::io_keyen_r()
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::io_%c_keyen_r\n", machine().describe_context(), 'a' + Port);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::io_%c_keyen_r\n", machine().describe_context(), 'a' + Port);
 	return 0xffff;
 }
 
 template<int Port>
 void generalplus_gpl951xx_device::io_keyen_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::io_%c_keyen_w %04x\n", machine().describe_context(), 'a' + Port, data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::io_%c_keyen_w %04x\n", machine().describe_context(), 'a' + Port, data);
 }
 
 // Misc
 
 u16 generalplus_gpl951xx_device::sys_ctrl_r()
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::sys_ctrl_r\n", machine().describe_context());
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::sys_ctrl_r\n", machine().describe_context());
 	return m_sys_ctrl;
 }
 
 void generalplus_gpl951xx_device::sys_ctrl_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::sys_ctrl_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::sys_ctrl_w %04x\n", machine().describe_context(), data);
 	m_sys_ctrl = data;
 }
 
 void generalplus_gpl951xx_device::clock_ctrl_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::clock_ctrl_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::clock_ctrl_w %04x\n", machine().describe_context(), data);
 	m_clock_ctrl = data;
 }
 
 u16 generalplus_gpl951xx_device::clk_ctrl0_r()
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::clk_ctrl0_r\n", machine().describe_context());
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::clk_ctrl0_r\n", machine().describe_context());
 	return 0x0000;
 }
 
 void generalplus_gpl951xx_device::clk_ctrl0_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::clk_ctrl0 %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::clk_ctrl0 %04x\n", machine().describe_context(), data);
 }
 
 void generalplus_gpl951xx_device::watchdog_ctrl_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::watchdog_ctrl_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::watchdog_ctrl_w %04x\n", machine().describe_context(), data);
 }
 
 u16 generalplus_gpl951xx_device::power_state_r()
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::power_state_r\n", machine().describe_context());
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::power_state_r\n", machine().describe_context());
 	return 0x0002;
 }
 
 u16 generalplus_gpl951xx_device::pllclkwait_r()
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::pllclkwait_r\n", machine().describe_context());
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::pllclkwait_r\n", machine().describe_context());
 	return 0x0000;
 }
 
 void generalplus_gpl951xx_device::pllclkwait_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::pllclkwait_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::pllclkwait_w %04x\n", machine().describe_context(), data);
 }
 
 // sets bit 0x0002 then expects it to have cleared
 u16 generalplus_gpl951xx_device::cache_ctrl_r()
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::cache_ctrl_r\n", machine().describe_context());
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::cache_ctrl_r\n", machine().describe_context());
 	return m_cache_ctrl & ~ 0x0002;
 }
 
 void generalplus_gpl951xx_device::cache_ctrl_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::cache_ctrl_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::cache_ctrl_w %04x\n", machine().describe_context(), data);
 	m_cache_ctrl = data;
 }
 
+// P_INT_Status1
+//
+// 15  KEYIF  - Key-change interrupt status (R/W)
+// 14  ADCRIF - Line ADC Converstion Ready interrupt status
+// 13  PwrONIF - Power on key change event status
+// 12  OTIF    - Over temperature event status
+// 
+// 11  UARTIF  - UART Interrupt status
+// 10  SPI0    - Serial Peripheral Interface 0 interrupt status
+//  9  FPIF    - FP Interrupt Status (LCD)
+//  8
+// 
+//  7  ASIF    - Line ADC Auto Sample Mode FIFO full interrupt status
+//  6
+//  5  AUDBIF  - Audio Channel B (CHB) FIFO Empty Interrupt status
+//  4  AUDAIF  - Audio Channel A (CHA) FIFO Empty Interrupt status
+// 
+//  3  USB     - USB interrupt status
+//  2  DMA     - System DMA interrupt status
+//  1  EXT1IF  - External interrupt 1 status (R/W)
+//  0  EXT0IF  - External interrupt 0 status (R/W)
+
 u16 generalplus_gpl951xx_device::int_status1_r()
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::int_status1_r\n", machine().describe_context());
-	return 0x0000;
+	u16 ret = 0x0000;
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::int_status1_r\n", machine().describe_context());
+
+	if (m_gpl_chx->is_cha_fifo_empty_irq())
+		ret |= 0x0010;
+
+	if (m_gpl_chx->is_chb_fifo_empty_irq())
+		ret |= 0x0020;
+
+	return ret;
 }
 
 void generalplus_gpl951xx_device::int_status1_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::int_status1_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::int_status1_w %04x\n", machine().describe_context(), data);
 	//m_int_status1 = data;
 }
 
+// P_INT_Status2
+//
+// 15
+// 14
+// 13
+// 12
+//
+// 11  KSIF - Key-Scan Interrupt status
+// 10  TMBCIF - TimebaseC interrupt status
+//  9  TMBBIF - TimebaseB interrupt status
+//  8  TMBAIF - TimebaseA interrupt status
+//
+//  7  CTSIF  - CTS Controller interrupt status
+//  6
+//  5  I2C - I2C Controller interrupt status
+//  4  NAND - NAND Flash Controller interrupt status
+//
+//  3
+//  2 SPI1    - Serial Peripheral Interface 1 interrupt status
+//  1 RTC     - RTC Controller interrupt status
+//  0 ADCFF   - MIC ADC Auto Sample Mode FIFO Full interrupt status
+
 u16 generalplus_gpl951xx_device::int_status2_r()
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::int_status2_r\n", machine().describe_context());
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::int_status2_r\n", machine().describe_context());
 	u16 ret = 0;
 
 	if (m_gpl_timebase->timebasea_irq_flag())
@@ -948,46 +1002,74 @@ u16 generalplus_gpl951xx_device::int_status2_r()
 
 void generalplus_gpl951xx_device::int_status2_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::int_status2_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::int_status2_w %04x\n", machine().describe_context(), data);
 	// none of this bits are listed as writeable for GPL95xx or GPL162xx
+}
+
+// P_INT_Status3
+//
+// 15  TMHIF - TimerH Interrupt status
+// 14  TMGIF - TimerG Interrupt status
+// 13  TMFIF - TimerF Interrupt status
+// 12  TMEIF - TimerE Interrupt status
+// 
+// 11  TMDIF - TimerD Interrupt status
+// 10  TMCIF - TimerC Interrupt status
+//  9  TMBIF - TimerB Interrupt status
+//  8  TMAIF - TimerA Interrupt status
+// 
+//  7  UNEXP - unexpected access Interrupt status
+//  6
+//  5
+//  4
+// 
+//  3
+//  2 BEAT - SPU beat interrupt status (R/W)
+//  1
+//  0
+
+u16 generalplus_gpl951xx_device::int_status3_r()
+{
+	u16 ret = 0;
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::int_status3_r\n", machine().describe_context());
+
+	if (m_timerh_ctrl & 0x8000)
+		ret |= 0x8000;
+
+	if (m_timerg_ctrl & 0x8000)
+		ret |= 0x4000;
+
+	return ret;
+}
+
+void generalplus_gpl951xx_device::int_status3_w(u16 data)
+{
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::int_status3_w %04x\n", machine().describe_context(), data);
+	// bit 2 (SPU Beat Interrupt) is listed as R/W for GPL95, but not GPL162? (verify)
 }
 
 void generalplus_gpl951xx_device::int_priority_1_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::int_priority_1_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::int_priority_1_w %04x\n", machine().describe_context(), data);
 	m_int_priority_1 = data;
 }
 
 void generalplus_gpl951xx_device::int_priority_2_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::int_priority_2_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::int_priority_2_w %04x\n", machine().describe_context(), data);
 	m_int_priority_2 = data;
 }
 
 void generalplus_gpl951xx_device::int_priority_3_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::int_priority_3_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::int_priority_3_w %04x\n", machine().describe_context(), data);
 	m_int_priority_3 = data;
 }
 
 void generalplus_gpl951xx_device::mint_ctrl_w(u16 data)
 {
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::mint_ctrl_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_OTHER, "%s: generalplus_gpl951xx_device::mint_ctrl_w %04x\n", machine().describe_context(), data);
 	m_misc_int_ctrl = data;
-}
-
-// CHA (for sound output)
-
-u16 generalplus_gpl951xx_device::cha_ctrl_r()
-{
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::cha_ctrl_r\n", machine().describe_context());
-	return 0xffff;
-}
-
-void generalplus_gpl951xx_device::cha_ctrl_w(u16 data)
-{
-	LOGMASKED(LOG_OTHER, "%s:generalplus_gpl951xx_device::cha_ctrl_w %04x\n", machine().describe_context(), data);
-	m_cha_ctrl = data;
 }
 
 
@@ -1261,17 +1343,17 @@ void generalplus_gpl951xx_device::gpspi_direct_internal_map(address_map &map)
 	// 78ee
 	// 78ef
 
-	map(0x0078f0, 0x0078f0).rw(FUNC(generalplus_gpl951xx_device::cha_ctrl_r), FUNC(generalplus_gpl951xx_device::cha_ctrl_w)); // 78f0 - CHA_Ctrl
-	// 78f1 - CHA_Data
-	// 78f2 - CHA_FIFO
+	map(0x0078f0, 0x0078f0).rw(m_gpl_chx, FUNC(gpl_chx_device::cha_ctrl_r), FUNC(gpl_chx_device::cha_ctrl_w)); // 78f0 - CHA_Ctrl
+	map(0x0078f1, 0x0078f1).rw(m_gpl_chx, FUNC(gpl_chx_device::cha_data_r), FUNC(gpl_chx_device::cha_data_w)); // 78f1 - CHA_Data
+	map(0x0078f2, 0x0078f2).rw(m_gpl_chx, FUNC(gpl_chx_device::cha_fifo_r), FUNC(gpl_chx_device::cha_fifo_w)); // 78f2 - CHA_FIFO
 	// 78f3
 	// 78f4
 	// 78f5
 	// 78f6
 	// 78f7
-	// 78f8 - CHB_Ctrl
-	// 78f9 - CHB_Data
-	// 78fa - CHB_FIFO
+	map(0x0078f8, 0x0078f8).rw(m_gpl_chx, FUNC(gpl_chx_device::chb_ctrl_r), FUNC(gpl_chx_device::chb_ctrl_w)); // 78f8 - CHB_Ctrl
+	map(0x0078f9, 0x0078f9).rw(m_gpl_chx, FUNC(gpl_chx_device::chb_data_r), FUNC(gpl_chx_device::chb_data_w)); // 78f9 - CHB_Data
+	map(0x0078fa, 0x0078fa).rw(m_gpl_chx, FUNC(gpl_chx_device::chb_fifo_r), FUNC(gpl_chx_device::chb_fifo_w)); // 78fa - CHB_FIFO
 	// 78fb
 	// 78fc
 	// 78fd
@@ -1510,18 +1592,16 @@ void generalplus_gpl951xx_device::update_interrupts(int state)
 	{
 		set_state_unsynced(UNSP_IRQ4_LINE, CLEAR_LINE);
 	}
-}
 
-TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpl951xx_device::timer_g_cb )
-{
-	m_timerg_ctrl |= 0x8000;
-	update_interrupts(1);
-}
+	if ((m_gpl_chx->is_cha_fifo_empty_irq()) || (m_gpl_chx->is_chb_fifo_empty_irq()))
+	{
+		set_state_unsynced(UNSP_IRQ1_LINE, ASSERT_LINE);
+	}
+	else
+	{
+		set_state_unsynced(UNSP_IRQ1_LINE, CLEAR_LINE);
+	}
 
-TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gpl951xx_device::timer_h_cb )
-{
-	m_timerh_ctrl |= 0x8000;
-	update_interrupts(1);
 }
 
 u16 generalplus_gpl951xx_device::read_space(offs_t offset)
@@ -1563,9 +1643,17 @@ void generalplus_gpl951xx_device::device_add_mconfig(machine_config &config)
 	m_spg_audio->add_route(0, *this, 1.0, 0);
 	m_spg_audio->add_route(1, *this, 1.0, 1);
 
+	// technically I think this gets mixed down to the same 'DAC' as the regular audio output
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac0, 0).add_route(0, *this, 1.0, 0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac1, 0).add_route(0, *this, 1.0, 1);
+
 	GPL_DMA(config, m_gpl_dma, 0);
 	m_gpl_dma->space_read_callback().set(FUNC(generalplus_gpl951xx_device::read_space));
 	m_gpl_dma->space_write_callback().set(FUNC(generalplus_gpl951xx_device::write_space));
+
+	GPL_CHX(config, m_gpl_chx, 0);
+	m_gpl_chx->cha_write_callback().set(FUNC(generalplus_gpl951xx_device::dac_0_w));
+	m_gpl_chx->chb_write_callback().set(FUNC(generalplus_gpl951xx_device::dac_1_w));
 
 	GPL_TIMEBASE(config, m_gpl_timebase, 0);
 	m_gpl_timebase->updateirqs_callback().set(FUNC(generalplus_gpl951xx_device::update_interrupts));
@@ -1603,6 +1691,9 @@ generalplus_gpl951xx_device::generalplus_gpl951xx_device(const machine_config &m
 	m_timer_g(*this, "timer_g"),
 	m_timer_h(*this, "timer_h"),
 	m_rtc(*this, "rtc"),
+	m_gpl_chx(*this, "gpl_chx"),
+	m_dac0(*this, "dac0"),
+	m_dac1(*this, "dac1"),
 	m_gpl_dma(*this, "gpl_dma"),
 	m_gpl_timebase(*this, "gpl_timebase"),
 	m_screen(*this, finder_base::DUMMY_TAG),
