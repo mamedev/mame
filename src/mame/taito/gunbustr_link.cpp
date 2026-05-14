@@ -144,11 +144,15 @@ public:
 			{
 				m_sock.open(m_local->protocol(), err);
 				if (!err)
+					m_sock.set_option(asio::ip::tcp::no_delay(true), err);
+				if (!err)
 					m_sock.bind(*m_local, err);
 			}
 			else
 			{
 				m_sock.open(m_remote->protocol(), err);
+				if (!err)
+					m_sock.set_option(asio::ip::tcp::no_delay(true), err);
 			}
 		}
 		else
@@ -269,8 +273,10 @@ private:
 	{
 		LOG("Accepting connection on %s\n", *m_local);
 		m_acceptor.async_accept(
-				[this] (std::error_code const &err, asio::ip::tcp::socket sock)
+				[this] (std::error_code err, asio::ip::tcp::socket sock)
 				{
+					if (!err)
+						sock.set_option(asio::ip::tcp::no_delay(true), err);
 					if (err)
 					{
 						LOG("Error accepting connection: %s\n", err.message());
