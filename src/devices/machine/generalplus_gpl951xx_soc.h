@@ -125,7 +125,7 @@ private:
 	u16 timerh_preload_r();
 	void timerh_preload_w(u16 data);
 
-	static constexpr std::string m_portnames[6] = { "a", "b", "c", "d", "e", "f" };
+	const char* m_portnames[6] = { "a", "b", "c", "d", "e", "f" };
 
 	template<int Port> u16 io_data_r();
 	template<int Port> void io_data_w(u16 data);
