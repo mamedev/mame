@@ -92,6 +92,7 @@
 #include <locale>
 #include <optional>
 #include <sstream>
+#include <system_error>
 #include <thread>
 #include <utility>
 
