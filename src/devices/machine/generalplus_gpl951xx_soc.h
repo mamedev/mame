@@ -7,7 +7,6 @@
 #pragma once
 
 
-
 #include "cpu/unsp/unsp.h"
 #include "machine/timer.h"
 
@@ -75,7 +74,6 @@ protected:
 
 private:
 	// SPIFC interface
-
 	u16 spifc_ctrl_r();
 	void spifc_ctrl_w(u16 data);
 	u16 spifc_cmd_r();
@@ -124,8 +122,6 @@ private:
 	void timerh_ctrl_w(u16 data);
 	u16 timerh_preload_r();
 	void timerh_preload_w(u16 data);
-
-	static constexpr std::string m_portnames[6] = { "a", "b", "c", "d", "e", "f" };
 
 	template<int Port> u16 io_data_r();
 	template<int Port> void io_data_w(u16 data);
