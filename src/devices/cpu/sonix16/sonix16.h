@@ -30,12 +30,17 @@ protected:
 
 	// device_execute_interface overrides
 	virtual void execute_run() override;
+	virtual u32 execute_min_cycles() const noexcept override { return 1; }
+	virtual u32 execute_max_cycles() const noexcept override { return 2; }
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
+
+	// device_state_interface overrides
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 private:
 	u16 get_reg(unsigned r) const noexcept;

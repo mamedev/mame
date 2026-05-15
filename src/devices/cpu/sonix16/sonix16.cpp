@@ -4,6 +4,9 @@
 
     Sonix 16-bit DSP emulation (preliminary)
 
+    Instruction timings are undocumented, and the timings currently used
+    are probably very far from accurate.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -224,7 +227,7 @@ void sonix16_device::device_start()
 	state_add<u16>(SONIX16_MR1, "MR1", std::bind(&sonix16_device::get_reg, this, 7), std::bind(&sonix16_device::set_reg, this, 7, _1)).noshow();
 	state_add<u16>(SONIX16_MR2, "MR2", std::bind(&sonix16_device::mr2_r, this), std::bind(&sonix16_device::mr2_w, this, _1)).mask(0x00ff).noshow();
 	state_add(SONIX16_SSF, "SSF", m_ssf).mask(0x3f);
-	state_add(STATE_GENFLAGS, "CURFLAGS", m_ssf).mask(0x3f).noshow();
+	state_add(STATE_GENFLAGS, "CURFLAGS", m_ssf).mask(0x3f).formatstr("%6s").noshow();
 	state_add(SONIX16_RAMBK, "RAMBk", m_rambk).mask(0xfe);
 	state_add(SONIX16_IX0BK, "Ix0BK", m_ixbk[0]);
 	state_add(SONIX16_IX1BK, "Ix1BK", m_ixbk[1]);
@@ -251,6 +254,7 @@ void sonix16_device::device_reset()
 {
 	m_pc = 0;
 
+	m_ssf = 0;
 	m_rambk = 0;
 	m_inten = 0;
 }
@@ -369,33 +373,33 @@ void sonix16_device::execute_run()
 			switch (BIT(inst, 2, 3))
 			{
 			case 0: case 2:
-				rop += yop;
 				cf = u32(rop) + yop >= 0x10000;
+				rop += yop;
 				break;
 
 			case 1: case 4:
-				rop -= yop;
 				cf = rop >= yop;
+				rop -= yop;
 				break;
 
 			case 3:
-				rop += yop + BIT(m_ssf, 2);
 				cf = u32(rop) + yop + BIT(m_ssf, 2) >= 0x10000;
+				rop += yop + BIT(m_ssf, 2);
 				break;
 
 			case 5:
-				rop -= yop + 1 - BIT(m_ssf, 2);
 				cf = u32(rop) + u16(~yop) + BIT(m_ssf, 2) >= 0x10000;
+				rop -= yop + 1 - BIT(m_ssf, 2);
 				break;
 
 			case 6:
-				rop = yop - rop;
 				cf = yop >= rop;
+				rop = yop - rop;
 				break;
 
 			case 7:
-				rop = yop - rop + 1 - BIT(m_ssf, 2);
 				cf = u16(~rop) + u32(yop) + BIT(m_ssf, 2) >= 0x10000;
+				rop = yop - rop + 1 - BIT(m_ssf, 2);
 				break;
 			}
 			m_ssf = (m_ssf & 0x30) | (cf ? 0x04 : 0) | (BIT(rop, 15) ? 0x02 : 0) | (rop == 0 ? 0x01 : 0);
@@ -550,33 +554,33 @@ void sonix16_device::execute_run()
 			switch (BIT(inst, 2, 3))
 			{
 			case 0: case 2:
-				rop += yop;
 				cf = u32(rop) + yop >= 0x10000;
+				rop += yop;
 				break;
 
 			case 1: case 4:
-				rop -= yop;
 				cf = rop >= yop;
+				rop -= yop;
 				break;
 
 			case 3:
-				rop += yop + BIT(m_ssf, 2);
 				cf = u32(rop) + yop + BIT(m_ssf, 2) >= 0x10000;
+				rop += yop + BIT(m_ssf, 2);
 				break;
 
 			case 5:
-				rop -= yop + 1 - BIT(m_ssf, 2);
 				cf = u32(rop) + u16(~yop) + BIT(m_ssf, 2) >= 0x10000;
+				rop -= yop + 1 - BIT(m_ssf, 2);
 				break;
 
 			case 6:
-				rop = yop - rop;
 				cf = yop >= rop;
+				rop = yop - rop;
 				break;
 
 			case 7:
-				rop = yop - rop + 1 - BIT(m_ssf, 2);
 				cf = u16(~rop) + u32(yop) + BIT(m_ssf, 2) >= 0x10000;
+				rop = yop - rop + 1 - BIT(m_ssf, 2);
 				break;
 			}
 			m_ssf = (m_ssf & 0x30) | (cf ? 0x04 : 0) | (BIT(rop, 15) ? 0x02 : 0) | (rop == 0 ? 0x01 : 0);
@@ -692,4 +696,20 @@ void sonix16_device::execute_run()
 			m_icount--;
 		}
 	} while (m_icount > 0);
+}
+
+void sonix16_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+	case STATE_GENFLAGS:
+		str = util::string_format("%c%c%c%c%c%c",
+				BIT(m_ssf, 5) ? 'I' : '.',
+				BIT(m_ssf, 4) ? 'M' : '.',
+				BIT(m_ssf, 3) ? 'A' : '.',
+				BIT(m_ssf, 2) ? 'C' : '.',
+				BIT(m_ssf, 1) ? 'N' : '.',
+				BIT(m_ssf, 0) ? 'Z' : '.');
+		break;
+	}
 }
