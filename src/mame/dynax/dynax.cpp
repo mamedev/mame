@@ -1311,23 +1311,9 @@ void dynax_state::ougonhai_banked_map(address_map &map)
 }
 
 
-void dynax_state::mjtkp2_dsw_w(uint8_t data)
-{
-	m_dsw_sel = data;
-}
-
 uint8_t dynax_state::mjtkp2_dsw_r()
 {
-	switch (m_dsw_sel)
-	{
-		case 0x00: return m_dsw[0]->read();
-		case 0x01: return m_dsw[1]->read();
-		case 0x02: return m_dsw[2]->read();
-		case 0x03: return m_dsw[3]->read();
-		case 0x04: return m_dsw[4]->read();
-	}
-
-	return 0xff;
+	return m_dsw[m_dsw_sel]->read();
 }
 
 void dynax_state::mjtkp2_map(address_map &map)
@@ -1340,7 +1326,7 @@ void dynax_state::mjtkp2_map(address_map &map)
 	map(0x14001, 0x14001).w(FUNC(dynax_state::tenkai_ip_w));
 	map(0x14002, 0x14003).r(FUNC(dynax_state::tenkai_ip_r));
 	map(0x14081, 0x14087).w(m_blitter, FUNC(dynax_blitter_rev2_device::regs_w));    // Blitter (inverted scroll values)
-	map(0x14100, 0x14100).w(FUNC(dynax_state::mjtkp2_dsw_w));
+	map(0x14100, 0x14100).w(FUNC(dynax_state::tenkai_dswsel_w));
 	map(0x14180, 0x14180).r(FUNC(dynax_state::mjtkp2_dsw_r));
 	map(0x14200, 0x14200).w(m_blitter, FUNC(dynax_blitter_rev2_device::pen_w)); // maybe
 	map(0x14210, 0x14210).w(FUNC(dynax_state::dynax_blit_dest_w)); // maybe

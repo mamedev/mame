@@ -595,6 +595,29 @@ ROM_START( gongfuxm )
 	ROM_LOAD( "24c02.bin", 0x000, 0x100, CRC(2365af83) SHA1(ea6a40939b0e08404b729edd000b01f0108e57df) )
 ROM_END
 
+// 亮剑 (Liàng Jiàn) (Draw the Sword)
+// W78E065 + HM6116P-2 + 12 MHz XTAL + 2x JFC95101 + 2x TOP8279 + U6295 + 24C02. No bank of switches
+ROM_START( ljian )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "w78e065", 0x00000, 0x10000, CRC(2e50c3df) SHA1(65aef33ad0173c826d10e55c8f62c13c10e0aad2) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "29f1615", 0x000000, 0x200000, CRC(ff2930c2) SHA1(6a260fba6cc73986477b8dc404a3a12ecb1306a3) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x100, "i2cmem", 0 )
+	ROM_LOAD( "24c02.bin", 0x000, 0x100, CRC(cfffbd57) SHA1(22049c36c56272411d7d431e38a8bd1fc6257d42) )
+ROM_END
+
+// 两只蝴蝶 (Liǎng Zhī Húdié) (Two Butterflies)
+// SUPERR QQ5 PCB: 89E564R + HM6116P-2 + 12 MHz XTAL + JFC95101 + TMP82C255AN-2 + U6295 + 24C02. No bank of switches
+ROM_START( lzhudie )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "w78e065", 0x00000, 0x10000, CRC(f9389dc5) SHA1(4014dbbc2aa7b1661db53b74bfbc57126400b528) ) // 1xxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "29f1615", 0x000000, 0x200000, CRC(5e827bea) SHA1(94ace5fb8161a3004526a77767baa789fd1b8d5d) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -609,3 +632,5 @@ GAME( 1991, whujiang, 0, panda2, panda2,  panda2_state, empty_init, ROT0, "Hom I
 GAME( 1998, whujijqb, 0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Hom Inn",                     "Wu Hujiang Jiaqiang Ban", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 GAME( 1997, xqingwa,  0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Jinlong Electronics",         "Xiao Qingwa",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 GAME( 2005, gongfuxm, 0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Yuanfa Technology",           "Gongfu Xiongmao",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2001, ljian,    0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Liang Jian",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1999, lzhudie,  0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Liang Zhi Hudie",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )

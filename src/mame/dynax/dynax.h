@@ -207,7 +207,6 @@ private:
 	void tenkai_blit_scrolly_w(uint8_t data);
 	void tenkai_priority_w(uint8_t data);
 	uint8_t mjtkp2_dsw_r();
-	void mjtkp2_dsw_w(uint8_t data);
 
 	uint32_t screen_update_sprtmtch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mjdialq2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
