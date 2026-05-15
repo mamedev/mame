@@ -2172,6 +2172,7 @@ void ioport_manager::frame_update_callback()
 void ioport_manager::frame_update()
 {
 	auto profile = g_profiler.start(PROFILER_INPUT);
+	auto dis = machine().disable_side_effects();
 
 	// record/playback information about the current frame
 	attotime curtime = machine().time();
