@@ -89,7 +89,6 @@ void news_hid_hle_device::map_apbus(address_map &map)
 
 void news_hid_hle_device::map_nws12xx_keyboard(address_map &map)
 {
-	// TODO: some unemulated features here
 	map(0x0, 0x0).r(FUNC(news_hid_hle_device::data_r<KEYBOARD>));
 	map(0x1, 0x1).r(FUNC(news_hid_hle_device::status_68k_r));
 	map(0x2, 0x2).w(FUNC(news_hid_hle_device::ien_w<KEYBOARD>));
@@ -101,6 +100,7 @@ void news_hid_hle_device::map_nws12xx_keyboard(address_map &map)
 		reset_w<MOUSE>(data);
 	}));
 
+	// TODO: below are unemulated features
 	// 4 = keyboard speed
 	// 5 = keyboard clock
 	// 6 = buzzer, ROM version 2.0A writes to this and also reads it back
@@ -110,11 +110,12 @@ void news_hid_hle_device::map_nws12xx_keyboard(address_map &map)
 
 void news_hid_hle_device::map_nws12xx_mouse(address_map &map)
 {
-	// TODO: some unemulated features here
 	map(0x0, 0x0).r(FUNC(news_hid_hle_device::data_r<MOUSE>));
 	map(0x1, 0x1).r(FUNC(news_hid_hle_device::status_r<MOUSE>));
 	map(0x2, 0x2).w(FUNC(news_hid_hle_device::ien_w<MOUSE>));
 	map(0x3, 0x3).w(FUNC(news_hid_hle_device::reset_w<MOUSE>));
+
+	// TODO: below are unemulated features
 	// 4 = mouse speed, 5 = mouse clock
 }
 

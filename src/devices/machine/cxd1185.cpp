@@ -24,7 +24,7 @@
 #define LOG_SCSI    (1U << 6)
 #define LOG_DMA     (1U << 7)
 
-//#define VERBOSE (LOG_GENERAL|LOG_CMD|LOG_REG|LOG_STATE)
+//#define VERBOSE (LOG_GENERAL|LOG_CMD|LOG_REG|LOG_STATE|LOG_CONFIG|LOG_INT|LOG_SCSI|LOG_DMA)
 
 #include "logmacro.h"
 
@@ -69,11 +69,6 @@ void cxd1185_device::map(address_map &map)
 	map(0xd, 0xd).rw(FUNC(cxd1185_device::sync_ctrl_r), FUNC(cxd1185_device::sync_ctrl_w));
 	map(0xe, 0xe).rw(FUNC(cxd1185_device::scsi_ctrl_r), FUNC(cxd1185_device::scsi_ctrl_w));
 	map(0xf, 0xf).rw(FUNC(cxd1185_device::ioport_r), FUNC(cxd1185_device::ioport_w));
-}
-
-void cxd1185_device::log_count_w(unsigned byte, u8 data)
-{
-	LOG("(%s) count_w<%u>(0x%x)\n", machine().describe_context(), byte, data);
 }
 
 void cxd1185_device::device_start()
@@ -607,7 +602,7 @@ int cxd1185_device::state_step()
 		break;
 
 	case XFR_INFO:
-		LOGMASKED(LOG_STATE, "transfer: count %d waiting for REQ, ctrl = 0x%x vs 0x%x\n", (m_command & TRBE) ? m_count : 1, m_scsi_bus->ctrl_r(), S_REQ);
+		LOGMASKED(LOG_STATE, "transfer: count %d waiting for REQ\n", (m_command & TRBE) ? m_count : 1);
 		if (m_scsi_bus->ctrl_r() & S_REQ)
 			m_state = m_scsi_bus->ctrl_r() & S_INP ? XFR_IN : XFR_OUT;
 		break;
@@ -693,7 +688,6 @@ int cxd1185_device::state_step()
 		}
 		else
 		{
-			LOGMASKED(LOG_STATE, "transfer out: waiting for FIFO drain?\n");
 			delay = -1;
 			if (m_command & DMA)
 				set_drq(true);
@@ -722,7 +716,7 @@ int cxd1185_device::state_step()
 		}
 		break;
 	case XFR_OUT_REQ:
-		LOGMASKED(LOG_STATE, "transfer out: count %d waiting for REQ, ctrl = 0x%x vs 0x%x\n", (m_command & TRBE) ? m_count : 1, m_scsi_bus->ctrl_r(), S_REQ);
+		LOGMASKED(LOG_STATE, "transfer out: count %d waiting for REQ\n", m_count);
 		if (m_scsi_bus->ctrl_r() & S_REQ)
 		{
 			// check if target changed phase
