@@ -328,7 +328,7 @@ void s8k_cpu_base::out_ns_cb(int state)
 {
 	LOG("%s NORMAL/SYSTEM MODE CHANGE: %d\n", machine().describe_context(), state);
 
-	m_normal_mode = !state;
+	m_normal_mode = state;
 	m_ns_cb(state);
 }
 

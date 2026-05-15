@@ -396,21 +396,6 @@ void z8002_device::Interrupt()
 		LOG("Z8K syscall [$%02x/$%04x]\n", m_op[0] & 0xff, m_pc);
 	}
 	else
-	if (m_irq_req & Z8000_SEGTRAP)
-	{
-		standard_irq_callback(SEGT_LINE, m_pc);
-		m_irq_vec = m_iack_in[0](m_pc);
-
-		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
-		PUSH_PC();
-		PUSHW(SP, fcw);       /* save current m_fcw */
-		PUSHW(SP, m_irq_vec);   /* save interrupt/trap type tag */
-		m_pc = GET_PC(SEGTRAP);
-		m_irq_req &= ~Z8000_SEGTRAP;
-		CHANGE_FCW(GET_FCW(SEGTRAP));
-		LOG("Z8K segtrap $%04x\n", m_pc);
-	}
-	else
 	if (m_irq_req & Z8000_NMI)
 	{
 		standard_irq_callback(NMI_LINE, m_pc);
@@ -427,20 +412,19 @@ void z8002_device::Interrupt()
 		LOG("Z8K NMI $%04x\n", m_pc);
 	}
 	else
-	if ((m_irq_req & Z8000_NVI) && (m_fcw & F_NVIE))
+	if (m_irq_req & Z8000_SEGTRAP)
 	{
-		standard_irq_callback(NVI_LINE, m_pc);
-		m_irq_vec = m_iack_in[2](m_pc);
-		m_halt = false;
+		standard_irq_callback(SEGT_LINE, m_pc);
+		m_irq_vec = m_iack_in[0](m_pc);
 
 		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
 		PUSHW(SP, m_irq_vec);   /* save interrupt/trap type tag */
-		m_pc = GET_PC(NVI);
-		m_irq_req &= ~Z8000_NVI;
-		CHANGE_FCW(GET_FCW(NVI));
-		LOG("Z8K NVI $%04x\n", m_pc);
+		m_pc = GET_PC(SEGTRAP);
+		m_irq_req &= ~Z8000_SEGTRAP;
+		CHANGE_FCW(GET_FCW(SEGTRAP));
+		LOG("Z8K segtrap $%04x\n", m_pc);
 	}
 	else
 	if ((m_irq_req & Z8000_VI) && (m_fcw & F_VIE))
@@ -457,6 +441,22 @@ void z8002_device::Interrupt()
 		m_irq_req &= ~Z8000_VI;
 		CHANGE_FCW(GET_FCW(VI));
 		LOG("Z8K VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", m_irq_vec, VEC00 + 2 * (m_irq_vec & 0xff), m_fcw, m_pc);
+	}
+	else
+	if ((m_irq_req & Z8000_NVI) && (m_fcw & F_NVIE))
+	{
+		standard_irq_callback(NVI_LINE, m_pc);
+		m_irq_vec = m_iack_in[2](m_pc);
+		m_halt = false;
+
+		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
+		PUSH_PC();
+		PUSHW(SP, fcw);       /* save current m_fcw */
+		PUSHW(SP, m_irq_vec);   /* save interrupt/trap type tag */
+		m_pc = GET_PC(NVI);
+		m_irq_req &= ~Z8000_NVI;
+		CHANGE_FCW(GET_FCW(NVI));
+		LOG("Z8K NVI $%04x\n", m_pc);
 	}
 }
 

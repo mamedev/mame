@@ -162,12 +162,12 @@ INPUT_CHANGED_MEMBER(s8k_state::start_btn_cb)
 
 void s8k_state::normal_led_w(int state)
 {
-	m_normal_led = !state;
+	m_normal_led = state;
 }
 
 void s8k_state::busack_led_w(int state)
 {
-	m_busack_led = !state;
+	m_busack_led = state;
 }
 
 //**************************************************************************

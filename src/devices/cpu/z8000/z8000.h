@@ -76,7 +76,7 @@ public:
 		ST_REQ_DATA,		/* data memory request */
 		ST_REQ_STACK,		/* stack memory request */
 		ST_EREQ_DATA,		/* data memory request (EPU) */
-		ST_EREQ_STACK,		/* space memory request (EPU) */
+		ST_EREQ_STACK,		/* stack memory request (EPU) */
 		ST_IFETCH_N,		/* instruction fetch, nth word */
 		ST_IFETCH_1,		/* instruction fetch, first word */
 		ST_EPU_TRF,			/* extension processor transfer */
