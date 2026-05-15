@@ -140,20 +140,11 @@ public:
 
 		if (m_remote)
 		{
-			if (m_local)
-			{
-				m_sock.open(m_local->protocol(), err);
-				if (!err)
-					m_sock.set_option(asio::ip::tcp::no_delay(true), err);
-				if (!err)
-					m_sock.bind(*m_local, err);
-			}
-			else
-			{
-				m_sock.open(m_remote->protocol(), err);
-				if (!err)
-					m_sock.set_option(asio::ip::tcp::no_delay(true), err);
-			}
+			m_sock.open((m_local ? m_local : m_remote)->protocol(), err);
+			if (!err)
+				m_sock.set_option(asio::ip::tcp::no_delay(true), err);
+			if (!err && m_local)
+				m_sock.bind(*m_local, err);
 		}
 		else
 		{
@@ -307,16 +298,11 @@ private:
 					if (!err && !m_stopping)
 					{
 						std::error_code e;
-						if (m_local)
-						{
-							m_sock.open(m_local->protocol(), e);
-							if (!err)
-								m_sock.bind(*m_local, e);
-						}
-						else
-						{
-							m_sock.open(m_remote->protocol(), e);
-						}
+						m_sock.open((m_local ? m_local : m_remote)->protocol(), e);
+						if (!e)
+							m_sock.set_option(asio::ip::tcp::no_delay(true), e);
+						if (!e && m_local)
+							m_sock.bind(*m_local, e);
 						if (e)
 						{
 							LOG("Error opening socket: %s\n", e.message());
