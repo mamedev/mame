@@ -452,6 +452,7 @@ void gaelco3d_state::tms_control3_w(int state)
  *
  *************************************/
 
+// TODO: find volume control, convert to device
 // These are some of the control registers. We don't use them all
 enum
 {
@@ -970,6 +971,22 @@ void gaelco3d_state::gaelco3d(machine_config &config)
 	DMADAC(config, m_dmadac[3]).add_route(ALL_OUTPUTS, "mono", 0.45);  // speedup: seat speaker
 }
 
+void gaelco3d_state::speedup(machine_config &config)
+{
+	gaelco3d(config);
+
+	config.device_remove("mono");
+	// speedup has 5 speakers, cfr. sound test diagram
+	SPEAKER(config, "mono").front_center();
+	SPEAKER(config, "rear", 2).rear();
+	// TODO: confirm positioning
+	SPEAKER(config, "seat_floor").set_position(0, 0.0, 0.5, 1.0);
+
+	DMADAC(config.replace(), m_dmadac[0]).add_route(ALL_OUTPUTS, "rear", 1.00, 0);  // left rear
+	DMADAC(config.replace(), m_dmadac[1]).add_route(ALL_OUTPUTS, "rear", 1.00, 1);  // right rear
+	DMADAC(config.replace(), m_dmadac[2]).add_route(ALL_OUTPUTS, "seat_floor", 1.00);  // seat speaker
+	DMADAC(config.replace(), m_dmadac[3]).add_route(ALL_OUTPUTS, "mono", 1.00 );  // front mono
+}
 
 void gaelco3d_state::gaelco3d2(machine_config &config)
 {
@@ -1821,12 +1838,12 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1996, speedup,    0,        gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.20, checksum 2037)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 11/Mar
-GAMEL( 1996, speedup21,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.10, checksum 9536)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 05/Mar
-GAMEL( 1996, speedup20,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.00, checksum E145)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 18/Feb
-GAMEL( 1996, speedup20a, speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.00, checksum 491B)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 17/Feb
-GAMEL( 1996, speedup12,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.20, checksum 6851)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 10/Oct
-GAMEL( 1996, speedup10,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.00, checksum 31A9)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
+GAMEL( 1996, speedup,    0,        speedup,   speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.20, checksum 2037)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 11/Mar
+GAMEL( 1996, speedup21,  speedup,  speedup,   speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.10, checksum 9536)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 05/Mar
+GAMEL( 1996, speedup20,  speedup,  speedup,   speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.00, checksum E145)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 18/Feb
+GAMEL( 1996, speedup20a, speedup,  speedup,   speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.00, checksum 491B)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 17/Feb
+GAMEL( 1996, speedup12,  speedup,  speedup,   speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.20, checksum 6851)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 10/Oct
+GAMEL( 1996, speedup10,  speedup,  speedup,   speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.00, checksum 31A9)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
 
 GAME( 1997, surfplnt,    0,        gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (version 4.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 GAME( 1997, surfplnt40,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (version 4.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
