@@ -42,6 +42,7 @@ private:
 	u16 m_system_dma_memtype;
 	u16 m_dma_params[8][4];
 	u8 m_dma_latched[4];
+	u16 m_dma_status;
 
 	devcb_read16 m_space_read_cb;
 	devcb_write16 m_space_write_cb;
