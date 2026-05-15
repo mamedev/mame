@@ -55,15 +55,15 @@ void news_lcd_device::device_add_mconfig(machine_config &config)
 	// TODO: Hitachi HD64646FS LCD Timing Controller (software-compatible with Hitachi's CRTC)
 }
 
-u8 news_lcd_device::lctc_r()
+u8 news_lcd_device::lctc_r(offs_t offset)
 {
-	LOG("(%s) lctc_r()\n", machine().describe_context());
+	LOG("(%s) lctc_r(0x%x)\n", machine().describe_context(), offset);
 	return 0x0;
 }
 
 void news_lcd_device::lctc_w(offs_t offset, u8 data)
 {
-	LOG("(%s) lctc_w(%02x, %02x)\n", machine().describe_context(), offset, data);
+	LOG("(%s) lctc_w(0x%x, 0x%x)\n", machine().describe_context(), offset, data);
 }
 
 u32 news_lcd_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, [[maybe_unused]] const rectangle &cliprect)

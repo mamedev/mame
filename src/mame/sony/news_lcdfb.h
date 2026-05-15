@@ -32,7 +32,7 @@ protected:
 	void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	u8 lctc_r();
+	u8 lctc_r(offs_t offset);
 	void lctc_w(offs_t offset, u8 data);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
