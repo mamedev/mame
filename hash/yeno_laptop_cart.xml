@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="yeno_laptop_cart" description="Yeno educational laptop cartridges">
+
+	<software name="wissenst" supported="no">
+		<description>Wissens Tester (Germany)</description>
+		<year>199?</year>
+		<publisher>Yeno</publisher>
+		<part name="cart" interface="yeno_laptop_cart">
+			<dataarea name="rom" size="0x40000">
+				<rom name="27c020.ic1" size="0x40000" crc="20c43741" sha1="cc1dfa301180f89755672d2b74b6013627b85928"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="swissen" supported="no">
+		<description>Super Wissen (Germany)</description>
+		<year>199?</year>
+		<publisher>Yeno</publisher>
+		<part name="cart" interface="yeno_laptop_cart">
+			<dataarea name="rom" size="0x40000">
+				<rom name="Superwissen.ic1" size="0x40000" crc="714b4cbe" sha1="d1f5ce30bb8be73ed4edd9ce613c96a9cf7c39ab"/>
+			</dataarea>
+		</part>
+	</software>	
+
+</softwarelist>
