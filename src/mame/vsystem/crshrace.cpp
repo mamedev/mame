@@ -355,7 +355,7 @@ void crshrace_state::sh_bankswitch_w(uint8_t data)
 
 int crshrace_state::soundlatch_pending_r()
 {
-	if (!machine().side_effects_disabled())
+	if (!machine().side_effects_disabled() && m_maincpu->executing())
 	{
 		// retry_access() forces the z80 to catch up before maincpu does the read
 		if (!m_z80_sync)
