@@ -881,6 +881,7 @@ void news_68k_laptop_state::nws1250(machine_config &config)
 	m_scsi->irq_out_cb().set(DEVICE_SELF, FUNC(news_68k_laptop_state::irq_w<SCSI>));
 	m_scsi->irq_out_cb().append(m_dma, FUNC(dmac_0266_device::eop_w));
 	m_scsi->drq_out_cb().set(m_dma, FUNC(dmac_0266_device::req_w));
+	m_scsi->port_out_cb().set(m_lcd, FUNC(news_lcd_device::lcd_dim_w)); // PRT0 is used to control the LCD dimmer
 	m_dma->dma_r_cb().set(m_scsi, FUNC(cxd1185_device::dma_r));
 	m_dma->dma_w_cb().set(m_scsi, FUNC(cxd1185_device::dma_w));
 	// TODO: set LCD dim from GPIO output
