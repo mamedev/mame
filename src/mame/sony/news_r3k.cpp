@@ -223,7 +223,7 @@ void nws3260_state::nws3260_map(address_map &map)
 	map(0x10000003, 0x10000003).w(m_lcd, FUNC(news_lcd_device::lcd_enable_w));
 	map(0x10100003, 0x10100003).w(m_lcd, FUNC(news_lcd_device::lcd_dim_w));
 	map(0x10200000, 0x1021ffff).ram().share("vram").mirror(0xa0000000);
-	map(0x1ff60000, 0x1ff6001b).lw8([this] (offs_t offset, u8 data) { LOG("crtc offset %x 0x%02x\n", offset, data); }, "lfbm_crtc_w"); // TODO: HD64646FS
+	map(0x1ff60000, 0x1ff6001b).m(m_lcd, FUNC(news_lcd_device::map_lctc));
 }
 
 void news_r3k_desktop_state::desktop_cpu_map(address_map &map)
