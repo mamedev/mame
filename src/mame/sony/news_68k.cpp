@@ -124,9 +124,15 @@ __|              |         |  |ALS05A| |N82077   |   __             6 x 74F00J->
 #include "machine/ncr5380.h"
 #include "machine/cxd1185.h"
 
-// video
+// laptop video
+#include "news_lcdfb.h"
+
+// desktop video
+#define DESKTOP_GRAPHICS 0
+#if DESKTOP_GRAPHICS
 #include "screen.h"
 #include "video/bt45x.h"
+#endif
 
 // busses and connectors
 #include "machine/nscsi_bus.h"
@@ -141,11 +147,9 @@ __|              |         |  |ALS05A| |N82077   |   __             6 x 74F00J->
 
 #define LOG_INTERRUPT (1U << 1)
 #define LOG_TIMER (1U << 2)
+#define LOG_PARALLEL (1U << 3)
 #define VERBOSE (LOG_GENERAL|LOG_TIMER)
 #include "logmacro.h"
-
-#define DESKTOP_GRAPHICS 0
-
 
 namespace {
 
@@ -310,17 +314,15 @@ protected:
 
 	void laptop_cpu_map(address_map &map);
 	virtual void cpu_autovector_map(address_map &map) override ATTR_COLD;
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 	TIMER_CALLBACK_MEMBER(timer);
 	void timer_w(offs_t offset, u8 data);
 
 	// Laptop-specific devices
 	required_device<cxd1185_device> m_scsi;
-	required_device<screen_device> m_lcd;
+	required_device<news_lcd_device> m_lcd;
 	required_shared_ptr<u32> m_vram;
 
 	// Laptop-specific platform hardware
-	bool m_lcd_enable = false;
 	u16 m_timer_rate = 0;
 };
 
@@ -364,12 +366,10 @@ void news_68k_desktop_state::machine_start()
 void news_68k_laptop_state::machine_start()
 {
 	news_68k_base_state::machine_start();
+
 	m_timer = timer_alloc(FUNC(news_68k_laptop_state::timer), this);
 
-	m_lcd_enable = false;
 	m_timer_rate = 0;
-
-	save_item(NAME(m_lcd_enable));
 	save_item(NAME(m_timer_rate));
 }
 
@@ -442,16 +442,16 @@ void news_68k_desktop_state::desktop_cpu_map(address_map &map)
 	// external I/O
 	map(0xf0000000, 0xffffffff).r(FUNC(news_68k_desktop_state::bus_error_r));
 
-#if DESKTOP_GRAPHICS
-	// POPC
-	//map(0xf0fc0000, 0xf0fc0003).unmaprw();
-	// f0fc0000 & 0x40 == 0x00 -> popm
-	// f0fc0000 & 0xc0 == 0xc0 -> popc
-	map(0xf0fc0000, 0xf0fc0001).lr16([]() {return 0x00c0; }, "popc_probe"); // lower 2 bits give busy state
-	map(0xf0fc4000, 0xf0fc4007).m(m_ramdac, FUNC(bt458_device::map)).umask32(0x00ff00ff);
-
-	//map(0xf0fc0000, 0xf10bffff).rom().region("krom", 0);
-#endif
+// #if DESKTOP_GRAPHICS
+// 	// POPC
+// 	//map(0xf0fc0000, 0xf0fc0003).unmaprw();
+// 	// f0fc0000 & 0x40 == 0x00 -> popm
+// 	// f0fc0000 & 0xc0 == 0xc0 -> popc
+// 	map(0xf0fc0000, 0xf0fc0001).lr16([]() {return 0x00c0; }, "popc_probe"); // lower 2 bits give busy state
+// 	map(0xf0fc4000, 0xf0fc4007).m(m_ramdac, FUNC(bt458_device::map)).umask32(0x00ff00ff);
+//
+// 	//map(0xf0fc0000, 0xf10bffff).rom().region("krom", 0);
+// #endif
 
 	// 0xf0c30000 expansion lance #1
 	// 0xf0c20000   lance #1 memory
@@ -512,13 +512,11 @@ void news_68k_laptop_state::laptop_cpu_map(address_map &map)
 	map(0xe2000000, 0xe20fffff).rom().region("krom", 0);
 	map(0xe4000000, 0xe401ffff).ram().share("vram");
 
-	map(0xe1480000, 0xe148001f).nopw(); // TODO: HD64646FS LCD Controller (Hitachi CRTC-compatible)
+	map(0xe1480000, 0xe148001f).m(m_lcd, FUNC(news_lcd_device::map_lctc));
+
 	// TODO: Unsure what 0xe1500000 is - the monitor ROM sets it to 0x2 before memory probe, and clears it afterwards.
 	map(0xe1500001, 0xe1500001).w(FUNC(news_68k_laptop_state::led_w));
-	map(0xe1500002, 0xe1500002).lw8([this] (u32 data) {
-		m_lcd_enable = bool(data);
-		LOG("(%s) %s LCD\n", machine().describe_context(), m_lcd_enable ? "Enabled" : "Disabled");
-	}, "lcd_enable_w");
+	map(0xe1500002, 0xe1500002).w(m_lcd, FUNC(news_lcd_device::lcd_enable_w));
 
 	// external I/O
 	map(0xf0000000, 0xffffffff).r(FUNC(news_68k_laptop_state::bus_error_r));
@@ -628,13 +626,13 @@ void news_68k_base_state::ram_enable_w(u8 data)
 
 void news_68k_base_state::parallel_irq_enable_w(u8 data)
 {
-	LOG("(%s) %s parallel interrupt", machine().describe_context(), data ? "enabled" : "disabled");
+	LOGMASKED(LOG_PARALLEL, "(%s) %s parallel interrupt", machine().describe_context(), data ? "enabled" : "disabled");
 	m_parallel_irq_enabled = data;
 }
 
 void news_68k_base_state::parallel_data_w(u8 data)
 {
-	LOG("Parallel data w 0x%x\n", data);
+	LOGMASKED(LOG_PARALLEL, "Parallel data w 0x%x\n", data);
 	m_parallel_data->write(data);
 }
 
@@ -702,28 +700,6 @@ TIMER_CALLBACK_MEMBER(news_68k_laptop_state::timer)
 	m_cpu->set_input_line(INPUT_LINE_IRQ6, ASSERT_LINE);
 }
 
-u32 news_68k_laptop_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
-{
-	if (!m_lcd_enable)
-		return 0;
-
-	u32 const *pixel_pointer = m_vram;
-
-	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
-	{
-		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 32)
-		{
-			u32 const pixel_data = *pixel_pointer++;
-
-			// TODO: Does the NWS-1200 have a dim capability like the 3200?
-			for (unsigned i = 0; i < 32; i++)
-				bitmap.pix(y, x + i) = BIT(pixel_data, 31 - i) ? rgb_t::black() : rgb_t::white();
-		}
-	}
-
-	return 0;
-}
-
 static void news_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
@@ -773,7 +749,7 @@ void news_68k_base_state::common(machine_config &config)
 		bool const new_status = status;
 		if (m_parallel_busy != new_status)
 		{
-			LOG("Parallel busy changed to %s\n", new_status ? "H" : "L");
+			LOGMASKED(LOG_PARALLEL, "Parallel busy changed to %s\n", new_status ? "H" : "L");
 			m_parallel_busy = new_status;
 			irq_w<PRINTER>(1);
 		}
@@ -782,7 +758,7 @@ void news_68k_base_state::common(machine_config &config)
 		bool const new_status = status;
 		if (m_parallel_fault != new_status)
 		{
-			LOG("Parallel fault changed to %s\n", new_status ? "H" : "L");
+			LOGMASKED(LOG_PARALLEL, "Parallel fault changed to %s\n", new_status ? "H" : "L");
 			m_parallel_fault = !new_status;
 			irq_w<PRINTER>(1);
 		}
@@ -863,7 +839,7 @@ void news_68k_desktop_state::nws1580(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(64.0_MHz_XTAL, 1024, 0, 1024, 768, 0, 768);
-	m_screen->set_screen_update(FUNC(news_68k_base_state::screen_update));
+	m_screen->set_screen_update(FUNC(news_68k_desktop_state::screen_update));
 
 	// AM81C458-80JC
 	BT458(config, m_ramdac, 64.0_MHz_XTAL);
@@ -900,18 +876,18 @@ void news_68k_laptop_state::nws1250(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
 	// scsi host adapter
-	CXD1185(config, m_scsi, 20_MHz_XTAL / 2); // TODO: needs confirmation on hw
+	CXD1185(config, m_scsi, 20_MHz_XTAL / 2); // TODO: clock rate needs confirmation on hw
 	m_scsibus->set_external_device(7, m_scsi);
 	m_scsi->irq_out_cb().set(DEVICE_SELF, FUNC(news_68k_laptop_state::irq_w<SCSI>));
 	m_scsi->irq_out_cb().append(m_dma, FUNC(dmac_0266_device::eop_w));
 	m_scsi->drq_out_cb().set(m_dma, FUNC(dmac_0266_device::req_w));
 	m_dma->dma_r_cb().set(m_scsi, FUNC(cxd1185_device::dma_r));
 	m_dma->dma_w_cb().set(m_scsi, FUNC(cxd1185_device::dma_w));
+	// TODO: set LCD dim from GPIO output
 
 	// Integrated LCD panel
-	SCREEN(config, m_lcd, SCREEN_TYPE_LCD);
-	m_lcd->set_raw(52416000, 1120, 0, 1120, 780, 0, 780);
-	m_lcd->set_screen_update(FUNC(news_68k_laptop_state::screen_update));
+	NEWS_LCD(config, m_lcd);
+	m_lcd->set_vram(m_vram);
 }
 
 static INPUT_PORTS_START(nws12x0)
@@ -965,14 +941,14 @@ INPUT_PORTS_END
 
 ROM_START(nws1250)
 	ROM_REGION32_BE(0x20000, "eprom", 0)
-	ROM_SYSTEM_BIOS(0, "nws1250-20", "SONY NET WORK STATION MC68030 Monitor Release 2.0")
+	ROM_SYSTEM_BIOS(0, "nws1250-20", "SONY NET WORK STATION MC68030 Monitor Release 2.0") // default to match with paired graphics ROM
 	ROMX_LOAD("nws1200_9006_am27c1024.bin", 0x00000, 0x20000, CRC(0b836746) SHA1(0dd7ed246c203646747eb99a72e3b91bb702796c), ROM_BIOS(0) | ROM_GROUPWORD | ROM_REVERSE)
 	ROM_SYSTEM_BIOS(1, "nws1250-20a", "SONY NET WORK STATION MC68030 Monitor Release 2.0A")
 	ROMX_LOAD("nws-1200_ver_2.0a_9010.ic2", 0x00000, 0x20000, CRC(87eca9d2) SHA1(235585a55bc2b3206cfec532852526a638eccad2), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE)
 
 	// AM27S21PC PROM
 	ROM_REGION32_BE(0x100, "idrom", 0)
-	//ROM_LOAD("n1250_50292_am27s21pc.ic36", 0x000, 0x100, NO_DUMP)
+	// IDROM has system-specific data, so there is no "golden" dump.
 	ROM_LOAD("idrom.bin", 0x000, 0x100, CRC(8cf47e35) SHA1(3eef8168ffb8f7879bcbac9e8fee2115a191ae83) BAD_DUMP)
 
 	// 2 x MB834200B (mask ROM, from system with monitor 2.0)
