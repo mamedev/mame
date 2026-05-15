@@ -1210,6 +1210,11 @@ ROM_START( mc_105te )
 	ROM_LOAD( "2011 super hik 105-in-1 turbo edition.prg", 0x00000, 0x800000, CRC(c0f85771) SHA1(8c4182b1de3be10dd895089823cc67a9d12589ef) )
 ROM_END
 
+ROM_START( gamekid )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "gamekid.bin", 0x00000, 0x800000, CRC(df721044) SHA1(b8ba8d1303b8a10b7d2f6c74bf40027156848fbd) )
+ROM_END
+
 ROM_START( mc_sp69 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "sports game 69-in-1.prg", 0x00000, 0x400000, CRC(1242da7f) SHA1(bb8f99b1f4a4783b3f7e54d74f1f2a6a628da154) )
@@ -1577,6 +1582,12 @@ CONS( 200?, megapad,   0, 0,  nes_vt_waixing_2mb,        nes_vt, nes_vt_waixing_
 CONS( 2006, ablmini,   0, 0,  nes_vt_waixing_alt_pal_8mb, nes_vt, nes_vt_waixing_alt_state, empty_init, "Advance Bright Ltd", "Double Players Mini Joystick 80-in-1 (MJ8500, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, solargm,   0,  0, nes_vt_waixing_alt_pal_8mb, nes_vt, nes_vt_waixing_alt_state, empty_init, "<unknown>", "Solar Games 80-in-1 (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Solar Games logo is also found in the SunPlus based Millennium Arcade units
+
+// Front of the box has the French name used in the description, no company name is present.
+// back of box has "85 in 1 TV console and 1 LCD soccer game" (English) and "85 juegos para la televisión y 1 juego LCD incluido!" (Spanish)
+// ingame shows "Kid Land 85 in 1"
+// the LCD soccer game built into the unit appears to be driven by a separate glob and is not dumped
+CONS( 200?, gamekid,   0,  0,  nes_vt_waixing_alt_pal_8mb,    nes_vt, nes_vt_waixing_alt_state, empty_init, "<unknown>", u8"Game Kid - 85 jeux pour la télévision et 1 jeu LCD inclus! / Kid Land 85 in 1 (TV part)", MACHINE_IMPERFECT_GRAPHICS )
 
 // silver 'N64' type controller design
 CONS( 200?, zudugo,    0, 0,  nes_vt_waixing_alt_4mb,     nes_vt, nes_vt_waixing_alt_state, empty_init, "Macro Winners / Waixing", "Zudu-go / 2udu-go", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // the styling on the box looks like a '2' in places, a 'Z' in others.
