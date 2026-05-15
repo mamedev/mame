@@ -148,7 +148,7 @@ __|              |         |  |ALS05A| |N82077   |   __             6 x 74F00J->
 #define LOG_INTERRUPT (1U << 1)
 #define LOG_TIMER (1U << 2)
 #define LOG_PARALLEL (1U << 3)
-#define VERBOSE (LOG_GENERAL|LOG_TIMER)
+#define VERBOSE 0
 #include "logmacro.h"
 
 namespace {

@@ -23,6 +23,7 @@
 
 #include "dmac_0448.h"
 #include "news_hid.h"
+#include "news_lcdfb.h"
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
@@ -38,7 +39,6 @@
 #include "machine/z80scc.h"
 #include "sound/spkrdev.h"
 
-#include "screen.h"
 #include "speaker.h"
 
 #define VERBOSE 0
@@ -156,16 +156,10 @@ public:
 	void nws3260(machine_config &config);
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-
 	void nws3260_map(address_map &map) ATTR_COLD;
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
-	required_device<screen_device> m_lcd;
+	required_device<news_lcd_device> m_lcd;
 	required_shared_ptr<u32> m_vram;
-
-	bool m_lcd_enable = false;
-	bool m_lcd_dim = false;
 };
 
 class news_r3k_desktop_state : public news_r3k_base_state
@@ -184,16 +178,6 @@ public:
 protected:
 	void desktop_cpu_map(address_map &map) ATTR_COLD;
 };
-
-void nws3260_state::machine_start()
-{
-	news_r3k_base_state::machine_start();
-
-	save_item(NAME(m_lcd_enable));
-	save_item(NAME(m_lcd_dim));
-	m_lcd_enable = false;
-	m_lcd_dim = false;
-}
 
 void news_r3k_base_state::machine_start()
 {
@@ -236,8 +220,8 @@ void nws3260_state::nws3260_map(address_map &map)
 {
 	cpu_map(map);
 	map(0x10000000, 0x101fffff).rom().region("krom", 0);
-	map(0x10000000, 0x10000003).lw32([this] (u32 data) { m_lcd_enable = bool(data); }, "lcd_enable_w");
-	map(0x10100000, 0x10100003).lw32([this] (u32 data) { m_lcd_dim = BIT(data, 0); }, "lcd_dim_w");
+	map(0x10000003, 0x10000003).w(m_lcd, FUNC(news_lcd_device::lcd_enable_w));
+	map(0x10100003, 0x10100003).w(m_lcd, FUNC(news_lcd_device::lcd_dim_w));
 	map(0x10200000, 0x1021ffff).ram().share("vram").mirror(0xa0000000);
 	map(0x1ff60000, 0x1ff6001b).lw8([this] (offs_t offset, u8 data) { LOG("crtc offset %x 0x%02x\n", offset, data); }, "lfbm_crtc_w"); // TODO: HD64646FS
 }
@@ -343,30 +327,6 @@ static INPUT_PORTS_START(nws_r3k_desktop)
 	PORT_DIPSETTING(0x00000000, "9600")
 	PORT_DIPSETTING(0x80000000, "1200")
 INPUT_PORTS_END
-
-u32 nws3260_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
-{
-	if (!m_lcd_enable)
-		return 0;
-
-	rgb_t const black = rgb_t::black();
-	rgb_t const white = m_lcd_dim ? rgb_t(191, 191, 191) : rgb_t::white();
-
-	u32 const *pixel_pointer = m_vram;
-
-	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
-	{
-		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 32)
-		{
-			u32 const pixel_data = *pixel_pointer++;
-
-			for (unsigned i = 0; i < 32; i++)
-				bitmap.pix(y, x + i) = BIT(pixel_data, 31 - i) ? black : white;
-		}
-	}
-
-	return 0;
-}
 
 void news_r3k_base_state::inten_w(offs_t offset, u16 data, u16 mem_mask)
 {
@@ -559,9 +519,8 @@ void nws3260_state::nws3260(machine_config &config)
 	common(config);
 
 	// Integrated LCD panel
-	SCREEN(config, m_lcd, SCREEN_TYPE_LCD);
-	m_lcd->set_raw(52416000, 1120, 0, 1120, 780, 0, 780);
-	m_lcd->set_screen_update(FUNC(nws3260_state::screen_update));
+	NEWS_LCD(config, m_lcd);
+	m_lcd->set_vram(m_vram);
 }
 
 void news_r3k_desktop_state::nws3410(machine_config &config)
