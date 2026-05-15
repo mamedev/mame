@@ -452,7 +452,7 @@ void gaelco3d_state::tms_control3_w(int state)
  *
  *************************************/
 
-// TODO: find volume control, convert to device
+// TODO: convert to device
 // These are some of the control registers. We don't use them all
 enum
 {
@@ -941,9 +941,12 @@ void gaelco3d_state::gaelco3d(machine_config &config)
 	m_mainlatch->q_out_cb<7>().set(FUNC(gaelco3d_state::unknown_13a_w));
 
 	LS259(config, m_outlatch); // IC2 on top board near edge connector
+	// TODO: speedup should have a second coin counter according to schematics
+	// this LS259 is connected to a ULM2064, that controls both coin counters and lamps
+	m_outlatch->q_out_cb<0>().set([this] (int state) { machine().bookkeeping().coin_counter_w(0, state); });
 	m_outlatch->q_out_cb<1>().set(FUNC(gaelco3d_state::tms_control3_w));
 	m_outlatch->q_out_cb<2>().set_output("Start_lamp"); // START LAMP
-	m_outlatch->q_out_cb<3>().set(FUNC(gaelco3d_state::unknown_137_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(gaelco3d_state::unknown_137_w)); // leader lamp?
 	m_outlatch->q_out_cb<4>().set(m_serial, FUNC(gaelco_serial_device::irq_enable));
 	m_outlatch->q_out_cb<5>().set(FUNC(gaelco3d_state::analog_port_clock_w));
 	m_outlatch->q_out_cb<6>().set(FUNC(gaelco3d_state::analog_port_latch_w));
