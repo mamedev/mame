@@ -78,7 +78,7 @@ private:
 
 	uint8_t kbd_r();
 	uint16_t ads7843_r(offs_t offset);
-	void update_amp();
+	//void update_amp();
 
 	required_device<cpu_device> m_maincpu;
 	required_device<sa1110_periphs_device> m_sa1100;
@@ -96,8 +96,8 @@ private:
 	required_ioport_array<8> m_keyboard;
 
 	uint8_t m_key_scan = 0;
-	uint8_t m_volume = 0;
-	bool m_amp_enable = true;
+	//uint8_t m_volume = 0;
+	//bool m_amp_enable = true;
 };
 
 
@@ -164,8 +164,8 @@ void psion7_state::machine_start()
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 
 	save_item(NAME(m_key_scan));
-	save_item(NAME(m_volume));
-	save_item(NAME(m_amp_enable));
+	//save_item(NAME(m_volume));
+	//save_item(NAME(m_amp_enable));
 }
 
 void psion7_state::machine_reset()
@@ -211,22 +211,22 @@ uint16_t psion7_state::ads7843_r(offs_t offset)
 }
 
 
-void psion7_state::update_amp()
-{
-	// TODO: MSC1192 speaker amplifier, can be put into standby to mute audio.
-	static const float codec_volume[4] = { 1.0f, 0.75f, 0.5f, 0.25f };
-
-	if (m_amp_enable)
-	{
-		m_buzzer->set_output_gain(ALL_OUTPUTS, 1.0);
-		m_codec->set_output_gain(ALL_OUTPUTS, codec_volume[m_volume]); // VOL
-	}
-	else
-	{
-		m_buzzer->set_output_gain(ALL_OUTPUTS, 0.0);
-		m_codec->set_output_gain(ALL_OUTPUTS, 0.0);
-	}
-}
+//void psion7_state::update_amp()
+//{
+//	// TODO: MSC1192 speaker amplifier, can be put into standby to mute audio.
+//	static const float codec_volume[4] = { 1.0f, 0.75f, 0.5f, 0.25f };
+//
+//	if (m_amp_enable)
+//	{
+//		m_buzzer->set_output_gain(ALL_OUTPUTS, 1.0);
+//		m_codec->set_output_gain(ALL_OUTPUTS, codec_volume[m_volume]); // VOL
+//	}
+//	else
+//	{
+//		m_buzzer->set_output_gain(ALL_OUTPUTS, 0.0);
+//		m_codec->set_output_gain(ALL_OUTPUTS, 0.0);
+//	}
+//}
 
 
 void psion7_state::s7_map(address_map &map)
