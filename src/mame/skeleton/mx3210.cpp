@@ -114,8 +114,8 @@ void mx3210_state::mx3210(machine_config &config)
 	WD37C65C(config, m_fdc, 20_MHz_XTAL/2, 20_MHz_XTAL/2); // FDC37C65CLJ-P, unknown clock
 	//FLOPPY_CONNECTOR(...)
 
-	AM7990(config, "lance1", 0); // AMD AM7990PC/80
-	AM7990(config, "lance2", 0); // AMD AM7990PC/80
+	AM7990(config, "lance1", 20_MHz_XTAL/2); // AMD AM7990PC/80
+	AM7990(config, "lance2", 20_MHz_XTAL/2); // AMD AM7990PC/80
 }
 
 ROM_START(mx3210)
