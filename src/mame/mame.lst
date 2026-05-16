@@ -16380,6 +16380,9 @@ ctk551
 ctk601
 gz70sp
 
+@source:casio/ctrc1.cpp
+ctrc1
+
 @source:casio/cz1.cpp
 cz1
 mz1
