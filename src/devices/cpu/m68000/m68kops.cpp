@@ -7323,10 +7323,9 @@ void m68000_musashi_device::xe8d0_bftst_l_ai_234fc()
 	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 	mask_long = mask_base >> offset;
 
-	data_long = ((u32)offset + width) <= 8  ? (u32)m68ki_read_8(ea) << 24 :
-				((u32)offset + width) <= 16 ? (u32)m68ki_read_16(ea) << 16 :
-				m68ki_read_32(ea); // TODO: move to input file
-
+	data_long = (offset + width) <= 8  ? m68ki_read_8(ea) << 24 :
+				(offset + width) <= 16 ? m68ki_read_16(ea) << 16 :
+				m68ki_read_32(ea);
 	m_n_flag = ((data_long & (0x80000000 >> offset))<<offset)>>24;
 	m_not_z_flag = data_long & mask_long;
 	m_v_flag = VFLAG_CLEAR;
@@ -7369,9 +7368,9 @@ void m68000_musashi_device::xe8e8_bftst_l_di_234fc()
 	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 	mask_long = mask_base >> offset;
 
-	data_long = ((u32)offset + width) <= 8  ? (u32)m68ki_read_8(ea) << 24 :
-	            ((u32)offset + width) <= 16 ? (u32)m68ki_read_16(ea) << 16 :
-	            m68ki_read_32(ea);
+	data_long = (offset + width) <= 8  ? m68ki_read_8(ea) << 24 :
+				(offset + width) <= 16 ? m68ki_read_16(ea) << 16 :
+				m68ki_read_32(ea);
 	m_n_flag = ((data_long & (0x80000000 >> offset))<<offset)>>24;
 	m_not_z_flag = data_long & mask_long;
 	m_v_flag = VFLAG_CLEAR;
@@ -7414,9 +7413,9 @@ void m68000_musashi_device::xe8f0_bftst_l_ix_234fc()
 	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 	mask_long = mask_base >> offset;
 
-	data_long = (u32)offset + width <= 8  ? m68ki_read_8(ea) << 24 :
-	            (u32)offset + width <= 16 ? m68ki_read_16(ea) << 16 :
-	            m68ki_read_32(ea);
+	data_long = (offset + width) <= 8  ? m68ki_read_8(ea) << 24 :
+				(offset + width) <= 16 ? m68ki_read_16(ea) << 16 :
+				m68ki_read_32(ea);
 	m_n_flag = ((data_long & (0x80000000 >> offset))<<offset)>>24;
 	m_not_z_flag = data_long & mask_long;
 	m_v_flag = VFLAG_CLEAR;
@@ -7459,9 +7458,9 @@ void m68000_musashi_device::xe8f8_bftst_l_aw_234fc()
 	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 	mask_long = mask_base >> offset;
 
-	data_long = ((u32)offset + width) <= 8  ? (u32)m68ki_read_8(ea) << 24 :
-	            ((u32)offset + width) <= 16 ? (u32)m68ki_read_16(ea) << 16 :
-	            m68ki_read_32(ea);
+	data_long = (offset + width) <= 8  ? m68ki_read_8(ea) << 24 :
+				(offset + width) <= 16 ? m68ki_read_16(ea) << 16 :
+				m68ki_read_32(ea);
 	m_n_flag = ((data_long & (0x80000000 >> offset))<<offset)>>24;
 	m_not_z_flag = data_long & mask_long;
 	m_v_flag = VFLAG_CLEAR;
@@ -7504,9 +7503,9 @@ void m68000_musashi_device::xe8f9_bftst_l_al_234fc()
 	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 	mask_long = mask_base >> offset;
 
-	data_long = ((u32)offset + width) <= 8  ? (u32)m68ki_read_8(ea) << 24 :
-	            ((u32)offset + width) <= 16 ? (u32)m68ki_read_16(ea) << 16 :
-	            m68ki_read_32(ea);
+	data_long = (offset + width) <= 8  ? m68ki_read_8(ea) << 24 :
+				(offset + width) <= 16 ? m68ki_read_16(ea) << 16 :
+				m68ki_read_32(ea);
 	m_n_flag = ((data_long & (0x80000000 >> offset))<<offset)>>24;
 	m_not_z_flag = data_long & mask_long;
 	m_v_flag = VFLAG_CLEAR;
@@ -7549,9 +7548,9 @@ void m68000_musashi_device::xe8fa_bftst_l_pcdi_234fc()
 	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 	mask_long = mask_base >> offset;
 
-	data_long = ((u32)offset + width) <= 8  ? (u32)m68ki_read_8(ea) << 24 :
-	            ((u32)offset + width) <= 16 ? (u32)m68ki_read_16(ea) << 16 :
-	            m68ki_read_32(ea);
+	data_long = (offset + width) <= 8  ? m68ki_read_8(ea) << 24 :
+				(offset + width) <= 16 ? m68ki_read_16(ea) << 16 :
+				m68ki_read_32(ea);
 	m_n_flag = ((data_long & (0x80000000 >> offset))<<offset)>>24;
 	m_not_z_flag = data_long & mask_long;
 	m_v_flag = VFLAG_CLEAR;
@@ -7594,9 +7593,9 @@ void m68000_musashi_device::xe8fb_bftst_l_pcix_234fc()
 	mask_base = MASK_OUT_ABOVE_32(0xffffffff << (32 - width));
 	mask_long = mask_base >> offset;
 
-	data_long = ((u32)offset + width) <= 8  ? (u32)m68ki_read_8(ea) << 24 :
-	            ((u32)offset + width) <= 16 ? (u32)m68ki_read_16(ea) << 16 :
-	            m68ki_read_32(ea);
+	data_long = (offset + width) <= 8  ? m68ki_read_8(ea) << 24 :
+				(offset + width) <= 16 ? m68ki_read_16(ea) << 16 :
+				m68ki_read_32(ea);
 	m_n_flag = ((data_long & (0x80000000 >> offset))<<offset)>>24;
 	m_not_z_flag = data_long & mask_long;
 	m_v_flag = VFLAG_CLEAR;
