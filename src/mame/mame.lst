@@ -40386,6 +40386,10 @@ revo
 revo_de
 revo_fr
 
+@source:psion/psion7.cpp
+netbook
+psion7
+
 @source:psion/psionhc.cpp
 psionhc100
 psionhc110
