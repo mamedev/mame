@@ -8,8 +8,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_PSION_PSION5_H
-#define MAME_PSION_PSION5_H
+#ifndef MAME_PSION_PSION5MX_H
+#define MAME_PSION_PSION5MX_H
 
 #pragma once
 
@@ -213,4 +213,4 @@ private:
 	emu_timer *m_rtc_ticker = nullptr;
 };
 
-#endif // MAME_PSION_PSION5_H
+#endif // MAME_PSION_PSION5MX_H

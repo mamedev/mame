@@ -12,8 +12,13 @@
 #pragma once
 
 #include "cpu/unsp/unsp.h"
+#include "machine/timer.h"
+
 #include "screen.h"
 #include "emupal.h"
+
+#include "generalplus_gpl_dma.h"
+#include "generalplus_gpl_timebase.h"
 #include "generalplus_gpl162xx_soc_video.h"
 #include "spg2xx_audio.h"
 
@@ -43,6 +48,9 @@ public:
 
 	auto nand_read_callback() { return m_nand_read_cb.bind(); }
 
+	// hack for beijuehh / bornkidh
+	void disable_timebase_interrupts() { m_disable_timebase_interrupts = true; }
+
 	template <typename... T> void set_cs_config_callback(T &&... args) { m_cs_callback.set(std::forward<T>(args)...); }
 	template <typename T> void set_cs_space(T &&tag, int no)
 	{
@@ -55,7 +63,6 @@ public:
 	void vblank(int state) { m_spg_video->vblank(state); }
 
 	void set_bootmode(int mode) { m_boot_mode = mode; }
-	void set_alt_periodic_irq(bool alt) { m_alt_periodic_irq = alt; }
 
 	IRQ_CALLBACK_MEMBER(irq_vector_cb);
 	void default_cs_callback(u16 cs0, u16 cs1, u16 cs2, u16 cs3, u16 cs4 );
@@ -97,9 +104,6 @@ protected:
 	devcb_read16 m_nand_read_cb;
 	optional_address_space m_cs_space;
 	u32 m_csbase;
-
-	u16 m_dma_params[8][4];
-	bool m_dma_latched[4];
 
 	// unk 78xx
 	u16 m_sys_ctrl;
@@ -144,25 +148,21 @@ protected:
 
 	u16 m_misc_int_ctrl;
 
-	u16 m_timebasea_ctrl;
-	u16 m_timebaseb_ctrl;
-	u16 m_timebasec_ctrl;
-
-	u16 m_timebase_reset;
-
 	u16 m_cha_ctrl;
 
-	u16 m_78fb;
+	u16 m_dac_pga;
 
 	// unk 79xx
 	u16 m_rtc_ctrl;
 	u16 m_rtc_int_status;
 	u16 m_rtc_int_ctrl;
 
-	u16 m_7960;
-	u16 m_7961;
+	u16 m_adc_setup;
+	u16 m_madc_ctrl;
 
-	u16 m_system_dma_memtype;
+	u16 m_timera_ctrl;
+	u16 m_timerb_ctrl;
+
 
 	u16 internalrom_lower32_r(offs_t offset);
 
@@ -177,33 +177,28 @@ protected:
 	devcb_write16 m_space_write_cb;
 	devcb_write_line m_dma_complete_cb;
 
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_a_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_b_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_c_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_e_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_f_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(scheduler_cb);
+
 	u16 unk_r(offs_t offset);
 	void unk_w(offs_t offset, u16 data);
 
-	void write_dma_params(int channel, int offset, u16 data);
-	u16 read_dma_params(int channel, int offset);
-	void trigger_systemm_dma(int channel);
-
-	u16 system_dma_params_channel0_r(offs_t offset);
-	void system_dma_params_channel0_w(offs_t offset, u16 data);
-	u16 system_dma_params_channel1_r(offs_t offset);
-	void system_dma_params_channel1_w(offs_t offset, u16 data);
-	u16 system_dma_params_channel2_r(offs_t offset);
-	void system_dma_params_channel2_w(offs_t offset, u16 data);
-	u16 system_dma_params_channel3_r(offs_t offset);
-	void system_dma_params_channel3_w(offs_t offset, u16 data);
-	u16 system_dma_status_r();
-	void system_dma_7abf_unk_w(u16 data);
-	u16 system_dma_memtype_r();
-	void system_dma_memtype_w(u16 data);
 
 	u16 power_state_r();
-	u16 unkarea_78fb_status_r();
+	u16 dac_pga_r();
 
-	u16 unkarea_7803_r();
-	void unkarea_7803_w(u16 data);
+	u16 sys_ctrl_r();
+	void sys_ctrl_w(u16 data);
 
 	void clock_ctrl_w(u16 data);
+
+	u16 clk_ctrl0_r();
+	void clk_ctrl0_w(u16 data);
 
 	void waitmode_enter_780c_w(u16 data);
 
@@ -213,15 +208,20 @@ protected:
 	void unkarea_7816_w(u16 data);
 	void pllchange_w(u16 data);
 
+	u16 pllclkwait_r();
+	void pllclkwait_w(u16 data);
+
+	void watchdog_ctrl_w(u16 data);
+
 	u16 cache_ctrl_r();
 	void cache_ctrl_w(u16 data);
 
 	void chipselect_csx_memory_device_control_w(offs_t offset, u16 data);
 
-	void unkarea_7835_w(u16 data);
+	void mcs0_page_w(u16 data);
 
-	u16 unkarea_782d_r();
-	void unkarea_782d_w(u16 data);
+	u16 raw_war_r();
+	void raw_war_w(u16 data);
 
 	// Port A
 	u16 ioa_data_r();
@@ -267,16 +267,20 @@ protected:
 	u16 iod_mux_r();
 	void iod_mux_w(u16 data);
 
-
+	u16 ioe_buffer_r();
+	void ioe_buffer_w(u16 data);
 	u16 ioe_dir_r();
 	void ioe_dir_w(u16 data);
 	u16 ioe_attrib_r();
 	void ioe_attrib_w(u16 data);
 
 	void int_status1_w(u16 data);
+	void int_status2_w(u16 data);
+	void int_status3_w(u16 data);
 
 	u16 int_status1_r();
 	u16 int_status2_r();
+	u16 int_status3_r();
 
 	void int_priority_1_w(u16 data);
 	void int_priority_2_w(u16 data);
@@ -284,16 +288,13 @@ protected:
 
 	void mint_ctrl_w(u16 data);
 
-	void timebasea_ctrl_w(u16 data);
-	void timebaseb_ctrl_w(u16 data);
-
-	u16 timebasec_ctrl_r();
-	void timebasec_ctrl_w(u16 data);
-
-	void timebase_reset_w(u16 data);
-
+	virtual void update_interrupts(int state);
+		
 	u16 timera_ctrl_r();
+	void timera_ctrl_w(u16 data);
+
 	u16 timerb_ctrl_r();
+	void timerb_ctrl_w(u16 data);
 
 	u16 timerc_ctrl_r();
 	u16 timerd_ctrl_r();
@@ -301,7 +302,7 @@ protected:
 	u16 cha_ctrl_r();
 	void cha_ctrl_w(u16 data);
 
-	u16 unkarea_7904_r();
+	u16 uart_status_r();
 
 	u16 rtc_ctrl_r();
 	void rtc_ctrl_w(u16 data);
@@ -316,35 +317,45 @@ protected:
 	u16 spi_7945_misc_control_reg_r();
 	void spi_7942_txdata_w(u16 data);
 
-	void unkarea_7960_w(u16 data);
-	u16 unkarea_7961_r();
-	void unkarea_7961_w(u16 data);
-	u16 unkarea_7962_r();
+	void adc_setup_w(u16 data);
+	u16 madc_ctrl_r();
+	void madc_ctrl_w(u16 data);
+	u16 madc_data_r();
 
 	void videoirq_w(int state);
 	void audioirq_w(int state);
 
-	u16 system_7a35_r();
-	u16 system_7a37_r();
-	u16 system_7a39_r();
-	u16 system_7a3a_r();
-	u16 system_7a46_r();
-	u16 system_7a54_r();
-
-	void checkirq6();
-
-	emu_timer *m_unk_timer;
-
-	TIMER_CALLBACK_MEMBER(unknown_tick);
+	u16 usb_7a35_r();
+	u16 usb_7a37_r();
+	u16 usb_7a39_r();
+	u16 usb_7a3a_r();
+	u16 usb_7a46_r();
+	u16 usb_7a54_r();
 
 	inline u16 read_space(offs_t offset);
 	inline void write_space(offs_t offset, u16 data);
 
-	bool m_alt_periodic_irq; // might be multiple timers, might be a register to configure, currently a config option.
-
 	// config registers (external pins)
 	int m_boot_mode; // 2 pins determine boot mode, likely only read at power-on
 	sunplus_gcm394_cs_callback_device m_cs_callback;
+
+	required_device<timer_device> m_timer_a;
+	required_device<timer_device> m_timer_b;
+	required_device<timer_device> m_timer_c;
+	required_device<timer_device> m_timer_d;
+	required_device<timer_device> m_timer_e;
+	required_device<timer_device> m_timer_f;
+	required_device<timer_device> m_scheduler;
+
+	required_device<gpl_dma_device> m_gpl_dma;
+	required_device<gpl_timebase_device> m_gpl_timebase;
+
+	// config/hacks
+	bool m_disable_timebase_interrupts;
+
+private:
+	void dma_complete(int state);
+
 };
 
 

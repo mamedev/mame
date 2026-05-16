@@ -312,6 +312,11 @@ void gcm394_base_video_device::device_reset()
 
 	m_sprite_7022_gfxbase_lsb = 0;
 	m_sprite_702d_gfxbase_msb = 0;
+
+	m_page0_addr_lsb = 0;
+	m_page0_addr_msb = 0;
+	m_page1_addr_lsb = 0;
+	m_page1_addr_msb = 0;
 	m_page2_addr_lsb = 0;
 	m_page2_addr_msb = 0;
 	m_page3_addr_lsb = 0;
@@ -327,7 +332,10 @@ u32 gcm394_base_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 	// The 'bitmap test mode' in jak_car2 requires this to be black instead.
 
 	// jak_s500 briely sets pen 0 of the layer to magenta, but then ends up erasing it
+	bool readfromcsspace = true;
 
+	if (!m_cs_space)
+		readfromcsspace = false;
 
 	if (0)
 	{
@@ -398,12 +406,12 @@ u32 gcm394_base_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 		for (int i = 0; i < 4; i++)
 		{
-			m_renderer->draw_page(true, m_703a_palettebank, cliprect, scanline, i, m_page0_addr_msb, m_page0_addr_lsb, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll, 0);
-			m_renderer->draw_page(true, m_703a_palettebank, cliprect, scanline, i, m_page1_addr_msb, m_page1_addr_lsb, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll, 1);
-			m_renderer->draw_page(true, m_703a_palettebank, cliprect, scanline, i, m_page2_addr_msb, m_page2_addr_lsb, m_tmap2_scroll, m_tmap2_regs, mem, m_paletteram, m_rowscroll, 2);
-			m_renderer->draw_page(true, m_703a_palettebank, cliprect, scanline, i, m_page3_addr_msb, m_page3_addr_lsb, m_tmap3_scroll, m_tmap3_regs, mem, m_paletteram, m_rowscroll, 3);
+			m_renderer->draw_page(readfromcsspace, m_703a_palettebank, cliprect, scanline, i, m_page0_addr_msb, m_page0_addr_lsb, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll, 0);
+			m_renderer->draw_page(readfromcsspace, m_703a_palettebank, cliprect, scanline, i, m_page1_addr_msb, m_page1_addr_lsb, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll, 1);
+			m_renderer->draw_page(readfromcsspace, m_703a_palettebank, cliprect, scanline, i, m_page2_addr_msb, m_page2_addr_lsb, m_tmap2_scroll, m_tmap2_regs, mem, m_paletteram, m_rowscroll, 2);
+			m_renderer->draw_page(readfromcsspace, m_703a_palettebank, cliprect, scanline, i, m_page3_addr_msb, m_page3_addr_lsb, m_tmap3_scroll, m_tmap3_regs, mem, m_paletteram, m_rowscroll, 3);
 
-			m_renderer->draw_sprites(true, m_use_legacy_mode ? 2 : 1, m_703a_palettebank, highres, cliprect, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram);
+			m_renderer->draw_sprites(readfromcsspace, m_use_legacy_mode ? 2 : 1, m_703a_palettebank, highres, cliprect, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram);
 		}
 
 		m_renderer->apply_saturation_and_fade(bitmap, cliprect, scanline);
@@ -808,17 +816,64 @@ void gcm394_base_video_device::video_dma_size_trigger_w(address_space &space, u1
 	}
 }
 
+// P_PPU_RAM_Bank
+//
+// only lowest bit is used
+
 void gcm394_base_video_device::ppu_ram_bank_w(u16 data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::ppu_ram_bank_w %04x\n", machine().describe_context(), data);
 	m_707e_spritebank = data;
 }
 
+// P_FB_PPU_GO
+//
+// 15  FBI_UPD  (Read Only, indicates FBI_ADDR is updated to current pointer)
+// 14  FBO_F    (Read Only, used in interlace mode)
+// 13
+// 12
+//
+// 11
+// 10
+//  9
+//  8
+//
+//  7
+//  6
+//  5
+//  4
+//
+//  3
+//  2
+//  1
+//  0  PPU_GO  (Render to framebuffer in frame base mode)
+
 u16 gcm394_base_video_device::video_707c_r()
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707c_r\n", machine().describe_context());
 	return 0x8000;
 }
+
+// Format for GPL1625x / GPAC800
+//
+// S000 MMDF EfIV BDCP
+//
+// S# = SAVE_ROM (0 = normal mode, 1 = ROM saving mode, uses even line data for odd lines)
+// MM = FB_MONO (0 = RGB, 1 = Mono, 2 = 2bpp, 3 = 4bpp)
+// D* = SPR25D (0 = disable virtual 3D sprites, 1 = enable)
+// F = FB_FORMAT (0 = RGB565, 1 = RGBG)
+// E = FB_EN (0 = Half-line base mode, 1 = Frame base mode)
+// f = FREE (0 = 22 bit addressing, 1 = 27 bit addressing)
+// I* = VGA_NOINTL (0 = VGA interlace mode 640x480, 1 = VGA-non interlace mode, 640x240)
+// V* = VGA_EN  (0 = QVGA / 320x240, 1 = VGA / 640x480)
+// B = TX_BOTUP (0 = top to bottom layers, 1 = bottom to top layers)
+// D = TX_DIRECT (0 = relative addressing, 1 = direct addressing)
+// C = TCHAR (0 = disable transparent tile, 1 = enable transparent tile - only works in relative address mode)
+// P = PPU_EN
+//
+// # not on GPL16250 (GPAC500 only?)
+// * not on GPL1622x / GPL1623x / GPAC500
+//
 
 u16 gcm394_base_video_device::ppu_enable_r()
 {
@@ -830,31 +885,32 @@ void gcm394_base_video_device::ppu_enable_w(u16 data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::ppu_enable_w %04x\n", machine().describe_context(), data);
 
-	// Format for GPL1625x / GPAC800
-	//
-	// S000 MMDF EfIV BDCP
-	//
-	// S# = SAVE_ROM (0 = normal mode, 1 = ROM saving mode, uses even line data for odd lines)
-	// MM = FB_MONO (0 = RGB, 1 = Mono, 2 = 2bpp, 3 = 4bpp)
-	// D* = SPR25D (0 = disable virtual 3D sprites, 1 = enable)
-	// F = FB_FORMAT (0 = RGB565, 1 = RGBG)
-	// E = FB_EN (0 = Half-line base mode, 1 = Frame base mode)
-	// f = FREE (0 = 22 bit addressing, 1 = 27 bit addressing)
-	// I* = VGA_NOINTL (0 = VGA interlace mode 640x480, 1 = VGA-non interlace mode, 640x240)
-	// V* = VGA_EN  (0 = QVGA / 320x240, 1 = VGA / 640x480)
-	// B = TX_BOTUP (0 = top to bottom layers, 1 = bottom to top layers)
-	// D = TX_DIRECT (0 = relative addressing, 1 = direct addressing)
-	// C = TCHAR (0 = disable transparent tile, 1 = enable transparent tile - only works in relative address mode)
-	// P = PPU_EN
-	//
-	// # not on GPL16250 (GPAC500 only?)
-	// * not on GPL1622x / GPL1623x / GPAC500
-	//
-
 	m_707f = data;
 	m_renderer->set_video_reg_7f(data);
 	//popmessage("707f is %04x\n", data);
 }
+
+// P_Palette_Control
+//
+// 15
+// 14
+// 13
+// 12
+//
+// 11
+// 10
+//  9
+//  8
+//
+//  7
+//  6
+//  5
+//  4
+//
+//  3  PAL_RAM_SEL[1] - ram banking for palette reads/writes
+//  2  PAL_RAM_SEL[0]
+//  1  PAL_TYPE[1] - enables 25-bit palette mode (otherwise 16-bit mode)
+//  0  PAL_TYPE[0] - selects which palettes to use
 
 u16 gcm394_base_video_device::video_703a_palettebank_r()
 {
@@ -864,18 +920,32 @@ u16 gcm394_base_video_device::video_703a_palettebank_r()
 
 void gcm394_base_video_device::video_703a_palettebank_w(u16 data)
 {
-	// I don't think bit 0 (0x01) is a bank select, it might be a 'mode select' for how the palette operates.
-	// neither lazertag or tkmag220 set it
-	// lazertag uses 2 banks (0 and 8)
-	// tkmag220 only uses 1 bank (0)
-
-	// ---- bb-s
-	// bb = write bank?
-	// s = sprite palette bank select?
 
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703a_palettebank_w %04x\n", machine().describe_context(), data);
 	m_703a_palettebank = data;
 }
+
+// P_PPU_IRQ_EN - IRQ enable/disable registers
+//
+// 15
+// 14
+// 13
+// 12
+// 
+// 11  IRQ_EN11 R/W  TV/TFT Frame End IRQ
+// 10  IRQ_EN10 R/W  Frame buffer FIFO under-run IRQ
+//  9  IRQ_EN9  R/W  Motion detection FIFO under-run IRQ
+//  8  IRQ_EN8  R/W  Sensor position hit IRQ
+// 
+//  7  IRQ_EN7  R/w  Motion detection frame end IRQ
+//  6  IRQ_EN6  R/W  Sensor frame end IRQ
+//  5  IRQ_EN5  R/W  Sprite engine under-run IRQ
+//  4  IRQ_EN4  R/W  Text engine under-run RIQ
+//
+//  3  IRQ_EN3  R/W  Palette write error IRQ
+//  2  IRQ_EN2  R/W  Sprite DMA transfer complete IRQ
+//  1  IRQ_EN1  R/W  Video position IRQ
+//  0  IRQ_EN0  R/W  Vertical blaking IRQ
 
 u16 gcm394_base_video_device::videoirq_source_enable_r()
 {
@@ -893,12 +963,33 @@ void gcm394_base_video_device::videoirq_source_enable_w(u16 data)
 		check_video_irq();
 }
 
+// P_PPU_IRQ_STS
+//
+// 15
+// 14
+// 13
+// 12
+//
+// 11  IRQ_STS11   TV/TFT Frame End IRQ
+// 10  IRQ_STS10   Frame buffer FIFO under-run IRQ
+//  9  IRQ_STS9    Motion detection FIFO under-run IRQ
+//  8  IRQ_STS8    Sensor position hit IRQ
+// 
+//  7  IRQ_STS7    Motion detection frame end IRQ
+//  6  IRQ_STS6    Sensor frame end IRQ
+//  5  IRQ_STS5    Sprite engine under-run IRQ
+//  4  IRQ_STS4    Text engine under-run IRQ
+//
+//  3  IRQ_STS3    Palette write error IRQ
+//  2  IRQ_STS2    Sprite DMA transfer complete IRQ
+//  1  IRQ_STS1    Video position IRQ
+//  0  IRQ_STS0    Vertical blaking IRQ
+
 u16 gcm394_base_video_device::video_7063_videoirq_source_r()
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7063_videoirq_source_r\n", machine().describe_context());
 	return m_video_irq_status;
 }
-
 
 void gcm394_base_video_device::video_7063_videoirq_source_ack_w(u16 data)
 {
@@ -909,6 +1000,28 @@ void gcm394_base_video_device::video_7063_videoirq_source_ack_w(u16 data)
 	if (changed)
 		check_video_irq();
 }
+
+// P_Blending
+//
+// 15
+// 14
+// 13
+// 12
+//
+// 11
+// 10
+//  9
+//  8
+// 
+//  7
+//  6
+//  5
+//  4
+// 
+//  3
+//  2
+//  1  BLDLVL[1]
+//  0  BLDLVL[0]
 
 void gcm394_base_video_device::blending_w(u16 data)
 {
@@ -972,6 +1085,28 @@ void gcm394_base_video_device::split_irq_xpos_w(u16 data)
 	update_raster_split_position();
 }
 
+// P_TV_Control
+//
+// 15  TV_TEST
+// 14
+// 13
+// 12  HD_SEL  (0 = CSYNC, 1 = HD)
+//
+// 11  VDSEL
+// 10  EVEN   (0 = odd field, 1 = even field)
+//  9  SYNC
+//  8  VINFMT[1]  - video input data format, 0 = RGB888, others = reserved
+//
+//  7  VINFMT[0]
+//  6  RESOLUTION[1]  - 0 = 320x240, 1 = 640x240, 2 = reserved, 3 = internal colour bar
+//  5  RESOLUTION[0]
+//  4  NONINTL        - 0 = interlaced, 1 = non-interlaced
+//
+//  3  TVSTD[2]  - TV Standard Select
+//  2  TVSTD[1]
+//  1  TVSTD[0]
+//  0  TVEN      - TV Module Enabled
+
 u16 gcm394_base_video_device::video_703c_tvcontrol1_r()
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703c_tvcontrol1_r\n", machine().describe_context());
@@ -984,6 +1119,8 @@ void gcm394_base_video_device::video_703c_tvcontrol1_w(u16 data)
 	m_703c_tvcontrol1 = data;
 	m_renderer->set_video_reg_3c(data);
 }
+
+// uncertain, apparently P_STN_COM_Clip or P_TFT_V_Width 
 
 u16 gcm394_base_video_device::video_7051_r()
 {
@@ -1124,8 +1261,9 @@ void gcm394_base_video_device::vblank(int state)
 	if (m_video_irq_enable & 1)
 	{
 		// jak_prft expects 0x800 to be set in the status register or most of the main vblank code is skipped, why?
+		// 0x800 is TV/TFT Frame End IRQ
 
-		m_video_irq_status |= 1 | 0x800;
+		m_video_irq_status |= (0x001 | 0x800);
 		LOGMASKED(LOG_GCM394_VIDEO, "Setting video IRQ status to %04x\n", m_video_irq_status);
 		check_video_irq();
 	}

@@ -621,8 +621,8 @@ static INPUT_PORTS_START( cyvern )      /* 2 buttons, 2 players */
 	PORT_INCLUDE( skns )
 
 	PORT_MODIFY("400000")
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )   /* No Button 3 */
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* No Button 3 */
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("%p Button 3 (undocumented)")  /* Undocumented and not shown in test mode, but has unique effect in game */
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("%p Button 3 (undocumented)")  /* Undocumented and not shown in test mode, but has unique effect in game */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( galpanis )    /* 1 button, 2 players */

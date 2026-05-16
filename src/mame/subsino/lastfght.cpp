@@ -64,6 +64,7 @@ Notes:
 
     TODO:
      - blitter timing is guessed, definitely expect non-instant transfers otherwise game is too fast
+     - no sound (custom SS9804 as per subsino_kr_h8.cpp and subsino2.cpp later games)
 
     The EEPROM protection method is the same as in the subsino2.cpp games.
 

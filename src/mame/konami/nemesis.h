@@ -248,7 +248,7 @@ private:
 
 	uint16_t  m_scanline_counter = 0;
 
-	void bubsys_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bubsys_005297_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(bubsys_interrupt);
 

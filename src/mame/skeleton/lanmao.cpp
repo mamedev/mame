@@ -544,8 +544,8 @@ ROM_END
 // on main PCB: 8031 (exact model unknown) + 6116P-3 + 10 MHz XTAL + 3.579545 XTAL + YM2413 + bank of 8 DIP switches
 // on LED PCB: 2x D8255AC-2 + M5L8279P-5 + logic
 ROM_START( whujiang )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cpu", 0x00000, 0x10000, CRC(5dcff135) SHA1(67427bccf310d3f51784b568b0c34741a6b7812f) )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "cpu", 0x0000, 0x8000, CRC(2fac1d32) SHA1(543951defb4dccd888480a1ca62d771e62c2e23f) )
 ROM_END
 
 // 五虎将加强版 (Wǔ Hǔjiàng Jiāqiáng Bǎn) (Five Tiger Generals Enhanced Version)
@@ -571,6 +571,53 @@ ROM_START( pkzw )
 	ROM_REGION( 0x800, "nvram", 0 )
 	ROM_LOAD( "nvram", 0x000, 0x800, CRC(d67da182) SHA1(12d51eae0eb0c15b04db58b7419dedf793cf44f7) )
 ROM_END
+
+// 小青蛙 (Xiǎo Qīngwā) (Little Frog)
+// 0DC0DC201ByLZY-P PCB: W78E065 + UM6116-2 + 12 MHz XTAL + 2x KC89C72 + TOP8279 + D71055C + OKIM6295. No bank of switches
+ROM_START( xqingwa )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "w78e065.c56", 0x0000, 0x8000, CRC(fd3d5d51) SHA1(eb444d53ba97a40de95a17664e56000c7fe0bc23) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "w27e040.c59", 0x00000, 0x80000, CRC(129d5e14) SHA1(aea7cd7126b56def8166de99739dbfc552b72394) )
+ROM_END
+
+// 功夫熊猫 (Gōngfu Xióngmāo) (Kung Fu Panda)
+// 168H007A2 PCB: 89E516RD + 12 MHz XTAL + 2x KC89C72 + 2x TOP8279 + TMP82C255AP-2 + 24C02 + OKIM6295. No bank of switches
+ROM_START( gongfuxm )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "89e516rd.bin", 0x00000, 0x10000, CRC(e3fa4dfd) SHA1(8f396887bec4f6443964c09f2700331bc26f1baa) ) // 1xxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "29f161.bin", 0x000000, 0x200000, CRC(59cd681b) SHA1(6d5e541cc620f7c4548757cdea19638c7bb82098) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x100, "i2cmem", 0 )
+	ROM_LOAD( "24c02.bin", 0x000, 0x100, CRC(2365af83) SHA1(ea6a40939b0e08404b729edd000b01f0108e57df) )
+ROM_END
+
+// 亮剑 (Liàng Jiàn) (Draw the Sword)
+// W78E065 + HM6116P-2 + 12 MHz XTAL + 2x JFC95101 + 2x TOP8279 + U6295 + 24C02. No bank of switches
+ROM_START( ljian )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "w78e065", 0x00000, 0x10000, CRC(2e50c3df) SHA1(65aef33ad0173c826d10e55c8f62c13c10e0aad2) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "29f1615", 0x000000, 0x200000, CRC(ff2930c2) SHA1(6a260fba6cc73986477b8dc404a3a12ecb1306a3) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x100, "i2cmem", 0 )
+	ROM_LOAD( "24c02.bin", 0x000, 0x100, CRC(cfffbd57) SHA1(22049c36c56272411d7d431e38a8bd1fc6257d42) )
+ROM_END
+
+// 两只蝴蝶 (Liǎng Zhī Húdié) (Two Butterflies)
+// SUPERR QQ5 PCB: 89E564R + HM6116P-2 + 12 MHz XTAL + JFC95101 + TMP82C255AN-2 + U6295 + 24C02. No bank of switches
+ROM_START( lzhudie )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "w78e065", 0x00000, 0x10000, CRC(f9389dc5) SHA1(4014dbbc2aa7b1661db53b74bfbc57126400b528) ) // 1xxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "29f1615", 0x000000, 0x200000, CRC(5e827bea) SHA1(94ace5fb8161a3004526a77767baa789fd1b8d5d) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -579,7 +626,11 @@ GAME( 1996, panda2,   0, panda2, panda2,  panda2_state, empty_init, ROT0, "Kelly
 GAME( 2003, lanmao,   0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Lan Mao",                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 
 // for the following sets no effort has been made yet to emulate the different behaviour. Most have also different LED layout
-GAME( 199?, pkzw,     0, panda2, panda2,  panda2_state, empty_init, ROT0, "<unknown>",                   "PK Zhiwang",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 199?, tzwang,   0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "<unknown>",                   "Tiaozhan Wang",           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 199?, whujiang, 0, panda2, panda2,  panda2_state, empty_init, ROT0, "<unknown>",                   "Wu Hujiang",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 199?, whujijqb, 0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "<unknown>",                   "Wu Hujiang Jiaqiang Ban", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1998, pkzw,     0, panda2, panda2,  panda2_state, empty_init, ROT0, "Hengfa Electronics",          "PK Zhiwang",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2000, tzwang,   0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Jindalai Electronics",        "Tiaozhan Wang",           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1991, whujiang, 0, panda2, panda2,  panda2_state, empty_init, ROT0, "Hom Inn",                     "Wu Hujiang",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1998, whujijqb, 0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Hom Inn",                     "Wu Hujiang Jiaqiang Ban", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1997, xqingwa,  0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Jinlong Electronics",         "Xiao Qingwa",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2005, gongfuxm, 0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Yuanfa Technology",           "Gongfu Xiongmao",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2001, ljian,    0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Liang Jian",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1999, lzhudie,  0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Liang Zhi Hudie",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )

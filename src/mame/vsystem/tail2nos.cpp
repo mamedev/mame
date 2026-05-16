@@ -41,10 +41,6 @@ class tail2nos_state : public driver_device
 public:
 	tail2nos_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_txvideoram(*this, "txvideoram"),
-		m_spriteram(*this, "spriteram"),
-		m_zoomram(*this, "k051316"),
-		m_soundbank(*this, "soundbank"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k051316(*this, "k051316"),
@@ -54,7 +50,11 @@ public:
 		m_acia(*this, "acia"),
 		m_rs232_out(*this, "com_out"),
 		m_rs232_in(*this, "com_in"),
-		m_analog(*this, "AN%u", 0U)
+		m_analog(*this, "AN%u", 0U),
+		m_txvideoram(*this, "txvideoram"),
+		m_spriteram(*this, "spriteram"),
+		m_zoomram(*this, "k051316"),
+		m_soundbank(*this, "soundbank")
 	{ }
 
 	void tail2nos(machine_config &config);
@@ -63,22 +63,10 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	// memory pointers
-	required_shared_ptr<uint16_t> m_txvideoram;
-	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_zoomram;
-	required_memory_bank m_soundbank;
-
-	// video-related
-	tilemap_t   *m_tx_tilemap;
-	uint8_t     m_txbank;
-	uint8_t     m_txpalette;
-	bool        m_video_enable;
-	bool        m_flip_screen;
-
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -91,12 +79,25 @@ private:
 	required_device<rs232_port_device> m_rs232_in;
 	required_ioport_array<2> m_analog;
 
+	// memory pointers
+	required_shared_ptr<uint16_t> m_txvideoram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_zoomram;
+	required_memory_bank m_soundbank;
+
+	// variables
+	tilemap_t *m_tx_tilemap;
+	uint8_t m_txbank = 0;
+	uint8_t m_txpalette = 0;
+	bool m_video_enable = false;
+	bool m_flip_screen = false;
+	bool m_z80_sync = false;
+
 	void txvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void zoomdata_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gfxbank_w(uint8_t data);
 	void sound_bankswitch_w(uint8_t data);
 	uint8_t soundlatch_pending_r();
-	void soundlatch_pending_w(int state);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void postload();
@@ -145,14 +146,12 @@ K051316_CB_MEMBER(tail2nos_state::zoom_callback)
 void tail2nos_state::postload()
 {
 	m_tx_tilemap->mark_all_dirty();
-
 	m_k051316->gfx(0)->mark_all_dirty();
 }
 
 void tail2nos_state::video_start()
 {
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tail2nos_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-
 	m_tx_tilemap->set_transparent_pen(15);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(tail2nos_state::postload), this));
@@ -176,6 +175,7 @@ void tail2nos_state::zoomdata_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int oldword = m_zoomram[offset];
 	COMBINE_DATA(&m_zoomram[offset]);
+
 	// tell the K051316 device the data changed
 	if (oldword != m_zoomram[offset])
 		m_k051316->mark_gfx_dirty(offset * 2);
@@ -241,6 +241,7 @@ void tail2nos_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int color = (m_spriteram[offs + 2] & 0xe000) >> 13;
 		int flipx = m_spriteram[offs + 2] & 0x1000;
 		int flipy = m_spriteram[offs + 2] & 0x0800;
+
 		if (m_flip_screen)
 		{
 			flipx = !flipx;
@@ -275,17 +276,16 @@ uint32_t tail2nos_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 uint8_t tail2nos_state::soundlatch_pending_r()
 {
+	if (!machine().side_effects_disabled())
+	{
+		// retry_access() forces the z80 to catch up before maincpu does the read
+		if (!m_z80_sync)
+			m_maincpu->retry_access();
+
+		m_z80_sync = !m_z80_sync;
+	}
+
 	return m_soundlatch->pending_r();
-}
-
-void tail2nos_state::soundlatch_pending_w(int state)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
-
-	// sound comms is 2-way (see soundlatch_pending_r),
-	// NMI routine is very short, so briefly set perfect_quantum to make sure that the timing is right
-	if (state)
-		machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 void tail2nos_state::sound_bankswitch_w(uint8_t data)
@@ -472,23 +472,22 @@ GFXDECODE_END
 
 void tail2nos_state::machine_start()
 {
-	uint8_t *ROM = memregion("audiocpu")->base();
-
-	m_soundbank->configure_entries(0, 2, &ROM[0x10000], 0x8000);
-	m_soundbank->set_entry(0);
+	m_soundbank->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x8000);
 
 	m_acia->write_cts(0);
 	m_acia->write_dcd(0);
-
-	m_txbank = 0;
-	m_txpalette = 0;
-	m_video_enable = false;
-	m_flip_screen = false;
 
 	save_item(NAME(m_txbank));
 	save_item(NAME(m_txpalette));
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_flip_screen));
+	save_item(NAME(m_z80_sync));
+}
+
+void tail2nos_state::machine_reset()
+{
+	m_soundbank->set_entry(0);
+	m_z80_sync = false;
 }
 
 
@@ -501,8 +500,7 @@ void tail2nos_state::tail2nos(machine_config &config)
 
 	Z80(config, m_audiocpu, XTAL(20'000'000) / 4); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tail2nos_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &tail2nos_state::sound_port_map);
-								// IRQs are triggered by the YM2608
+	m_audiocpu->set_addrmap(AS_IO, &tail2nos_state::sound_port_map); // IRQs are triggered by the YM2608
 
 	ACIA6850(config, m_acia, 0);
 	m_acia->irq_handler().set_inputline("maincpu", M68K_IRQ_3);
@@ -546,7 +544,7 @@ void tail2nos_state::tail2nos(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set(FUNC(tail2nos_state::soundlatch_pending_w));
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
 	ym2608_device &ymsnd(YM2608(config, "ymsnd", XTAL(8'000'000))); // verified on PCB
