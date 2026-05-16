@@ -40374,7 +40374,17 @@ psion3mx_fr
 psion3mx_nl
 
 @source:psion/psion5mx.cpp
+mako
+mc218
+mc218_de
+mc218_fr
 psion5mx
+psion5mx_fr
+psion5mxp
+psion5mxp_de
+revo
+revo_de
+revo_fr
 
 @source:psion/psionhc.cpp
 psionhc100
