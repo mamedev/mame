@@ -84,7 +84,7 @@ u32 news_lcd_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		{
 			u32 const pixel_data = *pixel_pointer++;
 
-			for (unsigned i = 0; i < 32; i++)
+			for (int i = 0; i < 32; i++)
 			{
 				bitmap.pix(y, x + i) = BIT(pixel_data, 31 - i) ? black : white;
 			}
