@@ -13,7 +13,7 @@
  */
 
 #include "emu.h"
-#include "kbd.h"
+#include "mg1_kbd.h"
 
 #define VERBOSE 0
 #include "logmacro.h"

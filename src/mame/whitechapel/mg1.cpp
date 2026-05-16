@@ -19,7 +19,7 @@
 
 #include "emu.h"
 
-#include "kbd.h"
+#include "mg1_kbd.h"
 
 #include "bus/rs232/rs232.h"
 #include "cpu/ns32000/ns32000.h"
