@@ -13,20 +13,17 @@
 
 #include <cstdarg>
 
-#define VERBOSE_LEVEL ( 0 )
+#define LOG_SEC1_RD		(1U << 1)
+#define LOG_SEC1_WR		(1U << 2)
+#define LOG_SEC2_RD		(1U << 3)
+#define LOG_SEC2_WR		(1U << 4)
+#define LOG_SEC2_UNK	(1U << 5)
+#define LOG_SEC3_RD		(1U << 6)
+#define LOG_SEC3_WR		(1U << 7)
+#define LOG_ERASE		(1U << 8)
 
-static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, const char *s_fmt, ... )
-{
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		device.logerror( "%s: %s", device.machine().describe_context(), buf );
-	}
-}
+#define VERBOSE			( 0 )
+#include "logmacro.h"
 
 
 /***************************************************************************
@@ -117,7 +114,7 @@ uint16_t diskonchip_g3_device::sec_1_r(offs_t offset)
 	{
 		data = (g3_read_data() << 0) | (g3_read_data() << 8);
 	}
-	verboselog(*this, 9, "(DOC) %08X -> %04X\n", 0x0800 + (offset << 1), data);
+	LOGMASKED(LOG_SEC1_RD, "(DOC) %08X -> %04X\n", 0x0800 + (offset << 1), data);
 	return data;
 }
 
@@ -146,7 +143,7 @@ void diskonchip_g3_device::g3_write_data(uint8_t data)
 
 void diskonchip_g3_device::sec_1_w(offs_t offset, uint16_t data)
 {
-	verboselog(*this, 9, "(DOC) %08X <- %04X\n", 0x0800 + (offset << 1), data);
+	LOGMASKED(LOG_SEC1_WR, "(DOC) %08X <- %04X\n", 0x0800 + (offset << 1), data);
 	if (m_sec_2[0x1B] & 0x40)
 	{
 		g3_write_data(data);
@@ -401,7 +398,7 @@ uint16_t diskonchip_g3_device::sec_2_read16(uint32_t offset)
 		// ?
 		case 0x1074 : data = sec_2_read_1074(); break;
 	}
-	verboselog(*this, 9, "(DOC) %08X -> %04X\n", 0x1000 + offset, data);
+	LOGMASKED(LOG_SEC2_RD, "(DOC) %08X -> %04X\n", 0x1000 + offset, data);
 	return data;
 }
 
@@ -432,7 +429,7 @@ uint8_t diskonchip_g3_device::sec_2_read8(uint32_t offset)
 		case 0x104E : data = sec_2_read_104E(); break;
 		case 0x104F : data = sec_2_read_104F(); break;
 	}
-	verboselog(*this, 9, "(DOC) %08X -> %02X\n", 0x1000 + offset, data);
+	LOGMASKED(LOG_SEC2_RD, "(DOC) %08X -> %02X\n", 0x1000 + offset, data);
 	return data;
 }
 
@@ -440,7 +437,7 @@ void diskonchip_g3_device::sec_2_write_100C(uint8_t data)
 {
 	const char *mode_name[] = { "reset", "normal", "deep power down" };
 	uint32_t mode = data & 3;
-	verboselog(*this, 5, "mode %d (%s)\n", mode, mode_name[mode]);
+	LOGMASKED(LOG_SEC2_WR, "mode %d (%s)\n", mode, mode_name[mode]);
 	if (mode == 0)
 	{
 		m_sec_2[0x04] = 00;
@@ -449,7 +446,7 @@ void diskonchip_g3_device::sec_2_write_100C(uint8_t data)
 
 void diskonchip_g3_device::sec_2_write_1032(uint8_t data)
 {
-	verboselog(*this, 5, "flash select %02X\n", data);
+	LOGMASKED(LOG_SEC2_WR, "flash select %02X\n", data);
 	if ((data == 0x12) || (data == 0x27))
 	{
 		m_transfer_offset = 0;
@@ -464,7 +461,7 @@ void diskonchip_g3_device::g3_erase_block()
 	uint32_t offset;
 	int i, j;
 	const uint8_t xxx[] = { 0x00, 0x00, 0x87, 0x00, 0x00, 0x00, 0xCE, 0x00, 0xCF, 0x72, 0xFC, 0x1B, 0xA9, 0xC7, 0xB9, 0x00 };
-	verboselog(*this, 5, "erase block %04X\n", m_block);
+	LOGMASKED(LOG_ERASE, "erase block %04X\n", m_block);
 	for (i=0;i<m_pages;i++)
 	{
 		m_page = i;
@@ -488,7 +485,7 @@ void diskonchip_g3_device::g3_erase_block()
 
 void diskonchip_g3_device::sec_2_write_1034(uint8_t data)
 {
-	verboselog(*this, 5, "flash command %02X\n", data);
+	LOGMASKED(LOG_SEC2_WR, "flash command %02X\n", data);
 	if ((m_sec_2[0x32] == 0x0E) && (data == 0x00))
 	{
 		m_test = 0;
@@ -519,7 +516,7 @@ void diskonchip_g3_device::sec_2_write_1034(uint8_t data)
 		}
 		else
 		{
-			verboselog(*this, 0, "diskonchip_sec_2_write_1034: unknown value %02X/%02X\n", data, m_sec_2[0x32]);
+			LOGMASKED(LOG_SEC2_UNK, "diskonchip_sec_2_write_1034: unknown value %02X/%02X\n", data, m_sec_2[0x32]);
 		}
 	}
 	else if (m_sec_2[0x32] == 0x12)
@@ -544,7 +541,7 @@ void diskonchip_g3_device::sec_2_write_1034(uint8_t data)
 		}
 		else
 		{
-			verboselog(*this, 0, "diskonchip_sec_2_write_1034: unknown value %02X/%02X\n", data, m_sec_2[0x32]);
+			LOGMASKED(LOG_SEC2_UNK, "diskonchip_sec_2_write_1034: unknown value %02X/%02X\n", data, m_sec_2[0x32]);
 		}
 	}
 	else if (m_sec_2[0x32] == 0x27)
@@ -561,7 +558,7 @@ void diskonchip_g3_device::sec_2_write_1034(uint8_t data)
 		}
 		else
 		{
-			verboselog(*this, 0, "diskonchip_sec_2_write_1034: unknown value %02X/%02X\n", data, m_sec_2[0x32]);
+			LOGMASKED(LOG_SEC2_UNK, "diskonchip_sec_2_write_1034: unknown value %02X/%02X\n", data, m_sec_2[0x32]);
 		}
 	}
 	else if ((m_sec_2[0x32] == 0x31) && (data == 0x71))
@@ -583,12 +580,12 @@ void diskonchip_g3_device::sec_2_write_1034(uint8_t data)
 		}
 		else
 		{
-			verboselog(*this, 0, "diskonchip_sec_2_write_1034: unknown value %02X/%02X\n", data, m_sec_2[0x32]);
+			LOGMASKED(LOG_SEC2_UNK, "diskonchip_sec_2_write_1034: unknown value %02X/%02X\n", data, m_sec_2[0x32]);
 		}
 	}
 	else
 	{
-		verboselog(*this, 0, "diskonchip_sec_2_write_1034: unknown value %02X/%02X\n", data, m_sec_2[0x32]);
+		LOGMASKED(LOG_SEC2_UNK, "diskonchip_sec_2_write_1034: unknown value %02X/%02X\n", data, m_sec_2[0x32]);
 	}
 }
 
@@ -604,7 +601,7 @@ void diskonchip_g3_device::sec_2_write_1036(uint8_t data)
 			if (block >= m_blocks) fatalerror( "DOCG3: invalid block (%d)\n", block);
 			plane = (m_data_1036 >> 6) & 1;
 			page = (m_data_1036 >> 0) & 0x3F;
-			verboselog(*this, 5, "flash address %d - %06X (plane %d block %04X page %04X)\n", m_address_count, m_data_1036, plane, block, page);
+			LOGMASKED(LOG_SEC2_WR, "flash address %d - %06X (plane %d block %04X page %04X)\n", m_address_count, m_data_1036, plane, block, page);
 			if (m_address_count == 1)
 			{
 				m_plane = 0;
@@ -623,7 +620,7 @@ void diskonchip_g3_device::sec_2_write_1036(uint8_t data)
 			plane = (m_data_1036 >> 14) & 1;
 			page = (m_data_1036 >> 8) & 0x3F;
 			unk = (m_data_1036 >> 0) & 0xFF;
-			verboselog(*this, 5, "flash address %d - %08X (plane %d block %04X page %04X unk %02X)\n", m_address_count, m_data_1036, plane, block, page, unk);
+			LOGMASKED(LOG_SEC2_WR, "flash address %d - %08X (plane %d block %04X page %04X unk %02X)\n", m_address_count, m_data_1036, plane, block, page, unk);
 			if (m_address_count == 1)
 			{
 				m_plane = 0;
@@ -636,27 +633,27 @@ void diskonchip_g3_device::sec_2_write_1036(uint8_t data)
 	else if (m_sec_2[0x34] == 0x05)
 	{
 		m_transfer_offset = data << 2;
-		verboselog(*this, 5, "flash transfer offset %04X\n", m_transfer_offset);
+		LOGMASKED(LOG_SEC2_WR, "flash transfer offset %04X\n", m_transfer_offset);
 	}
 }
 
 void diskonchip_g3_device::sec_2_write_1040(uint16_t data)
 {
 	m_transfersize = (data & 0x3FF);
-	verboselog(*this, 5, "flash transfer size %04X\n", m_transfersize);
+	LOGMASKED(LOG_SEC2_WR, "flash transfer size %04X\n", m_transfersize);
 }
 
 void diskonchip_g3_device::sec_2_write_100A(uint8_t data)
 {
 	m_device = data & 3;
-	verboselog(*this, 5, "select device %d\n", m_device);
+	LOGMASKED(LOG_SEC2_WR, "select device %d\n", m_device);
 }
 
 void diskonchip_g3_device::sec_2_write16(uint32_t offset, uint16_t data)
 {
 	m_sec_2[offset+0] = (data >> 0) & 0xFF;
 	m_sec_2[offset+1] = (data >> 8) & 0xFF;
-	verboselog(*this, 9, "(DOC) %08X <- %04X\n", 0x1000 + offset, data);
+	LOGMASKED(LOG_SEC2_WR, "(DOC) %08X <- %04X\n", 0x1000 + offset, data);
 	switch (0x1000 + offset)
 	{
 		// ?
@@ -677,7 +674,7 @@ void diskonchip_g3_device::sec_2_write16(uint32_t offset, uint16_t data)
 void diskonchip_g3_device::sec_2_write8(uint32_t offset, uint8_t data)
 {
 	m_sec_2[offset] = data;
-	verboselog(*this, 9, "(DOC) %08X <- %02X\n", 0x1000 + offset, data);
+	LOGMASKED(LOG_SEC2_WR, "(DOC) %08X <- %02X\n", 0x1000 + offset, data);
 	switch (0x1000 + offset)
 	{
 		// ?
@@ -709,7 +706,7 @@ uint16_t diskonchip_g3_device::sec_2_r(offs_t offset, uint16_t mem_mask)
 	}
 	else
 	{
-		verboselog(*this, 0, "diskonchip_g3_sec_2_r: unknown mem_mask %08X\n", mem_mask);
+		LOGMASKED(LOG_SEC2_UNK, "diskonchip_g3_sec_2_r: unknown mem_mask %08X\n", mem_mask);
 		return 0;
 	}
 }
@@ -730,20 +727,20 @@ void diskonchip_g3_device::sec_2_w(offs_t offset, uint16_t data, uint16_t mem_ma
 	}
 	else
 	{
-		verboselog(*this, 0, "diskonchip_g3_sec_2_w: unknown mem_mask %08X\n", mem_mask);
+		LOGMASKED(LOG_SEC2_UNK, "diskonchip_g3_sec_2_w: unknown mem_mask %08X\n", mem_mask);
 	}
 }
 
 uint16_t diskonchip_g3_device::sec_3_r(offs_t offset)
 {
 	uint16_t data = 0;
-	verboselog(*this, 9, "(DOC) %08X -> %04X\n", 0x1800 + (offset << 1), data);
+	LOGMASKED(LOG_SEC3_RD, "(DOC) %08X -> %04X\n", 0x1800 + (offset << 1), data);
 	return data;
 }
 
 void diskonchip_g3_device::sec_3_w(offs_t offset, uint16_t data)
 {
-	verboselog(*this, 9, "(DOC) %08X <- %02X\n", 0x1800 + (offset << 1), data);
+	LOGMASKED(LOG_SEC3_WR, "(DOC) %08X <- %02X\n", 0x1800 + (offset << 1), data);
 }
 
 //-------------------------------------------------
@@ -751,8 +748,6 @@ void diskonchip_g3_device::sec_3_w(offs_t offset, uint16_t data)
 //-------------------------------------------------
 void diskonchip_g3_device::device_start()
 {
-	verboselog(*this, 9, "(DOC) device start\n");
-
 	switch (m_size)
 	{
 		case 64 :
@@ -801,7 +796,6 @@ void diskonchip_g3_device::device_start()
 
 void diskonchip_g3_device::device_reset()
 {
-	verboselog(*this, 9, "(DOC) device reset\n");
 }
 
 //-------------------------------------------------

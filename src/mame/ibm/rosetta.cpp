@@ -245,7 +245,7 @@ void rosetta_device::device_post_load()
 	config_tlb();
 }
 
-bool rosetta_device::ior(u32 address, u32 &data)
+bool rosetta_device::ior(offs_t address, u32 &data)
 {
 	if ((address >> 16) == u8(m_control[IOBA]))
 	{
@@ -299,7 +299,7 @@ bool rosetta_device::ior(u32 address, u32 &data)
 	return false;
 }
 
-bool rosetta_device::iow(u32 address, u32 data)
+bool rosetta_device::iow(offs_t address, u32 data)
 {
 	if ((address >> 16) == u8(m_control[IOBA]))
 	{
@@ -360,9 +360,9 @@ bool rosetta_device::iow(u32 address, u32 data)
 }
 
 // translate logical to physical address ignoring protection and without side effects
-bool rosetta_device::translate(u32 &address) const
+bool rosetta_device::translate(offs_t &address) const
 {
-	unsigned const segment = address >> 28;
+	offs_t const segment = address >> 28;
 
 	// segment present
 	if (!(m_segment[segment] & SEGMENT_P))
@@ -431,7 +431,7 @@ bool rosetta_device::translate(u32 &address) const
 	return true;
 }
 
-bool rosetta_device::translate(u32 &address, bool system_processor, bool store)
+bool rosetta_device::translate(offs_t &address, bool system_processor, bool store)
 {
 	unsigned const segment = address >> 28;
 
@@ -685,7 +685,7 @@ u32 rosetta_device::tlb_reload(rosetta_device::tlb_entry &tlb_entry, u64 const v
 	fatalerror("rosetta_device::reload() endless loop detected\n");
 }
 
-void rosetta_device::set_mear(u32 const address, mear_state lock)
+void rosetta_device::set_mear(offs_t const address, mear_state lock)
 {
 	if (m_mear_lock == LOCKED)
 		return;
@@ -1015,7 +1015,7 @@ void rosetta_device::config_map()
 
 void rosetta_device::config_tlb()
 {
-	unsigned const ram_size = std::max(m_control[RAMS] & RAMS_SIZE, 7U);
+	offs_t const ram_size = std::max<offs_t>(m_control[RAMS] & RAMS_SIZE, 7ULL);
 
 	if (m_control[TCR] & TCR_S)
 	{
@@ -1103,7 +1103,7 @@ void rosetta_device::compute_address(u32 data)
 			: ((t.field1 & TLB_RPN2K) << 8) | (data & 0x07ffU);
 }
 
-bool rosetta_device::fetch(u32 address, u16 &data, rsc_mode const mode)
+bool rosetta_device::fetch(offs_t address, u16 &data, rsc_mode const mode)
 {
 	if (mode & rsc_mode::RSC_T)
 	{
@@ -1143,7 +1143,7 @@ bool rosetta_device::fetch(u32 address, u16 &data, rsc_mode const mode)
 	return true;
 }
 
-template <typename T> bool rosetta_device::load(u32 address, T &data, rsc_mode const mode, bool sp)
+template <typename T> bool rosetta_device::load(offs_t address, T &data, rsc_mode const mode, bool sp)
 {
 	if (mode & rsc_mode::RSC_T)
 	{
@@ -1193,7 +1193,7 @@ template <typename T> bool rosetta_device::load(u32 address, T &data, rsc_mode c
 	return true;
 }
 
-template <typename T> bool rosetta_device::store(u32 address, T data, rsc_mode const mode, bool sp)
+template <typename T> bool rosetta_device::store(offs_t address, T data, rsc_mode const mode, bool sp)
 {
 	if (mode & rsc_mode::RSC_T)
 	{
@@ -1237,7 +1237,7 @@ template <typename T> bool rosetta_device::store(u32 address, T data, rsc_mode c
 	return true;
 }
 
-template <typename T> bool rosetta_device::modify(u32 address, std::function<T(T)> f, rsc_mode const mode)
+template <typename T> bool rosetta_device::modify(offs_t address, std::function<T(T)> f, rsc_mode const mode)
 {
 	if (mode & rsc_mode::RSC_T)
 	{

@@ -117,8 +117,8 @@ protected:
 	};
 
 	// memory accessors
-	template <typename T> T mem_read(unsigned st, u32 address, bool user = false, bool pfs = false);
-	template <typename T> void mem_write(unsigned st, u32 address, u64 data, bool user = false);
+	template <typename T> T mem_read(unsigned st, offs_t address, bool user = false, bool pfs = false);
+	template <typename T> void mem_write(unsigned st, offs_t address, u64 data, bool user = false);
 
 	// instruction fetch/decode helpers
 	template <typename T> T fetch(unsigned &bytes);
@@ -227,7 +227,7 @@ public:
 
 	// ns32000_mmu_interface implementation
 	virtual void state_add(device_state_interface &parent, int &index) override;
-	virtual translate_result translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool rdwrval = false, bool suppress = false) override;
+	virtual translate_result translate(address_space &space, unsigned st, offs_t &address, bool user, bool write, bool rdwrval = false, bool suppress = false) override;
 
 protected:
 	// device_t implementation

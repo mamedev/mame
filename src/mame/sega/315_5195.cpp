@@ -472,14 +472,14 @@ void sega_315_5195_mapper_device::device_reset()
 //  actual underlying bus connections
 //-------------------------------------------------
 
-void sega_315_5195_mapper_device::compute_region(region_info &info, u8 index, u32 length, u32 mirror, u32 offset)
+void sega_315_5195_mapper_device::compute_region(region_info &info, u8 index, u64 length, u64 mirror, u64 offset)
 {
 	static const offs_t region_size_map[4] = { 0x00ffff, 0x01ffff, 0x07ffff, 0x1fffff };
 	info.size_mask = region_size_map[m_regs[0x10 + 2 * index] & 3];
 	info.base = (m_regs[0x11 + 2 * index] << 16) & ~info.size_mask;
 	info.mirror = mirror & info.size_mask;
 	info.start = info.base + (offset & info.size_mask);
-	info.end = info.start + std::min(length - 1, info.size_mask);
+	info.end = info.start + std::min<offs_t>(length - 1, info.size_mask);
 }
 
 

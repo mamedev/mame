@@ -204,9 +204,9 @@ private:
 	void release_descriptions();
 
 	// configuration parameters
-	u32 const           m_window_start;             // code window start offset = startpc - window_start
-	u32 const           m_window_end;               // code window end offset = startpc + window_end
-	u32 const           m_max_sequence;             // maximum instructions to include in a sequence
+	offs_t const        m_window_start;             // code window start offset = startpc - window_start
+	offs_t const        m_window_end;               // code window end offset = startpc + window_end
+	offs_t const        m_max_sequence;             // maximum instructions to include in a sequence
 
 	// CPU parameters
 	offs_t const        m_pageshift;                // shift to convert address to a page index

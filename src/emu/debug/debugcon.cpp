@@ -659,14 +659,6 @@ bool debugger_console::validate_number_parameter(std::string_view param, u64 &re
 	}
 }
 
-bool debugger_console::validate_number_parameter(std::string_view param, offs_t &result)
-{
-	u64 res;
-	bool ret = validate_number_parameter(param, res);
-	result = res;
-	return ret;
-}
-
 
 /// \brief Validate parameter as a device
 ///

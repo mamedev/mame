@@ -25,7 +25,7 @@ public:
 	virtual void fast_write(u32 data) override;
 
 	// ns32000_mmu_interface implementation
-	virtual translate_result translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool pfs = false, bool debug = false) override;
+	virtual translate_result translate(address_space &space, unsigned st, offs_t &address, bool user, bool write, bool pfs = false, bool debug = false) override;
 
 protected:
 	// device_t implementation

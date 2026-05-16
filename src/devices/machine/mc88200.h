@@ -14,10 +14,10 @@ public:
 
 	template <typename T> void set_mbus(T &&tag, int spacenum) { m_mbus.set_tag(std::forward<T>(tag), spacenum); }
 
-	bool translate(int intention, u32 &address, bool supervisor);
+	bool translate(int intention, offs_t &address, bool supervisor);
 
-	template <typename T> std::optional<T> read(u32 virtual_address, bool supervisor);
-	template <typename T> bool write(u32 virtual_address, T data, bool supervisor);
+	template <typename T> std::optional<T> read(offs_t virtual_address, bool supervisor);
+	template <typename T> bool write(offs_t virtual_address, T data, bool supervisor);
 	void bus_error_w(int state) { if (!machine().side_effects_disabled()) m_bus_error = true; }
 
 protected:
@@ -59,19 +59,19 @@ protected:
 
 	struct translate_result
 	{
-		translate_result(u32 address, bool ci, bool g, bool wt)
+		translate_result(offs_t address, bool ci, bool g, bool wt)
 			: address(address)
 			, ci(ci)
 			, g(g)
 			, wt(wt)
 		{}
 
-		u32 const address;
+		offs_t const address;
 		bool const ci; // cache inhibit
 		bool const g;  // global
 		bool const wt; // writethrough
 	};
-	std::optional<translate_result> translate(u32 virtual_address, bool supervisor, bool write);
+	std::optional<translate_result> translate(offs_t virtual_address, bool supervisor, bool write);
 
 	struct cache_set
 	{
@@ -92,24 +92,24 @@ protected:
 
 		struct cache_line
 		{
-			bool match_segment(u32 const address) const;
-			bool match_page(u32 const address) const;
+			bool match_segment(offs_t const address) const;
+			bool match_page(offs_t const address) const;
 
-			bool load_line(mc88200_device &cmmu, u32 const address);
-			bool copy_back(mc88200_device &cmmu, u32 const address, bool const flush = false);
+			bool load_line(mc88200_device &cmmu, offs_t const address);
+			bool copy_back(mc88200_device &cmmu, offs_t const address, bool const flush = false);
 
 			u32 tag;
 			u32 data[4];
 		}
 		line[4];
 	};
-	typedef bool (mc88200_device::cache_set::cache_line::* match_function)(u32 const) const;
+	typedef bool (mc88200_device::cache_set::cache_line::* match_function)(offs_t const) const;
 
 	std::optional<unsigned> cache_replace(cache_set const &cs);
 	void cache_flush(unsigned const start, unsigned const limit, match_function match, bool const copyback, bool const invalidate);
 
-	template <typename T> std::optional<T> mbus_read(u32 address);
-	template <typename T> bool mbus_write(u32 address, T data, bool flush = false);
+	template <typename T> std::optional<T> mbus_read(offs_t address);
+	template <typename T> bool mbus_write(offs_t address, T data, bool flush = false);
 
 private:
 	required_address_space m_mbus;

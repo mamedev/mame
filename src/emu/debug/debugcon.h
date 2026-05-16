@@ -117,7 +117,6 @@ public:
 
 	// validates a parameter as a numeric value
 	bool validate_number_parameter(std::string_view param, u64 &result);
-	bool validate_number_parameter(std::string_view param, offs_t &result);
 
 	// validates a parameter as a device
 	bool validate_device_parameter(std::string_view param, device_t *&result);
