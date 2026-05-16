@@ -174,4 +174,4 @@ ROM_START( ti57 )
 ROM_END
 
 // COMP(year, name, parent, compat, config, inputs, class, init, company, fullname, flags)
-COMP( 1977, ti57, 0, 0, ti57, ti57, ti57_state, empty_init, "Texas Instruments", "TI-57", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1977, ti57, 0, 0, ti57, ti57, ti57_state, empty_init, "Texas Instruments", "TI-57", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
