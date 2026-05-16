@@ -797,7 +797,7 @@ namespace
 	{
 		device.option_add("harddisk", NSCSI_HARDDISK);
 		device.option_add("cdrom", NSCSI_CDROM);
-		device.option_add("tape", NSCSI_TAPE);
+		device.option_add("tape", NSCSI_TAPE_NEWS);
 	}
 
 	void news_iop_state::handle_rts(int data)

@@ -42,25 +42,37 @@ void clear_response(uint8_t (&buf)[N], T len)
 
 
 DEFINE_DEVICE_TYPE(NSCSI_TAPE, nscsi_tape_device, "scsi_tape", "SCSI tape");
+DEFINE_DEVICE_TYPE(NSCSI_TAPE_NEWS, nscsi_tape_news_device, "scsi_tape_news", "SCSI tape NEWS");
 
 //////////////////////////////////////////////////////////////////////////////
 
 // construction
 
-nscsi_tape_device::nscsi_tape_device(const machine_config &config, device_type type, const char *tag, device_t *owner, u32 clock)
+nscsi_tape_device::nscsi_tape_device(const machine_config &config, device_type type, const char *tag, device_t *owner,
+	u32 clock, const std::string_view manufacturer, const std::string_view product, const std::string_view revision)
 	: nscsi_full_device(config, type, tag, owner, clock)
 	, m_image(*this, "image")
 	, m_sequence_counter(0)
 	, m_has_tape(false)
 	, m_tape_changed(false)
 	, m_fixed_block_len(TAPE_DEFAULT_FIXED_BLOCK_LEN)
+	, manufacturer(manufacturer)
+	, product(product)
+	, revision(revision)
 	, m_rw_buf_size(m_fixed_block_len)
 	, m_rw_pending(false)
 {
 }
 
 nscsi_tape_device::nscsi_tape_device(const machine_config &config, const char *tag, device_t *owner, u32 clock)
-	: nscsi_tape_device(config, NSCSI_TAPE, tag, owner, clock)
+	: nscsi_tape_device(config, NSCSI_TAPE, tag, owner, clock, "MAME", "SCSI tape drive", "1.0")
+{
+}
+
+// NEWS-OS 4 will recognize a few models out of the box. For streaming tape, the Anritsu DMT780 can recognize QIC-24,
+// QIC-120, QIC-150, and QIC-525, making it a flexible choice. Different versions of NEWS-OS may need a different drive.
+nscsi_tape_news_device::nscsi_tape_news_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_tape_device(mconfig, NSCSI_TAPE_NEWS, tag, owner, clock, "ANRITSU", "DMT780", "0000")
 {
 }
 
@@ -250,9 +262,9 @@ void nscsi_tape_device::handle_inquiry(const u8 lun) // mandatory; SCSI-2 sectio
 	m_scsi_cmdbuf[2] = 0x02; // we're compliant with SCSI-2 only
 	m_scsi_cmdbuf[3] = 0x02; // we use SCSI-2 response format
 	m_scsi_cmdbuf[4] = 32; // additional length
-	strncpy((char *)&m_scsi_cmdbuf[8], "MAME", 8); // vendor
-	strncpy((char *)&m_scsi_cmdbuf[16], "SCSI tape drive", 16); // product
-	strncpy((char *)&m_scsi_cmdbuf[32], "1.0", 4); // revision
+	std::copy_n(manufacturer.data(), std::min(manufacturer.size(),  static_cast<size_t>(8)), &m_scsi_cmdbuf[8]); // drive manufacturer
+	std::copy_n(product.data(), std::min(product.size(),  static_cast<size_t>(16)), &m_scsi_cmdbuf[16]); // product code
+	std::copy_n(revision.data(), std::min(revision.size(),  static_cast<size_t>(4)), &m_scsi_cmdbuf[32]); // product/firmware revision
 	for (u32 i = 8; i < 36; i++) {
 		if (m_scsi_cmdbuf[i] == 0)
 			m_scsi_cmdbuf[i] = ' '; // pad strings with spaces
