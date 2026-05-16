@@ -19,7 +19,12 @@ TODO:
 - tsclass: runs on a single LCD, needs mods
 - tsclass: throws bad U43 and U44 at POST, should also be two roms not one.
 - tsclass: understand how it draws score and trophy segments
-\- cfr. artwork, doesn't seem from lamps?
+\- cfr. artwork, doesn't seem from lamps but more like an FPGA extra transfer "in 1bpp" for
+   3 digits (2x score, 1x "trophy"):
+   - $40ce88-$40ceb8 player 1 side
+   - $40ceba player 1 lamps
+   - $40cebe-$40cec2 control words?
+   - $40cec4 player 2 side, same as above
 
 **************************************************************************************************/
 
