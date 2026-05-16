@@ -6,7 +6,7 @@ CES Classic wall games
 
 Notes:
 - to play Home Run Classic you have to select a pitcher shot and hold the remote button.
-    When you release the strobe, batter does the swing.
+  When you release the strobe, batter does the swing.
 
 TODO:
 - artwork;
@@ -18,6 +18,8 @@ TODO:
 - hookup m68681 + 2x max232;
 - tsclass: runs on a single LCD, needs mods
 - tsclass: throws bad U43 and U44 at POST, should also be two roms not one.
+- tsclass: understand how it draws score and trophy segments
+\- cfr. artwork, doesn't seem from lamps?
 
 **************************************************************************************************/
 
@@ -169,7 +171,7 @@ void cesclassic_state::main_map(address_map &map)
 	map(0x480000, 0x481fff).ram().share("nvram"); //8k according to schematics (games doesn't use that much tho)
 	map(0x600000, 0x600001).portr("SYSTEM");
 	map(0x610000, 0x610001).w(FUNC(cesclassic_state::outputs_w));
-//  map(0x640000, 0x640001).nopw();
+//  map(0x640000, 0x640001).nopw(); // more lamp strobe? cfr. tsclass test mode
 	map(0x640040, 0x640041).w(FUNC(cesclassic_state::lamps_w));
 	map(0x670000, 0x670001).portr("DSW");
 	map(0x70ff00, 0x70ff01).nopw(); // writes 0xffff at irq 3 end of service, watchdog?
@@ -291,7 +293,8 @@ void cesclassic_state::cesclassic(machine_config &config)
 	m_maincpu->set_vblank_int("l_lcd", FUNC(cesclassic_state::irq2_line_assert));  // TODO: unknown sources
 	m_maincpu->set_periodic_int(FUNC(cesclassic_state::irq3_line_assert), attotime::from_hz(60*8));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	// tsclass wants 1 fill for init correctly, other games don't seem to care
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// DS1232 MicroMonitor
 
@@ -345,6 +348,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1997, hrclass, 0, cesclassic, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics And Software", "Home Run Classic (v1.21 12-feb-1997)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
-GAME(1997, ccclass, 0, cesclassic, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics And Software", "Country Club Classic (v1.10 03-apr-1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
-GAME(1997, tsclass, 0, cesclassic, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics And Software", "Trap Shoot Classic (v1.0 21-mar-1997)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+GAME(1997, hrclass, 0, cesclassic, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics and Software", "Home Run Classic (v1.21 12-feb-1997)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+GAME(1997, ccclass, 0, cesclassic, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics and Software", "Country Club Classic (v1.10 03-apr-1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+GAME(1997, tsclass, 0, cesclassic, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics and Software", "Trap Shoot Classic (v1.0 21-mar-1997)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
