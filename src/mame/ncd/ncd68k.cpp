@@ -541,7 +541,7 @@ void ncd17c_state::configure(machine_config &config)
 	// keyboard controller
 	M6805P2(config, m_mcu, 3'750'000);
 
-	// ethernet/
+	// ethernet
 	AM7990(config, m_lance, 20_MHz_XTAL / 2);
 	m_lance->intr_out().set_inputline(m_maincpu, M68K_IRQ_3).invert();
 	m_lance->dma_in().set(FUNC(ncd17c_state::lance_dma_r));
