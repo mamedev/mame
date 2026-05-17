@@ -2182,6 +2182,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/lh79524_timer.h,MACHINES["LH79524"] = true
+---------------------------------------------------
+
+if MACHINES["LH79524"] then
+	files {
+		MAME_DIR .. "src/devices/machine/lh79524_timer.cpp",
+		MAME_DIR .. "src/devices/machine/lh79524_timer.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/locomo.h,MACHINES["LOCOMO"] = true
 ---------------------------------------------------
 
@@ -3581,8 +3593,16 @@ if MACHINES["SPG2XX"] then
 		MAME_DIR .. "src/devices/machine/generalplus_gpl162xx_soc_video.h",
 		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_soc.cpp",
 		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_soc.h",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_rtc.cpp",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_rtc.h",		
 		MAME_DIR .. "src/devices/machine/generalplus_gpce4_soc.cpp",
 		MAME_DIR .. "src/devices/machine/generalplus_gpce4_soc.h",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl_dma.cpp",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl_dma.h",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl_timebase.cpp",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl_timebase.h",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl_chx.cpp",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl_chx.h",
 		MAME_DIR .. "src/devices/machine/spg_renderer.cpp",
 		MAME_DIR .. "src/devices/machine/spg_renderer.h",
 		MAME_DIR .. "src/devices/machine/gpl_renderer.cpp",

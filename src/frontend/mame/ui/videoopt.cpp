@@ -38,8 +38,8 @@ constexpr uintptr_t ITEM_VIEW_FIRST     = 0x00000300;
     video targets menu
 -------------------------------------------------*/
 
-menu_video_targets::menu_video_targets(mame_ui_manager &mui, render_container &container)
-	: menu(mui, container)
+menu_video_targets::menu_video_targets(mame_ui_manager &mui, render_target &target)
+	: menu(mui, target)
 {
 	set_heading(_("Video Options"));
 }
@@ -54,12 +54,12 @@ void menu_video_targets::populate()
 	for (unsigned targetnum = 0; ; targetnum++)
 	{
 		// stop when we run out
-		render_target *const target = machine().render().target_by_index(targetnum);
-		if (!target)
+		render_target *const tgt = machine().render().target_by_index(targetnum);
+		if (!tgt)
 			break;
 
 		// add a menu item
-		item_append(util::string_format(_("Screen #%d"), targetnum), 0, target);
+		item_append(util::string_format(_("Screen #%d"), targetnum), 0, tgt);
 	}
 
 	// add option for snapshot target
@@ -76,13 +76,13 @@ bool menu_video_targets::handle(event const *ev)
 {
 	if (ev && (ev->iptkey == IPT_UI_SELECT))
 	{
-		render_target *const target = reinterpret_cast<render_target *>(ev->itemref);
+		render_target *const config_target = reinterpret_cast<render_target *>(ev->itemref);
 		menu::stack_push<menu_video_options>(
 				ui(),
-				container(),
+				target(),
 				std::string(selected_item().text()),
-				*target,
-				&machine().video().snapshot_target() == target);
+				*config_target,
+				&machine().video().snapshot_target() == config_target);
 	}
 
 	return false;
@@ -96,19 +96,19 @@ bool menu_video_targets::handle(event const *ev)
 
 menu_video_options::menu_video_options(
 		mame_ui_manager &mui,
-		render_container &container,
-		std::string_view title,
 		render_target &target,
-		bool snapshot)
-	: menu(mui, container)
-	, m_target(target)
-	, m_snapshot(snapshot)
+		std::string_view title,
+		render_target &config_target,
+		bool is_snapshot)
+	: menu(mui, target)
+	, m_config_target(config_target)
+	, m_is_snapshot(is_snapshot)
 {
 	set_heading(util::string_format(_("Video Options: %1$s"), title));
 
-	if (!m_snapshot || !machine().video().snap_native())
+	if (!m_is_snapshot || !machine().video().snap_native())
 	{
-		set_selected_index(target.view());
+		set_selected_index(config_target.view());
 		reset(reset_options::REMEMBER_POSITION);
 	}
 }
@@ -122,20 +122,20 @@ void menu_video_options::populate()
 	uintptr_t ref;
 
 	// add items for each view
-	if (!m_snapshot || !machine().video().snap_native())
+	if (!m_is_snapshot || !machine().video().snap_native())
 	{
-		for (char const *name = m_target.view_name(ref = 0); name; name = m_target.view_name(++ref))
-			item_append(name, convert_command_glyph(ref == m_target.view() ? "_>" : "_<"), 0, reinterpret_cast<void *>(ITEM_VIEW_FIRST + ref));
+		for (char const *name = m_config_target.view_name(ref = 0); name; name = m_config_target.view_name(++ref))
+			item_append(name, convert_command_glyph(ref == m_config_target.view() ? "_>" : "_<"), 0, reinterpret_cast<void *>(ITEM_VIEW_FIRST + ref));
 		item_append(menu_item_type::SEPARATOR);
 	}
 
 	// add items for visibility toggles
-	layout_view const &curview = m_target.current_view();
+	layout_view const &curview = m_config_target.current_view();
 	auto const &toggles = curview.visibility_toggles();
 	if (!toggles.empty())
 	{
 		ref = 0U;
-		auto const current_mask(m_target.visibility_mask());
+		auto const current_mask(m_config_target.visibility_mask());
 		for (auto toggle = toggles.begin(); toggles.end() != toggle; ++toggle, ++ref)
 		{
 			auto const toggle_mask(toggle->mask());
@@ -151,7 +151,7 @@ void menu_video_options::populate()
 	{
 		// add a rotate item
 		const auto *subtext = u8"";
-		switch (m_target.orientation())
+		switch (m_config_target.orientation())
 		{
 		case ROT0:      subtext = u8"None";     break;
 		case ROT90:     subtext = u8"CW 90°";   break;
@@ -163,13 +163,13 @@ void menu_video_options::populate()
 
 	// cropping
 	bool const canzoom(curview.has_art() && !curview.visible_screens().empty());
-	item_append_on_off(_("Zoom to Screen Area"), m_target.zoom_to_screen(), canzoom ? 0U : (FLAG_DEEMPHASIZE | FLAG_DISABLE), reinterpret_cast<void *>(ITEM_ZOOM));
+	item_append_on_off(_("Zoom to Screen Area"), m_config_target.zoom_to_screen(), canzoom ? 0U : (FLAG_DEEMPHASIZE | FLAG_DISABLE), reinterpret_cast<void *>(ITEM_ZOOM));
 
-	if (!m_snapshot)
+	if (!m_is_snapshot)
 	{
 		// uneven stretch
 		const auto *subtext = "";
-		switch (m_target.scale_mode())
+		switch (m_config_target.scale_mode())
 		{
 		case SCALE_FRACTIONAL:
 			subtext = _("On");
@@ -194,17 +194,17 @@ void menu_video_options::populate()
 		item_append(_("Non-Integer Scaling"), subtext, FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, reinterpret_cast<void *>(ITEM_UNEVENSTRETCH));
 
 		// keep aspect
-		item_append_on_off(_("Maintain Aspect Ratio"), m_target.keepaspect(), 0, reinterpret_cast<void *>(ITEM_KEEPASPECT));
+		item_append_on_off(_("Maintain Aspect Ratio"), m_config_target.keepaspect(), 0, reinterpret_cast<void *>(ITEM_KEEPASPECT));
 	}
 
 	// add pointer display options
-	if (!m_target.hidden())
+	if (!m_config_target.hidden())
 	{
 		item_append(menu_item_type::SEPARATOR);
 
 		// use millisecond precision for timeout display
-		auto const timeout = std::chrono::duration_cast<std::chrono::milliseconds>(ui().pointer_activity_timeout(m_target.index()));
-		bool const hide = ui().hide_inactive_pointers(m_target.index());
+		auto const timeout = std::chrono::duration_cast<std::chrono::milliseconds>(ui().pointer_activity_timeout(m_config_target.index()));
+		bool const hide = ui().hide_inactive_pointers(m_config_target.index());
 		if (hide)
 		{
 			if (timeout.count())
@@ -240,7 +240,7 @@ bool menu_video_options::handle(event const *ev)
 				machine().popmessage(_("Cannot change options while recording!"));
 				return true;
 			});
-	bool const snap_lockout(m_snapshot && machine().video().is_recording());
+	bool const snap_lockout(m_is_snapshot && machine().video().is_recording());
 	bool changed(false);
 	set_process_flags((reinterpret_cast<uintptr_t>(get_selection_ref()) == ITEM_POINTERTIMEOUT) ? PROCESS_LR_REPEAT : 0);
 
@@ -256,8 +256,8 @@ bool menu_video_options::handle(event const *ev)
 				if (snap_lockout)
 					return lockout_popup();
 				int const delta((ev->iptkey == IPT_UI_LEFT) ? ROT270 : ROT90);
-				m_target.set_orientation(orientation_add(delta, m_target.orientation()));
-				if (m_target.is_ui_target())
+				m_config_target.set_orientation(orientation_add(delta, m_config_target.orientation()));
+				if (m_config_target.is_ui_target())
 				{
 					render_container::user_settings settings = container().get_user_settings();
 					settings.m_orientation = orientation_add(delta ^ ROT180, settings.m_orientation);
@@ -273,7 +273,7 @@ bool menu_video_options::handle(event const *ev)
 			{
 				if (snap_lockout)
 					return lockout_popup();
-				m_target.set_zoom_to_screen(ev->iptkey == IPT_UI_RIGHT);
+				m_config_target.set_zoom_to_screen(ev->iptkey == IPT_UI_RIGHT);
 				changed = true;
 			}
 			break;
@@ -284,26 +284,26 @@ bool menu_video_options::handle(event const *ev)
 			{
 				if (snap_lockout)
 					return lockout_popup();
-				switch (m_target.scale_mode())
+				switch (m_config_target.scale_mode())
 				{
 				case SCALE_FRACTIONAL:
-					m_target.set_scale_mode(SCALE_INTEGER);
+					m_config_target.set_scale_mode(SCALE_INTEGER);
 					break;
 
 				case SCALE_FRACTIONAL_X:
-					m_target.set_scale_mode(SCALE_FRACTIONAL);
+					m_config_target.set_scale_mode(SCALE_FRACTIONAL);
 					break;
 
 				case SCALE_FRACTIONAL_Y:
-					m_target.set_scale_mode(SCALE_FRACTIONAL_X);
+					m_config_target.set_scale_mode(SCALE_FRACTIONAL_X);
 					break;
 
 				case SCALE_FRACTIONAL_AUTO:
-					m_target.set_scale_mode(SCALE_FRACTIONAL_Y);
+					m_config_target.set_scale_mode(SCALE_FRACTIONAL_Y);
 					break;
 
 				case SCALE_INTEGER:
-					m_target.set_scale_mode(SCALE_FRACTIONAL_AUTO);
+					m_config_target.set_scale_mode(SCALE_FRACTIONAL_AUTO);
 					break;
 				}
 				changed = true;
@@ -312,26 +312,26 @@ bool menu_video_options::handle(event const *ev)
 			{
 				if (snap_lockout)
 					return lockout_popup();
-				switch (m_target.scale_mode())
+				switch (m_config_target.scale_mode())
 				{
 				case SCALE_FRACTIONAL:
-					m_target.set_scale_mode(SCALE_FRACTIONAL_X);
+					m_config_target.set_scale_mode(SCALE_FRACTIONAL_X);
 					break;
 
 				case SCALE_FRACTIONAL_X:
-					m_target.set_scale_mode(SCALE_FRACTIONAL_Y);
+					m_config_target.set_scale_mode(SCALE_FRACTIONAL_Y);
 					break;
 
 				case SCALE_FRACTIONAL_Y:
-					m_target.set_scale_mode(SCALE_FRACTIONAL_AUTO);
+					m_config_target.set_scale_mode(SCALE_FRACTIONAL_AUTO);
 					break;
 
 				case SCALE_FRACTIONAL_AUTO:
-					m_target.set_scale_mode(SCALE_INTEGER);
+					m_config_target.set_scale_mode(SCALE_INTEGER);
 					break;
 
 				case SCALE_INTEGER:
-					m_target.set_scale_mode(SCALE_FRACTIONAL);
+					m_config_target.set_scale_mode(SCALE_FRACTIONAL);
 					break;
 				}
 				changed = true;
@@ -344,7 +344,7 @@ bool menu_video_options::handle(event const *ev)
 			{
 				if (snap_lockout)
 					return lockout_popup();
-				m_target.set_keepaspect(ev->iptkey == IPT_UI_RIGHT);
+				m_config_target.set_keepaspect(ev->iptkey == IPT_UI_RIGHT);
 				changed = true;
 			}
 			break;
@@ -355,22 +355,22 @@ bool menu_video_options::handle(event const *ev)
 			{
 			// decrease value
 			case IPT_UI_LEFT:
-				if (!ui().hide_inactive_pointers(m_target.index()))
+				if (!ui().hide_inactive_pointers(m_config_target.index()))
 				{
-					ui().set_hide_inactive_pointers(m_target.index(), true);
-					ui().set_pointer_activity_timeout(m_target.index(), std::chrono::milliseconds(10'000));
+					ui().set_hide_inactive_pointers(m_config_target.index(), true);
+					ui().set_pointer_activity_timeout(m_config_target.index(), std::chrono::milliseconds(10'000));
 					changed = true;
 				}
 				else
 				{
-					auto timeout = ui().pointer_activity_timeout(m_target.index());
+					auto timeout = ui().pointer_activity_timeout(m_config_target.index());
 					if (timeout >= std::chrono::milliseconds(100))
 					{
 						bool const shift_pressed = machine().input().code_pressed(KEYCODE_LSHIFT) || machine().input().code_pressed(KEYCODE_RSHIFT);
 						std::chrono::milliseconds const increment(shift_pressed ? 100 : 1'000);
 						auto const remainder = timeout % increment;
 						timeout -= remainder.count() ? remainder : increment;
-						ui().set_pointer_activity_timeout(m_target.index(), timeout);
+						ui().set_pointer_activity_timeout(m_config_target.index(), timeout);
 						changed = true;
 
 						if (!timeout.count())
@@ -381,19 +381,19 @@ bool menu_video_options::handle(event const *ev)
 
 			// increase value
 			case IPT_UI_RIGHT:
-				if (ui().hide_inactive_pointers(m_target.index()))
+				if (ui().hide_inactive_pointers(m_config_target.index()))
 				{
-					auto const timeout = ui().pointer_activity_timeout(m_target.index());
+					auto const timeout = ui().pointer_activity_timeout(m_config_target.index());
 					if (std::chrono::milliseconds(10'000) <= timeout)
 					{
-						ui().set_hide_inactive_pointers(m_target.index(), false);
+						ui().set_hide_inactive_pointers(m_config_target.index(), false);
 					}
 					else
 					{
 						bool const shift_pressed = machine().input().code_pressed(KEYCODE_LSHIFT) || machine().input().code_pressed(KEYCODE_RSHIFT);
 						int const increment(shift_pressed ? 100 : 1'000);
 						ui().set_pointer_activity_timeout(
-								m_target.index(),
+								m_config_target.index(),
 								std::chrono::milliseconds((1 + (timeout / std::chrono::milliseconds(increment))) * increment));
 					}
 					changed = true;
@@ -402,13 +402,13 @@ bool menu_video_options::handle(event const *ev)
 
 			// toggle hide after delay
 			case IPT_UI_SELECT:
-				ui().set_hide_inactive_pointers(m_target.index(), !ui().hide_inactive_pointers(m_target.index()));
+				ui().set_hide_inactive_pointers(m_config_target.index(), !ui().hide_inactive_pointers(m_config_target.index()));
 				changed = true;
 				break;
 
 			// restore initial setting
 			case IPT_UI_CLEAR:
-				ui().restore_initial_pointer_options(m_target.index());
+				ui().restore_initial_pointer_options(m_config_target.index());
 				changed = true;
 				break;
 			}
@@ -422,7 +422,7 @@ bool menu_video_options::handle(event const *ev)
 					return lockout_popup();
 				if (ev->iptkey == IPT_UI_SELECT)
 				{
-					m_target.set_view(reinterpret_cast<uintptr_t>(ev->itemref) - ITEM_VIEW_FIRST);
+					m_config_target.set_view(reinterpret_cast<uintptr_t>(ev->itemref) - ITEM_VIEW_FIRST);
 					changed = true;
 				}
 			}
@@ -432,7 +432,7 @@ bool menu_video_options::handle(event const *ev)
 					return lockout_popup();
 				if ((ev->iptkey == IPT_UI_LEFT) || (ev->iptkey == IPT_UI_RIGHT))
 				{
-					m_target.set_visibility_toggle(reinterpret_cast<uintptr_t>(ev->itemref) - ITEM_TOGGLE_FIRST, ev->iptkey == IPT_UI_RIGHT);
+					m_config_target.set_visibility_toggle(reinterpret_cast<uintptr_t>(ev->itemref) - ITEM_TOGGLE_FIRST, ev->iptkey == IPT_UI_RIGHT);
 					changed = true;
 				}
 			}

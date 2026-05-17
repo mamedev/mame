@@ -51,8 +51,8 @@ bool menu_select_game::s_first_start = true;
 //  ctor
 //-------------------------------------------------
 
-menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &container, const char *gamename)
-	: menu_select_launch(mui, container, false)
+menu_select_game::menu_select_game(mame_ui_manager &mui, render_target &target, const char *gamename)
+	: menu_select_launch(mui, target, false)
 	, m_persistent_data(system_list::instance())
 	, m_icons(MAX_ICONS_RENDER)
 	, m_icon_paths()
@@ -206,7 +206,7 @@ bool menu_select_game::handle(event const *ev)
 		const ui_system_info *system;
 		const ui_software_info *software;
 		get_selection(software, system);
-		menu::stack_push<menu_select_software>(ui(), container(), *system);
+		menu::stack_push<menu_select_software>(ui(), target(), *system);
 		return false;
 	}
 
@@ -277,7 +277,7 @@ bool menu_select_game::handle(event const *ev)
 					break;
 
 				case IPT_UI_AUDIT:
-					menu::stack_push<menu_audit>(ui(), container());
+					menu::stack_push<menu_audit>(ui(), target());
 					break;
 				}
 			}
@@ -533,12 +533,12 @@ void menu_select_game::build_available_list()
 //  and inescapable
 //-------------------------------------------------
 
-void menu_select_game::force_game_select(mame_ui_manager &mui, render_container &container)
+void menu_select_game::force_game_select(mame_ui_manager &mui, render_target &target)
 {
 	// drop any existing menus and start the system selection menu
 	menu::stack_reset(mui);
-	menu::stack_push_special_main<menu_select_game>(mui, container, nullptr);
-	mui.show_menu();
+	menu::stack_push_special_main<menu_select_game>(mui, target, nullptr);
+	mui.show_menu(target);
 
 	// make sure MAME is paused
 	mui.machine().pause();
@@ -557,7 +557,7 @@ bool menu_select_game::inkey_select(const event *menu_event)
 		// special case for configure options
 		menu::stack_push<menu_game_options>(
 				ui(),
-				container(),
+				target(),
 				m_persistent_data.filter_data(),
 				[this] () { reset(reset_options::SELECT_FIRST); });
 		return false;
@@ -566,7 +566,7 @@ bool menu_select_game::inkey_select(const event *menu_event)
 	{
 		// special case for configure machine
 		if (m_prev_selected)
-			menu::stack_push<menu_machine_configure>(ui(), container(), *reinterpret_cast<const ui_system_info *>(m_prev_selected));
+			menu::stack_push<menu_machine_configure>(ui(), target(), *reinterpret_cast<const ui_system_info *>(m_prev_selected));
 		return false;
 	}
 	else
@@ -580,7 +580,7 @@ bool menu_select_game::inkey_select(const event *menu_event)
 		{
 			if (!swlistdev.get_info().empty())
 			{
-				menu::stack_push<menu_select_software>(ui(), container(), *system);
+				menu::stack_push<menu_select_software>(ui(), target(), *system);
 				return false;
 			}
 		}
@@ -618,7 +618,7 @@ bool menu_select_game::inkey_select_favorite(const event *menu_event)
 		// special case for configure options
 		menu::stack_push<menu_game_options>(
 				ui(),
-				container(),
+				target(),
 				m_persistent_data.filter_data(),
 				[this] () { reset(reset_options::SELECT_FIRST); });
 		return false;
@@ -632,7 +632,7 @@ bool menu_select_game::inkey_select_favorite(const event *menu_event)
 			ui_system_info const &sysinfo = m_persistent_data.systems()[driver_list::find(swinfo->driver->name)];
 			menu::stack_push<menu_machine_configure>(
 					ui(),
-					container(),
+					target(),
 					sysinfo,
 					[this, empty = swinfo->startempty] (bool fav, bool changed)
 					{
@@ -653,7 +653,7 @@ bool menu_select_game::inkey_select_favorite(const event *menu_event)
 			if (!swlistdev.get_info().empty())
 			{
 				ui_system_info const &system(m_persistent_data.systems()[driver_list::find(ui_swinfo->driver->name)]);
-				menu::stack_push<menu_select_software>(ui(), container(), system);
+				menu::stack_push<menu_select_software>(ui(), target(), system);
 				return false;
 			}
 		}
@@ -884,7 +884,7 @@ void menu_select_game::inkey_export()
 			list.emplace_back(info.driver);
 	}
 
-	menu::stack_push<menu_export>(ui(), container(), std::move(list));
+	menu::stack_push<menu_export>(ui(), target(), std::move(list));
 }
 
 //-------------------------------------------------
@@ -993,7 +993,7 @@ void menu_select_game::show_config_menu(int index)
 	{
 		menu::stack_push<menu_machine_configure>(
 				ui(),
-				container(),
+				target(),
 				*reinterpret_cast<ui_system_info const *>(item(index).ref()),
 				nullptr);
 	}
@@ -1003,7 +1003,7 @@ void menu_select_game::show_config_menu(int index)
 		ui_system_info const &sys = m_persistent_data.systems()[driver_list::find(sw->driver->name)];
 		menu::stack_push<menu_machine_configure>(
 				ui(),
-				container(),
+				target(),
 				sys,
 				[this, empty = sw->startempty] (bool fav, bool changed)
 				{
@@ -1053,7 +1053,7 @@ void menu_select_game::filter_selected(int index)
 
 	m_persistent_data.filter_data().get_filter(machine_filter::type(index)).show_ui(
 			ui(),
-			container(),
+			target(),
 			[this] (machine_filter &filter)
 			{
 				set_switch_image();

@@ -5339,8 +5339,8 @@ GAME( 1989, hachooa,    hachoo,   system_A_gs88000,         hachoo,   megasys1_t
 GAME( 1989, hachooj,    hachoo,   system_A_gs88000,         hachoo,   megasys1_typea_hachoo_state, empty_init,        ROT0,   "Jaleco", "Hachoo! (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, jitsupro,   0,        system_A_gs88000,         jitsupro, megasys1_typea_state,        init_jitsupro_gfx, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, plusalph,   0,        system_A_gs88000,         plusalph, megasys1_typea_state,        empty_init,        ROT270, "Jaleco", "Plus Alpha", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, stdragon,   0,        system_A_d65006,          stdragon, megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "Saint Dragon (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, stdragona,  stdragon, system_A_d65006,          stdragon, megasys1_typea_state,        init_stdragon_gfx, ROT0,   "Jaleco", "Saint Dragon (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, stdragon,   0,        system_A_d65006,          stdragon, megasys1_typea_state,        empty_init,        ROT0,   "Jaleco / NMK", "Saint Dragon (set 1)", MACHINE_SUPPORTS_SAVE ) // "produced by NMK" in ending screen
+GAME( 1989, stdragona,  stdragon, system_A_d65006,          stdragon, megasys1_typea_state,        init_stdragon_gfx, ROT0,   "Jaleco / NMK", "Saint Dragon (set 2)", MACHINE_SUPPORTS_SAVE ) // ^
 GAME( 1989, stdragonb,  stdragon, system_A,                 stdragon, megasys1_typea_state,        init_stdragon_gfx, ROT0,   "bootleg","Saint Dragon (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodland,    0,        system_A_unkarray,        rodland,  megasys1_typea_state,        init_rodland_gfx,  ROT0,   "Jaleco", "Rod-Land (World, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodlanda,   rodland,  system_A_gs88000,         rodland,  megasys1_typea_state,        init_rodland_gfx,  ROT0,   "Jaleco", "Rod-Land (World, set 2)", MACHINE_SUPPORTS_SAVE )

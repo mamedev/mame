@@ -186,7 +186,6 @@ public:
 	void init_biohzdmb() ATTR_COLD;
 	template <uint32_t Prot_addr> void init_conny_bit6() ATTR_COLD;
 	template <uint32_t Prot_addr> void init_conny_bit7() ATTR_COLD;
-	template <uint32_t Prot_addr> void init_bushack() ATTR_COLD;
 	void init_sonic2mb() ATTR_COLD;
 	void init_twinktmb() ATTR_COLD;
 
@@ -281,37 +280,37 @@ private:
 	void ssf2mdb_68k_map(address_map &map) ATTR_COLD;
 };
 
-class md_connie_state : public md_boot_state
+class md_conny_state : public md_boot_state
 {
 public:
-	md_connie_state(const machine_config& mconfig, device_type type, const char* tag) :
+	md_conny_state(const machine_config& mconfig, device_type type, const char* tag) :
 		md_boot_state(mconfig, type, tag)
 	{
 	}
 
-	void connie(machine_config &config) ATTR_COLD;
+	void conny(machine_config &config) ATTR_COLD;
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	void md_connie_map(address_map &map) ATTR_COLD;
+	void md_conny_map(address_map &map) ATTR_COLD;
 };
 
-class md_connie_3in1_state : public md_connie_state
+class md_conny_3in1_state : public md_conny_state
 {
 public:
-	md_connie_3in1_state(const machine_config& mconfig, device_type type, const char* tag) :
-		md_connie_state(mconfig, type, tag),
+	md_conny_3in1_state(const machine_config& mconfig, device_type type, const char* tag) :
+		md_conny_state(mconfig, type, tag),
 		m_gamebank(*this, "gamebank")
 	{
 	}
 
-	void connie3in1(machine_config &config) ATTR_COLD;
+	void conny3in1(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void md_connie_3in1_map(address_map &map) ATTR_COLD;
+	void md_conny_3in1_map(address_map &map) ATTR_COLD;
 
 private:
 	required_memory_bank m_gamebank;
@@ -352,7 +351,7 @@ void md_boot_6button_state::ssf2mdb_68k_map(address_map &map)
 	map(0xa130f0, 0xa130ff).nopw(); // custom banking is disabled (!)
 }
 
-void md_connie_state::md_connie_map(address_map &map)
+void md_conny_state::md_conny_map(address_map &map)
 {
 	megadriv_68k_map(map);
 
@@ -362,7 +361,7 @@ void md_connie_state::md_connie_map(address_map &map)
 	map(0x840000, 0x840001).portr("COINS");
 }
 
-void md_connie_3in1_state::md_connie_3in1_map(address_map &map)
+void md_conny_3in1_state::md_conny_3in1_map(address_map &map)
 {
 	megadriv_68k_map(map);
 	map(0x000000, 0x0fffff).bankr(m_gamebank);
@@ -1197,16 +1196,16 @@ INPUT_PORTS_END
 // For 3in1mbc:
 // - Gunstar Heroes and Joe & Mac are very timing sensitive: a different timing will give more or less credits
 // - Snake Rattle n Roll doesn't care, also because that game doesn't use irqs at all.
-INPUT_CHANGED_MEMBER(md_connie_state::coin_inserted)
+INPUT_CHANGED_MEMBER(md_conny_state::coin_inserted)
 {
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::from_usec(1000));
 }
 
-INPUT_PORTS_START( connie )
+INPUT_PORTS_START( conny )
 	PORT_INCLUDE( md_common )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(md_connie_state::coin_inserted), 0) PORT_IMPULSE(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(md_conny_state::coin_inserted), 0) PORT_IMPULSE(1)
 	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
@@ -1221,15 +1220,30 @@ INPUT_PORTS_START( connie )
 	PORT_BIT(0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( connie3in1 )
-	PORT_INCLUDE( md_common )
+INPUT_PORTS_START( sidepmbc )
+	PORT_INCLUDE( conny )
 
-	PORT_START("COINS")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(md_connie_3in1_state::coin_inserted), 0) PORT_IMPULSE(1)
-	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("DSW:1,2")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "3 (duplicate)" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW:5")
+	// Tested after winning a round (PC=29AC0)
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW:8")
+	PORT_BIT(0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( conny3in1 )
+	PORT_INCLUDE( conny )
 
 	// dips are read on-the-fly by individual games
-	PORT_START("DSW")
+	PORT_MODIFY("DSW")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW:2")
 	// Joe & Mac at PC=d06, $a011a8 (Z80 space!?)
@@ -1268,27 +1282,27 @@ void md_boot_state::md_bootleg(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_state::md_bootleg_map);
 }
 
-void md_connie_state::connie(machine_config &config)
+void md_conny_state::conny(machine_config &config)
 {
 	megadrvb(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &md_connie_state::md_connie_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_conny_state::md_conny_map);
 }
 
-void md_connie_3in1_state::connie3in1(machine_config &config)
+void md_conny_3in1_state::conny3in1(machine_config &config)
 {
 	megadrvb(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &md_connie_3in1_state::md_connie_3in1_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_conny_3in1_state::md_conny_3in1_map);
 }
 
-void md_connie_3in1_state::machine_start()
+void md_conny_3in1_state::machine_start()
 {
 	md_boot_state::machine_start();
 	m_gamebank->configure_entries(0, 4, memregion("maincpu")->base(), 0x100000);
 }
 
-void md_connie_3in1_state::machine_reset()
+void md_conny_3in1_state::machine_reset()
 {
 	md_boot_state::machine_reset();
 	m_gamebank->set_entry(1);
@@ -1592,15 +1606,6 @@ void md_boot_state::init_conny_bit7()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(Prot_addr, Prot_addr + 1, read16smo_delegate(*this, NAME([] () { return 0x80; })));
 }
 
-template <uint32_t Prot_addr>
-void md_boot_state::init_bushack()
-{
-	init_conny_bit7<Prot_addr>();
-
-	// HACK: gross. The game dislikes megadriv_68k_check_z80_bus(), always expecting bit 8 to be 0. Hacked to boot for now.
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa11100, 0xa11101, read16s_delegate(*this, NAME([this] (uint16_t data, uint16_t mem_mask) { return megadriv_68k_check_z80_bus(data, mem_mask) & 0xfeff; })));
-}
-
 /*************************************
  *
  *  ROM definition(s)
@@ -1860,9 +1865,9 @@ GAME( 1994, barek2ch,  0,        md_bootleg,  barek2ch,  md_boot_state,         
 GAME( 1995, biohzdmb,  0,        megadrvb,    biohzdmb,  md_boot_state,         init_biohzdmb, ROT0, "bootleg / Sega",   "Bio-Hazard Battle (scrambled bootleg of Mega Drive version)",                                              0 )
 
 // Conny bootlegs with Mega Drive bootleg chipset marked TA-04, TA-05 and TA-06. 1 DIP switch bank.
-GAME( 1995, contrambc, 0,        connie,      connie,    md_connie_state,         init_bushack<0x860000>,    ROT0, "bootleg / Konami",    "Contra (Conny bootleg of Mega Drive version)",                                                    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // doesn't seem to like megadriv_68k_check_z80_bus(), crashes after title, doesn't read start button even if credits are in.
-GAME( 1995, sidepmbc,  0,        connie,      connie,    md_connie_state,         init_conny_bit7<0x8a0000>, ROT0, "bootleg / Data East", "Side Pocket (Conny bootleg of Mega Drive version)",                                               MACHINE_NOT_WORKING ) // buggy when pressing start with no credit (verify), test me
-GAME( 1995, 3in1mbc,   0,        connie3in1,  connie3in1,md_connie_3in1_state,    init_conny_bit7<0x880000>, ROT0, "bootleg",             "Gunstar Heroes / Snake Rattle n' Roll / Joe & Mac (Conny bootleg of Mega Drive versions)",        MACHINE_NOT_WORKING ) // pressing buttons during attract bankswitch between games. Gunstar Heroes crashes doing so during title screen anim (with irq 4 enabled, verify), credits aren't preserved when switching from/to Joe & Mac (verify)
-GAME( 1995, barek3mbc, 0,        connie,      connie,    md_connie_state,         init_conny_bit6<0x820000>, ROT0, "bootleg (Sega)",      "Bare Knuckle III (Conny bootleg of Mega Drive version)",                                          MACHINE_NOT_WORKING ) // test me
-GAME( 1996, mickeycmb, 0,        connie,      connie,    md_connie_state,         init_bushack<0x8c0000>,    ROT0, "bootleg (Conny)",     "The Great Hongyun Shu 1996 (Conny bootleg of Mega Drive version)",                                MACHINE_NOT_WORKING ) // test me
+GAME( 1995, contrambc, 0,        conny,      conny,    md_conny_state,         init_conny_bit6<0x860000>, ROT0, "bootleg (Conny / Chuangyi)", "Contra (Conny bootleg of Mega Drive version)", 0 ) // has shuffled levels compared to retail, can game softlock on continue screen (bad coding likely, verify)
+GAME( 1995, sidepmbc,  0,        conny,      sidepmbc, md_conny_state,         init_conny_bit7<0x8a0000>, ROT0, "bootleg (Conny)",            "Side Pocket (Conny bootleg of Mega Drive version)", 0 ) // buggy when pressing start with no credit (verify)
+GAME( 1995, 3in1mbc,   0,        conny3in1,  conny3in1,md_conny_3in1_state,    init_conny_bit7<0x880000>, ROT0, "bootleg (Conny)",            "Gunstar Heroes / Snake Rattle n' Roll / Joe & Mac (Conny bootleg of Mega Drive versions)", 0 ) // pressing buttons during attract bankswitch between games. Gunstar Heroes crashes doing so during title screen anim (with irq 4 enabled, verify), credits aren't preserved when switching from/to Joe & Mac (verify)
+GAME( 1995, barek3mbc, 0,        conny,      conny,    md_conny_state,         init_conny_bit6<0x820000>, ROT0, "bootleg (Conny)",            "Bare Knuckle III (Conny bootleg of Mega Drive version)", 0 )
+GAME( 1996, mickeycmb, 0,        conny,      conny,    md_conny_state,         init_conny_bit7<0x8c0000>, ROT0, "bootleg (Conny)",            "The Great Hongyun Shu 1996 (Conny bootleg of Mega Drive version)", 0 )
 // Samurai Spirits and Kuhga PCBs have also been seen

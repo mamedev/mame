@@ -183,7 +183,7 @@ void sapphire_state::machine_start()
 
 void sapphire_state::init_chesstea()
 {
-	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
+	u16 *rom = (u16*)memregion("maincpu")->base();
 
 	// There's a bug in the serial routine, where it clears SSR TDRE, and then
 	// writes to TDR. The H8 documentation warns not to do this, since the next

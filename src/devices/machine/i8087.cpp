@@ -423,7 +423,11 @@ int i8087_device::check_exceptions(bool store)
 	if ((m_sw & ~m_cw) & 0x3f)
 	{
 		// interrupt handler
-		if (!(m_cw & X87_CW_IEM)) { m_sw |= X87_SW_ES; m_int_handler(1); }
+		if (!(m_cw & X87_CW_IEM))
+		{
+			m_sw |= X87_SW_ES;
+			m_int_handler(1);
+		}
 		logerror("Unmasked x87 exception (CW:%.4x, SW:%.4x)\n", m_cw, m_sw);
 		if (store || !(unmasked & (X87_SW_OE | X87_SW_UE)))
 			return 0;
@@ -2141,7 +2145,8 @@ void i8087_device::fprem1(u8 modrm)
 
 		m_sw &= ~X87_SW_C2;
 
-		if (!extFloat80_ieee754_remainder(ST(0), ST(1), result, q)) {
+		if (!extFloat80_ieee754_remainder(ST(0), ST(1), result, q))
+		{
 			m_sw &= ~(X87_SW_C0|X87_SW_C3|X87_SW_C1);
 			if (q & 1)
 				m_sw |= X87_SW_C1;

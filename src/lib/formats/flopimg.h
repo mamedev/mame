@@ -93,7 +93,7 @@ public:
 	//! This checks if the file has the proper extension for this format.
 	//! @param file_name
 	//! @returns true if file matches the extension.
-	bool extension_matches(const char *file_name) const;
+	bool extension_matches(std::string_view file_name) const noexcept;
 
 protected:
 	//! Input for convert_to_edge

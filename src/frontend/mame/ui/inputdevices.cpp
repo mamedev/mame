@@ -24,8 +24,8 @@ namespace {
 class menu_input_device : public menu
 {
 public:
-	menu_input_device(mame_ui_manager &mui, render_container &container, input_device &device)
-		: menu(mui, container)
+	menu_input_device(mame_ui_manager &mui, render_target &target, input_device &device)
+		: menu(mui, target)
 		, m_device(device)
 		, m_have_analog(false)
 	{
@@ -191,8 +191,8 @@ private:
 
 
 
-menu_input_devices::menu_input_devices(mame_ui_manager &mui, render_container &container)
-	: menu(mui, container)
+menu_input_devices::menu_input_devices(mame_ui_manager &mui, render_target &target)
+	: menu(mui, target)
 {
 	set_heading(_("menu-inputdev", "Input Devices"));
 }
@@ -250,7 +250,7 @@ bool menu_input_devices::handle(event const *ev)
 	switch (ev->iptkey)
 	{
 	case IPT_UI_SELECT:
-		stack_push<menu_input_device>(ui(), container(), dev);
+		stack_push<menu_input_device>(ui(), target(), dev);
 		break;
 
 	case IPT_UI_PREV_GROUP:

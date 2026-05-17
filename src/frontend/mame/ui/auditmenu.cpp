@@ -40,8 +40,8 @@ void *const ITEMREF_START_FAST = reinterpret_cast<void *>(std::uintptr_t(2));
 } // anonymous namespace
 
 
-menu_audit::menu_audit(mame_ui_manager &mui, render_container &container)
-	: menu(mui, container)
+menu_audit::menu_audit(mame_ui_manager &mui, render_target &target)
+	: menu(mui, target)
 	, m_availablesorted(system_list::instance().sorted_list())
 	, m_unavailable(
 			std::accumulate(
@@ -113,7 +113,7 @@ void menu_audit::custom_render(uint32_t flags, void *selectedref, float top, flo
 					total);
 			text << '\n' << m_prompt;
 			ui().draw_text_box(
-					container(),
+					target(),
 					std::move(text).str(),
 					text_layout::text_justify::CENTER,
 					0.5F, 0.5F,
@@ -123,7 +123,7 @@ void menu_audit::custom_render(uint32_t flags, void *selectedref, float top, flo
 
 	case phase::CANCELLATION:
 		ui().draw_text_box(
-				container(),
+				target(),
 				util::string_format(
 					_("Cancel audit?\n\nPress %1$s to cancel\nPress %2$s to continue"),
 					ui().get_general_input_setting(IPT_UI_SELECT),

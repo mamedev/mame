@@ -38416,14 +38416,17 @@ ATK test: OK
 
 	<software name="poolrad" supported="no">
 		<!-- SPS (CAPS) release 555 -->
-		<description>Pool of Radiance (Europe, v1.0)</description>
+		<description>Advanced Dungeons &amp; Dragons: Pool of Radiance (Europe, v1.0)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
 ATK test: OK
+TODO: untested
 ]]></notes>
+		<info name="usage" value="Sports code wheel copy-protection" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1049612">

@@ -10,7 +10,6 @@ References:
 
 TODO:
 - convert video to a proper mc6845, consider this as a good base for new device rewrite;
-- cursor stuck in Bird Crash;
 - interlace (cfr. cpm22 in setup mode);
 - ROM/RAM bankswitch, it apparently happens after one instruction prefetching.
   Hacked around for now;
@@ -20,6 +19,7 @@ TODO:
 - Superimposing features (if/when SW dumps arises, cfr. SMC-70G promotional video)
 - Find better reference materials, available one lacks several pages;
 - Hookup expansion bus (needs pinout/specifications)
+- Currently emulating SMC-777C, base SMC-777 doesn't have the remappable color bank by default.
 
 **************************************************************************************************/
 

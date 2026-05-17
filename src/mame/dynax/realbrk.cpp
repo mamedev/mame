@@ -34,7 +34,7 @@ Notes:
   mode and select "results" from the menu - this hits the breakpoint - then
   set ($3,a2) to non zero.
 
-To Do:
+TODO:
 
 - Priorities (e.g during the intro, there are two black bands in the background
   that should obscure sprites).
@@ -54,67 +54,60 @@ To Do:
 /* Read 4 ten bit dip switches */
 u16 realbrk_state::realbrk_dsw_r()
 {
+	u16 ret = 0xffff;
 	const u16 sel = ~m_dsw_select[0];
-	if (sel & 0x01) return  (m_dsw_io[0]->read() & 0x00ff) << 8;      // DSW1 low bits
-	if (sel & 0x02) return  (m_dsw_io[1]->read() & 0x00ff) << 8;      // DSW2 low bits
-	if (sel & 0x04) return  (m_dsw_io[2]->read() & 0x00ff) << 8;      // DSW3 low bits
-	if (sel & 0x08) return  (m_dsw_io[3]->read() & 0x00ff) << 8;      // DSW4 low bits
+	for (int i = 0; i <= 4; i++)
+	{
+		if (BIT(sel, i))
+		{
+			if (i == 4)
+			{
+				ret &= ((m_dsw_io[0]->read() & 0x0300) << 0) |   // DSWs high 2 bits
+						((m_dsw_io[1]->read() & 0x0300) << 2) |
+						((m_dsw_io[2]->read() & 0x0300) << 4) |
+						((m_dsw_io[3]->read() & 0x0300) << 6) ;
+			}
+			else
+				ret &= (m_dsw_io[i]->read() & 0x00ff) << 8;
+		}
+	}
 
-	if (sel & 0x10) return  ((m_dsw_io[0]->read() & 0x0300) << 0) |   // DSWs high 2 bits
-							((m_dsw_io[1]->read() & 0x0300) << 2) |
-							((m_dsw_io[2]->read() & 0x0300) << 4) |
-							((m_dsw_io[3]->read() & 0x0300) << 6) ;
-
-	logerror("CPU #0 PC %06X: read with unknown dsw_select = %02x\n",m_maincpu->pc(),m_dsw_select[0]);
-	return 0xffff;
+	return ret;
 }
 
 u16 realbrk_state::pkgnsh_input_r(offs_t offset)
 {
-	switch(offset)
+	switch (offset)
 	{
-		case 0x00/2: return 0xffff;
-		case 0x02/2: return 0xffff;
-		case 0x04/2: return m_in_io[0]->read();      /*Service buttons*/
-		case 0x06/2: return m_dsw_io[0]->read();      /*DIP 2*/
-		case 0x08/2: return m_dsw_io[1]->read();      /*DIP 1*/
-		case 0x0a/2: return m_dsw_io[2]->read();      /*DIP 1+2 Hi-Bits*/
-		case 0x0c/2: return m_paddle_io[0]->read();  /*Handle 1p*/
-		case 0x0e/2: return m_player_io[0]->read();           /*Buttons 1p*/
-		case 0x10/2: return m_paddle_io[1]->read();  /*Handle 2p*/
-		case 0x12/2: return m_player_io[1]->read();           /*Buttons 2p*/
+		case 0x00 / 2: return 0xffff;
+		case 0x02 / 2: return 0xffff;
+		case 0x04 / 2: return m_in_io[0]->read();      /*Service buttons*/
+		case 0x06 / 2: return m_dsw_io[0]->read();      /*DIP 2*/
+		case 0x08 / 2: return m_dsw_io[1]->read();      /*DIP 1*/
+		case 0x0a / 2: return m_dsw_io[2]->read();      /*DIP 1+2 Hi-Bits*/
+		case 0x0c / 2: return m_paddle_io[0]->read();  /*Handle 1p*/
+		case 0x0e / 2: return m_player_io[0]->read();           /*Buttons 1p*/
+		case 0x10 / 2: return m_paddle_io[1]->read();  /*Handle 2p*/
+		case 0x12 / 2: return m_player_io[1]->read();           /*Buttons 2p*/
 	}
 	return 0xffff;
 }
 
 u16 realbrk_state::pkgnshdx_input_r(offs_t offset)
 {
-	const u16 sel = ~m_dsw_select[0];
-
-	switch(offset)
+	switch (offset)
 	{
-		case 0x00/2: return 0xffff;
-		case 0x02/2: return m_in_io[0]->read();  /*Service buttons*/
+		case 0x00 / 2: return 0xffff;
+		case 0x02 / 2: return m_in_io[0]->read();  /*Service buttons*/
 		/*DSW,same handling as realbrk*/
-		case 0x04/2:
-			if (sel & 0x01) return  (m_dsw_io[0]->read() & 0x00ff) << 8;      // DSW1 low bits
-			if (sel & 0x02) return  (m_dsw_io[1]->read() & 0x00ff) << 8;      // DSW2 low bits
-			if (sel & 0x04) return  (m_dsw_io[2]->read() & 0x00ff) << 8;      // DSW3 low bits
-			if (sel & 0x08) return  (m_dsw_io[3]->read() & 0x00ff) << 8;      // DSW4 low bits
-
-			if (sel & 0x10) return  ((m_dsw_io[0]->read() & 0x0300) << 0) |   // DSWs high 2 bits
-									((m_dsw_io[1]->read() & 0x0300) << 2) |
-									((m_dsw_io[2]->read() & 0x0300) << 4) |
-									((m_dsw_io[3]->read() & 0x0300) << 6) ;
-
-			return 0xffff;
-		case 0x06/2: return m_player_io[1]->read();/*Buttons+Handle 2p*/
-		case 0x08/2: return m_player_io[0]->read();/*Buttons+Handle 1p*/
-		case 0x0a/2: return 0xffff;
-		case 0x0c/2: return 0xffff;
-		case 0x0e/2: return 0xffff;
-		case 0x10/2: return 0xffff;
-		case 0x12/2: return 0xffff;
+		case 0x04 / 2: return realbrk_dsw_r();
+		case 0x06 / 2: return m_player_io[1]->read();/*Buttons+Handle 2p*/
+		case 0x08 / 2: return m_player_io[0]->read();/*Buttons+Handle 1p*/
+		case 0x0a / 2: return 0xffff;
+		case 0x0c / 2: return 0xffff;
+		case 0x0e / 2: return 0xffff;
+		case 0x10 / 2: return 0xffff;
+		case 0x12 / 2: return 0xffff;
 	}
 
 	return 0xffff;
@@ -125,7 +118,7 @@ u16 realbrk_state::backup_ram_r(offs_t offset)
 {
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
 	        unemulated tmp68301 feature?*/
-	if(m_maincpu->pcbase() == 0x02c08e)
+	if (m_maincpu->pcbase() == 0x02c08e)
 		return 0xffff;
 	else
 		return m_backup_ram[offset];
@@ -136,7 +129,7 @@ u16 realbrk_state::backup_ram_dx_r(offs_t offset)
 {
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
 	        unemulated tmp68301 feature?*/
-	if(m_maincpu->pcbase() == 0x02f046)
+	if (m_maincpu->pcbase() == 0x02f046)
 		return 0xffff;
 	else
 		return m_backup_ram[offset];
@@ -151,7 +144,7 @@ template<int Layer>
 void realbrk_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
-	m_tilemap[Layer]->mark_tile_dirty(offset/2);
+	m_tilemap[Layer]->mark_tile_dirty(offset / 2);
 }
 
 /***************************************************************************
@@ -164,13 +157,13 @@ void realbrk_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 void realbrk_state::base_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                         // ROM
-	map(0x200000, 0x203fff).ram().share("spriteram"); // Sprites
+	map(0x200000, 0x203fff).ram().share(m_spriteram); // Sprites
 	map(0x400000, 0x40ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // Palette
-	map(0x600000, 0x601fff).ram().w(FUNC(realbrk_state::vram_w<0>)).share("vram_0");  // Background   (0)
-	map(0x602000, 0x603fff).ram().w(FUNC(realbrk_state::vram_w<1>)).share("vram_1");  // Background   (1)
-	map(0x604000, 0x604fff).ram().w(FUNC(realbrk_state::vram_2_w)).share("vram_2");  // Text         (2)
+	map(0x600000, 0x601fff).ram().w(FUNC(realbrk_state::vram_w<0>)).share(m_vram[0]);  // Background   (0)
+	map(0x602000, 0x603fff).ram().w(FUNC(realbrk_state::vram_w<1>)).share(m_vram[1]);  // Background   (1)
+	map(0x604000, 0x604fff).ram().w(FUNC(realbrk_state::vram_2_w)).share(m_vram[2]);  // Text         (2)
 	map(0x605000, 0x605fff).ram();                                         //
-	map(0x606000, 0x60600f).ram().w(FUNC(realbrk_state::vregs_w)).share("vregs");    // Scroll + Video Regs
+	map(0x606000, 0x60600f).ram().w(FUNC(realbrk_state::vregs_w)).share(m_vregs);    // Scroll + Video Regs
 	map(0x606010, 0x61ffff).ram();                                         //
 	map(0x800000, 0x800003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);   // YMZ280
 	map(0xfe0000, 0xfeffff).ram();                                         // RAM
@@ -183,7 +176,7 @@ void realbrk_state::realbrk_mem(address_map &map)
 	map(0x800008, 0x80000b).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff); //
 	map(0xc00000, 0xc00001).portr("IN0");                            // P1 & P2 (Inputs)
 	map(0xc00002, 0xc00003).portr("IN1");                            // Coins
-	map(0xc00004, 0xc00005).ram().r(FUNC(realbrk_state::realbrk_dsw_r)).share("dsw_select");  // DSW select
+	map(0xc00004, 0xc00005).ram().r(FUNC(realbrk_state::realbrk_dsw_r)).share(m_dsw_select);  // DSW select
 	map(0xff0000, 0xfffbff).ram();                                         // RAM
 }
 
@@ -202,7 +195,7 @@ void realbrk_state::pkgnshdx_mem(address_map &map)
 	base_mem(map);
 	map(0x800008, 0x80000b).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff); //
 	map(0xc00000, 0xc00013).r(FUNC(realbrk_state::pkgnshdx_input_r));   // P1 & P2 (Inputs)
-	map(0xc00004, 0xc00005).writeonly().share("dsw_select"); // DSW select
+	map(0xc00004, 0xc00005).writeonly().share(m_dsw_select); // DSW select
 	map(0xff0000, 0xfffbff).rw(FUNC(realbrk_state::backup_ram_dx_r), FUNC(realbrk_state::backup_ram_w)).share("backup_ram");  // RAM
 }
 
@@ -210,12 +203,12 @@ void realbrk_state::pkgnshdx_mem(address_map &map)
 void realbrk_state::dai2kaku_mem(address_map &map)
 {
 	base_mem(map);
-	map(0x605000, 0x6053ff).ram().share("vram_0ras");   // rasterinfo   (0)
-	map(0x605400, 0x6057ff).ram().share("vram_1ras");   // rasterinfo   (1)
+	map(0x605000, 0x6053ff).ram().share(m_vram_ras[0]);   // rasterinfo   (0)
+	map(0x605400, 0x6057ff).ram().share(m_vram_ras[1]);   // rasterinfo   (1)
 	map(0x800008, 0x80000b).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff); //
 	map(0xc00000, 0xc00001).portr("IN0");                            // P1 & P2 (Inputs)
 	map(0xc00002, 0xc00003).portr("IN1");                            // Coins
-	map(0xc00004, 0xc00005).ram().r(FUNC(realbrk_state::realbrk_dsw_r)).share("dsw_select");  // DSW select
+	map(0xc00004, 0xc00005).ram().r(FUNC(realbrk_state::realbrk_dsw_r)).share(m_dsw_select);  // DSW select
 	map(0xff0000, 0xfffbff).ram();                                         // RAM
 }
 
@@ -701,39 +694,17 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const gfx_layout layout_8x8x4 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{   STEP4(0,1)      },
-	{   STEP4(3*4,-4),STEP4(7*4,-4)     },
-	{   STEP8(0,8*4)    },
-	8*8*4
-};
-
-static const gfx_layout layout_16x16x8 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{   STEP8(0,1)      },
-	{   STEP16(0,8)     },
-	{   STEP16(0,16*8)  },
-	16*16*8
-};
-
 static GFXDECODE_START( gfx_realbrk )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,         0, 0x80     )   // [0] Backgrounds
-	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,           0, 0x800    )   // [1] Text
-	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,         0, 0x80     )   // [2] Sprites (256 colors)
-	GFXDECODE_ENTRY( "gfx4", 0, gfx_16x16x4_packed_lsb, 0, 0x800    )   // [3] Sprites (16 colors)
+	GFXDECODE_ENTRY( "bgtiles",  0, gfx_16x16x8_raw,        0,  0x80 )   // [0] Backgrounds
+	GFXDECODE_ENTRY( "txtiles",  0, gfx_8x8x4_packed_lsb,   0, 0x800 )   // [1] Text
+	GFXDECODE_ENTRY( "sprites0", 0, gfx_16x16x8_raw,        0,  0x80 )   // [2] Sprites (256 colors)
+	GFXDECODE_ENTRY( "sprites1", 0, gfx_16x16x4_packed_lsb, 0, 0x800 )   // [3] Sprites (16 colors)
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_dai2kaku )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,     0, 0x80     )   // [0] Backgrounds
-	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,       0, 0x800    )   // [1] Text
-	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,     0, 0x80     )   // [2] Sprites (256 colors)
+	GFXDECODE_ENTRY( "bgtiles",  0, gfx_16x16x8_raw,      0,  0x80 )   // [0] Backgrounds
+	GFXDECODE_ENTRY( "txtiles",  0, gfx_8x8x4_packed_lsb, 0, 0x800 )   // [1] Text
+	GFXDECODE_ENTRY( "sprites0", 0, gfx_16x16x8_raw,      0,  0x80 )   // [2] Sprites (256 colors)
 GFXDECODE_END
 
 
@@ -902,21 +873,21 @@ ROM_START( pkgnsh )
 	ROM_LOAD16_BYTE( "50506.1h", 0x000001, 0x080000, CRC(06949a7d) SHA1(1276c28bc5cebeae749e0cded2da631353efbbb4) )
 	ROM_LOAD16_BYTE( "50505.1k", 0x000000, 0x080000, CRC(26df869f) SHA1(d716e561441da6ae8ca61e17335aab44770157a6) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )   /* Backgrounds */
+	ROM_REGION( 0x400000, "bgtiles", 0 )   /* Backgrounds */
 	ROM_LOAD32_WORD( "50512.2a", 0x0000002, 0x200000, CRC(5adae7bb) SHA1(de7cf952155459f7aab1448620bf26a925ca0572) )
 	ROM_LOAD32_WORD( "50509.2d", 0x0000000, 0x200000, CRC(ad937ab5) SHA1(ebe02c203358787c6b406fe3cbd3eca3b245456e) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )    /* Text Layer */
-	ROM_LOAD16_BYTE( "50510.1c", 0x000001, 0x020000, CRC(e26f1ad6) SHA1(5713af5fb02885657889cb2df7f58a39987ace6a) )
-	ROM_LOAD16_BYTE( "50511.1b", 0x000000, 0x020000, CRC(3da9af01) SHA1(21313fd5c8cf7ccb72c85422dbddfceedab2542f) )
+	ROM_REGION( 0x40000, "txtiles", 0 )    /* Text Layer */
+	ROM_LOAD16_BYTE( "50510.1c", 0x000000, 0x020000, CRC(e26f1ad6) SHA1(5713af5fb02885657889cb2df7f58a39987ace6a) )
+	ROM_LOAD16_BYTE( "50511.1b", 0x000001, 0x020000, CRC(3da9af01) SHA1(21313fd5c8cf7ccb72c85422dbddfceedab2542f) )
 
-	ROM_REGION( 0xc00000, "gfx3", 0 )   /* Sprites (256 colors) */
+	ROM_REGION( 0xc00000, "sprites0", 0 )   /* Sprites (256 colors) */
 	ROM_LOAD32_WORD( "50502.4k", 0x0000000, 0x400000, CRC(f7c04779) SHA1(fcbc2d166d405d0fe2a4ca67950fe6ec060b9fc1) ) // same as 52206.9f on dx
 	ROM_LOAD32_WORD( "50504.3k", 0x0000002, 0x400000, CRC(8e872be5) SHA1(0568a70ca640624f665b8b92ca5e9239b13ed116) ) // same as 52208.9d on dx
 	ROM_LOAD32_WORD( "50501.4l", 0x0800000, 0x200000, CRC(ca31e1ad) SHA1(7508547de5617f6091fc46f6eb1b45673419c483) )
 	ROM_LOAD32_WORD( "50503.3l", 0x0800002, 0x200000, CRC(80b5e8d0) SHA1(27359affaa84c7cb4dfc019bbfeae0f384602faa) )
 
-	ROM_REGION( 0x200000, "gfx4", ROMREGION_ERASEFF )   /* Sprites (16 colors) Not Used */
+	ROM_REGION( 0x200000, "sprites1", ROMREGION_ERASEFF )   /* Sprites (16 colors) Not Used */
 
 	ROM_REGION( 0x100000, "ymz", 0 )    /* Samples */
 	ROM_LOAD( "50508.1e", 0x000000, 0x080000, CRC(95a1473a) SHA1(d382a9a603711747c2fe5bd5721de5af369ccc42) )
@@ -983,21 +954,21 @@ ROM_START( pkgnshdx )
 	ROM_LOAD16_BYTE( "52202b.1r", 0x000000, 0x080000, CRC(3c1a10de) SHA1(44a13adec64645aa01e216dfd527b59e7298c732) )
 	ROM_LOAD16_BYTE( "52201b.2r", 0x000001, 0x080000, CRC(d63797ce) SHA1(d1b0b57b5426135e36772be296e94e04822e54ac) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )   /* Backgrounds */
+	ROM_REGION( 0x400000, "bgtiles", 0 )   /* Backgrounds */
 	ROM_LOAD32_WORD( "52210.9b", 0x0000000, 0x200000, CRC(6865b76a) SHA1(26215ec38b1fef279b3c3c1453116a0afe938b6b) )
 	ROM_LOAD32_WORD( "52211.9a", 0x0000002, 0x200000, CRC(8e227328) SHA1(200f9e4419dac62b191e5e8c6c32b777a9c08e5e) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )    /* Text Layer */
-	ROM_LOAD16_BYTE( "52205.1a", 0x000000, 0x020000, CRC(4b7d16c0) SHA1(5f6410121ec13bea2869d61db169dbe2536453ea) )
-	ROM_LOAD16_BYTE( "52204.1b", 0x000001, 0x020000, CRC(47a39496) SHA1(3ac9499b70c63185fb65378c18d4ff30ba1d2f2b) )
+	ROM_REGION( 0x40000, "txtiles", 0 )    /* Text Layer */
+	ROM_LOAD16_BYTE( "52205.1a", 0x000001, 0x020000, CRC(4b7d16c0) SHA1(5f6410121ec13bea2869d61db169dbe2536453ea) )
+	ROM_LOAD16_BYTE( "52204.1b", 0x000000, 0x020000, CRC(47a39496) SHA1(3ac9499b70c63185fb65378c18d4ff30ba1d2f2b) )
 
-	ROM_REGION( 0xc00000, "gfx3", 0 )   /* Sprites (256 colors) */
+	ROM_REGION( 0xc00000, "sprites0", 0 )   /* Sprites (256 colors) */
 	ROM_LOAD32_WORD( "52206.9f", 0x0000000, 0x400000, CRC(f7c04779) SHA1(fcbc2d166d405d0fe2a4ca67950fe6ec060b9fc1) )
 	ROM_LOAD32_WORD( "52208.9d", 0x0000002, 0x400000, CRC(8e872be5) SHA1(0568a70ca640624f665b8b92ca5e9239b13ed116) )
 	ROM_LOAD32_WORD( "52207.9e", 0x0800000, 0x200000, CRC(ae7a983f) SHA1(ba8ff28068e21dd24ea2e523a5b4023e86ea26cb) )
 	ROM_LOAD32_WORD( "52209.9c", 0x0800002, 0x200000, CRC(83ac2ea9) SHA1(aa1c45b7a404eed51e950bea3edcd34814f09213) )
 
-	ROM_REGION( 0x200000, "gfx4", ROMREGION_ERASEFF )   /* Sprites (16 colors) Not Used */
+	ROM_REGION( 0x200000, "sprites1", ROMREGION_ERASEFF )   /* Sprites (16 colors) Not Used */
 
 	ROM_REGION( 0x100000, "ymz", 0 )    /* Samples */
 	ROM_LOAD( "52203.2e", 0x000000, 0x100000, CRC(342a193d) SHA1(1e75ec7ac48dcc8396a0fa6db14f2661c28f671c) )
@@ -1055,21 +1026,21 @@ ROM_START( realbrk )
 	ROM_LOAD16_BYTE( "600k02b.1r", 0x000000, 0x080000, CRC(6954ff7f) SHA1(dc17be7dadb2d6acff039d4d6484ee71070e466d) )
 	ROM_LOAD16_BYTE( "600k01b.2r", 0x000001, 0x080000, CRC(6eb865bf) SHA1(07bcdbec8fd8d280b1cdb4b5545607d3a87e2395) )
 
-	ROM_REGION( 0x800000, "gfx1", 0 )   /* Backgrounds */
+	ROM_REGION( 0x800000, "bgtiles", 0 )   /* Backgrounds */
 	ROM_LOAD32_WORD( "52310.9b", 0x0000000, 0x400000, CRC(07dfd9f5) SHA1(8722a98adc33f56df1e3b194ce923bc987e15cbe) )
 	ROM_LOAD32_WORD( "52311.9a", 0x0000002, 0x400000, CRC(136a93a4) SHA1(b4bd46ba6c2b367aaf362f67d8be4757f1160864) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )    /* Text Layer */
-	ROM_LOAD16_BYTE( "52305.1a", 0x000000, 0x020000, CRC(56546fb4) SHA1(5e4dc1665ca96bf24b89d92c24f5ff8420cb465e) ) // 1xxxxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD16_BYTE( "52304.1b", 0x000001, 0x020000, CRC(b22b0aac) SHA1(8c62e19071a4031d0dcad621cce0ba550702659b) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_REGION( 0x40000, "txtiles", 0 )    /* Text Layer */
+	ROM_LOAD16_BYTE( "52305.1a", 0x000001, 0x020000, CRC(56546fb4) SHA1(5e4dc1665ca96bf24b89d92c24f5ff8420cb465e) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "52304.1b", 0x000000, 0x020000, CRC(b22b0aac) SHA1(8c62e19071a4031d0dcad621cce0ba550702659b) ) // 1xxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0xc00000, "gfx3", 0 )   /* Sprites (256 colors) */
+	ROM_REGION( 0xc00000, "sprites0", 0 )   /* Sprites (256 colors) */
 	ROM_LOAD32_WORD( "52306.9f",   0x0000000, 0x400000, CRC(5ff0f666) SHA1(e3f1d9dc84fbef73af37cefd90bdf87a35f59e0e) )
 	ROM_LOAD32_WORD( "52308.9d",   0x0000002, 0x400000, CRC(20817051) SHA1(4c9a443b5d6353ce67d5b1fe716f5ac20d194ef0) )
 	ROM_LOAD32_WORD( "mm60007.9e", 0x0800000, 0x200000, CRC(a1d40934) SHA1(59b85435b13c6617e79b8d995506e585b6c8bedd) )
 	ROM_LOAD32_WORD( "mm60009.9c", 0x0800002, 0x200000, CRC(58c03a6c) SHA1(ec7ae49bba6ffdba0f79f1e41e14945f6c3acb1d) )
 
-	ROM_REGION( 0x200000, "gfx4", 0 )   /* Sprites (16 colors) */
+	ROM_REGION( 0x200000, "sprites1", 0 )   /* Sprites (16 colors) */
 	ROM_LOAD( "mm60012.14f", 0x000000, 0x200000, CRC(2b5ba1ec) SHA1(d548ef8c96b7b868c866dedb314f56583726564d) )
 
 	ROM_REGION( 0x400000, "ymz", 0 )    /* Samples */
@@ -1083,21 +1054,21 @@ ROM_START( realbrko )
 
 	// note, the numbering on all the roms is shifted by 1 due to the sample data being split across 2 roms
 	//  this is how the board is labeled, it is not a mistake.
-	ROM_REGION( 0x800000, "gfx1", 0 )   /* Backgrounds */
+	ROM_REGION( 0x800000, "bgtiles", 0 )   /* Backgrounds */
 	ROM_LOAD32_WORD( "52311.9b", 0x0000000, 0x400000, CRC(07dfd9f5) SHA1(8722a98adc33f56df1e3b194ce923bc987e15cbe) )
 	ROM_LOAD32_WORD( "52312.9a", 0x0000002, 0x400000, CRC(136a93a4) SHA1(b4bd46ba6c2b367aaf362f67d8be4757f1160864) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )    /* Text Layer */
-	ROM_LOAD16_BYTE( "52306.1a", 0x000000, 0x020000, CRC(56546fb4) SHA1(5e4dc1665ca96bf24b89d92c24f5ff8420cb465e) ) // 1xxxxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD16_BYTE( "52305.1b", 0x000001, 0x020000, CRC(b22b0aac) SHA1(8c62e19071a4031d0dcad621cce0ba550702659b) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_REGION( 0x40000, "txtiles", 0 )    /* Text Layer */
+	ROM_LOAD16_BYTE( "52306.1a", 0x000001, 0x020000, CRC(56546fb4) SHA1(5e4dc1665ca96bf24b89d92c24f5ff8420cb465e) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "52305.1b", 0x000000, 0x020000, CRC(b22b0aac) SHA1(8c62e19071a4031d0dcad621cce0ba550702659b) ) // 1xxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0xc00000, "gfx3", 0 )   /* Sprites (256 colors) */
+	ROM_REGION( 0xc00000, "sprites0", 0 )   /* Sprites (256 colors) */
 	ROM_LOAD32_WORD( "52307.9f",   0x0000000, 0x400000, CRC(5ff0f666) SHA1(e3f1d9dc84fbef73af37cefd90bdf87a35f59e0e) )
 	ROM_LOAD32_WORD( "52309.9d",   0x0000002, 0x400000, CRC(20817051) SHA1(4c9a443b5d6353ce67d5b1fe716f5ac20d194ef0) )
 	ROM_LOAD32_WORD( "52308.9e",   0x0800000, 0x200000, CRC(a1d40934) SHA1(59b85435b13c6617e79b8d995506e585b6c8bedd) )
 	ROM_LOAD32_WORD( "52310.9c",   0x0800002, 0x200000, CRC(58c03a6c) SHA1(ec7ae49bba6ffdba0f79f1e41e14945f6c3acb1d) )
 
-	ROM_REGION( 0x200000, "gfx4", 0 )   /* Sprites (16 colors) */
+	ROM_REGION( 0x200000, "sprites1", 0 )   /* Sprites (16 colors) */
 	ROM_LOAD( "52313.14f", 0x000000, 0x200000, CRC(2b5ba1ec) SHA1(d548ef8c96b7b868c866dedb314f56583726564d) )
 
 	ROM_REGION( 0x400000, "ymz", 0 )    /* Samples */
@@ -1111,21 +1082,21 @@ ROM_START( realbrkj )
 	ROM_LOAD16_BYTE( "52302.1r", 0x000000, 0x080000, CRC(ab0379b0) SHA1(67af6670f2b37a7d4d6e03508f291f8ffe64d4cb) ) // sldh w/realbrko
 	ROM_LOAD16_BYTE( "52301.2r", 0x000001, 0x080000, CRC(9cc1596e) SHA1(a598f18eaac1ed6943069e9500b07b77e263f0d0) ) // sldh w/realbrko
 
-	ROM_REGION( 0x800000, "gfx1", 0 )   /* Backgrounds */
+	ROM_REGION( 0x800000, "bgtiles", 0 )   /* Backgrounds */
 	ROM_LOAD32_WORD( "52310.9b", 0x0000000, 0x400000, CRC(07dfd9f5) SHA1(8722a98adc33f56df1e3b194ce923bc987e15cbe) )
 	ROM_LOAD32_WORD( "52311.9a", 0x0000002, 0x400000, CRC(136a93a4) SHA1(b4bd46ba6c2b367aaf362f67d8be4757f1160864) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )    /* Text Layer */
-	ROM_LOAD16_BYTE( "52305.1a", 0x000000, 0x020000, CRC(56546fb4) SHA1(5e4dc1665ca96bf24b89d92c24f5ff8420cb465e) ) // 1xxxxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD16_BYTE( "52304.1b", 0x000001, 0x020000, CRC(b22b0aac) SHA1(8c62e19071a4031d0dcad621cce0ba550702659b) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_REGION( 0x40000, "txtiles", 0 )    /* Text Layer */
+	ROM_LOAD16_BYTE( "52305.1a", 0x000001, 0x020000, CRC(56546fb4) SHA1(5e4dc1665ca96bf24b89d92c24f5ff8420cb465e) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "52304.1b", 0x000000, 0x020000, CRC(b22b0aac) SHA1(8c62e19071a4031d0dcad621cce0ba550702659b) ) // 1xxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0xc00000, "gfx3", 0 )   /* Sprites (256 colors) */
+	ROM_REGION( 0xc00000, "sprites0", 0 )   /* Sprites (256 colors) */
 	ROM_LOAD32_WORD( "52306.9f", 0x0000000, 0x400000, CRC(5ff0f666) SHA1(e3f1d9dc84fbef73af37cefd90bdf87a35f59e0e) )
 	ROM_LOAD32_WORD( "52308.9d", 0x0000002, 0x400000, CRC(20817051) SHA1(4c9a443b5d6353ce67d5b1fe716f5ac20d194ef0) )
 	ROM_LOAD32_WORD( "52307.9e", 0x0800000, 0x200000, CRC(01555191) SHA1(7751e2e16345acc638d4dff997a5b52e9171fced) )
 	ROM_LOAD32_WORD( "52309.9c", 0x0800002, 0x200000, CRC(ef4f4bd9) SHA1(3233f501002a2622ddda581167ae24b1a13ea79e) )
 
-	ROM_REGION( 0x200000, "gfx4", 0 )   /* Sprites (16 colors) */
+	ROM_REGION( 0x200000, "sprites1", 0 )   /* Sprites (16 colors) */
 	ROM_LOAD( "52312.14f", 0x000000, 0x200000, CRC(2203d7c5) SHA1(0403f02b8f2bfc6cf98ff598eb9c2e3facc7ac4c) )
 
 	ROM_REGION( 0x400000, "ymz", 0 )    /* Samples */
@@ -1137,21 +1108,21 @@ ROM_START( realbrkk )
 	ROM_LOAD16_BYTE( "600k_02b", 0x000000, 0x080000, CRC(fdca08b1) SHA1(69b35c85b1842d0a8c98fc519b46c72954322ceb) )
 	ROM_LOAD16_BYTE( "600k_01b", 0x000001, 0x080000, CRC(b6fe8998) SHA1(86f7d6067e007de50a02478a0e583ab64408bc4f) )
 
-	ROM_REGION( 0x800000, "gfx1", 0 )   /* Backgrounds */
+	ROM_REGION( 0x800000, "bgtiles", 0 )   /* Backgrounds */
 	ROM_LOAD32_WORD( "52310.9b", 0x0000000, 0x400000, CRC(07dfd9f5) SHA1(8722a98adc33f56df1e3b194ce923bc987e15cbe) )
 	ROM_LOAD32_WORD( "52311.9a", 0x0000002, 0x400000, CRC(136a93a4) SHA1(b4bd46ba6c2b367aaf362f67d8be4757f1160864) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )    /* Text Layer */
-	ROM_LOAD16_BYTE( "600k_05", 0x000000, 0x020000, CRC(4de1d95e) SHA1(093d6d229b0e43e35f84a8d1bd707ccd1452fa91) )  // 1xxxxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD16_BYTE( "600k_04", 0x000001, 0x020000, CRC(70f2cf3d) SHA1(214550b1a838243fadf5c6b8ba6cbecef2031985) )  // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_REGION( 0x40000, "txtiles", 0 )    /* Text Layer */
+	ROM_LOAD16_BYTE( "600k_05", 0x000001, 0x020000, CRC(4de1d95e) SHA1(093d6d229b0e43e35f84a8d1bd707ccd1452fa91) )  // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "600k_04", 0x000000, 0x020000, CRC(70f2cf3d) SHA1(214550b1a838243fadf5c6b8ba6cbecef2031985) )  // 1xxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0xc00000, "gfx3", 0 )   /* Sprites (256 colors) */
+	ROM_REGION( 0xc00000, "sprites0", 0 )   /* Sprites (256 colors) */
 	ROM_LOAD32_WORD( "52306.9f",   0x0000000, 0x400000, CRC(5ff0f666) SHA1(e3f1d9dc84fbef73af37cefd90bdf87a35f59e0e) )
 	ROM_LOAD32_WORD( "52308.9d",   0x0000002, 0x400000, CRC(20817051) SHA1(4c9a443b5d6353ce67d5b1fe716f5ac20d194ef0) )
 	ROM_LOAD32_WORD( "mm60007.9e", 0x0800000, 0x200000, CRC(a1d40934) SHA1(59b85435b13c6617e79b8d995506e585b6c8bedd) )
 	ROM_LOAD32_WORD( "mm60009.9c", 0x0800002, 0x200000, CRC(58c03a6c) SHA1(ec7ae49bba6ffdba0f79f1e41e14945f6c3acb1d) )
 
-	ROM_REGION( 0x200000, "gfx4", 0 )   /* Sprites (16 colors) */
+	ROM_REGION( 0x200000, "sprites1", 0 )   /* Sprites (16 colors) */
 	ROM_LOAD( "mm60012.14f", 0x000000, 0x200000, CRC(2b5ba1ec) SHA1(d548ef8c96b7b868c866dedb314f56583726564d) )
 
 	ROM_REGION( 0x400000, "ymz", 0 )    /* Samples */
@@ -1165,15 +1136,15 @@ ROM_START( dai2kaku )
 	ROM_LOAD16_BYTE( "52201b.2r", 0x000000, 0x080000, CRC(5672cbe6) SHA1(4379edd0725e1b8cd5b3f9201e484487eccd1714) )
 	ROM_LOAD16_BYTE( "52202b.1r", 0x000001, 0x080000, CRC(e45d6368) SHA1(5fb39b7c2e0fd474e7c366279f616b9244e6cf2e) )
 
-	ROM_REGION( 0x800000, "gfx1", 0 )   /* Backgrounds */
+	ROM_REGION( 0x800000, "bgtiles", 0 )   /* Backgrounds */
 	ROM_LOAD32_WORD( "52210.9b", 0x0000000, 0x400000, CRC(29f0cd88) SHA1(e8eab4f3e4cb12663874d4f4a2fefc77d15fa078) )
 	ROM_LOAD32_WORD( "52211.9a", 0x0000002, 0x400000, CRC(304f896d) SHA1(fe46e0a9c497f1a9587933929520e1b7a9321c01) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )    /* Text Layer */
-	ROM_LOAD16_BYTE( "52205.1a", 0x000000, 0x020000, CRC(4b7d16c0) SHA1(5f6410121ec13bea2869d61db169dbe2536453ea) )
-	ROM_LOAD16_BYTE( "52204.1b", 0x000001, 0x020000, CRC(47a39496) SHA1(3ac9499b70c63185fb65378c18d4ff30ba1d2f2b) )
+	ROM_REGION( 0x40000, "txtiles", 0 )    /* Text Layer */
+	ROM_LOAD16_BYTE( "52205.1a", 0x000001, 0x020000, CRC(4b7d16c0) SHA1(5f6410121ec13bea2869d61db169dbe2536453ea) )
+	ROM_LOAD16_BYTE( "52204.1b", 0x000000, 0x020000, CRC(47a39496) SHA1(3ac9499b70c63185fb65378c18d4ff30ba1d2f2b) )
 
-	ROM_REGION( 0x800000, "gfx3", 0 )   /* Sprites (256 colors) */
+	ROM_REGION( 0x800000, "sprites0", 0 )   /* Sprites (256 colors) */
 	ROM_LOAD32_WORD( "52206.9f", 0x0000000, 0x400000, CRC(a8811f46) SHA1(f26fd3b567cd2974970a9e4495a16d8a3406c5d1) )
 	ROM_LOAD32_WORD( "52208.9d", 0x0000002, 0x400000, CRC(00c39300) SHA1(2dd2420700d9a6ec2ade595bccd25725bf60762b) )
 
@@ -1253,15 +1224,15 @@ ROM_START( dai2kaku_alt_rom_size )
 	ROM_LOAD16_BYTE( "1r", 0x000000, 0x080000, CRC(5672cbe6) SHA1(4379edd0725e1b8cd5b3f9201e484487eccd1714) )
 	ROM_LOAD16_BYTE( "2r", 0x000001, 0x080000, CRC(e45d6368) SHA1(5fb39b7c2e0fd474e7c366279f616b9244e6cf2e) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "bgtiles", 0 )
 	ROM_LOAD32_WORD( "9b", 0x000000, 0x200000, CRC(eab21697) SHA1(28540e04c0d4040328f3d3373e623138a8730c07) )
 	ROM_LOAD32_WORD( "9a", 0x000002, 0x200000, CRC(1b12dd4e) SHA1(8be13b72b2427eb66f1c4f736aa8bde0a8e1bc9b) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "nm52204.1b", 0x000000, 0x020000, CRC(47a39496) SHA1(3ac9499b70c63185fb65378c18d4ff30ba1d2f2b) )
-	ROM_LOAD16_BYTE( "nm52205.1a", 0x000001, 0x020000, CRC(4b7d16c0) SHA1(5f6410121ec13bea2869d61db169dbe2536453ea) )
+	ROM_REGION( 0x40000, "txtiles", 0 )
+	ROM_LOAD16_BYTE( "nm52204.1b", 0x000001, 0x020000, CRC(47a39496) SHA1(3ac9499b70c63185fb65378c18d4ff30ba1d2f2b) )
+	ROM_LOAD16_BYTE( "nm52205.1a", 0x000000, 0x020000, CRC(4b7d16c0) SHA1(5f6410121ec13bea2869d61db169dbe2536453ea) )
 
-	ROM_REGION( 0x400000, "gfx3", 0 )
+	ROM_REGION( 0x400000, "sprites0", 0 )
 	ROM_LOAD32_WORD( "9f", 0x000000, 0x200000, CRC(63a1a280) SHA1(a6a4b7ebe2b8d57f5c1fce43c9b28c5dc2d6057a) )
 	ROM_LOAD32_WORD( "9d", 0x000002, 0x200000, CRC(1743a929) SHA1(4756e9c567c406f635c6380e263f38a6a2a82038) )
 

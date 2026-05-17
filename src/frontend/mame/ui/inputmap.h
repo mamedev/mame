@@ -25,7 +25,7 @@ namespace ui {
 class menu_input_groups : public menu
 {
 public:
-	menu_input_groups(mame_ui_manager &mui, render_container &container);
+	menu_input_groups(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_input_groups() override;
 
 private:
@@ -55,7 +55,7 @@ protected:
 	};
 	using data_vector = std::vector<input_item_data>;
 
-	menu_input(mame_ui_manager &mui, render_container &container);
+	menu_input(mame_ui_manager &mui, render_target &target);
 
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
@@ -91,7 +91,7 @@ private:
 class menu_input_general : public menu_input
 {
 public:
-	menu_input_general(mame_ui_manager &mui, render_container &container, int group, std::string &&heading);
+	menu_input_general(mame_ui_manager &mui, render_target &target, int group, std::string &&heading);
 	virtual ~menu_input_general() override;
 
 protected:
@@ -107,7 +107,7 @@ private:
 class menu_input_specific : public menu_input
 {
 public:
-	menu_input_specific(mame_ui_manager &mui, render_container &container);
+	menu_input_specific(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_input_specific() override;
 
 protected:

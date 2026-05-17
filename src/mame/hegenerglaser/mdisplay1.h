@@ -27,7 +27,7 @@ public:
 	void data_w(u8 data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
@@ -39,8 +39,8 @@ private:
 	int m_common;
 	u32 m_digit_data;
 
-	void update_lcd();
 	void lcd_pwm_w(offs_t offset, u64 data);
+	void update_lcd();
 };
 
 

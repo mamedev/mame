@@ -33,6 +33,7 @@
 #include <cctype>
 #include <ctime>
 #include <sstream>
+#include <type_traits>
 
 
 namespace {
@@ -111,7 +112,7 @@ inline u8 compute_shift(ioport_value mask)
 
 const struct
 {
-	u32 id;
+	input_string_index id;
 	const char *string;
 } input_port_default_strings[] =
 {
@@ -145,10 +146,10 @@ const struct
 	{ INPUT_STRING_3C_3C, "3 Coins/3 Credits" },
 	{ INPUT_STRING_2C_2C, "2 Coins/2 Credits" },
 	{ INPUT_STRING_1C_1C, "1 Coin/1 Credit" },
-	{ INPUT_STRING_3C_5C, "3 Coins/5 Credits" },
 	{ INPUT_STRING_4C_5C, "4 Coins/5 Credits" },
 	{ INPUT_STRING_3C_4C, "3 Coins/4 Credits" },
 	{ INPUT_STRING_2C_3C, "2 Coins/3 Credits" },
+	{ INPUT_STRING_3C_5C, "3 Coins/5 Credits" },
 	{ INPUT_STRING_4C_7C, "4 Coins/7 Credits" },
 	{ INPUT_STRING_2C_4C, "2 Coins/4 Credits" },
 	{ INPUT_STRING_1C_2C, "1 Coin/2 Credits" },
@@ -3304,27 +3305,21 @@ ioport_configurer& ioport_configurer::field_set_gm_note(u8 note)
 //  ioport_token to a default string
 //-------------------------------------------------
 
-const char *ioport_configurer::string_from_token(const char *string)
+const char *ioport_configurer::string_from_token(input_string_index string)
 {
-	// 0 is an invalid index
-	if (string == nullptr)
-		return nullptr;
-
-	// if the index is greater than the count, assume it to be a pointer
-	if (uintptr_t(string) >= INPUT_STRING_COUNT)
-		return string;
-
-#if false // Set true, If you want to take care missing-token or wrong-sorting
+#if 0 // Set true, If you want to take care missing-token or wrong-sorting
 
 	// otherwise, scan the list for a matching string and return it
 	for (int index = 0; index < std::size(input_port_default_strings); index++)
-		if (input_port_default_strings[index].id == uintptr_t(string))
+		if (input_port_default_strings[index].id == string)
 			return input_port_default_strings[index].string;
 	return "(Unknown Default)";
 
 #else
 
-	return input_port_default_strings[uintptr_t(string)-1].string;
+	auto const index = std::underlying_type_t<input_string_index>(string) - 1;
+	assert(input_port_default_strings[index].id == string);
+	return input_port_default_strings[index].string;
 
 #endif
 }
@@ -3384,12 +3379,17 @@ ioport_configurer& ioport_configurer::field_alloc(ioport_type type, ioport_value
 	// append the field
 	if (type != IPT_UNKNOWN && type != IPT_UNUSED)
 		m_curport->m_active |= mask;
-	m_curfield = &m_curport->m_fieldlist.append(*new ioport_field(*m_curport, type, defval, mask, string_from_token(name)));
+	m_curfield = &m_curport->m_fieldlist.append(*new ioport_field(*m_curport, type, defval, mask, name));
 
 	// reset the current setting
 	m_cursetting = nullptr;
 	m_curshift = 0;
 	return *this;
+}
+
+ioport_configurer& ioport_configurer::field_alloc(ioport_type type, ioport_value defval, ioport_value mask, input_string_index name)
+{
+	return field_alloc(type, defval, mask, string_from_token(name));
 }
 
 
@@ -3444,8 +3444,13 @@ ioport_configurer& ioport_configurer::setting_alloc(ioport_value value, const ch
 		throw emu_fatalerror("setting_alloc called with no active field (value=%X name=%s)\n", value, name);
 
 	// append a new setting
-	m_cursetting = &m_curfield->m_settinglist.emplace_back(*m_curfield, value & m_curfield->mask(), string_from_token(name));
+	m_cursetting = &m_curfield->m_settinglist.emplace_back(*m_curfield, value & m_curfield->mask(), name);
 	return *this;
+}
+
+ioport_configurer& ioport_configurer::setting_alloc(ioport_value value, input_string_index name)
+{
+	return setting_alloc(value, string_from_token(name));
 }
 
 
@@ -3481,6 +3486,11 @@ ioport_configurer& ioport_configurer::onoff_alloc(const char *name, ioport_value
 	// clear cursettings set by setting_alloc
 	m_cursetting = nullptr;
 	return *this;
+}
+
+ioport_configurer& ioport_configurer::onoff_alloc(input_string_index name, ioport_value defval, ioport_value mask, const char *diplocation)
+{
+	return onoff_alloc(string_from_token(name), defval, mask, diplocation);
 }
 
 

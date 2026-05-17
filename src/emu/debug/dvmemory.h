@@ -134,7 +134,6 @@ private:
 
 	// internal state
 	debug_view_expression m_expression;         // expression describing the start address
-	offs_t              m_expression_computed;  // latest value of computed expression
 	u32                 m_chunks_per_row;       // number of chunks displayed per line
 	u8                  m_bytes_per_chunk;      // bytes per chunk
 	u8                  m_steps_per_chunk;      // bytes per chunk

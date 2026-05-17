@@ -217,13 +217,13 @@ void trident_4dwavedx_device::io_map(address_map &map)
 
 //  map(0x20, 0x23) Legacy MPU-401
 
-//  map(0x30, 0x31) Legacy Game Port
+//  map(0x30, 0x31) Legacy Game Port (used by Linux boot in misc/voyager.cpp)
 //  map(0x34, 0x37) Enhanced Game Port 1
 //  map(0x38, 0x3b) Enhanced Game Port 2
 
 	map(0x40, 0x43).rw(m_ac97, FUNC(ac97_stac9704_device::codec_write_r), FUNC(ac97_stac9704_device::codec_write_w));
 	map(0x44, 0x47).rw(m_ac97, FUNC(ac97_stac9704_device::codec_read_r), FUNC(ac97_stac9704_device::codec_read_w));
-//  map(0x48, 0x4b) AC'97 Command/Status
+	map(0x48, 0x4b).rw(m_ac97, FUNC(ac97_stac9704_device::codec_status_r), FUNC(ac97_stac9704_device::codec_command_w));
 
 //  map(0x50, 0x50) 4DWAVE-DX Status (r/o)
 //  map(0x54, 0x55) Legacy SB Frequency (r/o)

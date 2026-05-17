@@ -18251,6 +18251,9 @@ specd9
 specd9105g
 starball
 
+@source:excellent/es9606.cpp
+keirind2
+
 @source:excellent/gcpinbal.cpp
 gcpinbal
 pwrflip
@@ -19601,6 +19604,7 @@ pokesmqz
 pokexyqz
 smkatsum
 tomyspt
+udrive
 yuleyuan
 
 @source:handheld/gameking.cpp
@@ -19623,6 +19627,48 @@ taturtf
 
 @source:handheld/generalplus_gpel31xx.cpp
 tamameet
+
+@source:handheld/generalplus_gpl162xx_lcdtype.cpp
+pcp8718
+pcp8728
+bkid218
+
+@source:handheld/generalplus_gpl951xx.cpp
+fixitflx
+bfdigdug
+bfgalaga
+bfmpac
+bfpacman
+bfspyhnt
+bftetris
+bubltea
+dsgnpal
+flufflav
+pockrmsr
+pokebala
+pokeissh
+pokemech
+pokgoget
+punifrnd
+punij1m
+punij1pk
+punij1pu
+punij2pk
+punirune
+punirunea
+punistar
+segapet1
+segapet1a
+segapet2
+segapet2a
+segapet3
+segapet3a
+segaptdx
+smkcatch
+smkgacha
+smkguras
+smkgurasa
+wiwcs
 
 @source:handheld/gmaster.cpp
 gmaster
@@ -20290,6 +20336,9 @@ mm5a
 rebel5
 rebel5a
 rebel5b
+
+@source:hegenerglaser/mm6.cpp
+mm6
 
 @source:hegenerglaser/modena.cpp
 modena
@@ -20959,10 +21008,12 @@ lucky8q
 lucky8r
 lucky8s
 lucky8t
+lucky8tet
 lucky8u
 lucky8v
 lucky8w
-lucky8tet
+lucky8x
+lucky8y
 luckybar
 luckylad
 magodds
@@ -20979,6 +21030,7 @@ moonlght
 moonlghta
 moonlghtb
 moonlghtc
+mtonic
 mtonic2
 nc96
 nc96a
@@ -21405,6 +21457,7 @@ ketarrs15
 ketarrs151
 ketb
 ketbl
+ketikd
 killbld
 killbld100
 killbld104
@@ -25258,6 +25311,7 @@ konzero
 luckfoun
 mohicans
 monshow
+rapfire5
 romanl
 safemon
 safemonn
@@ -25265,7 +25319,6 @@ showqn
 spiceup
 sultanw
 whiterus
-rapfire5
 
 @source:konami/kongs470.cpp
 tdbingo
@@ -25615,6 +25668,7 @@ citybombj
 gradius
 gradiusb
 gwarrior
+gwarriorb
 hcrash
 hcrashc
 kittenk
@@ -25625,6 +25679,7 @@ nemesis
 nemesisuk
 nyanpani
 rf2
+rf2b
 salamand
 salamandj
 salamandt
@@ -29029,6 +29084,9 @@ rfmpb
 rfmpbr2
 swe1pb
 
+@source:midway/predators.cpp
+predtors
+
 @source:midway/seattle.cpp
 biofreak
 blitz
@@ -30155,6 +30213,7 @@ fun4
 fun4a
 
 @source:misc/banpresto_bpsc68000.cpp
+csdaruma
 lnumbers
 
 @source:misc/beaminv.cpp
@@ -31493,6 +31552,7 @@ gtsers12a
 gtsers14
 gtsers14a
 gtsers15
+gtsers15a
 gtsers18
 gtsers2
 gtsers3
@@ -34527,6 +34587,7 @@ dsabera
 dsaberj
 finalap2
 finalap2j
+finalap2jb
 finalap3
 finalap3a
 finalap3bl
@@ -35995,6 +36056,7 @@ dnce2000
 nytsudo
 papsudok
 pjoypj001
+popstar
 pv95in1
 racechl8
 vtvppong
@@ -36044,6 +36106,7 @@ dgun2959
 dgun851
 dgun853
 fccomp88
+gamekid
 gamezn2
 hs36blk
 hs36red
@@ -36092,6 +36155,8 @@ vt25in1
 vtboxing
 vtpinball
 vtsndtest
+vjtv2500
+vjtv2501
 wldsoctv
 zdog
 zudugo
@@ -36149,6 +36214,7 @@ micac250
 myaasa
 myaass
 mymman
+orb300
 retror30
 rminitv
 tvkunio1
@@ -36254,6 +36320,7 @@ tup240
 unk128vt
 unk198vt
 unkra200
+urban240
 vibes240
 vibes240a
 zl383
@@ -36985,6 +37052,7 @@ zodiack
 
 @source:orla/hk1000.cpp
 hk1000
+se41
 
 @source:orla/xm200.cpp
 xm200
@@ -37095,6 +37163,7 @@ mspacmanbhe
 mspacmanbi
 mspacmanblt
 mspacmanblt2
+mspacmanblt3
 mspacmanbpl
 mspacmancr
 mspacmane
@@ -40305,8 +40374,22 @@ psion3mx
 psion3mx_fr
 psion3mx_nl
 
-@source:psion/psion5.cpp
+@source:psion/psion5mx.cpp
+mako
+mc218
+mc218_de
+mc218_fr
 psion5mx
+psion5mx_fr
+psion5mxp
+psion5mxp_de
+revo
+revo_de
+revo_fr
+
+@source:psion/psion7.cpp
+netbook
+psion7
 
 @source:psion/psionhc.cpp
 psionhc100
@@ -40316,6 +40399,7 @@ psionhc120
 @source:psion/siena.cpp
 siena
 siena_fr
+siena_us
 
 @source:psion/workabout.cpp
 psionwa
@@ -40565,6 +40649,7 @@ s10
 s220
 
 @source:roland/roland_s50.cpp
+s330
 s50
 s550
 w30
@@ -43144,7 +43229,7 @@ wizt
 wizta
 
 @source:sequential/prophet5.cpp
-prophet5rev30
+prophet5r30
 
 @source:sequential/prophet600.cpp
 prpht600
@@ -43811,6 +43896,9 @@ am1000
 burningr
 creepyrl
 
+@source:skeleton/amlogic_aml7212.cpp
+popstarz
+
 @source:skeleton/amusement_6502.cpp
 unkamus
 
@@ -44053,6 +44141,7 @@ dynasty
 @source:skeleton/dyna_dc4000.cpp
 aladdin
 aladdina
+aladdinb
 cmast92
 cmast92a
 dynamj
@@ -44113,9 +44202,6 @@ waveterm
 
 @source:skeleton/extrema_m27sv.cpp
 multgmxl
-
-@source:skeleton/falconun.cpp
-falconun
 
 @source:skeleton/fanucs15.cpp
 fanucs15
@@ -44269,9 +44355,17 @@ kron180
 
 
 @source:skeleton/lanmao.cpp
+gongfuxm
 lanmao
+ljian
+lzhudie
 msaiche
 panda2
+pkzw
+tzwang
+xqingwa
+whujiang
+whujijqb
 
 @source:skeleton/leadsinger2.cpp
 leadsng2
@@ -44476,6 +44570,9 @@ pm68k
 @source:skeleton/powerpack.cpp
 powerpack
 
+@source:skeleton/probowl.cpp
+probowl
+
 @source:skeleton/proteus3.cpp
 proteus3
 
@@ -44611,6 +44708,7 @@ luckyvl
 
 @source:skeleton/tamagotchi_pix.cpp
 precur2w
+rotom800
 tamapix
 
 @source:skeleton/tavernie.cpp
@@ -44733,6 +44831,11 @@ hongmxy
 
 @source:skeleton/xor100.cpp
 xor100
+
+@source:skeleton/yeno_ks56c1660.cpp
+ckidpers
+intelct2
+misterx2
 
 @source:skeleton/zeebo_qualcomm_adreno130.cpp
 zeebo
@@ -46614,6 +46717,7 @@ trckydoca
 musicbal
 speedbal
 speedbala
+speedbalb
 
 @source:technos/battlane.cpp
 battlane
@@ -46765,6 +46869,7 @@ drgnbowla
 gaiden
 mastninj
 raiga
+raigaa
 ryukendn
 ryukendna
 shadoww
@@ -47284,6 +47389,7 @@ tigerhb1
 tigerhb2
 tigerhb3
 tigerhb4
+tigerhbt
 tigerhj
 
 @source:toaplan/slapfght_ms.cpp
@@ -47660,6 +47766,7 @@ smartfp
 smartfpf
 smartfps
 tkmag220
+typo176
 
 @source:tvgames/generalplus_gpl16250_romram.cpp
 jak_pf
@@ -47694,47 +47801,7 @@ pokegach
 prailpls
 starbuck
 vmastspi
-
-@source:tvgames/generalplus_gpl951xx.cpp
-fixitflx
-bfdigdug
-bfgalaga
-bfmpac
-bfpacman
-bfspyhnt
-bftetris
-bubltea
-dsgnpal
-flufflav
-pockrmsr
-pokebala
-pokeissh
-pokemech
-pokgoget
-punifrnd
-punij1m
-punij1pk
-punij1pu
-punij2pk
-punirune
-punistar
-segapet1
-segapet1a
-segapet2
-segapet2a
-segapet3
-segapet3a
-segaptdx
-smkcatch
-smkgacha
-smkguras
-smkgurasa
-wiwcs
-
-@source:tvgames/generalplus_gpl162xx_lcdtype.cpp
-pcp8718
-pcp8728
-bkid218
+wildking
 
 @source:tvgames/generalplus_gpl32612.cpp
 airobo
@@ -47763,6 +47830,7 @@ jak_ddhp
 jak_prhp
 jak_swbstrik
 jak_tmnthp
+jpad
 jpaddp
 kidizmb
 kidizmp
@@ -47824,6 +47892,7 @@ conyfght
 conyping
 conyteni
 easports
+easportsa
 easportsu
 jak_blue
 jak_bobb
@@ -48409,6 +48478,7 @@ panic
 panic2
 panic3
 panic4
+panicbl
 panicger
 panich
 
@@ -49151,6 +49221,7 @@ lucky74b
 lucky88w
 
 @source:wing/pinkiri8.cpp
+4jokers
 janmu
 janshi
 pinkiri8

@@ -7,6 +7,8 @@
    The CuboCD32 is a stock retail CD32 unit with additional hardware to adapt it
    for JAMMA use.
 
+   Hold coin1 at startup for service mode in all games
+
    TODO:
    - remove m_input_hack functions, needed to make inputs working;
    - extra RTC device mapped on i2c bus (shared with the Akiko one?);
@@ -1440,8 +1442,8 @@ GAME( 1995, lasstixx,  cubo, cubo, lasstixx, cubo_state, init_lasstixx, ROT0, "C
 GAME( 1995, mgnumber,  cubo, cubo, mgnumber, cubo_state, init_mgnumber, ROT0, "CD Express",    "Magic Number",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, mgprem11,  cubo, cubo, mgprem11, cubo_state, init_mgprem11, ROT0, "CD Express",    "Magic Premium (v1.1)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, eldoralg,  cubo, cubo, eldoralg, cubo_state, init_cubo,     ROT0, "Shangai Games", "Eldorado (4.2)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // touchscreen is offset and throws errors in calibration menu, joystick buttons aren't recognized properly in places, uses SPRES=3 (SHRES) for roulette ball in attract
-GAME( 1998, odeontw,   cubo, cubo, eldoralg, cubo_state, init_cubo,     ROT0, "CD Express",    "Odeon Twister (v1.4)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // claims invalid RAM config once intialized (i2c RTC?), hangs with NVRAM viewer in service mode
-GAME( 1998, odeontw2,  cubo, cubo, eldoralg, cubo_state, init_cubo,     ROT0, "CD Express",    "Odeon Twister 2 (v202.19)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "Security checking failed" once initialized
+GAME( 1998, odeontw,   cubo, cubo, eldoralg, cubo_state, init_cubo,     ROT0, "CD Express",    "Odeon Twister (v1.4)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // claims invalid RAM config once intialized (i2c RTC? bp c217e,1,{curpc=c2184;g}), hangs with NVRAM viewer in service mode, no touchscreen inputs in gameplay
+GAME( 1998, odeontw2,  cubo, cubo, eldoralg, cubo_state, init_cubo,     ROT0, "CD Express",    "Odeon Twister 2 (v202.19)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // PIC "Security checking failed" once initialized
 // Laser Gate 2, alt title for Eldorado?
 // Lucky Five
 // Greyhound Race

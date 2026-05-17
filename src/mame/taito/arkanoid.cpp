@@ -1448,7 +1448,7 @@ void arkanoid_state::hexa(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &aysnd(AY8910(config, "aysnd", 12_MHz_XTAL/4/2)); /* Imported from arkanoid - correct? */
+	ay8910_device &aysnd(AY8910(config, "aysnd", 12_MHz_XTAL/4));
 	aysnd.port_a_read_callback().set_ioport("INPUTS");
 	aysnd.port_b_read_callback().set_ioport("DSW");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -1486,7 +1486,7 @@ void arkanoid_state::brixian(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &aysnd(AY8910(config, "aysnd", 12_MHz_XTAL/4/2)); /* Imported from arkanoid - correct? */
+	ay8910_device &aysnd(AY8910(config, "aysnd", 12_MHz_XTAL/4));
 	aysnd.port_a_read_callback().set_ioport("INPUTS");
 	aysnd.port_b_read_callback().set_ioport("DSW");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);

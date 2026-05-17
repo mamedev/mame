@@ -6,11 +6,26 @@
 Looping / Sky Bumper
 
 TODO:
-- get sound working
+- get sound fully working
 - map and test any remaining input ports
-- fix skybump random resets (MT09453)
-- fix loopinguc random resets, same bug?
-- is the COP420 internal ROM the same for all sets? (ref: "NJD" label)
+- fix loopinguc random resets (see notes right below)
+- is the COP420 internal ROM the same for all sets? ref: "NJD" label,
+  the ones that aren't known are named "cop420" in MAME
+
+About the loopinguc reset issue: As noted in protection_r, the games expect
+to read specific values (in the correct order). And if the result is either
+off or does not change after a couple of reads, the game will reset itself.
+The loopinguc set will trigger a reset on average around every 5 minutes.
+
+The other US sets (including skybump) read protection_r around 10 times and
+decide they're happy and won't do any more checks. Perhaps they toned it
+down a bit due to instabilities (not as bad as MAME)? The European set
+(looping) does not check protection at all, even though it's confirmed to
+still have the COP420 chip.
+
+For loopinguc, the reset jump is at $32ba, for the other US sets at 3360.
+Inserting a NOP would probably prevent the resets, but without guarantee
+of not running into other issues.
 
 ---------------------------------------------------------------
 
@@ -81,6 +96,14 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "tilemap.h"
 
 
+#define LOG_IRQ   (1 << 1U)
+#define LOG_SOUND (2 << 1U)
+
+//#define VERBOSE (LOG_IRQ|LOG_SOUND)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
+
 namespace {
 
 
@@ -95,9 +118,6 @@ class looping_state : public driver_device
 public:
 	looping_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"),
-		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_aysnd(*this, "aysnd"),
@@ -105,7 +125,10 @@ public:
 		m_dac(*this, "dac"),
 		m_soundlatch(*this, "soundlatch"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram")
 	{ }
 
 	void looping(machine_config &config) ATTR_COLD;
@@ -122,21 +145,23 @@ private:
 	void flip_screen_y_w(int state);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
-	void level2_irq_set(int state);
+	void level2_irq_en(int state);
 	void main_irq_ack_w(int state);
 	void souint_clr(int state);
-	void ballon_enable_w(int state);
+	void balloon_enable_w(int state);
 	void out_0_w(uint8_t data);
 	void out_2_w(uint8_t data);
 	uint8_t adc_r();
 	void adc_w(uint8_t data);
 	void plr2_w(int state);
-	uint8_t cop_unk_r();
-	int cop_serial_r();
+	uint8_t cop_in_r();
+	uint8_t cop_g_r();
+	void cop_d_w(uint8_t data);
 	void cop_l_w(uint8_t data);
-	uint8_t protection_r();
-	[[maybe_unused]] void spcint(int state);
-	void int_update(int state);
+	uint8_t protection_r(offs_t offset);
+	void souint(int state);
+	void spcint(int state);
+	void int_update();
 	void sound_sw(uint8_t data);
 	void ay_enable_w(int state);
 	void speech_enable_w(int state);
@@ -151,23 +176,28 @@ private:
 	void sound_io_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 
-	// memory pointers
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
-	required_shared_ptr<uint8_t> m_spriteram;
-	uint8_t m_cop_port_l = 0;
-
-	// tilemaps
-	tilemap_t *m_bg_tilemap = nullptr;
-
+	// devices
 	required_device<tms9995_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<tms9980a_device> m_audiocpu;
 	required_device<ay8910_device> m_aysnd;
 	required_device<tms5220_device> m_tms;
 	required_device<dac_byte_interface> m_dac;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
+
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	bool m_irq_enable = false;
+	uint8_t m_cop_port_d = 0;
+	uint8_t m_cop_port_l = 0;
+	uint8_t m_cop_latch = 0;
+	uint16_t m_cop_address = 0;
 };
 
 
@@ -338,7 +368,11 @@ uint32_t looping_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 void looping_state::machine_start()
 {
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_cop_port_d));
 	save_item(NAME(m_cop_port_l));
+	save_item(NAME(m_cop_latch));
+	save_item(NAME(m_cop_address));
 }
 
 void looping_state::machine_reset()
@@ -347,7 +381,9 @@ void looping_state::machine_reset()
 	m_maincpu->ready_line(ASSERT_LINE);
 	m_maincpu->reset_line(ASSERT_LINE);
 
-	m_cop_port_l = 0;
+	m_irq_enable = true;
+	m_cop_latch = ~0;
+	m_cop_address = ~0;
 }
 
 
@@ -359,15 +395,15 @@ void looping_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(looping_state::interrupt)
 {
-	m_maincpu->set_input_line(INT_9995_INT1, ASSERT_LINE);
+	if (m_irq_enable)
+		m_maincpu->set_input_line(INT_9995_INT1, ASSERT_LINE);
 }
 
 
-void looping_state::level2_irq_set(int state)
+void looping_state::level2_irq_en(int state)
 {
-	logerror("Level 2 int = %d\n", state);
-	if (state == 0)
-		m_maincpu->set_input_line(INT_9995_INT1, ASSERT_LINE);
+	LOGMASKED(LOG_IRQ, "Level 2 int enable = %d\n", state);
+	m_irq_enable = !state;
 }
 
 
@@ -380,34 +416,41 @@ void looping_state::main_irq_ack_w(int state)
 
 void looping_state::souint_clr(int state)
 {
-	logerror("Soundint clr = %d\n", state);
 	if (state == 0)
 		m_soundlatch->acknowledge_w();
 }
 
 
-void looping_state::spcint(int state)
+void looping_state::souint(int state)
 {
-	logerror("Speech /int = %d\n", state == ASSERT_LINE ? 1 : 0);
-	m_audiocpu->set_input_line(INT_9980A_LEVEL4, state == ASSERT_LINE ? CLEAR_LINE : ASSERT_LINE);
+	LOGMASKED(LOG_IRQ, "Sound /int = %d\n", state);
+	int_update();
 }
 
 
-void looping_state::int_update(int state)
+void looping_state::spcint(int state)
 {
-	// hack necessitated by flawed input logic in TMS9980A core
+	LOGMASKED(LOG_IRQ, "Speech /int = %d\n", state);
+	int_update();
+}
+
+
+void looping_state::int_update()
+{
+	// sound interrupt level through 74148 (TMS9980A interrupts are unconventional)
 	if (m_soundlatch->pending_r())
 		m_audiocpu->set_input_line(INT_9980A_LEVEL2, ASSERT_LINE);
 	else if (!m_tms->intq_r())
 		m_audiocpu->set_input_line(INT_9980A_LEVEL4, ASSERT_LINE);
 	else
-		m_audiocpu->set_input_line(INT_9980A_CLEAR, CLEAR_LINE);
+		m_audiocpu->set_input_line(INT_9980A_CLEAR, ASSERT_LINE);
 }
+
 
 
 /*************************************
  *
- *  Custom DAC handling
+ *  Sound controls
  *
  *************************************/
 
@@ -428,13 +471,6 @@ void looping_state::sound_sw(uint8_t data)
 }
 
 
-
-/*************************************
- *
- *  Sound controls
- *
- *************************************/
-
 void looping_state::ay_enable_w(int state)
 {
 	for (int output = 0; output < 3; output++)
@@ -448,9 +484,9 @@ void looping_state::speech_enable_w(int state)
 }
 
 
-void looping_state::ballon_enable_w(int state)
+void looping_state::balloon_enable_w(int state)
 {
-	logerror("ballon_enable_w = %d\n", state);
+	LOGMASKED(LOG_SOUND, "balloon_enable_w = %d\n", state);
 }
 
 
@@ -481,27 +517,41 @@ void looping_state::plr2_w(int state)
  *
  *************************************/
 
-uint8_t looping_state::cop_unk_r()
+uint8_t looping_state::cop_g_r()
 {
-	return 1;
+	// G0: A3 (latched)
+	return BIT(m_cop_address, 3);
 }
 
-int looping_state::cop_serial_r()
+uint8_t looping_state::cop_in_r()
 {
-	return 1;
+	// IN1-IN3: A1,A2,A4 (latched)
+	return bitswap<3>(m_cop_address, 4, 2, 1) << 1;
+}
+
+void looping_state::cop_d_w(uint8_t data)
+{
+	// D1: clock L latch
+	if (BIT(data & ~m_cop_port_d, 1))
+		m_cop_latch = m_cop_port_l;
+
+	m_cop_port_d = data;
 }
 
 void looping_state::cop_l_w(uint8_t data)
 {
 	m_cop_port_l = data;
-	//logerror("%02x  ",data);
 }
 
-uint8_t looping_state::protection_r()
+uint8_t looping_state::protection_r(offs_t offset)
 {
+	// latch address pins when reading protection latch
+	if (!machine().side_effects_disabled())
+		m_cop_address = ~offset;
+
 	// The code reads ($7002) ($7004) alternately
 	// The result must change at least once every 10 reads
-	// A read from ($34b0 + result) must == $01
+	// A read from ($34b0 + result) must == $01 ($33f8 for loopinguc)
 
 	// Valid values:
 	//     $61 $67
@@ -509,16 +559,7 @@ uint8_t looping_state::protection_r()
 	//     $DB
 	//     $E1
 	//     $F3 $F7 $FD $FF
-
-	// Because they read alternately from different locations,
-	// it is trivial to bypass the protection.
-
-	// cop write alternately $02 $01 $08 $04 in port $102
-	// cop write randomly fc (unfortunately) but 61,67,b7,bf,db,e1,f3,fd,ff too and only these values
-
-	// missing something
-	if (m_cop_port_l != 0xfc) return m_cop_port_l;
-	return 0xff;
+	return m_cop_latch;
 }
 
 
@@ -530,8 +571,8 @@ uint8_t looping_state::protection_r()
 
 void looping_state::map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
-	map(0x7000, 0x7007).r(FUNC(looping_state::protection_r));
+	map(0x0000, 0x6fff).rom();
+	map(0x7000, 0x7fff).r(FUNC(looping_state::protection_r));
 
 	map(0x9000, 0x93ff).ram().w(FUNC(looping_state::videoram_w)).share(m_videoram);
 
@@ -560,9 +601,11 @@ void looping_state::sound_map(address_map &map)
 	map.global_mask(0x3fff);
 	map(0x0000, 0x37ff).rom();
 	map(0x3800, 0x3bff).ram();
+
 	map(0x3c00, 0x3c00).mirror(0x00f4).rw(m_aysnd, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0x3c01, 0x3c01).mirror(0x00f6).noprw();
 	map(0x3c02, 0x3c02).mirror(0x00f4).nopr().w(m_aysnd, FUNC(ay8910_device::data_w));
+
 	map(0x3e00, 0x3e00).mirror(0x00f4).nopr().w(m_tms, FUNC(tms5220_device::data_w));
 	map(0x3e01, 0x3e01).mirror(0x00f6).noprw();
 	map(0x3e02, 0x3e02).mirror(0x00f4).r(m_tms, FUNC(tms5220_device::status_r)).nopw();
@@ -570,8 +613,8 @@ void looping_state::sound_map(address_map &map)
 
 void looping_state::sound_io_map(address_map &map)
 {
-	map(0x0000, 0x000f).w("sen0", FUNC(ls259_device::write_d0));
-	map(0x0010, 0x001f).w("sen1", FUNC(ls259_device::write_d0));
+	map(0x0000, 0x000f).w("sen0", FUNC(ls259_device::write_d0)); // write_a0 according to schematics
+	map(0x0010, 0x001f).w("sen1", FUNC(ls259_device::write_d0)); // "
 }
 
 
@@ -618,13 +661,15 @@ void looping_state::looping(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &looping_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &looping_state::sound_io_map);
 
-	cop420_cpu_device &cop(COP420(config, "mcu", 8_MHz_XTAL / 2)); // unknown guess
-	cop.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false);
+	cop420_cpu_device &cop(COP420(config, "mcu", 750'000)); // approximation - RC osc. R=150K, C=47pF
+	cop.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	cop.write_d().set(FUNC(looping_state::cop_d_w));
 	cop.write_l().set(FUNC(looping_state::cop_l_w));
-	cop.read_l().set(FUNC(looping_state::cop_unk_r));
-	cop.read_g().set(FUNC(looping_state::cop_unk_r));
-	cop.read_in().set(FUNC(looping_state::cop_unk_r));
-	cop.read_si().set(FUNC(looping_state::cop_serial_r));
+	cop.read_l_tristate().set_constant(0xff);
+	cop.read_g().set(FUNC(looping_state::cop_g_r));
+	cop.read_in().set(FUNC(looping_state::cop_in_r));
+
+	config.set_perfect_quantum(m_audiocpu);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // C9 on CPU board
 	// Q0 = A16
@@ -648,7 +693,7 @@ void looping_state::looping(machine_config &config)
 	PALETTE(config, m_palette, FUNC(looping_state::palette_init), 32);
 
 	ls259_device &videolatch(LS259(config, "videolatch")); // E2 on video board
-	videolatch.q_out_cb<1>().set(FUNC(looping_state::level2_irq_set));
+	videolatch.q_out_cb<1>().set(FUNC(looping_state::level2_irq_en));
 	videolatch.q_out_cb<6>().set(FUNC(looping_state::flip_screen_x_w));
 	videolatch.q_out_cb<7>().set(FUNC(looping_state::flip_screen_y_w));
 
@@ -656,8 +701,7 @@ void looping_state::looping(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	//m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INT_9980A_LEVEL2);
-	m_soundlatch->data_pending_callback().set(FUNC(looping_state::int_update));
+	m_soundlatch->data_pending_callback().set(FUNC(looping_state::souint));
 	m_soundlatch->set_separate_acknowledge(true);
 
 	AY8910(config, m_aysnd, 8_MHz_XTAL / 4);
@@ -665,8 +709,7 @@ void looping_state::looping(machine_config &config)
 	m_aysnd->add_route(ALL_OUTPUTS, "speaker", 0.2);
 
 	TMS5220(config, m_tms, 640'000);
-	//m_tms->irq_cb().set(FUNC(looping_state::spcint));
-	m_tms->irq_cb().set(FUNC(looping_state::int_update));
+	m_tms->irq_cb().set(FUNC(looping_state::spcint));
 	m_tms->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
@@ -678,7 +721,7 @@ void looping_state::looping(machine_config &config)
 	ls259_device &sen1(LS259(config, "sen1")); // A1 on sound board with outputs connected to 4016 at B1
 	sen1.q_out_cb<0>().set(FUNC(looping_state::ay_enable_w));
 	sen1.q_out_cb<1>().set(FUNC(looping_state::speech_enable_w));
-	sen1.q_out_cb<2>().set(FUNC(looping_state::ballon_enable_w));
+	sen1.q_out_cb<2>().set(FUNC(looping_state::balloon_enable_w));
 }
 
 
@@ -693,10 +736,10 @@ static INPUT_PORTS_START( looping )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Shoot")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Accelerate?")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
@@ -769,7 +812,7 @@ ROM_START( looping )
 	ROM_LOAD( "loopa11.bin",   0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) // speech
 
 	ROM_REGION( 0x0400, "mcu", 0 ) // COP420 microcontroller code
-	ROM_LOAD( "cop.bin",       0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) ) // taken from the other sets
+	ROM_LOAD( "cop420-njd_n",  0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) ) // taken from the other sets
 
 	ROM_REGION( 0x1000, "gfx", 0 )
 	ROM_LOAD( "loopaa8.bin",   0x0000, 0x0800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
@@ -792,7 +835,7 @@ ROM_START( loopingu )
 	ROM_LOAD( "i-o.11a",       0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) // speech
 
 	ROM_REGION( 0x0400, "mcu", 0 ) // COP420 microcontroller code
-	ROM_LOAD( "cop.bin",       0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
+	ROM_LOAD( "cop420",        0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
 
 	ROM_REGION( 0x1000, "gfx", 0 )
 	ROM_LOAD( "log2.8a",       0x0000, 0x0800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
@@ -816,7 +859,7 @@ ROM_START( loopingua )
 	ROM_LOAD( "i-o.11a",       0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
 
 	ROM_REGION( 0x0400, "mcu", 0 ) // COP420 microcontroller code
-	ROM_LOAD( "cop.bin",       0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
+	ROM_LOAD( "cop420",        0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
 
 	ROM_REGION( 0x1000, "gfx", 0 )
 	ROM_LOAD( "log2.8a",       0x0000, 0x0800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
@@ -897,7 +940,7 @@ ROM_START( skybump )
 	ROM_LOAD( "snd.11a",       0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
 
 	ROM_REGION( 0x0400, "mcu", 0 ) // COP420 microcontroller code
-	ROM_LOAD( "cop.bin",       0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
+	ROM_LOAD( "cop420",        0x0000, 0x0400, CRC(d47fecec) SHA1(7eeedcb40f4cd50e1e259c6b01744a3fc97b60aa) )
 
 	ROM_REGION( 0x1000, "gfx", 0 )
 	ROM_LOAD( "vid.8a",        0x0000, 0x0800, CRC(459ccc55) SHA1(747f6789605b48be9e22f779f9e3f6c98ad4e594) )

@@ -536,7 +536,7 @@ uint8_t dynax_state::hjingi_keyboard_0_r()
 
 uint8_t dynax_adpcm_state::hjingi_keyboard_1_r()
 {
-	return hanamai_keyboard_r<1>() | ioport("BET")->read();
+	return hanamai_keyboard_r<1>() | m_bet->read();
 }
 
 void dynax_adpcm_state::hjingi_mem_map(address_map &map)
@@ -631,7 +631,7 @@ uint8_t dynax_adpcm_state::yarunara_input_r(offs_t offset)
 		switch (m_input_sel)
 		{
 		case 0x00:
-			result = ioport("COINS")->read(); // coins
+			result = m_coins->read(); // coins
 			break;
 
 		case 0x02:
@@ -914,15 +914,14 @@ void jantouki_state::jantouki_sound_io_map(address_map &map)
 
 uint8_t dynax_state::mjelctrn_keyboard_1_r()
 {
-	return (hanamai_keyboard_r<1>() & 0x3f) | (ioport("FAKE")->read() ? 0x40 : 0);
+	return (hanamai_keyboard_r<1>() & 0x3f) | (m_io_fake->read() ? 0x40 : 0);
 }
 
 uint8_t dynax_state::mjelctrn_dsw_r()
 {
-	int dsw = (m_keyb & 0xc0) >> 6;
-	static const char *const dswnames[] = { "DSW0", "DSW1", "DSW2", "DSW3" };
+	int const dsw = (m_keyb & 0xc0) >> 6;
 
-	return ioport(dswnames[dsw])->read();
+	return m_dsw[dsw]->read();
 }
 
 void dynax_adpcm_state::mjelctrn_io_map(address_map &map)
@@ -1075,7 +1074,7 @@ uint8_t dynax_state::tenkai_ip_r(offs_t offset)
 		{
 		case 0x00:
 		case 0x80:
-			result = ioport("COINS")->read(); // coins
+			result = m_coins->read(); // coins
 			break;
 
 		case 0x02:
@@ -1132,11 +1131,11 @@ void dynax_state::tenkai_dswsel_w(uint8_t data)
 uint8_t dynax_state::tenkai_dsw_r()
 {
 	uint8_t result = 0xff;
-	if (!BIT(m_dsw_sel, 0)) result &= ioport("DSW0")->read();
-	if (!BIT(m_dsw_sel, 1)) result &= ioport("DSW1")->read();
-	if (!BIT(m_dsw_sel, 2)) result &= ioport("DSW2")->read();
-	if (!BIT(m_dsw_sel, 3)) result &= ioport("DSW3")->read();
-	if (!BIT(m_dsw_sel, 4)) result &= ioport("DSW4")->read();
+	if (!BIT(m_dsw_sel, 0)) result &= m_dsw[0]->read();
+	if (!BIT(m_dsw_sel, 1)) result &= m_dsw[1]->read();
+	if (!BIT(m_dsw_sel, 2)) result &= m_dsw[2]->read();
+	if (!BIT(m_dsw_sel, 3)) result &= m_dsw[3]->read();
+	if (!BIT(m_dsw_sel, 4)) result &= m_dsw[4]->read();
 
 	return result;
 }
@@ -1311,6 +1310,47 @@ void dynax_state::ougonhai_banked_map(address_map &map)
 	map(0x90000, 0x97fff).rw(FUNC(dynax_state::tenkai_palette_r), FUNC(dynax_state::tenkai_palette_w));
 }
 
+
+uint8_t dynax_state::mjtkp2_dsw_r()
+{
+	if (m_dsw_sel < 5)
+		return m_dsw[m_dsw_sel]->read();
+	else
+		return 0xff;
+}
+
+void dynax_state::mjtkp2_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x05fff).rom();
+	map(0x06000, 0x07fff).ram().share("nvram");
+	map(0x08000, 0x0ffff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+	map(0x14000, 0x14000).w(FUNC(dynax_state::tenkai_ipsel_w));
+	map(0x14001, 0x14001).w(FUNC(dynax_state::tenkai_ip_w));
+	map(0x14002, 0x14003).r(FUNC(dynax_state::tenkai_ip_r));
+	map(0x14081, 0x14087).w(m_blitter, FUNC(dynax_blitter_rev2_device::regs_w));    // Blitter (inverted scroll values)
+	map(0x14100, 0x14100).w(FUNC(dynax_state::tenkai_dswsel_w));
+	map(0x14180, 0x14180).r(FUNC(dynax_state::mjtkp2_dsw_r));
+	map(0x14200, 0x14200).w(m_blitter, FUNC(dynax_blitter_rev2_device::pen_w)); // maybe
+	map(0x14210, 0x14210).w(FUNC(dynax_state::dynax_blit_dest_w)); // maybe
+	map(0x14220, 0x14220).w(FUNC(dynax_state::dynax_blit_palette23_w)); // maybe
+	map(0x14230, 0x14230).w(FUNC(dynax_state::dynax_blit_palette01_w)); // maybe
+	map(0x14240, 0x14240).w(FUNC(dynax_state::hanamai_priority_w));        // layer priority and enable
+	map(0x14250, 0x14250).w(FUNC(dynax_state::dynax_blit_backpen_w)); // maybe
+	map(0x14260, 0x14260).lw8(NAME([this] (uint8_t data) { if (data) logerror("%s unk $14260 write: %02x\n", machine().describe_context(), data); }));  // writes 0x80 sometimes
+	map(0x14280, 0x142ff).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_d1(offset >> 4, data); }));
+	map(0x14310, 0x14310).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x14320, 0x14320).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x14380, 0x14381).w("ym2413", FUNC(ym2413_device::write));
+}
+
+void dynax_state::mjtkp2_banked_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rom().region("maincpu", 0x10000);
+	map(0x40000, 0x400ff).w(FUNC(dynax_state::nanajign_palette_lo_w));
+	map(0x60000, 0x600ff).w(FUNC(dynax_state::nanajign_palette_hi_w));
+}
+
 /***************************************************************************
                                 Mahjong Gekisha
 ***************************************************************************/
@@ -1320,7 +1360,7 @@ uint8_t dynax_state::gekisha_keyboard_1_r()
 	uint8_t res = hanamai_keyboard_r<1>();
 
 	// bit 6
-	res |= ioport("BET")->read();
+	res |= m_bet->read();
 
 	// bit 7 = blitter busy
 
@@ -4522,6 +4562,16 @@ void dynax_state::mjreach(machine_config &config)
 	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::flipscreen_w)); // not inverted
 }
 
+void dynax_state::mjtkp2(machine_config &config)
+{
+	ougonhaib1(config);
+
+	tmp91640_device &tmp = downcast<tmp91640_device &>(*m_maincpu);
+	tmp.set_addrmap(AS_PROGRAM, &dynax_state::mjtkp2_map);
+
+	m_bankdev->set_map(&dynax_state::mjtkp2_banked_map);
+}
+
 void dynax_state::ougonhaib1(machine_config &config)
 {
 	tenkai(config);
@@ -7021,18 +7071,18 @@ ROM_START( mjtkp2 )
 	ROM_REGION( 0x50000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "5909c_dynax.5a", 0x00000, 0x20000, CRC(61916017) SHA1(2f39749512a3e36966e3bd787f1fa3378e96b4bb) )
 	ROM_RELOAD(                 0x10000, 0x20000 )
-	ROM_LOAD( "tmp90840.2c",    0x00000, 0x02000, NO_DUMP ) // chip type guessed (scratched off). MCU has pins  9, 10, 13, 14, 15, 16 stripped out
-	ROM_FILL(                   0x00000, 0x02000, 0xff ) // avoid fatal error due to random crap in the first 0x2000 of the external ROM. TODO: remove it once internal ROM is dumped
+	ROM_RELOAD(                 0x30000, 0x20000 )
+	ROM_LOAD( "tmp91c640n.2c",  0x00000, 0x04000, CRC(8fe634dd) SHA1(f11cd2160ecabe71edfddc956c323ff2e75d6cce) ) // chip type guessed (scratched off). MCU has pins  9, 10, 13, 14, 15, 16 stripped out
 
-	ROM_REGION( 0x100000, "blitter", 0 )
-	ROM_LOAD( "5908_dynax.6a",  0x00000, 0x20000, CRC(7ef47e7b) SHA1(15d05b8c52b82f1b43f0cc03979b2f2e8dd05ddd) )
-	ROM_LOAD( "5907_dynax.7a",  0x20000, 0x20000, CRC(f36baf94) SHA1(8474404a4137f7448c66a5adf507b474a97443a2) )
-	ROM_LOAD( "5906_dynax.8a",  0x40000, 0x20000, CRC(283935b1) SHA1(6af14310e44dfd7102f3c649c0c729ef406545e6) )
-	ROM_LOAD( "5905a_dynax.9a", 0x60000, 0x20000, CRC(62f9f922) SHA1(b75978db127fa24b28ac2c7c2587f3a5a360df6d) )
-	ROM_LOAD( "5904_dynax.10a", 0x80000, 0x20000, CRC(098a15dc) SHA1(4cc3313ca56c9c9a42e294e6d837c24c00463f73) )
-	ROM_LOAD( "5903_dynax.12a", 0xa0000, 0x20000, CRC(20f68aa7) SHA1(e18d39962caefb22c1ff39fd0fda0563877fa79c) )
-	ROM_LOAD( "5902_dynax.13a", 0xc0000, 0x20000, CRC(c053ba24) SHA1(76524a5a8f727c50be13adbca5eb9388c1f9887c) )
-	ROM_LOAD( "5901_dynax.15a", 0xe0000, 0x20000, CRC(8b9d0192) SHA1(77ba366c87d3f1eb5549de30a1d066684950622a) )
+	ROM_REGION( 0x100000, "blitter", ROMREGION_ERASE00 )
+	ROM_LOAD( "5901_dynax.15a", 0x00000, 0x20000, CRC(8b9d0192) SHA1(77ba366c87d3f1eb5549de30a1d066684950622a) ) // points, bets
+	ROM_LOAD( "5902_dynax.13a", 0x20000, 0x20000, CRC(c053ba24) SHA1(76524a5a8f727c50be13adbca5eb9388c1f9887c) ) // text and mahjong tiles
+	ROM_LOAD( "5903_dynax.12a", 0x40000, 0x20000, CRC(20f68aa7) SHA1(e18d39962caefb22c1ff39fd0fda0563877fa79c) )
+	ROM_LOAD( "5904_dynax.10a", 0x60000, 0x20000, CRC(098a15dc) SHA1(4cc3313ca56c9c9a42e294e6d837c24c00463f73) ) // girl check D-E
+	ROM_LOAD( "5908_dynax.6a",  0x80000, 0x20000, CRC(7ef47e7b) SHA1(15d05b8c52b82f1b43f0cc03979b2f2e8dd05ddd) ) // girl check B
+	ROM_LOAD( "5907_dynax.7a",  0xa0000, 0x20000, CRC(f36baf94) SHA1(8474404a4137f7448c66a5adf507b474a97443a2) ) // girl check C
+	ROM_LOAD( "5906_dynax.8a",  0xc0000, 0x20000, CRC(283935b1) SHA1(6af14310e44dfd7102f3c649c0c729ef406545e6) ) // girl check A
+	ROM_LOAD( "5905a_dynax.9a", 0xe0000, 0x20000, CRC(62f9f922) SHA1(b75978db127fa24b28ac2c7c2587f3a5a360df6d) ) // title
 ROM_END
 
 
@@ -7275,7 +7325,7 @@ GAME( 1991, ougonhai,   0,        ougonhai,   ougonhai, dynax_state,       empty
 GAME( 1991, ougonhaib1, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 1, medal)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ougonhaib2, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 2, medal)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ougonhaib3, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 3, medal)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjtkp2,     0,        ougonhai,   ougonhai, dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Tokkyu Kaiten-ban Part 2 (Japan)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing internal ROM dump
+GAME( 1991, mjtkp2,     0,        mjtkp2,     mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Tokkyu Kaiten-ban Part 2 (Japan)",                      MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // inputs / DSW, GFX glitches
 GAME( 1994, mjreach,    0,        mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach (Ver. 1.00, set 1)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreacha,   mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach (Ver. 1.00, set 2)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreachbl,  mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Reach (Ver. 1.00, bootleg)",                            MACHINE_SUPPORTS_SAVE )

@@ -380,7 +380,7 @@ Bottom board: JCG DAUGHTERL PCB-C K9100633A J9100434A (Sticker K91J0633A)
 Notes:
       All 3k files are PALs type PALCE 16V8 and saved in Jedec format.
       6264: 8k x8 SRAM
-      SMC_COM20020I: Network communmication IC
+      SMC_COM20020I: Network communication IC
       ROMs .36-.39 are 27C4001, main program.
       ROMs .5-.12, .18-.25 are 16M MASK, graphics.
       ROMs .32-.35 are 16M MASK, sound data.

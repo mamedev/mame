@@ -36,9 +36,9 @@ is used to shade quads according to their depth.
 -------------------
 
 TODO:
-- is there a video_enable flag? or at least one for the bitmap layer (see screen transitions)
-- some z-fighting issues, eg. signs and car rearwing (the problem is in namcos21_3d_device)
 - verify video timing, PCB videos do suggest exactly 60Hz
+- is it possible to remove the ROM hacks? see init functions, perfect quantum won't help (winrungp works
+  without the hack, but to be on the safe side it's better to keep it unless it can be fixed for real)
 - winrungp: some missing bitmap layer gfx due to underdumps of the gpu program roms (see attract mode
   when it's supposed to show "TRIANGLE" curve text, and the congratulations screen after winning)
 
@@ -322,6 +322,9 @@ public:
 		m_namcos21_dsp(*this, "namcos21dsp")
 	{ }
 
+	void init_winrungp();
+	void init_winrun91();
+
 	void winrun(machine_config &config);
 
 protected:
@@ -358,6 +361,7 @@ private:
 	u16 m_gpu_color = 0;
 	u16 m_gpu_register[0x10/2] = { };
 	u8 m_posirq_line = 0;
+	u8 m_video_enable = 0;
 
 	u16 dpram_word_r(offs_t offset);
 	void dpram_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -372,6 +376,7 @@ private:
 	void gpu_posirq_w(u8 data);
 	void gpu_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 gpu_videoram_r(offs_t offset);
+	void gpu_enable_w(u8 data);
 
 	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }
 	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
@@ -407,6 +412,7 @@ void namcos21_state::video_start()
 	save_item(NAME(m_gpu_color));
 	save_item(NAME(m_gpu_register));
 	save_item(NAME(m_posirq_line));
+	save_item(NAME(m_video_enable));
 }
 
 u16 namcos21_state::gpu_color_r()
@@ -440,12 +446,14 @@ void namcos21_state::gpu_register_w(offs_t offset, u16 data, u16 mem_mask)
 
 u8 namcos21_state::gpu_posirq_r()
 {
-	return m_posirq_line;
+	return 0;
 }
 
 void namcos21_state::gpu_posirq_w(u8 data)
 {
-	m_posirq_line = data;
+	// new posirq line relative to current vpos
+	const u8 vpos = m_screen->vblank() ? 0 : (m_screen->vpos() / 2);
+	m_posirq_line = vpos + ~data;
 }
 
 void namcos21_state::gpu_videoram_w(offs_t offset, u16 data, u16 mem_mask)
@@ -466,6 +474,11 @@ u16 namcos21_state::gpu_videoram_r(offs_t offset)
 	return (m_gpu_videoram[offset] << 8) | m_gpu_videoram_mask;
 }
 
+void namcos21_state::gpu_enable_w(u8 data)
+{
+	m_video_enable = BIT(data, 1);
+}
+
 void namcos21_state::bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// show GPU registers & related
@@ -482,11 +495,11 @@ void namcos21_state::bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 	for (int sy = cliprect.top(); sy <= cliprect.bottom(); sy++)
 	{
-		u8 const *const pSource = &m_gpu_videoram[((yscroll + sy) & 0x3ff) * 0x200];
-		u16 *const pDest = &bitmap.pix(sy);
+		u8 const *const source = &m_gpu_videoram[((yscroll + sy) & 0x3ff) * 0x200];
+		u16 *const dest = &bitmap.pix(sy);
 		for (int sx = cliprect.left(); sx <= cliprect.right(); sx++)
 		{
-			int const pen = pSource[(sx + xscroll) & 0x1ff];
+			int const pen = source[(sx + xscroll) & 0x1ff];
 			switch (pen)
 			{
 			case 0xff:
@@ -494,21 +507,21 @@ void namcos21_state::bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 			// NOTE: very similar to namcos21_c67_state::sprite_mix_callback
 			case 0x00:
-				if (pDest[sx] != (base ^ 0x10ff))
-					pDest[sx] = 0x4000 | (pDest[sx] & 0x1fff);
+				if (dest[sx] != (base ^ 0x10ff))
+					dest[sx] = 0x4000 | (dest[sx] & 0x1fff);
 				else
-					pDest[sx] = (base & 0xf00) | 0x00;
+					dest[sx] = (base & 0xf00) | 0x00;
 				break;
 
 			case 0x01:
-				if (pDest[sx] != (base ^ 0x10ff))
-					pDest[sx] = 0x6000 | (pDest[sx] & 0x1fff);
+				if (dest[sx] != (base ^ 0x10ff))
+					dest[sx] = 0x6000 | (dest[sx] & 0x1fff);
 				else
-					pDest[sx] = (base & 0xf00) | 0x01;
+					dest[sx] = (base & 0xf00) | 0x01;
 				break;
 
 			default:
-				pDest[sx] = base | pen;
+				dest[sx] = base | pen;
 				break;
 			}
 		}
@@ -518,6 +531,12 @@ void namcos21_state::bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 u32 namcos21_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	if (!m_video_enable)
+	{
+		bitmap.fill(m_palette->black_pen(), cliprect);
+		return 0;
+	}
+
 	bitmap.fill((m_gpu_color << 8 & 0xf00) | 0xff, cliprect);
 
 	// entries 0 and 1 unused parts controls priority mixing
@@ -674,11 +693,11 @@ static INPUT_PORTS_START( winrun )
 	PORT_START("AN0")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 0 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("AN1")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 1 */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(15) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x40) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal") // won't detect name entry below 0x40
 	PORT_START("AN2")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 2 */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
 	PORT_START("AN3")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 3 */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(15) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x40) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
 	PORT_START("AN4")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("AN5")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 5 */
@@ -754,21 +773,12 @@ void namcos21_state::mb87077_gain_changed(offs_t offset, u8 data)
 
 void namcos21_state::sound_reset_w(u8 data)
 {
-	if (data & 0x01)
-	{
-		// Resume execution
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	}
-	else
-	{
-		// Suspend execution
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	}
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void namcos21_state::system_reset_w(u8 data)
 {
-	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	reset_all_subcpus(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void namcos21_state::reset_all_subcpus(int state)
@@ -814,7 +824,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 		m_c65->ext_interrupt(HOLD_LINE);
 	}
 
-	if (scanline == (m_posirq_line ^ 0xff) * 2)
+	if (scanline == m_posirq_line * 2)
 		m_gpu_intc->pos_irq_trigger();
 }
 
@@ -867,6 +877,7 @@ void namcos21_state::winrun(machine_config &config)
 
 	NAMCO_C148(config, m_gpu_intc, 0, m_gpu, false);
 	m_gpu_intc->in_ext_callback().set([this](){ return m_screen->frame_number() & 1; });
+	m_gpu_intc->out_ext1_callback().set(FUNC(namcos21_state::gpu_enable_w));
 
 	NAMCO_C139(config, m_sci, 0);
 
@@ -1077,10 +1088,47 @@ ROM_END
 } // Anonymous namespace
 
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT       CLASS           INIT          MONITOR  COMPANY  FULLNAME                                             FLAGS */
+/*
 
-GAME( 1988, winrun,    0,        winrun,   winrun,     namcos21_state, empty_init,   ROT0,    "Namco", "Winning Run (World) (89/06/06, Ver.09)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // Sub Ver.09, 1989, Graphic Ver .06, 89/01/14, Sound Ver.2.00
-GAME( 1989, winrungp,  0,        winrun,   winrungp,   namcos21_state, empty_init,   ROT0,    "Namco", "Winning Run: Suzuka GP (Japan) (89/12/03, Ver.02)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // Sub Ver.02, 1989, Graphic Ver.02 89/12/03, Sound Ver.0000
+Both winrungp and winrun91 have a bug in service mode, which will cause the GPU to lock
+up in winrun91 (winrungp potentially as well). If the GPU 68000 is very slighty over or
+underclocked, it will work. The same thing goes for the refresh rate. The reason it works
+on real hardware is probably because the GPU PCB has its own 49.152MHz XTAL, and unlike
+MAME, it won't run at the exact same speed as the other 68000s due to XTAL tolerances.
+
+*/
+
+void namcos21_state::init_winrungp()
+{
+	u16 *rom = (u16*)memregion("gpu")->base();
+
+	// 006018: move.w  $180228.l, D0 ; read from shared RAM
+	// 00601E: cmp.w   $180228.l, D0 ; compare with same shared RAM
+	// 006024: beq     $6018
+
+	// beq to $601e instead of $6018
+	rom[0x6024/2] = 0x67f8; // 0x67f2
+}
+
+void namcos21_state::init_winrun91()
+{
+	u16 *rom = (u16*)memregion("gpu")->base();
+
+	// 001916: clr.w   $1e6000.l     ; reset watchdog
+	// 00191C: move.w  $180500.l, D0 ; read from shared RAM
+	// 001922: cmp.w   $180500.l, D0 ; compare with same shared RAM
+	// 001928: beq     $1916
+
+	// like winrungp, move the 'move' opcode out of the loop
+	std::swap_ranges(rom + 0x1916/2, rom + 0x1916/2 + 3, rom + 0x191c/2);
+	rom[0x1928/2] = 0x67f2; // 0x67ec
+}
+
+
+//    YEAR  NAME       PARENT    MACHINE   INPUT       CLASS           INIT           MONITOR  COMPANY  FULLNAME                                             FLAGS
+
+GAME( 1988, winrun,    0,        winrun,   winrun,     namcos21_state, empty_init,    ROT0,    "Namco", "Winning Run (World) (89/06/06, Ver.09)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // Sub Ver.09, 1989, Graphic Ver .06, 89/01/14, Sound Ver.2.00
+GAME( 1989, winrungp,  0,        winrun,   winrungp,   namcos21_state, init_winrungp, ROT0,    "Namco", "Winning Run: Suzuka GP (Japan) (89/12/03, Ver.02)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // Sub Ver.02, 1989, Graphic Ver.02 89/12/03, Sound Ver.0000
 
 // Available on a size/cost reduced 2 PCB set with 'Namco System 21B' printed on each board, still C65 I/O MCU, appears to be functionally identical to original NS21
-GAME( 1991, winrun91,  0,        winrun,   winrungp,   namcos21_state, empty_init,   ROT0,    "Namco", "Winning Run '91 (Japan) (1991/03/05, Ver 1.0)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // Main Ver 1.0 1991/03/05, Graphic Ver 1.0 1991/03/05
+GAME( 1991, winrun91,  0,        winrun,   winrungp,   namcos21_state, init_winrun91, ROT0,    "Namco", "Winning Run '91 (Japan) (1991/03/05, Ver 1.0)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // Main Ver 1.0 1991/03/05, Graphic Ver 1.0 1991/03/05

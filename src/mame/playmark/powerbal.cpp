@@ -19,11 +19,9 @@ Magic Sticks:
 #include "playmark.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/eepromser.h"
-#include "sound/okim6295.h"
+
 #include "screen.h"
 #include "speaker.h"
-#include "tilemap.h"
 
 
 namespace {
@@ -33,25 +31,27 @@ class powerbal_state : public playmark_base_state
 public:
 	powerbal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: playmark_base_state(mconfig, type, tag)
+		, m_tilebank(0)
+		, m_bg_yoffset(0)
 	{ }
 
-	void init_powerbal();
+	void init_powerbal() ATTR_COLD;
 
-	void powerbal(machine_config &config);
+	void powerbal(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-	u8 m_tilebank = 0;
-	s8 m_bg_yoffset = 0;
+	u8 m_tilebank;
+	s8 m_bg_yoffset;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void bgvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void tile_banking_w(u16 data);
-	void oki_banking(u16 data);
+	void tile_bank_w(u16 data);
+	void oki_bank_w(u16 data);
 
 	void oki_map(address_map &map) ATTR_COLD;
 
@@ -68,13 +68,13 @@ public:
 		: powerbal_state(mconfig, type, tag)
 	{ }
 
-	void atombjt(machine_config &config);
+	void atombjt(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	void tile_banking_w(u16 data);
+	void tile_bank_w(u16 data);
 
 	void main_map(address_map &map) ATTR_COLD;
 };
@@ -83,15 +83,15 @@ class magicstk_state : public powerbal_state
 {
 public:
 	magicstk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: powerbal_state(mconfig, type, tag),
-		m_eeprom(*this, "eeprom"),
-		m_ticket(*this, "ticket"),
-		m_token(*this, "token")
+		: powerbal_state(mconfig, type, tag)
+		, m_eeprom(*this, "eeprom")
+		, m_ticket(*this, "ticket")
+		, m_token(*this, "token")
 	{ }
 
-	void init_magicstk();
+	void init_magicstk() ATTR_COLD;
 
-	void magicstk(machine_config &config);
+	void magicstk(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -105,11 +105,11 @@ private:
 
 void magicstk_state::coin_eeprom_w(u8 data)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
 
-	m_eeprom->cs_write((data & 8) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->di_write((data & 2) >> 1);
-	m_eeprom->clk_write((data & 4) ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->cs_write(BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write(BIT(data, 1));
+	m_eeprom->clk_write(BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void powerbal_state::bgvideoram_w(offs_t offset, u16 data, u16 mem_mask)
@@ -118,7 +118,7 @@ void powerbal_state::bgvideoram_w(offs_t offset, u16 data, u16 mem_mask)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-void powerbal_state::tile_banking_w(u16 data)
+void powerbal_state::tile_bank_w(u16 data)
 {
 	if (((data >> 12) & 0x0f) != m_tilebank)
 	{
@@ -127,7 +127,7 @@ void powerbal_state::tile_banking_w(u16 data)
 	}
 }
 
-void atombjt_state::tile_banking_w(u16 data)
+void atombjt_state::tile_bank_w(u16 data)
 {
 	if ((data & 0x0f) != m_tilebank)
 	{
@@ -136,9 +136,9 @@ void atombjt_state::tile_banking_w(u16 data)
 	}
 }
 
-void powerbal_state::oki_banking(u16 data)
+void powerbal_state::oki_bank_w(u16 data)
 {
-	int bank = data & 3;
+	const int bank = data & 3;
 	m_okibank->set_entry(bank & (m_oki_numbanks - 1));
 }
 
@@ -148,7 +148,7 @@ void magicstk_state::main_map(address_map &map)
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x094000, 0x094001).nopw();
 	map(0x094002, 0x094003).nopw();
-	map(0x094004, 0x094005).w(FUNC(magicstk_state::tile_banking_w));
+	map(0x094004, 0x094005).w(FUNC(magicstk_state::tile_bank_w));
 	map(0x098180, 0x09917f).ram().w(FUNC(magicstk_state::bgvideoram_w)).share(m_bgvideoram);
 	map(0x0c2010, 0x0c2011).portr("IN0");
 	map(0x0c2012, 0x0c2013).portr("IN1");
@@ -156,7 +156,7 @@ void magicstk_state::main_map(address_map &map)
 	map(0x0c2015, 0x0c2015).w(FUNC(magicstk_state::coin_eeprom_w));
 	map(0x0c2016, 0x0c2017).portr("DSW1");
 	map(0x0c2018, 0x0c2019).portr("DSW2");
-	map(0x0c201c, 0x0c201d).w(FUNC(magicstk_state::oki_banking));
+	map(0x0c201c, 0x0c201d).w(FUNC(magicstk_state::oki_bank_w));
 	map(0x0c201f, 0x0c201f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0c4000, 0x0c4001).nopw();
 	map(0x0e0000, 0x0fffff).ram();
@@ -169,7 +169,7 @@ void powerbal_state::main_map(address_map &map)
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x094000, 0x094001).nopw();
 	map(0x094002, 0x094003).nopw();
-	map(0x094004, 0x094005).w(FUNC(powerbal_state::tile_banking_w));
+	map(0x094004, 0x094005).w(FUNC(powerbal_state::tile_bank_w));
 	map(0x098000, 0x098fff).ram().w(FUNC(powerbal_state::bgvideoram_w)).share(m_bgvideoram);
 	map(0x099000, 0x09bfff).ram(); // not used
 	map(0x0c2010, 0x0c2011).portr("IN0");
@@ -177,7 +177,7 @@ void powerbal_state::main_map(address_map &map)
 	map(0x0c2014, 0x0c2015).portr("IN2");
 	map(0x0c2016, 0x0c2017).portr("DSW1");
 	map(0x0c2018, 0x0c2019).portr("DSW2");
-	map(0x0c201c, 0x0c201d).w(FUNC(powerbal_state::oki_banking));
+	map(0x0c201c, 0x0c201d).w(FUNC(powerbal_state::oki_bank_w));
 	map(0x0c201f, 0x0c201f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0c4000, 0x0c4001).nopw();
 	map(0x0f0000, 0x0fffff).ram();
@@ -192,7 +192,7 @@ void atombjt_state::main_map(address_map &map)
 	map(0x080008, 0x080009).nopr(); // remnant of the original?
 	map(0x080014, 0x080015).noprw(); // always 1 in this bootleg. Flip-screen switch not present according to dip sheet.
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x094000, 0x094001).w(FUNC(atombjt_state::tile_banking_w));
+	map(0x094000, 0x094001).w(FUNC(atombjt_state::tile_bank_w));
 	map(0x094002, 0x094003).noprw();    // IRQ enable?
 	map(0x09c000, 0x09cfff).mirror(0x1000).ram().w(FUNC(atombjt_state::bgvideoram_w)).share(m_bgvideoram);
 	map(0x0c2010, 0x0c2011).portr("IN0");
@@ -200,7 +200,7 @@ void atombjt_state::main_map(address_map &map)
 	map(0x0c2014, 0x0c2015).portr("IN2");
 	map(0x0c2016, 0x0c2017).portr("DSW1");
 	map(0x0c2018, 0x0c2019).portr("DSW2");
-	map(0x0c201c, 0x0c201d).w(FUNC(atombjt_state::oki_banking));
+	map(0x0c201c, 0x0c201d).w(FUNC(atombjt_state::oki_bank_w));
 	map(0x0c201f, 0x0c201f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0c4000, 0x0c4001).nopw(); // always 0?
 	map(0x0f0000, 0x0fffff).ram();
@@ -558,10 +558,10 @@ INPUT_PORTS_END
 
 TILE_GET_INFO_MEMBER(powerbal_state::get_bg_tile_info)
 {
-	int code = (m_bgvideoram[tile_index] & 0x07ff) + m_tilebank * 0x800;
-	int colr = m_bgvideoram[tile_index] & 0xf000;
+	u32 code = (m_bgvideoram[tile_index] & 0x07ff) | (m_tilebank << 11);
+	const u16 colr = m_bgvideoram[tile_index] & 0xf000;
 
-	if (m_bgvideoram[tile_index] & 0x800)
+	if (BIT(m_bgvideoram[tile_index], 11))
 		code |= 0x8000;
 
 	tileinfo.set(1, code, colr >> 12, 0);
@@ -569,24 +569,24 @@ TILE_GET_INFO_MEMBER(powerbal_state::get_bg_tile_info)
 
 void powerbal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int height = m_gfxdecode->gfx(0)->height();
+	const int height = m_gfxdecode->gfx(0)->height();
 
 	for (int offs = 4; offs < m_spriteram.bytes() / 2; offs += 4)
 	{
 		int sy = m_spriteram[offs + 3 - 4];   // typical Playmark style...
-		if (sy & 0x8000)
+		if (BIT(sy, 15))
 			return; // end of list marker
 
-		int flipx = sy & 0x4000;
-		int sx = (m_spriteram[offs + 1] & 0x01ff) - 16 - 7;
+		const bool flipx = BIT(sy, 14);
+		const int sx = (m_spriteram[offs + 1] & 0x01ff) - 16 - 7;
 		sy = (256 - 8 - height - sy) & 0xff;
-		int code = m_spriteram[offs + 2];
-		int color = (m_spriteram[offs + 1] & 0xf000) >> 12;
+		const int code = m_spriteram[offs + 2];
+		const int color = (m_spriteram[offs + 1] & 0xf000) >> 12;
 
 		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
 				code,
 				color,
-				flipx,0,
+				flipx, 0,
 				sx + m_xoffset, sy + m_yoffset, m_sprtranspen);
 	}
 }
@@ -634,8 +634,8 @@ static const gfx_layout tilelayout =
 
 
 static GFXDECODE_START( gfx_powerbal )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0x100, 16 )    // colors 0x100-0x1ff
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar,    0x000, 16 )    // colors 0x000-0x0ff
+	GFXDECODE_ENTRY( "sprites", 0, tilelayout,       0x100, 16 )    // colors 0x100-0x1ff
+	GFXDECODE_ENTRY( "tiles",   0, gfx_8x8x4_planar, 0x000, 16 )    // colors 0x000-0x0ff
 GFXDECODE_END
 
 
@@ -775,13 +775,13 @@ ROM_START( powerbal )
 	ROM_LOAD16_BYTE( "3.u67",  0x00000, 0x40000, CRC(3aecdde4) SHA1(e78373246d55f120e8d94f4606da874df439b823) )
 	ROM_LOAD16_BYTE( "2.u66",  0x00001, 0x40000, CRC(a4552a19) SHA1(88b84daa1fd36d5c683cf0d6dce341aedbc360d1) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tiles", 0 )
 	ROM_LOAD( "4.u38",        0x000000, 0x80000, CRC(a60aa981) SHA1(46a5d2d2a353a45127a03a104e877ffd150daa92) )
 	ROM_LOAD( "5.u42",        0x080000, 0x80000, CRC(966c71df) SHA1(daf4bcf3d2ef10ea9a5e2e7ea71b3783b9f5b1f0) )
 	ROM_LOAD( "6.u39",        0x100000, 0x80000, CRC(668957b9) SHA1(31fc9328ff6044e17834b6d61a886a8ef2e6570c) )
 	ROM_LOAD( "7.u45",        0x180000, 0x80000, CRC(f5721c66) SHA1(1e8b3a8e82da60378dad7727af21157c4059b071) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "8.u86",        0x000000, 0x80000, CRC(4130694c) SHA1(581d0035ce1624568f635bd79290be6c587a2533) )
 	ROM_LOAD( "9.u85",        0x080000, 0x80000, CRC(e7bcd2e7) SHA1(01a5e5ac5da2fd79a0c9088f775096b9915bae92) )
 	ROM_LOAD( "10.u84",       0x100000, 0x80000, CRC(90412135) SHA1(499619c72613a1dd63a6504e39b159a18a71f4fa) )
@@ -804,13 +804,13 @@ ROM_START( magicstk )
 	ROM_LOAD16_BYTE( "12.u67", 0x00000, 0x20000, CRC(70a9c66f) SHA1(0cf4b2d0f796e35881d68adc69eca4360d6ad693) )
 	ROM_LOAD16_BYTE( "11.u66", 0x00001, 0x20000, CRC(a9d7c90e) SHA1(e12517776dc14747b4bbe49f93c4d7e83e8eae01) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "13.u36",       0x00000, 0x20000, CRC(31e52562) SHA1(18ee5ba990d97690ece81e4066a9f0395ddc6f3e) )
 	ROM_LOAD( "14.u42",       0x20000, 0x20000, CRC(b0d35eda) SHA1(a85d45d3b4fbacecf5aa2af9a18ba0ac9f1f9a26) )
 	ROM_LOAD( "15.u39",       0x40000, 0x20000, CRC(af27004b) SHA1(b022020e6bd6fc9ec95f23b6a37911df0768856e) )
 	ROM_LOAD( "16.u45",       0x60000, 0x20000, CRC(0c980db3) SHA1(212129bf86cdc73752be184e579299e03ba6862e) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "sprites", 0 )
 	ROM_LOAD( "17.u86",       0x00000, 0x20000, CRC(ce238006) SHA1(3425a8125d56139fe5d220b0d9d5c9a4af1f4d58) )
 	ROM_LOAD( "18.u85",       0x20000, 0x20000, CRC(3dc88bf6) SHA1(f9c04bca32bae4aa6df38635d73c6a4b8742fbd3) )
 	ROM_LOAD( "19.u84",       0x40000, 0x20000, CRC(ee12d5b2) SHA1(872edff5a35d2725e3dd752a5f609aca995bfeff) )
@@ -831,13 +831,13 @@ ROM_START( hotminda )
 	ROM_LOAD16_BYTE( "rom1.rom",       0x00001, 0x20000, CRC(33aaceba) SHA1(a914400b081eabd869f1ca2c843a91b03af510b1) )
 	ROM_LOAD16_BYTE( "rom2.rom",       0x00000, 0x20000, CRC(f5accd9f) SHA1(12194ea7c35263be9afd91f0abe2041998528af9) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "rom13.rom",       0x00000, 0x20000, CRC(18d22109) SHA1(52bbb68f4ef5f4d41f5915bef4304784451ca6d8) )
 	ROM_LOAD( "rom14.rom",       0x20000, 0x20000, CRC(f95a1ff6) SHA1(646c59199570ccd11cb53b0b59a6cd03b1b42fac) )
 	ROM_LOAD( "rom15.rom",       0x40000, 0x20000, CRC(8a9ea7ed) SHA1(529c0466df3f0aa050526699099ea7a5da9dbcfe) )
 	ROM_LOAD( "rom16.rom",       0x60000, 0x20000, CRC(df63b642) SHA1(d5df740717193b06267508d169bb5df6214ca13d))
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "sprites", 0 )
 	ROM_LOAD( "rom17.rom",       0x00000, 0x20000, CRC(805002cf) SHA1(dc97881bc78dcb753f404b7df2cfd4a071ca8393) )
 	ROM_LOAD( "rom18.rom",       0x20000, 0x20000, CRC(6a9d896b) SHA1(d617a69e6954de3bf7c322529232eadb90034fbc) )
 	ROM_LOAD( "rom19.rom",       0x40000, 0x20000, CRC(223ad90f) SHA1(57b4e364f21aeea24a99deb6bab13019846e8f9b) )
@@ -853,13 +853,13 @@ ROM_START( hotmindb ) // possible bug fix version of the above? Just a couple of
 	ROM_LOAD16_BYTE( "1.u66", 0x00001, 0x20000, CRC(24b1a1df) SHA1(8e909a2a4b9c64ddb845c9102e8f5b70513ed9cf) ) // red dot on the label
 	ROM_LOAD16_BYTE( "2.u77", 0x00000, 0x20000, CRC(f5accd9f) SHA1(12194ea7c35263be9afd91f0abe2041998528af9) ) // red dot on the label
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "13.u36", 0x00000, 0x20000, CRC(18d22109) SHA1(52bbb68f4ef5f4d41f5915bef4304784451ca6d8) )
 	ROM_LOAD( "14.u42", 0x20000, 0x20000, CRC(f95a1ff6) SHA1(646c59199570ccd11cb53b0b59a6cd03b1b42fac) )
 	ROM_LOAD( "15.u39", 0x40000, 0x20000, CRC(8a9ea7ed) SHA1(529c0466df3f0aa050526699099ea7a5da9dbcfe) )
 	ROM_LOAD( "16.u45", 0x60000, 0x20000, CRC(df63b642) SHA1(d5df740717193b06267508d169bb5df6214ca13d))
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "sprites", 0 )
 	ROM_LOAD( "17.u86", 0x00000, 0x20000, CRC(805002cf) SHA1(dc97881bc78dcb753f404b7df2cfd4a071ca8393) )
 	ROM_LOAD( "18.u85", 0x20000, 0x20000, CRC(6a9d896b) SHA1(d617a69e6954de3bf7c322529232eadb90034fbc) )
 	ROM_LOAD( "19.u84", 0x40000, 0x20000, CRC(223ad90f) SHA1(57b4e364f21aeea24a99deb6bab13019846e8f9b) )
@@ -875,13 +875,13 @@ ROM_START( atombjt ) // based off bjtwina set
 	ROM_LOAD16_BYTE( "22.u67",  0x00000, 0x20000, CRC(bead8c70) SHA1(2694bb0639f6b94119c21faf3810f00ef20b50da) )
 	ROM_LOAD16_BYTE( "21.u66",  0x00001, 0x20000, CRC(73e3d488) SHA1(7deed6e3aeda1902b75746a9b0a2737632425867) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tiles", 0 )
 	ROM_LOAD( "23.u36",  0x000000, 0x80000, CRC(a3fb6b91) SHA1(477f5722a6bb23f089f32b677efbf69e9dce4b74) )
 	ROM_LOAD( "24.u42",  0x080000, 0x80000, CRC(4c30e15f) SHA1(f92185743594e4e4573ac3f6c0c091802a08d5bd) )
 	ROM_LOAD( "25.u39",  0x100000, 0x80000, CRC(ff1af60f) SHA1(4fe626c9d59ab9b945535b2f796f13adc900f1ed) )
 	ROM_LOAD( "26.u45",  0x180000, 0x80000, CRC(6cc4e817) SHA1(70f2ab50e228a029d3157c94fe0a79e7aad010bd) )
 
-	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD( "27.u86",  0x000000, 0x40000, CRC(5a853e5c) SHA1(dfa4e891f716bbf8a038a14a24276cb690f65230) )
 	ROM_LOAD( "28.u85",  0x040000, 0x40000, CRC(41970bf6) SHA1(85b5677585dbdf96acabb59e6369d62d4c2f0e8e) )
 	ROM_LOAD( "29.u84",  0x080000, 0x40000, CRC(59a7d610) SHA1(0dc39c09f7f55dbd12ddb5e2e4ba9d86a2ba24d8) )

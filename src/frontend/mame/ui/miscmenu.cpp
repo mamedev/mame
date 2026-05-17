@@ -50,7 +50,7 @@ namespace ui {
     bios selection menu
 -------------------------------------------------*/
 
-menu_bios_selection::menu_bios_selection(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+menu_bios_selection::menu_bios_selection(mame_ui_manager &mui, render_target &target) : menu(mui, target)
 {
 	set_heading(_("BIOS Selection"));
 }
@@ -153,7 +153,7 @@ bool menu_bios_selection::handle(event const *ev)
 
 
 
-menu_network_devices::menu_network_devices(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+menu_network_devices::menu_network_devices(mame_ui_manager &mui, render_target &target) : menu(mui, target)
 {
 	set_heading(_("Network Devices"));
 }
@@ -248,7 +248,7 @@ bool menu_network_devices::handle(event const *ev)
     information menu
 -------------------------------------------------*/
 
-menu_bookkeeping::menu_bookkeeping(mame_ui_manager &mui, render_container &container) : menu_textbox(mui, container)
+menu_bookkeeping::menu_bookkeeping(mame_ui_manager &mui, render_target &target) : menu_textbox(mui, target)
 {
 	set_process_flags(PROCESS_CUSTOM_NAV);
 }
@@ -394,7 +394,7 @@ bool menu_crosshair::handle(event const *ev)
 					sel.push_back(_("menu-crosshair", "[built-in]"));
 					std::copy(m_pics.begin(), m_pics.end(), std::back_inserter(sel));
 					menu::stack_push<menu_selector>(
-							ui(), container(), std::string(ev->item->text()), std::move(sel), data.cur,
+							ui(), target(), std::string(ev->item->text()), std::move(sel), data.cur,
 							[this, &data] (int selection)
 							{
 								if (!selection)
@@ -432,7 +432,7 @@ bool menu_crosshair::handle(event const *ev)
     crosshair settings menu
 -------------------------------------------------*/
 
-menu_crosshair::menu_crosshair(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+menu_crosshair::menu_crosshair(mame_ui_manager &mui, render_target &target) : menu(mui, target)
 {
 	set_process_flags(PROCESS_LR_REPEAT);
 	set_heading(_("menu-crosshair", "Crosshair Options"));
@@ -629,8 +629,8 @@ menu_crosshair::~menu_crosshair()
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_export::menu_export(mame_ui_manager &mui, render_container &container, std::vector<const game_driver *> &&drvlist)
-	: menu(mui, container), m_list(std::move(drvlist))
+menu_export::menu_export(mame_ui_manager &mui, render_target &target, std::vector<const game_driver *> &&drvlist)
+	: menu(mui, target), m_list(std::move(drvlist))
 {
 	set_heading(_("Export Displayed List to File"));
 }
@@ -760,10 +760,10 @@ void menu_export::populate()
 
 menu_machine_configure::menu_machine_configure(
 		mame_ui_manager &mui,
-		render_container &container,
+		render_target &target,
 		ui_system_info const &info,
 		std::function<void (bool, bool)> &&handler)
-	: menu(mui, container)
+	: menu(mui, target)
 	, m_handler(std::move(handler))
 	, m_sys(info)
 	, m_curbios(0)
@@ -828,15 +828,15 @@ bool menu_machine_configure::handle(event const *ev)
 				break;
 			case VIDEO:
 				if (ev->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::video_options(), m_sys.driver, &m_opts);
+					menu::stack_push<submenu>(ui(), target(), submenu::video_options(), m_sys.driver, &m_opts);
 				break;
 			case CONTROLLER:
 				if (ev->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::control_options(), m_sys.driver, &m_opts);
+					menu::stack_push<submenu>(ui(), target(), submenu::control_options(), m_sys.driver, &m_opts);
 				break;
 			case ADVANCED:
 				if (ev->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::advanced_options(), m_sys.driver, &m_opts);
+					menu::stack_push<submenu>(ui(), target(), submenu::advanced_options(), m_sys.driver, &m_opts);
 				break;
 			default:
 				break;
@@ -929,8 +929,8 @@ void menu_machine_configure::setup_bios()
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_plugins_configure::menu_plugins_configure(mame_ui_manager &mui, render_container &container)
-	: menu(mui, container)
+menu_plugins_configure::menu_plugins_configure(mame_ui_manager &mui, render_target &target)
+	: menu(mui, target)
 {
 	set_heading(_("menu-plugins", "Plugins"));
 }

@@ -1220,7 +1220,7 @@ void ppu2c0x_device::write(offs_t offset, u8 data)
 		offset &= PPU_MAX_REG - 1;
 	}
 
-#ifdef MAME_DEBUG
+#if 0
 	if (m_scanline <= BOTTOM_VISIBLE_SCANLINE)
 	{
 		logerror("PPU register %d write %02x during non-vblank scanline %d (MAME %d, beam pos: %d)\n", offset, data, m_scanline, screen().vpos(), screen().hpos());

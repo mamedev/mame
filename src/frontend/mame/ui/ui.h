@@ -53,15 +53,16 @@ class laserdisc_device;
     CONSTANTS
 ***************************************************************************/
 
-#define UI_MAX_FONT_HEIGHT      (1.0f / 15.0f)
+#define UI_MAX_FONT_HEIGHT      (1.0F / 15.0F)
 
 /* width of lines drawn in the UI */
-#define UI_LINE_WIDTH           (1.0f / 500.0f)
+#define UI_LINE_WIDTH           (1.0F / 500.0F)
 
 /* handy colors */
 #define UI_GREEN_COLOR          rgb_t(0xef,0x0a,0x66,0x0a)
 #define UI_YELLOW_COLOR         rgb_t(0xef,0xcc,0x7a,0x28)
 #define UI_RED_COLOR            rgb_t(0xef,0xb2,0x00,0x00)
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -69,7 +70,6 @@ class laserdisc_device;
 
 class mame_ui_manager;
 
-// ======================> ui_colors
 
 class ui_colors
 {
@@ -112,7 +112,6 @@ private:
 	rgb_t m_slider_color;
 };
 
-// ======================> mame_ui_manager
 
 class mame_ui_manager : public ui_manager
 {
@@ -164,28 +163,30 @@ public:
 
 	void display_startup_screens(bool first_time);
 	virtual void set_startup_text(const char *text, bool force) override;
-	bool update_and_render(render_container &container);
+	bool update_and_render(render_target &target);
 
 	// getting display font and metrics
 	render_font *get_font();
-	float get_line_height(float scale = 1.0F);
+	float get_line_height(render_target &target, float scale = 1.0F);
 	float target_font_height() const { return m_target_font_height; }
-	float get_char_width(char32_t ch);
-	float get_string_width(std::string_view s);
-	float get_string_width(std::string_view s, float text_size);
-	float box_lr_border() const { return target_font_height() * 0.25f; }
-	float box_tb_border() const { return target_font_height() * 0.25f; }
+	float get_char_width(render_target &target, char32_t ch);
+	float get_string_width(render_target &target, std::string_view s);
+	float get_string_width(render_target &target, std::string_view s, float text_size);
+	float box_lr_border() const { return target_font_height() * 0.25F; }
+	float box_tb_border() const { return target_font_height() * 0.25F; }
 
 	// drawing boxes and text
 	void draw_outlined_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor);
 	void draw_outlined_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t fgcolor, rgb_t bgcolor);
 	void draw_textured_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture = nullptr, uint32_t flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	void draw_text(render_container &container, std::string_view buf, float x, float y);
-	void draw_text_full(render_container &container, std::string_view origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth = nullptr, float *totalheight = nullptr);
+	void draw_text(render_target &target, std::string_view buf, float x, float y);
+	void draw_text_full(render_target &target, std::string_view origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth = nullptr, float *totalheight = nullptr);
+	void draw_text_full(render_target &target, std::string_view origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight, float text_size);
 	void draw_text_full(render_container &container, std::string_view origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight, float text_size);
-	void draw_text_box(render_container &container, std::string_view text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor);
-	void draw_text_box(render_container &container, ui::text_layout &layout, float xpos, float ypos, rgb_t backcolor);
-	void draw_message_window(render_container &container, std::string_view text);
+	void draw_text_full(render_container &container, std::string_view origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight, float text_size, float aspect);
+	void draw_text_box(render_target &target, std::string_view text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor);
+	void draw_text_box(render_target &target, ui::text_layout &layout, float xpos, float ypos, rgb_t backcolor);
+	void draw_message_window(render_target &target, std::string_view text);
 
 	// load/save options to file
 	void load_ui_options();
@@ -201,7 +202,8 @@ public:
 	bool show_fps_counter();
 	void set_show_profiler(bool show);
 	bool show_profiler() const;
-	void show_menu();
+	bool show_menu();
+	bool show_menu(render_target &target);
 	virtual bool is_menu_active() override;
 	bool can_paste();
 	void image_handler_ingame();
@@ -213,8 +215,8 @@ public:
 	bool hide_inactive_pointers(int target) const noexcept;
 
 	// drawing informational overlays
-	void draw_fps_counter(render_container &container);
-	void draw_profiler(render_container &container);
+	void draw_fps_counter(render_target &target);
+	void draw_profiler(render_target &target);
 
 	// pointer display for UI handlers
 	template <typename T>
@@ -255,7 +257,7 @@ public:
 
 	// other
 	void process_ui_events();
-	ui::text_layout create_layout(render_container &container, float width = 1.0, ui::text_layout::text_justify justify = ui::text_layout::text_justify::LEFT, ui::text_layout::word_wrapping wrap = ui::text_layout::word_wrapping::WORD);
+	ui::text_layout create_layout(render_target &target, float width = 1.0, ui::text_layout::text_justify justify = ui::text_layout::text_justify::LEFT, ui::text_layout::word_wrapping wrap = ui::text_layout::word_wrapping::WORD);
 	void set_image_display_enabled(bool image_display_enabled) { m_image_display_enabled = image_display_enabled; }
 	bool image_display_enabled() const { return m_image_display_enabled; }
 	virtual void popup_time_string(int seconds, std::string message) override;
@@ -295,7 +297,9 @@ private:
 	std::unique_ptr<render_font> m_font;
 	handler_callback_func   m_handler_callback;
 	ui_callback_type        m_handler_callback_type;
+	render_target *         m_ui_target;
 	bool                    m_ui_active;
+	bool                    m_paused_for_menu;
 	bool                    m_single_step;
 	bool                    m_showfps;
 	osd_ticks_t             m_showfps_end;
@@ -315,6 +319,7 @@ private:
 	ui_colors               m_ui_colors;
 	float                   m_target_font_height;
 	bool                    m_unthrottle_mute;
+	bool                    m_ui_follow_focus;
 	bool                    m_image_display_enabled;
 
 	std::unique_ptr<ui::machine_info> m_machine_info;
@@ -336,6 +341,7 @@ private:
 
 	// private methods
 	void set_handler(ui_callback_type callback_type, handler_callback_func &&callback);
+	void activate_menu();
 	void frame_update();
 	void exit();
 	void increase_frameskip();
@@ -345,6 +351,7 @@ private:
 	void config_load_pointers(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode);
 	void config_save_pointers(config_type cfg_type, util::xml::data_node *parentnode);
 	template <typename... Params> void slider_alloc(Params &&...args) { m_sliders.push_back(std::make_unique<slider_state>(std::forward<Params>(args)...)); }
+	render_target &current_ui_target() const;
 
 	// slider controls
 	int32_t slider_volume(std::string *str, int32_t newval);

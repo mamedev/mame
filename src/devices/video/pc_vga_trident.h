@@ -17,8 +17,8 @@
 class trident_vga_device :  public svga_device
 {
 public:
-	// SDD fails on higher resolutions, TGUI9680 black screens in calchase (wants PCI?), BitBlt untested
-	// Needs major incremental split
+	// SDD fails on higher resolutions, TGUI9680 black screens in calchase service mode (wants PCI?),
+	// BitBlt untested, needs major incremental splits
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 	uint8_t port_83c6_r(offs_t offset);

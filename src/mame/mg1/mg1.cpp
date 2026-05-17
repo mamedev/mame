@@ -553,7 +553,7 @@ void mg1_state::mg1(machine_config &config)
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 	m_screen->screen_vblank().set_inputline(m_iop, M6801_TIN_LINE);
 
-	AM7990(config, m_net);
+	AM7990(config, m_net, 10'000'000); // clock is a guess
 	m_net->intr_out().set(m_icu, FUNC(ns32202_device::ir_w<6>));
 	m_net->dma_in().set([this](offs_t offset) { return m_cpu->space(0).read_word(offset); });
 	m_net->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) { m_cpu->space(0).write_word(offset, data, mem_mask); });

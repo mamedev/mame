@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Sandro Ronco
+// copyright-holders:Sandro Ronco, hap
 /*******************************************************************************
 
 Hegener + Glaser Mephisto Sensors Board, for modular chesscomputers
@@ -76,13 +76,31 @@ void mephisto_board_device::device_start()
 {
 	m_led_out.resolve();
 
+	m_board->set_delay(m_sensordelay);
+
+	// zerofill
 	m_mux = 0xff;
 	m_led_data = 0;
+	m_led_latch = 0;
+	m_cb_latch = 0xff;
 
+	m_data = 0;
+	m_row_le = 0;
+	m_ldc_le = 0;
+	m_ldc_en = 0;
+	m_cb_en = 0;
+
+	// register for savestates
 	save_item(NAME(m_mux));
 	save_item(NAME(m_led_data));
+	save_item(NAME(m_led_latch));
+	save_item(NAME(m_cb_latch));
 
-	m_board->set_delay(m_sensordelay);
+	save_item(NAME(m_data));
+	save_item(NAME(m_row_le));
+	save_item(NAME(m_ldc_le));
+	save_item(NAME(m_ldc_en));
+	save_item(NAME(m_cb_en));
 }
 
 
@@ -93,7 +111,10 @@ void mephisto_board_device::device_start()
 void mephisto_board_device::device_reset()
 {
 	m_mux = 0xff;
-	m_led_data = 0x00;
+	m_led_data = 0;
+	m_led_latch = 0;
+	m_cb_latch = 0xff;
+
 	update_led_pwm();
 }
 
@@ -102,11 +123,19 @@ void mephisto_board_device::device_reset()
 //  I/O handlers
 //-------------------------------------------------
 
+// misc
+
 void mephisto_board_device::refresh_leds_w(offs_t offset, u8 data)
 {
 	if (!m_disable_leds)
 		m_led_out[(offset >> 6 & 7) | (offset & 7) << 3] = data;
 }
+
+
+// high level interface
+
+// note: the 2 interfaces are identical hardware, the high level one just assumes
+// automatic CS and RW handling via MAME addressmaps
 
 u8 mephisto_board_device::input_r()
 {
@@ -119,11 +148,6 @@ u8 mephisto_board_device::input_r()
 	return data;
 }
 
-u8 mephisto_board_device::mux_r()
-{
-	return m_mux;
-}
-
 void mephisto_board_device::mux_w(u8 data)
 {
 	m_mux = data;
@@ -134,4 +158,68 @@ void mephisto_board_device::led_w(u8 data)
 {
 	m_led_data = data;
 	update_led_pwm();
+}
+
+
+// low level interface
+
+void mephisto_board_device::update_board()
+{
+	if (m_row_le)
+		mux_w(m_data);
+
+	if (m_ldc_le)
+		m_led_latch = m_data;
+
+	if (m_ldc_en)
+		m_cb_latch = input_r();
+	else
+		led_w(m_led_latch);
+}
+
+u8 mephisto_board_device::data_r()
+{
+	if (m_cb_en)
+		return 0xff;
+
+	return m_ldc_en ? input_r() : m_cb_latch;
+}
+
+void mephisto_board_device::data_w(u8 data)
+{
+	m_data = data;
+	update_board();
+}
+
+void mephisto_board_device::row_le_w(int state)
+{
+	// 74373(1) /LE
+	m_row_le = state ? 1 : 0;
+	update_board();
+}
+
+void mephisto_board_device::ldc_le_w(int state)
+{
+	// 74373(2) /LE
+	m_ldc_le = state ? 1 : 0;
+	update_board();
+}
+
+void mephisto_board_device::ldc_en_w(int state)
+{
+	// 74373(2) /OE & 74373(3) /LE
+	state = state ? 1 : 0;
+
+	// refresh inputs
+	if (!state && m_ldc_en)
+		m_cb_latch = input_r();
+
+	m_ldc_en = state;
+	update_board();
+}
+
+void mephisto_board_device::cb_en_w(int state)
+{
+	// 74373(3) /OE
+	m_cb_en = state ? 1 : 0;
 }

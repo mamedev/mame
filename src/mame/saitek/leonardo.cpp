@@ -51,11 +51,12 @@ Known expansion modules:
 - Brute Force (H8, Frans Morsch)
 - Sparc (SPARClite, Spracklen's)
 
-The H8 Brute Force module doesn't work with the 1st program version of Leonardo,
-this is mentioned in the repair manual and it says it requires an EPROM upgrade.
-The Sparc module doesn't appear to work with it either. Moreover, the Sparc module
-manual mentions that for it to work properly on Leonardo, the chesscomputer needs
-to be upgraded with an EMI PCB (power supply related, meaningless for emulation).
+The H8 Brute Force module doesn't work with the 1st program version of Leonardo
+(setting skill level doesn't work), this is mentioned in the repair manual and
+it says it requires an EPROM upgrade. The Sparc module doesn't appear to work with
+it either. Moreover, the Sparc module manual mentions that for it to work properly
+on Leonardo, the chesscomputer needs to be upgraded with an EMI PCB (power supply
+related, meaningless for emulation).
 
 *******************************************************************************/
 

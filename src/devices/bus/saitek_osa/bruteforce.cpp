@@ -10,7 +10,7 @@ Ulf Rathsman (known from Conchess and Mephisto MM II). It got canceled for some
 reason, and the final version is by Frans Morsch.
 
 Hardware notes:
-- Hitachi H8/325 MCU, 20MHz XTAL
+- Hitachi H8/325 MCU, 20MHz resonator
 - 256KB DRAM (2*NEC D424256C-80)
 - PCA EP9604-100 delay line (for DRAM CAS)
 

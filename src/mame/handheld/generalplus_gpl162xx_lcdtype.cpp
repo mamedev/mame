@@ -3,11 +3,11 @@
 
 /* These contain a similar game selection to the devices in unk6502_st2xxx.cpp but on updated hardware
 
-   The hardware appears to be an abuse of the GPL16250 SoC. The palette and sprite banks are used, but as work-ram
+   The hardware appears to be an abuse of the GPL162xx SoC. The palette and sprite banks are used, but as work-ram
    rather than for their intended purpose, and the rest of the GPL16250 video hardware is either entirely bypassed
    or doesn't exist.  All video is software rendered and output directly to the LCD Controller.
 
-   If this is confirmed via a decap then this should be merged with the GPL16250 implementation.
+   If this is confirmed via a decap then this should be merged with the GPL162xx implementation.
 
    The coding of these is similar to the unk6502_st2xxx.cpp too, with all game specific function calls being loaded
    on the fly from the SPI to a tiny portion of work RAM, with graphics likewise being loaded and decompressed for
@@ -63,76 +63,76 @@ private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<unsp_20_device> m_maincpu;
-	required_region_ptr<uint16_t> m_mainrom;
-	required_shared_ptr<uint16_t> m_mainram;
+	required_region_ptr<u16> m_mainrom;
+	required_shared_ptr<u16> m_mainram;
 
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
 	void map(address_map &map) ATTR_COLD;
 
-	required_region_ptr<uint8_t> m_spirom;
+	required_region_ptr<u8> m_spirom;
 
-	uint16_t unk_7abf_r();
-	uint16_t io_7860_r();
-	uint16_t unk_780f_r();
+	u16 unk_7abf_r();
+	u16 io_7860_r();
+	u16 unk_780f_r();
 
-	void io_7860_w(uint16_t data);
-	uint16_t m_7860;
+	void io_7860_w(u16 data);
+	u16 m_7860;
 
-	void unk_7862_w(uint16_t data);
-	void unk_7863_w(uint16_t data);
+	void unk_7862_w(u16 data);
+	void unk_7863_w(u16 data);
 
-	void unk_7868_w(uint16_t data);
-	uint16_t unk_7868_r();
-	uint16_t m_7868;
+	void unk_7868_w(u16 data);
+	u16 unk_7868_r();
+	u16 m_7868;
 
-	void bankswitch_707e_w(uint16_t data);
-	uint16_t bankswitch_707e_r();
-	uint16_t m_707e_bank;
+	void bankswitch_707e_w(u16 data);
+	u16 bankswitch_707e_r();
+	u16 m_707e_bank;
 
-	void bankswitch_703a_w(uint16_t data);
-	uint16_t bankswitch_703a_r();
-	uint16_t m_703a_bank;
+	void bankswitch_703a_w(u16 data);
+	u16 bankswitch_703a_r();
+	u16 m_703a_bank;
 
-	void bankedram_7300_w(offs_t offset, uint16_t data);
-	uint16_t bankedram_7300_r(offs_t offset);
-	uint16_t m_bankedram_7300[0x400];
+	void bankedram_7300_w(offs_t offset, u16 data);
+	u16 bankedram_7300_r(offs_t offset);
+	u16 m_bankedram_7300[0x400];
 
-	void bankedram_7400_w(offs_t offset, uint16_t data);
-	uint16_t bankedram_7400_r(offs_t offset);
-	uint16_t m_bankedram_7400[0x800];
+	void bankedram_7400_w(offs_t offset, u16 data);
+	u16 bankedram_7400_r(offs_t offset);
+	u16 m_bankedram_7400[0x800];
 
-	void system_dma_params_channel0_w(offs_t offset, uint16_t data);
-	uint16_t system_dma_params_channel0_r(offs_t offset);
+	void system_dma_params_channel0_w(offs_t offset, u16 data);
+	u16 system_dma_params_channel0_r(offs_t offset);
 
-	uint16_t m_dmaregs[8];
+	u16 m_dmaregs[8];
 
-	void lcd_w(uint16_t data);
-	void lcd_command_w(uint16_t data);
+	void lcd_w(u16 data);
+	void lcd_command_w(u16 data);
 
-	uint16_t spi_misc_control_r();
-	uint16_t spi_rx_fifo_r();
-	void spi_tx_fifo_w(uint16_t data);
+	u16 spi_misc_control_r();
+	u16 spi_rx_fifo_r();
+	void spi_tx_fifo_w(u16 data);
 
-	void spi_control_w(uint16_t data);
+	void spi_control_w(u16 data);
 
-	void spi_process_tx_data(uint8_t data);
-	uint8_t spi_process_rx();
-	uint8_t spi_rx();
-	uint8_t spi_rx_fast();
+	void spi_process_tx_data(u8 data);
+	u8 spi_process_rx();
+	u8 spi_rx();
+	u8 spi_rx_fast();
 
-	uint8_t m_rx_fifo[5]; // actually 8 bytes? or 8 half-bytes?
+	u8 m_rx_fifo[5]; // actually 8 bytes? or 8 half-bytes?
 
-	uint32_t m_spiaddress;
+	u32 m_spiaddress;
 
-	uint16_t unk_78a1_r();
-	uint16_t m_78a1;
-	uint16_t unk_78d8_r();
-	void unk_78d8_w(uint16_t data);
+	u16 unk_78a1_r();
+	u16 m_78a1;
+	u16 unk_78d8_r();
+	void unk_78d8_w(u16 data);
 
 	enum spistate : int
 	{
@@ -165,10 +165,10 @@ private:
 	lcdstate m_lcdstate;
 	int m_lastlcdcommand;
 
-	uint8_t m_displaybuffer[0x40000];
+	u8 m_displaybuffer[0x40000];
 	int m_lcdaddr;
 
-	uint16_t io_7870_r();
+	u16 io_7870_r();
 	required_ioport m_io_in0;
 	required_ioport m_io_in1;
 	required_device<bl_handhelds_menucontrol_device> m_menucontrol;
@@ -176,17 +176,17 @@ private:
 	void screen_vblank(int state);
 };
 
-uint32_t gpl162xx_lcdtype_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 gpl162xx_lcdtype_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int count = 0;
 	for (int y = 0; y < 256; y++)
 	{
-		uint32_t *const dst = &bitmap.pix(y);
+		u32 *const dst = &bitmap.pix(y);
 
 		for (int x = 0; x < 320; x++)
 		{
 			// 8-bit values get pumped through a 256 word table in internal ROM and converted to words
-			uint16_t dat = m_displaybuffer[(count * 2) + 1] | (m_displaybuffer[(count * 2) + 0] << 8);
+			u16 dat = m_displaybuffer[(count * 2) + 1] | (m_displaybuffer[(count * 2) + 0] << 8);
 
 			int b = ((dat >> 0) & 0x1f) << 3;
 			int g = ((dat >> 5) & 0x3f) << 2;
@@ -279,19 +279,19 @@ static INPUT_PORTS_START( gpl162xx_lcdtype )
 	PORT_DIPSETTING(      0x8000, "8000" )
 INPUT_PORTS_END
 
-uint16_t gpl162xx_lcdtype_state::unk_7abf_r()
+u16 gpl162xx_lcdtype_state::unk_7abf_r()
 {
 	return 0x0001;
 }
 
-uint16_t gpl162xx_lcdtype_state::io_7860_r()
+u16 gpl162xx_lcdtype_state::io_7860_r()
 {
-	uint16_t ret = m_io_in0->read();
+	u16 ret = m_io_in0->read();
 	LOGMASKED(LOG_GPL162XX_LCDTYPE_IO_PORT, "%s: io_7860_r %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-void gpl162xx_lcdtype_state::io_7860_w(uint16_t data)
+void gpl162xx_lcdtype_state::io_7860_w(u16 data)
 {
 	m_menucontrol->data_w((data & 0x10)>>4);
 	m_menucontrol->clock_w((data & 0x20)>>5);
@@ -299,11 +299,11 @@ void gpl162xx_lcdtype_state::io_7860_w(uint16_t data)
 	m_7860 = data;
 }
 
-void gpl162xx_lcdtype_state::unk_7862_w(uint16_t data)
+void gpl162xx_lcdtype_state::unk_7862_w(u16 data)
 {
 }
 
-void gpl162xx_lcdtype_state::unk_7863_w(uint16_t data)
+void gpl162xx_lcdtype_state::unk_7863_w(u16 data)
 {
 	// probably port direction (or 7862 is?)
 	if (data == 0x3cf7)
@@ -312,18 +312,18 @@ void gpl162xx_lcdtype_state::unk_7863_w(uint16_t data)
 	}
 }
 
-uint16_t gpl162xx_lcdtype_state::unk_780f_r()
+u16 gpl162xx_lcdtype_state::unk_780f_r()
 {
 	return 0x0002;
 }
 
-uint16_t gpl162xx_lcdtype_state::spi_misc_control_r()
+u16 gpl162xx_lcdtype_state::spi_misc_control_r()
 {
 	LOGMASKED(LOG_GPL162XX_LCDTYPE,"%s: spi_misc_control_r\n", machine().describe_context());
 	return 0x0000;
 }
 
-uint16_t gpl162xx_lcdtype_state::spi_rx_fifo_r()
+u16 gpl162xx_lcdtype_state::spi_rx_fifo_r()
 {
 	if (m_spistate == SPI_STATE_READING_FAST)
 		return spi_rx_fast();
@@ -332,7 +332,7 @@ uint16_t gpl162xx_lcdtype_state::spi_rx_fifo_r()
 	return spi_rx();
 }
 
-void gpl162xx_lcdtype_state::spi_process_tx_data(uint8_t data)
+void gpl162xx_lcdtype_state::spi_process_tx_data(u8 data)
 {
 	LOGMASKED(LOG_GPL162XX_LCDTYPE,"transmitting %02x\n", data);
 
@@ -444,7 +444,7 @@ void gpl162xx_lcdtype_state::spi_process_tx_data(uint8_t data)
 	}
 }
 
-uint8_t gpl162xx_lcdtype_state::spi_process_rx()
+u8 gpl162xx_lcdtype_state::spi_process_rx()
 {
 
 	switch (m_spistate)
@@ -452,7 +452,7 @@ uint8_t gpl162xx_lcdtype_state::spi_process_rx()
 	case SPI_STATE_READING:
 	case SPI_STATE_READING_FAST:
 	{
-		uint8_t dat = m_spirom[m_spiaddress & 0x7fffff];
+		u8 dat = m_spirom[m_spiaddress & 0x7fffff];
 
 		LOGMASKED(LOG_GPL162XX_LCDTYPE,"reading SPI %02x from SPI Address %08x (adjusted word offset %08x)\n", dat, m_spiaddress, (m_spiaddress/2)+0x20000);
 		m_spiaddress++;
@@ -470,9 +470,9 @@ uint8_t gpl162xx_lcdtype_state::spi_process_rx()
 }
 
 
-uint8_t gpl162xx_lcdtype_state::spi_rx()
+u8 gpl162xx_lcdtype_state::spi_rx()
 {
-	uint8_t ret = m_rx_fifo[0];
+	u8 ret = m_rx_fifo[0];
 
 	m_rx_fifo[0] = m_rx_fifo[1];
 	m_rx_fifo[1] = m_rx_fifo[2];
@@ -482,9 +482,9 @@ uint8_t gpl162xx_lcdtype_state::spi_rx()
 	return ret;
 }
 
-uint8_t gpl162xx_lcdtype_state::spi_rx_fast()
+u8 gpl162xx_lcdtype_state::spi_rx_fast()
 {
-	uint8_t ret = m_rx_fifo[0];
+	u8 ret = m_rx_fifo[0];
 
 	m_rx_fifo[0] = m_rx_fifo[1];
 	m_rx_fifo[1] = m_rx_fifo[2];
@@ -495,7 +495,7 @@ uint8_t gpl162xx_lcdtype_state::spi_rx_fast()
 	return ret;
 }
 
-void gpl162xx_lcdtype_state::spi_tx_fifo_w(uint16_t data)
+void gpl162xx_lcdtype_state::spi_tx_fifo_w(u16 data)
 {
 	data &= 0x00ff;
 	LOGMASKED(LOG_GPL162XX_LCDTYPE,"%s: spi_tx_fifo_w %04x\n", machine().describe_context(), data);
@@ -505,7 +505,7 @@ void gpl162xx_lcdtype_state::spi_tx_fifo_w(uint16_t data)
 
 // this is probably 'port b' but when SPI is enabled some points of this can become SPI control pins
 // it's accessed after each large data transfer, probably to reset the SPI into 'ready for command' state?
-void gpl162xx_lcdtype_state::unk_7868_w(uint16_t data)
+void gpl162xx_lcdtype_state::unk_7868_w(u16 data)
 {
 	LOGMASKED(LOG_GPL162XX_LCDTYPE_IO_PORT, "%s: unk_7868_w %04x (Port B + SPI reset?)\n", machine().describe_context(), data);
 
@@ -523,47 +523,47 @@ void gpl162xx_lcdtype_state::unk_7868_w(uint16_t data)
 	m_7868 = data;
 }
 
-uint16_t gpl162xx_lcdtype_state::unk_7868_r()
+u16 gpl162xx_lcdtype_state::unk_7868_r()
 {
 	return m_7868;
 }
 
-void gpl162xx_lcdtype_state::bankswitch_707e_w(uint16_t data)
+void gpl162xx_lcdtype_state::bankswitch_707e_w(u16 data)
 {
 	LOGMASKED(LOG_GPL162XX_LCDTYPE,"%s: bankswitch_707e_w %04x\n", machine().describe_context(), data);
 	m_707e_bank = data;
 }
 
-uint16_t gpl162xx_lcdtype_state::bankswitch_707e_r()
+u16 gpl162xx_lcdtype_state::bankswitch_707e_r()
 {
 	return m_707e_bank;
 }
 
 
-void gpl162xx_lcdtype_state::bankswitch_703a_w(uint16_t data)
+void gpl162xx_lcdtype_state::bankswitch_703a_w(u16 data)
 {
 	LOGMASKED(LOG_GPL162XX_LCDTYPE,"%s: bankswitch_703a_w %04x\n", machine().describe_context(), data);
 	m_703a_bank = data;
 }
 
-uint16_t gpl162xx_lcdtype_state::bankswitch_703a_r()
+u16 gpl162xx_lcdtype_state::bankswitch_703a_r()
 {
 	return m_703a_bank;
 }
 
-void gpl162xx_lcdtype_state::bankedram_7300_w(offs_t offset, uint16_t data)
+void gpl162xx_lcdtype_state::bankedram_7300_w(offs_t offset, u16 data)
 {
 	offset |= (m_703a_bank & 0x000c) << 6;
 	m_bankedram_7300[offset] = data;
 }
 
-uint16_t gpl162xx_lcdtype_state::bankedram_7300_r(offs_t offset)
+u16 gpl162xx_lcdtype_state::bankedram_7300_r(offs_t offset)
 {
 	offset |= (m_703a_bank & 0x000c) << 6;
 	return m_bankedram_7300[offset];
 }
 
-void gpl162xx_lcdtype_state::bankedram_7400_w(offs_t offset, uint16_t data)
+void gpl162xx_lcdtype_state::bankedram_7400_w(offs_t offset, u16 data)
 {
 	if (m_707e_bank & 1)
 	{
@@ -575,7 +575,7 @@ void gpl162xx_lcdtype_state::bankedram_7400_w(offs_t offset, uint16_t data)
 	}
 }
 
-uint16_t gpl162xx_lcdtype_state::bankedram_7400_r(offs_t offset)
+u16 gpl162xx_lcdtype_state::bankedram_7400_r(offs_t offset)
 {
 	if (m_707e_bank & 1)
 	{
@@ -587,7 +587,7 @@ uint16_t gpl162xx_lcdtype_state::bankedram_7400_r(offs_t offset)
 	}
 }
 
-void gpl162xx_lcdtype_state::system_dma_params_channel0_w(offs_t offset, uint16_t data)
+void gpl162xx_lcdtype_state::system_dma_params_channel0_w(offs_t offset, u16 data)
 {
 	m_dmaregs[offset] = data;
 
@@ -597,21 +597,21 @@ void gpl162xx_lcdtype_state::system_dma_params_channel0_w(offs_t offset, uint16_
 		{
 			LOGMASKED(LOG_GPL162XX_LCDTYPE,"%s: system_dma_params_channel0_w %01x %04x (DMA Mode)\n", machine().describe_context(), offset, data);
 
-			uint16_t mode = m_dmaregs[0];
-			uint32_t source = m_dmaregs[1] | (m_dmaregs[4] << 16);
-			uint32_t dest = m_dmaregs[2] | (m_dmaregs[5] << 16) ;
-			uint32_t length = m_dmaregs[3] | (m_dmaregs[6] << 16);
+			u16 mode = m_dmaregs[0];
+			u32 source = m_dmaregs[1] | (m_dmaregs[4] << 16);
+			u32 dest = m_dmaregs[2] | (m_dmaregs[5] << 16) ;
+			u32 length = m_dmaregs[3] | (m_dmaregs[6] << 16);
 
 			if ((mode != 0x0200) && (mode != 0x4009) && (mode != 0x6009))
 				fatalerror("unknown dma mode write %04x\n", data);
 
 			if ((mode == 0x4009) || (mode == 0x6009))
 			{
-				address_space& mem = m_maincpu->space(AS_PROGRAM);
+				address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 				for (int i = 0; i < length; i++)
 				{
-					uint16_t dat = mem.read_word(source);
+					u16 dat = mem.read_word(source);
 
 					if (mode & 0x2000)
 					{
@@ -663,35 +663,35 @@ void gpl162xx_lcdtype_state::system_dma_params_channel0_w(offs_t offset, uint16_
 	}
 }
 
-uint16_t gpl162xx_lcdtype_state::system_dma_params_channel0_r(offs_t offset)
+u16 gpl162xx_lcdtype_state::system_dma_params_channel0_r(offs_t offset)
 {
 	LOGMASKED(LOG_GPL162XX_LCDTYPE,"%s: system_dma_params_channel0_r %01x\n", machine().describe_context(), offset);
 	return m_dmaregs[offset];
 }
 
-uint16_t gpl162xx_lcdtype_state::io_7870_r()
+u16 gpl162xx_lcdtype_state::io_7870_r()
 {
 	LOGMASKED(LOG_GPL162XX_LCDTYPE_IO_PORT, "%s: io_7870_r (IO port)\n", machine().describe_context() );
 	return m_io_in1->read();
 }
 
-void gpl162xx_lcdtype_state::spi_control_w(uint16_t data)
+void gpl162xx_lcdtype_state::spi_control_w(u16 data)
 {
 	LOGMASKED(LOG_GPL162XX_LCDTYPE,"%s: spi_control_w %04x\n", machine().describe_context(), data);
 }
 
-uint16_t gpl162xx_lcdtype_state::unk_78a1_r()
+u16 gpl162xx_lcdtype_state::unk_78a1_r()
 {
 	// checked in interrupt, code skipped entirely if this isn't set
 	return m_78a1;
 }
 
-uint16_t gpl162xx_lcdtype_state::unk_78d8_r()
+u16 gpl162xx_lcdtype_state::unk_78d8_r()
 {
 	return 0xffff;
 }
 
-void gpl162xx_lcdtype_state::unk_78d8_w(uint16_t data)
+void gpl162xx_lcdtype_state::unk_78d8_w(u16 data)
 {
 	// written in IRQ, possible ack
 	if (data & 0x8000)
@@ -750,7 +750,7 @@ void gpl162xx_lcdtype_state::map(address_map &map)
 	map(0x20fc00, 0x20fc00).w(FUNC(gpl162xx_lcdtype_state::lcd_w));
 }
 
-void gpl162xx_lcdtype_state::lcd_command_w(uint16_t data)
+void gpl162xx_lcdtype_state::lcd_command_w(u16 data)
 {
 	data &= 0xff;
 
@@ -777,7 +777,7 @@ void gpl162xx_lcdtype_state::lcd_command_w(uint16_t data)
 	}
 }
 
-void gpl162xx_lcdtype_state::lcd_w(uint16_t data)
+void gpl162xx_lcdtype_state::lcd_w(u16 data)
 {
 	data &= 0xff; // definitely looks like 8-bit port as 16-bit values are shifted and rewritten
 	LOGMASKED(LOG_GPL162XX_LCDTYPE,"%s: lcd_w %02x\n", machine().describe_context(), data);

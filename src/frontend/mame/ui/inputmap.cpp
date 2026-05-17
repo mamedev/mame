@@ -31,7 +31,7 @@ constexpr unsigned INPUT_TYPE_TOTAL = INPUT_TYPE_ANALOG + SEQ_TYPE_TOTAL;
     menu
 -------------------------------------------------*/
 
-menu_input_groups::menu_input_groups(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+menu_input_groups::menu_input_groups(mame_ui_manager &mui, render_target &target) : menu(mui, target)
 {
 	set_heading(_("Input Assignments (general)"));
 }
@@ -59,7 +59,7 @@ bool menu_input_groups::handle(event const *ev)
 	{
 		menu::stack_push<menu_input_general>(
 				ui(),
-				container(),
+				target(),
 				int(uintptr_t(ev->itemref) - 1),
 				util::string_format(_("Input Assignments (%1$s)"), ev->item->text()));
 	}
@@ -73,8 +73,8 @@ bool menu_input_groups::handle(event const *ev)
     input menu
 -------------------------------------------------*/
 
-menu_input_general::menu_input_general(mame_ui_manager &mui, render_container &container, int _group, std::string &&heading)
-	: menu_input(mui, container)
+menu_input_general::menu_input_general(mame_ui_manager &mui, render_target &target, int _group, std::string &&heading)
+	: menu_input(mui, target)
 	, group(_group)
 {
 	set_heading(std::move(heading));
@@ -147,7 +147,7 @@ void menu_input_general::populate()
     input menu
 -------------------------------------------------*/
 
-menu_input_specific::menu_input_specific(mame_ui_manager &mui, render_container &container) : menu_input(mui, container)
+menu_input_specific::menu_input_specific(mame_ui_manager &mui, render_target &target) : menu_input(mui, target)
 {
 	set_heading(_("Input Assignments (this system)"));
 }
@@ -260,8 +260,8 @@ void menu_input_specific::populate()
     menu_input - display a menu for inputs
 -------------------------------------------------*/
 
-menu_input::menu_input(mame_ui_manager &mui, render_container &container)
-	: menu(mui, container)
+menu_input::menu_input(mame_ui_manager &mui, render_target &target)
+	: menu(mui, target)
 	, data()
 	, pollingitem(nullptr)
 	, seq_poll()

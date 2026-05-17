@@ -26,6 +26,7 @@
 #include "image.h"
 #include "softlist_dev.h"
 
+#include "util/path.h"
 #include "util/zippath.h"
 
 
@@ -39,17 +40,13 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, render_container &container, device_image_interface &image)
-	: menu(mui, container)
+menu_control_device_image::menu_control_device_image(mame_ui_manager &mui, render_target &target, device_image_interface &image)
+	: menu(mui, target)
 	, m_image(image)
-	, m_create_ok(false)
-	, m_create_confirmed(false)
 	, m_swi(nullptr)
 	, m_swp(nullptr)
 	, m_sld(nullptr)
 {
-	m_submenu_result.i = -1;
-
 	if (m_image.software_list_name())
 		m_sld = software_list_device::find_by_name(mui.machine().config(), m_image.software_list_name());
 	m_swi = m_image.software_entry();
@@ -134,19 +131,16 @@ menu_control_device_image::~menu_control_device_image()
 
 
 //-------------------------------------------------
-//  test_create - creates a new disk image
+//  test_create
 //-------------------------------------------------
 
-void menu_control_device_image::test_create(bool &can_create, bool &need_confirm)
+void menu_control_device_image::test_create(std::string const &path, bool &can_create, bool &need_confirm)
 {
-	// assemble the full path
-	auto path = util::zippath_combine(m_current_directory, m_current_file);
-
 	// does a file or a directory exist at the path
 	auto entry = osd_stat(path);
 	auto file_type = (entry != nullptr) ? entry->type : osd::directory::entry::entry_type::NONE;
 
-	switch(file_type)
+	switch (file_type)
 	{
 		case osd::directory::entry::entry_type::NONE:
 			// no file/dir here - always create
@@ -176,44 +170,303 @@ void menu_control_device_image::test_create(bool &can_create, bool &need_confirm
 
 
 //-------------------------------------------------
-//  load_software_part
+//  hook_load
 //-------------------------------------------------
 
-void menu_control_device_image::load_software_part()
+bool menu_control_device_image::hook_load(std::string const &name)
 {
-	std::string temp_name = string_format("%s:%s:%s", m_sld->list_name(), m_swi->shortname(), m_swp->name());
-
-	driver_enumerator drivlist(machine().options(), machine().options().system_name());
-	drivlist.next();
-	media_auditor auditor(drivlist);
-	media_auditor::summary summary = auditor.audit_software(*m_sld, *m_swi, AUDIT_VALIDATE_FAST);
-	// if everything looks good, load software
-	if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
+	auto [err, msg] = m_image.load(name);
+	if (err)
 	{
-		auto [err, msg] = m_image.load_software(temp_name);
-		if (err)
-			machine().popmessage(_("Error loading software item: %1$s"), !msg.empty() ? msg : err.message());
-		stack_pop();
+		machine().popmessage(_("Error loading media image: %1$s"), !msg.empty() ? msg : err.message());
+		return false;
 	}
 	else
 	{
-		machine().popmessage(_("Files required for the selected software are missing or incorrect."));
-		m_state = SELECT_SOFTLIST;
-		menu_activated();
+		return true;
 	}
 }
 
 
 //-------------------------------------------------
-//  hook_load
+//  hook_create
 //-------------------------------------------------
 
-void menu_control_device_image::hook_load(const std::string &name)
+bool menu_control_device_image::hook_create(std::string_view path)
 {
-	auto [err, msg] = m_image.load(name);
-	if (err)
-		machine().popmessage(_("Error loading media image: %1$s"), !msg.empty() ? msg : err.message());
-	stack_pop();
+	auto [err, msg] = m_image.create(path, nullptr, nullptr);
+	if (!err)
+		return true;
+
+	machine().popmessage(_("Error creating media image: %1$s"), !msg.empty() ? msg : err.message());
+	return false;
+}
+
+
+//-------------------------------------------------
+//  start_file
+//-------------------------------------------------
+
+void menu_control_device_image::start_file()
+{
+	menu::stack_push<menu_file_selector>(
+			ui(), target(),
+			m_image,
+			m_current_directory,
+			m_current_file,
+			true,
+			m_image.image_interface() != nullptr,
+			m_image.is_creatable(),
+			[this] (menu_file_selector::result result, std::string const &directory, std::string const &file)
+			{
+				m_current_directory = directory;
+				m_current_file = file;
+				switch (result)
+				{
+				case menu_file_selector::result::EMPTY:
+					m_image.unload();
+					stack_pop(); // pop the file selection menu
+					stack_pop(); // pop the fake menu that orchestrates the other menus
+					break;
+
+				case menu_file_selector::result::FILE:
+					if (hook_load(file))
+					{
+						stack_pop(); // pop the file selection menu
+						stack_pop(); // pop the fake menu that orchestrates the other menus
+					}
+					break;
+
+				case menu_file_selector::result::CREATE:
+					menu::stack_push<menu_file_create>(
+							ui(),
+							target(),
+							m_image,
+							directory,
+							std::string(core_filename_extract_base(m_current_file)),
+							[this] (std::string const &name) { create_file(m_current_directory, name); });
+					break;
+
+				case menu_file_selector::result::SOFTLIST:
+					stack_pop(); // pop the file selection menu
+					start_softlist();
+					break;
+
+				case menu_file_selector::result::MIDI:
+					stack_pop(); // pop the file selection menu
+					start_midi();
+					break;
+				}
+			});
+}
+
+
+//-------------------------------------------------
+//  start_softlist
+//-------------------------------------------------
+
+void menu_control_device_image::start_softlist()
+{
+	menu::stack_push<menu_software>(
+			ui(),
+			target(),
+			m_image.image_interface(),
+			[this] (software_list_device *sld)
+			{
+				if (!sld)
+				{
+					stack_pop(); // pop the software lists menu
+					stack_pop(); // pop the fake menu that orchestrates the other menus
+				}
+				else
+				{
+					menu::stack_push<menu_software_list>(
+							ui(),
+							target(),
+							*sld,
+							m_image.image_interface(),
+							[this, sld] (std::string_view item) { software_item_selected(*sld, item); });
+				}
+			});
+}
+
+
+//-------------------------------------------------
+//  start_midi
+//-------------------------------------------------
+
+void menu_control_device_image::start_midi()
+{
+	menu::stack_push<menu_midi_inout>(
+			ui(),
+			target(),
+			m_image.device().type() == MIDIIN,
+			[this] (std::string const &port)
+			{
+				auto const [err, msg] = m_image.load(port);
+				if (err)
+				{
+					machine().popmessage(_("Error opening MIDI port: %1$s"), !msg.empty() ? msg : err.message());
+				}
+				else
+				{
+					stack_pop(); // pop the MIDI port selection menu
+					stack_pop(); // pop the fake menu that orchestrates the other menus
+				}
+			});
+}
+
+
+//-------------------------------------------------
+//  load_software_part
+//-------------------------------------------------
+
+bool menu_control_device_image::load_software_part(software_list_device &sld, software_info const &swi, software_part const &swp)
+{
+	std::string temp_name = string_format("%s:%s:%s", sld.list_name(), swi.shortname(), swp.name());
+
+	driver_enumerator drivlist(machine().options(), machine().options().system_name());
+	drivlist.next();
+	media_auditor auditor(drivlist);
+	media_auditor::summary summary = auditor.audit_software(sld, swi, AUDIT_VALIDATE_FAST);
+
+	// if everything looks good, load software
+	if ((summary == media_auditor::CORRECT) || (summary == media_auditor::BEST_AVAILABLE) || (summary == media_auditor::NONE_NEEDED))
+	{
+		auto [err, msg] = m_image.load_software(temp_name);
+		if (!err)
+			return true;
+
+		machine().popmessage(_("Error loading software item: %1$s"), !msg.empty() ? msg : err.message());
+		return false;
+	}
+	else
+	{
+		machine().popmessage(_("Files required for the selected software are missing or incorrect."));
+		return false;
+	}
+}
+
+
+//-------------------------------------------------
+//  software_item_selected
+//-------------------------------------------------
+
+void menu_control_device_image::software_item_selected(software_list_device &sld, std::string_view item)
+{
+	auto *const swi = sld.find(item);
+	assert(swi);
+
+	if (swi->has_multiple_parts(m_image.image_interface()))
+	{
+		menu::stack_push<menu_software_parts>(
+				ui(),
+				target(),
+				*swi,
+				m_image.image_interface(),
+				false,
+				[this, &sld, swi] (menu_software_parts::result action, software_part const *swp)
+				{
+					assert(menu_software_parts::result::ENTRY == action);
+					assert(swp);
+
+					if (load_software_part(sld, *swi, *swp))
+					{
+						stack_pop(); // pop the software parts menu
+						stack_pop(); // pop the software items menu
+						stack_pop(); // pop the software lists menu
+						stack_pop(); // pop the fake menu that orchestrates the other menus
+					}
+				});
+	}
+	else
+	{
+		auto *const swp = swi->find_part("", m_image.image_interface());
+		assert(swp);
+
+		if (load_software_part(sld, *swi, *swp))
+		{
+			stack_pop(); // pop the software items menu
+			stack_pop(); // pop the software lists menu
+			stack_pop(); // pop the fake menu that orchestrates the other menus
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  other_part_selected
+//-------------------------------------------------
+
+void menu_control_device_image::other_part_selected(menu_software_parts::result action, software_part const *swp)
+{
+	switch (action)
+	{
+	case menu_software_parts::result::ENTRY:
+		assert(swp);
+		if (load_software_part(*m_sld, *m_swi, *swp))
+		{
+			stack_pop(); // pop the software parts menu
+			stack_pop(); // pop the fake menu that orchestrates the other menus
+		}
+		break;
+
+	case menu_software_parts::result::FMGR:
+		stack_pop(); // pop the software parts menu
+		start_file();
+		break;
+
+	case menu_software_parts::result::EMPTY:
+		m_image.unload();
+		stack_pop(); // pop the software parts menu
+		stack_pop(); // pop the fake menu that orchestrates the other menus
+		break;
+
+	case menu_software_parts::result::SWLIST:
+		stack_pop(); // pop the software parts menu
+		start_softlist();
+		break;
+	}
+}
+
+
+//-------------------------------------------------
+//  create_file
+//-------------------------------------------------
+
+void menu_control_device_image::create_file(std::string const &directory, std::string const &name)
+{
+	auto path = util::zippath_combine(directory, name);
+	bool can_create, need_confirm;
+	test_create(path, can_create, need_confirm);
+	if (!can_create)
+		return;
+
+	if (need_confirm)
+	{
+		menu::stack_push<menu_confirm_save_as>(
+				ui(),
+				target(),
+				[this, path] ()
+				{
+					stack_pop(); // pop the confirm overwrite menu
+					if (hook_create(path))
+					{
+						stack_pop(); // pop the create file menu
+						stack_pop(); // pop the file selection menu
+						stack_pop(); // pop the fake menu that orchestrates the other menus
+					}
+				});
+	}
+	else
+	{
+		if (hook_create(path))
+		{
+			stack_pop(); // pop the create file menu
+			stack_pop(); // pop the file selection menu
+			stack_pop(); // pop the fake menu that orchestrates the other menus
+		}
+	}
 }
 
 
@@ -243,199 +496,26 @@ bool menu_control_device_image::handle(event const *ev)
 
 void menu_control_device_image::menu_activated()
 {
-	switch(m_state)
+	switch (m_state)
 	{
 	case START_FILE:
-		menu::stack_push<menu_file_selector>(
-				ui(), container(),
-				&m_image,
-				m_current_directory,
-				m_current_file,
-				true,
-				m_image.image_interface() != nullptr,
-				m_image.is_creatable(),
-				[this] (menu_file_selector::result result, std::string &&directory, std::string &&file)
-				{
-					m_current_directory = std::move(directory);
-					m_current_file = std::move(file);
-					switch (result)
-					{
-					case menu_file_selector::result::EMPTY:
-						m_image.unload();
-						stack_pop();
-						break;
-
-					case menu_file_selector::result::FILE:
-						hook_load(m_current_file);
-						break;
-
-					case menu_file_selector::result::CREATE:
-						menu::stack_push<menu_file_create>(ui(), container(), &m_image, m_current_directory, m_current_file, m_create_ok);
-						m_state = CHECK_CREATE;
-						break;
-
-					case menu_file_selector::result::SOFTLIST:
-						m_state = START_SOFTLIST;
-						break;
-
-					case menu_file_selector::result::MIDI:
-						m_state = START_MIDI;
-						break;
-
-					default: // return to system
-						stack_pop();
-						break;
-					}
-				});
-		break;
-
-	case START_SOFTLIST:
-		m_sld = nullptr;
-		menu::stack_push<menu_software>(ui(), container(), m_image.image_interface(), &m_sld);
-		m_state = SELECT_SOFTLIST;
-		break;
-
-	case START_MIDI:
-		m_midi = "";
-		menu::stack_push<menu_midi_inout>(ui(), container(), m_image.device().type() == MIDIIN, &m_midi);
-		m_state = SELECT_MIDI;
-		break;
-
-	case SELECT_MIDI:
-		if(!m_midi.empty())
-		{
-			auto [err, msg] = m_image.load(m_midi);
-			if (err)
-				machine().popmessage(_("Error connecting to midi port: %1$s"), !msg.empty() ? msg : err.message());
-		}
-		stack_pop();
+		start_file();
+		m_state = DONE;
 		break;
 
 	case START_OTHER_PART:
-		m_submenu_result.swparts = menu_software_parts::result::INVALID;
-		menu::stack_push<menu_software_parts>(ui(), container(), m_swi, m_image.image_interface(), &m_swp, true, m_submenu_result.swparts);
-		m_state = SELECT_OTHER_PART;
+		menu::stack_push<menu_software_parts>(
+				ui(),
+				target(),
+				*m_swi,
+				m_image.image_interface(),
+				true,
+				[this] (menu_software_parts::result action, software_part const *swp) { other_part_selected(action, swp); });
+		m_state = DONE;
 		break;
 
-	case SELECT_SOFTLIST:
-		if (!m_sld)
-		{
-			stack_pop();
-		}
-		else
-		{
-			m_software_info_name.clear();
-			menu::stack_push<menu_software_list>(ui(), container(), m_sld, m_image.image_interface(), m_software_info_name);
-			m_state = SELECT_PARTLIST;
-		}
-		break;
-
-	case SELECT_PARTLIST:
-		m_swi = m_sld->find(m_software_info_name);
-		if (!m_swi)
-		{
-			m_state = START_SOFTLIST;
-			menu_activated();
-		}
-		else if (m_swi->has_multiple_parts(m_image.image_interface()))
-		{
-			m_submenu_result.swparts = menu_software_parts::result::INVALID;
-			m_swp = nullptr;
-			menu::stack_push<menu_software_parts>(ui(), container(), m_swi, m_image.image_interface(), &m_swp, false, m_submenu_result.swparts);
-			m_state = SELECT_ONE_PART;
-		}
-		else
-		{
-			m_swp = m_swi->find_part("", m_image.image_interface());
-			load_software_part();
-		}
-		break;
-
-	case SELECT_ONE_PART:
-		switch (m_submenu_result.swparts)
-		{
-		case menu_software_parts::result::ENTRY:
-			load_software_part();
-			break;
-
-		default: // return to list
-			m_state = SELECT_SOFTLIST;
-			menu_activated();
-			break;
-		}
-		break;
-
-	case SELECT_OTHER_PART:
-		switch (m_submenu_result.swparts)
-		{
-		case menu_software_parts::result::ENTRY:
-			load_software_part();
-			break;
-
-		case menu_software_parts::result::FMGR:
-			m_state = START_FILE;
-			menu_activated();
-			break;
-
-		case menu_software_parts::result::EMPTY:
-			m_image.unload();
-			stack_pop();
-			break;
-
-		case menu_software_parts::result::SWLIST:
-			m_state = START_SOFTLIST;
-			menu_activated();
-			break;
-
-		case menu_software_parts::result::INVALID: // return to system
-			stack_pop();
-			break;
-		}
-		break;
-
-	case CREATE_FILE:
-		{
-			bool can_create, need_confirm;
-			test_create(can_create, need_confirm);
-			if (can_create)
-			{
-				if (need_confirm)
-				{
-					menu::stack_push<menu_confirm_save_as>(ui(), container(), m_create_confirmed);
-					m_state = CREATE_CONFIRM;
-				}
-				else
-				{
-					m_state = DO_CREATE;
-					menu_activated();
-				}
-			}
-			else
-			{
-				m_state = START_FILE;
-				menu_activated();
-			}
-		}
-		break;
-
-	case CREATE_CONFIRM:
-		m_state = m_create_confirmed ? DO_CREATE : START_FILE;
-		menu_activated();
-		break;
-
-	case CHECK_CREATE:
-		m_state = m_create_ok ? CREATE_FILE : START_FILE;
-		menu_activated();
-		break;
-
-	case DO_CREATE:
-		{
-			auto path = util::zippath_combine(m_current_directory, m_current_file);
-			auto [err, msg] = m_image.create(path, nullptr, nullptr);
-			if (err)
-				machine().popmessage(_("Error creating media image: %1$s"), !msg.empty() ? msg : err.message());
-			stack_pop();
-		}
+	case DONE:
+		stack_pop();
 		break;
 	}
 }

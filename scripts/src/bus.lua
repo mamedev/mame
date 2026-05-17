@@ -4115,8 +4115,6 @@ if BUSES["NUBUS"] then
 		MAME_DIR .. "src/devices/bus/nubus/pds30_cb264.h",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_procolor816.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_procolor816.h",
-		MAME_DIR .. "src/devices/bus/nubus/pds30_sigmalview.cpp",
-		MAME_DIR .. "src/devices/bus/nubus/pds30_sigmalview.h",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_30hr.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_30hr.h",
 		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/cards.cpp",
@@ -5883,6 +5881,8 @@ if BUSES["TI99"] then
 		MAME_DIR .. "src/devices/bus/ti99/sidecar/arcturus.h",
 		MAME_DIR .. "src/devices/bus/ti99/sidecar/speechsyn.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/sidecar/speechsyn.h",
+		MAME_DIR .. "src/devices/bus/ti99/sidecar/thermal.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/sidecar/thermal.h",
 	}
 end
 

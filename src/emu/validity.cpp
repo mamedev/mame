@@ -117,17 +117,6 @@ struct pure_virtual_base
 
 
 //-------------------------------------------------
-//  ioport_string_from_index - return an indexed
-//  string from the I/O port system
-//-------------------------------------------------
-
-inline char const *ioport_string_from_index(u32 index)
-{
-	return ioport_configurer::string_from_token(reinterpret_cast<char const *>(uintptr_t(index)));
-}
-
-
-//-------------------------------------------------
 //  random_u64
 //  random_s64
 //  random_u32
@@ -1894,13 +1883,13 @@ void validate_delegates_functoid()
 //  strings
 //-------------------------------------------------
 
-inline int validity_checker::get_defstr_index(const char *string, bool suppress_error)
+inline input_string_index validity_checker::get_defstr_index(const char *string, bool suppress_error)
 {
 	// check for strings that should be DEF_STR
-	auto strindex = m_defstr_map.find(string);
-	if (!suppress_error && strindex != m_defstr_map.end() && string != ioport_string_from_index(strindex->second))
+	auto const strindex = m_defstr_map.find(string);
+	if (!suppress_error && (strindex != m_defstr_map.end()) && (string != ioport_configurer::string_from_token(strindex->second)))
 		osd_printf_error("Must use DEF_STR( %s )\n", string);
-	return (strindex != m_defstr_map.end()) ? strindex->second : 0;
+	return (strindex != m_defstr_map.end()) ? strindex->second : input_string_index(0);
 }
 
 
@@ -1978,9 +1967,9 @@ validity_checker::validity_checker(emu_options &options, bool quick)
 	// pre-populate the defstr map with all the default strings
 	for (int strnum = 1; strnum < INPUT_STRING_COUNT; strnum++)
 	{
-		const char *string = ioport_string_from_index(strnum);
+		const char *string = ioport_configurer::string_from_token(input_string_index(strnum));
 		if (string != nullptr)
-			m_defstr_map.insert(std::make_pair(string, strnum));
+			m_defstr_map.emplace(string, input_string_index(strnum));
 	}
 }
 
@@ -2579,8 +2568,8 @@ void validity_checker::validate_analog_input_field(const ioport_field &field)
 
 void validity_checker::validate_dip_settings(const ioport_field &field)
 {
-	char const *const demo_sounds = ioport_string_from_index(INPUT_STRING_Demo_Sounds);
-	char const *const flipscreen = ioport_string_from_index(INPUT_STRING_Flip_Screen);
+	char const *const demo_sounds = ioport_configurer::string_from_token(INPUT_STRING_Demo_Sounds);
+	char const *const flipscreen = ioport_configurer::string_from_token(INPUT_STRING_Flip_Screen);
 	char const *const name = field.specific_name() ? field.specific_name() : "UNNAMED";
 	u8 coin_list[__input_string_coinage_end + 1 - __input_string_coinage_start] = { 0 };
 	bool coin_error = false;
@@ -2589,7 +2578,7 @@ void validity_checker::validate_dip_settings(const ioport_field &field)
 	for (auto setting = field.settings().begin(); field.settings().end() != setting; ++setting)
 	{
 		// note any coinage strings
-		int strindex = get_defstr_index(setting->name());
+		input_string_index const strindex = get_defstr_index(setting->name());
 		if (strindex >= __input_string_coinage_start && strindex <= __input_string_coinage_end)
 			coin_list[strindex - __input_string_coinage_start] = 1;
 
@@ -2610,7 +2599,7 @@ void validity_checker::validate_dip_settings(const ioport_field &field)
 		if (field.settings().end() != nextsetting)
 		{
 			// check for inverted off/on DIP switch order
-			int next_strindex = get_defstr_index(nextsetting->name(), true);
+			input_string_index next_strindex = get_defstr_index(nextsetting->name(), true);
 			if (strindex == INPUT_STRING_On && next_strindex == INPUT_STRING_Off)
 				osd_printf_error("%s option must have Off/On options in the order: Off, On\n", name);
 
@@ -2638,7 +2627,7 @@ void validity_checker::validate_dip_settings(const ioport_field &field)
 		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "   Note proper coin sort order should be:\n");
 		for (int entry = 0; entry < std::size(coin_list); entry++)
 			if (coin_list[entry])
-				output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "      %s\n", ioport_string_from_index(__input_string_coinage_start + entry));
+				output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "      %s\n", ioport_configurer::string_from_token(input_string_index(__input_string_coinage_start + entry)));
 	}
 }
 
