@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/*****************************************************************************************************************
+/**************************************************************************************************
 
 Marine Date (c) 1981 Taito
 
@@ -8,19 +8,16 @@ driver by Angelo Salese,
 original "wiped off due of not anymore licenseable" driver by insideoutboy.
 
 TODO:
-- discrete sound
-- imperfect colors: unused bit 2 of color prom, guessworked sea gradient, mg16 entirely unused.
-  also unused colors 0x10-0x1f (might be a flashing bank)
+- discrete sound;
+- imperfect colors: actual guessworked sea gradient, mg16 entirely unused,
+  unused tilemap colors 0x10-0x1f (what for? Maybe unused for drawing but negated during collision?)
 - collision detection isn't perfect, sometimes octopus gets stuck and dies even if moves are
-  still available.
-  HW collision detection isn't perfect even from the reference, presumably needs a trojan run on
-  the real HW.
-- ROM writes (irq mask?)
-- Merge PC3259 device with crbaloon/bking/grchamp drivers.
-- Currently defaults to cocktail instead of upright. When upright chosen, screen is upside down.
-  (MT 07311)
+  still available (update: may be fixed by narrowing?).
+  NOTE: HW collision detection isn't perfect even from the reference(s);
+- ROM writes (irq mask?);
+- Merge PC3259 device with crbaloon/bking/grchamp drivers;
 
-*****************************************************************************************************************
+===================================================================================================
 
 Marine Date
 Taito 1981
@@ -53,6 +50,7 @@ Notes: (PCB contains lots of resistors/caps/transistors etc)
       4030    - RCA CD4030 Quad Exclusive-Or Gate
       VR*     - Volume pots for each sound
       VOL     - Master Volume pot
+
 Middle board
 MGO70002
 MGN00002
@@ -73,7 +71,9 @@ MGN00002
 Notes:
       MG12/13    - Hitachi HN462532 4kx8 EPROM
       MG14/15/16 - 82S123 bipolar PROM
-      PC3259     - PC3259 8025 H08 unknown DIP24 IC. Package design indicates it was manufactured by Fujitsu
+      PC3259     - PC3259 8025 H08 unknown DIP24 IC.
+                   Package design indicates it was manufactured by Fujitsu
+
 Lower board
 AA017779
 sticker: MGN00003
@@ -102,7 +102,7 @@ Notes:
 Top and Middle PCBs are plugged in with the solder-sides together.
 Lower PCB is plugged in with components facing up.
 
-*****************************************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -183,6 +183,7 @@ private:
 	uint32_t obj_to_layer_collision();
 };
 
+// TODO: exact resistor values
 void marinedt_state::palette_init(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
@@ -193,8 +194,11 @@ void marinedt_state::palette_init(palette_device &palette) const
 		// red component
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
-		//bit2 = BIT(color_prom[i], 2);
-		int const r = (0x55 * bit0) + (0xaa * bit1);
+		bit2 = BIT(color_prom[i], 2);
+		int r = (0x55 * bit0) + (0xaa * bit1);
+		// (sorta) match boundaries and seahorse being brown-ish (a bit too much)
+		if (bit2 == 0)
+			r /= 2;
 
 		// green component
 		bit0 = BIT(color_prom[i], 3);
@@ -236,7 +240,7 @@ void marinedt_state::init_seabitmap()
 		for (int x = clip.min_x; x <= clip.max_x; x++)
 		{
 			// TODO: exact formula (related to total h size?)
-			uint8_t blue_pen = 0x48 + ((x-32) / 8);
+			uint8_t blue_pen = 0x48 + ((x - 32) / 8);
 			// clamp
 			if(blue_pen > 0x5f)
 				blue_pen = 0x5f;
@@ -291,10 +295,11 @@ uint32_t marinedt_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	if(m_layer_en & 2)
-		copybitmap_trans(bitmap, m_obj[1].bitmap, 0, 0, 0, 0, cliprect, 0);
 	if(m_layer_en & 1)
 		copybitmap_trans(bitmap, m_obj[0].bitmap, 0, 0, 0, 0, cliprect, 0);
+	// mermaid goes above player
+	if(m_layer_en & 2)
+		copybitmap_trans(bitmap, m_obj[1].bitmap, 0, 0, 0, 0, cliprect, 0);
 
 	return 0;
 }
@@ -389,8 +394,7 @@ void marinedt_state::output_w(uint8_t data)
 	machine().bookkeeping().coin_lockout_global_w(!(BIT(data, 0)));
 }
 
-// collision detection
-// we return a value in the form of y<<5|x in case collision occurred
+// TODO: currently returning an address like tilemap, but this is probably just checked as boolean
 inline uint32_t marinedt_state::obj_to_obj_collision()
 {
 	// bail out if any obj is disabled
@@ -419,15 +423,19 @@ inline uint32_t marinedt_state::obj_to_obj_collision()
 	return 0;
 }
 
+// we return a value in the form of y<<5|x in case collision occurred
+// (which is the tilemap address)
 inline uint32_t marinedt_state::obj_to_layer_collision()
 {
 	// bail out if obj target is disabled
 	if((m_layer_en & 1) == 0)
 		return 0;
 
-	for(int y = 0; y < 32; y++)
+	// TODO: experimental, narrow to the internal 8x8 head
+	// definitely shouldn't hit octopus legs
+	for(int y = 12; y < 21; y++)
 	{
-		for(int x = 0; x < 32; x++)
+		for(int x = 12; x < 21; x++)
 		{
 			uint16_t resx, resy;
 
@@ -437,11 +445,10 @@ inline uint32_t marinedt_state::obj_to_layer_collision()
 			if((m_obj[0].bitmap.pix(resy, resx) & 3) == 0)
 				continue;
 
-			// shift in gameplay area (cfr. tilemap viewer 0s)
+			// shift in gameplay area (cfr. tilemap viewer out-of-screen 0s)
 			if(!m_screen_flip)
 				resy -= 32;
 
-			// TODO: non screen flip path doesn't work properly
 			if(m_tilemap->pixmap().pix(resy, resx) != 0)
 			{
 				if(m_screen_flip)
@@ -527,7 +534,7 @@ static INPUT_PORTS_START( marinedt )
 
 	// TODO: diplocations needs to be verified
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:4,3,2,1")
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:!4,!3,!2,!1")
 	PORT_DIPSETTING(    0x0f, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 7C_1C ) )
@@ -544,7 +551,7 @@ static INPUT_PORTS_START( marinedt )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ) )
-	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:8,7,6,5")
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:!8,!7,!6,!5")
 	PORT_DIPSETTING(    0xf0, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 7C_1C ) )
@@ -563,23 +570,23 @@ static INPUT_PORTS_START( marinedt )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "DSWB" ) PORT_DIPLOCATION("SWB:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Disable sprite-tile collision (Cheat)" ) PORT_DIPLOCATION("SWB:2")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWB:!1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Disable sprite-tile collision (Cheat)" ) PORT_DIPLOCATION("SWB:!2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_HIGH, "SWB:3")
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:4")
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_HIGH, "SWB:!3")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:!4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x10, 0x10, "Number of Coin Chutes") PORT_DIPLOCATION("SWB:5")
+	PORT_DIPNAME( 0x10, 0x10, "Number of Coin Chutes") PORT_DIPLOCATION("SWB:!5")
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPNAME( 0x20, 0x00, "Year Display" ) PORT_DIPLOCATION("SWB:6")
+	PORT_DIPNAME( 0x20, 0x00, "Year Display" ) PORT_DIPLOCATION("SWB:!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWB:8,7")
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWB:!8,!7")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x40, "4" )
 	PORT_DIPSETTING(    0x80, "5" )
@@ -699,4 +706,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1981, marinedt, 0, marinedt, marinedt, marinedt_state, empty_init, ROT270, "Taito", "Marine Date", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND )
+GAME( 1981, marinedt, 0, marinedt, marinedt, marinedt_state, empty_init, ROT90, "Taito", "Marine Date", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
