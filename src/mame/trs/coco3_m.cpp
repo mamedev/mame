@@ -56,7 +56,7 @@ void coco3_state::device_start()
 	coco_state::device_start();
 
 	// save state support
-	save_item(NAME(m_prev_keyboard_total));
+	save_item(NAME(m_prev_keyboard_pressed));
 	save_item(NAME(m_pia1b_control_register));
 }
 
@@ -111,29 +111,21 @@ INPUT_CHANGED_MEMBER(coco3_state::keyboard_changed)
     coco_state::keyboard_changed(field, param, oldval, newval);
 
     /* Support for CoCo 3 keyboard GIME interrupt */
-
-    int total = 0;
+    uint8_t any_pressed = 0;
     for (unsigned i = 0; i < m_keyboard.size(); i++)
     {
-        /* Invert because active low: 0=pressed, so ~read() gives 1=pressed */
-        uint8_t pressed = (~(m_keyboard[i]->read()) | poll_joystick_buttons()) & 0xFF;
-        total += __builtin_popcount(pressed);
+        any_pressed |= (~(m_keyboard[i]->read()) | poll_joystick_buttons()) & 0xFF;
     }
 
-    if (m_prev_keyboard_total == 0 && total > 0)
-    {
-        m_gime->set_il1(true);
-        m_gime->set_il1(false);
-    }
-    else if (m_prev_keyboard_total > 0 && total == 0)
+    bool pressed = any_pressed != 0;
+    if (pressed != m_prev_keyboard_pressed)
     {
         m_gime->set_il1(true);
         m_gime->set_il1(false);
     }
 
-    m_prev_keyboard_total = total;
+    m_prev_keyboard_pressed = pressed;
 }
-
 
 //-------------------------------------------------
 //  cart_w
