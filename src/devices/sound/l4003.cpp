@@ -34,9 +34,11 @@
 
     004x - Envelope volume (0 = max volume, 0xffff = silent)
 
-    005x - Volume envelope target
+    005x - Volume envelope target, same units as register 004x
 
-    006x - Volume envelope rate in 8.8 fixed point where 0x100 is 1 step per sample
+    006x - Volume envelope rate in 13.3 fixed point, and inverted.
+           So this value XOR 0xffff gives the 13.3 fixed point rate
+           in envelope steps per sample period
 
     007x - Main stereo left and right volumes
 
@@ -60,6 +62,9 @@
 #define LOG_REGISTERS_HIFREQ    (1U << 2)
 #define LOG_SAMPLE_READ         (1U << 3)
 #define LOG_SAMPLE_WRITE        (1U << 4)
+#define LOG_KEYON               (1U << 5)
+#define LOG_ENVELOPE            (1U << 6)
+#define LOG_VOLUME              (1U << 7)
 
 #define VERBOSE (0)
 
@@ -167,15 +172,15 @@ void l4003_sound_device::sound_stream_update(sound_stream &stream)
 			// as 12-bit linear.
 			const int32_t temp =
 				(int32_t)(((uint32_t)(uint16_t)sample << 16) | (uint16_t)vptr.filt_state) >> 8;
-			const int32_t new_state = temp + (int32_t)(((int64_t)vptr.filt_state * 647719) >> 20);
+			const int32_t new_state = temp + (int32_t)(((int64_t)vptr.filt_state * 0x9e227) >> 20);
 
 			int32_t temp2 =
-				(int32_t)(((int64_t)new_state * 374536) >> 20) +
-				(int32_t)(((int64_t)vptr.filt_state * 25693) >> 20);
+				(int32_t)(((int64_t)new_state * 0x5b708) >> 20) +
+				(int32_t)(((int64_t)vptr.filt_state * 0x645d) >> 20);
 
 			vptr.filt_state = new_state;
+			temp2 = (temp2 * 19) >> 4;
 
-			temp2 += (temp2 >> 3) + (temp2 >> 4);
 			if (temp2 >= 0)
 			{
 				if ((uint32_t)temp2 >= ((uint32_t)OUTPUT_SCALE << 8))
@@ -200,20 +205,19 @@ void l4003_sound_device::sound_stream_update(sound_stream &stream)
 			}
 
 			// volume envelope processing
-			vptr.env_pos += vptr.env_step;
-			const int steps = ((uint32_t)vptr.env_pos / 0x100);
-			if (steps > 0)
+			const uint16_t env_step = (uint16_t)vptr.env_step ^ 0xffff;
+			vptr.env_pos += env_step;
+
+			const int steps = (uint32_t)vptr.env_pos >> 3;
+			if (vptr.env_volume < vptr.env_target)
 			{
-				if (vptr.env_volume < vptr.env_target)
-				{
-					vptr.env_volume += std::min(steps, (vptr.env_target - vptr.env_volume));
-				}
-				else if (vptr.env_volume > vptr.env_target)
-				{
-					vptr.env_volume -= std::min(steps, (vptr.env_volume - vptr.env_target));
-				}
+				vptr.env_volume += std::min(steps, (vptr.env_target - vptr.env_volume));
 			}
-			vptr.env_pos &= 0xff;
+			else if (vptr.env_volume > vptr.env_target)
+			{
+				vptr.env_volume -= std::min(steps, (vptr.env_volume - vptr.env_target));
+			}
+			vptr.env_pos &= 0x7;
 
 			const int64_t left = (sample * (uint64_t(vptr.l_volume) * uint64_t(0xffff - vptr.env_volume))) >> 24;
 			const int64_t right = (sample * (uint64_t(vptr.r_volume) * uint64_t(0xffff - vptr.env_volume))) >> 24;
@@ -293,6 +297,7 @@ void l4003_sound_device::control_w(uint16_t data)
 				// if the pitch is being set from 0 to nonzero, it's a key-on so reset some state
 				if ((m_data != 0) && (v.step == 0))
 				{
+					LOGMASKED(LOG_KEYON, "ch %d: Key on @ pitch %04x start %08x env rate %04x target %04x L %02x R %02x\n", voice, m_data, v.start, v.env_step, v.env_target, v.l_volume, v.r_volume);
 					v.pos = 0;
 					v.frac = 0;
 					v.env_pos = 0;
@@ -312,23 +317,23 @@ void l4003_sound_device::control_w(uint16_t data)
 
 			case 0x0004:
 				v.env_volume = m_data;
-				LOGMASKED(LOG_REGISTERS, "ch %d: Envelope volume %04x (%s)\n", voice, v.env_volume, machine().describe_context());
+				LOGMASKED(LOG_ENVELOPE, "ch %d: Envelope volume %04x (%s)\n", voice, v.env_volume, machine().describe_context());
 				break;
 
 			case 0x0005:
 				v.env_target = m_data;
-				LOGMASKED(LOG_REGISTERS, "ch %d: Envelope target %04x (%s)\n", voice, v.env_target, machine().describe_context());
+				LOGMASKED(LOG_ENVELOPE, "ch %d: Envelope target %04x (cur %04x) (%s)\n", voice, v.env_target, v.env_volume, machine().describe_context());
 				break;
 
 			case 0x0006:
 				v.env_step = m_data;
-				LOGMASKED(LOG_REGISTERS, "ch %d: Envelope rate %04x (%s)\n", voice, v.env_step, machine().describe_context());
+				LOGMASKED(LOG_ENVELOPE, "ch %d: Envelope rate %04x (%s)\n", voice, v.env_step, machine().describe_context());
 				break;
 
 			case 0x0007:
 				v.l_volume = m_data & 0xff;
 				v.r_volume = (m_data >> 8) & 0xff;
-				LOGMASKED(LOG_REGISTERS, "ch %d: Volume L %02x R %02x (%s)\n", voice, v.l_volume, v.r_volume, machine().describe_context());
+				LOGMASKED(LOG_VOLUME, "ch %d: Volume L %02x R %02x (env %04x) (%s)\n", voice, v.l_volume, v.r_volume, v.env_volume, machine().describe_context());
 				break;
 
 // ----- Readbacks ----------------------------
