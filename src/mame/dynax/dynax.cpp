@@ -1313,7 +1313,10 @@ void dynax_state::ougonhai_banked_map(address_map &map)
 
 uint8_t dynax_state::mjtkp2_dsw_r()
 {
-	return m_dsw[m_dsw_sel]->read();
+	if (m_dsw_sel < 5)
+		return m_dsw[m_dsw_sel]->read();
+	else
+		return 0xff;
 }
 
 void dynax_state::mjtkp2_map(address_map &map)
