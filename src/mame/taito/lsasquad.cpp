@@ -146,6 +146,8 @@ Notes:
 
 #include "emu.h"
 
+#include "taito68705.h"
+
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
@@ -153,19 +155,21 @@ Notes:
 #include "sound/ay8910.h"
 #include "sound/ymopn.h"
 
-#include "taito68705.h"
-
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 namespace {
 
 class lsasquad_state : public driver_device
 {
 public:
-	lsasquad_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	lsasquad_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_scrollram(*this, "scrollram"),
 		m_spriteram(*this, "spriteram"),
@@ -179,10 +183,12 @@ public:
 		m_bmcu(*this, "bmcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_bmcu_port(*this, "MCU") { }
+		m_bmcu_port(*this, "MCU")
+	{
+	}
 
-	void lsasquad(machine_config &config);
-	void storming(machine_config &config);
+	void lsasquad(machine_config &config) ATTR_COLD;
+	void storming(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -219,7 +225,8 @@ private:
 	uint8_t lsasquad_sound_status_r();
 
 	uint8_t lsasquad_mcu_status_r();
-	void draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *scrollram);
+	void draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *scrollram);
+
 	void lsasquad_map(address_map &map) ATTR_COLD;
 	void lsasquad_sound_map(address_map &map) ATTR_COLD;
 	void storming_map(address_map &map) ATTR_COLD;
@@ -229,11 +236,12 @@ private:
 class daikaiju_state : public lsasquad_state
 {
 public:
-	daikaiju_state(const machine_config &mconfig, device_type type, const char *tag)
-		: lsasquad_state(mconfig, type, tag)
-		{}
+	daikaiju_state(const machine_config &mconfig, device_type type, const char *tag) :
+		lsasquad_state(mconfig, type, tag)
+	{
+	}
 
-	void daikaiju(machine_config &config);
+	void daikaiju(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
@@ -255,7 +263,7 @@ private:
 
 ***************************************************************************/
 
-void lsasquad_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *scrollram)
+void lsasquad_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *scrollram)
 {
 	int scrollx = scrollram[3];
 	int scrolly = -scrollram[0];
@@ -286,11 +294,13 @@ void lsasquad_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect,
 					flip_screen(), flip_screen(),
 					sx, sy, 15);
 			if (sx > 248)   // wraparound
+			{
 				m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
 						code,
 						color,
 						flip_screen(), flip_screen(),
 						sx - 256, sy, 15);
+			}
 		}
 	}
 }
@@ -421,11 +431,13 @@ int daikaiju_state::draw_layer_daikaiju(bitmap_ind16 &bitmap, const rectangle &c
 					flip_screen(), flip_screen(),
 					sx, sy, 15);
 				if (sx > 248)   // wraparound
+				{
 					m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
 						code,
 						color,
 						flip_screen(), flip_screen(),
 						sx - 256, sy, 15);
+				}
 			}
 		}
 	}
@@ -479,26 +491,27 @@ void lsasquad_state::sh_nmi_enable_w(uint8_t data)
 
 uint8_t lsasquad_state::lsasquad_sound_status_r()
 {
-	// bit 0: message pending for sound cpu
-	// bit 1: message pending for main cpu
-	return (m_soundlatch->pending_r() ? 1 : 0) | (m_soundlatch2->pending_r() ? 2 : 0);
+	// bit 0: message pending for sound CPU
+	// bit 1: message pending for main CPU
+	return (m_soundlatch->pending_r() ? 0x01 : 0x00) | (m_soundlatch2->pending_r() ? 0x02 : 0x00);
 }
 
 
 uint8_t daikaiju_state::daikaiju_sound_status_r()
 {
-	// bit 0: message pending for sound cpu
-	// bit 1: message pending for main cpu
-	return (m_soundlatch->pending_r() ? 2 : 1);
+	// FIXME: the comment is definitely wrong (there is no sound-to-main latch) - should bit 1 always be high?
+	// bit 0: message pending for sound CPU
+	// bit 1: message pending for main CPU
+	return (m_soundlatch->pending_r() ? 0x02 : 0x01);
 }
 
 uint8_t lsasquad_state::lsasquad_mcu_status_r()
 {
 	int res = m_bmcu_port->read();
 
-	// bit 0 = when 1, mcu is ready to receive data from main cpu
-	// bit 1 = when 0, mcu has sent data to the main cpu
-	//logerror("%04x: mcu_status_r\n", m_maincpu->pc());
+	// bit 0 = when 1, MCU is ready to receive data from main CPU
+	// bit 1 = when 0, MCU has sent data to the main CPU
+	LOG("%s: mcu_status_r\n", machine().describe_context());
 	if (m_bmcu)
 	{
 		if (CLEAR_LINE == m_bmcu->host_semaphore_r())
@@ -514,9 +527,9 @@ uint8_t daikaiju_state::daikaiju_mcu_status_r()
 {
 	int res = m_bmcu_port->read();
 
-	// bit 0 = when 1, mcu is ready to receive data from main cpu
-	// bit 1 = when 0, mcu has sent data to the main cpu
-	//logerror("%04x: mcu_status_r\n", m_maincpu->pc());
+	// bit 0 = when 1, MCU is ready to receive data from main CPU
+	// bit 1 = when 0, MCU has sent data to the main CPU
+	LOG("%s: mcu_status_r\n", machine().describe_context());
 	if (m_bmcu)
 	{
 		if (CLEAR_LINE == m_bmcu->host_semaphore_r())
@@ -525,7 +538,8 @@ uint8_t daikaiju_state::daikaiju_mcu_status_r()
 			res |= 0x02;
 	}
 
-	res |= ((m_soundlatch->pending_r() & 0x02) ^ 2) << 3; //inverted flag
+	// FIXME: this is definitely wrong - (m_soundlatch->pending_r() & 0x02) is always zero
+	res |= ((m_soundlatch->pending_r() & 0x02) ^ 2) << 3; // inverted flag
 	return res;
 }
 
@@ -537,7 +551,7 @@ void lsasquad_state::bankswitch_w(uint8_t data)
 	// bit 3 is zeroed on startup, maybe reset sound CPU
 
 	// bit 4 flips screen
-	flip_screen_set(data & 0x10);
+	flip_screen_set(BIT(data, 4));
 
 	// other bits unknown
 }
