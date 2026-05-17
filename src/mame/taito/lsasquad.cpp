@@ -158,6 +158,7 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -192,6 +193,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -220,6 +222,10 @@ protected:
 	required_device<palette_device> m_palette;
 
 	optional_ioport m_bmcu_port;
+
+	tilemap_t *m_tilemap = nullptr;
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	void vram_w(offs_t offset, uint8_t data);
 
 private:
 	uint8_t lsasquad_sound_status_r();
@@ -256,6 +262,26 @@ private:
 	uint8_t daikaiju_sound_status_r();
 	uint8_t daikaiju_mcu_status_r();
 };
+
+void lsasquad_state::vram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset >> 1);
+}
+
+TILE_GET_INFO_MEMBER(lsasquad_state::get_tile_info)
+{
+	int attr = m_videoram[(tile_index * 2 + 1) & 0x1fff];
+	int code = m_videoram[(tile_index * 2) & 0x1fff] + ((attr & 0x0f) << 8);
+	u8 color = attr >> 4;
+
+	tileinfo.set(0, code, color, 0);
+}
+
+void lsasquad_state::video_start()
+{
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lsasquad_state::get_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 128, 32);
+}
 
 /***************************************************************************
 
@@ -567,7 +593,7 @@ void lsasquad_state::lsasquad_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr(m_mainbank);
 	map(0xa000, 0xbfff).ram(); // SRAM
-	map(0xc000, 0xdfff).ram().share(m_videoram);    // SCREEN RAM
+	map(0xc000, 0xdfff).ram().w(FUNC(lsasquad_state::vram_w)).share(m_videoram);    // SCREEN RAM
 	map(0xe000, 0xe3ff).ram().share(m_scrollram);   // SCROLL RAM
 	map(0xe400, 0xe5ff).ram().share(m_spriteram);   // OBJECT RAM
 	map(0xe800, 0xe800).portr("DSWA");
@@ -610,7 +636,7 @@ void lsasquad_state::storming_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr(m_mainbank);
 	map(0xa000, 0xbfff).ram(); // SRAM
-	map(0xc000, 0xdfff).ram().share(m_videoram);    // SCREEN RAM
+	map(0xc000, 0xdfff).ram().w(FUNC(lsasquad_state::vram_w)).share(m_videoram);    // SCREEN RAM
 	map(0xe000, 0xe3ff).ram().share(m_scrollram);   // SCROLL RAM
 	map(0xe400, 0xe5ff).ram().share(m_spriteram);   // OBJECT RAM
 	map(0xe800, 0xe800).portr("DSWA");
@@ -638,7 +664,7 @@ void daikaiju_state::daikaiju_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr(m_mainbank);
 	map(0xa000, 0xbfff).ram(); // SRAM
-	map(0xc000, 0xdfff).ram().share(m_videoram);    // SCREEN RAM
+	map(0xc000, 0xdfff).ram().w(FUNC(daikaiju_state::vram_w)).share(m_videoram);    // SCREEN RAM
 	map(0xe000, 0xe3ff).ram().share(m_scrollram);   // SCROLL RAM
 	map(0xe400, 0xe7ff).ram().share(m_spriteram);   // OBJECT RAM
 	map(0xe800, 0xe800).portr("DSWA");
