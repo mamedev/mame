@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:baco, Antigravity
+// copyright-holders:baco, Jeff Parsons
 /*
   TMC1500 Family - Serial Register Processors
 

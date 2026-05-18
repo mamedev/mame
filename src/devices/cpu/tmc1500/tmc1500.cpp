@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:baco, Antigravity
+// copyright-holders:baco, Jeff Parsons
 /***************************************************************************
 
     Texas Instruments TMC1500 family (TMC1501, TMC1502, TMC1503, ...)

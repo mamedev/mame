@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:baco, Antigravity
+// copyright-holders:baco, Jeff Parsons
 
 #ifndef MAME_CPU_TMC1500_TMC1500_DASM_H
 #define MAME_CPU_TMC1500_TMC1500_DASM_H
