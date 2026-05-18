@@ -271,6 +271,33 @@ protected:
 	int m_print_count = 0;
 	emu_timer *m_vblank_end_int_timer = nullptr;
 	emu_timer *m_update_sprites_timer = nullptr;
+
+	// Binary outputs
+	output_finder<> m_output_back_lamp;
+	output_finder<2> m_output_blue_button;
+	output_finder<> m_output_blue_corner_lamp;
+	output_finder<> m_output_entry_lamp;
+	output_finder<6> m_output_p_start;
+	output_finder<> m_output_lamp0;
+	output_finder<> m_output_lamp1;
+	output_finder<> m_output_left_lamp;
+	output_finder<> m_output_left_winner_lamp;
+	output_finder<> m_output_lights_lamp;
+	output_finder<2> m_output_monitor_check_point_lamp;
+	output_finder<2> m_output_monitor_dj_music_lamp;
+	output_finder<2> m_output_monitor_digit;
+	output_finder<2> m_output_monitor_arrow_lamp;
+	output_finder<2> m_output_monitor_race_leader_lamp;
+	output_finder<2> m_output_monitor_start_lamp;
+	output_finder<2> m_output_monitor_steering_wheel_motor;
+	output_finder<> m_output_start_lamp;
+	output_finder<> m_output_winner_lamp;
+	output_finder<2> m_output_player_gun_recoil;
+	output_finder<2> m_output_red_button;
+	output_finder<> m_output_red_corner_lamp;
+	output_finder<> m_output_right_lamp;
+	output_finder<> m_output_right_winner_lamp;
+	output_finder<> m_output_wiper_lamp;
 };
 
 class segas32_regular_state : public segas32_state
