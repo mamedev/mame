@@ -282,7 +282,7 @@ void gcm394_base_video_device::device_reset()
 	for (int i=0;i<0x100 * 0x10;i++)
 		m_paletteram[i] = machine().rand()&0x7fff;
 
-	m_707f = 0x0000;
+	m_707f = 0x0001;
 	m_703a_palettebank = 0x0000;
 	m_video_irq_enable = 0x0000;
 	m_video_irq_status = 0x0000;
@@ -883,7 +883,22 @@ u16 gcm394_base_video_device::ppu_enable_r()
 }
 void gcm394_base_video_device::ppu_enable_w(u16 data)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::ppu_enable_w %04x\n", machine().describe_context(), data);
+	u8 save_rom = (data & 0x8000) >> 15;
+	u8 unused = (data & 0x7000) >> 12;
+	u8 fb_mono = (data & 0x0c00) >> 10;
+	u8 spr25d = (data & 0x0200) >> 9;
+	u8 fb_format = (data & 0x0100) >> 8;
+	u8 fb_en = (data & 0x0080) >> 7;
+	u8 free_adr = (data & 0x0040) >> 6;
+	u8 vga_nointl = (data & 0x0020) >> 5;
+	u8 vga_en = (data & 0x0010) >> 4;
+	u8 tx_botup = (data & 0x0008) >> 3;
+	u8 tx_direct = (data & 0x0004) >> 2;
+	u8 tchar = (data & 0x0002) >> 1;
+	u8 ppu_en = (data & 0x0001) >> 0;
+
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::ppu_enable_w %04x (save_rom %01x, unused %01x, fb_mono %01x, spr25d %01x, fb_format %01x, fb_en %01x, free_adr %01x, vga_nointl %01x, vga_en %01x, tx_botup %01x, tx_direct %01x, tchar %01x, ppu_en %01x)\n",
+		machine().describe_context(), data, save_rom, unused, fb_mono, spr25d, fb_format, fb_en, free_adr, vga_nointl, vga_en, tx_botup, tx_direct, tchar, ppu_en);
 
 	m_707f = data;
 	m_renderer->set_video_reg_7f(data);
