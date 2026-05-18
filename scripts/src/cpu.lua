@@ -2727,23 +2727,6 @@ if opt_tool(CPUS, "AVR8") then
 end
 
 --------------------------------------------------
--- Texas Instruments TMC1500 family
---@src/devices/cpu/tmc1500/tmc1500.h,CPUS["TMC1500"] = true
---------------------------------------------------
-
-if CPUS["TMC1500"] then
-	files {
-		MAME_DIR .. "src/devices/cpu/tmc1500/tmc1500.cpp",
-		MAME_DIR .. "src/devices/cpu/tmc1500/tmc1500.h",
-	}
-end
-
-if opt_tool(CPUS, "TMC1500") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tmc1500/tmc1500_dasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tmc1500/tmc1500_dasm.h")
-end
-
---------------------------------------------------
 -- Texas Instruments TMS1000 series
 --@src/devices/cpu/tms1000/tms1000.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms1000c.h,CPUS["TMS1000"] = true
