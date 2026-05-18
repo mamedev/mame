@@ -85,7 +85,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<m68000_base_device> m_cpu;
+	required_device<m68000_musashi_device> m_cpu;
 	required_device<ns32081_device> m_fpu;
 	required_device<hd63450_device> m_dmac;
 	required_device<z8536_device> m_cio;
@@ -207,8 +207,7 @@ uint16_t x37_state::ram_r(offs_t offset, uint16_t mem_mask)
 
 		if (!machine().side_effects_disabled() && at1 && !at0) {
 			// AT1=1, AT0=0: no access
-			m_cpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-			m_cpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+			m_cpu->set_buserror_details(offset << 1, 1, m_cpu->get_fc(), true);
 			logerror("%s: Invalid RAM read at offset %06x (MA %06x, AT1=1, AT0=0)\n", machine().describe_context(), offset<<1, ma);
 		} else if (ma < 0x400000) {
 			if (ACCESSING_BITS_0_7)
@@ -230,8 +229,7 @@ void x37_state::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	if (!machine().side_effects_disabled() && !at0) {
 		// AT0=0: read-only (AT1=0) or no access (AT1=1)
-		m_cpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_cpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+		m_cpu->set_buserror_details(offset << 1, 0, m_cpu->get_fc(), true);
 		logerror("%s: Invalid RAM write at offset %06x (MA %06x, AT1=%d, AT0=0)\n", machine().describe_context(), offset<<1, ma, at1);
 		return;
 	}
@@ -365,6 +363,8 @@ void x37_state::cio_pb_w(uint8_t data)
 	*/
 
 	m_cb = data;
+
+	LOG("%s CB %02x\n", machine().describe_context(), data);
 }
 
 uint8_t x37_state::cio_pc_r()
@@ -485,6 +485,8 @@ void x37_state::machine_start()
 
 void x37_state::machine_reset()
 {
+	m_cpu->set_emmu_enable(true);
+
 	m_cb = 0xff;
 
 	xdck_w(0, 0, 0xffff);
