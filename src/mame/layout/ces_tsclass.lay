@@ -26,8 +26,7 @@ Trap Shoot Classic layout
 		</disk>
 	</element>
 
-	<!-- NOTE: tsclass uses lower bank for left score/trophy -->
-	<group name="led_rscore">
+	<group name="led_lscore">
 		<repeat count="10">
 			<param name="s" start="0" increment="8" />
 			<param name="x" start="0" increment="1" />
@@ -42,7 +41,7 @@ Trap Shoot Classic layout
 		</repeat>
 	</group>
 
-	<group name="led_rtrophy">
+	<group name="led_ltrophy">
 		<repeat count="10">
 			<param name="s" start="80" increment="8" />
 			<param name="x" start="0" increment="1" />
@@ -57,7 +56,7 @@ Trap Shoot Classic layout
 		</repeat>
 	</group>
 
-	<group name="led_lscore">
+	<group name="led_rscore">
 		<repeat count="10">
 			<param name="s" start="200" increment="8" />
 			<param name="x" start="0" increment="1" />
@@ -72,7 +71,7 @@ Trap Shoot Classic layout
 		</repeat>
 	</group>
 
-	<group name="led_ltrophy">
+	<group name="led_rtrophy">
 		<repeat count="10">
 			<param name="s" start="280" increment="8" />
 			<param name="x" start="0" increment="1" />

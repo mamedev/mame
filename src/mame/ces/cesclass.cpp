@@ -5,15 +5,18 @@
 CES Classic wall games
 
 Notes:
-- to play Home Run Classic you have to select a pitcher shot and hold the remote button.
+- to play hrclass you have to select a pitcher shot and hold the remote button.
   When you release the strobe, batter does the swing.
+- "forfait point" in tsclass means the *other* team gets a point, which means the linear
+  LED orientation is actually correct.
 
 TODO:
 - complete artworks;
 \- confirm LED colors;
 \- remaining lamps;
+\- actual strobe outputs;
 \- image bezel for each game;
-- extra lamps, cfr. hrclass reference;
+\- measure bezel dims properly (currently very arbitrary 594x300);
 - irq sources & timings are unknown
 \- cfr. ccclass, being really slow on continue screen;
 - sound doesn't play most samples;
