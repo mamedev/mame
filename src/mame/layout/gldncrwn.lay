@@ -3,7 +3,7 @@
 license:CC0-1.0
 -->
 <mamelayout version="2">
-	<element name="reel1" defstate="0">
+	<element name="reel1:pos" defstate="0">
 		<rect>
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
@@ -12,7 +12,7 @@ license:CC0-1.0
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
-	<element name="reel2" defstate="0">
+	<element name="reel2:pos" defstate="0">
 		<rect>
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
@@ -21,7 +21,7 @@ license:CC0-1.0
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
-	<element name="reel3" defstate="0">
+	<element name="reel3:pos" defstate="0">
 		<rect>
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
@@ -30,7 +30,7 @@ license:CC0-1.0
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
-	<element name="reel4" defstate="0">
+	<element name="reel4:pos" defstate="0">
 		<rect>
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
@@ -39,7 +39,7 @@ license:CC0-1.0
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
-	<element name="reel5" defstate="0">
+	<element name="reel5:pos" defstate="0">
 		<rect>
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
@@ -48,7 +48,7 @@ license:CC0-1.0
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
-	<element name="reel6" defstate="0">
+	<element name="reel6:pos" defstate="0">
 		<rect>
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
@@ -83,22 +83,22 @@ license:CC0-1.0
 
 	<view name="Adder, VFD and Lamps">
 		<collection name="Lamps">
-			<element name="lamp1" ref="reel1">
+			<element name="lamp1" ref="reel1:pos">
 				<bounds x="145" y="280" width="26" height="14" />
 			</element>
-			<element name="lamp2" ref="reel2">
+			<element name="lamp2" ref="reel2:pos">
 				<bounds x="175" y="280" width="26" height="14" />
 			</element>
-			<element name="lamp3" ref="reel3">
+			<element name="lamp3" ref="reel3:pos">
 				<bounds x="205" y="280" width="26" height="14" />
 			</element>
-			<element name="lamp5" ref="reel4">
+			<element name="lamp5" ref="reel4:pos">
 				<bounds x="235" y="280" width="26" height="14" />
 			</element>
-			<element name="lamp6" ref="reel5">
+			<element name="lamp6" ref="reel5:pos">
 				<bounds x="265" y="280" width="26" height="14" />
 			</element>
-			<element name="lamp7" ref="reel6">
+			<element name="lamp7" ref="reel6:pos">
 				<bounds x="295" y="280" width="26" height="14" />
 			</element>
 			<element name="lamp0" ref="collect">
