@@ -468,7 +468,7 @@ void news_r3k_base_state::debug_w(u8 data)
 static void news_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("cdrom", NSCSI_CDROM_NEWS);
 	device.option_add("tape", NSCSI_TAPE_NEWS);
 }
 
