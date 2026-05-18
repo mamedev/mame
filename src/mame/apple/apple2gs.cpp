@@ -395,8 +395,9 @@ private:
 	void bank1_0000_sh_w(offs_t offset, u8 data);
 	u8 bank1_c000_r(offs_t offset);
 	void bank1_c000_w(offs_t offset, u8 data);
-	u8 expandedram_r(offs_t offset);
-	void expandedram_w(offs_t offset, u8 data);
+	u8 floatingbank_r(offs_t offset);
+	u8 ghostram_r(offs_t offset);
+	void ghostram_w(offs_t offset, u8 data);
 	void a2bus_irq_w(int state);
 	void a2bus_nmi_w(int state);
 	void a2bus_inh_w(int state);
@@ -466,7 +467,7 @@ private:
 	int m_glu_kbd_y = 0;
 
 	u8 *m_ram_ptr = nullptr;
-	int m_ram_size = 0;
+	int m_ram_size = 0, m_motherboard_ram = 0, m_ghost_mask = 0;
 	u8 m_megaii_ram[0x20000]{};  // 128K of "slow RAM" at $E0/0000
 
 	int m_inh_bank = 0;
@@ -745,12 +746,43 @@ void apple2gs_state::machine_start()
 	m_inh_slot = -1;
 	m_cnxx_slot = CNXX_UNCLAIMED;
 
+	// install ROM
+	address_space& space = m_maincpu->space(AS_PROGRAM);
+	if (m_is_rom3)
+		space.install_rom(0xfc0000, 0xffffff, m_rom);
+
 	// adjust RAM size
 	if (!m_is_rom3 && m_ram_size <= 1280 * 1024)
 	{
-		m_ram_size -= 0x20000;  // subtract 128k so requested RAM size matches exactly
+		m_ram_size -= 0x020000; // subtract 128k so requested RAM size matches exactly
 	}
 	// otherwise, RAM sizes for both classes of machine no longer include the Mega II RAM
+
+	// install "fast" RAM beyond banks 0, 1
+	m_motherboard_ram = m_is_rom3 ? 0x100000 : 0x020000;
+	if (m_ram_size > 0x020000)
+	{
+		space.install_ram(0x020000, m_ram_size - 1, m_ram_ptr + 0x020000);
+
+		if (m_ram_size > m_motherboard_ram)
+		{
+			// unmap empty RAM banks in case of non-power-of-two expansion
+			if (m_is_rom3 && m_ram_size < 0x800000)
+				space.nop_read(m_ram_size, 0x7fffff);
+
+			// expansion RAM ghosts power-of-two banks up through 7f
+			m_ghost_mask = (1 << (32 - count_leading_zeros_32(m_ram_size - m_motherboard_ram - 1))) - 1;
+			const int ghost_start = m_motherboard_ram + m_ghost_mask + 1;
+			if (ghost_start < 0x800000)
+				space.install_readwrite_handler(ghost_start, 0x7fffff,
+					 read8sm_delegate(*this, FUNC(apple2gs_state::ghostram_r)),
+					write8sm_delegate(*this, FUNC(apple2gs_state::ghostram_w)));
+
+			// unmap empty ROM banks
+			if (m_is_rom3) // ROM1 reads floating bus
+				space.nop_read(0xf00000, 0xfbffff);
+		}
+	}
 
 	// setup save states
 	save_item(NAME(m_speaker_state));
@@ -2459,32 +2491,31 @@ void apple2gs_state::c800_w(offs_t offset, u8 data)
 	}
 }
 
-/* for < 14MB RAM, returns the bank number on reads >= 8MB */
-u8 apple2gs_state::expandedram_r(offs_t offset)
+// 65816 bank register is left on floating bus
+u8 apple2gs_state::floatingbank_r(offs_t offset)
 {
-	offset += 0x020000;
-
-	if (offset >= m_ram_size)
-	{
-		if (offset >= 0x800000)
-		{
-			return offset >> 16;
-		}
-
-		return 0;
-	}
-
-	return m_ram_ptr[offset];
+	// When the memory expansion slot is empty, this is the behavior
+	// for every bank not populated by motherboard RAM or ROM.
+	return offset >> 16;
 }
 
-void apple2gs_state::expandedram_w(offs_t offset, u8 data)
+// mirror expansion RAM banks per Hardware Reference, Figure 3-9
+u8 apple2gs_state::ghostram_r(offs_t offset)
 {
-	offset += 0x20000;
+	offs_t ghost_offset = (offset & m_ghost_mask) + m_motherboard_ram;
 
-	if (offset < m_ram_size)
-	{
-		m_ram_ptr[offset] = data;
-	}
+	if (ghost_offset < m_ram_size)
+		return m_ram_ptr[ghost_offset];
+	else // unpopulated non-power-of-two bank
+		return m_is_rom3 ? 0xff : ((offset + m_motherboard_ram + m_ghost_mask + 1) >> 16);
+}
+
+void apple2gs_state::ghostram_w(offs_t offset, u8 data)
+{
+	offs_t ghost_offset = (offset & m_ghost_mask) + m_motherboard_ram;
+
+	if (ghost_offset < m_ram_size)
+		m_ram_ptr[ghost_offset] = data;
 }
 
 u8 apple2gs_state::inh_r(offs_t offset)
@@ -3088,6 +3119,10 @@ void apple2gs_state::bank1_0000_sh_w(offs_t offset, u8 data)
 
 void apple2gs_state::apple2gs_map(address_map &map)
 {
+	// default behavior for unpopulated banks (affected by memory expansion slot)
+	map(0x000000, 0xffffff).r(FUNC(apple2gs_state::floatingbank_r)).nopw();
+	map.unmap_value_high(); // with expansion slot, unpopulated banks return ff on ROM3
+
 	/* "fast side" - runs 2.8 MHz minus RAM refresh, banks 00 and 01 usually have writes shadowed to E0/E1 where I/O lives */
 	/* Banks 00 and 01 also have their own independent language cards which are NOT shadowed. */
 	map(0x000000, 0x0001ff).view(m_b0_0000bank);
@@ -3160,8 +3195,6 @@ void apple2gs_state::apple2gs_map(address_map &map)
 	m_lc01[0](0x1d000, 0x1ffff).rom().region("maincpu", 0x3d000).w(FUNC(apple2gs_state::lc_01_w));
 	m_lc01[1](0x1d000, 0x1ffff).rw(FUNC(apple2gs_state::lc_01_r), FUNC(apple2gs_state::lc_01_w));
 
-	map(0x020000, 0xdfffff).rw(FUNC(apple2gs_state::expandedram_r), FUNC(apple2gs_state::expandedram_w));
-
 	/* "Mega II side" - this is basically a 128K IIe on a chip that runs merrily at 1 MHz */
 	/* Unfortunately all I/O happens here, including new IIgs-specific stuff */
 	map(0xe00000, 0xe001ff).view(m_e0_0000bank);
@@ -3227,7 +3260,7 @@ void apple2gs_state::apple2gs_map(address_map &map)
 	m_lcaux[0](0xe1d000, 0xe1ffff).rom().region("maincpu", 0x3d000).w(FUNC(apple2gs_state::lc_aux_w));
 	m_lcaux[1](0xe1d000, 0xe1ffff).rw(FUNC(apple2gs_state::lc_aux_r), FUNC(apple2gs_state::lc_aux_w));
 
-	map(0xfc0000, 0xffffff).rom().region("maincpu", 0x00000);
+	map(0xfe0000, 0xffffff).rom().region("maincpu", 0x20000);
 }
 
 void apple2gs_state::vectors_map(address_map &map)
