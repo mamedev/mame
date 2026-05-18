@@ -45,6 +45,7 @@ protected:
 private:
 	u16 get_reg(unsigned r) const noexcept;
 	void set_reg(unsigned r, u16 v) noexcept;
+	u16 add(u16 xop, u16 yop, bool cin) noexcept;
 
 	u16 ssf_r();
 	void ssf_w(u16 data);
