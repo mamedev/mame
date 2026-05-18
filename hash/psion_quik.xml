@@ -1,0 +1,171 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="psion_quik" description="Psion quickloads">
+
+	<!-- Series 5mx PRO -->
+
+	<software name="5mx_250en" cloneof="5mx_255en">
+		<description>Series 5mx V1.05(250) English</description>
+		<year>1999</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="PRO"/>
+		<part name="quik" interface="psion_quik">
+			<dataarea name="rom" size="10485760">
+				<rom name="sysrom.bin" size="10485760" crc="31f02326" sha1="0ea2e3131f5cb2c105b4d5ec3bfafbf5e9e31a89"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="5mx_255en">
+		<description>Series 5mx V1.05(255) English</description>
+		<year>1999</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="PRO"/>
+		<part name="quik" interface="psion_quik">
+			<dataarea name="rom" size="10485760">
+				<rom name="sysrom.bin" size="10485760" crc="a1e2d038" sha1="4c082321264e1ae7fe77699e59b8960460690fa6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="5mx_265ge" cloneof="5mx_319ge">
+		<description>Series 5mx PRO V1.05(265) German</description>
+		<year>1999</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="PRO"/>
+		<part name="quik" interface="psion_quik">
+			<dataarea name="rom" size="10248192">
+				<rom name="sysrom.bin" size="10248192" crc="e731b184" sha1="dd0520b032d80a2fd84cbb22fedda1e939e12555"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="5mx_273ge" cloneof="5mx_319ge">
+		<description>Series 5mx PRO V1.05(273) German</description>
+		<year>1999</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="PRO"/>
+		<part name="quik" interface="psion_quik">
+			<dataarea name="rom" size="10256384">
+				<rom name="sysrom.bin" size="10256384" crc="75d4eee9" sha1="0bbc813daecbeda481ba59eadbf7b11bda808c67"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="5mx_319ge">
+		<description>Series 5mx PRO V1.05(319) German</description>
+		<year>1999</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="PRO"/>
+		<part name="quik" interface="psion_quik">
+			<dataarea name="rom" size="10473472">
+				<rom name="sysrom.bin" size="10473472" crc="a4e8ace2" sha1="9323060b1c41590b4875164bcd6e95608ac612cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- MalayBook -->
+
+	<software name="mb_281uk">
+		<description>MalayBook V1.05(281) English (UK)</description>
+		<year>2000</year>
+		<publisher>One Ed Dot Com</publisher>
+		<sharedfeat name="compatibility" value="NB"/>
+		<part name="quik" interface="psion_quik">
+			<dataarea name="rom" size="13947136">
+				<rom name="mb_281uk.img" size="13947136" crc="65d2e4e1" sha1="2741f468a5814e1bae184f77d924051e16fe58a8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- netBook -->
+
+	<software name="nb_254uk" cloneof="nb_450uk">
+		<description>netBook V1.05(254) English (UK)</description>
+		<year>1999</year>
+		<publisher>Symbian</publisher>
+		<sharedfeat name="compatibility" value="NB"/>
+		<part name="quik" interface="psion_quik">
+			<dataarea name="rom" size="12869888">
+				<rom name="nb_254uk.img" size="12869888" crc="478a7be9" sha1="0f5ed7ef439d3a2a0cbbf6c1c00df08ebeeb69b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nb_254us" cloneof="nb_453us">
+		<description>netBook V1.05(254) English (USA)</description>
+		<year>1999</year>
+		<publisher>Symbian</publisher>
+		<sharedfeat name="compatibility" value="NB"/>
+		<part name="quik" interface="psion_quik">
+			<dataarea name="rom" size="12845312">
+				<rom name="nb_254us.img" size="12845312" crc="5402331c" sha1="88aa561053b1bb8e07893a4025ca001e0dfa3768"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nb_450uk">
+		<description>netBook V1.05(450) English (UK)</description>
+		<year>2002</year>
+		<publisher>Symbian</publisher>
+		<sharedfeat name="compatibility" value="NB"/>
+		<part name="quik" interface="psion_quik">
+			<dataarea name="rom" size="14651648">
+				<rom name="nb_450uk.img" size="14651648" crc="7a3f8590" sha1="ff48e95bb8639e8a74fc3ddc59a9b1305275913f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nb_453us">
+		<description>netBook V1.05(453) English (USA)</description>
+		<year>2002</year>
+		<publisher>Symbian</publisher>
+		<sharedfeat name="compatibility" value="NB"/>
+		<part name="quik" interface="psion_quik">
+			<dataarea name="rom" size="14627072">
+				<rom name="nb_453us.img" size="14627072" crc="f75b755c" sha1="9fd54b3a5d2a193fcde2b4c005beab919441a3e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nb_456fr">
+		<description>netBook V1.05(456) French</description>
+		<year>2002</year>
+		<publisher>Symbian</publisher>
+		<sharedfeat name="compatibility" value="NB"/>
+		<part name="quik" interface="psion_quik">
+			<dataarea name="rom" size="14565632">
+				<rom name="nb_456fr.img" size="14565632" crc="9bda988e" sha1="4860c8152f819f5ac0645075211fecd2de3d39ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nb_457ge">
+		<description>netBook V1.05(457) German</description>
+		<year>2002</year>
+		<publisher>Symbian</publisher>
+		<sharedfeat name="compatibility" value="NB"/>
+		<part name="quik" interface="psion_quik">
+			<dataarea name="rom" size="14672128">
+				<rom name="nb_457ge.img" size="14672128" crc="554982a2" sha1="05de00be539beff734a029ee0ece1a502de9fae2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nb_462sp">
+		<description>netBook V1.05(462) Spanish</description>
+		<year>2002</year>
+		<publisher>Symbian</publisher>
+		<sharedfeat name="compatibility" value="NB"/>
+		<part name="quik" interface="psion_quik">
+			<dataarea name="rom" size="14586112">
+				<rom name="nb_462sp.img" size="14586112" crc="1234ba75" sha1="39777d181cc1a9fd6859d158f81d173f16e1c03e"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -30,9 +30,7 @@ public:
 	{
 	}
 
-	void yeno(machine_config &config);
-
-protected:
+	void yeno(machine_config &config) ATTR_COLD;
 
 private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);

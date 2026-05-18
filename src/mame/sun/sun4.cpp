@@ -1375,7 +1375,7 @@ void sun4_base_state::sun4_base(machine_config &config)
 	RAM(config, m_ram).set_default_size("16M").set_default_value(0x00);
 	m_ram->set_extra_options("4M,8M,12M,16M,20M,24M,28M,32M,36M,40M,48M,52M,64M");
 
-	M48T02(config, m_timekpr, 0);
+	M48T02(config, m_timekpr);
 
 	N82077AA(config, m_fdc, 24_MHz_XTAL);
 	m_fdc->set_ready_line_connected(false);
@@ -1383,7 +1383,7 @@ void sun4_base_state::sun4_base(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy, sun_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);
 
 	// Ethernet
-	AM79C90(config, m_lance);
+	AM79C90(config, m_lance, 10'000'000); // clock is a guess
 	m_lance->dma_in().set([this](offs_t offset)
 	{
 		u32 const data = m_mmu->insn_data_r<sun4c_mmu_device::SUPER_DATA>((0xff000000U | offset) >> 2, 0xffffffffU);
