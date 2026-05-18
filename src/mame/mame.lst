@@ -590,6 +590,9 @@ sr16
 midifex
 midiverb
 
+@source:alesis/qs.cpp
+alesqs7
+
 @source:alliedleisure/ace.cpp
 ace
 
@@ -43879,9 +43882,6 @@ airbase99
 
 @source:skeleton/alcat7100.cpp
 alcat7100
-
-@source:skeleton/alesis_qs.cpp
-alesqs7
 
 @source:skeleton/alphasma.cpp
 asma2k
