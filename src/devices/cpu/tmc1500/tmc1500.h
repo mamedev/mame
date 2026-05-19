@@ -83,10 +83,13 @@ protected:
 	uint8_t m_regsY[8][16];
 	
 	uint8_t m_scan_idx; // Current multiplexed digit index (0-15)
+	uint32_t m_disp_activity;
+	bool m_last_display_on;
 
 	// Execution Helpers
 	void execute_instruction();
 	void opDISP();
+	void refresh_display();
 	void opCALL(uint16_t addr);
 	void opRET();
 	void push(uint16_t addr);

@@ -73,6 +73,8 @@ void tmc1500_base_device::device_start()
 	save_item(NAME(m_regsO));
 	save_item(NAME(m_regsX));
 	save_item(NAME(m_regsY));
+	save_item(NAME(m_disp_activity));
+	save_item(NAME(m_last_display_on));
 
 	state_add(STATE_GENPC, "PC", m_pc).formatstr("%03X");
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
@@ -93,6 +95,8 @@ void tmc1500_base_device::device_reset()
 	m_cond = false; 	
 	m_regR5 = 0;
 	m_scan_idx = 0;
+	m_disp_activity = 0;
+	m_last_display_on = false;
 
 	memset(m_regsO, 0, sizeof(m_regsO));
 	memset(m_regsX, 0, sizeof(m_regsX));
@@ -122,6 +126,30 @@ void tmc1500_base_device::execute_run()
 
 void tmc1500_base_device::execute_instruction() {
 	u16 op = m_opcode;
+
+	// Update display activity and blanking
+	bool is_disp = (op & 0x0f00) == 0x0e00 && (op & 0x000f) == 0x07 && (op & 0x1000) == 0;
+	if (is_disp) {
+		for (int c = 0; c < 32; c++) {
+			m_disp_activity = (m_disp_activity * 999) / 1000 + 1000;
+		}
+	} else {
+		m_disp_activity = (m_disp_activity * 999) / 1000;
+	}
+
+	bool display_on = (m_disp_activity > 500000);
+	if (display_on != m_last_display_on) {
+		m_last_display_on = display_on;
+		if (!display_on) {
+			// Blank display
+			for (int i = 0; i < 12; i++) {
+				m_write_o(i, 0x0f, 0xffff);
+			}
+		} else {
+			// Redraw display with current register values
+			refresh_display();
+		}
+	}
 
 	// Control Flow (Bit 12 = 1)
 	if (op & 0x1000) {
@@ -330,13 +358,8 @@ void tmc1500_base_device::reg_xchg(uint8_t *r1, uint8_t *r2, int lo, int hi) {
 }
 
 // Display and Keyboard scanning
-void tmc1500_base_device::opDISP() {
-	m_cond = false;
-	m_regR5 = 0; 
-
+void tmc1500_base_device::refresh_display() {
 	for (int i = 11; i >= 0; i--) {
-		m_scan_idx = i;
-		
 		uint8_t a = m_regsO[0][i];
 		uint8_t b = m_regsO[1][i];
 		
@@ -345,6 +368,30 @@ void tmc1500_base_device::opDISP() {
 		else if (b & 0x01) data = 0x0e; // Minus sign
 		else data = a & 0x0f;
 		if (b & 0x02) data |= 0x10; // Decimal point
+		
+		m_write_o(11 - i, data, 0xffff);
+	}
+}
+
+void tmc1500_base_device::opDISP() {
+	m_cond = false;
+	m_regR5 = 0; 
+
+	bool display_on = (m_disp_activity > 500000);
+
+	for (int i = 11; i >= 0; i--) {
+		m_scan_idx = i;
+		
+		uint16_t data = 0x0f; // Blank by default if display is off
+		if (display_on) {
+			uint8_t a = m_regsO[0][i];
+			uint8_t b = m_regsO[1][i];
+			
+			if (b & 0x08) data = 0x0f; // Blank
+			else if (b & 0x01) data = 0x0e; // Minus sign
+			else data = a & 0x0f;
+			if (b & 0x02) data |= 0x10; // Decimal point
+		}
 		
 		m_write_o(11 - i, data, 0xffff);
 
