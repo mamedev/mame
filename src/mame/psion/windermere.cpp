@@ -830,14 +830,16 @@ void windermere_device::periphs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 			m_port_data[PORTB] = data;
 			m_port_w[PORTB](PORTB, data | ~m_port_ddr[PORTB], m_port_ddr[PORTB]);
 		}
-		//const uint8_t old = m_port_data[PORTB];
-		//const uint8_t diff = old ^ data;
-		//if (diff & 0x3c)
-		//	LOGMASKED(LOG_PIN, "Contrast: %d\n", (data >> 2) & 0x0f);
-		//if (BIT(diff, 6))
-		//	LOGMASKED(LOG_PIN, "Case Open: %d\n", BIT(data, 6));
-		//if (BIT(diff, 7))
-		//	LOGMASKED(LOG_PIN, "ETNA CompactFlash Power: %d\n", BIT(data, 7));
+#if 0
+		const uint8_t old = m_port_data[PORTB];
+		const uint8_t diff = old ^ data;
+		if (diff & 0x3c)
+			LOGMASKED(LOG_PIN, "Contrast: %d\n", (data >> 2) & 0x0f);
+		if (BIT(diff, 6))
+			LOGMASKED(LOG_PIN, "Case Open: %d\n", BIT(data, 6));
+		if (BIT(diff, 7))
+			LOGMASKED(LOG_PIN, "ETNA CompactFlash Power: %d\n", BIT(data, 7));
+#endif
 		break;
 	case REG_PCDR:
 		LOGMASKED(LOG_GPIO, "%s: peripheral write PCDR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
@@ -846,22 +848,24 @@ void windermere_device::periphs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 			m_port_data[PORTC] = data;
 			m_port_w[PORTC](PORTC, data | m_port_ddr[PORTC], ~m_port_ddr[PORTC]);
 		}
-		//const uint8_t old = m_port_data[PORTC];
-		//const uint8_t diff = old ^ data;
-		//if (BIT(diff, 0))
-		//	LOGMASKED(LOG_PIN, "RS232 RTS: %d\n", BIT(data, 0));
-		//if (BIT(diff, 1))
-		//	LOGMASKED(LOG_PIN, "RS232 DTR Toggle: %d\n", BIT(data, 1));
-		//if (BIT(diff, 2))
-		//	LOGMASKED(LOG_PIN, "Disable Power LED: %d\n", BIT(data, 2));
-		//if (BIT(diff, 3))
-		//	LOGMASKED(LOG_PIN, "Enable UART1: %d\n", BIT(data, 3));
-		//if (BIT(diff, 4))
-		//	LOGMASKED(LOG_PIN, "LCD Backlight: %d\n", BIT(data, 4));
-		//if (BIT(diff, 5))
-		//	LOGMASKED(LOG_PIN, "Enable UART0: %d\n", BIT(data, 5));
-		//if (BIT(diff, 6))
-		//	LOGMASKED(LOG_PIN, "Dictaphone: %d\n", BIT(data, 6));
+#if 0
+		const uint8_t old = m_port_data[PORTC];
+		const uint8_t diff = old ^ data;
+		if (BIT(diff, 0))
+			LOGMASKED(LOG_PIN, "RS232 RTS: %d\n", BIT(data, 0));
+		if (BIT(diff, 1))
+			LOGMASKED(LOG_PIN, "RS232 DTR Toggle: %d\n", BIT(data, 1));
+		if (BIT(diff, 2))
+			LOGMASKED(LOG_PIN, "Disable Power LED: %d\n", BIT(data, 2));
+		if (BIT(diff, 3))
+			LOGMASKED(LOG_PIN, "Enable UART1: %d\n", BIT(data, 3));
+		if (BIT(diff, 4))
+			LOGMASKED(LOG_PIN, "LCD Backlight: %d\n", BIT(data, 4));
+		if (BIT(diff, 5))
+			LOGMASKED(LOG_PIN, "Enable UART0: %d\n", BIT(data, 5));
+		if (BIT(diff, 6))
+			LOGMASKED(LOG_PIN, "Dictaphone: %d\n", BIT(data, 6));
+#endif
 		break;
 	case REG_PDDR:
 		LOGMASKED(LOG_GPIO, "%s: peripheral write PDDR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
@@ -870,24 +874,26 @@ void windermere_device::periphs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 			m_port_data[PORTD] = data;
 			m_port_w[PORTD](PORTD, data | m_port_ddr[PORTD], ~m_port_ddr[PORTD]);
 		}
-		//const uint8_t old = m_port_data[PORTD];
-		//const uint8_t diff = old ^ data;
-		//if (BIT(diff, 0))
-		//	LOGMASKED(LOG_PIN, "Codec Enable: %d\n", BIT(data, 0));
-		//if (BIT(diff, 1))
-		//	LOGMASKED(LOG_PIN, "Audio Amp Enable: %d\n", BIT(data, 1));
-		//if (BIT(diff, 2))
-		//	LOGMASKED(LOG_PIN, "LCD Power: %d\n", BIT(data, 2));
-		//if (BIT(diff, 3))
-		//	LOGMASKED(LOG_PIN, "ETNA Door: %d\n", BIT(data, 3));
-		//if (BIT(diff, 4))
-		//	LOGMASKED(LOG_PIN, "Sled: %d\n", BIT(data, 4));
-		//if (BIT(diff, 5))
-		//	LOGMASKED(LOG_PIN, "Pump Power2: %d\n", BIT(data, 5));
-		//if (BIT(diff, 6))
-		//	LOGMASKED(LOG_PIN, "Pump Power1: %d\n", BIT(data, 6));
-		//if (BIT(diff, 7))
-		//	LOGMASKED(LOG_PIN, "ETNA Error: %d\n", BIT(data, 7));
+#if 0
+		const uint8_t old = m_port_data[PORTD];
+		const uint8_t diff = old ^ data;
+		if (BIT(diff, 0))
+			LOGMASKED(LOG_PIN, "Codec Enable: %d\n", BIT(data, 0));
+		if (BIT(diff, 1))
+			LOGMASKED(LOG_PIN, "Audio Amp Enable: %d\n", BIT(data, 1));
+		if (BIT(diff, 2))
+			LOGMASKED(LOG_PIN, "LCD Power: %d\n", BIT(data, 2));
+		if (BIT(diff, 3))
+			LOGMASKED(LOG_PIN, "ETNA Door: %d\n", BIT(data, 3));
+		if (BIT(diff, 4))
+			LOGMASKED(LOG_PIN, "Sled: %d\n", BIT(data, 4));
+		if (BIT(diff, 5))
+			LOGMASKED(LOG_PIN, "Pump Power2: %d\n", BIT(data, 5));
+		if (BIT(diff, 6))
+			LOGMASKED(LOG_PIN, "Pump Power1: %d\n", BIT(data, 6));
+		if (BIT(diff, 7))
+			LOGMASKED(LOG_PIN, "ETNA Error: %d\n", BIT(data, 7));
+#endif
 		break;
 	case REG_PADDR:
 		LOGMASKED(LOG_GPIO, "%s: peripheral write PADDR = %08x & %08x\n", machine().describe_context(), data, mem_mask);

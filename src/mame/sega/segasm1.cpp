@@ -21,7 +21,7 @@
     TODO:
     - Hopper, expects line_r to kick in without a write first (?)
     - tinkerbl, blicks: throws with "RAM data is BAD" at each soft reset (PC=514 check with $f00438)
-	ROM skipping it causes infinite RTEs
+    ROM skipping it causes infinite RTEs
     - Bingo Party and Bingo Planet put up a message about ROM version mismatch with the RAM and say to press the reset switch.
       However, when this is done, the code simply locks up (BRA to itself) and doesn't initialize the RAM.
     - Verify sound latch locations on Tinker Bell vs. the comms games
@@ -108,7 +108,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<ym3438_device> m_ym;
 	required_device<sega_315_5296_device> m_io1, m_io2;
-//	required_device<ticket_dispenser_device> m_hopper;
+//  required_device<ticket_dispenser_device> m_hopper;
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 	required_memory_bank m_soundbank;
 
@@ -627,7 +627,7 @@ void systemm1_state::m1base(machine_config &config)
 	m_ym->add_route(0, "speaker", 0.40, 0);
 	m_ym->add_route(1, "speaker", 0.40, 1);
 
-//	HOPPER(config, m_hopper, attotime::from_msec(200));
+//  HOPPER(config, m_hopper, attotime::from_msec(200));
 
 	SEGA_315_5296(config, m_io1, XTAL(16'000'000));
 	m_io1->in_pa_callback().set_ioport("IN1_PA");

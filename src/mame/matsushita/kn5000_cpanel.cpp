@@ -2,23 +2,23 @@
 // copyright-holders:Felipe Sanches
 /***************************************************************************
 
-	KN5000 control panel HLE
+    KN5000 control panel HLE
 
-	Emulates the two Mitsubishi M37471M2196S MCUs on the control panel.
+    Emulates the two Mitsubishi M37471M2196S MCUs on the control panel.
 
-	Protocol Summary:
-	-----------------
-	- Commands are 2-byte sequences from main CPU
-	- Command byte encoding: bits 7-5 = panel (001=left, 111=right),
-	  bits 4-0 = command type (0=basic query, 2=analog register query,
-	  3=extended read, 5=data mode)
-	- Response packets have type encoded in bits 5-3:
-	    Type 0,1: Button state (bits 7:6 select panel: 00=right, 11=left)
-	    Type 2: Encoder (absolute 8-bit ADC value, NOT delta)
-	    Type 3-5: Sync/ACK
-	    Type 6,7: Multi-byte data
+    Protocol Summary:
+    -----------------
+    - Commands are 2-byte sequences from main CPU
+    - Command byte encoding: bits 7-5 = panel (001=left, 111=right),
+      bits 4-0 = command type (0=basic query, 2=analog register query,
+      3=extended read, 5=data mode)
+    - Response packets have type encoded in bits 5-3:
+        Type 0,1: Button state (bits 7:6 select panel: 00=right, 11=left)
+        Type 2: Encoder (absolute 8-bit ADC value, NOT delta)
+        Type 3-5: Sync/ACK
+        Type 6,7: Multi-byte data
 
-	See: https://felipesanches.github.io/kn5000-docs/control-panel-protocol/
+    See: https://felipesanches.github.io/kn5000-docs/control-panel-protocol/
 
 ***************************************************************************/
 

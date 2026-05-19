@@ -62,7 +62,7 @@ Graphite hardware:
 - RAM: 128MB PC100/133
 - Sound: Integrated AC'97 Controller on VT82C686A Southbridge
     + ES1373/CT5880 Audio Chip
-	or CMI8738/8768 driver with PCIR 13f6:0111, as per XP-2K-ME folder (?)
+    or CMI8738/8768 driver with PCIR 13f6:0111, as per XP-2K-ME folder (?)
 - Networking: SMC EZ Card 10 / SMC1208T (probably 10ec:8029 1113:1208)
 - Video Card: 3DFX Voodoo 3
 - Storage: Hard Drive (copy protected)

@@ -66,7 +66,7 @@ make sure the following options are set correctly:
 Now, you may want to take a moment to look below at the Configuration Settings
 section to see how to set up these next options.
 
-As explained in :ref:`advanced-multi-CFG`, MAME has a order in which it
+As explained in :ref:`advanced-multicfg-order`, MAME has a order in which it
 processes INI files.  The BGFX settings can be edited in ``mame.ini``, but to
 take full advantage of the power of MAME’s configuration files, you’ll want to
 copy the BGFX settings from ``mame.ini`` to one of the other configuration files

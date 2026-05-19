@@ -946,12 +946,12 @@ void gcm394_base_video_device::video_703a_palettebank_w(u16 data)
 // 14
 // 13
 // 12
-// 
+//
 // 11  IRQ_EN11 R/W  TV/TFT Frame End IRQ
 // 10  IRQ_EN10 R/W  Frame buffer FIFO under-run IRQ
 //  9  IRQ_EN9  R/W  Motion detection FIFO under-run IRQ
 //  8  IRQ_EN8  R/W  Sensor position hit IRQ
-// 
+//
 //  7  IRQ_EN7  R/w  Motion detection frame end IRQ
 //  6  IRQ_EN6  R/W  Sensor frame end IRQ
 //  5  IRQ_EN5  R/W  Sprite engine under-run IRQ
@@ -989,7 +989,7 @@ void gcm394_base_video_device::videoirq_source_enable_w(u16 data)
 // 10  IRQ_STS10   Frame buffer FIFO under-run IRQ
 //  9  IRQ_STS9    Motion detection FIFO under-run IRQ
 //  8  IRQ_STS8    Sensor position hit IRQ
-// 
+//
 //  7  IRQ_STS7    Motion detection frame end IRQ
 //  6  IRQ_STS6    Sensor frame end IRQ
 //  5  IRQ_STS5    Sprite engine under-run IRQ
@@ -1027,12 +1027,12 @@ void gcm394_base_video_device::video_7063_videoirq_source_ack_w(u16 data)
 // 10
 //  9
 //  8
-// 
+//
 //  7
 //  6
 //  5
 //  4
-// 
+//
 //  3
 //  2
 //  1  BLDLVL[1]
@@ -1135,7 +1135,7 @@ void gcm394_base_video_device::video_703c_tvcontrol1_w(u16 data)
 	m_renderer->set_video_reg_3c(data);
 }
 
-// uncertain, apparently P_STN_COM_Clip or P_TFT_V_Width 
+// uncertain, apparently P_STN_COM_Clip or P_TFT_V_Width
 
 u16 gcm394_base_video_device::video_7051_r()
 {

@@ -277,6 +277,17 @@ void sonix16_device::set_reg(unsigned r, u16 v) noexcept
 		m_mr = (m_mr & 0xff0000ffff) | u64(v) << 16;
 }
 
+u16 sonix16_device::add(u16 xop, u16 yop, bool cin) noexcept
+{
+	u32 r = u32(xop) + yop + (cin ? 1 : 0);
+	m_ssf = (m_ssf & 0x30)
+			| (BIT((r ^ xop) & ~(xop ^ yop), 15) ? 0x08 : 0)
+			| (BIT(r, 16) ? 0x04 : 0)
+			| (BIT(r, 15) ? 0x02 : 0)
+			| (u16(r) ? 0 : 0x01);
+	return u16(r);
+}
+
 void sonix16_device::execute_run()
 {
 	do
@@ -368,41 +379,32 @@ void sonix16_device::execute_run()
 			u32 addr = u32(m_ixbkram[BIT(inst, 8)]) << 16 | m_ir[BIT(inst, 8)];
 			u16 rop = m_r[BIT(inst, 5, 2)];
 			u16 yop = BIT(inst, 3, 2) == 0 ? 1 : m_r[BIT(inst, 0, 2) + (BIT(inst, 1) ? 0 : 4)];
-			bool cf = false;
-			// TODO: arithmetic overflow flag
 			switch (BIT(inst, 2, 3))
 			{
 			case 0: case 2:
-				cf = u32(rop) + yop >= 0x10000;
-				rop += yop;
+				rop = add(rop, yop, false);
 				break;
 
 			case 1: case 4:
-				cf = rop >= yop;
-				rop -= yop;
+				rop = add(rop, ~yop, true);
 				break;
 
 			case 3:
-				cf = u32(rop) + yop + BIT(m_ssf, 2) >= 0x10000;
-				rop += yop + BIT(m_ssf, 2);
+				rop = add(rop, yop, BIT(m_ssf, 2));
 				break;
 
 			case 5:
-				cf = u32(rop) + u16(~yop) + BIT(m_ssf, 2) >= 0x10000;
-				rop -= yop + 1 - BIT(m_ssf, 2);
+				rop = add(rop, ~yop, BIT(m_ssf, 2));
 				break;
 
 			case 6:
-				cf = yop >= rop;
-				rop = yop - rop;
+				rop = add(~rop, yop, true);
 				break;
 
 			case 7:
-				cf = u16(~rop) + u32(yop) + BIT(m_ssf, 2) >= 0x10000;
-				rop = yop - rop + 1 - BIT(m_ssf, 2);
+				rop = add(~rop, yop, BIT(m_ssf, 2));
 				break;
 			}
-			m_ssf = (m_ssf & 0x30) | (cf ? 0x04 : 0) | (BIT(rop, 15) ? 0x02 : 0) | (rop == 0 ? 0x01 : 0);
 			m_ram_space.write_word(addr, rop);
 			switch (BIT(inst, 9, 2))
 			{
@@ -549,41 +551,32 @@ void sonix16_device::execute_run()
 			// AU(1)
 			u16 rop = get_reg(BIT(inst, 5, 3));
 			u16 yop = BIT(inst, 3, 2) == 0 ? 1 << BIT(inst, 0, 2) : m_r[BIT(inst, 0, 2) + (BIT(inst, 1) ? 0 : 4)];
-			bool cf = false;
-			// TODO: arithmetic overflow flag
 			switch (BIT(inst, 2, 3))
 			{
 			case 0: case 2:
-				cf = u32(rop) + yop >= 0x10000;
-				rop += yop;
+				rop = add(rop, yop, false);
 				break;
 
 			case 1: case 4:
-				cf = rop >= yop;
-				rop -= yop;
+				rop = add(rop, ~yop, true);
 				break;
 
 			case 3:
-				cf = u32(rop) + yop + BIT(m_ssf, 2) >= 0x10000;
-				rop += yop + BIT(m_ssf, 2);
+				rop = add(rop, yop, BIT(m_ssf, 2));
 				break;
 
 			case 5:
-				cf = u32(rop) + u16(~yop) + BIT(m_ssf, 2) >= 0x10000;
-				rop -= yop + 1 - BIT(m_ssf, 2);
+				rop = add(rop, ~yop, BIT(m_ssf, 2));
 				break;
 
 			case 6:
-				cf = yop >= rop;
-				rop = yop - rop;
+				rop = add(~rop, yop, true);
 				break;
 
 			case 7:
-				cf = u16(~rop) + u32(yop) + BIT(m_ssf, 2) >= 0x10000;
-				rop = yop - rop + 1 - BIT(m_ssf, 2);
+				rop = add(~rop, yop, BIT(m_ssf, 2));
 				break;
 			}
-			m_ssf = (m_ssf & 0x30) | (cf ? 0x04 : 0) | (BIT(rop, 15) ? 0x02 : 0) | (rop == 0 ? 0x01 : 0);
 			set_reg(BIT(inst, 8, 3), rop);
 			m_icount--;
 		}

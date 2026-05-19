@@ -2,24 +2,24 @@
 // copyright-holders:Carl
 /****************************************************************************
 
-	NEC V20/V30/V33 emulator modified back to a 8086/80186 emulator
+    NEC V20/V30/V33 emulator modified back to a 8086/80186 emulator
 
-	(Re)Written June-September 2000 by Bryan McPhail (mish@tendril.co.uk) based
-	on code by Oliver Bergmann (Raul_Bloodworth@hotmail.com) who based code
-	on the i286 emulator by Fabrice Frances which had initial work based on
-	David Hedley's pcemu(!).
+    (Re)Written June-September 2000 by Bryan McPhail (mish@tendril.co.uk) based
+    on code by Oliver Bergmann (Raul_Bloodworth@hotmail.com) who based code
+    on the i286 emulator by Fabrice Frances which had initial work based on
+    David Hedley's pcemu(!).
 
-	DIV/IDIV note: it's been observed on real 8086/8088 that DIV and IDIV
-	set the zero flag in the expected manner according to the quotient.  The
-	firmware for the Akai MPC60 expicitly relies on this behavior.  One
-	example from the routine that calculates how many timer ticks a sample
-	should play for:
+    DIV/IDIV note: it's been observed on real 8086/8088 that DIV and IDIV
+    set the zero flag in the expected manner according to the quotient.  The
+    firmware for the Akai MPC60 expicitly relies on this behavior.  One
+    example from the routine that calculates how many timer ticks a sample
+    should play for:
 
-	5659 sub dx,dx      ; sets ZF=1
-	565b mov cx,0x000a  ; flags unchanged
-	565e div cx         ; firmware expects this to affect ZF
-	5660 jne 0x5665
-	5662 mov ax,1       ; if ZF=1 the quotient was zero, round up to 1 tick
+    5659 sub dx,dx      ; sets ZF=1
+    565b mov cx,0x000a  ; flags unchanged
+    565e div cx         ; firmware expects this to affect ZF
+    5660 jne 0x5665
+    5662 mov ax,1       ; if ZF=1 the quotient was zero, round up to 1 tick
     5665 ...
 
 ****************************************************************************/

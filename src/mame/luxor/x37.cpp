@@ -11,11 +11,10 @@
 
 /*
 
-	TODO
+    TODO
 
-	- trap on boot
-	- tst.w 0xfffffc
-	- SCC interrupt acknowledge
+    - tst.w 0xfffffc
+    - loadsys1 fails with syntax error
 
 */
 
@@ -119,6 +118,7 @@ private:
 	void cio_pb_w(uint8_t data);
 	uint8_t cio_pc_r();
 	void cio_pc_w(uint8_t data);
+	u8 scc_irq_ack_r();
 	void sasi_int_w(int state) { m_sasi_int = state; }
 
 	void xdck_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -162,6 +162,7 @@ void x37_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_cpu, FUNC(m68010_device::autovectors_map));
 	map(0xfffff7, 0xfffff7).lr8(NAME([this]() -> u8 { return m_cio->intack_r(); }));
+	map(0xfffff9, 0xfffff9).lr8(NAME([this]() -> u8 { return scc_irq_ack_r(); }));
 }
 
 static INPUT_PORTS_START( x37 )
@@ -291,24 +292,24 @@ uint16_t x37_state::edc_status_r(offs_t offset)
 {
 	/*
 
-		bit		description
+	    bit     description
 
-		0		MA16
-		1		MA17
-		2		MA18
-		3		MA19
-		4		MA20
-		5		MA21
-		6		0
-		7		0
-		8		ECC C0
-		9		ECC C1
-		10		ECC C2
-		11		ECC C3
-		12		ECC C4
-		13		ECC C5
-		14		ECC SEF
-		15		ECC DEF
+	    0       MA16
+	    1       MA17
+	    2       MA18
+	    3       MA19
+	    4       MA20
+	    5       MA21
+	    6       0
+	    7       0
+	    8       ECC C0
+	    9       ECC C1
+	    10      ECC C2
+	    11      ECC C3
+	    12      ECC C4
+	    13      ECC C5
+	    14      ECC SEF
+	    15      ECC DEF
 
 	*/
 
@@ -324,16 +325,16 @@ uint8_t x37_state::cio_pa_r()
 {
 	/*
 
-		bit		description
+	    bit     description
 
-		0		FDC INTRQ
-		1		*XIRQ1
-		2		*XIRQ2
-		3		*XIRQ3
-		4	 	*XIRQ4
-		5		*XIRQ5
-		6		*XIRQ6
-		7		*SASI INT
+	    0       FDC INTRQ
+	    1       *XIRQ1
+	    2       *XIRQ2
+	    3       *XIRQ3
+	    4       *XIRQ4
+	    5       *XIRQ5
+	    6       *XIRQ6
+	    7       *SASI INT
 
 	*/
 
@@ -349,16 +350,16 @@ void x37_state::cio_pb_w(uint8_t data)
 {
 	/*
 
-		bit		description
+	    bit     description
 
-		0		TASKNR
-		1		TASKNR
-		2		TASKNR
-		3		TASKNR
-		4		MAN INPUT, PERMIT OUTPUT
-		5		ENABLE IRQ1, DISABLE MAN INPUT
-		6
-		7		BOOT, GREEN LED
+	    0       TASKNR
+	    1       TASKNR
+	    2       TASKNR
+	    3       TASKNR
+	    4       MAN INPUT, PERMIT OUTPUT
+	    5       ENABLE IRQ1, DISABLE MAN INPUT
+	    6
+	    7       BOOT, GREEN LED
 
 	*/
 
@@ -415,28 +416,43 @@ void x37_state::cio_pc_w(uint8_t data)
 	m_nvram->sk_w(clock);
 }
 
+u8 x37_state::scc_irq_ack_r()
+{
+	for (device_z80daisy_interface *intf : m_scc)
+	{
+		int state = intf->z80daisy_irq_state();
+		if (state & Z80_DAISY_INT)
+		{
+			auto *scc = dynamic_cast<z80scc_device *>(intf);
+			return scc->m1_r();
+		}
+	}
+
+	return m68010_device::autovector(4);
+}
+
 void x37_state::xdck_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 
-		bit		description
+	    bit     description
 
-		0		FPMR
-		1	    FPDD
-		2	    FPHLT
-		3       MINI
-		4       N/C
-		5	    N/C
-		6       PRE1
-		7       PRE2
-		8		SEL0
-		9       SEL1
-		10	    SEL2
-		11      MOTOR
-		12      LO1 (anded with FPWG)
-		13      LO1
-		14      N/C
-		15      N/C
+	    0       FPMR
+	    1       FPDD
+	    2       FPHLT
+	    3       MINI
+	    4       N/C
+	    5       N/C
+	    6       PRE1
+	    7       PRE2
+	    8       SEL0
+	    9       SEL1
+	    10      SEL2
+	    11      MOTOR
+	    12      LO1 (anded with FPWG)
+	    13      LO1
+	    14      N/C
+	    15      N/C
 
 	*/
 
@@ -505,7 +521,7 @@ void x37_state::x37(machine_config &config)
 
 	HD63450(config, m_dmac, XTAL(20'000'000)/2, m_cpu, AS_PROGRAM);
 	m_dmac->set_burst_clocks(
-		attotime::from_nsec(120),  // ch0
+		attotime::from_nsec(120), // SASI
 		attotime::zero,
 		attotime::zero,
 		attotime::zero

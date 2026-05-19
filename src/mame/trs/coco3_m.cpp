@@ -108,23 +108,23 @@ void coco3_state::ff40_write(offs_t offset, uint8_t data)
 
 INPUT_CHANGED_MEMBER(coco3_state::keyboard_changed)
 {
-    coco_state::keyboard_changed(field, param, oldval, newval);
+	coco_state::keyboard_changed(field, param, oldval, newval);
 
-    /* Support for CoCo 3 keyboard GIME interrupt */
-    uint8_t any_pressed = 0;
-    for (unsigned i = 0; i < m_keyboard.size(); i++)
-    {
-        any_pressed |= (~(m_keyboard[i]->read()) | poll_joystick_buttons()) & 0xFF;
-    }
+	/* Support for CoCo 3 keyboard GIME interrupt */
+	uint8_t any_pressed = 0;
+	for (unsigned i = 0; i < m_keyboard.size(); i++)
+	{
+		any_pressed |= (~(m_keyboard[i]->read()) | poll_joystick_buttons()) & 0xFF;
+	}
 
-    bool pressed = any_pressed != 0;
-    if (pressed != m_prev_keyboard_pressed)
-    {
-        m_gime->set_il1(true);
-        m_gime->set_il1(false);
-    }
+	bool pressed = any_pressed != 0;
+	if (pressed != m_prev_keyboard_pressed)
+	{
+		m_gime->set_il1(true);
+		m_gime->set_il1(false);
+	}
 
-    m_prev_keyboard_pressed = pressed;
+	m_prev_keyboard_pressed = pressed;
 }
 
 //-------------------------------------------------

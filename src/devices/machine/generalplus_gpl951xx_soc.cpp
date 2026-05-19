@@ -1061,17 +1061,17 @@ void generalplus_gpl951xx_device::cache_ctrl_w(u16 data)
 // 14  ADCRIF - Line ADC Converstion Ready interrupt status
 // 13  PwrONIF - Power on key change event status
 // 12  OTIF    - Over temperature event status
-// 
+//
 // 11  UARTIF  - UART Interrupt status
 // 10  SPI0    - Serial Peripheral Interface 0 interrupt status
 //  9  FPIF    - FP Interrupt Status (LCD)
 //  8
-// 
+//
 //  7  ASIF    - Line ADC Auto Sample Mode FIFO full interrupt status
 //  6
 //  5  AUDBIF  - Audio Channel B (CHB) FIFO Empty Interrupt status
 //  4  AUDAIF  - Audio Channel A (CHA) FIFO Empty Interrupt status
-// 
+//
 //  3  USB     - USB interrupt status
 //  2  DMA     - System DMA interrupt status
 //  1  EXT1IF  - External interrupt 1 status (R/W)
@@ -1148,17 +1148,17 @@ void generalplus_gpl951xx_device::int_status2_w(u16 data)
 // 14  TMGIF - TimerG Interrupt status
 // 13  TMFIF - TimerF Interrupt status
 // 12  TMEIF - TimerE Interrupt status
-// 
+//
 // 11  TMDIF - TimerD Interrupt status
 // 10  TMCIF - TimerC Interrupt status
 //  9  TMBIF - TimerB Interrupt status
 //  8  TMAIF - TimerA Interrupt status
-// 
+//
 //  7  UNEXP - unexpected access Interrupt status
 //  6
 //  5
 //  4
-// 
+//
 //  3
 //  2 BEAT - SPU beat interrupt status (R/W)
 //  1

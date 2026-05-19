@@ -2,13 +2,13 @@
 // copyright-holders:Felipe Sanches
 /***************************************************************************
 
-	KN5000 control panel HLE
+    KN5000 control panel HLE
 
-	Emulates the two Mitsubishi M37471M2196S MCUs on the control panel.
-	Since no ROM dumps are available, this uses High Level Emulation based
-	on reverse engineering of the main CPU firmware protocol.
+    Emulates the two Mitsubishi M37471M2196S MCUs on the control panel.
+    Since no ROM dumps are available, this uses High Level Emulation based
+    on reverse engineering of the main CPU firmware protocol.
 
-	Protocol documentation: https://felipesanches.github.io/kn5000-docs/control-panel-protocol/
+    Protocol documentation: https://felipesanches.github.io/kn5000-docs/control-panel-protocol/
 
 ***************************************************************************/
 

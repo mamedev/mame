@@ -936,29 +936,29 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( puzznic )
 	PORT_START("DSWA")
-	TAITO_MACHINE_COCKTAIL_LOC(SW1)
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:5,6")
+	TAITO_MACHINE_COCKTAIL_LOC(DSA)
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )  PORT_DIPLOCATION("DSA:5,6")
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )    // There is no coin B in the manual
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )    // There is no coin B in the manual
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DSA:7" )    // There is no coin B in the manual
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DSA:8" )    // There is no coin B in the manual
 
 	PORT_START("DSWB")
-	TAITO_DIFFICULTY_LOC(SW2)           // Difficulty controls the Timer Speed (how many seconds are there in a minute)
-	PORT_DIPNAME( 0x0c, 0x0c, "Retries" )       PORT_DIPLOCATION("SW2:3,4")
+	TAITO_DIFFICULTY_LOC(DSB)           // Difficulty controls the Timer Speed (how many seconds are there in a minute)
+	PORT_DIPNAME( 0x0c, 0x0c, "Retries" )       PORT_DIPLOCATION("DSB:3,4")
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x04, "1" )
 	PORT_DIPSETTING(    0x0c, "2" )
 	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPNAME( 0x10, 0x10, "Bombs" )     PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x10, "Bombs" )     PORT_DIPLOCATION("DSB:5")
 	PORT_DIPSETTING(    0x10, "0" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x20, 0x20, "Girls" )     PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Girls" )     PORT_DIPLOCATION("DSB:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "Terms of Replay" )   PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, "Terms of Replay" )   PORT_DIPLOCATION("DSB:7,8")
 	PORT_DIPSETTING(    0x40, "Stage one step back/Timer continuous" )
 	PORT_DIPSETTING(    0xc0, "Stage reset to start/Timer continuous" )
 	PORT_DIPSETTING(    0x80, "Stage reset to start/Timer reset to start" )
@@ -993,6 +993,16 @@ static INPUT_PORTS_START( puzznic )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( puzznicnn )
+	PORT_INCLUDE( puzznic )
+
+	PORT_MODIFY("DSWB")
+	// marked unused in the manual and the World version doesn't have girls GFX anyway
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSB:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( plotting )
@@ -1039,7 +1049,7 @@ static INPUT_PORTS_START( plotting )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( plottingu )
-	PORT_INCLUDE(plotting)
+	PORT_INCLUDE( plotting )
 	PORT_MODIFY("DSWA")
 	TAITO_COINAGE_US_LOC(SW1)
 INPUT_PORTS_END
@@ -1692,7 +1702,7 @@ void taitol_1cpu_state::puzznic(machine_config &config)
 	add_muxes(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitol_1cpu_state::puzznic_map);
 
-	ARKANOID_68705P3(config, "mcu", 3_MHz_XTAL);
+	ARKANOID_68705P3(config, "mcu", 3.579545_MHz_XTAL);
 }
 
 void taitol_1cpu_state::puzznici(machine_config &config)
@@ -2150,6 +2160,81 @@ ROM_START( flipull ) // The demo mode is 1 player
 	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )  // derived, but verified  Pal stamped B86-04
 ROM_END
 
+/*
+Puzznic, Taito 1989
+Hardware info by Guru
+---------------------
+
+TAITO L SYSTEM
+K1100439A
+J1100187A
+|-------X-------JAMMA-----------------|
+|                         TD62064     |
+|DSB 74157             MB3735  VOL    |
+|    74157        Y3014B        74393 |
+|    74157 YM2203    C4556 74174      |
+|    74157                       DIP20|
+|DSA                       74175     Y|
+|               13.33056MHz           |
+|    TMM2063         74HC74           |
+|            MB3771          CXK58257 |
+|                                     |
+|            |---------|     CXK58257 |
+|  DIP28     |         |              |
+|            | TAITO   |     CXK58257 |
+|  DIP28     |TC0090LVC|              |
+|            |         |     CXK58257 |
+|  DIP28     |---------|              |
+|-------------------------------------|
+Notes: (all ICs shown)
+       TC0090LVC - Taito custom chip (Z80 core + GFX + I/O). Clock 6.66528MHz [13.33056/2]
+        CXK58257 - Sony CXK58257 32KiB x8-bit SRAM
+         TMM2063 - Toshiba TMM2063 8KiB x8-bit SRAM
+          YM2203 - Yamaha YM2203 OPN (FM Operator Type-N) Sound Chip. Clock 3.33264MHz [13.33056/4]
+          Y3014B - Yamaha YM3014B Serial Input Floating D/A Converter
+          MB3771 - Fujitsu MB3771 Reset IC
+           C4556 - NEC uPC4556 Dual Operational Amplifier
+         DSA/DSB - 8-position DIP switch
+           DIP28 - 28 pin socket (top board plugs in here on all 3 sockets)
+           DIP20 - 20 pin socket (top board plugs in here)
+               X - Wire on JAMMA pin 23 top and bottom to provide 2x button 2. Wires join to
+                   custom 48CR-1 resistor arrays on the edge near the JAMMA connector.
+               Y - Another wire joins from the custom chip pin 80 then to DIP20 socket pin 11.
+
+      Sync Timing (actual measurements on PCB)
+      -----------
+      MASTER OSC - 13.33040MHz
+           HSYNC - 15.4190kHz
+           VSYNC - 59.9992Hz
+
+
+Top Board
+---------
+
+J9100241A                      |------|
+K9100186A SUB PCB              |      |
+                               | DIP20|
+                               |      |
+                               |      |
+                               |      |
+|------------------------------|      |
+|                          PAL20L8.IC3|
+|                          74174      |
+|  DIP28     C20_09.IC11   74374 74139|
+|                          74374 74244|
+|  DIP28     C20_07.IC10   7474       |
+|                          3.579545MHz|
+|  DIP28     C20_06.IC9   68705P3     |
+|-------------------------------------|
+Notes: (all ICs shown)
+       DIP28 - 28 pin socket (pins on bottom plug into main board on all 3 sockets)
+       DIP20 - 20 pin socket (pins on bottom plug into main board)
+       C20_* - EPROMs, 3x 27C010
+     68705P3 - Motorola MC68705P3 Microcontroller with 2KiB x8-bit internal ROM. Clock 3.579545MHz
+     PAL20L8 - MMI PAL20L8ACN PAL. Note both world and Japan region games use the same PAL.
+
+*/
+
 ROM_START( puzznic )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "c20-09.ic11", 0x00000, 0x20000, CRC(156d6de1) SHA1(c247936b62ef354851c9bace76a7a0aa14194d5f) )
@@ -2446,7 +2531,7 @@ GAME( 1989, plottingb, plotting, plotting,  plotting,  taitol_1cpu_state, empty_
 GAME( 1989, plottingu, plotting, plotting,  plottingu, taitol_1cpu_state, empty_init,     ROT0,   "Taito America Corporation", "Plotting (US)", 0 )
 GAME( 1989, flipull,   plotting, plotting,  plotting,  taitol_1cpu_state, empty_init,     ROT0,   "Taito Corporation", "Flipull (Japan)", 0 )
 
-GAME( 1989, puzznic,   0,        puzznic,   puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
+GAME( 1989, puzznic,   0,        puzznic,   puzznicnn, taitol_1cpu_state, empty_init,     ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
 GAME( 1989, puzznicu,  puzznic,  puzznic,   puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "Taito America Corporation", "Puzznic (US)", 0 )
 GAME( 1989, puzznicj,  puzznic,  puzznic,   puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "Taito Corporation", "Puzznic (Japan)", 0 )
 GAME( 1989, puzznici,  puzznic,  puzznici,  puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "bootleg", "Puzznic (Italian bootleg)", 0 )

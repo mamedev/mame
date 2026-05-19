@@ -94,8 +94,8 @@ void haplucky_state::main_map(address_map &map) // TODO: verify everything
 	map(0xec00, 0xec00).nopr(); // watchdog
 	map(0xec80, 0xec83).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xee00, 0xee00).lr8(NAME([] () { return 0xff; })); // inputs, avoid reset for now
-//	map(0xef00, 0xef01) sound commands?
-//	map(0xef80, 0xef80) sound NMI?
+//  map(0xef00, 0xef01) sound commands?
+//  map(0xef80, 0xef80) sound NMI?
 	map(0xf000, 0xf0ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf100, 0xf1ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xf800, 0xffff).ram(); // videoram

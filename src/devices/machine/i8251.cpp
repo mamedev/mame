@@ -12,7 +12,7 @@
 
     TODO:
     - BRKDET: if, in Async mode, 16 low RxD bits in succession are clocked
-	  in, the SYNDET pin & status must go high. It will go low upon a
+      in, the SYNDET pin & status must go high. It will go low upon a
       status read, same as what happens with sync.
 
 *********************************************************************/

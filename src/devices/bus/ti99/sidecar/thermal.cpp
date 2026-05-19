@@ -4,61 +4,61 @@
 
     Thermal Printer
     Model PHP1900
-    
-    Typical sidecar setup:                         
+
+    Typical sidecar setup:
                              +-- Thermal Printer
                              v
      +----------------+---+------+----------
      |   TI-99/4(A)   |   |      |    (PEB connection cable)
      +------------+---+   |+----+|----------
-     | oooooooooo |   |---||    ||                             
-     | oooooooooo |   | ^ |+----+| 
+     | oooooooooo |   |---||    ||
+     | oooooooooo |   | ^ |+----+|
      +----------------+ | |    o |
                         | +------+
-                        | 
+                        |
               (Speech Synthesizer)
-    
-    The Thermal Printer is a sidecar device for the TI-99/4(A) console. It 
+
+    The Thermal Printer is a sidecar device for the TI-99/4(A) console. It
     enabled the user to create printouts of BASIC programs via the LIST "TP"
-    command, and to create other text-based output using OPEN / PRINT in 
-    BASIC or the usual DSR calls in assembly language. 
-    
+    command, and to create other text-based output using OPEN / PRINT in
+    BASIC or the usual DSR calls in assembly language.
+
     Speed is limited from its technology, and special thermal paper is needed.
-    Beside the standard ASCII set, user-defined patterns may be printed, but 
-    there will always be some empty pixel colums due to the construction of 
+    Beside the standard ASCII set, user-defined patterns may be printed, but
+    there will always be some empty pixel colums due to the construction of
     the print heads.
-    
-    Some games like "A-Maze-Ing" have a built-in screen dump for the 
+
+    Some games like "A-Maze-Ing" have a built-in screen dump for the
     Thermal Printer (press FCTN-P when the game is over).
-    
-    The button on the printer chassis is used to advance the paper. 
+
+    The button on the printer chassis is used to advance the paper.
 
     Technology:
-                      
- 	The Thermal Printer uses two fixed print heads with 16*5 dots each.
-	
-	|***** ***** ***** ... *****|***** ***** ***** ... *****|
-	 01234 01234 01234     01234 56789 56789 56789     56789   dot number
-	   15    14    13        0     15    14    13        0     char column number
-	 
-	|------------------- width of paper --------------------|
-	
-	Columns are powered one after another; the selected dots cause the heating
-	element to get hot at that location. It is possible to activate multiple
-	columns at once, if the selected dot is supposed to be active in all these
-	columns.
-	
-	Each character column is surrounded by one blank pixel column before and 
-	one blank pixel column after it, so we get 7 dots width per character 
-	column.
-	
-	The burning is done while the retriggered monoflop LS122 is active. The 
-	monoflop is a safety precaution to avoid burning the paper during a paper
-	jam or a crash of the printer driver.
-	
-	Pressing the paper feed button causes an interrupt which runs the paper
-	advance routine in the built-in driver. By default, this is bound to the
-	END key on the keyboard.
+
+    The Thermal Printer uses two fixed print heads with 16*5 dots each.
+
+    |***** ***** ***** ... *****|***** ***** ***** ... *****|
+     01234 01234 01234     01234 56789 56789 56789     56789   dot number
+       15    14    13        0     15    14    13        0     char column number
+
+    |------------------- width of paper --------------------|
+
+    Columns are powered one after another; the selected dots cause the heating
+    element to get hot at that location. It is possible to activate multiple
+    columns at once, if the selected dot is supposed to be active in all these
+    columns.
+
+    Each character column is surrounded by one blank pixel column before and
+    one blank pixel column after it, so we get 7 dots width per character
+    column.
+
+    The burning is done while the retriggered monoflop LS122 is active. The
+    monoflop is a safety precaution to avoid burning the paper during a paper
+    jam or a crash of the printer driver.
+
+    Pressing the paper feed button causes an interrupt which runs the paper
+    advance routine in the built-in driver. By default, this is bound to the
+    END key on the keyboard.
 
     Michael Zapf
     May 2026
@@ -93,7 +93,7 @@ namespace bus::ti99::sidecar {
 #define HEATMF_U8 "heatmf_u8"
 
 static constexpr unsigned LEFTPAD = 12;
-static constexpr unsigned PAPER_WIDTH = 242; 
+static constexpr unsigned PAPER_WIDTH = 242;
 static constexpr unsigned PAPER_HEIGHT = (11*72);
 
 /*
@@ -111,12 +111,12 @@ ti_thermal_printer_device::ti_thermal_printer_device(const machine_config &mconf
 {
 }
 
-void ti_thermal_printer_device::write_line() 
+void ti_thermal_printer_device::write_line()
 {
 	// Get the active columns and dots from the latches
 	int actcolumns = (m_latch_u6->output_state() << 8) | m_latch_u7->output_state();
-	int actdots    = (m_latch_u4->output_state() << 2) | ((m_latch_u5->output_state() & 0xc0) >> 6); 
-	
+	int actdots    = (m_latch_u4->output_state() << 2) | ((m_latch_u5->output_state() & 0xc0) >> 6);
+
 	LOGMASKED(LOG_PRINT, "Printing col=%04x dots=%02x\n", actcolumns, actdots);
 	for (int col = 0; col < 16; col++)  // multiple columns can be energized
 	{
@@ -127,9 +127,9 @@ void ti_thermal_printer_device::write_line()
 				if (BIT(actdots, dot))
 				{
 					int physcol = (dot >= 5)? (31 - col) : (15 - col);
-					m_bitmap_printer->draw_pixel(m_bitmap_printer->m_xpos 
+					m_bitmap_printer->draw_pixel(m_bitmap_printer->m_xpos
 						+ 7*physcol + (dot%5) + LEFTPAD,
-						m_bitmap_printer->m_ypos, 
+						m_bitmap_printer->m_ypos,
 						0x000000);  //rrggbb
 				}
 			}
@@ -138,8 +138,8 @@ void ti_thermal_printer_device::write_line()
 }
 
 /*
-	The heat monoflop is a safety feature in case of a paper jam. 
-	It turns off the current of the write heads after 15 ms when not retriggered.
+    The heat monoflop is a safety feature in case of a paper jam.
+    It turns off the current of the write heads after 15 ms when not retriggered.
 */
 void ti_thermal_printer_device::enable_column_latches(int state)
 {
@@ -157,7 +157,7 @@ void ti_thermal_printer_device::readz(offs_t offset, uint8_t *value)
 	{
 		*value = m_dsrrom[offset & 0x0fff];
 	}
-	
+
 	// Pass through to the external port
 	if (m_port != nullptr)
 		m_port->readz(offset, value);
@@ -185,9 +185,9 @@ void ti_thermal_printer_device::crureadz(offs_t offset, uint8_t *value)
 	if ((offset & 0xff00) == 0x1800)
 	{
 		// Only delivers a 0 when pressed, else Z
-		if (m_feed_pressed) *value = 0; 
+		if (m_feed_pressed) *value = 0;
 	}
-		
+
 	// Pass through to the external port
 	if (m_port != nullptr)
 		m_port->crureadz(offset, value);
@@ -199,14 +199,14 @@ void ti_thermal_printer_device::cruwrite(offs_t offset, uint8_t data)
 	{
 		LOGMASKED(LOG_CRU, "CRU address = %04x, data = %x\n", offset, data);
 		// LOGMASKED(LOG_CRU, "addr %d, bit %d = %d\n", (offset & 0xf0)>>4, (offset & 0x0e)>>1, data);
-		
+
 		int bitaddr = (offset & 0x0e)>>1;
 		switch (offset & 0xf0)
 		{
 		case 0x00:
 			m_latch_u5->write_bit(bitaddr, data);
 			if (bitaddr == 5) line_feed();
-			break;			
+			break;
 		case 0x10:
 			m_latch_u4->write_bit(bitaddr, data);
 			break;
@@ -229,7 +229,7 @@ void ti_thermal_printer_device::cruwrite(offs_t offset, uint8_t data)
 void ti_thermal_printer_device::line_feed()
 {
 	// Run the stepper
-	int pattern = bitswap<4>(m_latch_u5->output_state()>>2, 0, 1, 2, 3); 
+	int pattern = bitswap<4>(m_latch_u5->output_state()>>2, 0, 1, 2, 3);
 	m_bitmap_printer->update_pf_stepper(pattern);
 	m_bitmap_printer->update_cr_stepper(1);  // have to move the cr stepper to get the page to change
 	m_bitmap_printer->update_cr_stepper(5);
@@ -237,7 +237,7 @@ void ti_thermal_printer_device::line_feed()
 }
 
 /*
-	Just forwarding to the external port
+    Just forwarding to the external port
 */
 void ti_thermal_printer_device::memen_in(int state)
 {
@@ -263,14 +263,14 @@ void ti_thermal_printer_device::clock_in(int state)
 void ti_thermal_printer_device::reset_in(int state)
 {
 	clear_latches(state);
-	
+
 	// Pass through to the external port
 	if (m_port != nullptr)
 		m_port->reset_in(state);
 }
 
 /*
-	Forward external interrupts to the console.
+    Forward external interrupts to the console.
 */
 void ti_thermal_printer_device::extint(int state)
 {
@@ -289,7 +289,7 @@ void ti_thermal_printer_device::extready(int state)
 
 void ti_thermal_printer_device::clear_latches(int state)
 {
-	int value = (state==ASSERT_LINE)? 0 : 1; 
+	int value = (state==ASSERT_LINE)? 0 : 1;
 	m_latch_u5->clear_w(value);
 	m_latch_u4->clear_w(value);
 	m_heatmf_u8->clear_w(value);
@@ -330,20 +330,20 @@ void ti_thermal_printer_device::device_add_mconfig(machine_config& config)
 
 	TTL74123(config, m_heatmf_u8, 0);
 	m_heatmf_u8->set_connection_type(TTL74123_GROUNDED);
-	m_heatmf_u8->set_resistor_value(RES_K(10));	// actually, the 74122 is used (Rint = 10k)
+	m_heatmf_u8->set_resistor_value(RES_K(10)); // actually, the 74122 is used (Rint = 10k)
 	m_heatmf_u8->set_capacitor_value(CAP_U(4.7f));
 	m_heatmf_u8->set_clear_pin_value(1);
 	m_heatmf_u8->set_a_pin_value(0);
-	
+
 	LS259(config, m_latch_u4);     // Dots 2-9
-	LS259(config, m_latch_u5);     // ROM / Heat trigger / stepper / dots 0 and 1 
+	LS259(config, m_latch_u5);     // ROM / Heat trigger / stepper / dots 0 and 1
 	LS259(config, m_latch_u6);     // columns 8-15 and 24-31
 	LS259(config, m_latch_u7);     // columns 0-7 and 16-23
 
 	m_latch_u5->q_out_cb<1>().set(m_heatmf_u8, FUNC(ttl74123_device::b_w));
-		
+
 	m_heatmf_u8->out_cb().set(FUNC(ti_thermal_printer_device::enable_column_latches));
-	
+
 	TI99_IOPORT(config, m_port, 0, ti99_ioport_options_evpc1, nullptr);
 	m_port->extint_cb().set(FUNC(ti_thermal_printer_device::extint));
 	m_port->ready_cb().set(FUNC(ti_thermal_printer_device::extready));

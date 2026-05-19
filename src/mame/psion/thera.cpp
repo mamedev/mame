@@ -420,12 +420,12 @@ uint16_t thera_device::read(offs_t offset, uint16_t mem_mask)
 
 	case 0x24: // SPI Data
 		//if (data == 4 || data == 6 || data == 1)
-		//	m_spi_status &= ~2;
+		//  m_spi_status &= ~2;
 
 		//if (data == 1)
 		//{
-		//	//m_irq_status |= 1 << 7; // ADC
-		//	m_spi_status &= ~4;
+		//  //m_irq_status |= 1 << 7; // ADC
+		//  m_spi_status &= ~4;
 		//}
 		data = m_prom[m_prom_addr] | m_prom[m_prom_addr + 1] << 8;
 		m_prom_addr += 2;
