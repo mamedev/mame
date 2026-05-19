@@ -1826,7 +1826,7 @@ GAME( 1981, tripdraw,   0,        tripdraw,  tripdraw, casino_state, empty_init,
 GAME( 1984, bigcsino,   0,        statusbj,  bigcsino, casino_state, empty_init,     ROT0,  "Status Games",       "Big Casino",                            MACHINE_SUPPORTS_SAVE )
 
 // regular games
-GAME( 198?, ppatrol,    0,        funcsino,  ppatrol,  casino_state, empty_init,     ROT0,  "Status Games",       "Planet Patrol",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, ppatrol,    0,        funcsino,  ppatrol,  casino_state, empty_init,     ROT0,  "Status Games",       "Planet Patrol",                         MACHINE_SUPPORTS_SAVE ) // Flyer has 1981, but was released in Jan 1982
 
 // trivia
 GAME( 1984, hangman,    0,        statriv2,  hangman,  trivia_state, init_addr_lmh,  ROT0,  "Status Games",       "Hangman",                               MACHINE_SUPPORTS_SAVE )
