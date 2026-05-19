@@ -95,6 +95,7 @@ __|              |         |  |ALS05A| |N82077   |   __             6 x 74F00J->
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
+#include "bus/nscsi/tape.h"
 #include "bus/rs232/rs232.h"
 
 #include "machine/input_merger.h"
@@ -372,7 +373,8 @@ u32 news_68k_state::bus_error_r()
 static void news_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("cdrom", NSCSI_CDROM_NEWS);
+	device.option_add("tape", NSCSI_TAPE_NEWS);
 }
 
 void news_68k_state::common(machine_config &config)
