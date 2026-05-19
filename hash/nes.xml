@@ -42090,7 +42090,7 @@ This mod inserts recreations of the music tracks and sound effects into the prot
 	</software>
 
 	<software name="wwfsteel">
-		<description>WWF WrestleMania - Steel Cage Challenge (Europe)</description>
+		<description>WWF WrestleMania: Steel Cage Challenge (Europe)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="NES-WS-(NOE/UKV)"/>
@@ -42108,7 +42108,7 @@ This mod inserts recreations of the music tracks and sound effects into the prot
 	</software>
 
 	<software name="wwfsteelu" cloneof="wwfsteel">
-		<description>WWF WrestleMania - Steel Cage Challenge (USA)</description>
+		<description>WWF WrestleMania: Steel Cage Challenge (USA)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="NES-WS-USA"/>
