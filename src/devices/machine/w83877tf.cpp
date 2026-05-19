@@ -689,8 +689,8 @@ void w83877tf_device::request_irq(int irq, int state)
 		m_isa->irq12_w(state);
 		break;
 	//case 13:
-	//	m_isa->irq13_w(state);
-	//	break;
+	//  m_isa->irq13_w(state);
+	//  break;
 	case 14:
 		m_isa->irq14_w(state);
 		break;

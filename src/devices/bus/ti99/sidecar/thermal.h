@@ -4,7 +4,7 @@
 
     Thermal Printer
     Model PHP1900
-    
+
     Michael Zapf
     May 2026
 
@@ -26,7 +26,7 @@ class ti_thermal_printer_device : public bus::ti99::internal::ioport_attached_de
 {
 public:
 	ti_thermal_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	
+
 	void readz(offs_t offset, uint8_t *value) override;
 	void write(offs_t offset, uint8_t data) override;
 	void setaddress_dbin(offs_t offset, int state) override;
@@ -41,7 +41,7 @@ public:
 	void reset_in(int state) override;
 
 	INPUT_CHANGED_MEMBER( feed_button );
-	
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -64,7 +64,7 @@ private:
 	required_device<ttl74123_device> m_heatmf_u8;
 
 	bool m_feed_pressed;
-	line_state m_ext_int;	
+	line_state m_ext_int;
 
 	// DSR ROM
 	uint8_t*          m_dsrrom;

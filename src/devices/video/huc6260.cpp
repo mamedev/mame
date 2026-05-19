@@ -14,8 +14,8 @@
     VSync is low for 4095 master cycles (3 lines).
     VSync changes 30 master cycles after HSync would go low.
 
-	TODO:
-	- any differences between battlera VCE and HuC6260?
+    TODO:
+    - any differences between battlera VCE and HuC6260?
 
 **********************************************************************/
 

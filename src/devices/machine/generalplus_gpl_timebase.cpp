@@ -142,7 +142,7 @@ void gpl_timebase_device::timebaseb_ctrl_w(u16 data)
 		case 0x01: m_timebase_b->adjust(attotime::from_hz(16)); break;
 		case 0x02: m_timebase_b->adjust(attotime::from_hz(32)); break;
 		case 0x03: m_timebase_b->adjust(attotime::from_hz(64)); break;
-		}		
+		}
 	}
 	else
 	{
@@ -186,7 +186,7 @@ void gpl_timebase_device::timebasec_ctrl_w(u16 data)
 		case 0x01: m_timebase_c->adjust(attotime::from_hz(256)); break;
 		case 0x02: m_timebase_c->adjust(attotime::from_hz(512)); break;
 		case 0x03: m_timebase_c->adjust(attotime::from_hz(1024)); break;
-		}		
+		}
 	}
 	else
 	{

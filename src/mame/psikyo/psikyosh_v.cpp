@@ -51,31 +51,31 @@ Video Registers: at 0x305ffe0 for ps3 or 0x405ffe0 for ps5/ps5v2:
 0x04 -- ffffffff above continued.
 0x08 -- ffff0000 priority values for sprites, 4-bits per value
         0000ff00 unknown. always 20. number of addressable banks? boards are
-		         populated with 20.
+                 populated with 20.
         000000f0 unknown. s1945ii/s1945iii/gunbird2/gnbarich/tgm2/dragnblz/
-		         sbomber/mjgtaste sets to c. soldivid/daraku is 0. another bank
-				 select?
+                 sbomber/mjgtaste sets to c. soldivid/daraku is 0. another bank
+                 select?
         0000000f is priority for per-line post-blending
 0x0c -- 3f3f3f3f unknown. A table of 4 6-bit values. usually 0f102038. tgm2 is
                  0a172838.
         c0c00000 unknown. unused?
         0000c000 is flipscreen (currently ignored). presumably flipy<<1|flipx.
         000000c0 is screen size select. 0 is 224 lines, c is 240 (see tgm2, not
-		         confirmed).
+                 confirmed).
 0x10 -- ffff0000 is always 00aa
         0000f000 number of banks for sprites (not confirmed). mjgtaste/tgm2/
-		         sbomber/s1945ii/dragnblz/gnbarich is 3, gunbird2/s1945iii is
-				 2, soldivid/daraku is b.
+                 sbomber/s1945ii/dragnblz/gnbarich is 3, gunbird2/s1945iii is
+                 2, soldivid/daraku is b.
         00000fff Controls gfx data bank available to be read by SH-2 for
-		         verification.
+                 verification.
 0x14 -- ffffffff always 83ff000e
 0x18 -- ffffffff bank for tilemaps. As follows for the different tilemaps:
                  11223344. Bit 0x80 indicates use of line effects and the bank
-				 should be used to look up the tile-bank per line.
+                 should be used to look up the tile-bank per line.
 0x1c -- ff000000 controls bank for 'pre'/'post' values
         00ff0000 unknown, always 0?
         0000ffff enable bits for 4 tilemaps. 8 is enable. 4 indicates 8bpp
-		         tiles. 1 is size select for tilemap
+                 tiles. 1 is size select for tilemap
 */
 
 /*
@@ -881,7 +881,7 @@ void psikyosh_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 			u32 const zoomx = zoom_table[sprite_ptr->zoomx];
 
 			/* Avoid division-by-zero when table contains 0 (Uninitialised/Bug) */
-			if (zoomy && zoomx) 
+			if (zoomy && zoomx)
 			{
 				s16 alpha = sprite_ptr->alpha;
 
@@ -921,7 +921,7 @@ void psikyosh_state::prelineblend(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	   gnbarich sets the 0x000000ff to 0x7f in test mode whilst the others use 0x80.
 	   tgm2 sets it to 0x00 on warning screen. Likely has no effect. */
 	/* bank is always 8 (0x4000) except for daraku/soldivid */
-	u8 const bank = (m_vidregs[7] & 0xff000000) >> 24; 
+	u8 const bank = (m_vidregs[7] & 0xff000000) >> 24;
 	if (bank > 0x1f) // avoid possible oob access
 	{
 		bitmap.fill(m_palette->black_pen(), cliprect);
@@ -929,7 +929,7 @@ void psikyosh_state::prelineblend(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	}
 
 	/* Per row */
-	u32 const *linefill = &m_spriteram[(bank * 0x800) / 4]; 
+	u32 const *linefill = &m_spriteram[(bank * 0x800) / 4];
 
 	auto profile8 = g_profiler.start(PROFILER_USER8);
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
@@ -1006,7 +1006,7 @@ void psikyosh_state::video_start()
 	m_alphatable = std::make_unique<u8[]>(256);
 
 	/* 256 color sprites with palette selectable on 16 color boundaries */
-	m_gfxdecode->gfx(1)->set_granularity(16); 
+	m_gfxdecode->gfx(1)->set_granularity(16);
 
 	/* Pens 0xc0-0xff have a gradient of alpha values associated with them */
 	for (int i = 0; i < 0xc0; i++)
@@ -1077,7 +1077,7 @@ popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
 				draw_background(bitmap, cliprect, i);
 
 			// assume this has highest priority at same priority level
-			postlineblend(bitmap, cliprect, i); 
+			postlineblend(bitmap, cliprect, i);
 		}
 	}
 	return 0;

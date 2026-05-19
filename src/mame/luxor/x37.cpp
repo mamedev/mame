@@ -11,10 +11,10 @@
 
 /*
 
-	TODO
+    TODO
 
-	- tst.w 0xfffffc
-	- loadsys1 fails with syntax error
+    - tst.w 0xfffffc
+    - loadsys1 fails with syntax error
 
 */
 
@@ -292,24 +292,24 @@ uint16_t x37_state::edc_status_r(offs_t offset)
 {
 	/*
 
-		bit		description
+	    bit     description
 
-		0		MA16
-		1		MA17
-		2		MA18
-		3		MA19
-		4		MA20
-		5		MA21
-		6		0
-		7		0
-		8		ECC C0
-		9		ECC C1
-		10		ECC C2
-		11		ECC C3
-		12		ECC C4
-		13		ECC C5
-		14		ECC SEF
-		15		ECC DEF
+	    0       MA16
+	    1       MA17
+	    2       MA18
+	    3       MA19
+	    4       MA20
+	    5       MA21
+	    6       0
+	    7       0
+	    8       ECC C0
+	    9       ECC C1
+	    10      ECC C2
+	    11      ECC C3
+	    12      ECC C4
+	    13      ECC C5
+	    14      ECC SEF
+	    15      ECC DEF
 
 	*/
 
@@ -325,16 +325,16 @@ uint8_t x37_state::cio_pa_r()
 {
 	/*
 
-		bit		description
+	    bit     description
 
-		0		FDC INTRQ
-		1		*XIRQ1
-		2		*XIRQ2
-		3		*XIRQ3
-		4	 	*XIRQ4
-		5		*XIRQ5
-		6		*XIRQ6
-		7		*SASI INT
+	    0       FDC INTRQ
+	    1       *XIRQ1
+	    2       *XIRQ2
+	    3       *XIRQ3
+	    4       *XIRQ4
+	    5       *XIRQ5
+	    6       *XIRQ6
+	    7       *SASI INT
 
 	*/
 
@@ -350,16 +350,16 @@ void x37_state::cio_pb_w(uint8_t data)
 {
 	/*
 
-		bit		description
+	    bit     description
 
-		0		TASKNR
-		1		TASKNR
-		2		TASKNR
-		3		TASKNR
-		4		MAN INPUT, PERMIT OUTPUT
-		5		ENABLE IRQ1, DISABLE MAN INPUT
-		6
-		7		BOOT, GREEN LED
+	    0       TASKNR
+	    1       TASKNR
+	    2       TASKNR
+	    3       TASKNR
+	    4       MAN INPUT, PERMIT OUTPUT
+	    5       ENABLE IRQ1, DISABLE MAN INPUT
+	    6
+	    7       BOOT, GREEN LED
 
 	*/
 
@@ -435,24 +435,24 @@ void x37_state::xdck_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 
-		bit		description
+	    bit     description
 
-		0		FPMR
-		1	    FPDD
-		2	    FPHLT
-		3       MINI
-		4       N/C
-		5	    N/C
-		6       PRE1
-		7       PRE2
-		8		SEL0
-		9       SEL1
-		10	    SEL2
-		11      MOTOR
-		12      LO1 (anded with FPWG)
-		13      LO1
-		14      N/C
-		15      N/C
+	    0       FPMR
+	    1       FPDD
+	    2       FPHLT
+	    3       MINI
+	    4       N/C
+	    5       N/C
+	    6       PRE1
+	    7       PRE2
+	    8       SEL0
+	    9       SEL1
+	    10      SEL2
+	    11      MOTOR
+	    12      LO1 (anded with FPWG)
+	    13      LO1
+	    14      N/C
+	    15      N/C
 
 	*/
 

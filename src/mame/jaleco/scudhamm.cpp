@@ -90,7 +90,7 @@ TODO:
 
 #include "logmacro.h"
 
-#define LOGUNKNOWN(...)   LOGMASKED(LOG_UNKNOWN, __VA_ARGS__) 
+#define LOGUNKNOWN(...)   LOGMASKED(LOG_UNKNOWN, __VA_ARGS__)
 
 namespace {
 
@@ -110,7 +110,7 @@ public:
 		, m_io_in(*this, "IN%u", 0U)
 		, m_leds(*this, "led%u", 0U)
 	{
-		
+
 	}
 
 	void scudhamm(machine_config &config) ATTR_COLD;
@@ -1741,7 +1741,7 @@ void captflag_state::init_vscaptfl()
 	space.install_write_handler(0x100050, 0x100051, write16s_delegate(*this, FUNC(captflag_state::motor_command_right_w)));
 }
 
-} // anonymous namespace 
+} // anonymous namespace
 
 /***************************************************************************
 

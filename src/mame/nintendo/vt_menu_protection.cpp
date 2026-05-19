@@ -55,7 +55,7 @@ void vt_menu_protection_device::write_clock(bool state)
 				{
 					logerror("got command %02x\n", m_command);
 
-					// gtct885 uses command 0x30 to read, goretrop uses command 0x20 
+					// gtct885 uses command 0x30 to read, goretrop uses command 0x20
 					if ((m_command == 0x30) || (m_command == 0x20))
 					{
 						logerror("(read bytes)\n");

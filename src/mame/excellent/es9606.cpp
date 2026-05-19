@@ -285,7 +285,7 @@ void es9606_state::es9606(machine_config &config)
 {
 	M68000(config, m_maincpu, 32_MHz_XTAL / 2); // divider not verified, but CPU is rated for 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &es9606_state::program_map);
-//	m_maincpu->set_vblank_int("screen", FUNC(es9606_state::irq1_line_hold));
+//  m_maincpu->set_vblank_int("screen", FUNC(es9606_state::irq1_line_hold));
 
 	EEPROM_93C46_16BIT(config, m_eeprom); // exact model unknown
 

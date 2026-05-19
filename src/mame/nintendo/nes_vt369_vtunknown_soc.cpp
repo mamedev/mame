@@ -425,7 +425,7 @@ void vt3xx_soc_base_device::vt_4153_port_out_w(u8 data)
 // it then sets vt_414x_port_direction_w to 0x20 (0010 0000)
 // and reads from 414b masking with 0x10
 // pixel246 does similar.  (of note, both otrail and pixel246 test more RAM than usual too)
-// 
+//
 // maybe the port can be configured in different modes?
 
 u8 vt3xx_soc_base_device::vt_414x_port_direction_r()

@@ -374,7 +374,7 @@ void piet1_state::machine_start()
 
 	m_banks[0]->configure_entries(0, 32, rom, 0x4000);
 	m_banks[1]->configure_entries(0,  2, ram, 0x4000);
-//	m_banks[2]->configure_entries(0, 32, rom, 0x4000);
+//  m_banks[2]->configure_entries(0, 32, rom, 0x4000);
 	m_banks[2]->configure_entries(0, 32, rom, 0x4000);
 
 	for (size_t i = 0; i < 4; i++) {

@@ -169,7 +169,7 @@ NEP-16
 
 #include "logmacro.h"
 
-#define LOGHIT(...)   LOGMASKED(LOG_HIT, __VA_ARGS__) 
+#define LOGHIT(...)   LOGMASKED(LOG_HIT, __VA_ARGS__)
 
 static void hit_calc_orig(u16 p, u16 s, u16 org, u16 &l, u16 &r)
 {
@@ -668,10 +668,10 @@ void skns_state::io_w(offs_t offset, u32 data, u32 mem_mask)
 		case 2:
 			if (ACCESSING_BITS_24_31)
 			{ /* Coin Lock/Count */
-	//          machine().bookkeeping().coin_counter_w(0, BIT(data, 24));
-	//          machine().bookkeeping().coin_counter_w(1, BIT(data, 25));
-	//          machine().bookkeeping().coin_lockout_w(0, BIT(~data, 26));
-	//          machine().bookkeeping().coin_lockout_w(1, BIT(~data, 27)); // Works in puzzloop, others behave strange.
+				//machine().bookkeeping().coin_counter_w(0, BIT(data, 24));
+				//machine().bookkeeping().coin_counter_w(1, BIT(data, 25));
+				//machine().bookkeeping().coin_lockout_w(0, BIT(~data, 26));
+				//machine().bookkeeping().coin_lockout_w(1, BIT(~data, 27)); // Works in puzzloop, others behave strange.
 			}
 			if (ACCESSING_BITS_16_23)
 			{ /* Analogue Input Select */
@@ -686,7 +686,8 @@ void skns_state::io_w(offs_t offset, u32 data, u32 mem_mask)
 		case 3:
 			if (ACCESSING_BITS_8_15)
 			{ /* Interrupt Clear, do we need these? */
-	/*          if (BIT(data, 0))
+#if 0
+				if (BIT(data, 0))
 					m_maincpu->set_input_line(1, CLEAR_LINE);
 				if (BIT(data, 1))
 					m_maincpu->set_input_line(3, CLEAR_LINE);
@@ -701,9 +702,10 @@ void skns_state::io_w(offs_t offset, u32 data, u32 mem_mask)
 				if (BIT(data, 6))
 					m_maincpu->set_input_line(13, CLEAR_LINE);
 				if (BIT(data, 7))
-					m_maincpu->set_input_line(15, CLEAR_LINE);*/
+					m_maincpu->set_input_line(15, CLEAR_LINE);
+#endif
 
-				/* idle skip for vblokbrk/sarukani, i can't find a better place to put it :-( but i think it works ok unless its making the game too fast */
+				/* idle skip for vblokbrk/sarukani, I can't find a better place to put it :-( but I think it works OK unless it's making the game too fast */
 				if (m_maincpu->pc() == 0x04013b42)
 				{
 					if (!strcmp(machine().system().name,"vblokbrk") ||

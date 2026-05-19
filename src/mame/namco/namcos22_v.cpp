@@ -1402,12 +1402,12 @@ void namcos22_state::slavesim_handle_233002(const s32 *src)
 	    00000000: common
 	    00800000: alpinr2b cancel fogging on selection screen
 	    00800000: raverace cancel fogging on sky in attract mode
-		--xx----: pen when textures are disabled with objectflags 003fffff
-		----xxxx: pen when textures are disabled with objectflags 005fffff / 009fffff
+	    --xx----: pen when textures are disabled with objectflags 003fffff
+	    ----xxxx: pen when textures are disabled with objectflags 005fffff / 009fffff
 
 	    objectshift:
-        00800000: set at same time as objectflags 009fffff
-		--xxxxxx: low 22 bits: object z bias adjust (see blit_single_quad)
+	    00800000: set at same time as objectflags 009fffff
+	    --xxxxxx: low 22 bits: object z bias adjust (see blit_single_quad)
 
 	    objectflags:
 	    001fffff: common

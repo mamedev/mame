@@ -2,15 +2,15 @@
 // copyright-holders:Devin Acker
 /**********************************************************************
 
-	Skeleton for NEC PC-6022 Color Plotter Printer
+    Skeleton for NEC PC-6022 Color Plotter Printer
 
-	User manual:
-	https://archive.org/details/nec-pc-6022-color-plotter-printer-users-manual
+    User manual:
+    https://archive.org/details/nec-pc-6022-color-plotter-printer-users-manual
 
-	Page width is 96mm / 480px.
-	CPU port A controls the two steppers, and port C controls raising/lowering the pen.
-	Pen/color selection happens by moving the pen to the left of the print area, then
-	moving it back and forth 3 times per color change.
+    Page width is 96mm / 480px.
+    CPU port A controls the two steppers, and port C controls raising/lowering the pen.
+    Pen/color selection happens by moving the pen to the left of the print area, then
+    moving it back and forth 3 times per color change.
 
 **********************************************************************/
 

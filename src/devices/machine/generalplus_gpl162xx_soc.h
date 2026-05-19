@@ -289,7 +289,7 @@ protected:
 	void mint_ctrl_w(u16 data);
 
 	virtual void update_interrupts(int state);
-		
+
 	u16 timera_ctrl_r();
 	void timera_ctrl_w(u16 data);
 

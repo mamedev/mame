@@ -117,7 +117,7 @@ void zeus2_device::device_start()
 	// yoffs
 	// texel_width
 	// zbase
-//	save_item(NAME(m_system));
+//  save_item(NAME(m_system));
 	save_item(NAME(zeus_fifo));
 	save_item(NAME(zeus_fifo_words));
 	save_item(NAME(m_fill_color));
