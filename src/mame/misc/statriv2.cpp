@@ -692,6 +692,29 @@ static INPUT_PORTS_START( bbchall )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( ppatrol )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// are any other inputs used? there are 4 switches
+	PORT_START("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("COIN")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 /*************************************
  *
  *  Graphics decoding
@@ -891,6 +914,22 @@ ROM_START( bigcsino ) // 5 in 1 of: Joker Poker, Blackjack, Baccarat, Craps and 
 	ROM_LOAD( "82s123.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) // Socketed
 	ROM_LOAD( "82s123.u21", 0x0020, 0x0020, CRC(e8f60d23) SHA1(2070b8201b75a13e416f597d6b2473d0027f420c) ) // Soldered in (Color?)
 	ROM_LOAD( "82s123.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) // Soldered in
+ROM_END
+
+ROM_START( ppatrol )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp.u7",  0x0000, 0x0800, CRC(0a6a8082) SHA1(8ce2212bdbeacef919cb8051ca965a8809246829) )
+	ROM_LOAD( "pp.u8",  0x0800, 0x0800, CRC(895de6f7) SHA1(d373a2f4f431b1b474e6f0b9ed9d1b4c66a129c6) )
+	ROM_LOAD( "pp.u9",  0x1000, 0x0800, CRC(6f503a36) SHA1(d8f7642b6ff54e4558cd6ed2b02fec7d7706e170) )
+	ROM_LOAD( "pp.u10", 0x1800, 0x0800, CRC(73053ff6) SHA1(4a6e1ab7f53147a15eab16bd8dbb1c50b9018950) )
+
+	ROM_REGION( 0x0800, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "pp.u36", 0x0000, 0x0800, CRC(3ab71d9a) SHA1(67a47e4f018c82694e6a1a2ef96d257ac3adb1a7) )
+
+	ROM_REGION( 0x0140, "proms", 0 ) // not dumped from this PCB yet
+	ROM_LOAD( "82s123.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) )
+	ROM_LOAD( "82s123.u21", 0x0020, 0x0020, BAD_DUMP CRC(e8f60d23) SHA1(2070b8201b75a13e416f597d6b2473d0027f420c) )
+	ROM_LOAD( "82s123.u22", 0x0040, 0x0100, BAD_DUMP CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) )
 ROM_END
 
 ROM_START( hangman )
@@ -1785,6 +1824,9 @@ GAME( 1981, statusbj,   0,        statusbj,  statusbj, casino_state, empty_init,
 GAME( 1981, funcsino,   0,        funcsino,  funcsino, casino_state, empty_init,     ROT0,  "Status Games",       "Status Fun Casino (V1.3s)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, tripdraw,   0,        tripdraw,  tripdraw, casino_state, empty_init,     ROT0,  "Status Games",       "Tripple Draw (V3.1 s)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1984, bigcsino,   0,        statusbj,  bigcsino, casino_state, empty_init,     ROT0,  "Status Games",       "Big Casino",                            MACHINE_SUPPORTS_SAVE )
+
+// regular games
+GAME( 198?, ppatrol,    0,        funcsino,  ppatrol,  casino_state, empty_init,     ROT0,  "Status Games",       "Planet Patrol",                         MACHINE_SUPPORTS_SAVE )
 
 // trivia
 GAME( 1984, hangman,    0,        statriv2,  hangman,  trivia_state, init_addr_lmh,  ROT0,  "Status Games",       "Hangman",                               MACHINE_SUPPORTS_SAVE )
