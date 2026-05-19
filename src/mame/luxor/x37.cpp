@@ -13,9 +13,8 @@
 
 	TODO
 
-	- trap on boot
 	- tst.w 0xfffffc
-	- SCC interrupt acknowledge
+	- loadsys1 fails with syntax error
 
 */
 
@@ -119,6 +118,7 @@ private:
 	void cio_pb_w(uint8_t data);
 	uint8_t cio_pc_r();
 	void cio_pc_w(uint8_t data);
+	u8 scc_irq_ack_r();
 	void sasi_int_w(int state) { m_sasi_int = state; }
 
 	void xdck_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -162,6 +162,7 @@ void x37_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_cpu, FUNC(m68010_device::autovectors_map));
 	map(0xfffff7, 0xfffff7).lr8(NAME([this]() -> u8 { return m_cio->intack_r(); }));
+	map(0xfffff9, 0xfffff9).lr8(NAME([this]() -> u8 { return scc_irq_ack_r(); }));
 }
 
 static INPUT_PORTS_START( x37 )
@@ -415,6 +416,21 @@ void x37_state::cio_pc_w(uint8_t data)
 	m_nvram->sk_w(clock);
 }
 
+u8 x37_state::scc_irq_ack_r()
+{
+	for (device_z80daisy_interface *intf : m_scc)
+	{
+		int state = intf->z80daisy_irq_state();
+		if (state & Z80_DAISY_INT)
+		{
+			auto *scc = dynamic_cast<z80scc_device *>(intf);
+			return scc->m1_r();
+		}
+	}
+
+	return m68010_device::autovector(4);
+}
+
 void x37_state::xdck_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
@@ -505,7 +521,7 @@ void x37_state::x37(machine_config &config)
 
 	HD63450(config, m_dmac, XTAL(20'000'000)/2, m_cpu, AS_PROGRAM);
 	m_dmac->set_burst_clocks(
-		attotime::from_nsec(120),  // ch0
+		attotime::from_nsec(120), // SASI
 		attotime::zero,
 		attotime::zero,
 		attotime::zero
