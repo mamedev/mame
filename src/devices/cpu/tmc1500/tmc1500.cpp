@@ -73,8 +73,7 @@ void tmc1500_base_device::device_start()
 	save_item(NAME(m_regsO));
 	save_item(NAME(m_regsX));
 	save_item(NAME(m_regsY));
-	save_item(NAME(m_disp_activity));
-	save_item(NAME(m_last_display_on));
+	save_item(NAME(m_disp_activity)); 
 
 	state_add(STATE_GENPC, "PC", m_pc).formatstr("%03X");
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
@@ -95,8 +94,7 @@ void tmc1500_base_device::device_reset()
 	m_cond = false; 	
 	m_regR5 = 0;
 	m_scan_idx = 0;
-	m_disp_activity = 0;
-	m_last_display_on = false;
+	m_disp_activity = 0; 
 
 	memset(m_regsO, 0, sizeof(m_regsO));
 	memset(m_regsX, 0, sizeof(m_regsX));
@@ -121,48 +119,25 @@ void tmc1500_base_device::execute_run()
 
 		execute_instruction();
 		m_icount -= 1;
+
+		// If the display was active, decrement the activity counter.
+		// If no opDISP call occurs for 200 cycles (40 ms), turn off the display.
+		if (m_disp_activity > 0)
+		{
+			m_disp_activity--;
+			if (m_disp_activity == 0)
+			{
+				for (int i = 0; i < 12; i++)
+				{
+					m_write_o(i, 0x0f, 0xffff);
+				}
+			}
+		}
 	}
 }
 
 void tmc1500_base_device::execute_instruction() {
 	u16 op = m_opcode;
-
-	// Update display activity and blanking.
-	// Subjective Emulation Choice: The physical TI-57 blanks the LED display during calculations
-	// or infinite run loops (e.g., Lbl 0 -> GTO 0) to conserve battery power.
-	// Because MAME updates the display at discrete frame rates, a direct cycle-by-cycle hardware
-	// simulation of display decay would cause heavy visual flickering or beating frequencies.
-	//
-	// To resolve this, we employ a low-pass filter/integrator that tracks the duty cycle of the
-	// DISP instruction. Running a DISP instruction (which consumes 32 cycles) boosts the activity value,
-	// whereas running other instructions decays it.
-	// - Idle mode (waiting for keypress): The processor executes DISP in a tight loop, keeping the activity near maximum.
-	// - Run mode (calculating/running program): The processor runs non-DISP instructions, causing the activity
-	//   level to drop below the threshold and cleanly turning off the segments.
-	// - Keyboard responsiveness: Crucially, keyboard scanning in DISP still runs in the background, allowing
-	//   the R/S key to stop execution at any time.
-	bool is_disp = (op & 0x0f00) == 0x0e00 && (op & 0x000f) == 0x07 && (op & 0x1000) == 0;
-	if (is_disp) {
-		for (int c = 0; c < 32; c++) {
-			m_disp_activity = (m_disp_activity * 999) / 1000 + 1000;
-		}
-	} else {
-		m_disp_activity = (m_disp_activity * 999) / 1000;
-	}
- 
-	bool display_on = (m_disp_activity > 500000);
-	if (display_on != m_last_display_on) {
-		m_last_display_on = display_on;
-		if (!display_on) {
-			// Blank display
-			for (int i = 0; i < 12; i++) {
-				m_write_o(i, 0x0f, 0xffff);
-			}
-		} else {
-			// Redraw display with current register values
-			refresh_display();
-		}
-	}
 
 	// Control Flow (Bit 12 = 1)
 	if (op & 0x1000) {
@@ -370,41 +345,24 @@ void tmc1500_base_device::reg_xchg(uint8_t *r1, uint8_t *r2, int lo, int hi) {
 	update_r5(lo, hi, r1); // Update from the first register after swap
 }
 
-// Display and Keyboard scanning
-void tmc1500_base_device::refresh_display() {
-	for (int i = 11; i >= 0; i--) {
-		uint8_t a = m_regsO[0][i];
-		uint8_t b = m_regsO[1][i];
-		
-		uint16_t data = 0;
-		if (b & 0x08) data = 0x0f; // Blank
-		else if (b & 0x01) data = 0x0e; // Minus sign
-		else data = a & 0x0f;
-		if (b & 0x02) data |= 0x10; // Decimal point
-		
-		m_write_o(11 - i, data, 0xffff);
-	}
-}
 
 void tmc1500_base_device::opDISP() {
 	m_cond = false;
 	m_regR5 = 0; 
-
-	bool display_on = (m_disp_activity > 500000);
+	m_disp_activity = 200; // Reset activity timer (keep display on for 40 ms)
 
 	for (int i = 11; i >= 0; i--) {
 		m_scan_idx = i;
 		
 		uint16_t data = 0x0f; // Blank by default if display is off
-		if (display_on) {
-			uint8_t a = m_regsO[0][i];
-			uint8_t b = m_regsO[1][i];
-			
-			if (b & 0x08) data = 0x0f; // Blank
-			else if (b & 0x01) data = 0x0e; // Minus sign
-			else data = a & 0x0f;
-			if (b & 0x02) data |= 0x10; // Decimal point
-		}
+
+		uint8_t a = m_regsO[0][i];
+		uint8_t b = m_regsO[1][i];
+		
+		if (b & 0x08) data = 0x0f; // Blank
+		else if (b & 0x01) data = 0x0e; // Minus sign
+		else data = a & 0x0f;
+		if (b & 0x02) data |= 0x10; // Decimal point
 		
 		m_write_o(11 - i, data, 0xffff);
 
@@ -425,7 +383,7 @@ void tmc1500_base_device::opDISP() {
 			}
 		}
 	}
-	
+
 	m_icount -= 31;
 }
 
