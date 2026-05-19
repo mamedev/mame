@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "machine/timer.h"
+
 class gpl951xx_rtc_device :   public device_t,
 						public device_memory_interface
 {
@@ -22,7 +24,7 @@ public:
 	void rtc_request_w(u16 data);
 
 protected:
-	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
@@ -33,20 +35,36 @@ private:
 	inline uint8_t readbyte(offs_t address);
 	inline void writebyte(offs_t address, uint8_t data);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(rtc_cb);
+
 	u8 reg00_r();
 	u8 reg01_r();
+	u8 reg02_r();
+	void reg02_w(u8 data);
 
+	u8 reg40_r();
 	void reg40_w(u8 data);
 
 	u8 reg50_r();
 	void reg50_w(u8 data);
 
+	void loadcnt_w(offs_t offset, u8 data);
+	void alarmdat_w(offs_t offset, u8 data);
+	u8 timerval_r(offs_t offset);
+
 	u8 m_rtc_addr;
 	u8 m_read_dat;
 	u8 m_write_dat;
 
+	u8 m_reg02;
+
 	u8 m_reg40;
 	u8 m_reg50;
+
+	// these are 48-bit registers
+	u64 m_loadcnt;
+	u64 m_alarmdat;
+	u64 m_timerval; 
 };
 
 DECLARE_DEVICE_TYPE(GPL951XX_RTC, gpl951xx_rtc_device)

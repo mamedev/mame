@@ -22,6 +22,7 @@ public:
 		m_screen(*this, "screen"),
 		m_genspi(*this, "spi"),
 		m_io(*this, "IN%u", 0U),
+		m_adc(*this, "ADC%u", 0U),
 		m_lcdc(*this, "lcdc")
 	{
 	}
@@ -32,6 +33,8 @@ public:
 	void poke(machine_config &config) ATTR_COLD;
 	void flufflav(machine_config &config) ATTR_COLD;
 	void puni(machine_config &config) ATTR_COLD;
+	void bubltea(machine_config &config) ATTR_COLD;
+	void dsgnpal(machine_config &config) ATTR_COLD;
 	void bftetris(machine_config &config) ATTR_COLD;
 
 	void init_fif() ATTR_COLD;
@@ -44,9 +47,9 @@ protected:
 
 	u32 bftetris_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	u16 porta_r();
-	u16 portb_r();
-	u16 portc_r();
+	template <u8 Port> u16 port_r();
+	template <u8 Port> u16 adc_r();
+
 	void porta_w(u16 data);
 
 	void spi_reset(u8 data);
@@ -59,7 +62,8 @@ protected:
 	required_device<generalplus_gpl951xx_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<generic_spi_flash_device> m_genspi;
-	required_ioport_array<3> m_io;
+	required_ioport_array<6> m_io;
+	required_ioport_array<6> m_adc;
 	required_device<bftetris_lcdc_device> m_lcdc;
 };
 
@@ -68,25 +72,18 @@ u32 generalplus_gpl951xx_game_state::bftetris_screen_update(screen_device &scree
 	return m_lcdc->render_to_bitmap(screen, bitmap, cliprect);
 }
 
-
-u16 generalplus_gpl951xx_game_state::porta_r()
+template <u8 Port>
+u16 generalplus_gpl951xx_game_state::port_r()
 {
-	u16 data = m_io[0]->read();
-	logerror("Port A Read: %04x\n", data);
+	u16 data = m_io[Port]->read();
+	logerror("Port %c Read: %04x\n", 'A'+Port, data);
 	return data;
 }
 
-u16 generalplus_gpl951xx_game_state::portb_r()
+template <u8 Port>
+u16 generalplus_gpl951xx_game_state::adc_r()
 {
-	u16 data = m_io[1]->read();
-	logerror("Port B Read: %04x\n", data);
-	return data;
-}
-
-u16 generalplus_gpl951xx_game_state::portc_r()
-{
-	u16 data = m_io[2]->read();
-	logerror("Port C Read: %04x\n", data);
+	u16 data = m_adc[Port]->read();
 	return data;
 }
 
@@ -107,11 +104,84 @@ void generalplus_gpl951xx_game_state::machine_reset()
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 }
 
-static INPUT_PORTS_START( bfmpac )
-	PORT_START("IN0")
-	PORT_START("IN1")
+// default port structure for debugging inputs
+#define DEBUG_PORT(_name) \
+	PORT_START(#_name) \
+	PORT_DIPNAME( 0x0001, 0x0001, #_name ":0001" ) \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x0001, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x0002, 0x0002, #_name ":0002" ) \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x0002, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x0004, 0x0004, #_name ":0004" ) \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x0004, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x0008, 0x0008, #_name ":0008" ) \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x0010, 0x0010, #_name ":0010" ) \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x0010, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x0020, 0x0020, #_name ":0020" ) \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x0040, 0x0040, #_name ":0040" ) \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x0040, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x0080, 0x0080, #_name ":0080" ) \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x0080, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x0100, 0x0100, #_name ":0100" ) \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x0100, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x0200, 0x0200, #_name ":0200" ) \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x0200, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x0400, 0x0400, #_name ":0400" ) \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x0400, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x0800, 0x0800, #_name ":0800" ) \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x0800, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x1000, 0x1000, #_name ":1000" ) \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x1000, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x2000, 0x2000, #_name ":2000" ) \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x2000, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x4000, 0x4000, #_name ":4000" ) \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x8000, 0x8000, #_name ":8000" ) \
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 
-	PORT_START("IN2")
+static INPUT_PORTS_START( base )
+	DEBUG_PORT(IN0)
+	DEBUG_PORT(IN1)
+	DEBUG_PORT(IN2)
+	DEBUG_PORT(IN3)
+	DEBUG_PORT(IN4)
+	DEBUG_PORT(IN5)
+
+	PORT_START("ADC0")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START("ADC1")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START("ADC2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START("ADC3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START("ADC4")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START("ADC5")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bfmpac )
+	PORT_INCLUDE(base)
+
+	PORT_MODIFY("IN2")
 	PORT_DIPNAME( 0x0001, 0x0000, "0" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
@@ -157,6 +227,69 @@ static INPUT_PORTS_START( bfspyhnt )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( puni )
+	PORT_INCLUDE(base)
+
+	PORT_MODIFY("IN5")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( segapet1 )
+	PORT_INCLUDE(base)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) // hold this and 'button 3' on startup for a test mode
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON4 )
+
+	PORT_MODIFY("ADC5")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( segapet2 )
+	PORT_INCLUDE(base)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("<")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("OK")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME(">")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Cancel")
+
+	PORT_MODIFY("ADC5")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bubltea ) // has 3 surface buttons and the straw
+	PORT_INCLUDE(base)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Power / Next")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Increase Value")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Back")
+
+	PORT_MODIFY("ADC5")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dsgnpal )
+	PORT_INCLUDE(base)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 )
+
+	PORT_MODIFY("ADC5")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 void generalplus_gpl951xx_game_state::spi_reset(u8 data)
 {
 	m_genspi->reset();
@@ -178,13 +311,11 @@ void generalplus_gpl951xx_game_state::spi_cmd_access_from_soc(u8 data)
 
 void generalplus_gpl951xx_game_state::lcd_i80_cmd(u16 data)
 {
-	logerror("lcd_i80_cmd %02x\n", data);
 	m_lcdc->lcdc_command_w(data);
 }
 
 void generalplus_gpl951xx_game_state::lcd_i80_data(u16 data)
 {
-	logerror("lcd_i80_data %02x\n", data);
 	m_lcdc->lcdc_data_w(data);
 }
 
@@ -193,10 +324,20 @@ void generalplus_gpl951xx_game_state::lcd_i80_data(u16 data)
 void generalplus_gpl951xx_game_state::gpl951xx(machine_config &config)
 {
 	GPL951XX(config, m_maincpu, 96000000/2, m_screen);
-	m_maincpu->porta_in().set(FUNC(generalplus_gpl951xx_game_state::porta_r));
-	m_maincpu->portb_in().set(FUNC(generalplus_gpl951xx_game_state::portb_r));
-	m_maincpu->portc_in().set(FUNC(generalplus_gpl951xx_game_state::portc_r));
+	m_maincpu->porta_in().set(FUNC(generalplus_gpl951xx_game_state::port_r<0>));
+	m_maincpu->portb_in().set(FUNC(generalplus_gpl951xx_game_state::port_r<1>));
+	m_maincpu->portc_in().set(FUNC(generalplus_gpl951xx_game_state::port_r<2>));
+	m_maincpu->portd_in().set(FUNC(generalplus_gpl951xx_game_state::port_r<3>));
+	m_maincpu->porte_in().set(FUNC(generalplus_gpl951xx_game_state::port_r<4>));
+	m_maincpu->portf_in().set(FUNC(generalplus_gpl951xx_game_state::port_r<5>));
 	m_maincpu->porta_out().set(FUNC(generalplus_gpl951xx_game_state::porta_w));
+	m_maincpu->adc0_in().set(FUNC(generalplus_gpl951xx_game_state::adc_r<0>));
+	m_maincpu->adc1_in().set(FUNC(generalplus_gpl951xx_game_state::adc_r<1>));
+	m_maincpu->adc2_in().set(FUNC(generalplus_gpl951xx_game_state::adc_r<2>));
+	m_maincpu->adc3_in().set(FUNC(generalplus_gpl951xx_game_state::adc_r<3>));
+	m_maincpu->adc4_in().set(FUNC(generalplus_gpl951xx_game_state::adc_r<4>));
+	m_maincpu->adc5_in().set(FUNC(generalplus_gpl951xx_game_state::adc_r<5>));
+
 	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(generalplus_gpl951xx_device::irq_vector_cb));
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
@@ -206,10 +347,10 @@ void generalplus_gpl951xx_game_state::gpl951xx(machine_config &config)
 	m_maincpu->i80_cmd_out().set(FUNC(generalplus_gpl951xx_game_state::lcd_i80_cmd));
 	m_maincpu->i80_data_out().set(FUNC(generalplus_gpl951xx_game_state::lcd_i80_data));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(30); // is this coming from the LCDC? 60 is definitely too fast for the IRQ rate
 	m_screen->set_size(320*2, 262*2);
-	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
+	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update("maincpu", FUNC(generalplus_gpl951xx_device::screen_update));
 
 	m_screen->screen_vblank().set(m_maincpu, FUNC(generalplus_gpl951xx_device::vblank));
@@ -259,15 +400,33 @@ void generalplus_gpl951xx_game_state::flufflav(machine_config &config)
 	m_genspi->set_jedec_manufacturer(0xc2);
 	m_genspi->set_jedec_memtype(0x20);
 	m_genspi->set_jedec_capacity(0x16);
+
+	m_screen->set_visarea(0, 128-1, 0, 128-1);
+	m_screen->set_physical_aspect(1, 1);
 }
 
-void generalplus_gpl951xx_game_state::puni(machine_config &config)
+void generalplus_gpl951xx_game_state::dsgnpal(machine_config &config)
 {
 	gpl951xx(config);
 	m_genspi->set_jedec_manufacturer(0xc2);
 	m_genspi->set_jedec_memtype(0x20);
 	m_genspi->set_jedec_capacity(0x17);
 }
+
+void generalplus_gpl951xx_game_state::puni(machine_config &config)
+{
+	dsgnpal(config);
+	m_screen->set_visarea(0, 128-1, 0, 128-1);
+	m_screen->set_physical_aspect(1, 1);
+}
+
+void generalplus_gpl951xx_game_state::bubltea(machine_config &config)
+{
+	dsgnpal(config);
+	m_screen->set_visarea(0, 128-1, 0, 160-1);
+	m_screen->set_physical_aspect(128, 160);
+}
+
 
 void generalplus_gpl951xx_game_state::bftetris(machine_config &config)
 {
@@ -276,7 +435,7 @@ void generalplus_gpl951xx_game_state::bftetris(machine_config &config)
 	// all games have an LCDC, but bftetris programs it manually, while other games
 	// seem to take the GPL95xx output and show that directly
 	m_screen->set_size(320, 262);
-	m_screen->set_visarea(0, (320)-1, 0, (240)-1);
+	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(generalplus_gpl951xx_game_state::bftetris_screen_update));
 }
 
@@ -515,30 +674,30 @@ CONS(2020, bftetris, 0, 0, bftetris, bfspyhnt, generalplus_gpl951xx_game_state, 
 
 // unclear if colour matches, but there are multiple generations of these at least
 // uses PUNIRUNZU_MAIN_V3 pcb
-CONS(2021, punirune,  0,        0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_V3, pastel blue, Europe)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, punirune,  0,        0, puni, puni, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_V3, pastel blue, Europe)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // looks similar to above, but has HXR-1 instead of the usual markings on the PCB
 CONS(2021, punirunea, punirune, 0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (HXR-1 PCB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // the case on these looks like the European release, including English title logo.  CPU is a glob, PUNIRUNZU_MAIN_DICE_V1 on PCB
-CONS(2021, punij1m,  punirune, 0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_DICE_V1, mint, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2021, punij1pk, punirune, 0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_DICE_V1, pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2021, punij1pu, punirune, 0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_DICE_V1, purple, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, punij1m,  punirune, 0, puni, puni, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_DICE_V1, mint, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, punij1pk, punirune, 0, puni, puni, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_DICE_V1, pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, punij1pu, punirune, 0, puni, puni, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_DICE_V1, purple, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // the case on these is similar to the above, but the text is in Japanese, uses PUNIRUNZU_MAIN_V2 on pcb
-CONS(2021, punij2pk, punirune, 0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_V2, pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, punij2pk, punirune, 0, puni, puni, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_V2, pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // has a link feature
-CONS(2021, punifrnd, 0,        0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes Punitomo Tsuushin (hot pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, punifrnd, 0,        0, puni, puni, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes Punitomo Tsuushin (hot pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-CONS(2021, punistar, 0,        0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes Punistarz (pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, punistar, 0,        0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes Punistarz (pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // 'Poo' emoji shaped item, comes in multiple colours, has a solder pad which might change between units
 // this was dumped from the 'Lavender' unit
-CONS(2021, flufflav, 0,        0, flufflav, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Happinet", "Fuwatcho Uncho Fuwa Fuwa (lavender, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, flufflav, 0,        0, flufflav, bubltea, generalplus_gpl951xx_game_state, empty_init, "Happinet", "Fuwatcho Uncho Fuwa Fuwa (lavender, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // available in 2 colours, ROM confirmed to be the same on both
-CONS(2021, pockrmsr,  0,        0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Pocket Room - Sanrio Characters (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, pockrmsr,  0,        0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Pocket Room - Sanrio Characters (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // Pocket Monsters ガチッとゲットだぜ! モンスターボールゴー! - Pocket Monsters is printed on the inner shell, but not the box?
 CONS(2021, pokgoget, 0,        0, poke, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Gachitto Get da ze! Monster Ball Go! (210406, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
@@ -555,31 +714,30 @@ CONS( 2021, smkcatch, 0, 0, puni, bfmpac, generalplus_gpl951xx_game_state, empty
 // or Sumikko Gurashi - Sumikko Catch DX (すみっコぐらし すみっコキャッチDX) = Sumikko Catch with pouch and strap
 
 // is there a subtitle for this one? it's different to the others
-CONS( 201?, smkguras,  0,        0, puni, bfmpac, generalplus_gpl951xx_game_state, empty_init,  "San-X / Tomy", "Sumikko Gurashi DX (Japan, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS( 201?, smkgurasa, smkguras, 0, puni, bfmpac, generalplus_gpl951xx_game_state, empty_init,  "San-X / Tomy", "Sumikko Gurashi DX (Japan, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, smkguras,  0,        0, puni, bubltea, generalplus_gpl951xx_game_state, empty_init,  "San-X / Tomy", "Sumikko Gurashi DX (Japan, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, smkgurasa, smkguras, 0, puni, bubltea, generalplus_gpl951xx_game_state, empty_init,  "San-X / Tomy", "Sumikko Gurashi DX (Japan, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
-CONS( 2021, smkgacha,  0,        0, puni, bfmpac, generalplus_gpl951xx_game_state, empty_init,  "San-X / Tomy", "Sumikko Gacha (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2021, smkgacha,  0,        0, puni, bubltea, generalplus_gpl951xx_game_state, empty_init,  "San-X / Tomy", "Sumikko Gacha (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // there seem to be different versions of this available, is the software the same?
-CONS( 201?, dsgnpal, 0, 0, puni, bfmpac, generalplus_gpl951xx_game_state, empty_init,  "Tomy", "Kiratto Pri-Chan Design Palette (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, dsgnpal, 0, 0, dsgnpal, dsgnpal, generalplus_gpl951xx_game_state, empty_init,  "Tomy", "Kiratto Pri-Chan Design Palette (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | ROT270 )
 
-// for these Sega Toys pets the clones might end up being duplicates with only different user data, however they might also have different factory default data for each colour
-// もっちりペット もっちまるず
-CONS( 2018, segapet1,  0,        0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (2018 version, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS( 2018, segapet1a, segapet1, 0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (2018 version, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-// a 'DX' version (dated 2020) also exists, unclear if it's different software or just different packaging with bonuses
+// these have different version numbers (coming from the user/config area?) correlating to the colour of the device, even if the code the same
+CONS( 2018, segapet1,  0,        0, puni, segapet1, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (180615B P)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2018, segapet1a, segapet1, 0, puni, segapet1, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (180615B Y)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// DX version of the first game, 2020 on box, updated fabric cover, still has 2018 on case, newer code revision
+CONS( 2020, segaptdx,  0,        0, puni, segapet1, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu DX (190313A P)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // also もっちりペット もっちまるず
-CONS( 2019, segapet2,  0,        0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (2019 version, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS( 2019, segapet2a, segapet2, 0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (2019 version, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2019, segapet2,  0,        0, puni, segapet2, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (2019 version, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2019, segapet2a, segapet2, 0, puni, segapet2, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (2019 version, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // these ones have motors in the ears and a more fluffy cover
 // もっちふわペット もっちまるず
-CONS( 2020, segapet3,  0,        0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchifuwa Pet Mocchimaruzu (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS( 2020, segapet3a, segapet3, 0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchifuwa Pet Mocchimaruzu (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2020, segapet3,  0,        0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchifuwa Pet Mocchimaruzu (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2020, segapet3a, segapet3, 0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchifuwa Pet Mocchimaruzu (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-// DX version of the first game, 2020 on box, updated fabric cover, still has 2018 on case, but different software?
-CONS( 2020, segaptdx,  0,        0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu DX", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // まぜまぜミックス！ぷにタピちゃん
-CONS( 201?, bubltea,   0,        0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Mazemaze Mix! Puni Tapi-chan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 201?, bubltea,   0,        0, bubltea, bubltea, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Mazemaze Mix! Puni Tapi-chan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

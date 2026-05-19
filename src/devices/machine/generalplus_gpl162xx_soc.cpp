@@ -577,13 +577,13 @@ u16 sunplus_gcm394_base_device::int_status2_r()
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::int_status2_r\n", machine().describe_context());
 	u16 ret = 0;
 
-	if (m_gpl_timebase->timebasea_irq_flag())
+	if (m_gpl_timebase->timebase_irq_flag<0>())
 		ret |= 0x0100;
 
-	if (m_gpl_timebase->timebaseb_irq_flag())
+	if (m_gpl_timebase->timebase_irq_flag<1>())
 		ret |= 0x0200;
 
-	if (m_gpl_timebase->timebasec_irq_flag())
+	if (m_gpl_timebase->timebase_irq_flag<2>())
 		ret |= 0x0400;
 
 	return ret;
@@ -693,7 +693,7 @@ void sunplus_gcm394_base_device::mint_ctrl_w(u16 data)
 
 void sunplus_gcm394_base_device::update_interrupts(int state)
 {
-	if ((m_gpl_timebase->timebasea_irq_flag() && !m_disable_timebase_interrupts) || (m_gpl_timebase->timebaseb_irq_flag() && !m_disable_timebase_interrupts))
+	if ((m_gpl_timebase->timebase_irq_flag<0>() && !m_disable_timebase_interrupts) || (m_gpl_timebase->timebase_irq_flag<1>() && !m_disable_timebase_interrupts))
 	{
 		set_state_unsynced(UNSP_IRQ7_LINE, ASSERT_LINE);
 	}
@@ -702,7 +702,7 @@ void sunplus_gcm394_base_device::update_interrupts(int state)
 		set_state_unsynced(UNSP_IRQ7_LINE, CLEAR_LINE);
 	}
 
-	if ((m_gpl_timebase->timebasec_irq_flag() && !m_disable_timebase_interrupts) || (m_rtc_int_status & 0x0100))
+	if ((m_gpl_timebase->timebase_irq_flag<2>() && !m_disable_timebase_interrupts) || (m_rtc_int_status & 0x0100))
 	{
 		set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
 	}

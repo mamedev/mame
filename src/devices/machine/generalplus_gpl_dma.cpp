@@ -202,7 +202,10 @@ void gpl_dma_device::trigger_systemm_dma(int channel)
 	else if ((mode & 0x50) == 0x10)
 		destdelta = -1;
 
-	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words)\n", machine().describe_context(), mode, source, dest, length );
+	static const char* tmode_names[4] = { "Memory to Memory", "Memory to IO", "IO to Memory", "Reserved" };
+	u8 td = (mode & 0x0c00) >> 10;
+
+	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation with params mode:%04x (TD is %s) source:%08x (word offset) dest:%08x (word offset) length:%08x (words)\n", machine().describe_context(), mode, tmode_names[td], source, dest, length );
 
 	// wrlshunt transfers ROM to RAM, all RAM write addresses have 0x800000 in the destination set
 
@@ -214,7 +217,7 @@ void gpl_dma_device::trigger_systemm_dma(int channel)
 		u16 val;
 		if (mode & 0x1000)
 		{
-			val = (m_space_read_cb(source) & 0xFF) | (m_space_read_cb(source) << 8);
+			val = (m_space_read_cb(source) & 0xff) | (m_space_read_cb(source) << 8);
 			i++;
 		}
 		else
