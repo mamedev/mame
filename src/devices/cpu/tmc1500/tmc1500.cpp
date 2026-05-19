@@ -127,7 +127,20 @@ void tmc1500_base_device::execute_run()
 void tmc1500_base_device::execute_instruction() {
 	u16 op = m_opcode;
 
-	// Update display activity and blanking
+	// Update display activity and blanking.
+	// Subjective Emulation Choice: The physical TI-57 blanks the LED display during calculations
+	// or infinite run loops (e.g., Lbl 0 -> GTO 0) to conserve battery power.
+	// Because MAME updates the display at discrete frame rates, a direct cycle-by-cycle hardware
+	// simulation of display decay would cause heavy visual flickering or beating frequencies.
+	//
+	// To resolve this, we employ a low-pass filter/integrator that tracks the duty cycle of the
+	// DISP instruction. Running a DISP instruction (which consumes 32 cycles) boosts the activity value,
+	// whereas running other instructions decays it.
+	// - Idle mode (waiting for keypress): The processor executes DISP in a tight loop, keeping the activity near maximum.
+	// - Run mode (calculating/running program): The processor runs non-DISP instructions, causing the activity
+	//   level to drop below the threshold and cleanly turning off the segments.
+	// - Keyboard responsiveness: Crucially, keyboard scanning in DISP still runs in the background, allowing
+	//   the R/S key to stop execution at any time.
 	bool is_disp = (op & 0x0f00) == 0x0e00 && (op & 0x000f) == 0x07 && (op & 0x1000) == 0;
 	if (is_disp) {
 		for (int c = 0; c < 32; c++) {
@@ -136,7 +149,7 @@ void tmc1500_base_device::execute_instruction() {
 	} else {
 		m_disp_activity = (m_disp_activity * 999) / 1000;
 	}
-
+ 
 	bool display_on = (m_disp_activity > 500000);
 	if (display_on != m_last_display_on) {
 		m_last_display_on = display_on;
