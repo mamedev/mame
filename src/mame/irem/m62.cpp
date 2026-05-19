@@ -1393,7 +1393,7 @@ ROM_START( kungfub3s )
 	ROM_LOAD( "5.bin", 0x4000, 0x4000, CRC(8e7e4c56) SHA1(fdb79fcc652f1d0af74517e5df75921e8d3ca50f) )
 
 	ROM_REGION( 0x10000, "irem_audio:iremsound", ROMREGION_ERASEFF )
-	ROM_LOAD( "3.bin", 0xa000, 0x2000, NO_DUMP )
+	ROM_LOAD( "3.bin", 0xa000, 0x2000, BAD_DUMP CRC(58e87ab0) SHA1(3b03c101fec58eac13fc309a78df9a2cd44f7604) ) // Taken from other set, probably correct
 	ROM_LOAD( "2.bin", 0xc000, 0x2000, CRC(c81e31ea) SHA1(f0fc58b929188c8802cd85549bdf9f4566e6a677) ) // samples (ADPCM 4-bit)
 	ROM_LOAD( "1.bin", 0xe000, 0x2000, CRC(d99fb995) SHA1(caa6acdbc3b02d248fd123be95ea6fdcb4f35b59) )
 
