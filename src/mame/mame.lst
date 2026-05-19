@@ -566,6 +566,7 @@ vx600
 
 @source:akai/mpc60.cpp
 mpc60
+mpc60scsi
 
 @source:akai/mpc2000.cpp
 mpc2000xl
