@@ -69,10 +69,12 @@ nscsi_tape_device::nscsi_tape_device(const machine_config &config, const char *t
 {
 }
 
-// NEWS-OS 4 will recognize a few models out of the box. For streaming tape, the Anritsu DMT780 can recognize QIC-24,
-// QIC-120, QIC-150, and QIC-525, making it a flexible choice. Different versions of NEWS-OS may need a different drive.
+// This device uses the IDNT info from an Archive Viper 2150S tape drive, used by Sony in the NWP-546 external tape
+// drive and is supported out-of-the-box by NEWS-OS 4. Some formats may require using different IDNT data, like the
+// Anritsu DMT780 or Archive Viper 2525 for QIC-525, or the Sony SDT-1000 for DAT (among other formats/drives)
+// See /usr/src/sys/newsiodev/stdefs.c for more information (or to compile a kernel with support for other drives)
 nscsi_tape_news_device::nscsi_tape_news_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nscsi_tape_device(mconfig, NSCSI_TAPE_NEWS, tag, owner, clock, "ANRITSU", "DMT780", "0000")
+	nscsi_tape_device(mconfig, NSCSI_TAPE_NEWS, tag, owner, clock, "ARCHIVE", "VIPER 150", "0000")
 {
 }
 

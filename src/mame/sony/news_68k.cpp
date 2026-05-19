@@ -704,9 +704,6 @@ static void news_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	device.option_add("cdrom", NSCSI_CDROM);
-
-	// This uses an Anritsu DMT780 tape drive to cover a variety of QIC formats.
-	// Other formats may need different drives. Sony supported and sold several models of external tape drives.
 	device.option_add("tape", NSCSI_TAPE_NEWS);
 }
 
