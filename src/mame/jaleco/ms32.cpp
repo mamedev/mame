@@ -41,7 +41,7 @@ OTHER   : 5.5v battery
 
 ROMs:     None
 
-Chips marked * also appear on a non-megasystem 32 tetris 2 plus board
+Chips marked * also appear on a non-MegaSystem 32 Tetris 2 Plus board
 
 MS32 Cartridge
 --------------
@@ -60,7 +60,7 @@ PK Soccer V2     - Custom chip: JALECO SS92046-01 9338EV 436091 06441
 Tetris Plus      - Custom chip: JALECO SS92046-01 9412EV 450891 06441
 Angel Kiss       - Custom chip: JALECO SS92047-01 9423EV 450891 06441
 Gratia (set 1)   - Custom chip: JALECO SS92047-01 9423EV 450891 06441
-kirarast         - Custom chip: JALECO SS92047-01 9425EV 367821 06441
+Kirara Star      - Custom chip: JALECO SS92047-01 9425EV 367821 06441
 P47-Aces         - Custom chip: JALECO SS92048-01 9410EV 436091 06441
 
 Custom chips are 144 pin PQFP, some times mounted on a small plug-in board silkscreened SE93139 EB91022-30056
@@ -71,26 +71,26 @@ others are unknown
 Notes
 -----
 
-Some of the roms for each game are encrypted:
+Some of the ROMs for each game are encrypted:
   16x16x8 'Scroll' Tiles (Non-Roz BG Layer)
   8x8x8 'Ascii' Tiles (FG Layer)
 
-The only difference between the two Gratia sets are the encrypted ROMs in each set (they use
-different custom chips). The program ROMs are the same, as is all non encrypted graphics data.
+Some games have been released with different custom chips.
+The program ROMs are the same, as is all non encrypted graphics data.
 It's been verified that when the encrypted data is decrypted with it's respective algorithms
 the data in both sets match 100%
 
 
-ToDo / Notes
+TODO / Notes
 ------------
 
 Z80 + Sound Bits
 
-Priorities (code in tetrisp2.cpp doesn't use all of the priority ram.. and doesn't work here)
+Priorities (code in tetrisp2.cpp doesn't use all of the priority RAM.. and doesn't work here)
  - some games require completely reversed list processing!
 
-Dip switches/inputs in t2m32 and f1superb
-some games (hayaosi2) don't seem to have service mode even if it's listed among the dips
+DIP switches/inputs in t2m32 and f1superb
+some games (hayaosi2) don't seem to have service mode even if it's listed among the DIPs
 service mode is still accessible through F1 though
 
 Fix Anything Else (Palette etc.)
@@ -141,7 +141,7 @@ Not Working Games
 -----------------
 
 f1superb - the road is always rendered as straight.
-         - the game has a road layer and extra roms for it
+         - the game has a road layer and extra ROMs for it
          - there is an unknown maths DSP for protection
 
 Jaleco Megasystem 32 Game List - thanks to Yasuhiro
@@ -159,11 +159,11 @@ F-1 Super Battle (f1superb)
 
 Idol Janshi Su-Chi-Pi 2 (suchie2)
 Ryuusei Janshi Kirara Star (kirarast)
-Mahjong Angel Kiss
-Vs. Janshi Brand New Stars
+Mahjong Angel Kiss (akiss)
+Vs. Janshi Brand New Stars (bnstars)
 
 
-Hayaoshi Quiz Nettou Namahousou ( hayaosi3 )
+Hayaoshi Quiz Nettou Namahousou (hayaosi3)
 Hayaoshi Quiz Grand Champion Taikai (hayaosi2)
 
 Not Dumped:
@@ -826,7 +826,7 @@ I'm thinking that the stuff is dumped in that RAM at 0xFD100000 that's
 not used by other games and then some FPU operation is carried out on it
 before it's grabbed by the sprite copy code. The "option" stuff, may be
 they tried a few different ways to work out the sprite coords? There's
-one more intersting string at 0xFFE481FC referenced from unused code
+one more interesting string at 0xFFE481FC referenced from unused code
 at 0xFFE47FBC. It looks like debugging dump of sprite coordinate and
 angle information.
 
@@ -854,7 +854,7 @@ the structure of the "fpu" device, it uses two arrays of static info
 loaded from the ROM at boot, two identical sets of registers, and 4
 banks of volatile data read in every frame or so from the ROM race
 track arrays (although it looks like one was not used in the end).
-There's a sequence of four operations ivolving the "fpu" carried out
+There's a sequence of four operations involving the "fpu" carried out
 to prepare the info which then gets copied back to RAM and then to
 sprite RAM. I'll capture the relevant info and see if I can figure out
 what the operations might be, my maths isn't up to much though...
@@ -2356,7 +2356,7 @@ ROM_START( akiss )
 	ROM_LOAD( "mb95008-10.11",  0x000000, 0x200000, CRC(52da2e9e) SHA1(d7a29bdd1c6801aa8d36bc098e75091c63ba0766) )
 
 	ROM_REGION( 0x200000, "bgtiles", 0 )
-	ROM_LOAD( "mb95008-09.10",  0x000000, 0x200000,CRC(7236f6a0) SHA1(98dbb55f08d669ef3bf69394bb9739d0e6137fcb) )
+	ROM_LOAD( "mb95008-09.10",  0x000000, 0x200000, CRC(7236f6a0) SHA1(98dbb55f08d669ef3bf69394bb9739d0e6137fcb) ) // 1ST AND 2ND HALF IDENTICAL
 
 	ROM_REGION( 0x080000, "txtiles", 0 )
 	ROM_LOAD( "mb93166_ver1.0-30.30",  0x000000, 0x080000, CRC(1807c1ea) SHA1(94696b8319c4982cb5d33423f56e2348f210cdb5) )
@@ -2367,6 +2367,43 @@ ROM_START( akiss )
 	ROM_REGION( 0x400000, "ymf", 0 ) // samples - 8-bit signed PCM
 	ROM_LOAD( "mb95008-11.22",  0x000000, 0x200000, CRC(23b9af76) SHA1(98b4087c142500dc759bda94d71c77634452a7ad) )
 	ROM_LOAD( "mb95008-12.23",  0x200000, 0x200000, CRC(780a2f45) SHA1(770cbf04e34ae7d72e6eb2304bcdfaff483cd8c1) )
+
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
+ROM_END
+
+ROM_START( akissa ) // program ROMs still ver 1.0, bgtiles and tx tiles ver 1.1 (but same data as the other sets after decryption)
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "mb93166_ver1.0-26.26", 0x000003, 0x80000, CRC(5bdd01ee) SHA1(21b8e07bb7ef6b437a43719b02deeba970330900) ) // uses MB-94166 EB91022-20101 ROM board
+	ROM_LOAD32_BYTE( "mb93166_ver1.0-27.27", 0x000002, 0x80000, CRC(bb11b2c9) SHA1(86ba06d28bc8f560ac3d05515d061e05c90d1628) )
+	ROM_LOAD32_BYTE( "mb93166_ver1.0-28.28", 0x000001, 0x80000, CRC(20565478) SHA1(d532ab55be287f45d8d81317bb844c675eb1292c) )
+	ROM_LOAD32_BYTE( "mb93166_ver1.0-29.29", 0x000000, 0x80000, CRC(ff454f0d) SHA1(db81aaaf4160eb62badbe08fc01543463470ac97) )
+
+	ROM_REGION( 0x1000000, "sprite", 0 )
+	ROM_LOAD32_WORD( "mb95008-01.13", 0x000000, 0x200000, CRC(1be66420) SHA1(9fc85e6108f230418e012ad05586010235139039) )
+	ROM_LOAD32_WORD( "mb95008-02.1",  0x000002, 0x200000, CRC(1cc4808e) SHA1(70a19d66b4f187320c67760bc453b6afb7d66f9a) )
+	ROM_LOAD32_WORD( "mb95008-03.14", 0x400000, 0x200000, CRC(4045f0dc) SHA1(5ba9786618ecad9410dbdf3664f9dda848a754f7) )
+	ROM_LOAD32_WORD( "mb95008-04.2",  0x400002, 0x200000, CRC(ef3c139d) SHA1(3de374e77443dd4e967dbb5da820fe1c8c78aa1b) )
+	ROM_LOAD32_WORD( "mb95008-05.15", 0x800000, 0x200000, CRC(43ea4a84) SHA1(d9d9898edcf432998ed6b9a1622812def45cf369) )
+	ROM_LOAD32_WORD( "mb95008-06.3",  0x800002, 0x200000, CRC(24f23d4e) SHA1(8a7b6f28f25227391df73edb096695c5fe8df7dc) )
+	ROM_LOAD32_WORD( "mb95008-07.16", 0xc00000, 0x200000, CRC(bf47747e) SHA1(b97121953f41039182e25ea023802df4524cf9bd) )
+	ROM_LOAD32_WORD( "mb95008-08.4",  0xc00002, 0x200000, CRC(34829a09) SHA1(7229c56fee53a9d4d29cf0c9dec471b6cc4dc30b) )
+
+	ROM_REGION( 0x400000, "roztiles", 0 )
+	ROM_LOAD( "mb95008-10.11", 0x000000, 0x200000, CRC(52da2e9e) SHA1(d7a29bdd1c6801aa8d36bc098e75091c63ba0766) )
+
+	ROM_REGION( 0x100000, "bgtiles", 0 )
+	ROM_LOAD( "mb93166_ver1.1-10.10", 0x000000, 0x100000, CRC(af0753be) SHA1(ea8e0fbfd95093d05ea5daec502bb488dc1cf5ec) )
+
+	ROM_REGION( 0x080000, "txtiles", 0 )
+	ROM_LOAD( "mb93166_ver1.1-30.30", 0x000000, 0x080000, CRC(e658f120) SHA1(b942e8e1333ed337bce03a7671c4a45ed370b266) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
+	ROM_LOAD( "mb93166_ver1.0-21.21", 0x000000, 0x040000, CRC(01a03687) SHA1(2340c4ed19f434e8c23709edfc93259313aefaf9) )
+
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples - 8-bit signed PCM
+	ROM_LOAD( "mb95008-11.22", 0x000000, 0x200000, CRC(23b9af76) SHA1(98b4087c142500dc759bda94d71c77634452a7ad) )
+	ROM_LOAD( "mb95008-12.23", 0x200000, 0x200000, CRC(780a2f45) SHA1(770cbf04e34ae7d72e6eb2304bcdfaff483cd8c1) )
 
 	ROM_REGION( 0x000001, "motherbrd_pals", 0)
 	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
@@ -2701,7 +2738,8 @@ GAME( 1995, gametngk,  0,        ms32,              gametngk, ms32_state,       
 GAME( 1995, tetrisp,   0,        ms32,              tetrisp,  ms32_state,               init_ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, p47aces,   0,        ms32,              p47aces,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, p47acesa,  p47aces,  ms32,              p47aces,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, akiss,     0,        ms32,              suchie2,  ms32_state,               init_ss92047_01, ROT0,   "Jaleco",        "Mahjong Angel Kiss (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, akiss,     0,        ms32,              suchie2,  ms32_state,               init_ss92047_01, ROT0,   "Jaleco",        "Mahjong Angel Kiss (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, akissa,    akiss,    ms32,              suchie2,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "Mahjong Angel Kiss (ver 1.0, 92048-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, gratia,    0,        ms32,              gratia,   ms32_state,               init_ss92047_01, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, gratiaa,   gratia,   ms32,              gratia,   ms32_state,               init_ss91022_10, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, kirarast,  0,        ms32,              kirarast, ms32_state,               init_ss92047_01, ROT0,   "Jaleco",        "Ryuusei Janshi Kirara Star (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

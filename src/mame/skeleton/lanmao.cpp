@@ -645,6 +645,26 @@ ROM_START( qiandd )
 	ROM_LOAD( "24c02.bin", 0x000, 0x100, CRC(98dbf990) SHA1(f22ceb7e66c3515d244b98b89ecc4e099eaab2a0) )
 ROM_END
 
+// 小蜜蜂 (Xiǎo Mìfēng) (Little Bee)
+// B13363 PCB: MPC89E515AE + 12 MHz XTAL + HT8279 + KC89C72 + U6295
+ROM_START( xmifeng )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mpc89e515", 0x00000, 0x10000, CRC(de21886e) SHA1(5c0c69c59ae0a32baa15445da698c590cca34cf9) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "27e040", 0x00000, 0x80000, CRC(baa1c867) SHA1(b27f21ca6609595e8a7bceb577e45e4990ef4d1b) )
+ROM_END
+
+// 夕阳天使 (Xīyáng Tiānshǐ) (Sunset Angel)
+// SST89C58 + 6116ASP-12 + 12 MHz XTAL + TOP8279 + 2x KC89C72 + U6295 + 24C02
+ROM_START( xtianshi )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sst89c58.u34", 0x00000, 0x10000, CRC(3a16353c) SHA1(9b7823e9423077ae7057f3e569f450f632eef091) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "29l1611.u15", 0x000000, 0x200000, CRC(9c4ba947) SHA1(ace7b41e0818a1ff82ac003a5c9023a59f9a4582) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
+ROM_END
+
 } // anonymous namespace
 
 
@@ -663,3 +683,5 @@ GAME( 2001, ljian,    0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Chang
 GAME( 1999, lzhudie,  0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Liang Zhi Hudie",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 GAME( 2003, daolang,  0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Dao Lang",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 GAME( 1997, qiandd,   0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Jinlong Electronics",         "Qian Duoduo",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2001, xmifeng,  0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Huatian Company",             "Xiao Mifeng",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2002, xtianshi, 0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Longfeng Chengxiang",         "Xiyang Tianshi",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )

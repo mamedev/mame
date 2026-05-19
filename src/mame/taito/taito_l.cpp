@@ -2246,8 +2246,8 @@ ROM_START( puzznic )
 	ROM_LOAD16_BYTE( "c20-07.ic10", 0x00000, 0x10000, CRC(be12749a) SHA1(c67d1a434486843a6776d89e905362b7db595d8d) )
 	ROM_LOAD16_BYTE( "c20-06.ic9",  0x00001, 0x10000, CRC(ac85a9c5) SHA1(2d72dae86a191ccdac9648980aca832fb9886544) )
 
-	ROM_REGION( 0x0800, "pals", 0 )
-	ROM_LOAD( "mmipal20l8.ic3", 0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0200, "pals", 0 ) // PAL20L8
+	ROM_LOAD( "c20-05.ic3", 0x0000, 0x0144, CRC(f90e5594) SHA1(6181bb25b77028bb150c84bdc073f0457efd7eaa) ) // Confirmed/Matches Japan Set
 ROM_END
 
 ROM_START( puzznicu )
@@ -2261,8 +2261,8 @@ ROM_START( puzznicu )
 	ROM_LOAD16_BYTE( "c20-03.ic10",  0x00000, 0x20000, CRC(4264056c) SHA1(d2d8a170ae0f361093a5384935238605a59e5938) )
 	ROM_LOAD16_BYTE( "c20-02.ic9",   0x00001, 0x20000, CRC(3c115f8b) SHA1(8d518be01b7c4d6d993d5d9b62aab719a5c8baca) )
 
-	ROM_REGION( 0x0800, "pals", 0 )
-	ROM_LOAD( "mmipal20l8.ic3", 0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0200, "pals", 0 ) // PAL20L8
+	ROM_LOAD( "c20-05.ic3", 0x0000, 0x0144, CRC(f90e5594) SHA1(6181bb25b77028bb150c84bdc073f0457efd7eaa) ) // Confirmed/Matches Japan Set
 ROM_END
 
 ROM_START( puzznicj )
@@ -2533,7 +2533,7 @@ GAME( 1989, flipull,   plotting, plotting,  plotting,  taitol_1cpu_state, empty_
 
 GAME( 1989, puzznic,   0,        puzznic,   puzznicnn, taitol_1cpu_state, empty_init,     ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
 GAME( 1989, puzznicu,  puzznic,  puzznic,   puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "Taito America Corporation", "Puzznic (US)", 0 )
-GAME( 1989, puzznicj,  puzznic,  puzznic,   puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "Taito Corporation", "Puzznic (Japan)", 0 )
+GAME( 1989, puzznicj,  puzznic,  puzznic,   puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "Animation 20 / Taito Corporation", "Puzznic (Japan)", 0 )
 GAME( 1989, puzznici,  puzznic,  puzznici,  puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "bootleg", "Puzznic (Italian bootleg)", 0 )
 GAME( 1989, puzznicb,  puzznic,  puzznici,  puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "bootleg", "Puzznic (bootleg, set 1)", 0 )
 GAME( 1989, puzznicba, puzznic,  puzznici,  puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "bootleg", "Puzznic (bootleg, set 2)", 0 )
