@@ -39,6 +39,8 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/epson_qx/keyboard/keyboard.h"
 #include "bus/epson_qx/option.h"
+#include "bus/epson_qx/video/qx_gdc_cards.h"
+#include "bus/epson_qx/video/video.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
@@ -54,9 +56,7 @@
 #include "machine/upd765.h"
 #include "machine/z80sio.h"
 #include "sound/spkrdev.h"
-#include "video/upd7220.h"
 
-#include "emupal.h"
 #include "speaker.h"
 #include "screen.h"
 #include "softlist_dev.h"
@@ -87,11 +87,11 @@ public:
 		m_dma_2(*this, "8237dma_2"),
 		m_fdc(*this, "upd765"),
 		m_floppy(*this, "upd765:%u", 0U),
-		m_hgdc(*this, "upd7220"),
 		m_rtc(*this, "rtc"),
 		m_kbd(*this, "kbd"),
 		m_centronics(*this, "centronics"),
 		m_bus(*this, "bus"),
+		m_video_slot(*this, "video"),
 		m_speaker(*this, "speaker"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
@@ -101,19 +101,13 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_rambank(*this, "rambank"),
 		m_cmosram(*this, "cmosram", 0x800, ENDIANNESS_LITTLE),
-		m_nvram(*this, "cmosram"),
-		m_video_ram(*this, "vram", 0x60000, ENDIANNESS_LITTLE),
-		m_vram_bank(*this, "vrambank"),
-		m_char_rom(*this, "chargen"),
-		m_palette(*this, "palette")
+		m_nvram(*this, "cmosram")
 	{
 	}
 
 	void qx10(machine_config &config);
 
 private:
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
@@ -128,13 +122,10 @@ private:
 	void update_fdd_motor(uint8_t state);
 	void fdd_motor_w(uint8_t data);
 	uint8_t qx10_30_r();
-	void zoom_w(uint8_t data);
 	void tc_w(int state);
 	void sqw_out(uint8_t state);
 	IRQ_CALLBACK_MEMBER( inta_call );
 	uint8_t get_slave_ack(offs_t offset);
-	uint8_t vram_bank_r();
-	void vram_bank_w(uint8_t data);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 
@@ -154,15 +145,10 @@ private:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	void qx10_palette(palette_device &palette) const;
 	void dma_hrq_changed(int state);
-
-	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
 	void qx10_io(address_map &map) ATTR_COLD;
 	void qx10_mem(address_map &map) ATTR_COLD;
-	void upd7220_map(address_map &map) ATTR_COLD;
 
 	required_device<pit8253_device> m_pit_1;
 	required_device<pit8253_device> m_pit_2;
@@ -174,11 +160,11 @@ private:
 	required_device<am9517a_device> m_dma_2;
 	required_device<upd765a_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
-	required_device<upd7220_device> m_hgdc;
 	required_device<mc146818_device> m_rtc;
 	required_device<bus::epson_qx::keyboard::keyboard_port_device> m_kbd;
 	required_device<centronics_device> m_centronics;
 	required_device<bus::epson_qx::option_bus_device> m_bus;
+	required_device<bus::epson_qx::video::video_slot_device> m_video_slot;
 	required_device<speaker_sound_device>   m_speaker;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -189,10 +175,6 @@ private:
 	memory_bank_creator m_rambank;
 	memory_share_creator<u8> m_cmosram;
 	required_device<nvram_device> m_nvram;
-	memory_share_creator<uint16_t> m_video_ram;
-	memory_bank_creator m_vram_bank;
-	required_region_ptr<uint8_t> m_char_rom;
-	required_device<palette_device> m_palette;
 
 	/* FDD */
 	int     m_fdcint = 0;
@@ -217,109 +199,7 @@ private:
 	int     m_membank = 0;
 	int     m_memprom = 0;
 	int     m_memcmos = 0;
-
-	uint8_t m_vram_bank_val = 0;
-	uint8_t m_color_mode = 0;
-	uint8_t m_zoom = 0;
 };
-
-UPD7220_DISPLAY_PIXELS_MEMBER( qx10_state::hgdc_display_pixels )
-{
-	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	int gfx[3];
-	address &= 0xffff;
-	if(m_color_mode)
-	{
-		gfx[0] = m_video_ram[address + 0x00000];
-		gfx[1] = m_video_ram[address + 0x10000];
-		gfx[2] = m_video_ram[address + 0x20000];
-	}
-	else
-	{
-		gfx[0] = m_video_ram[address];
-		gfx[1] = 0;
-		gfx[2] = 0;
-	}
-
-	for(int xi=0;xi<16;xi++)
-	{
-		uint8_t pen;
-		pen = ((gfx[0] >> xi) & 1) ? 1 : 0;
-		pen|= ((gfx[1] >> xi) & 1) ? 2 : 0;
-		pen|= ((gfx[2] >> xi) & 1) ? 4 : 0;
-		for (int z = 0; z <= m_zoom; ++z)
-		{
-			int xval = ((x+xi)*(m_zoom+1))+z;
-			if (xval >= bitmap.cliprect().width() * 2)
-				continue;
-			bitmap.pix(y, xval) = palette[pen];
-		}
-	}
-}
-
-UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
-{
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	addr &= 0xffff;
-
-	for (int x = 0; x < pitch; x++)
-	{
-		int tile = m_video_ram[((addr+x)*2) >> 1] & 0xff;
-		int attr = m_video_ram[((addr+x)*2) >> 1] >> 8;
-
-		// TODO: color mode support
-		uint8_t color = (m_color_mode) ? 1 : (attr & 4) ? 2 : 1;
-
-		for (int yi = 0; yi < lr; yi++)
-		{
-			uint8_t tile_data = (m_char_rom[tile*16+yi]);
-
-			if(attr & 8)
-				tile_data^=0xff;
-
-			if(cursor_on && cursor_addr == addr+x)
-				tile_data^=0xff;
-
-			 //TODO: check for blinking interval
-			if(attr & 0x80 && m_screen->frame_number() & 0x10)
-				tile_data=0;
-
-			for (int xi = 0; xi < 8; xi++)
-			{
-				int res_x = ((x * 8) + xi) * (m_zoom + 1);
-				int res_y = y + (yi * (m_zoom + 1));
-
-				// TODO: cpm22mf:flop2 display random character test will go out of bounds here
-				if(!m_screen->visible_area().contains(res_x, res_y))
-					continue;
-
-				uint8_t pen;
-				if(yi >= 16)
-					pen = 0;
-				else
-					pen = ((tile_data >> xi) & 1) ? color : 0;
-
-				for (int zx = 0; zx <= m_zoom; ++zx)
-				{
-					for (int zy = 0; zy <= m_zoom; ++zy)
-					{
-						if(pen)
-							bitmap.pix(res_y+zy, res_x+zx) = palette[pen];
-					}
-				}
-			}
-		}
-	}
-}
-
-uint32_t qx10_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
-{
-	bitmap.fill(m_palette->black_pen(), cliprect);
-
-	m_hgdc->screen_update(screen, bitmap, cliprect);
-
-	return 0;
-}
 
 /*
     Sound
@@ -408,11 +288,6 @@ void qx10_state::cmos_sel_w(uint8_t data)
 {
 	m_memcmos = data & 1;
 	update_memory_mapping();
-}
-
-void qx10_state::zoom_w(uint8_t data)
-{
-	m_zoom = data & 0x0f;
 }
 
 /***********************************************************
@@ -691,30 +566,6 @@ uint8_t qx10_state::get_slave_ack(offs_t offset)
 
 */
 
-uint8_t qx10_state::vram_bank_r()
-{
-	return m_vram_bank_val;
-}
-
-void qx10_state::vram_bank_w(uint8_t data)
-{
-	m_vram_bank_val = data;
-
-	if(m_color_mode)
-	{
-		int bank = -1;
-
-		if (data & 1)      { bank = 0; } // B
-		else if (data & 2) { bank = 1; } // G
-		else if (data & 4) { bank = 2; } // R
-
-		if (bank >= 0)
-		{
-			m_vram_bank->set_entry(bank);
-		}
-	}
-}
-
 void qx10_state::qx10_mem(address_map &map)
 {
 	map.unmap_value_high();
@@ -754,13 +605,8 @@ void qx10_state::qx10_io(address_map &map)
 	map(0x18, 0x1b).mirror(0xff00).portr("DSW").w(FUNC(qx10_state::qx10_18_w));
 	map(0x1c, 0x1f).mirror(0xff00).w(FUNC(qx10_state::prom_sel_w));
 	map(0x20, 0x23).mirror(0xff00).w(FUNC(qx10_state::cmos_sel_w));
-	map(0x2c, 0x2c).mirror(0xff00).portr("CONFIG");
-	map(0x2d, 0x2d).mirror(0xff00).rw(FUNC(qx10_state::vram_bank_r), FUNC(qx10_state::vram_bank_w));
 	map(0x30, 0x33).mirror(0xff00).rw(FUNC(qx10_state::qx10_30_r), FUNC(qx10_state::fdd_motor_w));
 	map(0x34, 0x35).mirror(0xff00).m(m_fdc, FUNC(upd765a_device::map));
-	map(0x38, 0x39).mirror(0xff00).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
-	map(0x3a, 0x3a).mirror(0xff00).w(FUNC(qx10_state::zoom_w));
-//  map(0x3b, 0x3b) GDC light pen req
 	map(0x3c, 0x3c).mirror(0xff00).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w));
 	map(0x3d, 0x3d).mirror(0xff00).w(m_rtc, FUNC(mc146818_device::address_w));
 	map(0x40, 0x4f).mirror(0xff00).rw(m_dma_1, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
@@ -808,19 +654,12 @@ static INPUT_PORTS_START( qx10 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("CONFIG")
-	PORT_CONFNAME( 0x03, 0x02, "Video Board" )
-	PORT_CONFSETTING( 0x02, "Monochrome" )
-	PORT_CONFSETTING( 0x01, "Color" )
-	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 
 void qx10_state::machine_start()
 {
 	m_rambank->configure_entries(0, 4, m_ram->pointer(), 0x10000);
-	m_vram_bank->configure_entries(0, 3, &m_video_ram[0], 0x20000);
 	m_bus->set_memview(m_external_view[0]);
 
 	// FDD
@@ -845,11 +684,6 @@ void qx10_state::machine_start()
 	save_item(NAME(m_membank));
 	save_item(NAME(m_memprom));
 	save_item(NAME(m_memcmos));
-
-	// Video
-	save_item(NAME(m_vram_bank_val));
-	save_item(NAME(m_color_mode));
-	save_item(NAME(m_zoom));
 }
 
 void qx10_state::machine_reset()
@@ -860,64 +694,11 @@ void qx10_state::machine_reset()
 	m_spkr_enable = 0;
 	m_pit1_out0 = 1;
 
-	m_zoom = 0;
-
 	m_external_bank = 0;
 	m_memprom = 0;
 	m_memcmos = 0;
 	m_membank = 0;
 	update_memory_mapping();
-
-	{
-		int i;
-
-		/* TODO: is there a bit that sets this up? */
-		m_color_mode = ioport("CONFIG")->read() & 1;
-		vram_bank_w(1);
-
-		if(m_color_mode) //color
-		{
-			for ( i = 0; i < 8; i++ )
-				m_palette->set_pen_color(i, pal1bit((i >> 2) & 1), pal1bit((i >> 1) & 1), pal1bit((i >> 0) & 1));
-		}
-		else //monochrome
-		{
-			for ( i = 0; i < 8; i++ )
-				m_palette->set_pen_color(i, pal1bit(0), pal1bit(0), pal1bit(0));
-
-			m_palette->set_pen_color(1, 0x00, 0x9f, 0x00);
-			m_palette->set_pen_color(2, 0x00, 0xff, 0x00);
-		}
-	}
-}
-
-/* F4 Character Displayer */
-static const gfx_layout qx10_charlayout =
-{
-	8, 16,                  /* 8 x 16 characters */
-	RGN_FRAC(1,1),          /* 128 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	/* y offsets */
-	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8, 8*8,  9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16                    /* every char takes 16 bytes */
-};
-
-static GFXDECODE_START( gfx_qx10 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, qx10_charlayout, 1, 1 )
-GFXDECODE_END
-
-
-void qx10_state::qx10_palette(palette_device &palette) const
-{
-	// ...
-}
-
-void qx10_state::upd7220_map(address_map &map)
-{
-	map(0x0000, 0xffff).bankrw("vrambank").mirror(0x30000);
 }
 
 void qx10_state::qx10(machine_config &config)
@@ -930,10 +711,12 @@ void qx10_state::qx10(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_screen_update(FUNC(qx10_state::screen_update));
 	m_screen->set_raw(16.67_MHz_XTAL, 872, 152, 792, 421, 4, 404);
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_qx10);
-	PALETTE(config, m_palette, FUNC(qx10_state::qx10_palette), 8);
+	m_screen->set_screen_update(m_video_slot, FUNC(bus::epson_qx::video::video_slot_device::screen_update));
+
+	EPSON_QX_VIDEO_SLOT(config, m_video_slot, bus::epson_qx::video::video_cards, "q10gms");
+	m_video_slot->set_iospace(m_maincpu, AS_IO);
+	m_video_slot->drq_callback().set(m_dma_1, FUNC(am9517a_device::dreq1_w)).invert();
 
 	/* Devices */
 
@@ -992,9 +775,9 @@ void qx10_state::qx10(machine_config &config)
 	m_dma_1->in_memr_callback().set(FUNC(qx10_state::memory_read_byte));
 	m_dma_1->out_memw_callback().set(FUNC(qx10_state::memory_write_byte));
 	m_dma_1->in_ior_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_r));
-	m_dma_1->in_ior_callback<1>().set(m_hgdc, FUNC(upd7220_device::dack_r));
+	m_dma_1->in_ior_callback<1>().set(m_video_slot, FUNC(bus::epson_qx::video::video_slot_device::dack_r));
 	m_dma_1->out_iow_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_w));
-	m_dma_1->out_iow_callback<1>().set(m_hgdc, FUNC(upd7220_device::dack_w));
+	m_dma_1->out_iow_callback<1>().set(m_video_slot, FUNC(bus::epson_qx::video::video_slot_device::dack_w));
 
 	AM9517A(config, m_dma_2, MAIN_CLK/4);
 	m_dma_2->dreq_active_low();
@@ -1003,13 +786,6 @@ void qx10_state::qx10(machine_config &config)
 	m_ppi->out_pa_callback().set("prndata", FUNC(output_latch_device::write));
 	m_ppi->in_pb_callback().set(FUNC(qx10_state::portb_r));
 	m_ppi->out_pc_callback().set(FUNC(qx10_state::portc_w));
-
-	UPD7220(config, m_hgdc, 16.67_MHz_XTAL/4/2);
-	m_hgdc->set_addrmap(0, &qx10_state::upd7220_map);
-	m_hgdc->set_display_pixels(FUNC(qx10_state::hgdc_display_pixels));
-	m_hgdc->set_draw_text(FUNC(qx10_state::hgdc_draw_text));
-	m_hgdc->drq_wr_callback().set(m_dma_1, FUNC(am9517a_device::dreq1_w)).invert();
-	m_hgdc->set_screen("screen");
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(m_pic_s, FUNC(pic8259_device::ir2_w));
@@ -1097,11 +873,6 @@ ROM_START( qx10 )
 	ROM_RELOAD(0x800, 0x800)
 	ROM_RELOAD(0x1000, 0x800)
 	ROM_RELOAD(0x1800, 0x800)
-
-	ROM_REGION( 0x1000, "chargen", 0 )
-//  ROM_LOAD( "qge.2e",   0x0000, 0x0800, BAD_DUMP CRC(ed93cb81) SHA1(579e68bde3f4184ded7d89b72c6936824f48d10b))  //this one contains special characters only
-//  ROM_LOAD( "qge.2e",   0x0000, 0x1000, BAD_DUMP CRC(eb31a2d5) SHA1(6dc581bf2854a07ae93b23b6dfc9c7abd3c0569e))
-	ROM_LOAD( "qga.2e",   0x0000, 0x1000, CRC(4120b128) SHA1(9b96f6d78cfd402f8aec7c063ffb70a21b78eff0))
 ROM_END
 
 } // anonymous namespace
