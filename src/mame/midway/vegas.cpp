@@ -2833,10 +2833,10 @@ GAME( 1999, nbanfl,     0,         nbanfl,   nbashowt, vegas_state, init_nbanfl,
 GAME( 2000, nbagold,    0,         nbagold,  nbashowt, vegas_state, init_nbagold,  ROT0, "Midway Games", "SportStation: NBA Showtime NBA on NBC Gold Edition (ver 3.0, Feb 18 2000) / NFL Blitz 2000 Gold Edition", MACHINE_SUPPORTS_SAVE ) // boot game dipswitch has no effect, so NFL Blitz 2000 version number not shown
 
 // Durango + Denver SIO + Voodoo 3
-GAMEL(1999, sf2049,     0,         sf2049,   sf2049,   vegas_state, init_sf2049,   ROT0, "Atari Games",  "San Francisco Rush 2049", MACHINE_SUPPORTS_SAVE, layout_sf2049 )
-GAMEL(2003, sf2049se,   0,         sf2049se, sf2049se, vegas_state, init_sf2049se, ROT0, "Atari Games",  "San Francisco Rush 2049: Special Edition", MACHINE_SUPPORTS_SAVE, layout_sf2049 )
-GAMEL(2000, sf2049te,   0,         sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",  "San Francisco Rush 2049: Tournament Edition", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
-GAMEL(2001, sf2049tea,  sf2049te,  sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",  "San Francisco Rush 2049: Tournament Edition Unlocked", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL(1999, sf2049,     0,         sf2049,   sf2049,   vegas_state, init_sf2049,   ROT0, "Atari Games",  "San Francisco Rush 2049 (Version 1.04, EPROM 1.02 Jul 9 1999, GUTS 1.03 Sep 3 1999, GAME Sep 8 1999)", MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL(2003, sf2049se,   0,         sf2049se, sf2049se, vegas_state, init_sf2049se, ROT0, "Atari Games",  "San Francisco Rush 2049: Special Edition (Version 1.00, GUTS 1.61 Sep 16 2003, GAME Sep 16 2003)", MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL(2000, sf2049te,   0,         sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",  "San Francisco Rush 2049: Tournament Edition (VERS 0.34 Sep 26 2000, EPROM 0.56 Apr 17 2000)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
+GAMEL(2001, sf2049tea,  sf2049te,  sf2049te, sf2049se, vegas_state, init_sf2049te, ROT0, "Atari Games",  "San Francisco Rush 2049: Tournament Edition Unlocked (VERS 0.31 Sep 26 2000, EPROM 0.56 Apr 17 2000)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sf2049 )
 
 // Durango + Vegas SIO + Voodoo 3
 GAME( 2000, cartfury,   0,         cartfury, cartfury, vegas_state, init_cartfury, ROT0, "Midway Games", "CART Fury Championship Racing (ver 1.00)", MACHINE_SUPPORTS_SAVE )
