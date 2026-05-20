@@ -12,7 +12,7 @@
  *  - https://github.com/NetBSD/src/blob/trunk/sys/arch/news68k/dev/si.c
  *
  * TODO:
- *  - find the real solution to the short transfer issue
+ *  - find the real solution to the short transfer issue (or proof ICKDMAC always autopads transactions)
  */
 
 #include "emu.h"
@@ -209,7 +209,9 @@ void dmac_0266_device::dma_check(s32 param)
 	// set terminal count flag
 	if (!m_tcount)
 	{
-		LOG("data transfer complete, setting TCZERO\n");
+		LOG("transfer complete\n");
+		// HACK: per hack above, don't disable when reaching terminal count
+		//m_control &= ~ENABLE;
 		m_status |= TCZERO;
 	}
 
@@ -217,10 +219,5 @@ void dmac_0266_device::dma_check(s32 param)
 	{
 		// Even though the TC can be zero here, we will need to autopad if the operation hasn't completed.
 		m_dma_check->adjust(attotime::zero);
-	}
-	else {
-		// EOP set, disable now.
-		LOG("DMA operation complete, disabling\n");
-		m_control &= ~ENABLE;
 	}
 }
