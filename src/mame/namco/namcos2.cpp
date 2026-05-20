@@ -5810,7 +5810,7 @@ GAME(  1990, dsaber,     0,        base3,    base,     namcos2_state,  init_dsab
 GAME(  1990, dsabera,    dsaber,   base3,    base,     namcos2_state,  init_dsaber,   ROT90,  "Namco", "Dragon Saber (World, older?)", MACHINE_SUPPORTS_SAVE )
 GAME(  1990, dsaberj,    dsaber,   base3,    base,     namcos2_state,  init_dsaberj,  ROT90,  "Namco", "Dragon Saber (Japan, Rev B)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL( 1990, finalap2,   0,        finalap2, finallap, finallap_state, init_finalap2, ROT0,   "Namco", "Final Lap 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1990, finalap2,   0,        finalap2, finallap, finallap_state, init_finalap2, ROT0,   "Namco", "Final Lap 2 (World, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 GAMEL( 1990, finalap2j,  finalap2, finalap2, finallap, finallap_state, init_finalap2, ROT0,   "Namco", "Final Lap 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 GAMEL( 1990, finalap2jb, finalap2, finalap2, finallap, finallap_state, init_finalap2, ROT0,   "Namco", "Final Lap 2 (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 
