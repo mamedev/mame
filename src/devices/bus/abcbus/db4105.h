@@ -25,8 +25,8 @@
 // ======================> databoard_4105_device
 
 class databoard_4105_device :  public device_t,
-						   	   public nscsi_device_interface,
-						       public device_abcbus_card_interface
+							   public nscsi_device_interface,
+							   public device_abcbus_card_interface
 {
 public:
 	// construction/destruction

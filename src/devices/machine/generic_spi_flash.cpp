@@ -242,8 +242,16 @@ void generic_spi_flash_device::process_write_command(u8 data)
 		m_spi_addr = (m_spi_addr & 0xffff00) | (data); m_spi_state_step++;
 		break;
 	default:
-		LOGMASKED(LOG_SPI, "Write SPI data %02x\n", data);
-		m_spiptr[(m_spi_addr++) & (m_length - 1)] = data;
+
+		if (m_spi_statusreg & 0x02)
+		{
+			LOGMASKED(LOG_SPI, "Write SPI data %02x at %08x\n", data, m_spi_addr);
+			m_spiptr[(m_spi_addr++) & (m_length - 1)] = data;
+		}
+		else
+		{
+			LOGMASKED(LOG_SPI, "Write SPI data %02x at %08x (but write protect enabled)\n", data, m_spi_addr);
+		}
 		break;
 	}
 }

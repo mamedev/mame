@@ -4,7 +4,7 @@
 // these are similar to the devices in generalplus_gpl162xx_lcdtype.cpp
 // including the other HD 360 Degrees Rocker Palm Eyecare Console
 // which has an identical case
-// 
+//
 // they've been rebuilt for a different (unknown) tech level
 // (but still unSP2.0 based, even if they have GP3x in the header)
 // register use (in the tiny bit of code) looks similar to generalplus_gpce4.cpp

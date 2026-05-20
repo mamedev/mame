@@ -3594,7 +3594,7 @@ if MACHINES["SPG2XX"] then
 		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_soc.cpp",
 		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_soc.h",
 		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_rtc.cpp",
-		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_rtc.h",		
+		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_rtc.h",
 		MAME_DIR .. "src/devices/machine/generalplus_gpce4_soc.cpp",
 		MAME_DIR .. "src/devices/machine/generalplus_gpce4_soc.h",
 		MAME_DIR .. "src/devices/machine/generalplus_gpl_dma.cpp",

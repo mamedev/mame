@@ -211,22 +211,24 @@ uint16_t psion7_state::ads7843_r(offs_t offset)
 }
 
 
-//void psion7_state::update_amp()
-//{
-//	// TODO: MSC1192 speaker amplifier, can be put into standby to mute audio.
-//	static const float codec_volume[4] = { 1.0f, 0.75f, 0.5f, 0.25f };
-//
-//	if (m_amp_enable)
-//	{
-//		m_buzzer->set_output_gain(ALL_OUTPUTS, 1.0);
-//		m_codec->set_output_gain(ALL_OUTPUTS, codec_volume[m_volume]); // VOL
-//	}
-//	else
-//	{
-//		m_buzzer->set_output_gain(ALL_OUTPUTS, 0.0);
-//		m_codec->set_output_gain(ALL_OUTPUTS, 0.0);
-//	}
-//}
+#if 0
+void psion7_state::update_amp()
+{
+	// TODO: MSC1192 speaker amplifier, can be put into standby to mute audio.
+	constexpr float codec_volume[4] = { 1.0f, 0.75f, 0.5f, 0.25f };
+
+	if (m_amp_enable)
+	{
+		m_buzzer->set_output_gain(ALL_OUTPUTS, 1.0);
+		m_codec->set_output_gain(ALL_OUTPUTS, codec_volume[m_volume]); // VOL
+	}
+	else
+	{
+		m_buzzer->set_output_gain(ALL_OUTPUTS, 0.0);
+		m_codec->set_output_gain(ALL_OUTPUTS, 0.0);
+	}
+}
+#endif
 
 
 void psion7_state::s7_map(address_map &map)

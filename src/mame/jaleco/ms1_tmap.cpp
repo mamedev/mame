@@ -25,7 +25,7 @@
 
 #include "logmacro.h"
 
-#define LOGVIDEO(...)   LOGMASKED(LOG_VIDEO, __VA_ARGS__) 
+#define LOGVIDEO(...)   LOGMASKED(LOG_VIDEO, __VA_ARGS__)
 
 static constexpr int TILES_PER_PAGE_X = 0x20;
 static constexpr int TILES_PER_PAGE_Y = 0x20;

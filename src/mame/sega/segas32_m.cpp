@@ -404,7 +404,7 @@ uint16_t segas32_state::arescue_dsp_r(offs_t offset)
 					logerror("Unhandled DSP cmd %04x (%04x).\n", m_arescue_dsp_io[0], m_arescue_dsp_io[1]);
 					break;
 			}
-		}	
+		}
 	}
 
 	return m_arescue_dsp_io[offset];

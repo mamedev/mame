@@ -15,7 +15,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="swissen" supported="no">
 		<description>Super Wissen (Germany)</description>
 		<year>199?</year>
@@ -25,6 +25,6 @@ license:CC0-1.0
 				<rom name="Superwissen.ic1" size="0x40000" crc="714b4cbe" sha1="d1f5ce30bb8be73ed4edd9ce613c96a9cf7c39ab"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 </softwarelist>

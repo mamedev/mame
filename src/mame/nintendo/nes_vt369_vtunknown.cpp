@@ -619,7 +619,7 @@ void vt36x_otrail_state::otrail_seeprom_w(u8 data)
 void vt36x_otrail_state::otrail_sound_w(u8 data)
 {
 	// is this really a DAC?
-	// 
+	//
 	// it might be an another chip playing samples from an internal ROM
 	// as there are longer sound clips and only short bursts of writes that
 	// look more like commands
@@ -1314,7 +1314,7 @@ ROM_START( lxcap )
 
 	//ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection
 	// This table is just (0x100 - offset) & 0xff with a nibble swap applied at the end
-	// 
+	//
 	// The chip here (which is accessed in a different way to gtct885 etc.) might not
 	// be fetching data from a table, but doing a calculation
 	//
@@ -1508,7 +1508,7 @@ ROM_START( goretrop )
 	ROM_REGION( 0x100, "protection", 0 ) // data from additional 8-pin chip for protection (copied to 0x701 - 0x7ff)
 	// This is a hacked version of the data from gtct885, as the 'jump from ROM' offsets seem to match, but the
 	// code needs to be at a different address, and some of the ports read/written by the code are different too
-	// 
+	//
 	// This is functional enough to get the menu running, but the real data still needs extracting.
 	ROM_LOAD( "protection.bin", 0x00000, 0x100, BAD_DUMP CRC(3cd42234) SHA1(3a4afc890d894b4256960150b2729fd5f93555a0) )
 ROM_END
@@ -1828,7 +1828,7 @@ CONS( 201?, red5mam,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_st
 
 CONS( 2016, dgun2593,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING )
 
-CONS( 201?, urban240,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Urban Outfitters", "Mini Arcade Machine 240-in-1 (translucent case)", MACHINE_NOT_WORKING ) 
+CONS( 201?, urban240,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Urban Outfitters", "Mini Arcade Machine 240-in-1 (translucent case)", MACHINE_NOT_WORKING )
 
 CONS( 200?, gcs2mgp,   0,  0,  vt36x_altswap_16mb, vt369_rot, vt36x_state, empty_init, "Jungle's Soft", "Mini Game Player 48-in-1",  MACHINE_NOT_WORKING | ROT270 )
 

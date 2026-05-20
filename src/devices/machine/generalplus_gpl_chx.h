@@ -30,6 +30,9 @@ public:
 	u16 chb_fifo_r();
 	void chb_fifo_w(u16 data);
 
+	void check_cha_fifo_empty();
+	void check_chb_fifo_empty();
+
 	void process_cha_fifo();
 	void process_chb_fifo();
 

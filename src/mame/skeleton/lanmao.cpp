@@ -589,7 +589,7 @@ ROM_START( gongfuxm )
 	ROM_LOAD( "89e516rd.bin", 0x00000, 0x10000, CRC(e3fa4dfd) SHA1(8f396887bec4f6443964c09f2700331bc26f1baa) ) // 1xxxxxxxxxxxxxxx = 0x00
 
 	ROM_REGION( 0x200000, "oki", 0 )
-	ROM_LOAD( "29f161.bin", 0x000000, 0x200000, CRC(59cd681b) SHA1(6d5e541cc620f7c4548757cdea19638c7bb82098) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "29f161.bin", 0x000000, 0x200000, CRC(59cd681b) SHA1(6d5e541cc620f7c4548757cdea19638c7bb82098) ) // 1ST AND 2ND HALF IDENTICAL, has scrambled address lines
 
 	ROM_REGION( 0x100, "i2cmem", 0 )
 	ROM_LOAD( "24c02.bin", 0x000, 0x100, CRC(2365af83) SHA1(ea6a40939b0e08404b729edd000b01f0108e57df) )
@@ -616,6 +616,53 @@ ROM_START( lzhudie )
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "29f1615", 0x000000, 0x200000, CRC(5e827bea) SHA1(94ace5fb8161a3004526a77767baa789fd1b8d5d) )
+
+	ROM_REGION( 0x100, "i2cmem", 0 )
+	ROM_LOAD( "24c02.bin", 0x000, 0x100, CRC(bd8dde38) SHA1(4850a4eb9b63fbc4ae82806d347573e3a46d55f7) )
+ROM_END
+
+// 刀郎 (Dāoláng) (Knife Man, but also the name of a Chinese singer)
+// on main PCB (DL-ZY-20): W78E065A40PL (on riser socket) + HM6116P-3 + 12 MHz XTAL + TOP8279 + Oki M6295 + 24C02 +  bank of 8 switches
+// on LED PCB (6944177): D8255AC-2 + TOP8279 + JFC95101 + JFC95101G
+ROM_START( daolang )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "w78e065.bin", 0x0000, 0x8000, CRC(7fb77e5f) SHA1(aa417fef065b3c71c8d150101780ed3aa05d6792) )
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "29f1615.bin", 0x000000, 0x200000, CRC(6ba48b6b) SHA1(a6e2193c7bbbc1552aeb7158102d94936767f357) ) // has scrambled address lines
+ROM_END
+
+// 钱多多 (Qián Duōduō) (Money Galore)
+// same PCB as lanmao
+ROM_START( qiandd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "w78e065", 0x00000, 0x10000, CRC(d58b137f) SHA1(eb0cfc4b98a88a73ebdde673d98a90970755ffda) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "29f1615", 0x00000, 0x80000, CRC(c47e29c5) SHA1(d55264f389339875d090c08bead6e3ec1558461f) )
+
+	ROM_REGION( 0x100, "i2cmem", 0 )
+	ROM_LOAD( "24c02.bin", 0x000, 0x100, CRC(98dbf990) SHA1(f22ceb7e66c3515d244b98b89ecc4e099eaab2a0) )
+ROM_END
+
+// 小蜜蜂 (Xiǎo Mìfēng) (Little Bee)
+// B13363 PCB: MPC89E515AE + 12 MHz XTAL + HT8279 + KC89C72 + U6295
+ROM_START( xmifeng )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mpc89e515", 0x00000, 0x10000, CRC(de21886e) SHA1(5c0c69c59ae0a32baa15445da698c590cca34cf9) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "27e040", 0x00000, 0x80000, CRC(baa1c867) SHA1(b27f21ca6609595e8a7bceb577e45e4990ef4d1b) )
+ROM_END
+
+// 夕阳天使 (Xīyáng Tiānshǐ) (Sunset Angel)
+// SST89C58 + 6116ASP-12 + 12 MHz XTAL + TOP8279 + 2x KC89C72 + U6295 + 24C02
+ROM_START( xtianshi )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sst89c58.u34", 0x00000, 0x10000, CRC(3a16353c) SHA1(9b7823e9423077ae7057f3e569f450f632eef091) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "29l1611.u15", 0x000000, 0x200000, CRC(9c4ba947) SHA1(ace7b41e0818a1ff82ac003a5c9023a59f9a4582) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
 } // anonymous namespace
@@ -626,11 +673,15 @@ GAME( 1996, panda2,   0, panda2, panda2,  panda2_state, empty_init, ROT0, "Kelly
 GAME( 2003, lanmao,   0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Lan Mao",                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 
 // for the following sets no effort has been made yet to emulate the different behaviour. Most have also different LED layout
-GAME( 1998, pkzw,     0, panda2, panda2,  panda2_state, empty_init, ROT0, "Hengfa Electronics",          "PK Zhiwang",              MACHINE_NO_SOUND        | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 2000, tzwang,   0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Jindalai Electronics",        "Tiaozhan Wang",           MACHINE_NO_SOUND        | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 1991, whujiang, 0, panda2, panda2,  panda2_state, empty_init, ROT0, "Hom Inn",                     "Wu Hujiang",              MACHINE_NO_SOUND        | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 1998, whujijqb, 0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Hom Inn",                     "Wu Hujiang Jiaqiang Ban", MACHINE_NO_SOUND        | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 1997, xqingwa,  0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Jinlong Electronics",         "Xiao Qingwa",             MACHINE_NO_SOUND        | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 2005, gongfuxm, 0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Yuanfa Technology",           "Gongfu Xiongmao",         MACHINE_NO_SOUND        | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 2001, ljian,    0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Liang Jian",              MACHINE_NO_SOUND        | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 1999, lzhudie,  0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Liang Zhi Hudie",         MACHINE_NO_SOUND        | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1998, pkzw,     0, panda2, panda2,  panda2_state, empty_init, ROT0, "Hengfa Electronics",          "PK Zhiwang",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2000, tzwang,   0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Jindalai Electronics",        "Tiaozhan Wang",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1991, whujiang, 0, panda2, panda2,  panda2_state, empty_init, ROT0, "Hom Inn",                     "Wu Hujiang",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1998, whujijqb, 0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Hom Inn",                     "Wu Hujiang Jiaqiang Ban", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1997, xqingwa,  0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Jinlong Electronics",         "Xiao Qingwa",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2005, gongfuxm, 0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Yuanfa Technology",           "Gongfu Xiongmao",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2001, ljian,    0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Liang Jian",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1999, lzhudie,  0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Liang Zhi Hudie",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2003, daolang,  0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Dao Lang",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1997, qiandd,   0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Jinlong Electronics",         "Qian Duoduo",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2001, xmifeng,  0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Huatian Company",             "Xiao Mifeng",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2002, xtianshi, 0, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Longfeng Chengxiang",         "Xiyang Tianshi",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )

@@ -72,17 +72,17 @@ void gpl_chx_device::device_reset()
 // 14  FEMIEN - FIFO Empty Interrupt Enable
 // 13  CHAEN  - CHA Enable
 // 12  DACBEN
-// 
+//
 // 11  SIGNEN - used signed data
 // 10  AMP_PE - Positive-side push-pull amp enable
 //  9  AMP_NE - Negative-side push-pull amp enable
 //  8
-// 
+//
 //  7  ONE_DAC - Mix CHA and CHB data to CHA
 //  6  GAIN[3]
 //  5  GAIN[2]
 //  4  GAIN[1]
-// 
+//
 //  3  GAIN[0]
 //  2  CASCADE1 - External signal1 (ACIN) mixing enable
 //  1  CASCADE0 - External signal0 (ACIN) mixing enable
@@ -106,6 +106,8 @@ void gpl_chx_device::cha_ctrl_w(u16 data)
 	}
 
 	m_cha_ctrl = data;
+
+	//check_cha_fifo_empty();
 }
 
 // P_CHA_Data
@@ -143,17 +145,17 @@ void gpl_chx_device::cha_data_w(u16 data)
 // 14  FFUNRN - CHA FIFO under run flag
 // 13
 // 12
-// 
+//
 // 11
 // 10
 //  9
 //  8  FRST - FIFO Reset
-// 
+//
 //  7  CHAFEILV[3] - CHA FIFO Empty Interrupt Level
 //  6  CHAFEILV[2]
 //  5  CHAFEILV[1]
 //  4  CHAFEILV[0]
-// 
+//
 //  3  CHAFINX[3] - CHA FIFO Used
 //  2  CHAFINX[2]
 //  1  CHAFINX[1]
@@ -185,17 +187,17 @@ void gpl_chx_device::cha_fifo_w(u16 data)
 // 14  FEMIEN   - FIFO Empty Interrupt Enable
 // 13  CHBEN    - CHB Enable
 // 12  SSF      - CHB service Frequency (0 = different to CHAA, 1 = the same)
-// 
+//
 // 11  CHACFG   - CHB uses CHA config (0 = CHB config, 1 = CHA config)
 // 10  MONO     - Mono mode (0 = Stereo, 1 = Mono)
 //  9
 //  8
-// 
+//
 //  7
 //  6
 //  5
 //  4
-// 
+//
 //  3
 //  2
 //  1
@@ -219,6 +221,8 @@ void gpl_chx_device::chb_ctrl_w(u16 data)
 	}
 
 	m_chb_ctrl = data;
+
+	//check_chb_fifo_empty();
 }
 
 // P_CHB_Data
@@ -272,6 +276,20 @@ void gpl_chx_device::chb_fifo_w(u16 data)
 	}
 }
 
+void gpl_chx_device::check_cha_fifo_empty()
+{
+	u8 emptyamount = (m_cha_fifo_reg & 0x00f0) >> 4;
+
+	if (m_cha_fifo_entries <= emptyamount)
+	{
+		if (m_cha_ctrl & 0x4000)
+		{
+			m_cha_ctrl |= 0x8000;
+			m_updateirqs_cb(1);
+		}
+	}
+}
+
 void gpl_chx_device::process_cha_fifo()
 {
 	if (!(m_cha_ctrl & 0x2000))
@@ -292,13 +310,18 @@ void gpl_chx_device::process_cha_fifo()
 		// trying to underflow the FIFO?
 	}
 
-	u8 emptyamount = (m_cha_fifo_reg & 0x00f0) >> 4;
+	check_cha_fifo_empty();
+}
 
-	if (m_cha_fifo_entries <= emptyamount)
+void gpl_chx_device::check_chb_fifo_empty()
+{
+	u8 emptyamount = (m_chb_fifo_reg & 0x00f0) >> 4;
+
+	if (m_chb_fifo_entries <= emptyamount)
 	{
-		if (m_cha_ctrl & 0x4000)
+		if (m_chb_ctrl & 0x4000)
 		{
-			m_cha_ctrl |= 0x8000;
+			m_chb_ctrl |= 0x8000;
 			m_updateirqs_cb(1);
 		}
 	}
@@ -324,16 +347,7 @@ void gpl_chx_device::process_chb_fifo()
 		// trying to underflow the FIFO?
 	}
 
-	u8 emptyamount = (m_chb_fifo_reg & 0x00f0) >> 4;
-
-	if (m_chb_fifo_entries <= emptyamount)
-	{
-		if (m_chb_ctrl & 0x4000)
-		{
-			m_chb_ctrl |= 0x8000;
-			m_updateirqs_cb(1);
-		}
-	}
+	check_chb_fifo_empty();
 }
 
 void gpl_chx_device::device_add_mconfig(machine_config &config)

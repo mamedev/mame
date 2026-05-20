@@ -3157,7 +3157,7 @@ ROM_START( gwarriorb )
 
 	ROM_REGION( 0x48360, "bubblememory", 0 )
 	/* The Gradius cartridge contains 0x807 pages of 130 bytes each */
-	ROM_LOAD16_WORD_SWAP( "gwarriorb.bin", 0x00000, 0x48360, CRC(a10e1b62) SHA1(a801ad8d318644495fbe2c971395d271d12508f1)	 )
+	ROM_LOAD16_WORD_SWAP( "gwarriorb.bin", 0x00000, 0x48360, CRC(a10e1b62) SHA1(a801ad8d318644495fbe2c971395d271d12508f1)    )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD( "400b03.8g", 0x0000, 0x2000, CRC(85c2afc5) SHA1(387842d02d50d0d78a27270e7267af19555b9e63) )
@@ -3173,7 +3173,7 @@ ROM_START( rf2b )
 
 	ROM_REGION( 0x48360, "bubblememory", 0 )
 	/* The Gradius cartridge contains 0x807 pages of 130 bytes each */
-	ROM_LOAD16_WORD_SWAP( "rf2b.bin", 0x00000, 0x48360, CRC(7ee7acc5) SHA1(ab95a75b259327a7f88c7ec56dbca74496c91688)	 )
+	ROM_LOAD16_WORD_SWAP( "rf2b.bin", 0x00000, 0x48360, CRC(7ee7acc5) SHA1(ab95a75b259327a7f88c7ec56dbca74496c91688)     )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD( "400b03.8g", 0x0000, 0x2000, CRC(85c2afc5) SHA1(387842d02d50d0d78a27270e7267af19555b9e63) )
@@ -3271,5 +3271,5 @@ GAME( 1985, gradiusb,  bubsys, bubsys, gradiusb, bubsys_state, bubsys_init,     
 GAME( 1985, gwarriorb, bubsys, bubsys, gwarrior, bubsys_state, bubsys_init,          ROT0,  "Konami", "Galactic Warriors (Bubble System)",        MACHINE_UNEMULATED_PROTECTION )
 GAME( 1985, rf2b,      bubsys, bubsys, rf2,      bubsys_state, bubsys_init,          ROT0,  "Konami", "Konami RF2 - Red Fighter (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
 GAME( 1985, twinbeeb,  bubsys, bubsys, twinbeeb, bubsys_state, bubsys_twinbeeb_init, ROT90, "Konami", "TwinBee (Bubble System)",                  MACHINE_UNEMULATED_PROTECTION )
-	
+
 // Bubble System Attack Rush was announced, but never released

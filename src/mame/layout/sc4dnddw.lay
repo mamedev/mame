@@ -1006,17 +1006,17 @@ license:CC0-1.0
 			</element>
 		</repeat>
 
-		<element name="reel1" ref="Steppers" state="0"><bounds x="40" y="350" width="10" height="5" /></element>
-		<element name="sreel1" ref="SteppersReel1" state="0"><bounds x="0" y="300" width="50" height="50" /></element>
-		<element name="reel2" ref="Steppers" state="0"><bounds x="90" y="350" width="10" height="5" /></element>
-		<element name="sreel2" ref="SteppersReel2" state="0"><bounds x="50" y="300" width="50" height="50" /></element>
-		<element name="reel3" ref="Steppers" state="0"><bounds x="140" y="350" width="10" height="5" /></element>
-		<element name="sreel3" ref="SteppersReel3" state="0"><bounds x="100" y="300" width="50" height="50" /></element>
-		<element name="reel4" ref="Steppers" state="0"><bounds x="190" y="350" width="10" height="5" /></element>
-		<element name="sreel4" ref="SteppersReel4" state="0"><bounds x="150" y="300" width="50" height="50" /></element>
-		<element name="reel5" ref="Steppers" state="0"><bounds x="240" y="350" width="10" height="5" /></element>
-		<element name="sreel5" ref="SteppersReel5" state="0"><bounds x="200" y="300" width="50" height="50" /></element>
-		<element name="reel6" ref="Steppers" state="0"><bounds x="290" y="350" width="10" height="5" /></element>
-		<element name="sreel6" ref="SteppersReel6" state="0"><bounds x="250" y="300" width="50" height="50" /></element>
+		<element name="reel1:pos" ref="Steppers" state="0"><bounds x="40" y="350" width="10" height="5" /></element>
+		<element name="reel1:scroll" ref="SteppersReel1" state="0"><bounds x="0" y="300" width="50" height="50" /></element>
+		<element name="reel2:pos" ref="Steppers" state="0"><bounds x="90" y="350" width="10" height="5" /></element>
+		<element name="reel2:scroll" ref="SteppersReel2" state="0"><bounds x="50" y="300" width="50" height="50" /></element>
+		<element name="reel3:pos" ref="Steppers" state="0"><bounds x="140" y="350" width="10" height="5" /></element>
+		<element name="reel3:scroll" ref="SteppersReel3" state="0"><bounds x="100" y="300" width="50" height="50" /></element>
+		<element name="reel4:pos" ref="Steppers" state="0"><bounds x="190" y="350" width="10" height="5" /></element>
+		<element name="reel4:scroll" ref="SteppersReel4" state="0"><bounds x="150" y="300" width="50" height="50" /></element>
+		<element name="reel5:pos" ref="Steppers" state="0"><bounds x="240" y="350" width="10" height="5" /></element>
+		<element name="reel5:scroll" ref="SteppersReel5" state="0"><bounds x="200" y="300" width="50" height="50" /></element>
+		<element name="reel6:pos" ref="Steppers" state="0"><bounds x="290" y="350" width="10" height="5" /></element>
+		<element name="reel6:scroll" ref="SteppersReel6" state="0"><bounds x="250" y="300" width="50" height="50" /></element>
 	</view>
 </mamelayout>

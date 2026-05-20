@@ -102,7 +102,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- similar to P-Designer cart but simpler-->
 	<software name="peditor">
 		<description>P-Editor</description>
