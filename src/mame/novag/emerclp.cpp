@@ -24,7 +24,7 @@ Hardware notes:
 
 H8/325 C88 MCU is used in:
 - Novag Emerald Classic Plus
-- Novag Amber (suspected)
+- Novag Amber
 - Novag Turquoise (suspected)
 - Excalibur Karpov 2294 (Excalibur brand Emerald Classic Plus)
 

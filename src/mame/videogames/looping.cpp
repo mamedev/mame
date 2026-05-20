@@ -23,7 +23,7 @@ down a bit due to instabilities (not as bad as MAME)? The European set
 (looping) does not check protection at all, even though it's confirmed to
 still have the COP420 chip.
 
-For loopinguc, the reset jump is at $32ba, for the other US sets at 3360.
+For loopinguc, the reset jump is at $32ba, for the other US sets at $3360.
 Inserting a NOP would probably prevent the resets, but without guarantee
 of not running into other issues.
 
