@@ -106,7 +106,8 @@ void dmac_0266_device::control_w(u32 data)
 		{
 			if (data & ENABLE)
 			{
-				LOG("transfer started %s address 0x%08x count 0x%x\n", (m_control & DIRECTION) ? "read" : "write",
+				LOG("%s transfer started address 0x%08x count 0x%x\n",
+					m_control & DIRECTION ? "read" : "write",
 					(m_map[m_tag & 0x7f] << 12) | (m_offset & 0xfff), m_tcount);
 
 				m_dma_check->adjust(attotime::zero);
@@ -141,12 +142,15 @@ void dmac_0266_device::dma_check(s32 param)
 		 * It's not clear how the real hardware works - for now this hack
 		 * continues to read and discard data from the device, or write
 		 * arbitrary zero bytes to it until it asserts EOP (driven by IRQ).
+		 * Future NEWS DMACs (ICKDMAC2, DMAC3, etc.) implement this as an optional
+		 * feature, so it is likely that the original ICKDMAC had this always enabled.
+		 * If that is the case, then this isn't actually a hack.
 		 */
 		if (!(m_status & INTERRUPT))
 		{
 			if (m_control & DIRECTION)
 			{
-				const u8 pad = m_dma_r();
+				[[maybe_unused]] const u8 pad = m_dma_r();
 				LOGMASKED(LOG_AUTOPAD, "DMA pad byte r 0x%x\n", pad);
 			}
 			else
@@ -205,20 +209,18 @@ void dmac_0266_device::dma_check(s32 param)
 	// set terminal count flag
 	if (!m_tcount)
 	{
-		LOG("transfer complete, setting TCZERO\n");
-		// HACK: per hack above, don't disable when reaching terminal count
-		//m_control &= ~ENABLE;
+		LOG("data transfer complete, setting TCZERO\n");
 		m_status |= TCZERO;
-
 	}
 
 	if (!(m_status & INTERRUPT))
 	{
-		// EOP not set, which means we need to keep going
+		// Even though the TC can be zero here, we will need to autopad if the operation hasn't completed.
 		m_dma_check->adjust(attotime::zero);
-	} 
-	// else {
-	// 	// EOP set, disable now.
-	// 	m_control &= ~ENABLE;
-	// }
+	}
+	else {
+		// EOP set, disable now.
+		LOG("DMA operation complete, disabling\n");
+		m_control &= ~ENABLE;
+	}
 }

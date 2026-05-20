@@ -442,16 +442,16 @@ void news_68k_desktop_state::desktop_cpu_map(address_map &map)
 	// external I/O
 	map(0xf0000000, 0xffffffff).r(FUNC(news_68k_desktop_state::bus_error_r));
 
-// #if DESKTOP_GRAPHICS
-// 	// POPC
-// 	//map(0xf0fc0000, 0xf0fc0003).unmaprw();
-// 	// f0fc0000 & 0x40 == 0x00 -> popm
-// 	// f0fc0000 & 0xc0 == 0xc0 -> popc
-// 	map(0xf0fc0000, 0xf0fc0001).lr16([]() {return 0x00c0; }, "popc_probe"); // lower 2 bits give busy state
-// 	map(0xf0fc4000, 0xf0fc4007).m(m_ramdac, FUNC(bt458_device::map)).umask32(0x00ff00ff);
-//
-// 	//map(0xf0fc0000, 0xf10bffff).rom().region("krom", 0);
-// #endif
+#if DESKTOP_GRAPHICS
+	// POPC
+	//map(0xf0fc0000, 0xf0fc0003).unmaprw();
+	// f0fc0000 & 0x40 == 0x00 -> popm
+	// f0fc0000 & 0xc0 == 0xc0 -> popc
+	map(0xf0fc0000, 0xf0fc0001).lr16([]() {return 0x00c0; }, "popc_probe"); // lower 2 bits give busy state
+	map(0xf0fc4000, 0xf0fc4007).m(m_ramdac, FUNC(bt458_device::map)).umask32(0x00ff00ff);
+
+	//map(0xf0fc0000, 0xf10bffff).rom().region("krom", 0);
+#endif
 
 	// 0xf0c30000 expansion lance #1
 	// 0xf0c20000   lance #1 memory
