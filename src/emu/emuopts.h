@@ -82,6 +82,7 @@
 #define OPTION_REFRESHSPEED         "refreshspeed"
 #define OPTION_LOWLATENCY           "lowlatency"
 #define OPTION_SCREENLESS_FRAMERATE "screenless_framerate"
+#define OPTION_SYNC_INTERVAL        "sync_interval"
 
 // core render options
 #define OPTION_KEEPASPECT           "keepaspect"
@@ -368,6 +369,7 @@ public:
 	bool refresh_speed() const { return m_refresh_speed; }
 	bool low_latency() const { return bool_value(OPTION_LOWLATENCY); }
 	float screenless_framerate() const { return float_value(OPTION_SCREENLESS_FRAMERATE); }
+	uint32_t sync_interval() const { return int_value(OPTION_SYNC_INTERVAL); }
 
 	// core render options
 	bool keep_aspect() const { return bool_value(OPTION_KEEPASPECT); }

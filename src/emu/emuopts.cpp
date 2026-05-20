@@ -96,6 +96,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_REFRESHSPEED ";rs",                         "0",         core_options::option_type::BOOLEAN,    "automatically adjust emulation speed to keep the emulated refresh rate slower than the host screen" },
 	{ OPTION_LOWLATENCY ";lolat",                        "0",         core_options::option_type::BOOLEAN,    "draws new frame before throttling to reduce input latency" },
 	{ OPTION_SCREENLESS_FRAMERATE,                       "0",         core_options::option_type::INTEGER,    "frame rate when the device has no screen" },
+	{ OPTION_SYNC_INTERVAL,                              "0",         core_options::option_type::INTEGER,    "throttle whenever system and real time drift this number of microseconds apart" },
 
 	// render options
 	{ nullptr,                                           nullptr,     core_options::option_type::HEADER,     "CORE RENDER OPTIONS" },

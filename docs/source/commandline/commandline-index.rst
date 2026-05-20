@@ -149,6 +149,7 @@ Core Performance Options
 | :ref:`[no]sleep <mame-commandline-nosleep>`
 | :ref:`speed <mame-commandline-speed>`
 | :ref:`[no]refreshspeed <mame-commandline-norefreshspeed>`
+| :ref:`sync_interval <mame-commandline-sync-interval>`
 | :ref:`numprocessors <mame-commandline-numprocessors>`
 | :ref:`bench <mame-commandline-bench>`
 | :ref:`[no]lowlatency <mame-commandline-lowlatency>`

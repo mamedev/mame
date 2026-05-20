@@ -1488,6 +1488,7 @@ void lua_engine::initialize()
 			});
 	machine_type["options"] = sol::property(&running_machine::options);
 	machine_type["samplerate"] = sol::property(&running_machine::sample_rate);
+	machine_type["sync_interval"] = sol::property(&running_machine::sync_interval, &running_machine::set_sync_interval);
 	machine_type["paused"] = sol::property(&running_machine::paused);
 	machine_type["exit_pending"] = sol::property(&running_machine::exit_pending);
 	machine_type["hard_reset_pending"] = sol::property(&running_machine::hard_reset_pending);
