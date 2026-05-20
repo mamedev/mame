@@ -90,6 +90,9 @@ public:
 	void add_sound_to_recording(const s16 *sound, int numsamples);
 	bool is_recording() const { return !m_movie_recordings.empty(); }
 
+	// throttling helper, visible for running_machine.
+	void update_throttle(attotime emutime);
+
 private:
 	// internal helpers
 	void exit();
@@ -103,7 +106,6 @@ private:
 	// speed and throttling helpers
 	int original_speed_setting() const;
 	bool finish_screen_updates();
-	void update_throttle(attotime emutime);
 	osd_ticks_t throttle_until_ticks(osd_ticks_t target_ticks);
 	void update_frameskip();
 	void update_refresh_speed();

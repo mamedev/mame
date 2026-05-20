@@ -260,6 +260,7 @@ void video_manager::frame_update(bool from_debugger)
 	bool skipped_it = m_skipping_this_frame;
 	bool const update_screens = (phase == machine_phase::RUNNING) && (!machine().paused() || machine().options().update_in_pause());
 	bool anything_changed = update_screens && finish_screen_updates();
+	bool machine_syncs = machine().sync_interval() != 0;
 
 	// update inputs and draw the user interface
 	machine().osd().input_update(true);
@@ -278,7 +279,7 @@ void video_manager::frame_update(bool from_debugger)
 
 	// if we're throttling, synchronize before rendering
 	attotime current_time = machine().time();
-	if (!from_debugger && phase > machine_phase::INIT && !m_low_latency && effective_throttle())
+	if (!from_debugger && phase > machine_phase::INIT && !m_low_latency && !machine_syncs && effective_throttle())
 		update_throttle(current_time);
 
 	// ask the OSD to update
@@ -288,7 +289,7 @@ void video_manager::frame_update(bool from_debugger)
 	}
 
 	// we synchronize after rendering instead of before, if low latency mode is enabled
-	if (!from_debugger && phase > machine_phase::INIT && m_low_latency && effective_throttle())
+	if (!from_debugger && phase > machine_phase::INIT && m_low_latency && !machine_syncs && effective_throttle())
 		update_throttle(current_time);
 
 	machine().osd().input_update(false);
