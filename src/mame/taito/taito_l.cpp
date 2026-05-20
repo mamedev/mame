@@ -2533,7 +2533,7 @@ GAME( 1989, flipull,   plotting, plotting,  plotting,  taitol_1cpu_state, empty_
 
 GAME( 1989, puzznic,   0,        puzznic,   puzznicnn, taitol_1cpu_state, empty_init,     ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
 GAME( 1989, puzznicu,  puzznic,  puzznic,   puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "Taito America Corporation", "Puzznic (US)", 0 )
-GAME( 1989, puzznicj,  puzznic,  puzznic,   puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "Animation 20 / Taito Corporation", "Puzznic (Japan)", 0 )
+GAME( 1989, puzznicj,  puzznic,  puzznic,   puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "Taito Corporation / Animation 20", "Puzznic (Japan)", 0 )
 GAME( 1989, puzznici,  puzznic,  puzznici,  puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "bootleg", "Puzznic (Italian bootleg)", 0 )
 GAME( 1989, puzznicb,  puzznic,  puzznici,  puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "bootleg", "Puzznic (bootleg, set 1)", 0 )
 GAME( 1989, puzznicba, puzznic,  puzznici,  puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "bootleg", "Puzznic (bootleg, set 2)", 0 )

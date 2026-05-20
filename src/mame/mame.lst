@@ -35487,6 +35487,9 @@ exp85
 @source:newcrest/chess2001.cpp
 ch2001
 
+@source:newcrest/chess3008.cpp
+ch3008
+
 @source:newcrest/computachess.cpp
 scpchess
 scpchessa
