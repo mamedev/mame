@@ -5834,7 +5834,7 @@ GAME(  1992, bubbletr,   0,        base,     bubbletr, gollygho_state, init_bubb
 GAME(  1992, bubbletrj,  bubbletr, base,     bubbletr, gollygho_state, init_bubbletr, ROT180, "Namco", "Bubble Trouble - Golly! Ghost! 2 (Japan, Rev C)", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
 GAMEL( 1992, finalap3,   0,        finalap3, finalap3, finallap_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1992, finalap3a,  finalap3, finalap3, finalap3, finallap_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1992, finalap3a,  finalap3, finalap3, finalap3, finallap_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 GAMEL( 1992, finalap3j,  finalap3, finalap3, finalap3, finallap_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 GAMEL( 1992, finalap3jc, finalap3, finalap3, finalap3, finallap_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (Japan, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 GAMEL( 1992, finalap3bl, finalap3, finalap3, finalap3, finallap_state, init_finalap3bl,ROT0,  "Namco", "Final Lap 3 (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
