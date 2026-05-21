@@ -121,7 +121,7 @@ protected:
 		SIGNAL_COUNT
 	};
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_stop() override ATTR_COLD;
 
@@ -173,10 +173,7 @@ public:
 	ieee488_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, int address, T &&opts, char const *dflt)
 		: ieee488_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 		set_address(address);
 	}
 	ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -198,7 +195,7 @@ public:
 	void set_address(int address) { m_address = address; }
 	int get_address() { return m_address; }
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 protected:

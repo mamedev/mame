@@ -871,9 +871,12 @@ void c1541_device_base::via1_pb_w(uint8_t data)
 	    PB4
 	    PB5     DS0         density select 0
 	    PB6     DS1         density select 1
-	    PB7     SYNC        SYNC detect line
+	    PB7
 
 	*/
+
+	if (machine().phase() != machine_phase::RUNNING)
+		return;
 
 	// spindle motor
 	m_ga->mtr_w(BIT(data, 2));

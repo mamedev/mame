@@ -25,9 +25,8 @@ public:
 
 	class memory_interface {
 	public:
-		memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_cprogram, m_csprogram;
-		memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
-		memory_access<14, 0, 0, ENDIANNESS_LITTLE>::specific m_program14;
+		memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program, m_cprogram, m_csprogram;
+		memory_access<14, 0, 0, ENDIANNESS_LITTLE>::specific m_program14, m_cprogram14, m_csprogram14;
 
 		virtual ~memory_interface() = default;
 		virtual uint8_t read(uint16_t adr) = 0;
@@ -72,6 +71,8 @@ protected:
 	public:
 		virtual ~mi_default14() = default;
 		virtual uint8_t read(uint16_t adr) override;
+		virtual uint8_t read_sync(uint16_t adr) override;
+		virtual uint8_t read_arg(uint16_t adr) override;
 		virtual void write(uint16_t adr, uint8_t val) override;
 	};
 
@@ -140,10 +141,11 @@ protected:
 
 	uint8_t read(uint16_t adr) { return m_mintf->read(adr); }
 	uint8_t read_9(uint16_t adr) { return m_mintf->read_9(adr); }
+	uint8_t read_sync(uint16_t adr) { return m_mintf->read_sync(adr); }
 	void write(uint16_t adr, uint8_t val) { m_mintf->write(adr, val); }
 	void write_9(uint16_t adr, uint8_t val) { m_mintf->write_9(adr, val); }
 	uint8_t read_arg(uint16_t adr) { return m_mintf->read_arg(adr); }
-	uint8_t read_pc() { return m_mintf->read_arg(m_PC); }
+	uint8_t read_pc() { return read_arg(m_PC); }
 	void prefetch_start();
 	void prefetch_end();
 	void prefetch_end_noirq();

@@ -13,6 +13,6 @@
 
 #pragma once
 
-DECLARE_DEVICE_TYPE(HP9133, device_ieee488_interface)
+DECLARE_DEVICE_TYPE(GPIB_HP9133, device_ieee488_interface)
 
 #endif // MAME_BUS_IEEE488_HP9133_H

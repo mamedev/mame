@@ -35,7 +35,7 @@ public:
 	void command_hi_w(u8 data);
 	u8 response_r();
 	void dac_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void ataxx_dac_control(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void ataxx_dac_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void i80186_tmr0_w(int state);
 	void i80186_tmr1_w(int state);
 
@@ -74,7 +74,7 @@ protected:
 	void leland_80186_map_program(address_map &map) ATTR_COLD;
 
 private:
-	void set_clock_line(int which, int state) { m_clock_active = state ? (m_clock_active | (1<<which)) : (m_clock_active & ~(1<<which)); }
+	void set_clock_line(int which, int state) { m_clock_active = state ? (m_clock_active | (1 << which)) : (m_clock_active & ~(1 << which)); }
 
 	// internal state
 	u16 m_peripheral;
@@ -86,7 +86,7 @@ private:
 	bool m_response_sync;
 	u32 m_ext_start;
 	u32 m_ext_stop;
-	u8 m_ext_active;
+	bool m_ext_active;
 
 	required_device<cpu_device> m_master;
 

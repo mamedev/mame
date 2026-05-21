@@ -58,8 +58,6 @@ pugixml - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 rapidjson - [The MIT License (MIT)](http://opensource.org/licenses/MIT), [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause) (msinttypes), JSON license (JSON_checker)
 
-softfloat - ["Softfloat 2b" U.C. Berkeley modified license](https://github.com/mamedev/mame/blob/master/3rdparty/softfloat/README.txt) MIT compatible
-
 softfloat3 - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 
 sol2 - [The MIT License (MIT)](http://opensource.org/licenses/MIT)

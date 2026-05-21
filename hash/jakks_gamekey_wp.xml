@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="jakks_gamekey_wp" description="JAKKS Pacific 'WP' Game Keys (Featuring Winnie the Pooh)">
+
+	<!-- This list is for the 'WP' coded Game Keys, for Winnie the Pooh -->
+
+	<!-- from a GameKey with Italian packaging (Dolce come il miele), but plays in English -->
+	<software name="sweet">
+		<description>Sweet as Honey</description>
+		<year>2006</year>
+		<publisher>JAKKS Pacific / Backbone Entertainment</publisher>
+		<part name="cart" interface="jakks_gamekey">
+			<!--
+			Contains 3 bonus games:
+			1. Roll Race (It.: Gara dei pneumatici)
+			2. Pooh's Sweet Treat (It.: La dolce ricetta di Pooh)
+			3. The Search for Honey Pots (It.: Alla ricerca dei vasetti di miele)
+			-->
+			<dataarea name="rom" size="0x800000">
+				<rom name="wpgamekey.bin" size="0x200000" crc="7700ed88" sha1="b6b1570b2634fb652b6be7fe758afc5a19d738de" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

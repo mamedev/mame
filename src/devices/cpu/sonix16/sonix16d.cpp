@@ -28,8 +28,8 @@ const sonix16_disassembler::instruction sonix16_disassembler::instructions[] = {
 	{ 0xa000, 0xf000, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "RAM(0x%03x) = %s", (opcode & 0x800) >> 3 | (opcode & 0xff), regs[(opcode >> 8) & 7]); }},
 	{ 0xb000, 0xf000, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "%s = RAM(0x%03x)", regs[(opcode >> 8) & 7], (opcode & 0x800) >> 3 | (opcode & 0xff)); }},
 	{ 0xc000, 0xf800, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "%s.h = 0x%02x", immregs[(opcode >> 8) & 7], opcode & 0xff); }},
-	{ 0xc800, 0xf81f, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "RAM(%s%s) = %s + 1", indregs[(opcode >> 8) & 1], mods[(opcode >> 9) & 3], regs[(opcode >> 5) & 7]); }},
-	{ 0xc804, 0xf81f, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "RAM(%s%s) = %s - 1", indregs[(opcode >> 8) & 1], mods[(opcode >> 9) & 3], regs[(opcode >> 5) & 7]); }},
+	{ 0xc800, 0xf89f, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "RAM(%s%s) = %s + 1", indregs[(opcode >> 8) & 1], mods[(opcode >> 9) & 3], regs[(opcode >> 5) & 3]); }},
+	{ 0xc804, 0xf89f, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "RAM(%s%s) = %s - 1", indregs[(opcode >> 8) & 1], mods[(opcode >> 9) & 3], regs[(opcode >> 5) & 3]); }},
 	{ 0xc808, 0xf89c, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "RAM(%s%s) = %s + %s", indregs[(opcode >> 8) & 1], mods[(opcode >> 9) & 3], regs[(opcode >> 5) & 3], yregs[opcode & 3]); }},
 	{ 0xc80c, 0xf89c, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "RAM(%s%s) = %s + %s + C", indregs[(opcode >> 8) & 1], mods[(opcode >> 9) & 3], regs[(opcode >> 5) & 3], yregs[opcode & 3]); }},
 	{ 0xc810, 0xf89c, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "RAM(%s%s) = %s - %s", indregs[(opcode >> 8) & 1], mods[(opcode >> 9) & 3], regs[(opcode >> 5) & 3], yregs[opcode & 3]); }},
@@ -65,6 +65,7 @@ const sonix16_disassembler::instruction sonix16_disassembler::instructions[] = {
 	{ 0xf000, 0xfbfc, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "mr = %s * %s (%s)", regs[(opcode >> 1) & 1], yregs[opcode & 1], (opcode & 0x400) ? "FS" : "IS"); }},
 	{ 0xf100, 0xfbfc, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "mr = mr + %s * %s (%s)", regs[(opcode >> 1) & 1], yregs[opcode & 1], (opcode & 0x400) ? "FS" : "IS"); }},
 	{ 0xf200, 0xfbfc, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "mr = mr - %s * %s (%s)", regs[(opcode >> 1) & 1], yregs[opcode & 1], (opcode & 0x400) ? "FS" : "IS"); }},
+	{ 0xf07c, 0xfffc, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "mr = %s * %s (unknown)", regs[(opcode >> 1) & 1], yregs[opcode & 1]); }},
 	{ 0xf080, 0xfb80, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "mr = %s * %s (%s), %s = RAM(%s%s)", regs[(opcode >> 1) & 1], yregs[opcode & 1], (opcode & 0x400) ? "FS" : "IS", macregs[(opcode >> 2) & 3], indregs[(opcode >> 6) & 1], mods[(opcode >> 4) & 3]); }},
 	{ 0xf180, 0xfb80, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "mr = mr + %s * %s (%s), %s = RAM(%s%s)", regs[(opcode >> 1) & 1], yregs[opcode & 1], (opcode & 0x400) ? "FS" : "IS", macregs[(opcode >> 2) & 3], indregs[(opcode >> 6) & 1], mods[(opcode >> 4) & 3]); }},
 	{ 0xf280, 0xfb80, 1, [](std::ostream &stream, u16 opcode, u16 arg, u32 pc) { util::stream_format(stream, "mr = mr - %s * %s (%s), %s = RAM(%s%s)", regs[(opcode >> 1) & 1], yregs[opcode & 1], (opcode & 0x400) ? "FS" : "IS", macregs[(opcode >> 2) & 3], indregs[(opcode >> 6) & 1], mods[(opcode >> 4) & 3]); }},
@@ -113,8 +114,14 @@ std::string sonix16_disassembler::ioreg(u8 reg)
 	case 0x16:
 		return "pcl";
 
+	case 0x17:
+		return "mmr";
+
 	case 0x18:
 		return "sp";
+
+	case 0x19:
+		return "mr2";
 
 	case 0x1a: case 0x1b:
 		return util::string_format("iy%dbk", reg & 1);
@@ -134,8 +141,14 @@ std::string sonix16_disassembler::ioreg(u8 reg)
 	case 0x23:
 		return "intcr";
 
+	case 0x3a:
+		return "iosw";
+
 	case 0x3e:
 		return "shidx";
+
+	case 0x3f:
+		return "shv2";
 
 	default:
 		return util::string_format("IO(0x%02x)", reg);
@@ -160,5 +173,5 @@ offs_t sonix16_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	instructions[i].fct(stream, opcode, ((instructions[i].size & LENGTHMASK) >= 2) ? opcodes.r16(pc+1) : 0, pc);
 
-	return instructions[i].size;
+	return instructions[i].size | SUPPORTED;
 }

@@ -16,8 +16,6 @@
 #include "emupal.h"
 #include "screen.h"
 
-#define Z80_MASTER_CLOCK         XTAL(10'816'000)
-
 
 class cosmic_state : public driver_device
 {

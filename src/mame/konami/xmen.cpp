@@ -35,9 +35,9 @@ Reverse-engineered schematics: https://github.com/jotego/jtbin/blob/master/sch/x
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
-#include "machine/k054321.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "sound/k054321.h"
 #include "sound/k054539.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
@@ -47,6 +47,9 @@ Reverse-engineered schematics: https://github.com/jotego/jtbin/blob/master/sch/x
 #include "speaker.h"
 
 #include "layout/generic.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 namespace {
@@ -62,17 +65,21 @@ public:
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251"),
 		m_screen(*this, "screen"),
+		m_eeprom(*this, "eeprom"),
 		m_z80bank(*this, "z80bank"),
-		m_okibank(*this, "okibank"),
-		m_eeprom_out(*this, "EEPROMOUT")
+		m_okibank(*this, "okibank")
 	{ }
 
-	void xmen(machine_config &config);
-	void xmenabl(machine_config &config);
+	void xmen(machine_config &config) ATTR_COLD;
+	void xmenabl(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	void base(machine_config &config) ATTR_COLD;
 
 	// video-related
 	uint8_t m_layer_colorbase[3]{};
@@ -89,17 +96,9 @@ protected:
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
 	required_device<screen_device> m_screen;
-
-	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-	void base(machine_config &config);
+	required_device<eeprom_serial_er5911_device> m_eeprom;
 
 private:
-	optional_memory_bank m_z80bank;
-	optional_memory_bank m_okibank;
-
-	required_ioport m_eeprom_out;
-
 	void sound_bankswitch_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -112,6 +111,9 @@ private:
 	void main_map(address_map &map) ATTR_COLD;
 	void oki_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
+
+	optional_memory_bank m_z80bank;
+	optional_memory_bank m_okibank;
 };
 
 class xmen6p_state : public xmen_state
@@ -123,7 +125,7 @@ public:
 		m_tilemap(*this, "tilemap%u", 0)
 	{ }
 
-	void xmen6p(machine_config &config);
+	void xmen6p(machine_config &config) ATTR_COLD;
 
 	int field_r() { return (m_screen->frame_number() & 1) ^ m_screen->vblank(); }
 
@@ -131,15 +133,15 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	bitmap_ind16 m_screen_bitmap[2]; // 0 left screen, 1 right screen
-	required_shared_ptr_array<uint16_t, 2> m_spriteram;
-	required_shared_ptr_array<uint16_t, 4> m_tilemap;
-	uint16_t *m_k053247_ram;
-
 	template <uint8_t Which> uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
 	void main_map(address_map &map) ATTR_COLD;
+
+	bitmap_ind16 m_screen_bitmap[2]; // 0 left screen, 1 right screen
+	required_shared_ptr_array<uint16_t, 2> m_spriteram;
+	required_shared_ptr_array<uint16_t, 4> m_tilemap;
+	uint16_t *m_k053247_ram;
 };
 
 
@@ -326,7 +328,7 @@ void xmen6p_state::screen_vblank(int state)
 
 void xmen_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	//logerror("%06x: write %04x mask %04x to 108000\n", m_maincpu->pc(), data, mem_mask);
+	LOG("%06x: write %04x mask %04x to 108000\n", m_maincpu->pc(), data, mem_mask);
 	if (ACCESSING_BITS_0_7)
 	{
 		// bits 0/1 = coin counters
@@ -336,7 +338,9 @@ void xmen_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		// bit 2 = EEPROM data
 		// bit 3 = EEPROM clock (active high)
 		// bit 4 = EEPROM cs (active low)
-		m_eeprom_out->write(data, 0xff);
+		m_eeprom->di_write(BIT(data, 2));
+		m_eeprom->cs_write(BIT(data, 4));
+		m_eeprom->clk_write(BIT(data, 3));
 
 		// bit 5 is enabled in IRQ3, disabled in IRQ5 (sprite DMA end)
 		m_irq5_enable = bool(BIT(data, 5));
@@ -416,7 +420,7 @@ void xmen_state::sound_map(address_map &map)
 
 void xmen_state::oki_map(address_map &map)
 {
-	map(0x00000, 0x2ffff).rom();
+	map(0x00000, 0x2ffff).rom().region("oki", 0);
 	map(0x30000, 0x3ffff).bankr(m_okibank);
 }
 
@@ -501,11 +505,6 @@ static INPUT_PORTS_START( xmen )
 	PORT_BIT( 0x3000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
-
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( xmen2p )
@@ -530,11 +529,6 @@ static INPUT_PORTS_START( xmen2p )
 	PORT_BIT( 0x3000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
-
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( xmen6p )
@@ -562,11 +556,6 @@ static INPUT_PORTS_START( xmen6p )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START6 ) // not verified
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xmen6p_state::field_r)) // screen indicator?
-
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
 INPUT_PORTS_END
 
 
@@ -581,7 +570,7 @@ void xmen_state::machine_start()
 	if (m_okibank)
 	{
 		m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
-		m_okibank->set_entry(0);
+		m_okibank->set_entry(3);
 	}
 
 	save_item(NAME(m_sprite_colorbase));
@@ -601,7 +590,7 @@ void xmen_state::machine_reset()
 	}
 
 	m_sprite_colorbase = 0;
-	m_irq5_enable = false;
+	control_w(0, 0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(xmen_state::scanline)
@@ -624,7 +613,7 @@ void xmen_state::base(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(xmen_state::scanline), "screen", 0, 1);
 
-	EEPROM_ER5911_8BIT(config, "eeprom");
+	EEPROM_ER5911_8BIT(config, m_eeprom);
 
 	WATCHDOG_TIMER(config, "watchdog");
 

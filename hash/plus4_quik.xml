@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="plus4_quik" description="Commodore Plus/4 / C16 / C116 quickload">
+
+	<software name="axis">
+		<description>Axis</description>
+		<year>2026</year>
+		<publisher>AnyStone Games</publisher>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="26236">
+				<rom name="axis.prg" size="26236" crc="3b3f6889" sha1="6a8c3f3b85757f0c923b2556fecd325a6f290c04"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkanoid">
+		<description>Arkanoid +4</description>
+		<year>2021</year>
+		<publisher>Assassins</publisher>
+		<sharedfeat name="compatibility" value="PAL" />
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="31014">
+				<rom name="arkanoid_plus4.prg" size="31014" crc="21149e6f" sha1="11d3bfcc6b11c13def176ee53dff0910985a5f46"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

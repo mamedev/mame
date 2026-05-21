@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-Gun Dealer memory map
+Gun Dealer hardware
 
 driver by Nicola Salmoria
 
@@ -21,6 +21,7 @@ bootleg, as its board has the same NMK-style markings for the ROM and PROM
 locations. In place of the MCU here is a small daughterboard with three
 SN74LS245N buffers, a resistor array and an Altera EP320PC.
 
+memory map:
 0000-7fff ROM
 8000-bfff ROM (banked)
 c400-c7ff palette RAM
@@ -97,28 +98,27 @@ class gundealr_state : public driver_device
 public:
 	gundealr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_paletteram(*this, "paletteram")
 		, m_bg_videoram(*this, "bg_videoram")
 		, m_fg_videoram(*this, "fg_videoram")
+		, m_rambase(*this, "rambase")
 		, m_mainbank(*this, "mainbank")
 		, m_maincpu(*this, "maincpu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 	{ }
 
-	void gundealr(machine_config &config);
-	void gundealrbl(machine_config &config);
+	void gundealr(machine_config &config) ATTR_COLD;
+	void gundealrbl(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-private:
 	// memory pointers
-	required_shared_ptr<uint8_t> m_paletteram;
 	required_shared_ptr<uint8_t> m_bg_videoram;
 	required_shared_ptr<uint8_t> m_fg_videoram;
+	required_shared_ptr<uint8_t> m_rambase;
 	required_memory_bank m_mainbank;
 
 	// devices
@@ -135,7 +135,6 @@ private:
 	void bankswitch_w(uint8_t data);
 	void bg_videoram_w(offs_t offset, uint8_t data);
 	void fg_videoram_w(offs_t offset, uint8_t data);
-	void paletteram_w(offs_t offset, uint8_t data);
 	template<int Xor> void fg_scroll_w(offs_t offset, uint8_t data);
 	template<int Bit> void flipscreen_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -155,15 +154,12 @@ class yamyam_mcu_state : public gundealr_state
 public:
 	yamyam_mcu_state(const machine_config &mconfig, device_type type, const char *tag)
 		: gundealr_state(mconfig, type, tag)
-		, m_rambase(*this, "rambase")
 		, m_port_in(*this, "IN%u", 0)
 	{ }
 
 	void yamyam(machine_config &config);
 
 private:
-	required_shared_ptr<uint8_t> m_rambase;
-
 	required_ioport_array<3> m_port_in;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_sim);
@@ -178,7 +174,7 @@ private:
 
 TILE_GET_INFO_MEMBER(gundealr_state::get_bg_tile_info)
 {
-	uint8_t attr = m_bg_videoram[2 * tile_index + 1];
+	const uint8_t attr = m_bg_videoram[2 * tile_index + 1];
 	tileinfo.set(0,
 			m_bg_videoram[2 * tile_index] + ((attr & 0x07) << 8),
 			(attr & 0xf0) >> 4,
@@ -193,13 +189,12 @@ TILEMAP_MAPPER_MEMBER(gundealr_state::pagescan)
 
 TILE_GET_INFO_MEMBER(gundealr_state::get_fg_tile_info)
 {
-	uint8_t attr = m_fg_videoram[2 * tile_index + 1];
+	const uint8_t attr = m_fg_videoram[2 * tile_index + 1];
 	tileinfo.set(1,
 			m_fg_videoram[2 * tile_index] + ((attr & 0x03) << 8),
 			(attr & 0xf0) >> 4,
 			0);
 }
-
 
 
 /***************************************************************************
@@ -214,8 +209,9 @@ void gundealr_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gundealr_state::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(gundealr_state::pagescan)), 16, 16, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(15);
-}
 
+	save_item(NAME(m_scroll));
+}
 
 
 /***************************************************************************
@@ -235,24 +231,6 @@ void gundealr_state::fg_videoram_w(offs_t offset, uint8_t data)
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
-
-void gundealr_state::paletteram_w(offs_t offset, uint8_t data)
-{
-	int val;
-
-	m_paletteram[offset] = data;
-
-	val = m_paletteram[offset & ~1];
-	const int r = (val >> 4) & 0x0f;
-	const int g = (val >> 0) & 0x0f;
-
-	val = m_paletteram[offset | 1];
-	const int b = (val >> 4) & 0x0f;
-	// TODO: the bottom 4 bits are used as well, but I'm not sure about the meaning
-
-	m_palette->set_pen_color(offset / 2, pal4bit(r), pal4bit(g), pal4bit(b));
-}
-
 
 /***************************************************************************
 
@@ -299,10 +277,10 @@ void gundealr_state::base_map(address_map &map)
 	map(0xc005, 0xc005).portr("IN1");
 	map(0xc006, 0xc006).portr("IN2");
 	map(0xc016, 0xc016).w(FUNC(gundealr_state::bankswitch_w));
-	map(0xc400, 0xc7ff).ram().w(FUNC(gundealr_state::paletteram_w)).share(m_paletteram);
+	map(0xc400, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xc800, 0xcfff).ram().w(FUNC(gundealr_state::bg_videoram_w)).share(m_bg_videoram);
 	map(0xd000, 0xdfff).ram().w(FUNC(gundealr_state::fg_videoram_w)).share(m_fg_videoram);
-	map(0xe000, 0xffff).ram().share("rambase");
+	map(0xe000, 0xffff).ram().share(m_rambase);
 }
 
 void gundealr_state::gundealr_main_map(address_map &map)
@@ -573,20 +551,15 @@ static INPUT_PORTS_START( yamyam )
 INPUT_PORTS_END
 
 
-
 static GFXDECODE_START( gfx_gundealr )
 	GFXDECODE_ENTRY( "bgtiles", 0, gfx_8x8x4_packed_msb,                 0, 16 ) // colors 0-255
 	GFXDECODE_ENTRY( "fgtiles", 0, gfx_8x8x4_col_2x2_group_packed_msb, 256, 16 ) // colors 256-511
 GFXDECODE_END
 
 
-
-
 void gundealr_state::machine_start()
 {
 	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
-
-	save_item(NAME(m_scroll));
 }
 
 void gundealr_state::machine_reset()
@@ -599,12 +572,12 @@ void gundealr_state::machine_reset()
 
 TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::scanline)
 {
-	int scanline = param;
+	const int scanline = param;
 
 	if (scanline == 240) // vblank-out irq
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h
 	else if ((scanline == 0) || (scanline == 120) ) //timer irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 10h
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08h
 }
 
 void gundealr_state::gundealr(machine_config &config)
@@ -625,7 +598,8 @@ void gundealr_state::gundealr(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gundealr);
-	PALETTE(config, m_palette).set_entries(512);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -639,10 +613,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(yamyam_mcu_state::mcu_sim)
 	static const uint8_t snipped_cmd05_1[5] = { 0xcd, 0x20, 0xe0, 0x7e, 0xc9 };
 	static const uint8_t snipped_cmd05_2[8] = { 0xc5, 0x01, 0x00, 0x00, 0x4f, 0x09, 0xc1, 0xc9 };
 
-	int i;
-
 	LOGMCUSIM("e000 = %02x\n", m_rambase[0x000]);
-	switch(m_rambase[0x000])
+	switch (m_rambase[0x000])
 	{
 		case 0x03:
 			m_rambase[0x001] = 0x03;
@@ -653,7 +625,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(yamyam_mcu_state::mcu_sim)
 			    3a 01 c0  ld   a,($c001)
 			    c9        ret
 			*/
-			for(i = 0; i < 8; i++)
+			for (int i = 0; i < 8; i++)
 				m_rambase[0x010 + i] = snipped_cmd03[i];
 
 			break;
@@ -671,7 +643,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(yamyam_mcu_state::mcu_sim)
 			    c1          pop     bc
 			    c9          ret
 			*/
-			for(i = 0; i < 8; i++)
+			for (int i = 0; i < 8; i++)
 				m_rambase[0x020 + i] = snipped_cmd05_2[i];
 
 			/*
@@ -680,7 +652,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(yamyam_mcu_state::mcu_sim)
 			    7e          ld      a,(hl)
 			    c9          ret
 			*/
-			for(i = 0; i < 5; i++)
+			for (int i = 0; i < 5; i++)
 				m_rambase[0x010 + i] = snipped_cmd05_1[i];
 
 			break;

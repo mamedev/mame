@@ -51,7 +51,7 @@ void luna_68k_cmc_device::device_add_mconfig(machine_config &config)
 	M68020(config, m_cpu, 25_MHz_XTAL/2);
 	m_cpu->set_addrmap(AS_PROGRAM, &luna_68k_cmc_device::cpu_map);
 
-	AM7990(config, m_eth); // Linked to an AM7992BCD
+	AM7990(config, m_eth, 10'000'000); // Linked to an AM7992BCD
 	TMS9914(config, m_gpib, 25_MHz_XTAL/5);
 	AM9513(config, m_stc, 25_MHz_XTAL/2); // FIXME: clock unknown
 

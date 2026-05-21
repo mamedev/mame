@@ -206,7 +206,7 @@
 
 #include "mfpresolve.h"
 
-#include "asmjit/src/asmjit/x86.h"
+#include "asmjit/asmjit/x86.h"
 
 #include <cstddef>
 #include <cstdio>
@@ -503,7 +503,7 @@ private:
 	void emit_memaccess_setup(Assembler &a, const memory_accessors &accessors, const address_space::specific_access_info::side &side) const;
 
 	[[noreturn]] void end_of_block() const;
-	static void debug_log_hashjmp(offs_t pc, int mode);
+	static void debug_log_hashjmp(char const *tag, offs_t pc, int mode);
 	static void debug_log_hashjmp_fail();
 
 	void generate_one(Assembler &a, const uml::instruction &inst);
@@ -1335,7 +1335,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, u32 n
 	uintptr_t linemask = 63;
 	if (err)
 	{
-		osd_printf_verbose("Error getting cache line size (%s:%d %s), assuming 64 bytes\n", err.category().name(), err.value(), err.message());
+		osd_printf_verbose("drcbe_x64(%s): Error getting cache line size (%s:%d %s), assuming 64 bytes\n", m_device.tag(), err.category().name(), err.value(), err.message());
 	}
 	else
 	{
@@ -1854,7 +1854,7 @@ void drcbe_x64::movsd_p64_r128(Assembler &a, be_parameter const &param, Vec cons
 
 [[noreturn]] void drcbe_x64::end_of_block() const
 {
-	osd_printf_error("drcbe_x64(%s): fell off the end of a generated code block!\n", m_device.tag());
+	osd_printf_error("drcbe_x64(%s): Fell off the end of a generated code block!\n", m_device.tag());
 	std::fflush(stdout);
 	std::fflush(stderr);
 	std::abort();
@@ -1866,9 +1866,9 @@ void drcbe_x64::movsd_p64_r128(Assembler &a, be_parameter const &param, Vec cons
 //  logging of hashjmps
 //-------------------------------------------------
 
-void drcbe_x64::debug_log_hashjmp(offs_t pc, int mode)
+void drcbe_x64::debug_log_hashjmp(char const *tag, offs_t pc, int mode)
 {
-	std::printf("mode=%d PC=%08X\n", mode, pc);
+	osd_printf_info("drcbe_x64(%s): HASHJMP mode=%d PC=%08X\n", tag, mode, pc);
 }
 
 
@@ -1879,7 +1879,7 @@ void drcbe_x64::debug_log_hashjmp(offs_t pc, int mode)
 
 void drcbe_x64::debug_log_hashjmp_fail()
 {
-	std::printf("  (FAIL)\n");
+	osd_printf_info("  (FAIL)\n");
 }
 
 
@@ -2089,8 +2089,9 @@ void drcbe_x64::op_hashjmp(Assembler &a, const instruction &inst)
 
 	if (LOG_HASHJMPS)
 	{
-		mov_reg_param(a, gpd(REG_PARAM1), pcp);
-		mov_reg_param(a, gpd(REG_PARAM2), modep);
+		mov_r64_imm(a, gpq(REG_PARAM1), uintptr_t(m_device.tag()));
+		mov_reg_param(a, gpd(REG_PARAM2), pcp);
+		mov_reg_param(a, gpd(REG_PARAM3), modep);
 		smart_call_m64(a, &m_near.debug_log_hashjmp);
 	}
 

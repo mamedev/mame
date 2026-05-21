@@ -668,7 +668,7 @@ ROM_START(lnw80)
 	ROM_LOAD("lnw_chr.u100",   0x0000, 0x0800, CRC(c89b27df) SHA1(be2a009a07e4378d070002a558705e9a0de59389) )
 
 	ROM_REGION(0x0020, "proms", 0)
-	ROM_LOAD_OPTIONAL("lnw_ntsc.u130",  0x0000, 0x0020, CRC(b990a207) SHA1(1a1cc3150cbfed76b1c88c0d561f9bee954f3234) )
+	ROM_LOAD("lnw_ntsc.u130",  0x0000, 0x0020, CRC(b990a207) SHA1(1a1cc3150cbfed76b1c88c0d561f9bee954f3234) )
 ROM_END
 
 } // anonymous namespace

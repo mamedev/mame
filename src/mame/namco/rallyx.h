@@ -72,7 +72,7 @@ private:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_device<namco_device> m_namco_sound;
+	optional_device<namco_wsg_device> m_namco_sound;
 	optional_device<samples_device> m_samples;
 	optional_device<timeplt_audio_device> m_timeplt_audio;
 	required_device<gfxdecode_device> m_gfxdecode;

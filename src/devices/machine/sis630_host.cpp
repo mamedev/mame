@@ -25,7 +25,7 @@ TODO:
 #define LOG_AGP    (1U << 4) // log AGP
 
 #define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO | LOG_AGP)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -160,7 +160,7 @@ void sis630_host_device::memory_map(address_map &map)
 {
 }
 
-void sis630_host_device::map_shadowram(address_space *memory_space, uint32_t start_offs, uint32_t end_offs, bool read_enable, bool write_enable)
+void sis630_host_device::map_shadowram(address_space *memory_space, offs_t start_offs, offs_t end_offs, bool read_enable, bool write_enable)
 {
 	LOGMAP("- 0x%08x-0x%08x ", start_offs, end_offs);
 
@@ -194,8 +194,8 @@ void sis630_host_device::smi_act_w(int state)
 	else
 		m_smiact = 1;
 
-	if (m_smiact == 0)
-	    machine().debug_break();
+//  if (m_smiact == 0)
+//      machine().debug_break();
 	remap_cb();
 }
 

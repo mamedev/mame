@@ -71,51 +71,51 @@
 #include "generalplus_gpl16250.h"
 
 
-uint16_t gcm394_game_state::cs0_r(offs_t offset)
+u16 gcm394_game_state::cs0_r(offs_t offset)
 {
 	return m_romregion[offset & 0x3fffff];
 }
 
-void gcm394_game_state::cs0_w(offs_t offset, uint16_t data)
+void gcm394_game_state::cs0_w(offs_t offset, u16 data)
 {
 	logerror("cs0_w %04x %04x (to ROM!)\n", offset, data);
 }
 
-uint16_t gcm394_game_state::cs1_r(offs_t offset) { logerror("cs1_r %06n", offset); return 0x0000; }
-void gcm394_game_state::cs1_w(offs_t offset, uint16_t data) { logerror("cs1_w %06x %04x\n", offset, data); }
-uint16_t gcm394_game_state::cs2_r(offs_t offset) { logerror("cs2_r %06n", offset); return 0x0000; }
-void gcm394_game_state::cs2_w(offs_t offset, uint16_t data) { logerror("cs2_w %06x %04x\n", offset, data); }
-uint16_t gcm394_game_state::cs3_r(offs_t offset) { logerror("cs3_r %06n", offset); return 0x0000; }
-void gcm394_game_state::cs3_w(offs_t offset, uint16_t data) { logerror("cs3_w %06x %04x\n", offset, data); }
-uint16_t gcm394_game_state::cs4_r(offs_t offset) { logerror("cs4_r %06n", offset); return 0x0000; }
-void gcm394_game_state::cs4_w(offs_t offset, uint16_t data) { logerror("cs4_w %06x %04x\n", offset, data); }
+u16 gcm394_game_state::cs1_r(offs_t offset) { logerror("cs1_r %06n", offset); return 0x0000; }
+void gcm394_game_state::cs1_w(offs_t offset, u16 data) { logerror("cs1_w %06x %04x\n", offset, data); }
+u16 gcm394_game_state::cs2_r(offs_t offset) { logerror("cs2_r %06n", offset); return 0x0000; }
+void gcm394_game_state::cs2_w(offs_t offset, u16 data) { logerror("cs2_w %06x %04x\n", offset, data); }
+u16 gcm394_game_state::cs3_r(offs_t offset) { logerror("cs3_r %06n", offset); return 0x0000; }
+void gcm394_game_state::cs3_w(offs_t offset, u16 data) { logerror("cs3_w %06x %04x\n", offset, data); }
+u16 gcm394_game_state::cs4_r(offs_t offset) { logerror("cs4_r %06n", offset); return 0x0000; }
+void gcm394_game_state::cs4_w(offs_t offset, u16 data) { logerror("cs4_w %06x %04x\n", offset, data); }
 
-void gcm394_game_state::cs_map_base(address_map& map)
+void gcm394_game_state::cs_map_base(address_map &map)
 {
 }
 
-uint16_t gcm394_game_state::porta_r()
+u16 gcm394_game_state::porta_r()
 {
-	uint16_t data = m_io[0]->read();
+	u16 data = m_io[0]->read();
 	logerror("Port A Read: %04x\n", data);
 	return data;
 }
 
-uint16_t gcm394_game_state::portb_r()
+u16 gcm394_game_state::portb_r()
 {
-	uint16_t data = m_io[1]->read();
+	u16 data = m_io[1]->read();
 	logerror("Port B Read: %04x\n", data);
 	return data;
 }
 
-uint16_t gcm394_game_state::portc_r()
+u16 gcm394_game_state::portc_r()
 {
-	uint16_t data = m_io[2]->read();
+	u16 data = m_io[2]->read();
 	logerror("Port C Read: %04x\n", data);
 	return data;
 }
 
-void gcm394_game_state::porta_w(uint16_t data)
+void gcm394_game_state::porta_w(u16 data)
 {
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
 }
@@ -152,12 +152,6 @@ void gcm394_game_state::base(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 }
 
-void gcm394_game_state::base_alt_irq(machine_config &config)
-{
-	gcm394_game_state::base(config);
-	m_maincpu->set_alt_periodic_irq(true);
-}
-
 void gcm394_game_state::machine_start()
 {
 	space(0).specific(m_memory);
@@ -177,7 +171,7 @@ device_memory_interface::space_config_vector gcm394_game_state::memory_space_con
 	return space_config_vector{ std::make_pair(0, &m_full_mem_config) };
 }
 
-void gcm394_game_state::cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4)
+void gcm394_game_state::cs_callback(u16 cs0, u16 cs1, u16 cs2, u16 cs3, u16 cs4)
 {
 	address_space &external = space(0);
 

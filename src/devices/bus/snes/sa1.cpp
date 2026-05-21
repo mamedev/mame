@@ -1264,7 +1264,7 @@ u8 sns_sa1_device::sa1_hi_r(offs_t offset)
 		else
 			return sa1_rom_r(offset | 0x800000);
 
-		return 0xff; // TOOD: Maybe open bus. Check if same as the main system or different (currently not accessible from carts anyway).
+		return 0xff; // TODO: Maybe open bus. Check if same as the main system or different (currently not accessible from carts anyway).
 	}
 	else
 		return sa1_rom_r(offset | 0xc00000);
@@ -1320,7 +1320,7 @@ u8 sns_sa1_device::sa1_lo_r(offs_t offset)
 				return rom_r(offset);
 		}
 
-		return 0xff; // TOOD: Maybe open bus. Check if same as the main system or different (currently not accessible from carts anyway).
+		return 0xff; // TODO: Maybe open bus. Check if same as the main system or different (currently not accessible from carts anyway).
 	}
 	else if (offset < 0x500000)
 		return sa1_bwram_r(offset & 0xfffff, false);      // SA-1 BWRAM (not mirrored above)

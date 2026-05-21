@@ -540,6 +540,8 @@ int i8089_channel_device::execute_run()
 			uint16_t op2 = m_iop->read_word(m_r[TP].t, m_r[TP].w);
 			set_reg(TP, m_r[TP].w + 2);
 			int mm2 = (op2 >> 8) & 0x03;
+			// fix-up the second half of the instruction
+			if (mm2 == BC) mm2 = PP;
 
 			if (w) mov_mm(mm, mm2, o, offset((op2 >> 1) & 0x03, mm2, w));
 			else   movb_mm(mm, mm2, o, offset((op2 >> 1) & 0x03, mm2, w));

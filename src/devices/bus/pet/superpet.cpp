@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "superpet.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/m6809/m6809.h"
 
@@ -312,7 +313,7 @@ void superpet_device::pet_bd_w(offs_t offset, uint8_t data, int &sel)
 	case 0xefe2:
 	case 0xefe3:
 		m_dongle->write(offset & 0x03, data);
-		printf("6702 %u %02x\n", offset & 0x03, data);
+		logerror("6702 %u %02x\n", offset & 0x03, data);
 		break;
 
 	case 0xeff0:
@@ -343,7 +344,7 @@ void superpet_device::pet_bd_w(offs_t offset, uint8_t data, int &sel)
 
 			m_system = data;
 			update_cpu();
-			printf("SYSTEM %02x\n", data);
+			logerror("SYSTEM %02x\n", data);
 		}
 		break;
 
@@ -365,7 +366,7 @@ void superpet_device::pet_bd_w(offs_t offset, uint8_t data, int &sel)
 		*/
 
 		m_bank = data;
-		printf("BANK %02x\n", data);
+		logerror("BANK %02x\n", data);
 		break;
 	}
 }

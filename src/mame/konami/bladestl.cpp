@@ -421,6 +421,9 @@ void bladestl_state::bladestl(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
+	k051733_device &k051733(K051733(config, "k051733", 24_MHz_XTAL / 2));
+	k051733.set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
+
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);
@@ -439,9 +442,6 @@ void bladestl_state::bladestl(machine_config &config)
 	K007420(config, m_k007420, 24_MHz_XTAL, "palette", gfx_bladestl_spr);
 	m_k007420->set_bank_limit(0x3ff);
 	m_k007420->set_sprite_callback(FUNC(bladestl_state::sprite_callback));
-
-	k051733_device &k051733(K051733(config, "k051733", 24_MHz_XTAL / 2));
-	k051733.set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

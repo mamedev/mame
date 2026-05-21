@@ -37,7 +37,7 @@ namespace {
 class nes_sh6578_state : public driver_device
 {
 public:
-	nes_sh6578_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_sh6578_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_bank(*this, "cartbank"),
 		m_maincpu(*this, "maincpu"),
@@ -50,10 +50,10 @@ public:
 		m_ext(*this, "EXT")
 	{ }
 
-	void nes_sh6578(machine_config& config);
-	void nes_sh6578_pal(machine_config& config);
+	void nes_sh6578(machine_config &config) ATTR_COLD;
+	void nes_sh6578_pal(machine_config &config) ATTR_COLD;
 
-	void init_nes_sh6578();
+	void init_nes_sh6578() ATTR_COLD;
 
 	int unknown_random_r()
 	{
@@ -138,7 +138,7 @@ private:
 
 	void rom_map(address_map &map) ATTR_COLD;
 	void nes_sh6578_map(address_map &map) ATTR_COLD;
-	void ppu_map(address_map &map);
+	void ppu_map(address_map &map) ATTR_COLD;
 
 	//uint16_t get_tileaddress(uint8_t x, uint8_t y, bool ishigh);
 
@@ -157,7 +157,7 @@ private:
 class nes_sh6578_abl_wikid_state : public nes_sh6578_state
 {
 public:
-	nes_sh6578_abl_wikid_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_sh6578_abl_wikid_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_sh6578_state(mconfig, type, tag)
 	{ }
 
@@ -168,7 +168,7 @@ protected:
 class nes_sh6578_max10in1_state : public nes_sh6578_state
 {
 public:
-	nes_sh6578_max10in1_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_sh6578_max10in1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_sh6578_state(mconfig, type, tag)
 	{ }
 
@@ -475,7 +475,7 @@ uint8_t nes_sh6578_state::apu_read_mem(offs_t offset)
 
 
 
-void nes_sh6578_state::nes_sh6578_map(address_map& map)
+void nes_sh6578_state::nes_sh6578_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2007).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
@@ -605,7 +605,7 @@ void nes_sh6578_state::machine_start()
 }
 
 // SH6578 can address 20-bit address space (1MB of ROM)
-void nes_sh6578_state::rom_map(address_map& map)
+void nes_sh6578_state::rom_map(address_map &map)
 {
 	map(0x00000, 0xfffff).bankr("cartbank");
 }
@@ -640,7 +640,7 @@ void nes_sh6578_state::ppu_map(address_map &map)
 }
 
 
-void nes_sh6578_state::nes_sh6578(machine_config& config)
+void nes_sh6578_state::nes_sh6578(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, NTSC_APU_CLOCK); // regular M6502 core, not RP2A03?
@@ -676,7 +676,7 @@ void nes_sh6578_state::nes_sh6578(machine_config& config)
 	m_apu->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void nes_sh6578_state::nes_sh6578_pal(machine_config& config)
+void nes_sh6578_state::nes_sh6578_pal(machine_config &config)
 {
 	nes_sh6578(config);
 

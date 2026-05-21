@@ -52,6 +52,7 @@ protected:
 		m_c123tmap(*this, "c123tmap"),
 		m_master_intc(*this, "master_intc"),
 		m_slave_intc(*this, "slave_intc"),
+		m_nvram(*this, "nvram", 0x2000, ENDIANNESS_BIG),
 		m_sci(*this, "sci"),
 		m_c169roz(*this, "c169roz"),
 		m_c45_road(*this, "c45_road"),
@@ -123,14 +124,13 @@ protected:
 	required_device<namco_c123tmap_device> m_c123tmap;
 	required_device<namco_c148_device> m_master_intc;
 	required_device<namco_c148_device> m_slave_intc;
+	memory_share_creator<u8> m_nvram;
 	required_device<namco_c139_device> m_sci;
 	optional_device<namco_c169roz_device> m_c169roz;
 	optional_device<namco_c45_road_device> m_c45_road;
 	required_device<screen_device> m_screen;
 	required_memory_bank m_audiobank;
 	required_region_ptr<u16> m_c140_region;
-
-	std::unique_ptr<u8[]> m_eeprom;
 
 	required_shared_ptr<u8> m_dpram; /* 2Kx8 */
 
@@ -144,8 +144,8 @@ protected:
 	u8 dpram_byte_r(offs_t offset);
 	void dpram_byte_w(offs_t offset, u8 data);
 
-	void eeprom_w(offs_t offset, u8 data);
-	u8 eeprom_r(offs_t offset);
+	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }
+	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
 
 	u16 c140_rom_r(offs_t offset);
 	void sound_bankselect_w(u8 data);

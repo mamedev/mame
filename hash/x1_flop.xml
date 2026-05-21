@@ -3091,7 +3091,7 @@ Expects [KBD] name entry presses with shift held
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198608xx"/>
-		<info name="alt_title" value="スーパーマリオブラザーズスペシャル"/>
+		<info name="alt_title" value="スーパーマリオブラザーズ スペシャル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="super mario.2d" size="327680" crc="0a54b15e" sha1="5972b491be0a25eae4b9ad8719aa988a76514ba4"/>
@@ -3105,7 +3105,7 @@ Expects [KBD] name entry presses with shift held
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198608xx"/>
-		<info name="alt_title" value="スーパーマリオブラザーズスペシャル"/>
+		<info name="alt_title" value="スーパーマリオブラザーズ スペシャル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="s_mario.d88" size="348848" crc="46abbc86" sha1="77156b7021529d7b18cb3a8fb346606be95a364d"/>
@@ -6024,7 +6024,7 @@ not fit the disk)]
 	<software name="game04">
 <!-- From GAME1-25_List.txt:
 1. パンチボール マリオブラザーズ
-2. マリオブラザーズスペシャル
+2. マリオブラザーズ スペシャル
 3. ギャラクシアン
 4. 野球狂
 5. ジャン狂

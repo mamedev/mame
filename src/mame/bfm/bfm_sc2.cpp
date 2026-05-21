@@ -148,7 +148,6 @@ Adder hardware:
 #include "bfm_comn.h"
 #include "bfm_dm01.h"
 
-#include "awpvid.h"
 
 #include "cpu/m6809/m6809.h"
 
@@ -642,8 +641,8 @@ void bfm_sc2_novid_state::reel12_w(uint8_t data)
 	m_reel[0]->update( data    &0x0f);
 	m_reel[1]->update((data>>4)&0x0f);
 
-	awp_draw_reel(machine(),"reel1", *m_reel[0]);
-	awp_draw_reel(machine(),"reel2", *m_reel[1]);
+	m_reel[0]->draw();
+	m_reel[1]->draw();
 }
 
 void bfm_sc2_novid_state::reel34_w(uint8_t data)
@@ -653,8 +652,8 @@ void bfm_sc2_novid_state::reel34_w(uint8_t data)
 	m_reel[2]->update( data    &0x0f);
 	m_reel[3]->update((data>>4)&0x0f);
 
-	awp_draw_reel(machine(),"reel3", *m_reel[2]);
-	awp_draw_reel(machine(),"reel4", *m_reel[3]);
+	m_reel[2]->draw();
+	m_reel[3]->draw();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -666,8 +665,8 @@ void bfm_sc2_novid_state::reel56_w(uint8_t data)
 	m_reel[4]->update( data    &0x0f);
 	m_reel[5]->update((data>>4)&0x0f);
 
-	awp_draw_reel(machine(),"reel5", *m_reel[4]);
-	awp_draw_reel(machine(),"reel6", *m_reel[5]);
+	m_reel[4]->draw();
+	m_reel[5]->draw();
 }
 
 

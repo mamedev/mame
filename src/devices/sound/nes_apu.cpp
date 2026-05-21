@@ -721,7 +721,8 @@ void nesapu_device::write(offs_t offset, u8 value)
 		break;
 	default:
 #ifdef MAME_DEBUG
-logerror("invalid apu write: $%02X at $%04X\n", value, offset);
+		if (value)
+			logerror("invalid apu write: $%02X at $%04X\n", value, offset);
 #endif
 		break;
 	}

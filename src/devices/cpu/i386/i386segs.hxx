@@ -80,7 +80,7 @@ void i386_device::i386_load_call_gate(I386_CALL_GATE *gate)
 void i386_device::i386_set_descriptor_accessed(uint16_t selector)
 {
 	// assume the selector is valid, we don't need to check it again
-	uint32_t base, addr;
+	offs_t base, addr;
 	uint8_t rights;
 	if(!(selector & ~3))
 		return;
@@ -2500,7 +2500,7 @@ inline void i386_device::dri_changed()
 		{
 			int breakpoint_type = (m_dr[7] >> ((dr << 2) + 16)) & 3;
 			int breakpoint_length = (m_dr[7] >> ((dr << 2) + 16 + 2)) & 3;
-			uint32_t phys_addr = m_dr[dr];
+			offs_t phys_addr = m_dr[dr];
 			uint32_t error;
 			if(translate_address(m_CPL, TR_READ, &phys_addr, &error))
 			{

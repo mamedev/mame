@@ -47,8 +47,8 @@ public:
 
 protected:
 	enum {
-		AS_INTD = 4, // Direct internal access space
-		AS_INTI = 5, // Indirect internal access space
+		AS_SFR = 4, // Internal SFR access space
+		AS_IDATA = 5, // Internal data RAM access space
 	};
 
 	enum {
@@ -151,9 +151,9 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config m_program_config;
-	address_space_config m_data_config;
-	address_space_config m_intd_config;
-	address_space_config m_inti_config;
+	address_space_config m_xdata_config;
+	address_space_config m_sfr_config;
+	address_space_config m_idata_config;
 
 	// Internal stuff
 	u16 m_ppc;             // previous pc
@@ -205,9 +205,11 @@ protected:
 	required_shared_ptr<u8> m_internal_ram; // 128 RAM (8031/51) + 128 RAM in second bank (8032/52)
 
 	void program_map(address_map &map) ATTR_COLD;
-	void intd_map(address_map &map) ATTR_COLD;
-	void inti_map(address_map &map) ATTR_COLD;
+	void idata_map(address_map &map) ATTR_COLD;
 	virtual void sfr_map(address_map &map) ATTR_COLD;
+
+	u8 read_direct(u8 r) { return r < 0x80 ? m_idata.read_byte(r) : m_sfr.read_byte(r); }
+	void write_direct(u8 r, u8 data) { if (r < 0x80) m_idata.write_byte(r, data); else m_sfr.write_byte(r, data); }
 
 	// SFR Callbacks
 	u8 psw_r();
@@ -289,9 +291,9 @@ protected:
 
 	// Memory spaces
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
-	memory_access<18, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
-	memory_access< 8, 0, 0, ENDIANNESS_LITTLE>::specific m_intd;
-	memory_access< 8, 0, 0, ENDIANNESS_LITTLE>::specific m_inti;
+	memory_access<18, 0, 0, ENDIANNESS_LITTLE>::specific m_xdata;
+	memory_access< 8, 0, 0, ENDIANNESS_LITTLE>::specific m_sfr;
+	memory_access< 8, 0, 0, ENDIANNESS_LITTLE>::specific m_idata;
 
 	devcb_read8::array<8> m_port_in_cb;
 	devcb_write8::array<8> m_port_out_cb;

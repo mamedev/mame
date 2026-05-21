@@ -53,7 +53,7 @@ TODO:
   - doesn't agree at all with the current reel implementation
   - locks when soft-reset
   - inputs, outputs
-- circus2 has the same problems as pharmyst, bat the stopping at system RAM check
+- circus2 has the same problems as pharmyst, bar the stopping at system RAM check
 */
 
 

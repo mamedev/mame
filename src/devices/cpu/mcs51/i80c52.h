@@ -4,6 +4,8 @@
 #ifndef MAME_CPU_MCS51_I80C52_H
 #define MAME_CPU_MCS51_I80C52_H
 
+#pragma once
+
 #include "i8052.h"
 
 class i80c52_device : public i8052_device

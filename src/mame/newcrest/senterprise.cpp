@@ -24,7 +24,7 @@ Super Crown:
 
 Super Enterprise (model 210.C):
 - PCB label: 210C 600-002
-- Sanyo LC7580, same LCDs as Sphinx Galaxy
+- Sanyo LC7580, same LCDs as Chess 3008
 - rest is same as above
 
 210 MCU is used in:
@@ -41,11 +41,12 @@ Super Enterprise (model 210.C):
 
 #include "emu.h"
 
+#include "chess3008_lcd.h"
+
 #include "cpu/m6800/m6801.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
-#include "video/lc7580.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
@@ -57,8 +58,6 @@ Super Enterprise (model 210.C):
 
 namespace {
 
-// model 210 / shared
-
 class senterp_state : public driver_device
 {
 public:
@@ -66,6 +65,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_board(*this, "board"),
+		m_lcd(*this, "lcd"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0)
@@ -74,6 +74,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_off);
 
 	void senterp(machine_config &config);
+	void senterpc(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -82,6 +83,7 @@ protected:
 	// devices/pointers
 	required_device<hd6301y0_cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
+	optional_device<chess3008_lcd_device> m_lcd;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<3> m_inputs;
@@ -96,6 +98,7 @@ protected:
 	u8 input2_r();
 	void leds_w(u8 data);
 	void mux_w(u8 data);
+	void lcd_w(u8 data);
 
 	TIMER_CALLBACK_MEMBER(set_standby);
 };
@@ -106,42 +109,6 @@ void senterp_state::machine_start()
 
 	// register for savestates
 	save_item(NAME(m_inp_mux));
-}
-
-
-// model 210.C
-
-class senterpc_state : public senterp_state
-{
-public:
-	senterpc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		senterp_state(mconfig, type, tag),
-		m_lcd(*this, "lcd"),
-		m_out_digit(*this, "digit%u", 0U),
-		m_out_lcd(*this, "s%u.%u", 0U, 0U)
-	{ }
-
-	void senterpc(machine_config &config);
-
-protected:
-	virtual void machine_start() override ATTR_COLD;
-
-private:
-	required_device<lc7580_device> m_lcd;
-	output_finder<8> m_out_digit;
-	output_finder<2, 52> m_out_lcd;
-
-	void lcd_output_w(offs_t offset, u64 data);
-	void lcd_w(u8 data);
-};
-
-void senterpc_state::machine_start()
-{
-	senterp_state::machine_start();
-
-	// resolve outputs
-	m_out_digit.resolve();
-	m_out_lcd.resolve();
 }
 
 
@@ -176,8 +143,6 @@ INPUT_CHANGED_MEMBER(senterp_state::power_off)
 /*******************************************************************************
     I/O
 *******************************************************************************/
-
-// common
 
 u8 senterp_state::input1_r()
 {
@@ -218,44 +183,10 @@ void senterp_state::mux_w(u8 data)
 	m_display->write_mx(m_inp_mux);
 }
 
-
-// LCD (senterpc)
-
-void senterpc_state::lcd_output_w(offs_t offset, u64 data)
+void senterp_state::lcd_w(u8 data)
 {
-	// output individual segments
-	for (int i = 0; i < 52; i++)
-		m_out_lcd[offset][i] = BIT(data, i);
-
-	// unscramble digit 7segs
-	static const u8 seg2digit[4*7] =
-	{
-		0x03, 0x04, 0x00, 0x40, 0x41, 0x02, 0x42,
-		0x05, 0x06, 0x07, 0x48, 0x44, 0x45, 0x46,
-		0x0c, 0x0d, 0x0b, 0x0a, 0x4a, 0x4c, 0x4b,
-		0x0e, 0x0f, 0x10, 0x50, 0x4d, 0x4e, 0x4f
-	};
-
-	for (int i = 0; i < 8; i++)
-	{
-		u8 digit = 0;
-		for (int seg = 0; seg < 7; seg++)
-		{
-			u8 bit = seg2digit[7 * (i & 3) + seg] + 26 * (i >> 2);
-			digit |= m_out_lcd[BIT(bit, 6)][bit & 0x3f] << seg;
-		}
-		m_out_digit[i] = digit;
-	}
-}
-
-void senterpc_state::lcd_w(u8 data)
-{
-	// P22: LC7580 DATA
-	// P26: LC7580 CLK
-	// P27: LC7580 CE
-	m_lcd->data_w(BIT(data, 2));
-	m_lcd->clk_w(BIT(data, 6));
-	m_lcd->ce_w(BIT(data, 7));
+	// P22,P26,P27: LC7580 pins (senterpc)
+	m_lcd->lcd_w(BIT(data, 2) | (data >> 5 & 6));
 
 	// P22+P27: piezo
 	m_dac->write(BIT(data, 2) & BIT(~data, 7));
@@ -354,19 +285,17 @@ void senterp_state::senterp(machine_config &config)
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
-void senterpc_state::senterpc(machine_config &config)
+void senterp_state::senterpc(machine_config &config)
 {
 	senterp(config);
 
 	// basic machine hardware
-	m_maincpu->standby_cb().append(m_lcd, FUNC(lc7580_device::inh_w));
-	m_maincpu->out_p2_cb().set(FUNC(senterpc_state::leds_w));
-	m_maincpu->out_p2_cb().append(FUNC(senterpc_state::lcd_w));
+	m_maincpu->standby_cb().append(m_lcd, FUNC(chess3008_lcd_device::inh_w));
+	m_maincpu->out_p2_cb().set(FUNC(senterp_state::leds_w));
+	m_maincpu->out_p2_cb().append(FUNC(senterp_state::lcd_w));
 
 	// video hardware
-	LC7580(config, m_lcd, 0);
-	m_lcd->write_segs().set(FUNC(senterpc_state::lcd_output_w));
-
+	CHESS3008_LCD(config, m_lcd);
 	config.set_default_layout(layout_cxg_senterprisec);
 }
 
@@ -394,6 +323,6 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, senterp,  0,       0,      senterp,  senterp,  senterp_state,  empty_init, "Newcrest Technology / CXG Systems / LogiSoft", "Super Enterprise (model 210)", MACHINE_SUPPORTS_SAVE )
-SYST( 1986, senterpc, senterp, 0,      senterpc, senterpc, senterpc_state, empty_init, "Newcrest Technology / CXG Systems / LogiSoft", "Super Enterprise (model 210.C)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS          INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1986, senterp,  0,       0,      senterp,  senterp,  senterp_state, empty_init, "Newcrest Technology / CXG Systems / LogiSoft", "Super Enterprise (model 210)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, senterpc, senterp, 0,      senterpc, senterpc, senterp_state, empty_init, "Newcrest Technology / CXG Systems / LogiSoft", "Super Enterprise (model 210.C)", MACHINE_SUPPORTS_SAVE )

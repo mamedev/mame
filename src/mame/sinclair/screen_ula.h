@@ -9,7 +9,8 @@ class screen_ula_device : public device_t, public device_gfx_interface
 {
 
 public:
-	screen_ula_device &set_host_ram_ptr(const u8 *host_ram_ptr) { m_host_ram_ptr = host_ram_ptr; return *this; }
+	screen_ula_device &set_bram_bank5_ptr(const u8 *bram_bank5_ptr) { m_bram_bank5_ptr = bram_bank5_ptr; return *this; }
+	screen_ula_device &set_bram_bank7_ptr(const u8 *bram_bank7_ptr) { m_bram_bank7_ptr = bram_bank7_ptr; return *this; }
 	screen_ula_device &set_palette(const char *tag, u16 base_offset, u16 alt_offset);
 
 	void set_raster_offset(u16 offset_h,  u16 offset_v) { m_offset_h = offset_h; m_offset_v = offset_v; }
@@ -31,7 +32,7 @@ public:
 	void ula_fine_scroll_x_w (bool ula_fine_scroll_x) { m_ula_fine_scroll_x = ula_fine_scroll_x; }
 
 	void draw_border(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 border_color, u8 pcode = 0);
-	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool flash = 0, u8 pcode = 0);
+	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 pcode = 0);
 
 protected:
 	screen_ula_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -52,10 +53,12 @@ protected:
 	ula_type m_ula_type;
 
 private:
-	static inline constexpr u16 UTM_FALLBACK_PEN = 0x800;
+	static inline constexpr u16 UTM_FALLBACK_PEN = 0xa00;
+	static inline constexpr u8 FLASH_FRAME_INVERT_COUNT = 16;
 
 	u16 m_offset_h, m_offset_v;
-	const u8 *m_host_ram_ptr;
+	const u8 *m_bram_bank5_ptr;
+	const u8 *m_bram_bank7_ptr;
 	u8 m_global_transparent;
 	u16 m_palette_base_offset;
 	u16 m_palette_alt_offset;

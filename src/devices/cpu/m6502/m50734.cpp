@@ -171,7 +171,7 @@ void m50734_device::read_dummy(u16 adr)
 u8 m50734_device::read_data(u16 adr)
 {
 	if (BIT(m_p0_function, 5))
-		return m_data.read_byte(adr);
+		return m_data.read_interruptible(adr);
 	else
 		return m740_device::read(adr);
 }
@@ -179,7 +179,7 @@ u8 m50734_device::read_data(u16 adr)
 void m50734_device::write_data(u16 adr, u8 val)
 {
 	if (BIT(m_p0_function, 5))
-		m_data.write_byte(adr, val);
+		m_data.write_interruptible(adr, val);
 	else
 		m740_device::write(adr, val);
 }

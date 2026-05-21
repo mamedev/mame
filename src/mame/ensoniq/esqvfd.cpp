@@ -11,6 +11,13 @@
 #include "esq1by22.lh"
 #include "esq2by40.lh"
 
+#define LOG_DISPLAY_COMMANDS (1U << 1)
+#define LOGDC(...) LOGMASKED(LOG_DISPLAY_COMMANDS, __VA_ARGS__)
+
+// #define VERBOSE LOG_DISPLAY_COMMANDS
+
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(ESQ1X22,     esq1x22_device,     "esq1x22",     "Ensoniq 1x22 VFD")
 DEFINE_DEVICE_TYPE(ESQ2X40,     esq2x40_device,     "esq2x40",     "Ensoniq 2x40 VFD")
 DEFINE_DEVICE_TYPE(ESQ2X40_SQ1, esq2x40_sq1_device, "esq2x40_sq1", "Ensoniq 2x40 VFD (SQ-1 variant)")
@@ -226,6 +233,7 @@ void esq2x40_device::device_add_mconfig(machine_config &config)
 
 void esq2x40_device::write_char(uint8_t data)
 {
+	LOGDC("display command %02X ", data);
 	if (m_lastchar == 0xfa) {
 		// ESQ-1 sends (cursor move) 0xfa 0xYY to mark YY characters as underlined at the current cursor location
 		for (uint8_t j = 0; j < m_rows; j++) {
@@ -241,11 +249,13 @@ void esq2x40_device::write_char(uint8_t data)
 
 		m_lastchar = 0;
 		update_display();
+		LOGDC("ESQ1 %d chars underlined from (%d,%d)\n", data, m_cursy, m_cursx);
 		return;
 	} else if (m_lastchar == 0xff) {
 		// 0xff light commands are followed by a byte indicating the light and
 		// its requested status. Ignore this.
 		m_lastchar = 0;
+		LOGDC("set light %d status %d (ignoring)\n", data & 0x3f, data >> 6);
 		return;
 	}
 
@@ -254,59 +264,86 @@ void esq2x40_device::write_char(uint8_t data)
 	if ((data >= 0x80) && (data < 0xd0)) {
 		m_cursy = ((data & 0x7f) >= 40) ? 1 : 0;
 		m_cursx = (data & 0x7f) % 40;
+		LOGDC("cursor move to (%d,%d)\n", m_cursy, m_cursx);
 	} else if (data >= 0xd0) {
 		switch (data) {
 			case 0xd0:  // blink start
 				m_curattr |= AT_BLINK;
+				LOGDC("start blink\n");
 				break;
 
 			case 0xd1:  // blink stop (cancel all attribs on VFX+)
 				m_curattr = 0; //&= ~AT_BLINK;
+				LOGDC("attrs off D1\n");
 				break;
 
 			case 0xd2:  // blinking underline on VFX
 				m_curattr |= AT_BLINK | AT_UNDERLINE;
+				LOGDC("start blinking underline\n");
 				break;
 
 			case 0xd3:  // start underline
 				m_curattr |= AT_UNDERLINE;
+				LOGDC("start underline\n");
 				break;
 
 			case 0xd4:  // move curser one step right
 				cursor_right();
+				LOGDC("cursor right to (%d,%d)\n", m_cursy, m_cursx);
 				break;
 
 			case 0xd5:  // move curser one step left
 				cursor_left();
+				LOGDC("cursor left to (%d,%d)\n", m_cursy, m_cursx);
 				break;
 
 			case 0xd6:  // clear screen
 				clear();
+				LOGDC("clear screen D6\n");
+				break;
+
+			case 0xd9:  // underline current character
+				m_attrs[m_cursy][m_cursx] |= AT_UNDERLINE;
+				m_dirty[m_cursy][m_cursx] = 1;
+				LOGDC("set underline at (%d,%d)\n", m_cursy, m_cursx);
+				break;
+
+			case 0xdb:  // de-underline current character
+				m_attrs[m_cursy][m_cursx] &= ~AT_UNDERLINE;
+				m_dirty[m_cursy][m_cursx] = 1;
+				LOGDC("clear underline at (%d,%d)\n", m_cursy, m_cursx);
 				break;
 
 			case 0xe8:  // also cancel attributes
 				m_curattr = 0;
+				LOGDC("attr off E8\n");
 				break;
 
 			case 0xf5:  // save cursor position
 				m_savedx = m_cursx;
 				m_savedy = m_cursy;
+				m_curattr = 0;
+				LOGDC("save cursor position (%d,%d)\n", m_cursy, m_cursx);
 				break;
 
 			case 0xf6:  // restore cursor position
 				m_cursx = m_savedx;
 				m_cursy = m_savedy;
 				m_curattr = m_attrs[m_cursy][m_cursx];
+				LOGDC("restore cursor position (%d,%d) attr %x\n", m_cursy, m_cursx, m_curattr);
 				break;
 
 			case 0xfd: // also clear screen?
 				clear();
+				LOGDC("clear screen FD\n");
 				break;
 
 			case 0xff: // light status; ignore. Next byte will also be ignored.
+				LOGDC("set light status (ignoring)\n");
 				break;
 
 			default:
+				LOGDC("unhandled %02X\n", data);
 				break;
 		}
 	} else if ((data >= 0x20) && (data <= 0x5f)) {
@@ -315,6 +352,9 @@ void esq2x40_device::write_char(uint8_t data)
 		m_dirty[m_cursy][m_cursx] = 1;
 
 		cursor_right();
+		LOGDC("char '%c', cursor now (%d,%d)\n", data, m_cursy, m_cursx);
+	} else {
+		LOGDC("unhandled %02X\n", data);
 	}
 
 	update_display();

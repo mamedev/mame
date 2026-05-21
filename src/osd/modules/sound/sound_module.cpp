@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstring>
 #include <numeric>
 #include <utility>
 
@@ -14,8 +15,10 @@ sound_module::~sound_module()
 	// implementing this here forces the vtable and inline virtual member functions to be instantiated
 }
 
-sound_module::abuffer::abuffer(uint32_t channels) noexcept :
+sound_module::abuffer::abuffer(uint32_t channels, uint32_t rate) noexcept :
 	m_channels(channels),
+	m_rate(rate),
+	m_used_buffers(0),
 	m_max_buffers(8),
 	m_hindex(0),
 	m_last_sample(channels, 0)
@@ -32,10 +35,11 @@ void sound_module::abuffer::set_latency(float latency)
 
 void sound_module::abuffer::clear()
 {
+	get(m_last_sample.data(), 1);
 	m_used_buffers = 0;
 	m_used_buffers_prev = 0;
 	m_overrun = false;
-	std::fill(m_history.begin(), m_history.end(), 0);
+	m_history.fill(0);
 
 	m_delta = 0;
 	m_delta2 = 0;
@@ -49,11 +53,12 @@ void sound_module::abuffer::get(int16_t *data, uint32_t samples) noexcept
 	m_delta2 -= samples;
 	uint32_t pos = 0;
 	while(pos != samples) {
+		// on underrun, fill buffer with last sample to prevent audible pop
 		if(!m_used_buffers) {
 			m_delta2 += samples - pos;
 			m_underruns++;
 			while(pos != samples) {
-				std::copy_n(m_last_sample.data(), m_channels, data);
+				std::memmove(data, m_last_sample.data(), m_channels * sizeof(int16_t));
 				data += m_channels;
 				pos++;
 			}
@@ -61,25 +66,72 @@ void sound_module::abuffer::get(int16_t *data, uint32_t samples) noexcept
 		}
 
 		auto &buf = m_buffers.front();
-		if(buf.m_data.empty()) {
+		if(buf.data.empty()) {
 			pop_buffer();
 			continue;
 		}
 
-		uint32_t avail = (buf.m_data.size() / m_channels) - buf.m_cpos;
+		uint32_t avail = (buf.data.size() / m_channels) - buf.cpos;
 		if(avail > (samples - pos)) {
 			avail = samples - pos;
-			std::copy_n(buf.m_data.data() + (buf.m_cpos * m_channels), avail * m_channels, data);
-			buf.m_cpos += avail;
+			std::copy_n(buf.data.data() + (buf.cpos * m_channels), avail * m_channels, data);
+			buf.cpos += avail;
 			break;
 		}
 
-		std::copy_n(buf.m_data.data() + (buf.m_cpos * m_channels), avail * m_channels, data);
+		std::copy_n(buf.data.data() + (buf.cpos * m_channels), avail * m_channels, data);
 		pop_buffer();
 		pos += avail;
 		data += avail * m_channels;
 	}
+	m_internal_get = false;
 	//printf("%d -%d +%d # %d %d\n", m_used_buffers, m_underruns, m_overruns, m_delta, m_delta2);
+}
+
+void sound_module::abuffer::flush_buffers(uint32_t remain)
+{
+	assert(remain);
+
+	for(uint32_t i = 0; i != m_used_buffers - remain; i++)
+		m_delta2 -= (m_buffers[i].data.size() / m_channels - m_buffers[i].cpos);
+
+	// number of samples to crossfade (eg. 128 when samplerate is 48000)
+	const uint32_t samples = std::max(m_rate / 375, 2U);
+
+	// get crossfade source chunk
+	if(!m_internal_get || m_last_fade.size() != samples * m_channels) {
+		m_last_fade.resize(samples * m_channels);
+		get(m_last_fade.data(), samples);
+		m_internal_get = true;
+		m_delta += samples;
+		m_delta2 += samples;
+	}
+
+	// flush buffers until [remain] are left
+	if(m_used_buffers > remain) {
+		for(uint32_t i = 0; i < remain; i++) {
+			using std::swap;
+			swap(m_buffers[i], m_buffers[m_used_buffers + i - remain]);
+		}
+		m_used_buffers = remain;
+	}
+
+	if(!m_used_buffers || samples > (m_buffers[0].data.size() / m_channels - m_buffers[0].cpos))
+		return;
+	int16_t *dest = &m_buffers[0].data[m_channels * m_buffers[0].cpos];
+
+	// crossfade into front of buffer to reduce clicks
+	for(uint32_t i = 0; i < samples; i++) {
+		int32_t gain_b = (i << 15) / (samples - 1);
+		int32_t gain_a = 32768 - gain_b;
+
+		for(uint32_t ch = 0; ch < m_channels; ch++) {
+			uint32_t j = i * m_channels + ch;
+
+			int32_t mix = (m_last_fade[j] * gain_a + dest[j] * gain_b) >> 15;
+			dest[j] = static_cast<int16_t>(mix);
+		}
+	}
 }
 
 void sound_module::abuffer::push(const int16_t *data, uint32_t samples)
@@ -87,14 +139,14 @@ void sound_module::abuffer::push(const int16_t *data, uint32_t samples)
 	m_delta += samples;
 	m_delta2 += samples;
 	auto &buf = push_buffer();
-	buf.m_cpos = 0;
-	buf.m_data.resize(samples * m_channels);
-	std::copy_n(data, samples * m_channels, buf.m_data.data());
+	buf.cpos = 0;
+	buf.data.resize(samples * m_channels);
+	std::copy_n(data, samples * m_channels, buf.data.data());
 	std::copy_n(data + ((samples - 1) * m_channels), m_channels, m_last_sample.data());
 
 	// maximum number of buffers relative to samples
 	// unless -speed or -refreshspeed is used, this is same as m_max_buffers
-	const uint32_t max_buffers = std::max(m_max_buffers * 48000 / samples / 50, 4U);
+	const uint32_t max_buffers = std::max(m_max_buffers * m_rate / samples / 50, 4U);
 
 	// minimum number of buffers after overrun
 	// lower limit of 2 prevents buffer underruns with push(this), get, get, push
@@ -103,21 +155,11 @@ void sound_module::abuffer::push(const int16_t *data, uint32_t samples)
 	m_history[m_hindex] = m_used_buffers_prev - m_used_buffers;
 	m_hindex = (m_hindex + 1) % m_history.size();
 
-	auto flush_buffers = [&](uint32_t n) {
-		for(uint32_t i = 0; i != m_used_buffers - n; i++)
-			m_delta2 -= (m_buffers[i].m_data.size() / m_channels - m_buffers[i].m_cpos);
-		for(uint32_t i = 0; i < n; i++) {
-			using std::swap;
-			swap(m_buffers[i], m_buffers[m_used_buffers + i - n]);
-		}
-		m_used_buffers = n;
-	};
-
 	if(m_overrun && std::accumulate(m_history.begin(), m_history.end(), 0) >= -2) {
 		if(m_used_buffers > min_buffers) {
 			// once it's stabilized after an overrun, reduce buffers to minimum latency
 			flush_buffers(min_buffers);
-			std::fill(m_history.begin(), m_history.end(), 0);
+			m_history.fill(0);
 		}
 		m_overrun = false;
 	} else if(m_used_buffers > max_buffers) {
@@ -135,7 +177,7 @@ uint32_t sound_module::abuffer::available() const noexcept
 {
 	uint32_t result = 0;
 	for(uint32_t i = 0; m_used_buffers > i; ++i)
-		result += (m_buffers[i].m_data.size() / m_channels) - m_buffers[i].m_cpos;
+		result += (m_buffers[i].data.size() / m_channels) - m_buffers[i].cpos;
 	return result;
 }
 

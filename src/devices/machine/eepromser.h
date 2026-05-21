@@ -91,7 +91,6 @@ protected:
 	virtual void parse_command_and_address() = 0;
 	virtual void execute_command();
 
-
 	// configuration state
 	uint8_t         m_command_address_bits;     // number of address bits in a command
 	bool            m_streaming_enabled;        // true if streaming is enabled
@@ -175,8 +174,8 @@ protected:
 
 class eeprom_serial_x24c44_device : public eeprom_serial_base_device
 {
-		//async recall not implemented
-		//async store not implemented
+	//async recall not implemented
+	//async store not implemented
 public:
 	// read handlers
 	int do_read();          // DO

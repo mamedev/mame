@@ -513,11 +513,11 @@ void speedbal_state::init_speedbal()
 
 ROM_START( speedbal ) // seems to have a more complete hidden test mode, with a 'hard test' that's not enabled in the alternate Speed Ball ROM set
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.u14",  0x0000,  0x8000, CRC(94c6f107) SHA1(cd7ada17f0f59623cf615df68c5f8f4077377820) )
-	ROM_LOAD( "3.u15",  0x8000,  0x8000, CRC(a036687f) SHA1(fc2cd683cd6a9a75ab6b188f7b4592b355a569e0) )
+	ROM_LOAD( "1.u14",  0x00000, 0x08000, CRC(94c6f107) SHA1(cd7ada17f0f59623cf615df68c5f8f4077377820) )
+	ROM_LOAD( "3.u15",  0x08000, 0x08000, CRC(a036687f) SHA1(fc2cd683cd6a9a75ab6b188f7b4592b355a569e0) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "2.u100",  0x0000,  0x8000, CRC(e6a6d9b7) SHA1(35d228d13d4305f606fdd84adad1d6e435f4b7ce) )
+	ROM_LOAD( "2.u100", 0x00000, 0x08000, CRC(e6a6d9b7) SHA1(35d228d13d4305f606fdd84adad1d6e435f4b7ce) )
 
 	ROM_REGION( 0x08000, "chars", 0 )
 	ROM_LOAD( "10.u50", 0x00000, 0x08000, CRC(36dea4bf) SHA1(60095f482af4595a39be5ae6def8cd30298c1ef8) )
@@ -535,11 +535,33 @@ ROM_END
 
 ROM_START( speedbala )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sb1.bin",  0x0000,  0x8000, CRC(1c242e34) SHA1(8b2e8983e0834c99761ce2b5ea765dba56e77964) )
-	ROM_LOAD( "sb3.bin",  0x8000,  0x8000, CRC(7682326a) SHA1(15a72bf088a9adfaa50c11202b4970e07c309a21) )
+	ROM_LOAD( "1.u14",  0x00000, 0x08000, CRC(9315ad41) SHA1(7d99abba21a76bb8df29eb4fd54882c21cf38ea9) )
+	ROM_LOAD( "3.u15",  0x08000, 0x08000, CRC(17d13c1c) SHA1(2c20e61c09020f5d44338965245ca15febf70dd8) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "sb2.bin",  0x0000,  0x8000, CRC(e6a6d9b7) SHA1(35d228d13d4305f606fdd84adad1d6e435f4b7ce) )
+	ROM_LOAD( "2.u100", 0x00000, 0x08000, CRC(70eeb5c8) SHA1(72fcd19bce5fbd40ff490040ed245d60db05c9b6) )
+
+	ROM_REGION( 0x08000, "chars", 0 )
+	ROM_LOAD( "10.u50", 0x00000, 0x08000, CRC(36dea4bf) SHA1(60095f482af4595a39be5ae6def8cd30298c1ef8) )
+
+	ROM_REGION( 0x20000, "bgtiles", 0 )
+	ROM_LOAD( "9.u45",  0x00000, 0x08000, CRC(b567e85e) SHA1(7036792ea70ad48384f348399ed9b136272fedb6) )
+	ROM_LOAD( "5.u46",  0x08000, 0x08000, CRC(b0eae4ba) SHA1(baee3fcb1399c56efaa5f97912de324d7b38f286) )
+	ROM_LOAD( "8.u47",  0x10000, 0x08000, CRC(d2bfbdb6) SHA1(b552b055450f438729c83337f561d05b6518ae75) )
+	ROM_LOAD( "4.u48",  0x18000, 0x08000, CRC(1d23a130) SHA1(aabf7c46f9299ffb8b8ca92839622d000a470a0b) )
+
+	ROM_REGION( 0x10000, "sprites", ROMREGION_INVERT )
+	ROM_LOAD( "7.u67",  0x00000, 0x08000, CRC(9f1b33d1) SHA1(1f8be8f8e6a2ee99a7dafeead142ccc629fa792d) )
+	ROM_LOAD( "6.u68",  0x08000, 0x08000, CRC(0e2506eb) SHA1(56f779266b977819063c475b84ca246fc6d8d6a7) )
+ROM_END
+
+ROM_START( speedbalb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sb1.bin",  0x00000, 0x08000, CRC(1c242e34) SHA1(8b2e8983e0834c99761ce2b5ea765dba56e77964) )
+	ROM_LOAD( "sb3.bin",  0x08000, 0x08000, CRC(7682326a) SHA1(15a72bf088a9adfaa50c11202b4970e07c309a21) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "sb2.bin",  0x00000, 0x08000, CRC(e6a6d9b7) SHA1(35d228d13d4305f606fdd84adad1d6e435f4b7ce) )
 
 	ROM_REGION( 0x08000, "chars", 0 )
 	ROM_LOAD( "sb10.bin", 0x00000, 0x08000, CRC(36dea4bf) SHA1(60095f482af4595a39be5ae6def8cd30298c1ef8) )
@@ -582,7 +604,7 @@ void speedbal_state::init_musicbal()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	const uint8_t xorTable[8] = {0x05, 0x06, 0x84, 0x84, 0x00, 0x87, 0x84, 0x84};     // XORs affecting bits #0, #1, #2 & #7
+	const uint8_t xorTable[8] = {0x05, 0x06, 0x84, 0x84, 0x00, 0x87, 0x84, 0x84};   // XORs affecting bits #0, #1, #2 & #7
 	const int swapTable[4][4] = {                                                   // 4 possible swaps affecting bits #0, #1, #2 & #7
 		{1,0,7,2},
 		{2,7,0,1},
@@ -608,4 +630,5 @@ void speedbal_state::init_musicbal()
 
 GAMEL( 1987, speedbal,  0,        speedbal, speedbal, speedbal_state, init_speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball (set 1)", MACHINE_SUPPORTS_SAVE, layout_speedbal )
 GAMEL( 1987, speedbala, speedbal, speedbal, speedbal, speedbal_state, init_speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball (set 2)", MACHINE_SUPPORTS_SAVE, layout_speedbal )
+GAMEL( 1987, speedbalb, speedbal, speedbal, speedbal, speedbal_state, init_speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball (set 3)", MACHINE_SUPPORTS_SAVE, layout_speedbal )
 GAMEL( 1988, musicbal,  0,        speedbal, musicbal, speedbal_state, init_musicbal, ROT270, "Tecfri / Desystem S.A.", "Music Ball",         MACHINE_SUPPORTS_SAVE, layout_speedbal )

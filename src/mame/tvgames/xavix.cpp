@@ -1468,6 +1468,25 @@ static INPUT_PORTS_START( jarajal )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( multiplt )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	// TODO: steering inputs appear to use multiple bits
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // DOWN
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // UP
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Horn")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) // holding this keeps wheel in center
+
+	PORT_MODIFY("IN1")
+	PORT_DIPNAME( 0x02, 0x02, "Output Mode" )
+	PORT_DIPSETTING(    0x00, "Audio Only")
+	PORT_DIPSETTING(    0x02, "TV Output")
+INPUT_PORTS_END
+
+
 
 static INPUT_PORTS_START( tcarnavi )
 	PORT_INCLUDE(xavix)
@@ -2662,6 +2681,11 @@ ROM_START( hippofr )
 	ROM_LOAD( "54-6447-010.u3", 0x000000, 0x200000, CRC(1fb15364) SHA1(ff2bb54f7d6ccd3c83e722599c6f2b213bf35df8) )
 ROM_END
 
+ROM_START( multiplt )
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "2en1multipilotefr.u2", 0x000000, 0x200000, CRC(77f2ebf6) SHA1(0181bc7d3b6ea5a4a247ffe02fee2cb4942c1623) )
+ROM_END
+
 /* XaviX hardware titles (1st Generation)
 
     These use
@@ -2679,7 +2703,9 @@ ROM_END
 // Also exists as
 // 80-32703 Hippo's Alphabet Adventure (UK)
 // 80-32700 ABC Jungle Fun (US?)
-CONS( 1999, hippofr,  0,          0,  xavix_2mb, xavix,xavix_state,      init_xavix,    "VTech",             "Hippo: et la formidable aventure des lettres (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // needs keyboard emulating
+CONS( 1999, hippofr,  0,          0,  xavix_2mb, xavix,xavix_state,      init_xavix,    "VTech",             "2 en 1 Hippo: et la formidable aventure des lettres (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // needs keyboard emulating
+
+CONS( 1999?, multiplt, 0,         0,  xavix_2mb, multiplt,xavix_state,      init_xavix,    "VTech",             "2 en 1 Multi'Pilote (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイCLASSIC タイトーノスタルジア1
 CONS( 2006, taitons1,  0,          0,  xavix_i2c_24lc04_2mb, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Taito",             "Let's! TV Play Classic - Taito Nostalgia 1 (Japan)", MACHINE_IMPERFECT_SOUND )

@@ -794,7 +794,7 @@ void stfight_state::empcityubl(machine_config &config)
 {
 	stfight(config);
 
-	m_maincpu->set_addrmap(AS_OPCODES, address_map_constructor());
+	m_maincpu->remove_addrmap(AS_OPCODES);
 }
 
 void stfight_state::cshooter(machine_config &config)

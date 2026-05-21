@@ -1706,7 +1706,7 @@ void newport_base_device::vrint_w(int state)
 	}
 }
 
-// TOOD: Figure out a better way of doing this
+// TODO: Figure out a better way of doing this
 void newport_base_device::update_screen_size(int state)
 {
 	const int x_start = m_vc2->readout_x0();

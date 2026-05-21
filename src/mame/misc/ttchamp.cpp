@@ -283,10 +283,10 @@ void ttchamp_state::paldat_w(uint16_t data)
 
 uint16_t ttchamp_state::pic_r(offs_t offset, uint16_t mem_mask)
 {
-//  printf("%06x: read from PIC (%04x)\n", m_maincpu->pc(),mem_mask);
+//  logerror("%06x: read from PIC (%04x)\n", m_maincpu->pc(),mem_mask);
 	if (m_picmodex == picmode::SET_READLATCH)
 	{
-//      printf("read data %02x from %02x\n", m_pic_latched, m_pic_readaddr);
+//      logerror("read data %02x from %02x\n", m_pic_latched, m_pic_readaddr);
 		m_picmodex = picmode::IDLE;
 
 		return m_pic_latched << 8;
@@ -298,29 +298,29 @@ uint16_t ttchamp_state::pic_r(offs_t offset, uint16_t mem_mask)
 
 void ttchamp_state::pic_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-//  printf("%06x: write to PIC %04x (%04x) (%d)\n", m_maincpu->pc(),data,mem_mask, m_picmodex);
+//  logerror("%06x: write to PIC %04x (%04x) (%d)\n", m_maincpu->pc(),data,mem_mask, m_picmodex);
 	if (m_picmodex == picmode::IDLE)
 	{
 		if (data == 0x11)
 		{
 			m_picmodex = picmode::SET_READADDRESS;
-//          printf("state = SET_READADDRESS\n");
+//          logerror("state = SET_READADDRESS\n");
 		}
 		else if (data == 0x12)
 		{
 			m_picmodex = picmode::SET_WRITELATCH;
-//          printf("latch write data.. \n" );
+//          logerror("latch write data.. \n" );
 		}
 		else if (data == 0x20)
 		{
 			m_picmodex = picmode::SET_WRITEADDRESS;
-//          printf("state = picmode::SET_WRITEADDRESS\n");
+//          logerror("state = picmode::SET_WRITEADDRESS\n");
 		}
 		else if (data == 0x21) // write latched data
 		{
 			m_picmodex = picmode::IDLE;
 			m_bakram[m_pic_writeaddr] = m_pic_writelatched;
-	//      printf("wrote %02x to %02x\n", m_pic_writelatched, m_pic_writeaddr);
+	//      logerror("wrote %02x to %02x\n", m_pic_writelatched, m_pic_writeaddr);
 		}
 		else if (data == 0x22) // next data to latch
 		{
@@ -328,12 +328,12 @@ void ttchamp_state::pic_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			// address by 1 to give correct results? maybe it can read 'previous' data' too?
 			m_pic_latched = m_bakram[m_pic_readaddr>>1];
 
-//          printf("latch read data %02x from %02x\n",m_pic_latched, m_pic_readaddr );
+//          logerror("latch read data %02x from %02x\n",m_pic_latched, m_pic_readaddr );
 			m_picmodex = picmode::SET_READLATCH; // waiting to read...
 		}
 		else
 		{
-//          printf("unknown\n");
+//          logerror("unknown\n");
 		}
 	}
 	else if (m_picmodex == picmode::SET_READADDRESS)
@@ -368,7 +368,7 @@ uint16_t ttchamp_state::mem_r(offs_t offset)
 		vram = m_videoram2;
 	else
 	{
-		printf("unhandled video bank %02x\n", m_port10);
+		logerror("unhandled video bank %02x\n", m_port10);
 		vram = m_videoram2;
 	}
 
@@ -403,14 +403,14 @@ void ttchamp_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		vram = m_videoram2;
 	else
 	{
-		printf("unhandled video bank %02x\n", m_port10);
+		logerror("unhandled video bank %02x\n", m_port10);
 		vram = m_videoram2;
 	}
 
 
 	if (m_spritesinit == 1)
 	{
-	//  printf("%06x: spider_blitter_w %08x %04x %04x (init?) (base?)\n", m_maincpu->pc(), offset * 2, data, mem_mask);
+	//  logerror("%06x: spider_blitter_w %08x %04x %04x (init?) (base?)\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 
 		m_spritesinit = 2;
 		m_spritesaddr = offset;
@@ -418,9 +418,9 @@ void ttchamp_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 	else if (m_spritesinit == 2)
 	{
-	//  printf("%06x: spider_blitter_w %08x %04x %04x (init2) (width?)\n", m_maincpu->pc(), offset * 2, data, mem_mask);
+	//  logerror("%06x: spider_blitter_w %08x %04x %04x (init2) (width?)\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 		m_spriteswidth = offset & 0xff;
-		//printf("%08x\n",(offset*2) & 0xfff00);
+		//logerror("%08x\n",(offset*2) & 0xfff00);
 
 		m_spritesinit = 3;
 	}
@@ -438,7 +438,7 @@ void ttchamp_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		{
 			if(m_spritesinit != 3)
 			{
-				printf("blitter bus write but blitter unselected? %08x %04x\n",offset*2,data);
+				logerror("blitter bus write but blitter unselected? %08x %04x\n",offset*2,data);
 				return;
 			}
 
@@ -452,7 +452,7 @@ void ttchamp_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			if (m_rombank)
 				src += 0x100000;
 
-		//  printf("%06x: spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", m_maincpu->pc(), offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
+		//  logerror("%06x: spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", m_maincpu->pc(), offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
 			offset &= 0x7fff;
 
 			for (int i = 0; i < m_spriteswidth; i++)
@@ -496,7 +496,7 @@ void ttchamp_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		else
 		{
 			// sometimes happens, why? special meanings? wrong interpretation of something else?
-			printf("%06x: spider_blitter_w unhandled RAM access %08x %04x %04x\n", m_maincpu->pc(), offset * 2, data, mem_mask);
+			logerror("%06x: spider_blitter_w unhandled RAM access %08x %04x %04x\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 		}
 	}
 }
@@ -535,14 +535,14 @@ void ttchamp_state::port10_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 /* selects upper bank for the blitter */
 void ttchamp_state::port20_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	//printf("%06x: port20_w %04x %04x\n", m_maincpu->pc(), data, mem_mask);
+	//logerror("%06x: port20_w %04x %04x\n", m_maincpu->pc(), data, mem_mask);
 	m_rombank = 1;
 }
 
 /* selects lower bank for the blitter */
 void ttchamp_state::port62_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	//printf("%06x: port62_w %04x %04x\n", m_maincpu->pc(), data, mem_mask);
+	//logerror("%06x: port62_w %04x %04x\n", m_maincpu->pc(), data, mem_mask);
 	m_rombank = 0;
 }
 

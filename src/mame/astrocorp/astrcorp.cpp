@@ -2181,9 +2181,7 @@ RAM1 are SEC KM681000BLG-7L RAM chips
 ***************************************************************************/
 
 ROM_START( skilldrp )
-	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "7-skill_drop_g1.01s.u100", 0x00000, 0x40000, CRC(8867df18) SHA1(19ad0104647b6f5c8b6c06749c24defdcacfd54d) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
@@ -2197,9 +2195,7 @@ ROM_START( skilldrp )
 ROM_END
 
 ROM_START( skilldrp_g10s )
-	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "7-skill_drop_g1.0s.u100", 0x00000, 0x40000, CRC(f968b783) SHA1(1d693b1d460e659ca94aae8625ea26e120053f84) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
@@ -2213,9 +2209,7 @@ ROM_START( skilldrp_g10s )
 ROM_END
 
 ROM_START( luckycoin )
-	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "u100", 0x00000, 0x40000, CRC(77bbeebc) SHA1(45f5a18694e2a93d9c299dc1f405df32c9773ce6) ) // label was peeled off
 
 	ROM_REGION( 0x200000, "sprites", 0 )
@@ -4619,7 +4613,7 @@ void astoneag_state::interleave_sprites_16x32()
 //     YEAR   NAME             PARENT    MACHINE          INPUTS          STATE            INIT            ROT   COMPANY                         FULLNAME                                        FLAGS                                                                               LAYOUT
 
 // unencrypted
-GAME(  1999,  luckys99,        0,        luckys99,        luckys99,       astrocorp_state, init_showhand,  ROT0, "Astro Corp.",                  "Lucky Spin 1999 (Ver. A.1)",                   MACHINE_SUPPORTS_SAVE )
+GAME(  1999,  luckys99,        0,        luckys99,        luckys99,       astrocorp_state, init_showhand,  ROT0, "Astro Corp.",                  "Lucky Spin 1999 (Ver. A.1)",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAMEL( 2000,  showhand,        0,        showhand,        showhand,       astrocorp_state, init_showhand,  ROT0, "Astro Corp.",                  "Show Hand (Italy)",                            MACHINE_SUPPORTS_SAVE,                                                              layout_showhand  )
 GAMEL( 2000,  showhandc,       showhand, showhandc,       showhandc,      astrocorp_state, init_showhandc, ROT0, "Astro Corp.",                  "Wangpai Duijue (China)",                       MACHINE_SUPPORTS_SAVE,                                                              layout_showhandc  )
 GAMEL( 2002,  skilldrp,        0,        skilldrp,        skilldrp,       astrocorp_state, empty_init,     ROT0, "Astro Corp.",                  "Skill Drop Georgia (Ver. G1.01S, Oct 1 2002)", MACHINE_SUPPORTS_SAVE,                                                              layout_skilldrp  ) // Oct  1 2002 09:42:32

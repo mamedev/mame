@@ -5,27 +5,33 @@
 
 Fidelity SC9, Fidelity Playmatic "S"
 
+3 versions were available, the newest "B" version was ~2MHz and included the
+Budapest program. The Playmatic S was only released in Germany, it's basically
+a 'deluxe' version of SC9 with magnet sensors and came with CB9 and CB16.
+
 TODO:
-- fscc9ps module switch and led
-- verify fscc9ps XTAL (checked against sound recording, 99.97% similarity)
+- fscc9ps module switch and led (the switch simply disconnects voltage)
 
 Hardware notes:
 
-Fidelity Sensory Chess Challenger "9" (SC9) overview:
+Fidelity Sensory Chess Challenger "9" rev. C:
 - PCB label: 510-1046C01 2-1-82
-- R6502-13, 1.4MHz from resonator, another pcb with the same resonator was measured 1.49MHz*
+- R6502-13, ~1.5MHz (no XTAL, clock from RC circuit)
 - 2KB RAM(TMM2016P), 2*8KB ROM(HN48364P)
 - 36-pin edge connector, assume same as SC12
 - 8*(8+1) buttons, 8*8+1 LEDs
 
-*: 2 other boards were measured 1.60MHz and 1.88MHz(newest serial). Online references
-suggest 3 versions of SC9(C01) total: 1.5MHz, 1.6MHz, and 1.9MHz.
+CPU frequency measurements from 4 SC9s were 1.4MHz, 1.49MHz, 1.6MHz, and 1.88MHz.
+The first three have the same R/C circuit. The higher speed one may have been a
+fluke, or it was overclock (it was not a rev. D PCB).
 
-I/O is via TTL, not further documented here
+Playmatic S is on the same PCB with some wire mods. The R/C circuit is similar,
+two 680pf capacitors where SC9 has one (340pf, effectively twice as fast). Also
+seen with what looks like a 3MHz resonator. Measurements from 3 separate Playmatics
+were 2.82MHz, 2.89MHz, and 2.93Mhz, the latter one has the resonator.
 
-3 versions were available, the newest "B" version was 2MHz and included the Budapest
-program. The Playmatic S was only released in Germany, it's basically a 'deluxe'
-version of SC9 with magnet sensors and came with CB9 and CB16.
+The newest SC9 on the 510-1046D01 PCB has a 3.9MHz resonator. Older SC9 versions
+won't work on this PCB.
 
 ================================================================================
 
@@ -41,7 +47,7 @@ Known modules (*denotes undumped):
 - *TDF: Tarrasch Defence to the Queen's Gambit
 
 The edge connector has D0-D7, A0-A13, 2 chip select lines, read/write lines, IRQ
-line. IRQ and write strobe are unused. Maximum known size is 16KB.
+line. IRQ and write strobe aren't used by modules. Maximum known size is 16KB.
 
 *******************************************************************************/
 
@@ -83,8 +89,6 @@ public:
 	void sc9d(machine_config &config);
 	void playmatic(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(sc9c_change_cpu_freq);
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
@@ -114,13 +118,6 @@ void sc9_state::machine_start()
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
-}
-
-INPUT_CHANGED_MEMBER(sc9_state::sc9c_change_cpu_freq)
-{
-	// SC9(C01) was released with 1.5MHz, 1.6MHz, or 1.9MHz CPU
-	static const u32 freq[3] = { 1'500'000, 1'600'000, 1'900'000 };
-	m_maincpu->set_unscaled_clock(freq[newval % 3]);
 }
 
 
@@ -214,16 +211,6 @@ static INPUT_PORTS_START( sc9 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("RE")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( sc9c )
-	PORT_INCLUDE( sc9 )
-
-	PORT_START("CPU")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sc9_state::sc9c_change_cpu_freq), 0) // factory set
-	PORT_CONFSETTING(    0x00, "1.5MHz" )
-	PORT_CONFSETTING(    0x01, "1.6MHz" )
-	PORT_CONFSETTING(    0x02, "1.9MHz" )
-INPUT_PORTS_END
-
 
 
 /*******************************************************************************
@@ -262,7 +249,7 @@ void sc9_state::sc9b(machine_config &config)
 	sc9d(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(1'500'000); // from ceramic resonator "681 JSA", measured
+	m_maincpu->set_clock(1'500'000); // no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc9_state::sc9_map);
 }
 
@@ -271,7 +258,7 @@ void sc9_state::playmatic(machine_config &config)
 	sc9b(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(5.626_MHz_XTAL / 2); // advertised as double the speed of SC9
+	m_maincpu->set_clock(3_MHz_XTAL); // advertised as double the speed of SC9
 	m_board->set_type(sensorboard_device::MAGNETS);
 
 	config.set_default_layout(layout_fidel_playmatic);
@@ -301,7 +288,7 @@ ROM_START( fscc9c ) // PCB label 510-1046C01
 	ROM_LOAD("101-1034b02", 0xe000, 0x2000, CRC(cbaf97d7) SHA1(7ed8e68bb74713d9e2ff1d9c037012320b7bfcbf) ) // "
 ROM_END
 
-ROM_START( fscc9ps )
+ROM_START( fscc9ps ) // PCB label 510-1046C01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("c_green", 0xc000, 0x2000, CRC(e96aa95d) SHA1(16d90cf0ef166aef579d442671290a2c43e24dfe) )
 	ROM_LOAD("e_green", 0xe000, 0x2000, CRC(d7a95999) SHA1(27c19bc56a15f1ac78177683441e04f27c6e48ef) )
@@ -318,5 +305,5 @@ ROM_END
 //    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1982, fscc9,   0,      0,      sc9d,      sc9,   sc9_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. D)", MACHINE_SUPPORTS_SAVE ) // aka version "B"
 SYST( 1982, fscc9b,  fscc9,  0,      sc9b,      sc9,   sc9_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. B)", MACHINE_SUPPORTS_SAVE )
-SYST( 1982, fscc9c,  fscc9,  0,      sc9b,      sc9c,  sc9_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. C)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, fscc9c,  fscc9,  0,      sc9b,      sc9,   sc9_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. C)", MACHINE_SUPPORTS_SAVE )
 SYST( 1983, fscc9ps, fscc9,  0,      playmatic, sc9,   sc9_state, empty_init, "Fidelity Deutschland", "Sensory 9 Playmatic S", MACHINE_SUPPORTS_SAVE ) // 9 is not between quotation marks here

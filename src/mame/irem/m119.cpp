@@ -131,7 +131,7 @@ ROM_START( scumimon )
 	ROM_LOAD16_BYTE( "scu1.b-c1.ic2", 0x000001, 0x200000, CRC(adff81ba) SHA1(a176b9ab5b2f47abb89e817699d742dbf876a4c7) )
 
 	ROM_REGION(0x200000, "ymz", 0)
-	ROM_LOAD( "scu1.a-v0-.ic35", 0x000000, 0x100000, CRC(819e4bbd) SHA1(e0ca76a7b97b05bbffdb96866a8bdd460fc589b2) ) // FIXED BITS (xxxxxxxxxxxxx1xx)
+	ROM_LOAD( "scu1.a-v0-.ic35", 0x000000, 0x100000, CRC(ef52018d) SHA1(c64a8d1ce2f753ad100bb2fd04498a3f56c895c7) )
 
 	// TODO: 2x PLDs once identified
 ROM_END

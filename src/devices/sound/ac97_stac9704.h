@@ -6,8 +6,8 @@
 #pragma once
 
 class ac97_stac9704_device : public device_t
-                           , public device_mixer_interface
-                           , public device_memory_interface
+						   , public device_mixer_interface
+						   , public device_memory_interface
 {
 public:
 	ac97_stac9704_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -18,6 +18,8 @@ public:
 	u32 codec_write_r(offs_t offset, u32 mem_mask = ~0);
 	void codec_read_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 codec_read_r(offs_t offset, u32 mem_mask = ~0);
+	void codec_command_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 codec_status_r(offs_t offset, u32 mem_mask = ~0);
 
 protected:
 	ac97_stac9704_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

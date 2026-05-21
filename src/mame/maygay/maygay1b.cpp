@@ -308,8 +308,8 @@ void maygay1b_state::reel12_w(uint8_t data)
 	m_reels[0]->update( data     & 0x0F);
 	m_reels[1]->update((data>>4) & 0x0F);
 
-	awp_draw_reel(machine(),"reel1", *m_reels[0]);
-	awp_draw_reel(machine(),"reel2", *m_reels[1]);
+	m_reels[0]->draw();
+	m_reels[1]->draw();
 }
 
 void maygay1b_state::reel34_w(uint8_t data)
@@ -317,8 +317,8 @@ void maygay1b_state::reel34_w(uint8_t data)
 	m_reels[2]->update( data     & 0x0F);
 	m_reels[3]->update((data>>4) & 0x0F);
 
-	awp_draw_reel(machine(),"reel3", *m_reels[2]);
-	awp_draw_reel(machine(),"reel4", *m_reels[3]);
+	m_reels[2]->draw();
+	m_reels[3]->draw();
 }
 
 void maygay1b_state::reel56_w(uint8_t data)
@@ -326,8 +326,8 @@ void maygay1b_state::reel56_w(uint8_t data)
 	m_reels[4]->update( data     & 0x0F);
 	m_reels[5]->update((data>>4) & 0x0F);
 
-	awp_draw_reel(machine(),"reel5", *m_reels[4]);
-	awp_draw_reel(machine(),"reel6", *m_reels[5]);
+	m_reels[4]->draw();
+	m_reels[5]->draw();
 }
 
 uint8_t maygay1b_state::m1_duart_r()

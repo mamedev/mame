@@ -4,30 +4,6 @@
 
   a8sio.h - Atari 8 bit SIO bus interface
 
-
-              1 1
-      2 4 6 8 0 2
-     +-----------+
-    / o o o o o o \
-   / o o o o o o o \
-  +-----------------+
-     1 3 5 7 9 1 1
-               1 3
-
-  1 - clock in (to computer)
-  2 - clock out
-  3 - data in
-  4 - GND
-  5 - data out
-  6 - GND
-  7 - command (active low)
-  8 - motor
-  9 - proceed (active low)
- 10 - +5V/ready
- 11 - audio in
- 12 - +12V (A400/A800)
- 13 - interrupt (active low)
-
 ***************************************************************************/
 
 #ifndef MAME_BUS_A800_A8SIO_H
@@ -46,10 +22,7 @@ public:
 	a8sio_device(machine_config const &mconfig, char const *tag, device_t *owner, char const *dflt)
 		: a8sio_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		a8sio_cards(*this);
 		set_default_option(dflt);
-		set_fixed(false);
 	}
 	a8sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -76,7 +49,7 @@ public:
 protected:
 	a8sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -90,7 +63,7 @@ protected:
 	device_a8sio_card_interface *m_device;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(A8SIO, a8sio_device)
 
 

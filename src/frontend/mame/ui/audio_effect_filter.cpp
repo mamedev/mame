@@ -27,8 +27,8 @@ static constexpr u32 FL_MAX = 20000;
 
 } // anonymous namespace
 
-menu_audio_effect_filter::menu_audio_effect_filter(mame_ui_manager &mui, render_container &container, u16 chain, u16 entry, audio_effect *effect)
-	: menu(mui, container)
+menu_audio_effect_filter::menu_audio_effect_filter(mame_ui_manager &mui, render_target &target, u16 chain, u16 entry, audio_effect *effect)
+	: menu(mui, target)
 {
 	m_chain = chain;
 	m_entry = entry;
@@ -372,7 +372,7 @@ u32 menu_audio_effect_filter::flag_highpass_active() const
 {
 	u32 flag = 0;
 	if(!m_effect->isset_highpass_active())
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	if(m_effect->highpass_active())
 		flag |= FLAG_LEFT_ARROW;
 	else
@@ -384,7 +384,7 @@ u32 menu_audio_effect_filter::flag_fh() const
 {
 	u32 flag = 0;
 	if(!m_effect->isset_fh())
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	u32 f = m_effect->fh();
 	if(f > FH_MIN)
 		flag |= FLAG_LEFT_ARROW;
@@ -397,7 +397,7 @@ u32 menu_audio_effect_filter::flag_qh() const
 {
 	u32 flag = 0;
 	if(!m_effect->isset_qh())
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	u32 q = roundf(m_effect->qh() * 100.0f);
 	if(q > 10)
 		flag |= FLAG_LEFT_ARROW;
@@ -410,7 +410,7 @@ u32 menu_audio_effect_filter::flag_lowpass_active() const
 {
 	u32 flag = 0;
 	if(!m_effect->isset_lowpass_active())
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	if(m_effect->lowpass_active())
 		flag |= FLAG_LEFT_ARROW;
 	else
@@ -422,7 +422,7 @@ u32 menu_audio_effect_filter::flag_fl() const
 {
 	u32 flag = 0;
 	if(!m_effect->isset_fl())
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	u32 f = m_effect->fl();
 	if(f > FL_MIN)
 		flag |= FLAG_LEFT_ARROW;
@@ -435,7 +435,7 @@ u32 menu_audio_effect_filter::flag_ql() const
 {
 	u32 flag = 0;
 	if(!m_effect->isset_ql())
-		flag |= FLAG_INVERT;
+		flag |= FLAG_DEEMPHASIZE;
 	u32 q = roundf(m_effect->ql() * 100.0f);
 	if(q > 10)
 		flag |= FLAG_LEFT_ARROW;

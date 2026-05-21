@@ -1125,18 +1125,16 @@ Configuration Options
 
       - ``mame.ini``
       - ``debug.ini``                       (if the debugger is enabled)
-      - ``source/``\ *<driver>*\ ``.ini``   (based on the source filename of the driver)
       - ``vertical.ini``                    (for systems with vertical monitor orientation)
       - ``horizont.ini``                    (for systems with horizontal monitor orientation)
-      - ``arcade.ini``                      (for systems in source added with ``GAME()`` macro)
-      - ``console.ini``                     (for systems in source added with ``CONS()`` macro)
-      - ``computer.ini``                    (for systems in source added with ``COMP()`` macro)
-      - ``othersys.ini``                    (for systems in source added with ``SYST()`` macro)
-      - ``vector.ini``                      (for vector systems only)
+      - ``raster.ini``                      (for raster display systems only)
+      - ``vector.ini``                      (for vector display systems only)
+      - ``lcd.ini``                         (for matrix display systems only)
+      - ``source/``\ *<driver>*\ ``.ini``   (based on the source filename of the driver)
       - *<parent>*\ ``.ini``                (for clones only, may be called recursively)
       - *<systemname>*\ ``.ini``
 
-      (See :ref:`advanced-multi-CFG` for further details)
+      (See :ref:`advanced-multicfg-order` for further details)
 
     The settings in the later INIs override those in the earlier INIs.  So, for
     example, if you wanted to disable overlay effects in the vector systems, you
@@ -3022,11 +3020,11 @@ Core Sound Options
     * - ``wasapi``
       - Windows
       - Yes
-      - Yes [#SoundWASAPIMonitoring]_
+      - Yes
       - Yes
       - Yes
     * - ``xaudio2``
-      - Windows [#SoundXAudio2OS]_
+      - Windows
       - No
       - No
       - Yes
@@ -3064,11 +3062,6 @@ Core Sound Options
 
 
 ..  rubric:: Footnotes
-
-..  [#SoundWASAPIMonitoring] MAME requires Windows 10 1703 or later to use
-    output monitoring with WASAPI.
-
-..  [#SoundXAudio2OS] MAME requires Windows 8 or later to use XAudio2.
 
 ..  [#SoundWinSDL] While SDL is not a supported option on official MAME builds
     for Windows, you can compile MAME with SDL support on Windows.
@@ -3317,7 +3310,7 @@ Core Input Options
     Generally you will want to set up the **-joystick_map** setting in the
     per-system ``<system>.ini`` file as opposed to the main ``MAME.INI``
     file so that the mapping only affects the systems you want it to.  See
-    :ref:`Multiple Configuration Files <advanced-multi-CFG>` for further
+    :ref:`Multiple Configuration Files <advanced-multicfg-order>` for further
     details on per-system configuration.
 
     Maps are defined as a string of numbers and characters. Since the grid is

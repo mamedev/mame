@@ -7,6 +7,10 @@ Syusse Oozumou
 
 Driver by Takahiro Nogi 1999/10/04
 
+TODO:
+- verify clocks, especially audiocpu
+- verify vcount chain (exact interrupt timing and vblank flag on DSW1.7)
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -14,6 +18,7 @@ Driver by Takahiro Nogi 1999/10/04
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 
@@ -56,7 +61,7 @@ private:
 	void scroll_w(uint8_t data);
 	void flipscreen_w(uint8_t data);
 
-	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -359,7 +364,7 @@ static INPUT_PORTS_START( ssozumo )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Controls ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Dual ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 INPUT_PORTS_END
 
 
@@ -398,31 +403,30 @@ static GFXDECODE_START( gfx_ssozumo )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,   8*8, 2 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(ssozumo_state::sound_timer_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(ssozumo_state::scanline)
 {
-	if (m_sound_nmi_mask)
-		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	const int scanline = param;
+
+	// guess, assume to be the same as tagteam and matmania
+	if (m_sound_nmi_mask && scanline < 256)
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void ssozumo_state::ssozumo(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 1'200'000); // 1.2 MHz ????
+	M6502(config, m_maincpu, 12_MHz_XTAL / 8); // 1.5 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssozumo_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(ssozumo_state::irq0_line_hold));
 
-	M6502(config, m_audiocpu, 975'000);         // 975 kHz ??
+	M6502(config, m_audiocpu, 975'000); // 975 kHz? (1MHz sounds wrong compared to PCB video)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ssozumo_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(ssozumo_state::sound_timer_irq), attotime::from_hz(272 / 16 * 57)); // guess, assume to be the same as tagteam
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(ssozumo_state::scanline), "screen", 8, 16);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-//  screen.set_size(32*8, 32*8);
-//  screen.set_visarea(0*8, 32*8 - 1, 1*8, 31*8 - 1);
-	// DECO video CRTC, unverified
-	screen.set_raw(XTAL(12'000'000) / 2, 384, 0, 256, 272, 8, 248);
+	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 8, 248); // DECO video CRTC, unverified
 	screen.set_screen_update(FUNC(ssozumo_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -434,10 +438,10 @@ void ssozumo_state::ssozumo(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
 
-	YM2149(config, "ay1", 1'500'000).add_route(ALL_OUTPUTS, "speaker", 0.3);
-	YM2149(config, "ay2", 1'500'000).add_route(ALL_OUTPUTS, "speaker", 0.3);
+	YM2149(config, "ay1", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.3); // 1.5MHz
+	YM2149(config, "ay2", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.3); // 1.5MHz
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
 }
 
 

@@ -1484,6 +1484,8 @@ void crusnexo_state::crusnexo(machine_config &config)
 	midzeus2(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &crusnexo_state::crusnexo_map);
 
+	m_zeus->set_system_type(zeus2_device::CRUSNEXO);
+
 	m_ioasic->set_upper(472 /* or 476,477,478,110 */ );
 }
 
@@ -1491,6 +1493,8 @@ void thegrid_state::thegrid(machine_config &config)
 {
 	midzeus2(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &thegrid_state::thegrid_map);
+
+	m_zeus->set_system_type(zeus2_device::THEGRID);
 
 	PIC16C57(config, "pic", 8000000).set_disable(); // unverified clock, not hooked up
 	m_ioasic->set_upper(474 /* or 491 */ );
