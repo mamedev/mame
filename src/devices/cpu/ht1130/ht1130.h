@@ -148,6 +148,10 @@ protected:
 	u32 m_sound_pos;
 	s32 m_sound_signal;
 	u32 m_sound_rand;
+
+	// sound: LFSR-state -> frequency-divisor lookup, built at start
+	u8 m_lfsr2div[128];
+	void build_lfsr_div_table();
 };
 
 class ht1190_device : public ht1130_device

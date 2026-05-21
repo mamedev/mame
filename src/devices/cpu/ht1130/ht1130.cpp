@@ -24,15 +24,6 @@ TODO:
 #define VERBOSE (LOG_UNHANDLED_OPS)
 #include "logmacro.h"
 
-// 7-bit LFSR to divisor table from BrickEmuPy
-static const u8 ht1130_lfsr2div[128] = {
-	0, 2, 123, 3, 124, 75, 117, 4, 125, 101, 111, 76, 118, 42, 69, 5, 126, 66, 63, 102, 112, 86, 36, 77, 119,
-	21, 95, 43, 70, 25, 105, 6, 127, 115, 99, 67, 64, 34, 19, 103, 113, 17, 15, 87, 37, 55, 89, 78, 120, 39,
-	60, 22, 96, 52, 57, 44, 71, 91, 30, 26, 106, 47, 80, 7, 1, 122, 74, 116, 100, 110, 41, 68, 65, 62, 85, 35,
-	20, 94, 24, 104, 114, 98, 33, 18, 16, 14, 54, 88, 38, 59, 51, 56, 90, 29, 46, 79, 121, 73, 109, 40, 61, 84,
-	93, 23, 97, 32, 13, 53, 58, 50, 28, 45, 72, 108, 83, 92, 31, 12, 49, 27, 107, 82, 11, 48, 81, 10, 9, 8
-};
-
 // device type definitions
 DEFINE_DEVICE_TYPE(HT1130, ht1130_device, "ht1130", "Holtek HT1130")
 DEFINE_DEVICE_TYPE(HT1190, ht1190_device, "ht1190", "Holtek HT1190")
@@ -107,7 +98,7 @@ void ht1130_device::sound_stream_update(sound_stream &stream)
 		return;
 	}
 
-	u32 div = ht1130_lfsr2div[note & 0x7f];
+	u32 div = m_lfsr2div[note & 0x7f];
 	if (div == 0)
 	{
 		stream.fill(0, 0);
@@ -128,7 +119,7 @@ void ht1130_device::sound_stream_update(sound_stream &stream)
 
 			if (noise)
 			{
-				m_sound_rand = (m_sound_rand << 1) | (((m_sound_rand >> 14) ^ (m_sound_rand >> 13)) & 1);
+				m_sound_rand = ((m_sound_rand << 1) | (((m_sound_rand >> 14) ^ (m_sound_rand >> 13)) & 1)) & 0x7fff;
 			}
 		}
 
@@ -263,6 +254,27 @@ void ht1190_device::internal_data_map_ht1190(address_map &map)
 	map(0xb0, 0xff).ram().w(FUNC(ht1190_device::displayram_w)).share(m_displayram);
 }
 
+void ht1130_device::build_lfsr_div_table()
+{
+	// The HT1130 melody generator uses a 7-bit Fibonacci LFSR as its
+	// programmable frequency divider.  A note byte holds an LFSR state; the
+	// audible divisor is that state's index within the LFSR sequence.
+	std::fill(std::begin(m_lfsr2div), std::end(m_lfsr2div), 0);
+
+	u8 state = 0x40; // sequence seed: this state has divisor 1
+	for (unsigned pos = 1; pos <= 127; pos++)
+	{
+		m_lfsr2div[state] = u8(pos);
+
+		// advance 7-bit LFSR: shift left, feed in bit6 XOR bit0
+		const u8 feedback = ((state >> 6) ^ state) & 1;
+		state = u8(((state << 1) | feedback) & 0x7f);
+	}
+
+	// m_lfsr2div[0] intentionally left 0: the all-zero LFSR state is
+	// unreachable, and note value 0 is handled as silence before lookup.
+}
+
 void ht1130_device::init_lcd(u8 compins)
 {
 	m_lcd_timer = timer_alloc(FUNC(ht1130_device::update_lcd), this);
@@ -341,6 +353,8 @@ void ht1130_device::init_common()
 	m_sound_pos = 0;
 	m_sound_signal = 0;
 	m_sound_rand = 1;
+
+	build_lfsr_div_table();
 
 	// savestates
 	save_item(NAME(m_pc));
@@ -1135,7 +1149,7 @@ void ht1130_device::do_op()
 		m_sound_on = true;
 		m_sound_pos = 0;
 		u8 speed_idx = (m_sound_speed_div && m_sound_speed_div.found() && m_sound_speed_div.bytes() > 0) ? m_sound_speed_div[m_sound_channel % m_sound_speed_div.bytes()] : 1;
-		m_sound_clock_counter = (u32)ht1130_lfsr2div[speed_idx & 0x7f] * m_sound_freq_div * 16;
+		m_sound_clock_counter = (u32)m_lfsr2div[speed_idx & 0x7f] * m_sound_freq_div * 16;
 		return;
 	}
 
@@ -1167,7 +1181,7 @@ void ht1130_device::do_op()
 		m_sound_on = true;
 		m_sound_pos = 0;
 		u8 speed_idx = (m_sound_speed_div && m_sound_speed_div.found() && m_sound_speed_div.bytes() > 0) ? m_sound_speed_div[m_sound_channel % m_sound_speed_div.bytes()] : 1;
-		m_sound_clock_counter = (u32)ht1130_lfsr2div[speed_idx & 0x7f] * m_sound_freq_div * 16;
+		m_sound_clock_counter = (u32)m_lfsr2div[speed_idx & 0x7f] * m_sound_freq_div * 16;
 		return;
 	}
 
@@ -1245,7 +1259,7 @@ void ht1130_device::execute_run()
 				if (m_sound_on)
 				{
 					u8 speed_idx = (m_sound_speed_div && m_sound_speed_div.found() && m_sound_speed_div.bytes() > 0) ? m_sound_speed_div[m_sound_channel % m_sound_speed_div.bytes()] : 1;
-					m_sound_clock_counter = (u32)ht1130_lfsr2div[speed_idx & 0x7f] * m_sound_freq_div * 16;
+					m_sound_clock_counter = (u32)m_lfsr2div[speed_idx & 0x7f] * m_sound_freq_div * 16;
 				}
 			}
 			else
