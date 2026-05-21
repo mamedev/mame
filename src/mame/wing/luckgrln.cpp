@@ -737,7 +737,8 @@ static INPUT_PORTS_START( _7smash )
 	PORT_DIPSETTING(    0x00, "D" )
 	PORT_DIPSETTING(    0x20, "C" )
 	PORT_DIPSETTING(    0x40, "B" )
-	PORT_DIPSETTING(    0x60, "A" ) // inputs and layout are for this Panel Type only, ToDo: expand with conditional inputs
+	PORT_DIPSETTING(    0x60, "A" ) // inputs and layout are for this Panel Type only
+	// TODO: expand with conditional inputs
 	PORT_DIPNAME( 0x80, 0x80, "Alt. Test" )       PORT_DIPLOCATION("DSW2:8") // not shown on test screen
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

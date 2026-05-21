@@ -1,4 +1,5 @@
 // license:BSD-3-Clause
+// copyright-holders: Stuart Inglis
 
 // 6502 interruptible access unit test
 
@@ -30,7 +31,8 @@ private:
 		PHASE_OPERAND_LO,
 		PHASE_OPERAND_HI,
 		PHASE_DATA,
-		PHASE_NEXT_FETCH
+		PHASE_NEXT_FETCH,
+		PHASE_FINISHED
 	};
 
 	required_device<m6502_device> m_maincpu;
@@ -47,7 +49,6 @@ private:
 	u16 m_last_read_address = 0;
 	u8 m_last_read_data = 0;
 	phase m_phase = PHASE_RESET_LO;
-	bool m_finished = false;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -134,15 +135,19 @@ void utm6502_state::observe_read(offs_t offset, u8 data)
 	case PHASE_NEXT_FETCH:
 		if ((cycle != (m_opcode_cycle + 6)) || (offset != 0xc003) || (data != 0xea))
 			fail("expected next opcode fetch at opcode+6");
-		m_finished = true;
-		throw emu_fatalerror(0, "PASS");
+		m_phase = PHASE_FINISHED;
+		break;
+
+	case PHASE_FINISHED:
+		osd_printf_info("PASS\n");
+		machine().schedule_exit();
+		break;
 	}
 }
 
 
 void utm6502_state::fail(char const *message)
 {
-	m_finished = true;
 	throw emu_fatalerror(
 			"%s; phase=%s delay_hits=%u delay0=%u delay1=%u last=%u:%04X:%02X opcode=%u",
 			message,
@@ -168,6 +173,7 @@ char const *utm6502_state::phase_name() const
 	case PHASE_OPERAND_HI: return "OPERAND_HI";
 	case PHASE_DATA:       return "DATA";
 	case PHASE_NEXT_FETCH: return "NEXT_FETCH";
+	case PHASE_FINISHED:   return "FINISHED";
 	}
 
 	return "UNKNOWN";
@@ -176,7 +182,7 @@ char const *utm6502_state::phase_name() const
 
 TIMER_CALLBACK_MEMBER(utm6502_state::slice_tick)
 {
-	if (!m_finished && ((m_maincpu->total_cycles() - m_base_cycle) > 32))
+	if ((m_maincpu->total_cycles() - m_base_cycle) > 32)
 		fail("timed out waiting for expected read sequence");
 }
 
@@ -202,7 +208,6 @@ void utm6502_state::machine_start()
 	save_item(NAME(m_delay_hits));
 	save_item(NAME(m_last_read_address));
 	save_item(NAME(m_last_read_data));
-	save_item(NAME(m_finished));
 }
 
 
@@ -218,7 +223,6 @@ void utm6502_state::machine_reset()
 	m_last_read_address = 0;
 	m_last_read_data = 0;
 	m_phase = PHASE_RESET_LO;
-	m_finished = false;
 
 	m_ram[0xc000] = 0xad; // LDA $1234
 	m_ram[0xc001] = 0x34;

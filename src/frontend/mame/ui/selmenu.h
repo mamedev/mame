@@ -125,7 +125,7 @@ protected:
 		static bool         s_reselect;
 	};
 
-	menu_select_launch(mame_ui_manager &mui, render_container &container, bool is_swlist);
+	menu_select_launch(mame_ui_manager &mui, render_target &target, bool is_swlist);
 
 	focused_menu get_focus() const { return m_focus; }
 
@@ -243,7 +243,7 @@ private:
 		bitmap_vector const &toolbar_bitmaps() { return m_toolbar_bitmaps; }
 		texture_ptr_vector const &toolbar_textures() { return m_toolbar_textures; }
 
-		void cache_toolbar(running_machine &machine, float width, float height);
+		void cache_toolbar(running_machine &machine, render_target &target, float width, float height);
 
 	private:
 		bitmap_ptr              m_snapx_bitmap;
@@ -393,7 +393,7 @@ private:
 
 	static void make_audit_fail_text(std::ostream &str, media_auditor const &auditor, media_auditor::summary summary);
 	static void launch_system(mame_ui_manager &mui, game_driver const &driver, ui_software_info const *swinfo, std::string const *part, int const *bios);
-	static bool select_part(mame_ui_manager &mui, render_container &container, software_info const &info, ui_software_info const &ui_info);
+	static bool select_part(mame_ui_manager &mui, render_target &target, software_info const &info, ui_software_info const &ui_info);
 	static bool has_multiple_bios(ui_software_info const &swinfo, s_bios &biosname);
 	static bool has_multiple_bios(game_driver const &driver, s_bios &biosname);
 

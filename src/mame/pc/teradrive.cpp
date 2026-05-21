@@ -377,8 +377,8 @@ isa16_wd90c10_romless_device::isa16_wd90c10_romless_device(const machine_config 
 void isa16_wd90c10_romless_device::device_add_mconfig(machine_config &config)
 {
 	isa16_wd90c11_lr_device::device_add_mconfig(config);
-	// unknown source, assume standard NTSC (divided internally)
-	// tested in Video mode
+	// clocked thru WD90C61-JE dual clock generator, assume standard NTSC (divided internally)
+	// tested in Video mode DIP
 	m_vga->set_vclk2(14'318'181);
 }
 
@@ -750,7 +750,6 @@ void teradrive_state::md_z80_map(address_map &map)
 			address_space &space68k = m_md68kcpu->space();
 			u8 ret = space68k.read_byte(m_z80_main_address + offset);
 			return ret;
-
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			address_space &space68k = m_md68kcpu->space();

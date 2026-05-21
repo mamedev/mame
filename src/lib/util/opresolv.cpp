@@ -57,7 +57,7 @@ option_resolution::option_resolution(const option_guide &guide)
 			}
 
 			// set the range
-			entry.set_enum_value_range(enum_value_begin, enum_value_end);
+			entry.set_enum_value_range(&*enum_value_begin, &*enum_value_end);
 		}
 	}
 }

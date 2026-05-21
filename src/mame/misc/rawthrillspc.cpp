@@ -74,9 +74,9 @@ void rawthrillspc_state::rawthrillspc(machine_config &config)
 
 #define OPTIPLEX740_BIOS \
 	ROM_REGION32_LE( 0x20000, "bios", 0 ) \
-	ROM_SYSTEM_BIOS( 0, "122", "v1.2.2" ) \
+	ROM_SYSTEM_BIOS( 0, "v122", "v1.2.2" ) \
 	ROMX_LOAD( "1.2.2_4m.bin", 0x00000, 0x20000, CRC(43d5b4c8) SHA1(6307050961da5d647ca2fa787fd67c5ac9c690c9), ROM_BIOS(0) ) \
-	ROM_SYSTEM_BIOS( 1, "104", "v1.0.3" ) \
+	ROM_SYSTEM_BIOS( 1, "v104", "v1.0.4" ) \
 	ROMX_LOAD( "1.0.4_4m.bin", 0x00000, 0x20000, CRC(73f0420b) SHA1(4821d21d2c75084062cb1047eb08b1b3ab2424e1), ROM_BIOS(1) )
 
 ROM_START( gtrhroac )

@@ -97,7 +97,7 @@ private:
 	required_device<z80scc_device> m_scc;
 	optional_device<rtc3430042_device> m_rtc;
 	optional_device<egret_device> m_egret;
-	optional_ioport m_config;
+	required_ioport m_config;
 
 	void set_via2_interrupt(int value);
 	void field_interrupts();
@@ -336,12 +336,12 @@ void maciici_state::via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint8_t maciici_state::via_in_a()
 {
-	return 0xc7; // IIci: PA6 | PA2 | PA1
+	return 0xc6 | BIT(m_config->read(), 1); // IIci: PA6 | PA2 | PA1
 }
 
 uint8_t maciici_state::via_in_a_iisi()
 {
-	return 0x97; // IIci: PA4 | PA2 | PA1
+	return 0x96 | BIT(m_config->read(), 1); // IIsi: PA4 | PA2 | PA1
 }
 
 uint8_t maciici_state::via_in_b()
@@ -502,6 +502,11 @@ void maciici_state::devsel_w(uint8_t devsel)
 }
 
 static INPUT_PORTS_START(maciici)
+	PORT_START("config")
+	PORT_DIPUNUSED(0x01, IP_ACTIVE_LOW);
+	PORT_CONFNAME(0x02, 0x02, "Diagnostic mode")
+	PORT_CONFSETTING(0x02, "Disabled")
+	PORT_CONFSETTING(0x00, "Enabled")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(maciisi)
@@ -509,6 +514,10 @@ static INPUT_PORTS_START(maciisi)
 	PORT_CONFNAME(0x01, 0x00, "FPU")
 	PORT_CONFSETTING(0x00, "No FPU")
 	PORT_CONFSETTING(0x01, "FPU Present")
+
+	PORT_CONFNAME(0x02, 0x02, "Diagnostic mode")
+	PORT_CONFSETTING(0x02, "Disabled")
+	PORT_CONFSETTING(0x00, "Enabled")
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -535,21 +544,21 @@ void maciici_state::maciixi_base(machine_config &config)
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(FUNC(maciici_state::scc_irq_w));
-	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
-	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
 
-	rs232_port_device &rs232a(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
 	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 
-	rs232_port_device &rs232b(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	rs232_port_device &rs232b(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
 	SPEAKER(config, "speaker", 2).front();
-	ASC(config, m_asc, C15M, asc_device::asc_type::ASC);
+	ASC(config, m_asc, C15M);
 	m_asc->irqf_callback().set(m_rbv, FUNC(rbv_device::asc_irq_w));
 	m_asc->add_route(0, "speaker", 1.0, 0);
 	m_asc->add_route(1, "speaker", 1.0, 1);

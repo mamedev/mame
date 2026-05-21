@@ -11,8 +11,8 @@ TODO:
 - complete I/Os (BMC-A00211 PCB has 4 banks of DIPs but only 1 is hooked up?);
 - Identify what's on $600000 & $620000;
 - Uses tas opcode to sync to irq, from VDP?
-- magkengo: doesn't boot, same as popobear would do without the 0x620000 work-around, but it doesn't
-  read there.
+- magkengo: doesn't boot, expects $530000 bit 7 to be low but then doesn't upload any
+  meaningful GFX (different bpp? qiwang does the same checks);
 - qiwang: uses unhandled GFX features, needs correct I/O
 
 ===================================================================================================

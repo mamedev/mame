@@ -223,7 +223,8 @@ void minicom_state::init_minicom()
 void minicom_state::minicom(machine_config &config)
 {
 	/* basic machine hardware */
-	I87C52(config, m_maincpu, XTAL(10'000'000)); /*FIX-ME: verify the correct clock frequency */
+	// FIXME: verify the correct clock frequency
+	I87C52(config, m_maincpu, XTAL(10'000'000));
 	m_maincpu->port_out_cb<0>().set(FUNC(minicom_state::i87c52_p0_w));
 	m_maincpu->port_in_cb<1>().set(FUNC(minicom_state::i87c52_p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(minicom_state::i87c52_p1_w));

@@ -93,7 +93,7 @@ public:
 	//! This checks if the file has the proper extension for this format.
 	//! @param file_name
 	//! @returns true if file matches the extension.
-	bool extension_matches(const char *file_name) const;
+	bool extension_matches(std::string_view file_name) const noexcept;
 
 protected:
 	//! Input for convert_to_edge
@@ -376,6 +376,8 @@ protected:
 
 
 	//!  Regenerate the data for a full track.
+	//!  PC-type sectors with MFM encoding and fixed-size, with explicit start and end sectors.
+	static void get_track_data_mfm_pc_sectors(int track, int head, const floppy_image &image, int cell_size, int sector_size, int start_sector, int end_sector, uint8_t *sectdata);
 	//!  PC-type sectors with MFM encoding and fixed-size.
 	static void get_track_data_mfm_pc(int track, int head, const floppy_image &image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata);
 

@@ -21,7 +21,7 @@ namespace ui {
 class menu_main : public menu
 {
 public:
-	menu_main(mame_ui_manager &mui, render_container &container);
+	menu_main(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_main();
 
 protected:

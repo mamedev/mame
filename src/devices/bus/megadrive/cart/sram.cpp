@@ -109,7 +109,7 @@ void megadrive_rom_sram_device::time_io_map(address_map &map)
 }
 
 /*
- * Sonic 3
+ * Sonic 3 / The Curse of Illmoore Bay
  * Uses it's own (earlier?) version where bit 0 is the view select, swapped, and no write protect
  *
  */

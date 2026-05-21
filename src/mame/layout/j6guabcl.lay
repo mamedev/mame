@@ -3016,27 +3016,27 @@
 			<color red="1.0" green="1.0" blue="1.0"/>
 		</rect>
 	</element>
-	<element name="reel0" defstate="0">
+	<element name="reel0:pos" defstate="0">
 		<reel reelreversed="0" stateoffset="-5461" numsymbolsvisible="3" symbollist="GUAB(7),Grapes,Cherry(1),Triple Bar,Grapes,JPM,Cherry(3),Cashpot,Single Bar,JPM,Double Bar(2),Cherry,Grapes,Single Bar,JPM,Cherry">
 			<color red="0.0" green="0.0" blue="0.0"/>
 		</reel>
 	</element>
-	<element name="reel1" defstate="0">
+	<element name="reel1:pos" defstate="0">
 		<reel reelreversed="0" stateoffset="-5461" numsymbolsvisible="3" symbollist="GUAB,Grapes,Cherry,Triple Bar(6),Grapes,JPM,Cherry,Cashpot,Single Bar(2),JPM,Double Bar(1),Cherry,Grapes(3),Single Bar,JPM,Cherry">
 			<color red="0.0" green="0.0" blue="0.0"/>
 		</reel>
 	</element>
-	<element name="reel2" defstate="0">
+	<element name="reel2:pos" defstate="0">
 		<reel reelreversed="0" stateoffset="-5461" numsymbolsvisible="3" symbollist="GUAB,Grapes,Cherry,Triple Bar,Grapes(5),JPM,Cherry,Cashpot,Single Bar,JPM(2),Double Bar,Cherry,Grapes(1),Single Bar,JPM,Cherry(3)">
 			<color red="0.0" green="0.0" blue="0.0"/>
 		</reel>
 	</element>
-	<element name="reel3" defstate="0">
+	<element name="reel3:pos" defstate="0">
 		<reel reelreversed="0" stateoffset="-5461" numsymbolsvisible="3" symbollist="GUAB,Grapes,Cherry(1),Triple Bar,Grapes,JPM,Cherry(?),Cashpot,Single Bar,JPM,Double Bar(2),Cherry,Grapes,Single Bar(4),JPM,Cherry">
 			<color red="0.0" green="0.0" blue="0.0"/>
 		</reel>
 	</element>
-	<element name="reel4" defstate="0">
+	<element name="reel4:pos" defstate="0">
 		<reel reelreversed="0" stateoffset="-1365" numsymbolsvisible="1" symbollist="12,11,10,9,8,7,6,5,4,3,2,1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 		</reel>
@@ -3274,7 +3274,7 @@
 		<element name="lamp0" ref="reel_lamp" state="0">
 			<bounds x="176.0000" y="553.6667" width="80.0000" height="53.3333"/>
 		</element>
-		<element name="sreel1" ref="reel0" state="0">
+		<element name="reel1:scroll" ref="reel0:pos" state="0">
 			<bounds x="176" y="447" width="80" height="160"/>
 		</element>
 		<element ref="reel_background">
@@ -3289,7 +3289,7 @@
 		<element name="lamp3" ref="reel_lamp" state="0">
 			<bounds x="258.0000" y="553.6667" width="80.0000" height="53.3333"/>
 		</element>
-		<element name="sreel2" ref="reel1" state="0">
+		<element name="reel2:scroll" ref="reel1:pos" state="0">
 			<bounds x="258" y="447" width="80" height="160"/>
 		</element>
 		<element ref="reel_background">
@@ -3304,7 +3304,7 @@
 		<element name="lamp16" ref="reel_lamp" state="0">
 			<bounds x="340.0000" y="553.6667" width="80.0000" height="53.3333"/>
 		</element>
-		<element name="sreel3" ref="reel2" state="0">
+		<element name="reel3:scroll" ref="reel2:pos" state="0">
 			<bounds x="340" y="447" width="80" height="160"/>
 		</element>
 		<element ref="reel_background">
@@ -3319,7 +3319,7 @@
 		<element name="lamp19" ref="reel_lamp" state="0">
 			<bounds x="422.0000" y="553.6667" width="80.0000" height="53.3333"/>
 		</element>
-		<element name="sreel4" ref="reel3" state="0">
+		<element name="reel4:scroll" ref="reel3:pos" state="0">
 			<bounds x="422" y="447" width="80" height="160"/>
 		</element>
 		<element ref="reel_background">
@@ -3328,7 +3328,7 @@
 		<element name="lamp-2" ref="reel_lamp" state="0">
 			<bounds x="449.0000" y="181.0000" width="60.0000" height="50.0000"/>
 		</element>
-		<element name="sreel5" ref="reel4" state="0">
+		<element name="reel5:scroll" ref="reel4:pos" state="0">
 			<bounds x="449" y="181" width="60" height="50"/>
 		</element>
 		<element name="lamp232" ref="lamp_232_1_border" state="0">
@@ -5293,7 +5293,7 @@
 		<element name="lamp-2" ref="reel_lamp" state="0">
 			<bounds x="1100.0000" y="192.0000" width="120.0000" height="80.0000"/>
 		</element>
-		<element name="sreel1" ref="reel0" state="0">
+		<element name="reel1:scroll" ref="reel0:pos" state="0">
 			<bounds x="1100" y="32" width="120" height="240"/>
 		</element>
 		<element ref="reel_background">
@@ -5308,7 +5308,7 @@
 		<element name="lamp3" ref="reel_lamp" state="0">
 			<bounds x="1240.0000" y="192.0000" width="120.0000" height="80.0000"/>
 		</element>
-		<element name="sreel2" ref="reel1" state="0">
+		<element name="reel2:scroll" ref="reel1:pos" state="0">
 			<bounds x="1240" y="32" width="120" height="240"/>
 		</element>
 		<element ref="reel_background">
@@ -5323,7 +5323,7 @@
 		<element name="lamp16" ref="reel_lamp" state="0">
 			<bounds x="1380.0000" y="192.0000" width="120.0000" height="80.0000"/>
 		</element>
-		<element name="sreel3" ref="reel2" state="0">
+		<element name="reel3:scroll" ref="reel2:pos" state="0">
 			<bounds x="1380" y="32" width="120" height="240"/>
 		</element>
 		<element ref="reel_background">
@@ -5338,7 +5338,7 @@
 		<element name="lamp19" ref="reel_lamp" state="0">
 			<bounds x="1520.0000" y="192.0000" width="120.0000" height="80.0000"/>
 		</element>
-		<element name="sreel4" ref="reel3" state="0">
+		<element name="reel4:scroll" ref="reel3:pos" state="0">
 			<bounds x="1520" y="32" width="120" height="240"/>
 		</element>
 		<element ref="reel_background">
@@ -5347,22 +5347,22 @@
 		<element name="lamp-2" ref="reel_lamp" state="0">
 			<bounds x="1660.0000" y="32.0000" width="120.0000" height="240.0000"/>
 		</element>
-		<element name="sreel5" ref="reel4" state="0">
+		<element name="reel5:scroll" ref="reel4:pos" state="0">
 			<bounds x="1660" y="32" width="120" height="240"/>
 		</element>
-		<element name="reel1" ref="debug_stepper_value">
+		<element name="reel1:pos" ref="debug_stepper_value">
 			<bounds x="1100" y="272" width="50" height="30"/>
 		</element>
-		<element name="reel2" ref="debug_stepper_value">
+		<element name="reel2:pos" ref="debug_stepper_value">
 			<bounds x="1240" y="272" width="50" height="30"/>
 		</element>
-		<element name="reel3" ref="debug_stepper_value">
+		<element name="reel3:pos" ref="debug_stepper_value">
 			<bounds x="1380" y="272" width="50" height="30"/>
 		</element>
-		<element name="reel4" ref="debug_stepper_value">
+		<element name="reel4:pos" ref="debug_stepper_value">
 			<bounds x="1520" y="272" width="50" height="30"/>
 		</element>
-		<element name="reel5" ref="debug_stepper_value">
+		<element name="reel5:pos" ref="debug_stepper_value">
 			<bounds x="1660" y="272" width="50" height="30"/>
 		</element>
 		<element name="debug_reel_symbol_count" ref="debug_reel_symbol_count_0">

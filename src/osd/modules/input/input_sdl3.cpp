@@ -42,6 +42,10 @@
 #include <tuple>
 #include <utility>
 
+#ifdef __APPLE__
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+
 // winnt.h defines this
 #ifdef DELETE
 #undef DELETE
@@ -629,7 +633,7 @@ private:
 		s8  currkey[MAX_KEYS];
 	};
 
-	SDL_KeyboardID m_keyboard_id;
+	[[maybe_unused]] SDL_KeyboardID m_keyboard_id;
 	keyboard_trans_table const &m_trans_table;
 	keyboard_state m_keyboard;
 	std::chrono::steady_clock::time_point m_capslock_pressed;
@@ -781,13 +785,8 @@ public:
 
 		case SDL_EVENT_MOUSE_WHEEL:
 			// adjust SDL 1-per-click to match Win32 120-per-click
-#if SDL_VERSION_ATLEAST(3, 2, 12)
-			m_v += std::lround(event.wheel.integer_y * 120 * input_device::RELATIVE_PER_PIXEL);
-			m_h += std::lround(event.wheel.integer_x * 120 * input_device::RELATIVE_PER_PIXEL);
-#else
 			m_v += std::lround(event.wheel.y * 120 * input_device::RELATIVE_PER_PIXEL);
 			m_h += std::lround(event.wheel.x * 120 * input_device::RELATIVE_PER_PIXEL);
-#endif
 			break;
 		}
 	}
@@ -2183,7 +2182,7 @@ protected:
 	{
 		// dispatch event to every device by default
 		this->devicelist().for_each_device(
-				[&event] (auto &device) { device.queue_events(&event, 1); });
+				[&event] (auto &device) { device.queue_event(event); });
 	}
 };
 
@@ -2570,7 +2569,7 @@ protected:
 
 		// if we find a matching joystick, dispatch the event to the joystick
 		if (target_device)
-			target_device->queue_events(&event, 1);
+			target_device->queue_event(event);
 	}
 
 	device_info *find_reconnect_match(SDL_GUID const &guid, char const *serial)
@@ -2747,6 +2746,13 @@ public:
 		sdl_joystick_module_base::input_init(machine);
 
 		osd_printf_verbose("Game Controller: Start initialization\n");
+
+#ifdef __APPLE__
+		// allow GCController to discover devices asynchronously
+		CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.1, false);
+#endif
+		SDL_PumpEvents();
+
 		int stick_count = 0;
 		const auto joysticks = SDL_GetJoysticks(&stick_count);
 		for (int physical_stick = 0; physical_stick < stick_count; physical_stick++)

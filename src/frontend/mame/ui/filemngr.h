@@ -27,9 +27,9 @@ namespace ui {
 class menu_file_manager : public menu
 {
 public:
-	static void force_file_manager(mame_ui_manager &mui, render_container &container, std::string &&warnings);
+	static void force_file_manager(mame_ui_manager &mui, render_target &target, std::string &&warnings);
 
-	menu_file_manager(mame_ui_manager &mui, render_container &container, std::string &&warnings);
+	menu_file_manager(mame_ui_manager &mui, render_target &target, std::string &&warnings);
 	virtual ~menu_file_manager();
 
 protected:

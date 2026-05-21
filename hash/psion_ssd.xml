@@ -183,7 +183,7 @@ license:CC0-1.0
 		<description>En Route: Belgium, Netherlands, Luxembourg</description>
 		<year>1997</year>
 		<publisher>Palmtop BV</publisher>
-		<info name="usage" value="Requires 512K" />
+		<info name="required_ram" value="512KB" />
 		<sharedfeat name="compatibility" value="S3A"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="1048576">
@@ -196,7 +196,7 @@ license:CC0-1.0
 		<description>En Route: United Kingdom, Eire</description>
 		<year>1997</year>
 		<publisher>Palmtop BV</publisher>
-		<info name="usage" value="Requires 512K" />
+		<info name="required_ram" value="512KB" />
 		<sharedfeat name="compatibility" value="S3A"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="1048576">
@@ -329,7 +329,7 @@ license:CC0-1.0
 		<description>Monopoly</description>
 		<year>1997</year>
 		<publisher>Psion</publisher>
-		<info name="usage" value="Requires 512K" />
+		<info name="required_ram" value="512KB" />
 		<sharedfeat name="compatibility" value="S3A"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="262144">
@@ -386,15 +386,39 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="s3cstart">
+		<description>Serie 3c Start Disk und Zusatzsoftware</description>
+		<year>1995</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="S3c_Start_Disk_und_Zusatzsoftware.rom" size="131072" crc="8cef1e02" sha1="f1ce82dce8261700174e893fbe99ee28549ac6df"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="scrabble">
 		<description>Scrabble</description>
 		<year>1996</year>
 		<publisher>Psion</publisher>
-		<info name="usage" value="Requires 256K" />
+		<info name="required_ram" value="256KB" />
 		<sharedfeat name="compatibility" value="S3,S3A"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="1048576">
 				<rom name="Scrabble.rom" size="1048576" crc="6e32cc02" sha1="5441d873f8a5ae95bd9085711d88fa41641321b2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sienademo" supported="partial">
+		<description>Siena Demonstration</description>
+		<year>1996</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="SIENA"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="524288">
+				<rom name="Siena_Demonstration.rom" size="524288" crc="4f78069f" sha1="bf5e3c27ee71835414a5be87dc8f60b0573e2e38"/>
 			</dataarea>
 		</part>
 	</software>

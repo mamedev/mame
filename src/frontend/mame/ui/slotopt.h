@@ -22,7 +22,7 @@ namespace ui {
 class menu_slot_devices : public menu
 {
 public:
-	menu_slot_devices(mame_ui_manager &mui, render_container &container);
+	menu_slot_devices(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_slot_devices() override;
 
 protected:

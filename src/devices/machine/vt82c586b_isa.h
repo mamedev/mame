@@ -25,12 +25,6 @@ public:
 	vt82c586b_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
 		: vt82c586b_isa_device(mconfig, tag, owner, clock)
 	{
-		// revisions:
-		// 0*h for regular VT82C586
-		// 2*h for '586A
-		// 3*h for '586B OEM Silicon
-		// 4*h for '586B Production Silicon
-		set_ids(0x11060586, 0x41, 0x060100, 0x00000000);
 		set_multifunction_device(true);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
@@ -55,6 +49,7 @@ public:
 	void pc_irq6_w(int state);
 	void pc_irq7_w(int state);
 	void pc_irq8n_w(int state);
+	void pc_irq9_w(int state);
 	void pc_irq12m_w(int state);
 	// TODO: remaps externally for IDE, cfr. config $4a
 	void pc_irq14_w(int state);
@@ -71,6 +66,8 @@ public:
 	template <typename T> void set_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 
 protected:
+	vt82c586b_isa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_add_mconfig(machine_config & config) override;
 	virtual void device_config_complete() override;
 	virtual void device_start() override ATTR_COLD;
@@ -165,7 +162,6 @@ private:
 	void at_speaker_set_spkrdata(uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
 	void pc_irq5_w(int state);
-	void pc_irq9_w(int state);
 	void pc_irq10_w(int state);
 	void pc_irq11_w(int state);
 	void iochck_w(int state);
@@ -210,7 +206,22 @@ private:
 	u8 m_acpi_pin_config;
 };
 
-DECLARE_DEVICE_TYPE(VT82C586B_ISA, vt82c586b_isa_device)
+class vt82c596b_isa_device : public vt82c586b_isa_device
+{
+public:
+	template <typename T>
+	vt82c596b_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: vt82c596b_isa_device(mconfig, tag, owner, clock)
+	{
+		set_multifunction_device(true);
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
 
+	vt82c596b_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+};
+
+DECLARE_DEVICE_TYPE(VT82C586B_ISA, vt82c586b_isa_device)
+DECLARE_DEVICE_TYPE(VT82C596B_ISA, vt82c596b_isa_device)
 
 #endif // MAME_MACHINE_VT82C586B_ISA_H

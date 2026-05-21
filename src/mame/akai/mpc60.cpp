@@ -2,23 +2,29 @@
 // copyright-holders:AJR, R. Belmont
 /***************************************************************************
 
-    mpc60.cpp - Akai / Roger Linn MPC3000 music workstation
+    mpc60.cpp - Akai / Roger Linn MPC60 music workstation
     Driver by R. Belmont and AJR
 
+    This driver includes support for the Marion Systems SCSI option board,
+    which gives the machine much-needed mass storage capabilities.  Even
+    without using IRQs or DMA, the SCSI is still much faster than the DSDD
+    floppy drive.
+
     Hardware:
-        CPU: 80186 at 10 MHz
-        Floppy: uPD72065
+        CPU: 80186 at 10 MHz (input clock 20 MHz, internal /2)
+        Floppy: uPD72066
         LCD: LC7981
         UARTs: MB89371 (x2)
         Panel controller CPU: NEC uPD78C11 @ 12 MHz
-          (internal ROM is not dumped but the panel works fine without it)
         Sound DSP: L4003
+        SCSI: NCR5380
 
 ***************************************************************************/
 
 #include "emu.h"
 
 #include "bus/midi/midi.h"
+#include "bus/nscsi/devices.h"
 #include "cpu/i86/i186.h"
 #include "cpu/upd7810/upd7810.h"
 #include "formats/dfi_dsk.h"
@@ -36,6 +42,7 @@
 #include "machine/i8255.h"
 #include "machine/input_merger.h"
 #include "machine/mb89371.h"
+#include "machine/ncr5380.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
@@ -44,6 +51,7 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "mpc60.lh"
@@ -88,6 +96,10 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+	void io_map(address_map &map) ATTR_COLD;
+
+	required_device<cpu_device> m_maincpu;
+
 private:
 	u8 nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, u8 data);
@@ -98,7 +110,6 @@ private:
 	void mpc60_palette(palette_device &palette) const;
 
 	void mem_map(address_map &map) ATTR_COLD;
-	void io_map(address_map &map) ATTR_COLD;
 	void panel_map(address_map &map) ATTR_COLD;
 	void lcd_map(address_map &map) ATTR_COLD;
 	void dsp_map(address_map &map) ATTR_COLD;
@@ -119,7 +130,6 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(dial_timer_tick);
 
-	required_device<cpu_device> m_maincpu;
 	required_device<upd7810_device> m_panelcpu;
 	required_device<l4003_sound_device> m_dsp;
 	required_device<upd72065_device> m_fdc;
@@ -130,7 +140,7 @@ private:
 	required_device<hc259_device> m_loled, m_hiled;
 	required_ioport_array<8> m_keys;
 	required_ioport_array<4> m_drums;
-	required_ioport  m_dataentry;
+	required_ioport m_dataentry;
 
 	std::unique_ptr<u8[]> m_nvram_data;
 
@@ -138,6 +148,28 @@ private:
 	int m_last_dial, m_count_dial, m_quadrature_phase;
 
 	uint8_t m_ppi_portc;
+};
+
+class mpc60_scsi_state: public mpc60_state
+{
+public:
+	mpc60_scsi_state(const machine_config &mconfig, device_type type, const char *tag)
+		: mpc60_state(mconfig, type, tag),
+		m_ncr5380(*this, "ncr5380"),
+		m_scsibus(*this, "scsi")
+	{
+	}
+
+	void mpc60_scsi(machine_config &config);
+
+private:
+	uint8_t scsi_dma_r();
+	void scsi_dma_w(uint8_t data);
+
+	void scsi_io_map(address_map &map) ATTR_COLD;
+
+	required_device<ncr5380_device> m_ncr5380;
+	required_device<nscsi_bus_device> m_scsibus;
 };
 
 void mpc60_state::machine_start()
@@ -197,6 +229,23 @@ void mpc60_state::io_map(address_map &map)
 	map(0x01c0, 0x01df).w(m_loled, FUNC(hc259_device::write_a3)).umask16(0x00ff);
 	map(0x01e0, 0x01ff).w(m_hiled, FUNC(hc259_device::write_a3)).umask16(0x00ff);
 	map(0x0200, 0x0207).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+}
+
+void mpc60_scsi_state::scsi_io_map(address_map &map)
+{
+	mpc60_state::io_map(map);
+	map(0x0220, 0x023f).m(m_ncr5380, FUNC(ncr5380_device::map)).umask16(0x00ff);
+	map(0x0230, 0x0231).rw(FUNC(mpc60_scsi_state::scsi_dma_r), FUNC(mpc60_scsi_state::scsi_dma_w));
+}
+
+uint8_t mpc60_scsi_state::scsi_dma_r()
+{
+	return m_ncr5380->dma_r();
+}
+
+void mpc60_scsi_state::scsi_dma_w(uint8_t data)
+{
+	m_ncr5380->dma_w(data);
 }
 
 void mpc60_state::panel_map(address_map &map)
@@ -577,7 +626,7 @@ void mpc60_state::mpc60(machine_config &config)
 	// IC8 - Rx is MIDI in 1 & 2, Tx is MIDI out 1 & 2
 	MB89371(config, m_sio[1], 20_MHz_XTAL / 4);
 	m_sio[1]->rxrdy_handler<0>().set("rxrdy", FUNC(input_merger_device::in_w<1>));
-	m_sio[1]->rxrdy_handler<0>().set("rxrdy", FUNC(input_merger_device::in_w<2>));
+	m_sio[1]->rxrdy_handler<1>().set("rxrdy", FUNC(input_merger_device::in_w<2>));
 	m_sio[1]->txrdy_handler<0>().set("txrdy", FUNC(input_merger_device::in_w<2>));
 	m_sio[1]->txrdy_handler<1>().set("txrdy", FUNC(input_merger_device::in_w<3>));
 	m_sio[1]->txd_handler<0>().set("mdout1", FUNC(midi_port_device::write_txd));
@@ -642,9 +691,28 @@ void mpc60_state::mpc60(machine_config &config)
 	m_midiclock->signal_handler().append(m_sio[1], FUNC(mb89371_device::write_txc<0>));
 	m_midiclock->signal_handler().append(m_sio[1], FUNC(mb89371_device::write_txc<1>));
 
-	//L4003(config, "voicelsi", 35.84_MHz_XTAL);
+	SOFTWARE_LIST(config, "flop_mpc60").set_original("mpc60_flop");
 
 	config.set_default_layout(layout_mpc60);
+}
+
+void mpc60_scsi_state::mpc60_scsi(machine_config &config)
+{
+	mpc60(config);
+
+	m_maincpu->set_addrmap(AS_IO, &mpc60_scsi_state::scsi_io_map);
+
+	NSCSI_BUS(config, m_scsibus);
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk", false);
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr, false);
+
+	NCR5380(config, m_ncr5380, 16_MHz_XTAL / 2);
+	m_scsibus->set_external_device(7, m_ncr5380);
 }
 
 ROM_START(mpc60)
@@ -654,6 +722,7 @@ ROM_START(mpc60)
 	ROMX_LOAD("mp6cpu3.ic3", 0x00001, 0x10000, CRC(f068838b) SHA1(42e815880d1c1a5b7d1c7933aad9c28410fc2627), ROM_BIOS(0) | ROM_SKIP(1))
 	ROMX_LOAD("mp6cpu1.ic4", 0x20000, 0x10000, CRC(1271bc73) SHA1(99fd6fa4c04e5bdf868e78072fec5b55c01350da), ROM_BIOS(0) | ROM_SKIP(1))
 	ROMX_LOAD("mpc6cpu4.ic5", 0x20001, 0x10000, CRC(d922a66d) SHA1(0f4bc0522b9826d617f4af72382d75853515d7f5), ROM_BIOS(0) | ROM_SKIP(1))
+
 	ROM_SYSTEM_BIOS(1, "v112", "v1.12")
 	ROMX_LOAD("mpc60_v1-12_2.ic2", 0x00000, 0x10000, CRC(ddf26146) SHA1(987547198dc3984ab3dfa7f133ba7dca702cc269), ROM_BIOS(1) | ROM_SKIP(1))
 	ROMX_LOAD("mpc60_v1-12_4.ic3", 0x00001, 0x10000, CRC(9725d193) SHA1(6efda3d6760b3951c5036108106d446f6e128c59), ROM_BIOS(1) | ROM_SKIP(1))
@@ -665,25 +734,38 @@ ROM_START(mpc60)
 	ROM_LOAD16_BYTE("mpc60_voice_2_v1-0.ic18", 0x00001, 0x08000, CRC(42f8e0a6) SHA1(a22dbefb9dafbb0c4095fd0bf4e63e67b5ec3b95))
 
 	ROM_REGION(0x1000, "panelcpu", 0)
-	ROM_LOAD("upd78c11g-044-36.ic1", 0x0000, 0x1000, NO_DUMP)
-	ROM_FILL(0x0000, 1, 0x54) // dummy reset vector
-	ROM_FILL(0x0001, 1, 0x00)
-	ROM_FILL(0x0002, 1, 0x40)
-	ROM_FILL(0x0018, 1, 0x54) // dummy interrupt vector
-	ROM_FILL(0x0019, 1, 0x18)
-	ROM_FILL(0x001a, 1, 0x40)
-	ROM_FILL(0x0090, 1, 0xca) // dummy CALT vectors
-	ROM_FILL(0x0091, 1, 0x41)
-	ROM_FILL(0x0092, 1, 0xca)
-	ROM_FILL(0x0093, 1, 0x41)
-	ROM_FILL(0x0094, 1, 0xca)
-	ROM_FILL(0x0095, 1, 0x41)
-	ROM_FILL(0x0096, 1, 0xca)
-	ROM_FILL(0x0097, 1, 0x41)
-	ROM_FILL(0x0098, 1, 0xca)
-	ROM_FILL(0x0099, 1, 0x41)
-	ROM_FILL(0x009a, 1, 0xca)
-	ROM_FILL(0x009b, 1, 0x41)
+	ROM_LOAD("upd78c11g-044-36.ic1", 0x0000, 0x1000, CRC(59fee9fa) SHA1(830eea667e46437f9a65280bf59234107abe49c8))
+
+	ROM_REGION(0x2000, "panel", 0)
+	ROM_LOAD("akai mpc60 panel eprom op v1-1 2764.ic2", 0x0000, 0x2000, CRC(f1332f47) SHA1(dd5e917d16941fce3db4bfe21d37f722d6262561))
+ROM_END
+
+ROM_START(mpc60scsi)
+	ROM_REGION16_LE(0x40000, "program", 0)
+	ROM_SYSTEM_BIOS(0, "v214", "v2.14") // V2.14 is identical to V2.12 but with SCSI support
+	ROMX_LOAD("mpc60_2_14_3.ic5", 0x000000, 0x010000, CRC(62a3da24) SHA1(c97c434e2fcba9097db2eb6c2b57637ffdefc085), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("mpc60_2_14_4.ic3", 0x000001, 0x010000, CRC(63eb7c2d) SHA1(fa117d30db58a5a9c7456276bb0c65aec9a9aac2), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("mpc60_2_14_1.ic4", 0x020000, 0x010000, CRC(6a452666) SHA1(52643a0f2799292eb69d2ea992427a402ba94da1), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("mpc60_2_14_2.ic2", 0x020001, 0x010000, CRC(0cb5d810) SHA1(cdc6ee933d7e113055deb873ca22620b2e41a897), ROM_BIOS(0) | ROM_SKIP(1))
+
+	ROM_SYSTEM_BIOS(1, "v212", "v2.12") // V2.12 CPU ROMs (MBM27C512-20)
+	ROMX_LOAD("mp6cpu2.ic2", 0x00000, 0x10000, CRC(e71b1acb) SHA1(b56ddfff1c546fc21341b1a614e18da9726312f4), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("mp6cpu3.ic3", 0x00001, 0x10000, CRC(f068838b) SHA1(42e815880d1c1a5b7d1c7933aad9c28410fc2627), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("mp6cpu1.ic4", 0x20000, 0x10000, CRC(1271bc73) SHA1(99fd6fa4c04e5bdf868e78072fec5b55c01350da), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("mpc6cpu4.ic5", 0x20001, 0x10000, CRC(d922a66d) SHA1(0f4bc0522b9826d617f4af72382d75853515d7f5), ROM_BIOS(1) | ROM_SKIP(1))
+
+	ROM_SYSTEM_BIOS(2, "v112", "v1.12")
+	ROMX_LOAD("mpc60_v1-12_2.ic2", 0x00000, 0x10000, CRC(ddf26146) SHA1(987547198dc3984ab3dfa7f133ba7dca702cc269), ROM_BIOS(2) | ROM_SKIP(1))
+	ROMX_LOAD("mpc60_v1-12_4.ic3", 0x00001, 0x10000, CRC(9725d193) SHA1(6efda3d6760b3951c5036108106d446f6e128c59), ROM_BIOS(2) | ROM_SKIP(1))
+	ROMX_LOAD("mpc60_v1-12_1.ic4", 0x20000, 0x10000, CRC(f202dbb1) SHA1(6fd82224a99b52b6c414b88d5c920abda32ffa32), ROM_BIOS(2) | ROM_SKIP(1))
+	ROMX_LOAD("mpc60_v1-12_3.ic5", 0x20001, 0x10000, CRC(ba5a1640) SHA1(1f9f49c49a3682b9a44d614ac411a7c043df399e), ROM_BIOS(2) | ROM_SKIP(1))
+
+	ROM_REGION16_LE(0x10000, "waves", 0)
+	ROM_LOAD16_BYTE("mpc60_voice_1_v1-0.ic17", 0x00000, 0x08000, CRC(b8fdfe3e) SHA1(c2f0e1d8813d4178d2f883a3f3e461e036b56229)) // lowest nibble is unused
+	ROM_LOAD16_BYTE("mpc60_voice_2_v1-0.ic18", 0x00001, 0x08000, CRC(42f8e0a6) SHA1(a22dbefb9dafbb0c4095fd0bf4e63e67b5ec3b95))
+
+	ROM_REGION(0x1000, "panelcpu", 0)
+	ROM_LOAD("upd78c11g-044-36.ic1", 0x0000, 0x1000, CRC(59fee9fa) SHA1(830eea667e46437f9a65280bf59234107abe49c8))
 
 	ROM_REGION(0x2000, "panel", 0)
 	ROM_LOAD("akai mpc60 panel eprom op v1-1 2764.ic2", 0x0000, 0x2000, CRC(f1332f47) SHA1(dd5e917d16941fce3db4bfe21d37f722d6262561))
@@ -691,4 +773,5 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1987, mpc60, 0, 0, mpc60, mpc60, mpc60_state, empty_init, "Akai Electric", "MPC60 MIDI Production Center", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1988, mpc60, 0, 0, mpc60, mpc60, mpc60_state, empty_init, "Akai Electric", "MPC60 MIDI Production Center", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+SYST(1988, mpc60scsi, mpc60, 0, mpc60_scsi, mpc60, mpc60_scsi_state, empty_init, "Akai Electric", "MPC60 MIDI Production Center (with SCSI)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)

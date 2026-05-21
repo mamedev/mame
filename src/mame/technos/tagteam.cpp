@@ -18,11 +18,12 @@ Stephh's notes :
   - When the "Cabinet" Dip Switch is set to "Cocktail", the screen status
     depends on which player is the main wrestler on the ring :
 
-      * player 1 : normal screen
-      * player 2 : inverted screen
+    * player 1 : normal screen
+    * player 2 : inverted screen
 
 TODO:
-        * fix hi-score (reset) bug
+  - fix hi-score (reset) bug
+  - verify vcount chain (exact interrupt timing and vblank flag on DSW1.7)
 
 ***************************************************************************/
 
@@ -52,6 +53,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram")
@@ -70,6 +72,7 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<uint8_t> m_videoram;
@@ -109,9 +112,9 @@ static const res_net_info tagteam_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_TTL_OUT,
 	{
-		{ RES_NET_AMP_EMITTER, 4700, 0, 3, { 4700, 3300, 1500 } },
-		{ RES_NET_AMP_EMITTER, 4700, 0, 3, { 4700, 3300, 1500 } },
-		{ RES_NET_AMP_EMITTER, 4700, 0, 2, {       3300, 1500 } }
+		{ RES_NET_AMP_NONE, 0, 0, 3, { 4700, 3300, 1500 } },
+		{ RES_NET_AMP_NONE, 0, 0, 3, { 4700, 3300, 1500 } },
+		{ RES_NET_AMP_NONE, 0, 0, 2, {       3300, 1500 } }
 	}
 };
 
@@ -132,6 +135,8 @@ void tagteam_state::palette(palette_device &palette) const
 	std::vector<rgb_t> rgb;
 	compute_res_net_all(rgb, color_prom, tagteam_decode_info, tagteam_net_info);
 	palette.set_pen_colors(0x00, rgb);
+
+	palette.palette()->normalize_range(0, 31);
 }
 
 
@@ -248,20 +253,17 @@ void tagteam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			flipy = !flipy;
 		}
 
-
 		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
-		code, color,
-		flipx, flipy,
-		sx, sy, 0);
+			code, color,
+			flipx, flipy,
+			sx, sy, 0);
 
 		// Wrap around
-
 		code = m_videoram[offs + 0x20] + 256 * spritebank;
 		color = m_palettebank;
 		sy += (flip_screen() ? -256 : 256);
 
-
-			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -363,7 +365,7 @@ static INPUT_PORTS_START( bigprowr )
 	PORT_DIPSETTING(    0x40, "Upright, Dual Controls" )
 	PORT_DIPSETTING(    0x20, "Cocktail, Single Controls" ) // IMPOSSIBLE !
 	PORT_DIPSETTING(    0x60, DEF_STR( Cocktail ) )     // "Cocktail, Dual Controls"
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1")
@@ -430,6 +432,10 @@ GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(tagteam_state::v8_timer_irq)
 {
+	// 16 times per frame
+	if (param > 256)
+		return;
+
 	// same source for both interrupts
 	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 	if (m_sound_nmi_mask)
@@ -449,10 +455,10 @@ void tagteam_state::tagteam(machine_config &config)
 	TIMER(config, "v8").configure_scanline(FUNC(tagteam_state::v8_timer_irq), "screen", 8, 16); // connected to bit 4 of vcount (basically once every 16 scanlines)
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 8, 248); // confirmed from schematics; 57 Hz measured?
-	screen.set_screen_update(FUNC(tagteam_state::screen_update));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 8, 248); // confirmed from schematics; 57 Hz measured?
+	m_screen->set_screen_update(FUNC(tagteam_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tagteam);
 	PALETTE(config, m_palette, FUNC(tagteam_state::palette), 32);
@@ -466,7 +472,7 @@ void tagteam_state::tagteam(machine_config &config)
 	AY8910(config, "ay1", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	AY8910(config, "ay2", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }
 
 

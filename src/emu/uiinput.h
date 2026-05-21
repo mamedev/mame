@@ -88,6 +88,10 @@ public:
 	// return true if a key down for the given user interface sequence is detected, or if autorepeat at the given speed is triggered
 	bool pressed_repeat(int code, int speed);
 
+	// get current or most recently focused render target
+	render_target *focused_target() const { return m_focused_target; }
+	render_target *last_focused_target() const { return m_last_focused_target; }
+
 	// getters
 	running_machine &machine() const { return m_machine; }
 
@@ -108,6 +112,10 @@ private:
 
 	// internal state
 	running_machine &   m_machine;
+
+	// track focused render target;
+	render_target *     m_focused_target;
+	render_target *     m_last_focused_target;
 
 	// pressed states; retrieved with pressed() or pressed_repeat()
 	bool                m_presses_enabled;

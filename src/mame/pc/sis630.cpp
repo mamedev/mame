@@ -385,15 +385,15 @@ void sis630_state::gamecstl(machine_config &config)
 //  subdevice<pc_kbdc_device>("pci:01.0:aux_con")->set_default_option(nullptr);
 }
 
-ROM_START(shutms11)
+ROM_START( shutms11 )
 	ROM_REGION32_LE(0x80000, "flash", ROMREGION_ERASEFF )
-	ROM_SYSTEM_BIOS(0, "ms11s11d", "ms11s11d")
+	ROM_SYSTEM_BIOS(0, "s11d", "MS11S11D (03/06/2000)")
 	ROMX_LOAD( "ms11s11d.bin",     0x040000, 0x040000, CRC(27077a58) SHA1(32327ebf328cb0c2dec819c3710acc83527803c5), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS(1, "ms11s134", "ms11s134")
+	ROM_SYSTEM_BIOS(1, "s134", "MS11S134 (11/23/2000)")
 	ROMX_LOAD( "ms11s134.bin",     0x040000, 0x040000, CRC(d739c4f3) SHA1(2301e57163ac4d9b7eddcabce52fa7d01b22330e), ROM_BIOS(1) )
 ROM_END
 
-ROM_START(asuspolo)
+ROM_START( asuspolo )
 	ROM_REGION32_LE(0x80000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "polotv", "Polo-TV 1009")
 	ROMX_LOAD( "potv1009.awd",     0x040000, 0x040000, CRC(981e1c75) SHA1(0e1cd42ad62fca63e4919c708348ce18947faaa4), ROM_BIOS(0) )
@@ -401,7 +401,7 @@ ROM_START(asuspolo)
 	ROMX_LOAD( "1011efx.001",      0x040000, 0x040000, CRC(00d73848) SHA1(b2b4ed8e9ec10b853dfdabe1af580b01983864fc), ROM_BIOS(1) )
 ROM_END
 
-ROM_START(asuscusc)
+ROM_START( asuscusc )
 	ROM_REGION32_LE(0x80000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "cusc",        "Cusc 1009")
 	ROMX_LOAD( "cusc1009.awd",     0x040000, 0x040000, CRC(f7d8cab9) SHA1(47e7728d487a8105de1bc0eeb58a603e334304c0), ROM_BIOS(0) )
@@ -409,7 +409,7 @@ ROM_START(asuscusc)
 	ROMX_LOAD( "cusc1011.001",     0x040000, 0x040000, CRC(c2935b70) SHA1(8dedfc7423ebbee5dbe3af3ad92cd0f9866ca876), ROM_BIOS(1) )
 ROM_END
 
-ROM_START(zidav630e)
+ROM_START( zidav630e )
 	ROM_REGION32_LE(0x80000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "award_v108",  "Award BIOS v1.08")
 	ROMX_LOAD( "v630108e.bin",     0x040000, 0x040000, CRC(25c91274) SHA1(95ff37ad0cfb39bb4ceff2db1cd47f13849ea53a), ROM_BIOS(0) )
@@ -421,7 +421,7 @@ ROM_END
 
 // GameCristal - PC-based multigame arcade (with an unknown emulator).
 
-ROM_START(gamecstl)
+ROM_START( gamecstl )
 	ROM_REGION32_LE(0x80000, "flash", ROMREGION_ERASEFF )
 	// from gamecstl HDD dump, under "C:\drvs\bios\bios1_9"
 	ROM_LOAD( "prod19.rom",     0x040000, 0x040000, BAD_DUMP CRC(9262306c) SHA1(5cd805622ecb4d326591b5f2cf918fe5cb1bce8e) )
@@ -434,7 +434,7 @@ ROM_START(gamecstl)
 	ROM_LOAD( "gamecristal_datasat.bin", 0x0000, 0x2000, NO_DUMP ) // MCU on the JAMMA interface PCB, unknown type and ROM size
 ROM_END
 
-ROM_START(gamecst2)
+ROM_START( gamecst2 )
 	ROM_REGION32_LE(0x80000, "pci:01.0:flash", ROMREGION_ERASEFF )
 	ROM_LOAD( "prod19.rom",     0x040000, 0x040000, BAD_DUMP CRC(9262306c) SHA1(5cd805622ecb4d326591b5f2cf918fe5cb1bce8e) )
 	ROM_CONTINUE(               0x000000, 0x040000 )

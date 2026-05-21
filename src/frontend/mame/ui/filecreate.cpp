@@ -19,7 +19,6 @@
 
 #include "formats/flopimg.h"
 
-#include "path.h"
 #include "zippath.h"
 
 #include <cstring>
@@ -31,7 +30,7 @@ namespace ui {
 CONSTANTS
 ***************************************************************************/
 
-// conditional compilation to enable chosing of image formats - this is not
+// conditional compilation to enable choosing of image formats - this is not
 // yet fully implemented
 #define ENABLE_FORMATS          0
 
@@ -55,11 +54,14 @@ CONFIRM SAVE AS MENU
 //  ctor
 //-------------------------------------------------
 
-menu_confirm_save_as::menu_confirm_save_as(mame_ui_manager &mui, render_container &container, bool &yes)
-	: menu(mui, container)
-	, m_yes(yes)
+menu_confirm_save_as::menu_confirm_save_as(
+		mame_ui_manager &mui,
+		render_target &target,
+		handler_function &&handler)
+	: menu(mui, target)
+	, m_handler(std::move(handler))
 {
-	m_yes = false;
+	set_needs_prev_menu_item(false);
 }
 
 
@@ -78,7 +80,7 @@ menu_confirm_save_as::~menu_confirm_save_as()
 
 void menu_confirm_save_as::populate()
 {
-	item_append(_("File Already Exists - Override?"), FLAG_DISABLE, nullptr);
+	item_append(_("File Already Exists - Overwrite?"), FLAG_DISABLE, nullptr);
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("No"), 0, ITEMREF_NO);
 	item_append(_("Yes"), 0, ITEMREF_YES);
@@ -94,10 +96,9 @@ bool menu_confirm_save_as::handle(event const *ev)
 	if (ev && (ev->iptkey == IPT_UI_SELECT))
 	{
 		if (ev->itemref == ITEMREF_YES)
-			m_yes = true;
-
-		// no matter what, pop out
-		stack_pop();
+			m_handler();
+		else
+			stack_pop();
 	}
 
 	return false;
@@ -113,18 +114,21 @@ FILE CREATE MENU
 //  ctor
 //-------------------------------------------------
 
-menu_file_create::menu_file_create(mame_ui_manager &mui, render_container &container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool &ok)
-	: menu(mui, container)
-	, m_ok(ok)
+menu_file_create::menu_file_create(
+		mame_ui_manager &mui,
+		render_target &target,
+		device_image_interface &image,
+		std::string_view current_directory,
+		std::string &&starting_name,
+		handler_function &&handler)
+	: menu(mui, target)
+	, m_handler(std::move(handler))
+	, m_image(image)
 	, m_current_directory(current_directory)
-	, m_current_file(current_file)
 	, m_current_format(nullptr)
+	, m_filename(std::move(starting_name))
 {
-	m_image = image;
-	m_ok = false;
-
 	m_filename.reserve(1024);
-	m_filename = core_filename_extract_base(current_file);
 }
 
 
@@ -193,7 +197,7 @@ void menu_file_create::populate()
 	item_append(_("New Image Name:"), *new_image_name, 0, ITEMREF_NEW_IMAGE_NAME);
 
 	// do we support multiple formats?
-	image_device_format const *const format = ENABLE_FORMATS ? m_image->formatlist().front().get() : nullptr;
+	image_device_format const *const format = ENABLE_FORMATS ? m_image.formatlist().front().get() : nullptr;
 	if (format)
 	{
 		// FIXME: is this in the right order?  It reassigns m_current_format after reading it.
@@ -224,15 +228,9 @@ bool menu_file_create::handle(event const *ev)
 		{
 			std::string tmp_file(m_filename);
 			if (tmp_file.find('.') != -1 && tmp_file.find('.') < tmp_file.length() - 1)
-			{
-				m_current_file = m_filename;
-				m_ok = true;
-				stack_pop();
-			}
+				m_handler(m_filename);
 			else
-			{
-				ui().popup_time(1, "%s", _("Please enter a file extension too"));
-			}
+				ui().popup_time(1, "%s", _("Please enter a file name extension, too"));
 		}
 		break;
 
@@ -280,12 +278,29 @@ SELECT FORMAT MENU
 //  ctor
 //-------------------------------------------------
 
-menu_select_format::menu_select_format(mame_ui_manager &mui, render_container &container, const std::vector<const floppy_image_format_t *> &formats, int ext_match, const floppy_image_format_t **result)
-	: menu(mui, container)
+menu_select_format::menu_select_format(
+		mame_ui_manager &mui,
+		render_target &target,
+		floppy_image_device &fd,
+		std::string_view name,
+		handler_function &&handler)
+	: menu(mui, target)
+	, m_handler(std::move(handler))
 {
-	m_formats = formats;
-	m_ext_match = ext_match;
-	m_result = result;
+	m_formats.reserve(fd.get_formats().size());
+	for (floppy_image_format_t const *i : fd.get_formats())
+	{
+		if (i->supports_save() && i->extension_matches(name))
+			m_formats.emplace_back(i);
+	}
+	m_ext_match = m_formats.size();
+	for (floppy_image_format_t const *i : fd.get_formats())
+	{
+		if (i->supports_save() && !i->extension_matches(name))
+			m_formats.emplace_back(i);
+	}
+
+	set_heading(_("Select image format"));
 }
 
 
@@ -304,15 +319,16 @@ menu_select_format::~menu_select_format()
 
 void menu_select_format::populate()
 {
-	item_append(_("Select image format"), FLAG_DISABLE, nullptr);
 	for (unsigned int i = 0; i != m_formats.size(); i++)
 	{
 		const floppy_image_format_t *fmt = m_formats[i];
 
-		if (i && i == m_ext_match)
+		if (i && (i == m_ext_match))
 			item_append(menu_item_type::SEPARATOR);
 		item_append(fmt->description(), fmt->name(), 0, const_cast<floppy_image_format_t *>(fmt));
 	}
+
+	item_append(menu_item_type::SEPARATOR);
 }
 
 
@@ -323,11 +339,8 @@ void menu_select_format::populate()
 bool menu_select_format::handle(event const *ev)
 {
 	// process the menu
-	if (ev && ev->iptkey == IPT_UI_SELECT)
-	{
-		*m_result = (floppy_image_format_t *)ev->itemref;
-		stack_pop();
-	}
+	if (ev && (ev->iptkey == IPT_UI_SELECT))
+		m_handler(*reinterpret_cast<floppy_image_format_t const *>(ev->itemref));
 
 	return false;
 }
@@ -341,12 +354,16 @@ SELECT FORMAT MENU
 //  ctor
 //-------------------------------------------------
 
-menu_select_floppy_init::menu_select_floppy_init(mame_ui_manager &mui, render_container &container, std::vector<std::reference_wrapper<const floppy_image_device::fs_info>> &&fs, int *result)
-	: menu(mui, container),
-	  m_fs(std::move(fs)),
-	  m_result(result)
-
+menu_select_floppy_init::menu_select_floppy_init(
+		mame_ui_manager &mui,
+		render_target &target,
+		std::vector<std::reference_wrapper<floppy_image_device::fs_info const> > &&fs,
+		handler_function &&handler)
+	: menu(mui, target)
+	, m_handler(std::move(handler))
+	, m_fs(std::move(fs))
 {
+	set_heading(_("Select initial contents"));
 }
 
 
@@ -365,10 +382,9 @@ menu_select_floppy_init::~menu_select_floppy_init()
 
 void menu_select_floppy_init::populate()
 {
-	item_append(_("Select initial contents"), FLAG_DISABLE, nullptr);
-	int id = 0;
-	for (const floppy_image_device::fs_info &fmt : m_fs)
-		item_append(fmt.m_description, fmt.m_name, 0, (void *)(uintptr_t)(id++));
+	for (floppy_image_device::fs_info const &fs : m_fs)
+		item_append(fs.m_description, fs.m_name, 0, &const_cast<floppy_image_device::fs_info &>(fs));
+	item_append(menu_item_type::SEPARATOR);
 }
 
 
@@ -380,10 +396,7 @@ bool menu_select_floppy_init::handle(event const *ev)
 {
 	// process the menu
 	if (ev && ev->iptkey == IPT_UI_SELECT)
-	{
-		*m_result = int(uintptr_t(ev->itemref));
-		stack_pop();
-	}
+		m_handler(*reinterpret_cast<floppy_image_device::fs_info const *>(ev->itemref));
 
 	return false;
 }

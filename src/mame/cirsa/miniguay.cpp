@@ -2,9 +2,10 @@
 // copyright-holders:
 
 /*
-    Mini Guay (c) 1986 Cirsa
-
-    Slot machine.
+    Cirsa 860607 hardware for slot machines.
+    Known games on this hardware:
+      -Mini Bar (c) 1989 Cirsa
+      -Mini Guay (c) 1986 Cirsa
 
     Main components:
     1 x 8085
@@ -15,6 +16,7 @@
     1 x 6.144MHz Osc
     battery backed RAM
 
+    Layout for 860607-2A PCB:
    ________________________________________________
   |C |  ________   ________                       |
   |O |  ULN2064B  |_7417N_|                       |
@@ -56,12 +58,7 @@
   ||N|    PCB 860607-2A             |
   |_________________________________|
 
-    Two different PCBs were found with same components, albeit some from different producers.
     The coin acceptor is driven by a MCU (unknown type).
-
-    The dumped version (Mini Guay VD) uses plastic displays with light bulbs, but there's a different
-    one (undumped) called "Mini Guay VR" (VR stands for "Version Rodillos") or just "Mini Guay" with
-    reels instead, with an additional PCB for reels control (8031 + 2764 EPROM).
 */
 
 #include "emu.h"
@@ -205,6 +202,10 @@ void miniguay_state::miniguay(machine_config &config)
 }
 
 
+/* Mini Guay - 860607-2A PCB
+   The dumped version (Mini Guay VD) uses plastic displays with light bulbs, but there's a different
+   one (undumped) called "Mini Guay VR" (VR stands for "Versión Rodillos") or just "Mini Guay" with
+   reels instead, with an additional PCB for reels control (8031 + 2764 EPROM). */
 ROM_START( miniguay )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "a21t_b-82.bin", 0x0000, 0x8000, CRC(04865da9) SHA1(78cf41d8428eb67ae40e764494ac03d45762500a) ) // Dumped from two different PCBs
@@ -213,7 +214,19 @@ ROM_START( miniguay )
 	ROM_LOAD( "pat_031_pal16r4.bin", 0x000, 0x104, NO_DUMP )
 ROM_END
 
+/* Mini Bar - 860607-3 PCB
+   This is the "regular" displays Mini Bar version. There is another one with bigger displays,
+   (labeled "Displays Grandes") but it's unknown if it uses a different ROM. */
+ROM_START( minibar )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "c_mini_bar_b-1831_v4.0.ic13", 0x0000, 0x8000, CRC(accc2dc9) SHA1(a4574c451e0dd65365a552b03ba2d1f8af1ab1cc) )
+
+	ROM_REGION( 0x200, "plds", 0 )
+	ROM_LOAD( "pat_042.ic19", 0x000, 0x104, NO_DUMP )
+ROM_END
+
 } // Anonymous namespace
 
 
-GAME( 1986, miniguay, 0, miniguay, miniguay, miniguay_state, empty_init, ROT0, "Cirsa", "Mini Guay VD", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // VD stands for "Version Displays".
+GAME( 1986, miniguay, 0, miniguay, miniguay, miniguay_state, empty_init, ROT0, "Cirsa", "Mini Guay VD", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // VD stands for "Versión Displays".
+GAME( 1989, minibar,  0, miniguay, miniguay, miniguay_state, empty_init, ROT0, "Cirsa", "Mini Bar",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

@@ -205,7 +205,7 @@ void accomm_state::ram_w(offs_t offset, uint8_t data)
 
 uint8_t accomm_state::via_pb_r()
 {
-	return 0xfe | (m_rtc->sda_r() & m_cct->read_sda());
+	return 0xfe | (m_rtc->sda_r() & m_dtmf->sda_r() & m_cct->read_sda());
 }
 
 void accomm_state::via_pb_w(uint8_t data)
@@ -214,6 +214,9 @@ void accomm_state::via_pb_w(uint8_t data)
 
 	m_rtc->sda_w(BIT(data, 1));
 	m_rtc->scl_w(BIT(data, 2));
+
+	m_dtmf->sda_w(BIT(data, 1));
+	m_dtmf->scl_w(BIT(data, 2));
 
 	m_cct->write_sda(BIT(data, 1));
 	m_cct->write_scl(BIT(data, 2));

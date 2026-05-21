@@ -77,7 +77,7 @@ public:
 	void init_macqd800();
 
 private:
-	required_device<m68040_device> m_maincpu;
+	required_device<m68000_musashi_device> m_maincpu;
 	required_device<djmemc_device> m_djmemc;
 	required_device<iosb_device> m_iosb;
 	required_device<dfac_device> m_dfac;
@@ -204,15 +204,15 @@ void quadra800_state::macqd800(machine_config &config)
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(m_iosb, FUNC(iosb_device::scc_irq_w));
-	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
-	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
 
-	rs232_port_device &rs232a(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
 	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 
-	rs232_port_device &rs232b(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	rs232_port_device &rs232b(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
@@ -279,7 +279,7 @@ void quadra800_state::macct610(machine_config &config)
 {
 	macqd800(config);
 
-	M68040(config.replace(), m_maincpu, 20_MHz_XTAL);
+	M68LC040(config.replace(), m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &quadra800_state::quadra800_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
@@ -294,7 +294,7 @@ void quadra800_state::macct650(machine_config &config)
 {
 	macqd800(config);
 
-	M68040(config.replace(), m_maincpu, 25_MHz_XTAL);
+	M68LC040(config.replace(), m_maincpu, 25_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &quadra800_state::quadra800_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 

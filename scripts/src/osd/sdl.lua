@@ -59,6 +59,8 @@ function maintargetosdoptions(_target,_subtarget)
 				links {
 					"SDL2main",
 					"SDL2",
+					"imm32",
+					"version",
 				}
 			configuration { "vs*" }
 				links {

@@ -2598,6 +2598,29 @@ ROM_START( nndmsealc ) // NS-96205 96017 + NS-96206A 96017
 	ROM_LOAD( "mr97016-04.ic16", 0x000000, 0x200000, CRC(f421232b) SHA1(d9cdc911566e795e6968d4b349c008b47132bea3) )
 ROM_END
 
+// NS-96206A ROM board
+ROM_START( nndmseald )
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_LOAD16_BYTE( "nandemo.6.rom1.ver1.1.ic1", 0x00000, 0x40000, CRC(e0d9bcf1) SHA1(53b182d2bbf9352acad543ffc791289acb9aa457) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "nandemo.6.rom1.ver1.1.ic3", 0x00001, 0x40000, CRC(9e67e597) SHA1(729752897aa0266b1dc80d7a2d50d9e32750d938) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x100000, "sprite", ROMREGION_ERASE )    // 8x8x8 (Sprites)
+// This game doesn't use sprites, but the region needs to be a valid size for at least one sprite 'page' for the init to work.
+
+	ROM_REGION( 0x400000, "tiles_bg", 0 )   // 16x16x8 (Background)
+	ROM_LOAD( "mr97016-02.ic7", 0x000000, 0x200000, CRC(15d4200c) SHA1(5735be05830113884f24abc85c6a9ad9fb095cef) )
+
+	ROM_REGION( 0x400000, "tiles_rot", 0 )   // 16x16x8 (Rotation)
+	ROM_LOAD( "mr97016-01.ic2", 0x000000, 0x200000, CRC(b1edf0c8) SHA1(0af89e5f7369ccfd9b98ca060dbb61acb43b7431) )
+	ROM_LOAD( "mr97016-05.ic4", 0x200000, 0x200000, CRC(adabc618) SHA1(1372634a050d2f8475edeb245965d855bf0f7af7) )
+
+	ROM_REGION( 0x100000, "tiles_fg", 0 )   // 8x8x8 (Foreground)
+	ROM_LOAD( "mr97016-03.ic10", 0x000000, 0x100000, CRC(496c1ea1) SHA1(1fd235f7a2a124c9c40e5bd7bea67a964398fa7c) )
+
+	ROM_REGION( 0x200000, "oki", 0 )  // Samples
+	ROM_LOAD( "mr97016-04.ic16", 0x000000, 0x200000, CRC(f421232b) SHA1(d9cdc911566e795e6968d4b349c008b47132bea3) )
+ROM_END
+
 
 /***************************************************************************
 
@@ -3407,32 +3430,33 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,     STATE,          INIT,         MONITOR, COMPANY,                       FULLNAME,                               FLAGS
-GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2,  tetrisp2_state, empty_init,   ROT0,                      "Jaleco / The Tetris Company", "Tetris Plus 2 (World, V2.8)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tetrisp2a, tetrisp2, tetrisp2, tetrisp2,  tetrisp2_state, empty_init,   ROT0,                      "Jaleco / The Tetris Company", "Tetris Plus 2 (World, V2.7)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,                      "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,                      "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2,  tetrisp2_state, empty_init,   ROT0,                      "Jaleco / The Tetris Company", "Tetris Plus 2 (World, V2.8)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2a, tetrisp2, tetrisp2, tetrisp2,  tetrisp2_state, empty_init,   ROT0,                      "Jaleco / The Tetris Company", "Tetris Plus 2 (World, V2.7)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,                      "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,                      "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997, nndmseal,  0,        nndmseal, nndmseal,  nndmseal_state, empty_init,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco",              "Nandemo Seal Iinkai (ver 1.3)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1997, nndmseal11,nndmseal, nndmseal, nndmseal,  nndmseal_state, empty_init,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco",              "Nandemo Seal Iinkai (ver 1.1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1997, nndmseala, nndmseal, nndmseal, nndmseal,  nndmseal_state, empty_init,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco",              "Nandemo Seal Iinkai (Astro Boy ver. 1.0?)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // version guessed
-GAME( 1997, nndmsealb, nndmseal, nndmseal, nndmseal,  nndmseal_state, empty_init,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco",              "Nandemo Seal Iinkai (Astro Boy ver. 1.1)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // appears to have one more mode than the one above, ver taken from PRG ROM labels
-GAME( 1997, nndmsealc, nndmseal, nndmseal, nndmseal,  nndmseal_state, empty_init,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco",              "Nandemo Seal Iinkai (alternate ver 1.0)",   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // only shows Jaleco copyright even though I'Max is in strings in ROMs. Ver taken from PRG ROM labels
+GAME( 1997, nndmseal,  0,        nndmseal, nndmseal,  nndmseal_state, empty_init,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco",              "Nandemo Seal Iinkai (ver 1.3)",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1997, nndmseal11,nndmseal, nndmseal, nndmseal,  nndmseal_state, empty_init,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco",              "Nandemo Seal Iinkai (ver 1.1)",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1997, nndmseala, nndmseal, nndmseal, nndmseal,  nndmseal_state, empty_init,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco",              "Nandemo Seal Iinkai (Astro Boy ver. 1.0?)",   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // version guessed
+GAME( 1997, nndmsealb, nndmseal, nndmseal, nndmseal,  nndmseal_state, empty_init,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco",              "Nandemo Seal Iinkai (Astro Boy ver. 1.1)",    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // appears to have one more mode than the one above, ver taken from PRG ROM labels
+GAME( 1997, nndmsealc, nndmseal, nndmseal, nndmseal,  nndmseal_state, empty_init,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco",              "Nandemo Seal Iinkai (alternate ver 1.0)",     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // only shows Jaleco copyright even though I'Max is in strings in ROMs. Ver taken from PRG ROM labels
+GAME( 1997, nndmseald, nndmseal, nndmseal, nndmseal,  nndmseal_state, empty_init,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco",              "Nandemo Seal Iinkai (Jungle Taitei ver 1.1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-GAME( 1999, rockn,     0,        rockn,    rockn,     rockn_state,    init_rockn,   ROT270,                    "Jaleco",                      "Rock'n Tread (Japan)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rockna,    rockn,    rockn,    rockn,     rockn_state,    init_rockn,   ROT270,                    "Jaleco",                      "Rock'n Tread (Japan, alternate)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rockn2,    0,        rockn2,   rockn,     rockn_state,    init_rockn2,  ROT270,                    "Jaleco",                      "Rock'n Tread 2 (Japan)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rocknms,   0,        rocknms,  rocknms,   rocknms_state,  init_rocknms, ROT0,                      "Jaleco",                      "Rock'n MegaSession (Japan)",                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, rocknms10, rocknms,  rocknms,  rocknms,   rocknms_state,  init_rocknms, ROT0,                      "Jaleco",                      "Rock'n MegaSession (Japan, ver 1.0)",       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, rockn3,    0,        rockn2,   rockn,     rockn_state,    init_rockn3,  ROT270,                    "Jaleco",                      "Rock'n 3 (Japan)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 2000, rockn4,    0,        rockn2,   rockn,     rockn_state,    init_rockn3,  ROT270,                    "Jaleco / PCCWJ",              "Rock'n 4 (Japan, prototype)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rockn,     0,        rockn,    rockn,     rockn_state,    init_rockn,   ROT270,                    "Jaleco",                      "Rock'n Tread (Japan)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rockna,    rockn,    rockn,    rockn,     rockn_state,    init_rockn,   ROT270,                    "Jaleco",                      "Rock'n Tread (Japan, alternate)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rockn2,    0,        rockn2,   rockn,     rockn_state,    init_rockn2,  ROT270,                    "Jaleco",                      "Rock'n Tread 2 (Japan)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rocknms,   0,        rocknms,  rocknms,   rocknms_state,  init_rocknms, ROT0,                      "Jaleco",                      "Rock'n MegaSession (Japan)",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, rocknms10, rocknms,  rocknms,  rocknms,   rocknms_state,  init_rocknms, ROT0,                      "Jaleco",                      "Rock'n MegaSession (Japan, ver 1.0)",         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, rockn3,    0,        rockn2,   rockn,     rockn_state,    init_rockn3,  ROT270,                    "Jaleco",                      "Rock'n 3 (Japan)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 2000, rockn4,    0,        rockn2,   rockn,     rockn_state,    init_rockn3,  ROT270,                    "Jaleco / PCCWJ",              "Rock'n 4 (Japan, prototype)",                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, vjslap,    0,        vjdash,   vjdash,    stepstag_state, empty_init,   ROT0,                      "Jaleco",                      "VJ: Visual & Music Slap",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, vjdash,    vjslap,   vjdash,   vjdash,    stepstag_state, empty_init,   ROT0,                      "Jaleco",                      "VJ Dash (ver 1.0)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, vjdasha,   vjslap,   vjdash,   vjdash,    stepstag_state, empty_init,   ROT0,                      "Jaleco",                      "VJ Dash (Ver 1.2)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, vjslap,    0,        vjdash,   vjdash,    stepstag_state, empty_init,   ROT0,                      "Jaleco",                      "VJ: Visual & Music Slap",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, vjdash,    vjslap,   vjdash,   vjdash,    stepstag_state, empty_init,   ROT0,                      "Jaleco",                      "VJ Dash (ver 1.0)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, vjdasha,   vjslap,   vjdash,   vjdash,    stepstag_state, empty_init,   ROT0,                      "Jaleco",                      "VJ Dash (Ver 1.2)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // Undumped:
 // - Stepping Stage <- the original Game
 // - Stepping Stage 2 Supreme
 // Dumped (partially):
-GAME( 1999, stepstag,  0,        stepstag, stepstag,  stepstag_state, empty_init,   ROT0,                      "Jaleco",                      "Stepping Stage Special",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, step3,     0,        stepstag, stepstag,  stepstag_state, empty_init,   ROT0,                      "Jaleco",                      "Stepping 3 Superior",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, stepstag,  0,        stepstag, stepstag,  stepstag_state, empty_init,   ROT0,                      "Jaleco",                      "Stepping Stage Special",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, step3,     0,        stepstag, stepstag,  stepstag_state, empty_init,   ROT0,                      "Jaleco",                      "Stepping 3 Superior",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

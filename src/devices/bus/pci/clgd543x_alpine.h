@@ -28,7 +28,7 @@ protected:
 
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
-//	virtual void mmio_map(address_map &map) ATTR_COLD;
+//  virtual void mmio_map(address_map &map) ATTR_COLD;
 	void vram_aperture_map(address_map &map) ATTR_COLD;
 private:
 	required_device<cirrus_gd5430_vga_device> m_vga;

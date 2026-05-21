@@ -31,21 +31,39 @@ public:
 			bool const fixed)
 		: mahjong_panel_connector_device(mconfig, tag, owner, u32(0))
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<T>(opts), dflt, fixed);
 	}
 	mahjong_panel_connector_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 	virtual ~mahjong_panel_connector_device();
 
 	u8 read(u8 select) { return m_panel ? m_panel->read(select) : 0x3f; }
 
+	static void standard_panels(device_slot_interface &device) ATTR_COLD;
+	static void mahjong_panels(device_slot_interface &device) ATTR_COLD;
+	static void hanafuda_panels(device_slot_interface &device) ATTR_COLD;
+	static void medal_panels(device_slot_interface &device) ATTR_COLD;
+	static void amusement_panels(device_slot_interface &device) ATTR_COLD;
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 
 private:
 	device_mahjong_panel_interface *m_panel;
+};
+
+
+class mahjong_panel_device_base : public device_t, public device_mahjong_panel_interface
+{
+public:
+	virtual u8 read(u8 select) override;
+
+protected:
+	mahjong_panel_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	required_ioport_array<6> m_keys;
 };
 
 

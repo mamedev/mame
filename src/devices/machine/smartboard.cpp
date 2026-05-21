@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
-/******************************************************************************
+/*
 
 Tasc SmartBoard SB30 (analog)
 
@@ -18,7 +18,7 @@ SB20 and the newer SB30 are not emulated. They're on different hardware, with
 embedded CPU to reduce I/O overhead. Note, those are not compatible with old
 versions of Tasc R30.
 
-******************************************************************************/
+*/
 
 #include "emu.h"
 #include "smartboard.h"
@@ -128,8 +128,7 @@ ioport_constructor tasc_sb30_device::device_input_ports() const
 
 void tasc_sb30_device::device_add_mconfig(machine_config &config)
 {
-	SENSORBOARD(config, m_board);
-	m_board->set_type(sensorboard_device::INDUCTIVE);
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::INDUCTIVE);
 	m_board->set_max_id(32);
 	m_board->init_cb().set(FUNC(tasc_sb30_device::init_cb));
 	m_board->spawn_cb().set(FUNC(tasc_sb30_device::spawn_cb));

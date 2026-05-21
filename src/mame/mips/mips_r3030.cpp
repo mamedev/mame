@@ -372,7 +372,7 @@ void mips_r3030_state::r3030(machine_config &config)
 	m_scsi->drq_handler_cb().set(m_rambo, FUNC(mips_rambo_device::drq_w<0>));
 
 	// ethernet
-	AM7990(config, m_net);
+	AM7990(config, m_net, 10'000'000); // clock is a guess
 	m_net->intr_out().set(FUNC(mips_r3030_state::irq_w<INT_NET>));
 	m_net->dma_in().set(FUNC(mips_r3030_state::lance_r));
 	m_net->dma_out().set(FUNC(mips_r3030_state::lance_w));

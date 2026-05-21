@@ -183,7 +183,7 @@ void vme_mvme328_device::device_add_mconfig(machine_config &config)
 											  m_sts |= 1U << 6;
 										  else
 											  m_sts &= ~(1U << 6);
-										  
+
 										  m_cpu->set_input_line(INPUT_LINE_IRQ6, state);
 									  });
 
@@ -205,7 +205,7 @@ void vme_mvme328_device::device_add_mconfig(machine_config &config)
 											  m_sts |= 1U << 5;
 										  else
 											  m_sts &= ~(1U << 5);
-										  
+
 										  m_cpu->set_input_line(INPUT_LINE_IRQ5, state);
 									  });
 

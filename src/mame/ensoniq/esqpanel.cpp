@@ -508,11 +508,16 @@ void esqpanel_device::rcv_complete()    // Rx completed receiving byte
 
 //  if (data >= 0xe0) LOG("Got %02x from motherboard (second %s)\n", data, m_expect_calibration_second_byte ? "yes" : "no");
 
-	send_to_display(data);
+	// Set this to `true` to prevent this byte to be sent to the display.
+	// This lets us avoid sending keyboard calibration and light related
+	// commands that the display just has to ignore anyway.
+	bool skip_display = false;
+
 	m_external_panel_server->send_to_all(data);
 
 	if (m_expect_calibration_second_byte)
 	{
+		skip_display = true;
 //      LOG("second byte is %02x\n", data);
 		if (data == 0xfd)   // calibration request
 		{
@@ -523,6 +528,8 @@ void esqpanel_device::rcv_complete()    // Rx completed receiving byte
 	}
 	else if (m_expect_light_second_byte)
 	{
+		skip_display = true;
+
 		// Lights on the Buttons, on the VFX-SD:
 		// Number   Button
 		// 0        1-6
@@ -552,10 +559,12 @@ void esqpanel_device::rcv_complete()    // Rx completed receiving byte
 	}
 	else if (data == 0xfb)   // request calibration
 	{
+		skip_display = true;
 		m_expect_calibration_second_byte = true;
 	}
 	else if (data == 0xff)  // button light state command
 	{
+		skip_display = true;
 		m_expect_light_second_byte = true;
 	}
 	else
@@ -577,6 +586,12 @@ void esqpanel_device::rcv_complete()    // Rx completed receiving byte
 				xmit_char(data);   // actual value of response is never checked
 			}
 		}
+	}
+
+	// If this was not inhibited, send this to the display as well.
+	if (!skip_display)
+	{
+		send_to_display(data);
 	}
 }
 

@@ -24,23 +24,7 @@
 
 #ifdef SDLMAME_UNIX
 
-#if defined(__sun__) && defined(__svr4__)
-#define SDLMAME_SOLARIS 1
-#define NO_AFFINITY_NP 1
-//#undef _XOPEN_SOURCE
-//#undef _XOPEN_VERSION
-//#undef _XOPEN_SOURCE_EXTENDED
-//#undef _XPG6
-//#undef _XPG5
-//#undef _XPG4_2
-//#define _XOPEN_SOURCE
-//#define _XOPEN_VERSION 4
-#elif defined(__irix__) || defined(__sgi)
-#define SDLMAME_IRIX 1
-/* Large file support on IRIX needs _SGI_SOURCE */
-#undef _POSIX_SOURCE
-
-#elif defined(__linux__) || defined(__FreeBSD_kernel__)
+#if defined(__linux__) || defined(__FreeBSD_kernel__)
 #define SDLMAME_LINUX 1
 
 #elif defined(__FreeBSD__)
@@ -76,11 +60,6 @@ struct _IO_FILE {};  //_IO_FILE is an opaque type in the emscripten libc which m
 // fix for Ubuntu 8.10
 #ifdef _FORTIFY_SOURCE
 #undef _FORTIFY_SOURCE
-#endif
-
-// nasty hack to stop altivec #define vector/bool/pixel screwing us over
-#if defined(__ALTIVEC__) && !defined(__APPLE_ALTIVEC__)
-#define __APPLE_ALTIVEC__ 1
 #endif
 
 #endif /* SDLMAME_UNIX */

@@ -50,6 +50,8 @@
 
 #include <cfloat>
 #include <cmath>
+#include <locale>
+#include <sstream>
 
 
 // This array *must* stay in order, it's binary-searched
@@ -460,7 +462,8 @@ const double XTAL::known_xtals[] = {
 	 36'000'000, // 36_MHz_XTAL            Sega Model 1 video board
 	 36'864'000, // 36.864_MHz_XTAL        Unidesa Cirsa Rock 'n' Roll
 	 37'980'000, // 37.98_MHz_XTAL         Falco 5220
-	 38'769'220, // 38.76922_MHz_XTAL      Namco System 21 video board
+	 38'769'220, // 38.76922_MHz_XTAL      Namco System 21 video board (C67 / Driver's Eyes)
+	 38'808'000, // 38.808_MHz_XTAL        Namco System 21 video board (Winning Run)
 	 38'863'630, // 38.86363_MHz_XTAL      Sharp X68000 15.98kHz video
 	 39'321'600, // 39.3216_MHz_XTAL       Sun 2/120
 	 39'710'000, // 39.71_MHz_XTAL         Wyse WY-60 132-column display clock
@@ -597,25 +600,21 @@ bool XTAL::validate(double base_clock)
 	return false;
 }
 
-void XTAL::validate(const char *message) const
+void XTAL::validate(std::string_view message) const
 {
 	if(!validate(m_base_clock))
 		fail(m_base_clock, message);
 }
 
-void XTAL::validate(const std::string &message) const
+void XTAL::fail(double base_clock, std::string_view message)
 {
-	if(!validate(m_base_clock))
-		fail(m_base_clock, message);
-}
-
-void XTAL::fail(double base_clock, const std::string &message)
-{
-	std::string full_message = util::string_format("Unknown crystal value %.0f. ", base_clock);
+	std::ostringstream full_message;
+	full_message.imbue(std::locale::classic());
+	util::stream_format(full_message, "Unknown crystal value %.0f. ", base_clock);
 	if(xtal_error_low && xtal_error_high)
-		full_message += util::string_format(" Did you mean %.0f or %.0f?", xtal_error_low, xtal_error_high);
+		util::stream_format(full_message, " Did you mean %.0f or %.0f?", xtal_error_low, xtal_error_high);
 	else
-		full_message += util::string_format(" Did you mean %.0f?", xtal_error_low ? xtal_error_low : xtal_error_high);
-	full_message += util::string_format(" Context: %s\n", message);
-	fatalerror("%s\n", full_message);
+		util::stream_format(full_message, " Did you mean %.0f?", xtal_error_low ? xtal_error_low : xtal_error_high);
+	util::stream_format(full_message, " Context: %s\n", message);
+	fatalerror("%s", std::move(full_message).str());
 }

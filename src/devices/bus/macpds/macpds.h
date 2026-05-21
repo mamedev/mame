@@ -28,14 +28,12 @@ class macpds_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	template <typename T>
-	macpds_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *nbtag, T &&opts, const char *dflt)
+	template <typename T, typename U>
+	macpds_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&nbtag, U &&opts, const char *dflt)
 		: macpds_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_macpds_slot(nbtag);
+		set_options(std::forward<U>(opts), dflt, false);
+		set_macpds_slot(std::forward<T>(nbtag));
 	}
 
 	macpds_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -47,14 +45,14 @@ public:
 protected:
 	macpds_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	// configuration
 	required_device<macpds_device> m_macpds;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(MACPDS_SLOT, macpds_slot_device)
 
 
@@ -87,7 +85,7 @@ public:
 protected:
 	macpds_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -98,7 +96,7 @@ protected:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(MACPDS, macpds_device)
 
 // ======================> device_macpds_card_interface

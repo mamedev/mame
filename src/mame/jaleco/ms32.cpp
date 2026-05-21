@@ -41,7 +41,7 @@ OTHER   : 5.5v battery
 
 ROMs:     None
 
-Chips marked * also appear on a non-megasystem 32 tetris 2 plus board
+Chips marked * also appear on a non-MegaSystem 32 Tetris 2 Plus board
 
 MS32 Cartridge
 --------------
@@ -60,7 +60,7 @@ PK Soccer V2     - Custom chip: JALECO SS92046-01 9338EV 436091 06441
 Tetris Plus      - Custom chip: JALECO SS92046-01 9412EV 450891 06441
 Angel Kiss       - Custom chip: JALECO SS92047-01 9423EV 450891 06441
 Gratia (set 1)   - Custom chip: JALECO SS92047-01 9423EV 450891 06441
-kirarast         - Custom chip: JALECO SS92047-01 9425EV 367821 06441
+Kirara Star      - Custom chip: JALECO SS92047-01 9425EV 367821 06441
 P47-Aces         - Custom chip: JALECO SS92048-01 9410EV 436091 06441
 
 Custom chips are 144 pin PQFP, some times mounted on a small plug-in board silkscreened SE93139 EB91022-30056
@@ -71,26 +71,26 @@ others are unknown
 Notes
 -----
 
-Some of the roms for each game are encrypted:
+Some of the ROMs for each game are encrypted:
   16x16x8 'Scroll' Tiles (Non-Roz BG Layer)
   8x8x8 'Ascii' Tiles (FG Layer)
 
-The only difference between the two Gratia sets are the encrypted ROMs in each set (they use
-different custom chips). The program ROMs are the same, as is all non encrypted graphics data.
+Some games have been released with different custom chips.
+The program ROMs are the same, as is all non encrypted graphics data.
 It's been verified that when the encrypted data is decrypted with it's respective algorithms
 the data in both sets match 100%
 
 
-ToDo / Notes
+TODO / Notes
 ------------
 
 Z80 + Sound Bits
 
-Priorities (code in tetrisp2.cpp doesn't use all of the priority ram.. and doesn't work here)
+Priorities (code in tetrisp2.cpp doesn't use all of the priority RAM.. and doesn't work here)
  - some games require completely reversed list processing!
 
-Dip switches/inputs in t2m32 and f1superb
-some games (hayaosi2) don't seem to have service mode even if it's listed among the dips
+DIP switches/inputs in t2m32 and f1superb
+some games (hayaosi2) don't seem to have service mode even if it's listed among the DIPs
 service mode is still accessible through F1 though
 
 Fix Anything Else (Palette etc.)
@@ -141,7 +141,7 @@ Not Working Games
 -----------------
 
 f1superb - the road is always rendered as straight.
-         - the game has a road layer and extra roms for it
+         - the game has a road layer and extra ROMs for it
          - there is an unknown maths DSP for protection
 
 Jaleco Megasystem 32 Game List - thanks to Yasuhiro
@@ -159,11 +159,11 @@ F-1 Super Battle (f1superb)
 
 Idol Janshi Su-Chi-Pi 2 (suchie2)
 Ryuusei Janshi Kirara Star (kirarast)
-Mahjong Angel Kiss
-Vs. Janshi Brand New Stars
+Mahjong Angel Kiss (akiss)
+Vs. Janshi Brand New Stars (bnstars)
 
 
-Hayaoshi Quiz Nettou Namahousou ( hayaosi3 )
+Hayaoshi Quiz Nettou Namahousou (hayaosi3)
 Hayaoshi Quiz Grand Champion Taikai (hayaosi2)
 
 Not Dumped:
@@ -475,8 +475,9 @@ Notes from Charles MacDonald
 
 #include "mahjong.h"
 
-#include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
+#include "cpu/z80/z80.h"
+
 #include "speaker.h"
 
 #include "f1superb.lh"
@@ -486,7 +487,7 @@ Notes from Charles MacDonald
 
 ioport_value ms32_state::mahjong_ctrl_r()
 {
-	u32 mj_input = 0xff;
+	u32 mj_input = 0x3f;
 
 	for (int i = 0; i < m_io_mj.size(); i++)
 	{
@@ -494,7 +495,8 @@ ioport_value ms32_state::mahjong_ctrl_r()
 			mj_input &= m_io_mj[i]->read();
 	}
 
-	return bitswap<8>(mj_input, 6, 5, 4, 2, 3, 1, 0, 7);
+	// rotated one bit left so the Start column is the least significant bit
+	return bitswap<6>(mj_input, 4, 2, 3, 1, 0, 5) | 0xc0;
 }
 
 void ms32_base_state::sound_command_w(u32 data)
@@ -824,7 +826,7 @@ I'm thinking that the stuff is dumped in that RAM at 0xFD100000 that's
 not used by other games and then some FPU operation is carried out on it
 before it's grabbed by the sprite copy code. The "option" stuff, may be
 they tried a few different ways to work out the sprite coords? There's
-one more intersting string at 0xFFE481FC referenced from unused code
+one more interesting string at 0xFFE481FC referenced from unused code
 at 0xFFE47FBC. It looks like debugging dump of sprite coordinate and
 angle information.
 
@@ -852,7 +854,7 @@ the structure of the "fpu" device, it uses two arrays of static info
 loaded from the ROM at boot, two identical sets of registers, and 4
 banks of volatile data read in every frame or so from the ROM race
 track arrays (although it looks like one was not used in the end).
-There's a sequence of four operations ivolving the "fpu" carried out
+There's a sequence of four operations involving the "fpu" carried out
 to prepare the info which then gets copied back to RAM and then to
 sprite RAM. I'll capture the relevant info and see if I can figure out
 what the operations might be, my maths isn't up to much though...
@@ -963,22 +965,6 @@ static INPUT_PORTS_START( ms32_mahjong )
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_INCLUDE(mahjong_matrix_1p)
-
-	PORT_MODIFY("KEY0")
-	PORT_BIT( 0x00000060, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_START1 ) // rotated into LSB
-
-	PORT_MODIFY("KEY1")
-	PORT_BIT( 0x000000c0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("KEY2")
-	PORT_BIT( 0x000000c0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("KEY3")
-	PORT_BIT( 0x000000c0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("KEY4")
-	PORT_BIT( 0x000000c0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 /*************************************
@@ -1781,13 +1767,13 @@ void ms32_f1superbattle_state::f1superb(machine_config &config)
 /********** ROM LOADING **********/
 
 ROM_START( bbbxing )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "mb93138a_25_ver1.3.25", 0x000003, 0x80000, CRC(b526b41e) SHA1(44945931b159646468a954d5acdd2c6c61daf098) ) /* uses MB-93138A EB91022-20078-1 rom board */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "mb93138a_25_ver1.3.25", 0x000003, 0x80000, CRC(b526b41e) SHA1(44945931b159646468a954d5acdd2c6c61daf098) ) // uses MB-93138A EB91022-20078-1 ROM board
 	ROM_LOAD32_BYTE( "mb93138a_27_ver1.3.27", 0x000002, 0x80000, CRC(45b27ad8) SHA1(0af415b17400aabecdcb6d1d069f28b64780017f) )
 	ROM_LOAD32_BYTE( "mb93138a_29_ver1.3.29", 0x000001, 0x80000, CRC(85bbbe79) SHA1(bc5ebb96491762e6a0d202ddf7faeb57c66211b4) )
 	ROM_LOAD32_BYTE( "mb93138a_31_ver1.3.31", 0x000000, 0x80000, CRC(e0c865ed) SHA1(f21e8dc174c50d7afdd3f82c1c66dfcc002bdd07) )
 
-	ROM_REGION( 0x1100000, "sprite", 0 ) /* sprites */
+	ROM_REGION( 0x1100000, "sprite", 0 )
 	ROM_LOAD32_WORD( "mr92042-07.1",          0x0000002, 0x200000, CRC(c1c10c3b) SHA1(e1f739f38e148c4d7aff6b81b3e42131c5c6c3dd) )
 	ROM_LOAD32_WORD( "mr92042-06.13",         0x0000000, 0x200000, CRC(4b8c1574) SHA1(c389c70b532d54528a175f460ca3f329b34cf67c) )
 	ROM_LOAD32_WORD( "mr92042-09.2",          0x0400002, 0x200000, CRC(03b77c1e) SHA1(f156ae6a4f2a8ae99815eb5a7b28425d273c1c3e) )
@@ -1799,34 +1785,34 @@ ROM_START( bbbxing )
 	ROM_LOAD32_WORD( "mb93138a_5_ver1.0.5",   0x1000002, 0x080000, CRC(64989edf) SHA1(033eab0e8a53607b2bb420f6356804b2cfa1544c) )
 	ROM_LOAD32_WORD( "mb93138a_17_ver1.0.17", 0x1000000, 0x080000, CRC(1d7ebaf0) SHA1(5aac7cb01013ce3be206318678aced5812bff9a9) )
 
-	ROM_REGION( 0x200000, "roztiles", 0 ) /* roz tiles */
+	ROM_REGION( 0x200000, "roztiles", 0 )
 	ROM_LOAD( "mr92042-05.9",   0x000000, 0x200000, CRC(a41cb650) SHA1(1c55a4afe55c1250806f2d93c25842dc3fb7f987) )
 
-	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 )
 	ROM_LOAD( "mr92042-04.11",  0x000000, 0x200000, CRC(85238ca9) SHA1(1ce32d585fe66764d621c11882ef9d2abaea6256) )
 
-	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 )
 	ROM_LOAD( "mr92042-01.32",0x000000, 0x080000, CRC(3ffdae75) SHA1(2b837d28f7ecdd49e8525bd5c249e83021d5fe9f) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "mb93138a_21_ver1.0.21",  0x000000, 0x040000, CRC(5f3ea01f) SHA1(761f6a5852312d2b12de009f3cf0476f5b2e906c) )
 
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples
 	ROM_LOAD( "mr92042-01.22",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "mr92042-02.23",  0x200000, 0x200000, CRC(b7875a23) SHA1(62bb4c1318f98ea68894658d92ce08e84d386d0c) )
 
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
 ROM_END
 
 ROM_START( suchie2 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "mb-93166-26_ver1.1.26", 0x000003, 0x80000, CRC(e4e62134) SHA1(224b3e8dba56009bf2af6eceb7495e60302a6360) ) /* uses MB-94166 EB91022-20101 rom board */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "mb-93166-26_ver1.1.26", 0x000003, 0x80000, CRC(e4e62134) SHA1(224b3e8dba56009bf2af6eceb7495e60302a6360) ) // uses MB-94166 EB91022-20101 ROM board
 	ROM_LOAD32_BYTE( "mb-93166-27_ver1.1.27", 0x000002, 0x80000, CRC(7bd00919) SHA1(60565b5e1da5fee00ac4a7fb1202d7150dab49ee) )
 	ROM_LOAD32_BYTE( "mb-93166-28_ver1.1.28", 0x000001, 0x80000, CRC(aa49eec2) SHA1(173afc596caa1c464fc3247cb64d36c1d97a1520) )
 	ROM_LOAD32_BYTE( "mb-93166-29_ver1.1.29", 0x000000, 0x80000, CRC(92763e41) SHA1(eb593bbb586661c4c4e8728d845b146974d0bdf8) )
 
-	ROM_REGION( 0x1000000, "sprite", 0 ) /* sprites */
+	ROM_REGION( 0x1000000, "sprite", 0 )
 	ROM_LOAD32_WORD( "mb94019-02.1",  0x000002, 0x200000, CRC(f9d692f2) SHA1(666df55d26e00be39073173fa3616ac9dafbe615) )
 	ROM_LOAD32_WORD( "mb94019-01.13", 0x000000, 0x200000, CRC(1ddfe825) SHA1(27fbf492fdb4f0b4b8db18330e840c130213e15e) )
 	ROM_LOAD32_WORD( "mb94019-04.2",  0x400002, 0x200000, CRC(24ca77ec) SHA1(a5c575224ab276cbed5785f40fc0d35dd2748e74) )
@@ -1836,34 +1822,34 @@ ROM_START( suchie2 )
 	ROM_LOAD32_WORD( "mb94019-08.4",  0xc00002, 0x200000, CRC(4b07edc9) SHA1(22aaa923a94a7bec997d2adabc8ec2c7696c33a5) )
 	ROM_LOAD32_WORD( "mb94019-07.16", 0xc00000, 0x200000, CRC(34f471a8) SHA1(4c9c358a9bfdb436a211caa14d085e631609681d) )
 
-	ROM_REGION( 0x200000, "roztiles", 0 ) /* roz tiles */
+	ROM_REGION( 0x200000, "roztiles", 0 )
 	ROM_LOAD( "94019-09.11", 0x000000, 0x200000, CRC(cde7bb6f) SHA1(47454dac4ce67ce8d7e0c5ef3a732477ac8170a7) )
 
-	ROM_REGION( 0x100000, "bgtiles", 0 ) /* bg tiles */
+	ROM_REGION( 0x100000, "bgtiles", 0 )
 	ROM_LOAD( "mb94019-12.10", 0x000000, 0x100000, CRC(15ae05d9) SHA1(ac00d3766c42ccba4585b9acfacc81bcb940ac26) )
 
-	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 )
 	ROM_LOAD( "mb-93166-30_ver1.0.30", 0x000000, 0x080000, CRC(0c738883) SHA1(e552c1842d759e5e617eb9c6cc178620a461b4dd) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "mb-93166-21_ver1.0.21", 0x000000, 0x040000, CRC(e7fd1bf4) SHA1(74567530364bfd93bffddb588758d8498e197668) )
 
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples
 	ROM_LOAD( "mb94019-10.22", 0x000000, 0x200000, CRC(745d41ec) SHA1(9118d0f27b65c9d37970326ccf86fdccb81d32f5) )
 	ROM_LOAD( "mb94019-11.23", 0x200000, 0x200000, CRC(021dc350) SHA1(c71936091f86440201fdbdc94b0d1d22c4018188) )
 
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
 ROM_END
 
 ROM_START( suchie2o )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "mb-93166-26_ver1.0.26", 0x000003, 0x80000, CRC(21dc94dd) SHA1(faf2eea891cb061d5df47ef31d9538feb0c1233c) ) /* uses MB-94166 EB91022-20101 rom board */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "mb-93166-26_ver1.0.26", 0x000003, 0x80000, CRC(21dc94dd) SHA1(faf2eea891cb061d5df47ef31d9538feb0c1233c) ) // uses MB-94166 EB91022-20101 ROM board
 	ROM_LOAD32_BYTE( "mb-93166-27_ver1.0.27", 0x000002, 0x80000, CRC(5bf18a7d) SHA1(70869dc37e6ad79ce4e85db71a03c5cccf9d732b) )
 	ROM_LOAD32_BYTE( "mb-93166-28_ver1.0.28", 0x000001, 0x80000, CRC(b1261d51) SHA1(3f393aeb7a076c4d2d2cc7f22ead05f405186d80) )
 	ROM_LOAD32_BYTE( "mb-93166-29_ver1.0.29", 0x000000, 0x80000, CRC(9211c82a) SHA1(0aa3f93293b81e0f66b985046eb5e91708693959) )
 
-	ROM_REGION( 0x1000000, "sprite", 0 ) /* sprites */
+	ROM_REGION( 0x1000000, "sprite", 0 )
 	ROM_LOAD32_WORD( "mb94019-02.1",  0x000002, 0x200000, CRC(f9d692f2) SHA1(666df55d26e00be39073173fa3616ac9dafbe615) )
 	ROM_LOAD32_WORD( "mb94019-01.13", 0x000000, 0x200000, CRC(1ddfe825) SHA1(27fbf492fdb4f0b4b8db18330e840c130213e15e) )
 	ROM_LOAD32_WORD( "mb94019-04.2",  0x400002, 0x200000, CRC(24ca77ec) SHA1(a5c575224ab276cbed5785f40fc0d35dd2748e74) )
@@ -1873,34 +1859,34 @@ ROM_START( suchie2o )
 	ROM_LOAD32_WORD( "mb94019-08.4",  0xc00002, 0x200000, CRC(4b07edc9) SHA1(22aaa923a94a7bec997d2adabc8ec2c7696c33a5) )
 	ROM_LOAD32_WORD( "mb94019-07.16", 0xc00000, 0x200000, CRC(34f471a8) SHA1(4c9c358a9bfdb436a211caa14d085e631609681d) )
 
-	ROM_REGION( 0x200000, "roztiles", 0 ) /* roz tiles */
+	ROM_REGION( 0x200000, "roztiles", 0 )
 	ROM_LOAD( "mb94019-09.11", 0x000000, 0x200000, CRC(cde7bb6f) SHA1(47454dac4ce67ce8d7e0c5ef3a732477ac8170a7) )
 
-	ROM_REGION( 0x100000, "bgtiles", 0 ) /* bg tiles */
+	ROM_REGION( 0x100000, "bgtiles", 0 )
 	ROM_LOAD( "mb94019-12.10", 0x000000, 0x100000, CRC(15ae05d9) SHA1(ac00d3766c42ccba4585b9acfacc81bcb940ac26) )
 
-	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 )
 	ROM_LOAD( "mb-93166-30_ver1.0.30", 0x000000, 0x080000, CRC(0c738883) SHA1(e552c1842d759e5e617eb9c6cc178620a461b4dd) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "mb-93166-21_ver1.0.21", 0x000000, 0x040000, CRC(e7fd1bf4) SHA1(74567530364bfd93bffddb588758d8498e197668) )
 
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples
 	ROM_LOAD( "mb94019-10.22", 0x000000, 0x200000, CRC(745d41ec) SHA1(9118d0f27b65c9d37970326ccf86fdccb81d32f5) )
 	ROM_LOAD( "mb94019-11.23", 0x200000, 0x200000, CRC(021dc350) SHA1(c71936091f86440201fdbdc94b0d1d22c4018188) )
 
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
 ROM_END
 
 ROM_START( desertwr )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "mb93166_ver1.0-26.26", 0x000003, 0x80000, CRC(582b9584) SHA1(027a987cde7e9e1b24aef6a3086eba61679ad0b6) ) /* uses MB-94166 EB91022-20101 rom board */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "mb93166_ver1.0-26.26", 0x000003, 0x80000, CRC(582b9584) SHA1(027a987cde7e9e1b24aef6a3086eba61679ad0b6) ) // uses MB-94166 EB91022-20101 ROM board
 	ROM_LOAD32_BYTE( "mb93166_ver1.0-27.27", 0x000002, 0x80000, CRC(cb60dda3) SHA1(0499b8ab19abdf8db8c18d778b3f9f6e0d277ff0) )
 	ROM_LOAD32_BYTE( "mb93166_ver1.0-28.28", 0x000001, 0x80000, CRC(0de40efb) SHA1(c49c3b27939e428dec1f642b7fdb9a1ff760289a) )
 	ROM_LOAD32_BYTE( "mb93166_ver1.0-29.29", 0x000000, 0x80000, CRC(fc25eae2) SHA1(a4d47fcb4d4c3285cf67d77d8a21478f344b98ca) )
 
-	ROM_REGION( 0x1000000, "sprite", 0 ) /* sprites */
+	ROM_REGION( 0x1000000, "sprite", 0 )
 	ROM_LOAD32_WORD( "mb94038-01.13", 0x000000, 0x200000, CRC(f11f83e2) SHA1(e3c99e6583003210483163c79182cb14aa334702) )
 	ROM_LOAD32_WORD( "mb94038-02.1",  0x000002, 0x200000, CRC(3d1fa710) SHA1(5fae3e8c714cca88e22e432dd7275c6898c631a8) )
 	ROM_LOAD32_WORD( "mb94038-03.14", 0x400000, 0x200000, CRC(84fd5790) SHA1(6187ff32a63f3b4105ea875f52237f0d4314f8b6) )
@@ -1910,36 +1896,36 @@ ROM_START( desertwr )
 	ROM_LOAD32_WORD( "mb94038-07.16", 0xc00000, 0x200000, CRC(426f4193) SHA1(98a16a70c225d7cd061fcd6e88992d393e6ef9fd) )
 	ROM_LOAD32_WORD( "mb94038-08.4",  0xc00002, 0x200000, CRC(f4088399) SHA1(9d53880996f85776815840bca1f8c3958de4c275) )
 
-	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles", 0 )
 	ROM_LOAD( "mb94038-11.11", 0x000000, 0x200000, CRC(bf2ec3a3) SHA1(904cd5ab2e855bdb94bc70efa6db42af672337d7) )
 	ROM_LOAD( "mb94038-12.12", 0x200000, 0x200000, CRC(d0e113da) SHA1(57f27cbd58421a0afe724fec5628c4a29aad8868) )
 
-	ROM_REGION( 0x400000, "bgtiles", 0 ) /* bg tiles */
-	ROM_LOAD( "mb94038-09.10", 0x000000, 0x200000, CRC(72ec1ce7) SHA1(88bd9ca3aa7a6410e8fcf6fd70304f12724653bb) ) /* YES, the ROM number & socket number are backwards - it's correct */
+	ROM_REGION( 0x400000, "bgtiles", 0 )
+	ROM_LOAD( "mb94038-09.10", 0x000000, 0x200000, CRC(72ec1ce7) SHA1(88bd9ca3aa7a6410e8fcf6fd70304f12724653bb) ) // YES, the ROM number & socket number are backwards - it's correct
 	ROM_LOAD( "mb94038-10.9",  0x200000, 0x200000, CRC(1e17f2a9) SHA1(19e6be1daa157593fbab84149f1f739dd39c9226) )
 
-	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 )
 	ROM_LOAD( "mb93166_ver1.0-29.30", 0x000000, 0x080000, CRC(980ab89c) SHA1(8468fc13a5988e25750e8d99ff464f46e86ab412) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "mb93166_ver1.0-21.21", 0x000000, 0x040000, CRC(9300be4c) SHA1(a8e9c1704abf26545aeb9a5d28fd0cafd38f2d84) )
 
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples
 	ROM_LOAD( "mb92042-01.22", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "mb94038-13.23", 0x200000, 0x200000, CRC(b0cac8f2) SHA1(f7d2e32d9c2f301341f7c02678c2c1e09ce655ba) )
 
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
 ROM_END
 
 ROM_START( f1superb )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
 	ROM_LOAD32_BYTE( "f1sb26.bin", 0x000003, 0x80000, CRC(042fccd5) SHA1(4a69de3aef51adad502d54987468170b9e7bb8ac) )
 	ROM_LOAD32_BYTE( "f1sb27.bin", 0x000002, 0x80000, CRC(5f96cf32) SHA1(c9c64576a8bb81a8e8bbe30b054ed33afd760b93) )
 	ROM_LOAD32_BYTE( "f1sb28.bin", 0x000001, 0x80000, CRC(cfda8003) SHA1(460146556f606bf213d7e2ab29d2eb8827131bd0) )
 	ROM_LOAD32_BYTE( "f1sb29.bin", 0x000000, 0x80000, CRC(f21f1481) SHA1(97a97ff3b9a71b1a024d8f2cfe57a1d02cec5ea4) )
 
-	ROM_REGION( 0x2000000, "sprite", 0 ) /* 8x8 not all? */
+	ROM_REGION( 0x2000000, "sprite", 0 ) // 8x8 not all?
 	ROM_LOAD32_WORD( "f1sb1.bin",  0x0000002, 0x200000, CRC(53a3a97b) SHA1(c8cd501ae10d9eb48a02e4e59a1ce389a27afc44) )
 	ROM_LOAD32_WORD( "f1sb13.bin", 0x0000000, 0x200000, CRC(36565a99) SHA1(db08ff3107dcc07ca31140715d7d4b7bd27fa4c5) )
 	ROM_LOAD32_WORD( "f1sb2.bin",  0x0400002, 0x200000, CRC(a452f50a) SHA1(3782a37203b652ea5df5b04dc74a0fdace7b14cc) )
@@ -1957,43 +1943,43 @@ ROM_START( f1superb )
 	ROM_LOAD32_WORD( "f1sb8.bin",  0x1c00002, 0x200000, CRC(ba3f1533) SHA1(3ff1c4cca8358fc8daf0d2c381672569085ac9ae) )
 	ROM_LOAD32_WORD( "f1sb20.bin", 0x1c00000, 0x200000, CRC(fa349897) SHA1(31e08aa2821e409057e3094333b9ecbe04a6a38a) )
 
-	ROM_REGION( 0x800000, "roztiles", 0 ) /* roz tiles */
+	ROM_REGION( 0x800000, "roztiles", 0 )
 	ROM_LOAD( "f1sb9.bin",  0x000000, 0x200000, CRC(66b12e1f) SHA1(4dc3f162a5116403cc0c491af335208672c8e9af) )
 	ROM_LOAD( "f1sb10.bin", 0x200000, 0x200000, CRC(893d7f4b) SHA1(b2734f20f703a0dcf8b1fdaebf2b6198b2fb0f51) )
 	ROM_LOAD( "f1sb11.bin", 0x400000, 0x200000, CRC(0b848bb5) SHA1(e4c0e434add151112352d6068e5de1a7098e6346) )
 	ROM_LOAD( "f1sb12.bin", 0x600000, 0x200000, CRC(edecd5f4) SHA1(9b86802d08e5c8ec1a6dcea75dc8f050d3e96970) )
 
-	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 )
 	ROM_LOAD( "f1sb31.bin", 0x000000, 0x200000, CRC(1d0d2efd) SHA1(e6446ef9c71be9316c286157f71e0043347c6a5c) )
 
-	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 )
 	ROM_LOAD( "f1sb32.bin", 0x000000, 0x080000, CRC(1b31fcce) SHA1(354cc6f43cd3bf3ba921ac8c5631ab993bedf563) )
 
-	ROM_REGION( 0x800000, "gfx5", 0 ) /* extra data? doesn't seem to be tiles */
+	ROM_REGION( 0x800000, "gfx5", 0 ) // extra data? doesn't seem to be tiles
 	ROM_LOAD( "f1sb2b.bin", 0x000000, 0x200000, CRC(18d73b16) SHA1(f06f4d31b15658cc1e1b559ae3b8a90b797546ca) )
 	ROM_LOAD( "f1sb3b.bin", 0x200000, 0x200000, CRC(ce728fe0) SHA1(e0fd7b8f4d3dc9e2b15ddf027c61e67e5c1f22b5) )
 	ROM_LOAD( "f1sb4b.bin", 0x400000, 0x200000, CRC(077180c5) SHA1(ab16739da709ecdbbb1264beba349ef6ecf3f8b1) )
 	ROM_LOAD( "f1sb5b.bin", 0x600000, 0x200000, CRC(efabc47d) SHA1(195afde8a1f45da4fc04c3080a3cf5fdfff7be5e) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "f1sb21.bin", 0x000000, 0x040000, CRC(e131e1c7) SHA1(33f95a074930c49548069518d8c6dcde7fa25627) )
 
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples
 	ROM_LOAD( "mr92042-01.22", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "f1sb23.bin", 0x200000, 0x200000, CRC(bfefa3ab) SHA1(7770cc9b091e258ede7f2780df61a592cc008dd7) )
 
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
 ROM_END
 
 ROM_START( gratia )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "94019_26_ver1.0.26", 0x000003, 0x80000, CRC(f398cba5) SHA1(11e06abebfdfc8a99b5c56e9f6ed389f645b6c72) ) /* Labeled 94019  (26)Ver1,0  with the Kanji version of the game name before "(26)" */
-	ROM_LOAD32_BYTE( "94019_27_ver1.0.27", 0x000002, 0x80000, CRC(ba3318c5) SHA1(9b100988b998c39b586b51fe9fee874dbf711610) ) /* Labeled 94019  (27)Ver1,0  with the Kanji version of the game name before "(27)" */
-	ROM_LOAD32_BYTE( "94019_28_ver1.0.28", 0x000001, 0x80000, CRC(e0762e89) SHA1(a567c347e7f73f1ef1c753d14ac4f58311380fac) ) /* Labeled 94019  (28)Ver1,0  with the Kanji version of the game name before "(28)" */
-	ROM_LOAD32_BYTE( "94019_29_ver1.0.29", 0x000000, 0x80000, CRC(8059800b) SHA1(7548d01b6ea15e962353b3585db6515e5819e5ce) ) /* Labeled 94019  (29)Ver1,0  with the Kanji version of the game name before "(29)" */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "94019_26_ver1.0.26", 0x000003, 0x80000, CRC(f398cba5) SHA1(11e06abebfdfc8a99b5c56e9f6ed389f645b6c72) ) // Labeled 94019  (26)Ver1,0  with the Kanji version of the game name before "(26)"
+	ROM_LOAD32_BYTE( "94019_27_ver1.0.27", 0x000002, 0x80000, CRC(ba3318c5) SHA1(9b100988b998c39b586b51fe9fee874dbf711610) ) // Labeled 94019  (27)Ver1,0  with the Kanji version of the game name before "(27)"
+	ROM_LOAD32_BYTE( "94019_28_ver1.0.28", 0x000001, 0x80000, CRC(e0762e89) SHA1(a567c347e7f73f1ef1c753d14ac4f58311380fac) ) // Labeled 94019  (28)Ver1,0  with the Kanji version of the game name before "(28)"
+	ROM_LOAD32_BYTE( "94019_29_ver1.0.29", 0x000000, 0x80000, CRC(8059800b) SHA1(7548d01b6ea15e962353b3585db6515e5819e5ce) ) // Labeled 94019  (29)Ver1,0  with the Kanji version of the game name before "(29)"
 
-	ROM_REGION( 0x0c00000, "sprite", 0 ) /* sprites */
+	ROM_REGION( 0x0c00000, "sprite", 0 )
 	ROM_LOAD32_WORD( "mr94019-01.13", 0x000000, 0x200000, CRC(92d8ae9b) SHA1(02b36e6e14b28a9830e07fd328772dbb20b76889) )
 	ROM_LOAD32_WORD( "mr94019-02.1",  0x000002, 0x200000, CRC(f7bd9cc4) SHA1(5658bfb4081439ab06c6ade2531581aa60d1c6be) )
 	ROM_LOAD32_WORD( "mr94019-03.14", 0x400000, 0x200000, CRC(62a69590) SHA1(d95cc1e1ec85161ee6cd1ae77b405cf8ef81217a) )
@@ -2001,35 +1987,35 @@ ROM_START( gratia )
 	ROM_LOAD32_WORD( "mr94019-05.15", 0x800000, 0x200000, CRC(a16994df) SHA1(9170b1fd9252d7a9601c3b2e6b1ba86686730b86) )
 	ROM_LOAD32_WORD( "mr94019-06.3",  0x800002, 0x200000, CRC(01d52ef1) SHA1(1585c7eb3729bab78467f627b7b671d619451a74) )
 
-	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles", 0 )
 	ROM_LOAD( "mr94019-08.11", 0x000000, 0x200000, CRC(abd124e0) SHA1(2da1d818c909e4abbb79ed03f3dbf15d744439ce) )
 	ROM_LOAD( "mr94019-09.12", 0x200000, 0x200000, CRC(711ab08b) SHA1(185b80b965ac3aba4857b4f83637008c2c1cc6ff) )
 
-	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 )
 	ROM_LOAD( "94019_2.07", 0x000000, 0x200000, CRC(043f969b) SHA1(ad10339e561c1a65451a2e9a8e79ceda3787674a) )
 
-	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 )
 	ROM_LOAD( "94019_2.030",0x000000, 0x080000, CRC(f9543fcf) SHA1(8466c7893bc6c43e2a80b8f91a776fd0a345ea6c) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
-	ROM_LOAD( "94019_21ver1.0.21",0x000000, 0x040000, CRC(6e8dd039) SHA1(f1e69c9b40b14ba0f8377a6d9b6c3933919bc803) ) /* Labeled 94019  (21)Ver1,0  with the Kanji version of the game name before "(21)" */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
+	ROM_LOAD( "94019_21ver1.0.21",0x000000, 0x040000, CRC(6e8dd039) SHA1(f1e69c9b40b14ba0f8377a6d9b6c3933919bc803) ) // Labeled 94019  (21)Ver1,0  with the Kanji version of the game name before "(21)"
 
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples
 	ROM_LOAD( "mr92042-01.22", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "mr94019-10.23", 0x200000, 0x200000, CRC(a751e316) SHA1(3d658370c71b83582fd132b3da441089df9bfd05) )
 
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
 ROM_END
 
 ROM_START( gratiaa )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "94019_26_ver1.0.26", 0x000003, 0x80000, CRC(f398cba5) SHA1(11e06abebfdfc8a99b5c56e9f6ed389f645b6c72) ) /* Labeled 94019  (26)Ver1,0  with the Kanji version of the game name before "(26)" */
-	ROM_LOAD32_BYTE( "94019_27_ver1.0.27", 0x000002, 0x80000, CRC(ba3318c5) SHA1(9b100988b998c39b586b51fe9fee874dbf711610) ) /* Labeled 94019  (27)Ver1,0  with the Kanji version of the game name before "(27)" */
-	ROM_LOAD32_BYTE( "94019_28_ver1.0.28", 0x000001, 0x80000, CRC(e0762e89) SHA1(a567c347e7f73f1ef1c753d14ac4f58311380fac) ) /* Labeled 94019  (28)Ver1,0  with the Kanji version of the game name before "(28)" */
-	ROM_LOAD32_BYTE( "94019_29_ver1.0.29", 0x000000, 0x80000, CRC(8059800b) SHA1(7548d01b6ea15e962353b3585db6515e5819e5ce) ) /* Labeled 94019  (29)Ver1,0  with the Kanji version of the game name before "(29)" */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "94019_26_ver1.0.26", 0x000003, 0x80000, CRC(f398cba5) SHA1(11e06abebfdfc8a99b5c56e9f6ed389f645b6c72) ) // Labeled 94019  (26)Ver1,0  with the Kanji version of the game name before "(26)"
+	ROM_LOAD32_BYTE( "94019_27_ver1.0.27", 0x000002, 0x80000, CRC(ba3318c5) SHA1(9b100988b998c39b586b51fe9fee874dbf711610) ) // Labeled 94019  (27)Ver1,0  with the Kanji version of the game name before "(27)"
+	ROM_LOAD32_BYTE( "94019_28_ver1.0.28", 0x000001, 0x80000, CRC(e0762e89) SHA1(a567c347e7f73f1ef1c753d14ac4f58311380fac) ) // Labeled 94019  (28)Ver1,0  with the Kanji version of the game name before "(28)"
+	ROM_LOAD32_BYTE( "94019_29_ver1.0.29", 0x000000, 0x80000, CRC(8059800b) SHA1(7548d01b6ea15e962353b3585db6515e5819e5ce) ) // Labeled 94019  (29)Ver1,0  with the Kanji version of the game name before "(29)"
 
-	ROM_REGION( 0x0c00000, "sprite", 0 ) /* sprites */
+	ROM_REGION( 0x0c00000, "sprite", 0 )
 	ROM_LOAD32_WORD( "mr94019-01.13", 0x000000, 0x200000, CRC(92d8ae9b) SHA1(02b36e6e14b28a9830e07fd328772dbb20b76889) )
 	ROM_LOAD32_WORD( "mr94019-02.1",  0x000002, 0x200000, CRC(f7bd9cc4) SHA1(5658bfb4081439ab06c6ade2531581aa60d1c6be) )
 	ROM_LOAD32_WORD( "mr94019-03.14", 0x400000, 0x200000, CRC(62a69590) SHA1(d95cc1e1ec85161ee6cd1ae77b405cf8ef81217a) )
@@ -2037,35 +2023,35 @@ ROM_START( gratiaa )
 	ROM_LOAD32_WORD( "mr94019-05.15", 0x800000, 0x200000, CRC(a16994df) SHA1(9170b1fd9252d7a9601c3b2e6b1ba86686730b86) )
 	ROM_LOAD32_WORD( "mr94019-06.3",  0x800002, 0x200000, CRC(01d52ef1) SHA1(1585c7eb3729bab78467f627b7b671d619451a74) )
 
-	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles", 0 )
 	ROM_LOAD( "mr94019-08.11", 0x000000, 0x200000, CRC(abd124e0) SHA1(2da1d818c909e4abbb79ed03f3dbf15d744439ce) )
 	ROM_LOAD( "mr94019-09.12", 0x200000, 0x200000, CRC(711ab08b) SHA1(185b80b965ac3aba4857b4f83637008c2c1cc6ff) )
 
-	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 )
 	ROM_LOAD( "mr94019-07.10", 0x000000, 0x200000, CRC(561a786b) SHA1(23df08d50801bd6e4a2f12dd3bb50632ff77f0f2) )
 
-	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
-	ROM_LOAD( "94019_30ver1.0.30",0x000000, 0x080000, CRC(026b5379) SHA1(b9237477f1bf8ae83174e8231492fe667e6d6a13) ) /* Labeled 94019  (21)Ver1,0  with the Kanji version of the game name before "(30)" */
+	ROM_REGION( 0x080000, "txtiles", 0 )
+	ROM_LOAD( "94019_30ver1.0.30",0x000000, 0x080000, CRC(026b5379) SHA1(b9237477f1bf8ae83174e8231492fe667e6d6a13) ) // Labeled 94019  (21)Ver1,0  with the Kanji version of the game name before "(30)"
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
-	ROM_LOAD( "94019_21ver1.0.21",0x000000, 0x040000, CRC(6e8dd039) SHA1(f1e69c9b40b14ba0f8377a6d9b6c3933919bc803) ) /* Labeled 94019  (21)Ver1,0  with the Kanji version of the game name before "(21)" */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
+	ROM_LOAD( "94019_21ver1.0.21",0x000000, 0x040000, CRC(6e8dd039) SHA1(f1e69c9b40b14ba0f8377a6d9b6c3933919bc803) ) // Labeled 94019  (21)Ver1,0  with the Kanji version of the game name before "(21)"
 
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples
 	ROM_LOAD( "mr92042-01.22", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "mr94019-10.23", 0x200000, 0x200000, CRC(a751e316) SHA1(3d658370c71b83582fd132b3da441089df9bfd05) )
 
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
 ROM_END
 
 ROM_START( gametngk )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "mb94166_ver1.0-26.26", 0x000003, 0x80000, CRC(e622e774) SHA1(203c2a3563a337af4cec92a66e0fa410d901b01f) ) /* uses MB-94166 EB91022-20101 rom board */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "mb94166_ver1.0-26.26", 0x000003, 0x80000, CRC(e622e774) SHA1(203c2a3563a337af4cec92a66e0fa410d901b01f) ) // uses MB-94166 EB91022-20101 ROM board
 	ROM_LOAD32_BYTE( "mb94166_ver1.0-27.27", 0x000002, 0x80000, CRC(da862b9c) SHA1(17dc6da08d7f5551c8f4bc4d9c416dbfc82d8397) )
 	ROM_LOAD32_BYTE( "mb94166_ver1.0-28.28", 0x000001, 0x80000, CRC(b3738934) SHA1(cd07572e55e83807e76179cfc6b97e0410067911) )
 	ROM_LOAD32_BYTE( "mb94166_ver1.0-29.29", 0x000000, 0x80000, CRC(45154a45) SHA1(4c7c2c6738fdfe54ebe41a0ac6222cbfce5d7757) )
 
-	ROM_REGION( 0x1000000, "sprite", 0 ) /* sprites */
+	ROM_REGION( 0x1000000, "sprite", 0 )
 	ROM_LOAD32_WORD( "mr94041-01.13", 0x0000000, 0x200000, CRC(3f99adf7) SHA1(cbb8d2fc253b0c58e7eb9286c66e6b36daf9d4af) )
 	ROM_LOAD32_WORD( "mr94041-02.1",  0x0000002, 0x200000, CRC(c3c5ae69) SHA1(5ed7f57a7139f87c680c68e44ea4022b917a9381) )
 	ROM_LOAD32_WORD( "mr94041-03.14", 0x0400000, 0x200000, CRC(d858b6de) SHA1(a06cf529c9508c8c8508894e2e004373edd9debf) )
@@ -2075,36 +2061,36 @@ ROM_START( gametngk )
 	ROM_LOAD32_WORD( "mr94041-07.16", 0x0c00000, 0x200000, CRC(a6966af5) SHA1(3a65824f3f325af39d8e9932357ce9f8878f0321) )
 	ROM_LOAD32_WORD( "mr94041-08.4",  0x0c00002, 0x200000, CRC(d7d2f73a) SHA1(0eb28f4cdea73aa8fed0b62cbac6cd7d7694c2ee) )
 
-	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles", 0 )
 	ROM_LOAD( "mr94041-11.11", 0x000000, 0x200000, CRC(00dcdbc3) SHA1(f7e34bc9f714ea81fc9855d90db792dd1e99bae8) )
 	ROM_LOAD( "mr94041-12.12", 0x200000, 0x200000, CRC(0ce48329) SHA1(9c198cef998eb3b9c33123bd8cc02210498f82d9) )
 
-	ROM_REGION( 0x400000, "bgtiles", 0 ) /* bg tiles */
-	ROM_LOAD( "mr94041-09.10", 0x000000, 0x200000, CRC(a33e6051) SHA1(d6e34b022eb36dcfa8cfe6d6d1254f994b3b3dca) ) /* YES, the ROM number & socket number are backwards - it's correct */
+	ROM_REGION( 0x400000, "bgtiles", 0 )
+	ROM_LOAD( "mr94041-09.10", 0x000000, 0x200000, CRC(a33e6051) SHA1(d6e34b022eb36dcfa8cfe6d6d1254f994b3b3dca) ) // YES, the ROM number & socket number are backwards - it's correct
 	ROM_LOAD( "mr94041-10.9",  0x200000, 0x200000, CRC(b3497147) SHA1(df7d8ea7ec3e3df5e0c6658f14995df5479181bf) )
 
-	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 )
 	ROM_LOAD( "mb94166_ver1.0-30.30", 0x000000, 0x080000, CRC(c0f27b7f) SHA1(874fe80aa4b46520f844ef6efa61f28eabccbc4f) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "mb94166_ver1.0-21.21", 0x000000, 0x040000, CRC(38dcb837) SHA1(29fdde54e52dec4ee39a6f2db8e0d67774320d15) )
 
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples
 	ROM_LOAD( "mr94041-13.22", 0x000000, 0x200000, CRC(fba84caf) SHA1(318270dbf825a8e0f315992c49a2dc34dd1df7c1) )
 	ROM_LOAD( "mr94041-14.23", 0x200000, 0x200000, CRC(2d6308bd) SHA1(600b6ccdbb976301075e0b287124a9fd5fe7fc1b) )
 
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
 ROM_END
 
 ROM_START( hayaosi2 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "mb93138a.25", 0x000003, 0x80000, CRC(563c6f2f) SHA1(bc2a61fd2e0adf58256feeef8491b67af6d6eacf) ) /* uses MB-93138A EB91022-20078-1 rom board */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "mb93138a.25", 0x000003, 0x80000, CRC(563c6f2f) SHA1(bc2a61fd2e0adf58256feeef8491b67af6d6eacf) ) // uses MB-93138A EB91022-20078-1 ROM board
 	ROM_LOAD32_BYTE( "mb93138a.27", 0x000002, 0x80000, CRC(fe8e283a) SHA1(fc6c06ae296110b1f5794187d5208b17541614cb) )
 	ROM_LOAD32_BYTE( "mb93138a.29", 0x000001, 0x80000, CRC(e6fe3d0d) SHA1(9a0caab82b160991b4f2ac993e7e4b4c5d3bb15e) )
 	ROM_LOAD32_BYTE( "mb93138a.31", 0x000000, 0x80000, CRC(d944bf8c) SHA1(ce93b5d2ebe886b38dc42b1e554b17dc951a51b4) )
 
-	ROM_REGION( 0x900000, "sprite", 0 ) /* sprites */
+	ROM_REGION( 0x900000, "sprite", 0 )
 	ROM_LOAD32_WORD( "mr93038.04",  0x000000, 0x200000, CRC(ab5edb11) SHA1(b7742aefbce9efc512c3526714b6f20a6c03af60) )
 	ROM_LOAD32_WORD( "mr93038.05",  0x000002, 0x200000, CRC(274522f1) SHA1(717435d6bf1b2a2220a2f0a53b070bb81cc2ed2b) )
 	ROM_LOAD32_WORD( "mr93038.06",  0x400000, 0x200000, CRC(f9961ebf) SHA1(e91b160cb5a76e3f6044cc71681dadf2fbff7e8b) )
@@ -2112,24 +2098,24 @@ ROM_START( hayaosi2 )
 	ROM_LOAD32_WORD( "mb93138a.15", 0x800000, 0x080000, CRC(a5f64d87) SHA1(11bf017f700faba57a5a2edced7a5d81a581bc50) )
 	ROM_LOAD32_WORD( "mb93138a.3",  0x800002, 0x080000, CRC(a2ae2b21) SHA1(65cee4e5e0a9b8dcac578e34210e1af7d7b2e6f7) )
 
-	ROM_REGION( 0x200000, "roztiles", 0 ) /* roz tiles */
+	ROM_REGION( 0x200000, "roztiles", 0 )
 	ROM_LOAD( "mr93038.03",  0x000000, 0x200000, CRC(6999dec9) SHA1(eb4c6ba200cd08b41509314c659feb3af12117ee) )
 
-	ROM_REGION( 0x100000, "bgtiles", 0 ) /* bg tiles */
+	ROM_REGION( 0x100000, "bgtiles", 0 )
 	ROM_LOAD( "mr93038.08",  0x000000, 0x100000, CRC(21282cb0) SHA1(52ea94a6457f7684674783c362052bcc40086dd0) )
 
-	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 )
 	ROM_LOAD( "mb93138a.32", 0x000000, 0x080000, CRC(f563a144) SHA1(14d86e4992329811857e1faf282cd9ec530a364c) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "mb93138a.21", 0x000000, 0x040000, CRC(8e8048b0) SHA1(93285a0570ed829b36f4e8c57d133a7dd14f123d) )
 
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples - 8-bit signed PCM
 	ROM_LOAD( "mr92042.01",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "mr93038.01",  0x200000, 0x200000, CRC(b8a38bfc) SHA1(1aa7b69beebceb6f09a1ee006de054cb84002e94) )
 
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
 ROM_END
 
 /*
@@ -2200,13 +2186,13 @@ Lithium battery + LH5168D-10L(SRAM)
 
 
 ROM_START( hayaosi3 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "mb93138_25_ver1.5.25", 0x000003, 0x80000, CRC(ba8cec03) SHA1(edaa52e0b07307bb21168205ee0d5d6ff8168de9) ) /* uses MB-93138A EB91022-20078-1 rom board */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "mb93138_25_ver1.5.25", 0x000003, 0x80000, CRC(ba8cec03) SHA1(edaa52e0b07307bb21168205ee0d5d6ff8168de9) ) // uses MB-93138A EB91022-20078-1 ROM board
 	ROM_LOAD32_BYTE( "mb93138_27_ver1.5.27", 0x000002, 0x80000, CRC(571725df) SHA1(66575ec1a29d6fc1b50ae5a5ce8025bb1043deaf) )
 	ROM_LOAD32_BYTE( "mb93138_29_ver1.5.29", 0x000001, 0x80000, CRC(da891976) SHA1(27e8c395e92ca01b47bffdf766bc95a6c2150815) )
 	ROM_LOAD32_BYTE( "mb93138_31_ver1.5.31", 0x000000, 0x80000, CRC(2d17bb06) SHA1(623b603c4002734427c882424a1e0dc889cf7e02) )
 
-	ROM_REGION( 0x1000000, "sprite", 0 ) /* sprites */
+	ROM_REGION( 0x1000000, "sprite", 0 )
 	ROM_LOAD32_WORD( "mr94027.01",  0x000000, 0x200000, CRC(c72e5c6e) SHA1(b98cd656c48c775953d00b5d8bafd4ffde76d8df) )
 	ROM_LOAD32_WORD( "mr94027.02",  0x000002, 0x200000, CRC(59976568) SHA1(a280c352d612913834c76b8e23d86c937fd21281) )
 	ROM_LOAD32_WORD( "mr94027.03",  0x400000, 0x200000, CRC(3ff68f4f) SHA1(1e367b92560c32c87e27fc0e99be3bdb5eb0510b) )
@@ -2216,34 +2202,34 @@ ROM_START( hayaosi3 )
 	ROM_LOAD32_WORD( "mr94027.07",  0xc00000, 0x200000, CRC(c66099c4) SHA1(5a6edffa39a98f38cc3cffbad9191fb2e794a812) )
 	ROM_LOAD32_WORD( "mr94027.08",  0xc00002, 0x200000, CRC(753b05e0) SHA1(0424e92b32a73c27ecb549e6e9449446ea938e40) )
 
-	ROM_REGION( 0x200000, "roztiles", 0 ) /* roz tiles */
+	ROM_REGION( 0x200000, "roztiles", 0 )
 	ROM_LOAD( "mr94027.09",  0x000000, 0x200000, CRC(32ead437) SHA1(b94175cf186b4ebcc180a4c092d2ffcdd9ff3b1d) )
 
-	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 )
 	ROM_LOAD( "mr94027.11",  0x000000, 0x200000, CRC(b65d5096) SHA1(2c4e1e3e9f96be8369cb2de142a82f94506f85c0) )
 
-	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 )
 	ROM_LOAD( "mb93138_32_ver1.0.32", 0x000000, 0x080000, CRC(df5d00b4) SHA1(2bbbcd546d5b5170d81bf33b37b46b70b417c9c7) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "mb93138.21", 0x000000, 0x040000, CRC(008bc217) SHA1(eec66a86f285ccbc47eba17a4bb83cc1f8a5f425) )
 
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples - 8-bit signed PCM
 	ROM_LOAD( "mr92042.01",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "mr94027.10",  0x200000, 0x200000, CRC(e7cabe41) SHA1(5d903baed690a98856f7581319cf4dbfe1db47bb) )
 
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
 ROM_END
 
 ROM_START( hayaosi3a )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "mb93138_25_ver1.2.25", 0x000003, 0x80000, CRC(71b1f51b) SHA1(bd1c4f75c2949a998ce0f5acaf6def7e7069e40b) ) /* uses MB-93138A EB91022-20078-1 rom board */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "mb93138_25_ver1.2.25", 0x000003, 0x80000, CRC(71b1f51b) SHA1(bd1c4f75c2949a998ce0f5acaf6def7e7069e40b) ) // uses MB-93138A EB91022-20078-1 ROM board
 	ROM_LOAD32_BYTE( "mb93138_27_ver1.2.27", 0x000002, 0x80000, CRC(2657e8dc) SHA1(efeafe8c890d447ab4584fd7509538fc86fd555b) )
 	ROM_LOAD32_BYTE( "mb93138_29_ver1.2.29", 0x000001, 0x80000, CRC(8999b41b) SHA1(95b94112105bfa2b708bad44bbbdc33616ad2182) )
 	ROM_LOAD32_BYTE( "mb93138_31_ver1.2.31", 0x000000, 0x80000, CRC(f5d4ef54) SHA1(ed208cb6ed171acac312cb282b2fabc8af70610e) )
 
-	ROM_REGION( 0x1000000, "sprite", 0 ) /* sprites */
+	ROM_REGION( 0x1000000, "sprite", 0 )
 	ROM_LOAD32_WORD( "mr94027.01",  0x000000, 0x200000, CRC(c72e5c6e) SHA1(b98cd656c48c775953d00b5d8bafd4ffde76d8df) )
 	ROM_LOAD32_WORD( "mr94027.02",  0x000002, 0x200000, CRC(59976568) SHA1(a280c352d612913834c76b8e23d86c937fd21281) )
 	ROM_LOAD32_WORD( "mr94027.03",  0x400000, 0x200000, CRC(3ff68f4f) SHA1(1e367b92560c32c87e27fc0e99be3bdb5eb0510b) )
@@ -2253,34 +2239,34 @@ ROM_START( hayaosi3a )
 	ROM_LOAD32_WORD( "mr94027.07",  0xc00000, 0x200000, CRC(c66099c4) SHA1(5a6edffa39a98f38cc3cffbad9191fb2e794a812) )
 	ROM_LOAD32_WORD( "mr94027.08",  0xc00002, 0x200000, CRC(753b05e0) SHA1(0424e92b32a73c27ecb549e6e9449446ea938e40) )
 
-	ROM_REGION( 0x200000, "roztiles", 0 ) /* roz tiles */
+	ROM_REGION( 0x200000, "roztiles", 0 )
 	ROM_LOAD( "mr94027.09",  0x000000, 0x200000, CRC(32ead437) SHA1(b94175cf186b4ebcc180a4c092d2ffcdd9ff3b1d) )
 
-	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 )
 	ROM_LOAD( "mr94027.11",  0x000000, 0x200000, CRC(b65d5096) SHA1(2c4e1e3e9f96be8369cb2de142a82f94506f85c0) )
 
-	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 )
 	ROM_LOAD( "mb93138_32_ver1.0.32", 0x000000, 0x080000, CRC(df5d00b4) SHA1(2bbbcd546d5b5170d81bf33b37b46b70b417c9c7) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "mb93138_21_ver1.0.21", 0x000000, 0x040000, CRC(008bc217) SHA1(eec66a86f285ccbc47eba17a4bb83cc1f8a5f425) )
 
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples - 8-bit signed PCM
 	ROM_LOAD( "mr92042.01",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "mr94027.10",  0x200000, 0x200000, CRC(e7cabe41) SHA1(5d903baed690a98856f7581319cf4dbfe1db47bb) )
 
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
 ROM_END
 
 ROM_START( kirarast )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
 	ROM_LOAD32_BYTE( "mr95025.26", 0x000003, 0x80000, CRC(eb7faf5f) SHA1(5b79ff3043db5ef2622ae1665145462d949c9bb8) )
 	ROM_LOAD32_BYTE( "mr95025.27", 0x000002, 0x80000, CRC(80644d05) SHA1(6da8bf8aeb1477112f9022c0c5f472cbcd27df8e) )
 	ROM_LOAD32_BYTE( "mr95025.28", 0x000001, 0x80000, CRC(6df8c384) SHA1(3ad01d3d51cfc1f48029c16ee1cc74fc59d7603c) )
 	ROM_LOAD32_BYTE( "mr95025.29", 0x000000, 0x80000, CRC(3b6e681b) SHA1(148fa10631db53a4ad1dcdfb60b4f0654e077396) )
 
-	ROM_REGION( 0x1000000, "sprite", 0 ) /* sprites */
+	ROM_REGION( 0x1000000, "sprite", 0 )
 	ROM_LOAD32_WORD( "mr95025.01",  0x000000, 0x200000, CRC(02279069) SHA1(fb3ce00701271d0163f72e4f2e56faa9f16d8fd0) )
 	ROM_LOAD32_WORD( "mr95025.02",  0x000002, 0x200000, CRC(885161d4) SHA1(1bc82de0b2759758d437db3ef9f0f7805f759b59) )
 	ROM_LOAD32_WORD( "mr95025.03",  0x400000, 0x200000, CRC(1ae06df9) SHA1(e1493a386fd8c54c88afab43d13d73869ae467ee) )
@@ -2290,35 +2276,73 @@ ROM_START( kirarast )
 	ROM_LOAD32_WORD( "mr95025.07",  0xc00000, 0x200000, CRC(0263a010) SHA1(b9c85647b406c89f0e839eac93eaf5d2e6963f7d) )
 	ROM_LOAD32_WORD( "mr95025.08",  0xc00002, 0x200000, CRC(8efc00d6) SHA1(f750e0e21310ceceeae3ad80eb2fe2920f5a0076) )
 
-	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles", 0 )
 	ROM_LOAD( "mr95025.10",  0x000000, 0x200000, CRC(ba7ad413) SHA1(b1f1c218dea3217f21d5e2f44db3786055ed879a) )
 	ROM_LOAD( "mr95025.11",  0x200000, 0x200000, CRC(11557299) SHA1(6efa56f897ab026f965376a0d4032f7a0d20cafe) )
 
-	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 )
 	ROM_LOAD( "mr95025.09",  0x000000, 0x200000, CRC(ca6cbd17) SHA1(9d16ef187b062590315066218e89bdf33cfd9865) )
 
-	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 )
 	ROM_LOAD( "mr95025.30",  0x000000, 0x080000, CRC(aee6e0c2) SHA1(dee985f7a9773ba7a4d31a3833a7775d778bbe5a) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "mr95025.21",  0x000000, 0x040000, CRC(a6c70c7f) SHA1(fe2108f3e8d46ed53d8c5c98e8d0fdb19b77075d) )
 
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples - 8-bit signed PCM
 	ROM_LOAD( "mr95025.12",  0x000000, 0x200000, CRC(1dd4f766) SHA1(455befd3a216f2197cd2e7e4899d4f1af7d20bf7) )
 	ROM_LOAD( "mr95025.13",  0x200000, 0x200000, CRC(0adfe5b8) SHA1(02309e5789b58896e5f68603502c76d4a917bd91) )
 
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
+ROM_END
+
+ROM_START( kirarasta )
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "mb93166_ver1.0-26.26", 0x000003, 0x80000, CRC(eb7faf5f) SHA1(5b79ff3043db5ef2622ae1665145462d949c9bb8) ) // uses MB-94166 EB91022-20101 ROM board
+	ROM_LOAD32_BYTE( "mb93166_ver1.0-27.27", 0x000002, 0x80000, CRC(80644d05) SHA1(6da8bf8aeb1477112f9022c0c5f472cbcd27df8e) )
+	ROM_LOAD32_BYTE( "mb93166_ver1.0-28.28", 0x000001, 0x80000, CRC(6df8c384) SHA1(3ad01d3d51cfc1f48029c16ee1cc74fc59d7603c) )
+	ROM_LOAD32_BYTE( "mb93166_ver1.0-29.29", 0x000000, 0x80000, CRC(3b6e681b) SHA1(148fa10631db53a4ad1dcdfb60b4f0654e077396) )
+
+	ROM_REGION( 0x1000000, "sprite", 0 )
+	ROM_LOAD32_WORD( "mr95025.01",  0x000000, 0x200000, CRC(02279069) SHA1(fb3ce00701271d0163f72e4f2e56faa9f16d8fd0) )
+	ROM_LOAD32_WORD( "mr95025.02",  0x000002, 0x200000, CRC(885161d4) SHA1(1bc82de0b2759758d437db3ef9f0f7805f759b59) )
+	ROM_LOAD32_WORD( "mr95025.03",  0x400000, 0x200000, CRC(1ae06df9) SHA1(e1493a386fd8c54c88afab43d13d73869ae467ee) )
+	ROM_LOAD32_WORD( "mr95025.04",  0x400002, 0x200000, CRC(91ab7006) SHA1(0b99c352a696e21b2f31207cbf9b4a64edf543ce) )
+	ROM_LOAD32_WORD( "mr95025.05",  0x800000, 0x200000, CRC(e61af029) SHA1(685315e833a168383c4c5cdaf72de172f14995b6) )
+	ROM_LOAD32_WORD( "mr95025.06",  0x800002, 0x200000, CRC(63f64ffc) SHA1(a2a109be24b5f1ec2e41e423d4194394ea8c3c8b) )
+	ROM_LOAD32_WORD( "mr95025.07",  0xc00000, 0x200000, CRC(0263a010) SHA1(b9c85647b406c89f0e839eac93eaf5d2e6963f7d) )
+	ROM_LOAD32_WORD( "mr95025.08",  0xc00002, 0x200000, CRC(8efc00d6) SHA1(f750e0e21310ceceeae3ad80eb2fe2920f5a0076) )
+
+	ROM_REGION( 0x400000, "roztiles", 0 )
+	ROM_LOAD( "mr95025.10",  0x000000, 0x200000, CRC(ba7ad413) SHA1(b1f1c218dea3217f21d5e2f44db3786055ed879a) )
+	ROM_LOAD( "mr95025.11",  0x200000, 0x200000, CRC(11557299) SHA1(6efa56f897ab026f965376a0d4032f7a0d20cafe) )
+
+	ROM_REGION( 0x200000, "bgtiles", 0 )
+	ROM_LOAD( "mr95025-14-10.10",  0x000000, 0x200000, CRC(6b62d346) SHA1(29b07212901d6314dea98fc6382c5689cf2486bd) )
+
+	ROM_REGION( 0x080000, "txtiles", 0 )
+	ROM_LOAD( "mb93166_ver1.0-30-10.30",  0x000000, 0x080000, CRC(331e6365) SHA1(3aa51ca38eacf3011a3e547c23e12d2897fe9705) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
+	ROM_LOAD( "mb93166_ver1.0-21.21",  0x000000, 0x040000, CRC(a6c70c7f) SHA1(fe2108f3e8d46ed53d8c5c98e8d0fdb19b77075d) )
+
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples - 8-bit signed PCM
+	ROM_LOAD( "mr95025.12",  0x000000, 0x200000, CRC(1dd4f766) SHA1(455befd3a216f2197cd2e7e4899d4f1af7d20bf7) )
+	ROM_LOAD( "mr95025.13",  0x200000, 0x200000, CRC(0adfe5b8) SHA1(02309e5789b58896e5f68603502c76d4a917bd91) )
+
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
 ROM_END
 
 ROM_START( akiss )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "mb93166_ver1.0-26.26", 0x000003, 0x80000, CRC(5bdd01ee) SHA1(21b8e07bb7ef6b437a43719b02deeba970330900) ) /* uses MB-94166 EB91022-20101 rom board */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "mb93166_ver1.0-26.26", 0x000003, 0x80000, CRC(5bdd01ee) SHA1(21b8e07bb7ef6b437a43719b02deeba970330900) ) // uses MB-94166 EB91022-20101 ROM board
 	ROM_LOAD32_BYTE( "mb93166_ver1.0-27.27", 0x000002, 0x80000, CRC(bb11b2c9) SHA1(86ba06d28bc8f560ac3d05515d061e05c90d1628) )
 	ROM_LOAD32_BYTE( "mb93166_ver1.0-28.28", 0x000001, 0x80000, CRC(20565478) SHA1(d532ab55be287f45d8d81317bb844c675eb1292c) )
 	ROM_LOAD32_BYTE( "mb93166_ver1.0-29.29", 0x000000, 0x80000, CRC(ff454f0d) SHA1(db81aaaf4160eb62badbe08fc01543463470ac97) )
 
-	ROM_REGION( 0x1000000, "sprite", 0 ) /* sprites */
+	ROM_REGION( 0x1000000, "sprite", 0 )
 	ROM_LOAD32_WORD( "mb95008-01.13", 0x000000, 0x200000, CRC(1be66420) SHA1(9fc85e6108f230418e012ad05586010235139039) )
 	ROM_LOAD32_WORD( "mb95008-02.1",  0x000002, 0x200000, CRC(1cc4808e) SHA1(70a19d66b4f187320c67760bc453b6afb7d66f9a) )
 	ROM_LOAD32_WORD( "mb95008-03.14", 0x400000, 0x200000, CRC(4045f0dc) SHA1(5ba9786618ecad9410dbdf3664f9dda848a754f7) )
@@ -2328,24 +2352,61 @@ ROM_START( akiss )
 	ROM_LOAD32_WORD( "mb95008-07.16", 0xc00000, 0x200000, CRC(bf47747e) SHA1(b97121953f41039182e25ea023802df4524cf9bd) )
 	ROM_LOAD32_WORD( "mb95008-08.4",  0xc00002, 0x200000, CRC(34829a09) SHA1(7229c56fee53a9d4d29cf0c9dec471b6cc4dc30b) )
 
-	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles", 0 )
 	ROM_LOAD( "mb95008-10.11",  0x000000, 0x200000, CRC(52da2e9e) SHA1(d7a29bdd1c6801aa8d36bc098e75091c63ba0766) )
 
-	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
-	ROM_LOAD( "mb95008-09.10",  0x000000, 0x200000,CRC(7236f6a0) SHA1(98dbb55f08d669ef3bf69394bb9739d0e6137fcb) )
+	ROM_REGION( 0x200000, "bgtiles", 0 )
+	ROM_LOAD( "mb95008-09.10",  0x000000, 0x200000, CRC(7236f6a0) SHA1(98dbb55f08d669ef3bf69394bb9739d0e6137fcb) ) // 1ST AND 2ND HALF IDENTICAL
 
-	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 )
 	ROM_LOAD( "mb93166_ver1.0-30.30",  0x000000, 0x080000, CRC(1807c1ea) SHA1(94696b8319c4982cb5d33423f56e2348f210cdb5) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "mb93166_ver1.0-21.21",  0x000000, 0x040000, CRC(01a03687) SHA1(2340c4ed19f434e8c23709edfc93259313aefaf9) )
 
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples - 8-bit signed PCM
 	ROM_LOAD( "mb95008-11.22",  0x000000, 0x200000, CRC(23b9af76) SHA1(98b4087c142500dc759bda94d71c77634452a7ad) )
 	ROM_LOAD( "mb95008-12.23",  0x200000, 0x200000, CRC(780a2f45) SHA1(770cbf04e34ae7d72e6eb2304bcdfaff483cd8c1) )
 
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
+ROM_END
+
+ROM_START( akissa ) // program ROMs still ver 1.0, bgtiles and tx tiles ver 1.1 (but same data as the other sets after decryption)
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "mb93166_ver1.0-26.26", 0x000003, 0x80000, CRC(5bdd01ee) SHA1(21b8e07bb7ef6b437a43719b02deeba970330900) ) // uses MB-94166 EB91022-20101 ROM board
+	ROM_LOAD32_BYTE( "mb93166_ver1.0-27.27", 0x000002, 0x80000, CRC(bb11b2c9) SHA1(86ba06d28bc8f560ac3d05515d061e05c90d1628) )
+	ROM_LOAD32_BYTE( "mb93166_ver1.0-28.28", 0x000001, 0x80000, CRC(20565478) SHA1(d532ab55be287f45d8d81317bb844c675eb1292c) )
+	ROM_LOAD32_BYTE( "mb93166_ver1.0-29.29", 0x000000, 0x80000, CRC(ff454f0d) SHA1(db81aaaf4160eb62badbe08fc01543463470ac97) )
+
+	ROM_REGION( 0x1000000, "sprite", 0 )
+	ROM_LOAD32_WORD( "mb95008-01.13", 0x000000, 0x200000, CRC(1be66420) SHA1(9fc85e6108f230418e012ad05586010235139039) )
+	ROM_LOAD32_WORD( "mb95008-02.1",  0x000002, 0x200000, CRC(1cc4808e) SHA1(70a19d66b4f187320c67760bc453b6afb7d66f9a) )
+	ROM_LOAD32_WORD( "mb95008-03.14", 0x400000, 0x200000, CRC(4045f0dc) SHA1(5ba9786618ecad9410dbdf3664f9dda848a754f7) )
+	ROM_LOAD32_WORD( "mb95008-04.2",  0x400002, 0x200000, CRC(ef3c139d) SHA1(3de374e77443dd4e967dbb5da820fe1c8c78aa1b) )
+	ROM_LOAD32_WORD( "mb95008-05.15", 0x800000, 0x200000, CRC(43ea4a84) SHA1(d9d9898edcf432998ed6b9a1622812def45cf369) )
+	ROM_LOAD32_WORD( "mb95008-06.3",  0x800002, 0x200000, CRC(24f23d4e) SHA1(8a7b6f28f25227391df73edb096695c5fe8df7dc) )
+	ROM_LOAD32_WORD( "mb95008-07.16", 0xc00000, 0x200000, CRC(bf47747e) SHA1(b97121953f41039182e25ea023802df4524cf9bd) )
+	ROM_LOAD32_WORD( "mb95008-08.4",  0xc00002, 0x200000, CRC(34829a09) SHA1(7229c56fee53a9d4d29cf0c9dec471b6cc4dc30b) )
+
+	ROM_REGION( 0x400000, "roztiles", 0 )
+	ROM_LOAD( "mb95008-10.11", 0x000000, 0x200000, CRC(52da2e9e) SHA1(d7a29bdd1c6801aa8d36bc098e75091c63ba0766) )
+
+	ROM_REGION( 0x100000, "bgtiles", 0 )
+	ROM_LOAD( "mb93166_ver1.1-10.10", 0x000000, 0x100000, CRC(af0753be) SHA1(ea8e0fbfd95093d05ea5daec502bb488dc1cf5ec) )
+
+	ROM_REGION( 0x080000, "txtiles", 0 )
+	ROM_LOAD( "mb93166_ver1.1-30.30", 0x000000, 0x080000, CRC(e658f120) SHA1(b942e8e1333ed337bce03a7671c4a45ed370b266) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
+	ROM_LOAD( "mb93166_ver1.0-21.21", 0x000000, 0x040000, CRC(01a03687) SHA1(2340c4ed19f434e8c23709edfc93259313aefaf9) )
+
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples - 8-bit signed PCM
+	ROM_LOAD( "mb95008-11.22", 0x000000, 0x200000, CRC(23b9af76) SHA1(98b4087c142500dc759bda94d71c77634452a7ad) )
+	ROM_LOAD( "mb95008-12.23", 0x200000, 0x200000, CRC(780a2f45) SHA1(770cbf04e34ae7d72e6eb2304bcdfaff483cd8c1) )
+
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
 ROM_END
 
 /*
@@ -2354,13 +2415,13 @@ P-47 Aces Ver 1.1  -  Observed fixes:
   The sound test in the test menu now works.
 */
 ROM_START( p47aces )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "p-47_aces_3-31_rom_26_ver1.1.26", 0x000003, 0x80000, CRC(99c0e211) SHA1(6fc3b1e5ddadda85934145a2e62b55ccb2011fb5) ) /* Labeled "P-47 ACES 3/31  ROM 26 Ver1.1" */
-	ROM_LOAD32_BYTE( "p-47_aces_3-31_rom_27_ver1.1.27", 0x000002, 0x80000, CRC(2a0c107a) SHA1(1d83bd55acaad62a5823f09b1683f846631fdeca) ) /* Labeled "P-47 ACES 3/31  ROM 27 Ver1.1" */
-	ROM_LOAD32_BYTE( "p-47_aces_3-31_rom_28_ver1.1.28", 0x000001, 0x80000, CRC(53509d28) SHA1(44e6388ade514bb747a84bfef17f852393b44a37) ) /* Labeled "P-47 ACES 3/31  ROM 28 Ver1.1" */
-	ROM_LOAD32_BYTE( "p-47_aces_3-31_rom_29_ver1.1.29", 0x000000, 0x80000, CRC(91e7b7da) SHA1(f3a0e193c59e285d97a7ea9bc92a7b3c5c009532) ) /* Labeled "P-47 ACES 3/31  ROM 29 Ver1.1" */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "p-47_aces_3-31_rom_26_ver1.1.26", 0x000003, 0x80000, CRC(99c0e211) SHA1(6fc3b1e5ddadda85934145a2e62b55ccb2011fb5) ) // Labeled "P-47 ACES 3/31  ROM 26 Ver1.1"
+	ROM_LOAD32_BYTE( "p-47_aces_3-31_rom_27_ver1.1.27", 0x000002, 0x80000, CRC(2a0c107a) SHA1(1d83bd55acaad62a5823f09b1683f846631fdeca) ) // Labeled "P-47 ACES 3/31  ROM 27 Ver1.1"
+	ROM_LOAD32_BYTE( "p-47_aces_3-31_rom_28_ver1.1.28", 0x000001, 0x80000, CRC(53509d28) SHA1(44e6388ade514bb747a84bfef17f852393b44a37) ) // Labeled "P-47 ACES 3/31  ROM 28 Ver1.1"
+	ROM_LOAD32_BYTE( "p-47_aces_3-31_rom_29_ver1.1.29", 0x000000, 0x80000, CRC(91e7b7da) SHA1(f3a0e193c59e285d97a7ea9bc92a7b3c5c009532) ) // Labeled "P-47 ACES 3/31  ROM 29 Ver1.1"
 
-	ROM_REGION( 0xe00000, "sprite", 0 ) /* sprites */
+	ROM_REGION( 0xe00000, "sprite", 0 )
 	ROM_LOAD32_WORD( "mr94020-02.1",  0x000002, 0x200000, CRC(28732d3c) SHA1(15b2687bcad31793fc7d6a9dc3eccb7ad9b5f659) )
 	ROM_LOAD32_WORD( "mr94020-01.13", 0x000000, 0x200000, CRC(a6ccf999) SHA1(5d32fb6f6987ede6c125bec9581da4695ad64dff) )
 	ROM_LOAD32_WORD( "mr94020-04.2",  0x400002, 0x200000, CRC(128db576) SHA1(f6561f54f6b95842a5f14d29682449bf0d837a85) )
@@ -2370,36 +2431,36 @@ ROM_START( p47aces )
 	ROM_LOAD32_WORD( "mr94020-08.4",  0xc00002, 0x100000, CRC(4b3372be) SHA1(cdc7d7615b6b5d45ca071b2967980dc6c6294ac0) )
 	ROM_LOAD32_WORD( "mr94020-07.16", 0xc00000, 0x100000, CRC(c23c5467) SHA1(5ff51ecb86ccbae2af160599890e13a7cc70072d) )
 
-	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles", 0 )
 	ROM_LOAD( "mr94020-11.11", 0x000000, 0x200000, CRC(c1fe16b3) SHA1(8b9d2483ba06ab8072676e73d949c696535b3d26) )
 	ROM_LOAD( "mr94020-12.12", 0x200000, 0x200000, CRC(75871325) SHA1(9191263a52ec6ac325cf6130b35be7cdd1ec2f50) )
 
-	ROM_REGION( 0x400000, "bgtiles", 0 ) /* bg tiles */
-	ROM_LOAD( "mr94020-10.10", 0x000000, 0x200000, CRC(a44e9e06) SHA1(ff51796e160d996e931b92049e6214982f270caa) ) /* unlike other sets, the ROM number & socket number match - it's correct */
+	ROM_REGION( 0x400000, "bgtiles", 0 )
+	ROM_LOAD( "mr94020-10.10", 0x000000, 0x200000, CRC(a44e9e06) SHA1(ff51796e160d996e931b92049e6214982f270caa) ) // unlike other sets, the ROM number & socket number match - it's correct
 	ROM_LOAD( "mr94020-09.9",  0x200000, 0x200000, CRC(226014a6) SHA1(090bdc1f6d2b9d33b431dbb49a457a4bb36cd3ad) )
 
-	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
-	ROM_LOAD( "p-47_ver1.0-30.30", 0x000000, 0x080000, CRC(7ba90fad) SHA1(c0a3d4458816f00b8f5eb4b6d4531d1abeaccbe5) ) /* Labeled "P-47 Ver1.0 -30" */
+	ROM_REGION( 0x080000, "txtiles", 0 )
+	ROM_LOAD( "p-47_ver1.0-30.30", 0x000000, 0x080000, CRC(7ba90fad) SHA1(c0a3d4458816f00b8f5eb4b6d4531d1abeaccbe5) ) // Labeled "P-47 Ver1.0 -30"
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
-	ROM_LOAD( "p-47_ver1.0-21.21", 0x000000, 0x040000, CRC(f2d43927) SHA1(69ac20f339a515d58cafbcd6f7d7982ca5cda681) ) /* Labeled "P-47 Ver1.0 -21" */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
+	ROM_LOAD( "p-47_ver1.0-21.21", 0x000000, 0x040000, CRC(f2d43927) SHA1(69ac20f339a515d58cafbcd6f7d7982ca5cda681) ) // Labeled "P-47 Ver1.0 -21"
 
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples - 8-bit signed PCM
 	ROM_LOAD( "mr92042-01.22", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "mr94020-13.23", 0x200000, 0x200000, CRC(547fa4d4) SHA1(8a5ecb3300646762f63d37a27e643e1f6ce5e775) )
 
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
 ROM_END
 
 ROM_START( p47acesa )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "p47_ver1.0-26.26", 0x000003, 0x80000, CRC(e017b819) SHA1(942fb48e8bb3a263534a0351a1a9979d786bc475) ) /* Labeled "P-47 Ver1.0 -26" */
-	ROM_LOAD32_BYTE( "p47_ver1.0-27.27", 0x000002, 0x80000, CRC(bd1b81e0) SHA1(b15f157fe3a30295f999a4c285da2d6f22d7fba6) ) /* Labeled "P-47 Ver1.0 -27" */
-	ROM_LOAD32_BYTE( "p47_ver1.0-28.28", 0x000001, 0x80000, CRC(4742a5f7) SHA1(cd297aa150082c545647c9a755cf2cdbdc98c988) ) /* Labeled "P-47 Ver1.0 -28" */
-	ROM_LOAD32_BYTE( "p47_ver1.0-29.29", 0x000000, 0x80000, CRC(86e17d8b) SHA1(73004f243c6dfb86ce4cc61475dc7caaf452750e) ) /* Labeled "P-47 Ver1.0 -29" */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "p47_ver1.0-26.26", 0x000003, 0x80000, CRC(e017b819) SHA1(942fb48e8bb3a263534a0351a1a9979d786bc475) ) // Labeled "P-47 Ver1.0 -26"
+	ROM_LOAD32_BYTE( "p47_ver1.0-27.27", 0x000002, 0x80000, CRC(bd1b81e0) SHA1(b15f157fe3a30295f999a4c285da2d6f22d7fba6) ) // Labeled "P-47 Ver1.0 -27"
+	ROM_LOAD32_BYTE( "p47_ver1.0-28.28", 0x000001, 0x80000, CRC(4742a5f7) SHA1(cd297aa150082c545647c9a755cf2cdbdc98c988) ) // Labeled "P-47 Ver1.0 -28"
+	ROM_LOAD32_BYTE( "p47_ver1.0-29.29", 0x000000, 0x80000, CRC(86e17d8b) SHA1(73004f243c6dfb86ce4cc61475dc7caaf452750e) ) // Labeled "P-47 Ver1.0 -29"
 
-	ROM_REGION( 0xe00000, "sprite", 0 ) /* sprites */
+	ROM_REGION( 0xe00000, "sprite", 0 )
 	ROM_LOAD32_WORD( "mr94020-02.1",  0x000002, 0x200000, CRC(28732d3c) SHA1(15b2687bcad31793fc7d6a9dc3eccb7ad9b5f659) )
 	ROM_LOAD32_WORD( "mr94020-01.13", 0x000000, 0x200000, CRC(a6ccf999) SHA1(5d32fb6f6987ede6c125bec9581da4695ad64dff) )
 	ROM_LOAD32_WORD( "mr94020-04.2",  0x400002, 0x200000, CRC(128db576) SHA1(f6561f54f6b95842a5f14d29682449bf0d837a85) )
@@ -2409,99 +2470,99 @@ ROM_START( p47acesa )
 	ROM_LOAD32_WORD( "mr94020-08.4",  0xc00002, 0x100000, CRC(4b3372be) SHA1(cdc7d7615b6b5d45ca071b2967980dc6c6294ac0) )
 	ROM_LOAD32_WORD( "mr94020-07.16", 0xc00000, 0x100000, CRC(c23c5467) SHA1(5ff51ecb86ccbae2af160599890e13a7cc70072d) )
 
-	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles", 0 )
 	ROM_LOAD( "mr94020-11.11", 0x000000, 0x200000, CRC(c1fe16b3) SHA1(8b9d2483ba06ab8072676e73d949c696535b3d26) )
 	ROM_LOAD( "mr94020-12.12", 0x200000, 0x200000, CRC(75871325) SHA1(9191263a52ec6ac325cf6130b35be7cdd1ec2f50) )
 
-	ROM_REGION( 0x400000, "bgtiles", 0 ) /* bg tiles */
-	ROM_LOAD( "mr94020-10.10", 0x000000, 0x200000, CRC(a44e9e06) SHA1(ff51796e160d996e931b92049e6214982f270caa) ) /* unlike other sets, the ROM number & socket number match - it's correct */
+	ROM_REGION( 0x400000, "bgtiles", 0 )
+	ROM_LOAD( "mr94020-10.10", 0x000000, 0x200000, CRC(a44e9e06) SHA1(ff51796e160d996e931b92049e6214982f270caa) ) // unlike other sets, the ROM number & socket number match - it's correct
 	ROM_LOAD( "mr94020-09.9",  0x200000, 0x200000, CRC(226014a6) SHA1(090bdc1f6d2b9d33b431dbb49a457a4bb36cd3ad) )
 
-	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
-	ROM_LOAD( "p-47_ver1.0-30.30", 0x000000, 0x080000, CRC(7ba90fad) SHA1(c0a3d4458816f00b8f5eb4b6d4531d1abeaccbe5) ) /* Labeled "P-47 Ver1.0 -30" */
+	ROM_REGION( 0x080000, "txtiles", 0 )
+	ROM_LOAD( "p-47_ver1.0-30.30", 0x000000, 0x080000, CRC(7ba90fad) SHA1(c0a3d4458816f00b8f5eb4b6d4531d1abeaccbe5) ) // Labeled "P-47 Ver1.0 -30"
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
-	ROM_LOAD( "p-47_ver1.0-21.21", 0x000000, 0x040000, CRC(f2d43927) SHA1(69ac20f339a515d58cafbcd6f7d7982ca5cda681) ) /* Labeled "P-47 Ver1.0 -21" */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
+	ROM_LOAD( "p-47_ver1.0-21.21", 0x000000, 0x040000, CRC(f2d43927) SHA1(69ac20f339a515d58cafbcd6f7d7982ca5cda681) ) // Labeled "P-47 Ver1.0 -21"
 
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples - 8-bit signed PCM
 	ROM_LOAD( "mr92042-01.22", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "mr94020-13.23", 0x200000, 0x200000, CRC(547fa4d4) SHA1(8a5ecb3300646762f63d37a27e643e1f6ce5e775) )
 
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
 ROM_END
 
 ROM_START( tetrisp )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "mb93166_ver1.0-26.26", 0x000003, 0x80000, CRC(d318a9ba) SHA1(cae86d86518fdfeb736e7b2040277c76cc3b4017) ) /* uses MB-94166 EB91022-20101 rom board */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "mb93166_ver1.0-26.26", 0x000003, 0x80000, CRC(d318a9ba) SHA1(cae86d86518fdfeb736e7b2040277c76cc3b4017) ) // uses MB-94166 EB91022-20101 ROM board
 	ROM_LOAD32_BYTE( "mb93166_ver1.0-27.27", 0x000002, 0x80000, CRC(2d69b6d3) SHA1(f0a513f449aa25808672fb27e3691ccabfba48a1) )
 	ROM_LOAD32_BYTE( "mb93166_ver1.0-28.28", 0x000001, 0x80000, CRC(87522e16) SHA1(4f0d8abec046884d89c559e3a4a5ac9e0e47a0dc) )
 	ROM_LOAD32_BYTE( "mb93166_ver1.0-29.29", 0x000000, 0x80000, CRC(43a61941) SHA1(a097c88c45d8486eb6ffdd13904b6eb2a3fa45b9) )
 
-	ROM_REGION( 0x400000, "sprite", 0 ) /* sprites */
+	ROM_REGION( 0x400000, "sprite", 0 )
 	ROM_LOAD32_WORD( "mr95024-01.01", 0x000002, 0x200000, CRC(cb0e92b9) SHA1(179cc9e2d819d7f6238e924184e8a383d172aa72) )
 	ROM_LOAD32_WORD( "mr95024-02.13", 0x000000, 0x200000, CRC(4a825990) SHA1(f99ba9f88f5582259ba0e50480451d4e9d1d03b7) )
 
-	ROM_REGION( 0x200000, "roztiles", 0 ) /* roz tiles */
+	ROM_REGION( 0x200000, "roztiles", 0 )
 	ROM_LOAD( "mr95024-04.11", 0x000000, 0x200000, CRC(c0d5246f) SHA1(413285f6b40001281c4fcec1ce73400c3ae610ed) )
 
-	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 )
 	ROM_LOAD( "mr95024-03.10", 0x000000, 0x200000, CRC(a03e4a8d) SHA1(d52c78d5e9d874dce514ffb035f2424409d8fb7a) )
 
-	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 )
 	ROM_LOAD( "mb93166_ver1.0-30.30", 0x000000, 0x080000, CRC(cea7002d) SHA1(5462edaeb9339790b95ed15a4bfaab8fae655b12) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "mb93166_ver1.0-21.21", 0x000000, 0x040000, CRC(5c565e3b) SHA1(d349a8ca50d03c06d8978e6d3632b624f019dee4) )
 
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples
 	ROM_LOAD( "mr92042-01.22", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "mr95024-05.23", 0x200000, 0x200000, CRC(57502a17) SHA1(ce880188854dc17d9ebbfa3c373469cf5e6858c2) )
 
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
 ROM_END
 
 ROM_START( tp2m32 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "mp2_26.ver1.0.26", 0x000003, 0x80000, CRC(152f0ccf) SHA1(1e318e125a54216ebf3f85740db1dd85aacac819) ) /* labeled M  P2 26 Ver1.0  - game name in Kanji between M and P2 - uses MB-94166 EB91022-20101 rom board */
-	ROM_LOAD32_BYTE( "mp2_27.ver1.0.27", 0x000002, 0x80000, CRC(d89468d0) SHA1(023fbc13b0f6332217904c89225b330aa5742f20) ) /* labeled M  P2 27 Ver1.0  - game name in Kanji between M and P2 */
-	ROM_LOAD32_BYTE( "mp2_28.ver1.0.28", 0x000001, 0x80000, CRC(041aac23) SHA1(3f7863ffa897978493e98445fe020dccbe521752) ) /* labeled M  P2 28 Ver1.0  - game name in Kanji between M and P2 */
-	ROM_LOAD32_BYTE( "mp2_29.ver1.0.29", 0x000000, 0x80000, CRC(4e83b2ca) SHA1(2766793f050a6952f4f53a763686f95bd7544f3f) ) /* labeled M  P2 29 Ver1.0  - game name in Kanji between M and P2 */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "mp2_26.ver1.0.26", 0x000003, 0x80000, CRC(152f0ccf) SHA1(1e318e125a54216ebf3f85740db1dd85aacac819) ) // labeled M  P2 26 Ver1.0  - game name in Kanji between M and P2 - uses MB-94166 EB91022-20101 ROM board
+	ROM_LOAD32_BYTE( "mp2_27.ver1.0.27", 0x000002, 0x80000, CRC(d89468d0) SHA1(023fbc13b0f6332217904c89225b330aa5742f20) ) // labeled M  P2 27 Ver1.0  - game name in Kanji between M and P2
+	ROM_LOAD32_BYTE( "mp2_28.ver1.0.28", 0x000001, 0x80000, CRC(041aac23) SHA1(3f7863ffa897978493e98445fe020dccbe521752) ) // labeled M  P2 28 Ver1.0  - game name in Kanji between M and P2
+	ROM_LOAD32_BYTE( "mp2_29.ver1.0.29", 0x000000, 0x80000, CRC(4e83b2ca) SHA1(2766793f050a6952f4f53a763686f95bd7544f3f) ) // labeled M  P2 29 Ver1.0  - game name in Kanji between M and P2
 
-	ROM_REGION( 0x800000, "sprite", 0 ) /* sprites */
+	ROM_REGION( 0x800000, "sprite", 0 )
 	ROM_LOAD32_WORD( "mr96019-01.13", 0x000000, 0x400000, CRC(06f7dc64) SHA1(722c51b707b9854c0293afdff18b27ec7cae6719) )
 	ROM_LOAD32_WORD( "mr96019-02.1",  0x000002, 0x400000, CRC(3e613bed) SHA1(038b5e43fa3d69654107c8093126eeb2e8fa4ddc) )
 
-	ROM_REGION( 0x200000, "roztiles", 0 ) /* roz tiles */
+	ROM_REGION( 0x200000, "roztiles", 0 )
 	ROM_LOAD( "mr96019-04.11", 0x000000, 0x200000, CRC(b5a03129) SHA1(a50d8b70615c49216f647534d1658c1a6d58a783) )
 
-	ROM_REGION( 0x400000, "bgtiles", 0 ) /* bg tiles */
+	ROM_REGION( 0x400000, "bgtiles", 0 )
 	ROM_LOAD( "mr96019-03.10", 0x000000, 0x400000, CRC(94af8057) SHA1(e3bc6e02fe4c503ae51284770a76abbeff989147) )
 
-	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
-	ROM_LOAD( "mp2_30.ver1.0.30", 0x000000, 0x080000, CRC(6845e476) SHA1(61c33714db2e2b5ccdcef0e0d3efdc391fe6aba2) ) /* labeled M  P2 30 Ver1.0  - game name in Kanji between M and P2 */
+	ROM_REGION( 0x080000, "txtiles", 0 )
+	ROM_LOAD( "mp2_30.ver1.0.30", 0x000000, 0x080000, CRC(6845e476) SHA1(61c33714db2e2b5ccdcef0e0d3efdc391fe6aba2) ) // labeled M  P2 30 Ver1.0  - game name in Kanji between M and P2
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
-	ROM_LOAD( "mp2_21.ver1.0.21", 0x000000, 0x040000, CRC(2bcc4176) SHA1(74740fa13ab81b9819b4cfbe9d34a0749ba23b8f) ) /* labeled M  P2 21 Ver1.0  - game name in Kanji between M and P2 */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
+	ROM_LOAD( "mp2_21.ver1.0.21", 0x000000, 0x040000, CRC(2bcc4176) SHA1(74740fa13ab81b9819b4cfbe9d34a0749ba23b8f) ) // labeled M  P2 21 Ver1.0  - game name in Kanji between M and P2
 
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples
 	ROM_LOAD( "mr96019-05.22", 0x000000, 0x200000, CRC(74aa5c31) SHA1(7e3f86198fb678244fab76bee9c72bbdfc818118) )
 
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
 ROM_END
 
 
 
-ROM_START( bnstars ) /* ver 1.1 */
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "vsjanshi_26_ver1.1.26", 0x000003, 0x80000, CRC(75eeec8f) SHA1(26315381baa0abb470203dc565ad98c52fe17b20) ) /* uses MB-94166 EB91022-20101 rom board */
+ROM_START( bnstars ) // ver 1.1
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "vsjanshi_26_ver1.1.26", 0x000003, 0x80000, CRC(75eeec8f) SHA1(26315381baa0abb470203dc565ad98c52fe17b20) ) // uses MB-94166 EB91022-20101 ROM board
 	ROM_LOAD32_BYTE( "vsjanshi_27_ver1.1.27", 0x000002, 0x80000, CRC(69f24ab9) SHA1(e019a444111e4ed7f9a378d6e2d13ddb9324bc49) )
 	ROM_LOAD32_BYTE( "vsjanshi_28_ver1.1.28", 0x000001, 0x80000, CRC(d075cfb6) SHA1(f70741e9f536d5c7604126d36c7aa8ed8f25c329) )
 	ROM_LOAD32_BYTE( "vsjanshi_29_ver1.1.29", 0x000000, 0x80000, CRC(bc395b50) SHA1(84d7cc492a11a5a9402e929f0bd138ad63e3d079) )
 
-	ROM_REGION( 0x1000000, "sprite", 0 ) /* sprites */
+	ROM_REGION( 0x1000000, "sprite", 0 )
 	ROM_LOAD32_WORD( "mr96004-01.13", 0x000000, 0x200000, CRC(3366d104) SHA1(2de0cabe2ead777b5b02cade7f2003ef7f90b75b) )
 	ROM_LOAD32_WORD( "mr96004-02.1",  0x000002, 0x200000, CRC(ad556664) SHA1(4b36f8d8d9efa37cf515af41d14433e7eafa27a2) )
 	ROM_LOAD32_WORD( "mr96004-03.14", 0x400000, 0x200000, CRC(b399e2b1) SHA1(9b6a00a219db8d66dcf592160b7b5f7a86b8f0c9) )
@@ -2511,23 +2572,23 @@ ROM_START( bnstars ) /* ver 1.1 */
 	ROM_LOAD32_WORD( "mr96004-07.16", 0xc00000, 0x200000, CRC(177e32fa) SHA1(3ca1f397dc28f1fa3a4136705b92c63e4e438f05) )
 	ROM_LOAD32_WORD( "mr96004-08.4",  0xc00002, 0x200000, CRC(f6df27b2) SHA1(60590976020d86bdccd4eaf57b349ea31bec6830) )
 
-	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles", 0 )
 	ROM_LOAD( "mr96004-09.11",  0x000000, 0x400000, CRC(7f8ea9f0) SHA1(f1fe682dcb884f1aa4a5536e17ab94157a99f519) )
 
-	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 )
 	ROM_LOAD( "mr96004-11.10", 0x000000, 0x200000,  CRC(e6da552c) SHA1(69a5af3015883793c7d1343243ccae23db9ef77c) )
 
-	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 )
 	ROM_LOAD( "vsjanshi_30_ver1.0.30",  0x000000, 0x080000, CRC(fdbbac21) SHA1(c77d852e53126cc8ebfe1e79d1134e42b54d1aab) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "vsjanshi_21_ver1.0.21",  0x000000, 0x040000, CRC(d622bce1) SHA1(059fcc3c7216d3ea4f3a4226a06219375ce8c2bf) )
 
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples - 8-bit signed PCM
 	ROM_LOAD( "mr96004-10.22",  0x000000, 0x400000, CRC(83f4303a) SHA1(90ee010591afe1d35744925ef0e8d9a7e2ef3378) )
 
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
 ROM_END
 
 /*
@@ -2569,13 +2630,13 @@ Custom chip: SS92046-01 9338EV 436091 06441
 */
 
 ROM_START( wpksocv2 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "pk_soccer_v2_rom_25_ver._1.1.25", 0x000003, 0x80000, CRC(6c22a56c) SHA1(a03cbcfc024b39d2776f9e9897d1da07df6ae2d7) ) /* uses MB-93138A EB91022-20078-1 rom board */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // V70 code
+	ROM_LOAD32_BYTE( "pk_soccer_v2_rom_25_ver._1.1.25", 0x000003, 0x80000, CRC(6c22a56c) SHA1(a03cbcfc024b39d2776f9e9897d1da07df6ae2d7) ) // uses MB-93138A EB91022-20078-1 ROM board
 	ROM_LOAD32_BYTE( "pk_soccer_v2_rom_27_ver._1.1.27", 0x000002, 0x80000, CRC(50c594a8) SHA1(454a63d7b2a07399a64449205271b797bca1dec1) )
 	ROM_LOAD32_BYTE( "pk_soccer_v2_rom_29_ver._1.1.29", 0x000001, 0x80000, CRC(22acd835) SHA1(0fa96a6dfde737d541842f85dc257776044e15b5) )
 	ROM_LOAD32_BYTE( "pk_soccer_v2_rom_31_ver._1.1.31", 0x000000, 0x80000, CRC(f25e50f5) SHA1(b58722f11a8b94ef053caf531ac94a959350288a) )
 
-	ROM_REGION( 0xc00000, "sprite", 0 ) /* sprites */
+	ROM_REGION( 0xc00000, "sprite", 0 )
 	ROM_LOAD32_WORD( "mr95033-01.13", 0x000000, 0x200000, CRC(1f76ed57) SHA1(af9076b4b4c26b362825d892f46d2c04b4bb9d07) )
 	ROM_LOAD32_WORD( "mr95033-02.1",  0x000002, 0x200000, CRC(5b119910) SHA1(aff44e355227dd159e388ab85a5b6d48644ff421) )
 	ROM_LOAD32_WORD( "mr95033-03.14", 0x400000, 0x200000, CRC(8b6099ed) SHA1(c514cec1491aed00a5714c0b8d17c96e87ba50aa) )
@@ -2583,24 +2644,24 @@ ROM_START( wpksocv2 )
 	ROM_LOAD32_WORD( "mr95033-05.15", 0x800000, 0x200000, CRC(cc5b8d0b) SHA1(70a5b9db600fc168d13ad54653cf1c8d2a45d991) )
 	ROM_LOAD32_WORD( "mr95033-06.3",  0x800002, 0x200000, CRC(2f79942f) SHA1(73417d10f37bcd539b8081312226cf142a5a0d3d) )
 
-	ROM_REGION( 0x200000, "roztiles", 0 ) /* roz tiles */
+	ROM_REGION( 0x200000, "roztiles", 0 )
 	ROM_LOAD( "mr95033-07.9", 0x000000, 0x200000, CRC(76cd2e0b) SHA1(41aa18dfb4e06547d1f6d7ce49e5225027d16bbb) )
 
-	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 )
 	ROM_LOAD( "mr95033-09.11", 0x000000, 0x200000, CRC(8a6dae81) SHA1(e235f2865a9a003330bff1e4d0a017e5d10efd2a) )
 
-	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 )
 	ROM_LOAD( "pk_soccer_v2_rom_32_ver._1.1.32", 0x000000, 0x080000, CRC(becc25c2) SHA1(4ae7665cd45ebd9586068e99327145194ba216fc) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
+	ROM_REGION( 0x40000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "mb93139_ver1.0_ws-21.21", 0x000000, 0x040000, CRC(bdeff5d6) SHA1(920a6fc983d53f09510887e4e81ee89ccd5079e6) )
 
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
+	ROM_REGION( 0x400000, "ymf", 0 ) // samples
 	ROM_LOAD( "mr92042-01.22", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "mr95033-08.23", 0x200000, 0x200000, CRC(89a291fa) SHA1(7746a0490134fc902ce2dc7b0d33b455d792c105) )
 
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
+	ROM_REGION( 0x000001, "motherbrd_pals", 0)
+	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) // AMI 18CV8-15.
 ROM_END
 
 
@@ -2650,16 +2711,6 @@ void ms32_state::init_ss92048_01()
 	decrypt_ms32_bg(machine(), 0x20400,0xd4, "bgtiles");
 }
 
-void ms32_state::init_kirarast()
-{
-	init_ss92047_01();
-}
-
-void ms32_state::init_suchie2()
-{
-	init_ss92048_01();
-}
-
 void ms32_f1superbattle_state::init_f1superb()
 {
 #if 0
@@ -2671,10 +2722,6 @@ void ms32_f1superbattle_state::init_f1superb()
 	init_ss92046_01();
 }
 
-void ms32_state::init_bnstars()
-{
-	init_ss92046_01();
-}
 
 /********** GAME DRIVERS **********/
 
@@ -2684,19 +2731,21 @@ GAME( 1994, hayaosi2,  0,        ms32,              hayaosi2, ms32_state,       
 GAME( 1994, hayaosi3,  0,        ms32,              hayaosi3, ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.5)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, hayaosi3a, hayaosi3, ms32,              hayaosi3, ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.2)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, bbbxing,   0,        ms32,              bbbxing,  ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "Best Bout Boxing (ver 1.3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
-GAME( 1994, suchie2,   0,        ms32,              suchie2,  ms32_state,               init_suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, suchie2o,  suchie2,  ms32,              suchie2,  ms32_state,               init_suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, suchie2,   0,        ms32,              suchie2,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, suchie2o,  suchie2,  ms32,              suchie2,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, desertwr,  0,        ms32,              desertwr, ms32_state,               init_ss91022_10, ROT270, "Jaleco",        "Desert War / Wangan Sensou (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, gametngk,  0,        ms32,              gametngk, ms32_state,               init_ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, tetrisp,   0,        ms32,              tetrisp,  ms32_state,               init_ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, p47aces,   0,        ms32,              p47aces,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, p47acesa,  p47aces,  ms32,              p47aces,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, akiss,     0,        ms32,              suchie2,  ms32_state,               init_kirarast,   ROT0,   "Jaleco",        "Mahjong Angel Kiss (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, akiss,     0,        ms32,              suchie2,  ms32_state,               init_ss92047_01, ROT0,   "Jaleco",        "Mahjong Angel Kiss (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, akissa,    akiss,    ms32,              suchie2,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "Mahjong Angel Kiss (ver 1.0, 92048-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, gratia,    0,        ms32,              gratia,   ms32_state,               init_ss92047_01, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, gratiaa,   gratia,   ms32,              gratia,   ms32_state,               init_ss91022_10, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kirarast,  0,        ms32,              kirarast, ms32_state,               init_kirarast,   ROT0,   "Jaleco",        "Ryuusei Janshi Kirara Star", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kirarast,  0,        ms32,              kirarast, ms32_state,               init_ss92047_01, ROT0,   "Jaleco",        "Ryuusei Janshi Kirara Star (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kirarasta, kirarast, ms32,              kirarast, ms32_state,               init_ss91022_10, ROT0,   "Jaleco",        "Ryuusei Janshi Kirara Star (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, tp2m32,    tetrisp2, ms32_invert_lines, tp2m32,   ms32_state,               init_ss91022_10, ROT0,   "Jaleco",        "Tetris Plus 2 (ver 1.0, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, bnstars,   bnstars1, ms32,              suchie2,  ms32_state,               init_bnstars,    ROT0,   "Jaleco",        "Vs. Janshi Brandnew Stars (Ver 1.1, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, bnstars,   bnstars1, ms32,              suchie2,  ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "Vs. Janshi Brandnew Stars (Ver 1.1, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, wpksocv2,  0,        ms32_invert_lines, wpksocv2, ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 /* these boot and show something */

@@ -14,6 +14,7 @@
     31 LEDs, 13 modules of double-digit 7-seg displays and 4 push-buttons).
   * we may also have user inputs from the coin slot and from the
     cabinet buttons, for making bets.
+  * stuck at error 03.
 
 **************************************************************************/
 
@@ -38,9 +39,10 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 		, m_leds(*this, "led%u", 0U)
 		, m_inputs(*this, { "KEYS1", "KEYS2", "DSW", "PUSHBUTTONS" })
+		, m_p1(*this, "P1")
 	{ }
 
-	void marywu(machine_config &config);
+	void marywu(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -53,14 +55,18 @@ private:
 	void ay2_port_a_w(uint8_t data);
 	void ay2_port_b_w(uint8_t data);
 	uint8_t keyboard_r();
+	uint8_t i80c31_p1_r();
+	void i80c31_p1_w(uint8_t data);
 	void data_map(address_map &map) ATTR_COLD;
 	void program_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_selected_7seg_module = 0;
+	uint8_t m_p1_out = 0xff;
 
 	output_finder<32> m_digits;
 	output_finder<30> m_leds;
 	required_ioport_array<4> m_inputs;
+	required_ioport m_p1;
 };
 
 static INPUT_PORTS_START( marywu )
@@ -150,6 +156,25 @@ uint8_t marywu_state::keyboard_r()
 	}
 }
 
+uint8_t marywu_state::i80c31_p1_r()
+{
+	// meter feedback is read here. Fails with error 02 if it doesn't get the expected value.
+	uint8_t const ioport_val = m_p1->read();
+	uint8_t meter_fb = 0x00;
+
+	if (!BIT(m_p1_out, 0))
+		meter_fb = (BIT(m_p1_out, 1) << 4) | (BIT(m_p1_out, 2) << 5);
+
+	return (ioport_val & 0xcf) | meter_fb;
+}
+
+void marywu_state::i80c31_p1_w(uint8_t data)
+{
+	// m_hopper->motor_w(BIT(data, 3));
+
+	m_p1_out = data;
+}
+
 void marywu_state::display_7seg_data_w(uint8_t data)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // HEF4511BP (7 seg display driver)
@@ -176,6 +201,9 @@ void marywu_state::machine_start()
 {
 	m_digits.resolve();
 	m_leds.resolve();
+
+	save_item(NAME(m_selected_7seg_module));
+	save_item(NAME(m_p1_out));
 }
 
 void marywu_state::marywu(machine_config &config)
@@ -189,7 +217,8 @@ void marywu_state::marywu(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &marywu_state::program_map);
 	maincpu.set_addrmap(AS_DATA, &marywu_state::data_map);
 	//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
-	maincpu.port_in_cb<1>().set_ioport("P1");
+	maincpu.port_in_cb<1>().set(FUNC(marywu_state::i80c31_p1_r));
+	maincpu.port_out_cb<1>().set(FUNC(marywu_state::i80c31_p1_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

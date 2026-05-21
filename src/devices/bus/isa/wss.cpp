@@ -39,7 +39,6 @@ void isa16_wss_device::device_add_mconfig(machine_config &config)
 	AD1848(config, m_soundport, 0);
 	m_soundport->irq().set([this] (int state) { m_isa->irq7_w(state); });
 	m_soundport->drq().set([this] (int state) { m_isa->drq0_w(state); });
-
 }
 
 void isa16_wss_device::device_start()

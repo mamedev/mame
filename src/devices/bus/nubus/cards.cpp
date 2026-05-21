@@ -27,7 +27,6 @@
 #include "pds30_30hr.h"
 #include "pds30_cb264.h"
 #include "pds30_procolor816.h"
-#include "pds30_sigmalview.h"
 #include "quadralink.h"
 #include "thunder4gx.h"
 

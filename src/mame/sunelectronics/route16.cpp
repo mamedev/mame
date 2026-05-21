@@ -1193,7 +1193,7 @@ void jongpute_state::jongpute(machine_config &config)
 {
 	route16(config);
 	m_cpu1->set_addrmap(AS_PROGRAM, &jongpute_state::jongpute_cpu1_map);
-	m_cpu1->set_addrmap(AS_IO, address_map_constructor());
+	m_cpu1->remove_addrmap(AS_IO);
 
 	// video hardware
 	m_screen->set_screen_update(FUNC(jongpute_state::screen_update_stratvox));

@@ -395,8 +395,9 @@ private:
 	void bank1_0000_sh_w(offs_t offset, u8 data);
 	u8 bank1_c000_r(offs_t offset);
 	void bank1_c000_w(offs_t offset, u8 data);
-	u8 expandedram_r(offs_t offset);
-	void expandedram_w(offs_t offset, u8 data);
+	u8 floatingbank_r(offs_t offset);
+	u8 ghostram_r(offs_t offset);
+	void ghostram_w(offs_t offset, u8 data);
 	void a2bus_irq_w(int state);
 	void a2bus_nmi_w(int state);
 	void a2bus_inh_w(int state);
@@ -466,7 +467,7 @@ private:
 	int m_glu_kbd_y = 0;
 
 	u8 *m_ram_ptr = nullptr;
-	int m_ram_size = 0;
+	int m_ram_size = 0, m_motherboard_ram = 0, m_ghost_mask = 0;
 	u8 m_megaii_ram[0x20000]{};  // 128K of "slow RAM" at $E0/0000
 
 	int m_inh_bank = 0;
@@ -565,7 +566,7 @@ private:
 // 1 MHz is 14M / 14.  14/5 = 2.8 * 65536 (16.16 fixed point) = 0x2cccd.
 #define slow_cycle() \
 {   \
-	if (!machine().side_effects_disabled() && m_last_speed) \
+	if (m_last_speed && !machine().side_effects_disabled()) \
 	{\
 		m_slow_counter += 0x0002cccd; \
 		int cycles = (m_slow_counter >> 16) & 0xffff; \
@@ -745,12 +746,43 @@ void apple2gs_state::machine_start()
 	m_inh_slot = -1;
 	m_cnxx_slot = CNXX_UNCLAIMED;
 
+	// install ROM
+	address_space& space = m_maincpu->space(AS_PROGRAM);
+	if (m_is_rom3)
+		space.install_rom(0xfc0000, 0xffffff, m_rom);
+
 	// adjust RAM size
 	if (!m_is_rom3 && m_ram_size <= 1280 * 1024)
 	{
-		m_ram_size -= 0x20000;  // subtract 128k so requested RAM size matches exactly
+		m_ram_size -= 0x020000; // subtract 128k so requested RAM size matches exactly
 	}
 	// otherwise, RAM sizes for both classes of machine no longer include the Mega II RAM
+
+	// install "fast" RAM beyond banks 0, 1
+	m_motherboard_ram = m_is_rom3 ? 0x100000 : 0x020000;
+	if (m_ram_size > 0x020000)
+	{
+		space.install_ram(0x020000, m_ram_size - 1, m_ram_ptr + 0x020000);
+
+		if (m_ram_size > m_motherboard_ram)
+		{
+			// unmap empty RAM banks in case of non-power-of-two expansion
+			if (m_is_rom3 && m_ram_size < 0x800000)
+				space.nop_read(m_ram_size, 0x7fffff);
+
+			// expansion RAM ghosts power-of-two banks up through 7f
+			m_ghost_mask = (1 << (32 - count_leading_zeros_32(m_ram_size - m_motherboard_ram - 1))) - 1;
+			const int ghost_start = m_motherboard_ram + m_ghost_mask + 1;
+			if (ghost_start < 0x800000)
+				space.install_readwrite_handler(ghost_start, 0x7fffff,
+					 read8sm_delegate(*this, FUNC(apple2gs_state::ghostram_r)),
+					write8sm_delegate(*this, FUNC(apple2gs_state::ghostram_w)));
+
+			// unmap empty ROM banks
+			if (m_is_rom3) // ROM1 reads floating bus
+				space.nop_read(0xf00000, 0xfbffff);
+		}
+	}
 
 	// setup save states
 	save_item(NAME(m_speaker_state));
@@ -987,7 +1019,7 @@ void apple2gs_state::update_speed()
 
 void apple2gs_state::accel_slot(int slot)
 {
-	if ((m_accel_present) && (m_accel_slotspk & (1 << slot)))
+	if ((m_accel_present) && (m_accel_slotspk & (1 << slot)) && !machine().side_effects_disabled())
 	{
 		m_accel_temp_slowdown = true;
 		m_acceltimer->adjust(attotime::from_msec(52));
@@ -1048,7 +1080,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	}
 	else if (scanline == ((256+BORDER_TOP) % m_screen->height()))
 	{
-		// TODO: latch LANGSEL here to toggle NTSC/PAL
+		// LANGSEL is latched when wrapping scanline 256
+		const int height = m_video->is_pal_video_mode() ? 312 : 262;
+		if (height != m_screen->height())
+		{
+			// toggle 50/60 Hz, both use 65 1M cycles per scanline
+			m_screen->configure(m_screen->width(), height, m_screen->visible_area(), HZ_TO_ATTOSECONDS(A2GS_1M.dvalue() / (65 * height)));
+			if (scanline >= height)
+				scanline -= height;
+		}
 
 		// "quarter" second IRQ occurs every 16 frames, ~3.75 Hz
 		if ((m_screen->frame_number() & 0xf) == 0)
@@ -1542,13 +1582,36 @@ u8 apple2gs_state::c000_r(offs_t offset)
 {
 	u8 ret;
 
-	// allow ROM window at C07x to be debugger-visible
-	if ((offset < 0x70) || (offset > 0x7f))
+	if (offset < 0x71)
 	{
-		if(machine().side_effects_disabled()) return read_floatingbus();
+		switch (offset)
+		{
+			// C07x ROM and FPI registers are fast
+			case 0x2d: case 0x35: case 0x36: case 0x37: case 0x68:
+				break;
+			default:
+				slow_cycle();
+		}
 	}
 
-	slow_cycle();
+	if (!machine().side_effects_disabled())
+	{
+		switch (offset)
+		{
+			case 0x38:  // SCCBREG
+				return m_scc->cb_r(0);
+
+			case 0x39:  // SCCAREG
+				return m_scc->ca_r(0);
+
+			case 0x3a:  // SCCBDATA
+				return m_scc->db_r(0);
+
+			case 0x3b:  // SCCADATA
+				return m_scc->da_r(0);
+		}
+	}
+
 	const u8 uFloatingBus = read_floatingbus(); // video side-effects latch after reading
 	const u8 uFloatingBus7 = uFloatingBus & 0x7f;
 	const u8 uKeyboard = keyglu_816_read(GLU_C000);
@@ -1562,7 +1625,8 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return uKeyboard;
 
 		case 0x10:  // read any key down, reset keyboard strobe
-			keyglu_816_write(GLU_C010, 0);
+			if (!machine().side_effects_disabled())
+				keyglu_816_write(GLU_C010, 0);
 			return keyglu_816_read(GLU_C010) | (uKeyboard & 0x7f);
 
 		case 0x11:  // read LCRAM2 (LC Dxxx bank)
@@ -1639,13 +1703,15 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 		case 0x2e:  // VERTCNT
 			// reading VERTCNT clears SCB status
-			clear_vgcint(~VGCINT_SCANLINE);
+			if (!machine().side_effects_disabled())
+				clear_vgcint(~VGCINT_SCANLINE);
 
 			return get_vpos() >> 1;
 
 		case 0x2f:  // HORIZCNT
 			// reading HORIZCNT clears SCB status
-			clear_vgcint(~VGCINT_SCANLINE);
+			if (!machine().side_effects_disabled())
+				clear_vgcint(~VGCINT_SCANLINE);
 
 			ret = (m_screen->hpos() - BORDER_LEFT) / 16 + (25 + ALIGN_CNT); // adjust for set_raw
 			if (ret >= 65)
@@ -1679,36 +1745,26 @@ u8 apple2gs_state::c000_r(offs_t offset)
 		case 0x36:  // SPEED/CYAREG
 			return m_speed;
 
-		case 0x38:  // SCCBREG
-			return m_scc->cb_r(0);
-
-		case 0x39:  // SCCAREG
-			return m_scc->ca_r(0);
-
-		case 0x3a:  // SCCBDATA
-			return m_scc->db_r(0);
-
-		case 0x3b:  // SCCADATA
-			return m_scc->da_r(0);
-
 		case 0x3c:  // SOUNDCTL
 			return m_sndglu_ctrl;
 
 		case 0x3d:  // SOUNDDATA
 			ret = m_sndglu_dummy_read;
+			if (!machine().side_effects_disabled())
+			{
+				if (m_sndglu_ctrl & 0x40)    // docram access
+				{
+					m_sndglu_dummy_read = m_docram[m_sndglu_addr];
+				}
+				else
+				{
+					m_sndglu_dummy_read = m_doc->read(m_sndglu_addr);
+				}
 
-			if (m_sndglu_ctrl & 0x40)    // docram access
-			{
-				m_sndglu_dummy_read = m_docram[m_sndglu_addr];
-			}
-			else
-			{
-				m_sndglu_dummy_read = m_doc->read(m_sndglu_addr);
-			}
-
-			if (m_sndglu_ctrl & 0x20)    // auto-increment
-			{
-				m_sndglu_addr++;
+				if (m_sndglu_ctrl & 0x20)    // auto-increment
+				{
+					m_sndglu_addr++;
+				}
 			}
 			return ret;
 
@@ -1733,7 +1789,8 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 		case 0x61: // button 0 or Open Apple
 			// HACK/TODO: the 65816 loses a race to the microcontroller on reset
-			if (m_adb_reset_freeze > 0) m_adb_reset_freeze--;
+			if (m_adb_reset_freeze > 0 && !machine().side_effects_disabled())
+				m_adb_reset_freeze--;
 			return ((m_gameio->sw0_r() || (m_adb_p3_last & 0x20)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x62: // button 1 or Option
@@ -1814,7 +1871,14 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 {
 	if(machine().side_effects_disabled()) return;
 
-	slow_cycle();
+	switch (offset)
+	{
+		// FPI registers are fast
+		case 0x35: case 0x36: case 0x37:
+			break;
+		default:
+			slow_cycle();
+	}
 
 	switch (offset)
 	{
@@ -1999,7 +2063,6 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			{
 				m_bank0_atc.select(1);
 				m_bank1_atc.select(1);
-
 			}
 			break;
 
@@ -2192,10 +2255,7 @@ u8 apple2gs_state::c080_r(offs_t offset)
 		}
 		else
 		{
-			if (m_accel_present)
-			{
-				accel_slot(slot);
-			}
+			accel_slot(slot);
 
 			if (slot >= 4)
 			{
@@ -2333,9 +2393,8 @@ u8 apple2gs_state::c100_r(offs_t offset)
 {
 	const int slot = ((offset>>8) & 0xf) + 1;
 
-	slow_cycle();
-
 	accel_slot(slot);
+	slow_cycle();
 
 	// SETSLOTCXROM is disabled, so the $C02D SLOT register controls what's in each slot
 	if (!(m_slotromsel & (1 << slot)))
@@ -2351,7 +2410,6 @@ void apple2gs_state::c100_w(offs_t offset, u8 data)
 	const int slot = ((offset>>8) & 0xf) + 1;
 
 	accel_slot(slot);
-
 	slow_cycle();
 
 	if ((m_slotromsel & (1 << slot)))
@@ -2369,7 +2427,6 @@ u8 apple2gs_state::c400_r(offs_t offset)
 	const int slot = ((offset>>8) & 0xf) + 4;
 
 	accel_slot(slot);
-
 	slow_cycle();
 
 	if (!(m_slotromsel & (1 << slot)))
@@ -2385,7 +2442,6 @@ void apple2gs_state::c400_w(offs_t offset, u8 data)
 	const int slot = ((offset>>8) & 0xf) + 4;
 
 	accel_slot(slot);
-
 	slow_cycle();
 
 	if ((m_slotromsel & (1 << slot)))
@@ -2435,32 +2491,31 @@ void apple2gs_state::c800_w(offs_t offset, u8 data)
 	}
 }
 
-/* for < 14MB RAM, returns the bank number on reads >= 8MB */
-u8 apple2gs_state::expandedram_r(offs_t offset)
+// 65816 bank register is left on floating bus
+u8 apple2gs_state::floatingbank_r(offs_t offset)
 {
-	offset += 0x020000;
-
-	if (offset >= m_ram_size)
-	{
-		if (offset >= 0x800000)
-		{
-			return offset >> 16;
-		}
-
-		return 0;
-	}
-
-	return m_ram_ptr[offset];
+	// When the memory expansion slot is empty, this is the behavior
+	// for every bank not populated by motherboard RAM or ROM.
+	return offset >> 16;
 }
 
-void apple2gs_state::expandedram_w(offs_t offset, u8 data)
+// mirror expansion RAM banks per Hardware Reference, Figure 3-9
+u8 apple2gs_state::ghostram_r(offs_t offset)
 {
-	offset += 0x20000;
+	offs_t ghost_offset = (offset & m_ghost_mask) + m_motherboard_ram;
 
-	if (offset < m_ram_size)
-	{
-		m_ram_ptr[offset] = data;
-	}
+	if (ghost_offset < m_ram_size)
+		return m_ram_ptr[ghost_offset];
+	else // unpopulated non-power-of-two bank
+		return m_is_rom3 ? 0xff : ((offset + m_motherboard_ram + m_ghost_mask + 1) >> 16);
+}
+
+void apple2gs_state::ghostram_w(offs_t offset, u8 data)
+{
+	offs_t ghost_offset = (offset & m_ghost_mask) + m_motherboard_ram;
+
+	if (ghost_offset < m_ram_size)
+		m_ram_ptr[ghost_offset] = data;
 }
 
 u8 apple2gs_state::inh_r(offs_t offset)
@@ -2724,134 +2779,48 @@ void apple2gs_state::lc_01_w(offs_t offset, u8 data)
 	m_ram_ptr[(offset & 0x1fff) + 0x1e000] = data;
 }
 
-// floating bus code from old machine/apple2: needs to be reworked based on real beam position to enable e.g. Bob Bishop's screen splitter
 u8 apple2gs_state::read_floatingbus()
 {
-	enum
+	int h_clock = (m_screen->hpos() - BORDER_LEFT) / 16 + (25 + ALIGN_RFB); // adjust for set_raw
+	if (h_clock >= 65)
+		h_clock -= 65;
+
+	int v_clock = m_screen->vpos();
+	if (v_clock < BORDER_TOP)
+		v_clock += m_screen->height(); // remap top border to bottom of VBL
+	v_clock -= BORDER_TOP;
+	v_clock += (h_clock < (25 - ALIGN_RFB)); // adjust for hpos wrap
+	if (v_clock >= m_screen->height())
+		v_clock -= m_screen->height();
+
+	/*
+	Unlike 8-bit Apples, the IIgs does not redundantly scan video memory during
+	blanking.  The first five HBL cycles are used for Mega II "RAM refresh":
+	during these PH1 cycles (and everywhere after scanline 199) nothing is put
+	onto the data bus.  The floating value is instead the last byte fetched
+	during PH0, of the instruction which invoked this read.  For example:
+	    LDA C050 returns C0 (typical softswitch)
+	    LDA C250 returns C2 (ROM of a Your Card slot with no card)
+	    LDA 50   returns 50 (with direct page C000)
+	*/
+	static bool recurse = false; // no recursion, single thread
+	if (!recurse && ((h_clock < 5) || (v_clock > 199)))
 	{
-		// scanner types
-		kScannerNone = 0, kScannerApple2, kScannerApple2e,
-
-		// scanner constants
-		kHBurstClock      =    53, // clock when Color Burst starts
-		kHBurstClocks     =     4, // clocks per Color Burst duration
-		kHClock0State     =  0x18, // H[543210] = 011000
-		kHClocks          =    65, // clocks per horizontal scan (including HBL)
-		kHPEClock         =    40, // clock when HPE (horizontal preset enable) goes low
-		kHPresetClock     =    41, // clock when H state presets
-		kHSyncClock       =    49, // clock when HSync starts
-		kHSyncClocks      =     4, // clocks per HSync duration
-		kNTSCScanLines    =   262, // total scan lines including VBL (NTSC)
-		kNTSCVSyncLine    =   224, // line when VSync starts (NTSC)
-		kPALScanLines     =   312, // total scan lines including VBL (PAL)
-		kPALVSyncLine     =   264, // line when VSync starts (PAL)
-		kVLine0State      = 0x100, // V[543210CBA] = 100000000
-		kVPresetLine      =   256, // line when V state presets
-		kVSyncLines       =     4, // lines per VSync duration
-		kClocksPerVSync   = kHClocks * kNTSCScanLines // FIX: NTSC only?
-	};
-
-	// vars
-	//
-	int i, Hires, Mixed, Page2, _80Store, ScanLines, /* VSyncLine, ScanCycles,*/
-		h_clock, h_state, h_0, h_1, h_2, h_3, h_4, h_5,
-		v_line, v_state, v_A, v_B, v_C, v_0, v_1, v_2, v_3, v_4, /* v_5, */
-		_hires, addend0, addend1, addend2, sum, address;
-
-	// video scanner data
-	//
-	i = m_maincpu->total_cycles() % kClocksPerVSync; // cycles into this VSync
-
-	// machine state switches
-	//
-	Hires    = (m_video->get_hires() && m_video->get_graphics()) ? 1 : 0;
-	Mixed    = m_video->get_mix() ? 1 : 0;
-	Page2    = m_video->get_page2() ? 1 : 0;
-	_80Store = m_video->get_80store() ? 1 : 0;
-
-	// calculate video parameters according to display standard
-	//
-	ScanLines  = 1 ? kNTSCScanLines : kPALScanLines; // FIX: NTSC only?
-	// VSyncLine  = 1 ? kNTSCVSyncLine : kPALVSyncLine; // FIX: NTSC only?
-	// ScanCycles = ScanLines * kHClocks;
-
-	// calculate horizontal scanning state
-	//
-	h_clock = (i + kHPEClock) % kHClocks; // which horizontal scanning clock
-	h_state = kHClock0State + h_clock; // H state bits
-	if (h_clock >= kHPresetClock) // check for horizontal preset
-	{
-		h_state -= 1; // correct for state preset (two 0 states)
-	}
-	h_0 = (h_state >> 0) & 1; // get horizontal state bits
-	h_1 = (h_state >> 1) & 1;
-	h_2 = (h_state >> 2) & 1;
-	h_3 = (h_state >> 3) & 1;
-	h_4 = (h_state >> 4) & 1;
-	h_5 = (h_state >> 5) & 1;
-
-	// calculate vertical scanning state
-	//
-	v_line  = i / kHClocks; // which vertical scanning line
-	v_state = kVLine0State + v_line; // V state bits
-	if ((v_line >= kVPresetLine)) // check for previous vertical state preset
-	{
-		v_state -= ScanLines; // compensate for preset
-	}
-	v_A = (v_state >> 0) & 1; // get vertical state bits
-	v_B = (v_state >> 1) & 1;
-	v_C = (v_state >> 2) & 1;
-	v_0 = (v_state >> 3) & 1;
-	v_1 = (v_state >> 4) & 1;
-	v_2 = (v_state >> 5) & 1;
-	v_3 = (v_state >> 6) & 1;
-	v_4 = (v_state >> 7) & 1;
-	//v_5 = (v_state >> 8) & 1;
-
-	// calculate scanning memory address
-	//
-	_hires = Hires;
-	if (Hires && Mixed && (v_4 & v_2))
-	{
-		_hires = 0; // (address is in text memory)
-	}
-
-	addend0 = 0x68; // 1            1            0            1
-	addend1 =              (h_5 << 5) | (h_4 << 4) | (h_3 << 3);
-	addend2 = (v_4 << 6) | (v_3 << 5) | (v_4 << 4) | (v_3 << 3);
-	sum     = (addend0 + addend1 + addend2) & (0x0F << 3);
-
-	address = 0;
-	address |= h_0 << 0; // a0
-	address |= h_1 << 1; // a1
-	address |= h_2 << 2; // a2
-	address |= sum;      // a3 - aa6
-	address |= v_0 << 7; // a7
-	address |= v_1 << 8; // a8
-	address |= v_2 << 9; // a9
-	address |= ((_hires) ? v_A : (1 ^ (Page2 & (1 ^ _80Store)))) << 10; // a10
-	address |= ((_hires) ? v_B : (Page2 & (1 ^ _80Store))) << 11; // a11
-	if (_hires) // hires?
-	{
-		// Y: insert hires only address bits
-		//
-		address |= v_C << 12; // a12
-		address |= (1 ^ (Page2 & (1 ^ _80Store))) << 13; // a13
-		address |= (Page2 & (1 ^ _80Store)) << 14; // a14
+		// approximate (for non-flow control instructions) by peeking at PC
+		offs_t pc = m_maincpu->pc();
+		// previous byte, wrapping at bank boundary
+		pc = (pc & 0xFF0000) | ((pc - 1) & 0xFFFF);
+		// prevent recursion via slot firmware or Mega II C07x
+		recurse = true;
+		u8 res = m_maincpu->space(AS_PROGRAM).read_byte(pc);
+		recurse = false;
+		return res;
 	}
 	else
 	{
-		// N: text, so no higher address bits unless Apple ][, not Apple //e
-		//
-		if ((1) && // Apple ][? // FIX: check for Apple ][? (FB is most useful in old games)
-			(kHPEClock <= h_clock) && // Y: HBL?
-			(h_clock <= (kHClocks - 1)))
-		{
-			address |= 1 << 12; // Y: a12 (add $1000 to address!)
-		}
+		const u32 address = m_video->scanner_address_GS(h_clock, v_clock);
+		return m_megaii_ram[address];
 	}
-
-	return m_megaii_ram[address % m_ram_size]; // FIX: this seems to work, but is it right!?
 }
 
 /***************************************************************************
@@ -3150,6 +3119,10 @@ void apple2gs_state::bank1_0000_sh_w(offs_t offset, u8 data)
 
 void apple2gs_state::apple2gs_map(address_map &map)
 {
+	// default behavior for unpopulated banks (affected by memory expansion slot)
+	map(0x000000, 0xffffff).r(FUNC(apple2gs_state::floatingbank_r)).nopw();
+	map.unmap_value_high(); // with expansion slot, unpopulated banks return ff on ROM3
+
 	/* "fast side" - runs 2.8 MHz minus RAM refresh, banks 00 and 01 usually have writes shadowed to E0/E1 where I/O lives */
 	/* Banks 00 and 01 also have their own independent language cards which are NOT shadowed. */
 	map(0x000000, 0x0001ff).view(m_b0_0000bank);
@@ -3188,14 +3161,14 @@ void apple2gs_state::apple2gs_map(address_map &map)
 
 	map(0x00c000, 0x00ffff).view(m_bank0_atc);
 	m_bank0_atc[0](0xc000, 0xffff).rw(FUNC(apple2gs_state::bank0_c000_r), FUNC(apple2gs_state::bank0_c000_w));
-	m_bank0_atc[1](0xc000, 0xffff).rw(FUNC(apple2gs_state::c000_r), FUNC(apple2gs_state::c000_w));
-	m_bank0_atc[1](0xc080, 0xffff).rw(FUNC(apple2gs_state::c080_r), FUNC(apple2gs_state::c080_w));
-	m_bank0_atc[1](0xc100, 0xffff).rw(FUNC(apple2gs_state::c100_r), FUNC(apple2gs_state::c100_w));
-	m_bank0_atc[1](0xc300, 0xffff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
-	m_bank0_atc[1](0xc400, 0xffff).rw(FUNC(apple2gs_state::c400_r), FUNC(apple2gs_state::c400_w));
-	m_bank0_atc[1](0xc800, 0xffff).rw(FUNC(apple2gs_state::c800_r), FUNC(apple2gs_state::c800_w));
-	m_bank0_atc[1](0xd000, 0xffff).view(m_upper00);
+	m_bank0_atc[1](0xc000, 0xc07f).rw(FUNC(apple2gs_state::c000_r), FUNC(apple2gs_state::c000_w));
+	m_bank0_atc[1](0xc080, 0xc0ff).rw(FUNC(apple2gs_state::c080_r), FUNC(apple2gs_state::c080_w));
+	m_bank0_atc[1](0xc100, 0xc2ff).rw(FUNC(apple2gs_state::c100_r), FUNC(apple2gs_state::c100_w));
+	m_bank0_atc[1](0xc300, 0xc3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
+	m_bank0_atc[1](0xc400, 0xc7ff).rw(FUNC(apple2gs_state::c400_r), FUNC(apple2gs_state::c400_w));
+	m_bank0_atc[1](0xc800, 0xcfff).rw(FUNC(apple2gs_state::c800_r), FUNC(apple2gs_state::c800_w));
 
+	m_bank0_atc[1](0xd000, 0xffff).view(m_upper00);
 	m_upper00[0](0xd000, 0xffff).view(m_lc00);
 	m_upper00[1](0xd000, 0xffff).rw(FUNC(apple2gs_state::inh_r), FUNC(apple2gs_state::inh_w));
 
@@ -3258,8 +3231,6 @@ void apple2gs_state::apple2gs_map(address_map &map)
 	m_e0_4000bank[2](0xe04000, 0xe0bfff).rw(FUNC(apple2gs_state::e0ram_r<0x4000>), FUNC(apple2gs_state::e1ram_w<0x4000>));
 	m_e0_4000bank[3](0xe04000, 0xe0bfff).rw(FUNC(apple2gs_state::e1ram_r<0x4000>), FUNC(apple2gs_state::e1ram_w<0x4000>));
 
-	map(0x020000, 0xdfffff).rw(FUNC(apple2gs_state::expandedram_r), FUNC(apple2gs_state::expandedram_w));
-
 	map(0xe0c000, 0xe0c07f).rw(FUNC(apple2gs_state::c000_r), FUNC(apple2gs_state::c000_w));
 	map(0xe0c080, 0xe0c0ff).rw(FUNC(apple2gs_state::c080_r), FUNC(apple2gs_state::c080_w));
 	map(0xe0c100, 0xe0c2ff).rw(FUNC(apple2gs_state::c100_r), FUNC(apple2gs_state::c100_w));
@@ -3289,7 +3260,7 @@ void apple2gs_state::apple2gs_map(address_map &map)
 	m_lcaux[0](0xe1d000, 0xe1ffff).rom().region("maincpu", 0x3d000).w(FUNC(apple2gs_state::lc_aux_w));
 	m_lcaux[1](0xe1d000, 0xe1ffff).rw(FUNC(apple2gs_state::lc_aux_r), FUNC(apple2gs_state::lc_aux_w));
 
-	map(0xfc0000, 0xffffff).rom().region("maincpu", 0x00000);
+	map(0xfe0000, 0xffffff).rom().region("maincpu", 0x20000);
 }
 
 void apple2gs_state::vectors_map(address_map &map)
@@ -3549,13 +3520,17 @@ u8 apple2gs_state::keyglu_816_read(u8 offset)
 		case GLU_MOUSEY:
 			if (!m_glu_mouse_read_stat)
 			{
-				m_glu_mouse_read_stat = true;
+				if (!machine().side_effects_disabled())
+					m_glu_mouse_read_stat = true;
 				return m_glu_regs[GLU_MOUSEX];
 			}
-			m_glu_mouse_read_stat = false;
-			m_glu_regs[GLU_KG_STATUS] &= ~KGS_MOUSEX_FULL;
-			m_glu_regs[GLU_SYSSTAT] &= ~GLU_STATUS_MOUSEIRQ;
-			keyglu_regen_irqs();
+			if (!machine().side_effects_disabled())
+			{
+				m_glu_mouse_read_stat = false;
+				m_glu_regs[GLU_KG_STATUS] &= ~KGS_MOUSEX_FULL;
+				m_glu_regs[GLU_SYSSTAT] &= ~GLU_STATUS_MOUSEIRQ;
+				keyglu_regen_irqs();
+			}
 			return m_glu_regs[GLU_MOUSEY];
 
 		case GLU_SYSSTAT:
@@ -3582,13 +3557,14 @@ u8 apple2gs_state::keyglu_816_read(u8 offset)
 				{
 					sysstat |= GLU_STATUS_MOUSEIRQ;
 				}
-				m_glu_816_read_dstat = true;
+				if (!machine().side_effects_disabled())
+					m_glu_816_read_dstat = true;
 				//printf("Read SYSSTAT %02x (PC=%x)\n", sysstat, m_maincpu->pc());
 				return sysstat;
 			}
 
 		case GLU_DATA:
-			if (m_glu_816_read_dstat)
+			if (m_glu_816_read_dstat && !machine().side_effects_disabled())
 			{
 				m_glu_816_read_dstat = false;
 				m_glu_regs[GLU_KG_STATUS] &= ~KGS_DATA_FULL;
@@ -3795,6 +3771,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_rtc->cko_cb().set(FUNC(apple2gs_state::rtc_vgc));
 
 	APPLE2_VIDEO(config, m_video, A2GS_14M).set_screen(m_screen);
+	m_video->set_base_model(a2_video_device::model::IIGS);
 
 	APPLE2_COMMON(config, m_a2common, A2GS_14M).set_GS_cputag(m_maincpu);
 

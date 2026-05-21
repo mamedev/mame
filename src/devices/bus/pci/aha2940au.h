@@ -34,8 +34,8 @@ protected:
 	required_memory_region m_bios;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 private:
 
 };

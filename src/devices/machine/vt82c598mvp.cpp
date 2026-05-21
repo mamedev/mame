@@ -16,11 +16,18 @@
 
 DEFINE_DEVICE_TYPE(VT82C598MVP_HOST, vt82c598mvp_host_device, "vt82c598mvp_host", "Via VT82C598MVP \"Apollo MVP3\" Host")
 
-vt82c598mvp_host_device::vt82c598mvp_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_host_device(mconfig, VT82C598MVP_HOST, tag, owner, clock)
+vt82c598mvp_host_device::vt82c598mvp_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: pci_host_device(mconfig, type, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 {
 }
+
+vt82c598mvp_host_device::vt82c598mvp_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vt82c598mvp_host_device(mconfig, VT82C598MVP_HOST, tag, owner, clock)
+{
+	set_ids(0x11060598, 0x00, 0x060000, 0x00);
+}
+
 
 void vt82c598mvp_host_device::device_start()
 {
@@ -445,7 +452,9 @@ void vt82c598mvp_host_device::map_extra(
 	// 01 SMI DRAM always mapped (overlays VGA)
 	// 10 <reserved>
 	// 11 SMI DRAM on SMM
-	if ((smi_mapping == 3 && m_smiact == 0) || smi_mapping == 1)
+	// HACK: function is for '691, that actually uses code/data separation for SMI DRAM
+	// (never setup shadow RAM control[2] bits 0-1)
+	if ((smi_mapping == smi_bank() && m_smiact == 0) || smi_mapping == 1)
 	{
 		memory_space->install_ram      (0x000a0000, 0x000bffff, &m_ram[0x000a0000/4]);
 	}
@@ -494,9 +503,14 @@ void vt82c598mvp_host_device::map_extra(
 
 DEFINE_DEVICE_TYPE(VT82C598MVP_BRIDGE, vt82c598mvp_bridge_device, "vt82c598mvp_bridge", "Via VT82C598MVP \"Apollo MVP3\" PCI-to-PCI Bridge")
 
-vt82c598mvp_bridge_device::vt82c598mvp_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_bridge_device(mconfig, VT82C598MVP_BRIDGE, tag, owner, clock)
+vt82c598mvp_bridge_device::vt82c598mvp_bridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: pci_bridge_device(mconfig, type, tag, owner, clock)
 //  , m_vga(*this, finder_base::DUMMY_TAG)
+{
+}
+
+vt82c598mvp_bridge_device::vt82c598mvp_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vt82c598mvp_bridge_device(mconfig, VT82C598MVP_BRIDGE, tag, owner, clock)
 {
 	set_ids_bridge(0x11068598, 0x00);
 }
@@ -552,4 +566,55 @@ void vt82c598mvp_bridge_device::config_map(address_map &map)
 	);
 }
 
+/*
+ * Apollo Pro overrides
+ */
+
+DEFINE_DEVICE_TYPE(VT82C691_HOST, vt82c691_host_device, "vt82c691_host", "Via VT82C691 \"Apollo Pro\" Host")
+
+vt82c691_host_device::vt82c691_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vt82c598mvp_host_device(mconfig, VT82C691_HOST, tag, owner, clock)
+{
+	// Rev. 44 from neomania detlog.txt
+	set_ids(0x11060691, 0x44, 0x060000, 0x00);
+}
+
+void vt82c691_host_device::device_start()
+{
+	vt82c598mvp_host_device::device_start();
+
+	save_item(NAME(m_bios_scratch));
+}
+
+void vt82c691_host_device::device_reset()
+{
+	vt82c598mvp_host_device::device_reset();
+
+	std::fill(std::begin(m_bios_scratch), std::end(m_bios_scratch), 0U);
+}
+
+void vt82c691_host_device::config_map(address_map &map)
+{
+	vt82c598mvp_host_device::config_map(map);
+
+	// TODO: other minor changes + write once subvendor ID
+
+	map(0xf0, 0xf7).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_bios_scratch[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("%02Xh: BIOS Scratch %02x\n", offset + 0xf0, data);
+			m_bios_scratch[offset] = data;
+		})
+	);
+}
+
+DEFINE_DEVICE_TYPE(VT82C691_BRIDGE, vt82c691_bridge_device, "vt82c691_bridge", "Via VT82C691 \"Apollo Pro\" PCI-to-PCI Bridge")
+
+vt82c691_bridge_device::vt82c691_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vt82c598mvp_bridge_device(mconfig, VT82C691_BRIDGE, tag, owner, clock)
+{
+	set_ids_bridge(0x11068691, 0x00);
+}
 

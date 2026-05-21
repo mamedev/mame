@@ -367,14 +367,14 @@ void tipc_state::vsync_changed(int state)
 /*
  * attribute bits (TechRef p. 2-42)
  *
- * 0	intensity level 1 (blue)
- * 1	intensity level 2 (red)
- * 2	intensity level 3 (green)
- * 3	character enable
- * 4	reverse
- * 5	underline
- * 6	blink
- * 7	alt character set
+ * 0    intensity level 1 (blue)
+ * 1    intensity level 2 (red)
+ * 2    intensity level 3 (green)
+ * 3    character enable
+ * 4    reverse
+ * 5    underline
+ * 6    blink
+ * 7    alt character set
  *
  * attribute priority, from high to low (p. 2-55)
  *

@@ -10,6 +10,8 @@
 ******************************************************************************/
 
 #include "emu.h"
+
+#include "bus/psion/module/slot.h"
 #include "cpu/nec/nec.h"
 #include "machine/nvram.h"
 #include "machine/psion_asic1.h"
@@ -18,13 +20,11 @@
 #include "machine/psion_ssd.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
-#include "bus/psion/module/slot.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
-#include "utf8.h"
 
 
 namespace {
@@ -42,7 +42,8 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_palette(*this, "palette")
 		, m_keyboard(*this, "COL%u", 0U)
-		, m_speaker(*this, "speaker")
+		, m_buzzer(*this, "buzzer")
+		, m_mic(*this, "mic")
 		, m_ssd(*this, "ssd%u", 1U)
 		, m_exp(*this, "exp%u", 0U)
 	{ }
@@ -66,7 +67,8 @@ private:
 	required_device<nvram_device> m_nvram;
 	required_device<palette_device> m_palette;
 	required_ioport_array<8> m_keyboard;
-	required_device<speaker_sound_device> m_speaker;
+	required_device<speaker_sound_device> m_buzzer;
+	required_device<microphone_device> m_mic;
 	required_device_array<psion_ssd_device, 2> m_ssd;
 	required_device_array<psion_module_slot_device, 2> m_exp;
 
@@ -116,10 +118,10 @@ void psionhc_state::asic1_map(address_map &map)
 
 static INPUT_PORTS_START( psionhc_uk )
 	PORT_START("COL0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))     PORT_NAME(UTF8_RIGHT" Info")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))      PORT_NAME(UTF8_LEFT" Task")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))      PORT_NAME(UTF8_DOWN" PG Dn")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP))        PORT_NAME(UTF8_UP" Pg Up")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))     PORT_NAME(u8"\u2192 Info")  // U+2192 = →
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))      PORT_NAME(u8"\u2190 Task")  // U+2190 = ←
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))      PORT_NAME(u8"\u2193 PG Dn") // U+2193 = ↓
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP))        PORT_NAME(u8"\u2191 Pg Up") // U+2191 = ↑
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                                                   PORT_NAME("Menu")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)        PORT_CHAR(UCHAR_MAMEKEY(ESC))       PORT_NAME("Esc")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('+')  PORT_CHAR('=')
@@ -327,8 +329,8 @@ void psionhc_state::psionhc100(machine_config &config)
 	m_asic2->int_cb().set(m_asic1, FUNC(psion_asic1_device::eint3_w));
 	m_asic2->nmi_cb().set(m_asic1, FUNC(psion_asic1_device::enmi_w));
 	m_asic2->cbusy_cb().set_inputline(m_maincpu, NEC_INPUT_LINE_POLL);
-	m_asic2->buz_cb().set(m_speaker, FUNC(speaker_sound_device::level_w));
-	m_asic2->buzvol_cb().set([this](int state) { m_speaker->set_output_gain(ALL_OUTPUTS, state ? 1.0 : 0.25); });
+	m_asic2->buz_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
+	m_asic2->buzvol_cb().set([this](int state) { m_buzzer->set_output_gain(ALL_OUTPUTS, state ? 1.0 : 0.25); });
 	m_asic2->dr_cb().set([this](int state) { m_dr = state; });
 	m_asic2->col_cb().set([this](uint8_t data) { return m_keyboard[data & 7]->read(); });
 	m_asic2->read_pd_cb().set(FUNC(psionhc_state::port_data_r));
@@ -348,8 +350,13 @@ void psionhc_state::psionhc100(machine_config &config)
 
 	PSION_PSU_ASIC3(config, m_asic3);
 
+	//I29C48(config, "codec").add_route(ALL_OUTPUTS, "mono", 1.00); // TODO: 29C48
+
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00); // Piezo buzzer
+	SPEAKER_SOUND(config, m_buzzer).add_route(ALL_OUTPUTS, "mono", 1.0); // Piezo buzzer
+
+	MICROPHONE(config, m_mic, 1).front_center();
+	//m_mic->add_route(0, "codec", 1.0);
 
 	PSION_SSD(config, m_ssd[0]);
 	m_ssd[0]->door_cb().set(m_asic2, FUNC(psion_asic2_device::dnmi_w));

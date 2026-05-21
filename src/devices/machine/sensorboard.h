@@ -26,7 +26,7 @@ public:
 
 	// configuration helpers
 	sensorboard_device &set_type(sb_type type); // sensor type
-	sensorboard_device &set_size(u8 width, u8 height) { m_width = width; m_height = height; return *this; } // board dimensions, max 13 * 10
+	sensorboard_device &set_size(u8 width, u8 height) { m_width = width; m_height = height; return *this; } // board dimensions, max 13 * 13
 	sensorboard_device &set_spawnpoints(u8 i) { m_maxspawn = i; m_maxid = i; return *this; } // number of piece spawnpoints, max 16
 	sensorboard_device &set_max_id(u8 i) { m_maxid = i; return *this; } // maximum piece id (if larger than set_spawnpoints)
 	sensorboard_device &set_delay(attotime delay) { m_sensordelay = delay; return *this; } // delay when activating a sensor (like PORT_IMPULSE), set to attotime::never to disable
@@ -48,12 +48,14 @@ public:
 	u16 read_file(u8 x, bool reverse = false);
 	u16 read_rank(u8 y, bool reverse = false);
 
-	bool is_inductive() { return m_inductive; }
-
 	// handle board state
 	u8 read_piece(u8 x, u8 y) { return m_curstate[y * m_width + x]; }
 	void write_piece(u8 x, u8 y, u8 id) { m_curstate[y * m_width + x] = id; }
 	void clear_board(u8 data = 0) { memset(m_curstate, 0, sizeof(m_curstate)); } // default clear_cb()
+
+	bool inductive() { return m_inductive; }
+	u8 width() { return m_width; }
+	u8 height() { return m_height; }
 
 	void refresh();
 	void cancel_sensor();

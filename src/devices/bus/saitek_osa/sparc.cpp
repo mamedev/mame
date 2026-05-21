@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-Saitek OSA Module: Kasparov Sparc (1993)
+Saitek OSA: Kasparov Sparc Module (1993)
 
 The chess engine is by the Spracklen's. Their last, and also their strongest.
 
@@ -11,7 +11,7 @@ Hardware notes:
 - Fujitsu MB86930-20 SPARClite @ 20MHz
 - 256KB ROM (4*AMD AM27C512)
 - 1MB DRAM (8*NEC 424256-60), expandable to 4MB
-- ESAN 31A-5500 delay line (only on newer PCB)
+- ESAN 31A-5500 delay line (for DRAM CAS, only on newer PCB)
 
 Two PCB revisions are known, the older one is a lighter green PCB, it has
 empty positions for more ICs (maybe expanded RAM?), and does not have a
@@ -126,7 +126,7 @@ u8 saitekosa_sparc_device::data_r()
 
 void saitekosa_sparc_device::nmi_w(int state)
 {
-	m_maincpu->set_input_line(SPARC_IRQ1, !state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(SPARC_IRQ1, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void saitekosa_sparc_device::ack_w(int state)
@@ -142,8 +142,8 @@ void saitekosa_sparc_device::ack_w(int state)
 
 u32 saitekosa_sparc_device::host_io_r(offs_t offset, u32 mem_mask)
 {
-	// d0-d7: data input latch, d8: ACK-P
-	return m_expansion->data_state() | (m_expansion->ack_state() ? 0 : 0x100);
+	// d0-d7: data input, d8: ACK-P
+	return m_expansion->data_state() | (m_expansion->ack_state() << 8);
 }
 
 void saitekosa_sparc_device::host_io_w(offs_t offset, u32 data, u32 mem_mask)
@@ -153,7 +153,7 @@ void saitekosa_sparc_device::host_io_w(offs_t offset, u32 data, u32 mem_mask)
 
 	// d8: STB-P, d9: RTS-P
 	m_expansion->stb_w(BIT(m_data_out, 8));
-	m_expansion->rts_w(BIT(~m_data_out, 9));
+	m_expansion->rts_w(BIT(m_data_out, 9));
 }
 
 void saitekosa_sparc_device::debugger_map(address_map &map)
@@ -234,4 +234,4 @@ const tiny_rom_entry *saitekosa_sparc_device::device_rom_region() const
 } // anonymous namespace
 
 
-DEFINE_DEVICE_TYPE_PRIVATE(OSA_SPARC, device_saitekosa_expansion_interface, saitekosa_sparc_device, "osa_sparc", "Saitek OSA Sparc")
+DEFINE_DEVICE_TYPE_PRIVATE(OSA_SPARC, device_saitekosa_expansion_interface, saitekosa_sparc_device, "osa_sparc", "Saitek OSA: Kasparov Sparc Module")

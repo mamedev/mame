@@ -60,8 +60,8 @@ inline uint32_t tape_position_flags(double position, double length)
 //  ctor
 //-------------------------------------------------
 
-menu_tape_control::menu_tape_control(mame_ui_manager &mui, render_container &container, cassette_image_device *device)
-	: menu_device_control<cassette_image_device>(mui, container, device)
+menu_tape_control::menu_tape_control(mame_ui_manager &mui, render_target &target, cassette_image_device *device)
+	: menu_device_control<cassette_image_device>(mui, target, device)
 	, m_slider_item_index(-1)
 {
 	set_process_flags(PROCESS_LR_REPEAT);

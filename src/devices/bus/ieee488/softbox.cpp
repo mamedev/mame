@@ -10,13 +10,23 @@
     This is an emulation of the SoftBox as a PET/CBM peripheral, where
     the PET is used as a terminal over IEEE-488.  For the standalone
     mode where an RS-232 terminal is used, and also information on
-    how to set up the Corvus drive, see: src/mame/drivers/softbox.c.
+    how to set up the Corvus drive, see: src/mame/skeleton/softbox.cpp
 */
 
 
 #include "emu.h"
 #include "softbox.h"
 
+#include "bus/rs232/rs232.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/harddriv.h"
+#include "machine/com8116.h"
+#include "machine/corvushd.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+
+
+namespace {
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -28,13 +38,6 @@
 #define I8255_1_TAG     "ic16"
 #define RS232_TAG       "rs232"
 
-
-
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(SOFTBOX, softbox_device, "pet_softbox", "SSE SoftBox")
 
 
 //-------------------------------------------------
@@ -54,6 +57,60 @@ ROM_START( softbox )
 	ROMX_LOAD( "389.ic3", 0x000, 0x800, CRC(d66e581a) SHA1(2403e25c140c41b0e6d6975d39c9cd9d6f335048), ROM_BIOS(2) )
 	ROMX_LOAD( "390.ic4", 0x800, 0x800, CRC(abe6cb30) SHA1(4b26d5db36f828e01268f718799f145d09b449ad), ROM_BIOS(2) )
 ROM_END
+
+
+//**************************************************************************
+//  TYPE DECLARATIONS
+//**************************************************************************
+
+// ======================> softbox_device
+
+class softbox_device :  public device_t,
+						public device_ieee488_interface
+{
+public:
+	// construction/destruction
+	softbox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset_after_children() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	// device_ieee488_interface implementation
+	virtual void ieee488_ifc(int state) override;
+
+private:
+	enum
+	{
+		LED_A = 0,
+		LED_B,
+		LED_READY
+	};
+
+	uint8_t ppi0_pa_r();
+	void ppi0_pb_w(uint8_t data);
+
+	uint8_t ppi1_pa_r();
+	void ppi1_pb_w(uint8_t data);
+	uint8_t ppi1_pc_r();
+	void ppi1_pc_w(uint8_t data);
+
+	void dbrg_w(uint8_t data);
+
+	void softbox_io(address_map &map) ATTR_COLD;
+	void softbox_mem(address_map &map) ATTR_COLD;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<com8116_device> m_dbrg;
+	required_device<corvus_hdc_device> m_hdc;
+	output_finder<3> m_leds;
+
+	int m_ifc;  // Tracks previous state of IEEE-488 IFC line
+};
 
 
 //-------------------------------------------------
@@ -313,7 +370,7 @@ ioport_constructor softbox_device::device_input_ports() const
 //-------------------------------------------------
 
 softbox_device::softbox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SOFTBOX, tag, owner, clock)
+	: device_t(mconfig, GPIB_SOFTBOX, tag, owner, clock)
 	, device_ieee488_interface(mconfig, *this)
 	, m_maincpu(*this, Z80_TAG)
 	, m_dbrg(*this, "ic14")
@@ -380,3 +437,12 @@ void softbox_device::dbrg_w(uint8_t data)
 	m_dbrg->str_w(data & 0x0f);
 	m_dbrg->stt_w(data >> 4);
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(GPIB_SOFTBOX, device_ieee488_interface, softbox_device, "gpib_softbox", "SSE SoftBox")

@@ -34,7 +34,7 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_palette(*this, "palette")
 		, m_keyboard(*this, "COL%u", 0U)
-		, m_speaker(*this, "speaker")
+		, m_buzzer(*this, "buzzer")
 		, m_ssd(*this, "ssd%u", 1U)
 		, m_sibo(*this, "sibo")
 		//, m_exp(*this, "exp")
@@ -56,7 +56,7 @@ private:
 	required_device<nvram_device> m_nvram;
 	required_device<palette_device> m_palette;
 	required_ioport_array<8> m_keyboard;
-	required_device<speaker_sound_device> m_speaker;
+	required_device<speaker_sound_device> m_buzzer;
 	required_device_array<psion_ssd_device, 2> m_ssd;
 	required_device<psion_sibo_slot_device> m_sibo;
 	//required_device<psion_exp_slot_device> m_exp;
@@ -203,12 +203,12 @@ void workabout_state::workabout(machine_config &config)
 	m_asic9->set_screen("screen");
 	m_asic9->set_ram_rom("ram", "rom");
 	m_asic9->port_ab_r().set(FUNC(workabout_state::kbd_r));
-	m_asic9->buz_cb().set(m_speaker, FUNC(speaker_sound_device::level_w));
+	m_asic9->buz_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_asic9->col_cb().set([this](uint8_t data) { m_key_col = data; });
-	m_asic9->data_r<0>().set(m_ssd[1], FUNC(psion_ssd_device::data_r));      // SSD Pack 1
-	m_asic9->data_w<0>().set(m_ssd[1], FUNC(psion_ssd_device::data_w));
-	m_asic9->data_r<1>().set(m_ssd[0], FUNC(psion_ssd_device::data_r));      // SSD Pack 2
-	m_asic9->data_w<1>().set(m_ssd[0], FUNC(psion_ssd_device::data_w));
+	m_asic9->data_r<0>().set(m_ssd[0], FUNC(psion_ssd_device::data_r));      // SSD Pack 1
+	m_asic9->data_w<0>().set(m_ssd[0], FUNC(psion_ssd_device::data_w));
+	m_asic9->data_r<1>().set(m_ssd[1], FUNC(psion_ssd_device::data_r));      // SSD Pack 2
+	m_asic9->data_w<1>().set(m_ssd[1], FUNC(psion_ssd_device::data_w));
 	//m_asic9->data_r<2>().set(m_exp[0], FUNC(psion_exp_slot_device::data_r)); // Expansion port A
 	//m_asic9->data_w<2>().set(m_exp[0], FUNC(psion_exp_slot_device::data_w));
 	//m_asic9->data_r<3>().set(m_exp[1], FUNC(psion_exp_slot_device::data_r)); // Expansion port B
@@ -225,7 +225,7 @@ void workabout_state::workabout(machine_config &config)
 	PALETTE(config, "palette", FUNC(workabout_state::palette_init), 3);
 
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00); // Piezo buzzer
+	SPEAKER_SOUND(config, m_buzzer).add_route(ALL_OUTPUTS, "mono", 1.00); // Piezo buzzer
 
 	RAM(config, m_ram);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
@@ -261,12 +261,12 @@ void workabout_state::psionwamx(machine_config &config)
 	m_asic9->set_screen("screen");
 	m_asic9->set_ram_rom("ram", "rom");
 	m_asic9->port_ab_r().set(FUNC(workabout_state::kbd_r));
-	m_asic9->buz_cb().set(m_speaker, FUNC(speaker_sound_device::level_w));
+	m_asic9->buz_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_asic9->col_cb().set([this](uint8_t data) { m_key_col = data; });
-	m_asic9->data_r<0>().set(m_ssd[1], FUNC(psion_ssd_device::data_r));      // SSD Pack 1
-	m_asic9->data_w<0>().set(m_ssd[1], FUNC(psion_ssd_device::data_w));
-	m_asic9->data_r<1>().set(m_ssd[0], FUNC(psion_ssd_device::data_r));      // SSD Pack 2
-	m_asic9->data_w<1>().set(m_ssd[0], FUNC(psion_ssd_device::data_w));
+	m_asic9->data_r<0>().set(m_ssd[0], FUNC(psion_ssd_device::data_r));      // SSD Pack 1
+	m_asic9->data_w<0>().set(m_ssd[0], FUNC(psion_ssd_device::data_w));
+	m_asic9->data_r<1>().set(m_ssd[1], FUNC(psion_ssd_device::data_r));      // SSD Pack 2
+	m_asic9->data_w<1>().set(m_ssd[1], FUNC(psion_ssd_device::data_w));
 	//m_asic9->data_r<2>().set(m_exp[0], FUNC(psion_exp_slot_device::data_r)); // Expansion port A
 	//m_asic9->data_w<2>().set(m_exp[0], FUNC(psion_exp_slot_device::data_w));
 	//m_asic9->data_r<3>().set(m_exp[1], FUNC(psion_exp_slot_device::data_r)); // Expansion port B

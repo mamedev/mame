@@ -1136,9 +1136,9 @@ void screen_device::set_visible_area(int min_x, int max_x, int min_y, int max_y)
 
 
 //-------------------------------------------------
-//  update_partial - perform a partial update from
-//  the last scanline up to and including the
-//  specified scanline
+//  update_partial (scanline) - perform a partial
+//  update from the last scanline up to and
+//  including the specified scanline
 //-----------------------------------------------*/
 
 bool screen_device::update_partial(int scanline)
@@ -1176,6 +1176,16 @@ bool screen_device::update_partial(int scanline)
 	{
 		LOG_PARTIAL_UPDATES(("skipped because frame was already rendered\n"));
 		return false;
+	}
+
+	// if we left off in the middle of a scanline, eg. with update_now(), finish that scanline first
+	if (m_partial_scan_hpos > 0)
+	{
+		update_partial(m_last_partial_scan + 1, 0);
+
+		// check again if scanline was already rendered
+		if (scanline < m_last_partial_scan)
+			return true;
 	}
 
 	// set the range of scanlines to render
@@ -1252,11 +1262,12 @@ bool screen_device::update_partial(int scanline)
 
 
 //-------------------------------------------------
-//  update_now - perform an update from the last
-//  beam position up to the current beam position
+//  update_partial (vpos, hpos) - perform an update
+//  from the last beam position up to (but not
+//  including!) the newly specified beam position
 //-------------------------------------------------
 
-void screen_device::update_now()
+bool screen_device::update_partial(int vpos, int hpos)
 {
 	// these two checks only apply if we're allowed to skip frames
 	if (!(m_video_attributes & VIDEO_ALWAYS_UPDATE))
@@ -1265,47 +1276,45 @@ void screen_device::update_now()
 		if (machine().video().skip_this_frame())
 		{
 			LOG_PARTIAL_UPDATES(("skipped due to frameskipping\n"));
-			return;
+			return false;
 		}
 
 		// skip if this screen is not visible anywhere
 		if (!machine().render().is_live(*this))
 		{
 			LOG_PARTIAL_UPDATES(("skipped because screen not live\n"));
-			return;
+			return false;
 		}
 	}
 
-	int current_vpos = vpos();
-	int current_hpos = hpos();
 	rectangle clip = m_visarea;
 
 	// skip if we already rendered this line
-	if (current_vpos < m_last_partial_scan)
+	if (vpos < m_last_partial_scan)
 	{
 		LOG_PARTIAL_UPDATES(("skipped because line was already rendered\n"));
-		return;
+		return false;
 	}
 
-	// if beam position is the same, there's nothing to update
-	if (current_vpos == m_last_partial_scan && current_hpos == m_partial_scan_hpos)
+	// if beam position is the same or less, there's nothing to update
+	if (vpos == m_last_partial_scan && hpos <= m_partial_scan_hpos)
 	{
-		LOG_PARTIAL_UPDATES(("skipped because beam position is unchanged\n"));
-		return;
+		LOG_PARTIAL_UPDATES(("skipped because beam position already passed\n"));
+		return false;
 	}
 
 	// skip if we already rendered this frame
-	// this can happen if a cpu timeslice that called update_now is in the previous frame while scanline 0 already started
+	// this can happen if a cpu timeslice that called update_partial is in the previous frame while scanline 0 already started
 	if (m_last_partial_scan == 0 && m_partial_scan_hpos == 0 && m_last_partial_reset > machine().time())
 	{
 		LOG_PARTIAL_UPDATES(("skipped because frame was already rendered\n"));
-		return;
+		return false;
 	}
 
-	LOG_PARTIAL_UPDATES(("update_now(): Y=%d, X=%d, last partial %d, partial hpos %d  (vis %d %d)\n", current_vpos, current_hpos, m_last_partial_scan, m_partial_scan_hpos, m_visarea.right(), m_visarea.bottom()));
+	LOG_PARTIAL_UPDATES(("update_partial(): Y=%d, X=%d, last partial %d, partial hpos %d  (vis %d %d)\n", vpos, hpos, m_last_partial_scan, m_partial_scan_hpos, m_visarea.right(), m_visarea.bottom()));
 
 	// start off by doing a partial update up to the line before us, in case that was necessary
-	if (current_vpos > m_last_partial_scan)
+	if (vpos > m_last_partial_scan)
 	{
 		// if the line before us was incomplete, we must do it in two pieces
 		if (m_partial_scan_hpos > 0)
@@ -1352,21 +1361,21 @@ void screen_device::update_now()
 			m_partial_scan_hpos = 0;
 			m_last_partial_scan++;
 		}
-		if (current_vpos > m_last_partial_scan)
+		if (vpos > m_last_partial_scan)
 		{
-			update_partial(current_vpos - 1);
+			update_partial(vpos - 1);
 		}
 	}
 
 	// now draw this partial scanline
-	if (current_hpos > 0)
+	if (hpos > 0)
 	{
 		clip = m_visarea;
 
 		clip.set((std::max)(clip.left(), m_partial_scan_hpos),
-				(std::min)(clip.right(), current_hpos - 1),
-				(std::max)(clip.top(), current_vpos),
-				(std::min)(clip.bottom(), current_vpos));
+				(std::min)(clip.right(), hpos - 1),
+				(std::max)(clip.top(), vpos),
+				(std::min)(clip.bottom(), vpos));
 
 		// and if there's something to draw, do it
 		if (!clip.empty())
@@ -1379,12 +1388,12 @@ void screen_device::update_now()
 			screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
 			if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
 			{
-				pre_update_scanline(current_vpos);
+				pre_update_scanline(vpos);
 				switch (curbitmap.format())
 				{
 					default:
-					case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][current_vpos], clip);   break;
-					case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][current_vpos], clip);   break;
+					case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][vpos], clip);   break;
+					case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][vpos], clip);   break;
 				}
 			}
 			else
@@ -1405,8 +1414,9 @@ void screen_device::update_now()
 	}
 
 	// remember where we left off
-	m_partial_scan_hpos = current_hpos;
-	m_last_partial_scan = current_vpos;
+	m_partial_scan_hpos = hpos;
+	m_last_partial_scan = vpos;
+	return true;
 }
 
 
@@ -1571,7 +1581,7 @@ int screen_device::hpos() const
 //-------------------------------------------------
 //  time_until_pos - returns the amount of time
 //  remaining until the beam is at the given
-//  hpos,vpos
+//  vpos,hpos
 //-------------------------------------------------
 
 attotime screen_device::time_until_pos(int vpos, int hpos) const

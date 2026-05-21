@@ -37,6 +37,44 @@
  Reach         *       *     *      *
  Ron           *       *     *      *
 
+
+ "Standard" mahjong keyboards use a 4*6 matrix.  Gambling controls add an additional row.
+
+ A         E         I         M         Kan       Start
+ B         F         J         N         Reach     Bet
+ C         G         K         Chi       Ron       -
+ D         H         L         Pon       -         -
+ Last      Take      W-Up      F.Flop    Big       Small
+
+ Hanafuda keyboards use a subset of the matrix.
+ These are rare.  A mahjong panel with additional labels would usually be used.
+
+ 1         5         -         Yes       -         Start
+ 2         6         -         No        -         Bet
+ 3         7         -         -         -         -
+ 4         8         -         -         -         -
+ -         Take      W-Up      F.Flop    Big       Small
+
+ Rarest of all is the 6-button hanafuda (or "hanaroku") keyboard, using a 6*6 matrix.
+ This has controls for two player positions in one matrix.
+
+ 1P 1      1P 2      1P 3      1P 4      Payout    F.Flop
+ 1P 5      1P No     1P Yes    1P 6      -         -
+ -         1P Start  1P Bet    -         -         -
+ 2P 1      2P 2      2P 3      2P 4      -         -
+ 2P 5      2P No     2P Yes    2P 6      -         -
+ -         2P Start  2P Bet    -         -         -
+
+ Columns are usually wired from left to right from least significant to most significant bit.
+ Nichibutsu wires the bits in the opposite order.
+ The Jaleco MegaSystem 32 has the columns rotated by one position so the Start column is the least significant bit.
+ Various other games (e.g. from Seta) change the order of rows and/or columns.
+ Sega, Sanritsu, Toaplan and some others transposed the rows and columns, producing a 6*4 or 6*5 matrix.
+
+ Note that non-standard mahjong/hanafuda keyboards exist:
+ * Some Nichibutsu hanafuda games use the Reach/Ron positions for Yes/No (rather than M/N).
+ * SNK Neo Geo mahjong keyboards use a non-standard 3*7 matrix.
+
  */
 #include "emu.h"
 #include "mahjong.h"
@@ -72,7 +110,7 @@ INPUT_PORTS_START(hanafuda_matrix_bet)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E)           PORT_PLAYER(1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES)         PORT_PLAYER(1)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START)                PORT_PLAYER(1)
 
 	PORT_START("KEY1")
@@ -157,40 +195,6 @@ INPUT_PORTS_START(hanaroku_panel)
 	PORT_BIT(0x38, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-
-
-class mahjong_panel_device_base : public device_t, public device_mahjong_panel_interface
-{
-public:
-	virtual u8 read(u8 select) override
-	{
-		u8 result = 0x3f;
-		for (unsigned i = 0; m_keys.size() > i; ++i)
-		{
-			if (!BIT(select, i))
-				result &= m_keys[i]->read();
-		}
-		return result;
-	}
-
-protected:
-	mahjong_panel_device_base(
-			machine_config const &mconfig,
-			device_type type,
-			char const *tag,
-			device_t *owner,
-			u32 clock) :
-		device_t(mconfig, type, tag, owner, clock),
-		device_mahjong_panel_interface(mconfig, *this),
-		m_keys(*this, "KEY%u", 0U)
-	{
-	}
-
-	virtual void device_start() override ATTR_COLD { }
-
-private:
-	required_ioport_array<6> m_keys;
-};
 
 
 class mahjong_panel_device : public mahjong_panel_device_base
@@ -335,6 +339,66 @@ mahjong_panel_connector_device::~mahjong_panel_connector_device()
 void mahjong_panel_connector_device::device_start()
 {
 	m_panel = get_card_device();
+}
+
+void mahjong_panel_connector_device::standard_panels(device_slot_interface &device)
+{
+	device.option_add("mj",   MAHJONG_MEDAL_PANEL);
+	device.option_add("mjam", MAHJONG_PANEL);
+	device.option_add("hf",   HANAFUDA_MEDAL_PANEL);
+	device.option_add("hfam", HANAFUDA_PANEL);
+}
+
+void mahjong_panel_connector_device::mahjong_panels(device_slot_interface &device)
+{
+	device.option_add("mj",   MAHJONG_MEDAL_PANEL);
+	device.option_add("mjam", MAHJONG_PANEL);
+}
+
+void mahjong_panel_connector_device::hanafuda_panels(device_slot_interface &device)
+{
+	device.option_add("hf",   HANAFUDA_MEDAL_PANEL);
+	device.option_add("hfam", HANAFUDA_PANEL);
+}
+
+void mahjong_panel_connector_device::medal_panels(device_slot_interface &device)
+{
+	device.option_add("mj",   MAHJONG_MEDAL_PANEL);
+	device.option_add("hf",   HANAFUDA_MEDAL_PANEL);
+}
+
+void mahjong_panel_connector_device::amusement_panels(device_slot_interface &device)
+{
+	device.option_add("mjam", MAHJONG_PANEL);
+	device.option_add("hfam", HANAFUDA_PANEL);
+}
+
+
+mahjong_panel_device_base::mahjong_panel_device_base(
+		machine_config const &mconfig,
+		device_type type,
+		char const *tag,
+		device_t *owner,
+		u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_mahjong_panel_interface(mconfig, *this),
+	m_keys(*this, "KEY%u", 0U)
+{
+}
+
+u8 mahjong_panel_device_base::read(u8 select)
+{
+	u8 result = 0x3f;
+	for (unsigned i = 0; m_keys.size() > i; ++i)
+	{
+		if (!BIT(select, i))
+			result &= m_keys[i]->read();
+	}
+	return result;
+}
+
+void mahjong_panel_device_base::device_start()
+{
 }
 
 

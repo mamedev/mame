@@ -92,15 +92,12 @@ public:
 		: hp_hil_slot_device(mconfig, tag, owner, 0)
 	{
 		m_mlc.set_tag(std::forward<T>(mlc_tag));
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 	}
 	hp_hil_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	// configuration
@@ -108,7 +105,7 @@ protected:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(HP_HIL_SLOT, hp_hil_slot_device)
 
 
@@ -132,7 +129,7 @@ public:
 	void hil_write(uint16_t data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -146,7 +143,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(HP_HIL_MLC, hp_hil_mlc_device)
 
 

@@ -11,7 +11,7 @@
     Hitachi Deskstar HDS721680PLA320 80 GB
     EGIS2JVS V1.2 card
     Windows XP embedded
-	TODO: north/southbridge?
+    TODO: north/southbridge?
 
     The system was meant to be modular, but only 2 titles are said to have been actually released.
 

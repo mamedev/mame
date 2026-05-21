@@ -38,7 +38,7 @@ public:
 		, m_bank3(*this, "bank3")
 		, m_floppy_timer(*this, "floppy_timer")
 		, m_leds(*this, "led%c", unsigned('A'))
-		{}
+	{ }
 
 	void init_kaypro();
 

@@ -596,7 +596,7 @@ void mips_i2000_state::i2000(machine_config &config)
 	m_scsi->breq_cb().set(m_iop, FUNC(v50_device::dreq_w<1>));
 
 	// ethernet
-	AM7990(config, m_net);
+	AM7990(config, m_net, 20_MHz_XTAL / 2);
 	m_net->intr_out().set_inputline(m_iop, INPUT_LINE_IRQ5).invert();
 	m_net->dma_in().set(FUNC(mips_i2000_state::lance_r));
 	m_net->dma_out().set(FUNC(mips_i2000_state::lance_w));

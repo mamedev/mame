@@ -2158,7 +2158,7 @@ protected:
 	{
 		// dispatch event to every device by default
 		this->devicelist().for_each_device(
-				[&event] (auto &device) { device.queue_events(&event, 1); });
+				[&event] (auto &device) { device.queue_event(event); });
 	}
 };
 
@@ -2504,7 +2504,7 @@ protected:
 
 		// if we find a matching joystick, dispatch the event to the joystick
 		if (target_device)
-			target_device->queue_events(&event, 1);
+			target_device->queue_event(event);
 	}
 
 	device_info *find_reconnect_match(SDL_JoystickGUID const &guid, char const *serial)

@@ -4,13 +4,16 @@
 
     Mirage Youjuu Mahjongden (c) 1994 Mitchell
 
-    Similar to simpl156.cpp with shifted stuff around.
+    Similar to simpl156.cpp with stuff shifted around.
 
     TODO:
-    - some unknown writes (irq acks / sprite DMA start presumably);
+    - some unknown writes (IRQ acks / sprite DMA start presumably);
 
     Notes:
-    - To enter into full Test Mode you need to keep pressed the Mahjong A key at start-up.
+    - To enter into full Test Mode you need to hold the Mahjong A key at start-up.
+      Chi=down, L=up, A=select, Start=select/return
+      Object Test: Ron=pgdn, N=pgup, D=table, Reach/Pon=palette, FF=objmov test
+      Back Test: A=table, Reach/Pon=palette
 
 ===============================================================================================
 
@@ -39,9 +42,12 @@ MR_01-.3A    [a0b758aa]
 ***********************************************************************************************/
 
 #include "emu.h"
+
 #include "deco16ic.h"
 #include "decocrpt.h"
 #include "decospr.h"
+
+#include "mahjong.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
@@ -135,13 +141,14 @@ void miragemj_state::key_matrix_w(uint16_t data)
 
 uint16_t miragemj_state::key_matrix_r()
 {
-	uint16_t result = 0xffff;
+	uint8_t const select = bitswap<5>(m_key_matrix_select, 2, 4, 1, 3, 0);
+	uint16_t result = 0x3f;
 	for (int i = 0; m_io_key.size() > i; ++i)
 	{
-		if (BIT(m_key_matrix_select, i))
+		if (BIT(select, i))
 			result &= m_io_key[i]->read();
 	}
-	return result;
+	return 0xffc0 | result;
 }
 
 void miragemj_state::okim1_rombank_w(uint16_t data)
@@ -195,41 +202,7 @@ static INPUT_PORTS_START( mirage )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
-	PORT_BIT( 0xfff7, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_INCLUDE( mahjong_matrix_1p_ff )
 INPUT_PORTS_END
 
 

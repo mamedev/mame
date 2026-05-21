@@ -13,10 +13,10 @@ OSC: 10MHz ??MHz
 driver by Nicola Salmoria
 
 TODO:
-- Complete dip switches.
+- Complete DIP switches.
 
 - Several imperfections with sprites rendering:
-  - some sprites are misplaced by 1pixel vertically
+  - some sprites are misplaced by 1 pixel vertically
   - during the tile distribution at the beginning of a match, there's something
     wrong with the stacks moved around, they are misaligned and something is
     missing.
@@ -24,6 +24,8 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "mahjong.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
@@ -62,7 +64,7 @@ public:
 		m_adpcmrom(*this, "adpcm"),
 		m_videoram(*this, "videoram"),
 		m_mainbank(*this, "mainbank"),
-		m_row(*this, "ROW.%u", 0)
+		m_row(*this, "KEY%u", 0)
 	{ }
 
 	void mjkjidai(machine_config &config);
@@ -85,7 +87,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_memory_bank m_mainbank;
 
-	required_ioport_array<12> m_row;
+	required_ioport_array<10> m_row;
 
 	uint16_t m_adpcm_pos = 0;
 	uint32_t m_adpcm_end = 0;
@@ -256,15 +258,14 @@ void mjkjidai_state::adpcm_int(int state)
 
 ioport_value mjkjidai_state::keyboard_r()
 {
-	int res = 0x3f;
+	ioport_value const sel1 = bitswap<6>(~m_keyb, 6, 7, 8, 9, 10, 11);
+	ioport_value const sel2 = bitswap<6>(~m_keyb, 0, 1, 2, 3, 4, 5);
 
-	for (int i = 0; i < 12; i++)
+	ioport_value res = 0x3f;
+	for (int i = 0; i < 5; i++)
 	{
-		if (~m_keyb & (0x800 >> i))
-		{
-			res = m_row[i]->read();
-			break;
-		}
+		if (((m_row[i]->read() & sel1) != sel1) || ((m_row[i + 5]->read() & sel2) != sel2))
+			res &= ~(1 << i);
 	}
 
 	return res;
@@ -366,81 +367,7 @@ static INPUT_PORTS_START( mjkjidai )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // reinitialize NVRAM and reset the game
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("ROW.0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x38, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x3e, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.10")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
-	PORT_BIT( 0x38, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.11")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x3e, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_INCLUDE(mahjong_matrix_2p)
 INPUT_PORTS_END
 
 

@@ -2970,22 +2970,22 @@
 			<color red="1.0" green="1.0" blue="1.0"/>
 		</rect>
 	</element>
-	<element name="reel0" defstate="0">
+	<element name="reel0:pos" defstate="0">
 		<reel reelreversed="0" stateoffset="-5461" numsymbolsvisible="3" symbollist="Red 7,Melon,Bell,Grapes(B2),Cherry,Bell(R3),Grapes(?),Cherry,Melon,Blue 7(B1),Grapes,Melon,JPM,Cherry,Blue 7(R2),Cherry">
 			<color red="0.0" green="0.0" blue="0.0"/>
 		</reel>
 	</element>
-	<element name="reel1" defstate="0">
+	<element name="reel1:pos" defstate="0">
 		<reel reelreversed="0" stateoffset="-5461" numsymbolsvisible="3" symbollist="Red 7,Melon,Bell(?),Grapes(R3),Cherry,Bell(B3),Grapes,Cherry,Melon,Red 7(R2),Grapes,Melon,JPM,Cherry(B1),Blue 7,Cherry(1)">
 			<color red="0.0" green="0.0" blue="0.0"/>
 		</reel>
 	</element>
-	<element name="reel2" defstate="0">
+	<element name="reel2:pos" defstate="0">
 		<reel reelreversed="0" stateoffset="-5461" numsymbolsvisible="3" symbollist="Red 7,Melon(R2),Bell,Grapes,Cherry(R4),Bell,Grapes,Cherry(B1),Melon,Blue 7,Grapes(B2),Melon(?),JPM,Cherry,Blue 7,Cherry(R3)">
 			<color red="0.0" green="0.0" blue="0.0"/>
 		</reel>
 	</element>
-	<element name="reel3" defstate="0">
+	<element name="reel3:pos" defstate="0">
 		<reel reelreversed="0" stateoffset="-1365" numsymbolsvisible="3" symbollist="12,3,10,5,11,7,1,8,4,9,2,6">
 			<color red="0.0" green="0.0" blue="0.0"/>
 		</reel>
@@ -3051,7 +3051,7 @@
 		<element name="lamp0" ref="reel_lamp" state="0">
 			<bounds x="107.0000" y="518.6667" width="90.0000" height="53.3333"/>
 		</element>
-		<element name="sreel1" ref="reel0" state="0">
+		<element name="reel1:scroll" ref="reel0:pos" state="0">
 			<bounds x="107" y="412" width="90" height="160"/>
 		</element>
 		<element ref="reel_background">
@@ -3066,7 +3066,7 @@
 		<element name="lamp3" ref="reel_lamp" state="0">
 			<bounds x="199.0000" y="518.6667" width="90.0000" height="53.3333"/>
 		</element>
-		<element name="sreel2" ref="reel1" state="0">
+		<element name="reel2:scroll" ref="reel1:pos" state="0">
 			<bounds x="199" y="412" width="90" height="160"/>
 		</element>
 		<element ref="reel_background">
@@ -3081,7 +3081,7 @@
 		<element name="lamp16" ref="reel_lamp" state="0">
 			<bounds x="291.0000" y="518.6667" width="90.0000" height="53.3333"/>
 		</element>
-		<element name="sreel3" ref="reel2" state="0">
+		<element name="reel3:scroll" ref="reel2:pos" state="0">
 			<bounds x="291" y="412" width="90" height="160"/>
 		</element>
 		<element ref="reel_background">
@@ -3096,7 +3096,7 @@
 		<element name="lamp19" ref="reel_lamp" state="0">
 			<bounds x="398.0000" y="512.6667" width="60.0000" height="33.3333"/>
 		</element>
-		<element name="sreel4" ref="reel3" state="0">
+		<element name="reel4:scroll" ref="reel3:pos" state="0">
 			<bounds x="398" y="446" width="60" height="100"/>
 		</element>
 		<element name="lamp157" ref="lamp_157_1_border" state="0">

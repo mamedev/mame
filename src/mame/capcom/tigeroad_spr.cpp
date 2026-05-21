@@ -19,7 +19,7 @@
 #include "tigeroad_spr.h"
 
 
-DEFINE_DEVICE_TYPE(TIGEROAD_SPRITE, tigeroad_spr_device, "tigeroad_spr", "Simple Capcom (Tiger Road) Sprite")
+DEFINE_DEVICE_TYPE(TIGEROAD_SPRITE, tigeroad_spr_device, "tigeroad_spr", "Capcom Tiger Road Sprites")
 
 tigeroad_spr_device::tigeroad_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TIGEROAD_SPRITE, tag, owner, clock)
@@ -50,7 +50,7 @@ void tigeroad_spr_device::device_start()
 /*
    4  words per sprite
 
-   0  ---- ---t tttt tttt = tile number
+   0  ---- tttt tttt tttt = tile number (one less bit on f1dream/bionicc)
 
    1  ---- ---- --cc cc-- = colour
    1  ---- ---- ---- --x- = flip x
@@ -72,15 +72,12 @@ void tigeroad_spr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 		const u32 tile_number = source[0];
 
 		const u16 attr = source[1];
-		int sy = source[2] & 0x1ff;
-		int sx = source[3] & 0x1ff;
+		int sy = util::sext(source[2] & 0x1ff, 9);
+		int sx = util::sext(source[3] & 0x1ff, 9);
 
 		int flipx = attr & 0x02;
 		int flipy = attr & 0x01;
-		const u32 color = (attr >> 2) & 0x0f;
-
-		if (sx > 0x100) sx -= 0x200;
-		if (sy > 0x100) sy -= 0x200;
+		const u8 color = (attr >> 2) & 0x0f;
 
 		if (flip_screen)
 		{

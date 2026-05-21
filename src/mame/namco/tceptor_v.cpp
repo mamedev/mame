@@ -76,11 +76,11 @@ void tceptor_state::tceptor_palette(palette_device &palette)
 
 	// setup sprite mask color map
 	// tceptor2: only 0x23
-	std::fill(std::begin(m_is_mask_spr), std::end(m_is_mask_spr), 0);
+	std::fill(std::begin(m_is_mask_spr), std::end(m_is_mask_spr), false);
 	for (int i = 0; i < 0x400; i++)
 	{
 		if (palette.pen_indirect(i | 0x400) == SPR_MASK_COLOR)
-			m_is_mask_spr[i >> 4] = 1;
+			m_is_mask_spr[i >> 4] = true;
 	}
 }
 
@@ -89,8 +89,8 @@ void tceptor_state::tceptor_palette(palette_device &palette)
 
 inline int tceptor_state::get_tile_addr(int tile_index)
 {
-	int x = tile_index / 28;
-	int y = tile_index % 28;
+	int const x = tile_index / 28;
+	int const y = tile_index % 28;
 
 	switch (x)
 	{
@@ -105,9 +105,9 @@ inline int tceptor_state::get_tile_addr(int tile_index)
 
 TILE_GET_INFO_MEMBER(tceptor_state::get_tx_tile_info)
 {
-	int offset = get_tile_addr(tile_index);
-	int code = m_tile_ram[offset];
-	int color = m_tile_attr[offset];
+	int const offset = get_tile_addr(tile_index);
+	int const code = m_tile_ram[offset];
+	int const color = m_tile_attr[offset];
 
 	tileinfo.group = color;
 
@@ -164,18 +164,18 @@ void tceptor_state::tceptor_tile_attr_w(offs_t offset, uint8_t data)
 
 TILE_GET_INFO_MEMBER(tceptor_state::get_bg1_tile_info)
 {
-	uint16_t data = m_bg_ram[tile_index * 2] | (m_bg_ram[tile_index * 2 + 1] << 8);
-	int code = (data & 0x3ff) | 0x000;
-	int color = (data & 0xfc00) >> 10;
+	uint16_t const data = m_bg_ram[tile_index * 2] | (m_bg_ram[tile_index * 2 + 1] << 8);
+	int const code = (data & 0x3ff) | 0x000;
+	int const color = (data & 0xfc00) >> 10;
 
 	tileinfo.set(m_bg, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(tceptor_state::get_bg2_tile_info)
 {
-	uint16_t data = m_bg_ram[tile_index * 2 + 0x1000] | (m_bg_ram[tile_index * 2 + 1 + 0x1000] << 8);
-	int code = (data & 0x3ff) | 0x400;
-	int color = (data & 0xfc00) >> 10;
+	uint16_t const data = m_bg_ram[tile_index * 2 + 0x1000] | (m_bg_ram[tile_index * 2 + 1 + 0x1000] << 8);
+	int const code = (data & 0x3ff) | 0x400;
+	int const color = (data & 0xfc00) >> 10;
 
 	tileinfo.set(m_bg, code, color, 0);
 }
@@ -233,15 +233,14 @@ void tceptor_state::decode_bg(const char * region)
 		128
 	};
 
-	int gfx_index = m_bg;
+	int const gfx_index = m_bg;
 	uint8_t *src = memregion(region)->base() + 0x8000;
-	int len = 0x8000;
-	int i;
+	int const len = 0x8000;
 
 	std::vector<uint8_t> buffer(len);
 
 	/* expand rom tc2-19.10d */
-	for (i = 0; i < len / 2; i++)
+	for (int i = 0; i < len / 2; i++)
 	{
 		buffer[i*2+1] = src[i] & 0x0f;
 		buffer[i*2] = (src[i] & 0xf0) >> 4;
@@ -280,13 +279,12 @@ void tceptor_state::decode_sprite16(const char * region)
 	};
 
 	uint8_t *src = memregion(region)->base();
-	int len = memregion(region)->bytes();
-	int i, y;
+	int const len = memregion(region)->bytes();
 
 	m_decoded_16 = std::make_unique<uint8_t[]>(len);
 
-	for (i = 0; i < len / (4*4*16); i++)
-		for (y = 0; y < 16; y++)
+	for (int i = 0; i < len / (4*4*16); i++)
+		for (int y = 0; y < 16; y++)
 		{
 			memcpy(&m_decoded_16[(i*4 + 0) * (2*16*16/8) + y * (2*16/8)],
 					&src[i * (2*32*32/8) + y * (2*32/8)],
@@ -330,14 +328,13 @@ void tceptor_state::decode_sprite32(const char * region)
 	};
 
 	uint8_t *src = memregion(region)->base();
-	int len = memregion(region)->bytes();
-	int total = spr32_layout.total;
-	int size = spr32_layout.charincrement / 8;
-	int i;
+	int const len = memregion(region)->bytes();
+	int const total = spr32_layout.total;
+	int const size = spr32_layout.charincrement / 8;
 
 	m_decoded_32 = make_unique_clear<uint8_t[]>(len);
 
-	for (i = 0; i < total; i++)
+	for (int i = 0; i < total; i++)
 	{
 		int code;
 
@@ -355,8 +352,6 @@ void tceptor_state::video_start()
 {
 	int gfx_index;
 
-	m_sprite_ram_buffered = make_unique_clear<uint16_t[]>(0x200/2);
-
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 		if (m_gfxdecode->gfx(gfx_index) == nullptr)
@@ -364,13 +359,13 @@ void tceptor_state::video_start()
 	assert(gfx_index + 4 <= MAX_GFX_ELEMENTS);
 
 	m_bg = gfx_index++;
-	decode_bg("gfx2");
+	decode_bg("bgtiles");
 
 	m_sprite16 = gfx_index++;
-	decode_sprite16("gfx3");
+	decode_sprite16("spr16tiles");
 
 	m_sprite32 = gfx_index++;
-	decode_sprite32("gfx4");
+	decode_sprite32("spr32tiles");
 
 	/* allocate temp bitmaps */
 	m_screen->register_screen_bitmap(m_temp_bitmap);
@@ -386,11 +381,8 @@ void tceptor_state::video_start()
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tceptor_state::get_bg1_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tceptor_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	save_pointer(NAME(m_sprite_ram_buffered), 0x200 / 2);
-	save_item(NAME(m_bg_scroll_x[0]));
-	save_item(NAME(m_bg_scroll_y[0]));
-	save_item(NAME(m_bg_scroll_x[1]));
-	save_item(NAME(m_bg_scroll_y[1]));
+	save_item(NAME(m_bg_scroll_x));
+	save_item(NAME(m_bg_scroll_y));
 }
 
 
@@ -419,23 +411,23 @@ void tceptor_state::video_start()
 
 void tceptor_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority)
 {
-	uint16_t *mem1 = &m_sprite_ram_buffered[0x000/2];
-	uint16_t *mem2 = &m_sprite_ram_buffered[0x100/2];
-	int need_mask = 0;
+	const uint16_t *const mem1 = &m_sprite_ram->buffer()[0x000/2];
+	const uint16_t *const mem2 = &m_sprite_ram->buffer()[0x100/2];
+	bool need_mask = false;
 
 	for (int i = 0; i < 0x100; i += 2)
 	{
 		int scalex = (mem1[1 + i] & 0xfc00) << 1;
 		int scaley = (mem1[0 + i] & 0xfc00) << 1;
-		int pri = 7 - ((mem1[1 + i] & 0x3c0) >> 6);
+		int const pri = 7 - ((mem1[1 + i] & 0x3c0) >> 6);
 
 		if (pri == sprite_priority && scalex && scaley)
 		{
 			int x = mem2[1 + i] & 0x3ff;
 			int y = 512 - (mem2[0 + i] & 0x3ff);
-			int flipx = mem2[0 + i] & 0x4000;
-			int flipy = mem2[0 + i] & 0x8000;
-			int color = mem1[1 + i] & 0x3f;
+			int const flipx = BIT(mem2[0 + i], 14);
+			int const flipy = BIT(mem2[0 + i], 15);
+			int const color = mem1[1 + i] & 0x3f;
 			int gfx;
 			int code;
 
@@ -458,7 +450,7 @@ void tceptor_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 					// backup previous bitmap
 					copybitmap(m_temp_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 
-				need_mask = 1;
+				need_mask = true;
 			}
 
 			// round off
@@ -492,11 +484,10 @@ void tceptor_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 }
 
 
-uint32_t tceptor_state::screen_update_tceptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tceptor_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle rect;
-	int pri;
-	int bg_center = 144 - ((((m_bg_scroll_x[0] + m_bg_scroll_x[1] ) & 0x1ff) - 288) / 2);
+	int const bg_center = 144 - ((((m_bg_scroll_x[0] + m_bg_scroll_x[1] ) & 0x1ff) - 288) / 2);
 
 	// left background
 	rect = cliprect;
@@ -512,7 +503,7 @@ uint32_t tceptor_state::screen_update_tceptor(screen_device &screen, bitmap_ind1
 	m_bg_tilemap[1]->set_scrolly(0, m_bg_scroll_y[1] + 20); // 32?
 	m_bg_tilemap[1]->draw(screen, bitmap, rect, 0, 0);
 
-	for (pri = 0; pri < 8; pri++)
+	for (int pri = 0; pri < 8; pri++)
 	{
 		m_c45_road->draw(screen, bitmap, cliprect, pri * 2);
 		m_c45_road->draw(screen, bitmap, cliprect, pri * 2 + 1);
@@ -523,12 +514,12 @@ uint32_t tceptor_state::screen_update_tceptor(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-void tceptor_state::screen_vblank_tceptor(int state)
+void tceptor_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
 	{
-		memcpy(m_sprite_ram_buffered.get(), m_sprite_ram, 0x200);
+		m_sprite_ram->copy();
 
 		if (m_m6809_irq_enable)
 			m_maincpu->set_input_line(0, HOLD_LINE);

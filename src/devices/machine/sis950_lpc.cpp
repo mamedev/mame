@@ -40,7 +40,7 @@ TODO:
 #define LOG_TODO   (1U << 2) // log unimplemented registers
 #define LOG_MAP    (1U << 3) // log full remaps
 #define LOG_LPC    (1U << 4) // log LPC legacy regs
-#define LOG_IRQ    (1U << 5) // log IRQ remaps
+#define LOG_IRQ    (1U << 5) // log IRQ remaps and state
 
 #define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO | LOG_IRQ)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -934,7 +934,7 @@ void sis950_lpc_device::irq_handler(int line, int state)
 	if(line < 0 || line >= 16)
 		return;
 
-	logerror("irq_handler %d %d\n", line, state);
+	LOGIRQ("irq_handler %d %d\n", line, state);
 	redirect_irq(line, state);
 }
 

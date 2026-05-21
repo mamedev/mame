@@ -78,6 +78,25 @@ void gaelco2_state::init_alighunt()
 }
 
 
+void gaelco2_state::init_luckyclrs()
+{
+	// TODO: remove if DS5002FP ever gets dumped
+
+	u16 *const rom = &memregion("maincpu")->as_u16();
+
+	// test fec020 , checks for value of 09
+	rom[0x0081a / 2] = 0x4e71;
+	// test fec00f
+	rom[0x01d92 / 2] = 0x4e71;
+	// test fe32b4
+	rom[0x08106 / 2] = 0x4e71;
+	// test fe443c , bypass RESET SCHEDA
+	rom[0x17654 / 2] = 0x4e71;
+	// test fe4440
+	rom[0x1768e / 2] = 0x4e71;
+}
+
+
 void gaelco2_dual_state::init_touchgo()
 {
 	/*

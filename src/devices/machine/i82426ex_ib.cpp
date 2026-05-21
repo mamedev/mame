@@ -131,8 +131,8 @@ void i82426ex_ib_device::device_reset()
 	m_dma_channel = -1;
 
 	m_nmi_mask = 1;
-//	m_dma[0]->set_unscaled_clock(2'500'000);
-//	m_dma[1]->set_unscaled_clock(2'500'000);
+//  m_dma[0]->set_unscaled_clock(2'500'000);
+//  m_dma[1]->set_unscaled_clock(2'500'000);
 }
 
 void i82426ex_ib_device::device_reset_after_children()
@@ -178,16 +178,16 @@ void i82426ex_ib_device::io_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) { m_dma_page[offset] = data; })
 	);
 	map(0x00a0, 0x00a1).rw(m_intc[1], FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-//	map(0x00b2, 0x00b2) APMC
-//	map(0x00b3, 0x00b3) APMS
+//  map(0x00b2, 0x00b2) APMC
+//  map(0x00b3, 0x00b3) APMS
 	map(0x00c0, 0x00df).lrw8(
 		NAME([this] (offs_t offset) { return m_dma[1]->read(offset >> 1); }),
 		NAME([this] (offs_t offset, u8 data) { m_dma[1]->write(offset >> 1, data); })
 	);
-//	map(0x00f0, 0x00f0) Coprocessor Error
-//	map(0x0480, 0x048f) DMA high page (not all of it)
-//	map(0x04d0, 0x04d0) INT-1 Edge/Level Control
-//	map(0x04d1, 0x04d1) INT-2 Edge/Level Control
+//  map(0x00f0, 0x00f0) Coprocessor Error
+//  map(0x0480, 0x048f) DMA high page (not all of it)
+//  map(0x04d0, 0x04d0) INT-1 Edge/Level Control
+//  map(0x04d1, 0x04d1) INT-2 Edge/Level Control
 }
 
 u8 i82426ex_ib_device::portb_r()
@@ -217,7 +217,7 @@ void i82426ex_ib_device::portb_w(u8 data)
 	if (!BIT(m_portb, 1))
 		m_write_spkr(0);
 
-//	m_write_spkr(BIT(m_portb, 1));
+//  m_write_spkr(BIT(m_portb, 1));
 
 	// clear channel check latch?
 	if (BIT(m_portb, 3))

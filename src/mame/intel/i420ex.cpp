@@ -127,7 +127,7 @@ void i420ex_state::i420ex(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &i420ex_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &i420ex_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("ib:intc1", FUNC(pic8259_device::inta_cb));
-//	m_maincpu->smiact().set("pci:05.0", FUNC(i82425ex_psc_device::smi_act_w));
+//  m_maincpu->smiact().set("pci:05.0", FUNC(i82425ex_psc_device::smi_act_w));
 
 	i82426ex_ib_device &ib(I82426EX_IB(config, "ib", XTAL(14'318'181), "maincpu", "keybc"));
 	ib.intr().set_inputline("maincpu", INPUT_LINE_IRQ0);
@@ -155,7 +155,7 @@ void i420ex_state::i420ex(machine_config &config)
 	ps2_keyboard_controller_device &keybc(PS2_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
 	// TODO: use its own BIOS
 	// Detection fails with Compaq
-//	keybc.set_default_bios_tag("compaq");
+//  keybc.set_default_bios_tag("compaq");
 	keybc.hot_res().set_inputline("maincpu", INPUT_LINE_RESET);
 	keybc.gate_a20().set_inputline("maincpu", INPUT_LINE_A20);
 	keybc.kbd_irq().set("ib:intc1", FUNC(pic8259_device::ir1_w));
