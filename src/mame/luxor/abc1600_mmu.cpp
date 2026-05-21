@@ -75,7 +75,7 @@ void abc1600_mmu_device::mac_w(offs_t offset, uint8_t data)
 }
 
 abc1600_mmu_device::abc1600_mmu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
-    device_t(mconfig, LUXOR_ABC1600_MMU, tag, owner, clock),
+	device_t(mconfig, LUXOR_ABC1600_MMU, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_state_interface(mconfig, *this),
 	m_read_tren(*this, 0xff),
@@ -92,12 +92,12 @@ abc1600_mmu_device::abc1600_mmu_device(machine_config const &mconfig, char const
 }
 
 abc1600_mmu_device::mmu::mmu(m68008_device *maincpu, address_space &boot, address_space &program, address_space &cpu_space, address_space &mac_space, u8 *segment_ram, u16 *page_ram) :
-    m_maincpu(maincpu),
+	m_maincpu(maincpu),
 	m_segment_ram(segment_ram),
 	m_page_ram(page_ram),
 	m_a_boot(boot),
-    m_a_program(program),
-    m_a_cpu_space(cpu_space),
+	m_a_program(program),
+	m_a_cpu_space(cpu_space),
 	m_a_mac_space(mac_space),
 	m_super(false),
 	m_boote(0),
@@ -145,8 +145,8 @@ device_memory_interface::space_config_vector abc1600_mmu_device::memory_space_co
 {
 	return space_config_vector {
 		std::make_pair(AS_BOOT, &m_boot_config),
-        std::make_pair(AS_PROGRAM, &m_program_config),
-        std::make_pair(m68000_base_device::AS_CPU_SPACE, &m_cpu_space_config),
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(m68000_base_device::AS_CPU_SPACE, &m_cpu_space_config),
 		std::make_pair(AS_MAC, &m_s_program_config)
 	};
 }
@@ -165,9 +165,9 @@ bool abc1600_mmu_device::mmu::ifc2(int intention) const
 
 bool abc1600_mmu_device::mmu::force_task0(offs_t logical, int intention) const
 {
-    const bool a19 = BIT(logical, 19);
+	const bool a19 = BIT(logical, 19);
 
-    return !(a19 || ifc2(intention));
+	return !(a19 || ifc2(intention));
 }
 
 int abc1600_mmu_device::mmu::get_task(offs_t logical, int intention) const
@@ -206,16 +206,16 @@ offs_t abc1600_mmu_device::mmu::get_physical_address(offs_t logical, int intenti
 
 bool abc1600_mmu_device::mmu::translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
- 	if (spacenum == m68000_base_device::AS_CPU_SPACE) {
+	if (spacenum == m68000_base_device::AS_CPU_SPACE) {
 		target_space = &m_a_cpu_space;
 		return true;
 	}
 
-    if (spacenum != AS_PROGRAM)
+	if (spacenum != AS_PROGRAM)
 		return false;
 
 	if (!m_boote && (intention != TR_WRITE) && (address < 0x20000)) {
-	    target_space = &m_a_boot;
+		target_space = &m_a_boot;
 		return true;
 	}
 
@@ -237,7 +237,7 @@ bool abc1600_mmu_device::mmu::translate(int spacenum, int intention, offs_t &add
 u8 abc1600_mmu_device::mmu::mmu_read(offs_t logical, int intention)
 {
 	if (!m_boote && (logical < 0x20000))
-	    return m_boot.read_interruptible(logical);
+		return m_boot.read_interruptible(logical);
 
 	if (!ifc2(intention) && BIT(logical, 19))
 		return m_s_program.read_interruptible(logical);

@@ -51,14 +51,6 @@ Note:   if MAME_DEBUG is defined, pressing:
 #include "cave.h"
 
 
-static constexpr u8 CAVE_SPRITETYPE_ZBUF = 0x01;
-static constexpr u8 CAVE_SPRITETYPE_ZOOM = 0x02;
-
-static constexpr u8 SPRITE_FLIPX_CAVE    = 0x01;
-static constexpr u8 SPRITE_FLIPY_CAVE    = 0x02;
-static constexpr u8 SPRITE_VISIBLE_CAVE  = 0x04;
-
-
 /* Sailormn: the lower 2 Megabytes of tiles banked */
 
 void cave_z80_state::sailormn_tilebank_w(int bank)
@@ -89,12 +81,8 @@ void cave_z80_state::sailormn_get_banked_code(bool tiledim, u32 &color, u32 &pri
 
 ***************************************************************************/
 
-void cave_state::vh_start(u16 sprcol_granularity)
+void cave_state::video_start()
 {
-	m_sprite_granularity = sprcol_granularity;
-
-	sprite_init();
-
 	m_layers_offs_x = 0x13;
 	m_layers_offs_y = -0x12;
 
@@ -121,22 +109,10 @@ void cave_state::vh_start(u16 sprcol_granularity)
 	}
 }
 
-// 4 bit sprite granularity
-VIDEO_START_MEMBER(cave_state,spr_4bpp)
-{
-	vh_start(16);
-}
-
-// 8 bit sprite granularity
-VIDEO_START_MEMBER(cave_state,spr_8bpp)
-{
-	vh_start(256);
-}
-
 // ppsatan (3 screen)
 void ppsatan_state::video_start()
 {
-	vh_start(16);
+	cave_state::video_start();
 	for (int chip = 1; chip < 3; chip++)
 	{
 		m_background_pen[chip] = m_gfxdecode[chip]->gfx(0)->colorbase() +
@@ -153,942 +129,29 @@ void ppsatan_state::video_start()
 	}
 }
 
-/***************************************************************************
-
-                            Zoomed Sprites Drawing
-
-    Sprite format with zoom, 16 bytes per each sprites
-
-    Offset:     Bits:                   Value:
-
-    00.w                                X Position*
-
-    02.w                                Y Position*
-
-    04.w        fe-- ---- ---- ----
-                --dc ba98 ---- ----     Color
-                ---- ---- 76-- ----
-                ---- ---- --54 ----     Priority
-                ---- ---- ---- 3---     Flip X
-                ---- ---- ---- -2--     Flip Y
-                ---- ---- ---- --10     Code High Bit(s?)
-
-    06.w                                Code Low Bits
-
-    08/0A.w                             Zoom X / Y
-
-    0C.w        fedc ba98 ---- ----     Tile Size X
-                ---- ---- 7654 3210     Tile Size Y
-
-    0E.w                                Unused
-
-    * S.9.6 Fixed point or 10 bit signed integer,
-      Configured from videoregs
-
-
-                                Sprites Drawing
-
-    Sprite format without zoom, 16 bytes per each sprites
-
-    Offset:     Bits:                   Value:
-
-    00.w        fe-- ---- ---- ----
-                --dc ba98 ---- ----     Color
-                ---- ---- 76-- ----
-                ---- ---- --54 ----     Priority
-                ---- ---- ---- 3---     Flip X
-                ---- ---- ---- -2--     Flip Y
-                ---- ---- ---- --10     Code High Bit(s?)
-
-    02.w                                Code Low Bits
-
-    04.w        fedc ba-- ---- ----
-                ---- --98 7654 3210     X Position**
-
-    06.w        fedc ba-- ---- ----
-                ---- --98 7654 3210     Y Position**
-
-    08.w        fedc ba98 ---- ----     Tile Size X
-                ---- ---- 7654 3210     Tile Size Y
-
-    0A.w                                Unused
-
-    0C.w                                Unused
-
-    0E.w                                Unused
-
-    ** 10 bit signed only? need verifications.
-
-***************************************************************************/
-
-void cave_state::get_sprite_info_cave(int chip)
+bool cave_state::colpri_cb(u8 &dstpri, u32 &colpri)
 {
-	chip %= 4;
-
-	if (m_sprite[chip] == nullptr)
-		return;
-
-	gfx_element *gfx = m_spr_gfxdecode[chip]->gfx(0);
-	sprite_cave *sprite = m_sprite[chip].get();
-
-	const int glob_flipx = m_videoregs[chip][0] & 0x8000;
-	const int glob_flipy = m_videoregs[chip][1] & 0x8000;
-
-	const int max_x = m_screen[chip]->width();
-	const int max_y = m_screen[chip]->height();
-
-	const u16 *source = &m_spriteram[chip][(0x4000 / 2) * m_spriteram_bank[chip]];
-	const u16 *finish = source + (0x4000 / 2);
-	u32 clk = 0; // used clock cycle for sprites
-
-	for (; source < finish; source += 8)
+	const u8 pri = (colpri >> 6) & 3;
+	if (dstpri <= pri)
 	{
-		clk += 32; // 32 clock per each sprites
-		if (clk > m_max_sprite_clk[chip])
-			break;
-
-		int x, y;
-		int total_width_f, total_height_f;
-
-		if ((m_videoregs[chip][5] & 0x3000) == 0)    // if bit 12/13 is 0 (or separated per X and Y?)
-		{
-			x = (source[0] & 0x3ff) << 8;
-			y = (source[1] & 0x3ff) << 8;
-		}
-		else
-		{
-			x = source[0] << 2;
-			y = source[1] << 2;
-		}
-		const u16 attr  = source[2];
-		u32 code        = source[3] + ((attr & 3) << 16);
-		int zoomx       = source[4];
-		int zoomy       = source[5];
-		const u16 size  = source[6];
-
-		sprite->tile_width  = ((size >> 8) & 0x1f) * 16;
-		sprite->tile_height = ((size >> 0) & 0x1f) * 16;
-
-		if (!sprite->tile_width || !sprite->tile_height)
-			continue;
-
-		clk += sprite->tile_width * sprite->tile_height; // 256 clock per each sprite blocks
-		if (clk > m_max_sprite_clk[chip])
-			break;
-
-		/* Bound checking */
-		sprite->pen_data = &m_sprite_gfx[chip][(code << 8) & m_sprite_gfx_mask[chip]];
-
-		int flipx = attr & 0x0008;
-		int flipy = attr & 0x0004;
-
-		sprite->total_width  = (total_width_f  = sprite->tile_width  * zoomx) / 0x100;
-		sprite->total_height = (total_height_f = sprite->tile_height * zoomy) / 0x100;
-
-		if (sprite->total_width <= 1)
-		{
-			sprite->total_width = 1;
-			sprite->zoomx_re = sprite->tile_width << 16;
-			sprite->xcount0 = sprite->zoomx_re / 2;
-			x -= 0x80;
-		}
-		else
-		{
-			sprite->zoomx_re = 0x1000000 / zoomx;
-			sprite->xcount0 = sprite->zoomx_re - 1;
-		}
-
-		if (sprite->total_height <= 1)
-		{
-			sprite->total_height = 1;
-			sprite->zoomy_re = sprite->tile_height << 16;
-			sprite->ycount0 = sprite->zoomy_re / 2;
-			y -= 0x80;
-		}
-		else
-		{
-			sprite->zoomy_re = 0x1000000 / zoomy;
-			sprite->ycount0 = sprite->zoomy_re - 1;
-		}
-
-		if ((m_videoregs[chip][5] & 0x3000) == 0)
-		{
-			x >>= 8;
-			y >>= 8;
-			if (flipx && (zoomx != 0x100)) x += sprite->tile_width - sprite->total_width;
-			if (flipy && (zoomy != 0x100)) y += sprite->tile_height - sprite->total_height;
-		}
-		else
-		{
-			if (flipx && (zoomx != 0x100)) x += (sprite->tile_width << 8) - total_width_f - 0x80;
-			if (flipy && (zoomy != 0x100)) y += (sprite->tile_height << 8) - total_height_f - 0x80;
-			x >>= 8;
-			y >>= 8;
-		}
-
-		if (x > 0x1ff)  x -= 0x400;
-		if (y > 0x1ff)  y -= 0x400;
-
-		if (x + sprite->total_width <= 0 || x >= max_x || y + sprite->total_height <= 0 || y >= max_y)
-		{continue;}
-
-		sprite->priority    = (attr & 0x0030) >> 4;
-		sprite->flags       = SPRITE_VISIBLE_CAVE;
-		sprite->line_offset = sprite->tile_width;
-		sprite->base_pen    = gfx->colorbase() + (((attr & 0x3f00) >> 8) * gfx->granularity());   // first 0x4000 colors
-
-		if (glob_flipx) { x = max_x - x - sprite->total_width;  flipx = !flipx; }
-		if (glob_flipy) { y = max_y - y - sprite->total_height; flipy = !flipy; }
-
-		sprite->x = x;
-		sprite->y = y;
-
-		if (flipx)  sprite->flags |= SPRITE_FLIPX_CAVE;
-		if (flipy)  sprite->flags |= SPRITE_FLIPY_CAVE;
-
-		sprite++;
+		colpri &= 0x3f;
+		dstpri = 0xff;
+		return true;
 	}
-	m_num_sprites[chip] = sprite - m_sprite[chip].get();
+	return false;
 }
 
-void cave_state::get_sprite_info_donpachi(int chip)
+bool cave_z80_state::pwrinst2_colpri_cb(u8 &dstpri, u32 &colpri)
 {
-	chip %= 4;
-
-	if (m_sprite[chip] == nullptr)
-		return;
-
-	gfx_element *gfx = m_spr_gfxdecode[chip]->gfx(0);
-	sprite_cave *sprite = m_sprite[chip].get();
-
-	const int glob_flipx = m_videoregs[chip][0] & 0x8000;
-	const int glob_flipy = m_videoregs[chip][1] & 0x8000;
-
-	const int max_x = m_screen[chip]->width();
-	const int max_y = m_screen[chip]->height();
-
-	const u16 *source = &m_spriteram[chip][(0x4000 / 2) * m_spriteram_bank[chip]];
-	const u16 *finish = source + (0x4000 / 2);
-	u32 clk = 0; // used clock cycle for sprites
-
-	for (; source < finish; source += 8)
+	const u8 pri = ((colpri >> 6) & 1) + 2;
+	if (dstpri <= pri)
 	{
-		clk += 32; // 32 clock per each sprites
-		if (clk > m_max_sprite_clk[chip])
-			break;
-
-		int y;
-
-		const u16 attr = source[0];
-		u32 code       = source[1] + ((attr & 3) << 16);
-		int x          = source[2] & 0x3ff;
-
-		if (m_spritetype[0] & TYPE_ISPWRINST2)    /* pwrinst2 */
-			y = (source[3] + 1) & 0x3ff;
-		else
-			y = source[3] & 0x3ff;
-
-		const u16 size = source[4];
-
-		sprite->tile_width  = sprite->total_width  = ((size >> 8) & 0x1f) * 16;
-		sprite->tile_height = sprite->total_height = ((size >> 0) & 0x1f) * 16;
-
-		/* Bound checking */
-		sprite->pen_data = &m_sprite_gfx[chip][(code << 8) & m_sprite_gfx_mask[chip]];
-
-		if (x > 0x1ff)  x -= 0x400;
-		if (y > 0x1ff)  y -= 0x400;
-
-		if (!sprite->tile_width || !sprite->tile_height ||
-			x + sprite->total_width <= 0 || x >= max_x || y + sprite->total_height <= 0 || y >= max_y)
-		{continue;}
-
-		clk += sprite->tile_width * sprite->tile_height; // 256 clock per each sprite blocks
-		if (clk > m_max_sprite_clk[chip])
-			break;
-
-		int flipx    = attr & 0x0008;
-		int flipy    = attr & 0x0004;
-
-		if (m_spritetype[0] & TYPE_ISPWRINST2)    /* pwrinst2 */
-		{
-			sprite->priority = ((attr & 0x0010) >> 4) + 2;
-			sprite->base_pen = gfx->colorbase() + ((((attr & 0x3f00) >> 8) + ((attr & 0x0020) << 1)) * gfx->granularity());
-		}
-		else
-		{
-			sprite->priority = (attr & 0x0030) >> 4;
-			sprite->base_pen = gfx->colorbase() + (((attr & 0x3f00) >> 8) * gfx->granularity());  // first 0x4000 colors
-		}
-
-		sprite->flags = SPRITE_VISIBLE_CAVE;
-		sprite->line_offset = sprite->tile_width;
-
-		if (glob_flipx) { x = max_x - x - sprite->total_width;  flipx = !flipx; }
-		if (glob_flipy) { y = max_y - y - sprite->total_height; flipy = !flipy; }
-
-		sprite->x = x;
-		sprite->y = y;
-
-		if (flipx)  sprite->flags |= SPRITE_FLIPX_CAVE;
-		if (flipy)  sprite->flags |= SPRITE_FLIPY_CAVE;
-
-		sprite++;
+		colpri = (colpri & 0x3f) | ((colpri & 0x80) >> 1);
+		dstpri = 0xff;
+		return true;
 	}
-	m_num_sprites[chip] = sprite - m_sprite[chip].get();
+	return false;
 }
-
-
-void cave_state::sprite_init()
-{
-	if ((m_spritetype[0] & TYPE_NOZOOM) == 0) // most of the games
-	{
-		m_get_sprite_info = &cave_state::get_sprite_info_cave;
-		m_spritetype[1] = CAVE_SPRITETYPE_ZOOM;
-	}
-	else                        // donpachi ddonpach
-	{
-		m_get_sprite_info = &cave_state::get_sprite_info_donpachi;
-		m_spritetype[1] = 0;
-	}
-
-	m_sprite_zbuf_baseval = 0x10000 - MAX_SPRITE_NUM;
-	for (int screen = 0; screen < 4; screen++)
-	{
-		if (m_screen[screen])
-		{
-			m_screen[screen]->register_screen_bitmap(m_sprite_zbuf[screen]);
-
-			save_item(NAME(m_sprite_zbuf[screen]), screen);
-		}
-	}
-
-	for (int chip = 0; chip < 4; chip++)
-	{
-		m_max_sprite_clk[chip] = 0;
-		if (m_videoregs[chip] && m_spr_gfxdecode[chip])
-		{
-			for (int screen = 0; screen < 4; screen++)
-			{
-				if (m_screen[screen])
-				{
-					const u32 new_clk = (m_screen[screen]->visible_area().width() > 360 ? 512 : 448) * 272 * 2; // whole screen size related?
-					if (m_max_sprite_clk[chip] < new_clk)
-					{
-						m_max_sprite_clk[chip] = new_clk;
-					}
-				}
-			}
-			m_num_sprites[chip] = m_spriteram[chip].bytes() / 0x10 / 2;
-			m_sprite[chip] = std::make_unique<sprite_cave []>(m_num_sprites[chip]);
-			m_spr_gfxdecode[chip]->gfx(0)->set_granularity(m_sprite_granularity);
-		}
-		else
-		{
-			m_num_sprites[chip] = 0;
-			m_sprite[chip] = nullptr;
-		}
-		for (auto &prio : m_sprite_table[chip])
-			for (sprite_cave *&spr : prio)
-				spr = nullptr;
-		m_spriteram_bank[chip] = m_spriteram_bank_delay[chip] = 0;
-	}
-
-	m_sprite_draw = &cave_state::sprite_draw_donpachi;
-
-	save_item(NAME(m_sprite_zbuf_baseval));
-	save_item(NAME(m_num_sprites));
-	save_item(NAME(m_spriteram_bank));
-	save_item(NAME(m_spriteram_bank_delay));
-
-	save_item(NAME(m_blit.clip_left));
-	save_item(NAME(m_blit.clip_right));
-	save_item(NAME(m_blit.clip_top));
-	save_item(NAME(m_blit.clip_bottom));
-}
-
-void cave_state::sprite_check(int chip, int screen_no, screen_device &screen, const rectangle &clip)
-{
-	if (m_sprite[chip] == nullptr)
-		return;
-
-	{   /* set clip */
-		const int left = clip.min_x;
-		const int top = clip.min_y;
-		const int right = clip.max_x + 1;
-		const int bottom = clip.max_y + 1;
-
-		m_blit.clip_left = left;
-		m_blit.clip_top = top;
-		m_blit.clip_right = right;
-		m_blit.clip_bottom = bottom;
-	}
-
-	{   /* check priority & sprite type */
-		sprite_cave *sprite = m_sprite[chip].get();
-		const sprite_cave *const finish = &sprite[m_num_sprites[chip]];
-		int i[4] = {0,0,0,0};
-		int priority_check = 0;
-		int spritetype = m_spritetype[1];
-		const rectangle &visarea = screen.visible_area();
-
-		while (sprite < finish)
-		{
-			if (sprite->x + sprite->total_width  > m_blit.clip_left && sprite->x < m_blit.clip_right  &&
-				sprite->y + sprite->total_height > m_blit.clip_top  && sprite->y < m_blit.clip_bottom   )
-			{
-				m_sprite_table[chip][sprite->priority][i[sprite->priority]++] = sprite;
-
-				if (!(spritetype & CAVE_SPRITETYPE_ZBUF))
-				{
-					if (priority_check > sprite->priority)
-						spritetype |= CAVE_SPRITETYPE_ZBUF;
-					else
-						priority_check = sprite->priority;
-				}
-			}
-			sprite++;
-		}
-
-		m_sprite_table[chip][0][i[0]] = nullptr;
-		m_sprite_table[chip][1][i[1]] = nullptr;
-		m_sprite_table[chip][2][i[2]] = nullptr;
-		m_sprite_table[chip][3][i[3]] = nullptr;
-
-		switch (spritetype)
-		{
-			case CAVE_SPRITETYPE_ZOOM:
-				m_sprite_draw = &cave_state::sprite_draw_cave;
-				break;
-
-			case CAVE_SPRITETYPE_ZOOM | CAVE_SPRITETYPE_ZBUF:
-				m_sprite_draw = &cave_state::sprite_draw_cave_zbuf;
-				if (clip.min_y == visarea.min_y)
-				{
-					if (!(m_sprite_zbuf_baseval += MAX_SPRITE_NUM))
-						m_sprite_zbuf[screen_no].fill(0, visarea);
-				}
-				break;
-
-			case CAVE_SPRITETYPE_ZBUF:
-				m_sprite_draw = &cave_state::sprite_draw_donpachi_zbuf;
-				if (clip.min_y == visarea.min_y)
-				{
-					if (!(m_sprite_zbuf_baseval += MAX_SPRITE_NUM))
-						m_sprite_zbuf[screen_no].fill(0, visarea);
-				}
-				break;
-
-			default:
-			case 0:
-				m_sprite_draw = &cave_state::sprite_draw_donpachi;
-		}
-	}
-}
-
-void cave_state::do_blit_zoom32(int chip, const sprite_cave *sprite)
-{
-	/*  assumes SPRITE_LIST_RAW_DATA flag is set */
-	int x1, x2, y1, y2, dx, dy;
-	int xcount0 = 0x10000 + sprite->xcount0, ycount0 = 0x10000 + sprite->ycount0;
-
-	if (sprite->flags & SPRITE_FLIPX_CAVE)
-	{
-		x2 = sprite->x;
-		x1 = x2 + sprite->total_width;
-		dx = -1;
-		if (x2 < m_blit.clip_left)
-			x2 = m_blit.clip_left;
-
-		if (x1 > m_blit.clip_right)
-		{
-			xcount0 += (x1 - m_blit.clip_right) * sprite->zoomx_re;
-			x1 = m_blit.clip_right;
-			while ((xcount0 & 0xffff) >= sprite->zoomx_re)
-			{
-				xcount0 += sprite->zoomx_re;
-				x1--;
-			}
-		}
-
-		if (x2 >= x1)
-			return;
-		x1--; x2--;
-	}
-	else
-	{
-		x1 = sprite->x;
-		x2 = x1 + sprite->total_width;
-		dx = 1;
-		if (x1 < m_blit.clip_left)
-		{
-			xcount0 += (m_blit.clip_left - x1) * sprite->zoomx_re;
-			x1 = m_blit.clip_left;
-			while ((xcount0 & 0xffff) >= sprite->zoomx_re)
-			{
-				xcount0 += sprite->zoomx_re;
-				x1++;
-			}
-		}
-		if (x2 > m_blit.clip_right)
-			x2 = m_blit.clip_right;
-		if (x1 >= x2)
-			return;
-	}
-
-	if (sprite->flags & SPRITE_FLIPY_CAVE)
-	{
-		y2 = sprite->y;
-		y1 = y2 + sprite->total_height;
-		dy = -1;
-		if (y2 < m_blit.clip_top)
-			y2 = m_blit.clip_top;
-		if (y1 > m_blit.clip_bottom)
-		{
-			ycount0 += (y1 - m_blit.clip_bottom) * sprite->zoomy_re;
-			y1 = m_blit.clip_bottom;
-			while ((ycount0 & 0xffff) >= sprite->zoomy_re)
-			{
-				ycount0 += sprite->zoomy_re;
-				y1--;
-			}
-		}
-		if (y2 >= y1)
-			return;
-		y1--; y2--;
-	}
-	else
-	{
-		y1 = sprite->y;
-		y2 = y1 + sprite->total_height;
-		dy = 1;
-		if (y1 < m_blit.clip_top)
-		{
-			ycount0 += (m_blit.clip_top - y1) * sprite->zoomy_re;
-			y1 = m_blit.clip_top;
-			while ((ycount0 & 0xffff) >= sprite->zoomy_re)
-			{
-				ycount0 += sprite->zoomy_re;
-				y1++;
-			}
-		}
-		if (y2 > m_blit.clip_bottom)
-			y2 = m_blit.clip_bottom;
-		if (y1 >= y2)
-			return;
-	}
-
-	{
-		const u8 *pen_data = sprite->pen_data - 1 - sprite->line_offset;
-		const pen_t base_pen = sprite->base_pen;
-		const int pitch = m_blit.line_offset * dy;
-		u32 *dest = m_blit.baseaddr + (m_blit.line_offset * y1);
-		int ycount = ycount0;
-
-		for (int y = y1; y != y2; y += dy)
-		{
-			if (ycount & 0xffff0000)
-			{
-				int xcount = xcount0;
-				pen_data += sprite->line_offset * (ycount >> 16);
-				ycount &= 0xffff;
-				const u8 *source = pen_data;
-				for (int x = x1; x != x2; x += dx)
-				{
-					if (xcount & 0xffff0000)
-					{
-						source += xcount >> 16;
-						xcount &= 0xffff;
-						const u8 pen = *source;
-						if (pen)
-							dest[x] = m_palette[chip]->pen_color(base_pen + pen);
-					}
-					xcount += sprite->zoomx_re;
-				}
-			}
-			ycount += sprite->zoomy_re;
-			dest += pitch;
-		}
-	}
-}
-
-
-void cave_state::do_blit_zoom32_zb(int chip, const sprite_cave *sprite)
-{
-	/*  assumes SPRITE_LIST_RAW_DATA flag is set */
-	int x1, x2, y1, y2, dx, dy;
-	int xcount0 = 0x10000 + sprite->xcount0, ycount0 = 0x10000 + sprite->ycount0;
-
-	if (sprite->flags & SPRITE_FLIPX_CAVE)
-	{
-		x2 = sprite->x;
-		x1 = x2 + sprite->total_width;
-		dx = -1;
-		if (x2 < m_blit.clip_left)
-			x2 = m_blit.clip_left;
-		if (x1 > m_blit.clip_right)
-		{
-			xcount0 += (x1 - m_blit.clip_right) * sprite->zoomx_re;
-			x1 = m_blit.clip_right;
-			while ((xcount0 & 0xffff) >= sprite->zoomx_re)
-			{
-				xcount0 += sprite->zoomx_re;
-				x1--;
-			}
-		}
-		if (x2 >= x1)
-			return;
-		x1--; x2--;
-	}
-	else
-	{
-		x1 = sprite->x;
-		x2 = x1 + sprite->total_width;
-		dx = 1;
-		if (x1 < m_blit.clip_left)
-		{
-			xcount0 += (m_blit.clip_left - x1) * sprite->zoomx_re;
-			x1 = m_blit.clip_left;
-			while ((xcount0 & 0xffff) >= sprite->zoomx_re)
-			{
-				xcount0 += sprite->zoomx_re;
-				x1++;
-			}
-		}
-		if (x2 > m_blit.clip_right)
-			x2 = m_blit.clip_right;
-		if (x1 >= x2)
-			return;
-	}
-	if (sprite->flags & SPRITE_FLIPY_CAVE)
-	{
-		y2 = sprite->y;
-		y1 = y2 + sprite->total_height;
-		dy = -1;
-		if (y2 < m_blit.clip_top)
-			y2 = m_blit.clip_top;
-		if (y1 > m_blit.clip_bottom)
-		{
-			ycount0 += (y1 - m_blit.clip_bottom) * sprite->zoomy_re;
-			y1 = m_blit.clip_bottom;
-			while ((ycount0 & 0xffff) >= sprite->zoomy_re)
-			{
-				ycount0 += sprite->zoomy_re;
-				y1--;
-			}
-		}
-		if (y2 >= y1)
-			return;
-		y1--; y2--;
-	}
-	else
-	{
-		y1 = sprite->y;
-		y2 = y1 + sprite->total_height;
-		dy = 1;
-		if (y1 < m_blit.clip_top)
-		{
-			ycount0 += (m_blit.clip_top - y1) * sprite->zoomy_re;
-			y1 = m_blit.clip_top;
-			while ((ycount0 & 0xffff) >= sprite->zoomy_re)
-			{
-				ycount0 += sprite->zoomy_re;
-				y1++;
-			}
-		}
-		if (y2 > m_blit.clip_bottom)
-			y2 = m_blit.clip_bottom;
-		if (y1 >= y2)
-			return;
-	}
-
-	{
-		const u8 *pen_data = sprite->pen_data - 1 - sprite->line_offset;
-		const pen_t base_pen = sprite->base_pen;
-		const int pitch = m_blit.line_offset * dy;
-		u32 *dest = m_blit.baseaddr + (m_blit.line_offset * y1);
-		const int pitchz = m_blit.line_offset_zbuf * dy;
-		u16 *zbf = m_blit.baseaddr_zbuf + (m_blit.line_offset_zbuf * y1);
-		const u16 pri_sp = u16(sprite - m_sprite[chip].get()) + m_sprite_zbuf_baseval;
-		int ycount = ycount0;
-
-		for (int y = y1; y != y2; y += dy)
-		{
-			if (ycount & 0xffff0000)
-			{
-				int xcount = xcount0;
-				pen_data += sprite->line_offset * (ycount >> 16);
-				ycount &= 0xffff;
-				const u8 *source = pen_data;
-				for (int x = x1; x != x2; x += dx)
-				{
-					if (xcount & 0xffff0000)
-					{
-						source += xcount >> 16;
-						xcount &= 0xffff;
-						const u8 pen = *source;
-						if (pen && (zbf[x] <= pri_sp))
-						{
-							dest[x] = m_palette[chip]->pen_color(base_pen + pen);
-							zbf[x] = pri_sp;
-						}
-					}
-					xcount += sprite->zoomx_re;
-				}
-			}
-			ycount += sprite->zoomy_re;
-			dest += pitch;
-			zbf += pitchz;
-		}
-	}
-}
-
-void cave_state::do_blit_32(int chip, const sprite_cave *sprite)
-{
-	/*  assumes SPRITE_LIST_RAW_DATA flag is set */
-	int x1, x2, y1, y2, dx, dy;
-	int xcount0 = 0, ycount0 = 0;
-
-	if (sprite->flags & SPRITE_FLIPX_CAVE)
-	{
-		x2 = sprite->x;
-		x1 = x2 + sprite->total_width;
-		dx = -1;
-		if (x2 < m_blit.clip_left)
-			x2 = m_blit.clip_left;
-		if (x1 > m_blit.clip_right)
-		{
-			xcount0 = x1 - m_blit.clip_right;
-			x1 = m_blit.clip_right;
-		}
-		if (x2 >= x1)
-			return;
-		x1--; x2--;
-	}
-	else
-	{
-		x1 = sprite->x;
-		x2 = x1 + sprite->total_width;
-		dx = 1;
-		if (x1 < m_blit.clip_left)
-		{
-			xcount0 = m_blit.clip_left - x1;
-			x1 = m_blit.clip_left;
-		}
-		if (x2 > m_blit.clip_right)
-			x2 = m_blit.clip_right;
-		if (x1 >= x2)
-			return;
-	}
-	if (sprite->flags & SPRITE_FLIPY_CAVE)
-	{
-		y2 = sprite->y;
-		y1 = y2 + sprite->total_height;
-		dy = -1;
-		if (y2 < m_blit.clip_top)
-			y2 = m_blit.clip_top;
-		if (y1 > m_blit.clip_bottom)
-		{
-			ycount0 = y1 - m_blit.clip_bottom;
-			y1 = m_blit.clip_bottom;
-		}
-		if (y2 >= y1)
-			return;
-		y1--; y2--;
-	}
-	else
-	{
-		y1 = sprite->y;
-		y2 = y1 + sprite->total_height;
-		dy = 1;
-		if (y1 < m_blit.clip_top)
-		{
-			ycount0 = m_blit.clip_top - y1;
-			y1 = m_blit.clip_top;
-		}
-		if (y2 > m_blit.clip_bottom)
-			y2 = m_blit.clip_bottom;
-		if (y1 >= y2)
-			return;
-	}
-
-	{
-		const u8 *pen_data = sprite->pen_data;
-		const pen_t base_pen = sprite->base_pen;
-		const int pitch = m_blit.line_offset * dy;
-		u32 *dest = m_blit.baseaddr + (m_blit.line_offset * y1);
-
-		pen_data += sprite->line_offset * ycount0 + xcount0;
-		for (int y = y1; y != y2; y += dy)
-		{
-			const u8 *source = pen_data;
-			for (int x = x1; x != x2; x += dx)
-			{
-				const u8 pen = *source;
-				if (pen)
-					dest[x] = m_palette[chip]->pen_color(base_pen + pen);
-				source++;
-			}
-			pen_data += sprite->line_offset;
-			dest += pitch;
-		}
-	}
-}
-
-
-void cave_state::do_blit_32_zb(int chip, const sprite_cave *sprite)
-{
-	/*  assumes SPRITE_LIST_RAW_DATA flag is set */
-	int x1, x2, y1, y2, dx, dy;
-	int xcount0 = 0, ycount0 = 0;
-
-	if (sprite->flags & SPRITE_FLIPX_CAVE)
-	{
-		x2 = sprite->x;
-		x1 = x2 + sprite->total_width;
-		dx = -1;
-		if (x2 < m_blit.clip_left)
-			x2 = m_blit.clip_left;
-		if (x1 > m_blit.clip_right)
-		{
-			xcount0 = x1 - m_blit.clip_right;
-			x1 = m_blit.clip_right;
-		}
-		if (x2 >= x1)
-			return;
-		x1--; x2--;
-	}
-	else
-	{
-		x1 = sprite->x;
-		x2 = x1 + sprite->total_width;
-		dx = 1;
-		if (x1 < m_blit.clip_left)
-		{
-			xcount0 = m_blit.clip_left - x1;
-			x1 = m_blit.clip_left;
-		}
-		if (x2 > m_blit.clip_right)
-			x2 = m_blit.clip_right;
-		if (x1 >= x2)
-			return;
-	}
-	if (sprite->flags & SPRITE_FLIPY_CAVE)
-	{
-		y2 = sprite->y;
-		y1 = y2 + sprite->total_height;
-		dy = -1;
-		if (y2 < m_blit.clip_top)
-			y2 = m_blit.clip_top;
-		if (y1 > m_blit.clip_bottom)
-		{
-			ycount0 = y1 - m_blit.clip_bottom;
-			y1 = m_blit.clip_bottom;
-		}
-		if (y2 >= y1)
-			return;
-		y1--; y2--;
-	}
-	else
-	{
-		y1 = sprite->y;
-		y2 = y1 + sprite->total_height;
-		dy = 1;
-		if (y1 < m_blit.clip_top)
-		{
-			ycount0 = m_blit.clip_top - y1;
-			y1 = m_blit.clip_top;
-		}
-		if (y2 > m_blit.clip_bottom)
-			y2 = m_blit.clip_bottom;
-		if (y1 >= y2)
-			return;
-	}
-
-	{
-		const u8 *pen_data = sprite->pen_data;
-		const pen_t base_pen = sprite->base_pen;
-		const int pitch = m_blit.line_offset * dy;
-		u32 *dest = m_blit.baseaddr + (m_blit.line_offset * y1);
-		const int pitchz = m_blit.line_offset_zbuf * dy;
-		u16 *zbf = m_blit.baseaddr_zbuf + (m_blit.line_offset_zbuf * y1);
-		const u16 pri_sp = u16(sprite - m_sprite[chip].get()) + m_sprite_zbuf_baseval;
-
-		pen_data += sprite->line_offset * ycount0 + xcount0;
-		for (int y = y1; y != y2; y += dy)
-		{
-			const u8 *source;
-			source = pen_data;
-			for (int x = x1; x != x2; x += dx)
-			{
-				const u8 pen = *source;
-				if (pen && (zbf[x] <= pri_sp))
-				{
-					dest[x] = m_palette[chip]->pen_color(base_pen + pen);
-					zbf[x] = pri_sp;
-				}
-				source++;
-			}
-			pen_data += sprite->line_offset;
-			dest += pitch;
-			zbf += pitchz;
-		}
-	}
-}
-
-
-void cave_state::sprite_draw_cave(int chip, int priority)
-{
-	if (m_sprite[chip] == nullptr)
-		return;
-
-	int i = 0;
-	while (m_sprite_table[chip][priority][i])
-	{
-		const sprite_cave *sprite = m_sprite_table[chip][priority][i++];
-		if ((sprite->tile_width == sprite->total_width) && (sprite->tile_height == sprite->total_height))
-			do_blit_32(chip, sprite);
-		else
-			do_blit_zoom32(chip, sprite);
-	}
-}
-
-void cave_state::sprite_draw_cave_zbuf(int chip, int priority)
-{
-	if (m_sprite[chip] == nullptr)
-		return;
-
-	int i = 0;
-	while (m_sprite_table[chip][priority][i])
-	{
-		const sprite_cave *sprite = m_sprite_table[chip][priority][i++];
-		if ((sprite->tile_width == sprite->total_width) && (sprite->tile_height == sprite->total_height))
-			do_blit_32_zb(chip, sprite);
-		else
-			do_blit_zoom32_zb(chip, sprite);
-	}
-}
-
-void cave_state::sprite_draw_donpachi(int chip, int priority)
-{
-	if (m_sprite[chip] == nullptr)
-		return;
-
-	int i = 0;
-	while (m_sprite_table[chip][priority][i])
-		do_blit_32(chip, m_sprite_table[chip][priority][i++]);
-}
-
-void cave_state::sprite_draw_donpachi_zbuf(int chip, int priority)
-{
-	if (m_sprite[chip] == nullptr)
-		return;
-
-	int i = 0;
-	while (m_sprite_table[chip][priority][i])
-		do_blit_32_zb(chip, m_sprite_table[chip][priority][i++]);
-}
-
 
 /***************************************************************************
 
@@ -1148,22 +211,22 @@ void cave_state::sprite_draw_donpachi_zbuf(int chip, int priority)
 
 inline void cave_state::tilemap_draw(int chip,
 	screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,
-	u32 flags, u32 priority, u32 priority2, int GFX)
+	u32 flags, u32 priority, u32 priority2, int layer)
 {
-	tilemap038_device *TILEMAP = m_tilemap[GFX];
+	tilemap038_device *tilemap = m_tilemap[layer];
 
 	/* Bail out if ... */
 
-	if (!TILEMAP)                                              /* no tilemap; */
+	if (!tilemap)                                              /* no tilemap; */
 		return;
 
-	if (((TILEMAP->external() & 0x0003) != priority2) ||       /* tilemap's global priority not the requested one; */
-			((!TILEMAP->enable())))                            /* tilemap's disabled. */
+	if (((tilemap->external() & 0x0003) != priority2) ||       /* tilemap's global priority not the requested one; */
+			((!tilemap->enable())))                            /* tilemap's disabled. */
 		return;
 
-	const bool flipx = TILEMAP->flipx();
-	const bool flipy = TILEMAP->flipy();
-	TILEMAP->set_flip((flipx ? TILEMAP_FLIPX : 0) | (flipy ? TILEMAP_FLIPY : 0));
+	const bool flipx = tilemap->flipx();
+	const bool flipy = tilemap->flipy();
+	tilemap->set_flip((flipx ? TILEMAP_FLIPX : 0) | (flipy ? TILEMAP_FLIPY : 0));
 
 	int offs_x         = m_layers_offs_x;
 	const int offs_y   = m_layers_offs_y;
@@ -1173,15 +236,15 @@ inline void cave_state::tilemap_draw(int chip,
 	/* An additional 8 pixel offset for layers with 8x8 tiles. Plus
 	   Layer 0 is displaced by 1 pixel wrt Layer 1, so is Layer 2 wrt
 	   Layer 1 */
-	if      (TILEMAP == m_tilemap[0])    offs_x -= (TILEMAP->tile_is_16x16() ? 1 : (1 + 8));
-	else if (TILEMAP == m_tilemap[1])    offs_x -= (TILEMAP->tile_is_16x16() ? 2 : (2 + 8));
-	else if (TILEMAP == m_tilemap[2])    offs_x -= (TILEMAP->tile_is_16x16() ? 3 : (3 + 8));
-	else if (TILEMAP == m_tilemap[3])    offs_x -= (TILEMAP->tile_is_16x16() ? 4 : (4 + 8));
+	if      (tilemap == m_tilemap[0])    offs_x -= (tilemap->tile_is_16x16() ? 1 : (1 + 8));
+	else if (tilemap == m_tilemap[1])    offs_x -= (tilemap->tile_is_16x16() ? 2 : (2 + 8));
+	else if (tilemap == m_tilemap[2])    offs_x -= (tilemap->tile_is_16x16() ? 3 : (3 + 8));
+	else if (tilemap == m_tilemap[3])    offs_x -= (tilemap->tile_is_16x16() ? 4 : (4 + 8));
 
-	const int sx = TILEMAP->scrollx() - m_videoregs[chip][0] + (flipx ? (offs_x + 2) : -offs_x);
-	const int sy = TILEMAP->scrolly() - m_videoregs[chip][1] + (flipy ? (offs_y + 2) : -offs_y);
+	const int sx = tilemap->scrollx() - m_spritegen[chip]->videoregs_r(0) + (flipx ? (offs_x + 2) : -offs_x);
+	const int sy = tilemap->scrolly() - m_spritegen[chip]->videoregs_r(1) + (flipy ? (offs_y + 2) : -offs_y);
 
-	if (TILEMAP->rowselect_en())  // row-select
+	if (tilemap->rowselect_en())  // row-select
 	{
 		rectangle clip;
 		int endline, vramdata0, vramdata1;
@@ -1200,13 +263,13 @@ inline void cave_state::tilemap_draw(int chip,
 		for (int startline = cliprect.min_y; startline <= cliprect.max_y;)
 		{
 			/* Find the largest slice */
-			vramdata0 = (vramdata1 = TILEMAP->rowselect(sy + offs_row + startline));
+			vramdata0 = (vramdata1 = tilemap->rowselect(sy + offs_row + startline));
 			for (endline = startline + 1; endline <= cliprect.max_y; endline++)
-				if ((++vramdata1) != TILEMAP->rowselect(sy + offs_row + endline)) break;
+				if ((++vramdata1) != tilemap->rowselect(sy + offs_row + endline)) break;
 
-			TILEMAP->set_scrolly(0, vramdata0 - startline);
+			tilemap->set_scrolly(0, vramdata0 - startline);
 
-			if (TILEMAP->rowscroll_en())  // row-scroll, row-select
+			if (tilemap->rowscroll_en())  // row-scroll, row-select
 			{
 				/*
 				    Row-scroll:
@@ -1216,15 +279,15 @@ inline void cave_state::tilemap_draw(int chip,
 				    tilemap->draw just once.
 				*/
 
-				TILEMAP->set_scroll_rows(512);
+				tilemap->set_scroll_rows(512);
 				for (int line = startline; line < endline; line++)
-					TILEMAP->set_scrollx((vramdata0 - startline + line) & 511,
-										sx + TILEMAP->rowscroll(sy + offs_row + line));
+					tilemap->set_scrollx((vramdata0 - startline + line) & 511,
+										sx + tilemap->rowscroll(sy + offs_row + line));
 			}
 			else                    // no row-scroll, row-select
 			{
-				TILEMAP->set_scroll_rows(1);
-				TILEMAP->set_scrollx(0, sx);
+				tilemap->set_scroll_rows(1);
+				tilemap->set_scrollx(0, sx);
 			}
 
 			if (flipy)
@@ -1238,28 +301,28 @@ inline void cave_state::tilemap_draw(int chip,
 				clip.max_y = endline - 1;
 			}
 
-			TILEMAP->draw(screen, bitmap, clip, flags, priority);
+			tilemap->draw(screen, bitmap, clip, flags, priority, 0);
 
 			startline = endline;
 		}
 	}
-	else if (TILEMAP->rowscroll_en()) // row-scroll, no row-select
+	else if (tilemap->rowscroll_en()) // row-scroll, no row-select
 	{
-		TILEMAP->set_scroll_rows(512);
+		tilemap->set_scroll_rows(512);
 		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
-			TILEMAP->set_scrollx((line + sy) & 511,
-							sx + TILEMAP->rowscroll(sy + offs_row + line));
-		TILEMAP->set_scrolly(0, sy);
-		TILEMAP->draw(screen, bitmap, cliprect, flags, priority);
+			tilemap->set_scrollx((line + sy) & 511,
+							sx + tilemap->rowscroll(sy + offs_row + line));
+		tilemap->set_scrolly(0, sy);
+		tilemap->draw(screen, bitmap, cliprect, flags, priority, 0);
 	}
 	else
 	{
 		/* Normal scrolling */
-		TILEMAP->set_scroll_rows(1);
-		TILEMAP->set_scroll_cols(1);
-		TILEMAP->set_scrollx(0, sx);
-		TILEMAP->set_scrolly(0, sy);
-		TILEMAP->draw(screen, bitmap, cliprect, flags, priority);
+		tilemap->set_scroll_rows(1);
+		tilemap->set_scroll_cols(1);
+		tilemap->set_scrollx(0, sx);
+		tilemap->set_scrolly(0, sy);
+		tilemap->draw(screen, bitmap, cliprect, flags, priority, 0);
 	}
 }
 
@@ -1268,15 +331,10 @@ u32 cave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 {
 	int layers_ctrl = -1;
 
-	m_blit.baseaddr = &bitmap.pix(0);
-	m_blit.line_offset = bitmap.rowbytes() >> 2;
-	m_blit.baseaddr_zbuf = &m_sprite_zbuf[0].pix(0);
-	m_blit.line_offset_zbuf = m_sprite_zbuf[0].rowbytes() >> 1;
-
-	for (int GFX = 0; GFX < 4; GFX++)
+	for (int layer = 0; layer < 4; layer++)
 	{
-		if (m_tilemap[GFX])
-			m_tilemap[GFX]->prepare();
+		if (m_tilemap[layer])
+			m_tilemap[layer]->prepare();
 	}
 
 #ifdef MAME_DEBUG
@@ -1299,12 +357,6 @@ u32 cave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		if (machine().input().code_pressed(KEYCODE_A))  msk |= val << 16;   // for sprites
 		if (msk != 0) layers_ctrl &= msk;
 
-#if 1
-		/* Show the video registers (cave_videoregs) */
-		popmessage("%04X %04X %04X %04X %04X %04X %04X %04X",
-			m_videoregs[0][0], m_videoregs[0][1], m_videoregs[0][2], m_videoregs[0][3],
-			m_videoregs[0][4], m_videoregs[0][5], m_videoregs[0][6], m_videoregs[0][7]);
-#endif
 		/* Show the scroll / flags registers of the selected layer */
 		if ((m_tilemap[0]) && (msk & 0x000f))   popmessage("x:%04X y:%04X f:%04X", m_tilemap[0]->vregs(0),m_tilemap[0]->vregs(1),m_tilemap[0]->vregs(2));
 		if ((m_tilemap[1]) && (msk & 0x00f0))   popmessage("x:%04X y:%04X f:%04X", m_tilemap[1]->vregs(0),m_tilemap[1]->vregs(1),m_tilemap[1]->vregs(2));
@@ -1314,12 +366,12 @@ u32 cave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 	/* Show the row / "column" scroll enable flags, when they change state */
 	m_rasflag = 0;
-	for (int GFX = 0; GFX < 4; GFX++)
+	for (int layer = 0; layer < 4; layer++)
 	{
-		if (m_tilemap[GFX])
+		if (m_tilemap[layer])
 		{
-			m_rasflag |= (m_tilemap[GFX]->vregs(0) & 0x4000) ? 0x0001 << (4*GFX) : 0;
-			m_rasflag |= (m_tilemap[GFX]->vregs(1) & 0x4000) ? 0x0002 << (4*GFX) : 0;
+			m_rasflag |= (m_tilemap[layer]->vregs(0) & 0x4000) ? 0x0001 << (4*layer) : 0;
+			m_rasflag |= (m_tilemap[layer]->vregs(1) & 0x4000) ? 0x0002 << (4*layer) : 0;
 		}
 	}
 
@@ -1335,9 +387,8 @@ u32 cave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 }
 #endif
 
-	sprite_check(0, 0, screen, cliprect);
-
 	bitmap.fill(m_palette[0]->pen_color(m_background_pen[0]), cliprect);
+	screen.priority().fill(0, cliprect);
 
 	/*
 	    Tiles and sprites are ordered by priority (0 back, 3 front) with
@@ -1353,16 +404,15 @@ u32 cave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	*/
 	for (int pri = 0; pri <= 3; pri++)  // tile / sprite priority
 	{
-		if (layers_ctrl & (1 << (pri + 16)))    (this->*m_sprite_draw)(0, pri);
-
 		for (int pri2 = 0; pri2 <= 3; pri2++)   // priority of the whole layer
 		{
-			if (layers_ctrl & (1 << (pri +  0)))    tilemap_draw(0, screen, bitmap, cliprect, pri, 0, pri2, 0);
-			if (layers_ctrl & (1 << (pri +  4)))    tilemap_draw(0, screen, bitmap, cliprect, pri, 0, pri2, 1);
-			if (layers_ctrl & (1 << (pri +  8)))    tilemap_draw(0, screen, bitmap, cliprect, pri, 0, pri2, 2);
-			if (layers_ctrl & (1 << (pri + 12)))    tilemap_draw(0, screen, bitmap, cliprect, pri, 0, pri2, 3);
+			if (layers_ctrl & (1 << (pri +  0)))    tilemap_draw(0, screen, bitmap, cliprect, pri, pri + 1, pri2, 0);
+			if (layers_ctrl & (1 << (pri +  4)))    tilemap_draw(0, screen, bitmap, cliprect, pri, pri + 1, pri2, 1);
+			if (layers_ctrl & (1 << (pri +  8)))    tilemap_draw(0, screen, bitmap, cliprect, pri, pri + 1, pri2, 2);
+			if (layers_ctrl & (1 << (pri + 12)))    tilemap_draw(0, screen, bitmap, cliprect, pri, pri + 1, pri2, 3);
 		}
 	}
+	m_spritegen[0]->draw(screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -1370,61 +420,21 @@ u32 cave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 /**************************************************************/
 
-void cave_state::get_sprite_info(int chip)
-{
-	if (m_videoregs[chip] == nullptr)
-		return;
-
-	const int spriteram_bankmax = m_spriteram[chip].bytes() / 0x4000;
-
-	if (m_kludge == 3)   /* mazinger metmqstr */
-	{
-		if (machine().video().skip_this_frame() == 0)
-		{
-			m_spriteram_bank[chip] = m_spriteram_bank_delay[chip];
-			(this->*m_get_sprite_info)(chip);
-		}
-		m_spriteram_bank_delay[chip] = (m_videoregs[chip][4] & 3) % spriteram_bankmax;
-	}
-	else
-	{
-		if (machine().video().skip_this_frame() == 0)
-		{
-			m_spriteram_bank[chip] = (m_videoregs[chip][4] & 3) % spriteram_bankmax;
-			(this->*m_get_sprite_info)(chip);
-		}
-	}
-}
-
-void cave_state::device_post_load()
-{
-	for (int chip = 0; chip < 4; chip++)
-		get_sprite_info(chip);
-}
-
-
 // Poka Poka Satan: 3 screens * (1 Sprite chip + 1 Tilemap chip)
 
 u32 ppsatan_state::screen_update_ppsatan_core(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int chip)
 {
-	m_blit.baseaddr = &bitmap.pix(0);
-	m_blit.line_offset = bitmap.rowbytes() >> 2;
-	m_blit.baseaddr_zbuf = &m_sprite_zbuf[chip].pix(0);
-	m_blit.line_offset_zbuf = m_sprite_zbuf[chip].rowbytes() >> 1;
-
 	m_tilemap[chip]->prepare();
 
-	sprite_check(chip, chip, screen, cliprect);
-
 	bitmap.fill(m_palette[chip]->pen_color(m_background_pen[chip]), cliprect);
+	screen.priority().fill(0, cliprect);
 
 	for (int pri = 0; pri <= 3; pri++)  // tile / sprite priority
 	{
-		(this->*m_sprite_draw)(chip, pri);
-
 		for (int pri2 = 0; pri2 <= 3; pri2++)   // priority of the whole layer
-			tilemap_draw(chip, screen, bitmap, cliprect, pri, 0, pri2, chip);
+			tilemap_draw(chip, screen, bitmap, cliprect, pri, pri + 1, pri2, chip);
 	}
+	m_spritegen[chip]->draw(screen, bitmap, cliprect);
 
 	return 0;
 }

@@ -97,7 +97,6 @@ private:
 
 	uint8_t video_ram_r(offs_t offset);
 	MC6847_GET_CHARROM_MEMBER(char_rom_r);
-	void fsync_irq_w(int state);
 
 	uint8_t m_port40 = 0U;
 	int m_centronics_busy = 0;
@@ -187,7 +186,7 @@ uint8_t phc25_state::port40_r()
 	uint8_t data = 0;
 
 	/* vertical sync */
-	data |= !m_vdg->fs_r() << 4;
+	data |= m_vdg->fs_r() << 4;
 
 	/* cassette read */
 	data |= (m_cassette->input() > +0.3) << 5;
@@ -603,14 +602,6 @@ MC6847_GET_CHARROM_MEMBER(phc25_state::char_rom_r)
 	return m_chargen[(ch * 16 + line) & 0xfff];
 }
 
-void phc25_state::fsync_irq_w(int state)
-{
-	if (state == 0)
-	{
-		m_maincpu->pulse_input_line(INPUT_LINE_IRQ0, attotime::from_usec(100));
-	}
-}
-
 void phc25_state::machine_reset()
 {
 	m_port40 = 0;
@@ -644,7 +635,7 @@ void phc25_state::phc25(machine_config &config)
 
 	M5C6847P1(config, m_vdg, XTAL(4'433'619), true);
 	m_vdg->set_screen("screen");
-	m_vdg->fsync_wr_callback().set(FUNC(phc25_state::fsync_irq_w));
+	m_vdg->fsync_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE).invert();
 	m_vdg->input_callback().set(FUNC(phc25_state::video_ram_r));
 	m_vdg->set_get_char_rom(FUNC(phc25_state::char_rom_r));
 	m_vdg->set_get_fixed_mode(mc6847_device::MODE_GM2 | mc6847_device::MODE_GM1 | mc6847_device::MODE_INTEXT);
@@ -680,7 +671,7 @@ void phc25_state::phc25j(machine_config &config)
 
 	M5C6847P1(config.replace(), m_vdg, XTAL(3'579'545));
 	m_vdg->set_screen("screen");
-	m_vdg->fsync_wr_callback().set(FUNC(phc25_state::fsync_irq_w));
+	m_vdg->fsync_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE).invert();
 	m_vdg->input_callback().set(FUNC(phc25_state::video_ram_r));
 	m_vdg->set_get_char_rom(FUNC(phc25_state::char_rom_r));
 	m_vdg->set_get_fixed_mode(mc6847_device::MODE_GM2 | mc6847_device::MODE_GM1 | mc6847_device::MODE_INTEXT);

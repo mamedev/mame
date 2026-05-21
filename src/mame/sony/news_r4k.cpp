@@ -97,6 +97,7 @@
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
+#include "bus/nscsi/tape.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/mips/r4000.h"
 #include "imagedev/floppy.h"
@@ -373,6 +374,7 @@ static void news_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	device.option_add("cdrom", NSCSI_CDROM_NEWS);
+	device.option_add("tape", NSCSI_TAPE_NEWS);
 }
 
 /*

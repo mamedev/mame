@@ -405,7 +405,7 @@ class Generator {
 }
 
 const generator = new Generator({
-  baseDir : path.resolve(__dirname, "../src"),
+  baseDir : path.resolve(__dirname, ".."),
   verify  : process.argv.indexOf("--verify") !== -1,
   noBackup: process.argv.indexOf("--no-backup") !== -1
 });

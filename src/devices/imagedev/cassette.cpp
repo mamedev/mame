@@ -17,6 +17,7 @@
 #include "util/ioprocs.h"
 #include "util/ioprocsfilter.h"
 
+#include <array>
 #include <regex>
 
 #define LOG_WARN          (1U << 1)   // Warnings
@@ -410,7 +411,7 @@ std::string cassette_image_device::call_display()
 	// only show the image when a cassette is loaded and the motor is on
 	if (exists() && !is_stopped() && motor_on())
 	{
-		static char const *const shapes[] = { u8"\u2500", u8"\u2572", u8"\u2502", u8"\u2571" };
+		static std::array const shapes{ u8"\u2500", u8"\u2572", u8"\u2502", u8"\u2571" };
 
 		// figure out where we are in the cassette
 		double position = get_position();
@@ -421,7 +422,7 @@ std::string cassette_image_device::call_display()
 		int n = (int(position) / ANIMATION_FPS) % std::size(shapes);
 
 		// play or record
-		const char *status_icon = (uistate == CASSETTE_PLAY)
+		auto const *const status_icon = (uistate == CASSETTE_PLAY)
 			? u8"\u25ba"
 			: u8"\u25cf";
 
@@ -429,12 +430,12 @@ std::string cassette_image_device::call_display()
 		result = string_format("%s %s %02d:%02d (%04d) [%02d:%02d (%04d)]",
 			shapes[n],                  // animation
 			status_icon,                // play or record
-			((int)position / 60),
-			((int)position % 60),
-			(int)position,
-			((int)length / 60),
-			((int)length % 60),
-			(int)length);
+			int(position) / 60,
+			int(position) % 60,
+			int(position),
+			int(length) / 60,
+			int(length) % 60,
+			int(length));
 
 		// make sure tape stops at end when playing
 		if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)

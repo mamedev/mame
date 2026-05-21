@@ -479,7 +479,62 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_sys573_jvs_host(*this, "sys573_jvs_host"),
 		m_k573dio(*this, "k573dio"),
-		m_lamps(*this, "lamp%u", 0U),
+		m_output_lamps(*this, "lamp%u", 0U),
+		m_output_blue_io_lamp(*this, "blue io %u", 0U),
+		m_output_red_io_lamp(*this, "red io %u", 0U),
+		m_output_extra_balls(*this, "extra %u", 1U),
+		m_output_motor(*this, "motor"),
+		m_output_brake(*this, "brake"),
+		m_output_cymbal(*this, "cymbal"),
+		m_output_speaker(*this, "speaker"),
+		m_output_start_lamp(*this, "start lamp"),
+		m_output_select_button(*this, "select button"),
+		m_output_select_left(*this, "select left"),
+		m_output_select_right(*this, "select right"),
+		m_output_select_lrl(*this, "select left right"),
+		m_output_left(*this, "left %up", 1U),
+		m_output_right(*this, "right %up", 1U),
+		m_output_neon_top(*this, "neon top"),
+		m_output_neon_woofer(*this, "neon woofer"),
+		m_output_halogen(*this, "halogen %u", 1U),
+		m_output_foot_up(*this, "foot %up up", 1U),
+		m_output_foot_left(*this, "foot %up left", 1U),
+		m_output_foot_right(*this, "foot %up right", 1U),
+		m_output_foot_down(*this, "foot %up down", 1U),
+		m_output_body_right_low(*this, "body right low"),
+		m_output_body_left_low(*this, "body left low"),
+		m_output_body_left_high(*this, "body left high"),
+		m_output_body_right_high(*this, "body right high"),
+		m_output_body_center(*this, "body center"),
+		m_output_body_right(*this, "body right"),
+		m_output_body_left(*this, "body left"),
+		m_output_hi_hat(*this, "hi-hat"),
+		m_output_high_tom(*this, "high tom"),
+		m_output_low_tom(*this, "low tom"),
+		m_output_snare(*this, "snare"),
+		m_output_spot_left(*this, "spot left"),
+		m_output_spot_right(*this, "spot right"),
+		m_output_spot_left_right(*this, "spot left & right"),
+		m_output_player_start(*this, "player %u start", 3U),
+		m_output_player_red(*this, "player %u red", 3U),
+		m_output_player_green(*this, "player %u green", 3U),
+		m_output_player_blue(*this, "player %u blue", 3U),
+		m_output_punchman_left_top(*this, "left top lamp"),
+		m_output_punchman_left_middle(*this, "left middle lamp"),
+		m_output_punchman_left_bottom(*this, "left bottom lamp"),
+		m_output_punchman_right_top(*this, "right top lamp"),
+		m_output_punchman_right_middle(*this, "right middle lamp"),
+		m_output_punchman_right_bottom(*this, "right bottom lamp"),
+		m_output_fire_lamp_left(*this, "fire lamp left"),
+		m_output_fire_fan_left(*this, "fire fan left"),
+		m_output_fire_fan_right(*this, "fire fan right"),
+		m_output_fire_lamp_right(*this, "fire lamp right"),
+		m_output_conga_left(*this, "conga left"),
+		m_output_conga_right(*this, "conga right"),
+		m_output_conga_centre(*this, "conga centre"),
+		m_output_spot_light_yellow(*this, "yellow spot light"),
+		m_output_spot_light_blue(*this, "blue spot light"),
+		m_output_spot_light_pink(*this, "pink spot light"),
 		m_analog0(*this, "analog0"),
 		m_analog1(*this, "analog1"),
 		m_analog2(*this, "analog2"),
@@ -615,7 +670,66 @@ protected:
 	required_device<sys573_jvs_host> m_sys573_jvs_host;
 	optional_device<k573dio_device> m_k573dio;
 
-	output_finder<2> m_lamps;
+	output_finder<2> m_output_lamps;
+
+	// Konami IO board outputs (patterned names)
+	output_finder<12> m_output_blue_io_lamp;
+	output_finder<12> m_output_red_io_lamp;
+	output_finder<4> m_output_extra_balls;
+
+	// Individual outputs
+	output_finder<> m_output_motor;
+	output_finder<> m_output_brake;
+	output_finder<> m_output_cymbal;
+	output_finder<> m_output_speaker;
+	output_finder<> m_output_start_lamp;
+	output_finder<> m_output_select_button;
+	output_finder<> m_output_select_left;
+	output_finder<> m_output_select_right;
+	output_finder<> m_output_select_lrl;
+	output_finder<2> m_output_left;
+	output_finder<2> m_output_right;
+	output_finder<> m_output_neon_top;
+	output_finder<> m_output_neon_woofer;
+	output_finder<3> m_output_halogen;
+	output_finder<2> m_output_foot_up;
+	output_finder<2> m_output_foot_left;
+	output_finder<2> m_output_foot_right;
+	output_finder<2> m_output_foot_down;
+	output_finder<> m_output_body_right_low;
+	output_finder<> m_output_body_left_low;
+	output_finder<> m_output_body_left_high;
+	output_finder<> m_output_body_right_high;
+	output_finder<> m_output_body_center;
+	output_finder<> m_output_body_right;
+	output_finder<> m_output_body_left;
+	output_finder<> m_output_hi_hat;
+	output_finder<> m_output_high_tom;
+	output_finder<> m_output_low_tom;
+	output_finder<> m_output_snare;
+	output_finder<> m_output_spot_left;
+	output_finder<> m_output_spot_right;
+	output_finder<> m_output_spot_left_right;
+	output_finder<3> m_output_player_start;
+	output_finder<3> m_output_player_red;
+	output_finder<3> m_output_player_green;
+	output_finder<3> m_output_player_blue;
+	output_finder<> m_output_punchman_left_top;
+	output_finder<> m_output_punchman_left_middle;
+	output_finder<> m_output_punchman_left_bottom;
+	output_finder<> m_output_punchman_right_top;
+	output_finder<> m_output_punchman_right_middle;
+	output_finder<> m_output_punchman_right_bottom;
+	output_finder<> m_output_fire_lamp_left;
+	output_finder<> m_output_fire_fan_left;
+	output_finder<> m_output_fire_fan_right;
+	output_finder<> m_output_fire_lamp_right;
+	output_finder<> m_output_conga_left;
+	output_finder<> m_output_conga_right;
+	output_finder<> m_output_conga_centre;
+	output_finder<> m_output_spot_light_yellow;
+	output_finder<> m_output_spot_light_blue;
+	output_finder<> m_output_spot_light_pink;
 
 private:
 	bool jvs_is_valid_packet();
@@ -801,6 +915,12 @@ class pnchmn_state : public ksys573_state
 public:
 	pnchmn_state(const machine_config &mconfig, device_type type, const char *tag) :
 		ksys573_state(mconfig, type, tag),
+			m_output_left_top_pad(*this, "left top pad"),
+		m_output_left_middle_pad(*this, "left middle pad"),
+		m_output_left_bottom_pad(*this, "left bottom pad"),
+		m_output_right_top_pad(*this, "right top pad"),
+		m_output_right_middle_pad(*this, "right middle pad"),
+		m_output_right_bottom_pad(*this, "right bottom pad"),
 		m_pads(*this, "PADS")
 	{
 	}
@@ -821,6 +941,12 @@ private:
 
 	double m_pad_position[6] = { };
 	int m_pad_motor_direction[6] = { };
+	output_finder<> m_output_left_top_pad;
+	output_finder<> m_output_left_middle_pad;
+	output_finder<> m_output_left_bottom_pad;
+	output_finder<> m_output_right_top_pad;
+	output_finder<> m_output_right_middle_pad;
+	output_finder<> m_output_right_bottom_pad;
 	attotime m_last_pad_update;
 	required_ioport m_pads;
 };
@@ -1104,7 +1230,62 @@ void ksys573_state::driver_start()
 
 void ksys573_state::machine_start()
 {
-	m_lamps.resolve();
+	m_output_lamps.resolve();
+	m_output_blue_io_lamp.resolve();
+	m_output_red_io_lamp.resolve();
+	m_output_extra_balls.resolve();
+	m_output_motor.resolve();
+	m_output_brake.resolve();
+	m_output_cymbal.resolve();
+	m_output_speaker.resolve();
+	m_output_start_lamp.resolve();
+	m_output_select_button.resolve();
+	m_output_select_left.resolve();
+	m_output_select_right.resolve();
+	m_output_select_lrl.resolve();
+	m_output_left.resolve();
+	m_output_right.resolve();
+	m_output_neon_top.resolve();
+	m_output_neon_woofer.resolve();
+	m_output_halogen.resolve();
+	m_output_foot_up.resolve();
+	m_output_foot_left.resolve();
+	m_output_foot_right.resolve();
+	m_output_foot_down.resolve();
+	m_output_body_right_low.resolve();
+	m_output_body_left_low.resolve();
+	m_output_body_left_high.resolve();
+	m_output_body_right_high.resolve();
+	m_output_body_center.resolve();
+	m_output_body_right.resolve();
+	m_output_body_left.resolve();
+	m_output_hi_hat.resolve();
+	m_output_high_tom.resolve();
+	m_output_low_tom.resolve();
+	m_output_snare.resolve();
+	m_output_spot_left.resolve();
+	m_output_spot_right.resolve();
+	m_output_spot_left_right.resolve();
+	m_output_player_start.resolve();
+	m_output_player_red.resolve();
+	m_output_player_green.resolve();
+	m_output_player_blue.resolve();
+	m_output_punchman_left_top.resolve();
+	m_output_punchman_left_middle.resolve();
+	m_output_punchman_left_bottom.resolve();
+	m_output_punchman_right_top.resolve();
+	m_output_punchman_right_middle.resolve();
+	m_output_punchman_right_bottom.resolve();
+	m_output_fire_lamp_left.resolve();
+	m_output_fire_fan_left.resolve();
+	m_output_fire_fan_right.resolve();
+	m_output_fire_lamp_right.resolve();
+	m_output_conga_left.resolve();
+	m_output_conga_right.resolve();
+	m_output_conga_centre.resolve();
+	m_output_spot_light_yellow.resolve();
+	m_output_spot_light_blue.resolve();
+	m_output_spot_light_pink.resolve();
 }
 
 void ksys573_state::machine_reset()
@@ -1201,11 +1382,11 @@ void ksys573_state::ge765pwbba_w(offs_t offset, uint16_t data, uint16_t mem_mask
 		break;
 
 	case 0x40:
-		output().set_value( "motor", data & 0xff );
+		m_output_motor = data & 0xff;
 		break;
 
 	case 0x44:
-		output().set_value( "brake", data & 0xff );
+		m_output_brake = data & 0xff;
 		break;
 
 	case 0x50:
@@ -1440,19 +1621,19 @@ void ddr_state::ddr_output_callback(offs_t offset, uint8_t data)
 	switch( offset )
 	{
 	case 0:
-		output().set_value( "foot 1p up", !data );
+		m_output_foot_up[0] = !data;
 		break;
 
 	case 1:
-		output().set_value( "foot 1p left", !data );
+		m_output_foot_left[0] = !data;
 		break;
 
 	case 2:
-		output().set_value( "foot 1p right", !data );
+		m_output_foot_right[0] = !data;
 		break;
 
 	case 3:
-		output().set_value( "foot 1p down", !data );
+		m_output_foot_down[0] = !data;
 		break;
 
 	case 4:
@@ -1464,19 +1645,19 @@ void ddr_state::ddr_output_callback(offs_t offset, uint8_t data)
 		break;
 
 	case 8:
-		output().set_value( "foot 2p up", !data );
+		m_output_foot_up[1] = !data;
 		break;
 
 	case 9:
-		output().set_value( "foot 2p left", !data );
+		m_output_foot_left[1] = !data;
 		break;
 
 	case 10:
-		output().set_value( "foot 2p right", !data );
+		m_output_foot_right[1] = !data;
 		break;
 
 	case 11:
-		output().set_value( "foot 2p down", !data );
+		m_output_foot_down[1] = !data;
 		break;
 
 	case 12:
@@ -1488,32 +1669,32 @@ void ddr_state::ddr_output_callback(offs_t offset, uint8_t data)
 		break;
 
 	case 17:
-		m_lamps[0] = data ? 0 : 1; // start 1
+		m_output_lamps[0] = data ? 0 : 1; // start 1
 		break;
 
 	case 18:
-		m_lamps[1] = data ? 0 : 1; // start 2
+		m_output_lamps[1] = data ? 0 : 1; // start 2
 		break;
 
 	case 20:
-		output().set_value( "body right low", !data );
+		m_output_body_right_low = !data;
 		break;
 
 	case 21:
-		output().set_value( "body left low", !data );
+		m_output_body_left_low = !data;
 		break;
 
 	case 22:
-		output().set_value( "body left high", !data );
+		m_output_body_left_high = !data;
 		break;
 
 	case 23:
-		output().set_value( "body right high", !data );
+		m_output_body_right_high = !data;
 		break;
 
 	case 28: // digital
 	case 30: // analogue
-		output().set_value( "speaker", !data );
+		m_output_speaker = !data;
 		break;
 
 	default:
@@ -1545,22 +1726,22 @@ void ddr_state::init_ddr()
 
 void ksys573_state::gtrfrks_lamps_b7(int state)
 {
-	output().set_value( "spot left", state );
+	m_output_spot_left = state;
 }
 
 void ksys573_state::gtrfrks_lamps_b6(int state)
 {
-	output().set_value( "spot right", state );
+	m_output_spot_right = state;
 }
 
 void ksys573_state::gtrfrks_lamps_b5(int state)
 {
-	m_lamps[0] = state ? 1 : 0; // start left
+	m_output_lamps[0] = state ? 1 : 0; // start left
 }
 
 void ksys573_state::gtrfrks_lamps_b4(int state)
 {
-	m_lamps[1] = state ? 1 : 0; // start right
+	m_output_lamps[1] = state ? 1 : 0; // start right
 }
 
 /* ddr solo */
@@ -1577,39 +1758,39 @@ void ksys573_state::ddrsolo_output_callback(offs_t offset, uint8_t data)
 		break;
 
 	case 8:
-		output().set_value( "extra 4", !data );
+		m_output_extra_balls[3] = !data;
 		break;
 
 	case 9:
-		output().set_value( "extra 2", !data );
+		m_output_extra_balls[1] = !data;
 		break;
 
 	case 10:
-		output().set_value( "extra 1", !data );
+		m_output_extra_balls[0] = !data;
 		break;
 
 	case 11:
-		output().set_value( "extra 3", !data );
+		m_output_extra_balls[2] = !data;
 		break;
 
 	case 16:
-		output().set_value( "speaker", !data );
+		m_output_speaker = !data;
 		break;
 
 	case 20:
-		m_lamps[0] = data ? 0 : 1; // start
+		m_output_lamps[0] = data ? 0 : 1; // start
 		break;
 
 	case 21:
-		output().set_value( "body center", !data );
+		m_output_body_center = !data;
 		break;
 
 	case 22:
-		output().set_value( "body right", !data );
+		m_output_body_right = !data;
 		break;
 
 	case 23:
-		output().set_value( "body left", !data );
+		m_output_body_left = !data;
 		break;
 
 	default:
@@ -1626,52 +1807,52 @@ void ksys573_state::drmn_output_callback(offs_t offset, uint8_t data)
 	{
 	case 0: // drmn2+
 	case 16: // drmn
-		output().set_value( "hi-hat", !data );
+		m_output_hi_hat = !data;
 		break;
 
 	case 1: // drmn2+
 	case 17: // drmn
-		output().set_value( "high tom", !data );
+		m_output_high_tom = !data;
 		break;
 
 	case 2: // drmn2+
 	case 18: // drmn
-		output().set_value( "low tom", !data );
+		m_output_low_tom = !data;
 		break;
 
 	case 3: // drmn2+
 	case 19: // drmn
-		output().set_value( "snare", !data );
+		m_output_snare = !data;
 		break;
 
 	case 8: // drmn2+
 	case 30: // drmn
-		output().set_value( "spot left & right", !data );
+		m_output_spot_left_right = !data;
 		break;
 
 	case 9: // drmn2+
 	case 31: // drmn
-		output().set_value( "neon top", data );
+		m_output_neon_top = data;
 		break;
 
 	case 11: // drmn2+
 	case 27: // drmn
-		output().set_value( "neon woofer", data );
+		m_output_neon_woofer = data;
 		break;
 
 	case 12: // drmn2+
 	case 20: // drmn
-		output().set_value( "cymbal", !data );
+		m_output_cymbal = !data;
 		break;
 
 	case 13: // drmn2+
 	case 21: // drmn
-		m_lamps[0] = data ? 1 : 0; // start
+		m_output_lamps[0] = data ? 1 : 0; // start
 		break;
 
 	case 14: // drmn2+
 	case 22: // drmn
-		output().set_value( "select button", data );
+		m_output_select_button = data;
 		break;
 
 	case 23: // drmn
@@ -1696,111 +1877,111 @@ void ksys573_state::dmx_output_callback(offs_t offset, uint8_t data)
 	switch( offset )
 	{
 	case 0:
-		output().set_value( "blue io 8", !data );
+		m_output_blue_io_lamp[8] = !data;
 		break;
 
 	case 1:
-		output().set_value( "blue io 9", !data );
+		m_output_blue_io_lamp[9] = !data;
 		break;
 
 	case 2:
-		output().set_value( "red io 9", !data );
+		m_output_red_io_lamp[9] = !data;
 		break;
 
 	case 3:
-		output().set_value( "red io 8", !data );
+		m_output_red_io_lamp[8] = !data;
 		break;
 
 	case 4:
-		output().set_value( "blue io 6", !data );
+		m_output_blue_io_lamp[6] = !data;
 		break;
 
 	case 5:
-		output().set_value( "blue io 7", !data );
+		m_output_blue_io_lamp[7] = !data;
 		break;
 
 	case 6:
-		output().set_value( "red io 7", !data );
+		m_output_red_io_lamp[7] = !data;
 		break;
 
 	case 7:
-		output().set_value( "red io 6", !data );
+		m_output_red_io_lamp[6] = !data;
 		break;
 
 	case 8:
-		output().set_value( "blue io 4", !data );
+		m_output_blue_io_lamp[4] = !data;
 		break;
 
 	case 9:
-		output().set_value( "blue io 5", !data );
+		m_output_blue_io_lamp[5] = !data;
 		break;
 
 	case 10:
-		output().set_value( "red io 5", !data );
+		m_output_red_io_lamp[5] = !data;
 		break;
 
 	case 11:
-		output().set_value( "red io 4", !data );
+		m_output_red_io_lamp[4] = !data;
 		break;
 
 	case 12:
-		output().set_value( "blue io 10", !data );
+		m_output_blue_io_lamp[10] = !data;
 		break;
 
 	case 13:
-		output().set_value( "blue io 11", !data );
+		m_output_blue_io_lamp[11] = !data;
 		break;
 
 	case 14:
-		output().set_value( "red io 11", !data );
+		m_output_red_io_lamp[11] = !data;
 		break;
 
 	case 15:
-		output().set_value( "red io 10", !data );
+		m_output_red_io_lamp[10] = !data;
 		break;
 
 	case 16:
-		output().set_value( "blue io 0", !data );
+		m_output_blue_io_lamp[0] = !data;
 		break;
 
 	case 17:
-		output().set_value( "blue io 1", !data );
+		m_output_blue_io_lamp[1] = !data;
 		break;
 
 	case 18:
-		output().set_value( "red io 1", !data );
+		m_output_red_io_lamp[1] = !data;
 		break;
 
 	case 19:
-		output().set_value( "red io 0", !data );
+		m_output_red_io_lamp[0] = !data;
 		break;
 
 	case 20:
-		output().set_value( "blue io 2", !data );
+		m_output_blue_io_lamp[2] = !data;
 		break;
 
 	case 21:
-		output().set_value( "blue io 3", !data );
+		m_output_blue_io_lamp[3] = !data;
 		break;
 
 	case 22:
-		output().set_value( "red io 3", !data );
+		m_output_red_io_lamp[3] = !data;
 		break;
 
 	case 23:
-		output().set_value( "red io 2", !data );
+		m_output_red_io_lamp[2] = !data;
 		break;
 
 	case 28:
-		output().set_value( "yellow spot light", !data );
+		m_output_spot_light_yellow = !data;
 		break;
 
 	case 29:
-		output().set_value( "blue spot light", !data );
+		m_output_spot_light_blue = !data;
 		break;
 
 	case 31:
-		output().set_value( "pink spot light", !data );
+		m_output_spot_light_pink = !data;
 		break;
 
 	default:
@@ -1811,32 +1992,32 @@ void ksys573_state::dmx_output_callback(offs_t offset, uint8_t data)
 
 void ksys573_state::dmx_lamps_b0(int state)
 {
-	output().set_value( "left 2p", state );
+	m_output_left[1] = state;
 }
 
 void ksys573_state::dmx_lamps_b1(int state)
 {
-	m_lamps[1] = state ? 1 : 0; // start 1p
+	m_output_lamps[1] = state ? 1 : 0; // start 1p
 }
 
 void ksys573_state::dmx_lamps_b2(int state)
 {
-	output().set_value( "right 2p", state );
+	m_output_right[1] = state;
 }
 
 void ksys573_state::dmx_lamps_b3(int state)
 {
-	output().set_value( "left 1p", state );
+	m_output_left[0] = state;
 }
 
 void ksys573_state::dmx_lamps_b4(int state)
 {
-	m_lamps[0] = state ? 1 : 0; // start 2p
+	m_output_lamps[0] = state ? 1 : 0; // start 2p
 }
 
 void ksys573_state::dmx_lamps_b5(int state)
 {
-	output().set_value( "right 1p", state );
+	m_output_right[0] = state;
 }
 
 /* step champ */
@@ -1851,13 +2032,13 @@ void ksys573_state::stepchmp_lamp_clock(int state)
 
 		if( m_serial_lamp_bits == 8 )
 		{
-			output().set_value( "halogen 1", ( m_serial_lamp_shift >> 3 ) & 1 );
-			output().set_value( "halogen 2", ( m_serial_lamp_shift >> 2 ) & 1 );
-			output().set_value( "halogen 3", ( m_serial_lamp_shift >> 1 ) & 1 );
+			m_output_halogen[0] = ( m_serial_lamp_shift >> 3 ) & 1;
+			m_output_halogen[1] = ( m_serial_lamp_shift >> 2 ) & 1;
+			m_output_halogen[2] = ( m_serial_lamp_shift >> 1 ) & 1;
 
-			output().set_value( "player 1 start", ( m_serial_lamp_shift >> 7 ) & 1 );
-			output().set_value( "player 2 start", ( m_serial_lamp_shift >> 6 ) & 1 );
-			output().set_value( "player 3 start", ( m_serial_lamp_shift >> 5 ) & 1 );
+			m_output_player_start[0] = ( m_serial_lamp_shift >> 7 ) & 1;
+			m_output_player_start[1] = ( m_serial_lamp_shift >> 6 ) & 1;
+			m_output_player_start[2] = ( m_serial_lamp_shift >> 5 ) & 1;
 
 			m_serial_lamp_bits = 0;
 			m_serial_lamp_shift = 0;
@@ -1893,21 +2074,21 @@ void ksys573_state::animechmp_lamp_clock(int state)
 				LOG( "unknown bits in serial_lamp_shift %08x\n", m_serial_lamp_shift & ~0xfff );
 			}
 
-			output().set_value( "player 1 red", ( m_serial_lamp_shift >> 11 ) & 1 );
-			output().set_value( "player 1 green", ( m_serial_lamp_shift >> 10 ) & 1 );
-			output().set_value( "player 1 blue", ( m_serial_lamp_shift >> 9 ) & 1 );
+			m_output_player_red[0] = ( m_serial_lamp_shift >> 11 ) & 1;
+			m_output_player_green[0] = ( m_serial_lamp_shift >> 10 ) & 1;
+			m_output_player_blue[0] = ( m_serial_lamp_shift >> 9 ) & 1;
 
-			output().set_value( "player 2 red", ( m_serial_lamp_shift >> 8 ) & 1 );
-			output().set_value( "player 2 green", ( m_serial_lamp_shift >> 7 ) & 1 );
-			output().set_value( "player 2 blue", ( m_serial_lamp_shift >> 6 ) & 1 );
+			m_output_player_red[1] = ( m_serial_lamp_shift >> 8 ) & 1;
+			m_output_player_green[1] = ( m_serial_lamp_shift >> 7 ) & 1;
+			m_output_player_blue[1] = ( m_serial_lamp_shift >> 6 ) & 1;
 
-			output().set_value( "player 3 red", ( m_serial_lamp_shift >> 5 ) & 1 );
-			output().set_value( "player 3 green", ( m_serial_lamp_shift >> 4 ) & 1 );
-			output().set_value( "player 3 blue", ( m_serial_lamp_shift >> 3 ) & 1 );
+			m_output_player_red[2] = ( m_serial_lamp_shift >> 5 ) & 1;
+			m_output_player_green[2] = ( m_serial_lamp_shift >> 4 ) & 1;
+			m_output_player_blue[2] = ( m_serial_lamp_shift >> 3 ) & 1;
 
-			output().set_value( "player 1 start", ( m_serial_lamp_shift >> 2 ) & 1 );
-			output().set_value( "player 2 start", ( m_serial_lamp_shift >> 1 ) & 1 );
-			output().set_value( "player 3 start", ( m_serial_lamp_shift >> 0 ) & 1 );
+			m_output_player_start[0] = ( m_serial_lamp_shift >> 2 ) & 1;
+			m_output_player_start[1] = ( m_serial_lamp_shift >> 1 ) & 1;
+			m_output_player_start[2] = ( m_serial_lamp_shift >> 0 ) & 1;
 
 			m_serial_lamp_bits = 0;
 			m_serial_lamp_shift = 0;
@@ -1957,13 +2138,13 @@ void ksys573_state::salarymc_lamp_clock(int state)
 				LOG( "unknown bits in serial_lamp_shift %08x\n", m_serial_lamp_shift & ~0xe38 );
 			}
 
-			output().set_value( "player 1 red", ( m_serial_lamp_shift >> 11 ) & 1 );
-			output().set_value( "player 1 green", ( m_serial_lamp_shift >> 10 ) & 1 );
-			output().set_value( "player 1 blue", ( m_serial_lamp_shift >> 9 ) & 1 );
+			m_output_player_red[0] = ( m_serial_lamp_shift >> 11 ) & 1;
+			m_output_player_green[0] = ( m_serial_lamp_shift >> 10 ) & 1;
+			m_output_player_blue[0] = ( m_serial_lamp_shift >> 9 ) & 1;
 
-			output().set_value( "player 2 red", ( m_serial_lamp_shift >> 5 ) & 1 );
-			output().set_value( "player 2 green", ( m_serial_lamp_shift >> 4 ) & 1 );
-			output().set_value( "player 2 blue", ( m_serial_lamp_shift >> 3 ) & 1 );
+			m_output_player_red[1] = ( m_serial_lamp_shift >> 5 ) & 1;
+			m_output_player_green[1] = ( m_serial_lamp_shift >> 4 ) & 1;
+			m_output_player_blue[1] = ( m_serial_lamp_shift >> 3 ) & 1;
 
 			m_serial_lamp_bits = 0;
 			m_serial_lamp_shift = 0;
@@ -2021,10 +2202,10 @@ void ksys573_state::hyperbbc_lamp_strobe1(int state)
 {
 	if( state && !m_hyperbbc_lamp_strobe1 )
 	{
-		output().set_value( "player 1 red", m_hyperbbc_lamp_red );
-		output().set_value( "player 1 green", m_hyperbbc_lamp_green );
-		output().set_value( "player 1 blue", m_hyperbbc_lamp_blue );
-		output().set_value( "player 1 start", m_hyperbbc_lamp_start );
+		m_output_player_red[0] = m_hyperbbc_lamp_red;
+		m_output_player_green[0] = m_hyperbbc_lamp_green;
+		m_output_player_blue[0] = m_hyperbbc_lamp_blue;
+		m_output_player_start[0] = m_hyperbbc_lamp_start;
 	}
 
 	m_hyperbbc_lamp_strobe1 = state;
@@ -2034,10 +2215,10 @@ void ksys573_state::hyperbbc_lamp_strobe2(int state)
 {
 	if( state && !m_hyperbbc_lamp_strobe2 )
 	{
-		output().set_value( "player 2 red", m_hyperbbc_lamp_red );
-		output().set_value( "player 2 green", m_hyperbbc_lamp_green );
-		output().set_value( "player 2 blue", m_hyperbbc_lamp_blue );
-		output().set_value( "player 2 start", m_hyperbbc_lamp_start );
+		m_output_player_red[1] = m_hyperbbc_lamp_red;
+		m_output_player_green[1] = m_hyperbbc_lamp_green;
+		m_output_player_blue[1] = m_hyperbbc_lamp_blue;
+		m_output_player_start[1] = m_hyperbbc_lamp_start;
 	}
 
 	m_hyperbbc_lamp_strobe2 = state;
@@ -2047,10 +2228,10 @@ void ksys573_state::hyperbbc_lamp_strobe3(int state)
 {
 	if( state && !m_hyperbbc_lamp_strobe3 )
 	{
-		output().set_value( "player 3 red", m_hyperbbc_lamp_red );
-		output().set_value( "player 3 green", m_hyperbbc_lamp_green );
-		output().set_value( "player 3 blue", m_hyperbbc_lamp_blue );
-		output().set_value( "player 3 start", m_hyperbbc_lamp_start );
+		m_output_player_red[2] = m_hyperbbc_lamp_red;
+		m_output_player_green[2] = m_hyperbbc_lamp_green;
+		m_output_player_blue[2] = m_hyperbbc_lamp_blue;
+		m_output_player_start[2] = m_hyperbbc_lamp_start;
 	}
 
 	m_hyperbbc_lamp_strobe3 = state;
@@ -2106,42 +2287,42 @@ void ksys573_state::mamboagg_output_callback(offs_t offset, uint8_t data)
 	switch( offset )
 	{
 	case 4:
-		output().set_value( "fire lamp left", !data );
+		m_output_fire_lamp_left = !data;
 		break;
 	case 5:
-		output().set_value( "fire fan left", !data );
+		m_output_fire_fan_left = !data;
 		break;
 	case 6:
-		output().set_value( "fire fan right", !data );
+		m_output_fire_fan_right = !data;
 		break;
 	case 7:
-		output().set_value( "fire lamp right", !data );
+		m_output_fire_lamp_right = !data;
 		break;
 	case 28:
-		output().set_value( "conga left", !data );
+		m_output_conga_left = !data;
 		break;
 	case 29:
-		output().set_value( "conga right", !data );
+		m_output_conga_right = !data;
 		break;
 	case 31:
-		output().set_value( "conga centre", !data );
+		m_output_conga_centre = !data;
 		break;
 	}
 }
 
 void ksys573_state::mamboagg_lamps_b3(int state)
 {
-	m_lamps[0] = state ? 1 : 0; // start 1p
+	m_output_lamps[0] = state ? 1 : 0; // start 1p
 }
 
 void ksys573_state::mamboagg_lamps_b4(int state)
 {
-	output().set_value( "select right", state );
+	m_output_select_right = state;
 }
 
 void ksys573_state::mamboagg_lamps_b5(int state)
 {
-	output().set_value( "select left", state );
+	m_output_select_left = state;
 }
 
 
@@ -2159,28 +2340,28 @@ void pnchmn_state::punchmania_output_callback(offs_t offset, uint8_t data)
 	switch( offset )
 	{
 	case 8:
-		output().set_value( "select left right", !data );
+		m_output_select_lrl = !data;
 		break;
 	case 9:
-		output().set_value( "left bottom lamp", !data );
+		m_output_punchman_left_bottom = !data;
 		break;
 	case 10:
-		output().set_value( "left middle lamp", !data );
+		m_output_punchman_left_middle = !data;
 		break;
 	case 11:
-		output().set_value( "start lamp", !data );
+		m_output_start_lamp = !data;
 		break;
 	case 12:
-		output().set_value( "left top lamp", !data );
+		m_output_punchman_left_top = !data;
 		break;
 	case 13:
-		output().set_value( "right middle lamp", !data );
+		m_output_punchman_right_middle = !data;
 		break;
 	case 14:
-		output().set_value( "right top lamp", !data );
+		m_output_punchman_right_top = !data;
 		break;
 	case 15:
-		output().set_value( "right bottom lamp", !data );
+		m_output_punchman_right_bottom = !data;
 		break;
 	case 16:
 		m_pad_motor_direction[ 0 ] = data ? 1 : 0; // left top motor +
@@ -6259,12 +6440,12 @@ double pnchmn_state::punchmania_inputs_callback(uint8_t input)
 		}
 	}
 
-	machine().output().set_value( "left top pad", pad_position[ 0 ] );
-	machine().output().set_value( "left middle pad", pad_position[ 1 ] );
-	machine().output().set_value( "left bottom pad", pad_position[ 2 ] );
-	machine().output().set_value( "right top pad", pad_position[ 3 ] );
-	machine().output().set_value( "right middle pad", pad_position[ 4 ] );
-	machine().output().set_value( "right bottom pad", pad_position[ 5 ] );
+	m_output_left_top_pad = ( pad_position[ 0 ] );
+	m_output_left_middle_pad = ( pad_position[ 1 ] );
+	m_output_left_bottom_pad = ( pad_position[ 2 ] );
+	m_output_right_top_pad = ( pad_position[ 3 ] );
+	m_output_right_middle_pad = ( pad_position[ 4 ] );
+	m_output_right_bottom_pad = ( pad_position[ 5 ] );
 
 	m_last_pad_update = curtime;
 

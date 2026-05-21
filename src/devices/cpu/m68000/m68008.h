@@ -31,7 +31,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
-	
+
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 protected:

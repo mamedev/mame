@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "sa1110.h"
+#include "screen.h"
 
 #define LOG_UNKNOWN     (1U << 1)
 #define LOG_ICP         (1U << 2)
@@ -28,7 +29,8 @@
 #define LOG_PPC         (1U << 17)
 #define LOG_DMA         (1U << 18)
 #define LOG_UDC         (1U << 19)
-#define LOG_ALL         (LOG_UNKNOWN | LOG_ICP | LOG_UART3 | LOG_MCP | LOG_OSTIMER | LOG_RTC | LOG_POWER | LOG_RESET | LOG_GPIO | LOG_INTC | LOG_PPC | LOG_DMA | LOG_UDC)
+#define LOG_LCD         (1U << 20)
+#define LOG_ALL         (LOG_UNKNOWN | LOG_ICP | LOG_UART3 | LOG_MCP | LOG_OSTIMER | LOG_RTC | LOG_POWER | LOG_RESET | LOG_GPIO | LOG_INTC | LOG_PPC | LOG_DMA | LOG_UDC | LOG_LCD)
 
 #define VERBOSE         (0)
 #include "logmacro.h"
@@ -38,6 +40,8 @@ DEFINE_DEVICE_TYPE(SA1110_PERIPHERALS, sa1110_periphs_device, "sa1110_periphs", 
 sa1110_periphs_device::sa1110_periphs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SA1110_PERIPHERALS, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
+	, device_palette_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this, false)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_uart3_irqs(*this, "uart3irq")
 	, m_mcp_irqs(*this, "mcpirq")
@@ -191,6 +195,16 @@ void sa1110_periphs_device::map(address_map &map)
 	map(0x300000b4, 0x300000b7).rw(FUNC(sa1110_periphs_device::dma_dbta_r<5>), FUNC(sa1110_periphs_device::dma_dbta_w<5>));
 	map(0x300000b8, 0x300000bb).rw(FUNC(sa1110_periphs_device::dma_dbsb_r<5>), FUNC(sa1110_periphs_device::dma_dbsb_w<5>));
 	map(0x300000bc, 0x300000bf).rw(FUNC(sa1110_periphs_device::dma_dbtb_r<5>), FUNC(sa1110_periphs_device::dma_dbtb_w<5>));
+
+	map(0x30100000, 0x30100003).rw(FUNC(sa1110_periphs_device::lcd_lccr_r<0>), FUNC(sa1110_periphs_device::lcd_lccr_w<0>));
+	map(0x30100004, 0x30100007).rw(FUNC(sa1110_periphs_device::lcd_lcsr_r), FUNC(sa1110_periphs_device::lcd_lcsr_w));
+	map(0x30100010, 0x30100013).rw(FUNC(sa1110_periphs_device::lcd_dbar_r<0>), FUNC(sa1110_periphs_device::lcd_dbar_w<0>));
+	map(0x30100014, 0x30100017).rw(FUNC(sa1110_periphs_device::lcd_dcar_r<0>), FUNC(sa1110_periphs_device::lcd_dcar_w<0>));
+	map(0x30100018, 0x3010001b).rw(FUNC(sa1110_periphs_device::lcd_dbar_r<1>), FUNC(sa1110_periphs_device::lcd_dbar_w<1>));
+	map(0x3010001c, 0x3010001f).rw(FUNC(sa1110_periphs_device::lcd_dcar_r<1>), FUNC(sa1110_periphs_device::lcd_dcar_w<1>));
+	map(0x30100020, 0x30100023).rw(FUNC(sa1110_periphs_device::lcd_lccr_r<1>), FUNC(sa1110_periphs_device::lcd_lccr_w<1>));
+	map(0x30100024, 0x30100027).rw(FUNC(sa1110_periphs_device::lcd_lccr_r<2>), FUNC(sa1110_periphs_device::lcd_lccr_w<2>));
+	map(0x30100028, 0x3010002b).rw(FUNC(sa1110_periphs_device::lcd_lccr_r<3>), FUNC(sa1110_periphs_device::lcd_lccr_w<3>));
 }
 
 /*
@@ -765,9 +779,9 @@ void sa1110_periphs_device::uart_check_rx_fifo_service()
 	{
 		m_uart_regs.utsr0 |= (1 << UTSR0_RFS_BIT);
 		if (BIT(m_uart_regs.utcr[3], UTCR3_RIE_BIT))
-		{
 			m_uart3_irqs->in_w<UART3_RFS>(1);
-		}
+		else
+			m_uart3_irqs->in_w<UART3_RFS>(0);
 	}
 	else
 	{
@@ -810,9 +824,9 @@ void sa1110_periphs_device::uart_check_tx_fifo_service()
 	{
 		m_uart_regs.utsr0 |= (1 << UTSR0_TFS_BIT);
 		if (BIT(m_uart_regs.utcr[3], UTCR3_TIE_BIT))
-		{
 			m_uart3_irqs->in_w<UART3_TFS>(1);
-		}
+		else
+			m_uart3_irqs->in_w<UART3_TFS>(0);
 	}
 	else
 	{
@@ -979,6 +993,10 @@ void sa1110_periphs_device::uart3_utcr3_w(offs_t offset, u32 data, u32 mem_mask)
 		uart_set_receive_irq_enabled(BIT(data, 3));
 	if (BIT(changed, 4))
 		uart_set_transmit_irq_enabled(BIT(data, 4));
+
+	// update FIFO-service interrupt
+	uart_check_rx_fifo_service();
+	uart_check_tx_fifo_service();
 }
 
 u32 sa1110_periphs_device::uart3_utdr_r(offs_t offset, u32 mem_mask)
@@ -990,7 +1008,7 @@ u32 sa1110_periphs_device::uart3_utdr_r(offs_t offset, u32 mem_mask)
 
 void sa1110_periphs_device::uart3_utdr_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	LOGMASKED(LOG_UART3, "%s: uart3_utdr_w: UART Data Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	LOGMASKED(LOG_UART3, "%s: uart3_utdr_w: UART Data Register = %08x & %08x '%c'\n", machine().describe_context(), data, mem_mask, char(data));
 	if (data == 0x0d || data == 0x0a || (data >= 0x20 && data < 0x7f))
 	{
 		osd_printf_debug("%c", (char)data);
@@ -2024,7 +2042,7 @@ void sa1110_periphs_device::rst_rsrr_w(offs_t offset, u32 data, u32 mem_mask)
 
 u32 sa1110_periphs_device::rst_rcsr_r(offs_t offset, u32 mem_mask)
 {
-	const u32 data = m_rcsr;
+	const u32 data = m_rcsr & 0x0f;
 	LOGMASKED(LOG_RESET, "%s: rst_rcsr_r: Reset Controller Status Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
@@ -2473,7 +2491,7 @@ void sa1110_periphs_device::ppc_ppfr_w(offs_t offset, u32 data, u32 mem_mask)
 
 /*
 
-  Intel SA-1110 Peripheral Pin Controller
+  Intel SA-1110 DMA Controller
 
   pg. 186 to 194 Intel StrongARM SA-1110 Microprocessor Developer's Manual
 
@@ -2684,8 +2702,118 @@ void sa1110_periphs_device::dma_dbtb_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 }
 
+
+/*
+
+  Intel SA-1110 LCD Controller
+
+*/
+
+template <int Register>
+u32 sa1110_periphs_device::lcd_lccr_r(offs_t offset, u32 mem_mask)
+{
+	const u32 data = m_lcd_regs.lccr[Register];
+	LOGMASKED(LOG_LCD, "%s: lcd_lccr_r: LCD Control Register %d: %08x & %08x\n", machine().describe_context(), Register, data, mem_mask);
+	return data;
+}
+
+template <int Register>
+void sa1110_periphs_device::lcd_lccr_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	LOGMASKED(LOG_LCD, "%s: lcd_lccr_w: LCD Control Register %d = %08x & %08x\n", machine().describe_context(), Register, data, mem_mask);
+	COMBINE_DATA(&m_lcd_regs.lccr[Register]);
+}
+
+u32 sa1110_periphs_device::lcd_lcsr_r(offs_t offset, u32 mem_mask)
+{
+	const u32 data = m_lcd_regs.lcsr;
+	LOGMASKED(LOG_LCD, "%s: lcd_lcsr_r: LCD Status Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void sa1110_periphs_device::lcd_lcsr_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	LOGMASKED(LOG_LCD, "%s: lcd_lcsr_w: LCD Status Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_lcd_regs.lcsr);
+}
+
+template <int Channel>
+u32 sa1110_periphs_device::lcd_dbar_r(offs_t offset, u32 mem_mask)
+{
+	const u32 data = m_lcd_regs.dbar[Channel];
+	LOGMASKED(LOG_LCD, "%s: lcd_dbar_r: DMA Channel %d Base Address Register: %08x & %08x\n", machine().describe_context(), Channel, data, mem_mask);
+	return data;
+}
+
+template <int Channel>
+void sa1110_periphs_device::lcd_dbar_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	LOGMASKED(LOG_LCD, "%s: lcd_dbar_w: DMA Channel %d Base Address Register = %08x & %08x\n", machine().describe_context(), Channel, data, mem_mask);
+	COMBINE_DATA(&m_lcd_regs.dbar[Channel]);
+}
+
+template <int Channel>
+u32 sa1110_periphs_device::lcd_dcar_r(offs_t offset, u32 mem_mask)
+{
+	const u32 data = m_lcd_regs.dcar[Channel];
+	LOGMASKED(LOG_LCD, "%s: lcd_dcar_r: DMA Channel %d Current Address Register: %08x & %08x\n", machine().describe_context(), Channel, data, mem_mask);
+	return data;
+}
+
+template <int Channel>
+void sa1110_periphs_device::lcd_dcar_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	LOGMASKED(LOG_LCD, "%s: lcd_dcar_w: DMA Channel %d Current Address Register = %08x & %08x\n", machine().describe_context(), Channel, data, mem_mask);
+	COMBINE_DATA(&m_lcd_regs.dcar[Channel]);
+}
+
+uint32_t sa1110_periphs_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	if (BIT(m_lcd_regs.lccr[0], 0)) // LCD enable (LEN)
+	{
+		address_space &space = m_maincpu->space(AS_PROGRAM);
+		int const sds = BIT(m_lcd_regs.lccr[0], 2) + 1;
+		int const ppl = BIT(m_lcd_regs.lccr[1], 0, 10) + 16;
+		int const lpp = BIT(m_lcd_regs.lccr[2], 0, 10) + 1;
+
+		for (int panel = 0; panel < sds; panel++)
+		{
+			offs_t videoram = m_lcd_regs.dbar[panel];
+
+			if (panel == 0)
+			{
+				int const entries = BIT(space.read_word(videoram), 12) ? 256 : 16;
+				for (int pen = 0; pen < entries; pen++)
+				{
+					u16 const data = space.read_word(videoram + (pen * 2));
+					set_pen_color(pen, pal4bit(data >> 8), pal4bit(data >> 4), pal4bit(data >> 0));
+				}
+				videoram += 0x200;
+			}
+
+			for (int y = 0; y < lpp; y++)
+			{
+				for (int x = 0; x < ppl; x++)
+				{
+					u8 const pixel = space.read_byte(videoram + (y * ppl) + x);
+					bitmap.pix((panel * lpp) + y + m_lcd_y_offset, x + m_lcd_x_offset) = pen(pixel);
+				}
+			}
+		}
+	}
+	else
+	{
+		bitmap.fill(0, cliprect);
+	}
+	return 0;
+}
+
+
 void sa1110_periphs_device::device_start()
 {
+	// initialise reset controller status
+	m_rcsr = 0x00;
+
 	save_item(NAME(m_udc_regs.udccr));
 	save_item(NAME(m_udc_regs.udcar));
 	save_item(NAME(m_udc_regs.udcomp));
@@ -2834,6 +2962,11 @@ void sa1110_periphs_device::device_start()
 	save_item(STRUCT_MEMBER(m_dma_regs, dbs));
 	save_item(STRUCT_MEMBER(m_dma_regs, dbt));
 	save_item(NAME(m_dma_active_mask));
+
+	save_item(NAME(m_lcd_regs.lccr));
+	save_item(NAME(m_lcd_regs.lcsr));
+	save_item(NAME(m_lcd_regs.dbar));
+	save_item(NAME(m_lcd_regs.dcar));
 }
 
 void sa1110_periphs_device::device_reset()
@@ -2980,7 +3113,17 @@ void sa1110_periphs_device::device_reset()
 		std::fill_n(&regs.dbt[0], 2, 0);
 	}
 
-	m_rcsr = 0x00000001; // indicate hardware reset
+	// init LCD regs
+	std::fill_n(&m_lcd_regs.lccr[0], 4, 0);
+	m_lcd_regs.lcsr = 0;
+	std::fill_n(&m_lcd_regs.dbar[0], 2, 0);
+	std::fill_n(&m_lcd_regs.dcar[0], 2, 0);
+
+	for (int i = 0; i < entries(); i++)
+		set_pen_color(i, rgb_t::black());
+
+	if (m_rcsr == 0x00)
+		m_rcsr = 0x08; // indicate hardware reset (only if no other reset causes are set)
 
 	m_gpio_regs.gplr = 0;
 	m_gpio_regs.gpdr = 0;

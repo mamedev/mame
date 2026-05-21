@@ -103,8 +103,8 @@ private:
 
 	required_device<cpu_device> m_maincpu, m_pmu;
 	required_device<mscvia_device> m_via1;
-	required_device<pseudovia_device> m_pseudovia;
-	required_device<asc_device> m_asc;
+	required_device<msc_pseudovia_device> m_pseudovia;
+	required_device<asc_msc_device> m_asc;
 	required_region_ptr<u32> m_rom;
 
 	sound_stream *m_stream;

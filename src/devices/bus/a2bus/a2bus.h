@@ -40,10 +40,7 @@ public:
 	a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&a2bus_tag, U &&opts, const char *dflt)
 		: a2bus_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 		m_a2bus.set_tag(std::forward<T>(a2bus_tag));
 	}
 	a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

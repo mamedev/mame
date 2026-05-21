@@ -528,7 +528,7 @@ void k057714_device::vblank_w(int state)
 	}
 }
 
-int k057714_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t k057714_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 

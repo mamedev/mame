@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="x37_hdd" description="Luxor X37 hard disks">
+
+	<software name="micr1325a">
+		<description>Formatted Micropolis 1325A 69MB</description>
+		<year>198?</year>
+		<publisher>Luxor</publisher>
+
+		<!-- Micropolis 1325A 69MB -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="micr1325a" sha1="683180e8ac8f3b097e9f5c1a6950544e6e65a4d1" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

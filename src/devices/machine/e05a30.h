@@ -45,12 +45,16 @@ public:
 	int get_ready_led() { return !m_centronics_busy; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	/* callbacks */
+	void update_printhead(int pos, uint8_t data);
+	void update_pf_stepper(uint8_t data);
+	void update_cr_stepper(uint8_t data);
+
+	// callbacks
 	devcb_write16 m_write_printhead;
 	devcb_write8 m_write_pf_stepper;
 	devcb_write8 m_write_cr_stepper;
@@ -63,15 +67,11 @@ private:
 	devcb_write_line m_write_cpu_reset;
 	devcb_write_line m_write_ready_led;
 
-	void update_printhead(int pos, uint8_t data);
-	void update_pf_stepper(uint8_t data);
-	void update_cr_stepper(uint8_t data);
-
-	/* port 0x05 and 0x06 (9-bit) */
+	// port 0x05 and 0x06 (9-bit)
 	uint16_t m_printhead;
-	/* port 0x07 (4-bit) */
+	// port 0x07 (4-bit)
 	uint8_t m_pf_stepper;
-	/* port 0x08 (4-bit) */
+	// port 0x08 (4-bit)
 	uint8_t m_cr_stepper;
 
 	/* Centronics stuff */
@@ -83,7 +83,6 @@ private:
 	uint8_t m_centronics_data_latch;
 	uint8_t m_centronics_data_latched;
 	uint32_t m_c000_shift_register;
-
 };
 
 DECLARE_DEVICE_TYPE(E05A30, e05a30_device)

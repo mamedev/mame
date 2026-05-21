@@ -3,7 +3,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/st2205u.h"
-#include "bl_handhelds_lcdc.h"
+#include "video/st7735_lcdc.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -42,7 +42,7 @@ private:
 	void st22xx_cutepet_map(address_map &map) ATTR_COLD;
 
 	required_device<screen_device> m_screen;
-	required_device<bl_handhelds_lcdc_device> m_lcdc;
+	required_device<st7735_lcdc_device> m_lcdc;
 	required_ioport_array<4> m_input_matrix;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -224,16 +224,16 @@ void st22xx_bbl338_state::st22xx_dphh8213_map(address_map &map)
 {
 	map(0x0000000, 0x01fffff).rom().region("maincpu", 0);
 
-	map(0x0600000, 0x0600000).w(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_command_w));
-	map(0x0604000, 0x0604000).rw(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_data_r), FUNC(bl_handhelds_lcdc_device::lcdc_data_w));
+	map(0x0600000, 0x0600000).w(m_lcdc, FUNC(st7735_lcdc_device::lcdc_command_w));
+	map(0x0604000, 0x0604000).rw(m_lcdc, FUNC(st7735_lcdc_device::lcdc_data_r), FUNC(st7735_lcdc_device::lcdc_data_w));
 }
 
 void st22xx_bbl338_state::st22xx_cutepet_map(address_map &map)
 {
 	map(0x0000000, 0x03fffff).rom().region("maincpu", 0);
 
-	map(0x0600000, 0x0600000).w(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_command_w));
-	map(0x0604100, 0x0604100).rw(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_data_r), FUNC(bl_handhelds_lcdc_device::lcdc_data_w));
+	map(0x0600000, 0x0600000).w(m_lcdc, FUNC(st7735_lcdc_device::lcdc_command_w));
+	map(0x0604100, 0x0604100).rw(m_lcdc, FUNC(st7735_lcdc_device::lcdc_data_r), FUNC(st7735_lcdc_device::lcdc_data_w));
 }
 
 
@@ -242,8 +242,8 @@ void st22xx_bbl338_state::st22xx_bbl338_map(address_map &map)
 	//map(0x0000000, 0x0003fff).rom().region("internal", 0); // not dumped, so ensure any accesses here are logged
 	map(0x1000000, 0x13fffff).rom().region("maincpu", 0);
 
-	map(0x0600000, 0x0600000).w(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_command_w));
-	map(0x0604000, 0x0604000).rw(m_lcdc, FUNC(bl_handhelds_lcdc_device::lcdc_data_r), FUNC(bl_handhelds_lcdc_device::lcdc_data_w));
+	map(0x0600000, 0x0600000).w(m_lcdc, FUNC(st7735_lcdc_device::lcdc_command_w));
+	map(0x0604000, 0x0604000).rw(m_lcdc, FUNC(st7735_lcdc_device::lcdc_data_r), FUNC(st7735_lcdc_device::lcdc_data_w));
 }
 
 u32 st22xx_bbl338_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -367,7 +367,7 @@ void st22xx_bbl338_state::st22xx_dphh8213(machine_config &config)
 	m_screen->set_visarea(0, 160 - 1, 0, 128 - 1);
 	m_screen->set_screen_update(FUNC(st22xx_bbl338_state::screen_update));
 
-	BL_HANDHELDS_LCDC(config, m_lcdc, 0);
+	ST7735(config, m_lcdc, 0);
 }
 
 void st22xx_bbl338_state::st22xx_cutepet(machine_config &config)
@@ -393,7 +393,7 @@ void st22xx_bbl338_state::st22xx_bbl338(machine_config &config)
 	m_screen->set_screen_update(FUNC(st22xx_bbl338_state::screen_update));
 
 	// incorrect for bbl338 (or will need changes to support higher resolutions)
-	BL_HANDHELDS_LCDC(config, m_lcdc, 0);
+	ST7735(config, m_lcdc, 0);
 }
 
 

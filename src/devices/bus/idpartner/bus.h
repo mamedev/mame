@@ -63,10 +63,7 @@ public:
 	bus_connector_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&bus_tag, U &&opts, const char *dflt)
 		: bus_connector_device(mconfig, tag, owner)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 		m_bus.set_tag(std::forward<T>(bus_tag));
 	}
 

@@ -19,6 +19,8 @@ No other info about the MB used, most notable folders in the HDD dump:
 \- VIA VT82C686A/VT82C686B/VT8231/VT8233/VT8233A/VT8233B/VT8235 audio driver files (ComboAudio_a1u300a)
 \- VIA Hyperion 4in1 chipset driver (VIA_4IN1_V440V(a)P3)
 \- VIA IDE miniport (IDE_MPD3014, VIA Bus Master (Ultra DMA) driver)
+\- 98lite 4.5 "Professional Edition"
+\- Symantec Ghost 7.5
 - C:\windows:
 \- viagart.inf "VIA CPU to AGP controller"
 \- viamach.inf "VIA Standard CPU to PCI Bridge" / "VIA Standard PCI to ISA Bridge" /
@@ -28,7 +30,9 @@ No other info about the MB used, most notable folders in the HDD dump:
 \- nvaml.inf "nVidia Windows 95/98/ME Display Drivers"
 \- monitor.pnf (custom DDC setup?)
 
-Running this in pcipc will successfully boot a custom Korean Windows 98SE (no Microsoft splash boot screen), will try to install drivers, punts to a DOS sub-window requiring at least a 256 color mode.
+Running this in pcipc will successfully boot a custom Korean Windows 98SE (no Microsoft splash boot screen),
+will try to install drivers, punts to a DOS sub-window requiring at least a 256 color mode and
+DirectX 8.
 
 */
 

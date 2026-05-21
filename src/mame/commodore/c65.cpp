@@ -324,6 +324,7 @@ public:
 		, m_ipl_rom(*this, "ipl")
 		, m_cart_exp(*this, "cart_exp")
 		, m_exrom_view(*this, "exrom_view")
+		, m_portswap(*this, "JOYSWAP")
 	{ }
 
 	void init_c65();
@@ -367,6 +368,7 @@ private:
 	required_memory_region m_ipl_rom;
 	required_device<generic_slot_device> m_cart_exp;
 	memory_view m_exrom_view;
+	optional_ioport m_portswap;
 
 	uint8_t m_keyb_input[10]{};
 	uint8_t m_keyb_c0_c7 = 0U;
@@ -1097,9 +1099,10 @@ void c65_state::uart_w(offs_t offset, uint8_t data)
 uint8_t c65_state::cia0_porta_r()
 {
 	uint8_t res = 0xff;
+	int cur_joy = m_portswap->read() ? 0 : 1;
 
 	// joystick
-	uint8_t joy_b = m_joy[1]->read_joy();
+	uint8_t joy_b = m_joy[cur_joy]->read_joy();
 
 	res &= (0xf0 | (joy_b & 0x0f));
 	res &= ~(!BIT(joy_b, 5) << 4);
@@ -1112,10 +1115,11 @@ uint8_t c65_state::cia0_portb_r()
 {
 	static const char *const c64ports[] = { "C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7" };
 	static const char *const c65ports[] = { "C8", "C9" };
+	int cur_joy = m_portswap->read() ? 1 : 0;
 	uint8_t res;
 
 	res = 0xff;
-	uint8_t joy_a = m_joy[0]->read_joy();
+	uint8_t joy_a = m_joy[cur_joy]->read_joy();
 
 	res &= (0xf0 | (joy_a & 0x0f));
 	res &= ~(!BIT(joy_a, 5) << 4);
@@ -1141,15 +1145,16 @@ uint8_t c65_state::cia0_portb_r()
 
 void c65_state::cia0_porta_w(uint8_t data)
 {
+	int cur_joy = m_portswap->read() ? 0 : 1;
 	m_keyb_c0_c7 = ~data;
-	m_joy[1]->joy_w(data & 0x1f);
+	m_joy[cur_joy]->joy_w(data & 0x1f);
 //  logerror("%02x\n",m_keyb_c0_c7);
 }
 
 void c65_state::cia0_portb_w(uint8_t data)
 {
-	m_joy[0]->joy_w(data & 0x1f);
-
+	int cur_joy = m_portswap->read() ? 1 : 0;
+	m_joy[cur_joy]->joy_w(data & 0x1f);
 }
 
 /*
@@ -1323,6 +1328,11 @@ static INPUT_PORTS_START( c65 )
 
 	PORT_START("CAPS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_F8) PORT_TOGGLE
+
+	PORT_START( "JOYSWAP" )
+	PORT_CONFNAME( 0x01, 0x00, "Swap joystick ports" )
+	PORT_CONFSETTING( 0x01, "Joystick in swapped port" )
+	PORT_CONFSETTING( 0x00, "Joystick in assigned port" )
 INPUT_PORTS_END
 
 

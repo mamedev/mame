@@ -36,16 +36,7 @@ class hp80_io_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	hp80_io_slot_device(machine_config const &mconfig, char const *tag, device_t *owner)
-		: hp80_io_slot_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		option_reset();
-		hp80_io_slot_devices(*this);
-		set_default_option(nullptr);
-		set_fixed(false);
-	}
-
-	hp80_io_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp80_io_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~hp80_io_slot_device();
 
 	// configuration helpers
@@ -69,7 +60,7 @@ public:
 	void clear_service();
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 private:
@@ -101,7 +92,7 @@ protected:
 	void halt_w(int state);
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(HP80_IO_SLOT, hp80_io_slot_device)
 
 #endif // MAME_BUS_HP80_IO_HP80_IO_H

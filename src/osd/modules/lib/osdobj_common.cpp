@@ -146,11 +146,6 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_SOUND,                           OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "sound output method: " },
 	{ OSDOPTION_AUDIO_LATENCY ";alat(0.0-50.0)", "0.0",            core_options::option_type::FLOAT,     "audio latency, 0 for default (increase to reduce glitches, decrease for responsiveness)" },
 
-#ifdef SDLMAME_MACOSX
-	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "CoreAudio-SPECIFIC OPTIONS" },
-	{ OSDOPTION_AUDIO_OUTPUT,                    OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "audio output device" },
-#endif
-
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD MIDI OPTIONS" },
 	{ OSDOPTION_MIDI_PROVIDER,                   OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "MIDI I/O method: " },
 

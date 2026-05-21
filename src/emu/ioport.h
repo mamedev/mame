@@ -97,7 +97,7 @@ enum ioport_type_class
 
 
 // default strings used in port definitions
-enum
+enum input_string_index
 {
 	INPUT_STRING_Off = 1,
 	INPUT_STRING_On,
@@ -736,7 +736,7 @@ struct ioport_field_live
 // ======================> ioport_list
 
 // class that holds a list of I/O ports
-class ioport_list : public std::map<std::string, std::unique_ptr<ioport_port>>
+class ioport_list : public util::transparent_string_map<std::string, std::unique_ptr<ioport_port> >
 {
 	DISABLE_COPYING(ioport_list);
 
@@ -1035,7 +1035,7 @@ public:
 	ioport_configurer(device_t &owner, ioport_list &portlist, std::ostream &errorbuf);
 
 	// static helpers
-	static const char *string_from_token(const char *string);
+	static const char *string_from_token(input_string_index string);
 
 	// port helpers
 	ioport_configurer& port_alloc(const char *tag);
@@ -1043,10 +1043,12 @@ public:
 
 	// field helpers
 	ioport_configurer& field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name = nullptr);
+	ioport_configurer& field_alloc(ioport_type type, ioport_value defval, ioport_value mask, input_string_index name);
 	ioport_configurer& field_add_char(std::initializer_list<char32_t> charlist);
 	ioport_configurer& field_add_code(input_seq_type which, input_code code);
 	ioport_configurer& field_set_way(int way) { m_curfield->m_way = way; return *this; }
-	ioport_configurer& field_set_name(const char *name) { assert(m_curfield != nullptr); m_curfield->m_name = string_from_token(name); return *this; }
+	ioport_configurer& field_set_name(const char *name) { assert(m_curfield != nullptr); m_curfield->m_name = name; return *this; }
+	ioport_configurer& field_set_name(input_string_index name) { assert(m_curfield != nullptr); m_curfield->m_name = string_from_token(name); return *this; }
 	ioport_configurer& field_set_player(int player) { m_curfield->m_player = player - 1; return *this; }
 	ioport_configurer& field_set_cocktail() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_COCKTAIL; field_set_player(2); return *this; }
 	ioport_configurer& field_set_toggle() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_TOGGLE; return *this; }
@@ -1071,10 +1073,18 @@ public:
 
 	// setting helpers
 	ioport_configurer& setting_alloc(ioport_value value, const char *name);
+	ioport_configurer& setting_alloc(ioport_value value, input_string_index name);
 
 	// misc helpers
 	ioport_configurer& set_condition(ioport_condition::condition_t condition, const char *tag, ioport_value mask, ioport_value value);
 	ioport_configurer& onoff_alloc(const char *name, ioport_value defval, ioport_value mask, const char *diplocation);
+	ioport_configurer& onoff_alloc(input_string_index name, ioport_value defval, ioport_value mask, const char *diplocation);
+
+	// allow UTF-8 strings to be used for names transparently
+	ioport_configurer& field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char8_t *name) { return field_alloc(type, defval, mask, reinterpret_cast<const char *>(name)); }
+	ioport_configurer& field_set_name(const char8_t *name) { return field_set_name(reinterpret_cast<const char *>(name)); }
+	ioport_configurer& setting_alloc(ioport_value value, const char8_t *name) { return setting_alloc(value, reinterpret_cast<const char *>(name)); }
+	ioport_configurer& onoff_alloc(const char8_t *name, ioport_value defval, ioport_value mask, const char *diplocation) { return onoff_alloc(reinterpret_cast<const char *>(name), defval, mask, diplocation); }
 
 private:
 	// internal state
@@ -1100,12 +1110,8 @@ private:
 #define INPUT_CHANGED_MEMBER(name)  void name(ioport_field &field, u32 param, ioport_value oldval, ioport_value newval)
 #define DECLARE_INPUT_CHANGED_MEMBER(name)  void name(ioport_field &field, u32 param, ioport_value oldval, ioport_value newval)
 
-// macro for port changed callback functions (PORT_CROSSHAIR_MAPPER)
-#define CROSSHAIR_MAPPER_MEMBER(name)   float name(float linear_value)
-#define DECLARE_CROSSHAIR_MAPPER_MEMBER(name)   float name(float linear_value)
-
 // macro for wrapping a default string
-#define DEF_STR(str_num) ((const char *)INPUT_STRING_##str_num)
+#define DEF_STR(str_num) (INPUT_STRING_##str_num)
 
 
 

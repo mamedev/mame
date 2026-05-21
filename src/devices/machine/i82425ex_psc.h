@@ -34,7 +34,7 @@ public:
 	auto ide1_irq_w() { return m_ide1_irq.bind(); }
 	auto ide2_irq_w() { return m_ide2_irq.bind(); }
 
-//	void smi_act_w(int state);
+//  void smi_act_w(int state);
 
 protected:
 	i82425ex_psc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

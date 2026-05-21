@@ -300,7 +300,8 @@ void mbc55x_state::mbc55x(machine_config &config)
 	m_pit->out_handler<2>().append("sio", FUNC(i8251_device::write_rxc));
 	m_pit->out_handler<2>().append("line", FUNC(rs232_port_device::write_etc));
 
-	clock_device &clk_78_6khz(CLOCK(config, "clk_78.6khz", 14.318181_MHz_XTAL / 14 / 13));
+	clock_device &clk_78_6khz(CLOCK(config, "clk_78.6khz"));
+	clk_78_6khz.set_period(attotime::from_hz(14.318181_MHz_XTAL / 14 / 13));
 	clk_78_6khz.signal_handler().set(m_pit, FUNC(pit8253_device::write_clk0));
 	clk_78_6khz.signal_handler().append(m_kb_uart, FUNC(i8251_device::write_txc));
 	clk_78_6khz.signal_handler().append(m_kb_uart, FUNC(i8251_device::write_rxc));

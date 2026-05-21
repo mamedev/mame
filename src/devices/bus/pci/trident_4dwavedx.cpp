@@ -8,7 +8,8 @@ AC'97 v1.x (fixed 48 kHz)
 
 TODO:
 - dxdiag: sound test don't playback on lower modes;
-- diablo: ambient BGM doesn't work, SFXs don't playback from time to time;
+- diablo: dungeon ambient BGM and townspeople speech doesn't work
+  \- streaming LBA bank from .mpq is empty in both cases (?)
 - Missing features in Bank A (testable in dxdiag -> Music -> Trident PCI WaveTable MIDI);
 - Move DMA reading out of sound_stream_update;
 - Mix-in wave engine output to AC'97 input;
@@ -65,7 +66,7 @@ void trident_4dwavedx_device::device_add_mconfig(machine_config &config)
 		irq_pin_w(0, state);
 		//irq_pin_w(0, 0);
 		//if (state)
-		//	irq_pin_w(0, 1);
+		//  irq_pin_w(0, 1);
 	});
 	m_pcm->add_route(0, m_ac97, 1.00, 0);
 	m_pcm->add_route(1, m_ac97, 1.00, 1);
@@ -155,9 +156,9 @@ void trident_4dwavedx_device::config_map(address_map &map)
 				, m_ddma_config & ~0xf, BIT(m_ddma_config, 3), BIT(m_ddma_config, 0));
 		})
 	);
-//	map(0x44, 0x44) Legacy I/O Base
-//	map(0x45, 0x45) Legacy DMA
-//	map(0x46, 0x46) Legacy Control
+//  map(0x44, 0x44) Legacy I/O Base
+//  map(0x45, 0x45) Legacy DMA
+//  map(0x46, 0x46) Legacy Control
 	map(0x44, 0x47).lrw32(
 		NAME([this] (offs_t offset, u32 mem_mask) {
 			LOG("PCI 44h: Legacy control read (mask %08x)\n", mem_mask);
@@ -211,22 +212,22 @@ void trident_4dwavedx_device::config_map(address_map &map)
 
 void trident_4dwavedx_device::io_map(address_map &map)
 {
-//	map(0x00, 0x0f) Legacy DMA
-//	map(0x10, 0x1f) Legacy SB mapping
+//  map(0x00, 0x0f) Legacy DMA
+//  map(0x10, 0x1f) Legacy SB mapping
 
-//	map(0x20, 0x23) Legacy MPU-401
+//  map(0x20, 0x23) Legacy MPU-401
 
-//	map(0x30, 0x31) Legacy Game Port
-//	map(0x34, 0x37) Enhanced Game Port 1
-//	map(0x38, 0x3b) Enhanced Game Port 2
+//  map(0x30, 0x31) Legacy Game Port (used by Linux boot in misc/voyager.cpp)
+//  map(0x34, 0x37) Enhanced Game Port 1
+//  map(0x38, 0x3b) Enhanced Game Port 2
 
 	map(0x40, 0x43).rw(m_ac97, FUNC(ac97_stac9704_device::codec_write_r), FUNC(ac97_stac9704_device::codec_write_w));
 	map(0x44, 0x47).rw(m_ac97, FUNC(ac97_stac9704_device::codec_read_r), FUNC(ac97_stac9704_device::codec_read_w));
-//	map(0x48, 0x4b) AC'97 Command/Status
+	map(0x48, 0x4b).rw(m_ac97, FUNC(ac97_stac9704_device::codec_status_r), FUNC(ac97_stac9704_device::codec_command_w));
 
-//	map(0x50, 0x50) 4DWAVE-DX Status (r/o)
-//	map(0x54, 0x55) Legacy SB Frequency (r/o)
-//	map(0x57, 0x57) Legacy SB Time Constant (r/o)
+//  map(0x50, 0x50) 4DWAVE-DX Status (r/o)
+//  map(0x54, 0x55) Legacy SB Frequency (r/o)
+//  map(0x57, 0x57) Legacy SB Time Constant (r/o)
 	map(0x58, 0x5b).lrw32(
 		NAME([this] (offs_t offset) {
 			return m_asr3;
@@ -255,46 +256,46 @@ void trident_4dwavedx_device::io_map(address_map &map)
 			}
 		})
 	);
-//	map(0x60, 0x63) OPL3 Emulation Channel Key on/off Trace
+//  map(0x60, 0x63) OPL3 Emulation Channel Key on/off Trace
 
-//	map(0x70, 0x73) Record Channel index 2 (chorus) / 1 (reverb) / 0 (mixer)
-//	map(0x78, 0x7b) Bank A PCI Stream Buffer Valid flags (testing only)
-//	map(0x7c, 0x7f) Bank B PCI Stream Buffer Valid flags (testing only)
+//  map(0x70, 0x73) Record Channel index 2 (chorus) / 1 (reverb) / 0 (mixer)
+//  map(0x78, 0x7b) Bank A PCI Stream Buffer Valid flags (testing only)
+//  map(0x7c, 0x7f) Bank B PCI Stream Buffer Valid flags (testing only)
 
-//	map(0x80, 0xff) Wave Engine
+//  map(0x80, 0xff) Wave Engine
 	map(0x80, 0x83).rw(m_pcm, FUNC(t4dwave_pcm_device::banka_status_r), FUNC(t4dwave_pcm_device::starta_w));
 	map(0x84, 0x87).rw(m_pcm, FUNC(t4dwave_pcm_device::banka_status_r), FUNC(t4dwave_pcm_device::stopa_w));
-//	map(0x88, 0x8b) DLYA
-//	map(0x8c, 0x8f) SIGNCSOA
-//	map(0x90, 0x93) CSPFA
-//	map(0x94, 0x97) CEBCA
+//  map(0x88, 0x8b) DLYA
+//  map(0x8c, 0x8f) SIGNCSOA
+//  map(0x90, 0x93) CSPFA
+//  map(0x94, 0x97) CEBCA
 	map(0x98, 0x9b).rw(m_pcm, FUNC(t4dwave_pcm_device::aina_r), FUNC(t4dwave_pcm_device::aina_w));
-//	map(0x9c, 0x9f) EINTA
+//  map(0x9c, 0x9f) EINTA
 	map(0xa0, 0xa3).rw(m_pcm, FUNC(t4dwave_pcm_device::global_control_r), FUNC(t4dwave_pcm_device::global_control_w));
 	map(0xa4, 0xa7).rw(m_pcm, FUNC(t4dwave_pcm_device::aintena_r), FUNC(t4dwave_pcm_device::aintena_w));
 	map(0xa8, 0xab).rw(m_pcm, FUNC(t4dwave_pcm_device::wavevol_r), FUNC(t4dwave_pcm_device::wavevol_w));
-//	map(0xac, 0xaf) DELTAR
+//  map(0xac, 0xaf) DELTAR
 	map(0xb0, 0xb3).rw(m_pcm, FUNC(t4dwave_pcm_device::miscint_r), FUNC(t4dwave_pcm_device::miscint_w));
 	map(0xb4, 0xb7).rw(m_pcm, FUNC(t4dwave_pcm_device::bankb_status_r), FUNC(t4dwave_pcm_device::startb_w));
 	map(0xb8, 0xbb).rw(m_pcm, FUNC(t4dwave_pcm_device::bankb_status_r), FUNC(t4dwave_pcm_device::stopb_w));
-//	map(0xbc, 0xbf) CSPFB
-//	map(0xc0, 0xc3) SBBL/SBCL
-//	map(0xc4, 0xc7) SBE2R/SBDD/SBCTRL
-//	map(0xc8, 0xcb) STIMER (r/o)
-//	map(0xcc, 0xcd) ROM Test
-//	map(0xce, 0xcf) LFOB
-//	map(0xd0, 0xd3) Test Mixer FIFO
-//	map(0xd4, 0xd7) Test Mixer Accumulator
+//  map(0xbc, 0xbf) CSPFB
+//  map(0xc0, 0xc3) SBBL/SBCL
+//  map(0xc4, 0xc7) SBE2R/SBDD/SBCTRL
+//  map(0xc8, 0xcb) STIMER (r/o)
+//  map(0xcc, 0xcd) ROM Test
+//  map(0xce, 0xcf) LFOB
+//  map(0xd0, 0xd3) Test Mixer FIFO
+//  map(0xd4, 0xd7) Test Mixer Accumulator
 	map(0xd8, 0xdb).rw(m_pcm, FUNC(t4dwave_pcm_device::ainb_r), FUNC(t4dwave_pcm_device::ainb_w));
 	map(0xdc, 0xdf).rw(m_pcm, FUNC(t4dwave_pcm_device::aintenb_r), FUNC(t4dwave_pcm_device::aintenb_w));
 
 	map(0xe0, 0xe3).rw(m_pcm, FUNC(t4dwave_pcm_device::cso_r), FUNC(t4dwave_pcm_device::cso_w));
 	map(0xe4, 0xe7).w(m_pcm, FUNC(t4dwave_pcm_device::lba_w));
 	map(0xe8, 0xeb).rw(m_pcm, FUNC(t4dwave_pcm_device::eso_r), FUNC(t4dwave_pcm_device::eso_w));
-//	map(0xec, 0xef) FMC/RVOL/CVOL
+//  map(0xec, 0xef) FMC/RVOL/CVOL
 	map(0xf0, 0xf3).rw(m_pcm, FUNC(t4dwave_pcm_device::gvsel_r), FUNC(t4dwave_pcm_device::gvsel_w));
-//	map(0xf4, 0xf7) EBUF1 (bank A only)
-//	map(0xf8, 0xfb) EBUF2 (bank A only)
+//  map(0xf4, 0xf7) EBUF1 (bank A only)
+//  map(0xf8, 0xfb) EBUF2 (bank A only)
 }
 
 void trident_4dwavedx_device::mmio_map(address_map &map)
@@ -393,9 +394,9 @@ void t4dwave_pcm_device::device_start()
 	save_item(STRUCT_MEMBER(m_channel, pan_vol));
 	save_item(STRUCT_MEMBER(m_channel, vol));
 	save_item(STRUCT_MEMBER(m_channel, play_mode));
-//	save_item(STRUCT_MEMBER(m_channel, is_16bit));
-//	save_item(STRUCT_MEMBER(m_channel, is_stereo));
-//	save_item(STRUCT_MEMBER(m_channel, is_signed));
+//  save_item(STRUCT_MEMBER(m_channel, is_16bit));
+//  save_item(STRUCT_MEMBER(m_channel, is_stereo));
+//  save_item(STRUCT_MEMBER(m_channel, is_signed));
 	save_item(STRUCT_MEMBER(m_channel, loop_enable));
 	save_item(STRUCT_MEMBER(m_channel, ec_envelope));
 	save_item(STRUCT_MEMBER(m_channel, pci_buf));
@@ -413,6 +414,29 @@ void t4dwave_pcm_device::device_reset()
 	m_miscint = 0;
 	m_aina = m_aintena = m_ainb = m_aintenb = 0;
 	m_bankA_keyon = m_bankB_keyon = 0;
+
+	for (int i = 0; i < 64; i++)
+	{
+		m_channel[i].lba = 0;
+		m_channel[i].cso = 0;
+		m_channel[i].eso_cache = 0;
+		std::fill(std::begin(m_channel[i].hso), std::end(m_channel[i].hso), 0);
+		std::fill(std::begin(m_channel[i].eso), std::end(m_channel[i].eso), 0);
+		m_channel[i].delta = 0;
+		m_channel[i].gvsel_cache = 0;
+		m_channel[i].gvsel = false;
+		m_channel[i].pan_control = false;
+		m_channel[i].pan_vol = 0;
+		m_channel[i].vol = 0;
+		m_channel[i].play_mode = 0;
+		m_channel[i].loop_enable = 0;
+		m_channel[i].ec_envelope = 0;
+		m_channel[i].pci_buf = 0;
+
+		m_channel[i].ticks = 0;
+		m_channel[i].sample_data = 0;
+		m_channel[i].dma_fetch = false;
+	}
 }
 
 // START_A & STOP_A
@@ -646,9 +670,9 @@ void t4dwave_pcm_device::gvsel_w(offs_t offset, u32 data, u32 mem_mask)
 	channel.pan_vol =     (channel.gvsel_cache >> 24) & 0x3f;
 	channel.vol =         (channel.gvsel_cache >> 16) & 0xff;
 	channel.play_mode =   (channel.gvsel_cache >> 13) & 7;
-//	channel.is_16bit =    !!BIT(channel.gvsel_cache, 15);
-//	channel.is_stereo =   !!BIT(channel.gvsel_cache, 14);
-//	channel.is_signed =   !!BIT(channel.gvsel_cache, 13);
+//  channel.is_16bit =    !!BIT(channel.gvsel_cache, 15);
+//  channel.is_stereo =   !!BIT(channel.gvsel_cache, 14);
+//  channel.is_signed =   !!BIT(channel.gvsel_cache, 13);
 	channel.loop_enable = !!BIT(channel.gvsel_cache, 12);
 	channel.ec_envelope = channel.gvsel_cache & 0xfff;
 
@@ -838,7 +862,6 @@ void t4dwave_pcm_device::sound_stream_update(sound_stream &stream)
 					}
 					if (channel.cso >= channel.eso[play_mode])
 					{
-						channel.cso = 0;
 						// ENDLP_IE
 						if (BIT(m_global_control, 12))
 						{
@@ -854,7 +877,14 @@ void t4dwave_pcm_device::sound_stream_update(sound_stream &stream)
 								m_bankB_keyon &= ~(1 << chB);
 							else
 								m_bankA_keyon &= ~(1 << ch);
+							// TODO: not entirely correct
+							// diablo: really wants CSO granularity being different depending on play mode
+							channel.cso = 0xffff;
 							continue;
+						}
+						else
+						{
+							channel.cso = 0;
 						}
 					}
 				}

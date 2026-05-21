@@ -9,8 +9,8 @@
 
     Intel Celeron CPU, 1.70GHz
     MSI MS-6566E VER: 2 motherboard
-	Intel RG82845E (MCH)
-	Intel FW82801BA (ICH2)
+    Intel RG82845E (MCH)
+    Intel FW82801BA (ICH2)
     Samsung 256MB DDR PC2100 CL2.5 RAM
     Inside TNC 128MB(?) VGA Graphics Video Card E-G012-01-1247 <- seems to be a Korean OEM for nVidia GeForce2 MX400 (NV11) -AS
     Dynamic 4281 Rev. A sound card by Jin Information Technology with Crystal CS4281 sound chip

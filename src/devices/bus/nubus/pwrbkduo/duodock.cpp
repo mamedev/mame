@@ -212,7 +212,6 @@ ioport_constructor duodock_device::device_input_ports() const
 void duodock_device::device_add_mconfig(machine_config &config)
 {
 	APPLE_PSEUDOVIA(config, m_pvia, 15.6672_MHz_XTAL);
-	m_pvia->set_is_aiv3();          // AIV3 is a "pure" pseudovia that doesn't use the 6522 back-compatible IER
 	m_pvia->readmsc_handler().set(FUNC(duodock_device::vsc_r));
 	m_pvia->writemsc_handler().set(FUNC(duodock_device::vsc_w));
 	m_pvia->writevideo_handler().set(FUNC(duodock_device::vidhandler_w));

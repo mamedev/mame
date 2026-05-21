@@ -12,9 +12,70 @@
 #include "s3c44b0.h"
 
 #include "cpu/arm7/arm7.h"
+
 #include "screen.h"
 
-#include <cstdarg>
+#define LOG_LCD_CONTROL    (1ULL << 1)
+#define LOG_LCD_TIMER      (1ULL << 2)
+#define LOG_LCD_CONFIG     (1ULL << 3)
+#define LOG_LCD_DMA        (1ULL << 4)
+#define LOG_LCD_DMA_INIT   (1ULL << 5)
+#define LOG_LCD_RASTERCALC (1ULL << 6)
+#define LOG_LCD_RW         (1ULL << 7)
+
+#define LOG_CLKPOW_CONFIG  (1ULL << 8)
+#define LOG_CLKPOW_RW      (1ULL << 9)
+
+#define LOG_IRQ_REQUEST    (1ULL << 10)
+#define LOG_IRQ_RW         (1ULL << 11)
+
+#define LOG_PWM_CONTROL    (1ULL << 12)
+#define LOG_PWM_TIMER      (1ULL << 13)
+#define LOG_PWM_CONFIG     (1ULL << 14)
+#define LOG_PWM_RW         (1ULL << 15)
+
+#define LOG_I2C_TRANSFER   (1ULL << 16)
+
+#define LOG_IIC_CONTROL    (1ULL << 17)
+#define LOG_IIC_TIMER      (1ULL << 18)
+#define LOG_IIC_RW         (1ULL << 19)
+
+#define LOG_GPIO_RW        (1ULL << 20)
+
+#define LOG_UART_TIMER     (1ULL << 21)
+#define LOG_UART_DATA      (1ULL << 22)
+#define LOG_UART_CONFIG    (1ULL << 23)
+#define LOG_UART_RW        (1ULL << 24)
+
+#define LOG_WDT_CONTROL    (1ULL << 25)
+#define LOG_WDT_TIMER      (1ULL << 26)
+#define LOG_WDT_CONFIG     (1ULL << 27)
+#define LOG_WDT_RW         (1ULL << 28)
+
+#define LOG_CPUWRAP_RW     (1ULL << 29)
+
+#define LOG_ADC_CONTROL    (1ULL << 30)
+#define LOG_ADC_TIMER      (1ULL << 31)
+#define LOG_ADC_CONFIG     (1ULL << 32)
+#define LOG_ADC_RW         (1ULL << 33)
+
+#define LOG_SIO_CONTROL    (1ULL << 34)
+#define LOG_SIO_TIMER      (1ULL << 35)
+#define LOG_SIO_CONFIG     (1ULL << 36)
+#define LOG_SIO_RW         (1ULL << 37)
+
+#define LOG_IIS_CONTROL    (1ULL << 38)
+#define LOG_IIS_CONFIG     (1ULL << 39)
+#define LOG_IIS_TIMER      (1ULL << 40)
+#define LOG_IIS_RW         (1ULL << 41)
+
+#define LOG_DMA_CONTROL    (1ULL << 42)
+#define LOG_DMA_TIMER      (1ULL << 43)
+#define LOG_DMA_STEP       (1ULL << 44)
+#define LOG_DMA_RW         (1ULL << 45)
+
+//#define VERBOSE (...)
+#include "logmacro.h"
 
 
 #define S3C44B0_INTCON    (0x00 / 4) // Interrupt Control
@@ -205,19 +266,6 @@
 
 
 #define VERBOSE_LEVEL ( 0 )
-
-static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, const char *s_fmt, ...)
-{
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[32768];
-		va_start( v, s_fmt);
-		vsprintf( buf, s_fmt, v);
-		va_end( v);
-		device.logerror( "%s: %s", device.machine().describe_context( ), buf);
-	}
-}
 
 DEFINE_DEVICE_TYPE(S3C44B0, s3c44b0_device, "s3c44b0", "Samsung S3C44B0 SoC")
 
@@ -504,10 +552,9 @@ uint8_t s3c44b0_device::lcd_get_color_stn_08_b(uint8_t data)
 
 void s3c44b0_device::lcd_dma_reload()
 {
-	int lcdbank, lcdbaseu, lcdbasel;
-	lcdbank  = BITS(m_lcd.regs.lcdsaddr1, 26, 21);
-	lcdbaseu = BITS(m_lcd.regs.lcdsaddr1, 20, 0);
-	lcdbasel = BITS(m_lcd.regs.lcdsaddr2, 20, 0);
+	int const lcdbank  = BITS(m_lcd.regs.lcdsaddr1, 26, 21);
+	int const lcdbaseu = BITS(m_lcd.regs.lcdsaddr1, 20, 0);
+	int const lcdbasel = BITS(m_lcd.regs.lcdsaddr2, 20, 0);
 
 	m_lcd.vramaddr_cur = (lcdbank << 22) | (lcdbaseu << 1);
 	m_lcd.vramaddr_max = (lcdbank << 22) | (lcdbasel << 1);
@@ -516,13 +563,13 @@ void s3c44b0_device::lcd_dma_reload()
 	m_lcd.pagewidth_cur = 0;
 	m_lcd.pagewidth_max = BITS(m_lcd.regs.lcdsaddr3, 8, 0);
 	m_lcd.bswp = BIT(m_lcd.regs.lcdsaddr2, 29); // note: juicebox changes bswp when video playback starts
-//  verboselog( *this, 3, "LCD - vramaddr %08X %08X offsize %08X pagewidth %08X\n", m_lcd.vramaddr_cur, m_lcd.vramaddr_max, m_lcd.offsize, m_lcd.pagewidth_max);
+	LOGMASKED(LOG_LCD_DMA_INIT, "LCD - vramaddr %08X %08X offsize %08X pagewidth %08X\n", m_lcd.vramaddr_cur, m_lcd.vramaddr_max, m_lcd.offsize, m_lcd.pagewidth_max);
 }
 
 void s3c44b0_device::lcd_dma_init()
 {
 	m_lcd.modesel = BITS(m_lcd.regs.lcdsaddr1, 28, 27);
-//  verboselog( *this, 3, "LCD - modesel %d bswp %d\n", m_lcd.modesel, m_lcd.bswp);
+	LOGMASKED(LOG_LCD_DMA_INIT, "LCD - modesel %d bswp %d\n", m_lcd.modesel, m_lcd.bswp);
 	lcd_dma_reload();
 }
 
@@ -622,13 +669,13 @@ attotime s3c44b0_device::time_until_pos(int vpos, int hpos)
 {
 	attoseconds_t time1, time2;
 	attotime retval;
-	verboselog( *this, 3, "s3c44b0_time_until_pos - vpos %d hpos %d\n", vpos, hpos);
+	LOGMASKED(LOG_LCD_RASTERCALC, "s3c44b0_time_until_pos - vpos %d hpos %d\n", vpos, hpos);
 	time1 = (attoseconds_t)vpos * m_lcd.scantime + (attoseconds_t)hpos * m_lcd.pixeltime;
 	time2 = (machine().time() - m_lcd.frame_time).as_attoseconds();
-	verboselog( *this, 3, "machine %f frametime %f time1 %f time2 %f\n", machine().time().as_double(), m_lcd.frame_time.as_double(), attotime(0, time1).as_double(), attotime(0, time2).as_double());
+	LOGMASKED(LOG_LCD_RASTERCALC, "machine %f frametime %f time1 %f time2 %f\n", machine().time().as_double(), m_lcd.frame_time.as_double(), attotime(0, time1).as_double(), attotime(0, time2).as_double());
 	while (time1 <= time2) time1 += m_lcd.frame_period;
 	retval = attotime( 0, time1 - time2);
-	verboselog( *this, 3, "result %f\n", retval.as_double());
+	LOGMASKED(LOG_LCD_RASTERCALC, "result %f\n", retval.as_double());
 	return retval;
 }
 
@@ -656,15 +703,15 @@ int s3c44b0_device::lcd_get_hpos()
 TIMER_CALLBACK_MEMBER( s3c44b0_device::lcd_timer_exp )
 {
 	int vpos = m_lcd.vpos;
-	verboselog( *this, 2, "LCD timer callback (%f)\n", machine().time().as_double());
-	verboselog( *this, 3, "LCD - (1) vramaddr %08X vpos %d hpos %d\n", m_lcd.vramaddr_cur, m_lcd.vpos, m_lcd.hpos);
+	LOGMASKED(LOG_LCD_TIMER, "LCD timer callback (%f)\n", machine().time().as_double());
+	LOGMASKED(LOG_LCD_DMA, "LCD - (1) vramaddr %08X vpos %d hpos %d\n", m_lcd.vramaddr_cur, m_lcd.vpos, m_lcd.hpos);
 	switch (m_lcd.modesel)
 	{
 		case S3C44B0_MODESEL_04 : lcd_render_stn_04(); break;
 		case S3C44B0_MODESEL_08 : lcd_render_stn_08(); break;
-		default : verboselog( *this, 0, "s3c44b0_lcd_timer_exp: modesel %d not supported\n", m_lcd.modesel); break;
+		default : logerror("s3c44b0_lcd_timer_exp: modesel %d not supported\n", m_lcd.modesel); break;
 	}
-	verboselog( *this, 3, "LCD - (2) vramaddr %08X vpos %d hpos %d\n", m_lcd.vramaddr_cur, m_lcd.vpos, m_lcd.hpos);
+	LOGMASKED(LOG_LCD_DMA, "LCD - (2) vramaddr %08X vpos %d hpos %d\n", m_lcd.vramaddr_cur, m_lcd.vpos, m_lcd.hpos);
 	if (m_lcd.vpos < vpos)
 	{
 //      verboselog( *this, 3, "LCD - (1) frame_time %f\n", attotime_to_double(m_lcd.frame_time));
@@ -728,30 +775,28 @@ uint32_t s3c44b0_device::lcd_r(offs_t offset, uint32_t mem_mask)
 		}
 		break;
 	}
-//  verboselog( *this, 9, "(LCD) %08X -> %08X\n", S3C44B0_BASE_LCD + (offset << 2), data);
+	LOGMASKED(LOG_LCD_RW, "%s: (LCD) %08X -> %08X\n", machine().describe_context(), S3C44B0_BASE_LCD + (offset << 2), data);
 	return data;
 }
 
 void s3c44b0_device::lcd_configure()
 {
-	int dismode, clkval, lineval, wdly, hozval, lineblank, wlh, mclk;
-	double vclk, framerate;
-	int width, height;
-	verboselog( *this, 5, "s3c44b0_lcd_configure\n");
-	dismode = BITS(m_lcd.regs.lcdcon1, 6, 5);
-	clkval = BITS(m_lcd.regs.lcdcon1, 21, 12);
-	lineval = BITS(m_lcd.regs.lcdcon2, 9, 0);
-	wdly = BITS(m_lcd.regs.lcdcon1, 9, 8);
-	hozval = BITS(m_lcd.regs.lcdcon2, 20, 10);
-	lineblank = BITS(m_lcd.regs.lcdcon2, 31, 21);
-	wlh = BITS(m_lcd.regs.lcdcon1, 11, 10);
-	mclk = get_mclk();
-	verboselog( *this, 3, "LCD - dismode %d clkval %d lineval %d wdly %d hozval %d lineblank %d wlh %d mclk %d\n", dismode, clkval, lineval, wdly, hozval, lineblank, wlh, mclk);
-	vclk = (double)(mclk / (clkval * 2));
-	verboselog( *this, 3, "LCD - vclk %f\n", vclk);
-	framerate = 1 / (((1 / vclk) * (hozval + 1) + (1 / mclk) * (wlh + wdly + lineblank)) * (lineval + 1));
+	LOGMASKED(LOG_LCD_CONFIG, "%s: s3c44b0_lcd_configure\n", machine().describe_context());
+	int const dismode = BITS(m_lcd.regs.lcdcon1, 6, 5);
+	int const clkval = BITS(m_lcd.regs.lcdcon1, 21, 12);
+	int const lineval = BITS(m_lcd.regs.lcdcon2, 9, 0);
+	int const wdly = BITS(m_lcd.regs.lcdcon1, 9, 8);
+	int const hozval = BITS(m_lcd.regs.lcdcon2, 20, 10);
+	int const lineblank = BITS(m_lcd.regs.lcdcon2, 31, 21);
+	int const wlh = BITS(m_lcd.regs.lcdcon1, 11, 10);
+	int const mclk = get_mclk();
+	LOGMASKED(LOG_LCD_CONFIG, "LCD - dismode %d clkval %d lineval %d wdly %d hozval %d lineblank %d wlh %d mclk %d\n", dismode, clkval, lineval, wdly, hozval, lineblank, wlh, mclk);
+	double const vclk = (double)(mclk / (clkval * 2));
+	LOGMASKED(LOG_LCD_CONFIG, "LCD - vclk %f\n", vclk);
+	double framerate = 1 / (((1 / vclk) * (hozval + 1) + (1 / mclk) * (wlh + wdly + lineblank)) * (lineval + 1));
 	framerate = framerate / 3; // ???
-	verboselog( *this, 3, "LCD - framerate %f\n", framerate);
+	LOGMASKED(LOG_LCD_CONFIG, "LCD - framerate %f\n", framerate);
+	int width, height;
 	switch (dismode)
 	{
 		case S3C44B0_PNRMODE_STN_04_SS : width = ((hozval + 1) * 4); break;
@@ -761,7 +806,7 @@ void s3c44b0_device::lcd_configure()
 	}
 	height = lineval + 1;
 	m_lcd.framerate = framerate;
-	verboselog( *this, 3, "video_screen_configure %d %d %f\n", width, height, m_lcd.framerate);
+	LOGMASKED(LOG_LCD_CONFIG, "video_screen_configure %d %d %f\n", width, height, m_lcd.framerate);
 	screen().configure(screen().width(), screen().height(), screen().visible_area(), HZ_TO_ATTOSECONDS(m_lcd.framerate));
 	m_lcd.hpos_min = 25;
 	m_lcd.hpos_max = 25 + width - 1;
@@ -769,7 +814,7 @@ void s3c44b0_device::lcd_configure()
 	m_lcd.vpos_min = 25;
 	m_lcd.vpos_max = 25 + height - 1;
 	m_lcd.vpos_end = 25 + height - 1 + 25;
-	verboselog( *this, 3, "LCD - min_x %d min_y %d max_x %d max_y %d\n", m_lcd.hpos_min, m_lcd.vpos_min, m_lcd.hpos_max, m_lcd.vpos_max);
+	LOGMASKED(LOG_LCD_CONFIG, "LCD - min_x %d min_y %d max_x %d max_y %d\n", m_lcd.hpos_min, m_lcd.vpos_min, m_lcd.hpos_max, m_lcd.vpos_max);
 	if (m_lcd.bitmap)
 	{
 		m_lcd.bitmap = nullptr;
@@ -786,7 +831,7 @@ void s3c44b0_device::lcd_configure()
 
 void s3c44b0_device::lcd_start()
 {
-	verboselog( *this, 1, "LCD start\n");
+	LOGMASKED(LOG_LCD_CONTROL, "%s: LCD start\n", machine().describe_context());
 	lcd_configure();
 	lcd_dma_init();
 	m_lcd.vpos = m_lcd.vpos_min;
@@ -798,7 +843,7 @@ void s3c44b0_device::lcd_start()
 
 void s3c44b0_device::lcd_stop()
 {
-	verboselog( *this, 1, "LCD stop\n");
+	LOGMASKED(LOG_LCD_CONTROL, "%s: LCD stop\n", machine().describe_context());
 	m_lcd.timer->adjust(attotime::never, 0);
 }
 
@@ -813,7 +858,7 @@ void s3c44b0_device::lcd_recalc()
 void s3c44b0_device::lcd_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_lcd.regs)[offset];
-//  verboselog( *this, 9, "(LCD) %08X <- %08X\n", S3C44B0_BASE_LCD + (offset << 2), data);
+	LOGMASKED(LOG_LCD_RW, "%s: (LCD) %08X <- %08X\n", machine().describe_context(), S3C44B0_BASE_LCD + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_lcd.regs)[offset]);
 	switch (offset)
 	{
@@ -838,25 +883,25 @@ uint32_t s3c44b0_device::get_mclk()
 	mdiv = BITS(data, 19, 12);
 	pdiv = BITS(data, 9, 4);
 	sdiv = BITS(data, 1, 0);
-	return (uint32_t)((double)((mdiv + 8) * clock()) / (double)((pdiv + 2) * (1 << sdiv)));
+	return uint32_t(double((mdiv + 8) * clock()) / double((pdiv + 2) * (1 << sdiv)));
 }
 
 uint32_t s3c44b0_device::clkpow_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_clkpow.regs)[offset];
-	verboselog( *this, 9, "(CLKPOW) %08X -> %08X\n", S3C44B0_BASE_CLKPOW + (offset << 2), data);
+	LOGMASKED(LOG_CLKPOW_RW, "%s: (CLKPOW) %08X -> %08X\n", machine().describe_context(), S3C44B0_BASE_CLKPOW + (offset << 2), data);
 	return data;
 }
 
 void s3c44b0_device::clkpow_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	verboselog( *this, 9, "(CLKPOW) %08X <- %08X\n", S3C44B0_BASE_CLKPOW + (offset << 2), data);
+	LOGMASKED(LOG_CLKPOW_RW, "%s: (CLKPOW) %08X <- %08X\n", machine().describe_context(), S3C44B0_BASE_CLKPOW + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_clkpow.regs)[offset]);
 	switch (offset)
 	{
 		case S3C44B0_PLLCON :
 		{
-			verboselog( *this, 5, "CLKPOW - mclk %d\n", get_mclk());
+			LOGMASKED(LOG_CLKPOW_CONFIG, "%s: CLKPOW - mclk %d\n", machine().describe_context(), get_mclk());
 			m_cpu->set_unscaled_clock(get_mclk() * CLOCK_MULTIPLIER);
 		}
 		break;
@@ -923,7 +968,7 @@ void s3c44b0_device::check_pending_irq()
 
 void s3c44b0_device::request_irq(uint32_t int_type)
 {
-	verboselog( *this, 5, "request irq %d\n", int_type);
+	LOGMASKED(LOG_IRQ_REQUEST, "request irq %d\n", int_type);
 	m_irq.regs.intpnd |= (1 << int_type);
 	check_pending_irq();
 }
@@ -936,7 +981,7 @@ void s3c44b0_device::check_pending_eint()
 
 void s3c44b0_device::request_eint(uint32_t number)
 {
-	verboselog( *this, 5, "request external interrupt %d\n", number);
+	LOGMASKED(LOG_IRQ_REQUEST, "request external interrupt %d\n", number);
 	if (number < 4)
 	{
 		request_irq(S3C44B0_INT_EINT0 + number);
@@ -951,13 +996,13 @@ void s3c44b0_device::request_eint(uint32_t number)
 uint32_t s3c44b0_device::irq_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_irq.regs)[offset];
-	verboselog( *this, 9, "(IRQ) %08X -> %08X\n", S3C44B0_BASE_INT + (offset << 2), data);
+	LOGMASKED(LOG_IRQ_RW, "%s: (IRQ) %08X -> %08X\n", machine().describe_context(), S3C44B0_BASE_INT + (offset << 2), data);
 	return data;
 }
 
 void s3c44b0_device::irq_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	verboselog( *this, 9, "(IRQ) %08X <- %08X\n", S3C44B0_BASE_INT + (offset << 2), data);
+	LOGMASKED(LOG_IRQ_RW, "%s: (IRQ) %08X <- %08X\n", machine().describe_context(), S3C44B0_BASE_INT + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_irq.regs)[offset]);
 	switch (offset)
 	{
@@ -1034,7 +1079,7 @@ uint32_t s3c44b0_device::pwm_r(offs_t offset, uint32_t mem_mask)
 		}
 		break;
 	}
-	verboselog( *this, 9, "(PWM) %08X -> %08X\n", S3C44B0_BASE_PWM + (offset << 2), data);
+	LOGMASKED(LOG_PWM_RW, "%s: (PWM) %08X -> %08X\n", machine().describe_context(), S3C44B0_BASE_PWM + (offset << 2), data);
 	return data;
 }
 
@@ -1045,7 +1090,7 @@ void s3c44b0_device::pwm_start(int timer)
 	const int mux_shift[] = { 0, 4, 8, 12, 16, 20};
 	uint32_t mclk, prescaler, mux, cnt, cmp, auto_reload;
 	double freq, hz;
-	verboselog( *this, 1, "PWM %d start\n", timer);
+	LOGMASKED(LOG_PWM_CONTROL, "%s: PWM %d start\n", machine().describe_context(), timer);
 	mclk = get_mclk();
 	prescaler = (m_pwm.regs.tcfg0 >> prescaler_shift[timer]) & 0xFF;
 	mux = (m_pwm.regs.tcfg1 >> mux_shift[timer]) & 0x0F;
@@ -1116,7 +1161,7 @@ void s3c44b0_device::pwm_start(int timer)
 	{
 		hz = freq / cnt;
 	}
-	verboselog( *this, 5, "PWM %d - mclk=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d auto_reload=%d hz=%f\n", timer, mclk, prescaler, mux_table[mux], freq, cnt, cmp, auto_reload, hz);
+	LOGMASKED(LOG_PWM_CONFIG, "%s: PWM %d - mclk=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d auto_reload=%d hz=%f\n", machine().describe_context(), timer, mclk, prescaler, mux_table[mux], freq, cnt, cmp, auto_reload, hz);
 	m_pwm.cnt[timer] = cnt;
 	m_pwm.cmp[timer] = cmp;
 	m_pwm.freq[timer] = freq;
@@ -1139,7 +1184,7 @@ void s3c44b0_device::pwm_start(int timer)
 
 void s3c44b0_device::pwm_stop(int timer)
 {
-	verboselog( *this, 1, "PWM %d stop\n", timer);
+	LOGMASKED(LOG_PWM_CONTROL, "%s: PWM %d stop\n", machine().describe_context(), timer);
 	m_pwm.timer[timer]->adjust(attotime::never, 0);
 }
 
@@ -1155,33 +1200,33 @@ void s3c44b0_device::pwm_recalc(int timer)
 void s3c44b0_device::pwm_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_pwm.regs)[offset];
-	verboselog( *this, 9, "(PWM) %08X <- %08X\n", S3C44B0_BASE_PWM + (offset << 2), data);
+	LOGMASKED(LOG_PWM_RW, "%s: (PWM) %08X <- %08X\n", machine().describe_context(), S3C44B0_BASE_PWM + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_pwm.regs)[offset]);
 	switch (offset)
 	{
 		case S3C44B0_TCON :
 		{
-			if ((data & (1 << 0)) != (old_value & (1 << 0)))
+			if (BIT(data, 0) != BIT(old_value, 0))
 			{
 				pwm_recalc(0);
 			}
-			if ((data & (1 << 8)) != (old_value & (1 << 8)))
+			if (BIT(data, 8) != BIT(old_value, 8))
 			{
 				pwm_recalc(1);
 			}
-			if ((data & (1 << 12)) != (old_value & (1 << 12)))
+			if (BIT(data, 12) != BIT(old_value, 12))
 			{
 				pwm_recalc(2);
 			}
-			if ((data & (1 << 16)) != (old_value & (1 << 16)))
+			if (BIT(data, 16) != BIT(old_value, 16))
 			{
 				pwm_recalc(3);
 			}
-			if ((data & (1 << 20)) != (old_value & (1 << 20)))
+			if (BIT(data, 20) != BIT(old_value, 20))
 			{
 				pwm_recalc(4);
 			}
-			if ((data & (1 << 24)) != (old_value & (1 << 24)))
+			if (BIT(data, 24) != BIT(old_value, 24))
 			{
 				pwm_recalc(5);
 			}
@@ -1194,7 +1239,7 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::pwm_timer_exp )
 {
 	int ch = param;
 	const int ch_int[] = { S3C44B0_INT_TIMER0, S3C44B0_INT_TIMER1, S3C44B0_INT_TIMER2, S3C44B0_INT_TIMER3, S3C44B0_INT_TIMER4, S3C44B0_INT_TIMER5 };
-	verboselog( *this, 2, "PWM %d timer callback\n", ch);
+	LOGMASKED(LOG_PWM_TIMER, "PWM %d timer callback\n", ch);
 	if (BITS(m_pwm.regs.tcfg1, 27, 24) == (ch + 1))
 	{
 		fatalerror("s3c44b0_dma_request_pwm( device)\n");
@@ -1224,7 +1269,7 @@ inline int s3c44b0_device::iface_i2c_sda_r()
 
 void s3c44b0_device::i2c_send_start()
 {
-	verboselog( *this, 5, "i2c_send_start\n");
+	LOGMASKED(LOG_I2C_TRANSFER, "i2c_send_start\n");
 	iface_i2c_sda_w(1);
 	iface_i2c_scl_w(1);
 	iface_i2c_sda_w(0);
@@ -1233,7 +1278,7 @@ void s3c44b0_device::i2c_send_start()
 
 void s3c44b0_device::i2c_send_stop()
 {
-	verboselog( *this, 5, "i2c_send_stop\n");
+	LOGMASKED(LOG_I2C_TRANSFER, "i2c_send_stop\n");
 	iface_i2c_sda_w(0);
 	iface_i2c_scl_w(1);
 	iface_i2c_sda_w(1);
@@ -1243,7 +1288,7 @@ void s3c44b0_device::i2c_send_stop()
 uint8_t s3c44b0_device::i2c_receive_byte(int ack)
 {
 	uint8_t data = 0;
-	verboselog( *this, 5, "i2c_receive_byte ...\n");
+	LOGMASKED(LOG_I2C_TRANSFER, "i2c_receive_byte ...\n");
 	iface_i2c_sda_w(1);
 	for (int i = 0; i < 8; i++)
 	{
@@ -1251,8 +1296,8 @@ uint8_t s3c44b0_device::i2c_receive_byte(int ack)
 		data = (data << 1) + (iface_i2c_sda_r() ? 1 : 0);
 		iface_i2c_scl_w(0);
 	}
-	verboselog( *this, 5, "recv data %02X\n", data);
-	verboselog( *this, 5, "send ack %d\n", ack);
+	LOGMASKED(LOG_I2C_TRANSFER, "recv data %02X\n", data);
+	LOGMASKED(LOG_I2C_TRANSFER, "send ack %d\n", ack);
 	iface_i2c_sda_w(ack ? 0 : 1);
 	iface_i2c_scl_w(1);
 	iface_i2c_scl_w(0);
@@ -1262,8 +1307,8 @@ uint8_t s3c44b0_device::i2c_receive_byte(int ack)
 int s3c44b0_device::i2c_send_byte(uint8_t data)
 {
 	int ack;
-	verboselog( *this, 5, "i2c_send_byte ...\n");
-	verboselog( *this, 5, "send data %02X\n", data);
+	LOGMASKED(LOG_I2C_TRANSFER, "i2c_send_byte ...\n");
+	LOGMASKED(LOG_I2C_TRANSFER, "send data %02X\n", data);
 	for (int i = 0; i < 8; i++)
 	{
 		iface_i2c_sda_w((data & 0x80) ? 1 : 0);
@@ -1274,7 +1319,7 @@ int s3c44b0_device::i2c_send_byte(uint8_t data)
 	iface_i2c_sda_w(1); // ack bit
 	iface_i2c_scl_w(1);
 	ack = iface_i2c_sda_r();
-	verboselog( *this, 5, "recv ack %d\n", ack);
+	LOGMASKED(LOG_I2C_TRANSFER, "recv ack %d\n", ack);
 	iface_i2c_scl_w(0);
 	return ack;
 }
@@ -1282,7 +1327,7 @@ int s3c44b0_device::i2c_send_byte(uint8_t data)
 void s3c44b0_device::iic_start()
 {
 	int mode_selection;
-	verboselog( *this, 1, "IIC start\n");
+	LOGMASKED(LOG_IIC_CONTROL, "%s: IIC start\n", machine().describe_context());
 	i2c_send_start();
 	mode_selection = BITS(m_iic.regs.iicstat, 7, 6);
 	switch (mode_selection)
@@ -1295,7 +1340,7 @@ void s3c44b0_device::iic_start()
 
 void s3c44b0_device::iic_stop()
 {
-	verboselog( *this, 1, "IIC stop\n");
+	LOGMASKED(LOG_IIC_CONTROL, "%s: IIC stop\n", machine().describe_context());
 	i2c_send_stop();
 	m_iic.timer->adjust(attotime::never, 0);
 }
@@ -1303,7 +1348,7 @@ void s3c44b0_device::iic_stop()
 void s3c44b0_device::iic_resume()
 {
 	int mode_selection;
-	verboselog( *this, 1, "IIC resume\n");
+	LOGMASKED(LOG_IIC_CONTROL, "%s: IIC resume\n", machine().describe_context());
 	mode_selection = BITS(m_iic.regs.iicstat, 7, 6);
 	switch (mode_selection)
 	{
@@ -1324,14 +1369,14 @@ uint32_t s3c44b0_device::iic_r(offs_t offset, uint32_t mem_mask)
 		}
 		break;
 	}
-	verboselog( *this, 9, "(IIC) %08X -> %08X\n", S3C44B0_BASE_IIC + (offset << 2), data);
+	LOGMASKED(LOG_IIC_RW, "%s: (IIC) %08X -> %08X\n", machine().describe_context(), S3C44B0_BASE_IIC + (offset << 2), data);
 	return data;
 }
 
 void s3c44b0_device::iic_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_iic.regs)[offset];
-	verboselog( *this, 9, "(IIC) %08X <- %08X\n", S3C44B0_BASE_IIC + (offset << 2), data);
+	LOGMASKED(LOG_IIC_RW, "%s: (IIC) %08X <- %08X\n", machine().describe_context(), S3C44B0_BASE_IIC + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_iic.regs)[offset]);
 	switch (offset)
 	{
@@ -1409,11 +1454,11 @@ void s3c44b0_device::iic_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 TIMER_CALLBACK_MEMBER( s3c44b0_device::iic_timer_exp )
 {
 	int enable_interrupt;
-	verboselog( *this, 2, "IIC timer callback\n");
+	LOGMASKED(LOG_IIC_TIMER, "IIC timer callback\n");
 	m_iic.count++;
 	enable_interrupt = BIT(m_iic.regs.iiccon, 5);
 
-	m_iic.regs.iicds = 0xFF; // TEST
+	m_iic.regs.iicds = 0xff; // TEST
 
 	if (enable_interrupt)
 	{
@@ -1475,14 +1520,14 @@ uint32_t s3c44b0_device::gpio_r(offs_t offset, uint32_t mem_mask)
 		}
 		break;
 	}
-	verboselog( *this, 9, "(GPIO) %08X -> %08X\n", S3C44B0_BASE_GPIO + (offset << 2), data);
+	LOGMASKED(LOG_GPIO_RW, "%s: (GPIO) %08X -> %08X\n", machine().describe_context(), S3C44B0_BASE_GPIO + (offset << 2), data);
 	return data;
 }
 
 void s3c44b0_device::gpio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_gpio.regs)[offset];
-	verboselog( *this, 9, "(GPIO) %08X <- %08X\n", S3C44B0_BASE_GPIO + (offset << 2), data);
+	LOGMASKED(LOG_GPIO_RW, "%s: (GPIO) %08X <- %08X\n", machine().describe_context(), S3C44B0_BASE_GPIO + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_gpio.regs)[offset]);
 	switch (offset)
 	{
@@ -1545,7 +1590,7 @@ uint32_t s3c44b0_device::uart_r(int ch, uint32_t offset)
 		case S3C44B0_URXH :
 		{
 			uint8_t rxdata = data & 0xFF;
-			verboselog( *this, 5, "UART %d read %02X (%c)\n", ch, rxdata, ((rxdata >= 32) && (rxdata < 128)) ? (char)rxdata : '?');
+			LOGMASKED(LOG_UART_DATA, "%s: UART %d read %02X (%c)\n", machine().describe_context(), ch, rxdata, ((rxdata >= 32) && (rxdata < 128)) ? (char)rxdata : '?');
 			m_uart[ch].regs.utrstat &= ~1; // [bit 0] Receive buffer data ready
 		}
 		break;
@@ -1561,7 +1606,7 @@ void s3c44b0_device::uart_w(int ch, uint32_t offset, uint32_t data, uint32_t mem
 		case S3C44B0_UTXH :
 		{
 			uint8_t txdata = data & 0xFF;
-			verboselog( *this, 5, "UART %d write %02X (%c)\n", ch, txdata, ((txdata >= 32) && (txdata < 128)) ? (char)txdata : '?');
+			LOGMASKED(LOG_UART_DATA, "%s: UART %d write %02X (%c)\n", machine().describe_context(), ch, txdata, ((txdata >= 32) && (txdata < 128)) ? (char)txdata : '?');
 #ifdef UART_PRINTF
 			printf( "%c", ((txdata >= 32) && (txdata < 128)) ? (char)txdata : '?');
 #endif
@@ -1572,7 +1617,7 @@ void s3c44b0_device::uart_w(int ch, uint32_t offset, uint32_t data, uint32_t mem
 			uint32_t mclk, hz;
 			mclk = get_mclk();
 			hz = (mclk / (m_uart->regs.ubrdiv + 1)) / 16;
-			verboselog( *this, 5, "UART %d - mclk %08X hz %08X\n", ch, mclk, hz);
+			LOGMASKED(LOG_UART_CONFIG, "%s: UART %d - mclk %08X hz %08X\n", machine().describe_context(), ch, mclk, hz);
 			m_uart->timer->adjust(attotime::from_hz(hz), ch, attotime::from_hz(hz));
 		}
 		break;
@@ -1582,26 +1627,26 @@ void s3c44b0_device::uart_w(int ch, uint32_t offset, uint32_t data, uint32_t mem
 uint32_t s3c44b0_device::uart_0_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = uart_r(0, offset);
-//  verboselog( *this, 9, "(UART 0) %08X -> %08X\n", S3C44B0_BASE_UART_0 + (offset << 2), data);
+//  LOGMASKED(LOG_UART_RW, "%s: (UART 0) %08X -> %08X\n", machine().describe_context(), S3C44B0_BASE_UART_0 + (offset << 2), data);
 	return data;
 }
 
 uint32_t s3c44b0_device::uart_1_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = uart_r(1, offset);
-//  verboselog( *this, 9, "(UART 1) %08X -> %08X\n", S3C44B0_BASE_UART_1 + (offset << 2), data);
+//  LOGMASKED(LOG_UART_RW, "%s: (UART 1) %08X -> %08X\n", machine().describe_context(), S3C44B0_BASE_UART_1 + (offset << 2), data);
 	return data;
 }
 
 void s3c44b0_device::uart_0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	verboselog( *this, 9, "(UART 0) %08X <- %08X (%08X)\n", S3C44B0_BASE_UART_0 + (offset << 2), data, mem_mask);
+	LOGMASKED(LOG_UART_RW, "%s: (UART 0) %08X <- %08X (%08X)\n", machine().describe_context(), S3C44B0_BASE_UART_0 + (offset << 2), data, mem_mask);
 	uart_w(0, offset, data, mem_mask);
 }
 
 void s3c44b0_device::uart_1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	verboselog( *this, 9, "(UART 1) %08X <- %08X (%08X)\n", S3C44B0_BASE_UART_1 + (offset << 2), data, mem_mask);
+	LOGMASKED(LOG_UART_RW, "%s: (UART 1) %08X <- %08X (%08X)\n", machine().describe_context(), S3C44B0_BASE_UART_1 + (offset << 2), data, mem_mask);
 	uart_w(1, offset, data, mem_mask);
 }
 
@@ -1615,7 +1660,7 @@ void s3c44b0_device::uart_fifo_w(int uart, uint8_t data)
 TIMER_CALLBACK_MEMBER( s3c44b0_device::uart_timer_exp )
 {
 	int ch = param;
-	verboselog( *this, 2, "UART %d timer callback\n", ch);
+	LOGMASKED(LOG_UART_TIMER, "UART %d timer callback\n", ch);
 	if ((m_uart->regs.ucon & (1 << 9)) != 0)
 	{
 		const int ch_int[] = { S3C44B0_INT_UTXD0, S3C44B0_INT_UTXD1 };
@@ -1645,7 +1690,7 @@ uint32_t s3c44b0_device::wdt_r(offs_t offset, uint32_t mem_mask)
 		}
 		break;
 	}
-	verboselog( *this, 9, "(WDT) %08X -> %08X\n", S3C44B0_BASE_WDT + (offset << 2), data);
+	LOGMASKED(LOG_WDT_RW, "%s: (WDT) %08X -> %08X\n", machine().describe_context(), S3C44B0_BASE_WDT + (offset << 2), data);
 	return data;
 }
 
@@ -1653,19 +1698,19 @@ void s3c44b0_device::wdt_start()
 {
 	uint32_t mclk, prescaler, clock;
 	double freq, hz;
-	verboselog( *this, 1, "WDT start\n");
+	LOGMASKED(LOG_WDT_CONTROL, "%s: WDT start\n", machine().describe_context());
 	mclk = get_mclk();
 	prescaler = BITS(m_wdt.regs.wtcon, 15, 8);
 	clock = 16 << BITS(m_wdt.regs.wtcon, 4, 3);
 	freq = (double)mclk / (prescaler + 1) / clock;
 	hz = freq / m_wdt.regs.wtcnt;
-	verboselog( *this, 5, "WDT mclk %d prescaler %d clock %d freq %f hz %f\n", mclk, prescaler, clock, freq, hz);
+	LOGMASKED(LOG_WDT_CONFIG, "%s: WDT mclk %d prescaler %d clock %d freq %f hz %f\n", machine().describe_context(), mclk, prescaler, clock, freq, hz);
 	m_wdt.timer->adjust(attotime::from_hz(hz), 0, attotime::from_hz(hz));
 }
 
 void s3c44b0_device::wdt_stop()
 {
-	verboselog( *this, 1, "WDT stop\n");
+	LOGMASKED(LOG_WDT_CONTROL, "%s: WDT stop\n", machine().describe_context());
 	m_wdt.regs.wtcnt = wdt_calc_current_count();
 	m_wdt.timer->adjust(attotime::never, 0);
 }
@@ -1681,7 +1726,7 @@ void s3c44b0_device::wdt_recalc()
 void s3c44b0_device::wdt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_wdt.regs)[offset];
-	verboselog( *this, 9, "(WDT) %08X <- %08X\n", S3C44B0_BASE_WDT + (offset << 2), data);
+	LOGMASKED(LOG_WDT_RW, "%s: (WDT) %08X <- %08X\n", machine().describe_context(), S3C44B0_BASE_WDT + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_wdt.regs)[offset]);
 	switch (offset)
 	{
@@ -1698,7 +1743,7 @@ void s3c44b0_device::wdt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 TIMER_CALLBACK_MEMBER( s3c44b0_device::wdt_timer_exp )
 {
-	verboselog( *this, 2, "WDT timer callback\n");
+	LOGMASKED(LOG_WDT_TIMER, "WDT timer callback\n");
 	if ((m_wdt.regs.wtcon & (1 << 2)) != 0)
 	{
 		request_irq(S3C44B0_INT_WDT);
@@ -1715,13 +1760,13 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::wdt_timer_exp )
 uint32_t s3c44b0_device::cpuwrap_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_cpuwrap.regs)[offset];
-	verboselog( *this, 9, "(CPUWRAP) %08X -> %08X\n", S3C44B0_BASE_CPU_WRAPPER + (offset << 2), data);
+	LOGMASKED(LOG_CPUWRAP_RW, "%s: (CPUWRAP) %08X -> %08X\n", machine().describe_context(), S3C44B0_BASE_CPU_WRAPPER + (offset << 2), data);
 	return data;
 }
 
 void s3c44b0_device::cpuwrap_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	verboselog( *this, 9, "(CPUWRAP) %08X <- %08X\n", S3C44B0_BASE_CPU_WRAPPER + (offset << 2), data);
+	LOGMASKED(LOG_CPUWRAP_RW, "%s: (CPUWRAP) %08X <- %08X\n", machine().describe_context(), S3C44B0_BASE_CPU_WRAPPER + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_cpuwrap.regs)[offset]);
 }
 
@@ -1730,7 +1775,7 @@ void s3c44b0_device::cpuwrap_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 uint32_t s3c44b0_device::adc_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_adc.regs)[offset];
-	verboselog( *this, 9, "(ADC) %08X -> %08X\n", S3C44B0_BASE_ADC + (offset << 2), data);
+	LOGMASKED(LOG_ADC_RW, "%s: (ADC) %08X -> %08X\n", machine().describe_context(), S3C44B0_BASE_ADC + (offset << 2), data);
 	return data;
 }
 
@@ -1738,18 +1783,18 @@ void s3c44b0_device::adc_start()
 {
 	uint32_t mclk, prescaler;
 	double freq, hz;
-	verboselog( *this, 1, "ADC start\n");
+	LOGMASKED(LOG_ADC_CONTROL, "%s: ADC start\n", machine().describe_context());
 	mclk = get_mclk();
 	prescaler = BITS(m_adc.regs.adcpsr, 7, 0);
 	freq = (double)mclk / (2 * (prescaler + 1)) / 16;
 	hz = freq / 1; //m_wdt.regs.wtcnt;
-	verboselog( *this, 5, "ADC mclk %d prescaler %d freq %f hz %f\n", mclk, prescaler, freq, hz);
+	LOGMASKED(LOG_ADC_CONFIG, "%s: ADC mclk %d prescaler %d freq %f hz %f\n", machine().describe_context(), mclk, prescaler, freq, hz);
 	m_adc.timer->adjust(attotime::from_hz(hz), 0);
 }
 
 void s3c44b0_device::adc_stop()
 {
-	verboselog( *this, 1, "ADC stop\n");
+	LOGMASKED(LOG_ADC_CONTROL, "%s: ADC stop\n", machine().describe_context());
 	m_adc.timer->adjust(attotime::never, 0);
 }
 
@@ -1764,13 +1809,13 @@ void s3c44b0_device::adc_recalc()
 void s3c44b0_device::adc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_wdt.regs)[offset];
-	verboselog( *this, 9, "(ADC) %08X <- %08X\n", S3C44B0_BASE_ADC + (offset << 2), data);
+	LOGMASKED(LOG_ADC_RW, "%s: (ADC) %08X <- %08X\n", machine().describe_context(), S3C44B0_BASE_ADC + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_adc.regs)[offset]);
 	switch (offset)
 	{
 		case S3C44B0_ADCCON :
 		{
-			if ((data & (1 << 0)) != (old_value & (1 << 0)))
+			if (BIT(data, 0) != BIT(old_value, 0))
 			{
 				adc_recalc();
 			}
@@ -1782,7 +1827,7 @@ void s3c44b0_device::adc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 TIMER_CALLBACK_MEMBER( s3c44b0_device::adc_timer_exp )
 {
-	verboselog( *this, 2, "ADC timer callback\n");
+	LOGMASKED(LOG_ADC_TIMER, "ADC timer callback\n");
 	m_adc.regs.adccon |= (1 << 6);
 	request_irq(S3C44B0_INT_ADC);
 }
@@ -1792,34 +1837,32 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::adc_timer_exp )
 uint32_t s3c44b0_device::sio_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_sio.regs)[offset];
-	verboselog( *this, 9, "(SIO) %08X -> %08X\n", S3C44B0_BASE_SIO + (offset << 2), data);
+	LOGMASKED(LOG_SIO_RW, "%s: (SIO) %08X -> %08X\n", machine().describe_context(), S3C44B0_BASE_SIO + (offset << 2), data);
 	return data;
 }
 
 void s3c44b0_device::sio_start()
 {
-	uint32_t mclk, prescaler;
-	double freq, hz;
-	verboselog( *this, 1, "SIO start\n");
-	mclk = get_mclk();
-	prescaler = BITS(m_sio.regs.sbrdr, 11, 0);
-	freq = (double)mclk / 2 / (prescaler + 1);
-	hz = freq / 1; //m_wdt.regs.wtcnt;
-	verboselog( *this, 5, "SIO mclk %d prescaler %d freq %f hz %f\n", mclk, prescaler, freq, hz);
+	LOGMASKED(LOG_SIO_CONTROL, "%s: SIO start\n", machine().describe_context());
+	uint32_t const mclk = get_mclk();
+	uint32_t const prescaler = BITS(m_sio.regs.sbrdr, 11, 0);
+	double const freq = (double)mclk / 2 / (prescaler + 1);
+	double const hz = freq / 1; //m_wdt.regs.wtcnt;
+	LOGMASKED(LOG_SIO_CONFIG, "%s: SIO mclk %d prescaler %d freq %f hz %f\n", machine().describe_context(), mclk, prescaler, freq, hz);
 	m_sio.timer->adjust(attotime::from_hz(hz), 0);
 //  printf("SIO transmit %02X (%c)\n", m_sio.regs.siodat, ((m_sio.regs.siodat >= 32) && (m_sio.regs.siodat < 128)) ? (char)m_sio.regs.siodat : '?');
 }
 
 void s3c44b0_device::sio_stop()
 {
-	verboselog( *this, 1, "SIO stop\n");
+	LOGMASKED(LOG_SIO_CONTROL, "%s: SIO stop\n", machine().describe_context());
 //  m_wdt.regs.wtcnt = s3c44b0_wdt_calc_current_count( device);
 	m_sio.timer->adjust(attotime::never, 0);
 }
 
 void s3c44b0_device::sio_recalc()
 {
-	if ((m_sio.regs.siocon & (1 << 3)) != 0)
+	if (BIT(m_sio.regs.siocon, 3) != 0)
 		sio_start();
 	else
 		sio_stop();
@@ -1828,7 +1871,7 @@ void s3c44b0_device::sio_recalc()
 void s3c44b0_device::sio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_sio.regs)[offset];
-	verboselog( *this, 9, "(SIO) %08X <- %08X\n", S3C44B0_BASE_SIO + (offset << 2), data);
+	LOGMASKED(LOG_SIO_RW, "%s: (SIO) %08X <- %08X\n", machine().describe_context(), S3C44B0_BASE_SIO + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_sio.regs)[offset]);
 	switch (offset)
 	{
@@ -1846,7 +1889,7 @@ void s3c44b0_device::sio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 TIMER_CALLBACK_MEMBER( s3c44b0_device::sio_timer_exp )
 {
-	verboselog( *this, 2, "SIO timer callback\n");
+	LOGMASKED(LOG_SIO_TIMER, "SIO timer callback\n");
 
 	m_sio.regs.siodat = 0x00; // TEST
 
@@ -1868,33 +1911,33 @@ void s3c44b0_device::iis_start()
 	uint32_t mclk;
 	int prescaler;
 	double freq, hz;
-	const int div[] = { 2, 4, 6, 8, 10, 12, 14, 16, 1, 0, 3, 0, 5, 0, 7, 0 };
-	verboselog( *this, 1, "IIS start\n");
+	constexpr int div[] = { 2, 4, 6, 8, 10, 12, 14, 16, 1, 0, 3, 0, 5, 0, 7, 0 };
+	LOGMASKED(LOG_IIS_CONTROL, "%s: IIS start\n", machine().describe_context());
 	mclk = get_mclk();
 	prescaler = BITS(m_iis.regs.iispsr, 3, 0);
 	freq = (double)mclk / div[prescaler];
 	hz = freq / 256 * 2;
-	verboselog( *this, 5, "IIS mclk %d prescaler %d freq %f hz %f\n", mclk, prescaler, freq, hz);
+	LOGMASKED(LOG_IIS_CONFIG, "%s: IIS mclk %d prescaler %d freq %f hz %f\n", machine().describe_context(), mclk, prescaler, freq, hz);
 	m_iis.timer->adjust(attotime::from_hz(hz), 0, attotime::from_hz(hz));
 }
 
 void s3c44b0_device::iis_stop()
 {
-	verboselog( *this, 1, "IIS stop\n");
+	LOGMASKED(LOG_IIS_CONTROL, "%s: IIS stop\n", machine().describe_context());
 	m_iis.timer->adjust(attotime::never, 0);
 }
 
 uint32_t s3c44b0_device::iis_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_iis.regs)[offset];
-	verboselog( *this, 9, "(IIS) %08X -> %08X\n", S3C44B0_BASE_IIS + (offset << 2), data);
+	LOGMASKED(LOG_IIS_RW, "%s: (IIS) %08X -> %08X\n", machine().describe_context(), S3C44B0_BASE_IIS + (offset << 2), data);
 	return data;
 }
 
 void s3c44b0_device::iis_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_iis.regs)[offset];
-	verboselog( *this, 9, "(IIS) %08X <- %08X\n", S3C44B0_BASE_IIS + (offset << 2), data);
+	LOGMASKED(LOG_IIS_RW, "%s: (IIS) %08X <- %08X\n", machine().describe_context(), S3C44B0_BASE_IIS + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_iis.regs)[offset]);
 	switch (offset)
 	{
@@ -1936,7 +1979,7 @@ void s3c44b0_device::iis_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 TIMER_CALLBACK_MEMBER( s3c44b0_device::iis_timer_exp )
 {
-	verboselog( *this, 2, "IIS timer callback\n");
+	LOGMASKED(LOG_IIS_TIMER, "IIS timer callback\n");
 	if ((m_iis.regs.iiscon & (1 << 5)) != 0)
 	{
 		bdma_request_iis();
@@ -1948,22 +1991,20 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::iis_timer_exp )
 void s3c44b0_device::zdma_trigger(int ch)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
-	uint32_t saddr, daddr;
-	int dal, dst, opt, das, cnt;
-	verboselog( *this, 5, "s3c44b0_zdma_trigger %d\n", ch);
-	dst = BITS(m_zdma->regs.dcsrc, 31, 30);
-	dal = BITS(m_zdma->regs.dcsrc, 29, 28);
-	saddr = BITS(m_zdma->regs.dcsrc, 27, 0);
-	verboselog( *this, 5, "dst %d dal %d saddr %08X\n", dst, dal, saddr);
-	opt = BITS(m_zdma->regs.dcdst, 31, 30);
-	das = BITS(m_zdma->regs.dcdst, 29, 28);
-	daddr = BITS(m_zdma->regs.dcdst, 27, 0);
-	verboselog( *this, 5, "opt %d das %d daddr %08X\n", opt, das, daddr);
-	cnt = BITS(m_zdma->regs.dccnt, 19, 0);
-	verboselog( *this, 5, "icnt %08X\n", cnt);
+	LOGMASKED(LOG_DMA_CONTROL, "s3c44b0_zdma_trigger %d\n", ch);
+	int const dst = BITS(m_zdma->regs.dcsrc, 31, 30);
+	int const dal = BITS(m_zdma->regs.dcsrc, 29, 28);
+	uint32_t saddr = BITS(m_zdma->regs.dcsrc, 27, 0);
+	LOGMASKED(LOG_DMA_CONTROL, "dst %d dal %d saddr %08X\n", dst, dal, saddr);
+	int const opt = BITS(m_zdma->regs.dcdst, 31, 30);
+	int const das = BITS(m_zdma->regs.dcdst, 29, 28);
+	uint32_t daddr = BITS(m_zdma->regs.dcdst, 27, 0);
+	LOGMASKED(LOG_DMA_CONTROL, "opt %d das %d daddr %08X\n", opt, das, daddr);
+	int cnt = BITS(m_zdma->regs.dccnt, 19, 0);
+	LOGMASKED(LOG_DMA_CONTROL, "icnt %08X\n", cnt);
 	while (cnt > 0)
 	{
-		verboselog( *this, 9, "[%08X] -> [%08X]\n", saddr, daddr);
+		LOGMASKED(LOG_DMA_STEP, "[%08X] -> [%08X]\n", saddr, daddr);
 		switch (dst)
 		{
 			case 0 : space.write_byte(daddr, space.read_byte(saddr)); break;
@@ -1997,7 +2038,7 @@ void s3c44b0_device::zdma_trigger(int ch)
 
 void s3c44b0_device::zdma_start(int ch)
 {
-	verboselog( *this, 5, "ZDMA %d start\n", ch);
+	LOGMASKED(LOG_DMA_CONTROL, "%s: ZDMA %d start\n", machine().describe_context(), ch);
 	m_zdma->regs.dcsrc = m_zdma->regs.disrc;
 	m_zdma->regs.dcdst = m_zdma->regs.didst;
 	m_zdma->regs.dccnt = m_zdma->regs.dicnt;
@@ -2034,33 +2075,33 @@ void s3c44b0_device::zdma_w(int ch, uint32_t offset, uint32_t data, uint32_t mem
 uint32_t s3c44b0_device::zdma_0_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = zdma_r(0, offset);
-	verboselog( *this, 9, "(ZDMA 0) %08X -> %08X\n", S3C44B0_BASE_ZDMA_0 + (offset << 2), data);
+	LOGMASKED(LOG_DMA_RW, "%s: (ZDMA 0) %08X -> %08X\n", machine().describe_context(), S3C44B0_BASE_ZDMA_0 + (offset << 2), data);
 	return data;
 }
 
 uint32_t s3c44b0_device::zdma_1_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = zdma_r(1, offset);
-	verboselog( *this, 9, "(ZDMA 1) %08X -> %08X\n", S3C44B0_BASE_ZDMA_1 + (offset << 2), data);
+	LOGMASKED(LOG_DMA_RW, "(%s: ZDMA 1) %08X -> %08X\n", machine().describe_context(), S3C44B0_BASE_ZDMA_1 + (offset << 2), data);
 	return data;
 }
 
 void s3c44b0_device::zdma_0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	verboselog( *this, 9, "(ZDMA 0) %08X <- %08X (%08X)\n", S3C44B0_BASE_ZDMA_0 + (offset << 2), data, mem_mask);
+	LOGMASKED(LOG_DMA_RW, "(%s: ZDMA 0) %08X <- %08X (%08X)\n", machine().describe_context(), S3C44B0_BASE_ZDMA_0 + (offset << 2), data, mem_mask);
 	zdma_w(0, offset, data, mem_mask);
 }
 
 void s3c44b0_device::zdma_1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	verboselog( *this, 9, "(ZDMA 1) %08X <- %08X (%08X)\n", S3C44B0_BASE_ZDMA_1 + (offset << 2), data, mem_mask);
+	LOGMASKED(LOG_DMA_RW, "(%s: ZDMA 1) %08X <- %08X (%08X)\n", machine().describe_context(), S3C44B0_BASE_ZDMA_1 + (offset << 2), data, mem_mask);
 	zdma_w(1, offset, data, mem_mask);
 }
 
 TIMER_CALLBACK_MEMBER( s3c44b0_device::zdma_timer_exp )
 {
 	int ch = param;
-	verboselog( *this, 2, "ZDMA %d timer callback\n", ch);
+	LOGMASKED(LOG_DMA_TIMER, "ZDMA %d timer callback\n", ch);
 }
 
 /* BDMA */
@@ -2068,20 +2109,18 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::zdma_timer_exp )
 void s3c44b0_device::bdma_trigger(int ch)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
-	uint32_t saddr, daddr;
-	int dal, dst, tdm, das, cnt;
-	verboselog( *this, 5, "s3c44b0_bdma_trigger %d\n", ch);
-	dst = BITS(m_bdma->regs.dcsrc, 31, 30);
-	dal = BITS(m_bdma->regs.dcsrc, 29, 28);
-	saddr = BITS(m_bdma->regs.dcsrc, 27, 0);
-	verboselog( *this, 5, "dst %d dal %d saddr %08X\n", dst, dal, saddr);
-	tdm = BITS(m_bdma->regs.dcdst, 31, 30);
-	das = BITS(m_bdma->regs.dcdst, 29, 28);
-	daddr = BITS(m_bdma->regs.dcdst, 27, 0);
-	verboselog( *this, 5, "tdm %d das %d daddr %08X\n", tdm, das, daddr);
-	cnt = BITS(m_bdma->regs.dccnt, 19, 0);
-	verboselog( *this, 5, "icnt %08X\n", cnt);
-	verboselog( *this, 9, "[%08X] -> [%08X]\n", saddr, daddr);
+	LOGMASKED(LOG_DMA_CONTROL, "s3c44b0_bdma_trigger %d\n", ch);
+	int const dst = BITS(m_bdma->regs.dcsrc, 31, 30);
+	int const dal = BITS(m_bdma->regs.dcsrc, 29, 28);
+	uint32_t saddr = BITS(m_bdma->regs.dcsrc, 27, 0);
+	LOGMASKED(LOG_DMA_CONTROL, "dst %d dal %d saddr %08X\n", dst, dal, saddr);
+	int const tdm = BITS(m_bdma->regs.dcdst, 31, 30);
+	int const das = BITS(m_bdma->regs.dcdst, 29, 28);
+	uint32_t daddr = BITS(m_bdma->regs.dcdst, 27, 0);
+	LOGMASKED(LOG_DMA_CONTROL, "tdm %d das %d daddr %08X\n", tdm, das, daddr);
+	int cnt = BITS(m_bdma->regs.dccnt, 19, 0);
+	LOGMASKED(LOG_DMA_CONTROL, "icnt %08X\n", cnt);
+	LOGMASKED(LOG_DMA_STEP, "[%08X] -> [%08X]\n", saddr, daddr);
 	switch (dst)
 	{
 		case 0 : space.write_byte(daddr, space.read_byte(saddr)); break;
@@ -2114,7 +2153,7 @@ void s3c44b0_device::bdma_trigger(int ch)
 
 void s3c44b0_device::bdma_request_iis()
 {
-	verboselog( *this, 5, "s3c44b0_bdma_request_iis\n");
+	LOGMASKED(LOG_DMA_CONTROL, "s3c44b0_bdma_request_iis\n");
 	bdma_trigger(0);
 }
 
@@ -2126,7 +2165,7 @@ uint32_t s3c44b0_device::bdma_r(int ch, uint32_t offset)
 
 void s3c44b0_device::bdma_start(int ch)
 {
-	verboselog( *this, 5, "BDMA %d start\n", ch);
+	LOGMASKED(LOG_DMA_CONTROL, "%s: BDMA %d start\n", machine().describe_context(), ch);
 	int qsc = BITS(m_bdma->regs.dicnt, 31, 30);
 	if ((ch == 0) && (qsc == 1))
 	{
@@ -2143,7 +2182,7 @@ void s3c44b0_device::bdma_start(int ch)
 
 void s3c44b0_device::bdma_stop(int ch)
 {
-	verboselog( *this, 5, "BDMA %d stop\n", ch);
+	LOGMASKED(LOG_DMA_CONTROL, "%s: BDMA %d stop\n", machine().describe_context(), ch);
 	m_bdma[ch].timer->adjust(attotime::never, ch);
 }
 
@@ -2174,31 +2213,31 @@ void s3c44b0_device::bdma_w(int ch, uint32_t offset, uint32_t data, uint32_t mem
 uint32_t s3c44b0_device::bdma_0_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = bdma_r(0, offset);
-	verboselog( *this, 9, "(BDMA 0) %08X -> %08X\n", S3C44B0_BASE_BDMA_0 + (offset << 2), data);
+	LOGMASKED(LOG_DMA_RW, "%s: (BDMA 0) %08X -> %08X\n", machine().describe_context(), S3C44B0_BASE_BDMA_0 + (offset << 2), data);
 	return data;
 }
 
 uint32_t s3c44b0_device::bdma_1_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = bdma_r(1, offset);
-	verboselog( *this, 9, "(BDMA 1) %08X -> %08X\n", S3C44B0_BASE_BDMA_1 + (offset << 2), data);
+	LOGMASKED(LOG_DMA_RW, "%s: (BDMA 1) %08X -> %08X\n", machine().describe_context(), S3C44B0_BASE_BDMA_1 + (offset << 2), data);
 	return data;
 }
 
 void s3c44b0_device::bdma_0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	verboselog( *this, 9, "(BDMA 0) %08X <- %08X (%08X)\n", S3C44B0_BASE_BDMA_0 + (offset << 2), data, mem_mask);
+	LOGMASKED(LOG_DMA_RW, "%s: (BDMA 0) %08X <- %08X (%08X)\n", machine().describe_context(), S3C44B0_BASE_BDMA_0 + (offset << 2), data, mem_mask);
 	bdma_w(0, offset, data, mem_mask);
 }
 
 void s3c44b0_device::bdma_1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	verboselog( *this, 9, "(BDMA 1) %08X <- %08X (%08X)\n", S3C44B0_BASE_BDMA_1 + (offset << 2), data, mem_mask);
+	LOGMASKED(LOG_DMA_RW, "%s: (BDMA 1) %08X <- %08X (%08X)\n", machine().describe_context(), S3C44B0_BASE_BDMA_1 + (offset << 2), data, mem_mask);
 	bdma_w(1, offset, data, mem_mask);
 }
 
 TIMER_CALLBACK_MEMBER( s3c44b0_device::bdma_timer_exp )
 {
 	int ch = param;
-	verboselog( *this, 2, "BDMA %d timer callback\n", ch);
+	LOGMASKED(LOG_DMA_TIMER, "BDMA %d timer callback\n", ch);
 }

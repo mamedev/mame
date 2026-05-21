@@ -16,7 +16,7 @@ General Layout
 Pos   Len   Description
    80    01 card ID (00 for SN-R8-01, 01 for SN-R8-02, etc.)
    81    01 number of tones
-   82    0E padding (byte 0xFF)
+   82    0E padding (byte 0xff)
    90    70 tone offsets, 2 bytes per offset, relative to 0x100, each value points to the start of a "tone" definition
   100   500 tone list
   600   200 demo song header?
@@ -28,17 +28,17 @@ Tone List (address: 0x100)
 ---------
 Pos Len Description
 00  08  tone name
-08  01  ?? (always 0x8F)
+08  01  ?? (always 0x8f)
 09  01  ??
-0A  01  frequency (0xE0 == 44100 Hz)
+0A  01  frequency (0xe0 == 44100 Hz)
 0B  02  ??
 0C  02  sample A bank/flags
         sample cards:
-            Bit 10 (0x0400) = bank (0 = card offsets 0x00000..0x3FFFF, 1 = card offsets 0x40000..0x7FFFF)
+            Bit 10 (0x0400) = bank (0 = card offsets 0x00000..0x3ffff, 1 = card offsets 0x40000..0x7ffff)
         R8 internal ROM:
-            Bit 10 (0x0400) = bank bit 0 (0 = offsets 0x00000..0x3FFFF, 1 = offsets 0x40000..0x7FFFF)
-            Bit 12 (0x1000) = bank bit 1 (0 = offsets 0x00000..0x7FFFF, 1 = offsets 0x80000..0xFFFFF)
-        Bits 14-15 (0xC000) - play/loop mode
+            Bit 10 (0x0400) = bank bit 0 (0 = offsets 0x00000..0x3ffff, 1 = offsets 0x40000..0x7ffff)
+            Bit 12 (0x1000) = bank bit 1 (0 = offsets 0x00000..0x7ffff, 1 = offsets 0x80000..0xfffff)
+        Bits 14-15 (0xc000) - play/loop mode
             0 = normal loop
             1 = no loop? (not used)
             2 = ping-pong 1? (forwards, backwards, forwards, backwards, ...)
@@ -64,11 +64,11 @@ Pos Len Description
 -> 30h bytes per entry
 
 "sample A" is what is heard. The use for "sample B" is unknown.
-The 8 unknwon consecutive bytes (0x16..0x1D and 0x28..0x2F) are probably related to the envelope generation.
+The 8 unknown consecutive bytes (0x16..0x1d and 0x28..0x2f) are probably related to the envelope generation.
 
 
-R8/R8M internal tone list offsets: 0x018C10
-R8/R8M internal tone list data: 0x018CA0
+R8/R8M internal tone list offsets: 0x018c10
+R8/R8M internal tone list data: 0x018ca0
 R8 mkII doesn't seem to store the tone list in the program ROM.
 
 */
@@ -90,11 +90,11 @@ R8 mkII doesn't seem to store the tone list in the program ROM.
 namespace {
 
 // PCM card address line scrambling
-#define UNSCRAMBLE_ADDR_EXT(_offset) \
-	bitswap<19>(_offset,18,17, 8, 9,16,11,12, 7,14,10,13,15, 3, 2, 1, 6, 4, 5, 0)
+template <typename T> constexpr auto UNSCRAMBLE_ADDR(T &&offset)
+{ return bitswap<19>(offset,18,17,15,14,16,12,11, 7, 9,13,10, 8, 3, 2, 1, 6, 4, 5, 0); }
 
-#define UNSCRAMBLE_DATA(_data) \
-	bitswap<8>(_data,1,2,7,3,5,0,4,6)
+constexpr u8 UNSCRAMBLE_DATA(u8 data)
+{ return bitswap<8>(data,1,2,7,3,5,0,4,6); }
 
 // PCM card offsets in PCM chip memory space
 // Right now this is an assumption based on the existing sample tables and wasn't confirmed with the firmware yet.
@@ -111,16 +111,16 @@ public:
 	{
 	}
 
-	void r8_common(machine_config &config);
-	void init_r8();
+	void r8_common(machine_config &config) ATTR_COLD;
+	void init_r8() ATTR_COLD;
 
 protected:
 	void mk1_map(address_map &map) ATTR_COLD;
 	void mk2_map(address_map &map) ATTR_COLD;
 
-	std::pair<std::error_condition, std::string> pcmrom_load(generic_slot_device* pcmcard, int card_id, device_image_interface &image);
+	std::pair<std::error_condition, std::string> pcmrom_load(generic_slot_device *pcmcard, int card_id, device_image_interface &image);
 	void pcmrom_unload(int card_id);
-	void descramble_rom_external(u8* dst, const u8* src);
+	void descramble_pcm_rom(u8 *dst, const u8 *src);
 
 	required_device<upd78k2_device> m_maincpu;
 	required_device<mb87419_mb87420_device> m_pcm;
@@ -188,7 +188,7 @@ private:
 
 std::pair<std::error_condition, std::string> roland_r8_base_state::pcmrom_load(generic_slot_device *pcmcard, int card_id, device_image_interface &image)
 {
-	uint32_t const size = pcmcard->common_get_size("rom");
+	u32 const size = pcmcard->common_get_size("rom");
 	if (size > PCMCARD_SIZE)
 		return std::make_pair(image_error::INVALIDLENGTH, "Invalid size (maximum supported is 512K)");
 
@@ -197,10 +197,10 @@ std::pair<std::error_condition, std::string> roland_r8_base_state::pcmrom_load(g
 	u8 *base = pcmcard->get_rom_base();
 	if (size < PCMCARD_SIZE)
 	{
-		uint32_t mirror = (1 << (31 - count_leading_zeros_32(size)));
+		u32 mirror = (1 << (31 - count_leading_zeros_32(size)));
 		if (mirror < 0x020000)  // due to how address descrambling works, we can currently only do mirroring for 128K pages
 			mirror = 0x020000;
-		for (uint32_t ofs = mirror; ofs < PCMCARD_SIZE; ofs += mirror)
+		for (u32 ofs = mirror; ofs < PCMCARD_SIZE; ofs += mirror)
 			memcpy(base + ofs, base, mirror);
 	}
 
@@ -209,7 +209,7 @@ std::pair<std::error_condition, std::string> roland_r8_base_state::pcmrom_load(g
 	u8 *dst = reinterpret_cast<u8 *>(memregion("pcm")->base());
 	memcpy(&src[pcm_addr], base, PCMCARD_SIZE);
 	// descramble PCM card ROM
-	descramble_rom_external(&dst[pcm_addr], &src[pcm_addr]);
+	descramble_pcm_rom(&dst[pcm_addr], &src[pcm_addr]);
 	//pcmard_loaded[card_id] = true;
 
 	return std::make_pair(std::error_condition(), std::string());
@@ -283,7 +283,7 @@ void roland_r8m_state::r8m(machine_config &config)
 	UPD78213(config.replace(), m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_r8m_state::mk1_map);
 
-	for (auto& pcmcard : m_pcmcards)
+	for (auto &pcmcard : m_pcmcards)
 		GENERIC_CARTSLOT(config, pcmcard, generic_romram_plain_slot, "r8_card", "bin");
 	m_pcmcards[0]->set_device_load(FUNC(roland_r8m_state::pcmcard0_load));
 	m_pcmcards[0]->set_device_unload(FUNC(roland_r8m_state::pcmcard0_unload));
@@ -326,18 +326,18 @@ void roland_r8_base_state::init_r8()
 
 	for (offs_t addr = 0; addr < memregion("pcmorg")->bytes(); addr += 0x100000)
 	{
-		// TODO: descramble internal ROMs
-		memcpy(&dst[addr + 0x00000], &src[addr + 0x00000], 0x80000);
+		// descramble internal ROMs
+		descramble_pcm_rom(&dst[addr + 0x00000], &src[addr + 0x00000]);
 		// descramble PCM card ROMs
-		descramble_rom_external(&dst[addr + 0x80000], &src[addr + 0x80000]);
+		descramble_pcm_rom(&dst[addr + 0x80000], &src[addr + 0x80000]);
 	}
 }
 
-void roland_r8_base_state::descramble_rom_external(u8* dst, const u8* src)
+void roland_r8_base_state::descramble_pcm_rom(u8 *dst, const u8 *src)
 {
 	for (offs_t srcpos = 0x00; srcpos < PCMCARD_SIZE; srcpos ++)
 	{
-		offs_t dstpos = UNSCRAMBLE_ADDR_EXT(srcpos);
+		offs_t dstpos = UNSCRAMBLE_ADDR(srcpos);
 		dst[dstpos] = UNSCRAMBLE_DATA(src[srcpos]);
 	}
 }
@@ -349,7 +349,7 @@ ROM_START(r8)
 
 	ROM_REGION(0x200000, "pcmorg", ROMREGION_ERASE00) // ROMs before descrambling
 	ROM_LOAD("r15179929-mn234000rle.ic30", 0x000000, 0x080000, NO_DUMP)
-	// 0x80000..0xFFFFF is reserved for PCM cards, according to the sample list
+	// 0x80000..0xfffff is reserved for PCM cards, according to the sample list
 	ROM_LOAD("r15179930-mn234000rlf.ic31", 0x100000, 0x080000, NO_DUMP)
 	ROM_REGION(0x200000, "pcm", ROMREGION_ERASE00) // ROMs after descrambling
 ROM_END
@@ -361,7 +361,7 @@ ROM_START(r8m)
 	ROM_REGION(0x400000, "pcmorg", ROMREGION_ERASE00) // ROMs before descrambling (must be large enough to allow for 3 PCM cards at offsets 0.5M, 1.5M and 2.5M)
 	// same ROMs as R-8 assumed
 	ROM_LOAD("r15179929-mn234000rle.bin", 0x000000, 0x080000, NO_DUMP)
-	// 0x80000..0xFFFFF is reserved for PCM cards, according to the sample list
+	// 0x80000..0xfffff is reserved for PCM cards, according to the sample list
 	ROM_LOAD("r15179930-mn234000rlf.bin", 0x100000, 0x080000, NO_DUMP)
 	ROM_REGION(0x400000, "pcm", ROMREGION_ERASE00) // ROMs after descrambling
 ROM_END

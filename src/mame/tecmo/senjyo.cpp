@@ -1179,6 +1179,11 @@ ROM_START( starforcb )
 
 	ROM_REGION( 0x0020, "dac", 0 )
 	ROM_LOAD( "a18s030.7b",    0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )  // waveform
+
+	// on a piggyback PCB with a standard D780C and logic, to mimic the SEGA encrypted CPU behavior
+	ROM_REGION( 0x0120, "decryption_proms", 0 )
+	ROM_LOAD( "tbp21s10n.bin",  0x000, 0x100, CRC(a439a677) SHA1(7baaaee0d267866e05b552743e0d483fea10bbc9) )
+	ROM_LOAD( "tbp18s030n.bin", 0x100, 0x020, CRC(d74eb481) SHA1(e185ceb1f52fb08e4e19c53a6db1e0ba1e3fdb5e) )
 ROM_END
 
 ROM_START( starforca )

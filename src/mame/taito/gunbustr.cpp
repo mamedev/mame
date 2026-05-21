@@ -46,11 +46,13 @@
 
 #include "emu.h"
 
+#include "gunbustr_link.h"
 #include "taito_en.h"
 #include "taitoio.h"
 #include "tc0480scp.h"
 
 #include "cpu/m68000/m68020.h"
+#include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/es5506.h"
 
@@ -76,27 +78,24 @@ class gunbustr_state : public driver_device
 public:
 	gunbustr_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
+		m_maincpu(*this, "maincpu"),
 		m_tc0480scp(*this, "tc0480scp"),
-		m_ram(*this,"ram"),
-		m_spriteram(*this,"spriteram"),
+		m_ram(*this, "ram"),
+		m_spriteram(*this, "spriteram"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_spritemap(*this, "spritemap"),
-		m_io_light_x(*this, "LIGHT%u_X", 0U),
-		m_io_light_y(*this, "LIGHT%u_Y", 0U),
+		m_io_light_x(*this, "%uP_VRH", 1U),
+		m_io_light_y(*this, "%uP_VRV", 1U),
 		m_gun_recoil_pl(*this, "Player%u_Gun_Recoil", 1U),
 		m_hit_lamp(*this, "Hit_lamp")
 
 	{
-		m_coin_lockout = true;
 	}
 
-	void gunbustr(machine_config &config);
-
-	void init_gunbustrj();
-	void init_gunbustr();
+	void gunbustr(machine_config &config) ATTR_COLD;
+	void gunbustrj(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -104,13 +103,9 @@ protected:
 private:
 	void prg_map(address_map &map) ATTR_COLD;
 
-	TIMER_CALLBACK_MEMBER(trigger_irq5);
-
 	void motor_control_w(u32 data);
-	u32 gun_r();
-	void gun_w(u32 data);
-	u32 main_cycle_r();
 	void coin_word_w(u8 data);
+	void coin_word_lockout_w(u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gunbustr_interrupt);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const u32 *primasks, int x_offs, int y_offs);
@@ -139,9 +134,7 @@ private:
 		int primask = 0;
 	};
 
-	bool m_coin_lockout;
 	std::unique_ptr<gb_tempsprite[]> m_spritelist{};
-	emu_timer *m_interrupt5_timer = nullptr;
 };
 
 
@@ -236,6 +229,10 @@ void gunbustr_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		zoomy += 1;
 
 		y += y_offs;
+
+		// Offset for flip start position
+		// For some reason X doesn't need this
+		if (flipy) { y += 0x80 - zoomy; }
 
 		// treat coords as signed
 		if (x > 0x340) x -= 0x400;
@@ -377,28 +374,24 @@ u32 gunbustr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 /*********************************************************************/
 
-TIMER_CALLBACK_MEMBER(gunbustr_state::trigger_irq5)
-{
-	m_maincpu->set_input_line(5, HOLD_LINE);
-}
-
 INTERRUPT_GEN_MEMBER(gunbustr_state::gunbustr_interrupt)
 {
-	m_interrupt5_timer->adjust(m_maincpu->cycles_to_attotime(200000 - 500));
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
 void gunbustr_state::coin_word_w(u8 data)
 {
-	if (m_coin_lockout)
-	{
-		machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
-		machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
-	}
-
 	// game does not write a separate counter for coin 2! maybe in linked mode?
-	machine().bookkeeping().coin_counter_w(0, data & 0x04);
-	machine().bookkeeping().coin_counter_w(1, data & 0x04);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
+}
+
+void gunbustr_state::coin_word_lockout_w(u8 data)
+{
+	coin_word_w(data);
+
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 0));
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 1));
 }
 
 void gunbustr_state::motor_control_w(u32 data)
@@ -411,37 +404,24 @@ void gunbustr_state::motor_control_w(u32 data)
 }
 
 
-
-u32 gunbustr_state::gun_r()
-{
-	return (m_io_light_x[0]->read() << 24) | (m_io_light_y[0]->read() << 16) |
-			(m_io_light_x[1]->read() << 8)  |  m_io_light_y[1]->read();
-}
-
-void gunbustr_state::gun_w(u32 data)
-{
-	// 10000 cycle delay is arbitrary
-	m_interrupt5_timer->adjust(m_maincpu->cycles_to_attotime(10000));
-}
-
-
 /***********************************************************
              MEMORY STRUCTURES
 ***********************************************************/
 
 void gunbustr_state::prg_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x21ffff).ram().share(m_ram); // main CPUA RAM
 	map(0x300000, 0x301fff).ram().share(m_spriteram);
 	map(0x380000, 0x380003).w(FUNC(gunbustr_state::motor_control_w)); // motor, lamps etc.
 	map(0x390000, 0x3907ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)); // Sound shared RAM
 	map(0x400000, 0x400007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
-	map(0x500000, 0x500003).rw(FUNC(gunbustr_state::gun_r), FUNC(gunbustr_state::gun_w));
+	map(0x500000, 0x500007).rw("adc", FUNC(adc0809_device::data_r), FUNC(adc0809_device::address_offset_start_w));
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0x900000, 0x901fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0xc00000, 0xc03fff).ram(); // network RAM ?
+	map(0xc00000, 0xc007ff).mirror(0x003800).m("link", FUNC(gunbustr_link_device::map)); // shared RAM for link - is this actually mirrored or is 0xc00800-0xc03fff unmapped?
 }
 
 /***********************************************************
@@ -491,16 +471,16 @@ static INPUT_PORTS_START( gunbustr )
 
 	// Light gun inputs
 
-	PORT_START("LIGHT0_X")
+	PORT_START("1P_VRH")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
-	PORT_START("LIGHT0_Y")
+	PORT_START("1P_VRV")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("LIGHT1_X")
+	PORT_START("2P_VRH")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(2)
 
-	PORT_START("LIGHT1_Y")
+	PORT_START("2P_VRV")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_REVERSE PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -545,8 +525,24 @@ void gunbustr_state::gunbustr(machine_config &config)
 	tc0510nio.write_3_callback().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(5);
 	tc0510nio.write_3_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(6);
 	tc0510nio.write_3_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(4);
+	tc0510nio.write_4_callback().set(FUNC(gunbustr_state::coin_word_lockout_w));
 	tc0510nio.write_4_callback().set(FUNC(gunbustr_state::coin_word_w));
 	tc0510nio.read_7_callback().set_ioport("SYSTEM");
+
+	// TODO: unknown clock, 20 MHz to a F163 output to QD then to ADC CLK
+	adc0809_device &adc(ADC0809(config, "adc", 500'000));
+	adc.eoc_ff_callback().set_inputline("maincpu", 5);
+	adc.in_callback<0>().set_ioport("1P_VRH");
+	adc.in_callback<1>().set_ioport("1P_VRV");
+	adc.in_callback<2>().set_ioport("2P_VRH");
+	adc.in_callback<3>().set_ioport("2P_VRV");
+	// floating on schematics, unused by the game
+	adc.in_callback<4>().set_constant(0xff);
+	adc.in_callback<5>().set_constant(0xff);
+	adc.in_callback<6>().set_constant(0xff);
+	adc.in_callback<7>().set_constant(0xff);
+
+	GUNBUSTR_LINK(config, "link", 0);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -562,7 +558,7 @@ void gunbustr_state::gunbustr(machine_config &config)
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_palette(m_palette);
-	m_tc0480scp->set_offsets(0x20, 0x07);
+	m_tc0480scp->set_offsets(0x20, 0x08);
 	m_tc0480scp->set_offsets_tx(-1, -1);
 	m_tc0480scp->set_offsets_flip(-1, 0);
 
@@ -572,6 +568,14 @@ void gunbustr_state::gunbustr(machine_config &config)
 	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
 	taito_en.add_route(0, "speaker", 1.0, 0);
 	taito_en.add_route(1, "speaker", 1.0, 1);
+}
+
+void gunbustr_state::gunbustrj(machine_config &config)
+{
+	gunbustr(config);
+
+	// no coin lockout, perhaps this was a prototype version without proper coin handling?
+	subdevice<tc0510nio_device>("tc0510nio")->write_4_callback().set(FUNC(gunbustr_state::coin_word_w));
 }
 
 /***************************************************************************/
@@ -678,33 +682,9 @@ ROM_START( gunbustrj )
 	ROM_LOAD16_WORD( "eeprom-gunbustr.bin", 0x0000, 0x0080, CRC(ef3685a1) SHA1(899b4b6dd2fd78be3a2ce00a2ef1840de9f122c3) )
 ROM_END
 
-u32 gunbustr_state::main_cycle_r()
-{
-	if (m_maincpu->pc() == 0x55a && (m_ram[0x3acc / 4] & 0xff000000) == 0)
-		m_maincpu->spin_until_interrupt();
-
-	return m_ram[0x3acc/4];
-}
-
-void gunbustr_state::init_gunbustr()
-{
-	// Speedup handler
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x203acc, 0x203acf, read32smo_delegate(*this, FUNC(gunbustr_state::main_cycle_r)));
-
-	m_interrupt5_timer = timer_alloc(FUNC(gunbustr_state::trigger_irq5), this);
-}
-
-void gunbustr_state::init_gunbustrj()
-{
-	init_gunbustr();
-
-	// no coin lockout, perhaps this was a prototype version without proper coin handling?
-	m_coin_lockout = false;
-}
-
 } // anonymous namespace
 
 
-GAME( 1992, gunbustr,  0,        gunbustr, gunbustr, gunbustr_state, init_gunbustr, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Gunbuster (World)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gunbustru, gunbustr, gunbustr, gunbustr, gunbustr_state, init_gunbustr, ORIENTATION_FLIP_X, "Taito America Corporation", "Gunbuster (US)",    MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gunbustrj, gunbustr, gunbustr, gunbustr, gunbustr_state, init_gunbustrj,ORIENTATION_FLIP_X, "Taito Corporation",         "Gunbuster (Japan)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gunbustr,  0,        gunbustr,  gunbustr, gunbustr_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Gunbuster (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gunbustru, gunbustr, gunbustr,  gunbustr, gunbustr_state, empty_init, ORIENTATION_FLIP_X, "Taito America Corporation", "Gunbuster (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gunbustrj, gunbustr, gunbustrj, gunbustr, gunbustr_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation",         "Gunbuster (Japan)", MACHINE_SUPPORTS_SAVE )

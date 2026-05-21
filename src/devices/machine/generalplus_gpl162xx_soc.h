@@ -12,17 +12,22 @@
 #pragma once
 
 #include "cpu/unsp/unsp.h"
+#include "machine/timer.h"
+
 #include "screen.h"
 #include "emupal.h"
+
+#include "generalplus_gpl_dma.h"
+#include "generalplus_gpl_timebase.h"
 #include "generalplus_gpl162xx_soc_video.h"
 #include "spg2xx_audio.h"
 
-typedef device_delegate<void (uint16_t, uint16_t, uint16_t, uint16_t, uint16_t)> sunplus_gcm394_cs_callback_device;
+typedef device_delegate<void (u16, u16, u16, u16, u16)> sunplus_gcm394_cs_callback_device;
 
 class sunplus_gcm394_base_device : public unsp_20_device, public device_mixer_interface
 {
 public:
-	sunplus_gcm394_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+	sunplus_gcm394_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 		sunplus_gcm394_base_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(sunplus_gcm394_base_device::gcm394_internal_map), this))
 	{
 	}
@@ -43,6 +48,9 @@ public:
 
 	auto nand_read_callback() { return m_nand_read_cb.bind(); }
 
+	// hack for beijuehh / bornkidh
+	void disable_timebase_interrupts() { m_disable_timebase_interrupts = true; }
+
 	template <typename... T> void set_cs_config_callback(T &&... args) { m_cs_callback.set(std::forward<T>(args)...); }
 	template <typename T> void set_cs_space(T &&tag, int no)
 	{
@@ -50,27 +58,26 @@ public:
 		m_spg_video.lookup()->set_cs_video_space(tag, no, m_csbase);
 	}
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return m_spg_video->screen_update(screen, bitmap, cliprect); }
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return m_spg_video->screen_update(screen, bitmap, cliprect); }
 
 	void vblank(int state) { m_spg_video->vblank(state); }
 
 	void set_bootmode(int mode) { m_boot_mode = mode; }
-	void set_alt_periodic_irq(bool alt) { m_alt_periodic_irq = alt; }
 
 	IRQ_CALLBACK_MEMBER(irq_vector_cb);
-	void default_cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4 );
+	void default_cs_callback(u16 cs0, u16 cs1, u16 cs2, u16 cs3, u16 cs4 );
 
 	void set_legacy_video_mode() { m_spg_video->set_legacy_video_mode(); }
 	void set_disallow_resolution_control() { m_spg_video->set_disallow_resolution_control(); }
 
 	void set_romtype(int romtype) { m_romtype = romtype; }
 
-	uint16_t get_ram_addr(uint32_t addr) { return m_mainram[addr]; }
+	u16 get_ram_addr(u32 addr) { return m_mainram[addr]; }
 
 protected:
-	sunplus_gcm394_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor internal);
+	sunplus_gcm394_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal);
 
-	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;
@@ -96,257 +103,259 @@ protected:
 
 	devcb_read16 m_nand_read_cb;
 	optional_address_space m_cs_space;
-	uint32_t m_csbase;
-
-	uint16_t m_dma_params[8][4];
-	bool m_dma_latched[4];
+	u32 m_csbase;
 
 	// unk 78xx
-	uint16_t m_7803;
+	u16 m_sys_ctrl;
 
-	uint16_t m_7807;
+	u16 m_clock_ctrl;
 
-	uint16_t m_membankswitch_7810;
+	u16 m_membankswitch_7810;
 
-	uint16_t m_7816;
-	uint16_t m_7817;
+	u16 m_7816;
+	u16 m_pllchange;
 
-	uint16_t m_7819;
+	u16 m_cache_ctrl;
 
-	uint16_t m_782x[5];
+	u16 m_782x[5];
 
-	uint16_t m_782d;
+	u16 m_782d;
 
-	uint16_t m_7835;
+	u16 m_7835;
 
-	uint16_t m_7860;
+	u16 m_7862_porta_direction;
+	u16 m_7863_porta_attribute;
 
-	uint16_t m_7861;
+	u16 m_786a_portb_direction;
+	u16 m_786b_portb_attribute;
 
-	uint16_t m_7862_porta_direction;
-	uint16_t m_7863_porta_attribute;
+	u16 m_7872_portc_direction;
+	u16 m_7873_portc_attribute;
 
-	uint16_t m_786a_portb_direction;
-	uint16_t m_786b_portb_attribute;
+	u16 m_787a_portd_direction;
+	u16 m_787b_portd_attribute;
 
-	uint16_t m_7872_portc_direction;
-	uint16_t m_7873_portc_attribute;
+	u16 m_ioc_data;
 
-	uint16_t m_787a_portd_direction;
-	uint16_t m_787b_portd_attribute;
+	u16 m_ioe_dir;
+	u16 m_ioe_attrib;
 
-	uint16_t m_7870;
+	u16 m_int_status1;
 
-	//uint16_t m_7871;
+	u16 m_int_priority_1;
+	u16 m_int_priority_2;
+	u16 m_int_priority_3;
 
+	u16 m_misc_int_ctrl;
 
-	uint16_t m_7882;
-	uint16_t m_7883;
+	u16 m_cha_ctrl;
 
-	uint16_t m_78a0;
-
-	uint16_t m_78a4;
-	uint16_t m_78a5;
-	uint16_t m_78a6;
-
-	uint16_t m_78a8;
-
-	uint16_t m_78b0;
-	uint16_t m_78b1;
-	uint16_t m_78b2;
-
-	uint16_t m_78b8;
-
-	uint16_t m_78f0;
-
-	uint16_t m_78fb;
+	u16 m_dac_pga;
 
 	// unk 79xx
-	uint16_t m_7934;
-	uint16_t m_7935;
-	uint16_t m_7936;
+	u16 m_rtc_ctrl;
+	u16 m_rtc_int_status;
+	u16 m_rtc_int_ctrl;
 
-	uint16_t m_7960;
-	uint16_t m_7961;
+	u16 m_adc_setup;
+	u16 m_madc_ctrl;
 
-	uint16_t m_system_dma_memtype;
+	u16 m_timera_ctrl;
+	u16 m_timerb_ctrl;
 
-	uint16_t internalrom_lower32_r(offs_t offset);
 
-	uint16_t cs_space_r(offs_t offset);
-	void cs_space_w(offs_t offset, uint16_t data);
-	uint16_t cs_bank_space_r(offs_t offset);
-	void cs_bank_space_w(offs_t offset, uint16_t data);
+	u16 internalrom_lower32_r(offs_t offset);
+
+	u16 cs_space_r(offs_t offset);
+	void cs_space_w(offs_t offset, u16 data);
+	u16 cs_bank_space_r(offs_t offset);
+	void cs_bank_space_w(offs_t offset, u16 data);
 	int m_romtype;
 
-private:
+protected:
 	devcb_read16 m_space_read_cb;
 	devcb_write16 m_space_write_cb;
 	devcb_write_line m_dma_complete_cb;
 
-	uint16_t unk_r(offs_t offset);
-	void unk_w(offs_t offset, uint16_t data);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_a_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_b_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_c_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_e_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_f_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(scheduler_cb);
 
-	void write_dma_params(int channel, int offset, uint16_t data);
-	uint16_t read_dma_params(int channel, int offset);
-	void trigger_systemm_dma(int channel);
+	u16 unk_r(offs_t offset);
+	void unk_w(offs_t offset, u16 data);
 
-	uint16_t system_dma_params_channel0_r(offs_t offset);
-	void system_dma_params_channel0_w(offs_t offset, uint16_t data);
-	uint16_t system_dma_params_channel1_r(offs_t offset);
-	void system_dma_params_channel1_w(offs_t offset, uint16_t data);
-	uint16_t system_dma_params_channel2_r(offs_t offset);
-	void system_dma_params_channel2_w(offs_t offset, uint16_t data);
-	uint16_t system_dma_params_channel3_r(offs_t offset);
-	void system_dma_params_channel3_w(offs_t offset, uint16_t data);
-	uint16_t system_dma_status_r();
-	void system_dma_7abf_unk_w(uint16_t data);
-	uint16_t system_dma_memtype_r();
-	void system_dma_memtype_w(uint16_t data);
 
-	uint16_t unkarea_780f_status_r();
-	uint16_t unkarea_78fb_status_r();
+	u16 power_state_r();
+	u16 dac_pga_r();
 
-	uint16_t unkarea_7803_r();
-	void unkarea_7803_w(uint16_t data);
+	u16 sys_ctrl_r();
+	void sys_ctrl_w(u16 data);
 
-	void unkarea_7807_w(uint16_t data);
+	void clock_ctrl_w(u16 data);
 
-	void waitmode_enter_780c_w(uint16_t data);
+	u16 clk_ctrl0_r();
+	void clk_ctrl0_w(u16 data);
 
-	uint16_t membankswitch_7810_r();
-	void membankswitch_7810_w(uint16_t data);
+	void waitmode_enter_780c_w(u16 data);
 
-	void unkarea_7816_w(uint16_t data);
-	void unkarea_7817_w(uint16_t data);
+	u16 membankswitch_7810_r();
+	void membankswitch_7810_w(u16 data);
 
-	uint16_t unkarea_7819_r();
-	void unkarea_7819_w(uint16_t data);
+	void unkarea_7816_w(u16 data);
+	void pllchange_w(u16 data);
 
-	void chipselect_csx_memory_device_control_w(offs_t offset, uint16_t data);
+	u16 pllclkwait_r();
+	void pllclkwait_w(u16 data);
 
-	void unkarea_7835_w(uint16_t data);
+	void watchdog_ctrl_w(u16 data);
 
-	uint16_t unkarea_782d_r();
-	void unkarea_782d_w(uint16_t data);
+	u16 cache_ctrl_r();
+	void cache_ctrl_w(u16 data);
+
+	void chipselect_csx_memory_device_control_w(offs_t offset, u16 data);
+
+	void mcs0_page_w(u16 data);
+
+	u16 raw_war_r();
+	void raw_war_w(u16 data);
 
 	// Port A
-	uint16_t ioarea_7860_porta_r();
-	void ioarea_7860_porta_w(uint16_t data);
-	uint16_t ioarea_7861_porta_buffer_r();
-	void ioarea_7861_porta_buffer_w(uint16_t data);
-	uint16_t ioarea_7862_porta_direction_r();
-	void ioarea_7862_porta_direction_w(uint16_t data);
-	uint16_t ioarea_7863_porta_attribute_r();
-	void ioarea_7863_porta_attribute_w(uint16_t data);
+	u16 ioa_data_r();
+	void ioa_data_w(u16 data);
+	u16 ioa_buffer_r();
+	void ioa_buffer_w(u16 data);
+	u16 ioa_dir_r();
+	void ioa_dir_w(u16 data);
+	u16 ioa_attrib_r();
+	void ioa_attrib_w(u16 data);
 
 	// Port B
-	uint16_t ioarea_7868_portb_r();
-	void ioarea_7868_portb_w(uint16_t data);
-	uint16_t ioarea_7869_portb_buffer_r();
-	void ioarea_7869_portb_buffer_w(uint16_t data);
-	uint16_t ioarea_786a_portb_direction_r();
-	void ioarea_786a_portb_direction_w(uint16_t data);
-	uint16_t ioarea_786b_portb_attribute_r();
-	void ioarea_786b_portb_attribute_w(uint16_t data);
+	u16 iob_data_r();
+	void iob_data_w(u16 data);
+	u16 iob_buffer_r();
+	void iob_buffer_w(u16 data);
+	u16 iob_dir_r();
+	void iob_dir_w(u16 data);
+	u16 iob_attrib_r();
+	void iob_attrib_w(u16 data);
 
 	// Port C
-	uint16_t ioarea_7870_portc_r();
-	void ioarea_7870_portc_w(uint16_t data);
-	uint16_t ioarea_7871_portc_buffer_r();
-	void ioarea_7871_portc_buffer_w(uint16_t data);
-	uint16_t ioarea_7872_portc_direction_r();
-	void ioarea_7872_portc_direction_w(uint16_t data);
-	uint16_t ioarea_7873_portc_attribute_r();
-	void ioarea_7873_portc_attribute_w(uint16_t data);
+	u16 ioc_data_r();
+	void ioc_data_w(u16 data);
+	u16 ioc_buffer_r();
+	void ioc_buffer_w(u16 data);
+	u16 ioc_dir_r();
+	void ioc_dir_w(u16 data);
+	u16 ioc_attrib_r();
+	void ioc_attrib_w(u16 data);
 
 	// Port D
-	uint16_t ioarea_7878_portd_r();
-	void ioarea_7878_portd_w(uint16_t data);
-	uint16_t ioarea_7879_portd_buffer_r();
-	void ioarea_7879_portd_buffer_w(uint16_t data);
-	uint16_t ioarea_787a_portd_direction_r();
-	void ioarea_787a_portd_direction_w(uint16_t data);
-	uint16_t ioarea_787b_portd_attribute_r();
-	void ioarea_787b_portd_attribute_w(uint16_t data);
+	u16 iod_data_r();
+	void iod_data_w(u16 data);
+	u16 iod_buffer_r();
+	void iod_buffer_w(u16 data);
+	u16 iod_dir_r();
+	void iod_dir_w(u16 data);
+	u16 iod_attib_r();
+	void iod_attib_w(u16 data);
+	u16 iod_drv_r();
+	void iod_drv_w(u16 data);
+	u16 iod_mux_r();
+	void iod_mux_w(u16 data);
 
-	uint16_t unkarea_7882_r();
-	void unkarea_7882_w(uint16_t data);
-	uint16_t unkarea_7883_r();
-	void unkarea_7883_w(uint16_t data);
+	u16 ioe_buffer_r();
+	void ioe_buffer_w(u16 data);
+	u16 ioe_dir_r();
+	void ioe_dir_w(u16 data);
+	u16 ioe_attrib_r();
+	void ioe_attrib_w(u16 data);
 
-	void unkarea_78a0_w(uint16_t data);
+	void int_status1_w(u16 data);
+	void int_status2_w(u16 data);
+	void int_status3_w(u16 data);
 
-	uint16_t unkarea_78a0_r();
-	uint16_t unkarea_78a1_r();
+	u16 int_status1_r();
+	u16 int_status2_r();
+	u16 int_status3_r();
 
-	void unkarea_78a4_w(uint16_t data);
-	void unkarea_78a5_w(uint16_t data);
-	void unkarea_78a6_w(uint16_t data);
+	void int_priority_1_w(u16 data);
+	void int_priority_2_w(u16 data);
+	void int_priority_3_w(u16 data);
 
-	void unkarea_78a8_w(uint16_t data);
+	void mint_ctrl_w(u16 data);
 
-	void unkarea_78b0_w(uint16_t data);
-	void unkarea_78b1_w(uint16_t data);
+	virtual void update_interrupts(int state);
 
-	uint16_t unkarea_78b2_r();
-	void unkarea_78b2_w(uint16_t data);
+	u16 timera_ctrl_r();
+	void timera_ctrl_w(u16 data);
 
-	void unkarea_78b8_w(uint16_t data);
+	u16 timerb_ctrl_r();
+	void timerb_ctrl_w(u16 data);
 
-	uint16_t unkarea_78c0_r();
-	uint16_t unkarea_78c8_r();
+	u16 timerc_ctrl_r();
+	u16 timerd_ctrl_r();
 
-	uint16_t unkarea_78d0_r();
-	uint16_t unkarea_78d8_r();
+	u16 cha_ctrl_r();
+	void cha_ctrl_w(u16 data);
 
-	uint16_t unkarea_78f0_r();
-	void unkarea_78f0_w(uint16_t data);
+	u16 uart_status_r();
 
-	uint16_t unkarea_7904_r();
+	u16 rtc_ctrl_r();
+	void rtc_ctrl_w(u16 data);
 
-	uint16_t unkarea_7934_r();
-	void unkarea_7934_w(uint16_t data);
+	u16 rtc_int_status_r();
+	void rtc_int_status_w(u16 data);
 
-	uint16_t unkarea_7935_r();
-	void unkarea_7935_w(uint16_t data);
+	u16 rtc_int_ctrl_r();
+	void rtc_int_ctrl_w(u16 data);
 
-	uint16_t unkarea_7936_r();
-	void unkarea_7936_w(uint16_t data);
+	u16 spi_7944_rxdata_r();
+	u16 spi_7945_misc_control_reg_r();
+	void spi_7942_txdata_w(u16 data);
 
-	uint16_t spi_7944_rxdata_r();
-	uint16_t spi_7945_misc_control_reg_r();
-	void spi_7942_txdata_w(uint16_t data);
-
-	void unkarea_7960_w(uint16_t data);
-	uint16_t unkarea_7961_r();
-	void unkarea_7961_w(uint16_t data);
-	uint16_t unkarea_7962_r();
+	void adc_setup_w(u16 data);
+	u16 madc_ctrl_r();
+	void madc_ctrl_w(u16 data);
+	u16 madc_data_r();
 
 	void videoirq_w(int state);
 	void audioirq_w(int state);
 
-	uint16_t system_7a35_r();
-	uint16_t system_7a37_r();
-	uint16_t system_7a39_r();
-	uint16_t system_7a3a_r();
-	uint16_t system_7a46_r();
-	uint16_t system_7a54_r();
+	u16 usb_7a35_r();
+	u16 usb_7a37_r();
+	u16 usb_7a39_r();
+	u16 usb_7a3a_r();
+	u16 usb_7a46_r();
+	u16 usb_7a54_r();
 
-	void checkirq6();
-
-	emu_timer *m_unk_timer;
-
-	TIMER_CALLBACK_MEMBER(unknown_tick);
-
-	inline uint16_t read_space(offs_t offset);
-	inline void write_space(offs_t offset, uint16_t data);
-
-	bool m_alt_periodic_irq; // might be multiple timers, might be a register to configure, currently a config option.
+	inline u16 read_space(offs_t offset);
+	inline void write_space(offs_t offset, u16 data);
 
 	// config registers (external pins)
 	int m_boot_mode; // 2 pins determine boot mode, likely only read at power-on
 	sunplus_gcm394_cs_callback_device m_cs_callback;
+
+	required_device<timer_device> m_timer_a;
+	required_device<timer_device> m_timer_b;
+	required_device<timer_device> m_timer_c;
+	required_device<timer_device> m_timer_d;
+	required_device<timer_device> m_timer_e;
+	required_device<timer_device> m_timer_f;
+	required_device<timer_device> m_scheduler;
+
+	required_device<gpl_dma_device> m_gpl_dma;
+	required_device<gpl_timebase_device> m_gpl_timebase;
+
+	// config/hacks
+	bool m_disable_timebase_interrupts;
+
+private:
+	void dma_complete(int state);
+
 };
 
 
@@ -355,13 +364,13 @@ class sunplus_gcm394_device : public sunplus_gcm394_base_device
 {
 public:
 	template <typename T>
-	sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
+	sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&screen_tag) :
 		sunplus_gcm394_device(mconfig, tag, owner, clock)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
 
-	sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sunplus_gcm394_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 

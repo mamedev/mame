@@ -1328,7 +1328,7 @@ bool sound_coreaudio::coreaudio_stream::create_source_graph(struct coreaudio_dev
 	}
 
 	format.mFormatID = kAudioFormatLinearPCM;
-	format.mFormatFlags = kAudioFormatFlagsNativeEndian | kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
+	format.mFormatFlags = 0U | kAudioFormatFlagsNativeEndian | kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked; // zero because C++20 doesn't allow arithmetic between different enum types
 	format.mFramesPerPacket = 1;
 	format.mChannelsPerFrame = device.m_channels;
 	format.mBitsPerChannel = 16;
@@ -1679,7 +1679,7 @@ int sound_coreaudio::coreaudio_stream::create_sink_stream(struct coreaudio_devic
 	AudioStreamBasicDescription format;
 	format.mSampleRate = m_sample_rate;
 	format.mFormatID = kAudioFormatLinearPCM;
-	format.mFormatFlags = kAudioFormatFlagsNativeEndian | kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
+	format.mFormatFlags = 0U | kAudioFormatFlagsNativeEndian | kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked; // zero because C++20 doesn't allow arithmetic between different enum types
 	format.mFramesPerPacket = 1;
 	format.mChannelsPerFrame = m_channels;
 	format.mBitsPerChannel = 16;

@@ -28,6 +28,8 @@
 #include "debug/debugcpu.h"
 #include "debug/express.h"
 
+#include "softfloat3/bochs_ext/softfloat3_ext.h"
+
 #define LOG_MSR             (1U << 1)
 #define LOG_INVALID_OPCODE  (1U << 2)
 #define LOG_LIMIT_CHECK     (1U << 3)
@@ -2236,28 +2238,28 @@ void i386_device::state_export(const device_state_entry &entry)
 			m_debugger_temp = m_eip & 0xffff;
 			break;
 		case X87_ST0:
-			m_debugger_temp = floatx80_to_float64(ST(0));
+			m_debugger_temp = extF80_to_f64(ST(0)).v;
 			break;
 		case X87_ST1:
-			m_debugger_temp = floatx80_to_float64(ST(1));
+			m_debugger_temp = extF80_to_f64(ST(1)).v;
 			break;
 		case X87_ST2:
-			m_debugger_temp = floatx80_to_float64(ST(2));
+			m_debugger_temp = extF80_to_f64(ST(2)).v;
 			break;
 		case X87_ST3:
-			m_debugger_temp = floatx80_to_float64(ST(3));
+			m_debugger_temp = extF80_to_f64(ST(3)).v;
 			break;
 		case X87_ST4:
-			m_debugger_temp = floatx80_to_float64(ST(4));
+			m_debugger_temp = extF80_to_f64(ST(4)).v;
 			break;
 		case X87_ST5:
-			m_debugger_temp = floatx80_to_float64(ST(5));
+			m_debugger_temp = extF80_to_f64(ST(5)).v;
 			break;
 		case X87_ST6:
-			m_debugger_temp = floatx80_to_float64(ST(6));
+			m_debugger_temp = extF80_to_f64(ST(6)).v;
 			break;
 		case X87_ST7:
-			m_debugger_temp = floatx80_to_float64(ST(7));
+			m_debugger_temp = extF80_to_f64(ST(7)).v;
 			break;
 	}
 }
@@ -2331,7 +2333,7 @@ void i386_device::state_string_export(const device_state_entry &entry, std::stri
 			str = string_format("%08x%08x%08x%08x", XMM(7).d[3], XMM(7).d[2], XMM(7).d[1], XMM(7).d[0]);
 			break;
 	}
-	float_exception_flags = 0; // kill any float exceptions that occur here
+	softfloat_exceptionFlags = 0; // kill any float exceptions that occur here
 }
 
 void i386_device::build_opcode_table(uint32_t features)
@@ -2483,6 +2485,7 @@ void i386_device::zero_state()
 	m_cpuid_id1 = 0;
 	m_cpuid_id2 = 0;
 	m_cpu_version = 0;
+	m_brand_id = 0; // Pentium III model 8 onward
 	m_feature_flags = 0;
 	m_tsc = 0;
 	m_perfctr[0] = m_perfctr[1] = 0;
@@ -3425,6 +3428,7 @@ void pentium3_device::device_reset()
 	// [15:15] CMOV and FCMOV
 	// [18:18] PSN (Processor Serial Number, P3 only)
 	m_feature_flags = 0x0004a111;       // TODO: enable relevant flags here
+	m_brand_id = 0x02;
 
 	CHANGE_PC(m_eip);
 }
@@ -3518,6 +3522,7 @@ void pentium4_device::device_reset()
 	// [ 8:8] CMPXCHG8B instruction
 	// [15:15] CMOV and FCMOV
 	m_feature_flags = 0x00008101;       // TODO: enable relevant flags here
+	m_brand_id = 0x08;
 
 	CHANGE_PC(m_eip);
 }

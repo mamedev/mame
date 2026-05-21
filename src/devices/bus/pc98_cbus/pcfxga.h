@@ -9,7 +9,7 @@
 #include "slot.h"
 
 class pcfxga_cbus_device : public device_t
-                         , public device_pc98_cbus_slot_interface
+						 , public device_pc98_cbus_slot_interface
 {
 public:
 	pcfxga_cbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

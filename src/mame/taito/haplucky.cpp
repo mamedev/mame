@@ -28,6 +28,7 @@
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 
@@ -43,16 +44,19 @@ class haplucky_state : public driver_device
 public:
 	haplucky_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette")
 	{ }
 
 	void haplucky(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 
 	uint8_t m_sound_data = 0;
 	uint8_t m_sound_status = 0x0f;
@@ -64,6 +68,9 @@ private:
 	void sound_io_map(address_map &map) ATTR_COLD;
 };
 
+void haplucky_state::video_start()
+{
+}
 
 uint32_t haplucky_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -80,13 +87,23 @@ void haplucky_state::machine_start()
 void haplucky_state::main_map(address_map &map) // TODO: verify everything
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0); // TODO: There's only a 0x4000 ROM, but calls past it. Missing ROM board?
-	map(0xe000, 0xe7ff).ram();
-	map(0xf800, 0xffff).ram();
+	map(0xc000, 0xdfff).ram(); // layer or PCG
+
+	map(0xe000, 0xe7ff).ram(); // work RAM
+	map(0xe800, 0xe97f).ram(); // sprite RAM?
+	map(0xec00, 0xec00).nopr(); // watchdog
+	map(0xec80, 0xec83).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xee00, 0xee00).lr8(NAME([] () { return 0xff; })); // inputs, avoid reset for now
+//  map(0xef00, 0xef01) sound commands?
+//  map(0xef80, 0xef80) sound NMI?
+	map(0xf000, 0xf0ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf100, 0xf1ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xf800, 0xffff).ram(); // videoram
 }
 
 void haplucky_state::sound_map(address_map &map) // TODO: verify everything, but program is almost identical to the Super Dead Heat sub CPU one
 {
-	map(0x0000, 0xdfff).rom().region("audiocpu", 0);
+	map(0x0000, 0xf7ff).rom().region("audiocpu", 0); // empty at $ea9e onward
 	map(0x8000, 0x8000).w("dac", FUNC(dac_byte_interface::write));
 	map(0xf800, 0xffff).ram();
 }
@@ -129,7 +146,6 @@ static INPUT_PORTS_START( haplucky )
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
 INPUT_PORTS_END
 
-
 void haplucky_state::haplucky(machine_config &config)
 {
 	// basic machine hardware
@@ -141,6 +157,9 @@ void haplucky_state::haplucky(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &haplucky_state::sound_map);
 	audiocpu.set_addrmap(AS_IO, &haplucky_state::sound_io_map);
 
+	i8255_device &ppi(I8255(config, "ppi", 0)); // M5L8255AP-5
+	ppi.in_pc_callback().set_ioport("IN0");
+
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: everything to be verified
 	screen.set_refresh_hz(60);
@@ -150,7 +169,10 @@ void haplucky_state::haplucky(machine_config &config)
 	screen.set_screen_update(FUNC(haplucky_state::screen_update));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette").set_entries(0x800); // TODO: entries to be verified
+	// TODO: format probably incorrect (needs GFXs to tell)
+	// writes 444 format for the initial $87 entries, remaining ones looks gibberish
+	// also entries $x8-$xf never touched (?)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 256);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -169,11 +191,15 @@ void haplucky_state::haplucky(machine_config &config)
 ROM_START( haplucky )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "a58-01-1.ic24", 0x0000, 0x4000, CRC(6bddc224) SHA1(fb3783b4b97c1f9b454e5b8301897d8cfcc0b7b7) ) // MBM27128-25 on CPU board
-	ROM_FILL( 0x400f, 0x01, 0xc9 ) // code jumps here early, return for now
+	ROM_FILL( 0x4000, 0x4000, 0xc9 ) // code jumps often to this section, replace with "ret" opcodes
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a58-02.ic5", 0x0000, 0x8000, CRC(cfffcffb) SHA1(4808930f6b8cc105d39ffef1525defbc25bd43f4) ) // MBM27256-25 on CPU board
 	ROM_LOAD( "a58-03.ic6", 0x8000, 0x8000, CRC(470887e4) SHA1(69d9f907816c8c1b39b7c432b4196d04fcd7e365) ) // MBM27256-25 on CPU board
+
+	ROM_REGION( 0x10000, "gfx", 0 )
+	// ephemeral naming, at least one ROM missing here
+	ROM_LOAD( "gfx.rom", 0, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x400, "plds", 0 )
 	ROM_LOAD( "a40-09.ic26", 0x000, 0x104, CRC(733d1242) SHA1(3f99940f0c49023cbbd308eacfb5b102a52a68d2) ) // PAL16L8ACN, on video board

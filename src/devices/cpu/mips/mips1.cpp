@@ -58,24 +58,21 @@ enum exception : u32
 	EXCEPTION_BADCOP3   = 0x3000002c,
 };
 
-enum cop0_reg : u8
-{
-	COP0_Index    = 0,
-	COP0_Random   = 1,
-	COP0_EntryLo  = 2,
-	COP0_BusCtrl  = 2,  // r3041 only
-	COP0_Config   = 3,  // r3041/r3071/r3081 only
-	COP0_Context  = 4,
-	COP0_BadVAddr = 8,
-	COP0_Count    = 9,  // r3041 only
-	COP0_EntryHi  = 10,
-	COP0_PortSize = 10, // r3041 only
-	COP0_Compare  = 11, // r3041 only
-	COP0_Status   = 12,
-	COP0_Cause    = 13,
-	COP0_EPC      = 14,
-	COP0_PRId     = 15,
-};
+constexpr u8 COP0_Index    = 0;
+constexpr u8 COP0_Random   = 1;
+constexpr u8 COP0_EntryLo  = 2;
+constexpr u8 COP0_BusCtrl  = 2;  // r3041 only
+constexpr u8 COP0_Config   = 3;  // r3041/r3071/r3081 only
+constexpr u8 COP0_Context  = 4;
+constexpr u8 COP0_BadVAddr = 8;
+constexpr u8 COP0_Count    = 9;  // r3041 only
+constexpr u8 COP0_EntryHi  = 10;
+constexpr u8 COP0_PortSize = 10; // r3041 only
+constexpr u8 COP0_Compare  = 11; // r3041 only
+constexpr u8 COP0_Status   = 12;
+constexpr u8 COP0_Cause    = 13;
+constexpr u8 COP0_EPC      = 14;
+constexpr u8 COP0_PRId     = 15;
 
 enum sr_mask : u32
 {

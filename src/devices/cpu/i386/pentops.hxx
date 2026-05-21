@@ -2,9 +2,6 @@
 // copyright-holders:Ville Linde, Barry Rodewald, Carl, Philip Bennett, Samuele Zannoli
 // Pentium+ specific opcodes
 
-extern flag float32_is_nan( float32 a ); // since its not defined in softfloat.h
-extern flag float64_is_nan( float64 a ); // since its not defined in softfloat.h
-
 bool i386_device::MMXPROLOG()
 {
 	if (m_cr[0] & CR0_TS)
@@ -2839,8 +2836,8 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 				WRITE32(ea + 28, 0); // mxcsr_mask
 				for(int i = 0; i < 8; i++)
 				{
-					WRITE64(ea + i*16 + 32, m_x87_reg[i].low);
-					WRITE64(ea + i*16 + 40, m_x87_reg[i].high);
+					WRITE64(ea + i*16 + 32, m_x87_reg[i].signif);
+					WRITE64(ea + i*16 + 40, m_x87_reg[i].signExp);
 				}
 				for(int i = 0; i < 8; i++)
 				{
@@ -2866,13 +2863,13 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 				for(int i = 0; i < 8; i++)
 				{
 					int tag;
-					m_x87_reg[i].low = READ64(ea + i*16 + 32);
-					m_x87_reg[i].high = READ16(ea + i*16 + 40);
+					m_x87_reg[i].signif = READ64(ea + i*16 + 32);
+					m_x87_reg[i].signExp = READ16(ea + i*16 + 40);
 					if(!(atag & (1 << i)))
 						tag = X87_TW_EMPTY;
 					else if(floatx80_is_zero(m_x87_reg[i]))
 						tag = X87_TW_ZERO;
-					else if(floatx80_is_inf(m_x87_reg[i]) || floatx80_is_nan(m_x87_reg[i]))
+					else if(floatx80_is_inf(m_x87_reg[i]) || extFloat80_is_nan(m_x87_reg[i]))
 						tag = X87_TW_SPECIAL;
 					else
 						tag = X87_TW_VALID;
@@ -4111,23 +4108,23 @@ void i386_device::sse_minss_r128_r128m32() // Opcode f3 0f 5d
 
 void i386_device::sse_comiss_r128_r128m32() // Opcode 0f 2f
 {
-	float32 a,b;
+	float32_t a,b;
 	uint8_t modrm = FETCH();
 	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
-		a = XMM((modrm >> 3) & 0x7).d[0];
-		b = XMM(modrm & 0x7).d[0];
+		a.v = XMM((modrm >> 3) & 0x7).d[0];
+		b.v = XMM(modrm & 0x7).d[0];
 	} else {
 		XMM_REG src;
 		uint32_t ea = GetEA(modrm, 0);
 		READXMM(ea, src);
-		a = XMM((modrm >> 3) & 0x7).d[0];
-		b = src.d[0];
+		a.v = XMM((modrm >> 3) & 0x7).d[0];
+		b.v = src.d[0];
 	}
 	m_OF=0;
 	m_SF=0;
 	m_AF=0;
-	if (float32_is_nan(a) || float32_is_nan(b))
+	if (f32_isNaN(a) || f32_isNaN(b))
 	{
 		m_ZF = 1;
 		m_PF = 1;
@@ -4138,9 +4135,9 @@ void i386_device::sse_comiss_r128_r128m32() // Opcode 0f 2f
 		m_ZF = 0;
 		m_PF = 0;
 		m_CF = 0;
-		if (float32_eq(a, b))
+		if (f32_eq(a, b))
 			m_ZF = 1;
-		if (float32_lt(a, b))
+		if (f32_lt(a, b))
 			m_CF = 1;
 	}
 	// should generate exception when at least one of the operands is either QNaN or SNaN
@@ -4149,23 +4146,23 @@ void i386_device::sse_comiss_r128_r128m32() // Opcode 0f 2f
 
 void i386_device::sse_comisd_r128_r128m64() // Opcode 66 0f 2f
 {
-	float64 a,b;
+	float64_t a,b;
 	uint8_t modrm = FETCH();
 	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
-		a = XMM((modrm >> 3) & 0x7).q[0];
-		b = XMM(modrm & 0x7).q[0];
+		a.v = XMM((modrm >> 3) & 0x7).q[0];
+		b.v = XMM(modrm & 0x7).q[0];
 	} else {
 		XMM_REG src;
 		uint32_t ea = GetEA(modrm, 0);
 		READXMM(ea, src);
-		a = XMM((modrm >> 3) & 0x7).q[0];
-		b = src.q[0];
+		a.v = XMM((modrm >> 3) & 0x7).q[0];
+		b.v = src.q[0];
 	}
 	m_OF=0;
 	m_SF=0;
 	m_AF=0;
-	if (float64_is_nan(a) || float64_is_nan(b))
+	if (f64_isNaN(a) || f64_isNaN(b))
 	{
 		m_ZF = 1;
 		m_PF = 1;
@@ -4176,9 +4173,9 @@ void i386_device::sse_comisd_r128_r128m64() // Opcode 66 0f 2f
 		m_ZF = 0;
 		m_PF = 0;
 		m_CF = 0;
-		if (float64_eq(a, b))
+		if (f64_eq(a, b))
 			m_ZF = 1;
-		if (float64_lt(a, b))
+		if (f64_lt(a, b))
 			m_CF = 1;
 	}
 	// should generate exception when at least one of the operands is either QNaN or SNaN
@@ -4187,23 +4184,23 @@ void i386_device::sse_comisd_r128_r128m64() // Opcode 66 0f 2f
 
 void i386_device::sse_ucomiss_r128_r128m32() // Opcode 0f 2e
 {
-	float32 a,b;
+	float32_t a,b;
 	uint8_t modrm = FETCH();
 	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
-		a = XMM((modrm >> 3) & 0x7).d[0];
-		b = XMM(modrm & 0x7).d[0];
+		a.v = XMM((modrm >> 3) & 0x7).d[0];
+		b.v = XMM(modrm & 0x7).d[0];
 	} else {
 		XMM_REG src;
 		uint32_t ea = GetEA(modrm, 0);
 		READXMM(ea, src);
-		a = XMM((modrm >> 3) & 0x7).d[0];
-		b = src.d[0];
+		a.v = XMM((modrm >> 3) & 0x7).d[0];
+		b.v = src.d[0];
 	}
 	m_OF=0;
 	m_SF=0;
 	m_AF=0;
-	if (float32_is_nan(a) || float32_is_nan(b))
+	if (f32_isNaN(a) || f32_isNaN(b))
 	{
 		m_ZF = 1;
 		m_PF = 1;
@@ -4214,9 +4211,9 @@ void i386_device::sse_ucomiss_r128_r128m32() // Opcode 0f 2e
 		m_ZF = 0;
 		m_PF = 0;
 		m_CF = 0;
-		if (float32_eq(a, b))
+		if (f32_eq(a, b))
 			m_ZF = 1;
-		if (float32_lt(a, b))
+		if (f32_lt(a, b))
 			m_CF = 1;
 	}
 	// should generate exception when at least one of the operands is SNaN
@@ -4225,23 +4222,23 @@ void i386_device::sse_ucomiss_r128_r128m32() // Opcode 0f 2e
 
 void i386_device::sse_ucomisd_r128_r128m64() // Opcode 66 0f 2e
 {
-	float64 a,b;
+	float64_t a,b;
 	uint8_t modrm = FETCH();
 	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
-		a = XMM((modrm >> 3) & 0x7).q[0];
-		b = XMM(modrm & 0x7).q[0];
+		a.v = XMM((modrm >> 3) & 0x7).q[0];
+		b.v = XMM(modrm & 0x7).q[0];
 	} else {
 		XMM_REG src;
 		uint32_t ea = GetEA(modrm, 0);
 		READXMM(ea, src);
-		a = XMM((modrm >> 3) & 0x7).q[0];
-		b = src.q[0];
+		a.v = XMM((modrm >> 3) & 0x7).q[0];
+		b.v = src.q[0];
 	}
 	m_OF=0;
 	m_SF=0;
 	m_AF=0;
-	if (float64_is_nan(a) || float64_is_nan(b))
+	if (f64_isNaN(a) || f64_isNaN(b))
 	{
 		m_ZF = 1;
 		m_PF = 1;
@@ -4252,9 +4249,9 @@ void i386_device::sse_ucomisd_r128_r128m64() // Opcode 66 0f 2e
 		m_ZF = 0;
 		m_PF = 0;
 		m_CF = 0;
-		if (float64_eq(a, b))
+		if (f64_eq(a, b))
 			m_ZF = 1;
-		if (float64_lt(a, b))
+		if (f64_lt(a, b))
 			m_CF = 1;
 	}
 	// should generate exception when at least one of the operands is SNaN

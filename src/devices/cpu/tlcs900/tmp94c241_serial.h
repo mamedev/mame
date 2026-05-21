@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include "tmp94c241.h"
 
 class tmp94c241_serial_device :
 	public device_t
@@ -19,13 +18,23 @@ class tmp94c241_serial_device :
 	static constexpr uint8_t PORT_F = 14; // 6 bit I/O. Shared with I/O functions of serial interface
 
 public:
-	tmp94c241_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint8_t channel, uint32_t clock = 0);
+	tmp94c241_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tmp94c241_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint8_t channel) :
+		tmp94c241_serial_device(mconfig, tag, owner, clock)
+	{
+		set_channel(channel);
+	}
 
-	void rxd(int state);
+	void set_channel(uint8_t channel) { m_channel = channel; }
+
+	auto setint_cb() { return m_setint_cb.bind(); }
+
 	auto txd() { return m_txd_cb.bind(); }
 	auto sclk_in() { return m_sclk_in_cb.bind(); }
 	auto sclk_out() { return m_sclk_out_cb.bind(); }
 	auto tx_start() { return m_tx_start_cb.bind(); }  // Signals start of new byte transmission
+
+	void rxd(int state);
 	void sioclk(int state);
 
 	uint8_t brNcr_r();
@@ -37,6 +46,8 @@ public:
 	void scNbuf_w(uint8_t data);
 	uint8_t scNbuf_r();
 
+	void pffc_sclk_w(int state) { m_pffc_sclk = state ? 1 : 0; }
+
 protected:
 	// device_t
 	virtual void device_start() override ATTR_COLD;
@@ -44,9 +55,18 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(timer_callback);
 
+	devcb_write8 m_setint_cb;
+
+	devcb_write_line m_txd_cb;
+	devcb_write_line m_sclk_in_cb;
+	devcb_write_line m_sclk_out_cb;
+	devcb_write_line m_tx_start_cb;  // Signals start of new byte transmission
+
 	emu_timer *m_timer;
 
 	uint8_t m_channel;
+
+	uint8_t m_pffc_sclk;
 	uint8_t m_serial_control;
 	uint8_t m_serial_mode;
 	uint8_t m_baud_rate;
@@ -68,13 +88,6 @@ protected:
 
 	uint8_t m_tx_buffer;           // TX double buffer (holds next byte while shift register is busy)
 	bool m_tx_buffer_full;         // True when m_tx_buffer contains data waiting to be loaded
-
-	devcb_write_line m_txd_cb;
-	devcb_write_line m_sclk_in_cb;
-	devcb_write_line m_sclk_out_cb;
-	devcb_write_line m_tx_start_cb;  // Signals start of new byte transmission
-
-	required_device<tmp94c241_device> m_cpu;
 };
 
 DECLARE_DEVICE_TYPE(TMP94C241_SERIAL, tmp94c241_serial_device)

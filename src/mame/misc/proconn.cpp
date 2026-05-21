@@ -26,7 +26,6 @@
 
 #include "emu.h"
 
-#include "awpvid.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/meters.h"

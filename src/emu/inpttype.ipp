@@ -102,7 +102,6 @@ namespace {
 		CORE_INPUT_TYPES_BEGIN(gamble) \
 		INPUT_PORT_DIGITAL_TYPE(  1, OTHER,    GAMBLE_KEYIN,        N_p("input-name", "Key In"),                 input_seq(KEYCODE_Q) ) \
 		INPUT_PORT_DIGITAL_TYPE(  1, OTHER,    GAMBLE_KEYOUT,       N_p("input-name", "Key Out"),                input_seq(KEYCODE_W) ) \
-		INPUT_PORT_DIGITAL_TYPE(  1, OTHER,    GAMBLE_SERVICE,      N_p("input-name", "Service"),                input_seq(KEYCODE_9) ) \
 		INPUT_PORT_DIGITAL_TYPE(  1, OTHER,    GAMBLE_BOOK,         N_p("input-name", "Bookkeeping"),            input_seq(KEYCODE_0) ) \
 		INPUT_PORT_DIGITAL_TYPE(  1, OTHER,    GAMBLE_PAYOUT,       N_p("input-name", "Payout"),                 input_seq(KEYCODE_4) ) \
 		INPUT_PORT_DIGITAL_TYPE(  1, PLAYER1,  GAMBLE_BET,          N_p("input-name", "Bet"),                    input_seq(KEYCODE_M) ) \

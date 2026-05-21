@@ -14415,7 +14415,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 
 	<!-- This might not exist on cartridge, no photographic evidence yet. -->
 	<software name="yakyukyo">
-		<description>Yakyu Kyo (Japan)</description>
+		<description>Yakyuu Kyou (Japan)</description>
 		<year>1985</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="alt_title" value="野球狂" />
@@ -14568,7 +14568,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 	</software>
 
 	<software name="chima">
-		<description>Youkai Tantei Chimachima (Japan)</description>
+		<description>Youkai Tantei Chima Chima (Japan)</description>
 		<year>1985</year>
 		<publisher>Bothtec</publisher>
 		<info name="serial" value="MK-7401" />
@@ -14582,7 +14582,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 	</software>
 
 	<software name="chimaa">
-		<description>Youkai Tantei Chimachima (Japan, alt)</description>
+		<description>Youkai Tantei Chima Chima (Japan, alt)</description>
 		<year>1985</year>
 		<publisher>Bothtec</publisher>
 		<info name="serial" value="MK-7401" />
@@ -14597,10 +14597,10 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 
 	<!-- No photographic proof of a physical release. -->
 	<software name="chimak" cloneof="chima">
-		<description>Yogoetamjeong Chimagun Chimachima (Korea)</description>
+		<description>Yogoetamjeong Chimagun Chima Chima (Korea)</description>
 		<year>19??</year>
 		<publisher>Topia</publisher>
-		<info name="alt_title" value="요괴탐정 치마군 Chimachima"/>
+		<info name="alt_title" value="요괴탐정 치마군 Chima Chima"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">

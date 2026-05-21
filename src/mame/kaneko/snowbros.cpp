@@ -2000,7 +2000,7 @@ void semicom_state::semicom(machine_config &config)
 
 	m_soundcpu->set_clock(XTAL(16'000'000)/4); /* 4MHz - Confirmed */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &semicom_state::hyperpac_sound_map);
-	m_soundcpu->set_addrmap(AS_IO, address_map_constructor());
+	m_soundcpu->remove_addrmap(AS_IO);
 
 	m_pandora->set_gfxinfo(gfx_hyperpac_spr);
 

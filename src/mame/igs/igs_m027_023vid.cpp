@@ -187,9 +187,9 @@ void igs_m027_023vid_state::m027_map(address_map &map)
 
 	map(0x2800'0000, 0x2800'0fff).ram();
 
-	map(0x3890'0000, 0x3890'7fff).rw(m_video, FUNC(igs023_video_device::videoram_r), FUNC(igs023_video_device::videoram_w)).umask32(0xffffffff);
-	map(0x38a0'0000, 0x38a0'11ff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x38b0'0000, 0x38b0'ffff).rw(m_video, FUNC(igs023_video_device::videoregs_r), FUNC(igs023_video_device::videoregs_w)).umask32(0xffffffff);
+	map(0x3890'0000, 0x3890'7fff).m(m_video, FUNC(igs023_video_device::videoram_map)).umask32(0xffffffff);
+	map(0x38a0'0000, 0x38a0'13ff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x38b0'0000, 0x38b0'ffff).m(m_video, FUNC(igs023_video_device::videoregs_map)).umask32(0xffffffff);
 
 	map(0x4800'0000, 0x4800'0001).r(FUNC(igs_m027_023vid_state::in_r<0>));
 	map(0x4800'0002, 0x4800'0003).r(FUNC(igs_m027_023vid_state::in_r<1>));
@@ -394,19 +394,17 @@ void igs_m027_023vid_state::m027_023vid(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1000));
-	m_screen->set_size(512, 256);
-	m_screen->set_visarea(0, 448-1, 0, 224-1);
+	m_screen->set_raw(50_MHz_XTAL/5, 640, 0, 448, 264, 0, 224); // copied from igs/pgm.cpp, correct?
 	m_screen->set_screen_update(m_video, FUNC(igs023_video_device::screen_update));
-	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(igs_m027_023vid_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1200/2);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1400/2);
 
 	// PGM video
 	IGS023_VIDEO(config, m_video, 0);
 	m_video->set_palette(m_palette);
+	m_video->set_screen(m_screen);
 	m_video->read_spriteram_callback().set(FUNC(igs_m027_023vid_state::sprites_r));
 
 	// sound hardware

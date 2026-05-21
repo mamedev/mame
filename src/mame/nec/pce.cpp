@@ -58,7 +58,6 @@ Super System Card:
 #include "bus/pce/pce_acard.h"
 #include "bus/pce/pce_rom.h"
 #include "bus/pce/pce_scdsys.h"
-#include "cpu/h6280/h6280.h"
 #include "sound/cdda.h"
 #include "sound/msm5205.h"
 #include "video/huc6202.h"

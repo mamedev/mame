@@ -207,7 +207,7 @@ private:
 
 	// internal state
 	running_machine &m_machine;                  // reference to our machine
-	std::unordered_map<std::string, output_item> m_itemtable;
+	util::transparent_string_unordered_map<std::string, output_item> m_itemtable;
 	notify_vector m_global_notifylist;
 	std::vector<std::reference_wrapper<output_item> > m_save_order;
 	std::unique_ptr<s32 []> m_save_data;

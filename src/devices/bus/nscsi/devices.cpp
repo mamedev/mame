@@ -23,6 +23,7 @@
 void default_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("cdrom_2x", NSCSI_CDROM_2X);
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	device.option_add("tape", NSCSI_TAPE);
 	device.option_add("s1410", NSCSI_S1410);

@@ -178,7 +178,7 @@ void imgtool_init(bool omit_untested, void (*warn)(const char *message))
 //  imgtool_exit - closes out the imgtool core
 //-------------------------------------------------
 
-void imgtool_exit(void)
+void imgtool_exit()
 {
 	if (global_imgtool_library)
 		global_imgtool_library.reset();
@@ -570,7 +570,7 @@ imgtool::partition::partition(imgtool::image &image, const imgtool_class &imgcla
 	m_supports_bootblock = imgtool_get_info_int(&imgclass, IMGTOOLINFO_INT_SUPPORTS_BOOTBLOCK) ? 1 : 0;
 	m_begin_enum = (imgtoolerr_t(*)(imgtool::directory &, const char *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_BEGIN_ENUM);
 	m_next_enum = (imgtoolerr_t(*)(imgtool::directory &, imgtool_dirent &)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_NEXT_ENUM);
-	m_close_enum = (void(*)(imgtool::directory &)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_CLOSE_ENUM);
+	m_close_enum = (void (*)(imgtool::directory &)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_CLOSE_ENUM);
 	m_free_space = (imgtoolerr_t(*)(imgtool::partition &, uint64_t *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_FREE_SPACE);
 	m_read_file = (imgtoolerr_t(*)(imgtool::partition &, const char *, const char *, imgtool::stream &)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_READ_FILE);
 	m_write_file = (imgtoolerr_t(*)(imgtool::partition &, const char *, const char *, imgtool::stream &, util::option_resolution *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_WRITE_FILE);
@@ -767,32 +767,32 @@ static bool test_imgtool_datetime(int second, int minute, int hour, int day_of_m
 
 	if (t2.tm_sec != second)
 	{
-		util::stream_format(std::wcerr, L"test_imgtool_datetime():  Expected t2.tm_sec to be %d, instead got %d\n", second, t2.tm_sec);
+		util::stream_format(std::cerr, "test_imgtool_datetime():  Expected t2.tm_sec to be %d, instead got %d\n", second, t2.tm_sec);
 		error = true;
 	}
 	if (t2.tm_min != minute)
 	{
-		util::stream_format(std::wcerr, L"test_imgtool_datetime():  Expected t2.tm_min to be %d, instead got %d\n", minute, t2.tm_min);
+		util::stream_format(std::cerr, "test_imgtool_datetime():  Expected t2.tm_min to be %d, instead got %d\n", minute, t2.tm_min);
 		error = true;
 	}
 	if (t2.tm_hour != hour)
 	{
-		util::stream_format(std::wcerr, L"test_imgtool_datetime():  Expected t2.tm_hour to be %d, instead got %d\n", hour, t2.tm_hour);
+		util::stream_format(std::cerr, "test_imgtool_datetime():  Expected t2.tm_hour to be %d, instead got %d\n", hour, t2.tm_hour);
 		error = true;
 	}
 	if (t2.tm_mday != day_of_month)
 	{
-		util::stream_format(std::wcerr, L"test_imgtool_datetime():  Expected t2.tm_mday to be %d, instead got %d\n", day_of_month, t2.tm_mday);
+		util::stream_format(std::cerr, "test_imgtool_datetime():  Expected t2.tm_mday to be %d, instead got %d\n", day_of_month, t2.tm_mday);
 		error = true;
 	}
 	if (t2.tm_mon != month - 1)
 	{
-		util::stream_format(std::wcerr, L"test_imgtool_datetime():  Expected t2.tm_mon to be %d, instead got %d\n", month - 1, t2.tm_mon);
+		util::stream_format(std::cerr, "test_imgtool_datetime():  Expected t2.tm_mon to be %d, instead got %d\n", month - 1, t2.tm_mon);
 		error = true;
 	}
 	if (t2.tm_year != year - 1900)
 	{
-		util::stream_format(std::wcerr, L"test_imgtool_datetime():  Expected t2.tm_mon to be %d, instead got %d\n", year - 1900, t2.tm_year);
+		util::stream_format(std::cerr, "test_imgtool_datetime():  Expected t2.tm_mon to be %d, instead got %d\n", year - 1900, t2.tm_year);
 		error = true;
 	}
 	return error;
@@ -822,7 +822,7 @@ static bool test_imgtool_datetime()
 //  of the imgtool modules
 //-------------------------------------------------
 
-bool imgtool_validitychecks(void)
+bool imgtool_validitychecks()
 {
 	bool error = false;
 	imgtoolerr_t err = (imgtoolerr_t)IMGTOOLERR_SUCCESS;
@@ -845,17 +845,17 @@ bool imgtool_validitychecks(void)
 
 		if (module->name.empty())
 		{
-			util::stream_format(std::wcerr, L"imgtool module has null 'name'\n");
+			util::stream_format(std::cerr, "imgtool module has null 'name'\n");
 			error = true;
 		}
 		if (module->description.empty())
 		{
-			util::stream_format(std::wcerr, L"imgtool module %s has null 'description'\n", wstring_from_utf8(module->name));
+			util::stream_format(std::cerr, "imgtool module %s has null 'description'\n", module->name);
 			error = true;
 		}
 		if (module->extensions.empty())
 		{
-			util::stream_format(std::wcerr, L"imgtool module %s has null 'extensions'\n", wstring_from_utf8(module->extensions));
+			util::stream_format(std::cerr, "imgtool module %s has null 'extensions'\n", module->extensions);
 			error = true;
 		}
 
@@ -865,22 +865,22 @@ bool imgtool_validitychecks(void)
 		{
 			if (module->alternate_path_separator)
 			{
-				util::stream_format(std::wcerr, L"imgtool module %s specified alternate_path_separator but not path_separator\n", wstring_from_utf8(module->name));
+				util::stream_format(std::cerr, "imgtool module %s specified alternate_path_separator but not path_separator\n", module->name);
 				error = true;
 			}
 			if (module->initial_path_separator)
 			{
-				util::stream_format(std::wcerr, L"imgtool module %s specified initial_path_separator without directory support\n", wstring_from_utf8(module->name));
+				util::stream_format(std::cerr, "imgtool module %s specified initial_path_separator without directory support\n", module->name);
 				error = true;
 			}
 			if (module->create_dir)
 			{
-				util::stream_format(std::wcerr, L"imgtool module %s implements create_dir without directory support\n", wstring_from_utf8(module->name));
+				util::stream_format(std::cerr, "imgtool module %s implements create_dir without directory support\n", module->name);
 				error = true;
 			}
 			if (module->delete_dir)
 			{
-				util::stream_format(std::wcerr, L"imgtool module %s implements delete_dir without directory support\n", wstring_from_utf8(module->name));
+				util::stream_format(std::cerr, "imgtool module %s implements delete_dir without directory support\n", module->name);
 				error = true;
 			}
 		}
@@ -891,13 +891,13 @@ bool imgtool_validitychecks(void)
 		{
 			if (!module->create)
 			{
-				util::stream_format(std::wcerr, L"imgtool module %s has creation options without supporting create\n", wstring_from_utf8(module->name));
+				util::stream_format(std::cerr, "imgtool module %s has creation options without supporting create\n", module->name);
 				error = true;
 			}
 			if ((!module->createimage_optguide && !module->createimage_optspec.empty())
 				|| (module->createimage_optguide && module->createimage_optspec.empty()))
 			{
-				util::stream_format(std::wcerr, L"imgtool module %s has partially incomplete creation options\n", wstring_from_utf8(module->name));
+				util::stream_format(std::cerr, "imgtool module %s has partially incomplete creation options\n", module->name);
 				error = true;
 			}
 
@@ -913,7 +913,7 @@ bool imgtool_validitychecks(void)
 		imgtool_exit();
 	if (err)
 	{
-		util::stream_format(std::wcerr, L"imgtool: %s\n", wstring_from_utf8(imgtool_error(err)));
+		util::stream_format(std::cerr, "imgtool: %s\n", imgtool_error(err));
 		error = true;
 	}
 	return error;
@@ -926,7 +926,7 @@ bool imgtool_validitychecks(void)
     buffer used for string passing
 -------------------------------------------------*/
 
-char *imgtool_temp_str(void)
+char *imgtool_temp_str()
 {
 	static int index;
 	static char temp_string_pool[32][256];
@@ -1170,7 +1170,7 @@ imgtoolerr_t imgtool::partition::canonicalize_path(uint32_t flags, const char *p
 	{
 		if (flags & PATH_MUSTBEDIR)
 		{
-			// do we specify a path when paths are not supported? */
+			// do we specify a path when paths are not supported?
 			if (path && *path)
 				return imgtoolerr_t(IMGTOOLERR_CANNOTUSEPATH | IMGTOOLERR_SRC_FUNCTIONALITY);
 

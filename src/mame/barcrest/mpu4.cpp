@@ -217,7 +217,6 @@ To change between them, follow these instructions:
 #include "emu.h"
 #include "mpu4.h"
 
-#include "awpvid.h"       //Fruit Machines Only
 
 #include "machine/rescap.h"
 #include "speaker.h"
@@ -352,27 +351,27 @@ void mpu4_state::update_meters()
 	case FIVE_REEL_5TO8:
 		m_reel[4]->update(((data >> 4) & 0x0f));
 		data = (data & 0x0f); //Strip reel data from meter drives, leaving active elements
-		awp_draw_reel(machine(),"reel5", *m_reel[4]);
+		m_reel[4]->draw();
 		break;
 
 	case FIVE_REEL_8TO5:
 		m_reel[4]->update((((data & 0x01) + ((data & 0x08) >> 2) + ((data & 0x20) >> 3) + ((data & 0x80) >> 4)) & 0x0f)) ;
 		data = 0x00; //Strip all reel data from meter drives, nothing is connected
-		awp_draw_reel(machine(),"reel5", *m_reel[4]);
+		m_reel[4]->draw();
 		break;
 
 	case FIVE_REEL_3TO6:
 		m_reel[4]->update(((data >> 2) & 0x0f));
 		data = 0x00; //Strip all reel data from meter drives
-		awp_draw_reel(machine(),"reel5", *m_reel[4]);
+		m_reel[4]->draw();
 		break;
 
 	case SIX_REEL_1TO8:
 		m_reel[4]->update( data       & 0x0f);
 		m_reel[5]->update((data >> 4) & 0x0f);
 		data = 0x00; //Strip all reel data from meter drives
-		awp_draw_reel(machine(),"reel5", *m_reel[4]);
-		awp_draw_reel(machine(),"reel6", *m_reel[5]);
+		m_reel[4]->draw();
+		m_reel[5]->draw();
 		break;
 
 #if 0
@@ -380,14 +379,14 @@ void mpu4_state::update_meters()
 		m_reel[4]->update(((data >> 4) & 0x0f));
 		//data = 0x00; //Strip all reel data from meter drives
 		data = (data & 0x0f);
-		awp_draw_reel(machine(),"reel5", *m_reel[4]);
+		m_reel[4]->draw();
 		break;
 #endif
 
 	case SEVEN_REEL:
 		m_reel[0]->update((((data & 0x01) + ((data & 0x08) >> 2) + ((data & 0x20) >> 3) + ((data & 0x80) >> 4)) & 0x0f)) ;
 		data = 0x00; //Strip all reel data from meter drives
-		awp_draw_reel(machine(),"reel1", *m_reel[0]);
+		m_reel[0]->draw();
 		break;
 
 	case FLUTTERBOX: //The backbox fan assembly fits in a reel unit sized box, wired to the remote meter pin, so we can handle it here
@@ -870,15 +869,15 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 	{
 		m_reel[4]->update( data      &0x0f);
 		m_reel[5]->update((data >> 4)&0x0f);
-		awp_draw_reel(machine(),"reel5", *m_reel[4]);
-		awp_draw_reel(machine(),"reel6", *m_reel[5]);
+		m_reel[4]->draw();
+		m_reel[5]->draw();
 	}
 	else if (m_reel_mux == SEVEN_REEL)
 	{
 		m_reel[1]->update( data      &0x0f);
 		m_reel[2]->update((data >> 4)&0x0f);
-		awp_draw_reel(machine(),"reel2", *m_reel[1]);
-		awp_draw_reel(machine(),"reel3", *m_reel[2]);
+		m_reel[1]->draw();
+		m_reel[2]->draw();
 	}
 }
 
@@ -1019,15 +1018,15 @@ void mpu4_state::pia_ic6_portb_w(uint8_t data)
 	{
 		m_reel[3]->update( data      &0x0f);
 		m_reel[4]->update((data >> 4)&0x0f);
-		awp_draw_reel(machine(),"reel4", *m_reel[3]);
-		awp_draw_reel(machine(),"reel5", *m_reel[4]);
+		m_reel[3]->draw();
+		m_reel[4]->draw();
 	}
 	else if (m_reels)
 	{
 		m_reel[0]->update( data      &0x0f);
 		m_reel[1]->update((data >> 4)&0x0f);
-		awp_draw_reel(machine(),"reel1", *m_reel[0]);
-		awp_draw_reel(machine(),"reel2", *m_reel[1]);
+		m_reel[0]->draw();
+		m_reel[1]->draw();
 	}
 }
 
@@ -1075,15 +1074,15 @@ void mpu4_state::pia_ic7_porta_w(uint8_t data)
 	{
 		m_reel[5]->update( data      &0x0f);
 		m_reel[6]->update((data >> 4)&0x0f);
-		awp_draw_reel(machine(),"reel6", *m_reel[5]);
-		awp_draw_reel(machine(),"reel7", *m_reel[6]);
+		m_reel[5]->draw();
+		m_reel[6]->draw();
 	}
 	else if (m_reels)
 	{
 		m_reel[2]->update( data      &0x0f);
 		m_reel[3]->update((data >> 4)&0x0f);
-		awp_draw_reel(machine(),"reel3", *m_reel[2]);
-		awp_draw_reel(machine(),"reel4", *m_reel[3]);
+		m_reel[2]->draw();
+		m_reel[3]->draw();
 	}
 }
 

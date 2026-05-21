@@ -120,16 +120,21 @@ How the architecture works:
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68010.h"
-#include "machine/ram.h"
-#include "machine/am9513.h"
-#include "machine/i82586.h"
-#include "machine/mm58167.h"
-#include "machine/z80scc.h"
-#include "machine/bankdev.h"
-#include "machine/input_merger.h"
+
 #include "bus/rs232/rs232.h"
+#include "cpu/m68000/m68010.h"
+#include "machine/am9513.h"
+#include "machine/bankdev.h"
+#include "machine/i82586.h"
+#include "machine/input_merger.h"
+#include "machine/mm58167.h"
+#include "machine/ram.h"
+#include "machine/z80scc.h"
+
 #include "screen.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 namespace {
@@ -240,19 +245,19 @@ uint16_t sun2_state::tl_mmu_r(uint8_t fc, offs_t offset, uint16_t mem_mask)
 			switch (offset & 7)
 			{
 				case 4:
-					//printf("sun2: Read IDPROM @ %x (PC=%x)\n", offset<<1, m_maincpu->pc());
+					LOG("sun2: Read IDPROM @ %x (PC=%x)\n", offset<<1, m_maincpu->pc());
 					return m_idprom_ptr[(offset>>10) & 0x1f]<<8;
 
 				case 5:
-					//printf("sun2: Read diag reg\n");
+					LOG("sun2: Read diag reg\n");
 					return m_diagreg;
 
 				case 6:
-					//printf("sun2: Read bus error @ PC %x\n", m_maincpu->pc());
+					LOG("sun2: Read bus error @ PC %x\n", m_maincpu->pc());
 					return m_buserror;
 
 				case 7:
-					//printf("sun2: Read sysenable\n");
+					LOG("sun2: Read sysenable\n");
 					return m_sysenable;
 			}
 		}
@@ -267,7 +272,7 @@ uint16_t sun2_state::tl_mmu_r(uint8_t fc, offs_t offset, uint16_t mem_mask)
 					page = m_segmap[m_context & 7][offset >> 14] << 4;
 					page += ((offset >> 10) & 0xf);
 
-					//printf("sun2: Read page map at %x (entry %d)\n", offset<<1, page);
+					LOG("sun2: Read page map at %x (entry %d)\n", offset<<1, page);
 					if (offset & 1) // low-order 16 bits
 					{
 						return m_pagemap[page] & 0xffff;
@@ -275,11 +280,11 @@ uint16_t sun2_state::tl_mmu_r(uint8_t fc, offs_t offset, uint16_t mem_mask)
 					return m_pagemap[page] >> 16;
 
 				case 2: // segment map
-					//printf("sun2: Read segment map at %x (entry %d, user ctx %d)\n", offset<<1, offset>>14, m_context & 7);
+					LOG("sun2: Read segment map at %x (entry %d, user ctx %d)\n", offset<<1, offset>>14, m_context & 7);
 					return m_segmap[m_context & 7][offset >> 14];
 
 				case 3: // context reg
-					//printf("sun2: Read context reg\n");
+					LOG("sun2: Read context reg\n");
 					return m_context;
 			}
 		}
@@ -302,7 +307,7 @@ uint16_t sun2_state::tl_mmu_r(uint8_t fc, offs_t offset, uint16_t mem_mask)
 	uint8_t pmeg = m_segmap[context][offset >> 14];
 	uint32_t entry = (pmeg << 4) + ((offset >> 10) & 0xf);
 
-	//  printf("sun2: Context = %d, pmeg = %d, offset >> 14 = %x, entry = %d, page = %d\n", context, pmeg, offset >> 14, entry, (offset >> 10) & 0xf);
+	LOG("sun2: Context = %d, pmeg = %d, offset >> 14 = %x, entry = %d, page = %d\n", context, pmeg, offset >> 14, entry, (offset >> 10) & 0xf);
 
 	if (m_pagemap[entry] & PM_VALID)
 	{
@@ -312,8 +317,8 @@ uint16_t sun2_state::tl_mmu_r(uint8_t fc, offs_t offset, uint16_t mem_mask)
 		uint32_t tmp = (m_pagemap[entry] & 0xfff) << 10;
 		tmp |= (offset & 0x3ff);
 
-	//  if (!machine().side_effects_disabled())
-	//      printf("sun2: Translated addr: %08x, type %d (page %d page entry %08x, orig virt %08x, FC %d)\n", tmp << 1, (m_pagemap[entry] >> 22) & 7, entry, m_pagemap[entry], offset<<1, fc);
+		if (!machine().side_effects_disabled())
+			LOG("sun2: Translated addr: %08x, type %d (page %d page entry %08x, orig virt %08x, FC %d)\n", tmp << 1, (m_pagemap[entry] >> 22) & 7, entry, m_pagemap[entry], offset<<1, fc);
 
 		switch ((m_pagemap[entry] >> 22) & 7)
 		{
@@ -343,7 +348,7 @@ uint16_t sun2_state::tl_mmu_r(uint8_t fc, offs_t offset, uint16_t mem_mask)
 					}
 				}
 
-				//printf("read device space @ %x\n", tmp<<1);
+				LOG("read device space @ %x\n", tmp<<1);
 				return m_type1space->read16(tmp, mem_mask);
 
 			case 2: // type 2 space
@@ -355,10 +360,12 @@ uint16_t sun2_state::tl_mmu_r(uint8_t fc, offs_t offset, uint16_t mem_mask)
 	}
 	else
 	{
-		if (!machine().side_effects_disabled()) printf("sun2: pagemap entry not valid!\n");
+		if (!machine().side_effects_disabled())
+			logerror("sun2: pagemap entry not valid!\n");
 	}
 
-	if (!machine().side_effects_disabled()) printf("sun2: Unmapped read @ %08x (FC %d, mask %04x, PC=%x, seg %x)\n", offset<<1, fc, mem_mask, m_maincpu->pc(), offset>>15);
+	if (!machine().side_effects_disabled())
+		logerror("sun2: Unmapped read @ %08x (FC %d, mask %04x, PC=%x, seg %x)\n", offset<<1, fc, mem_mask, m_maincpu->pc(), offset>>15);
 
 	return 0xffff;
 }
@@ -370,7 +377,7 @@ void sun2_state::mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void sun2_state::tl_mmu_w(uint8_t fc, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	//printf("sun2: Write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc(), offset<<1);
+	LOG("sun2: Write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc(), offset<<1);
 
 	if (fc == 3)
 	{
@@ -379,33 +386,33 @@ void sun2_state::tl_mmu_w(uint8_t fc, offs_t offset, uint16_t data, uint16_t mem
 			switch (offset & 7)
 			{
 				case 4:
-					//printf("sun2: Write? IDPROM @ %x\n", offset<<1);
+					LOG("sun2: Write? IDPROM @ %x\n", offset<<1);
 					return;
 
 				case 5:
 					// XOR to match Table 2-1 in the 2/50 Field Service Manual
-					printf("sun2: CPU LEDs to %02x (PC=%x) => ", (data & 0xff) ^ 0xff, m_maincpu->pc());
+					osd_printf_info("sun2: CPU LEDs to %02x (PC=%x) => ", (data & 0xff) ^ 0xff, m_maincpu->pc());
 					m_diagreg = data & 0xff;
 					for (int i = 0; i < 8; i++)
 					{
 						if (m_diagreg & (1<<(7-i)))
 						{
-							printf("*");
+							osd_printf_info("*");
 						}
 						else
 						{
-							printf("O");
+							osd_printf_info("O");
 						}
 					}
-					printf("\n");
+					osd_printf_info("\n");
 					return;
 
 				case 6:
-					//printf("sun2: Write %04x to bus error not allowed\n", data);
+					LOG("sun2: Write %04x to bus error not allowed\n", data);
 					return;
 
 				case 7:
-					//printf("sun2: Write %04x to system enable\n", data);
+					LOG("sun2: Write %04x to system enable\n", data);
 					COMBINE_DATA(&m_sysenable);
 					return;
 			}
@@ -421,7 +428,7 @@ void sun2_state::tl_mmu_w(uint8_t fc, offs_t offset, uint16_t data, uint16_t mem
 					page = m_segmap[m_context & 7][offset >> 14] << 4;
 					page += ((offset >> 10) & 0xf);
 
-					//printf("sun2: Write %04x to page map at %x (entry %d), ", data, offset<<1, page);
+					LOG("sun2: Write %04x to page map at %x (entry %d), ", data, offset<<1, page);
 					if (offset & 1) // low-order 16 bits
 					{
 						m_pagemap[page] &= 0xffff0000;
@@ -432,16 +439,16 @@ void sun2_state::tl_mmu_w(uint8_t fc, offs_t offset, uint16_t data, uint16_t mem
 						m_pagemap[page] &= 0x0000ffff;
 						m_pagemap[page] |= (data<<16);
 					}
-					//printf("entry now %08x (adr %08x  PC=%x)\n", m_pagemap[page], (m_pagemap[page] & 0xfffff) << 11, m_maincpu->pc());
+					LOG("entry now %08x (adr %08x  PC=%x)\n", m_pagemap[page], (m_pagemap[page] & 0xfffff) << 11, m_maincpu->pc());
 					return;
 
 				case 2: // segment map
-					//printf("sun2: Write %02x to segment map at %x (entry %d, user ctx %d PC=%x)\n", data & 0xff, offset<<1, offset>>14, m_context & 7, m_maincpu->pc());
+					LOG("sun2: Write %02x to segment map at %x (entry %d, user ctx %d PC=%x)\n", data & 0xff, offset<<1, offset>>14, m_context & 7, m_maincpu->pc());
 					m_segmap[m_context & 7][offset >> 14] = data & 0xff;
 					return;
 
 				case 3: // context reg
-					//printf("sun2: Write %04x to context\n", data);
+					LOG("sun2: Write %04x to context\n", data);
 					COMBINE_DATA(&m_context);
 					return;
 			}
@@ -461,7 +468,8 @@ void sun2_state::tl_mmu_w(uint8_t fc, offs_t offset, uint16_t data, uint16_t mem
 		uint32_t tmp = (m_pagemap[entry] & 0xfff) << 10;
 		tmp |= (offset & 0x3ff);
 
-		//if (!machine().side_effects_disabled()) printf("sun2: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 1, (m_pagemap[entry] >> 22) & 7, m_pagemap[entry], offset<<1);
+		if (!machine().side_effects_disabled())
+			LOG("sun2: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 1, (m_pagemap[entry] >> 22) & 7, m_pagemap[entry], offset<<1);
 
 		switch ((m_pagemap[entry] >> 22) & 7)
 		{
@@ -470,7 +478,7 @@ void sun2_state::tl_mmu_w(uint8_t fc, offs_t offset, uint16_t data, uint16_t mem
 				return;
 
 			case 1: // type 1
-				//printf("write device space @ %x\n", tmp<<1);
+				LOG("write device space @ %x\n", tmp<<1);
 				m_type1space->write16(tmp, data, mem_mask);
 				return;
 
@@ -485,10 +493,11 @@ void sun2_state::tl_mmu_w(uint8_t fc, offs_t offset, uint16_t data, uint16_t mem
 	}
 	else
 	{
-		if (!machine().side_effects_disabled()) printf("sun2: pagemap entry not valid!\n");
+		if (!machine().side_effects_disabled())
+			logerror("sun2: pagemap entry not valid!\n");
 	}
 
-	printf("sun2: Unmapped write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc(), offset<<1);
+	logerror("sun2: Unmapped write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc(), offset<<1);
 }
 
 // BW2 video control
@@ -499,7 +508,7 @@ uint16_t sun2_state::video_ctrl_r()
 
 void sun2_state::video_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	//printf("sun2: BW2: %x to video_ctrl\n", data);
+	LOG("sun2: BW2: %x to video_ctrl\n", data);
 	COMBINE_DATA(&m_bw2_ctrl);
 }
 

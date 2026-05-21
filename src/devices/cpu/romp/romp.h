@@ -25,19 +25,16 @@ protected:
 		ROMP_GPR = 16,
 	};
 
-	enum scr : unsigned
-	{
-		COUS =  6, // counter source
-		COU  =  7, // counter
-		TS   =  8, // timer status
-		ECR  =  9, // exception control (advanced/enhanced only)
-		MQ   = 10, // multiplier quotient
-		MPCS = 11, // machine/program check status
-		IRB  = 12, // interrupt request buffer
-		IAR  = 13, // instruction address register
-		ICS  = 14, // interrupt control status
-		CS   = 15, // condition status
-	};
+	static constexpr unsigned COUS =  6; // counter source
+	static constexpr unsigned COU  =  7; // counter
+	static constexpr unsigned TS   =  8; // timer status
+	static constexpr unsigned ECR  =  9; // exception control (advanced/enhanced only)
+	static constexpr unsigned MQ   = 10; // multiplier quotient
+	static constexpr unsigned MPCS = 11; // machine/program check status
+	static constexpr unsigned IRB  = 12; // interrupt request buffer
+	static constexpr unsigned IAR  = 13; // instruction address register
+	static constexpr unsigned ICS  = 14; // interrupt control status
+	static constexpr unsigned CS   = 15; // condition status
 
 	enum ts_mask : u32
 	{

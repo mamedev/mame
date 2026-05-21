@@ -24,12 +24,12 @@ public:
 	virtual void input_data5(int state) override { if (state) m_ddr |= 0x20; else m_ddr &= ~0x20; }
 	virtual void input_data6(int state) override { if (state) m_ddr |= 0x40; else m_ddr &= ~0x40; }
 	virtual void input_data7(int state) override { if (state) m_ddr |= 0x80; else m_ddr &= ~0x80; }
-//	virtual void input_ack(int state) override { printf("input_ack %d\n", state); }
-//	virtual void input_busy(int state)  override { printf("input_busy %d\n", state); }
-//	virtual void input_perror(int state) override { printf("input_perror %d\n", state); }
-//	virtual void input_select(int state) override { printf("input_select %d\n", state); }
+//  virtual void input_ack(int state) override { printf("input_ack %d\n", state); }
+//  virtual void input_busy(int state)  override { printf("input_busy %d\n", state); }
+//  virtual void input_perror(int state) override { printf("input_perror %d\n", state); }
+//  virtual void input_select(int state) override { printf("input_select %d\n", state); }
 	virtual void input_autofd(int state) override;
-//	virtual void input_fault(int state) override { printf("input_fault %d\n", state); }
+//  virtual void input_fault(int state) override { printf("input_fault %d\n", state); }
 	virtual void input_init(int state) override;
 	virtual void input_select_in(int state) override;
 

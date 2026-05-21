@@ -39,14 +39,9 @@ This driver is based on the Prophet 5 Rev 3.0 technical manual, and is intended
 as an education tool. To that end, names for variables, I/O handlers, enums,
 etc., generally match signal names in the schematics.
 
-There is minimal audio. Running with `-oslog -output console` will display CVs,
-and voice and LED control signals.
-
 When the Prophet 5 boots up, it runs its autotune routine (`tune` LED will be
 illuminated). The synth is unresponsive while this is happening. Once that's
-done, it will load bank 1 program 1. To instantly configure the sound based on
-the current knob positions, press the "preset" button ('P') to exit preset mode
-(preset LED should turn off).
+done, it will load bank 1 program 1.
 */
 
 #include "emu.h"
@@ -60,6 +55,7 @@ the current knob positions, press the "preset" button ('P') to exit preset mode
 #include "machine/timer.h"
 #include "sound/cem3310.h"
 #include "sound/cem3320.h"
+#include "sound/cem3340.h"
 #include "sound/dac.h"
 #include "sound/flt_rc.h"
 #include "sound/mixer.h"
@@ -83,15 +79,21 @@ the current knob positions, press the "preset" button ('P') to exit preset mode
 #define LOG_PROG_LATCH  (1U << 6)
 #define LOG_FILTER      (1U << 7)
 #define LOG_WHEEL       (1U << 8)
+#define LOG_LFO         (1U << 9)
+#define LOG_OSC         (1U << 10)
+#define LOG_PMOD        (1U << 11)
+#define LOG_TUNE        (1U << 12)
 
-#define VERBOSE (LOG_GENERAL | LOG_CALIBRATION | LOG_PROG_LATCH | LOG_CV)
+#define VERBOSE (LOG_CALIBRATION)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
+
 namespace {
 
 constexpr double VCC = 5.0;
+constexpr double V5A = 5.0;
 constexpr double VPLUS = 15.0;
 constexpr double VMINUS = -15.0;
 constexpr double MAX_CV_IN = 10.0;  // Maximun voltage for CV inputs on back panel.
@@ -100,7 +102,35 @@ constexpr double VD = 0.6;  // Diode voltage drop / PNP emitter-base voltage dro
 double normalized(const required_ioport &input)
 {
 	assert(input->field(1)->minval() == 0);
-	return double(input->read()) / double(input->field(1)->maxval());
+	// Clamp max value to 1, to protect against old configurations with larger
+	// port max values.
+	return std::min(1.0, double(input->read()) / double(input->field(1)->maxval()));
+}
+
+// Returns the Thevenin-equivalent resistance (Req) and voltage (Veq) looking
+// from point X to the circuit on the left.
+//
+// +15V
+//   |
+//  Rtrim---Rwiper---+---X      ----->      Veq---Req---X
+//   |               |
+//   |              Rgnd
+//   |               |
+// -15V             GND
+//
+// This circuit is used for balance and offset trimming on OTAs and op-amps.
+std::pair<double, double> balance_rveq(const required_ioport &trimmer, double r_wiper, double r_gnd)
+{
+	constexpr double TRIMMER_R_MAX = RES_K(100);
+	const double r_bottom = normalized(trimmer) * TRIMMER_R_MAX;
+	const double r_top = TRIMMER_R_MAX - r_bottom;
+
+	const double v_top = VPLUS * RES_VOLTAGE_DIVIDER(r_top, RES_2_PARALLEL(r_bottom, r_wiper + r_gnd));
+	const double v_bottom = VMINUS * RES_VOLTAGE_DIVIDER(r_bottom, RES_2_PARALLEL(r_top, r_wiper + r_gnd));
+	const double v_eq = (v_top + v_bottom) * RES_VOLTAGE_DIVIDER(r_wiper, r_gnd);
+	const double r_eq = RES_2_PARALLEL(r_gnd, r_wiper + RES_2_PARALLEL(r_top, r_bottom));
+
+	return std::make_pair(r_eq, v_eq);
 }
 
 // A voltage-to-current converter based on a PNP transistor. Converts control
@@ -194,6 +224,184 @@ void prophet5_cv2cc_device::sound_stream_update(sound_stream &stream)
 
 namespace {
 
+// Emulates the tuning MUXes and tuning comparator.
+// U439 & U440 (CD4051) and U435 (LM311) with surrounding resistors.
+// Schematic: "PCB 4 CV DMUX, TUNE MUX, AUD OUT", top right.
+//
+// The ramp waveform (0-10V) of the oscillator selected for tuning will be
+// routed to the comparator. When the waveform is larger than the comparator's
+// threshold (~1.48V), the comparator's output will go low. When there is no
+// oscillator selected, the comparator's output will be high.
+class prophet5_tuning_device : public device_t
+{
+public:
+	prophet5_tuning_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0) ATTR_COLD;
+
+	void set_oscillators(const std::array<cem3340_device *, 10> &osc) ATTR_COLD;
+
+	auto cmp_cb() { return m_cmp_cb.bind(); }
+
+	void control_w(u8 data);
+
+protected:
+	void device_start() override ATTR_COLD;
+
+private:
+	TIMER_CALLBACK_MEMBER(sample_timer_tick);
+	TIMER_CALLBACK_MEMBER(osc_timer_tick);
+	void update_osc_timer();
+	void set_cmp_state(int state);
+
+	devcb_write8 m_cmp_cb;
+
+	emu_timer *m_sample_timer;
+	emu_timer *m_thresh_timer;
+	emu_timer *m_reset_timer;
+	std::array<cem3340_device *, 10> m_osc;
+
+	s8 m_tune_osc;
+	s8 m_cmp_state;
+
+	enum osc_state
+	{
+		OSC_THRESH = 0,
+		OSC_RESET,
+	};
+};
+
+}  // anonymous namespace
+
+DEFINE_DEVICE_TYPE(PROPHET5_TUNING, prophet5_tuning_device, "prophet5_tuning", "Prophet 5 tuning mux and comparator")
+
+prophet5_tuning_device::prophet5_tuning_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, PROPHET5_TUNING, tag, owner, 0)
+	, m_cmp_cb(*this)
+	, m_sample_timer(nullptr)
+	, m_thresh_timer(nullptr)
+	, m_reset_timer(nullptr)
+	, m_tune_osc(-2)
+	, m_cmp_state(-2)
+{
+	std::fill(m_osc.begin(), m_osc.end(), nullptr);
+}
+
+void prophet5_tuning_device::set_oscillators(const std::array<cem3340_device *, 10> &osc)
+{
+	m_osc = osc;
+}
+
+void prophet5_tuning_device::device_start()
+{
+	save_item(NAME(m_tune_osc));
+	save_item(NAME(m_cmp_state));
+
+	m_sample_timer = timer_alloc(FUNC(prophet5_tuning_device::sample_timer_tick), this);
+	m_thresh_timer = timer_alloc(FUNC(prophet5_tuning_device::osc_timer_tick), this);
+	m_reset_timer = timer_alloc(FUNC(prophet5_tuning_device::osc_timer_tick), this);
+}
+
+void prophet5_tuning_device::control_w(u8 data)
+{
+	// D0-D2: ABC inputs for both tuning MUXes.
+	const u8 mux_abc = BIT(data, 0, 3);
+
+	// D4-D5: INH inputs of individual tuning MUXes.
+	const bool mux0_on = !BIT(data, 4);
+	const bool mux1_on = !BIT(data, 5);
+
+	// Well-behaved firmware should not enable both MUXes at the same time.
+	// If that happens, picking MUX0 because:
+	// - If ABC >=2, enabling MUX1 will be a no-op anyway.
+	// - If ABC < 2, the outputs of the MUXes will conflict, and the result will
+	//   be undefined. Arbitrarily pick MUX0 in that case.
+	s8 tune_osc = -1;
+	if (mux0_on)
+		tune_osc = mux_abc;
+	else if (mux1_on && mux_abc < 2)
+		tune_osc = 8 + mux_abc;
+
+	if (tune_osc == m_tune_osc)
+		return;
+
+	m_tune_osc = tune_osc;
+	update_osc_timer();
+
+	if (m_tune_osc >= 0)
+	{
+		// If an oscillator is selected, set up a timer that will predict the
+		// comparator's trip points (updates the osc timers) at each sample.
+		// The frequent prediction is needed because the oscillator's frequency
+		// is controlled by a voltage stream (rather than being fixed).
+		const attotime t = attotime::from_hz(m_osc[m_tune_osc]->sample_rate());
+		m_sample_timer->adjust(t, 0, t);
+
+		// The comparator's state will depend on the phase of the just-selected
+		// oscillator, which is arbitrary. But it is much more likely to be 0
+		// given the comparator's threshold.
+		set_cmp_state(0);
+	}
+	else
+	{
+		m_sample_timer->reset();
+
+		// When no oscillator is selected, a pull-down resistor (R4183) at the
+		// comparator's inverting input will make the output go high.
+		set_cmp_state(1);
+	}
+
+	LOGMASKED(LOG_TUNE, "Osc selected for tuning: %d\n", m_tune_osc);
+}
+
+TIMER_CALLBACK_MEMBER(prophet5_tuning_device::sample_timer_tick)
+{
+	update_osc_timer();
+}
+
+TIMER_CALLBACK_MEMBER(prophet5_tuning_device::osc_timer_tick)
+{
+	assert(m_tune_osc >= 0);
+	set_cmp_state((param == OSC_THRESH) ? 0 : 1);
+}
+
+void prophet5_tuning_device::update_osc_timer()
+{
+	// Comparator's positive going threshold (which is what's relevant here,
+	// since it is compared against the ramp waveform), as annotated in the
+	// schematic.
+	constexpr double CMP_THRESH = 1.48;
+
+	if (m_tune_osc < 0)
+	{
+		m_thresh_timer->reset();
+		m_reset_timer->reset();
+		return;
+	}
+
+	cem3340_device *osc = m_osc[m_tune_osc];
+	const attotime period = attotime::from_hz(osc->freq());
+
+	// Timer tracking the ramp waveform crossing the comparator's threshold.
+	const attotime t_thresh = osc->ramp_time_to_thresh(CMP_THRESH);
+	m_thresh_timer->adjust(t_thresh, OSC_THRESH, period);
+
+	// Timer tracking the ramp waveform resetting.
+	const attotime t_reset = osc->ramp_time_to_thresh(0);
+	m_reset_timer->adjust(t_reset, OSC_RESET, period);
+}
+
+void prophet5_tuning_device::set_cmp_state(int state)
+{
+	if (state != m_cmp_state)
+	{
+		m_cmp_state = state;
+		assert(m_cmp_state == 0 || m_cmp_state == 1);
+		m_cmp_cb(m_cmp_state);
+	}
+}
+
+
+namespace {
+
 // A Prophet 5 Rev 3.x voice.
 class prophet5_voice_device : public device_t, public device_sound_interface
 {
@@ -202,8 +410,13 @@ public:
 		const machine_config &mconfig,
 		const char *tag,
 		device_t *owner,
+		device_sound_interface *osc_a_sum_cv,
+		device_sound_interface *osc_b_sum_cv,
 		device_sound_interface *filt_sum_cv,
-		device_sound_interface *noise) ATTR_COLD;
+		device_sound_interface *pw_b_sum_cv,
+		device_sound_interface *pw_a_sum_cv,
+		device_sound_interface *noise,
+		const std::array<double, 5> &jitter) ATTR_COLD;
 	prophet5_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) ATTR_COLD;
 
 	auto volume_changed_cb() { return m_volume_changed_cb.bind(); }
@@ -211,19 +424,45 @@ public:
 	cem3310_device *vca_eg() { return m_vca_eg.target(); }
 	cem3310_device *filt_eg() { return m_filt_eg.target(); }
 
+	cem3340_device *osc_a_for_tuning() { return m_osc_a.target(); }
+	cem3340_device *osc_b_for_tuning() { return m_osc_b.target(); }
+
 	double volume_trimmer_r() const;
 
 	void gate_w(int state);
+
+	void pmod_env_amt_w(double cc);
+	void pmod_osc_amt_w(double cc);
+	void pmod_freq_a_s_w(int state);  // U459A pin 13
+	void pmod_pw_a_s_w(int state);    // U436A pin 13
+	void pmod_filt_s_w(int state);    // U438C pin 6
+
+	void osc_a_sh_w(double cv);
+	void osc_a_mix_w(double cc);
+	void osc_a_ramp_s_w(int state);   // U459B pin 5
+	void osc_a_pulse_s_w(int state);  // U459D pin 12
+
+	void osc_b_sh_w(double cv);
+	void osc_b_mix_w(double cc);
+	void osc_b_ramp_s_w(int state);   // U446D pin 12
+	void osc_b_pulse_s_w(int state);  // U446A pin 13
+	void osc_b_tri_s_w(int state);    // U446B pin 5
+
 	void filt_sh_w(double cv);
 	void filt_res_w(double cv);
 	void filt_env_amt_w(double cc);
 
 	DECLARE_INPUT_CHANGED_MEMBER(filter_trimmer_changed) { update_filter_freq_calibration(); }
 	DECLARE_INPUT_CHANGED_MEMBER(volume_trimmer_changed) { m_volume_changed_cb(0); }
+	DECLARE_INPUT_CHANGED_MEMBER(voice_balance_trimmer_changed) { voice_update_balance_calibration(); }
 
 	const char *trimmer_name_volume() const ATTR_COLD { return m_volume_name.c_str(); }
 	const char *trimmer_name_filt_scale() const ATTR_COLD { return m_filt_scale_name.c_str(); }
 	const char *trimmer_name_filt_offset() const ATTR_COLD { return m_filt_offset_name.c_str(); }
+	const char *trimmer_name_filt_env_bal() const ATTR_COLD { return m_filt_env_bal_name.c_str(); }
+	const char *trimmer_name_vca_bal() const ATTR_COLD { return m_vca_bal_name.c_str(); }
+	const char *trimmer_name_pmod_env_bal() const ATTR_COLD { return m_pmod_env_bal_name.c_str(); }
+	const char *trimmer_name_pmod_osc_bal() const ATTR_COLD { return m_pmod_osc_bal_name.c_str(); }
 
 protected:
 	void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -234,34 +473,69 @@ protected:
 	void sound_stream_update(sound_stream &stream) override;
 
 private:
+	static double jittered(double x, double random, double tolerance);
+
+	void update_osc_b_mix();
 	void update_filter_freq_calibration();
+	void voice_update_balance_calibration();
 
 	const std::string m_volume_name;
 	const std::string m_filt_scale_name;
 	const std::string m_filt_offset_name;
+	const std::string m_filt_env_bal_name;
+	const std::string m_vca_bal_name;
+	const std::string m_pmod_env_bal_name;
+	const std::string m_pmod_osc_bal_name;
 
+	const std::array<double, 5> m_jitter;
+
+	device_sound_interface *const m_osc_a_sum_cv;
+	device_sound_interface *const m_osc_b_sum_cv;
 	device_sound_interface *const m_filt_sum_cv;
+	device_sound_interface *const m_pw_b_sum_cv;
+	device_sound_interface *const m_pw_a_sum_cv;
 	device_sound_interface *const m_noise;
 	sound_stream *m_stream;
 
-	required_device<cem3310_device> m_vca_eg;  // U412
-	required_device<ca3280_vca_lin_device> m_vca;  // U477A
+	required_device<ca3280_vca_lin_device> m_pmod_env_vca;  // U422A
+	required_device<ca3280_vca_device> m_pmod_osc_vca;  // U428A
+	required_device<mixer_device> m_pmod;  // U431A (LM348)
+
+	required_device<va_scale_offset_device> m_osc_a_freq;
+	required_device<mixer_device> m_osc_a_pw;  // U432B (LM348)
+	required_device<cem3340_device> m_osc_a;  // U454
+	required_device<ca3280_vca_device> m_osc_a_mix;  // U464A
+
+	required_device<va_scale_offset_device> m_osc_b_freq;
+	required_device<cem3340_device> m_osc_b;  // U441
+	required_device<va_scale_offset_device> m_osc_b_tri_center;  // U451A and surrounding resistors.
+	required_device<ca3280_vca_device> m_osc_b_mix;  // U464B
 
 	required_device<cem3310_device> m_filt_eg;  // U417
 	required_device<ca3280_vca_lin_device> m_filt_eg_vca;  // U422B
 	required_device<va_const_device> m_filt_freq_sh;
 	// Inverting op-amp summer: LM348 + R4133 (trimmer) + R4145 + C464
-	required_device<mixer_device> m_filt_freq_smr;
-	required_device<filter_rc_device> m_filt_freq_smr_lpf;
+	required_device<filter_rc_device> m_filt_freq_smr;
 	// Scale & offset resistor network: R4501 (trimmer) + R4458 + R4459 + R4502
 	required_device<va_scale_offset_device> m_filt_freq_offset;
 	required_device<cem3320_lpf4_device> m_vcf;  // U469
 
-	required_ioport m_volume;  // R4529
+	required_device<cem3310_device> m_vca_eg;  // U412
+	required_device<ca3280_vca_lin_device> m_vca;  // U477A
+
 	devcb_write8 m_volume_changed_cb;
 
+	required_ioport m_volume;  // R4529
 	required_ioport m_filt_scale;  // R4133
 	required_ioport m_filt_offset;  // R4501
+	required_ioport m_filt_env_bal;  // R495
+	required_ioport m_vca_bal;  // R4520
+	required_ioport m_pmod_env_bal;  // R494
+	required_ioport m_pmod_osc_bal;  // R4138
+
+	bool m_osc_b_ramp_s;
+	bool m_osc_b_pulse_s;
+	bool m_osc_b_tri_s;
 };
 
 INPUT_PORTS_START(prophet5_voice_trimmers)
@@ -280,6 +554,22 @@ INPUT_PORTS_START(prophet5_voice_trimmers)
 	PORT_START("trimmer_filt_offset")
 	PORT_ADJUSTER(82, voice.trimmer_name_filt_offset())
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_voice_device::filter_trimmer_changed), 0)
+
+	PORT_START("trimmer_filt_env_balance")
+	PORT_ADJUSTER(69, voice.trimmer_name_filt_env_bal())
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_voice_device::voice_balance_trimmer_changed), 0);
+
+	PORT_START("trimmer_vca_balance")
+	PORT_ADJUSTER(64, voice.trimmer_name_vca_bal())
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_voice_device::voice_balance_trimmer_changed), 0);
+
+	PORT_START("trimmer_pmod_env_balance")
+	PORT_ADJUSTER(59, voice.trimmer_name_pmod_env_bal())
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_voice_device::voice_balance_trimmer_changed), 0);
+
+	PORT_START("trimmer_pmod_osc_balance")
+	PORT_ADJUSTER(50, voice.trimmer_name_pmod_osc_bal())
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_voice_device::voice_balance_trimmer_changed), 0);
 INPUT_PORTS_END
 
 }  // anonymous namespace
@@ -290,52 +580,196 @@ prophet5_voice_device::prophet5_voice_device(
 		const machine_config &mconfig,
 		const char *tag,
 		device_t *owner,
+		device_sound_interface *osc_a_sum_cv,
+		device_sound_interface *osc_b_sum_cv,
 		device_sound_interface *filt_sum_cv,
-		device_sound_interface *noise)
+		device_sound_interface *pw_b_sum_cv,
+		device_sound_interface *pw_a_sum_cv,
+		device_sound_interface *noise,
+		const std::array<double, 5> &jitter)
 	: device_t(mconfig, PROPHET5_VOICE, tag, owner, 0)
 	, device_sound_interface(mconfig, *this)
 	, m_volume_name(util::string_format("%s TRIMMER: VOLUME", strmakeupper(basetag())))
 	, m_filt_scale_name(util::string_format("%s TRIMMER: FILT SCALE", strmakeupper(basetag())))
 	, m_filt_offset_name(util::string_format("%s TRIMMER: FILT OFFSET", strmakeupper(basetag())))
+	, m_filt_env_bal_name(util::string_format("%s TRIMMER: FILT ENV BALANCE", strmakeupper(basetag())))
+	, m_vca_bal_name(util::string_format("%s TRIMMER: VCA BALANCE", strmakeupper(basetag())))
+	, m_pmod_env_bal_name(util::string_format("%s TRIMMER: PMOD ENV BALANCE", strmakeupper(basetag())))
+	, m_pmod_osc_bal_name(util::string_format("%s TRIMMER: PMOD OSC BALANCE", strmakeupper(basetag())))
+	, m_jitter(jitter)
+	, m_osc_a_sum_cv(osc_a_sum_cv)
+	, m_osc_b_sum_cv(osc_b_sum_cv)
 	, m_filt_sum_cv(filt_sum_cv)
+	, m_pw_b_sum_cv(pw_b_sum_cv)
+	, m_pw_a_sum_cv(pw_a_sum_cv)
 	, m_noise(noise)
 	, m_stream(nullptr)
-	, m_vca_eg(*this, "vca_eg")
-	, m_vca(*this, "vca")
+	, m_pmod_env_vca(*this, "pmod_env_vca")
+	, m_pmod_osc_vca(*this, "pmod_osc_vca")
+	, m_pmod(*this, "pmod_buffer")
+	, m_osc_a_freq(*this, "osc_a_freq")
+	, m_osc_a_pw(*this, "osc_a_pw")
+	, m_osc_a(*this, "osc_a")
+	, m_osc_a_mix(*this, "osc_a_mix")
+	, m_osc_b_freq(*this, "osc_b_freq")
+	, m_osc_b(*this, "osc_b")
+	, m_osc_b_tri_center(*this, "osc_b_tri_center")
+	, m_osc_b_mix(*this, "osc_b_mix")
 	, m_filt_eg(*this, "filt_eg")
 	, m_filt_eg_vca(*this, "filt_eg_vca")
 	, m_filt_freq_sh(*this, "filt_freq_sh")
 	, m_filt_freq_smr(*this, "filt_freq_summer")
-	, m_filt_freq_smr_lpf(*this, "filt_freq_summer_lpf")
 	, m_filt_freq_offset(*this, "filt_freq_offset")
 	, m_vcf(*this, "vcf")
-	, m_volume(*this, "trimmer_volume")
+	, m_vca_eg(*this, "vca_eg")
+	, m_vca(*this, "vca")
 	, m_volume_changed_cb(*this)
+	, m_volume(*this, "trimmer_volume")
 	, m_filt_scale(*this, "trimmer_filt_scale")
 	, m_filt_offset(*this, "trimmer_filt_offset")
+	, m_filt_env_bal(*this, "trimmer_filt_env_balance")
+	, m_vca_bal(*this, "trimmer_vca_balance")
+	, m_pmod_env_bal(*this, "trimmer_pmod_env_balance")
+	, m_pmod_osc_bal(*this, "trimmer_pmod_osc_balance")
+	, m_osc_b_ramp_s(false)
+	, m_osc_b_pulse_s(false)
+	, m_osc_b_tri_s(false)
 {
 }
 
 prophet5_voice_device::prophet5_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: prophet5_voice_device(mconfig, tag, owner, nullptr, nullptr)
+	: prophet5_voice_device(mconfig, tag, owner, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, {})
 {
+}
+
+// 'random' should be a uniform random number in the range [-1, 1].
+// 'tolerance' is the component's (resistor or capacitor) tolerance in %.
+double prophet5_voice_device::jittered(double x, double random, double tolerance)
+{
+	return x + x * random * tolerance / 100.0;
 }
 
 void prophet5_voice_device::device_add_mconfig(machine_config &config)
 {
 	// Modulation and audio pipeline for a single voice. The output of each
 	// stage is either a voltage or a current, as per the actual hardware.
+	//
+	// The component designations refer to voice 1 (schematic: "PCB 5 VOICE 1").
+	// All voices are identical.
 
-	// *** VCA modulation ***
 
-	// The only VCA modulation source is an ADSR envelope generator. Its voltage
-	// output is converted to a current and fed to the CA3280's control input.
-	CEM3310(config, m_vca_eg, RES_K(24.3), CAP_U(0.039))  // U412, R419 (1%), C427 (5%)
-		.add_route(0, "amp_cc", 1.0);
-	PROPHET5_CV2CC(config, "amp_cc", RES_K(3.3))  // Q410, R4496
-		.add_route(0, m_vca, 1.0, ca3280_vca_lin_device::INPUT_GAIN);
+	// *** Polyphonic modulation (polymod) ***
 
-	// *** Filter (VCF) control and modulation ***
+	constexpr double R4108 = RES_K(30);
+
+	// A VCA controls the amount of the filter envelope in the polymod signal.
+	CA3280_VCA_LIN(config, m_pmod_env_vca, RES_K(120), VPLUS, VMINUS)  // R446
+		.set_rplus(RES_K(22))  // R445
+		// r_minus is set in voice_update_balance_calibration().
+		.configure_voltage_output(R4108)
+		.add_route(0, m_pmod, 1.0);
+
+	// Another VCA controls the amount of osc B's output in the polymod signal.
+	// The mix of osc B's waveforms and the "+" input scaling are handled in
+	// update_osc_b_mix().
+	// The "-" input is set in voice_update_balance_calibration().
+	CA3280_VCA(config, m_pmod_osc_vca)
+		.configure_voltage_output(R4108)
+		.add_route(0, m_pmod, 1.0);
+
+	// The output of the two VCAs is mixed and distributed to osc A and filter
+	// control signals.
+	MIXER(config, m_pmod)
+		.add_route(0, m_osc_a_freq, 0.0)  // Gain computed in pmod_freq_a_s_w().
+		.add_route(0, m_osc_a_pw, 0.0)  // Gain computed in pmod_pw_a_s_w().
+		.add_route(0, m_filt_freq_smr, 0.0);  // Gain computed in pmod_filt_s_w().
+
+
+	// *** Noise source ***
+
+	if (m_noise)
+		m_noise->add_route(0, m_vcf, 1.0 / RES_K(100), cem3320_lpf4_device::INPUT_AUDIO);  // R4367
+
+
+	// *** Oscillator A ***
+
+	// Osc A frequency control. The osc A master sum CV is mixed with a per-voice
+	// frequency CV ("freq A S/H"), a fixed offset, and the polymod signal (when
+	// enabled), before being fed to the VCO's frequency control. The per voice
+	// CV and fixed offset are both captured in m_osc_a_freq's offset (
+	// see osc_a_sh_w()).
+	if (m_osc_a_sum_cv)
+		m_osc_a_sum_cv->add_route(0, m_osc_a_freq, 1.0 / RES_K(100));  // R4322 (1%, matched to 0.01% with R4321)
+	VA_SCALE_OFFSET(config, m_osc_a_freq)
+		.add_route(0, m_osc_a, 1.0, cem3340_device::INPUT_FREQ);
+
+	// Osc A pulse width control. The PW A master sum CV is mixed with the
+	// polymod signal and fed to the PW CV input of the VCO.
+	if (m_pw_a_sum_cv)
+		m_pw_a_sum_cv->add_route(0, m_osc_a_pw, 1.0 / RES_K(100));  // R4163 (1%)
+	MIXER(config, m_osc_a_pw)
+		.add_route(0, m_osc_a, -RES_K(52.3), cem3340_device::INPUT_PW);  // R4162 (1%)
+
+	// Oscillator A chip. The ramp and pulse outputs are fed, via switches, to
+	// the "+" and "-" inputs of an OTA. The switches control whether each
+	// waveform is enabled (route gains controlled by osc_a_ramp_s_w() and
+	// osc_a_pulse_s_w()).
+	const double cf_a = jittered(CAP_P(1000), m_jitter[0], 5);  // C4119 (poly). Tolerance not documented. Assuming 5%.
+	const double rr_a = jittered(RES_M(2.21), m_jitter[1], 1);  // R4326 (1%)
+	CEM3340(config, m_osc_a, cf_a, rr_a)  // U454
+		.add_route(cem3340_device::OUTPUT_RAMP, m_osc_a_mix, 0.0, ca3280_vca_device::INPUT_AUDIO)
+		.add_route(cem3340_device::OUTPUT_PULSE, m_osc_a_mix, 0.0, ca3280_vca_device::INPUT_AUDIO_INV);
+
+	// The OTA controls the level of osc A in the mix (see osc_a_mix_w()).
+	CA3280_VCA(config, m_osc_a_mix)  // U464A
+		.configure_plus_divider(RES_K(150), RES_R(330))  // R4364, R4363
+		.configure_minus_divider(RES_K(200), RES_R(330))  // R4366, R4365
+		.add_route(0, m_vcf, 1.0, cem3320_lpf4_device::INPUT_AUDIO);
+
+
+	// *** Oscillator B ***
+
+	// Osc B frequency control. Same setup as osc A.
+	if (m_osc_b_sum_cv)
+		m_osc_b_sum_cv->add_route(0, m_osc_b_freq, 1.0 / RES_K(100));  // R4205 (1%, matched to 0.01% with R4206)
+	VA_SCALE_OFFSET(config, m_osc_b_freq)
+		.add_route(0, m_osc_b, 1.0, cem3340_device::INPUT_FREQ);
+
+	// Osc B pulse width control. The PW B master sum CV is directly fed to the
+	// PW CV input of the VCO.
+	if (m_pw_b_sum_cv)
+		m_pw_b_sum_cv->add_route(0, m_osc_b, 1.0, cem3340_device::INPUT_PW);
+
+	// Oscillator B chip. The setup is similar to that of osc A, except that the
+	// triangle output is also used, and the outputs are also routed to the
+	// polymod osc B VCA. Route gains to m_osc_b_mix and m_pmod_osc_vca are
+	// computed in update_osc_b_mix().
+	const double cf_b = jittered(CAP_P(1000), m_jitter[2], 5);  // C481 (poly). Tolerance not documented. Assuming 5%.
+	const double rr_b = jittered(RES_M(2.21), m_jitter[3], 1);  // R4209 (1%)
+	CEM3340(config, m_osc_b, cf_b, rr_b)  // U441
+		.add_route(cem3340_device::OUTPUT_RAMP, m_osc_b_mix, 0.0, ca3280_vca_device::INPUT_AUDIO)
+		.add_route(cem3340_device::OUTPUT_RAMP, m_pmod_osc_vca, 0.0, ca3280_vca_device::INPUT_AUDIO)
+		.add_route(cem3340_device::OUTPUT_PULSE, m_osc_b_mix, 0.0, ca3280_vca_device::INPUT_AUDIO_INV)
+		.add_route(cem3340_device::OUTPUT_PULSE, m_pmod_osc_vca, 0.0, ca3280_vca_device::INPUT_AUDIO)
+		.add_route(cem3340_device::OUTPUT_TRIANGLE, m_osc_b_tri_center, 1.0);
+
+	// The triangle waveform is fed through a switch (osc_b_tri_s_w()) to a
+	// circuit that scales and centers it.
+	VA_SCALE_OFFSET(config, m_osc_b_tri_center)  // U451A (TL082) and surrounding resistors.
+		.set_scale(0).set_offset(0)  // Computed in update_osc_b_mix().
+		.add_route(0, m_osc_b_mix, 0.0, ca3280_vca_device::INPUT_AUDIO_INV)
+		.add_route(0, m_pmod_osc_vca, 0.0, ca3280_vca_device::INPUT_AUDIO);
+
+	// The OTA controls the level of osc B in the mix (see osc_b_mix_w()). The
+	// ramp signal is fed to the "+" input, and the transformed triangle signal
+	// and pulse signal are mixed passively and fed to the "-" input.
+	CA3280_VCA(config, m_osc_b_mix)  // U464B
+		// Scaling for the "+" and "-" inputs is captured in the route gains
+		// computed in update_osc_b_mix().
+		.add_route(0, m_vcf, 1.0, cem3320_lpf4_device::INPUT_AUDIO);
+
+
+	// *** Filter (VCF) ***
 
 	// There are two cutoff frequency control voltages (CVs). One common to all
 	// voices ("filt sum cv") and a delta ("filt s/h") for each voice. The delta
@@ -346,15 +780,15 @@ void prophet5_voice_device::device_add_mconfig(machine_config &config)
 		m_filt_sum_cv->add_route(0, m_filt_freq_smr, 1.0 / RES_K(100));  // R4143 (1%)
 
 	// The filter has its own ADSR envelope generator. Its voltage output is fed
-	// to a VCA, which controls the envelope amount applied to the filter's
-	// cutoff frequency. The output of the VCA is a current.
+	// to a VCA ("filt env amt"), which controls the envelope amount applied to
+	// the filter's cutoff frequency. The output of the VCA is a current.
 	CEM3310(config, m_filt_eg, RES_K(24.3), CAP_U(0.039))  // U417, R440 (1%), C443 (5%)
-		.add_route(0, m_filt_eg_vca, 1.0);
+		.add_route(0, m_filt_eg_vca, 1.0)
+		.add_route(0, m_pmod_env_vca, 1.0);
 	CA3280_VCA_LIN(config, m_filt_eg_vca, RES_K(121), VPLUS, VMINUS)  // U422B, R451 (1%)
-		.configure_voltage_input(RES_K(47.5))  // R452 (1%)
+		.set_rplus(RES_K(47.5))  // R452 (1%)
+		// rminus is set in voice_update_balance_calibration().
 		.add_route(0, m_filt_freq_smr, 1.0);
-
-	// TODO: Emulate the "polymod" filter modulation source.
 
 	// The control currents from all sources are summed, scaled, and low-pass-
 	// filtered by U433B (LM348 op-amp) and surrounding components. The scale
@@ -362,28 +796,34 @@ void prophet5_voice_device::device_add_mconfig(machine_config &config)
 	// scaled and offset by a resistor network, which is calibrated with the
 	// "filt offset" trimmer. See update_filter_freq_calibration(). The
 	// processed voltage is then fed to the VCF's frequency control input.
-	MIXER(config, m_filt_freq_smr).add_route(0, m_filt_freq_smr_lpf, 1.0);
-	FILTER_RC(config, m_filt_freq_smr_lpf)  // ~751-982 Hz.
+	FILTER_RC(config, m_filt_freq_smr)  // ~751-982 Hz LPF
 		.add_route(0, m_filt_freq_offset, 1.0);
 	VA_SCALE_OFFSET(config, m_filt_freq_offset)
 		.add_route(0, m_vcf, 1.0, cem3320_lpf4_device::INPUT_FREQ);
 
-	// *** Audio ***
-
-	if (m_noise)
-		m_noise->add_route(0, "osc_mixer", 1.0 / RES_K(100));  // R4367
-
-	// Currents from the noise source and oscillators are summed into the VCF input.
-	MIXER(config, "osc_mixer").add_route(0, m_vcf, 1.0, cem3320_lpf4_device::INPUT_AUDIO);
-
 	// The filter's output is scaled by a non-inverting amplifier (U474B, TL082).
 	constexpr double VCF_OUT_GAIN = 1.0 + RES_K(240) / RES_K(100);  // R4500 / R4499
-	CEM3320_LPF4(config, m_vcf, CAP_P(150))
+	const double cp_f = jittered(CAP_P(150), m_jitter[4], 5);  // C4151 (5%, poly)
+	CEM3320_LPF4(config, m_vcf, cp_f)  // U469
 		.configure_resonance(RES_K(200), RES_K(51), RES_K(3), VCF_OUT_GAIN)  // R4414, R4416, R4415
+		.add_route(0, "vcf_dcblock", 1.0);
+	FILTER_RC(config, "vcf_dcblock")
+		.set_rc(filter_rc_device::HIGHPASS, RES_K(68), 0, 0, CAP_U(2.2))  // R4460, C4164 (tantalum, 20%)
 		.add_route(0, m_vca, VCF_OUT_GAIN);
 
+
+	// *** Amplifier (VCA) ***
+
+	// The only VCA modulation source is an ADSR envelope generator. Its voltage
+	// output is converted to a current and fed to the CA3280's control input.
+	CEM3310(config, m_vca_eg, RES_K(24.3), CAP_U(0.039))  // U412, R419 (1%), C427 (5%)
+		.add_route(0, "amp_cc", 1.0);
+	PROPHET5_CV2CC(config, "amp_cc", RES_K(3.3))  // Q410, R4496
+		.add_route(0, m_vca, 1.0, ca3280_vca_lin_device::INPUT_GAIN);
+
 	CA3280_VCA_LIN(config, m_vca, RES_K(68), VPLUS, VMINUS)  // R4546
-		.configure_voltage_input(RES_K(20))  // R4548
+		.set_rplus(RES_K(20))  // R4548
+		// r_minus is set in voice_update_balance_calibration().
 		.add_route(0, *this, 1.0);
 }
 
@@ -395,11 +835,16 @@ ioport_constructor prophet5_voice_device::device_input_ports() const
 void prophet5_voice_device::device_start()
 {
 	m_stream = stream_alloc(1, 1, machine().sample_rate());
+	save_item(NAME(m_osc_b_ramp_s));
+	save_item(NAME(m_osc_b_pulse_s));
+	save_item(NAME(m_osc_b_tri_s));
 }
 
 void prophet5_voice_device::device_reset()
 {
+	update_osc_b_mix();
 	update_filter_freq_calibration();
+	voice_update_balance_calibration();
 }
 
 void prophet5_voice_device::sound_stream_update(sound_stream &stream)
@@ -417,12 +862,113 @@ void prophet5_voice_device::gate_w(int state)
 {
 	m_vca_eg->gate_w(state);
 	m_filt_eg->gate_w(state);
-	LOGMASKED(LOG_GATE, "Voice: %s, gate: %d\n", tag(), state);
+
+	// Note that frequency is controlled by a stream and could be changing.
+	// The frequencies printed below are the instantaneous frequencies.
+	LOGMASKED(LOG_GATE, "Voice: %s, gate: %d, osc A freq: %f, osc B freq: %f\n",
+			  tag(), state, m_osc_a->freq(), m_osc_b->freq());
+}
+
+void prophet5_voice_device::pmod_env_amt_w(double cc)
+{
+	m_pmod_env_vca->set_fixed_gain_cv(cc);
+	LOGMASKED(LOG_PMOD, "%s: PMOD filter envelope amount CC: %f\n", tag(), cc);
+}
+
+void prophet5_voice_device::pmod_osc_amt_w(double cc)
+{
+	m_pmod_osc_vca->set_fixed_gain_cv(cc);
+	LOGMASKED(LOG_PMOD, "%s: PMOD osc B amount CC: %f\n", tag(), cc);
+}
+
+void prophet5_voice_device::pmod_freq_a_s_w(int state)
+{
+	const double gain = state ? (1.0 / RES_K(301)) : 0.0;  // R4357 (1%)
+	m_pmod->set_route_gain(0, m_osc_a_freq, 0, gain);
+	LOGMASKED(LOG_PMOD, "%s: PMOD osc A freq: %d - %f\n", tag(), state, gain);
+}
+
+void prophet5_voice_device::pmod_pw_a_s_w(int state)
+{
+	const double gain = state ? (1.0 / RES_K(30.1)) : 0.0;  // R4172 (1%)
+	m_pmod->set_route_gain(0, m_osc_a_pw, 0, gain);
+	LOGMASKED(LOG_PMOD, "%s: PMOD osc A PW: %d\n", tag(), state);
+}
+
+void prophet5_voice_device::pmod_filt_s_w(int state)
+{
+	const double gain = state ? (1.0 / RES_K(54.9)) : 0.0;  // R4181 (1%)
+	m_pmod->set_route_gain(0, m_filt_freq_smr, 0, gain);
+	LOGMASKED(LOG_PMOD, "%s: PMOD filter freq: %d\n", tag(), state);
+}
+
+void prophet5_voice_device::osc_a_sh_w(double cv)
+{
+	constexpr double R4321 = RES_K(100);  // 1%, matched to 0.01% with R4322.
+	m_osc_a_freq->set_offset(cv / R4321 + VPLUS / RES_K(357));  // R4324 (1%)
+	LOGMASKED(LOG_OSC, "%s: Osc A freq S/H CV: %f\n", tag(), cv);
+}
+
+void prophet5_voice_device::osc_a_mix_w(double cc)
+{
+	m_osc_a_mix->set_fixed_gain_cv(cc);
+	LOGMASKED(LOG_OSC, "%s: Osc A mix amt CC: %f mA\n", tag(), 1000 * cc);
+}
+
+void prophet5_voice_device::osc_a_ramp_s_w(int state)
+{
+	constexpr int from = cem3340_device::OUTPUT_RAMP;
+	constexpr int to = ca3280_vca_device::INPUT_AUDIO;
+	m_osc_a->set_route_gain(from, m_osc_a_mix, to, state ? 1.0 : 0.0);
+	LOGMASKED(LOG_OSC, "%s: Osc A ramp: %d\n", tag(), state);
+}
+
+void prophet5_voice_device::osc_a_pulse_s_w(int state)
+{
+	constexpr int from = cem3340_device::OUTPUT_PULSE;
+	constexpr int to = ca3280_vca_device::INPUT_AUDIO_INV;
+	m_osc_a->set_route_gain(from, m_osc_a_mix, to, state ? 1.0 : 0.0);
+	LOGMASKED(LOG_OSC, "%s: Osc A pulse: %d\n", tag(), state);
+}
+
+void prophet5_voice_device::osc_b_sh_w(double cv)
+{
+	constexpr double R4206 = RES_K(100);  // 1%, matched to 0.01% with R4205.
+	m_osc_b_freq->set_offset(cv / R4206 + VPLUS / RES_K(357));  // R4204 (1%)
+	LOGMASKED(LOG_OSC, "%s: Osc B freq S/H CV: %f\n", tag(), cv);
+}
+
+void prophet5_voice_device::osc_b_mix_w(double cc)
+{
+	m_osc_b_mix->set_fixed_gain_cv(cc);
+	LOGMASKED(LOG_OSC, "%s: Osc B mix amt CC: %f mA\n", tag(), 1000 * cc);
+}
+
+void prophet5_voice_device::osc_b_ramp_s_w(int state)
+{
+	m_osc_b_ramp_s = bool(state);
+	update_osc_b_mix();
+	LOGMASKED(LOG_OSC, "%s: Osc B ramp: %d\n", tag(), m_osc_b_ramp_s);
+}
+
+void prophet5_voice_device::osc_b_pulse_s_w(int state)
+{
+	m_osc_b_pulse_s = bool(state);
+	update_osc_b_mix();
+	LOGMASKED(LOG_OSC, "%s: Osc B pulse: %d\n", tag(), m_osc_b_pulse_s);
+}
+
+void prophet5_voice_device::osc_b_tri_s_w(int state)
+{
+	m_osc_b_tri_s = bool(state);
+	update_osc_b_mix();
+	LOGMASKED(LOG_OSC, "%s: Osc B triangle: %d\n", tag(), m_osc_b_tri_s);
 }
 
 void prophet5_voice_device::filt_sh_w(double cv)
 {
 	m_filt_freq_sh->set_value(cv);
+	LOGMASKED(LOG_FILTER, "%s: Filter S/H CV: %f\n", tag(), cv);
 }
 
 void prophet5_voice_device::filt_res_w(double cv)
@@ -437,6 +983,142 @@ void prophet5_voice_device::filt_env_amt_w(double cc)
 	LOGMASKED(LOG_FILTER, "%s: Filter envelope AMT CC: %f\n", tag(), cc);
 }
 
+void prophet5_voice_device::update_osc_b_mix()
+{
+	// See middle-left part of schematic: "PCB4 VOICE 1".
+
+	// CEM3340      CD4016
+	// _______
+	//        |      ___
+	//   RAMP |-----|   |--------------------+----R4241------------+ (+) MIX VCA
+	//        |     |___|                    |                     |
+	//        |       |                      +----R4243---+      R4370---GND
+	//        | m_osc_b_ramp_s                            |
+	//        |      ___                                  |
+	//  PULSE |-----|   |--------------------+----R4250---|--------+ (-) MIX VCA
+	//        |     |___|                    |            |        |
+	//        |       |                      +----R4251---+   +----+
+	//        | m_osc_b_pulse_s                           |   |    |
+	//        |      ___      ________________            |   |  R4371---GND
+	//    TRI |-----|   |----| SCALE & CENTER |-+-R4285---|---+
+	//        |     |___|    |________________| |         |
+	//        |       |                         +-R4280---+-------- (+) PMOD VCA
+	//        | m_osc_b_tri_s                             |
+	//________|                                         R4105---GND
+
+	constexpr int RAMP = cem3340_device::OUTPUT_RAMP;
+	constexpr int PULSE = cem3340_device::OUTPUT_PULSE;
+	constexpr int OTA_IN = ca3280_vca_device::INPUT_AUDIO;
+	constexpr int OTA_IN_INV = ca3280_vca_device::INPUT_AUDIO_INV;
+
+	// Oscillator B Mix VCA.
+	constexpr double R4241 = RES_K(150);
+	constexpr double R4370 = RES_R(330);
+	constexpr double R4250 = RES_K(200);
+	constexpr double R4285 = RES_K(150);
+	constexpr double R4371 = RES_R(330);
+
+	// Oscillator B PMOD VCA.
+	constexpr double R4243 = RES_K(150);
+	constexpr double R4251 = RES_K(200);
+	constexpr double R4280 = RES_K(150);
+	constexpr double R4105 = RES_R(330);
+
+	// Things to keep in mind if inspecting the code below.
+	// * The Scale & Center circuit always outputs a voltage, even when the
+	//   triangle switch is disabled. So R4285 and R4280 will always load the
+	//   Mix and PMOD inputs, respectively.
+	// * The pulse and triangle waveforms are mixed passively into the inverting
+	//   input of the Mix VCA.
+	// * All 3 waveforms are mixed passively into the non-inverting input of the
+	//   PMOD VCA.
+	// * Interestingly, the pulse and triangle waveforms are inverted for the
+	//   audio mix, but not inverted for PMOD.
+
+	// ramp
+	{
+		double mix_gain = 0;
+		double pmod_gain = 0;
+		if (m_osc_b_ramp_s)
+		{
+			mix_gain = RES_VOLTAGE_DIVIDER(R4241, R4370);
+
+			double r_gnd = RES_2_PARALLEL(R4105, R4280);
+			if (m_osc_b_pulse_s)
+				r_gnd = RES_2_PARALLEL(r_gnd, R4251);
+
+			pmod_gain = RES_VOLTAGE_DIVIDER(R4243, r_gnd);
+		}
+		m_osc_b->set_route_gain(RAMP, m_osc_b_mix, OTA_IN, mix_gain);
+		m_osc_b->set_route_gain(RAMP, m_pmod_osc_vca, OTA_IN, pmod_gain);
+	}
+
+	// pulse
+	{
+		double mix_gain = 0;
+		double pmod_gain = 0;
+		if (m_osc_b_pulse_s)
+		{
+			mix_gain = RES_VOLTAGE_DIVIDER(R4250, RES_2_PARALLEL(R4371, R4285));
+
+			double r_gnd = RES_2_PARALLEL(R4105, R4280);
+			if (m_osc_b_ramp_s)
+				r_gnd = RES_2_PARALLEL(r_gnd, R4243);
+
+			pmod_gain = RES_VOLTAGE_DIVIDER(R4251, r_gnd);
+		}
+		m_osc_b->set_route_gain(PULSE, m_osc_b_mix, OTA_IN_INV, mix_gain);
+		m_osc_b->set_route_gain(PULSE, m_pmod_osc_vca, OTA_IN, pmod_gain);
+	}
+
+	// triangle
+	{
+		double mix_r_gnd = R4371;
+		double pmod_r_gnd = R4105;
+
+		if (m_osc_b_ramp_s)
+		{
+			pmod_r_gnd = RES_2_PARALLEL(pmod_r_gnd, R4243);
+		}
+		if (m_osc_b_pulse_s)
+		{
+			mix_r_gnd = RES_2_PARALLEL(mix_r_gnd, R4250);
+			pmod_r_gnd = RES_2_PARALLEL(pmod_r_gnd, R4251);
+		}
+
+		const double mix_gain = RES_VOLTAGE_DIVIDER(R4285, mix_r_gnd);
+		const double pmod_gain = RES_VOLTAGE_DIVIDER(R4280, pmod_r_gnd);
+
+		m_osc_b_tri_center->set_route_gain(0, m_osc_b_mix, OTA_IN_INV, mix_gain);
+		m_osc_b_tri_center->set_route_gain(0, m_pmod_osc_vca, OTA_IN, pmod_gain);
+	}
+
+	// Scale & Center.
+
+	// See "DC LEVEL-SHIFTER" section of schematic "PCB4 VOICE 1".
+	// The output of the triangle switch is processed by U451A (TL082) and the
+	// surrounding resistor network. When the switch is off, the output of that
+	// circuit will be 0V. When the switch is on, the circuit will scale and
+	// offset the [0V, 5V] triangle signal to approximately [-4.2V, 5V].
+
+	double tri_scale = 0;
+	double tri_offset = 0;
+	if (m_osc_b_tri_s)
+	{
+		// Values are based on a simulation. While the centering circuit is
+		// similar to that of the LFO (see update_lfo_mix()), one of the voltage
+		// reference resistors is slightly different, and the voltage reference
+		// is loaded by the centering circuits of all 5 voices. This results in
+		// somewhat different values for these constants.
+		constexpr double MIN_OUT = -4.601;
+		constexpr double MAX_OUT = 5.386;
+		tri_scale = (MAX_OUT - MIN_OUT) / 5.0;
+		tri_offset = MIN_OUT;
+	}
+	m_osc_b_tri_center->set_scale(tri_scale);
+	m_osc_b_tri_center->set_offset(tri_offset);
+}
+
 void prophet5_voice_device::update_filter_freq_calibration()
 {
 	// Control voltages from multiple sources are summed and inverted by U433B
@@ -444,7 +1126,7 @@ void prophet5_voice_device::update_filter_freq_calibration()
 	// feedback turns this into an LPF.
 	const double r_feedback = RES_K(162) + RES_K(50) * normalized(m_filt_scale);  // R4145 (1%) + R4133
 	m_filt_freq_smr->set_output_gain(0, -r_feedback);
-	m_filt_freq_smr_lpf->filter_rc_set_RC(filter_rc_device::LOWPASS, r_feedback, 0, 0, CAP_U(0.001));  // C464
+	m_filt_freq_smr->filter_rc_set_RC(filter_rc_device::LOWPASS, r_feedback, 0, 0, CAP_U(0.001));  // C464
 
 	// The summed CV is further scaled and offset by a resistor network.
 	constexpr double R4458 = RES_K(187);  // 1%
@@ -460,6 +1142,34 @@ void prophet5_voice_device::update_filter_freq_calibration()
 	LOGMASKED(LOG_CALIBRATION | LOG_FILTER, "%s: Filter frequency: %f\n", tag(), m_vcf->get_freq());
 }
 
+void prophet5_voice_device::voice_update_balance_calibration()
+{
+	std::pair<double, double> rv_equiv;
+
+	rv_equiv = balance_rveq(m_filt_env_bal, RES_K(475), RES_K(47.5));  // R453 (1%), R450 (1%)
+	m_filt_eg_vca->set_rminus(rv_equiv.first);
+	m_filt_eg_vca->set_fixed_inv_input(rv_equiv.second);
+	LOGMASKED(LOG_CALIBRATION, "%s: Filt env balance R: %f, V-: %f - Idiff: %e\n",
+			  tag(), rv_equiv.first, rv_equiv.second, m_filt_eg_vca->diff(0, rv_equiv.second));
+
+	rv_equiv = balance_rveq(m_vca_bal, RES_K(200), RES_K(20));  // R4536, R4547
+	m_vca->set_rminus(rv_equiv.first);
+	m_vca->set_fixed_inv_input(rv_equiv.second);
+	LOGMASKED(LOG_CALIBRATION, "%s: VCA balance R: %f, V-: %f - Idiff: %e\n",
+			  tag(), rv_equiv.first, rv_equiv.second, m_vca->diff(0, rv_equiv.second));
+
+	rv_equiv = balance_rveq(m_pmod_env_bal, RES_K(470), RES_K(22));  // R444, R447
+	m_pmod_env_vca->set_rminus(rv_equiv.first);
+	m_pmod_env_vca->set_fixed_inv_input(rv_equiv.second);
+	LOGMASKED(LOG_CALIBRATION, "%s: PMOD env balance R: %f, V-: %f - Idiff: %e\n",
+			  tag(), rv_equiv.first, rv_equiv.second, m_pmod_env_vca->diff(0, rv_equiv.second));
+
+	rv_equiv = balance_rveq(m_pmod_osc_bal, RES_M(2.2), RES_R(330));  // R4104, R4106
+	m_pmod_osc_vca->set_fixed_inv_input(rv_equiv.second);
+	LOGMASKED(LOG_CALIBRATION, "PMOD osc balance V-: %f, Vdiff: %f\n",
+			  rv_equiv.second, m_pmod_osc_vca->diff(0, rv_equiv.second));
+}
+
 
 namespace {
 
@@ -473,14 +1183,44 @@ public:
 	void select_a440_w(int state);
 	void a440_w(int state);
 
-	void filt_kbd_s_w(int state);
-	void wmod_filt_s_w(int state);
+	// Signal routing switch IC (CD4016) control.
 
+	void lfo_ramp_s_w(int state);  // U377A pin 13
+	void lfo_sqr_s_w(int state);   // U377B pin 5
+	void lfo_tri_s_w(int state);   // U377C pin 6
+
+	void wmod_freq_a_s_w(int state);  // U371B pin 5
+	void wmod_freq_b_s_w(int state);  // U371A pin 13
+	void wmod_filt_s_w(int state);    // U369C pin 6
+	void wmod_pw_b_s_w(int state);    // U369B pin 5
+	void wmod_pw_a_s_w(int state);    // U369A pin 13
+
+	void osc_b_lo_freq_s_w(int state);  // U371D pin 12
+	void osc_b_kbd_s_w(int state);      // U379B pin 5
+	void filt_kbd_s_w(int state);       // U369D pin 12
+
+	// Signal routing switches on each voice.
+	void pmod_freq_a_s_w(int state);
+	void pmod_pw_a_s_w(int state);
+	void pmod_filt_s_w(int state);
+	void osc_a_ramp_s_w(int state);
+	void osc_a_pulse_s_w(int state);
+	void osc_b_ramp_s_w(int state);
+	void osc_b_pulse_s_w(int state);
+	void osc_b_tri_s_w(int state);
+
+	void tune_control_w(u8 data);
 	void cv_w(offs_t cv_index, double cv);
+
+	auto tune_cmp_cb() { return m_tune_cmp_cb.bind(); }
 
 	DECLARE_INPUT_CHANGED_MEMBER(mod_wheel_changed) { update_wmod_amount(); }
 	DECLARE_INPUT_CHANGED_MEMBER(filter_cv_in_changed) { update_filter_fixed_cvs(); }
 	DECLARE_INPUT_CHANGED_MEMBER(master_volume_changed) { update_master_volume(); }
+	DECLARE_INPUT_CHANGED_MEMBER(pitch_mod_changed) { update_pitch_mod(false); }
+	DECLARE_INPUT_CHANGED_MEMBER(pitch_wheel_trim_changed) { update_pitch_mod(true); }
+	DECLARE_INPUT_CHANGED_MEMBER(osc_offset_trimmer_changed) { update_osc_offset(); }
+	DECLARE_INPUT_CHANGED_MEMBER(balance_trimmer_changed) { update_balance_calibration(); }
 
 protected:
 	void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -491,21 +1231,34 @@ private:
 	static double eg_rate_cv(double cv);
 	static double eg_sustain_cv(double cv);
 	static double glide_rate_cc(double cv);
+	static double lfo_vca_cc(double cv);
 
+	void update_lfo_mix();
 	void update_wmod_amount();
-	void update_wmod_routing();
-	void update_glide_out_routing();
+	void update_pitch_mod(bool calibrating);
+	void update_osc_offset();
 	void update_filter_fixed_cvs();
 	void update_voice_volume();
 	void update_master_volume();
+	void update_balance_calibration();
 
+	required_device<va_const_device> m_pitch_mod;  // Pitch wheel + master tune knob.
 	required_device<va_ota_eg_device> m_glide_eg;  // U381A (CA3280) + surrounding components.
 	required_device<ca3280_vca_device> m_mod_noise_vca;  // U378B
+	required_device<cem3340_device> m_lfo;  // U376
+	required_device<va_scale_offset_device> m_lfo_tri_center;  // U380B (TL082) and surrounding resistors.
+	required_device<ca3280_vca_device> m_lfo_vca;  // U378A
 	required_device<mixer_device> m_wmod;  // R2, U374D (LM348) - W-MOD BUFFER
-	required_device<va_const_device> m_filt_fixed_cvs;
-	required_device<mixer_device> m_filt_cv_mixer;
+
+	required_device<va_scale_offset_device> m_osc_a_offset;  // U368C (LM348)
+	required_device<va_scale_offset_device> m_osc_b_offset;  // U368D (LM348)
+	required_device<va_scale_offset_device> m_osc_b_sum_cv_mixer;  // U368A (LM348)
+	required_device<va_scale_offset_device> m_filt_cv_mixer;  // U367A (LM348)
+	required_device<va_scale_offset_device> m_pw_b_cv_mixer;  // U366C (LM348)
+	required_device<va_scale_offset_device> m_pw_a_cv_mixer;  // U366A (LM348)
 
 	required_device_array<prophet5_voice_device, 5> m_voices;
+	required_device<prophet5_tuning_device> m_tune_cmp;
 	required_device<dac_1bit_device> m_a440;  // U315B (8253) output (pin 13)
 	required_device<filter_rc_device> m_a440_lpf;  // C4183 and surrounding resistors.
 	required_device<filter_rc_device> m_parasitic_filter;  // C4183's "parasitic" effect on the voice outputs.
@@ -513,14 +1266,51 @@ private:
 	required_device<ca3280_vca_lin_device> m_master_vol_vca;  // U479B (CA3280)
 
 	required_ioport m_master_vol_pot;  // R113
+	required_ioport m_master_tune_pot;  // R104
 	required_ioport m_amp_cv_in_connected;
 	required_ioport m_amp_cv_in;  // J7
 	required_ioport m_filter_cv_in;  // J6
 	required_ioport m_mod_wheel;  // R2
+	required_ioport m_pitch_wheel;  // R1
+	required_ioport m_pitch_wheel_trim;  // R3129
+	required_ioport m_lfo_bal;  // R3141
+	required_ioport m_osc_a_offset_trim;  // R339
+	required_ioport m_osc_b_offset_trim;  // R338
 
-	bool m_filt_kbd_s;  // U369D (CD4016) control (pin 12)
-	bool m_wmod_filt_s;  // U369C (CD4016) control (pin 6)
+	devcb_write8 m_tune_cmp_cb;
+
+	bool m_tune;
+	bool m_lfo_ramp_s;
+	bool m_lfo_sqr_s;
+	bool m_lfo_tri_s;
+	bool m_wmod_freq_a_s;
+	bool m_wmod_freq_b_s;
 	std::array<double, 40> m_cv;
+
+	// Osc A master sum components.
+	// Resistors in matched group B are matched to 0.01% of each other.
+	static inline constexpr double R3104 = RES_K(182);  // 1%
+	static inline constexpr double R382 = RES_K(100);  // 1%, matched group B
+	static inline constexpr double R383 = RES_K(100);  // 1%, matched group B
+
+	// Osc B master sum components.
+	// Resistors in matched group A are matched to 0.01% of each other.
+	static inline constexpr double R3103 = RES_K(182);  // 1%
+	static inline constexpr double R387 = RES_K(100);  // 1%, matched group A
+	static inline constexpr double R379 = RES_K(100);  // 1%, matched group A
+
+	// Random perturbation of oscillator and filter capacitor and resistor
+	// values. Ensures the 5 voices are not identical. Generated in python with
+	// random.uniform(-1, 1), and truncated to 5 decimal places.
+	static inline constexpr std::array<std::array<double, 5>, 5> JITTER =
+	{{
+		// OscA Cf,  OscA Rr,  OscB Cf,  OscB Rr,  Filt Cp
+		{  0.81696,  0.90818,  0.14546,  0.22070,  0.05212 },  // voice 1
+		{ -0.77821, -0.94071,  0.03588, -0.11369, -0.49884 },  // voice 2
+		{  0.16002, -0.69243, -0.12850, -0.14771, -0.86846 },  // voice 3
+		{  0.32065, -0.30883,  0.32969,  0.22658, -0.32831 },  // voice 4
+		{  0.45709,  0.39231, -0.08091,  0.82278, -0.89985 },  // voice 5
+	}};
 
 	enum cv_type
 	{
@@ -553,31 +1343,64 @@ DEFINE_DEVICE_TYPE(PROPHET5_AUDIO, prophet5_audio_device, "prophet5_audio", "Pro
 
 prophet5_audio_device::prophet5_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, PROPHET5_AUDIO, tag, owner, clock)
+	, m_pitch_mod(*this, "pitch_mod")
 	, m_glide_eg(*this, "glide_eg")
 	, m_mod_noise_vca(*this, "mod_noise_vca")
+	, m_lfo(*this, "lfo")
+	, m_lfo_tri_center(*this, "lfo_tri_center")
+	, m_lfo_vca(*this, "lfo_vca")
 	, m_wmod(*this, "wmod")
-	, m_filt_fixed_cvs(*this, "filt_fixed_cvs")
+	, m_osc_a_offset(*this, "osc_a_offset")
+	, m_osc_b_offset(*this, "osc_b_offset")
+	, m_osc_b_sum_cv_mixer(*this, "osc_b_sum_cv_mixer")
 	, m_filt_cv_mixer(*this, "filt_cv_mixer")
+	, m_pw_b_cv_mixer(*this, "pw_b_cv_mixer")
+	, m_pw_a_cv_mixer(*this, "pw_a_cv_mixer")
 	, m_voices(*this, "voice_%u", 0U)
+	, m_tune_cmp(*this, "tuning_mux_cmp")
 	, m_a440(*this, "a440_generator")
 	, m_a440_lpf(*this, "a440_lpf")
 	, m_parasitic_filter(*this, "parasitic_filter")
 	, m_noise_vca(*this, "noise_vca")
 	, m_master_vol_vca(*this, "master_volume_vca")
 	, m_master_vol_pot(*this, ":pot_volume")
+	, m_master_tune_pot(*this, ":pot_tune")
 	, m_amp_cv_in_connected(*this, ":cv_in_amp_connected")
 	, m_amp_cv_in(*this, ":cv_in_amp")
 	, m_filter_cv_in(*this, ":cv_in_filter")
 	, m_mod_wheel(*this, ":wheel_mod")
-	, m_filt_kbd_s(false)
-	, m_wmod_filt_s(false)
+	, m_pitch_wheel(*this, ":wheel_pitch")
+	, m_pitch_wheel_trim(*this, ":trimmer_wheel_pitch")
+	, m_lfo_bal(*this, ":trimmer_lfo_balance")
+	, m_osc_a_offset_trim(*this, ":trimmer_osc_a_offset")
+	, m_osc_b_offset_trim(*this, ":trimmer_osc_b_offset")
+	, m_tune_cmp_cb(*this)
+	, m_tune(false)
+	, m_lfo_ramp_s(false)
+	, m_lfo_sqr_s(false)
+	, m_lfo_tri_s(false)
+	, m_wmod_freq_a_s(false)
+	, m_wmod_freq_b_s(false)
 {
 	std::fill(m_cv.begin(), m_cv.end(), -1);
 }
 
 void prophet5_audio_device::device_add_mconfig(machine_config &config)
 {
-	// *** Modulation ***
+	// *** Modulation sources ***
+	// Schematic: left and top middle of "PCB 3 WMOD, MASTER SUMMERS".
+
+	// Pitch modulation: pitch wheel and master tune knob.
+	// Both controls are captured in m_pitch_mod (see update_pitch_mod()). Their
+	// sum is low-pass filtered (smooths out pitch bends) before being
+	// distributed to the osc A and B master sum CV generators. Pitch modulation
+	// is disconnected during autotune.
+	constexpr double R378 = RES_K(100);  // 1%
+	VA_CONST(config, m_pitch_mod).add_route(0, "pitch_mod_mixer", 1.0);
+	FILTER_RC(config, "pitch_mod_mixer")  // U367C (LM348)
+		.set_lowpass(R378, CAP_U(0.1))  // C368, ~15.9 Hz LPF
+		.add_route(0, "osc_a_sum_cv_mixer", -R378 / RES_K(100))  // R365 (1%, matched group B)
+		.add_route(0, m_osc_b_sum_cv_mixer, -R378 / RES_K(100));  // R358 (1%, matched group A)
 
 	// Unison / Glide CV generator.
 	// An OTA-based envelope generator produces the "GLIDE OUT CV". It slews
@@ -585,9 +1408,11 @@ void prophet5_audio_device::device_add_mconfig(machine_config &config)
 	// as linear, and transitions to an "RC" curve when very close to the target
 	// voltage. The EG consists of U381A (CA3280), U380A (TL082) and surrounding
 	// passives. The GLIDE OUT CV is distributed to the "sum CVs" of the filter
-	// and two oscillators (see update_glide_out_routing()).
+	// and two oscillators.
 	VA_OTA_EG(config, m_glide_eg, va_ota_eg_device::ota_type::CA3280, CAP_U(0.1)) // C376
-		.add_route(0, m_filt_cv_mixer, 1.0);
+		.add_route(0, m_osc_a_offset, 1.0 / R382)  // Gain modified in tune_control_w().
+		.add_route(0, m_osc_b_offset, 0.0)  // Gain computed in osc_b_kbd_s_w().
+		.add_route(0, m_filt_cv_mixer, 0.0);  // Gain computed in filt_kbd_s_w().
 
 	// Pink noise modulation source.
 	// The output of the noise IC is offset, scaled, inverted and low-pass-
@@ -596,7 +1421,6 @@ void prophet5_audio_device::device_add_mconfig(machine_config &config)
 	// That signal is then fed to a VCA, which controls the amount of modulation
 	// by the noise source.
 	// TODO: Implement the "noise bal" trimmer.
-	// TODO: Intensity seems to max out early in the mod wheel's range. Figure out why.
 
 	// Offset, scale, inversion, clipping and centering (in lieu of the trimmer)
 	// are all handled by "mod_noise_buffer". Relevant calculations:
@@ -618,42 +1442,113 @@ void prophet5_audio_device::device_add_mconfig(machine_config &config)
 		.set_lowpass(R393, CAP_U(0.01))  // C372
 		.add_route(0, m_mod_noise_vca, 1.0);
 	CA3280_VCA(config, m_mod_noise_vca)  // U378B
-		.configure_input_divider(RES_K(20), RES_R(330))  // R3119, R3120
+		.configure_plus_divider(RES_K(20), RES_R(330))  // R3119, R3120
 		.add_route(0, m_wmod, 1.0);
 
-	// TODO: Implement LFO modulation source.
+	// LFO modulation source.
+	// The LFO is built around a CEM3340 configured with a pulse width of 50%.
+	// Its 3 waveform outputs can be enabled individually via CD4016 switches (
+	// see lfo_*_s_w()). The triangle's output is further processed to center it
+	// around 0V, which is more appropriate for vibrato effects. The 3 waveforms
+	// are mixed passively and fed to a VCA, which controls the amount of
+	// modulation by the LFO. Many of the route gains, and the triangle scale
+	// and offset are computed in update_lfo_mix().
+	CEM3340(config, m_lfo, CAP_U(0.1), RES_M(2.21))  // U376 - C382 (mylar, 5%), R3138 (1%)
+		.set_pw_cv(VPLUS * RES_VOLTAGE_DIVIDER(RES_K(10), RES_K(2)))  // R3110, R3111, 50% PW.
+		.add_route(cem3340_device::OUTPUT_TRIANGLE, m_lfo_tri_center, 1.0)
+		.add_route(cem3340_device::OUTPUT_RAMP, m_lfo_vca, 1.0)
+		.add_route(cem3340_device::OUTPUT_PULSE, m_lfo_vca, 1.0);
+	VA_SCALE_OFFSET(config, m_lfo_tri_center)  // U380B (TL082) and surrounding resistors.
+		.set_scale(0).set_offset(0)
+		.add_route(0, m_lfo_vca, 1.0);
+	CA3280_VCA(config, m_lfo_vca).add_route(0, m_wmod, 1.0);  // U378A
 
 	// The output currents from the noise and LFO VCAs are summed and converted
 	// to a voltage by the mod wheel and R3113 (see update_wmod_amount()). The
 	// voltage is buffered by U374D (LM348) and distributed to all "sum CV"
-	// generators (see update_wmod_routing()).
-	MIXER(config, m_wmod).add_route(0, m_filt_cv_mixer, 1.0);
+	// generators.
+	MIXER(config, m_wmod)
+		.add_route(0, m_osc_a_offset, 0.0)  // Gain computed in wmod_freq_a_s_w().
+		.add_route(0, m_osc_b_offset, 0.0)  // Gain computed in wmod_freq_b_s_w().
+		.add_route(0, m_filt_cv_mixer, 0.0)  // Gain computed in wmod_filt_s_w().
+		.add_route(0, m_pw_b_cv_mixer, 0.0)  // Gain computed in wmod_pw_b_s_w().
+		.add_route(0, m_pw_a_cv_mixer, 0.0);  // Gain computed in wmod_pw_a_s_w().
+
+
+	// *** Master sum CV generators ***
+	// Schematic: right side of "PCB 3 WMOD, MASTER SUMMERS".
+
+	// Osc A frequency "sum CV" generator.
+	// The first stage (U368C op-amp) mixes the unison/glide CV (when autotune
+	// is disabled) with the wheel mod CV (when "wmod freq A" is enabled), and
+	// applies a trimmed offset intended to cancel any offset from the wheel mod
+	// source (see update_osc_offset()). The second stage (U368B op-amp) mixes
+	// the output of the first one with the pitch modulation source (when
+	// autotune is disabled), applies a low-pass filter, and distributes the
+	// result to all voices.
+	constexpr double R363 = RES_K(100);  // 1%, matched group B
+	VA_SCALE_OFFSET(config, m_osc_a_offset)  // U368C (LM348)
+		.add_route(0, "osc_a_sum_cv_mixer", -R383 / RES_K(100));  // R364 (1%, matched group B)
+	MIXER(config, "osc_a_sum_cv_mixer")  // U368B (LM348)
+		.add_route(0, "osc_a_sum_cv_lpf", -R363);
+	auto &osc_a_sum_cv = FILTER_RC(config, "osc_a_sum_cv_lpf")  // U368B (LM348)
+		.set_lowpass(R363, CAP_U(0.01));  // C364, ~159 Hz LPF
+
+	// Osc B frequency "sum CV" generator.
+	// Similar architecture to osc A above, with two differences:
+	// 1. The unison/glide CV is only mixed in when "osc b keyboard" is enabled.
+	// 2. The second stage will mix in a constant offset when "osc b lo freq"
+	//    is enabled, converting osc B into an LFO.
+	constexpr double R360 = RES_K(100);  // 1%, matched group A
+	VA_SCALE_OFFSET(config, m_osc_b_offset)  // U368D (LM348)
+		.add_route(0, m_osc_b_sum_cv_mixer, -R379 / RES_K(100));  // R359 (1%, matched group A)
+	VA_SCALE_OFFSET(config, m_osc_b_sum_cv_mixer)  // U368A (LM348)
+		// Offset computed in osb_b_lo_freq_s_w().
+		.add_route(0, "osc_b_sum_cv_lpf", -R360);
+	auto &osc_b_sum_cv = FILTER_RC(config, "osc_b_sum_cv_lpf")  // U368A (LM348)
+		.set_lowpass(R360, CAP_U(0.01));  // C362, ~159 Hz LPF
 
 	// Filter cutoff frequency "sum CV" generator.
 	// Mixes multiple sources of cutoff frequency CVs: firmware-controlled CV,
-	// external CV in (those two are combined in m_filt_fixed_cvs), glide out CV
-	// (when keyboard tracking is enabled), and wheel modulation (when enabled
-	// for the filter). The summed CV is then offset, low-pass-filtered, and
-	// distributed to all voices.
-	constexpr double R357 = RES_K(100);  // 1%
-	VA_CONST(config, m_filt_fixed_cvs)
-		.add_route(0, m_filt_cv_mixer, 1.0);
-	MIXER(config, m_filt_cv_mixer)
-		.add_route(0, "filt_cv_offset", -RES_K(100));  // R354 (1%), voltage
+	// external CV in (those two are captured as the offset in m_filt_cv_mixer),
+	// glide out CV (when keyboard tracking is enabled), and wheel modulation
+	// (when enabled for the filter). The summed CV is then offset, low-pass-
+	// filtered, and distributed to all voices. Resistors in matched group N are
+	// matched to 0.01% of each other.
+	constexpr double R357 = RES_K(100);  // 1%, matched group N
+	VA_SCALE_OFFSET(config, m_filt_cv_mixer)
+		.add_route(0, "filt_cv_offset", -RES_K(100));  // R354 (1%, matched group N)
 	VA_SCALE_OFFSET(config, "filt_cv_offset")
-		.set_scale(1.0 / RES_K(100))  // R355 (1%)
+		.set_scale(1.0 / RES_K(100))  // R355 (1%, matched group N)
 		.set_offset(VPLUS / RES_K(261))  // R356 (1%)
 		.add_route(0, "filt_sum_cv", -R357);
-	auto &filt_sum_cv = FILTER_RC(config, "filt_sum_cv")  // ~159 Hz
+	auto &filt_sum_cv = FILTER_RC(config, "filt_sum_cv")  // ~159 Hz LPF
 		.set_lowpass(R357, CAP_U(0.01));  // C363
+
+	// Pulse width B "sum CV" generator.
+	// The first inverting stage mixes the PW B CV (provided as the offset to
+	// m_pw_b_cv_mixer in cv_w()) and the PW B wmod signal (if enabled). A second
+	// processing stage inverts again and scales to ~52.3%.
+	VA_SCALE_OFFSET(config, m_pw_b_cv_mixer)  // U366C (LM348) + OSC B PW CV
+		.add_route(0, "pw_b_sum_cv", -RES_K(100) * (-RES_K(52.3) / RES_K(100)));  // R373, R350 (1%), R351
+	auto &pw_b_sum_cv = MIXER(config, "pw_b_sum_cv");  // U366B (LM348)
+
+	// Pulse width A "sum CV" generator.
+	// Similar to the above, except that the second stage is implemented in
+	// each voice, since it also mixes in the voice's "polymod" signal.
+	VA_SCALE_OFFSET(config, m_pw_a_cv_mixer)  // U366A (LM348) + OSC A PW CV
+		.add_route(0, "pw_a_sum_cv", -RES_K(100));  // R347
+	auto &pw_a_sum_cv = MIXER(config, "pw_a_sum_cv");
 
 
 	// *** Audio ***
+	// Schematic: bottom of "PCB 4 CV DMUX, TUNE MUX, AUD OUT".
 
 	// The values in each stream represent voltages or currents, as per the real
 	// hardware. This scaler converts the final voltage to audio within the
-	// range [-1, 1].
-	constexpr double VOLTAGE_TO_AUDIO_SCALER = 0.20;
+	// range [-1, 1]. The value is chosen such that most patches do not clip
+	// at max volume.
+	constexpr double VOLTAGE_TO_AUDIO_SCALER = 0.1;
 
 	// White noise generator. A single source is used for all voices.
 	// The input level to the CA3280 is >10x above its linear range, but this
@@ -667,7 +1562,7 @@ void prophet5_audio_device::device_add_mconfig(machine_config &config)
 		.set_rc(filter_rc_device::HIGHPASS, R4131 + R4132, 0, 0, CAP_U(0.1))  // C458
 		.add_route(0, m_noise_vca, 1.0);
 	CA3280_VCA(config, m_noise_vca)
-		.configure_input_divider(R4131, R4132)  // Scaled amplitude: +/- ~0.36V.
+		.configure_plus_divider(R4131, R4132)  // Scaled amplitude: +/- ~0.36V.
 		.configure_voltage_output(RES_K(10));  // R4129
 
 	// The 5 voices. The output of each voice device is a current, but it is
@@ -675,11 +1570,17 @@ void prophet5_audio_device::device_add_mconfig(machine_config &config)
 	// update_voice_volume().
 	for (int i = 0; i < m_voices.size(); ++i)
 	{
-		PROPHET5_VOICE(config, m_voices[i], &filt_sum_cv, m_noise_vca)
+		PROPHET5_VOICE(config, m_voices[i], &osc_a_sum_cv, &osc_b_sum_cv, &filt_sum_cv,
+					   &pw_b_sum_cv, &pw_a_sum_cv, m_noise_vca, JITTER[i])
 			.add_route(0, "voice_summer", 1.0)
-			.add_route(0, "parasitic_filter_mixer", 1.0);
+			.add_route(0, m_parasitic_filter, 1.0);
 		m_voices[i]->volume_changed_cb().set([this] (u8 data) { update_voice_volume(); });
 	}
+
+	// A pair of MUXes can route each oscillator to a comparator. The comparator's
+	// output drives the CLK input of the tuning flipflop (see prophet5_state::prophet5rev30()).
+	// The two MUXes and comparator are emulated in PROPHET5_TUNING.
+	PROPHET5_TUNING(config, m_tune_cmp).cmp_cb().set([this] (u8 data) { m_tune_cmp_cb(data); });
 
 	// A440 tone generator. The LPF's parameters can vary, and are computed in
 	// update_voice_volume().
@@ -695,7 +1596,6 @@ void prophet5_audio_device::device_add_mconfig(machine_config &config)
 	// The HPF's output is scaled and subtracted from the rest of the mix in
 	// "voice_summer", to produce the shelving effect. The HPF's parameters and
 	// its (negative) output gain are computed in update_voice_volume().
-	MIXER(config, "parasitic_filter_mixer").add_route(0, m_parasitic_filter, 1.0);
 	FILTER_RC(config, m_parasitic_filter).add_route(0, "voice_summer", 1.0);
 
 	// Passive mixing of all voices and the tone generator, followed by a buffer
@@ -707,8 +1607,9 @@ void prophet5_audio_device::device_add_mconfig(machine_config &config)
 	// the master volume knob and, if connected, the external AMPLIFIER CV IN
 	// input (J7). See update_master_volume().
 	CA3280_VCA_LIN(config, m_master_vol_vca, RES_K(68), VPLUS, VMINUS)  // R4561
-		.configure_voltage_input(RES_K(15))  // R4564
 		.configure_voltage_output(RES_K(20))  // R4562
+		.set_rplus(RES_K(15))  // R4564
+		.set_rminus(RES_K(15))  // R4563 - from parts list. Value in the schematic is unclear.
 		.add_route(0, "dcblock", 1.0);
 
 	// Output stage.
@@ -720,9 +1621,21 @@ void prophet5_audio_device::device_add_mconfig(machine_config &config)
 
 void prophet5_audio_device::device_start()
 {
-	save_item(NAME(m_filt_kbd_s));
-	save_item(NAME(m_wmod_filt_s));
+	save_item(NAME(m_tune));
+	save_item(NAME(m_lfo_ramp_s));
+	save_item(NAME(m_lfo_sqr_s));
+	save_item(NAME(m_lfo_tri_s));
+	save_item(NAME(m_wmod_freq_a_s));
+	save_item(NAME(m_wmod_freq_b_s));
 	save_item(NAME(m_cv));
+
+	std::array<cem3340_device *, 10> osc;
+	for (int i = 0; i < 5; ++i)
+	{
+		osc[2 * i] = m_voices[i]->osc_a_for_tuning();
+		osc[2 * i + 1] = m_voices[i]->osc_b_for_tuning();
+	}
+	m_tune_cmp->set_oscillators(osc);
 }
 
 void prophet5_audio_device::device_reset()
@@ -730,12 +1643,14 @@ void prophet5_audio_device::device_reset()
 	for (int i = 0; i < m_cv.size(); ++i)
 		cv_w(i, 0);
 
+	update_lfo_mix();
 	update_wmod_amount();
-	update_wmod_routing();
-	update_glide_out_routing();
+	update_pitch_mod(true);
+	update_osc_offset();
 	update_filter_fixed_cvs();
 	update_voice_volume();
 	update_master_volume();
+	update_balance_calibration();
 }
 
 void prophet5_audio_device::select_a440_w(int state)
@@ -752,18 +1667,159 @@ void prophet5_audio_device::a440_w(int state)
 	m_a440->write(state);
 }
 
-void prophet5_audio_device::filt_kbd_s_w(int state)
+void prophet5_audio_device::lfo_ramp_s_w(int state)
 {
-	m_filt_kbd_s = bool(state);
-	LOGMASKED(LOG_PROG_LATCH, "filt_kbd_s = %d\n", m_filt_kbd_s);
-	update_glide_out_routing();
+	m_lfo_ramp_s = bool(state);
+	LOGMASKED(LOG_PROG_LATCH, "lfo_ramp_s = %d\n", state);
+	update_lfo_mix();
+}
+
+void prophet5_audio_device::lfo_sqr_s_w(int state)
+{
+	m_lfo_sqr_s = bool(state);
+	LOGMASKED(LOG_PROG_LATCH, "lfo_sqr_s = %d\n", state);
+	update_lfo_mix();
+}
+
+void prophet5_audio_device::lfo_tri_s_w(int state)
+{
+	m_lfo_tri_s = bool(state);
+	LOGMASKED(LOG_PROG_LATCH, "lfo_tri_s = %d\n", state);
+	update_lfo_mix();
+}
+
+void prophet5_audio_device::wmod_freq_a_s_w(int state)
+{
+	m_wmod_freq_a_s = bool(state);
+	const double route_gain = m_wmod_freq_a_s ? (1.0 / R3104) : 0.0;
+	m_wmod->set_route_gain(0, m_osc_a_offset, 0, route_gain);
+	LOGMASKED(LOG_PROG_LATCH, "wmod_freq_a_s = %d\n", m_wmod_freq_a_s);
+	update_osc_offset();
+}
+
+void prophet5_audio_device::wmod_freq_b_s_w(int state)
+{
+	m_wmod_freq_b_s = bool(state);
+	const double route_gain = m_wmod_freq_b_s ? (1.0 / R3103) : 0.0;
+	m_wmod->set_route_gain(0, m_osc_b_offset, 0, route_gain);
+	LOGMASKED(LOG_PROG_LATCH, "wmod_freq_b_s = %d\n", m_wmod_freq_b_s);
+	update_osc_offset();
 }
 
 void prophet5_audio_device::wmod_filt_s_w(int state)
 {
-	m_wmod_filt_s = bool(state);
-	LOGMASKED(LOG_PROG_LATCH, "wmod_filt_s = %d\n", m_wmod_filt_s);
-	update_wmod_routing();
+	const double route_gain = state ? (1.0 / RES_K(13.3)) : 0.0;  // R399 (1%)
+	m_wmod->set_route_gain(0, m_filt_cv_mixer, 0, route_gain);
+	LOGMASKED(LOG_PROG_LATCH, "wmod_filt_s = %d\n", state);
+}
+
+void prophet5_audio_device::wmod_pw_b_s_w(int state)
+{
+	const double route_gain = state ? (1.0 / RES_K(15)) : 0.0;  // R398
+	m_wmod->set_route_gain(0, m_pw_b_cv_mixer, 0, route_gain);
+	LOGMASKED(LOG_PROG_LATCH, "wmod_pw_b_s = %d\n", state);
+}
+
+void prophet5_audio_device::wmod_pw_a_s_w(int state)
+{
+	const double route_gain = state ? (1.0 / RES_K(15)) : 0.0;  // R397
+	m_wmod->set_route_gain(0, m_pw_a_cv_mixer, 0, route_gain);
+	LOGMASKED(LOG_PROG_LATCH, "wmod_pw_a_s = %d\n", state);
+}
+
+void prophet5_audio_device::osc_b_lo_freq_s_w(int state)
+{
+	m_osc_b_sum_cv_mixer->set_offset(state ? (VPLUS / RES_K(200)) : 0.0);  // R3105 (1%)
+	LOGMASKED(LOG_PROG_LATCH, "osc_b_lo_freq_s = %d\n", state);
+}
+
+void prophet5_audio_device::osc_b_kbd_s_w(int state)
+{
+	const double route_gain = state ? (1.0 / R387) : 0.0;
+	m_glide_eg->set_route_gain(0, m_osc_b_offset, 0, route_gain);
+	LOGMASKED(LOG_PROG_LATCH, "osc_b_kbd_s = %d\n", state);
+}
+
+void prophet5_audio_device::filt_kbd_s_w(int state)
+{
+	const double route_gain = state ? (1.0 / RES_K(100)) : 0.0;  // R372 (1%, matched group N)
+	m_glide_eg->set_route_gain(0, m_filt_cv_mixer, 0, route_gain);
+	LOGMASKED(LOG_PROG_LATCH, "filt_kbd_s = %d\n", state);
+}
+
+void prophet5_audio_device::pmod_freq_a_s_w(int state)
+{
+	LOGMASKED(LOG_PROG_LATCH, "pmod_freq_a_s = %d\n", state);
+	for (prophet5_voice_device *v : m_voices)
+		v->pmod_freq_a_s_w(state);
+}
+
+void prophet5_audio_device::pmod_pw_a_s_w(int state)
+{
+	LOGMASKED(LOG_PROG_LATCH, "pmod_pw_a_s = %d\n", state);
+	for (prophet5_voice_device *v : m_voices)
+		v->pmod_pw_a_s_w(state);
+}
+
+void prophet5_audio_device::pmod_filt_s_w(int state)
+{
+	LOGMASKED(LOG_PROG_LATCH, "pmod_filt_s = %d\n", state);
+	for (prophet5_voice_device *v : m_voices)
+		v->pmod_filt_s_w(state);
+}
+
+void prophet5_audio_device::osc_a_ramp_s_w(int state)
+{
+	LOGMASKED(LOG_PROG_LATCH, "osc_a_ramp_s = %d\n", state);
+	for (prophet5_voice_device *v : m_voices)
+		v->osc_a_ramp_s_w(state);
+}
+
+void prophet5_audio_device::osc_a_pulse_s_w(int state)
+{
+	LOGMASKED(LOG_PROG_LATCH, "osc_a_pulse_s = %d\n", state);
+	for (prophet5_voice_device *v : m_voices)
+		v->osc_a_pulse_s_w(state);
+}
+
+void prophet5_audio_device::osc_b_ramp_s_w(int state)
+{
+	LOGMASKED(LOG_PROG_LATCH, "osc_b_ramp_s = %d\n", state);
+	for (prophet5_voice_device *v : m_voices)
+		v->osc_b_ramp_s_w(state);
+}
+
+void prophet5_audio_device::osc_b_pulse_s_w(int state)
+{
+	LOGMASKED(LOG_PROG_LATCH, "osc_b_pulse_s = %d\n", state);
+	for (prophet5_voice_device *v : m_voices)
+		v->osc_b_pulse_s_w(state);
+}
+
+void prophet5_audio_device::osc_b_tri_s_w(int state)
+{
+	LOGMASKED(LOG_PROG_LATCH, "osc_b_tri_s = %d\n", state);
+	for (prophet5_voice_device *v : m_voices)
+		v->osc_b_tri_s_w(state);
+}
+
+void prophet5_audio_device::tune_control_w(u8 data)
+{
+	m_tune_cmp->control_w(data);
+
+	// D3: -TUNE
+	const bool tune = !BIT(data, 3);
+	if (tune != m_tune)
+	{
+		m_tune = tune;
+		update_pitch_mod(false);
+
+		// Unison / glide CV is disconnected from osc A when tuning.
+		const double glide_gain = m_tune ? 0.0 : (1.0 / R382);
+		m_glide_eg->set_route_gain(0, m_osc_a_offset, 0, glide_gain);
+
+		LOGMASKED(LOG_TUNE, "Tuning enabled: %d\n", m_tune);
+	}
 }
 
 void prophet5_audio_device::cv_w(offs_t cv_index, double cv)
@@ -790,23 +1846,80 @@ void prophet5_audio_device::cv_w(offs_t cv_index, double cv)
 
 	switch (cv_index)
 	{
+		case CV_GLIDE:  m_glide_eg->set_iabc(glide_rate_cc(cv)); break;
+		case CV_UNISON: m_glide_eg->set_target_v(cv); break;
+
+		case CV_LFO_FREQ:
+			m_lfo->set_freq_cc(VPLUS / RES_K(487) + cv / RES_K(110));  // R3135 (1%), R3136 (1%)
+			LOGMASKED(LOG_LFO, "LFO frequency: %f\n", m_lfo->freq());
+			break;
 		case CV_WMOD_SRC_MIX:
+			// A single CV is used to cross-fade between the LFO and noise
+			// modulation sources. The same CV is processed by two different
+			// voltage-to-current converters. As the CV increases, the CC for
+			// the noise VCA increases, while the CC for the LFO VCA decreases.
+			m_lfo_vca->set_fixed_gain_cv(lfo_vca_cc(cv));
 			m_mod_noise_vca->set_fixed_gain_cv(cv2cc(cv, RES_K(8.2)));  // Q307, R3116
 			break;
+
+		case CV_PMOD_ENV_AMT:
+		{
+			// The generated control current is split across voices.
+			const double cc = cv2cc(cv, RES_K(3)) / double(m_voices.size());  // Q304, R326
+			for (prophet5_voice_device *v : m_voices)
+				v->pmod_env_amt_w(cc);
+			break;
+		}
+		case CV_PMOD_OSC_B:
+		{
+			// The generated control current is split across voices.
+			const double cc = cv2cc(cv, RES_K(5.6)) / double(m_voices.size());  // Q303, R320
+			for (prophet5_voice_device *v : m_voices)
+				v->pmod_osc_amt_w(cc);
+			break;
+		}
 
 		case CV_MIX_NOISE:
 			m_noise_vca->set_fixed_gain_cv(cv2cc(cv, RES_K(75)));  // Q305, R327
 			break;
+		case CV_MIX_OSC_A:
+		{
+			// The control current is split across the osc A mix VCAs of the 5 voices.
+			const double cc = cv2cc(cv, RES_K(33)) / double(m_voices.size());  // Q306, R328
+			for (prophet5_voice_device *v : m_voices)
+				v->osc_a_mix_w(cc);
+			break;
+		}
+		case CV_MIX_OSC_B:
+		{
+			// The control current is split across the osc B mix VCAs of the 5 voices.
+			const double cc = cv2cc(cv, RES_K(33)) / double(m_voices.size());  // Q302, R322
+			for (prophet5_voice_device *v : m_voices)
+				v->osc_b_mix_w(cc);
+			break;
+		}
 
-		case CV_GLIDE:  m_glide_eg->set_iabc(glide_rate_cc(cv)); break;
-		case CV_UNISON: m_glide_eg->set_target_v(cv); break;
+		case CV_OSC_A_PW: m_pw_a_cv_mixer->set_offset(cv / RES_K(100)); break;  // R348
+		case CV_OSC_B_PW: m_pw_b_cv_mixer->set_offset(cv / RES_K(100)); break;  // R349
 
-		case CV_FILT_CUTOFF: update_filter_fixed_cvs(); break;
+		case CV_OSC_1A_SH: m_voices[0]->osc_a_sh_w(cv); break;
+		case CV_OSC_2A_SH: m_voices[1]->osc_a_sh_w(cv); break;
+		case CV_OSC_3A_SH: m_voices[2]->osc_a_sh_w(cv); break;
+		case CV_OSC_4A_SH: m_voices[3]->osc_a_sh_w(cv); break;
+		case CV_OSC_5A_SH: m_voices[4]->osc_a_sh_w(cv); break;
+
+		case CV_OSC_1B_SH: m_voices[0]->osc_b_sh_w(cv); break;
+		case CV_OSC_2B_SH: m_voices[1]->osc_b_sh_w(cv); break;
+		case CV_OSC_3B_SH: m_voices[2]->osc_b_sh_w(cv); break;
+		case CV_OSC_4B_SH: m_voices[3]->osc_b_sh_w(cv); break;
+		case CV_OSC_5B_SH: m_voices[4]->osc_b_sh_w(cv); break;
+
 		case CV_FILT_1_SH: m_voices[0]->filt_sh_w(cv); break;
 		case CV_FILT_2_SH: m_voices[1]->filt_sh_w(cv); break;
 		case CV_FILT_3_SH: m_voices[2]->filt_sh_w(cv); break;
 		case CV_FILT_4_SH: m_voices[3]->filt_sh_w(cv); break;
 		case CV_FILT_5_SH: m_voices[4]->filt_sh_w(cv); break;
+		case CV_FILT_CUTOFF: update_filter_fixed_cvs(); break;
 		case CV_FILT_RESONANCE:
 			for (prophet5_voice_device *v : m_voices)
 				v->filt_res_w(cv);
@@ -941,6 +2054,109 @@ double prophet5_audio_device::glide_rate_cc(double cv)
 	return std::min(i_c, IC_MAX);
 }
 
+double prophet5_audio_device::lfo_vca_cc(double cv)
+{
+	// 15V
+	//  |         CV---+
+	// R(10K)          |
+	//  |              |
+	//  +----------|->PNP--|-----R(3.3K)----- CA3280 Iabc (LFO VCA control current)
+	//  |
+	// R(20K)
+	//  |
+	// GND
+	constexpr double R3128 = RES_K(10);
+	constexpr double R3130 = RES_K(20);
+
+	// Find approximate voltage at the emitter of the PNP (Q308, 2N4250).
+	constexpr double MAX_VE = VPLUS * RES_VOLTAGE_DIVIDER(R3128, R3130);
+	const double ve = std::min(cv + VD, MAX_VE);
+
+	// Iabc = collector current ~= emitter current = current through R(10K) - current through R(20K).
+	return (VPLUS - ve) / R3128 - ve / R3130;
+}
+
+void prophet5_audio_device::update_lfo_mix()
+{
+	// CEM3340       CD4016
+	// _______
+	//        |      ___
+	//   RAMP |-----|   |------------------------------R3133---+
+	//        |     |___|                                      |
+	//        |       |                                        |
+	//        |  m_lfo_ramp_s                                  |
+	//        |      ___                                       |
+	//  PULSE |-----|   |------------------------------R3132---+
+	//        |     |___|                                      |
+	//        |       |                                        |
+	//        |  m_lfo_sqr_s                                   |
+	//        |      ___       __________________              |
+	//    TRI |-----|   |-----|  SCALE & CENTER  |-----R3131---+----- LFO VCA
+	//        |     |___|     |__________________|             |
+	//        |       |                                      R3140
+	//        |  m_lfo_tri_s                                   |
+	//________|                                               GND
+
+	constexpr double R3131 = RES_K(160);
+	constexpr double R3132 = RES_K(200);
+	constexpr double R3133 = RES_K(160);
+	constexpr double R3140 = RES_R(330);
+
+	// Individual switches control whether each waveform makes it to the mix.
+	// Mixing is passive. The Scale & Center circuit always outputs a voltage,
+	// regardless of the triangle switch state, so R3131 will always load the
+	// mixed signal. In contrast, R3132 and R3133 will only load the signal if
+	// the corresponding switch is enabled.
+
+	double ramp_gain = 0;
+	if (m_lfo_ramp_s)
+	{
+		double r_gnd = RES_2_PARALLEL(R3140, R3131);
+		if (m_lfo_sqr_s)
+			r_gnd = RES_2_PARALLEL(r_gnd, R3132);
+		ramp_gain = RES_VOLTAGE_DIVIDER(R3133, r_gnd);
+	}
+	m_lfo->set_route_gain(cem3340_device::OUTPUT_RAMP, m_lfo_vca, 0, ramp_gain);
+
+	double sqr_gain = 0;
+	if (m_lfo_sqr_s)
+	{
+		double r_gnd = RES_2_PARALLEL(R3140, R3131);
+		if (m_lfo_ramp_s)
+			r_gnd = RES_2_PARALLEL(r_gnd, R3133);
+		sqr_gain = RES_VOLTAGE_DIVIDER(R3132, r_gnd);
+	}
+	m_lfo->set_route_gain(cem3340_device::OUTPUT_PULSE, m_lfo_vca, 0, sqr_gain);
+
+	double tri_r_gnd = R3140;
+	if (m_lfo_ramp_s)
+		tri_r_gnd = RES_2_PARALLEL(tri_r_gnd, R3133);
+	if (m_lfo_sqr_s)
+		tri_r_gnd = RES_2_PARALLEL(tri_r_gnd, R3132);
+	const double tri_gain = RES_VOLTAGE_DIVIDER(R3131, tri_r_gnd);
+	m_lfo_tri_center->set_route_gain(0, m_lfo_vca, 0, tri_gain);
+
+	// The output of the triangle switch is processed by U380B (TL082) and the
+	// surrounding resistor network. When the switch is off, the output of that
+	// circuit will be 0V. When the switch is on, the circuit will scale and
+	// offset the [0V, 5V] triangle signal to approximately [-5V, 5V].
+	double tri_scale = 0;
+	double tri_offset = 0;
+	if (m_lfo_tri_s)
+	{
+		// Values are based on a simulation.
+		constexpr double MIN_OUT = -4.889;
+		constexpr double MAX_OUT = 4.941;
+		tri_scale = (MAX_OUT - MIN_OUT) / 5.0;
+		tri_offset = MIN_OUT;
+	}
+	m_lfo_tri_center->set_scale(tri_scale);
+	m_lfo_tri_center->set_offset(tri_offset);
+
+	LOGMASKED(LOG_LFO, "LFO waveform gains - ramp: %f, sqr: %f, tri: %f. Tri scale: %f, offset:%f\n",
+			  ramp_gain, sqr_gain, tri_gain, tri_scale, tri_offset);
+}
+
 void prophet5_audio_device::update_wmod_amount()
 {
 	// The two VCAs are current sources.
@@ -954,9 +2170,13 @@ void prophet5_audio_device::update_wmod_amount()
 	constexpr double R2 = RES_K(100);  // mod wheel
 	constexpr double R3113 = RES_K(10);
 
+	// The real hardware does not use the full range of the wheel potentiometers.
+	// The exact range is not known. Going by ear.
+	constexpr double WHEEL_RANGE = 0.1;
+
 	// Compute the gain that converts the sum of the VCA currents to the voltage
 	// at the buffer.
-	const double r2_bottom = normalized(m_mod_wheel) * R2;
+	const double r2_bottom = normalized(m_mod_wheel) * WHEEL_RANGE * R2;
 	const double r2_top = R2 - r2_bottom;
 	const double i2v = RES_2_PARALLEL(R3113, R2) * RES_VOLTAGE_DIVIDER(r2_top, r2_bottom);
 
@@ -964,17 +2184,122 @@ void prophet5_audio_device::update_wmod_amount()
 	LOGMASKED(LOG_WHEEL, "Mod wheel: %d, I2V: %f\n", m_mod_wheel->read(), i2v);
 }
 
-void prophet5_audio_device::update_wmod_routing()
+void prophet5_audio_device::update_pitch_mod(bool calibrating)
 {
-	const double filt_gain = m_wmod_filt_s ? (1.0 / RES_K(13.3)) : 0.0;  // R399 (1%)
-	m_wmod->set_route_gain(0, m_filt_cv_mixer, 0, filt_gain);
-	LOGMASKED(LOG_WHEEL, "Mod wheel routing - filter: %f\n", filt_gain);
+	// Pitch wheel and master tune knob. See middle top of schematic:
+	// "PCB 3 WMOD, MASTER SUMMERS".
+
+	// Under normal operation, the master tune and pitch wheel contributions are
+	// summed by U367C (LM348 op-amp). During autotune, those get disconnected,
+	// and a constant voltage source gets connected.
+
+	if (m_tune)
+	{
+		const double i = V5A / (RES_K(1) + RES_M(2.21));  // R375, R376 (1%)
+		m_pitch_mod->set_value(i);
+		LOGMASKED(LOG_WHEEL, "Pitch mod current during tuning: %e\n", i);
+		return;
+	}
+
+	// Compute master tune knob contribution.
+
+	constexpr double R104_MAX = RES_K(100);  // Master tune potentiometer.
+	constexpr double R377 = RES_M(1);  // 1%
+
+	const double rt_bottom = R104_MAX * normalized(m_master_tune_pot);
+	const double rt_top = R104_MAX - rt_bottom;
+	const double i_tune = V5A * RES_VOLTAGE_DIVIDER(rt_top, RES_2_PARALLEL(rt_bottom, R377)) / R377;
+
+	// Compute pitch wheel contribution.
+
+	constexpr double R1_MAX = RES_K(100);  // Pitch wheel.
+	constexpr double R3129_MAX = RES_K(10);  // Pitch wheel trimmer.
+	constexpr double R3106 = RES_K(4.7);
+	constexpr double R3100 = RES_K(100);  // 1%
+	constexpr double R3102 = RES_K(100);  // 1%
+
+	// According to the user manual, the pitch wheel varies the pitch by +/- a 5th.
+	// The wheel range below achieves that, but it is probably not the real one.
+	// See the TODO about diodes below.
+	constexpr double WHEEL_RANGE = 0.065;
+	constexpr double R1_SIDE = (1.0 - WHEEL_RANGE) * R1_MAX / 2.0;
+
+	// Compute resistance below and above the motion range of the pitch wheel.
+	const double rp_bottom = R1_SIDE + R3129_MAX * normalized(m_pitch_wheel_trim);
+	const double rp_top = R3106 + R1_SIDE;
+
+	// Compute resistance below and above the pitch wheel wiper, within the motion range.
+	const double rm_bottom = WHEEL_RANGE * R1_MAX * normalized(m_pitch_wheel);
+	const double rm_top = WHEEL_RANGE * R1_MAX - rm_bottom;
+
+	// Compute total resistance below and above the wiper.
+	const double rp_total_bottom = rp_bottom + rm_bottom;
+	const double rp_total_top = rp_top + rm_top;
+
+	// Compute voltage at the wiper of the pitch wheel.
+	// NOTE: There is a pair of anti-parallel diodes connected to the wiper.
+	// Those are annotated with "deadband", but they likely shape the response
+	// of the pitch wheel beyond just a deadband. The equations below assume the
+	// diodes do not exist, which is not very accurate in this case.
+	// TODO: Better approximation of diode effect. Remember to also adjust WHEEL_RANGE.
+	const double v =
+		VPLUS * RES_VOLTAGE_DIVIDER(rp_total_top, RES_3_PARALLEL(rp_total_bottom, R3100, R3102)) +
+		VMINUS * RES_VOLTAGE_DIVIDER(rp_total_bottom, RES_3_PARALLEL(rp_total_top, R3100, R3102));
+	const double i_pitch_wheel = v / R3102;
+
+	// Compute current at the op-amp (U367C) summing node.
+	double i_total = i_tune + i_pitch_wheel;
+	m_pitch_mod->set_value(i_total);
+	LOGMASKED(LOG_WHEEL, "Master tune current: %e. Pitch wheel current: %e. Total: %e\n",
+			  i_tune, i_pitch_wheel, i_total);
+
+	if (calibrating)
+		LOGMASKED(LOG_CALIBRATION, "Pitch wheel wiper V: %f\n", v);
 }
 
-void prophet5_audio_device::update_glide_out_routing()
+void prophet5_audio_device::update_osc_offset()
 {
-	const double filt_route_gain = m_filt_kbd_s ? (1.0 / RES_K(100)) : 0.0;  // R372 (1%)
-	m_glide_eg->set_route_gain(0, m_filt_cv_mixer, 0, filt_route_gain);
+	// First mixer stage of the osc A master sum generator. It mixes the
+	// unison/glide out CV with the wheel modulation (wmod) signal, and applies
+	// a trimmed offset intended to counteract any offset in the wmod signal.
+	// This ensures the pitch doesn't change when "wmod freq" is enabled or
+	// disabled. The setup for osc B is the same.
+	//
+	// GLIDE OUT CV --- SWITCH -+- BUFFER --- R382 ---+--- R383 ---+
+	//                          |                     |            |
+	//                GND --- R3117                   |    |\      |
+	//                                                |    | \     |
+	//          WMOD --- R3104 --- SWITCH ------------+--- |- \    |
+	//                                                     |   >---+
+	//  +15V                                          +--- |+ /
+	//    |                                           |    | /   U368C
+	//   R339 (osc_a_offset_trim) ------- R362 -------+    |/
+	//    |                                           |
+	//  -15V                                        R381
+	//                                                |
+	//                                               GND
+	//
+	// Note that voltage through R382 is applied regardless of the state of the
+	// glide CV switch (0V when the switch is off). Whereas the wmod voltage is
+	// only applied when the corresponding switch is on.
+
+	// Osc A
+	double ra_inv = 1.0 / R383 + 1.0 / R382;
+	if (m_wmod_freq_a_s)
+		ra_inv += 1.0 / R3104;
+	const double va = balance_rveq(m_osc_a_offset_trim, RES_M(10), RES_K(10)).second;  // R362, R381
+	const double offset_a = -va * ra_inv;
+	m_osc_a_offset->set_offset(offset_a);
+	LOGMASKED(LOG_CALIBRATION, "Osc A offset - V+: %e, output offset: %e\n", va, -R383 * offset_a);
+
+	// Osc B
+	double rb_inv = 1.0 / R379 + 1.0 / R387;
+	if (m_wmod_freq_b_s)
+		rb_inv += 1.0 / R3103;
+	const double vb = balance_rveq(m_osc_b_offset_trim, RES_M(10), RES_K(10)).second;  // R361, R380
+	const double offset_b = -vb * rb_inv;
+	m_osc_b_offset->set_offset(offset_b);
+	LOGMASKED(LOG_CALIBRATION, "Osc B offset - V+: %e, output offset: %e\n", vb, -R379 * offset_b);
 }
 
 void prophet5_audio_device::update_filter_fixed_cvs()
@@ -983,7 +2308,7 @@ void prophet5_audio_device::update_filter_fixed_cvs()
 	// LM348, configured as an inverting mixer) and surrounding resistors.
 	const double i_cv_in = MAX_CV_IN * normalized(m_filter_cv_in) / RES_K(100);  // R374 (1%)
 	const double i_ctf_cv = m_cv[CV_FILT_CUTOFF] / RES_K(100);  // R352 (1%)
-	m_filt_fixed_cvs->set_value(i_cv_in + i_ctf_cv);
+	m_filt_cv_mixer->set_offset(i_cv_in + i_ctf_cv);
 }
 
 void prophet5_audio_device::update_voice_volume()
@@ -1134,7 +2459,7 @@ void prophet5_audio_device::update_master_volume()
 		else
 		{
 			r_top = RES_R(100);  // R345
-			max_vol_cv = VCC;
+			max_vol_cv = V5A;
 		}
 
 		const double r_vol_bottom = R113_MAX * volume;
@@ -1147,6 +2472,14 @@ void prophet5_audio_device::update_master_volume()
 
 	LOGMASKED(LOG_CV, "Master volume changed. Pot: %f, CV in connected: %d, Max CV: %f, VOL CV: %f, VOL CC: %f\n",
 			  volume, cv_in_connected, max_vol_cv, vol_cv, vol_cc);
+}
+
+void prophet5_audio_device::update_balance_calibration()
+{
+	const std::pair<double, double> rv_equiv = balance_rveq(m_lfo_bal, RES_M(2.2), RES_R(330));  // R3151, R3152
+	m_lfo_vca->set_fixed_inv_input(rv_equiv.second);
+	LOGMASKED(LOG_CALIBRATION, "LFO Balance V-: %f, Vdiff: %f\n",
+			  rv_equiv.second, m_lfo_vca->diff(0, rv_equiv.second));
 }
 
 
@@ -1208,6 +2541,7 @@ private:
 	required_device<prophet5_audio_device> m_audio;
 	required_device<z80_device> m_maincpu;  // U311
 	required_device<ttl7474_device> m_tune_ff;  // U322A
+	required_device<output_latch_device> m_misc_latch;  // U332
 	required_device<timer_device> m_gate_in_delay;  // R311, C316, U331A
 	required_device<pwm_display_device> m_led_matrix_pwm;
 	required_device<pwm_display_device> m_digit_pwm;
@@ -1224,8 +2558,6 @@ private:
 	required_ioport m_seq_cv_in;
 	required_ioport m_seq_offset;
 	required_ioport m_seq_scale;
-	output_finder<> m_tune_mux_select;
-	output_finder<> m_tuning;
 	std::vector<std::vector<output_finder<>>> m_leds;
 
 	u8 m_switch_row = 0;  // U212 input (CD4514 decoder).
@@ -1241,9 +2573,6 @@ private:
 	bool m_tune_counter_out = false;  // 8253 (U315) counter 0 output.
 	bool m_latch_gate5 = false;  // U340 (CD4174) output Q4 (pin 12).
 	bool m_ext_gate5 = false;  // U330B (CD4013) output Q (pin 13).
-
-	static inline constexpr double VPLUS = 15.0;
-	static inline constexpr double VMINUS = -15.0;
 };
 
 prophet5_state::prophet5_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -1251,6 +2580,7 @@ prophet5_state::prophet5_state(const machine_config &mconfig, device_type type, 
 	, m_audio(*this, AUDIO_TAG)
 	, m_maincpu(*this, "maincpu")
 	, m_tune_ff(*this, "tune_ff")
+	, m_misc_latch(*this, "misc_latch")
 	, m_gate_in_delay(*this, "gate_in_delay")
 	, m_led_matrix_pwm(*this, "led_matrix_pwm")
 	, m_digit_pwm(*this, "led_digit_pwm")
@@ -1267,8 +2597,6 @@ prophet5_state::prophet5_state(const machine_config &mconfig, device_type type, 
 	, m_seq_cv_in(*this, "cv_in_seq")
 	, m_seq_offset(*this, "trimmer_seq_offset")
 	, m_seq_scale(*this, "trimmer_seq_scale")
-	, m_tune_mux_select(*this, "tune_mux_select")
-	, m_tuning(*this, "tuning")
 {
 	static constexpr const char *LED_NAMES[8][5] =
 	{
@@ -1482,15 +2810,12 @@ void prophet5_state::update_vmux()
 
 void prophet5_state::mux_abc_w(u8 data)  // U338, CD4174 latch.
 {
-	// D0-D2: ABC inputs for all S&H and Tune MUXes.
+	// D0-D2: ABC inputs for all S&H MUXes.
 	m_mux_abc = BIT(data, 0, 3);
 	update_sh();
 
-	// D3: -TUNE.
-	m_tuning = BIT(data, 3) ? 0 : 1;
-
-	// D4-D5: INH inputs of individual Tune MUXes.
-	m_tune_mux_select = ~BIT(data, 4, 2) & 0x03;
+	// D0-D5: tune control.
+	m_audio->tune_control_w(data);
 }
 
 void prophet5_state::sh_mux_inh_w(u8 data)  // U339, CD4174 latch.
@@ -1600,7 +2925,7 @@ void prophet5_state::io_map(address_map &map)
 	map(0x08, 0x08).mirror(0x07).w(FUNC(prophet5_state::led_sink_w));  // CSOL1, LED SINK
 	map(0x10, 0x10).mirror(0x07).w(FUNC(prophet5_state::switch_w));  // CSOL2, KBD/SW DRVR
 	map(0x18, 0x18).mirror(0x07).w(FUNC(prophet5_state::pot_mux_w));  // CSOL3, POT MUX ADR
-	map(0x20, 0x20).mirror(0x07).w("misc_latch", FUNC(output_latch_device::write));  // CSOL4, CASS/TUNE
+	map(0x20, 0x20).mirror(0x07).w(m_misc_latch, FUNC(output_latch_device::write));  // CSOL4, CASS/TUNE
 	map(0x28, 0x28).mirror(0x07).w(FUNC(prophet5_state::clr_int_w));  // CSOL5, CLEAR INT
 
 	// Output port decoding for 15V CMOS chips done by U329 (CD4556).
@@ -1629,8 +2954,6 @@ void prophet5_state::machine_start()
 	save_item(NAME(m_latch_gate5));
 	save_item(NAME(m_ext_gate5));
 
-	m_tune_mux_select.resolve();
-	m_tuning.resolve();
 	for (auto &led_row : m_leds)
 		for (auto &led : led_row)
 			led.resolve();
@@ -1639,6 +2962,7 @@ void prophet5_state::machine_start()
 void prophet5_state::machine_reset()
 {
 	update_nvram_record();
+	m_misc_latch->write(0x00);  // /CLR input tied to /RESET.
 }
 
 void prophet5_state::prophet5rev30(machine_config &config)
@@ -1669,41 +2993,42 @@ void prophet5_state::prophet5rev30(machine_config &config)
 	config.set_default_layout(layout_sequential_prophet5);
 
 	PROPHET5_AUDIO(config, m_audio);
+	m_audio->tune_cmp_cb().set(m_tune_ff, FUNC(ttl7474_device::clock_w));
 
-	auto &u332 = OUTPUT_LATCH(config, "misc_latch");
-	u332.bit_handler<0>().set(m_tune_ff, FUNC(ttl7474_device::clear_w));
-	u332.bit_handler<1>().set(m_tune_ff, FUNC(ttl7474_device::preset_w));
-	u332.bit_handler<2>().set_output("cassette_out");
-	u332.bit_handler<3>().set(m_tune_ff, FUNC(ttl7474_device::d_w));
-	u332.bit_handler<4>().set("tune_pit", FUNC(pit8253_device::write_gate0));
-	u332.bit_handler<5>().set("tune_pit", FUNC(pit8253_device::write_gate1));
-	u332.bit_handler<5>().append(m_audio, FUNC(prophet5_audio_device::select_a440_w));
+	OUTPUT_LATCH(config, m_misc_latch);  // U332
+	m_misc_latch->bit_handler<0>().set(m_tune_ff, FUNC(ttl7474_device::clear_w));
+	m_misc_latch->bit_handler<1>().set(m_tune_ff, FUNC(ttl7474_device::preset_w));
+	m_misc_latch->bit_handler<2>().set_output("cassette_out");
+	m_misc_latch->bit_handler<3>().set(m_tune_ff, FUNC(ttl7474_device::d_w));
+	m_misc_latch->bit_handler<4>().set("tune_pit", FUNC(pit8253_device::write_gate0));
+	m_misc_latch->bit_handler<5>().set("tune_pit", FUNC(pit8253_device::write_gate1));
+	m_misc_latch->bit_handler<5>().append(m_audio, FUNC(prophet5_audio_device::select_a440_w));
 
 	auto &u335 = OUTPUT_LATCH(config, "program_latch_0");
-	u335.bit_handler<0>().set_output("osc_a_sqr");
-	u335.bit_handler<1>().set_output("osc_a_saw");
+	u335.bit_handler<0>().set(m_audio, FUNC(prophet5_audio_device::osc_a_pulse_s_w));
+	u335.bit_handler<1>().set(m_audio, FUNC(prophet5_audio_device::osc_a_ramp_s_w));
 	u335.bit_handler<2>().set_output("osc_a_sync");
-	u335.bit_handler<3>().set_output("osc_b_saw");
-	u335.bit_handler<4>().set_output("osc_b_tri");
-	u335.bit_handler<5>().set_output("osc_b_sqr");
-	u335.bit_handler<6>().set_output("osc_b_kbd");  // Actually U341A (4013 flipflop).
+	u335.bit_handler<3>().set(m_audio, FUNC(prophet5_audio_device::osc_b_ramp_s_w));
+	u335.bit_handler<4>().set(m_audio, FUNC(prophet5_audio_device::osc_b_tri_s_w));
+	u335.bit_handler<5>().set(m_audio, FUNC(prophet5_audio_device::osc_b_pulse_s_w));
+	u335.bit_handler<6>().set(m_audio, FUNC(prophet5_audio_device::osc_b_kbd_s_w));  // Actually U341A (4013 flipflop).
 
 	auto &u334 = OUTPUT_LATCH(config, "program_latch_1");
-	u334.bit_handler<0>().set_output("pmod_freq_a");
-	u334.bit_handler<1>().set_output("pmod_pw_a");
-	u334.bit_handler<2>().set_output("pmod_filt");
-	u334.bit_handler<3>().set_output("lfo_saw");
-	u334.bit_handler<4>().set_output("lfo_tri");
-	u334.bit_handler<5>().set_output("lfo_sqr");
+	u334.bit_handler<0>().set(m_audio, FUNC(prophet5_audio_device::pmod_freq_a_s_w));
+	u334.bit_handler<1>().set(m_audio, FUNC(prophet5_audio_device::pmod_pw_a_s_w));
+	u334.bit_handler<2>().set(m_audio, FUNC(prophet5_audio_device::pmod_filt_s_w));
+	u334.bit_handler<3>().set(m_audio, FUNC(prophet5_audio_device::lfo_ramp_s_w));
+	u334.bit_handler<4>().set(m_audio, FUNC(prophet5_audio_device::lfo_tri_s_w));
+	u334.bit_handler<5>().set(m_audio, FUNC(prophet5_audio_device::lfo_sqr_s_w));
 	u334.bit_handler<6>().set(m_audio, FUNC(prophet5_audio_device::filt_kbd_s_w));  // Actually U341B (4013 flipflop).
 
 	auto &u333 = OUTPUT_LATCH(config, "program_latch_2");
-	u333.bit_handler<0>().set_output("wmod_freq_a");
-	u333.bit_handler<1>().set_output("wmod_freq_b");
-	u333.bit_handler<2>().set_output("wmod_pw_a");
-	u333.bit_handler<3>().set_output("wmod_pw_b");
+	u333.bit_handler<0>().set(m_audio, FUNC(prophet5_audio_device::wmod_freq_a_s_w));
+	u333.bit_handler<1>().set(m_audio, FUNC(prophet5_audio_device::wmod_freq_b_s_w));
+	u333.bit_handler<2>().set(m_audio, FUNC(prophet5_audio_device::wmod_pw_a_s_w));
+	u333.bit_handler<3>().set(m_audio, FUNC(prophet5_audio_device::wmod_pw_b_s_w));
 	u333.bit_handler<4>().set(m_audio, FUNC(prophet5_audio_device::wmod_filt_s_w));
-	u333.bit_handler<5>().set_output("osc_b_lo");
+	u333.bit_handler<5>().set(m_audio, FUNC(prophet5_audio_device::osc_b_lo_freq_s_w));
 
 	auto &u340 = OUTPUT_LATCH(config, "gate_latch");
 	u340.bit_handler<0>().set([this] (int state) { m_audio->voice(0)->gate_w(state); });
@@ -1856,20 +3181,20 @@ INPUT_PORTS_START(prophet5)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_B3
 
 	PORT_START("switch_row_11")  // C2 - G2
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_C4
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_C4 PORT_CODE(KEYCODE_C)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_CS4
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_D4
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_DS4
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_E4
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_E4 PORT_CODE(KEYCODE_V)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_F4
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_FS4
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_G4
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_G4 PORT_CODE(KEYCODE_B)
 
 	PORT_START("switch_row_12")  // G#2 - D#3
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_GS4
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A4 PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A4
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_AS4
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_B4
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_B4 PORT_CODE(KEYCODE_N)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_C5
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_CS5
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_D4
@@ -1881,7 +3206,7 @@ INPUT_PORTS_START(prophet5)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_FS4
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_G5
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_GS5
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A5 PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A5 PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_AS5
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_B5
 
@@ -1897,7 +3222,7 @@ INPUT_PORTS_START(prophet5)
 
 	PORT_START("switch_row_15")  // G#4 - C5
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_GS6
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A6 PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A6 PORT_CODE(KEYCODE_COMMA)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_AS6
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_B6
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_C7
@@ -1937,111 +3262,118 @@ INPUT_PORTS_START(prophet5)
 	// All knob potentiometers are 10K linear, unless otherwise noted.
 
 	PORT_START("pot_0")  // R217
-	PORT_ADJUSTER(0, "GLIDE") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(0, "GLIDE") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 0)
 
 	PORT_START("pot_1")  // R211
-	PORT_ADJUSTER(127, "LFO FREQ") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(120, "LFO FREQ") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 1)
 
 	PORT_START("pot_2")  // R216
-	PORT_ADJUSTER(0, "WMOD SRC MIX") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(0, "WMOD SRC MIX") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 2)
 
 	PORT_START("pot_3")  // R202
-	PORT_ADJUSTER(0, "PMOD OSC B") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(0, "PMOD OSC B") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 3)
 
 	PORT_START("pot_4")  // R201
-	PORT_ADJUSTER(0, "PMOD FILT ENV") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(0, "PMOD FILT ENV") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 4)
 
 	PORT_START("pot_5")  // R204
-	PORT_ADJUSTER(127, "OSC A FREQ") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(120, "OSC A FREQ") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 5)
 
 	PORT_START("pot_6")  // R213
-	PORT_ADJUSTER(127, "OSC B FREQ") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(120, "OSC B FREQ") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 6)
 
 	PORT_START("pot_7")  // R214
-	PORT_ADJUSTER(127, "OSC B FINE") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(0, "OSC B FINE") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 7)
 
 	PORT_START("pot_8")  // R101
-	PORT_ADJUSTER(255, "FILT CUTOFF") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(240, "FILT CUTOFF") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 8)
 
 	PORT_START("pot_9")  // R103
-	PORT_ADJUSTER(0, "FILT ENV AMT") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(0, "FILT ENV AMT") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 9)
 
 	PORT_START("pot_10")  // R208
-	PORT_ADJUSTER(255, "MIX OSC B") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(240, "MIX OSC B") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 10)
 
 	PORT_START("pot_11")  // R215
-	PORT_ADJUSTER(127, "OSC B PW") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(120, "OSC B PW") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 11)
 
 	PORT_START("pot_12")  // R207
-	PORT_ADJUSTER(255, "MIX OSC A") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(240, "MIX OSC A") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 12)
 
 	PORT_START("pot_13")  // R205
-	PORT_ADJUSTER(127, "OSC A PW") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(120, "OSC A PW") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 13)
 
 	PORT_START("pot_14")  // R210
-	PORT_ADJUSTER(0, "MIX NOISE") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(0, "MIX NOISE") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 14)
 
 	PORT_START("pot_15")  // R102
-	PORT_ADJUSTER(0, "FILT RESONANCE") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(0, "FILT RESONANCE") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 15)
 
 	PORT_START("pot_16")  // R105
-	PORT_ADJUSTER(10, "FILT ATTACK") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(10, "FILT ATTACK") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 16)
 
 	PORT_START("pot_17")  // R106
-	PORT_ADJUSTER(10, "FILT DECAY") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(10, "FILT DECAY") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 17)
 
 	PORT_START("pot_18")  // R107
-	PORT_ADJUSTER(255, "FILT SUSTAIN") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(240, "FILT SUSTAIN") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 18)
 
 	PORT_START("pot_19")  // R108
-	PORT_ADJUSTER(20, "FILT RELEASE") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(20, "FILT RELEASE") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 19)
 
 	PORT_START("pot_20")  // R109
-	PORT_ADJUSTER(10, "AMP ATTACK") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(10, "AMP ATTACK") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 20)
 
 	PORT_START("pot_21")  // R110
-	PORT_ADJUSTER(10, "AMP DECAY") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(10, "AMP DECAY") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 21)
 
 	PORT_START("pot_22")  // R111
-	PORT_ADJUSTER(255, "AMP SUSTAIN") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(240, "AMP SUSTAIN") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 22)
 
 	PORT_START("pot_23")  // R112
-	PORT_ADJUSTER(20, "AMP RELEASE") PORT_MINMAX(0, 255)
+	PORT_ADJUSTER(20, "AMP RELEASE") PORT_MINMAX(0, 240)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 23)
 
 	PORT_START("pot_tune")  // R104, 100K, linear
 	PORT_ADJUSTER(50, "MASTER TUNE")
+		PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(prophet5_audio_device::pitch_mod_changed), 0)
 
 	PORT_START("pot_volume")  // R113, 100K, linear
 	PORT_ADJUSTER(90, "VOLUME")
 		PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(prophet5_audio_device::master_volume_changed), 0)
 
+	PORT_START("trimmer_wheel_pitch")  // R3129, 10K, linear
+	// Default value based on calibration instructions.
+	PORT_ADJUSTER(47, "TRIMMER: PITCH WHEEL")
+		PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(prophet5_audio_device::pitch_wheel_trim_changed), 0)
+
 	PORT_START("wheel_pitch")  // R1, 100K, linear
 	PORT_BIT(0xff, 50, IPT_PADDLE) PORT_NAME("PITCH WHEEL") PORT_MINMAX(0, 100)
 		PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_CENTERDELTA(30)
+		PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(prophet5_audio_device::pitch_mod_changed), 0)
 
 	PORT_START("wheel_mod")  // R2, 100K, linear
 	PORT_ADJUSTER(0, "MOD WHEEL")
@@ -2081,16 +3413,33 @@ INPUT_PORTS_START(prophet5)
 	// An input of 0V has the same effect as the input not being connected.
 	PORT_ADJUSTER(0, "CV IN: FILTER")
 		PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(prophet5_audio_device::filter_cv_in_changed), 0)
+
+	PORT_START("trimmer_osc_a_offset")
+	PORT_ADJUSTER(50, "TRIMMER: OSC A OFFSET")
+		PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(prophet5_audio_device::osc_offset_trimmer_changed), 0)
+
+	PORT_START("trimmer_osc_b_offset")
+	PORT_ADJUSTER(50, "TRIMMER: OSC B OFFSET")
+		PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(prophet5_audio_device::osc_offset_trimmer_changed), 0)
+
+	PORT_START("trimmer_lfo_balance")
+	// Default value based on calibration instructions.
+	PORT_ADJUSTER(50, "TRIMMER: LFO BALANCE")
+		PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(prophet5_audio_device::balance_trimmer_changed), 0)
 INPUT_PORTS_END
 
-ROM_START(prophet5rev30)
+ROM_START(prophet5r30)
 	ROM_REGION(0xc00, "maincpu", 0)  // 3 x 2708 1Kbyte ROMS.
 	ROM_LOAD("0.v8.1.u312", 0x000000, 0x000400, CRC(6337d2ae) SHA1(bad79f6475dc0a8bb139ea0a12258cb3e5bfa0be))
 	ROM_LOAD("1.v8.1.u313", 0x000400, 0x000400, CRC(1e334fd3) SHA1(276b7abf4a13fbae0d09e869f786b3073ee82504))
 	ROM_LOAD("2.v8.1.u314", 0x000800, 0x000400, CRC(ffafaa95) SHA1(9d119fb22270d45e34c1f16899453ae7469d7d20))
+
+	ROM_REGION(0x400, "nvram", ROMREGION_ERASE00)
+	// Handcrafted from diagrams in the owner's manual. Won't match factory settings exactly.
+	ROM_LOAD("nvram.bin", 0x000000, 0x000400, BAD_DUMP CRC(42f0ebe4) SHA1(65be6b2d649cbbb0d41f62063322dff5678a6ff0))
 ROM_END
 
 }  // anonymous namespace
 
 // Prophet 5 Rev 3.0, serial numbers 1301-2285.
-SYST(1980, prophet5rev30, 0, 0, prophet5rev30, prophet5, prophet5_state, empty_init, "Sequential Circuits", "Prophet 5 (Model 1000) Rev 3.0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
+SYST(1980, prophet5r30, 0, 0, prophet5rev30, prophet5, prophet5_state, empty_init, "Sequential Circuits", "Prophet 5 (Model 1000) Rev 3.0", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

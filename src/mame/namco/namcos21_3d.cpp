@@ -1,163 +1,121 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, David Haywood
+/*
+
+Namco System 21 3D Rasterizer
+
+TODO:
+- any reason it's not using poly.h?
+
+*/
 
 #include "emu.h"
 #include "namcos21_3d.h"
 
 DEFINE_DEVICE_TYPE(NAMCOS21_3D, namcos21_3d_device, "namcos21_3d", "Namco System 21 3D Rasterizer")
 
-namcos21_3d_device::namcos21_3d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+namcos21_3d_device::namcos21_3d_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NAMCOS21_3D, tag, owner, clock),
-	m_fixed_palbase(-1),
-	m_zz_shift(10),
-	m_zzmult(0x100),
+	m_num_palettes(0),
 	m_depth_reverse(false),
 	m_poly_frame_width(0),
 	m_poly_frame_height(0),
-	m_framebuffer_size_in_bytes(0)
+	m_framebuffer_size(0)
 {
 }
 
 void namcos21_3d_device::device_start()
 {
-	allocate_poly_framebuffer();
-}
+	assert(m_num_palettes != 0);
+	assert(m_framebuffer_size > 0);
 
-void namcos21_3d_device::device_reset()
-{
-}
+	m_poly_framebuffer_z = std::make_unique<u16[]>(m_framebuffer_size);
+	m_poly_framebuffer_pens = std::make_unique<u16[]>(m_framebuffer_size);
 
-void namcos21_3d_device::allocate_poly_framebuffer()
-{
-	if (m_framebuffer_size_in_bytes == 0)
-		fatalerror("m_framebuffer_size_in_bytes == 0\n");
+	m_poly_framebuffer_z2 = std::make_unique<u16[]>(m_framebuffer_size);
+	m_poly_framebuffer_pens2 = std::make_unique<u16[]>(m_framebuffer_size);
 
-	m_mpPolyFrameBufferZ = std::make_unique<uint16_t[]>(m_framebuffer_size_in_bytes / 2);
-	m_mpPolyFrameBufferPens = std::make_unique<uint16_t[]>(m_framebuffer_size_in_bytes / 2);
+	save_pointer(NAME(m_poly_framebuffer_z), m_framebuffer_size);
+	save_pointer(NAME(m_poly_framebuffer_pens), m_framebuffer_size);
 
-	m_mpPolyFrameBufferZ2 = std::make_unique<uint16_t[]>(m_framebuffer_size_in_bytes / 2);
-	m_mpPolyFrameBufferPens2 = std::make_unique<uint16_t[]>(m_framebuffer_size_in_bytes / 2);
+	save_pointer(NAME(m_poly_framebuffer_z2), m_framebuffer_size);
+	save_pointer(NAME(m_poly_framebuffer_pens2), m_framebuffer_size);
 
 	swap_and_clear_poly_framebuffer();
 	swap_and_clear_poly_framebuffer();
-
-	save_pointer(NAME(m_mpPolyFrameBufferZ), m_framebuffer_size_in_bytes / 2);
-	save_pointer(NAME(m_mpPolyFrameBufferPens), m_framebuffer_size_in_bytes / 2);
-
-	save_pointer(NAME(m_mpPolyFrameBufferZ2), m_framebuffer_size_in_bytes / 2);
-	save_pointer(NAME(m_mpPolyFrameBufferPens2), m_framebuffer_size_in_bytes / 2);
 }
 
 void namcos21_3d_device::swap_and_clear_poly_framebuffer()
 {
-	/* swap work and visible framebuffers */
-	m_mpPolyFrameBufferZ.swap(m_mpPolyFrameBufferZ2);
+	// swap work and visible framebuffers
+	m_poly_framebuffer_z.swap(m_poly_framebuffer_z2);
+	m_poly_framebuffer_pens.swap(m_poly_framebuffer_pens2);
 
-	m_mpPolyFrameBufferPens.swap(m_mpPolyFrameBufferPens2);
-
-	/* wipe work zbuffer */
-	for (int i = 0; i < m_poly_frame_width*m_poly_frame_height; i++)
-	{
-		m_mpPolyFrameBufferZ[i] = 0x7fff;
-	}
+	// wipe work framebuffers
+	std::fill_n(m_poly_framebuffer_z.get(), m_framebuffer_size, 0x8000);
+	std::fill_n(m_poly_framebuffer_pens.get(), m_framebuffer_size, 0);
 }
 
-void namcos21_3d_device::copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, const rectangle &clip, int zlo, int zhi)
+void namcos21_3d_device::copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/* blit the visible framebuffer */
+	rectangle clip = { 0, m_poly_frame_width - 1, 0, m_poly_frame_height - 1 };
+	clip &= cliprect;
+
+	// blit the visible framebuffer
 	for (int sy = clip.top(); sy <= clip.bottom(); sy++)
 	{
-		uint16_t *const dest = &bitmap.pix(sy);
-		uint16_t const *const pPen = m_mpPolyFrameBufferPens2.get() + m_poly_frame_width * sy;
-		uint16_t const *const pZ = m_mpPolyFrameBufferZ2.get() + m_poly_frame_width * sy;
+		u16 *const dest = &bitmap.pix(sy);
+		const u16 *const source = m_poly_framebuffer_pens2.get() + m_poly_frame_width * sy;
 		for (int sx = clip.left(); sx <= clip.right(); sx++)
 		{
-			int z = pZ[sx];
-			//if( pZ[sx]!=0x7fff )
-			if (z >= zlo && z <= zhi)
-			{
-				dest[sx] = pPen[sx];
-			}
+			const u16 pen = source[sx];
+			if (pen)
+				dest[sx] = pen;
 		}
 	}
 }
 
 /*********************************************************************************************/
 
-#define SWAP(T,A,B) { const T *temp = A; A = B; B = temp; }
-
-void namcos21_3d_device::renderscanline_flat(const edge *e1, const edge *e2, int sy, unsigned color, int depthcueenable)
+void namcos21_3d_device::renderscanline_flat(const edge *e1, const edge *e2, int sy, u16 color, int zsort)
 {
 	if (e1->x > e2->x)
-	{
-		SWAP(edge, e1, e2);
-	}
+		std::swap(e1, e2);
 
+	u16 *dest = m_poly_framebuffer_pens.get() + sy * m_poly_frame_width;
+	u16 *zbuf = m_poly_framebuffer_z.get() + sy * m_poly_frame_width;
+	int x0 = (int)e1->x;
+	int x1 = (int)e2->x;
+	int w = x1 - x0;
+
+	if (w)
 	{
-		uint16_t *pDest = m_mpPolyFrameBufferPens.get() + sy * m_poly_frame_width;
-		uint16_t *pZBuf = m_mpPolyFrameBufferZ.get() + sy * m_poly_frame_width;
-		int x0 = (int)e1->x;
-		int x1 = (int)e2->x;
-		int w = x1 - x0;
-		if (w)
+		x0 = std::max(x0, 0);
+		x1 = std::min(x1, m_poly_frame_width);
+
+		for (int x = x0; x < x1; x++)
 		{
-			double z = e1->z;
-			double dz = (e2->z - e1->z) / w;
-			int x, crop;
-			crop = -x0;
-			if (crop > 0)
+			if (zsort < zbuf[x])
 			{
-				z += crop * dz;
-				x0 = 0;
-			}
-			if (x1 > m_poly_frame_width - 1)
-			{
-				x1 = m_poly_frame_width - 1;
-			}
-
-			for (x = x0; x < x1; x++)
-			{
-				uint16_t zz = (uint16_t)z;
-				if (zz < pZBuf[x])
-				{
-					int pen = color;
-					if (depthcueenable && zz > 0)
-					{
-						int depth = 0;
-						if (m_depth_reverse)
-						{
-							depth = (zz >> m_zz_shift)*m_zzmult;
-							pen += depth;
-						}
-						else
-						{
-							depth = (zz >> m_zz_shift)*m_zzmult;
-							pen -= depth;
-						}
-					}
-					pDest[x] = pen;
-					pZBuf[x] = zz;
-				}
-				z += dz;
+				dest[x] = color;
+				zbuf[x] = zsort;
 			}
 		}
 	}
 }
 
-void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, const n21_vertex *v2, unsigned color, int depthcueenable)
+void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, const n21_vertex *v2, u16 color, int zsort)
 {
-	int dy, ystart, yend, crop;
-
-	/* first, sort so that v0->y <= v1->y <= v2->y */
+	// first, sort so that v0->y <= v1->y <= v2->y
 	for (;;)
 	{
 		if (v0->y > v1->y)
 		{
-			SWAP(n21_vertex, v0, v1);
+			std::swap(v0, v1);
 		}
 		else if (v1->y > v2->y)
 		{
-			SWAP(n21_vertex, v1, v2);
+			std::swap(v1, v2);
 		}
 		else
 		{
@@ -165,14 +123,14 @@ void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, c
 		}
 	}
 
-	ystart = v0->y;
-	yend = v2->y;
-	dy = yend - ystart;
+	int ystart = v0->y;
+	int yend = v2->y;
+	int dy = yend - ystart;
+
 	if (dy)
 	{
-		int y;
-		edge e1; /* short edge (top and bottom) */
-		edge e2; /* long (common) edge */
+		edge e1; // short edge (top and bottom)
+		edge e2; // long (common) edge
 
 		double dx2dy = (v2->x - v0->x) / dy;
 		double dz2dy = (v2->z - v0->z) / dy;
@@ -182,7 +140,7 @@ void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, c
 
 		e2.x = v0->x;
 		e2.z = v0->z;
-		crop = -ystart;
+		int crop = -ystart;
 		if (crop > 0)
 		{
 			e2.x += dx2dy * crop;
@@ -207,11 +165,11 @@ void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, c
 				e1.z += dz1dy * crop;
 				ystart = 0;
 			}
-			if (yend > m_poly_frame_height - 1) yend = m_poly_frame_height - 1;
+			yend = std::min(yend, m_poly_frame_height);
 
-			for (y = ystart; y < yend; y++)
+			for (int y = ystart; y < yend; y++)
 			{
-				renderscanline_flat(&e1, &e2, y, color, depthcueenable);
+				renderscanline_flat(&e1, &e2, y, color, zsort);
 
 				e2.x += dx2dy;
 				e2.z += dz2dy;
@@ -239,13 +197,11 @@ void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, c
 				e1.z += dz1dy * crop;
 				ystart = 0;
 			}
-			if (yend > m_poly_frame_height - 1)
+			yend = std::min(yend, m_poly_frame_height);
+
+			for (int y = ystart; y < yend; y++)
 			{
-				yend = m_poly_frame_height - 1;
-			}
-			for (y = ystart; y < yend; y++)
-			{
-				renderscanline_flat(&e1, &e2, y, color, depthcueenable);
+				renderscanline_flat(&e1, &e2, y, color, zsort);
 
 				e2.x += dx2dy;
 				e2.z += dz2dy;
@@ -257,59 +213,105 @@ void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, c
 	}
 }
 
-void namcos21_3d_device::draw_quad(int sx[4], int sy[4], int zcode[4], int color)
+void namcos21_3d_device::blit_single_quad(int sx[4], int sy[4], int zcode[4], u16 color)
 {
-	n21_vertex a, b, c, d;
-	int depthcueenable = 1;
-	/*
-	    0x0000..0x1fff  sprite palettes (0x20 sets of 0x100 colors)
-	    0x2000..0x3fff  polygon palette bank0 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
-	    0x4000..0x5fff  polygon palette bank1 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
-	    0x6000..0x7fff  polygon palette bank2 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
-	*/
+	// backface culling
+	const s64 cross1 =
+			(sx[1] - sx[0]) * (sy[2] - sy[0]) -
+			(sy[1] - sy[0]) * (sx[2] - sx[0]);
+	const s64 cross2 =
+			(sx[3] - sx[2]) * (sy[0] - sy[2]) -
+			(sy[3] - sy[2]) * (sx[0] - sx[2]);
 
+	if (cross1 >= 0LL && cross2 >= 0LL)
+		return;
 
-	if (m_fixed_palbase != -1)
+	const u8 code = color >> 8;
+
+	// polygon colors start at 0x2000
+	const u16 palbase = 0x2000 | (m_depth_reverse ? 0 : m_penmask);
+	color = palbase | (color & 0xff);
+
+	// if it has 0x10 palettes (each is 0x200 size), high bit comes from color bit 9
+	if (m_num_palettes == 0x10 && !BIT(code, 1))
+		color |= 0x100;
+
+	// add depth cue
+	int zsort = 0;
+
+	for (int i = 0; i < 4; i++)
+		zsort += zcode[i];
+
+	zsort /= 4;
+	zsort = std::max(zsort, 0);
+
+	const int depth = zsort >> 2 & m_penmask;
+	color += m_depth_reverse ? depth : -depth;
+
+	n21_vertex v[4];
+
+	for (int i = 0; i < 4; i++)
 	{
-		// Winning Run & Driver's Eyes use this logic
-		color = m_fixed_palbase | (color & 0xff);
+		v[i].x = m_poly_frame_width / 2 + sx[i];
+		v[i].y = m_poly_frame_height / 2 + sy[i];
+		v[i].z = zcode[i];
 	}
-	else
-	{ /* map color code to hardware pen */
-		int code = color >> 8;
+
+	rendertri(&v[0], &v[1], &v[2], color, zsort);
+	rendertri(&v[2], &v[3], &v[0], color, zsort);
+}
+
+void namcos21_3d_device::draw_direct_quad(const u16 *source, u16 color)
+{
+	int sx[4], sy[4], zcode[4];
+
+	for (int i = 0; i < 4; i++)
+	{
+		sx[i] = (s16)*source++;
+		sy[i] = (s16)*source++;
+		zcode[i] = (s16)*source++;
+	}
+
+	blit_single_quad(sx, sy, zcode, color);
+}
+
+int namcos21_3d_device::draw_quads(const u16 *source, const u8 *pointram, const u32 ptram_size, u32 quad_idx)
+{
+	const u32 ptram_mask = ptram_size - 1;
+	quad_idx = (quad_idx * 6) & ptram_mask;
+
+	int sx[4], sy[4], zcode[4];
+	int max_vi = -1; // for debug
+
+	for (int count = 0; count < ptram_size / 6; count++)
+	{
+		u8 code = pointram[quad_idx];
+		quad_idx = (quad_idx + 1) & ptram_mask;
+
+		u16 color = pointram[quad_idx] | (code << 8);
+		quad_idx = (quad_idx + 1) & ptram_mask;
+
+		for (int i = 0; i < 4; i++)
+		{
+			u8 vi = pointram[quad_idx];
+			quad_idx = (quad_idx + 1) & ptram_mask;
+
+			sx[i] = (s16)source[vi * 3 + 0];
+			sy[i] = (s16)source[vi * 3 + 1];
+			zcode[i] = (s16)source[vi * 3 + 2];
+
+			if (vi > max_vi)
+				max_vi = vi;
+		}
+
+		blit_single_quad(sx, sy, zcode, color & 0x7fff);
+
 		if (code & 0x80)
 		{
-			color = color & 0xff;
-			// color = 0x3e00|color;
-			color = 0x2100 | color;
-			depthcueenable = 0;
-		}
-		else
-		{
-			color &= 0xff;
-			color = 0x3e00 | color;
-			if ((code & 0x02) == 0)
-			{
-				color |= 0x100;
-			}
+			// end-of-quadlist marker
+			break;
 		}
 	}
-	a.x = sx[0];
-	a.y = sy[0];
-	a.z = zcode[0];
 
-	b.x = sx[1];
-	b.y = sy[1];
-	b.z = zcode[1];
-
-	c.x = sx[2];
-	c.y = sy[2];
-	c.z = zcode[2];
-
-	d.x = sx[3];
-	d.y = sy[3];
-	d.z = zcode[3];
-
-	rendertri(&a, &b, &c, color, depthcueenable);
-	rendertri(&c, &d, &a, color, depthcueenable);
+	return (max_vi + 1) * 3;
 }

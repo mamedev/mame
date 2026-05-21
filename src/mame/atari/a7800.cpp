@@ -6,6 +6,10 @@
 
   Dan Boris
 
+  TODO:
+  - Implement MARIA disable bit and 2600 compatibility mode
+  - Needs to verify BIOS area size mapped in CPU
+
     2002/05/13 kubecj   added more banks for bankswitching
                         added PAL machine description
                         changed clock to be precise
@@ -121,19 +125,23 @@ public:
 		m_tia(*this, "tia"),
 		m_maria(*this, "maria"),
 		m_riot(*this, "riot"),
-		m_io_joysticks(*this, "joysticks"),
-		m_io_buttons(*this, "buttons"),
-		m_io_console_buttons(*this, "console_buttons"),
+		m_io_joysticks(*this, "JOYSTICKS"),
+		m_io_buttons(*this, "BUTTONS"),
+		m_io_console_buttons(*this, "CONSOLE"),
 		m_cart(*this, "cartslot"),
 		m_screen(*this, "screen"),
-		m_bios(*this, "maincpu")
+		m_bios_view(*this, "bios_view")
 	{
 	}
 
 protected:
+	static constexpr int TRIGGER_HSYNC = 64717;
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 	void a7800_common(machine_config &config, uint32_t clock) ATTR_COLD;
 
-	uint8_t bios_or_cart_r(offs_t offset);
 	uint8_t tia_r(offs_t offset);
 	void tia_w(offs_t offset, uint8_t data);
 	virtual void a7800_palette(palette_device &palette) const ATTR_COLD;
@@ -142,20 +150,20 @@ protected:
 	uint8_t riot_joystick_r();
 	uint8_t riot_console_button_r();
 	void riot_button_pullup_w(uint8_t data);
+	void dma_wait_cb(uint64_t data);
+	void halt_cpu_cb(int state);
+	void dli_cb(int state);
 
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	void a7800_mem(address_map &map) ATTR_COLD;
 
-	int m_lines;
-	int m_ispal;
+	int32_t m_lines = 263;
+	bool m_ispal = false;
 
-	int m_ctrl_lock;
-	int m_ctrl_reg;
-	int m_maria_flag;
-	int m_p1_one_button;
-	int m_p2_one_button;
-	int m_bios_enabled;
+	bool m_ctrl_lock = false;
+	uint8_t m_ctrl_reg = 0;
+	bool m_maria_flag = false;
+	bool m_p1_one_button = true;
+	bool m_p2_one_button = true;
 
 	emu_timer *m_dma_start_timer = nullptr;
 
@@ -168,7 +176,7 @@ protected:
 	required_ioport m_io_console_buttons;
 	required_device<a78_cart_slot_device> m_cart;
 	required_device<screen_device> m_screen;
-	required_region_ptr<uint8_t> m_bios;
+	memory_view m_bios_view;
 };
 
 class a7800_ntsc_state : public a7800_state
@@ -209,8 +217,8 @@ uint8_t a7800_state::riot_console_button_r()
 void a7800_state::riot_button_pullup_w(uint8_t data)
 {
 	// pin 6 of the controller port is held high by the riot chip when reading two-button controllers (from schematic)
-	m_p1_one_button = data & 0x04;
-	m_p2_one_button = data & 0x10;
+	m_p1_one_button = BIT(data, 2);
+	m_p2_one_button = BIT(data, 4);
 }
 
 uint8_t a7800_state::tia_r(offs_t offset)
@@ -247,7 +255,8 @@ uint8_t a7800_state::tia_r(offs_t offset)
 		else
 			return 0x80;
 	default:
-		logerror("undefined TIA read %x\n",offset);
+		if (!machine().side_effects_disabled())
+			logerror("undefined TIA read %x\n",offset);
 	}
 	return 0xff;
 }
@@ -257,17 +266,21 @@ void a7800_state::tia_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0x20)
 	{ //INPTCTRL covers TIA registers 0x00-0x1F until locked
-		if (data & 0x01)
+		if (BIT(data, 0))
 		{
 			if (m_ctrl_lock && offset == 0x01)
-				m_maria_flag = 1;
+				m_maria_flag = true;
 			else if (!m_ctrl_lock)
-				m_maria_flag = 1;
+				m_maria_flag = true;
 		}
 		if (!m_ctrl_lock)
 		{
-			m_ctrl_lock = data & 0x01;
+			m_ctrl_lock = BIT(data, 0);
 			m_ctrl_reg = data;
+			if (BIT(m_ctrl_reg, 2))
+				m_bios_view.disable();
+			else
+				m_bios_view.select(0);
 		}
 	}
 	m_tia->tia_sound_w(offset, data);
@@ -289,15 +302,27 @@ TIMER_CALLBACK_MEMBER(a7800_state::maria_startdma)
 }
 
 
+// MARIA
 
-// ROM
-uint8_t a7800_state::bios_or_cart_r(offs_t offset)
+void a7800_state::dma_wait_cb(uint64_t data)
 {
-	if (!(m_ctrl_reg & 0x04))
-		return m_bios[offset];
-	else
-		return m_cart->read_40xx(offset + 0x8000);
+	m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime((data + 3) / 4));
 }
+
+void a7800_state::halt_cpu_cb(int state)
+{
+	if (state)
+		m_maincpu->spin_until_trigger(TRIGGER_HSYNC);
+	else
+		machine().scheduler().trigger(TRIGGER_HSYNC);
+}
+
+void a7800_state::dli_cb(int state)
+{
+	if (state)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
 
 /***************************************************************************
     ADDRESS MAPS
@@ -319,8 +344,10 @@ void a7800_state::a7800_mem(address_map &map)
 								// 0x2800, and only on some hardware (MARIA? motherboard?) revisions,
 								// and even then with inconsistent and unreliable results.
 	map(0x4000, 0xffff).w(m_cart, FUNC(a78_cart_slot_device::write_40xx));
-	map(0x4000, 0xbfff).r(m_cart, FUNC(a78_cart_slot_device::read_40xx));
-	map(0xc000, 0xffff).r(FUNC(a7800_state::bios_or_cart_r));    // here also the BIOS can be accessed
+	map(0x4000, 0xffff).r(m_cart, FUNC(a78_cart_slot_device::read_40xx));
+	// TODO: actually 0x8000-0xffff?
+	map(0xc000, 0xffff).view(m_bios_view);    // here also the BIOS can be accessed
+	m_bios_view[0](0xc000, 0xffff).rom().region("maincpu", 0);
 }
 
 
@@ -329,7 +356,7 @@ void a7800_state::a7800_mem(address_map &map)
 ***************************************************************************/
 
 static INPUT_PORTS_START( a7800 )
-	PORT_START("joysticks")
+	PORT_START("JOYSTICKS")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2) PORT_8WAY
@@ -339,14 +366,14 @@ static INPUT_PORTS_START( a7800 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_8WAY
 
-	PORT_START("buttons")
+	PORT_START("BUTTONS")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2)       PORT_PLAYER(2)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2)       PORT_PLAYER(1)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1)       PORT_PLAYER(2)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON1)       PORT_PLAYER(1)
-	PORT_BIT(0xF0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("console_buttons")
+	PORT_START("CONSOLE")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)  PORT_NAME("Reset")         PORT_CODE(KEYCODE_U)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)  PORT_NAME("Select")        PORT_CODE(KEYCODE_I)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -1328,7 +1355,6 @@ void a7800_state::machine_start()
 {
 	save_item(NAME(m_p1_one_button));
 	save_item(NAME(m_p2_one_button));
-	save_item(NAME(m_bios_enabled));
 	save_item(NAME(m_ctrl_lock));
 	save_item(NAME(m_ctrl_reg));
 	save_item(NAME(m_maria_flag));
@@ -1367,10 +1393,10 @@ void a7800_state::machine_start()
 
 void a7800_state::machine_reset()
 {
-	m_ctrl_lock = 0;
+	m_ctrl_lock = false;
 	m_ctrl_reg = 0;
-	m_maria_flag = 0;
-	m_bios_enabled = 0;
+	m_maria_flag = false;
+	m_bios_view.select(0);
 }
 
 void a7800_state::a7800_common(machine_config &config, uint32_t clock)
@@ -1388,8 +1414,11 @@ void a7800_state::a7800_common(machine_config &config, uint32_t clock)
 	PALETTE(config, "palette", FUNC(a7800_state::a7800_palette), std::size(a7800_colors));
 
 	ATARI_MARIA(config, m_maria, 0);
-	m_maria->set_dmacpu_tag(m_maincpu);
-	m_maria->set_screen_tag(m_screen);
+	m_maria->set_screen(m_screen);
+	m_maria->set_dmaspace_tag(m_maincpu, AS_PROGRAM);
+	m_maria->dma_wait_callback().set(FUNC(a7800_state::dma_wait_cb));
+	m_maria->halt_callback().set(FUNC(a7800_state::halt_cpu_cb));
+	m_maria->dli_callback().set(FUNC(a7800_state::dli_cb));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1456,8 +1485,8 @@ void a7800_ntsc_state::init_a7800_ntsc()
 {
 	m_ispal = false;
 	m_lines = 263;
-	m_p1_one_button = 1;
-	m_p2_one_button = 1;
+	m_p1_one_button = true;
+	m_p2_one_button = true;
 }
 
 
@@ -1465,8 +1494,8 @@ void a7800_pal_state::init_a7800_pal()
 {
 	m_ispal = true;
 	m_lines = 313;
-	m_p1_one_button = 1;
-	m_p2_one_button = 1;
+	m_p1_one_button = true;
+	m_p2_one_button = true;
 }
 
 } // anonymous namespace

@@ -402,8 +402,8 @@ void macvail_state::maclc520(machine_config &config)
 
 	APPLE_DFAC2(config, m_dfac2, 22257);
 	m_dfac2->sda_callback().set(m_cuda, FUNC(cuda_device::set_iic_sda));
-	m_cuda->iic_scl_callback().set(m_dfac2, FUNC(dfac2_device::scl_write));
-	m_cuda->iic_sda_callback().set(m_dfac2, FUNC(dfac2_device::sda_write));
+	m_cuda->iic_scl_callback().append(m_dfac2, FUNC(dfac2_device::scl_write));
+	m_cuda->iic_sda_callback().append(m_dfac2, FUNC(dfac2_device::sda_write));
 }
 
 void macvail_state::maclc550(machine_config &config)

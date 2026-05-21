@@ -1633,6 +1633,11 @@ ROM_START( my1stddr )
 	ROM_LOAD( "myfirstddr.bin", 0x000000, 0x400000, CRC(2ef57bfc) SHA1(9feea5adb9de8fe17e915f3a037e8ddd70e58ae7) )
 ROM_END
 
+ROM_START( my1stddrj )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "myfirstddrjp.u2", 0x000000, 0x400000, CRC(da62d32f) SHA1(de67f3b1d4bfbf9c51c606f53d7b2958859203bc) )
+ROM_END
+
 ROM_START( abl4play )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "abl4play.bin", 0x000000, 0x800000, CRC(5d57fb70) SHA1(34cdf80dc8cb08e5cd98c724268e4c5f483780d7) )
@@ -1747,6 +1752,7 @@ CONS( 2007, trkfldch,  0,          0,  trkfldch, trkfldch,trkfldch_state,      e
 CONS( 2007, trkfldchj, trkfldch,   0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",                                     "Hashire! Tobe! Nagero! Hyper Sports Challenge (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 CONS( 2006, my1stddr,  0,          0,  trkfldch, my1stddr,trkfldch_state,      empty_init,    "Konami",                                     "My First Dance Dance Revolution (US)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Japan version has different songs
+CONS( 2006, my1stddrj, my1stddr,   0,  trkfldch, my1stddr,trkfldch_state,      empty_init,    "Konami",                                     "My First Dance Dance Revolution (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Japan version has different songs
 
 CONS( 200?, abl4play,  0,          0,  trkfldch, abl4play,trkfldch_state,      empty_init,    "Advance Bright Ltd",                         "4 Player System - 10 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 

@@ -73,9 +73,7 @@ public:
 	nubus_slot_device(const machine_config &mconfig, T &&tag, device_t *owner, const char *nbtag, U &&opts, const char *dflt)
 		: nubus_slot_device(mconfig, tag, owner, (u32)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
+		set_options(std::forward<U>(opts), dflt, false);
 		set_nubus_slot(std::forward<T>(nbtag), tag);
 	}
 

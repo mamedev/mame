@@ -16,6 +16,7 @@ thanks-to:Franz Huber
 		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
 		<disk state="0"><color red="1.0" green="0.1" blue="0.15" alpha="0.17" /></disk>
 	</element>
+
 	<element name="hlb" defstate="0">
 		<rect state="0">
 			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
@@ -471,54 +472,54 @@ thanks-to:Franz Huber
 		<element ref="gray"><bounds x="89" y="103" width="4" height="4" /></element>
 		<element ref="gray"><bounds x="94" y="103" width="4" height="4" /></element>
 
-		<element ref="blackb"><bounds x="69.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="blackb"><bounds x="74.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="blackb"><bounds x="79.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="blackb"><bounds x="84.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="blackb"><bounds x="89.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="blackb"><bounds x="94.2" y="94.05" width="2.1" height="2.1" /></element>
+		<element ref="blackb"><bounds x="69.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="blackb"><bounds x="74.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="blackb"><bounds x="79.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="blackb"><bounds x="84.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="blackb"><bounds x="89.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="blackb"><bounds x="94.2" y="93.9" width="2.1" height="2.1" /></element>
 
-		<element ref="text_p6"><bounds x="69.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="text_p5"><bounds x="74.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="text_p4"><bounds x="79.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="text_p3"><bounds x="84.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="text_p2"><bounds x="89.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="text_p1"><bounds x="94.2" y="94.05" width="2.1" height="2.1" /></element>
+		<element ref="text_p6"><bounds x="69.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="text_p5"><bounds x="74.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="text_p4"><bounds x="79.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="text_p3"><bounds x="84.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="text_p2"><bounds x="89.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="text_p1"><bounds x="94.2" y="93.9" width="2.1" height="2.1" /></element>
 
-		<element ref="whitem" blend="multiply"><bounds x="69.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="whitem" blend="multiply"><bounds x="74.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="whitem" blend="multiply"><bounds x="79.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="whitem" blend="multiply"><bounds x="84.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="whitem" blend="multiply"><bounds x="89.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="whitem" blend="multiply"><bounds x="94.2" y="94.05" width="2.1" height="2.1" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="69.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="74.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="79.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="84.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="89.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="whitem" blend="multiply"><bounds x="94.2" y="93.9" width="2.1" height="2.1" /></element>
 
-		<element ref="gray" blend="add"><bounds x="69.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="gray" blend="add"><bounds x="74.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="gray" blend="add"><bounds x="79.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="gray" blend="add"><bounds x="84.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="gray" blend="add"><bounds x="89.2" y="94.05" width="2.1" height="2.1" /></element>
-		<element ref="gray" blend="add"><bounds x="94.2" y="94.05" width="2.1" height="2.1" /></element>
+		<element ref="gray" blend="add"><bounds x="69.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="gray" blend="add"><bounds x="74.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="gray" blend="add"><bounds x="79.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="gray" blend="add"><bounds x="84.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="gray" blend="add"><bounds x="89.2" y="93.9" width="2.1" height="2.1" /></element>
+		<element ref="gray" blend="add"><bounds x="94.2" y="93.9" width="2.1" height="2.1" /></element>
 
 		<element ref="blackw"><bounds x="90.35" y="104.5" width="1.3" height="1.3" /></element>
 		<element ref="white"><bounds x="95.35" y="104.5" width="1.3" height="1.3" /></element>
 
-		<element ref="text_b1"><bounds x="70.9" y="94" width="2.1" height="2.27" /></element>
-		<element ref="text_b2"><bounds x="75.9" y="94" width="2.1" height="2.27" /></element>
-		<element ref="text_b3"><bounds x="80.9" y="94" width="2.1" height="2.27" /></element>
-		<element ref="text_b4"><bounds x="85.9" y="94" width="2.1" height="2.27" /></element>
-		<element ref="text_b5"><bounds x="90.9" y="94" width="2.1" height="2.27" /></element>
-		<element ref="text_b6"><bounds x="95.9" y="94" width="2.1" height="2.27" /></element>
+		<element ref="text_b1"><bounds x="70.9" yc="95" width="2.1" height="1.75" /></element>
+		<element ref="text_b2"><bounds x="75.9" yc="95" width="2.1" height="1.75" /></element>
+		<element ref="text_b3"><bounds x="80.9" yc="95" width="2.1" height="1.75" /></element>
+		<element ref="text_b4"><bounds x="85.9" yc="95" width="2.1" height="1.75" /></element>
+		<element ref="text_b5"><bounds x="90.9" yc="95" width="2.1" height="1.75" /></element>
+		<element ref="text_b6"><bounds x="95.9" yc="95" width="2.1" height="1.75" /></element>
 
-		<element ref="text_info"><bounds x="69.2" y="99"  width="3.6" height="2.2" /></element>
-		<element ref="text_pos"> <bounds x="74.2" y="99"  width="3.6" height="2.2" /></element>
-		<element ref="text_lev"> <bounds x="79.2" y="99"  width="3.6" height="2.2" /></element>
-		<element ref="text_mem"> <bounds x="84.2" y="99"  width="3.6" height="2.2" /></element>
-		<element ref="text_cl">  <bounds x="89.2" y="99"  width="3.6" height="2.2" /></element>
-		<element ref="text_ent"> <bounds x="94.2" y="99"  width="3.6" height="2.2" /></element>
-		<element ref="text_res"> <bounds x="69.2" y="104" width="3.6" height="2.2" /></element>
-		<element ref="text_res"> <bounds x="74.2" y="104" width="3.6" height="2.2" /></element>
-		<element ref="text_best"><bounds x="79.2" y="104" width="3.6" height="2.2" /></element>
-		<element ref="text_mon"> <bounds x="84.2" y="104" width="3.6" height="2.2" /></element>
+		<element ref="text_info"><bounds xc="71" yc="100" width="3.6" height="1.75" /></element>
+		<element ref="text_pos"> <bounds xc="76" yc="100" width="3.6" height="1.75" /></element>
+		<element ref="text_lev"> <bounds xc="81" yc="100" width="3.6" height="1.75" /></element>
+		<element ref="text_mem"> <bounds xc="86" yc="100" width="3.6" height="1.75" /></element>
+		<element ref="text_cl">  <bounds xc="91" yc="100" width="3.6" height="1.75" /></element>
+		<element ref="text_ent"> <bounds xc="96" yc="100" width="3.6" height="1.75" /></element>
+		<element ref="text_res"> <bounds xc="71" yc="105" width="3.6" height="1.75" /></element>
+		<element ref="text_res"> <bounds xc="76" yc="105" width="3.6" height="1.75" /></element>
+		<element ref="text_best"><bounds xc="81" yc="105" width="3.6" height="1.75" /></element>
+		<element ref="text_mon"> <bounds xc="86" yc="105" width="3.6" height="1.75" /></element>
 
 		<element ref="keys" inputtag="KEY.0" inputmask="0x01"><bounds x="69" y="93" width="4" height="4" /><color alpha="0.25" /></element>
 		<element ref="keys" inputtag="KEY.0" inputmask="0x02"><bounds x="74" y="93" width="4" height="4" /><color alpha="0.25" /></element>

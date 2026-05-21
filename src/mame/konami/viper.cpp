@@ -101,7 +101,9 @@
     Other notes:
     - "Distribution error" means there's a region mismatch.
     - Hold TEST while booting (from the very start) to initialize the RTC for most games.
-    - It seems that p911 has 3 unique regional images: U/E, K/A, and J. If you try booting, for example, U region on a K/A image, it won't find some files and will error out with "distribution error".
+    - It seems that p911 has 3 unique regional images: U/E, K/A, and J. If you try booting,
+      for example, U region on a K/A image, it won't find some files and will error
+      out with "distribution error".
     - mocapglf: enable "show diag" at boot then disable it once the diag text appears.
       This will allow game to bypass the I/O SENSOR error later on.
 

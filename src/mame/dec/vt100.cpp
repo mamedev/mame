@@ -614,7 +614,7 @@ ROM_START( vt100 ) // This is from the schematics at http://www.bitsavers.org/pd
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
-	ROM_LOAD_OPTIONAL("23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional ?word processing? alternate character set ROM
+	ROM_LOAD( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional ?word processing? alternate character set ROM
 ROM_END
 
 #if 0
@@ -674,7 +674,7 @@ ROM_START( vt132 ) // This is from anecdotal evidence and vt100.net, as the vt13
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
-	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set ROM
+	ROM_LOAD( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set ROM
 ROM_END
 #endif
 
@@ -704,7 +704,7 @@ ROM_START( vt100ac ) // This is from the VT180 technical manual at http://www.bi
 
 	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
-	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional ?word processing? alternate character set ROM
+	ROM_LOAD( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional ?word processing? alternate character set ROM
 	ROM_REGION(0x10000, "stpcpu",ROMREGION_ERASEFF)
 /* The intelligent STP board: Below is limited information for an ?older version? or prototype of the board
 // expansion board for a vt100 with a processor on it and dma, intended to act as a RAM/send buffer for the STP printer board.
@@ -736,13 +736,13 @@ ROM_START( vt103 ) // This is from the schematics at http://www.bitsavers.org/pd
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
-	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set ROM
+	ROM_LOAD( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set ROM
 
 	ROM_REGION(0x0800, "tapecpu", 0) // ROM for the 8085 CPU in the integrated serial tu58-xa drive
 	ROM_LOAD( "23-089e2.e1", 0x0000, 0x0800, CRC(8614dd4c) SHA1(1b554e6c98bddfc6bc48d81c990deea43cf9df7f)) // Label: "23-089E2 // P8316E - AMD // 35227 8008NPP"
 
 	ROM_REGION(0x80000, "lsi11cpu", 0) // ROM for the LSI-11 CPU board
-	ROM_LOAD_OPTIONAL( "unknown.bin", 0x00000, 0x80000, NO_DUMP)
+	ROM_LOAD( "unknown.bin", 0x00000, 0x80000, NO_DUMP)
 ROM_END
 #endif
 
@@ -758,7 +758,7 @@ ROM_START( vt105 ) // This is from anecdotal evidence and vt100.net, as the vt10
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
-	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set ROM
+	ROM_LOAD( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set ROM
 ROM_END
 
 #if 0
@@ -774,7 +774,7 @@ ROM_START( vt110 )
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
-	ROM_LOAD_OPTIONAL ( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set ROM
+	ROM_LOAD( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set ROM
 //DECDataway board ROMs go here!
 ROM_END
 
@@ -791,7 +791,7 @@ ROM_START( vt125 ) // This is from bitsavers and vt100.net, as the vt125 schemat
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
-	ROM_LOAD_OPTIONAL ( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set ROM
+	ROM_LOAD( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set ROM
 
 	// "GPO" aka vt125 "mono board" ROMs and PROMs
 	ROM_REGION(0x10000, "monocpu", ROMREGION_ERASEFF) // ROMs for the 8085 sub-CPU
@@ -826,7 +826,7 @@ ROM_START( vt101 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 m
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "23-018e2-00.e3", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
-	ROM_LOAD_OPTIONAL( "23-094e2-00.e4", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set ROM
+	ROM_LOAD( "23-094e2-00.e4", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set ROM
 ROM_END
 
 
@@ -846,7 +846,7 @@ ROM_START( vt102 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 m
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "23-018e2-00.e3", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
-	ROM_LOAD_OPTIONAL( "23-094e2-00.e4", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set ROM
+	ROM_LOAD( "23-094e2-00.e4", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set ROM
 ROM_END
 
 ROM_START( vt131 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt131 mainboard with vt132-style block serial mode
@@ -865,7 +865,7 @@ ROM_START( vt131 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt131 mainboa
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "23-018e2-00.e3", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
-	ROM_LOAD_OPTIONAL( "23-094e2-00.e4", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set ROM
+	ROM_LOAD( "23-094e2-00.e4", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set ROM
 ROM_END
 
 ROM_START( vt180 )
@@ -879,7 +879,7 @@ ROM_START( vt180 )
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
-	ROM_LOAD_OPTIONAL ( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set ROM
+	ROM_LOAD( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set ROM
 
 	ROM_REGION(0x10000, "z80cpu", 0) // z80 daughterboard
 	ROM_LOAD( "23-021e3-00.bin", 0x0000, 0x1000, CRC(a2a575d2) SHA1(47a2c40aaec89e8476240f25515d75ab157f2911))

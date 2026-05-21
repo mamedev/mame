@@ -4033,26 +4033,26 @@ enum {
 #define NODE(_x)    (NODE_00 + (_x) * DISCRETE_MAX_OUTPUTS)
 #define NODE_SUB(_x, _y) ((_x) + (_y))
 
+constexpr uint32_t NODE_NC      = NODE_00;
+constexpr uint32_t NODE_SPECIAL = NODE(DISCRETE_MAX_NODES);
+
+constexpr uint32_t NODE_START   = NODE_00;
+constexpr uint32_t NODE_END     = NODE_SPECIAL;
+
 #if DISCRETE_MAX_OUTPUTS == 8
-#define NODE_CHILD_NODE_NUM(_x)     ((int)(_x) & 7)
-#define NODE_DEFAULT_NODE(_x)       ((int)(_x) & ~7)
-#define NODE_INDEX(_x)              (((int)(_x) - NODE_START)>>3)
+constexpr int NODE_CHILD_NODE_NUM(int x) { return x & 7; }
+constexpr int NODE_DEFAULT_NODE(int x) { return x & ~7; }
+constexpr int NODE_INDEX(int x) { return (x - NODE_START) >> 3; }
 #else
 #error "DISCRETE_MAX_OUTPUTS != 8"
 #endif
 
 #define NODE_RELATIVE(_x, _y) (NODE(NODE_INDEX(_x) + (_y)))
 
-#define NODE_NC  NODE_00
-#define NODE_SPECIAL  NODE(DISCRETE_MAX_NODES)
-
-#define NODE_START  NODE_00
-#define NODE_END    NODE_SPECIAL
-
 #define IS_VALUE_A_NODE(val)    (((val) > NODE_START) && ((val) <= NODE_END))
 
 // Optional node such as used in CR_FILTER
-#define OPT_NODE(val)   (int) val
+#define OPT_NODE(val)   (int(val))
 /*************************************
  *
  *  Enumerated values for Node types

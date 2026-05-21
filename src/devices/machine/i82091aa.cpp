@@ -178,8 +178,8 @@ void i82091aa_device::config_map(address_map &map)
 			return 0x00;
 		})
 	);
-//	map(0x02, 0x02) AIPCFG1 AIP Configuration 1
-//	map(0x03, 0x03) AIPCFG2 AIP Configuration 2
+//  map(0x02, 0x02) AIPCFG1 AIP Configuration 1
+//  map(0x03, 0x03) AIPCFG2 AIP Configuration 2
 	map(0x10, 0x10).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_fcfg1;

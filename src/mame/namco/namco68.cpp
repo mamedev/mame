@@ -73,7 +73,7 @@ uint8_t namcoc68_device::dpram_byte_r(offs_t offset)
 
 void namcoc68_device::dpram_byte_w(offs_t offset, uint8_t data)
 {
-	m_dp_out(offset,data);
+	m_dp_out(offset, data);
 }
 
 uint8_t namcoc68_device::unk_r()

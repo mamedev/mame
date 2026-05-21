@@ -75,6 +75,12 @@ ROM_START( gwsmb35 )
 	ROM_LOAD( "mx25u8035e.bin", 0x000000, 0x100000, CRC(e261a5bf) SHA1(4ce600f725f166e9f0dfd9e3b2f61ef95fa6383c) )
 ROM_END
 
+ROM_START( gwzeldan )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "mx25u3232.bin", 0x000000, 0x400000, CRC(53d58c63) SHA1(8101d200c89ed5e4ff3addd5b1a22d195d290892) )
+ROM_END
+
 } // anonymous namespace
 
 CONS( 2020, gwsmb35,      0,              0,      gw35th, gw35th, gw35th_state, empty_init, "Nintendo", "Game & Watch: Super Mario Bros. 35th Anniversary", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2020, gwzeldan,     0,              0,      gw35th, gw35th, gw35th_state, empty_init, "Nintendo", "Game & Watch: The Legend of Zelda Anniversary", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

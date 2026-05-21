@@ -190,12 +190,12 @@ u16 dragngun_state::read_spriteformat(int spriteformatram_offset, u8 attr)
 		return m_sprite_spriteformat[0][((spriteformatram_offset & 0x1ff)<<2) + attr];
 }
 
-u16 dragngun_state::read_spritetable(int offs, u8 attr, int whichlist)
+u16 dragngun_state::read_spritetable(int offs, u8 attr)
 {
 	return m_spriteram->buffer()[(offs << 3) + attr];
 }
 
-u16 dragngun_state::read_spritelist(int offs, int whichlist)
+u16 dragngun_state::read_spritelist(int offs)
 {
 	return m_sprite_indextable[offs];
 }
@@ -270,7 +270,8 @@ u32 dragngun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	{
 		rectangle clip(cliprect.left(), cliprect.right(), 8, 247);
 		m_sprgenzoom->clear_screen_bitmap(clip);
-		m_sprgenzoom->draw_dg(screen, bitmap, clip);
+		m_sprgenzoom->build_sprite_list_and_render_sprites(clip);
+		m_sprgenzoom->draw(screen, bitmap, clip);
 	}
 
 	return 0;
