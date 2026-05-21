@@ -21,7 +21,7 @@
 #define LOG_DATA    (1U << 1)
 #define LOG_AUTOPAD (1U << 2)
 
-//#define VERBOSE (LOG_GENERAL|LOG_AUTOPAD)
+// #define VERBOSE (LOG_GENERAL|LOG_AUTOPAD)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(DMAC_0266, dmac_0266_device, "dmac_0266", "Sony 0266 WSC-ICKDMAC DMA Controller")
@@ -159,8 +159,6 @@ void dmac_0266_device::dma_check(s32 param)
 				m_dma_w(0);
 			}
 		}
-		else
-			LOGMASKED(LOG_AUTOPAD, "Skipping pad byte because interrupt was set\n"); // temp log
 
 		if (!(m_status & INTERRUPT))
 		{
