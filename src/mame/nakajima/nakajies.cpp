@@ -165,12 +165,9 @@ TODO:
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
-#include "sound/beep.h"
-#include "sound/spkrdev.h"
 
 #include "emupal.h"
 #include "screen.h"
-#include "speaker.h"
 
 
 namespace {
@@ -198,8 +195,6 @@ public:
 		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		, m_speaker(*this, "mono")
-		, m_beep(*this, "beep")
 		, m_centronics(*this, "centronics")
 		, m_cent_data_out(*this, "cent_data_out")
 		, m_uart(*this, "uart")
@@ -266,8 +261,6 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<speaker_device> m_speaker;
-	required_device<beep_device> m_beep;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<i8251_device> m_uart;
@@ -288,7 +281,6 @@ protected:
 	u32 m_uart_rxrdy = 0;
 	u32 m_uart_txrdy = 0;
 	bool m_lcd_on = false;
-	u16 m_beep_freq = 0;
 	u32 m_pccard_card_detect = 1;
 	u32 m_pccard_write_protect = 1;
 	u32 m_pccard_battery_failed = 1;
@@ -348,9 +340,6 @@ void nakajies_state::nakajies_io_map(address_map &map)
 	map(0x0010, 0x0017).w(FUNC(nakajies_state::banking_w));
 	map(0x30, 0x30).w(FUNC(nakajies_state::uart_control_w));
 	map(0x40, 0x40).w(m_cent_data_out, FUNC(output_latch_device::write));
-	map(0x0050, 0x0050).lw8(NAME([this](u8 data) { m_beep_freq = (m_beep_freq & 0xff00) | data; m_beep->set_clock(250000/m_beep_freq); })); // 250000 is a wild guess
-	map(0x0051, 0x0051).lw8(NAME([this](u8 data) { m_beep_freq = (m_beep_freq & 0x00ff) | (data << 8); m_beep->set_clock(250000/m_beep_freq); })); // 250000 is a wild guess
-	map(0x0052, 0x0052).lw8(NAME([this](u8 data) { m_beep->set_state(!BIT(data, 7)); }));
 	// Unknown
 	map(0x0053, 0x0053).noprw();
 	map(0x0060, 0x0060).lrw8(
@@ -869,10 +858,6 @@ void nakajies_state::drwrt100(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wales210);
 	PALETTE(config, m_palette, FUNC(nakajies_state::nakajies_palette), 2);
 
-	/* sound */
-	SPEAKER(config, m_speaker).front_center();
-	BEEP(config, m_beep, 0).add_route(ALL_OUTPUTS, m_speaker, 0.25);
-
 	/* rtc */
 	RP5C01(config, m_rtc, XTAL(32'768));
 
@@ -1006,10 +991,10 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT         CLASS               INIT        COMPANY     FULLNAME            FLAGS
-COMP( 199?, wales210, 0,        0,      nakajies210, nakajies_irq, nakajies_state,     empty_init, "Walther",  "ES-210",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // German, 128KB RAM
-COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies_irq, nakajies_state,     empty_init, "Dator",    "Dator 3000",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Spanish, 128KB RAM
-COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies_irq, nakajies_state,     empty_init, "Nakajima", "ES-210 (Spain)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Spanish, 128KB RAM
-COMP( 1996, drwrt100, wales210, 0,      drwrt100,    nakajies_irq, nakajies_state,     empty_init, "NTS",      "DreamWriter T100", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // English, 128KB RAM
-COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies_nmi, nakajies_state,     empty_init, "NTS",      "DreamWriter T400", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // English, 256KB RAM
-COMP( 199?, drwrt450, wales210, 0,      nakajies220, nakajies_nmi, nakajies_state,     empty_init, "NTS",      "DreamWriter 450",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // English, 256KB RAM
-COMP( 1996, drwrt200, wales210, 0,      nakajies250, nakajies_nmi, nakajies_fdc_state, empty_init, "NTS",      "DreamWriter T200", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // English, 256KB RAM
+COMP( 199?, wales210, 0,        0,      nakajies210, nakajies_irq, nakajies_state,     empty_init, "Walther",  "ES-210",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // German, 128KB RAM
+COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies_irq, nakajies_state,     empty_init, "Dator",    "Dator 3000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
+COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies_irq, nakajies_state,     empty_init, "Nakajima", "ES-210 (Spain)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
+COMP( 1996, drwrt100, wales210, 0,      drwrt100,    nakajies_irq, nakajies_state,     empty_init, "NTS",      "DreamWriter T100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 128KB RAM
+COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies_nmi, nakajies_state,     empty_init, "NTS",      "DreamWriter T400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
+COMP( 199?, drwrt450, wales210, 0,      nakajies220, nakajies_nmi, nakajies_state,     empty_init, "NTS",      "DreamWriter 450",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
+COMP( 1996, drwrt200, wales210, 0,      nakajies250, nakajies_nmi, nakajies_fdc_state, empty_init, "NTS",      "DreamWriter T200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
