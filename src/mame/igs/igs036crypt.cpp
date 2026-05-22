@@ -51,7 +51,7 @@ The unused section at the tail end of the ROMs are pattern-filled and hide 20-by
 values located at positions which vary per set. The first 16 bytes is a magic number
 that the internal ROM looks for while hash checking the external ROM. Once a match
 is found, the next 4 bytes is used as a hash for the external ROM and the 4 bytes of
-the hash are skipped in the hash calculation. It appears that the hash algorhythm is
+the hash are skipped in the hash calculation. It appears that the hash algorithm is
 the same for all igs036 games, with the exception of the two shifts that are used.
 Note that the hash check is performed while the external ROM is decrypted.
 Code to validate the hash is commented below.
