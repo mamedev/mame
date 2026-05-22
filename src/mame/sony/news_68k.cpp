@@ -944,9 +944,9 @@ ROM_START(nws1250)
 	ROMX_LOAD("nws-1200_ver_2.0a_9010.ic2", 0x00000, 0x20000, CRC(87eca9d2) SHA1(235585a55bc2b3206cfec532852526a638eccad2), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE)
 
 	// AM27S21PC PROM
-	ROM_REGION32_BE(0x100, "idrom", 0)
 	// IDROM has system-specific data, so there is no "golden" dump.
-	ROM_LOAD("idrom.bin", 0x000, 0x100, CRC(8cf47e35) SHA1(3eef8168ffb8f7879bcbac9e8fee2115a191ae83) BAD_DUMP)
+	ROM_REGION32_BE(0x100, "idrom", 0)
+	ROM_LOAD("n1250_50292_am27s21pc.ic36", 0x000, 0x100, CRC(8cf47e35) SHA1(3eef8168ffb8f7879bcbac9e8fee2115a191ae83) BAD_DUMP)
 
 	// 2 x MB834200B (mask ROM, from system with monitor 2.0)
 	// There may be a different revision of these on MB834200A ROMs
