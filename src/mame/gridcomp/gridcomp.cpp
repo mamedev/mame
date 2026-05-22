@@ -63,6 +63,7 @@
 #include "emu.h"
 
 #include "gridkeyb.h"
+#include "gridmodem.h"
 #include "gridrom.h"
 
 #include "bus/ieee488/ieee488.h"
@@ -73,13 +74,13 @@
 #include "machine/i7220.h"
 #include "machine/i80130.h"
 #include "machine/i8087.h"
-#include "machine/i8255.h"
 #include "machine/mm58174.h"
 #include "machine/ram.h"
 #include "machine/tms9914.h"
 #include "machine/z80sio.h"
 #include "sound/dac.h"
 
+#include "emuopts.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -133,7 +134,7 @@ private:
 	required_device<i8086_cpu_device> m_maincpu;
 	required_device<i80130_device> m_osp;
 	required_device<mm58174_device> m_rtc;
-	required_device<i8255_device> m_modem;
+	required_device<grid_modem_device> m_modem;
 	optional_device<i8274_device> m_uart8274;
 	required_device<dac0832_device> m_dac;
 	required_device<ram_device> m_ram;
@@ -147,8 +148,6 @@ private:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	uint16_t grid_9ff0_r(offs_t offset);
-	uint8_t grid_modem_r(offs_t offset);
-	void grid_modem_w(offs_t offset, uint8_t data);
 
 	void grid_sound_w(offs_t offset, uint8_t data);
 
@@ -194,20 +193,6 @@ static void rs232_devices(device_slot_interface &device)
 	LOGDBG("9FF0: %02x == %02x\n", 0x9ff00 + (offset << 1), data);
 
 	return data;
-}
-
-// reject all commands
-uint8_t gridcomp_state::grid_modem_r(offs_t offset)
-{
-	uint8_t data = 0;
-	LOG("MDM %02x == %02x\n", 0xdfec0 + (offset << 1), data);
-
-	return data;
-}
-
-void gridcomp_state::grid_modem_w(offs_t offset, uint8_t data)
-{
-	LOG("MDM %02x <- %02x\n", 0xdfec0 + (offset << 1), data);
 }
 
 void gridcomp_state::grid_sound_w(offs_t offset, uint8_t data)
@@ -285,7 +270,7 @@ void gridcomp_state::grid1101_map(address_map &map)
 	map(0xdfe40, 0xdfe4f).w(FUNC(gridcomp_state::grid_sound_w));  // modem controller??
 	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
-	map(0xdfec0, 0xdfecf).rw(FUNC(gridcomp_state::grid_modem_r), FUNC(gridcomp_state::grid_modem_w)).umask16(0x00ff); // incl. DTMF generator
+	map(0xdfec0, 0xdfecf).rw(m_modem, FUNC(grid_modem_device::read), FUNC(grid_modem_device::write)).umask16(0x00ff); // incl. DTMF generator
 	map(0xdff00, 0xdff1f).rw(m_uart8274, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
 	map(0xdff40, 0xdff5f).rw(m_rtc, FUNC(mm58174_device::read), FUNC(mm58174_device::write)).umask16(0xff00);
 	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::read), FUNC(tms9914_device::write)).umask16(0x00ff);
@@ -305,7 +290,7 @@ void gridcomp_state::grid1121_map(address_map &map)
 	map(0xdfe40, 0xdfe4f).w(FUNC(gridcomp_state::grid_sound_w));  // modem controller??
 	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
-	map(0xdfec0, 0xdfecf).rw(FUNC(gridcomp_state::grid_modem_r), FUNC(gridcomp_state::grid_modem_w)).umask16(0x00ff); // incl. DTMF generator
+	map(0xdfec0, 0xdfecf).rw(m_modem, FUNC(grid_modem_device::read), FUNC(grid_modem_device::write)).umask16(0x00ff); // incl. DTMF generator
 	map(0xdff00, 0xdff1f).rw(m_uart8274, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
 	map(0xdff40, 0xdff5f).rw(m_rtc, FUNC(mm58174_device::read), FUNC(mm58174_device::write)).umask16(0xff00);
 	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::read), FUNC(tms9914_device::write)).umask16(0x00ff);
@@ -413,7 +398,10 @@ void gridcomp_state::grid1101(machine_config &config)
 	rs232_port.dcd_handler().set(m_uart8274, FUNC(i8274_device::dcda_w));
 	rs232_port.cts_handler().set(m_uart8274, FUNC(i8274_device::ctsa_w));
 
-	I8255(config, "modem");
+	GRID_MODEM(config, m_modem, 0);
+	m_modem->set_remote_host(config.options().comm_remotehost());
+	m_modem->set_remote_port(config.options().comm_remoteport());
+	m_modem->int_cb().set(m_osp, FUNC(i80130_device::ir2_w));
 
 	RAM(config, m_ram).set_default_size("256K").set_default_value(0);
 
