@@ -7,8 +7,7 @@
     Versions: TBBlue 1.2, Issue 0, Issue 1, Issue 2,
               Issue 2B (Kickstarter 1), Issue 2D, Issue 2E, Issue 2H,
               Issue 4 (Kickstarter 2), Issue 5 (Kickstarter 3)
-    Current implementation is based on Issue 4. Only limited difference
-    tracked through PORT_CONFIG
+    Current implementation is based on Issue 5.
 
     TODO:
     * contention
@@ -1030,7 +1029,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), l[0]);
 		if (ula_en)
 		{
-			m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07);
+			m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07, l[0]);
 			if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, l[0]);
 			else m_ula_scr->draw(screen, bitmap, clip256x192, l[0]);
 		}
@@ -1043,7 +1042,6 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		{
 			if (ula_en)
 			{
-				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07, 1);
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, 1);
 			}
@@ -1056,7 +1054,6 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 1);
 			if (ula_en)
 			{
-				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07, 1);
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, 1);
 			}
@@ -1069,7 +1066,6 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			if (layer2_en) m_layer2->draw_mix(screen, bitmap, m_blendprio_bitmap, clip320x256, m_nr_15_layer_priority & 1);
 			if (ula_en)
 			{
-				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07);
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192);
 				else m_ula_scr->draw(screen, bitmap, clip256x192);
 			}
@@ -1080,12 +1076,12 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 2);
 			if (ula_en)
 			{
-				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07);
+				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07, 2);
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 2);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, 2);
 			}
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 2);
-			if (layer2_en) m_layer2->draw_mix(screen, bitmap, bitmap, clip320x256, m_nr_15_layer_priority & 1);
+			if (layer2_en) m_layer2->draw(screen, bitmap, clip320x256, 1, 2);
 		}
 	}
 	// sprites below foreground

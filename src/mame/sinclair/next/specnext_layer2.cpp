@@ -31,7 +31,7 @@ void specnext_layer2_device::draw_mix(screen_device &screen, bitmap_rgb32 &bitma
 
 	const rgb_t gt0 = rgbexpand<3,3,3>((m_global_transparent << 1) | 0, 6, 3, 0);
 	const rgb_t gt1 = rgbexpand<3,3,3>((m_global_transparent << 1) | 1, 6, 3, 0);
-	const rgb_t fb = palette().pen_color(0x800);
+	const rgb_t fb = palette().pen_color(0xa00);
 	auto blend_op = [gt0, gt1, fb, mixer](u8 &prio, u32 &target, u32 &priotarget, const rgb_t pen, bool is_prio_color)
 	{
 		if ((pen == gt0) || (pen == gt1))
