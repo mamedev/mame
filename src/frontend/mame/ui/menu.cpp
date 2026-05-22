@@ -447,7 +447,8 @@ void menu::reset(reset_options options)
 {
 	// don't accept pointer input until the menu has been redrawn
 	m_items_drawn = false;
-	m_pointer_state = track_pointer::IDLE;
+	if (track_pointer::IDLE != m_pointer_state)
+		m_pointer_state = track_pointer::COMPLETED;
 
 	// based on the reset option, set the reset info
 	m_resetpos = 0;
