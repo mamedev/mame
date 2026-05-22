@@ -88,7 +88,7 @@ void flashvga2_state::mem_map(address_map &map)
 
 void flashvga2_state::io_map(address_map &map)
 {
-	map(0x200a, 0x200b).nopw();
+	map(0x2000, 0x201f).rw("uart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
 	map(0x217a, 0x217b).lr8(NAME([] () { return 0xffff; }));
 }
 
@@ -98,11 +98,12 @@ INPUT_PORTS_END
 
 void flashvga2_state::flashvga2(machine_config &config)
 {
-	I80186(config, m_maincpu, 50_MHz_XTAL/2);
+	I80186(config, m_maincpu, 50_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &flashvga2_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &flashvga2_state::io_map);
 
-	SCN2681(config, "uart", 3.6864_MHz_XTAL); // Philips SCC2692AC1A44
+	scn2681_device &uart(SCN2681(config, "uart", 3.6864_MHz_XTAL)); // Philips SCC2692AC1A44
+	uart.irq_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	M48T02(config, "m48t18", 0); // ST M48T18-150PC1
 
@@ -113,7 +114,7 @@ void flashvga2_state::flashvga2(machine_config &config)
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
 	screen.set_palette("palette");
-//	screen.screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::int?_w));
+	screen.screen_vblank().set("uart", FUNC(scn2681_device::ip0_w)).invert();
 
 	PALETTE(config, "palette").set_entries(512);
 
