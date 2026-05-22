@@ -44225,6 +44225,7 @@ fc100
 
 @source:skeleton/fdek_h8s.cpp
 battkids
+nyankids
 sirekids
 
 @source:skeleton/fk1.cpp
@@ -44277,6 +44278,9 @@ hazl1552
 
 @source:skeleton/hazl1420.cpp
 hazl1420
+
+@source:skeleton/hkcastle.cpp
+hkcastle
 
 @source:skeleton/hohnadam.cpp
 hohnadam
@@ -45566,6 +45570,7 @@ anoworld
 jankenmn
 
 @source:sunwise/jankmg2.cpp
+jankmg
 jankmg2
 ppresent
 

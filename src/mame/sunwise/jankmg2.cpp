@@ -153,6 +153,15 @@ void jankmg2_state::jankmg2(machine_config &config)
 }
 
 
+ROM_START( jankmg )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "gjk1.u17", 0x0000, 0x4000, CRC(61f5656a) SHA1(67de8e9bcd305b8e19b46f788d5925b0eeb0c72b) )
+
+	ROM_REGION( 0x40000, "dac_data", 0 )
+	ROM_LOAD( "gjk2.u13", 0x00000, 0x40000, CRC(36f361ce) SHA1(03f74ac18e5a53ed57485f8d66158f2260437c78) )
+	// 3 more unpopulated ROM spaces at u14, u15 and u16
+ROM_END
+
 ROM_START( jankmg2 )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "gjv1.1.p.u17", 0x0000, 0x4000, CRC(1aa201e7) SHA1(943dff75a46775dd12aed07659dff3d961a58211) )
@@ -174,5 +183,6 @@ ROM_END
 } // anonymous namespace
 
 
+GAME( 1995, jankmg,   0, jankmg2, jankmg2, jankmg2_state, empty_init, ROT0, "Sunwise", "Ganso Janken Man",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // date according to manual
 GAME( 199?, jankmg2,  0, jankmg2, jankmg2, jankmg2_state, empty_init, ROT0, "Sunwise", "Ganso Janken Man 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 199?, ppresent, 0, jankmg2, jankmg2, jankmg2_state, empty_init, ROT0, "Sunwise", "Pretty Present",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
