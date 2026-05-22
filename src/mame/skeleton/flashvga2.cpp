@@ -66,24 +66,44 @@ private:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
 };
 
-static INPUT_PORTS_START(ruletamag)
-INPUT_PORTS_END
-
+// TODO: bitmap or blitter based (program contains lots of 8bpp with uneven pitches).
 uint32_t flashvga2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-static GFXDECODE_START( gfx_flashvga2 )
-GFXDECODE_END
+void flashvga2_state::mem_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
+	map(0x40000, 0x7ffff).ram();
+	map(0x80000, 0x8ffff).ram();
+	// TODO: obviously bankswitched, also flash ROM based
+	map(0xc0000, 0xfffff).rom().region("program_rom", 0x7c0000);
+}
+
+void flashvga2_state::io_map(address_map &map)
+{
+	map(0x2000, 0x201f).rw("uart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
+	map(0x217a, 0x217b).lr8(NAME([] () { return 0xffff; }));
+}
+
+static INPUT_PORTS_START(ruletamag)
+INPUT_PORTS_END
+
 
 void flashvga2_state::flashvga2(machine_config &config)
 {
-	I80186(config, m_maincpu, 50_MHz_XTAL/2);
+	I80186(config, m_maincpu, 50_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &flashvga2_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &flashvga2_state::io_map);
 
-	SCN2681(config, "uart", 3.6864_MHz_XTAL); // Philips SCC2692AC1A44
+	scn2681_device &uart(SCN2681(config, "uart", 3.6864_MHz_XTAL)); // Philips SCC2692AC1A44
+	uart.irq_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	M48T02(config, "m48t18", 0); // ST M48T18-150PC1
 
@@ -94,6 +114,7 @@ void flashvga2_state::flashvga2(machine_config &config)
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
 	screen.set_palette("palette");
+	screen.screen_vblank().set("uart", FUNC(scn2681_device::ip0_w)).invert();
 
 	PALETTE(config, "palette").set_entries(512);
 
@@ -106,9 +127,9 @@ void flashvga2_state::flashvga2(machine_config &config)
    The manual can be downloaded from: https://www.recreativas.org/manuales/tragaperras
    Video of the actual machine booting: https://youtu.be/xUARqw1_N_A  */
 ROM_START( ruletamag )
-	ROM_REGION( 0x800000, "maincpu", 0 )
-	ROM_LOAD( "m29f032d.u100", 0x000000, 0x400000, CRC(04bf20c2) SHA1(fc4be2c22dc266d6a460aeca257b449be5ab630f) )
-	ROM_LOAD( "m29f032d.u101", 0x400000, 0x400000, CRC(2bd85284) SHA1(36f4b918d1d9b57bf382fa940180b3a1aac9780f) )
+	ROM_REGION16_LE( 0x800000, "program_rom", 0 )
+	ROM_LOAD16_BYTE( "m29f032d.u100", 0x000000, 0x400000, CRC(04bf20c2) SHA1(fc4be2c22dc266d6a460aeca257b449be5ab630f) )
+	ROM_LOAD16_BYTE( "m29f032d.u101", 0x000001, 0x400000, CRC(2bd85284) SHA1(36f4b918d1d9b57bf382fa940180b3a1aac9780f) )
 
 	ROM_REGION( 0x8000, "seeprom", 0 )
 	ROM_LOAD( "m24256bf.u31",  0x000000, 0x008000, CRC(af9adcae) SHA1(ac6274edc4240d5cf397455868009263264ffc6e) )

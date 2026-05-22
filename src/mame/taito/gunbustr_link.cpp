@@ -9,7 +9,7 @@
 
   To use this:
   * Enable Link Simulation in MAME's Machine Configuration menu.
-  * Access the game's Tet Mode Menu, and select Configuration.
+  * Access the game's Test Mode Menu, and select Configuration.
   * Set Link Play to On, and set the ID Number to 0 for one instance
     and 1 for the other instance (it helps to have separate NVRAM
     directories for the two instances).
