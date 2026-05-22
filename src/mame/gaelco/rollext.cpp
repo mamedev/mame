@@ -570,7 +570,12 @@ void rollext_state::a0000000_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 
 			m_adc_reg = newdata;
+			// bit 6: unknown (video enable or coin lockout)
+			// bit 1: start lamp
+			machine().bookkeeping().coin_counter_w(0, BIT(newdata, 0));
 		}
+
+		// if (ACCESSING_BITS_0_7) ADC force feedback?
 	}
 }
 

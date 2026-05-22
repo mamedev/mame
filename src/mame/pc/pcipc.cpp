@@ -675,7 +675,7 @@ void pcipc_state::pcipctx(machine_config &config)
 	// Socket 7 / PGA321
 	pentium_device &maincpu(PENTIUM(config, "maincpu", 60000000));
 	maincpu.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
-//	maincpu.smiact().set("pci:00.0", FUNC(i82439tx_host_device::smi_act_w));
+//  maincpu.smiact().set("pci:00.0", FUNC(i82439tx_host_device::smi_act_w));
 
 	PCI_ROOT(config, "pci", 0);
 	I82439TX(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
@@ -684,7 +684,7 @@ void pcipc_state::pcipctx(machine_config &config)
 	// IT8680F claims to have an RTC but it doesn't seem enabled, assume internal RTC used instead.
 	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu", true));
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
-//	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+//  isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 
 	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", 0, "maincpu"));

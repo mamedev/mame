@@ -15,7 +15,7 @@ TODO:
 #include "vt82c586b_usb.h"
 
 #define VERBOSE (LOG_GENERAL)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -59,11 +59,14 @@ void vt82c586b_usb_device::device_reset()
 	std::fill(std::begin(m_misc_control), std::end(m_misc_control), 0);
 }
 
+uint8_t vt82c586b_usb_device::latency_timer_r()
+{
+	return 0x16;
+}
+
 void vt82c586b_usb_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	// latency timer
-	map(0x0d, 0x0d).lr8(NAME([] () { return 0x16; }));
 
 	map(0x40, 0x40).lrw8(
 		NAME([this] () { return m_misc_control[0]; }),

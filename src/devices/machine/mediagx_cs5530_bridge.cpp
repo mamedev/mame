@@ -14,7 +14,7 @@
 #define LOG_MAP    (1U << 1) // log full remaps
 
 #define VERBOSE (LOG_GENERAL | LOG_MAP)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 

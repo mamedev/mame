@@ -1,21 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:
-
 /****************************************************************************
 
 Skeleton driver for "Sea Wolf - Next Mission", from Coastal Amusements Inc.
 
-Based on an Foxconn "45CMX" PCB:
--Intel Celeron SL9XN 1.8GHz/512/800/06 CPU.
--1024MB DDR2-667 RAM.
--North Bridge: Intel 945GC/945G chipset; South Bridge: Intel ICH7.
-
-Jaton Video-PX8400GS-EX video board with 512 MB RAM (NVIDIA GeForce 8400GS).
+Based on an Foxconn 45CMX-X PCB:
+- Intel Celeron SL9XN 1.8GHz/512/800/06 CPU.
+- 1024MB DDR2-667 RAM.
+- Intel 82945GC GMCH North Bridge;
+- Intel 82801GB ICH7 South Bridge;
+- Jaton Video-PX8400GS-EX video board with 512 MB RAM (NVIDIA GeForce 8400GS).
 
 Coastal Game I/O PCB:
--Atmel 89C5131A near a 24MHz cristal.
--Buttons for set and calibration.
--Etc.
+- Atmel 89C5131A near a 24MHz cristal.
+- Buttons for set and calibration.
+- Etc.
 
 ****************************************************************************/
 
@@ -61,6 +60,7 @@ INPUT_PORTS_END
 
 void seawolfnm_state::seawolfnm(machine_config &config)
 {
+	// Socket T LGA775
 	PENTIUM4(config, m_maincpu, 100'000'000); // Actually an Intel Celeron SL9XN 1.8GHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &seawolfnm_state::seawolfnm_map);
 	m_maincpu->set_addrmap(AS_IO, &seawolfnm_state::seawolfnm_io);

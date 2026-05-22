@@ -60,7 +60,7 @@
         Standard JAMMA I/O interface, including player 3 and 4 connectors
         4 channel general purpose A to D interface (steering wheel and control pedals)
         100baseT Ethernet interface for debugging and/or inter game communications
-        Forced-feedback “Wheel Driver Interface” for driving games
+        Force-feedback “Wheel Driver Interface” for driving games
         High-current drivers for lamps or solenoids
         Gun interface I/O tightly coupled to the CRT controller
 

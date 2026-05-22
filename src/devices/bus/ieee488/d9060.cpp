@@ -29,9 +29,16 @@
 
 #include "emu.h"
 #include "d9060.h"
+
 #include "bus/scsi/d9060hd.h"
+#include "bus/scsi/scsi.h"
+#include "cpu/m6502/m6502.h"
+#include "machine/6522via.h"
+#include "machine/mos6530.h"
 
 
+
+namespace {
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -58,11 +65,94 @@ enum
 
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(D9060, d9060_device, "d9060", "Commodore D9060")
-DEFINE_DEVICE_TYPE(D9090, d9090_device, "d9090", "Commodore D9090")
+
+// ======================> d9060_device_base
+
+class d9060_device_base : public device_t, public device_ieee488_interface
+{
+protected:
+	enum
+	{
+		TYPE_9060,
+		TYPE_9090
+	};
+
+	// construction/destruction
+	d9060_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	// device_ieee488_interface implementation
+	void ieee488_atn(int state) override;
+	void ieee488_ifc(int state) override;
+
+private:
+	inline void update_ieee_signals();
+
+	uint8_t dio_r();
+	void dio_w(uint8_t data);
+	uint8_t riot1_pa_r();
+	void riot1_pa_w(uint8_t data);
+	uint8_t riot1_pb_r();
+	void riot1_pb_w(uint8_t data);
+	void via_pb_w(uint8_t data);
+	void ack_w(int state);
+	void enable_w(int state);
+	void scsi_data_w(uint8_t data);
+
+	void hdc_mem(address_map &map) ATTR_COLD;
+	void main_mem(address_map &map) ATTR_COLD;
+
+	required_device<m6502_device> m_maincpu;
+	required_device<m6502_device> m_hdccpu;
+	required_device<mos6532_device> m_riot0;
+	required_device<mos6532_device> m_riot1;
+	required_device<via6522_device> m_via;
+	required_device<scsi_port_device> m_sasibus;
+	required_device<output_latch_device> m_sasi_data_out;
+	required_ioport m_address;
+	output_finder<3> m_leds;
+
+	// IEEE-488 bus
+	int m_rfdo;                         // not ready for data output
+	int m_daco;                         // not data accepted output
+	int m_atna;                         // attention acknowledge
+	int m_ifc;
+
+	// SASI bus
+	int m_enable;
+	uint8_t m_data;
+
+	int m_variant;
+};
+
+
+// ======================> d9060_device
+
+class d9060_device : public d9060_device_base
+{
+public:
+	// construction/destruction
+	d9060_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+// ======================> d9090_device
+
+class d9090_device : public d9060_device_base
+{
+public:
+	// construction/destruction
+	d9090_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
 
 //-------------------------------------------------
@@ -497,7 +587,7 @@ d9060_device_base::d9060_device_base(const machine_config &mconfig, device_type 
 //-------------------------------------------------
 
 d9060_device::d9060_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: d9060_device_base(mconfig, D9060, tag, owner, clock, TYPE_9060)
+	: d9060_device_base(mconfig, GPIB_D9060, tag, owner, clock, TYPE_9060)
 {
 }
 
@@ -507,7 +597,7 @@ d9060_device::d9060_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 d9090_device::d9090_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: d9060_device_base(mconfig, D9090, tag, owner, clock, TYPE_9090)
+	: d9060_device_base(mconfig, GPIB_D9090, tag, owner, clock, TYPE_9090)
 {
 }
 
@@ -571,3 +661,14 @@ void d9060_device_base::ieee488_ifc(int state)
 
 	m_ifc = state;
 }
+
+} // anonymous namespace
+
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(GPIB_D9060, device_ieee488_interface, d9060_device, "d9060", "Commodore D9060 hard disk drive")
+DEFINE_DEVICE_TYPE_PRIVATE(GPIB_D9090, device_ieee488_interface, d9090_device, "d9090", "Commodore D9090 hard disk drive")

@@ -346,9 +346,12 @@ uint8_t nes_disksys_device::read_ex(offs_t offset)
 			// bit6 - End of Head (1 when disk head is on the most inner track)
 			// bit7 - Disk Data Read/Write Enable (1 when disk is readable/writable)
 			ret = m_fds_status0 | 0x80;
-			// clear the disk IRQ detect and byte transfer flags
-			m_fds_status0 &= ~0x03;
-			set_irq_line(CLEAR_LINE);
+			if (!machine().side_effects_disabled())
+			{
+				// clear the disk IRQ detect and byte transfer flags
+				m_fds_status0 &= ~0x03;
+				set_irq_line(CLEAR_LINE);
+			}
 			break;
 		case 0x11:
 			// $4031 - data latch
@@ -357,19 +360,26 @@ uint8_t nes_disksys_device::read_ex(offs_t offset)
 				ret = 0;
 			else if (m_fds_current_side && m_read_mode)
 			{
-				ret = m_fds_data[(m_fds_current_side - 1) * 65500 + m_fds_head_position++];
-				if (m_fds_head_position == 65500)
+				ret = m_fds_data[(m_fds_current_side - 1) * 65500 + m_fds_head_position];
+				if (!machine().side_effects_disabled())
 				{
-					printf("end of disk reached!\n");
-					m_fds_status0 |= 0x40;
-					m_fds_head_position -= 2;
+					m_fds_head_position++;
+					if (m_fds_head_position == 65500)
+					{
+						logerror("%s: end of disk reached!\n", machine().describe_context());
+						m_fds_status0 |= 0x40;
+						m_fds_head_position -= 2;
+					}
 				}
 			}
 			else
 				ret = 0;
 			// clear the byte transfer flag
-			m_fds_status0 &= ~0x02;
-			set_irq_line(CLEAR_LINE);
+			if (!machine().side_effects_disabled())
+			{
+				m_fds_status0 &= ~0x02;
+				set_irq_line(CLEAR_LINE);
+			}
 			break;
 		case 0x12:
 			// $4032 - disk status 1:
@@ -382,11 +392,14 @@ uint8_t nes_disksys_device::read_ex(offs_t offset)
 			{
 				// If we've switched disks, report "no disk" for a few reads
 				ret = 1;
-				m_fds_count++;
-				if (m_fds_count == 50)
+				if (!machine().side_effects_disabled())
 				{
-					m_fds_last_side = m_fds_current_side;
-					m_fds_count = 0;
+					m_fds_count++;
+					if (m_fds_count == 50)
+					{
+						m_fds_last_side = m_fds_current_side;
+						m_fds_count = 0;
+					}
 				}
 			}
 			else

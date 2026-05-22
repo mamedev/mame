@@ -5,27 +5,27 @@
 
 Fidelity Phantom (model 6100)
 
-Fidelity licensed (or perhaps bought) the design of Milton Bradley's Grand·Master
+Fidelity licensed (or perhaps bought) the design of Milton Bradley's Grand Master
 motorized chessboard and released their own version. It has a small LCD panel added,
 the rest looks nearly the same from the outside. After Fidelity was taken over by H+G,
 it was rereleased in 1990 as the Mephisto Phantom. This is assumed to be identical.
 
 At boot-up, the computer will do a self-test, the user can start playing after the
 motor has moved to the upper-right corner. The computer will continue positioning
-pieces though, so it may be a bit distracting. Or, just hold INSERT (on PC) for a
-while to speed up MAME before starting a new game.
+pieces though, so it may be a bit distracting. Or, just fast forward MAME for a while
+(hold INS key on Windows) before starting a new game.
 
 After the user captures a piece, select the captured piece from the MAME sensorboard
-spawn block and place it anywhere on a free spot at the designated box at the
-edge of the chessboard.
+spawn block and place it anywhere on a free spot at the designated box at the edge
+of the chessboard.
 
 Hardware notes:
 - PCB label: 510.1128A01
 - R65C02P4, XTAL marked 4.915200
 - 2*32KB ROM 27C256-15, 8KB RAM MS6264L-10
 - LCD driver, display panel for digits
-- magnetized x/y DC motors under chessboard, chesspieces have magnet underneath
-- piezo speaker, LEDs, 8*8 chessboard buttons
+- 2 DC motors under chessboard, electromagnet for automatically moving chess pieces
+- piezo speaker, 9 LEDs, 12*8 chessboard buttons
 
 Chesster Phantom is on the same base hardware, and adds the Chesster voice to it,
 using the same ROM as the original Chesster. Model 6124 extra hardware is on a
@@ -34,7 +34,8 @@ Model 6126 has a dedicated PCB, this version also has a motion sensor at the fro
 and 2 leds to mimic eyes, and the housing color theme is green instead of beige.
 
 TODO:
-- sensorboard undo buffer goes out of control, probably not worth solving this issue
+- verify motor comms, fphantom has motor drift errors that don't appear to happen
+  on the real thing (auto corrected by gmboard_device, so it works fine)
 
 BTANB:
 - cphantom: As the manual suggests, the computer's move should be displayed on the
@@ -47,8 +48,10 @@ BTANB:
 #include "emu.h"
 
 #include "cpu/m6502/r65c02.h"
-#include "machine/sensorboard.h"
-#include "machine/timer.h"
+#include "machine/7474.h"
+#include "machine/clock.h"
+#include "machine/gmboard.h"
+#include "machine/input_merger.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
 
@@ -69,18 +72,15 @@ public:
 	phantom_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_irq_ff(*this, "irq_ff%u", 0),
 		m_rombank(*this, "rombank"),
 		m_dac(*this, "dac"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
-		m_inputs(*this, "IN.%u", 0),
-		m_piece_hand(*this, "cpu_hand"),
-		m_out_motor(*this, "motor%u", 0U),
-		m_out_pos(*this, "pos_%c", unsigned('x'))
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	void phantom(machine_config &config);
-	void init_phantom();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -88,27 +88,17 @@ protected:
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
+	optional_device_array<ttl7474_device, 4> m_irq_ff;
 	required_memory_bank m_rombank;
 	optional_device<dac_1bit_device> m_dac;
-	required_device<sensorboard_device> m_board;
+	required_device<gmboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	optional_ioport_array<2> m_inputs;
-	output_finder<> m_piece_hand;
-	output_finder<5> m_out_motor;
-	output_finder<2> m_out_pos;
 
 	u8 m_mux = 0;
 	u8 m_select = 0;
 	u32 m_lcd_data = 0;
-
-	u8 m_motors_ctrl = 0;
-	int m_hmotor_pos = 0;
-	int m_vmotor_pos = 0;
-	bool m_vmotor_sensor0_ff = false;
-	bool m_vmotor_sensor1_ff = false;
-	bool m_hmotor_sensor0_ff = false;
-	bool m_hmotor_sensor1_ff = false;
-	u8 m_pieces_map[0x80][0x80] = { };
+	bool m_stop[2] = { };
 
 	// address maps
 	virtual void main_map(address_map &map) ATTR_COLD;
@@ -120,84 +110,39 @@ protected:
 	void motors_w(u8 data);
 	virtual u8 input_r(offs_t offset);
 	u8 motors_r(offs_t offset);
-	u8 irq_ack_r();
-	u8 hmotor_ff_clear_r();
-	u8 vmotor_ff_clear_r();
-
-	void init_board(u8 data);
-	void clear_board(u8 data);
-	void check_rotation();
-	TIMER_DEVICE_CALLBACK_MEMBER(motors_timer);
-	void update_pieces_position(int state);
-	void output_magnet_pos();
+	template<int N> u8 irq_clear_r();
+	template<int N> void motor_stop_w(int state);
 };
 
 void phantom_state::machine_start()
 {
-	m_hmotor_pos = 0x23;
-	m_vmotor_pos = 0x0e;
-
-	// resolve outputs
-	m_piece_hand.resolve();
-	m_out_motor.resolve();
-	m_out_pos.resolve();
+	int numbanks = memregion("rombank")->bytes() / 0x4000;
+	m_rombank->configure_entries(0, numbanks, memregion("rombank")->base(), 0x4000);
 
 	// register for savestates
 	save_item(NAME(m_mux));
 	save_item(NAME(m_select));
 	save_item(NAME(m_lcd_data));
-	save_item(NAME(m_motors_ctrl));
-	save_item(NAME(m_hmotor_pos));
-	save_item(NAME(m_vmotor_pos));
-	save_item(NAME(m_vmotor_sensor0_ff));
-	save_item(NAME(m_vmotor_sensor1_ff));
-	save_item(NAME(m_hmotor_sensor0_ff));
-	save_item(NAME(m_hmotor_sensor1_ff));
-	save_item(NAME(m_pieces_map));
+	save_item(NAME(m_stop));
 }
 
 void phantom_state::machine_reset()
 {
 	m_rombank->set_entry(0);
-	output_magnet_pos();
-}
 
-void phantom_state::init_board(u8 data)
-{
-	m_board->preset_chess(data);
-
-	// reposition pieces if board will be rotated
-	if (data & 2)
-	{
-		for (int y = 0; y < 8; y++)
-			for (int x = 7; x >= 0; x--)
-			{
-				m_board->write_piece(x + 4, y, m_board->read_piece(x, y));
-				m_board->write_piece(x, y, 0);
-			}
-	}
-}
-
-void phantom_state::clear_board(u8 data)
-{
-	memset(m_pieces_map, 0, sizeof(m_pieces_map));
-	m_piece_hand = 0;
-	m_board->clear_board(data);
-}
-
-void phantom_state::init_phantom()
-{
-	int numbanks = memregion("rombank")->bytes() / 0x4000;
-	m_rombank->configure_entries(0, numbanks, memregion("rombank")->base(), 0x4000);
+	// make sure 7474 is not in an indeterminate state
+	irq_clear_r<0>();
+	irq_clear_r<1>();
+	irq_clear_r<2>();
 }
 
 
 // Chesster Phantom
 
-class chessterp_state : public phantom_state
+class cphantom_state : public phantom_state
 {
 public:
-	chessterp_state(const machine_config &mconfig, device_type type, const char *tag) :
+	cphantom_state(const machine_config &mconfig, device_type type, const char *tag) :
 		phantom_state(mconfig, type, tag),
 		m_speech(*this, "speech"),
 		m_eye_led(*this, "eye_led")
@@ -215,14 +160,13 @@ private:
 
 	virtual void main_map(address_map &map) override ATTR_COLD;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 	virtual void control_w(offs_t offset, u8 data) override;
 	virtual u8 input_r(offs_t offset) override;
 
 	u8 m_select2 = 0;
 };
 
-void chessterp_state::machine_start()
+void cphantom_state::machine_start()
 {
 	phantom_state::machine_start();
 
@@ -230,134 +174,10 @@ void chessterp_state::machine_start()
 	save_item(NAME(m_select2));
 }
 
-void chessterp_state::machine_reset()
+void cphantom_state::machine_reset()
 {
 	phantom_state::machine_reset();
 	m_speech->write(0x80);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(chessterp_state::nmi_timer)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-}
-
-
-
-/*******************************************************************************
-    Motor Sim
-*******************************************************************************/
-
-void phantom_state::check_rotation()
-{
-	if (m_vmotor_pos != 0 && m_vmotor_pos != 0x88)
-	{
-		if (m_motors_ctrl & 0x03) m_vmotor_sensor0_ff = true;
-		if (m_motors_ctrl & 0x02) m_vmotor_sensor1_ff = true;
-	}
-	if (m_hmotor_pos != 0 && m_hmotor_pos != 0xc0)
-	{
-		if (m_motors_ctrl & 0x0c) m_hmotor_sensor0_ff = true;
-		if (m_motors_ctrl & 0x04) m_hmotor_sensor1_ff = true;
-	}
-}
-
-void phantom_state::output_magnet_pos()
-{
-	// put active state on x bit 8
-	const int active = BIT(m_motors_ctrl, 4) ? 0x100 : 0;
-	m_out_pos[0] = m_hmotor_pos | active;
-	m_out_pos[1] = m_vmotor_pos;
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(phantom_state::motors_timer)
-{
-	check_rotation();
-
-	// simulate 1 rotation gap per each tick
-	if ((m_motors_ctrl & 0x01) && m_vmotor_pos > 0x00) m_vmotor_pos--;
-	if ((m_motors_ctrl & 0x02) && m_vmotor_pos < 0x88) m_vmotor_pos++;
-	if ((m_motors_ctrl & 0x04) && m_hmotor_pos > 0x00) m_hmotor_pos--;
-	if ((m_motors_ctrl & 0x08) && m_hmotor_pos < 0xc0) m_hmotor_pos++;
-
-	check_rotation();
-	output_magnet_pos();
-}
-
-void phantom_state::update_pieces_position(int state)
-{
-	int mx = m_hmotor_pos / 3;
-	int my = m_vmotor_pos / 3;
-
-	// convert motors position into board coordinates
-	int x = m_hmotor_pos / 16 - 2;
-	int y = m_vmotor_pos / 16;
-
-	if (x < 0)
-		x += 12;
-
-	// check if the magnet is in the center of a square
-	const bool valid_pos = ((m_hmotor_pos & 0x0f) > 0 && (m_hmotor_pos & 0x0f) <= 7) && ((m_vmotor_pos & 0x0f) > 8 && (m_vmotor_pos & 0x0f) <= 0xf);
-
-	if (state)
-	{
-		if (valid_pos)
-		{
-			// pick up piece, unless it was picked up by the user
-			const int pos = (y << 4 & 0xf0) | (x & 0x0f);
-			if (pos != m_board->get_handpos())
-			{
-				m_piece_hand = m_board->read_piece(x, y);
-
-				if (m_piece_hand != 0)
-				{
-					m_board->write_piece(x, y, 0);
-					m_board->refresh();
-				}
-			}
-		}
-		else
-		{
-			int count = 0;
-
-			// check surrounding area for piece
-			for (int sy = my - 1; sy <= my + 1; sy++)
-				for (int sx = mx - 1; sx <= mx + 1; sx++)
-					if (sy >= 0 && sx >= 0 && m_pieces_map[sy][sx] != 0)
-					{
-						m_piece_hand = m_pieces_map[sy][sx];
-						m_pieces_map[sy][sx] = 0;
-						count++;
-					}
-
-			// more than one piece found (shouldn't happen)
-			if (count > 1)
-				popmessage("Internal collision!");
-		}
-	}
-	else if (m_piece_hand != 0)
-	{
-		if (valid_pos)
-		{
-			// collision with piece on board (user interference)
-			if (m_board->read_piece(x, y) != 0)
-				popmessage("Collision at %c%d!", x + 'A', y + 1);
-			else
-			{
-				m_board->write_piece(x, y, m_piece_hand);
-				m_board->refresh();
-			}
-		}
-		else
-		{
-			// collision with internal pieces map (shouldn't happen)
-			if (m_pieces_map[my][mx] != 0)
-				popmessage("Internal collision!");
-			else
-				m_pieces_map[my][mx] = m_piece_hand;
-		}
-
-		m_piece_hand = 0;
-	}
 }
 
 
@@ -397,11 +217,10 @@ void phantom_state::control_w(offs_t offset, u8 data)
 	update_lcd(prev);
 }
 
-void chessterp_state::control_w(offs_t offset, u8 data)
+void cphantom_state::control_w(offs_t offset, u8 data)
 {
 	// chesster version has two 74259, more I/O
 	u8 lcd_prev = m_select;
-	u8 nmi_prev = m_select2;
 
 	// a0-a2,d0,d1: 2*74259
 	u8 mask = 1 << offset;
@@ -417,9 +236,8 @@ void chessterp_state::control_w(offs_t offset, u8 data)
 	// 74259(2) Q2: eye leds
 	m_eye_led = BIT(~m_select2, 2);
 
-	// 74259(2) Q3 rising edge: nmi clear
-	if (~nmi_prev & m_select2 & 8)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	// 74259(2) Q3: nmi F/F clear
+	m_irq_ff[3]->clear_w(BIT(m_select2, 3));
 
 	// 74259(1) Q4,Q5, 74259(2) Q4: speechrom bank
 	m_rombank->set_entry(BIT(m_select, 4) | (BIT(m_select2, 4) << 1) | (BIT(m_select, 5) << 2));
@@ -432,16 +250,16 @@ void phantom_state::motors_w(u8 data)
 {
 	// d0: vertical motor down
 	// d1: vertical motor up
+	if (!m_stop[1])
+		m_board->motor_w(1, bitswap<2>(data, 0, 1));
+
 	// d2: horizontal motor left
 	// d3: horizontal motor right
+	if (!m_stop[0])
+		m_board->motor_w(0, data >> 2 & 3);
+
 	// d4: electromagnet
-	for (int i = 0; i < 5; i++)
-		m_out_motor[i] = BIT(data, i);
-
-	if ((m_motors_ctrl ^ data) & 0x10)
-		update_pieces_position(BIT(data, 4));
-
-	m_motors_ctrl = data;
+	m_board->magnet_w(BIT(data, 4));
 
 	// d5: speaker (not for chesster version, though it still writes to it)
 	if (m_dac != nullptr)
@@ -466,28 +284,28 @@ u8 phantom_state::input_r(offs_t offset)
 	// buttons
 	if (m_mux == 8)
 	{
-		if (BIT(m_inputs[0]->read(), offset * 2 + 1)) data &= ~0x40;
-		if (BIT(m_inputs[0]->read(), offset * 2 + 0)) data &= ~0x80;
+		data ^= BIT(m_inputs[0]->read(), offset * 2 + 1) << 6;
+		data ^= BIT(m_inputs[0]->read(), offset * 2 + 0) << 7;
 	}
 
 	// chessboard sensors
 	else if (offset < 4)
 	{
-		if (BIT(m_board->read_file(offset * 2 + 1), m_mux)) data &= ~0x40;
-		if (BIT(m_board->read_file(offset * 2 + 0), m_mux)) data &= ~0x80;
+		data ^= BIT(m_board->read_file(offset * 2 + 1), m_mux) << 6;
+		data ^= BIT(m_board->read_file(offset * 2 + 0), m_mux) << 7;
 	}
 
 	// captured pieces
 	else
 	{
-		if (BIT(m_board->read_file( 8 + (offset & 1)), m_mux)) data &= ~0x40; // black
-		if (BIT(m_board->read_file(11 - (offset & 1)), m_mux)) data &= ~0x80; // white
+		data ^= BIT(m_board->read_file( 8 + (offset & 1)), m_mux) << 6; // black
+		data ^= BIT(m_board->read_file(11 - (offset & 1)), m_mux) << 7; // white
 	}
 
 	return data;
 }
 
-u8 chessterp_state::input_r(offs_t offset)
+u8 cphantom_state::input_r(offs_t offset)
 {
 	u8 data = phantom_state::input_r(offset) & 0xfe;
 
@@ -498,46 +316,51 @@ u8 chessterp_state::input_r(offs_t offset)
 
 u8 phantom_state::motors_r(offs_t offset)
 {
-	u8 data = 0xff;
+	u8 data = 0x3f;
 
-	// optical rotation sensors
-	switch (offset)
+	// IRQ F/F Q
+	if (offset)
 	{
-	case 0:
-		if (!m_vmotor_sensor1_ff) data &= ~0x40;
-		if (!m_hmotor_sensor1_ff) data &= ~0x80;
-		break;
-	case 1:
-		if (!m_vmotor_sensor0_ff) data &= ~0x40;
-		if (!m_hmotor_sensor0_ff) data &= ~0x80;
-		break;
+		data |= m_irq_ff[1]->output_r() << 6;
+		data |= m_irq_ff[0]->output_r() << 7;
+	}
+
+	// motor quadrature state
+	else
+	{
+		data |= BIT(m_board->quad_r(1), 1) << 6;
+		data |= BIT(m_board->quad_r(0), 1) << 7;
 	}
 
 	return data;
 }
 
-u8 phantom_state::irq_ack_r()
+template<int N>
+void phantom_state::motor_stop_w(int state)
 {
-	if (!machine().side_effects_disabled())
-		m_maincpu->set_input_line(R65C02_IRQ_LINE, CLEAR_LINE);
-
-	return 0;
+	if (state)
+	{
+		if (N < 2)
+		{
+			// cphantom expects motors to turn off
+			m_stop[N] = true;
+			m_board->motor_w(N, 0);
+		}
+		else
+			m_stop[0] = m_stop[1] = false;
+	}
 }
 
-u8 phantom_state::hmotor_ff_clear_r()
+template<int N>
+u8 phantom_state::irq_clear_r()
 {
 	if (!machine().side_effects_disabled())
-		m_hmotor_sensor1_ff = m_hmotor_sensor0_ff = false;
+	{
+		m_irq_ff[N]->clear_w(0);
+		m_irq_ff[N]->clear_w(1);
+	}
 
-	return 0;
-}
-
-u8 phantom_state::vmotor_ff_clear_r()
-{
-	if (!machine().side_effects_disabled())
-		m_vmotor_sensor1_ff = m_vmotor_sensor0_ff = false;
-
-	return 0;
+	return 0xff;
 }
 
 
@@ -554,14 +377,14 @@ void phantom_state::main_map(address_map &map)
 	map(0x2200, 0x2200).mirror(0x00ff).w(FUNC(phantom_state::motors_w));
 	map(0x2400, 0x2405).mirror(0x00f8).r(FUNC(phantom_state::input_r));
 	map(0x2406, 0x2407).mirror(0x00f8).r(FUNC(phantom_state::motors_r));
-	map(0x2500, 0x2500).mirror(0x00ff).r(FUNC(phantom_state::hmotor_ff_clear_r));
-	map(0x2600, 0x2600).mirror(0x00ff).r(FUNC(phantom_state::vmotor_ff_clear_r));
-	map(0x2700, 0x2700).mirror(0x00ff).r(FUNC(phantom_state::irq_ack_r));
+	map(0x2500, 0x2500).mirror(0x00ff).r(FUNC(phantom_state::irq_clear_r<0>));
+	map(0x2600, 0x2600).mirror(0x00ff).r(FUNC(phantom_state::irq_clear_r<1>));
+	map(0x2700, 0x2700).mirror(0x00ff).r(FUNC(phantom_state::irq_clear_r<2>));
 	map(0x4000, 0x7fff).bankr(m_rombank);
 	map(0x8000, 0xffff).rom();
 }
 
-void chessterp_state::main_map(address_map &map)
+void cphantom_state::main_map(address_map &map)
 {
 	phantom_state::main_map(map);
 	map(0x2300, 0x2300).mirror(0x00ff).w(m_speech, FUNC(dac_8bit_r2r_device::data_w));
@@ -615,16 +438,25 @@ void phantom_state::phantom(machine_config &config)
 	R65C02(config, m_maincpu, 4.9152_MHz_XTAL); // R65C02P4 or RP65C02G
 	m_maincpu->set_addrmap(AS_PROGRAM, &phantom_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(4.9152_MHz_XTAL / 0x2000); // 4060, 600Hz
-	m_maincpu->set_periodic_int(FUNC(phantom_state::irq0_line_assert), irq_period);
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, R65C02_IRQ_LINE);
 
-	TIMER(config, "motors_timer").configure_periodic(FUNC(phantom_state::motors_timer), irq_period * 9);
+	TTL7474(config, m_irq_ff[0]).output_cb().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	TTL7474(config, m_irq_ff[1]).output_cb().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	TTL7474(config, m_irq_ff[2]).output_cb().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
-	m_board->set_size(8+4, 8);
-	m_board->clear_cb().set(FUNC(phantom_state::clear_board));
-	m_board->init_cb().set(FUNC(phantom_state::init_board));
-	m_board->set_delay(attotime::from_msec(100));
+	m_irq_ff[0]->output_cb().append(FUNC(phantom_state::motor_stop_w<0>));
+	m_irq_ff[1]->output_cb().append(FUNC(phantom_state::motor_stop_w<1>));
+	m_irq_ff[2]->output_cb().append(FUNC(phantom_state::motor_stop_w<2>));
+
+	auto &irq_clock(CLOCK(config, "irq_clock"));
+	irq_clock.set_period(attotime::from_ticks(0x2000, 4.9152_MHz_XTAL)); // 4060, 600Hz
+	irq_clock.signal_handler().set(m_irq_ff[2], FUNC(ttl7474_device::clock_w));
+
+	MB_GMBOARD(config, m_board);
+	m_board->set_size(750, 575, 64);
+	m_board->set_offsets(10, 75);
+	m_board->quad_cb<0>().set(m_irq_ff[0], FUNC(ttl7474_device::clock_w)).bit(0);
+	m_board->quad_cb<1>().set(m_irq_ff[1], FUNC(ttl7474_device::clock_w)).bit(0);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1+4, 9);
@@ -637,15 +469,18 @@ void phantom_state::phantom(machine_config &config)
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
-void chessterp_state::cphantom(machine_config &config)
+void cphantom_state::cphantom(machine_config &config)
 {
 	phantom(config);
 
 	// basic machine hardware
-	const attotime nmi_period = attotime::from_hz(4.9152_MHz_XTAL / 0x200); // 4060, 9.6kHz
-	timer_device &nmi_clock(TIMER(config, "nmi_clock"));
-	nmi_clock.configure_periodic(FUNC(chessterp_state::nmi_timer), nmi_period);
-	nmi_clock.set_start_delay(nmi_period / 2); // interleaved with irq_period
+	TTL7474(config, m_irq_ff[3]).comp_output_cb().set_inputline(m_maincpu, R65C02_NMI_LINE).invert();
+
+	auto &nmi_clock(CLOCK(config, "nmi_clock"));
+	nmi_clock.set_period(attotime::from_ticks(0x200, 4.9152_MHz_XTAL)); // 4060, 9.6kHz
+	nmi_clock.signal_handler().set(m_irq_ff[3], FUNC(ttl7474_device::clock_w));
+
+	m_board->set_offsets(10, 70);
 
 	config.set_default_layout(layout_fidel_cphantom);
 
@@ -685,7 +520,7 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT          COMPANY, FULLNAME, FLAGS
-SYST( 1988, fphantom, 0,      0,      phantom,  phantom,  phantom_state,   init_phantom, "Fidelity International", "Phantom (Fidelity)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1988, fphantom, 0,      0,      phantom,  phantom,  phantom_state,  empty_init, "Fidelity International", "Phantom (Fidelity)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )
 
-SYST( 1991, cphantom, 0,      0,      cphantom, cphantom, chessterp_state, init_phantom, "Fidelity Electronics International", "Chesster Phantom (model 6126)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )
+SYST( 1991, cphantom, 0,      0,      cphantom, cphantom, cphantom_state, empty_init, "Fidelity Electronics International", "Chesster Phantom (model 6126)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )

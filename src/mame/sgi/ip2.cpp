@@ -8,7 +8,6 @@
  *  - PCB Schematic, IP2 (Drawing Number 5000-558, rev C, 14 Nov 1985), Silicon Graphics Inc.
  *
  * TODO:
- *  - segment protection and limits
  *  - mouse
  *  - Multibus protection
  *  - slave mode and external interrupt
@@ -155,7 +154,7 @@ protected:
 	void cpu_map(address_map &map) ATTR_COLD;
 
 	// address translation and memory access
-	template <unsigned Segment> u16 mapa(offs_t offset) const;
+	template <unsigned Segment> std::tuple<bool,u16> map(offs_t offset) const;
 	template <unsigned Segment> u32 ram_r(offs_t offset, u32 mem_mask);
 	template <unsigned Segment> void ram_w(offs_t offset, u32 data, u32 mem_mask);
 
@@ -194,6 +193,7 @@ protected:
 	// other helpers
 	void bus_error(u32 address, bool read, bool retry);
 	template <unsigned I> void int_w(int state);
+	template <unsigned I> void lint_w(int state);
 
 private:
 	required_device<m68020_device> m_cpu;
@@ -227,6 +227,8 @@ private:
 	u16 m_limit[3];
 
 	u8 m_int;
+	u8 m_lint; // local interrupt
+
 	bool m_installed;
 };
 
@@ -243,32 +245,32 @@ void sgi_ip2_device::device_add_mconfig(machine_config &config)
 
 	// irq1: multibus 0, multibus 1
 	input_merger_any_low_device &irq1(INPUT_MERGER_ANY_LOW(config, "irq1"));
-	irq1.output_handler().set_inputline(m_cpu, INPUT_LINE_IRQ1);
+	irq1.output_handler().set(FUNC(sgi_ip2_device::int_w<1>));
 
 	// irq6: multibus 6, uart0, uart1, ext, rtc
 	input_merger_any_low_device &irq6(INPUT_MERGER_ANY_LOW(config, "irq6"));
-	irq6.output_handler().set_inputline(m_cpu, INPUT_LINE_IRQ6);
+	irq6.output_handler().set(FUNC(sgi_ip2_device::int_w<6>));
 
 	// irq7: multibus 7, parity, mouse, mouse unplug
 	input_merger_any_low_device &irq7(INPUT_MERGER_ANY_LOW(config, "irq7"));
-	irq7.output_handler().set_inputline(m_cpu, INPUT_LINE_IRQ7);
+	irq7.output_handler().set(FUNC(sgi_ip2_device::int_w<7>));
 
 	// Multibus interrupts
 	int_callback<0>().set(irq1, FUNC(input_merger_any_low_device::in_w<0>));
 	int_callback<1>().set(irq1, FUNC(input_merger_any_low_device::in_w<1>));
-	int_callback<2>().set_inputline(m_cpu, INPUT_LINE_IRQ2).invert();
-	int_callback<3>().set_inputline(m_cpu, INPUT_LINE_IRQ3).invert();
-	int_callback<4>().set_inputline(m_cpu, INPUT_LINE_IRQ4).invert();
-	int_callback<5>().set_inputline(m_cpu, INPUT_LINE_IRQ5).invert();
+	int_callback<2>().set(FUNC(sgi_ip2_device::int_w<2>)).invert();
+	int_callback<3>().set(FUNC(sgi_ip2_device::int_w<3>)).invert();
+	int_callback<4>().set(FUNC(sgi_ip2_device::int_w<4>)).invert();
+	int_callback<5>().set(FUNC(sgi_ip2_device::int_w<5>)).invert();
 	int_callback<6>().set(irq6, FUNC(input_merger_any_low_device::in_w<4>));
 	int_callback<7>().set(irq7, FUNC(input_merger_any_low_device::in_w<0>));
 
 	MC68681(config, m_duart[0], 3.6864_MHz_XTAL);
-	m_duart[0]->irq_cb().set(FUNC(sgi_ip2_device::int_w<0>)).invert(); // FIXME: active low
+	m_duart[0]->irq_cb().set(FUNC(sgi_ip2_device::lint_w<0>)).invert(); // FIXME: active low
 	m_duart[0]->irq_cb().append(irq6, FUNC(input_merger_any_low_device::in_w<0>)).invert();
 
 	MC68681(config, m_duart[1], 3.6864_MHz_XTAL);
-	m_duart[1]->irq_cb().set(FUNC(sgi_ip2_device::int_w<1>)).invert(); // FIXME: active low
+	m_duart[1]->irq_cb().set(FUNC(sgi_ip2_device::lint_w<1>)).invert(); // FIXME: active low
 	m_duart[1]->irq_cb().append(irq6, FUNC(input_merger_any_low_device::in_w<1>)).invert();
 
 	RS232_PORT(config, m_port[0], keyboard_devices, nullptr);
@@ -287,7 +289,7 @@ void sgi_ip2_device::device_add_mconfig(machine_config &config)
 	m_port[3]->rxd_handler().set(m_duart[1], FUNC(scn2681_device::rx_b_w));
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
-	m_rtc->irq().set(FUNC(sgi_ip2_device::int_w<3>)).invert(); // FIXME: active low
+	m_rtc->irq().set(FUNC(sgi_ip2_device::lint_w<3>)).invert(); // FIXME: active low
 	m_rtc->irq().append(irq6, FUNC(input_merger_any_low_device::in_w<3>)).invert();
 
 	NVRAM(config, m_nvram); // AM2148-55DC x 4 (1024x4 SRAM)
@@ -316,6 +318,7 @@ void sgi_ip2_device::device_start()
 	save_item(NAME(m_base));
 	save_item(NAME(m_limit));
 	save_item(NAME(m_int));
+	save_item(NAME(m_lint));
 
 	m_mbtn = 0;
 }
@@ -340,7 +343,8 @@ void sgi_ip2_device::device_reset()
 
 	m_rtc_ctrl = 0;
 	m_status = 0;
-	m_int = 0x1f;
+	m_int = 0;
+	m_lint = 0x1f;
 
 	m_boot.select(0);
 	m_slave.disable();
@@ -453,26 +457,35 @@ void sgi_ip2_device::cpu_map(address_map &map)
 	map(0xffff'fff0, 0xffff'ffff).lr8(
 		[this](offs_t offset)
 		{
-			return m_vector[BIT(offset, 1, 3) << 6 | m_int];
+			return m_vector[BIT(offset, 1, 3) << 6 | m_lint];
 		}, "vector_r");
 }
 
-template <unsigned Segment> u16 sgi_ip2_device::mapa(offs_t offset) const
+template <unsigned Segment> std::tuple<bool, u16> sgi_ip2_device::map(offs_t offset) const
 {
 	if constexpr (Segment == 1)
-		return m_base[Segment] - (BIT(offset, 10, 14) ^ 0x3fffU);
+	{
+		u16 const page = (BIT(offset, 10, 14) ^ 0x3fffU);
+
+		return { m_limit[Segment] && page > m_limit[Segment], m_base[Segment] - page };
+	}
 	else
-		return m_base[Segment] + BIT(offset, 10, 14);
+	{
+		u16 const page = BIT(offset, 10, 14);
+
+		return { m_limit[Segment] && page > m_limit[Segment], m_base[Segment] + page};
+	}
 }
 
 template <unsigned Segment> u32 sgi_ip2_device::ram_r(offs_t offset, u32 mem_mask)
 {
-	u32 &page = m_page[mapa<Segment>(offset)];
+	auto const [limit, page_number] = map<Segment>(offset);
+	u32 &page = m_page[page_number];
 
 	if (!machine().side_effects_disabled())
 	{
 		// check protection
-		if (!(page & PAGE_P) || ((page & PAGE_P) == PAGE_PS && !(m_cpu->get_fc() & 4)))
+		if (limit || !(page & PAGE_P) || ((page & PAGE_P) == PAGE_PS && !(m_cpu->get_fc() & 4)))
 		{
 			bus_error((Segment << 28) + (offset << 2), true, true);
 
@@ -492,12 +505,13 @@ template <unsigned Segment> u32 sgi_ip2_device::ram_r(offs_t offset, u32 mem_mas
 
 template <unsigned Segment> void sgi_ip2_device::ram_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	u32 &page = m_page[mapa<Segment>(offset)];
+	auto const [limit, page_number] = map<Segment>(offset);
+	u32 &page = m_page[page_number];
 
 	if (!machine().side_effects_disabled())
 	{
 		// check protection
-		if (!(page & PAGE_P) || (page & PAGE_P) == PAGE_PR || ((page & PAGE_P) == PAGE_PS && !(m_cpu->get_fc() & 4)))
+		if (limit || !(page & PAGE_P) || (page & PAGE_P) == PAGE_PR || ((page & PAGE_P) == PAGE_PS && !(m_cpu->get_fc() & 4)))
 		{
 			bus_error((Segment << 28) + (offset << 2), false, true);
 
@@ -570,6 +584,8 @@ u16 sgi_ip2_device::status_r()
 void sgi_ip2_device::status_w(u16 data)
 {
 	LOG("%s: status_w 0x%04x\n", machine().describe_context(), data);
+
+	int_w<0>(bool(data & ST_ENABINT));
 
 	if ((data ^ m_status) & ST_BOOT_)
 	{
@@ -708,10 +724,34 @@ void sgi_ip2_device::bus_error(u32 address, bool read, bool retry)
 
 template <unsigned I> void sgi_ip2_device::int_w(int state)
 {
+	if (BIT(m_int, I) != state)
+	{
+		if (state)
+			m_int |= 1U << I;
+		else
+			m_int &= ~(1U << I);
+
+		if (I == 0)
+		{
+			// update active interrupts
+			for (unsigned i = 1; i < 8; i++)
+			{
+				if (BIT(m_int, i))
+					m_cpu->set_input_line(INPUT_LINE_IRQ0 + i, state ? ASSERT_LINE : CLEAR_LINE);
+			}
+		}
+		else
+			// update single interrupt
+			m_cpu->set_input_line(INPUT_LINE_IRQ0 + I, (BIT(m_int, 0) && state) ? ASSERT_LINE : CLEAR_LINE);
+	}
+}
+
+template <unsigned I> void sgi_ip2_device::lint_w(int state)
+{
 	if (state)
-		m_int |= 1U << I;
+		m_lint |= 1U << I;
 	else
-		m_int &= ~(1U << I);
+		m_lint &= ~(1U << I);
 }
 
 static INPUT_PORTS_START(sgi_ip2)

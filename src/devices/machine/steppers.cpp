@@ -53,6 +53,8 @@ stepper_device::stepper_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_max_steps(48*2)
 	, m_optic_cb(*this)
+	, m_output_pos(*this, "pos")
+	, m_output_scroll(*this, "scroll")
 {
 }
 
@@ -107,6 +109,9 @@ void stepper_device::device_start()
 	save_item(NAME(m_step_pos));
 	save_item(NAME(m_abs_step_pos));
 	save_item(NAME(m_max_steps));
+
+	m_output_pos.resolve();
+	m_output_scroll.resolve();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -518,4 +523,22 @@ void reel_device::device_start()
 	stepper_device::device_start();
 
 	save_item(NAME(m_type));
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+void stepper_device::draw()
+{
+	int reelpos = get_position();
+	if (reelpos != m_output_pos)
+	{
+		m_output_pos = reelpos;
+
+		/* update scroll output if configured */
+		if (get_max())
+		{
+			int sreelpos = (reelpos * 0x10000) / get_max();
+			m_output_scroll = sreelpos;
+		}
+	}
 }

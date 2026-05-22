@@ -126,15 +126,13 @@ protected:
 
 	tilemap_t *m_bg_tilemap = nullptr;
 
-	void io_map(address_map &map) ATTR_COLD;
+	virtual void io_map(address_map &map) ATTR_COLD;
 
 private:
 	// video-related
 	uint8_t m_scroll_lsb = 0U;
 	uint8_t m_scroll_msb = 0U;
 	uint8_t m_starfield_enabled = 0U;
-
-	uint8_t m_in0_b4 = 0U;
 
 	void palette_w(offs_t offset, uint8_t data);
 	void scroll_x_lsb_w(uint8_t data);
@@ -163,7 +161,7 @@ protected:
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void io_map(address_map &map) ATTR_COLD;
+	virtual void io_map(address_map &map) override ATTR_COLD;
 };
 
 
@@ -206,13 +204,8 @@ void battlex_state::videoram_w(offs_t offset, uint8_t data)
 
 void battlex_state::flipscreen_w(uint8_t data)
 {
-	m_starfield_enabled = data & 0x10;
-
-	if (flip_screen() != (data >> 7))
-	{
-		flip_screen_set(data & 0x80);
-		machine().tilemap().mark_all_dirty();
-	}
+	m_starfield_enabled = BIT(data, 4);
+	flip_screen_set(BIT(data, 7));
 }
 
 
@@ -252,8 +245,8 @@ void battlex_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	{
 		int sx = (source[0] & 0x7f) * 2 - (source[0] & 0x80) * 2;
 		int sy = source[3];
-		int const tile = source[2] ; // dodgeman has 0x100 sprites
-		int const color = source[1] & 0x07;   // bits 3, 4, 5 also used during explosions
+		int const tile = source[2]; // dodgeman has 0x100 sprites
+		int const color = source[1] & 0x07; // bits 3, 4, 5 also used during explosions
 		int flipy = source[1] & 0x80;
 		int flipx = source[1] & 0x40;
 
@@ -268,7 +261,6 @@ void battlex_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		gfx->transpen(bitmap, cliprect, tile, color, flipx, flipy, sx, sy, 0);
 		source += 4;
 	}
-
 }
 
 uint32_t battlex_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -287,18 +279,15 @@ uint32_t battlex_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 INTERRUPT_GEN_MEMBER(battlex_state::interrupt)
 {
-	m_in0_b4 = 1;
-	device.execute().set_input_line(0, ASSERT_LINE);
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 ioport_value battlex_state::in0_b4_r()
 {
-	uint32_t ret = m_in0_b4;
-	if (m_in0_b4)
-	{
+	ioport_value ret = m_maincpu->input_line_state(0) ? 1 : 0;
+
+	if (!machine().side_effects_disabled())
 		m_maincpu->set_input_line(0, CLEAR_LINE);
-		m_in0_b4 = 0;
-	}
 
 	return ret;
 }
@@ -464,7 +453,6 @@ void battlex_state::machine_start()
 	save_item(NAME(m_scroll_lsb));
 	save_item(NAME(m_scroll_msb));
 	save_item(NAME(m_starfield_enabled));
-	save_item(NAME(m_in0_b4));
 }
 
 void battlex_state::machine_reset()
@@ -472,13 +460,12 @@ void battlex_state::machine_reset()
 	m_scroll_lsb = 0;
 	m_scroll_msb = 0;
 	m_starfield_enabled = 0;
-	m_in0_b4 = 0;
 }
 
 void battlex_state::battlex(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(10'000'000) / 4 );      // divider not verified
+	Z80(config, m_maincpu, XTAL(10'000'000) / 4); // divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &battlex_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &battlex_state::io_map);
 	m_maincpu->set_periodic_int(FUNC(battlex_state::interrupt), attotime::from_hz(400)); // controls game speed?
@@ -497,16 +484,14 @@ void battlex_state::battlex(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	AY8910(config, "ay1", XTAL(10'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.40);   // divider not verified
+	AY8910(config, "ay1", XTAL(10'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.40); // divider not verified
 }
 
 void dodgeman_state::dodgeman(machine_config &config)
 {
 	battlex(config);
 
-	m_maincpu->set_addrmap(AS_IO, &dodgeman_state::io_map);
-
-	AY8910(config, "ay2", XTAL(10'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.40);   // divider not verified
+	AY8910(config, "ay2", XTAL(10'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.40); // divider not verified
 }
 
 

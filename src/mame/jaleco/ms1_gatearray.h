@@ -9,7 +9,7 @@
 class megasys1_gatearray_device : public device_t
 {
 public:
-	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_cpuspace_tag(T &&tag, int spacenum) { m_cpuspace.set_tag(std::forward<T>(tag), spacenum); }
 	template <typename T> void set_cpuregion_tag(T &&tag) { m_cpuregion.set_tag(std::forward<T>(tag)); }
 
 protected:
@@ -30,12 +30,12 @@ protected:
 
 	virtual void rom_decode() = 0;
 
-	int m_gatearray_hs = 0;
-	u16 m_gatearray_hs_ram[0x8]{};
+	bool m_gatearray_hs;
+	u16 m_gatearray_hs_ram[0x8];
 
-	const u16 *m_gatearray_seq = nullptr;
+	const u16 *m_gatearray_seq;
 
-	required_device<cpu_device> m_cpu;
+	required_address_space m_cpuspace;
 	required_memory_region m_cpuregion;
 };
 

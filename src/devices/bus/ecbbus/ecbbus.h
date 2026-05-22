@@ -67,17 +67,11 @@ public:
 	ecbbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bustag, int num, U &&opts, char const *dflt)
 		: ecbbus_slot_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 		set_ecbbus_slot(std::forward<T>(bustag), num);
 	}
 
 	ecbbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
 
 	// inline configuration
 	template <typename T> void set_ecbbus_slot(T &&tag, int num)
@@ -86,6 +80,10 @@ public:
 		m_bus_num = num;
 	}
 
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+
 private:
 	// configuration
 	required_device<ecbbus_device> m_bus;
@@ -93,7 +91,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(ECBBUS_SLOT, ecbbus_slot_device)
 
 
@@ -120,7 +118,7 @@ public:
 	void nmi_w(int state) { m_write_nmi(state); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 private:
@@ -133,7 +131,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(ECBBUS, ecbbus_device)
 
 
@@ -160,7 +158,5 @@ protected:
 
 
 void ecbbus_cards(device_slot_interface &device);
-
-
 
 #endif // MAME_BUS_ECBBUS_ECBBUS_H

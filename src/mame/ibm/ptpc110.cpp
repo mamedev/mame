@@ -302,7 +302,7 @@ void ptpc110_state::ptpc110(machine_config &config)
 	keybc.kbd_irq().set(m_chipset, FUNC(vl82c420_device::irq01_w));
 	keybc.kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
 	keybc.kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
-	keybc.aux_irq().set(m_chipset, FUNC(vl82c420_device::irq04_w));
+	keybc.aux_irq().set(m_chipset, FUNC(vl82c420_device::irq12_w));
 	keybc.aux_clk().set("aux", FUNC(pc_kbdc_device::clock_write_from_mb));
 	keybc.aux_data().set("aux", FUNC(pc_kbdc_device::data_write_from_mb));
 

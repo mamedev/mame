@@ -29,21 +29,19 @@ void realbrk_state::realbrk_flipscreen_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		machine().bookkeeping().coin_counter_w(0,    data & 0x0001);
-		machine().bookkeeping().coin_counter_w(1,    data & 0x0004);
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
 
-		flip_screen_set(    data & 0x0080);
+		flip_screen_set(BIT(data, 7));
 	}
 
 	if (ACCESSING_BITS_8_15)
-	{
-		m_disable_video =   data & 0x8000;
-	}
+		m_disable_video = BIT(data, 15);
 }
 
 void realbrk_state::dai2kaku_flipscreen_w(u16 data)
 {
-	m_disable_video = 0;
+	m_disable_video = false;
 }
 
 /***************************************************************************
@@ -78,7 +76,7 @@ TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info)
 	tileinfo.set(0,
 			code,
 			attr & 0x7f,
-			TILE_FLIPYX( attr >> 14 ));
+			TILE_FLIPYX(attr >> 14));
 }
 
 /***************************************************************************
@@ -100,7 +98,7 @@ TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info_2)
 	const u16 code = m_vram[2][tile_index];
 	tileinfo.set(1,
 			code & 0x0fff,
-			((code & 0xf000) >> 12) | ((m_vregs[0xa/2] & 0x7f) << 4),
+			((code & 0xf000) >> 12) | ((m_vregs[0xa / 2] & 0x7f) << 4),
 			0);
 }
 
@@ -131,11 +129,14 @@ void realbrk_state::video_start()
 	m_tilemap[1]->set_transparent_pen(0);
 	m_tilemap[2]->set_transparent_pen(0);
 
-	m_tmpbitmap0 = std::make_unique<bitmap_ind16>(32,32);
-	m_tmpbitmap1 = std::make_unique<bitmap_ind16>(32,32);
+	m_disable_video = false;
 
+	m_tmpbitmap0.allocate(32, 32);
+	m_tmpbitmap1.allocate(32, 32);
+
+	save_item(NAME(m_tmpbitmap0));
+	save_item(NAME(m_tmpbitmap1));
 	save_item(NAME(m_disable_video));
-	m_disable_video = 0;
 }
 
 /***************************************************************************
@@ -216,19 +217,19 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		const int xdim  = ((s[3] >> 0) & 0x00ff) << (16 - 6 + 4);
 		const int ydim  = ((s[3] >> 8) & 0x00ff) << (16 - 6 + 4);
 
-		int flipx       = BIT(s[4], 8);
-		int flipy       = BIT(s[4], 9);
+		bool flipx      = BIT(s[4], 8);
+		bool flipy      = BIT(s[4], 9);
 		const u8 rot    = (s[4] >> 4) & 0x0003;
 		const u8 pri    = (s[4] >> 0) & 0x0003;
 
 		const u32 color = s[5];
 
-		const u8 gfx    = m_gfxdecode->gfx(3) ? (s[6] & 0x0001) + 2 : 2;
+		const u8 gfx    = m_gfxdecode->gfx(3) ? BIT(s[6], 0) + 2 : 2;
 
 		u32 code        = s[7];
 
-		sx              = ((sx & 0x1ff) - (sx & 0x200)) << 16;
-		sy              = ((sy & 0x0ff) - (sy & 0x100)) << 16;
+		sx              = util::sext(sx, 10) << 16;
+		sy              = util::sext(sy, 9) << 16;
 
 		if (flip_screen_x()) { flipx = !flipx;     sx = (max_x << 16) - sx - xnum * xdim; }
 		if (flip_screen_y()) { flipy = !flipy;     sy = (max_y << 16) - sy - ynum * ydim; }
@@ -267,9 +268,9 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 				{
 					// buffer the tile and rotate it into bitmap
 					constexpr rectangle spritetile_clip(0, 31, 0, 31);
-					m_tmpbitmap0->fill(0, spritetile_clip);
-					m_tmpbitmap1->fill(0, spritetile_clip);
-					m_gfxdecode->gfx(gfx)->zoom_transpen(*m_tmpbitmap0, spritetile_clip,
+					m_tmpbitmap0.fill(0, spritetile_clip);
+					m_tmpbitmap1.fill(0, spritetile_clip);
+					m_gfxdecode->gfx(gfx)->zoom_transpen(m_tmpbitmap0, spritetile_clip,
 							code++,
 							color,
 							flipx, flipy,
@@ -278,11 +279,11 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 							0);
 
 					// peek at the unrotated sprite
-					// copybitmap_trans(bitmap, *m_tmpbitmap0, 0,0, 50 + (x * xdim / 0x10000), 50 + (y * ydim/0x10000), cliprect, 0);
+					// copybitmap_trans(bitmap, m_tmpbitmap0, 0,0, 50 + (x * xdim / 0x10000), 50 + (y * ydim/0x10000), cliprect, 0);
 					switch (rot)
 					{
 					case 0x1: // rot 90
-						copyrozbitmap_trans(*m_tmpbitmap1, m_tmpbitmap1->cliprect(), *m_tmpbitmap0,
+						copyrozbitmap_trans(m_tmpbitmap1, m_tmpbitmap1.cliprect(), m_tmpbitmap0,
 								u32(0) << 16,
 								u32(16) << 16,
 								0 << 16,
@@ -296,7 +297,7 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 						break;
 
 					case 0x2: // rot 180
-						copyrozbitmap_trans(*m_tmpbitmap1, m_tmpbitmap1->cliprect(), *m_tmpbitmap0,
+						copyrozbitmap_trans(m_tmpbitmap1, m_tmpbitmap1.cliprect(), m_tmpbitmap0,
 								u32(16) << 16,
 								u32(16) << 16,
 								0xffff << 16,
@@ -310,7 +311,7 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 						break;
 
 					case 0x3: // rot 270
-						copyrozbitmap_trans(*m_tmpbitmap1, m_tmpbitmap1->cliprect(), *m_tmpbitmap0,
+						copyrozbitmap_trans(m_tmpbitmap1, m_tmpbitmap1.cliprect(), m_tmpbitmap0,
 								u32(16) << 16,
 								u32(0) << 16,
 								0 << 16,
@@ -324,7 +325,7 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 						break;
 					}
 
-					prio_copybitmap_trans(bitmap, *m_tmpbitmap1, 0, 0, currx, curry, cliprect, priority, PRI_MAP[pri], 0);
+					prio_copybitmap_trans(bitmap, m_tmpbitmap1, 0, 0, currx, curry, cliprect, priority, PRI_MAP[pri], 0);
 				}
 				else
 				{
@@ -376,8 +377,8 @@ void realbrk_state::vregs_w(offs_t offset, u16 data, u16 mem_mask)
 	data = COMBINE_DATA(&m_vregs[offset]);
 	if (data != old_data)
 	{
-		if ((offset == 0xa/2) && ((old_data ^ data) & 0x7f))
-			m_tilemap[0]->mark_all_dirty();
+		if ((offset == 0xa / 2) && ((old_data ^ data) & 0x7f))
+			m_tilemap[2]->mark_all_dirty();
 	}
 }
 
@@ -464,7 +465,7 @@ u32 realbrk_state::screen_update_dai2kaku(screen_device &screen, bitmap_ind16 &b
 		return 0;
 	}
 
-	bitmap.fill(m_vregs[0xc/2] & 0x7fff, cliprect);
+	bitmap.fill(m_vregs[0xc / 2] & 0x7fff, cliprect);
 	screen.priority().fill(0, cliprect);
 
 	int layers_ctrl(-1);

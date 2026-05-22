@@ -157,7 +157,7 @@
 #define LOG_OBJECT_BRANCH   (1U << 7) // log branch taken (verbose)
 
 #define VERBOSE (LOG_UNHANDLED_BLITS)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 

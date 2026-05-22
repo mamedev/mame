@@ -46,12 +46,9 @@
         - Factory floppy disks for any of these samplers.
 
     TODOs:
-        - S3000 crashes when trying to access a CD-ROM to load sounds.  The closely
-          related CD3000i does not.
-        - Many Akai factory CD sounds have popping and crackling.  Seems to be
-          an issue with the L6028 DSP.
         - Split the data entry knob into a device so we can share it across the
-          various Akai drivers.
+          various Akai drivers (basically a single-axis quadmouse.cpp)
+        - Recording.
 
     HOWTOs (move to wiki when driver is promoted):
         - Creating a bootable hard disk for the S2000:
@@ -148,7 +145,7 @@ public:
 		, m_ledlatch(*this, "ledlatch")
 		, m_keys(*this, "C%u", 0)
 		, m_dataentry(*this, "DATAENTRY")
-		, m_key_scan_row(0)
+		, m_key_scan_mask(0x3f)
 		, m_last_dial(0)
 		, m_count_dial(0)
 		, m_quadrature_phase(0)
@@ -157,12 +154,10 @@ public:
 
 	void base(machine_config & config);
 	void s2000(machine_config &config);
-	void s3000(machine_config &config);
 	void s3000xl(machine_config &config);
-	void cd3000(machine_config &config);
 	void cd3000xl(machine_config &config);
 
-private:
+protected:
 	required_device<v53a_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	optional_device<hd61830_device> m_lcdc;
@@ -184,12 +179,9 @@ private:
 	virtual void machine_reset() override ATTR_COLD;
 
 	void s2000_map(address_map &map) ATTR_COLD;
-	void s3000_map(address_map &map) ATTR_COLD;
 	void s3000xl_map(address_map &map) ATTR_COLD;
 	void s2000_io_map(address_map &map) ATTR_COLD;
-	void s3000_io_map(address_map &map) ATTR_COLD;
 	void s3000xl_io_map(address_map &map) ATTR_COLD;
-	void cd3000_io_map(address_map &map) ATTR_COLD;
 	void dsp_map(address_map &map) ATTR_COLD;
 	void dsp_rom_map(address_map &map) ATTR_COLD;
 
@@ -217,15 +209,38 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(dial_timer_tick);
 
-	uint8_t m_key_scan_row;
+	uint8_t m_key_scan_mask;
 	int m_last_dial, m_count_dial, m_quadrature_phase;
 
 	uint8_t m_id_magic;
 };
 
+class s3000_banked_state: public s3000_state
+{
+public:
+	s3000_banked_state(const machine_config &mconfig, device_type type, const char *tag)
+		: s3000_state(mconfig, type, tag)
+		, m_upper_bank(*this, "upper_bank")
+	{ }
+
+	void s3000_map(address_map &map) ATTR_COLD;
+	void s3000_io_map(address_map &map) ATTR_COLD;
+	void cd3000i_io_map(address_map &map) ATTR_COLD;
+
+	void control_port_w(uint8_t data);
+
+	void s3000(machine_config &config);
+	void cd3000i(machine_config &config);
+
+private:
+	memory_view m_upper_bank;
+
+	virtual void machine_reset() override ATTR_COLD;
+};
+
 void s3000_state::machine_start()
 {
-	save_item(NAME(m_key_scan_row));
+	save_item(NAME(m_key_scan_mask));
 	save_item(NAME(m_last_dial));
 	save_item(NAME(m_count_dial));
 	save_item(NAME(m_quadrature_phase));
@@ -233,11 +248,31 @@ void s3000_state::machine_start()
 	m_floppy_led.resolve();
 	m_floppy->get_device()->setup_led_cb(floppy_image_device::led_cb(&s3000_state::floppy_led_cb, this));
 }
-
 void s3000_state::machine_reset()
 {
 	m_maincpu->cts_w(CLEAR_LINE);   // grounded on schematic
 	m_fdc->ready_w(CLEAR_LINE);     // also grounded on schematic
+}
+
+void s3000_banked_state::machine_reset()
+{
+	s3000_state::machine_reset();
+
+	// always select ROM on reset
+	m_upper_bank.select(0);
+}
+
+/*
+    Bit 0: Either analog/digital input select or digital input enable
+    Bit 1: Left channel input DMA enable
+    Bit 2: Right channel input DMA enable
+    Bit 3: Input control strobe or reset
+    Bit 4: Select RAM or ROM at 0xc0000-0xfffff
+    Bits 5-7: Unknown
+*/
+void s3000_banked_state::control_port_w(uint8_t data)
+{
+	m_upper_bank.select(BIT(data, 4));
 }
 
 void s3000_state::s2000_map(address_map &map)
@@ -247,10 +282,12 @@ void s3000_state::s2000_map(address_map &map)
 	map(0x180000, 0x1fffff).ram();
 }
 
-void s3000_state::s3000_map(address_map &map)
+void s3000_banked_state::s3000_map(address_map &map)
 {
 	map(0x000000, 0x0bffff).ram();  // 2x HM658512 512kx8 = 1 MiB
-	map(0x0c0000, 0x0fffff).rom().region("maincpu", 0);
+	map(0x0c0000, 0x0fffff).view(m_upper_bank);
+	m_upper_bank[0](0x0c0000, 0x0fffff).rom().region("maincpu", 0);
+	m_upper_bank[1](0x0c0000, 0x0fffff).ram();
 }
 
 void s3000_state::s3000xl_map(address_map &map)
@@ -289,23 +326,24 @@ void s3000_state::s2000_io_map(address_map &map)
 // a = FIRCS (effects DSP if EB16 installed)
 // c = LTCCS
 // e = DIOCS
-void s3000_state::s3000_io_map(address_map &map)
+void s3000_banked_state::s3000_io_map(address_map &map)
 {
 	map(0x0000, 0x001f).m("spc", FUNC(mb89352_device::map)).umask16(0x00ff);
 	map(0x0020, 0x0023).m(m_fdc, FUNC(upd72069_device::map)).umask16(0x00ff);
-	map(0x0020, 0x0023).r(FUNC(s3000_state::fdc_hc365_r)).umask16(0xff00);
+	map(0x0020, 0x0023).r(FUNC(s3000_banked_state::fdc_hc365_r)).umask16(0xff00);
 	map(0x0048, 0x0048).rw(m_lcdc, FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w)).umask16(0x00ff);
 	map(0x004a, 0x004a).rw(m_lcdc, FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
 	map(0x0050, 0x0057).rw(m_klcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x0060, 0x0067).rw(FUNC(s3000_state::id_r), FUNC(s3000_state::id_w)).umask16(0x00ff);
+	map(0x0060, 0x0067).rw(FUNC(s3000_banked_state::id_r), FUNC(s3000_banked_state::id_w)).umask16(0x00ff);
+	map(0x0068, 0x0068).w(FUNC(s3000_banked_state::control_port_w)).umask16(0x00ff);
 	map(0x0080, 0x008f).m(m_dsp, FUNC(l7a1045_sound_device::map));
 	map(0x00a0, 0x00a5).nopw(); // quiet writes to the effects DSP
 }
 
-void s3000_state::cd3000_io_map(address_map &map)
+void s3000_banked_state::cd3000i_io_map(address_map &map)
 {
 	s3000_io_map(map);
-	map(0x0060, 0x0067).rw(FUNC(s3000_state::cd_id_r), FUNC(s3000_state::id_w)).umask16(0x00ff);
+	map(0x0060, 0x0067).rw(FUNC(s3000_banked_state::cd_id_r), FUNC(s3000_banked_state::id_w)).umask16(0x00ff);
 }
 
 void s3000_state::s3000xl_io_map(address_map &map)
@@ -403,7 +441,15 @@ uint8_t s3000_state::cd_id_r(offs_t offset)
 
 uint8_t s3000_state::klcs_porta_r()
 {
-	uint8_t rv = m_keys[m_key_scan_row]->read() & ~0xc0;
+	uint8_t rv = 0x3f;
+
+	for (int row = 0; row < 8; row++)
+	{
+		if (!BIT(m_key_scan_mask, 7 - row))
+		{
+			rv &= (m_keys[row]->read() & 0x3f);
+		}
+	}
 
 	if (m_count_dial)
 	{
@@ -448,11 +494,7 @@ uint8_t s3000_state::klcs_porta_r()
 
 void s3000_state::klcs_portb_w(uint8_t data)
 {
-	m_key_scan_row = data ^ 0xff;
-	if (m_key_scan_row != 0)
-	{
-		m_key_scan_row = count_leading_zeros_32(m_key_scan_row) - 24;
-	}
+	m_key_scan_mask = data;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(s3000_state::dial_timer_tick)
@@ -542,8 +584,6 @@ static void add_formats(format_registration &fr)
 void s3000_state::base(machine_config &config)
 {
 	V53A(config, m_maincpu, 32_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &s3000_state::s3000_map);
-	m_maincpu->set_addrmap(AS_IO, &s3000_state::s3000_io_map);
 	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v53a_device::hack_w));
 	m_maincpu->in_memr_cb().set(FUNC(s3000_state::dma_memr_cb));
 	m_maincpu->out_memw_cb().set(FUNC(s3000_state::dma_memw_cb));
@@ -561,7 +601,7 @@ void s3000_state::base(machine_config &config)
 	m_maincpu->in_io16r_cb<3>().set(m_dsp, FUNC(l7a1045_sound_device::dma_r16_cb));
 	m_maincpu->out_io16w_cb<3>().set(m_dsp, FUNC(l7a1045_sound_device::dma_w16_cb));
 
-	m_maincpu->set_tclk(4'000'000);
+	m_maincpu->set_tclk(32_MHz_XTAL/32); // only timer 2 uses external TCLK, and it needs to be ~1 MHz for panel key repeat to be sane
 	m_maincpu->v53_tout_handler<0>().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 
 	constexpr XTAL V53_CLKOUT = 32_MHz_XTAL / 2;
@@ -604,7 +644,7 @@ void s3000_state::base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, "cdrom_2x");
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:7", default_scsi_devices, nullptr);
 
@@ -651,12 +691,6 @@ void s3000_state::base(machine_config &config)
 	TIMER(config, "dialtimer").configure_periodic(FUNC(s3000_state::dial_timer_tick), attotime::from_hz(60.0));
 }
 
-void s3000_state::s3000(machine_config &config)
-{
-	base(config);
-	config.set_default_layout(layout_s3000);
-}
-
 void s3000_state::s2000(machine_config &config)
 {
 	base(config);
@@ -687,14 +721,6 @@ void s3000_state::s2000(machine_config &config)
 	SOFTWARE_LIST(config, "flop_s2000").set_original("s2000_flop");
 }
 
-void s3000_state::cd3000(machine_config &config)
-{
-	base(config);
-	m_maincpu->set_addrmap(AS_IO, &s3000_state::cd3000_io_map);
-
-	config.set_default_layout(layout_cd3000i);
-}
-
 void s3000_state::s3000xl(machine_config &config)
 {
 	base(config);
@@ -704,8 +730,6 @@ void s3000_state::s3000xl(machine_config &config)
 
 	m_fdc->set_ready_line_connected(false); // uPD READY pin is grounded on schematic
 	m_fdc->set_ts_line_connected(false);    // actually connected to DSKCHG (!)
-
-	m_klcs->in_pa_callback().set(FUNC(s3000_state::klcs_porta_r));
 
 	I8255(config, m_wadcs);
 
@@ -719,6 +743,23 @@ void s3000_state::cd3000xl(machine_config &config)
 	config.set_default_layout(layout_cd3000xl);
 }
 
+void s3000_banked_state::s3000(machine_config &config)
+{
+	base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &s3000_banked_state::s3000_map);
+	m_maincpu->set_addrmap(AS_IO, &s3000_banked_state::s3000_io_map);
+	config.set_default_layout(layout_s3000);
+}
+
+void s3000_banked_state::cd3000i(machine_config &config)
+{
+	base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &s3000_banked_state::s3000_map);
+	m_maincpu->set_addrmap(AS_IO, &s3000_banked_state::cd3000i_io_map);
+
+	config.set_default_layout(layout_cd3000i);
+}
+
 // KC = port A, KR = port B, KD = port C
 //   0           1     2       3          4
 // 0 HELP        F8    1/W     0/Z
@@ -729,6 +770,7 @@ void s3000_state::cd3000xl(machine_config &config)
 // 5 EDIT P/C    F3    7/Q     4/T
 // 6 EDIT S/B    F2    NAME    ENT/PLAY   DOWN
 // 7 SELECT P/A  F1    3/Y     -/>        LEFT
+
 static INPUT_PORTS_START(s3000)
 	PORT_START("C0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Help / P") PORT_CODE(KEYCODE_I)
@@ -1010,7 +1052,7 @@ ROM_END
 } // anonymous namespace
 
 SYST( 1993, s2000,    0, 0, s2000,    s2000,    s3000_state, empty_init, "Akai", "S2000", MACHINE_NOT_WORKING )
-SYST( 1993, s3000,    0, 0, s3000,    s3000,    s3000_state, empty_init, "Akai", "S3000", MACHINE_NOT_WORKING )
-SYST( 1993, cd3000i,  0, 0, cd3000,   s3000,    s3000_state, empty_init, "Akai", "CD3000i", MACHINE_NOT_WORKING)
+SYST( 1993, s3000,    0, 0, s3000,    s3000,    s3000_banked_state, empty_init, "Akai", "S3000", MACHINE_NOT_WORKING )
+SYST( 1993, cd3000i,  0, 0, cd3000i,  s3000,    s3000_banked_state, empty_init, "Akai", "CD3000i", MACHINE_NOT_WORKING)
 SYST( 1994, s3000xl,  0, 0, s3000xl,  s3000xl,  s3000_state, empty_init, "Akai", "S3000XL", MACHINE_NOT_WORKING)
 SYST( 1994, cd3000xl, 0, 0, cd3000xl, cd3000xl, s3000_state, empty_init, "Akai", "CD3000XL", MACHINE_NOT_WORKING)

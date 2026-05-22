@@ -33,11 +33,11 @@ def load_opcodes(fname):
             # append instruction to last opcode
             if line == '\tprefetch();':
                 opcodes[-1][1].append("\tprefetch_start();")
-                opcodes[-1][1].append("\tm_IR = m_mintf->read_sync(m_PC);")
+                opcodes[-1][1].append("\tm_IR = read_sync(m_PC);")
                 opcodes[-1][1].append("\tprefetch_end();")
             elif line == '\tprefetch_noirq();':
                 opcodes[-1][1].append("\tprefetch_start();")
-                opcodes[-1][1].append("\tm_IR = m_mintf->read_sync(m_PC);")
+                opcodes[-1][1].append("\tm_IR = read_sync(m_PC);")
                 opcodes[-1][1].append("\tprefetch_end_noirq();")
             else:
                 opcodes[-1][1].append(line)
@@ -292,4 +292,3 @@ def main(argv):
 # ======================================================================
 if __name__ == "__main__":
     sys.exit(main(sys.argv))
-

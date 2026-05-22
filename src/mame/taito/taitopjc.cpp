@@ -12,6 +12,8 @@
    - Inconsistent frame rate compared to PCB recordings; game has a tendency to freeze frame hiccup
    - Analog inputs update at a slower rate (about every 8-10 frames instead of every frame); this issue
      is also present in taitotz.cpp
+   - Convert 2d videochip to actual device for the device_memory_interface implications and because it's a
+     16-bit i/f (TCG010PJC?)
    - Hook up remaining sound / Zoom hardware - see /src/sony/taito_zm.cpp for reference
 
 
@@ -310,7 +312,7 @@ G)ame Connector, dual row 50 pins
 #define LOG_DSP                  (1U << 6)
 #define LOG_SOUND                (1U << 7)
 
-#define VERBOSE (0)
+#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 #define LOGVIDEO(...)  LOGMASKED(LOG_VIDEO, __VA_ARGS__)
@@ -529,6 +531,17 @@ void taitopjc_state::videochip_w(offs_t address, uint32_t data)
 		m_scroll_y = (data >> 16) & 0xffff;
 		m_scroll_x = data & 0xffff;
 	}
+	else if (address < 6)
+	{
+		// [0] hi <unused>?
+		// [0] lo VTOTAL
+		// [1] hi VDISPLAY end
+		// [1] lo VDISPLAY start
+		// [2] hi VSYNC start
+		// [2] lo VSYNC end
+		// [3-5] same but for Horizontal, in pixel units
+		LOG("CRTC address %d %08x (U: %d L: %d)\n", address, data, data >> 16, data & 0xffff);
+	}
 	else
 	{
 		LOGVIDEO("Video Address %08X = %08X\n", address, data);
@@ -728,6 +741,7 @@ void taitopjc_state::dsp_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 		}
 		#endif
 
+	// TODO: convert to debugger command
 #if (VERBOSE & LOG_DISPLAY_LIST)
 		print_display_list();
 #endif
@@ -1046,10 +1060,11 @@ void taitopjc_state::taitopjc(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(480, 384);
-	screen.set_visarea(0, 479, 0, 383);
+	// V 0x1be / 0x14 / 0x194 / 0x1a8 / 0x1be
+	// H 0x294 / 0x3f / 0x221 / 0x24c / 0x294
+	// TODO: gets a 56.17 Hz with this, may be off by 1 or 2, verify on PCB, fix display ranges
+	screen.set_raw(XTAL(16'537'000), 660, 0, 482, 446, 0, 384);
+//  screen.set_visarea(0, 479, 0, 383);
 	screen.set_screen_update(FUNC(taitopjc_state::screen_update));
 	screen.set_palette(m_palette);
 

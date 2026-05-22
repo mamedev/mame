@@ -133,7 +133,7 @@ void _39in1_state::machine_reset()
 
 u32 _39in1_state::cpld_r(offs_t offset)
 {
-	// if (m_maincpu->pc() != m_mcu_ipt_pc) printf("CPLD read @ %x (PC %x state %d)\n", offset, m_maincpu->pc(), m_state);
+	// if (m_maincpu->pc() != m_mcu_ipt_pc) logerror("CPLD read @ %x (PC %x state %d)\n", offset, m_maincpu->pc(), m_state);
 
 	if (m_maincpu->pc() == 0x3f04)
 	{
@@ -161,7 +161,7 @@ u32 _39in1_state::cpld_r(offs_t offset)
 				case 0x4001a: return 0x75;
 				case 0x4001c: return 0x97;
 				case 0x4001e: return 0xb1;
-				default: printf("State 1 unknown offset %x\n", offset); break;
+				default: logerror("State 1 unknown offset %x\n", offset); break;
 			}
 		}
 		else if (m_state == 2)                      // 29c0: 53 ac 0c 2b a2 07 e6 be 31
@@ -208,7 +208,7 @@ void _39in1_state::cpld_w(offs_t offset, u32 data, u32 mem_mask)
 #if 0
 	else
 	{
-		printf("%08x: CPLD_W: %08x = %08x & %08x\n", m_maincpu->pc(), offset, data, mem_mask);
+		logerror("%08x: CPLD_W: %08x = %08x & %08x\n", m_maincpu->pc(), offset, data, mem_mask);
 	}
 #endif
 }

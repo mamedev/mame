@@ -1776,7 +1776,7 @@ class sega_beena_state : public sega_9h0_0008_cart_state
 public:
 	sega_beena_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sega_9h0_0008_cart_state(mconfig, type, tag)
-		, m_card(*this, "card")
+		, m_card(*this, "cardslot")
 		, m_io_page_config(*this, "PAGE_CONFIG")
 		, m_io_page(*this, "PAGE")
 		, m_io_pad_left(*this, "PAD_LEFT")
@@ -1789,7 +1789,7 @@ public:
 
 	void sega_beena(machine_config &config);
 
-	virtual DECLARE_CROSSHAIR_MAPPER_MEMBER(pen_y_mapper);
+	virtual float pen_y_mapper(float linear_value);
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -2019,7 +2019,7 @@ void sega_beena_state::update_sensors(offs_t offset)
 	}
 }
 
-CROSSHAIR_MAPPER_MEMBER(sega_beena_state::pen_y_mapper)
+float sega_beena_state::pen_y_mapper(float linear_value)
 {
 	// TODO: Either remove or adapt for Storyware layout
 	return linear_value;
@@ -2031,7 +2031,7 @@ class tvochken_state : public sega_9h0_0008_state
 public:
 	tvochken_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sega_9h0_0008_state(mconfig, type, tag)
-		, m_card(*this, "card")
+		, m_card(*this, "cardslot")
 		, m_io_buttons(*this, "BUTTONS")
 	{ }
 

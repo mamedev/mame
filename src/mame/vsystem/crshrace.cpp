@@ -167,8 +167,6 @@ class crshrace_state : public driver_device
 public:
 	crshrace_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram.%u", 0U),
-		m_z80bank(*this, "bank1"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_spr(*this, "vsystem_spr"),
@@ -176,7 +174,9 @@ public:
 		m_spriteram(*this, "spriteram.%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch"),
+		m_videoram(*this, "videoram.%u", 0U),
+		m_z80bank(*this, "bank1")
 	{ }
 
 	void crshrace(machine_config &config);
@@ -184,17 +184,14 @@ public:
 	void init_crshrace2();
 	void init_crshrace();
 
+	int soundlatch_pending_r();
+
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	// memory pointers
-	required_shared_ptr_array<uint16_t, 2> m_videoram;
-
-	required_memory_bank m_z80bank;
-
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<z80_device> m_audiocpu;
@@ -205,15 +202,19 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	// video-related
+	// memory pointers
+	required_shared_ptr_array<uint16_t, 2> m_videoram;
+	required_memory_bank m_z80bank;
+
+	// variables
 	tilemap_t *m_tilemap[2]{};
 	uint8_t m_roz_bank = 0U;
 	uint8_t m_gfxctrl = 0U;
 	uint8_t m_flipscreen = 0U;
+	bool m_z80_sync = false;
 
 	uint32_t tile_callback(uint32_t code);
 	void sh_bankswitch_w(uint8_t data);
-	void soundlatch_pending_w(int state);
 	template <uint8_t Which> void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_videoram[Which][offset]); m_tilemap[Which]->mark_tile_dirty(offset); }
 	void roz_bank_w(offs_t offset, uint8_t data);
 	void gfxctrl_w(offs_t offset, uint8_t data);
@@ -352,14 +353,18 @@ void crshrace_state::sh_bankswitch_w(uint8_t data)
 	m_z80bank->set_entry(data & 0x03);
 }
 
-void crshrace_state::soundlatch_pending_w(int state)
+int crshrace_state::soundlatch_pending_r()
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+	if (!machine().side_effects_disabled() && m_maincpu->executing())
+	{
+		// retry_access() forces the z80 to catch up before maincpu does the read
+		if (!m_z80_sync)
+			m_maincpu->retry_access();
 
-	// sound comms is 2-way (see pending_r in "DSW2"),
-	// NMI routine is very short, so briefly set perfect_quantum to make sure that the timing is right
-	if (state)
-		machine().scheduler().perfect_quantum(attotime::from_usec(100));
+		m_z80_sync = !m_z80_sync;
+	}
+
+	return m_soundlatch->pending_r();
 }
 
 
@@ -547,7 +552,7 @@ static INPUT_PORTS_START( crshrace )
     PORT_DIPSETTING(      0x0e00, "5" )
     PORT_DIPSETTING(      0x0f00, "5" )
 */
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", FUNC(generic_latch_8_device::pending_r)) // pending sound command
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(crshrace_state::soundlatch_pending_r)) // pending sound command
 INPUT_PORTS_END
 
 // Same as 'crshrace', but additional "unknown" Dip Switch (see notes)
@@ -557,7 +562,6 @@ static INPUT_PORTS_START( crshrace2 )
 	PORT_MODIFY("DSW0")
 	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW2:5" )       // Check code at 0x00ea36
 INPUT_PORTS_END
-
 
 
 
@@ -578,6 +582,7 @@ void crshrace_state::machine_start()
 	save_item(NAME(m_roz_bank));
 	save_item(NAME(m_gfxctrl));
 	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_z80_sync));
 }
 
 void crshrace_state::machine_reset()
@@ -585,16 +590,17 @@ void crshrace_state::machine_reset()
 	m_roz_bank = 0;
 	m_gfxctrl = 0;
 	m_flipscreen = 0;
+	m_z80_sync = false;
 }
 
 void crshrace_state::crshrace(machine_config &config) // TODO: PCB sports 32 MHz and 24 MHz XTALs. Derive from those and verify dividers.
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 16'000'000);    // 16 MHz ???
+	M68000(config, m_maincpu, 16'000'000); // 16 MHz ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &crshrace_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(crshrace_state::irq1_line_hold));
 
-	Z80(config, m_audiocpu, 4'000'000);   // 4 MHz ???
+	Z80(config, m_audiocpu, 4'000'000); // 4 MHz ???
 	m_audiocpu->set_addrmap(AS_PROGRAM, &crshrace_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &crshrace_state::sound_io_map);
 
@@ -625,7 +631,7 @@ void crshrace_state::crshrace(machine_config &config) // TODO: PCB sports 32 MHz
 	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set(FUNC(crshrace_state::soundlatch_pending_w));
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8'000'000));

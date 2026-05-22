@@ -2162,8 +2162,7 @@ ROM_START( fm8 )
 
 	// optional Kanji ROM (same as for the FM-7?)
 	ROM_REGION( 0x20000, "kanji1", 0 )
-	ROM_LOAD_OPTIONAL( "kanji.rom", 0x0000, 0x20000, NO_DUMP )
-
+	ROM_LOAD( "kanji.rom",    0x0000, 0x20000, NO_DUMP )
 ROM_END
 
 
@@ -2181,8 +2180,7 @@ ROM_START( fmnew7 )
 
 	// optional Kanji ROM
 	ROM_REGION( 0x20000, "kanji1", 0 )
-	ROM_LOAD_OPTIONAL( "kanji.rom", 0x0000, 0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
-
+	ROM_LOAD( "kanji.rom",    0x0000, 0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
 ROM_END
 
 ROM_START( fm7 )
@@ -2205,7 +2203,7 @@ ROM_START( fm7 )
 
 	// optional Kanji ROM
 	ROM_REGION( 0x20000, "kanji1", 0 )
-	ROM_LOAD_OPTIONAL( "kanji.rom", 0x0000, 0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
+	ROM_LOAD( "kanji.rom",     0x0000, 0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
 ROM_END
 
 ROM_START( fm77av )
@@ -2256,7 +2254,6 @@ ROM_START( fm7740sx )
 	ROM_REGION( 0x4c000, "additional", 0 )
 	ROM_LOAD( "dicrom.rom", 0x00000, 0x40000, CRC(b142acbc) SHA1(fe9f92a8a2750bcba0a1d2895e75e83858e4f97f) )
 	ROM_LOAD( "extsub.rom", 0x40000, 0x0c000, CRC(0f7fcce3) SHA1(a1304457eeb400b4edd3c20af948d66a04df255e) )
-
 ROM_END
 
 ROM_START( fm11 )
@@ -2274,8 +2271,7 @@ ROM_START( fm11 )
 
 	// optional Kanji ROM
 	ROM_REGION( 0x20000, "kanji1", 0 )
-	ROM_LOAD_OPTIONAL( "kanji.rom", 0x0000, 0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
-
+	ROM_LOAD( "kanji.rom",    0x0000, 0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
 ROM_END
 
 ROM_START( fm16beta )

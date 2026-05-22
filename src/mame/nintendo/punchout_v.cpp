@@ -165,9 +165,8 @@ void punchout_state::punchout_spr2_videoram_w(offs_t offset, uint8_t data)
 
 void punchout_state::draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette)
 {
-	int zoom;
+	int zoom = m_spr1_ctrlram[0] + 256 * (m_spr1_ctrlram[1] & 0x0f);
 
-	zoom = m_spr1_ctrlram[0] + 256 * (m_spr1_ctrlram[1] & 0x0f);
 	if (zoom)
 	{
 		int sx,sy;
@@ -208,15 +207,14 @@ void punchout_state::draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap
 
 void punchout_state::armwrest_draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette)
 {
-	int zoom;
+	int zoom = m_spr1_ctrlram[0] + 256 * (m_spr1_ctrlram[1] & 0x0f);
 
-	zoom = m_spr1_ctrlram[0] + 256 * (m_spr1_ctrlram[1] & 0x0f);
 	if (zoom)
 	{
 		int sx,sy;
 		uint32_t startx,starty;
 		int incxx,incyy;
-		tilemap_t *_tilemap;
+		tilemap_t *spr1_tilemap;
 
 		sx = 4096 - (m_spr1_ctrlram[2] + 256 * (m_spr1_ctrlram[3] & 0x0f));
 		if (sx > 2048) sx -= 4096;
@@ -235,16 +233,16 @@ void punchout_state::armwrest_draw_big_sprite(screen_device &screen, bitmap_ind1
 
 		if (m_spr1_ctrlram[6] & 1)   /* flip x */
 		{
-			_tilemap = m_spr1_tilemap_flipx;
+			spr1_tilemap = m_spr1_tilemap_flipx;
 			startx = ((32 * 8) << 16) - startx - 1;
 			incxx = -incxx;
 		}
 		else
-			_tilemap = m_spr1_tilemap;
+			spr1_tilemap = m_spr1_tilemap;
 
-		_tilemap->set_palette_offset(0x100 * palette);
+		spr1_tilemap->set_palette_offset(0x100 * palette);
 
-		_tilemap->draw_roz(screen, bitmap, cliprect,
+		spr1_tilemap->draw_roz(screen, bitmap, cliprect,
 			startx,starty + 0x200*(2) * zoom,
 			incxx,0,0,incyy,    /* zoom, no rotation */
 			0,  /* no wraparound */
@@ -285,11 +283,10 @@ void punchout_state::drawbs2(screen_device &screen, bitmap_ind16 &bitmap, const 
 
 void punchout_state::punchout_copy_top_palette(int bank)
 {
-	int i;
 	const uint8_t *color_prom = memregion("proms")->base();
 
 	// top monitor palette
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
 		int base = 0x100 * bank;
 		int r, g, b;
@@ -305,11 +302,10 @@ void punchout_state::punchout_copy_top_palette(int bank)
 
 void punchout_state::punchout_copy_bot_palette(int bank)
 {
-	int i;
 	const uint8_t *color_prom = memregion("proms")->base() + 0x600;
 
 	// bottom monitor palette
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
 		int base = 0x100 * bank;
 		int r, g, b;
@@ -338,12 +334,10 @@ uint32_t punchout_state::screen_update_punchout_top(screen_device &screen, bitma
 
 uint32_t punchout_state::screen_update_punchout_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
-
 	punchout_copy_bot_palette(BIT(*m_palettebank,0));
 
 	/* copy the character mapped graphics */
-	for (offs = 0;offs < 32;offs++)
+	for (int offs = 0; offs < 32; offs++)
 		m_bg_bot_tilemap->set_scrollx(offs, 58 + m_bg_bot_videoram[2*offs] + 256 * (m_bg_bot_videoram[2*offs + 1] & 0x01));
 
 	m_bg_bot_tilemap->draw(screen, bitmap, cliprect, 0, 0);

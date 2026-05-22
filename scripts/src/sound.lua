@@ -111,6 +111,18 @@ if SOUNDS["AC97"] then
 	}
 end
 
+---------------------------------------------------
+-- SigmaTel STAC9704
+--@src/devices/sound/ac97_stac9704.h,SOUNDS["AC97_STAC9704"] = true
+---------------------------------------------------
+
+if SOUNDS["AC97_STAC9704"] then
+	files {
+		MAME_DIR .. "src/devices/sound/ac97_stac9704.cpp",
+		MAME_DIR .. "src/devices/sound/ac97_stac9704.h",
+	}
+end
+
 
 ---------------------------------------------------
 -- Apple custom sound chips
@@ -204,6 +216,18 @@ if SOUNDS["CEM3320"] then
 	files {
 		MAME_DIR .. "src/devices/sound/cem3320.cpp",
 		MAME_DIR .. "src/devices/sound/cem3320.h",
+	}
+end
+
+---------------------------------------------------
+-- CEM 3340 voltage-controlled oscillator chip
+--@src/devices/sound/cem3340.h,SOUNDS["CEM3340"] = true
+---------------------------------------------------
+
+if SOUNDS["CEM3340"] then
+	files {
+		MAME_DIR .. "src/devices/sound/cem3340.cpp",
+		MAME_DIR .. "src/devices/sound/cem3340.h",
 	}
 end
 
@@ -498,6 +522,7 @@ end
 --@src/devices/sound/k007232.h,SOUNDS["K007232"] = true
 --@src/devices/sound/k051649.h,SOUNDS["K051649"] = true
 --@src/devices/sound/k053260.h,SOUNDS["K053260"] = true
+--@src/devices/sound/k054321.h,SOUNDS["K054321"] = true
 --@src/devices/sound/k054539.h,SOUNDS["K054539"] = true
 --@src/devices/sound/k056800.h,SOUNDS["K056800"] = true
 ---------------------------------------------------
@@ -527,6 +552,13 @@ if SOUNDS["K053260"] then
 	files {
 		MAME_DIR .. "src/devices/sound/k053260.cpp",
 		MAME_DIR .. "src/devices/sound/k053260.h",
+	}
+end
+
+if SOUNDS["K054321"] then
+	files {
+		MAME_DIR .. "src/devices/sound/k054321.cpp",
+		MAME_DIR .. "src/devices/sound/k054321.h",
 	}
 end
 
@@ -592,6 +624,20 @@ if SOUNDS["MAS3507D"] then
 	files {
 		MAME_DIR .. "src/devices/sound/mas3507d.cpp",
 		MAME_DIR .. "src/devices/sound/mas3507d.h",
+	}
+end
+
+
+
+---------------------------------------------------
+-- Fujitsu MB87077 volume controller
+--@src/devices/sound/mb87077.h,SOUNDS["MB87077"] = true
+---------------------------------------------------
+
+if SOUNDS["MB87077"] then
+	files {
+		MAME_DIR .. "src/devices/sound/mb87077.cpp",
+		MAME_DIR .. "src/devices/sound/mb87077.h",
 	}
 end
 

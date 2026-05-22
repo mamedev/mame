@@ -438,8 +438,8 @@ void abc99_device::serial_input()
 
 TIMER_CALLBACK_MEMBER(abc99_device::serial_clock)
 {
-	m_slot->trxc_w(1);
-	m_slot->trxc_w(0);
+	m_slot->trxc_w(m_rxtxc);
+	m_rxtxc = !m_rxtxc;
 }
 
 
@@ -487,7 +487,7 @@ void abc99_device::device_start()
 
 	// allocate timers
 	m_serial_timer = timer_alloc(FUNC(abc99_device::serial_clock), this);
-	attotime serial_clock = MCS48_ALE_CLOCK(m_mousecpu->get_t0_clock()); // 8333 bps
+	attotime serial_clock = MCS48_ALE_CLOCK(m_mousecpu->get_t0_clock() * 2); // 8333 bps x16
 	m_serial_timer->adjust(serial_clock, 0, serial_clock);
 
 	// state saving
@@ -500,6 +500,7 @@ void abc99_device::device_start()
 	save_item(NAME(m_t1_z5));
 	save_item(NAME(m_led_en));
 	save_item(NAME(m_reset));
+	save_item(NAME(m_rxtxc));
 }
 
 
@@ -514,6 +515,7 @@ void abc99_device::device_reset()
 	m_mousecpu->set_input_line(MCS48_INPUT_EA, ASSERT_LINE);
 
 	m_slot->write_rx(1);
+	m_rxtxc = 0;
 }
 
 

@@ -197,11 +197,14 @@ void pdc20262_device::device_reset()
 	remap_cb();
 }
 
+u8 pdc20262_device::latency_timer_r()
+{
+	return 0x01;
+}
+
 void pdc20262_device::config_map(address_map &map)
 {
 	pci_card_device::config_map(map);
-	// latency timer
-	map(0x0d, 0x0d).lr8(NAME([] () { return 0x01; }));
 	// TODO: everything, starting from capptr_r override
 }
 

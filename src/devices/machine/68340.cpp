@@ -134,7 +134,7 @@ uint16_t m68340_cpu_device::m68340_internal_base_r(offs_t offset, uint16_t mem_m
 
 	if (m_sfc==0x7)
 	{
-		return ((!BIT(offset, 0) ? (m_m68340_base >> 16): m_m68340_base)) & 0xffff;
+		return (!BIT(offset, 0) ? (m_m68340_base >> 16): m_m68340_base) & 0xffff;
 	}
 	else
 	{

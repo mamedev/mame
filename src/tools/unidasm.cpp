@@ -51,7 +51,7 @@ using util::BIT;
 #include "cpu/dsp563xx/dsp563xxd.h"
 #include "cpu/dspp/dsppdasm.h"
 #include "cpu/e0c6200/e0c6200d.h"
-#include "cpu/e132xs/32xsdasm.h"
+#include "cpu/e132xs/e1dasm.h"
 #include "cpu/es5510/es5510d.h"
 #include "cpu/esrip/esripdsm.h"
 #include "cpu/f2mc16/f2mc16d.h"
@@ -169,7 +169,7 @@ using util::BIT;
 #include "cpu/scudsp/scudspdasm.h"
 #include "cpu/se3208/se3208dis.h"
 #include "cpu/sh/sh_dasm.h"
-#include "cpu/sharc/sharcdsm.h"
+#include "cpu/sharc/sharc_dasm.h"
 #include "cpu/sigma2/sigma2d.h"
 #include "cpu/sm510/sm510d.h"
 #include "cpu/sm8500/sm8500d.h"
@@ -227,13 +227,12 @@ using util::BIT;
 #include "cpu/z8000/8000dasm.h"
 
 #include "corestr.h"
-#include "eminline.h"
-#include "endianness.h"
 #include "ioprocs.h"
 #include "osdfile.h"
 #include "strformat.h"
 
 #include <algorithm>
+#include <bit>
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
@@ -348,16 +347,6 @@ struct z8000_unidasm_t : z8000_disassembler::config
 } z8000_unidasm;
 
 // Configuration missing
-struct hyperstone_unidasm_t : hyperstone_disassembler::config
-{
-	bool h;
-	hyperstone_unidasm_t() { h = false; }
-	virtual ~hyperstone_unidasm_t() = default;
-
-	virtual bool get_h() const { return h; }
-} hyperstone_unidasm;
-
-// Configuration missing
 struct nec_unidasm_t : nec_disassembler::config
 {
 	int mode;
@@ -367,13 +356,13 @@ struct nec_unidasm_t : nec_disassembler::config
 } nec_unidasm;
 
 
-static constexpr auto le = util::endianness::little;
-static constexpr auto be = util::endianness::big;
+static constexpr auto le = std::endian::little;
+static constexpr auto be = std::endian::big;
 
 struct dasm_table_entry
 {
 	const char *            name;
-	util::endianness        endian;
+	std::endian             endian;
 	int8_t                  pcshift;
 	std::function<util::disasm_interface *()> alloc;
 };
@@ -491,7 +480,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "hp_09825_67907",  be, -1, []() -> util::disasm_interface * { return new hp_09825_67907_disassembler; } },
 	{ "hpc16083",        le,  0, []() -> util::disasm_interface * { return new hpc16083_disassembler; } },
 	{ "hpc16164",        le,  0, []() -> util::disasm_interface * { return new hpc16164_disassembler; } },
-	{ "hyperstone",      be,  0, []() -> util::disasm_interface * { return new hyperstone_disassembler(&hyperstone_unidasm); } },
+	{ "hyperstone",      be,  0, []() -> util::disasm_interface * { return new hyperstone_disassembler(nullptr); } },
 	{ "ht1130",          le,  0, []() -> util::disasm_interface * { return new ht1130_disassembler; } },
 	{ "i4004",           le,  0, []() -> util::disasm_interface * { return new i4004_disassembler; } },
 	{ "i4040",           le,  0, []() -> util::disasm_interface * { return new i4040_disassembler; } },
@@ -1350,7 +1339,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 	// Compute the pc wraparound
 	offs_t pclength = opts.dasm->pcshift < 0 ? rounded_size >> -opts.dasm->pcshift : rounded_size << opts.dasm->pcshift;
 	offs_t limit = opts.basepc + pclength;
-	offs_t pc_mask = limit ? util::make_bitmask<offs_t>(32 - count_leading_zeros_32(limit - 1)) : 0xffffffff;
+	offs_t pc_mask = limit ? util::make_bitmask<offs_t>(std::bit_width(limit - 1)) : 0xffffffff;
 
 	// Compute the page wraparound
 	offs_t page_mask = flags & util::disasm_interface::PAGED ? (1 << disasm->page_address_bits()) - 1 : 0;
@@ -1397,7 +1386,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 	}
 
 	// Compute the shift amount from pc delta to granularity-sized elements
-	u32 granularity_shift = 31 - count_leading_zeros_32(disasm->opcode_alignment());
+	u32 granularity_shift = std::bit_width(disasm->opcode_alignment()) - 1;
 
 	// Number of pc steps to disassemble
 	u32 count = pclength;
@@ -1407,7 +1396,7 @@ int disasm_file(util::random_read &file, u64 length, options &opts)
 
 	// pc to string conversion
 	std::function<std::string (offs_t pc)> pc_to_string;
-	int aw = 32 - count_leading_zeros_32(pc_mask);
+	int aw = std::bit_width(pc_mask);
 	bool is_octal = opts.octal; // Parameter?  Per-cpu config?
 	if((flags & util::disasm_interface::PAGED2LEVEL) == util::disasm_interface::PAGED2LEVEL) {
 		int bits1 = disasm->page_address_bits();

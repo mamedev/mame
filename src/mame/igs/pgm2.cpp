@@ -778,7 +778,7 @@ void pgm2_state::pgm2(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	ymz774_device &ymz774(YMZ774(config, "ymz774", 16384000)); // is clock correct ?
+	ymz774_device &ymz774(YMZ774(config, "ymz774", 22.5792_MHz_XTAL));
 	ymz774.add_route(0, "speaker", 1.0, 0);
 	ymz774.add_route(1, "speaker", 1.0, 1);
 

@@ -299,7 +299,7 @@ inline void rp2c33_sound_device::exec_mod()
 		m_mod_acc += m_mod_freq; // input clock * frequency / 65536
 		while (m_mod_acc > 0xffff)
 		{
-			int val = m_mod_table[((m_mod_addr++) >> 1) & 0x1f] & 7;
+			const int val = m_mod_table[((m_mod_addr++) >> 1) & 0x1f] & 7;
 			m_mod_acc -= (1 << 16);
 			if (val == 4)
 				m_mod_pos = 0;

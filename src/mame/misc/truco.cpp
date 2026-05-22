@@ -497,7 +497,7 @@ void truco_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( truco )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )  PORT_NAME("Keyout enable Key")         // Connected to JAMMA S17 (P2 START)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )        PORT_NAME("Keyout enable Key")         // Connected to JAMMA S17 (P2 START)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                            // Connected to JAMMA S14 (SERVICE SW)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )         PORT_NAME("P1-4")PORT_CODE(KEYCODE_D)  // still not clear... Connected to JAMMA C26 (P2 SELECT)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN)                                            // Connected to JAMMA S16 (COIN2)

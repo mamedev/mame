@@ -123,7 +123,6 @@ namespace emu::detail {
 		void commit(u32 samples);
 		void sync();
 
-		void ensure_size(u32 buffer_size);
 		void set_history(u32 history);
 
 		u32 available_samples() const { return m_write_position - m_sync_position; }
@@ -155,7 +154,6 @@ namespace emu::detail {
 		void commit(u32 samples);
 		void sync();
 
-		void ensure_size(u32 buffer_size);
 		void set_history(u32 history);
 
 		void resample(u32 previous_rate, u32 next_rate, attotime sync_time, attotime now);

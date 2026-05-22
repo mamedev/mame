@@ -20,6 +20,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "cpu/i8089/i8089.h"
+#include "formats/apricotpc_dsk.h"
 #include "formats/apridisk.h"
 #include "imagedev/floppy.h"
 #include "machine/clock.h"
@@ -257,6 +258,7 @@ void apricot_state::fdc_intrq_w(int state)
 void apricot_state::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
+	fr.add(FLOPPY_APRICOTPC_FORMAT);
 	fr.add(FLOPPY_APRIDISK_FORMAT);
 }
 

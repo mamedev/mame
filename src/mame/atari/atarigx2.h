@@ -35,14 +35,17 @@ public:
 		, m_io_special(*this, "SPECIAL")
 	{ }
 
-	void init_spclords();
-	void init_rrreveng();
-	void init_motofren();
-	void atarigx2_0x200(machine_config &config);
-	void atarigx2_0x400(machine_config &config);
+	void init_spclords() ATTR_COLD;
+	void init_rrreveng() ATTR_COLD;
+	void init_motofren() ATTR_COLD;
+
+	void atarigx2_0x200(machine_config &config) ATTR_COLD;
+	void atarigx2_0x400(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
+
+private:
 	void video_int_ack_w(uint32_t data = 0);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 	uint32_t special_port2_r();
@@ -59,10 +62,9 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void atarigx2_mo_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void atarigx2(machine_config &config);
+	void atarigx2(machine_config &config) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
 
-private:
 	required_device<atari_jsa_iiis_device> m_jsa;
 	optional_device<atari_xga_device> m_xga;
 

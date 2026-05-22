@@ -36,6 +36,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/imageutl.cpp",
 		MAME_DIR .. "src/lib/formats/imageutl.h",
 
+		MAME_DIR .. "src/lib/formats/aiffile.cpp",
+		MAME_DIR .. "src/lib/formats/aiffile.h",
 		MAME_DIR .. "src/lib/formats/cassimg.cpp",
 		MAME_DIR .. "src/lib/formats/cassimg.h",
 		MAME_DIR .. "src/lib/formats/flacfile.cpp",
@@ -327,6 +329,18 @@ if opt_tool(FORMATS, "APPLIX_DSK") then
 	files {
 		MAME_DIR.. "src/lib/formats/applix_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/applix_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/apricotpc_dsk.h,FORMATS["APRICOTPC_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "APRICOTPC_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/apricotpc_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/apricotpc_dsk.h",
 	}
 end
 

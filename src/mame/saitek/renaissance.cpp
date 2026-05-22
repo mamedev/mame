@@ -112,6 +112,7 @@ private:
 	void leds_w(u8 data);
 	void control_w(u8 data);
 	u8 control_r();
+	void update_ack();
 	void exp_rts_w(int state);
 
 	u8 p2_r();
@@ -231,12 +232,17 @@ u8 ren_state::control_r()
 	return 0;
 }
 
+void ren_state::update_ack()
+{
+	if (m_rts_state != m_ack_state)
+		m_expansion->ack_w(!m_ack_state);
+}
+
 void ren_state::exp_rts_w(int state)
 {
-	// recursive NAND with ACK-P
-	if (state && m_ack_state)
-		m_expansion->ack_w(m_ack_state);
+	// SR latch to ACK-P
 	m_rts_state = state;
+	update_ack();
 }
 
 
@@ -284,11 +290,9 @@ void ren_state::p5_w(u8 data)
 	// P53: NAND with STB-P
 	m_stb->in_w<1>(BIT(data, 3));
 
-	// P55: expansion ACK-P (recursive NAND with RTS-P)
-	int ack_state = BIT(data, 5);
-	if (m_rts_state || !ack_state)
-		m_expansion->ack_w(ack_state);
-	m_ack_state = ack_state;
+	// P55: expansion ACK-P (SR latch with RTS-P)
+	m_ack_state = BIT(data, 5);
+	update_ack();
 
 	// P50: power-off on falling edge
 	m_expansion->pw_w(data & 1);
@@ -317,7 +321,7 @@ void ren_state::p6_w(u8 data)
 void ren_state::main_map(address_map &map)
 {
 	map(0x2000, 0x2000).w(FUNC(ren_state::mux_w));
-	map(0x2400, 0x2400).w(FUNC(ren_state::leds_w));
+	map(0x2400, 0x2400).nopr().w(FUNC(ren_state::leds_w));
 	map(0x2600, 0x2600).rw(FUNC(ren_state::control_r), FUNC(ren_state::control_w));
 	map(0x4000, 0x5fff).ram().share("nvram");
 	map(0x6000, 0x607f).w("lcd", FUNC(sed1502_device::write));

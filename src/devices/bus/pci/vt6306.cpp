@@ -57,7 +57,9 @@ void vt6306_device::device_start()
 	// INTA#
 	intr_pin = 1;
 
-	// TODO: min_gnt = 0x00, max_lat = 0x20
+	// min_gnt = <none>, max_lat = 8 usec
+	minimum_grant = 0x00;
+	maximum_latency = 0x20;
 }
 
 void vt6306_device::device_reset()

@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "psi_kbd.h"
+
 #include "ergoline.h"
 #include "hle.h"
 
@@ -35,6 +36,7 @@ psi_keyboard_bus_device::psi_keyboard_bus_device(const machine_config &mconfig, 
 	m_key_strobe_handler(*this),
 	m_key_data(0xff)
 {
+	set_options(psi_keyboard_devices, nullptr, false);
 }
 
 //-------------------------------------------------

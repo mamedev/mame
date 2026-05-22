@@ -904,10 +904,10 @@ ROM_START( exprraidbl ) // basically wexpress3 with Express Raider tilemap ROMs
 	ROM_LOAD( "1.12f", 0x0000, 0x8000, CRC(6ce11971) SHA1(16bfa69b3ad02253e81c8110c9b840be03952790) )
 
 	ROM_REGION( 0x0400, "proms", 0 ) // PROMs weren't dumped for this set, using the ones from the other
-	ROM_LOAD( "5b", 0x0000, 0x0100, CRC(da31dfbc) SHA1(ac476440864f538918f7bef2e1db82fd19195f89) ) // red
-	ROM_LOAD( "6b", 0x0100, 0x0100, CRC(51f25b4c) SHA1(bfcca57613fbb22919e00db1f6a8c7ca50faa60b) ) // green
-	ROM_LOAD( "7b", 0x0200, 0x0100, CRC(a6168d7f) SHA1(0c7b31adcd764ce2631c3fb5c1a968b01f65e741) ) // blue
-	ROM_LOAD( "9b", 0x0300, 0x0100, CRC(52aad300) SHA1(ff09772b930afa87e28d0628ef85a589a3d149c9) ) // priority
+	ROM_LOAD( "prom.5b", 0x0000, 0x0100, CRC(da31dfbc) SHA1(ac476440864f538918f7bef2e1db82fd19195f89) ) // red
+	ROM_LOAD( "prom.6b", 0x0100, 0x0100, CRC(51f25b4c) SHA1(bfcca57613fbb22919e00db1f6a8c7ca50faa60b) ) // green
+	ROM_LOAD( "prom.7b", 0x0200, 0x0100, CRC(a6168d7f) SHA1(0c7b31adcd764ce2631c3fb5c1a968b01f65e741) ) // blue
+	ROM_LOAD( "prom.9b", 0x0300, 0x0100, CRC(52aad300) SHA1(ff09772b930afa87e28d0628ef85a589a3d149c9) ) // priority
 ROM_END
 
 ROM_START( wexpress )

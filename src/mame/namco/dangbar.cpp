@@ -70,7 +70,7 @@ void dangbar_state::main_map(address_map &map)
 
 void dangbar_state::audio_map(address_map &map) // TODO: audio section seems similar to namcos2.cpp / namcos21.cpp
 {
-	map(0xd000, 0xffff).rom().region("audiocpu", 0x01000);
+	map(0xc000, 0xffff).rom().region("audiocpu", 0);
 }
 
 

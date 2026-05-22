@@ -27,7 +27,6 @@
 
 # NO_OPENGL = 0
 # USE_DISPATCH_GL = 0
-# MODERN_WIN_API = 0
 # USE_SDL = 1
 # SDL_INI_PATH = .;$HOME/.mame/;ini;
 # SDL2_MULTIAPI = 1
@@ -149,6 +148,10 @@ ifeq ($(MSYSTEM),MINGW32)
 PLATFORM := x86
 else ifeq ($(MSYSTEM),MINGW64)
 PLATFORM := x86
+else ifeq ($(MSYSTEM),UCRT64)
+PLATFORM := x86
+else ifeq ($(MSYSTEM),CLANG64)
+PLATFORM := x86
 else ifeq ($(MSYSTEM),CLANGARM64)
 PLATFORM := arm64
 else # MSYSTEM
@@ -209,12 +212,6 @@ endif
 
 ifeq ($(firstword $(filter Linux,$(UNAME))),Linux)
 OS := linux
-else ifeq ($(firstword $(filter Solaris,$(UNAME))),Solaris)
-OS := solaris
-GENIEOS := solaris
-else ifeq ($(firstword $(filter SunOS,$(UNAME))),SunOS)
-OS := solaris
-GENIEOS := solaris
 else ifeq ($(firstword $(filter FreeBSD,$(UNAME))),FreeBSD)
 OS := freebsd
 GENIEOS := bsd
@@ -245,6 +242,10 @@ MINGW := $(MINGW_PREFIX)
 ifeq ($(MSYSTEM),MINGW32)
 	MINGW32 := $(MINGW_PREFIX)
 else ifeq ($(MSYSTEM),MINGW64)
+	MINGW64 := $(MINGW_PREFIX)
+else ifeq ($(MSYSTEM),UCRT64)
+	MINGW64 := $(MINGW_PREFIX)
+else ifeq ($(MSYSTEM),CLANG64)
 	MINGW64 := $(MINGW_PREFIX)
 else ifeq ($(MSYSTEM),CLANGARM64)
 	MINGW64 := $(MINGW_PREFIX)
@@ -316,6 +317,10 @@ TARGETOS := windows
 ifeq ($(MSYSTEM),MINGW32)
 ARCHITECTURE = _x86
 else ifeq ($(MSYSTEM),MINGW64)
+ARCHITECTURE := _x64
+else ifeq ($(MSYSTEM),UCRT64)
+ARCHITECTURE := _x64
+else ifeq ($(MSYSTEM),CLANG64)
 ARCHITECTURE := _x64
 else ifeq ($(MSYSTEM),CLANGARM64)
 ARCHITECTURE := _x64
@@ -459,8 +464,6 @@ OSD := sdl
 else ifeq ($(TARGETOS),netbsd)
 OSD := sdl
 else ifeq ($(TARGETOS),openbsd)
-OSD := sdl
-else ifeq ($(TARGETOS),solaris)
 OSD := sdl
 else ifeq ($(TARGETOS),macosx)
 OSD := sdl3
@@ -741,10 +744,6 @@ endif
 
 ifdef USE_QTDEBUG
 PARAMS += --USE_QTDEBUG='$(USE_QTDEBUG)'
-endif
-
-ifdef MODERN_WIN_API
-PARAMS += --MODERN_WIN_API='$(MODERN_WIN_API)'
 endif
 
 ifdef USE_SDL
@@ -1136,11 +1135,22 @@ ifdef MSBUILD
 	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2022-clang/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
-.PHONY: vs2022_intel
-vs2022_intel: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2022
+#-------------------------------------------------
+# Visual Studio 2026
+#-------------------------------------------------
+
+.PHONY: vs2026
+vs2026: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2026
 ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2022-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2026/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+.PHONY: vs2026_clang
+vs2026_clang: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=clangcl vs2026
+ifdef MSBUILD
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2026-clang/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 #-------------------------------------------------
@@ -1316,48 +1326,6 @@ macosx_arm64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-osx-clang/Makefile
 macosx_x86_clang: generate $(PROJECTDIR)/$(MAKETYPE)-osx-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-osx-clang config=$(CONFIG)32 precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-osx-clang config=$(CONFIG)32
-
-#-------------------------------------------------
-# gmake-solaris
-#-------------------------------------------------
-
-ifndef CLANG_VERSION
-$(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=solaris --gcc_version=$(GCC_VERSION) $(MAKETYPE)
-endif
-.PHONY: solaris_x64
-solaris_x64: generate $(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)64 precompile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)64
-
-.PHONY: solaris
-solaris: solaris_x86
-
-.PHONY: solaris_x86
-solaris_x86: generate $(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)32 precompile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)32
-
-#-------------------------------------------------
-# gmake-solaris-clang
-#-------------------------------------------------
-
-ifdef CLANG_VERSION
-$(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=solaris --gcc_version=$(CLANG_VERSION) $(MAKETYPE)
-endif
-.PHONY: solaris_x64_clang
-solaris_x64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)64 precompile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)64
-
-.PHONY: solaris_clang
-solaris_clang: solaris_x86_clang
-
-.PHONY: solaris_x86_clang
-solaris_x86_clang: generate $(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)32 precompile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)32
 
 #-------------------------------------------------
 # gmake-freebsd
@@ -1537,7 +1505,7 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.286"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.287"' > $@
 	@echo '#define BARE_VCS_REVISION "$(NEW_GIT_VERSION)"' >> $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char bare_vcs_revision[];' >> $@
@@ -1547,7 +1515,7 @@ $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " (" BARE_VCS_REVISION ")";' >> $@
 else
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo #define BARE_BUILD_VERSION "0.286" > $@
+	@echo #define BARE_BUILD_VERSION "0.287" > $@
 	@echo #define BARE_VCS_REVISION "$(NEW_GIT_VERSION)" >> $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char bare_vcs_revision[]; >> $@

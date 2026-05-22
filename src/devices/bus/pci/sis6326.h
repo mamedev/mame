@@ -51,7 +51,13 @@ private:
 	u8 m_draw_sel;
 	u16 m_src_pitch, m_dst_pitch;
 	u16 m_rect_width, m_rect_height;
-	u32 m_fg_color, m_bg_color;
+
+	union COLOR_DRAW {
+		u8 b[4];
+		u32 u;
+	};
+
+	COLOR_DRAW m_fg_color, m_bg_color;
 	u8 m_fg_rop, m_bg_rop;
 	u8 m_mask[8];
 	u16 m_clip_top, m_clip_left, m_clip_bottom, m_clip_right;
@@ -59,19 +65,19 @@ private:
 	u16 m_draw_command;
 	u8 m_pattern_data[128];
 
-	typedef u8 (sis6326_pci_device::*get_src_func)(u32 offset_base, u32 x);
+	typedef u8 (sis6326_pci_device::*get_src_func)(u32 offset_base, u32 x, u8 shifter);
 	static const get_src_func get_src_table[4];
-	u8 get_src_bgcol(u32 offset_base, u32 x);
-	u8 get_src_fgcol(u32 offset_base, u32 x);
-	u8 get_src_mem(u32 offset_base, u32 x);
-	u8 get_src_cpu(u32 offset_base, u32 x);
+	u8 get_src_bgcol(u32 offset_base, u32 x, u8 shifter);
+	u8 get_src_fgcol(u32 offset_base, u32 x, u8 shifter);
+	u8 get_src_mem(u32 offset_base, u32 x, u8 shifter);
+	u8 get_src_cpu(u32 offset_base, u32 x, u8 shifter);
 
-	typedef u8 (sis6326_pci_device::*get_pat_func)(u32 offset_base, u32 x);
+	typedef u8 (sis6326_pci_device::*get_pat_func)(u32 offset_base, u32 x, u8 shifter);
 	static const get_pat_func get_pat_table[4];
-	u8 get_pat_bgcol(u32 y, u32 x);
-	u8 get_pat_fgcol(u32 y, u32 x);
-	u8 get_pat_regs(u32 y, u32 x);
-	u8 get_pat_ddraw(u32 y, u32 x);
+	u8 get_pat_bgcol(u32 y, u32 x, u8 shifter);
+	u8 get_pat_fgcol(u32 y, u32 x, u8 shifter);
+	u8 get_pat_regs(u32 y, u32 x, u8 shifter);
+	u8 get_pat_ddraw(u32 y, u32 x, u8 shifter);
 	u32 GetROP(u8 rop, u32 src, u32 dst, u32 pat);
 
 };
@@ -82,6 +88,8 @@ public:
 	sis6326_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	sis6326_agp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
@@ -100,7 +108,19 @@ private:
 	void agp_command_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 };
 
+class sis6326_dvd_device : public sis6326_agp_device
+{
+public:
+	sis6326_dvd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
+
 DECLARE_DEVICE_TYPE(SIS6326_PCI, sis6326_pci_device)
 DECLARE_DEVICE_TYPE(SIS6326_AGP, sis6326_agp_device)
+DECLARE_DEVICE_TYPE(SIS6326_DVD, sis6326_dvd_device)
 
 #endif // MAME_BUS_PCI_SIS6326_H

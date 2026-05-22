@@ -80,7 +80,7 @@ private:
 		std::vector<float> m_volumes;
 		abuffer m_buffer;
 
-		stream_info(sound_pulse *pulse, uint32_t osdid, uint32_t channels) : m_pulse(pulse), m_osdid(osdid), m_pulse_id(0), m_channels(channels), m_stream(nullptr), m_volumes(channels), m_buffer(channels) {}
+		stream_info(sound_pulse *pulse, uint32_t osdid, uint32_t channels, uint32_t rate) : m_pulse(pulse), m_osdid(osdid), m_pulse_id(0), m_channels(channels), m_stream(nullptr), m_volumes(channels), m_buffer(channels, rate) {}
 	};
 
 	std::map<uint32_t, node_info> m_nodes;
@@ -448,7 +448,7 @@ uint32_t sound_pulse::stream_sink_open(uint32_t node, std::string name, uint32_t
 	node_info &snode = m_nodes.find(ni->second)->second;
 
 	uint32_t id = m_stream_current_id++;
-	auto &stream = m_streams.emplace(id, stream_info(this, id, snode.m_sink_port_count)).first->second;
+	auto &stream = m_streams.emplace(id, stream_info(this, id, snode.m_sink_port_count, rate)).first->second;
 
 	pa_sample_spec ss;
 #ifdef LSB_FIRST

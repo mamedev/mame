@@ -33,6 +33,7 @@
 #include "a2sam.h"
 #include "a2scsi.h"
 #include "a2sd.h"
+#include "a2sic.h"
 #include "a2softcard.h"
 #include "a2ssc.h"
 #include "a2superdrive.h"
@@ -70,6 +71,7 @@
 #include "ssbapple.h"
 #include "ssprite.h"
 #include "suprterminal.h"
+#include "sweetalk.h"
 #include "timemasterho.h"
 #include "titan3plus2.h"
 #include "transwarp.h"
@@ -161,6 +163,8 @@ void apple2_cards(device_slot_interface &device)
 	device.option_add("romcardfp", A2BUS_ROMCARDFP);           // Apple II ROM Card with Autostart Monitor + Applesoft BASIC
 	device.option_add("romcardint", A2BUS_ROMCARDINT);         // Apple II ROM Card with Autostart Monitor + Integer BASIC
 	device.option_add("ap2", A2BUS_IBSAP2);                    // IBS Computertechnik AP 2 Serial Interface
+	device.option_add("sic", A2BUS_SIC);                       // Apple II Serial Interface Card
+	device.option_add("sweetalk", A2BUS_SWEETALK);             // Micromint Sweet Talker Phonetic Speech Synthesizer Interface
 }
 
 void apple2e_cards(device_slot_interface &device)
@@ -248,6 +252,8 @@ void apple2e_cards(device_slot_interface &device)
 	device.option_add("romcardfp", A2BUS_ROMCARDFP);           // Apple II ROM Card with Autostart Monitor + Applesoft BASIC
 	device.option_add("romcardint", A2BUS_ROMCARDINT);         // Apple II ROM Card with Autostart Monitor + Integer BASIC
 	device.option_add("ap2", A2BUS_IBSAP2);                    // IBS Computertechnik AP 2 Serial Interface
+	device.option_add("sic", A2BUS_SIC);                       // Apple II Serial Interface Card
+	device.option_add("sweetalk", A2BUS_SWEETALK);             // Micromint Sweet Talker Phonetic Speech Synthesizer Interface
 }
 
 void apple2gs_cards(device_slot_interface &device)
@@ -324,6 +330,7 @@ void apple2gs_cards(device_slot_interface &device)
 	device.option_add("wicotrackball", A2BUS_WICOTRACKBALL);   // Wico Trackball
 	device.option_add("ieee488", A2BUS_IEEE488);               // Apple II IEEE-488 Interface Card
 	device.option_add("ap2", A2BUS_IBSAP2);                    // IBS Computertechnik AP 2 Serial Interface
+	device.option_add("sweetalk", A2BUS_SWEETALK);             // Micromint Sweet Talker Phonetic Speech Synthesizer Interface
 }
 
 void apple3_cards(device_slot_interface &device)

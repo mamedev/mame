@@ -94,6 +94,10 @@
 #include "applix_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_APRICOTPC_DSK
+#include "apricotpc_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_APRIDISK
 #include "apridisk.h"
 #endif
@@ -936,6 +940,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 
 	en.category("Apricot");
+#ifdef HAS_FORMATS_APRICOTPC_DSK
+	en.add(FLOPPY_APRICOTPC_FORMAT); // apricotpc_dsk.h
+#endif
 #ifdef HAS_FORMATS_APRIDISK
 	en.add(FLOPPY_APRIDISK_FORMAT); // apridisk.h
 #endif

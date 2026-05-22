@@ -19,7 +19,11 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	void evolhh(machine_config &config);
+	void evolhh(machine_config &config) ATTR_COLD;
+	void smkatsum(machine_config &config) ATTR_COLD;
+	void buttdtct(machine_config &config) ATTR_COLD;
+	void pokeqz(machine_config &config) ATTR_COLD;
+	void udrive(machine_config &config) ATTR_COLD;
 
 	void init_yuleyuan();
 
@@ -32,6 +36,13 @@ private:
 	required_device<sonix16_device> m_maincpu;
 
 	void evolution_map(address_map &map) ATTR_COLD;
+	void evolution_ram_map(address_map &map) ATTR_COLD;
+	void smkatsum_map(address_map &map) ATTR_COLD;
+	void smkatsum_ram_map(address_map &map) ATTR_COLD;
+	void buttdtct_ram_map(address_map &map) ATTR_COLD;
+	void pokeqz_map(address_map &map) ATTR_COLD;
+	void udrive_map(address_map &map) ATTR_COLD;
+	void udrive_ram_map(address_map &map) ATTR_COLD;
 };
 
 void evolution_handheldgame_state::machine_start()
@@ -53,7 +64,51 @@ uint32_t evolution_handheldgame_state::screen_update(screen_device &screen, bitm
 
 void evolution_handheldgame_state::evolution_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).mirror(0x400000).rom().region("maincpu", 0x00000);
+	map(0x000000, 0x00ffff).rom().region("bootstrap", 0);
+	map(0x400000, 0x5fffff).rom().region("maincpu", 0);
+}
+
+void evolution_handheldgame_state::evolution_ram_map(address_map &map)
+{
+	map(0x000000, 0x0003ff).ram();
+	map(0x00a000, 0x00bfff).ram();
+	map(0x200000, 0x207fff).ram();
+	map(0x400000, 0x5fffff).rom().region("maincpu", 0);
+}
+
+void evolution_handheldgame_state::smkatsum_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom().region("maincpu", 0);
+}
+
+void evolution_handheldgame_state::smkatsum_ram_map(address_map &map)
+{
+	map(0x000000, 0x002fff).ram();
+}
+
+void evolution_handheldgame_state::buttdtct_ram_map(address_map &map)
+{
+	map(0x000000, 0x003fff).ram();
+}
+
+void evolution_handheldgame_state::pokeqz_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom().mirror(0x400000).region("maincpu", 0); // ?
+}
+
+void evolution_handheldgame_state::udrive_map(address_map &map)
+{
+	map(0x000000, 0x000001).rom().region("maincpu", 0); // bootstrap or mirror?
+	map(0x400000, 0x7fffff).rom().region("maincpu", 0);
+}
+
+void evolution_handheldgame_state::udrive_ram_map(address_map &map)
+{
+	map(0x000000, 0x0037ff).ram();
+	map(0x005000, 0x0052ff).ram();
+	map(0x005800, 0x0059ff).ram();
+	map(0x006000, 0x0063ff).ram();
+	map(0x007000, 0x0071ff).ram();
 }
 
 
@@ -61,6 +116,7 @@ void evolution_handheldgame_state::evolhh(machine_config &config)
 {
 	SONIX16(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &evolution_handheldgame_state::evolution_map);
+	m_maincpu->set_addrmap(AS_DATA, &evolution_handheldgame_state::evolution_ram_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -72,7 +128,46 @@ void evolution_handheldgame_state::evolhh(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 }
 
+void evolution_handheldgame_state::smkatsum(machine_config &config)
+{
+	evolhh(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &evolution_handheldgame_state::smkatsum_map);
+	m_maincpu->set_addrmap(AS_DATA, &evolution_handheldgame_state::smkatsum_ram_map);
+}
+
+void evolution_handheldgame_state::buttdtct(machine_config &config)
+{
+	smkatsum(config);
+
+	m_maincpu->set_addrmap(AS_DATA, &evolution_handheldgame_state::buttdtct_ram_map);
+}
+
+void evolution_handheldgame_state::pokeqz(machine_config &config)
+{
+	smkatsum(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &evolution_handheldgame_state::pokeqz_map);
+}
+
+void evolution_handheldgame_state::udrive(machine_config &config)
+{
+	evolhh(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &evolution_handheldgame_state::udrive_map);
+	m_maincpu->set_addrmap(AS_DATA, &evolution_handheldgame_state::udrive_ram_map);
+}
+
 ROM_START( evolhh )
+	ROM_REGION16_LE( 0x20000, "bootstrap", 0 )
+	ROM_LOAD( "bootstrap.bin", 0x00000, 0x20000, NO_DUMP ) // precise extent unknown
+	ROM_FILL( 0x00000, 1, 0x40 )
+	ROM_FILL( 0x00001, 1, 0xfe )
+	ROM_FILL( 0x00002, 1, 0x04 )
+	ROM_FILL( 0x00003, 1, 0x00 )
+	ROM_FILL( 0x1537a, 1, 0x42 )
+	ROM_FILL( 0x1537b, 1, 0xff )
+
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD( "s29gl032m90tfir4.u4", 0x000000, 0x400000, CRC(c647ca01) SHA1(a88f512d3fe8803dadc4eb6a94b5babd40c698de) )
 ROM_END
@@ -125,6 +220,12 @@ ROM_START( hoppech )
 	ROM_LOAD( "25l128.u3", 0x000000, 0x1000000, CRC(4a983ab2) SHA1(d5571cf0f3fcf872826a2ff8b45be69336b117dd) )
 ROM_END
 
+ROM_START( udrive )
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	ROM_LOAD( "udrive.u3", 0x000000, 0x800000, CRC(c7fd123f) SHA1(8b315e594f7bf99544f323e517ccdebf2b1ac8a7) )
+ROM_END
+
+
 void evolution_handheldgame_state::init_yuleyuan()
 {
 	u16 *spi = &memregion("maincpu")->as_u16();
@@ -137,20 +238,24 @@ void evolution_handheldgame_state::init_yuleyuan()
 
 CONS( 2006, evolhh,      0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Kidz Delight", "Evolution Max", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a pink 'for girls' unit, exists in other colours, software likely the same
 
-CONS( 2018, smkatsum,    0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "San-X / Tomy", "Sumikko Gurashi - Sumikko Atsume (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2018, smkatsum,    0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "San-X / Tomy", "Sumikko Gurashi - Sumikko Atsume (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // おしりたんてい ププッとかいけつゲーム
-CONS( 2020, buttdtct,    0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Tomy", "Oshiri Tantei - Puputto Kaiketsu Game (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2020, buttdtct,    0,       0,      buttdtct, evolhh, evolution_handheldgame_state, empty_init, "Tomy", "Oshiri Tantei - Puputto Kaiketsu Game (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 2015, pokexyqz,    0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Pokemon Encyclopedia Z Pokemon XY Quiz Game Rotom (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2015, pokexyqz,    0,       0,      pokeqz, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Pokemon Encyclopedia Z Pokemon XY Quiz Game Rotom (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // ロトム図鑑 サン＆ムーン ポケモン クイズ
-CONS( 2015, pokesmqz,    0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Rotom Zukan Sun & Moon Pokemon Quiz (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2015, pokesmqz,    0,       0,      pokeqz, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Rotom Zukan Sun & Moon Pokemon Quiz (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 201?, tomyspt,     0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Pretty Rhythm Smart Pod Touch (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 201?, tomyspt,     0,       0,      pokeqz, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Pretty Rhythm Smart Pod Touch (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // ほっぺちゃん スイ☆コレ　ホワイト
-CONS( 201?, hoppech,     0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Hoppe-chan SuiColle (white, Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 201?, hoppech,     0,       0,      pokeqz, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Hoppe-chan SuiColle (white, Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // 星座电子宠物机 (virtual pet by 育乐元)
-CONS( 2022, yuleyuan,    0,       0,      evolhh, evolhh, evolution_handheldgame_state, init_yuleyuan, "Yule Yuan", "Xingzuo Dianzi Chongwu Ji", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // dumped from yellow model
+CONS( 2022, yuleyuan,    0,       0,      pokeqz, evolhh, evolution_handheldgame_state, init_yuleyuan, "Yule Yuan", "Xingzuo Dianzi Chongwu Ji", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // dumped from yellow model
+
+// this uses TV output, rather than being a handheld
+// SONIX SNT110FG SoC, test mode shows '4941' as checksum
+CONS( 201?, udrive,     0,       0,       udrive, evolhh, evolution_handheldgame_state, empty_init, "MGA", "Little Tikes Cozy Coupe U-Drive", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

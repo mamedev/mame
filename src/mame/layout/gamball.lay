@@ -310,7 +310,7 @@ license:CC0-1.0
 			<bounds x="85" y="520.6666" width="49" height="29.3333"/>
 		</element>
 
-		<element name="sreel1" ref="SteppersReel1" state="0">
+		<element name="reel1:scroll" ref="SteppersReel1" state="0">
 			<bounds x="85" y="463" width="49" height="87.9999"/>
 		</element>
 
@@ -371,7 +371,7 @@ license:CC0-1.0
 		<element name="lamp17" ref="reellamp" state="0">
 			<bounds x="161" y="520.6666" width="49" height="29.3333"/>
 		</element>
-		<element name="sreel2" ref="SteppersReel2" state="96">
+		<element name="reel2:scroll" ref="SteppersReel2" state="96">
 			<bounds x="161" y="463" width="49" height="87.9999"/>
 		</element>
 		<element name="lamp2" ref="reellamp" state="0">
@@ -383,7 +383,7 @@ license:CC0-1.0
 		<element name="lamp18" ref="reellamp" state="0">
 			<bounds x="236" y="520.6666" width="49" height="29.3333"/>
 		</element>
-		<element name="sreel3" ref="SteppersReel3" state="96">
+		<element name="reel3:scroll" ref="SteppersReel3" state="96">
 			<bounds x="236" y="463" width="49" height="87.9999"/>
 		</element>
 		<element name="lamp3" ref="reellamp" state="0">
@@ -395,7 +395,7 @@ license:CC0-1.0
 		<element name="lamp19" ref="reellamp" state="0">
 			<bounds x="311" y="520.6666" width="49" height="29.3333"/>
 		</element>
-		<element name="sreel4" ref="SteppersReel4" state="96">
+		<element name="reel4:scroll" ref="SteppersReel4" state="96">
 			<bounds x="311" y="463" width="49" height="87.9999"/>
 		</element>
 		<element name="lamp68" ref="1" state="0">

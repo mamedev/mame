@@ -233,7 +233,7 @@ void taitoair_state::lineram_w(offs_t offset, u16 data, u16 mem_mask)
 		m_line_ram[offset] = data;
 
 	//if (offset == 0x3fff)
-	//  printf("LineRAM go %d\n",(int)m_screen->frame_number());
+	//  logerror("LineRAM go %d\n", m_screen->frame_number());
 }
 
 u16 taitoair_state::dspram_r(offs_t offset)
@@ -346,7 +346,7 @@ void taitoair_state::sound_bankswitch_w(u8 data)
 */
 void taitoair_state::dma_regs_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	printf("%08x %04x\n",offset,data);
+	logerror("dma_regs_w: %08x %04x\n", offset, data);
 
 	if (offset == 0 && ACCESSING_BITS_8_15)
 	{
@@ -771,8 +771,8 @@ ROM_START( topland )
 	ROM_LOAD16_BYTE( "b62-21.35", 0x00000, 0x02000, CRC(5f38460d) SHA1(0593718d15b30b10f7686959932e2c934de2a529) )  // cpu board
 	ROM_LOAD16_BYTE( "b62-20.6",  0x00001, 0x02000, CRC(a4afe958) SHA1(7593a327f4ea0cc9e28fd3269278871f62fb0598) )  // cpu board
 
-	ROM_REGION( 0x10000, "mechacpu", 0 )
-	ROM_LOAD( "b62_mecha.rom", 0x00000, 0x08000, NO_DUMP )
+	ROM_REGION( 0x10000, "mechacpu", 0 ) // on POWER P.C. BOARD J3000014A
+	ROM_LOAD( "b09_37.13", 0x00000, 0x08000, CRC(4bdf15ed) SHA1(b960208e63cede116925e064279a6cf107aef81c) ) // same as mlanding
 
 	ROM_REGION( 0x100000, "tc0080vco", 0 )   /* 16x16 tiles */
 	ROM_LOAD64_BYTE( "b62-33.39",  0x000007, 0x20000, CRC(38786867) SHA1(7292e3fa69cad6494f2e8e7efa9c3f989bdf958d) )
@@ -820,8 +820,8 @@ ROM_START( toplandj )
 	ROM_LOAD16_BYTE( "b62-21.35", 0x00000, 0x02000, CRC(5f38460d) SHA1(0593718d15b30b10f7686959932e2c934de2a529) )  // cpu board
 	ROM_LOAD16_BYTE( "b62-20.6",  0x00001, 0x02000, CRC(a4afe958) SHA1(7593a327f4ea0cc9e28fd3269278871f62fb0598) )  // cpu board
 
-	ROM_REGION( 0x10000, "mechacpu", 0 )
-	ROM_LOAD( "b62_mecha.rom", 0x00000, 0x08000, NO_DUMP )
+	ROM_REGION( 0x10000, "mechacpu", 0 ) // on POWER P.C. BOARD J3000014A
+	ROM_LOAD( "b09_37.13", 0x00000, 0x08000, CRC(4bdf15ed) SHA1(b960208e63cede116925e064279a6cf107aef81c) ) // same as mlanding
 
 	ROM_REGION( 0x100000, "tc0080vco", 0 )   /* 16x16 tiles */
 	ROM_LOAD64_BYTE( "b62-33.39",  0x000007, 0x20000, CRC(38786867) SHA1(7292e3fa69cad6494f2e8e7efa9c3f989bdf958d) )

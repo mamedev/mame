@@ -47,7 +47,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_lcdctrl(*this, "lcdctrl")
 		, m_screen(*this, "screen")
-		, m_cart(*this, "cart")
+		, m_cart(*this, "cartslot")
 		, m_nvram(*this, "nvram")
 		, m_in_kbd(*this, { "RIGHT", "LEFT" })
 	{ }

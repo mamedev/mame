@@ -25,8 +25,8 @@
 
 namespace ui {
 
-menu_audio_effects::menu_audio_effects(mame_ui_manager &mui, render_container &container)
-	: menu(mui, container)
+menu_audio_effects::menu_audio_effects(mame_ui_manager &mui, render_target &target)
+	: menu(mui, target)
 {
 	set_heading(_("menu-aeffect", "Audio Effects"));
 	set_process_flags(PROCESS_LR_REPEAT);
@@ -74,19 +74,19 @@ bool menu_audio_effects::handle(event const *ev)
 		audio_effect *eff = chain == 0xffff ? machine().sound().default_effect_chain()[entry] : machine().sound().effect_chain(chain)[entry];
 		switch(eff->type()) {
 		case audio_effect::COMPRESSOR:
-			menu::stack_push<menu_audio_effect_compressor>(ui(), container(), chain, entry, eff);
+			menu::stack_push<menu_audio_effect_compressor>(ui(), target(), chain, entry, eff);
 			break;
 
 		case audio_effect::EQ:
-			menu::stack_push<menu_audio_effect_eq>(ui(), container(), chain, entry, eff);
+			menu::stack_push<menu_audio_effect_eq>(ui(), target(), chain, entry, eff);
 			break;
 
 		case audio_effect::FILTER:
-			menu::stack_push<menu_audio_effect_filter>(ui(), container(), chain, entry, eff);
+			menu::stack_push<menu_audio_effect_filter>(ui(), target(), chain, entry, eff);
 			break;
 
 		case audio_effect::REVERB:
-			menu::stack_push<menu_audio_effect_reverb>(ui(), container(), chain, entry, eff);
+			menu::stack_push<menu_audio_effect_reverb>(ui(), target(), chain, entry, eff);
 			break;
 		}
 		return true;
@@ -211,7 +211,7 @@ u32 menu_audio_effects::flag_latency() const
 	if(latency < 0.05f)
 		flag |= FLAG_RIGHT_ARROW;
 	if(machine().sound().resampler_type() != sound_manager::RESAMPLER_HQ)
-		flag |= FLAG_INVERT | FLAG_DISABLE;
+		flag |= FLAG_DEEMPHASIZE | FLAG_DISABLE;
 	return flag;
 }
 
@@ -224,7 +224,7 @@ u32 menu_audio_effects::flag_length() const
 	if(length < 500)
 		flag |= FLAG_RIGHT_ARROW;
 	if(machine().sound().resampler_type() != sound_manager::RESAMPLER_HQ)
-		flag |= FLAG_INVERT | FLAG_DISABLE;
+		flag |= FLAG_DEEMPHASIZE | FLAG_DISABLE;
 	return flag;
 }
 
@@ -237,7 +237,7 @@ u32 menu_audio_effects::flag_phases() const
 	if(phases < 1000)
 		flag |= FLAG_RIGHT_ARROW;
 	if(machine().sound().resampler_type() != sound_manager::RESAMPLER_HQ)
-		flag |= FLAG_INVERT | FLAG_DISABLE;
+		flag |= FLAG_DEEMPHASIZE | FLAG_DISABLE;
 	return flag;
 }
 

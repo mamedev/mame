@@ -493,7 +493,7 @@ void ncd16_state::configure(machine_config &config)
 	M68705P3(config, m_mcu, 3'750'000);
 
 	// ethernet
-	AM7990(config, m_lance);
+	AM7990(config, m_lance, 20_MHz_XTAL / 2);
 	m_lance->intr_out().set_inputline(m_maincpu, M68K_IRQ_3).invert();
 	m_lance->dma_in().set(FUNC(ncd16_state::lance_dma_r));
 	m_lance->dma_out().set(FUNC(ncd16_state::lance_dma_w));
@@ -542,7 +542,7 @@ void ncd17c_state::configure(machine_config &config)
 	M6805P2(config, m_mcu, 3'750'000);
 
 	// ethernet
-	AM7990(config, m_lance);
+	AM7990(config, m_lance, 20_MHz_XTAL / 2);
 	m_lance->intr_out().set_inputline(m_maincpu, M68K_IRQ_3).invert();
 	m_lance->dma_in().set(FUNC(ncd17c_state::lance_dma_r));
 	m_lance->dma_out().set(FUNC(ncd17c_state::lance_dma_w));
@@ -577,7 +577,7 @@ void ncd19_state::configure(machine_config &config)
 	M6805P2(config, m_mcu, 15_MHz_XTAL / 4);
 
 	// ethernet
-	AM7990(config, m_lance);
+	AM7990(config, m_lance, 20_MHz_XTAL / 2);
 	m_lance->intr_out().set_inputline(m_maincpu, M68K_IRQ_3).invert();
 	m_lance->dma_in().set(FUNC(ncd19_state::lance_dma_r));
 	m_lance->dma_out().set(FUNC(ncd19_state::lance_dma_w));

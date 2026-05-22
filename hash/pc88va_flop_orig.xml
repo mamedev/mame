@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="pc88va_flop_orig" description="NEC PC-88VA original disk images">
+
+	<software name="alantia" supported="no">
+		<description>Alantia VA Special</description>
+		<year>1988</year>
+		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
+		<notes><![CDATA[
+Garbage layer covering title and gameplay
+[FDC] randomly doesn't boot
+]]></notes>
+		<info name="alt_title" value="アランティアＶＡスペシャル" />
+		<info name="developer" value="Cross Media Soft" />
+		<info name="release" value="198811xx" />
+		<!-- TODO: claims Disks 1 ~ 2 ~ 3 when swapping, but package comes with A ~ B ~ C (?) -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="6438423">
+				<rom name="alantia va special (disk a).mfi" size="6438423" crc="35fd853b" sha1="4f46f322f34156f1ffc81282f646303709c9a58a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="5302992">
+				<rom name="alantia va special (disk b).mfi" size="5302992" crc="d83082dc" sha1="a8e167fbe2ebc41918da54dc55b982bfdcb193dc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="5509048">
+				<rom name="alantia va special (disk c).mfi" size="5509048" crc="8062f0be" sha1="624f2173c76f3ebefda462dbb51cc419c5e10e07" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fqueen" supported="no">
+		<description>First Queen</description>
+		<year>1989</year>
+		<publisher>呉ソフトウェア工房 (Kure Software Koubou)</publisher>
+		<notes><![CDATA[
+Text boxes often don't draw properly, making readability hard
+]]></notes>
+		<info name="alt_title" value="ファーストクイーン" />
+		<info name="release" value="198901xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="5469380">
+				<rom name="firstqueen (disk a).mfi" size="5469380" crc="d6a94fd1" sha1="a11abc42dfa99d45ed4c843efa1eb3b30b6ec8fc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="5842664">
+				<rom name="firstqueen (disk b).mfi" size="5842664" crc="1f89112e" sha1="cadc1dfca83cdcbdb13e82a4f01a5c1ebf54bda3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kawaisom" supported="no">
+		<description>Kawaisou Monogatari</description>
+		<year>1987</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<notes><![CDATA[
+[FDC] DISK ERROR at startup
+]]></notes>
+		<info name="alt_title" value="かわいそう物語" />
+		<info name="release" value="198712xx" />
+		<sharedfeat name="mouseport_default" value="mouse"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="5329817">
+				<rom name="kawaisou monogatari (disk a).mfi" size="5329817" crc="36f34b1" sha1="06b6088aec27c4e44cd0f09c3fb5fd3774c64e8e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="5363454">
+				<rom name="kawaisou monogatari (disk b).mfi" size="5363454" crc="1347cbc4" sha1="7929f48c649857e2ed5a03fcbf8a61534ee1e9f6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Original Scenario Disk"/>
+			<dataarea name="flop" size="5285696">
+				<rom name="kawaisou monogatari (original scenario disk).mfi" size="5285696" crc="931980ca" sha1="43253b591dc48a72d45436793c7398fa4edc1e69" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lodoss" supported="no">
+		<description>Record of Lodoss War - Haiiro no Majo</description>
+		<year>1988</year>
+		<publisher>ハミングバード (HummingBird)</publisher>
+		<notes><![CDATA[
+[FDC] randomly black screen
+]]></notes>
+		<info name="alt_title" value="ロードス島戦記 灰色の魔女" />
+		<info name="release" value="198809xx" />
+		<sharedfeat name="mouseport_default" value="mouse"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk"/>
+			<dataarea name="flop" size="5952678">
+				<rom name="lodoss-tou senki - haiiro no majo (program disk).mfi" size="5952678" crc="99d7e0b8" sha1="c66181cd2c1e0f02bc95705077c68e4d39e480a5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Save Disk"/>
+			<dataarea name="flop" size="5650068">
+				<rom name="lodoss-tou senki - haiiro no majo (save disk).mfi" size="5650068" crc="9ac52112" sha1="828f0f9a9d819fc506b0cc6d94cabc129f5c5a06" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Scenario Disk"/>
+			<dataarea name="flop" size="6232910">
+				<rom name="lodoss-tou senki - haiiro no majo (scenario disk).mfi" size="6232910" crc="c2959317" sha1="27125b0551563d411aa649dc0e319ff1a699a69c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

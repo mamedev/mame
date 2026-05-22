@@ -28,6 +28,13 @@ public:
 		, m_decwriter(*this, "decwriter")
 		, m_tty(*this, "teletype")
 		, m_mode_button(*this, "MODE_BUTTON%u", 0U)
+		, m_output_acc(*this, "acc%u")
+		, m_output_opcode(*this, "opcode%u")
+		, m_output_mem_data(*this, "mem_data%u")
+		, m_output_mem_addr(*this, "mem_addr%u")
+		, m_output_pc(*this, "pc%u")
+		, m_output_rc(*this, "rc%u")
+		, m_output_flags(*this, "flags%u")
 	{ }
 
 	void init_patinho_feio() ATTR_COLD;
@@ -58,13 +65,20 @@ protected:
 
 private:
 	output_finder<6> m_mode_button;
+	output_finder<8> m_output_acc;
+	output_finder<8> m_output_opcode;
+	output_finder<8> m_output_mem_data;
+	output_finder<12> m_output_mem_addr;
+	output_finder<12> m_output_pc;
+	output_finder<12> m_output_rc;
+	output_finder<2> m_output_flags;
+
 	uint8_t* paper_tape_data = nullptr;
 	uint32_t paper_tape_length = 0;
 	uint32_t paper_tape_address = 0;
 
 	emu_timer *m_decwriter_timer = nullptr;
 	emu_timer *m_teletype_timer = nullptr;
-	output_manager *m_out = nullptr;
 	uint8_t m_prev_ACC = 0;
 	uint8_t m_prev_opcode = 0;
 	uint8_t m_prev_mem_data = 0;
@@ -77,7 +91,6 @@ private:
 
 void patinho_feio_state::init_patinho_feio()
 {
-	m_out = &output();
 	m_prev_ACC = 0;
 	m_prev_opcode = 0;
 	m_prev_mem_data = 0;
@@ -88,24 +101,19 @@ void patinho_feio_state::init_patinho_feio()
 }
 
 void patinho_feio_state::update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_data, uint16_t mem_addr, uint16_t PC, uint8_t FLAGS, uint16_t RC, uint8_t mode){
-	char lamp_id[11];
-
 	for (int i=0; i<6; i++){
 		m_mode_button[i] = (mode == i) ? 1 : 0;
 	}
 
 	for (int i=0; i<8; i++){
 		if ((m_prev_ACC ^ ACC) & (1 << i)){
-			sprintf(lamp_id, "acc%d", i);
-			m_out->set_value(lamp_id, (ACC >> i) & 1);
+			m_output_acc[i] = (ACC >> i) & 1;
 		}
 		if ((m_prev_opcode ^ opcode) & (1 << i)){
-			sprintf(lamp_id, "opcode%d", i);
-			m_out->set_value(lamp_id, (opcode >> i) & 1);
+			m_output_opcode[i] = (opcode >> i) & 1;
 		}
 		if ((m_prev_mem_data ^ mem_data) & (1 << i)){
-			sprintf(lamp_id, "mem_data%d", i);
-			m_out->set_value(lamp_id, (mem_data >> i) & 1);
+			m_output_mem_data[i] = (mem_data >> i) & 1;
 		}
 	}
 	m_prev_ACC = ACC;
@@ -114,24 +122,21 @@ void patinho_feio_state::update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_d
 
 	for (int i=0; i<12; i++){
 		if ((m_prev_mem_addr ^ mem_addr) & (1 << i)){
-			sprintf(lamp_id, "mem_addr%d", i);
-			m_out->set_value(lamp_id, (mem_addr >> i) & 1);
+			m_output_mem_addr[i] = (mem_addr >> i) & 1;
 		}
 		if ((m_prev_PC ^ PC) & (1 << i)){
-			sprintf(lamp_id, "pc%d", i);
-			m_out->set_value(lamp_id, (PC >> i) & 1);
+			m_output_pc[i] = (PC >> i) & 1;
 		}
 		if ((m_prev_RC ^ RC) & (1 << i)){
-			sprintf(lamp_id, "rc%d", i);
-			m_out->set_value(lamp_id, (RC >> i) & 1);
+			m_output_rc[i] = (RC >> i) & 1;
 		}
 	}
 	m_prev_mem_addr = mem_addr;
 	m_prev_PC = PC;
 	m_prev_RC = RC;
 
-	if ((m_prev_FLAGS ^ FLAGS) & (1 << 0)) m_out->set_value("flags0", (FLAGS >> 0) & 1);
-	if ((m_prev_FLAGS ^ FLAGS) & (1 << 1)) m_out->set_value("flags1", (FLAGS >> 1) & 1);
+	if ((m_prev_FLAGS ^ FLAGS) & (1 << 0)) m_output_flags[0] = (FLAGS >> 0) & 1;
+	if ((m_prev_FLAGS ^ FLAGS) & (1 << 1)) m_output_flags[1] = (FLAGS >> 1) & 1;
 	m_prev_FLAGS = FLAGS;
 }
 
@@ -242,6 +247,13 @@ void patinho_feio_state::machine_start(){
 	m_decwriter_timer = timer_alloc(FUNC(patinho_feio_state::decwriter_callback), this);
 
 	m_mode_button.resolve();
+	m_output_acc.resolve();
+	m_output_opcode.resolve();
+	m_output_mem_data.resolve();
+	m_output_mem_addr.resolve();
+	m_output_pc.resolve();
+	m_output_rc.resolve();
+	m_output_flags.resolve();
 
 	// Copy some programs directly into RAM.
 	// This is a hack for setting up the computer

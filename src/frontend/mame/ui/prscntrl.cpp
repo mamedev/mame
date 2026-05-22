@@ -23,8 +23,8 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_control_device_preset::menu_control_device_preset(mame_ui_manager &mui, render_container &container, device_image_interface &image)
-	: menu(mui, container)
+menu_control_device_preset::menu_control_device_preset(mame_ui_manager &mui, render_target &target, device_image_interface &image)
+	: menu(mui, target)
 	, m_image(image)
 {
 	set_heading(string_format(_("[root%1$s] %2$s"), image.device().tag(), image.instance_name()));

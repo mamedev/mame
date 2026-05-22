@@ -16,23 +16,10 @@ configuration { "vs*" }
 
 configuration { }
 
-if not _OPTIONS["MODERN_WIN_API"] then
-	_OPTIONS["MODERN_WIN_API"] = "0"
-end
-
-if _OPTIONS["MODERN_WIN_API"]=="1" then
 	defines {
-		"WINVER=0x0602",
-		"_WIN32_WINNT=0x0602",
-		"NTDDI_VERSION=0x06030000",
-		"MODERN_WIN_API",
+		"WINVER=0x0A00",
+		"_WIN32_WINNT=0x0A00",
 	}
-else
-	defines {
-		"_WIN32_WINNT=0x0602",
-		"NTDDI_VERSION=0x06000000",
-	}
-end
 
 if _OPTIONS["USE_TAPTUN"]=="1" or _OPTIONS["USE_PCAP"]=="1" then
 	defines {

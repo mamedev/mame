@@ -176,7 +176,7 @@ public:
 		m_gsc(*this, "gsc"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_asc(*this, "asc"),
+		m_easc(*this, "easc"),
 		m_dfac(*this, "dfac"),
 		m_scc(*this, "scc"),
 		m_vram(*this, "vram"),
@@ -227,7 +227,7 @@ private:
 	required_device<m68030_device> m_maincpu;
 	required_device<m50753_device> m_pmu;
 	required_device<via6522_device> m_via1;
-	required_device<pseudovia_device> m_pseudovia;
+	required_device<pb030_pseudovia_device> m_pseudovia;
 	required_device<macadb_device> m_macadb;
 	required_device<ncr53c80_device> m_ncr5380;
 	required_device<mac_scsi_helper_device> m_scsihelp;
@@ -238,7 +238,7 @@ private:
 	optional_device<gsc_device> m_gsc;
 	optional_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
-	required_device<asc_device> m_asc;
+	required_device<asc_easc_device> m_easc;
 	required_device<dfac_device> m_dfac;
 	required_device<z80scc_device> m_scc;
 	optional_shared_ptr<u32> m_vram, m_ext_vram;
@@ -1117,7 +1117,7 @@ void macpb030_state::macpb140_map(address_map &map)
 	map(0x50006000, 0x50007fff).rw(FUNC(macpb030_state::scsi_drq_r), FUNC(macpb030_state::scsi_drq_w)).mirror(0x01f00000);
 	map(0x50010000, 0x50011fff).rw(FUNC(macpb030_state::scsi_r), FUNC(macpb030_state::scsi_w)).mirror(0x01f00000);
 	map(0x50012060, 0x50012063).r(FUNC(macpb030_state::scsi_drq_r)).mirror(0x01f00000);
-	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x01f00000);
+	map(0x50014000, 0x50015fff).rw(m_easc, FUNC(asc_easc_device::read), FUNC(asc_easc_device::write)).mirror(0x01f00000);
 	map(0x50016000, 0x50017fff).rw(FUNC(macpb030_state::swim_r), FUNC(macpb030_state::swim_w)).mirror(0x01f00000);
 	map(0x50024000, 0x50027fff).r(FUNC(macpb030_state::buserror_r)).mirror(0x01f00000); // bus error here to make sure we aren't mistaken for another decoder
 	map(0x50080000, 0x500bffff).rw(FUNC(macpb030_state::jaws_r), FUNC(macpb030_state::jaws_w)).mirror(0x01f00000);
@@ -1139,7 +1139,7 @@ void macpb030_state::macpb160_map(address_map &map)
 	map(0x50f06000, 0x50f07fff).rw(FUNC(macpb030_state::scsi_drq_r), FUNC(macpb030_state::scsi_drq_w));
 	map(0x50f10000, 0x50f11fff).rw(FUNC(macpb030_state::scsi_r), FUNC(macpb030_state::scsi_w));
 	map(0x50f12060, 0x50f12063).r(FUNC(macpb030_state::scsi_drq_r));
-	map(0x50f14000, 0x50f15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
+	map(0x50f14000, 0x50f15fff).rw(m_easc, FUNC(asc_device::read), FUNC(asc_device::write));
 	map(0x50f16000, 0x50f17fff).rw(FUNC(macpb030_state::swim_r), FUNC(macpb030_state::swim_w));
 	map(0x50f24000, 0x50f27fff).r(FUNC(macpb030_state::buserror_r)); // bus error here to make sure we aren't mistaken for another decoder
 	map(0x50f80000, 0x50fbffff).rw(FUNC(macpb030_state::niagra_r), FUNC(macpb030_state::niagra_w));
@@ -1159,7 +1159,7 @@ void macpb030_state::macpb165c_map(address_map &map)
 	map(0x50f06000, 0x50f07fff).rw(FUNC(macpb030_state::scsi_drq_r), FUNC(macpb030_state::scsi_drq_w));
 	map(0x50f10000, 0x50f11fff).rw(FUNC(macpb030_state::scsi_r), FUNC(macpb030_state::scsi_w));
 	map(0x50f12060, 0x50f12063).r(FUNC(macpb030_state::scsi_drq_r));
-	map(0x50f14000, 0x50f15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
+	map(0x50f14000, 0x50f15fff).rw(m_easc, FUNC(asc_device::read), FUNC(asc_device::write));
 	map(0x50f16000, 0x50f17fff).rw(FUNC(macpb030_state::swim_r), FUNC(macpb030_state::swim_w));
 	map(0x50f20000, 0x50f21fff).r(FUNC(macpb030_state::buserror_r)); // bus error here to detect we're not the grayscale 160/165/180
 	map(0x50f24000, 0x50f27fff).r(FUNC(macpb030_state::buserror_r)); // bus error here to make sure we aren't mistaken for another decoder
@@ -1331,7 +1331,7 @@ void macpb030_state::macpb140(machine_config &config)
 	m_via1->writepb_handler().set(FUNC(macpb030_state::via_out_b));
 	m_via1->irq_handler().set(FUNC(macpb030_state::via_irq_w));
 
-	APPLE_PSEUDOVIA(config, m_pseudovia, 31.3344_MHz_XTAL / 20);
+	APPLE_PB030_PSEUDOVIA(config, m_pseudovia, 31.3344_MHz_XTAL / 20);
 	m_pseudovia->readpa_handler().set(FUNC(macpb030_state::via2_in_a));
 	m_pseudovia->readpb_handler().set(FUNC(macpb030_state::via2_in_b));
 	m_pseudovia->writepa_handler().set(FUNC(macpb030_state::via2_out_a));
@@ -1342,10 +1342,10 @@ void macpb030_state::macpb140(machine_config &config)
 	APPLE_DFAC(config, m_dfac, 22257);
 
 	SPEAKER(config, "speaker", 2).front();
-	ASC(config, m_asc, 22.5792_MHz_XTAL, asc_device::asc_type::EASC);
-	m_asc->irqf_callback().set(m_pseudovia, FUNC(pseudovia_device::asc_irq_w));
-	m_asc->add_route(0, "speaker", 1.0, 0);
-	m_asc->add_route(1, "speaker", 1.0, 1);
+	ASC_EASC(config, m_easc, 22.5792_MHz_XTAL);
+	m_easc->irqf_callback().set(m_pseudovia, FUNC(pseudovia_device::asc_irq_w));
+	m_easc->add_route(0, "speaker", 1.0, 0);
+	m_easc->add_route(1, "speaker", 1.0, 1);
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("2M");

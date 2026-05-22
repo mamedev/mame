@@ -3,17 +3,18 @@
 /* compute operations */
 
 #include <cmath>
+#include <limits>
 
-#define CLEAR_ALU_FLAGS()           do { m_core->astat &= ~(AZ|AN|AV|AC|AS|AI); } while (false)
+#define CLEAR_ALU_FLAGS()           do { m_core->astat &= ~(AZ | AN | AV | AC | AS | AI); } while (false)
 
-#define SET_FLAG_AZ(r)              do { m_core->astat |= (((r) == 0) ? AZ : 0); } while (false)
-#define SET_FLAG_AN(r)              do { m_core->astat |= (((r) & 0x80000000) ? AN : 0); } while (false)
-#define SET_FLAG_AC_ADD(r,a,b)      do { m_core->astat |= ((uint32_t(r) < uint32_t(a)) ? AC : 0); } while (false)
-#define SET_FLAG_AV_ADD(r,a,b)      do { m_core->astat |= (((~((a) ^ (b)) & ((a) ^ (r))) & 0x80000000) ? AV : 0); } while (false)
-#define SET_FLAG_AC_SUB(r,a,b)      do { m_core->astat |= (!(uint32_t(a) < uint32_t(b)) ? AC : 0); } while (false)
-#define SET_FLAG_AV_SUB(r,a,b)      do { m_core->astat |= (((((a) ^ (b)) & ((a) ^ (r))) & 0x80000000) ? AV : 0); } while (false)
+#define SET_FLAG_AZ(r)              do { m_core->astat |= ((r) == 0) ? AZ : 0; } while (false)
+#define SET_FLAG_AN(r)              do { m_core->astat |= ((r) & 0x80000000) ? AN : 0; } while (false)
+#define SET_FLAG_AC_ADD(r,a,b)      do { m_core->astat |= (uint32_t(r) < uint32_t(a)) ? AC : 0; } while (false)
+#define SET_FLAG_AC_SUB(r,a,b)      do { m_core->astat |= (uint32_t(r) <= uint32_t(a)) ? AC : 0; } while (false)
+#define SET_FLAG_AV_ADD(r,a,b)      do { if (~((a) ^ (b)) & ((a) ^ (r)) & 0x80000000) { m_core->astat |= AV; m_core->stky |= AOS; } } while (false)
+#define SET_FLAG_AV_SUB(r,a,b)      do { if (((a) ^ (b)) & ((a) ^ (r)) & 0x80000000) { m_core->astat |= AV; m_core->stky |= AOS; } } while (false)
 
-#define CLEAR_MULTIPLIER_FLAGS()    do { m_core->astat &= ~(MN|MV|MU|MI); } while (false)
+#define CLEAR_MULTIPLIER_FLAGS()    do { m_core->astat &= ~(MN | MV | MU | MI); } while (false)
 
 #define SET_FLAG_MN(r)              do { m_core->astat |= (((r) & 0x80000000) ? MN : 0); } while (false)
 #define SET_FLAG_MV(r)              do { m_core->astat |= (((uint32_t((r) >> 32) != 0) && (uint32_t((r) >> 32) != 0xffffffff)) ? MV : 0); } while (false)
@@ -21,10 +22,38 @@
 /* TODO: MU needs 80-bit result */
 #define SET_FLAG_MU(r)              do { m_core->astat |= (((uint32_t((r) >> 32) == 0) && (uint32_t(r)) != 0) ? MU : 0); } while (false)
 
-constexpr bool IS_FLOAT_ZERO(uint32_t r)        { return (r & (FLOAT_EXPONENT_MASK | FLOAT_MANTISSA_MASK)) == 0; }
-constexpr bool IS_FLOAT_DENORMAL(uint32_t r)    { return ((r & FLOAT_EXPONENT_MASK) == 0) && ((r & FLOAT_MANTISSA_MASK) != 0); }
-constexpr bool IS_FLOAT_NAN(uint32_t r)         { return ((r & FLOAT_EXPONENT_MASK) == FLOAT_EXPONENT_MASK) && ((r & FLOAT_MANTISSA_MASK) != 0); }
-constexpr bool IS_FLOAT_INFINITY(uint32_t r)    { return (r & (FLOAT_EXPONENT_MASK | FLOAT_MANTISSA_MASK)) == FLOAT_INFINITY; }
+// saturate overflowed result
+inline void SATURATE(uint32_t &r)                       { r = uint32_t((int32_t(r) >> 31) ^ 0x80000000); }
+
+constexpr bool IS_FLOAT_ZERO(uint32_t r)                { return (r & (FLOAT_EXPONENT_MASK | FLOAT_MANTISSA_MASK)) == 0; }
+constexpr bool IS_FLOAT_DENORMAL(uint32_t r)            { return ((r & FLOAT_EXPONENT_MASK) == 0) && ((r & FLOAT_MANTISSA_MASK) != 0); }
+constexpr bool IS_FLOAT_DENORMAL_OR_ZERO(uint32_t r)    { return (r & FLOAT_EXPONENT_MASK) == 0; }
+constexpr bool IS_FLOAT_NAN(uint32_t r)                 { return ((r & FLOAT_EXPONENT_MASK) == FLOAT_EXPONENT_MASK) && ((r & FLOAT_MANTISSA_MASK) != 0); }
+constexpr bool IS_FLOAT_INFINITY(uint32_t r)            { return (r & (FLOAT_EXPONENT_MASK | FLOAT_MANTISSA_MASK)) == FLOAT_INFINITY; }
+constexpr bool IS_FLOAT_NEGATIVE(uint32_t r)            { return (r & FLOAT_SIGN_MASK) && !IS_FLOAT_NAN(r); }
+
+inline bool IS_FLOAT_NAN_ADD(uint32_t a, uint32_t b)
+{
+	bool const aemax = (a & FLOAT_EXPONENT_MASK) == FLOAT_EXPONENT_MASK;
+	bool const bemax = (b & FLOAT_EXPONENT_MASK) == FLOAT_EXPONENT_MASK;
+	return (aemax && ((a & FLOAT_MANTISSA_MASK) != 0)) || (bemax && ((b & FLOAT_MANTISSA_MASK) != 0)) || (aemax && bemax && ((a ^ b) & FLOAT_SIGN_MASK));
+}
+
+inline bool IS_FLOAT_NAN_SUB(uint32_t a, uint32_t b)
+{
+	bool const aemax = (a & FLOAT_EXPONENT_MASK) == FLOAT_EXPONENT_MASK;
+	bool const bemax = (b & FLOAT_EXPONENT_MASK) == FLOAT_EXPONENT_MASK;
+	return (aemax && ((a & FLOAT_MANTISSA_MASK) != 0)) || (bemax && ((b & FLOAT_MANTISSA_MASK) != 0)) || (aemax && bemax && !((a ^ b) & FLOAT_SIGN_MASK));
+}
+
+inline bool IS_FLOAT_NAN_MUL(uint32_t a, uint32_t b)
+{
+	bool const aemax = (a & FLOAT_EXPONENT_MASK) == FLOAT_EXPONENT_MASK;
+	bool const bemax = (b & FLOAT_EXPONENT_MASK) == FLOAT_EXPONENT_MASK;
+	return (aemax && (((a & FLOAT_MANTISSA_MASK) != 0) || IS_FLOAT_ZERO(b))) || (bemax && (((b & FLOAT_MANTISSA_MASK) != 0) || IS_FLOAT_ZERO(a)));
+}
+
+constexpr uint32_t FLOAT_FLUSH_DENORMAL(uint32_t r)     { return IS_FLOAT_DENORMAL_OR_ZERO(r) ? (r & FLOAT_SIGN_MASK) : r; }
 
 
 /*****************************************************************************/
@@ -103,258 +132,281 @@ const uint32_t adsp21062_device::rsqrts_mantissa_lookup[128] =
 	0x00370000, 0x00370000, 0x00360000, 0x00350000,
 };
 
+
 /*****************************************************************************/
-/* Integer ALU operations */
+/* ALU helpers */
 
-/* Rn = Rx + Ry */
-void adsp21062_device::compute_add(int rn, int rx, int ry)
+/* Fx + Fy */
+adsp21062_device::SHARC_REG adsp21062_device::FADD(int fx, int fy)
 {
-	uint32_t r = REG(rx) + REG(ry);
-
-	if (m_core->mode1 & MODE1_ALUSAT)
-		fatalerror("SHARC: compute_add: ALU saturation not implemented!\n");
-
-	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r);
-	SET_FLAG_AZ(r);
-	SET_FLAG_AV_ADD(r, REG(rx), REG(ry));
-	SET_FLAG_AC_ADD(r, REG(rx), REG(ry));
-	REG(rn) = r;
-
-	m_core->astat &= ~AF;
-}
-
-/* Rn = Rx - Ry */
-void adsp21062_device::compute_sub(int rn, int rx, int ry)
-{
-	uint32_t r = REG(rx) - REG(ry);
-
-	if (m_core->mode1 & MODE1_ALUSAT)
-		fatalerror("SHARC: compute_sub: ALU saturation not implemented!\n");
-
-	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r);
-	SET_FLAG_AZ(r);
-	SET_FLAG_AV_SUB(r, REG(rx), REG(ry));
-	SET_FLAG_AC_SUB(r, REG(rx), REG(ry));
-	REG(rn) = r;
-
-	m_core->astat &= ~AF;
-}
-
-/* Rn = Rx + Ry + CI */
-void adsp21062_device::compute_add_ci(int rn, int rx, int ry)
-{
-	int c = (m_core->astat & AC) ? 1 : 0;
-	uint32_t r = REG(rx) + REG(ry) + c;
-
-	if (m_core->mode1 & MODE1_ALUSAT)
-		fatalerror("SHARC: compute_add_ci: ALU saturation not implemented!\n");
-
-	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r);
-	SET_FLAG_AZ(r);
-	SET_FLAG_AV_ADD(r, REG(rx), REG(ry)+c);
-	SET_FLAG_AC_ADD(r, REG(rx), REG(ry)+c);
-	REG(rn) = r;
-
-	m_core->astat &= ~AF;
-}
-
-/* Rn = Rx - Ry + CI - 1 */
-void adsp21062_device::compute_sub_ci(int rn, int rx, int ry)
-{
-	int c = (m_core->astat & AC) ? 1 : 0;
-	uint32_t r = REG(rx) - REG(ry) + c - 1;
-
-	if (m_core->mode1 & MODE1_ALUSAT)
-		fatalerror("SHARC: compute_sub_ci: ALU saturation not implemented!\n");
-
-	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r);
-	SET_FLAG_AZ(r);
-	SET_FLAG_AV_SUB(r, REG(rx), REG(ry)+c-1);
-	SET_FLAG_AC_SUB(r, REG(rx), REG(ry)+c-1);
-	REG(rn) = r;
-
-	m_core->astat &= ~AF;
-}
-
-/* Rn = Rx AND Ry */
-void adsp21062_device::compute_and(int rn, int rx, int ry)
-{
-	uint32_t r = REG(rx) & REG(ry);
-
-	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r);
-	SET_FLAG_AZ(r);
-	REG(rn) = r;
-
-	m_core->astat &= ~AF;
-}
-
-/* COMP(Rx, Ry) */
-void adsp21062_device::compute_comp(int rx, int ry)
-{
-	uint32_t comp_accum;
-
-	CLEAR_ALU_FLAGS();
-	if( REG(rx) == REG(ry) )
-		m_core->astat |= AZ;
-	if( (int32_t)REG(rx) < (int32_t)REG(ry) )
-		m_core->astat |= AN;
-
-	// Update ASTAT compare accumulation register
-	comp_accum = (m_core->astat >> 24) & 0xff;
-	comp_accum >>= 1;
-	if ((m_core->astat & (AZ|AN)) == 0)
+	SHARC_REG r;
+	if (IS_FLOAT_NAN_ADD(REG(fx), REG(fy)))
 	{
-		comp_accum |= 0x80;
+		r.r = FLOAT_CANONICAL_NAN;
+		m_core->astat |= AI;
+		m_core->stky |= AIS;
 	}
-	m_core->astat &= 0xffffff;
-	m_core->astat |= comp_accum << 24;
+	else
+	{
+		SHARC_REG x, y;
+		x.r = FLOAT_FLUSH_DENORMAL(REG(fx));
+		y.r = FLOAT_FLUSH_DENORMAL(REG(fy));
+		r.f = x.f + y.f;
 
-	m_core->astat &= ~AF;
+		if (IS_FLOAT_INFINITY(r.r))
+		{
+			m_core->astat |= AV;
+			m_core->stky |= AVS;
+			if (m_core->mode1 & MODE1_TRUNCATE)
+				r.r = (r.r & FLOAT_SIGN_MASK) | 0x7f7fffff;
+		}
+		else if (IS_FLOAT_DENORMAL_OR_ZERO(r.r))
+		{
+			m_core->astat |= AZ;
+			m_core->stky |= ((r.r & FLOAT_MANTISSA_MASK) != 0) ? AUS : 0;
+			r.r &= FLOAT_SIGN_MASK;
+		}
+		m_core->astat |= (r.r & FLOAT_SIGN_MASK) ? AN : 0;
+	}
+
+	m_core->astat |= AF;
+	return r;
 }
 
-/* Rn = PASS Rx */
-void adsp21062_device::compute_pass(int rn, int rx)
+/* Fx - Fy */
+adsp21062_device::SHARC_REG adsp21062_device::FSUB(int fx, int fy)
 {
-	CLEAR_ALU_FLAGS();
-	/* TODO: floating-point extension field is set to 0 */
+	SHARC_REG r;
+	if (IS_FLOAT_NAN_SUB(REG(fx), REG(fy)))
+	{
+		r.r = FLOAT_CANONICAL_NAN;
+		m_core->astat |= AI;
+		m_core->stky |= AIS;
+	}
+	else
+	{
+		SHARC_REG x, y;
+		x.r = FLOAT_FLUSH_DENORMAL(REG(fx));
+		y.r = FLOAT_FLUSH_DENORMAL(REG(fy));
+		r.f = x.f - y.f;
 
-	REG(rn) = REG(rx);
-	if (REG(rn) == 0)
-		m_core->astat |= AZ;
-	if (REG(rn) & 0x80000000)
-		m_core->astat |= AN;
+		if (IS_FLOAT_INFINITY(r.r))
+		{
+			m_core->astat |= AV;
+			m_core->stky |= AVS;
+			if (m_core->mode1 & MODE1_TRUNCATE)
+				r.r = (r.r & FLOAT_SIGN_MASK) | 0x7f7fffff;
+		}
+		else if (IS_FLOAT_DENORMAL_OR_ZERO(r.r))
+		{
+			m_core->astat |= AZ;
+			m_core->stky |= ((r.r & FLOAT_MANTISSA_MASK) != 0) ? AUS : 0;
+			r.r &= FLOAT_SIGN_MASK;
+		}
+		m_core->astat |= (r.r & FLOAT_SIGN_MASK) ? AN : 0;
+	}
 
-	m_core->astat &= ~AF;
+	m_core->astat |= AF;
+	return r;
 }
 
-/* Rn = Rx XOR Ry */
-void adsp21062_device::compute_xor(int rn, int rx, int ry)
+/* (Fx + Fy) / 2 */
+adsp21062_device::SHARC_REG adsp21062_device::FAVG(int fx, int fy)
 {
-	uint32_t r = REG(rx) ^ REG(ry);
-	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r);
-	SET_FLAG_AZ(r);
-	REG(rn) = r;
+	SHARC_REG r;
+	if (IS_FLOAT_NAN_ADD(REG(fx), REG(fy)))
+	{
+		r.r = FLOAT_CANONICAL_NAN;
+		m_core->astat |= AI;
+		m_core->stky |= AIS;
+	}
+	else
+	{
+		// TODO: this loses one bit of range due to the intermediate sub being constrained to single precision
+		SHARC_REG x, y;
+		x.r = FLOAT_FLUSH_DENORMAL(REG(fx));
+		y.r = FLOAT_FLUSH_DENORMAL(REG(fy));
+		r.f = (x.f + y.f) * 0.5f;
 
-	m_core->astat &= ~AF;
+		if (IS_FLOAT_INFINITY(r.r))
+		{
+			m_core->astat |= AV;
+			m_core->stky |= AVS;
+			if (m_core->mode1 & MODE1_TRUNCATE)
+				r.r = (r.r & FLOAT_SIGN_MASK) | 0x7f7fffff;
+		}
+		else if (IS_FLOAT_DENORMAL_OR_ZERO(r.r))
+		{
+			m_core->astat |= AZ;
+			m_core->stky |= ((r.r & FLOAT_MANTISSA_MASK) != 0) ? AUS : 0;
+			r.r &= FLOAT_SIGN_MASK;
+		}
+		m_core->astat |= (r.r & FLOAT_SIGN_MASK) ? AN : 0;
+	}
+
+	m_core->astat |= AF;
+	return r;
 }
 
-/* Rn = Rx OR Ry */
-void adsp21062_device::compute_or(int rn, int rx, int ry)
+/* ABS Fx */
+adsp21062_device::SHARC_REG adsp21062_device::FABS(int fx)
 {
-	uint32_t r = REG(rx) | REG(ry);
-	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r);
-	SET_FLAG_AZ(r);
-	REG(rn) = r;
+	SHARC_REG r;
+	if (IS_FLOAT_NAN(REG(fx)))
+	{
+		r.r = FLOAT_CANONICAL_NAN;
+		m_core->astat |= AI;
+		m_core->stky |= AIS;
+	}
+	else
+	{
+		if (IS_FLOAT_DENORMAL_OR_ZERO(REG(fx)))
+		{
+			r.r = 0;
+			m_core->astat |= AZ;
+		}
+		else
+		{
+			r.r = REG(fx) & ~FLOAT_SIGN_MASK;
+		}
+		m_core->astat |= (REG(fx) & FLOAT_SIGN_MASK) ? AS : 0;
+	}
 
-	m_core->astat &= ~AF;
+	m_core->astat |= AF;
+	return r;
 }
 
-/* Rn = Rx + 1 */
-void adsp21062_device::compute_inc(int rn, int rx)
+/* MIN(Fx, Fy) */
+adsp21062_device::SHARC_REG adsp21062_device::FMIN(int fx, int fy)
 {
-	uint32_t r = REG(rx) + 1;
+	SHARC_REG r;
+	if (IS_FLOAT_NAN(REG(fx)) || IS_FLOAT_NAN(REG(fy)))
+	{
+		r.r = FLOAT_CANONICAL_NAN;
+		m_core->astat |= AI;
+		m_core->stky |= AIS;
+	}
+	else
+	{
+		// TODO: flush denormals to zero, handle negative versus positive zero
+		r.f = std::min(FREG(fx), FREG(fy));
 
-	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r);
-	SET_FLAG_AZ(r);
-	SET_FLAG_AV_ADD(r, REG(rx), 1);
-	SET_FLAG_AC_ADD(r, REG(rx), 1);
+		m_core->astat |= (r.f < 0.0f) ? AN : 0;
+		m_core->astat |= (IS_FLOAT_ZERO(r.r)) ? AZ : 0;
+	}
 
-	REG(rn) = r;
-
-	m_core->astat &= ~AF;
+	m_core->astat |= AF;
+	return r;
 }
 
-/* Rn = Rx - 1 */
-void adsp21062_device::compute_dec(int rn, int rx)
+/* MAX(Fx, Fy) */
+adsp21062_device::SHARC_REG adsp21062_device::FMAX(int fx, int fy)
 {
-	uint32_t r = REG(rx) - 1;
+	SHARC_REG r;
+	if (IS_FLOAT_NAN(REG(fx)) || IS_FLOAT_NAN(REG(fy)))
+	{
+		r.r = FLOAT_CANONICAL_NAN;
+		m_core->astat |= AI;
+		m_core->stky |= AIS;
+	}
+	else
+	{
+		// TODO: flush denormals to zero, handle negative versus positive zero
+		r.f = std::max(FREG(fx), FREG(fy));
 
-	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r);
-	SET_FLAG_AZ(r);
-	SET_FLAG_AV_SUB(r, REG(rx), 1);
-	SET_FLAG_AC_SUB(r, REG(rx), 1);
+		m_core->astat |= (r.f < 0.0f) ? AN : 0;
+		m_core->astat |= (IS_FLOAT_ZERO(r.r)) ? AZ : 0;
+	}
 
-	REG(rn) = r;
-
-	m_core->astat &= ~AF;
+	m_core->astat |= AF;
+	return r;
 }
 
-/* Rn = MIN(Rx, Ry) */
-void adsp21062_device::compute_min(int rn, int rx, int ry)
+/* Fx + Fy,   Fx - Fy */
+std::pair<adsp21062_device::SHARC_REG, adsp21062_device::SHARC_REG> adsp21062_device::FADD_FSUB(int fx, int fy)
 {
-	uint32_t r = std::min((int32_t)REG(rx), (int32_t)REG(ry));
+	std::pair<SHARC_REG, SHARC_REG> r;
+	bool const xemax = (REG(fx) & FLOAT_EXPONENT_MASK) == FLOAT_EXPONENT_MASK;
+	bool const yemax = (REG(fy) & FLOAT_EXPONENT_MASK) == FLOAT_EXPONENT_MASK;
 
-	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r);
-	SET_FLAG_AZ(r);
+	if ((xemax && ((REG(fx) & FLOAT_MANTISSA_MASK) != 0)) || (yemax && (REG(fy) & FLOAT_MANTISSA_MASK) != 0))
+	{
+		// at least one NaN
+		r.first.r = FLOAT_CANONICAL_NAN;
+		r.second.r = FLOAT_CANONICAL_NAN;
+		m_core->astat |= AI;
+		m_core->stky |= AIS;
+	}
+	else if (!xemax || !yemax)
+	{
+		// neither NaN, at least one not infinity
+		SHARC_REG x, y;
+		x.r = FLOAT_FLUSH_DENORMAL(REG(fx));
+		y.r = FLOAT_FLUSH_DENORMAL(REG(fy));
+		r.first.f = x.f + y.f;
+		r.second.f = x.f - y.f;
 
-	REG(rn) = r;
+		if (IS_FLOAT_INFINITY(r.first.r))
+		{
+			m_core->astat |= AV;
+			m_core->stky |= AVS;
+			if (m_core->mode1 & MODE1_TRUNCATE)
+				r.first.r = (r.first.r & FLOAT_SIGN_MASK) | 0x7f7fffff;
+		}
+		else if (IS_FLOAT_DENORMAL_OR_ZERO(r.first.r))
+		{
+			m_core->astat |= AZ;
+			m_core->stky |= ((r.first.r & FLOAT_MANTISSA_MASK) != 0) ? AUS : 0;
+			r.first.r &= FLOAT_SIGN_MASK;
+		}
 
-	m_core->astat &= ~AF;
+		if (IS_FLOAT_INFINITY(r.second.r))
+		{
+			m_core->astat |= AV;
+			m_core->stky |= AVS;
+			if (m_core->mode1 & MODE1_TRUNCATE)
+				r.second.r = (r.second.r & FLOAT_SIGN_MASK) | 0x7f7fffff;
+		}
+		else if (IS_FLOAT_DENORMAL_OR_ZERO(r.second.r))
+		{
+			m_core->astat |= AZ;
+			m_core->stky |= ((r.second.r & FLOAT_MANTISSA_MASK) != 0) ? AUS : 0;
+			r.second.r &= FLOAT_SIGN_MASK;
+		}
+
+		m_core->astat |= ((r.first.r | r.second.r) & FLOAT_SIGN_MASK) ? AN : 0;
+	}
+	else
+	{
+		// both infinity
+		if ((REG(fx) ^ REG(fy)) & FLOAT_SIGN_MASK)
+		{
+			// opposite signs - sum is NaN
+			r.first.r = FLOAT_CANONICAL_NAN;
+			r.second.f =  (REG(fx) & FLOAT_SIGN_MASK) | ((m_core->mode1 & MODE1_TRUNCATE) ? 0x7f7fffff : FLOAT_INFINITY);
+		}
+		else
+		{
+			// same sign - difference is NaN
+			r.first.f =  (REG(fx) & FLOAT_SIGN_MASK) | ((m_core->mode1 & MODE1_TRUNCATE) ? 0x7f7fffff : FLOAT_INFINITY);
+			r.second.r = FLOAT_CANONICAL_NAN;
+		}
+
+		m_core->astat |= (REG(fx) & FLOAT_SIGN_MASK) ? AN : 0;
+		m_core->astat |= AV | AI;
+		m_core->stky |= AVS | AIS;
+	}
+
+	m_core->astat |= AF;
+	return r;
 }
 
-/* Rn = MAX(Rx, Ry) */
-void adsp21062_device::compute_max(int rn, int rx, int ry)
+uint32_t adsp21062_device::SCALB(SHARC_REG fx, int ry)
 {
-	uint32_t r = std::max((int32_t)REG(rx), (int32_t)REG(ry));
+	uint32_t const mantissa = fx.r & FLOAT_MANTISSA_MASK;
+	uint32_t const sign = fx.r & FLOAT_SIGN_MASK;
 
-	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r);
-	SET_FLAG_AZ(r);
-
-	REG(rn) = r;
-
-	m_core->astat &= ~AF;
-}
-
-/* Rn = -Rx */
-void adsp21062_device::compute_neg(int rn, int rx)
-{
-	uint32_t r = -(int32_t)(REG(rx));
-
-	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r);
-	SET_FLAG_AZ(r);
-	SET_FLAG_AV_SUB(r, 0, REG(rx));
-	SET_FLAG_AC_SUB(r, 0, REG(rx));
-
-	REG(rn) = r;
-
-	m_core->astat &= ~AF;
-}
-
-/* Rn = NOT Rx */
-void adsp21062_device::compute_not(int rn, int rx)
-{
-	uint32_t r = ~REG(rx);
-
-	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r);
-	SET_FLAG_AZ(r);
-
-	REG(rn) = r;
-
-	m_core->astat &= ~AF;
-}
-
-/*****************************************************************************/
-/* Floating-point ALU operations */
-
-uint32_t adsp21062_device::SCALB(SHARC_REG rx, int ry)
-{
-	uint32_t mantissa = rx.r & FLOAT_MANTISSA_MASK;
-	uint32_t sign = rx.r & FLOAT_SIGN_MASK;
-
-	int exponent = float_get_unbiased_exponent(rx.r);
+	int exponent = float_get_unbiased_exponent(fx.r);
 	exponent += int32_t(REG(ry));
 
 	if (exponent > 127)
@@ -375,128 +427,616 @@ uint32_t adsp21062_device::SCALB(SHARC_REG rx, int ry)
 	}
 }
 
-/* Fn = FLOAT Rx */
-void adsp21062_device::compute_float(int rn, int rx)
+
+/*****************************************************************************/
+/* Multiplier helpers */
+
+/* Fn = Fx * Fy */
+adsp21062_device::SHARC_REG adsp21062_device::FMUL(int fx, int fy)
 {
-	// verified
-	FREG(rn) = (float)(int32_t)REG(rx);
-
-	CLEAR_ALU_FLAGS();
-	// AN
-	SET_FLAG_AN(REG(rn));
-	// AZ
-	m_core->astat |= (IS_FLOAT_DENORMAL(REG(rn)) || IS_FLOAT_ZERO(REG(rn))) ? AZ : 0;
-	// AUS
-	m_core->stky |= (IS_FLOAT_DENORMAL(REG(rn))) ? AUS : 0;
-	/* TODO: AV flag */
-
-	m_core->astat |= AF;
-}
-
-/* Rn = FIX Fx */
-void adsp21062_device::compute_fix(int rn, int rx)
-{
-	int32_t alu_i;
-	SHARC_REG r_alu;
-
-	r_alu.f = FREG(rx);
-	if (m_core->mode1 & MODE1_TRUNCATE)
+	SHARC_REG r;
+	if (IS_FLOAT_NAN_MUL(REG(fx), REG(fy)))
 	{
-		alu_i = int32_t(floorf(r_alu.f));
+		r.r = FLOAT_CANONICAL_NAN;
+		m_core->astat |= MI;
+		m_core->stky |= MIS;
 	}
 	else
 	{
-		alu_i = int32_t(nearbyintf(r_alu.f)); // assume rounding mode is set to FE_TONEAREST
+		r.f = FREG(fx) * FREG(fy);
+
+		m_core->astat |= (r.r & FLOAT_SIGN_MASK) ? MN : 0;
+		m_core->astat |= IS_FLOAT_INFINITY(r.r) ? MV : 0;
+		m_core->astat |= IS_FLOAT_DENORMAL(r.r) ? MU : 0;
+		m_core->stky |= IS_FLOAT_INFINITY(r.r) ? MVS : 0;
+		m_core->stky |= IS_FLOAT_DENORMAL(r.r) ? MUS : 0;
 	}
-
-	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(alu_i);
-	// AZ
-	SET_FLAG_AZ(alu_i);
-	// AU
-	m_core->stky |= (IS_FLOAT_DENORMAL(r_alu.r)) ? AUS : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(rx))) ? AI : 0;
-	/* TODO: AV flag */
-
-	REG(rn) = alu_i;
-	m_core->astat |= AF;
+	return r;
 }
 
-/* Rn = FIX Fx BY Ry */
-void adsp21062_device::compute_fix_scaled(int rn, int rx, int ry)
-{
-	int32_t alu_i;
-	SHARC_REG r_alu;
 
-	r_alu.r = SCALB(m_core->r[rx], ry);
-	if (m_core->mode1 & MODE1_TRUNCATE)
+/*****************************************************************************/
+/* Integer ALU operations */
+
+/* Rn = Rx + Ry */
+void adsp21062_device::compute_add(int rn, int rx, int ry)
+{
+	uint32_t r = REG(rx) + REG(ry);
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AV_ADD(r, REG(rx), REG(ry));
+	SET_FLAG_AC_ADD(r, REG(rx), REG(ry));
+
+	if ((m_core->mode1 & MODE1_ALUSAT) && (m_core->astat & AV))
+		SATURATE(r);
+
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+
+	REG(rn) = r;
+	m_core->astat &= ~AF;
+}
+
+/* Rn = Rx - Ry */
+void adsp21062_device::compute_sub(int rn, int rx, int ry)
+{
+	uint32_t r = REG(rx) - REG(ry);
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AV_SUB(r, REG(rx), REG(ry));
+	SET_FLAG_AC_SUB(r, REG(rx), REG(ry));
+
+	if ((m_core->mode1 & MODE1_ALUSAT) && (m_core->astat & AV))
+		SATURATE(r);
+
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+
+	REG(rn) = r;
+	m_core->astat &= ~AF;
+}
+
+/* Rn = Rx + Ry + CI */
+void adsp21062_device::compute_add_ci(int rn, int rx, int ry)
+{
+	int const c = (m_core->astat & AC) ? 1 : 0;
+	uint32_t r = REG(rx) + REG(ry) + c;
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AV_ADD(r, REG(rx), REG(ry));
+	SET_FLAG_AC_ADD(r, REG(rx), REG(ry));
+	if ((c == 1) && (REG(ry) == 0xffffffff))
+		m_core->astat |= AC;
+
+	if ((m_core->mode1 & MODE1_ALUSAT) && (m_core->astat & AV))
+		SATURATE(r);
+
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+
+	REG(rn) = r;
+	m_core->astat &= ~AF;
+}
+
+/* Rn = Rx - Ry + CI - 1 */
+void adsp21062_device::compute_sub_ci(int rn, int rx, int ry)
+{
+	int const c = (m_core->astat & AC) ? 1 : 0;
+	uint32_t r = REG(rx) - REG(ry) + c - 1;
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AV_SUB(r, REG(rx), REG(ry));
+	if ((c != 0) || (REG(ry) != 0xffffffff))
+		SET_FLAG_AC_SUB(r, REG(rx), REG(ry));
+
+	if ((m_core->mode1 & MODE1_ALUSAT) && (m_core->astat & AV))
+		SATURATE(r);
+
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+
+	REG(rn) = r;
+	m_core->astat &= ~AF;
+}
+
+/* COMP(Rx, Ry) */
+void adsp21062_device::compute_comp(int rx, int ry)
+{
+	CLEAR_ALU_FLAGS();
+	if (REG(rx) == REG(ry))
+		m_core->astat |= AZ;
+	else if (int32_t(REG(rx)) < int32_t(REG(ry)))
+		m_core->astat |= AN;
+
+	// Update ASTAT compare accumulation register
+	uint32_t comp_accum = (m_core->astat >> 1) & 0x7f000000;
+	if ((m_core->astat & (AZ | AN)) == 0)
+		comp_accum |= 0x80000000;
+
+	m_core->astat &= 0x00ffffff;
+	m_core->astat |= comp_accum;
+
+	m_core->astat &= ~AF;
+}
+
+/* Rn = Rx + CI */
+void adsp21062_device::compute_add_ci(int rn, int rx)
+{
+	int const c = (m_core->astat & AC) ? 1 : 0;
+	uint32_t r = REG(rx) + c;
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AV_ADD(r, REG(rx), 0);
+	SET_FLAG_AC_ADD(r, REG(rx), 0);
+
+	if ((m_core->mode1 & MODE1_ALUSAT) && (m_core->astat & AV))
+		SATURATE(r);
+
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+
+	REG(rn) = r;
+	m_core->astat &= ~AF;
+}
+
+/* Rn = Rx + CI - 1 */
+void adsp21062_device::compute_sub_ci(int rn, int rx)
+{
+	int const c = (m_core->astat & AC) ? 1 : 0;
+	uint32_t r = REG(rx) + c - 1;
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AV_SUB(r, REG(rx), 0);
+	SET_FLAG_AC_SUB(r, REG(rx), 0);
+
+	if ((m_core->mode1 & MODE1_ALUSAT) && (m_core->astat & AV))
+		SATURATE(r);
+
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+
+	REG(rn) = r;
+	m_core->astat &= ~AF;
+}
+
+/* Rn = Rx + 1 */
+void adsp21062_device::compute_inc(int rn, int rx)
+{
+	uint32_t r = REG(rx) + 1;
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AV_ADD(r, REG(rx), 1);
+	SET_FLAG_AC_ADD(r, REG(rx), 1);
+
+	if ((m_core->mode1 & MODE1_ALUSAT) && (m_core->astat & AV))
+		SATURATE(r);
+
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+
+	REG(rn) = r;
+	m_core->astat &= ~AF;
+}
+
+/* Rn = Rx - 1 */
+void adsp21062_device::compute_dec(int rn, int rx)
+{
+	uint32_t r = REG(rx) - 1;
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AV_SUB(r, REG(rx), 1);
+	SET_FLAG_AC_SUB(r, REG(rx), 1);
+
+	if ((m_core->mode1 & MODE1_ALUSAT) && (m_core->astat & AV))
+		SATURATE(r);
+
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+
+	REG(rn) = r;
+	m_core->astat &= ~AF;
+}
+
+/* Rn = -Rx */
+void adsp21062_device::compute_neg(int rn, int rx)
+{
+	uint32_t r = -int32_t(REG(rx));
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AV_SUB(r, 0, REG(rx));
+	SET_FLAG_AC_SUB(r, 0, REG(rx));
+
+	if ((m_core->mode1 & MODE1_ALUSAT) && (m_core->astat & AV))
+		SATURATE(r);
+
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+
+	REG(rn) = r;
+	m_core->astat &= ~AF;
+}
+
+/* Rn = ABS Rx */
+void adsp21062_device::compute_abs(int rn, int rx)
+{
+	uint32_t r = std::abs(int32_t(REG(rx)));
+
+	CLEAR_ALU_FLAGS();
+	if (int32_t(r) < 0)
 	{
-		alu_i = int32_t(floorf(r_alu.f));
+		m_core->astat |= AV;
+		m_core->stky |= AOS;
+		if (m_core->mode1 & MODE1_ALUSAT)
+			r = 0x7fffffff;
+	}
+
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+	m_core->astat |= (int32_t(REG(rx)) < 0) ? AS : 0;
+
+	REG(rn) = r;
+	m_core->astat &= ~AF;
+}
+
+/* Rn = PASS Rx */
+void adsp21062_device::compute_pass(int rn, int rx)
+{
+	CLEAR_ALU_FLAGS();
+	/* TODO: floating-point extension field is set to 0 */
+
+	REG(rn) = REG(rx);
+	if (REG(rn) == 0)
+		m_core->astat |= AZ;
+	if (REG(rn) & 0x80000000)
+		m_core->astat |= AN;
+
+	m_core->astat &= ~AF;
+}
+
+/* Rn = Rx AND Ry */
+void adsp21062_device::compute_and(int rn, int rx, int ry)
+{
+	uint32_t const r = REG(rx) & REG(ry);
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+
+	REG(rn) = r;
+	m_core->astat &= ~AF;
+}
+
+/* Rn = Rx OR Ry */
+void adsp21062_device::compute_or(int rn, int rx, int ry)
+{
+	uint32_t const r = REG(rx) | REG(ry);
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+
+	REG(rn) = r;
+	m_core->astat &= ~AF;
+}
+
+/* Rn = Rx XOR Ry */
+void adsp21062_device::compute_xor(int rn, int rx, int ry)
+{
+	uint32_t const r = REG(rx) ^ REG(ry);
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+
+	REG(rn) = r;
+	m_core->astat &= ~AF;
+}
+
+/* Rn = NOT Rx */
+void adsp21062_device::compute_not(int rn, int rx)
+{
+	uint32_t const r = ~REG(rx);
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+
+	REG(rn) = r;
+	m_core->astat &= ~AF;
+}
+
+/* Rn = MIN(Rx, Ry) */
+void adsp21062_device::compute_min(int rn, int rx, int ry)
+{
+	uint32_t const r = std::min(int32_t(REG(rx)), int32_t(REG(ry)));
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+
+	REG(rn) = r;
+	m_core->astat &= ~AF;
+}
+
+/* Rn = MAX(Rx, Ry) */
+void adsp21062_device::compute_max(int rn, int rx, int ry)
+{
+	uint32_t const r = std::max(int32_t(REG(rx)), int32_t(REG(ry)));
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+
+	REG(rn) = r;
+	m_core->astat &= ~AF;
+}
+
+/* Rn = CLIP Rx BY Ry */
+void adsp21062_device::compute_clip(int rn, int rx, int ry)
+{
+	const int32_t absry = std::abs(int32_t(REG(ry)));
+	const uint32_t r = std::clamp(int32_t(REG(rx)), -absry, absry);
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+
+	REG(rn) = r;
+	m_core->astat &= ~AF;
+}
+
+
+/*****************************************************************************/
+/* Floating-point ALU operations */
+
+/* Fn = Fx + Fy */
+void adsp21062_device::compute_fadd(int fn, int fx, int fy)
+{
+	CLEAR_ALU_FLAGS();
+	FREG(fn) = FADD(fx, fy).f;
+}
+
+/* Fn = Fx - Fy */
+void adsp21062_device::compute_fsub(int fn, int fx, int fy)
+{
+	CLEAR_ALU_FLAGS();
+	FREG(fn) = FSUB(fx, fy).f;
+}
+
+/* Fn = ABS(Fx + Fy) */
+void adsp21062_device::compute_fadd_abs(int fn, int fx, int fy)
+{
+	CLEAR_ALU_FLAGS();
+
+	SHARC_REG r;
+	if (IS_FLOAT_NAN_ADD(REG(fx), REG(fy)))
+	{
+		r.r = FLOAT_CANONICAL_NAN;
+		m_core->astat |= AI;
+		m_core->stky |= AIS;
 	}
 	else
 	{
-		alu_i = int32_t(nearbyintf(r_alu.f)); // assume rounding mode is set to FE_TONEAREST
+		SHARC_REG x, y;
+		x.r = FLOAT_FLUSH_DENORMAL(REG(fx));
+		y.r = FLOAT_FLUSH_DENORMAL(REG(fy));
+		r.f = x.f + y.f;
+		r.r &= ~FLOAT_SIGN_MASK;
+
+		if (r.r == FLOAT_EXPONENT_MASK) // sign bit won't be set, avoid redundant masking
+		{
+			m_core->astat |= AV;
+			m_core->stky |= AVS;
+			if (m_core->mode1 & MODE1_TRUNCATE)
+				r.r = 0x7f7fffff;
+		}
+		else if (IS_FLOAT_DENORMAL_OR_ZERO(r.r))
+		{
+			m_core->astat |= AZ;
+			m_core->stky |= ((r.r & FLOAT_MANTISSA_MASK) != 0) ? AUS : 0;
+			r.r = 0;
+		}
 	}
 
-	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(alu_i);
-	// AZ
-	SET_FLAG_AZ(alu_i);
-	// AU
-	m_core->stky |= (IS_FLOAT_DENORMAL(r_alu.r)) ? AUS : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(rx))) ? AI : 0;
-	/* TODO: AV flag */
-
-	REG(rn) = alu_i;
+	FREG(fn) = r.f;
 	m_core->astat |= AF;
 }
 
-/* Fn = FLOAT Rx BY Ry */
-void adsp21062_device::compute_float_scaled(int rn, int rx, int ry)
+/* Fn = ABS(Fx - Fy) */
+void adsp21062_device::compute_fsub_abs(int fn, int fx, int fy)
 {
-	SHARC_REG x;
-	x.f = float(int32_t(REG(rx)));
-
-	// verified
 	CLEAR_ALU_FLAGS();
 
-	REG(rn) = SCALB(x, ry);
+	SHARC_REG r;
+	if (IS_FLOAT_NAN_SUB(REG(fx), REG(fy)))
+	{
+		r.r = FLOAT_CANONICAL_NAN;
+		m_core->astat |= AI;
+		m_core->stky |= AIS;
+	}
+	else
+	{
+		SHARC_REG x, y;
+		x.r = FLOAT_FLUSH_DENORMAL(REG(fx));
+		y.r = FLOAT_FLUSH_DENORMAL(REG(fy));
+		r.f = x.f - y.f;
+		r.r &= ~FLOAT_SIGN_MASK;
 
-	// AN
-	SET_FLAG_AN(REG(rn));
-	// AZ
-	m_core->astat |= (IS_FLOAT_DENORMAL(REG(rn)) || IS_FLOAT_ZERO(REG(rn))) ? AZ : 0;
-	// AU
-	m_core->stky |= (IS_FLOAT_DENORMAL(REG(rn))) ? AUS : 0;
+		if (r.r == FLOAT_EXPONENT_MASK) // sign bit won't be set, avoid redundant masking
+		{
+			m_core->astat |= AV;
+			m_core->stky |= AVS;
+			if (m_core->mode1 & MODE1_TRUNCATE)
+				r.r = 0x7f7fffff;
+		}
+		else if (IS_FLOAT_DENORMAL_OR_ZERO(r.r))
+		{
+			m_core->astat |= AZ;
+			m_core->stky |= ((r.r & FLOAT_MANTISSA_MASK) != 0) ? AUS : 0;
+			r.r = 0;
+		}
+	}
 
+	FREG(fn) = r.f;
+	m_core->astat |= AF;
+}
+
+/* Fn = (Fx + Fy) / 2 */
+void adsp21062_device::compute_favg(int fn, int fx, int fy)
+{
+	CLEAR_ALU_FLAGS();
+	FREG(fn) = FAVG(fx, fy).f;
+}
+
+/* COMP(Fx, Fy) */
+void adsp21062_device::compute_fcomp(int fx, int fy)
+{
+	CLEAR_ALU_FLAGS();
+	if (IS_FLOAT_NAN(REG(fx)) || IS_FLOAT_NAN(REG(fy)))
+	{
+		m_core->astat |= AI;
+		m_core->stky |= AIS;
+	}
+	else
+	{
+		if (FREG(fx) == FREG(fy))
+			m_core->astat |= AZ;
+		else if (FREG(fx) < FREG(fy))
+			m_core->astat |= AN;
+	}
+
+	// Update ASTAT compare accumulation register
+	// TODO: confirm whether this is set for unordered operands
+	uint32_t comp_accum = (m_core->astat >> 1) & 0x7f000000;
+	if ((m_core->astat & (AZ | AN)) == 0)
+		comp_accum |= 0x80000000;
+
+	m_core->astat &= 0x00ffffff;
+	m_core->astat |= comp_accum;
+
+	m_core->astat |= AF;
+}
+
+/* Fn = -Fx */
+void adsp21062_device::compute_fneg(int fn, int fx)
+{
+	CLEAR_ALU_FLAGS();
+
+	SHARC_REG r;
+	if (IS_FLOAT_NAN(REG(fx)))
+	{
+		r.r = FLOAT_CANONICAL_NAN;
+		m_core->astat |= AI;
+		m_core->stky |= AIS;
+	}
+	else
+	{
+		if (IS_FLOAT_DENORMAL_OR_ZERO(REG(fx)))
+		{
+			r.r = ~REG(fx) & FLOAT_SIGN_MASK;
+			m_core->astat |= AZ;
+		}
+		else
+		{
+			r.r = REG(fx) ^ FLOAT_SIGN_MASK;
+		}
+		m_core->astat |= (r.r & FLOAT_SIGN_MASK) ? AN : 0;
+	}
+
+	FREG(fn) = r.f;
+	m_core->astat |= AF;
+}
+
+/* Fn = ABS Fx */
+void adsp21062_device::compute_fabs(int fn, int fx)
+{
+	CLEAR_ALU_FLAGS();
+	FREG(fn) = FABS(fx).f;
+}
+
+/* Fn = PASS Fx */
+void adsp21062_device::compute_fpass(int fn, int fx)
+{
+	CLEAR_ALU_FLAGS();
+
+	SHARC_REG r;
+	if (IS_FLOAT_NAN(REG(fx)))
+	{
+		r.r = FLOAT_CANONICAL_NAN;
+		m_core->astat |= AI;
+		m_core->stky |= AIS;
+	}
+	else
+	{
+		if (IS_FLOAT_DENORMAL_OR_ZERO(REG(fx)))
+		{
+			r.r = REG(fx) & FLOAT_SIGN_MASK;
+			m_core->astat |= AZ;
+		}
+		else
+		{
+			r.r = REG(fx);
+		}
+		m_core->astat |= (r.r & FLOAT_SIGN_MASK) ? AN : 0;
+	}
+
+	FREG(fn) = r.f;
+	m_core->astat |= AF;
+}
+
+/* Fn = SCALB Fx BY Fy */
+void adsp21062_device::compute_scalb(int fn, int fx, int ry)
+{
+	// verified
+	SHARC_REG r;
+	CLEAR_ALU_FLAGS();
+
+	if (IS_FLOAT_NAN(REG(fx)))
+	{
+		m_core->astat |= AI;
+		m_core->stky |= AIS;
+
+		REG(fn) = FLOAT_CANONICAL_NAN;
+	}
+	else
+	{
+		r.r = SCALB(m_core->r[fx], ry);
+
+		// AN
+		SET_FLAG_AN(r.r);
+		// AZ
+		m_core->astat |= IS_FLOAT_ZERO(r.r) ? AZ : 0;
+		// AUS
+		m_core->stky |= (IS_FLOAT_DENORMAL(r.r)) ? AUS : 0;
+
+		FREG(fn) = r.f;
+	}
 	m_core->astat |= AF;
 }
 
 /* Rn = LOGB Fx */
-void adsp21062_device::compute_logb(int rn, int rx)
+void adsp21062_device::compute_logb(int rn, int fx)
 {
 	// verified
-	uint32_t r = REG(rx);
+	uint32_t r = REG(fx);
 
 	CLEAR_ALU_FLAGS();
 
-	if (IS_FLOAT_INFINITY(REG(rx)))
+	if (IS_FLOAT_INFINITY(REG(fx)))
 	{
 		REG(rn) = FLOAT_INFINITY;
 
 		m_core->astat |= AV;
 	}
-	else if (IS_FLOAT_ZERO(REG(rx)))
+	else if (IS_FLOAT_ZERO(REG(fx)))
 	{
 		REG(rn) = FLOAT_SIGN_MASK | FLOAT_INFINITY;
 
 		m_core->astat |= AV;
 	}
-	else if (IS_FLOAT_NAN(REG(rx)))
+	else if (IS_FLOAT_NAN(REG(fx)))
 	{
-		REG(rn) = 0xffffffff;
+		REG(rn) = FLOAT_CANONICAL_NAN;
 
 		m_core->astat |= AI;
 		m_core->stky |= AIS;
@@ -515,288 +1055,117 @@ void adsp21062_device::compute_logb(int rn, int rx)
 	m_core->astat |= AF;
 }
 
-/* Fn = SCALB Fx BY Fy */
-void adsp21062_device::compute_scalb(int rn, int rx, int ry)
+/* Rn = FIX Fx BY Ry */
+void adsp21062_device::compute_fix_scaled(int rn, int fx, int ry)
+{
+	int32_t alu_i;
+	SHARC_REG r_alu;
+
+	r_alu.r = SCALB(m_core->r[fx], ry);
+	if (m_core->mode1 & MODE1_TRUNCATE)
+	{
+		alu_i = int32_t(floorf(r_alu.f));
+	}
+	else
+	{
+		alu_i = int32_t(nearbyintf(r_alu.f)); // assume rounding mode is set to FE_TONEAREST
+	}
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AN(alu_i);
+	// AZ
+	SET_FLAG_AZ(alu_i);
+	// AU
+	m_core->stky |= (IS_FLOAT_DENORMAL(r_alu.r)) ? AUS : 0;
+	// AI
+	m_core->astat |= (IS_FLOAT_NAN(REG(fx))) ? AI : 0;
+	/* TODO: AV flag */
+
+	REG(rn) = alu_i;
+	m_core->astat |= AF;
+}
+
+/* Rn = FIX Fx */
+void adsp21062_device::compute_fix(int rn, int fx)
+{
+	int32_t alu_i;
+	SHARC_REG r_alu;
+
+	r_alu.f = FREG(fx);
+	if (m_core->mode1 & MODE1_TRUNCATE)
+	{
+		alu_i = int32_t(floorf(r_alu.f));
+	}
+	else
+	{
+		alu_i = int32_t(nearbyintf(r_alu.f)); // assume rounding mode is set to FE_TONEAREST
+	}
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AN(alu_i);
+	// AZ
+	SET_FLAG_AZ(alu_i);
+	// AU
+	m_core->stky |= (IS_FLOAT_DENORMAL(r_alu.r)) ? AUS : 0;
+	// AI
+	m_core->astat |= (IS_FLOAT_NAN(REG(fx))) ? AI : 0;
+	/* TODO: AV flag */
+
+	REG(rn) = alu_i;
+	m_core->astat |= AF;
+}
+
+/* Fn = FLOAT Rx BY Ry */
+void adsp21062_device::compute_float_scaled(int fn, int rx, int ry)
+{
+	SHARC_REG x;
+	x.f = float(int32_t(REG(rx)));
+
+	// verified
+	CLEAR_ALU_FLAGS();
+
+	REG(fn) = SCALB(x, ry);
+
+	// AN
+	SET_FLAG_AN(REG(fn));
+	// AZ
+	m_core->astat |= IS_FLOAT_DENORMAL_OR_ZERO(REG(fn)) ? AZ : 0;
+	// AU
+	m_core->stky |= IS_FLOAT_DENORMAL(REG(fn)) ? AUS : 0;
+
+	m_core->astat |= AF;
+}
+
+/* Fn = FLOAT Rx */
+void adsp21062_device::compute_float(int fn, int rx)
 {
 	// verified
-	SHARC_REG r;
-	CLEAR_ALU_FLAGS();
-
-	if (IS_FLOAT_NAN(REG(rx)))
-	{
-		m_core->astat |= AI;
-		m_core->stky |= AIS;
-
-		REG(rn) = 0xffffffff;
-	}
-	else
-	{
-		r.r = SCALB(m_core->r[rx], ry);
-
-		// AN
-		SET_FLAG_AN(r.r);
-		// AZ
-		m_core->astat |= IS_FLOAT_ZERO(r.r) ? AZ : 0;
-		// AUS
-		m_core->stky |= (IS_FLOAT_DENORMAL(r.r)) ? AUS : 0;
-
-		FREG(rn) = r.f;
-	}
-	m_core->astat |= AF;
-}
-
-/* Fn = Fx + Fy */
-void adsp21062_device::compute_fadd(int rn, int rx, int ry)
-{
-	SHARC_REG r;
-	r.f = FREG(rx) + FREG(ry);
+	FREG(fn) = (float)(int32_t)REG(rx);
 
 	CLEAR_ALU_FLAGS();
 	// AN
-	m_core->astat |= (r.f < 0.0f) ? AN : 0;
+	SET_FLAG_AN(REG(fn));
 	// AZ
-	m_core->astat |= (IS_FLOAT_DENORMAL(r.r) || IS_FLOAT_ZERO(r.r)) ? AZ : 0;
+	m_core->astat |= IS_FLOAT_DENORMAL_OR_ZERO(REG(fn)) ? AZ : 0;
 	// AUS
-	m_core->stky |= (IS_FLOAT_DENORMAL(r.r)) ? AUS : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(rx)) || IS_FLOAT_NAN(REG(ry))) ? AI : 0;
+	m_core->stky |= IS_FLOAT_DENORMAL(REG(fn)) ? AUS : 0;
 	/* TODO: AV flag */
 
-	// AIS
-	if (m_core->astat & AI)   m_core->stky |= AIS;
-
-	FREG(rn) = r.f;
-	m_core->astat |= AF;
-}
-
-/* Fn = (Fx + Fy) / 2 */
-void adsp21062_device::compute_favg(int rn, int rx, int ry)
-{
-	SHARC_REG r;
-	r.f = (FREG(rx) + FREG(ry)) / 2.0f;
-
-	CLEAR_ALU_FLAGS();
-	// AN
-	m_core->astat |= (r.f < 0.0f) ? AN : 0;
-	// AZ
-	m_core->astat |= (IS_FLOAT_DENORMAL(r.r) || IS_FLOAT_ZERO(r.r)) ? AZ : 0;
-	// AUS
-	m_core->stky |= (IS_FLOAT_DENORMAL(r.r)) ? AUS : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(rx)) || IS_FLOAT_NAN(REG(ry))) ? AI : 0;
-	/* TODO: AV flag */
-
-	// AIS
-	if (m_core->astat & AI)   m_core->stky |= AIS;
-
-	FREG(rn) = r.f;
-	m_core->astat |= AF;
-}
-
-/* Fn = Fx - Fy */
-void adsp21062_device::compute_fsub(int rn, int rx, int ry)
-{
-	SHARC_REG r;
-	r.f = FREG(rx) - FREG(ry);
-
-	CLEAR_ALU_FLAGS();
-	// AN
-	m_core->astat |= (r.f < 0.0f) ? AN : 0;
-	// AZ
-	m_core->astat |= (IS_FLOAT_DENORMAL(r.r) || IS_FLOAT_ZERO(r.r)) ? AZ : 0;
-	// AUS
-	m_core->stky |= (IS_FLOAT_DENORMAL(r.r)) ? AUS : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(rx)) || IS_FLOAT_NAN(REG(ry))) ? AI : 0;
-	/* TODO: AV flag */
-
-	// AIS
-	if (m_core->astat & AI)   m_core->stky |= AIS;
-
-	FREG(rn) = r.f;
-	m_core->astat |= AF;
-}
-
-/* Fn = -Fx */
-void adsp21062_device::compute_fneg(int rn, int rx)
-{
-	SHARC_REG r;
-	r.f = -FREG(rx);
-
-	CLEAR_ALU_FLAGS();
-	// AZ
-	m_core->astat |= (IS_FLOAT_ZERO(r.r)) ? AZ : 0;
-	// AN
-	m_core->astat |= (r.f < 0.0f) ? AN : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(rx))) ? AI : 0;
-
-	// AIS
-	if (m_core->astat & AI)   m_core->stky |= AIS;
-
-	FREG(rn) = r.f;
-	m_core->astat |= AF;
-}
-
-/* COMP(Fx, Fy) */
-void adsp21062_device::compute_fcomp(int rx, int ry)
-{
-	uint32_t comp_accum;
-
-	CLEAR_ALU_FLAGS();
-	// AZ
-	if (FREG(rx) == FREG(ry))
-		m_core->astat |= AZ;
-	// AN
-	if (FREG(rx) < FREG(ry))
-		m_core->astat |= AN;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(rx)) || IS_FLOAT_NAN(REG(ry))) ? AI : 0;
-
-	// AIS
-	if (m_core->astat & AI)   m_core->stky |= AIS;
-
-	// Update ASTAT compare accumulation register
-	comp_accum = (m_core->astat >> 24) & 0xff;
-	comp_accum >>= 1;
-	if ((m_core->astat & (AZ|AN)) == 0)
-	{
-		comp_accum |= 0x80;
-	}
-	m_core->astat &= 0xffffff;
-	m_core->astat |= comp_accum << 24;
-	m_core->astat |= AF;
-}
-
-/* Fn = ABS(Fx + Fy) */
-void adsp21062_device::compute_fabs_plus(int rn, int rx, int ry)
-{
-	SHARC_REG r;
-	r.f = fabsf(FREG(rx) + FREG(ry));
-
-	CLEAR_ALU_FLAGS();
-	// AZ
-	m_core->astat |= (IS_FLOAT_DENORMAL(r.r) || IS_FLOAT_ZERO(r.r)) ? AZ : 0;
-	// AUS
-	m_core->stky |= (IS_FLOAT_DENORMAL(r.r)) ? AUS : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(rx)) || IS_FLOAT_NAN(REG(ry))) ? AI : 0;
-	/* TODO: AV flag */
-
-	// AIS
-	if (m_core->astat & AI)   m_core->stky |= AIS;
-
-	FREG(rn) = r.f;
-	m_core->astat |= AF;
-}
-
-/* Fn = MAX(Fx, Fy) */
-void adsp21062_device::compute_fmax(int rn, int rx, int ry)
-{
-	SHARC_REG r_alu;
-
-	r_alu.f = std::max(FREG(rx), FREG(ry));
-
-	CLEAR_ALU_FLAGS();
-	m_core->astat |= (r_alu.f < 0.0f) ? AN : 0;
-	// AZ
-	m_core->astat |= (IS_FLOAT_ZERO(r_alu.r)) ? AZ : 0;
-	// AU
-	m_core->stky |= (IS_FLOAT_DENORMAL(r_alu.r)) ? AUS : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(rx)) || IS_FLOAT_NAN(REG(ry))) ? AI : 0;
-	/* TODO: AV flag */
-
-	FREG(rn) = r_alu.f;
-	m_core->astat |= AF;
-}
-
-/* Fn = MIN(Fx, Fy) */
-void adsp21062_device::compute_fmin(int rn, int rx, int ry)
-{
-	SHARC_REG r_alu;
-
-	r_alu.f = std::min(FREG(rx), FREG(ry));
-
-	CLEAR_ALU_FLAGS();
-	m_core->astat |= (r_alu.f < 0.0f) ? AN : 0;
-	// AZ
-	m_core->astat |= (IS_FLOAT_ZERO(r_alu.r)) ? AZ : 0;
-	// AU
-	m_core->stky |= (IS_FLOAT_DENORMAL(r_alu.r)) ? AUS : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(rx)) || IS_FLOAT_NAN(REG(ry))) ? AI : 0;
-	/* TODO: AV flag */
-
-	FREG(rn) = r_alu.f;
-	m_core->astat |= AF;
-}
-
-/* Fn = COPYSIGN(Fx, Fy) */
-void adsp21062_device::compute_fcopysign(int rn, int rx, int ry)
-{
-	SHARC_REG r_alu;
-
-	r_alu.r = (REG(rx) & (FLOAT_EXPONENT_MASK | FLOAT_MANTISSA_MASK)) | (REG(ry) & FLOAT_SIGN_MASK); // TODO DENORM and NAN cases ?
-
-	CLEAR_ALU_FLAGS();
-	m_core->astat |= (r_alu.f < 0.0f) ? AN : 0;
-	// AZ
-	m_core->astat |= (IS_FLOAT_ZERO(r_alu.r)) ? AZ : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(rx)) || IS_FLOAT_NAN(REG(ry))) ? AI : 0;
-
-	FREG(rn) = r_alu.f;
-	m_core->astat |= AF;
-}
-
-/* Fn = CLIP Fx BY Fy */
-void adsp21062_device::compute_fclip(int rn, int rx, int ry)
-{
-	SHARC_REG r_alu;
-
-	if (FREG(rx) < fabsf(FREG(ry)))
-	{
-		r_alu.f = FREG(rx);
-	}
-	else
-	{
-		if (FREG(rx) >= 0.0f)
-		{
-			r_alu.f = fabsf(FREG(ry));
-		}
-		else
-		{
-			r_alu.f = -fabsf(FREG(ry));
-		}
-	}
-
-
-	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r_alu.r);
-	// AZ
-	m_core->astat |= (IS_FLOAT_ZERO(r_alu.r)) ? AZ : 0;
-	// AU
-	m_core->stky |= (IS_FLOAT_DENORMAL(r_alu.r)) ? AUS : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(rx)) || IS_FLOAT_NAN(REG(ry))) ? AI : 0;
-
-	FREG(rn) = r_alu.f;
 	m_core->astat |= AF;
 }
 
 /* Fn = RECIPS Fx */
-void adsp21062_device::compute_recips(int rn, int rx)
+void adsp21062_device::compute_recips(int fn, int fx)
 {
 	// verified
 	uint32_t r;
 
 	CLEAR_ALU_FLAGS();
 
-	if (IS_FLOAT_NAN(REG(rx)))
+	if (IS_FLOAT_NAN(REG(fx)))
 	{
 		// NaN
-		r = 0xffffffff;
+		r = FLOAT_CANONICAL_NAN;
 
 		// AI
 		m_core->astat |= AI;
@@ -804,19 +1173,19 @@ void adsp21062_device::compute_recips(int rn, int rx)
 		// AIS
 		m_core->stky |= AIS;
 	}
-	else if (IS_FLOAT_ZERO(REG(rx)))
+	else if (IS_FLOAT_ZERO(REG(fx)))
 	{
 		// +- Zero
-		r = (REG(rx) & FLOAT_SIGN_MASK) | FLOAT_INFINITY;
+		r = (REG(fx) & FLOAT_SIGN_MASK) | FLOAT_INFINITY;
 
 		m_core->astat |= AV;
 	}
 	else
 	{
-		uint32_t mantissa = REG(rx) & FLOAT_MANTISSA_MASK;
-		uint32_t sign = REG(rx) & FLOAT_SIGN_MASK;
+		uint32_t mantissa = REG(fx) & FLOAT_MANTISSA_MASK;
+		uint32_t sign = REG(fx) & FLOAT_SIGN_MASK;
 
-		int res_exponent = -float_get_unbiased_exponent(REG(rx)) - 1;
+		int res_exponent = -float_get_unbiased_exponent(REG(fx)) - 1;
 
 		uint32_t res_mantissa = recips_mantissa_lookup[mantissa >> 16];
 
@@ -832,39 +1201,37 @@ void adsp21062_device::compute_recips(int rn, int rx)
 
 		r = sign | (uint32_t(res_exponent) << FLOAT_EXPONENT_SHIFT) | res_mantissa;
 
-		SET_FLAG_AN(REG(rx));
+		SET_FLAG_AN(REG(fx));
 		// AZ
 		m_core->astat |= (IS_FLOAT_ZERO(r)) ? AZ : 0;
 	}
 
-	// AF
+	REG(fn) = r;
 	m_core->astat |= AF;
-
-	REG(rn) = r;
 }
 
 /* Fn = RSQRTS Fx */
-void adsp21062_device::compute_rsqrts(int rn, int rx)
+void adsp21062_device::compute_rsqrts(int fn, int fx)
 {
 	// verified
 	uint32_t r;
 
-	if (uint32_t(REG(rx)) > 0x80000000)
+	if (uint32_t(REG(fx)) > 0x80000000)
 	{
 		// non-zero negative
-		r = 0xffffffff;
+		r = FLOAT_CANONICAL_NAN;
 	}
-	else if (IS_FLOAT_NAN(REG(rx)))
+	else if (IS_FLOAT_NAN(REG(fx)))
 	{
 		// NaN
-		r = 0xffffffff;
+		r = FLOAT_CANONICAL_NAN;
 	}
 	else
 	{
-		uint32_t mantissa = REG(rx) & 0xffffff;   // mantissa + LSB of biased exponent
-		uint32_t sign = REG(rx) & FLOAT_SIGN_MASK;
+		uint32_t mantissa = REG(fx) & 0xffffff;   // mantissa + LSB of biased exponent
+		uint32_t sign = REG(fx) & FLOAT_SIGN_MASK;
 
-		int32_t res_exponent = -(float_get_unbiased_exponent(REG(rx)) >> 1) - 1;
+		int32_t res_exponent = -(float_get_unbiased_exponent(REG(fx)) >> 1) - 1;
 
 		uint32_t res_mantissa = rsqrts_mantissa_lookup[mantissa >> 17];
 
@@ -873,67 +1240,93 @@ void adsp21062_device::compute_rsqrts(int rn, int rx)
 
 	CLEAR_ALU_FLAGS();
 	// AN
-	m_core->astat |= (REG(rx) == 0x80000000) ? AN : 0;
+	m_core->astat |= (REG(fx) == 0x80000000) ? AN : 0;
 	// AZ & AV
 	m_core->astat |= (IS_FLOAT_ZERO(r)) ? AZ : 0;
-	m_core->astat |= (IS_FLOAT_ZERO(REG(rx))) ? AV : 0;
+	m_core->astat |= (IS_FLOAT_ZERO(REG(fx))) ? AV : 0;
 	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(rx)) || (REG(rx) & FLOAT_SIGN_MASK)) ? AI : 0;
+	m_core->astat |= (IS_FLOAT_NAN(REG(fx)) || (REG(fx) & FLOAT_SIGN_MASK)) ? AI : 0;
 	// AIS
 	if (m_core->astat & AI)   m_core->stky |= AIS;
-	// AF
-	m_core->astat |= AF;
 
-	REG(rn) = r;
+	REG(fn) = r;
+	m_core->astat |= AF;
 }
 
-
-/* Fn = PASS Fx */
-void adsp21062_device::compute_fpass(int rn, int rx)
+/* Fn = COPYSIGN(Fx, Fy) */
+void adsp21062_device::compute_fcopysign(int fn, int fx, int fy)
 {
-	SHARC_REG r;
-	r.f = FREG(rx);
-
 	CLEAR_ALU_FLAGS();
-	// AN
-	m_core->astat |= (r.f < 0.0f) ? AN : 0;
-	// AZ
-	m_core->astat |= (IS_FLOAT_ZERO(r.r)) ? AZ : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(rx))) ? AI : 0;
 
-	FREG(rn) = r.f;
-	m_core->astat |= AF;
-}
-
-/* Fn = ABS Fx */
-void adsp21062_device::compute_fabs(int rn, int rx)
-{
 	SHARC_REG r;
-	if (IS_FLOAT_NAN(REG(rx)))
+	if (IS_FLOAT_NAN(REG(fx)) || IS_FLOAT_NAN(REG(fy)))
 	{
-		r.r = 0xffffffff;
-	}
-	else if (IS_FLOAT_DENORMAL(REG(rx)))
-	{
-		r.r = 0;
+		r.r = FLOAT_CANONICAL_NAN;
+		m_core->astat |= AI;
+		m_core->stky |= AIS;
 	}
 	else
 	{
-		r.r = REG(rx) & 0x7fffffff;
+		r.r = REG(fy) & FLOAT_SIGN_MASK;
+		m_core->astat |= r.r ? AN : 0; // only the sign bit is set here so it avoids need to mask
+		if (IS_FLOAT_DENORMAL_OR_ZERO(REG(fx)))
+			m_core->astat |= AZ;
+		else
+			r.r |= REG(fx) & ~FLOAT_SIGN_MASK;
 	}
 
-	CLEAR_ALU_FLAGS();
-	// AZ
-	m_core->astat |= IS_FLOAT_ZERO(r.r) ? AZ : 0;
-	// AS
-	m_core->astat |= (REG(rx) < 0.0f) ? AS : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(rx))) ? AI : 0;
-
-	FREG(rn) = r.f;
+	FREG(fn) = r.f;
 	m_core->astat |= AF;
 }
+
+/* Fn = MIN(Fx, Fy) */
+void adsp21062_device::compute_fmin(int fn, int fx, int fy)
+{
+	CLEAR_ALU_FLAGS();
+	FREG(fn) = FMIN(fx, fy).f;
+}
+
+/* Fn = MAX(Fx, Fy) */
+void adsp21062_device::compute_fmax(int fn, int fx, int fy)
+{
+	CLEAR_ALU_FLAGS();
+	FREG(fn) = FMAX(fx, fy).f;
+}
+
+/* Fn = CLIP Fx BY Fy */
+void adsp21062_device::compute_fclip(int fn, int fx, int fy)
+{
+	CLEAR_ALU_FLAGS();
+
+	SHARC_REG r;
+	if (IS_FLOAT_NAN(REG(fx)) || IS_FLOAT_NAN(REG(fy)))
+	{
+		r.r = FLOAT_CANONICAL_NAN;
+		m_core->astat |= AI;
+		m_core->stky |= AIS;
+	}
+	else
+	{
+		if (IS_FLOAT_DENORMAL_OR_ZERO(REG(fx)) || IS_FLOAT_DENORMAL_OR_ZERO(REG(fy)))
+		{
+			r.r = REG(fx) & FLOAT_SIGN_MASK;
+			m_core->astat |= AZ;
+		}
+		else
+		{
+			SHARC_REG absry, negabsry;
+			absry.r = REG(fy) & ~FLOAT_SIGN_MASK;
+			negabsry.r = REG(fy) | FLOAT_SIGN_MASK;
+			r.f = std::clamp(FREG(fx), negabsry.f, absry.f);
+			m_core->astat |= IS_FLOAT_ZERO(r.r) ? AZ : 0;
+		}
+		m_core->astat |= (r.r & FLOAT_SIGN_MASK) ? AN : 0;
+	}
+
+	FREG(fn) = r.f;
+	m_core->astat |= AF;
+}
+
 
 /*****************************************************************************/
 /* Multiplier opcodes */
@@ -991,15 +1384,10 @@ uint32_t adsp21062_device::compute_mrb_plus_mul_ssin(int rx, int ry)
 }
 
 /* Fn = Fx * Fy */
-void adsp21062_device::compute_fmul(int rn, int rx, int ry)
+void adsp21062_device::compute_fmul(int fn, int fx, int fy)
 {
-	FREG(rn) = FREG(rx) * FREG(ry);
-
 	CLEAR_MULTIPLIER_FLAGS();
-	SET_FLAG_MN(REG(rn));
-	/* TODO: MV flag */
-	/* TODO: MU flag */
-	/* TODO: MI flag */
+	FREG(fn) = FMUL(fx, fy).f;
 }
 
 /*****************************************************************************/
@@ -1044,26 +1432,25 @@ void adsp21062_device::compute_dual_add_sub(int ra, int rs, int rx, int ry)
 {
 	uint32_t r_add = REG(rx) + REG(ry);
 	uint32_t r_sub = REG(rx) - REG(ry);
+	bool const av_add = ~(REG(rx) ^ REG(ry)) & (REG(rx) ^ r_add) & 0x80000000;
+	bool const av_sub = (REG(rx) ^ REG(ry)) & (REG(rx) ^ r_sub) & 0x80000000;
 
 	CLEAR_ALU_FLAGS();
-	if (r_add == 0 || r_sub == 0)
-	{
-		m_core->astat |= AZ;
-	}
-	if (r_add & 0x80000000 || r_sub & 0x80000000)
-	{
-		m_core->astat |= AN;
-	}
-	if (((~(REG(rx) ^ REG(ry)) & (REG(rx) ^ r_add)) & 0x80000000) ||
-		(( (REG(rx) ^ REG(ry)) & (REG(rx) ^ r_sub)) & 0x80000000))
+	if (av_add || av_sub)
 	{
 		m_core->astat |= AV;
+		m_core->stky |= AOS;
 	}
-	if (((uint32_t)r_add < (uint32_t)REG(rx)) ||
-		(!((uint32_t)r_sub < (uint32_t)REG(rx))))
+	m_core->astat |= ((r_add < uint32_t(REG(rx))) || (r_sub <= uint32_t(REG(rx)))) ? AC : 0;
+
+	if (m_core->mode1 & MODE1_ALUSAT)
 	{
-		m_core->astat |= AC;
+		if (av_add) SATURATE(r_add);
+		if (av_sub) SATURATE(r_sub);
 	}
+
+	m_core->astat |= ((r_add == 0) || (r_sub == 0)) ? AZ : 0;
+	m_core->astat |= ((r_add | r_sub) & 0x80000000) ? AN : 0;
 
 	REG(ra) = r_add;
 	REG(rs) = r_sub;
@@ -1122,120 +1509,68 @@ void adsp21062_device::compute_mul_ssfr_sub(int rm, int rxm, int rym, int ra, in
 }
 
 
-/* floating-point */
+/*****************************************************************************/
+/* Dual add/subtract */
 
 /* Fa = Fx + Fy,   Fs = Fx - Fy */
-void adsp21062_device::compute_dual_fadd_fsub(int ra, int rs, int rx, int ry)
+void adsp21062_device::compute_dual_fadd_fsub(int fa, int fs, int fx, int fy)
 {
-	SHARC_REG r_add, r_sub;
-	r_add.f = FREG(rx) + FREG(ry);
-	r_sub.f = FREG(rx) - FREG(ry);
-
 	CLEAR_ALU_FLAGS();
-	// AN
-	m_core->astat |= ((r_add.f < 0.0f) || (r_sub.f < 0.0f)) ? AN : 0;
-	// AZ
-	m_core->astat |= (IS_FLOAT_DENORMAL(r_add.r) || IS_FLOAT_ZERO(r_add.r) ||
-					IS_FLOAT_DENORMAL(r_sub.r) || IS_FLOAT_ZERO(r_sub.r)) ? AZ : 0;
-	// AUS
-	m_core->stky |= (IS_FLOAT_DENORMAL(r_add.r) || IS_FLOAT_DENORMAL(r_sub.r)) ? AUS : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(rx)) || IS_FLOAT_NAN(REG(ry))) ? AI : 0;
-	/* TODO: AV flag */
-
-	// AIS
-	if (m_core->astat & AI)   m_core->stky |= AIS;
-
-	FREG(ra) = r_add.f;
-	FREG(rs) = r_sub.f;
-	m_core->astat |= AF;
+	auto [r_add, r_sub] = FADD_FSUB(fx, fy);
+	FREG(fa) = r_add.f;
+	FREG(fs) = r_sub.f;
 }
+
+
+/*****************************************************************************/
+/* Floating-point multiplication and ALU operation */
 
 /* Fm = Fxm * Fym,   Fa = Fxa + Fya */
 void adsp21062_device::compute_fmul_fadd(int fm, int fxm, int fym, int fa, int fxa, int fya)
 {
-	SHARC_REG r_mul, r_add;
-	r_mul.f = FREG(fxm) * FREG(fym);
-	r_add.f = FREG(fxa) + FREG(fya);
-
 	CLEAR_MULTIPLIER_FLAGS();
-	SET_FLAG_MN(r_mul.r);
-	/* TODO: MV flag */
-	/* TODO: MU flag */
-	/* TODO: MI flag */
-
 	CLEAR_ALU_FLAGS();
-	m_core->astat |= (r_add.f < 0.0f) ? AN : 0;
-	// AZ
-	m_core->astat |= (IS_FLOAT_DENORMAL(r_add.r) || IS_FLOAT_ZERO(r_add.r)) ? AZ : 0;
-	// AU
-	m_core->stky |= (IS_FLOAT_DENORMAL(r_add.r)) ? AUS : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(fxa)) || IS_FLOAT_NAN(REG(fya))) ? AI : 0;
-	/* TODO: AV flag */
 
-	// AIS
-	if (m_core->astat & AI)   m_core->stky |= AIS;
+	SHARC_REG r_mul = FMUL(fxm, fym);
+	SHARC_REG r_alu = FADD(fxa, fya);
 
 	FREG(fm) = r_mul.f;
-	FREG(fa) = r_add.f;
-	m_core->astat |= AF;
+	FREG(fa) = r_alu.f;
 }
 
 /* Fm = Fxm * Fym,   Fa = Fxa - Fya */
 void adsp21062_device::compute_fmul_fsub(int fm, int fxm, int fym, int fa, int fxa, int fya)
 {
-	SHARC_REG r_mul, r_sub;
-	r_mul.f = FREG(fxm) * FREG(fym);
-	r_sub.f = FREG(fxa) - FREG(fya);
-
 	CLEAR_MULTIPLIER_FLAGS();
-	SET_FLAG_MN(r_mul.r);
-	/* TODO: MV flag */
-	/* TODO: MU flag */
-	/* TODO: MI flag */
-
 	CLEAR_ALU_FLAGS();
-	m_core->astat |= (r_sub.f < 0.0f) ? AN : 0;
-	// AZ
-	m_core->astat |= (IS_FLOAT_DENORMAL(r_sub.r) || IS_FLOAT_ZERO(r_sub.r)) ? AZ : 0;
-	// AU
-	m_core->stky |= (IS_FLOAT_DENORMAL(r_sub.r)) ? AUS : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(fxa)) || IS_FLOAT_NAN(REG(fya))) ? AI : 0;
-	/* TODO: AV flag */
 
-	// AIS
-	if (m_core->astat & AI)   m_core->stky |= AIS;
+	SHARC_REG r_mul = FMUL(fxm, fym);
+	SHARC_REG r_alu = FSUB(fxa, fya);
 
 	FREG(fm) = r_mul.f;
-	FREG(fa) = r_sub.f;
-	m_core->astat |= AF;
+	FREG(fa) = r_alu.f;
 }
 
-/* Fm = Fxm * Fym,   Fa = FLOAT Fxa BY Fya */
-void adsp21062_device::compute_fmul_float_scaled(int fm, int fxm, int fym, int fa, int fxa, int fya)
+/* Fm = Fxm * Fym,   Fa = FLOAT Rxa BY Rya */
+void adsp21062_device::compute_fmul_float_scaled(int fm, int fxm, int fym, int fa, int rxa, int rya)
 {
-	SHARC_REG x;
-	SHARC_REG r_mul, r_alu;
-	r_mul.f = FREG(fxm) * FREG(fym);
-
-	x.f = float(int32_t(REG(fxa)));
-
-	r_alu.r = SCALB(x, fya);
-
 	CLEAR_MULTIPLIER_FLAGS();
-	SET_FLAG_MN(r_mul.r);
-	/* TODO: MV flag */
-	/* TODO: MU flag */
-	/* TODO: MI flag */
-
 	CLEAR_ALU_FLAGS();
+
+	SHARC_REG r_mul = FMUL(fxm, fym);
+
+	SHARC_REG x;
+	SHARC_REG r_alu;
+
+	x.f = float(int32_t(REG(rxa)));
+
+	r_alu.r = SCALB(x, rya);
+
 	m_core->astat |= (r_alu.f < 0.0f) ? AN : 0;
 	// AZ
-	m_core->astat |= (IS_FLOAT_DENORMAL(r_alu.r) || IS_FLOAT_ZERO(r_alu.r)) ? AZ : 0;
+	m_core->astat |= IS_FLOAT_DENORMAL_OR_ZERO(r_alu.r) ? AZ : 0;
 	// AU
-	m_core->stky |= (IS_FLOAT_DENORMAL(r_alu.r)) ? AUS : 0;
+	m_core->stky |= IS_FLOAT_DENORMAL(r_alu.r) ? AUS : 0;
 	/* TODO: set AV if overflowed */
 
 	FREG(fm) = r_mul.f;
@@ -1243,14 +1578,18 @@ void adsp21062_device::compute_fmul_float_scaled(int fm, int fxm, int fym, int f
 	m_core->astat |= AF;
 }
 
-/* Fm = Fxm * Fym,   Fa = FIX Fxa BY Fya */
-void adsp21062_device::compute_fmul_fix_scaled(int fm, int fxm, int fym, int fa, int fxa, int fya)
+/* Fm = Fxm * Fym,   Ra = FIX Fxa BY Rya */
+void adsp21062_device::compute_fmul_fix_scaled(int fm, int fxm, int fym, int ra, int fxa, int rya)
 {
-	int32_t alu_i;
-	SHARC_REG r_mul, r_alu;
-	r_mul.f = FREG(fxm) * FREG(fym);
+	CLEAR_MULTIPLIER_FLAGS();
+	CLEAR_ALU_FLAGS();
 
-	r_alu.r = SCALB(m_core->r[fxa], fya);
+	SHARC_REG r_mul = FMUL(fxm, fym);
+
+	int32_t alu_i;
+	SHARC_REG r_alu;
+
+	r_alu.r = SCALB(m_core->r[fxa], rya);
 
 	if (m_core->mode1 & MODE1_TRUNCATE)
 	{
@@ -1261,13 +1600,6 @@ void adsp21062_device::compute_fmul_fix_scaled(int fm, int fxm, int fym, int fa,
 		alu_i = int32_t(nearbyintf(r_alu.f)); // assume rounding mode is set to FE_TONEAREST
 	}
 
-	CLEAR_MULTIPLIER_FLAGS();
-	SET_FLAG_MN(r_mul.r);
-	/* TODO: MV flag */
-	/* TODO: MU flag */
-	/* TODO: MI flag */
-
-	CLEAR_ALU_FLAGS();
 	SET_FLAG_AN(alu_i);
 	// AZ
 	SET_FLAG_AZ(alu_i);
@@ -1278,166 +1610,75 @@ void adsp21062_device::compute_fmul_fix_scaled(int fm, int fxm, int fym, int fa,
 	/* TODO: AV flag */
 
 	FREG(fm) = r_mul.f;
-	REG(fa) = alu_i; // TODO: check this, should be RA?
+	REG(ra) = alu_i;
 	m_core->astat |= AF;
 }
 
-void adsp21062_device::compute_fmul_avg(int fm, int fxm, int fym, int fa, int fxa, int fya)
+void adsp21062_device::compute_fmul_favg(int fm, int fxm, int fym, int fa, int fxa, int fya)
 {
-	SHARC_REG r_mul, r_alu;
-	r_mul.f = FREG(fxm) * FREG(fym);
-	r_alu.f = (FREG(fxa) + FREG(fya)) / 2.0f;
-
 	CLEAR_MULTIPLIER_FLAGS();
-	SET_FLAG_MN(r_mul.r);
-	/* TODO: MV flag */
-	/* TODO: MU flag */
-	/* TODO: MI flag */
-
 	CLEAR_ALU_FLAGS();
-	// AN
-	m_core->astat |= (r_alu.f < 0.0f) ? AN : 0;
-	// AZ
-	m_core->astat |= (IS_FLOAT_DENORMAL(r_alu.r) || IS_FLOAT_ZERO(r_alu.r)) ? AZ : 0;
-	// AUS
-	m_core->stky |= (IS_FLOAT_DENORMAL(r_alu.r)) ? AUS : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(fxa)) || IS_FLOAT_NAN(REG(fya))) ? AI : 0;
-	/* TODO: AV flag */
+
+	SHARC_REG r_mul = FMUL(fxm, fym);
+	SHARC_REG r_alu = FAVG(fxa, fya);
 
 	FREG(fm) = r_mul.f;
 	FREG(fa) = r_alu.f;
-	m_core->astat |= AF;
 }
 
-void adsp21062_device::compute_fmul_abs(int fm, int fxm, int fym, int fa, int fxa, int fya)
+void adsp21062_device::compute_fmul_fabs(int fm, int fxm, int fym, int fa, int fxa)
 {
-	SHARC_REG r_mul, r_alu;
-	r_mul.f = FREG(fxm) * FREG(fym);
-	if (IS_FLOAT_NAN(REG(fxa)))
-	{
-		r_alu.r = 0xffffffff;
-	}
-	else if (IS_FLOAT_DENORMAL(REG(fxa)))
-	{
-		r_alu.r = 0;
-	}
-	else
-	{
-		r_alu.r = REG(fxa) & 0x7fffffff;
-	}
-
 	CLEAR_MULTIPLIER_FLAGS();
-	SET_FLAG_MN(r_mul.r);
-	/* TODO: MV flag */
-	/* TODO: MU flag */
-	/* TODO: MI flag */
-
 	CLEAR_ALU_FLAGS();
-	// AZ
-	m_core->astat |= IS_FLOAT_ZERO(r_alu.r) ? AZ : 0;
-	// AS
-	m_core->astat |= (REG(fxa) < 0.0f) ? AS : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(fxa))) ? AI : 0;
+
+	SHARC_REG r_mul = FMUL(fxm, fym);
+	SHARC_REG r_alu = FABS(fxa);
 
 	FREG(fm) = r_mul.f;
 	FREG(fa) = r_alu.f;
-	m_core->astat |= AF;
 }
 
 /* Fm = Fxm * Fym,   Fa = MAX(Fxa, Fya) */
 void adsp21062_device::compute_fmul_fmax(int fm, int fxm, int fym, int fa, int fxa, int fya)
 {
-	SHARC_REG r_mul, r_alu;
-	r_mul.f = FREG(fxm) * FREG(fym);
-
-	r_alu.f = std::max(FREG(fxa), FREG(fya));
-
 	CLEAR_MULTIPLIER_FLAGS();
-	SET_FLAG_MN(r_mul.r);
-	/* TODO: MV flag */
-	/* TODO: MU flag */
-	/* TODO: MI flag */
-
 	CLEAR_ALU_FLAGS();
-	m_core->astat |= (r_alu.f < 0.0f) ? AN : 0;
-	// AZ
-	m_core->astat |= (IS_FLOAT_ZERO(r_alu.r)) ? AZ : 0;
-	// AU
-	m_core->stky |= (IS_FLOAT_DENORMAL(r_alu.r)) ? AUS : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(fxa)) || IS_FLOAT_NAN(REG(fya))) ? AI : 0;
-	/* TODO: AV flag */
+
+	SHARC_REG r_mul = FMUL(fxm, fym);
+	SHARC_REG r_alu = FMAX(fxa, fya);
 
 	FREG(fm) = r_mul.f;
 	FREG(fa) = r_alu.f;
-	m_core->astat |= AF;
 }
 
 
 /* Fm = Fxm * Fym,   Fa = MIN(Fxa, Fya) */
 void adsp21062_device::compute_fmul_fmin(int fm, int fxm, int fym, int fa, int fxa, int fya)
 {
-	SHARC_REG r_mul, r_alu;
-	r_mul.f = FREG(fxm) * FREG(fym);
-
-	r_alu.f = std::min(FREG(fxa), FREG(fya));
-
 	CLEAR_MULTIPLIER_FLAGS();
-	SET_FLAG_MN(r_mul.r);
-	/* TODO: MV flag */
-	/* TODO: MU flag */
-	/* TODO: MI flag */
-
 	CLEAR_ALU_FLAGS();
-	m_core->astat |= (r_alu.f < 0.0f) ? AN : 0;
-	// AZ
-	m_core->astat |= (IS_FLOAT_ZERO(r_alu.r)) ? AZ : 0;
-	// AU
-	m_core->stky |= (IS_FLOAT_DENORMAL(r_alu.r)) ? AUS : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(fxa)) || IS_FLOAT_NAN(REG(fya))) ? AI : 0;
-	/* TODO: AV flag */
+
+	SHARC_REG r_mul = FMUL(fxm, fym);
+	SHARC_REG r_alu = FMIN(fxa, fya);
 
 	FREG(fm) = r_mul.f;
 	FREG(fa) = r_alu.f;
-	m_core->astat |= AF;
 }
 
 
+/*****************************************************************************/
+/* Multiplication and dual add/subtract */
 
 /* Fm = Fxm * Fym,   Fa = Fxa + Fya,   Fs = Fxa - Fya */
 void adsp21062_device::compute_fmul_dual_fadd_fsub(int fm, int fxm, int fym, int fa, int fs, int fxa, int fya)
 {
-	SHARC_REG r_mul, r_add, r_sub;
-	r_mul.f = FREG(fxm) * FREG(fym);
-	r_add.f = FREG(fxa) + FREG(fya);
-	r_sub.f = FREG(fxa) - FREG(fya);
-
 	CLEAR_MULTIPLIER_FLAGS();
-	SET_FLAG_MN(r_mul.r);
-	/* TODO: MV flag */
-	/* TODO: MU flag */
-	/* TODO: MI flag */
-
 	CLEAR_ALU_FLAGS();
-	// AN
-	m_core->astat |= ((r_add.r < 0.0f) || (r_sub.r < 0.0f)) ? AN : 0;
-	// AZ
-	m_core->astat |= (IS_FLOAT_DENORMAL(r_add.r) || IS_FLOAT_ZERO(r_add.r) ||
-					IS_FLOAT_DENORMAL(r_sub.r) || IS_FLOAT_ZERO(r_sub.r)) ? AZ : 0;
-	// AUS
-	m_core->stky |= (IS_FLOAT_DENORMAL(r_add.r) || IS_FLOAT_DENORMAL(r_sub.r)) ? AUS : 0;
-	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(fxa)) || IS_FLOAT_NAN(REG(fya))) ? AI : 0;
-	/* TODO: AV flag */
 
-	// AIS
-	if (m_core->astat & AI)   m_core->stky |= AIS;
+	SHARC_REG r_mul = FMUL(fxm, fym);
+	auto [r_add, r_sub] = FADD_FSUB(fxa, fya);
 
 	FREG(fm) = r_mul.f;
 	FREG(fa) = r_add.f;
 	FREG(fs) = r_sub.f;
-	m_core->astat |= AF;
 }

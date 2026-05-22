@@ -677,7 +677,6 @@ protected:
 	virtual void static_generate_entry_point() override;
 	virtual void static_generate_memory_accessor(int size, int iswrite, const char *name, uml::code_handle *&handleptr) override;
 
-private:
 	bool            m_bigendian;
 };
 
@@ -1902,15 +1901,6 @@ public:
 	virtual void sh3_register_map(address_map& map) override ATTR_COLD;
 };
 
-class sh7709s_device : public sh3_base_device
-{
-public:
-	sh7709s_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock, endianness_t endianness = ENDIANNESS_LITTLE);
-
-	virtual void sh3_register_map(address_map& map) override ATTR_COLD;
-};
-
-
 class sh4_device : public sh4_base_device
 {
 public:
@@ -1978,7 +1968,6 @@ protected:
 DECLARE_DEVICE_TYPE(SH3,     sh3_device)
 DECLARE_DEVICE_TYPE(SH7708S, sh7708s_device)
 DECLARE_DEVICE_TYPE(SH7709,  sh7709_device)
-DECLARE_DEVICE_TYPE(SH7709S, sh7709s_device)
 
 DECLARE_DEVICE_TYPE(SH4,     sh4_device)
 DECLARE_DEVICE_TYPE(SH7091,  sh7091_device)

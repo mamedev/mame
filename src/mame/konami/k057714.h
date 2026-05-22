@@ -16,7 +16,7 @@ public:
 
 	void set_pixclock(const XTAL &xtal);
 
-	int draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint32_t read(offs_t offset);
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

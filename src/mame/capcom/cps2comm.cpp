@@ -92,6 +92,7 @@
 #include <locale>
 #include <optional>
 #include <sstream>
+#include <system_error>
 #include <thread>
 #include <utility>
 
@@ -142,6 +143,8 @@ public:
 		if (m_remote)
 		{
 			m_in_sock.open(m_remote->protocol(), err);
+			if (!err)
+				m_in_sock.set_option(asio::ip::tcp::no_delay(true), err);
 			if (err)
 				return err;
 		}
@@ -173,7 +176,8 @@ public:
 
 	void stop()
 	{
-		m_ioctx.post(
+		asio::post(
+				m_ioctx,
 				[this] ()
 				{
 					m_stopping = true;
@@ -191,7 +195,8 @@ public:
 
 	void set_routing(u8 val)
 	{
-		m_ioctx.post(
+		asio::post(
+				m_ioctx,
 				[this, val] ()
 				{
 					if (BIT(val, 0, 2) == 0U)
@@ -216,7 +221,8 @@ public:
 
 	void send_in(u8 data)
 	{
-		m_ioctx.post(
+		asio::post(
+				m_ioctx,
 				[this, data] ()
 				{
 					if (m_in_connected)
@@ -231,7 +237,8 @@ public:
 
 	void send_out(u8 data)
 	{
-		m_ioctx.post(
+		asio::post(
+				m_ioctx,
 				[this, data] ()
 				{
 					if (m_out_sock.is_open())
@@ -342,8 +349,10 @@ private:
 	{
 		LOG("Accepting OUT port connection on %s\n", *m_local);
 		m_acceptor.async_accept(
-				[this] (std::error_code const &err, asio::ip::tcp::socket sock)
+				[this] (std::error_code err, asio::ip::tcp::socket sock)
 				{
+					if (!err)
+						sock.set_option(asio::ip::tcp::no_delay(true), err);
 					if (err)
 					{
 						LOG("Error accepting OUT port connection: %s\n", err.message());
@@ -407,6 +416,8 @@ private:
 					{
 						std::error_code e;
 						m_in_sock.open(m_remote->protocol(), e);
+						if (!e)
+							m_in_sock.set_option(asio::ip::tcp::no_delay(true), e);
 						if (e)
 						{
 							LOG("Error opening IN port socket: %s\n", e.message());

@@ -80,7 +80,9 @@ void oti64111_pci_device::device_start()
 	// INTA#
 	intr_pin = 1;
 
-	// TODO: (default?) min_gnt = 0xff, max_lat = 0x01
+	// min_gnt = <maximum allowed>, max_lat = 0.25 usec
+	minimum_grant = 0xff;
+	maximum_latency = 0x01;
 }
 
 void oti64111_pci_device::device_reset()

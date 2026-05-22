@@ -144,6 +144,19 @@ void renderer_sdl1::setup_texture(const osd_dim &size)
 
 	fmt = (m_scale_mode.pixel_format ? m_scale_mode.pixel_format : mode->format);
 
+	// The software renderer does not write the alpha channel, leaving it as zero.
+	// On macOS this causes all color channels to be multiplied to zero, producing a black screen.
+	// Map alpha formats to their opaque equivalents so SDL treats the alpha byte as
+	// padding and fills it with 0xFF when blitting to the window surface.
+	switch (SDL_PixelFormat(fmt))
+	{
+		case SDL_PIXELFORMAT_ARGB8888: fmt = SDL_PIXELFORMAT_XRGB8888; break;
+		case SDL_PIXELFORMAT_ABGR8888: fmt = SDL_PIXELFORMAT_XBGR8888; break;
+		case SDL_PIXELFORMAT_RGBA8888: fmt = SDL_PIXELFORMAT_RGBX8888; break;
+		case SDL_PIXELFORMAT_BGRA8888: fmt = SDL_PIXELFORMAT_BGRX8888; break;
+		default: break;
+	}
+
 	if (m_scale_mode.is_scale)
 	{
 		int m_hw_scale_width = 0;
@@ -251,7 +264,7 @@ int renderer_sdl1::draw(int update)
 	int32_t vofs, hofs, blitwidth, blitheight, ch, cw;
 	int bpp;
 
-	osd_dim wdim = window().get_size();
+	osd_dim wdim = window().get_size_pixels();
 	if (has_flags(FI_CHANGED) || (wdim != m_last_dim))
 	{
 		destroy_all_textures();
@@ -604,7 +617,7 @@ static void yuv_RGB_to_YUY2X2(const uint16_t *bitmap, uint8_t *ptr, const int pi
 
 render_primitive_list *renderer_sdl1::get_primitives()
 {
-	osd_dim nd = window().get_size();
+	osd_dim nd = window().get_size_pixels();
 	if (nd != m_blit_dim)
 	{
 		m_blit_dim = nd;

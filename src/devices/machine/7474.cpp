@@ -43,7 +43,6 @@
 #include "7474.h"
 
 
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -101,27 +100,26 @@ void ttl7474_device::update()
 {
 	if (!m_preset && m_clear)           // line 1 in truth table
 	{
-		m_output    = 1;
+		m_output = 1;
 		m_output_comp = 0;
 	}
 	else if (m_preset && !m_clear)      // line 2 in truth table
 	{
-		m_output    = 0;
+		m_output = 0;
 		m_output_comp = 1;
 	}
 	else if (!m_preset && !m_clear)     // line 3 in truth table
 	{
-		m_output    = 1;
+		m_output = 1;
 		m_output_comp = 1;
 	}
 	else if (!m_last_clock && m_clk)    // line 4 in truth table
 	{
-		m_output    =  m_d;
+		m_output = m_d;
 		m_output_comp = !m_d;
 	}
 
 	m_last_clock = m_clk;
-
 
 	// call callback if any of the outputs changed
 	if (m_output != m_last_output)
@@ -188,7 +186,7 @@ void ttl7474_device::d_w(int state)
 
 int ttl7474_device::output_r()
 {
-	return m_output!=0;
+	return m_output != 0;
 }
 
 
@@ -198,7 +196,7 @@ int ttl7474_device::output_r()
 
 int ttl7474_device::output_comp_r()
 {
-	return m_output_comp!=0;
+	return m_output_comp != 0;
 }
 
 void ttl7474_device::init()

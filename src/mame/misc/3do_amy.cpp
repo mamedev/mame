@@ -21,7 +21,7 @@ TODO:
 #include "3do_amy.h"
 
 #define VERBOSE (0)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 

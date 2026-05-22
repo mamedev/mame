@@ -78,6 +78,7 @@
 #include "sblaster.h"
 #include "ssi2001.h"
 #include "stereo_fx.h"
+#include "wss.h"
 
 // network
 #include "3c503.h"
@@ -233,6 +234,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("omti8621", ISA16_OMTI8621);
 	device.option_add("lrk331", LRK331);
 	device.option_add("hpblp", HPBLP);
+	device.option_add("wss", ISA16_WSS);
 
 	// EISA cards
 	// TODO: move to own block

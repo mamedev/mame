@@ -7,7 +7,8 @@ Novag (Perfect Technology*) Star Diamond (model 1004)
 
 *: Novag Industries dissolved in 2000. The Novag brand continued for a few years
 under Perfect Technology, Ltd., established by the daughter of Novag's founder.
-The main programmer (David Kittinger) also moved to the new company.
+The chief engineer (Wayne Chow) and the chess programmer (David Kittinger) also
+moved to the new company.
 
 Although there may be newer Novag products with (old) software by David Kittinger,
 Star Diamond was the last chess computer that he personally worked on.

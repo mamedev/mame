@@ -599,12 +599,12 @@ void dspp_device::parse_operands(uint32_t numops)
 uint16_t dspp_device::read_next_operand()
 {
 	int32_t value = m_core->m_operands[m_core->m_opidx].value;
-	//if (m_core->m_op == 0x46a0) printf("Value is %08x\n", value);
+	//if (m_core->m_op == 0x46a0) logerror("Value is %08x\n", value);
 
 	if (value < 0)
 	{
 		value = read_data(m_core->m_operands[m_core->m_opidx].addr);
-		//if (m_core->m_op == 0x46a0) printf("New value is %08x from %08x\n", value, m_core->m_operands[m_core->m_opidx].addr);
+		//if (m_core->m_op == 0x46a0) logerror("New value is %08x from %08x\n", value, m_core->m_operands[m_core->m_opidx].addr);
 	}
 
 	// Next operand
@@ -760,7 +760,7 @@ void dspp_device::execute_run()
 				debugger_instruction_hook(m_core->m_pc);
 
 			m_core->m_op = read_op(m_core->m_pc);
-			//printf("%04x: %04x\n", (uint16_t)m_core->m_pc, (uint16_t)m_core->m_op);
+			//logerror("%04x: %04x\n", (uint16_t)m_core->m_pc, (uint16_t)m_core->m_op);
 			update_pc();
 
 			// Decode and execute
@@ -922,7 +922,7 @@ void dspp_device::exec_branch()
 	if (mode == 2)
 		branch = !branch;
 
-	//printf("Branch: %d %d %d %d %d\n", branch ? 1 : 0, flag0 ? 1 : 0, mask0 ? 1 : 0, flag1 ? 1 : 0, mask1 ? 1 : 0);
+	//logerror("Branch: %d %d %d %d %d\n", branch ? 1 : 0, flag0 ? 1 : 0, mask0 ? 1 : 0, flag1 ? 1 : 0, mask1 ? 1 : 0);
 
 	if (branch)
 		m_core->m_pc = m_core->m_op & 0x3ff;
@@ -1057,7 +1057,7 @@ inline void dspp_device::exec_arithmetic()
 	int32_t alu_a, alu_b;
 
 	//if (m_core->m_op == 0x46a0)
-		//printf("Arithmetic: numops:%d, muxa:%d, muxb:%d, alu_op:%d, barrel_code:%d\n", numops, muxa, muxb, alu_op, barrel_code);
+		//logerror("Arithmetic: numops:%d, muxa:%d, muxb:%d, alu_op:%d, barrel_code:%d\n", numops, muxa, muxb, alu_op, barrel_code);
 
 	switch (muxa)
 	{
@@ -1070,7 +1070,7 @@ inline void dspp_device::exec_arithmetic()
 		{
 			alu_a = read_next_operand() << 4;
 			//if (m_core->m_op == 0x46a0)
-				//printf("Arithmetic: Next operand: %04x\n", alu_a >> 4);
+				//logerror("Arithmetic: Next operand: %04x\n", alu_a >> 4);
 			break;
 		}
 		case 3:
@@ -1573,7 +1573,7 @@ void dspp_device::service_input_dma(int32_t channel)
 
 			if (isSQXD)
 			{
-				printf("SQXD NOT TESTED!");
+				logerror("SQXD NOT TESTED!");
 
 				sample = decode_sqxd(curbyte, dma.m_prev_value);
 				dma.m_prev_value = sample;
@@ -2146,7 +2146,7 @@ uint32_t dspp_device::read_ext_control(offs_t offset)
 		}
 		default:
 		{
-			printf("DSPP: Unhandled external control read (%.4x)\n", offset << 2);
+			logerror("DSPP: Unhandled external control read (%.4x)\n", offset << 2);
 			break;
 		}
 	}
@@ -2381,7 +2381,7 @@ void dspp_device::write_ext_control(offs_t offset, uint32_t data)
 		}
 		default:
 		{
-			printf("DSPP: Unhandled external control write (%.4x with %.8x)\n", offset << 2, data);
+			logerror("DSPP: Unhandled external control write (%.4x with %.8x)\n", offset << 2, data);
 			break;
 		}
 	}
@@ -2607,7 +2607,7 @@ uint16_t dspp_device::read_output_fifo()
 
 // DEBUG!
 
-char * GetBinary(char * buffer, uint32_t val, uint32_t bits)
+inline char *GetBinary(char *buffer, uint32_t val, uint32_t bits)
 {
 	uint32_t i;
 
@@ -2619,33 +2619,33 @@ char * GetBinary(char * buffer, uint32_t val, uint32_t bits)
 	return buffer;
 }
 
-void dspp_device::dump_state()
+void dspp_device::dump_state(std::ostream &str)
 {
 	// DMA
 	for (uint32_t i = 0; i < NUM_DMA_CHANNELS; ++i)
 	{
-		printf("\n=== CHANNEL %02X ===\n", i);
-		printf("CURR_ADDRESS: %08X\n", m_fifo_dma[i].m_current_addr);
-		printf("CURR_COUNT:   %08X\n", m_fifo_dma[i].m_current_count);
-		printf("NEXT_ADDR:    %08X\n", m_fifo_dma[i].m_next_addr);
-		printf("NEXT_COUNT:   %08X\n", m_fifo_dma[i].m_next_count);
-		printf("PREV_VALUE:   %08X\n", m_fifo_dma[i].m_prev_value);
-		printf("PREV_CURRENT: %08X\n", m_fifo_dma[i].m_prev_current);
-		printf("GO_FOREVER:   %X\n", m_fifo_dma[i].m_go_forever);
-		printf("NEXT_VALID:   %X\n", m_fifo_dma[i].m_next_valid);
+		util::stream_format(str, "\n=== CHANNEL %02X ===\n", i);
+		util::stream_format(str, "CURR_ADDRESS: %08X\n", m_fifo_dma[i].m_current_addr);
+		util::stream_format(str, "CURR_COUNT:   %08X\n", m_fifo_dma[i].m_current_count);
+		util::stream_format(str, "NEXT_ADDR:    %08X\n", m_fifo_dma[i].m_next_addr);
+		util::stream_format(str, "NEXT_COUNT:   %08X\n", m_fifo_dma[i].m_next_count);
+		util::stream_format(str, "PREV_VALUE:   %08X\n", m_fifo_dma[i].m_prev_value);
+		util::stream_format(str, "PREV_CURRENT: %08X\n", m_fifo_dma[i].m_prev_current);
+		util::stream_format(str, "GO_FOREVER:   %X\n", m_fifo_dma[i].m_go_forever);
+		util::stream_format(str, "NEXT_VALID:   %X\n", m_fifo_dma[i].m_next_valid);
 	}
 
 	char buffer[64];
 
-	printf("\n=== GLOBAL REGISTER===\n");
-	printf("DSPX_CONTROL:           %08X\n", m_core->m_dspx_control);
-	printf("DSPX_RESET:             %08X\n", m_dspx_reset);
-	printf("DSPX_INT_ENABLE:        %08X\n", m_dspx_int_enable);
-	printf("DSPX_CHANNEL_ENABLE:    %08X %s\n", m_dspx_channel_enable, GetBinary(buffer, m_dspx_channel_enable, 32));
-	printf("DSPX_CHANNEL_COMPLETE:  %08X %s\n", m_dspx_channel_complete, GetBinary(buffer, m_dspx_channel_complete, 32));
-	printf("DSPX_CHANNEL_DIRECTION: %08X %s\n", m_dspx_channel_direction, GetBinary(buffer, m_dspx_channel_direction, 32));
-	printf("DSPX_CHANNEL_8BIT:      %08X %s\n", m_dspx_channel_8bit, GetBinary(buffer, m_dspx_channel_8bit, 32));
-	printf("DSPX_CHANNEL_SQXD:      %08X %s\n", m_dspx_channel_sqxd, GetBinary(buffer, m_dspx_channel_sqxd, 32));
+	util::stream_format(str, "\n=== GLOBAL REGISTER===\n");
+	util::stream_format(str, "DSPX_CONTROL:           %08X\n", m_core->m_dspx_control);
+	util::stream_format(str, "DSPX_RESET:             %08X\n", m_dspx_reset);
+	util::stream_format(str, "DSPX_INT_ENABLE:        %08X\n", m_dspx_int_enable);
+	util::stream_format(str, "DSPX_CHANNEL_ENABLE:    %08X %s\n", m_dspx_channel_enable, GetBinary(buffer, m_dspx_channel_enable, 32));
+	util::stream_format(str, "DSPX_CHANNEL_COMPLETE:  %08X %s\n", m_dspx_channel_complete, GetBinary(buffer, m_dspx_channel_complete, 32));
+	util::stream_format(str, "DSPX_CHANNEL_DIRECTION: %08X %s\n", m_dspx_channel_direction, GetBinary(buffer, m_dspx_channel_direction, 32));
+	util::stream_format(str, "DSPX_CHANNEL_8BIT:      %08X %s\n", m_dspx_channel_8bit, GetBinary(buffer, m_dspx_channel_8bit, 32));
+	util::stream_format(str, "DSPX_CHANNEL_SQXD:      %08X %s\n", m_dspx_channel_sqxd, GetBinary(buffer, m_dspx_channel_sqxd, 32));
 
 #if 0
 	uint32_t    m_dspx_shadow_current_addr;

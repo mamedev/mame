@@ -188,8 +188,7 @@ public:
 		, m_rtc(*this, "rtc")
 		, m_view{
 			{*this, "view_0"}, {*this, "view_1"}, {*this, "view_2"}, {*this, "view_3"},
-		    {*this, "view_4"}, {*this, "view_5"}, {*this, "view_6"}, {*this, "view_7"}
-		}
+			{*this, "view_4"}, {*this, "view_5"}, {*this, "view_6"}, {*this, "view_7"} }
 		, m_port_row(*this, "ROW%u", 0U)
 		, m_port_status(*this, "status")
 		, m_rombank(*this, "rombank%u", 0U)
@@ -210,10 +209,10 @@ public:
 	{
 	}
 
-	void drwrt100(machine_config &config);
-	void nakajies210(machine_config &config);
-	void nakajies220(machine_config &config);
-	void dator3k(machine_config &config);
+	void drwrt100(machine_config &config) ATTR_COLD;
+	void nakajies210(machine_config &config) ATTR_COLD;
+	void nakajies220(machine_config &config) ATTR_COLD;
+	void dator3k(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_button_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(power_button_irq);
@@ -748,16 +747,14 @@ void nakajies_state::machine_reset()
 	m_lcd_memory_start = 0;
 	m_keyboard_row = 0;
 
-	for (int i = 0; i < NUMBER_OF_AREAS; i++)
-	{
-		m_view[i].select(VIEW_ROM);
-	}
+	for (auto &view : m_view)
+		view.select(VIEW_ROM);
 
-	for (int i = 0; i < NUMBER_OF_AREAS; i++)
-	{
-		m_rombank[i]->set_entry(0x07);
-		m_rambank[i]->set_entry(0);
-	}
+	for (auto &bank : m_rombank)
+		bank->set_entry(0x07);
+
+	for (auto &bank : m_rambank)
+		bank->set_entry(0);
 }
 
 u32 nakajies_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

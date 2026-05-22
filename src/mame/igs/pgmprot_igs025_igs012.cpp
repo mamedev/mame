@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, ElSemi
 /***********************************************************************
- PGM 012 + 025 PGM protection emulation
+ IGS 012 + 025 PGM protection emulation
 
  these are simulations of the IGS 012 and 025 protection combination
  used on the following PGM games
@@ -14,6 +14,9 @@
 
  IGS025 is some kind of state machine / logic device which the game
  uses for various security checks bitswap checks.
+
+ TODO:
+ - Hook up IGS012 protection device
 
  ***********************************************************************/
 
@@ -130,6 +133,8 @@ void pgm_012_025_state::pgm_012_025_drgw2(machine_config &config)
 
 	IGS025(config, m_igs025, 0);
 	//m_igs025->set_external_cb(FUNC(pgm_022_025_state::igs025_to_igs012_callback), this);
+
+	//IGS012(config, m_igs012, 0);
 }
 
 

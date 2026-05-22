@@ -35,25 +35,19 @@ enum fsr_mask : u32
 	FSR_RM  = 0x00000180, // rounding mode
 	FSR_SWF = 0x0000fe00, // software field
 	FSR_RMB = 0x00010000, // (32381 only) register modify bit
-};
 
-enum rm_mask : u32
-{
-	RM_N = 0x00000000, // round to nearest value
-	RM_Z = 0x00000080, // round toward zero
-	RM_U = 0x00000100, // round toward positive infinity
-	RM_D = 0x00000180, // round toward negative infinity
-};
+	RM_N    = 0x00000000, // round to nearest value
+	RM_Z    = 0x00000080, // round toward zero
+	RM_U    = 0x00000100, // round toward positive infinity
+	RM_D    = 0x00000180, // round toward negative infinity
 
-enum tt_mask : u32
-{
-	TT_UND = 0x00000001, // underflow
-	TT_OVF = 0x00000002, // overflow
-	TT_DVZ = 0x00000003, // divide by zero
-	TT_ILL = 0x00000004, // illegal instruction
-	TT_INV = 0x00000005, // invalid operation
-	TT_INX = 0x00000006, // inexact result
-	TT_RSV = 0x00000007, // reserved
+	TT_UND  = 0x00000001, // underflow
+	TT_OVF  = 0x00000002, // overflow
+	TT_DVZ  = 0x00000003, // divide by zero
+	TT_ILL  = 0x00000004, // illegal instruction
+	TT_INV  = 0x00000005, // invalid operation
+	TT_INX  = 0x00000006, // inexact result
+	TT_RSV  = 0x00000007, // reserved
 };
 
 enum state : unsigned

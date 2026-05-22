@@ -2,7 +2,7 @@
 // copyright-holders:Phil Stroffolino, Nicola Salmoria
 /***************************************************************************
 
-Homedata Games
+Home Data Games
 
 driver by Phil Stroffolino and Nicola Salmoria
 
@@ -169,7 +169,7 @@ Sound:  SN76489AN DAC
 OSC:    9.000MHz 16.000MHz
 Custom: GX61A01
 
-Note: Manual dips are completely wrong, this actually matches pteacher
+Note: Manual DIP switches are completely wrong, this actually matches pteacher
 
 ----------------------------------------------------------------------------
 Mahjong-yougo no Kisotairyoku [麻雀用語の基礎体力]
@@ -404,24 +404,26 @@ uint8_t homedata_upd7807_state::pteacher_io_r()
 
 uint8_t homedata_upd7807_state::pteacher_keyboard_r()
 {
-	int dips = ioport("DSW")->read();
+	//logerror("%s: keyboard_r with port A = %02x\n",machine().describe_context(),upd7807_porta);
 
-	//  logerror("%s: keyboard_r with port A = %02x\n",machine().describe_context(),upd7807_porta);
+	bool const p1sel = !BIT(m_upd7807_porta, 3);
+	bool const p2sel = !BIT(m_upd7807_porta, 7);
+	uint8_t const p1col = (m_upd7807_porta >> 0) & 0x07;
+	uint8_t const p2col = (m_upd7807_porta >> 4) & 0x07;
+	uint8_t result = 0;
 
-	if (m_upd7807_porta & 0x80)
+	for (unsigned i = 0; 5 > i; ++i)
 	{
-		// player 1 + dip switches
-		int const row = m_upd7807_porta & 0x07;
-		return m_keys[row]->read() | (((dips >> row) & 1) << 5);  // 0-5
-	}
-	if (m_upd7807_porta & 0x08) // TODO: this works fine with DIPs 7-8 of the 1st bank, but then expects DIPs 1-4 of the 2nd bank in inverted order
-	{
-		// player 2 + dip switches
-		int const row = ((m_upd7807_porta >> 4) & 0x07) + 6;
-		return m_keys[row]->read() | (((dips >> row) & 1) << 5); // 6-11
+		if (p1sel) result |= BIT(~m_keys[i + 0]->read() & 0x3f, p1col) << i;
+		if (p2sel) result |= BIT(~m_keys[i + 5]->read() & 0x3f, p2col) << i;
 	}
 
-	return 0xff;
+	// switches 1-4 of the 2nd bank are in reverse order
+	ioport_value const dips = ioport("DSW")->read();
+	if (p1sel) result |= BIT(~dips, p1col + 0) << 5;
+	if (p2sel) result |= BIT(~dips, p2col + 6) << 5;
+
+	return ~result;
 }
 
 uint8_t homedata_upd7807_state::pteacher_upd7807_porta_r()
@@ -661,7 +663,7 @@ static INPUT_PORTS_START( mjhokite )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_INCLUDE(mahjong_matrix_2p_ff)
+	PORT_INCLUDE( mahjong_matrix_2p_ff )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( reikaids )
@@ -793,122 +795,12 @@ static INPUT_PORTS_START( battlcry )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mj_keyboard )
-	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   // DIP switch (handled separately)
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   // DIP switch (handled separately)
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   // DIP switch (handled separately)
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   // DIP switch (handled separately)
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   // DIP switch (handled separately)
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   // DIP switch (handled separately)
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   // DIP switch (handled separately)
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   // DIP switch (handled separately)
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   // dip switch (handled separately)
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   // DIP switch (handled separately)
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY10")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   // DIP switch (handled separately)
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY11")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   // DIP switch (handled separately)
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( pteacher )
-	PORT_START("DSW")   /* dip switches (handled by pteacher_keyboard_r) */
+	PORT_START("DSW")   /* DIP switches (handled by pteacher_keyboard_r) */
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0000, "In-Game BGM")        PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x0002, 0x0000, "In-Game Music")          PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:3,4")
@@ -936,7 +828,7 @@ static INPUT_PORTS_START( pteacher )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_INCLUDE( mj_keyboard )
+	PORT_INCLUDE( mahjong_matrix_2p_ff )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjjoship )
@@ -962,7 +854,7 @@ static INPUT_PORTS_START( mjjoship )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jogakuen )
-	PORT_START("DSW")   /* dip switches (handled by pteacher_keyboard_r) */
+	PORT_START("DSW")   /* DIP switches (handled by pteacher_keyboard_r) */
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
@@ -975,12 +867,12 @@ static INPUT_PORTS_START( jogakuen )
 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "In-Game BGM" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x0010, 0x0010, "In-Game Music" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x0020, 0x0020, "Gal Strip Voice" ) PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1004,11 +896,11 @@ static INPUT_PORTS_START( jogakuen )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_INCLUDE( mj_keyboard )
+	PORT_INCLUDE( mahjong_matrix_2p_ff )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjikaga )
-	PORT_START("DSW")   /* dip switches (handled by pteacher_keyboard_r) */
+	PORT_START("DSW")   /* DIP switches (handled by pteacher_keyboard_r) */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1019,14 +911,14 @@ static INPUT_PORTS_START( mjikaga )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "In-Game BGM" ) PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "In-Game Music" ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1049,7 +941,7 @@ static INPUT_PORTS_START( mjikaga )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_INCLUDE( mj_keyboard )
+	PORT_INCLUDE( mahjong_matrix_2p_ff )
 INPUT_PORTS_END
 
 

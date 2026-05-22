@@ -87,12 +87,12 @@ menu_load_save_state_base::file_entry::file_entry(std::string &&file_name, std::
 
 menu_load_save_state_base::menu_load_save_state_base(
 		mame_ui_manager &mui,
-		render_container &container,
+		render_target &target,
 		std::string_view header,
 		std::string_view footer,
 		bool must_exist,
 		bool one_shot)
-	: autopause_menu<>(mui, container)
+	: autopause_menu<>(mui, target)
 	, m_switch_poller(machine().input())
 	, m_footer(footer)
 	, m_confirm_delete(nullptr)
@@ -496,7 +496,7 @@ void menu_load_save_state_base::custom_render(uint32_t flags, void *selectedref,
 
 	// draw the confirmation prompt if necessary
 	if (!m_confirm_prompt.empty())
-		ui().draw_text_box(container(), m_confirm_prompt, text_layout::text_justify::CENTER, 0.5F, 0.5F, ui().colors().background_color());
+		ui().draw_text_box(target(), m_confirm_prompt, text_layout::text_justify::CENTER, 0.5F, 0.5F, ui().colors().background_color());
 }
 
 
@@ -550,8 +550,8 @@ bool menu_load_save_state_base::is_present(const std::string &name) const
 //  ctor
 //-------------------------------------------------
 
-menu_load_state::menu_load_state(mame_ui_manager &mui, render_container &container, bool one_shot)
-	: menu_load_save_state_base(mui, container, _("menu-savestate", "Load State"), _("menu-savestate", "Select state to load"), true, one_shot)
+menu_load_state::menu_load_state(mame_ui_manager &mui, render_target &target, bool one_shot)
+	: menu_load_save_state_base(mui, target, _("menu-savestate", "Load State"), _("menu-savestate", "Select state to load"), true, one_shot)
 {
 }
 
@@ -574,8 +574,8 @@ void menu_load_state::process_file(std::string &&file_name)
 //  ctor
 //-------------------------------------------------
 
-menu_save_state::menu_save_state(mame_ui_manager &mui, render_container &container, bool one_shot)
-	: menu_load_save_state_base(mui, container, _("menu-savestate", "Save State"), _("menu-savestate", "Press a key or joystick button, or select state to overwrite"), false, one_shot)
+menu_save_state::menu_save_state(mame_ui_manager &mui, render_target &target, bool one_shot)
+	: menu_load_save_state_base(mui, target, _("menu-savestate", "Save State"), _("menu-savestate", "Press a key or joystick button, or select state to overwrite"), false, one_shot)
 {
 }
 

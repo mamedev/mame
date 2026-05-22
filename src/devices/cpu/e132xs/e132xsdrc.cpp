@@ -4,13 +4,20 @@
 #include "emu.h"
 #include "e132xs.h"
 
-#include "32xsdefs.h"
-#include "e132xsfe.h"
+#include "e1defs.h"
+#include "e1fe.h"
 
 #include "cpu/drcumlsh.h"
 
+#include "util/vecstream.h"
 
-/* map variables */
+#include <locale>
+
+
+// configuration
+enum { DO_ELIDE_CONDITION_CALC = 1 };
+
+// map variables
 #define MAPVAR_PC       M0
 #define MAPVAR_CYCLES   M1
 
@@ -63,65 +70,60 @@ public:
 struct hyperstone_device::c_funcs
 {
 
-	static void unimplemented(void *param)
+	static void unimplemented(hyperstone_device &that)
 	{
-		auto &that = *reinterpret_cast<hyperstone_device *>(param);
 		fatalerror("PC=%08X: Unimplemented op %08X\n", that.PC, that.m_core->arg0);
 	}
 
-	static void print(void *param)
+	static void print(hyperstone_device &that)
 	{
-		auto &that = *reinterpret_cast<hyperstone_device *>(param);
 		printf("%c: %08x\n", (char)that.m_core->arg0, that.m_core->arg1);
 	}
 
-	static void standard_irq_callback(void *param)
+	static void standard_irq_callback(hyperstone_device &that)
 	{
-		auto &that = *reinterpret_cast<hyperstone_device *>(param);
 		that.standard_irq_callback(that.m_core->arg0, that.m_core->global_regs[0]);
 	}
 
-	static void debugger_exception_hook(void *param)
+	static void debugger_exception_hook(hyperstone_device &that)
 	{
-		auto &that = *reinterpret_cast<hyperstone_device *>(param);
 		that.debugger_exception_hook(int32_t(that.m_core->arg0));
 	}
 
-	static void adjust_timer_interrupt(void *param)
+	static void adjust_timer_interrupt(hyperstone_device &that)
 	{
-		reinterpret_cast<hyperstone_device *>(param)->adjust_timer_interrupt();
+		that.adjust_timer_interrupt();
 	}
 
-	static void compute_tr(void *param)
+	static void compute_tr(hyperstone_device &that)
 	{
-		reinterpret_cast<hyperstone_device *>(param)->compute_tr();
+		that.compute_tr();
 	}
 
-	static void update_timer_prescale(void *param)
+	static void update_timer_prescale(hyperstone_device &that)
 	{
-		reinterpret_cast<hyperstone_device *>(param)->update_timer_prescale();
+		that.update_timer_prescale();
 	}
 
-	static void update_bus_control(void *param)
+	static void update_bus_control(hyperstone_device &that)
 	{
-		reinterpret_cast<hyperstone_device *>(param)->update_bus_control();
+		that.update_bus_control();
 	}
 
-	static void update_memory_control(void *param)
+	static void update_memory_control(hyperstone_device &that)
 	{
-		reinterpret_cast<hyperstone_device *>(param)->update_memory_control();
+		that.update_memory_control();
 	}
 
 #if E132XS_LOG_DRC_REGS || E132XS_LOG_INTERPRETER_REGS
-	static void dump_registers(void *param)
+	static void dump_registers(hyperstone_device &that)
 	{
-		reinterpret_cast<hyperstone_device *>(param)->dump_registers();
+		that.dump_registers();
 	}
 #endif
 
-	static void total_cycles(void *param)
+	static void total_cycles(hyperstone_device &that)
 	{
-		auto &that = *reinterpret_cast<hyperstone_device *>(param);
 		that.m_core->numcycles = that.total_cycles();
 	}
 };
@@ -261,14 +263,15 @@ void hyperstone_device::generate_get_trap_addr(drcuml_block &block, uml::code_la
 void hyperstone_device::code_compile_block(uint8_t mode, offs_t pc)
 {
 	compiler_state compiler(mode);
-	const opcode_desc *seqhead, *seqlast;
-	bool override = false;
 
 	auto profile = g_profiler.start(PROFILER_DRC_COMPILE);
 
-	/* get a description of this sequence */
+	// describe a sequence of instructions
 	const opcode_desc *desclist = m_drcfe->describe_code(pc);
+	if (m_drcuml->logging())
+		log_descriptions(desclist, 0);
 
+	bool override = false;
 	bool succeeded = false;
 	while (!succeeded)
 	{
@@ -278,14 +281,15 @@ void hyperstone_device::code_compile_block(uint8_t mode, offs_t pc)
 			drcuml_block &block(m_drcuml->begin_block(8192));
 
 			/* loop until we get through all instruction sequences */
-			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
+			const opcode_desc *seqlast = nullptr;
+			for (const opcode_desc *seqhead = desclist; seqhead; seqhead = seqlast->next())
 			{
 				/* add a code log entry */
 				if (m_drcuml->logging())
 					block.append_comment("-------------------------");
 
 				/* determine the last instruction in this sequence */
-				for (seqlast = seqhead; seqlast != nullptr; seqlast = seqlast->next())
+				for (seqlast = seqhead; seqlast; seqlast = seqlast->next())
 					if (seqlast->end_sequence())
 						break;
 				assert(seqlast != nullptr);
@@ -351,6 +355,62 @@ void hyperstone_device::code_compile_block(uint8_t mode, offs_t pc)
 		}
 	}
 }
+
+void hyperstone_device::log_descriptions(const opcode_desc *desc_list, unsigned indent)
+{
+	util::ovectorstream buffer;
+	buffer.imbue(std::locale::classic());
+
+	// assume no indent is the start of a sequence and needs a heading
+	if (!indent)
+		m_drcuml->log_printf("\nDescriptor list @ %08X\n", desc_list->pc);
+
+	for ( ; desc_list; desc_list = desc_list->next())
+	{
+		buffer.clear();
+		buffer.seekp(0);
+		desc_list->log_flags(buffer);
+		buffer.put('\0');
+
+		m_drcuml->log_printf("%08X t:%08X f:%s: ", desc_list->pc, desc_list->targetpc, &buffer.vec()[0]);
+
+		// disassemble the current instruction and output it to the log
+		buffer.clear();
+		buffer.seekp(0);
+		util::stream_format(buffer, "%*s", 4 * indent, "");
+		if (desc_list->virtual_noop())
+			buffer << "<virtual nop>";
+		else
+			m_disassembler.disassemble_one(buffer, desc_list->pc, desc_list->opptr);
+		buffer.put('\0');
+		m_drcuml->log_printf(
+				(desc_list->regin.any() || desc_list->regout.any()) ? "%-40s" : "%s",
+				&buffer.vec()[0]);
+
+		// output register dependencies
+		buffer.clear();
+		buffer.seekp(0);
+		if (desc_list->regin.any())
+		{
+			desc_list->log_registers_used(buffer);
+			if (desc_list->regout.any())
+				buffer << ' ';
+		}
+		if (desc_list->regout.any())
+			desc_list->log_registers_modified(buffer);
+		buffer.put('\0');
+		m_drcuml->log_printf("%s\n", &buffer.vec()[0]);
+
+		// if we have a delay slot, output it recursively
+		if (desc_list->delay.first())
+			log_descriptions(desc_list->delay.first(), indent + 1);
+
+		// at the end of a sequence add a dividing line
+		if (desc_list->end_sequence())
+			m_drcuml->log_printf("-----\n");
+	}
+}
+
 
 /***************************************************************************
     STATIC CODEGEN
@@ -856,7 +916,10 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 			UML_TEST(block, mem(&m_core->delay_slot), ~uint32_t(0));
 			UML_JMPc(block, uml::COND_NZ, set_delay_pc);
 
-			UML_ADD(block, DRC_PC, DRC_PC, desc->length);
+			if (desc->pc_value_unknown())
+				UML_ADD(block, DRC_PC, DRC_PC, desc->length);
+			else
+				UML_MOV(block, DRC_PC, desc->pc_value());
 			UML_MOV(block, mem(&m_core->delay_slot_taken), 0);
 			UML_JMP(block, done);
 
@@ -868,7 +931,10 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 		}
 		else
 		{
-			UML_ADD(block, DRC_PC, DRC_PC, desc->length);
+			if (desc->pc_value_unknown())
+				UML_ADD(block, DRC_PC, DRC_PC, desc->length);
+			else
+				UML_MOV(block, DRC_PC, desc->pc_value());
 			UML_MOV(block, mem(&m_core->delay_slot_taken), 0);
 		}
 

@@ -168,35 +168,28 @@ protected:
 	TIMER_CALLBACK_MEMBER(dac_update);
 
 private:
-	enum base_addr
-	{
-		POWERBUS_BASE   = 0x00010000,
-		MEMCTL_BASE     = 0x00020000,
-		VDU_BASE        = 0x00030000,
-		TE_BASE         = 0x00040000,
-		DSP_BASE        = 0x00060000,
-		CTRLPORT_BASE   = 0x00070000,
-		MPEG_BASE       = 0x00080000,
-		TE_TRAM_BASE    = 0x000c0000,
-		SLOT1_BASE      = 0x01000000,
-		SLOT2_BASE      = 0x02000000,
-		SLOT3_BASE      = 0x03000000,
-		SLOT4_BASE      = 0x04000000,
-		SLOT5_BASE      = 0x05000000,
-		SLOT6_BASE      = 0x06000000,
-		SLOT7_BASE      = 0x07000000,
-		SLOT8_BASE      = 0x08000000,
-		CPUID_BASE      = 0x10000000,
-		RAM_BASE        = 0x40000000,
-	};
+	static constexpr uint32_t POWERBUS_BASE   = 0x00010000;
+	static constexpr uint32_t MEMCTL_BASE     = 0x00020000;
+	static constexpr uint32_t VDU_BASE        = 0x00030000;
+	static constexpr uint32_t TE_BASE         = 0x00040000;
+	static constexpr uint32_t DSP_BASE        = 0x00060000;
+	static constexpr uint32_t CTRLPORT_BASE   = 0x00070000;
+	static constexpr uint32_t MPEG_BASE       = 0x00080000;
+	static constexpr uint32_t TE_TRAM_BASE    = 0x000c0000;
+	static constexpr uint32_t SLOT1_BASE      = 0x01000000;
+	static constexpr uint32_t SLOT2_BASE      = 0x02000000;
+	static constexpr uint32_t SLOT3_BASE      = 0x03000000;
+	static constexpr uint32_t SLOT4_BASE      = 0x04000000;
+	static constexpr uint32_t SLOT5_BASE      = 0x05000000;
+	static constexpr uint32_t SLOT6_BASE      = 0x06000000;
+	static constexpr uint32_t SLOT7_BASE      = 0x07000000;
+	static constexpr uint32_t SLOT8_BASE      = 0x08000000;
+	static constexpr uint32_t CPUID_BASE      = 0x10000000;
+	static constexpr uint32_t RAM_BASE        = 0x40000000;
 
-	enum dev_mask
-	{
-		DEVICE_MASK     = 0x0000ffff,
-		SLOT_MASK       = 0x00ffffff,
-		TE_TRAM_MASK    = 0x00003fff,
-	};
-
+	static constexpr uint32_t DEVICE_MASK     = 0x0000ffff;
+	static constexpr uint32_t SLOT_MASK       = 0x00ffffff;
+	static constexpr uint32_t TE_TRAM_MASK    = 0x00003fff;
 
 	void configure_ppc_address_map(address_space &space);
 
