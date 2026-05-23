@@ -19,7 +19,7 @@
   - Evil Stone
 
   Triple processor games (1 main TC0090LVC (z80 core), 1 slave z80, 1 sound z80)
-  - Fighting hawk
+  - Fighting Hawk
   - Raimais
   - Champion Wrestler
 
@@ -2540,18 +2540,18 @@ GAME( 1989, puzznicba, puzznic,  puzznici,  puzznic,   taitol_1cpu_state, empty_
 
 GAME( 1990, horshoes,  0,        horshoes,  horshoes,  horshoes_state,    empty_init,     ROT270, "Taito America Corporation", "American Horseshoes (US)", 0 )
 
-GAME( 1990, palamed,   0,        palamed,   palamed,   taitol_1cpu_state, empty_init,     ROT0,   "Hot-B Co., Ltd.", "Palamedes (US)", 0 ) // Prototype or location test
+GAME( 1990, palamed,   0,        palamed,   palamed,   taitol_1cpu_state, empty_init,     ROT0,   "Hot-B", "Palamedes (US)", 0 ) // Prototype or location test
 GAME( 1990, palamedj,  palamed,  palamed,   palamed,   taitol_1cpu_state, empty_init,     ROT0,   "Taito Corporation", "Palamedes (Japan)", 0 )
 
 GAME( 1993, cachat,    0,        cachat,    cachat,    taitol_1cpu_state, empty_init,     ROT0,   "Taito Corporation", "Cachat (Japan)", 0 )
 GAME( 1993, tubeit,    cachat,   cachat,    tubeit,    taitol_1cpu_state, empty_init,     ROT0,   "bootleg", "Tube-It", 0 ) // No (c) message
 
-GAME( 199?, cubybop,   0,        cachat,    cubybop,   taitol_1cpu_state, empty_init,     ROT0,   "Hot-B Co., Ltd.", "Cuby Bop (location test)", 0 ) // No (c) message, but Hot-B company logo in tile gfx
+GAME( 199?, cubybop,   0,        cachat,    cubybop,   taitol_1cpu_state, empty_init,     ROT0,   "Hot-B", "Cuby Bop (Japan, location test)", 0 ) // No (c) message, but Hot-B company logo in tile gfx
 
-GAME( 1992, plgirls,   0,        cachat,    plgirls,   taitol_1cpu_state, empty_init,     ROT270, "Hot-B Co., Ltd.", "Play Girls", 0 )
+GAME( 1992, plgirls,   0,        cachat,    plgirls,   taitol_1cpu_state, empty_init,     ROT270, "Hot-B", "Play Girls", 0 )
 GAME( 1992, lagirl,    plgirls,  cachat,    plgirls,   taitol_1cpu_state, empty_init,     ROT270, "bootleg", "LA Girl", 0 ) // bootleg hardware with changed title & backgrounds
 
-GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  taitol_1cpu_state, empty_init,     ROT270, "Hot-B Co., Ltd.", "Play Girls 2", 0 )
+GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  taitol_1cpu_state, empty_init,     ROT270, "Hot-B", "Play Girls 2", 0 )
 GAME( 1993, plgirls2b, plgirls2, cachat,    plgirls2,  taitol_1cpu_state, empty_init,     ROT270, "bootleg", "Play Girls 2 (bootleg)", MACHINE_IMPERFECT_GRAPHICS ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts almost the same - scroll offset problems)
 
 GAME( 1990, evilston,  0,        evilston,  evilston,  taitol_2cpu_state, empty_init,     ROT270, "Spacy Industrial, Ltd.", "Evil Stone", 0 ) // Taiwanese publisher, unknown Japanese developer
