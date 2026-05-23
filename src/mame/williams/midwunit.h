@@ -5,8 +5,8 @@
     Driver for Midway Wolf-unit games.
 
 **************************************************************************/
-#ifndef MAME_MIDWAY_MIDWUNIT_H
-#define MAME_MIDWAY_MIDWUNIT_H
+#ifndef MAME_WILLIAMS_MIDWUNIT_H
+#define MAME_WILLIAMS_MIDWUNIT_H
 
 #pragma once
 
@@ -89,4 +89,4 @@ private:
 	uint16_t *m_umk3_palette = nullptr;
 };
 
-#endif // MAME_MIDWAY_MIDWUNIT_H
+#endif // MAME_WILLIAMS_MIDWUNIT_H

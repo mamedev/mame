@@ -5,8 +5,8 @@
     Driver for Midway V-Unit games
 
 **************************************************************************/
-#ifndef MAME_MIDWAY_MIDVUNIT_H
-#define MAME_MIDWAY_MIDVUNIT_H
+#ifndef MAME_WILLIAMS_MIDVUNIT_H
+#define MAME_WILLIAMS_MIDVUNIT_H
 
 #pragma once
 
@@ -283,4 +283,4 @@ private:
 	int m_lastval = 0;
 };
 
-#endif // MAME_MIDWAY_MIDVUNIT_H
+#endif // MAME_WILLIAMS_MIDVUNIT_H

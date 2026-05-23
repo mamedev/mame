@@ -5,8 +5,8 @@
     Driver for Midway Zeus games
 
 **************************************************************************/
-#ifndef MAME_MIDWAY_MIDZEUS_H
-#define MAME_MIDWAY_MIDZEUS_H
+#ifndef MAME_WILLIAMS_MIDZEUS_H
+#define MAME_WILLIAMS_MIDZEUS_H
 
 #pragma once
 
@@ -202,4 +202,4 @@ private:
 	required_ioport m_io_gun_trigger;
 };
 
-#endif // MAME_MIDWAY_MIDZEUS_H
+#endif // MAME_WILLIAMS_MIDZEUS_H

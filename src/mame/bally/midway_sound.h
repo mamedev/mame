@@ -7,8 +7,8 @@
     Functions to emulate general the various Midway sound cards.
 
 ***************************************************************************/
-#ifndef MAME_MIDWAY_MIDWAY_H
-#define MAME_MIDWAY_MIDWAY_H
+#ifndef MAME_BALLY_MIDWAY_SOUND_H
+#define MAME_BALLY_MIDWAY_SOUND_H
 
 #pragma once
 
@@ -205,4 +205,4 @@ private:
 	void irq_w(int state);
 };
 
-#endif // MAME_MIDWAY_MIDWAY_H
+#endif // MAME_BALLY_MIDWAY_SOUND_H

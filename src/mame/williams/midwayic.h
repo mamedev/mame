@@ -5,8 +5,8 @@
     Emulation of various Midway ICs
 
 ***************************************************************************/
-#ifndef MAME_MIDWAY_MIDWAYIC_H
-#define MAME_MIDWAY_MIDWAYIC_H
+#ifndef MAME_WILLIAMS_MIDWAYIC_H
+#define MAME_WILLIAMS_MIDWAYIC_H
 
 #pragma once
 
@@ -239,4 +239,4 @@ DECLARE_DEVICE_TYPE(MIDWAY_SERIAL_PIC_EMU, midway_serial_pic_emu_device)
 DECLARE_DEVICE_TYPE(MIDWAY_SERIAL_PIC2, midway_serial_pic2_device)
 DECLARE_DEVICE_TYPE(MIDWAY_IOASIC, midway_ioasic_device)
 
-#endif // MAME_MIDWAY_MIDWAYIC_H
+#endif // MAME_WILLIAMS_MIDWAYIC_H
