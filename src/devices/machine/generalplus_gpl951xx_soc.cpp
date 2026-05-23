@@ -11,7 +11,7 @@
 // GPL95101UB / GPL95101UB1 (101 models have fewer features than 100)
 //
 
- 
+
 #include "emu.h"
 #include "generalplus_gpl951xx_soc.h"
 
@@ -479,6 +479,38 @@ u16 generalplus_gpl951xx_device::timer_ctrl_r()
 template<int Timer>
 void generalplus_gpl951xx_device::timer_ctrl_w(u16 data)
 {
+	char const *const SRCB_NAME[8] =
+	{
+		"2048Hz",
+		"1024Hz",
+		"256Hz",
+		"TimeBaseB",
+		"TimeBaseA",
+		"(logic low)",
+		"(logic high)",
+		"EXT1 with pre-scaler"
+	};
+
+	char const *const SRCA_NAME[16] =
+	{
+		"SYSCLK/2",
+		"SYSCLK/256",
+		"32768Hz",
+		"8192Hz",
+		"4096Hz",
+		"(logic high)",
+		"Timer Overflow",
+		"EXT0 with pre-scaler",
+		"(logic low)",
+		"9: reserved",
+		"a: reserved",
+		"b: reserved",
+		"c: reserved",
+		"d: reserved",
+		"e: reserved",
+		"f: reserved"
+	};
+
 	u8 tmxif_clear = (data & 0x8000) >> 15;
 	u8 tmxie = (data & 0x4000) >> 14;
 	u8 tmxen = (data & 0x2000) >> 13;
@@ -487,7 +519,9 @@ void generalplus_gpl951xx_device::timer_ctrl_w(u16 data)
 	u8 srcbsel = (data & 0x0070) >> 4;
 	u8 srcasel = (data & 0x000f) >> 0;
 
-	logerror("%s: timer%c_ctrl_w %04x (tmxif_clear %01x) (interrupt enabled %01x) (timer enabled %01x) (ext0sel %01x) (ext1sel %01x) (srcbsel %01x) (srcasel %01x)\n", machine().describe_context(), 'a'+Timer, data, tmxif_clear, tmxie, tmxen, ext0sel, ext1sel, m_srcb[srcbsel], m_srca[srcasel]);
+	logerror("%s: timer%c_ctrl_w %04x (tmxif_clear %01x) (interrupt enabled %01x) (timer enabled %01x) (ext0sel %01x) (ext1sel %01x) (srcbsel %01x) (srcasel %01x)\n",
+			machine().describe_context(), 'a'+Timer, data,
+			tmxif_clear, tmxie, tmxen, ext0sel, ext1sel, SRCB_NAME[srcbsel], SRCA_NAME[srcasel]);
 
 	if (data & 0x8000)
 	{
@@ -544,12 +578,12 @@ void generalplus_gpl951xx_device::timer_preload_w(u16 data)
 // 10
 //  9  CAPxSEL[1]  - 00 = every falling, 01 = every rising, 10/11 = reserved
 //  8  CAPxSEL[0]
-// 
+//
 //  7
 //  6
 //  5  CMPxSEL[1] - 00 = high pulse on CCPB, 01 = low pulse on CCPB, 10 = unaffected on CCPB, 11 = reserved
 //  4  CMPxSEL[0]
-// 
+//
 //  3
 //  2
 //  1  PWMxSEL[1] - 00 = PWM mode/NRO output, 01 = PWM mode/NRZ output, 10 = BAM mode/NRO output, 11 = BAM mode/NRZ output
@@ -830,6 +864,18 @@ u16 generalplus_gpl951xx_device::madc_ctrl_r()
 
 void generalplus_gpl951xx_device::madc_ctrl_w(u16 data)
 {
+	char const *const CHANNEL_NAME[8] =
+	{
+		"LINEIN 0",
+		"LINEIN 1",
+		"LINEIN 2",
+		"LINEIN 3",
+		"LINEIN 4",
+		"LINEIN 5",
+		"1.2V bandgap",
+		"LDOV50"
+	};
+
 	logerror("%s: madc_ctrl_w %04x\n", machine().describe_context(), data);
 
 	if (data & 0x8000)
@@ -857,7 +903,7 @@ void generalplus_gpl951xx_device::madc_ctrl_w(u16 data)
 
 		u8 channel = data & 0x0007;
 
-		logerror("manual ADC conversion on port %s\n", m_adc_channels[channel]); 
+		logerror("manual ADC conversion on port %s\n", CHANNEL_NAME[channel]);
 
 		if (channel < 6)
 		{

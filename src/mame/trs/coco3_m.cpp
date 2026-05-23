@@ -47,13 +47,12 @@
 #include "coco3.h"
 
 //-------------------------------------------------
-//  device_start
+//  machine_start
 //-------------------------------------------------
 
-void coco3_state::device_start()
+void coco3_state::machine_start()
 {
-	// call base device_start
-	coco_state::device_start();
+	coco_state::machine_start();
 
 	// save state support
 	save_item(NAME(m_prev_keyboard_pressed));
@@ -114,7 +113,7 @@ INPUT_CHANGED_MEMBER(coco3_state::keyboard_changed)
 	uint8_t any_pressed = 0;
 	for (unsigned i = 0; i < m_keyboard.size(); i++)
 	{
-		any_pressed |= (~(m_keyboard[i]->read()) | poll_joystick_buttons()) & 0xFF;
+		any_pressed |= (~(m_keyboard[i]->read()) | poll_joystick_buttons()) & 0xff;
 	}
 
 	bool pressed = any_pressed != 0;
