@@ -11,7 +11,7 @@
 #pragma once
 
 #include "csd.h"
-#include "midway.h"
+#include "midway_sound.h"
 
 #include "ballysound.h"
 

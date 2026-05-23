@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 /*
 
-Spy Hunter(Tecfri bootleg)
+Spy Hunter (Tecfri bootleg)
 single PCB with 2x Z80
 
 significant changes compared to original HW

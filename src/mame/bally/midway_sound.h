@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    midway.h
+    midway_sound.h
 
     Functions to emulate general the various Midway sound cards.
 

@@ -11,17 +11,16 @@
       and Filter are all exactly the same), so these should probably be combined
       into one base class with two subclass device implementations to reduce
       duplicated code.
-      The "Cheap Squeak Deluxe" board in /audio/csd.cpp is also almost identical
+      The "Cheap Squeak Deluxe" board in bally/csd.cpp is also almost identical
       to the "Sounds Good" board, and should also be a member of any future
       combined class/device implementation.
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "mcr.h"
-#include "midway.h"
+#include "midway_sound.h"
 
-#include "williamssound.h"
+#include "machine/rescap.h"
 
 #include <algorithm>
 
