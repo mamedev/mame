@@ -679,7 +679,7 @@ void generalplus_gpl951xx_device::tft_ctrl_w(u16 data)
 	u8 clk_s = (data & 0x000e) >> 1;
 	u8 tften = (data & 0x0001) >> 0;
 
-	static const char* modenames[16] =
+	static char const *const modenames[16] =
 	{
 		"0: UPS051 mode",
 		"1: UPS052 mode",
@@ -1884,19 +1884,19 @@ void generalplus_gpl951xx_device::device_add_mconfig(machine_config &config)
 	m_spg_video->space_read_callback().set(FUNC(generalplus_gpl951xx_device::read_space));
 	m_spg_video->set_video_space(DEVICE_SELF, AS_PROGRAM);
 
-	TIMER(config, "timer_a").configure_generic(FUNC(generalplus_gpl951xx_device::timer_cb<0>));
-	TIMER(config, "timer_b").configure_generic(FUNC(generalplus_gpl951xx_device::timer_cb<1>));
-	TIMER(config, "timer_c").configure_generic(FUNC(generalplus_gpl951xx_device::timer_cb<2>));
-	TIMER(config, "timer_d").configure_generic(FUNC(generalplus_gpl951xx_device::timer_cb<3>));
+	TIMER(config, m_timer[0]).configure_generic(FUNC(generalplus_gpl951xx_device::timer_cb<0>));
+	TIMER(config, m_timer[1]).configure_generic(FUNC(generalplus_gpl951xx_device::timer_cb<1>));
+	TIMER(config, m_timer[2]).configure_generic(FUNC(generalplus_gpl951xx_device::timer_cb<2>));
+	TIMER(config, m_timer[3]).configure_generic(FUNC(generalplus_gpl951xx_device::timer_cb<3>));
 	// timers e and f are a little different
-	TIMER(config, "timer_e").configure_generic(FUNC(generalplus_gpl951xx_device::timer_cb<4>));
-	TIMER(config, "timer_f").configure_generic(FUNC(generalplus_gpl951xx_device::timer_cb<5>));
+	TIMER(config, m_timer[4]).configure_generic(FUNC(generalplus_gpl951xx_device::timer_cb<4>));
+	TIMER(config, m_timer[5]).configure_generic(FUNC(generalplus_gpl951xx_device::timer_cb<5>));
 
 	// timers g and h are for the cha/chb DAC (and can overflow trigger each other, not the above)
-	TIMER(config, "timer_g").configure_generic(FUNC(generalplus_gpl951xx_device::timer_cb<6>));
-	TIMER(config, "timer_h").configure_generic(FUNC(generalplus_gpl951xx_device::timer_cb<7>));
+	TIMER(config, m_timer[6]).configure_generic(FUNC(generalplus_gpl951xx_device::timer_cb<6>));
+	TIMER(config, m_timer[7]).configure_generic(FUNC(generalplus_gpl951xx_device::timer_cb<7>));
 
-	TIMER(config, "adc_timer").configure_generic(FUNC(generalplus_gpl951xx_device::adc_timer_cb));
+	TIMER(config, m_adc_timer).configure_generic(FUNC(generalplus_gpl951xx_device::adc_timer_cb));
 
 	GPL951XX_RTC(config, m_rtc, 0);
 }

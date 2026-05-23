@@ -327,7 +327,7 @@ void bftetris_lcdc_device::lcdc_data_w(u16 data)
 
 void bftetris_lcdc_device::device_start()
 {
-	std::fill(std::begin(m_displaybuffer), std::end(m_displaybuffer), 0);
+	m_displaybuffer = make_unique_clear<u16 []>(512 * 256);
 	m_posx = 0;
 	m_posy = 0;
 	m_posminx = 0;
@@ -339,7 +339,7 @@ void bftetris_lcdc_device::device_start()
 	m_displayon = 0;
 	m_sleep = 1;
 
-	save_item(NAME(m_displaybuffer));
+	save_pointer(NAME(m_displaybuffer), 512 * 256);
 	save_item(NAME(m_posx));
 	save_item(NAME(m_posy));
 	save_item(NAME(m_posminx));
