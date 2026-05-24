@@ -30941,7 +30941,60 @@ void cmaster_state::init_jkrmast()
 
 void cmaster_state::init_jkrmastc()
 {
-	// TODO: decryption
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int A = 0x0000; A < 0x4000; A++)
+	{
+		uint8_t x = rom[A];
+		x = bitswap<8>(x ^ 0x12, 0, 6, 5, 1, 3, 2, 7, 4);
+		rom[A] = x;
+	}
+
+	for (int A = 0x4000; A < 0x8000; A++)
+	{
+		uint8_t x = rom[A];
+		x = bitswap<8>(x ^ 0x81, 1, 6, 5, 0, 3, 2, 4, 7);
+		rom[A] = x;
+	}
+
+	uint8_t buf[0x8000];
+	memcpy(buf, rom, 0x8000);
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		if ((i & 0x78) == 0x00)
+			rom[i] = buf[i ^ 0x08];
+		else if ((i & 0x78) == 0x08)
+			rom[i] = buf[i ^ 0x10];
+		else if ((i & 0x78) == 0x10)
+			rom[i] = buf[i ^ 0x10];
+		else if ((i & 0x78) == 0x18)
+			rom[i] = buf[i ^ 0x08];
+		else if ((i & 0x78) == 0x20)
+			rom[i] = buf[i];
+		else if ((i & 0x78) == 0x28)
+			rom[i] = buf[i ^ 0x18];
+		else if ((i & 0x78) == 0x30)
+			rom[i] = buf[i ^ 0x18];
+		else if ((i & 0x78) == 0x38)
+			rom[i] = buf[i];
+		else if ((i & 0x78) == 0x40)
+			rom[i] = buf[i ^ 0x18];
+		else if ((i & 0x78) == 0x48)
+			rom[i] = buf[i];
+		else if ((i & 0x78) == 0x50)
+			rom[i] = buf[i];
+		else if ((i & 0x78) == 0x58)
+			rom[i] = buf[i ^ 0x18];
+		else if ((i & 0x78) == 0x60)
+			rom[i] = buf[i ^ 0x10];
+		else if ((i & 0x78) == 0x68)
+			rom[i] = buf[i ^ 0x08];
+		else if ((i & 0x78) == 0x70)
+			rom[i] = buf[i ^ 0x08];
+		else if ((i & 0x78) == 0x78)
+			rom[i] = buf[i ^ 0x10];
+	}
 
 	init_palnibbles();
 }
