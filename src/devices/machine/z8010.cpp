@@ -239,7 +239,7 @@ void z8010_device::write(offs_t offset, uint8_t data)
 	{
 	/* control registers */
 	case 0x00: m_mode = data; break;
-	case 0x01: m_sar = data & 0x3f; break;
+	case 0x01: m_sar = data & 0x3f; m_dsc = 0; break;
 	case 0x20: m_dsc = data & 0x03; break;
 
 	/* segment descriptor registers */
