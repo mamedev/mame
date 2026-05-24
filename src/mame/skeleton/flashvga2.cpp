@@ -233,12 +233,11 @@ INPUT_PORTS_END
 
 void flashvga2_state::machine_start()
 {
-
+	m_program_bank->configure_entries(0, 0x20, memregion("program_rom")->base(), 0x40000);
 }
 
 void flashvga2_state::machine_reset()
 {
-	m_program_bank->configure_entries(0, 0x20, memregion("program_rom")->base(), 0x40000);
 	m_program_bank->set_entry(0);
 }
 

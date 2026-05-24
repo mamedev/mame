@@ -13,13 +13,17 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "speaker.h"
+
 #include "cpu/z80/z80.h"
 //#include "machine/m66240.h"
 #include "machine/te7750.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
 #include "taitosnd.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
 
 namespace {
 
@@ -29,9 +33,19 @@ public:
 	cucaracha_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_program_bank(*this, "program_bank")
+		, m_vram(*this, "vram")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
 	{ }
 
 	void cucaracha(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	void palette_init(palette_device &palette) const;
 
 private:
 	void out4_w(uint8_t data);
@@ -45,14 +59,51 @@ private:
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override ATTR_COLD;
-
 	required_device<cpu_device> m_maincpu;
+	required_memory_bank m_program_bank;
+	required_shared_ptr<uint8_t> m_vram;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
+
+void cucaracha_state::palette_init(palette_device &palette) const
+{
+	// TODO: improve, may really be b&w with red bezel, and reversed?
+	for (int idx = 0; idx < 4; idx++)
+		palette.set_pen_color(idx, 0x55 * idx, 0x19 * idx, 0x26 * idx);
+}
+
+uint32_t cucaracha_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		const u32 base_address = y * 0x20;
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x+= 4)
+		{
+			const u32 x_address = base_address + (x >> 2);
+			for(int xi = 0; xi < 4; xi++)
+			{
+				int pen = (m_vram[x_address] >> ((3 - xi) * 2)) & 3;
+
+				bitmap.pix(y, x + xi) = m_palette->pen(pen);
+			}
+		}
+	}
+
+	return 0;
+}
 
 
 void cucaracha_state::machine_start()
 {
+	m_program_bank->configure_entries(0, 8, memregion("program_rom")->base(), 0x2000);
+}
+
+void cucaracha_state::machine_reset()
+{
+	m_program_bank->set_entry(4);
 }
 
 
@@ -84,6 +135,8 @@ void cucaracha_state::out8_w(uint8_t data)
 void cucaracha_state::out9_w(uint8_t data)
 {
 	logerror("Writing %02X to TE7750 port 9\n", data);
+	// assumed, writes a 4 when displaying ERR 5
+	m_program_bank->set_entry(data & 7);
 }
 
 void cucaracha_state::ym_porta_w(uint8_t data)
@@ -95,11 +148,10 @@ void cucaracha_state::ym_porta_w(uint8_t data)
 
 void cucaracha_state::main_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).rom(); // probably banked
+	map(0x0000, 0x7fff).rom().region("program_rom", 0);
+	map(0x8000, 0x9fff).bankr(m_program_bank);
 	map(0xa000, 0xbfff).ram();
-	// c000-c??? = ?
-	// c200-c??? = ?
+	map(0xc000, 0xc3ff).ram().share("vram");
 	// d000 = ?output
 	// d001 = ?output
 	// d101 = ?output
@@ -131,7 +183,8 @@ void cucaracha_state::cucaracha(machine_config &config)
 {
 	Z80(config, m_maincpu, XTAL(16'000'000) / 4); // divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &cucaracha_state::main_map);
-	// IRQ from ???
+	// TODO: pinpoint IRQ source
+	m_maincpu->set_periodic_int(FUNC(cucaracha_state::irq0_line_hold), attotime::from_hz(60));
 	// NMI related to E002 input and TE7750 port 7
 
 	te7750_device &te7750(TE7750(config, "te7750"));
@@ -153,6 +206,16 @@ void cucaracha_state::cucaracha(machine_config &config)
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
 	ciu.nmi_callback().set_inputline("soundcpu", INPUT_LINE_NMI);
 	ciu.reset_callback().set_inputline("soundcpu", INPUT_LINE_RESET);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(128, 16);
+	m_screen->set_visarea(0, 128 - 1, 0, 16 - 1);
+	m_screen->set_screen_update(FUNC(cucaracha_state::screen_update));
+	m_screen->set_palette(m_palette);
+
+	PALETTE(config, m_palette, FUNC(cucaracha_state::palette_init), 4);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -257,7 +320,7 @@ INPUT_PORTS_START( cucaracha )
 INPUT_PORTS_END
 
 ROM_START( cucaracha )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "program_rom", 0 )
 	ROM_LOAD( "ic2", 0, 0x20000, CRC(f9dbca28) SHA1(b2f6d6b66bfa5e5ca7c26a0709f7136bf9e1a42e) )
 	// 8000-FFFF are graphics; 10000-1FFFF is unused
 
@@ -277,7 +340,7 @@ ROM_START( cucaracha )
 ROM_END
 
 ROM_START( cucaracha2 )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "program_rom", 0 )
 	ROM_LOAD( "ic2.rom", 0, 0x20000, CRC(03bf24d1) SHA1(ef63a5be25d77ac20984402cc45137d292a9fa1d) )
 	// 8000-FFFF are graphics; 10000-1FFFF is unused
 
