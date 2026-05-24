@@ -419,6 +419,7 @@ private:
 
 			m_pending_begin[buffer] = BUFFER_BYTES;
 			m_pending_end[buffer] = 0;
+			m_last_sent = buffer;
 		}
 
 		m_sending = true;
