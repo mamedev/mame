@@ -5,8 +5,8 @@
     Neo Geo Memory card functions
 
 *********************************************************************/
-#ifndef MAME_NEOGEO_NG_MEMCARD_H
-#define MAME_NEOGEO_NG_MEMCARD_H
+#ifndef MAME_SNK_NG_MEMCARD_H
+#define MAME_SNK_NG_MEMCARD_H
 
 #pragma once
 
@@ -50,8 +50,8 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(NG_MEMCARD, ng_memcard_device)
 
 
-#endif // MAME_NEOGEO_NG_MEMCARD_H
+#endif // MAME_SNK_NG_MEMCARD_H

@@ -6,8 +6,8 @@
     Neo-Geo hardware
 
 *************************************************************************/
-#ifndef MAME_NEOGEO_NEOGEO_H
-#define MAME_NEOGEO_NEOGEO_H
+#ifndef MAME_SNK_NEOGEO_H
+#define MAME_SNK_NEOGEO_H
 
 #pragma once
 
@@ -286,4 +286,4 @@ private:
 INPUT_PORTS_EXTERN(neogeo);
 INPUT_PORTS_EXTERN(aes);
 
-#endif // MAME_NEOGEO_NEOGEO_H
+#endif // MAME_SNK_NEOGEO_H
