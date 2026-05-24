@@ -136,7 +136,7 @@ void cucaracha_state::out9_w(uint8_t data)
 {
 	logerror("Writing %02X to TE7750 port 9\n", data);
 	// assumed, writes a 4 when displaying ERR 5
-	m_program_bank->set_entry(data & 7);
+	m_program_bank->set_entry(data & 0xf);
 }
 
 void cucaracha_state::ym_porta_w(uint8_t data)
