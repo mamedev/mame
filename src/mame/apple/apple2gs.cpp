@@ -86,6 +86,8 @@
 
 #include "utf8.h"
 
+#include <bit>
+
 
 namespace {
 
@@ -467,8 +469,8 @@ private:
 	int m_glu_kbd_y = 0;
 
 	u8 *m_ram_ptr = nullptr;
-	int m_ram_size = 0, m_motherboard_ram = 0, m_ghost_mask = 0;
-	u8 m_megaii_ram[0x20000]{};  // 128K of "slow RAM" at $E0/0000
+	unsigned m_ram_size = 0, m_motherboard_ram = 0, m_ghost_mask = 0;
+	u8 m_megaii_ram[0x20000]{};  // 128K of "slow RAM" at $E0/0000 FIXME: turn into memory_share_creator
 
 	int m_inh_bank = 0;
 
@@ -771,12 +773,14 @@ void apple2gs_state::machine_start()
 				space.nop_read(m_ram_size, 0x7fffff);
 
 			// expansion RAM ghosts power-of-two banks up through 7f
-			m_ghost_mask = (1 << (32 - count_leading_zeros_32(m_ram_size - m_motherboard_ram - 1))) - 1;
+			m_ghost_mask = (1 << std::bit_width(m_ram_size - m_motherboard_ram - 1)) - 1;
 			const int ghost_start = m_motherboard_ram + m_ghost_mask + 1;
 			if (ghost_start < 0x800000)
+			{
 				space.install_readwrite_handler(ghost_start, 0x7fffff,
 					 read8sm_delegate(*this, FUNC(apple2gs_state::ghostram_r)),
 					write8sm_delegate(*this, FUNC(apple2gs_state::ghostram_w)));
+			}
 
 			// unmap empty ROM banks
 			if (m_is_rom3) // ROM1 reads floating bus

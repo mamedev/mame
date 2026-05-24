@@ -30,6 +30,7 @@
 #include "osdepend.h"
 
 #include <algorithm>
+#include <bit>
 #include <cctype>
 #include <ctime>
 #include <sstream>
@@ -1437,7 +1438,7 @@ void ioport_field::expand_diplocation(const char *location, std::ostream &errorb
 	}
 
 	// then verify the number of bits in the mask matches
-	int const bits = population_count_32(m_mask);
+	int const bits = std::popcount(m_mask);
 	if (bits > entries)
 		util::stream_format(errorbuf, "Switch location '%s' does not describe enough bits for mask %X\n", location, m_mask);
 	else if (bits < entries)

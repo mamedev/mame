@@ -11,8 +11,10 @@
 #include "emu.h"
 #include "voodoo.h"
 
-namespace voodoo
-{
+#include <bit>
+
+
+namespace voodoo {
 
 static constexpr bool LOG_RASTERIZERS = false;
 
@@ -61,7 +63,7 @@ static const rectangle global_cliprect(-4096, 4095, -4096, 4095);
 
 inline s32 ATTR_FORCE_INLINE compute_wfloat(s64 iterw)
 {
-	int exp = count_leading_zeros_64(iterw) - 16;
+	int exp = std::countl_zero(u64(iterw)) - 16;
 	if (exp < 0)
 		return 0x0000;
 	if (exp >= 16)
@@ -1416,7 +1418,7 @@ inline s32 ATTR_FORCE_INLINE voodoo_renderer::compute_depthval(poly_data const &
 			result = 0xffff;
 		else
 		{
-			int exp = count_leading_zeros_32(iterz) - 4;
+			int const exp = std::countl_zero(u32(iterz)) - 4;
 			return ((exp << 12) | ((iterz >> (15 - exp)) ^ 0x1fff)) + 1;
 		}
 	}
@@ -2894,4 +2896,4 @@ static_rasterizer_info s_predef_raster_table[] =
 	{ nullptr, rasterizer_params(0xffffffff) }
 };
 
-}
+} // namespace voodoo

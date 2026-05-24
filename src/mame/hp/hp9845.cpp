@@ -39,6 +39,8 @@
 #include "hp9845.h"
 
 #include "hp9845_optrom.h"
+#include "hp9845_printer.h"
+
 #include "bus/hp9845_io/hp9845_io.h"
 #include "machine/timer.h"
 
@@ -46,9 +48,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#include "hp9845b.lh"
+#include <bit>
 
-#include "hp9845_printer.h"
+#include "hp9845b.lh"
 
 // Debugging
 #define VERBOSE 0
@@ -550,7 +552,7 @@ attotime hp9845_base_state::time_to_gv_mem_availability() const
 void hp9845_base_state::kb_scan_ioport(ioport_value pressed , ioport_port &port , unsigned idx_base , int& max_seq_len , unsigned& max_seq_idx)
 {
 	while (pressed) {
-		unsigned bit_no = 31 - count_leading_zeros_32(pressed);
+		unsigned bit_no = std::bit_width(pressed) - 1;
 		ioport_value mask = BIT_MASK(bit_no);
 		int seq_len = port.field(mask)->seq().length();
 		if (seq_len > max_seq_len) {

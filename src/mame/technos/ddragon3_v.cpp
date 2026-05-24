@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "ddragon3.h"
 
+#include <bit>
+
+
 void ddragon3_state::ddragon3_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
@@ -182,7 +185,7 @@ void ddragon3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			bool flipy = BIT(source[1], 3);
 
 			const uint8_t chain = (source[1] & 0x00e0) >> 5;
-			const uint16_t cmask = ~((1 << (32 - count_leading_zeros_32(chain))) - 1);
+			const uint16_t cmask = ~((1 << std::bit_width(chain)) - 1);
 			const uint16_t number = ((source[2] & 0x00ff) | (source[3] & 0x00ff) << 8) & cmask;
 			const uint8_t colourbank = (source[4] & 0x000f);
 

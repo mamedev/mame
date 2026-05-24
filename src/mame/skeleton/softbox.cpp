@@ -422,14 +422,17 @@ uint8_t softbox_state::boot_r(offs_t offset)
 	   into the BIOS.  On reset, the Z80 will fetch it from 0x0000 and set
 	   its PC, then the normal map will be restored on the next
 	   instruction fetch. */
-	if (!m_boot_cnt)
+	if (!machine().side_effects_disabled())
 	{
-		m_boot_cnt = true;
-	}
-	else
-	{
-		m_boot_mem.disable();
-		m_boot_m1.disable();
+		if (!m_boot_cnt)
+		{
+			m_boot_cnt = true;
+		}
+		else
+		{
+			m_boot_mem.disable();
+			m_boot_m1.disable();
+		}
 	}
 	return m_rom[offset & 0x0fff];
 }

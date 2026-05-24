@@ -166,6 +166,8 @@ To enable mixed-case input and display on prav8c, enter the command "SETMOD 1" i
 
 #include "utf8.h"
 
+#include <bit>
+
 
 namespace {
 
@@ -1428,7 +1430,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 
 			if ((uFkeys ^ m_franklin_last_fkeys) && uFkeys)
 			{
-				m_transchar = count_leading_zeros_32(uFkeys) + 0x20;
+				m_transchar = std::countl_zero(uFkeys) + 0x20;
 				m_strobe = 0x80;
 				m_franklin_strobe = 0;
 			}

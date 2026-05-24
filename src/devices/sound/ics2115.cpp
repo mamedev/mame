@@ -20,6 +20,7 @@
 #include "ics2115.h"
 
 #include <algorithm>
+#include <bit>
 #include <cmath>
 
 //#define ICS2115_ISOLATE 6
@@ -95,13 +96,13 @@ void ics2115_device::device_start()
 	//log2(256*128) = 15 for -3db + 1 must be confirmed by real hardware owners
 	constexpr int PAN_LEVEL = 16;
 
-	for (int i = 0; i < 256; i++)
+	for (unsigned i = 0; i < 256U; i++)
 	{
 		const u8 exponent = (~i >> 4) & 0x07;
 		const u8 mantissa = ~i & 0x0f;
 		const s16 value = lut[exponent] + (mantissa << (exponent + 3));
 		m_ulaw[i] = (i & 0x80) ? -value : value;
-		m_panlaw[i] = PAN_LEVEL - (31 - count_leading_zeros_32(i)); //m_panlaw[i] = PAN_LEVEL - log2(i)
+		m_panlaw[i] = PAN_LEVEL - (std::bit_width(i) - 1); //m_panlaw[i] = PAN_LEVEL - log2(i)
 	}
 	m_panlaw[0] = 0xfff; //all bits to one when no pan
 

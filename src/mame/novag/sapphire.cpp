@@ -83,6 +83,8 @@ which hardware it runs on, see diamond.cpp for Diamond II.
 #include "screen.h"
 #include "speaker.h"
 
+#include <bit>
+
 // internal artwork
 #include "novag_chesstea.lh"
 #include "novag_sapphire.lh"
@@ -252,7 +254,7 @@ void sapphire_state::update_lcd()
 		const u8 shift = m_lcd_pwm->width() & 0x18;
 
 		// LCD common is analog (voltage level)
-		const u8 com = population_count_32(m_lcd_data >> (shift + (i * 2)) & 3);
+		const u8 com = std::popcount(m_lcd_data >> (shift + (i * 2)) & 3U);
 		u16 segs = m_lcd_data & ((1 << shift) - 1);
 		segs |= m_lcd_segs2 << shift; // sapphire
 

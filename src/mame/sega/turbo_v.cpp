@@ -8,7 +8,11 @@
 
 #include "emu.h"
 #include "turbo.h"
+
 #include "video/resnet.h"
+
+#include <bit>
+
 
 static constexpr uint32_t sprite_expand[16] =
 {
@@ -962,7 +966,7 @@ uint32_t buckrog_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				uint32_t sprbits = get_sprite_bits(&plb);
 
 				// the PLB bits go into an LS148 8-to-3 decoder and become MUX0-3 (PROM board SH 2/10)
-				uint8_t mux = count_leading_zeros_32(bitswap<8>(plb,0,1,2,3,4,5,6,7)) - 24;
+				uint8_t mux = std::countl_zero(bitswap<8>(plb,0,1,2,3,4,5,6,7));
 				if (mux == 8) mux = 0xf;
 
 				// MUX then selects one of the sprites and selects CD0-3

@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <bit>
+
 
 inline u16 model2_renderer::get_texel(u32 base_x, u32 base_y, int x, int y, const u32 *sheet)
 {
@@ -261,7 +263,7 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 	float dvoz = extent.param[2].dpdx;
 
 	// calculate maximum mipmap level from texture dimensions; we go down to 2x2
-	s32 max_level = 30 - count_leading_zeros_32(std::min(object.texwidth, object.texheight));
+	s32 max_level = 30 - std::countl_zero(std::min(object.texwidth, object.texheight));
 
 	colorbase = state->m_palram[(colorbase + 0x1000)] & 0x7fff;
 

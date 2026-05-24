@@ -227,6 +227,9 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 
 #include "emu.h"
 
+// netlist
+#include "nl_bship.h"
+
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/tms1000/tms1000.h"
@@ -257,8 +260,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "screen.h"
 #include "speaker.h"
 
-// netlist
-#include "nl_bship.h"
+#include <bit>
 
 // internal artwork
 #include "t7in1ss.lh"
@@ -7617,7 +7619,7 @@ private:
 void elecdet_state::write_r(u32 data)
 {
 	// R7,R8(tied together): speaker out
-	m_speaker->level_w((m_o & 0x80) ? population_count_32(data >> 7 & 3) : 0);
+	m_speaker->level_w((m_o & 0x80) ? std::popcount(data >> 7 & 3U) : 0);
 
 	// R0-R6: select digit
 	m_display->matrix(data, bitswap<8>(m_o,7,5,2,1,4,0,6,3));
@@ -8022,7 +8024,7 @@ void starwlb_state::write_o(u16 data)
 	m_inp_mux = data & 3;
 
 	// O3-O6(tied together): speaker out (actually only writes 0x0 or 0xf)
-	m_speaker->level_w(population_count_32(data >> 3 & 0xf));
+	m_speaker->level_w(std::popcount(data >> 3 & 0xfU));
 
 	// O2: lamp
 	// O7: one more led
@@ -10151,8 +10153,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(bigtrak_state::gearbox_sim_tick)
 
 void bigtrak_state::update_speaker()
 {
-	int data = (m_o & 1) | (m_o >> 6 & 2) | (m_r >> 8 & 4);
-	m_speaker->level_w(population_count_32(data));
+	unsigned data = (m_o & 1) | (m_o >> 6 & 2) | (m_r >> 8 & 4);
+	m_speaker->level_w(std::popcount(data));
 }
 
 void bigtrak_state::write_r(u32 data)
@@ -10579,7 +10581,7 @@ void arcmania_state::write_r(u32 data)
 void arcmania_state::write_o(u16 data)
 {
 	// O0-O2(tied together): speaker out
-	m_speaker->level_w(population_count_32(data & 7));
+	m_speaker->level_w(std::popcount(data & 7U));
 
 	// O3,O4,O6: input mux
 	m_inp_mux = (data >> 3 & 3) | (data >> 4 & 4);
@@ -10860,7 +10862,7 @@ void merlin_state::write_r(u32 data)
 void merlin_state::write_o(u16 data)
 {
 	// O4-O6(tied together): speaker out
-	m_speaker->level_w(population_count_32(data >> 4 & 7));
+	m_speaker->level_w(std::popcount(data >> 4 & 7U));
 
 	// O0-O3: input mux
 	// O7: N/C
@@ -11169,7 +11171,7 @@ void stopthief_state::write_r(u32 data)
 	m_display->matrix(data & 7, bitswap<8>(m_o,3,5,2,1,4,0,6,7) & 0x7f);
 
 	// R3-R8(tied together): speaker out
-	m_speaker->level_w((m_o & 8) ? population_count_32(data >> 3 & 0x3f) : 0);
+	m_speaker->level_w((m_o & 8) ? std::popcount(data >> 3 & 0x3fU) : 0);
 }
 
 void stopthief_state::write_o(u16 data)

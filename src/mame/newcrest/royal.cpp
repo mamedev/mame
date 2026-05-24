@@ -46,6 +46,8 @@ Excluding other brands with the same product name, HD614042SJ02 MCU was used in:
 
 #include "speaker.h"
 
+#include <bit>
+
 // internal artwork
 #include "cxg_granada.lh"
 #include "cxg_royal.lh"
@@ -156,7 +158,7 @@ void royal_state::update_lcd()
 	for (int i = 0; i < 2; i++)
 	{
 		// LCD common is analog (voltage level)
-		const u8 com = population_count_32(m_lcd_com >> (i * 2) & 3);
+		const u8 com = std::popcount(m_lcd_com >> (i * 2) & 3U);
 		const u16 data = (com == 0) ? m_lcd_segs : (com == 2) ? ~m_lcd_segs : 0;
 
 		// 2 digits per common

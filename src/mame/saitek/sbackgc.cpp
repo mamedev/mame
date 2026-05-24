@@ -52,6 +52,8 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+#include <bit>
+
 // internal artwork
 #include "saitek_ecbackg.lh"
 #include "saitek_sbackgc.lh"
@@ -412,7 +414,7 @@ void sbackgc_base_state::update_lcd()
 	for (int i = 0; i < 2; i++)
 	{
 		// LCD common is analog (voltage level)
-		const u8 com = population_count_32(m_lcd_com >> (i * 2) & 3);
+		const u8 com = std::popcount(m_lcd_com >> (i * 2) & 3U);
 		const u32 data = (com == 0) ? m_lcd_segs : (com == 2) ? ~m_lcd_segs : 0;
 		m_lcd_pwm->write_row(i, data);
 	}
@@ -425,8 +427,8 @@ void sbackgc_base_state::lcd_segs_w(offs_t offset, u8 data, u8 mem_mask)
 		return;
 
 	// R3x-R8x: LCD segments (P1x,P3x,P4x on ecbackg)
-	const u8 width = 32 - count_leading_zeros_32(mem_mask);
-	const u8 mask = (1 << width) - 1;
+	const u8 width = std::bit_width(mem_mask);
+	const u8 mask = util::make_bitmask<u8>(width);
 	const u8 shift = width * N;
 
 	m_lcd_segs = (m_lcd_segs & ~(mask << shift)) | ((data & mask) << shift);

@@ -266,6 +266,8 @@ Some routine locations
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include <bit>
+
 
 namespace {
 
@@ -432,7 +434,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cm32p_state::card_load)
 	u8 *base = pcmcard->get_rom_base();
 	if (size < 0x080000)
 	{
-		u32 mirror = (1 << (31 - count_leading_zeros_32(size)));
+		u32 mirror = std::bit_floor(size);
 		if (mirror < 0x020000)  // due to how address descrambling works, we can currently only do mirroring for 128K pages
 			mirror = 0x020000;
 		for (u32 ofs = mirror; ofs < 0x080000; ofs += mirror)

@@ -56,6 +56,8 @@ There's also a newer version with a H8/3687 MCU.
 #include "screen.h"
 #include "speaker.h"
 
+#include <bit>
+
 // internal artwork
 #include "novag_emerclp.lh"
 #include "novag_obsidian.lh"
@@ -182,7 +184,7 @@ void emerclp_state::update_lcd()
 	for (int i = 0; i < 4; i++)
 	{
 		// LCD common is analog (voltage level)
-		const u8 com = population_count_32(m_lcd_com >> (i * 2) & 3);
+		const u8 com = std::popcount(m_lcd_com >> (i * 2) & 3U);
 		const u16 data = (com == 0) ? lcd_segs : (com == 2) ? ~lcd_segs : 0;
 		m_lcd_pwm->write_row(i, data);
 	}
