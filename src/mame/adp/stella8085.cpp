@@ -29,6 +29,7 @@ Nova Kniffi reference: https://www.youtube.com/watch?v=YBq2Z1irXek
 #include "emu.h"
 
 #include "cpu/i8085/i8085.h"
+#include "machine/i8255.h"
 #include "machine/i8256.h"
 #include "machine/i8279.h"
 #include "machine/mc146818.h"
@@ -52,6 +53,7 @@ public:
 	stella8085_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_ppi(*this, "ppi"),
 		m_uart(*this, "muart"),
 		m_kdc(*this, "kdc"),
 		m_tz(*this, "TZ%u", 0U),
@@ -74,6 +76,7 @@ private:
 	bool m_kbd_bd = false;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<i8255_device> m_ppi;
 	required_device<i8256_device> m_uart;
 	required_device<i8279_device> m_kdc;
 	required_ioport_array<8> m_tz;
@@ -153,10 +156,7 @@ void stella8085_state::io_map(address_map &map)
 	map(0x00, 0x00).w(FUNC(stella8085_state::io00));
 	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
-	map(0x70, 0x70).w(FUNC(stella8085_state::io70));
-	map(0x71, 0x71).w(FUNC(stella8085_state::io71));
-	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
-	map(0x73, 0x73).w(FUNC(stella8085_state::io73)); // probably extra lamps
+	map(0x70, 0x73).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	// map(0x80, 0x8f) //Y8 ICC5 empty socket
 	map(0x90, 0x9f).rw(FUNC(stella8085_state::io9r),FUNC(stella8085_state::io9w)); //Y9 wired to rtc circuits but somehow memory mapped in hardware
 }
@@ -164,10 +164,7 @@ void stella8085_state::io_map(address_map &map)
 void stella8085_state::io_4040_map(address_map &map)
 {
 	map(0x00, 0x00).w(FUNC(stella8085_state::io00));
-	map(0x70, 0x70).w(FUNC(stella8085_state::io70));
-	map(0x71, 0x71).w(FUNC(stella8085_state::io71));
-	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
-	map(0x73, 0x73).w(FUNC(stella8085_state::io73));
+	map(0x70, 0x73).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x80, 0x81).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x90, 0x9f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
 }
@@ -565,6 +562,11 @@ void stella8085_state::dicemstr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::large_program_map);
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_map);
 
+	I8255(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(stella8085_state::io70));
+	m_ppi->out_pb_callback().set(FUNC(stella8085_state::io71));
+	m_ppi->out_pc_callback().set(FUNC(stella8085_state::sounddev));
+
 	I8256(config, m_uart, 10.240_MHz_XTAL / 2); // divider not verified
 	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
 
@@ -586,6 +588,11 @@ void stella8085_state::doppelpot(machine_config &config)
 	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_map);
+
+	I8255(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(stella8085_state::io70));
+	m_ppi->out_pb_callback().set(FUNC(stella8085_state::io71));
+	m_ppi->out_pc_callback().set(FUNC(stella8085_state::sounddev));
 
 	I8256(config, m_uart, 6.144_MHz_XTAL / 2);
 	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
