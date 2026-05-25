@@ -9,6 +9,8 @@ TODO:
 - Emulate DS5000T properly (i8051 dump or HLE + DS1215).
 - confirm palette RGB layout;
 - Understand how attribute RAM view select really works;
+- Extract "Hopper Service" password;
+- Extract "Rent" password (under preferences -> Page 2C);
 
 ===================================================================================================
 
