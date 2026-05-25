@@ -109,7 +109,6 @@ private:
 	void io70(uint8_t data) ATTR_COLD;
 	void io71(uint8_t data) ATTR_COLD;
 	void sounddev(uint8_t data) ATTR_COLD;
-	void io73(uint8_t data) ATTR_COLD;
 	uint8_t io9r() ATTR_COLD;
 	void io9w(uint8_t data) ATTR_COLD;
 
@@ -365,11 +364,6 @@ void stella8085_state::sounddev(uint8_t data)
 	uint8_t length = data & 0x30;
 	uint8_t octave = data & 0xc0;
 	makesound(tone, octave, 60*(length+1)); // 60 is not correct
-}
-
-void stella8085_state::io73(uint8_t data)
-{
-	//old boards
 }
 
 void stella8085_state::makesound(uint8_t tone, uint8_t octave, uint8_t length)
