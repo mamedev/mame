@@ -221,7 +221,7 @@ private:
 
 	virtual TIMER_CALLBACK_MEMBER(irq_off) override;
 	virtual TIMER_CALLBACK_MEMBER(irq_on) override;
-	INTERRUPT_GEN_MEMBER(specnext_interrupt);
+	INTERRUPT_GEN_MEMBER(on_vblank);
 	TIMER_CALLBACK_MEMBER(line_irq_on);
 	INTERRUPT_GEN_MEMBER(line_interrupt);
 	TIMER_CALLBACK_MEMBER(spi_clock);
@@ -2742,7 +2742,7 @@ void specnext_state::irq_w(int state)
 	update_dma_delay();
 }
 
-INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
+INTERRUPT_GEN_MEMBER(specnext_state::on_vblank)
 {
 	m_tiles->control_w(m_nr_6b_tm_control); // TODO (1): Santa's Pressie, The Next War
 
@@ -2753,8 +2753,9 @@ INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
 		update_video_mode();
 	}
 
-	line_irq_adjust();
 	m_video_test_pattern_active = ((m_io_joy_left->read() & 0x700) == 0x700) || ((m_io_joy_right->read() & 0x700) == 0x700);
+
+	line_irq_adjust();
 	if (!port_ff_interrupt_disable())
 	{
 		m_irq_on_timer->adjust(m_screen->time_until_pos(m_video_timings.int_v, m_video_timings.int_h << 1));
@@ -4032,7 +4033,7 @@ void specnext_state::tbblue(machine_config &config)
 	m_maincpu->set_m1_map(&specnext_state::map_fetch);
 	m_maincpu->set_memory_map(&specnext_state::map_mem);
 	m_maincpu->set_io_map(&specnext_state::map_io);
-	m_maincpu->set_vblank_int("screen", FUNC(specnext_state::specnext_interrupt));
+	m_maincpu->set_vblank_int("screen", FUNC(specnext_state::on_vblank));
 	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return 0xff; }));
 	m_maincpu->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_next_regs.write_byte(offset, data); });
 	m_maincpu->in_nextreg_cb().set([this](offs_t offset) { return m_next_regs.read_byte(offset); });
