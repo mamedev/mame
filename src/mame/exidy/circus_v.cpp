@@ -41,12 +41,14 @@ void circus_state::draw_line(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 	if (x1 == x2)
 	{
 		for (int count = y2; count >= y1; count -= skip)
-			bitmap.pix(count, x1) = 1;
+			if (cliprect.contains(x1, count))
+				bitmap.pix(count, x1) = 1;
 	}
 	else
 	{
 		for (int count = x2; count >= x1; count -= skip)
-			bitmap.pix(y1, count) = 1;
+			if (cliprect.contains(count, y1))
+				bitmap.pix(y1, count) = 1;
 	}
 }
 
@@ -60,19 +62,16 @@ void circus_state::draw_sprite_collision(bitmap_ind16 &bitmap, const rectangle &
 	for (int sy = 0; sy < 16; sy++)
 	{
 		int dy = m_clown_x + sy - 1;
-		if (dy >= 0 && dy < bitmap.height())
+		for (int sx = 0; sx < 16; sx++)
 		{
-			for (int sx = 0; sx < 16; sx++)
+			int dx = m_clown_y + sx;
+			if (cliprect.contains(dx, dy))
 			{
-				int dx = m_clown_y + sx;
-				if (dx >= 0 && dx < bitmap.width())
+				int pixel = sprite_data[sy * sprite_gfx->rowbytes() + sx];
+				if (pixel)
 				{
-					int pixel = sprite_data[sy * sprite_gfx->rowbytes() + sx];
-					if (pixel)
-					{
-						collision |= bitmap.pix(dy, dx);
-						bitmap.pix(dy, dx) = m_palette->pen(pixel);
-					}
+					collision |= bitmap.pix(dy, dx);
+					bitmap.pix(dy, dx) = m_palette->pen(pixel);
 				}
 			}
 		}

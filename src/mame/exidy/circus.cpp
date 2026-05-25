@@ -363,7 +363,7 @@ void circus_state::base_mcfg(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // needed for proper hardware collisions
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE | VIDEO_UPDATE_SCANLINE); // needed for proper hardware collisions
 	m_screen->set_raw(11.289_MHz_XTAL / 2, 42*8, 0, 31*8, 280, 0, 256);
 	m_screen->set_screen_update(FUNC(circus_state::screen_update));
 	m_screen->set_palette(m_palette);
