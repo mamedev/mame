@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "h8.h"
+#include "h8_cpu_base.h"
 #include "h8_intc.h"
 
 class h8_timer16_channel_device : public device_t {
@@ -98,8 +98,8 @@ public:
 	u8 tisr_r(int offset) const;
 
 protected:
-	required_device<h8_device> m_cpu;
-	required_device<h8_intc_device> m_intc;
+	required_device<h8_cpu_base> m_cpu;
+	required_device<h8_intc_base> m_intc;
 	optional_device<h8_timer16_channel_device> m_chained_timer;
 	int m_interrupt[6];
 	u8 m_tier_mask;
@@ -265,7 +265,7 @@ public:
 	void tolr_w(u8 data);
 
 protected:
-	required_device<h8_device> m_cpu;
+	required_device<h8_cpu_base> m_cpu;
 	optional_device_array<h8_timer16_channel_device, 6> m_timer_channel;
 	int m_timer_count;
 	u8 m_default_tstr;
