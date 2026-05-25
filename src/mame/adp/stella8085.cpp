@@ -154,8 +154,8 @@ void stella8085_state::program_4040_map(address_map &map)
 void stella8085_state::io_map(address_map &map)
 {
 	map(0x00, 0x00).w(FUNC(stella8085_state::io00));
-	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
+	map(0x50, 0x51).rw(m_kdc, FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0x60, 0x6f).rw(m_uart, FUNC(i8256_device::read), FUNC(i8256_device::write));
 	map(0x70, 0x73).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	// map(0x80, 0x8f) //Y8 ICC5 empty socket
 	map(0x90, 0x9f).rw(FUNC(stella8085_state::io9r),FUNC(stella8085_state::io9w)); //Y9 wired to rtc circuits but somehow memory mapped in hardware
@@ -165,8 +165,8 @@ void stella8085_state::io_4040_map(address_map &map)
 {
 	map(0x00, 0x00).w(FUNC(stella8085_state::io00));
 	map(0x70, 0x73).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x80, 0x81).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0x90, 0x9f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
+	map(0x80, 0x81).rw(m_kdc, FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0x90, 0x9f).rw(m_uart, FUNC(i8256_device::read), FUNC(i8256_device::write));
 }
 
 /*********************************************
@@ -579,7 +579,7 @@ void stella8085_state::dicemstr(machine_config &config)
 	RTC62421(config, "rtc", 32.768_kHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 0)
+	BEEP(config, m_beep, 0)
 		.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -612,7 +612,7 @@ void stella8085_state::doppelpot(machine_config &config)
 	MC146818(config, "rtc", 32.768_kHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 0)
+	BEEP(config, m_beep, 0)
 		.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
