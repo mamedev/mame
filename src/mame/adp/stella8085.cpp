@@ -83,10 +83,11 @@ private:
 	required_device<beep_device> m_beep;
 	emu_timer *m_sound_timer;
 
-	void program_map(address_map &map) ATTR_COLD;
 	void large_program_map(address_map &map) ATTR_COLD;
-	void small_program_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
+	void program_4040_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
+	void io_4040_map(address_map &map) ATTR_COLD;
 
 	// I8256 ports
 	uint8_t lw_r(); //P1.0-P1.3
@@ -124,6 +125,13 @@ void stella8085_state::machine_start()
 	save_item(NAME(m_digit));
 }
 
+void stella8085_state::large_program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom(); // ICE6
+	map(0x8000, 0x9fff).ram(); // ICC6
+	map(0xa000, 0xffff).rom(); // ICD6
+}
+
 void stella8085_state::program_map(address_map &map)
 {
 	map(0x0000, 0x8fff).rom(); // ICE6, ICD6, ICC5
@@ -132,14 +140,7 @@ void stella8085_state::program_map(address_map &map)
 	map(0xc000, 0xc7ff).ram(); // ICC6
 }
 
-void stella8085_state::large_program_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom(); // ICE6
-	map(0x8000, 0x9fff).ram(); // ICC6
-	map(0xa000, 0xffff).rom(); // ICD6
-}
-
-void stella8085_state::small_program_map(address_map &map)
+void stella8085_state::program_4040_map(address_map &map)
 {
 	map(0x0000, 0x4fff).rom();
 	map(0x5000, 0x5fff).ram();
@@ -158,6 +159,17 @@ void stella8085_state::io_map(address_map &map)
 	map(0x73, 0x73).w(FUNC(stella8085_state::io73)); // probably extra lamps
 	// map(0x80, 0x8f) //Y8 ICC5 empty socket
 	map(0x90, 0x9f).rw(FUNC(stella8085_state::io9r),FUNC(stella8085_state::io9w)); //Y9 wired to rtc circuits but somehow memory mapped in hardware
+}
+
+void stella8085_state::io_4040_map(address_map &map)
+{
+	map(0x00, 0x00).w(FUNC(stella8085_state::io00));
+	map(0x70, 0x70).w(FUNC(stella8085_state::io70));
+	map(0x71, 0x71).w(FUNC(stella8085_state::io71));
+	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
+	map(0x73, 0x73).w(FUNC(stella8085_state::io73));
+	map(0x80, 0x81).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0x90, 0x9f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
 }
 
 /*********************************************
@@ -600,7 +612,8 @@ void stella8085_state::doppelpot(machine_config &config)
 void stella8085_state::excellent(machine_config &config)
 {
 	doppelpot(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::small_program_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4040_map);
+	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4040_map);
 }
 
 ROM_START( bahia )
