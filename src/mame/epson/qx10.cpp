@@ -180,7 +180,7 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<bus::epson_qx::option_bus_device> m_bus;
 	required_device<speaker_sound_device>   m_speaker;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	memory_view m_lower_view;
 	memory_view m_upper_view;
@@ -924,6 +924,7 @@ void qx10_state::qx10(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MAIN_CLK / 4);
+	m_maincpu->z80_set_m1_cycles(4+1);
 	m_maincpu->set_addrmap(AS_PROGRAM, &qx10_state::qx10_mem);
 	m_maincpu->set_addrmap(AS_IO, &qx10_state::qx10_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(qx10_state::inta_call));
