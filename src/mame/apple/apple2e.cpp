@@ -1320,7 +1320,7 @@ void apple2e_state::machine_reset()
 
 	if (m_has_laser_mouse)
 	{
-		a2bus_laser128_device *printer_slot = static_cast<a2bus_laser128_device *>(m_slotdevice[1]);
+		auto *const printer_slot = downcast<a2bus_laser128_device *>(m_slotdevice[1]);
 
 		if (m_sysconfig->read() & 0x08)
 		{
