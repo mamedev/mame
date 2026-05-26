@@ -59,16 +59,11 @@ public:
 
 protected:
 	mc6847_friend_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock,
-			const uint8_t *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, int divider,
-			bool supports_partial_body_scanlines, bool pal);
+			bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline,
+			int divider, bool supports_partial_body_scanlines, bool pal);
 
 	// fonts
-	static const uint8_t vdg_t1_fontdata8x12[];
-	static const uint8_t vdg_fontdata8x12[];
-	static const uint8_t semigraphics4_fontdata8x12[];
-	static const uint8_t semigraphics6_fontdata8x12[];
-	static const uint8_t s68047_fontdata8x12[];
-	static const uint8_t stripes[];
+	required_memory_region m_font_rom_region;
 
 	// pixel definitions
 	typedef uint32_t pixel_t;
@@ -88,8 +83,8 @@ protected:
 	class character_map
 	{
 	public:
-		// constructor that sets up the font data
-		character_map(const uint8_t *fontdata, bool is_mc6847t1);
+		character_map(bool is_mc6847t1);
+		void load_font(memory_region *rom_region);
 
 		// optimized template function that emits a single character
 		template<int xscale>
@@ -141,12 +136,18 @@ protected:
 
 		// lookup table for MC6847 modes to determine font data and color
 		entry m_entries[128];
+		bool m_is_mc6847t1;
 
 		// text font data calculated on startup
+		void generate_semigraphics_font(uint8_t output[], size_t char_count, size_t row_height);
+
+		uint8_t m_text_fontdata[96][12]{};
 		uint8_t m_text_fontdata_inverse[64*12];
 		uint8_t m_text_fontdata_lower_case[64*12];
 		uint8_t m_text_fontdata_lower_case_inverse[64*12];
 		uint8_t m_stripes[128*12];
+		uint8_t m_semigraphics4_fontdata8x12[16 * 12];
+		uint8_t m_semigraphics6_fontdata8x12[64 * 12];
 
 		// optimized function that tests a single bit
 		ATTR_FORCE_INLINE pixel_t bit_test(uint8_t data, int shift, pixel_t color_0, pixel_t color_1)
@@ -429,6 +430,8 @@ protected:
 	bool is_bottom_pal_padding_line(int scanline) const;
 	bool is_pal_padding_line(int scanline) const;
 
+	static void decode_gime_font_rom(const uint8_t *raw_rom, uint8_t dest[][12], int char_count, int row_offset, const int *source_order = nullptr);
+
 private:
 	enum scanline_zone
 	{
@@ -501,7 +504,7 @@ public:
 	void set_palette(const uint32_t *palette) { m_palette = (palette) ? palette : default_palette(); }
 
 protected:
-	mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs, bool pal);
+	mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, double tpfs, bool pal);
 
 	// device_t overrides
 	virtual void device_config_complete() override;
@@ -510,6 +513,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// other overrides
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void field_sync_changed(bool line) override;
 	virtual void record_full_body_scanline(uint16_t physical_scanline, uint16_t scanline) override;
 	virtual void record_partial_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline, int32_t start_clock, int32_t end_clock) override;
@@ -618,6 +622,7 @@ public:
 
 protected:
 	virtual uint8_t border_value(uint8_t mode) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 class s68047_device : public mc6847_base_device
@@ -626,6 +631,7 @@ public:
 	s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual uint32_t emit_samples(uint8_t mode, const uint8_t *data, int length, pixel_t *RESTRICT pixels, const pixel_t *RESTRICT palette,
 			get_char_rom_delegate const &get_char_rom, int x, int y) override;
 	virtual const uint32_t* default_palette() override { return s_s68047_palette; }
