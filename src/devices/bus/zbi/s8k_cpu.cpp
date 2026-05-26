@@ -105,6 +105,8 @@ void s8k_cpu_base::base_device_resolve_objects()
 	m_bus->assign_iospace_installer(&m_maincpu->space(AS_IO));
 
 	m_maincpu->ns().append(*m_bus, FUNC(zbi_bus_device::ns_w));
+	m_maincpu->busack().append(*m_bus, FUNC(zbi_bus_device::busack_w));
+	m_maincpu->viack().set(*m_bus, FUNC(zbi_bus_device::viack_r));
 }
 
 //**************************************************************************
@@ -330,6 +332,11 @@ void s8k_cpu_base::out_ns_cb(int state)
 
 	m_normal_mode = state;
 	m_ns_cb(state);
+}
+
+void s8k_cpu_base::out_busack_cb(int state)
+{
+	m_busack_cb(state);
 }
 
 //**************************************************************************
@@ -622,6 +629,7 @@ void zbi_s8k_cpu10_card_device::device_add_mconfig(machine_config &config)
 	m_maincpu->segtack().set(FUNC(zbi_s8k_cpu10_card_device::segtack_r));
 	m_maincpu->nmiack().set(FUNC(zbi_s8k_cpu10_card_device::nmiack_r));
 	m_maincpu->ns().set(FUNC(zbi_s8k_cpu10_card_device::out_ns_cb));
+	m_maincpu->busack().set(FUNC(zbi_s8k_cpu10_card_device::out_busack_cb));
 
 	Z8010(config, m_mmu_code, CLK_CPU);
 	m_mmu_code->out_segt_cb().set(FUNC(zbi_s8k_cpu10_card_device::segt_interrupt));
@@ -749,8 +757,6 @@ void zbi_s8k_cpu10_card_device::device_add_mconfig(machine_config &config)
 void zbi_s8k_cpu10_card_device::device_resolve_objects()
 {
 	s8k_cpu_base::base_device_resolve_objects();
-
-	m_maincpu->viack().set(*m_bus, FUNC(zbi_bus_device::viack_r));
 
 	// Z80 daisy chain for CPU-A board components
 	m_bus->add_to_daisy_chain(subtag(m_ctc[0].finder_tag()));
@@ -1096,16 +1102,6 @@ void zbi_s8k_hpcpu_card_device::addrmap_sio(address_map &map)
 	map(0x0000, 0xffff).rw(FUNC(zbi_s8k_hpcpu_card_device::spec_io_r), FUNC(zbi_s8k_hpcpu_card_device::spec_io_w));
 }
 
-uint16_t zbi_s8k_hpcpu_card_device::viack_r()
-{
-	if (m_cio_irq)
-		return m_cio->intack_r();
-	if (m_scc_irq)
-		return m_scc->m1_r();
-
-	return m_bus->viack_r();
-}
-
 //**************************************************************************
 //  DEVICE INITIALIZATION
 //**************************************************************************
@@ -1159,6 +1155,13 @@ void zbi_s8k_hpcpu_card_device::device_reset()
 void zbi_s8k_hpcpu_card_device::device_resolve_objects()
 {
 	s8k_cpu_base::base_device_resolve_objects();
+
+	// Z80 daisy chain for HPCPU board components
+	m_bus->add_to_daisy_chain(subtag(m_cio.finder_tag()));
+	m_bus->add_to_daisy_chain(subtag(m_scc.finder_tag()));
+
+	m_scc->out_int_callback().set(*m_bus, FUNC(zbi_bus_device::vi_w));
+	m_cio->irq_wr_cb().set(*m_bus, FUNC(zbi_bus_device::vi_w));
 }
 
 //**************************************************************************
@@ -1179,8 +1182,8 @@ void zbi_s8k_hpcpu_card_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(z8001_device::AS_SIO, &zbi_s8k_hpcpu_card_device::addrmap_sio);
 	m_maincpu->segtack().set(FUNC(zbi_s8k_hpcpu_card_device::segtack_r));
 	m_maincpu->nmiack().set(FUNC(zbi_s8k_hpcpu_card_device::nmiack_r));
-	m_maincpu->viack().set(FUNC(zbi_s8k_hpcpu_card_device::viack_r));
 	m_maincpu->ns().set(FUNC(zbi_s8k_hpcpu_card_device::out_ns_cb));
+	m_maincpu->busack().set(FUNC(zbi_s8k_hpcpu_card_device::out_busack_cb));
 
 	Z8010(config, m_mmu_code, CLK_HPCPU);
 	m_mmu_code->out_segt_cb().set(FUNC(zbi_s8k_hpcpu_card_device::segt_interrupt));
@@ -1191,7 +1194,6 @@ void zbi_s8k_hpcpu_card_device::device_add_mconfig(machine_config &config)
 
 	SCC8530(config, m_scc, CLK_HPCPU);
 	m_scc->configure_channels(CLK_SCC, CLK_SCC, CLK_SCC, CLK_SCC);
-	m_scc->out_int_callback().set(FUNC(zbi_s8k_hpcpu_card_device::scc_irq_w));
 	m_scc->out_txda_callback().set("scc:cha:tty0", FUNC(rs232_port_device::write_txd));
 	m_scc->out_rtsa_callback().set("scc:cha:tty0", FUNC(rs232_port_device::write_rts));
 	m_scc->out_dtra_callback().set("scc:cha:tty0", FUNC(rs232_port_device::write_dtr));
@@ -1209,7 +1211,6 @@ void zbi_s8k_hpcpu_card_device::device_add_mconfig(machine_config &config)
 	rs232b.dcd_handler().set(m_scc, FUNC(scc8530_device::dcdb_w));
 
 	Z8536(config, m_cio, CLK_HPCPU);
-	m_cio->irq_wr_cb().set(FUNC(zbi_s8k_hpcpu_card_device::cio_irq_w));
 }
 
 static INPUT_PORTS_START( s8k_hpcpu )

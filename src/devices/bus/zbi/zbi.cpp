@@ -4,6 +4,12 @@
 
     ZBI bus & slot device
 
+TODO:
+ - non-masked interrupt
+ - non-vectored interrupt
+ - multimicro request
+ - CPU request
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -98,6 +104,23 @@ void zbi_bus_device::busreq_w(int state)
 		entry.card_busreq_w(state);
 }
 
+void zbi_bus_device::busack_w(int state)
+{
+	for (device_zbi_card_interface &entry : m_device_list)
+	{
+		// Did this device make the request?
+		if (entry.busdaisy_req_state() == ASSERT_LINE)
+		{
+			if (state)
+				entry.busdaisy_req_ack();	// Acknowledge request
+			else
+				busreq_w(ASSERT_LINE);		// Trigger bus request on behalf of waiting device
+
+			break;
+		}
+	}
+}
+
 void zbi_bus_device::cpureq_w(int state)
 {
 	for (device_zbi_card_interface &entry : m_device_list)
@@ -118,8 +141,11 @@ void zbi_bus_device::mmreq_w(int state)
 
 void zbi_bus_device::vi_w(int state)
 {
+	// Ignore the sent device state and forward the daisy chain state instead
+	int vi_daisy_state = daisy_update_irq_state();
+
 	for (device_zbi_card_interface &entry : m_device_list)
-		entry.card_vi_w(state);
+		entry.card_vi_w(vi_daisy_state);
 }
 
 void zbi_bus_device::nvi_w(int state)
@@ -190,11 +216,13 @@ uint16_t zbi_bus_device::viack_r()
 
 uint16_t zbi_bus_device::nviack_r()
 {
+	// TODO
 	return 0;
 }
 
 uint16_t zbi_bus_device::nmiack_r()
 {
+	// TODO
 
 	return 0;
 }
@@ -206,15 +234,16 @@ uint16_t zbi_bus_device::nmiack_r()
 device_zbi_card_interface::device_zbi_card_interface(const machine_config &mconfig, device_t &device)
 	: device_z80daisy_interface(mconfig, device)
 	, m_bus(nullptr)
-	, m_int(0), m_mask(0), m_vector(0xff)
 {
 }
 
+//-------------------------------------------------
+//  z80daisy_irq_state - return the overall IRQ
+//  state for this device
+//-------------------------------------------------
+
 int device_zbi_card_interface::z80daisy_irq_state()
 {
-	if (m_int & ~m_mask)
-		return Z80_DAISY_INT;
-
 	return 0;
 }
 
@@ -225,7 +254,7 @@ int device_zbi_card_interface::z80daisy_irq_state()
 
 int device_zbi_card_interface::z80daisy_irq_ack()
 {
-	return m_vector;
+	return 0xff;
 }
 
 //-------------------------------------------------
@@ -234,6 +263,15 @@ int device_zbi_card_interface::z80daisy_irq_ack()
 //-------------------------------------------------
 
 void device_zbi_card_interface::z80daisy_irq_reti()
+{
+}
+
+int device_zbi_card_interface::busdaisy_req_state()
+{
+	return 0;
+}
+
+void device_zbi_card_interface::busdaisy_req_ack()
 {
 }
 

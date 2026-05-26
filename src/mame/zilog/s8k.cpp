@@ -122,6 +122,10 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_config_complete() override ATTR_COLD;
 
+	// Timer functions to catch rapid activity pulses
+	TIMER_CALLBACK_MEMBER(normal_led_delay);
+	TIMER_CALLBACK_MEMBER(busack_led_delay);
+
 	required_device<zbi_bus_device> m_bus;
 	required_device<zbi_slot_device> m_slot_cpu;
 	required_device<ram_device> m_ram;
@@ -132,6 +136,9 @@ protected:
 
 private:
 	void init_ram(machine_config &config);
+
+	emu_timer *m_normal_timer;
+	emu_timer *m_busack_timer;
 
 	s8k_cpu_base *m_cpu_device;
 };
@@ -162,12 +169,34 @@ INPUT_CHANGED_MEMBER(s8k_state::start_btn_cb)
 
 void s8k_state::normal_led_w(int state)
 {
-	m_normal_led = state;
+	if (state)
+	{
+		m_normal_led = state;
+		m_normal_timer->reset();
+	}
+	else
+		m_normal_timer->adjust(attotime::from_hz(30));
 }
 
 void s8k_state::busack_led_w(int state)
 {
-	m_busack_led = state;
+	if (state)
+	{
+		m_busack_led = state;
+		m_busack_timer->reset();
+	}
+	else
+		m_busack_timer->adjust(attotime::from_hz(30));
+}
+
+TIMER_CALLBACK_MEMBER(s8k_state::normal_led_delay)
+{
+	m_normal_led = 0;
+}
+
+TIMER_CALLBACK_MEMBER(s8k_state::busack_led_delay)
+{
+	m_busack_led = 0;
 }
 
 //**************************************************************************
@@ -176,6 +205,9 @@ void s8k_state::busack_led_w(int state)
 
 void s8k_state::machine_start()
 {
+	m_normal_timer = timer_alloc(FUNC(s8k_state::normal_led_delay), this);
+	m_busack_timer = timer_alloc(FUNC(s8k_state::busack_led_delay), this);
+
 	m_power_led.resolve();
 	m_normal_led.resolve();
 	m_busack_led.resolve();
@@ -235,7 +267,7 @@ void s8k_state::s8k_v1(machine_config &config)
 	ZBI_BUS(config, m_bus, 0);
 	ZBI_SLOT(config, "slot_cpu", m_bus, zbi_s8k_cpu_cards, "cpu_a10", true);
 	ZBI_SLOT(config, "slot_disk", m_bus, zbi_s8k_disk_cards, nullptr);
-	ZBI_SLOT(config, "slot_tape", m_bus, zbi_s8k_tape_cards, nullptr); // WDC
+	ZBI_SLOT(config, "slot_tape", m_bus, zbi_s8k_tape_cards, nullptr); // WDC only
 	ZBI_SLOT(config, "slot_opt1", m_bus, zbi_s8k_option1_cards, nullptr);
 	ZBI_SLOT(config, "slot_opt2", m_bus, zbi_s8k_option2_cards, nullptr);
 	ZBI_SLOT(config, "slot_mem", m_bus, zbi_s8k_ram_cards, "parity");
@@ -273,7 +305,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME                  FLAGS
-COMP( 1982, s8000,   0,      0,      s8k,     s8k,   s8k_state, empty_init, "Zilog", "System 8000",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1982, s8000v1, s8000,  0,      s8k_v1,  s8k,   s8k_state, empty_init, "Zilog", "System 8000 1.0",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1984, s8000s2, s8000,  0,      s8k_s2,  s8k,   s8k_state, empty_init, "Zilog", "System 8000 Series Two", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME                   FLAGS
+COMP( 1982, s8000,   0,      0,      s8k,     s8k,   s8k_state, empty_init, "Zilog", "System 8000",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1982, s8000v1, s8000,  0,      s8k_v1,  s8k,   s8k_state, empty_init, "Zilog", "System 8000 Model 20/30", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1984, s8000s2, s8000,  0,      s8k_s2,  s8k,   s8k_state, empty_init, "Zilog", "System 8000 Series Two",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

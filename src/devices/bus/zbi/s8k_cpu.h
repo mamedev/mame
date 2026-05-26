@@ -64,6 +64,8 @@ protected:
 		{ m_maincpu->set_input_line(z8002_device::VI_LINE, state); }
 	virtual void card_nmi_w(int state) override
 		{ m_maincpu->set_input_line(z8002_device::NMI_LINE, state); }
+	virtual void card_busreq_w(int state) override
+		{ m_maincpu->set_input_line(z8002_device::BUSREQ_LINE, state); }
 
 	uint16_t nmiack_r();
 	uint16_t segtack_r();
@@ -81,6 +83,7 @@ protected:
 
 	//helpers
 	void out_ns_cb(int state);
+	void out_busack_cb(int state);
 
 	// object finders
 	required_device<z8001_device> m_maincpu;
@@ -250,18 +253,9 @@ private:
 	uint8_t cio_r(offs_t offset) { return m_cio->read(~(offset >> 1)); }
 	void cio_w(offs_t offset, uint8_t data) { m_cio->write(~(offset >> 1), data); }
 
-	//TODO: THIS IS NOT OKAY!!! IT DOESN'T HANDLE THE CASE OF MULTIPLE INTERRUPTS!!!
-	void scc_irq_w(int state) { m_scc_irq = state; m_bus->vi_w(state ? ASSERT_LINE : CLEAR_LINE); }
-	void cio_irq_w(int state) { m_cio_irq = state; m_bus->vi_w(state ? ASSERT_LINE : CLEAR_LINE); }
-
-	uint16_t viack_r();
-
 	// Board registers
 	uint16_t m_reg_scr	= 0; // System Configuration Register
 	uint8_t m_reg_ubr	= 0; // User Break Register
-
-	int m_scc_irq = 0;
-	int m_cio_irq = 0;
 };
 
 // device type definition

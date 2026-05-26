@@ -89,6 +89,7 @@ public:
 
 	void memerr_w(int state);
 	void busreq_w(int state);
+	void busack_w(int state);
 	void cpureq_w(int state);
 	void cpuavail_w(int state);
 	void mmreq_w(int state);
@@ -173,12 +174,10 @@ protected:
 	virtual int z80daisy_irq_ack() override;
 	virtual void z80daisy_irq_reti() override;
 
-	zbi_bus_device *m_bus;
+	virtual int busdaisy_req_state();
+	virtual void busdaisy_req_ack();
 
-private:
-	int m_int;
-	int m_mask;
-	int m_vector;
+	zbi_bus_device *m_bus;
 };
 
 // ======================> zbi_slot_device

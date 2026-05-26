@@ -40,7 +40,8 @@ z8002_device::z8002_device(const machine_config &mconfig, device_type type, cons
 	, m_iack_in(*this, 0xffff)
 	, m_mo_out(*this)
 	, m_ns_out(*this)
-	, m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_halt(false), m_icount(0)
+	, m_busack_out(*this)
+	, m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_busreq_state(0), m_busack_state(0), m_mi(0), m_halt(false), m_icount(0)
 	, m_vector_mult(vecmult)
 {
 }
@@ -489,6 +490,8 @@ void z8002_device::clear_internal_state()
 	m_regs.Q[0] = m_regs.Q[1] = m_regs.Q[2] = m_regs.Q[3] = 0;
 	m_nmi_state = 0;
 	m_irq_state[0] = m_irq_state[1] = m_irq_state[2] = 0;
+	m_busreq_state = 0;
+	m_busack_state = 0;
 }
 
 void z8002_device::register_debug_state()
@@ -566,6 +569,8 @@ void z8002_device::register_save_state()
 	save_item(NAME(m_regs.Q));
 	save_item(NAME(m_nmi_state));
 	save_item(NAME(m_irq_state));
+	save_item(NAME(m_busreq_state));
+	save_item(NAME(m_busack_state));
 	save_item(NAME(m_mi));
 	save_item(NAME(m_halt));
 	save_item(NAME(m_icount));
@@ -632,6 +637,25 @@ void z8002_device::execute_run()
 {
 	do
 	{
+		/* bus request pending? */
+		if (m_busreq_state)
+		{
+			if (!m_busack_state)
+			{
+				m_busack_state = 1;
+				m_busack_out(ASSERT_LINE);
+			}
+			if (m_icount > 0)
+				m_icount = 0;
+			m_refresh &= 0x7fff;
+			return;
+		}
+		else if (m_busack_state)
+		{
+			m_busack_state = 0;
+			m_busack_out(CLEAR_LINE);
+		}
+
 		/* any interrupt request pending? */
 		if (m_irq_req)
 			Interrupt();
@@ -671,6 +695,10 @@ void z8002_device::execute_set_input(int irqline, int state)
 		{
 			m_irq_req |= Z8000_NMI;
 		}
+	}
+	else if (irqline == BUSREQ_LINE)
+	{
+		m_busreq_state = state;
 	}
 	else if (irqline < 3)
 	{

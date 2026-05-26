@@ -88,6 +88,7 @@ public:
 		NVI_LINE = 0,
 		VI_LINE = 1,
 		SEGT_LINE = 2,
+		BUSREQ_LINE = 3,
 		NMI_LINE = INPUT_LINE_NMI
 	};
 
@@ -105,6 +106,7 @@ public:
 	auto nmiack() { return m_iack_in[1].bind(); }
 	auto nviack() { return m_iack_in[2].bind(); }
 	auto viack() { return m_iack_in[3].bind(); }
+	auto busack() { return m_busack_out.bind(); }
 	auto mo() { return m_mo_out.bind(); }
 	void mi_w(int state) { m_mi = state; } // XXX: this has to apply in the middle of an insn for now
 	auto ns() { return m_ns_out.bind(); }
@@ -119,6 +121,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
+	virtual bool cpu_is_interruptible() const override { return true; }
 	virtual uint32_t execute_min_cycles() const noexcept override { return 2; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 744; }
 	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0xff; }
@@ -147,6 +150,7 @@ protected:
 	devcb_read16::array<4> m_iack_in;
 	devcb_write_line m_mo_out;
 	devcb_write_line m_ns_out;
+	devcb_write_line m_busack_out;
 
 	uint32_t  m_op[4];      /* opcodes/data of current instruction */
 	uint32_t  m_ppc;        /* previous program counter */
@@ -169,6 +173,8 @@ protected:
 	} m_regs;             /* registers */
 	int m_nmi_state;      /* NMI line state */
 	int m_irq_state[3];   /* IRQ line states (NVI, VI, SEGT) */
+	int m_busreq_state;   /* bus request pin state */
+	int m_busack_state;   /* bus acknowledge pin state */
 	int m_mi;
 	bool m_halt;
 	memory_access<23, 1, 0, ENDIANNESS_BIG>::cache m_cache;
