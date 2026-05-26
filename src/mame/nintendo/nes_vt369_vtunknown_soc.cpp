@@ -34,9 +34,9 @@ DEFINE_DEVICE_TYPE(VT3XX_SOC_UNK_DG, vt3xx_soc_unk_dg_device, "vt3xx_unknown_soc
 
 vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	nes_vt02_vt03_soc_device(mconfig, type, tag, owner, clock),
+	m_soundcpu(*this, "soundcpu"),
 	m_bank6000(0),
 	m_bank6000_enable(0),
-	m_soundcpu(*this, "soundcpu"),
 	m_sound_timer(nullptr),
 	m_internal_rom(*this, "internal"),
 	m_soundram(*this, "soundram"),
