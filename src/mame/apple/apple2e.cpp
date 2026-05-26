@@ -354,6 +354,7 @@ public:
 	u8 c000_laser_r(offs_t offset);
 	void c000_laser_w(offs_t offset, u8 data);
 	u8 laserprn_busy_r();
+	u8 franklin_busy_r();
 	void laserprn_w(u8 data);
 	TIMER_CALLBACK_MEMBER(update_laserprn_strobe);
 	u8 c000_iic_r(offs_t offset);
@@ -1319,17 +1320,17 @@ void apple2e_state::machine_reset()
 
 	if (m_has_laser_mouse)
 	{
-	   a2bus_laser128_device *printer_slot = static_cast<a2bus_laser128_device *>(m_slotdevice[1]);
+		a2bus_laser128_device *printer_slot = static_cast<a2bus_laser128_device *>(m_slotdevice[1]);
 
-	   if (m_sysconfig->read() & 0x08)
-	   {
-		  printer_slot->set_parallel_printer(true);
-	   }
-	   else
-	   {
-		  printer_slot->set_parallel_printer(false);
-	   }
-
+		if (m_sysconfig->read() & 0x08)
+		{
+			printer_slot->set_parallel_printer(true);
+		}
+		else
+		{
+			printer_slot->set_parallel_printer(false);
+			m_centronics_busy = true; // pull high
+		}
 	}
 
 	m_exp_bankhior = 0xf0;
@@ -2358,20 +2359,30 @@ void apple2e_state::c000_laser_w(offs_t offset, u8 data)
 
 u8 apple2e_state::laserprn_busy_r()
 {
-	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+	if (m_intcxrom)
+	{
+		return c100_int_r(0xc1);
+	}
+	else
+	{
+		return (m_centronics_busy ? 0xff : 0);
+	}
+}
 
-	return (m_centronics_busy ? 0x80 : 0) | uFloatingBus7;
+u8 apple2e_state::franklin_busy_r()
+{
+	return (m_centronics_busy ? 0x80 : 0) | (read_floatingbus() & 0x7f);
 }
 
 void apple2e_state::laserprn_w(u8 data)
 {
 	m_printer_out->write(data);
 
-   // generate strobe pulse after one clock cycle
+	// generate strobe pulse after one clock cycle
 	m_next_strobe = 0U;
 	if (!m_strobe_timer->enabled())
 	{
-	   m_strobe_timer->adjust(attotime::from_hz(1021800));
+		m_strobe_timer->adjust(attotime::from_hz(1021800));
 	}
 }
 
@@ -3515,7 +3526,7 @@ void apple2e_state::ace500_map(address_map &map)
 	map(0xc0a8, 0xc0ab).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc090, 0xc097).w(FUNC(apple2e_state::laserprn_w));
 	map(0xc0b0, 0xc0bf).rw(FUNC(apple2e_state::ace500_c0bx_r), FUNC(apple2e_state::ace500_c0bx_w));
-	map(0xc1c1, 0xc1c1).r(FUNC(apple2e_state::laserprn_busy_r));
+	map(0xc1c1, 0xc1c1).r(FUNC(apple2e_state::franklin_busy_r));
 }
 
 void apple2e_state::ace2200_map(address_map &map)
@@ -3526,7 +3537,7 @@ void apple2e_state::ace2200_map(address_map &map)
 	m_4000bank[0](0x4000, 0xbfff).rw(FUNC(apple2e_state::ram4000_ace2200_r), FUNC(apple2e_state::ram4000_w));
 
 	map(0xc090, 0xc097).w(FUNC(apple2e_state::laserprn_w));
-	map(0xc1c1, 0xc1c1).r(FUNC(apple2e_state::laserprn_busy_r));
+	map(0xc1c1, 0xc1c1).r(FUNC(apple2e_state::franklin_busy_r));
 }
 
 void apple2e_state::spectred_keyb_map(address_map &map)
@@ -5384,6 +5395,9 @@ void apple2e_state::laser128ex2(machine_config &config)
 	m_printer_conn->set_output_latch(*m_printer_out);
 
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
+
+	// RTC: Oki M6242
+	// STD/ALT keyboard switch is replaced by MODEM/MIDI serial switch
 }
 
 void apple2e_state::ace500(machine_config &config)
@@ -6023,7 +6037,11 @@ ROM_START(las128ex)
 	ROM_CONTINUE(0x1000, 0x1000) // lo-res patterns, twice
 
 	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD("las128ex.256", 0x0000, 0x8000, CRC(b67c8ba1) SHA1(8bd5f82a501b1cf9d988c7207da81e514ca254b0))
+	ROM_SYSTEM_BIOS(0, "890214", "v6.0")
+	ROMX_LOAD( "laser 128ex v6.0 890214.bin", 0x000000, 0x008000, CRC(c5daa340) SHA1(64063485fc7bb8c169a84536aad10b5e3cb775a8), ROM_BIOS(0) )
+
+	ROM_SYSTEM_BIOS(1, "880301", "v4.5")
+	ROMX_LOAD( "laser 128ex v4.5 880301.bin", 0x000000, 0x008000, CRC(b67c8ba1) SHA1(8bd5f82a501b1cf9d988c7207da81e514ca254b0), ROM_BIOS(1) )
 
 	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
 	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // need to dump real laser rom
@@ -6277,9 +6295,9 @@ COMP( 1985?,spectred,   apple2e, 0,      spectred,        spectred,   apple2e_st
 COMP( 1986, tk3000,     apple2e, 0,      tk3000,          tk3000,     apple2e_state, init_tk3000,   "Microdigital",                      "TK3000 //e" , MACHINE_SUPPORTS_SAVE )
 COMP( 1989, prav8c,     apple2e, 0,      prav8c,          prav8c,     apple2e_state, empty_init,    "Pravetz",                           "Pravetz 8C", MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )
 COMP( 1987, laser128,   apple2c, 0,      laser128,        laser128,   apple2e_state, init_laser128, "Video Technology",                  "Laser 128", MACHINE_SUPPORTS_SAVE )
-COMP( 1987, laser128o,  apple2c, 0,      laser128o,       laser128,   apple2e_state, init_laser128, "Video Technology",                  "Laser 128 (original hardware)", MACHINE_SUPPORTS_SAVE )
-COMP( 1988, las128ex,   apple2c, 0,      laser128,        laser128,   apple2e_state, init_128ex,    "Video Technology",                  "Laser 128ex (version 4.5)", MACHINE_SUPPORTS_SAVE )
-COMP( 1988, las128e2,   apple2c, 0,      laser128ex2,     laser128,   apple2e_state, init_128ex,    "Video Technology",                  "Laser 128ex2 (version 6.1)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, laser128o,  apple2c, 0,      laser128o,       laser128,   apple2e_state, init_laser128, "Video Technology",                  "Laser 128 (original hardware)", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, las128ex,   apple2c, 0,      laser128,        laser128,   apple2e_state, init_128ex,    "Video Technology",                  "Laser 128EX", MACHINE_SUPPORTS_SAVE )
+COMP( 1988, las128e2,   apple2c, 0,      laser128ex2,     laser128,   apple2e_state, init_128ex,    "Video Technology",                  "Laser 128EX/2", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2c0,   apple2c, 0,      apple2c_iwm,     apple2cus,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //c (UniDisk 3.5)", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2c0uk, apple2c, 0,      apple2c_iwm_pal, apple2cuk,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (UniDisk 3.5, UK)", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2c0de, apple2c, 0,      apple2c_iwm_pal, apple2cde,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (UniDisk 3.5, Germany)", MACHINE_SUPPORTS_SAVE )
