@@ -204,8 +204,9 @@ public:
 		m_in0(*this, "IN0")
 	{ }
 
-	void sus_tk(machine_config &config);
-	void sus_rtc(machine_config &config);
+	void sus_tk(machine_config &config) ATTR_COLD;
+	void sus_rtc(machine_config &config) ATTR_COLD;
+
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -239,7 +240,6 @@ private:
 	void mem_map_tk(address_map &map) ATTR_COLD;
 	void mem_map_rtc(address_map &map) ATTR_COLD;
 	void fc7_map(address_map &map) ATTR_COLD;
-
 };
 
 

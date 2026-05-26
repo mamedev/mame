@@ -1732,10 +1732,12 @@ void floppy_image_format_t::get_track_data_mfm_pc_sectors(int track, int head, c
 	}
 }
 
+
 void floppy_image_format_t::get_track_data_mfm_pc(int track, int head, const floppy_image &image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata)
 {
 	get_track_data_mfm_pc_sectors(track, head, image, cell_size, sector_size, 1, sector_count, sectdata);
 }
+
 
 std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bitstream_fm_pc(const std::vector<bool> &bitstream)
 {

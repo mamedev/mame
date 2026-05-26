@@ -4,10 +4,11 @@
 #include "emu.h"
 #include "nes_vt369_vtunknown_soc.h"
 
+#include "m6502_swap_op_d5_d6.h"
+
 #include "cpu/m6502/rp2a03.h"
 #include "cpu/m6502/vt3xx_spu.h"
 #include "sound/nes_apu_vt.h"
-#include "m6502_swap_op_d5_d6.h"
 #include "video/ppu2c0x_vt.h"
 
 #include "screen.h"
@@ -33,6 +34,8 @@ DEFINE_DEVICE_TYPE(VT3XX_SOC_UNK_DG, vt3xx_soc_unk_dg_device, "vt3xx_unknown_soc
 
 vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	nes_vt02_vt03_soc_device(mconfig, type, tag, owner, clock),
+	m_bank6000(0),
+	m_bank6000_enable(0),
 	m_soundcpu(*this, "soundcpu"),
 	m_sound_timer(nullptr),
 	m_internal_rom(*this, "internal"),
