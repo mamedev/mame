@@ -34,8 +34,6 @@
 #include "sound/ymopn.h"
 #include "taitosnd.h"
 
-#include "emupal.h"
-#include "screen.h"
 #include "speaker.h"
 
 #include "cucaracha.lh"
@@ -327,8 +325,8 @@ INPUT_PORTS_START( cucaracha )
 	PORT_DIPSETTING(    0x00, "x 2" )
 	// labeled from A to D
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:!3,!4")
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:!5")
