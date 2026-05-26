@@ -6440,6 +6440,7 @@ if BUSES["Z88"] then
 	}
 end
 
+
 ---------------------------------------------------
 --
 --@src/devices/bus/zbi/zbi.h,BUSES["ZBI"] = true
@@ -6455,5 +6456,7 @@ if (BUSES["ZBI"]~=null) then
 		MAME_DIR .. "src/devices/bus/zbi/s8k_cpu.h",
 		MAME_DIR .. "src/devices/bus/zbi/s8k_ram.cpp",
 		MAME_DIR .. "src/devices/bus/zbi/s8k_ram.h",
+		MAME_DIR .. "src/devices/bus/zbi/s8k_smdc.cpp",
+		MAME_DIR .. "src/devices/bus/zbi/s8k_smdc.h",
 	}
 end

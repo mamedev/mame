@@ -15,7 +15,7 @@ I/O Space      Device Class            Current use
 1000 - 1FFF    Tape Devices            9-Track 1000 - 101F
 2000 - 6FFF    Reserved                FPP 2000 - 200F
 7000 - 8FFF    Disk Devices
-				- SMD                  7F00 - 7F0F
+				- SMDC                 7F00 - 7F0F
 				- WDC/mWDC             8000 - 80FF
 9000 - 9FFF    Available to User
 A000 - DFFF    Reserved
@@ -268,12 +268,13 @@ z8010_device *s8k_cpu_base::select_data_mmu(offs_t offset, uint8_t sbr, uint8_t 
 
 uint16_t s8k_cpu_base::ram_r(address_space &space, offs_t offset, uint16_t mask)
 {
+	uint16_t data = 0;
 	if (translate_addr(space.spacenum(), false, offset))
-		return m_bus->ram16_r(offset, mask);
+		data = m_bus->ram16_r(offset, mask);
 	else if (space.spacenum() == AS_PROGRAM)
-		return 0x8d07;	// NOP instruction
-	else
-		return 0;
+		data = 0x8d07;	// NOP instruction
+
+	return data;
 }
 
 void s8k_cpu_base::ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mask)
@@ -366,13 +367,14 @@ zbi_s8k_cpu10_card_device::zbi_s8k_cpu10_card_device(const machine_config &mconf
 //**************************************************************************
 
 
-uint8_t zbi_s8k_cpu10_card_device::reg_scr_r()
+uint16_t zbi_s8k_cpu10_card_device::reg_scr_r(offs_t offset, uint16_t mask)
 {
-	return m_reg_scr;
+	return (mask == 0xffff) ? swapendian_int16((uint16_t)(m_reg_scr)) : (uint16_t)(m_reg_scr);
 }
 
-void zbi_s8k_cpu10_card_device::reg_scr_w(uint8_t data)
+void zbi_s8k_cpu10_card_device::reg_scr_w(uint16_t data)
 {
+	data >>= 8;
 	uint8_t diff = data ^ m_reg_scr;
 
 	LOG("%s reg_scr_w: %02x\n", machine().describe_context(), data);
@@ -809,8 +811,8 @@ void zbi_s8k_cpu10_card_device::device_reset()
 	m_bus->iospace()->install_readwrite_handler(0xff81, 0xffbf,
 		read8sm_delegate(*this, FUNC(zbi_s8k_cpu10_card_device::comms_r)), write8sm_delegate(*this, FUNC(zbi_s8k_cpu10_card_device::comms_w)));
 
-	m_bus->iospace()->install_readwrite_handler(0xffc1, 0xffc1,
-		read8smo_delegate(*this, FUNC(zbi_s8k_cpu10_card_device::reg_scr_r)), write8smo_delegate(*this, FUNC(zbi_s8k_cpu10_card_device::reg_scr_w)));
+	m_bus->iospace()->install_readwrite_handler(0xffc0, 0xffc1,
+		read16s_delegate(*this, FUNC(zbi_s8k_cpu10_card_device::reg_scr_r)), write16smo_delegate(*this, FUNC(zbi_s8k_cpu10_card_device::reg_scr_w)));
 	m_bus->iospace()->install_readwrite_handler(0xffc9, 0xffc9,
 		read8smo_delegate(*this, FUNC(zbi_s8k_cpu10_card_device::reg_sbr_r)), write8smo_delegate(*this, FUNC(zbi_s8k_cpu10_card_device::reg_sbr_w)));
 	m_bus->iospace()->install_readwrite_handler(0xffd1, 0xffd1,
@@ -826,10 +828,10 @@ void zbi_s8k_cpu10_card_device::device_reset()
 ROM_START( s8k_cpu10 )
 	ROM_REGION16_BE(0x2000, "maincpu", 0)
 
-	ROMX_LOAD("cpu10_34-0601-00a.u76", 0x0000, 0x0800, CRC(fe8e0de5) SHA1(9d28f6ecbf4f077c80cf987c9ea7adf99bf3429c), ROM_SKIP(1))
-	ROMX_LOAD("cpu10_34-0602-00a.u74", 0x0001, 0x0800, CRC(0b634c89) SHA1(1b81f56151038812441a7ceaf28f2bcb7d58b6d4), ROM_SKIP(1))
-	ROMX_LOAD("cpu10_34-0605-00a.u77", 0x1000, 0x0800, CRC(ae5ebab8) SHA1(e082107914da9acc1a71fa5c2dc9d1d464222fe5), ROM_SKIP(1))
-	ROMX_LOAD("cpu10_34-0606-00a.u75", 0x1001, 0x0800, CRC(a46db483) SHA1(86569a6c8649f691acbf7d42a825bde105460f55), ROM_SKIP(1))
+	ROMX_LOAD("cpu_34-0601-00a.u76", 0x0000, 0x0800, CRC(fe8e0de5) SHA1(9d28f6ecbf4f077c80cf987c9ea7adf99bf3429c), ROM_SKIP(1))
+	ROMX_LOAD("cpu_34-0602-00a.u74", 0x0001, 0x0800, CRC(0b634c89) SHA1(1b81f56151038812441a7ceaf28f2bcb7d58b6d4), ROM_SKIP(1))
+	ROMX_LOAD("cpu_34-0605-00a.u77", 0x1000, 0x0800, CRC(ae5ebab8) SHA1(e082107914da9acc1a71fa5c2dc9d1d464222fe5), ROM_SKIP(1))
+	ROMX_LOAD("cpu_34-0606-00a.u75", 0x1001, 0x0800, CRC(a46db483) SHA1(86569a6c8649f691acbf7d42a825bde105460f55), ROM_SKIP(1))
 ROM_END
 
 static INPUT_PORTS_START( s8k_cpu10 )

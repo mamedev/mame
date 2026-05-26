@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "s8k_cpu.h"
 #include "s8k_ram.h"
+#include "s8k_smdc.h"
 
 void zbi_s8k_cpu_cards(device_slot_interface &device)
 {
@@ -27,7 +28,7 @@ void zbi_s8k_disk_cards(device_slot_interface &device)
 {
 	//TODO: WDC
 	//TODO: MWDC
-	//TODO: SMDC
+	device.option_add("smdc", ZBI_S8K_SMDC);
 }
 
 void zbi_s8k_tape_cards(device_slot_interface &device)

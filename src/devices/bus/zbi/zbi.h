@@ -4,6 +4,7 @@
 
     ZBI bus & slot device
 
+ZBI (Z-Bus Backplane Interconnect) is a multiplexed 32-bit bus.
 Each ZBI card has 2 connectors, P1 and P2.
 P1 is for connecting the card to the common ZBI bus.
 P2 is for connecting it to the peripheral(s) managed by the device.

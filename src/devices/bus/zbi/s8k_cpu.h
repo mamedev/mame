@@ -141,8 +141,8 @@ private:
 
 	virtual bool translate_addr(int spacenum, bool write, offs_t &offset) override;
 
-	uint8_t reg_scr_r();
-	void reg_scr_w(uint8_t data);
+	uint16_t reg_scr_r(offs_t offset, uint16_t mask);
+	void reg_scr_w(uint16_t data);
 	uint8_t reg_sbr_r();
 	void reg_sbr_w(uint8_t data);
 	uint8_t reg_nbr_r();

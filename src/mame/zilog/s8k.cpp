@@ -10,7 +10,7 @@ Based on docs and code from Oliver Lehmann's site (http://www.pofo.de/S8000/)
 Models
 ------
 
-System 8000 is a backplane-based computer with 6 or 10 card slots, and as such it can have a variety of configuratons, some of which are officially designated as Models.
+System 8000 is a backplane-based minicomputer with 6 or 10 card slots, and as such it can have a variety of configuratons, some of which are officially designated as Models.
 The following System 8000 models are known:
 
                CPU  Segmented  Disk type   Exp. Slots   Mem. Slots
@@ -251,7 +251,7 @@ void s8k_state::s8k(machine_config &config)
 
 	ZBI_BUS(config, m_bus, 0);
 	ZBI_SLOT(config, "slot_cpu", m_bus, zbi_s8k_cpu_cards, "cpu_a", true);
-	ZBI_SLOT(config, "slot_disk", m_bus, zbi_s8k_disk_cards, nullptr);
+	ZBI_SLOT(config, "slot_disk", m_bus, zbi_s8k_disk_cards, "smdc");
 	ZBI_SLOT(config, "slot_tape", m_bus, zbi_s8k_tape_cards, nullptr);
 	ZBI_SLOT(config, "slot_opt1", m_bus, zbi_s8k_option1_cards, nullptr);
 	ZBI_SLOT(config, "slot_opt2", m_bus, zbi_s8k_option2_cards, nullptr);
@@ -281,7 +281,7 @@ void s8k_state::s8k_s2(machine_config &config)
 
 	ZBI_BUS(config, m_bus, 0);
 	ZBI_SLOT(config, "slot_cpu", m_bus, zbi_s8k_cpu_cards, "hpcpu", true);
-	ZBI_SLOT(config, "slot_disk", m_bus, zbi_s8k_disk_cards, nullptr);
+	ZBI_SLOT(config, "slot_disk", m_bus, zbi_s8k_disk_cards, "smdc");
 	ZBI_SLOT(config, "slot_tape", m_bus, zbi_s8k_tape_cards, nullptr);
 	ZBI_SLOT(config, "slot_opt1", m_bus, zbi_s8k_option1_cards, nullptr);
 	ZBI_SLOT(config, "slot_opt2", m_bus, zbi_s8k_option2_cards, nullptr);

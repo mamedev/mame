@@ -8,6 +8,8 @@
 NOTE: Due to limitations, the configurable RAM device needs to be added to
 the root driver device. It is only referenced here using finders.
 
+TODO: Actually perform the parity & ECC checks
+
 **********************************************************************/
 
 #include "emu.h"
