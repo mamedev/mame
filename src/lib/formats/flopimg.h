@@ -16,6 +16,7 @@
 #include "utilfwd.h"
 
 #include <memory>
+#include <string_view>
 #include <vector>
 
 #include <cassert>
