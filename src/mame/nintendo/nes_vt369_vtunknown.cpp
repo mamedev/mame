@@ -533,9 +533,9 @@ void vt36x_gtct885_state::gtct885_prot_w(u8 data)
 	// so 0x20, 0x10, and 0x08 are outputs
 	// some kind of serial device
 
-	m_protection->write_data((data & 0x20) ? true : false);
-	m_protection->write_enable((data & 0x10) ? true : false);
-	m_protection->write_clock((data & 0x08) ? true : false);
+	m_protection->write_data(BIT(data, 5));
+	m_protection->write_enable(BIT(data, 4));
+	m_protection->write_clock(BIT(data, 3));
 }
 
 u8 vt36x_gtct885_state::gtct885_prot_r()
@@ -548,9 +548,9 @@ u8 vt36x_gtct885_state::gtct885_prot_r()
 void vt4ffx_goretrop_state::goretrop_prot_w(u8 data)
 {
 	// direction is set to 0x0e before writing here
-	m_protection->write_data((data & 0x08) ? true : false);
-	m_protection->write_enable((data & 0x04) ? true : false);
-	m_protection->write_clock((data & 0x02) ? false : true);
+	m_protection->write_data(BIT(data, 3));
+	m_protection->write_enable(BIT(data, 2));
+	m_protection->write_clock(BIT(~data, 1));
 }
 
 u8 vt4ffx_goretrop_state::goretrop_prot_r()
@@ -576,8 +576,8 @@ void vt36x_tetrtin_state::lxcap_prot_w(u8 data)
 
 	*/
 
-	m_protection->write_data((data & 0x02) ? true : false);
-	m_protection->write_clock((data & 0x01) ? true : false);
+	m_protection->write_data(BIT(data, 1));
+	m_protection->write_clock(BIT(data, 0));
 }
 
 u8 vt36x_tetrtin_state::lxcap_prot_r()
@@ -590,8 +590,8 @@ u8 vt36x_tetrtin_state::lxcap_prot_r()
 
 void vt36x_tetrtin_state::pixel_prot_w(u8 data)
 {
-	m_protection->write_data((data & 0x10) ? true : false);
-	m_protection->write_clock((data & 0x20) ? true : false);
+	m_protection->write_data(BIT(data, 4));
+	m_protection->write_clock(BIT(data, 5));
 }
 
 u8 vt36x_tetrtin_state::pixel_prot_r()
@@ -612,8 +612,8 @@ void vt36x_tetrtin_state::nesvt270_prot_w(u8 data)
 
 void vt36x_otrail_state::otrail_seeprom_w(u8 data)
 {
-	m_i2cmem->write_scl((data & 0x04) ? true : false);
-	m_i2cmem->write_sda((data & 0x08) ? true : false);
+	m_i2cmem->write_scl(BIT(data, 2));
+	m_i2cmem->write_sda(BIT(data, 3));
 }
 
 void vt36x_otrail_state::otrail_sound_w(u8 data)
