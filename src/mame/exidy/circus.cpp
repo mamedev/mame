@@ -41,7 +41,6 @@ NOTES:
 
 TODO:
 - circus: use PROM data to draw framing box and diving boards
-- circus/ripcord collision detection is accurate?
 - crash: irq timing
 - improve discrete sound
 
@@ -75,8 +74,9 @@ void circus_state::machine_start()
 
 void circus_state::machine_reset()
 {
-	m_clown_x = 0;
-	m_clown_y = 0;
+	// ripcord power-on attract mode parachutist won't jump from plane if these are 0
+	m_clown_x = -m_gfxdecode->gfx(1)->height();
+	m_clown_y = -m_gfxdecode->gfx(1)->width();
 	m_clown_z = 0;
 }
 
