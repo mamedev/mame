@@ -468,6 +468,7 @@ public:
 	void crazybonb(machine_config &config) ATTR_COLD;
 	void cutylineb(machine_config &config) ATTR_COLD;
 	void jkrmast(machine_config &config) ATTR_COLD;
+	void jkrmastc(machine_config &config) ATTR_COLD;
 	void ll3(machine_config &config) ATTR_COLD;
 	void nfm(machine_config &config) ATTR_COLD;
 	void pkrmast(machine_config &config) ATTR_COLD;
@@ -498,6 +499,7 @@ public:
 	void init_hamhouse9() ATTR_COLD;
 	void init_jkrmast() ATTR_COLD;
 	void init_jkrmastc() ATTR_COLD;
+	void init_jkrmastd() ATTR_COLD;
 	void decrypt_ll3() ATTR_COLD;
 	void init_ll3() ATTR_COLD;
 	void init_ll3b() ATTR_COLD;
@@ -584,6 +586,7 @@ private:
 	void crazybon_portmap(address_map &map) ATTR_COLD;
 	void jkrmast_map(address_map &map) ATTR_COLD;
 	void jkrmast_portmap(address_map &map) ATTR_COLD;
+	void jkrmastc_portmap(address_map &map) ATTR_COLD;
 	void ll3_map(address_map &map) ATTR_COLD;
 	void ll3_portmap(address_map &map) ATTR_COLD;
 	void nfm_map(address_map &map) ATTR_COLD;
@@ -4428,6 +4431,19 @@ void cmaster_state::jkrmast_portmap(address_map &map)
 	map(0x13, 0x13).w(FUNC(cmaster_state::pkm_out0_w));
 	map(0x17, 0x17).lw8(NAME([this] (uint8_t data) { m_reel_bank = (data & 0x30) >> 4; m_bgcolor = data & 0x03; m_bg_tilemap->mark_all_dirty(); }));
 	map(0x18, 0x18).w(FUNC(cmaster_state::jkm_vid_reg_w)); // enable reg
+}
+
+// TODO: unknown reads / writes
+void cmaster_state::jkrmastc_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Inputs
+	map(0x04, 0x07).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // DIP switches
+	map(0x09, 0x09).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x0a, 0x0b).w("aysnd", FUNC(ay8910_device::data_address_w));
+	//map(0x13, 0x13).w(FUNC(cmaster_state::pkm_out0_w));
+	map(0x1c, 0x1c).lw8(NAME([this] (uint8_t data) { m_reel_bank = (data & 0x30) >> 4; m_bgcolor = data & 0x03; m_bg_tilemap->mark_all_dirty(); }));
+	map(0x1d, 0x1d).w(FUNC(cmaster_state::jkm_vid_reg_w)); // enable reg
 }
 
 void cmaster_state::ll3_portmap(address_map &map)
@@ -16904,6 +16920,21 @@ void cmaster_state::jkrmast(machine_config &config)
 	subdevice<ay8910_device>("aysnd")->port_b_read_callback().set_ioport("DSW4");
 }
 
+void cmaster_state::jkrmastc(machine_config &config)
+{
+	jkrmast(config);
+
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::jkrmastc_portmap);
+
+	m_ppi[0]->in_pa_callback().set_ioport("IN2");
+	m_ppi[0]->in_pb_callback().set_ioport("IN0");
+	m_ppi[0]->in_pc_callback().set_ioport("IN1");
+
+	m_ppi[1]->in_pa_callback().set_ioport("DSW1");
+	m_ppi[1]->in_pb_callback().set_ioport("DSW2");
+	m_ppi[1]->in_pc_callback().set_ioport("DSW3");
+}
+
 void cmaster_state::crazybon(machine_config &config)
 {
 	pkrmast(config);
@@ -21393,6 +21424,29 @@ ROM_START( jkrmastc )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "b.l5", 0x00000, 0x20000, CRC(73b96601) SHA1(8a35210a0277874e88a3c8e31aab22128660ce04) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "a.j5", 0x00000, 0x20000, CRC(2e567f2c) SHA1(efbfe38b2014d30b5d1e41396e88f7c9b659df93) )
+
+	ROM_REGION( 0x200, "colours", 0 )
+	ROM_LOAD( "n82s147a.s8", 0x000, 0x200, CRC(da92f0ae) SHA1(1269a2029e689a5f111c57e80825b3756b50521e) )
+
+	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 )
+	// filled at init()
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "n82s129.h3",  0x0000, 0x0100, CRC(cfb152cf) SHA1(3166b9b21be4ce1d3b6fc8974c149b4ead03abac) )
+ROM_END
+
+ROM_START( jkrmastd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512.bin", 0x4000, 0x4000, CRC(7af5ec24) SHA1(5c2756781f3a1d338f8c6034828b2ef254668c25) )
+	ROM_CONTINUE(           0x0000, 0x4000 )
+	ROM_CONTINUE(           0xc000, 0x4000 )
+	ROM_CONTINUE(           0x8000, 0x4000 )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "b.l5", 0x00000, 0x20000, CRC(69f412a5) SHA1(dafcf59be991c3b37f66cc05529154650013615a) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "a.j5", 0x00000, 0x20000, CRC(2e567f2c) SHA1(efbfe38b2014d30b5d1e41396e88f7c9b659df93) )
@@ -30914,12 +30968,8 @@ void cmaster_state::init_jkrmast()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (int A = 0; A < 0x8000; A++)
-	{
-		uint8_t x = rom[A];
-		x = bitswap<8>(x ^ 0x0a, 5, 6, 1, 4, 7, 2, 3, 0);
-		rom[A] = x;
-	}
+	for (int i = 0; i < 0x8000; i++)
+		rom[i] = bitswap<8>(rom[i] ^ 0x0a, 5, 6, 1, 4, 7, 2, 3, 0);
 
 	uint8_t buf[0x8000];
 	memcpy(buf, rom, 0x8000);
@@ -30941,21 +30991,15 @@ void cmaster_state::init_jkrmast()
 
 void cmaster_state::init_jkrmastc()
 {
+	// decryption verified via ICE dump
+
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (int A = 0x0000; A < 0x4000; A++)
-	{
-		uint8_t x = rom[A];
-		x = bitswap<8>(x ^ 0x12, 0, 6, 5, 1, 3, 2, 7, 4);
-		rom[A] = x;
-	}
+	for (int i = 0x0000; i < 0x4000; i++)
+		rom[i] = bitswap<8>(rom[i] ^ 0x12, 0, 6, 5, 1, 3, 2, 7, 4);
 
-	for (int A = 0x4000; A < 0x8000; A++)
-	{
-		uint8_t x = rom[A];
-		x = bitswap<8>(x ^ 0x81, 1, 6, 5, 0, 3, 2, 4, 7);
-		rom[A] = x;
-	}
+	for (int i = 0x4000; i < 0x8000; i++)
+		rom[i] = bitswap<8>(rom[i] ^ 0x81, 1, 6, 5, 0, 3, 2, 4, 7);
 
 	uint8_t buf[0x8000];
 	memcpy(buf, rom, 0x8000);
@@ -30986,6 +31030,65 @@ void cmaster_state::init_jkrmastc()
 			rom[i] = buf[i];
 		else if ((i & 0x78) == 0x58)
 			rom[i] = buf[i ^ 0x18];
+		else if ((i & 0x78) == 0x60)
+			rom[i] = buf[i ^ 0x10];
+		else if ((i & 0x78) == 0x68)
+			rom[i] = buf[i ^ 0x08];
+		else if ((i & 0x78) == 0x70)
+			rom[i] = buf[i ^ 0x08];
+		else if ((i & 0x78) == 0x78)
+			rom[i] = buf[i ^ 0x10];
+	}
+
+	init_palnibbles();
+}
+
+void cmaster_state::init_jkrmastd()
+{
+	// decryption verified via ICE dump
+
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0x0000; i < 0x4000; i++)
+		rom[i] = bitswap<8>(rom[i] ^ 0x48, 7, 4, 5, 6, 0, 2, 1, 3);
+
+	for (int i = 0x4000; i < 0x8000; i++)
+	{
+		if (BIT(rom[i], 5))
+			rom[i] = bitswap<8>(rom[i] ^ 0x48, 7, 4, 5, 3, 0, 2, 1, 6);
+		else
+			rom[i] = bitswap<8>(rom[i] ^ 0x48, 7, 6, 5, 0, 3, 2, 1, 4);
+	}
+
+	uint8_t buf[0x8000];
+	memcpy(buf, rom, 0x8000);
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		if ((i & 0x78) == 0x00)
+			rom[i] = buf[i ^ 0x08];
+		else if ((i & 0x78) == 0x08)
+			rom[i] = buf[i ^ 0x10];
+		else if ((i & 0x78) == 0x10)
+			rom[i] = buf[i ^ 0x10];
+		else if ((i & 0x78) == 0x18)
+			rom[i] = buf[i ^ 0x08];
+		else if ((i & 0x78) == 0x20)
+			rom[i] = buf[i ^ 0x18];
+		else if ((i & 0x78) == 0x28)
+			rom[i] = buf[i];
+		else if ((i & 0x78) == 0x30)
+			rom[i] = buf[i];
+		else if ((i & 0x78) == 0x38)
+			rom[i] = buf[i ^ 0x18];
+		else if ((i & 0x78) == 0x40)
+			rom[i] = buf[i];
+		else if ((i & 0x78) == 0x48)
+			rom[i] = buf[i ^ 0x18];
+		else if ((i & 0x78) == 0x50)
+			rom[i] = buf[i ^ 0x18];
+		else if ((i & 0x78) == 0x58)
+			rom[i] = buf[i];
 		else if ((i & 0x78) == 0x60)
 			rom[i] = buf[i ^ 0x10];
 		else if ((i & 0x78) == 0x68)
@@ -34017,7 +34120,8 @@ GAMEL( 1991, tonypok,    0,         cm,        tonypok,   cmaster_state, init_to
 GAME(  1999, jkrmast,    0,         jkrmast,   jkrmast,   cmaster_state, init_jkrmast,   ROT0, "Pick-A-Party USA",   "Joker Master 2000 Special Edition (V515)",     0 )
 GAME(  1999, jkrmasta,   jkrmast,   jkrmast,   jkrmast,   cmaster_state, init_jkrmast,   ROT0, "Pick-A-Party USA",   "Joker Master 2000 Special Edition (V512/513)", 0 )
 GAME(  1999, jkrmastb,   jkrmast,   jkrmast,   jkrmastb,  cmaster_state, init_jkrmast,   ROT0, "Pick-A-Party USA",   "Joker Master 2000 Special Edition (V512)",     0 )
-GAME(  1997, jkrmastc,   jkrmast,   jkrmast,   jkrmastb,  cmaster_state, init_jkrmastc,  ROT0, "Pick-A-Party USA",   "Joker Master 2000 Special Edition (V1C)",      MACHINE_NOT_WORKING ) // encrypted
+GAME(  1997, jkrmastc,   jkrmast,   jkrmastc,  jkrmastb,  cmaster_state, init_jkrmastc,  ROT0, "Pick-A-Party USA",   "The New 1997 Joker Master (V1C)",              MACHINE_NOT_WORKING ) // protected? calls into NVRAM when starting wheels. Needs inputs / outputs
+GAME(  1997, jkrmastd,   jkrmast,   jkrmastc,  jkrmastb,  cmaster_state, init_jkrmastd,  ROT0, "Pick-A-Party USA",   "The New 1997 Joker Master - New York (V3G)",   MACHINE_NOT_WORKING ) // protected? calls into NVRAM when starting wheels. Needs inputs / outputs
 GAME(  1993, pkrmast,    0,         pkrmast,   pkrmast,   cmaster_state, init_pkrmast,   ROT0, "Fun USA",            "Poker Master (ED-1993, dual game, set 1)",     0 ) // puts FUN USA 95H N/G  V2.20 in NVRAM
 GAME(  1993, pkrmasta,   pkrmast,   pkrmast,   pkrmast,   cmaster_state, init_pkrmast,   ROT0, "Fun USA",            "Poker Master (ED-1993, dual game, set 2)",     0 ) // puts PM93 JAN 29/1996 V1.52 in NVRAM
 GAME(  1993, missbingo,  pkrmast,   pkrmast,   pkrmast,   cmaster_state, init_pkrmast,   ROT0, "Fun USA",            "Miss Bingo (Poker Master HW, dual game)",      0 )
