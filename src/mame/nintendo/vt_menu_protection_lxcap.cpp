@@ -11,7 +11,9 @@
 DEFINE_DEVICE_TYPE(VT_MENU_PROTECTION_LXCAP, vt_menu_protection_lxcap_device, "vtmenuprot_lxcap", "VT Menu Protection (lxcap)")
 
 vt_menu_protection_lxcap_device::vt_menu_protection_lxcap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VT_MENU_PROTECTION_LXCAP, tag, owner, clock)
+	device_t(mconfig, VT_MENU_PROTECTION_LXCAP, tag, owner, clock),
+	m_in_clock(false),
+	m_in_data(false)
 {
 }
 
@@ -21,18 +23,18 @@ uint8_t vt_menu_protection_lxcap_device::read()
 	return m_outlatch;
 }
 
-void vt_menu_protection_lxcap_device::write_clock(bool state)
+void vt_menu_protection_lxcap_device::write_clock(int state)
 {
-	if (state != m_clock)
+	if (bool(state) != m_in_clock)
 	{
 		if (state)
 		{
 			logerror("%s vt_menu_protection_lxcap_device::write_clock HIGH\n", machine().describe_context());
-			logerror("reading/writing data bit %d\n", m_data ? 1 : 0);
+			logerror("reading/writing data bit %d\n", m_in_data ? 1 : 0);
 
 			if (m_phase == 0)
 			{
-				m_command = (m_command << 1) | (m_data ? 1 : 0);
+				m_command = (m_command << 1) | (m_in_data ? 1 : 0);
 				m_bitcount++;
 
 				if (m_bitcount == 20)
@@ -74,12 +76,12 @@ void vt_menu_protection_lxcap_device::write_clock(bool state)
 		}
 	}
 
-	m_clock = state;
+	m_in_clock = bool(state);
 }
 
-void vt_menu_protection_lxcap_device::write_data(bool state)
+void vt_menu_protection_lxcap_device::write_data(int state)
 {
-	if (state != m_data)
+	if (bool(state) != m_in_data)
 	{
 		if (state)
 			logerror("%s vt_menu_protection_lxcap_device::write_data HIGH\n", machine().describe_context());
@@ -87,13 +89,13 @@ void vt_menu_protection_lxcap_device::write_data(bool state)
 			logerror("%s vt_menu_protection_lxcap_device::write_data LOW\n", machine().describe_context());
 	}
 
-	m_data = state;
+	m_in_data = bool(state);
 }
 
 void vt_menu_protection_lxcap_device::device_start()
 {
-	save_item(NAME(m_data));
-	save_item(NAME(m_clock));
+	save_item(NAME(m_in_data));
+	save_item(NAME(m_in_clock));
 	save_item(NAME(m_bitcount));
 	save_item(NAME(m_command));
 	save_item(NAME(m_phase));
@@ -103,8 +105,6 @@ void vt_menu_protection_lxcap_device::device_start()
 
 void vt_menu_protection_lxcap_device::device_reset()
 {
-	m_data = false;
-	m_clock = false;
 	m_bitcount = 0;
 	m_command = 0;
 	m_phase = 0;

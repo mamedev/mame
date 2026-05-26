@@ -15,16 +15,16 @@ public:
 	vt_menu_protection_lxcap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint8_t read();
-	void write_clock(bool state);
-	void write_data(bool state);
+	void write_clock(int state);
+	void write_data(int state);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	bool m_clock;
-	bool m_data;
+	bool m_in_clock;
+	bool m_in_data;
 
 	u8 m_bitcount;
 	u32 m_command;
