@@ -72,6 +72,20 @@ private:
 };
 
 
+// trapeze
+
+class trapeze_state : public circus_state
+{
+public:
+	trapeze_state(const machine_config &mconfig, device_type type, const char *tag) :
+		circus_state(mconfig, type, tag)
+	{ }
+
+private:
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+};
+
+
 // robotbwl
 
 class robotbwl_state : public circus_state
@@ -124,6 +138,8 @@ public:
 private:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	virtual void sound_w(uint8_t data) override;
+
+	void draw_border(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 

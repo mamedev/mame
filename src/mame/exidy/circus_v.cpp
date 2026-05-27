@@ -95,10 +95,10 @@ bool circus_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect)
 void circus_state::draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// The PROMs are used to draw the border and diving boards
-	draw_line(bitmap, cliprect, 0, 18, 255, 18, 0);
-	draw_line(bitmap, cliprect, 0, 249, 255, 249, 1);
-	draw_line(bitmap, cliprect, 0, 18, 0, 248, 0);
-	draw_line(bitmap, cliprect, 247, 18, 247, 248, 0);
+	draw_line(bitmap, cliprect, 0, 16, 255, 16, 0);
+	draw_line(bitmap, cliprect, 0, 248, 255, 248, 1);
+	draw_line(bitmap, cliprect, 0, 16, 0, 255, 0);
+	draw_line(bitmap, cliprect, 247, 16, 247, 255, 0);
 
 	draw_line(bitmap, cliprect, 0, 136, 17, 136, 0);
 	draw_line(bitmap, cliprect, 231, 136, 248, 136, 0);
@@ -110,6 +110,22 @@ uint32_t circus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_fg(bitmap, cliprect);
+
+	if (draw_sprite(bitmap, cliprect))
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+
+	return 0;
+}
+
+
+
+/*******************************************************************************
+    Trapeze
+*******************************************************************************/
+
+uint32_t trapeze_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	if (draw_sprite(bitmap, cliprect))
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -200,9 +216,17 @@ uint32_t crash_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
     Rip Cord
 *******************************************************************************/
 
+void ripcord_state::draw_border(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	draw_line(bitmap, cliprect, 0, 16, 255, 16, 0);
+	draw_line(bitmap, cliprect, 0, 16, 0, 255, 0);
+	draw_line(bitmap, cliprect, 247, 16, 247, 255, 0);
+}
+
 uint32_t ripcord_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_border(bitmap, cliprect);
 
 	if (draw_sprite(bitmap, cliprect))
 		m_maincpu->set_input_line(0, ASSERT_LINE);
