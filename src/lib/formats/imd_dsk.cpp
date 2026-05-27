@@ -949,9 +949,8 @@ bool imd_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	//    we deliberately do not cache anything from a prior load().
 	std::string header;
 	{
-		std::time_t t = std::time(nullptr);
-		std::tm lt{};
-		localtime_r(&t, &lt);
+		std::time_t const t = std::time(nullptr);
+		std::tm const lt = *std::localtime(&t);
 		char buf[64];
 		std::snprintf(buf, sizeof(buf), "IMD 1.20: %02d/%02d/%04d %02d:%02d:%02d\r\n",
 					  lt.tm_mday, lt.tm_mon + 1, lt.tm_year + 1900,
