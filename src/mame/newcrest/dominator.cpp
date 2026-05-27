@@ -12,7 +12,7 @@ This engine was also used in the newer Mephisto Modena.
 Hardware notes:
 - R65C02P4 or G65SC02P-4 @ 4MHz
 - 32KB ROM, 8KB RAM battery-backed
-- Sanyo LC7582, 2 LCD panels (each 4-digit, some unused segments)
+- Sanyo LC7582, same LCDs as Chess 3008
 - TTL, piezo, 8*8+8 LEDs, button sensors
 
 Sphinx Commander also uses the Dominator program, and is on similar hardware,
@@ -169,6 +169,7 @@ static INPUT_PORTS_START( commander )
 	PORT_INCLUDE( dominator )
 
 	PORT_MODIFY("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Multi-Move")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Library")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_C) PORT_NAME("Sound/Color")
 INPUT_PORTS_END

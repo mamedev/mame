@@ -5,8 +5,8 @@
     Driver for early Williams games
 
 **************************************************************************/
-#ifndef MAME_MIDWAY_WILLIAMS_H
-#define MAME_MIDWAY_WILLIAMS_H
+#ifndef MAME_WILLIAMS_WILLIAMS_H
+#define MAME_WILLIAMS_WILLIAMS_H
 
 #pragma once
 
@@ -376,5 +376,4 @@ private:
 	void pia_s11_bg_strobe_w(int state);
 };
 
-
-#endif // MAME_MIDWAY_WILLIAMS_H
+#endif // MAME_WILLIAMS_WILLIAMS_H

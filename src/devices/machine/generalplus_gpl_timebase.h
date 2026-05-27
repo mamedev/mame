@@ -12,9 +12,9 @@ class gpl_timebase_device : public device_t
 public:
 	gpl_timebase_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<u16 Timer> bool timebase_irq_flag() { return ((m_timebase_ctrl[Timer] & 0x8000) && (m_timebase_ctrl[Timer] & 0x4000)) ? true : false; }
-
 	auto updateirqs_callback() { return m_updateirqs_cb.bind(); }
+
+	template <u16 Timer> bool timebase_irq_flag() { return ((m_timebase_ctrl[Timer] & 0x8000) && (m_timebase_ctrl[Timer] & 0x4000)) ? true : false; }
 
 	u16 timebasea_ctrl_r();
 	u16 timebaseb_ctrl_r();
@@ -32,10 +32,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	template<u16 Timer> TIMER_DEVICE_CALLBACK_MEMBER(timebase_cb);
+	template <u16 Timer> TIMER_DEVICE_CALLBACK_MEMBER(timebase_cb);
 
-	template<u16 Timer> u16 timebase_ctrl_r();
-	template<u16 Timer> void timebase_ctrl_w(u16 data);
+	template <u16 Timer> u16 timebase_ctrl_r();
+	template <u16 Timer> void timebase_ctrl_w(u16 data);
 
 
 	attotime get_timer_period(int timer, int ctrlval);

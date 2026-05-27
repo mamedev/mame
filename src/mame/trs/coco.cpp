@@ -112,14 +112,11 @@ void coco_state::analog_port_start(analog_input_t *analog, const char *rx_tag, c
 
 
 //-------------------------------------------------
-//  device_start
+//  machine_start
 //-------------------------------------------------
 
-void coco_state::device_start()
+void coco_state::machine_start()
 {
-	// call base device_start
-	driver_device::device_start();
-
 	// look up analog ports
 	analog_port_start(&m_joystick, JOYSTICK_RX_TAG, JOYSTICK_RY_TAG,
 		JOYSTICK_LX_TAG, JOYSTICK_LY_TAG, JOYSTICK_BUTTONS_TAG);
@@ -159,11 +156,8 @@ void coco_state::device_start()
 //  device_reset
 //-------------------------------------------------
 
-void coco_state::device_reset()
+void coco_state::machine_reset()
 {
-	/* call base device_start */
-	driver_device::device_reset();
-
 	/* reset state */
 	m_dac_output = 0;
 	m_analog_audio_level = 0;

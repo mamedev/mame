@@ -5,13 +5,13 @@
     Midway MCR system
 
 **************************************************************************/
-#ifndef MAME_MIDWAY_MCR_H
-#define MAME_MIDWAY_MCR_H
+#ifndef MAME_BALLY_MCR_H
+#define MAME_BALLY_MCR_H
 
 #pragma once
 
 #include "csd.h"
-#include "midway.h"
+#include "midway_sound.h"
 
 #include "ballysound.h"
 
@@ -238,4 +238,4 @@ extern const z80_daisy_config mcr_ipu_daisy_chain[];
 extern const gfx_layout mcr_bg_layout;
 extern const gfx_layout mcr_sprite_layout;
 
-#endif // MAME_MIDWAY_MCR_H
+#endif // MAME_BALLY_MCR_H

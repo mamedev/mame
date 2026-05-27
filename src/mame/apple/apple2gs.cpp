@@ -747,7 +747,7 @@ void apple2gs_state::machine_start()
 	m_cnxx_slot = CNXX_UNCLAIMED;
 
 	// install ROM
-	address_space& space = m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	if (m_is_rom3)
 		space.install_rom(0xfc0000, 0xffffff, m_rom);
 
@@ -1169,21 +1169,21 @@ void apple2gs_state::palette_init(palette_device &palette)
 	static const unsigned char apple2gs_palette[] =
 	{
 		0x0, 0x0, 0x0,  /* Black         $0              $0000 */
-		0xD, 0x0, 0x3,  /* Deep Red      $1              $0D03 */
+		0xd, 0x0, 0x3,  /* Deep Red      $1              $0D03 */
 		0x0, 0x0, 0x9,  /* Dark Blue     $2              $0009 */
-		0xD, 0x2, 0xD,  /* Purple        $3              $0D2D */
+		0xd, 0x2, 0xd,  /* Purple        $3              $0D2D */
 		0x0, 0x7, 0x2,  /* Dark Green    $4              $0072 */
 		0x5, 0x5, 0x5,  /* Dark Gray     $5              $0555 */
-		0x2, 0x2, 0xF,  /* Medium Blue   $6              $022F */
-		0x6, 0xA, 0xF,  /* Light Blue    $7              $06AF */
+		0x2, 0x2, 0xf,  /* Medium Blue   $6              $022F */
+		0x6, 0xa, 0xf,  /* Light Blue    $7              $06AF */
 		0x8, 0x5, 0x0,  /* Brown         $8              $0850 */
-		0xF, 0x6, 0x0,  /* Orange        $9              $0F60 */
-		0xA, 0xA, 0xA,  /* Light Gray    $A              $0AAA */
-		0xF, 0x9, 0x8,  /* Pink          $B              $0F98 */
-		0x1, 0xD, 0x0,  /* Light Green   $C              $01D0 */
-		0xF, 0xF, 0x0,  /* Yellow        $D              $0FF0 */
-		0x4, 0xF, 0x9,  /* Aquamarine    $E              $04F9 */
-		0xF, 0xF, 0xF   /* White         $F              $0FFF */
+		0xf, 0x6, 0x0,  /* Orange        $9              $0F60 */
+		0xa, 0xa, 0xa,  /* Light Gray    $A              $0AAA */
+		0xf, 0x9, 0x8,  /* Pink          $B              $0F98 */
+		0x1, 0xd, 0x0,  /* Light Green   $C              $01D0 */
+		0xf, 0xf, 0x0,  /* Yellow        $D              $0FF0 */
+		0x4, 0xf, 0x9,  /* Aquamarine    $E              $04F9 */
+		0xf, 0xf, 0xf   /* White         $F              $0FFF */
 	};
 
 	for (int i = 0; i < 16; i++)
@@ -2368,7 +2368,7 @@ void apple2gs_state::write_slot_rom(int slotbias, int offset, u8 data)
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && (!machine().side_effects_disabled()))
+		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && !machine().side_effects_disabled())
 		{
 			m_cnxx_slot = slotnum;
 			update_slotrom_banks();
@@ -2397,7 +2397,7 @@ u8 apple2gs_state::c100_r(offs_t offset)
 	slow_cycle();
 
 	// SETSLOTCXROM is disabled, so the $C02D SLOT register controls what's in each slot
-	if (!(m_slotromsel & (1 << slot)))
+	if (!BIT(m_slotromsel, slot))
 	{
 		return read_int_rom(0x3c100, offset);
 	}
@@ -2412,7 +2412,7 @@ void apple2gs_state::c100_w(offs_t offset, u8 data)
 	accel_slot(slot);
 	slow_cycle();
 
-	if ((m_slotromsel & (1 << slot)))
+	if (BIT(m_slotromsel, slot))
 	{
 		write_slot_rom(1, offset, data);
 	}
@@ -2429,7 +2429,7 @@ u8 apple2gs_state::c400_r(offs_t offset)
 	accel_slot(slot);
 	slow_cycle();
 
-	if (!(m_slotromsel & (1 << slot)))
+	if (!BIT(m_slotromsel, slot))
 	{
 		return read_int_rom(0x3c400, offset);
 	}
@@ -2444,7 +2444,7 @@ void apple2gs_state::c400_w(offs_t offset, u8 data)
 	accel_slot(slot);
 	slow_cycle();
 
-	if ((m_slotromsel & (1 << slot)))
+	if (BIT(m_slotromsel, slot))
 	{
 		write_slot_rom(4, offset, data);
 	}
@@ -2809,7 +2809,7 @@ u8 apple2gs_state::read_floatingbus()
 		// approximate (for non-flow control instructions) by peeking at PC
 		offs_t pc = m_maincpu->pc();
 		// previous byte, wrapping at bank boundary
-		pc = (pc & 0xFF0000) | ((pc - 1) & 0xFFFF);
+		pc = (pc & 0xff0000) | ((pc - 1) & 0xffff);
 		// prevent recursion via slot firmware or Mega II C07x
 		recurse = true;
 		u8 res = m_maincpu->space(AS_PROGRAM).read_byte(pc);
@@ -2934,7 +2934,7 @@ void apple2gs_state::b0ram0800_w(offs_t offset, u8 data)
 	m_ram_ptr[offset+0x800] = data;
 	if (offset < 0x400)
 	{
-		if ((!(m_shadow & SHAD_TXTPG2)) && (m_is_rom3))
+		if (!(m_shadow & SHAD_TXTPG2) && m_is_rom3)
 		{
 			slow_cycle();
 			m_megaii_ram[offset+0x800] = data;
@@ -2985,7 +2985,7 @@ void apple2gs_state::b1ram0800_w(offs_t offset, u8 data)
 	m_ram_ptr[offset+0x10800] = data;
 	if (offset < 0x400)
 	{
-		if ((!(m_shadow & SHAD_TXTPG2)) && (m_is_rom3))
+		if (!(m_shadow & SHAD_TXTPG2) && m_is_rom3)
 		{
 			slow_cycle();
 			m_megaii_ram[offset+0x10800] = data;
@@ -2996,7 +2996,7 @@ u8 apple2gs_state::b1ram2000_r(offs_t offset)  { return m_ram_ptr[offset+0x12000
 void apple2gs_state::b1ram2000_w(offs_t offset, u8 data)
 {
 	m_ram_ptr[offset+0x12000] = data;
-	if ((!(m_shadow & SHAD_HIRESPG1) && !(m_shadow & SHAD_AUXHIRES)) || (!(m_shadow & SHAD_SUPERHIRES)))
+	if ((!(m_shadow & SHAD_HIRESPG1) && !(m_shadow & SHAD_AUXHIRES)) || !(m_shadow & SHAD_SUPERHIRES))
 	{
 		auxram0000_w(offset+0x2000, data);
 	}
@@ -3007,7 +3007,7 @@ void apple2gs_state::b1ram4000_w(offs_t offset, u8 data)
 	m_ram_ptr[offset+0x14000] = data;
 	if (offset < 0x2000)
 	{
-		if ((!(m_shadow & SHAD_HIRESPG2) && !(m_shadow & SHAD_AUXHIRES)) || (!(m_shadow & SHAD_SUPERHIRES)))
+		if ((!(m_shadow & SHAD_HIRESPG2) && !(m_shadow & SHAD_AUXHIRES)) || !(m_shadow & SHAD_SUPERHIRES))
 		{
 			auxram0000_w(offset+0x4000, data);
 		}
@@ -3088,7 +3088,7 @@ void apple2gs_state::bank1_0000_sh_w(offs_t offset, u8 data)
 		case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
 		case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
 		case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
-			if ((!(m_shadow & SHAD_HIRESPG1) && !(m_shadow & SHAD_AUXHIRES)) || (!(m_shadow & SHAD_SUPERHIRES)))
+			if ((!(m_shadow & SHAD_HIRESPG1) && !(m_shadow & SHAD_AUXHIRES)) || !(m_shadow & SHAD_SUPERHIRES))
 			{
 				auxram0000_w(offset, data);
 			}
@@ -3099,7 +3099,7 @@ void apple2gs_state::bank1_0000_sh_w(offs_t offset, u8 data)
 		case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
 		case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57:
 		case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
-			if ((!(m_shadow & SHAD_HIRESPG2) && !(m_shadow & SHAD_AUXHIRES)) || (!(m_shadow & SHAD_SUPERHIRES)))
+			if ((!(m_shadow & SHAD_HIRESPG2) && !(m_shadow & SHAD_AUXHIRES)) || !(m_shadow & SHAD_SUPERHIRES))
 			{
 				auxram0000_w(offset, data);
 			}
@@ -3123,8 +3123,8 @@ void apple2gs_state::apple2gs_map(address_map &map)
 	map(0x000000, 0xffffff).r(FUNC(apple2gs_state::floatingbank_r)).nopw();
 	map.unmap_value_high(); // with expansion slot, unpopulated banks return ff on ROM3
 
-	/* "fast side" - runs 2.8 MHz minus RAM refresh, banks 00 and 01 usually have writes shadowed to E0/E1 where I/O lives */
-	/* Banks 00 and 01 also have their own independent language cards which are NOT shadowed. */
+	// "fast side" - runs 2.8 MHz minus RAM refresh, banks 00 and 01 usually have writes shadowed to E0/E1 where I/O lives
+	// Banks 00 and 01 also have their own independent language cards which are NOT shadowed.
 	map(0x000000, 0x0001ff).view(m_b0_0000bank);
 	m_b0_0000bank[0](0x0000, 0x01ff).rw(FUNC(apple2gs_state::b0ram0000_r), FUNC(apple2gs_state::b0ram0000_w));
 	m_b0_0000bank[1](0x0000, 0x01ff).rw(FUNC(apple2gs_state::b1ram0000_r), FUNC(apple2gs_state::b1ram0000_w));
@@ -3195,8 +3195,8 @@ void apple2gs_state::apple2gs_map(address_map &map)
 	m_lc01[0](0x1d000, 0x1ffff).rom().region("maincpu", 0x3d000).w(FUNC(apple2gs_state::lc_01_w));
 	m_lc01[1](0x1d000, 0x1ffff).rw(FUNC(apple2gs_state::lc_01_r), FUNC(apple2gs_state::lc_01_w));
 
-	/* "Mega II side" - this is basically a 128K IIe on a chip that runs merrily at 1 MHz */
-	/* Unfortunately all I/O happens here, including new IIgs-specific stuff */
+	// "Mega II side" - this is basically a 128K IIe on a chip that runs merrily at 1 MHz
+	// Unfortunately all I/O happens here, including new IIgs-specific stuff
 	map(0xe00000, 0xe001ff).view(m_e0_0000bank);
 	m_e0_0000bank[0](0xe00000, 0xe001ff).rw(FUNC(apple2gs_state::e0ram_r<0x0000>), FUNC(apple2gs_state::e0ram_w<0x0000>));
 	m_e0_0000bank[1](0xe00000, 0xe001ff).rw(FUNC(apple2gs_state::e1ram_r<0x0000>), FUNC(apple2gs_state::e1ram_w<0x0000>));

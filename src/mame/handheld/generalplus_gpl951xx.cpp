@@ -3,13 +3,14 @@
 
 #include "emu.h"
 
-#include "screen.h"
-#include "speaker.h"
+#include "unknown_bftetris_lcdc.h"
 
 #include "machine/generalplus_gpl951xx_soc.h"
 #include "machine/generic_spi_flash.h"
 
-#include "unknown_bftetris_lcdc.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 namespace {
 

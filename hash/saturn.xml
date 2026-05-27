@@ -39340,5 +39340,93 @@ Game will freeze if you let the intro video play and press start. You can skip i
 		</part>
 	</software>
 
+	<!-- !Homebrew -->
+
+	<software name="deza2sgm1" supported="partial">
+		<description>Dezaemon 2 Save Game Manager</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+https://wiki.mamedev.org/index.php?title=Game:deza2sgm
+Data disk for dezaemn2 games, requires a Backup RAM [cart]
+]]></notes>
+		<info name="developer" value="Madroms" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dezaemon 2 save game manager" sha1="60e5242641d869c3eaba4ff21c8e57acd5dfb062" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="deza2sgm2" supported="partial">
+		<description>Dezaemon 2 Save Game Manager Vol. 2</description>
+		<year>2008</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+https://wiki.mamedev.org/index.php?title=Game:deza2sgm
+Data disk for dezaemn2 games, requires a Backup RAM [cart] or a [FDD]
+]]></notes>
+		<info name="developer" value="Madroms" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dezaemon 2 save game manager vol 2" sha1="341dd03af9789604e8a17456921da651dcc005ae" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pssati" supported="no">
+		<!-- from v0.832 FINAL -->
+		<description>Pseudo Saturn Installer (v1.2)</description>
+		<year>2015</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+https://github.com/cyberwarriorx/pseudosaturn
+Action Replay to Pseudo Saturn Installer
+Optional [ComLink] support
+]]></notes>
+		<info name="developer" value="Pseudo Saturn Team" />
+		<info name="developer" value="CyberWarriorX" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="installer" sha1="33b4fdcaabc13e9f59eff4aa75942695a3237171" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="psatkaif" supported="no">
+		<description>Pseudo Saturn Kai Flasher (v6.545)</description>
+		<year>2024</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Action Replay to Pseudo Saturn Kai Installer, requires 1024KB of cart memory
+]]></notes>
+		<info name="developer" value="cafe-alpha" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pskai_flasher_full" sha1="b22ef701bb8c9480319cbed62e45872b89b5a638" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="usbcartf" supported="no">
+		<description>USB Cart Flasher (Revision 11)</description>
+		<year>2013</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+https://github.com/andersm/usbcart/tree/master
+Requires a working Action Replay flash [cart]
+]]></notes>
+		<info name="developer" value="andersm"/>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="usb_cart_flasher" sha1="94e0f0663858f4ab932e9376cce4bfbaca86d1cd" />
+			</diskarea>
+		</part>
+	</software>
 
 </softwarelist>

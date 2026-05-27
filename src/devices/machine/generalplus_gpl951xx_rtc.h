@@ -64,7 +64,7 @@ private:
 	// these are 48-bit registers
 	u64 m_loadcnt;
 	u64 m_alarmdat;
-	u64 m_timerval; 
+	u64 m_timerval;
 };
 
 DECLARE_DEVICE_TYPE(GPL951XX_RTC, gpl951xx_rtc_device)

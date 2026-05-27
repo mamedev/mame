@@ -1020,7 +1020,9 @@ ROM_START( tehkanwcd ) // from a 2-PCB set labeled "A-32302 Tehkan" and "B-32302
 	ROM_LOAD( "twc-5.bin",    0x0000, 0x4000, CRC(444b5544) SHA1(0786d6d9ada7fe49c8ab9751b049095474d2e598) )
 ROM_END
 
-/* Just a year hack to put "1986" plus some other small changes, but this set has been found on different bootleg TWC PCBs. */
+/* Just a year hack to put "1986" plus some other small changes, but this set has been found on different bootleg TWC PCBs. 
+   Cocamatic (Spain) distributed this set using 27256 for all ROMs, giving the dump different hashes (but with exactly the
+   same content (with 1ST AND 2ND HALF IDENTICAL). */
 ROM_START( tehkanwch )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "worldcup_3.bin",   0x0000, 0x4000, CRC(dd3f789b) SHA1(8e616a64d96f62797485c78e9c3f36fa90486e3f) ) // 27128

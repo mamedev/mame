@@ -741,13 +741,13 @@ std::error_condition zippath_fopen(std::string_view filename, uint32_t openflags
 
 		if (subpath.empty())
 			filerr = util::core_file::open(filename, openflags, file);
-		else
+		else if (!filerr)
 			filerr = std::errc::no_such_file_or_directory;
 
 		// if we errored, then go up a directory
 		if (filerr)
 		{
-			if (std::errc::no_such_file_or_directory != filerr)
+			if ((std::errc::no_such_file_or_directory != filerr) && (std::errc::not_a_directory != filerr))
 				break;
 
 			// go up a directory
@@ -771,7 +771,7 @@ std::error_condition zippath_fopen(std::string_view filename, uint32_t openflags
 			while (len > 0 && is_zip_file_separator(temp[len - 1]))
 				len--;
 			temp = temp.substr(0, len);
-			mainpath.assign(temp);
+			mainpath = std::move(temp);
 		}
 	}
 

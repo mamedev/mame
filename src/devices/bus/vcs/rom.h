@@ -360,6 +360,17 @@ private:
 };
 
 
+// ======================> a26_rom_f0_device
+
+class a26_rom_f0_device : public a26_rom_f6_device
+{
+public:
+	a26_rom_f0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void install_memory_handlers(address_space *space) override;
+};
+
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(A26_ROM_2K_4K, a26_rom_2k_4k_device)
@@ -382,6 +393,7 @@ DECLARE_DEVICE_TYPE(A26_ROM_4IN1,  a26_rom_4in1_device)
 DECLARE_DEVICE_TYPE(A26_ROM_8IN1,  a26_rom_8in1_device)
 DECLARE_DEVICE_TYPE(A26_ROM_32IN1, a26_rom_32in1_device)
 DECLARE_DEVICE_TYPE(A26_ROM_X07,   a26_rom_x07_device)
+DECLARE_DEVICE_TYPE(A26_ROM_F0,    a26_rom_f0_device)
 
 
 #endif // MAME_BUS_VCS_ROM_H

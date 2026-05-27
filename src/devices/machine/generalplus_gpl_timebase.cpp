@@ -49,7 +49,7 @@ attotime gpl_timebase_device::get_timer_period(int timer, int ctrlval)
 // Timebase ('fixed' frequency timers)
 // (each can select from 3 different frequencies, different for each timer)
 
-template<u16 Timer>
+template <u16 Timer>
 TIMER_DEVICE_CALLBACK_MEMBER( gpl_timebase_device::timebase_cb )
 {
 	// sets bit 15 in m_timebase_ctrl[2], also visible (as read only) in P_INT_Status2, bit 8
@@ -78,13 +78,15 @@ TIMER_DEVICE_CALLBACK_MEMBER( gpl_timebase_device::timebase_cb )
 //  1  TMBAS[1]
 //  0  TMBAS[0]  00 = Reserved, 01 = 1Hz, 10 = 2Hz, 11 = 4Hz
 
-template<u16 Timer> u16 gpl_timebase_device::timebase_ctrl_r()
+template <u16 Timer>
+u16 gpl_timebase_device::timebase_ctrl_r()
 {
 	LOGMASKED(LOG_TIMEBASE, "%s:sunplus_gcm394_base_device::timebase%c_ctrl_r\n", machine().describe_context(), 'a'+Timer);
 	return m_timebase_ctrl[Timer];
 }
 
-template<u16 Timer> void gpl_timebase_device::timebase_ctrl_w(u16 data)
+template <u16 Timer>
+void gpl_timebase_device::timebase_ctrl_w(u16 data)
 {
 	LOGMASKED(LOG_TIMEBASE, "%s:sunplus_gcm394_base_device::timebase%c_ctrl_w %04x\n", machine().describe_context(), 'a'+Timer, data);
 
@@ -125,7 +127,7 @@ void gpl_timebase_device::timebasec_ctrl_w(u16 data) { timebase_ctrl_w<2>(data);
 
 void gpl_timebase_device::device_add_mconfig(machine_config &config)
 {
-	TIMER(config, "timebase_a").configure_generic(FUNC(gpl_timebase_device::timebase_cb<0>));
-	TIMER(config, "timebase_b").configure_generic(FUNC(gpl_timebase_device::timebase_cb<1>));
-	TIMER(config, "timebase_c").configure_generic(FUNC(gpl_timebase_device::timebase_cb<2>));
+	TIMER(config, m_timebasetimer[0]).configure_generic(FUNC(gpl_timebase_device::timebase_cb<0>));
+	TIMER(config, m_timebasetimer[1]).configure_generic(FUNC(gpl_timebase_device::timebase_cb<1>));
+	TIMER(config, m_timebasetimer[2]).configure_generic(FUNC(gpl_timebase_device::timebase_cb<2>));
 }

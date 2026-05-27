@@ -6,8 +6,8 @@
     Williams/Midway Y/Z-unit system
 
 **************************************************************************/
-#ifndef MAME_MIDWAY_MIDYUNIT_H
-#define MAME_MIDWAY_MIDYUNIT_H
+#ifndef MAME_WILLIAMS_MIDYUNIT_H
+#define MAME_WILLIAMS_MIDYUNIT_H
 
 #pragma once
 
@@ -304,4 +304,4 @@ private:
 	void yawdim2_sound_map(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_MIDWAY_MIDYUNIT_H
+#endif // MAME_WILLIAMS_MIDYUNIT_H

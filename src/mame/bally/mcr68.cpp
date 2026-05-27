@@ -59,7 +59,8 @@
 
 #include "emu.h"
 
-#include "midway.h"
+#include "midway_sound.h"
+
 #include "s11c_bg.h"
 
 #include "cpu/m68000/m68000.h"

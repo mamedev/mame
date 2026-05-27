@@ -6,8 +6,8 @@
     Driver for Midway T-unit games.
 
 **************************************************************************/
-#ifndef MAME_MIDWAY_MIDTUNIT_H
-#define MAME_MIDWAY_MIDTUNIT_H
+#ifndef MAME_WILLIAMS_MIDTUNIT_H
+#define MAME_WILLIAMS_MIDTUNIT_H
 
 #pragma once
 
@@ -141,4 +141,4 @@ private:
 	uint16_t   m_mk2_prot_data = 0;
 };
 
-#endif // MAME_MIDWAY_MIDTUNIT_H
+#endif // MAME_WILLIAMS_MIDTUNIT_H

@@ -935,7 +935,6 @@ u16 gcm394_base_video_device::video_703a_palettebank_r()
 
 void gcm394_base_video_device::video_703a_palettebank_w(u16 data)
 {
-
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703a_palettebank_w %04x\n", machine().describe_context(), data);
 	m_703a_palettebank = data;
 }

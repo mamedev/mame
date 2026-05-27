@@ -222,55 +222,11 @@ private:
 	inline u16 read_space(offs_t offset);
 	inline void write_space(offs_t offset, u16 data);
 
-	template<int Timer>	TIMER_DEVICE_CALLBACK_MEMBER(timer_cb);
+	template<int Timer> TIMER_DEVICE_CALLBACK_MEMBER(timer_cb);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(adc_timer_cb);
 
 	u16 m_byteswap;
-
-	const char* m_srcb[8] =
-	{
-		"2048Hz",
-		"1024Hz",
-		"256Hz",
-		"TimeBaseB",
-		"TimeBaseA",
-		"(logic low)",
-		"(logic high)",
-		"EXT1 with pre-scaler"
-	};
-
-	const char* m_srca[16] =
-	{
-		"SYSCLK/2",
-		"SYSCLK/256",
-		"32768Hz",
-		"8192Hz",
-		"4096Hz",
-		"(logic high)",
-		"Timer Overflow",
-		"EXT0 with pre-scaler",
-		"(logic low)",
-		"9: reserved",
-		"a: reserved",
-		"b: reserved",
-		"c: reserved",
-		"d: reserved",
-		"e: reserved",
-		"f: reserved"
-	};
-
-	const char* m_adc_channels[8] =
-	{
-		"LINEIN 0",
-		"LINEIN 1",
-		"LINEIN 2",
-		"LINEIN 3",
-		"LINEIN 4",
-		"LINEIN 5",
-		"1.2V bandgap",
-		"LDOV50"
-	};
 
 	u16 m_timer_preload[8];
 	u16 m_timer_ctrl[8];

@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MIDWAY_WILLIAMSBLITTER_H
-#define MAME_MIDWAY_WILLIAMSBLITTER_H
+#ifndef MAME_WILLIAMS_WILLIAMSBLITTER_H
+#define MAME_WILLIAMS_WILLIAMSBLITTER_H
 
 #pragma once
 
@@ -126,4 +126,4 @@ public:
 DECLARE_DEVICE_TYPE(WILLIAMS_BLITTER_SC1, williams_blitter_sc1_device)
 DECLARE_DEVICE_TYPE(WILLIAMS_BLITTER_SC2, williams_blitter_sc2_device)
 
-#endif // MAME_MIDWAY_WILLIAMSBLITTER_H
+#endif // MAME_WILLIAMS_WILLIAMSBLITTER_H

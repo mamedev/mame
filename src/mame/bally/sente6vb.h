@@ -5,9 +5,8 @@
     Bally/Sente 6VB audio board emulation
 
 ***************************************************************************/
-
-#ifndef MAME_MIDWAY_SENTE6VB_H
-#define MAME_MIDWAY_SENTE6VB_H
+#ifndef MAME_BALLY_SENTE6VB_H
+#define MAME_BALLY_SENTE6VB_H
 
 #pragma once
 
@@ -81,4 +80,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SENTE6VB, sente6vb_device)
 
-#endif // MAME_MIDWAY_SENTE6VB_H
+#endif // MAME_BALLY_SENTE6VB_H

@@ -7,12 +7,11 @@
 
 **************************************************************************/
 
-#ifndef MAME_MIDWAY_MIDTUNIT_V_H
-#define MAME_MIDWAY_MIDTUNIT_V_H
+#ifndef MAME_WILLIAMS_MIDTUNIT_V_H
+#define MAME_WILLIAMS_MIDTUNIT_V_H
 
 #pragma once
 
-#include "emu.h"
 #include "cpu/tms34010/tms34010.h"
 #include "emupal.h"
 
@@ -230,4 +229,4 @@ DECLARE_DEVICE_TYPE(MIDTUNIT_VIDEO, midtunit_video_device)
 DECLARE_DEVICE_TYPE(MIDWUNIT_VIDEO, midwunit_video_device)
 DECLARE_DEVICE_TYPE(MIDXUNIT_VIDEO, midxunit_video_device)
 
-#endif // MAME_MIDWAY_MIDTUNIT_V_H
+#endif // MAME_WILLIAMS_MIDTUNIT_V_H
