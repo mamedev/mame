@@ -67,9 +67,9 @@
 #include "gridrom.h"
 
 #include "bus/ieee488/ieee488.h"
-#include "bus/rs232/rs232.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/printer.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "machine/i7220.h"
 #include "machine/i80130.h"

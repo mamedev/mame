@@ -61,14 +61,14 @@ kn5000_cpanel_device::kn5000_cpanel_device(const machine_config &mconfig, const 
 	m_txd_cb(*this),
 	m_sclk_out_cb(*this),
 	m_inta_cb(*this),
+	m_cpl_ports(*this, finder_base::DUMMY_TAG, 0U),
+	m_cpr_ports(*this, finder_base::DUMMY_TAG, 0U),
 	m_cpl_leds(*this, "cpl_led_%u", 0U),
 	m_cpr_leds(*this, "cpr_led_%u", 0U)
 {
 	std::fill(std::begin(m_cmd_buffer), std::end(m_cmd_buffer), 0);
 	std::fill(std::begin(m_last_button_state), std::end(m_last_button_state), 0);
 	std::fill(std::begin(m_pending_button_state), std::end(m_pending_button_state), 0);
-	std::fill(std::begin(m_cpl_ports), std::end(m_cpl_ports), nullptr);
-	std::fill(std::begin(m_cpr_ports), std::end(m_cpr_ports), nullptr);
 }
 
 void kn5000_cpanel_device::device_start()
@@ -216,7 +216,7 @@ void kn5000_cpanel_device::sioclk(int state)
 	}
 
 	LOGMASKED(LOG_SERIAL, "sioclk state=%d rxd=%d rx_count=%d tx_count=%d\n",
-		state, m_rxd, m_rx_clock_count, m_tx_clock_count);
+			state, m_rxd, m_rx_clock_count, m_tx_clock_count);
 
 	if (state)
 	{
@@ -231,7 +231,7 @@ void kn5000_cpanel_device::sioclk(int state)
 			m_rx_clock_count--;
 
 			LOGMASKED(LOG_SERIAL, "RX bit: %d, shift_reg=%02X, count=%d\n",
-				m_rxd, m_rx_shift_register, m_rx_clock_count);
+					m_rxd, m_rx_shift_register, m_rx_clock_count);
 
 			if (m_rx_clock_count == 0)
 			{
@@ -271,7 +271,7 @@ void kn5000_cpanel_device::sioclk(int state)
 			{
 				// First bit of a chained byte (loaded from queue) — output bit 0 without shifting
 				LOGMASKED(LOG_SERIAL, "TX bit 0 (chained): %d, shift_reg=%02X\n",
-					m_tx_shift_register & 1, m_tx_shift_register);
+						m_tx_shift_register & 1, m_tx_shift_register);
 				m_txd_cb(m_tx_shift_register & 1);
 				m_tx_clock_count--;
 			}
@@ -280,7 +280,7 @@ void kn5000_cpanel_device::sioclk(int state)
 				// Normal operation: shift out the next bit
 				m_tx_shift_register >>= 1;
 				LOGMASKED(LOG_SERIAL, "TX bit: %d, shift_reg=%02X, count=%d\n",
-					m_tx_shift_register & 1, m_tx_shift_register, m_tx_clock_count);
+						m_tx_shift_register & 1, m_tx_shift_register, m_tx_clock_count);
 				m_txd_cb(m_tx_shift_register & 1);
 				m_tx_clock_count--;
 			}
@@ -302,7 +302,7 @@ void kn5000_cpanel_device::sioclk(int state)
 					m_tx_clock_count = 8;  // Full 8 bits — don't pre-output yet
 
 					LOGMASKED(LOG_SERIAL, "TX next byte queued: %02X (no pre-output)\n",
-						m_tx_shift_register);
+							m_tx_shift_register);
 
 					// Don't pre-output: bit 7 of previous byte is still on the line
 					// and needs to be sampled by CPU on the next rising edge.
@@ -325,7 +325,7 @@ void kn5000_cpanel_device::sioclk(int state)
 void kn5000_cpanel_device::send_byte(uint8_t data)
 {
 	LOGMASKED(LOG_SERIAL, "send_byte(%02X) tx_count=%d queue_size=%zu sioclk_state=%d\n",
-		data, m_tx_clock_count, m_tx_queue.size(), m_sioclk_state);
+			data, m_tx_clock_count, m_tx_queue.size(), m_sioclk_state);
 
 	if (m_tx_clock_count == 0 && !m_tx_skip_first_falling)
 	{
@@ -336,7 +336,7 @@ void kn5000_cpanel_device::send_byte(uint8_t data)
 		// Pre-output first bit immediately so CPU can sample it on the first rising edge
 		m_txd_cb(m_tx_shift_register & 1);
 		LOGMASKED(LOG_SERIAL, "TX start: byte=%02X, pre-output bit=%d\n",
-			data, data & 1);
+				data, data & 1);
 
 		// Only skip the first falling edge if clock is currently HIGH.
 		// If clock is HIGH: next edge = falling (skip it)
@@ -355,7 +355,7 @@ void kn5000_cpanel_device::send_byte(uint8_t data)
 void kn5000_cpanel_device::process_received_byte(uint8_t data)
 {
 	LOGMASKED(LOG_SERIAL, "RX byte: %02X (cmd_index=%d, accept=%d)\n",
-		data, m_cmd_index, m_accept_next_byte);
+			data, m_cmd_index, m_accept_next_byte);
 
 	// Reject phantom bytes (PFFC-off phases in firmware TX state machine).
 	// The accept flag is managed by tx_start's deferred mechanism, not
@@ -372,7 +372,7 @@ void kn5000_cpanel_device::process_received_byte(uint8_t data)
 	// this filter they would be paired with the next real command byte,
 	// misaligning the 2-byte command parser and potentially triggering
 	// unintended LED commands or sync responses.
-	if (m_cmd_index == 0 && data == 0xFF)
+	if (m_cmd_index == 0 && data == 0xff)
 	{
 		LOGMASKED(LOG_SERIAL, "ignoring dummy byte 0xFF as command\n");
 		return;
@@ -548,12 +548,7 @@ uint8_t kn5000_cpanel_device::read_button_segment(int segment, bool is_left_pane
 	if (segment < 0 || segment > 10)
 		return 0;
 
-	ioport_port *port = is_left_panel ? m_cpl_ports[segment] : m_cpr_ports[segment];
-	if (port)
-	{
-		return port->read() & 0xff;
-	}
-	return 0;
+	return (is_left_panel ? m_cpl_ports : m_cpr_ports)[segment].read_safe(0) & 0xff;
 }
 
 void kn5000_cpanel_device::send_button_packet(int segment, bool is_left_panel)
@@ -567,7 +562,7 @@ void kn5000_cpanel_device::send_button_packet(int segment, bool is_left_panel)
 
 	uint8_t header = (segment & 0x0f);
 	if (is_left_panel)
-		header |= 0xC0;  // Left panel: bits 7:6 = 11
+		header |= 0xc0;  // Left panel: bits 7:6 = 11
 
 	send_byte(header);
 	send_byte(state);
@@ -764,7 +759,7 @@ TIMER_CALLBACK_MEMBER(kn5000_cpanel_device::idle_detect_callback)
 		{
 			// Multi-packet: pulse INTA to re-trigger the interrupt
 			LOGMASKED(LOG_SERIAL, "re-triggering INTA for next packet (%zu bytes queued)\n",
-				m_tx_queue.size());
+					m_tx_queue.size());
 			m_inta_cb(0);
 			m_inta_cb(1);
 		}
@@ -797,7 +792,7 @@ TIMER_CALLBACK_MEMBER(kn5000_cpanel_device::self_clock_callback)
 		{
 			// All response data sent — stop self-clocking and deassert INTA.
 			LOGMASKED(LOG_SERIAL, "self-clock TX complete (%d bytes), deasserting INTA\n",
-				m_self_clock_bytes_sent);
+					m_self_clock_bytes_sent);
 			m_self_clocking = false;
 			m_self_clock_timer->reset(attotime::never);
 
@@ -816,7 +811,7 @@ TIMER_CALLBACK_MEMBER(kn5000_cpanel_device::self_clock_callback)
 			// packet per INTA cycle.  Keep INTA asserted to block
 			// WaitTXReady while more data is queued.
 			LOGMASKED(LOG_SERIAL, "self-clock pausing after 2-byte packet, %zu bytes queued\n",
-				m_tx_queue.size());
+					m_tx_queue.size());
 			m_self_clocking = false;
 			m_self_clock_timer->reset(attotime::never);
 
@@ -857,7 +852,7 @@ TIMER_CALLBACK_MEMBER(kn5000_cpanel_device::button_scan_callback)
 			{
 				// Stable for 2 scans: confirmed change
 				LOGMASKED(LOG_BUTTONS, "confirmed right seg %d change (%02X->%02X)\n",
-					seg, m_last_button_state[seg], state);
+						seg, m_last_button_state[seg], state);
 				send_button_packet(seg, false);
 				changed = true;
 			}
@@ -865,7 +860,7 @@ TIMER_CALLBACK_MEMBER(kn5000_cpanel_device::button_scan_callback)
 			{
 				// First observation — record as pending, wait for confirmation
 				LOGMASKED(LOG_BUTTONS, "pending right seg %d change (%02X->%02X)\n",
-					seg, m_last_button_state[seg], state);
+						seg, m_last_button_state[seg], state);
 				m_pending_button_state[seg] = state;
 			}
 		}
@@ -888,14 +883,14 @@ TIMER_CALLBACK_MEMBER(kn5000_cpanel_device::button_scan_callback)
 			if (state == m_pending_button_state[idx])
 			{
 				LOGMASKED(LOG_BUTTONS, "confirmed left seg %d change (%02X->%02X)\n",
-					seg, m_last_button_state[idx], state);
+						seg, m_last_button_state[idx], state);
 				send_button_packet(seg, true);
 				changed = true;
 			}
 			else
 			{
 				LOGMASKED(LOG_BUTTONS, "pending left seg %d change (%02X->%02X)\n",
-					seg, m_last_button_state[idx], state);
+						seg, m_last_button_state[idx], state);
 				m_pending_button_state[idx] = state;
 			}
 		}

@@ -415,8 +415,8 @@ private:
 			m_entries.emplace(pos, std::move(name), std::forward<T>(value));
 	}
 
-	template <typename T, typename U, typename = std::enable_if_t<std::is_constructible_v<std::string, T>>>
-	void try_insert(T &&name, U &&value)
+	template <typename T, typename U>
+	void try_insert(T &&name, U &&value) requires std::is_constructible_v<std::string, T>
 	{
 		entry_vector::iterator const pos(
 				std::lower_bound(

@@ -3,8 +3,20 @@
 #include "emu.h"
 #include "vfxcart.h"
 
-// #define VERBOSE 1
+//#define VERBOSE 1
 #include "logmacro.h"
+
+
+namespace {
+
+INPUT_PORTS_START(vfxcart)
+	PORT_START("CFG")
+	PORT_CONFNAME(0x01, 0x01, "Cartridge Speed")
+	PORT_CONFSETTING(0x00, "Original (> 3 minutes for a full write)")
+	PORT_CONFSETTING(0x01, "Fast (~ 1 minute for a full write)")
+INPUT_PORTS_END
+
+} // anonymous namespace
 
 
 DEFINE_DEVICE_TYPE(ENSONIQ_VFX_CARTRIDGE, ensoniq_vfx_cartridge, "ensoniq_vfx_cartridge", "Ensoniq VFX family Cartridge")
@@ -18,6 +30,8 @@ ensoniq_vfx_cartridge::ensoniq_vfx_cartridge(
 	, device_image_interface(mconfig, *this)
 	, m_eeprom(*this, "eeprom")
 	, m_input_config(*this, "CFG")
+	, m_is_loaded(false)
+	, m_is_writeable(false)
 {
 }
 
@@ -52,17 +66,6 @@ void ensoniq_vfx_cartridge::device_reset()
 		m_eeprom->override_t_wc_usec();
 		m_eeprom->override_program_on_read();
 	}
-}
-
-namespace {
-
-INPUT_PORTS_START(vfxcart)
-	PORT_START("CFG")
-	PORT_CONFNAME(0x01, 0x01, "Cartridge Speed")
-	PORT_CONFSETTING(0x00, "Original (> 3 minutes for a full write)")
-	PORT_CONFSETTING(0x01, "Fast (~ 1 minute for a full write)")
-INPUT_PORTS_END
-
 }
 
 ioport_constructor ensoniq_vfx_cartridge::device_input_ports() const
