@@ -506,6 +506,7 @@ private:
 	bool m_accel_fast;
 	bool m_accel_present;
 	bool m_accel_temp_slowdown;
+	bool m_accel_disable_delay;
 	int m_accel_stage;
 	u32 m_accel_speed;
 	u8 m_accel_slotspk, m_accel_gameio, m_laser_speed;
@@ -552,7 +553,10 @@ private:
 	void update_iic_mouse();
 	void accel_full_speed();
 	void accel_normal_speed();
+	void accel_temp_delay(int ms, bool condition);
+	void accel_stop_delay();
 	void accel_slot(int slot);
+	void laser_slot(int slot);
 	void laser_calc_speed();
 
 	u8 m_cec_remap[0x40000];
@@ -1184,6 +1188,7 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_accel_slotspk));
 	save_item(NAME(m_accel_gameio));
 	save_item(NAME(m_accel_temp_slowdown));
+	save_item(NAME(m_accel_disable_delay));
 	save_item(NAME(m_accel_laser));
 	save_item(NAME(m_accel_speed));
 	save_item(NAME(m_next_strobe));
@@ -1258,10 +1263,11 @@ void apple2e_state::machine_reset()
 	m_cec_bank = 0;
 	m_accel_unlocked = false;
 	m_accel_stage = 0;
-	m_accel_slotspk = 0x41; // speaker and slot 6 slow
+	m_accel_slotspk = 0xE4; // slots 7, 6, 5, 2 slow
 	m_accel_gameio = 0x40;  // paddle delay on
 	m_accel_present = false;
 	m_accel_temp_slowdown = false;
+	m_accel_disable_delay = false;
 	m_accel_fast = false;
 	m_centronics_busy = false;
 	m_35sel = false;
@@ -1286,6 +1292,7 @@ void apple2e_state::machine_reset()
 		{
 			m_isiicplus = true;
 			m_accel_present = true;
+			// firmware sets m_accel_slotspk to 0x67: slots 6, 5, 2, 1 and speaker slow
 		}
 		else
 		{
@@ -1316,6 +1323,9 @@ void apple2e_state::machine_reset()
 	{
 		m_accel_present = true;
 		m_accel_speed = 1021800;
+		m_accel_slotspk = 0x46; // slots 6, 2, 1 slow
+		if (m_slotdevice[5] != nullptr) m_accel_slotspk |= 0x20;
+		if (m_slotdevice[7] != nullptr) m_accel_slotspk |= 0x80;
 	}
 
 	if (m_has_laser_mouse)
@@ -1533,24 +1543,40 @@ void apple2e_state::accel_normal_speed()
 	m_maincpu->set_unscaled_clock(m_pal ? 1016966 : 1021800, true); // re-align to PH0
 }
 
-void apple2e_state::accel_slot(int slot)
+void apple2e_state::accel_temp_delay(int ms, bool condition)
 {
-	if ((m_accel_present) && (m_accel_slotspk & (1 << slot)) && !machine().side_effects_disabled())
+	// C05B status bit toggles even when accelerator is disabled
+	if ((m_accel_present) && (!m_accel_disable_delay) && (condition))
 	{
 		m_accel_temp_slowdown = true;
-		m_acceltimer->adjust(attotime::from_msec(52));
+		m_acceltimer->adjust(attotime::from_msec(ms));
 		accel_normal_speed();
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::accel_timer)
+void apple2e_state::accel_stop_delay()
 {
-	if (m_accel_fast)
-	{
-		accel_full_speed();
-	}
 	m_accel_temp_slowdown = false;
 	m_acceltimer->adjust(attotime::never);
+	if (m_accel_fast)
+		accel_full_speed();
+}
+
+void apple2e_state::accel_slot(int slot)
+{
+	if (!machine().side_effects_disabled())
+		accel_temp_delay(52, BIT(m_accel_slotspk, slot));
+}
+
+void apple2e_state::laser_slot(int slot)
+{
+	if ((m_accel_laser) && !machine().side_effects_disabled())
+		accel_temp_delay(52, BIT(m_accel_slotspk, slot));
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::accel_timer)
+{
+	accel_stop_delay();
 }
 
 void apple2e_state::auxbank_update()
@@ -1885,12 +1911,7 @@ void apple2e_state::do_io(int offset)
 	{
 		m_speaker_state ^= 1;
 		m_speaker->level_w(m_speaker_state);
-		if ((m_accel_present) && (m_accel_slotspk & 1))
-		{
-			m_accel_temp_slowdown = true;
-			m_acceltimer->adjust(attotime::from_msec(5));
-			accel_normal_speed();
-		}
+		accel_temp_delay(5, (m_accel_slotspk & 1));
 		return;
 	}
 
@@ -2018,20 +2039,15 @@ void apple2e_state::do_io(int offset)
 		case 0x68:  // IIgs STATE register, which ProDOS touches
 			break;
 
-		// trigger joypad read
-		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
+		case 0x70:  // PTRIG
+			// Zip paddle delay
+			accel_temp_delay(5, BIT(m_accel_gameio, 6));
+			[[fallthrough]];
+		case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 			if ((m_isiic) || (m_isace500))
 			{
 				lower_irq(IRQ_VBL);
-			}
-
-			// Zip paddle flag
-			if ((m_accel_present) && (BIT(m_accel_gameio, 6)))
-			{
-				m_accel_temp_slowdown = true;
-				m_acceltimer->adjust(attotime::from_msec(5));
-				accel_normal_speed();
 			}
 
 			// 558 monostable one-shot timers; a running timer cannot be restarted
@@ -2548,6 +2564,22 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 			do_io(offset);
 			break;
 
+		case 0x5e: // Zip delay
+			if (m_accel_unlocked)
+			{
+				if (BIT(data, 7))
+				{
+					m_accel_disable_delay = true;
+					accel_stop_delay();
+				}
+				else
+				{
+					m_accel_disable_delay = false;
+				}
+			}
+			do_io(offset);
+			break;
+
 		case 0x5f: // Zip game I/O flags
 			if (m_accel_unlocked)
 			{
@@ -2841,6 +2873,8 @@ void apple2e_state::c080_w(offs_t offset, u8 data)
 	}
 	else
 	{
+		accel_slot(slot);
+
 		if ((m_isiicplus) && (slot == 6))
 		{
 			m_iwm->write(offset % 0x10, data);
@@ -2954,17 +2988,16 @@ u8 apple2e_state::read_int_rom(int slotbias, int offset)
 	return m_rom_ptr[slotbias + offset];
 }
 
-u8 apple2e_state::c100_r(offs_t offset)  { accel_slot(1 + ((offset >> 8) & 0x7)); return read_slot_rom(1, offset); }
-u8 apple2e_state::c100_int_r(offs_t offset)  { accel_slot(1 + ((offset >> 8) & 0x7)); return read_int_rom(0x100, offset); }
-u8 apple2e_state::c100_int_bank_r(offs_t offset)  { accel_slot(1 + ((offset >> 8) & 0x7)); return read_int_rom(0x4100, offset); }
+u8 apple2e_state::c100_r(offs_t offset)  { return read_slot_rom(1, offset); }
+u8 apple2e_state::c100_int_r(offs_t offset)  { return read_int_rom(0x100, offset); }
+u8 apple2e_state::c100_int_bank_r(offs_t offset)  { return read_int_rom(0x4100, offset); }
 u8 apple2e_state::c100_cec_r(offs_t offset)  { return m_rom_ptr[0xc100 + offset]; }
 u8 apple2e_state::c100_cec_bank_r(offs_t offset)  { return m_rom_ptr[0x4100 + offset]; }
-void apple2e_state::c100_w(offs_t offset, u8 data) { accel_slot(1); write_slot_rom(1, offset, data); }
-u8 apple2e_state::c300_r(offs_t offset)  { accel_slot(3 + ((offset >> 8) & 0x7)); return read_slot_rom(3, offset); }
+void apple2e_state::c100_w(offs_t offset, u8 data) { write_slot_rom(1, offset, data); }
+u8 apple2e_state::c300_r(offs_t offset)  { return read_slot_rom(3, offset); }
 
 u8 apple2e_state::c300_int_r(offs_t offset)
 {
-	accel_slot(3 + ((offset >> 8) & 0x7));
 	if ((!m_slotc3rom) && !machine().side_effects_disabled())
 	{
 		m_intc8rom = true;
@@ -2975,7 +3008,6 @@ u8 apple2e_state::c300_int_r(offs_t offset)
 
 u8 apple2e_state::c300_int_bank_r(offs_t offset)
 {
-	accel_slot(3 + ((offset >> 8) & 0x7));
 	if ((!m_slotc3rom) && !machine().side_effects_disabled())
 	{
 		m_intc8rom = true;
@@ -2986,7 +3018,6 @@ u8 apple2e_state::c300_int_bank_r(offs_t offset)
 
 void apple2e_state::c300_w(offs_t offset, u8 data)
 {
-	accel_slot(3 + ((offset >> 8) & 0x7));
 	if ((!m_slotc3rom) && !machine().side_effects_disabled())
 	{
 		m_intc8rom = true;
@@ -2999,10 +3030,10 @@ void apple2e_state::c300_w(offs_t offset, u8 data)
 u8 apple2e_state::c300_cec_r(offs_t offset)  { return m_rom_ptr[0xc300 + offset]; }
 u8 apple2e_state::c300_cec_bank_r(offs_t offset)  { return m_rom_ptr[0x4300 + offset]; }
 
-u8 apple2e_state::c400_r(offs_t offset)  { accel_slot(4 + ((offset >> 8) & 0x7)); return read_slot_rom(4, offset); }
+u8 apple2e_state::c400_r(offs_t offset)  { laser_slot(4 + ((offset >> 8) & 0x7)); return read_slot_rom(4, offset); }
 u8 apple2e_state::c400_int_r(offs_t offset)
 {
-	accel_slot(4 + ((offset >> 8) & 0x7));
+	laser_slot(4 + ((offset >> 8) & 0x7));
 	if ((offset < 0x100) && (m_mockingboard4c))
 	{
 		return read_slot_rom(4, offset);
@@ -3013,7 +3044,6 @@ u8 apple2e_state::c400_int_r(offs_t offset)
 
 u8 apple2e_state::c400_int_bank_r(offs_t offset)
 {
-	accel_slot(4 + ((offset >> 8) & 0x7));
 	if ((offset < 0x100) && (m_mockingboard4c))
 	{
 		return read_slot_rom(4, offset);
@@ -3024,7 +3054,7 @@ u8 apple2e_state::c400_int_bank_r(offs_t offset)
 
 void apple2e_state::c400_w(offs_t offset, u8 data)
 {
-	accel_slot(4 + ((offset >> 8) & 0x7));
+	laser_slot(4 + ((offset >> 8) & 0x7));
 	if ((m_isiic) && (offset < 0x100))
 	{
 		m_mockingboard4c = true;
@@ -3062,6 +3092,7 @@ u8 apple2e_state::c800_r(offs_t offset)
 
 	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
+		laser_slot(m_cnxx_slot);
 		return m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
 	}
 
@@ -3151,6 +3182,8 @@ u8 apple2e_state::c800_int_r(offs_t offset)
 		return m_rom_ptr[m_ace500rombank + offset];
 	}
 
+	if (m_cnxx_slot > 0)
+		laser_slot(m_cnxx_slot);
 	return m_rom_ptr[0x800 + offset];
 }
 
@@ -3202,6 +3235,7 @@ void apple2e_state::c800_w(offs_t offset, u8 data)
 
 	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
+		laser_slot(m_cnxx_slot);
 		m_slotdevice[m_cnxx_slot]->write_c800(offset&0xfff, data);
 	}
 
@@ -3414,15 +3448,15 @@ void apple2e_state::base_map(address_map &map)
 	m_0000bank[1](0x0000, 0x01ff).rw(FUNC(apple2e_state::auxram0000_r), FUNC(apple2e_state::auxram0000_w));
 
 	map(0x0200, 0x03ff).view(m_0200bank);
-	m_0200bank[0](0x0200, 0x03ff).rw(FUNC(apple2e_state::ram0200_r), FUNC(apple2e_state::ram0200_w));         // wr 0 rd 0
-	m_0200bank[1](0x0200, 0x03ff).rw(FUNC(apple2e_state::auxram0200_r), FUNC(apple2e_state::ram0200_w));      // wr 0 rd 1
-	m_0200bank[2](0x0200, 0x03ff).rw(FUNC(apple2e_state::ram0200_r), FUNC(apple2e_state::auxram0200_w));      // wr 1 rd 0
+	m_0200bank[0](0x0200, 0x03ff).rw(FUNC(apple2e_state::ram0200_r), FUNC(apple2e_state::ram0200_w));       // wr 0 rd 0
+	m_0200bank[1](0x0200, 0x03ff).rw(FUNC(apple2e_state::auxram0200_r), FUNC(apple2e_state::ram0200_w));    // wr 0 rd 1
+	m_0200bank[2](0x0200, 0x03ff).rw(FUNC(apple2e_state::ram0200_r), FUNC(apple2e_state::auxram0200_w));    // wr 1 rd 0
 	m_0200bank[3](0x0200, 0x03ff).rw(FUNC(apple2e_state::auxram0200_r), FUNC(apple2e_state::auxram0200_w)); // wr 1 rd 1
 
 	map(0x0400, 0x07ff).view(m_0400bank);
-	m_0400bank[0](0x0400, 0x07ff).rw(FUNC(apple2e_state::ram0400_r), FUNC(apple2e_state::ram0400_w));         // wr 0 rd 0
-	m_0400bank[1](0x0400, 0x07ff).rw(FUNC(apple2e_state::auxram0400_r), FUNC(apple2e_state::ram0400_w));      // wr 0 rd 1
-	m_0400bank[2](0x0400, 0x07ff).rw(FUNC(apple2e_state::ram0400_r), FUNC(apple2e_state::auxram0400_w));      // wr 1 rd 0
+	m_0400bank[0](0x0400, 0x07ff).rw(FUNC(apple2e_state::ram0400_r), FUNC(apple2e_state::ram0400_w));       // wr 0 rd 0
+	m_0400bank[1](0x0400, 0x07ff).rw(FUNC(apple2e_state::auxram0400_r), FUNC(apple2e_state::ram0400_w));    // wr 0 rd 1
+	m_0400bank[2](0x0400, 0x07ff).rw(FUNC(apple2e_state::ram0400_r), FUNC(apple2e_state::auxram0400_w));    // wr 1 rd 0
 	m_0400bank[3](0x0400, 0x07ff).rw(FUNC(apple2e_state::auxram0400_r), FUNC(apple2e_state::auxram0400_w)); // wr 1 rd 1
 
 	map(0x0800, 0x1fff).view(m_0800bank);
@@ -3492,26 +3526,34 @@ void apple2e_state::apple2c_map(address_map &map)
 {
 	base_map(map);
 	map(0xc000, 0xc07f).r(FUNC(apple2e_state::c000_iic_r));
-	map(0xc098, 0xc09b).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0xc0a8, 0xc0ab).rw(m_acia2, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xc098, 0xc09b).lrw8(
+		[this](offs_t offset)          { accel_slot(1); return m_acia1->read(offset); }, "acia1_r",
+		[this](offs_t offset, u8 data) { accel_slot(1); m_acia1->write(offset, data); }, "acia1_w");
+	map(0xc0a8, 0xc0ab).lrw8(
+		[this](offs_t offset)          { accel_slot(2); return m_acia2->read(offset); }, "acia2_r",
+		[this](offs_t offset, u8 data) { accel_slot(2); m_acia2->write(offset, data); }, "acia2_w");
 }
 
 void apple2e_state::apple2c_memexp_map(address_map &map)
 {
-	base_map(map);
-	map(0xc000, 0xc07f).r(FUNC(apple2e_state::c000_iic_r));
-	map(0xc098, 0xc09b).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0xc0a8, 0xc0ab).rw(m_acia2, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0xc0c0, 0xc0c3).rw(FUNC(apple2e_state::memexp_r), FUNC(apple2e_state::memexp_w));
+	apple2c_map(map);
+	map(0xc0c0, 0xc0c3).lrw8(
+		[this](offs_t offset)          { accel_slot(4); return memexp_r(offset); }, "memexp_r",
+		[this](offs_t offset, u8 data) { accel_slot(4); memexp_w(offset, data);  }, "memexp_w");
 }
 
 void apple2e_state::laser128_map(address_map &map)
 {
 	base_map(map);
 	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_laser_r), FUNC(apple2e_state::c000_laser_w));
-	map(0xc090, 0xc097).w(FUNC(apple2e_state::laserprn_w));
-	map(0xc098, 0xc09b).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0xc0a8, 0xc0ab).rw(m_acia2, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xc090, 0xc097).lw8(
+		[this](u8 data)                { accel_slot(1); laserprn_w(data); }, "laserprn_w");
+	map(0xc098, 0xc09b).lrw8(
+		[this](offs_t offset)          { accel_slot(1); return m_acia1->read(offset); }, "acia1_r",
+		[this](offs_t offset, u8 data) { accel_slot(1); m_acia1->write(offset, data); }, "acia1_w");
+	map(0xc0a8, 0xc0ab).lrw8(
+		[this](offs_t offset)          { accel_slot(2); return m_acia2->read(offset); }, "acia2_r",
+		[this](offs_t offset, u8 data) { accel_slot(2); m_acia2->write(offset, data); }, "acia2_w");
 	map(0xc0c0, 0xc0cf).rw(FUNC(apple2e_state::laser_mouse_r), FUNC(apple2e_state::laser_mouse_w));
 	map(0xc0d0, 0xc0d3).rw(FUNC(apple2e_state::memexp_r), FUNC(apple2e_state::memexp_w));
 	map(0xc0e0, 0xc0ef).rw(m_iwm, FUNC(applefdintf_device::read), FUNC(applefdintf_device::write));
