@@ -1192,11 +1192,16 @@ template <u8 Bank> void sprinter_state::ram_w(offs_t offset, u8 data)
 
 	if ((page & 0xf0) == 0x50)
 	{
+		const bool transparent = BIT(page, 3);
+		if (transparent && (data == 0xff))
+			return;
+
 		const u32 vaddr = m_port_y * 1024 + (offset & 0x3ff);
-		if (BIT(~page, 2))
+		const bool vram_only = BIT(page, 2);
+		if (!vram_only)
 			m_ram->pointer()[(0x50 << 14) + vaddr] = data;
-		if (!(BIT(page, 3) && (data == 0xff)))
-			vram_w(vaddr, data);
+
+		vram_w(vaddr, data);
 	}
 	else
 	{
