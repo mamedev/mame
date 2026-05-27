@@ -37,6 +37,8 @@ protected:
 	virtual void an1_w(int state) override;
 	virtual void an2_w(int state) override;
 	virtual void an3_w(int state) override;
+	virtual bool has_sw0() const override { return true; }
+	virtual bool has_sw1() const override { return true; }
 
 private:
 	required_device<picture_image_device> m_picture;

@@ -46,6 +46,11 @@
     this "feature", and it was relatively rare in real life as Apple joysticks only
     had buttons 0 and 1 normally).
 
+    NOTE: Later IIe motherboards add very weak pullups to SW0 and SW1, normally
+    counteracted by pulldowns in the keyboard, to ensure that the system enters
+    test mode upon powerup if neither a joystick nor a keyboard is connected
+    (a configuration not emulated here).
+
     IIc: IIe enhanced shrunken into a pizzabox with a Disk II compatible
          half-height drive included in the case.
 
@@ -234,6 +239,7 @@ public:
 		m_kbdmatrix(*this, "X%u", 0U),
 		m_kbspecial(*this, "keyb_special"),
 		m_kbd_lang_sel(*this, "kbd_lang_select"),
+		m_kbd_shift_mod(*this, "kbd_shift_mod"),
 		m_sysconfig(*this, "a2_config"),
 		m_franklin_fkeys(*this, "franklin_fkeys"),
 		m_speaker(*this, A2_SPEAKER_TAG),
@@ -269,7 +275,6 @@ public:
 		m_isace2200 = false;
 		m_ace2200_axxx_bank = false;
 		m_pal = false;
-		m_shift_key_mod = false;
 		m_cur_floppy = nullptr;
 		m_devsel = 0;
 		m_has_laser_mouse = false;
@@ -296,6 +301,7 @@ public:
 	optional_ioport_array<9> m_kbdmatrix;
 	optional_ioport m_kbspecial;
 	optional_ioport m_kbd_lang_sel; // high-order nibble: keyboard selection offset - low-order nibble: character ROM area selection offset (including lo-res patterns)
+	optional_ioport m_kbd_shift_mod;
 	optional_ioport m_sysconfig;
 	optional_ioport m_franklin_fkeys;
 	required_device<speaker_sound_device> m_speaker;
@@ -2158,23 +2164,20 @@ u8 apple2e_state::c000_r(offs_t offset)
 		case 0x61:  // button 0 or Open Apple (or mouse button 1 on IIc)
 		case 0x69:
 			if (m_prav8c_kbd.found())
-				return ((m_gameio->sw0_r() || m_prav8c_kbd->sw0_r()) ? 0x80 : 0) | (m_prav8c_c060 & 0x40) | (uFloatingBus7 & 0x3f);
+				return (((m_gameio->has_sw0() && m_gameio->sw0_r()) || m_prav8c_kbd->sw0_r()) ? 0x80 : 0) | (m_prav8c_c060 & 0x40) | (uFloatingBus7 & 0x3f);
 			else
-				return ((m_gameio->sw0_r() || (m_kbspecial->read() & 0x10)) ? 0x80 : 0) | uFloatingBus7;
+				return (((m_gameio->has_sw0() && m_gameio->sw0_r()) || (m_kbspecial->read() & 0x10)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x62:  // button 1 or Solid Apple
 		case 0x6a:
 			if (m_prav8c_kbd.found())
-				return ((m_gameio->sw1_r() || m_prav8c_kbd->sw1_r()) ? 0x80 : 0) | (m_prav8c_c060 & 0x40) | (uFloatingBus7 & 0x3f);
+				return (((m_gameio->has_sw1() && m_gameio->sw1_r()) || m_prav8c_kbd->sw1_r()) ? 0x80 : 0) | (m_prav8c_c060 & 0x40) | (uFloatingBus7 & 0x3f);
 			else
-				return ((m_gameio->sw1_r() || (m_kbspecial->read() & 0x20)) ? 0x80 : 0) | uFloatingBus7;
+				return (((m_gameio->has_sw1() && m_gameio->sw1_r()) || (m_kbspecial->read() & 0x20)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x63:  // button 2 (or SHIFT key, on IIe Platinum)
 		case 0x6b:
-			if (m_prav8c_kbd.found())
-				return (m_gameio->sw2_r() ? 0x80 : 0) | (m_prav8c_c060 & 0x40) | (uFloatingBus7 & 0x3f);
-			else
-				return ((m_gameio->sw2_r() || ((m_shift_key_mod) && (m_kbspecial->read() & 0x06) == 0)) ? 0x80 : 0) | uFloatingBus7;
+			return ((m_kbd_shift_mod.read_safe(0) ? (m_kbspecial->read() & 0x06) == 0 : m_gameio->sw2_r()) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x64:  // joy 1 X axis
 		case 0x6c:
@@ -4030,6 +4033,11 @@ static INPUT_PORTS_START( apple2e_special )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open Apple")   PORT_CODE(KEYCODE_LALT)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
+
+	PORT_START("kbd_shift_mod")
+	PORT_CONFNAME(1, 0, "Shift key = SW2")
+	PORT_CONFSETTING(0, DEF_STR(Off))
+	PORT_CONFSETTING(1, DEF_STR(On))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2e_special_sl ) // replace Caps Lock with Shift Lock
@@ -4899,6 +4907,9 @@ INPUT_PORTS_START( apple2ep_keypad ) // must be included after including the mai
 	PORT_MODIFY("X7")
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)   PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)   PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
+
+	PORT_MODIFY("kbd_shift_mod")
+	PORT_BIT(1, IP_ACTIVE_LOW, IPT_UNUSED) // see Apple IIe Technical Note #9
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2epus )
@@ -5166,7 +5177,6 @@ void apple2e_state::prav8c(machine_config &config)
 void apple2e_state::apple2ep(machine_config &config)
 {
 	apple2ee(config);
-	m_shift_key_mod = true; // see Apple IIe Technical Note #9
 }
 
 void apple2e_state::apple2eppal(machine_config &config)

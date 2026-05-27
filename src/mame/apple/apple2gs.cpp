@@ -1795,13 +1795,13 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			// HACK/TODO: the 65816 loses a race to the microcontroller on reset
 			if (m_adb_reset_freeze > 0 && !machine().side_effects_disabled())
 				m_adb_reset_freeze--;
-			return ((m_gameio->sw0_r() || (m_adb_p3_last & 0x20)) ? 0x80 : 0) | uFloatingBus7;
+			return (((m_gameio->has_sw0() && m_gameio->sw0_r()) || (m_adb_p3_last & 0x20)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x62: // button 1 or Option
-			return ((m_gameio->sw1_r() || (m_adb_p3_last & 0x10)) ? 0x80 : 0) | uFloatingBus7;
+			return (((m_gameio->has_sw1() && m_gameio->sw1_r()) || (m_adb_p3_last & 0x10)) ? 0x80 : 0) | uFloatingBus7;
 
-		case 0x63: // button 2, inverted (no shift key mod)
-			return (m_gameio->sw2_r() ? 0 : 0x80) | uFloatingBus7;
+		case 0x63: // button 2 (no shift key mod)
+			return (m_gameio->sw2_r() ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x64:  // joy 1 X axis
 			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
