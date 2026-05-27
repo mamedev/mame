@@ -234,7 +234,7 @@ public:
 	void bubsys(machine_config &config) ATTR_COLD;
 
 	void bubsys_init() ATTR_COLD;
-	void bubsys_twinbeeb_init() ATTR_COLD;
+	void bs_twinbee_init() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

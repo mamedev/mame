@@ -26103,13 +26103,15 @@ viostormubbl
 
 @source:konami/nemesis.cpp
 blkpnthr
+bs_gradius
+bs_gwarrior
+bs_rf2
+bs_twinbee
 bubsys
 citybomb
 citybombj
 gradius
-gradiusb
 gwarrior
-gwarriorb
 hcrash
 hcrashc
 kittenk
@@ -26120,12 +26122,10 @@ nemesis
 nemesisuk
 nyanpani
 rf2
-rf2b
 salamand
 salamandj
 salamandt
 twinbee
-twinbeeb
 
 @source:konami/nwk-tr.cpp
 racingj

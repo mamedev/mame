@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
 /***************************************************************************
+
 This entire hardware series is generally called 'GX400'
 
     Bubble System           (various games) GX400 PWB(B) 200207F
@@ -78,7 +79,7 @@ TODO:
 - bubble system needs a delay (and auto-sound-nmi hookup) so the 'getting ready... 49...' countdown actually
   plays before the simulated 005297 releases the 68k and the load (and morning music) begins.
 - hcrash: Konami GT-type inputs doesn't work properly.
-- gradiusb: still needs proper 005297 emulation;
+- bs_gradius: still needs proper 005297 emulation;
 
 modified by Hau
 03/27/2009
@@ -1627,7 +1628,7 @@ static INPUT_PORTS_START( bubsys )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( gradiusb )
+static INPUT_PORTS_START( bs_gradius )
 	PORT_INCLUDE( bubsys )
 
 	PORT_MODIFY("DSW1")
@@ -1651,7 +1652,7 @@ static INPUT_PORTS_START( gradiusb )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( twinbeeb )
+static INPUT_PORTS_START( bs_twinbee )
 	PORT_INCLUDE( bubsys )
 
 	PORT_MODIFY("DSW1")
@@ -2757,7 +2758,7 @@ ROM_END
 GAME(  1985, nemesis,   0,        nemesis,   nemesis,  gx400_state,    empty_init, ROT0,   "Konami",                  "Nemesis (ROM version)",         MACHINE_SUPPORTS_SAVE )
 GAME(  1985, nemesisuk, nemesis,  nemesis,   nemesuk,  gx400_state,    empty_init, ROT0,   "Konami",                  "Nemesis (World?, ROM version)", MACHINE_SUPPORTS_SAVE )
 GAMEL( 1985, konamigt,  0,        konamigt,  konamigt, gx400_state,    empty_init, ROT0,   "Konami",                  "Konami GT",                     MACHINE_SUPPORTS_SAVE, layout_konamigt )
-GAME(  1985, rf2,       konamigt, rf2_gx400, rf2,      gx400_state,    empty_init, ROT0,   "Konami",                  "Konami RF2 - Red Fighter",      MACHINE_SUPPORTS_SAVE )
+GAME(  1985, rf2,       konamigt, rf2_gx400, rf2,      gx400_state,    empty_init, ROT0,   "Konami",                  "Konami RF2: Red Fighter",       MACHINE_SUPPORTS_SAVE )
 GAME(  1985, twinbee,   0,        gx400,     twinbee,  gx400_state,    empty_init, ROT90,  "Konami",                  "TwinBee (ROM version)",         MACHINE_SUPPORTS_SAVE )
 GAME(  1985, gradius,   nemesis,  gx400,     gradius,  gx400_state,    empty_init, ROT0,   "Konami",                  "Gradius (Japan, ROM version)",  MACHINE_SUPPORTS_SAVE )
 GAME(  1985, gwarrior,  0,        gx400,     gwarrior, gx400_state,    empty_init, ROT0,   "Konami",                  "Galactic Warriors",             MACHINE_SUPPORTS_SAVE )
@@ -3135,12 +3136,12 @@ ROM_START( bubsys )
 	ROM_LOAD( "400a2.1b", 0x100, 0x100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
 ROM_END
 
-ROM_START( gradiusb )
+ROM_START( bs_gradius )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD( "boot.bin", 0x0000, 0x1e0, CRC(f0774fc2) SHA1(84fade54e025f170d983200a86c1ed96ef1a9ed3) )
 
 	ROM_REGION( 0x48360, "bubblememory", 0 )
-	/* The Gradius cartridge contains 0x807 pages of 130 bytes each */
+	/* The cartridge contains 0x807 pages of 130 bytes each */
 	ROM_LOAD16_WORD_SWAP( "gradius.bin", 0x000, 0x48360, CRC(f83b9607) SHA1(53493c2d5b0e66dd6b75865abf0982ee50c01a6f) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
@@ -3151,12 +3152,12 @@ ROM_START( gradiusb )
 	ROM_LOAD( "400a2.1b", 0x100, 0x100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
 ROM_END
 
-ROM_START( gwarriorb )
+ROM_START( bs_gwarrior )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD( "boot.bin", 0x000, 0x1e0, CRC(728263bd) SHA1(70dde04b9e3d55e3ac809be52cdc2d616eaa114a) )
 
 	ROM_REGION( 0x48360, "bubblememory", 0 )
-	/* The Gradius cartridge contains 0x807 pages of 130 bytes each */
+	/* The cartridge contains 0x807 pages of 130 bytes each */
 	ROM_LOAD16_WORD_SWAP( "gwarriorb.bin", 0x00000, 0x48360, CRC(a10e1b62) SHA1(a801ad8d318644495fbe2c971395d271d12508f1)    )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
@@ -3167,12 +3168,12 @@ ROM_START( gwarriorb )
 	ROM_LOAD( "400a2.1b", 0x100, 0x100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
 ROM_END
 
-ROM_START( rf2b )
+ROM_START( bs_rf2 )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD( "boot.bin", 0x000, 0x1e0, CRC(ee6e93d7) SHA1(7302c08a726a760f59d6837be8fd10bbd1f79da0) )
 
 	ROM_REGION( 0x48360, "bubblememory", 0 )
-	/* The Gradius cartridge contains 0x807 pages of 130 bytes each */
+	/* The cartridge contains 0x807 pages of 130 bytes each */
 	ROM_LOAD16_WORD_SWAP( "rf2b.bin", 0x00000, 0x48360, CRC(7ee7acc5) SHA1(ab95a75b259327a7f88c7ec56dbca74496c91688)     )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
@@ -3183,7 +3184,7 @@ ROM_START( rf2b )
 	ROM_LOAD( "400a2.1b", 0x100, 0x100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
 ROM_END
 
-ROM_START( twinbeeb )
+ROM_START( bs_twinbee )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD( "boot.bin", 0x000, 0x1e0, CRC(ee6e93d7) SHA1(7302c08a726a760f59d6837be8fd10bbd1f79da0) )
 
@@ -3228,7 +3229,7 @@ void bubsys_state::bubsys_init()
 }
 
 
-void bubsys_state::bubsys_twinbeeb_init()
+void bubsys_state::bs_twinbee_init()
 {
 	// the twinbee bubble data is in a stripped down, predecoded state already, why?
 	// this reencodes it to something the loading code can actually use
@@ -3266,10 +3267,11 @@ void bubsys_state::bubsys_twinbeeb_init()
 	bubsys_init();
 }
 
-GAME( 1985, bubsys,    0,      bubsys, bubsys,   bubsys_state, bubsys_init,          ROT0,  "Konami", "Bubble System BIOS",                       MACHINE_IS_BIOS_ROOT )
-GAME( 1985, gradiusb,  bubsys, bubsys, gradiusb, bubsys_state, bubsys_init,          ROT0,  "Konami", "Gradius (Bubble System)",                  MACHINE_UNEMULATED_PROTECTION )
-GAME( 1985, gwarriorb, bubsys, bubsys, gwarrior, bubsys_state, bubsys_init,          ROT0,  "Konami", "Galactic Warriors (Bubble System)",        MACHINE_UNEMULATED_PROTECTION )
-GAME( 1985, rf2b,      bubsys, bubsys, rf2,      bubsys_state, bubsys_init,          ROT0,  "Konami", "Konami RF2 - Red Fighter (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1985, twinbeeb,  bubsys, bubsys, twinbeeb, bubsys_state, bubsys_twinbeeb_init, ROT90, "Konami", "TwinBee (Bubble System)",                  MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, bubsys,      0,      bubsys, bubsys,     bubsys_state, bubsys_init,     ROT0,  "Konami", "Bubble System BIOS",                      MACHINE_IS_BIOS_ROOT )
+
+GAME( 1985, bs_gradius,  bubsys, bubsys, bs_gradius, bubsys_state, bubsys_init,     ROT0,  "Konami", "Gradius (Bubble System)",                 MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, bs_gwarrior, bubsys, bubsys, gwarrior,   bubsys_state, bubsys_init,     ROT0,  "Konami", "Galactic Warriors (Bubble System)",       MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, bs_rf2,      bubsys, bubsys, rf2,        bubsys_state, bubsys_init,     ROT0,  "Konami", "Konami RF2: Red Fighter (Bubble System)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1985, bs_twinbee,  bubsys, bubsys, bs_twinbee, bubsys_state, bs_twinbee_init, ROT90, "Konami", "TwinBee (Bubble System)",                 MACHINE_UNEMULATED_PROTECTION )
 
 // Bubble System Attack Rush was announced, but never released
