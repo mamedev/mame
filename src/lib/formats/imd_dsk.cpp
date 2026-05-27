@@ -455,11 +455,6 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	if(io.length(size))
 		return false;
 
-	// Clear any leftover header text from a previous load on the
-	// singleton.  save() will check this and, if non-empty, write
-	// the captured block back so an IMD->IMD round trip keeps the
-	// original first-line timestamp and comment intact.
-	m_loaded_comment.clear();
 	auto const [err, img, actual] = read_at(io, 0, size);
 	if(err || (actual != size))
 		return false;
@@ -655,10 +650,6 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				delete [] sects[i].data;
 	}
 
-	// Stash the source ASCII header (incl. trailing 0x1a) so save() can
-	// preserve the original timestamp + comment on an IMD->IMD round trip.
-	m_loaded_comment.assign(reinterpret_cast<const char *>(comment.data()), comment.size());
-
 	return true;
 }
 
@@ -675,9 +666,8 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
          and emit IMD's per-track record: 5-byte header, sector
          numbering map, optional cyl/head maps, then per-sector type
          byte + data (compressed when the sector is all-fill).
-      3. Header timestamp + comment is preserved when the source was
-         itself an IMD; otherwise a fresh "Created by MAME flopconvert"
-         header with localtime is emitted.
+      3. A fresh "Created by MAME flopconvert" header with localtime is
+         emitted at the start of every saved IMD.
 
 *********************************************************************/
 
@@ -955,14 +945,10 @@ bool imd_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 		return false;
 	}
 
-	// -- ASCII header.  Reuse the source IMD's header block when one
-	//    was captured by load(); otherwise generate fresh.
+	// -- ASCII header.  Always fresh; the format manager is const, so
+	//    we deliberately do not cache anything from a prior load().
 	std::string header;
-	if (!m_loaded_comment.empty() && m_loaded_comment.back() == '\x1a') {
-		header.assign(m_loaded_comment.begin(), m_loaded_comment.end() - 1);
-		header += "\r\n(re-saved by MAME flopconvert)\r\n";
-		header += '\x1a';
-	} else {
+	{
 		std::time_t t = std::time(nullptr);
 		std::tm lt{};
 		localtime_r(&t, &lt);

@@ -73,12 +73,6 @@ private:
 	// CRC-16-CCITT, polynomial 0x1021, big-endian; used to validate
 	// IDAM and DAM records.
 	static uint16_t crc16_ccitt(const uint8_t *data, int len, uint16_t init = 0xffff);
-
-	// Captured comment block (incl. trailing 0x1A) from the most
-	// recent load(); reused by save() so an IMD->IMD passthrough
-	// preserves the original header line.  Empty when the image was
-	// loaded from any other format.
-	mutable std::string m_loaded_comment;
 };
 
 extern const imd_format FLOPPY_IMD_FORMAT;
