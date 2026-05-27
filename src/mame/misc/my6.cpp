@@ -82,6 +82,8 @@ void my6_state::program_map(address_map &map)
 
 void my6_state::data_map(address_map &map)
 {
+	map(0xc000, 0xc001).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	
 }
 
 void my6_state::display_map(address_map &map)
