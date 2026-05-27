@@ -200,6 +200,19 @@ DEVICE_IMAGE_LOAD_MEMBER(smarttv_state::cart_load_smarttv)
 	m_cart->rom_alloc(0x800000, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
+	// some carts have a cartridge in the header, use this to check it matches
+	const int length = m_cart->get_rom_size();
+	const uint8_t* rom = m_cart->get_rom_base();
+
+	uint32_t checksum = 0x00000000;
+	// the first 0x10 bytes are where the "chksum:xxxxxxxx " string is listed, so skip over them
+	for (int i = 0x10; i < length; i++)
+	{
+		checksum += rom[i];
+	}
+
+	logerror("Calculated Byte Sum of bytes from 0x10 to 0x%08x is %08x, in header %c%c%c%c%c%c%c%c\n", length - 1, checksum, rom[7], rom[8], rom[9], rom[10], rom[11], rom[12], rom[13], rom[14]);
+
 	return std::make_pair(std::error_condition(), std::string());
 }
 

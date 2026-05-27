@@ -17,4 +17,81 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="spazio" supported="no">
+		<description>Avventure nello Spazio (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="AvventureNelloSpazio.bin" size="0x400000" crc="5b59714a" sha1="5d810e85b261e8bfe769bb7bace34b04a13aa48c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scuola4" supported="no">
+		<description>La Scuola di Smart TV - 4 anni (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="lascuoladismarttv4.bin" size="0x400000" crc="d0a5eeb3" sha1="f25302ad4439f097fd2e8a5b92d09e5e5817fa48"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scuola5" supported="no">
+		<description>La Scuola di Smart TV - 5+ anni (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="lascuoladismarttv5plus.bin" size="0x400000" crc="82e8dbe7" sha1="64801e36be5e1db5e5888ff84459196508b8ceee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mondo" supported="no">
+		<description>Mondosauro (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="mondosauro.bin" size="0x400000" crc="46c310df" sha1="2a73c60a5b52954def57405c0751d88f1e5d389c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cuccioli" supported="no">
+		<description>Cuccioli Labrador (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="Cuccioli.bin" size="0x400000" crc="a95580eb" sha1="de4c01189e4c78a1a287bd49d322d4f762986601"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winxblm" supported="no">
+		<description>Winx Club Bloom (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="WinxBloom.bin" size="0x400000" crc="cad48e67" sha1="e2d8be2fcc5da63e471c3f4d85a01bf4f25fec5f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="imove" supported="no"> <!-- uses a camera -->
+		<description>i-move (Italy)</description>
+		<year>2008</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="smarttv_imove.bin" size="0x800000" crc="7267485e" sha1="5a9ae3b17dae325dee872ad594adb55b6251a900"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
