@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_ZBI_S8K_CARDS_H
-#define MAME_BUS_ZBI_S8K_CARDS_H
+#ifndef MAME_BUS_ZBI_ZBI_CARDS_H
+#define MAME_BUS_ZBI_ZBI_CARDS_H
 
 #pragma once
 
@@ -19,4 +19,4 @@ void zbi_s8k_tape_cards(device_slot_interface &device);
 void zbi_s8k_option1_cards(device_slot_interface &device);
 void zbi_s8k_option2_cards(device_slot_interface &device);
 
-#endif // MAME_BUS_ZBI_S8K_CARDS_H
+#endif // MAME_BUS_ZBI_ZBI_CARDS_H
