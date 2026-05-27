@@ -67,7 +67,7 @@ license:CC0-1.0
 		<publisher>Clementoni</publisher>
 		<part name="cart" interface="smarttv_cart">
 			<dataarea name="rom" size="0x400000">
-				<rom name="Cuccioli.bin" size="0x400000" crc="a95580eb" sha1="de4c01189e4c78a1a287bd49d322d4f762986601"/>
+				<rom name="cuccioli.bin" size="0x400000" crc="a95580eb" sha1="de4c01189e4c78a1a287bd49d322d4f762986601"/>
 			</dataarea>
 		</part>
 	</software>
@@ -78,7 +78,7 @@ license:CC0-1.0
 		<publisher>Clementoni</publisher>
 		<part name="cart" interface="smarttv_cart">
 			<dataarea name="rom" size="0x400000">
-				<rom name="WinxBloom.bin" size="0x400000" crc="cad48e67" sha1="e2d8be2fcc5da63e471c3f4d85a01bf4f25fec5f"/>
+				<rom name="winxbloom.bin" size="0x400000" crc="cad48e67" sha1="e2d8be2fcc5da63e471c3f4d85a01bf4f25fec5f"/>
 			</dataarea>
 		</part>
 	</software>
