@@ -604,12 +604,33 @@ ROM_START( dmndhrt )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "diamond_heart_u.s.a_u33.u33", 0x00000, 0x40000, CRC(63b0bc97) SHA1(12adb70a8283c6fec10e2221f1216a7fbfc99355) )
 
-	// PAL locations not readable
 	ROM_REGION( 0x800, "plds", ROMREGION_ERASE00 )
-	ROM_LOAD( "palce20v8h_1", 0x000, 0x157, NO_DUMP )
-	ROM_LOAD( "palce20v8h_2", 0x200, 0x157, NO_DUMP )
-	ROM_LOAD( "palce20v8h_3", 0x400, 0x157, NO_DUMP )
-	ROM_LOAD( "palce20v8h_4", 0x600, 0x157, NO_DUMP )
+	ROM_LOAD( "palce20v8h.pl4", 0x000, 0x157, NO_DUMP )
+	ROM_LOAD( "palce20v8h.pl5", 0x200, 0x157, NO_DUMP )
+	ROM_LOAD( "palce20v8h.pl6", 0x400, 0x157, NO_DUMP )
+	ROM_LOAD( "palce20v8h.pl7", 0x600, 0x157, NO_DUMP )
+ROM_END
+
+ROM_START( dmndhrtp ) // u51 was scratched for this set but believed to be AT90S4414, too
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "8.u8", 0x00000, 0x40000, CRC(6fe1a75a) SHA1(373eab66823a5e06bc00fab0ba541a20c9db9505) )
+	ROM_LOAD16_BYTE( "3.u3", 0x00001, 0x40000, CRC(89440d16) SHA1(f81c6188a073794f4dd214e45200d8c60569dc03) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "diamond_heart_v20_u51.u51", 0x0000, 0x1000, NO_DUMP ) // tried to read as at90s4414. Programmer said 'Device is secured.(Lock bit 1 and 2)'
+
+	ROM_REGION( 0x100000, "tiles", 0 )
+	ROM_LOAD16_BYTE( "11_13ba.u10", 0x00000, 0x80000, CRC(f664cf59) SHA1(cd10fb43562dfec5481994fe612f1bbef1b168b8) ) // handwritten label
+	ROM_LOAD16_BYTE( "11_52b.u11",  0x00001, 0x80000, CRC(c0a28638) SHA1(02b348ccf982f486716e394da7a0b7334c7028c2) ) // handwritten label
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "m27c2001.u33", 0x00000, 0x40000, CRC(63b0bc97) SHA1(12adb70a8283c6fec10e2221f1216a7fbfc99355) ) // no sticker, same contents as dmndhrt
+
+	ROM_REGION( 0x800, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "palce20v8h-15pc-4.pl4", 0x000, 0x157, NO_DUMP )
+	ROM_LOAD( "palce20v8h-15pc-4.pl5", 0x200, 0x157, NO_DUMP )
+	ROM_LOAD( "palce20v8h-15pc-4.pl6", 0x400, 0x157, NO_DUMP )
+	ROM_LOAD( "palce20v8h-25pc-4.pl7", 0x600, 0x157, NO_DUMP )
 ROM_END
 
 ROM_START( dmndhrtn ) // u51 was scratched for this set but believed to be AT90S4414, too
@@ -627,12 +648,11 @@ ROM_START( dmndhrtn ) // u51 was scratched for this set but believed to be AT90S
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "f29c51002t.u33", 0x00000, 0x40000, CRC(97f774cd) SHA1(7c5a1c4a0e7cfb71e24d174c43a83735abfc59c8) ) // no sticker
 
-	// PAL locations not readable
 	ROM_REGION( 0x800, "plds", ROMREGION_ERASE00 )
-	ROM_LOAD( "gal20v8b_1", 0x000, 0x157, NO_DUMP )
-	ROM_LOAD( "gal20v8b_2", 0x200, 0x157, NO_DUMP )
-	ROM_LOAD( "gal20v8b_3", 0x400, 0x157, NO_DUMP )
-	ROM_LOAD( "gal20v8b_4", 0x600, 0x157, NO_DUMP )
+	ROM_LOAD( "gal20v8b.pl4", 0x000, 0x157, NO_DUMP )
+	ROM_LOAD( "gal20v8b.pl5", 0x200, 0x157, NO_DUMP )
+	ROM_LOAD( "gal20v8b.pl6", 0x400, 0x157, NO_DUMP )
+	ROM_LOAD( "gal20v8b.pl7", 0x600, 0x157, NO_DUMP )
 ROM_END
 
 ROM_START( honeybee ) // u51 was scratched for this set but believed to be AT90S4414, too
@@ -652,15 +672,16 @@ ROM_START( honeybee ) // u51 was scratched for this set but believed to be AT90S
 
 	// PAL locations not readable
 	ROM_REGION( 0x800, "plds", ROMREGION_ERASE00 )
-	ROM_LOAD( "gal20v8b_1", 0x000, 0x157, NO_DUMP )
-	ROM_LOAD( "gal20v8b_2", 0x200, 0x157, NO_DUMP )
-	ROM_LOAD( "gal20v8b_3", 0x400, 0x157, NO_DUMP )
-	ROM_LOAD( "gal20v8b_4", 0x600, 0x157, NO_DUMP )
+	ROM_LOAD( "gal20v8b.pl4", 0x000, 0x157, NO_DUMP )
+	ROM_LOAD( "gal20v8b.pl5", 0x200, 0x157, NO_DUMP )
+	ROM_LOAD( "gal20v8b.pl6", 0x400, 0x157, NO_DUMP )
+	ROM_LOAD( "gal20v8b.pl7", 0x600, 0x157, NO_DUMP )
 ROM_END
 
 } // anonymous namespace
 
 
-GAME( 2001, dmndhrt,  0, cle68k, dmndhrt,  cle68k_state, empty_init, ROT0, "LSE", "Diamond Heart (v1.06)",     MACHINE_NOT_WORKING ) // 2001/02/15
-GAME( 2003, dmndhrtn, 0, cle68k, dmndhrtn, cle68k_state, empty_init, ROT0, "CLE", "Diamond Heart New (v20.0)", MACHINE_NOT_WORKING ) // 2003/04/25
-GAME( 2004, honeybee, 0, cle68k, honeybee, cle68k_state, empty_init, ROT0, "LSE", "Honey-Bee (v3.0)",          MACHINE_NOT_WORKING ) // 2004/07/01
+GAME( 2001, dmndhrt,  0, cle68k, dmndhrt,  cle68k_state, empty_init, ROT0, "LSE", "Diamond Heart (v1.06)",      MACHINE_NOT_WORKING ) // 2001/02/15
+GAME( 2001, dmndhrtp, 0, cle68k, dmndhrtn, cle68k_state, empty_init, ROT0, "LSE", "Diamond Heart Plus (v18.0)", MACHINE_NOT_WORKING ) // 2001/02/15
+GAME( 2003, dmndhrtn, 0, cle68k, dmndhrtn, cle68k_state, empty_init, ROT0, "CLE", "Diamond Heart New (v20.0)",  MACHINE_NOT_WORKING ) // 2003/04/25
+GAME( 2004, honeybee, 0, cle68k, honeybee, cle68k_state, empty_init, ROT0, "LSE", "Honey-Bee (v3.0)",           MACHINE_NOT_WORKING ) // 2004/07/01

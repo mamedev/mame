@@ -7,11 +7,11 @@
 #pragma once
 
 #include "pci.h"
-#include "machine/pci-ide.h"
 
 #include "bus/ata/ataintf.h"
 #include "bus/isa/isa.h"
 
+#include "machine/idectrl.h"
 #include "machine/ins8250.h"
 #include "machine/ds128x.h"
 #include "machine/pic8259.h"
@@ -190,7 +190,10 @@ private:
 	// southbridge
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259_master;
+	// protected because needed by EB
+protected:
 	required_device<pic8259_device> m_pic8259_slave;
+private:
 	required_device<am9517a_device> m_dma8237_1;
 	required_device<am9517a_device> m_dma8237_2;
 	required_device<pit8254_device> m_pit8254;
@@ -210,7 +213,9 @@ private:
 	void at_speaker_set_spkrdata(uint8_t data);
 
 	uint8_t m_channel_check;
+protected:
 	uint8_t m_nmi_enabled;
+private:
 
 	void pc_select_dma_channel(int channel, bool state);
 	void redirect_irq(int irq, int state);

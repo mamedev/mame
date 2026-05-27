@@ -154,7 +154,7 @@ void sbus_cgsix_device::device_start()
 	save_item(NAME(m_fbc.m_vertex_count));
 
 	m_fbc.m_prim_buf = std::make_unique<vertex[]>(0x1000); // Unknown size on hardware
-	save_pointer(NAME(reinterpret_cast<uint8_t*>(m_fbc.m_prim_buf.get())), sizeof(vertex) * 0x1000);
+	save_pointer(reinterpret_cast<uint8_t*>(m_fbc.m_prim_buf.get()), "m_fbc.m_prim_buf", sizeof(vertex) * 0x1000);
 
 	save_item(NAME(m_fbc.m_curr_prim_type));
 

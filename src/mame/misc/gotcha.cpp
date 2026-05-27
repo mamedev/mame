@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-Gotcha  (c) 1997 Dongsung
+Gotcha (c) 1997 Dongsung
 
 driver by Nicola Salmoria
 

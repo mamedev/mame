@@ -109,6 +109,12 @@ void a2bus_agat7_ports_device::device_reset()
 	m_centronics_busy = false;
 }
 
+void a2bus_agat7_ports_device::reset_from_bus()
+{
+	m_d9->reset();
+	m_d10->reset();
+}
+
 /*-------------------------------------------------
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/

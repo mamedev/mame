@@ -79,17 +79,17 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_shared_ptr<uint32_t> m_workram;
-	required_region_ptr<uint8_t> m_encdata;
+	required_shared_ptr<u32> m_workram;
+	required_region_ptr<u8> m_encdata;
 
 	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
 
-	void ddz_mem(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
-void ddz_state::ddz_mem(address_map &map)
+void ddz_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x00ffffff).rom().nopw().region("ipl", 0);
 
@@ -99,7 +99,7 @@ void ddz_state::ddz_mem(address_map &map)
 
 	map(0x01800000, 0x01ffffff).m(m_vr0soc, FUNC(vrender0soc_device::regs_map));
 
-	map(0x02000000, 0x027fffff).ram().share("workram");
+	map(0x02000000, 0x027fffff).ram().share(m_workram);
 
 	map(0x03000000, 0x04ffffff).m(m_vr0soc, FUNC(vrender0soc_device::audiovideo_map));
 }
@@ -128,12 +128,12 @@ void ddz_state::machine_reset()
 void ddz_state::ddz(machine_config &config)
 {
 	SE3208(config, m_maincpu, 14'318'180 * 3); // TODO : dynamic via PLL
-	m_maincpu->set_addrmap(AS_PROGRAM, &ddz_state::ddz_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddz_state::main_map);
 	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
 	VRENDER0_SOC(config, m_vr0soc, 14'318'180 * 6); // TODO : dynamic via PLL
 	m_vr0soc->set_host_space_tag(m_maincpu, AS_PROGRAM);
-	m_vr0soc->int_callback().set_inputline(m_maincpu, SE3208_INT);
+	m_vr0soc->int_callback().set_inputline(m_maincpu, se3208_device::SE3208_INT);
 
 	SPEAKER(config, "speaker", 2).front();
 	m_vr0soc->add_route(0, "speaker", 1.0, 0);
@@ -219,8 +219,8 @@ ROM_END
 
 void ddz_state::init_ddz()
 {
-	uint8_t *ipl = reinterpret_cast<uint8_t *>(memregion("ipl")->base());
-	for (uint32_t x = 0; x < m_encdata.bytes(); x += 16)
+	u8 *ipl = reinterpret_cast<u8 *>(memregion("ipl")->base());
+	for (u32 x = 0; x < m_encdata.bytes(); x += 16)
 	{
 		// TODO
 		for (int y = 0; y < 16; y++)

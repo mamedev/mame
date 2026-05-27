@@ -244,11 +244,11 @@ public:
 		, m_devram(*this, "devram")
 		, m_videoram(*this, "videoram%u", 1)
 		, m_colorram(*this, "colorram%u", 1)
-		, m_masterbank(*this, "masterbank")
-		, m_slavebank(*this, "slavebank")
+		, m_mainbank(*this, "mainbank")
+		, m_subbank(*this, "subbank")
 		, m_audiobank(*this, "audiobank")
-		, m_master(*this, "master")
-		, m_slave(*this, "slave")
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "subcpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_pandora(*this, "pandora")
 		, m_calc1(*this, "calc1")
@@ -269,23 +269,23 @@ protected:
 
 private:
 	// memory pointers
-	required_shared_ptr<uint8_t> m_devram;
-	required_shared_ptr_array<uint8_t, 2> m_videoram;
-	required_shared_ptr_array<uint8_t, 2> m_colorram;
+	required_shared_ptr<u8> m_devram;
+	required_shared_ptr_array<u8, 2> m_videoram;
+	required_shared_ptr_array<u8, 2> m_colorram;
 
-	required_memory_bank m_masterbank;
-	required_memory_bank m_slavebank;
+	required_memory_bank m_mainbank;
+	required_memory_bank m_subbank;
 	required_memory_bank m_audiobank;
 
 	// video-related
 	tilemap_t *m_tilemap[2]{};
-	uint8_t m_scrollx[2]{};
-	uint8_t m_scrolly[2]{};
-	uint8_t m_highbits = 0;
+	u8 m_scrollx[2]{};
+	u8 m_scrolly[2]{};
+	u8 m_highbits = 0;
 
 	// devices
-	required_device<cpu_device> m_master;
-	required_device<cpu_device> m_slave;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<kaneko_pandora_device> m_pandora;
 	optional_device<kaneko_hit_device> m_calc1;
@@ -294,28 +294,28 @@ private:
 	required_device<palette_device> m_palette;
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 
-	void calc1_w(offs_t offset, uint8_t data);
-	uint8_t calc1_r(offs_t offset);
-	void master_nmi_trigger_w(uint8_t data);
-	void master_bankswitch_w(uint8_t data);
-	void slave_bankswitch_w(uint8_t data);
-	void sound_bankswitch_w(uint8_t data);
-	uint8_t soundcommand_status_r();
-	void coin_counter_w(uint8_t data);
-	template<int Layer> void videoram_w(offs_t offset, uint8_t data);
-	template<int Layer> void colorram_w(offs_t offset, uint8_t data);
-	void scrollregs_w(offs_t offset, uint8_t data);
+	void calc1_w(offs_t offset, u8 data);
+	u8 calc1_r(offs_t offset);
+	void main_nmi_trigger_w(u8 data);
+	void main_bankswitch_w(u8 data);
+	void sub_bankswitch_w(u8 data);
+	void sound_bankswitch_w(u8 data);
+	u8 soundcommand_status_r();
+	void coin_counter_w(u8 data);
+	template<int Layer> void videoram_w(offs_t offset, u8 data);
+	template<int Layer> void colorram_w(offs_t offset, u8 data);
+	void scrollregs_w(offs_t offset, u8 data);
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
-	INTERRUPT_GEN_MEMBER(slave_interrupt);
+	INTERRUPT_GEN_MEMBER(sub_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	void master_map(address_map &map) ATTR_COLD;
-	void master_prot_map(address_map &map) ATTR_COLD;
-	void master_io_map(address_map &map) ATTR_COLD;
-	void slave_map(address_map &map) ATTR_COLD;
-	void slave_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void main_prot_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
+	void sub_io_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 	void sound_io_map(address_map &map) ATTR_COLD;
 };
@@ -363,7 +363,7 @@ private:
             Bg Y    Bg X    Fg Y    Fg X    <-Scroll High Bits (complemented!)
 */
 
-void airbustr_state::scrollregs_w(offs_t offset, uint8_t data)
+void airbustr_state::scrollregs_w(offs_t offset, u8 data)
 {
 	switch (offset)     // offset 0 <-> port 4
 	{
@@ -373,7 +373,7 @@ void airbustr_state::scrollregs_w(offs_t offset, uint8_t data)
 		case 0x06:  m_scrollx[((offset & 4) >> 2) ^ 1] = data;    break;
 		case 0x08:  m_highbits   = ~data;   break;  // complemented high bits
 
-		default: LOGSCROLLREGS("CPU #2 - port %02X written with %02X - PC = %04X\n", offset, data, m_slave->pc());
+		default: LOGSCROLLREGS("%s: port %02X written with %02X\n", machine().describe_context(), offset, data);
 	}
 
 	for (int layer = 0; layer < 2; layer++)
@@ -408,7 +408,7 @@ void airbustr_state::video_start()
 }
 
 
-uint32_t airbustr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 airbustr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
@@ -434,36 +434,36 @@ void airbustr_state::screen_vblank(int state)
 
 // Read / Write Handlers
 
-void airbustr_state::calc1_w(offs_t offset, uint8_t data)
+void airbustr_state::calc1_w(offs_t offset, u8 data)
 {
 	offset += 0xfe0;
 	m_devram[offset] = data;
 
 	// CALC1 chip is 16-bit
-	uint16_t data16 = m_devram[offset | 1] << 8 | m_devram[offset & ~1];
+	u16 const data16 = m_devram[offset | 1] << 8 | m_devram[offset & ~1];
 	m_calc1->kaneko_hit_w((offset & 0x1f) / 2, data16);
 }
 
-uint8_t airbustr_state::calc1_r(offs_t offset)
+u8 airbustr_state::calc1_r(offs_t offset)
 {
 	// CALC1 chip is 16-bit
-	uint16_t ret = m_calc1->kaneko_hit_r(offset / 2);
+	u16 const ret = m_calc1->kaneko_hit_r(offset / 2);
 	return (offset & 1) ? (ret >> 8) : (ret & 0xff);
 }
 
-void airbustr_state::master_nmi_trigger_w(uint8_t data)
+void airbustr_state::main_nmi_trigger_w(u8 data)
 {
-	m_slave->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void airbustr_state::master_bankswitch_w(uint8_t data)
+void airbustr_state::main_bankswitch_w(u8 data)
 {
-	m_masterbank->set_entry(data & 0x07);
+	m_mainbank->set_entry(data & 0x07);
 }
 
-void airbustr_state::slave_bankswitch_w(uint8_t data)
+void airbustr_state::sub_bankswitch_w(u8 data)
 {
-	m_slavebank->set_entry(data & 0x07);
+	m_subbank->set_entry(data & 0x07);
 
 	for (int layer = 0; layer < 2; layer++)
 		m_tilemap[layer]->set_flip(BIT(data, 4) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
@@ -474,12 +474,12 @@ void airbustr_state::slave_bankswitch_w(uint8_t data)
 	m_pandora->set_clear_bitmap(BIT(data, 5));
 }
 
-void airbustr_state::sound_bankswitch_w(uint8_t data)
+void airbustr_state::sound_bankswitch_w(u8 data)
 {
 	m_audiobank->set_entry(data & 0x07);
 }
 
-uint8_t airbustr_state::soundcommand_status_r()
+u8 airbustr_state::soundcommand_status_r()
 {
 	// bits: 2 <-> ?    1 <-> soundlatch full   0 <-> soundlatch2 empty
 	return 4 | (m_soundlatch[0]->pending_r() << 1) | !m_soundlatch[1]->pending_r();
@@ -487,58 +487,58 @@ uint8_t airbustr_state::soundcommand_status_r()
 
 
 template<int Layer>
-void airbustr_state::videoram_w(offs_t offset, uint8_t data)
+void airbustr_state::videoram_w(offs_t offset, u8 data)
 {
 	m_videoram[Layer][offset] = data;
 	m_tilemap[Layer]->mark_tile_dirty(offset);
 }
 
 template<int Layer>
-void airbustr_state::colorram_w(offs_t offset, uint8_t data)
+void airbustr_state::colorram_w(offs_t offset, u8 data)
 {
 	m_colorram[Layer][offset] = data;
 	m_tilemap[Layer]->mark_tile_dirty(offset);
 }
 
-void airbustr_state::coin_counter_w(uint8_t data)
+void airbustr_state::coin_counter_w(u8 data)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	machine().bookkeeping().coin_counter_w(1, data & 2);
-	machine().bookkeeping().coin_lockout_w(0, ~data & 4);
-	machine().bookkeeping().coin_lockout_w(1, ~data & 8);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 2));
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 3));
 }
 
 
 // Memory Maps
 
-void airbustr_state::master_map(address_map &map)
+void airbustr_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr(m_masterbank);
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_r), FUNC(kaneko_pandora_device::spriteram_w));
 	map(0xd000, 0xdfff).ram();
 	map(0xe000, 0xefff).ram().share(m_devram); // shared with protection device (see below)
-	map(0xf000, 0xffff).ram().share("master_slave");
+	map(0xf000, 0xffff).ram().share("main_sub");
 }
 
-void airbustr_state::master_prot_map(address_map &map)
+void airbustr_state::main_prot_map(address_map &map)
 {
-	master_map(map);
+	main_map(map);
 	map(0xefe0, 0xeff5).rw(FUNC(airbustr_state::calc1_r), FUNC(airbustr_state::calc1_w));
 }
 
-void airbustr_state::master_io_map(address_map &map)
+void airbustr_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(airbustr_state::master_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(airbustr_state::main_bankswitch_w));
 	map(0x01, 0x01).nopw(); // ???
-	map(0x02, 0x02).w(FUNC(airbustr_state::master_nmi_trigger_w));
+	map(0x02, 0x02).w(FUNC(airbustr_state::main_nmi_trigger_w));
 }
 
-void airbustr_state::slave_map(address_map &map)
+void airbustr_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr(m_slavebank);
+	map(0x8000, 0xbfff).bankr(m_subbank);
 	map(0xc000, 0xc3ff).ram().w(FUNC(airbustr_state::videoram_w<1>)).share(m_videoram[1]);
 	map(0xc400, 0xc7ff).ram().w(FUNC(airbustr_state::colorram_w<1>)).share(m_colorram[1]);
 	map(0xc800, 0xcbff).ram().w(FUNC(airbustr_state::videoram_w<0>)).share(m_videoram[0]);
@@ -546,13 +546,13 @@ void airbustr_state::slave_map(address_map &map)
 	map(0xd000, 0xd5ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xd600, 0xdfff).ram();
 	map(0xe000, 0xefff).ram();
-	map(0xf000, 0xffff).ram().share("master_slave");
+	map(0xf000, 0xffff).ram().share("main_sub");
 }
 
-void airbustr_state::slave_io_map(address_map &map)
+void airbustr_state::sub_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(airbustr_state::slave_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(airbustr_state::sub_bankswitch_w));
 	map(0x02, 0x02).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0x04, 0x0c).w(FUNC(airbustr_state::scrollregs_w));
 	map(0x0e, 0x0e).r(FUNC(airbustr_state::soundcommand_status_r));
@@ -696,18 +696,18 @@ GFXDECODE_END
 // Main Z80 uses IM2
 TIMER_DEVICE_CALLBACK_MEMBER(airbustr_state::scanline)
 {
-	int scanline = param;
+	int const scanline = param;
 
 	if (scanline == 240) // vblank-out irq
-		m_master->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 
 	// Pandora "sprite end dma" irq? TODO: timing is likely off
 	if (scanline == 64)
-		m_master->set_input_line_and_vector(0, HOLD_LINE, 0xfd); // Z80
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfd); // Z80
 }
 
 // Sub Z80 uses IM2 too, but 0xff irq routine just contains an irq ack in it
-INTERRUPT_GEN_MEMBER(airbustr_state::slave_interrupt)
+INTERRUPT_GEN_MEMBER(airbustr_state::sub_interrupt)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd); // Z80
 }
@@ -717,8 +717,8 @@ INTERRUPT_GEN_MEMBER(airbustr_state::slave_interrupt)
 
 void airbustr_state::machine_start()
 {
-	m_masterbank->configure_entries(0, 8, memregion("master")->base(), 0x4000);
-	m_slavebank->configure_entries(0, 8, memregion("slave")->base(), 0x4000);
+	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
+	m_subbank->configure_entries(0, 8, memregion("subcpu")->base(), 0x4000);
 	m_audiobank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 
 	save_item(NAME(m_scrollx));
@@ -741,15 +741,15 @@ void airbustr_state::machine_reset()
 void airbustr_state::airbustrb(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_master, XTAL(12'000'000) / 2); // verified on PCB
-	m_master->set_addrmap(AS_PROGRAM, &airbustr_state::master_map);
-	m_master->set_addrmap(AS_IO, &airbustr_state::master_io_map);
+	Z80(config, m_maincpu, XTAL(12'000'000) / 2); // verified on PCB
+	m_maincpu->set_addrmap(AS_PROGRAM, &airbustr_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &airbustr_state::main_io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(airbustr_state::scanline), "screen", 0, 1);
 
-	Z80(config, m_slave, XTAL(12'000'000) / 2); // verified on PCB
-	m_slave->set_addrmap(AS_PROGRAM, &airbustr_state::slave_map);
-	m_slave->set_addrmap(AS_IO, &airbustr_state::slave_io_map);
-	m_slave->set_vblank_int("screen", FUNC(airbustr_state::slave_interrupt)); // nmi signal from master CPU
+	Z80(config, m_subcpu, XTAL(12'000'000) / 2); // verified on PCB
+	m_subcpu->set_addrmap(AS_PROGRAM, &airbustr_state::sub_map);
+	m_subcpu->set_addrmap(AS_IO, &airbustr_state::sub_io_map);
+	m_subcpu->set_vblank_int("screen", FUNC(airbustr_state::sub_interrupt)); // nmi signal from main CPU
 
 	Z80(config, m_audiocpu, XTAL(12'000'000) / 2); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &airbustr_state::sound_map);
@@ -797,7 +797,7 @@ void airbustr_state::airbustr(machine_config &config)
 {
 	airbustrb(config);
 
-	m_master->set_addrmap(AS_PROGRAM, &airbustr_state::master_prot_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &airbustr_state::main_prot_map);
 
 	KANEKO_HIT(config, m_calc1).set_type(0);
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3)); // a guess, and certainly wrong
@@ -807,10 +807,10 @@ void airbustr_state::airbustr(machine_config &config)
 // ROMs
 
 ROM_START( airbustr )
-	ROM_REGION( 0x20000, "master", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "pr12.h19",   0x00000, 0x20000, CRC(91362eb2) SHA1(cd85acfa6542af68dd1cad46f9426a95cfc9432e) )
 
-	ROM_REGION( 0x20000, "slave", 0 )
+	ROM_REGION( 0x20000, "subcpu", 0 )
 	ROM_LOAD( "pr13.l15",   0x00000, 0x20000, CRC(13b2257b) SHA1(325efa54e757a1f08caf81801930d61ea4e7b6d4) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )
@@ -819,7 +819,7 @@ ROM_START( airbustr )
 	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "pr-000.bin", 0x00000, 0x80000, CRC(8ca68f0d) SHA1(d60389e7e63e9850bcddecb486558de1414f1276) )
 
-	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_REGION( 0x100000, "sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "pr-001.bin", 0x00000, 0x80000, CRC(7e6cb377) SHA1(005290f9f53a0c3a6a9d04486b16b7fd52cc94b6) )
 	ROM_LOAD( "pr-02.bin",  0x80000, 0x10000, CRC(6bbd5e46) SHA1(26563737f3f91ee0a056d35ce42217bb57d8a081) )
 
@@ -829,14 +829,13 @@ ROM_START( airbustr )
 	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
 	ROM_LOAD( "pal16l8-pr-500.16f",  0x000, 0x104, CRC(e0f901e1) SHA1(f436f5357408ad7056c950018c0e94681b34fd11) )
 	ROM_LOAD( "gal16v8a-pr-501.13j", 0x200, 0x117, CRC(d8bf8cb5) SHA1(2ccd4b35f97a4fdaf13f3eccb741a0ff54fc7115) )
-
 ROM_END
 
 ROM_START( airbustrj )
-	ROM_REGION( 0x20000, "master", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "pr-14j.bin", 0x00000, 0x20000, CRC(6b9805bd) SHA1(db6df33cf17316a4b81d7731dca9fe8bbf81f014) )
 
-	ROM_REGION( 0x20000, "slave", 0 )
+	ROM_REGION( 0x20000, "subcpu", 0 )
 	ROM_LOAD( "pr-11j.bin", 0x00000, 0x20000, CRC(85464124) SHA1(8cce8dfdede48032c40d5f155fd58061866668de) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )
@@ -845,7 +844,7 @@ ROM_START( airbustrj )
 	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD( "pr-000.bin", 0x00000, 0x80000, CRC(8ca68f0d) SHA1(d60389e7e63e9850bcddecb486558de1414f1276) )
 
-	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_REGION( 0x100000, "sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "pr-001.bin", 0x000000, 0x80000, CRC(7e6cb377) SHA1(005290f9f53a0c3a6a9d04486b16b7fd52cc94b6) )
 	ROM_LOAD( "pr-02.bin",  0x080000, 0x10000, CRC(6bbd5e46) SHA1(26563737f3f91ee0a056d35ce42217bb57d8a081) )
 
@@ -871,24 +870,24 @@ ROM 5 is on a piggyback daughterboard with a z80 and a PAL
 */
 
 ROM_START( airbustrb )
-	ROM_REGION( 0x20000, "master", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "5.bin",   0x00000, 0x20000, CRC(9e4216a2) SHA1(46572da4df5a67b10cc3ee21bdc0ec4bcecaaf93) )
 
-	ROM_REGION( 0x20000, "slave", 0 )
+	ROM_REGION( 0x20000, "subcpu", 0 )
 	ROM_LOAD( "1.bin",   0x00000, 0x20000, CRC(85464124) SHA1(8cce8dfdede48032c40d5f155fd58061866668de) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "2.bin",  0x00000, 0x20000, CRC(6e0a5df0) SHA1(616b7c7aaf52a9a55b63c60717c1866940635cd4) )
 
 	ROM_REGION( 0x80000, "tiles", 0 )
-	// Same content as airbusj, pr-001.bin, different sized ROMs / interleave
+	// Same content as airbustrj, pr-001.bin, different sized ROMs / interleave
 	ROM_LOAD16_BYTE( "7.bin", 0x00000, 0x20000, CRC(2e3bf0a2) SHA1(84cabc753e5fd1164f0a8a9a9dee7d339a5607c5) )
 	ROM_LOAD16_BYTE( "9.bin", 0x00001, 0x20000, CRC(2c23c646) SHA1(41c0f8788c9715918b4138f076415f8640adc483) )
 	ROM_LOAD16_BYTE( "6.bin", 0x40000, 0x20000, CRC(0d6cd470) SHA1(329286bc6c9d1eccc74735d1c155a0f5f98f1444) )
 	ROM_LOAD16_BYTE( "8.bin", 0x40001, 0x20000, CRC(b3372e51) SHA1(aa8dcbb84c829994ae04ceecbef795ac53e72493) )
 
-	ROM_REGION( 0x100000, "sprites", 0 )
-	// Same content as airbusj, pr-001.bin, different sized ROMs
+	ROM_REGION( 0x100000, "sprites", ROMREGION_ERASE00 )
+	// Same content as airbustrj, pr-001.bin, different sized ROMs
 	ROM_LOAD( "13.bin", 0x00000, 0x20000, CRC(75dee86d) SHA1(fe342fed5bb84ee6f35d3f91987141c559e94d5a) )
 	ROM_LOAD( "12.bin", 0x20000, 0x20000, CRC(c98a8333) SHA1(3a990460e232ee07a9297fcffdb02451406f5bf1) )
 	ROM_LOAD( "11.bin", 0x40000, 0x20000, CRC(4e9baebd) SHA1(6cf878a3fb3d344e3f5f4d031fbde6f14b653636) )
@@ -897,7 +896,7 @@ ROM_START( airbustrb )
 	ROM_LOAD( "14.bin", 0x80000, 0x10000, CRC(6bbd5e46) SHA1(26563737f3f91ee0a056d35ce42217bb57d8a081) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	// Same content as airbusj, pr-200.bin, different sized ROMs
+	// Same content as airbustrj, pr-200.bin, different sized ROMs
 	ROM_LOAD( "4.bin", 0x00000, 0x20000, CRC(21d9bfe3) SHA1(4a69458cd2a6309e389c9e7593ae29d3ef0f8daf) )
 	ROM_LOAD( "3.bin", 0x20000, 0x20000, CRC(58cd19e2) SHA1(479f22241bf29f7af67d9679fc6c20f10004fdd8) )
 ROM_END

@@ -2894,6 +2894,11 @@ ROM_START( vtechtvssp )
 	ROM_LOAD16_WORD_SWAP( "vtechtvstation_sp.bin", 0x000000, 0x800000, CRC(4a2e91eb) SHA1(1ff9cc0360b670cc0ad7efa9de0edd2c68d4d8e3) )
 ROM_END
 
+ROM_START( genitvp )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "vtechtvstation_fr.bin", 0x000000, 0x800000, CRC(71c2c5f4) SHA1(cc81f67ec1888b40a735383dae09408f9c877314) )
+ROM_END
+
 ROM_START( vtechtvsgr )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "vtechtvstation_gr.bin", 0x000000, 0x800000, CRC(879f1b12) SHA1(c14d52bead2c190130ce88cbdd4f5e93145f13f9) )
@@ -3131,20 +3136,24 @@ ROM_START( pdcj )
 	ROM_LOAD16_WORD_SWAP( "chip2.u3", 0x800000, 0x400000, CRC(4fb335ac) SHA1(d6499816acb3da5c4f6a582bd3104c707422eb34) )
 ROM_END
 
-void spg2xx_game_state::init_crc()
+void spg2xx_game_state::init_crc(int blocks, int crclocation)
 {
 	// several games have a byte sum checksum listed at the start of ROM, this little helper function logs what it should match.
-	const int length = memregion("maincpu")->bytes();
+	const int length = memregion("maincpu")->bytes() / blocks;
 	const uint8_t* rom = memregion("maincpu")->base();
 
-	uint32_t checksum = 0x00000000;
-	// the first 0x10 bytes are where the "chksum:xxxxxxxx " string is listed, so skip over them
-	for (int i = 0x10; i < length; i++)
+	for (int block = 0; block < blocks; block++)
 	{
-		checksum += rom[i];
-	}
+		const uint8_t* rom2 = rom + block * 0x800000;
+		uint32_t checksum = 0x00000000;
+		// the first 0x10 bytes are where the "chksum:xxxxxxxx " string is listed, so skip over them
+		for (int i = 0x10 + crclocation; i < length; i++)
+		{
+			checksum += rom2[i];
+		}
 
-	logerror("Calculated Byte Sum of bytes from 0x10 to 0x%08x is %08x)\n", length - 1, checksum);
+		logerror("Block %d Calculated Byte Sum of bytes from 0x%08x to 0x%08x is %08x, in header %c%c%c%c%c%c%c%c\n", block, (block * 0x800000) + 0x10 + crclocation, (block * 0x800000) + length - 1, checksum, rom2[crclocation+7], rom2[crclocation+8], rom2[crclocation+9], rom2[crclocation+10], rom2[crclocation+11], rom2[crclocation+12], rom2[crclocation+13], rom2[crclocation+14]);
+	}
 }
 
 
@@ -3250,8 +3259,9 @@ CONS( 2007, drumsups,   0,        0, spg28x,    drumsups,  spg2xx_game_state,   
 CONS( 2009, senwfit,    0,        0, gssytts,   senwfit,   spg2xx_game_senwfit_state,  init_senwfit,  "Senario",                                                "Wireless Fitness / Dance Fit (Senario)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // VTech "TV Station" / "TV Learning Station" / "Nitro Vision"
-CONS( 2006, vtechtvssp, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Station (VTech, Spain)",                                             MACHINE_NOT_WORKING )
-CONS( 2006, vtechtvsgr, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Learning Station (VTech, Germany)",                                  MACHINE_NOT_WORKING )
+CONS( 2006, genitvp,    0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "Genius TV Progress (VTech, France)",                                    MACHINE_NOT_WORKING )
+CONS( 2006, vtechtvssp, genitvp,  0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Station (VTech, Spain)",                                             MACHINE_NOT_WORKING )
+CONS( 2006, vtechtvsgr, genitvp,  0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Learning Station (VTech, Germany)",                                  MACHINE_NOT_WORKING )
 
 CONS( 2007, itvphone,   0,        0, spg2xx_pal, itvphone, spg2xx_game_state,          init_itvphone, "Taikee / Oregon Scientific / V-Tac Technology Co Ltd.",  u8"Teléfono interactivo de TV (Spain)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 

@@ -10,7 +10,15 @@ class powervr2_device : public device_t,
 {
 public:
 	powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_texture_ram(T &&tag) { dc_texture_ram.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_framebuffer_ram(T &&tag) { dc_framebuffer_ram.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_cpu_space(T &&tag, int no) { m_cpu_space.set_tag(std::forward<T>(tag), no); }
+
+	auto maple_trigger_callback() { return maple_trigger_cb.bind(); }
 	auto irq_callback() { return irq_cb.bind(); }
+
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 	enum { NUM_BUFFERS = 4 };
@@ -180,9 +188,6 @@ public:
 	uint32_t ignoretexalpha,flipuv,clampuv,filtermode,sstexture,mmdadjust,tsinstruction;
 	uint32_t depthcomparemode,cullingmode,zwritedisable,cachebypass,dcalcctrl,volumeinstruction,mipmapped,vqcompressed,strideselect,paletteselector;
 
-	uint64_t *dc_texture_ram;
-	uint64_t *dc_framebuffer_ram;
-
 	uint64_t *pvr2_texture_ram;
 	uint64_t *pvr2_framebuffer_ram;
 
@@ -343,7 +348,12 @@ protected:
 	ioport_constructor device_input_ports() const override;
 
 private:
+	devcb_write_line maple_trigger_cb;
 	devcb_write8 irq_cb;
+	required_device<device_execute_interface> m_cpu; // TODO: only used for timing hacks - do timing properly
+	required_shared_ptr<uint64_t> dc_texture_ram;
+	required_shared_ptr<uint64_t> dc_framebuffer_ram;
+	required_address_space m_cpu_space;
 	required_ioport m_mamedebug;
 
 	// Core registers

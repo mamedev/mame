@@ -140,7 +140,7 @@ Compiled by Robbbert
 	<software name="salvo">
 		<description>Salvo</description>
 		<year>1979</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Staley's Sorcerer Software</publisher>
 		<info name="developer" value="J.T.Staley"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -305,7 +305,7 @@ Compiled by Robbbert
 	</software>
 	<software name="dodge">
 		<description>Dodgem</description>
-		<year>198?</year>
+		<year>1978</year>
 		<publisher>Creative Computing</publisher>
 		<info name="serial" value="311ES" />
 		<info name="usage" value="In Basic, CLOAD then RUN" />
@@ -367,8 +367,8 @@ Compiled by Robbbert
 	</software>
 	<software name="systm">
 		<description>Graphic Animation System</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1980</year>
+		<publisher>Quality Software</publisher>
 		<info name="serial" value="316ES" />
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -923,7 +923,7 @@ Compiled by Robbbert
 	</software>
 	<software name="checkers">
 		<description>Checkers</description>
-		<year>198?</year>
+		<year>1978</year>
 		<publisher>Creative Computing</publisher>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -970,7 +970,7 @@ Compiled by Robbbert
 	</software>
 	<software name="nuclear">
 		<description>Nuclear Reaction</description>
-		<year>198?</year>
+		<year>1978</year>
 		<publisher>Creative Computing</publisher>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -981,7 +981,7 @@ Compiled by Robbbert
 	</software>
 	<software name="pielob">
 		<description>Pie Lob</description>
-		<year>198?</year>
+		<year>1978</year>
 		<publisher>Creative Computing</publisher>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -1184,7 +1184,7 @@ Compiled by Robbbert
 	<software name="misil">
 		<description>Defense</description>
 		<year>1981</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Customized Technology</publisher>
 		<info name="developer" value="Roger A. Kemp"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -1278,7 +1278,7 @@ Compiled by Robbbert
 	<software name="blackj">
 		<description>Black Jack</description>
 		<year>1979</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Staley's Sorcerer Software</publisher>
 		<info name="developer" value="J.T.Staley"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -1290,7 +1290,7 @@ Compiled by Robbbert
 	<software name="cadas">
 		<description>Cassette Disk database system</description>
 		<year>1981</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Global Software Network</publisher>
 		<info name="developer" value="Bob Stafford"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -1337,7 +1337,7 @@ Compiled by Robbbert
 	<software name="flip">
 		<description>Flip</description>
 		<year>1979</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Staley's Sorcerer Software</publisher>
 		<info name="developer" value="J.T.Staley"/>
 		<info name="usage" value="In Basic, CLOAD then RUN. To pass, press Enter." />
 		<part name="cass" interface="sorcerer_cass">
@@ -1349,7 +1349,7 @@ Compiled by Robbbert
 	<software name="homerun">
 		<description>Home Run</description>
 		<year>1979</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Staley's Sorcerer Software</publisher>
 		<info name="developer" value="J.T.Staley"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">

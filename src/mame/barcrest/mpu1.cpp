@@ -36,7 +36,6 @@
 
 #include "emu.h"
 
-#include "awpvid.h"
 #include "fruitsamples.h"
 
 #include "cpu/m6800/m6800.h"
@@ -691,8 +690,7 @@ uint8_t mpu1_state::reel_pos_r(uint8_t reel)
 void mpu2_stepper_state::reel_w(int reel, uint8_t data)
 {
 	m_reels[reel]->update(data);
-	constexpr char reelnames[3][6] = { "reel1", "reel2", "reel3" };
-	awp_draw_reel(machine(), reelnames[reel], *m_reels[reel]);
+	m_reels[reel]->draw();
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( mpu12_base_state::nmi )
@@ -860,7 +858,7 @@ static INPUT_PORTS_START( m2rockon )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT ) PORT_NAME("Collect")
 
 	PORT_MODIFY("IN_PIA4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_INTERLOCK ) PORT_NAME("Back Door") PORT_TOGGLE
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Back Door") PORT_TOGGLE
 	/* Clears credits when activated if door is open. Don't know what this looks like on
 	   actual machines if even there, it's not shown on any wiring diagrams. */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Clear Credits")
@@ -880,7 +878,7 @@ static INPUT_PORTS_START( m2hilite )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT ) PORT_NAME("Collect")
 
 	PORT_MODIFY("IN_PIA4")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_INTERLOCK ) PORT_NAME("Back Door") PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Back Door") PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Nudge Up 3")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Nudge Up 2")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Nudge Up 1")
@@ -912,7 +910,7 @@ static INPUT_PORTS_START( m2splite )
 
 	PORT_MODIFY("IN_PIA4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Auto Nudge")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_INTERLOCK ) PORT_NAME("Back Door") PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Back Door") PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Nudge Up 3")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Nudge Up 2")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Nudge Up 1")
@@ -1070,8 +1068,7 @@ void mpu12_base_state::machine_reset()
 
 void mpu2_stepper_state::device_post_load()
 {
-	constexpr char reelnames[3][6] = { "reel1", "reel2", "reel3" };
-	for(int i = 0; i < 3; i++) awp_draw_reel(machine(), reelnames[i], *m_reels[i]);
+	for(int i = 0; i < 3; i++) m_reels[i]->draw();
 }
 
 void mpu12_base_state::mpu12_base(machine_config &config)

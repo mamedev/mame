@@ -63,7 +63,7 @@ protected:
 	virtual void write_c0nx(u8 offset, u8 data) override;
 	virtual u8 read_c800(u16 offset) override;
 	virtual void write_c800(u16 offset, u8 data) override;
-	virtual bool take_c800() override { return true; }
+	virtual bool take_c800() const override { return true; }
 
 private:
 	required_device<mc6845_device> m_crtc;

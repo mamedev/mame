@@ -43,7 +43,8 @@ pci9050_device::pci9050_device(const machine_config &mconfig, const char *tag, d
 	: pci_device(mconfig, PCI9050, tag, owner, clock)
 	, m_user_input_handler(*this, 0), m_user_output_handler(*this)
 {
-	set_ids(0x10b59050, 0x01, 0x06800000, 0x10b59050);
+	// "other bridge device"
+	set_ids(0x10b59050, 0x01, 0x068000, 0x10b59050);
 	for(int i=0; i<4; i++) {
 		m_devices[i] = nullptr;
 		m_names[i] = nullptr;

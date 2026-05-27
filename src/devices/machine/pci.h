@@ -69,6 +69,8 @@ public:
 	void interrupt_line_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	uint8_t interrupt_pin_r();
 	void interrupt_pin_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	uint8_t minimum_grant_r();
+	uint8_t maximum_latency_r();
 
 protected:
 	pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -112,6 +114,7 @@ protected:
 	uint32_t expansion_rom_base;
 	bool is_multifunction_device;
 	uint8_t intr_line, intr_pin;
+	uint8_t minimum_grant, maximum_latency;
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -251,7 +254,7 @@ protected:
 	pci_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	uint32_t config_address_r();
-	void config_address_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	virtual void config_address_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t config_data_r(offs_t offset, uint32_t mem_mask = ~0);
 	void config_data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t config_data_ex_r(offs_t offset, uint32_t mem_mask = ~0);

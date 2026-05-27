@@ -58,6 +58,8 @@ protected:
 	virtual uint8_t read_cnxx(uint8_t offset) override;
 	virtual uint8_t read_c800(uint16_t offset) override;
 	virtual void write_c800(uint16_t offset, uint8_t data) override;
+	virtual bool take_c800() const override { return true; }
+	virtual void reset_from_bus() override;
 
 	required_device<ata_interface_device> m_ata;
 	required_region_ptr<uint8_t> m_rom;
@@ -169,6 +171,11 @@ void a2bus_cffa2000_device::device_start()
 }
 
 void a2bus_cffa2000_device::device_reset()
+{
+	reset_from_bus();
+}
+
+void a2bus_cffa2000_device::reset_from_bus()
 {
 	m_writeprotect = true;
 	m_inwritecycle = false;

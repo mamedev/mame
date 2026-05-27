@@ -99,14 +99,15 @@ private:
 	output_finder<11> m_leds;
 
 	int m_keylatch;
-	int m_si;
-	int m_si_en;
-	int m_so_z2;
-	int m_so_z5;
-	int m_t1_z2;
-	int m_t1_z5;
-	int m_led_en;
-	int m_reset;
+	bool m_si;
+	bool m_si_en;
+	bool m_so_z2;
+	bool m_so_z5;
+	bool m_t1_z2;
+	bool m_t1_z5;
+	bool m_led_en;
+	bool m_reset;
+	bool m_rxtxc;
 };
 
 

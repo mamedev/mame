@@ -7,6 +7,7 @@
 #pragma once
 
 #include <array>
+#include <bit>
 #include <cstdint>
 
 
@@ -76,7 +77,7 @@ public:
 
 	static int gf2_reduce(uint64_t num)
 	{
-		return population_count_64(num) & 1;
+		return std::popcount(num) & 1;
 	}
 
 protected:
@@ -119,7 +120,7 @@ public:
 
 	static int gf2_reduce(uint64_t num)
 	{
-		return population_count_64(num) & 1;
+		return std::popcount(num) & 1;
 	}
 
 protected:

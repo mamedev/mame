@@ -5,7 +5,7 @@
     MPU-401 MIDI device interface
 
     TODO:
-    - skeleton, doesn't do anything
+    - PnP ports
 
 ***************************************************************************/
 
@@ -36,6 +36,7 @@ DIP-SWs
 
 void isa8_mpu401_device::mpu_irq_out(int state)
 {
+	m_isa->irq2_w(state);
 }
 
 //**************************************************************************
@@ -76,8 +77,6 @@ isa8_mpu401_device::isa8_mpu401_device(const machine_config &mconfig, const char
 void isa8_mpu401_device::device_start()
 {
 	set_isa_device();
-
-	m_isa->install_device(0x330, 0x0331, read8sm_delegate(*m_mpu401, FUNC(mpu401_device::mpu_r)), write8sm_delegate(*m_mpu401, FUNC(mpu401_device::mpu_w)));
 }
 
 //-------------------------------------------------
@@ -86,4 +85,14 @@ void isa8_mpu401_device::device_start()
 
 void isa8_mpu401_device::device_reset()
 {
+	remap(AS_IO, 0, 0xffff);
 }
+
+void isa8_mpu401_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x330, 0x0331, read8sm_delegate(*m_mpu401, FUNC(mpu401_device::mpu_r)), write8sm_delegate(*m_mpu401, FUNC(mpu401_device::mpu_w)));
+	}
+}
+

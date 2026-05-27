@@ -116,13 +116,13 @@ authors:hap
 		<element ref="white"><bounds x="29" y="32.55" width="1" height="1" /></element>
 		<element ref="blackb"><bounds x="29.15" y="32.7" width="0.7" height="0.7" /></element>
 
-		<element ref="text_l09"><bounds x="-1" y="37.3" width="5" height="1.3" /></element>
-		<element ref="text_l10"><bounds x="3"  y="37.3" width="5" height="1.3" /></element>
-		<element ref="text_l11"><bounds x="7"  y="37.3" width="5" height="1.3" /></element>
-		<element ref="text_l12"><bounds x="11" y="37.3" width="5" height="1.3" /></element>
-		<element ref="text_l13"><bounds x="15" y="37.3" width="5" height="1.3" /></element>
-		<element ref="text_l14"><bounds x="19" y="37.3" width="5" height="1.3" /></element>
-		<element ref="text_l15"><bounds x="25" y="37.3" width="5" height="1.3" /></element>
+		<element ref="text_l09"><bounds x="-0.5" y="37.3" width="4" height="1.3" /></element>
+		<element ref="text_l10"><bounds x="3.5"  y="37.3" width="4" height="1.3" /></element>
+		<element ref="text_l11"><bounds x="7.5"  y="37.3" width="4" height="1.3" /></element>
+		<element ref="text_l12"><bounds x="11.5" y="37.3" width="4" height="1.3" /></element>
+		<element ref="text_l13"><bounds x="15.5" y="37.3" width="4" height="1.3" /></element>
+		<element ref="text_l14"><bounds x="19.5" y="37.3" width="4" height="1.3" /></element>
+		<element ref="text_l15"><bounds x="25.5" y="37.3" width="4" height="1.3" /></element>
 	</group>
 
 

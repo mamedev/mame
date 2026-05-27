@@ -16,6 +16,7 @@
 #include "utilfwd.h"
 
 #include <memory>
+#include <string_view>
 #include <vector>
 
 #include <cassert>
@@ -93,7 +94,7 @@ public:
 	//! This checks if the file has the proper extension for this format.
 	//! @param file_name
 	//! @returns true if file matches the extension.
-	bool extension_matches(const char *file_name) const;
+	bool extension_matches(std::string_view file_name) const noexcept;
 
 protected:
 	//! Input for convert_to_edge
@@ -330,7 +331,8 @@ protected:
 		int actual_size;
 		uint8_t *data;
 		bool deleted;
-		bool bad_crc;
+		bool bad_data_crc;
+		bool bad_addr_crc;
 	};
 
 	struct desc_gcr_sector
@@ -375,6 +377,8 @@ protected:
 
 
 	//!  Regenerate the data for a full track.
+	//!  PC-type sectors with MFM encoding and fixed-size, with explicit start and end sectors.
+	static void get_track_data_mfm_pc_sectors(int track, int head, const floppy_image &image, int cell_size, int sector_size, int start_sector, int end_sector, uint8_t *sectdata);
 	//!  PC-type sectors with MFM encoding and fixed-size.
 	static void get_track_data_mfm_pc(int track, int head, const floppy_image &image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata);
 
@@ -520,7 +524,8 @@ public:
 		FF_3        = 0x20202033, //!< "3   " 3 inch disk
 		FF_35       = 0x20203533, //!< "35  " 3.5 inch disk
 		FF_525      = 0x20353235, //!< "525 " 5.25 inch disk
-		FF_8        = 0x20202038  //!< "8   " 8 inch disk
+		FF_8        = 0x20202038, //!< "8   " 8 inch disk
+		FF_TWIG     = 0x47495754, //!< "TWIG" 5.25 twiggy
 	};
 
 	//! Variants
@@ -547,7 +552,7 @@ public:
 		DSQD   = 0x44515344, //!< "DSQD", Double-sided quad-density (720K in 5.25, means DD+80 tracks)
 		DSQD10 = 0x30315144, //!< "DQ10", Double-sided quad-density 10 hard sector
 		DSQD16 = 0x36315144, //!< "DQ16", Double-sided quad-density 16 hard sector (720K in 5.25, means DD+80 tracks)
-		DSHD   = 0x44485344, //!< "DSHD", Double-sided high-density (1440K)
+		DSHD   = 0x44485344, //!< "DSHD", Double-sided high-density (1440K in 3.5, 1200K in 5.25)
 		DSED   = 0x44455344  //!< "DSED", Double-sided extra-density (2880K)
 	};
 

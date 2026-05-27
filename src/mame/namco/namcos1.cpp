@@ -15,7 +15,7 @@ Chou Zetsurinjin Berabowman        (c) 1988 Namco
 Alice In Wonderland / Marchen Maze (c) 1988 Namco
 Bakutotsu Kijuutei                 (c) 1988 Namco
 Pro Tennis World Court             (c) 1988 Namco
-Splatter House                     (c) 1988 Namco
+Splatterhouse                      (c) 1988 Namco
 Face Off                           (c) 1988 Namco
 Rompers                            (c) 1989 Namco
 Blast Off                          (c) 1989 Namco
@@ -316,7 +316,7 @@ Date  Name                                  Key  Screen
  7/88 Marchen Maze / Alice In Wonderland    152  H
  8/88 Bakutotsu Kijuutei / Baraduke 2       155  H
 10/88 Pro Tennis World Court                143  H
-11/88 Splatter House                        181  H
+11/88 Splatterhouse                         181  H
 12/88 Face Off                              C    H
  2/89 Rompers                               182  V
  3/89 Blast Off                             183  V
@@ -410,7 +410,7 @@ void namcos1_state::virtual_map(address_map &map)
 	map(0x2fc000, 0x2fc7ff).ram().share("scratchpad");
 	map(0x2fc800, 0x2fcfff).m(m_spritegen, FUNC(namcos1_sprite_device::spriteram_map));
 	map(0x2fd000, 0x2fd01f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control8_r), FUNC(namco_c123tmap_device::control8_w)).mirror(0xfe0);
-	map(0x2fe000, 0x2fe3ff).rw("namco", FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)).mirror(0xc00); /* PSG ( Shared ) */
+	map(0x2fe000, 0x2fe3ff).m("namco", FUNC(namco_cus30_device::amap)).mirror(0xc00); /* PSG ( Shared ) */
 	map(0x2ff000, 0x2ff7ff).ram().share(m_triram).mirror(0x800);
 	map(0x300000, 0x307fff).ram();
 	map(0x400000, 0x7fffff).rom().region("mainrom", 0);
@@ -421,7 +421,7 @@ void namcos1_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).bankr(m_soundbank); /* Banked ROMs */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::write));
-	map(0x5000, 0x53ff).rw("namco", FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)).mirror(0xc00); /* PSG ( Shared ) */
+	map(0x5000, 0x53ff).m("namco", FUNC(namco_cus30_device::amap)).mirror(0xc00); /* PSG ( Shared ) */
 	map(0x7000, 0x77ff).ram().share(m_triram).mirror(0x800);
 	map(0x8000, 0x9fff).ram(); /* Sound RAM 3 */
 	map(0xa000, 0xa000).nopr();
@@ -1056,7 +1056,7 @@ void namcos1_state::ns1(machine_config &config)
 
 	NAMCO_C123TMAP(config, m_c123tmap, 0);
 	m_c123tmap->set_palette(m_c116);
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos1_state::TilemapCB, this));
+	m_c123tmap->set_tile_callback(FUNC(namcos1_state::TilemapCB));
 	m_c123tmap->set_color_base(0x0800);
 	m_c123tmap->set_offset(73, 16);
 	m_c123tmap->set_tmap3_half_height();
@@ -1070,8 +1070,7 @@ void namcos1_state::ns1(machine_config &config)
 	ymsnd.add_route(1, "speaker", 0.50, 1);
 
 	namco_cus30_device &cus30(NAMCO_CUS30(config, "namco", XTAL(49'152'000)/2048/2));
-	cus30.set_voices(8);
-	cus30.set_stereo(1);
+	cus30.set_stereo(true);
 	cus30.add_route(0, "speaker", 0.50, 0);
 	cus30.add_route(1, "speaker", 0.50, 1);
 
@@ -1511,44 +1510,44 @@ ROM_END
 /* Pac-Mania */
 ROM_START( pacmania )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
-	ROM_LOAD( "pn2_s0.bin",         0x00000, 0x10000, CRC(c10370fa) SHA1(f819a31075d3c8df5deee2919cd446b9e678c47d) )
-	ROM_LOAD( "pn2_s1.bin",         0x10000, 0x10000, CRC(f761ed5a) SHA1(1487932c86a6094ed01d5032904fd7ae3435d09c) )
+	ROM_LOAD( "pn2_s0.a10", 0x00000, 0x10000, CRC(c10370fa) SHA1(f819a31075d3c8df5deee2919cd446b9e678c47d) ) // silkscreened SOUND0
+	ROM_LOAD( "pn2_s1.b10", 0x10000, 0x10000, CRC(f761ed5a) SHA1(1487932c86a6094ed01d5032904fd7ae3435d09c) ) // silkscreened SOUND1
 
-	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) // 4M for ROMs
 	/* 000000-07ffff empty */
 	/* 080000-0fffff empty */
 	/* 100000-17ffff empty */
 	/* 180000-1fffff empty */
 	/* 200000-27ffff empty */
 	/* 280000-2fffff empty */
-	ROM_LOAD_1024( "pn_prg-6.bin",    0x300000, CRC(fe94900c) SHA1(5ce726baafc5ed24ea4cae33232c97637afb486b) )
-	ROM_LOAD_512 ( "pn2_p7.bin",      0x380000, CRC(462fa4fd) SHA1(b27bee1ac64ac204c85703c3822de7dbda11b75e) )
+	ROM_LOAD_1024( "pn1_p6.s10", 0x300000, CRC(fe94900c) SHA1(5ce726baafc5ed24ea4cae33232c97637afb486b) ) // silkscreened PRG6
+	ROM_LOAD_512 ( "pn2_p7.t10", 0x380000, CRC(462fa4fd) SHA1(b27bee1ac64ac204c85703c3822de7dbda11b75e) ) // silkscreened PRG7
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+	ROM_REGION( 0x1000, "mcu", 0 ) // 63701 MCU with internal ROM code
+	ROM_LOAD( "cus64-64a1.m4", 0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) )
 
-	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
-	ROM_LOAD_HS( "pn2_v0.bin",      0x00000, 0x10000, CRC(1ad5788f) SHA1(f6b1ccdcc3db11c0ab83e3ff24e772cd2b491468) )
+	ROM_REGION( 0xc0000, "voice", 0 ) // MCU external ROM */
+	ROM_LOAD_HS( "pn2_v0.a4", 0x00000, 0x10000, CRC(1ad5788f) SHA1(f6b1ccdcc3db11c0ab83e3ff24e772cd2b491468) ) // silkscreened VOICE0
 
-	ROM_REGION( 0x20000, "c123tmap:mask", 0 )  /* character mask */
-	ROM_LOAD( "pn2_c8.bin",         0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) )
+	ROM_REGION( 0x20000, "c123tmap:mask", 0 ) // character mask
+	ROM_LOAD( "pn1_c8.t8", 0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) ) // silkscreened CHR8
 
-	ROM_REGION( 0x100000, "c123tmap", 0 ) /* characters */
-	ROM_LOAD( "pn_chr-0.bin",       0x00000, 0x20000, CRC(7c57644c) SHA1(77d9cc9ffbed47a941e4c5e5645d7d1126f6c302) )
-	ROM_LOAD( "pn_chr-1.bin",       0x20000, 0x20000, CRC(7eaa67ed) SHA1(4ad6cfa31d781fa7169663bbc319fc79d8965290) )
-	ROM_LOAD( "pn_chr-2.bin",       0x40000, 0x20000, CRC(27e739ac) SHA1(be9dbd22d988b76f7044328e2056c3f26b703401) )
-	ROM_LOAD( "pn_chr-3.bin",       0x60000, 0x20000, CRC(1dfda293) SHA1(fa01b0b8a820c1d24ff0f84b857d2784f0dac1cf) )
+	ROM_REGION( 0x100000, "c123tmap", 0 ) // characters
+	ROM_LOAD( "pn1_c0.a8", 0x00000, 0x20000, CRC(7c57644c) SHA1(77d9cc9ffbed47a941e4c5e5645d7d1126f6c302) ) // silkscreened CHR0
+	ROM_LOAD( "pn1_c1.b8", 0x20000, 0x20000, CRC(7eaa67ed) SHA1(4ad6cfa31d781fa7169663bbc319fc79d8965290) ) // silkscreened CHR1
+	ROM_LOAD( "pn1_c2.e8", 0x40000, 0x20000, CRC(27e739ac) SHA1(be9dbd22d988b76f7044328e2056c3f26b703401) ) // silkscreened CHR2
+	ROM_LOAD( "pn1_c3.f8", 0x60000, 0x20000, CRC(1dfda293) SHA1(fa01b0b8a820c1d24ff0f84b857d2784f0dac1cf) ) // silkscreened CHR3
 
-	ROM_REGION( 0x100000, "sprite", 0 ) /* sprites */
-	ROM_LOAD( "pn_obj-0.bin",       0x00000, 0x20000, CRC(fda57e8b) SHA1(16a72585268159d24f881dbb1aa6ae82bcc4bde7) )
-	ROM_LOAD( "pnx_obj1.bin",       0x20000, 0x20000, CRC(4c08affe) SHA1(f8f60fdc31779e2abe496e36ba0e4f27546cbc54) )
+	ROM_REGION( 0x100000, "sprite", 0 ) // sprites - PN1 O1 @ B9 for World & Japanese PCBs should match! - which is a bad dump?
+	ROM_LOAD( "pn1_o0.a9", 0x00000, 0x20000, CRC(fda57e8b) SHA1(16a72585268159d24f881dbb1aa6ae82bcc4bde7) ) // silkscreened OBJ0
+	ROM_LOAD( "pn1_o1.b9", 0x20000, 0x20000, CRC(4c08affe) SHA1(f8f60fdc31779e2abe496e36ba0e4f27546cbc54) ) // silkscreened OBJ1
 ROM_END
 
 // all other roms are MASK roms matching the world set, possible prototype sound roms (handwritten / dated labels)
 ROM_START( pacmaniao )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
-	ROM_LOAD( "pac-mania_111187.sound0",         0x00000, 0x10000, CRC(845d6a2e) SHA1(bd541a5df0cbc0fe7f24fedcecb5b9f52a78d102) ) // different
-	ROM_LOAD( "pac-mania_111187.sound1",         0x10000, 0x10000, CRC(411bc134) SHA1(89960596def3580d19d9121d1efffbba2d1bdd94) ) // identical to japanese version
+	ROM_LOAD( "pac-mania_111187.sound0", 0x00000, 0x10000, CRC(845d6a2e) SHA1(bd541a5df0cbc0fe7f24fedcecb5b9f52a78d102) ) // unique
+	ROM_LOAD( "pac-mania_111187.sound1", 0x10000, 0x10000, CRC(411bc134) SHA1(89960596def3580d19d9121d1efffbba2d1bdd94) ) // == pn1_s1.b10 (Japanese version)
 
 	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	/* 000000-07ffff empty */
@@ -1557,63 +1556,63 @@ ROM_START( pacmaniao )
 	/* 180000-1fffff empty */
 	/* 200000-27ffff empty */
 	/* 280000-2fffff empty */
-	ROM_LOAD_1024( "pn_prg-6.bin",    0x300000, CRC(fe94900c) SHA1(5ce726baafc5ed24ea4cae33232c97637afb486b) )
-	ROM_LOAD_512 ( "pn2_p7.bin",      0x380000, CRC(462fa4fd) SHA1(b27bee1ac64ac204c85703c3822de7dbda11b75e) )
+	ROM_LOAD_1024( "pn1_p6.s10", 0x300000, CRC(fe94900c) SHA1(5ce726baafc5ed24ea4cae33232c97637afb486b) ) // silkscreened PRG6
+	ROM_LOAD_512 ( "pn2_p7.t10", 0x380000, CRC(462fa4fd) SHA1(b27bee1ac64ac204c85703c3822de7dbda11b75e) ) // silkscreened PRG7
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+	ROM_REGION( 0x1000, "mcu", 0 ) // 63701 MCU with internal ROM code
+	ROM_LOAD( "cus64-64a1.m4", 0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) )
 
-	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
-	ROM_LOAD_HS( "pac-mania_111187.voice0",      0x00000, 0x10000, CRC(1ad5788f) SHA1(f6b1ccdcc3db11c0ab83e3ff24e772cd2b491468) ) // identical to world version
+	ROM_REGION( 0xc0000, "voice", 0 ) // MCU external ROM
+	ROM_LOAD_HS( "pac-mania_111187.voice0", 0x00000, 0x10000, CRC(1ad5788f) SHA1(f6b1ccdcc3db11c0ab83e3ff24e772cd2b491468) ) // == pn2_v0.a4 (World version)
 
-	ROM_REGION( 0x20000, "c123tmap:mask", 0 )  /* character mask */
-	ROM_LOAD( "pn1_c8.bin",         0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) ) // same as the Japanese version
+	ROM_REGION( 0x20000, "c123tmap:mask", 0 ) // character mask
+	ROM_LOAD( "pn1_c8.t8", 0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) ) // silkscreened CHR8
 
-	ROM_REGION( 0x100000, "c123tmap", 0 ) /* characters */
-	ROM_LOAD( "pn_chr-0.bin",       0x00000, 0x20000, CRC(7c57644c) SHA1(77d9cc9ffbed47a941e4c5e5645d7d1126f6c302) )
-	ROM_LOAD( "pn_chr-1.bin",       0x20000, 0x20000, CRC(7eaa67ed) SHA1(4ad6cfa31d781fa7169663bbc319fc79d8965290) )
-	ROM_LOAD( "pn_chr-2.bin",       0x40000, 0x20000, CRC(27e739ac) SHA1(be9dbd22d988b76f7044328e2056c3f26b703401) )
-	ROM_LOAD( "pn_chr-3.bin",       0x60000, 0x20000, CRC(1dfda293) SHA1(fa01b0b8a820c1d24ff0f84b857d2784f0dac1cf) )
+	ROM_REGION( 0x100000, "c123tmap", 0 ) // characters
+	ROM_LOAD( "pn1_c0.a8", 0x00000, 0x20000, CRC(7c57644c) SHA1(77d9cc9ffbed47a941e4c5e5645d7d1126f6c302) ) // silkscreened CHR0
+	ROM_LOAD( "pn1_c1.b8", 0x20000, 0x20000, CRC(7eaa67ed) SHA1(4ad6cfa31d781fa7169663bbc319fc79d8965290) ) // silkscreened CHR1
+	ROM_LOAD( "pn1_c2.e8", 0x40000, 0x20000, CRC(27e739ac) SHA1(be9dbd22d988b76f7044328e2056c3f26b703401) ) // silkscreened CHR2
+	ROM_LOAD( "pn1_c3.f8", 0x60000, 0x20000, CRC(1dfda293) SHA1(fa01b0b8a820c1d24ff0f84b857d2784f0dac1cf) ) // silkscreened CHR3
 
-	ROM_REGION( 0x100000, "sprite", 0 ) /* sprites */
-	ROM_LOAD( "pn_obj-0.bin",       0x00000, 0x20000, CRC(fda57e8b) SHA1(16a72585268159d24f881dbb1aa6ae82bcc4bde7) )
-	ROM_LOAD( "pnx_obj1.bin",       0x20000, 0x20000, CRC(4c08affe) SHA1(f8f60fdc31779e2abe496e36ba0e4f27546cbc54) )
+	ROM_REGION( 0x100000, "sprite", 0 ) // sprites - PN1 O1 @ B9 for World & Japanese PCBs should match! - which is a bad dump?
+	ROM_LOAD( "pn1_o0.a9", 0x00000, 0x20000, CRC(fda57e8b) SHA1(16a72585268159d24f881dbb1aa6ae82bcc4bde7) ) // silkscreened OBJ0
+	ROM_LOAD( "pn1_o1.b9", 0x20000, 0x20000, CRC(4c08affe) SHA1(f8f60fdc31779e2abe496e36ba0e4f27546cbc54) ) // silkscreened OBJ1
 ROM_END
 
-/* Pac-Mania (Japan) diff o1,s0,s1,p7,v0 */
+/* Pac-Mania (Japan) diff S0, S1, P7, V0 - While O1 is different, it should match the World O1 which has been verified on 2 PCBs */
 ROM_START( pacmaniaj )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
-	ROM_LOAD( "pn1_s0.bin",         0x00000, 0x10000, CRC(d5ef5eee) SHA1(6f263955662defe7a03cc89368b70d5fcb06ee3e) )
-	ROM_LOAD( "pn1_s1.bin",         0x10000, 0x10000, CRC(411bc134) SHA1(89960596def3580d19d9121d1efffbba2d1bdd94) )
+	ROM_LOAD( "pn1_s0.a10", 0x00000, 0x10000, CRC(d5ef5eee) SHA1(6f263955662defe7a03cc89368b70d5fcb06ee3e) ) // silkscreened SOUND0
+	ROM_LOAD( "pn1_s1.b10", 0x10000, 0x10000, CRC(411bc134) SHA1(89960596def3580d19d9121d1efffbba2d1bdd94) ) // silkscreened SOUND1
 
-	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) // 4M for ROMs
 	/* 000000-07ffff empty */
 	/* 080000-0fffff empty */
 	/* 100000-17ffff empty */
 	/* 180000-1fffff empty */
 	/* 200000-27ffff empty */
 	/* 280000-2fffff empty */
-	ROM_LOAD_1024( "pn_prg-6.bin",    0x300000, CRC(fe94900c) SHA1(5ce726baafc5ed24ea4cae33232c97637afb486b) )
-	ROM_LOAD_512 ( "pn1_p7.bin",      0x380000, CRC(2aa99e2b) SHA1(1d5e8ce6eac03696d51b32c1d0f6c3e82f604422) )
+	ROM_LOAD_1024( "pn1_p6.s10", 0x300000, CRC(fe94900c) SHA1(5ce726baafc5ed24ea4cae33232c97637afb486b) ) // silkscreened PRG6
+	ROM_LOAD_512 ( "pn1_p7.t10", 0x380000, CRC(2aa99e2b) SHA1(1d5e8ce6eac03696d51b32c1d0f6c3e82f604422) ) // silkscreened PRG7
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+	ROM_REGION( 0x1000, "mcu", 0 ) // 63701 MCU with internal ROM code
+	ROM_LOAD( "cus64-64a1.m4", 0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) )
 
-	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
-	ROM_LOAD_HS( "pn1_v0.bin",      0x00000, 0x10000, CRC(e2689f79) SHA1(b88e3435f2932901cc0a3b379b31a764bb9b2e2b) )
+	ROM_REGION( 0xc0000, "voice", 0 ) // MCU external ROM
+	ROM_LOAD_HS( "pn1_v0.a4", 0x00000, 0x10000, CRC(e2689f79) SHA1(b88e3435f2932901cc0a3b379b31a764bb9b2e2b) ) // silkscreened VOICE0
 
-	ROM_REGION( 0x20000, "c123tmap:mask", 0 )  /* character mask */
-	ROM_LOAD( "pn1_c8.bin",         0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) )
+	ROM_REGION( 0x20000, "c123tmap:mask", 0 ) // character mask
+	ROM_LOAD( "pn1_c8.t8", 0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) ) // silkscreened CHR8
 
-	ROM_REGION( 0x100000, "c123tmap", 0 ) /* characters */
-	ROM_LOAD( "pn_chr-0.bin",       0x00000, 0x20000, CRC(7c57644c) SHA1(77d9cc9ffbed47a941e4c5e5645d7d1126f6c302) )
-	ROM_LOAD( "pn_chr-1.bin",       0x20000, 0x20000, CRC(7eaa67ed) SHA1(4ad6cfa31d781fa7169663bbc319fc79d8965290) )
-	ROM_LOAD( "pn_chr-2.bin",       0x40000, 0x20000, CRC(27e739ac) SHA1(be9dbd22d988b76f7044328e2056c3f26b703401) )
-	ROM_LOAD( "pn_chr-3.bin",       0x60000, 0x20000, CRC(1dfda293) SHA1(fa01b0b8a820c1d24ff0f84b857d2784f0dac1cf) )
+	ROM_REGION( 0x100000, "c123tmap", 0 ) // characters
+	ROM_LOAD( "pn1_c0.a8", 0x00000, 0x20000, CRC(7c57644c) SHA1(77d9cc9ffbed47a941e4c5e5645d7d1126f6c302) ) // silkscreened CHR0
+	ROM_LOAD( "pn1_c1.b8", 0x20000, 0x20000, CRC(7eaa67ed) SHA1(4ad6cfa31d781fa7169663bbc319fc79d8965290) ) // silkscreened CHR1
+	ROM_LOAD( "pn1_c2.e8", 0x40000, 0x20000, CRC(27e739ac) SHA1(be9dbd22d988b76f7044328e2056c3f26b703401) ) // silkscreened CHR2
+	ROM_LOAD( "pn1_c3.f8", 0x60000, 0x20000, CRC(1dfda293) SHA1(fa01b0b8a820c1d24ff0f84b857d2784f0dac1cf) ) // silkscreened CHR3
 
-	ROM_REGION( 0x100000, "sprite", 0 ) /* sprites */
-	ROM_LOAD( "pn_obj-0.bin",       0x00000, 0x20000, CRC(fda57e8b) SHA1(16a72585268159d24f881dbb1aa6ae82bcc4bde7) )
-	ROM_LOAD( "pn_obj-1.bin",       0x20000, 0x20000, CRC(27bdf440) SHA1(0be16dc73590eb71090e6a0e6ddd6e7f4f3dbfba) )
+	ROM_REGION( 0x100000, "sprite", 0 ) // sprites - PN1 O1 @ B9 for World & Japanese PCBs should match! - which is a bad dump?
+	ROM_LOAD( "pn1_o0.a9", 0x00000, 0x20000, CRC(fda57e8b) SHA1(16a72585268159d24f881dbb1aa6ae82bcc4bde7) ) // silkscreened OBJ0
+	ROM_LOAD( "pnx_o1.b9", 0x20000, 0x20000, CRC(27bdf440) SHA1(0be16dc73590eb71090e6a0e6ddd6e7f4f3dbfba) ) // silkscreened OBJ1
 ROM_END
 
 /* Galaga '88 */
@@ -2053,7 +2052,7 @@ ROM_START( wldcourt )
 ROM_END
 
 /*
-Splatter House
+Splatterhouse
 Namco, 1988
 
 This game runs on Namco System 1 hardware
@@ -2112,7 +2111,7 @@ Notes:
 
       Namco Custom ICs -
                         123 (QFP80)
-                        181 (DIP28, KEYCUS, Splatter House)
+                        181 (DIP28, KEYCUS, Splatterhouse)
                         64A1 (DIP40, 63701 MCU)
 
 
@@ -2919,9 +2918,9 @@ GAME( 1988, mmaze,     0,        ns1,     mmaze,    namcos1_state, init_alice,  
 GAME( 1988, mmaze2,    mmaze,    ns1,     mmaze,    namcos1_state, init_alice,    ROT180, "Namco", "Marchen Maze (Japan, hack?)", MACHINE_SUPPORTS_SAVE ) // removed copyright screen, hacked for export? But still has and requires MCU
 GAME( 1988, bakutotu,  0,        ns1,     bakutotu, namcos1_state, init_bakutotu, ROT180, "Namco", "Bakutotsu Kijuutei", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, wldcourt,  0,        ns1,     wldcourt, namcos1_state, init_wldcourt, ROT180, "Namco", "Pro Tennis World Court (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, splatter,  0,        ns1,     splatter3,namcos1_state, init_splatter, ROT180, "Namco", "Splatter House (World, new version (SH3))", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, splatter2, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatter House (World, old version (SH2))", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, splatterj, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatter House (Japan, SH1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, splatter,  0,        ns1,     splatter3,namcos1_state, init_splatter, ROT180, "Namco", "Splatterhouse (World, new version (SH3))", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, splatter2, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatterhouse (World, old version (SH2))", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, splatterj, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatterhouse (Japan, SH1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, faceoff,   0,        ns1,     faceoff,  namcos1_state, init_faceoff,  ROT180, "Namco", "Face Off (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, rompers,   0,        ns1,     ns1,      namcos1_state, init_rompers,  ROT90,  "Namco", "Rompers (Japan, new version (Rev B))", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, romperso,  rompers,  ns1,     ns1,      namcos1_state, init_rompers,  ROT90,  "Namco", "Rompers (Japan, old version)", MACHINE_SUPPORTS_SAVE )

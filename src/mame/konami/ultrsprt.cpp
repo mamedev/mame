@@ -7,12 +7,14 @@
 */
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/eepromser.h"
 #include "machine/upd4701.h"
 #include "sound/k054539.h"
 #include "sound/k056800.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -31,33 +33,19 @@ public:
 		m_workram(*this, "workram"),
 		m_palette(*this, "palette"),
 		m_eeprom(*this, "eeprom"),
-		m_upd(*this, "upd%u", 1),
+		m_upd(*this, "upd%u", 1U),
+		m_vram(*this, "vram%u", 0U, 512U * 1024U, ENDIANNESS_BIG),
 		m_vrambank(*this, "vram"),
 		m_service(*this, "SERVICE")
 	{ }
 
-	void ultrsprt(machine_config &config);
+	void ultrsprt(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	static const u32 VRAM_PAGES      = 2;
-	static const u32 VRAM_PAGE_BYTES = 512 * 1024;
-
-	required_device<ppc_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<k056800_device> m_k056800;
-	required_shared_ptr<u32> m_workram;
-	required_device<palette_device> m_palette;
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device_array<upd4701_device, 2> m_upd;
-
-	required_memory_bank m_vrambank;
-
-	required_ioport m_service;
-
 	u8 eeprom_r();
 	void eeprom_w(u8 data);
 	u16 upd1_r(offs_t offset);
@@ -69,7 +57,19 @@ private:
 	void sound_map(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
 
-	std::unique_ptr<u32[]> m_vram;
+	required_device<ppc_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k056800_device> m_k056800;
+	required_shared_ptr<u32> m_workram;
+	required_device<palette_device> m_palette;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device_array<upd4701_device, 2> m_upd;
+
+	memory_share_array_creator<u32, 2> m_vram;
+	required_memory_bank m_vrambank;
+
+	required_ioport m_service;
+
 	u32 m_cpu_vram_page;
 };
 
@@ -78,21 +78,18 @@ private:
 
 u32 ultrsprt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	auto const vram = util::big_endian_cast<u8 const>(m_vram.get()) + (m_cpu_vram_page ^ 1) * VRAM_PAGE_BYTES;
+	auto const vram = util::big_endian_cast<u8 const>(&m_vram[m_cpu_vram_page ^ 1][0]);
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		int fb_index = y * 1024;
+		int const fb_index = y * 1024;
 		u16 *dest = &bitmap.pix(y, cliprect.min_x);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; ++x)
 		{
 			u8 const p1 = vram[fb_index + x + 512];
 
-			if (p1 == 0)
-				*dest++ = vram[fb_index + x];
-			else
-				*dest++ = 0x100 + p1;
+			*dest++ = p1 ? (0x100 | p1) : vram[fb_index + x];
 		}
 	}
 
@@ -129,12 +126,8 @@ void ultrsprt_state::eeprom_w(u8 data)
 	m_eeprom->clk_write(!BIT(data, 1));
 	m_eeprom->cs_write(BIT(data, 2));
 
-	u32 vram_page = (data & 0x08) >> 3;
-	if (vram_page != m_cpu_vram_page)
-	{
-		m_vrambank->set_entry(vram_page);
-		m_cpu_vram_page = vram_page;
-	}
+	m_cpu_vram_page = BIT(data, 3);
+	m_vrambank->set_entry(m_cpu_vram_page);
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
 	for (auto &upd : m_upd)
@@ -187,16 +180,16 @@ void ultrsprt_state::sound_map(address_map &map)
 
 static INPUT_PORTS_START( ultrsprt )
 	PORT_START("P1X")
-	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(80) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(200) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(1)
 
 	PORT_START("P1Y")
-	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(80) PORT_PLAYER(1)
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(200) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
 	PORT_START("P2X")
-	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(80) PORT_REVERSE PORT_PLAYER(2)
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(200) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(2)
 
 	PORT_START("P2Y")
-	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(80) PORT_PLAYER(2)
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(200) PORT_KEYDELTA(30) PORT_PLAYER(2)
 
 	PORT_START("BUTTONS")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("upd1", FUNC(upd4701_device::left_w))
@@ -224,11 +217,9 @@ void ultrsprt_state::machine_start()
 	// configure fast RAM regions for DRC
 	m_maincpu->ppcdrc_add_fastram(0xff000000, 0xff01ffff, false, m_workram);
 
-	m_vram = std::make_unique<u32[]>(VRAM_PAGE_BYTES / sizeof(u32) * VRAM_PAGES);
+	for (unsigned i = 0; m_vram.size() > i; ++i)
+		m_vrambank->configure_entry(i, &m_vram[i][0]);
 
-	m_vrambank->configure_entries(0, VRAM_PAGES, m_vram.get(), VRAM_PAGE_BYTES);
-
-	save_pointer(NAME(m_vram), VRAM_PAGE_BYTES / sizeof(u32) * VRAM_PAGES);
 	save_item(NAME(m_cpu_vram_page));
 }
 

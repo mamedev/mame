@@ -124,12 +124,12 @@ Cannot select other options in main menu, including user disk creation [KBD]
 		</part>
 	</software>
 
-	<software name="alpha" supported="no">
+	<software name="alpha" supported="yes">
 		<description>Alpha</description>
 		<year>1986</year>
 		<publisher>スクウェア (Square)</publisher>
 		<notes><![CDATA[
-Corrupt space ship GFX on first gameplay screen, [z80dma] or [FDC]
+Extensive use of [z80dma]
 ]]></notes>
 
 		<info name="usage" value="x1turbo only" />
@@ -2592,6 +2592,7 @@ Broken [kanji] during gameplay (half height)
 	</software>
 
 	<software name="silvergh">
+		<!-- misspelled as "Shilver Ghost" during boot -->
 		<description>Silver Ghost</description>
 		<year>1988</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
@@ -3090,7 +3091,7 @@ Expects [KBD] name entry presses with shift held
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198608xx"/>
-		<info name="alt_title" value="スーパーマリオブラザーズスペシャル"/>
+		<info name="alt_title" value="スーパーマリオブラザーズ スペシャル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="super mario.2d" size="327680" crc="0a54b15e" sha1="5972b491be0a25eae4b9ad8719aa988a76514ba4"/>
@@ -3104,7 +3105,7 @@ Expects [KBD] name entry presses with shift held
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="usage" value="x1turbo only" />
 		<info name="release" value="198608xx"/>
-		<info name="alt_title" value="スーパーマリオブラザーズスペシャル"/>
+		<info name="alt_title" value="スーパーマリオブラザーズ スペシャル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="s_mario.d88" size="348848" crc="46abbc86" sha1="77156b7021529d7b18cb3a8fb346606be95a364d"/>
@@ -3776,6 +3777,7 @@ omake: Broken [kanji] when booting with disk 2 in, cfr. https://tcrf.net/Zeliard
 		<description>The Curse of Mars</description>
 		<year>1988?</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="developer" value="M.N.M. Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="the curse of mars.2d" size="327680" crc="2d7eceae" sha1="e50d56313904d5c246abddac3293a0dd51aeca36"/>
@@ -3787,6 +3789,7 @@ omake: Broken [kanji] when booting with disk 2 in, cfr. https://tcrf.net/Zeliard
 		<description>The Curse of Mars (alt)</description>
 		<year>1988?</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="developer" value="M.N.M. Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="mars.2d" size="327680" crc="7a879e8c" sha1="476ede9ca7a83d57eaf6e14d06cfb7592f75988c"/>
@@ -3892,7 +3895,7 @@ omake: Broken [kanji] when booting with disk 2 in, cfr. https://tcrf.net/Zeliard
 
 	<software name="dslayer">
 	<!-- also found as login_ds.d88, harder version, original is undumped -->
-		<description>Dragon Slayer (Login Version)</description>
+		<description>Dragon Slayer (LOGiN Version)</description>
 		<year>1986?</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ドラゴンスレイヤー"/>
@@ -6021,7 +6024,7 @@ not fit the disk)]
 	<software name="game04">
 <!-- From GAME1-25_List.txt:
 1. パンチボール マリオブラザーズ
-2. マリオブラザーズスペシャル
+2. マリオブラザーズ スペシャル
 3. ギャラクシアン
 4. 野球狂
 5. ジャン狂

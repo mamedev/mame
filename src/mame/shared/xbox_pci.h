@@ -8,12 +8,14 @@
 #include "xbox_nv2a.h"
 #include "xbox_usb.h"
 
+#include "machine/idectrl.h"
 #include "machine/pci.h"
-#include "machine/pci-ide.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ds128x.h"
 #include "machine/am9517a.h"
+
+#include "cpu/dsp563xx/dsp56362.h"
 
 /*
  * Host
@@ -271,8 +273,6 @@ private:
 	void smbus_io2(address_map &map) ATTR_COLD;
 	uint32_t smbus_read(int bus, offs_t offset, uint32_t mem_mask);
 	void smbus_write(int bus, offs_t offset, uint32_t data, uint32_t mem_mask);
-	uint8_t minimum_grant_r() { return 3; }
-	uint8_t maximum_latency_r() { return 1; }
 };
 
 DECLARE_DEVICE_TYPE(MCPX_SMBUS, mcpx_smbus_device)
@@ -314,8 +314,6 @@ private:
 		int port;
 	} connecteds[4];
 	int connecteds_count;
-	uint8_t minimum_grant_r() { return 3; }
-	uint8_t maximum_latency_r() { return 1; }
 };
 
 DECLARE_DEVICE_TYPE(MCPX_OHCI, mcpx_ohci_device)
@@ -367,17 +365,23 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(audio_update);
 
 private:
+	required_device<dsp56362_device> gpdsp; // global processor
+	required_device<dsp56362_device> epdsp; // encode processor
 	required_device<device_memory_interface> cpu;
 	// APU contains 3 dsps: voice processor (VP) global processor (GP) encode processor (EP)
 	struct apu_state {
 		uint32_t memory[0x60000 / 4]{};
 		uint32_t gpdsp_sgaddress = 0; // global processor scatter-gather
 		uint32_t gpdsp_sgblocks = 0;
+		uint32_t gpdsp_sgaddress2 = 0;
+		uint32_t gpdsp_sgblocks2 = 0;
 		uint32_t gpdsp_address = 0;
 		uint32_t epdsp_sgaddress = 0; // encoder processor scatter-gather
 		uint32_t epdsp_sgblocks = 0;
@@ -385,7 +389,7 @@ private:
 		uint32_t epdsp_sgblocks2 = 0;
 		int voice_number = 0;
 		uint32_t voices_heap_blockaddr[1024]{};
-		uint64_t voices_active[4]{}; //one bit for each voice: 1 playing 0 not
+		uint64_t voices_active[4]{}; // one bit for each voice: 1 playing 0 not
 		uint32_t voicedata_address = 0;
 		int voices_frequency[256]{}; // sample rate
 		int voices_position[256]{}; // position in samples * 1000
@@ -396,14 +400,14 @@ private:
 		address_space *space = nullptr;
 	} apust;
 	void apu_mmio(address_map &map) ATTR_COLD;
-	uint8_t minimum_grant_r() { return 1; }
-	uint8_t maximum_latency_r() { return 0xc; }
+	void p_map(address_map &map) ATTR_COLD;
+	uint32_t program_memory_r(offs_t offset);
 };
 
 DECLARE_DEVICE_TYPE(MCPX_APU, mcpx_apu_device)
 
 /*
- * AC97 Audio Controller
+ * AC'97 Audio Controller
  */
 
 class mcpx_ac97_audio_device : public pci_device {
@@ -432,8 +436,6 @@ private:
 	void ac97_mmio(address_map &map) ATTR_COLD;
 	void ac97_io0(address_map &map) ATTR_COLD;
 	void ac97_io1(address_map &map) ATTR_COLD;
-	uint8_t minimum_grant_r() { return 2; }
-	uint8_t maximum_latency_r() { return 5; }
 };
 
 DECLARE_DEVICE_TYPE(MCPX_AC97_AUDIO, mcpx_ac97_audio_device)
@@ -498,8 +500,6 @@ private:
 	void ide_io(address_map &map) ATTR_COLD;
 	void ide_pri_interrupt(int state);
 	void ide_sec_interrupt(int state);
-	uint8_t minimum_grant_r() { return 3; }
-	uint8_t maximum_latency_r() { return 1; }
 };
 
 DECLARE_DEVICE_TYPE(MCPX_IDE, mcpx_ide_device)

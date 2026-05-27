@@ -2,11 +2,11 @@
 // copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-    ZFMicro USB Host controller
+ZFMicro USB Host controller (OHCI)
 
-    TODO:
-    - Stub interface, to be merged with pci-usb;
-    - PCI values omitted from docs, assumes same as OpenHCI;
+TODO:
+- Stub interface, to be merged with pci-usb;
+- PCI values omitted from docs, assumes same as OpenHCI;
 
 **************************************************************************************************/
 
@@ -14,7 +14,7 @@
 #include "zfmicro_usb.h"
 
 #define VERBOSE (LOG_GENERAL)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 

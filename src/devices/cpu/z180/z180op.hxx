@@ -343,7 +343,7 @@ int z180_device::take_interrupt(int irq)
 				case 0xcd0000:  /* call */
 					PUSH( PC );
 					_PCD = irq_vector & 0xffff;
-						/* CALL $xxxx + 'interrupt latency' cycles */
+					/* CALL $xxxx + 'interrupt latency' cycles */
 					cycles += m_cc[Z180_TABLE_op][0xcd] - m_cc[Z180_TABLE_ex][0xff];
 					break;
 				case 0xc30000:  /* jump */

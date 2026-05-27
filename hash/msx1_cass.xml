@@ -708,7 +708,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="aburner">
-		<description>Afterburner (Europe)</description>
+		<description>After Burner (Europe)</description>
 		<year>1988</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="UXK 588"/>
@@ -17048,7 +17048,7 @@ Side B
 	</software>
 
 	<software name="tmtprncs">
-		<description>The Tomato Princess from Salad Land (Japan)</description>
+		<description>Salad no Kuni no Tomato-hime (Japan)</description>
 		<year>1985</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="alt_tilte" value="サラダの国のトマト姫"/>

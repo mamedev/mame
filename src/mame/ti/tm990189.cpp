@@ -474,11 +474,10 @@ void tm990_189_rs232_image_device::call_unload()
 }
 
 
-/* static TMS9902_RTS_CALLBACK( rts_callback )
+/* void tm990189_state::rts_callback(int state)
 {
-    tm990189 *state = device->machine().driver_data<tm990189>();
-    state->m_rs232_rts = RTS;
-    tms9902->set_cts(RTS);
+    m_rs232_rts = state;
+    m_tms9918->set_cts(state);
 } */
 
 void tm990189_state::xmit_callback(uint8_t data)
@@ -865,16 +864,16 @@ ROM_START(990189v)
 	ROM_REGION(0x4000, "maincpu", 0 )
 
 	/* extra ROM */
-	ROM_LOAD("990-469.u32", 0x0800, 0x0800, CRC(08df7edb) SHA1(fa9751fd2e3e5d7ae03819fc9c7099e2ddd9fb53))
+	ROM_LOAD("990-469.u32",  0x0800, 0x0800, CRC(08df7edb) SHA1(fa9751fd2e3e5d7ae03819fc9c7099e2ddd9fb53))
 
 	/* extension ROM */
-	ROM_LOAD_OPTIONAL("demo1000.u13", 0x1000, 0x0800, CRC(c0e16685) SHA1(d0d314134c42fa4682aafbace67f539f67f6ba65))
+	ROM_LOAD("demo1000.u13", 0x1000, 0x0800, CRC(c0e16685) SHA1(d0d314134c42fa4682aafbace67f539f67f6ba65))
 
 	/* extension ROM */
-	ROM_LOAD_OPTIONAL("demo1800.u11", 0x1800, 0x0800, CRC(8737dc4b) SHA1(b87da7aa4d3f909e70f885c4b36999cc1abf5764))
+	ROM_LOAD("demo1800.u11", 0x1800, 0x0800, CRC(8737dc4b) SHA1(b87da7aa4d3f909e70f885c4b36999cc1abf5764))
 
 	/* boot ROM */
-	ROM_LOAD("990-469.u33", 0x3000, 0x1000, CRC(e9b4ac1b) SHA1(96e88f4cb7a374033cdf3af0dc26ca5b1d55b9f9))
+	ROM_LOAD("990-469.u33",  0x3000, 0x1000, CRC(e9b4ac1b) SHA1(96e88f4cb7a374033cdf3af0dc26ca5b1d55b9f9))
 	/*ROM_LOAD("unibasic.bin", 0x3000, 0x1000, CRC(de4d9744) SHA1(47afe7f6b04b564d2f30f21461e0ed7ea97fba4c) )*/ /* older, partial dump of university BASIC */
 ROM_END
 

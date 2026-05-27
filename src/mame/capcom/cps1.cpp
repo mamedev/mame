@@ -12,8 +12,10 @@ Paul Leaman (paul@vortexcomputing.demon.co.uk)
 
 68000 clock speeds are unknown for all games (except where commented)
 
-todo: move the bootleg sets with modified hardware into their own
-      drivers, like capcom/fcrash.cpp
+TODO:
+- move the bootleg sets with modified hardware into their own
+  drivers, like capcom/fcrash.cpp
+- verify wait cycle when accessing ROM/RAMs
 
 
 Notes
@@ -243,10 +245,8 @@ Stephh's log (2006.09.20) :
 #include "cps1.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/eepromser.h"
 #include "machine/upd4701.h"
-#include "sound/qsound.h"
 #include "sound/ymopm.h"
 
 #include "kabuki.h"
@@ -256,69 +256,71 @@ Stephh's log (2006.09.20) :
 
 uint16_t cps_state::cps1_dsw_r(offs_t offset)
 {
-	static const char *const dswname[] = { "IN0", "DSWA", "DSWB", "DSWC" };
-	int in = ioport(dswname[offset])->read();
+	int in = 0xff;
+	switch (offset)
+	{
+		case 0:
+			in = m_io_in[0]->read();
+			break;
+		case 1:
+		case 2:
+		case 3:
+			in = m_dsw[offset - 1]->read();
+			break;
+	}
 	return (in << 8) | 0xff;
 }
 
 uint16_t cps_state::cps1_hack_dsw_r(offs_t offset)
 {
-	static const char *const dswname[] = { "IN0", "DSWA", "DSWB", "DSWC" };
-	int in = ioport(dswname[offset])->read();
-	return (in << 8) | in;
-}
-
-uint16_t cps_state::cps1_in1_r()
-{
-	int in = ioport("IN1")->read();
-	return (in << 8) | in;
-}
-
-uint16_t cps_state::cps1_in2_r()
-{
-	int in = ioport("IN2")->read();
-	return (in << 8) | in;
-}
-
-uint16_t cps_state::cps1_in3_r()
-{
-	int in = ioport("IN3")->read();
+	int in = 0xff;
+	switch (offset)
+	{
+		case 0:
+			in = m_io_in[0]->read();
+			break;
+		case 1:
+		case 2:
+		case 3:
+			in = m_dsw[offset - 1]->read();
+			break;
+	}
 	return (in << 8) | in;
 }
 
 
 void cps_state::cps1_snd_bankswitch_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data & 0x01);
+	m_audiobank->set_entry(BIT(data, 0));
 }
 
 void cps_state::cps1_oki_pin7_w(uint8_t data)
 {
-	m_oki->set_pin7(data & 1);
+	m_oki->set_pin7(BIT(data, 0));
 }
 
 void cps_state::cps1_soundlatch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		m_soundlatch->write(data & 0xff);
+		m_soundlatch[0]->write(data & 0xff);
 	else
-		m_soundlatch->write(data >> 8);
+		m_soundlatch[0]->write(data >> 8);
 }
 
 void cps_state::cps1_soundlatch2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		m_soundlatch2->write(data & 0xff);
+		m_soundlatch[1]->write(data & 0xff);
 }
 
 void cps_state::cps1_coinctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		machine().bookkeeping().coin_counter_w(0, data & 0x0100);
-		machine().bookkeeping().coin_counter_w(1, data & 0x0200);
-		machine().bookkeeping().coin_lockout_w(0, ~data & 0x0400);
-		machine().bookkeeping().coin_lockout_w(1, ~data & 0x0800);
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 8));
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 9));
+		machine().bookkeeping().coin_lockout_w(0, BIT(~data, 10));
+		machine().bookkeeping().coin_lockout_w(1, BIT(~data, 11));
 
 		// bit 15 = CPS-A custom reset?
 	}
@@ -328,10 +330,10 @@ void cps_state::cpsq_coinctrl2_w(offs_t offset, uint16_t data, uint16_t mem_mask
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		machine().bookkeeping().coin_counter_w(2, data & 0x01);
-		machine().bookkeeping().coin_lockout_w(2, ~data & 0x02);
-		machine().bookkeeping().coin_counter_w(3, data & 0x04);
-		machine().bookkeeping().coin_lockout_w(3, ~data & 0x08);
+		machine().bookkeeping().coin_counter_w(2, BIT(data, 0));
+		machine().bookkeeping().coin_lockout_w(2, BIT(~data, 1));
+		machine().bookkeeping().coin_counter_w(3, BIT(data, 2));
+		machine().bookkeeping().coin_lockout_w(3, BIT(~data, 3));
 	}
 }
 
@@ -369,7 +371,7 @@ And particularly on CPS2, CPS-B-21 triggers raster interrupts.
 */
 TIMER_DEVICE_CALLBACK_MEMBER(cps_state::raster_scanline)
 {
-	int scanline = param;
+	const int scanline = param;
 	int raster_irq_pending = 0;
 
 	// clock raster counters on each scanline increment
@@ -429,51 +431,29 @@ void cps_state::cpu_space_map(address_map &map)
 
 uint16_t cps_state::qsound_rom_r(offs_t offset)
 {
-	if (memregion("user1") != nullptr)
+	if (m_audiorom_raw != nullptr)
 	{
-		uint8_t *rom = memregion("user1")->base();
-		return rom[offset] | 0xff00;
+		return m_audiorom_raw[offset] | 0xff00;
 	}
 	else
 	{
-		popmessage("%06x: read sound ROM byte %04x", m_maincpu->pc(), offset);
+		if (!machine().side_effects_disabled())
+			popmessage("%06x: read sound ROM byte %04x", m_maincpu->pc(), offset);
 		return 0;
 	}
-}
-
-uint16_t cps_state::qsound_sharedram1_r(offs_t offset)
-{
-	return m_qsound_sharedram1[offset] | 0xff00;
-}
-
-void cps_state::qsound_sharedram1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-		m_qsound_sharedram1[offset] = data;
-}
-
-uint16_t cps_state::qsound_sharedram2_r(offs_t offset)
-{
-	return m_qsound_sharedram2[offset] | 0xff00;
-}
-
-void cps_state::qsound_sharedram2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-		m_qsound_sharedram2[offset] = data;
 }
 
 void cps_state::qsound_banksw_w(uint8_t data)
 {
 	/* Z80 bank register for music note data. It's odd that it isn't encrypted though. */
 	int bank = data & 0x0f;
-	if ((0x10000 + (bank * 0x4000)) >= memregion("audiocpu")->bytes())
+	if ((0x10000 + (bank * 0x4000)) >= m_audioregion->bytes())
 	{
-		logerror("WARNING: Q sound bank overflow (%02x)\n", data);
+		logerror("%s: WARNING: Q sound bank overflow (%02x)\n", machine().describe_context(), data);
 		bank = 0;
 	}
 
-	membank("bank1")->set_entry(bank);
+	m_audiobank->set_entry(bank);
 }
 
 
@@ -603,14 +583,14 @@ void cps_state::main_map(address_map &map)
 	map(0x800020, 0x800021).nopr();                     /* ? Used by Rockman ? not mapped according to PAL */
 	map(0x800030, 0x800037).w(FUNC(cps_state::cps1_coinctrl_w));
 	/* Forgotten Worlds has dial controls on B-board mapped at 800040-80005f. See below */
-	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
+	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share(m_cps_a_regs);  /* CPS-A custom */
 	/* CPS-B custom is mapped by the PAL IOB2 on the B-board. SF2 revision "E" World and USA 910228 has it at a different
 	   address, see DRIVER_INIT */
-	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");
+	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share(m_cps_b_regs);
 	map(0x800180, 0x800187).w(FUNC(cps_state::cps1_soundlatch_w));    /* Sound command */
 	map(0x800188, 0x80018f).w(FUNC(cps_state::cps1_soundlatch2_w));   /* Sound timer fade */
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram"); /* SF2CE executes code from here */
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share(m_gfxram); /* SF2CE executes code from here */
+	map(0xff0000, 0xffffff).ram().share(m_mainram);
 }
 
 /* Forgotten Worlds has a NEC uPD4701AC on the B-board handling dial inputs from the CN-MOWS connector. */
@@ -651,14 +631,14 @@ SOUNDA15   = pin13 =   (  I1 )
 void cps_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_audiobank);
 	map(0xd000, 0xd7ff).ram();
 	map(0xf000, 0xf001).rw("2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xf002, 0xf002).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xf004, 0xf004).w(FUNC(cps_state::cps1_snd_bankswitch_w));
 	map(0xf006, 0xf006).w(FUNC(cps_state::cps1_oki_pin7_w)); /* controls pin 7 of OKI chip */
-	map(0xf008, 0xf008).r(m_soundlatch, FUNC(generic_latch_8_device::read)); /* Sound command */
-	map(0xf00a, 0xf00a).r(m_soundlatch2, FUNC(generic_latch_8_device::read)); /* Sound timer fade */
+	map(0xf008, 0xf008).r(m_soundlatch[0], FUNC(generic_latch_8_device::read)); /* Sound command */
+	map(0xf00a, 0xf00a).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)); /* Sound timer fade */
 }
 
 void cps_state::qsound_main_map(address_map &map)
@@ -667,28 +647,28 @@ void cps_state::qsound_main_map(address_map &map)
 	map(0x800000, 0x800007).portr("IN1");            /* Player input ports */
 	map(0x800018, 0x80001f).r(FUNC(cps_state::cps1_dsw_r));            /* System input ports / Dip Switches */
 	map(0x800030, 0x800037).w(FUNC(cps_state::cps1_coinctrl_w));
-	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
-	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");    /* CPS-B custom (mapped by LWIO/IOB1 PAL on B-board) */
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram"); /* SF2CE executes code from here */
+	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share(m_cps_a_regs);  /* CPS-A custom */
+	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share(m_cps_b_regs);    /* CPS-B custom (mapped by LWIO/IOB1 PAL on B-board) */
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share(m_gfxram); /* SF2CE executes code from here */
 	map(0xf00000, 0xf0ffff).r(FUNC(cps_state::qsound_rom_r));          /* Slammasters protection */
-	map(0xf18000, 0xf19fff).rw(FUNC(cps_state::qsound_sharedram1_r), FUNC(cps_state::qsound_sharedram1_w));  /* Q RAM */
+	map(0xf18000, 0xf19fff).rw(FUNC(cps_state::qsound_sharedram_r<0>), FUNC(cps_state::qsound_sharedram_w<0>));  /* Q RAM */
 	map(0xf1c000, 0xf1c001).portr("IN2");            /* Player 3 controls (later games) */
 	map(0xf1c002, 0xf1c003).portr("IN3");            /* Player 4 controls ("Muscle Bombers") */
 	map(0xf1c004, 0xf1c005).w(FUNC(cps_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
 	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
-	map(0xf1e000, 0xf1ffff).rw(FUNC(cps_state::qsound_sharedram2_r), FUNC(cps_state::qsound_sharedram2_w));  /* Q RAM */
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0xf1e000, 0xf1ffff).rw(FUNC(cps_state::qsound_sharedram_r<1>), FUNC(cps_state::qsound_sharedram_w<1>));  /* Q RAM */
+	map(0xff0000, 0xffffff).ram().share(m_mainram);
 }
 
-void cps_state::qsound_sub_map(address_map &map)
-{   // used by cps2.c too
+void cps_state::qsound_sub_map(address_map &map) // used by capcom/cps2.cpp too
+{
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");    /* banked (contains music data) */
-	map(0xc000, 0xcfff).ram().share("qsound_ram1");
-	map(0xd000, 0xd002).w("qsound", FUNC(qsound_device::qsound_w));
+	map(0x8000, 0xbfff).bankr(m_audiobank);    /* banked (contains music data) */
+	map(0xc000, 0xcfff).ram().share(m_qsound_sharedram[0]);
+	map(0xd000, 0xd002).w(m_qsound, FUNC(qsound_device::qsound_w));
 	map(0xd003, 0xd003).w(FUNC(cps_state::qsound_banksw_w));
-	map(0xd007, 0xd007).r("qsound", FUNC(qsound_device::qsound_r));
-	map(0xf000, 0xffff).ram().share("qsound_ram2");
+	map(0xd007, 0xd007).r(m_qsound, FUNC(qsound_device::qsound_r));
+	map(0xf000, 0xffff).ram().share(m_qsound_sharedram[1]);
 }
 
 void cps_state::qsound_decrypted_opcodes_map(address_map &map)
@@ -702,14 +682,14 @@ void cps_state::sf2m3_map(address_map &map)
 	map(0x800010, 0x800011).portr("IN1");            /* Player input ports */
 	map(0x800028, 0x80002f).r(FUNC(cps_state::cps1_hack_dsw_r));            /* System input ports / Dip Switches */
 	map(0x800030, 0x800037).w(FUNC(cps_state::cps1_coinctrl_w));
-	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
-	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");   /* CPS-B custom */
-	map(0x800186, 0x800187).r(FUNC(cps_state::cps1_in2_r));            /* Buttons 4,5,6 for both players */
+	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share(m_cps_a_regs);  /* CPS-A custom */
+	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share(m_cps_b_regs);   /* CPS-B custom */
+	map(0x800186, 0x800187).r(FUNC(cps_state::cps1_in_r<2>));            /* Buttons 4,5,6 for both players */
 	map(0x800190, 0x800197).w(FUNC(cps_state::cps1_soundlatch_w));    /* Sound command */
 	map(0x800198, 0x80019f).w(FUNC(cps_state::cps1_soundlatch2_w));   /* Sound timer fade */
 	map(0x8001a0, 0x8001c3).w(FUNC(cps_state::cps1_cps_a_w));
 	map(0x8001c4, 0x8001c5).w(FUNC(cps_state::sf2m3_layer_w));
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share(m_gfxram);
 	map(0xff0000, 0xffffff).ram();
 }
 
@@ -726,17 +706,17 @@ void cps_state::sf2m10_map(address_map &map)
 	map(0x800018, 0x80001f).r(FUNC(cps_state::cps1_hack_dsw_r));
 	map(0x800020, 0x800021).nopr();
 	map(0x800030, 0x800037).w(FUNC(cps_state::cps1_coinctrl_w));
-	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");
-	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");
+	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share(m_cps_a_regs);
+	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share(m_cps_b_regs);
 	map(0x800180, 0x800187).w(FUNC(cps_state::cps1_soundlatch_w));
 	map(0x800188, 0x80018f).w(FUNC(cps_state::cps1_soundlatch2_w));
 	map(0x8001a2, 0x8001b3).w(FUNC(cps_state::cps1_cps_a_w)); // make 8001b2 point at 800110
 	map(0x8001fe, 0x8001ff).nopw(); // writes FFFF here a lot
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share(m_gfxram);
 	map(0xe00000, 0xefffff).ram(); // it writes to the whole range at start
-	map(0xf1c000, 0xf1c001).r(FUNC(cps_state::cps1_in2_r));
+	map(0xf1c000, 0xf1c001).r(FUNC(cps_state::cps1_in_r<2>));
 	map(0xfeff00, 0xfeffff).ram(); // fix stack crash at start
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0xff0000, 0xffffff).ram().share(m_mainram);
 }
 
 void cps_state::varthb2_map(address_map &map)
@@ -745,12 +725,12 @@ void cps_state::varthb2_map(address_map &map)
 	map(0x800000, 0x800007).portr("IN1");            /* Player input ports */
 	map(0x800018, 0x80001f).r(FUNC(cps_state::cps1_hack_dsw_r));            /* System input ports / Dip Switches */
 	map(0x800030, 0x800037).w(FUNC(cps_state::cps1_coinctrl_w));
-	map(0x800100, 0x80013f).w(FUNC(cps_state::varthb2_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
-	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");
+	map(0x800100, 0x80013f).w(FUNC(cps_state::varthb2_cps_a_w)).share(m_cps_a_regs);  /* CPS-A custom */
+	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share(m_cps_b_regs);
 	map(0x800180, 0x800187).w(FUNC(cps_state::cps1_soundlatch_w));    /* Sound command */
 	map(0x800188, 0x80018f).w(FUNC(cps_state::cps1_soundlatch2_w));   /* Sound timer fade */
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share(m_gfxram);
+	map(0xff0000, 0xffffff).ram().share(m_mainram);
 }
 
 void cps_state::varthb3_map(address_map &map) // TODO: check everything
@@ -759,18 +739,18 @@ void cps_state::varthb3_map(address_map &map) // TODO: check everything
 	map(0x880000, 0x880007).portr("IN1");            /* Player input ports */
 	map(0x880008, 0x88000f).r(FUNC(cps_state::cps1_hack_dsw_r));            /* System input ports / Dip Switches */
 	map(0x800030, 0x800037).w(FUNC(cps_state::cps1_coinctrl_w));
-	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
-	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");
+	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share(m_cps_a_regs);  /* CPS-A custom */
+	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share(m_cps_b_regs);
 	map(0x800180, 0x800187).w(FUNC(cps_state::cps1_soundlatch_w));    /* Sound command */
 	map(0x800188, 0x80018f).w(FUNC(cps_state::cps1_soundlatch2_w));   /* Sound timer fade */
-	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
-	map(0xff0000, 0xffffff).ram().share("mainram");
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share(m_gfxram);
+	map(0xff0000, 0xffffff).ram().share(m_mainram);
 }
+
 
 /***********************************************************
              INPUT PORTS, DIPs
 ***********************************************************/
-
 
 #define CPS1_COINAGE_1(diploc) \
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION(diploc ":1,2,3") \
@@ -1608,20 +1588,15 @@ static INPUT_PORTS_START( unsquad )
 	PORT_DIPSETTING(    0x00, DEF_STR( Test ) )
 INPUT_PORTS_END
 
-/* To access the hidden pattern test modes, turn the "Service Mode" dip to ON, and hold down "P1 Button 1"
+/* Final Fight button 3 is not officially documented and does not exist on the control panel, probably a leftover.
+   Pressing it will allow you to escape from grabs and choke holds instantly.
+
+   To access the hidden pattern test modes, turn the "Service Mode" dip to ON, and hold down "P1 Button 1"
    ('Ctrl') or "P1 Button 2" ('Alt') during the bootup test. Button 1 will load the Scroll (Background) test,
-   and Button 2 will load an Obj (Sprite) viewer. */
+   and Button 2 will load an Obj (Sprite) viewer.
+*/
 static INPUT_PORTS_START( ffight )
-	PORT_INCLUDE( cps1_2b )
-
-#if 0
-/* The button below is not officially documented and does not exist on the control panel, probably a leftover.
-   Pressing it will allow you to escape from grabs and choke holds instantly. */
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME ("P1 Button 3 (Cheat)")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME ("P2 Button 3 (Cheat)")
-#endif
+	PORT_INCLUDE( cps1_3b )
 
 	PORT_START("DSWA")
 	CPS1_COINAGE_1( "SW(A)" )
@@ -3904,10 +3879,10 @@ static const gfx_layout cps1_layout32x32 =
 };
 
 GFXDECODE_START( gfx_cps1 )
-	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8,   0, 0x100 )
-	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8_2, 0, 0x100 )
-	GFXDECODE_ENTRY( "gfx", 0, cps1_layout16x16, 0, 0x100 )
-	GFXDECODE_ENTRY( "gfx", 0, cps1_layout32x32, 0, 0x100 )
+	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8,   0, 0x80 )
+	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8_2, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx", 0, cps1_layout16x16, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx", 0, cps1_layout32x32, 0, 0x80 )
 GFXDECODE_END
 
 
@@ -3929,13 +3904,13 @@ MACHINE_START_MEMBER(cps_state,common)
 MACHINE_START_MEMBER(cps_state,cps1)
 {
 	MACHINE_START_CALL_MEMBER(common);
-	membank("bank1")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);
+	m_audiobank->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 MACHINE_START_MEMBER(cps_state,qsound)
 {
 	MACHINE_START_CALL_MEMBER(common);
-	membank("bank1")->configure_entries(0, 6, memregion("audiocpu")->base() + 0x10000, 0x4000);
+	m_audiobank->configure_entries(0, 6, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 void cps_state::cps1_10MHz(machine_config &config)
@@ -3966,8 +3941,8 @@ void cps_state::cps1_10MHz(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	GENERIC_LATCH_8(config, m_soundlatch2);
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	ym2151_device &ym2151(YM2151(config, "2151", XTAL(3'579'545)));  /* verified on pcb */
 	ym2151.irq_handler().set_inputline(m_audiocpu, 0);
@@ -4022,10 +3997,12 @@ void cps_state::qsound(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::qsound_main_map);
 
-	Z80(config.replace(), m_audiocpu, XTAL(8'000'000));  /* verified on pcb */
+	Z80(config.replace(), m_audiocpu, XTAL(8'000'000)); // verified on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps_state::qsound_sub_map);
 	m_audiocpu->set_addrmap(AS_OPCODES, &cps_state::qsound_decrypted_opcodes_map);
-	m_audiocpu->set_periodic_int(FUNC(cps_state::irq0_line_hold), attotime::from_hz(250)); // measured (cps2.cpp)
+
+	const attotime audio_irq_period = attotime::from_hz(XTAL(8'000'000) / 32000); // measured 250Hz (capcom/cps2.cpp)
+	m_audiocpu->set_periodic_int(FUNC(cps_state::irq0_line_hold), audio_irq_period);
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, qsound)
 
@@ -4035,14 +4012,14 @@ void cps_state::qsound(machine_config &config)
 	config.device_remove("mono");
 	SPEAKER(config, "speaker", 2).front();
 
-	config.device_remove("soundlatch");
+	config.device_remove("soundlatch1");
 	config.device_remove("soundlatch2");
 	config.device_remove("2151");
 	config.device_remove("oki");
 
-	qsound_device &qsound(QSOUND(config, "qsound"));
-	qsound.add_route(0, "speaker", 1.0, 0);
-	qsound.add_route(1, "speaker", 1.0, 1);
+	QSOUND(config, m_qsound);
+	m_qsound->add_route(0, "speaker", 1.0, 0);
+	m_qsound->add_route(1, "speaker", 1.0, 1);
 }
 
 void cps_state::wofhfh(machine_config &config)
@@ -5543,7 +5520,7 @@ ROM_START( area88r )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
-	ROM_LOAD( "ara63b.1a",    0x0000, 0x0117, BAD_DUMP CRC(f5569c93) SHA1(7db7cf23639036590eef1e5e309f08560859efaf) ) /* Handcrafted but works on actual PCB.  Redump needed */
+	ROM_LOAD( "ara63b.1a",    0x0000, 0x0117, CRC(3e049379) SHA1(ff8a0e6a4b2c41528b70b997163d7395fb5c9056) )
 	ROM_LOAD( "iob1.12d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 	ROM_LOAD( "bprg1.11d",    0x0000, 0x0117, CRC(31793da7) SHA1(400fa7ac517421c978c1ee7773c30b9ed0c5d3f3) )
 
@@ -6918,6 +6895,43 @@ ROM_START( cawingj )
 	ROM_REGION( 0x0200, "bboardplds", 0 )
 	ROM_LOAD( "ca22b.1a",     0x0000, 0x0117, CRC(5152e678) SHA1(ac61df30cd073b26f2145e3ea0c513ec804d047a) )
 	ROM_LOAD( "iob1.12e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )    /* seen the same pcb with LWIO.12E */
+ROM_END
+
+/* B-Board 91634B-2, Japan Resale Ver. */
+ROM_START( cawingjr )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "usnj_23.8f", 0x00000, 0x80000, CRC(bbe45b1e) SHA1(0191083148ccb3b4755f81f46b51ec23f50cdace) )
+	ROM_LOAD16_WORD_SWAP( "usnj_22.7f", 0x80000, 0x80000, CRC(54872f9f) SHA1(1d556ffe0294a5788f797ce226972470b23cec93) )
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROM_LOAD64_WORD( "usn_01.3a", 0x000000, 0x80000, CRC(c08ffb8b) SHA1(a546237590786af19d9dd9a8428ab1147be1212f) )
+	ROM_LOAD64_WORD( "usn_02.4a", 0x000002, 0x80000, CRC(37b1b27a) SHA1(c27ed4bba1efd3376e5871689c242485f015014f) )
+	ROM_LOAD64_WORD( "usn_03.5a", 0x000004, 0x80000, CRC(9f89a540) SHA1(6948b7fe0e52af4d97b6b1457e97f454b9c047ef) )
+	ROM_LOAD64_WORD( "usn_04.6a", 0x000006, 0x80000, CRC(1f31f1d0) SHA1(c2c5f454d245c8621204a9d35400a4ba8c265a16) )
+
+	ROM_REGION( 0x28000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "usn_09.12f", 0x00000, 0x08000, CRC(0eb8a1d4) SHA1(434b42100ebe85f937c5e01dff90c6ead769946b) )
+	ROM_CONTINUE(           0x10000, 0x18000 )  // second half of ROM is unused, not mapped in memory
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "usn_18.11c",  0x00000, 0x20000, CRC(4a613a2c) SHA1(06e10644fc60925b85d2ca0888c9fa057bfe996a) )   // == ca_18.11c
+	ROM_LOAD( "usn_19.12c",  0x20000, 0x20000, CRC(74584493) SHA1(5cfb15f1b9729323707972646313aee8ab3ac4eb) )   // == ca_19.12c
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "ara63b.1a",    0x0000, 0x0117, CRC(3e049379) SHA1(ff8a0e6a4b2c41528b70b997163d7395fb5c9056) )
+	ROM_LOAD( "iob1.12d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
+	ROM_LOAD( "bprg1.11d",    0x0000, 0x0117, CRC(31793da7) SHA1(400fa7ac517421c978c1ee7773c30b9ed0c5d3f3) )
+
+	ROM_REGION( 0x0200, "cboardplds", 0 )
+	ROM_LOAD( "ioc1.ic7",     0x0000, 0x0104, CRC(a399772d) SHA1(55471189db573dd61e3087d12c55564291672c77) )
+	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
 ROM_END
 
 /* B-Board 89624B-3 */
@@ -13255,7 +13269,7 @@ ROM_START( slammast )
 	ROM_LOAD( "mb_qa.5k",   0x00000, 0x08000, CRC(e21a03c4) SHA1(98c03fd2c9b6bf8a4fc25a4edca87fff7c3c3819) )
 	ROM_CONTINUE(           0x10000, 0x18000 )
 
-	ROM_REGION( 0x8000, "user1", 0 )
+	ROM_REGION( 0x8000, "audiorom_raw", 0 )
 	ROM_COPY( "audiocpu", 0x000000, 0x00000, 0x8000 )
 
 	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
@@ -13318,7 +13332,7 @@ ROM_START( slammastu )
 	ROM_LOAD( "mb_qa.5k",   0x00000, 0x08000, CRC(e21a03c4) SHA1(98c03fd2c9b6bf8a4fc25a4edca87fff7c3c3819) )
 	ROM_CONTINUE(           0x10000, 0x18000 )
 
-	ROM_REGION( 0x8000, "user1", 0 )
+	ROM_REGION( 0x8000, "audiorom_raw", 0 )
 	ROM_COPY( "audiocpu", 0x000000, 0x00000, 0x8000 )
 
 	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
@@ -13378,7 +13392,7 @@ ROM_START( mbomberj )
 	ROM_LOAD( "mb_qa.5k",   0x00000, 0x08000, CRC(e21a03c4) SHA1(98c03fd2c9b6bf8a4fc25a4edca87fff7c3c3819) )
 	ROM_CONTINUE(           0x10000, 0x18000 )
 
-	ROM_REGION( 0x8000, "user1", 0 )
+	ROM_REGION( 0x8000, "audiorom_raw", 0 )
 	ROM_COPY( "audiocpu", 0x000000, 0x00000, 0x8000 )
 
 	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
@@ -14929,11 +14943,11 @@ void cps_state::varthb2_cps_a_w(offs_t offset, uint16_t data)
     In order to keep the cps source in some sort of order, the idea is to group similar bootleg hardware into separate
     derived classes and source files.
 
-    Rom swaps, hacks etc.  (on original Capcom hardware)  ->  cps1.cpp
-    Sound: Z80, 2x YM2203, 2x m5205 ("Final Crash" h/w)   ->  fcrash.cpp
-    Sound: Z80, 1x YM2151, 2x m5205                       ->  cps1bl_5205.cpp
-    Sound: PIC, 1x M6295            *1                    ->  cps1bl_pic.cpp
-    Sound: Z80, 1x YM2151, 1x M6295 *2                    ->  fcrash.cpp      (for now...)
+    Rom swaps, hacks etc.  (on original Capcom hardware)  ->  capcom/cps1.cpp
+    Sound: Z80, 2x YM2203, 2x m5205 ("Final Crash" h/w)   ->  capcom/fcrash.cpp
+    Sound: Z80, 1x YM2151, 2x m5205                       ->  capcom/cps1bl_5205.cpp
+    Sound: PIC, 1x M6295            *1                    ->  capcom/cps1bl_pic.cpp
+    Sound: Z80, 1x YM2151, 1x M6295 *2                    ->  capcom/fcrash.cpp      (for now...)
 
     *1 these seem to be only CPS1.5/Q sound games?
     *2 this is original configuration, but non-Capcom (usually single-board) hardware.
@@ -15009,6 +15023,7 @@ GAME( 1990, cawingr1,    cawing,   cps1_10MHz, cawing,     cps_state, empty_init
 GAME( 1990, cawingu,     cawing,   cps1_10MHz, cawing,     cps_state, empty_init,    ROT0,   "Capcom", "Carrier Air Wing (USA 901130)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, cawingur1,   cawing,   cps1_10MHz, cawing,     cps_state, empty_init,    ROT0,   "Capcom", "Carrier Air Wing (USA 901012)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, cawingj,     cawing,   cps1_10MHz, cawing,     cps_state, empty_init,    ROT0,   "Capcom", "U.S. Navy (Japan 901012)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, cawingjr,    cawing,   cps1_12MHz, cawing,     cps_state, empty_init,    ROT0,   "Capcom", "U.S. Navy (Japan Resale Ver. 901130)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, nemo,        0,        cps1_10MHz, nemo,       cps_state, empty_init,    ROT0,   "Capcom", "Nemo (World 901130)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1990, nemor1,      nemo,     cps1_10MHz, nemo,       cps_state, empty_init,    ROT0,   "Capcom", "Nemo (World 901109)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1990, nemoj,       nemo,     cps1_10MHz, nemo,       cps_state, empty_init,    ROT0,   "Capcom", "Nemo (Japan 901120, 88622B-3 ROM board)", MACHINE_SUPPORTS_SAVE )

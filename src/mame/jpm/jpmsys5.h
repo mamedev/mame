@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "awpvid.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/6821pia.h"

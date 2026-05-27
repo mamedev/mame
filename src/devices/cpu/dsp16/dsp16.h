@@ -17,6 +17,7 @@
 #include <memory>
 #include <utility>
 
+
 class dsp16_device_base : public cpu_device, protected dsp16_disassembler::cpu
 {
 public:
@@ -173,9 +174,11 @@ private:
 
 	// recompiler helpers
 	class core_state;
+	class opcode_desc;
 	class frontend;
 	class recompiler;
-	using core_state_ptr = std::unique_ptr<core_state, void (*)(core_state *)>;
+	struct core_destructer { void operator()(core_state *obj) const noexcept; };
+	using core_state_ptr = std::unique_ptr<core_state, core_destructer>;
 	using recompiler_ptr = std::unique_ptr<recompiler>;
 
 	// internal address maps

@@ -420,10 +420,8 @@ void pooyan_state::machine_start()
 
 void pooyan_state::pooyan(machine_config &config)
 {
-	static constexpr XTAL MASTER_CLOCK = XTAL(18'432'000);
-
 	// basic machine hardware
-	Z80(config, m_maincpu, MASTER_CLOCK / 3 / 2);
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 3 / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pooyan_state::main_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // B2
@@ -439,9 +437,7 @@ void pooyan_state::pooyan(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240); // measured ~60.6Hz
 	screen.set_screen_update(FUNC(pooyan_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(pooyan_state::vblank_irq));

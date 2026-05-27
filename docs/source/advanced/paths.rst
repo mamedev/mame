@@ -7,7 +7,7 @@ MAME has a specific order it uses when checking for user files such as ROM sets 
 Order of Path Loading
 ---------------------
 
-Let's use an example of the cheat file for AfterBurner 2 for Sega Genesis/MegaDrive (aburner2 in the megadrive softlist), and your cheatpath is set to "cheat" (as per the default) -- this is how MAME will search for that cheat file:
+Let's use an example of the cheat file for After Burner 2 for Sega Genesis/MegaDrive (aburner2 in the megadrive softlist), and your cheatpath is set to "cheat" (as per the default) -- this is how MAME will search for that cheat file:
 
 1. ``cheat/megadriv/aburner2.xml``
 2. ``cheat/megadriv.zip`` -> ``aburner2.xml``

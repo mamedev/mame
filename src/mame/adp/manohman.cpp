@@ -229,6 +229,60 @@ void manohman_state::cpu_space_map(address_map &map)
 *          Input Ports Definitions           *
 *********************************************/
 
+static INPUT_PORTS_START( backgamn )
+	PORT_START("SW1")
+	PORT_DIPNAME(0x01, 0x00, "Game Variant")       // Spielvariante
+	PORT_DIPSETTING(   0x00, "Per move")           // pro Zug
+	PORT_DIPSETTING(   0x01, "Per game")           // pro Spiel
+	PORT_DIPNAME(0x02, 0x00, "Game Price")         // Spielpreis
+	PORT_DIPSETTING(   0x02, "Half price")         // halber Preis
+	PORT_DIPSETTING(   0x00, "Full price")         // voller Preis
+	PORT_DIPNAME(0x04, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x04, DEF_STR(On))
+	PORT_DIPNAME(0x08, 0x00, "Clear Highscores")   // Highscore löschen
+	PORT_DIPSETTING(   0x08, DEF_STR(Off))
+	PORT_DIPSETTING(   0x00, "After 30 days")      // nach 30 Tg.
+	PORT_DIPNAME(0x10, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x10, DEF_STR(On))
+	PORT_DIPNAME(0x20, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x20, DEF_STR(On))
+	PORT_DIPNAME(0x40, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x40, DEF_STR(On))
+	PORT_DIPNAME(0x80, 0x00, DEF_STR(Language))    // Sprache
+	PORT_DIPSETTING(   0x00, DEF_STR(German))      // deutsch
+	PORT_DIPSETTING(   0x80, DEF_STR(English))     // englisch
+
+	PORT_START("SW2")
+	PORT_DIPNAME(0x01, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x01, DEF_STR(On))
+	PORT_DIPNAME(0x02, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x02, DEF_STR(On))
+	PORT_DIPNAME(0x04, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x04, DEF_STR(On))
+	PORT_DIPNAME(0x08, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x08, DEF_STR(Off))
+	PORT_DIPNAME(0x10, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x10, DEF_STR(On))
+	PORT_DIPNAME(0x20, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x20, DEF_STR(On))
+	PORT_DIPNAME(0x40, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x40, DEF_STR(On))
+	PORT_DIPNAME(0x80, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x80, DEF_STR(On))
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( manohman )
 
 INPUT_PORTS_END
@@ -276,6 +330,12 @@ ROM_START( backgamn )
 	ROM_LOAD16_BYTE( "b_f2_ii.bin", 0x00001, 0x10000, CRC(8e0ee50c) SHA1(2a05c337db1131b873646aa4109593636ebaa356) )
 ROM_END
 
+ROM_START( backgamnw )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "backgammon_wand_f2_i.u19",  0x00000, 0x10000, CRC(45e280d2) SHA1(65dff9d4884af2d37138f79d71bddd223433b13c) )
+	ROM_LOAD16_BYTE( "backgammon_wand_f2_ii.u20", 0x00001, 0x10000, CRC(ccc536c3) SHA1(82d9243d6f6e05d4ce83d1080c6c038852d2398c) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -283,6 +343,7 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT   COMPANY   FULLNAME         FLAGS
-GAME( 199?, manohman, 0,      manohman, manohman, manohman_state, empty_init, ROT0, "Merkur", "Mann, oh-Mann", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )
-GAME( 1990, backgamn, 0,      manohman, manohman, manohman_state, empty_init, ROT0, "Merkur", "Backgammon",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT        ROT   COMPANY   FULLNAME                FLAGS
+GAME( 199?, manohman,  0,        manohman, manohman, manohman_state, empty_init, ROT0, "Merkur", "Mann, oh-Mann",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )
+GAME( 1990, backgamn,  0,        manohman, backgamn, manohman_state, empty_init, ROT0, "Merkur", "Backgammon",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )
+GAME( 1990, backgamnw, backgamn, manohman, backgamn, manohman_state, empty_init, ROT0, "Merkur", "Backgammon (Wand)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )

@@ -25,7 +25,7 @@ gew12_device::gew12_device(const machine_config &mconfig, const char *tag, devic
 	, m_rom(*this, DEVICE_SELF)
 	, m_bank(*this, "bank%u", 0U)
 {
-	program_config.m_internal_map = address_map_constructor(FUNC(gew12_device::internal_map), this);
+	m_program_config.m_internal_map = address_map_constructor(FUNC(gew12_device::internal_map), this);
 }
 
 

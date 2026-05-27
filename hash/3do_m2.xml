@@ -14,7 +14,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<rom name="imsa racing.iso" size="671399936" crc="96e9befa"/>
 		<rom name="imsa racing.cue" size="77"        crc="590c368f"/>
 	-->
-		<description>IMSA Racing (Unreleased)</description>
+		<description>IMSA Racing (unreleased)</description>
 		<year>199?</year>
 		<publisher>3DO</publisher>
 		<part name="cdrom" interface="cdrom">

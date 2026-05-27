@@ -33,11 +33,11 @@ TODO:
 #define XTAL_5B 24.576_MHz_XTAL
 #define XTAL_5D 33.8688_MHz_XTAL
 
-DEFINE_DEVICE_TYPE(PC9801_118, pc9801_118_device, "pc9801_118", "NEC PC-9801-118")
+DEFINE_DEVICE_TYPE(PC9801_118, pc9801_118_device, "pc9801_118", "NEC PC-9801-118 sound card")
 
 pc9801_118_device::pc9801_118_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_bus(*this, DEVICE_SELF_OWNER)
+	, device_pc98_cbus_slot_interface(mconfig, *this)
 	, m_opn3(*this, "opn3")
 {
 }
@@ -57,7 +57,7 @@ void pc9801_118_device::device_add_mconfig(machine_config &config)
 	// actually YMF297-F (YMF288 + OPL3 compatible FM sources), unknown clock / divider
 	// 5B is near both CS-4232 and this
 	YM2608(config, m_opn3, XTAL_5B * 2 / 5);
-	m_opn3->irq_handler().set([this] (int state) { m_bus->int_w<5>(state); });
+	m_opn3->irq_handler().set([this] (int state) { m_bus->int_w(5, state); });
 //  m_opn3->port_a_read_callback().set(FUNC(pc9801_118_device::opn_porta_r));
 //  m_opn3->port_b_write_callback().set(FUNC(pc9801_118_device::opn_portb_w));
 	m_opn3->add_route(ALL_OUTPUTS, "speaker", 1.00, 0);
@@ -140,79 +140,40 @@ const tiny_rom_entry *pc9801_118_device::device_rom_region() const
 
 void pc9801_118_device::device_start()
 {
-	// hardwired on this board
-	const u16 m_io_base = 0x0188;
-	m_bus->install_io(0xa460, 0xa463, read8sm_delegate(*this, FUNC(pc9801_118_device::id_r)), write8sm_delegate(*this, FUNC(pc9801_118_device::ext_w)));
-
-	m_bus->install_io(
-		m_io_base,
-		m_io_base + 7,
-		read8sm_delegate(*this, FUNC(pc9801_118_device::opn3_r)),
-		write8sm_delegate(*this, FUNC(pc9801_118_device::opn3_w))
-	);
-
 	save_item(NAME(m_ext_reg));
 }
 
 void pc9801_118_device::device_reset()
 {
-	// TODO: is this enabled or disabled at boot?
-	m_ext_reg = 1;
+	// assume disabled on boot
+	m_ext_reg = 0;
 }
 
-void pc9801_118_device::device_validity_check(validity_checker &valid) const
+void pc9801_118_device::remap(int space_id, offs_t start, offs_t end)
 {
-}
-
-
-//**************************************************************************
-//  READ/WRITE HANDLERS
-//**************************************************************************
-
-
-uint8_t pc9801_118_device::opn3_r(offs_t offset)
-{
-	if(((offset & 5) == 0) || m_ext_reg )
-		return m_opn3->read(offset >> 1);
-	else // odd
+	if (space_id == AS_IO)
 	{
-		//printf("PC9801-118: Read to undefined port [%02x]\n",offset+0x188);
-		return 0xff;
+		m_bus->install_device(0x0000, 0xffff, *this, &pc9801_118_device::io_map);
 	}
 }
 
 
-void pc9801_118_device::opn3_w(offs_t offset, uint8_t data)
+void pc9801_118_device::io_map(address_map &map)
 {
-	if( ((offset & 5) == 0) || m_ext_reg )
-		m_opn3->write(offset >> 1,data);
-	//else // odd
-	//  printf("PC9801-118: Write to undefined port [%02x] %02x\n",offset+0x188,data);
+	// hardwired on this board
+	map(0x0188, 0x018f).rw(m_opn3, FUNC(ym2608_device::read), FUNC(ym2608_device::write)).umask16(0x00ff);
+
+	map(0xa460, 0xa460).rw(FUNC(pc9801_118_device::id_r), FUNC(pc9801_118_device::ext_w));
 }
 
-uint8_t pc9801_118_device::id_r(offs_t offset)
+u8 pc9801_118_device::id_r(offs_t offset)
 {
-	if(offset == 0)
-	{
-		logerror("OPN3 EXT read ID [%02x]\n",offset);
-		// TODO: confirm ID
-		// by assumption we make this same as later CanBe releases, may or may not be right
-		return 0x80 | (m_ext_reg & 1);
-	}
-
-	logerror("OPN3 EXT read unk [%02x]\n", offset);
-	return 0xff;
+	return 0x80 | (m_ext_reg & 1);
 }
 
-void pc9801_118_device::ext_w(offs_t offset, uint8_t data)
+void pc9801_118_device::ext_w(offs_t offset, u8 data)
 {
-	if(offset == 0)
-	{
-		m_ext_reg = data & 1;
-		if(data & 2)
-			logerror("%s: extended register %02x write\n", machine().describe_context(), data);
-		return;
-	}
-
-	logerror("%s: EXT write unk %02x -> [%02x]\n", machine().describe_context(), data, offset);
+	m_ext_reg = BIT(data, 0);
+	if (m_ext_reg)
+		popmessage("PC9801-118: extended CS4231 enable");
 }

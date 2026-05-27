@@ -20402,6 +20402,21 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Reworked into Mary-Kate & Ashley: Get a Clue! (mnaclue)
+	     and Maya the Bee & Her Friends (mayabeef)
+	-->
+	<software name="southprk">
+		<description>South Park (prototype)</description>
+		<year>1999</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="524288">
+				<rom name="south park (prototype).u1" size="524288" crc="e79d411a" sha1="ad9240b30e381cd7b260f5fc78aaaeed00c6b43d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spaceinv">
 		<description>Space Invaders (Europe, USA)</description>
 		<year>1999</year>

@@ -837,7 +837,7 @@ void super80v_state::super80v(machine_config &config)
 	TIMER(config, "timer_k").configure_periodic(FUNC(super80v_state::timer_k), attotime::from_hz(300)); // keyb scan
 
 	Z80DMA(config, m_dma, MASTER_CLOCK/6);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	//ba0 - not connected
 	m_dma->in_mreq_callback().set(FUNC(super80v_state::memory_read_byte));

@@ -114,4 +114,11 @@ private:
 	u64 dau_set_psw_flags(s64 d);
 };
 
+
+inline void dsp16_device::core_destructer::operator()(core_state *obj) const noexcept
+{
+	if (obj)
+		obj->~core_state();
+}
+
 #endif // MAME_CPU_DSP16_DSP16CORE_H

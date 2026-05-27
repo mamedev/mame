@@ -954,10 +954,7 @@ void tandy2k_state::machine_reset()
 	m_hires_en = 0;
 	m_clkmouse_cnt = 0;
 	m_clkmouse_irq = 0;
-}
 
-void tandy2k_state::device_reset_after_children()
-{
 	m_pc_keyboard->enable(0);
 }
 
@@ -1076,7 +1073,10 @@ void tandy2k_state::tandy2k(machine_config &config)
 	PIC8259(config, m_pic1, 0);
 	m_pic1->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int1_w));
 
-	I8272A(config, m_fdc, 16_MHz_XTAL / 4, true);
+	// there were two drive types shipped on the 2k, one sets ready when a disk is inserted
+	// and the door closed, the other disconnects ready on the drive itself
+	// the ready line from the cable is connected to the fdc
+	I8272A(config, m_fdc, 16_MHz_XTAL / 4, false);
 	m_fdc->set_select_lines_connected(true);
 	m_fdc->intrq_wr_callback().set(m_pic0, FUNC(pic8259_device::ir4_w));
 	m_fdc->drq_wr_callback().set(FUNC(tandy2k_state::fdc_drq_w));

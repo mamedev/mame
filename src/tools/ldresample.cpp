@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    ldresample.c
+    ldresample.cpp
 
     Laserdisc audio synchronizer and resampler.
 

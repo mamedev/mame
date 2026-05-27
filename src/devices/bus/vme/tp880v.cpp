@@ -34,7 +34,7 @@ vme_tp880v_card_device::vme_tp880v_card_device(machine_config const &mconfig, ch
 	, m_cio(*this, "cio%u", 0U)
 	, m_dma(*this, "dma")
 	, m_rtc(*this, "rtc")
-	, m_scsi(*this, "scsi:7:ncr53c90")
+	, m_scsi(*this, "ncr53c90")
 	, m_duart(*this, "duart")
 	, m_serial(*this, "serial%u", 0U)
 	, m_ram(*this, "ram")
@@ -97,15 +97,14 @@ void vme_tp880v_card_device::device_add_mconfig(machine_config &config)
 
 	// TODO: MC68440 is function and pin compatible with MC68450/HD63450, but
 	// has only two DMA channels instead of four.
-	HD63450(config, m_dma, 10'000'000); // MC68440FN10
-	m_dma->set_cpu_tag(m_ios);
+	HD63450(config, m_dma, 10'000'000, m_ios, AS_PROGRAM); // MC68440FN10
 	m_dma->irq_callback().set_inputline(m_ios, INPUT_LINE_IRQ3);
-	m_dma->dma_read<0>().set(m_scsi, FUNC(ncr53c90_device::dma_r));
-	m_dma->dma_write<0>().set(m_scsi, FUNC(ncr53c90_device::dma_w));
+	m_dma->dma8_read<0>().set(m_scsi, FUNC(ncr53c90_device::dma_r));
+	m_dma->dma8_write<0>().set(m_scsi, FUNC(ncr53c90_device::dma_w));
 
 	M48T02(config, m_rtc, 0); // MK40T02B-25
 
-	NSCSI_BUS(config, "scsi", 0);
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, "tape", false);
@@ -113,15 +112,11 @@ void vme_tp880v_card_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c90", NCR53C90).machine_config(
-		[this](device_t *device)
-		{
-			ncr53c90_device &ncr53c90(downcast<ncr53c90_device &>(*device));
 
-			ncr53c90.set_clock(10'000'000);
-			ncr53c90.irq_handler_cb().set_inputline(m_ios, INPUT_LINE_IRQ2);
-			ncr53c90.drq_handler_cb().set(m_dma, FUNC(hd63450_device::drq0_w));
-		});
+	NCR53C90(config, m_scsi, 10'000'000);
+	scsi.set_external_device(7, m_scsi);
+	m_scsi->irq_handler_cb().set_inputline(m_ios, INPUT_LINE_IRQ2);
+	m_scsi->drq_handler_cb().set(m_dma, FUNC(hd63450_device::drq0_w));
 
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
 	m_duart->irq_cb().set_inputline(m_ios, INPUT_LINE_IRQ6);

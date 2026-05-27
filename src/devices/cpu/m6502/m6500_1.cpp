@@ -111,7 +111,7 @@ m6500_1_device::m6500_1_device(machine_config const &mconfig, char const *tag, d
 	, m_uc{ 0U }
 	, m_lc{ 0U }
 {
-	program_config.m_internal_map = address_map_constructor(FUNC(m6500_1_device::memory_map), this);
+	m_program_config.m_internal_map = address_map_constructor(FUNC(m6500_1_device::memory_map), this);
 }
 
 
@@ -168,7 +168,7 @@ void m6500_1_device::device_reset()
 {
 	m6502_mcu_device_base<m6502_device>::device_reset();
 
-	SP = 0x003fU;
+	m_SP = 0x003fU;
 
 	internal_update();
 

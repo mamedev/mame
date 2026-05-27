@@ -50,7 +50,6 @@ protected:
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_cnxx(uint8_t offset) override;
 	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
-	virtual bool take_c800() override;
 };
 
 /***************************************************************************
@@ -96,11 +95,6 @@ void a2bus_ssb_device::device_start()
 
 void a2bus_ssb_device::device_reset()
 {
-}
-
-bool a2bus_ssb_device::take_c800()
-{
-	return false;
 }
 
 uint8_t a2bus_ssb_device::read_cnxx(uint8_t offset)

@@ -77,23 +77,22 @@ namespace
 		pia.readpa_handler().set(*this, FUNC(coco_symphony_twelve_device::read_porta));
 		pia.writepb_handler().set(*this, FUNC(coco_symphony_twelve_device::write_portb));
 
-		SPEAKER(config, "s12_l").front_left();
-		SPEAKER(config, "s12_r").front_right();
+		SPEAKER(config, "s12", 2).front();
 		AY8910(config, m_ay8910[0], DERIVED_CLOCK(1, 1));
 		m_ay8910[0]->set_flags(AY8910_SINGLE_OUTPUT);
-		m_ay8910[0]->add_route(ALL_OUTPUTS, "s12_l", 0.50);
+		m_ay8910[0]->add_route(ALL_OUTPUTS, "s12", 0.50, 0);
 
 		AY8910(config, m_ay8910[1], DERIVED_CLOCK(1, 1));
 		m_ay8910[1]->set_flags(AY8910_SINGLE_OUTPUT);
-		m_ay8910[1]->add_route(ALL_OUTPUTS, "s12_l", 0.50);
+		m_ay8910[1]->add_route(ALL_OUTPUTS, "s12", 0.50, 0);
 
 		AY8910(config, m_ay8910[2], DERIVED_CLOCK(1, 1));
 		m_ay8910[2]->set_flags(AY8910_SINGLE_OUTPUT);
-		m_ay8910[2]->add_route(ALL_OUTPUTS, "s12_r", 0.50);
+		m_ay8910[2]->add_route(ALL_OUTPUTS, "s12", 0.50, 1);
 
 		AY8910(config, m_ay8910[3], DERIVED_CLOCK(1, 1));
 		m_ay8910[3]->set_flags(AY8910_SINGLE_OUTPUT);
-		m_ay8910[3]->add_route(ALL_OUTPUTS, "s12_r", 0.50);
+		m_ay8910[3]->add_route(ALL_OUTPUTS, "s12", 0.50, 1);
 
 	}
 

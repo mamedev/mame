@@ -67,26 +67,29 @@ std::unique_ptr<util::disasm_interface> mcf5206e_device::create_disassembler()
 
 mcf5206e_device::mcf5206e_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: m68000_musashi_device(mconfig, tag, owner, clock, MCF5206E, 32, 32)
-	, m_coldfire_register_map("cpu_registers", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mcf5206e_device::coldfire_register_map), this))
+	, m_mbar_config("cpu_mbar", ENDIANNESS_BIG, 32, 10, 0, address_map_constructor(FUNC(mcf5206e_device::mbar_map), this))
 	, m_coldfire_vector_map("cpu_space", ENDIANNESS_BIG, 32, 28, 0, address_map_constructor(FUNC(mcf5206e_device::coldfire_vector_map), this))
 	, m_sim(*this, "sim")
 	, m_timer(*this, "timer%u", 1U)
 	, write_chip_select(*this)
-	, m_uart(*this, "coldfire_uart%u", 1U)
+	, m_uart(*this, "uart%u", 1U)
 	, write_tx1(*this)
 	, write_tx2(*this)
+	, m_gpio_r_cb(*this, 0xff)
 	, m_gpio_w_cb(*this)
-	, m_mbus(*this, "coldfire_mbus")
+	, m_mbus(*this, "mbus")
 	, write_sda(*this)
 	, write_scl(*this)
-	, m_dma(*this, "coldfire_dma%u", 0U)
+	, m_dma(*this, "dma%u", 0U)
 {
 }
 
+// TODO: make it derive from m68000_musashi_device properly
 device_memory_interface::space_config_vector mcf5206e_device::memory_space_config() const
 {
 	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_coldfire_register_map),
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO, &m_mbar_config),
 		std::make_pair(AS_CPU_SPACE, &m_coldfire_vector_map)
 	};
 }
@@ -119,10 +122,149 @@ void mcf5206e_device::device_add_mconfig(machine_config &config)
 
 }
 
+static inline u32 dword_from_byte(u8 data) { return data * 0x01010101U; }
+static inline u32 dword_from_word(u16 data) { return data * 0x00010001U; }
+static inline u32 dword_from_unaligned_word(u16 data) { return u32(data) << 8 | ((data >> 8) * 0x01000001U); }
+
+bool mcf5206e_device::is_mbar_access(offs_t offset)
+{
+	const u32 mbar_start = m_mbar & ~1;
+	const u32 mbar_end = m_mbar | 0x3ff;
+	return BIT(m_mbar, 0) && offset >= mbar_start && offset <= mbar_end;
+}
+
+
 void mcf5206e_device::device_start()
 {
 	m68000_musashi_device::device_start();
 	init_cpu_coldfire();
+
+	m_readimm16 = [this](offs_t address) -> u16 {
+		if (is_mbar_access(address))
+			return space(AS_IO).read_word(address & 0x3ff);
+		return m_oprogram32.read_word(address);
+	};
+	m_read8   = [this](offs_t address) -> u8 {
+		if (is_mbar_access(address))
+			return space(AS_IO).read_byte(address & 0x3ff);
+		return m_program32.read_byte(address);
+	};
+	m_read16  = [this](offs_t address) -> u16 {
+		if (is_mbar_access(address))
+			return space(AS_IO).read_word_unaligned(address & 0x3ff);
+
+		return m_program32.read_word_unaligned(address);
+	};
+	m_read32  = [this](offs_t address) -> u32 {
+		if (is_mbar_access(address))
+			return space(AS_IO).read_dword_unaligned(address & 0x3ff);
+		return m_program32.read_dword_unaligned(address);
+	};
+	m_write8  = [this](offs_t address, u8 data)  {
+		if (is_mbar_access(address))
+		{
+			address &= 0x3ff;
+			space(AS_IO).write_dword(address & 0xfffffffcU, dword_from_byte(data), 0xff000000U >> 8 * (address & 3));
+			return;
+		}
+		m_program32.write_dword(address & 0xfffffffcU, dword_from_byte(data), 0xff000000U >> 8 * (address & 3));
+	};
+	m_write16 = [this](offs_t address, u16 data)  {
+		if (is_mbar_access(address))
+		{
+			address &= 0x3ff;
+			switch (address & 3)
+			{
+			case 0:
+				space(AS_IO).write_dword(address, dword_from_word(data), 0xffff0000U);
+				break;
+
+			case 1:
+				space(AS_IO).write_dword(address - 1, dword_from_unaligned_word(data), 0x00ffff00);
+				break;
+
+			case 2:
+				space(AS_IO).write_dword(address - 2, dword_from_word(data), 0x0000ffff);
+				break;
+
+			case 3:
+				space(AS_IO).write_dword(address - 3, dword_from_unaligned_word(data), 0x000000ff);
+				space(AS_IO).write_dword(address + 1, dword_from_byte(data & 0x00ff), 0xff000000U);
+				break;
+			}
+			return;
+		}
+
+		switch (address & 3) {
+		case 0:
+			m_program32.write_dword(address, dword_from_word(data), 0xffff0000U);
+			break;
+
+		case 1:
+			m_program32.write_dword(address - 1, dword_from_unaligned_word(data), 0x00ffff00);
+			break;
+
+		case 2:
+			m_program32.write_dword(address - 2, dword_from_word(data), 0x0000ffff);
+			break;
+
+		case 3:
+			m_program32.write_dword(address - 3, dword_from_unaligned_word(data), 0x000000ff);
+			m_program32.write_dword(address + 1, dword_from_byte(data & 0x00ff), 0xff000000U);
+			break;
+		}
+	};
+	m_write32 = [this](offs_t address, u32 data) {
+		if (is_mbar_access(address))
+		{
+			address &= 0x3ff;
+
+			switch (address & 3)
+			{
+				case 0:
+					space(AS_IO).write_dword(address, data, 0xffffffffU);
+					break;
+
+				case 1:
+					space(AS_IO).write_dword(address - 1, (data & 0xff000000U) | (data & 0xffffff00U) >> 8, 0x00ffffff);
+					space(AS_IO).write_dword(address + 3, dword_from_byte(data & 0x000000ff), 0xff000000U);
+					break;
+
+				case 2:
+					space(AS_IO).write_dword(address - 2, dword_from_word((data & 0xffff0000U) >> 16), 0x0000ffff);
+					space(AS_IO).write_dword(address + 2, dword_from_word(data & 0x0000ffff), 0xffff0000U);
+					break;
+
+				case 3:
+					space(AS_IO).write_dword(address - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
+					space(AS_IO).write_dword(address + 1, rotl_32(data, 8), 0xffffff00U);
+					break;
+			}
+			return;
+		}
+
+		switch (address & 3) {
+		case 0:
+			m_program32.write_dword(address, data, 0xffffffffU);
+			break;
+
+		case 1:
+			m_program32.write_dword(address - 1, (data & 0xff000000U) | (data & 0xffffff00U) >> 8, 0x00ffffff);
+			m_program32.write_dword(address + 3, dword_from_byte(data & 0x000000ff), 0xff000000U);
+			break;
+
+		case 2:
+			m_program32.write_dword(address - 2, dword_from_word((data & 0xffff0000U) >> 16), 0x0000ffff);
+			m_program32.write_dword(address + 2, dword_from_word(data & 0x0000ffff), 0xffff0000U);
+			break;
+
+		case 3:
+			m_program32.write_dword(address - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
+			m_program32.write_dword(address + 1, rotl_32(data, 8), 0xffffff00U);
+			break;
+		}
+	};
+
 
 	init_regs(true);
 
@@ -141,8 +283,8 @@ void mcf5206e_device::device_start()
 	save_item(NAME(m_dmcr));
 
 	save_item(NAME(m_ppddr));
-	save_item(NAME(m_ppdat_in));
 	save_item(NAME(m_ppdat_out));
+
 }
 
 void mcf5206e_device::device_reset()
@@ -158,66 +300,66 @@ void mcf5206e_device::device_reset()
 }
 
 // should be set up in m68000_musashi_device::x4e7a_movec_l_c() to move this map according to the contents of MBAR
-void mcf5206e_device::coldfire_register_map(address_map &map)
+void mcf5206e_device::mbar_map(address_map &map)
 {
 	/* SIM Module */
-	map(0xf0000000, 0xf00000cf).m(m_sim, FUNC(coldfire_sim_device::sim_map));
+	map(0x000, 0x0cf).m(m_sim, FUNC(coldfire_sim_device::sim_map));
 
 	/* dram controller */
-	map(0xf0000046, 0xf0000047).rw(FUNC(mcf5206e_device::dcrr_r), FUNC(mcf5206e_device::dcrr_w));
-	map(0xf000004a, 0xf000004b).rw(FUNC(mcf5206e_device::dctr_r), FUNC(mcf5206e_device::dctr_w));
-	map(0xf000004c, 0xf000004d).rw(FUNC(mcf5206e_device::dcar0_r), FUNC(mcf5206e_device::dcar0_w));
-	map(0xf0000050, 0xf0000053).rw(FUNC(mcf5206e_device::dcmr0_r), FUNC(mcf5206e_device::dcmr0_w));
-	map(0xf0000057, 0xf0000057).rw(FUNC(mcf5206e_device::dccr0_r), FUNC(mcf5206e_device::dccr0_w));
-	map(0xf0000058, 0xf0000059).rw(FUNC(mcf5206e_device::dcar1_r), FUNC(mcf5206e_device::dcar1_w));
-	map(0xf000005c, 0xf000005f).rw(FUNC(mcf5206e_device::dcmr1_r), FUNC(mcf5206e_device::dcmr1_w));
-	map(0xf0000063, 0xf0000063).rw(FUNC(mcf5206e_device::dccr1_r), FUNC(mcf5206e_device::dccr1_w));
+	map(0x046, 0x047).rw(FUNC(mcf5206e_device::dcrr_r), FUNC(mcf5206e_device::dcrr_w));
+	map(0x04a, 0x04b).rw(FUNC(mcf5206e_device::dctr_r), FUNC(mcf5206e_device::dctr_w));
+	map(0x04c, 0x04d).rw(FUNC(mcf5206e_device::dcar0_r), FUNC(mcf5206e_device::dcar0_w));
+	map(0x050, 0x053).rw(FUNC(mcf5206e_device::dcmr0_r), FUNC(mcf5206e_device::dcmr0_w));
+	map(0x057, 0x057).rw(FUNC(mcf5206e_device::dccr0_r), FUNC(mcf5206e_device::dccr0_w));
+	map(0x058, 0x059).rw(FUNC(mcf5206e_device::dcar1_r), FUNC(mcf5206e_device::dcar1_w));
+	map(0x05c, 0x05f).rw(FUNC(mcf5206e_device::dcmr1_r), FUNC(mcf5206e_device::dcmr1_w));
+	map(0x063, 0x063).rw(FUNC(mcf5206e_device::dccr1_r), FUNC(mcf5206e_device::dccr1_w));
 
 	/* chip select registers */
-	map(0xf0000064, 0xf0000065).rw(FUNC(mcf5206e_device::csar0_r), FUNC(mcf5206e_device::csar0_w));
-	map(0xf0000068, 0xf000006b).rw(FUNC(mcf5206e_device::csmr0_r), FUNC(mcf5206e_device::csmr0_w));
-	map(0xf000006e, 0xf000006e).rw(FUNC(mcf5206e_device::cscr0_r), FUNC(mcf5206e_device::cscr0_w));
-	map(0xf0000070, 0xf0000071).rw(FUNC(mcf5206e_device::csar1_r), FUNC(mcf5206e_device::csar1_w));
-	map(0xf0000074, 0xf0000077).rw(FUNC(mcf5206e_device::csmr1_r), FUNC(mcf5206e_device::csmr1_w));
-	map(0xf000007a, 0xf000007a).rw(FUNC(mcf5206e_device::cscr1_r), FUNC(mcf5206e_device::cscr1_w));
-	map(0xf000007c, 0xf000007d).rw(FUNC(mcf5206e_device::csar2_r), FUNC(mcf5206e_device::csar2_w));
-	map(0xf0000080, 0xf0000083).rw(FUNC(mcf5206e_device::csmr2_r), FUNC(mcf5206e_device::csmr2_w));
-	map(0xf0000086, 0xf0000086).rw(FUNC(mcf5206e_device::cscr2_r), FUNC(mcf5206e_device::cscr2_w));
-	map(0xf0000088, 0xf0000089).rw(FUNC(mcf5206e_device::csar3_r), FUNC(mcf5206e_device::csar3_w));
-	map(0xf000008c, 0xf000008f).rw(FUNC(mcf5206e_device::csmr3_r), FUNC(mcf5206e_device::csmr3_w));
-	map(0xf0000092, 0xf0000092).rw(FUNC(mcf5206e_device::cscr3_r), FUNC(mcf5206e_device::cscr3_w));
-	map(0xf0000094, 0xf0000095).rw(FUNC(mcf5206e_device::csar4_r), FUNC(mcf5206e_device::csar4_w));
-	map(0xf0000098, 0xf000009b).rw(FUNC(mcf5206e_device::csmr4_r), FUNC(mcf5206e_device::csmr4_w));
-	map(0xf000009e, 0xf000009e).rw(FUNC(mcf5206e_device::cscr4_r), FUNC(mcf5206e_device::cscr4_w));
-	map(0xf00000a0, 0xf00000a1).rw(FUNC(mcf5206e_device::csar5_r), FUNC(mcf5206e_device::csar5_w));
-	map(0xf00000a4, 0xf00000a7).rw(FUNC(mcf5206e_device::csmr5_r), FUNC(mcf5206e_device::csmr5_w));
-	map(0xf00000aa, 0xf00000aa).rw(FUNC(mcf5206e_device::cscr5_r), FUNC(mcf5206e_device::cscr5_w));
-	map(0xf00000ac, 0xf00000ad).rw(FUNC(mcf5206e_device::csar6_r), FUNC(mcf5206e_device::csar6_w));
-	map(0xf00000b0, 0xf00000b3).rw(FUNC(mcf5206e_device::csmr6_r), FUNC(mcf5206e_device::csmr6_w));
-	map(0xf00000b6, 0xf00000b6).rw(FUNC(mcf5206e_device::cscr6_r), FUNC(mcf5206e_device::cscr6_w));
-	map(0xf00000b8, 0xf00000b9).rw(FUNC(mcf5206e_device::csar7_r), FUNC(mcf5206e_device::csar7_w));
-	map(0xf00000bc, 0xf00000bf).rw(FUNC(mcf5206e_device::csmr7_r), FUNC(mcf5206e_device::csmr7_w));
-	map(0xf00000c2, 0xf00000c2).rw(FUNC(mcf5206e_device::cscr7_r), FUNC(mcf5206e_device::cscr7_w));
-	map(0xf00000c4, 0xf00000c7).rw(FUNC(mcf5206e_device::dmcr_r), FUNC(mcf5206e_device::dmcr_w));
+	map(0x064, 0x065).rw(FUNC(mcf5206e_device::csar0_r), FUNC(mcf5206e_device::csar0_w));
+	map(0x068, 0x06b).rw(FUNC(mcf5206e_device::csmr0_r), FUNC(mcf5206e_device::csmr0_w));
+	map(0x06e, 0x06e).rw(FUNC(mcf5206e_device::cscr0_r), FUNC(mcf5206e_device::cscr0_w));
+	map(0x070, 0x071).rw(FUNC(mcf5206e_device::csar1_r), FUNC(mcf5206e_device::csar1_w));
+	map(0x074, 0x077).rw(FUNC(mcf5206e_device::csmr1_r), FUNC(mcf5206e_device::csmr1_w));
+	map(0x07a, 0x07a).rw(FUNC(mcf5206e_device::cscr1_r), FUNC(mcf5206e_device::cscr1_w));
+	map(0x07c, 0x07d).rw(FUNC(mcf5206e_device::csar2_r), FUNC(mcf5206e_device::csar2_w));
+	map(0x080, 0x083).rw(FUNC(mcf5206e_device::csmr2_r), FUNC(mcf5206e_device::csmr2_w));
+	map(0x086, 0x086).rw(FUNC(mcf5206e_device::cscr2_r), FUNC(mcf5206e_device::cscr2_w));
+	map(0x088, 0x089).rw(FUNC(mcf5206e_device::csar3_r), FUNC(mcf5206e_device::csar3_w));
+	map(0x08c, 0x08f).rw(FUNC(mcf5206e_device::csmr3_r), FUNC(mcf5206e_device::csmr3_w));
+	map(0x092, 0x092).rw(FUNC(mcf5206e_device::cscr3_r), FUNC(mcf5206e_device::cscr3_w));
+	map(0x094, 0x095).rw(FUNC(mcf5206e_device::csar4_r), FUNC(mcf5206e_device::csar4_w));
+	map(0x098, 0x09b).rw(FUNC(mcf5206e_device::csmr4_r), FUNC(mcf5206e_device::csmr4_w));
+	map(0x09e, 0x09e).rw(FUNC(mcf5206e_device::cscr4_r), FUNC(mcf5206e_device::cscr4_w));
+	map(0x0a0, 0x0a1).rw(FUNC(mcf5206e_device::csar5_r), FUNC(mcf5206e_device::csar5_w));
+	map(0x0a4, 0x0a7).rw(FUNC(mcf5206e_device::csmr5_r), FUNC(mcf5206e_device::csmr5_w));
+	map(0x0aa, 0x0aa).rw(FUNC(mcf5206e_device::cscr5_r), FUNC(mcf5206e_device::cscr5_w));
+	map(0x0ac, 0x0ad).rw(FUNC(mcf5206e_device::csar6_r), FUNC(mcf5206e_device::csar6_w));
+	map(0x0b0, 0x0b3).rw(FUNC(mcf5206e_device::csmr6_r), FUNC(mcf5206e_device::csmr6_w));
+	map(0x0b6, 0x0b6).rw(FUNC(mcf5206e_device::cscr6_r), FUNC(mcf5206e_device::cscr6_w));
+	map(0x0b8, 0x0b9).rw(FUNC(mcf5206e_device::csar7_r), FUNC(mcf5206e_device::csar7_w));
+	map(0x0bc, 0x0bf).rw(FUNC(mcf5206e_device::csmr7_r), FUNC(mcf5206e_device::csmr7_w));
+	map(0x0c2, 0x0c2).rw(FUNC(mcf5206e_device::cscr7_r), FUNC(mcf5206e_device::cscr7_w));
+	map(0x0c4, 0x0c7).rw(FUNC(mcf5206e_device::dmcr_r), FUNC(mcf5206e_device::dmcr_w));
 
 	// timer 1
-	map(0xf0000100, 0xf000011f).m(m_timer[0], FUNC(coldfire_timer_device::timer_map));
-	map(0xf0000120, 0xf000013f).m(m_timer[1], FUNC(coldfire_timer_device::timer_map));
+	map(0x100, 0x11f).m(m_timer[0], FUNC(coldfire_timer_device::timer_map));
+	map(0x120, 0x13f).m(m_timer[1], FUNC(coldfire_timer_device::timer_map));
 
-	// uart (mc68681 derrived)
-	map(0xf0000140, 0xf000017c).rw(m_uart[0], FUNC(mcf5206e_uart_device::read), FUNC(mcf5206e_uart_device::write));
-	map(0xf0000180, 0xf00001bc).rw(m_uart[1], FUNC(mcf5206e_uart_device::read), FUNC(mcf5206e_uart_device::write));
+	// uart (mc68681 derived)
+	map(0x140, 0x17f).rw(m_uart[0], FUNC(mcf5206e_uart_device::read), FUNC(mcf5206e_uart_device::write)).umask32(0xff000000);
+	map(0x180, 0x1bf).rw(m_uart[1], FUNC(mcf5206e_uart_device::read), FUNC(mcf5206e_uart_device::write)).umask32(0xff000000);
 
 	// parallel port
-	map(0xf00001c5, 0xf00001c5).rw(FUNC(mcf5206e_device::ppddr_r), FUNC(mcf5206e_device::ppddr_w));
-	map(0xf00001c9, 0xf00001c9).rw(FUNC(mcf5206e_device::ppdat_r), FUNC(mcf5206e_device::ppdat_w));
+	map(0x1c5, 0x1c5).rw(FUNC(mcf5206e_device::ppddr_r), FUNC(mcf5206e_device::ppddr_w));
+	map(0x1c9, 0x1c9).rw(FUNC(mcf5206e_device::ppdat_r), FUNC(mcf5206e_device::ppdat_w));
 
 	// mbus (i2c)
-	map(0xf00001e0, 0xf00001ff).m(m_mbus, FUNC(coldfire_mbus_device::mbus_map));
+	map(0x1e0, 0x1ff).m(m_mbus, FUNC(coldfire_mbus_device::mbus_map));
 
 	// dma
-	map(0xf0000200, 0xf000021f).m(m_dma[0], FUNC(coldfire_dma_device::dma_map));
-	map(0xf0000240, 0xf000025f).m(m_dma[1], FUNC(coldfire_dma_device::dma_map));
+	map(0x200, 0x21f).m(m_dma[0], FUNC(coldfire_dma_device::dma_map));
+	map(0x240, 0x25f).m(m_dma[1], FUNC(coldfire_dma_device::dma_map));
 }
 
 void mcf5206e_device::coldfire_vector_map(address_map &map)
@@ -327,18 +469,9 @@ void mcf5206e_device::dmcr_w(u16 data)
 
 /*
  * Parallel port
- * Just a 8 bit GPIO. Nothing to see here
+ * Just a 8 bit GPIO.
  */
 
-void mcf5206e_device::gpio_pin_w(int pin, int state)
-{
-	BITWRITE(m_ppdat_in, pin, state);
-}
-
-void mcf5206e_device::gpio_port_w(u8 state)
-{
-	m_ppdat_in = state;
-}
 
 void mcf5206e_device::ppddr_w(u8 data)
 {
@@ -351,11 +484,25 @@ void mcf5206e_device::ppddr_w(u8 data)
 		if(!BIT(m_sim->get_par(), 4)) mask |= 0x0f; // PP 0-3 / DDATA 0-3
 		if(!BIT(m_sim->get_par(), 5)) mask |= 0xf0; // PP 4-7 / PST 0-3
 
+		u8 ppdat_in = m_gpio_r_cb();
+
 		// GPIO pins will physically be set to the current input and output state, and masked according to PAR
-		m_gpio_w_cb(((m_ppdat_out & m_ppddr) | (m_ppdat_in & ~m_ppddr)) & mask);
+		m_gpio_w_cb(((m_ppdat_out & m_ppddr) | (ppdat_in & ~m_ppddr)) & mask);
 	}
 
 	m_ppddr = data;
+}
+
+u8 mcf5206e_device::ppddr_r()
+{
+	return m_ppddr;
+}
+
+u8 mcf5206e_device::ppdat_r()
+{
+	u8 ppdat_in = m_gpio_r_cb();
+
+	return (ppdat_in & ~m_ppddr) | (m_ppdat_out & m_ppddr);
 }
 
 void mcf5206e_device::ppdat_w(u8 data)
@@ -366,8 +513,9 @@ void mcf5206e_device::ppdat_w(u8 data)
 	u8 mask = 0;
 	if(!BIT(m_sim->get_par(), 4)) mask |= 0x0f; // PP 0-3 / DDATA 0-3
 	if(!BIT(m_sim->get_par(), 5)) mask |= 0xf0; // PP 4-7 / PST 0-3
+	u8 ppdat_in = m_gpio_r_cb();
 
-	m_gpio_w_cb(((m_ppdat_out & m_ppddr) | (m_ppdat_in & ~m_ppddr)) & mask);
+	m_gpio_w_cb(((m_ppdat_out & m_ppddr) | (ppdat_in & ~m_ppddr)) & mask);
 }
 
 
@@ -909,7 +1057,6 @@ void mcf5206e_device::init_regs(bool first_init)
 	m_dmcr = 0x0000;
 
 	m_ppddr = 0x00;
-	m_ppdat_in = 0x00;
 	m_ppdat_out = 0x00;
 }
 
@@ -975,6 +1122,7 @@ void coldfire_mbus_device::mbus_map(address_map &map)
 TIMER_CALLBACK_MEMBER(coldfire_mbus_device::mbus_callback)
 {
 	// TODO: Do bit transfers etc
+	// gamtor wants i2c irqs, as it runs the task based EEPROM checks there.
 }
 
 void coldfire_mbus_device::madr_w(u8 data)
@@ -1088,6 +1236,8 @@ void coldfire_dma_device::dcr_w(u16 data)
 {
 	m_dcr = data;
 	LOGMASKED(LOG_DMA, "%s: (DMA Control Register) dcr_w: %04x\n", this->machine().describe_context(), data);
+	if (BIT(data, 0))
+		popmessage("%s unemulated DMA trigger", this->tag());
 }
 
 void coldfire_dma_device::bcr_w(u16 data)

@@ -13,43 +13,43 @@ license:CC0-1.0
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="Solaris 8 Installation - SPARC Platform Edition for Sun Computer Systems 10-00 Revision A"/>
 			<diskarea name="cdrom">
-				<disk name="solaris_8_installation_10-00.chd" sha1="c2a783c4a90928eb5e75f031058b15d2516ad609" />
+				<disk name="solaris_8_installation_10-00" sha1="c2a783c4a90928eb5e75f031058b15d2516ad609" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<feature name="part_id" value="Solaris 8 Software - SPARC Platform Edition 10-00 Revision A - 1 of 2"/>
 			<diskarea name="cdrom">
-				<disk name="solaris_8_software_10-00_1_of_2.chd" sha1="dabf63ce5b91873da57590d781eb2d33f3f90749" />
+				<disk name="solaris_8_software_10-00_1_of_2" sha1="dabf63ce5b91873da57590d781eb2d33f3f90749" />
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="cdrom">
 			<feature name="part_id" value="Solaris 8 Software - SPARC Platform Edition 10-00 Revision A - 2 of 2"/>
 			<diskarea name="cdrom">
-				<disk name="solaris_8_software_10-00_2_of_2.chd" sha1="984c8a2d2896fce5f54d735b01d3e0ef7da7c6db" />
+				<disk name="solaris_8_software_10-00_2_of_2" sha1="984c8a2d2896fce5f54d735b01d3e0ef7da7c6db" />
 			</diskarea>
 		</part>
 		<part name="cdrom4" interface="cdrom">
 			<feature name="part_id" value="Solaris 8 Maintenance Update 2 And Installation Guide - SPARC Platform Edition 10-00 Revision A"/>
 			<diskarea name="cdrom">
-				<disk name="solaris_8_maintenance_update_2_and_installation_guide_10-00.chd" sha1="4d6ed28882a02579384bb63850539e77c1283030" />
+				<disk name="solaris_8_maintenance_update_2_and_installation_guide_10-00" sha1="4d6ed28882a02579384bb63850539e77c1283030" />
 			</diskarea>
 		</part>
 		<part name="cdrom5" interface="cdrom">
 			<feature name="part_id" value="Solaris 8 Software Supplement - SPARC Platform Edition for Sun Computer Systems 10-00 Revision A"/>
 			<diskarea name="cdrom">
-				<disk name="solaris_8_software_supplement_10-00.chd" sha1="75d8645b7b6840587d37bb1fb7b50085f46d1491" />
+				<disk name="solaris_8_software_supplement_10-00" sha1="75d8645b7b6840587d37bb1fb7b50085f46d1491" />
 			</diskarea>
 		</part>
 		<part name="cdrom6" interface="cdrom">
 			<feature name="part_id" value="Solaris 8 Documentation - SPARC / Intel PLatform Edition 10-00 Revision A"/>
 			<diskarea name="cdrom">
-				<disk name="solaris_8_documentation_10-00.chd" sha1="56010878650de07a6a844b7ffe2d7b02dd0dcc1a" />
+				<disk name="solaris_8_documentation_10-00" sha1="56010878650de07a6a844b7ffe2d7b02dd0dcc1a" />
 			</diskarea>
 		</part>
 		<part name="cdrom7" interface="cdrom">
 			<feature name="part_id" value="Flash PROM Update Multimedia Answerbook - SPARC Platform Edition for Sun Computer Systems 10-00 Revision A"/>
 			<diskarea name="cdrom">
-				<disk name="flash_prom_update_multimedia_answerbook_10-00.chd" sha1="2190acf740279dec20be16a5703adc1b6915854f" />
+				<disk name="flash_prom_update_multimedia_answerbook_10-00" sha1="2190acf740279dec20be16a5703adc1b6915854f" />
 			</diskarea>
 		</part>
 	</software>
@@ -61,7 +61,7 @@ license:CC0-1.0
 		<publisher>Sun Microsystems</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="sun_management_center_2_1_1.chd" sha1="1a204a0f0ad3d7b34cf577e3d5242eb4f036fb2e" />
+				<disk name="sun_management_center_2_1_1" sha1="1a204a0f0ad3d7b34cf577e3d5242eb4f036fb2e" />
 			</diskarea>
 		</part>
 	</software>
@@ -73,7 +73,7 @@ license:CC0-1.0
 		<publisher>Sun Microsystems</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="sunsolutions_2000_vol_1.chd" sha1="b3b529ba4bc7aa63e58bf99daf1efdfef28762c8" />
+				<disk name="sunsolutions_2000_vol_1" sha1="b3b529ba4bc7aa63e58bf99daf1efdfef28762c8" />
 			</diskarea>
 		</part>
 	</software>
@@ -85,7 +85,7 @@ license:CC0-1.0
 		<publisher>Tech Source Inc.</publisher>
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="raptor_gfx_openwindows_for_solaris.chd" sha1="c6e79c454561eb1735bae77058651fcb2a242a05" />
+				<disk name="raptor_gfx_openwindows_for_solaris" sha1="c6e79c454561eb1735bae77058651fcb2a242a05" />
 			</diskarea>
 		</part>
 	</software>

@@ -20,7 +20,7 @@ public:
 	virtual u8 read_c0nx(u8 offset) override;
 	virtual void write_c0nx(u8 offset, u8 data) override;
 	virtual u8 read_cnxx(u8 offset) override;
-	virtual bool take_c800() override { return false; }
+	virtual void reset_from_bus() override;
 
 protected:
 	a2bus_parprn_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
@@ -273,6 +273,11 @@ void a2bus_4dparprn_device::device_start()
 
 
 void a2bus_parprn_device::device_reset()
+{
+	reset_from_bus();
+}
+
+void a2bus_parprn_device::reset_from_bus()
 {
 	m_ack_latch = 1U;
 }

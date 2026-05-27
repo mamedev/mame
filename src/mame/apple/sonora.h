@@ -16,7 +16,7 @@
 
 // ======================> sonora_device
 
-class sonora_device :  public device_t, public device_sound_interface
+class sonora_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
@@ -63,13 +63,13 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mac_video_sonora_device> m_video;
 	required_device<via6522_device> m_via1;
-	required_device<pseudovia_device> m_pseudovia;
-	required_device<asc_device> m_asc;
+	required_device<sonora_pseudovia_device> m_pseudovia;
+	required_device<asc_sonora_device> m_asc;
 	required_device<applefdintf_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_region_ptr<u32> m_rom;
 
-	std::unique_ptr<u32[]> m_vram;
+	std::unique_ptr<u64[]> m_vram;
 	sound_stream *m_stream;
 	emu_timer *m_6015_timer;
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;

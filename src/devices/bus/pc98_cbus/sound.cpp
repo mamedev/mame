@@ -33,6 +33,7 @@ device_memory_interface::space_config_vector sound_pc9821ce_device::memory_space
 
 const tiny_rom_entry *sound_pc9821ce_device::device_rom_region() const
 {
+	// mapped from pc9821ce base
 	return nullptr;
 }
 
@@ -46,8 +47,6 @@ void sound_pc9821ce_device::device_add_mconfig(machine_config &config)
 void sound_pc9821ce_device::device_start()
 {
 	pc9801_86_device::device_start();
-
-	m_bus->install_device(0xac6c, 0xac6f, *this, &sound_pc9821ce_device::pnp_map);
 }
 
 void sound_pc9821ce_device::device_reset()
@@ -55,10 +54,11 @@ void sound_pc9821ce_device::device_reset()
 	pc9801_86_device::device_reset();
 }
 
-// expects writes with 0x54xx for index, 0x41xx for data
-void sound_pc9821ce_device::pnp_map(address_map &map)
+void sound_pc9821ce_device::io_map(address_map &map)
 {
-	map(0x00, 0x01).lrw16(
+	pc9801_86_device::io_map(map);
+	// expects writes with 0x54xx for index, 0x41xx for data
+	map(0xac6c, 0xac6d).lrw16(
 		NAME([this] (offs_t offset) {
 			return 0x5400 | m_index;
 		}),
@@ -68,7 +68,7 @@ void sound_pc9821ce_device::pnp_map(address_map &map)
 			m_index = data & 0xff;
 		})
 	);
-	map(0x02, 0x03).lrw16(
+	map(0xac6e, 0xac6f).lrw16(
 		NAME([this] (offs_t offset) {
 			return 0x4100 | this->space(0).read_byte(m_index);
 		}),
@@ -154,6 +154,7 @@ device_memory_interface::space_config_vector sound_pc9821cx3_device::memory_spac
 
 const tiny_rom_entry *sound_pc9821cx3_device::device_rom_region() const
 {
+	// mapped from pc9821cx3 base
 	return nullptr;
 }
 
@@ -166,13 +167,18 @@ void sound_pc9821cx3_device::device_add_mconfig(machine_config &config)
 void sound_pc9821cx3_device::device_start()
 {
 	pc9801_118_device::device_start();
-
-	m_bus->install_io(0x0f4a, 0x0f4b, read8sm_delegate(*this, FUNC(sound_pc9821cx3_device::control_r)), write8sm_delegate(*this, FUNC(sound_pc9821cx3_device::control_w)));
 }
 
 void sound_pc9821cx3_device::device_reset()
 {
 	pc9801_118_device::device_reset();
+}
+
+void sound_pc9821cx3_device::io_map(address_map &map)
+{
+	pc9801_118_device::io_map(map);
+
+	map(0x0f4a, 0x0f4b).rw(FUNC(sound_pc9821cx3_device::control_r), FUNC(sound_pc9821cx3_device::control_w));
 }
 
 u8 sound_pc9821cx3_device::control_r(offs_t offset)

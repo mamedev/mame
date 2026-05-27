@@ -421,6 +421,8 @@ void chqflag_state::chqflag(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
+	K051733(config, "k051733", 24_MHz_XTAL / 2);
+
 	ADC0804(config, "adc", RES_K(10), CAP_P(150)).vin_callback().set(FUNC(chqflag_state::analog_read_r));
 
 	// video hardware
@@ -454,8 +456,6 @@ void chqflag_state::chqflag(machine_config &config)
 	m_k051316[1]->set_layermask(0xc0);
 	m_k051316[1]->set_wrap(1);
 	m_k051316[1]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_2));
-
-	K051733(config, "k051733", 24_MHz_XTAL / 2);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

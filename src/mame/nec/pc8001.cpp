@@ -46,6 +46,7 @@ References:
 #include "speaker.h"
 #include "utf8.h"
 
+
 void pc8001_base_state::crtc_reverse_w(int state)
 {
 	// rvv acts as a global flip for reverse attribute meaning
@@ -723,6 +724,31 @@ void pc8001mk2sr_state::machine_reset()
 	//membank("bank2")->set_entry(2);
 }
 
+/* Snapquik */
+
+SNAPSHOT_LOAD_MEMBER(pc8001_state::snapshot_cb)
+{
+	if (m_ram->size() < 0x10000)
+		return std::make_pair(image_error::UNSUPPORTED, std::string("Configured RAM size must be 64K"));
+
+	if (image.length() > 0x8000)
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
+
+	uint8_t *ram = m_ram->pointer();
+
+	std::vector<u8> snapshot(image.length());
+	image.fread(&snapshot[0], image.length());
+
+	std::copy(std::begin(snapshot), std::end(snapshot), &ram[0x8000]);
+	m_maincpu->set_state_int(Z80_SP, ram[0xff3e] | (ram[0xff3f] << 8));
+	m_maincpu->set_pc(0xff3d);
+
+	//m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
+
 /* Machine Drivers */
 
 void pc8001_state::pc8001(machine_config &config)
@@ -778,6 +804,9 @@ void pc8001_state::pc8001(machine_config &config)
 
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K,64K");
 
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "bin,n80", attotime::from_seconds(1)));
+	snapshot.set_load_callback(FUNC(pc8001_state::snapshot_cb));
+
 	SOFTWARE_LIST(config, "disk_n_list").set_original("pc8001_flop");
 
 	/* sound hardware */
@@ -826,7 +855,7 @@ ROM_START( pc8001 )
 	ROM_SYSTEM_BIOS( 2, "v110", "N-BASIC v1.10" )
 	ROMX_LOAD( "n80v110.rom", 0x00000, 0x6000, BAD_DUMP CRC(1e02d93f) SHA1(4603cdb7a3833e7feb257b29d8052c872369e713), ROM_BIOS(2) )
 	// empty socket, cfr. notes in header for usage instructions
-	ROM_LOAD_OPTIONAL( "exprom.ic13", 0x6000, 0x2000, NO_DUMP )
+	ROM_LOAD( "exprom.ic13", 0x6000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x800, CGROM_TAG, 0)
 	ROM_LOAD( "font.rom", 0x000, 0x800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )

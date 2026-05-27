@@ -13,7 +13,8 @@ license:CC0-1.0
 		<publisher>nfg.forums</publisher>
 		<notes><![CDATA[
 Entry level disk image, -chs 8162,8,17
-Games with ERCACHE support fails booting, as per menu note
+Disregard "ERCACHE does not work in emulators" note.
+Xenon 2 and Wings run too fast on pc9821ap2
 ]]></notes>
 		<info name="usage" value="Press W at High Speed Boot error prompt the first time around" />
 		<part name="hdd" interface="ide_hdd">

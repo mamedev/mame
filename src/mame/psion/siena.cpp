@@ -4,6 +4,10 @@
 
     Psion Siena
 
+    TODO:
+    - Siena (US) should report USA instead of English, the locale switch is
+      unknown.
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -33,7 +37,7 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_palette(*this, "palette")
 		, m_keyboard(*this, "COL%u", 0U)
-		, m_speaker(*this, "speaker")
+		, m_buzzer(*this, "buzzer")
 		, m_condor(*this, "condor")
 		, m_honda(*this, "honda")
 	{ }
@@ -52,7 +56,7 @@ private:
 	required_device<nvram_device> m_nvram;
 	required_device<palette_device> m_palette;
 	required_ioport_array<8> m_keyboard;
-	required_device<speaker_sound_device> m_speaker;
+	required_device<speaker_sound_device> m_buzzer;
 	required_device<psion_condor_device> m_condor;
 	required_device<psion_honda_slot_device> m_honda;
 
@@ -86,7 +90,7 @@ static INPUT_PORTS_START( siena )
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1')                  PORT_NAME("1 Min")
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0')
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME)                                                       PORT_NAME("On/CE")           PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(siena_state::wakeup), 0)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNKNOWN) // Reset ?
 
 	PORT_START("COL1")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)          PORT_CHAR('w')  PORT_CHAR('W') PORT_CHAR('"')
@@ -278,7 +282,7 @@ void siena_state::siena(machine_config &config)
 	m_asic9->set_screen("screen");
 	m_asic9->set_ram_rom("ram", "rom");
 	m_asic9->port_ab_r().set(FUNC(siena_state::kbd_r));
-	m_asic9->buz_cb().set(m_speaker, FUNC(speaker_sound_device::level_w));
+	m_asic9->buz_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_asic9->col_cb().set([this](uint8_t data) { m_key_col = data; });
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -290,7 +294,7 @@ void siena_state::siena(machine_config &config)
 	PALETTE(config, "palette", FUNC(siena_state::palette_init), 3);
 
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00); // Piezo buzzer
+	SPEAKER_SOUND(config, m_buzzer).add_route(ALL_OUTPUTS, "mono", 1.00); // Piezo buzzer
 
 	RAM(config, m_ram).set_default_size("512K").set_extra_options("1M");
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
@@ -328,9 +332,16 @@ ROM_START(siena_fr)
 	ROMX_LOAD("vine_v4.21f_frn.bin", 0x00000, 0x100000, CRC(104691d6) SHA1(d1e12b305cd2de7dbf6b1a342adb7bf196d7abcb), ROM_BIOS(0))
 ROM_END
 
+ROM_START(siena_us)
+	ROM_REGION16_LE(0x100000, "rom", 0)
+	ROM_SYSTEM_BIOS(0, "408f", "V4.08F/ENG")
+	ROMX_LOAD("vine_v4.08f_eng.bin", 0x00000, 0x100000, CRC(222a7fd4) SHA1(250f43d327fbd5eea0b6ac4a7d7f514072b738f4), ROM_BIOS(0))
+ROM_END
+
 } // anonymous namespace
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT      CLASS          INIT         COMPANY   FULLNAME           FLAGS
 COMP( 1996, siena,    0,      0,      siena,    siena,     siena_state,   empty_init,  "Psion",  "Siena",           MACHINE_SUPPORTS_SAVE )
 COMP( 1996, siena_fr, siena,  0,      siena,    siena_fr,  siena_state,   empty_init,  "Psion",  "Siena (French)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1996, siena_us, siena,  0,      siena,    siena,     siena_state,   empty_init,  "Psion",  "Siena (US)",      MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

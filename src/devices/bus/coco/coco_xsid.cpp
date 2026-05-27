@@ -36,7 +36,7 @@ class coco_xsid_device : public device_t, public device_cococart_interface
 		virtual void device_add_mconfig(machine_config &config) override ATTR_COLD
 		{
 			SPEAKER(config, "speaker").front_center();
-			MOS8580(config, m_sid, DERIVED_CLOCK(1, 1));
+			MOS8580(config, m_sid, 1'000'000); // not sure what it's derived from
 			m_sid->add_route(ALL_OUTPUTS, "speaker", 1.0);
 		}
 

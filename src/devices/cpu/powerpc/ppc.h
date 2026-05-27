@@ -15,9 +15,7 @@
 
 #include "ppc_dasm.h"
 
-#include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
-#include "cpu/drcumlsh.h"
 
 #include "divtlb.h"
 
@@ -180,6 +178,7 @@ class ppc_device : public cpu_device, public device_vtlb_interface
 {
 protected:
 	class frontend;
+	class opcode_desc;
 
 	/* PowerPC flavors */
 	enum powerpc_flavor
@@ -229,6 +228,7 @@ public:
 
 	void ppc_set_dcstore_callback(write32sm_delegate callback);
 
+	void set_drc_cache_size(size_t bytes) { m_cache.set_size(bytes); }
 	void ppcdrc_set_options(uint32_t options);
 	void ppcdrc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 	void ppcdrc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles);
@@ -259,7 +259,7 @@ public:
 	void ppccom_get_dsisr();
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_stop() override ATTR_COLD;
@@ -698,8 +698,6 @@ protected:
 	bool generate_instruction_3b(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
 	bool generate_instruction_3f(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
 	void log_add_disasm_comment(drcuml_block &block, uint32_t pc, uint32_t op);
-	const char *log_desc_flags_to_string(uint32_t flags);
-	void log_register_list(const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
 	void log_opcode_desc(const opcode_desc *desclist, int indent);
 
 private:

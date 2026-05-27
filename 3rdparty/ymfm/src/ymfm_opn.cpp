@@ -1237,7 +1237,10 @@ void ym2608::write_data_hi(uint8_t data)
 	{
 		// 110: IRQ flag control
 		if (bitfield(data, 7))
+		{
 			m_fm.set_reset_status(0, 0xff);
+			m_adpcm_b.clear_status(adpcm_b_channel::STATUS_EOS | adpcm_b_channel::STATUS_PLAYING);
+		}
 		else
 		{
 			m_flag_control = data;
@@ -2024,6 +2027,8 @@ void ym2610::write_data(uint8_t data)
 		// 1C: EOS flag reset
 		m_flag_mask = ~data & EOS_FLAGS_MASK;
 		m_eos_status &= ~(data & EOS_FLAGS_MASK);
+		if (bitfield(data, 7))
+			m_adpcm_b.clear_status(adpcm_b_channel::STATUS_EOS);
 	}
 	else
 	{

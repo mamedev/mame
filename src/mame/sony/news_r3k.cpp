@@ -26,6 +26,7 @@
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
+#include "bus/nscsi/tape.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/mips/mips1.h"
 #include "imagedev/floppy.h"
@@ -60,7 +61,7 @@ public:
 		, m_net(*this, "net")
 		, m_fdc(*this, "fdc")
 		, m_hid(*this, "hid")
-		, m_scsi(*this, "scsi:7:cxd1185")
+		, m_scsi(*this, "cxd1185")
 		, m_serial(*this, "serial%u", 0U)
 		, m_scsibus(*this, "scsi")
 		, m_led(*this, "led%u", 0U)
@@ -467,7 +468,8 @@ void news_r3k_base_state::debug_w(u8 data)
 static void news_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("cdrom", NSCSI_CDROM_NEWS);
+	device.option_add("tape", NSCSI_TAPE_NEWS);
 }
 
 void news_r3k_base_state::common(machine_config &config)
@@ -501,7 +503,7 @@ void news_r3k_base_state::common(machine_config &config)
 	m_scc->out_rtsb_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
 	m_scc->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 
-	AM7990(config, m_net);
+	AM7990(config, m_net, 20_MHz_XTAL / 2);
 	m_net->intr_out().set(FUNC(news_r3k_base_state::irq_w<LANCE>)).invert();
 	m_net->dma_in().set([this](offs_t offset) { return m_net_ram[offset >> 1]; });
 	m_net->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset >> 1]); });
@@ -525,22 +527,18 @@ void news_r3k_base_state::common(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", news_scsi_devices, nullptr);
 
 	// scsi host adapter
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("cxd1185", CXD1185).clock(16_MHz_XTAL).machine_config(
-		[this] (device_t *device)
-		{
-			cxd1185_device &adapter = downcast<cxd1185_device &>(*device);
+	CXD1185(config, m_scsi, 16_MHz_XTAL);
+	m_scsibus->set_external_device(7, m_scsi);
+	m_scsi->irq_out_cb().set(m_dma, FUNC(dmac_0448_device::irq<0>));
+	m_scsi->drq_out_cb().set(m_dma, FUNC(dmac_0448_device::drq<0>));
+	m_scsi->port_out_cb().set(
+							  [this] (u8 data)
+							  {
+								  LOG("floppy %s\n", BIT(data, 0) ? "mount" : "eject");
+							  });
 
-			adapter.irq_out_cb().set(m_dma, FUNC(dmac_0448_device::irq<0>));
-			adapter.drq_out_cb().set(m_dma, FUNC(dmac_0448_device::drq<0>));
-			adapter.port_out_cb().set(
-				[this] (u8 data)
-				{
-					LOG("floppy %s\n", BIT(data, 0) ? "mount" : "eject");
-				});
-
-			subdevice<dmac_0448_device>(":dma")->dma_r_cb<0>().set(adapter, FUNC(cxd1185_device::dma_r));
-			subdevice<dmac_0448_device>(":dma")->dma_w_cb<0>().set(adapter, FUNC(cxd1185_device::dma_w));
-		});
+	m_dma->dma_r_cb<0>().set(m_scsi, FUNC(cxd1185_device::dma_r));
+	m_dma->dma_w_cb<0>().set(m_scsi, FUNC(cxd1185_device::dma_w));
 
 	NEWS_HID_HLE(config, m_hid);
 	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(FUNC(news_r3k_base_state::irq_w<KBD>));

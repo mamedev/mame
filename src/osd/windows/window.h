@@ -172,13 +172,7 @@ private:
 
 	win_window_info *   m_main;
 	bool                m_attached_mode;
-
-	// these functions first appear in Windows 8/Server 2012
-	OSD_DYNAMIC_API(user32, "User32.dll", "User32.dll");
-	OSD_DYNAMIC_API_FN(user32, BOOL, WINAPI, GetPointerType, UINT32, POINTER_INPUT_TYPE *);
-	OSD_DYNAMIC_API_FN(user32, BOOL, WINAPI, GetPointerInfo, UINT32, POINTER_INFO *);
-	OSD_DYNAMIC_API_FN(user32, BOOL, WINAPI, GetPointerPenInfo, UINT32, POINTER_PEN_INFO *);
-	OSD_DYNAMIC_API_FN(user32, BOOL, WINAPI, GetPointerTouchInfo, UINT32, POINTER_TOUCH_INFO *);
+	bool                m_cursor_clipped;
 
 	// info on currently active pointers - 64 pointers ought to be enough for anyone
 	uint64_t m_pointer_mask;

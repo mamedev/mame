@@ -210,17 +210,13 @@ static void mt6k_ata_devices(device_slot_interface &device)
 void mtxl_state::cdrom(device_t *device)
 {
 	auto ide0 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:0"));
-	ide0->option_reset();
-	mt6k_ata_devices(*ide0);
-	ide0->set_default_option("cdrom");
+	ide0->set_options(mt6k_ata_devices, "cdrom", true);
 }
 
 void mtxl_state::hdd(device_t *device)
 {
 	auto ide0 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:0"));
-	ide0->option_reset();
-	mt6k_ata_devices(*ide0);
-	ide0->set_default_option("hdd");
+	ide0->set_options(mt6k_ata_devices, "hdd", true);
 }
 #endif
 

@@ -111,7 +111,8 @@ bool poly_cpm_format::load(util::random_read &io, uint32_t form_factor, const st
 				sects[i].actual_size = bps;
 				sects[i].size = bps >> 8;
 				sects[i].deleted = false;
-				sects[i].bad_crc = false;
+				sects[i].bad_data_crc = false;
+				sects[i].bad_addr_crc = false;
 				sects[i].data = &sect_data[sdatapos];
 				/*auto const [err, actual] =*/ read(io, sects[i].data, bps); // FIXME: check for errors and premature EOF
 				sdatapos += bps;

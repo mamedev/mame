@@ -56,6 +56,7 @@ protected:
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual void reset_from_bus() override;
 
 	required_device<i8255_device> m_d14;
 	required_device<i8255_device> m_d15;

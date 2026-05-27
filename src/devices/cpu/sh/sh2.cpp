@@ -15,8 +15,13 @@
 
 #include "emu.h"
 #include "sh2.h"
+
+#include "sh2fe.h"
 #include "sh_dasm.h"
+
 #include "cpu/drcumlsh.h"
+
+#include <bit>
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -32,6 +37,10 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 {
 	m_cpu_type = cpu_type;
 	m_isdrc = allow_drc();
+}
+
+sh2_device::~sh2_device()
+{
 }
 
 void sh2_device::device_start()
@@ -191,7 +200,7 @@ void sh2_device::check_pending_irq(const char *message)
 		int irq = m_sh2_state->internal_irq_level;
 		if (m_sh2_state->pending_irq)
 		{
-			int external_irq = 15 - (count_leading_zeros_32(m_sh2_state->pending_irq) - 16);
+			int external_irq = std::bit_width(m_sh2_state->pending_irq) - 1;
 			if (external_irq >= irq)
 			{
 				irq = external_irq;
@@ -492,7 +501,7 @@ void sh2_device::sh2_exception_internal(const char *message, int irqline, int ve
 /////////
 // DRC
 
-const opcode_desc* sh2_device::get_desclist(offs_t pc)
+const sh2_device::opcode_desc* sh2_device::get_desclist(offs_t pc)
 {
 	return m_drcfe->describe_code(pc);
 }

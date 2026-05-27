@@ -90,13 +90,12 @@ public:
 	// CONT output: true when 9914 is current controller-in-charge
 	int cont_r();
 
-private:
-	// device-level overrides
+protected:
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	TIMER_CALLBACK_MEMBER(fsm_tick);
-
+private:
 	devcb_read8 m_dio_read_func;
 	devcb_write8 m_dio_write_func;
 	devcb_write_line::array<IEEE_488_SIGNAL_COUNT> m_signal_wr_fns;
@@ -106,8 +105,8 @@ private:
 	bool m_accrq_line;
 
 	uint8_t m_dio;
-	bool m_signals[ IEEE_488_SIGNAL_COUNT ];
-	bool m_ext_signals[ IEEE_488_SIGNAL_COUNT ];
+	bool m_signals[IEEE_488_SIGNAL_COUNT];
+	bool m_ext_signals[IEEE_488_SIGNAL_COUNT];
 	bool m_no_reflection;
 	bool m_ext_state_change;
 
@@ -244,12 +243,14 @@ private:
 	emu_timer *m_ah_dly_timer;
 	emu_timer *m_c_dly_timer;
 
+	TIMER_CALLBACK_MEMBER(fsm_tick);
+
 	uint8_t get_dio();
 	void set_dio(uint8_t data);
 	bool get_signal(ieee_488_signal_t signal) const;
 	bool get_ifcin() const;
-	void set_ext_signal(ieee_488_signal_t signal , int state);
-	void set_signal(ieee_488_signal_t signal , bool state);
+	void set_ext_signal(ieee_488_signal_t signal, int state);
+	void set_signal(ieee_488_signal_t signal, bool state);
 	void do_swrst();
 	bool listener_reset() const;
 	bool talker_reset() const;
@@ -260,8 +261,8 @@ private:
 	void do_LAF();
 	void do_TAF();
 	void if_cmd_received(uint8_t if_cmd);
-	void dab_received(uint8_t dab , bool eoi);
-	void do_aux_cmd(unsigned cmd , bool set_bit);
+	void dab_received(uint8_t dab, bool eoi);
+	void do_aux_cmd(unsigned cmd, bool set_bit);
 	void set_int0_bit(unsigned bit_no);
 	void set_int1_bit(unsigned bit_no);
 	void update_int();

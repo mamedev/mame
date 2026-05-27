@@ -474,6 +474,9 @@ void hanaawas_state::hanaawasa(machine_config &config)
 
 ***************************************************************************/
 
+// also seen on a HF-922 PCB with a G.G.I. Corporation sticker
+// only difference is in the first ROM where the copyright has been blanked out
+// CRC(f282dc49) SHA1(15788576af8142c14c4407b114c44a8b1a5babbd)
 ROM_START( hanaawas ) // PC0-017-11 PCB?
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "1.1e",       0x0000, 0x2000, CRC(618dc1e3) SHA1(31817f256512352db0d27322998d9dcf95a993cf) )

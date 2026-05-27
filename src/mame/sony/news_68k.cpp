@@ -95,6 +95,7 @@ __|              |         |  |ALS05A| |N82077   |   __             6 x 74F00J->
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
+#include "bus/nscsi/tape.h"
 #include "bus/rs232/rs232.h"
 
 #include "machine/input_merger.h"
@@ -120,7 +121,7 @@ public:
 		, m_scc(*this, "scc")
 		, m_net(*this, "net")
 		, m_fdc(*this, "fdc")
-		, m_scsi(*this, "scsi:7:cxd1180")
+		, m_scsi(*this, "cxd1180")
 		, m_hid(*this, "hid")
 		, m_serial(*this, "serial%u", 0U)
 		, m_irq5(*this, "irq5")
@@ -372,7 +373,8 @@ u32 news_68k_state::bus_error_r()
 static void news_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("cdrom", NSCSI_CDROM_NEWS);
+	device.option_add("tape", NSCSI_TAPE_NEWS);
 }
 
 void news_68k_state::common(machine_config &config)
@@ -421,7 +423,7 @@ void news_68k_state::common(machine_config &config)
 	m_scc->out_rtsb_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
 	m_scc->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 
-	AM7990(config, m_net);
+	AM7990(config, m_net, 20_MHz_XTAL / 2);
 	m_net->intr_out().set(FUNC(news_68k_state::irq_w<LANCE>)).invert();
 	m_net->dma_in().set([this](offs_t offset) { return m_net_ram[(offset >> 1) & 0x1fff]; });
 	m_net->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_net_ram[(offset >> 1) & 0x1fff]); });
@@ -435,7 +437,7 @@ void news_68k_state::common(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
 	// scsi bus and devices
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 
 	/*
 	 * CDC WREN V HH 94221-5 (5.25" half-height SCSI-1 single-ended)
@@ -453,18 +455,13 @@ void news_68k_state::common(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", news_scsi_devices, nullptr);
 
 	// scsi host adapter
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("cxd1180", CXD1180).machine_config(
-		[this](device_t *device)
-		{
-			cxd1180_device &adapter = downcast<cxd1180_device &>(*device);
-
-			adapter.irq_handler().set(*this, FUNC(news_68k_state::irq_w<SCSI>));
-			adapter.irq_handler().append(m_dma, FUNC(dmac_0266_device::eop_w));
-			adapter.drq_handler().set(m_dma, FUNC(dmac_0266_device::req_w));
-
-			subdevice<dmac_0266_device>(":dma")->dma_r_cb().set(adapter, FUNC(cxd1180_device::dma_r));
-			subdevice<dmac_0266_device>(":dma")->dma_w_cb().set(adapter, FUNC(cxd1180_device::dma_w));
-		});
+	CXD1180(config, m_scsi);
+	scsi.set_external_device(7, m_scsi);
+	m_scsi->irq_handler().set(DEVICE_SELF, FUNC(news_68k_state::irq_w<SCSI>));
+	m_scsi->irq_handler().append(m_dma, FUNC(dmac_0266_device::eop_w));
+	m_scsi->drq_handler().set(m_dma, FUNC(dmac_0266_device::req_w));
+	m_dma->dma_r_cb().set(m_scsi, FUNC(cxd1180_device::dma_r));
+	m_dma->dma_w_cb().set(m_scsi, FUNC(cxd1180_device::dma_w));
 
 	NEWS_HID_HLE(config, m_hid);
 

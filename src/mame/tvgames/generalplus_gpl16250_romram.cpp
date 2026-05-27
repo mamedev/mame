@@ -282,23 +282,23 @@ static INPUT_PORTS_START( jak_ths )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-uint16_t wrlshunt_game_state::cs0_r(offs_t offset)
+u16 wrlshunt_game_state::cs0_r(offs_t offset)
 {
 	return m_romregion[offset & m_romwords_mask];
 }
 
-void wrlshunt_game_state::cs0_w(offs_t offset, uint16_t data)
+void wrlshunt_game_state::cs0_w(offs_t offset, u16 data)
 {
 	logerror("cs0_w write to ROM?\n");
 	//m_romregion[offset & 0x3ffffff] = data;
 }
 
-uint16_t wrlshunt_game_state::cs1_r(offs_t offset)
+u16 wrlshunt_game_state::cs1_r(offs_t offset)
 {
 	return m_sdram[offset & 0x3fffff];
 }
 
-void wrlshunt_game_state::cs1_w(offs_t offset, uint16_t data)
+void wrlshunt_game_state::cs1_w(offs_t offset, u16 data)
 {
 	m_sdram[offset & 0x3fffff] = data;
 }
@@ -306,6 +306,8 @@ void wrlshunt_game_state::cs1_w(offs_t offset, uint16_t data)
 
 void wrlshunt_game_state::machine_start()
 {
+	gcm394_game_state::machine_start();
+
 	m_romwords_mask = (memregion("maincpu")->bytes()/2)-1;
 	save_item(NAME(m_sdram));
 }
@@ -313,11 +315,9 @@ void wrlshunt_game_state::machine_start()
 void wrlshunt_game_state::machine_reset()
 {
 	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
-	m_maincpu->set_cs_space(m_memory->get_program());
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
 	//m_maincpu->set_paldisplaybank_high_hack(1);
-	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
 void wrlshunt_game_state::init_wrlshunt()
@@ -335,19 +335,19 @@ void wrlshunt_game_state::gpl16250_romram(machine_config &config)
 	gcm394_game_state::base(config);
 }
 
-uint16_t wrlshunt_game_state::porta_r()
+u16 wrlshunt_game_state::porta_r()
 {
-	uint16_t data = m_io[0]->read();
+	u16 data = m_io[0]->read();
 	logerror("%s: Port A Read: %04x\n",  machine().describe_context(), data);
 	return data;
 }
 
-void wrlshunt_game_state::porta_w(uint16_t data)
+void wrlshunt_game_state::porta_w(u16 data)
 {
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
 
 	// HACK
-	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	if (mem.read_word(0x5b354) == 0xafd0)   // wrlshubt - skip check (EEPROM?)
 		mem.write_word(0x5b354, 0xB403);
 }
@@ -355,15 +355,15 @@ void wrlshunt_game_state::porta_w(uint16_t data)
 
 
 
-uint16_t jak_s500_game_state::porta_r()
+u16 jak_s500_game_state::porta_r()
 {
-	uint16_t data = m_io[0]->read();
+	u16 data = m_io[0]->read();
 	logerror("%s: Port A Read: %04x\n", machine().describe_context(), data);
 
 	// these are debug helpers to access the test modes while we don't have the
 	// secret codes / controls mapped properly
 
-	//address_space& mem = m_maincpu->space(AS_PROGRAM);
+	//address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 	//if (mem.read_word(0x22b408) == 0x4846)
 	//  mem.write_word(0x22b408, 0x4840);    // jak_s500 force service mode
@@ -383,9 +383,9 @@ uint16_t jak_s500_game_state::porta_r()
 	return data;
 }
 
-uint16_t jak_s500_game_state::portb_r()
+u16 jak_s500_game_state::portb_r()
 {
-	uint16_t data = m_io[1]->read();
+	u16 data = m_io[1]->read();
 	logerror("%s: Port B Read: %04x\n", machine().describe_context(), data);
 	return data;
 }
@@ -394,11 +394,9 @@ uint16_t jak_s500_game_state::portb_r()
 void jak_s500_game_state::machine_reset()
 {
 	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
-	m_maincpu->set_cs_space(m_memory->get_program());
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
 	//m_maincpu->set_paldisplaybank_high_hack(0);
-	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
 
@@ -425,12 +423,10 @@ void jak_pf_game_state::machine_reset()
 void jak_prft_game_state::machine_reset()
 {
 	jak_s500_game_state::machine_reset();
-	//m_maincpu->set_alt_tile_addressing_hack(0);
-	m_maincpu->set_alt_extrasprite_hack(1);
 }
 
 
-uint16_t paccon_game_state::paccon_speedup_hack_r()
+u16 paccon_game_state::paccon_speedup_hack_r()
 {
 	u32 const pc = m_maincpu->pc();
 	if (pc == 0x30033)
@@ -438,7 +434,7 @@ uint16_t paccon_game_state::paccon_speedup_hack_r()
 	return m_maincpu->get_ram_addr(0x6593);
 }
 
-uint16_t jak_pf_game_state::jak_pf_speedup_hack_r()
+u16 jak_pf_game_state::jak_pf_speedup_hack_r()
 {
 	u32 const pc = m_maincpu->pc();
 	if (pc == 0x30010)
@@ -446,7 +442,7 @@ uint16_t jak_pf_game_state::jak_pf_speedup_hack_r()
 	return m_maincpu->get_ram_addr(0x0001);
 }
 
-uint16_t jak_pf_game_state::jak_pf_speedup_hack2_r()
+u16 jak_pf_game_state::jak_pf_speedup_hack2_r()
 {
 	u32 const pc = m_maincpu->pc();
 	if (pc == 0x2611b4)
@@ -671,5 +667,5 @@ CONS(2011, jak_sinv, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_
 CONS(2011, wrlshunt, 0, 0, gpl16250_romram, wrlshunt, wrlshunt_game_state, init_wrlshunt, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // ぼくはトミカドライバー はたらくのりもの大集合！
-CONS(2014, tomycar,  0, 0, gpl16250_romram, paccon, jak_prft_game_state, init_wrlshunt, "Tomy Takara", "Boku wa Tomica Driver - Hataraku Norimono Daishuugou! (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2014, tomycar,  0, 0, gpl16250_romram, paccon, jak_prft_game_state, init_wrlshunt, "Takara Tomy", "Boku wa Tomica Driver - Hataraku Norimono Daishuugou! (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 

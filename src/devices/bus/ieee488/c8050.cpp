@@ -25,18 +25,25 @@
 #include "emu.h"
 #include "c8050.h"
 
+#include "c8050fdc.h"
+
+#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m6504.h"
+#include "machine/6522via.h"
+#include "machine/mos6530.h"
+
 #include "formats/d80_dsk.h"
 #include "formats/d82_dsk.h"
 
 
+
+namespace {
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
 
 #define M6502_TAG       "un1"
-#define M6532_0_TAG     "uc1"
-#define M6532_1_TAG     "ue1"
 #define M6504_TAG       "uh3"
 #define M6530_TAG       "uk3"
 #define FDC_TAG         "fdc"
@@ -53,13 +60,121 @@ enum
 
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C8050,   c8050_device,   "c8050",   "Commodore 8050")
-DEFINE_DEVICE_TYPE(C8250,   c8250_device,   "c8250",   "Commodore 8250")
-DEFINE_DEVICE_TYPE(C8250LP, c8250lp_device, "c8250lp", "Commodore 8250LP")
-DEFINE_DEVICE_TYPE(SFD1001, sfd1001_device, "sfd1001", "Commodore SFD-1001")
+// ======================> c8050_device
+
+class c8050_device : public device_t, public device_ieee488_interface
+{
+public:
+	// construction/destruction
+	c8050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	c8050_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	// device_ieee488_interface implementation
+	virtual void ieee488_atn(int state) override;
+	virtual void ieee488_ifc(int state) override;
+
+	void add_common_devices(machine_config &config);
+	inline void update_ieee_signals();
+
+	uint8_t dio_r() { return m_bus->dio_r(); };
+	void dio_w(uint8_t data) { m_bus->dio_w(this, data); };
+	uint8_t riot1_pa_r();
+	void riot1_pa_w(uint8_t data);
+	uint8_t riot1_pb_r();
+	void riot1_pb_w(uint8_t data);
+	void via_pb_w(uint8_t data);
+
+	required_device<m6502_device> m_maincpu;
+	required_device<m6504_device> m_fdccpu;
+	required_device<mos6532_device> m_riot0;
+	required_device<mos6532_device> m_riot1;
+	required_device<mos6530_device> m_miot;
+	required_device<via6522_device> m_via;
+	required_device<floppy_connector> m_floppy0;
+	optional_device<floppy_connector> m_floppy1;
+	required_device<c8050_fdc_device> m_fdc;
+	required_ioport m_address;
+	output_finder<4> m_leds;
+
+	void c8050_fdc_mem(address_map &map) ATTR_COLD;
+	void c8050_main_mem(address_map &map) ATTR_COLD;
+	void c8250lp_fdc_mem(address_map &map) ATTR_COLD;
+	void sfd1001_fdc_mem(address_map &map) ATTR_COLD;
+
+	// IEEE-488 bus
+	int m_rfdo;                         // not ready for data output
+	int m_daco;                         // not data accepted output
+	int m_atna;                         // attention acknowledge
+	int m_ifc;
+
+private:
+	static void floppy_formats(format_registration &fr);
+};
+
+
+// ======================> c8250_device
+
+class c8250_device : public c8050_device
+{
+public:
+	// construction/destruction
+	c8250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	static void floppy_formats(format_registration &fr);
+};
+
+
+// ======================> c8250lp_device
+
+class c8250lp_device : public c8050_device
+{
+public:
+	// construction/destruction
+	c8250lp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_t implementation
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	static void floppy_formats(format_registration &fr);
+};
+
+
+// ======================> sfd1001_device
+
+class sfd1001_device : public c8050_device
+{
+public:
+	// construction/destruction
+	sfd1001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_t implementation
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	static void floppy_formats(format_registration &fr);
+};
 
 
 //-------------------------------------------------
@@ -82,11 +197,15 @@ DEFINE_DEVICE_TYPE(SFD1001, sfd1001_device, "sfd1001", "Commodore SFD-1001")
 */
 
 ROM_START( c8050 ) // schematic 8050001
-	ROM_DEFAULT_BIOS("dos27")
-	ROM_SYSTEM_BIOS( 0, "dos25r1", "DOS 2.5 Revision 1" )
-	ROM_SYSTEM_BIOS( 1, "dos25r2", "DOS 2.5 Revision 2" )
-	ROM_SYSTEM_BIOS( 2, "dos25r3", "DOS 2.5 Revision 3" )
-	ROM_SYSTEM_BIOS( 3, "dos27", "DOS 2.7" )// 2364 ROM DOS 2.7
+	ROM_DEFAULT_BIOS("dos27mpi")
+	ROM_SYSTEM_BIOS( 0, "dos25m", "DOS 2.5 (Micropolis)" )
+	ROM_SYSTEM_BIOS( 1, "dos25r2m", "DOS 2.5 rev 2 (Micropolis)" )
+	ROM_SYSTEM_BIOS( 2, "dos25r3m", "DOS 2.5 rev 3 (Micropolis)" )
+	ROM_SYSTEM_BIOS( 3, "dos25t", "DOS 2.5 rev 3 (Tandon)" )
+	ROM_SYSTEM_BIOS( 4, "dos27t", "DOS 2.7 (Tandon)" )
+	ROM_SYSTEM_BIOS( 5, "dos27mo", "DOS 2.7 (Micropolis, older)" )
+	ROM_SYSTEM_BIOS( 6, "dos27m", "DOS 2.7 (Micropolis)" )
+	ROM_SYSTEM_BIOS( 7, "dos27mpi", "DOS 2.7 (MPI)" )
 
 	ROM_REGION( 0x4000, M6502_TAG, 0 )
 	ROMX_LOAD( "901482-01.ul1", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(0) )
@@ -95,17 +214,26 @@ ROM_START( c8050 ) // schematic 8050001
 	ROMX_LOAD( "901482-04.uh1", 0x2000, 0x2000, CRC(1bcf9df9) SHA1(217f4a8b348658bb365f4a1de21ecbaa6402b1c0), ROM_BIOS(1) )
 	ROMX_LOAD( "901482-06.ul1", 0x0000, 0x2000, CRC(3cbd2756) SHA1(7f5fbed0cddb95138dd99b8fe84fddab900e3650), ROM_BIOS(2) )
 	ROMX_LOAD( "901482-07.uh1", 0x2000, 0x2000, CRC(c7532d90) SHA1(0b6d1e55afea612516df5f07f4a6dccd3bd73963), ROM_BIOS(2) )
-	ROMX_LOAD( "901887-01.ul1", 0x0000, 0x2000, CRC(0073b8b2) SHA1(b10603195f240118fe5fb6c6dfe5c5097463d890), ROM_BIOS(3) )
-	ROMX_LOAD( "901888-01.uh1", 0x2000, 0x2000, CRC(de9b6132) SHA1(2e6c2d7ca934e5c550ad14bd5e9e7749686b7af4), ROM_BIOS(3) )
+	ROMX_LOAD( "901482-06.ul1", 0x0000, 0x2000, CRC(3cbd2756) SHA1(7f5fbed0cddb95138dd99b8fe84fddab900e3650), ROM_BIOS(3) )
+	ROMX_LOAD( "901482-07.uh1", 0x2000, 0x2000, CRC(c7532d90) SHA1(0b6d1e55afea612516df5f07f4a6dccd3bd73963), ROM_BIOS(3) )
+	ROMX_LOAD( "901887-01.ul1", 0x0000, 0x2000, CRC(0073b8b2) SHA1(b10603195f240118fe5fb6c6dfe5c5097463d890), ROM_BIOS(4) )
+	ROMX_LOAD( "901888-01.uh1", 0x2000, 0x2000, CRC(de9b6132) SHA1(2e6c2d7ca934e5c550ad14bd5e9e7749686b7af4), ROM_BIOS(4) )
+	ROMX_LOAD( "901887-01.ul1", 0x0000, 0x2000, CRC(0073b8b2) SHA1(b10603195f240118fe5fb6c6dfe5c5097463d890), ROM_BIOS(5) )
+	ROMX_LOAD( "901888-01.uh1", 0x2000, 0x2000, CRC(de9b6132) SHA1(2e6c2d7ca934e5c550ad14bd5e9e7749686b7af4), ROM_BIOS(5) )
+	ROMX_LOAD( "901887-01.ul1", 0x0000, 0x2000, CRC(0073b8b2) SHA1(b10603195f240118fe5fb6c6dfe5c5097463d890), ROM_BIOS(6) )
+	ROMX_LOAD( "901888-01.uh1", 0x2000, 0x2000, CRC(de9b6132) SHA1(2e6c2d7ca934e5c550ad14bd5e9e7749686b7af4), ROM_BIOS(6) )
+	ROMX_LOAD( "901887-01.ul1", 0x0000, 0x2000, CRC(0073b8b2) SHA1(b10603195f240118fe5fb6c6dfe5c5097463d890), ROM_BIOS(7) )
+	ROMX_LOAD( "901888-01.uh1", 0x2000, 0x2000, CRC(de9b6132) SHA1(2e6c2d7ca934e5c550ad14bd5e9e7749686b7af4), ROM_BIOS(7) )
 
 	ROM_REGION( 0x400, M6530_TAG, 0 )
-	ROM_LOAD_OPTIONAL( "901483-02.uk3", 0x000, 0x400, CRC(d7277f95) SHA1(7607f9357f3a08f2a9f20931058d60d9e3c17d39) ) // 6530-036
-	ROM_LOAD_OPTIONAL( "901483-03.uk3", 0x000, 0x400, CRC(9e83fa70) SHA1(e367ea8a5ddbd47f13570088427293138a10784b) ) // 6530-038 RIOT DOS 2.5 Micropolis
-	ROM_LOAD_OPTIONAL( "901483-04.uk3", 0x000, 0x400, CRC(ae1c7866) SHA1(13bdf0bb387159167534c07a4554964734373f11) ) // 6530-039 RIOT DOS 2.5 Tandon
-	ROM_LOAD_OPTIONAL( "901884-01.uk3", 0x000, 0x400, CRC(9e9a9f90) SHA1(39498d7369a31ea7527b5044071acf35a84ea2ac) ) // 6530-40 RIOT DOS 2.7 Tandon
-	ROM_LOAD_OPTIONAL( "901885-01.uk3", 0x000, 0x400, NO_DUMP ) // 6530-044
-	ROM_LOAD_OPTIONAL( "901885-04.uk3", 0x000, 0x400, CRC(bab998c9) SHA1(0dc9a3b60f1b866c63eebd882403532fc59fe57f) ) // 6530-47 RIOT DOS 2.7 Micropolis
-	ROM_LOAD( "901869-01.uk3", 0x000, 0x400, CRC(2915327a) SHA1(3a9a80f72ce76e5f5c72513f8ef7553212912ae3) ) // 6530-48 RIOT DOS 2.7 MPI
+	ROMX_LOAD( "901483-02.uk3", 0x000, 0x400, CRC(d7277f95) SHA1(7607f9357f3a08f2a9f20931058d60d9e3c17d39), ROM_BIOS(0) ) // 6530-036 DOS 2.5
+	ROMX_LOAD( "901483-02.uk3", 0x000, 0x400, CRC(d7277f95) SHA1(7607f9357f3a08f2a9f20931058d60d9e3c17d39), ROM_BIOS(1) ) // 6530-036 DOS 2.5
+	ROMX_LOAD( "901483-03.uk3", 0x000, 0x400, CRC(9e83fa70) SHA1(e367ea8a5ddbd47f13570088427293138a10784b), ROM_BIOS(2) ) // 6530-038 DOS 2.5 Micropolis
+	ROMX_LOAD( "901483-04.uk3", 0x000, 0x400, CRC(ae1c7866) SHA1(13bdf0bb387159167534c07a4554964734373f11), ROM_BIOS(3) ) // 6530-039 DOS 2.5 Tandon
+	ROMX_LOAD( "901884-01.uk3", 0x000, 0x400, CRC(9e9a9f90) SHA1(39498d7369a31ea7527b5044071acf35a84ea2ac), ROM_BIOS(4) ) // 6530-40 DOS 2.7 Tandon
+	ROMX_LOAD( "901885-01.uk3", 0x000, 0x400, NO_DUMP, ROM_BIOS(5) ) // 6530-044 DOS 2.7 Micropolis
+	ROMX_LOAD( "901885-04.uk3", 0x000, 0x400, CRC(bab998c9) SHA1(0dc9a3b60f1b866c63eebd882403532fc59fe57f), ROM_BIOS(6) ) // 6530-47 DOS 2.7 Micropolis
+	ROMX_LOAD( "901869-01.uk3", 0x000, 0x400, CRC(2915327a) SHA1(3a9a80f72ce76e5f5c72513f8ef7553212912ae3), ROM_BIOS(7) ) // 6530-48 DOS 2.7 MPI
 ROM_END
 
 
@@ -124,7 +252,7 @@ const tiny_rom_entry *c8050_device::device_rom_region() const
 //-------------------------------------------------
 
 ROM_START( c8250lp )
-	ROM_DEFAULT_BIOS("dos27")
+	ROM_DEFAULT_BIOS("dos27b")
 	ROM_SYSTEM_BIOS( 0, "dos27", "DOS 2.7" )
 	ROM_SYSTEM_BIOS( 1, "dos27b", "DOS 2.7B" )
 	ROM_SYSTEM_BIOS( 2, "speeddos", "SpeedDOS" )
@@ -160,17 +288,14 @@ const tiny_rom_entry *c8250lp_device::device_rom_region() const
 
 ROM_START( sfd1001 ) // schematic 251406
 	ROM_REGION( 0x4000, M6502_TAG, 0 )
-	ROM_LOAD( "901887-01.1j",  0x0000, 0x2000, CRC(0073b8b2) SHA1(b10603195f240118fe5fb6c6dfe5c5097463d890) )
-	ROM_LOAD( "901888-01.3j",  0x2000, 0x2000, CRC(de9b6132) SHA1(2e6c2d7ca934e5c550ad14bd5e9e7749686b7af4) )
+	ROM_LOAD( "901887-01.1j", 0x0000, 0x2000, CRC(0073b8b2) SHA1(b10603195f240118fe5fb6c6dfe5c5097463d890) )
+	ROM_LOAD( "901888-01.3j", 0x2000, 0x2000, CRC(de9b6132) SHA1(2e6c2d7ca934e5c550ad14bd5e9e7749686b7af4) )
 
 	ROM_REGION( 0x400, M6530_TAG, 0 )
 	ROM_LOAD( "901885-04.u1", 0x000, 0x400, CRC(bab998c9) SHA1(0dc9a3b60f1b866c63eebd882403532fc59fe57f) )
 
 	ROM_REGION( 0x800, M6504_TAG, 0 )
 	ROM_LOAD( "251257-02a.u2", 0x000, 0x800, CRC(b51150de) SHA1(3b954eb34f7ea088eed1d33ebc6d6e83a3e9be15) )
-
-	ROM_REGION( 0x800, "gcr", 0)
-	ROM_LOAD( "901467-01.5c",  0x000, 0x800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
 ROM_END
 
 
@@ -190,10 +315,10 @@ const tiny_rom_entry *sfd1001_device::device_rom_region() const
 
 void c8050_device::c8050_main_mem(address_map &map)
 {
-	map(0x0000, 0x007f).mirror(0x0100).m(M6532_0_TAG, FUNC(mos6532_device::ram_map));
-	map(0x0080, 0x00ff).mirror(0x0100).m(M6532_1_TAG, FUNC(mos6532_device::ram_map));
-	map(0x0200, 0x021f).mirror(0x0d60).m(M6532_0_TAG, FUNC(mos6532_device::io_map));
-	map(0x0280, 0x029f).mirror(0x0d60).m(M6532_1_TAG, FUNC(mos6532_device::io_map));
+	map(0x0000, 0x007f).mirror(0x0100).m(m_riot0, FUNC(mos6532_device::ram_map));
+	map(0x0080, 0x00ff).mirror(0x0100).m(m_riot1, FUNC(mos6532_device::ram_map));
+	map(0x0200, 0x021f).mirror(0x0d60).m(m_riot0, FUNC(mos6532_device::io_map));
+	map(0x0280, 0x029f).mirror(0x0d60).m(m_riot1, FUNC(mos6532_device::io_map));
 	map(0x1000, 0x13ff).mirror(0x0c00).ram().share("share1");
 	map(0x2000, 0x23ff).mirror(0x0c00).ram().share("share2");
 	map(0x3000, 0x33ff).mirror(0x0c00).ram().share("share3");
@@ -253,51 +378,6 @@ void c8050_device::sfd1001_fdc_mem(address_map &map)
 	map(0x0c00, 0x0fff).ram().share("share3");
 	map(0x1000, 0x13ff).ram().share("share4");
 	map(0x1800, 0x1fff).rom().region(M6504_TAG, 0);
-}
-
-
-//-------------------------------------------------
-//  riot6532 uc1
-//-------------------------------------------------
-
-uint8_t c8050_device::dio_r()
-{
-	/*
-
-	    bit     description
-
-	    PA0     DI0
-	    PA1     DI1
-	    PA2     DI2
-	    PA3     DI3
-	    PA4     DI4
-	    PA5     DI5
-	    PA6     DI6
-	    PA7     DI7
-
-	*/
-
-	return m_bus->dio_r();
-}
-
-void c8050_device::dio_w(uint8_t data)
-{
-	/*
-
-	    bit     description
-
-	    PB0     DO0
-	    PB1     DO1
-	    PB2     DO2
-	    PB3     DO3
-	    PB4     DO4
-	    PB5     DO5
-	    PB6     DO6
-	    PB7     DO7
-
-	*/
-
-	m_bus->dio_w(this, data);
 }
 
 //-------------------------------------------------
@@ -584,8 +664,8 @@ void c8050_device::device_add_mconfig(machine_config &config)
 	m_miot->pb_wr_callback<0>().set(m_fdc, FUNC(c8050_fdc_device::drv_sel_w));
 	m_miot->pb_rd_callback<6>().set_constant(1); // SINGLE SIDED
 
-	FLOPPY_CONNECTOR(config, FDC_TAG ":0", c8050_floppies, "525ssqd", c8050_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, FDC_TAG ":1", c8050_floppies, "525ssqd", c8050_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC_TAG ":0", c8050_floppies, "525ssqd", c8050_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, FDC_TAG ":1", c8050_floppies, "525ssqd", c8050_device::floppy_formats).enable_sound(true);
 }
 
 void c8250_device::device_add_mconfig(machine_config &config)
@@ -597,8 +677,8 @@ void c8250_device::device_add_mconfig(machine_config &config)
 	m_miot->pb_wr_callback<4>().set(m_fdc, FUNC(c8050_fdc_device::odd_hd_w));
 	m_miot->pb_rd_callback<6>().set_constant(0); // DOUBLE SIDED
 
-	FLOPPY_CONNECTOR(config, FDC_TAG ":0", c8250_floppies, "525qd", c8250_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, FDC_TAG ":1", c8250_floppies, "525qd", c8250_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC_TAG ":0", c8250_floppies, "525qd", c8250_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, FDC_TAG ":1", c8250_floppies, "525qd", c8250_device::floppy_formats).enable_sound(true);
 }
 
 void c8250lp_device::device_add_mconfig(machine_config &config)
@@ -610,8 +690,8 @@ void c8250lp_device::device_add_mconfig(machine_config &config)
 	m_miot->pb_wr_callback<4>().set(m_fdc, FUNC(c8050_fdc_device::odd_hd_w));
 	m_miot->pb_rd_callback<6>().set_constant(0); // DOUBLE SIDED
 
-	FLOPPY_CONNECTOR(config, FDC_TAG ":0", c8250_floppies, "525qd", c8250lp_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, FDC_TAG ":1", c8250_floppies, "525qd", c8250lp_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC_TAG ":0", c8250_floppies, "525qd", c8250lp_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, FDC_TAG ":1", c8250_floppies, "525qd", c8250lp_device::floppy_formats).enable_sound(true);
 }
 
 void sfd1001_device::device_add_mconfig(machine_config &config)
@@ -622,7 +702,7 @@ void sfd1001_device::device_add_mconfig(machine_config &config)
 	m_miot->pb_wr_callback<4>().set(m_fdc, FUNC(c8050_fdc_device::odd_hd_w));
 	m_miot->pb_rd_callback<6>().set_constant(0); // DOUBLE SIDED
 
-	FLOPPY_CONNECTOR(config, FDC_TAG ":0", sfd1001_floppies, "525qd", sfd1001_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC_TAG ":0", sfd1001_floppies, "525qd", sfd1001_device::floppy_formats).enable_sound(true);
 }
 
 
@@ -688,8 +768,8 @@ c8050_device::c8050_device(const machine_config &mconfig, device_type type, cons
 	device_ieee488_interface(mconfig, *this),
 	m_maincpu(*this, M6502_TAG),
 	m_fdccpu(*this, M6504_TAG),
-	m_riot0(*this, M6532_0_TAG),
-	m_riot1(*this, M6532_1_TAG),
+	m_riot0(*this, "uc1"),
+	m_riot1(*this, "ue1"),
 	m_miot(*this, M6530_TAG),
 	m_via(*this, "um3"),
 	m_floppy0(*this, FDC_TAG ":0"),
@@ -705,7 +785,7 @@ c8050_device::c8050_device(const machine_config &mconfig, device_type type, cons
 }
 
 c8050_device::c8050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	c8050_device(mconfig, C8050, tag, owner, clock)
+	c8050_device(mconfig, GPIB_C8050, tag, owner, clock)
 {
 }
 
@@ -715,7 +795,7 @@ c8050_device::c8050_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c8250_device::c8250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	c8050_device(mconfig, C8250, tag, owner, clock)
+	c8050_device(mconfig, GPIB_C8250, tag, owner, clock)
 {
 }
 
@@ -725,7 +805,7 @@ c8250_device::c8250_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c8250lp_device::c8250lp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	c8050_device(mconfig, C8250LP, tag, owner, clock)
+	c8050_device(mconfig, GPIB_C8250LP, tag, owner, clock)
 {
 }
 
@@ -735,7 +815,7 @@ c8250lp_device::c8250lp_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 sfd1001_device::sfd1001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	c8050_device(mconfig, SFD1001, tag, owner, clock)
+	c8050_device(mconfig, GPIB_SFD1001, tag, owner, clock)
 {
 }
 
@@ -764,20 +844,12 @@ void c8050_device::device_start()
 
 void c8050_device::device_reset()
 {
-	m_maincpu->reset();
-
 	// toggle M6502 SO
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, ASSERT_LINE);
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, CLEAR_LINE);
 
-	m_fdccpu->reset();
-
-	m_riot0->reset();
-	m_riot1->reset();
-	m_miot->reset();
-	m_via->reset();
-
-	m_riot1->pa_bit_w<7>(1);
+	// release ATN
+	m_riot1->pa_bit_w<7>(0);
 
 	// turn off spindle motors
 	m_fdc->mtr0_w(1);
@@ -793,7 +865,7 @@ void c8050_device::ieee488_atn(int state)
 {
 	update_ieee_signals();
 
-	m_riot1->pa_bit_w<7>(state);
+	m_riot1->pa_bit_w<7>(!state);
 }
 
 
@@ -810,3 +882,16 @@ void c8050_device::ieee488_ifc(int state)
 
 	m_ifc = state;
 }
+
+} // anonymous namespace
+
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(GPIB_C8050,   device_ieee488_interface, c8050_device,   "c8050",   "Commodore 8050 disk drive")
+DEFINE_DEVICE_TYPE_PRIVATE(GPIB_C8250,   device_ieee488_interface, c8250_device,   "c8250",   "Commodore 8250 disk drive")
+DEFINE_DEVICE_TYPE_PRIVATE(GPIB_C8250LP, device_ieee488_interface, c8250lp_device, "c8250lp", "Commodore 8250LP disk drive")
+DEFINE_DEVICE_TYPE_PRIVATE(GPIB_SFD1001, device_ieee488_interface, sfd1001_device, "sfd1001", "Commodore SFD-1001 disk drive")

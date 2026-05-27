@@ -33,8 +33,11 @@
 
 #include "emu.h"
 #include "a2scsi.h"
+
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
+
+#include "softlist_dev.h"
 #include "speaker.h"
 
 /***************************************************************************
@@ -49,7 +52,7 @@ DEFINE_DEVICE_TYPE(A2BUS_SCSI, a2bus_scsi_device, "a2scsi", "Apple II SCSI Card"
 
 #define SCSI_ROM_REGION  "scsi_rom"
 #define SCSI_BUS_TAG     "scsibus"
-#define SCSI_5380_TAG    "scsibus:7:ncr5380"
+#define SCSI_5380_TAG    "ncr5380"
 
 ROM_START( scsi )
 	ROM_REGION(0x4000, SCSI_ROM_REGION, 0)  // this is the Rev. C ROM
@@ -66,26 +69,20 @@ ROM_END
 
 void a2bus_scsi_device::device_add_mconfig(machine_config &config)
 {
-	// These machines were strictly external CD-ROMs so sound didn't route back into them; the AppleCD SC had
-	// RCA jacks for connection to speakers/a stereo.
-	SPEAKER(config, "speaker", 2).front();
-
 	NSCSI_BUS(config, m_scsibus);
 	NSCSI_CONNECTOR(config, "scsibus:0", default_scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:1").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
-		[](device_t *device)
-		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
-		});
+	NSCSI_CONNECTOR(config, "scsibus:1", default_scsi_devices, "aplcdsc_ext", false);
 	NSCSI_CONNECTOR(config, "scsibus:2", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:3", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:4", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:6", default_scsi_devices, "harddisk", false);
-	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr5380", NCR5380).machine_config([this](device_t *device) {
-		downcast<ncr5380_device &>(*device).drq_handler().set(*this, FUNC(a2bus_scsi_device::drq_w));
-	});
+
+	NCR5380(config, m_ncr5380);
+	m_scsibus->set_external_device(7, m_ncr5380);
+	m_ncr5380->drq_handler().set(DEVICE_SELF, FUNC(a2bus_scsi_device::drq_w));
+
+//  SOFTWARE_LIST(config, "cd_apple_dev").set_original("apple_devcd");
 }
 
 //-------------------------------------------------
@@ -132,8 +129,15 @@ void a2bus_scsi_device::device_start()
 
 void a2bus_scsi_device::device_reset()
 {
+	reset_from_bus();
+}
+
+void a2bus_scsi_device::reset_from_bus()
+{
 	m_rambank = m_rombank = 0;      // CLR on 74LS273 at U3E is connected to RES, so these clear on reset
 	m_816block = false;
+
+	m_ncr5380->reset();
 }
 
 

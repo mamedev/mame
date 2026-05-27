@@ -175,7 +175,7 @@
   Good Luck II.
 
   There are pieces of code that initialize two PIA 6821s, that are not included
-  in the PCB. Seems a leftover. Also the program try to handle a suppossed lamps
+  in the PCB. Seems a leftover. Also the program tries to handle a supposed lamps
   system through these 'phantom' PIAs...
 
   The sound system is through a YM2413, and sound a lot nicer than the former
@@ -388,7 +388,7 @@ static INPUT_PORTS_START( gluck2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Service")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -399,7 +399,7 @@ static INPUT_PORTS_START( gluck2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MEMORY_RESET )  PORT_NAME("Reset")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SW1")   // 2000
@@ -495,7 +495,7 @@ static INPUT_PORTS_START( sise7 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )     PORT_NAME("Small")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_NAME("Big")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Service")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Service")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )     PORT_CODE(KEYCODE_3_PAD) PORT_NAME("PAD 3")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )     PORT_CODE(KEYCODE_4_PAD) PORT_NAME("PAD 4")
 

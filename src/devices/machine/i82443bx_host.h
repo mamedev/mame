@@ -61,13 +61,12 @@ public:
 class i82443bx_bridge_device : public pci_bridge_device
 {
 public:
-	/*template <typename T> sis630_bridge_device(
+	/*template <typename T> i82443bx_bridge_device(
 	    const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
 	    T &&gui_tag
-	) : sis630_bridge_device(mconfig, tag, owner, clock)
+	) : i82443bx_bridge_device(mconfig, tag, owner, clock)
 	{
-	    // either 0001 or 6001 as device ID
-	    set_ids_bridge(0x10396001, 0x00);
+	    set_ids_bridge(0x80867191, 0x00);
 	    //set_multifunction_device(true);
 	    //m_vga.set_tag(std::forward<T>(gui_tag));
 	}*/
@@ -84,7 +83,7 @@ protected:
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 private:
-	//required_device<sis630_gui_device> m_vga;
+	//required_device<vga_device> m_vga;
 
 	virtual void bridge_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };

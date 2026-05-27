@@ -1043,13 +1043,13 @@ void x68k_state::x68000_base(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(x68k_state::ppi_port_c_r));
 	m_ppi->out_pc_callback().set(FUNC(x68k_state::ppi_port_c_w));
 
-	HD63450(config, m_hd63450, 40_MHz_XTAL / 4, "maincpu");
+	HD63450(config, m_hd63450, 40_MHz_XTAL / 4, "maincpu", AS_PROGRAM);
 	m_hd63450->set_clocks(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
 	m_hd63450->set_burst_clocks(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_nsec(450), attotime::from_nsec(50));
 	m_hd63450->irq_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ3);
 	m_hd63450->dma_end().set(FUNC(x68k_state::dma_end));
-	m_hd63450->dma_read<0>().set("upd72065", FUNC(upd72065_device::dma_r));
-	m_hd63450->dma_write<0>().set("upd72065", FUNC(upd72065_device::dma_w));
+	m_hd63450->dma8_read<0>().set("upd72065", FUNC(upd72065_device::dma_r));
+	m_hd63450->dma8_write<0>().set("upd72065", FUNC(upd72065_device::dma_w));
 
 	SCC8530(config, m_scc, 40_MHz_XTAL / 8);
 	m_scc->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ5);
@@ -1158,7 +1158,7 @@ void x68ksupr_state::x68ksupr_base(machine_config &config)
 {
 	x68000_base(config);
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
@@ -1166,15 +1166,10 @@ void x68ksupr_state::x68ksupr_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, "cdrom");
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("spc", MB89352).machine_config(
-		[this](device_t *device)
-		{
-			mb89352_device &spc = downcast<mb89352_device &>(*device);
-
-			spc.set_clock(40_MHz_XTAL / 8);
-			spc.out_irq_callback().set(*this, FUNC(x68ksupr_state::ioc_irq<IOC_HDD_INT>));
-			// TODO: duplicate DMA glue from CZ-6BS1
-		});
+	MB89352(config, m_scsictrl, 40_MHz_XTAL / 8);
+	scsi.set_external_device(7, m_scsictrl);
+	m_scsictrl->out_irq_callback().set(*this, FUNC(x68ksupr_state::ioc_irq<IOC_HDD_INT>));
+	// TODO: duplicate DMA glue from CZ-6BS1
 
 	VICON(config, m_crtc, 38.86363_MHz_XTAL);
 	m_crtc->set_clock_69m(69.55199_MHz_XTAL);

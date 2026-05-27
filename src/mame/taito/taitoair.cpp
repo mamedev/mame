@@ -169,7 +169,7 @@ After demo game in attract, palette seems too dark for a while.
 Palette corruption has occurred with areas not restored after a fade.
 Don't know why. (Perhaps 68000 relies on feedback from co-processor
 in determining what parts of palette ram to write... but this would
-then be fixed by hookup of 32025 core, which it isn't.)
+then be fixed by hookup of TMS320C25 core, which it isn't.)
 
 Mechanized cabinet has a problem with test mode: there is
 code at $d72 calling a sub which tests a silly amount of "power
@@ -219,7 +219,7 @@ void taitoair_state::system_control_w(offs_t offset, u16 data, u16 mem_mask)
 	m_dsp->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
 	m_gradbank = (data & 0x40);
-	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n", m_maincpu->pcbase(), data, ((data & 4) ? "Clear" : "Assert"), ((data & 1) ? "Clear" : "Assert"));
+	logerror("68K:%06x writing %04x to TMS320C25.  %s HOLD , %s RESET\n", m_maincpu->pcbase(), data, ((data & 4) ? "Clear" : "Assert"), ((data & 1) ? "Clear" : "Assert"));
 }
 
 u16 taitoair_state::lineram_r(offs_t offset)
@@ -233,7 +233,7 @@ void taitoair_state::lineram_w(offs_t offset, u16 data, u16 mem_mask)
 		m_line_ram[offset] = data;
 
 	//if (offset == 0x3fff)
-	//  printf("LineRAM go %d\n",(int)m_screen->frame_number());
+	//  logerror("LineRAM go %d\n", m_screen->frame_number());
 }
 
 u16 taitoair_state::dspram_r(offs_t offset)
@@ -250,7 +250,7 @@ void taitoair_state::dspram_w(offs_t offset, u16 data, u16 mem_mask)
 u16 taitoair_state::dsp_HOLD_signal_r()
 {
 	/* HOLD signal is active low */
-	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n", m_dsp->pcbase(), m_dsp_hold_signal);
+	//  logerror("TMS320C25:%04x Reading %01x level from HOLD signal\n", m_dsp->pcbase(), m_dsp_hold_signal);
 
 	return m_dsp_hold_signal;
 }
@@ -258,7 +258,7 @@ u16 taitoair_state::dsp_HOLD_signal_r()
 void taitoair_state::dsp_HOLDA_signal_w(offs_t offset, u16 data)
 {
 	if (offset)
-		logerror("TMS32025:%04x Writing %01x level to HOLD-Acknowledge signal\n", m_dsp->pcbase(), data);
+		logerror("TMS320C25:%04x Writing %01x level to HOLD-Acknowledge signal\n", m_dsp->pcbase(), data);
 }
 
 
@@ -346,7 +346,7 @@ void taitoair_state::sound_bankswitch_w(u8 data)
 */
 void taitoair_state::dma_regs_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	printf("%08x %04x\n",offset,data);
+	logerror("dma_regs_w: %08x %04x\n", offset, data);
 
 	if (offset == 0 && ACCESSING_BITS_8_15)
 	{
@@ -378,7 +378,7 @@ void taitoair_state::airsys_map(address_map &map)
 {
 	map(0x000000, 0x0bffff).rom();
 	map(0x0c0000, 0x0cffff).ram().share("m68000_mainram");
-	map(0x140000, 0x140001).w(FUNC(taitoair_state::system_control_w)); /* Pause the TMS32025 */
+	map(0x140000, 0x140001).w(FUNC(taitoair_state::system_control_w)); /* Pause the TMS320C25 */
 	map(0x180000, 0x187fff).ram().w(FUNC(taitoair_state::gradram_w)).share("gradram"); /* "gradiation ram (0/1)" */
 	map(0x188000, 0x189fff).mirror(0x2000).ram().w(FUNC(taitoair_state::paletteram_w)).share("paletteram");
 	map(0x800000, 0x820fff).rw(m_tc0080vco, FUNC(tc0080vco_device::word_r), FUNC(tc0080vco_device::word_w));    /* tilemaps, sprites */
@@ -412,7 +412,7 @@ void taitoair_state::sound_map(address_map &map)
 	map(0xf200, 0xf200).w(FUNC(taitoair_state::sound_bankswitch_w));
 }
 
-/********************************** TMS32025 ********************************/
+/********************************** TMS320C25 ********************************/
 
 void taitoair_state::dsp_test_start_w(u16 data)
 {
@@ -681,7 +681,7 @@ void taitoair_state::airsys(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(16'000'000) / 4);  // Z8400AB1
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitoair_state::sound_map);
 
-	TMS32025(config, m_dsp, XTAL(36'000'000)); // Unverified
+	TMS320C25(config, m_dsp, XTAL(36'000'000)); // Unverified
 	m_dsp->set_addrmap(AS_PROGRAM, &taitoair_state::DSP_map_program);
 	m_dsp->set_addrmap(AS_DATA, &taitoair_state::DSP_map_data);
 	m_dsp->hold_in_cb().set(FUNC(taitoair_state::dsp_HOLD_signal_r));
@@ -771,8 +771,8 @@ ROM_START( topland )
 	ROM_LOAD16_BYTE( "b62-21.35", 0x00000, 0x02000, CRC(5f38460d) SHA1(0593718d15b30b10f7686959932e2c934de2a529) )  // cpu board
 	ROM_LOAD16_BYTE( "b62-20.6",  0x00001, 0x02000, CRC(a4afe958) SHA1(7593a327f4ea0cc9e28fd3269278871f62fb0598) )  // cpu board
 
-	ROM_REGION( 0x10000, "mechacpu", 0 )
-	ROM_LOAD( "b62_mecha.rom", 0x00000, 0x08000, NO_DUMP )
+	ROM_REGION( 0x10000, "mechacpu", 0 ) // on POWER P.C. BOARD J3000014A
+	ROM_LOAD( "b09_37.13", 0x00000, 0x08000, CRC(4bdf15ed) SHA1(b960208e63cede116925e064279a6cf107aef81c) ) // same as mlanding
 
 	ROM_REGION( 0x100000, "tc0080vco", 0 )   /* 16x16 tiles */
 	ROM_LOAD64_BYTE( "b62-33.39",  0x000007, 0x20000, CRC(38786867) SHA1(7292e3fa69cad6494f2e8e7efa9c3f989bdf958d) )
@@ -820,8 +820,8 @@ ROM_START( toplandj )
 	ROM_LOAD16_BYTE( "b62-21.35", 0x00000, 0x02000, CRC(5f38460d) SHA1(0593718d15b30b10f7686959932e2c934de2a529) )  // cpu board
 	ROM_LOAD16_BYTE( "b62-20.6",  0x00001, 0x02000, CRC(a4afe958) SHA1(7593a327f4ea0cc9e28fd3269278871f62fb0598) )  // cpu board
 
-	ROM_REGION( 0x10000, "mechacpu", 0 )
-	ROM_LOAD( "b62_mecha.rom", 0x00000, 0x08000, NO_DUMP )
+	ROM_REGION( 0x10000, "mechacpu", 0 ) // on POWER P.C. BOARD J3000014A
+	ROM_LOAD( "b09_37.13", 0x00000, 0x08000, CRC(4bdf15ed) SHA1(b960208e63cede116925e064279a6cf107aef81c) ) // same as mlanding
 
 	ROM_REGION( 0x100000, "tc0080vco", 0 )   /* 16x16 tiles */
 	ROM_LOAD64_BYTE( "b62-33.39",  0x000007, 0x20000, CRC(38786867) SHA1(7292e3fa69cad6494f2e8e7efa9c3f989bdf958d) )

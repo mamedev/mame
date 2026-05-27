@@ -90,10 +90,10 @@ authors:hap
 		<element name="digit0" ref="digit"><bounds x="31" y="5.5" width="7" height="10.5" /></element>
 
 		<!-- button panel -->
-		<element ref="text_d1"><bounds x="17" y="37.2" width="13" height="1.5" /></element>
-		<element ref="text_d2"><bounds x="27" y="37.2" width="13" height="1.5" /></element>
-		<element ref="text_d3"><bounds x="57" y="37.2" width="13" height="1.5" /></element>
-		<element ref="text_d4"><bounds x="67" y="37.2" width="13" height="1.5" /></element>
+		<element ref="text_d1"><bounds x="18.5" y="37.2" width="10" height="1.5" /></element>
+		<element ref="text_d2"><bounds x="28.5" y="37.2" width="10" height="1.5" /></element>
+		<element ref="text_d3"><bounds x="58.5" y="37.2" width="10" height="1.5" /></element>
+		<element ref="text_d4"><bounds x="68.5" y="37.2" width="10" height="1.5" /></element>
 
 		<element ref="text_b01a"><bounds x="0.9"  y="20.5" width="5" height="2.5" /></element>
 		<element ref="text_b01b"><bounds x="3.5"  y="20.5" width="2.5" height="2.5" /></element>
@@ -163,7 +163,7 @@ authors:hap
 		<element ref="text_b14a"><bounds x="40.9" y="30.5" width="5" height="2.5" /></element>
 		<element ref="text_b15a"><bounds x="50.9" y="30.5" width="5" height="2.5" /></element>
 		<element ref="text_b17"><bounds x="71.5" y="32.3" width="4" height="2.4" /></element>
-		<element ref="text_b18"><bounds x="80.1" y="32.3" width="6.8" height="2.4" /></element>
+		<element ref="text_b18"><bounds x="80.25" y="32.3" width="6.5" height="2.4" /></element>
 
 		<element ref="text_b10c" blend="multiply"><bounds x="1.8" y="33.1" width="3.4" height="3.4" /></element>
 		<element ref="text_b11c" blend="multiply"><bounds x="11.8" y="33.1" width="3.4" height="3.4" /></element>

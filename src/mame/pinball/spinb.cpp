@@ -861,7 +861,7 @@ void spinb_state::ppia_c_w(u8 data)
 	if (m_6585a)
 	{
 		//m_6585a->playmode_w(15);
-		m_6585a->playmode_w(BIT(data, 5) ? 14 : 12);
+		m_6585a->playmode_w(BIT(data, 5) ? 12 : 14);
 		m_6585a->reset_w(BIT(data, 6));
 	}
 	m_ic5a->clear_w(!BIT(data, 6));
@@ -880,7 +880,7 @@ void spinb_state::ppim_c_w(u8 data)
 	if (m_6585m)
 	{
 		//m_6585m->playmode_w(15);
-		m_6585m->playmode_w(BIT(data, 5) ? 14 : 12);
+		m_6585m->playmode_w(BIT(data, 5) ? 12 : 14);
 		m_6585m->reset_w(BIT(data, 6));
 	}
 	m_ic5m->clear_w(!BIT(data, 6));

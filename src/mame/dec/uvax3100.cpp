@@ -142,11 +142,13 @@ void uvax3100_state::uvax3100(machine_config &config)
 	DC341(config, m_maincpu, 66.6667_MHz_XTAL / 6); // CPU CVAX 21-24674-17 11.11 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &uvax3100_state::mem_map);
 
-	AM7990(config, "lance1", 0); // AMD AM7990PC/80
+	AM7990(config, "lance1", 20_MHz_XTAL / 2); // AMD AM7990PC/80
 
 	// NCR5380(...)
 
 	// DUSCC68562(...) // Signetics SCN68562C4N48
+
+	// MC146818(config, "rtc", ...)
 
 	// Video hardware
 	GENERIC_TERMINAL(config, m_terminal, 0);

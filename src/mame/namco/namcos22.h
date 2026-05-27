@@ -11,11 +11,12 @@
 
 #pragma once
 
-#include "machine/eeprompar.h"
-#include "machine/mb87078.h"
 #include "namcomcu.h"
+
+#include "machine/eeprompar.h"
 #include "machine/timer.h"
 #include "sound/c352.h"
+#include "sound/mb87077.h"
 #include "video/rgbutil.h"
 #include "video/poly.h"
 
@@ -225,7 +226,8 @@ public:
 		m_custom(*this, "CUSTOM.%u", 0),
 		m_opt(*this, "OPT.%u", 0),
 		m_mcu_out(*this, "mcuout%u", 0U),
-		m_cpuled_out(*this, "cpuled%u", 0U)
+		m_cpuled_out(*this, "cpuled%u", 0U),
+		m_wheel_motor(*this, "wheel_motor")
 	{ }
 
 	void cybrcomm(machine_config &config);
@@ -294,8 +296,8 @@ protected:
 	void point_address_w(u16 data);
 	void point_loword_iw(u16 data);
 	void point_hiword_w(u16 data);
-	u16 point_loword_r();
-	u16 point_hiword_ir();
+	u16 point_loword_ir();
+	u16 point_hiword_r();
 	void dsp_unk2_w(u16 data);
 	u16 dsp_unk_port3_r();
 	void upload_code_to_slave_dsp_w(u16 data);
@@ -438,6 +440,7 @@ protected:
 	optional_ioport_array<2> m_opt;
 	output_finder<16> m_mcu_out;
 	output_finder<8> m_cpuled_out;
+	output_finder<> m_wheel_motor;
 
 	u8 m_syscontrol[0x20] = { };
 	bool m_dsp_irq_enabled = false;

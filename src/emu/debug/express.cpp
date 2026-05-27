@@ -35,6 +35,7 @@
 #include "corestr.h"
 
 #include <cctype>
+#include <locale>
 
 
 
@@ -314,8 +315,8 @@ std::string expression_error::code_string() const
 		case DIVIDE_BY_ZERO:        return "divide by zero";
 		case OUT_OF_MEMORY:         return "out of memory";
 		case INVALID_PARAM_COUNT:   return "invalid number of parameters";
-		case TOO_FEW_PARAMS:        return util::string_format("too few parameters (at least %d required)", m_num);
-		case TOO_MANY_PARAMS:       return util::string_format("too many parameters (no more than %d accepted)", m_num);
+		case TOO_FEW_PARAMS:        return util::string_format(std::locale::classic(), "too few parameters (at least %d required)", m_num);
+		case TOO_MANY_PARAMS:       return util::string_format(std::locale::classic(), "too many parameters (no more than %d accepted)", m_num);
 		case UNBALANCED_QUOTES:     return "unbalanced quotes";
 		case TOO_MANY_STRINGS:      return "too many strings";
 		case INVALID_MEMORY_SIZE:   return "invalid memory size (b/w/d/q expected)";
@@ -371,6 +372,8 @@ symbol_table::symbol_table(running_machine &machine, table_type type, symbol_tab
 	, m_memintf(dynamic_cast<device_memory_interface *>(device))
 	, m_memory_modified(nullptr)
 {
+	assert(type != table_type::CPU_STATE || device != nullptr);
+	assert(type != table_type::BUILTIN_GLOBALS || device == nullptr);
 }
 
 

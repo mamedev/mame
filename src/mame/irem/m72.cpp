@@ -4136,11 +4136,11 @@ ROM_END
 
 ROM_START( hharryu ) // where you see gen=84= actual label reads GEN(84)
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "gen_a-h0-u.ic55", 0x00001, 0x20000, CRC(ede7f755) SHA1(adcec83d6b936ab1a14d039792b9375e9f803a08) )
-	ROM_LOAD16_BYTE( "gen_a-l0-u.ic61", 0x00000, 0x20000, CRC(df0726ae) SHA1(7ef163d2e8c14a14328d4365705bb31540bdc7cb) )
-	ROM_LOAD16_BYTE( "gen_a-h1-f.ic54", 0x60001, 0x10000, CRC(31b741c5) SHA1(46c1c4cea09477cc4989f3e06e08851d02743e62) )
+	ROM_LOAD16_BYTE( "gen_a-h0-u.ic54", 0x00001, 0x20000, CRC(ede7f755) SHA1(adcec83d6b936ab1a14d039792b9375e9f803a08) )
+	ROM_LOAD16_BYTE( "gen_a-l0-u.ic60", 0x00000, 0x20000, CRC(df0726ae) SHA1(7ef163d2e8c14a14328d4365705bb31540bdc7cb) )
+	ROM_LOAD16_BYTE( "gen_a-h1-f.ic53", 0x60001, 0x10000, CRC(31b741c5) SHA1(46c1c4cea09477cc4989f3e06e08851d02743e62) )
 	ROM_RELOAD(                         0xe0001, 0x10000 )
-	ROM_LOAD16_BYTE( "gen_a-l1-f.ic60", 0x60000, 0x10000, CRC(b23e966c) SHA1(f506f6d1f4f7874070e91d1df8f141cca031ce29) )
+	ROM_LOAD16_BYTE( "gen_a-l1-f.ic59", 0x60000, 0x10000, CRC(b23e966c) SHA1(f506f6d1f4f7874070e91d1df8f141cca031ce29) )
 	ROM_RELOAD(                         0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -4174,12 +4174,50 @@ ROM_END
 
 ROM_START( dkgensan ) // where you see gen=84= actual label reads GEN(84)
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "gen_a-h0-.ic55", 0x00001, 0x20000, CRC(07a45f6d) SHA1(8ffbd395aad244747d9f87062d2b062f41a4829c) )
-	ROM_LOAD16_BYTE( "gen_a-l0-.ic61", 0x00000, 0x20000, CRC(46478fea) SHA1(fd4ff544588535333c1b98fbc08446ef49b11212) )
-	ROM_LOAD16_BYTE( "gen_a-h1-.ic54", 0x60001, 0x10000, CRC(54e5b73c) SHA1(5664f6e0a931b1c139e82dc98fcc9e38acd14616) )
+	ROM_LOAD16_BYTE( "gen_a-h0-.ic54", 0x00001, 0x20000, CRC(07a45f6d) SHA1(8ffbd395aad244747d9f87062d2b062f41a4829c) )
+	ROM_LOAD16_BYTE( "gen_a-l0-.ic60", 0x00000, 0x20000, CRC(46478fea) SHA1(fd4ff544588535333c1b98fbc08446ef49b11212) )
+	ROM_LOAD16_BYTE( "gen_a-h1-.ic53", 0x60001, 0x10000, CRC(54e5b73c) SHA1(5664f6e0a931b1c139e82dc98fcc9e38acd14616) )
 	ROM_RELOAD(                        0xe0001, 0x10000 )
-	ROM_LOAD16_BYTE( "gen_a-l1-.ic60", 0x60000, 0x10000, CRC(894f8a9f) SHA1(57a0885c52a094def03b129a450cc891e6c075c6) )
+	ROM_LOAD16_BYTE( "gen_a-l1-.ic59", 0x60000, 0x10000, CRC(894f8a9f) SHA1(57a0885c52a094def03b129a450cc891e6c075c6) )
 	ROM_RELOAD(                        0xe0000, 0x10000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "gen_a-sp-.ic17", 0x00000, 0x10000, CRC(e83cfc2c) SHA1(3193bdd06a9712fc499e6fc90a33140463ef59fe) )
+
+	ROM_REGION( 0x080000, "sprites", 0 ) // sprites - located on M84-C-A top board
+	ROM_LOAD( "hh_n0.ic33", 0x00000, 0x20000, CRC(ec5127ef) SHA1(014ac8ad7b19cd9b475b72a0f42a4991119501c4) )  // mask ROMs with no labels
+	ROM_LOAD( "hh_n1.ic34", 0x20000, 0x20000, CRC(def65294) SHA1(23f5d99fa9f604fde37cb52113bff233d9be1d25) )
+	ROM_LOAD( "hh_n2.ic35", 0x40000, 0x20000, CRC(bb0d6ad4) SHA1(4ab617fadfc32efad90ed7f0555513f167b0c43a) )
+	ROM_LOAD( "hh_n3.ic36", 0x60000, 0x20000, CRC(4351044e) SHA1(0d3ce3f4f1473fd997e70de91e7b5b5a5ec60ad4) )
+
+	ROM_REGION( 0x080000, "tiles0", 0 )  // tiles
+	ROM_LOAD( "hh_a0.ic51", 0x00000, 0x20000, CRC(c577ba5f) SHA1(c882e58cf64deca8eee6f14f3df43ecc932488fc) )  // mask ROMs with no labels
+	ROM_LOAD( "hh_a1.ic57", 0x20000, 0x20000, CRC(429d12ab) SHA1(ccba25eab981fc4e664f76e06a2964066f2ae2e8) )
+	ROM_LOAD( "hh_a2.ic66", 0x40000, 0x20000, CRC(b5b163b0) SHA1(82a708fea4953a7c4dcd1d4a1b07f302221ba30b) )
+	ROM_LOAD( "hh_a3.ic64", 0x60000, 0x20000, CRC(8ef566a1) SHA1(3afb020a7317efe89c18b2a7773894ce28499d49) )
+
+	ROM_REGION( 0x20000, "samples", 0 ) // samples
+	ROM_LOAD( "gen_a-vo-.ic14", 0x00000, 0x20000, CRC(d8595c66) SHA1(97920c9947fbac609fb901415e5471c6e4ca066c) )
+
+	ROM_REGION( 0x200, "proms", 0 ) // located on M84-C-A top board
+	ROM_LOAD( "gen=84=_c-4n-.ic21", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) ) // TBP24S10
+	ROM_LOAD( "gen=84=_c-4p-.ic22", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) ) // TBP24S10
+
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "gen=84=_a-2h.ic5",  0x0000, 0x0117, CRC(21ede612) SHA1(5d05d3088f3d248db8948da175551ea29d7478b5) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "gen=84=_a-5l.ic33", 0x0200, 0x0117, CRC(579e257d) SHA1(bea2da60dc068fe16f469695f66786fe5406a823) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "gen=84=_a-7d.ic45", 0x0400, 0x0117, CRC(79ef86f2) SHA1(69d3ead62e2c70f5831ec6915920da356c922dfb) ) // TIBPAL-16L8-25 - bruteforced
+	ROM_LOAD( "gen=84=_c-3a.ic8",  0x0600, 0x0117, CRC(c1e19913) SHA1(7292ea25df818fe25e00dc4f37b3338abf2caaa2) ) // TIBPAL-16L8-25 - bruteforced - located on M84-C-A top board
+ROM_END
+
+ROM_START( dkgensana ) // where you see gen=84= actual label reads GEN(84)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "gen=84=_a-h0-.ic54", 0x00001, 0x20000, CRC(4a2b6524) SHA1(5584b28831407332412ab83d0b80671e73957740) ) // does not have 'for use in Japan' warning message
+	ROM_LOAD16_BYTE( "gen=84=_a-l0-.ic60", 0x00000, 0x20000, CRC(a2aa72ef) SHA1(7ccb3610a4a2024e1087e7e4569536151f0c65e9) )
+	ROM_LOAD16_BYTE( "gen=84=_a-h1-.ic53", 0x60001, 0x10000, CRC(54e5b73c) SHA1(5664f6e0a931b1c139e82dc98fcc9e38acd14616) ) // == gen_a-h1-.ic54
+	ROM_RELOAD(                            0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "gen=84=_a-l1-.ic59", 0x60000, 0x10000, CRC(894f8a9f) SHA1(57a0885c52a094def03b129a450cc891e6c075c6) ) // == gen_a-l1-.ic60
+	ROM_RELOAD(                            0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "gen_a-sp-.ic17", 0x00000, 0x10000, CRC(e83cfc2c) SHA1(3193bdd06a9712fc499e6fc90a33140463ef59fe) )
@@ -4636,7 +4674,8 @@ GAME( 1997, rtype2m82b,  rtype2,   m82,          rtype2,       m82_state,      e
 
 /* M84 */
 GAME( 1990, hharryu,     hharry,   hharryu,      hharry,       m72_state,      empty_init,      ROT0,   "Irem America", "Hammerin' Harry (US, M84 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, dkgensan,    hharry,   hharryu,      hharry,       m72_state,      empty_init,      ROT0,   "Irem", "Daiku no Gensan (Japan, M84 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dkgensan,    hharry,   hharryu,      hharry,       m72_state,      empty_init,      ROT0,   "Irem", "Daiku no Gensan (Japan, M84 hardware, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // has 'for use in Japan' message
+GAME( 1990, dkgensana,   hharry,   hharryu,      hharry,       m72_state,      empty_init,      ROT0,   "Irem", "Daiku no Gensan (Japan, M84 hardware, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // does not have 'for use in Japan' message
 GAME( 1990, hharryb,     hharry,   hharryu,      hharry,       m72_state,      empty_init,      ROT0,   "bootleg", "Hammerin' Harry (World, M84 hardware bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, rtype2,      0,        rtype2,       rtype2,       m72_state,      empty_init,      ROT0,   "Irem", "R-Type II (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -213,7 +213,7 @@ public:
 	///   horizontal blanking period.
 	/// \param [in] hbend Index of first visible pixel after horizontal
 	///   blanking period ends.
-	/// \param [in] hbstart Index of first pixel in horzontal blanking
+	/// \param [in] hbstart Index of first pixel in horizontal blanking
 	///   period after visible pixels.
 	/// \param [in] vtotal Total lines per frame, including vertical
 	///   blanking period.
@@ -228,6 +228,7 @@ public:
 		set_clock(pixclock);
 		m_refresh = HZ_TO_ATTOSECONDS(pixclock) * htotal * vtotal;
 		m_vblank = m_refresh / vtotal * (vtotal - (vbstart - vbend));
+		m_oldstyle_vblank_supplied = false;
 		m_width = htotal;
 		m_height = vtotal;
 		m_visarea.set(hbend, hbstart ? hbstart - 1 : htotal - 1, vbend, vbstart - 1);
@@ -406,7 +407,8 @@ public:
 	int partial_updates() const { return m_partial_updates_this_frame; }
 	int partial_scan_hpos() const { return m_partial_scan_hpos; }
 	bool update_partial(int scanline);
-	void update_now();
+	bool update_partial(int vpos, int hpos);
+	bool update_now() { return update_partial(vpos(), hpos()); }
 	void reset_partial_updates();
 
 	// additional helpers

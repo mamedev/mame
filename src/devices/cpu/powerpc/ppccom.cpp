@@ -10,8 +10,12 @@
 
 #include "emu.h"
 #include "ppccom.h"
+
 #include "ppcfe.h"
 #include "ppc_dasm.h"
+
+#include "emuopts.h"
+
 
 /***************************************************************************
     DEBUGGING
@@ -165,33 +169,33 @@ static const uint8_t fcmp_cr_table_source[32] =
 	/* ...V. */ 0x4,
 	/* ...VC */ 0x8,
 	/* ..Z.. */ 0x2,
-	/* ..Z.C */ 0xa,
+	/* ..Z.C */ 0x2,
 	/* ..ZV. */ 0x2,
-	/* ..ZVC */ 0xa,
+	/* ..ZVC */ 0x2,
 	/* .S... */ 0x4,
 	/* .S..C */ 0x8,
 	/* .S.V. */ 0x4,
 	/* .S.VC */ 0x8,
 	/* .SZ.. */ 0x2,
-	/* .SZ.C */ 0xa,
+	/* .SZ.C */ 0x2,
 	/* .SZV. */ 0x2,
-	/* .SZVC */ 0xa,
-	/* U.... */ 0x5,
-	/* U...C */ 0x9,
-	/* U..V. */ 0x5,
-	/* U..VC */ 0x9,
-	/* U.Z.. */ 0x3,
-	/* U.Z.C */ 0xb,
-	/* U.ZV. */ 0x3,
-	/* U.ZVC */ 0xb,
-	/* US... */ 0x5,
-	/* US..C */ 0x9,
-	/* US.V. */ 0x5,
-	/* US.VC */ 0x9,
-	/* USZ.. */ 0x3,
-	/* USZ.C */ 0xb,
-	/* USZV. */ 0x3,
-	/* USZVC */ 0xb
+	/* .SZVC */ 0x2,
+	/* U.... */ 0x1,
+	/* U...C */ 0x1,
+	/* U..V. */ 0x1,
+	/* U..VC */ 0x1,
+	/* U.Z.. */ 0x1,
+	/* U.Z.C */ 0x1,
+	/* U.ZV. */ 0x1,
+	/* U.ZVC */ 0x1,
+	/* US... */ 0x1,
+	/* US..C */ 0x1,
+	/* US.V. */ 0x1,
+	/* US.VC */ 0x1,
+	/* USZ.. */ 0x1,
+	/* USZ.C */ 0x1,
+	/* USZV. */ 0x1,
+	/* USZVC */ 0x1
 };
 
 
@@ -596,7 +600,8 @@ static inline int sign_double(double x)
 void ppc_device::device_start()
 {
 	/* allocate the core from the near cache */
-	m_core = (internal_ppc_state *)m_cache.alloc_near(sizeof(internal_ppc_state));
+	m_cache.allocate_cache(mconfig().options().drc_rwx());
+	m_core = m_cache.alloc_near<internal_ppc_state>();
 	memset(m_core, 0, sizeof(internal_ppc_state));
 
 	m_entry = nullptr;
@@ -959,6 +964,65 @@ void ppc_device::device_start()
 			m_fdregmap[30] = uml::F7;
 		if (beinfo.direct_fregs > 8)
 			m_fdregmap[31] = uml::F8;
+	}
+
+	try
+	{
+		/* generate the entry point and out-of-cycles handlers */
+		static_generate_entry_point();
+		static_generate_nocode_handler();
+		static_generate_out_of_cycles();
+		static_generate_tlb_mismatch();
+		if (m_cap & PPCCAP_603_MMU)
+			static_generate_swap_tgpr();
+
+		/* append exception handlers for various types */
+		static_generate_exception(EXCEPTION_RESET,     true,  "exception_reset");
+		static_generate_exception(EXCEPTION_MACHCHECK, true,  "exception_machine_check");
+		static_generate_exception(EXCEPTION_DSI,       true,  "exception_dsi");
+		static_generate_exception(EXCEPTION_ISI,       true,  "exception_isi");
+		static_generate_exception(EXCEPTION_EI,        true,  "exception_ei");
+		static_generate_exception(EXCEPTION_EI,        false, "exception_ei_norecover");
+		static_generate_exception(EXCEPTION_ALIGN,     true,  "exception_align");
+		static_generate_exception(EXCEPTION_PROGRAM,   true,  "exception_program");
+		static_generate_exception(EXCEPTION_NOFPU,     true,  "exception_fpu_unavailable");
+		static_generate_exception(EXCEPTION_DECREMENT, true,  "exception_decrementer");
+		static_generate_exception(EXCEPTION_SYSCALL,   true,  "exception_syscall");
+		static_generate_exception(EXCEPTION_TRACE,     true,  "exception_trace");
+		static_generate_exception(EXCEPTION_FPASSIST,  true,  "exception_floating_point_assist");
+		if (m_cap & PPCCAP_603_MMU)
+		{
+			static_generate_exception(EXCEPTION_ITLBMISS,  true,  "exception_itlb_miss");
+			static_generate_exception(EXCEPTION_DTLBMISSL, true,  "exception_dtlb_miss_load");
+			static_generate_exception(EXCEPTION_DTLBMISSS, true,  "exception_dtlb_miss_store");
+		}
+
+		/* add subroutines for memory accesses */
+		for (int mode = 0; mode < 8; mode++)
+		{
+			static_generate_memory_accessor(mode, 1, false, false, "read8",       m_read8[mode],       nullptr);
+			static_generate_memory_accessor(mode, 1, true,  false, "write8",      m_write8[mode],      nullptr);
+			static_generate_memory_accessor(mode, 2, false, true,  "read16mask",  m_read16mask[mode],  nullptr);
+			static_generate_memory_accessor(mode, 2, false, false, "read16",      m_read16[mode],      m_read16mask[mode]);
+			static_generate_memory_accessor(mode, 2, true,  true,  "write16mask", m_write16mask[mode], nullptr);
+			static_generate_memory_accessor(mode, 2, true,  false, "write16",     m_write16[mode],     m_write16mask[mode]);
+			static_generate_memory_accessor(mode, 4, false, true,  "read32mask",  m_read32mask[mode],  nullptr);
+			static_generate_memory_accessor(mode, 4, false, false, "read32align", m_read32align[mode], nullptr);
+			static_generate_memory_accessor(mode, 4, false, false, "read32",      m_read32[mode],      m_read32mask[mode]);
+			static_generate_memory_accessor(mode, 4, true,  true,  "write32mask", m_write32mask[mode], nullptr);
+			static_generate_memory_accessor(mode, 4, true,  false, "write32align",m_write32align[mode],nullptr);
+			static_generate_memory_accessor(mode, 4, true,  false, "write32",     m_write32[mode],     m_write32mask[mode]);
+			static_generate_memory_accessor(mode, 8, false, true,  "read64mask",  m_read64mask[mode],  nullptr);
+			static_generate_memory_accessor(mode, 8, false, false, "read64",      m_read64[mode],      m_read64mask[mode]);
+			static_generate_memory_accessor(mode, 8, true,  true,  "write64mask", m_write64mask[mode], nullptr);
+			static_generate_memory_accessor(mode, 8, true,  false, "write64",     m_write64[mode],     m_write64mask[mode]);
+			static_generate_lsw_entries(mode);
+			static_generate_stsw_entries(mode);
+		}
+	}
+	catch (drcuml_block::abort_compilation &)
+	{
+		fatalerror("Error generating PPC static handlers\n");
 	}
 
 	/* mark the cache dirty so it is updated on next execute */
@@ -1511,18 +1575,11 @@ void ppc_device::ppccom_tlb_flush()
 
 void ppc_device::ppccom_get_dsisr()
 {
-	int intent = 0;
+	int intent = (m_core->param1 & 1) ? TR_WRITE : TR_READ;
 
-	if (m_core->param1 & 1)
-	{
-		intent = TR_WRITE;
-	}
-	else
-	{
-		intent = TR_READ;
-	}
-
-	m_core->param1 = ppccom_translate_address_internal(intent, false, m_core->param0);
+	offs_t address = m_core->param0;
+	m_core->param1 = ppccom_translate_address_internal(intent, false, address);
+	m_core->param0 = address;
 }
 
 /*-------------------------------------------------
@@ -2761,7 +2818,7 @@ void ppc_device::ppc4xx_spu_timer_reset()
 		attotime charperiod = clockperiod * (divisor * 16 * bpc);
 		m_spu.timer->adjust(charperiod, 0, charperiod);
 		if (PRINTF_SPU)
-			printf("ppc4xx_spu_timer_reset: baud rate = %.0f\n", charperiod.as_hz() * bpc);
+			osd_printf_debug("ppc4xx_spu_timer_reset: baud rate = %.0f\n", charperiod.as_hz() * bpc);
 	}
 
 	/* otherwise, disable the timer */
@@ -2860,7 +2917,7 @@ uint8_t ppc4xx_device::ppc4xx_spu_r(offs_t offset)
 			break;
 	}
 	if (PRINTF_SPU)
-		printf("spu_r(%d) = %02X\n", offset, result);
+		osd_printf_debug("spu_r(%d) = %02X\n", offset, result);
 	return result;
 }
 
@@ -2874,7 +2931,7 @@ void ppc4xx_device::ppc4xx_spu_w(offs_t offset, uint8_t data)
 	uint8_t oldstate, newstate;
 
 	if (PRINTF_SPU)
-		printf("spu_w(%d) = %02X\n", offset, data);
+		osd_printf_debug("spu_w(%d) = %02X\n", offset, data);
 	switch (offset)
 	{
 		/* clear error bits */

@@ -9,9 +9,9 @@
 
 #include "emu.h"
 #include "dspp.h"
+
 #include "dsppfe.h"
-#include "cpu/drcfe.h"
-#include "cpu/drcuml.h"
+
 #include "cpu/drcumlsh.h"
 
 using namespace uml;
@@ -29,15 +29,10 @@ using namespace uml;
 #define EXECUTE_UNMAPPED_CODE           2
 #define EXECUTE_RESET_CACHE             3
 
-inline void dspp_device::alloc_handle(drcuml_state *drcuml, code_handle **handleptr, const char *name)
+inline void dspp_device::alloc_handle(code_handle **handleptr, const char *name)
 {
 	if (*handleptr == nullptr)
-		*handleptr = drcuml->handle_alloc(name);
-}
-
-static inline uint32_t epc(const opcode_desc *desc)
-{
-	return desc->pc;
+		*handleptr = m_drcuml->handle_alloc(name);
 }
 
 
@@ -132,7 +127,7 @@ void dspp_device::static_generate_memory_accessor(bool iswrite, const char *name
 	drcuml_block &block = m_drcuml->begin_block(10);
 
 	// add a global entry for this
-	alloc_handle(m_drcuml.get(), &handleptr, name);
+	alloc_handle(&handleptr, name);
 	UML_HANDLE(block, *handleptr);                                                          // handle  *handleptr
 
 	if (iswrite)
@@ -152,7 +147,6 @@ void dspp_device::static_generate_memory_accessor(bool iswrite, const char *name
 
 void dspp_device::execute_run_drc()
 {
-	drcuml_state *drcuml = m_drcuml.get();
 	int execute_result;
 
 	if (m_cache_dirty)
@@ -162,7 +156,7 @@ void dspp_device::execute_run_drc()
 
 	do
 	{
-		execute_result = drcuml->execute(*m_entry);
+		execute_result = m_drcuml->execute(*m_entry);
 
 		/* if we need to recompile, do it */
 		if (execute_result == EXECUTE_MISSING_CODE)
@@ -182,7 +176,6 @@ void dspp_device::execute_run_drc()
 
 void dspp_device::compile_block(offs_t pc)
 {
-	drcuml_state *drcuml = m_drcuml.get();
 	compiler_state compiler = { 0 };
 	const opcode_desc *seqhead, *seqlast;
 	int override = false;
@@ -198,7 +191,7 @@ void dspp_device::compile_block(offs_t pc)
 		try
 		{
 			/* start the block */
-			drcuml_block &block = drcuml->begin_block(32768);
+			drcuml_block &block = m_drcuml->begin_block(32768);
 
 			/* loop until we get through all instruction sequences */
 			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
@@ -207,17 +200,17 @@ void dspp_device::compile_block(offs_t pc)
 				uint32_t nextpc;
 
 				/* add a code log entry */
-				if (drcuml->logging())
+				if (m_drcuml->logging())
 					block.append_comment("-------------------------");
 
 				/* determine the last instruction in this sequence */
 				for (seqlast = seqhead; seqlast != nullptr; seqlast = seqlast->next())
-					if (seqlast->flags & OPFLAG_END_SEQUENCE)
+					if (seqlast->end_sequence())
 						break;
 				assert(seqlast != nullptr);
 
 				/* if we don't have a hash for this mode/pc, or if we are overriding all, add one */
-				if (override || !drcuml->hash_exists(0, seqhead->pc))
+				if (override || !m_drcuml->hash_exists(0, seqhead->pc))
 					UML_HASH(block, 0, seqhead->pc);                                        // hash    mode,pc
 
 				/* if we already have a hash, and this is the first sequence, assume that we */
@@ -240,7 +233,7 @@ void dspp_device::compile_block(offs_t pc)
 				generate_checksum_block(block, &compiler, seqhead, seqlast);
 
 				/* label this instruction, if it may be jumped to locally */
-				if (seqhead->flags & OPFLAG_IS_BRANCH_TARGET)
+				if (seqhead->is_branch_target())
 					UML_LABEL(block, seqhead->pc | 0x80000000);                             // label   seqhead->pc
 
 				compiler.abortlabel = compiler.labelnum++;
@@ -251,7 +244,7 @@ void dspp_device::compile_block(offs_t pc)
 				UML_LABEL(block, compiler.abortlabel);
 
 				/* if we need to return to the start, do it */
-				if (seqlast->flags & OPFLAG_RETURN_TO_START)
+				if (seqlast->return_to_start())
 					nextpc = pc;
 
 				/* otherwise we just go to the next instruction */
@@ -283,13 +276,13 @@ void dspp_device::generate_checksum_block(drcuml_block &block, compiler_state *c
 	if (m_drcuml->logging())
 		block.append_comment("[Validation for %08X]", seqhead->pc);                // comment
 
-	/* loose verify or single instruction: just compare and fail */
 	if (false/*!(m_drcoptions & DSPPDRC_STRICT_VERIFY)*/ || seqhead->next() == nullptr)
 	{
-		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
+		// loose verify or single instruction: just compare and fail
+		if (!seqhead->virtual_noop())
 		{
-			uint32_t sum = seqhead->opptr.w[0];
-			uint32_t addr = seqhead->physpc;
+			uint32_t sum = seqhead->opptr[0];
+			uint32_t addr = seqhead->pc;
 			const void *base = m_code_cache.read_ptr(addr);
 			UML_MOV(block, I0, 0);
 			UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x2);         // load    i0,base,0,word
@@ -298,27 +291,28 @@ void dspp_device::generate_checksum_block(drcuml_block &block, compiler_state *c
 			UML_EXHc(block, COND_NE, *m_nocode, seqhead->pc);           // exne    nocode,seqhead->pc
 		}
 	}
-
-	/* full verification; sum up everything */
 	else
 	{
+		// full verification; sum up everything
 		uint32_t sum = 0;
-		uint32_t addr = seqhead->physpc;
+		uint32_t addr = seqhead->pc;
 		const void *base = m_code_cache.read_ptr(addr);
 		UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x2);              // load    i0,base,0,dword
-		sum += seqhead->opptr.w[0];
+		sum += seqhead->opptr[0];
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
-			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
+		{
+			if (!curdesc->virtual_noop())
 			{
-				addr = curdesc->physpc;
+				addr = curdesc->pc;
 				base = m_code_cache.read_ptr(addr);
 				assert(base != nullptr);
 				UML_LOAD(block, I1, base, 0, SIZE_WORD, SCALE_x2);      // load    i1,base,dword
 				UML_ADD(block, I0, I0, I1);                             // add     i0,i0,i1
-				sum += curdesc->opptr.w[0];
+				sum += curdesc->opptr[0];
 			}
+		}
 		UML_CMP(block, I0, sum);                                        // cmp     i0,sum
-		UML_EXHc(block, COND_NE, *m_nocode, epc(seqhead));              // exne    nocode,seqhead->pc
+		UML_EXHc(block, COND_NE, *m_nocode, seqhead->epc());            // exne    nocode,seqhead->pc
 	}
 }
 
@@ -352,8 +346,8 @@ void dspp_device::static_generate_entry_point()
 	drcuml_block &block = m_drcuml->begin_block(20);
 
 	/* forward references */
-	alloc_handle(m_drcuml.get(), &m_nocode, "nocode");
-	alloc_handle(m_drcuml.get(), &m_entry, "entry");
+	alloc_handle(&m_nocode, "nocode");
+	alloc_handle(&m_entry, "entry");
 	UML_HANDLE(block, *m_entry);                                                            // handle  entry
 
 	//load_fast_iregs(block);                                                                 // <load fastregs>
@@ -370,7 +364,7 @@ void dspp_device::static_generate_nocode_handler()
 	drcuml_block &block = m_drcuml->begin_block(10);
 
 	/* generate a hash jump via the current mode and PC */
-	alloc_handle(m_drcuml.get(), &m_nocode, "nocode");
+	alloc_handle(&m_nocode, "nocode");
 	UML_HANDLE(block, *m_nocode);                                                           // handle  nocode
 	UML_GETEXP(block, I0);                                                                  // getexp  i0
 
@@ -387,7 +381,7 @@ void dspp_device::static_generate_out_of_cycles()
 	drcuml_block &block = m_drcuml->begin_block(10);
 
 	/* generate a hash jump via the current mode and PC */
-	alloc_handle(m_drcuml.get(), &m_out_of_cycles, "out_of_cycles");
+	alloc_handle(&m_out_of_cycles, "out_of_cycles");
 	UML_HANDLE(block, *m_out_of_cycles);                                                    // handle  out_of_cycles
 	UML_GETEXP(block, I0);                                                                  // getexp  i0
 	UML_MOV(block, mem(&m_core->m_pc), I0);                                                 // mov     <pc>,i0
@@ -416,16 +410,8 @@ void dspp_device::generate_sequence_instruction(drcuml_block &block, compiler_st
 		UML_DEBUG(block, desc->pc);                                                         // debug   desc->pc
 	}
 
-	/* if we hit an unmapped address, fatal error */
-	if (desc->flags & OPFLAG_COMPILER_UNMAPPED)
-	{
-		UML_MOV(block, mem(&m_core->m_pc), desc->pc);                                       // mov     [pc],desc->pc
-		save_fast_iregs(block);                                                             // <save fastregs>
-		UML_EXIT(block, EXECUTE_UNMAPPED_CODE);                                             // exit    EXECUTE_UNMAPPED_CODE
-	}
-
 	/* unless this is a virtual no-op, it's a regular instruction */
-	if (!(desc->flags & OPFLAG_VIRTUAL_NOOP))
+	if (!desc->virtual_noop())
 	{
 		generate_opcode(block, compiler, desc);
 	}
@@ -445,12 +431,12 @@ void dspp_device::generate_update_cycles(drcuml_block &block, compiler_state *co
 
 void dspp_device::generate_opcode(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc)
 {
-	uint16_t op = desc->opptr.w[0];
+	uint16_t op = desc->opptr[0];
 
 	UML_SUB(block, mem(&m_core->m_tclock), mem(&m_core->m_tclock), 1);
 	UML_CALLC(block, cfunc_update_fifo_dma, this);
 
-	if (m_drcuml.get()->logging())
+	if (m_drcuml->logging())
 		block.append_comment("generate_opcode: %04x", op);
 
 	code_label skip = compiler->labelnum++;
@@ -459,7 +445,7 @@ void dspp_device::generate_opcode(drcuml_block &block, compiler_state *compiler,
 	//UML_TEST(block, mem(&m_core->m_flag_sleep), 1);
 	//UML_JMPc(block, COND_NZ, compiler->abortlabel);
 
-	//UML_MOV(block, mem(&m_core->m_arg0), desc->physpc);
+	//UML_MOV(block, mem(&m_core->m_arg0), desc->pc);
 	//UML_MOV(block, mem(&m_core->m_arg1), op);
 	//UML_CALLC(block, cfunc_print_sums, this);
 
@@ -489,7 +475,7 @@ void dspp_device::generate_opcode(drcuml_block &block, compiler_state *compiler,
 
 void dspp_device::generate_set_rbase(drcuml_block &block, compiler_state *compiler, uint32_t base, uint32_t addr)
 {
-	if (m_drcuml.get()->logging())
+	if (m_drcuml->logging())
 		block.append_comment("set_rbase");
 	switch (base)
 	{
@@ -511,14 +497,14 @@ void dspp_device::generate_set_rbase(drcuml_block &block, compiler_state *compil
 
 void dspp_device::generate_super_special(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc)
 {
-	uint16_t op = desc->opptr.w[0];
+	uint16_t op = desc->opptr[0];
 	uint32_t sel = (op >> 7) & 7;
 
 	switch (sel)
 	{
 		case 1: // BAC
 		{
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("BAC");
 			UML_SHR(block, mem(&m_core->m_jmpdest), mem(&m_core->m_acc), 4);    // m_core->m_pc = m_core->m_acc >> 4;
 			generate_branch(block, compiler, desc);
@@ -526,7 +512,7 @@ void dspp_device::generate_super_special(drcuml_block &block, compiler_state *co
 		}
 		case 4: // RTS
 		{
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("RTS");
 			// m_core->m_pc = m_core->m_stack[--m_core->m_stack_ptr];
 			UML_SUB(block, mem(&m_core->m_stack_ptr), mem(&m_core->m_stack_ptr), 1);
@@ -537,7 +523,7 @@ void dspp_device::generate_super_special(drcuml_block &block, compiler_state *co
 		case 5: // OP_MASK
 		{
 			// TODO
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("OP_MASK");
 			break;
 		}
@@ -545,7 +531,7 @@ void dspp_device::generate_super_special(drcuml_block &block, compiler_state *co
 		case 7: // SLEEP
 		{
 			// TODO: How does sleep work?
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("SLEEP");
 			UML_SUB(block, mem(&m_core->m_pc), mem(&m_core->m_pc), 1);  // --m_core->m_pc;
 			UML_MOV(block, mem(&m_core->m_flag_sleep), 1);              // m_core->m_flag_sleep = 1;
@@ -562,7 +548,7 @@ void dspp_device::generate_super_special(drcuml_block &block, compiler_state *co
 
 void dspp_device::generate_special_opcode(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc)
 {
-	uint16_t op = desc->opptr.w[0];
+	uint16_t op = desc->opptr[0];
 
 	switch ((op >> 10) & 7)
 	{
@@ -573,7 +559,7 @@ void dspp_device::generate_special_opcode(drcuml_block &block, compiler_state *c
 		}
 		case 1: // JUMP
 		{
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("JUMP");
 
 			UML_MOV(block, mem(&m_core->m_jmpdest), op & 0x3ff);
@@ -582,7 +568,7 @@ void dspp_device::generate_special_opcode(drcuml_block &block, compiler_state *c
 		}
 		case 2: // JSR
 		{
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("JSR");
 			UML_STORE(block, (void *)m_core->m_stack, mem(&m_core->m_stack_ptr), mem(&m_core->m_pc), SIZE_DWORD, SCALE_x4);
 			UML_ADD(block, mem(&m_core->m_stack_ptr), mem(&m_core->m_stack_ptr), 1);
@@ -593,13 +579,13 @@ void dspp_device::generate_special_opcode(drcuml_block &block, compiler_state *c
 		case 3: // BFM
 		{
 			// TODO
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("BFM");
 			break;
 		}
 		case 4: // MOVEREG
 		{
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("MOVEREG");
 			const uint32_t regdi = op & 0x3f;
 			generate_translate_reg(block, regdi & 0xf);
@@ -624,14 +610,14 @@ void dspp_device::generate_special_opcode(drcuml_block &block, compiler_state *c
 		}
 		case 5: // RBASE
 		{
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("RBASE");
 			generate_set_rbase(block, compiler, (op & 3) << 2, op & 0x3fc);
 			break;
 		}
 		case 6: // MOVED
 		{
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("MOVED");
 			generate_parse_operands(block, compiler, desc, 1);
 			generate_read_next_operand(block, compiler, desc);
@@ -642,7 +628,7 @@ void dspp_device::generate_special_opcode(drcuml_block &block, compiler_state *c
 		}
 		case 7: // MOVEI
 		{
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("MOVEI");
 			generate_parse_operands(block, compiler, desc, 1);
 			UML_MOV(block, I1, op & 0x3ff);
@@ -668,7 +654,7 @@ void dspp_device::generate_branch(drcuml_block &block, compiler_state *compiler,
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
 	{
 		generate_update_cycles(block, &compiler_temp, desc->targetpc);  // <subtract cycles>
-		if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
+		if (desc->intrablock_branch())
 			UML_JMP(block, desc->targetpc | 0x80000000);                // jmp     desc->targetpc | 0x80000000
 		else
 			UML_HASHJMP(block, 0, desc->targetpc, *m_nocode);           // hashjmp <mode>,desc->targetpc,nocode
@@ -688,9 +674,9 @@ void dspp_device::generate_branch(drcuml_block &block, compiler_state *compiler,
 
 void dspp_device::generate_branch_opcode(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc)
 {
-	uint16_t op = desc->opptr.w[0];
+	uint16_t op = desc->opptr[0];
 
-	if (m_drcuml.get()->logging())
+	if (m_drcuml->logging())
 		block.append_comment("branch_opcode");
 
 	uint32_t mode = (op >> 13) & 3;
@@ -736,29 +722,29 @@ void dspp_device::generate_branch_opcode(drcuml_block &block, compiler_state *co
 
 void dspp_device::generate_complex_branch_opcode(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc)
 {
-	uint16_t op = desc->opptr.w[0];
+	uint16_t op = desc->opptr[0];
 
 	switch ((op >> 10) & 7)
 	{
 		case 0: // BLT
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("BLT");
 			UML_XOR(block, I0, mem(&m_core->m_flag_neg), mem(&m_core->m_flag_over));    // branch = (n && !v) || (!n && v);
 			break;
 		case 1: // BLE
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("BLE");
 			UML_XOR(block, I0, mem(&m_core->m_flag_neg), mem(&m_core->m_flag_over));
 			UML_OR(block, I0, I0, mem(&m_core->m_flag_zero));                           // branch = ((n && !v) || (!n && v)) || z;
 			break;
 		case 2: // BGE
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("BGE");
 			UML_XOR(block, I0, mem(&m_core->m_flag_neg), mem(&m_core->m_flag_over));
 			UML_SUB(block, I0, 1, I0);                                                  // branch = ((n && v) || (!n && !v));
 			break;
 		case 3: // BGT
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("BGT");
 			UML_AND(block, I0, mem(&m_core->m_flag_neg), mem(&m_core->m_flag_over));
 			UML_SUB(block, I0, 1, I0);
@@ -766,24 +752,24 @@ void dspp_device::generate_complex_branch_opcode(drcuml_block &block, compiler_s
 			UML_AND(block, I0, I0, I1);                                                 // branch = ((n && v) || (!n && !v)) && !z;
 			break;
 		case 4: // BHI
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("BHI");
 			UML_SUB(block, I0, 1, mem(&m_core->m_flag_zero));
 			UML_AND(block, I0, I0, mem(&m_core->m_flag_carry));                         // branch = c && !z;
 			break;
 		case 5: // BLS
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("BLS");
 			UML_SUB(block, I0, 1, mem(&m_core->m_flag_carry));
 			UML_OR(block, I0, I0, mem(&m_core->m_flag_zero));                           // branch = !c || z;
 			break;
 		case 6: // BXS
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("BXS");
 			UML_MOV(block, I0, mem(&m_core->m_flag_exact));                             // branch = x;
 			break;
 		case 7: // BXC
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("BXC");
 			UML_SUB(block, I0, 1, mem(&m_core->m_flag_exact));                          // branch = !x;
 			break;
@@ -800,7 +786,7 @@ void dspp_device::generate_complex_branch_opcode(drcuml_block &block, compiler_s
 void dspp_device::generate_translate_reg(drcuml_block &block, uint16_t reg)
 {
 	const uint32_t base = (reg >> 2) & 3;
-	if (m_drcuml.get()->logging())
+	if (m_drcuml->logging())
 		block.append_comment("translate_reg");
 	UML_MOV(block, I1, mem(&m_core->m_rbase[base]));
 	UML_ADD(block, I1, I1, reg - (reg & ~3));
@@ -813,7 +799,7 @@ void dspp_device::generate_parse_operands(drcuml_block &block, compiler_state *c
 	uint32_t operand = 0;
 	uint32_t numregs = 0;
 
-	if (m_drcuml.get()->logging())
+	if (m_drcuml->logging())
 		block.append_comment("parse_operands");
 
 	for (uint32_t i = 0; i < MAX_OPERANDS; ++i)
@@ -931,10 +917,10 @@ void dspp_device::generate_parse_operands(drcuml_block &block, compiler_state *c
 
 void dspp_device::generate_read_next_operand(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc)
 {
-	//uint16_t op = (uint16_t)desc->opptr.w[0];
+	//uint16_t op = desc->opptr[0];
 
 	code_label no_load;
-	if (m_drcuml.get()->logging())
+	if (m_drcuml->logging())
 		block.append_comment("read_next_operand");
 	UML_LOAD(block, I0, (void *)&m_core->m_operands[0].value, mem(&m_core->m_opidx), SIZE_DWORD, SCALE_x8);
 	//if (op == 0x46a0)
@@ -965,7 +951,7 @@ void dspp_device::generate_read_next_operand(drcuml_block &block, compiler_state
 
 void dspp_device::generate_write_next_operand(drcuml_block &block, compiler_state *compiler)
 {
-	if (m_drcuml.get()->logging())
+	if (m_drcuml->logging())
 		block.append_comment("write_next_operand");
 	// int32_t addr = m_core->m_operands[m_core->m_opidx].addr;
 	UML_LOAD(block, I1, (void *)&m_core->m_operands[0].addr, mem(&m_core->m_opidx), SIZE_DWORD, SCALE_x8);
@@ -979,14 +965,14 @@ void dspp_device::generate_write_next_operand(drcuml_block &block, compiler_stat
 
 void dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc)
 {
-	uint16_t op = (uint16_t)desc->opptr.w[0];
+	uint16_t op = desc->opptr[0];
 	uint32_t numops = (op >> 13) & 3;
 	uint32_t muxa = (op >> 10) & 3;
 	uint32_t muxb = (op >> 8) & 3;
 	uint32_t alu_op = (op >> 4) & 0xf;
 	uint32_t barrel_code = op & 0xf;
 
-	if (m_drcuml.get()->logging())
+	if (m_drcuml->logging())
 		block.append_comment("arithmetic_opcode");
 
 	// Check for operand overflow
@@ -1066,7 +1052,7 @@ void dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state
 	switch (alu_op)
 	{
 		case 0: // _TRA
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("_TRA");
 			UML_MOV(block, I0, I2); // alu_res = alu_a;
 			UML_MOV(block, mem(&m_core->m_flag_over), 0);               // m_core->m_flag_over = 0;
@@ -1074,7 +1060,7 @@ void dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state
 			break;
 
 		case 1: // _NEG
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("_NEG");
 			UML_SUB(block, I0, 0, I3); // alu_res = -alu_b;
 			UML_MOV(block, mem(&m_core->m_flag_over), 0);               // m_core->m_flag_over = 0;
@@ -1082,7 +1068,7 @@ void dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state
 			break;
 
 		case 2: // _+
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("_+");
 			UML_ADD(block, I0, I2, I3); // alu_res = alu_a + alu_b;
 
@@ -1103,7 +1089,7 @@ void dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state
 			break;
 
 		case 3: // _+C
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("_+C");
 			UML_SHL(block, I3, mem(&m_core->m_flag_carry), 4);
 			UML_ADD(block, I0, I2, I3);                                 // alu_res = alu_a + (m_core->m_flag_carry << 4);
@@ -1117,7 +1103,7 @@ void dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state
 			break;
 
 		case 4: // _-
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("_-");
 			UML_SUB(block, I0, I2, I3);                                 // alu_res = alu_a - alu_b;
 
@@ -1139,7 +1125,7 @@ void dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state
 			break;
 
 		case 5: // _-B
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("_-B");
 			UML_SHL(block, I3, mem(&m_core->m_flag_carry), 4);
 			UML_SUB(block, I0, I2, I3);                                 // alu_res = alu_a - (m_core->m_flag_carry << 4);
@@ -1153,7 +1139,7 @@ void dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state
 			break;
 
 		case 6: // _++
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("_++");
 			UML_ADD(block, I0, I2, 1);                                  // alu_res = alu_a + 1;
 
@@ -1167,7 +1153,7 @@ void dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state
 			break;
 
 		case 7: // _--
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("_--");
 			UML_SUB(block, I0, I2, 1);                                  // alu_res = alu_a - 1;
 
@@ -1181,7 +1167,7 @@ void dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state
 			break;
 
 		case 8: // _TRL
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("_TRL");
 			UML_MOV(block, I0, I2);                                     // alu_res = alu_a;
 			UML_MOV(block, mem(&m_core->m_flag_over), 0);               // m_core->m_flag_over = 0;
@@ -1189,7 +1175,7 @@ void dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state
 			break;
 
 		case 9: // _NOT
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("_NOT");
 			UML_XOR(block, I0, I2, 0xffffffff);                         // alu_res = ~alu_a;
 			UML_MOV(block, mem(&m_core->m_flag_over), 0);               // m_core->m_flag_over = 0;
@@ -1197,7 +1183,7 @@ void dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state
 			break;
 
 		case 10: // _AND
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("_AND");
 			UML_AND(block, I0, I2, I3);                                 // alu_res = alu_a & alu_b;
 			UML_MOV(block, mem(&m_core->m_flag_over), 0);               // m_core->m_flag_over = 0;
@@ -1205,7 +1191,7 @@ void dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state
 			break;
 
 		case 11: // _NAND
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("_NAND");
 			UML_AND(block, I0, I2, I3);
 			UML_XOR(block, I0, I0, 0xffffffff);                         // alu_res = ~(alu_a & alu_b);
@@ -1214,7 +1200,7 @@ void dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state
 			break;
 
 		case 12: // _OR
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("_OR");
 			UML_OR(block, I0, I2, I3);                                  // alu_res = alu_a | alu_b;
 			UML_MOV(block, mem(&m_core->m_flag_over), 0);               // m_core->m_flag_over = 0;
@@ -1222,7 +1208,7 @@ void dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state
 			break;
 
 		case 13: // _NOR
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("_NOR");
 			UML_OR(block, I0, I2, I3);
 			UML_XOR(block, I0, I0, 0xffffffff);                         // alu_res = ~(alu_a | alu_b);
@@ -1231,7 +1217,7 @@ void dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state
 			break;
 
 		case 14: // _XOR
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("_XOR");
 			UML_XOR(block, I0, I2, I3);                                 // alu_res = alu_a ^ alu_b;
 			UML_MOV(block, mem(&m_core->m_flag_over), 0);               // m_core->m_flag_over = 0;
@@ -1239,7 +1225,7 @@ void dspp_device::generate_arithmetic_opcode(drcuml_block &block, compiler_state
 			break;
 
 		case 15: // _XNOR
-			if (m_drcuml.get()->logging())
+			if (m_drcuml->logging())
 				block.append_comment("_XNOR");
 			UML_XOR(block, I0, I2, I3);
 			UML_XOR(block, I0, I0, 0xffffffff);                         // alu_res = ~(alu_a ^ alu_b);

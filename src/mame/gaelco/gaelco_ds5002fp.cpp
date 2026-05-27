@@ -23,19 +23,18 @@ void gaelco_ds5002fp_device::dallas_ram(address_map &map)
 gaelco_ds5002fp_device::gaelco_ds5002fp_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, GAELCO_DS5002FP, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
-	, m_hostmem_config({ "hostmem", ENDIANNESS_BIG, 8, 16, 0 })
-	, m_hostmem(nullptr)
+	, m_hostmem_config("hostmem", ENDIANNESS_BIG, 8, 16)
 {
 }
 
 uint8_t gaelco_ds5002fp_device::hostmem_r(offs_t offset)
 {
-	return m_hostmem->read_byte(offset);
+	return m_hostmem.read_byte(offset);
 }
 
 void gaelco_ds5002fp_device::hostmem_w(offs_t offset, uint8_t data)
 {
-	m_hostmem->write_byte(offset, data);
+	m_hostmem.write_byte(offset, data);
 }
 
 void gaelco_ds5002fp_device::device_add_mconfig(machine_config &config)
@@ -49,7 +48,7 @@ void gaelco_ds5002fp_device::device_add_mconfig(machine_config &config)
 
 void gaelco_ds5002fp_device::device_start()
 {
-	m_hostmem = &space(0);
+	space(0).cache(m_hostmem);
 }
 
 device_memory_interface::space_config_vector gaelco_ds5002fp_device::memory_space_config() const

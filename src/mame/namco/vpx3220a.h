@@ -20,6 +20,9 @@ class vpx3220a_device : public device_t, public i2c_hle_interface
 public:
 	vpx3220a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	auto href_callback() { return m_href_cb.bind(); }
+	auto vref_callback() { return m_vref_cb.bind(); }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -28,8 +31,21 @@ protected:
 	virtual void write_data(u16 offset, u8 data) override;
 
 private:
+	TIMER_CALLBACK_MEMBER(href_tick);
+	TIMER_CALLBACK_MEMBER(vref_tick);
+
+	u16 get_fp_reg();
+	void set_fp_reg();
+
 	enum subaddr_t : u8;
 	enum fpaddr_t : u16;
+
+	devcb_write_line m_href_cb;
+	devcb_write_line m_vref_cb;
+	emu_timer *m_href_timer;
+	emu_timer *m_vref_timer;
+	int m_href;
+	int m_vref;
 
 	u8 m_ifc;
 	u8 m_afend;
@@ -52,9 +68,12 @@ private:
 	u8 m_driver_a;
 	u8 m_driver_b;
 
+	u16 m_fpdata;
 	u16 m_fpaddr;
 	u8 m_fpsta;
-	bool m_fp_lsb;
+	bool m_want_fp_lsb;
+	bool m_accessing_fp;
+	bool m_want_fp_data_lsb;
 
 	u16 m_fp_tint;
 	u16 m_fp_gain;
@@ -76,9 +95,7 @@ private:
 	u16 m_fp_sgain;
 	u16 m_fp_vsdt;
 	u16 m_fp_cmdwd;
-	u16 m_fp_infowd;
 	u16 m_fp_tvstndwr;
-	u16 m_fp_tvstndrd;
 };
 
 DECLARE_DEVICE_TYPE(VPX3220A, vpx3220a_device)

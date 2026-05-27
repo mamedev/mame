@@ -13,7 +13,7 @@ class dsp563xx_device;
 class hi08_device : public device_t
 {
 public:
-    hi08_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	hi08_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void write(offs_t offset, u8 data);
 	u8 read(offs_t offset);

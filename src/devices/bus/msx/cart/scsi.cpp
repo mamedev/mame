@@ -39,7 +39,7 @@ public:
 	msx_cart_gouda_scsi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, MSX_CART_GOUDA_SCSI, tag, owner, clock)
 		, msx_cart_interface(mconfig, *this)
-		, m_wd33c93a(*this, "scsi:6:wd33c93a")
+		, m_wd33c93a(*this, "wd33c93a")
 	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
@@ -56,14 +56,16 @@ private:
 
 void msx_cart_gouda_scsi_device::device_add_mconfig(machine_config &config)
 {
-	NSCSI_BUS(config, "scsi", 0);
+	auto &scsi(NSCSI_BUS(config, "scsi", 0));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi:6").option_set("wd33c93a", WD33C93A).clock(10_MHz_XTAL);
+
+	WD33C93A(config, m_wd33c93a, 10_MHz_XTAL);
+	scsi.set_external_device(6, m_wd33c93a);
 }
 
 std::error_condition msx_cart_gouda_scsi_device::initialize_cartridge(std::string &message)
@@ -102,7 +104,7 @@ public:
 	msx_cart_mega_scsi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, MSX_CART_MEGA_SCSI, tag, owner, clock)
 		, msx_cart_interface(mconfig, *this)
-		, m_mb89352a(*this, "scsi:7:mb89352a")
+		, m_mb89352a(*this, "mb89352a")
 		, m_srambank(*this, "srambank%u", 0U)
 		, m_view{ {*this, "view0"}, {*this, "view1"}, {*this, "view2"}, {*this, "view3"} }
 		, m_bank_mask(0)
@@ -130,7 +132,7 @@ private:
 
 void msx_cart_mega_scsi_device::device_add_mconfig(machine_config &config)
 {
-	NSCSI_BUS(config, "scsi", 0);
+	auto &scsi(NSCSI_BUS(config, "scsi", 0));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr, false);
@@ -139,8 +141,9 @@ void msx_cart_mega_scsi_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr, false);
 	// Input clock is 8MHz according to the schematic. However, clocks below 11MHz cause writes to fail. Reads are fine at 8MHz.
-	//NSCSI_CONNECTOR(config, "scsi:7").option_set("mb89352a", MB89352).clock(16_MHz_XTAL/2);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("mb89352a", MB89352).clock(11'000'000);
+	// MB89352(config, m_mb89352a, 16_MHz_XTAL/2);
+	MB89352(config, m_mb89352a, 11'000'000);
+	scsi.set_external_device(7, m_mb89352a);
 }
 
 void msx_cart_mega_scsi_device::device_reset()

@@ -20,7 +20,7 @@ namespace {
 class nes_vt42xx_base_state : public driver_device
 {
 public:
-	nes_vt42xx_base_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt42xx_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_io0(*this, "IO0"),
 		m_io1(*this, "IO1"),
@@ -52,10 +52,7 @@ protected:
 
 	required_region_ptr<uint8_t> m_prgrom;
 
-	uint8_t vt_rom_r(offs_t offset);
-	[[maybe_unused]] void vtspace_w(offs_t offset, uint8_t data);
-
-	void configure_soc(nes_vt02_vt03_soc_device* soc);
+	void configure_soc(nes_vt02_vt03_soc_device *soc);
 
 	uint8_t upper_412c_r();
 	uint8_t upper_412d_r();
@@ -69,7 +66,7 @@ private:
 class nes_vt42xx_state : public nes_vt42xx_base_state
 {
 public:
-	nes_vt42xx_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt42xx_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_vt42xx_base_state(mconfig, type, tag),
 		m_soc(*this, "soc")
 	{ }
@@ -80,12 +77,12 @@ public:
 	void vt_external_space_map_8mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_16mbyte(address_map &map) ATTR_COLD;
 
-	void nes_vt42xx(machine_config& config);
-	void nes_vt42xx_1mb(machine_config& config);
-	void nes_vt42xx_2mb(machine_config& config);
-	void nes_vt42xx_4mb(machine_config& config);
-	void nes_vt42xx_8mb(machine_config& config);
-	void nes_vt42xx_16mb(machine_config& config);
+	void nes_vt42xx(machine_config &config) ATTR_COLD;
+	void nes_vt42xx_1mb(machine_config &config) ATTR_COLD;
+	void nes_vt42xx_2mb(machine_config &config) ATTR_COLD;
+	void nes_vt42xx_4mb(machine_config &config) ATTR_COLD;
+	void nes_vt42xx_8mb(machine_config &config) ATTR_COLD;
+	void nes_vt42xx_16mb(machine_config &config) ATTR_COLD;
 
 	void init_rfcp168();
 	void init_g9_666();
@@ -101,12 +98,12 @@ protected:
 class nes_vt42xx_bitboy_state : public nes_vt42xx_state
 {
 public:
-	nes_vt42xx_bitboy_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt42xx_bitboy_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_vt42xx_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt42xx_bitboy_2x16mb(machine_config& config);
-	void nes_vt42xx_gprnrs16_2x16mb(machine_config& config);
+	void nes_vt42xx_bitboy_2x16mb(machine_config &config) ATTR_COLD;
+	void nes_vt42xx_gprnrs16_2x16mb(machine_config &config) ATTR_COLD;
 
 	void vt_external_space_map_bitboy_2x16mbyte(address_map &map) ATTR_COLD;
 
@@ -118,11 +115,11 @@ private:
 class nes_vt42xx_fapocket_state : public nes_vt42xx_state
 {
 public:
-	nes_vt42xx_fapocket_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt42xx_fapocket_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_vt42xx_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt42xx_fa(machine_config& config);
+	void nes_vt42xx_fa(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -134,40 +131,30 @@ private:
 	void fapocket_412c_w(u8 data);
 };
 
-uint8_t nes_vt42xx_base_state::vt_rom_r(offs_t offset)
-{
-	return m_prgrom[offset];
-}
-
-void nes_vt42xx_base_state::vtspace_w(offs_t offset, uint8_t data)
-{
-	logerror("%s: vtspace_w %08x : %02x", machine().describe_context(), offset, data);
-}
-
 // use maps with mirroring in depending on ROM size (this SoC can only access 16MB without banking?)
 void nes_vt42xx_state::vt_external_space_map_1mbyte(address_map &map)
 {
-	map(0x0000000, 0x00fffff).mirror(0x1f00000).r(FUNC(nes_vt42xx_state::vt_rom_r));
+	map(0x0000000, 0x00fffff).mirror(0x1f00000).rom().region("mainrom", 0);
 }
 
 void nes_vt42xx_state::vt_external_space_map_2mbyte(address_map &map)
 {
-	map(0x0000000, 0x01fffff).mirror(0x1e00000).r(FUNC(nes_vt42xx_state::vt_rom_r));
+	map(0x0000000, 0x01fffff).mirror(0x1e00000).rom().region("mainrom", 0);
 }
 
 void nes_vt42xx_state::vt_external_space_map_4mbyte(address_map &map)
 {
-	map(0x0000000, 0x03fffff).mirror(0x1c00000).r(FUNC(nes_vt42xx_state::vt_rom_r));
+	map(0x0000000, 0x03fffff).mirror(0x1c00000).rom().region("mainrom", 0);
 }
 
 void nes_vt42xx_state::vt_external_space_map_8mbyte(address_map &map)
 {
-	map(0x0000000, 0x07fffff).mirror(0x1800000).r(FUNC(nes_vt42xx_state::vt_rom_r));
+	map(0x0000000, 0x07fffff).mirror(0x1800000).rom().region("mainrom", 0);
 }
 
 void nes_vt42xx_state::vt_external_space_map_16mbyte(address_map &map)
 {
-	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt42xx_state::vt_rom_r));
+	map(0x0000000, 0x0ffffff).mirror(0x1000000).rom().region("mainrom", 0);
 }
 
 
@@ -262,7 +249,7 @@ void nes_vt42xx_fapocket_state::machine_reset()
 	m_ahigh = 0;
 }
 
-void nes_vt42xx_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
+void nes_vt42xx_base_state::configure_soc(nes_vt02_vt03_soc_device *soc)
 {
 	soc->set_addrmap(AS_PROGRAM, &nes_vt42xx_state::vt_external_space_map_16mbyte);
 	soc->read_0_callback().set(FUNC(nes_vt42xx_base_state::in0_r));
@@ -317,31 +304,31 @@ void nes_vt42xx_state::nes_vt42xx(machine_config &config)
 	m_soc->force_bad_dma();
 }
 
-void nes_vt42xx_state::nes_vt42xx_1mb(machine_config& config)
+void nes_vt42xx_state::nes_vt42xx_1mb(machine_config &config)
 {
 	nes_vt42xx(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt42xx_state::vt_external_space_map_1mbyte);
 }
 
-void nes_vt42xx_state::nes_vt42xx_2mb(machine_config& config)
+void nes_vt42xx_state::nes_vt42xx_2mb(machine_config &config)
 {
 	nes_vt42xx(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt42xx_state::vt_external_space_map_2mbyte);
 }
 
-void nes_vt42xx_state::nes_vt42xx_4mb(machine_config& config)
+void nes_vt42xx_state::nes_vt42xx_4mb(machine_config &config)
 {
 	nes_vt42xx(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt42xx_state::vt_external_space_map_4mbyte);
 }
 
-void nes_vt42xx_state::nes_vt42xx_8mb(machine_config& config)
+void nes_vt42xx_state::nes_vt42xx_8mb(machine_config &config)
 {
 	nes_vt42xx(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt42xx_state::vt_external_space_map_8mbyte);
 }
 
-void nes_vt42xx_state::nes_vt42xx_16mb(machine_config& config)
+void nes_vt42xx_state::nes_vt42xx_16mb(machine_config &config)
 {
 	nes_vt42xx(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt42xx_state::vt_external_space_map_16mbyte);
@@ -361,7 +348,7 @@ void nes_vt42xx_bitboy_state::gprnrs16_412c_w(u8 data)
 	m_ahigh = (data & 0x02) ? (1 << 24) : 0x0;
 }
 
-void nes_vt42xx_bitboy_state::nes_vt42xx_bitboy_2x16mb(machine_config& config)
+void nes_vt42xx_bitboy_state::nes_vt42xx_bitboy_2x16mb(machine_config &config)
 {
 	nes_vt42xx(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt42xx_bitboy_state::vt_external_space_map_bitboy_2x16mbyte);
@@ -369,7 +356,7 @@ void nes_vt42xx_bitboy_state::nes_vt42xx_bitboy_2x16mb(machine_config& config)
 	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt42xx_bitboy_state::bittboy_412c_w));
 }
 
-void nes_vt42xx_bitboy_state::nes_vt42xx_gprnrs16_2x16mb(machine_config& config)
+void nes_vt42xx_bitboy_state::nes_vt42xx_gprnrs16_2x16mb(machine_config &config)
 {
 	nes_vt42xx(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt42xx_bitboy_state::vt_external_space_map_bitboy_2x16mbyte);
@@ -395,7 +382,7 @@ void nes_vt42xx_fapocket_state::fapocket_412c_w(u8 data)
 	m_ahigh |= (data & 0x02) ? (1 << 24) : 0x0;
 }
 
-void nes_vt42xx_fapocket_state::nes_vt42xx_fa(machine_config& config)
+void nes_vt42xx_fapocket_state::nes_vt42xx_fa(machine_config &config)
 {
 	nes_vt42xx(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt42xx_fapocket_state::vt_external_space_map_fa_4x16mbyte);
@@ -420,14 +407,24 @@ ROM_START( rfcp168 )
 	ROM_LOAD( "winbond_w29gl128c.bin", 0x00000, 0x1000000, CRC(d11caf71) SHA1(64b269cee30a51549a2d0491bbeed07751771559) ) // ROM verified on 2 units
 ROM_END
 
-ROM_START( g9_666 )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "666in1.u1", 0x00000, 0x1000000, CRC(e3a98465) SHA1(dfec3e74e36aef9bfa57ec530c37642015569dc5) )
-ROM_END
-
 ROM_START( g5_500 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl128.u1", 0x00000, 0x1000000, CRC(de779dd7) SHA1(ac6d3fa6f18ceb795532ba9e85edffc040d74347) )
+ROM_END
+
+ROM_START( g6_666 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "g6_666.bin", 0x00000, 0x1000000, CRC(0f443cbe) SHA1(25c4d59e65b05f1255f18c802d72e4cf308ba49b) )
+ROM_END
+
+ROM_START( g7_666 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "g7_666.u1", 0x00000, 0x1000000, CRC(d2bbc3ab) SHA1(19d3326c30b048dd8483f6336656e0301b5aec8a) )
+ROM_END
+
+ROM_START( g9_666 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "666in1.u1", 0x00000, 0x1000000, CRC(e3a98465) SHA1(dfec3e74e36aef9bfa57ec530c37642015569dc5) )
 ROM_END
 
 ROM_START( hhgc319 )
@@ -459,6 +456,11 @@ ROM_END
 ROM_START( gbox2019 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "fgb2019.bin", 0x00000, 0x1000000, CRC(7ef130d5) SHA1(00f45974494707fdac78153b13d8cfb503716ad0) ) // flash ROM
+ROM_END
+
+ROM_START( gbox2022 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "sup400.bin", 0x00000, 0x1000000, CRC(56ea270d) SHA1(0949ed9d2aacfaa46f7399fda6d4d29e903cbe61) )
 ROM_END
 
 ROM_START( gprnrs1 )
@@ -504,7 +506,10 @@ ROM_START( wol260 )
 	ROM_LOAD( "js28f256m29ewh.u1", 0x00000, 0x2000000, CRC(ccb08b50) SHA1(089335c001085cfae94db6ea39e31388674581ed) )
 ROM_END
 
-
+ROM_START( g3_800 )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "g3_800in1.bin", 0x00000, 0x4000000, CRC(df326924) SHA1(38c26ea96fbf3ba80526072d07209f19b04812e9) )
+ROM_END
 
 void nes_vt42xx_state::init_rfcp168()
 {
@@ -571,11 +576,15 @@ void nes_vt42xx_state::init_bl339()
 
 CONS( 201?, rfcp168,  0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_rfcp168, "<unknown>", "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"
 
-// many duplicates, real game count to be confirmed, graphical issues in some games
+
+// these share the same bitswap, many duplicates, real game counts to be confirmed, graphical issues in some games
+CONS( 201?, g5_500,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_g9_666, "<unknown>", "G5 500 in 1 Handheld", MACHINE_NOT_WORKING )
+CONS( 201?, g6_666,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_g9_666, "<unknown>", "G6 666 in 1 Handheld", MACHINE_NOT_WORKING )
+CONS( 201?, g7_666,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_g9_666, "<unknown>", "G7 666 in 1 Handheld", MACHINE_NOT_WORKING )
 CONS( 202?, g9_666,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_g9_666, "<unknown>", "G9 Game Box 666 Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-// same bitswap as above
-CONS( 201?, g5_500,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_g9_666, "<unknown>", "G5 500 in 1 Handheld", MACHINE_NOT_WORKING )
+// 64Mbytes, same banking as fapocket, but no fake cart switch / port
+CONS( 202?, g3_800,   0,  0,  nes_vt42xx_fa, nes_vt42xx, nes_vt42xx_fapocket_state, empty_init, "<unknown>", "G3 800 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // highly scrambled
 CONS( 201?, hhgc319,  0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_hhgc319, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
@@ -592,7 +601,9 @@ CONS( 201?, mc_hh210, 0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, emp
 
 CONS( 201?, retro400, 0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, empty_init, "<unknown>", "Retro FC 400-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2019, gbox2019, 0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, empty_init, "Sup", "Game Box 400 in 1 (2019 PCB)", MACHINE_NOT_WORKING )
+CONS( 2019, gbox2019, 0,        0, nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, empty_init, "Sup", "Game Box 400 in 1 (2019 PCB)", MACHINE_NOT_WORKING )
+// ZY003-V8.9 090322 on PCB
+CONS( 2022, gbox2022, gbox2019, 0, nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, empty_init, "Sup", "Game Box 400 in 1 (2022 PCB)", MACHINE_NOT_WORKING )
 
 CONS( 200?, gprnrs1,  0,  0,  nes_vt42xx_8mb,  nes_vt42xx, nes_vt42xx_state, empty_init, "<unknown>", "Game Prince RS-1", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, gprnrs16, 0,  0,  nes_vt42xx_gprnrs16_2x16mb, nes_vt42xx, nes_vt42xx_bitboy_state, empty_init, "<unknown>", "Game Prince RS-16", MACHINE_IMPERFECT_GRAPHICS )

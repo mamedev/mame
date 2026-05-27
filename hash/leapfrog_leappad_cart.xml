@@ -35,6 +35,20 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="poohstucka" cloneof="poohstuck" supported="no">
+		<description>Leap 1 - Reading - Disney's Pooh Gets Stuck (UK)</description>
+		<year>2001</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-00653"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="ASY-310-00087-FAB-300-00087-A"/>
+			<feature name="u1" value="LeapFrog 2000 16M DIE ROM"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-00653.u1" size="0x200000" crc="6d67ac4b" sha1="3a12ca1e258b862b125881159423b9790922af0e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rsblwbea" supported="no">
 		<description>Richard Scarry's Best Little Word Book Ever! (UK)</description>
 		<year>200?</year>

@@ -293,11 +293,22 @@ void pc6001_state::joystick_out_w(uint8_t data)
 	m_joystick_out = data;
 }
 
+uint8_t pc6001_state::portc0_r()
+{
+	// bit 0: RS232 carrier detect
+	// bit 1: printer ready
+	uint8_t data = 0xfd;
+	if (!m_centronics_busy)
+		data |= 0x02;
+
+	return data;
+}
+
 void pc6001_state::pc6001_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom().nopw();
-//  map(0x4000, 0x5fff) // mapped by the cartslot
+	map(0x4000, 0x5fff).r(m_cart, FUNC(generic_slot_device::read_rom));
 	map(0x6000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).ram().share("ram");
 }
@@ -313,6 +324,7 @@ void pc6001_state::pc6001_io(address_map &map)
 	map(0xa2, 0xa2).mirror(0x0c).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0xa3, 0xa3).mirror(0x0c).nopw();
 	map(0xb0, 0xb0).mirror(0x0f).w(FUNC(pc6001_state::system_latch_w));
+	map(0xc0, 0xc0).mirror(0x0f).r(FUNC(pc6001_state::portc0_r));
 }
 
 /*****************************************
@@ -788,6 +800,7 @@ void pc6001mk2_state::pc6001mk2_io(address_map &map)
 
 	map(0xb0, 0xb0).mirror(0x0f).w(FUNC(pc6001mk2_state::mk2_system_latch_w));
 
+	map(0xc0, 0xc0).mirror(0x0f).r(FUNC(pc6001_state::portc0_r));
 	map(0xc0, 0xc0).w(FUNC(pc6001mk2_state::mk2_col_bank_w));
 	map(0xc1, 0xc1).w(FUNC(pc6001mk2_state::mk2_vram_bank_w));
 	map(0xc2, 0xc2).w(FUNC(pc6001mk2_state::mk2_opt_bank_w));
@@ -1078,6 +1091,7 @@ void pc6001mk2sr_state::pc6001mk2sr_io(address_map &map)
 	map(0xb2, 0xb2).r(FUNC(pc6001mk2sr_state::hw_rev_r));
 
 	map(0xb8, 0xbf).ram().share("irq_vectors");
+	map(0xc0, 0xc0).r(FUNC(pc6001_state::portc0_r));
 //  map(0xc0, 0xc0).w(FUNC(pc6001mk2sr_state::mk2_col_bank_w));
 	map(0xc1, 0xc1).w(FUNC(pc6001mk2sr_state::crt_mode_w));
 //  map(0xc2, 0xc2).w(FUNC(pc6001mk2sr_state::opt_bank_w));
@@ -1352,12 +1366,13 @@ uint8_t pc6001_state::ppi_portb_r()
 
 void pc6001_state::ppi_portb_w(uint8_t data)
 {
-	//printf("ppi_portb_w %02x\n",data);
+	m_cent_data_out->write(~data);
 }
 
 void pc6001_state::ppi_portc_w(uint8_t data)
 {
 	//printf("ppi_portc_w %02x\n",data);
+	m_centronics->write_strobe(BIT(~data, 0));
 }
 
 uint8_t pc6001_state::ppi_portc_r()
@@ -1528,6 +1543,11 @@ inline void pc6001_state::set_videoram_bank(uint32_t offs)
 	m_video_base = m_region_maincpu->base() + offs;
 }
 
+void pc6001_state::write_centronics_busy(int state)
+{
+	m_centronics_busy = state;
+}
+
 inline void pc6001_state::default_cartridge_reset()
 {
 	std::string region_tag;
@@ -1564,9 +1584,6 @@ void pc6001_state::machine_reset()
 	set_videoram_bank(0xc000);
 
 	default_cartridge_reset();
-	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
-
 	default_cassette_hack_reset();
 	irq_reset(3);
 	default_keyboard_hle_reset();
@@ -1739,6 +1756,7 @@ void pc6001_state::pc6001(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pc6001_cart");
 	SOFTWARE_LIST(config, "cart_list_pc6001").set_original("pc6001_cart");
+	SOFTWARE_LIST(config, "cass_list_pc6001").set_original("pc6001_cass");
 
 //  CASSETTE(config, m_cassette);
 //  m_cassette->set_formats(pc6001_cassette_formats);
@@ -1752,6 +1770,12 @@ void pc6001_state::pc6001(machine_config &config)
 	m_ay->port_b_read_callback().set(FUNC(pc6001_state::joystick_out_r));
 	m_ay->port_b_write_callback().set(FUNC(pc6001_state::joystick_out_w));
 	m_ay->add_route(ALL_OUTPUTS, "mono", 1.00);
+
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(pc6001_state::write_centronics_busy));
+
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	// TODO: accurate timing on this
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(pc6001_state::keyboard_callback), attotime::from_hz(250));
@@ -1776,6 +1800,9 @@ void pc6001mk2_state::pc6001mk2(machine_config &config)
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pc6001m2);
 
 	UPD7752(config, "upd7752", PC6001_MAIN_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 1.00);
+
+	SOFTWARE_LIST(config, "cass_list_pc6001mk2").set_original("pc6001mk2_cass");
+
 }
 
 void pc6601_state::floppy_formats(format_registration &fr)
@@ -1870,7 +1897,7 @@ ROM_START( pc6001 )
 	ROM_LOAD( "basicrom.60", 0x0000, 0x4000, CRC(54c03109) SHA1(c622fefda3cdc2b87a270138f24c05828b5c41d2) )
 
 	ROM_REGION( 0x800, "mcu", 0 )
-	ROM_LOAD( "upd8049.ic17", 0x000, 0x800, CRC(6682ec41) SHA1(ea739be6178c0f2ef48a3a33a3f2a3438ed2ca61) )
+	ROM_LOAD( "upd8049.ic17", 0x000, 0x800, CRC(6682ec41) SHA1(ea739be6178c0f2ef48a3a33a3f2a3438ed2ca61) BAD_DUMP ) // about 60% of bytes are bad
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "cgrom60.60", 0x0000, 0x1000, CRC(b0142d32) SHA1(9570495b10af5b1785802681be94b0ea216a1e26) )
@@ -1884,7 +1911,7 @@ ROM_START( pc6001a )
 	ROM_LOAD( "basicrom.60a", 0x0000, 0x4000, CRC(fa8e88d9) SHA1(c82e30050a837e5c8ffec3e0c8e3702447ffd69c) )
 
 	ROM_REGION( 0x800, "mcu", 0 )
-	ROM_LOAD( "upd8049.ic17", 0x000, 0x800, CRC(6682ec41) SHA1(ea739be6178c0f2ef48a3a33a3f2a3438ed2ca61) )
+	ROM_LOAD( "upd8049.ic17", 0x000, 0x800, CRC(6682ec41) SHA1(ea739be6178c0f2ef48a3a33a3f2a3438ed2ca61) BAD_DUMP ) // about 60% of bytes are bad
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "cgrom60.60a", 0x0000, 0x1000, CRC(49c21d08) SHA1(9454d6e2066abcbd051bad9a29a5ca27b12ec897) )
@@ -1904,8 +1931,8 @@ ROM_START( pc6001mk2 )
 	// exrom                 0x48000, 0x4000
 	// <invalid>             0x4c000, 0x4000
 
-	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
-	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x800, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "i8049", 0x000, 0x800, NO_DUMP )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_COPY( "maincpu", 0x1c000, 0x00000, 0x4000 )
@@ -1924,8 +1951,8 @@ ROM_START( pc6601 )
 	ROM_LOAD( "kanjirom.66", 0x20000, 0x8000, CRC(20c8f3eb) SHA1(4c9f30f0a2ebbe70aa8e697f94eac74d8241cadd) )
 	// exrom                 0x48000, 0x4000
 
-	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
-	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x800, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "i8049", 0x000, 0x800, NO_DUMP )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_COPY( "maincpu", 0x1c000, 0x00000, 0x4000 )
@@ -1939,8 +1966,8 @@ ROM_START( pc6001mk2sr )
 	ROM_LOAD( "systemrom1.64", 0x10000, 0x10000, CRC(b6fc2db2) SHA1(dd48b1eee60aa34780f153359f5da7f590f8dff4) )
 	ROM_LOAD( "systemrom2.64", 0x00000, 0x10000, CRC(55a62a1d) SHA1(3a19855d290fd4ac04e6066fe4a80ecd81dc8dd7) )
 
-	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
-	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x800, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "i8049", 0x000, 0x800, NO_DUMP )
 
 	ROM_REGION( 0x4000, "cgrom", 0 )
 	ROM_LOAD( "cgrom68.64", 0x0000, 0x4000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
@@ -1968,6 +1995,12 @@ ROM_START( pc6601sr )
 
 	ROM_REGION( 0x800, "mcu", 0 )
 	ROM_LOAD( "d8049hc-016.bin", 0x000, 0x800, CRC(65394e8d) SHA1(761397cbd812623367ef1df5561c6dddb7ebdab7) )
+
+	ROM_REGION( 0x800, "tim", 0 )
+	ROM_LOAD( "d8049hc-025.ic201", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x800, "sub", 0 )
+	ROM_LOAD( "d8049hc-246.ic47", 0x000, 0x800, NO_DUMP )
 
 	ROM_REGION( 0x4000, "cgrom", 0 )
 	ROM_LOAD( "cgrom68.68",   0x000000, 0x004000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )

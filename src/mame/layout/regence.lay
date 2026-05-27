@@ -395,54 +395,54 @@ authors:hap
 		<element name="8.3" ref="led2"><bounds x="89.25" y="17.25" width="1.5" height="1.5" /></element>
 		<element name="8.0" ref="led2"><bounds x="89.25" y="21.25" width="1.5" height="1.5" /></element>
 
-		<element ref="text_p6"><bounds x="95.4" y="36" width="3.3" height="3.3" /><color alpha="0.82" /></element>
-		<element ref="text_p5"><bounds x="95.4" y="40" width="3.3" height="3.3" /><color alpha="0.82" /></element>
-		<element ref="text_p4"><bounds x="95.4" y="44" width="3.3" height="3.3" /><color alpha="0.82" /></element>
-		<element ref="text_p3"><bounds x="95.4" y="48" width="3.3" height="3.3" /><color alpha="0.82" /></element>
-		<element ref="text_p2"><bounds x="95.4" y="52" width="3.3" height="3.3" /><color alpha="0.82" /></element>
-		<element ref="text_p1"><bounds x="95.4" y="56" width="3.3" height="3.3" /><color alpha="0.82" /></element>
+		<element ref="text_p6"><bounds x="95.9" y="36" width="3.3" height="3.3" /><color alpha="0.82" /></element>
+		<element ref="text_p5"><bounds x="95.9" y="40" width="3.3" height="3.3" /><color alpha="0.82" /></element>
+		<element ref="text_p4"><bounds x="95.9" y="44" width="3.3" height="3.3" /><color alpha="0.82" /></element>
+		<element ref="text_p3"><bounds x="95.9" y="48" width="3.3" height="3.3" /><color alpha="0.82" /></element>
+		<element ref="text_p2"><bounds x="95.9" y="52" width="3.3" height="3.3" /><color alpha="0.82" /></element>
+		<element ref="text_p1"><bounds x="95.9" y="56" width="3.3" height="3.3" /><color alpha="0.82" /></element>
 	</group>
 
 
 <!-- build screen -->
 
 	<view name="Internal Layout (French)">
-		<bounds left="-13" right="103" top="-1.5" bottom="87.5" />
+		<bounds left="-13" right="104" top="-1.5" bottom="87.5" />
 		<group ref="shared"><bounds left="-13" right="103" top="-1.5" bottom="87.5" /></group>
 
-		<element ref="text_rf1"><bounds x="91.5" y="9.1" width="11.5" height="1.8" /></element>
-		<element ref="text_rf2"><bounds x="91.5" y="13.1" width="11.5" height="1.8" /></element>
-		<element ref="text_rf3"><bounds x="91.5" y="17.1" width="11.5" height="1.8" /></element>
-		<element ref="text_rf4a"><bounds x="91.5" y="24.2" width="11.5" height="1.8" /></element>
-		<element ref="text_rf4b"><bounds x="91.5" y="25.8" width="11.5" height="1.8" /></element>
-		<element ref="text_rf5a"><bounds x="91.5" y="28.2" width="11.5" height="1.8" /></element>
-		<element ref="text_rf5b"><bounds x="91.5" y="29.8" width="11.5" height="1.8" /></element>
-		<element ref="text_rf6a"><bounds x="91.5" y="32.2" width="11.5" height="1.8" /></element>
-		<element ref="text_rf6b"><bounds x="91.5" y="33.8" width="11.5" height="1.8" /></element>
+		<element ref="text_rf1"><bounds x="92" y="9.1" width="11.5" height="1.8" /></element>
+		<element ref="text_rf2"><bounds x="92" y="13.1" width="11.5" height="1.8" /></element>
+		<element ref="text_rf3"><bounds x="92" y="17.1" width="11.5" height="1.8" /></element>
+		<element ref="text_rf4a"><bounds x="92" y="24.2" width="11.5" height="1.8" /></element>
+		<element ref="text_rf4b"><bounds x="92" y="25.8" width="11.5" height="1.8" /></element>
+		<element ref="text_rf5a"><bounds x="92" y="28.2" width="11.5" height="1.8" /></element>
+		<element ref="text_rf5b"><bounds x="92" y="29.8" width="11.5" height="1.8" /></element>
+		<element ref="text_rf6a"><bounds x="92" y="32.2" width="11.5" height="1.8" /></element>
+		<element ref="text_rf6b"><bounds x="92" y="33.8" width="11.5" height="1.8" /></element>
 
-		<element ref="text_rf1"><bounds x="91.5" y="61.1" width="11.5" height="1.8" /></element>
-		<element ref="text_rf2"><bounds x="91.5" y="65.1" width="11.5" height="1.8" /></element>
-		<element ref="text_rf7"><bounds x="91.5" y="69.1" width="11.5" height="1.8" /></element>
-		<element ref="text_rf8"><bounds x="91.5" y="73.1" width="11.5" height="1.8" /></element>
-		<element ref="text_rf9"><bounds x="91.5" y="77.1" width="11.5" height="1.8" /></element>
+		<element ref="text_rf1"><bounds x="92" y="61.1" width="11.5" height="1.8" /></element>
+		<element ref="text_rf2"><bounds x="92" y="65.1" width="11.5" height="1.8" /></element>
+		<element ref="text_rf7"><bounds x="92" y="69.1" width="11.5" height="1.8" /></element>
+		<element ref="text_rf8"><bounds x="92" y="73.1" width="11.5" height="1.8" /></element>
+		<element ref="text_rf9"><bounds x="92" y="77.1" width="11.5" height="1.8" /></element>
 	</view>
 
 	<view name="Internal Layout (German)">
-		<bounds left="-13" right="103" top="-1.5" bottom="87.5" />
+		<bounds left="-13" right="104" top="-1.5" bottom="87.5" />
 		<group ref="shared"><bounds left="-13" right="103" top="-1.5" bottom="87.5" /></group>
 
-		<element ref="text_rg1"><bounds x="91.5" y="9.1" width="11.5" height="1.8" /></element>
-		<element ref="text_rg2"><bounds x="91.5" y="13.1" width="11.5" height="1.8" /></element>
-		<element ref="text_rg3"><bounds x="91.5" y="17.1" width="11.5" height="1.8" /></element>
-		<element ref="text_rg4"><bounds x="91.5" y="25.1" width="11.5" height="1.8" /></element>
-		<element ref="text_rg5"><bounds x="91.5" y="29.1" width="11.5" height="1.8" /></element>
-		<element ref="text_rg6"><bounds x="91.5" y="33.1" width="11.5" height="1.8" /></element>
+		<element ref="text_rg1"><bounds x="92" y="9.1" width="11.5" height="1.8" /></element>
+		<element ref="text_rg2"><bounds x="92" y="13.1" width="11.5" height="1.8" /></element>
+		<element ref="text_rg3"><bounds x="92" y="17.1" width="11.5" height="1.8" /></element>
+		<element ref="text_rg4"><bounds x="92" y="25.1" width="11.5" height="1.8" /></element>
+		<element ref="text_rg5"><bounds x="92" y="29.1" width="11.5" height="1.8" /></element>
+		<element ref="text_rg6"><bounds x="92" y="33.1" width="11.5" height="1.8" /></element>
 
-		<element ref="text_rg1"><bounds x="91.5" y="61.1" width="11.5" height="1.8" /></element>
-		<element ref="text_rg2"><bounds x="91.5" y="65.1" width="11.5" height="1.8" /></element>
-		<element ref="text_rg7"><bounds x="91.5" y="69.1" width="11.5" height="1.8" /></element>
-		<element ref="text_rg8"><bounds x="91.5" y="73.1" width="11.5" height="1.8" /></element>
-		<element ref="text_rg9"><bounds x="91.5" y="77.1" width="11.5" height="1.8" /></element>
+		<element ref="text_rg1"><bounds x="92" y="61.1" width="11.5" height="1.8" /></element>
+		<element ref="text_rg2"><bounds x="92" y="65.1" width="11.5" height="1.8" /></element>
+		<element ref="text_rg7"><bounds x="92" y="69.1" width="11.5" height="1.8" /></element>
+		<element ref="text_rg8"><bounds x="92" y="73.1" width="11.5" height="1.8" /></element>
+		<element ref="text_rg9"><bounds x="92" y="77.1" width="11.5" height="1.8" /></element>
 	</view>
 
 </mamelayout>

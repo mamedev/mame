@@ -43,6 +43,24 @@ TODO:
 - gondo 2nd coin doesn't work, probably due to hacked MCU ROM
 - ghostb coinage dipswitch
 - how does meikyuhbl circumvent the MCU? It won't boot in MAME if MCU is removed
+- weird NMI issue in ghostb: Before starting stage 2, it waits for vblank, then
+  enables NMI by writing to ghostb_bank_w, then stores the written value in RAM.
+  It fails to initialize stage 2 properly if NMI happens right after enabling
+  the NMI flip-flop (when it hasn't yet stored a copy the bank register value
+  in RAM), so it appears that it expects 1 more opcode, see:
+
+  88D5: LDA    $3803
+  88D8: ANDA   #$08  ; vblank flag
+  88DA: BNE    $88D5
+
+  88DC: LDA    #$B7
+  88DE: STA    $3840 ; ghostb_bank_w
+  88E1: STA    <$68  ; expects NMI after this opcode
+
+  Where does this delay come from? Is it a MAME 6809 timing bug with NMI edge
+  detection? Or a brief TTL delay and it works by luck? Either way, it looks
+  like a bug by Data East. Normally you'd store the local variable first,
+  then write to the register.
 
 ***************************************************************************/
 
@@ -184,8 +202,12 @@ void ghostb_state::gondo_bank_w(u8 data)
 	if (!m_secclr)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 
-	m_nmigate->in_w<0>(BIT(data, 1));
+	// it relies on 1 more opcode after enabling NMI (see TODO notes)
+	if (BIT(m_bank_data ^ data, 1))
+		m_nmi_timer->adjust(m_maincpu->minimum_quantum_time(), BIT(data, 1));
+
 	flip_screen_set(BIT(data, 3));
+	m_bank_data = data;
 }
 
 void ghostb_state::ghostb_bank_w(u8 data)
@@ -1914,9 +1936,11 @@ void ghostb_state::machine_start()
 {
 	lastmisn_state::machine_start();
 
+	m_nmi_timer = timer_alloc(FUNC(ghostb_state::nmigate_set), this);
 	m_6502_timer = timer_alloc(FUNC(ghostb_state::audiocpu_nmi_clear), this);
 	m_i8751_timer = timer_alloc(FUNC(ghostb_state::mcu_irq_clear), this);
 
+	save_item(NAME(m_bank_data));
 	save_item(NAME(m_secclr));
 	save_item(NAME(m_buffer_strobe));
 }

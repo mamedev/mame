@@ -5,6 +5,8 @@
 #include "arm7core.h"
 #include "arm7help.h"
 
+#include <bit>
+
 #define LOG_OPS     (1U << 1)
 
 #define VERBOSE     (0)
@@ -270,7 +272,7 @@ int arm7_cpu_device::storeInc(uint32_t pat, uint32_t rbv, int mode)
 int arm7_cpu_device::storeDec(uint32_t pat, uint32_t rbv, int mode)
 {
 	// pre-count the # of registers being stored
-	int const result = population_count_32(pat & 0x0000ffff);
+	int const result = std::popcount(pat & 0x0000ffff);
 	int actual_result = 0;
 
 	// adjust starting address
@@ -1679,7 +1681,7 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 		uint32_t rm = insn&0xf;
 		uint32_t rd = (insn>>12)&0xf;
 
-		SetRegister(rd, count_leading_zeros_32(GetRegister(rm)));
+		SetRegister(rd, std::countl_zero(GetRegister(rm)));
 
 		R15 += 4;
 	}

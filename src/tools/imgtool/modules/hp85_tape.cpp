@@ -1033,7 +1033,7 @@ namespace {
 		if (bpr < 4) {
 			bpr = MAX_RECORD_SIZE;
 		} else if (bpr > file_size) {
-			util::stream_format(std::wcerr, L"BPR value too large, using %u\n", MAX_RECORD_SIZE);
+			util::stream_format(std::cerr, "BPR value too large, using %u\n", MAX_RECORD_SIZE);
 			bpr = MAX_RECORD_SIZE;
 		}
 		ent->record_len = (uint16_t)bpr;

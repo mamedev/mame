@@ -11,7 +11,7 @@
 
 #include "machine/nscsi_bus.h"
 
-class wd33c9x_base_device : public nscsi_device, public nscsi_slot_card_interface
+class wd33c9x_base_device : public device_t, public nscsi_device_interface
 {
 public:
 	auto irq_cb() { return m_irq_cb.bind(); }
@@ -30,6 +30,8 @@ public:
 	void indir_addr_w(uint8_t data);
 	uint8_t indir_reg_r();
 	void indir_reg_w(uint8_t data);
+
+	uint8_t status_r();
 
 	// Master Reset (MR) Interface
 	void reset_w(int state);

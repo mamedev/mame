@@ -190,7 +190,7 @@ void boramz80_state::output_w(uint8_t data)
 	for (int i = 0; i < 4; i++)
 		machine().bookkeeping().coin_counter_w(i, BIT(data, i));
 
-	if (data & 0xf0)
+	if (data & 0x70)
 		logerror("%s output_w: %02x\n", machine().describe_context(), data);
 
 	// bit 6 is used often
@@ -323,7 +323,7 @@ static INPUT_PORTS_START( pkboram )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_SERVICE )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // not shown is input test

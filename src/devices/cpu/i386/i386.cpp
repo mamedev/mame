@@ -28,6 +28,8 @@
 #include "debug/debugcpu.h"
 #include "debug/express.h"
 
+#include "softfloat3/bochs_ext/softfloat3_ext.h"
+
 #define LOG_MSR             (1U << 1)
 #define LOG_INVALID_OPCODE  (1U << 2)
 #define LOG_LIMIT_CHECK     (1U << 3)
@@ -194,10 +196,10 @@ device_vtlb_interface::vtlb_entry i386_device::get_permissions(uint32_t pte, int
 
 bool i386_device::i386_translate_address(int intention, bool debug, offs_t *address, vtlb_entry *entry)
 {
-	uint32_t a = *address;
-	uint32_t pdbr = m_cr[3] & 0xfffff000;
-	uint32_t directory = (a >> 22) & 0x3ff;
-	uint32_t table = (a >> 12) & 0x3ff;
+	offs_t a = *address;
+	offs_t pdbr = m_cr[3] & 0xfffff000;
+	offs_t directory = (a >> 22) & 0x3ff;
+	offs_t table = (a >> 12) & 0x3ff;
 	vtlb_entry perm = 0;
 	bool ret;
 	bool user = (intention & TR_USER) ? true : false;
@@ -281,20 +283,20 @@ bool i386_device::i386_translate_address(int intention, bool debug, offs_t *addr
 
 //#define TEST_TLB
 
-bool i386_device::translate_address(int pl, int type, uint32_t *address, uint32_t *error)
+bool i386_device::translate_address(int pl, int type, offs_t *address, uint32_t *error)
 {
 	if (!(m_cr[0] & CR0_PG)) // Some (very few) old OS's won't work with this
 		return true;
 
 	const vtlb_entry *table = vtlb_table();
-	uint32_t index = *address >> 12;
+	offs_t index = *address >> 12;
 	vtlb_entry entry = table[index];
 	if (type == TR_FETCH)
 		type = TR_READ;
 	if (pl == 3)
 		type |= TR_USER;
 #ifdef TEST_TLB
-	uint32_t test_addr = *address;
+	offs_t test_addr = *address;
 #endif
 
 	if (!(entry & FLAG_VALID) || ((type & TR_WRITE) && !(entry & FLAG_DIRTY)))
@@ -340,7 +342,8 @@ void i386_device::NEAR_BRANCH(int32_t offs)
 uint8_t i386_device::FETCH()
 {
 	uint8_t value;
-	uint32_t address = m_pc, error;
+	offs_t address = m_pc;
+	uint32_t error;
 
 	if(!translate_address(m_CPL,TR_FETCH,&address,&error))
 		PF_THROW(error);
@@ -357,7 +360,8 @@ uint8_t i386_device::FETCH()
 uint16_t i386_device::FETCH16()
 {
 	uint16_t value;
-	uint32_t address = m_pc, error;
+	offs_t address = m_pc;
+	uint32_t error;
 
 	if( !WORD_ALIGNED(address) ) {       /* Unaligned read */
 		value = (FETCH() << 0);
@@ -375,7 +379,8 @@ uint16_t i386_device::FETCH16()
 uint32_t i386_device::FETCH32()
 {
 	uint32_t value;
-	uint32_t address = m_pc, error;
+	offs_t address = m_pc;
+	uint32_t error;
 
 	if( !DWORD_ALIGNED(m_pc) ) {      /* Unaligned read */
 		value = (FETCH() << 0);
@@ -396,7 +401,8 @@ uint32_t i386_device::FETCH32()
 
 uint8_t i386_device::READ8PL(uint32_t ea, uint8_t privilege)
 {
-	uint32_t address = ea, error;
+	offs_t address = ea;
+	uint32_t error;
 
 	if(!translate_address(privilege,TR_READ,&address,&error))
 		PF_THROW(error);
@@ -408,7 +414,8 @@ uint8_t i386_device::READ8PL(uint32_t ea, uint8_t privilege)
 uint16_t i386_device::READ16PL(uint32_t ea, uint8_t privilege)
 {
 	uint16_t value;
-	uint32_t address = ea, error;
+	offs_t address = ea;
+	uint32_t error;
 
 	switch (ea & 3)
 	{
@@ -442,7 +449,8 @@ uint16_t i386_device::READ16PL(uint32_t ea, uint8_t privilege)
 uint32_t i386_device::READ32PL(uint32_t ea, uint8_t privilege)
 {
 	uint32_t value;
-	uint32_t address = ea, error;
+	offs_t address = ea;
+	uint32_t error;
 
 	switch (ea & 3)
 	{
@@ -487,7 +495,8 @@ uint32_t i386_device::READ32PL(uint32_t ea, uint8_t privilege)
 uint64_t i386_device::READ64PL(uint32_t ea, uint8_t privilege)
 {
 	uint64_t value;
-	uint32_t address = ea, error;
+	offs_t address = ea;
+	uint32_t error;
 
 	switch (ea & 3)
 	{
@@ -532,7 +541,8 @@ uint64_t i386_device::READ64PL(uint32_t ea, uint8_t privilege)
 uint16_t i386sx_device::READ16PL(uint32_t ea, uint8_t privilege)
 {
 	uint16_t value;
-	uint32_t address = ea, error;
+	offs_t address = ea;
+	uint32_t error;
 
 	if (WORD_ALIGNED(ea))
 	{
@@ -595,14 +605,18 @@ uint64_t i386sx_device::READ64PL(uint32_t ea, uint8_t privilege)
 
 void i386_device::WRITE_TEST(uint32_t ea)
 {
-	uint32_t address = ea, error;
+	offs_t address = ea;
+	uint32_t error;
+
 	if(!translate_address(m_CPL,TR_WRITE,&address,&error))
 		PF_THROW(error);
 }
 
 void i386_device::WRITE8PL(uint32_t ea, uint8_t privilege, uint8_t value)
 {
-	uint32_t address = ea, error;
+	offs_t address = ea;
+	uint32_t error;
+
 	if(!translate_address(privilege,TR_WRITE,&address,&error))
 		PF_THROW(error);
 
@@ -612,7 +626,8 @@ void i386_device::WRITE8PL(uint32_t ea, uint8_t privilege, uint8_t value)
 
 void i386_device::WRITE16PL(uint32_t ea, uint8_t privilege, uint16_t value)
 {
-	uint32_t address = ea, error;
+	offs_t address = ea;
+	uint32_t error;
 
 	switch(ea & 3)
 	{
@@ -642,7 +657,8 @@ void i386_device::WRITE16PL(uint32_t ea, uint8_t privilege, uint16_t value)
 
 void i386_device::WRITE32PL(uint32_t ea, uint8_t privilege, uint32_t value)
 {
-	uint32_t address = ea, error;
+	offs_t address = ea;
+	uint32_t error;
 
 	switch(ea & 3)
 	{
@@ -683,7 +699,8 @@ void i386_device::WRITE32PL(uint32_t ea, uint8_t privilege, uint32_t value)
 
 void i386_device::WRITE64PL(uint32_t ea, uint8_t privilege, uint64_t value)
 {
-	uint32_t address = ea, error;
+	offs_t address = ea;
+	uint32_t error;
 
 	switch(ea & 3)
 	{
@@ -724,7 +741,8 @@ void i386_device::WRITE64PL(uint32_t ea, uint8_t privilege, uint64_t value)
 
 void i386sx_device::WRITE16PL(uint32_t ea, uint8_t privilege, uint16_t value)
 {
-	uint32_t address = ea, error;
+	offs_t address = ea;
+	uint32_t error;
 
 	if (WORD_ALIGNED(ea))
 	{
@@ -1740,9 +1758,9 @@ void i386_device::i386_decode_four_byte38f3()
 
 uint8_t i386_device::read8_debug(uint32_t ea, uint8_t *data)
 {
-	uint32_t address = ea;
+	offs_t address = ea;
 
-	if(!i386_translate_address(TR_READ, true, &address,nullptr))
+	if(!i386_translate_address(TR_READ, true, &address, nullptr))
 		return 0;
 
 	address &= m_a20_mask;
@@ -1875,9 +1893,9 @@ uint64_t i386_device::debug_segofftovirt(int params, const uint64_t *param)
 
 uint64_t i386_device::debug_virttophys(int params, const uint64_t *param)
 {
-	uint32_t result = param[0];
+	offs_t result = param[0];
 
-	if(!i386_translate_address(TR_READ,true,&result,nullptr))
+	if(!i386_translate_address(TR_READ, true, &result, nullptr))
 		return 0;
 	return result;
 }
@@ -2220,28 +2238,28 @@ void i386_device::state_export(const device_state_entry &entry)
 			m_debugger_temp = m_eip & 0xffff;
 			break;
 		case X87_ST0:
-			m_debugger_temp = floatx80_to_float64(ST(0));
+			m_debugger_temp = extF80_to_f64(ST(0)).v;
 			break;
 		case X87_ST1:
-			m_debugger_temp = floatx80_to_float64(ST(1));
+			m_debugger_temp = extF80_to_f64(ST(1)).v;
 			break;
 		case X87_ST2:
-			m_debugger_temp = floatx80_to_float64(ST(2));
+			m_debugger_temp = extF80_to_f64(ST(2)).v;
 			break;
 		case X87_ST3:
-			m_debugger_temp = floatx80_to_float64(ST(3));
+			m_debugger_temp = extF80_to_f64(ST(3)).v;
 			break;
 		case X87_ST4:
-			m_debugger_temp = floatx80_to_float64(ST(4));
+			m_debugger_temp = extF80_to_f64(ST(4)).v;
 			break;
 		case X87_ST5:
-			m_debugger_temp = floatx80_to_float64(ST(5));
+			m_debugger_temp = extF80_to_f64(ST(5)).v;
 			break;
 		case X87_ST6:
-			m_debugger_temp = floatx80_to_float64(ST(6));
+			m_debugger_temp = extF80_to_f64(ST(6)).v;
 			break;
 		case X87_ST7:
-			m_debugger_temp = floatx80_to_float64(ST(7));
+			m_debugger_temp = extF80_to_f64(ST(7)).v;
 			break;
 	}
 }
@@ -2315,7 +2333,7 @@ void i386_device::state_string_export(const device_state_entry &entry, std::stri
 			str = string_format("%08x%08x%08x%08x", XMM(7).d[3], XMM(7).d[2], XMM(7).d[1], XMM(7).d[0]);
 			break;
 	}
-	float_exception_flags = 0; // kill any float exceptions that occur here
+	softfloat_exceptionFlags = 0; // kill any float exceptions that occur here
 }
 
 void i386_device::build_opcode_table(uint32_t features)
@@ -2467,6 +2485,7 @@ void i386_device::zero_state()
 	m_cpuid_id1 = 0;
 	m_cpuid_id2 = 0;
 	m_cpu_version = 0;
+	m_brand_id = 0; // Pentium III model 8 onward
 	m_feature_flags = 0;
 	m_tsc = 0;
 	m_perfctr[0] = m_perfctr[1] = 0;
@@ -2610,14 +2629,17 @@ void i386_device::enter_smm()
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffffffff;
 	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x8093;
 	m_sreg[DS].valid = m_sreg[ES].valid = m_sreg[FS].valid = m_sreg[GS].valid = m_sreg[SS].valid = true;
-	m_sreg[CS].selector = 0x3000; // pentium only, ppro sel = smbase >> 4
+	m_sreg[DS].d = m_sreg[ES].d = m_sreg[FS].d = m_sreg[GS].d = m_sreg[SS].d = 0;
+	m_sreg[CS].selector = (m_cpu_version >= 6) ? m_smbase >> 4 : 0x3000; // k6 reports family 6 but may also force 0x3000
 	m_sreg[CS].base = m_smbase;
 	m_sreg[CS].limit = 0xffffffff;
 	m_sreg[CS].flags = 0x8093;
 	m_sreg[CS].valid = true;
+	m_sreg[CS].d = 0;
 	m_cr[4] = 0;
 	m_dr[7] = 0x400;
 	m_eip = 0x8000;
+	m_CPL = 0;
 
 	m_nmi_masked = true;
 	CHANGE_PC(m_eip);
@@ -2683,15 +2705,13 @@ void i386_device::leave_smm()
 	m_cr[3] = READ32(smram_state + SMRAM_CR3);
 	m_cr[0] = READ32(smram_state + SMRAM_CR0);
 
-	m_CPL = (m_sreg[SS].flags >> 13) & 3; // cpl == dpl of ss
+	m_CPL = (m_sreg[SS].flags >> 5) & 3; // cpl == dpl of ss
 
 	for (int i = 0; i <= GS; i++)
 	{
+		m_sreg[i].d = (m_sreg[i].flags & 0x4000) ? 1 : 0;
 		if (PROTECTED_MODE && !V8086_MODE)
-		{
 			m_sreg[i].valid = m_sreg[i].selector ? true : false;
-			m_sreg[i].d = (m_sreg[i].flags & 0x4000) ? 1 : 0;
-		}
 		else
 			m_sreg[i].valid = true;
 	}
@@ -2760,11 +2780,11 @@ void i386_device::i386_set_a20_line(int state)
 {
 	if (state)
 	{
-		m_a20_mask = ~0;
+		m_a20_mask = ~offs_t(0);
 	}
 	else
 	{
-		m_a20_mask = ~(1 << 20);
+		m_a20_mask = ~(offs_t(1) << 20);
 	}
 	// TODO: how does A20M and the tlb interact
 	vtlb_flush_dynamic();
@@ -2801,7 +2821,16 @@ void i386_device::execute_run()
 				{
 					uint32_t phys_addr = 0;
 					uint32_t error;
-					phys_addr = (m_cr[0] & CR0_PG) ? translate_address(m_CPL, TR_FETCH, &m_dr[i], &error) : m_dr[i];
+					if(m_cr[0] & CR0_PG)
+					{
+						offs_t addr = m_dr[i];
+						phys_addr = translate_address(m_CPL, TR_FETCH, &addr, &error);
+						m_dr[i] = uint32_t(addr);
+					}
+					else
+					{
+						phys_addr = m_dr[i];
+					}
 					if(breakpoint_length != 0) // Not one byte in length? logerror it, I have no idea how this works on real processors.
 					{
 						LOGMASKED(LOG_INVALID_OPCODE, "i386: Breakpoint length not 1 byte on an instruction breakpoint\n");
@@ -3312,8 +3341,23 @@ void pentium2_device::device_reset()
 	m_cpuid_max_input_value_eax = 0x02;
 	m_cpu_version = REG32(EDX);
 
-	// [ 0:0] FPU on chip
-	m_feature_flags = 0x008081bf;       // TODO: enable relevant flags here
+	// [ 0: 0] FPU on chip
+	// [ 1: 1] VME Virtual 8086 Mode Enhancements
+	// [ 2: 2] DE Debugging Extensions
+	// [ 3: 3] PSE Page Size Extension
+	// [ 4: 4] TSC Time Stamp Counter
+	// [ 5: 5] MSR Model Specific Registers
+	// [ 6: 6] PAE Physical Address Extension
+	// [ 7: 7] MCE Machine Check Exception
+	// [ 8: 8] CMPXCHG8B opcode supported
+	// [11:11] SEP SYSENTER and SYSEXIT opcodes
+	// [12:12] MTRR Memory type range register
+	// [13:13] PGE Page Global Enable
+	// [14:14] MCA Machine Check Architecture
+	// [15:15] CMOV Conditional Move instructions
+	// [23:23] MMX instructions
+	//m_feature_flags = 0x0080f9ff;
+	m_feature_flags = 0x008081bf;  // TODO: enable missing flags
 
 	CHANGE_PC(m_eip);
 }
@@ -3384,6 +3428,7 @@ void pentium3_device::device_reset()
 	// [15:15] CMOV and FCMOV
 	// [18:18] PSN (Processor Serial Number, P3 only)
 	m_feature_flags = 0x0004a111;       // TODO: enable relevant flags here
+	m_brand_id = 0x02;
 
 	CHANGE_PC(m_eip);
 }
@@ -3396,7 +3441,7 @@ void pentium3_device::opcode_cpuid()
 		{
 			// TODO: lower part of 96 bits s/n for Pentium III processors only (ditched in 4)
 			// (upper 32-bits part is in EAX=1 EAX return)
-			// NB: if this is triggered from an Arcade system then there's a very good chance
+			// NOTE: if this is triggered from an Arcade system then there's a very good chance
 			// that is trying to tie the serial as a form of copy protection cfr. gamecstl
 			LOGMASKED(LOG_MSR, "CPUID with EAX=00000003 (Pentium III PSN?) at %08x!\n", m_eip);
 			REG32(EAX) = 0x00000000;
@@ -3477,6 +3522,7 @@ void pentium4_device::device_reset()
 	// [ 8:8] CMPXCHG8B instruction
 	// [15:15] CMOV and FCMOV
 	m_feature_flags = 0x00008101;       // TODO: enable relevant flags here
+	m_brand_id = 0x08;
 
 	CHANGE_PC(m_eip);
 }

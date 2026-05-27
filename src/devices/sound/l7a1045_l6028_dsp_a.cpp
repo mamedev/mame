@@ -58,13 +58,21 @@
 
     0  ffffffffssssaaaa   aaaaaaaaaaaaaaaa   aaaa------------
         f = flags?  always 01
-        s = sample type? always 1
+        s = 0 for RAM address space, 1 for ROM address space
         a = sample start address (24 bits, 16 MiB addressable)
+
+        For DMA, this is set to the DMA start address on channel 0
+        and it's expected to increment for each word transferred.
+        Setting the sample format field to 8 bit apparently causes
+        the
 
     1  ffffffff----aaaa   aaaaaaaaaaaaaaaa   rrrrrrrrrrrrrrrr
         f = flags.  0 for loop encoded by distance from sample end, 1 for loop encoded as an absolute address (see register 2)
         a = sample end address, bits 23-4
         r = sample rate in 4.12 fixed point relative to 44100 Hz (0x1000 = 44100 Hz)
+
+        For DMA, this register on channel 0 appears to be an inverted address mask?
+        Given a DMA of 0x1000 words, this is typically set to 0xfffff1000.
 
     If the flags field of register 1 is 0, register 2 is encoded like this:
     2  ----------------   mmmmmmmmmmmmmmmm   bbbbbbbbbbbbbbbb
@@ -81,7 +89,7 @@
         A = loop start address, bits 23-20
 
     3  ----------------   vvvvvvvvvvvvvvvv   ----------------
-        v = volume envelope starting value (16 bit, maaaaybe signed?)
+        v = volume envelope starting value (16 bit unsigned)
 
     4  ----------------   vvvvvvvvvvvvvvvv   rrrrrrrrrrrrrrrr
         v = volume envelope target value
@@ -117,6 +125,17 @@
 
     TODO:
     - How does the delay effect work?
+
+    Delay effect notes from the S3000's editor page.
+    All of these writes are register A, the voice number seems to be
+    the function select.
+    1 & 2 are the first stage volume and routing
+    5 is first stage feedback amount
+    12 & 13 are the second stage volume and routing
+    16 is second stage feedback amount
+    18 & 19 are the third stage volume and routing
+    20 & 21 are the final output volume and routing
+    22 is third stage feedback amount
 
 **************************************************************************************************/
 
@@ -163,7 +182,13 @@ l7a1045_sound_device::l7a1045_sound_device(const machine_config &mconfig, const 
 	  m_drq_handler(*this),
 	  m_stream(nullptr),
 	  m_key(0),
-	  m_mem_config("l6028", ENDIANNESS_LITTLE, 16, 25)
+	  m_control(0),
+	  m_dma_timer(nullptr),
+	  m_cur_channel(0),
+	  m_cur_register(0),
+	  m_sample_rate(44100.0),
+	  m_mem_config("l6028", ENDIANNESS_LITTLE, 16, 25),
+	  m_rom_config("l6028_rom", ENDIANNESS_LITTLE, 16, 25)
 {
 }
 
@@ -177,16 +202,23 @@ void l7a1045_sound_device::map(address_map &map)
 
 device_memory_interface::space_config_vector l7a1045_sound_device::memory_space_config() const
 {
-	return space_config_vector{std::make_pair(AS_DATA, &m_mem_config)};
+	return space_config_vector
+	{
+		std::make_pair(AS_DATA, &m_mem_config),
+		std::make_pair(AS_IO, &m_rom_config)
+	};
 }
 
 void l7a1045_sound_device::device_start()
 {
 	space(AS_DATA).cache(m_cache);
+	space(AS_IO).cache(m_rom_cache);
 
 	// Allocate the stream
 	m_sample_rate = clock() / 768.0f;
 	m_stream = stream_alloc(0, 10, m_sample_rate);
+
+	m_dma_timer = timer_alloc(FUNC(l7a1045_sound_device::dma_timer_callback), this);
 
 	save_item(STRUCT_MEMBER(m_voice, loop_start));
 	save_item(STRUCT_MEMBER(m_voice, start));
@@ -259,7 +291,7 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream)
 
 					case 1: // 12-bit non-linear, encoded into 8 bits
 						address = (start + pos);
-						data = m_cache.read_byte(address);
+						data = m_rom_cache.read_byte(address);
 						sample = (data & 0xfc) >> 2;
 						if (sample & 0x20)
 							sample -= 0x40;
@@ -391,20 +423,20 @@ uint16_t l7a1045_sound_device::voiceregs_r(offs_t offset)
 		m_regs[0][m_cur_channel] |= (uint64_t(current_addr) << 12);
 		m_regs[0][m_cur_channel] |= vptr->frac & 0x0fff;
 
-		LOGMASKED(LOG_READBACK_POSITION, "ch %d cur pos %08x final %012llx (%s)\n", m_cur_channel, current_addr, m_regs[0][m_cur_channel], machine().describe_context());
+		LOGMASKED(LOG_READBACK_POSITION, "ch %d cur pos %08x final %012llx (%s)\n", m_cur_channel, current_addr, m_regs[L6028_Start][m_cur_channel], machine().describe_context());
 	}
 	break;
 
 	case L6028_Volume_Env:
-		m_regs[3][m_cur_channel] &= 0xffff'0000'ffff;
-		m_regs[3][m_cur_channel] |= (uint64_t(vptr->env_volume) << 16);
-		LOGMASKED(LOG_READBACK_VOL, "ch %d read env vol %x => %012llx (%s)\n", m_cur_channel, vptr->env_volume, m_regs[3][m_cur_channel], machine().describe_context());
+		m_regs[L6028_Volume_Env][m_cur_channel] &= 0xffff'0000'ffff;
+		m_regs[L6028_Volume_Env][m_cur_channel] |= (uint64_t(vptr->env_volume) << 16);
+		LOGMASKED(LOG_READBACK_VOL, "ch %d read env vol %x => %012llx (%s)\n", m_cur_channel, vptr->env_volume, m_regs[L6028_Volume_Env][m_cur_channel], machine().describe_context());
 		break;
 
 	case L6028_Filter_Env:
-		m_regs[5][m_cur_channel] &= 0xffff'0000'ffff;
-		m_regs[5][m_cur_channel] |= (uint64_t(vptr->flt_freq) << 16);
-		LOGMASKED(LOG_READBACK_FILTER, "ch %d read filter cutoff %x => %012llx\n", m_cur_channel, vptr->env_volume, m_regs[3][m_cur_channel]);
+		m_regs[L6028_Filter_Env][m_cur_channel] &= 0xffff'0000'ffff;
+		m_regs[L6028_Filter_Env][m_cur_channel] |= (uint64_t(vptr->flt_freq) << 16);
+		LOGMASKED(LOG_READBACK_FILTER, "ch %d read filter cutoff %x => %012llx\n", m_cur_channel, vptr->flt_freq, m_regs[L6028_Filter_Env][m_cur_channel]);
 		break;
 	}
 
@@ -521,14 +553,14 @@ void l7a1045_sound_device::recalc_loop_start(l7a1045_voice *vptr)
 	else
 	{
 		const uint32_t multiplier = (((m_regs[L6028_Loop_Start][m_cur_channel] & 0xffff'0000) >> 16) ^ 0xffff) + 1;
-		const uint32_t base = m_regs[2][m_cur_channel] & 0xffff;
+		const uint32_t base = m_regs[L6028_Loop_Start][m_cur_channel] & 0xffff;
 		vptr->loop_start = (base * multiplier) >> 12;
 	}
 }
 
 uint16_t l7a1045_sound_device::control_r()
 {
-	return 0;
+	return m_control;
 }
 // bit 0 = set for wave DMA transfers
 // bit 1 = set for wave DMA transfers
@@ -539,11 +571,14 @@ uint16_t l7a1045_sound_device::control_r()
 // bit 6 = DMA start
 // bit 7 = set when DMA complete?
 // bit 8 = key on current channel
+// bit 15 = busy flag (possibly DMA specifically?)
 void l7a1045_sound_device::control_w(uint16_t data)
 {
 	m_stream->update();
 
 	LOGMASKED(LOG_REGISTERS, "%s: %04x to control (ch %d)\n", tag(), data, m_cur_channel);
+
+	m_control = data;
 
 	if (BIT(data, CONTROL_KEY_ON))
 	{
@@ -561,7 +596,16 @@ void l7a1045_sound_device::control_w(uint16_t data)
 		LOGMASKED(LOG_KEYON, "      raw 6 %012llx 7 %012llx\n", m_regs[6][m_cur_channel], m_regs[7][m_cur_channel]);
 	}
 
-	m_drq_handler(BIT(data, CONTROL_DMA_START));
+	if (BIT(m_control, CONTROL_DMA_START))
+	{
+		// 8x the sample period
+		const auto time = attotime::from_ticks(64, clock());
+		m_dma_timer->adjust(time, 0, time);
+	}
+	else
+	{
+		m_dma_timer->adjust(attotime::never);
+	}
 }
 
 void l7a1045_sound_device::atomic_w(uint16_t data)
@@ -573,17 +617,41 @@ void l7a1045_sound_device::atomic_w(uint16_t data)
 uint16_t l7a1045_sound_device::dma_r16_cb()
 {
 	const offs_t byteoffs = (m_voice[0].start << 1) + (m_voice[0].pos << 1);
-	LOGMASKED(LOG_DMA, "%s DMA 16 read: start %08x offs %08x => %08x\n", tag(), m_voice[0].start, m_voice[0].pos, byteoffs);
+
+	m_drq_handler(CLEAR_LINE);
 
 	m_voice[0].pos++;
+	if (m_voice[0].sample_type == 1)
+	{
+		LOGMASKED(LOG_DMA, "%s DMA read ROM @ %08x\n", tag(), byteoffs);
+		return m_rom_cache.read_word(byteoffs);
+	}
+
+	LOGMASKED(LOG_DMA, "%s DMA read RAM @ %08x\n", tag(), byteoffs);
 	return m_cache.read_word(byteoffs);
 }
 
 void l7a1045_sound_device::dma_w16_cb(uint16_t data)
 {
 	const offs_t byteoffs = (m_voice[0].start << 1) + (m_voice[0].pos << 1);
-	LOGMASKED(LOG_DMA, "%s DMA 16 write %04x: start %08x offs %08x => %08x\n", tag(), data, m_voice[0].start, m_voice[0].pos, byteoffs);
+
+	m_drq_handler(CLEAR_LINE);
+
+	if (m_voice[0].sample_type == 1)
+	{
+		m_rom_cache.write_word(byteoffs, data);
+		LOGMASKED(LOG_DMA, "%s DMA ROM write %04x to %08x\n", tag(), data, byteoffs);
+	}
+	else
+	{
+		m_cache.write_word(byteoffs, data);
+		LOGMASKED(LOG_DMA, "%s DMA RAM write %04x to %08x\n", tag(), data, byteoffs);
+	}
 
 	m_voice[0].pos++;
-	m_cache.write_word(byteoffs, data);
+}
+
+TIMER_CALLBACK_MEMBER(l7a1045_sound_device::dma_timer_callback)
+{
+	m_drq_handler(ASSERT_LINE);
 }

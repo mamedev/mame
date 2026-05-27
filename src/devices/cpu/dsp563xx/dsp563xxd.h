@@ -24,6 +24,7 @@ private:
 
 	static const u64 t_move_ex;
 	static const u64 t_npar_ex[4];
+	static const u32 t_npar_flags[0x100];
 
 	static const char *const ts_acc[2];
 	static const char *const ts_nacc[2];

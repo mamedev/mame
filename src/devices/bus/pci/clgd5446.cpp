@@ -27,8 +27,8 @@ DEFINE_DEVICE_TYPE(GD5446_PCI, cirrus_gd5446_pci_device, "clgd5446_pci", "Cirrus
 
 cirrus_gd5446_pci_device::cirrus_gd5446_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_card_device(mconfig, GD5446_PCI, tag, owner, clock)
-	, m_vga(*this, "svga")
-	, m_vga_rom(*this, "vga_rom")
+	, m_vga(*this, "vga")
+	, m_bios(*this, "bios")
 {
 	// subvendor ID: Returns values from ROM 0x7ffc-0x7ffe
 	set_ids(0x101300b8, 0x00, 0x030000, 0x10130000);
@@ -37,7 +37,7 @@ cirrus_gd5446_pci_device::cirrus_gd5446_pci_device(const machine_config &mconfig
 ROM_START( gd5446 )
 	// Cirrus Logic/Quadtel CL-GD5446 PCI VGA BIOS v1.31, AT27C256R
 	// from photoply
-	ROM_REGION32_LE( 0x8000, "vga_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x8000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "quadtel", "Quadtel CL-GD5446 1.31" )
 	ROMX_LOAD( "cl-gd5446_pci_vga_bios_version_1.31.u2", 0x0000, 0x8000, CRC(61f8cac7) SHA1(6e54aadfe10dfa5c7e417a054e9a64499a99083c), ROM_BIOS(0) )
 	// Chip:CL-GD5446-HC-A - ROM: CL-GD5436/46 PCI VGA BIOS Version 1.25 - RAM: 1MB, 2MB, 4MB -
@@ -75,7 +75,7 @@ void cirrus_gd5446_pci_device::device_start()
 	// TODO: Rev B do the same, except it just maps GPIO here thru CF8 / CF4
 	add_map( 512, M_MEM, FUNC(cirrus_gd5446_pci_device::gpio_map));
 
-	add_rom((u8 *)m_vga_rom->base(), 0x8000);
+	add_rom((u8 *)m_bios->base(), 0x8000);
 	expansion_rom_base = 0xc0000;
 
 	// INTA#
@@ -122,7 +122,7 @@ void cirrus_gd5446_pci_device::legacy_memory_map(address_map &map)
 
 void cirrus_gd5446_pci_device::legacy_io_map(address_map &map)
 {
-	map(0, 0x02f).m(m_vga, FUNC(cirrus_gd5446_vga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(cirrus_gd5446_vga_device::io_map));
 }
 
 uint8_t cirrus_gd5446_pci_device::vram_r(offs_t offset)
@@ -138,9 +138,9 @@ void cirrus_gd5446_pci_device::vram_w(offs_t offset, uint8_t data)
 void cirrus_gd5446_pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-	{
+	if (BIT(command, 1))
 		memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(cirrus_gd5446_pci_device::vram_r)), write8sm_delegate(*this, FUNC(cirrus_gd5446_pci_device::vram_w)));
 
-		io_space->install_device(0x03b0, 0x03df, *this, &cirrus_gd5446_pci_device::legacy_io_map);
-	}
+	if (BIT(command, 0))
+		io_space->install_device(0x0000, 0xffff, *this, &cirrus_gd5446_pci_device::legacy_io_map);
 }

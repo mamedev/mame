@@ -2,15 +2,15 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-Countertop Champ II? (c) 1993 U.S. Games
+Countertop Champion II (c) 1993 U.S. Games
 
 Bartop style multigame/quiz/fortune teller
 Dump contains a MS-DOS 3.3 ROM disk, ebay auction shows a Pine Technology PT-319A
 (SARC RC2016A5 chipset) + 2 other populated ISA16 cards out of 6.
 
 TODO:
-- Does extensive checks to COM1, towards what it claims to be `mtv1` (MicroTouch?)
-- ROM disk banking incomplete, meaning of $ca000 writes unknown;
+- FAT table claims data length 0x180000, but there are only two romdisk roms here;
+- ROM disk banking incomplete, meaning of $ca000 writes unknown (ROM select?);
 
 **************************************************************************************************/
 
@@ -22,6 +22,8 @@ TODO:
 #include "machine/at.h"
 #include "machine/bankdev.h"
 #include "machine/ds128x.h"
+#include "machine/ins8250.h"
+#include "machine/microtch.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
 
@@ -37,6 +39,8 @@ public:
 		, m_mb(*this, "mb")
 		, m_ram(*this, "ram")
 		, m_bank(*this, "bank%u", 0U)
+		, m_uart(*this, "ns16450_0")
+		, m_microtouch(*this, "microtouch")
 	{ }
 
 	void champ2(machine_config &config);
@@ -52,6 +56,9 @@ private:
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
 	required_device_array<address_map_bank_device, 2> m_bank;
+	required_device<ns16450_device> m_uart;
+	required_device<microtouch_device> m_microtouch;
+
 	void bank_map(address_map &map) ATTR_COLD;
 	void main_io(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
@@ -62,8 +69,10 @@ void champ2_state::main_map(address_map &map)
 {
 	map(0x000000, 0x09ffff).bankrw("bank10");
 	// Selectable thru jumpers (0xc800, 0xd000, 0xd800, 0xe000)
+	// $c8000 part may really be fixed
 	map(0x0c8000, 0x0c9fff).m(m_bank[0], FUNC(address_map_bank_device::amap8));
 	map(0x0ca000, 0x0cbfff).m(m_bank[1], FUNC(address_map_bank_device::amap8));
+	map(0x0dc000, 0x0ddfff).ram(); // NVRAM
 	// writes to $+2000 then $+0000, same value (0x03) at POST,
 	// then writes 0 to $+2000 and N to $+0000
 	map(0x0c8000, 0x0c8000).lw8(
@@ -75,6 +84,7 @@ void champ2_state::main_map(address_map &map)
 	map(0x0ca000, 0x0ca000).lw8(
 		NAME([this] (offs_t offset, u8 data) {
 			logerror("$ca000 bank %02x\n", data);
+			// ROM select for $ca000?
 			//m_bank[0]->set_bank(data & 0x7f);
 		})
 	);
@@ -87,12 +97,13 @@ void champ2_state::main_io(address_map &map)
 	map.global_mask(0x3ff);
 	map(0x0000, 0x00ff).m(m_mb, FUNC(at_mb_device::map));
 	map(0x0200, 0x0201).portr("GAME");
+	map(0x03f8, 0x03ff).rw(m_uart, FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w));
 }
 
 
 void champ2_state::bank_map(address_map &map)
 {
-	map(0x00000, 0xfffff).rom().region("game_prg", 0);
+	map(0x00000, 0x17ffff).rom().region("game_prg", 0);
 }
 
 static INPUT_PORTS_START( champ2 )
@@ -163,7 +174,14 @@ void champ2_state::champ2(machine_config &config)
 	RAM(config, m_ram).set_default_size("15M").set_extra_options("640K,1024K,1664K,2M,4M,8M,15M");
 
 	for (auto bank : m_bank)
-		ADDRESS_MAP_BANK(config, bank).set_map(&champ2_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0x2000);
+		ADDRESS_MAP_BANK(config, bank).set_map(&champ2_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 21, 0x2000);
+
+	ns16450_device &uart(NS16450(config, "ns16450_0", XTAL(1'843'200)));
+	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
+	uart.out_int_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir4_w));
+
+	// Wants a MicroTouch touch screen connected to COM1 (IO=3F8; IRQ=4) w/ 9600 8N1
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(uart, FUNC(ins8250_uart_device::rx_w));
 }
 
 
@@ -172,9 +190,10 @@ ROM_START( champ2 )
 	// borrowed from pc/at.cpp pt319a
 	ROM_LOAD( "3sam001.bin", 0x10000, 0x10000, BAD_DUMP CRC(cad22030) SHA1(85bb6027579a87bfe7ea0f7df3676fdaa64920ac))
 
-	ROM_REGION( 0x100000, "game_prg", 0 )
-	ROM_LOAD( "champ2.u2", 0x00000, 0x80000, CRC(058bd1a4) SHA1(e4c0db329cda0cdcab7c7b4d130f1c38fa32385f) )
-	ROM_LOAD( "champ2.u3", 0x80000, 0x80000, CRC(3bb1951f) SHA1(8057327285f57787cc7da678427767ee7f979a64) )
+	ROM_REGION( 0x180000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD( "champ2.u2",  0x000000, 0x80000, CRC(058bd1a4) SHA1(e4c0db329cda0cdcab7c7b4d130f1c38fa32385f) )
+	ROM_LOAD( "champ2.u3",  0x080000, 0x80000, CRC(3bb1951f) SHA1(8057327285f57787cc7da678427767ee7f979a64) )
+	ROM_LOAD( "champ2.u4",  0x100000, 0x80000, NO_DUMP )
 
 	ROM_REGION( 0x1caf, "pal", 0 )
 	ROM_LOAD( "champ2.u7",  0x00000, 0x1caf, BAD_DUMP CRC(bd70e89b) SHA1(3567d22057e366a439ffce2dd35180f5df80d47c) )
@@ -203,5 +222,4 @@ void champ2_state::init_at()
 
 
 //GAME( 1993, champ,  0, champ2,  champ2, champ2_state, empty_init, ROT0,  "U.S. Games", "Countertop Champion", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-// Title assumed by "Champ II" ROM labels
 GAME( 1994, champ2,  0, champ2,  champ2, champ2_state, init_at, ROT0,  "U.S. Games", "Countertop Champion 2 (ver 2.11)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

@@ -365,7 +365,7 @@ authors:hap
 		<repeat count="5">
 			<param name="y" start="52.916" increment="5.333333" />
 			<param name="i" start="1" increment="1" />
-			<element ref="text_l~i~"><bounds x="91.4" y="~y~" width="12.5" height="1.5" /></element>
+			<element ref="text_l~i~"><bounds x="91.5" y="~y~" width="12" height="1.5" /></element>
 		</repeat>
 
 		<repeat count="6">

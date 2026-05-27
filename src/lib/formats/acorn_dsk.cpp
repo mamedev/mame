@@ -702,7 +702,8 @@ bool opus_ddcpm_format::load(util::random_read &io, uint32_t form_factor, const 
 				sects[i].actual_size = bps;
 				sects[i].data = sectdata + i * 512;
 				sects[i].deleted = false;
-				sects[i].bad_crc = false;
+				sects[i].bad_data_crc = false;
+				sects[i].bad_addr_crc = false;
 			}
 
 			if (mfm)

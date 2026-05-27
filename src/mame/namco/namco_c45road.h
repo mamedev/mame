@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "screen.h"
 #include "tilemap.h"
 
 
@@ -15,28 +16,24 @@
 
 // ======================> namco_c45_road_device
 
-class namco_c45_road_device : public device_t, public device_gfx_interface, public device_memory_interface
+class namco_c45_road_device : public device_t, public device_gfx_interface
 {
 public:
 	// construction/destruction
 	namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void map(address_map &map) ATTR_COLD;
-
-	// read/write handlers
-	uint16_t read(offs_t offset);
-	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void writeonly_map(address_map &map) ATTR_COLD;
 
 	// C45 Land (Road) Emulation
 	void set_transparent_color(pen_t pen) { m_transparent_color = pen; }
 	void set_xoffset(int xoffset) { m_xoffset = xoffset; }
 
-	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
+	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, uint8_t prival = 0, uint8_t primask = uint8_t(~0));
 
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
-	virtual space_config_vector memory_space_config() const override;
 
 private:
 	// constants
@@ -52,10 +49,9 @@ private:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 	void tilemap_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	TILE_GET_INFO_MEMBER( get_road_info );
+	TILE_GET_INFO_MEMBER(get_road_info);
 
 	// internal state
-	address_space_config        m_space_config;
 	required_shared_ptr<uint16_t> m_tmapram;
 	required_shared_ptr<uint16_t> m_tileram;
 	required_shared_ptr<uint16_t> m_lineram;

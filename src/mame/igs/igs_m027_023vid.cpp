@@ -11,7 +11,7 @@ Main components for the PCB-0457-03-GS are:
 - 33 MHz XTAL
 - IGS 023 graphics chip
 - ICS2115V Wavefront sound chip
-- IGS 026B I/O chip
+- IGS 026B I/O chip (or sometimes 026A)
 - 3 banks of 8 DIP switches
 
 Notes:
@@ -187,9 +187,9 @@ void igs_m027_023vid_state::m027_map(address_map &map)
 
 	map(0x2800'0000, 0x2800'0fff).ram();
 
-	map(0x3890'0000, 0x3890'7fff).rw(m_video, FUNC(igs023_video_device::videoram_r), FUNC(igs023_video_device::videoram_w)).umask32(0xffffffff);
-	map(0x38a0'0000, 0x38a0'11ff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x38b0'0000, 0x38b0'ffff).rw(m_video, FUNC(igs023_video_device::videoregs_r), FUNC(igs023_video_device::videoregs_w)).umask32(0xffffffff);
+	map(0x3890'0000, 0x3890'7fff).m(m_video, FUNC(igs023_video_device::videoram_map)).umask32(0xffffffff);
+	map(0x38a0'0000, 0x38a0'13ff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x38b0'0000, 0x38b0'ffff).m(m_video, FUNC(igs023_video_device::videoregs_map)).umask32(0xffffffff);
 
 	map(0x4800'0000, 0x4800'0001).r(FUNC(igs_m027_023vid_state::in_r<0>));
 	map(0x4800'0002, 0x4800'0003).r(FUNC(igs_m027_023vid_state::in_r<1>));
@@ -394,19 +394,17 @@ void igs_m027_023vid_state::m027_023vid(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1000));
-	m_screen->set_size(512, 256);
-	m_screen->set_visarea(0, 448-1, 0, 224-1);
+	m_screen->set_raw(50_MHz_XTAL/5, 640, 0, 448, 264, 0, 224); // copied from igs/pgm.cpp, correct?
 	m_screen->set_screen_update(m_video, FUNC(igs023_video_device::screen_update));
-	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(igs_m027_023vid_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1200/2);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1400/2);
 
 	// PGM video
 	IGS023_VIDEO(config, m_video, 0);
 	m_video->set_palette(m_palette);
+	m_video->set_screen(m_screen);
 	m_video->read_spriteram_callback().set(FUNC(igs_m027_023vid_state::sprites_r));
 
 	// sound hardware
@@ -449,6 +447,27 @@ ROM_START( mxsqy )
 	ROM_LOAD( "igs_s2402.u21", 0x000000, 0x400000, CRC(a3e3b2e0) SHA1(906e5839ab62e570d9716e01b49e5b067e041269) )
 ROM_END
 
+ROM_START( mxsqy102tw )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A type G ARM based MCU
+	ROM_LOAD( "n6_027a.u41", 0x00000, 0x4000, CRC(f9ada8c4) SHA1(0715fdc3d15ae2d1af4e9c7d25f6410ae7c22d42) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v-102tw.u39", 0x000000, 0x80000, CRC(16095b98) SHA1(9fe2f06253a4ddaf47df7f998137f66f0c0cf4e2) )
+
+	ROM_REGION( 0x80000, "igs023",  0 )
+	ROM_LOAD( "text.u38", 0x00000, 0x80000, CRC(2f20eade) SHA1(aa11d26cb51483af5fdd4b181dff0f222baeaaff) )
+
+	ROM_REGION16_LE( 0x400000, "igs023:sprcol", 0 )
+	ROM_LOAD( "cg_u23.u23", 0x000000, 0x400000, CRC(dc8ff7ae) SHA1(4609b5543d8bea7a8dea4e744f81c407688a96ee) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION16_LE( 0x400000, "igs023:sprmask", 0 )
+	ROM_LOAD( "cg_u22.u22", 0x000000, 0x400000, CRC(53940332) SHA1(3c703cbdc51dfb100f3ce10452a81091305dee01) )
+
+	ROM_REGION( 0x400000, "ics", 0 )
+	ROM_LOAD( "u21", 0x000000, 0x400000, CRC(a3e3b2e0) SHA1(906e5839ab62e570d9716e01b49e5b067e041269) )
+ROM_END
+
 
 void igs_m027_023vid_state::init_mxsqy()
 {
@@ -465,4 +484,5 @@ void igs_m027_023vid_state::init_mxsqy()
 ***************************************************************************/
 
 // internal ROM is 2003
-GAME( 2003, mxsqy, 0, m027_023vid, mxsqy, igs_m027_023vid_state, init_mxsqy, ROT0, "IGS", "Mingxing San Que Yi (China, V201CN)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, mxsqy,          0, m027_023vid, mxsqy, igs_m027_023vid_state, init_mxsqy, ROT0, "IGS", "Mingxing San Que Yi (China, V201CN)",  MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, mxsqy102tw, mxsqy, m027_023vid, mxsqy, igs_m027_023vid_state, init_mxsqy, ROT0, "IGS", "Mingxing San Que Yi (Taiwan, V102TW)", MACHINE_IMPERFECT_GRAPHICS )

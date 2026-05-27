@@ -425,8 +425,8 @@ authors:hap
 		<element ref="text_b1b"><bounds xc="5" yc="32.0" width="3.3" height="1.1" /></element>
 		<element ref="text_b2a"><bounds xc="5" yc="36.0" width="3.3" height="1.1" /></element>
 		<element ref="text_b2b"><bounds xc="5" yc="37.0" width="3.3" height="1.1" /></element>
-		<element ref="text_b3"><bounds xc="5" yc="41.5" width="5" height="1.1" /></element>
-		<element ref="text_b4"><bounds xc="5" yc="46.5" width="5" height="1.1" /></element>
+		<element ref="text_b3"><bounds xc="5" yc="41.5" width="3.3" height="1.1" /></element>
+		<element ref="text_b4"><bounds xc="5" yc="46.5" width="3.3" height="1.1" /></element>
 		<element ref="text_b5a"><bounds xc="5" yc="51.0" width="3.3" height="1.1" /></element>
 		<element ref="text_b5b"><bounds xc="5" yc="52.0" width="3.3" height="1.1" /></element>
 

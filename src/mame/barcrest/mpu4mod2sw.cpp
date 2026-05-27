@@ -175,7 +175,7 @@ INPUT_PORTS_START( connect4 )
 	PORT_BIT(0x1F, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Switch")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox (Back) Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_DOOR) PORT_NAME("Cashbox (Back) Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_START("BLACK2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Select")
@@ -1539,6 +1539,11 @@ ROM_START( m421club )
 	ROM_LOAD( "dtw27.bin", 0x0000, 0x010000, CRC(8e37977e) SHA1(8e996e50b2a87b97f999bfd00166c32240b74690) )
 ROM_END
 
+ROM_START( m421clubg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gtw27.bin", 0x0000, 0x010000, CRC(dd561584) SHA1(ba98665435f74590fbfed9e61834eab393f20220) )
+ROM_END
+
 ROM_START( m4clbcnt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "con12.bin", 0x0000, 0x010000, CRC(e577d7bc) SHA1(be4d6d75f33782c503f91659b5f69d1fb4c220da) )
@@ -2142,6 +2147,8 @@ GAME(199?, m4wildms,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::m4dt
 GAME(199?, m4suptrn,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::actionbank_characteriser_prot>(R7, RT1), mpu4_dutch,            mpu4mod2_machines_state, init_m4,     ROT0,   "Barcrest","Supatron (Barcrest) (MPU4) (DSU 2.1)",GAME_FLAGS )
 
 GAME(199?, m421club,  0,          mod2_cheatchr_pal<mpu4_characteriser_pal::blackwhite_characteriser_prot>(R7, RT1), mpu4_dutch,            mpu4mod2_machines_state, init_m4,     ROT0,   "Barcrest","21 Club (Barcrest) (Dutch) (MPU4) (DTW 2.7)",GAME_FLAGS )
+// TODO: protection wrong, doesn't boot
+GAME(199?, m421clubg, m421club,   mod2_cheatchr_pal<mpu4_characteriser_pal::blackwhite_characteriser_prot>(R7, RT1), mpu4_dutch,            mpu4mod2_machines_state, init_m4,     ROT0,   "Barcrest","21 Club (Barcrest) (German) (MPU4) (GTW 2.7)",GAME_FLAGS )
 
 GAME(199?, m4class,   0,          mod2_cheatchr_pal<mpu4_characteriser_pal::take2_characteriser_prot>(R7, RT1), mpu4_dutch,            mpu4mod2_machines_state, init_m4,     ROT0,   "Barcrest","First Class (Barcrest) (Dutch) (MPU4) (DFC 2.0, set 1)",GAME_FLAGS )
 // INITIALIZE COMMS, before any prot sequence

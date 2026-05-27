@@ -183,7 +183,8 @@ bool oric_jasmin_format::load(util::random_read &io, uint32_t form_factor, const
 				sdesc[s].actual_size = 256;
 				sdesc[s].data = &data[256 * (sector + track*17 + head*17*41)];
 				sdesc[s].deleted = false;
-				sdesc[s].bad_crc = false;
+				sdesc[s].bad_data_crc = false;
+				sdesc[s].bad_addr_crc = false;
 			}
 
 			build_wd_track_mfm(track, head, image, 100000, 17, sdesc, 38, 40);

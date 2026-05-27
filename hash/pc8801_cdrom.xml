@@ -53,7 +53,7 @@ Game transfers not extensively tested
 	</software>
 
 	<software name="dioscd" supported="no">
-		<description>Dios CD-ROM ban</description>
+		<description>Dios CD-ROM-ban</description>
 		<year>1990</year>
 		<publisher>ザインソフト (Zain Soft)</publisher>
 		<notes><![CDATA[

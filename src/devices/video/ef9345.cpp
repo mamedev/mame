@@ -407,10 +407,8 @@ uint16_t ef9345_device::indexblock(uint16_t x, uint16_t y)
 
 uint16_t ef9345_device::indexrow(uint16_t y)
 {
-	uint16_t j;
-
 	// On the EF9345 the service row can be fetched from either Y=0 or Y=1.
-	j = (y == 0) ? BIT(m_tgs, 5) : ((m_ror & 0x1f) + y - 1);
+	uint16_t const j = (y == 0) ? BIT(m_tgs, 5) : ((m_ror & 0x1f) + y - 1);
 
 	return (j > 31) ? (j - 24) : j;
 }

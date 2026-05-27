@@ -5,6 +5,8 @@
  * AMD Am7990 Local Area Network Controller for Ethernet (LANCE) and Am79C90
  * CMOS Local Area Network Controller for Ethernet (C-LANCE).
  *
+ * Usually supported by the Am7992B Serial Interface Adapter, which generates TCLK by dividing its crystal oscillator input by 2.
+ *
  * Sources:
  *  - Am7990 Local Area Network Controller for Ethernet (LANCE), Publication #05698, Rev. C, June 1990, Advanced Micro Devices
  *  - Am79C90 CMOS Local Area Network Controller for Ethernet (C-LANCE), Publication #17881, Rev. C, January 1998, Advanced Micro Devices

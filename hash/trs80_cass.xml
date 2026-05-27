@@ -396,8 +396,8 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 		</part>
 	</software>
 	<software name="env">
-		<description>Les Invasiou des Extras-terrestres</description>
-		<year>19??</year>
+		<description>L'Invasion des Extras-terrestres</description>
+		<year>1983</year>
 		<publisher>Sivea</publisher>
 		<info name="author" value="Xavier Ackaouy" />
 		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then ENV then /" />
@@ -487,7 +487,7 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 	<software name="adv03">
 		<description>Mission Impossible</description>
 		<year>1979</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Adventure International</publisher>
 		<info name="author" value="Scott Adams" />
 		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then MISSIO then /" />
 		<sharedfeat name="compatibility" value="1,3,4,H" />
@@ -614,7 +614,7 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 	<software name="seadragon">
 		<description>Seadragon</description>
 		<year>1982</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Adventure International</publisher>
 		<info name="author" value="Wayne Westmoreland and Terry Gilman" />
 		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then SEADRA then /" />
 		<sharedfeat name="compatibility" value="1,3,4,H" />
@@ -653,7 +653,7 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 	<software name="spcwarp">
 		<description>Space Warp</description>
 		<year>1978</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Radio Shack</publisher>
 		<info name="author" value="Joshua Lavinsky" />
 		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then SPWAR" />
 		<sharedfeat name="compatibility" value="1,3,4,H" />

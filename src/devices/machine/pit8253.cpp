@@ -127,7 +127,10 @@ void pit_counter_device::device_start()
 	save_item(NAME(m_wmsb));
 	save_item(NAME(m_rmsb));
 	save_item(NAME(m_output));
+	save_item(NAME(m_output_pin));
 	save_item(NAME(m_gate));
+	save_item(NAME(m_gate_input));
+	save_item(NAME(m_gate_rose));
 	save_item(NAME(m_latched_count));
 	save_item(NAME(m_latched_status));
 	save_item(NAME(m_null_count));
@@ -137,6 +140,8 @@ void pit_counter_device::device_start()
 
 	/* zerofill */
 	m_gate = 1;
+	m_gate_input = 1;
+	m_gate_rose = 0;
 	m_phase = 0;
 	m_clock_signal = 0;
 
@@ -146,6 +151,7 @@ void pit_counter_device::device_start()
 	m_lowcount = 0;
 
 	m_output = 0;
+	m_output_pin = 0;
 	m_latched_count = 0;
 	m_latched_status = 0;
 	m_null_count = 1;
@@ -178,6 +184,7 @@ void pit_counter_device::device_reset()
 	m_lowcount = 0;
 
 	m_output = 2; /* output is undetermined */
+	m_output_pin = 2;
 	m_latched_count = 0;
 	m_latched_status = 0;
 	m_null_count = 1;
@@ -300,12 +307,29 @@ void pit_counter_device::set_output(int output)
 	if (output != m_output)
 	{
 		m_output = output;
-		LOG2("set_output() timer %d: %s\n", m_index, output ? "low to high" : "high to low");
-
-		downcast<pit8253_device *>(owner())->m_out_handler[m_index](output);
+		flush_output();
 	}
 }
 
+void pit_counter_device::flush_output()
+{
+	int new_output = m_output;
+	if (m_clockin == 0)
+	{
+		// TODO: The same logic should apply when m_clockin != 0, but that needs
+		// to be verified.
+		const int mode = CTRL_MODE(m_control);
+		if ((mode == 2 || mode == 3) && m_gate_input == 0)
+			new_output = 1;
+	}
+
+	if (new_output != m_output_pin)
+	{
+		LOG2("set_output() timer %d: %s\n", m_index, new_output ? "low to high" : "high to low");
+		m_output_pin = new_output;
+		downcast<pit8253_device *>(owner())->m_out_handler[m_index](new_output);
+	}
+}
 
 /* This emulates timer "timer" for "elapsed_cycles" cycles and assumes no
    callbacks occur during that time. */
@@ -1017,7 +1041,8 @@ TIMER_CALLBACK_MEMBER(pit_counter_device::count_w_deferred)
 			m_last_updated += m_clock_period;
 
 		load_count(data);
-		simulate(0);
+		if (m_clockin != 0)
+			simulate(0);
 
 		if (CTRL_MODE(m_control) == 0)
 			set_output(0);
@@ -1031,7 +1056,8 @@ TIMER_CALLBACK_MEMBER(pit_counter_device::count_w_deferred)
 			m_last_updated += m_clock_period;
 
 		load_count(data << 8);
-		simulate(0);
+		if (m_clockin != 0)
+			simulate(0);
 
 		if (CTRL_MODE(m_control) == 0)
 			set_output(0);
@@ -1046,7 +1072,8 @@ TIMER_CALLBACK_MEMBER(pit_counter_device::count_w_deferred)
 				m_last_updated += m_clock_period;
 
 			load_count(m_lowcount | (data << 8));
-			simulate(0);
+			if (m_clockin != 0)
+				simulate(0);
 		}
 		else
 		{
@@ -1084,22 +1111,35 @@ void pit8253_device::write(offs_t offset, uint8_t data)
 		m_counter[offset]->count_w(data);
 }
 
+bool pit_counter_device::edge_sensitive_gate() const
+{
+	const int mode = CTRL_MODE(m_control);
+	// TODO: The m_clockin check should not be necessary, but removing it needs
+	// to be verified.
+	return mode == 1 || mode == 2 || (mode == 3 && m_clockin == 0) || mode == 5;
+}
+
 TIMER_CALLBACK_MEMBER(pit_counter_device::gate_w_deferred)
 {
 	update();
 	int state = param;
 	LOG2("gate_w(): state=%d\n", state);
 
-	if (state != m_gate)
+	if (state != m_gate_input)
 	{
-		int mode = CTRL_MODE(m_control);
-
 		update();
-		m_gate = state;
-		if (state != 0 && ( mode == 1 || mode == 2 || mode == 5 ))
+		m_gate_input = state;
+		if (m_clockin != 0)
+			m_gate = state;
+		if (state != 0 && edge_sensitive_gate())
 		{
-			m_phase = 1;
+			if (m_clockin != 0)
+				m_phase = 1;
+			else
+				m_gate_rose = 1;
 		}
+		if (m_clockin == 0)
+			flush_output();
 		update();
 	}
 }
@@ -1120,12 +1160,25 @@ void pit_counter_device::set_clockin(double new_clockin)
 }
 
 
-void pit_counter_device::set_clock_signal(int state)
+TIMER_CALLBACK_MEMBER(pit_counter_device::set_clock_signal_deferred)
 {
+	const int state = param;
 	LOG2("set_clock_signal(): state = %d\n", state);
 
-	/* Trigger on low to high transition */
+	/* Sample GATE and the GATE edge detection flipflop on low to high transition */
 	if (!m_clock_signal && state)
+	{
+		m_gate = m_gate_input;
+		if (m_gate_rose)
+		{
+			if (edge_sensitive_gate())
+				m_phase = 1;
+			m_gate_rose = 0;
+		}
+	}
+
+	/* Trigger on high to low transition */
+	if (m_clock_signal && !state)
 	{
 		/* Advance a cycle */
 		simulate(1);

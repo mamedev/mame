@@ -40,10 +40,7 @@ public:
 	pet_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: pet_user_port_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	pet_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -88,7 +85,7 @@ public:
 	void write_m(int state);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_config_complete() override;
 	virtual void device_start() override ATTR_COLD;
 

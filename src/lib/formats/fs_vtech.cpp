@@ -7,9 +7,7 @@
 #include "fsblk.h"
 #include "vt_dsk.h"
 
-#include "multibyte.h"
-
-#include <stdexcept>
+#include <algorithm>
 
 using namespace fs;
 
@@ -20,6 +18,7 @@ namespace fs { const vtech_image VTECH; }
 //
 // Track 0 sectors 0-14 have the file names.  16 bytes/entry
 //   offset 0  : File type 'T' (basic), 'B' (binary), or some other letter (application-specific)
+//               0x00 = end of directory, 0x01 = deleted file
 //   offset 1  : 0x3a
 //   offset 2-9: File name
 //   offset a  : Track number of first file sector
@@ -49,12 +48,13 @@ public:
 	virtual std::error_condition file_create(const std::vector<std::string> &path, const meta_data &meta) override;
 
 	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+	virtual std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> enum_blocks(const std::vector<std::string> &path) override;
 	virtual std::error_condition file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
 
 	virtual std::error_condition format(const meta_data &meta) override;
 
 private:
-	meta_data file_metadata(const u8 *entry);
+	static meta_data file_metadata(const fsblk_t::block_t &bdir, u32 off);
 	std::tuple<fsblk_t::block_t::ptr, u32> file_find(std::string_view name);
 	std::vector<std::pair<u8, u8>> allocate_blocks(u32 count);
 	void free_blocks(const std::vector<std::pair<u8, u8>> &blocks);
@@ -140,14 +140,14 @@ std::error_condition vtech_impl::volume_metadata_change(const meta_data &meta)
 	return std::error_condition();
 }
 
-meta_data vtech_impl::file_metadata(const u8 *entry)
+meta_data vtech_impl::file_metadata(const fsblk_t::block_t &bdir, u32 off)
 {
 	meta_data res;
 
-	res.set(meta_name::name, trim_end_spaces(rstr(entry+2, 8)));
-	res.set(meta_name::file_type, std::string{ char(entry[0]) });
-	res.set(meta_name::loading_address, get_u16le(entry + 0xc));
-	res.set(meta_name::length, (get_u16le(entry + 0xe) - get_u16le(entry + 0xc)) & 0xffff);
+	res.set(meta_name::name, trim_end_spaces(bdir.rstr(off + 2, 8)));
+	res.set(meta_name::file_type, std::string{ char(bdir.r8(off)) });
+	res.set(meta_name::loading_address, bdir.r16l(off + 0xc));
+	res.set(meta_name::length, (bdir.r16l(off + 0xe) - bdir.r16l(off + 0xc)) & 0xffff);
 
 	return res;
 }
@@ -156,10 +156,12 @@ std::tuple<fsblk_t::block_t::ptr, u32> vtech_impl::file_find(std::string_view na
 {
 	for(int sect = 0; sect != 14; sect++) {
 		auto bdir = m_blockdev.get(sect);
-		for(u32 i = 0; i != 8; i ++) {
+		for(u32 i = 0; i != 8; i++) {
 			u32 off = i*16;
 			u8 type = bdir->r8(off);
-			if(type < 'A' || type > 'Z')
+			if(type == 0x00)
+				return std::make_tuple(fsblk_t::block_t::ptr(), 0xffffffff);
+			if(type == 0x01)
 				continue;
 			if(bdir->r8(off+1) != ':')
 				continue;
@@ -180,7 +182,7 @@ std::pair<std::error_condition, meta_data> vtech_impl::metadata(const std::vecto
 	if(off == 0xffffffff)
 		return std::make_pair(error::not_found, meta_data());
 
-	return std::make_pair(std::error_condition(), file_metadata(bdir->rodata() + off));
+	return std::make_pair(std::error_condition(), file_metadata(*bdir, off));
 }
 
 std::error_condition vtech_impl::metadata_change(const std::vector<std::string> &path, const meta_data &meta)
@@ -192,19 +194,18 @@ std::error_condition vtech_impl::metadata_change(const std::vector<std::string> 
 	if(off == 0xffffffff)
 		return error::not_found;
 
-	u8 *entry = bdir->data() + off;
 	if(meta.has(meta_name::file_type))
-		entry[0x0] = meta.get_string(meta_name::file_type)[0];
+		bdir->w8(off, meta.get_string(meta_name::file_type)[0]);
 	if(meta.has(meta_name::name)) {
 		std::string name = meta.get_string(meta_name::name);
 		name.resize(8, ' ');
-		wstr(entry+0x2, name);
+		bdir->wstr(off + 0x2, name);
 	}
 	if(meta.has(meta_name::loading_address)) {
 		u16 new_loading = meta.get_number(meta_name::loading_address);
-		u16 new_end = get_u16le(entry + 0xe) - get_u16le(entry + 0xc) + new_loading;
-		put_u16le(entry + 0xc, new_loading);
-		put_u16le(entry + 0xe, new_end);
+		u16 new_end = bdir->r16l(off + 0xe) - bdir->r16l(off + 0xc) + new_loading;
+		bdir->w16l(off + 0xc, new_loading);
+		bdir->w16l(off + 0xe, new_end);
 	}
 
 	return std::error_condition();
@@ -223,14 +224,16 @@ std::pair<std::error_condition, std::vector<dir_entry>> vtech_impl::directory_co
 
 	for(int sect = 0; sect != 14; sect++) {
 		auto bdir = m_blockdev.get(sect);
-		for(u32 i = 0; i != 8; i ++) {
+		for(u32 i = 0; i != 8; i++) {
 			u32 off = i*16;
 			u8 type = bdir->r8(off);
-			if(type < 'A' || type > 'Z')
+			if(type == 0x00)
+				return res;
+			if(type == 0x01)
 				continue;
 			if(bdir->r8(off+1) != ':')
 				continue;
-			meta_data meta = file_metadata(bdir->rodata()+off);
+			meta_data meta = file_metadata(*bdir, off);
 			res.second.emplace_back(dir_entry(dir_entry_type::file, meta));
 		}
 	}
@@ -248,7 +251,7 @@ std::error_condition vtech_impl::rename(const std::vector<std::string> &opath, c
 
 	std::string name = npath[0];
 	name.resize(8, ' ');
-	wstr(bdir->data() + off + 2, name);
+	bdir->wstr(off + 2, name);
 
 	return std::error_condition();
 }
@@ -267,10 +270,10 @@ std::error_condition vtech_impl::file_create(const std::vector<std::string> &pat
 	// Find the key for the next unused entry
 	for(int sect = 0; sect != 14; sect++) {
 		auto bdir = m_blockdev.get(sect);
-		for(u32 i = 0; i != 16; i ++) {
+		for(u32 i = 0; i != 8; i++) {
 			u32 off = i*16;
 			u8 type = bdir->r8(off);
-			if(type != 'T' && type != 'B') {
+			if(type == 0x00 || type == 0x01) {
 				std::string fname = meta.get_string(meta_name::name, "");
 				fname.resize(8, ' ');
 
@@ -299,11 +302,9 @@ std::pair<std::error_condition, std::vector<u8>> vtech_impl::file_read(const std
 	if(off == 0xffffffff)
 		return std::make_pair(error::not_found, data);
 
-	const u8 *entry = bdir->rodata() + off;
-
-	u8 track = entry[0xa];
-	u8 sector = entry[0xb];
-	int len = (get_u16le(entry + 0xe) - get_u16le(entry + 0xc)) & 0xffff;
+	u8 track = bdir->r8(off + 0xa);
+	u8 sector = bdir->r8(off + 0xb);
+	int len = (bdir->r16l(off + 0xe) - bdir->r16l(off + 0xc)) & 0xffff;
 
 	data.resize(len, 0);
 	int pos = 0;
@@ -311,15 +312,59 @@ std::pair<std::error_condition, std::vector<u8>> vtech_impl::file_read(const std
 		if(track >= 40 || sector >= 16)
 			break;
 		auto dblk = m_blockdev.get(track*16 + sector);
-		int size = len - pos;
-		if(size > 126)
-			size = 126;
+		int size = std::min(len - pos, 126);
 		dblk->read(0, data.data() + pos, size);
 		pos += size;
 		track = dblk->r8(126);
 		sector = dblk->r8(127);
 	}
 	return std::make_pair(std::error_condition(), data);
+}
+
+std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> vtech_impl::enum_blocks(const std::vector<std::string> &path)
+{
+	if(path.empty()) {
+		std::vector<u32> blocks;
+
+		for(int sect = 0; sect != 14; sect++) {
+			blocks.push_back(sect);
+			auto bdir = m_blockdev.get(sect);
+			for(u32 i = 0; i != 8; i++) {
+				u32 off = i*16;
+				u8 type = bdir->r8(off);
+				if(type == 0x00)
+					goto done;
+			}
+		}
+	done:
+		return std::make_tuple(std::error_condition(), std::vector<u32>(), std::move(blocks));
+	}
+
+	if(path.size() != 1)
+		return std::make_tuple(error::not_found, std::vector<u32>(), std::vector<u32>());
+
+	auto [bdir, off] = file_find(path[0]);
+	if(off == 0xffffffff)
+		return std::make_tuple(error::not_found, std::vector<u32>(), std::vector<u32>());
+
+	u8 track = bdir->r8(off + 0xa);
+	u8 sector = bdir->r8(off + 0xb);
+	int len = (bdir->r16l(off + 0xe) - bdir->r16l(off + 0xc)) & 0xffff;
+	std::vector<u32> blocks;
+
+	while(len != 0) {
+		if(track >= 40 || sector >= 16)
+			return std::make_tuple(error::invalid_block, std::vector<u32>(), std::move(blocks));
+		if(std::find(blocks.begin(), blocks.end(), track*16 + sector) != blocks.end())
+			return std::make_tuple(error::circular_reference, std::vector<u32>(), std::move(blocks));
+		blocks.push_back(track*16 + sector);
+		auto dblk = m_blockdev.get(track*16 + sector);
+		len = (len < 126) ? 0 : len - 126;
+		track = dblk->r8(126);
+		sector = dblk->r8(127);
+	}
+
+	return std::make_tuple(std::error_condition(), std::vector<u32>(), std::move(blocks));
 }
 
 std::error_condition vtech_impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
@@ -331,9 +376,7 @@ std::error_condition vtech_impl::file_write(const std::vector<std::string> &path
 	if(off == 0xffffffff)
 		return error::not_found;
 
-	u8 *entry = bdir->data() + off;
-
-	u32 cur_len = (get_u16le(entry + 0xe) - get_u16le(entry + 0xc)) & 0xffff;
+	u32 cur_len = (bdir->r16l(off + 0xe) - bdir->r16l(off + 0xc)) & 0xffff;
 	u32 new_len = data.size();
 	if(new_len > 65535)
 		new_len = 65535;
@@ -344,8 +387,8 @@ std::error_condition vtech_impl::file_write(const std::vector<std::string> &path
 	if(cur_ns < need_ns && free_block_count() < need_ns - cur_ns)
 		return error::no_space;
 
-	u8 track = entry[0xa];
-	u8 sector = entry[0xb];
+	u8 track = bdir->r8(off + 0xa);
+	u8 sector = bdir->r8(off + 0xb);
 	std::vector<std::pair<u8, u8>> tofree;
 	for(u32 i = 0; i != cur_ns; i++) {
 		tofree.emplace_back(std::make_pair(track, sector));
@@ -357,12 +400,10 @@ std::error_condition vtech_impl::file_write(const std::vector<std::string> &path
 	free_blocks(tofree);
 
 	std::vector<std::pair<u8, u8>> blocks = allocate_blocks(need_ns);
-	for(u32 i=0; i != need_ns; i ++) {
+	for(u32 i=0; i != need_ns; i++) {
 		auto dblk = m_blockdev.get(blocks[i].first * 16 + blocks[i].second);
-		u32 len = new_len - i*126;
-		if(len > 126)
-			len = 126;
-		else if(len < 126)
+		u32 len = std::min<u32>(new_len - i*126, 126);
+		if(len < 126)
 			dblk->fill(0x00);
 		dblk->write(0, data.data() + 126*i, len);
 		if(i < need_ns) {
@@ -372,13 +413,13 @@ std::error_condition vtech_impl::file_write(const std::vector<std::string> &path
 			dblk->w16l(126, 0);
 	}
 
-	u16 end_address = (get_u16le(entry + 0xc) + data.size()) & 0xffff;
-	put_u16le(entry + 0xe, end_address);
+	u16 end_address = (bdir->r16l(off + 0xc) + data.size()) & 0xffff;
+	bdir->w16l(off + 0xe, end_address);
 	if(need_ns) {
-		entry[0xa] = blocks[0].first;
-		entry[0xb] = blocks[0].second;
+		bdir->w8(off + 0xa, blocks[0].first);
+		bdir->w8(off + 0xb, blocks[0].second);
 	} else
-		put_u16le(entry + 0xa, 0);
+		bdir->w16l(off + 0xa, 0);
 
 	return std::error_condition();
 }

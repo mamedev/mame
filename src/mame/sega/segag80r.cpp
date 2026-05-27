@@ -148,6 +148,226 @@ static constexpr int WAIT_STATES = 2;
 
 /*************************************
  *
+ *  005 sound hardware
+ *
+ *************************************/
+
+/*
+    005
+
+    The Sound Board consists of the following:
+
+    An 8255:
+        Port A controls the sounds that use discrete circuitry
+            A0 - Large Expl. Sound Trig
+            A1 - Small Expl. Sound Trig
+            A2 - Drop Sound Bomb Trig
+            A3 - Shoot Sound Pistol Trig
+            A4 - Missile Sound Trig
+            A5 - Helicopter Sound Trig
+            A6 - Whistle Sound Trig
+            A7 - <unused>
+
+      Port B controls the melody generator (described below)
+
+      Port C is apparently unused
+
+
+    Melody Generator:
+
+        555 timer frequency = 1.44/((R1 + 2R2)*C)
+        R1 = 15e3
+        R2 = 4.7e3
+        C=1.5e-6
+        Frequency = 39.344 Hz
+
+        Auto timer is enabled if port B & 0x20 == 1
+        Auto timer is reset if 2716 value & 0x20 == 0
+
+        Manual timer is enabled if port B & 0x20 == 0
+        Manual timer is clocked if port B & 0x40 goes from 0 to 1
+
+        Both auto and manual timers clock LS393 counter
+        Counter is held to 0 if port B & 0x10 == 1
+
+        Output of LS393 >> 1 selects low 7 bits of lookup in 2716.
+        High 4 bits come from port B bits 0-3.
+
+        Low 5 bits of output from 2716 look up value in 6331 PROM at U8 (32x8)
+
+        8-bit output of 6331 at U8 is loaded into pair of LS161 counters whenever they overflow.
+        LS161 counters are clocked somehow (not clear how)
+
+        Carry output from LS161 counters (overflowing 8 bits) goes to the B
+            input on the LS293 counter at U14.
+        Rising edge of B input clocks bit 1 of counter (effectively adding 2).
+        Output B (bit 1) is mixed with output D (bit 3) with different weights
+            through a small RC circuit and fed into the 4391 input at U32.
+
+        The 4391 output is the final output.
+*/
+
+static const char *const sega005_sample_names[] =
+{
+	"*005",
+	"lexplode",     /* 0 */
+	"sexplode",     /* 1 */
+	"dropbomb",     /* 2 */
+	"shoot",        /* 3 */
+	"missile",      /* 4 */
+	"helicopt",     /* 5 */
+	"whistle",      /* 6 */
+	nullptr
+};
+
+
+void segag80r_state::sega005_sound_board(machine_config &config)
+{
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(segag80r_state::sega005_sound_a_w));
+	ppi.out_pb_callback().set("005", FUNC(sega005_sound_device::b_w));
+
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(7);
+	m_samples->set_samples_names(sega005_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
+
+	auto &custom(SEGA005(config, "005", 0));
+	custom.set_sound_region("005");
+	custom.set_proms_region("proms");
+	custom.add_route(ALL_OUTPUTS, "speaker", 0.25);
+}
+
+
+/*************************************
+ *
+ *  005 sound triggers
+ *
+ *************************************/
+
+void segag80r_state::sega005_sound_a_w(uint8_t data)
+{
+	uint8_t diff = data ^ m_sound_state[0];
+	m_sound_state[0] = data;
+
+	/* LARGE EXPL: channel 0 */
+	if ((diff & 0x01) && !(data & 0x01)) m_samples->start(0, 0);
+
+	/* SMALL EXPL: channel 1 */
+	if ((diff & 0x02) && !(data & 0x02)) m_samples->start(1, 1);
+
+	/* DROP BOMB: channel 2 */
+	if ((diff & 0x04) && !(data & 0x04)) m_samples->start(2, 2);
+
+	/* SHOOT PISTOL: channel 3 */
+	if ((diff & 0x08) && !(data & 0x08)) m_samples->start(3, 3);
+
+	/* MISSILE: channel 4 */
+	if ((diff & 0x10) && !(data & 0x10)) m_samples->start(4, 4);
+
+	/* HELICOPTER: channel 5 */
+	if ((diff & 0x20) && !(data & 0x20) && !m_samples->playing(5)) m_samples->start(5, 5, true);
+	if ((diff & 0x20) &&  (data & 0x20)) m_samples->stop(5);
+
+	/* WHISTLE: channel 6 */
+	if ((diff & 0x40) && !(data & 0x40) && !m_samples->playing(6)) m_samples->start(6, 6, true);
+	if ((diff & 0x40) &&  (data & 0x40)) m_samples->stop(6);
+}
+
+
+
+/*************************************
+ *
+ *  Space Odyssey sound hardware
+ *
+ *************************************/
+
+static const char *const spaceod_sample_names[] =
+{
+	"*spaceod",
+	"fire",         /* 0 */
+	"bomb",         /* 1 */
+	"eexplode",     /* 2 */
+	"pexplode",     /* 3 */
+	"warp",         /* 4 */
+	"birth",        /* 5 */
+	"scoreup",      /* 6 */
+	"ssound",       /* 7 */
+	"accel",        /* 8 */
+	"damaged",      /* 9 */
+	"erocket",      /* 10 */
+	nullptr
+};
+
+
+void segag80r_state::spaceod_sound_board(machine_config &config)
+{
+	/* sound hardware */
+
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(11);
+	m_samples->set_samples_names(spaceod_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
+}
+
+
+/*************************************
+ *
+ *  Space Odyssey sound triggers
+ *
+ *************************************/
+
+void segag80r_state::spaceod_sound_w(offs_t offset, uint8_t data)
+{
+	uint8_t diff = data ^ m_sound_state[offset];
+	m_sound_state[offset] = data;
+
+	switch (offset)
+	{
+		case 0:
+			/* BACK G: channel 0 */
+			if ((diff & 0x01) && !(data & 0x01) && !m_samples->playing(0)) m_samples->start(0, 7, true);
+			if ((diff & 0x01) &&  (data & 0x01)) m_samples->stop(0);
+
+			/* SHORT EXP: channel 1 */
+			if ((diff & 0x04) && !(data & 0x04)) m_samples->start(1, 2);
+
+			/* ACCELERATE: channel 2 */
+			if ((diff & 0x10) && !(data & 0x10)) m_samples->start(2, 8);
+
+			/* BATTLE STAR: channel 3 */
+			if ((diff & 0x20) && !(data & 0x20)) m_samples->start(3, 10);
+
+			/* D BOMB: channel 4 */
+			if ((diff & 0x40) && !(data & 0x40)) m_samples->start(4, 1);
+
+			/* LONG EXP: channel 5 */
+			if ((diff & 0x80) && !(data & 0x80)) m_samples->start(5, 3);
+			break;
+
+		case 1:
+			/* SHOT: channel 6 */
+			if ((diff & 0x01) && !(data & 0x01)) m_samples->start(6, 0);
+
+			/* BONUS UP: channel 7 */
+			if ((diff & 0x02) && !(data & 0x02)) m_samples->start(7, 6);
+
+			/* WARP: channel 8 */
+			if ((diff & 0x08) && !(data & 0x08)) m_samples->start(8, 4);
+
+			/* APPEARANCE UFO: channel 9 */
+			if ((diff & 0x40) && !(data & 0x40)) m_samples->start(9, 5);
+
+			/* BLACK HOLE: channel 10 */
+			if ((diff & 0x80) && !(data & 0x80)) m_samples->start(10, 9);
+			break;
+	}
+}
+
+
+
+/*************************************
+ *
  *  Machine setup and config
  *
  *************************************/
@@ -1686,10 +1906,6 @@ void segag80r_state::init_005()
 	m_background_pcb = G80_BACKGROUND_NONE;
 
 	save_item(NAME(m_sound_state));
-	save_item(NAME(m_sound_addr));
-	save_item(NAME(m_sound_data));
-	save_item(NAME(m_square_state));
-	save_item(NAME(m_square_count));
 }
 
 
@@ -1738,7 +1954,6 @@ void segag80r_state::init_monsterb()
 	pgmspace.install_write_handler(0xe000, 0xffff, write8sm_delegate(*this, FUNC(segag80r_state::monsterb_vidram_w)));
 
 	save_item(NAME(m_sound_state));
-	save_item(NAME(m_sound_addr));
 }
 
 
@@ -1762,7 +1977,6 @@ void segag80r_state::init_monster2()
 	pgmspace.install_write_handler(0xe000, 0xffff, write8sm_delegate(*this, FUNC(segag80r_state::pignewt_vidram_w)));
 
 	save_item(NAME(m_sound_state));
-	save_item(NAME(m_sound_addr));
 }
 
 

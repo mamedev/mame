@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert, R. Belmont
 //============================================================
 //
-//  sdlos_*.c - OS specific low level code
+//  osdlib_unix.cpp - OS specific low level code for POSIX-like systems
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
@@ -12,7 +12,11 @@
 #include "osdcore.h"
 #include "osdlib.h"
 
+#ifdef SDLMAME_SDL3
+#include <SDL3/SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 
 #include <csignal>
 #include <cstdio>
@@ -183,7 +187,11 @@ std::error_condition osd_set_clipboard_text(std::string_view text) noexcept
 	try
 	{
 		std::string const clip(text); // need to do this to ensure there's a terminating NUL for SDL
+		#ifdef SDLMAME_SDL3
+		if (!SDL_SetClipboardText(clip.c_str()))
+		#else
 		if (0 > SDL_SetClipboardText(clip.c_str()))
+		#endif
 		{
 			// SDL_GetError returns a message, can't really convert it to an error condition
 			return std::errc::io_error; // TODO: better error code?

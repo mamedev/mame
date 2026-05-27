@@ -8,7 +8,7 @@
 #include "machine/nscsi_bus.h"
 #include <queue>
 
-class mb87030_device : public nscsi_device, public nscsi_slot_card_interface
+class mb87030_device : public device_t, public nscsi_device_interface
 {
 public:
 	mb87030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -55,8 +55,8 @@ public:
 	uint8_t dma_r();
 	void dma_w(uint8_t val);
 
-	void ctrl_write(uint32_t value, uint32_t mask) { scsi_bus->ctrl_w(scsi_refid, value, mask); scsi_ctrl_changed(); }
-	uint32_t data_read() { return scsi_bus->data_r(); }
+	void ctrl_write(uint32_t value, uint32_t mask) { m_scsi_bus->ctrl_w(m_scsi_refid, value, mask); scsi_ctrl_changed(); }
+	uint32_t data_read() { return m_scsi_bus->data_r(); }
 protected:
 	mb87030_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -142,13 +142,11 @@ private:
 
 	emu_timer *m_timer;
 	emu_timer *m_delay_timer;
+	emu_timer *m_bus_free_timer;
 
-	enum TimerId {
-		Delay,
-		Timeout,
-	};
 	enum class State: uint8_t {
 		Idle,
+		WaitNewState,
 		ArbitrationWaitBusFree,
 		ArbitrationAssertBSY,
 		ArbitrationWait,
@@ -163,9 +161,11 @@ private:
 		TransferRecvData,
 		TransferSendAck,
 		TransferWaitDeassertREQ,
-		TransferDeassertACK
+		TransferDeassertACK,
+		TransferWaitFifoEmpty
 		//TransferCommand,
 	} m_state;
+	State m_delay_state;
 
 	void update_ssts();
 	void update_ints();
@@ -183,6 +183,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(delay_timeout);
 	TIMER_CALLBACK_MEMBER(timeout);
+	TIMER_CALLBACK_MEMBER(bus_free_timeout);
 
 	// registers
 	uint8_t m_bdid;

@@ -49,6 +49,7 @@ protected:
 	virtual void write_c0nx(u8 offset, u8 data) override { }
 	virtual u8 read_cnxx(u8 offset) override;
 	virtual void write_cnxx(u8 offset, u8 data) override;
+	virtual void reset_from_bus() override;
 
 	static void via_psg_ctrl(ay8913_device &psg, u8 &latch, u8 data);
 
@@ -108,6 +109,7 @@ protected:
 	virtual void write_c0nx(u8 offset, u8 data) override;
 	virtual u8 read_cnxx(u8 offset) override;
 	virtual void write_cnxx(u8 offset, u8 data) override;
+	virtual void reset_from_bus() override;
 
 	void via1_out_b(u8 data);
 	void via2_out_b(u8 data);
@@ -266,6 +268,22 @@ void a2bus_ayboard_device::device_start()
 void a2bus_ayboard_device::device_reset()
 {
 	m_porta1 = m_porta2 = 0;
+}
+
+void a2bus_ayboard_device::reset_from_bus()
+{
+	m_via1->reset();
+	if (m_via2.found())
+		m_via2->reset();
+	m_ay1->reset();
+	m_ay2->reset();
+}
+
+void a2bus_phasor_device::reset_from_bus()
+{
+	a2bus_ayboard_device::reset_from_bus();
+	m_ay3->reset();
+	m_ay4->reset();
 }
 
 /*-------------------------------------------------

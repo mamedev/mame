@@ -785,6 +785,29 @@ GAME_CUSTOM( 1994, m4rhog_h9,        m4rhog, mod4oki_bootleg_fixedret<0x2f>(R4, 
 GAME_CUSTOM( 1994, m4rhog_h10,       m4rhog, mod4oki_bootleg_fixedret<0x2f>(R4, RT1, LPS), mpu4, init_m4,    "rhog_10_.4",               0x0000, 0x010000, CRC(8efa581c) SHA1(03c25b674cfb02792edc9ef8a76b16af31d80aae), "hack?","Road Hog (BWB / Barcrest) (MPU4) (RO_ 1.0, hack?, set 3)" )
 GAME_CUSTOM( 1994, m4rhog_h11,       m4rhog, mod4oki_bootleg_fixedret<0x2f>(R4, RT1, LPS), mpu4, init_m4,    "rhog_10_.8",               0x0000, 0x010000, CRC(84d1f95d) SHA1(33f10e0e1e5abe6011b05f32f55c7dd6d3298945), "hack?","Road Hog (BWB / Barcrest) (MPU4) (RO_ 1.0, hack?, set 4)" )
 
+/*****************************************************************************************************************************************************************************
+*
+* Roadrunner (German)
+*
+*****************************************************************************************************************************************************************************/
+
+
+#define M4RRUN_EXTRA_ROMS \
+	ROM_REGION( 0x100000, "okicard:msm6376", 0 ) \
+	ROM_LOAD( "grosnd1.bin", 0x000000, 0x080000, CRC(3c178fc2) SHA1(f8abf2bbf60f31ab9e5b4123f889c70943357bab) ) \
+	ROM_LOAD( "grosnd2.bin", 0x080000, 0x080000, CRC(cfc1e087) SHA1(cfb4966e97bc98b97cf07c61ed9477575f8566ff) )
+
+#undef GAME_CUSTOM
+#define GAME_CUSTOM(year, setname,parent, machine, inputs, init, name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		M4RRUN_EXTRA_ROMS \
+	ROM_END \
+	GAME( year, setname, parent, machine, inputs, mpu4mod4oki_machines_state, init, ROT0, company, title, GAME_FLAGS )
+
+// "(C)1994 BARCREST Development" and "GRO 2.0"
+GAME_CUSTOM( 1994, m4rrun,           0,      mod4oki_cheatchr_pal<mpu4_characteriser_pal::rr6_characteriser_prot>(R4, RT1, LPS), mpu4, init_m4,  "gro20.p1",                  0x0000, 0x010000, CRC(f59a4a9e) SHA1(f61a35853b3b411db0f685dc4169714d8a6bdbc2), "Barcrest","Roadrunner" )
 
 
 /*****************************************************************************************************************************************************************************
@@ -7877,9 +7900,15 @@ ROM_START( m4cjdlx )
 	M4CRZJWL_EXTRAS
 ROM_END
 
-// doesn't require inverted coins, runs, has Deluxe in the title
-GAME(199?, m4cjdlx,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>(R4, RT1, LPLB), mpu4,    mpu4mod4oki_machines_state, init_m4big,ROT0,"Barcrest","Crown Jewels Deluxe (Barcrest) (German) (MPU4) (CJG 0.4)",GAME_FLAGS )
+ROM_START( m4cjdlxb )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "cjg.p1", 0x0000, 0x020000, CRC(3a8c163a) SHA1(397aa0f64e7699b92e6f46b44dfcb4455bc0b5fc) )    // Crown Jewels Deluxe (german)
+	M4CRZJWL_EXTRAS
+ROM_END
 
+// doesn't require inverted coins, runs, has Deluxe in the title
+GAME(1993, m4cjdlx,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>(R4, RT1, LPLB), mpu4,    mpu4mod4oki_machines_state, init_m4big,ROT0,"Barcrest","Crown Jewels Deluxe (Barcrest) (German) (MPU4) (CJG 0.4, set 1)",GAME_FLAGS )
+GAME(1993, m4cjdlxb,  m4cjdlx,    mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>(R4, RT1, LPLB), mpu4,    mpu4mod4oki_machines_state, init_m4big,ROT0,"Barcrest","Crown Jewels Deluxe (Barcrest) (German) (MPU4) (CJG 0.4, set 2)",GAME_FLAGS )
 
 /*****************************************************************************************************************************************************************************
 *

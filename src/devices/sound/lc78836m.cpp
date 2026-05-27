@@ -19,7 +19,7 @@
     DGND 12 |___________| 13 INITB
 
 
-    TOOD:
+    TODO:
     - INITB, DN aren't implemented
     - Filters aren't implemented
 
@@ -100,7 +100,6 @@ void lc78836m_device::sound_stream_update(sound_stream &stream)
 		m_att--;
 	else if (!m_mute && m_att < 1024)
 		m_att++;
-
 }
 
 void lc78836m_device::mute_w(int state)

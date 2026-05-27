@@ -147,17 +147,304 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 ***************************************************************************/
 
 #include "emu.h"
-#include "segas16a.h"
-#include "segaipt.h"
 
 #include "fd1089.h"
 #include "fd1094.h"
 
+#include "sega16sp.h"
+#include "segaic16.h"
+#include "segaipt.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/mcs48/mcs48.h"
+#include "cpu/mcs51/i8051.h"
+#include "cpu/z80/z80.h"
+#include "machine/cxd1095.h"
+#include "machine/gen_latch.h"
+#include "machine/i8255.h"
+#include "machine/i8243.h"
 #include "machine/nvram.h"
 #include "machine/segacrp2_device.h"
+#include "machine/watchdog.h"
 #include "sound/dac.h"
+#include "sound/ymopm.h"
 
+#include "screen.h"
 #include "speaker.h"
+
+
+namespace {
+
+class segas16a_state : public sega_16bit_common_base
+{
+public:
+	// construction/destruction
+	segas16a_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sega_16bit_common_base(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_mcu(*this, "mcu")
+		, m_i8255(*this, "i8255")
+		, m_ymsnd(*this, "ymsnd")
+		, m_upd7751(*this, "upd7751")
+		, m_upd7751_i8243(*this, "upd7751_8243")
+		, m_nvram(*this, "nvram")
+		, m_watchdog(*this, "watchdog")
+		, m_segaic16vid(*this, "segaic16vid")
+		, m_soundlatch(*this, "soundlatch")
+		, m_screen(*this, "screen")
+		, m_sprites(*this, "sprites")
+		, m_cxdio(*this, "cxdio")
+		, m_workram(*this, "nvram")
+		, m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes")
+		, m_custom_io_r(*this)
+		, m_custom_io_w(*this)
+		, m_video_control(0)
+		, m_mcu_control(0)
+		, m_upd7751_command(0)
+		, m_upd7751_rom_address(0)
+		, m_last_buttons1(0)
+		, m_last_buttons2(0)
+		, m_read_port(0)
+		, m_mj_input_num(0)
+		, m_mj_inputs(*this, "MJ%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
+	{ }
+
+	void system16a_no7751(machine_config &config) ATTR_COLD;
+	void system16a(machine_config &config) ATTR_COLD;
+	void system16a_fd1089a_no7751(machine_config &config) ATTR_COLD;
+	void system16a_fd1089b_no7751(machine_config &config) ATTR_COLD;
+	void system16a_fd1089a(machine_config &config) ATTR_COLD;
+	void system16a_fd1094(machine_config &config) ATTR_COLD;
+	void system16a_no7751p(machine_config &config) ATTR_COLD;
+	void system16a_fd1094_no7751(machine_config &config) ATTR_COLD;
+	void system16a_i8751(machine_config &config) ATTR_COLD;
+	void system16a_fd1089b(machine_config &config) ATTR_COLD;
+	void aceattaca_fd1094(machine_config &config) ATTR_COLD;
+
+	// game-specific driver init
+	void init_generic() ATTR_COLD;
+	void init_dumpmtmt() ATTR_COLD;
+	void init_fantzonep() ATTR_COLD;
+	void init_sjryukoa() ATTR_COLD;
+	void init_aceattaca() ATTR_COLD;
+	void init_passsht16a() ATTR_COLD;
+	void init_mjleague() ATTR_COLD;
+	void init_sdi() ATTR_COLD;
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	// PPI read/write callbacks
+	void misc_control_w(uint8_t data);
+	void tilemap_sound_w(uint8_t data);
+
+	// main CPU read/write handlers
+	uint16_t standard_io_r(offs_t offset);
+	void standard_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t misc_io_r(offs_t offset);
+	void misc_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	// Z80 sound CPU read/write handlers
+	uint8_t sound_data_r();
+	void upd7751_command_w(uint8_t data);
+	void upd7751_control_w(uint8_t data);
+	template<int Shift> void upd7751_rom_offset_w(uint8_t data);
+
+	// D7751 sound generator CPU read/write handlers
+	uint8_t upd7751_rom_r();
+	uint8_t upd7751_p2_r();
+	void upd7751_p2_w(uint8_t data);
+
+	// I8751 MCU read/write handlers
+	void mcu_control_w(uint8_t data);
+	void mcu_data_w(offs_t offset, uint8_t data);
+	uint8_t mcu_data_r(address_space &space, offs_t offset);
+
+	// I8751-related VBLANK interrupt handlers
+	void i8751_main_cpu_vblank_w(int state);
+
+	// video updates
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void mcu_data_map(address_map &map) ATTR_COLD;
+	void sound_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_no7751_portmap(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
+	void system16a_map(address_map &map) ATTR_COLD;
+
+	// internal types
+	typedef delegate<void ()> i8751_sim_delegate;
+	typedef delegate<void (uint8_t, uint8_t)> lamp_changed_delegate;
+
+	// I8751 simulations
+	void dumpmtmt_i8751_sim();
+
+	// timer handlers
+	TIMER_CALLBACK_MEMBER(i8751_sync);
+	TIMER_CALLBACK_MEMBER(ppi_sync);
+
+	// custom I/O handlers
+	uint16_t aceattaca_custom_io_r(offs_t offset);
+	void aceattaca_custom_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mjleague_custom_io_r(offs_t offset);
+	uint16_t passsht16a_custom_io_r(offs_t offset);
+	uint16_t sdi_custom_io_r(offs_t offset);
+	uint16_t sjryuko_custom_io_r(offs_t offset);
+	void sjryuko_lamp_changed_w(uint8_t changed, uint8_t newval);
+
+	// devices
+	required_device<m68000_device> m_maincpu;
+	required_device<z80_device> m_soundcpu;
+	optional_device<i8751_device> m_mcu;
+	required_device<i8255_device> m_i8255;
+	required_device<ym2151_device> m_ymsnd;
+	optional_device<upd7751_device> m_upd7751;
+	optional_device<i8243_device> m_upd7751_i8243;
+	required_device<nvram_device> m_nvram;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<segaic16_video_device> m_segaic16vid;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<screen_device> m_screen;
+	required_device<sega_sys16a_sprite_device> m_sprites;
+	optional_device<cxd1095_device> m_cxdio;
+
+	// memory pointers
+	required_shared_ptr<uint16_t> m_workram;
+	optional_shared_ptr<uint8_t> m_sound_decrypted_opcodes;
+
+	// configuration
+	read16sm_delegate       m_custom_io_r;
+	write16s_delegate       m_custom_io_w;
+	i8751_sim_delegate      m_i8751_vblank_hook;
+	lamp_changed_delegate   m_lamp_changed_w;
+
+	// internal state
+	emu_timer              * m_i8751_sync_timer;
+	uint8_t                  m_video_control;
+	uint8_t                  m_mcu_control;
+	uint8_t                  m_upd7751_command;
+	uint32_t                 m_upd7751_rom_address;
+	uint8_t                  m_last_buttons1;
+	uint8_t                  m_last_buttons2;
+	uint8_t                  m_read_port;
+	uint8_t                  m_mj_input_num;
+	optional_ioport_array<6> m_mj_inputs;
+	output_finder<2> m_lamps;
+};
+
+class afighter_16a_analog_state : public segas16a_state
+{
+public:
+	// construction/destruction
+	afighter_16a_analog_state(const machine_config &mconfig, device_type type, const char *tag)
+		: segas16a_state(mconfig, type, tag)
+		, m_accel(*this, "ACCEL")
+		, m_steer(*this, "STEER")
+	{ }
+
+	ioport_value afighter_accel_r();
+	ioport_value afighter_handl_left_r();
+	ioport_value afighter_handl_right_r();
+
+private:
+	required_ioport     m_accel;
+	required_ioport     m_steer;
+};
+
+
+//**************************************************************************
+//  VIDEO HARDWARE
+//**************************************************************************
+
+//-------------------------------------------------
+//  video_start - initialize the video system
+//-------------------------------------------------
+
+void segas16a_state::video_start()
+{
+	// initialize the tile/text layers
+	m_segaic16vid->tilemap_init( 0, segaic16_video_device::TILEMAP_16A, 0x000, 0, 1);
+}
+
+//-------------------------------------------------
+//  screen_update - render all graphics
+//-------------------------------------------------
+
+uint32_t segas16a_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// if no drawing is happening, fill with black and get out
+	if (!m_segaic16vid->m_display_enable)
+	{
+		bitmap.fill(m_palette->black_pen(), cliprect);
+		return 0;
+	}
+
+	// start the sprites drawing
+	m_sprites->draw_async(cliprect);
+
+	// reset priorities
+	screen.priority().fill(0, cliprect);
+
+	// draw background opaquely first, not setting any priorities
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 0 | TILEMAP_DRAW_OPAQUE, 0x00);
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 1 | TILEMAP_DRAW_OPAQUE, 0x00);
+
+	// draw background again, just to set the priorities on non-transparent pixels
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 0, 0x01);
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 1, 0x02);
+
+	// draw foreground
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_FOREGROUND, 0, 0x02);
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_FOREGROUND, 1, 0x04);
+
+	// text layer
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_TEXT, 0, 0x04);
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_TEXT, 1, 0x08);
+
+	// mix in sprites
+	bitmap_ind16 &sprites = m_sprites->bitmap();
+	m_sprites->iterate_dirty_rects(
+			cliprect,
+			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
+			{
+				for (int y = rect.min_y; y <= rect.max_y; y++)
+				{
+					uint16_t *const dest = &bitmap.pix(y);
+					uint16_t const *const src = &sprites.pix(y);
+					uint8_t const *const pri = &screen.priority().pix(y);
+					for (int x = rect.min_x; x <= rect.max_x; x++)
+					{
+						// only process written pixels
+						uint16_t const pix = src[x];
+						if (pix != 0xffff)
+						{
+							// compare sprite priority against tilemap priority
+							int priority = pix >> 10;
+							if ((1 << priority) > pri[x])
+							{
+								// if color bits are all 1, this triggers shadow/hilight
+								if ((pix & 0x3f0) == 0x3f0)
+									dest[x] += m_palette_entries;
+
+								// otherwise, just add in sprite palette base
+								else
+									dest[x] = 0x400 | (pix & 0x3ff);
+							}
+						}
+					}
+				}
+			});
+
+	return 0;
+}
+
 
 
 //**************************************************************************
@@ -384,6 +671,8 @@ void segas16a_state::upd7751_rom_offset_w(uint8_t data)
 	int newdata = (data << Shift) & mask;
 	m_upd7751_rom_address = (m_upd7751_rom_address & ~mask) | newdata;
 }
+
+
 
 //**************************************************************************
 //  D7751 SOUND GENERATOR CPU READ/WRITE HANDLERS
@@ -972,6 +1261,8 @@ void segas16a_state::decrypted_opcodes_map(address_map &map)
 {
 	map(0x00000, 0xfffff).bankr("fd1094_decrypted_opcodes");
 }
+
+
 
 //**************************************************************************
 //  SOUND CPU ADDRESS MAPS
@@ -2149,7 +2440,6 @@ void segas16a_state::system16a_fd1094_no7751(machine_config &config)
 //**************************************************************************
 //  ROM definitions
 //**************************************************************************
-
 
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -3890,6 +4180,7 @@ ROM_START( wb35d )
 ROM_END
 
 
+
 //**************************************************************************
 //  CONFIGURATION
 //**************************************************************************
@@ -3960,6 +4251,8 @@ void segas16a_state::init_sjryukoa()
 	m_custom_io_r = read16sm_delegate(*this, FUNC(segas16a_state::sjryuko_custom_io_r));
 	m_lamp_changed_w = delegate(&segas16a_state::sjryuko_lamp_changed_w, this);
 }
+
+} // anonymous namespace
 
 
 

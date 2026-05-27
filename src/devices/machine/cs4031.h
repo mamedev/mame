@@ -23,7 +23,7 @@ class cs4031_device : public device_t
 public:
 	// construction/destruction
 	template <typename T, typename U, typename V, typename W, typename X>
-	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cputag, U &&isatag, V &&biostag, W &&keybctag, X &&ramtag)
+	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cputag, U &&isatag, V &&biostag, W &&keybctag, X &&ramtag)
 		: cs4031_device(mconfig, tag, owner, clock)
 	{
 		set_cputag(std::forward<T>(cputag));
@@ -33,7 +33,7 @@ public:
 		set_ramtag(std::forward<X>(ramtag));
 	}
 
-	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// callbacks
 	auto ior() { return m_read_ior.bind(); }
@@ -47,23 +47,23 @@ public:
 	auto spkr() { return m_write_spkr.bind(); }
 
 	// internal io
-	void config_address_w(uint8_t data);
-	uint8_t config_data_r();
-	void config_data_w(uint8_t data);
-	uint8_t portb_r();
-	void portb_w(uint8_t data);
-	void rtc_nmi_w(uint8_t data);
-	void sysctrl_w(uint8_t data);
-	uint8_t sysctrl_r();
-	uint8_t dma_page_r(offs_t offset) { return m_dma_page[offset]; }
-	void dma_page_w(offs_t offset, uint8_t data) { m_dma_page[offset] = data; }
-	uint8_t dma2_r(offs_t offset) { return m_dma2->read(offset / 2); }
-	void dma2_w(offs_t offset, uint8_t data) { m_dma2->write(offset / 2, data); }
-	uint8_t keyb_data_r();
-	void keyb_data_w(uint8_t data);
-	uint8_t keyb_status_r();
-	void keyb_command_w(uint8_t data);
-	void keyb_command_blocked_w(uint8_t data);
+	void config_address_w(u8 data);
+	u8 config_data_r();
+	void config_data_w(u8 data);
+	u8 portb_r();
+	void portb_w(u8 data);
+	void rtc_nmi_w(u8 data);
+	void sysctrl_w(u8 data);
+	u8 sysctrl_r();
+	u8 dma_page_r(offs_t offset) { return m_dma_page[offset]; }
+	void dma_page_w(offs_t offset, u8 data) { m_dma_page[offset] = data; }
+	u8 dma2_r(offs_t offset) { return m_dma2->read(offset / 2); }
+	void dma2_w(offs_t offset, u8 data) { m_dma2->write(offset / 2, data); }
+	u8 keyb_data_r();
+	void keyb_data_w(u8 data);
+	u8 keyb_status_r();
+	void keyb_command_w(u8 data);
+	void keyb_command_blocked_w(u8 data);
 
 	// input lines
 	void irq01_w(int state) { m_intc1->ir1_w(state); }
@@ -139,12 +139,12 @@ private:
 	// internal state
 	required_device<device_memory_interface> m_cpu;
 	required_device<at_kbc_device_base> m_keybc;
-	required_region_ptr<uint8_t> m_isa;
-	required_region_ptr<uint8_t> m_bios;
+	required_region_ptr<u8> m_isa;
+	required_region_ptr<u8> m_bios;
 
 	address_space *m_space;
 	address_space *m_space_io;
-	uint8_t *m_ram;
+	u8 *m_ram;
 
 	// ipc core devices
 	required_device<am9517a_device> m_dma1;
@@ -156,11 +156,11 @@ private:
 	required_device<ram_device> m_ram_dev;
 
 	int m_dma_eop;
-	uint8_t m_dma_page[0x10];
-	uint8_t m_dma_high_byte;
+	u8 m_dma_page[0x10];
+	u8 m_dma_high_byte;
 	int m_dma_channel;
 
-	uint8_t m_portb;
+	u8 m_portb;
 	int m_refresh_toggle;
 	int m_iochck;
 	int m_nmi_mask;
@@ -190,30 +190,30 @@ private:
 		SOFT_RESET_AND_GATEA20 = 0x1c
 	};
 
-	uint8_t m_address;
+	u8 m_address;
 	bool m_address_valid;
 
-	uint8_t m_registers[0x20];
+	u8 m_registers[0x20];
 
-	uint8_t dma_read_byte(offs_t offset);
-	void dma_write_byte(offs_t offset, uint8_t data);
-	uint8_t dma_read_word(offs_t offset);
-	void dma_write_word(offs_t offset, uint8_t data);
+	u8 dma_read_byte(offs_t offset);
+	void dma_write_byte(offs_t offset, u8 data);
+	u8 dma_read_word(offs_t offset);
+	void dma_write_word(offs_t offset, u8 data);
 	void dma1_eop_w(int state);
-	uint8_t dma1_ior0_r() { return m_read_ior(0); }
-	uint8_t dma1_ior1_r() { return m_read_ior(1); }
-	uint8_t dma1_ior2_r() { return m_read_ior(2); }
-	uint8_t dma1_ior3_r() { return m_read_ior(3); }
-	uint8_t dma2_ior1_r() { uint16_t const result = m_read_ior(5); m_dma_high_byte = result >> 8; return result; }
-	uint8_t dma2_ior2_r() { uint16_t const result = m_read_ior(6); m_dma_high_byte = result >> 8; return result; }
-	uint8_t dma2_ior3_r() { uint16_t const result = m_read_ior(7); m_dma_high_byte = result >> 8; return result; }
-	void dma1_iow0_w(uint8_t data) { m_write_iow(0, data, 0xffff); }
-	void dma1_iow1_w(uint8_t data) { m_write_iow(1, data, 0xffff); }
-	void dma1_iow2_w(uint8_t data) { m_write_iow(2, data, 0xffff); }
-	void dma1_iow3_w(uint8_t data) { m_write_iow(3, data, 0xffff); }
-	void dma2_iow1_w(uint8_t data) { m_write_iow(5, (m_dma_high_byte << 8) | data, 0xffff); }
-	void dma2_iow2_w(uint8_t data) { m_write_iow(6, (m_dma_high_byte << 8) | data, 0xffff); }
-	void dma2_iow3_w(uint8_t data) { m_write_iow(7, (m_dma_high_byte << 8) | data, 0xffff); }
+	u8 dma1_ior0_r() { return m_read_ior(0); }
+	u8 dma1_ior1_r() { return m_read_ior(1); }
+	u8 dma1_ior2_r() { return m_read_ior(2); }
+	u8 dma1_ior3_r() { return m_read_ior(3); }
+	u8 dma2_ior1_r() { u16 const result = m_read_ior(5); m_dma_high_byte = result >> 8; return result; }
+	u8 dma2_ior2_r() { u16 const result = m_read_ior(6); m_dma_high_byte = result >> 8; return result; }
+	u8 dma2_ior3_r() { u16 const result = m_read_ior(7); m_dma_high_byte = result >> 8; return result; }
+	void dma1_iow0_w(u8 data) { m_write_iow(0, data, 0xffff); }
+	void dma1_iow1_w(u8 data) { m_write_iow(1, data, 0xffff); }
+	void dma1_iow2_w(u8 data) { m_write_iow(2, data, 0xffff); }
+	void dma1_iow3_w(u8 data) { m_write_iow(3, data, 0xffff); }
+	void dma2_iow1_w(u8 data) { m_write_iow(5, (m_dma_high_byte << 8) | data, 0xffff); }
+	void dma2_iow2_w(u8 data) { m_write_iow(6, (m_dma_high_byte << 8) | data, 0xffff); }
+	void dma2_iow3_w(u8 data) { m_write_iow(7, (m_dma_high_byte << 8) | data, 0xffff); }
 	void dma1_dack0_w(int state) { set_dma_channel(0, state); }
 	void dma1_dack1_w(int state) { set_dma_channel(1, state); }
 	void dma1_dack2_w(int state) { set_dma_channel(2, state); }
@@ -224,7 +224,7 @@ private:
 	void dma2_dack3_w(int state) { set_dma_channel(7, state); }
 	void dma2_hreq_w(int state) { m_write_hold(state); }
 	void intc1_int_w(int state) { m_write_intr(state); }
-	uint8_t intc1_slave_ack_r(offs_t offset);
+	u8 intc1_slave_ack_r(offs_t offset);
 	void ctc_out1_w(int state);
 	void ctc_out2_w(int state);
 };

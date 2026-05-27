@@ -7,9 +7,9 @@
 
     note:
      this file contains the originals only
-     for bootlegs see multfish_boot.c
-     for reference information about undumped sets see multfish_Ref.c - if adding a new set ALWAYS check that, anything not listed in there is
-                                                                        almost certainly a bootleg.
+     for bootlegs see multfish_boot.cpp
+     for reference information about undumped sets see at the end of the file
+     - if adding a new set ALWAYS check that, anything not listed in there is almost certainly a bootleg.
 
 */
 
@@ -829,7 +829,7 @@ static INPUT_PORTS_START( rollfr )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) //Service SW (20 B)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) //Service SW (20 B)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN6")

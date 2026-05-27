@@ -17,45 +17,42 @@ namespace {
 class generalplus_gpspispi_game_state : public gcm394_game_state
 {
 public:
-	generalplus_gpspispi_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+	generalplus_gpspispi_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		gcm394_game_state(mconfig, type, tag)
 	{
 	}
 
-	void generalplus_gpspispi(machine_config &config);
+	void generalplus_gpspispi(machine_config &config) ATTR_COLD;
 
-	void init_spi();
+	void init_spi() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-
-private:
 };
-
 
 
 class generalplus_gpspispi_bkrankp_game_state : public generalplus_gpspispi_game_state
 {
 public:
-	generalplus_gpspispi_bkrankp_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+	generalplus_gpspispi_bkrankp_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		generalplus_gpspispi_game_state(mconfig, type, tag),
 		m_cart(*this, "cartslot")
 	{
 	}
 
-	void generalplus_gpspispi_bkrankp(machine_config &config);
+	void generalplus_gpspispi_bkrankp(machine_config &config) ATTR_COLD;
 
 protected:
-	required_device<generic_slot_device> m_cart;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-private:
+	required_device<generic_slot_device> m_cart;
 };
 
 
 void generalplus_gpspispi_game_state::machine_start()
 {
+	gcm394_game_state::machine_start();
 }
 
 void generalplus_gpspispi_game_state::machine_reset()
@@ -63,7 +60,6 @@ void generalplus_gpspispi_game_state::machine_reset()
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
 	//m_maincpu->set_paldisplaybank_high_hack(0);
-	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
 static INPUT_PORTS_START( gcm394 )
@@ -75,6 +71,8 @@ INPUT_PORTS_END
 
 void generalplus_gpspispi_game_state::generalplus_gpspispi(machine_config &config)
 {
+	set_addrmap(0, &generalplus_gpspispi_game_state::cs_map_base);
+
 	GP_SPISPI(config, m_maincpu, 96000000/2, m_screen);
 	m_maincpu->porta_in().set(FUNC(generalplus_gpspispi_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpspispi_game_state::portb_r));
@@ -88,8 +86,6 @@ void generalplus_gpspispi_game_state::generalplus_gpspispi(machine_config &confi
 	m_maincpu->set_bootmode(0); // boot from internal ROM (SPI bootstrap)
 	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
 
-	FULL_MEMORY(config, m_memory).set_map(&generalplus_gpspispi_game_state::cs_map_base);
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320*2, 262*2);
@@ -102,7 +98,7 @@ void generalplus_gpspispi_game_state::generalplus_gpspispi(machine_config &confi
 
 DEVICE_IMAGE_LOAD_MEMBER(generalplus_gpspispi_bkrankp_game_state::cart_load)
 {
-	uint32_t const size = m_cart->common_get_size("rom");
+	u32 const size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
@@ -139,6 +135,14 @@ ROM_START( prailpls )
 	ROM_LOAD16_WORD_SWAP( "mx25l25635f.u9", 0x0000, 0x2000000, CRC(17faefb0) SHA1(1d31c5aa1a37882f74c08414f69c4285149352b7) )
 ROM_END
 
+ROM_START( vmastspi )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "mx25l25635f.sfrom1", 0x0000, 0x2000000, CRC(f30af4a2) SHA1(99526156c6e72eda9ea1ef93b9e825da069e050f) )
+ROM_END
+
 ROM_START( anpanbd )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
@@ -154,6 +158,35 @@ ROM_START( anpanm15 )
 	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "mx25l12835f.ic3", 0x0000, 0x1000000, CRC(47c36cbd) SHA1(f1cae506e21c1795401004d79f6bb1b1d982d657) )
 ROM_END
+
+ROM_START( anpaneng )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "w25q128fv.u11", 0x0000, 0x1000000, CRC(d204d646) SHA1(0b2f9f2d91a078b5fba687d73079b2b5665b33d4) )
+ROM_END
+
+ROM_START( jspodred )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x400000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "gpr5l322.sfrom1", 0x0000, 0x400000, CRC(5bd08294) SHA1(3a4a76b7b30c0dcf8184cb94d75819c382c1c668) )
+ROM_END
+
+ROM_START( wildking )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "mx25l12835f.sfrom1", 0x0000, 0x1000000, CRC(bc4cace6) SHA1(1fc2e28b194a59ddb1ed9a63978064d2d0a6ab8c) )
+
+	// there was an SD card slot, but the "Power Up Cartridge" included was just a piece of plastic, not a real card
+	// other software may be available for the unit however.
+ROM_END
+
+
 
 ROM_START( pokegach )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
@@ -202,13 +235,52 @@ ROM_START( lxcyrace )
 	ROM_LOAD( "25q128.u2", 0x0000, 0x1000000, CRC(4489c99d) SHA1(792d6d224584fe1f3349c64a59aa79a587dd8c17) )
 ROM_END
 
+ROM_START( lxcymsm )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD( "25q256.bin", 0x0000, 0x2000000, CRC(96b3ee5c) SHA1(f1e6bf46a4503877074310506d1acc4607dac331) )
+ROM_END
+
+ROM_START( lxcympp )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD( "25q256.bin", 0x0000, 0x2000000, CRC(570b669c) SHA1(e7fcae662c8c8cae18cf1151d6caefacfe1e9fda) )
+ROM_END
+
+ROM_START( lxcymls )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD( "25q256.bin", 0x0000, 0x2000000, CRC(76c89fe5) SHA1(99668cbce2ace6ec972ee4e72fec8b93862a0ef4) )
+ROM_END
+
+ROM_START( dgun3944 )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD( "by25q128as.bin", 0x0000, 0x1000000, CRC(cf2bfc98) SHA1(f8c984f0278506d74b0b6337d2e96bb9d3a58148) )
+ROM_END
+
+ROM_START( starbuck )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x200000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD( "by25q16est.bin", 0x0000, 0x200000,  CRC(926c1499) SHA1(edd88b11f350e0016ee7dc76e872f9ae8c00aa6c) )
+ROM_END
 
 void generalplus_gpspispi_game_state::init_spi()
 {
 	int vectorbase = 0x2fe0;
-	uint8_t* spirom = memregion("maincpu")->base();
+	u8 *spirom = memregion("maincpu")->base();
 
-	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 	/*  Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
 
@@ -229,13 +301,13 @@ void generalplus_gpspispi_game_state::init_spi()
 	// copy a block of code from the NAND to RAM
 	for (int i = 0; i < 0x2000; i++)
 	{
-		uint16_t word = spirom[(i * 2) + 0] | (spirom[(i * 2) + 1] << 8);
+		u16 word = spirom[(i * 2) + 0] | (spirom[(i * 2) + 1] << 8);
 
 		mem.write_word(dest + i, word);
 	}
 
 	// these vectors must either directly point to RAM, or at least redirect there after some code
-	uint16_t* internal = (uint16_t*)memregion("maincpu:internal")->base();
+	u16 *internal = (u16*)memregion("maincpu:internal")->base();
 	internal[0x7ff5] = vectorbase + 0x0a;
 	internal[0x7ff6] = vectorbase + 0x0c;
 	internal[0x7ff7] = dest + 0x20; // point boot vector at code in RAM (probably in reality points to internal code that copies the first block)
@@ -254,11 +326,24 @@ void generalplus_gpspispi_game_state::init_spi()
 // ぼくはプラレール運転士 新幹線で行こう！プラス  (I am a Plarail driver Let's go by Shinkansen! Plus)
 CONS(2015, prailpls, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Takara Tomy", "Boku wa Plarail Untenshi Shinkansen de Ikou! Plus (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // has built-in screen, but can be connected to a TV
 
+// uses glob, fishing controller
+// バーチャルマスターズ スピリッツ ブルー
+// a red version also exists, but software might be the same
+CONS(201?, vmastspi, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Takara Tomy", "Virtual Masters Spirits (blue, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
 // this is a half-head shaped unit, SHP13017-R1 main PCB  -  アンパンマン レッツゴー！育脳ドライブ きみものれるよ！アンパンマンごう「それいけ！アンパンマン」
 CONS(2014, anpanbd,  0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "JoyPalette", "Anpanman: Let's Go! Ikunou Drive (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-//  それいけ！アンパンマン」みんなで！育脳マット
+// それいけ！アンパンマン」みんなで！育脳マット
 CONS(2015, anpanm15, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "JoyPalette", "Anpanman: Minnade! Ikunou Mat (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// ANPANMAN タッチであそぼ！はじめてEnglish (the furigana for "Enlish" says "えいご")
+CONS(2013, anpaneng, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Sega Toys", "Anpanman: Touch de Asobo! Hajimete English (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// 甲虫王者ムシキング むしとりバトルずかん  (JS Pod on PCB)
+CONS(201?, jspodred, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Sega Toys", "Kouchuu Ouja Mushiking: Mushitori Battle Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+CONS(201?, wildking, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Sega Toys", "Wild King (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2015, bkrankp,  0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
@@ -281,3 +366,9 @@ CONS(2015, pokegac2y, pokegach, 0, generalplus_gpspispi_bkrankp, gcm394, general
 CONS(202?, bk139in1,  0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "<unknown>", "BornKid 32 Bit Preloaded 139-in-1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // same unknown hardware as above, fewer games
 CONS(2021, lxcyrace,  0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Racing (JL3150)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, lxcymsm,   0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Motion - Superman (JL3180SU)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, lxcympp,   0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Motion - Paw Patrol (JL3180PA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, lxcymls,   0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Motion - Lilo & Stitch (JL3180D_01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, dgun3944,  0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "dreamGEAR", "My Arcade All Star Sports (Pixel Pocket, DGUNL3944)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// sold by Starbucks China, contains a bunch of NES hacks (including a version of Super Mario Bros) probably running on an emulator
+CONS(2022, starbuck,  0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Subor",     "Starbucks x Subor (OEM Q2, China)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

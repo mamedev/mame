@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "h8_intc.h"
 
-#include "h8.h"
+#include "h8_cpu_base.h"
 
 
 DEFINE_DEVICE_TYPE(H8_INTC,    h8_intc_device,    "h8_intc",    "H8 interrupt controller")
@@ -29,7 +29,7 @@ h8_intc_device::h8_intc_device(const machine_config &mconfig, const char *tag, d
 }
 
 h8_intc_device::h8_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, type, tag, owner, clock), m_irq_vector_base(0), m_irq_vector_count(0), m_irq_vector_nmi(0), m_has_isr(false),
+	h8_intc_base(mconfig, type, tag, owner, clock), m_irq_vector_base(0), m_irq_vector_count(0), m_irq_vector_nmi(0), m_has_isr(false),
 	m_cpu(*this, finder_base::DUMMY_TAG), m_nmi_type(EDGE_FALL), m_nmi_input(false), m_irq_input(0), m_ier(0), m_isr(0), m_iscr(0), m_icr_filter(0), m_ipr_filter(0)
 {
 }

@@ -34,45 +34,156 @@
 
 /*
 
+    Installing MS-DOS to hard disk
+    ------------------------------
+
+    $ ./chdman createhd -chs 306,6,17 -ss 512 -o st412.chd
+    $ printf '\x0f%.0s' {1..256} > nvram/mm2m35d/x2212
+    $ ./mame mm2m35d -rs232b terminal -flop1 msdos221 -hard st412.chd
+
+    Select terminal keyboard in input settings
+
+    Monitor:
+
+    L (oad)
+    A (abort)
+    C (continue)
+
+    Select computer keyboard in input settings
+
+    DOS:
+
+    SETPAR
+    2 (15MB Winchester)
+    2 (640KB floppy 1)
+    0 (no floppy 2)
+
+    Mount msdos221:flop2
+
+    WFORM C:
+    B
+    <RETURN>
+
+    Wait for it...
+
+    Mount msdos221:flop1
+
+    SYS C:
+    COPY *.* C:
+
+    Mount msdos221:flop2
+
+    COPY *.* C:
+
+*/
+
+/*
+
     TODO:
 
-    - DMA
-    - floppy
-    - SASI
-    - video
-    - keyboard
+    - keyboard ROM is not dumped
+    - MPSC (DMA and interrupts)
+    - CRTC186 video using CRT9007
+    - IOE186 card
 
 */
 
 #include "emu.h"
-#include "mikromikko2.h"
+#include "bus/mm2/exp.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/i86/i186.h"
+#include "machine/74259.h"
+#include "machine/nvram.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/z80sio.h"
+#include "machine/x2212.h"
+#include "machine/z80sio.h"
+#include "sound/spkrdev.h"
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
 #include "softlist_dev.h"
 
-void mm2_state::novram_store(offs_t offset, uint8_t data)
+#define I80186_TAG "maincpu"
+
+namespace {
+
+class mm2_state : public driver_device
 {
-	m_novram->store(1);
-	m_novram->store(0);
-}
+public:
+	mm2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, I80186_TAG),
+		m_novram(*this, "x2212"),
+		m_pic(*this, "pic8259"),
+		m_pit(*this, "pit8253"),
+		m_mpsc(*this, "i8274"),
+		m_speaker(*this, "speaker"),
+		m_rs232a(*this, "rs232a"),
+		m_rs232b(*this, "rs232b"),
+		m_exp(*this, "exp"),
+		m_ctrl1(*this, "control1"),
+		m_ctrl2(*this, "control2"),
+		m_hold_latch(0)
+	{ }
 
-void mm2_state::novram_recall(offs_t offset, uint8_t data)
-{
-	m_novram->recall(!BIT(data, 0));
-}
+	void mm2(machine_config &config);
 
-uint8_t mm2_state::videoram_r(offs_t offset)
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
-	uint16_t data = program.read_word(0xd0000 | (offset << 1));
+private:
+	required_device<i80186_cpu_device> m_maincpu;
+	required_device<x2212_device> m_novram;
+	required_device<pic8259_device> m_pic;
+	required_device<pit8253_device> m_pit;
+	required_device<i8274_device> m_mpsc;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<rs232_port_device> m_rs232a;
+	required_device<rs232_port_device> m_rs232b;
+	required_device<mikromikko2_expansion_bus_device> m_exp;
+	required_device<ls259_device> m_ctrl1;
+	required_device<ls259_device> m_ctrl2;
 
-	// character
-	m_drb0->write(data & 0xff);
+	void mm2_mem(address_map &map) ATTR_COLD;
+	void mm2_io(address_map &map) ATTR_COLD;
 
-	// attributes
-	m_drb1->write(data >> 8);
+	uint8_t status_r(offs_t offset);
+	uint8_t novram_r(offs_t offset) { return m_novram->read(m_maincpu->space(AS_PROGRAM), offset) << 4; };
+	void novram_w(offs_t offset, uint8_t data) { m_novram->write(offset, data >> 4); };
+	uint16_t mpsc_r(offs_t offset, uint16_t mem_mask);
+	void mpsc_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	void novram_store(offs_t offset, uint8_t data) { m_novram->store(1); m_novram->store(0); }
+	void tcl_w(offs_t offset, uint8_t data) { m_pic->ir0_w(CLEAR_LINE); }
+	void diag_w(offs_t offset, uint8_t data) { logerror("DIAG %02x\n", data); }
+	void cls0_w(int state) { m_cls0 = state; }
+	void cls1_w(int state) { m_cls1 = state; }
+	void llba_w(int state) { m_llba = state; }
+	void llbb_w(int state) { m_llbb = state; }
+	void mpsc_txda_w(int state) { if (m_llba) m_mpsc->rxa_w(state); else m_rs232a->write_txd(state); }
+	void mpsc_txdb_w(int state) { if (m_llbb) m_mpsc->rxb_w(state); else m_rs232b->write_txd(state); }
+	void mpsc_rtsa_w(int state) { if (m_llba) m_mpsc->ctsa_w(state); else m_rs232a->write_rts(state); }
+	void mpsc_rtsb_w(int state) { if (m_llbb) m_mpsc->ctsb_w(state); else m_rs232b->write_rts(state); }
+	void tmrout0_w(int state) { if (!m_cls1 && !m_cls0) { m_mpsc->rxca_w(state); m_mpsc->txca_w(state); } };
+	void tmrout1_w(int state) { if (!m_cls1 && m_cls0) { m_mpsc->rxca_w(state); m_mpsc->txca_w(state); } };
+	void latch_hold(int state, int bit);
+	void update_bhlda();
+	void hold1_w(int state) { latch_hold(state, 0); }
+	void hold2_w(int state) { latch_hold(state, 1); }
+	void hold3_w(int state) { latch_hold(state, 2); }
+	void hold4_w(int state) { latch_hold(state, 3); }
+	void hold5_w(int state) { latch_hold(state, 4); }
 
-	return data & 0xff;
-}
+	uint8_t slave_ack_r(offs_t offset) { if (offset == 7) return m_maincpu->int_callback(*this, 0); return 0; }
+
+	bool m_cls0;
+	bool m_cls1;
+	bool m_llba;
+	bool m_llbb;
+
+	u8 m_hold_latch;
+};
 
 uint8_t mm2_state::status_r(offs_t offset)
 {
@@ -83,373 +194,184 @@ uint8_t mm2_state::status_r(offs_t offset)
 	return data;
 }
 
-uint8_t mm2_state::sasi_status_r(offs_t offset)
+uint16_t mm2_state::mpsc_r(offs_t offset, uint16_t mem_mask)
 {
-	uint8_t data = 0;
+	if (ACCESSING_BITS_8_15 && offset == 2)
+		return status_r(0) << 8;
 
-	data |= m_sasi->bsy_r();
-	data |= m_sasi->rst_r() << 1;
-	data |= m_sasi->msg_r() << 2;
-	data |= m_sasi->cd_r() << 3;
-	data |= m_sasi->req_r() << 4;
-	data |= m_sasi->io_r() << 5;
-	data |= m_sasi->ack_r() << 7;
-
-	return data;
-}
-
-void mm2_state::sasi_cmd_w(offs_t offset, uint8_t data)
-{
-	m_sasi->sel_w(BIT(data, 0));
-	m_sasi->rst_w(BIT(data, 1));
-	m_sasi->atn_w(BIT(data, 2));
-}
-
-uint8_t mm2_state::sasi_data_r(offs_t offset)
-{
-	uint8_t data = m_sasi->read();
-
-	if (m_sasi->req_r())
-	{
-		m_sasi->ack_w(1);
-	}
-
-	return data;
-}
-
-void mm2_state::sasi_data_w(offs_t offset, uint8_t data)
-{
-	m_sasi_data = data;
-
-	if (!m_sasi->io_r())
-	{
-		m_sasi->write(data);
-	}
-
-	if (m_sasi->req_r())
-	{
-		m_sasi->ack_w(1);
-	}
-}
-
-void mm2_state::sasi_bsy_w(int state)
-{
-	if (state)
-	{
-		m_sasi->sel_w(0);
-	}
-}
-
-void mm2_state::sasi_req_w(int state)
-{
-	if (!state)
-	{
-		m_sasi->ack_w(0);
-	}
-
-	m_dmac->dreq3_w(state);
-}
-
-void mm2_state::sasi_io_w(int state)
-{
-	if (state)
-	{
-		m_sasi->write(0);
-	}
-	else
-	{
-		m_sasi->write(m_sasi_data);
-	}
-}
-
-uint8_t mm2_state::dmac_mem_r(offs_t offset)
-{
-	uint16_t *mem = (uint16_t *)m_maincpu->space(AS_PROGRAM).get_read_ptr(m_dma_hi << 15);
-
-	if (WORD_ALIGNED(offset))
-	{
-		return mem[offset >> 1] & 0xff;
-	}
-	else
-	{
-		return mem[offset >> 1] >> 8;
-	}
-}
-
-void mm2_state::dmac_mem_w(offs_t offset, uint8_t data)
-{
-	uint16_t *mem = (uint16_t *)m_maincpu->space(AS_PROGRAM).get_write_ptr(m_dma_hi << 15);
-	uint16_t value = mem[offset >> 1];
-
-	if (WORD_ALIGNED(offset))
-	{
-		mem[offset >> 1] = (value & 0xff00) | data;
-	}
-	else
-	{
-		mem[offset >> 1] = data << 8 | (value & 0xff);
-	}
-}
-
-void mm2_state::mm2_map(address_map &map)
-{
-	map(0x00000, 0x1ffff).ram(); // DRAM 128 KB (on SBC186)
-	map(0x20000, 0x3ffff).ram(); // DRAM 128 KB (on SBC186)
-	map(0x40000, 0x7ffff).ram(); // DRAM 256 KB (on SBC186 or MEME186)
-	map(0x80000, 0xbffff).ram(); // DRAM 256 KB (on MEME186)
-	map(0xd0000, 0xd1fff).ram(); // video RAM
-	map(0xd8000, 0xd9fff).rom().region("chargen", 0);
-	map(0xf0000, 0xf01ff).rw(m_novram, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0xff00);
-	map(0xf0200, 0xfffff).rom().region(I80186_TAG, 0x200);
-}
-
-void mm2_state::mm2_io_map(address_map &map)
-{
-	// SBC16
-	map(0xf800, 0xf803).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0xf880, 0xf887).rw(m_mpsc, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
-	map(0xf884, 0xf885).r(FUNC(mm2_state::status_r)).umask16(0xff00);
-	map(0xf900, 0xf901).w(FUNC(mm2_state::novram_store)).umask16(0x00ff);
-	map(0xf97e, 0xf97f).w(FUNC(mm2_state::novram_recall)).umask16(0xff00);
-	map(0xf930, 0xf937).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
-	map(0xf940, 0xf941).w(FUNC(mm2_state::tcl_w)).umask16(0xff00);
-	map(0xf950, 0xf951).w(FUNC(mm2_state::diag_w)).umask16(0xff00);
-	map(0xf960, 0xf961).w(FUNC(mm2_state::cls0_w)).umask16(0xff00);
-	map(0xf962, 0xf963).w(FUNC(mm2_state::cls1_w)).umask16(0xff00);
-	//map(0xf965, 0xf965) LOOPBACK LLBA
-	//map(0xf967, 0xf967) LOOPBACK LLBB
-	//map(0xf969, 0xf969) DATA CODING NRZI
-	//map(0xf96b, 0xf96b) SIGNAL LEVELS V24
-	//map(0xf96d, 0xf96d) SIGNAL LEVELS X27
-	map(0xf96e, 0xf96f).w(FUNC(mm2_state::dtra_w)).umask16(0xff00);
-	//map(0xf971, 0xf971) V24 SIGNAL TSTA
-	//map(0xf973, 0xf973) V24 SIGNAL SRSA
-	map(0xf974, 0xf975).w(FUNC(mm2_state::dtrb_w)).umask16(0xff00);
-
-	// CRTC186
-	map(0xf980, 0xf9ff).rw(m_vpac, FUNC(crt9007_device::read), FUNC(crt9007_device::write)).umask16(0x00ff);
-	map(0xf980, 0xf981).rw(m_sio, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)).umask16(0xff00);
-	map(0xf982, 0xf983).rw(m_sio, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask16(0xff00);
-	map(0xf9c0, 0xf9c1).w(FUNC(mm2_state::cpl_w));
-	map(0xf9c2, 0xf9c3).w(FUNC(mm2_state::blc_w));
-	map(0xf9c4, 0xf9c5).w(FUNC(mm2_state::mode_w));
-	map(0xf9c6, 0xf9c7).w(FUNC(mm2_state::modeg_w));
-	map(0xf9ca, 0xf9cb).w(FUNC(mm2_state::c70_50_w));
-	map(0xf9cc, 0xf9cd).w(FUNC(mm2_state::crb_w));
-	map(0xf9ce, 0xf9cf).w(FUNC(mm2_state::cru_w));
-
-	// MMC186
-	map(0xfa00, 0xfa1f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0x00ff);
-	map(0xfa20, 0xfa21).rw(FUNC(mm2_state::sasi_status_r), FUNC(mm2_state::sasi_cmd_w)).umask16(0x00ff);
-	map(0xfa22, 0xfa23).rw(FUNC(mm2_state::sasi_data_r), FUNC(mm2_state::sasi_data_w)).umask16(0x00ff);
-	map(0xfa40, 0xfa41).r(m_fdc, FUNC(upd765a_device::msr_r)).umask16(0x00ff);
-	map(0xfa42, 0xfa43).rw(m_fdc, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w)).umask16(0x00ff);
-	// map(0xfa60, 0xfa60) CONTROL SASI Select
-	// map(0xfa62, 0xfa62) CONTROL SASI Interrupts Enable
-	map(0xfa66, 0xfa67).w(FUNC(mm2_state::fdc_reset_w)).umask16(0x00ff);
-	// map(0xfa6a, 0xfa6a) CONTROL -Mini/Std Select
-	map(0xfa6c, 0xfa6d).w(FUNC(mm2_state::motor_on_w)).umask16(0x00ff);
-	// map(0xfa6e, 0xfa6e) CONTROL Motor On (Std)
-	map(0xfa70, 0xfa70).mirror(0xe).w(FUNC(mm2_state::dma_hi_w)).umask16(0x00ff);
-}
-
-void mm2_state::vpac_mem(address_map &map)
-{
-	map(0x0000, 0x3fff).r(FUNC(mm2_state::videoram_r));
-}
-
-static INPUT_PORTS_START( mm2 )
-INPUT_PORTS_END
-
-static const gfx_layout charlayout =
-{
-	8, 15,
-	RGN_FRAC(1,1),
-	1,
-	{ RGN_FRAC(0,1) },
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	{  0*16,  1*16,  2*16,  3*16,  4*16,  5*16,  6*16,  7*16,
-		8*16,  9*16, 10*16, 11*16, 12*16, 13*16, 14*16 },
-	16*16
-};
-
-static const gfx_layout gfxlayout =
-{
-	8, 1,
-	RGN_FRAC(1,1),
-	1,
-	{ RGN_FRAC(0,1) },
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	{ 15*16 },
-	16*16
-};
-
-static GFXDECODE_START( gfx_mm2 )
-	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 1 )
-	GFXDECODE_ENTRY( "chargen", 0, gfxlayout, 0, 1 )
-GFXDECODE_END
-
-void mm2_state::palette(palette_device &palette) const
-{
-	palette.set_pen_color(0, rgb_t(0xff, 0xff, 0xff)); // white
-	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); // black (normal color)
-	palette.set_pen_color(2, rgb_t(0x7f, 0x7f, 0x7f)); // grey ("highlight" mode color)
-}
-
-uint32_t mm2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	if (!m_blc)
-	{
-		bitmap.fill(0, cliprect);
-		return 0;
-	}
-
-	uint16_t *vram = (uint16_t *)m_maincpu->space(AS_PROGRAM).get_read_ptr(0xd1000);
-	uint16_t *crom = (uint16_t *)m_maincpu->space(AS_PROGRAM).get_read_ptr(0xd8000);
-
-	for (int sy = 0; sy < 24; sy++)
-	{
-		for (int y = 0; y < 12; y++)
-		{
-			for (int sx = 0; sx < 80; sx++)
-			{
-				uint16_t data = vram[(sy * 80) + sx];
-				offs_t char_addr = ((data & 0x1ff) << 4) | y;
-				uint16_t char_data = crom[char_addr];
-
-				for (int bit = 0; bit < 8; bit++)
-				{
-					bool pixel = BIT(char_data, 0) ^ m_cpl;
-					char_data >>= 1;
-
-					bitmap.pix((sy * 12) + y, (sx * 8) + bit) = pixel;
-				}
-			}
-		}
-	}
+	if (ACCESSING_BITS_0_7)
+		return m_mpsc->cd_ba_r(offset);
 
 	return 0;
 }
 
+void mm2_state::mpsc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (ACCESSING_BITS_0_7)
+		m_mpsc->cd_ba_w(offset, data & 0xff);
+}
+
+void mm2_state::latch_hold(int state, int bit)
+{
+	if (state)
+		m_hold_latch |= 1 << bit;
+	else
+		m_hold_latch &= ~(1 << bit);
+
+	update_bhlda();
+}
+
+void mm2_state::update_bhlda()
+{
+	int bcas = 0;
+	if (BIT(m_hold_latch, 0)) bcas = 1;
+	else if (BIT(m_hold_latch, 1)) bcas = 2;
+	else if (BIT(m_hold_latch, 2)) bcas = 3;
+	else if (BIT(m_hold_latch, 3)) bcas = 4;
+	else if (BIT(m_hold_latch, 4)) bcas = 5;
+
+	line_state bhlda = bcas ? ASSERT_LINE : CLEAR_LINE;
+	m_maincpu->set_input_line(INPUT_LINE_HALT, bhlda);
+	m_exp->bhlda_w(bhlda, bcas);
+}
+
+void mm2_state::mm2_mem(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
+	map(0xc0000, 0xeffff).noprw();
+	map(0xf0000, 0xf01ff).rw(FUNC(mm2_state::novram_r), FUNC(mm2_state::novram_w)).umask16(0x00ff);
+	map(0xf0200, 0xfffff).rom().region(I80186_TAG, 0x200);
+}
+
+void mm2_state::mm2_io(address_map &map)
+{
+	map(0xf800, 0xf803).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0xf880, 0xf887).rw(FUNC(mm2_state::mpsc_r), FUNC(mm2_state::mpsc_w));
+	//map(0xf880, 0xf887).rw(m_mpsc, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
+	//map(0xf884, 0xf885).r(FUNC(mm2_state::status_r)).umask16(0xff00);
+	map(0xf900, 0xf901).w(FUNC(mm2_state::novram_store)).umask16(0xff00);
+	map(0xf930, 0xf937).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
+	map(0xf940, 0xf941).w(FUNC(mm2_state::tcl_w)).umask16(0xff00);
+	map(0xf950, 0xf951).w(FUNC(mm2_state::diag_w)).umask16(0xff00);
+	map(0xf960, 0xf96f).w(m_ctrl1, FUNC(ls259_device::write_d0)).umask16(0xff00);
+	map(0xf970, 0xf97f).w(m_ctrl2, FUNC(ls259_device::write_d0)).umask16(0xff00);
+}
+
+static INPUT_PORTS_START( mm2 )
+	// defined in bus/mm2/mm2kb.cpp
+INPUT_PORTS_END
+
 void mm2_state::machine_start()
 {
-}
+	m_mpsc->synca_w(1);
 
-void mm2_state::machine_reset()
-{
-	m_cpl = 0;
-	m_blc = 0;
-	m_mode = 0;
-	m_modeg = 0;
-	m_c70_50 = 0;
-	m_cru = 0;
-	m_crb = 0;
-}
+	u8 *rom = memregion(I80186_TAG)->base();
 
-void mm2_state::floppy_formats(format_registration &fr)
-{
-	fr.add_mfm_containers();
-}
+	// patch out ROM checksum validation
+	rom[0x051c] = 0x90;
+	rom[0x051d] = 0x90;
 
-static void mm2_floppies(device_slot_interface &device)
-{
-	device.option_add("525qd", FLOPPY_525_QD);
+	// patch out MPSC test which fails due to missing DMA and interrupts
+	rom[0x1cf8] = 0x90;
+	rom[0x1cf9] = 0x90;
+	rom[0x1cfa] = 0x90;
+
+	// patch out CRTC186 test which fails due to missing keyboard emulation
+	rom[0x1d00] = 0x90;
+	rom[0x1d01] = 0x90;
+	rom[0x1d02] = 0x90;
+
+	// state saving
+	save_item(NAME(m_cls0));
+	save_item(NAME(m_cls1));
+	save_item(NAME(m_llba));
+	save_item(NAME(m_llbb));
+	save_item(NAME(m_hold_latch));
 }
 
 void mm2_state::mm2(machine_config &config)
 {
 	// SBC186
-	I80186(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::mm2_map);
-	m_maincpu->set_addrmap(AS_IO, &mm2_state::mm2_io_map);
+	I80186(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::mm2_mem);
+	m_maincpu->set_addrmap(AS_IO, &mm2_state::mm2_io);
 	m_maincpu->irmx_irq_cb().set(m_pic, FUNC(pic8259_device::ir7_w));
+	m_maincpu->set_irmx_irq_ack(m_pic, FUNC(pic8259_device::inta_cb));
+	m_maincpu->irqa_cb().set(m_exp, FUNC(mikromikko2_expansion_bus_device::inta_w));
 	m_maincpu->tmrout0_handler().set(FUNC(mm2_state::tmrout0_w));
 	m_maincpu->tmrout1_handler().set(FUNC(mm2_state::tmrout1_w));
 
 	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
+	m_pic->in_sp_callback().set_constant(1);
+	m_pic->read_slave_ack_callback().set(FUNC(mm2_state::slave_ack_r));
 
 	PIT8253(config, m_pit);
-	m_pit->set_clk<0>(16_MHz_XTAL/8);
-	m_pit->set_clk<1>(16_MHz_XTAL/8);
-	m_pit->set_clk<2>(16_MHz_XTAL/8);
-	m_pit->out_handler<0>().set(FUNC(mm2_state::ir0_w));
+	m_pit->set_clk<0>(XTAL(16'000'000)/8);
+	m_pit->set_clk<1>(XTAL(16'000'000)/8);
+	m_pit->set_clk<2>(XTAL(16'000'000)/8);
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_pit->out_handler<1>().set(m_mpsc, FUNC(i8274_device::rxtxcb_w));
 	m_pit->out_handler<2>().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
-	I8274(config, m_mpsc, 16_MHz_XTAL/4);
-	m_mpsc->out_txda_callback().set(m_rs232a, FUNC(rs232_port_device::write_txd));
-	m_mpsc->out_rtsa_callback().set(m_rs232a, FUNC(rs232_port_device::write_rts));
-	m_mpsc->out_txdb_callback().set(m_rs232b, FUNC(rs232_port_device::write_txd));
-	m_mpsc->out_rtsb_callback().set(m_rs232b, FUNC(rs232_port_device::write_rts));
+	I8274(config, m_mpsc, XTAL(16'000'000)/4);
 	m_mpsc->out_int_callback().set(m_pic, FUNC(pic8259_device::ir1_w));
+	m_mpsc->out_txdrqa_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq0_w));
+	m_mpsc->out_rxdrqa_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
+	m_mpsc->out_txda_callback().set(FUNC(mm2_state::mpsc_txda_w));
+	m_mpsc->out_rtsa_callback().set(FUNC(mm2_state::mpsc_rtsa_w));
+	m_mpsc->out_txdb_callback().set(FUNC(mm2_state::mpsc_txdb_w));
+	m_mpsc->out_rtsb_callback().set(FUNC(mm2_state::mpsc_rtsb_w));
 
 	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
-	m_rs232a->rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxa_w));
-	m_rs232a->dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcda_w));
-	m_rs232a->cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsa_w));
+	m_rs232a->rxd_handler().set(m_mpsc, FUNC(i8274_device::rxa_w));
+	m_rs232a->dcd_handler().set(m_mpsc, FUNC(i8274_device::dcda_w));
+	m_rs232a->cts_handler().set(m_mpsc, FUNC(i8274_device::ctsa_w));
 
-	RS232_PORT(config, m_rs232b, default_rs232_devices, "terminal");
-	m_rs232b->rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxb_w));
-	m_rs232b->cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsb_w));
+	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
+	m_rs232b->rxd_handler().set(m_mpsc, FUNC(i8274_device::rxb_w));
+	m_rs232b->cts_handler().set(m_mpsc, FUNC(i8274_device::ctsb_w));
+
+	LS259(config, m_ctrl1);
+	m_ctrl1->q_out_cb<0>().set(FUNC(mm2_state::cls0_w));
+	m_ctrl1->q_out_cb<1>().set(FUNC(mm2_state::cls1_w));
+	m_ctrl1->q_out_cb<2>().set(FUNC(mm2_state::llba_w));
+	m_ctrl1->q_out_cb<3>().set(FUNC(mm2_state::llbb_w));
+	//m_ctrl1->q_out_cb<4>().set(); DATA CODING NRZI (0=NRZ, 1=NRZI)
+	//m_ctrl1->q_out_cb<5>().set(); SIGNAL LEVELS V28 (1=V.28)
+	//m_ctrl1->q_out_cb<6>().set(); SIGNAL LEVELS X27 (1=X.27)
+	m_ctrl1->q_out_cb<7>().set(m_rs232a, FUNC(rs232_port_device::write_dtr)).invert();
+
+	LS259(config, m_ctrl2);
+	//m_ctrl2->q_out_cb<0>().set(); V24 SIGNAL TSTA INVERTED
+	//m_ctrl2->q_out_cb<1>().set(); V24 SIGNAL SRSA INVERTED
+	m_ctrl2->q_out_cb<2>().set(m_rs232b, FUNC(rs232_port_device::write_dtr)).invert();
+	m_ctrl2->q_out_cb<7>().set(m_novram, FUNC(x2212_device::recall)).invert();
 
 	X2212(config, m_novram);
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	// CRTC186
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(71);
-	screen.set_screen_update(FUNC(mm2_state::screen_update));
-	screen.set_size(640, 420);
-	screen.set_visarea(0, 640-1, 0, 420-1);
-	screen.set_palette(m_palette);
+	MIKROMIKKO2_EXPANSION_BUS(config, m_exp, 0);
+	m_exp->set_memspace(m_maincpu, AS_PROGRAM);
+	m_exp->set_iospace(m_maincpu, AS_IO);
+	m_exp->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_exp->ir2_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
+	m_exp->ir3_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
+	m_exp->ir4_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
+	m_exp->ir5_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
+	m_exp->hold1_callback().set(FUNC(mm2_state::hold1_w));
+	m_exp->hold2_callback().set(FUNC(mm2_state::hold2_w));
+	m_exp->hold3_callback().set(FUNC(mm2_state::hold3_w));
+	m_exp->hold4_callback().set(FUNC(mm2_state::hold4_w));
+	m_exp->hold5_callback().set(FUNC(mm2_state::hold5_w));
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_mm2);
-	PALETTE(config, m_palette, FUNC(mm2_state::palette), 3);
-
-	CRT9007(config, m_vpac, 35.4525_MHz_XTAL/8);
-	m_vpac->set_addrmap(0, &mm2_state::vpac_mem);
-	m_vpac->set_character_width(10);
-	m_vpac->int_callback().set(FUNC(mm2_state::vpac_int_w));
-	m_vpac->set_screen(SCREEN_TAG);
-
-	CRT9212(config, m_drb0, 0);
-
-	CRT9212(config, m_drb1, 0);
-
-	I8251(config, m_sio, 16_MHz_XTAL/4);
-	m_sio->rxrdy_handler().set(FUNC(mm2_state::sio_rxrdy_w));
-	m_sio->txrdy_handler().set(FUNC(mm2_state::sio_txrdy_w));
-
-	// MMC186
-	AM9517A(config, m_dmac, 16_MHz_XTAL/4);
-	m_dmac->in_memr_callback().set(FUNC(mm2_state::dmac_mem_r));
-	m_dmac->out_memw_callback().set(FUNC(mm2_state::dmac_mem_w));
-	m_dmac->in_ior_callback<0>().set(FUNC(mm2_state::sasi_data_r));
-	m_dmac->out_iow_callback<0>().set(FUNC(mm2_state::sasi_data_w));
-	m_dmac->in_ior_callback<1>().set(m_fdc, FUNC(upd765_family_device::dma_r));
-	m_dmac->out_iow_callback<1>().set(m_fdc, FUNC(upd765_family_device::dma_w));
-
-	UPD765A(config, m_fdc, 16_MHz_XTAL/2, true, true);
-	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
-	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
-
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", mm2_floppies, "525qd", mm2_state::floppy_formats).enable_sound(true);
-
-	NSCSI_BUS(config, "sasi");
-	NSCSI_CONNECTOR(config, "sasi:0", default_scsi_devices, "s1410");
-	NSCSI_CONNECTOR(config, "sasi:7", default_scsi_devices, "scsicb", true)
-		.option_add_internal("scsicb", NSCSI_CB)
-		.machine_config([this](device_t* device) {
-			downcast<nscsi_callback_device&>(*device).bsy_callback().set(*this, FUNC(mm2_state::sasi_bsy_w));
-			downcast<nscsi_callback_device&>(*device).req_callback().set(*this, FUNC(mm2_state::sasi_req_w));
-			downcast<nscsi_callback_device&>(*device).io_callback().set(*this, FUNC(mm2_state::sasi_io_w));
-		});
-
-	// software lists
-	SOFTWARE_LIST(config, "flop_list").set_original("mm2_flop");
+	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp1", 0, m_exp, mikromikko2_expansion_bus_cards, "mmc186", false);
+	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp2", 0, m_exp, mikromikko2_expansion_bus_cards, "crtc186", false);
+	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp3", 0, m_exp, mikromikko2_expansion_bus_cards, nullptr, false);
+	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp4", 0, m_exp, mikromikko2_expansion_bus_cards, nullptr, false);
+	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp5", 0, m_exp, mikromikko2_expansion_bus_cards, "meme186", false);
 }
 
 ROM_START( mm2m35d )
@@ -466,17 +388,10 @@ ROM_START( mm2m35d )
 	ROMX_LOAD( "9489c.ic41", 0x8000, 0x4000, CRC(b5086aac) SHA1(f8d7a936baa701dcc30949fe1241be2ab9b80201), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROMX_LOAD( "9491c.ic58", 0x8001, 0x4000, CRC(32047735) SHA1(408f03bc2d89257488e4b3336500681bb168cdec), ROM_SKIP(1) | ROM_BIOS(1) )
 
-	ROM_REGION16_LE( 0x4000, "chargen", 0 )
-	ROMX_LOAD( "9067e.ic40", 0x0000, 0x2000, CRC(fa719d92) SHA1(af6cc03a8171b9c95e8548c5e0268816344d7367), ROM_SKIP(1) )
-
-	ROM_REGION( 0x2000, "attr", 0 )
-	ROM_LOAD( "9026a.ic26", 0x0000, 0x2000, CRC(fe1da600) SHA1(3a5512b08d8f7bb5a0ff3f50bcf33de649a0489d) )
-
-	ROM_REGION( 0x100, "timing", 0 )
-	ROM_LOAD( "739025b.ic8", 0x000, 0x100, CRC(c538b10a) SHA1(9810732a52ee6b8313d27462b27acc7e4d5badeb) )
-
-	ROM_REGION( 0x400, "keyboard", 0 )
-	ROM_LOAD( "keyboard", 0x000, 0x400, NO_DUMP )
+	ROM_REGION( 0x100, "x2212", 0 )
+	ROM_LOAD( "x2212", 0x000, 0x100, CRC(1b9f1518) SHA1(57928b28f654be84a00797ab5b5fa0389ae36016) )
 ROM_END
 
-COMP( 1983, mm2m35d,  0,     0,      mm2,   mm2,   mm2_state, empty_init, "Nokia Data", "MikroMikko 2 M35D", MACHINE_NOT_WORKING )
+} // anonymous namespace
+
+COMP( 1983, mm2m35d,  0,     0,      mm2,   mm2,   mm2_state, empty_init, "Nokia Data", "MikroMikko 2 M35D", MACHINE_IMPERFECT_GRAPHICS )

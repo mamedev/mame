@@ -6,7 +6,6 @@
 
     How to create HDD image:
     ------------------------
-    ./chdman createhd -chs 615,4,17 -ss 512 -o necd5126a.chd
     ./chdman createhd -chs 1024,8,17 -ss 512 -o micr1325a.chd
 
     How to format HDD:
@@ -24,9 +23,8 @@
     mf(2,0)
     mf(2,0)
     abcenix
-    loadsys1
-    <enter>
-    <enter>
+    loadsys1 -wt micr1325a -we sa40 -bs 512
+    loadsys
 
     ABCenix <= D-NIX <= AT&T Unix System V
 
@@ -36,13 +34,10 @@
 
     TODO:
 
-    - abcenix panics while booting after commit 78661e9aa92c7e43c9a96039e7dfb3dabc79a287
     - systest1600 failures
         - CIO timer (works if CIO clock is 4219000)
         - DMA (expects to read 0xff from 0x18000..)
-    - loadsys1 core dump (/etc/mkfs -b 1024 -v 69000 /dev/sa40)
     - crashes after reset
-    - connect RS-232 printer port
     - Z80 SCC/DART interrupt chain
     - [:2a:chb] - TX FIFO is full, discarding data
         [:] SCC write 000003
@@ -51,9 +46,24 @@
 */
 
 #include "emu.h"
-#include "abc1600.h"
-
+#include "abc1600_v.h"
+#include "abc1600_mmu.h"
+#include "bus/abcbus/abcbus.h"
+#include "bus/abckb/abckb.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/m68000/m68008.h"
+#include "formats/abc1600_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/74259.h"
+#include "machine/e0516.h"
+#include "machine/input_merger.h"
+#include "machine/nmc9306.h"
+#include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "machine/z80dma.h"
+#include "machine/z80scc.h"
+#include "machine/z80sio.h"
+#include "machine/z8536.h"
 #include "softlist_dev.h"
 
 
@@ -61,9 +71,28 @@
 //  CONSTANTS / MACROS
 //**************************************************************************
 
-#define VERBOSE 0
+//#define VERBOSE 0
 #include "logmacro.h"
 
+#define MC68008P8_TAG       "3f"
+#define Z8410AB1_0_TAG      "5g"
+#define Z8410AB1_1_TAG      "7g"
+#define Z8410AB1_2_TAG      "9g"
+#define Z8470AB1_TAG        "17b"
+#define Z8530B1_TAG         "2a"
+#define Z8536B1_TAG         "15b"
+#define SAB1797_02P_TAG     "5a"
+#define FDC9229BT_TAG       "7a"
+#define E050_C16PC_TAG      "13b"
+#define NMC9306_TAG         "14c"
+#define BUS0I_TAG           "bus0i"
+#define BUS0X_TAG           "bus0x"
+#define BUS1_TAG            "bus1"
+#define BUS2_TAG            "bus2"
+#define RS232_A_TAG         "rs232a"
+#define RS232_B_TAG         "rs232b"
+#define RS232_PR_TAG        "rs232pr"
+#define ABC_KEYBOARD_PORT_TAG   "kb"
 
 #define A1          BIT(offset, 1)
 #define A2          BIT(offset, 2)
@@ -91,6 +120,121 @@ enum
 };
 
 
+namespace {
+
+class abc1600_state : public driver_device
+{
+public:
+	abc1600_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, MC68008P8_TAG),
+		m_mac(*this, "mac"),
+		m_dma0(*this, Z8410AB1_0_TAG),
+		m_dma1(*this, Z8410AB1_1_TAG),
+		m_dma2(*this, Z8410AB1_2_TAG),
+		m_dart(*this, Z8470AB1_TAG),
+		m_scc(*this, Z8530B1_TAG),
+		m_cio(*this, Z8536B1_TAG),
+		m_fdc(*this, SAB1797_02P_TAG),
+		m_rtc(*this, E050_C16PC_TAG),
+		m_nvram(*this, NMC9306_TAG),
+		m_ram(*this, RAM_TAG),
+		m_floppy(*this, SAB1797_02P_TAG":%u", 0U),
+		m_bus0i(*this, BUS0I_TAG),
+		m_bus0x(*this, BUS0X_TAG),
+		m_bus1(*this, BUS1_TAG),
+		m_bus2(*this, BUS2_TAG),
+		m_kb(*this, ABC_KEYBOARD_PORT_TAG)
+	{ }
+
+	void abc1600(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( reset );
+
+private:
+	required_device<m68008_device> m_maincpu;
+	required_device<abc1600_mmu_device> m_mac;
+	required_device<z80dma_device> m_dma0;
+	required_device<z80dma_device> m_dma1;
+	required_device<z80dma_device> m_dma2;
+	required_device<z80dart_device> m_dart;
+	required_device<scc8530_device> m_scc;
+	required_device<z8536_device> m_cio;
+	required_device<fd1797_device> m_fdc;
+	required_device<e0516_device> m_rtc;
+	required_device<nmc9306_device> m_nvram;
+	required_device<ram_device> m_ram;
+	required_device_array<floppy_connector, 3> m_floppy;
+	required_device<abcbus_slot_device> m_bus0i;
+	required_device<abcbus_slot_device> m_bus0x;
+	required_device<abcbus_slot_device> m_bus1;
+	required_device<abcbus_slot_device> m_bus2;
+	required_device<abc_keyboard_port_device> m_kb;
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	static void floppy_formats(format_registration &fr);
+
+	uint8_t bus_r(offs_t offset);
+	void bus_w(offs_t offset, uint8_t data);
+	uint8_t dart_r(offs_t offset);
+	void dart_w(offs_t offset, uint8_t data);
+	uint8_t scc_r(offs_t offset);
+	void scc_w(offs_t offset, uint8_t data);
+	uint8_t cio_r(offs_t offset);
+	void cio_w(offs_t offset, uint8_t data);
+	void fw0_w(uint8_t data);
+	void fw1_w(uint8_t data);
+
+	void cs7_w(int state);
+	void btce_w(int state);
+	void atce_w(int state);
+	void dmadis_w(int state);
+	void sysscc_w(int state);
+	void sysfs_w(int state);
+	void dbrq0_w(int state) { m_dbrq0 = state; update_br(); }
+	void dbrq1_w(int state) { m_dbrq1 = state; update_br(); }
+	void dbrq2_w(int state) { m_dbrq2 = state; update_br(); }
+	uint8_t read_tren0(offs_t offset) { return m_bus0i->read_tren() & m_bus0x->read_tren(); }
+	void write_tren0(offs_t offset, uint8_t data) { m_bus0i->write_tren(data); m_bus0x->write_tren(data); }
+
+	uint8_t cio_pa_r();
+	uint8_t cio_pb_r();
+	void cio_pb_w(uint8_t data);
+	uint8_t cio_pc_r();
+	void cio_pc_w(uint8_t data);
+
+	void nmi_w(int state);
+
+	void update_br();
+	void update_pren0(int state);
+	void update_pren1(int state);
+	void update_drdy0(int state);
+	void update_drdy1(int state);
+	void sccrq_a_w(int state) { m_sccrq_a = state; update_drdy1(0); }
+	void sccrq_b_w(int state) { m_sccrq_b = state; update_drdy1(0); }
+
+	// DMA
+	int m_dmadis = 0;
+	int m_sysscc = 0;
+	int m_sysfs = 0;
+	int m_dbrq0 = CLEAR_LINE;
+	int m_dbrq1 = CLEAR_LINE;
+	int m_dbrq2 = CLEAR_LINE;
+
+	void mac_mem(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
+
+	// peripherals
+	int m_cs7 = 0;                  // card select address bit 7
+	int m_bus0 = 0;                 // BUS 0 selected
+	uint8_t m_csb = 0U;             // card select
+	int m_atce = 0;                 // V.24 channel A external clock enable
+	int m_btce = 0;                 // V.24 channel B external clock enable
+	bool m_sccrq_a = 0;
+	bool m_sccrq_b = 0;
+};
 
 
 //**************************************************************************
@@ -448,6 +592,8 @@ void abc1600_state::dmadis_w(int state)
 	LOG("%s _DMADIS %d\n", machine().describe_context(), state);
 
 	m_dmadis = state;
+
+	update_br();
 }
 
 
@@ -488,20 +634,6 @@ void abc1600_state::sysfs_w(int state)
 //  ADDRESS MAPS
 //**************************************************************************
 
-//-------------------------------------------------
-//  ADDRESS_MAP( abc1600_mem )
-//-------------------------------------------------
-
-void abc1600_state::abc1600_mem(address_map &map)
-{
-	map(0x00000, 0xfffff).rw(ABC1600_MAC_TAG, FUNC(abc1600_mac_device::read), FUNC(abc1600_mac_device::write));
-}
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( mac_mem )
-//-------------------------------------------------
-
 void abc1600_state::mac_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).ram();
@@ -518,13 +650,21 @@ void abc1600_state::mac_mem(address_map &map)
 	map(0x1ff500, 0x1ff500).mirror(0xff).rw(m_dma2, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x1ff600, 0x1ff607).mirror(0xf8).rw(FUNC(abc1600_state::scc_r), FUNC(abc1600_state::scc_w));
 	map(0x1ff700, 0x1ff707).mirror(0xf8).rw(FUNC(abc1600_state::cio_r), FUNC(abc1600_state::cio_w));
-	map(0x1ff800, 0x1ff8ff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr0_map));
-	map(0x1ff900, 0x1ff9ff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr1_map));
-	map(0x1ffa00, 0x1ffaff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr2_map));
+	map(0x1ff800, 0x1ff807).mirror(0xf8).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr0_map));
+	map(0x1ff900, 0x1ff907).mirror(0xf8).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr1_map));
+	map(0x1ffa00, 0x1ffa07).mirror(0xf8).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr2_map));
 	map(0x1ffb00, 0x1ffb00).mirror(0x7e).w(FUNC(abc1600_state::fw0_w));
 	map(0x1ffb01, 0x1ffb01).mirror(0x7e).w(FUNC(abc1600_state::fw1_w));
-	map(0x1ffd00, 0x1ffd07).mirror(0xf8).w(ABC1600_MAC_TAG, FUNC(abc1600_mac_device::dmamap_w));
+	map(0x1ffd00, 0x1ffd07).mirror(0xf8).w("mac", FUNC(abc1600_mmu_device::dmamap_w));
 	map(0x1ffe00, 0x1ffe00).mirror(0xff).w("spec_contr_reg", FUNC(ls259_device::write_nibble_d3));
+}
+
+void abc1600_state::cpu_space_map(address_map &map)
+{
+	map(0xffff0, 0xfffff).m(m_maincpu, FUNC(m68008_device::autovectors_map));
+	map(0xffff5, 0xffff5).lr8(NAME([this]() -> u8 { return m_cio->intack_r(); }));
+	map(0xffffb, 0xffffb).lr8(NAME([this]() -> u8 { return m_dart->m1_r(); }));
+	map(0xfffff, 0xfffff).lr8(NAME([this]() -> u8 { m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE); return m68008_device::autovector(7); }));
 }
 
 
@@ -707,14 +847,14 @@ uint8_t abc1600_state::cio_pa_r()
 
 	uint8_t data = 0;
 
-	data |= m_bus2->irq_r();
-	data |= m_bus1->irq_r() << 1;
-	data |= m_bus0x->xint2_r() << 2;
-	data |= m_bus0x->xint3_r() << 3;
-	data |= m_bus0x->xint4_r() << 4;
-	data |= m_bus0x->xint5_r() << 5;
-	data |= m_bus0x->irq_r() << 6;
-	data |= m_bus0i->irq_r() << 7;
+	data |= !m_bus2->irq_r();
+	data |= !m_bus1->irq_r() << 1;
+	data |= !m_bus0x->xint2_r() << 2;
+	data |= !m_bus0x->xint3_r() << 3;
+	data |= !m_bus0x->xint4_r() << 4;
+	data |= !m_bus0x->xint5_r() << 5;
+	data |= !m_bus0x->irq_r() << 6;
+	data |= !m_bus0i->irq_r() << 7;
 
 	return data;
 }
@@ -851,14 +991,6 @@ void abc1600_state::nmi_w(int state)
 //  MACHINE INITIALIZATION
 //**************************************************************************
 
-void abc1600_state::cpu_space_map(address_map &map)
-{
-	map(0xffff0, 0xfffff).m(m_maincpu, FUNC(m68008_device::autovectors_map));
-	map(0xffff5, 0xffff5).lr8(NAME([this]() -> u8 { return m_cio->intack_r(); }));
-	map(0xffffb, 0xffffb).lr8(NAME([this]() -> u8 { return m_dart->m1_r(); }));
-	map(0xfffff, 0xfffff).lr8(NAME([this]() -> u8 { m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE); return m68008_device::autovector(7); }));
-}
-
 void abc1600_state::machine_start()
 {
 	// state saving
@@ -875,8 +1007,6 @@ void abc1600_state::machine_start()
 	save_item(NAME(m_btce));
 	save_item(NAME(m_sccrq_a));
 	save_item(NAME(m_sccrq_b));
-	save_item(NAME(m_scc_irq));
-	save_item(NAME(m_dart_irq));
 }
 
 
@@ -903,65 +1033,66 @@ void abc1600_state::machine_reset()
 void abc1600_state::abc1600(machine_config &config)
 {
 	// basic machine hardware
-	M68008(config, m_maincpu, 64_MHz_XTAL / 8);
-	m_maincpu->set_addrmap(AS_PROGRAM, &abc1600_state::abc1600_mem);
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &abc1600_state::cpu_space_map);
-	//m_maincpu->out_bg_callback().set(FUNC(abc1600_state::bg_w));
+	M68008(config, m_maincpu, XTAL(64'000'000)/8);
+	m_maincpu->enable_mmu8();
+
+	INPUT_MERGER_ANY_HIGH(config, "irq5").output_handler().set_inputline(m_maincpu, M68K_IRQ_5);
+
+	LUXOR_ABC1600_MMU(config, m_mac);
+	m_mac->set_addrmap(AS_PROGRAM, &abc1600_state::mac_mem);
+	m_mac->set_addrmap(m68000_base_device::AS_CPU_SPACE, &abc1600_state::cpu_space_map);
+	m_mac->set_cpu(m_maincpu);
+	m_mac->in_tren_cb<0>().set(FUNC(abc1600_state::read_tren0));
+	m_mac->out_tren_cb<0>().set(FUNC(abc1600_state::write_tren0));
+	m_mac->in_tren_cb<1>().set(m_bus1, FUNC(abcbus_slot_device::read_tren));
+	m_mac->out_tren_cb<1>().set(m_bus1, FUNC(abcbus_slot_device::write_tren));
+	m_mac->in_tren_cb<2>().set(m_bus2, FUNC(abcbus_slot_device::read_tren));
+	m_mac->out_tren_cb<2>().set(m_bus2, FUNC(abcbus_slot_device::write_tren));
 
 	// video hardware
-	ABC1600_MOVER(config, ABC1600_MOVER_TAG, 0);
+	abc1600_mover_device &mover(ABC1600_MOVER(config, ABC1600_MOVER_TAG, XTAL(64'000'000)));
+	mover.amm_callback().set(m_cio, FUNC(z8536_device::pb4_w));
 
-	// devices
-	ABC1600_MAC(config, m_mac, 0);
-	m_mac->set_addrmap(AS_PROGRAM, &abc1600_state::mac_mem);
-	m_mac->set_cpu(m_maincpu);
-	m_mac->in_tren0_cb().set(m_bus0i, FUNC(abcbus_slot_device::read_tren)); // TODO bus0x
-	m_mac->out_tren0_cb().set(m_bus0i, FUNC(abcbus_slot_device::write_tren)); // TODO bus0x
-	m_mac->in_tren1_cb().set(m_bus1, FUNC(abcbus_slot_device::read_tren));
-	m_mac->out_tren1_cb().set(m_bus1, FUNC(abcbus_slot_device::write_tren));
-	m_mac->in_tren2_cb().set(m_bus2, FUNC(abcbus_slot_device::read_tren));
-	m_mac->out_tren2_cb().set(m_bus2, FUNC(abcbus_slot_device::write_tren));
-
-	ls259_device &spec_contr_reg(LS259(config, "spec_contr_reg")); // Special Control Register @ 13E
+	ls259_device &spec_contr_reg(LS259(config, "spec_contr_reg"));
 	spec_contr_reg.q_out_cb<0>().set(FUNC(abc1600_state::cs7_w));
 	spec_contr_reg.q_out_cb<2>().set(FUNC(abc1600_state::btce_w));
 	spec_contr_reg.q_out_cb<3>().set(FUNC(abc1600_state::atce_w));
-	spec_contr_reg.q_out_cb<4>().set(m_mac, FUNC(abc1600_mac_device::partst_w));
+	spec_contr_reg.q_out_cb<4>().set(m_mac, FUNC(abc1600_mmu_device::partst_w));
 	spec_contr_reg.q_out_cb<5>().set(FUNC(abc1600_state::dmadis_w));
 	spec_contr_reg.q_out_cb<6>().set(FUNC(abc1600_state::sysscc_w));
 	spec_contr_reg.q_out_cb<7>().set(FUNC(abc1600_state::sysfs_w));
 
-	Z80DMA(config, m_dma0, 64_MHz_XTAL / 16);
+	Z80DMA(config, m_dma0, XTAL(64'000'000)/16);
 	m_dma0->out_busreq_callback().set(FUNC(abc1600_state::dbrq0_w));
 	m_dma0->out_bao_callback().set(m_dma1, FUNC(z80dma_device::bai_w));
-	m_dma0->in_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_mreq_r));
-	m_dma0->out_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_mreq_w));
+	m_dma0->in_mreq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma0_mreq_r));
+	m_dma0->out_mreq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma0_mreq_w));
 	m_dma0->out_ieo_callback().set([this](int state) { m_bus0i->prac_w(state); m_bus0x->prac_w(state); }).exor(1);
-	m_dma0->in_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_iorq_r));
-	m_dma0->out_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_iorq_w));
+	m_dma0->in_iorq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma0_iorq_r));
+	m_dma0->out_iorq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma0_iorq_w));
 
-	Z80DMA(config, m_dma1, 64_MHz_XTAL / 16);
+	Z80DMA(config, m_dma1, XTAL(64'000'000)/16);
 	m_dma1->out_busreq_callback().set(FUNC(abc1600_state::dbrq1_w));
 	m_dma1->out_bao_callback().set(m_dma2, FUNC(z80dma_device::bai_w));
-	m_dma1->in_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma1_mreq_r));
-	m_dma1->out_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma1_mreq_w));
+	m_dma1->in_mreq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma1_mreq_r));
+	m_dma1->out_mreq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma1_mreq_w));
 	m_dma1->out_ieo_callback().set(m_bus1, FUNC(abcbus_slot_device::prac_w)).exor(1);
-	m_dma1->in_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma1_iorq_r));
-	m_dma1->out_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma1_iorq_w));
+	m_dma1->in_iorq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma1_iorq_r));
+	m_dma1->out_iorq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma1_iorq_w));
 
-	Z80DMA(config, m_dma2, 64_MHz_XTAL / 16);
+	Z80DMA(config, m_dma2, XTAL(64'000'000)/16);
 	m_dma2->out_busreq_callback().set(FUNC(abc1600_state::dbrq2_w));
-	m_dma2->in_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma2_mreq_r));
-	m_dma2->out_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma2_mreq_w));
+	m_dma2->in_mreq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma2_mreq_r));
+	m_dma2->out_mreq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma2_mreq_w));
 	m_dma2->out_ieo_callback().set(m_bus2, FUNC(abcbus_slot_device::prac_w)).exor(1);
-	m_dma2->in_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma2_iorq_r));
-	m_dma2->out_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma2_iorq_w));
+	m_dma2->in_iorq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma2_iorq_r));
+	m_dma2->out_iorq_callback().set(m_mac, FUNC(abc1600_mmu_device::dma2_iorq_w));
 
-	Z80DART(config, m_dart, 64_MHz_XTAL / 16);
-	m_dart->out_int_callback().set(FUNC(abc1600_state::dart_irq_w));
+	Z80DART(config, m_dart, XTAL(64'000'000)/16);
+	m_dart->out_int_callback().set("irq5", FUNC(input_merger_device::in_w<0>));
 	m_dart->out_txda_callback().set(RS232_PR_TAG, FUNC(rs232_port_device::write_txd));
-	//m_dart->out_dtra_callback().set(RS232_PR_TAG, FUNC(rs232_port_device::write_dcd));
-	//m_dart->out_rtsa_callback().set(RS232_PR_TAG, FUNC(rs232_port_device::write_cts));
+	m_dart->out_dtra_callback().set(RS232_PR_TAG, FUNC(rs232_port_device::write_dtr));
+	m_dart->out_rtsa_callback().set(RS232_PR_TAG, FUNC(rs232_port_device::write_rts));
 	m_dart->out_txdb_callback().set(ABC_KEYBOARD_PORT_TAG, FUNC(abc_keyboard_port_device::txd_w));
 
 	abc_keyboard_port_device &kb(ABC_KEYBOARD_PORT(config, ABC_KEYBOARD_PORT_TAG, abc_keyboard_devices, "abc99"));
@@ -971,11 +1102,11 @@ void abc1600_state::abc1600(machine_config &config)
 
 	rs232_port_device &rs232pr(RS232_PORT(config, RS232_PR_TAG, default_rs232_devices, nullptr));
 	rs232pr.rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
-	//rs232pr.rts_handler().set(m_dart, FUNC(z80dart_device::ctsa_w));
-	//rs232pr.dtr_handler().set(m_dart, FUNC(z80dart_device::dcda_w));
+	rs232pr.dcd_handler().set(m_dart, FUNC(z80dart_device::dcda_w));
+	rs232pr.cts_handler().set(m_dart, FUNC(z80dart_device::ctsa_w));
 
-	SCC8530(config, m_scc, 64_MHz_XTAL / 16);
-	m_scc->out_int_callback().set(FUNC(abc1600_state::scc_irq_w));
+	SCC8530(config, m_scc, XTAL(64'000'000)/16);
+	m_scc->out_int_callback().set("irq5", FUNC(input_merger_device::in_w<1>));
 	m_scc->out_wreqa_callback().set(FUNC(abc1600_state::sccrq_a_w));
 	m_scc->out_wreqb_callback().set(FUNC(abc1600_state::sccrq_b_w));
 	m_scc->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
@@ -997,7 +1128,7 @@ void abc1600_state::abc1600(machine_config &config)
 	rs232b.dcd_handler().set(m_scc, FUNC(scc8530_device::dcdb_w));
 	rs232b.ri_handler().set(m_scc, FUNC(scc8530_device::syncb_w));
 
-	Z8536(config, m_cio, 64_MHz_XTAL / 16);
+	Z8536(config, m_cio, XTAL(64'000'000)/16);
 	m_cio->irq_wr_cb().set_inputline(MC68008P8_TAG, M68K_IRQ_2);
 	m_cio->pa_rd_cb().set(FUNC(abc1600_state::cio_pa_r));
 	m_cio->pb_rd_cb().set(FUNC(abc1600_state::cio_pb_r));
@@ -1007,10 +1138,10 @@ void abc1600_state::abc1600(machine_config &config)
 
 	NMC9306(config, m_nvram, 0);
 
-	E0516(config, m_rtc, 32.768_kHz_XTAL);
+	E0516(config, m_rtc, XTAL(32'768));
 	m_rtc->outsel_rd_cb().set_constant(0);
 
-	FD1797(config, m_fdc, 64_MHz_XTAL / 64); // clocked by 9229B
+	FD1797(config, m_fdc, XTAL(64'000'000)/64); // clocked by 9229B
 	m_fdc->intrq_wr_callback().set(m_cio, FUNC(z8536_device::pb7_w));
 	m_fdc->drq_wr_callback().set(FUNC(abc1600_state::update_drdy0));
 
@@ -1018,28 +1149,28 @@ void abc1600_state::abc1600(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy[1], abc1600_floppies, nullptr, abc1600_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[2], abc1600_floppies, "525qd", abc1600_state::floppy_formats).enable_sound(true);
 
-	ABCBUS_SLOT(config, m_bus0i, 64_MHz_XTAL / 16, abc1600bus_cards, nullptr);
+	ABCBUS_SLOT(config, m_bus0i, XTAL(64'000'000)/16, abc1600bus_cards, nullptr);
 	m_bus0i->irq_callback().set(m_cio, FUNC(z8536_device::pa7_w));
 	m_bus0i->pren_callback().set(FUNC(abc1600_state::update_pren0));
 	m_bus0i->trrq_callback().set(FUNC(abc1600_state::update_drdy0));
 
-	ABCBUS_SLOT(config, m_bus0x, 64_MHz_XTAL / 16, abc1600bus_cards, nullptr);
-	m_bus0x->irq_callback().set(m_cio, FUNC(z8536_device::pa6_w));
+	ABCBUS_SLOT(config, m_bus0x, XTAL(64'000'000)/16, abc1600bus_cards, nullptr);
+	m_bus0x->irq_callback().set(m_cio, FUNC(z8536_device::pa6_w)).invert();
 	m_bus0x->nmi_callback().set(FUNC(abc1600_state::nmi_w));
-	m_bus0x->xint2_callback().set(m_cio, FUNC(z8536_device::pa2_w));
-	m_bus0x->xint3_callback().set(m_cio, FUNC(z8536_device::pa3_w));
-	m_bus0x->xint4_callback().set(m_cio, FUNC(z8536_device::pa4_w));
-	m_bus0x->xint5_callback().set(m_cio, FUNC(z8536_device::pa5_w));
+	m_bus0x->xint2_callback().set(m_cio, FUNC(z8536_device::pa2_w)).invert();
+	m_bus0x->xint3_callback().set(m_cio, FUNC(z8536_device::pa3_w)).invert();
+	m_bus0x->xint4_callback().set(m_cio, FUNC(z8536_device::pa4_w)).invert();
+	m_bus0x->xint5_callback().set(m_cio, FUNC(z8536_device::pa5_w)).invert();
 	m_bus0x->pren_callback().set(FUNC(abc1600_state::update_pren0));
 	m_bus0x->trrq_callback().set(FUNC(abc1600_state::update_drdy0));
 
-	ABCBUS_SLOT(config, m_bus1, 64_MHz_XTAL / 16, abc1600bus_cards, nullptr);
-	m_bus1->irq_callback().set(m_cio, FUNC(z8536_device::pa1_w));
+	ABCBUS_SLOT(config, m_bus1, XTAL(64'000'000)/16, abc1600bus_cards, nullptr);
+	m_bus1->irq_callback().set(m_cio, FUNC(z8536_device::pa1_w)).invert();
 	m_bus1->pren_callback().set(FUNC(abc1600_state::update_pren1));
 	m_bus1->trrq_callback().set(FUNC(abc1600_state::update_drdy1));
 
-	ABCBUS_SLOT(config, m_bus2, 64_MHz_XTAL / 16, abc1600bus_cards, "4105");
-	m_bus2->irq_callback().set(m_cio, FUNC(z8536_device::pa0_w));
+	ABCBUS_SLOT(config, m_bus2, XTAL(64'000'000)/16, abc1600bus_cards, "4105");
+	m_bus2->irq_callback().set(m_cio, FUNC(z8536_device::pa0_w)).invert();
 	m_bus2->pren_callback().set(m_dma2, FUNC(z80dma_device::iei_w)).exor(1);
 	m_bus2->trrq_callback().set(m_dma2, FUNC(z80dma_device::rdy_w));
 
@@ -1071,8 +1202,10 @@ ROM_START( abc1600 )
 	ROM_LOAD( "1031", 0x71c, 0x144, CRC(0aedc9fc) SHA1(2cbbc7d5cb16b410d296062feb77ed26ff01af24) ) // NS32081 IN ABC1600
 
 	ROM_REGION( 0x20, NMC9306_TAG, 0 )
-	ROM_LOAD( "nmc9306.14c", 0x00, 0x20, CRC(1cb59b6e) SHA1(3c955a667034db86fa1b848f0c0317157a3a48f6) )
+	ROM_LOAD( "nmc9306.14c", 0x00, 0x20, CRC(0edfc912) SHA1(a4d080456d32a6731d8969dd3727fba76cfe252d) )
 ROM_END
+
+} // anonymous namespace
 
 
 
@@ -1081,4 +1214,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME    FLAGS
-COMP( 1985, abc1600, 0,      0,      abc1600, abc1600, abc1600_state, empty_init, "Luxor", "ABC 1600", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, abc1600, 0,      0,      abc1600, abc1600, abc1600_state, empty_init, "Luxor", "ABC 1600", MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

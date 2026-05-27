@@ -23,10 +23,7 @@ public:
 	sega_9h0_0008_iox_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, bool const fixed)
 		: sega_9h0_0008_iox_slot_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<T>(opts), dflt, fixed);
 	}
 	sega_9h0_0008_iox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	virtual ~sega_9h0_0008_iox_slot_device();

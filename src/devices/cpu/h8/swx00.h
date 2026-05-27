@@ -19,8 +19,6 @@
     1     on   effects ram                program rom+ram            QY100 main
     3     off? wave rom                   effects ram                PSR540
 
-
-
 ***************************************************************************/
 
 #ifndef MAME_CPU_H8_SWX00_H
@@ -119,6 +117,7 @@ protected:
 	virtual int trapa_setup() override;
 	virtual void irq_setup() override;
 	virtual void internal_update(u64 current_time) override;
+	using h8_device::internal_update;
 	virtual void notify_standby(int state) override;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;

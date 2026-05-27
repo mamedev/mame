@@ -643,10 +643,7 @@ void coco12_state::t4426(machine_config &config)
 {
 	coco(config);
 
-	m_cococart->option_reset();
-	t4426_cart(*m_cococart);
-	m_cococart->set_default_option("t4426");
-	m_cococart->set_fixed(true); // This cart is fixed so no way to change it
+	m_cococart->set_options(t4426_cart, "t4426", true); // This cart is fixed so no way to change it
 }
 
 void coco12_state::cd6809(machine_config &config)

@@ -83,7 +83,7 @@ void rtpc_kbd_device::device_add_mconfig(machine_config &config)
 	// the speaker is physically present inside the keyboard housing, but it
 	// is wired to and controlled directly by the host; it is not connected to
 	// the keyboard mcu at all
-	SPEAKER(config, "mono").front_left();
+	SPEAKER(config, "mono").front_center();
 	speaker_sound_device &speaker(SPEAKER_SOUND(config, "speaker"));
 	speaker.add_route(ALL_OUTPUTS, "mono", 0.50);
 }

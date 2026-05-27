@@ -391,7 +391,7 @@ void anoworld_state::anoworld(machine_config &config)
 	ctc0.intr_callback().set_inputline("maincpu", 0);
 
 	Z80DMA(config, m_dma, 4_MHz_XTAL);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->out_int_callback().set_inputline("maincpu", 0);
 	m_dma->in_mreq_callback().set(FUNC(anoworld_state::dma_memory_r));
 	m_dma->out_mreq_callback().set(FUNC(anoworld_state::dma_memory_w));

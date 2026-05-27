@@ -118,7 +118,7 @@ void output_manager::register_save()
 
 output_manager::output_item *output_manager::find_item(std::string_view string)
 {
-	auto item = m_itemtable.find(std::string(string));
+	auto item = m_itemtable.find(string);
 	if (item != m_itemtable.end())
 		return &item->second;
 

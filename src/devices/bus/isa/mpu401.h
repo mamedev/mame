@@ -30,6 +30,7 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 private:
 	// called back by the MPU401 core to set the IRQ line state
 	void mpu_irq_out(int state);

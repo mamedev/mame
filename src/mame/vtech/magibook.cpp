@@ -54,7 +54,7 @@ void magibook_state::magibook(machine_config &config)
 
 	// Screenless
 
-	SPEAKER(config, "mono").front_left();
+	SPEAKER(config, "mono").front_center();
 }
 
 // Spanish machine on VTech 6021 hardware, may be different between regions.

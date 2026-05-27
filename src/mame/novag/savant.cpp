@@ -146,13 +146,13 @@ u8 savant_state::nvram_r(offs_t offset)
 
 void savant_state::stall_w(offs_t offset, u8 data)
 {
-	// any access to port C0 puts the Z80 into WAIT, sets BUSRQ, and sets MCU EXT INT
+	// any access to port C0 puts the Z80 into WAIT, sets BUSREQ, and sets MCU EXT INT
 	if (!m_z80_wait)
 	{
 		m_databus = offset >> 8;
 		m_psu->ext_int_w(1);
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
-		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, ASSERT_LINE);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, ASSERT_LINE);
 		m_maincpu->retry_access();
 	}
 
@@ -213,9 +213,9 @@ void savant_state::control_w(u8 data)
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 	}
 
-	// d1: clear Z80 BUSRQ
+	// d1: clear Z80 BUSREQ
 	if (data & ~m_control & 2)
-		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, CLEAR_LINE);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, CLEAR_LINE);
 
 	// d2: return data for Z80
 

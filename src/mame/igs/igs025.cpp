@@ -251,27 +251,28 @@ uint16_t igs025_device::killbld_igs025_prot_r(offs_t offset)
 
 		case 0x05:
 		{
-						switch (m_kb_ptr)
-						{
-						case 1:
-							return 0x3f00 | ((m_kb_game_id >> 0) & 0xff);
+			switch (m_kb_ptr)
+			{
+			case 1:
+				return 0x3f00 | ((m_kb_game_id >> 0) & 0xff);
 
-						case 2:
-							return 0x3f00 | ((m_kb_game_id >> 8) & 0xff);
+			case 2:
+				return 0x3f00 | ((m_kb_game_id >> 8) & 0xff);
 
-						case 3:
-							return 0x3f00 | ((m_kb_game_id >> 16) & 0xff);
+			case 3:
+				return 0x3f00 | ((m_kb_game_id >> 16) & 0xff);
 
-						case 4:
-							return 0x3f00 | ((m_kb_game_id >> 24) & 0xff);
+			case 4:
+				return 0x3f00 | ((m_kb_game_id >> 24) & 0xff);
 
-						default: // >= 5
-							return 0x3f00 | bitswap<8>(m_kb_prot_hold, 5, 2, 9, 7, 10, 13, 12, 15);
-						}
+			default: // >= 5
+				return 0x3f00 | bitswap<8>(m_kb_prot_hold, 5, 2, 9, 7, 10, 13, 12, 15);
+			}
 		}
 
 		case 0x40:
-			killbld_protection_calculate_hilo();
+			if (!machine().side_effects_disabled())
+				killbld_protection_calculate_hilo();
 			return 0; // Read and then discarded
 
 			//  default:
@@ -298,7 +299,7 @@ uint16_t igs025_device::killbld_igs025_prot_r(offs_t offset)
 
 void igs025_device::killbld_protection_calculate_hold(int y, int z)
 {
-	unsigned short old = m_kb_prot_hold;
+	uint16_t old = m_kb_prot_hold;
 
 	m_kb_prot_hold = ((old << 1) | (old >> 15));
 
@@ -315,15 +316,13 @@ void igs025_device::killbld_protection_calculate_hold(int y, int z)
 
 void igs025_device::killbld_protection_calculate_hilo()
 {
-	uint8_t source;
-
 	m_kb_prot_hilo_select++;
 
 	if (m_kb_prot_hilo_select > 0xeb) {
 		m_kb_prot_hilo_select = 0;
 	}
 
-	source = m_kb_source_data[m_kb_region][m_kb_prot_hilo_select];
+	uint8_t source = m_kb_source_data[m_kb_region][m_kb_prot_hilo_select];
 
 	if (m_kb_prot_hilo_select & 1)
 	{

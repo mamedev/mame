@@ -14,14 +14,12 @@
 #include "corestr.h"
 #include "osdcore.h"
 
-#include <locale>
-#include <string>
-
 #include <cassert>
 #include <cctype>
-#include <cstdarg>
 #include <cstdlib>
+#include <locale>
 #include <sstream>
+#include <unordered_set>
 
 
 const int core_options::MAX_UNADORNED_OPTIONS;
@@ -162,6 +160,76 @@ const char *core_options::entry::value_unsubstituted() const noexcept
 
 
 //-------------------------------------------------
+//  entry::int_value
+//-------------------------------------------------
+
+int core_options::entry::int_value() const
+{
+	char const *const data = value();
+	if (!data)
+		return 0;
+	std::istringstream str(data);
+	str.imbue(std::locale::classic());
+	int ival;
+	if (str >> ival)
+		return ival;
+	else
+		return 0;
+}
+
+
+//-------------------------------------------------
+//  entry::float_value
+//-------------------------------------------------
+
+float core_options::entry::float_value() const
+{
+	char const *const data = value();
+	if (!data)
+		return 0.0F;
+	std::istringstream str(data);
+	str.imbue(std::locale::classic());
+	float fval;
+	if (str >> fval)
+		return fval;
+	else
+		return 0.0F;
+}
+
+
+//-------------------------------------------------
+//  entry::int_default_value
+//-------------------------------------------------
+
+int core_options::entry::int_default_value() const
+{
+	std::istringstream str(default_value());
+	str.imbue(std::locale::classic());
+	int ival;
+	if (str >> ival)
+		return ival;
+	else
+		return 0;
+}
+
+
+//-------------------------------------------------
+//  entry::float_default_value
+//-------------------------------------------------
+
+float core_options::entry::float_default_value() const
+{
+	std::istringstream str(default_value());
+	str.imbue(std::locale::classic());
+	float fval;
+	if (str >> fval)
+		return fval;
+	else
+		return 0.0F;
+}
+
+
+//-------------------------------------------------
 //  entry::copy_from
 //-------------------------------------------------
 
@@ -208,6 +276,16 @@ void core_options::entry::set_value(std::string &&newvalue, int priority_value, 
 	}
 }
 
+void core_options::entry::set_value(int value, int priority)
+{
+	set_value(util::string_format(std::locale::classic(), "%d", value), priority, false, false);
+}
+
+void core_options::entry::set_value(float value, int priority)
+{
+	set_value(util::string_format(std::locale::classic(), "%f", value), priority, false, false);
+}
+
 
 //-------------------------------------------------
 //  entry::set_default_value
@@ -247,9 +325,10 @@ bool core_options::entry::internal_copy_value(const entry &that)
 //  entry::validate
 //-------------------------------------------------
 
-void core_options::entry::validate(const std::string &data)
+void core_options::entry::validate(std::string_view data)
 {
-	std::istringstream str(data);
+	std::istringstream str;
+	str.str(std::string(data));
 	str.imbue(std::locale::classic());
 
 	switch (type())
@@ -899,6 +978,7 @@ void core_options::parse_command_line(const std::vector<std::string> &args, int 
 
 void core_options::parse_ini_file(util::core_file &inifile, int priority, bool ignore_unknown_options, bool always_override)
 {
+	std::unordered_set<entry *> entries_set;
 	std::ostringstream error_stream;
 	condition_type condition = condition_type::NONE;
 
@@ -957,8 +1037,37 @@ void core_options::parse_ini_file(util::core_file &inifile, int priority, bool i
 			continue;
 		}
 
-		// set the new data
-		do_set_value(*curentry, trim_spaces_and_quotes(optiondata), priority, error_stream, condition, true);
+		// ensure INI files found earlier in the path have priority
+		std::string_view const trimmed = trim_spaces_and_quotes(optiondata);
+		if (entries_set.find(curentry.get()) != entries_set.end())
+		{
+			do_set_value(*curentry, trimmed, priority, error_stream, condition, true);
+		}
+		if (curentry->priority() < priority)
+		{
+			do_set_value(*curentry, trimmed, priority, error_stream, condition, true);
+			entries_set.emplace(curentry.get());
+		}
+		else
+		{
+			// just validate if the entry already has the same or higher priority and we didn't set it
+			try
+			{
+				curentry->validate(trimmed);
+			}
+			catch (options_warning_exception const &ex)
+			{
+				// we want to aggregate option exceptions
+				error_stream << ex.message();
+				condition = std::max(condition, condition_type::WARN);
+			}
+			catch (options_error_exception const &ex)
+			{
+				// we want to aggregate option exceptions
+				error_stream << ex.message();
+				condition = std::max(condition, condition_type::ERR);
+			}
+		}
 	}
 
 	// did we have any errors that may need to be aggregated?
@@ -1134,16 +1243,8 @@ const char *core_options::description(std::string_view option) const noexcept
 
 int core_options::int_value(std::string_view option) const
 {
-	char const *const data = value(option);
-	if (!data)
-		return 0;
-	std::istringstream str(data);
-	str.imbue(std::locale::classic());
-	int ival;
-	if (str >> ival)
-		return ival;
-	else
-		return 0;
+	auto const entry = get_entry(option);
+	return entry ? entry->int_value() : 0;
 }
 
 
@@ -1153,16 +1254,8 @@ int core_options::int_value(std::string_view option) const
 
 float core_options::float_value(std::string_view option) const
 {
-	char const *const data = value(option);
-	if (!data)
-		return 0.0f;
-	std::istringstream str(data);
-	str.imbue(std::locale::classic());
-	float fval;
-	if (str >> fval)
-		return fval;
-	else
-		return 0.0f;
+	auto const entry = get_entry(option);
+	return entry ? entry->float_value() : 0.0F;
 }
 
 
@@ -1187,18 +1280,22 @@ void core_options::set_value(std::string_view name, const char *value, int prior
 void core_options::set_value(std::string_view name, std::string &&value, int priority)
 {
 	auto entry = get_entry(name);
-	assert(entry != nullptr);
+	assert(entry);
 	entry->set_value(std::move(value), priority, false, false);
 }
 
 void core_options::set_value(std::string_view name, int value, int priority)
 {
-	set_value(name, util::string_format("%d", value), priority);
+	auto entry = get_entry(name);
+	assert(entry);
+	entry->set_value(value, priority);
 }
 
 void core_options::set_value(std::string_view name, float value, int priority)
 {
-	set_value(name, util::string_format("%f", value), priority);
+	auto entry = get_entry(name);
+	assert(entry);
+	entry->set_value(value, priority);
 }
 
 
@@ -1237,13 +1334,13 @@ void core_options::do_set_value(entry &curentry, std::string_view data, int prio
 	{
 		curentry.set_value(std::string(data), priority, false, perform_substitutions);
 	}
-	catch (options_warning_exception &ex)
+	catch (options_warning_exception const &ex)
 	{
 		// we want to aggregate option exceptions
 		error_stream << ex.message();
 		condition = std::max(condition, condition_type::WARN);
 	}
-	catch (options_error_exception &ex)
+	catch (options_error_exception const &ex)
 	{
 		// we want to aggregate option exceptions
 		error_stream << ex.message();

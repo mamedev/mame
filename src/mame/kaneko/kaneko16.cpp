@@ -49,6 +49,12 @@ Note: Decapping shows the CALC3 MCU to be a NEC uPD78322 series MCU with 16K int
 
 To Do:
 
+[blazeon, wingforc]
+- Hardware has 2 sprite hardware for swapping sprite otuput buffer?
+
+[bonkadv]
+- Needs to verify sprite/background offset and/or screen resolution?
+
 [gtmr]
 - Stage 4: The layers' scrolling is very jerky for a couple of seconds
   in the middle of this level (probably interrupt related)
@@ -115,12 +121,12 @@ Non-Bugs (happen on real PCB)
 
 MACHINE_RESET_MEMBER(kaneko16_state,gtmr)
 {
-	m_VIEW2_2_pri = 1;
+	m_view2_2_pri = 1;
 }
 
 MACHINE_RESET_MEMBER(kaneko16_state,mgcrystl)
 {
-	m_VIEW2_2_pri = 0;
+	m_view2_2_pri = 0;
 }
 
 
@@ -176,8 +182,10 @@ void kaneko16_state::ym2149_w(offs_t offset, u16 data, u16 mem_mask)
 	/* Each 2149 register is mapped to a different address */
 	m_ym2149[Chip]->address_w(offset);
 	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_BITS_0_7) m_ym2149[Chip]->data_w( data       & 0xff);
-	else                m_ym2149[Chip]->data_w((data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7)
+		m_ym2149[Chip]->data_w( data       & 0xff);
+	else
+		m_ym2149[Chip]->data_w((data >> 8) & 0xff);
 }
 
 template<unsigned Mask>
@@ -505,7 +513,8 @@ u16 kaneko16_gtmr_state::gtmr2_wheel_r()
 		case 0x0800:    // 360' Wheel
 			return  (m_wheel_port[2]->read() << 8);
 		default:
-			logerror("gtmr2_wheel_r : read at %06x with joystick\n", m_maincpu->pc());
+			if (!machine().side_effects_disabled())
+				logerror("%s: gtmr2_wheel_r : read at %06x with joystick\n", machine().describe_context(), m_maincpu->pc());
 			return  (~0);
 	}
 }
@@ -657,9 +666,8 @@ void kaneko16_blazeon_state::blazeon_soundport(address_map &map)
 void kaneko16_blazeon_state::wingforc_soundport(address_map &map)
 {
 	map.global_mask(0xff);
+	blazeon_soundport(map);
 //  map(0x00, 0x00) // 02 written at boot
-	map(0x02, 0x03).rw(m_ymsnd, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x0a, 0x0a).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0c, 0x0c).w(FUNC(kaneko16_blazeon_state::oki_bank0_w<0x3>));
 }
@@ -2771,6 +2779,15 @@ ROM_START( blazeon )
 
 	ROM_REGION( 0x100000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "bz_bg.u2", 0x000000, 0x100000, CRC(fc67f19f) SHA1(f5d9e037a736b0932efbfb48587de08bec93df5d) )
+
+	ROM_REGION( 0xf00, "plds", ROMREGION_ERASE00 ) // all brute-forced
+	ROM_LOAD( "peel18cv8.u37", 0x000, 0x155, CRC(f79332f9) SHA1(64a1f20d034ca9b16907af3ff16f1cb8b3f2372f) )
+	ROM_LOAD( "gal22v10.u38",  0x200, 0x2e5, CRC(115012a0) SHA1(316a1c35215b48cc50d2e61f61b48fd787937eee) )
+	ROM_LOAD( "peel18cv8.u66", 0x500, 0x155, CRC(7e53ea83) SHA1(67a32b1908817a891cacbdee5ed47645e82e4247) )
+	ROM_LOAD( "peel18cv8.u76", 0x700, 0x155, CRC(eb390e91) SHA1(4cae39ad07e3eebec3dab72609dda1d2d9942b45) )
+	ROM_LOAD( "peel18cv8.u77", 0x900, 0x155, CRC(5c0a5843) SHA1(9fb1f2bda8cec113ceaddb7b2fae30f913c33c3d) )
+	ROM_LOAD( "peel18cv8.u78", 0xb00, 0x155, CRC(f2cec7c6) SHA1(024de04e10739d8d4bf91e64bdcd428df9779698) )
+	ROM_LOAD( "peel18cv8.u79", 0xd00, 0x155, CRC(9d7ce11d) SHA1(031a0cd5d73b5bb1feea3fad0db0478db639eda1) )
 ROM_END
 
 ROM_START( blazeonj )
@@ -4509,8 +4526,8 @@ GAME( 1992, explbrkrk,  explbrkr, bakubrkr, bakubrkr,  kaneko16_state,          
 GAME( 1992, bakubrkr,   explbrkr, bakubrkr, bakubrkr,  kaneko16_state,          init_bakubrkr, ROT90, "Kaneko", "Bakuretsu Breaker (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, wingforc,   0,        wingforc, wingforc,  kaneko16_blazeon_state,  init_bakubrkr, ROT270,"A.I (Atlus license)",  "Wing Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, bonkadv,    0,        bonkadv,  bonkadv,   kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bonkadva,   bonkadv,  bonkadv,  bonkadv,   kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Bonk's Adventure (prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // shows an upside down KO! sprite, probably cause of check failing. Playable apart from that
+GAME( 1994, bonkadv,    0,        bonkadv,  bonkadv,   kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko (Hudson Soft / Red license)", "B.C. Kid (Europe) / Bonk's Adventure: Arcade Version (US, China, Korea) / Kyukyoku!! PC Genjin: Special Arcade Version (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bonkadva,   bonkadv,  bonkadv,  bonkadv,   kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko (Hudson Soft / Red license)", "Bonk's Adventure: Arcade Version (prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // shows an upside down KO! sprite, probably cause of check failing. Playable apart from that
 GAME( 1994, bloodwar,   0,        bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Blood Warrior", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, oedfight,   bloodwar, bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan, Bloodshed version)", MACHINE_SUPPORTS_SAVE ) // shows blood effects like Blood Warrior version
 GAME( 1994, oedfighta,  bloodwar, bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan, Bloodless version)", MACHINE_SUPPORTS_SAVE ) // shows no blood effects

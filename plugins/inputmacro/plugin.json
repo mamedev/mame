@@ -2,7 +2,7 @@
 	"plugin": {
 		"name": "inputmacro",
 		"description": "Input macro plugin",
-		"version": "0.0.1",
+		"version": "0.0.2",
 		"author": "Vas Crabb",
 		"type": "plugin",
 		"start": "false"

@@ -99,9 +99,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_dasp(*this, "dasp"),
-		m_ncr53cf96(*this, "scsi:7:ncr53cf96"),
+		m_ncr53cf96(*this, "ncr53cf96"),
 		m_k056800(*this, "k056800"),
-		m_pcmram(*this, "pcmram")
+		m_pcmram(*this, "pcmram"),
+		m_duart(*this, "duart")
 	{
 	}
 
@@ -118,6 +119,7 @@ private:
 	required_device<ncr53cf96_device> m_ncr53cf96;
 	required_device<k056800_device> m_k056800;
 	required_shared_ptr<uint8_t> m_pcmram;
+	required_device<mb89371_device> m_duart;
 
 	uint8_t m_sound_ctrl = 0;
 	uint8_t m_sound_intck = 0;
@@ -201,7 +203,8 @@ void konamigq_state::konamigq_map(address_map &map)
 	map(0x1f230004, 0x1f230007).portr("P3_SERVICE");
 	map(0x1f238000, 0x1f238003).portr("DSW");
 	map(0x1f300000, 0x1f5fffff).rw(FUNC(konamigq_state::pcmram_r), FUNC(konamigq_state::pcmram_w)).umask32(0x00ff00ff);
-	map(0x1f680000, 0x1f68001f).rw("mb89371", FUNC(mb89371_device::read), FUNC(mb89371_device::write)).umask32(0x00ff00ff);
+	map(0x1f680000, 0x1f680007).rw(m_duart, FUNC(mb89371_device::read<0>), FUNC(mb89371_device::write<0>)).umask32(0x00ff00ff);
+	map(0x1f680008, 0x1f68000f).rw(m_duart, FUNC(mb89371_device::read<1>), FUNC(mb89371_device::write<1>)).umask32(0x00ff00ff);
 	map(0x1f780000, 0x1f780003).nopw(); /* watchdog? */
 }
 
@@ -339,6 +342,8 @@ void konamigq_state::machine_reset()
 	m_dma_offset = 0;
 	m_dma_size = 0;
 	m_dma_requested = m_dma_is_write = false;
+
+	m_duart->write_cts<0>(CLEAR_LINE);
 }
 
 void konamigq_state::konamigq(machine_config &config)
@@ -357,19 +362,18 @@ void konamigq_state::konamigq(machine_config &config)
 	m_dasp->set_addrmap(AS_DATA, &konamigq_state::konamigq_dasp_map);
 	m_dasp->set_periodic_int(FUNC(konamigq_state::tms_sync), attotime::from_hz(48000));
 
-	MB89371(config, "mb89371", 0);
+	MB89371(config, m_duart, 4_MHz_XTAL);
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_data(konamigq_def_eeprom, 128);
 
-	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0").option_set("harddisk", NSCSI_HARDDISK);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53cf96", NCR53CF96).clock(32_MHz_XTAL/2).machine_config(
-			[this] (device_t *device)
-			{
-				ncr53cf96_device &adapter = downcast<ncr53cf96_device &>(*device);
-				adapter.irq_handler_cb().set(":maincpu:irq", FUNC(psxirq_device::intin10));
-				adapter.drq_handler_cb().set(*this, FUNC(konamigq_state::scsi_drq));
-			});
+	auto &scsi(NSCSI_BUS(config, "scsi"));
+	auto &hd(NSCSI_HARDDISK(config, "harddisk"));
+	scsi.set_external_device(0, hd);
+
+	NCR53CF96(config, m_ncr53cf96, 32_MHz_XTAL/2);
+	scsi.set_external_device(7, m_ncr53cf96);
+	m_ncr53cf96->irq_handler_cb().set(":maincpu:irq", FUNC(psxirq_device::intin10));
+	m_ncr53cf96->drq_handler_cb().set(DEVICE_SELF, FUNC(konamigq_state::scsi_drq));
 
 	/* video hardware */
 	CXD8538Q(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
@@ -488,7 +492,7 @@ ROM_START( cryptklr )
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) /* bios */
 	ROM_LOAD( "420b03.27p",   0x0000000, 0x080000, CRC(aab391b1) SHA1(bf9dc7c0c8168c22a4be266fe6a66d3738df916b) )
 
-	DISK_REGION( "scsi:0:harddisk" )
+	DISK_REGION( "harddisk" )
 	DISK_IMAGE( "420uaa04", 0, SHA1(67cb1418fc0de2a89fc61847dc9efb9f1bebb347) )
 ROM_END
 

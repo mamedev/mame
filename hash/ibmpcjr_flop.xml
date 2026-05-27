@@ -163,4 +163,16 @@ Has voice sample pitch issues
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- Demos -->
+	<software name="64kought" supported="yes">
+		<description>64K RAM Ought to be Enough</description>
+		<year>2018</year>
+		<publisher>Pungas de Villa Martelli</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="64kought.360" size="368640" crc="a3626639" sha1="af7d49799e2ae56cc96761c5d588b37158f4f5ec"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

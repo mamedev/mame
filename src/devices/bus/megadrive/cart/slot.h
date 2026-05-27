@@ -21,10 +21,7 @@ public:
 	megadrive_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, T &&opts, char const *dflt)
 		: megadrive_cart_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	megadrive_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual ~megadrive_cart_slot_device();
@@ -45,6 +42,12 @@ public:
 
 	void install_cart_mem();
 
+	// from slot to host
+	auto vres_cb() { return m_vres_cb.bind(); }
+
+	// from cart to slot
+	void vres_w(int state) { m_vres_cb(state); }
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
@@ -64,6 +67,8 @@ private:
 
 	std::error_condition load_swlist();
 	std::error_condition load_loose(util::random_read &file);
+
+	devcb_write_line m_vres_cb;
 };
 
 class device_megadrive_cart_interface : public device_interface

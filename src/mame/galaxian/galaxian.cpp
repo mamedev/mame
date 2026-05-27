@@ -10918,6 +10918,22 @@ ROM_START( tdpgal )
 	ROM_LOAD( "bprom.bin",       0x0000, 0x0020, CRC(2b4cf53f) SHA1(8d7eb0453173b9821eea32419b67559bfb4578d0) )
 ROM_END
 
+ROM_START( tdpgala )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "g8", 0x0000, 0x0800, CRC(7be819fe) SHA1(ab5a332914546692f9976e243daf3040f0d9952e) ) // matches tdpgal
+	ROM_LOAD( "f8", 0x0800, 0x0800, CRC(d6641a10) SHA1(d576eda7c47b3e0eba9fadbff9266b095daf4be3) )
+	ROM_LOAD( "e8", 0x1000, 0x0800, CRC(e6c85dca) SHA1(159cd711f012d29ed80007eeb9ab18fd8d943069) )
+	ROM_LOAD( "d8", 0x1800, 0x0800, CRC(a7dfcfe7) SHA1(75fc517bf4dd36f67c11fb5bc9ed7d48ed626ea5) )
+	ROM_LOAD( "c8", 0x2000, 0x1000, CRC(01484c16) SHA1(ea55578c330a40b0881f7b5eeeffb24b7bbb9741) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "j1", 0x0000, 0x0800, CRC(39eec13f) SHA1(5cd8045eaded0008a5aaec555c3841fd0f29b2a8) )
+	ROM_LOAD( "k1", 0x0800, 0x0800, CRC(3113bcfd) SHA1(e2792e5fe7d7f27bb329e3104dee3ca29d72ef48) ) // matches tdpgal
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "74s472.gg", 0x0000, 0x0020, CRC(2b4cf53f) SHA1(8d7eb0453173b9821eea32419b67559bfb4578d0) ) // matches tdpgal
+ROM_END
+
 ROM_START( kamakazi3 ) // Hack of Video Games (UK) Ltd. version???? flyer spells it Kamakaze III, also no year or (c)
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "f_r_a.bin",    0x0000, 0x0800, CRC(e8f3aa67) SHA1(a0e9576784dbe602dd9780e667f01f31defd7c00) )
@@ -11730,6 +11746,31 @@ ROM_START( pacmanblci ) // Cirsa bootleg (not Artic Multi-System)
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "sn74s288n.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
+/* Cocamatic bootleg on Videogame Electrogame PCB, not Artic Multi-System.
+   Game on real hardware, for colors reference: https://youtube.com/shorts/tU5qrcJb0Lg  */
+ROM_START( pacmanblco )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "co01.bin",  0x0000, 0x0800, CRC(6718df42) SHA1(ee15c3f583d381fba4878f824f83d04479a0cee5) )
+	ROM_LOAD( "co02.bin",  0x0800, 0x0800, CRC(3954e41c) SHA1(4b3f838d55ab4b5b93e1bcb26b3661f090a9124f) )
+	ROM_LOAD( "co03.bin",  0x1000, 0x0800, CRC(f98c0ceb) SHA1(4faf8b2fb3f109d1196a9ea256328485074a31b9) )
+	ROM_LOAD( "co04.bin",  0x1800, 0x0800, BAD_DUMP CRC(a9cd0082) SHA1(f44ff1ad15d5ee3096f8f44f9c605f32ae2737d9) ) // ROM didn't read correctly, taken from pacmanbl for now
+	ROM_LOAD( "co05.bin",  0x2000, 0x0800, CRC(6d475afc) SHA1(4fe6bde352c7dd9572fefaae4b59640b4f4eb8ba) )
+	ROM_LOAD( "co06.bin",  0x2800, 0x0800, CRC(cbe863d3) SHA1(97a2ffa6ab33e6061c664dcd1ee57c86a456782f) )
+	ROM_LOAD( "co07.bin",  0x3000, 0x0800, CRC(9b6ee47a) SHA1(a8d74433e92b4e8a6350c7387147474a582850f6) )
+	//                     0x3800, 0x0800 not populated
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "co10.bin",  0x0000, 0x0800, CRC(b2ed320b) SHA1(680a6fdcb65cc2d88d10bc85e0b2628f43375c5c) )
+	ROM_LOAD( "co09.bin",  0x0800, 0x0800, CRC(ab88b2c4) SHA1(d0c829ea8021eae81a2b82d36c35ad8258b115e0) )
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "co11.bin",  0x0000, 0x0800, CRC(44a45b72) SHA1(8abd0684a01d6c23ef5cf5f0765458f982316acf) )
+	ROM_LOAD( "co12.bin",  0x0800, 0x0800, CRC(fa84659f) SHA1(20c212723f9062f052539190dfe3fc41577543eb) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "cocamatic_prom.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( komemokos ) // Hack of the Cirsa bootleg (pacmanblci) titled Komemokos (not Artic Multi-System)
@@ -16560,7 +16601,7 @@ ROM_START( jungsub )
 
 	/* There is twice as much GFX data here as an original 'Jungler'
 
-	   This appears to be because the Rally X / Jungler hardware supports both X and Y tile flipping, a feature
+	   This appears to be because the Rally-X / Jungler hardware supports both X and Y tile flipping, a feature
 	   which Jungler needs.  Galaxian / Scramble hardware does not support tile flipping.
 
 	   Adding flipped copies of all the tiles would require 4x ROM capacity (normal, Flip X, Flip Y, Flip XY)
@@ -16838,7 +16879,8 @@ GAME( 1981, redufob,     redufo,   galaxian,   redufob,    galaxian_state, init_
 GAME( 1981, redufob2,    redufo,   galaxian,   redufob,    galaxian_state, init_nolock,     ROT90,  "bootleg",                         "Defend the Terra Attack on the Red UFO (bootleg, set 2)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, redufob3,    redufo,   galaxian,   redufob3,   galaxian_state, init_nolock,     ROT90,  "bootleg",                         "Defend the Terra Attack on the Red UFO (bootleg, set 3)",             MACHINE_SUPPORTS_SAVE )
 GAME( 19??, exodus,      redufo,   galaxian,   redufo,     galaxian_state, init_nolock,     ROT90,  "bootleg? (Subelectro)",           "Exodus (bootleg?)",                                                   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tdpgal,      0,        galaxian,   tdpgal,     galaxian_state, init_nolock,     ROT90,  "Design Labs / Thomas Automatics", "Triple Draw Poker",                                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tdpgal,      0,        galaxian,   tdpgal,     galaxian_state, init_nolock,     ROT90,  "Design Labs / Thomas Automatics", "Triple Draw Poker (Design Labs / Thomas Automatics)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1984, tdpgala,     tdpgal,   galaxian,   tdpgal,     galaxian_state, init_nolock,     ROT90,  "Video Village",                   "Triple Draw Poker (Video Village)",                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1979, kamakazi3,   galaxian, galaxian,   superg,     galaxian_state, init_nolock,     ROT90,  "hack",                            "Kamakazi III (hack of 'Super Galaxians')",                            MACHINE_SUPPORTS_SAVE ) // Hack of a hack (superg)
 GAME( 1979, spacian2,    galaxian, galaxian,   superg,     galaxian_state, init_nolock,     ROT90,  "Namco / Taito",                   "T.T Spacian Part-2",                                                  MACHINE_SUPPORTS_SAVE ) // endorsed by Namco, or bootleg?
 
@@ -16874,6 +16916,7 @@ GAME( 1981, pacmanbla,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_
 GAME( 1981, pacmanblb,   puckman,  pacmanbl,   pacmanblb,  galaxian_state, init_pacmanbl,   ROT90,  "bootleg",                      "Pac-Man (bootleg on Moon Alien 'AL-10A1' hardware)",                MACHINE_SUPPORTS_SAVE ) // Doesn't have separate tile / sprite roms, probably should move it
 GAME( 1981, pacmanblc,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Calfesa)",            "Pac-Man (Calfesa, Spanish bootleg on Galaxian hardware)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )  // same PROM as Moon Cresta, gives very strange colors and sprites get cut
 GAME( 1981, pacmanblci,  puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Cirsa)",              "Pac-Man (Cirsa, Spanish bootleg on Galaxian hardware)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pacmanblco,  puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Cocamatic)",          "Pac-Man (Cocamatic, Spanish bootleg on Galaxian hardware)",         MACHINE_SUPPORTS_SAVE )
 GAME( 199?, komemokos,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "hack",                         "Komemokos (hack of 'Pac-Man (Cirsa, Spanish bootleg)')",            MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pacmanblv,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Video Dens)",         "Pac-Man (Video Dens, Spanish bootleg on Galaxian hardware, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pacmanblva,  puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Video Dens)",         "Pac-Man (Video Dens, Spanish bootleg on Galaxian hardware, set 2)", MACHINE_SUPPORTS_SAVE )

@@ -72,7 +72,7 @@ void ds9_format::find_size(util::random_read &io, uint8_t &track_count, uint8_t 
 	uint32_t const expected_size = 256 * track_count * head_count * sector_count;
 
 	uint64_t size;
-	if (!io.length(size) && (size >= expected_size)) // standard format has 860160 bytes
+	if (!io.length(size) && (size == expected_size)) // standard format has 860160 bytes
 		return;
 
 	track_count = head_count = sector_count = 0;

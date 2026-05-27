@@ -98,7 +98,7 @@ void m3745x_device::device_reset()
 {
 	m740_device::device_reset();
 
-	SP = 0x01ff;    // we have the "traditional" stack in page 1, not 0 like some M740 derivatives
+	m_SP = 0x01ff;    // we have the "traditional" stack in page 1, not 0 like some M740 derivatives
 
 	for (auto & elem : m_timers)
 	{
@@ -175,7 +175,7 @@ void m3745x_device::recalc_irqs()
 	all_ints = (m_intreq1 & m_intctrl1) << 8;
 	all_ints |= (m_intreq2 & m_intctrl2);
 
-//  printf("recalc_irqs: last_all_ints = %04x last_ints = %04x (req1 %02x ctrl1 %02x req2 %02x ctrl2 %02x)\n", all_ints, m_last_all_ints, m_intreq1, m_intctrl1, m_intreq2, m_intctrl2);
+	//printf("recalc_irqs: last_all_ints = %04x last_ints = %04x (req1 %02x ctrl1 %02x req2 %02x ctrl2 %02x)\n", all_ints, m_last_all_ints, m_intreq1, m_intctrl1, m_intreq2, m_intctrl2);
 
 	// check all 16 IRQ bits for changes
 	for (int i = 0; i < 16; i++)
@@ -186,19 +186,19 @@ void m3745x_device::recalc_irqs()
 			// and wasn't last time
 			if (!(m_last_all_ints & (1 << i)))
 			{
-//              printf("    asserting irq %d (%d)\n", i, irq_lines[i]);
+				//printf("    asserting irq %d (%d)\n", i, irq_lines[i]);
 				if (irq_lines[i] != -1)
 				{
 					m740_device::execute_set_input(irq_lines[i], ASSERT_LINE);
 				}
 			}
 		}
-		else    // bit is clear now
+		else // bit is clear now
 		{
 			// ...and wasn't clear last time
 			if (m_last_all_ints & (1 << i))
 			{
-//              printf("    clearing irq %d (%d)\n", i, irq_lines[i]);
+				//printf("    clearing irq %d (%d)\n", i, irq_lines[i]);
 				if (irq_lines[i] != -1)
 				{
 					m740_device::execute_set_input(irq_lines[i], CLEAR_LINE);

@@ -589,7 +589,9 @@ void ppu_vt32_device::m_newvid_1d_w(u8 data) { logerror("%s: m_newvid_1d_w %02x\
 
 void ppu_vt32_device::draw_background(u8 *line_priority)
 {
-	if ((get_newvid_1c() == 0x2e) || (get_newvid_1c() == 0x0a))
+	// fingerd also uses 6d for the first song, which doesn't work with this code
+	// maybe changes how extended attribute is used?
+	if ((get_newvid_1c() == 0x2e) || (get_newvid_1c() == 0x0a) || (get_newvid_1c() == 0x6e))
 	{
 		// strange custom mode, feels more like a vt369 mode
 		// tiles use 16x16x8 packed data
@@ -746,8 +748,9 @@ void ppu_vt3xx_device::lcdc_regs_w(offs_t offset, u8 data)
 	static const vid_mode mode_table[] = {
 		// configurations used for lower resolution output
 		{ 0, 159, 0, 127, { 0xa0, 0xff, 0x00, 0x40, 0xff, 0x04, 0x00, 0xa8, 0x04, 0x0f }, },
-		{ 0, 199, 0, 199, { 0xdc, 0xff, 0x00, 0x58, 0xff, 0x04, 0x10, 0xa8, 0x04, 0x00 }, },  // hkb502 menu, uncertain dimensions
-		{ 0, 127, 0, 159, { 0x80, 0x80, 0x00, 0x50, 0xff, 0x04, 0x00, 0xaa, 0x08, 0x00 }, },  // lexi30 menu
+		{ 0, 199, 0, 199, { 0xdc, 0xff, 0x00, 0x58, 0xff, 0x04, 0x10, 0xa8, 0x04, 0x00 }, }, // hkb502 menu, uncertain dimensions
+		{ 0, 127, 0, 159, { 0x80, 0x80, 0x00, 0x50, 0xff, 0x04, 0x00, 0xaa, 0x08, 0x00 }, }, // lexi30 menu
+		{ 0, 127, 0, 159, { 0x80, 0xff, 0x00, 0x50, 0xff, 0x04, 0x00, 0xa6, 0x04, 0x00 }, }, // jl1810gr
 		{ 0, 127, 0, 159, { 0x80, 0x3f, 0x00, 0x50, 0xff, 0x69, 0x00, 0x54, 0x08, 0x00 }, }, // gcs2mgp
 
 		// lxcypkdp uses this on the menus, they must rotate the rendering somehow as this is vertical and the games are horizontal!

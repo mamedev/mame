@@ -151,7 +151,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="krestnoa">
-		<description>KRESTNO (Alt)</description>
+		<description>KRESTNO (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
@@ -261,7 +261,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pacmana" cloneof="pacman">
-		<description>PACMAN (Alt)</description>
+		<description>PACMAN (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
@@ -327,7 +327,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pitona" cloneof="piton">
-		<description>PITON (Alt)</description>
+		<description>PITON (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
@@ -525,7 +525,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tennisa" cloneof="tennis">
-		<description>TENNIS (Alt)</description>
+		<description>TENNIS (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">

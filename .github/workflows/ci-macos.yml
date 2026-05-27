@@ -29,7 +29,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Install dependencies
-      run: brew install python3 sdl2
+      run: brew install python3 sdl3
     - name: Build
       env:
         USE_LIBSDL: 1

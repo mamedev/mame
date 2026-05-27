@@ -3074,7 +3074,7 @@ void S3C24_CLASS_NAME::s3c24xx_cam_w(offs_t offset, uint32_t data, uint32_t mem_
 
 #endif
 
-/* AC97 Interface */
+/* AC'97 Interface */
 
 #if defined(DEVICE_S3C2440)
 

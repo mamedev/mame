@@ -33,8 +33,8 @@ DEFINE_DEVICE_TYPE(RIVA128ZX, riva128zx_device, "riva128zx", "SGS-Thompson/nVidi
 
 riva128_device::riva128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_card_device(mconfig, type, tag, owner, clock)
-	, m_svga(*this, "svga")
-	, m_vga_rom(*this, "vga_rom")
+	, m_vga(*this, "vga")
+	, m_bios(*this, "bios")
 {
 	// device ID 0x12d2 SGS-Thompson/nVidia joint venture
 	// 0x0018 RIVA 128 (NV3)
@@ -49,7 +49,7 @@ riva128_device::riva128_device(const machine_config &mconfig, const char *tag, d
 }
 
 ROM_START( riva128 )
-	ROM_REGION32_LE( 0x8000, "vga_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x8000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "diamond", "Diamond Viper V330 1.62-CO 01/14/98" )
 	ROMX_LOAD( "diamond_v330_rev-e.vbi", 0x0000, 0x8000, CRC(68686ddc) SHA1(cd2e299acd79624c7d82ce3317004c96bd4e36f7), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "asus", "ASUS AGP/3DP-V3000 1.51B 09/06/97" )
@@ -67,13 +67,13 @@ void riva128_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update(m_svga, FUNC(nvidia_nv3_vga_device::screen_update));
+	screen.set_screen_update(m_vga, FUNC(nvidia_nv3_vga_device::screen_update));
 
-	NVIDIA_NV3_VGA(config, m_svga, 0);
-	m_svga->set_screen("screen");
+	NVIDIA_NV3_VGA(config, m_vga, 0);
+	m_vga->set_screen("screen");
 	// FIXME: shared RAM
 	// reports as 4MB in AIDA16
-	m_svga->set_vram_size(4*1024*1024);
+	m_vga->set_vram_size(4*1024*1024);
 }
 
 void riva128_device::device_start()
@@ -86,7 +86,7 @@ void riva128_device::device_start()
 	add_map(0x100, M_IO, FUNC(riva128_device::indirect_io_map));
 	// TODO: Windows 98 expects an extra range mapped at 0x10000000-0x10007fff
 
-	add_rom((u8 *)m_vga_rom->base(), 0x8000);
+	add_rom((u8 *)m_bios->base(), 0x8000);
 	expansion_rom_base = 0xc0000;
 
 	// INTA#
@@ -194,17 +194,17 @@ void riva128_device::legacy_memory_map(address_map &map)
 
 void riva128_device::legacy_io_map(address_map &map)
 {
-	map(0, 0x02f).m(m_svga, FUNC(nvidia_nv3_vga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(nvidia_nv3_vga_device::io_map));
 }
 
 uint8_t riva128_device::vram_r(offs_t offset)
 {
-	return downcast<nvidia_nv3_vga_device *>(m_svga.target())->mem_r(offset);
+	return downcast<nvidia_nv3_vga_device *>(m_vga.target())->mem_r(offset);
 }
 
 void riva128_device::vram_w(offs_t offset, uint8_t data)
 {
-	downcast<nvidia_nv3_vga_device *>(m_svga.target())->mem_w(offset, data);
+	downcast<nvidia_nv3_vga_device *>(m_vga.target())->mem_w(offset, data);
 }
 
 void riva128_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -212,10 +212,11 @@ void riva128_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 {
 	if (m_vga_legacy_enable)
 	{
-		memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(riva128_device::vram_r)), write8sm_delegate(*this, FUNC(riva128_device::vram_w)));
+		if (BIT(command, 1))
+			memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(riva128_device::vram_r)), write8sm_delegate(*this, FUNC(riva128_device::vram_w)));
 
-		io_space->install_device(0x03b0, 0x03df, *this, &riva128_device::legacy_io_map);
-		//memory_space->install_rom(0xc0000, 0xcffff, (void *)expansion_rom);
+		if (BIT(command, 0))
+			io_space->install_device(0x0000, 0xffff, *this, &riva128_device::legacy_io_map);
 	}
 }
 
@@ -233,7 +234,7 @@ riva128zx_device::riva128zx_device(const machine_config &mconfig, const char *ta
 }
 
 ROM_START( riva128zx )
-	ROM_REGION32_LE( 0x8000, "vga_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x8000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "asus", "ASUS AGP-V3000 ZX TV (V1.70D.03)" )
 	ROMX_LOAD( "asus_agp-v3000zx.vbi", 0x000000, 0x008000, CRC(8319de18) SHA1(837fe8afdf03196550c51ff4987e7f25cc75222c), ROM_BIOS(0) )
 	// TODO: confirm if this is really a 128ZX

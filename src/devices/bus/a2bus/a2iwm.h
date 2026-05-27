@@ -37,6 +37,7 @@ protected:
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(u8 offset) override;
 	virtual void write_c0nx(u8 offset, u8 data) override;
+	virtual void reset_from_bus() override;
 
 	required_device<iwm_device> m_iwm;
 	required_device_array<floppy_connector, 2> m_floppy;

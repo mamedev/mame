@@ -207,6 +207,7 @@ constexpr char f_dtd_string[] =
 		"\t\t\t<!ATTLIST disk status (baddump|nodump|good) \"good\">\n"
 		"\t\t\t<!ATTLIST disk optional (yes|no) \"no\">\n"
 		"\t\t<!ELEMENT device_ref EMPTY>\n"
+		"\t\t\t<!ATTLIST device_ref tag CDATA #REQUIRED>\n"
 		"\t\t\t<!ATTLIST device_ref name CDATA #REQUIRED>\n"
 		"\t\t<!ELEMENT sample EMPTY>\n"
 		"\t\t\t<!ATTLIST sample name CDATA #REQUIRED>\n"
@@ -1010,7 +1011,7 @@ void output_device_refs(std::ostream &out, device_t &root)
 {
 	for (device_t &device : device_enumerator(root))
 		if (&device != &root)
-			util::stream_format(out, "\t\t<device_ref name=\"%s\"/>\n", util::xml::normalize_string(device.shortname()));
+			util::stream_format(out, "\t\t<device_ref tag=\"%s\" name=\"%s\"/>\n", util::xml::normalize_string(device.tag()), util::xml::normalize_string(device.shortname()));
 }
 
 
@@ -1436,26 +1437,13 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 		CTRL_COUNT
 	};
 
-	enum
-	{
-		CTRL_P1,
-		CTRL_P2,
-		CTRL_P3,
-		CTRL_P4,
-		CTRL_P5,
-		CTRL_P6,
-		CTRL_P7,
-		CTRL_P8,
-		CTRL_P9,
-		CTRL_P10,
-		CTRL_PCOUNT
-	};
+	constexpr unsigned CTRL_PCOUNT = 10;
 
 	// directions
-	const uint8_t DIR_UP = 0x01;
-	const uint8_t DIR_DOWN = 0x02;
-	const uint8_t DIR_LEFT = 0x04;
-	const uint8_t DIR_RIGHT = 0x08;
+	constexpr uint8_t DIR_UP = 0x01;
+	constexpr uint8_t DIR_DOWN = 0x02;
+	constexpr uint8_t DIR_LEFT = 0x04;
+	constexpr uint8_t DIR_RIGHT = 0x08;
 
 	// initialize the list of control types
 	struct
@@ -2172,7 +2160,7 @@ void output_slots(std::ostream &out, machine_config &config, device_t &device, c
 					{
 						util::stream_format(out, "\t\t\t<slotoption name=\"%s\"", normalize_string(option.second->name()));
 						util::stream_format(out, " devname=\"%s\"", normalize_string(dev->shortname()));
-						if (slot.default_option() && !strcmp(slot.default_option(), option.second->name()))
+						if (slot.default_option() && (slot.default_option() == option.second->name()))
 							out << " default=\"yes\"";
 						out << "/>\n";
 					}

@@ -4,10 +4,10 @@
 /*
     C123 Tilemaps
     used by
+    namcos1.cpp (all games)
     namcos2.cpp (all games)
     namcofl.cpp (all games)
     namconb1.cpp (all games)
-    namcos1.cpp (all games)
 */
 
 #include "emu.h"
@@ -22,20 +22,24 @@ DEFINE_DEVICE_TYPE(NAMCO_C123TMAP, namco_c123tmap_device, "namco_c123tmap", "Nam
 namco_c123tmap_device::namco_c123tmap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NAMCO_C123TMAP, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
+	m_tilemapinfo(*this),
 	m_color_base(0),
 	m_xoffs(0),
 	m_yoffs(0),
 	m_tmap3_half_height(false),
 	m_mask(*this, "mask")
 {
+	std::fill(std::begin(m_tilemapinfo.control), std::end(m_tilemapinfo.control), 0);
 }
 
 void namco_c123tmap_device::device_start()
 {
+	m_tilemapinfo.cb.resolve();
+
 	const int size = m_tmap3_half_height ? 0x8000 : 0x10000;
 	m_tilemapinfo.videoram = std::make_unique<uint16_t[]>(size);
 
-	/* four scrolling tilemaps */
+	// four scrolling tilemaps
 	m_tilemapinfo.tmap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x0000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemapinfo.tmap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x1000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemapinfo.tmap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x2000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
@@ -43,7 +47,7 @@ void namco_c123tmap_device::device_start()
 	{
 		m_tilemapinfo.tmap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x3000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-		/* two non-scrolling tilemaps */
+		// two non-scrolling tilemaps
 		m_tilemapinfo.tmap[4] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x3808>)), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
 		m_tilemapinfo.tmap[5] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x3c08>)), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
 	}
@@ -51,12 +55,12 @@ void namco_c123tmap_device::device_start()
 	{
 		m_tilemapinfo.tmap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x3000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
-		/* two non-scrolling tilemaps */
+		// two non-scrolling tilemaps
 		m_tilemapinfo.tmap[4] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x4008>)), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
 		m_tilemapinfo.tmap[5] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c123tmap_device::get_tile_info<0x4408>)), TILEMAP_SCAN_ROWS, 8, 8, 36, 28);
 	}
 
-	/* define offsets for scrolling */
+	// define offsets for scrolling
 	for (int i = 0; i < 6; i++)
 	{
 		if (i < 4)
@@ -86,17 +90,21 @@ void namco_c123tmap_device::mark_all_dirty(void)
 	{
 		m_tilemapinfo.tmap[i]->mark_all_dirty();
 	}
-} /* mark_all_dirty */
+}
 
 template<int Offset>
 TILE_GET_INFO_MEMBER(namco_c123tmap_device::get_tile_info)
 {
-	const uint16_t *vram = &m_tilemapinfo.videoram[Offset];
-	int tile, mask;
-	m_tilemapinfo.cb(vram[tile_index], tile, mask);
+	const uint16_t data = m_tilemapinfo.videoram[Offset + tile_index];
+	int tile = 0, mask = 0;
+	if (m_tilemapinfo.cb.isnull())
+		tile = mask = data;
+	else
+		m_tilemapinfo.cb(data, tile, mask);
+
 	tileinfo.mask_data = m_mask + mask * 8;
 	tileinfo.set(0, tile, 0, 0);
-} /* get_tile_info */
+}
 
 void namco_c123tmap_device::init_scroll(int flip) // 8 bit control with external flip screen value
 {
@@ -119,13 +127,13 @@ void namco_c123tmap_device::draw(screen_device &screen, bitmap_ind16 &bitmap, co
 {
 	for (int i = 0; i < 6; i++)
 	{
-		// bit 3 : disable layer
+		// bit 3: disable layer
 		if ((m_tilemapinfo.control[0x20 / 2 + i] & 0x7) == pri)
 		{
 			m_tilemapinfo.tmap[i]->draw(screen, bitmap, cliprect, 0, prival, primask);
 		}
 	}
-} /* draw */
+}
 
 void namco_c123tmap_device::set_tilemap_videoram(int offset, uint16_t newword)
 {
@@ -140,7 +148,7 @@ void namco_c123tmap_device::set_tilemap_videoram(int offset, uint16_t newword)
 		const int tile = (offset & 0x7ff / 2) - (0x10 / 2);
 		m_tilemapinfo.tmap[((offset >> 10) & 1) + 4]->mark_tile_dirty(tile);
 	}
-} /* set_tilemap_videoram */
+}
 
 // 16 bit handlers
 void namco_c123tmap_device::videoram16_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -174,7 +182,7 @@ void namco_c123tmap_device::control16_w(offs_t offset, uint16_t data, uint16_t m
 	{
 		if (offset == 0x02 / 2)
 		{
-			/* all planes are flipped X+Y from D15 of this word */
+			// all planes are flipped X+Y from D15 of this word
 			const int attrs = BIT(data, 15) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
 			for (int i = 0; i <= 5; i++)
 			{
@@ -236,4 +244,3 @@ uint8_t namco_c123tmap_device::control8_r(offs_t offset)
 {
 	return m_tilemapinfo.control[offset] & 0xff;
 }
-

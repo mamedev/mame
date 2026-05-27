@@ -340,13 +340,13 @@ authors:hap
 			<param name="x" start="9" increment="10.8" />
 			<param name="i" start="1" increment="1" />
 
-			<element ref="text_b~i~"><bounds xc="~x~" y="7" width="15" height="1.866" /></element>
+			<element ref="text_b~i~"><bounds xc="~x~" y="7" width="10" height="1.866" /></element>
 		</repeat>
 		<repeat count="4">
 			<param name="x" start="8" increment="9" />
 			<param name="i" start="6" increment="1" />
 
-			<element ref="text_b~i~"><bounds xc="~x~" y="20.333" width="15" height="1.866" /></element>
+			<element ref="text_b~i~"><bounds xc="~x~" y="20.333" width="8.2" height="1.866" /></element>
 		</repeat>
 		<repeat count="6">
 			<param name="x" start="8" increment="9" />

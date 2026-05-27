@@ -10,7 +10,6 @@ authors:hap
 	<element name="white"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
 	<element name="whited"><disk><color red="0.81" green="0.8" blue="0.79" /></disk></element>
 	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
-	<element name="blackd"><disk><color red="0" green="0" blue="0" /></disk></element>
 
 	<element name="led" defstate="0">
 		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
@@ -49,9 +48,46 @@ authors:hap
 	<element name="text_ud"><text string="&#x2195;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_ss"><text string="&#xa7;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
-	<element name="text_stop">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="STOP"><color red="0.05" green="0.05" blue="0.05" /></text>
+	<element name="lr_arrow">
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="24" height="24" viewBox="0 0 24 24">
+				<g fill="none" stroke="#cfccc9" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="1">
+					<path d="M3 12l18 0" />
+					<path d="M6 15l-3 -3l3 -3" />
+					<path d="M18 15l3 -3l-3 -3" />
+				</g>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="stop">
+		<disk>
+			<bounds xc="0" yc="0" width="3.6" height="3.6" />
+			<color red="0.81" green="0.8" blue="0.79" />
+		</disk>
+		<disk>
+			<bounds xc="0" yc="0" width="3.3" height="3.3" />
+			<color red="0" green="0" blue="0" />
+		</disk>
+		<disk>
+			<bounds xc="0" yc="0" width="3.0" height="3.0" />
+			<color red="0.81" green="0.8" blue="0.79" />
+		</disk>
+		<text string="STOP">
+			<bounds xc="0" yc="0" width="2.8" height="1.1" />
+			<color red="0.05" green="0.05" blue="0.05" />
+		</text>
+	</element>
+
+	<element name="blackd">
+		<disk>
+			<bounds xc="0" yc="0" width="1" height="1" />
+			<color red="0.81" green="0.8" blue="0.79" />
+		</disk>
+		<disk>
+			<bounds xc="0" yc="0" width="0.8" height="0.8" />
+			<color red="0" green="0" blue="0" />
+		</disk>
 	</element>
 
 	<element name="text_p1"><image file="chess/wk.svg"><color alpha="0.9" /></image></element>
@@ -429,21 +465,19 @@ authors:hap
 
 		<element ref="whited"><bounds x="88.2" y="7.3" width="1.4" height="1.4" /></element>
 
-		<element ref="text_ud"><bounds x="87.5" y="16.3" width="3" height="3" /></element>
-		<element ref="text_lr"><bounds x="87.5" y="26.3" width="3" height="3" /></element>
-		<element ref="text_ud"><bounds x="87.5" y="26.3" width="3" height="3" /></element>
-		<element ref="text_ss"><bounds x="87.5" y="36.5" width="3" height="3" /></element>
-		<element ref="text_q"><bounds x="87.5" y="46.5" width="3" height="3" /></element>
+		<element ref="lr_arrow"><bounds x="87.5" yc="18" width="3" height="3" /><orientation rotate="90" /></element>
+		<element ref="lr_arrow"><bounds x="87.5" yc="28" width="3" height="3" /></element>
+		<element ref="lr_arrow"><bounds x="87.5" yc="28" width="3" height="3" /><orientation rotate="90" /></element>
+		<element ref="text_ss"><bounds x="87.5" yc="38" width="3" height="3" /></element>
+		<element ref="text_q"><bounds x="87.5" yc="48" width="3" height="3" /></element>
 
 		<element ref="white"><bounds x="87.5" y="56.5" width="3" height="3" /></element>
 		<element ref="black"><bounds x="87.8" y="56.8" width="2.4" height="2.4" /></element>
 		<element ref="text_p6"><bounds x="87.7" y="56.65" width="2.6" height="2.6" /></element>
 
-		<element ref="whited"><bounds x="87.5" y="66.5" width="3" height="3" /></element>
-		<element ref="text_stop"><bounds x="87.8" y="67.25" width="2.5" height="1.5" /></element>
+		<element ref="stop"><bounds x="87.5" yc="68" width="3.2" height="3.2" /></element>
 
-		<element ref="whited"><bounds x="87.5" y="76.7" width="2.6" height="2.6" /></element>
-		<element ref="blackd"><bounds x="87.8" y="77.0" width="2.0" height="2.0" /></element>
+		<element ref="blackd"><bounds x="87.5" yc="78" width="2.8" height="2.8" /></element>
 		<element ref="whited"><bounds x="90.3" y="78.7" width="0.6" height="0.6" /></element>
 
 	</view>

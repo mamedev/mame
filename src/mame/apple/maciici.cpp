@@ -62,7 +62,7 @@ public:
 		m_adbmodem(*this, "adbmodem"),
 		m_asc(*this, "asc"),
 		m_scsibus1(*this, "scsi"),
-		m_ncr5380(*this, "scsi:7:ncr5380"),
+		m_ncr5380(*this, "ncr5380"),
 		m_scsihelp(*this, "scsihelp"),
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
@@ -97,7 +97,7 @@ private:
 	required_device<z80scc_device> m_scc;
 	optional_device<rtc3430042_device> m_rtc;
 	optional_device<egret_device> m_egret;
-	optional_ioport m_config;
+	required_ioport m_config;
 
 	void set_via2_interrupt(int value);
 	void field_interrupts();
@@ -176,14 +176,17 @@ private:
 			m_fdc->write((offset >> 8) & 0xf, data & 0xff);
 		else
 			m_fdc->write((offset >> 8) & 0xf, data >> 8);
+
+		if (!machine().side_effects_disabled())
+			m_maincpu->adjust_icount(-5);
 	}
 };
 
 void maciici_state::machine_start()
 {
-	m_rbv->set_ram_info((u32 *)m_ram->pointer(), m_ram->size());
+	m_rbv->set_ram_info(m_ram->pointer<u32>(), m_ram->size());
 
-	m_rom_ptr = (u32 *)memregion("bootrom")->base();
+	m_rom_ptr = &memregion("bootrom")->as_u32();
 	m_rom_size = memregion("bootrom")->bytes();
 
 	m_last_taken_interrupt = -1;
@@ -191,7 +194,7 @@ void maciici_state::machine_start()
 
 void maciici_state::machine_reset()
 {
-	// main cpu shouldn't start until Egret wakes it up
+	// main CPU shouldn't start until Egret wakes it up
 	if (m_egret)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -333,12 +336,12 @@ void maciici_state::via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint8_t maciici_state::via_in_a()
 {
-	return 0xc7; // IIci: PA6 | PA2 | PA1
+	return 0xc6 | BIT(m_config->read(), 1); // IIci: PA6 | PA2 | PA1
 }
 
 uint8_t maciici_state::via_in_a_iisi()
 {
-	return 0x97; // IIci: PA4 | PA2 | PA1
+	return 0x96 | BIT(m_config->read(), 1); // IIsi: PA4 | PA2 | PA1
 }
 
 uint8_t maciici_state::via_in_b()
@@ -499,6 +502,11 @@ void maciici_state::devsel_w(uint8_t devsel)
 }
 
 static INPUT_PORTS_START(maciici)
+	PORT_START("config")
+	PORT_DIPUNUSED(0x01, IP_ACTIVE_LOW);
+	PORT_CONFNAME(0x02, 0x02, "Diagnostic mode")
+	PORT_CONFSETTING(0x02, "Disabled")
+	PORT_CONFSETTING(0x00, "Enabled")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(maciisi)
@@ -506,6 +514,10 @@ static INPUT_PORTS_START(maciisi)
 	PORT_CONFNAME(0x01, 0x00, "FPU")
 	PORT_CONFSETTING(0x00, "No FPU")
 	PORT_CONFSETTING(0x01, "FPU Present")
+
+	PORT_CONFNAME(0x02, 0x02, "Diagnostic mode")
+	PORT_CONFSETTING(0x02, "Disabled")
+	PORT_CONFSETTING(0x00, "Enabled")
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -532,21 +544,21 @@ void maciici_state::maciixi_base(machine_config &config)
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(FUNC(maciici_state::scc_irq_w));
-	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
-	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
 
-	rs232_port_device &rs232a(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
 	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 
-	rs232_port_device &rs232b(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	rs232_port_device &rs232b(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
 	SPEAKER(config, "speaker", 2).front();
-	ASC(config, m_asc, C15M, asc_device::asc_type::ASC);
+	ASC(config, m_asc, C15M);
 	m_asc->irqf_callback().set(m_rbv, FUNC(rbv_device::asc_irq_w));
 	m_asc->add_route(0, "speaker", 1.0, 0);
 	m_asc->add_route(1, "speaker", 1.0, 1);
@@ -559,7 +571,7 @@ void maciici_state::maciixi_base(machine_config &config)
 	m_via1->cb2_handler().set(FUNC(maciici_state::via_out_cb2));
 	m_via1->irq_handler().set(FUNC(maciici_state::via_irq));
 
-	NSCSI_BUS(config, "scsi");
+	NSCSI_BUS(config, m_scsibus1);
 	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
@@ -572,10 +584,9 @@ void maciici_state::maciixi_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device)
-																					 {
-		ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
-		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w)); });
+	NCR53C80(config, m_ncr5380);
+	m_scsibus1->set_external_device(7, m_ncr5380);
+	m_ncr5380->drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
 
 	MAC_SCSI_HELPER(config, m_scsihelp);
 	m_scsihelp->scsi_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::read));

@@ -251,9 +251,9 @@ void zorba_state::zorba(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(14.318'181_MHz_XTAL, 880, 0, 640, 297, 0, 275);
 	screen.set_color(rgb_t::green());
-	screen.set_refresh_hz(50);
-	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
+	screen.set_screen_update(m_crtc, FUNC(i8275_device::screen_update));
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_zorba);
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
@@ -267,7 +267,7 @@ void zorba_state::zorba(machine_config &config)
 
 	/* devices */
 	Z80DMA(config, m_dma, 24_MHz_XTAL / 6);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->out_int_callback().set("irq0", FUNC(input_merger_device::in_w<0>));
 	//ba0 - not connected
 	m_dma->in_mreq_callback().set(FUNC(zorba_state::memory_read_byte));

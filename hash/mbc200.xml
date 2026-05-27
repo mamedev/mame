@@ -18,7 +18,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="boota" cloneof="boot">
-		<description>Boot disk (Alt)</description>
+		<description>Boot disk (alt)</description>
 		<year>198?</year>
 		<publisher>Sanyo</publisher>
 

@@ -17,20 +17,26 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="execdesk">
+	<software name="execudsk">
 		<description>ExecuDesk</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="execudesk1.d64" size="174848" crc="1aa9a9aa" sha1="9445cc89d08215d173e84841d3b01ed327d8347c" status="baddump" />
+			<dataarea name="flop" size="533248">
+				<rom name="execudesk.d80" size="533248" crc="7c72a37a" sha1="e730be7d54f02b7eca13d555e25cfbfc7c144c59" />
 			</dataarea>
 		</part>
+	</software>
 
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="execudesk2.d64" size="174848" crc="9553ea18" sha1="01ed09de6635522ca69e7d2784c81d3a06cee1c3" status="baddump" />
+	<software name="petpeeve" supported="no">
+		<description>PETpeeve</description>
+		<year>2025</year>
+		<publisher>Rabenauge &amp; Plush &amp; Crest</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1066496">
+				<rom name="PETpeeve.d82" size="1066496" crc="00681a19" sha1="88421431acc9887acb79e091d7c38857f267e811" />
 			</dataarea>
 		</part>
 	</software>

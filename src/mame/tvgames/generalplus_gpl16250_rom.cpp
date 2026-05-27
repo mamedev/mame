@@ -16,6 +16,91 @@
 #include "generalplus_gpl16250.h"
 
 
+namespace {
+
+class tkmag220_game_state : public gcm394_game_state
+{
+public:
+	tkmag220_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		gcm394_game_state(mconfig, type, tag)
+	{
+	}
+
+	void tkmag220(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	virtual u16 cs0_r(offs_t offset) override;
+
+	void tkmag220_portd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	int m_upperbase = 0;
+};
+
+
+class beijuehh_game_state : public gcm394_game_state
+{
+public:
+	beijuehh_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		gcm394_game_state(mconfig, type, tag)
+	{
+	}
+
+	void beijuehh(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	virtual u16 cs0_r(offs_t offset) override;
+
+	void beijuehh_portb_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void beijuehh_portd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	int m_upperbase = 0;
+
+	u16 m_portb_data = 0U;
+	u16 m_portd_data = 0U;
+	u8 m_bank = 0U;
+};
+
+
+class gameu_handheld_game_state : public gcm394_game_state
+{
+public:
+	gameu_handheld_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		gcm394_game_state(mconfig, type, tag)
+	{
+	}
+
+	virtual u16 cs0_r(offs_t offset) override;
+
+	void gameu(machine_config &config) ATTR_COLD;
+
+	void init_gameu() ATTR_COLD;
+	void init_gameu50() ATTR_COLD;
+	void init_gameu108() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	void gameu_porta_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void gameu_portb_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void gameu_portc_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void gameu_portd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	u32 m_upperbase;
+	u16 m_porta_data;
+	u16 m_portb_data;
+	u16 m_portc_data;
+	u16 m_portd_data;
+};
+
+
 
 static INPUT_PORTS_START( base )
 	PORT_START("IN0")
@@ -321,7 +406,9 @@ static INPUT_PORTS_START( beijuehh )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x0e00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // this one must be kept in this state or the machine will freeze after a few seconds?
 	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -404,6 +491,16 @@ ROM_START( myac220 )
 	ROM_LOAD16_WORD_SWAP( "myarcadegogamerportable.bin", 0x0000000, 0x8000000, BAD_DUMP CRC(c929a2fa) SHA1(e99007ccc45a268267b4ea0efaf22e3117f5a6bd) ) // several sections seemed to be erased, was repaired with data from tkmag220, likely good but should be verified
 ROM_END
 
+ROM_START( typo176 )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "gl01gp.u2", 0x0000000, 0x8000000, CRC(44b04142) SHA1(f04a6275e4f3010c660699ab83bd78ca73cb3c7b) )
+ROM_END
+
+ROM_START( gp230 )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "s29gl01gp12tfi01.u2", 0x0000000, 0x8000000, CRC(9deb638e) SHA1(d5815135f48178460eee4a3abd45d79fabe1bcfa) )
+ROM_END
+
 ROM_START( beijuehh )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "beijeu.bin", 0x0000000, 0x8000000, CRC(e7b968af) SHA1(a39a3a70e6e0827e4395e09e55983eb9e9348e4a) ) // some address lines might be swapped
@@ -457,7 +554,7 @@ void tkmag220_game_state::tkmag220(machine_config &config)
 	m_maincpu->portd_out().set(FUNC(tkmag220_game_state::tkmag220_portd_w));
 }
 
-void tkmag220_game_state::tkmag220_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void tkmag220_game_state::tkmag220_portd_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (m_maincpu->pc() < 0x10000)
 	{
@@ -475,7 +572,7 @@ void tkmag220_game_state::tkmag220_portd_w(offs_t offset, uint16_t data, uint16_
 }
 
 
-uint16_t tkmag220_game_state::cs0_r(offs_t offset)
+u16 tkmag220_game_state::cs0_r(offs_t offset)
 {
 	// [:] installing cs0 handler start_address 00000000 end_address 007fffff
 	return m_romregion[(offset & 0x07fffff) + m_upperbase];
@@ -491,7 +588,6 @@ void tkmag220_game_state::machine_reset()
 	//m_maincpu->set_paldisplaybank_high_hack(0);
 	//m_maincpu->set_pal_sprites_hack(0x000);
 	//m_maincpu->set_pal_back_hack(0x000);
-	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
 
@@ -508,10 +604,15 @@ void beijuehh_game_state::beijuehh(machine_config &config)
 
 	m_maincpu->portb_out().set(FUNC(beijuehh_game_state::beijuehh_portb_w));
 	m_maincpu->portd_out().set(FUNC(beijuehh_game_state::beijuehh_portd_w));
+
+	// beijuehh and bornkidh have a protection function that runs in the timebase interrupt
+	// for beijuehh it causes freezes in xracer3, in bornkidh it runs at all times and even
+	// freezes the menus.  disable the timebase interrupts in the core until this is understood.
+	m_maincpu->disable_timebase_interrupts();
 }
 
 
-void beijuehh_game_state::beijuehh_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void beijuehh_game_state::beijuehh_portb_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (m_maincpu->pc() < 0xf000)
 	{
@@ -534,7 +635,7 @@ void beijuehh_game_state::beijuehh_portb_w(offs_t offset, uint16_t data, uint16_
 }
 
 
-void beijuehh_game_state::beijuehh_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void beijuehh_game_state::beijuehh_portd_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (m_maincpu->pc() < 0xf000)
 	{
@@ -557,7 +658,7 @@ void beijuehh_game_state::beijuehh_portd_w(offs_t offset, uint16_t data, uint16_
 }
 
 
-uint16_t beijuehh_game_state::cs0_r(offs_t offset)
+u16 beijuehh_game_state::cs0_r(offs_t offset)
 {
 	// [:] installing cs0 handler start_address 00000000 end_address 003fffff
 	return m_romregion[(offset & 0x03fffff) + m_upperbase];
@@ -583,8 +684,6 @@ void beijuehh_game_state::machine_reset()
 	//m_maincpu->set_paldisplaybank_high_hack(0);
 	//m_maincpu->set_pal_sprites_hack(0x000);
 	//m_maincpu->set_pal_back_hack(0x000);
-	m_maincpu->set_alt_tile_addressing_hack(1);
-	//m_maincpu->set_alt_extrasprite_hack(1);
 	m_maincpu->set_legacy_video_mode();
 }
 
@@ -603,36 +702,30 @@ void gameu_handheld_game_state::gameu(machine_config &config)
 	m_screen->set_visarea(0, (160)-1, 0, (128)-1); // appears to be the correct resolution for the LCD panel
 }
 
-void gormiti_game_state::machine_reset()
-{
-	gcm394_game_state::machine_reset();
-	m_maincpu->set_alt_tile_addressing_hack(1);
-}
-
-uint16_t gameu_handheld_game_state::cs0_r(offs_t offset)
+u16 gameu_handheld_game_state::cs0_r(offs_t offset)
 {
 	return m_romregion[(offset & 0x00fffff) + m_upperbase];
 }
 
-void gameu_handheld_game_state::gameu_porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gameu_handheld_game_state::gameu_porta_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	logerror("%s: porta write %04x\n", machine().describe_context(), data);
 	m_porta_data = data;
 }
 
-void gameu_handheld_game_state::gameu_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gameu_handheld_game_state::gameu_portb_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	logerror("%s: portb write %04x\n", machine().describe_context(), data);
 	m_portb_data = data;
 }
 
-void gameu_handheld_game_state::gameu_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gameu_handheld_game_state::gameu_portc_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	logerror("%s: portc write %04x\n", machine().describe_context(), data);
 	m_portc_data = data;
 }
 
-void gameu_handheld_game_state::gameu_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gameu_handheld_game_state::gameu_portd_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// hacky, maybe we need better direction/attribute handling on the ports in the core?
 	m_portd_data = data;
@@ -641,13 +734,15 @@ void gameu_handheld_game_state::gameu_portd_w(offs_t offset, uint16_t data, uint
 	{
 		logerror("%s: portd write %04x %04x\n", machine().describe_context(), data, mem_mask);
 
-		uint8_t bank = (data & 0xfc00) >> 10;
+		u8 bank = (data & 0xfc00) >> 10;
 		m_upperbase = bank * 0x40000;
 	}
 
 }
 void gameu_handheld_game_state::machine_start()
 {
+	gcm394_game_state::machine_start();
+
 	m_upperbase = 0;
 	m_porta_data = 0;
 	m_portb_data = 0;
@@ -664,13 +759,12 @@ void gameu_handheld_game_state::machine_start()
 void gameu_handheld_game_state::machine_reset()
 {
 	gcm394_game_state::machine_reset();
-	m_maincpu->set_alt_tile_addressing_hack(1);
 	m_upperbase = 0;
 }
 
 void gameu_handheld_game_state::init_gameu()
 {
-	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
+	u16 *ROM = (u16*)memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
 
 	for (int i = 0; i < size/2; i++)
@@ -681,10 +775,7 @@ void gameu_handheld_game_state::init_gameu()
 									 8, 7, 13, 15, 4, 5,  12, 10);
 	}
 
-	m_maincpu->set_alt_tile_addressing_hack(0);
 	m_maincpu->set_disallow_resolution_control();
-
-
 }
 
 void gameu_handheld_game_state::init_gameu50()
@@ -692,7 +783,7 @@ void gameu_handheld_game_state::init_gameu50()
 	init_gameu();
 
 	// why do we need these? it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise, which can't be correct
-	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
+	u16 *ROM = (u16*)memregion("maincpu")->base();
 	int base = 0x19c9a;
 	ROM[(base + 0x00) / 2] = 0xf165;
 	ROM[(base + 0x02) / 2] = 0xf165;
@@ -711,7 +802,7 @@ void gameu_handheld_game_state::init_gameu108()
 {
 	init_gameu();
 
-	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
+	u16 *ROM = (u16*)memregion("maincpu")->base();
 
 	// why do we need these? it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise, which can't be correct
 	ROM[(0x1aa48) / 2] = 0xf165;
@@ -723,11 +814,13 @@ void gameu_handheld_game_state::init_gameu108()
 	ROM[(0x1aa86) / 2] = 0xf165;
 }
 
+} // anonymous namespace
+
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
-CONS(2008, jak_spmm,  0,       0, base, jak_spmm,  gormiti_game_state, empty_init, "JAKKS Pacific Inc / Santa Cruz Games", "The Amazing Spider-Man and The Masked Menace (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS(2008, jak_prr,   0,       0, base, jak_spmm,  gormiti_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Power Rangers to the Rescue (JAKKS Pacific TV Game) (Aug 8 2008 16:46:59)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS(2008, jak_bj,    0,       0, base, jak_bj,    gormiti_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bejeweled Deluxe (JAKKS Pacific TV Game) (Feb 28 2008 22:54:43)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS(2009, jak_tpir,  0,       0, base, jak_spmm,  gormiti_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Price Is Right (JAKKS Pacific TV Game) (Mar 24 2009 17:34:55)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2008, jak_spmm,  0,       0, base, jak_spmm,  gcm394_game_state, empty_init, "JAKKS Pacific Inc / Santa Cruz Games", "The Amazing Spider-Man and The Masked Menace (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2008, jak_prr,   0,       0, base, jak_spmm,  gcm394_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Power Rangers to the Rescue (JAKKS Pacific TV Game) (Aug 8 2008 16:46:59)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2008, jak_bj,    0,       0, base, jak_bj,    gcm394_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bejeweled Deluxe (JAKKS Pacific TV Game) (Feb 28 2008 22:54:43)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2009, jak_tpir,  0,       0, base, jak_spmm,  gcm394_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Price Is Right (JAKKS Pacific TV Game) (Mar 24 2009 17:34:55)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS(2009, smartfp,   0,       0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, smartfps,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
@@ -737,13 +830,19 @@ CONS(2009, smartfpf,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init,
 CONS(2008, fpsport,   0,       0, base, base,     gcm394_game_state, empty_init, "Fisher-Price", "3-in-1 Smart Sports! (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // uses a barcode card scanner device with custom cards
-CONS(200?, dressmtv,  0,       0, base_alt_irq, dressmtv, gormiti_game_state, empty_init, "Tomy Takara", "Disney Princess Dress Mania TV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(200?, dressmtv,  0,       0, base, dressmtv, gcm394_game_state, empty_init, "Takara Tomy", "Disney Princess Dress Mania TV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // These are ports of the 'Family Sport' games to GPL16250 type hardware, but they don't seem to use many unSP 2.0 instructions.
 // The menu style is close to 'm505neo' but the game selection is closer to 'dnv200fs' (but without the Sports titles removed, and with a few other extras not found on that unit)
 CONS(201?, tkmag220,  0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "TaiKee / Senca",         "Mini Arcade Games Console (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // DGUN-2891 or DGUN-2864 ? both look the same, no indication on unboxed unit?
 CONS(201?, myac220,   0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "dreamGEAR / Senca",      "My Arcade Go Gamer Portable (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS(201?, typo176,   0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "Typo / Senca",           "Arcade Game 2.0 (model 8052C, Family Sport 176-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// has 227 selectable games, and 3 single game cartridges
+// cartridges have no ROM but launch a single game after the boot screen (Fighter, Baseball or Golf)
+// must be read by GPIO port or similar
+CONS(201?, gp230,  0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "<unknown>",         "TFT Portable Player / GPDevice 230-in-1 (YJ-801)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // 2012 date from manual
 CONS(2012, imgame,    0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "I'm Game / Senca",      "I'm Game! GP120 (Family Sport 120-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -756,7 +855,7 @@ CONS(201?, beijuehh,    0,       0, beijuehh, beijuehh, beijuehh_game_state,  em
 CONS(201?, bornkidh,    0,       0, beijuehh, beijuehh, beijuehh_game_state,  empty_init,      "BornKid",     "BornKid 16 Bit Handheld Games 100-in-1 (model GB-10X)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // die on this one is 'GCM420'
-CONS(2013, gormiti,   0, 0, base, gormiti,  gormiti_game_state, empty_init, "Giochi Preziosi", "Gormiti Game Arena (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2013, gormiti,   0, 0, base, gormiti,  gcm394_game_state, empty_init, "Giochi Preziosi", "Gormiti Game Arena (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // unit looks a bit like a knock-off Wii-U tablet, but much smaller
 // was also available under other names, with different designs (PSP style)

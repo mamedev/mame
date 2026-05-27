@@ -16,7 +16,7 @@
 
 #include "input_common.h"
 
-#include "sdl/osdsdl.h"
+#include "osdsdl.h"
 
 // MAME headers
 #include "inpttype.h"
@@ -709,7 +709,7 @@ public:
 
 		// If we find a matching lightgun, dispatch the event to the lightgun
 		if (target_device != devicelist().end())
-			(*target_device)->queue_events(&xevent, 1);
+			(*target_device)->queue_event(xevent);
 	}
 };
 

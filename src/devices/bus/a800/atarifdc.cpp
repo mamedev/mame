@@ -424,21 +424,18 @@ void atari_fdc_device::a800_serial_command()
 			logerror("atari serout command offset = 0\n");
 		return;
 	}
-	clr_serin(10);
 
 	if (VERBOSE_SERIAL)
 	{
-		logerror("atari serout command %d: %02X %02X %02X %02X %02X : %02X ",
+		logerror("atari serout command %d: %02X %02X %02X %02X %02X : %02X %s\n",
 			m_serout_offs,
 			m_serout_buff[0], m_serout_buff[1], m_serout_buff[2],
-			m_serout_buff[3], m_serout_buff[4], m_serout_chksum);
+			m_serout_buff[3], m_serout_buff[4], m_serout_chksum,
+			m_serout_chksum == 0 ? "OK" : "BAD");
 	}
 
 	if (m_serout_chksum == 0)
 	{
-		if (VERBOSE_SERIAL)
-			logerror("OK\n");
-
 		drive = m_serout_buff[0] - '1';   /* drive # */
 		/* sector # */
 		if (drive < 0 || drive > 3)             /* ignore unknown drives */
@@ -450,6 +447,8 @@ void atari_fdc_device::a800_serial_command()
 
 		/* extract sector number from the command buffer */
 		sector = m_serout_buff[2] + 256 * m_serout_buff[3];
+
+		clr_serin(10);
 
 		switch (m_serout_buff[1]) /* command ? */
 		{
@@ -592,9 +591,8 @@ void atari_fdc_device::a800_serial_command()
 	else
 	{
 		atari_set_frame_message("serial cmd chksum error");
-		if (VERBOSE_SERIAL)
-			logerror("BAD\n");
 
+		clr_serin(10);
 		add_serin('E',0);
 	}
 	if (VERBOSE_SERIAL)
@@ -740,7 +738,6 @@ void atari_fdc_device::command_w(int state)
 	}
 	else
 	{
-		m_serin_delay = 0;
 		a800_serial_command();
 	}
 }
@@ -762,11 +759,9 @@ atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *ta
 	m_serout_count(0),
 	m_serout_offs(0),
 	m_serout_chksum(0),
-//  m_serout_delay(0),
 	m_serin_count(0),
 	m_serin_offs(0),
 	m_serin_chksum(0),
-	m_serin_delay(0),
 	m_command(false)
 {
 }
@@ -799,7 +794,6 @@ void atari_fdc_device::device_start()
 	save_item(NAME(m_serin_offs));
 	save_item(NAME(m_serin_buff));
 	save_item(NAME(m_serin_chksum));
-	save_item(NAME(m_serin_delay));
 	save_item(NAME(m_command));
 }
 

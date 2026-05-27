@@ -376,7 +376,7 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="arcadiang" cloneof="arcadian">
-		<description>Arcadians (Ger)</description>
+		<description>Arcadians (German)</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GLG14" />
@@ -586,7 +586,7 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="treeknowg" cloneof="treeknow">
-		<description>Baum der Weisheit (Ger)</description>
+		<description>Baum der Weisheit (German)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GLE04" />
@@ -1820,7 +1820,7 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="introcasg" cloneof="introcas">
-		<description>Einfuhrungs Kassette (Ger)</description>
+		<description>Einfuhrungs Kassette (German)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -3141,7 +3141,7 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="forthg">
-		<description>FORTH (Ger)</description>
+		<description>FORTH (German)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GLL01" />
@@ -3176,9 +3176,9 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="fraka" cloneof="frak">
-		<description>Frak! (Alternative)</description>
+		<description>Frak! (Alternative Software)</description>
 		<year>198?</year>
-		<publisher>Alternative</publisher>
+		<publisher>Alternative Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="24221">
 				<rom name="frakv11_e.uef" size="24221" crc="f1330371" sha1="7d8c89dcd98bc0a74ea72b479ee1da0ea4de5595"/>
@@ -3233,7 +3233,7 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="freefallg" cloneof="freefall">
-		<description>Freier Fall (Ger)</description>
+		<description>Freier Fall (German)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GLG22" />
@@ -3521,9 +3521,9 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="ggoochcra" cloneof="ggoochcr">
-		<description>Graham Gooch's Test Cricket (Alternative)</description>
+		<description>Graham Gooch's Test Cricket (Alternative Software)</description>
 		<year>198?</year>
-		<publisher>Alternative</publisher>
+		<publisher>Alternative Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="18383">
 				<rom name="grahamgoochmatchcricket-arr_e.uef" size="18383" crc="11762a0b" sha1="24feb73957b628c2617e792e7eca19cc45706a19"/>
@@ -3642,7 +3642,7 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="haushalt">
-		<description>Haushaltbudget (Ger)</description>
+		<description>Haushaltbudget (German)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GLB05" />
@@ -4242,7 +4242,7 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="cgraphsg">
-		<description>Kreative Graphiken (Ger)</description>
+		<description>Kreative Graphiken (German)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GLX01" />
@@ -4295,7 +4295,7 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="lispg" cloneof="lisp">
-		<description>LISP (Ger)</description>
+		<description>LISP (German)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GLL02" />
@@ -4581,7 +4581,7 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="meteorsg" cloneof="meteors">
-		<description>Meteors (Ger)</description>
+		<description>Meteors (German)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GLG13" />
@@ -5064,7 +5064,7 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="peekocg" cloneof="peekoc">
-		<description>Peeko-Computer (Ger)</description>
+		<description>Peeko-Computer (German)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GBE02" />
@@ -5277,7 +5277,7 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="plantoidg" cloneof="plantoid">
-		<description>Planetoid (Ger)</description>
+		<description>Planetoid (German)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GLG15" />
@@ -6295,7 +6295,7 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="spascal">
-		<description>S-Pascal (Ger)</description>
+		<description>S-Pascal (German)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GLL08" />
@@ -6520,7 +6520,7 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="sshipcomg" cloneof="sshipcom">
-		<description>Starship Command (Ger)</description>
+		<description>Starship Command (German)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GLG22" />
@@ -6985,7 +6985,7 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="dskdiaryg" cloneof="dskdiary">
-		<description>Terminkalendar (Ger)</description>
+		<description>Terminkalendar (German)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GLB01" />
@@ -7868,9 +7868,9 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="zalagaa" cloneof="zalaga">
-		<description>Zalaga (Alternative)</description>
+		<description>Zalaga (Alternative Software)</description>
 		<year>198?</year>
-		<publisher>Alternative</publisher>
+		<publisher>Alternative Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="20293">
 				<rom name="zalaga-alrr_e.uef" size="20293" crc="99ae102c" sha1="b933fcda2f10e846235bc21aabc7e030599e4a9f"/>
@@ -7890,7 +7890,7 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="zeichenb">
-		<description>Zeichenbrett (Ger)</description>
+		<description>Zeichenbrett (German)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GLX03" />

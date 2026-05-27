@@ -11,7 +11,7 @@
 #pragma once
 
 #include "alpha68k_palette.h"
-#include "snk68_spr.h"
+#include "alpha68k_spr.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs48/mcs48.h"
@@ -31,28 +31,25 @@
 
 class alpha68k_state : public driver_device
 {
-public:
-	alpha68k_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_outlatch(*this, "outlatch"),
-		m_soundlatch(*this, "soundlatch"),
-		m_shared_ram(*this, "shared_ram"),
-		m_spriteram(*this, "spriteram"),
-		m_videoram(*this, "videoram"),
-		m_in(*this, "IN%u", 0U),
-		m_p1(*this, "P1"),
-		m_p2(*this, "P2"),
-		m_system(*this, "SYSTEM"),
-		m_dsw1(*this, "DSW1"),
-		m_dsw2(*this, "DSW2"),
-		m_audiobank(*this, "audiobank")
+protected:
+	alpha68k_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_outlatch(*this, "outlatch")
+		, m_soundlatch(*this, "soundlatch")
+		, m_shared_ram(*this, "shared_ram")
+		, m_spriteram(*this, "spriteram")
+		, m_videoram(*this, "videoram")
+		, m_in(*this, "IN%u", 0U)
+		, m_io_p(*this, "P%u", 1U)
+		, m_system(*this, "SYSTEM")
+		, m_dsw(*this, "DSW%u", 1U)
+		, m_audiobank(*this, "audiobank")
 	{ }
 
-protected:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -67,26 +64,28 @@ protected:
 	optional_shared_ptr<u16> m_videoram;
 
 	optional_ioport_array<7> m_in;
-	optional_ioport m_p1, m_p2, m_system, m_dsw1, m_dsw2;
+	optional_ioport_array<2> m_io_p;
+	optional_ioport m_system;
+	optional_ioport_array<2> m_dsw;
 	optional_memory_bank m_audiobank;
 
-	int           m_flipscreen = 0;
+	bool m_flipscreen = false;
+
+	bool m_invert_controls = false;
+	int  m_microcontroller_id = 0;
+	u32  m_game_id = 0U;  // see below
+	u32  m_deposits1 = 0U;
+	u32  m_deposits2 = 0U;
+	u32  m_credits = 0U;
+	u32  m_coinvalue = 0U;
+	int  m_coin_id = 0;
+	u32  m_microcontroller_data = 0U;
+	u32  m_trigstate = 0U;
+	bool m_latch = false;
 
 	// MCU sims
 	void alpha_microcontroller_w(offs_t offset, u16 data, u16 mem_mask);
-	int           m_invert_controls = 0;
-	int           m_microcontroller_id = 0;
-	unsigned      m_game_id = 0U;  // see below
-	unsigned      m_deposits1 = 0U;
-	unsigned      m_deposits2 = 0U;
-	unsigned      m_credits = 0U;
-	unsigned      m_coinvalue = 0U;
-	int           m_coin_id = 0;
-	unsigned      m_microcontroller_data = 0U;
-	unsigned      m_trigstate = 0U;
-	int           m_latch = 0;
-
-	void set_screen_raw_params(machine_config &config);
+	void set_screen_raw_params(machine_config &config) ATTR_COLD;
 
 	DECLARE_MACHINE_START(common);
 	DECLARE_MACHINE_RESET(common);
@@ -102,45 +101,43 @@ public:
 		, m_palette(*this, "palette")
 	{}
 
-	void alpha68k_II(machine_config &config);
-	void btlfieldb(machine_config &config);
+	void init_skysoldr() ATTR_COLD;
+	void init_timesold() ATTR_COLD;
+	void init_timesold1() ATTR_COLD;
+	void init_btlfield() ATTR_COLD;
+	void init_btlfieldb() ATTR_COLD;
 
-	void init_skysoldr();
-	void init_timesold();
-	void init_timesold1();
-	void init_btlfield();
-	void init_btlfieldb();
+	void alpha68k_II(machine_config &config) ATTR_COLD;
+	void btlfieldb(machine_config &config) ATTR_COLD;
+
 protected:
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<snk68_spr_device> m_sprites;
+	required_device<alpha68k_sprite_device> m_sprites;
 	required_device<alpha68k_palette_device> m_palette;
 
-	void base_config(machine_config &config);
+	/* video-related */
+	tilemap_t *m_fix_tilemap = nullptr;
+	s32 m_bank_base = 0;
+	u8 m_color_entry_mask = ~0;
+
+	u8 m_sound_nmi_mask = 0U;
+	u8 m_sound_pa_latch = 0U;
+
 	DECLARE_VIDEO_START(alpha68k);
-	void video_config(machine_config &config, u16 num_pens);
-	void tile_callback(int &tile, int& fx, int& fy, int& region);
-	void tile_callback_noflipx(int &tile, int& fx, int& fy, int& region);
-	void tile_callback_noflipy(int &tile, int& fx, int& fy, int& region);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void tile_callback(u32 &tile, bool &fx, bool &fy, u8 &region, u32 &color);
+	void tile_callback_noflipx(u32 &tile, bool &fx, bool &fy, u8 &region, u32 &color);
+	void tile_callback_noflipy(u32 &tile, bool &fx, bool &fy, u8 &region, u32 &color);
 
 	INTERRUPT_GEN_MEMBER(sound_nmi);
 	void sound_bank_w(u8 data);
 	void flipscreen_w(int flip);
 	void porta_w(u8 data);
-	u8       m_sound_nmi_mask = 0U;
-	u8       m_sound_pa_latch = 0U;
 
 	DECLARE_MACHINE_START(alpha68k_II);
 	DECLARE_MACHINE_RESET(alpha68k_II);
 	void video_bank_w(u8 data);
-	void alpha68k_II_map(address_map &map) ATTR_COLD;
-	void sound_map(address_map &map) ATTR_COLD;
-	void sound_portmap(address_map &map) ATTR_COLD;
 
 	u16 alpha_II_trigger_r(offs_t offset);
-
-	/* video-related */
-	tilemap_t     *m_fix_tilemap = nullptr;
-	int           m_bank_base = 0;
 
 	void outlatch_w(offs_t offset, u8 data = 0);
 	u16 control_1_r();
@@ -150,6 +147,14 @@ protected:
 	void videoram_w(offs_t offset, u16 data);
 	void video_control2_w(int state);
 	void video_control3_w(int state);
+
+	void base_config(machine_config &config) ATTR_COLD;
+	void video_config(machine_config &config, u16 num_pens, const gfx_decode_entry *gfxinfo) ATTR_COLD;
+
+	void alpha68k_II_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
+
 private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 };
@@ -161,8 +166,9 @@ public:
 		: alpha68k_II_state(mconfig, type, tag)
 	{}
 
-	void init_goldmedl();
-	void goldmedal(machine_config &config);
+	void init_goldmedl() ATTR_COLD;
+
+	void goldmedal(machine_config &config) ATTR_COLD;
 };
 
 class alpha68k_III_state : public alpha68k_II_state
@@ -172,13 +178,16 @@ public:
 		: alpha68k_II_state(mconfig, type, tag)
 	{}
 
-	void alpha68k_III(machine_config &config);
+	void alpha68k_III(machine_config &config) ATTR_COLD;
+
 protected:
 	DECLARE_MACHINE_START(alpha68k_V);
 	DECLARE_MACHINE_RESET(alpha68k_V);
+
+	u16 alpha_V_trigger_r(offs_t offset);
+
 	void alpha68k_III_map(address_map &map) ATTR_COLD;
 	void alpha68k_V_map(address_map &map) ATTR_COLD;
-	u16 alpha_V_trigger_r(offs_t offset);
 };
 
 class goldmedal_III_state : public alpha68k_III_state
@@ -188,8 +197,9 @@ public:
 		: alpha68k_III_state(mconfig, type, tag)
 	{}
 
-	void init_goldmedla();
-	void goldmedal(machine_config &config);
+	void init_goldmedla() ATTR_COLD;
+
+	void goldmedal(machine_config &config) ATTR_COLD;
 };
 
 class alpha68k_V_state : public alpha68k_III_state
@@ -199,13 +209,14 @@ public:
 		: alpha68k_III_state(mconfig, type, tag)
 	{}
 
-	void init_skyadvnt();
-	void init_skyadvntu();
-	void init_sbasebal();
-	void init_sbasebalj();
-	void init_gangwarsu();
-	void init_gangwars();
-	void alpha68k_V(machine_config &config);
+	void init_skyadvnt() ATTR_COLD;
+	void init_skyadvntu() ATTR_COLD;
+	void init_sbasebal() ATTR_COLD;
+	void init_sbasebalj() ATTR_COLD;
+	void init_gangwarsu() ATTR_COLD;
+	void init_gangwars() ATTR_COLD;
+
+	void alpha68k_V(machine_config &config) ATTR_COLD;
 };
 
 class skyadventure_state : public alpha68k_V_state
@@ -215,7 +226,7 @@ public:
 		: alpha68k_V_state(mconfig, type, tag)
 	{}
 
-	void skyadventure(machine_config &config);
+	void skyadventure(machine_config &config) ATTR_COLD;
 };
 
 class gangwars_state : public alpha68k_V_state
@@ -225,7 +236,7 @@ public:
 		: alpha68k_V_state(mconfig, type, tag)
 	{}
 
-	void gangwars(machine_config &config);
+	void gangwars(machine_config &config) ATTR_COLD;
 };
 
 /*
@@ -234,14 +245,13 @@ public:
 
 class alpha68k_prom_state : public alpha68k_state
 {
-public:
+protected:
 	alpha68k_prom_state(const machine_config &mconfig, device_type type, const char *tag)
-		: alpha68k_state(mconfig, type, tag),
-		m_palette(*this, "palette"),
-		m_color_proms(*this, "color_proms")
+		: alpha68k_state(mconfig, type, tag)
+		, m_palette(*this, "palette")
+		, m_color_proms(*this, "color_proms")
 	{}
 
-protected:
 	void palette_init(palette_device &palette) const;
 
 	required_device<palette_device> m_palette;
@@ -255,21 +265,20 @@ protected:
  */
 class alpha68k_N_state : public alpha68k_prom_state
 {
-public:
+protected:
 	alpha68k_N_state(const machine_config &mconfig, device_type type, const char *tag)
 		: alpha68k_prom_state(mconfig, type, tag)
 	{}
 
-protected:
-	void main_map(address_map &map) ATTR_COLD;
-
-	void base_config(machine_config &config);
-	void video_config(machine_config &config, u8 tile_transchar, u8 tile_bankshift, bool is_super_stingray);
+	void base_config(machine_config &config) ATTR_COLD;
+	void video_config(machine_config &config, u8 tile_transchar, u8 tile_bankshift, bool is_super_stingray) ATTR_COLD;
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	u16 kyros_alpha_trigger_r(offs_t offset);
+
+	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 	void sound_iomap(address_map &map) ATTR_COLD;
 
@@ -287,10 +296,17 @@ public:
 		, m_alpha8511(*this, "alpha8511")
 	{}
 
-	void init_sstingry();
-	void sstingry(machine_config &config);
+	void init_sstingry() ATTR_COLD;
+	void sstingry(machine_config &config) ATTR_COLD;
 
 private:
+	required_device<mcs48_cpu_device> m_alpha8511;
+
+	u8 m_alpha8511_address = 0U;
+	u8 m_alpha8511_control = 0U;
+	bool m_alpha8511_read_mode = 0;
+	emu_timer *m_alpha8511_sync_timer = 0;
+
 	u8 alpha8511_command_r(offs_t offset);
 	void alpha8511_command_w(offs_t offset, u8 data);
 	TIMER_CALLBACK_MEMBER(alpha8511_sync);
@@ -302,12 +318,6 @@ private:
 
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
-
-	required_device<mcs48_cpu_device> m_alpha8511;
-	u8 m_alpha8511_address = 0U;
-	u8 m_alpha8511_control = 0U;
-	bool m_alpha8511_read_mode = 0;
-	emu_timer *m_alpha8511_sync_timer = 0;
 };
 
 class kyros_state : public alpha68k_N_state
@@ -317,8 +327,9 @@ public:
 		: alpha68k_N_state(mconfig, type, tag)
 	{}
 
-	void kyros(machine_config &config);
-	void init_kyros();
+	void init_kyros() ATTR_COLD;
+
+	void kyros(machine_config &config) ATTR_COLD;
 };
 
 class jongbou_state : public alpha68k_N_state
@@ -328,15 +339,17 @@ public:
 		: alpha68k_N_state(mconfig, type, tag)
 	{}
 
-	void jongbou(machine_config &config);
-	void init_jongbou();
-	void init_jongbou2();
+	void init_jongbou() ATTR_COLD;
+	void init_jongbou2() ATTR_COLD;
+
+	void jongbou(machine_config &config) ATTR_COLD;
 
 private:
+	u16 dial_inputs_r();
+
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 	void sound_iomap(address_map &map) ATTR_COLD;
-	u16 dial_inputs_r();
 };
 
 /*
@@ -346,15 +359,13 @@ private:
  */
 class alpha68k_I_state : public alpha68k_prom_state
 {
-public:
+protected:
 	alpha68k_I_state(const machine_config &mconfig, device_type type, const char *tag)
 		: alpha68k_prom_state(mconfig, type, tag)
 	{}
 
-
-protected:
-	void base_config(machine_config &config);
-	void video_config(machine_config &config, int yshift);
+	void base_config(machine_config &config) ATTR_COLD;
+	void video_config(machine_config &config, int yshift) ATTR_COLD;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -368,8 +379,9 @@ public:
 		: alpha68k_I_state(mconfig, type, tag)
 	{}
 
-	void paddlema(machine_config &config);
-	void init_paddlema();
+	void init_paddlema() ATTR_COLD;
+
+	void paddlema(machine_config &config) ATTR_COLD;
 
 private:
 	void main_map(address_map &map) ATTR_COLD;
@@ -383,18 +395,19 @@ public:
 		: alpha68k_I_state(mconfig, type, tag)
 	{}
 
-	void tnextspc(machine_config &config);
-	void init_tnextspc();
+	void init_tnextspc() ATTR_COLD;
+
+	void tnextspc(machine_config &config) ATTR_COLD;
 
 private:
-	void main_map(address_map &map) ATTR_COLD;
-	void sound_map(address_map &map) ATTR_COLD;
-	void sound_iomap(address_map &map) ATTR_COLD;
-
 	void tnextspc_coin_counters_w(offs_t offset, u16 data);
 	void tnextspc_unknown_w(offs_t offset, u16 data);
 	void tnextspc_soundlatch_w(u8 data);
 	u16 sound_cpu_r();
+
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_iomap(address_map &map) ATTR_COLD;
 };
 
 /* game_id - used to deal with a few game specific situations */

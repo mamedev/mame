@@ -96,7 +96,7 @@ namespace webpp {
 			std::list<SendData> send_queue;
 
 			void send_from_queue(const std::shared_ptr<Connection> &connection) {
-				strand.post([this, connection]() {
+				asio::post(strand, [this, connection]() {
 					asio::async_write(*socket, send_queue.begin()->header_stream->streambuf,
 							strand.wrap([this, connection](const std::error_code& ec, size_t /*bytes_transferred*/) {
 						if(!ec) {
@@ -219,11 +219,11 @@ namespace webpp {
 				io_context=std::make_shared<asio::io_context>();
 
 			if(io_context->stopped())
-				io_context->reset();
+				io_context->restart();
 
 			asio::ip::tcp::endpoint endpoint;
 			if(config.address.size()>0)
-				endpoint=asio::ip::tcp::endpoint(asio::ip::address::from_string(config.address), config.port);
+				endpoint=asio::ip::tcp::endpoint(asio::ip::make_address(config.address), config.port);
 			else
 				endpoint=asio::ip::tcp::endpoint(asio::ip::tcp::v4(), config.port);
 
@@ -283,7 +283,7 @@ namespace webpp {
 			else
 				header_stream->put(static_cast<unsigned char>(length));
 
-			connection->strand.post([connection, header_stream, message_stream, callback]() {
+			asio::post(connection->strand, [connection, header_stream, message_stream, callback]() {
 				connection->send_queue.emplace_back(header_stream, message_stream, callback);
 				if(connection->send_queue.size()==1)
 					connection->send_from_queue(connection);
@@ -653,12 +653,12 @@ namespace webpp {
 		void timer_idle_init(const std::shared_ptr<Connection> &connection) {
 			if(config.timeout_idle>0) {
 				connection->timer_idle= std::make_unique<asio::system_timer>(connection->socket->get_executor());
-				connection->timer_idle->expires_from_now(std::chrono::seconds(static_cast<unsigned long>(config.timeout_idle)));
+				connection->timer_idle->expires_after(std::chrono::seconds(static_cast<unsigned long>(config.timeout_idle)));
 				timer_idle_expired_function(connection);
 			}
 		}
 		void timer_idle_reset(const std::shared_ptr<Connection> &connection) const {
-			if(config.timeout_idle>0 && connection->timer_idle->expires_from_now(std::chrono::seconds(static_cast<unsigned long>(config.timeout_idle)))>0)
+			if(config.timeout_idle>0 && connection->timer_idle->expires_after(std::chrono::seconds(static_cast<unsigned long>(config.timeout_idle)))>0)
 				timer_idle_expired_function(connection);
 		}
 		void timer_idle_cancel(const std::shared_ptr<Connection> &connection) const {

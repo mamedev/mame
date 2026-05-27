@@ -45,6 +45,8 @@
 #include "mc68901.h"
 #include "cpu/m68000/m68000.h"
 
+#include <bit>
+
 #define LOG_RCV     (1U << 1)
 #define LOG_XMIT    (1U << 2)
 
@@ -848,7 +850,7 @@ void mc68901_device::write(offs_t offset, u8 data)
 		LOG("MC68901 Sync Character : %x\n", data);
 
 		m_scr = data;
-		m_scr_parity = BIT(population_count_32(data), 0);
+		m_scr_parity = BIT(std::popcount(data), 0);
 		break;
 
 	case REGISTER_UCR:

@@ -2,7 +2,7 @@
 -- copyright-holders:Vas Crabb
 local exports = {
 	name = 'inputmacro',
-	version = '0.0.1',
+	version = '0.0.2',
 	description = 'Input macro plugin',
 	license = 'BSD-3-Clause',
 	author = { name = 'Vas Crabb' } }
@@ -41,7 +41,7 @@ function inputmacro.startplugin()
 	local function activate_inputs(inputs)
 		for index, input in ipairs(inputs) do
 			if input.field then
-				active_inputs[string.format('%s.%d.%d', input.port, input.mask, input.type)] = input.field
+				active_inputs[string.format('%s.%d.%d', input.port, input.mask, input.type)] = { input.field, input.value or 1 }
 			end
 		end
 	end
@@ -94,12 +94,12 @@ function inputmacro.startplugin()
 			end
 		end
 
-		for key, field in pairs(active_inputs) do
-			field:set_value(1)
+		for key, input in pairs(active_inputs) do
+			input[1]:set_value(input[2])
 		end
-		for key, field in pairs(previous_inputs) do
+		for key, input in pairs(previous_inputs) do
 			if not active_inputs[key] then
-				field:clear_value()
+				input[1]:clear_value()
 			end
 		end
 	end

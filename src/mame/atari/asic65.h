@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "cpu/tms32010/tms32010.h"
+#include "cpu/tms320c1x/tms320c1x.h"
 
 enum {
 	ASIC65_STANDARD,
@@ -46,7 +46,7 @@ public:
 	void asic65_io_map(address_map &map) ATTR_COLD;
 	void asic65_program_map(address_map &map) ATTR_COLD;
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -64,8 +64,8 @@ private:
 	u8   m_reset_state;
 	u8   m_last_bank;
 
-	/* ROM-based interface states */
-	required_device<tms32010_device> m_ourcpu;
+	// ROM-based interface states
+	required_device<tms320c10_device> m_ourcpu;
 	u8   m_tfull;
 	u8   m_68full;
 	u8   m_cmd;

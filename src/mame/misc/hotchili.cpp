@@ -304,7 +304,7 @@ void hotchili_state::hc_map(address_map &map)
 static INPUT_PORTS_START( hotchili )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("All Clear / Configuration")  // pressed on startup
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("All Clear / Configuration")  // pressed on startup
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unknown
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )  // active: enables RNG and read inputs on secondary buffer (inputs with special timing)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Meter Reading Key") PORT_TOGGLE
@@ -320,7 +320,7 @@ static INPUT_PORTS_START( hotchili )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("CoinTest")      // coin test
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_CODE(KEYCODE_T) PORT_NAME("Test Select")   // test select
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_CODE(KEYCODE_Y) PORT_NAME("Test End")
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR ) PORT_TOGGLE
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_DOOR ) PORT_TOGGLE
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Play 1 Credits / Change (Setup)") // 1st. Start

@@ -9,7 +9,7 @@
 
     Only one game is known (a Mario Bros. hack/translation patch).
 
-    Info: http://agatcomp.ru/Pravetz/SuperGames.shtml
+    Info: http://agatcomp.ru/Pravetz/Hard/SuperGames.shtml
 
     To do:
     - verify palette, pixel and cpu clocks
@@ -100,7 +100,7 @@ void superga2_state::machine_start()
 	save_item(NAME(m_speaker_state));
 
 	// setup video pointers
-	m_video->set_ram_pointers(m_ram_ptr, m_ram_ptr);
+	m_video->set_ram_pointers(m_ram_ptr, nullptr);
 	m_video->set_char_pointer(nullptr, 0);  // no text modes on this machine
 }
 
@@ -130,9 +130,10 @@ void superga2_state::speaker_toggle_w(uint8_t data)
 
 uint8_t superga2_state::switches_r(offs_t offset)
 {
+	const uint8_t uFloatingBus = read_floatingbus(); // video side-effects latch after reading
 	if (!machine().side_effects_disabled())
 		m_softlatch->write_bit((offset & 0x0e) >> 1, offset & 0x01);
-	return read_floatingbus();
+	return uFloatingBus;
 }
 
 uint8_t superga2_state::reset_r(offs_t offset)
@@ -207,8 +208,8 @@ void superga2_state::superga2(machine_config &config)
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
-	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, false, false>)));
+	m_screen->set_raw(1021800 * 14, 65 * 14, 0, 40 * 14, 262, 0, 192);
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, true, true>)));
 	m_screen->set_palette(m_video);
 
 	/* sound hardware */

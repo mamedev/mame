@@ -224,38 +224,35 @@ protected:
 };
 
 /* defines for each bit and mask in input port "CSW" */
-enum
-{
-	/* bit numbers */
-	tx0_control_bit     = 0,
+/* bit numbers */
+constexpr unsigned tx0_control_bit     = 0;
 
-	tx0_stop_c0_bit     = 1,
-	tx0_stop_c1_bit     = 2,
-	tx0_gbl_cm_sel_bit  = 3,
-	tx0_stop_bit        = 4,
-	tx0_restart_bit     = 5,
-	tx0_read_in_bit     = 6,
+constexpr unsigned tx0_stop_c0_bit     = 1;
+constexpr unsigned tx0_stop_c1_bit     = 2;
+constexpr unsigned tx0_gbl_cm_sel_bit  = 3;
+constexpr unsigned tx0_stop_bit        = 4;
+constexpr unsigned tx0_restart_bit     = 5;
+constexpr unsigned tx0_read_in_bit     = 6;
 
-	tx0_toggle_dn_bit   = 12,
-	tx0_toggle_up_bit   = 13,
-	tx0_cm_sel_bit      = 14,
-	tx0_lr_sel_bit      = 15,
+constexpr unsigned tx0_toggle_dn_bit   = 12;
+constexpr unsigned tx0_toggle_up_bit   = 13;
+constexpr unsigned tx0_cm_sel_bit      = 14;
+constexpr unsigned tx0_lr_sel_bit      = 15;
 
-	/* masks */
-	tx0_control = (1 << tx0_control_bit),
+/* masks */
+constexpr unsigned tx0_control      = 1 << tx0_control_bit;
 
-	tx0_stop_cyc0 = (1 << tx0_stop_c0_bit),
-	tx0_stop_cyc1 = (1 << tx0_stop_c1_bit),
-	tx0_gbl_cm_sel = (1 << tx0_gbl_cm_sel_bit),
-	tx0_stop = (1 << tx0_stop_bit),
-	tx0_restart = (1 << tx0_restart_bit),
-	tx0_read_in = (1 << tx0_read_in_bit),
+constexpr unsigned tx0_stop_cyc0    = 1 << tx0_stop_c0_bit;
+constexpr unsigned tx0_stop_cyc1    = 1 << tx0_stop_c1_bit;
+constexpr unsigned tx0_gbl_cm_sel   = 1 << tx0_gbl_cm_sel_bit;
+constexpr unsigned tx0_stop         = 1 << tx0_stop_bit;
+constexpr unsigned tx0_restart      = 1 << tx0_restart_bit;
+constexpr unsigned tx0_read_in      = 1 << tx0_read_in_bit;
 
-	tx0_toggle_dn = (1 << tx0_toggle_dn_bit),
-	tx0_toggle_up = (1 << tx0_toggle_up_bit),
-	tx0_cm_sel = (1 << tx0_cm_sel_bit),
-	tx0_lr_sel = (1 << tx0_lr_sel_bit)
-};
+constexpr unsigned tx0_toggle_dn    = 1 << tx0_toggle_dn_bit;
+constexpr unsigned tx0_toggle_up    = 1 << tx0_toggle_up_bit;
+constexpr unsigned tx0_cm_sel       = 1 << tx0_cm_sel_bit;
+constexpr unsigned tx0_lr_sel       = 1 << tx0_lr_sel_bit;
 
 /* defines for our font */
 enum
@@ -266,43 +263,35 @@ enum
 	tx0_fontdata_size = 8 * tx0_charnum
 };
 
-enum
-{
-	/* size and position of crt window */
-	crt_window_width = /*511*/512,
-	crt_window_height = /*511*/512,
-	crt_window_offset_x = 0,
-	crt_window_offset_y = 0,
-	/* size and position of operator control panel window */
-	panel_window_width = 272,
-	panel_window_height = 264,
-	panel_window_offset_x = crt_window_width,
-	panel_window_offset_y = 0,
-	/* size and position of typewriter window */
-	typewriter_window_width = 640,
-	typewriter_window_height = 160,
-	typewriter_window_offset_x = 0,
-	typewriter_window_offset_y = crt_window_height
-};
+/* size and position of crt window */
+constexpr int crt_window_width = /*511*/512;
+constexpr int crt_window_height = /*511*/512;
+constexpr int crt_window_offset_x = 0;
+constexpr int crt_window_offset_y = 0;
+/* size and position of operator control panel window */
+constexpr int panel_window_width = 272;
+constexpr int panel_window_height = 264;
+constexpr int panel_window_offset_x = crt_window_width;
+constexpr int panel_window_offset_y = 0;
+/* size and position of typewriter window */
+constexpr int typewriter_window_width = 640;
+constexpr int typewriter_window_height = 160;
+constexpr int typewriter_window_offset_x = 0;
+constexpr int typewriter_window_offset_y = crt_window_height;
 
-enum
-{
-	total_width = crt_window_width + panel_window_width,
-	total_height = crt_window_height + typewriter_window_height,
+constexpr int total_width = crt_window_width + panel_window_width;
+constexpr int total_height = crt_window_height + typewriter_window_height;
 
-	/* respect 4:3 aspect ratio to keep pixels square */
-	virtual_width_1 = ((total_width+3)/4)*4,
-	virtual_height_1 = ((total_height+2)/3)*3,
-	virtual_width_2 = virtual_height_1*4/3,
-	virtual_height_2 = virtual_width_1*3/4,
-	virtual_width = (virtual_width_1 > virtual_width_2) ? virtual_width_1 : virtual_width_2,
-	virtual_height = (virtual_height_1 > virtual_height_2) ? virtual_height_1 : virtual_height_2
-};
+/* respect 4:3 aspect ratio to keep pixels square */
+constexpr int virtual_width_1 = ((total_width+3)/4)*4;
+constexpr int virtual_height_1 = ((total_height+2)/3)*3;
+constexpr int virtual_width_2 = virtual_height_1*4/3;
+constexpr int virtual_height_2 = virtual_width_1*3/4;
+constexpr int virtual_width = (virtual_width_1 > virtual_width_2) ? virtual_width_1 : virtual_width_2;
+constexpr int virtual_height = (virtual_height_1 > virtual_height_2) ? virtual_height_1 : virtual_height_2;
 
-enum
-{   /* refresh rate in Hz: can be changed at will */
-	refresh_rate = 60
-};
+/* refresh rate in Hz: can be changed at will */
+constexpr int refresh_rate = 60;
 
 /* Color codes */
 enum

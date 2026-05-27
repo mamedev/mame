@@ -184,16 +184,13 @@ authors:hap
 	<view name="Simple LEDs">
 		<bounds left="0" top="-124" right="300" bottom="325" />
 
-<!-- NOTE: visible screen is not 3:4, partially cut from view horizontally (see imolagp.cpp) -->
-<!-- It would be better to output the full screen area and cut it off in the layout -->
-
+		<!-- NOTE: visible screen is not 3:4, partially cut from view horizontally (see imolagp.cpp) -->
+		<!-- It would be better to output the full screen area and cut it off in the layout -->
 		<screen index="0">
 			<bounds left="0" top="0" right="300" bottom="325" />
 		</screen>
 
-
-<!-- color bars -->
-
+		<!-- color bars -->
 		<element ref="static_green">
 			<bounds x="0" y="-120" width="8" height="116" />
 		</element>
@@ -264,9 +261,7 @@ authors:hap
 			<bounds x="292" y="-124" width="8" height="8" />
 		</element>
 
-
-<!-- score -->
-
+		<!-- score -->
 		<element ref="text_s">
 			<bounds x="10" y="-122" width="8" height="9" />
 		</element>
@@ -303,9 +298,7 @@ authors:hap
 			<bounds x="71.5" y="-113" width="15" height="23" />
 		</element>
 
-
-<!-- result/credits -->
-
+		<!-- result/credits -->
 		<element ref="text_i">
 			<bounds x="26" y="-54" width="8" height="9" />
 		</element>
@@ -341,17 +334,14 @@ authors:hap
 		</element>
 
 		<element ref="text_result">
-			<bounds x="65" y="-54" width="40" height="10" />
+			<bounds x="65" y="-54" width="24" height="10" />
 		</element>
 		<element ref="text_credits">
-			<bounds x="65" y="-34" width="40" height="10" />
+			<bounds x="65" y="-34" width="24" height="10" />
 		</element>
 
-
-<!-- time -->
-
-<!-- (the area above TIME has a racecar drawn on the cab) -->
-
+		<!-- time -->
+		<!-- (the area above TIME has a racecar drawn on the cab) -->
 		<element ref="static_green">
 			<bounds x="125" y="-64" width="50" height="55" />
 		</element>
@@ -366,7 +356,7 @@ authors:hap
 		</element>
 
 		<element ref="text_time">
-			<bounds x="129" y="-60" width="42" height="15" />
+			<bounds x="131" y="-60" width="38" height="15" />
 		</element>
 
 		<element name="digit04" ref="digit">
@@ -376,9 +366,7 @@ authors:hap
 			<bounds x="150" y="-41" width="15" height="23" />
 		</element>
 
-
-<!-- highscores -->
-
+		<!-- highscores -->
 		<element ref="static_gray">
 			<bounds x="197" y="-117" width="83" height="103" />
 		</element>
@@ -514,7 +502,6 @@ authors:hap
 		<element ref="text_s">
 			<bounds x="200" y="-27.5" width="12" height="9" />
 		</element>
-
 
 	</view>
 </mamelayout>

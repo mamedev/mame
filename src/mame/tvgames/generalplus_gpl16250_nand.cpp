@@ -31,27 +31,27 @@
 #include "generalplus_gpl16250_nand.h"
 #include "softlist_dev.h"
 
-uint16_t generalplus_gpac800_game_state::cs0_r(offs_t offset)
+u16 generalplus_gpac800_game_state::cs0_r(offs_t offset)
 {
 	return m_sdram2[offset & 0xffff];
 }
 
-void generalplus_gpac800_game_state::cs0_w(offs_t offset, uint16_t data)
+void generalplus_gpac800_game_state::cs0_w(offs_t offset, u16 data)
 {
 	m_sdram2[offset & 0xffff] = data;
 }
 
-uint16_t generalplus_gpac800_game_state::cs1_r(offs_t offset)
+u16 generalplus_gpac800_game_state::cs1_r(offs_t offset)
 {
 	return m_sdram[offset & (m_sdram_kwords-1)];
 }
 
-void generalplus_gpac800_game_state::cs1_w(offs_t offset, uint16_t data)
+void generalplus_gpac800_game_state::cs1_w(offs_t offset, u16 data)
 {
 	m_sdram[offset & (m_sdram_kwords-1)] = data;
 }
 
-uint8_t generalplus_gpac800_game_state::read_nand(offs_t offset)
+u8 generalplus_gpac800_game_state::read_nand(offs_t offset)
 {
 	if (!m_nandregion)
 		return 0x0000;
@@ -74,7 +74,7 @@ void generalplus_gpac800_game_state::dma_complete_hacks(int state)
 
 	// note, these patch the code copied to SRAM so the 'PROGRAM ROM' check fails (it passes otherwise)
 
-	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 	//if (mem.read_word(0x4368c) == 0x4846)
 	//  mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
@@ -101,6 +101,8 @@ void generalplus_gpac800_game_state::dma_complete_hacks(int state)
 
 void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 {
+	set_addrmap(0, &generalplus_gpac800_game_state::cs_map_base);
+
 	GPAC800(config, m_maincpu, 96000000/2, m_screen);
 	m_maincpu->porta_in().set(FUNC(generalplus_gpac800_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpac800_game_state::portb_r));
@@ -113,11 +115,10 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 	m_maincpu->set_bootmode(0); // boot from internal ROM (NAND bootstrap)
 	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
+	m_maincpu->set_cs_space(DEVICE_SELF, 0);
 	m_maincpu->dma_complete_callback().set(FUNC(generalplus_gpac800_game_state::dma_complete_hacks));
 
 	m_maincpu->nand_read_callback().set(FUNC(generalplus_gpac800_game_state::read_nand));
-
-	FULL_MEMORY(config, m_memory).set_map(&generalplus_gpac800_game_state::cs_map_base);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -131,7 +132,7 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 
 DEVICE_IMAGE_LOAD_MEMBER(generalplus_gpac800_vbaby_game_state::cart_load)
 {
-	uint32_t const size = m_cart->common_get_size("rom");
+	u32 const size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
@@ -707,12 +708,14 @@ ROM_END
 
 void generalplus_gpac800_game_state::machine_start()
 {
+	gcm394_game_state::machine_start();
+
 	save_item(NAME(m_sdram));
 }
 
 void generalplus_gpac800_game_state::nand_create_stripped_region()
 {
-	uint8_t* rom = m_nandregion;
+	u8 *rom = m_nandregion;
 	int size = memregion("nandrom")->bytes();
 	m_size = size;
 
@@ -747,14 +750,12 @@ void generalplus_gpac800_game_state::nand_create_stripped_region()
 void generalplus_gpac800_game_state::machine_reset()
 {
 	// configure CS defaults
-	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	mem.write_word(0x007820, 0x0047);
 	mem.write_word(0x007821, 0xff47);
 	mem.write_word(0x007822, 0x00c7);
 	mem.write_word(0x007823, 0x0047);
 	mem.write_word(0x007824, 0x0047);
-
-	m_maincpu->set_cs_space(m_memory->get_program());
 
 	if (m_nandregion)
 	{
@@ -766,7 +767,7 @@ void generalplus_gpac800_game_state::machine_reset()
 
 		// simulate bootstrap / internal ROM
 
-		address_space& mem = m_maincpu->space(AS_PROGRAM);
+		address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 		/* Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
 		   00000000 (50 47 61 6E 64 6E 61 6E 64 6E)-- -- -- -- -- --  PGandnandn------
@@ -785,7 +786,7 @@ void generalplus_gpac800_game_state::machine_reset()
 		// copy a block of code from the NAND to RAM
 		for (int i = 0; i < m_initial_copy_words; i++)
 		{
-			uint16_t word = m_strippedrom[(i * 2) + 0] | (m_strippedrom[(i * 2) + 1] << 8);
+			u16 word = m_strippedrom[(i * 2) + 0] | (m_strippedrom[(i * 2) + 1] << 8);
 
 			mem.write_word(dest + i, word);
 		}
@@ -796,7 +797,7 @@ void generalplus_gpac800_game_state::machine_reset()
 		   so these must trampoline (although 20xxx currently isn't handled as RAM, so that needs more
 		   thought anyway
 		*/
-		uint16_t* internal = (uint16_t*)memregion("maincpu:internal")->base();
+		u16 *internal = (u16*)memregion("maincpu:internal")->base();
 
 		int addr;
 		addr = (m_vectorbase + 0x0a) & 0x000fffff;
@@ -861,7 +862,6 @@ void generalplus_gpac800_game_state::machine_reset()
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
 	//m_maincpu->set_paldisplaybank_high_hack(0);
-	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
 
@@ -935,7 +935,7 @@ void generalplus_gpac800_game_state::nand_beambox()
 
 // NAND dumps w/ internal bootstrap (and u'nSP 2.0 extended opcodes)  (have gpnandnand strings)
 // the JAKKS ones seem to be known as 'Generalplus GPAC800' hardware
-CONS(2010, wlsair60,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "Jungle Soft / Kids Station Toys Inc",      "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // some of th games seem to be based on ones found in the 'Millennium Arcade' multigames (WinFun related) so might have the same external timer check
+CONS(2010, wlsair60,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "Jungle Soft / Kids Station Toys Inc",      "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // some of the games seem to be based on ones found in the 'Millennium Arcade' multigames (WinFun related) so might have the same external timer check
 CONS(200?, beambox,    0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_beambox,       "Hasbro",                                   "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, mgtfit,     0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "MGT",                                      "Fitness Konsole (NC1470)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
 CONS(200?, vbaby,      0, 0, generalplus_gpac800_vbaby, jak_car2, generalplus_gpac800_vbaby_game_state, nand_vbaby,         "VTech",                                    "V.Baby", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

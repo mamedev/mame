@@ -56,140 +56,142 @@ public:
 	{ }
 
 
-	void crospuzl(machine_config &config);
+	void crospuzl(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-
 	/* memory pointers */
-	required_shared_ptr<uint32_t> m_workram;
-	required_region_ptr<uint8_t> m_flash;
+	required_shared_ptr<u32> m_workram;
+	required_region_ptr<u8> m_flash;
 
 	/* devices */
 	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
 	required_device<pcf8583_device> m_rtc;
 
-	uint8_t    m_FlashCmd = 0;
-	uint8_t    m_FlashPrevCommand = 0;
-	uint32_t   m_FlashAddr = 0;
-	uint8_t    m_FlashShift = 0;
+	u8 m_flash_cmd = 0;
+	u8 m_flash_prev_command = 0;
+	u32 m_flash_addr = 0;
+	u8 m_flash_shift = 0;
 
-//  void Banksw_w(uint32_t data);
-	uint8_t FlashCmd_r();
-	void FlashCmd_w(uint8_t data);
-	void FlashAddr_w(uint8_t data);
+	u32 m_pio = 0;
+	u32 m_ddr = 0;
 
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	void crospuzl_mem(address_map &map) ATTR_COLD;
+//  void banksw_w(u32 data);
+	u8 flash_cmd_r();
+	void flash_cmd_w(u8 data);
+	void flash_addr_w(u8 data);
 
 	// PIO
-	uint32_t m_PIO = 0;
-	uint32_t m_ddr = 0;
-	uint32_t PIOlddr_r();
-	void PIOlddr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t PIOldat_r();
-	void PIOldat_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t PIOedat_r();
+	u32 piolddr_r();
+	void piolddr_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 pioldat_r();
+	void pioldat_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 pioedat_r();
+
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
-uint32_t crospuzl_state::PIOedat_r()
+u32 crospuzl_state::pioedat_r()
 {
-	// TODO: this needs fixing in serflash_device
+	// TODO: this needs fixing in nand_device
 	// (has a laconic constant for the ready line)
 	return (m_rtc->sda_r() << 19)
 		| (machine().rand() & 0x04000000); // serial ready line
 }
 
-uint8_t crospuzl_state::FlashCmd_r()
+u8 crospuzl_state::flash_cmd_r()
 {
-	if ((m_FlashCmd & 0xff) == 0xff)
+	if ((m_flash_cmd & 0xff) == 0xff)
 	{
 		return 0xff;
 	}
-	if ((m_FlashCmd & 0xff) == 0x90)
+	if ((m_flash_cmd & 0xff) == 0x90)
 	{
 		// Service Mode has the first two bytes of the ID printed,
 		// in format ****/ee81
 		// ee81 has no correspondence in the JEDEC flash vendor ID list,
 		// and the standard claims that the ID is 7 + 1 parity bit.
 		// TODO: Retrieve ID from actual HW service mode screen.
-//      const uint8_t id[5] = { 0xee, 0x81, 0x00, 0x15, 0x00 };
-		const uint8_t id[5] = { 0xec, 0xf1, 0x00, 0x95, 0x40 };
-		uint8_t res = id[m_FlashAddr];
+//      const u8 id[5] = { 0xee, 0x81, 0x00, 0x15, 0x00 };
+		const u8 id[5] = { 0xec, 0xf1, 0x00, 0x95, 0x40 };
+		const u8 res = id[m_flash_addr];
 		if (!machine().side_effects_disabled())
 		{
-			m_FlashAddr++;
-			m_FlashAddr %= 5;
+			m_flash_addr++;
+			m_flash_addr %= 5;
 		}
 		return res;
 	}
-	if ((m_FlashCmd & 0xff) == 0x30)
+	if ((m_flash_cmd & 0xff) == 0x30)
 	{
-		uint8_t res = m_flash[m_FlashAddr];
+		const u8 res = m_flash[m_flash_addr];
 		if (!machine().side_effects_disabled())
-			m_FlashAddr++;
+			m_flash_addr++;
 		return res;
 	}
 	return 0;
 }
 
-void crospuzl_state::FlashCmd_w(uint8_t data)
+void crospuzl_state::flash_cmd_w(u8 data)
 {
-	m_FlashPrevCommand = m_FlashCmd;
-	m_FlashCmd = data;
-	m_FlashShift = 0;
-	m_FlashAddr = 0;
-	logerror("%08x %08x CMD\n",m_FlashPrevCommand, m_FlashCmd);
+	m_flash_prev_command = m_flash_cmd;
+	m_flash_cmd = data;
+	m_flash_shift = 0;
+	m_flash_addr = 0;
+	logerror("%s: %08x %08x CMD\n", machine().describe_context(), m_flash_prev_command, m_flash_cmd);
 }
 
-void crospuzl_state::FlashAddr_w(uint8_t data)
+void crospuzl_state::flash_addr_w(u8 data)
 {
-	m_FlashAddr |= data << (m_FlashShift*8);
-	m_FlashShift++;
-	if (m_FlashShift == 4)
-		logerror("%08x %02x ADDR\n",m_FlashAddr,m_FlashShift);
+	m_flash_addr |= data << (m_flash_shift * 8);
+	m_flash_shift++;
+	if (m_flash_shift == 4)
+		logerror("%s: %08x %02x ADDR\n", machine().describe_context(), m_flash_addr, m_flash_shift);
 }
 
-uint32_t crospuzl_state::PIOlddr_r()
+u32 crospuzl_state::piolddr_r()
 {
 	return m_ddr;
 }
 
-void crospuzl_state::PIOlddr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void crospuzl_state::piolddr_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (BIT(m_ddr, 19) != BIT(data, 19))
-		m_rtc->sda_w(BIT(data, 19) ? 1 : BIT(m_PIO, 19));
+		m_rtc->sda_w(BIT(data, 19) ? 1 : BIT(m_pio, 19));
 	if (BIT(m_ddr, 20) != BIT(data, 20))
-		m_rtc->scl_w(BIT(data, 20) ? 1 : BIT(m_PIO, 20));
+		m_rtc->scl_w(BIT(data, 20) ? 1 : BIT(m_pio, 20));
 	COMBINE_DATA(&m_ddr);
 }
 
-uint32_t crospuzl_state::PIOldat_r()
+u32 crospuzl_state::pioldat_r()
 {
-	return m_PIO;
+	return m_pio;
 }
 
 // PIO Latched output DATa Register
 // TODO: change me
-void crospuzl_state::PIOldat_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void crospuzl_state::pioldat_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (!BIT(m_ddr, 19))
 		m_rtc->sda_w(BIT(data, 19));
 	if (!BIT(m_ddr, 20))
 		m_rtc->scl_w(BIT(data, 20));
 
-	COMBINE_DATA(&m_PIO);
+	COMBINE_DATA(&m_pio);
 }
 
-void crospuzl_state::crospuzl_mem(address_map &map)
+void crospuzl_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom().nopw();
 
-	map(0x01500000, 0x01500000).r(FUNC(crospuzl_state::FlashCmd_r));
-	map(0x01500100, 0x01500100).w(FUNC(crospuzl_state::FlashCmd_w));
-	map(0x01500200, 0x01500200).w(FUNC(crospuzl_state::FlashAddr_w));
+	map(0x01500000, 0x01500000).r(FUNC(crospuzl_state::flash_cmd_r));
+	map(0x01500100, 0x01500100).w(FUNC(crospuzl_state::flash_cmd_w));
+	map(0x01500200, 0x01500200).w(FUNC(crospuzl_state::flash_addr_w));
 	map(0x01510000, 0x01510003).portr("IN0");
 	map(0x01511000, 0x01511003).portr("IN1");
 	map(0x01512000, 0x01512003).portr("IN2");
@@ -199,32 +201,32 @@ void crospuzl_state::crospuzl_mem(address_map &map)
 
 	map(0x01800000, 0x01ffffff).m(m_vr0soc, FUNC(vrender0soc_device::regs_map));
 	map(0x0180001c, 0x0180001f).noprw();
-	map(0x01802000, 0x01802003).rw(FUNC(crospuzl_state::PIOlddr_r), FUNC(crospuzl_state::PIOlddr_w));
-	map(0x01802004, 0x01802007).rw(FUNC(crospuzl_state::PIOldat_r), FUNC(crospuzl_state::PIOldat_w));
-	map(0x01802008, 0x0180200b).r(FUNC(crospuzl_state::PIOedat_r));
+	map(0x01802000, 0x01802003).rw(FUNC(crospuzl_state::piolddr_r), FUNC(crospuzl_state::piolddr_w));
+	map(0x01802004, 0x01802007).rw(FUNC(crospuzl_state::pioldat_r), FUNC(crospuzl_state::pioldat_w));
+	map(0x01802008, 0x0180200b).r(FUNC(crospuzl_state::pioedat_r));
 
-	map(0x02000000, 0x027fffff).ram().share("workram");
+	map(0x02000000, 0x027fffff).ram().share(m_workram);
 
 	map(0x03000000, 0x04ffffff).m(m_vr0soc, FUNC(vrender0soc_device::audiovideo_map));
 
 //  map(0x05000000, 0x05ffffff).bankr("mainbank");
-//  map(0x05000000, 0x05000003).rw(FUNC(crospuzl_state::FlashCmd_r), FUNC(crospuzl_state::FlashCmd_w));
+//  map(0x05000000, 0x05000003).rw(FUNC(crospuzl_state::flash_cmd_r), FUNC(crospuzl_state::flash_cmd_w));
 }
 
 void crospuzl_state::machine_start()
 {
 //  save_item(NAME(m_Bank));
-	save_item(NAME(m_FlashCmd));
-	save_item(NAME(m_PIO));
+	save_item(NAME(m_flash_cmd));
+	save_item(NAME(m_pio));
 	save_item(NAME(m_ddr));
 }
 
 void crospuzl_state::machine_reset()
 {
-	m_FlashCmd = 0xff;
-	m_FlashAddr = 0;
-	m_FlashShift = 0;
-	m_FlashPrevCommand = 0xff;
+	m_flash_cmd = 0xff;
+	m_flash_addr = 0;
+	m_flash_shift = 0;
+	m_flash_prev_command = 0xff;
 	m_ddr = 0xffffffff;
 }
 
@@ -363,18 +365,18 @@ INPUT_PORTS_END
 void crospuzl_state::crospuzl(machine_config &config)
 {
 	SE3208(config, m_maincpu, 14318180 * 3); // FIXME: 72 MHz-ish
-	m_maincpu->set_addrmap(AS_PROGRAM, &crospuzl_state::crospuzl_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &crospuzl_state::main_map);
 	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	VRENDER0_SOC(config, m_vr0soc, 14318180 * 6); // FIXME: 72 MHz-ish
 	m_vr0soc->set_host_space_tag(m_maincpu, AS_PROGRAM);
-	m_vr0soc->int_callback().set_inputline(m_maincpu, SE3208_INT);
+	m_vr0soc->int_callback().set_inputline(m_maincpu, se3208_device::SE3208_INT);
 	m_vr0soc->set_external_vclk(14318180 * 2); // Unknown clock, should output ~70 Hz?
 
 //  ROM strings have references to a K9FXX08 device
-//  TODO: use this device, in machine/smartmed.h (has issues with is_busy() emulation)
+//  TODO: use this device, in machine/nandflash.h (has issues with is_busy() emulation)
 //  SAMSUNG_K9F1G08U0B(config, m_nand, 0); // TODO: exact flavor
 
 	PCF8583(config, m_rtc, 32.768_kHz_XTAL);

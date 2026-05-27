@@ -439,7 +439,7 @@ void ym7101_device::vram_w(offs_t offset, u16 data, u16 mem_mask)
 	COMBINE_DATA(&m_vram[offset]);
 	gfx(0)->mark_dirty(offset >> 4);
 
-	const u32 sprite_table = m_sprite_attribute_table >> 1;
+	const offs_t sprite_table = m_sprite_attribute_table >> 1;
 
 	// TODO: check akumajo Stage 6-3
 	// TODO: check segacd:snatcheru (H32, puts sprite_table at $fe00)
@@ -1032,7 +1032,7 @@ void ym7101_device::prepare_tile_line(int scanline)
 
 bool ym7101_device::render_line(int scanline)
 {
-	if (scanline >= 224)
+	if (scanline > 224)
 		return false;
 
 	uint32_t *p = &m_bitmap.pix(scanline);
@@ -1139,6 +1139,7 @@ u8 ym7101_device::mix_sh(u8 dot_a, u8 dot_b, u8 dot_sprite)
 
 TIMER_CALLBACK_MEMBER(ym7101_device::scan_timer_callback)
 {
+	const int irq_ticks = 32;
 	int scanline = param;
 
 	// TODO: to execution pipeline
@@ -1146,7 +1147,7 @@ TIMER_CALLBACK_MEMBER(ym7101_device::scan_timer_callback)
 	{
 		// mazinsagj hangs on title screen transition with 16
 		// (expects to hit at first non-border hpos?)
-		m_vint_on_timer->adjust(attotime::from_ticks(32, clock()));
+		m_vint_on_timer->adjust(attotime::from_ticks(irq_ticks, clock()));
 		m_vint_pending = 1;
 	}
 
@@ -1162,6 +1163,8 @@ TIMER_CALLBACK_MEMBER(ym7101_device::scan_timer_callback)
 
 	// TODO: should trigger at the end of current display phase
 	// check dracula, galahad, marvlandj, roadrashj on changes
+	// TODO: goldnax3 is now fussy on intro (same as 315-5313 core)
+	// broke on active_scan range from >= to >, which is a requirement for dashdes and shangon ...
 	if (active_scan)
 	{
 		m_vcounter --;
@@ -1172,7 +1175,7 @@ TIMER_CALLBACK_MEMBER(ym7101_device::scan_timer_callback)
 			m_hint_pending = 1;
 			if (m_ie1)
 			{
-				m_hint_on_timer->adjust(attotime::from_ticks(16, clock()));
+				m_hint_on_timer->adjust(attotime::from_ticks(irq_ticks, clock()));
 			}
 			else
 				m_hint_callback(0);

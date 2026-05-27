@@ -868,6 +868,14 @@ TIMER_CALLBACK_MEMBER(swim1_device::ism_periodic_sync)
 void swim1_device::ism_sync()
 {
 	u64 next_sync = time_to_cycles(machine().time());
+
+	// machine().time() can go backwards for currently unknown reasons.
+	// guard against it here, which fixes a lot of problems.
+	if (m_last_sync > next_sync)
+	{
+		return;
+	}
+
 	if(!(m_ism_mode & 0x08)) {
 		m_last_sync = next_sync;
 		return;

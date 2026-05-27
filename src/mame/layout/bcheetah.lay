@@ -52,11 +52,11 @@ authors:hap
 	<group name="status">
 		<bounds x="0" y="0" width="5.5" height="3" />
 
-		<element ref="text_m2"><bounds x="0" y="0" width="4" height="1" /></element>
+		<element ref="text_m2"><bounds x="0" y="0" width="3.5" height="1" /></element>
 		<element name="motor2_left" ref="text_ml"><bounds x="3.5" y="0" width="1" height="1" /></element>
 		<element name="motor2_right" ref="text_mr"><bounds x="4.5" y="0" width="1" height="1" /></element>
 
-		<element ref="text_m1"><bounds x="0" y="1.15" width="4" height="1" /></element>
+		<element ref="text_m1"><bounds x="0" y="1.15" width="3.5" height="1" /></element>
 		<element name="motor1" ref="text_mdrv"><bounds x="3.5" y="1.15" width="2" height="1" /></element>
 	</group>
 

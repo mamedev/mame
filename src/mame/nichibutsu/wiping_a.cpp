@@ -19,18 +19,16 @@
 
 DEFINE_DEVICE_TYPE(WIPING_CUSTOM, wiping_sound_device, "wiping_sound", "Wiping Custom Sound")
 
-wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, WIPING_CUSTOM, tag, owner, clock),
+wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, WIPING_CUSTOM, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_last_channel(nullptr),
 	m_sound_prom(*this, "soundproms"),
 	m_sound_rom(*this, "samples"),
-	m_num_voices(0),
-	m_sound_enable(0),
 	m_stream(nullptr)
 {
-	memset(m_channel_list, 0, sizeof(wp_sound_channel)*MAX_VOICES);
-	memset(m_soundregs, 0, sizeof(uint8_t)*0x4000);
+	memset(m_channel_list, 0, sizeof(sound_channel) * MAX_VOICES);
+	memset(m_soundregs, 0, sizeof(uint8_t) * 0x4000);
 }
 
 
@@ -40,7 +38,7 @@ wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const ch
 
 void wiping_sound_device::device_start()
 {
-	wp_sound_channel *voice;
+	sound_channel *voice;
 
 	/* get stream channels */
 	m_stream = stream_alloc(0, 1, clock()); // 48000 Hz
@@ -49,11 +47,7 @@ void wiping_sound_device::device_start()
 	m_mixer_buffer.resize(clock());
 
 	/* extract globals from the interface */
-	m_num_voices = 8;
-	m_last_channel = m_channel_list + m_num_voices;
-
-	/* start with sound enabled, many games don't have a sound enable register */
-	m_sound_enable = 1;
+	m_last_channel = m_channel_list + MAX_VOICES;
 
 	/* reset all the voices */
 	for (voice = m_channel_list; voice < m_last_channel; voice++)
@@ -77,7 +71,7 @@ void wiping_sound_device::device_start()
 
 void wiping_sound_device::sound_w(offs_t offset, uint8_t data)
 {
-	wp_sound_channel *voice;
+	sound_channel *voice;
 	int base;
 
 	/* update the streams */
@@ -127,13 +121,9 @@ void wiping_sound_device::sound_w(offs_t offset, uint8_t data)
 
 void wiping_sound_device::sound_stream_update(sound_stream &stream)
 {
-	wp_sound_channel *voice;
+	sound_channel *voice;
 	short *mix;
 	int i;
-
-	/* if no sound, we're done */
-	if (m_sound_enable == 0)
-		return;
 
 	/* zap the contents of the mixer buffer */
 	std::fill_n(&m_mixer_buffer[0], stream.samples(), 0);

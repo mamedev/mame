@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include "machine/gen_latch.h"
-
 #define BLK (0xff)
 #define INPUT_PORT_A (-1)
 #define INPUT_PORT_B (-2)
@@ -70,7 +68,7 @@ public:
 		m_external_addrswap[1] = a1;
 		m_external_addrswap[0] = a0;
 	}
-	void set_interface_scramble_reverse() { set_interface_scramble(0,1,2,3,4,5,6,7,8,9); }
+	void set_interface_scramble_reverse() { set_interface_scramble(0, 1, 2, 3, 4, 5, 6, 7, 8, 9); }
 	void set_interface_scramble_interleave() { set_interface_scramble(4, 5, 3, 6, 2, 7, 1, 8, 0, 9); }
 	void set_use_magic_read_address_xor(bool use_xor) { m_magic_read_address_xor_enabled = use_xor; }
 
@@ -78,51 +76,65 @@ public:
 
 	u8 soundlatch_r();
 
-	devcb_read16 m_port_a_r;
-	devcb_read16 m_port_b_r;
-	devcb_read16 m_port_c_r;
+protected:
+	deco_146_base_device(const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			device_t *owner,
+			u32 clock,
+			u8 bankswap_read_addr,
+			u16 magic_read_addr_xor,
+			u8 xor_port,
+			u8 mask_port,
+			u8 sound_port,
+			u8 configregion,
+			deco146port_xx const *lookup_table);
 
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+private:
+	u16 read_protport(u16 address);
+	void write_protport(u16 address, u16 data, u16 mem_mask);
+	u16 read_data_getloc(u16 address, int& location);
+
+	TIMER_CALLBACK_MEMBER(write_soundlatch);
+
+	// configurations
 	u8 m_bankswitch_swap_read_address;
 	u16 m_magic_read_address_xor;
 	bool m_magic_read_address_xor_enabled;
 	u8 m_xor_port;
 	u8 m_mask_port;
 	u8 m_soundlatch_port;
-
-	u8 m_external_addrswap[10];
+	[[maybe_unused]] u8 m_configregion; // which value of upper 4 address lines accesses the config region
 
 	deco146port_xx const *m_lookup_table;
 
-protected:
-	deco_146_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	u8 m_external_addrswap[10];
 
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
+	// internal states
+	u16 m_rambank[2][0x80];
 
-	u16 read_protport(u16 address);
-	virtual void write_protport(u16 address, u16 data, u16 mem_mask);
-	virtual u16 read_data_getloc(u16 address, int& location);
-
-	std::unique_ptr<u16[]> m_rambank[2];
-
-	int m_current_rambank;
+	u8 m_current_rambank;
 
 	u16 m_nand;
 	u16 m_xor;
 
 	u16 m_latchaddr;
 	u16 m_latchdata;
+	u8 m_latchflag;
 
-	u8 m_configregion; // which value of upper 4 address lines accesses the config region
-	int m_latchflag;
-
-private:
-	TIMER_CALLBACK_MEMBER(write_soundlatch);
-
-	u8 region_selects[6];
+	u8 m_region_selects[6];
 
 	u8 m_soundlatch;
+
+	// callbacks
 	devcb_write_line m_soundlatch_irq_cb;
+
+	devcb_read16 m_port_a_r;
+	devcb_read16 m_port_b_r;
+	devcb_read16 m_port_c_r;
 };
 
 class deco146_device : public deco_146_base_device

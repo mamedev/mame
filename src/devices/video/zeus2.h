@@ -10,9 +10,11 @@
 
 #pragma once
 
+#include "cpu/tms320c3x/tms320c3x.h"
 #include "video/poly.h"
+
 #include "video/rgbutil.h"
-#include "cpu/tms32031/tms32031.h"
+
 
 /*************************************
 *  Constants
@@ -152,8 +154,9 @@ public:
 	int texel_width;
 	float zbase;
 
-	enum { THEGRID, CRUSNEXO, MWSKINS };
-	int m_system;
+	enum system_t { THEGRID, CRUSNEXO, MWSKINS };
+	void set_system_type(system_t type) { m_system = type; }
+	system_t m_system;
 #if PRINT_TEX_INFO
 	void check_tex(uint32_t &texmode, float &zObj, float &zMat, float &zOff);
 	std::string tex_info(void);
@@ -220,7 +223,7 @@ public:
 			return reinterpret_cast<float&>(val);
 		}
 		else
-			return tms3203x_device::fp_to_float(val);
+			return tms320c3x_device::fp_to_float(val);
 	}
 
 	inline uint32_t frame_addr_from_xy(uint32_t x, uint32_t y, bool render)

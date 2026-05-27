@@ -526,7 +526,7 @@ void mz3500_state::io_w(offs_t offset, u8 data)
 	switch(offset)
 	{
 		case 0:
-			m_slave->set_input_line(Z80_INPUT_LINE_BUSRQ, data & 2 ? ASSERT_LINE : CLEAR_LINE);
+			m_slave->set_input_line(Z80_INPUT_LINE_BUSREQ, data & 2 ? ASSERT_LINE : CLEAR_LINE);
 			break;
 		case 1:
 			if (!BIT(m_old_sres, 7) && BIT(data, 7))

@@ -96,7 +96,6 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 #include "emu.h"
 #include "jpmimpct.h"
 
-#include "awpvid.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
@@ -385,25 +384,25 @@ void jpmimpct_state::reels_0123_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	if (m_reel[0])
 	{
 		m_reel[0]->update((data >> 0) & 0x0f);
-		awp_draw_reel(machine(),"reel1", *m_reel[0]);
+		m_reel[0]->draw();
 	}
 
 	if (m_reel[1])
 	{
 		m_reel[1]->update((data >> 4)& 0x0f);
-		awp_draw_reel(machine(),"reel2", *m_reel[1]);
+		m_reel[1]->draw();
 	}
 
 	if (m_reel[2])
 	{
 		m_reel[2]->update((data >> 8)& 0x0f);
-		awp_draw_reel(machine(),"reel3", *m_reel[2]);
+		m_reel[2]->draw();
 	}
 
 	if (m_reel[3])
 	{
 		m_reel[3]->update((data >> 12)& 0x0f);
-		awp_draw_reel(machine(),"reel4", *m_reel[3]);
+		m_reel[3]->draw();
 	}
 }
 
@@ -412,12 +411,12 @@ void jpmimpct_state::reels_45_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (m_reel[4])
 	{
 		m_reel[4]->update((data >> 0)& 0x0f);
-		awp_draw_reel(machine(),"reel5", *m_reel[4]);
+		m_reel[4]->draw();
 	}
 	if (m_reel[5])
 	{
 		m_reel[5]->update((data >> 4)& 0x0f);
-		awp_draw_reel(machine(),"reel6", *m_reel[5]);
+		m_reel[5]->draw();
 	}
 }
 
@@ -772,22 +771,22 @@ INPUT_PORTS_START( jpmimpct_inputs )
 	// or will simply ignore them
 	PORT_START("J10_0")
 	PORT_CONFNAME( 0x0f, 0x08, "Jackpot / Prize Key" )
-	PORT_CONFSETTING(    0x0f, "Not Fitted"  )
-	PORT_CONFSETTING(    0x0e, "0x0e"  )
-	PORT_CONFSETTING(    0x0d, "0x0d"  )
-	PORT_CONFSETTING(    0x0c, "0x0c"  )
-	PORT_CONFSETTING(    0x0b, "0x0b"  )
-	PORT_CONFSETTING(    0x0a, "8 GBP Cash"  )
-	PORT_CONFSETTING(    0x09, "8 GBP Token"  )
-	PORT_CONFSETTING(    0x08, "10 GBP Cash"  )
-	PORT_CONFSETTING(    0x07, "5 GBP"  )
-	PORT_CONFSETTING(    0x06, "15 GBP"  )
-	PORT_CONFSETTING(    0x05, "25 GBP"  )
-	PORT_CONFSETTING(    0x04, "0x04"  )
-	PORT_CONFSETTING(    0x03, "0x03"  )
-	PORT_CONFSETTING(    0x02, "0x02"  )
-	PORT_CONFSETTING(    0x01, "0x01"  )
-	PORT_CONFSETTING(    0x00, "0x00"  )
+	PORT_CONFSETTING(    0x0f, "Not Fitted" )
+	PORT_CONFSETTING(    0x0e, "0x0e" )
+	PORT_CONFSETTING(    0x0d, "0x0d" )
+	PORT_CONFSETTING(    0x0c, "0x0c" )
+	PORT_CONFSETTING(    0x0b, "0x0b" )
+	PORT_CONFSETTING(    0x0a, "8 GBP Cash" )
+	PORT_CONFSETTING(    0x09, "8 GBP Token" )
+	PORT_CONFSETTING(    0x08, "10 GBP Cash" )
+	PORT_CONFSETTING(    0x07, "5 GBP" )
+	PORT_CONFSETTING(    0x06, "15 GBP" )
+	PORT_CONFSETTING(    0x05, "25 GBP" )
+	PORT_CONFSETTING(    0x04, "0x04" )
+	PORT_CONFSETTING(    0x03, "0x03" )
+	PORT_CONFSETTING(    0x02, "0x02" )
+	PORT_CONFSETTING(    0x01, "0x01" )
+	PORT_CONFSETTING(    0x00, "0x00" )
 	PORT_CONFNAME( 0x70, 0x60, "Stake Key" )
 	PORT_CONFSETTING(    0x00, "0x00" )
 	PORT_CONFSETTING(    0x10, "0x10" )
@@ -880,7 +879,7 @@ INPUT_PORTS_START( jpmimpct_inputs )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("J10_2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_INTERLOCK) PORT_NAME("Back Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE // always?
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Back Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE // always?
 	PORT_DIPNAME( 0x02, 0x02, "J10_2: 0x02")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1007,7 +1006,7 @@ INPUT_PORTS_START( jpmimpct_video_inputs )
 	PORT_INCLUDE( jpmimpct_inputs )
 
 	PORT_MODIFY("J10_2")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_INTERLOCK) PORT_NAME("Cashbox Door")  PORT_CODE(KEYCODE_W) PORT_TOGGLE // not always, probably shouldn't be defined here
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_DOOR) PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_W) PORT_TOGGLE // not always, probably shouldn't be defined here
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 INPUT_PORTS_END
 

@@ -16,24 +16,49 @@
 #include "bus/rs232/terminal.h"
 #include "machine/ins8250.h"
 
+
+namespace {
+
 static void isa_com(device_slot_interface &device)
 {
+	// TODO: why such a tiny list of allowed devices?
 	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
-	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
-	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
-	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse",  LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse",     WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse",  MSYSTEMS_HLE_SERIAL_MOUSE);
 	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
-	device.option_add("terminal", SERIAL_TERMINAL);
-	device.option_add("null_modem", NULL_MODEM);
-	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
+	device.option_add("terminal",        SERIAL_TERMINAL);
+	device.option_add("null_modem",      NULL_MODEM);
+	device.option_add("sun_kbd",         SUN_KBD_ADAPTOR);
 }
 
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
+// ======================> isa8_com_device
 
-DEFINE_DEVICE_TYPE(ISA8_COM, isa8_com_device, "isa_com", "Communications Adapter PC/XT")
+class isa8_com_device : public device_t, public device_isa8_card_interface
+{
+public:
+	// construction/destruction
+	isa8_com_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+		isa8_com_device(mconfig, ISA8_COM, tag, owner, clock)
+	{
+	}
+
+	void pc_com_interrupt_1(int state) { m_isa->irq4_w(state); }
+	void pc_com_interrupt_2(int state) { m_isa->irq3_w(state); }
+
+protected:
+	isa8_com_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+		device_t(mconfig, type, tag, owner, clock),
+		device_isa8_card_interface(mconfig, *this)
+	{
+	}
+
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+};
+
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -96,22 +121,6 @@ void isa8_com_device::device_add_mconfig(machine_config &config)
 //**************************************************************************
 
 //-------------------------------------------------
-//  isa8_com_device - constructor
-//-------------------------------------------------
-
-isa8_com_device::isa8_com_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	isa8_com_device(mconfig, ISA8_COM, tag, owner, clock)
-{
-}
-
-isa8_com_device::isa8_com_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_isa8_card_interface(mconfig, *this)
-{
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -124,19 +133,25 @@ void isa8_com_device::device_start()
 //  m_isa->install_device(0x02e8, 0x02ef, read8sm_delegate(*subdevice<ins8250_uart_device>("uart_3"), FUNC(ins8250_device::ins8250_r)), write8sm_delegate(*subdevice<ins8250_uart_device>("uart_3"), FUNC(ins8250_device::ins8250_w)));
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
 
-void isa8_com_device::device_reset()
+
+// ======================> isa8_com_at_device
+
+class isa8_com_at_device :
+		public isa8_com_device
 {
-}
+public:
+	// construction/destruction
+	isa8_com_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+		isa8_com_device(mconfig, ISA8_COM_AT, tag, owner, clock)
+	{
+	}
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
+protected:
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+};
 
-DEFINE_DEVICE_TYPE(ISA8_COM_AT, isa8_com_at_device, "isa_com_at", "Communications Adapter")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -183,11 +198,12 @@ void isa8_com_at_device::device_add_mconfig(machine_config &config)
 	//RS232_PORT(config, "serport3", isa_com, nullptr);
 }
 
-//-------------------------------------------------
-//  isa8_com_device - constructor
-//-------------------------------------------------
+} // anonymous namespace
 
-isa8_com_at_device::isa8_com_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	isa8_com_device(mconfig, ISA8_COM_AT, tag, owner, clock)
-{
-}
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(ISA8_COM,    device_isa8_card_interface, isa8_com_device,    "isa_com",    "Communications Adapter PC/XT")
+DEFINE_DEVICE_TYPE_PRIVATE(ISA8_COM_AT, device_isa8_card_interface, isa8_com_at_device, "isa_com_at", "Communications Adapter")

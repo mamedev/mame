@@ -29,8 +29,8 @@ struct drcuml_machine_state;
 
 // use a namespace to wrap all the UML instruction concepts so that
 // we can keep names short
-namespace uml
-{
+namespace uml {
+
 	// integer registers
 	constexpr int REG_I0 = 0x400;
 	constexpr int REG_I_COUNT = 10;
@@ -181,6 +181,8 @@ namespace uml
 		OP_SET,                     // SET     dst,c
 		OP_MOV,                     // MOV     dst,src[,c]
 		OP_SEXT,                    // SEXT    dst,src,size
+		OP_BFXU,                    // BFXU    dst,src,shift,width
+		OP_BFXS,                    // BFXS    dst,src,shift,width
 		OP_ROLAND,                  // ROLAND  dst,src,shift,mask
 		OP_ROLINS,                  // ROLINS  dst,src,shift,mask
 		OP_ADD,                     // ADD     dst,src1,src2[,f]
@@ -324,7 +326,8 @@ namespace uml
 		static parameter make_memory(void const *base) { return parameter(PTYPE_MEMORY, reinterpret_cast<parameter_value>(const_cast<void *>(base))); }
 		static parameter make_size(operand_size size) { assert(size >= SIZE_BYTE && size <= SIZE_QWORD); return parameter(PTYPE_SIZE, size); }
 		static parameter make_string(char const *string) { return parameter(PTYPE_STRING, reinterpret_cast<parameter_value>(const_cast<char *>(string))); }
-		static parameter make_cfunc(c_function func) { return parameter(PTYPE_C_FUNCTION, reinterpret_cast<parameter_value>(func)); }
+		template <typename T> static parameter make_cfunc(void (*func)(T *)) { return parameter(PTYPE_C_FUNCTION, parameter_value(reinterpret_cast<uintptr_t>(func))); }
+		template <typename T> static parameter make_cfunc(void (*func)(T &)) { return parameter(PTYPE_C_FUNCTION, parameter_value(reinterpret_cast<uintptr_t>(func))); }
 		static parameter make_rounding(float_rounding_mode mode) { assert(mode >= ROUND_TRUNC && mode <= ROUND_DEFAULT); return parameter(PTYPE_ROUNDING, mode); }
 
 		// operators
@@ -343,7 +346,7 @@ namespace uml
 		memory_space space() const { assert(m_type == PTYPE_SIZE_SPACE); return memory_space(m_value >> 4); }
 		code_handle &handle() const { assert(m_type == PTYPE_CODE_HANDLE); return *reinterpret_cast<code_handle *>(m_value); }
 		code_label label() const { assert(m_type == PTYPE_CODE_LABEL); return code_label(m_value); }
-		c_function cfunc() const { assert(m_type == PTYPE_C_FUNCTION); return reinterpret_cast<c_function>(m_value); }
+		c_function cfunc() const { assert(m_type == PTYPE_C_FUNCTION); return reinterpret_cast<c_function>(uintptr_t(m_value)); }
 		float_rounding_mode rounding() const { assert(m_type == PTYPE_ROUNDING); return float_rounding_mode(m_value); }
 		char const *string() const { assert(m_type == PTYPE_STRING); return reinterpret_cast<char const *>(m_value); }
 
@@ -463,8 +466,8 @@ namespace uml
 		void callh(condition_t cond, code_handle &handle) { configure(OP_CALLH, 4, handle, cond); }
 		void ret() { configure(OP_RET, 4); }
 		void ret(condition_t cond) { configure(OP_RET, 4, cond); }
-		void callc(c_function func, void *ptr) { configure(OP_CALLC, 4, parameter::make_cfunc(func), parameter::make_memory(ptr)); }
-		void callc(condition_t cond, c_function func, void *ptr) { configure(OP_CALLC, 4, parameter::make_cfunc(func), parameter::make_memory(ptr), cond); }
+		template <typename T> void callc(T func, void *ptr) { configure(OP_CALLC, 4, parameter::make_cfunc(func), parameter::make_memory(ptr)); }
+		template <typename T> void callc(condition_t cond, T func, void *ptr) { configure(OP_CALLC, 4, parameter::make_cfunc(func), parameter::make_memory(ptr), cond); }
 		void recover(parameter dst, parameter mapvar) { assert(mapvar.is_mapvar()); configure(OP_RECOVER, 4, dst, mapvar); }
 
 		// internal register operations
@@ -489,6 +492,8 @@ namespace uml
 		void mov(parameter dst, parameter src1) { configure(OP_MOV, 4, dst, src1); }
 		void mov(condition_t cond, parameter dst, parameter src1) { configure(OP_MOV, 4, dst, src1, cond); }
 		void sext(parameter dst, parameter src1, operand_size size) { configure(OP_SEXT, 4, dst, src1, parameter::make_size(size)); }
+		void bfxu(parameter dst, parameter src, parameter shift, parameter width) { configure(OP_BFXU, 4, dst, src, shift, width); }
+		void bfxs(parameter dst, parameter src, parameter shift, parameter width) { configure(OP_BFXS, 4, dst, src, shift, width); }
 		void roland(parameter dst, parameter src, parameter shift, parameter mask) { configure(OP_ROLAND, 4, dst, src, shift, mask); }
 		void rolins(parameter dst, parameter src, parameter shift, parameter mask) { configure(OP_ROLINS, 4, dst, src, shift, mask); }
 		void add(parameter dst, parameter src1, parameter src2) { configure(OP_ADD, 4, dst, src1, src2); }
@@ -530,6 +535,8 @@ namespace uml
 		void dmov(parameter dst, parameter src1) { configure(OP_MOV, 8, dst, src1); }
 		void dmov(condition_t cond, parameter dst, parameter src1) { configure(OP_MOV, 8, dst, src1, cond); }
 		void dsext(parameter dst, parameter src1, operand_size size) { configure(OP_SEXT, 8, dst, src1, parameter::make_size(size)); }
+		void dbfxu(parameter dst, parameter src, parameter shift, parameter width) { configure(OP_BFXU, 8, dst, src, shift, width); }
+		void dbfxs(parameter dst, parameter src, parameter shift, parameter width) { configure(OP_BFXS, 8, dst, src, shift, width); }
 		void droland(parameter dst, parameter src, parameter shift, parameter mask) { configure(OP_ROLAND, 8, dst, src, shift, mask); }
 		void drolins(parameter dst, parameter src, parameter shift, parameter mask) { configure(OP_ROLINS, 8, dst, src, shift, mask); }
 		void dadd(parameter dst, parameter src1, parameter src2) { configure(OP_ADD, 8, dst, src1, src2); }
@@ -677,6 +684,7 @@ namespace uml
 	const parameter M7(parameter::make_mapvar(MAPVAR_M0 + 7));
 	const parameter M8(parameter::make_mapvar(MAPVAR_M0 + 8));
 	const parameter M9(parameter::make_mapvar(MAPVAR_M0 + 9));
-}
+
+} // namespace uml
 
 #endif // MAME_CPU_UML_H

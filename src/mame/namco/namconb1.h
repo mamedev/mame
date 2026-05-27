@@ -112,6 +112,7 @@ protected:
 	u8 port7_r();
 	template <int Bit> u16 dac_bit_r();
 
+	bool sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri);
 	u32 screen_update_namconb1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 

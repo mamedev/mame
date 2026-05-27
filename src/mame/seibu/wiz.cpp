@@ -1224,7 +1224,7 @@ void stinger_state::scion(machine_config &config)
 {
 	stinger(config);
 
-	m_maincpu->set_addrmap(AS_OPCODES, address_map_constructor());
+	m_maincpu->remove_addrmap(AS_OPCODES);
 
 	// video hardware
 	subdevice<screen_device>("screen")->set_visarea(2*8, 32*8-1, 2*8, 30*8-1);

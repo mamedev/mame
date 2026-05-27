@@ -21,7 +21,7 @@
   internal RAM, among other advanced techniques, this game was remarkably ahead of its time
   for 1979.
 
-  The hardwarte is composed by six PCBs connected by a small custom backplane.
+  The hardware is composed by six PCBs connected by a small custom backplane.
 
   More info, schematics, and source code:
    https://www.recreativas.org/el-paracaidista-404-videogame-electrogame

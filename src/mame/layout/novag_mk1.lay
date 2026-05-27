@@ -49,12 +49,12 @@ authors:hap
 	<element name="text_b02a"><text string="B" align="2"><color red="1" green="1" blue="1" /></text></element>
 	<element name="text_b03a"><text string="C" align="2"><color red="1" green="1" blue="1" /></text></element>
 	<element name="text_b04a"><text string="D" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_b04b"><text string="PLAY"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_b04b"><text string="PLAY" align="1"><color red="1" green="1" blue="1" /></text></element>
 	<element name="text_b05a"><text string="E" align="2"><color red="1" green="1" blue="1" /></text></element>
 	<element name="text_b06a"><text string="F" align="2"><color red="1" green="1" blue="1" /></text></element>
 	<element name="text_b07a"><text string="G" align="2"><color red="1" green="1" blue="1" /></text></element>
 	<element name="text_b08a"><text string="H" align="2"><color red="1" green="1" blue="1" /></text></element>
-	<element name="text_b08b"><text string="md"><color red="1" green="1" blue="1" /></text></element>
+	<element name="text_b08b"><text string="md" align="1"><color red="1" green="1" blue="1" /></text></element>
 
 	<element name="text_b01b"><image file="chess/wk.svg"/></element>
 	<element name="text_b02b"><image file="chess/wq.svg"/></element>
@@ -67,12 +67,12 @@ authors:hap
 	<element name="text_b10a"><text string="2" align="2"><color red="0" green="0" blue="0" /></text></element>
 	<element name="text_b11a"><text string="3" align="2"><color red="0" green="0" blue="0" /></text></element>
 	<element name="text_b12a"><text string="4" align="2"><color red="0" green="0" blue="0" /></text></element>
-	<element name="text_b12b"><text string="fp"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_b12b"><text string="fp" align="1"><color red="0" green="0" blue="0" /></text></element>
 	<element name="text_b13a"><text string="5" align="2"><color red="0" green="0" blue="0" /></text></element>
 	<element name="text_b14a"><text string="6" align="2"><color red="0" green="0" blue="0" /></text></element>
 	<element name="text_b15a"><text string="7" align="2"><color red="0" green="0" blue="0" /></text></element>
 	<element name="text_b16a"><text string="8" align="2"><color red="0" green="0" blue="0" /></text></element>
-	<element name="text_b16b"><text string="ep"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_b16b"><text string="ep" align="1"><color red="0" green="0" blue="0" /></text></element>
 
 	<element name="text_b09b"><image file="chess/bk.svg"/></element>
 	<element name="text_b10b"><image file="chess/bq.svg"/></element>
@@ -109,7 +109,7 @@ authors:hap
 		<element ref="text_b02a"><bounds x="26.5" y="34.5" width="3.5" height="4" /></element>
 		<element ref="text_b03b"><bounds x="34.4" y="30.1" width="4" height="4" /></element>
 		<element ref="text_b03a"><bounds x="38.5" y="34.5" width="3.5" height="4" /></element>
-		<element ref="text_b04b"><bounds x="46.1" y="30.5" width="7" height="3" /></element>
+		<element ref="text_b04b"><bounds x="46.9" y="30.5" width="6" height="3" /></element>
 		<element ref="text_b04a"><bounds x="50.5" y="34.5" width="3.5" height="4" /></element>
 
 		<element ref="text_b05b"><bounds x="10.4" y="42.1" width="4" height="4" /></element>
@@ -118,7 +118,7 @@ authors:hap
 		<element ref="text_b06a"><bounds x="26.5" y="46.5" width="3.5" height="4" /></element>
 		<element ref="text_b07b"><bounds x="34.4" y="42.1" width="4" height="4" /></element>
 		<element ref="text_b07a"><bounds x="38.5" y="46.5" width="3.5" height="4" /></element>
-		<element ref="text_b08b"><bounds x="46.1" y="42.5" width="5.5" height="3" /></element>
+		<element ref="text_b08b"><bounds x="46.9" y="42.5" width="6" height="3" /></element>
 		<element ref="text_b08a"><bounds x="50.5" y="46.5" width="3.5" height="4" /></element>
 
 		<element ref="whitem" blend="multiply"><bounds x="10" y="30" width="9" height="9" /></element>
@@ -154,7 +154,7 @@ authors:hap
 		<element ref="text_b10a"><bounds x="26.5" y="58.5" width="3.5" height="4" /></element>
 		<element ref="text_b11b"><bounds x="34.4" y="54.1" width="4" height="4" /></element>
 		<element ref="text_b11a"><bounds x="38.5" y="58.5" width="3.5" height="4" /></element>
-		<element ref="text_b12b"><bounds x="46.1" y="54.5" width="5" height="3" /></element>
+		<element ref="text_b12b"><bounds x="46.9" y="54.5" width="6" height="3" /></element>
 		<element ref="text_b12a"><bounds x="50.5" y="58.5" width="3.5" height="4" /></element>
 
 		<element ref="text_b13b"><bounds x="10.4" y="66.1" width="4" height="4" /></element>
@@ -163,7 +163,7 @@ authors:hap
 		<element ref="text_b14a"><bounds x="26.5" y="70.5" width="3.5" height="4" /></element>
 		<element ref="text_b15b"><bounds x="34.4" y="66.1" width="4" height="4" /></element>
 		<element ref="text_b15a"><bounds x="38.5" y="70.5" width="3.5" height="4" /></element>
-		<element ref="text_b16b"><bounds x="46.1" y="66.5" width="5.5" height="3" /></element>
+		<element ref="text_b16b"><bounds x="46.9" y="66.5" width="6" height="3" /></element>
 		<element ref="text_b16a"><bounds x="50.5" y="70.5" width="3.5" height="4" /></element>
 
 		<element ref="blackm" blend="multiply"><bounds x="10" y="54" width="9" height="9" /></element>

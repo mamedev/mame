@@ -1919,7 +1919,8 @@ static const uint32_t m4cfinln_keys[2] = { 0x10, 0x213623 };
 
 #define M4CFINLN_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
-	/* missing? */
+	ROM_LOAD( "cupfinal2.bin", 0x000000, 0x080000, CRC(280375ec) SHA1(3bc12545662ba521a2cdea0e8826888195908e29) ) \
+	ROM_LOAD( "cupfinal3.bin", 0x080000, 0x080000, CRC(43d1bf82) SHA1(01291d2a0bfad14d12107fe293dce14048ef85b0) )
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -1930,8 +1931,9 @@ static const uint32_t m4cfinln_keys[2] = { 0x10, 0x213623 };
 	ROM_END \
 	GAME(year, setname, parent, bwboki_chr_cheat<m4cfinln_keys>(R5, RT3), mpu4_impcoin, mpu4bwb_machines_state, init_m4big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4cfinln,       m4cpfinl,   "cfd_7_1.bin",  0x0000, 0x020000, CRC(e42ec2aa) SHA1(6495448c1d11ce0ab9ad794bc3a0981432e22945), "BWB","Cup Final (Nova) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4cfinln__a,    m4cpfinl,   "cfd_d0.bin",   0x0000, 0x020000, CRC(179fcf13) SHA1(abd18ed28118ba0a62ab321a9d963105946d5eef), "BWB","Cup Final (Nova) (MPU4) (set 2)" )
+GAME_CUSTOM( 1995, m4cfinln,       m4cpfinl,   "cfd_7_1.bin",  0x0000, 0x020000, CRC(e42ec2aa) SHA1(6495448c1d11ce0ab9ad794bc3a0981432e22945), "BWB","Cup Final (Nova) (MPU4) (set 1)" )
+GAME_CUSTOM( 1995, m4cfinln__a,    m4cpfinl,   "cfd_d0.bin",   0x0000, 0x020000, CRC(179fcf13) SHA1(abd18ed28118ba0a62ab321a9d963105946d5eef), "BWB","Cup Final (Nova) (MPU4) (set 2)" )
+GAME_CUSTOM( 1995, m4cfinln__b,    m4cpfinl,   "cf_rom1.bin",  0x0000, 0x020000, CRC(f7245a04) SHA1(a635137a51aeb966013521ee35c57f3c8add2dfd), "BWB","Cup Final (Nova) (MPU4) (set 3)" )
 
 
 /*****************************************************************************************************************************************************************************

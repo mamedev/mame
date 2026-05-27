@@ -88,7 +88,7 @@ BTANB:
 
 #include "emu.h"
 
-#include "mmdisplay1.h"
+#include "mdisplay1.h"
 
 #include "cpu/cosmac/cosmac.h"
 #include "machine/cdp1852.h"

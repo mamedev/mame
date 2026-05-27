@@ -110,7 +110,6 @@
 
 #include "emu.h"
 #include "cpu/m68000/mcf5206e.h"
-#include "machine/mcf5206e.h"
 #include "machine/intelfsh.h"
 #include "speaker.h"
 

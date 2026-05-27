@@ -94,6 +94,10 @@
 #include "applix_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_APRICOTPC_DSK
+#include "apricotpc_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_APRIDISK
 #include "apridisk.h"
 #endif
@@ -726,6 +730,10 @@
 #include "wd177x_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_WREN_DSK
+#include "wren_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_X07_CAS
 #include "x07_cas.h"
 #endif
@@ -831,6 +839,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Sharp");
 #ifdef HAS_FORMATS_MZ_CAS
 	en.add(mz700_cassette_formats); // mz_cas.h
+	en.add(mz80b_cassette_formats); // mz_cas.h
 #endif
 #ifdef HAS_FORMATS_X1_TAP
 	en.add(x1_cassette_formats); // x1_tap.h
@@ -931,6 +940,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 
 	en.category("Apricot");
+#ifdef HAS_FORMATS_APRICOTPC_DSK
+	en.add(FLOPPY_APRICOTPC_FORMAT); // apricotpc_dsk.h
+#endif
 #ifdef HAS_FORMATS_APRIDISK
 	en.add(FLOPPY_APRIDISK_FORMAT); // apridisk.h
 #endif
@@ -1546,5 +1558,10 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Casio");
 #ifdef HAS_FORMATS_FZ1_DSK
 	en.add(FLOPPY_FZ1_FORMAT); // fz1_dsk.h
+#endif
+
+	en.category("Wren");
+#ifdef HAS_FORMATS_WREN_DSK
+	en.add(FLOPPY_WREN_FORMAT); // wren_dsk.h
 #endif
 }

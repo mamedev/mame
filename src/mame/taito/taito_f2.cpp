@@ -264,8 +264,11 @@ Notes:
 
 #include "emu.h"
 #include "taito_f2.h"
+
 #include "taitoipt.h"
 #include "taitosnd.h"
+
+#include "mahjong.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -274,6 +277,7 @@ Notes:
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
+
 #include "speaker.h"
 
 
@@ -340,12 +344,12 @@ u16 mjnquest_state::dsw_r(offs_t offset)
 	{
 		case 0x00:
 		{
-			return (m_io_in[5]->read() << 8) + m_io_dsw[0]->read();   /* DSW A + coin */
+			return (m_io_in[0]->read() << 8) | m_io_dsw[0]->read();   /* DSW A + coin */
 		}
 
 		case 0x01:
 		{
-			return (m_io_in[6]->read() << 8) + m_io_dsw[1]->read();   /* DSW B + coin */
+			return (m_io_in[1]->read() << 8) | m_io_dsw[1]->read();   /* DSW B + coin */
 		}
 	}
 
@@ -357,14 +361,13 @@ u16 mjnquest_state::dsw_r(offs_t offset)
 
 u16 mjnquest_state::input_r()
 {
-	u16 ret = 0xffff;
-
+	u16 ret = 0x3f;
 	for (int i = 0; i < 5; i++)
 	{
 		if (BIT(m_mjnquest_input, i))
-			ret &= m_io_in[i]->read();
+			ret &= m_io_key[i]->read();
 	}
-	return ret;
+	return 0xffc0 | ret;
 }
 
 void mjnquest_state::inputselect_w(u16 data)
@@ -2592,47 +2595,14 @@ static INPUT_PORTS_START( yuyugogo )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjnquest )
+	PORT_INCLUDE(mahjong_matrix_1p)
+
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN4")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )      // ?
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN6")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -3001,8 +2971,9 @@ void cameltry_state::cameltry(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cameltry_state::cameltry_map);
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(cameltry_state,dondokod)
+	MCFG_VIDEO_START_OVERRIDE(cameltry_state, dondokod)
 	m_screen->set_screen_update(FUNC(cameltry_state::screen_update_pri_roz));
+	m_screen->screen_vblank().set(FUNC(cameltry_state::screen_vblank_partial_buffer_delayed));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_offsets(3, 0);
@@ -3536,7 +3507,7 @@ void cameltry_state::cameltrya(machine_config &config)
 	m_screen->set_size(40*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(cameltry_state::screen_update_pri_roz));
-	m_screen->screen_vblank().set(FUNC(cameltry_state::screen_vblank_no_buffer));
+	m_screen->screen_vblank().set(FUNC(cameltry_state::screen_vblank_partial_buffer_delayed));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taitof2);
@@ -5614,10 +5585,10 @@ GAME( 1990, thundfox,   0,        thundfox,  thundfox,   taitof2_state,  empty_i
 GAME( 1990, thundfoxu,  thundfox, thundfox,  thundfoxu,  taitof2_state,  empty_init,    ROT0,   "Taito America Corporation", "Thunder Fox (US, rev 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, thundfoxj,  thundfox, thundfox,  thundfoxj,  taitof2_state,  empty_init,    ROT0,   "Taito Corporation",         "Thunder Fox (Japan, rev 1)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, cameltry,   0,        cameltry,  cameltry,   cameltry_state, empty_init,    ROT0,   "Taito America Corporation", "Cameltry (World, YM2610)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cameltry,   0,        cameltry,  cameltry,   cameltry_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Cameltry (World, YM2610)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, cameltryu,  cameltry, cameltry,  cameltry,   cameltry_state, empty_init,    ROT0,   "Taito America Corporation", "Cameltry (US, YM2610)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, cameltryj,  cameltry, cameltry,  cameltryj,  cameltry_state, empty_init,    ROT0,   "Taito Corporation",         "Cameltry (Japan, YM2610)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cameltrya,  cameltry, cameltrya, cameltry,   cameltry_state, empty_init,    ROT0,   "Taito America Corporation", "Cameltry (World, YM2203 + M6295)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cameltrya,  cameltry, cameltrya, cameltry,   cameltry_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Cameltry (World, YM2203 + M6295)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, cameltryau, cameltry, cameltrya, cameltry,   cameltry_state, empty_init,    ROT0,   "Taito America Corporation", "Cameltry (US, YM2203 + M6295)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, qtorimon,   0,        qtorimon,  qtorimon,   taitof2_state,  empty_init,    ROT0,   "Taito Corporation",         "Quiz Torimonochou (Japan)", MACHINE_SUPPORTS_SAVE )
@@ -5646,15 +5617,15 @@ GAME( 1990, runark,     growl,    growl,     runark,     taitof2_state,  empty_i
 GAME( 1990, growlp,     growl,    growl,     growl,      taitof2_state,  empty_init,    ROT0,   "Taito Corporation Japan",   "Growl (World, prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, mjnquest,   0,        mjnquest,  mjnquest,   mjnquest_state, init_mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mjnquestb,  mjnquest, mjnquest,  mjnquest,   mjnquest_state, init_mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (Japan, No Nudity)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjnquestb,  mjnquest, mjnquest,  mjnquest,   mjnquest_state, init_mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (Japan, no nudity)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, footchmp,   0,        footchmp,  footchmp,   footchmp_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Football Champ / Euro Football Champ (World)", MACHINE_SUPPORTS_SAVE ) // title depends on dipswitch
-GAME( 1990, htherou,    footchmp, footchmp,  htherou,    footchmp_state, empty_init,    ROT0,   "Taito Corporation",         "Hat Trick Hero (US)", MACHINE_SUPPORTS_SAVE ) // Single PCB
+GAME( 1990, htherou,    footchmp, footchmp,  htherou,    footchmp_state, empty_init,    ROT0,   "Taito America Corporation", "Hat Trick Hero (US)", MACHINE_SUPPORTS_SAVE ) // Single PCB
 GAME( 1990, htheroj,    footchmp, hthero,    htheroj,    footchmp_state, empty_init,    ROT0,   "Taito Corporation",         "Hat Trick Hero (Japan)", MACHINE_SUPPORTS_SAVE ) // Dual PCB
 GAME( 1992, footchmpbl, footchmp, footchmpbl,footchmpbl, footchmp_state, empty_init,    ROT0,   "bootleg",                   "Football Champ / Euro Football Champ (World) (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // very different hw register etc.
 
 GAME( 1992, euroch92,   0,        footchmp,  footchmp,   footchmp_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Euro Champ '92 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, euroch92j,  euroch92, footchmp,  footchmp,   footchmp_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Euro Champ '92 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, euroch92j,  euroch92, footchmp,  footchmp,   footchmp_state, empty_init,    ROT0,   "Taito Corporation",         "Euro Champ '92 (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, koshien,    0,        koshien,   koshien,    taitof2_state,  empty_init,    ROT0,   "Taito Corporation",         "Ah Eikou no Koshien (Japan)", MACHINE_SUPPORTS_SAVE )
 
@@ -5669,7 +5640,7 @@ GAME( 1991, solfigtr,   0,        solfigtr,  solfigtr,   taitof2_state,  empty_i
 GAME( 1991, qzquest,    0,        qzquest ,  qzquest,    taitof2_state,  empty_init,    ROT0,   "Taito Corporation",         "Quiz Quest - Hime to Yuusha no Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, pulirula,   0,        pulirula,  pulirula,   dondokod_state, empty_init,    ROT0,   "Taito Corporation Japan",   "PuLiRuLa (World, dual PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, pulirulaa,  pulirula, pulirula,  pulirulaj,  dondokod_state, empty_init,    ROT0,   "Taito Corporation",         "PuLiRuLa (World, single PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pulirulaa,  pulirula, pulirula,  pulirulaj,  dondokod_state, empty_init,    ROT0,   "Taito Corporation Japan",   "PuLiRuLa (World, single PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, pulirulaj,  pulirula, pulirula,  pulirulaj,  dondokod_state, empty_init,    ROT0,   "Taito Corporation",         "PuLiRuLa (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, metalb,     0,        metalb,    metalb,     footchmp_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Metal Black (World)", MACHINE_SUPPORTS_SAVE )

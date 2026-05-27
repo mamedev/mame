@@ -843,13 +843,13 @@ authors:hap
 		<element ref="text_g"><bounds x="68" y="0.2" width="2" height="2" /></element>
 		<element ref="text_h"><bounds x="78" y="0.2" width="2" height="2" /></element>
 
-		<element ref="text_l1"><bounds x="-9.0" yc="8" width="10" height="1.5" /></element>
-		<element ref="text_l2"><bounds x="-9.0" yc="28" width="10" height="1.5" /></element>
-		<element ref="text_l3"><bounds x="-9.0" yc="37.25" width="10" height="1.5" /></element>
-		<element ref="text_l3a"><bounds x="-9.0" yc="38.75" width="9.5" height="1.5" /></element>
-		<element ref="text_l4"><bounds x="-9.0" yc="47.25" width="10" height="1.5" /></element>
-		<element ref="text_l4a"><bounds x="-9.0" yc="48.75" width="9.5" height="1.5" /></element>
-		<element ref="text_l5"><bounds x="-9.0" yc="78" width="10" height="1.5" /></element>
+		<element ref="text_l1"><bounds x="-5.0" yc="8" width="6" height="1.5" /></element>
+		<element ref="text_l2"><bounds x="-5.0" yc="28" width="6" height="1.5" /></element>
+		<element ref="text_l3"><bounds x="-5.0" yc="37.25" width="6" height="1.5" /></element>
+		<element ref="text_l3a"><bounds x="-5.0" yc="38.75" width="5.5" height="1.5" /></element>
+		<element ref="text_l4"><bounds x="-5.0" yc="47.25" width="6" height="1.5" /></element>
+		<element ref="text_l4a"><bounds x="-5.0" yc="48.75" width="5.5" height="1.5" /></element>
+		<element ref="text_l5"><bounds x="-5.0" yc="78" width="6" height="1.5" /></element>
 
 		<element ref="text_l6"><bounds xc="14" yc="84.75" width="10" height="1.5" /></element>
 		<element ref="text_l7"><bounds xc="44" yc="84.75" width="10" height="1.5" /></element>

@@ -18,17 +18,17 @@
 DEFINE_DEVICE_TYPE(NES_VT32_SOC,     nes_vt32_soc_device,     "nes_vt32_soc", "VT32 series System on a Chip (FP) (NTSC)")
 DEFINE_DEVICE_TYPE(NES_VT32_SOC_PAL, nes_vt32_soc_pal_device, "nes_vt32_soc_pal", "VT32 series System on a Chip (FP) (PAL)")
 
-nes_vt32_soc_device::nes_vt32_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
+nes_vt32_soc_device::nes_vt32_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	nes_vt09_soc_device(mconfig, type, tag, owner, clock)
 {
 }
 
-nes_vt32_soc_device::nes_vt32_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+nes_vt32_soc_device::nes_vt32_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	nes_vt32_soc_device(mconfig, NES_VT32_SOC, tag, owner, clock)
 {
 }
 
-nes_vt32_soc_pal_device::nes_vt32_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+nes_vt32_soc_pal_device::nes_vt32_soc_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	nes_vt32_soc_device(mconfig, NES_VT32_SOC_PAL, tag, owner, clock)
 {
 }
@@ -75,7 +75,7 @@ u8 nes_vt32_soc_device::chr_r(offs_t offset)
 }
 
 
-void nes_vt32_soc_device::device_add_mconfig(machine_config& config)
+void nes_vt32_soc_device::device_add_mconfig(machine_config &config)
 {
 	RP2A03_VTSCR(config, m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt32_soc_device::nes_vt32_soc_map);
@@ -106,7 +106,7 @@ void nes_vt32_soc_device::device_add_mconfig(machine_config& config)
 	m_apu->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void nes_vt32_soc_pal_device::do_pal_timings_and_ppu_replacement(machine_config& config)
+void nes_vt32_soc_pal_device::do_pal_timings_and_ppu_replacement(machine_config &config)
 {
 	m_maincpu->set_clock(PALC_APU_CLOCK);
 
@@ -124,7 +124,7 @@ void nes_vt32_soc_pal_device::do_pal_timings_and_ppu_replacement(machine_config&
 	m_screen->set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);
 }
 
-void nes_vt32_soc_pal_device::device_add_mconfig(machine_config& config)
+void nes_vt32_soc_pal_device::device_add_mconfig(machine_config &config)
 {
 	nes_vt32_soc_device::device_add_mconfig(config);
 	do_pal_timings_and_ppu_replacement(config);
@@ -144,11 +144,15 @@ void nes_vt32_soc_device::vtfp_411e_encryption_state_w(u8 data)
 
 	if (data == 0x05)
 	{
-		downcast<rp2a03_vtscr&>(*m_maincpu).set_next_scramble(true);
+		downcast<rp2a03_vtscr&>(*m_maincpu).set_next_scramble(0xa1);
+	}
+	else if (data == 0x07)
+	{
+		downcast<rp2a03_vtscr&>(*m_maincpu).set_next_scramble(0x7e);
 	}
 	else if (data == 0x00)
 	{
-		downcast<rp2a03_vtscr&>(*m_maincpu).set_next_scramble(false);
+		downcast<rp2a03_vtscr&>(*m_maincpu).set_next_scramble(0x00);
 	}
 	else if (data == 0xc0)
 	{
@@ -170,7 +174,7 @@ void nes_vt32_soc_device::vtfp_411e_encryption_state_w(u8 data)
 
 		*/
 		m_ppu_chr_data_scramble = 1;
-		downcast<rp2a03_vtscr&>(*m_maincpu).set_next_scramble(false);
+		downcast<rp2a03_vtscr&>(*m_maincpu).set_next_scramble(0x00);
 	}
 }
 

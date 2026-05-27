@@ -29,8 +29,10 @@ TODO (pc9821as):
 - Update: it never goes into above after default of m_dma_access_ctrl changed to 0xfe?
 
 TODO (pc9821ce):
-- Needs SCSI to boot stuff, or 2.5" option IDE for 98NOTE;
-- Can't boot any floppy, thinks it's never ready/leaves motor off;
+- Throws random TIMER errors at POST (soft reset to bypass);
+- Takes forever to load a floppy, throws (A)bort / (R)etry / (F)ail on DOS;
+- 3.5" floppies won't load without changing SDIP floppy to Fixed Mode,
+  while 5.25" floppies want specifically Auto-Detect instead;
 
 TODO (pc9821cx3):
 - Incomplete bank mapping, keeps looping over the same routine when hopping to PnP BIOS after
@@ -65,6 +67,9 @@ TODO: (pc9821nr15/pc9821nr166/pc9821nw150)
 #include "emu.h"
 #include "pc9821.h"
 
+#include "bus/pc98_61simm/options.h"
+#include "bus/pc98_61simm/slot.h"
+#include "bus/pc98_cbus/options.h"
 #include "machine/pci.h"
 
 // TODO: remove me, cfr. pc9801.cpp; verify that 9801 clocks are correct for 9821 series as well
@@ -260,16 +265,16 @@ uint8_t pc9821_state::ext2_video_ff_r()
 //      case 0x01: 200 line color / b&w mode (i/o 0x68 -> 0x02)
 //      case 0x02: Odd-numbered raster mask  (i/o 0x68 -> 0x08)
 		case 0x03: res = m_video_ff[DISPLAY_REG]; break; // display reg
-//      case 0x04: palette mode (i/o 0x6a -> 0x00)
+		case 0x04: res = m_ex_video_ff[ANALOG_16_MODE]; break; // palette mode (i/o 0x6a -> 0x00)
 //      case 0x05: GDC sync mode (i/o 0x6a -> 0x40)
 //      case 0x06: unknown (i/o 0x6a -> 0x44)
 //      case 0x07: EGC compatibility mode (i/o 0x6a -> 0x04)
-//      case 0x08: Protected mode f/f (i/o 0x6a -> 0x06)
-//      case 0x09: GDC clock #0 (i/o 0x6a -> 0x82)
+		case 0x08: res = m_ex_video_ff[6 >> 1]; break; // Protected mode f/f (i/o 0x6a -> 0x06)
+		case 0x09: res = m_ex_video_ff[0x82 >> 1]; break; // GDC clock #0 (i/o 0x6a -> 0x82)
 		case 0x0a: res = m_ex_video_ff[ANALOG_256_MODE]; break; // 256 color mode
 //      case 0x0b: VRAM access mode (i/o 0x6a -> 0x62)
 //      case 0x0c: unknown
-//      case 0x0d: VRAM boundary mode (i/o 0x6a -> 0x68)
+		case 0x0d: res = m_ex_video_ff[0x68 >> 1]; break; // VRAM boundary mode (i/o 0x6a -> 0x68)
 //      case 0x0e: 65,536 color GFX mode (i/o 0x6a -> 0x22)
 //      case 0x0f: 65,536 color palette mode (i/o 0x6a -> 0x24)
 //      case 0x10: unknown (i/o 0x6a -> 0x6a)
@@ -310,11 +315,70 @@ uint16_t pc9821_state::pc9821_grcg_gvram_r(offs_t offset, uint16_t mem_mask)
 {
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
-		u16 *ext_gvram = (u16 *)m_ext_gvram.target();
-		int bank = offset >> 14;
-		if(bank <= 1)
-			return ext_gvram[((m_pegc.bank[bank])*0x4000) + (offset & 0x3fff)];
-		return 0xffff;
+		int bank_idx = offset >> 14;
+		if (bank_idx > 1)
+			return 0xffff;
+
+		u8 *ext_gvram = (u8 *)m_ext_gvram.target();
+
+		if(m_pegc.packed_mode)
+		{
+			// Packed Mode Read
+			//logerror("Packed Mode R Used\n");
+			u16 *ext_gvram16 = (u16 *)m_ext_gvram.target();
+			return ext_gvram16[(m_pegc.bank[bank_idx] * 0x4000) + (offset & 0x3fff)];
+		}
+		else
+		{
+			// Planar Mode Read
+			//logerror("Planar Mode R Used\n");
+			u32 addr = (offset * 16);
+			u16 ret = 0;
+			u8 plane_mask = m_pegc.regs[0x04];
+			u8 pal1 = m_pegc.regs[0x14];
+			u16 rop = m_pegc.regs[0x08] | (m_pegc.regs[0x09] << 8);
+			bool cpu_data = BIT(rop, 8);
+			bool shift_dir = BIT(rop, 9);
+			bool pat_update = BIT(rop, 13);
+
+			for(int i = 0; i < 16; i++)
+			{
+				u32 tmp = (shift_dir ? (addr + 15 - i) : (addr + i)) & 0x7ffff;
+				u8 pixel_data = ext_gvram[tmp];
+
+				if(!((pixel_data ^ pal1) & ~plane_mask))
+					ret |= (1 << i);
+
+				if(pat_update && !machine().side_effects_disabled())
+					m_pegc.pattern[tmp & m_pegc.pattern_mask] = pixel_data;
+			}
+
+			// VRAM to VRAM
+			if(!cpu_data && !machine().side_effects_disabled())
+			{
+				if(m_pegc.remain == 0)
+				{
+					m_pegc.remain = ((m_pegc.regs[0x10] | (m_pegc.regs[0x11] << 8)) & 0x0fff) + 1;
+					m_pegc.first_process_w = true;
+					m_pegc.first_process_r = true;
+					m_pegc.shift_cnt = 0;
+				}
+
+				u32 src_shift = m_pegc.first_process_r ? (m_pegc.regs[0x12] & 0x1f) : 0;
+				int read_count = m_pegc.first_process_r ? (16 - src_shift) : 16;
+
+				for(int i = 0; i < read_count; i++)
+				{
+					u32 tmp = (shift_dir ? (addr + 15 - src_shift - i) : (addr + src_shift + i)) & 0x7ffff;
+					u8 pixel_data = ext_gvram[tmp];
+
+					if(m_pegc.shift_cnt < std::size(m_pegc.shift_buffer))
+						m_pegc.shift_buffer[m_pegc.shift_cnt++] = pixel_data;
+				}
+				m_pegc.first_process_r = false;
+			}
+			return ret;
+		}
 	}
 
 	return grcg_gvram_r(offset, mem_mask);
@@ -322,13 +386,142 @@ uint16_t pc9821_state::pc9821_grcg_gvram_r(offs_t offset, uint16_t mem_mask)
 
 void pc9821_state::pc9821_grcg_gvram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if(m_ex_video_ff[ANALOG_256_MODE])
+	//logerror("PEGC_W: PC=%08x Off=%05x Data=%04x\n", m_maincpu->pc(), offset, data);
+	if (m_ex_video_ff[ANALOG_256_MODE])
 	{
-		u16 *ext_gvram = (u16 *)m_ext_gvram.target();
-		int bank = offset >> 14;
-		if(bank <= 1)
-			COMBINE_DATA(&ext_gvram[((m_pegc.bank[bank])*0x4000) + (offset & 0x3fff)]);
-		return;
+		int bank_idx = offset >> 14;
+		if (bank_idx > 1) return;
+
+		u8 *ext_gvram = (u8 *)m_ext_gvram.target();
+
+		if(m_pegc.packed_mode)
+		{
+			// Packed Mode
+			//logerror("Packed Mode W Used\n");
+			u16 *ext_gvram16 = (u16 *)m_ext_gvram.target();
+			COMBINE_DATA(&ext_gvram16[(m_pegc.bank[bank_idx] * 0x4000) + (offset & 0x3fff)]);
+		}
+		else
+		{
+			// Planar Mode
+			//logerror("Planar Mode W Used\n");
+			u8 plane_mask = m_pegc.regs[0x04];
+			u16 rop = m_pegc.regs[0x08] | (m_pegc.regs[0x09] << 8);
+			u32 pixel_mask = m_pegc.regs[0x0c] | (m_pegc.regs[0x0d] << 8) | (m_pegc.regs[0x0e] << 16) | (m_pegc.regs[0x0f] << 24);
+
+			bool cpu_data = BIT(rop, 8);
+			bool shift_dir = BIT(rop, 9);
+			u8 ropmethod = (rop >> 10) & 3;
+			bool ropupdmode = BIT(rop, 12);
+			u8 pal1 = m_pegc.regs[0x14];
+			u8 pal2 = m_pegc.regs[0x18];
+
+			if(m_pegc.remain == 0)
+			{
+				m_pegc.remain = ((m_pegc.regs[0x10] | (m_pegc.regs[0x11] << 8)) & 0x0fff) + 1;
+				m_pegc.first_process_w = true;
+				m_pegc.first_process_r = true;
+				m_pegc.shift_cnt = 0;
+			}
+
+			u32 dst_shift = m_pegc.first_process_w ? (m_pegc.regs[0x13] & 0x1f) : 0;
+			u32 addr = (offset * 16);
+
+			if(cpu_data)
+			{
+				u32 src_shift = m_pegc.first_process_w ? (m_pegc.regs[0x12] & 0x1f) : 0;
+				int push_count = m_pegc.first_process_w ? (16 - src_shift) : 16;
+
+				for(int i = 0; i < push_count; i++)
+				{
+					int orig_i = i + src_shift;
+					int bit_idx = ((orig_i / 8) * 8) + (7 - (orig_i % 8));
+
+					if(m_pegc.shift_cnt < sizeof(m_pegc.shift_buffer))
+						m_pegc.shift_buffer[m_pegc.shift_cnt++] = (data & (1 << bit_idx)) ? 0xff : 0x00;
+				}
+			}
+
+			int process_count = m_pegc.first_process_w ? (16 - dst_shift) : 16;
+			if (process_count > m_pegc.remain) process_count = m_pegc.remain;
+			if (process_count > m_pegc.shift_cnt) process_count = m_pegc.shift_cnt;
+
+			// ROP
+			for(int i = 0; i < process_count; i++)
+			{
+				u32 tmp = (shift_dir ? (addr + 15 - dst_shift - i) : (addr + dst_shift + i)) & 0x7ffff;
+
+				int p_idx = i + dst_shift;
+				u32 pixel_mask_pos = 1 << ((p_idx / 8) * 8 + (7 - (p_idx & 7)));
+
+				if(pixel_mask & pixel_mask_pos)
+				{
+					u8 src = m_pegc.shift_buffer[i];
+					u8 dst = ext_gvram[tmp];
+
+					if(ropupdmode)
+					{
+						ext_gvram[tmp] &= plane_mask;
+
+						u8 c4 = 0, c8 = 0;
+						if (ropmethod == 0) { c4 = c8 = m_pegc.pattern[tmp & m_pegc.pattern_mask]; }
+						else if (ropmethod == 1) { c4 = c8 = pal2; }
+						else if (ropmethod == 2) { c4 = c8 = pal1; }
+						else { c4 = pal1; c8 = pal2; }
+
+						u8 res = 0;
+						/*
+						bit 7: S and D and C4
+						bit 6: S and D and ~C4
+						bit 5: S and ~D and C4
+						bit 4: S and ~D and ~C4
+						bit 3: ~S and D and C8
+						bit 2: ~S and D and ~C8
+						bit 1: ~S and ~D and C8
+						bit 0: ~S and ~D and ~C8
+						*/
+						if (rop & 0x80) res |= (src & dst & c4);
+						if (rop & 0x40) res |= (src & dst & ~c4);
+						if (rop & 0x20) res |= (src & ~dst & c4);
+						if (rop & 0x10) res |= (src & ~dst & ~c4);
+						if (rop & 0x08) res |= (~src & dst & c8);
+						if (rop & 0x04) res |= (~src & dst & ~c8);
+						if (rop & 0x02) res |= (~src & ~dst & c8);
+						if (rop & 0x01) res |= (~src & ~dst & ~c8);
+
+						ext_gvram[tmp] |= (res & ~plane_mask);
+					}
+					else
+					{
+						u8 res = 0;
+						for(int j = 0; j < 8; j++)
+						{
+							if (src & (1 << j)) res |= (~plane_mask | dst) & (1 << j);
+							else                res |= (plane_mask & dst) & (1 << j);
+						}
+						ext_gvram[tmp] = res;
+					}
+				}
+				m_pegc.remain--;
+			}
+
+			if(m_pegc.remain == 0)
+			{
+				m_pegc.first_process_w = true;
+				m_pegc.first_process_r = true;
+				m_pegc.shift_cnt = 0;
+			}
+			else
+			{
+				m_pegc.first_process_w = false;
+
+				int remaining_shift = m_pegc.shift_cnt - process_count;
+				for(int i = 0; i < remaining_shift; i++)
+					m_pegc.shift_buffer[i] = m_pegc.shift_buffer[i + process_count];
+				m_pegc.shift_cnt = remaining_shift;
+			}
+			return;
+		}
 	}
 
 	grcg_gvram_w(offset,data,mem_mask);
@@ -369,53 +562,82 @@ void pc9821_state::pegc_mmio_map(address_map &map)
 	);
 	map(0x100, 0x100).lw8(
 		NAME([this] (u8 data) {
-			m_pegc.packed_mode = bool(BIT(data, 0));
+			m_pegc.packed_mode = !bool(BIT(data, 0));
 			logerror("$e0100 packed mode %02x\n", data);
 		})
 	);
-//  map(0x102, 0x102) enable pegc linear VRAM at upper addresses
-	// $4a0 alias
-	map(0x104, 0x104).lw8(
+	map(0x102, 0x102).lw8(
 		NAME([this] (u8 data) {
-			pc9821_egc_w(0x0 / 2, data, 0x00ff);
+			logerror("$e0102 upper VRAM %s (%02x)\n", BIT(data, 0) ? "enable" : "disable", data);
+			if (BIT(data, 0))
+			{
+				m_pegc_vram_view.select(0);
+			}
+			else
+				m_pegc_vram_view.disable();
 		})
 	);
-	// $4a4 alias
-	map(0x108, 0x109).lw16(
-		NAME([this] (u16 data, u16 mem_mask) {
-			pc9821_egc_w(0x4 / 2, data, mem_mask);
+	map(0x104, 0x11f).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_pegc.regs[4 + offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_pegc.regs[4 + offset] = data;
 		})
 	);
-//  map(0x10a, 0x10a) enable color comparator when reading VRAM
-	// $4a8 alias (mask)
-	// TODO: verify what happens on 32-bit accesses
-	map(0x10c, 0x10d).lw16(
-		NAME([this] (u16 data, u16 mem_mask) {
-			pc9821_egc_w(0x8 / 2, data, mem_mask);
-		})
-	);
-	// $4ae alias (block transfer)
-	map(0x110, 0x111).lw16(
-		NAME([this] (u16 data, u16 mem_mask) {
-			pc9821_egc_w(0xe / 2, data, mem_mask);
-		})
-	);
-	// $4ac alias (shift reg)
-	map(0x112, 0x113).lw16(
-		NAME([this] (u16 data, u16 mem_mask) {
-			pc9821_egc_w(0xc / 2, data, mem_mask);
-		})
-	);
-	// $4a6 alias (foreground color)
-	map(0x114, 0x114).lw8(
-		NAME([this] (u8 data) {
-			pc9821_egc_w(0x6 / 2, data, 0xff);
-		})
-	);
-	// $4aa alias (background color)
-	map(0x118, 0x118).lw8(
-		NAME([this] (u8 data) {
-			pc9821_egc_w(0xa / 2, data, 0xff);
+	map(0x120, 0x19f).lrw32(
+		NAME([this] (offs_t offset, u32 mem_mask) -> u32 {
+			u16 rop = m_pegc.regs[0x08] | (m_pegc.regs[0x09] << 8);
+			u32 ret = 0;
+
+			if (rop & 0x8000)
+			{
+				// Mode 1: 1 palette x 32 pixels
+				int pix_idx = offset;
+				if (pix_idx < 32 && ACCESSING_BITS_0_7) {
+					ret = m_pegc.pattern[pix_idx];
+				}
+				return ret;
+			}
+			else
+			{
+				// Mode 0: 32 pixels x 8 planes
+				int plane = offset;
+				if (plane < 8) {
+					for (int i = 0; i < 32; i++) {
+						if (BIT(m_pegc.pattern[i], plane))
+							ret |= (1U << i);
+					}
+				}
+				return ret;
+			}
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			u16 rop = m_pegc.regs[0x08] | (m_pegc.regs[0x09] << 8);
+
+			if (rop & 0x8000)
+			{
+				// Mode 1: 1 palette x 32 pixels
+				int pix_idx = offset;
+
+				if (pix_idx < 32 && ACCESSING_BITS_0_7) {
+					m_pegc.pattern[pix_idx] = data & 0xff;
+				}
+			}
+			else
+			{
+				m_pegc.pattern_mask = (mem_mask == 0xffffffff) ? 31 : 15;
+				// Mode 0: 32 pixels x 8 planes
+				int plane = offset;
+				if (plane < 8) {
+					for (int i = 0; i < 32; i++) {
+						if (BIT(mem_mask, i)) {
+							if (BIT(data, i)) m_pegc.pattern[i] |= (1 << plane);
+							else              m_pegc.pattern[i] &= ~(1 << plane);
+						}
+					}
+				}
+			}
 		})
 	);
 //  map(0x120, 0x19f) pattern register (image_xfer? relates to bit 15 of $108)
@@ -443,22 +665,32 @@ TIMER_CALLBACK_MEMBER(pc9821_state::pit_delay)
 
 void pc9821_state::pc9821_map(address_map &map)
 {
-	pc9801bx2_map(map);
+	pc9801vm_map(map);
+	map(0x00000000, 0x0009ffff).rw("simm", FUNC(pc9801_61_simm_device::read), FUNC(pc9801_61_simm_device::write));
+
+	map(0x000da000, 0x000dbfff).ram(); // ide ram
+
 	map(0x000a8000, 0x000bffff).rw(FUNC(pc9821_state::pc9821_grcg_gvram_r), FUNC(pc9821_state::pc9821_grcg_gvram_w));
-//  map(0x000cc000, 0x000cffff).rom().region("sound_bios", 0); //sound BIOS
-//  map(0x000d8000, 0x000d9fff).rom().region("ide",0)
-//  map(0x000da000, 0x000dbfff).ram(); // ide ram
 	map(0x000e0000, 0x000e7fff).rw(FUNC(pc9821_state::grcg_gvram0_r), FUNC(pc9821_state::grcg_gvram0_w));
 	map(0x000e0000, 0x000e7fff).view(m_pegc_mmio_view);
 	m_pegc_mmio_view[0](0x000e0000, 0x000e7fff).m(*this, FUNC(pc9821_state::pegc_mmio_map));
-	map(0x00f00000, 0x00f9ffff).ram().share("ext_gvram");
-	map(0xfff00000, 0xfff9ffff).ram().share("ext_gvram");
+	map(0x000e8000, 0x000fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+
+	map(0x00100000, 0x00efffff).rw("simm", FUNC(pc9801_61_simm_device::read_ext), FUNC(pc9801_61_simm_device::write_ext));
+	map(0x00f00000, 0xffffffff).view(m_pegc_vram_view);
+	m_pegc_vram_view[0](0x00f00000, 0x00f7ffff).ram().share("ext_gvram");
+	m_pegc_vram_view[0](0xfff00000, 0xfff7ffff).ram().share("ext_gvram");
+
+	map(0xffee8000, 0xffefffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+	map(0xfffe8000, 0xffffffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+	map(0x00f00000, 0x00ffffff).view(m_hole_15M_view);
+	m_hole_15M_view[0](0x00f00000, 0x00ffffff).rw("simm", FUNC(pc9801_61_simm_device::read_15m_ext), FUNC(pc9801_61_simm_device::write_15m_ext));
 }
 
 void pc9821_state::pc9821_io(address_map &map)
 {
 	// later SW expects unmapped C-Bus accesses to return high for proper card detection
-	// cfr. entax, amarankh, freebsd21
+	// cfr. entax, amarankh, freebsd21, gods
 	map.unmap_value_high();
 	pc9801bx2_io(map);
 	map(0x0000, 0x001f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0xff00ff00);
@@ -488,16 +720,15 @@ void pc9821_state::pc9821_io(address_map &map)
 	map(0x0070, 0x007f).w(FUNC(pc9821_state::pit_latch_delay)).umask16(0xff00);
 //  map(0x0070, 0x007f).rw(FUNC(pc9821_state::grcg_r), FUNC(pc9821_state::grcg_w)).umask32(0x00ff00ff); //display registers "GRCG" / i8253 pit
 	map(0x0090, 0x0093).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask32(0x00ff00ff);
-	// TODO: check me, should derive from templated fn instead
-	map(0x0094, 0x0094).rw(FUNC(pc9821_state::fdc_2hd_ctrl_r), FUNC(pc9821_state::fdc_2hd_ctrl_w));
+	map(0x0094, 0x0094).rw(FUNC(pc9821_state::fdc_2hd_2dd_ctrl_r<1>), FUNC(pc9821_state::fdc_2hd_2dd_ctrl_w<1>));
 	map(0x00a0, 0x00af).rw(FUNC(pc9821_state::pc9821_a0_r), FUNC(pc9821_state::pc9821_a0_w)); //upd7220 bitmap ports / display registers
 //  map(0x00b0, 0x00b3) PC9861k (serial port?)
 //  map(0x00b9, 0x00b9) PC9861k
 //  map(0x00bb, 0x00bb) PC9861k
 //  map(0x00bc, 0x00bf).rw(FUNC(pc9821_state::fdc_mode_ctrl_r), FUNC(pc9821_state::fdc_mode_ctrl_w));
 	map(0x00c8, 0x00cb).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask32(0x00ff00ff);
-//  map(0x00cc, 0x00cc).rw(FUNC(pc9821_state::fdc_2hd_ctrl_r), FUNC(pc9821_state::fdc_2hd_ctrl_w));
-	//  map(0x00d8, 0x00df) AMD98 (sound?) board
+	map(0x00cc, 0x00cc).rw(FUNC(pc9821_state::fdc_2hd_2dd_ctrl_r<0>), FUNC(pc9821_state::fdc_2hd_2dd_ctrl_w<0>));
+//  map(0x00d8, 0x00df) AMD98 sound board, N/A for PC-9821
 //  map(0x00f0, 0x00ff).rw(FUNC(pc9821_state::a20_ctrl_r), FUNC(pc9821_state::a20_ctrl_w)).umask32(0x00ff00ff);
 //  map(0x0188, 0x018f).rw(FUNC(pc9821_state::pc9801_opn_r), FUNC(pc9821_state::pc9801_opn_w)); //ym2203 opn / <undefined>
 //  map(0x018c, 0x018f) YM2203 OPN extended ports / <undefined>
@@ -627,6 +858,13 @@ void pc9821_mate_a_state::pc9821as_io(address_map &map)
 	// TODO: specific MATE A local bus (overlays just like C-Bus?)
 }
 
+void pc9821_mate_a_state::pc9821ap2_map(address_map &map)
+{
+	pc9821as_map(map);
+	map(0x01000000, 0x04ffffff).rw("simm", FUNC(pc9801_61_simm_device::read_16m_ext), FUNC(pc9801_61_simm_device::write_16m_ext));
+}
+
+
 /*
  * CanBe overrides
  */
@@ -659,12 +897,30 @@ void pc9821_canbe_state::cbus_43f_bank_w(offs_t offset, uint8_t data)
 	pc9801vm_state::cbus_43f_bank_w(offset, data);
 }
 
+void pc9821_canbe_state::hole_15m_control_w(offs_t offset, u8 data)
+{
+	// pc9821ce writes a 0x1f instead of the usual 0x04
+	// will throw an extended GVRAM error if we don't remap it in the 15M range ...
+	m_hole_15m = data;
+	if (data == 0x1f)
+		m_hole_15M_view.select(1);
+	else if (BIT(data, 2))
+		m_hole_15M_view.select(0);
+	else
+		m_hole_15M_view.disable();
+
+	if (data & 0xfb && data != 0x1f)
+		popmessage("hole_15m_control_w: undocumented trigger %02x", data);
+}
 
 void pc9821_canbe_state::pc9821ce_map(address_map &map)
 {
 	pc9821_map(map);
 	map(0x000f8000, 0x000fffff).view(m_bios_view);
 	m_bios_view[6](0x000f8000, 0x000fffff).rom().region("biosrom", 0x18000);
+
+	m_hole_15M_view[1](0x00f00000, 0x00ffffff).rw("simm", FUNC(pc9801_61_simm_device::read_15m_ext), FUNC(pc9801_61_simm_device::write_15m_ext));
+	m_hole_15M_view[1](0x00f00000, 0x00f7ffff).ram().share("ext_gvram");
 }
 
 void pc9821_canbe_state::pc9821ce_io(address_map &map)
@@ -777,7 +1033,7 @@ static INPUT_PORTS_START( pc9821 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Mouse Middle Button")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Left Button")
 
-	PORT_START("ROM_LOAD")
+	PORT_START("BIOS_LOAD")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_CONFNAME( 0x04, 0x00, "Load IDE BIOS" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
@@ -800,6 +1056,22 @@ MACHINE_START_MEMBER(pc9821_state,pc9821)
 {
 	m_pit_delay = timer_alloc(FUNC(pc9821_state::pit_delay), this);
 	MACHINE_START_CALL_MEMBER(pc9801bx2);
+	save_item(STRUCT_MEMBER(m_pegc, pal_entry));
+	save_pointer(NAME(m_pegc.r), 0x100);
+	save_pointer(NAME(m_pegc.g), 0x100);
+	save_pointer(NAME(m_pegc.b), 0x100);
+	save_item(STRUCT_MEMBER(m_pegc, bank), 2);
+	save_item(STRUCT_MEMBER(m_pegc, packed_mode));
+	save_pointer(NAME(m_pegc.regs), 0x100);
+	save_pointer(NAME(m_pegc.lastdata), 64);
+	save_pointer(NAME(m_pegc.pattern), 32);
+	save_item(STRUCT_MEMBER(m_pegc, pattern_mask));
+	save_item(STRUCT_MEMBER(m_pegc, lastdatalen));
+	save_item(STRUCT_MEMBER(m_pegc, remain));
+	save_item(STRUCT_MEMBER(m_pegc, first_process_w));
+	save_item(STRUCT_MEMBER(m_pegc, first_process_r));
+	save_pointer(NAME(m_pegc.shift_buffer), 64);
+	save_item(STRUCT_MEMBER(m_pegc, shift_cnt));
 
 	// ...
 }
@@ -846,7 +1118,8 @@ MACHINE_RESET_MEMBER(pc9821_canbe_state,pc9821_canbe)
 void pc9821_state::pc9821(machine_config &config)
 {
 	// TODO: specs for a vanilla MULTi doesn't match
-	// should be 386sx at 20 MHz, this may be "just" a FA/BX class instead
+	// should be 386sx at 20 MHz, this may be "just" a BX4 instead by judging at
+	// what it access downstream
 	pc9801rs(config);
 	const auto xtal = BASE_CLOCK / 2;
 	I486(config.replace(), m_maincpu, xtal); // unknown clock
@@ -858,7 +1131,7 @@ void pc9821_state::pc9821(machine_config &config)
 	m_pit->set_clk<1>(MAIN_CLOCK_X2);
 	m_pit->set_clk<2>(MAIN_CLOCK_X2);
 
-	m_cbus[0]->set_default_option("pc9801_86");
+	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, "pc9801_86");
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_state, pc9821)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9821_state, pc9821)
@@ -879,6 +1152,12 @@ void pc9821_state::pc9821(machine_config &config)
 //  m_hgdc[1]->set_display_pixels(FUNC(pc9821_state::pegc_display_pixels));
 
 	PC98_SDIP(config, "sdip", 0);
+
+	// RAM 1.6MB (S1) / 3.6 (S2) ~ 15M (with dedicated 10MB module)
+	config.device_remove("simm");
+	PC9801_61_SIMM(config, "simm", pc9821_simm_options, "2mb");
+//  m_ram->set_default_size("2M");
+//  m_ram->set_extra_options("4M,8M,14M,15M");
 }
 
 void pc9821_mate_a_state::pc9821as(machine_config &config)
@@ -895,6 +1174,11 @@ void pc9821_mate_a_state::pc9821as(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
+
+	// RAM 3.6 MB ~ 14.6 MB
+	PC9801_61_SIMM(config.replace(), "simm", pc9821_simm_options, "4mb");
+//  m_ram->set_default_size("4M");
+//  m_ram->set_extra_options("8M,14M,15M");
 }
 
 void pc9821_mate_a_state::pc9821ap2(machine_config &config)
@@ -902,7 +1186,7 @@ void pc9821_mate_a_state::pc9821ap2(machine_config &config)
 	pc9821(config);
 	const XTAL xtal = XTAL(66'000'000);
 	I486(config.replace(), m_maincpu, xtal); // i486dx2
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_a_state::pc9821as_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_a_state::pc9821ap2_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_a_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
@@ -913,7 +1197,12 @@ void pc9821_mate_a_state::pc9821ap2(machine_config &config)
 
 	// 80486DX2 66MHz
 	// DOS 5.0, Windows 3.1
-	// 5.6MB RAM, up to 73.6MB
+	// minimum RAM 3.6MB (U2) / 7.6MB (C9T)
+	// maximum RAM 71.6MB / 73.6MB (U8W / C9W)
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "4mb");
+//  m_ram->set_default_size("4M");
+//  m_ram->set_extra_options("8M,14M,32M,64M,72M,74M");
+
 	// 340MB HD
 	// Expansion slot C-BUS4 (4)
 	// Graphics controller S3 86C928
@@ -928,14 +1217,17 @@ void pc9821_canbe_state::pc9821ce(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9821_canbe_state::pc9821ce_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	// 3.5 x2
 	// 1.6MB ~ 14.6MB model S1
 	// 5.6MB ~ 14.6MB model S2
-	// pc9801-86
+	PC9801_61_SIMM(config.replace(), "simm", pc9821_simm_options, "2mb");
+//  m_ram->set_default_size("2M");
+//  m_ram->set_extra_options("6M,8M,14M,15M");
 
-	m_cbus[0]->set_default_option("sound_pc9821ce");
-	m_cbus[0]->set_fixed(true);
+	// pc9801-86 (built-in)
+	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus:mb1", 0, "cbus", pc98_cbus_devices, "sound_pc9821ce", true);
 
+	// 3.5 x2
 	config_floppy_35hd(config);
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
@@ -960,19 +1252,23 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
 //  m_cbus[0]->set_default_option(nullptr);
-	m_cbus[0]->set_default_option("sound_pc9821cx3");
-	m_cbus[0]->set_fixed(true);
+	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus:mb1", 0, "cbus", pc98_cbus_devices, "sound_pc9821cx3", true);
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
 	MCFG_MACHINE_RESET_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
+
+	// RAM 16MB ~ 128MB
+	// TODO: really regular SIMM over PCI
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "16mb");
+//  RAM(config.replace(), m_ram).set_default_size("16M").set_extra_options("32M,64M,128M");
 
 	// VLSI Supercore594 (Wildcat) PCI 2.0
 	// GD5440
 	// built-in 3.5 floppy x 1
 	// file bay with built-in CD-Rom (4x)
 	// HDD with pre-installed software (850MB, 1.2GB)
-	// minimum RAM: 16MB
-	// maximum RAM: 128MB
+
 	// C-Bus x 3
 	// PC-9821CB-B04, on dedicated bus (Fax/Modem 14'400 bps) and IrDA board (115'200 bps)
 	// Optional PC-9821C3-B02 MIDI board, on dedicated bus
@@ -1000,6 +1296,9 @@ void pc9821_mate_x_state::pc9821xa16(machine_config &config)
 
 	// Xa16/R specs
 	// 16MB ~ 128MB F.P.DRAM
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "16mb");
+//  RAM(config.replace(), m_ram).set_default_size("16M").set_extra_options("32M,64M,128M");
+
 	// VLSI Supercore594 (PCI rev 2.0)
 	// S3 manufactured Trident TGUI9680XGi with 2MB VRAM (on board PCI)
 	// 3.5" floppy x1
@@ -1008,6 +1307,9 @@ void pc9821_mate_x_state::pc9821xa16(machine_config &config)
 	// 1.2GB HDD
 	// CD-Rom x4
 
+	PCI_ROOT(config, "pci", 0);
+	// ...
+
 	// Xa16/W specs (same as above except)
 	// Intel I430HX (PCI rev 2.1)
 	// 32MB ~ 256MB ECC compatible EDO DRAM
@@ -1015,8 +1317,6 @@ void pc9821_mate_x_state::pc9821xa16(machine_config &config)
 	// 100Base-TX / 10Base-T ethernet (on board PCI)
 	// 1.6GB HDD
 	// CD-Rom x6 or x8
-	PCI_ROOT(config, "pci", 0);
-	// ...
 }
 
 void pc9821_mate_x_state::pc9821xv13(machine_config &config)
@@ -1027,10 +1327,14 @@ void pc9821_mate_x_state::pc9821xv13(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_x_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
+	// RAM 16MB ~ 128MB
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "16mb");
+//  RAM(config.replace(), m_ram).set_default_size("16M").set_extra_options("32M,64M,128M");
+
 	// Xv13/R identical to Xa16/R specs with an extra C-Bus slot
 
 	// Xv13/W identical to Xa16/W specs with MGA-2064W as PCI GFX card
-	// PCI rev 2.0 or 2.1
+	// PCI rev 2.0 (VLSI Supercore596 Wildcat) or 2.1 (Intel 430HX)
 	PCI_ROOT(config, "pci", 0);
 	// ...
 }
@@ -1043,15 +1347,18 @@ void pc9821_mate_r_state::pc9821ra20(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_r_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	// Intel 440FX
 	// 16MB ~ 128MB F.P.DRAM for /N12 or 32MB ~ 256MB ECC compatible EDO DRAM for /N30
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "16mb");
+//  RAM(config.replace(), m_ram).set_default_size("16M").set_extra_options("32M,64M,128M");
+
+	// Intel 440FX
+	PCI_ROOT(config, "pci", 0);
+	// ...
+
 	// S3 manufactured Trident TGUI9682XGi with 2MB VRAM (on board PCI)
 	// 1.2GB HDD for /N12 or 3GB for /N30
 	// CD-Rom x6 or x8
 	// 100Base-TX / 10Base-T ethernet (on board PCI)
-	PCI_ROOT(config, "pci", 0);
-	// ...
-
 }
 
 void pc9821_mate_r_state::pc9821ra266(machine_config &config)
@@ -1062,36 +1369,42 @@ void pc9821_mate_r_state::pc9821ra266(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_r_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_r_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+	// 512KB CPU cache RAM
+
+	// 32MB, max 256 MB (ECC EDO RAM)
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "32mb");
+//  RAM(config.replace(), m_ram).set_default_size("32M").set_extra_options("64M,128M,192M,256M");
 
 	// Intel 440FX
-	// 512KB CPU cache RAM
+	PCI_ROOT(config, "pci", 0);
+	// ...
+
 	// Trident TGUI9682XGi + integrated 98 gfx card
 	// 3x cbus + 2x PCI slots
 	// 3GB HDD
 	// 16x CD-ROM
 	// 3.5" floppy x 1
 	// built-in ethernet 100BASE-TX/10BASE-T
-	// 32MB, max 256 MB (ECC EDO RAM)
 
 	// PC-9821Ra266/M30R has been re-released in 1998,
 	// unknown differences other than having Win98 pre-installed
-
-	PCI_ROOT(config, "pci", 0);
-	// ...
 }
 
 void pc9821_mate_r_state::pc9821ra333(machine_config &config)
 {
 	pc9821(config);
 	const double xtal = 333000000;
-	PENTIUM2(config.replace(), m_maincpu, xtal); // actually a Celeron
+
+	PENTIUM2(config.replace(), m_maincpu, xtal); // actually Celeron @ 333
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_r_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_r_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-
-	// Celeron @ 333
 	// 128KB CPU cache RAM
-	// 32MB, max 256 MB (ECC EDO RAM)
+
+	// ECC EDO RAM 32MB ~ 256 MB
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "64mb");
+//  RAM(config.replace(), m_ram).set_default_size("32M").set_extra_options("64M,128M,192M,256M");
+
 	// Trident TGUI9682XGi + integrated 98 gfx card
 	// 3x cbus + 2x PCI slots
 	// 6GB HDD
@@ -1113,8 +1426,12 @@ void pc9821_note_lavie_state::pc9821nr15(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_note_lavie_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_note_lavie_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-
 	// 256KB CPU cache RAM
+
+	// EDO RAM 16MB ~ 256MB
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "16mb");
+//  RAM(config.replace(), m_ram).set_default_size("16M").set_extra_options("32M,64M,128M");
+
 	// TFT 12.1 screen with 800x600 max resolution
 	// Trident Cyber9385 Flat Panel Controller (SVGA, PCI?)
 	// -86 board
@@ -1129,12 +1446,16 @@ void pc9821_note_lavie_state::pc9821nr166(machine_config &config)
 {
 	pc9821(config);
 	const double xtal = 166000000;
+	// 256KB CPU cache RAM
 	PENTIUM_MMX(config.replace(), m_maincpu, xtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_note_lavie_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_note_lavie_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	// 256KB CPU cache RAM
+	// EDO RAM 32MB ~ 256MB
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "32mb");
+//  RAM(config.replace(), m_ram).set_default_size("32M").set_extra_options("64M,128M");
+
 	// TFT 13.3 screen with 1024x768 resolution
 	// Trident Cyber9385 Flat Panel Controller (SVGA, PCI?)
 	// PCI TypeII x 2 (Type III x 1)
@@ -1151,8 +1472,12 @@ void pc9821_note_lavie_state::pc9821nw150(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_note_lavie_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_note_lavie_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-
 	// 256KB CPU cache RAM
+
+	// EDO RAM 32MB ~ 64M
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "32mb");
+//  RAM(config.replace(), m_ram).set_default_size("32M").set_extra_options("64M");
+
 	// TFT 12.1 screen with 800x600 resolution & true color
 	// Trident Cyber9385-1 Flat Panel Controller (SVGA, PCI?)
 	// built-in CD-Rom x16
@@ -1311,6 +1636,7 @@ ROM_START( pc9821ce )
 	// 0x0c000 sound BIOS
 	// 0x10000 sound BIOS copy
 	// 0x16000 <to be identified>
+	// 0x18000 IDE BIOS
 	// 0x1a000 setup menu
 	ROM_COPY( "biosrom", 0x38000, 0x28000, 0x08000 )
 	ROM_COPY( "biosrom", 0x30000, 0x20000, 0x08000 )
@@ -1320,12 +1646,13 @@ ROM_START( pc9821ce )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_ce2.rom", 0x00000, 0x046800, BAD_DUMP CRC(d1c2702a) SHA1(e7781e9d35b6511d12631641d029ad2ba3f7daef) )
 
-	ROM_REGION( 0x4000, "cbus0:sound_pc9821ce:sound_bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x4000, "cbus:mb1:sound_pc9821ce:bios", ROMREGION_ERASE00 )
 	ROM_COPY( "biosrom", 0x0c000, 0x00000, 0x04000 )
 
 	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
-	// Uses SCSI not IDE
-//  LOAD_IDE_ROM
+
+	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
+	ROM_COPY( "biosrom", 0x18000, 0x00000, 0x02000 )
 ROM_END
 
 
@@ -1404,7 +1731,7 @@ ROM_START( pc9821cx3 )
 	// cfr. $afe00 and $ad400 range
 	LOAD_KANJI_ROMS(ROMREGION_ERASE00)
 
-	ROM_REGION( 0x4000, "cbus0:sound_pc9821cx3:sound_bios", 0)
+	ROM_REGION( 0x4000, "cbus:mb1:sound_pc9821cx3:bios", 0)
 	ROM_COPY( "biosrom", 0x54000, 0x00000, 0x04000 )
 
 	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
@@ -1720,3 +2047,5 @@ COMP( 1997, pc9821nw150, pc9821nr15,   0, pc9821nw150, pc9821,   pc9821_note_lav
 
 // 98FiNE
 // ...
+
+// PS-98 (client-server system based on late PC-9821s)

@@ -423,7 +423,7 @@ bool woz_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	auto [total_blocks, max_blocks] = count_blocks(tracks);
 	bool has_flux = test_flux(tracks);
 
-	std::vector<uint8_t> data(1536 + total_blocks*512 + (has_flux ? 512 : 0), 0);
+	std::vector<uint8_t> data(1536 + total_blocks*512 + (has_flux ? 168 : 0), 0);
 
 	memcpy(&data[0], signature2, 8);
 

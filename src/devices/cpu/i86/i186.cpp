@@ -167,6 +167,9 @@ i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type 
 	, m_irmx_irq_ack(*this)
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
+	// The Effective Address calculation times are already included in the
+	// instruction timings for the 80186, so fill the table with zeros.
+	memset(m_ea_timing, 0, sizeof(m_i80186_ea_timing));
 	set_irq_acknowledge_callback(*this, FUNC(i80186_cpu_device::inta_callback));
 }
 
@@ -198,19 +201,30 @@ void i80186_cpu_device::execute_run()
 	{
 		if ((m_dma[0].drq_state && (m_dma[0].control & ST_STOP)) || (m_dma[1].drq_state && (m_dma[1].control & ST_STOP)))
 		{
-			int channel = m_last_dma ? 0 : 1;
-			m_last_dma = !m_last_dma;
-			if (!(m_dma[1].drq_state && (m_dma[1].control & ST_STOP)))
-				channel = 0;
-			else if (!(m_dma[0].drq_state && (m_dma[0].control & ST_STOP)))
-				channel = 1;
-			else if ((m_dma[0].control & CHANNEL_PRIORITY) && !(m_dma[1].control & CHANNEL_PRIORITY))
-				channel = 0;
-			else if ((m_dma[1].control & CHANNEL_PRIORITY) && !(m_dma[0].control & CHANNEL_PRIORITY))
-				channel = 1;
-			m_icount--;
-			drq_callback(channel);
-			continue;
+			// A real '186 has some latency after writing to the DMA registers before a transfer will fire.
+			// mpc60 has a continuous RAM 0 to RAM 0 transfer running on channel 0 for unknown reasons, and
+			// without this latency a transfer can fire between the IRQ handler resetting the source address
+			// and destination address, resulting in the DMA turning from an expensive NOP into a memmove.
+			if (!m_dma_latency)
+			{
+				int channel = m_last_dma ? 0 : 1;
+				m_last_dma = !m_last_dma;
+				if (!(m_dma[1].drq_state && (m_dma[1].control & ST_STOP)))
+					channel = 0;
+				else if (!(m_dma[0].drq_state && (m_dma[0].control & ST_STOP)))
+					channel = 1;
+				else if ((m_dma[0].control & CHANNEL_PRIORITY) && !(m_dma[1].control & CHANNEL_PRIORITY))
+					channel = 0;
+				else if ((m_dma[1].control & CHANNEL_PRIORITY) && !(m_dma[0].control & CHANNEL_PRIORITY))
+					channel = 1;
+				m_icount--;
+				drq_callback(channel);
+				continue;
+			}
+		}
+		if (m_dma_latency > 0)
+		{
+			m_dma_latency--;
 		}
 		if (m_seg_prefix_next)
 		{
@@ -305,13 +319,14 @@ void i80186_cpu_device::execute_run()
 			case 0x62: // i_bound
 				{
 					m_modrm = fetch();
-					uint32_t low = GetRMWord();
-					uint32_t high = GetnextRMWord();
-					uint32_t tmp = RegWord();
-					if (tmp < low || tmp > high)
+					int16_t low = (int16_t)GetRMWord();
+					int16_t high = (int16_t)GetnextRMWord();
+					int16_t idx = (int16_t)RegWord();
+					if (idx < low || idx > high) {
 						interrupt(5);
+					}
 					CLK(BOUND);
-					logerror("%06x: bound %04x high %04x low %04x tmp\n", m_pc, high, low, tmp);
+					logerror("%06x: bound %i <= %i <= %i\n", m_pc, low, idx, high);
 				}
 				break;
 
@@ -381,7 +396,6 @@ void i80186_cpu_device::execute_run()
 					break;
 				default:
 					logerror("%06x: Mov Sreg - Invalid register\n", m_pc);
-					m_ip = m_prev_ip;
 					interrupt(6);
 					break;
 				}
@@ -632,7 +646,6 @@ void i80186_cpu_device::execute_run()
 				{
 					m_icount -= 10; // UD fault timing?
 					logerror("%06x: Invalid Opcode %02x\n", m_pc, op);
-					m_ip = m_prev_ip;
 					interrupt(6); // 80186 has #UD
 					break;
 				}
@@ -721,6 +734,7 @@ void i80186_cpu_device::device_start()
 	save_item(NAME(m_mem.peripheral));
 	save_item(NAME(m_reloc));
 	save_item(NAME(m_last_dma));
+	save_item(NAME(m_dma_latency));
 
 	// zerofill
 	memset(m_timer, 0, sizeof(m_timer));
@@ -729,6 +743,7 @@ void i80186_cpu_device::device_start()
 	memset(&m_mem, 0, sizeof(mem_state));
 	m_reloc = 0;
 	m_last_dma = 0;
+	m_dma_latency = 0;
 
 	m_timer[0].int_timer = timer_alloc(FUNC(i80186_cpu_device::timer_elapsed), this);
 	m_timer[1].int_timer = timer_alloc(FUNC(i80186_cpu_device::timer_elapsed), this);
@@ -909,7 +924,10 @@ IRQ_CALLBACK_MEMBER(i80186_cpu_device::int_callback)
 	LOGMASKED(LOG_INTERRUPTS, "(%f) **** Acknowledged interrupt vector %02X\n", machine().time().as_double(), m_intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
-	set_input_line(0, CLEAR_LINE);
+	if (!BIT(m_reloc, 14))
+		set_input_line(0, CLEAR_LINE);
+	else
+		m_irmx_irq_cb(CLEAR_LINE);
 	m_intr.pending = 0;
 
 	uint16_t oldreq = m_intr.request;
@@ -1000,17 +1018,19 @@ void i80186_cpu_device::update_interrupt_state()
 			{
 				if ((m_intr.timer[int_num] & 0x0f) == priority)
 				{
-					int irq = (1 << int_num);
+					const int irq_map[3] = {0x01, 0x10, 0x20};
+					int irq = irq_map[int_num];
+
 					/* if we're already servicing something at this level, don't generate anything new */
-					if (m_intr.in_service & 0x01)
+					if (m_intr.in_service & irq)
 						return;
 
 					/* if there's something pending, generate an interrupt */
-					if (m_intr.status & irq)
+					if (BIT(m_intr.status, int_num))
 					{
 						new_vector = m_intr.vector | priority;
 						/* set the clear mask and generate the int */
-						m_intr.ack_mask = int_num ? (8 << int_num) : 1;
+						m_intr.ack_mask = irq;
 						goto generate_int;
 					}
 				}
@@ -1020,8 +1040,10 @@ void i80186_cpu_device::update_interrupt_state()
 		{
 			if ((m_intr.timer[0] & 0x0f) == priority)
 			{
+				int const irq = 0x01;
+
 				/* if we're already servicing something at this level, don't generate anything new */
-				if (m_intr.in_service & 0x01)
+				if (m_intr.in_service & irq)
 					return;
 
 				/* if there's something pending, generate an interrupt */
@@ -1037,7 +1059,7 @@ void i80186_cpu_device::update_interrupt_state()
 						logerror("Invalid timer interrupt!\n");
 
 					/* set the clear mask and generate the int */
-					m_intr.ack_mask = 0x0001;
+					m_intr.ack_mask = irq;
 					goto generate_int;
 				}
 			}
@@ -1045,14 +1067,22 @@ void i80186_cpu_device::update_interrupt_state()
 
 		/* check DMA interrupts */
 		for (int int_num = 0; int_num < 2; int_num++)
+		{
 			if ((m_intr.dma[int_num] & 0x0F) == priority)
 			{
+				const int irq_map[2] = {0x04, 0x08};
+				int irq = irq_map[int_num];
+				if (BIT(m_reloc, 14)) {
+					const int irq_map[2] = {0x08, 0x04};
+					irq = irq_map[int_num];
+				}
+
 				/* if we're already servicing something at this level, don't generate anything new */
-				if (m_intr.in_service & (0x04 << int_num))
+				if (m_intr.in_service & irq)
 					return;
 
 				/* if there's something pending, generate an interrupt */
-				if (m_intr.request & (0x04 << int_num))
+				if (m_intr.request & irq)
 				{
 					if (BIT(m_reloc, 14))
 						new_vector = m_intr.vector | priority;
@@ -1060,10 +1090,11 @@ void i80186_cpu_device::update_interrupt_state()
 						new_vector = 0x0a + int_num;
 
 					/* set the clear mask and generate the int */
-					m_intr.ack_mask = 0x0004 << int_num;
+					m_intr.ack_mask = irq;
 					goto generate_int;
 				}
 			}
+		}
 
 		if (BIT(m_reloc, 14))
 			continue;
@@ -1126,8 +1157,39 @@ void i80186_cpu_device::handle_eoi(int data)
 {
 	bool handled = false;
 
+	/* iRMX */
+	if (BIT(m_reloc, 14))
+	{
+		int level = data & 0x07;
+
+		for (int int_num = 0; int_num < 3 && !handled; int_num++)
+		{
+			const int irq_map[3] = {0x01, 0x10, 0x20};
+			const int mask = irq_map[int_num];
+
+			if ((m_intr.timer[int_num] & 0x07) == level && (m_intr.in_service & mask))
+			{
+				m_intr.in_service &= ~mask;
+				LOGMASKED(LOG_INTERRUPTS, "(%f) **** Got EOI for timer%d\n", machine().time().as_double(), int_num);
+				handled = true;
+			}
+		}
+
+		for (int int_num = 0; int_num < 2 && !handled; int_num++)
+		{
+			const int irq_map[2] = {0x08, 0x04};
+			const int mask = irq_map[int_num];
+
+			if ((m_intr.dma[int_num] & 0x07) == level && (m_intr.in_service & mask))
+			{
+				m_intr.in_service &= ~mask;
+				LOGMASKED(LOG_INTERRUPTS, "(%f) **** Got EOI for DMA%d\n", machine().time().as_double(), int_num);
+				handled = true;
+			}
+		}
+	}
 	/* specific case */
-	if (!(data & 0x8000))
+	else if (!(data & 0x8000))
 	{
 		/* turn off the appropriate in-service bit */
 		switch (data & 0x1f)
@@ -1152,27 +1214,11 @@ void i80186_cpu_device::handle_eoi(int data)
 		for (int priority = 0; priority <= 7 && !handled; priority++)
 		{
 			/* check for in-service timers */
-			if (BIT(m_reloc, 14))
+			if ((m_intr.timer[0] & 0x07) == priority && (m_intr.in_service & 0x01))
 			{
-				for (int int_num = 0; int_num < 2 && !handled; int_num++)
-				{
-					int mask = int_num ? (8 << int_num) : 1;
-					if ((m_intr.timer[int_num] & 0x07) == priority && (m_intr.in_service & mask))
-					{
-						m_intr.in_service &= ~mask;
-						LOGMASKED(LOG_INTERRUPTS, "(%f) **** Got EOI for timer%d\n", machine().time().as_double(), int_num);
-						handled = true;
-					}
-				}
-			}
-			else
-			{
-				if ((m_intr.timer[0] & 0x07) == priority && (m_intr.in_service & 0x01))
-				{
-					m_intr.in_service &= ~0x01;
-					LOGMASKED(LOG_INTERRUPTS, "(%f) **** Got EOI for timer\n", machine().time().as_double());
-					handled = true;
-				}
+				m_intr.in_service &= ~0x01;
+				LOGMASKED(LOG_INTERRUPTS, "(%f) **** Got EOI for timer\n", machine().time().as_double());
+				handled = true;
 			}
 
 			/* check for in-service DMA interrupts */
@@ -1183,9 +1229,6 @@ void i80186_cpu_device::handle_eoi(int data)
 					LOGMASKED(LOG_INTERRUPTS, "(%f) **** Got EOI for DMA%d\n", machine().time().as_double(), int_num);
 					handled = true;
 				}
-
-			if (BIT(m_reloc, 14))
-				continue;
 
 			/* check external interrupts */
 			for (int int_num = 0; int_num < 4 && !handled; int_num++)
@@ -1259,10 +1302,13 @@ TIMER_CALLBACK_MEMBER(i80186_cpu_device::timer_elapsed)
 
 	if (which == 2)
 	{
-		if ((m_dma[0].control & (TIMER_DRQ | ST_STOP)) == (TIMER_DRQ | ST_STOP))
-			drq_callback(0);
-		if ((m_dma[1].control & (TIMER_DRQ | ST_STOP)) == (TIMER_DRQ | ST_STOP))
-			drq_callback(1);
+		if (!m_dma_latency)
+		{
+			if ((m_dma[0].control & (TIMER_DRQ | ST_STOP)) == (TIMER_DRQ | ST_STOP))
+				drq_callback(0);
+			if ((m_dma[1].control & (TIMER_DRQ | ST_STOP)) == (TIMER_DRQ | ST_STOP))
+				drq_callback(1);
+		}
 		if ((m_timer[0].control & 0x800c) == 0x8008)
 			inc_timer(0);
 		if ((m_timer[1].control & 0x800c) == 0x8008)
@@ -1491,7 +1537,12 @@ void i80186_cpu_device::update_dma_control(int which, int new_control)
 		new_control = (new_control & ~ST_STOP) | (d->control & ST_STOP);
 	new_control &= ~CHG_NOCHG;
 
-	LOGMASKED(LOG_DMA, "Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
+	if (which > 0)
+	logerror("Initiated DMA %d - count = %04X, source = %08X (%s), dest = %08X (%s)\n", which, d->count,
+		d->source,
+		d->control & SRC_MIO ? "I/O" : "MEM",
+		d->dest,
+		d->control & DEST_MIO ? "I/O" : "MEM");
 
 	/* set the new control register */
 	d->control = new_control;
@@ -1565,7 +1616,15 @@ void i80186_cpu_device::drq_callback(int which)
 	if ((dma->control & INTERRUPT_ON_ZERO) && dma->count == 0)
 	{
 		LOGMASKED(LOG_DMA_HIFREQ, "DMA%d - requesting interrupt: count = %04X, source = %04X\n", which, dma->count, dma->source);
-		m_intr.request |= 0x04 << which;
+
+		const int irq_map[2] = {0x04, 0x08};
+		int irq = irq_map[which];
+		if (BIT(m_reloc, 14)) {
+			const int irq_map[2] = {0x08, 0x04};
+			irq = irq_map[which];
+		}
+
+		m_intr.request |= irq;
 		update_interrupt_state();
 	}
 }
@@ -1959,6 +2018,7 @@ void i80186_cpu_device::internal_port_w(offs_t offset, uint16_t data)
 			LOGMASKED(LOG_PORTS, "%05X:80186 DMA%d lower source address = %04X\n", m_pc, (offset - 0x60) / 8, data);
 			which = (offset - 0x60) / 8;
 			m_dma[which].source = (m_dma[which].source & ~0x0ffff) | (data & 0x0ffff);
+			m_dma_latency = 8;
 			break;
 
 		case 0x61:
@@ -1966,6 +2026,7 @@ void i80186_cpu_device::internal_port_w(offs_t offset, uint16_t data)
 			LOGMASKED(LOG_PORTS, "%05X:80186 DMA%d upper source address = %04X\n", m_pc, (offset - 0x61) / 8, data);
 			which = (offset - 0x61) / 8;
 			m_dma[which].source = (m_dma[which].source & ~0xf0000) | ((data << 16) & 0xf0000);
+			m_dma_latency = 8;
 			break;
 
 		case 0x62:
@@ -1973,6 +2034,7 @@ void i80186_cpu_device::internal_port_w(offs_t offset, uint16_t data)
 			LOGMASKED(LOG_PORTS, "%05X:80186 DMA%d lower dest address = %04X\n", m_pc, (offset - 0x62) / 8, data);
 			which = (offset - 0x62) / 8;
 			m_dma[which].dest = (m_dma[which].dest & ~0x0ffff) | (data & 0x0ffff);
+			m_dma_latency = 8;
 			break;
 
 		case 0x63:
@@ -1980,6 +2042,7 @@ void i80186_cpu_device::internal_port_w(offs_t offset, uint16_t data)
 			LOGMASKED(LOG_PORTS, "%05X:80186 DMA%d upper dest address = %04X\n", m_pc, (offset - 0x63) / 8, data);
 			which = (offset - 0x63) / 8;
 			m_dma[which].dest = (m_dma[which].dest & ~0xf0000) | ((data << 16) & 0xf0000);
+			m_dma_latency = 8;
 			break;
 
 		case 0x64:
@@ -1987,6 +2050,7 @@ void i80186_cpu_device::internal_port_w(offs_t offset, uint16_t data)
 			LOGMASKED(LOG_PORTS, "%05X:80186 DMA%d transfer count = %04X\n", m_pc, (offset - 0x64) / 8, data);
 			which = (offset - 0x64) / 8;
 			m_dma[which].count = data;
+			m_dma_latency = 8;
 			break;
 
 		case 0x65:

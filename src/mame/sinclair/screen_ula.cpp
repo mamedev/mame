@@ -47,12 +47,12 @@ u8 screen_ula_device::screen_mode()
 	return ((m_ula_type == ULA_TYPE_NEXT) && m_ula_shadow_en) ? 0b000 : (m_port_ff_reg & 7);
 }
 
-void screen_ula_device::draw_border(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 border_color)
+void screen_ula_device::draw_border(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 border_color, u8 pcode)
 {
 	u8 pap_attr = border_color << 3;
 	if ((m_ula_type == ULA_TYPE_NEXT) && m_ulanext_en)
 		pap_attr = border_color << m_pap_shift;
-	else if (m_ulap_en && (screen_mode() == 6))
+	else if (screen_mode() == 6)
 		pap_attr = 0x40 | (~m_port_ff_reg & 0x38);
 	const rgb_t pap = parse_attribute(pap_attr).first;
 
@@ -60,21 +60,31 @@ void screen_ula_device::draw_border(bitmap_rgb32 &bitmap, const rectangle &clipr
 	const rgb_t gt1 = rgbexpand<3,3,3>((m_global_transparent << 1) | 1, 6, 3, 0);
 	if (pap != gt0 && pap != gt1)
 	{
-		bitmap.fill(pap, cliprect);
+		rectangle scr = { SCREEN_AREA.left() << 1, (SCREEN_AREA.right() << 1) | 1, SCREEN_AREA.top(), SCREEN_AREA.bottom() };
+		scr.offset(m_offset_h, m_offset_v);
 
-		rectangle clip = { SCREEN_AREA.left() << 1, (SCREEN_AREA.right() << 1) | 1, SCREEN_AREA.top(), SCREEN_AREA.bottom() };
-		clip.offset(m_offset_h, m_offset_v);
-		clip &= cliprect;
-
-		if (!clip.empty())
-			bitmap.fill(palette().pen_color(UTM_FALLBACK_PEN), clip);
+		const rectangle vis = screen.visible_area();
+		rectangle bsides[4] =
+		{
+			rectangle(vis.left(),      vis.right(),    vis.top(),        scr.top() - 1),
+			rectangle(vis.left(),      scr.left() - 1, scr.top(),        scr.bottom()),
+			rectangle(scr.right() + 1, vis.right(),    scr.top(),        scr.bottom()),
+			rectangle(vis.left(),      vis.right(),    scr.bottom() + 1, vis.bottom())
+		};
+		for (auto i = 0; i < 4; i++)
+		{
+			const rectangle border = bsides[i] & cliprect;
+			if (!border.empty())
+			{
+				if (pcode)
+					screen.priority().fill(pcode, border);
+				bitmap.fill(pap, border);
+			}
+		}
 	}
-	else
-		bitmap.fill(palette().pen_color(UTM_FALLBACK_PEN), cliprect);
-
 }
 
-void screen_ula_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool flash, u8 pcode)
+void screen_ula_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 pcode)
 {
 	rectangle clip = { m_ula_clip_x1 << 1, (m_ula_clip_x2 << 1) | 1, m_ula_clip_y1, m_ula_clip_y2 };
 	clip.offset(m_offset_h, m_offset_v);
@@ -85,20 +95,24 @@ void screen_ula_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const 
 		if (screen_mode() == 6)
 			draw_hires(bitmap, clip, screen.priority(), pcode);
 		else
+		{
+			const bool flash = u64(screen.frame_number() / FLASH_FRAME_INVERT_COUNT) & 1;
 			draw_ula(bitmap, clip, flash, screen.priority(), pcode);
+		}
 	}
 }
 
 void screen_ula_device::draw_ula(bitmap_rgb32 &bitmap, const rectangle &clip, bool flash, bitmap_ind8 &priority_bitmap, u8 pcode)
 {
 	const bool hicolor = screen_mode() == 2; // timex hicolor
-	const bool timex_alt = !m_ula_shadow_en && screen_mode() == 1;
 	flash &= !m_ulanext_en && !m_ulap_en;
 	const rgb_t gt0 = rgbexpand<3,3,3>((m_global_transparent << 1) | 0, 6, 3, 0);
 	const rgb_t gt1 = rgbexpand<3,3,3>((m_global_transparent << 1) | 1, 6, 3, 0);
-	const u8 *screen_location = m_host_ram_ptr + ((m_ula_shadow_en ? 7 : 5) << 14) + (timex_alt ? 0x2000 : 0);
+	const u8 *screen_location = m_ula_shadow_en ? m_bram_bank7_ptr : m_bram_bank5_ptr;
+	if (screen_mode() == 1) // Timex alt screen
+		screen_location += 0x2000;
 
-	const u16 x2_min = ((clip.left() - m_offset_h) + (m_ula_scroll_x << 1)) % (SCREEN_AREA.width() << 1);
+	const u16 x2_min = ((clip.left() - m_offset_h) + (m_ula_scroll_x << 1) + m_ula_fine_scroll_x) % (SCREEN_AREA.width() << 1);
 	for (u16 vpos = clip.top(); vpos <= clip.bottom(); vpos++)
 	{
 		u16 hpos = clip.left();
@@ -121,22 +135,22 @@ void screen_ula_device::draw_ula(bitmap_rgb32 &bitmap, const rectangle &clip, bo
 				const rgb_t pen = (pix8 & b) ? ink : pap;
 				if ((pen != gt0) && (pen != gt1))
 				{
-					*pix = pen;
-					*prio |= pcode;
-					if (hpos < clip.right())
+					pix[0] = pen;
+					prio[0] |= pcode;
+					if (!off2 && (hpos < clip.right()))
 					{
-						*(pix + 1) = pen;
-						*(prio + 1) |= pcode;
+						pix[1] = pen;
+						prio[1] |= pcode;
 					}
 				}
-			}
-			if (off2)
-			{
-				hpos -= 1;
-				pix -= 1;
-				prio -= 1;
-				x2 -= 1;
-				off2 = false;
+				if (off2)
+				{
+					hpos -= 1;
+					pix -= 1;
+					prio -= 1;
+					x2 -= 1;
+					off2 = false;
+				}
 			}
 			x2 %= SCREEN_AREA.width() << 1;
 			if (x2 == 0)
@@ -157,14 +171,14 @@ void screen_ula_device::draw_hires(bitmap_rgb32 &bitmap, const rectangle &clip, 
 {
 	const rgb_t gt0 = rgbexpand<3,3,3>((m_global_transparent << 1) | 0, 6, 3, 0);
 	const rgb_t gt1 = rgbexpand<3,3,3>((m_global_transparent << 1) | 1, 6, 3, 0);
-	const u8 *screen_location = m_host_ram_ptr + ((m_ula_shadow_en ? 7 : 5) << 14);
+	const u8 *screen_location = m_ula_shadow_en ? m_bram_bank7_ptr : m_bram_bank5_ptr;
 
 	const u8 attr = 0x40 | (~m_port_ff_reg & 0x38) | BIT(m_port_ff_reg, 3, 3);
 	const std::pair<rgb_t, rgb_t> pi = parse_attribute(attr);
 	const rgb_t pap = pi.first;
 	const rgb_t ink = pi.second;
 
-	const u16 x_min = ((clip.left() - m_offset_h) + (m_ula_scroll_x << 1)) % (SCREEN_AREA.width() << 1);
+	const u16 x_min = ((clip.left() - m_offset_h) + (m_ula_scroll_x << 1) + m_ula_fine_scroll_x) % (SCREEN_AREA.width() << 1);
 	for (u16 vpos = clip.top(); vpos <= clip.bottom(); vpos++)
 	{
 		u16 hpos = clip.left();
@@ -226,16 +240,8 @@ std::pair<rgb_t, rgb_t> screen_ula_device::parse_attribute(u8 attr)
 	}
 	else if (m_ulap_en)
 	{
-		if (m_ula_type == ULA_TYPE_NEXT)
-		{
-			ink = 0xc0 | ((attr & 0xc0) >> 3) | BIT(attr, 0, 3);
-			pap = 0xe0 | ((attr & 0xc0) >> 3) | BIT(attr, 3, 3);
-		}
-		else
-		{
-			ink = 0xc0 | ((attr & 0xc0) >> 2) | BIT(attr, 0, 3);
-			pap = 0xc8 | ((attr & 0xc0) >> 2) | BIT(attr, 3, 3);
-		}
+		ink = 0xc0 | ((attr & 0xc0) >> 2) | BIT(attr, 0, 3);
+		pap = 0xc8 | ((attr & 0xc0) >> 2) | BIT(attr, 3, 3);
 	}
 	else
 	{
@@ -265,10 +271,13 @@ void screen_ula_device::device_add_mconfig(machine_config &config)
 	m_ula_clip_y2 = 192;
 	m_ula_scroll_x = 0;
 	m_ula_scroll_y = 0;
+	m_ula_fine_scroll_x = 0;
 }
 
 void screen_ula_device::device_start()
 {
+	save_item(NAME(m_offset_h));
+	save_item(NAME(m_offset_v));
 	save_item(NAME(m_global_transparent));
 	save_item(NAME(m_ula_palette_select));
 	save_item(NAME(m_ulanext_en));

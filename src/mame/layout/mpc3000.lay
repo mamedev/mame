@@ -4,20 +4,21 @@
 
 <!-- Layout for AKAI MPC3000 Drum Sampler/Sequencer Machine from 1994
      by Guru (https://gurudumps.otenko.com/)
-     NOTE: This layout suits the default ROM v3.12. Other top panels exist with minor changes -->
+     NOTE: This pixel-accurate layout suits the default ROM v3.12. Other top panels exist with minor changes -->
 
 	<element name="script_warning" defstate="1">
 		<text state="1" string="TO CONTROL SLIDERS/KNOBS WITH MOUSE PLEASE ENABLE LAYOUT PLUGIN">
 			<color red="1" green="0" blue="0"/></text></element>
 
-<!-- Guide image. Do not attempt to edit this layout unless you have the original MPC3000 guide image ;-) -->
+<!-- Guide image. All elements in this layout are positionally accurate to an image of a real MPC3000.
+                  Do not attempt to edit this layout unless you have the original MPC3000 guide image ;-) -->
 	<element name="background"><image file="mpc3000.png" /></element>
 
 <!-- Selective tick marks around the volume and record knobs every 30 degrees (some missing by design) -->
 	<element name="knob-ticks">
 		<image><data><![CDATA[
 			<svg width="80" height="80">
-					stroke="#000000" stroke-width="0.7" transform="translate(26, 52)>
+				<g  stroke="#000000" stroke-width="0.7" transform="translate(26, 52)>
 					<line x1="0" y1="0" x2="20" y2="0"/>
 					<line transform="rotate(30)" x1="0" y1="0" x2="20" y2="0"/>
 					<line transform="rotate(60)" x1="0" y1="0" x2="20" y2="0"/>
@@ -29,11 +30,123 @@
 					<line transform="rotate(270)" x1="0" y1="0" x2="20" y2="0"/>
 					<line transform="rotate(300)" x1="0" y1="0" x2="20" y2="0"/>
 					<line transform="rotate(330)" x1="0" y1="0" x2="20" y2="0"/>
+				</g>
 			</svg>
 		]]></data></image>
 	</element>
 
-<!-- Basic Round Led -->
+<!-- MPC logo using simple lines -->
+	<element name="mpc-text">
+		<image><data><![CDATA[
+	<svg width="400" height="100" viewBox="0 0 400 100">
+	  <line x1="20" y1="80" x2="20" y2="20" stroke="black" stroke-width="3" />
+	  <line x1="20" y1="20" x2="50" y2="20" stroke="black" stroke-width="3" />
+	 <line x1="50" y1="20" x2="50" y2="80" stroke="black" stroke-width="3" />
+	  <line x1="35" y1="20" x2="35" y2="80" stroke="black" stroke-width="3" />
+	  <line x1="60" y1="80" x2="60" y2="20" stroke="black" stroke-width="3" />
+	  <line x1="60" y1="20" x2="80" y2="20" stroke="black" stroke-width="3" />
+	  <line x1="80" y1="20" x2="80" y2="50" stroke="black" stroke-width="3" />
+	  <line x1="60" y1="50" x2="80" y2="50" stroke="black" stroke-width="3" />
+	  <line x1="90" y1="20" x2="110" y2="20" stroke="black" stroke-width="3" />
+	  <line x1="90" y1="20" x2="90" y2="80" stroke="black" stroke-width="3" />
+	  <line x1="90" y1="80" x2="110" y2="80" stroke="black" stroke-width="3" />
+	  <line x1="120" y1="20" x2="140" y2="20" stroke="black" stroke-width="3" />
+	  <line x1="140" y1="20" x2="140" y2="50" stroke="black" stroke-width="3" />
+	  <line x1="120" y1="50" x2="140" y2="50" stroke="black" stroke-width="3" />
+	  <line x1="140" y1="50" x2="140" y2="80" stroke="black" stroke-width="3" />
+	  <line x1="120" y1="80" x2="140" y2="80" stroke="black" stroke-width="3" />
+	  <line x1="150" y1="20" x2="170" y2="20" stroke="black" stroke-width="3" />
+	  <line x1="170" y1="20" x2="170" y2="80" stroke="black" stroke-width="3" />
+	  <line x1="150" y1="80" x2="170" y2="80" stroke="black" stroke-width="3" />
+	  <line x1="150" y1="20" x2="150" y2="80" stroke="black" stroke-width="3" />
+	  <line x1="180" y1="20" x2="200" y2="20" stroke="black" stroke-width="3" />
+	  <line x1="200" y1="20" x2="200" y2="80" stroke="black" stroke-width="3" />
+	  <line x1="180" y1="80" x2="200" y2="80" stroke="black" stroke-width="3" />
+	  <line x1="180" y1="20" x2="180" y2="80" stroke="black" stroke-width="3" />
+	  <line x1="210" y1="20" x2="230" y2="20" stroke="black" stroke-width="3" />
+	  <line x1="230" y1="20" x2="230" y2="80" stroke="black" stroke-width="3" />
+	  <line x1="210" y1="80" x2="230" y2="80" stroke="black" stroke-width="3" />
+	  <line x1="210" y1="20" x2="210" y2="80" stroke="black" stroke-width="3" />
+	</svg>
+	]]></data></image>
+	</element>
+
+<!-- AKAI text using free Novo font then converted to svg code -->
+	<element name="akai-novo-text">
+	<image><data><![CDATA[
+	<svg width: 300px; height: auto; >
+		<path fill-rule="evenodd" clip-rule="evenodd" fill="#E41F26" d="M13.92,0.06c0.88,0,1.76,0,2.64,0
+			c0.159,0.124,0.132,0.302,0.133,0.469c0.003,1.249,0.001,2.498,0.001,3.783c0.227-0.195,0.384-0.419,0.572-0.611
+			c1.127-1.148,2.27-2.281,3.407-3.417c0.111-0.112,0.263-0.14,0.386-0.224c1,0,2,0,3,0c0.083,0.2-0.08,0.293-0.186,0.4
+			c-0.814,0.826-1.637,1.643-2.457,2.461c-0.453,0.452-0.898,0.911-1.36,1.354c-0.182,0.175-0.187,0.306-0.03,0.505
+			c0.816,1.032,1.64,2.059,2.46,3.088c0.44,0.555,0.878,1.11,1.316,1.667c0.261,0.331,0.285,0.332,0.452-0.042
+			c0.663-1.485,1.313-2.977,1.975-4.463c0.592-1.332,1.182-2.665,1.779-3.994c0.098-0.219,0.186-0.442,0.292-0.657
+			c0.063-0.129,0.138-0.241,0.258-0.32c1.1,0,2.199,0,3.3,0c0.174,0.079,0.272,0.22,0.347,0.391
+			c0.792,1.808,1.596,3.611,2.405,5.411c0.576,1.282,1.139,2.57,1.714,3.853c0.06,0.132,0.135,0.274,0.034,0.425
+			c-0.96,0-1.92,0-2.88,0c-0.168-0.073-0.246-0.212-0.312-0.379c-0.2-0.511-0.393-1.024-0.584-1.539
+			c-0.09-0.241-0.228-0.349-0.487-0.347c-1.238,0.005-2.477,0.005-3.715,0c-0.261-0.002-0.398,0.105-0.487,0.347
+			c-0.191,0.515-0.385,1.028-0.585,1.539C27.246,9.928,27.168,10.066,27,10.14c-1.98,0-3.96,0-5.94,0
+			c-0.386-0.123-0.547-0.48-0.771-0.763c-0.812-1.024-1.614-2.055-2.42-3.083c-0.111-0.142-0.225-0.188-0.384-0.092
+			c-0.034,0.021,0.01-0.003-0.026,0.015c-0.765,0.356-0.765,0.356-0.765,1.207c0,0.769,0.001,1.538-0.001,2.307
+			c0,0.15,0.006,0.304-0.133,0.409c-0.88,0-1.76,0-2.64,0c-0.158-0.123-0.136-0.302-0.137-0.469
+			c-0.007-0.959-0.003-1.918-0.003-2.877c0-2.059-0.003-4.117,0.002-6.175C13.783,0.426,13.737,0.212,13.92,0.06z"/>
+		<path fill-rule="evenodd" clip-rule="evenodd" fill="#E41F26" d="M2.94,10.14c-0.901,0-1.802,0.002-2.702-0.003
+			c-0.057-0.001-0.155,0.072-0.178-0.057c0.185-0.943,0.677-1.766,1.047-2.634C1.841,5.729,2.62,4.031,3.374,2.322
+			C3.66,1.673,3.943,1.023,4.242,0.38C4.303,0.25,4.378,0.138,4.5,0.06c1.1,0,2.2,0,3.3,0c0.174,0.079,0.272,0.22,0.348,0.391
+			c0.792,1.808,1.596,3.611,2.404,5.411c0.576,1.282,1.139,2.57,1.714,3.853c0.06,0.132,0.134,0.274,0.034,0.425
+			c-0.96,0-1.92,0-2.88,0c-0.167-0.073-0.246-0.212-0.311-0.379c-0.2-0.511-0.393-1.024-0.584-1.539
+			C8.436,7.98,8.298,7.873,8.038,7.875c-1.238,0.005-2.477,0.005-3.715,0C4.063,7.873,3.925,7.98,3.835,8.222
+			C3.644,8.736,3.451,9.25,3.251,9.761C3.186,9.928,3.108,10.066,2.94,10.14z"/>
+		<path fill-rule="evenodd" clip-rule="evenodd" fill="#D3D3D3" d="M28.561,0.06c-0.145,0.517-0.408,0.985-0.619,1.474
+			c-0.608,1.409-1.237,2.81-1.863,4.212c-0.506,1.137-1.02,2.27-1.528,3.405c-0.106,0.239-0.226,0.476-0.305,0.724
+			c-0.073,0.231-0.151,0.246-0.296,0.064c-0.396-0.499-0.795-0.996-1.19-1.496c-0.517-0.652-1.028-1.309-1.546-1.96
+			c-0.488-0.614-0.979-1.226-1.475-1.833c-0.116-0.141-0.028-0.21,0.06-0.297c0.312-0.311,0.622-0.622,0.932-0.933
+			c1.046-1.046,2.093-2.091,3.138-3.138c0.068-0.069,0.129-0.148,0.193-0.222C25.561,0.06,27.061,0.06,28.561,0.06z"/>
+		<path fill-rule="evenodd" clip-rule="evenodd" fill="#D3D3D3" d="M36.36,10.14c-0.524-1.189-1.046-2.381-1.573-3.57
+			c-0.358-0.808-0.729-1.61-1.088-2.418c-0.541-1.215-1.076-2.434-1.616-3.649c-0.066-0.151-0.148-0.295-0.223-0.442
+			c1.68,0,3.359,0,5.04,0c0.192,0.162,0.13,0.386,0.136,0.589c0.014,0.494,0.01,0.491,0.469,0.673
+			c0.27,0.106,0.544,0.201,0.811,0.314c0.175,0.074,0.27,0.197,0.274,0.39c0.002,0.1,0.008,0.2,0.008,0.3
+			c0.001,1.85,0.002,3.7,0,5.549c-0.001,0.573-0.009,0.577-0.533,0.791c-0.231,0.094-0.471,0.167-0.704,0.257
+			C37.13,9.011,37.045,9.16,37.035,9.4c-0.011,0.25,0.088,0.526-0.135,0.739C36.72,10.14,36.54,10.14,36.36,10.14z"/>
+		<path fill-rule="evenodd" clip-rule="evenodd" fill="#D3D3D3" d="M12.3,10.14c-0.523-1.189-1.045-2.381-1.572-3.57
+			c-0.359-0.808-0.729-1.61-1.089-2.418C9.098,2.936,8.563,1.718,8.023,0.502C7.956,0.352,7.875,0.207,7.8,0.06
+			c2.04,0,4.08,0,6.12,0c0,3.36,0,6.72,0,10.08C13.38,10.14,12.84,10.14,12.3,10.14z"/>
+		<path fill-rule="evenodd" clip-rule="evenodd" fill="#E41F26" d="M36.9,10.14c0-0.329,0.005-0.658-0.002-0.987
+			c-0.004-0.157,0.03-0.237,0.207-0.292c0.406-0.125,0.795-0.305,1.2-0.438c0.134-0.045,0.157-0.1,0.157-0.224
+			c-0.004-2.066-0.004-4.132,0-6.198c0-0.124-0.023-0.179-0.157-0.223c-0.404-0.133-0.794-0.313-1.2-0.438
+			c-0.177-0.054-0.211-0.134-0.207-0.291C36.905,0.719,36.9,0.39,36.9,0.06c1.861,0,3.724,0.005,5.586-0.007
+			c0.215-0.001,0.25,0.056,0.239,0.251c-0.02,0.318-0.006,0.637-0.006,0.956c-0.064,0.132-0.167,0.212-0.306,0.267
+			c-0.232,0.091-0.471,0.167-0.703,0.257c-0.382,0.147-0.41,0.187-0.412,0.591c-0.003,0.769-0.001,1.538-0.001,2.306
+			c0,1.048-0.002,2.097,0.001,3.145c0.002,0.404,0.03,0.444,0.412,0.592c0.232,0.089,0.471,0.165,0.703,0.257
+			c0.139,0.055,0.241,0.134,0.306,0.267c0,0.34-0.009,0.68,0.005,1.02c0.005,0.15-0.034,0.185-0.185,0.184
+			C40.66,10.138,38.78,10.14,36.9,10.14z"/>
+		<path fill-rule="evenodd" clip-rule="evenodd" fill="#D3D3D3" d="M4.5,0.06C4.356,0.577,4.093,1.044,3.882,1.532
+			C3.275,2.94,2.646,4.339,2.022,5.74c-0.427,0.958-0.865,1.911-1.29,2.87C0.514,9.103,0.319,9.605,0.06,10.08
+			c0-3.253,0.002-6.507-0.004-9.76c0-0.2,0.021-0.271,0.253-0.268C1.706,0.067,3.103,0.06,4.5,0.06z"/>
+		<path fill-rule="evenodd" clip-rule="evenodd" fill="#D3D3D3" d="M2.94,10.14c0.295-0.747,0.596-1.491,0.877-2.244
+			c0.049-0.13,0.097-0.158,0.222-0.158c1.427,0.004,2.854,0.004,4.282,0c0.125,0,0.173,0.028,0.222,0.158
+			C8.824,8.648,9.125,9.393,9.42,10.14C7.26,10.14,5.1,10.14,2.94,10.14z"/>
+		<path fill-rule="evenodd" clip-rule="evenodd" fill="#D3D3D3" d="M27,10.14c0.295-0.747,0.597-1.491,0.878-2.244
+			c0.048-0.13,0.097-0.158,0.222-0.158c1.427,0.004,2.854,0.004,4.281,0c0.125,0,0.173,0.028,0.222,0.158
+			c0.281,0.753,0.583,1.497,0.878,2.244C31.32,10.14,29.16,10.14,27,10.14z"/>
+		<path fill-rule="evenodd" clip-rule="evenodd" fill="#D3D3D3" d="M16.56,10.14c0-1.116,0.003-2.233-0.003-3.351
+			c-0.001-0.178,0.041-0.287,0.214-0.37c0.279-0.133,0.542-0.301,0.814-0.45c0.087-0.048,0.139-0.1,0.246,0.039
+			c0.76,0.993,1.544,1.969,2.317,2.952c0.308,0.391,0.608,0.786,0.912,1.18C19.56,10.14,18.06,10.14,16.56,10.14z"/>
+		<path fill-rule="evenodd" clip-rule="evenodd" fill="#D3D3D3" d="M42.72,8.94c-0.462-0.173-0.922-0.35-1.388-0.514
+			c-0.112-0.04-0.177-0.062-0.177-0.21c0.007-2.078,0.007-4.156,0-6.234c0-0.148,0.064-0.17,0.177-0.209
+			c0.466-0.164,0.926-0.341,1.388-0.514C42.72,3.82,42.72,6.38,42.72,8.94z"/>
+		<path fill-rule="evenodd" clip-rule="evenodd" fill="#D3D3D3" d="M21.06,0.06c-0.283,0.292-0.562,0.589-0.849,0.877
+			c-0.908,0.912-1.824,1.816-2.727,2.733C17.177,3.984,16.9,4.329,16.56,4.715c0-1.596,0-3.125,0-4.655
+			C18.06,0.06,19.56,0.06,21.06,0.06z"/>
+		<path fill-rule="evenodd" clip-rule="evenodd" fill="#D3D3D3" d="M30.254,1.653c0.507,1.472,1.115,2.851,1.64,4.275
+			c-1.091,0-2.173,0-3.272,0C29.164,4.508,29.701,3.102,30.254,1.653z"/>
+		<path fill-rule="evenodd" clip-rule="evenodd" fill="#D3D3D3" d="M6.193,1.655c0.51,1.47,1.114,2.852,1.642,4.272
+			c-1.093,0-2.175,0-3.274,0C5.104,4.505,5.642,3.099,6.193,1.655z"/>
+	</svg>
+	]]></data></image>
+	</element>
+
+<!-- Round LED -->
 	<element name="led" defstate="0">
 		<disk state="0"><color red="0.7" green="0" blue="0" /></disk>
 		<disk state="1"><color red="1.0" green="0" blue="0" /></disk>
@@ -848,9 +961,7 @@
 	</group>
 
 <!-- MPC3000 Texts -->
-	<element name="akai-logo-text"><text align="1" string="AKAI" /></element>
-	<element name="mpc3000-logo-text"><text align="1" string="MPC3000" /></element>
-	<element name="professional-logo-text"><text align="2" string="professional" /></element>
+	<element name="professional-text"><text align="2" string="professional" /></element>
 	<element name="midi"><text align="1" string="MIDI PRODUCTION CENTER" /></element>
 	<element name="integ"><text align="1" string="INTEGRATED  RHYTHM  MACHINE" /></element>
 	<element name="16bit"><text align="2" string="16  BIT  DRUM  SAMPLER / MIDI  SEQUENCER" /></element>
@@ -962,21 +1073,21 @@
 		<!-- ROW 1 -->
 		<!--Drum Pad 13 -->
 		<element ref="drumpad-black-outline1"><bounds x="220" y="360" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB0" inputmask="0x10">
+		<element ref="drumpad-grey1" inputtag="PB3" inputmask="0x80">
 			<bounds x="235" y="375" width="460" height="460" />
 		</element>
 		<element ref="drum-label-ride1"><bounds x="240" y="285" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
 		<!--Drum Pad 14 -->
 		<element ref="drumpad-black-outline1"><bounds x="810" y="360" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB0" inputmask="0x20">
+		<element ref="drumpad-grey1" inputtag="PB2" inputmask="0x80">
 			<bounds x="825" y="375" width="460" height="460" />
 		</element>
 		<element ref="drum-label-ride2"><bounds x="830" y="285" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
 		<!--Drumpad 15 -->
 		<element ref="drumpad-black-outline1"><bounds x="1400" y="360" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB0" inputmask="0x40">
+		<element ref="drumpad-grey1" inputtag="PB1" inputmask="0x80">
 			<bounds x="1415" y="375" width="460" height="460" />
 		</element>
 		<element ref="drum-label-crash1"><bounds x="1420" y="285" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
@@ -991,14 +1102,14 @@
 		<!-- ROW 2 -->
 		<!--Drumpad 9 -->
 		<element ref="drumpad-black-outline1"><bounds x="220" y="950" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB1" inputmask="0x10">
+		<element ref="drumpad-grey1" inputtag="PB3" inputmask="0x40">
 			<bounds x="235" y="965" width="460" height="460" />
 		</element>
 		<element ref="drum-label-tom1"><bounds x="240" y="875" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
 		<!--Drumpad 10 -->
 		<element ref="drumpad-black-outline1"><bounds x="810" y="950" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB1" inputmask="0x20">
+		<element ref="drumpad-grey1" inputtag="PB2" inputmask="0x40">
 			<bounds x="825" y="965" width="460" height="460" />
 		</element>
 		<element ref="drum-label-tom2"><bounds x="830" y="875" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
@@ -1012,7 +1123,7 @@
 
 		<!--Drumpad 12 -->
 		<element ref="drumpad-black-outline1"><bounds x="1990" y="950" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB1" inputmask="0x80">
+		<element ref="drumpad-grey1" inputtag="PB0" inputmask="0x40">
 			<bounds x="2005" y="965" width="460" height="460" />
 		</element>
 		<element ref="drum-label-tom4"><bounds x="2010" y="875" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
@@ -1020,7 +1131,7 @@
 		<!-- ROW 3 -->
 		<!--Drumpad 5 -->
 		<element ref="drumpad-black-outline1"><bounds x="220" y="1540" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB2" inputmask="0x10">
+		<element ref="drumpad-grey1" inputtag="PB3" inputmask="0x20">
 			<bounds x="235" y="1555" width="460" height="460" />
 		</element>
 		<element ref="drum-label-hihatfoot"><bounds x="240" y="1465" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
@@ -1034,14 +1145,14 @@
 
 		<!--Drumpad 7 -->
 		<element ref="drumpad-black-outline1"><bounds x="1400" y="1540" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB2" inputmask="0x40">
+		<element ref="drumpad-grey1" inputtag="PB1" inputmask="0x20">
 			<bounds x="1415" y="1555" width="460" height="460" />
 		</element>
 		<element ref="drum-label-hihatloose"><bounds x="1420" y="1465" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
 		<!--Drumpad 8 -->
 		<element ref="drumpad-black-outline1"><bounds x="1990" y="1540" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB2" inputmask="0x80">
+		<element ref="drumpad-grey1" inputtag="PB0" inputmask="0x20">
 			<bounds x="2005" y="1555" width="460" height="460" />
 		</element>
 		<element ref="drum-label-hihatopen"><bounds x="2010" y="1465" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
@@ -1056,21 +1167,21 @@
 
 		<!--Drumpad 2 -->
 		<element ref="drumpad-black-outline1"><bounds x="810" y="2130" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB3" inputmask="0x20">
+		<element ref="drumpad-grey1" inputtag="PB2" inputmask="0x10">
 			<bounds x="825" y="2145" width="460" height="460" />
 		</element>
 		<element ref="drum-label-kickalt"><bounds x="830" y="2055" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
 		<!--Drumpad 3 -->
 		<element ref="drumpad-black-outline1"><bounds x="1400" y="2130" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB3" inputmask="0x40">
+		<element ref="drumpad-grey1" inputtag="PB1" inputmask="0x10">
 			<bounds x="1415" y="2145" width="460" height="460" />
 		</element>
 		<element ref="drum-label-snare"><bounds x="1420" y="2055" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
 
 		<!--Drumpad 4 -->
 		<element ref="drumpad-black-outline1"><bounds x="1990" y="2130" width="490" height="490" /><color red="0.0" green="0.0" blue="0.0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB3" inputmask="0x80">
+		<element ref="drumpad-grey1" inputtag="PB0" inputmask="0x10">
 			<bounds x="2005" y="2145" width="460" height="460" />
 		</element>
 		<element ref="drum-label-snarealt"><bounds x="2010" y="2055" width="460" height="75" /><color red="0.0" green="0.0" blue="0.0" /></element>
@@ -1118,9 +1229,9 @@
 		<group ref="vents"><bounds x="3915" y="580" width="2225" height="40" /></group>
 
 <!-- Panel Text Logos -->
-		<element ref="akai-logo-text"><bounds x="480" y="155" width="500" height="310" /><color red="0.902" green="0.117" blue="0.149" /></element>
-		<element ref="professional-logo-text"><bounds x="460" y="420" width="500" height="120" /><color red="0.902" green="0.117" blue="0.149" /></element>
-		<element ref="mpc3000-logo-text"><bounds x="2760" y="780" width="1500" height="230" /><color red="0.0" green="0.0" blue="0.0" /></element>
+		<element ref="akai-novo-text"><bounds x="260" y="228" width="720" height="190" /></element>
+		<element ref="professional-text"><bounds x="435" y="420" width="560" height="120" /><color red="0.902" green="0.117" blue="0.149" /></element>
+		<element ref="mpc-text"><bounds x="2105" y="785" width="2450" height="220" /></element>
 
 <!-- Left Side Knob Labels -->
 		<element ref="knob-volume"><bounds x="155" y="710" width="350" height="70" /><color red="0.0" green="0.0" blue="0.0" /></element>

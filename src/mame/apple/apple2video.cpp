@@ -45,22 +45,33 @@ a2_video_device::a2_video_device(const machine_config &mconfig, device_type type
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-	, m_vidconfig(*this, "a2_video_config") {}
+	, m_base_model(model::II)
+	, m_vidconfig(*this, "a2_video_config")
+{
+}
 
 a2_video_device::a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a2_video_device(mconfig, APPLE2_VIDEO, tag, owner, clock) {}
+	: a2_video_device(mconfig, APPLE2_VIDEO, tag, owner, clock)
+{
+}
 
 a2_video_device_composite::a2_video_device_composite(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a2_video_device(mconfig, APPLE2_VIDEO_COMPOSITE, tag, owner, clock) {}
+	: a2_video_device(mconfig, APPLE2_VIDEO_COMPOSITE, tag, owner, clock)
+{
+}
 
 a2_video_device_composite_rgb::a2_video_device_composite_rgb(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a2_video_device(mconfig, APPLE2_VIDEO_COMPOSITE_RGB, tag, owner, clock) {}
+	: a2_video_device(mconfig, APPLE2_VIDEO_COMPOSITE_RGB, tag, owner, clock)
+{
+}
+
 
 void a2_video_device::device_start()
 {
 	// initialise for device_palette_interface
 	init_palette();
 
+	save_item(NAME(m_hgr2));
 	save_item(NAME(m_page2));
 	save_item(NAME(m_flash));
 	save_item(NAME(m_mix));
@@ -80,10 +91,15 @@ void a2_video_device::device_start()
 	save_item(NAME(m_monochrome));
 	save_item(NAME(m_rgbmode));
 	save_item(NAME(m_shr_palette));
+	save_item(NAME(m_shr_scbs));
 }
 
 void a2_video_device::device_reset()
 {
+	// cache derived values for delayed updates
+	m_scanner_period = (m_base_model == model::IIGS) ? 16 : 14;
+	m_delay_bias = (m_base_model == model::IIGS) ? 0 : 1;
+
 	// Start in fullscreen hires if there is no character ROM. This is used
 	// by the superga2 and tk2000 drivers, which support no other modes.
 	m_graphics = m_hires = (m_char_ptr == nullptr);
@@ -98,7 +114,119 @@ void a2_video_device::device_reset()
 	m_monohgr = false;
 	m_newvideo = 0x01;
 	m_rgbmode = 3;  // default to color DHGR
-	m_monochrome = 0; // TODO: never set, but if left uninitialized could cause the emulation to start in monochrome by accident. Default to color for now
+	m_monochrome = 0; // TODO: only affects IIgs composite output
+}
+
+/*
+Calculate video scanner address for a given beam position,
+based on the current video mode state.
+Input: h_clock [0...64] with active video from 25,
+       v_clock [0..261/311], active video from 0.
+Callers may apply machine-specific cycle delays to the input,
+and machine-specific ram_size bounds to the output address.
+*/
+u16 a2_video_device::scanner_address(int h_clock, int v_clock)
+{
+	// machine state switches
+	int Hires = (m_hires && m_graphics) ? 1 : 0;
+	int const Mixed = m_mix ? 1 : 0;
+	int const Page2 = use_page_2() ? 1 : 0;
+
+	// calculate horizontal scanning state
+	int const h_state = h_clock - (h_clock > 0); // two 0 states: [0, 0...63]
+	int const h_0 = BIT(h_state, 0); // get horizontal state bits
+	int const h_1 = BIT(h_state, 1);
+	int const h_2 = BIT(h_state, 2);
+	int const h_3 = BIT(h_state, 3);
+	int const h_4 = BIT(h_state, 4);
+	int const h_5 = BIT(h_state, 5);
+
+	// calculate vertical scanning state
+	int v_state = 256 + v_clock; // V[543210CBA] = 100000000
+	if (v_clock >= 256) // vertical overflow
+	{
+		v_state -= screen().height(); // compensate for preset
+	}
+	int const v_A = BIT(v_state, 0); // get vertical state bits
+	int const v_B = BIT(v_state, 1);
+	int const v_C = BIT(v_state, 2);
+	int const v_0 = BIT(v_state, 3);
+	int const v_1 = BIT(v_state, 4);
+	int const v_2 = BIT(v_state, 5);
+	int const v_3 = BIT(v_state, 6);
+	int const v_4 = BIT(v_state, 7);
+
+	// calculate scanning memory address
+	if (Hires && Mixed && v_4 && v_2)
+	{
+		Hires = 0; // address is in text memory for mixed hires
+	}
+
+	int const addend0 = 0x0d; // 1            1            0            1
+	int const addend1 =              (h_5 << 2) | (h_4 << 1) | (h_3 << 0);
+	int const addend2 = (v_4 << 3) | (v_3 << 2) | (v_4 << 1) | (v_3 << 0);
+	int const sum     = (addend0 + addend1 + addend2) & 0x0f;
+
+	u16 address;
+	address  = h_0 << 0; // a0
+	address |= h_1 << 1; // a1
+	address |= h_2 << 2; // a2
+	address |= sum << 3; // a3 - a6
+	address |= v_0 << 7; // a7
+	address |= v_1 << 8; // a8
+	address |= v_2 << 9; // a9
+	if (Hires)
+	{
+		// insert hires-only address bits
+		address |= v_A << 10; // a10
+		address |= v_B << 11; // a11
+		address |= v_C << 12; // a12
+		address |= Page2 ? m_hgr2 : 0x2000; // a13 - a15
+	}
+	else
+	{
+		// insert text-only address bits
+		address |= Page2 ? 0x0800 : 0x0400; // a10 - a11
+
+		if (m_base_model == model::II && (h_clock < 25)) // Apple II HBL
+		{
+			address |= 1 << 12; // a12 (add $1000)
+		}
+	}
+
+	return address;
+}
+
+u32 a2_video_device::scanner_address_GS(int h_clock, int v_clock)
+{
+	u32 address;
+
+	if (BIT(m_newvideo, 7))
+	{
+		// each SHR h_clock reads four bytes, only the last is visible to PH0
+		if (h_clock >= 25) // pixels
+		{
+			const u32 base = 0x16000 - 50 + 1;
+			address = base + (v_clock * 80) + (h_clock * 2);
+		}
+		else if ((h_clock >= 9) && (h_clock <= 16)) // palette
+		{
+			const u32 base = 0x19f00 - 18 + 1;
+			const u32 palette = m_shr_scbs[v_clock] & 0x0f;
+			address = base + (palette * 16) + (h_clock * 2);
+		}
+		else // SCB
+		{
+			const u32 base = 0x19e80;
+			address = base + (v_clock >> 1);
+		}
+	}
+	else // 8-bit modes per Sather, UTAIIe
+	{
+		address = scanner_address(h_clock, v_clock);
+	}
+
+	return address;
 }
 
 void a2_video_device::txt_w(int state)
@@ -106,42 +234,53 @@ void a2_video_device::txt_w(int state)
 	if (m_graphics == state) // avoid flickering from II+ refresh polling
 	{
 		// select graphics or text mode
-		screen().update_now();
+		delayed_update(3);
 		m_graphics = !state;
 	}
 }
 
 void a2_video_device::mix_w(int state)
 {
-	// select mixed mode or nomix
-	screen().update_now();
-	m_mix = state;
+	if (m_mix != state)
+	{
+		// select mixed or full mode
+		delayed_update(3);
+		m_mix = state;
+	}
 }
 
 void a2_video_device::scr_w(int state)
 {
 	// select primary or secondary page
-	if (!m_80col)
-		screen().update_now();
+	if (!m_80store && (m_page2 != state))
+		delayed_update(2);
 	m_page2 = state;
 }
 
 void a2_video_device::res_w(int state)
 {
-	// select lo-res or hi-res
-	screen().update_now();
-	m_hires = state;
+	if (m_hires != state)
+	{
+		// select lo-res or hi-res
+		delayed_update((m_base_model == model::IIGS) ? 1 : 2);
+		m_hires = state;
+	}
 }
 
 void a2_video_device::an2_w(int state)
 {
-	m_an2 = state;
+	if (m_an2 != state)
+	{
+		// select katakana on II_J_PLUS
+		delayed_update(1);
+		m_an2 = state;
+	}
 }
 
 void a2_video_device::an3_w(int state)
 {
 	// select double hi-res
-	screen().update_now();
+	delayed_update(1);
 
 	// RGB cards shift in a mode bit on the rising edge
 	if ((m_dhires) && (state))
@@ -155,8 +294,69 @@ void a2_video_device::an3_w(int state)
 
 void a2_video_device::a80col_w(bool b80Col)
 {
-	screen().update_now();
-	m_80col = b80Col;
+	if (m_80col != b80Col)
+	{
+		// select 80 or 40 columns
+		delayed_update(1);
+		m_80col = b80Col;
+	}
+}
+
+void a2_video_device::a80store_w(bool b80Store)
+{
+	// select PAGE2 aux RAM (displaying PAGE1)
+	if (m_page2 && (m_80store != b80Store))
+		delayed_update(2);
+	m_80store = b80Store;
+}
+
+void a2_video_device::altcharset_w(bool altch)
+{
+	if (m_altcharset != altch)
+	{
+		// select primary or alternate (MouseText) character set
+		delayed_update(1);
+		m_altcharset = altch;
+	}
+}
+
+void a2_video_device::set_GS_textcol(u8 textcol)
+{
+	// select foreground and background text colors
+	const u8 fg = textcol >> 4;
+	const u8 bg = textcol & 0xf;
+	if ((m_GSfg != fg) || (m_GSbg != bg))
+	{
+		screen().update_now();
+		m_GSfg = fg;
+		m_GSbg = bg;
+	}
+}
+
+void a2_video_device::set_GS_border(u8 border)
+{
+	// select border color
+	if (m_GSborder != border)
+	{
+		screen().update_now();
+		m_GSborder = border;
+	}
+}
+
+void a2_video_device::set_newvideo(u8 newvideo)
+{
+	// select super hi-res and monochrome modes
+	if ((m_newvideo & 0xa0) != (newvideo & 0xa0))
+		screen().update_now();
+	m_newvideo = newvideo;
+}
+
+void a2_video_device::set_GS_langsel(u8 langsel)
+{
+	// select primary language character set
+	if ((m_GS_langsel & 0xe8) != (langsel & 0xe8))
+		delayed_update(1);
+	m_GS_langsel = langsel;
 }
 
 // 4-bit left rotate. Bits 4-6 of n must be a copy of bits 0-2.
@@ -196,6 +396,17 @@ public:
 
 } reverse_7_bits;
 
+void a2_video_device::delayed_update(int cycles)
+{
+	int hpos = screen().hpos() + (cycles - m_delay_bias) * m_scanner_period;
+	int vpos = screen().vpos();
+	if (hpos >= screen().width())
+	{
+		hpos -= screen().width();
+		vpos++;
+	}
+	screen().update_partial(vpos, hpos);
+}
 
 inline bool a2_video_device::use_page_2() const { return m_page2 && !m_80store; }
 
@@ -252,13 +463,13 @@ static uint8_t const artifact_color_lut[2][1<<7] = {
 // that's a lost cause anyway.
 {
 	0x00,0x00,0x00,0x00,0x88,0x00,0xcc,0x00,0x11,0x11,0x55,0x11,0x99,0x99,0xdd,0xff,
-	0x22,0x22,0x66,0x66,0xaa,0xaa,0xee,0xee,0x33,0x33,0x33,0x33,0xbb,0xbB,0xff,0xff,
+	0x22,0x22,0x66,0x66,0xaa,0xaa,0xee,0xee,0x33,0x33,0x33,0x33,0xbb,0xbb,0xff,0xff,
 	0x00,0x00,0x44,0x44,0xcc,0xcc,0xcc,0xcc,0x55,0x55,0x55,0x55,0x99,0x99,0xdd,0xff,
-	0x66,0x22,0x66,0x66,0xee,0xaa,0xee,0xee,0x77,0x77,0x77,0x77,0xff,0xfF,0xff,0xff,
+	0x66,0x22,0x66,0x66,0xee,0xaa,0xee,0xee,0x77,0x77,0x77,0x77,0xff,0xff,0xff,0xff,
 	0x00,0x00,0x00,0x00,0x88,0x88,0x88,0x88,0x11,0x11,0x55,0x11,0x99,0x99,0xdd,0x99,
-	0x00,0x22,0x66,0x66,0xaa,0xaa,0xaa,0xaa,0x33,0x33,0x33,0x33,0xbb,0xbB,0xff,0xff,
+	0x00,0x22,0x66,0x66,0xaa,0xaa,0xaa,0xaa,0x33,0x33,0x33,0x33,0xbb,0xbb,0xff,0xff,
 	0x00,0x00,0x44,0x44,0xcc,0xcc,0xcc,0xcc,0x11,0x11,0x55,0x55,0x99,0x99,0xdd,0xdd,
-	0x00,0x22,0x66,0x66,0xee,0xaa,0xee,0xee,0xff,0x33,0xff,0x77,0xff,0xfF,0xff,0xff,
+	0x00,0x22,0x66,0x66,0xee,0xaa,0xee,0xee,0xff,0x33,0xff,0x77,0xff,0xff,0xff,0xff,
 }};
 
 template <int ContextBits, typename F>
@@ -374,7 +585,7 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 {
 	unsigned invert_mask = Invert ? 0 : 0x7f;
 
-	if (Model == model::IIE || Model == model::IIGS)
+	if (Model == model::IIE || Model == model::PRAVETZ_8C || Model == model::IIGS)
 	{
 		if (!m_altcharset)
 		{
@@ -388,7 +599,7 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 				}
 			}
 		}
-		else
+		else if (Model != model::PRAVETZ_8C)
 		{
 			if ((code >= 0x60) && (code <= 0x7f))
 			{
@@ -396,14 +607,24 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 				invert_mask ^= 0x7f;  // and flip the color
 			}
 		}
-		if (Model == model::IIE)
+		if (Model != model::IIGS)
 		{
 			code |= get_iie_langsw() * 0x100;
 		}
-		else if (Model == model::IIGS)
+		else if (BIT(m_GS_langsel, 3))
 		{
-			code |= get_GS_language() * 0x100;
+			code |= (m_GS_langsel >> 5) * 0x100;
 		}
+	}
+	else if (Model == model::IVEL_ULTRA)
+	{
+		// this model doesn't seem to support flashing characters
+		if (code < 0x80)
+			invert_mask ^= 0x7f;
+
+		// YU/ASCII select
+		if (m_an2)
+			code |= 0x100;
 	}
 	else    // original II and II Plus
 	{
@@ -418,7 +639,7 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 				invert_mask ^= 0x7f;
 			}
 		}
-		else if (code < 0x40 && Model != model::IVEL_ULTRA) // inverse: flip FG and BG
+		else if (code < 0x40) // inverse: flip FG and BG
 		{
 			invert_mask ^= 0x7f;
 		}
@@ -431,7 +652,7 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 
 	/* look up the character data */
 	unsigned bits = m_char_ptr[code * 8 + row];
-	bits = (Model == model::IVEL_ULTRA) ? (bits >> 1) : (bits & 0x7f);
+	bits = (Model == model::IVEL_ULTRA || Model == model::DODO) ? ((bits >> 2) | ((bits & 2) << 5)) : (bits & 0x7f);
 	bits ^= invert_mask;
 	return Flip ? reverse_7_bits[bits] : bits;
 }
@@ -460,7 +681,7 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		/* calculate address */
 		uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5));
 		uint8_t const *const vram = m_ram_ptr + address;
-		uint8_t const *const vaux = Double ? (m_aux_ptr + address) : nullptr;
+		uint8_t const *const vaux = Double ? (m_aux_ptr + (address & m_aux_mask)) : nullptr;
 		auto const NIBBLE = [&row] (auto byte) { return ((byte) >> (row & 4)) & 0x0f; };
 		if (render_perfect_blocks)
 		{
@@ -540,7 +761,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	// printf("TXT: row %d startcol %d stopcol %d left %d right %d\n", beginrow, startcol, stopcol, cliprect.left(), cliprect.right());
 
-	bool const is_80_column = (Model == model::IIE || Model == model::IIGS) && m_80col;
+	bool const is_80_column = (Model == model::IIE || Model == model::PRAVETZ_8C || Model == model::IIGS) && m_80col;
 	bool const monochrome = !(m_graphics && composite_monitor() && composite_text_color(is_80_column));
 	for (int row = beginrow; row <= endrow; row++)
 	{
@@ -561,7 +782,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 			}
 		}
 
-		if (Model == model::IIE && rgb_monitor() && m_dhires && !m_80col)
+		if ((Model == model::IIE || Model == model::PRAVETZ_8C) && rgb_monitor() && m_dhires && !m_80col)
 		{
 			// Video-7 foreground-background mode
 			render_line_color_array(&bitmap.pix(row), words, startcol, stopcol, &aux_page[aux_address]);
@@ -577,29 +798,30 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 }
 
+// explicit instantiations
 template void a2_video_device::text_update<a2_video_device::model::II, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<a2_video_device::model::II, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::II, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<a2_video_device::model::II, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::IIE, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::IIE, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::IIE, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::IIE, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<a2_video_device::model::IIGS, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<a2_video_device::model::PRAVETZ_8C, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<a2_video_device::model::IIGS, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::II_J_PLUS, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<a2_video_device::model::DODO, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
 void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	unsigned const start_address = use_page_2() ? 0x4000 : 0x2000;
+	unsigned const start_address = use_page_2() ? m_hgr2 : 0x2000;
 
 	beginrow = (std::max)(beginrow, cliprect.top());
 	endrow = (std::min)(endrow, cliprect.bottom());
 	int const startcol = (cliprect.left() / 14);
 	int const stopcol = (cliprect.right() / 14) + 1;
 
-	// B&W/Green/Amber monitor, CEC mono HGR mode, or IIgs $C021 monochrome HGR
-	bool const monochrome = monochrome_monitor() || m_monohgr || (m_monochrome & 0x80);
+	// B&W/Green/Amber monitor, CEC/tk2000 mono HGR mode, or IIgs force-monochrome-DHR and 7M
+	bool const monochrome = monochrome_monitor() || m_monohgr || ((m_newvideo & 0x20) && m_dhires);
 
 	// verified on h/w: setting dhires w/o 80col emulates a rev. 0 Apple ][ with no orange/blue
 	uint8_t const bit7_mask = m_dhires ? 0 : 0x80;
@@ -607,19 +829,34 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	for (int row = beginrow; row <= endrow; row++)
 	{
 		unsigned const address = start_address + (((row/8) & 0x07) << 7) + (((row/8) & 0x18) * 5) + ((row & 7) << 10);
-		uint8_t const *const vram_row = &m_ram_ptr[address];
-
-		uint16_t words[40];
-
-		unsigned last_output_bit = 0;
-
-		for (int col = std::max(0, startcol-1); col < std::min(stopcol+1, 40); col++)
+		static const uint16_t empty_words[40] =
 		{
-			unsigned word = double_7_bits[vram_row[col] & 0x7f];
-			if (vram_row[col] & bit7_mask)
-				word = (word * 2 + last_output_bit) & 0x3fff;
-			words[col] = word;
-			last_output_bit = word >> 13;
+			// empty RAM socket causes TTL input to float high
+			0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff,
+			0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff,
+			0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff,
+			0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff,
+			0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff, 0x3fff
+		};
+		uint16_t ram_words[40];
+		uint16_t *words;
+
+		if (address > m_ram_mask)
+			words = (uint16_t *)empty_words;
+		else
+		{
+			uint8_t const *const vram_row = &m_ram_ptr[address];
+			unsigned last_output_bit = 0;
+			words = ram_words;
+
+			for (int col = std::max(0, startcol-1); col < std::min(stopcol+1, 40); col++)
+			{
+				unsigned word = double_7_bits[vram_row[col] & 0x7f];
+				if (vram_row[col] & bit7_mask)
+					word = (word * 2 + last_output_bit) & 0x3fff;
+				words[col] = word;
+				last_output_bit = word >> 13;
+			}
 		}
 
 		if (rgb_monitor())
@@ -644,7 +881,7 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	int const page = use_page_2() ? 0x4000 : 0x2000;
+	uint32_t const page = use_page_2() ? m_hgr2 : 0x2000;
 	int const rgbmode = rgb_monitor() ? m_rgbmode : -1;
 
 	beginrow = (std::max)(beginrow, cliprect.top());
@@ -655,14 +892,11 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	// B&W/Green/Amber monitor, IIgs force-monochrome-DHR setting, or IIe RGB card monochrome DHR
 	bool const monochrome = monochrome_monitor() || (m_newvideo & 0x20) || rgbmode == 0;
 
-	uint8_t const *const vram = &m_ram_ptr[page];
-	uint8_t const *const vaux = (m_aux_ptr ? m_aux_ptr : vram) + page;
-
 	for (int row = beginrow; row <= endrow; row++)
 	{
-		int const offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5)) | ((row & 7) << 10);
-		uint8_t const *const vram_row = vram + offset;
-		uint8_t const *const vaux_row = vaux + offset;
+		uint32_t const address = page + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5) | ((row & 7) << 10));
+		uint8_t const *const vram_row = m_ram_ptr + address;
+		uint8_t const *const vaux_row = m_aux_ptr + (address & m_aux_mask);
 
 		uint16_t *p = &bitmap.pix(row);
 
@@ -780,55 +1014,42 @@ uint32_t a2_video_device::palette_entries() const noexcept
 
 uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int const beamy = cliprect.top();
+	// de-jitter clock drift; video scanner latches whole bytes
+	const int left = cliprect.left() & ~0xf;
+	const int right = (cliprect.right() + 1) & ~0xf; // inclusive bounds
+	const bool shr = BIT(m_newvideo, 7);
 
-	if (m_newvideo & 0x80)
+	const int beamy = cliprect.top();
 	{
-		// in top or bottom border?
-		if ((beamy < BORDER_TOP) || (beamy >= 200+BORDER_TOP))
-		{
-			// don't draw past the bottom border
-			if (beamy >= 231+BORDER_TOP)
-			{
-				return 0;
-			}
+		uint32_t *const scanline = &bitmap.pix(beamy);
 
+		if ((beamy < BORDER_TOP) || (beamy >= BORDER_TOP + (shr ? 200 : 192)))
+		{
+			// in top or bottom border
 			uint32_t *const scanline = &bitmap.pix(beamy);
-			for (int col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
-			{
+			for (int col = left; col < right; col++)
 				scanline[col] = m_GSborder_colors[m_GSborder];
-			}
 		}
-		else    // regular screen area
+		else if (shr)
 		{
-			int const shrline = beamy - BORDER_TOP;
-
-			uint8_t scb;
-			if (shrline & 1)
-			{
-				scb = m_aux_ptr[0x9e80 + (shrline >> 1)];
-			}
-			else
-			{
-				scb = m_aux_ptr[0x5e80 + (shrline >> 1)];
-			}
-			int const palette = ((scb & 0x0f) << 4);
-
-			uint8_t const *const vram = &m_aux_ptr[0x2000 + (shrline * 80)];
-			uint8_t const *const vram2 = &m_aux_ptr[0x6000 + (shrline * 80)];
-
-			uint32_t *const scanline = &bitmap.pix(beamy);
+			const int shrline = beamy - BORDER_TOP;
+			const u8 scb = m_shr_scbs[shrline];
+			const int palette = ((scb & 0x0f) << 4);
+			const uint8_t *const vram = &m_aux_ptr[0x2000 + (shrline * 80)];
+			const uint8_t *const vram2 = &m_aux_ptr[0x6000 + (shrline * 80)];
 
 			// draw left and right borders
-			for (int col = 0; col < BORDER_LEFT; col++)
-			{
+			for (int col = left; col < (std::min)(right, BORDER_LEFT); col++)
 				scanline[col] = m_GSborder_colors[m_GSborder];
-				scanline[col+BORDER_LEFT+640] = m_GSborder_colors[m_GSborder];
-			}
+			for (int col = (std::max)(left, BORDER_LEFT + 640); col < right; col++)
+				scanline[col] = m_GSborder_colors[m_GSborder];
+
+			const int gsleft  = (std::max)((left  - BORDER_LEFT), 0) / 8;
+			const int gsright = (std::min)((right - BORDER_LEFT), 640) / 8;
 
 			if (scb & 0x80) // 640 mode
 			{
-				for (int col = 0; col < 80; col++)
+				for (int col = gsleft; col < gsright; col++)
 				{
 					uint8_t b = vram[col];
 					scanline[col * 8 + 0 + BORDER_LEFT] = m_shr_palette[palette +  0 + ((b >> 6) & 0x03)];
@@ -843,7 +1064,7 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 					scanline[col * 8 + 7 + BORDER_LEFT] = m_shr_palette[palette + 12 + ((b >> 0) & 0x03)];
 				}
 			}
-			else        // 320 mode
+			else // 320 mode
 			{
 				// the low 5 bits of the SCB determine the initial fillmode color
 				// for the scanline (hardware testing by John Brooks)
@@ -854,7 +1075,7 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 				};
 
 				uint32_t last_pixel = fillmode_init[scb & 0x1f];
-				for (int col = 0; col < 80; col++)
+				for (int col = gsleft; col < gsright; col++)
 				{
 					uint8_t b;
 					uint32_t pixel;
@@ -903,44 +1124,32 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 				}
 			}
 		}
-	}
-	else
-	{
-		if (beamy >= BORDER_TOP)
-		{
-			rectangle const new_cliprect(0, 559, cliprect.top() - BORDER_TOP, cliprect.bottom() - BORDER_TOP);
-			screen_update<model::IIGS, false, false>(screen, *m_8bit_graphics, new_cliprect);
-		}
-
-		if ((beamy < (BORDER_TOP+4)) || (beamy >= (192+4+BORDER_TOP)))
-		{
-			if (beamy >= (231+BORDER_TOP))
-			{
-				return 0;
-			}
-
-			uint32_t *const scanline = &bitmap.pix(beamy);
-			for (int col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
-			{
-				scanline[col] = m_GSborder_colors[m_GSborder];
-			}
-		}
 		else
 		{
-			uint32_t *const scanline = &bitmap.pix(beamy);
+			// scale 16 MHz cliprect to 14 MHz
+			const int a2left  = (std::max)(((left  - BORDER_LEFT) / 16 * 14), 0);
+			const int a2right = (std::min)(((right - BORDER_LEFT) / 16 * 14), 560);
+			const rectangle a2cliprect(a2left, a2right - 1, cliprect.top() - BORDER_TOP, cliprect.bottom() - BORDER_TOP);
+			screen_update<model::IIGS, true, false>(screen, *m_8bit_graphics, a2cliprect); // exclusive bounds
+
+			// these stretch factors align partial updates within left and right borders
+			// FIXME: stretch 8-bit modes to match super hi-res, stop stretching borders
+			const float lbstretch = (float)(BORDER_LEFT  + 40) / (BORDER_LEFT  / 16);
+			const float rbstretch = (float)(BORDER_RIGHT + 40) / (BORDER_RIGHT / 16);
+			const int lbleft  = left  / 16 * lbstretch;
+			const int lbright = right / 16 * lbstretch;
+			const int rbleft  = ((left  - (BORDER_LEFT + 640)) / 16 * rbstretch) + (BORDER_LEFT + 40 + 560);
+			const int rbright = ((right - (BORDER_LEFT + 640)) / 16 * rbstretch) + (BORDER_LEFT + 40 + 560);
 
 			// draw left and right borders
-			for (int col = 0; col < BORDER_LEFT + 40; col++)
-			{
+			for (int col = lbleft; col < (std::min)(lbright, BORDER_LEFT + 40); col++)
 				scanline[col] = m_GSborder_colors[m_GSborder];
-				scanline[col+BORDER_LEFT+600] = m_GSborder_colors[m_GSborder];
-			}
+			for (int col = (std::max)(rbleft, BORDER_LEFT + 40 + 560); col < rbright; col++)
+				scanline[col] = m_GSborder_colors[m_GSborder];
 
-			uint16_t *a2pixel = &m_8bit_graphics->pix(beamy-(BORDER_TOP+4));
-			for (int x = 0; x < 560; x++)
-			{
-				scanline[40 + BORDER_LEFT + x] = m_GSborder_colors[*a2pixel++];
-			}
+			const uint16_t *const a2pixel = &m_8bit_graphics->pix(beamy - BORDER_TOP);
+			for (int col = a2left; col < a2right; col++)
+				scanline[BORDER_LEFT + 40 + col] = m_GSborder_colors[a2pixel[col]];
 		}
 	}
 	return 0;
@@ -955,7 +1164,16 @@ uint32_t a2_video_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 	}
 
 	// always update the flash timer here so it's smooth regardless of mode switches
-	m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
+	if (Model == model::IIE || Model == model::PRAVETZ_8C || Model == model::IIGS)
+	{
+		// video scanner overflow flash timer every 16 frames, ~1.87 Hz (NTSC)
+		m_flash = screen.frame_number() & 0x10;
+	}
+	else
+	{
+		// approximate 555 flash timer, ~2 Hz cycle
+		m_flash = (machine().time() * 4).seconds() & 1;
+	}
 
 	int text_start_row = 0;
 
@@ -965,7 +1183,7 @@ uint32_t a2_video_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 
 		if (m_hires)
 		{
-			if ((Model == model::IIE || Model == model::IIGS) && m_dhires && m_80col && m_aux_ptr)
+			if ((Model == model::IIE || Model == model::PRAVETZ_8C || Model == model::IIGS) && m_dhires && m_80col && m_aux_ptr)
 			{
 				dhgr_update(screen, bitmap, cliprect, 0, text_start_row - 1);
 			}
@@ -976,7 +1194,7 @@ uint32_t a2_video_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 		}
 		else    // lo-res
 		{
-			if ((Model == model::IIE || Model == model::IIGS) && m_dhires && m_80col && m_aux_ptr)
+			if ((Model == model::IIE || Model == model::PRAVETZ_8C || Model == model::IIGS) && m_dhires && m_80col && m_aux_ptr)
 			{
 				lores_update<true>(screen, bitmap, cliprect, 0, text_start_row - 1);
 			}
@@ -995,17 +1213,18 @@ uint32_t a2_video_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
+// explicit instantiations
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-template uint32_t a2_video_device::screen_update<a2_video_device::model::II, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-template uint32_t a2_video_device::screen_update<a2_video_device::model::II, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-template uint32_t a2_video_device::screen_update<a2_video_device::model::IIGS, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::PRAVETZ_8C, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::IIGS, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II_J_PLUS, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::DODO, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 static INPUT_PORTS_START( a2_vidconfig_composite );
 	PORT_START("a2_video_config")
