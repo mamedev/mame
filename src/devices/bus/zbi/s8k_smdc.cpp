@@ -129,7 +129,7 @@ enum : uint8_t
 	SMD_ES_ERRSECTOR,		/* sector overrun error */
 	SMD_ES_ERRDMA,			/* DMA memory error returned in SR_ES */
 	SMD_ES_ERRSEL,			/* select error */
-	SMD_ES_INVCT,			/* CT invalid */
+	SMD_ES_BADCT,			/* CT invalid */
 	SMD_ES_BUSY,			/* SMD dual access busy */
 	SMD_ES_ERRSEEK,			/* multiple rezero error */
 	SMD_ES_ERRST,			/* SMD status error (see DS) */
@@ -472,7 +472,9 @@ int zbi_s8k_smdc_card_device::busdaisy_req_state()
 
 void zbi_s8k_smdc_card_device::busdaisy_req_ack()
 {
-	int i;
+	int i, j;
+	offs_t pkt_idx;
+
 	smd_dispatch_table *dt;
 
 	/* read dispatch table */
@@ -488,6 +490,14 @@ void zbi_s8k_smdc_card_device::busdaisy_req_ack()
 	{
 		if (dt->PS[i] == SMD_DT_PS_GO)
 		{
+			pkt_idx = (dt->PA[i].PH << 16) | dt->PA[i].PL;
+
+			/* read the packet */
+			for (j = 0; j < 16; j++)
+			{
+				m_pkt[j] = m_bus->ram16_r(pkt_idx + 2*j);
+			}
+
 			/* set BUSY state */
 			dt->PS[i] = SMD_DT_PS_BUSY;
 			m_bus->ram16_w(m_dta_idx+i*2, dt->PS[i]);
@@ -502,6 +512,12 @@ void zbi_s8k_smdc_card_device::busdaisy_req_ack()
 			if (m_ie)
 			{
 				m_bus->vi_w(ASSERT_LINE);
+			}
+
+			/* write the packet back */
+			for (j = 0; j < 16; j++)
+			{
+				m_bus->ram16_w(pkt_idx + 2*j, m_pkt[j]);
 			}
 		}
 	}
@@ -560,37 +576,25 @@ int zbi_s8k_smdc_card_device::get_lbasector()
 
 void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 {
-	offs_t pkt_idx, dma_idx;
-	int unit, block, i;
+	offs_t dma_idx;
+	int unit, block;
 	smd_dispatch_table *dt = reinterpret_cast<smd_dispatch_table*>(m_dt);
 	smd_packet *pkt = reinterpret_cast<smd_packet*>(m_pkt);
 	harddisk_image_device *file;
-
-	pkt_idx = (dt->PA[drv].PH << 16) | dt->PA[drv].PL;
-
-	/* read the packet */
-	for (i = 0; i < 16; i++)
-	{
-		m_pkt[i] = m_bus->ram16_r(pkt_idx + 2*i);
-	}
+	bool drv_good;
 
 	unit = pkt->UN & 3;
 
-	LOGCMD("%s smd_do_drive: drv=%d unit=%d cmd=%04x pkt_idx=%06x\n", machine().describe_context(), drv, unit, pkt->CM, pkt_idx);
+	LOGCMD("%s smd_do_drive: drv=%d unit=%d cmd=%04x pkt_idx=%06x\n",
+		   machine().describe_context(), drv, unit, pkt->CM, ((dt->PA[drv].PH << 16) | dt->PA[drv].PL));
 
 	m_drv = unit;
 	file = m_drives[unit];
-
-	if (!file || !file->exists())
-	{
-		pkt->DS = SMD_DS_FT;
-		m_es = SMD_ES_ERRSEL;
-		return;
-	}
+	drv_good = (file && file->exists());
 
 	m_es = SMD_ES_NOERR;
 
-	switch(pkt->CM & SMD_CM_CMD_MASK)
+	switch (pkt->CM & SMD_CM_CMD_MASK)
 	{
 	case SMD_CM_CMD_NOP:		/* NOP */
 		pkt->CT = SMD_FW_VERSION;
@@ -598,6 +602,11 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 
 	case SMD_CM_CMD_SELECT:		/* select drive */
 		LOGCMD("%s SMDC select unit %d\n", machine().describe_context(), unit);
+		if (!drv_good)
+		{
+			pkt->DS |= SMD_DS_FT;
+			m_es = SMD_ES_ERRSEL;
+		}
 		break;
 
 	case SMD_CM_CMD_RESET:		/* reset fault */
@@ -625,26 +634,44 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 		LOGWRITE("%s SMD write: unit=%d cyl=%d hd=%d sec=%d count=%d addr=%04x:%04x\n", machine().describe_context(),
 				 unit, pkt->CY, pkt->HD, pkt->SC, pkt->CT, pkt->AH, pkt->AL);
 
-		if (pkt->CT % 2 == 1)
+		if (pkt->CT & 1)
 		{
-			m_es = SMD_ES_INVCT;
-			pkt->DS = SMD_DS_FT;
+			m_es = SMD_ES_BADCT;
+			pkt->DS |= SMD_DS_FT;
 			LOGDATA("Invalid write byte count: %d!\n", pkt->CT);
+			break;
 		}
-		else
+
+		if (!drv_good)
 		{
-			dma_idx = (pkt->AH << 16) | pkt->AL;
-			block = get_lbasector();
+			m_es = SMD_ES_NOSECTOR;
+			pkt->DS |= SMD_DS_FT;
+			break;
+		}
 
-			LOGSEEK(" --> seek to block $%d (offset %d)\n", block, block*512);
+		dma_idx = (pkt->AH << 16) | pkt->AL;
 
-			/* DMA from main memory */
-			for (offs_t n = 0; n < pkt->CT; n++)
-			{
-				m_buffer[n] = m_bus->ram8_r(dma_idx++);
-			}
+		if (dma_idx & 1)
+		{
+			m_es = SMD_ES_BADDMA;
+			pkt->DS |= SMD_DS_FT;
+			break;
+		}
 
-			file->write(block, m_buffer);
+		block = get_lbasector();
+
+		LOGSEEK(" --> seek to block $%d (offset %d)\n", block, block*512);
+
+		/* DMA from main memory */
+		for (unsigned int n = 0; n < pkt->CT; n++)
+		{
+			m_buffer[n] = m_bus->ram8_r(dma_idx++);
+		}
+
+		if (!file->write(block, m_buffer))
+		{
+			m_es = SMD_ES_NOSECTOR;
+			pkt->DS |= SMD_DS_FT;
 		}
 		break;
 
@@ -652,23 +679,43 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 		LOGREAD("%s SMD read: unit=%d cyl=%d hd=%d sec=%d count=%d addr=%04x:%04x\n", machine().describe_context(),
 				unit, pkt->CY, pkt->HD, pkt->SC, pkt->CT, pkt->AH, pkt->AL);
 
-		if (pkt->CT % 2 == 1)
+		if (pkt->CT & 1)
 		{
-			m_es = SMD_ES_INVCT;
-			pkt->DS = SMD_DS_FT;
+			m_es = SMD_ES_BADCT;
+			pkt->DS |= SMD_DS_FT;
 			LOGDATA("Invalid read byte count: %d!\n", pkt->CT);
+			break;
+		}
+
+		if (!drv_good)
+		{
+			m_es = SMD_ES_NOSECTOR;
+			pkt->DS |= SMD_DS_FT;
+			break;
+		}
+
+		dma_idx = (pkt->AH << 16) | pkt->AL;
+
+		if (dma_idx & 1)
+		{
+			m_es = SMD_ES_BADDMA;
+			pkt->DS |= SMD_DS_FT;
+			break;
+		}
+
+		block = get_lbasector();
+
+		LOGSEEK(" --> seek to block $%d (offset %d)\n", block, block*512);
+
+		if (!file->read(block, m_buffer))
+		{
+			m_es = SMD_ES_NOSECTOR;
+			pkt->DS |= SMD_DS_FT;
 		}
 		else
 		{
-			dma_idx = (pkt->AH << 16) | pkt->AL;
-			block = get_lbasector();
-
-			LOGSEEK(" --> seek to block $%d (offset %d)\n", block, block*512);
-
-			file->read(block, m_buffer);
-
 			/* DMA to main memory */
-			for (offs_t n = 0; n < pkt->CT; n++)
+			for (unsigned int n = 0; n < pkt->CT; n++)
 			{
 				m_bus->ram8_w(dma_idx++, m_buffer[n]);
 			}
@@ -676,23 +723,29 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 		break;
 
 	case SMD_CM_CMD_SIZE:	/* size disk */
-		pkt->CY = file->get_info().cylinders;
-		pkt->HD = file->get_info().heads;
-		pkt->SC = file->get_info().sectors;
+		if (drv_good)
+		{
+			pkt->CY = file->get_info().cylinders;
+			pkt->HD = file->get_info().heads;
+			pkt->SC = file->get_info().sectors;
+		}
+		else
+		{
+			pkt->CY = 0;
+			pkt->HD = 0;
+			pkt->SC = 0;
+		}
 		break;
 
 	default:
 		pkt->DS = SMD_DS_FT;
 	}
 
-	pkt->DS &= 0x003f;
-	pkt->DS |= SMD_DS_RY | SMD_DS_OC | ((1<<drv) << 8) | ((1<<drv) << 12);
+	if (drv_good)
+		pkt->DS |= SMD_DS_OC;
 
-	/* write the packet back */
-	for (i = 0; i < 16; i++)
-	{
-		m_bus->ram16_w(pkt_idx + 2*i, m_pkt[i]);
-	}
+	pkt->DS &= 0x003f;
+	pkt->DS |= SMD_DS_RY | ((1<<drv) << 8) | ((1<<drv) << 12);
 }
 
 //**************************************************************************
