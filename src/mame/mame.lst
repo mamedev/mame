@@ -597,6 +597,11 @@ s3000xl
 cd3000i
 cd3000xl
 
+@source:akai/x7000.cpp
+s612
+s700
+x7000
+
 @source:alesis/alesis.cpp
 hr16
 hr16b
