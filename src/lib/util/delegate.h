@@ -913,7 +913,7 @@ public:
 	template <class FunctionClass> delegate(static_ref_func_type<FunctionClass> funcptr, FunctionClass *object) : basetype(funcptr, object) { }
 
 	template <typename T>
-	explicit delegate(T &&functoid) requires suitable_functoid<T>::value
+	explicit delegate(T &&functoid) requires (suitable_functoid<T>::value)
 		: basetype()
 		, m_functoid(std::forward<T>(functoid))
 		, m_set_functoid(make_functoid_setter<T>())
