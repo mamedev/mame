@@ -46,12 +46,12 @@ public:
 	path_iterator(path_iterator const &that);
 
 	template <typename T>
-	path_iterator(T &&searchpath) requires std::is_constructible_v<std::string, T>
+	path_iterator(T &&searchpath) requires (std::is_constructible_v<std::string, T>)
 		: path_iterator(std::string(std::forward<T>(searchpath)))
 	{ }
 
 	template <typename T>
-	path_iterator(T &&paths) requires std::is_constructible_v<std::string, decltype(*std::begin(std::declval<T &>()))>
+	path_iterator(T &&paths) requires (std::is_constructible_v<std::string, decltype(*std::begin(std::declval<T &>()))>)
 		: path_iterator(concatenate_paths(std::forward<T>(paths)))
 	{ m_separator = '\0'; }
 

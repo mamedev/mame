@@ -66,7 +66,7 @@ public:
 	template <class FunctionClass> named_delegate(member_func_type<FunctionClass> funcptr, char const *name, FunctionClass *object) : basetype(funcptr, object), m_name(name) { }
 	template <class FunctionClass> named_delegate(const_member_func_type<FunctionClass> funcptr, char const *name, FunctionClass *object) : basetype(funcptr, object), m_name(name) { }
 	template <class FunctionClass> named_delegate(static_ref_func_type<FunctionClass> funcptr, char const *name, FunctionClass *object) : basetype(funcptr, object), m_name(name) { }
-	template <typename T> named_delegate(T &&funcptr, char const *name) requires suitable_functoid<T>::value : basetype(std::forward<T>(funcptr)), m_name(name) { }
+	template <typename T> named_delegate(T &&funcptr, char const *name) requires (suitable_functoid<T>::value) : basetype(std::forward<T>(funcptr)), m_name(name) { }
 
 	// allow assignment
 	named_delegate &operator=(named_delegate const &) = default;
@@ -190,24 +190,24 @@ public:
 
 	// construct with target object
 	template <class T, class D>
-	device_delegate_base(T &object, ReturnType (D::*funcptr)(Params...), char const *name) requires is_related_device<D, T>::value
+	device_delegate_base(T &object, ReturnType (D::*funcptr)(Params...), char const *name) requires (is_related_device<D, T>::value)
 		: basetype(funcptr, name, static_cast<D *>(&object))
 		, device_delegate_helper(get_device(object))
 	{ }
 	template <class T, class D>
-	device_delegate_base(T &object, ReturnType (D::*funcptr)(Params...) const, char const *name) requires is_related_device<D, T>::value
+	device_delegate_base(T &object, ReturnType (D::*funcptr)(Params...) const, char const *name) requires (is_related_device<D, T>::value)
 		: basetype(funcptr, name, static_cast<D *>(&object))
 		, device_delegate_helper(get_device(object))
 	{ }
 	template <class T, class D>
-	device_delegate_base(T &object, ReturnType (*funcptr)(D &, Params...), char const *name) requires is_related_device<D, T>::value
+	device_delegate_base(T &object, ReturnType (*funcptr)(D &, Params...), char const *name) requires (is_related_device<D, T>::value)
 		: basetype(funcptr, name, static_cast<D *>(&object))
 		, device_delegate_helper(get_device(object))
 	{ }
 
 	// construct with callable object
 	template <typename T>
-	device_delegate_base(device_t &owner, T &&funcptr, char const *name) requires suitable_functoid<T>::value
+	device_delegate_base(device_t &owner, T &&funcptr, char const *name) requires (suitable_functoid<T>::value)
 		: basetype(std::forward<T>(funcptr), name)
 		, device_delegate_helper(owner)
 	{ }
