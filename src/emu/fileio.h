@@ -46,13 +46,12 @@ public:
 	path_iterator(path_iterator const &that);
 
 	template <typename T>
-	path_iterator(T &&searchpath, std::enable_if_t<std::is_constructible<std::string, T>::value, int> = 0)
+	path_iterator(T &&searchpath) requires std::is_constructible_v<std::string, T>
 		: path_iterator(std::string(std::forward<T>(searchpath)))
 	{ }
 
-	// TODO: this doesn't work with C arrays (only vector, std::array, etc.)
 	template <typename T>
-	path_iterator(T &&paths, std::enable_if_t<std::is_constructible<std::string, typename std::remove_reference_t<T>::value_type>::value, int> = 0)
+	path_iterator(T &&paths) requires std::is_constructible_v<std::string, decltype(*std::begin(std::declval<T &>()))>
 		: path_iterator(concatenate_paths(std::forward<T>(paths)))
 	{ m_separator = '\0'; }
 
@@ -130,7 +129,7 @@ public:
 	// file open/creation
 	emu_file(u32 openflags);
 	template <typename T>
-	emu_file(T &&searchpath, std::enable_if_t<std::is_constructible<path_iterator, T>::value, u32> openflags)
+	emu_file(T &&searchpath, u32 openflags) requires std::is_constructible_v<path_iterator, T>
 		: emu_file(path_iterator(std::forward<T>(searchpath)), openflags)
 	{ }
 	template <typename T, typename U, typename V, typename... W>
@@ -237,12 +236,12 @@ private:
 };
 
 
-extern template path_iterator::path_iterator(char *&, int);
-extern template path_iterator::path_iterator(char * const &, int);
-extern template path_iterator::path_iterator(char const *&, int);
-extern template path_iterator::path_iterator(char const * const &, int);
-extern template path_iterator::path_iterator(std::vector<std::string> &, int);
-extern template path_iterator::path_iterator(const std::vector<std::string> &, int);
+extern template path_iterator::path_iterator(char *&);
+extern template path_iterator::path_iterator(char * const &);
+extern template path_iterator::path_iterator(char const *&);
+extern template path_iterator::path_iterator(char const * const &);
+extern template path_iterator::path_iterator(std::vector<std::string> &);
+extern template path_iterator::path_iterator(const std::vector<std::string> &);
 
 extern template emu_file::emu_file(std::string &, u32);
 extern template emu_file::emu_file(const std::string &, u32);

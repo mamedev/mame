@@ -89,8 +89,8 @@ class address_map_entry
 			return &dynamic_cast<T &>(obj);
 	}
 
-	template <typename T> static std::enable_if_t<emu::detail::is_device_implementation<T>::value, const char *> get_tag(T &obj) { return obj.tag(); }
-	template <typename T> static std::enable_if_t<emu::detail::is_device_interface<T>::value, const char *> get_tag(T &obj) { return obj.device().tag(); }
+	template <emu::detail::device_implementation_class T> static const char *get_tag(T const &obj) { return obj.tag(); }
+	template <emu::detail::device_interface_class T> static const char *get_tag(T const &obj) { return obj.device().tag(); }
 
 public:
 	// construction/destruction

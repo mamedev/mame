@@ -614,7 +614,7 @@ public:
 	/// \param [in] device Reference to anticipated target device.
 	/// \return The same reference supplied by the caller.
 	template <typename T>
-	std::enable_if_t<std::is_convertible<T *, DeviceClass *>::value, T &> operator=(T &device)
+	T &operator=(T &device) requires std::is_convertible_v<T *, DeviceClass *>
 	{
 		assert(!this->m_resolved);
 		assert(is_expected_tag(device));
@@ -633,8 +633,8 @@ private:
 	/// \param [in] device Reference to device.
 	/// \return True if supplied device matches the configured target
 	///   tag, or false otherwise.
-	template <typename T>
-	std::enable_if_t<emu::detail::is_device_implementation<T>::value, bool> is_expected_tag(T const &device) const
+	template <emu::detail::device_implementation_class T>
+	bool is_expected_tag(T const &device) const
 	{
 		return this->m_base.get().subtag(this->m_tag) == device.tag();
 	}
@@ -643,8 +643,8 @@ private:
 	/// \param [in] device Reference to interface/mixin.
 	/// \return True if supplied mixin matches the configured target
 	///   tag, or false otherwise.
-	template <typename T>
-	std::enable_if_t<emu::detail::is_device_interface<T>::value, bool> is_expected_tag(T const &interface) const
+	template <emu::detail::device_interface_class T>
+	bool is_expected_tag(T const &interface) const
 	{
 		return this->m_base.get().subtag(this->m_tag) == interface.device().tag();
 	}

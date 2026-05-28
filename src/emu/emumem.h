@@ -233,196 +233,196 @@ template <typename T> using rw_delegate_device_class_t = typename rw_delegate_ty
 
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read8_delegate, device_t &, L, const char *>::value, read8_delegate> make_lr8_delegate(device_t &owner, L &&l, const char *name)
+inline read8_delegate make_lr8_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read8_delegate, device_t &, L, const char *>
 { return read8_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read8m_delegate, device_t &, L, const char *>::value, read8m_delegate> make_lr8_delegate(device_t &owner, L &&l, const char *name)
+inline read8m_delegate make_lr8_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read8m_delegate, device_t &, L, const char *>
 { return read8m_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read8s_delegate, device_t &, L, const char *>::value, read8s_delegate> make_lr8_delegate(device_t &owner, L &&l, const char *name)
+inline read8s_delegate make_lr8_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read8s_delegate, device_t &, L, const char *>
 { return read8s_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read8sm_delegate, device_t &, L, const char *>::value, read8sm_delegate> make_lr8_delegate(device_t &owner, L &&l, const char *name)
+inline read8sm_delegate make_lr8_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read8sm_delegate, device_t &, L, const char *>
 { return read8sm_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read8mo_delegate, device_t &, L, const char *>::value, read8mo_delegate> make_lr8_delegate(device_t &owner, L &&l, const char *name)
+inline read8mo_delegate make_lr8_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read8mo_delegate, device_t &, L, const char *>
 { return read8mo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read8smo_delegate, device_t &, L, const char *>::value, read8smo_delegate> make_lr8_delegate(device_t &owner, L &&l, const char *name)
+inline read8smo_delegate make_lr8_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read8smo_delegate, device_t &, L, const char *>
 { return read8smo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read16_delegate, device_t &, L, const char *>::value, read16_delegate> make_lr16_delegate(device_t &owner, L &&l, const char *name)
+inline read16_delegate make_lr16_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read16_delegate, device_t &, L, const char *>
 { return read16_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read16m_delegate, device_t &, L, const char *>::value, read16m_delegate> make_lr16_delegate(device_t &owner, L &&l, const char *name)
+inline read16m_delegate make_lr16_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read16m_delegate, device_t &, L, const char *>
 { return read16m_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read16s_delegate, device_t &, L, const char *>::value, read16s_delegate> make_lr16_delegate(device_t &owner, L &&l, const char *name)
+inline read16s_delegate make_lr16_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read16s_delegate, device_t &, L, const char *>
 { return read16s_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read16sm_delegate, device_t &, L, const char *>::value, read16sm_delegate> make_lr16_delegate(device_t &owner, L &&l, const char *name)
+inline read16sm_delegate make_lr16_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read16sm_delegate, device_t &, L, const char *>
 { return read16sm_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read16mo_delegate, device_t &, L, const char *>::value, read16mo_delegate> make_lr16_delegate(device_t &owner, L &&l, const char *name)
+inline read16mo_delegate make_lr16_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read16mo_delegate, device_t &, L, const char *>
 { return read16mo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read16smo_delegate, device_t &, L, const char *>::value, read16smo_delegate> make_lr16_delegate(device_t &owner, L &&l, const char *name)
+inline read16smo_delegate make_lr16_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read16smo_delegate, device_t &, L, const char *>
 { return read16smo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read32_delegate, device_t &, L, const char *>::value, read32_delegate> make_lr32_delegate(device_t &owner, L &&l, const char *name)
+inline read32_delegate make_lr32_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read32_delegate, device_t &, L, const char *>
 { return read32_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read32m_delegate, device_t &, L, const char *>::value, read32m_delegate> make_lr32_delegate(device_t &owner, L &&l, const char *name)
+inline read32m_delegate make_lr32_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read32m_delegate, device_t &, L, const char *>
 { return read32m_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read32s_delegate, device_t &, L, const char *>::value, read32s_delegate> make_lr32_delegate(device_t &owner, L &&l, const char *name)
+inline read32s_delegate make_lr32_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read32s_delegate, device_t &, L, const char *>
 { return read32s_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read32sm_delegate, device_t &, L, const char *>::value, read32sm_delegate> make_lr32_delegate(device_t &owner, L &&l, const char *name)
+inline read32sm_delegate make_lr32_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read32sm_delegate, device_t &, L, const char *>
 { return read32sm_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read32mo_delegate, device_t &, L, const char *>::value, read32mo_delegate> make_lr32_delegate(device_t &owner, L &&l, const char *name)
+inline read32mo_delegate make_lr32_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read32mo_delegate, device_t &, L, const char *>
 { return read32mo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read32smo_delegate, device_t &, L, const char *>::value, read32smo_delegate> make_lr32_delegate(device_t &owner, L &&l, const char *name)
+inline read32smo_delegate make_lr32_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read32smo_delegate, device_t &, L, const char *>
 { return read32smo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read64_delegate, device_t &, L, const char *>::value, read64_delegate> make_lr64_delegate(device_t &owner, L &&l, const char *name)
+inline read64_delegate make_lr64_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read64_delegate, device_t &, L, const char *>
 { return read64_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read64m_delegate, device_t &, L, const char *>::value, read64m_delegate> make_lr64_delegate(device_t &owner, L &&l, const char *name)
+inline read64m_delegate make_lr64_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read64m_delegate, device_t &, L, const char *>
 { return read64m_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read64s_delegate, device_t &, L, const char *>::value, read64s_delegate> make_lr64_delegate(device_t &owner, L &&l, const char *name)
+inline read64s_delegate make_lr64_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read64s_delegate, device_t &, L, const char *>
 { return read64s_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read64sm_delegate, device_t &, L, const char *>::value, read64sm_delegate> make_lr64_delegate(device_t &owner, L &&l, const char *name)
+inline read64sm_delegate make_lr64_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read64sm_delegate, device_t &, L, const char *>
 { return read64sm_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read64mo_delegate, device_t &, L, const char *>::value, read64mo_delegate> make_lr64_delegate(device_t &owner, L &&l, const char *name)
+inline read64mo_delegate make_lr64_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read64mo_delegate, device_t &, L, const char *>
 { return read64mo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read64smo_delegate, device_t &, L, const char *>::value, read64smo_delegate> make_lr64_delegate(device_t &owner, L &&l, const char *name)
+inline read64smo_delegate make_lr64_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<read64smo_delegate, device_t &, L, const char *>
 { return read64smo_delegate(owner, std::forward<L>(l), name); }
 
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write8_delegate, device_t &, L, const char *>::value, write8_delegate> make_lw8_delegate(device_t &owner, L &&l, const char *name)
+inline write8_delegate make_lw8_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write8_delegate, device_t &, L, const char *>
 { return write8_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write8m_delegate, device_t &, L, const char *>::value, write8m_delegate> make_lw8_delegate(device_t &owner, L &&l, const char *name)
+inline write8m_delegate make_lw8_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write8m_delegate, device_t &, L, const char *>
 { return write8m_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write8s_delegate, device_t &, L, const char *>::value, write8s_delegate> make_lw8_delegate(device_t &owner, L &&l, const char *name)
+inline write8s_delegate make_lw8_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write8s_delegate, device_t &, L, const char *>
 { return write8s_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write8sm_delegate, device_t &, L, const char *>::value, write8sm_delegate> make_lw8_delegate(device_t &owner, L &&l, const char *name)
+inline write8sm_delegate make_lw8_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write8sm_delegate, device_t &, L, const char *>
 { return write8sm_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write8mo_delegate, device_t &, L, const char *>::value, write8mo_delegate> make_lw8_delegate(device_t &owner, L &&l, const char *name)
+inline write8mo_delegate make_lw8_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write8mo_delegate, device_t &, L, const char *>
 { return write8mo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write8smo_delegate, device_t &, L, const char *>::value, write8smo_delegate> make_lw8_delegate(device_t &owner, L &&l, const char *name)
+inline write8smo_delegate make_lw8_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write8smo_delegate, device_t &, L, const char *>
 { return write8smo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write16_delegate, device_t &, L, const char *>::value, write16_delegate> make_lw16_delegate(device_t &owner, L &&l, const char *name)
+inline write16_delegate make_lw16_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write16_delegate, device_t &, L, const char *>
 { return write16_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write16m_delegate, device_t &, L, const char *>::value, write16m_delegate> make_lw16_delegate(device_t &owner, L &&l, const char *name)
+inline write16m_delegate make_lw16_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write16m_delegate, device_t &, L, const char *>
 { return write16m_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write16s_delegate, device_t &, L, const char *>::value, write16s_delegate> make_lw16_delegate(device_t &owner, L &&l, const char *name)
+inline write16s_delegate make_lw16_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write16s_delegate, device_t &, L, const char *>
 { return write16s_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write16sm_delegate, device_t &, L, const char *>::value, write16sm_delegate> make_lw16_delegate(device_t &owner, L &&l, const char *name)
+inline write16sm_delegate make_lw16_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write16sm_delegate, device_t &, L, const char *>
 { return write16sm_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write16mo_delegate, device_t &, L, const char *>::value, write16mo_delegate> make_lw16_delegate(device_t &owner, L &&l, const char *name)
+inline write16mo_delegate make_lw16_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write16mo_delegate, device_t &, L, const char *>
 { return write16mo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write16smo_delegate, device_t &, L, const char *>::value, write16smo_delegate> make_lw16_delegate(device_t &owner, L &&l, const char *name)
+inline write16smo_delegate make_lw16_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write16smo_delegate, device_t &, L, const char *>
 { return write16smo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write32_delegate, device_t &, L, const char *>::value, write32_delegate> make_lw32_delegate(device_t &owner, L &&l, const char *name)
+inline write32_delegate make_lw32_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write32_delegate, device_t &, L, const char *>
 { return write32_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write32m_delegate, device_t &, L, const char *>::value, write32m_delegate> make_lw32_delegate(device_t &owner, L &&l, const char *name)
+inline write32m_delegate make_lw32_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write32m_delegate, device_t &, L, const char *>
 { return write32m_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write32s_delegate, device_t &, L, const char *>::value, write32s_delegate> make_lw32_delegate(device_t &owner, L &&l, const char *name)
+inline write32s_delegate make_lw32_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write32s_delegate, device_t &, L, const char *>
 { return write32s_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write32sm_delegate, device_t &, L, const char *>::value, write32sm_delegate> make_lw32_delegate(device_t &owner, L &&l, const char *name)
+inline write32sm_delegate make_lw32_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write32sm_delegate, device_t &, L, const char *>
 { return write32sm_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write32mo_delegate, device_t &, L, const char *>::value, write32mo_delegate> make_lw32_delegate(device_t &owner, L &&l, const char *name)
+inline write32mo_delegate make_lw32_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write32mo_delegate, device_t &, L, const char *>
 { return write32mo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write32smo_delegate, device_t &, L, const char *>::value, write32smo_delegate> make_lw32_delegate(device_t &owner, L &&l, const char *name)
+inline write32smo_delegate make_lw32_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write32smo_delegate, device_t &, L, const char *>
 { return write32smo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write64_delegate, device_t &, L, const char *>::value, write64_delegate> make_lw64_delegate(device_t &owner, L &&l, const char *name)
+inline write64_delegate make_lw64_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write64_delegate, device_t &, L, const char *>
 { return write64_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write64m_delegate, device_t &, L, const char *>::value, write64m_delegate> make_lw64_delegate(device_t &owner, L &&l, const char *name)
+inline write64m_delegate make_lw64_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write64m_delegate, device_t &, L, const char *>
 { return write64m_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write64s_delegate, device_t &, L, const char *>::value, write64s_delegate> make_lw64_delegate(device_t &owner, L &&l, const char *name)
+inline write64s_delegate make_lw64_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write64s_delegate, device_t &, L, const char *>
 { return write64s_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write64sm_delegate, device_t &, L, const char *>::value, write64sm_delegate> make_lw64_delegate(device_t &owner, L &&l, const char *name)
+inline write64sm_delegate make_lw64_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write64sm_delegate, device_t &, L, const char *>
 { return write64sm_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write64mo_delegate, device_t &, L, const char *>::value, write64mo_delegate> make_lw64_delegate(device_t &owner, L &&l, const char *name)
+inline write64mo_delegate make_lw64_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write64mo_delegate, device_t &, L, const char *>
 { return write64mo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write64smo_delegate, device_t &, L, const char *>::value, write64smo_delegate> make_lw64_delegate(device_t &owner, L &&l, const char *name)
+inline write64smo_delegate make_lw64_delegate(device_t &owner, L &&l, const char *name) requires std::is_constructible_v<write64smo_delegate, device_t &, L, const char *>
 { return write64smo_delegate(owner, std::forward<L>(l), name); }
 
 
