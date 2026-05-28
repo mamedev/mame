@@ -112,6 +112,7 @@ public:
 	auto ns() { return m_ns_out.bind(); }
 
 	bool is_ifetch1() const noexcept { return (m_op_valid == 0); }
+	void set_m20_hack(bool is_hack) { m_m20_hack = is_hack; }
 
 protected:
 	z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int vecmult);
@@ -186,6 +187,7 @@ protected:
 	memory_access<16, 1, 0, ENDIANNESS_BIG>::specific m_sio;
 	int m_icount;
 	const int m_vector_mult;
+	bool m_m20_hack;
 
 	void clear_internal_state();
 	void register_debug_state();

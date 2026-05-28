@@ -42,7 +42,7 @@ z8002_device::z8002_device(const machine_config &mconfig, device_type type, cons
 	, m_ns_out(*this)
 	, m_busack_out(*this)
 	, m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_busreq_state(0), m_busack_state(0), m_mi(0), m_halt(false), m_icount(0)
-	, m_vector_mult(vecmult)
+	, m_vector_mult(vecmult), m_m20_hack(true)
 {
 }
 
@@ -205,12 +205,8 @@ uint16_t z8002_device::RDMEM_W(memory_access<23, 1, 0, ENDIANNESS_BIG>::specific
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	addr &= ~1;
-	// TODO: REMOVE THIS!
 	/* hack for m20 driver: BIOS accesses 0x7f0000 and expects a segmentation violation */
-	if ((addr >= 0x7f0000) &&
-		(!(strncmp(machine().system().name, "m20", 3)) ||
-		!(strncmp(machine().system().name, "m40", 3)) ||
-		!(strncmp(machine().system().name, "m44", 3)))) {
+	if (m_m20_hack && (addr >= 0x7f0000)) {
 		m_irq_req = Z8000_SEGTRAP;
 		return 0xffff;
 	}

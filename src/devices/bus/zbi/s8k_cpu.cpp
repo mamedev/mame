@@ -623,6 +623,7 @@ void zbi_s8k_cpu10_card_device::centronics_ack_w(uint8_t data)
 void zbi_s8k_cpu10_card_device::device_add_mconfig(machine_config &config)
 {
 	Z8001(config, m_maincpu, CLK_CPU);
+	m_maincpu->set_m20_hack(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zbi_s8k_cpu10_card_device::addrmap_program);
 	m_maincpu->set_addrmap(AS_DATA, &zbi_s8k_cpu10_card_device::addrmap_data);
 	m_maincpu->set_addrmap(z8001_device::AS_STACK, &zbi_s8k_cpu10_card_device::addrmap_stack);
@@ -828,10 +829,10 @@ void zbi_s8k_cpu10_card_device::device_reset()
 ROM_START( s8k_cpu10 )
 	ROM_REGION16_BE(0x2000, "maincpu", 0)
 
-	ROMX_LOAD("cpu_34-0601-00a.u76", 0x0000, 0x0800, CRC(fe8e0de5) SHA1(9d28f6ecbf4f077c80cf987c9ea7adf99bf3429c), ROM_SKIP(1))
-	ROMX_LOAD("cpu_34-0602-00a.u74", 0x0001, 0x0800, CRC(0b634c89) SHA1(1b81f56151038812441a7ceaf28f2bcb7d58b6d4), ROM_SKIP(1))
-	ROMX_LOAD("cpu_34-0605-00a.u77", 0x1000, 0x0800, CRC(ae5ebab8) SHA1(e082107914da9acc1a71fa5c2dc9d1d464222fe5), ROM_SKIP(1))
-	ROMX_LOAD("cpu_34-0606-00a.u75", 0x1001, 0x0800, CRC(a46db483) SHA1(86569a6c8649f691acbf7d42a825bde105460f55), ROM_SKIP(1))
+	ROM_LOAD16_BYTE("cpu_34-0601-00a.u76", 0x0000, 0x0800, CRC(fe8e0de5) SHA1(9d28f6ecbf4f077c80cf987c9ea7adf99bf3429c))
+	ROM_LOAD16_BYTE("cpu_34-0602-00a.u74", 0x0001, 0x0800, CRC(0b634c89) SHA1(1b81f56151038812441a7ceaf28f2bcb7d58b6d4))
+	ROM_LOAD16_BYTE("cpu_34-0605-00a.u77", 0x1000, 0x0800, CRC(ae5ebab8) SHA1(e082107914da9acc1a71fa5c2dc9d1d464222fe5))
+	ROM_LOAD16_BYTE("cpu_34-0606-00a.u75", 0x1001, 0x0800, CRC(a46db483) SHA1(86569a6c8649f691acbf7d42a825bde105460f55))
 ROM_END
 
 static INPUT_PORTS_START( s8k_cpu10 )
@@ -1177,6 +1178,7 @@ void zbi_s8k_hpcpu_card_device::device_resolve_objects()
 void zbi_s8k_hpcpu_card_device::device_add_mconfig(machine_config &config)
 {
 	Z8001(config, m_maincpu, CLK_HPCPU);
+	m_maincpu->set_m20_hack(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zbi_s8k_hpcpu_card_device::addrmap_program);
 	m_maincpu->set_addrmap(AS_DATA, &zbi_s8k_hpcpu_card_device::addrmap_data);
 	m_maincpu->set_addrmap(z8001_device::AS_STACK, &zbi_s8k_hpcpu_card_device::addrmap_stack);
@@ -1236,8 +1238,8 @@ INPUT_PORTS_END
 ROM_START( s8k_hpcpu )
 	ROM_REGION16_BE(0x4000, "maincpu", 0)
 
-	ROMX_LOAD("hpcpu_34-1117-00_v10.1_common.19e", 0x0000, 0x2000, CRC(a77055c8) SHA1(f1268c6b163f9e4151d425ccc2f5cb4c9c0af8c8), ROM_SKIP(1))
-	ROMX_LOAD("hpcpu_34-1119-00_v10.1_16user.21e", 0x0001, 0x2000, CRC(610e8b0c) SHA1(bc804e09cf6905c9f0ccc502a15c98841ee4b087), ROM_SKIP(1))
+	ROM_LOAD16_BYTE("hpcpu_34-1117-00_v10.1_common.19e", 0x0000, 0x2000, CRC(a77055c8) SHA1(f1268c6b163f9e4151d425ccc2f5cb4c9c0af8c8))
+	ROM_LOAD16_BYTE("hpcpu_34-1119-00_v10.1_16user.21e", 0x0001, 0x2000, CRC(610e8b0c) SHA1(bc804e09cf6905c9f0ccc502a15c98841ee4b087))
 ROM_END
 
 ioport_constructor zbi_s8k_hpcpu_card_device::device_input_ports() const
