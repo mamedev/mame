@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- Die gemeinsame Auswahl für alle geometrischen Formen (Innere Verschachtelung) -->
+  <xs:group name="innerShapeGroup">
+    <xs:choice>
+      <xs:element name="bounds" type="boundsType"/>
+      <xs:element name="color" type="colorType"/>
+      <xs:element name="orientation" type="orientationType"/>
+      <xs:element name="rect" type="rectType"/>
+      <xs:element name="disk" type="diskType"/>
+      <xs:element name="text" type="textType"/>
+    </xs:choice>
+  </xs:group>
+
+  <!-- Definition der Typen für Grundformen -->
+  <xs:complexType name="rectType" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="innerShapeGroup"/>
+    </xs:choice>
+    <xs:attribute name="state" type="xs:string" use="optional"/>
+    <xs:attribute name="statemask" type="xs:string" use="optional"/>
+    <xs:attribute name="symbollist" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="diskType" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="innerShapeGroup"/>
+    </xs:choice>
+    <xs:attribute name="state" type="xs:string" use="optional"/>
+    <xs:attribute name="statemask" type="xs:string" use="optional"/>
+    <xs:attribute name="symbollist" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="textType" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="innerShapeGroup"/>
+    </xs:choice>
+    <xs:attribute name="string" type="xs:string" use="optional"/>
+    <xs:attribute name="align" type="xs:string" use="optional"/>
+    <xs:attribute name="state" type="xs:string" use="optional"/>
+    <xs:attribute name="statemask" type="xs:string" use="optional"/>
+    <xs:attribute name="symbollist" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="imageType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="data" type="xs:string"/>
+      <xs:element name="color" type="colorType"/>
+      <xs:element name="bounds" type="boundsType"/>
+      <xs:element name="orientation" type="orientationType"/>
+    </xs:choice>
+    <xs:attribute name="file" type="xs:string" use="optional"/>
+    <xs:attribute name="state" type="xs:string" use="optional"/>
+    <xs:attribute name="statemask" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="simplecounterType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="color" type="colorType"/>
+      <xs:element name="bounds" type="boundsType"/>
+      <xs:element name="orientation" type="orientationType"/>
+    </xs:choice>
+    <xs:attribute name="digits" type="xs:string" use="optional"/>
+    <xs:attribute name="maxstate" type="xs:string" use="optional"/>
+    <xs:attribute name="align" type="xs:string" use="optional"/>
+    <xs:attribute name="state" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="scrollType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="bounds" type="boundsType"/>
+      <xs:element name="color" type="colorType"/>
+      <xs:element name="orientation" type="orientationType"/>
+    </xs:choice>
+    <xs:attribute name="name" type="xs:string" use="optional"/>
+    <xs:attribute name="min" type="xs:string" use="optional"/>
+    <xs:attribute name="max" type="xs:string" use="optional"/>
+    <xs:attribute name="size" type="xs:string" use="optional"/>
+    <xs:attribute name="wrap" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="reelType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="bounds" type="boundsType"/>
+      <xs:element name="color" type="colorType"/>
+      <xs:element name="orientation" type="orientationType"/>
+    </xs:choice>
+    <xs:attribute name="symbollist" type="xs:string" use="optional"/>
+    <xs:attribute name="stateoffset" type="xs:string" use="optional"/>
+    <xs:attribute name="state" type="xs:string" use="optional"/>
+    <xs:attribute name="numsymbolsvisible" type="xs:string" use="optional"/>
+    <xs:attribute name="reelreversed" type="xs:string" use="optional"/>
+    <xs:attribute name="beltreel" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <!-- REPARATUR basierend auf oberheim_dmx.lay.xsd: Globaler, unfehlbarer Animationstyp -->
+  <xs:complexType name="animateType">
+    <xs:attribute name="inputtag" type="xs:string" use="optional"/>
+    <xs:attribute name="mask" type="xs:string" use="optional"/>
+    <xs:attribute name="inputmask" type="xs:string" use="optional"/>
+    <xs:attribute name="name" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <!-- Das übergeordnete MAME-Element verweist auf die Typen -->
+  <xs:complexType name="elementType" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="rect" type="rectType"/>
+      <xs:element name="disk" type="diskType"/>
+      <xs:element name="text" type="textType"/>
+      <xs:element name="image" type="imageType"/>
+      <xs:element name="simplecounter" type="simplecounterType"/>
+      <xs:element name="yscroll" type="scrollType"/>
+      <xs:element name="xscroll" type="scrollType"/>
+      <xs:element name="reel" type="reelType"/>
+      <xs:element name="animate" type="animateType"/>
+      <xs:element name="led7seg">
+        <xs:complexType>
+          <xs:sequence><xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/></xs:sequence>
+          <xs:anyAttribute processContents="skip"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="led14seg">
+        <xs:complexType>
+          <xs:sequence><xs:element name="color" type="colorType" minOccurs="0"/></xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="led14segsc">
+        <xs:complexType>
+          <xs:sequence><xs:element name="color" type="colorType" minOccurs="0"/></xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="led16seg">
+        <xs:complexType>
+          <xs:sequence><xs:element name="color" type="colorType" minOccurs="0"/></xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="led16segsc">
+        <xs:complexType>
+          <xs:sequence><xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/></xs:sequence>
+          <xs:anyAttribute processContents="skip"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="orientation" type="orientationType"/>
+    </xs:choice>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="defstate" type="xs:string" use="optional"/>
+    <xs:attribute name="align" type="xs:string" use="optional"/>
+    <xs:attribute name="clickthrough" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+
+</xs:schema>

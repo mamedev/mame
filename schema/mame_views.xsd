@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- Schleifen-Typ -->
+  <xs:complexType name="repeatType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="param">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="required"/>
+          <xs:attribute name="start" type="xs:string" use="optional"/>
+          <xs:attribute name="increment" type="xs:string" use="optional"/>
+          <xs:attribute name="lshift" type="xs:string" use="optional"/>
+          <xs:attribute name="rshift" type="xs:string" use="optional"/>
+          <xs:attribute name="value" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="repeat" type="repeatType"/>
+      <xs:element name="backdrop" type="viewItemType"/>
+      <xs:element name="bezel" type="viewItemType"/>
+      <xs:element name="overlay" type="viewItemType"/>
+      <xs:element name="element" type="viewItemType"/>
+      <xs:element name="screen" type="screenType"/>
+      <xs:element name="group" type="groupInstanceType"/>
+      <xs:element name="color" type="colorType"/>
+    </xs:choice>
+    <xs:attribute name="count" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <!-- Bildschirm-Typ -->
+  <xs:complexType name="screenType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="bounds" type="boundsType"/>
+      <xs:element name="orientation" type="orientationType"/>
+      <xs:element name="color" type="colorType"/>
+    </xs:choice>
+    <xs:attribute name="index" type="xs:string" use="optional"/>
+    <xs:attribute name="tag" type="xs:string" use="optional"/>
+    <xs:attribute name="blend" type="xs:string" use="optional"/>
+    <xs:attribute name="id" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <!-- Gruppen-Instanz-Typ: REPARATUR -> screen und bounds an vorderster Stelle erlaubt -->
+  <xs:complexType name="groupInstanceType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="screen" type="screenType"/>
+      <xs:element name="bounds" type="boundsType"/>
+      <xs:element name="element" type="viewItemType"/>
+      <xs:element name="backdrop" type="viewItemType"/>
+      <xs:element name="bezel" type="viewItemType"/>
+      <xs:element name="overlay" type="viewItemType"/>
+      <xs:element name="group" type="groupInstanceType"/>
+      <xs:element name="repeat" type="repeatType"/>
+      <xs:element name="orientation" type="orientationType"/>
+      <xs:element name="collection" type="collectionType"/>
+      <xs:element name="color" type="colorType"/>
+    </xs:choice>
+    <xs:attributeGroup ref="viewItemAttributes"/>
+  </xs:complexType>
+
+  <!-- Kollektions-Typ -->
+  <xs:complexType name="collectionType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="element" type="viewItemType"/>
+      <xs:element name="backdrop" type="viewItemType"/>
+      <xs:element name="bezel" type="viewItemType"/>
+      <xs:element name="overlay" type="viewItemType"/>
+      <xs:element name="screen" type="screenType"/>
+      <xs:element name="group" type="groupInstanceType"/>
+      <xs:element name="repeat" type="repeatType"/>
+      <xs:element name="collection" type="collectionType"/>
+      <xs:element name="color" type="colorType"/>
+      <xs:element name="param">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="required"/>
+          <xs:attribute name="start" type="xs:string" use="optional"/>
+          <xs:attribute name="increment" type="xs:string" use="optional"/>
+          <xs:attribute name="lshift" type="xs:string" use="optional"/>
+          <xs:attribute name="rshift" type="xs:string" use="optional"/>
+          <xs:attribute name="value" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+    <xs:attribute name="name" type="xs:string" use="optional"/>
+    <xs:attribute name="visible" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <!-- Der Haupt-ViewType -->
+  <xs:complexType name="viewType" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="screen" type="screenType"/>
+      <xs:element name="backdrop" type="viewItemType"/>
+      <xs:element name="bezel" type="viewItemType"/>
+      <xs:element name="overlay" type="viewItemType"/>
+      <xs:element name="element" type="viewItemType"/>
+      <xs:element name="bounds" type="boundsType"/>
+      <xs:element name="orientation" type="orientationType"/>
+      <xs:element name="repeat" type="repeatType"/>
+      <xs:element name="group" type="groupInstanceType"/>
+      <xs:element name="collection" type="collectionType"/>
+      <xs:element name="color" type="colorType"/>
+      <xs:element name="param">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="required"/>
+          <xs:attribute name="start" type="xs:string" use="optional"/>
+          <xs:attribute name="increment" type="xs:string" use="optional"/>
+          <xs:attribute name="lshift" type="xs:string" use="optional"/>
+          <xs:attribute name="rshift" type="xs:string" use="optional"/>
+          <xs:attribute name="value" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="showpointers" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+
+
+</xs:schema>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <xs:complexType name="boundsType">
+    <xs:attribute name="left" type="xs:string" use="optional"/>
+    <xs:attribute name="top" type="xs:string" use="optional"/>
+    <xs:attribute name="right" type="xs:string" use="optional"/>
+    <xs:attribute name="bottom" type="xs:string" use="optional"/>
+    <xs:attribute name="x" type="xs:string" use="optional"/>
+    <xs:attribute name="y" type="xs:string" use="optional"/>
+    <xs:attribute name="width" type="xs:string" use="optional"/>
+    <xs:attribute name="height" type="xs:string" use="optional"/>
+    <xs:attribute name="xc" type="xs:string" use="optional"/>
+    <xs:attribute name="yc" type="xs:string" use="optional"/>
+    <xs:attribute name="state" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="colorType">
+    <xs:attribute name="red" type="xs:string" use="optional"/>
+    <xs:attribute name="green" type="xs:string" use="optional"/>
+    <xs:attribute name="blue" type="xs:string" use="optional"/>
+    <xs:attribute name="alpha" type="xs:string" use="optional"/>
+    <xs:attribute name="state" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="orientationType">
+    <xs:attribute name="rotate" type="xs:string" use="optional"/>
+    <xs:attribute name="swapxy" type="xs:string" use="optional"/>
+    <xs:attribute name="flipx" type="xs:string" use="optional"/>
+    <xs:attribute name="flipy" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <xs:attributeGroup name="viewItemAttributes">
+    <xs:attribute name="element" type="xs:string" use="optional"/>
+    <xs:attribute name="ref" type="xs:string" use="optional"/>
+    <xs:attribute name="name" type="xs:string" use="optional"/>
+    <xs:attribute name="state" type="xs:string" use="optional"/>
+    <xs:attribute name="inputtag" type="xs:string" use="optional"/>
+    <xs:attribute name="inputmask" type="xs:string" use="optional"/>
+    <xs:attribute name="blend" type="xs:string" use="optional"/>
+    <xs:attribute name="inputraw" type="xs:string" use="optional"/>
+    <xs:attribute name="defstate" type="xs:string" use="optional"/>
+    <xs:attribute name="id" type="xs:string" use="optional"/>
+    <xs:attribute name="align" type="xs:string" use="optional"/>
+    <xs:attribute name="clickthrough" type="xs:string" use="optional"/>
+  </xs:attributeGroup>
+
+  <xs:complexType name="viewItemType" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="bounds" type="boundsType"/>
+      <xs:element name="orientation" type="orientationType"/>
+      <xs:element name="color" type="colorType"/>
+      <xs:element name="rect" type="rectType"/>
+      <xs:element name="disk" type="diskType"/>
+      <xs:element name="text" type="textType"/>
+      <xs:element name="yscroll" type="scrollType"/>
+      <xs:element name="xscroll" type="scrollType"/>
+      <xs:element name="reel" type="reelType"/>
+      <!-- Nutzt jetzt ebenfalls den unfehlbaren globalen Typen -->
+      <xs:element name="animate" type="animateType"/>
+    </xs:choice>
+    <xs:attributeGroup ref="viewItemAttributes"/>
+  </xs:complexType>
+
+
+</xs:schema>

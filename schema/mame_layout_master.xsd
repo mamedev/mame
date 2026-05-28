@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- Die drei Teildateien sauber einbinden -->
+  <xs:include schemaLocation="mame_types.xsd"/>
+  <xs:include schemaLocation="mame_elements.xsd"/>
+  <xs:include schemaLocation="mame_views.xsd"/>
+
+  <!-- Das Root-Element umschließt alle Strukturen lokal und eindeutig -->
+  <xs:element name="mamelayout">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        
+        <!-- Top-Level: Grafikdefinition -->
+        <xs:element name="element" type="elementType"/>
+        <xs:element name="view" type="viewType"/>
+        <xs:element name="repeat" type="repeatType"/>
+        
+        <!-- Das Gruppen-Makro mit vollständiger Auswahl aller gelernten MAME-Knoten -->
+        <xs:element name="group">
+          <xs:complexType mixed="true">
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="element" type="viewItemType"/>
+              <xs:element name="group" type="groupInstanceType"/>
+              <xs:element name="repeat" type="repeatType"/>
+              <xs:element name="collection" type="collectionType"/>
+              <xs:element name="bounds" type="boundsType"/>
+              <xs:element name="color" type="colorType"/>
+              
+              <!-- REPARATUR basierend auf lafootb.lay.xsd: screen direkt im globalen Gruppen-Definitionsblock erlaubt -->
+              <xs:element name="screen" type="screenType"/>
+              
+              <xs:element name="param">
+                <xs:complexType>
+                  <xs:attribute name="name" type="xs:string" use="required"/>
+                  <xs:attribute name="start" type="xs:string" use="optional"/>
+                  <xs:attribute name="increment" type="xs:string" use="optional"/>
+                  <xs:attribute name="lshift" type="xs:string" use="optional"/>
+                  <xs:attribute name="rshift" type="xs:string" use="optional"/>
+                  <xs:attribute name="value" type="xs:string" use="optional"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+          </xs:complexType>
+        </xs:element>
+        
+        <xs:element name="script">
+          <xs:complexType mixed="true">
+            <xs:sequence><xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/></xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+      <xs:attribute name="version" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>
