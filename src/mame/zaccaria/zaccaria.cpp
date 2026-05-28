@@ -743,8 +743,17 @@ ROM_START( monymony )
 	ROM_LOAD( "bg3.1e",       0x4000, 0x2000, CRC(36980455) SHA1(4140b0cd4137c8f209124b12d9c0eb3b04f91991) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "9g",  0x0000, 0x0200, CRC(fc9a0f21) SHA1(2a93d684645ee1b70315386127223151582ab370) )
-	ROM_LOAD( "9f",  0x0200, 0x0200, CRC(93106704) SHA1(d3b8281c87d253a2ed40ff400438e879ca40c2b7) )
+	ROM_LOAD( "9g",           0x0000, 0x0200, CRC(fc9a0f21) SHA1(2a93d684645ee1b70315386127223151582ab370) )
+	ROM_LOAD( "9f",           0x0200, 0x0200, CRC(93106704) SHA1(d3b8281c87d253a2ed40ff400438e879ca40c2b7) )
+
+	ROM_REGION( 0x00f5, "proms2", 0 )
+	ROM_LOAD( "82s100.ic8c",  0x0000, 0x00f5, NO_DUMP )
+	ROM_LOAD( "82s100.ic8n",  0x0000, 0x00f5, NO_DUMP )
+
+	ROM_REGION( 0x0117, "plds", 0 )
+	ROM_LOAD( "01_pal.ic6j",  0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "01_pal.ic6k",  0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "02_pal.1a",    0x0000, 0x0117, NO_DUMP ) // On the ROMs PCB
 ROM_END
 
 ROM_START( monymony2 )
@@ -778,8 +787,17 @@ ROM_START( monymony2 )
 	ROM_LOAD( "bg3.1e",       0x4000, 0x2000, CRC(36980455) SHA1(4140b0cd4137c8f209124b12d9c0eb3b04f91991) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "9g",  0x0000, 0x0200, CRC(fc9a0f21) SHA1(2a93d684645ee1b70315386127223151582ab370) )
-	ROM_LOAD( "9f",  0x0200, 0x0200, CRC(93106704) SHA1(d3b8281c87d253a2ed40ff400438e879ca40c2b7) )
+	ROM_LOAD( "9g",           0x0000, 0x0200, CRC(fc9a0f21) SHA1(2a93d684645ee1b70315386127223151582ab370) )
+	ROM_LOAD( "9f",           0x0200, 0x0200, CRC(93106704) SHA1(d3b8281c87d253a2ed40ff400438e879ca40c2b7) )
+
+	ROM_REGION( 0x00f5, "proms2", 0 )
+	ROM_LOAD( "82s100.ic8c",  0x0000, 0x00f5, NO_DUMP )
+	ROM_LOAD( "82s100.ic8n",  0x0000, 0x00f5, NO_DUMP )
+
+	ROM_REGION( 0x0117, "plds", 0 )
+	ROM_LOAD( "01_pal.ic6j",  0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "01_pal.ic6k",  0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "02_pal.1a",    0x0000, 0x0117, NO_DUMP ) // On the ROMs PCB
 ROM_END
 
 /* Original Zaccaria PCBs, ASSA (Automave) stickers on ROMs.
@@ -823,9 +841,9 @@ ROM_START( monymony3	 )
 	ROM_LOAD( "82s100.ic8n",        0x0000, 0x00f5, NO_DUMP )
 
 	ROM_REGION( 0x0117, "plds", 0 )
-	ROM_LOAD( "01_pal16v8.ic6j",            0x0000, 0x0117, NO_DUMP )
-	ROM_LOAD( "01_pal16v8.ic6k",            0x0000, 0x0117, NO_DUMP )
-    ROM_LOAD( "a-00281_assa_m5_pal16v8.1a", 0x0000, 0x0117, NO_DUMP ) // On the ROMs PCB 1B11147
+	ROM_LOAD( "01_pal16v8.ic6j",            0x0000, 0x0117, BAD_DUMP CRC(38097d9b) SHA1(ce739600ed749466cab47ce73d93d22df1b5e199) ) // Bruteforced and untested
+	ROM_LOAD( "01_pal16v8.ic6k",            0x0000, 0x0117, BAD_DUMP CRC(b8f87879) SHA1(3098814e14fb69368553da67582f734eb15ce133) ) // Bruteforced and untested
+    ROM_LOAD( "a-00281_assa_m5_pal16l8.1a", 0x0000, 0x0104, NO_DUMP ) // On the ROMs PCB 1B11147
 ROM_END
 
 ROM_START( jackrabt )
@@ -874,9 +892,14 @@ ROM_START( jackrabt )
 	ROM_LOAD( "jr-ic9g",      0x0000, 0x0200, CRC(85577107) SHA1(76575fa68b66130b18dfe7374d1a03740963cc73) )
 	ROM_LOAD( "jr-ic9f",      0x0200, 0x0200, CRC(085914d1) SHA1(3d6f9318f5a9f08ce89e4184e3efb9881f671fa7) )
 
-	ROM_REGION( 0x0400, "plds", 0 )
-	ROM_LOAD( "jr-pal16l8.6j",   0x0000, 0x0104, NO_DUMP ) // PAL is read protected
-	ROM_LOAD( "jr-pal16l8.6k",   0x0200, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_REGION( 0x00f5, "proms2", 0 )
+	ROM_LOAD( "82s100.ic8c",  0x0000, 0x00f5, NO_DUMP )
+	ROM_LOAD( "82s100.ic8n",  0x0000, 0x00f5, NO_DUMP )
+
+	ROM_REGION( 0x0104, "plds", 0 )
+	ROM_LOAD( "jr-pal16l8.6j", 0x0000, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "jr-pal16l8.6k", 0x0000, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "jr-pal.1a",     0x0000, 0x0104, NO_DUMP ) // On the ROMs PCB
 ROM_END
 
 ROM_START( jackrabt2 )
@@ -910,14 +933,17 @@ ROM_START( jackrabt2 )
 	ROM_LOAD( "3bg.1e",       0x4000, 0x2000, CRC(14f23cdd) SHA1(e5f3dac52288c56f2fd2940b397bb6c896131a26) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "jr-ic9g",      0x0000, 0x0200, CRC(85577107) SHA1(76575fa68b66130b18dfe7374d1a03740963cc73) )
-	ROM_LOAD( "jr-ic9f",      0x0200, 0x0200, CRC(085914d1) SHA1(3d6f9318f5a9f08ce89e4184e3efb9881f671fa7) )
+	ROM_LOAD( "jr.ic9g",      0x0000, 0x0200, CRC(85577107) SHA1(76575fa68b66130b18dfe7374d1a03740963cc73) )
+	ROM_LOAD( "jr.ic9f",      0x0200, 0x0200, CRC(085914d1) SHA1(3d6f9318f5a9f08ce89e4184e3efb9881f671fa7) )
 
-	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_REGION( 0x00f5, "proms2", 0 )
+	ROM_LOAD( "82s100.ic8c",  0x0000, 0x00f5, CRC(70ddfa6d) SHA1(904347cc63e88413c393f14b5f1260a57ab72677) )
+	ROM_LOAD( "82s100.ic8n",  0x0000, 0x00f5, CRC(e00625ee) SHA1(88bbd020be67355dc0eb58b79f7deb77cbe505bb) )
+
+	ROM_REGION( 0x0104, "plds", 0 )
 	ROM_LOAD( "pal16l8.6j",   0x0000, 0x0104, CRC(a88e52d6) SHA1(32efecb91843d5d1bdace86cbcc94ebacf1b9389) )
 	ROM_LOAD( "pal16l8.6k",   0x0200, 0x0104, NO_DUMP )
-	ROM_LOAD( "82s100.8c",    0x0400, 0x00f5, CRC(70ddfa6d) SHA1(904347cc63e88413c393f14b5f1260a57ab72677) )
-	ROM_LOAD( "82s100.8n",    0x0500, 0x00f5, CRC(e00625ee) SHA1(88bbd020be67355dc0eb58b79f7deb77cbe505bb) )
+    ROM_LOAD( "pal.1a",       0x0000, 0x0104, NO_DUMP ) // On the ROMs PCB
 ROM_END
 
 ROM_START( jackrabts )
@@ -951,8 +977,17 @@ ROM_START( jackrabts )
 	ROM_LOAD( "3bg.1e",       0x4000, 0x2000, CRC(14f23cdd) SHA1(e5f3dac52288c56f2fd2940b397bb6c896131a26) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "jr-ic9g",      0x0000, 0x0200, CRC(85577107) SHA1(76575fa68b66130b18dfe7374d1a03740963cc73) )
-	ROM_LOAD( "jr-ic9f",      0x0200, 0x0200, CRC(085914d1) SHA1(3d6f9318f5a9f08ce89e4184e3efb9881f671fa7) )
+	ROM_LOAD( "jr.ic9g",      0x0000, 0x0200, CRC(85577107) SHA1(76575fa68b66130b18dfe7374d1a03740963cc73) )
+	ROM_LOAD( "jr.ic9f",      0x0200, 0x0200, CRC(085914d1) SHA1(3d6f9318f5a9f08ce89e4184e3efb9881f671fa7) )
+
+	ROM_REGION( 0x00f5, "proms2", 0 )
+	ROM_LOAD( "82s100.ic8c",  0x0000, 0x00f5, CRC(70ddfa6d) SHA1(904347cc63e88413c393f14b5f1260a57ab72677) )
+	ROM_LOAD( "82s100.ic8n",  0x0000, 0x00f5, CRC(e00625ee) SHA1(88bbd020be67355dc0eb58b79f7deb77cbe505bb) )
+
+	ROM_REGION( 0x0104, "plds", 0 )
+	ROM_LOAD( "pal.6j",       0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "pal.6k",       0x0200, 0x0104, NO_DUMP )
+	ROM_LOAD( "pal.1a",       0x0000, 0x0104, NO_DUMP ) // On the ROMs PCB
 ROM_END
 
 } // anonymous namespace
