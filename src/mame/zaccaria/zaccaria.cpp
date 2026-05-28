@@ -942,7 +942,7 @@ ROM_START( jackrabt2 )
 
 	ROM_REGION( 0x0104, "plds", 0 )
 	ROM_LOAD( "pal16l8.6j",   0x0000, 0x0104, CRC(a88e52d6) SHA1(32efecb91843d5d1bdace86cbcc94ebacf1b9389) )
-	ROM_LOAD( "pal16l8.6k",   0x0200, 0x0104, NO_DUMP )
+	ROM_LOAD( "pal16l8.6k",   0x0000, 0x0104, NO_DUMP )
     ROM_LOAD( "pal.1a",       0x0000, 0x0104, NO_DUMP ) // On the ROMs PCB
 ROM_END
 
@@ -986,7 +986,7 @@ ROM_START( jackrabts )
 
 	ROM_REGION( 0x0104, "plds", 0 )
 	ROM_LOAD( "pal.6j",       0x0000, 0x0104, NO_DUMP )
-	ROM_LOAD( "pal.6k",       0x0200, 0x0104, NO_DUMP )
+	ROM_LOAD( "pal.6k",       0x0000, 0x0104, NO_DUMP )
 	ROM_LOAD( "pal.1a",       0x0000, 0x0104, NO_DUMP ) // On the ROMs PCB
 ROM_END
 
