@@ -32,10 +32,10 @@ TODO:
 
 
 Notes:
-- The protection device at 1A on the ROM board (1B11147) is unidentified on the
-  schematics but appears to be a PAL16L8 or PAL16R4. It sits on bits 4-7 of the
-  data bus, and is read from locations where only bits 0-3 are connected to regular
-  devices (6400-6407 has 4-bit RAM, while 6c00-6c07 has a 4-bit input port).
+- The protection device at 1A on the ROM board (1B11147) is a PAL16L8.
+  It sits on bits 4-7 of the data bus, and is read from locations where only
+  bits 0-3 are connected to regular devices (6400-6407 has 4-bit RAM, while
+  6c00-6c07 has a 4-bit input port).
 
 - The 6802 driving the TMS5220 has a push button connected to the NMI line. On
   Zaccaria pinballs, when pressed, this causes the speech 6802 and the slave
