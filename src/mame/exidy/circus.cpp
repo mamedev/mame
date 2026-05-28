@@ -39,10 +39,19 @@ D000      Paddle Position and Interrupt Reset (where applicable)
 NOTES:
 - Circus: Taito licensed and released the game as "Acrobat TV"
 
+Trapeze and Rip Cord are very picky about initial RAM contents.
+
+Trapeze locks up generating random numbers if both 0x0e and 0x0f are zero. Rip
+Cord can have minor issues like tile glitches, or the parachutist refusing to
+jump during attract mode. Or it can get very confused (eg. filling RAM with 0x55).
+The current fill value(s) of 0x00, 0xf0 works around both issues.
+
+On Circus and Robot Bowl, it affects attract mode main character initial position.
+
 TODO:
-- use PROM data to draw foreground lines
-- ripcord tile glitches after cold boot (see eg. bottom-left) and parachutist
-  refuses to jump during initial attract mode, related to initial RAM value
+- circus, robotbwl, ripcord: use PROM data to draw foreground lines
+- ripcord: parachutist 1st jump always fails after cold boot, unless you let attract
+  mode run until it does the 1st (failed) jump there, maybe BTANB?
 - crash: irq timing
 - improve discrete sound
 
@@ -66,8 +75,9 @@ TODO:
 
 void circus_state::machine_start()
 {
-	// trapeze locks up generating random numbers if both 0x0e and 0x0f are zero
-	std::fill(m_ram.begin(), m_ram.end(), 0xff);
+	// some games rely on initial RAM contents, see driver notes
+	for (int i = 0; i < m_ram.bytes() / 2; i++)
+		m_ram[i * 2 + 1] = 0xf0;
 
 	save_item(NAME(m_clown_x));
 	save_item(NAME(m_clown_y));
