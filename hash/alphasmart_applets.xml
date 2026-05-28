@@ -4,7 +4,7 @@
 license:CC0-1.0
 -->
 
-<softwarelist name="alphasmart_kapps" description="AlphaSmart 3000 SmartApplets">
+<softwarelist name="alphasmart_applets" description="AlphaSmart SmartApplets">
 
 	<software name="accreader_uk_1_3" supported="no">
 		<description>Accelerated Reader (1.3, English (UK))</description>
