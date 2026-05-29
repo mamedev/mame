@@ -25,7 +25,7 @@ public:
 		m_cart_region(nullptr)
 	{ }
 
-	void smarttv(machine_config &config);
+	void smarttv(machine_config &config) ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
@@ -202,7 +202,7 @@ DEVICE_IMAGE_LOAD_MEMBER(smarttv_state::cart_load_smarttv)
 
 	// some carts have a cartridge in the header, use this to check it matches
 	const int length = m_cart->get_rom_size();
-	const uint8_t* rom = m_cart->get_rom_base();
+	const uint8_t *rom = m_cart->get_rom_base();
 
 	uint32_t checksum = 0x00000000;
 	// the first 0x10 bytes are where the "chksum:xxxxxxxx " string is listed, so skip over them
