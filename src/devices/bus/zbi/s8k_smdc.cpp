@@ -264,7 +264,7 @@ zbi_s8k_smdc_card_device::zbi_s8k_smdc_card_device(const machine_config &mconfig
 	, m_drv(0)
 	, m_es(0)
 	, m_iv(0)
-	, m_ie(true)
+	, m_ie(false)
 	, m_wakeup(false)
 	, m_init_left(5)
 	, m_busreq_state(0)
@@ -283,7 +283,7 @@ void zbi_s8k_smdc_card_device::smd_init()
 
 	m_cyl[0] = m_cyl[1] = m_cyl[2] = m_cyl[3] = 0;
 
-	m_ie = true;
+	m_ie = false;
 	m_iv = 0;
 	m_es = 0;
 	m_drv = 0;
@@ -434,6 +434,7 @@ int zbi_s8k_smdc_card_device::z80daisy_irq_ack()
 {
 	m_status |= SMD_SR_IUS;
 	m_status &= ~SMD_SR_IP;
+	m_ie = false;
 
 	LOGINT("%s SMD interrupt: iv=%02x, es=%02x, drv=%d\n", machine().describe_context(), m_iv, m_es, m_drv);
 
