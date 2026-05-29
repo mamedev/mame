@@ -7,7 +7,7 @@ WaterMelon T-5740
 https://segaretro.org/Pier_Solar_and_the_Great_Architects
 
 TODO:
-- several unknowns in TIME io range;
+- several unknowns in TIME I/O range;
 
 **************************************************************************************************/
 

@@ -97,14 +97,14 @@ void megadrive_rom_sram_device::cart_map(address_map &map)
 
 void megadrive_rom_sram_device::time_io_map(address_map &map)
 {
-	// TODO: does all Sega games have this?
-	// there must be a threshold where this is a thing vs. where is not ...
 	map(0xf1, 0xf1).lw8(NAME([this] (offs_t offset, u8 data) {
-		if (BIT(data, 1))
-			m_sram_view.disable();
-		else
+		if (BIT(data, 0))
 			m_sram_view.select(0);
-		m_nvram_write_protect = !!BIT(data, 0);
+		else
+			m_sram_view.disable();
+		// TODO: does all Sega games have this?
+		// there must be a threshold where this is a thing vs. where is not ...
+		m_nvram_write_protect = !!BIT(data, 1);
 	}));
 }
 
