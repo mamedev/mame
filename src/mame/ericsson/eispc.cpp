@@ -122,7 +122,7 @@ public:
 		, m_lpt(*this, "lpt")
 		, m_kbd8251(*this, "kbd8251")
 		, m_keyboard(*this, "keyboard")
-		, m_leds(*this, "kbled%u")
+		, m_leds(*this, "kbled%u", 0U)
 		, m_pic8259(*this, "pic8259")
 		, m_pit8253(*this, "pit8253")
 		, m_speaker(*this, "speaker")

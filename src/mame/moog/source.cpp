@@ -87,10 +87,10 @@ public:
 		, m_keyboard_io(*this, "keyboard_oct_%d", 1U)
 		, m_encoder(*this, "incremental_controller")
 		, m_trigger_io(*this, "trigger_in")
-		, m_octave_led(*this, "octave_led_%d")
+		, m_octave_led(*this, "octave_led_%d", 0U)
 		, m_lfo_rate_led(*this, "mod_rate_led")
-		, m_program_display(*this, "program_digit_%d")
-		, m_edit_display(*this, "edit_digit_%d")
+		, m_program_display(*this, "program_digit_%d", 0U)
+		, m_edit_display(*this, "edit_digit_%d", 0U)
 		, m_edit_led(*this, "edit_led")
 		, m_kb_track(*this, "kb_track")
 		, m_osc_waveform(*this, "osc_%d_waveform", 1U)
@@ -100,7 +100,8 @@ public:
 		, m_lfo_shape(*this, "lfo_shape")
 		, m_trigger_out(*this, "trigger_out")
 		, m_cv(int(CV::SIZE), 0)
-	{}
+	{
+	}
 
 	void source(machine_config &config) ATTR_COLD;
 

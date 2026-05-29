@@ -191,7 +191,8 @@ public:
 		m_tms6100(*this, "tms6100"),
 		m_cart(*this, "cartslot"),
 		m_inputs(*this, "IN.%u", 0),
-		m_power_on(*this, "power")
+		m_power_on(*this, "power"),
+		m_overlay_code_output(*this, "overlay_code")
 	{ }
 
 	// machine configs
@@ -215,6 +216,7 @@ protected:
 	optional_device<generic_slot_device> m_cart;
 	required_ioport_array<10> m_inputs;
 	output_finder<> m_power_on;
+	output_finder<> m_overlay_code_output;
 
 	u8 *m_cart_base = nullptr;
 	u16 m_o = 0;
@@ -231,6 +233,7 @@ protected:
 void snspellc_state::machine_start()
 {
 	m_power_on.resolve();
+	m_overlay_code_output.resolve();
 
 	// register for savestates
 	save_item(NAME(m_o));
@@ -401,10 +404,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(tntell_state::get_overlay)
 	m_overlay_code = m_overlay_inp->read();
 
 	// try to get it from (external) layout
+	// FIXME: replace this with a layout script that sets an input value for the current page
 	if (m_overlay_code == 0x20)
 	{
 		// as output value, eg. with defstate (in decimal)
-		m_overlay_code = output().get_value("overlay_code") & 0x1f;
+		m_overlay_code = m_overlay_code_output & 0x1f;
 
 		// and from current view name ($ + 2 hex digits)
 		render_target *target = machine().render().first_target();

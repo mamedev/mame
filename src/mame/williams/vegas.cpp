@@ -412,7 +412,7 @@ private:
 	optional_ioport m_io_system;
 	optional_ioport m_io_dips;
 	output_finder<> m_system_led;
-	output_finder<1> m_wheel_driver;
+	output_finder<> m_wheel_driver;
 	output_finder<16> m_lamps;
 
 	static const uint8_t translate49[7];
@@ -1158,7 +1158,7 @@ void vegas_state::wheel_board_w(uint32_t data)
 	if (chip_select && latch_clk) {
 		switch (op) {
 		case 0x0:
-			m_wheel_driver[0] = arg; // target wheel angle. signed byte.
+			m_wheel_driver = arg; // target wheel angle. signed byte.
 			m_wheel_force = int8_t(~arg);
 			break;
 

@@ -22,14 +22,14 @@ public:
 	wpc_out_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~wpc_out_device();
 
+	void set_names(const char *const *names);
+	void set_handler(handler_t cb);
+	void set_gi_count(int _count);
+
 	void out_w(offs_t offset, uint8_t data);
 	void out4_w(uint8_t data); // fixed offset 4
 	void gi_w(uint8_t data);
 	void led_w(uint8_t data);
-
-	void set_names(const char *const *names);
-	void set_handler(handler_t cb);
-	void set_gi_count(int _count);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -41,14 +41,15 @@ protected:
 
 	void send_output(int sid, int state);
 
-	uint8_t state[6]{}, gi = 0;
-	bool first_after_led = false;
-	attotime previous_gi_update;
-	int gi_count = 0;
-	uint32_t gi_time[5];
-	emu_timer *timer = nullptr;
-	const char *const *names;
+	output_finder<> m_cpu_led;
 	handler_t handler_cb;
+	uint8_t state[6], gi;
+	bool first_after_led;
+	attotime previous_gi_update;
+	int gi_count;
+	uint32_t gi_time[5];
+	emu_timer *timer;
+	const char *const *names;
 };
 
 DECLARE_DEVICE_TYPE(WPC_OUT, wpc_out_device)
