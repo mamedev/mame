@@ -332,8 +332,8 @@ ROM_END
 
 void gt_device_base::device_add_mconfig(machine_config &config)
 {
-	DP8510(config, m_bpu[0], 0);
-	DP8510(config, m_bpu[1], 0);
+	DP8510(config, m_bpu[0]);
+	DP8510(config, m_bpu[1]);
 }
 
 void interpro_digitizer_devices(device_slot_interface &device)
@@ -385,8 +385,8 @@ void mpcb963_device::device_add_mconfig(machine_config &config)
 	m_screen[0]->set_screen_update(FUNC(mpcb963_device::screen_update<0>));
 	m_screen[0]->screen_vblank().set(FUNC(device_cbus_card_interface::irq3));
 	BT459(config, m_ramdac[0], pixclock);
-	RAM(config, m_vram[0], 0).set_default_size("1M");
-	RAM(config, m_mram[0], 0).set_default_size("128K");
+	RAM(config, m_vram[0]).set_default_size("1M");
+	RAM(config, m_mram[0]).set_default_size("128K");
 }
 
 void mpcba79_device::device_add_mconfig(machine_config &config)
@@ -400,15 +400,15 @@ void mpcba79_device::device_add_mconfig(machine_config &config)
 	m_screen[0]->set_screen_update(FUNC(mpcba79_device::screen_update<0>));
 	m_screen[0]->screen_vblank().set(FUNC(device_cbus_card_interface::irq3));
 	BT459(config, m_ramdac[0], pixclock);
-	RAM(config, m_vram[0], 0).set_default_size("1M");
-	RAM(config, m_mram[0], 0).set_default_size("128K");
+	RAM(config, m_vram[0]).set_default_size("1M");
+	RAM(config, m_mram[0]).set_default_size("128K");
 
 	SCREEN(config, m_screen[1], SCREEN_TYPE_RASTER);
 	m_screen[1]->set_raw(pixclock, 1504, 296 + GT_X_DELTA, 1184 + 296 + GT_X_DELTA, 920, 34, 884 + 34);
 	m_screen[1]->set_screen_update(FUNC(mpcba79_device::screen_update<1>));
 	BT459(config, m_ramdac[1], pixclock);
-	RAM(config, m_vram[1], 0).set_default_size("1M");
-	RAM(config, m_mram[1], 0).set_default_size("128K");
+	RAM(config, m_vram[1]).set_default_size("1M");
+	RAM(config, m_mram[1]).set_default_size("128K");
 }
 
 /*
@@ -433,8 +433,8 @@ void msmt070_device::device_add_mconfig(machine_config &config)
 	m_screen[0]->set_screen_update(FUNC(msmt070_device::screen_update<0>));
 	m_screen[0]->screen_vblank().set(FUNC(device_cbus_card_interface::irq3));
 	BT459(config, m_ramdac[0], pixclock);
-	RAM(config, m_vram[0], 0).set_default_size("2M");
-	RAM(config, m_mram[0], 0).set_default_size("128K");
+	RAM(config, m_vram[0]).set_default_size("2M");
+	RAM(config, m_mram[0]).set_default_size("128K");
 }
 
 void msmt071_device::device_add_mconfig(machine_config &config)
@@ -448,15 +448,15 @@ void msmt071_device::device_add_mconfig(machine_config &config)
 	m_screen[0]->set_screen_update(FUNC(msmt071_device::screen_update<0>));
 	m_screen[0]->screen_vblank().set(FUNC(device_cbus_card_interface::irq3));
 	BT459(config, m_ramdac[0], pixclock);
-	RAM(config, m_vram[0], 0).set_default_size("2M");
-	RAM(config, m_mram[0], 0).set_default_size("128K");
+	RAM(config, m_vram[0]).set_default_size("2M");
+	RAM(config, m_mram[0]).set_default_size("128K");
 
 	SCREEN(config, m_screen[1], SCREEN_TYPE_RASTER);
 	m_screen[1]->set_raw(pixclock, 1472, 264 + GT_X_DELTA, 1184 + 264 + GT_X_DELTA, 944, 57, 884 + 57);
 	m_screen[1]->set_screen_update(FUNC(msmt071_device::screen_update<1>));
 	BT459(config, m_ramdac[1], pixclock);
-	RAM(config, m_vram[1], 0).set_default_size("2M");
-	RAM(config, m_mram[1], 0).set_default_size("128K");
+	RAM(config, m_vram[1]).set_default_size("2M");
+	RAM(config, m_mram[1]).set_default_size("128K");
 }
 
 /*
@@ -483,8 +483,8 @@ void msmt081_device::device_add_mconfig(machine_config &config)
 	BT459(config, m_ramdac[0], pixclock);
 
 	// FIXME: following memory sizes are pure speculation
-	RAM(config, m_vram[0], 0).set_default_size("4M"); // guess
-	RAM(config, m_mram[0], 0).set_default_size("256K"); // guess
+	RAM(config, m_vram[0]).set_default_size("4M"); // guess
+	RAM(config, m_mram[0]).set_default_size("256K"); // guess
 }
 
 /*
@@ -503,9 +503,9 @@ void mpcbb68_device::device_add_mconfig(machine_config &config)
 	BT459(config, m_ramdac[0], pixclock);
 
 	// FIXME: pure speculation
-	RAM(config, m_vram[0], 0).set_default_size("2M");
-	RAM(config, m_mram[0], 0).set_default_size("128K");
-	RAM(config, m_hram[0], 0).set_default_size("512K");
+	RAM(config, m_vram[0]).set_default_size("2M");
+	RAM(config, m_mram[0]).set_default_size("128K");
+	RAM(config, m_hram[0]).set_default_size("512K");
 }
 
 /*
@@ -530,9 +530,9 @@ void mpcbb92_device::device_add_mconfig(machine_config &config)
 	BT459(config, m_ramdac[0], pixclock);
 
 	// FIXME: following memory sizes are pure speculation (40 parts @ 256Kx4?)
-	RAM(config, m_vram[0], 0).set_default_size("4M");
-	RAM(config, m_mram[0], 0).set_default_size("256K");
-	RAM(config, m_hram[0], 0).set_default_size("1M");
+	RAM(config, m_vram[0]).set_default_size("4M");
+	RAM(config, m_mram[0]).set_default_size("256K");
+	RAM(config, m_hram[0]).set_default_size("1M");
 }
 
 gt_device_base::gt_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const bool double_buffered, const bool masked_reads)

@@ -187,7 +187,7 @@ void sdk86_state::sdk86(machine_config &config)
 	config.set_default_layout(layout_sdk86);
 
 	/* Devices */
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_uart->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_uart->rts_handler().set(m_uart, FUNC(i8251_device::write_cts));

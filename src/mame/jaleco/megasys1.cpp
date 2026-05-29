@@ -1950,7 +1950,7 @@ void megasys1_typea_state::system_A(machine_config &config)
 void megasys1_typea_state::system_A_d65006(machine_config &config)
 {
 	system_A(config);
-	MEGASYS1_GATEARRAY_D65006(config, m_gatearray, 0);
+	MEGASYS1_GATEARRAY_D65006(config, m_gatearray);
 	m_gatearray->set_cpuspace_tag(m_maincpu, AS_PROGRAM);
 	m_gatearray->set_cpuregion_tag("maincpu");
 }
@@ -1958,7 +1958,7 @@ void megasys1_typea_state::system_A_d65006(machine_config &config)
 void megasys1_typea_state::system_A_gs88000(machine_config &config)
 {
 	system_A(config);
-	MEGASYS1_GATEARRAY_GS88000(config, m_gatearray, 0);
+	MEGASYS1_GATEARRAY_GS88000(config, m_gatearray);
 	m_gatearray->set_cpuspace_tag(m_maincpu, AS_PROGRAM);
 	m_gatearray->set_cpuregion_tag("maincpu");
 }
@@ -1966,7 +1966,7 @@ void megasys1_typea_state::system_A_gs88000(machine_config &config)
 void megasys1_typea_state::system_A_unkarray(machine_config &config)
 {
 	system_A(config);
-	MEGASYS1_GATEARRAY_UNKARRAY(config, m_gatearray, 0);
+	MEGASYS1_GATEARRAY_UNKARRAY(config, m_gatearray);
 	m_gatearray->set_cpuspace_tag(m_maincpu, AS_PROGRAM);
 	m_gatearray->set_cpuregion_tag("maincpu");
 }

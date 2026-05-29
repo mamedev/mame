@@ -226,7 +226,7 @@ void ibm5550_state::ibm5550(machine_config &config)
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// D8253C-2
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 
 	// Parallel port, 36 pins
 	// keyboard connector
@@ -264,10 +264,10 @@ void ibm5550_state::ibm5550(machine_config &config)
 //  mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
 
 	// FIXME: determine ISA bus clock
-//  ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false);
-//  ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
-//  ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
-//  ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
+//  ISA8_SLOT(config, "isa1", "mb:isa", pc_isa8_cards, "cga", false);
+//  ISA8_SLOT(config, "isa2", "mb:isa", pc_isa8_cards, "fdc_xt", false);
+//  ISA8_SLOT(config, "isa3", "mb:isa", pc_isa8_cards, "lpt", false);
+//  ISA8_SLOT(config, "isa4", "mb:isa", pc_isa8_cards, "com", false);
 
 	/* keyboard */
 //  pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));

@@ -5763,7 +5763,7 @@ void blitz_state::megadpkr(machine_config &config)
 	m_mcu->portb_w().set(FUNC(blitz_state::mcu_portb_w));
 	m_mcu->portc_w().set(FUNC(blitz_state::mcu_portc_w));
 
-	M48T02(config, "timekpr", 0);
+	M48T02(config, "timekpr");
 
 	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(blitz_state::pottnpkr_mux_port_r));

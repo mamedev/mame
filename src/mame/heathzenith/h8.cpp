@@ -103,7 +103,7 @@ void h8_state::device_config_complete()
 
 void h8_state::h8(machine_config &config)
 {
-	H8BUS(config, m_h8bus, 0);
+	H8BUS(config, m_h8bus);
 
 	H8BUS_SLOT(config,  m_p1, "h8bus", h8_p1_cards,  "fp");
 	H8BUS_SLOT(config,  m_p2, "h8bus", h8_p2_cards,  "cpu8080");

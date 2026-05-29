@@ -1715,12 +1715,12 @@ void roland_tr707_state::tr_707_727_common(machine_config &config)
 
 	TIMER(config, m_tempo_timer).configure_generic(FUNC(roland_tr707_state::tempo_timer_tick));
 	TIMER(config, m_tempo_restart_timer).configure_generic(FUNC(roland_tr707_state::tempo_restart_timer_tick));
-	TTL7474(config, m_tempo_ff, 0);  // 4013, IC4a.
+	TTL7474(config, m_tempo_ff);  // 4013, IC4a.
 	m_tempo_ff->comp_output_cb().set(FUNC(roland_tr707_state::internal_tempo_clock_cb));
 
 	VA_RC_EG(config, m_accent_adc_rc).set_c(CAP_U(0.27));  // C15.
 	TIMER(config, m_accent_adc_timer).configure_generic(FUNC(roland_tr707_state::accent_adc_timer_tick));
-	TTL7474(config, m_accent_adc_ff, 0);  // 4013, IC4b.
+	TTL7474(config, m_accent_adc_ff);  // 4013, IC4b.
 	m_accent_adc_ff->d_w(1);  // D tied to VCC.
 	m_accent_adc_ff->comp_output_cb().set(FUNC(roland_tr707_state::accent_adc_flipflop_cb));
 

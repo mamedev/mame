@@ -336,7 +336,7 @@ void patinho_feio_state::patinho_feio(machine_config &config)
 //  m_maincpu->iodev_read<14>().set(FUNC(patinho_feio_state::papertapereader_data_r));
 
 	/* DECWRITER */
-	TELEPRINTER(config, m_decwriter, 0);
+	TELEPRINTER(config, m_decwriter);
 	m_decwriter->set_keyboard_callback(FUNC(patinho_feio_state::decwriter_kbd_input));
 
 	/* Teletype */

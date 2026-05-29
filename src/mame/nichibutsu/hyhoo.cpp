@@ -535,7 +535,7 @@ void hyhoo_state::hyhoo(machine_config &config)
 	m_screen->set_visarea(0, 512-1, 16, 240-1);
 	m_screen->set_screen_update(FUNC(hyhoo_state::screen_update));
 
-	NB1413M3(config, m_nb1413m3, 0, nb1413m3_device::NB1413M3_HYHOO);
+	NB1413M3(config, m_nb1413m3, nb1413m3_device::NB1413M3_HYHOO);
 	m_nb1413m3->set_blitter_rom_tag("blitter");
 
 	// sound hardware

@@ -1026,7 +1026,7 @@ void namcos1_state::ns1(machine_config &config)
 	m_mcu->out_p1_cb().set(FUNC(namcos1_state::coin_w));
 	m_mcu->out_p2_cb().set(FUNC(namcos1_state::dac_gain_w));
 
-	NAMCO_C117(config, m_c117, 0);
+	NAMCO_C117(config, m_c117);
 	m_c117->set_addrmap(AS_PROGRAM, &namcos1_state::virtual_map);
 	m_c117->set_cpu_tags("maincpu", "subcpu");
 	m_c117->subres_cb().set(FUNC(namcos1_state::subres_w));
@@ -1036,7 +1036,7 @@ void namcos1_state::ns1(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	LS157(config, m_dsw_sel, 0); // LS257 'A3'
+	LS157(config, m_dsw_sel); // LS257 'A3'
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1045,7 +1045,7 @@ void namcos1_state::ns1(machine_config &config)
 	screen.screen_vblank().set(FUNC(namcos1_state::screen_vblank));
 	screen.set_palette(m_c116);
 
-	NAMCO_C116(config, m_c116, 0);
+	NAMCO_C116(config, m_c116);
 	m_c116->enable_shadows();
 
 	NAMCOS1_SPRITE(config, m_spritegen, XTAL(49'152'000), m_c116, gfx_namcos1_spr);
@@ -1054,7 +1054,7 @@ void namcos1_state::ns1(machine_config &config)
 	m_spritegen->set_gfxbank_callback(FUNC(namcos1_state::sprite_bank_cb));
 	m_spritegen->flip_callback().set(FUNC(namcos1_state::flip_screen_set));
 
-	NAMCO_C123TMAP(config, m_c123tmap, 0);
+	NAMCO_C123TMAP(config, m_c123tmap);
 	m_c123tmap->set_palette(m_c116);
 	m_c123tmap->set_tile_callback(FUNC(namcos1_state::TilemapCB));
 	m_c123tmap->set_color_base(0x0800);

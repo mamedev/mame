@@ -1150,7 +1150,7 @@ void stv_state::stv(machine_config &config)
 	m_scsp->add_route(0, "speaker", 1.0, 0);
 	m_scsp->add_route(1, "speaker", 1.0, 1);
 
-	SEGA_BILLBOARD(config, m_billboard, 0);
+	SEGA_BILLBOARD(config, m_billboard);
 
 	config.set_default_layout(layout_segabill);
 }
@@ -1158,7 +1158,7 @@ void stv_state::stv(machine_config &config)
 void stv_state::stv_5881(machine_config &config)
 {
 	stv(config);
-	SEGA315_5881_CRYPT(config, m_cryptdevice, 0);
+	SEGA315_5881_CRYPT(config, m_cryptdevice);
 	m_cryptdevice->set_read_cb(FUNC(stv_state::crypt_read_callback));
 }
 
@@ -1193,7 +1193,7 @@ void stv_state::stvcd(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &stv_state::stvcd_mem);
 	m_slave->set_addrmap(AS_PROGRAM, &stv_state::stvcd_mem);
 
-	saturn_cd_hle_device &stvcd(SATURN_CD_HLE(config, "saturn_cd_hle", 0));
+	saturn_cd_hle_device &stvcd(SATURN_CD_HLE(config, "saturn_cd_hle"));
 	stvcd.add_route(0, "scsp", 1.0, 0);
 	stvcd.add_route(1, "scsp", 1.0, 1);
 }
@@ -1208,7 +1208,7 @@ void stv_state::stv_5838(machine_config &config)
 {
 	stv(config);
 
-	SEGA315_5838_COMP(config, m_5838crypt, 0);
+	SEGA315_5838_COMP(config, m_5838crypt);
 	m_5838crypt->set_addrmap(0, &stv_state::sega5838_map);
 }
 
@@ -1231,7 +1231,7 @@ void stv_state::batmanfr_sound_comms_w(offs_t offset, uint32_t data, uint32_t me
 void stv_state::batmanfr(machine_config &config)
 {
 	stv(config);
-	ACCLAIM_RAX(config, m_rax, 0);
+	ACCLAIM_RAX(config, m_rax);
 	// TODO: RAX output connected to SCSP?
 	m_rax->add_route(0, "speaker", 1.0, 0);
 	m_rax->add_route(1, "speaker", 1.0, 1);

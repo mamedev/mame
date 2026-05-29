@@ -783,15 +783,15 @@ void sixtrak_state::sixtrak_common(machine_config &config, device_sound_interfac
 	aciaclock.signal_handler().append("midiacia", FUNC(acia6850_device::write_rxc));
 	aciaclock.signal_handler().append("nmiff", FUNC(ttl7474_device::clock_w));
 
-	auto &acia = ACIA6850(config, "midiacia", 0);  // U137 (or is it U157?)
+	auto &acia = ACIA6850(config, "midiacia");  // U137 (or is it U157?)
 	acia.txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	acia.irq_handler().set("nmiff", FUNC(ttl7474_device::d_w)).invert();
 	acia.write_dcd(0);
 	acia.write_cts(0);
 
-	TTL7474(config, "nmiff", 0).output_cb().set_inputline(m_maincpu, INPUT_LINE_NMI).invert();  // U146B
+	TTL7474(config, "nmiff").output_cb().set_inputline(m_maincpu, INPUT_LINE_NMI).invert();  // U146B
 
-	TTL7474(config, m_tuning_ff, 0);
+	TTL7474(config, m_tuning_ff);
 	m_tuning_ff->comp_output_cb().set(m_pit, FUNC(pit8253_device::write_clk0));
 
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set("midiacia", FUNC(acia6850_device::write_rxd));

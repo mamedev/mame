@@ -21,7 +21,7 @@
 class segas32_state : public device_t
 {
 public:
-	segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
@@ -304,16 +304,16 @@ protected:
 class segas32_regular_state : public segas32_state
 {
 public:
-	segas32_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas32_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class segas32_analog_state : public segas32_state
 {
 public:
-	segas32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	segas32_analog_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	segas32_analog_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
@@ -321,7 +321,7 @@ protected:
 class segas32_trackball_state : public segas32_state
 {
 public:
-	segas32_trackball_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas32_trackball_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void system32_trackball_map(address_map &map) ATTR_COLD;
 protected:
@@ -331,10 +331,10 @@ protected:
 class segas32_4player_state : public segas32_state
 {
 public:
-	segas32_4player_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas32_4player_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	segas32_4player_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	segas32_4player_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
@@ -342,7 +342,7 @@ protected:
 class segas32_v25_state : public segas32_4player_state
 {
 public:
-	segas32_v25_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas32_v25_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	static const uint8_t arf_opcode_table[256];
 	static const uint8_t ga2_opcode_table[256];
@@ -358,7 +358,7 @@ private:
 class segas32_upd7725_state : public segas32_analog_state
 {
 public:
-	segas32_upd7725_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas32_upd7725_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -367,7 +367,7 @@ protected:
 class segas32_cd_state : public segas32_state
 {
 public:
-	segas32_cd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas32_cd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void lamps1_w(uint8_t data);
 	void lamps2_w(uint8_t data);
@@ -386,10 +386,10 @@ private:
 class sega_multi32_state : public segas32_state
 {
 public:
-	sega_multi32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_multi32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	sega_multi32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sega_multi32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
@@ -397,7 +397,7 @@ protected:
 class sega_multi32_analog_state : public sega_multi32_state
 {
 public:
-	sega_multi32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_multi32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	ioport_value in2_analog_read();
 	ioport_value in3_analog_read();
@@ -416,7 +416,7 @@ private:
 class sega_multi32_6player_state : public sega_multi32_state
 {
 public:
-	sega_multi32_6player_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_multi32_6player_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

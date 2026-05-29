@@ -292,7 +292,7 @@ void jazz_state::jazz(machine_config &config)
 	m_vram->set_default_value(0);
 
 	// local bus dma, timer and interrupt controller
-	MCT_ADR(config, m_mct_adr, 0);
+	MCT_ADR(config, m_mct_adr);
 	m_mct_adr->set_addrmap(0, &jazz_state::mct_map);
 	m_mct_adr->out_int_dma_cb().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 	m_mct_adr->out_int_device_cb().set_inputline(m_cpu, INPUT_LINE_IRQ1);
@@ -392,7 +392,7 @@ void jazz_state::jazz(machine_config &config)
 	serial1.ri_handler().set(m_ace[1], FUNC(ns16550_device::ri_w));
 	serial1.rxd_handler().set(m_ace[1], FUNC(ns16550_device::rx_w));
 
-	PC_LPT(config, m_lpt, 0);
+	PC_LPT(config, m_lpt);
 	m_lpt->irq_handler().set(m_mct_adr, FUNC(mct_adr_device::irq<0>));
 
 	// TODO: sound, interrupt 2, drq 2(l) & 3(r)

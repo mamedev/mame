@@ -611,10 +611,10 @@ void basf7100_state::basf7100(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_usec(600));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	I8251(config, m_usart[0], 0); // unknown clock
+	I8251(config, m_usart[0]); // unknown clock
 	m_usart[0]->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_usart[0]->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_usart[0]->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
@@ -628,7 +628,7 @@ void basf7100_state::basf7100(machine_config &config)
 	rs232.cts_handler().set(m_usart[0], FUNC(i8251_device::write_cts));
 	rs232.dsr_handler().set(m_usart[0], FUNC(i8251_device::write_dsr));
 
-	I8251(config, m_usart[1], 0); // unknown clock
+	I8251(config, m_usart[1]); // unknown clock
 	m_usart[1]->txd_handler().set("auxrs232", FUNC(rs232_port_device::write_txd));
 	m_usart[1]->rts_handler().set("auxrs232", FUNC(rs232_port_device::write_rts));
 	m_usart[1]->dtr_handler().set("auxrs232", FUNC(rs232_port_device::write_dtr));

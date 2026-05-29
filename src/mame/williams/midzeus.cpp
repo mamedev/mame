@@ -1397,12 +1397,12 @@ void midzeus_state::midzeus(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs"));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.add_route(0, "speaker", 1.0, 1);
 	dcs.add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -1448,15 +1448,15 @@ void midzeus2_state::midzeus2(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
+	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs"));
 	dcs.set_maincpu_tag(m_maincpu);
 	dcs.add_route(0, "speaker", 1.0, 1);
 	dcs.add_route(1, "speaker", 1.0, 0);
 
-	M48T35(config, m_m48t35, 0);
+	M48T35(config, m_m48t35);
 
 	// I/O hardware
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -1466,10 +1466,10 @@ void midzeus2_state::midzeus2(machine_config &config)
 	m_ioasic->set_yearoffs(99);
 	m_ioasic->set_upper(474);
 
-	IBM21S851(config, m_fw_phy, 0);
+	IBM21S851(config, m_fw_phy);
 	m_fw_phy->reset_cb().set(m_fw_link, FUNC(tsb12lv01a_device::phy_reset_w));
 
-	TSB12LV01A(config, m_fw_link, 0);
+	TSB12LV01A(config, m_fw_link);
 	m_fw_link->int_cb().set(FUNC(midzeus2_state::firewire_irq));
 	m_fw_link->phy_read().set(m_fw_phy, FUNC(ibm21s851_device::read));
 	m_fw_link->phy_write().set(m_fw_phy, FUNC(ibm21s851_device::write));

@@ -605,7 +605,7 @@ void sun3x_state::sun3_80(machine_config &config)
 	M68030(config, m_maincpu, 20000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sun3x_state::sun3_80_mem);
 
-	M48T02(config, TIMEKEEPER_TAG, 0);
+	M48T02(config, TIMEKEEPER_TAG);
 
 	SCC8530(config, m_scc1, 4.9152_MHz_XTAL);
 	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));

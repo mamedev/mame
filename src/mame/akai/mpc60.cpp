@@ -652,7 +652,7 @@ void mpc60_state::mpc60(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, m_floppy, mpc60_state::floppies, "35dd", add_formats).enable_sound(true);
 
-	hd61830_device &lcdc(HD61830(config, "lcdc", 0)); // LC7981
+	hd61830_device &lcdc(HD61830(config, "lcdc")); // LC7981
 	lcdc.set_addrmap(0, &mpc60_state::lcd_map);
 	lcdc.set_screen("screen");
 

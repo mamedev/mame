@@ -1185,12 +1185,12 @@ public:
 		m_sub->write_sci_clk<1>().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
 		m_sub->write_sci_clk<1>().append(m_settings, FUNC(namco_settings_device::clk_w));
 
-		NAMCO_SETTINGS(config, m_settings, 0);
+		NAMCO_SETTINGS(config, m_settings);
 
 		RTC4543(config, m_rtc, XTAL(32'768));
 		m_rtc->data_cb().set(m_sub, FUNC(h8_device::sci_rx_w<1>));
 
-		AT28C16(config, "at28c16", 0);
+		AT28C16(config, "at28c16");
 
 		/* sound hardware */
 		SPEAKER(config, "speaker", 2).front();

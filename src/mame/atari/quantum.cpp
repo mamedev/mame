@@ -307,7 +307,7 @@ void quantum_state::quantum(machine_config &config)
 	screen.set_visarea(0, 900, 0, 600);
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	AVG_QUANTUM(config, m_avg, 0);
+	AVG_QUANTUM(config, m_avg);
 	m_avg->set_vector("vector");
 	m_avg->set_memory(m_maincpu, AS_PROGRAM, 0x800000);
 

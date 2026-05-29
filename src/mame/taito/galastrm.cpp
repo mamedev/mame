@@ -845,7 +845,7 @@ void galastrm_state::galastrm(machine_config &config)
 	adc.in_callback<0>().set_ioport("STICKX");
 	adc.in_callback<1>().set_ioport("STICKY");
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_2_callback().set_ioport("IN0");
 	tc0510nio.read_3_callback().set_ioport("IN1");
 	tc0510nio.write_3_callback().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(5);
@@ -865,22 +865,22 @@ void galastrm_state::galastrm(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_galastrm);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_offsets(-48, -56);
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_tc0110pcr);
 	m_tc0480scp->set_offsets(-40, -3);
 
-	TC0110PCR(config, m_tc0110pcr, 0);
+	TC0110PCR(config, m_tc0110pcr);
 	m_tc0110pcr->set_shift(0);
 	m_tc0110pcr->set_color_callback(FUNC(galastrm_state::color_xrgb555));
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en"));
 	taito_en.add_route(0, "speaker", 1.0, 0);
 	taito_en.add_route(1, "speaker", 1.0, 1);
 }

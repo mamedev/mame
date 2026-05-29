@@ -750,7 +750,7 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	// instead.
 	for (int voice = 0; voice < NUM_MUX_VOICES; ++voice)
 	{
-		DAC76(config, m_mux_dac[voice], 0);  // AM6070 (U88).
+		DAC76(config, m_mux_dac[voice]);  // AM6070 (U88).
 		m_mux_dac[voice]->configure_voltage_output(R_DAC_I2V, R_DAC_I2V);  // R58, R59.
 		m_mux_dac[voice]->set_fixed_iref(MUX_DAC_IREF);
 		FILTER_VOLUME(config, m_mux_volume[voice]);  // CD4053 (U90), R60, R62 (see mux_drum_w()).
@@ -774,7 +774,7 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	// *** Snare / sidestick section.
 
 	TIMER(config, m_snare_timer).configure_generic(FUNC(linndrum_audio_device::snare_timer_tick));  // 74LS627 (U80A).
-	DAC76(config, m_snare_dac, 0);  // AM6070 (U92)
+	DAC76(config, m_snare_dac);  // AM6070 (U92)
 	m_snare_dac->configure_voltage_output(R_DAC_I2V, R_DAC_I2V);  // R127, R126.
 
 	// The DAC's current outputs are processed by a current-to-voltage converter
@@ -800,7 +800,7 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	// components.
 
 	TIMER(config, m_tom_timer).configure_generic(FUNC(linndrum_audio_device::tom_timer_tick));  // 74LS627 (U77B).
-	DAC76(config, m_tom_dac, 0);  // AM6070 (U82).
+	DAC76(config, m_tom_dac);  // AM6070 (U82).
 	// Schematic is missing the second resistor, but that's almost certainly an error.
 	m_tom_dac->configure_voltage_output(R_DAC_I2V, R_DAC_I2V);
 	m_tom_dac->set_fixed_iref(TOM_DAC_IREF);

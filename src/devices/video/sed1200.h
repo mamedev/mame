@@ -28,7 +28,7 @@ public:
 	const uint8_t *render();
 
 protected:
-	sed1200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sed1200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_start() override ATTR_COLD;
 
@@ -52,7 +52,7 @@ private:
 
 class sed1200d0a_device : public sed1200_device {
 public:
-	sed1200d0a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sed1200d0a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
@@ -60,7 +60,7 @@ protected:
 
 class sed1200f0a_device : public sed1200_device {
 public:
-	sed1200f0a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sed1200f0a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
@@ -68,7 +68,7 @@ protected:
 
 class sed1200d0b_device : public sed1200_device {
 public:
-	sed1200d0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sed1200d0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
@@ -76,7 +76,7 @@ protected:
 
 class sed1200f0b_device : public sed1200_device {
 public:
-	sed1200f0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sed1200f0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;

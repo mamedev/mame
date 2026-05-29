@@ -1073,7 +1073,7 @@ void taitopjc_state::taitopjc(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 32768);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
-	TC0780FPA(config, m_tc0780fpa, 0);
+	TC0780FPA(config, m_tc0780fpa);
 }
 
 

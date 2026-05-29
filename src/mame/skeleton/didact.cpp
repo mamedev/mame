@@ -787,7 +787,7 @@ void modulab_state::modulab(machine_config &config)
 	config.set_default_layout(layout_modulab);
 
 	/* Devices */
-	MM74C923(config, m_kb, 0);
+	MM74C923(config, m_kb);
 	m_kb->set_cap_osc(CAP_U(0.10));
 	m_kb->set_cap_debounce(CAP_U(1));
 	m_kb->da_wr_callback().set(FUNC(modulab_state::da_w));
@@ -812,7 +812,7 @@ void md6802_state::md6802(machine_config &config)
 	config.set_default_layout(layout_md6802);
 
 	/* Devices */
-	TTL74145(config, m_tb16_74145, 0);
+	TTL74145(config, m_tb16_74145);
 	/* PIA #1 0xA000-0xA003 - used differently by laborations and loaded software */
 	PIA6821(config, m_pia1);
 
@@ -848,10 +848,10 @@ void mp68a_state::mp68a(machine_config &config)
 
 	/* Devices */
 	/* PIA #1 0x500-0x503 - used differently by laborations and loaded software */
-	PIA6821(config, m_pia1, 0); // actually 6820
+	PIA6821(config, m_pia1); // actually 6820
 
 	/* PIA #2 Keyboard & Display 0x600-0x603 */
-	PIA6821(config, m_pia2, 0); // actually 6820
+	PIA6821(config, m_pia2); // actually 6820
 	/* --PIA inits----------------------- */
 	/* 0x0BAF 0x601 (Control A) = 0x30 - CA2 is low and enable DDRA */
 	/* 0x0BB1 0x603 (Control B) = 0x30 - CB2 is low and enable DDRB */

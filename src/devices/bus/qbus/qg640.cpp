@@ -89,8 +89,8 @@ void qg640_device::device_add_mconfig(machine_config &config)
 	m_acrtc->set_screen("screen");
 	m_acrtc->set_addrmap(0, &qg640_device::videoram_map);
 
-	BT471(config, m_clut[0], 0); // IMSG170P-35
-	BT471(config, m_clut[1], 0); // IMSG170P-35
+	BT471(config, m_clut[0]); // IMSG170P-35
+	BT471(config, m_clut[1]); // IMSG170P-35
 }
 
 ROM_START(qg640)

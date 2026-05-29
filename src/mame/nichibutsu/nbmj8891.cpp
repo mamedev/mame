@@ -2211,7 +2211,7 @@ void nbmj8891_state::gionbana(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::gionbana_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(nbmj8891_state::irq0_line_hold));
 
-	NB1413M3(config, m_nb1413m3, 0, nb1413m3_device::NB1413M3_GIONBANA);
+	NB1413M3(config, m_nb1413m3, nb1413m3_device::NB1413M3_GIONBANA);
 	m_nb1413m3->set_blitter_rom_tag("gfx1");
 
 	/* video hardware */

@@ -473,7 +473,7 @@ void accomm_state::accomm(machine_config &config)
 	rs423.dcd_handler().set(m_scn2641, FUNC(scn2641_device::dcd_w));
 	rs423.cts_handler().set(m_scn2641, FUNC(scn2641_device::cts_w));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("modem", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("modem", FUNC(rs232_port_device::write_rts));
 	m_acia->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
@@ -493,7 +493,7 @@ void accomm_state::accomm(machine_config &config)
 	m_adlc->out_txd_cb().set("econet", FUNC(econet_device::host_data_w));
 	m_adlc->out_irq_cb().set_inputline(m_maincpu, G65816_LINE_NMI);
 
-	econet_device &econet(ECONET(config, "econet", 0));
+	econet_device &econet(ECONET(config, "econet"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));

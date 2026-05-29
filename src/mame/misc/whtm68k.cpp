@@ -410,11 +410,11 @@ void whtm68k_state::yizhix(machine_config &config)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 
-	RAMDAC(config, m_ramdac[0], 0, "palette"); // MU9C4870-80PC
+	RAMDAC(config, m_ramdac[0], "palette"); // MU9C4870-80PC
 	m_ramdac[0]->set_addrmap(0, &whtm68k_state::ramdac_map<0>);
 	m_ramdac[0]->set_color_base(0);
 
-	RAMDAC(config, m_ramdac[1], 0, "palette"); // MU9C4870-80PC
+	RAMDAC(config, m_ramdac[1], "palette"); // MU9C4870-80PC
 	m_ramdac[1]->set_addrmap(0, &whtm68k_state::ramdac_map<1>);
 	m_ramdac[1]->set_color_base(0x100);
 

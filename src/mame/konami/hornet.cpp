@@ -1424,7 +1424,7 @@ void hornet_state::hornet(machine_config &config)
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_voodoo[0]->stall_callback().set(m_dsp[0], FUNC(adsp21062_device::write_stall));
 
-	K033906(config, m_k033906[0], 0, m_voodoo[0]);
+	K033906(config, m_k033906[0], m_voodoo[0]);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1432,7 +1432,7 @@ void hornet_state::hornet(machine_config &config)
 	screen.set_raw(64_MHz_XTAL / 4, 644, 41, 41 + 512, 428, 27, 27 + 384);
 	screen.set_screen_update(FUNC(hornet_state::screen_update<0>));
 
-	K037122(config, m_k037122[0], 0);
+	K037122(config, m_k037122[0]);
 	m_k037122[0]->set_screen("screen");
 
 	K056800(config, m_k056800, 16.9344_MHz_XTAL);
@@ -1444,12 +1444,12 @@ void hornet_state::hornet(machine_config &config)
 		.add_route(0, "speaker", 1.0, 0)
 		.add_route(1, "speaker", 1.0, 1);
 
-	M48T58(config, "m48t58", 0);
+	M48T58(config, "m48t58");
 
-	ADC12138(config, m_adc12138, 0);
+	ADC12138(config, m_adc12138);
 	m_adc12138->set_ipt_convert_callback(FUNC(hornet_state::adc12138_input_callback));
 
-	KONPPC(config, m_konppc, 0);
+	KONPPC(config, m_konppc);
 	m_konppc->set_dsp_tag(0, m_dsp[0]);
 	m_konppc->set_k033906_tag(0, m_k033906[0]);
 	m_konppc->set_voodoo_tag(0, m_voodoo[0]);
@@ -1457,7 +1457,7 @@ void hornet_state::hornet(machine_config &config)
 	m_konppc->set_num_boards(1);
 	m_konppc->set_cgboard_type(konppc_device::CGBOARD_TYPE_HORNET);
 
-	KONPPC_JVS_HOST(config, m_jvs_host, 0);
+	KONPPC_JVS_HOST(config, m_jvs_host);
 	m_jvs_host->output_callback().set([this](uint8_t c) { m_maincpu->ppc4xx_spu_receive_byte(c); });
 }
 
@@ -1478,7 +1478,7 @@ void hornet_state::hornet_lan(machine_config &config)
 
 	m_dsp[0]->enable_recompiler();
 
-	KONAMI_GN676A_LAN(config, m_gn676_lan, 0);
+	KONAMI_GN676A_LAN(config, m_gn676_lan);
 }
 
 void hornet_state::nbapbp(machine_config &config)
@@ -1489,7 +1489,7 @@ void hornet_state::nbapbp(machine_config &config)
 	// with the 2L6B panel dipswitch settings on the Windy2 board.
 	// NOTE: Harness JVS + cabinet 4 player will work with a second JVS I/O device hooked up, but then
 	// the official recommended setting of cabinet type 4 player + harness JAMMA breaks.
-	KONAMI_WINDY2_JVS_IO_2L6B_PANEL(config, "windy2_jvsio", 0, m_jvs_host);
+	KONAMI_WINDY2_JVS_IO_2L6B_PANEL(config, "windy2_jvsio", m_jvs_host);
 }
 
 void terabrst_state::terabrst(machine_config &config) // TODO: add K056800 from I/O board
@@ -1516,7 +1516,7 @@ void hornet_state::sscope(machine_config &config)
 
 	m_k037122[0]->set_screen("lscreen");
 
-	K037122(config, m_k037122[1], 0); // unknown input clock
+	K037122(config, m_k037122[1]); // unknown input clock
 	m_k037122[1]->set_screen("rscreen");
 
 	m_voodoo[0]->set_screen("lscreen");
@@ -1530,7 +1530,7 @@ void hornet_state::sscope(machine_config &config)
 	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 	m_voodoo[1]->stall_callback().set(m_dsp[1], FUNC(adsp21062_device::write_stall));
 
-	K033906(config, m_k033906[1], 0, m_voodoo[1]);
+	K033906(config, m_k033906[1], m_voodoo[1]);
 
 	// video hardware
 	config.device_remove("screen");
@@ -1546,7 +1546,7 @@ void hornet_state::sscope(machine_config &config)
 	rscreen.set_screen_update(FUNC(hornet_state::screen_update<1>));
 
 	// Comes from the GQ830-PWB(J) board
-	ADC12138(config, m_adc12138_sscope, 0);
+	ADC12138(config, m_adc12138_sscope);
 	m_adc12138_sscope->set_ipt_convert_callback(FUNC(hornet_state::adc12138_input_callback));
 
 	m_konppc->set_dsp_tag(1, m_dsp[1]);

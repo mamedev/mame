@@ -9,7 +9,7 @@ class specnext_layer2_device : public device_t, public device_gfx_interface
 {
 
 public:
-	specnext_layer2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	specnext_layer2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	specnext_layer2_device &set_host_ram_ptr(const u8 *host_ram_ptr) { m_host_ram_ptr = host_ram_ptr; return *this; }
 	specnext_layer2_device &set_palette(const char *tag, u16 base_offset, u16 alt_offset);

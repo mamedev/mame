@@ -1292,7 +1292,7 @@ void sfbonus_state::sfbonus(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(0x100*2); // *2 for priority workaround / custom drawing
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &sfbonus_state::ramdac_map);
 
 

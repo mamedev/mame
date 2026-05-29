@@ -331,12 +331,12 @@ void maxaflex_state::maxaflex(machine_config &config)
 	m_mcu->portb_w().set(FUNC(maxaflex_state::mcu_portb_w));
 	m_mcu->portc_w().set(FUNC(maxaflex_state::mcu_portc_w));
 
-	ATARI_GTIA(config, m_gtia, 0);
+	ATARI_GTIA(config, m_gtia);
 	m_gtia->set_region(GTIA_NTSC);
 	m_gtia->read_callback().set_ioport("console");
 	m_gtia->trigger_callback().set_ioport("djoy_b");
 
-	ATARI_ANTIC(config, m_antic, 0);
+	ATARI_ANTIC(config, m_antic);
 	m_antic->set_gtia_tag(m_gtia);
 
 	pia6821_device &pia(PIA6821(config, "pia"));

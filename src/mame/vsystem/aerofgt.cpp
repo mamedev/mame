@@ -380,7 +380,7 @@ void aerofgt_state::aerofgt(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &aerofgt_state::sound_portmap); // IRQs are triggered by the YM2610
 
-	vs9209_device &io(VS9209(config, "io", 0));
+	vs9209_device &io(VS9209(config, "io"));
 	io.porta_input_cb().set_ioport("P1");
 	io.portb_input_cb().set_ioport("P2");
 	io.portc_input_cb().set_ioport("SYSTEM");
@@ -390,7 +390,7 @@ void aerofgt_state::aerofgt(machine_config &config)
 	io.portg_output_cb().set("watchdog", FUNC(mb3773_device::write_line_ck)).bit(7);
 	io.porth_input_cb().set_ioport("JP1");
 
-	MB3773(config, "watchdog", 0);
+	MB3773(config, "watchdog");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -404,7 +404,7 @@ void aerofgt_state::aerofgt(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aerofgt);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	VSYSTEM_SPR(config, m_spr, 0, m_palette, gfx_aerofgt_spr);
+	VSYSTEM_SPR(config, m_spr, m_palette, gfx_aerofgt_spr);
 	m_spr->set_tile_indirect_cb(FUNC(aerofgt_state::tile_callback));
 	m_spr->set_pri_cb(FUNC(aerofgt_state::pri_callback));
 

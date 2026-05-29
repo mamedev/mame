@@ -498,7 +498,7 @@ void ctk551_state::ctk530(machine_config& config)
 	midiout_slot(mdout);
 	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 
-	PWM_DISPLAY(config, m_pwm, 0);
+	PWM_DISPLAY(config, m_pwm);
 	m_pwm->set_size(4, 8);
 	m_pwm->set_segmask(0x7, 0xff);
 

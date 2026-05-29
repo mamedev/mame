@@ -2658,7 +2658,7 @@ void towns_state::towns_base(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
 	m_speaker->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(307200);
 	m_pit->out_handler<0>().set(FUNC(towns_state::towns_pit_out0_changed));
 	m_pit->set_clk<1>(307200);
@@ -2666,18 +2666,18 @@ void towns_state::towns_base(machine_config &config)
 	m_pit->set_clk<2>(307200);
 	m_pit->out_handler<2>().set(FUNC(towns_state::pit_out2_changed));
 
-	pit8253_device &pit2(PIT8253(config, "pit2", 0));
+	pit8253_device &pit2(PIT8253(config, "pit2"));
 	pit2.set_clk<0>(307200); // reserved
 	pit2.set_clk<1>(1228800); // RS-232
 	pit2.out_handler<1>().set(FUNC(towns_state::pit2_out1_changed));
 	pit2.set_clk<2>(307200); // reserved
 
-	PIC8259(config, m_pic_master, 0);
+	PIC8259(config, m_pic_master);
 	m_pic_master->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic_master->in_sp_callback().set_constant(1);
 	m_pic_master->read_slave_ack_callback().set(FUNC(towns_state::get_slave_ack));
 
-	PIC8259(config, m_pic_slave, 0);
+	PIC8259(config, m_pic_slave);
 	m_pic_slave->out_int_callback().set(m_pic_master, FUNC(pic8259_device::ir7_w));
 	m_pic_slave->in_sp_callback().set_constant(0);
 
@@ -2695,20 +2695,20 @@ void towns_state::towns_base(machine_config &config)
 	SOFTWARE_LIST(config, "cd_list").set_original("fmtowns_cd");
 //  SOFTWARE_LIST(config, "win_cd_list").set_original("generic_cdrom");
 
-	UPD71071(config, m_dma[0], 0);
+	UPD71071(config, m_dma[0]);
 	m_dma[0]->set_cpu_tag("maincpu");
 	m_dma[0]->set_clock(4000000);
 	m_dma[0]->dma_read_callback<0>().set(FUNC(towns_state::towns_fdc_dma_r));
 	m_dma[0]->dma_read_callback<3>().set(FUNC(towns_state::towns_state::towns_cdrom_dma_r));
 	m_dma[0]->dma_write_callback<0>().set(FUNC(towns_state::towns_fdc_dma_w));
-	UPD71071(config, m_dma[1], 0);
+	UPD71071(config, m_dma[1]);
 	m_dma[1]->set_cpu_tag("maincpu");
 	m_dma[1]->set_clock(4000000);
 	m_dma[1]->dma_read_callback<0>().set(FUNC(towns_state::towns_fdc_dma_r));
 	m_dma[1]->dma_read_callback<3>().set(FUNC(towns_state::towns_state::towns_cdrom_dma_r));
 	m_dma[1]->dma_write_callback<0>().set(FUNC(towns_state::towns_fdc_dma_w));
 
-	I8251(config, m_i8251, 0);
+	I8251(config, m_i8251);
 	m_i8251->rxrdy_handler().set(FUNC(towns_state::towns_rxrdy_irq));
 	m_i8251->txrdy_handler().set(FUNC(towns_state::towns_txrdy_irq));
 	m_i8251->syndet_handler().set(FUNC(towns_state::towns_syndet_irq));
@@ -2721,7 +2721,7 @@ void towns_state::towns_base(machine_config &config)
 	rs232c.dsr_handler().set(m_i8251, FUNC(i8251_device::write_dsr));
 	rs232c.cts_handler().set(m_i8251, FUNC(i8251_device::write_cts));
 
-	FMT_ICMEM(config, m_icmemcard, 0);
+	FMT_ICMEM(config, m_icmemcard);
 
 	/* First-generation models: 1 MB onboard, 3 SIMM slots with 1 or 2 MB each, except slot 1 (limited to 1 MB).
 	   Model 2 comes with a 1 MB SIMM preinstalled on slot 1, Model 1 doesn't. */
@@ -2762,14 +2762,14 @@ void towns16_state::townsux(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
 	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
 	scsi.set_slot_device(3, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_2));
 	scsi.set_slot_device(4, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
 	scsi.set_slot_device(5, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
 
-	FMSCSI(config, m_scsi, 0);
+	FMSCSI(config, m_scsi);
 	m_scsi->set_scsi_port("scsi");
 	m_scsi->irq_handler().set(FUNC(towns16_state::towns_scsi_irq));
 	m_scsi->drq_handler().set(FUNC(towns16_state::towns_scsi_drq));
@@ -2795,14 +2795,14 @@ void towns_state::townssj(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
 	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
 	scsi.set_slot_device(3, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_2));
 	scsi.set_slot_device(4, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
 	scsi.set_slot_device(5, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
 
-	FMSCSI(config, m_scsi, 0);
+	FMSCSI(config, m_scsi);
 	m_scsi->set_scsi_port("scsi");
 	m_scsi->irq_handler().set(FUNC(towns_state::towns_scsi_irq));
 	m_scsi->drq_handler().set(FUNC(towns_state::towns_scsi_drq));

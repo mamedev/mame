@@ -432,7 +432,7 @@ static void news_scsi_devices(device_slot_interface &device)
 
 void news_r3k_base_state::common(machine_config &config)
 {
-	DMAC_0448(config, m_dma, 0);
+	DMAC_0448(config, m_dma);
 	m_dma->set_bus(m_cpu, 0);
 	m_dma->out_int_cb().set(FUNC(news_r3k_base_state::irq_w<DMA>));
 	m_dma->dma_r_cb<1>().set(m_fdc, FUNC(upd72067_device::dma_r));

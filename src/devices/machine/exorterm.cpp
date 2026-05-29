@@ -825,7 +825,7 @@ void exorterm155_device::device_add_mconfig(machine_config &config)
 
 	config.set_default_layout(layout_exorterm155);
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set(FUNC(exorterm155_device::acia_txd_w));
 	m_acia->rts_handler().set(FUNC(exorterm155_device::acia_rts_w));
 	m_acia->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));

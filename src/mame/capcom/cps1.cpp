@@ -3986,7 +3986,7 @@ void cps_state::ganbare(machine_config &config)
 	m_maincpu->remove_vblank_int();
 	TIMER(config, "scantimer").configure_scanline(FUNC(cps_state::raster_scanline), "screen", 0, 1);
 
-	M48T35(config, m_m48t35, 0);
+	M48T35(config, m_m48t35);
 }
 
 void cps_state::qsound(machine_config &config)

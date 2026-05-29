@@ -156,7 +156,7 @@ void sgi_pm2_device::device_add_mconfig(machine_config &config)
 	M68000(config, m_cpu, 20_MHz_XTAL / 2); // MC68010L10
 	m_cpu->set_addrmap(AS_PROGRAM, &sgi_pm2_device::mem_map);
 
-	SGI_PM2_MMU(config, m_mmu, 0);
+	SGI_PM2_MMU(config, m_mmu);
 	m_mmu->error().set([this](int state) { m_cpu->trigger_bus_error(); });
 	m_cpu->set_current_mmu(m_mmu);
 

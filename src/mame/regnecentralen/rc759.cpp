@@ -635,7 +635,7 @@ void rc759_state::rc759(machine_config &config)
 	m_cas->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// expansion slot
-	ISBX_SLOT(config, m_isbx, 0, isbx_cards, nullptr);
+	ISBX_SLOT(config, m_isbx, isbx_cards, nullptr);
 	m_isbx->mintr0().set("maincpu", FUNC(i80186_cpu_device::int1_w));
 	m_isbx->mintr1().set("maincpu", FUNC(i80186_cpu_device::int3_w));
 	m_isbx->mdrqt().set("maincpu", FUNC(i80186_cpu_device::drq0_w));

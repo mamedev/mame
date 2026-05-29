@@ -4830,7 +4830,7 @@ void htengoku_state::htengoku(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	RST_POS_BUFFER(config, "mainirq", 0).int_callback().set_inputline(m_maincpu, 0);
+	RST_POS_BUFFER(config, "mainirq").int_callback().set_inputline(m_maincpu, 0);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(htengoku_state::flipscreen_w));
@@ -4853,7 +4853,7 @@ void htengoku_state::htengoku(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set(FUNC(htengoku_state::vblank_w));
 
-	DYNAX_BLITTER_REV2(config, m_blitter, 0);
+	DYNAX_BLITTER_REV2(config, m_blitter);
 	m_blitter->vram_out_cb().set(FUNC(htengoku_state::blit_pixel_w));
 	m_blitter->scrollx_cb().set(FUNC(htengoku_state::blit_scrollx_w));
 	m_blitter->scrolly_cb().set(FUNC(htengoku_state::blit_scrolly_w));

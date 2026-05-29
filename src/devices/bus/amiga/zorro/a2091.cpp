@@ -181,7 +181,7 @@ void a2091_device::device_add_mconfig(machine_config &config)
 	m_wdc->irq_cb().set(m_irq, FUNC(input_merger_any_high_device::in_w<0>));
 	m_wdc->drq_cb().set(m_dmac, FUNC(amiga_dmac_device::sdreq_w));
 
-	XT_HDC(config, m_xt, 0);
+	XT_HDC(config, m_xt);
 	m_xt->irq_handler().set(m_irq, FUNC(input_merger_any_high_device::in_w<1>));
 	m_xt->drq_handler().set(m_dmac, FUNC(amiga_dmac_device::xdreq_w));
 

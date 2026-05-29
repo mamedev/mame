@@ -74,7 +74,7 @@ void iq151_staper_device::device_add_mconfig(machine_config &config)
 	m_ppi->out_pb_callback().set(FUNC(iq151_staper_device::ppi_portb_w));
 	m_ppi->out_pc_callback().set(FUNC(iq151_staper_device::ppi_portc_w));
 
-	PRINTER(config, "printer", 0);
+	PRINTER(config, "printer");
 }
 
 //-------------------------------------------------

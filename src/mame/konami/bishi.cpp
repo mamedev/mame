@@ -547,7 +547,7 @@ void bishi_state::bishi(machine_config &config)
 	K054338(config, m_k054338, 0);
 	// FP 201404: any reason why this is not connected to the k055555 below?
 
-	K055555(config, m_k055555, 0);
+	K055555(config, m_k055555);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();

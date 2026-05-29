@@ -73,7 +73,7 @@ public:
 	uint8_t maximum_latency_r();
 
 protected:
-	pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	optional_memory_region m_region;
 
@@ -142,7 +142,7 @@ protected:
 
 class agp_device : public pci_device {
 protected:
-	agp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	agp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -155,7 +155,7 @@ public:
 	{
 		set_ids_bridge(main_id, revision);
 	}
-	pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void set_remap_cb(mapper_cb _remap_cb) override;
 	virtual void map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -207,7 +207,7 @@ protected:
 		AS_PCI_CONFIG = 0
 	};
 
-	pci_bridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pci_bridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -238,7 +238,7 @@ private:
 
 class agp_bridge_device : public pci_bridge_device {
 protected:
-	agp_bridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	agp_bridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -251,7 +251,7 @@ public:
 	void set_spaces(address_space *memory, address_space *io = nullptr, address_space *busmaster = nullptr);
 
 protected:
-	pci_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pci_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint32_t config_address_r();
 	virtual void config_address_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -285,7 +285,7 @@ using pci_irq_handler = device_delegate<void (int, int)>;
 
 class pci_root_device : public device_t {
 public:
-	pci_root_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pci_root_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void irq_pin_w(int pin, int state);
 	void irq_w(int line, int state);

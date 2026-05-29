@@ -229,11 +229,11 @@ void ec184x_state::ec1840(machine_config &config)
 
 	// FIXME: determine ISA bus clock
 	// 7-slot backplane, at least two slots are always taken by CPU and memory cards
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", ec184x_isa8_cards, "ec1840.0002", false);
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", ec184x_isa8_cards, "ec1840.0003", false);
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", ec184x_isa8_cards, "ec1840.0004", false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", ec184x_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa5", 0, "mb:isa", ec184x_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", "mb:isa", ec184x_isa8_cards, "ec1840.0002", false);
+	ISA8_SLOT(config, "isa2", "mb:isa", ec184x_isa8_cards, "ec1840.0003", false);
+	ISA8_SLOT(config, "isa3", "mb:isa", ec184x_isa8_cards, "ec1840.0004", false);
+	ISA8_SLOT(config, "isa4", "mb:isa", ec184x_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa5", "mb:isa", ec184x_isa8_cards, nullptr, false);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("ec1841");
 
@@ -261,12 +261,12 @@ void ec184x_state::ec1841(machine_config &config)
 	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	// FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", ec184x_isa8_cards, "ec1841.0002", false); // cga
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", ec184x_isa8_cards, "ec1841.0003", false); // fdc (IRQ6) + mouse port (IRQ2..5)
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", ec184x_isa8_cards, "ec1840.0004", false); // lpt (IRQ7||5) [+ serial (IRQx)]
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", ec184x_isa8_cards, "hdc", false);
-	ISA8_SLOT(config, "isa5", 0, "mb:isa", ec184x_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa6", 0, "mb:isa", ec184x_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", "mb:isa", ec184x_isa8_cards, "ec1841.0002", false); // cga
+	ISA8_SLOT(config, "isa2", "mb:isa", ec184x_isa8_cards, "ec1841.0003", false); // fdc (IRQ6) + mouse port (IRQ2..5)
+	ISA8_SLOT(config, "isa3", "mb:isa", ec184x_isa8_cards, "ec1840.0004", false); // lpt (IRQ7||5) [+ serial (IRQx)]
+	ISA8_SLOT(config, "isa4", "mb:isa", ec184x_isa8_cards, "hdc", false);
+	ISA8_SLOT(config, "isa5", "mb:isa", ec184x_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa6", "mb:isa", ec184x_isa8_cards, nullptr, false);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("ec1841");
 

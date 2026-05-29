@@ -381,28 +381,28 @@ void midway_quicksilver2_state::midqslvr(machine_config &config)
 
 	P87C552(config, "iocpu", 16'000'000).set_disable();
 
-	PCI_ROOT(config, "pci", 0);
-	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 64*1024*1024);
+	PCI_ROOT(config, "pci");
+	I82443BX_HOST(config, "pci:00.0", "maincpu", 64*1024*1024);
 	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
 	//I82443BX_AGP   (config, "pci:01.0:00.0");
 
-	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu, true));
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", m_maincpu, true));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 
-	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", 0, m_maincpu));
+	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", m_maincpu));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
 
-	I82371EB_USB (config, "pci:07.2", 0);
-	I82371EB_ACPI(config, "pci:07.3", 0);
+	I82371EB_USB (config, "pci:07.2");
+	I82371EB_ACPI(config, "pci:07.3");
 	ACPI_PIIX4   (config, "pci:07.3:acpi");
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
-	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37m707", true).set_option_machine_config("fdc37m707", superio_config);
-	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "board4", "pci:07.0:isabus", isa_internal_devices, "fdc37m707", true).set_option_machine_config("fdc37m707", superio_config);
+	ISA16_SLOT(config, "isa1", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	// YMF740G goes thru "pci:0c.0"
 	// Expansion slots, mapping SVGA for debugging
@@ -441,7 +441,7 @@ void midway_graphite_state::graphite(machine_config &config)
 	PENTIUM3(config, m_maincpu, 100'000'000); // downclocked for debugging
 	m_maincpu->set_addrmap(AS_PROGRAM, &midway_graphite_state::graphite_map);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

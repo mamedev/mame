@@ -392,7 +392,7 @@ void bally_sounds_plus_device::device_add_mconfig(machine_config &config)
 	// and required as the chip likes to output a DC offset at idle.
 	FILTER_RC(config, m_mc3417_filter).set_ac();
 	m_mc3417_filter->add_route(ALL_OUTPUTS, *this, 1.0);
-	MC3417(config, m_mc3417, 0);
+	MC3417(config, m_mc3417);
 	// A gain of 2.2 is a guess. It sounds about loud enough and doesn't clip.
 	m_mc3417->add_route(ALL_OUTPUTS, "mc3417_filter", 2.2);
 }

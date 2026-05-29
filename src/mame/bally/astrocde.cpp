@@ -1347,7 +1347,7 @@ void astrocde_state::spacezap(machine_config &config)
 	m_astrocade_sound[0]->so_cb<0>().set("watchdog", FUNC(watchdog_timer_device::reset_w));
 	m_astrocade_sound[0]->so_cb<3>().set("outlatch", FUNC(output_latch_device::write));
 
-	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch", 0)); // MC14174B on game board at U16
+	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch")); // MC14174B on game board at U16
 	outlatch.bit_handler<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
 	outlatch.bit_handler<1>().set(FUNC(astrocde_state::coin_counter_w<1>));
 
@@ -1475,13 +1475,13 @@ void astrocde_state::profpac(machine_config &config)
 	m_bank4000->set_map(&astrocde_state::profpac_bank4000_map);
 	m_bank4000->set_addr_width(20);
 
-	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch", 0)); // 74LS174 on game board at U6
+	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch")); // 74LS174 on game board at U6
 	outlatch.bit_handler<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
 	outlatch.bit_handler<1>().set(FUNC(astrocde_state::coin_counter_w<1>));
 	outlatch.bit_handler<2>().set_output("led0");
 	outlatch.bit_handler<3>().set_output("led1");
 
-	output_latch_device &lamplatch(OUTPUT_LATCH(config, "lamplatch", 0)); // 74LS174 on game board at U7
+	output_latch_device &lamplatch(OUTPUT_LATCH(config, "lamplatch")); // 74LS174 on game board at U7
 	lamplatch.bit_handler<0>().set_output("lamp0"); // left lamp A
 	lamplatch.bit_handler<1>().set_output("lamp1"); // left lamp B
 	lamplatch.bit_handler<2>().set_output("lamp2"); // left lamp C
@@ -1502,7 +1502,7 @@ void demndrgn_state::demndrgn(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &demndrgn_state::demndrgn_map);
 	m_maincpu->set_addrmap(AS_IO, &demndrgn_state::port_map_16col_pattern_demndrgn);
 
-	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch", 0));
+	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch"));
 	outlatch.bit_handler<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
 	outlatch.bit_handler<1>().set(FUNC(astrocde_state::coin_counter_w<1>));
 	outlatch.bit_handler<2>().set_output("led0");

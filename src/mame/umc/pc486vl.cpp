@@ -112,7 +112,7 @@ void pc486vl_state::base_config(machine_config &config)
 	// - doesn't apply with md4duv (that effectively supports 64M)
 	RAM(config, "ram").set_default_size("64M");
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->iochck_callback().set(m_chipset, FUNC(um8498f_device::iochck_w));
@@ -154,24 +154,24 @@ void pc486vl_state::pccm912(machine_config &config)
 {
 	base_config(config);
 	// TODO: actually 4 + 3 VLB
-	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "vga", false);
-	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, "fdc", false);
-	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, "ide", false);
-	ISA16_SLOT(config, "isa4", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa6", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa7", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa1", "isabus", pc_isa16_cards, "vga", false);
+	ISA16_SLOT(config, "isa2", "isabus", pc_isa16_cards, "fdc", false);
+	ISA16_SLOT(config, "isa3", "isabus", pc_isa16_cards, "ide", false);
+	ISA16_SLOT(config, "isa4", "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa6", "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa7", "isabus", pc_isa16_cards, nullptr, false);
 }
 
 void pc486vl_state::pc486vl(machine_config &config)
 {
 	base_config(config);
-	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "vga", false);
-	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, "fdc", false);
-	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, "ide", false);
-	ISA16_SLOT(config, "isa4", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa6", 0, "isabus", pc_isa8_cards,  nullptr, false);
+	ISA16_SLOT(config, "isa1", "isabus", pc_isa16_cards, "vga", false);
+	ISA16_SLOT(config, "isa2", "isabus", pc_isa16_cards, "fdc", false);
+	ISA16_SLOT(config, "isa3", "isabus", pc_isa16_cards, "ide", false);
+	ISA16_SLOT(config, "isa4", "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa6", "isabus", pc_isa8_cards,  nullptr, false);
 }
 
 // PC-Chips M912 - Chipset: UM8498F, UM8496F - CPU: 486 - BIOS: AMI - ISA16: 4, ISA16/VL: 3

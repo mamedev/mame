@@ -663,7 +663,7 @@ void ie15_device::ie15core(machine_config &config)
 	config.set_default_layout(layout_ie15);
 
 	/* Devices */
-	IE15_KEYBOARD(config, m_keyboard, 0);
+	IE15_KEYBOARD(config, m_keyboard);
 	m_keyboard->keyboard_cb().set(FUNC(ie15_device::kbd_put));
 	m_keyboard->sdv_cb().set(FUNC(ie15_device::kbd_sdv));
 

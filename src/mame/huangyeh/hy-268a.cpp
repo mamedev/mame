@@ -141,7 +141,7 @@ void hy268a_state::xycs(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(0x100); // TODO
 
-	RAMDAC(config, "ramdac", 0, "palette").set_addrmap(0, &hy268a_state::ramdac_map);
+	RAMDAC(config, "ramdac", "palette").set_addrmap(0, &hy268a_state::ramdac_map);
 
 	HD63484(config, "acrtc", 22_MHz_XTAL / 4).set_addrmap(0, &hy268a_state::hd63484_map); // divider not verified
 

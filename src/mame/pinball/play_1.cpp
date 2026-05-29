@@ -582,7 +582,7 @@ void play_1_state::play_1(machine_config &config)
 	genpin_audio(config);
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	CLOCK(config, m_monotone, 0); // sound device
+	CLOCK(config, m_monotone); // sound device
 	m_monotone->signal_handler().set("speaker", FUNC(speaker_sound_device::level_w));
 }
 

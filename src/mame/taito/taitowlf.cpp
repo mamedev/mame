@@ -160,7 +160,7 @@ void isa16_taito_rom_disk::device_add_mconfig(machine_config &config)
 {
 	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&isa16_taito_rom_disk::bankdev_map).set_options(ENDIANNESS_LITTLE, 8, 16 + 14, 0x4000);
 
-	TC0510NIO(config, m_tc0510nio, 0);
+	TC0510NIO(config, m_tc0510nio);
 	m_tc0510nio->read_0_callback().set_ioport("IN0");
 	m_tc0510nio->read_1_callback().set_ioport("IN1");
 	m_tc0510nio->read_2_callback().set_ioport("IN2");
@@ -413,7 +413,7 @@ void isa16_p5txla_mb::device_add_mconfig(machine_config &config)
 	//m_rtc->irq().set(m_pic8259_2, FUNC(pic8259_device::ir0_w));
 	m_rtc->set_century_index(0x32);
 
-	KBDC8042(config, m_kbdc, 0);
+	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	m_kbdc->system_reset_callback().set_inputline(":maincpu", INPUT_LINE_RESET);
 	m_kbdc->gate_a20_callback().set_inputline(":maincpu", INPUT_LINE_A20);
@@ -592,26 +592,26 @@ void p5txla_state::p5txla(machine_config &config)
 //  m_maincpu->smiact().set("pci:00.0", FUNC(i82439tx_host_device::smi_act_w));
 
 	// FSB 66 MHz
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// 64MB for Taito Wolf HW, to be checked for base p5txla
-	I82439TX(config, "pci:00.0", 0, m_maincpu, 64*1024*1024);
+	I82439TX(config, "pci:00.0", m_maincpu, 64*1024*1024);
 
 	// TODO: 82371AB
-	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, m_maincpu));
+	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", m_maincpu));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline(m_maincpu, INPUT_LINE_SMI);
 
-	i82371sb_ide_device &ide(I82371SB_IDE(config, "pci:07.1", 0, m_maincpu));
+	i82371sb_ide_device &ide(I82371SB_IDE(config, "pci:07.1", m_maincpu));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
 
-	ISA16_SLOT(config, "board1", 0, "pci:07.0:isabus", isa_internal_devices, "w83877tf", true).set_option_machine_config("w83877tf", winbond_superio_config);
-	ISA16_SLOT(config, "board2", 0, "pci:07.0:isabus", isa_internal_devices, "p5txla_mb", true);
-	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa4", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "board1", "pci:07.0:isabus", isa_internal_devices, "w83877tf", true).set_option_machine_config("w83877tf", winbond_superio_config);
+	ISA16_SLOT(config, "board2", "pci:07.0:isabus", isa_internal_devices, "p5txla_mb", true);
+	ISA16_SLOT(config, "isa1", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr)); // "microsoft_mouse"));
 	serport0.rxd_handler().set("board1:w83877tf", FUNC(w83877tf_device::rxd1_w));
@@ -628,7 +628,7 @@ void p5txla_state::p5txla(machine_config &config)
 	serport1.cts_handler().set("board1:w83877tf", FUNC(w83877tf_device::ncts2_w));
 
 	// on-board
-	ATI_RAGEIIDVD(config, PCI_VIDEO_ID, 0);
+	ATI_RAGEIIDVD(config, PCI_VIDEO_ID);
 }
 
 void taitowlf_state::romdisk_config(device_t *device)
@@ -644,7 +644,7 @@ void taitowlf_state::taitowlf(machine_config &config)
 
 	m_maincpu->set_clock(200'000'000);
 
-	ISA16_SLOT(config, "board3", 0, "pci:07.0:isabus", isa_internal_devices, "taito_romdisk", true).set_option_machine_config("taito_romdisk", romdisk_config);
+	ISA16_SLOT(config, "board3", "pci:07.0:isabus", isa_internal_devices, "taito_romdisk", true).set_option_machine_config("taito_romdisk", romdisk_config);
 	// TODO: remove keyboard slot option
 
 	VOODOO_1_PCI(config.replace(), m_voodoo, 0, m_maincpu, m_screen);

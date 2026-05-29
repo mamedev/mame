@@ -499,9 +499,9 @@ void pluto6_state::pluto6(machine_config &config){
 	m_maincpu->sda_w_cb().set(FUNC(pluto6_state::pluto_sda));
 	m_maincpu->scl_w_cb().set(FUNC(pluto6_state::pluto_scl));
 
-	PLUTO6_EXPANSION_SLOT(config, m_exp0, 0);
+	PLUTO6_EXPANSION_SLOT(config, m_exp0);
 	m_exp0->set_default_option(nullptr);
-	PLUTO6_EXPANSION_SLOT(config, m_exp1, 0);
+	PLUTO6_EXPANSION_SLOT(config, m_exp1);
 	m_exp1->set_default_option(nullptr);
 
 	SPEAKER(config, "speaker", 2).front();

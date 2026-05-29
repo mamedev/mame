@@ -4090,11 +4090,11 @@ void specnext_state::tbblue(machine_config &config)
 	MIDI_PORT(config, "mdthru", midiout_slot, "midiout");
 	MIDI_PORT(config, m_midi_out, midiout_slot, "midiout");
 
-	SPI_SDCARD(config, m_sdcards[0], 0);
+	SPI_SDCARD(config, m_sdcards[0]);
 	m_sdcards[0]->set_prefer_sdhc();
 	m_sdcards[0]->spi_miso_callback().set(FUNC(specnext_state::spi_miso_w));
 
-	SPI_SDCARD(config, m_sdcards[1], 0);
+	SPI_SDCARD(config, m_sdcards[1]);
 	m_sdcards[1]->set_prefer_sdhc();
 	m_sdcards[1]->spi_miso_callback().set(FUNC(specnext_state::spi_miso_w));
 
@@ -4116,11 +4116,11 @@ void specnext_state::tbblue(machine_config &config)
 			.add_route(2, "speakers", 0.50, 1);
 	}
 
-	SPECNEXT_MULTIFACE(config, m_mf, 0);
-	SPECNEXT_DIVMMC(config, m_divmmc, 0);
+	SPECNEXT_MULTIFACE(config, m_mf);
+	SPECNEXT_DIVMMC(config, m_divmmc);
 
-	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
-	ZXBUS_SLOT(config, "zxbus:1", 0, zxbus, zxbus_cards, nullptr);
+	zxbus_device &zxbus(ZXBUS(config, "zxbus"));
+	ZXBUS_SLOT(config, "zxbus:1", zxbus, zxbus_cards, nullptr);
 
 	m_screen->set_raw(28_MHz_XTAL / 2, 456 << 1, 312,  { 0, (359 << 1) | 1, 0, 287 });
 	m_screen->set_screen_update(FUNC(specnext_state::screen_update));
@@ -4130,14 +4130,14 @@ void specnext_state::tbblue(machine_config &config)
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_tbblue);
 	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
-	SCREEN_ULA_NEXT (config, m_ula_scr, 0).set_palette(m_palette->device().tag(), 0x000, 0x100);
-	SPECNEXT_LORES  (config, m_lores,   0).set_palette(m_palette->device().tag(), 0x000, 0x100);
-	SPECNEXT_TILES  (config, m_tiles,   0).set_palette(m_palette->device().tag(), 0x200, 0x300);
-	SPECNEXT_LAYER2 (config, m_layer2,  0).set_palette(m_palette->device().tag(), 0x400, 0x500);
+	SCREEN_ULA_NEXT (config, m_ula_scr).set_palette(m_palette->device().tag(), 0x000, 0x100);
+	SPECNEXT_LORES  (config, m_lores).set_palette(m_palette->device().tag(), 0x000, 0x100);
+	SPECNEXT_TILES  (config, m_tiles).set_palette(m_palette->device().tag(), 0x200, 0x300);
+	SPECNEXT_LAYER2 (config, m_layer2).set_palette(m_palette->device().tag(), 0x400, 0x500);
 
 	// drawgfx doesn't allow to mask palette access and in case of 256-color sprite does use offset, the index overflow palette boundries.
 	// We are duplicating palletes to imitate mask on palette index which required by sprites device.
-	SPECNEXT_SPRITES(config, m_sprites, 0).set_palette(m_palette->device().tag(), 0x600, 0x800);
+	SPECNEXT_SPRITES(config, m_sprites).set_palette(m_palette->device().tag(), 0x600, 0x800);
 
 	SPECNEXT_COPPER(config, m_copper, 28_MHz_XTAL);
 	m_copper->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_next_regs.write_byte(offset, data); });

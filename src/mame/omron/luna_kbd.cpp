@@ -184,7 +184,7 @@ luna_keyboard_device::luna_keyboard_device(machine_config const &mconfig, char c
 void luna_keyboard_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "beeper").front_center();
-	BEEP(config, m_beep, 0).add_route(ALL_OUTPUTS, "beeper", 0.25);
+	BEEP(config, m_beep).add_route(ALL_OUTPUTS, "beeper", 0.25);
 }
 
 void luna_keyboard_device::device_start()

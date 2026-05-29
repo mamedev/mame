@@ -142,8 +142,8 @@ void i420ex_state::i420ex(machine_config &config)
 
 	// TODO: config space not known
 	// 05.0 is clearly host: it's what the BIOS addresses at startup
-	PCI_ROOT(config, "pci", 0);
-	i82425ex_psc_device &psc(I82425EX_PSC(config, "pci:05.0", 0, "maincpu", "ib", 64*1024*1024));
+	PCI_ROOT(config, "pci");
+	i82425ex_psc_device &psc(I82425EX_PSC(config, "pci:05.0", "maincpu", "ib", 64*1024*1024));
 	psc.ide1_irq_w().set("ib:intc2", FUNC(pic8259_device::ir6_w));
 	psc.ide2_irq_w().set("ib:intc2", FUNC(pic8259_device::ir7_w));
 
@@ -181,14 +181,14 @@ void i420ex_state::entrada(machine_config &config)
 {
 	i420ex(config);
 
-	GD5434_PCI(config, "pci:06.0", 0);
+	GD5434_PCI(config, "pci:06.0");
 
 	// TODO: on proprietary PISA riser
 	PCI_SLOT(config, "pci:1", pci_cards, 7,  0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards, 8,  1, 2, 3, 0, nullptr);
 
-	ISA16_SLOT(config, "board1", 0, "ib:isabus", pc_isa_onboard, "superio", true).set_option_machine_config("superio", intel_superio_config);
-	ISA16_SLOT(config, "isa1",   0, "ib:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "board1", "ib:isabus", pc_isa_onboard, "superio", true).set_option_machine_config("superio", intel_superio_config);
+	ISA16_SLOT(config, "isa1", "ib:isabus", pc_isa16_cards, nullptr, false);
 
 	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
 	serport0.rxd_handler().set("board1:superio", FUNC(i82091aa_device::rxd1_w));
@@ -214,12 +214,12 @@ void i420ex_state::a486ap4(machine_config &config)
 	PCI_SLOT(config, "pci:3", pci_cards, 9,  2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 10, 3, 0, 1, 2, nullptr);
 
-	ISA16_SLOT(config, "isa1",   0, "ib:isabus", pc_isa16_cards, "fdc_smc", false);
-	ISA16_SLOT(config, "isa2",   0, "ib:isabus", pc_isa16_cards, "comat", false);
-	ISA16_SLOT(config, "isa3",   0, "ib:isabus", pc_isa16_cards, "lpt", false);
-	ISA16_SLOT(config, "isa4",   0, "ib:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa1", "ib:isabus", pc_isa16_cards, "fdc_smc", false);
+	ISA16_SLOT(config, "isa2", "ib:isabus", pc_isa16_cards, "comat", false);
+	ISA16_SLOT(config, "isa3", "ib:isabus", pc_isa16_cards, "lpt", false);
+	ISA16_SLOT(config, "isa4", "ib:isabus", pc_isa16_cards, nullptr, false);
 	// TODO: VLB really
-	ISA16_SLOT(config, "isa5",   0, "ib:isabus", pc_isa16_cards, "svga_et4k", false);
+	ISA16_SLOT(config, "isa5", "ib:isabus", pc_isa16_cards, "svga_et4k", false);
 }
 
 

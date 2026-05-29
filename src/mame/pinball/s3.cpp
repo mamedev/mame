@@ -624,7 +624,7 @@ void s3a_state::s3a(machine_config &config)
 
 	// Add the soundcard
 	SPEAKER(config, "mono").front_center();
-	WILLIAMS_S4_SOUND(config, m_s4sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	WILLIAMS_S4_SOUND(config, m_s4sound).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

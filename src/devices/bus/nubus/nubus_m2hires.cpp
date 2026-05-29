@@ -124,7 +124,7 @@ void nubus_m2hires_device::device_add_mconfig(machine_config &config)
 	m_screen->set_screen_update(FUNC(nubus_m2hires_device::screen_update));
 	m_screen->set_raw(30.24_MHz_XTAL, 896, 0, 640, 525, 0, 480);
 
-	BT453(config, m_ramdac, 0);
+	BT453(config, m_ramdac);
 }
 
 const tiny_rom_entry *nubus_m2hires_device::device_rom_region() const
@@ -407,7 +407,7 @@ void nubus_portrait_device::device_add_mconfig(machine_config &config)
 	m_screen->set_raw(57.2832_MHz_XTAL, 832, 0, 640, 918, 0, 832);
 	m_screen->set_physical_aspect(3, 4);
 
-	BT454(config, m_ramdac, 0);
+	BT454(config, m_ramdac);
 }
 
 ROM_START(wsportrait)
@@ -505,7 +505,7 @@ void nubus_workstation_device::device_add_mconfig(machine_config &config)
 	m_screen->set_screen_update(FUNC(nubus_workstation_device::screen_update));
 	m_screen->set_raw(100_MHz_XTAL, 1448, 0, 1152, 913, 0, 832);
 
-	BT454(config, m_ramdac, 0);
+	BT454(config, m_ramdac);
 }
 
 void nubus_workstation_device::device_start()

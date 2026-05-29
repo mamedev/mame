@@ -424,7 +424,7 @@ void kn01_state::kn01(machine_config &config, XTAL clock)
 	m_screen->set_raw(69169800, 1280, 212, 1024+212, 901, 34, 864+34);
 	m_screen->set_screen_update(FUNC(kn01_state::screen_update));
 
-	TIMER(config, m_scantimer, 0);
+	TIMER(config, m_scantimer);
 	m_scantimer->configure_scanline(FUNC(kn01_state::scanline_timer), "screen", 0, 1);
 
 	BT478(config, m_vdac, 69169800);
@@ -447,7 +447,7 @@ void kn01_state::kn01(machine_config &config, XTAL clock)
 	DC7085(config, m_dz, 15.2064_MHz_XTAL);
 	m_dz->int_cb().set_inputline(m_cpu, INPUT_LINE_IRQ2);
 
-	LK201(config, m_lk201, 0);
+	LK201(config, m_lk201);
 	m_dz->tx_cb<0>().set([this](int state) { if (!(m_status & TXDIS)) m_lk201->rx_w(state); });
 	m_lk201->tx_handler().set(m_dz, FUNC(dc7085_device::rx_w<0>));
 

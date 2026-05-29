@@ -514,7 +514,7 @@ void mpc3000_state::mpc3000(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, m_floppy, mpc3000_state::floppies, "35hd", add_formats).enable_sound(true);
 
-	pit8254_device &pit(PIT8254(config, "synctmr", 0)); // MB89254
+	pit8254_device &pit(PIT8254(config, "synctmr")); // MB89254
 	pit.set_clk<0>(V53_PCLKOUT);
 	pit.set_clk<1>(V53_PCLKOUT);
 	pit.set_clk<2>(V53_PCLKOUT);

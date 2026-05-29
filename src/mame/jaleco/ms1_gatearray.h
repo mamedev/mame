@@ -18,7 +18,7 @@ protected:
 			device_type type,
 			char const *tag,
 			device_t *owner,
-			u32 clock);
+			u32 clock = 0);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -43,10 +43,10 @@ protected:
 class megasys1_gatearray_d65006_device : public megasys1_gatearray_device
 {
 public:
-	megasys1_gatearray_d65006_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	megasys1_gatearray_d65006_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	megasys1_gatearray_d65006_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	megasys1_gatearray_d65006_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
 	virtual void rom_decode() override;
 
@@ -58,10 +58,10 @@ private:
 class megasys1_gatearray_gs88000_device : public megasys1_gatearray_device
 {
 public:
-	megasys1_gatearray_gs88000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	megasys1_gatearray_gs88000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	megasys1_gatearray_gs88000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	megasys1_gatearray_gs88000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
 	virtual void rom_decode() override;
 
@@ -72,10 +72,10 @@ protected:
 class megasys1_gatearray_unkarray_device : public megasys1_gatearray_device
 {
 public:
-	megasys1_gatearray_unkarray_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	megasys1_gatearray_unkarray_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	megasys1_gatearray_unkarray_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	megasys1_gatearray_unkarray_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
 	virtual void rom_decode() override;
 };

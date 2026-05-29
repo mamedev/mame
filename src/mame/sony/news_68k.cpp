@@ -709,7 +709,7 @@ void news_68k_base_state::common(machine_config &config)
 {
 	M48T02(config, m_rtc);
 
-	DMAC_0266(config, m_dma, 0);
+	DMAC_0266(config, m_dma);
 	m_dma->set_bus(m_cpu, 0);
 
 	INPUT_MERGER_ANY_HIGH(config, m_irq5);

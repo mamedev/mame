@@ -783,7 +783,7 @@ void maygay1b_state::maygay_m1(machine_config &config)
 	REEL(config, m_reels[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reels[5]->optic_handler().set(FUNC(maygay1b_state::reel_optic_cb<5>));
 
-	METERS(config, m_meters, 0).set_number(8);
+	METERS(config, m_meters).set_number(8);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

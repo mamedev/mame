@@ -310,7 +310,7 @@ void timetrv_state::timetrv(machine_config &config)
 	m_uart->out_tx_callback().set(m_laserdisc, FUNC(pioneer_ldv4200hle_device::rx_w));
 
 	/* video hardware */
-	PIONEER_LDV4200HLE(config, m_laserdisc, 0);
+	PIONEER_LDV4200HLE(config, m_laserdisc);
 	m_laserdisc->set_overlay(256, 256, FUNC(timetrv_state::screen_update));
 	m_laserdisc->add_route(0, "mono", 0.4);
 	m_laserdisc->add_route(1, "mono", 0.4);

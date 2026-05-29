@@ -2436,7 +2436,7 @@ void punkshot_state::punkshot(machine_config &config)
 	m_k051960->set_screen(m_screen);
 	m_k051960->set_sprite_callback(FUNC(punkshot_state::punkshot_sprite_callback));
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2480,7 +2480,7 @@ void lgtnfght_state::lgtnfght(machine_config &config)
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(lgtnfght_state::lgtnfght_sprite_callback));
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -2528,8 +2528,8 @@ void blswhstl_state::blswhstl(machine_config &config)
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(blswhstl_state::blswhstl_sprite_callback));
 
-	K053251(config, m_k053251, 0);
-	K054000(config, m_k054000, 0);
+	K053251(config, m_k053251);
+	K054000(config, m_k054000);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -2586,11 +2586,11 @@ void glfgreat_state::glfgreat(machine_config &config)
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(glfgreat_state::lgtnfght_sprite_callback));
 
-	K053936(config, m_k053936, 0);
+	K053936(config, m_k053936);
 	m_k053936->set_wrap(1);
 	m_k053936->set_offsets(-11, 0);
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -2645,10 +2645,10 @@ void prmrsocr_state::prmrsocr(machine_config &config)
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(prmrsocr_state::prmrsocr_sprite_callback));
 
-	K053936(config, m_k053936, 0);
+	K053936(config, m_k053936);
 	m_k053936->set_offsets(-11, 1);
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -2699,7 +2699,7 @@ void tmnt2_state::tmnt2(machine_config &config)
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(tmnt2_state::lgtnfght_sprite_callback));
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -2748,7 +2748,7 @@ void ssriders_state::ssriders(machine_config &config)
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(ssriders_state::lgtnfght_sprite_callback));
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -2804,7 +2804,7 @@ void sunsetbl_state::sunsetbl(machine_config &config)
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(sunsetbl_state::lgtnfght_sprite_callback));
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2846,8 +2846,8 @@ void punkshot_state::thndrx2(machine_config &config)
 	m_k051960->set_screen(m_screen);
 	m_k051960->set_sprite_callback(FUNC(punkshot_state::thndrx2_sprite_callback));
 
-	K053251(config, m_k053251, 0);
-	K054000(config, m_k054000, 0);
+	K053251(config, m_k053251);
+	K054000(config, m_k054000);
 
 	/* sound hardware */
 	// NB: game defaults in mono

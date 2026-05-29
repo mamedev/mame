@@ -2238,17 +2238,17 @@ INPUT_PORTS_END
 
 void bfm_sc2_state::_3meters(machine_config &config)
 {
-	METERS(config, m_meters, 0).set_number(3);
+	METERS(config, m_meters).set_number(3);
 }
 
 void bfm_sc2_state::_5meters(machine_config &config)
 {
-	METERS(config, m_meters, 0).set_number(5);
+	METERS(config, m_meters).set_number(5);
 }
 
 void bfm_sc2_state::_8meters(machine_config &config)
 {
-	METERS(config, m_meters, 0).set_number(8);
+	METERS(config, m_meters).set_number(8);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -2280,7 +2280,7 @@ void bfm_sc2_vid_state::scorpion2_vid(machine_config &config)
 	NVRAM(config, "e2ram").set_custom_handler(FUNC(bfm_sc2_vid_state::e2ram_init));
 	config.set_default_layout(layout_sc2_vid);
 
-	BFM_ADDER2(config, "adder2", 0);
+	BFM_ADDER2(config, "adder2");
 
 	SPEAKER(config, "mono").front_center();
 	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -3845,7 +3845,7 @@ void bfm_sc2_dmd_state::scorpion2_dm01(machine_config &config)
 
 	/* video hardware */
 	config.set_default_layout(layout_sc2_dmd);
-	BFM_DM01(config, m_dm01, 0);
+	BFM_DM01(config, m_dm01);
 	m_dm01->busy_callback().set(FUNC(bfm_sc2_dmd_state::bfmdm01_busy));
 
 	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);

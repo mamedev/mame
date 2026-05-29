@@ -400,7 +400,7 @@ void s9_state::s9(machine_config &config)
 
 	/* Add the soundcard */
 	SPEAKER(config, "mono").front_center();
-	WILLIAMS_S9_SOUND(config, m_s9sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	WILLIAMS_S9_SOUND(config, m_s9sound).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

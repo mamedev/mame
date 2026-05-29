@@ -1051,7 +1051,7 @@ void smc777_state::smc777(machine_config &config)
 
 	config.set_default_layout(layout_smc777);
 
-	SMC777_KBD(config, m_kbd, 0);
+	SMC777_KBD(config, m_kbd);
 	m_kbd->caplock_callback().set([this] (int state) { m_caplock_led = state; });
 	m_kbd->kanalock_callback().set([this] (int state) { m_kanalock_led = state; });
 

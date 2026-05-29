@@ -100,10 +100,10 @@ const tiny_rom_entry *comx_eb_device::device_rom_region() const
 
 void comx_eb_device::device_add_mconfig(machine_config &config)
 {
-	COMX_EXPANSION_SLOT(config, SLOT1_TAG, 0, comx_expansion_cards, "fd").irq_callback().set(FUNC(comx_eb_device::slot1_irq_w));
-	COMX_EXPANSION_SLOT(config, SLOT2_TAG, 0, comx_expansion_cards, "clm").irq_callback().set(FUNC(comx_eb_device::slot2_irq_w));
-	COMX_EXPANSION_SLOT(config, SLOT3_TAG, 0, comx_expansion_cards, "joy").irq_callback().set(FUNC(comx_eb_device::slot3_irq_w));
-	COMX_EXPANSION_SLOT(config, SLOT4_TAG, 0, comx_expansion_cards, "ram").irq_callback().set(FUNC(comx_eb_device::slot4_irq_w));
+	COMX_EXPANSION_SLOT(config, SLOT1_TAG, comx_expansion_cards, "fd").irq_callback().set(FUNC(comx_eb_device::slot1_irq_w));
+	COMX_EXPANSION_SLOT(config, SLOT2_TAG, comx_expansion_cards, "clm").irq_callback().set(FUNC(comx_eb_device::slot2_irq_w));
+	COMX_EXPANSION_SLOT(config, SLOT3_TAG, comx_expansion_cards, "joy").irq_callback().set(FUNC(comx_eb_device::slot3_irq_w));
+	COMX_EXPANSION_SLOT(config, SLOT4_TAG, comx_expansion_cards, "ram").irq_callback().set(FUNC(comx_eb_device::slot4_irq_w));
 }
 
 

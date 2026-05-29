@@ -2298,8 +2298,8 @@ void segas16a_state::system16a(machine_config &config)
 	m_screen->set_screen_update(FUNC(segas16a_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	SEGA_SYS16A_SPRITES(config, m_sprites, 0);
-	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
+	SEGA_SYS16A_SPRITES(config, m_sprites);
+	SEGAIC16VID(config, m_segaic16vid, "gfxdecode");
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_segas16a);
 	PALETTE(config, m_palette).set_entries(2048*2);

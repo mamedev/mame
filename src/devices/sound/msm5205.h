@@ -20,7 +20,7 @@ public:
 	static constexpr int S64_4B = 6; // prescaler 1/64(6KHz), data 4bit
 	static constexpr int SEX_4B = 7; // VCK slave mode      , data 4bit
 
-	msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void set_prescaler_selector(int select)
 	{

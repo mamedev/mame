@@ -11,7 +11,7 @@ class gameboy_sound_device : public device_t,
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
-	gameboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gameboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual u8 sound_r(offs_t offset);
 	virtual u8 wave_r(offs_t offset) = 0;
@@ -19,7 +19,7 @@ public:
 	virtual void wave_w(offs_t offset, u8 data) = 0;
 
 protected:
-	gameboy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gameboy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -161,7 +161,7 @@ protected:
 class dmg_apu_device : public gameboy_sound_device
 {
 public:
-	dmg_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dmg_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual u8 wave_r(offs_t offset) override;
 	virtual void wave_w(offs_t offset, u8 data) override;
@@ -177,14 +177,14 @@ protected:
 class cgb04_apu_device : public gameboy_sound_device
 {
 public:
-	cgb04_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cgb04_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual u8 wave_r(offs_t offset) override;
 	virtual void wave_w(offs_t offset, u8 data) override;
 	virtual void sound_w(offs_t offset, u8 data) override;
 
 protected:
-	cgb04_apu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cgb04_apu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_reset() override ATTR_COLD;
 	virtual void apu_power_off() override;
@@ -195,14 +195,14 @@ protected:
 class agb_apu_device : public cgb04_apu_device
 {
 public:
-	agb_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	agb_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual u8 sound_r(offs_t offset) override;
 	virtual u8 wave_r(offs_t offset) override;
 	virtual void wave_w(offs_t offset, u8 data) override;
 
 protected:
-	agb_apu_device(const machine_config &mconfig, device_type &type, const char *tag, device_t *owner, uint32_t clock);
+	agb_apu_device(const machine_config &mconfig, device_type &type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_reset() override ATTR_COLD;
 	virtual void update_wave_channel(SOUND &snd, uint64_t cycles) override;

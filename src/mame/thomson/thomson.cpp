@@ -2130,7 +2130,7 @@ void mo5nr_state::mo5nr(machine_config &config)
 
 	GENERIC_CARTSLOT(config.replace(), "cartslot", generic_plain_slot, "mo_cart", "m5,rom").set_device_load(FUNC(mo5nr_state::mo5_cartridge));
 
-	NANORESEAU_MO(config, m_nanoreseau, 0, true);
+	NANORESEAU_MO(config, m_nanoreseau, true);
 
 	m_extension->option_remove("nanoreseau");
 

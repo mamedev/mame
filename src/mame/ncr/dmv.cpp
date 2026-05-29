@@ -824,7 +824,7 @@ void dmv_state::dmv(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	DMV_KEYBOARD(config, m_keyboard, 0);
+	DMV_KEYBOARD(config, m_keyboard);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -864,7 +864,7 @@ void dmv_state::dmv(machine_config &config)
 	FLOPPY_CONNECTOR(config, "i8272:0", dmv_floppies, "525dd", dmv_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "i8272:1", dmv_floppies, "525dd", dmv_state::floppy_formats);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(50);
 	m_pit->out_handler<0>().set(FUNC(dmv_state::pit_out0));
 	m_pit->set_clk<2>(XTAL(24'000'000) / 3 / 16);

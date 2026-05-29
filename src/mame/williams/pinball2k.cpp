@@ -633,13 +633,13 @@ void pinball2k_state::mediagx(machine_config &config)
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
-	isa16_device &isa(ISA16(config, "isa", 0));
+	isa16_device &isa(ISA16(config, "isa"));
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
 	// VGA hook is for temp debugging aid
-	ISA16_SLOT(config, "isa1", 0, "isa", pc_isa16_cards, "vga", false);
+	ISA16_SLOT(config, "isa1", "isa", pc_isa16_cards, "vga", false);
 
-	RAMDAC(config, m_ramdac, 0, m_palette);
+	RAMDAC(config, m_ramdac, m_palette);
 	m_ramdac->set_addrmap(0, &pinball2k_state::ramdac_map);
 
 	/* video hardware */

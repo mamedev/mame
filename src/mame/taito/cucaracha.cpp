@@ -389,7 +389,7 @@ void cucaracha_state::cucaracha(machine_config &config)
 	z80_device &soundcpu(Z80(config, "soundcpu", 4000000));
 	soundcpu.set_addrmap(AS_PROGRAM, &cucaracha_state::sound_map);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.nmi_callback().set_inputline("soundcpu", INPUT_LINE_NMI);
 	ciu.reset_callback().set_inputline("soundcpu", INPUT_LINE_RESET);
 

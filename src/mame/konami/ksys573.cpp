@@ -400,7 +400,7 @@ class sys573_jvs_host : public jvs_host
 {
 public:
 	// construction/destruction
-	sys573_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sys573_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	void send_packet(uint8_t *data, int length);
 	int received_packet(uint8_t *buffer);
 
@@ -2544,7 +2544,7 @@ void ksys573_state::konami573(machine_config &config, bool no_cdrom)
 
 	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
 
-	ATA_INTERFACE(config, m_ata, 0);
+	ATA_INTERFACE(config, m_ata);
 	m_ata->irq_handler().set(FUNC(ksys573_state::ata_interrupt));
 	if(!no_cdrom)
 	{
@@ -2553,7 +2553,7 @@ void ksys573_state::konami573(machine_config &config, bool no_cdrom)
 		m_ata->slot(0).set_default_option("cr589");
 	}
 
-	konami573_cassette_slot_device &cassette(KONAMI573_CASSETTE_SLOT(config, "cassette", 0));
+	konami573_cassette_slot_device &cassette(KONAMI573_CASSETTE_SLOT(config, "cassette"));
 	cassette.dsr_handler().set("maincpu:sio1", FUNC(psxsio1_device::write_dsr));
 
 	// onboard flash
@@ -2566,10 +2566,10 @@ void ksys573_state::konami573(machine_config &config, bool no_cdrom)
 	FUJITSU_29F016A(config, "29f016a.31h");
 	FUJITSU_29F016A(config, "29f016a.27h");
 
-	PCCARD_SLOT(config, m_pccard1, 0);
+	PCCARD_SLOT(config, m_pccard1);
 	m_pccard1->cd1().set([this](int state) { m_pccard_cd[0] = state; });
 
-	PCCARD_SLOT(config, m_pccard2, 0);
+	PCCARD_SLOT(config, m_pccard2);
 	m_pccard2->cd1().set([this](int state) { m_pccard_cd[1] = state; });
 
 	ADDRESS_MAP_BANK(config, m_flashbank ).set_map( &ksys573_state::flashbank_map ).set_options( ENDIANNESS_LITTLE, 16, 32, 0x400000);
@@ -2586,12 +2586,12 @@ void ksys573_state::konami573(machine_config &config, bool no_cdrom)
 	spu.add_route(0, "speaker", 1.0, 0);
 	spu.add_route(1, "speaker", 1.0, 1);
 
-	M48T58(config, "m48t58", 0);
+	M48T58(config, "m48t58");
 
 	adc0834_device &adc(ADC0834(config, "adc0834"));
 	adc.set_input_callback(FUNC(ksys573_state::analogue_inputs_callback));
 
-	SYS573_JVS_HOST(config, m_sys573_jvs_host, 0);
+	SYS573_JVS_HOST(config, m_sys573_jvs_host);
 
 	// Uncomment for generating new security cartridges
 	// Warning: Does not play well with memory card reader (JVS chaining issue?)
@@ -2727,7 +2727,7 @@ void ddr_state::ddr2mc2(machine_config &config)
 	k573a(config);
 	cassx(config);
 
-	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, m_sys573_jvs_host);
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", m_sys573_jvs_host);
 }
 
 void ddr_state::ddr2ml(machine_config &config)
@@ -2736,7 +2736,7 @@ void ddr_state::ddr2ml(machine_config &config)
 	pccard1_16mb(config);
 	cassx(config);
 
-	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, m_sys573_jvs_host);
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", m_sys573_jvs_host);
 }
 
 void ddr_state::ddrbocd(machine_config &config)
@@ -2754,7 +2754,7 @@ void ddr_state::ddr3m(machine_config &config)
 	pccard2_32mb(config);
 	cassyyi(config);
 
-	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, m_sys573_jvs_host);
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", m_sys573_jvs_host);
 }
 
 void ddr_state::ddr3mp(machine_config &config)
@@ -2765,7 +2765,7 @@ void ddr_state::ddr3mp(machine_config &config)
 	pccard2_32mb(config);
 	cassxzi(config);
 
-	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, m_sys573_jvs_host);
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", m_sys573_jvs_host);
 }
 
 void ddr_state::ddrusa(machine_config &config)
@@ -2784,7 +2784,7 @@ void ddr_state::ddr5m(machine_config &config)
 	pccard2_32mb(config);
 	casszi(config);
 
-	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, m_sys573_jvs_host);
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", m_sys573_jvs_host);
 }
 
 // Dancing Stage
@@ -2871,7 +2871,7 @@ void ksys573_state::ddr4ms(machine_config &config)
 	pccard2_32mb(config);
 	cassxzi(config);
 
-	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, m_sys573_jvs_host);
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", m_sys573_jvs_host);
 }
 
 // DrumMania
@@ -2897,7 +2897,7 @@ void ksys573_state::drmn4m(machine_config &config)
 
 	casszi(config);
 
-	KONAMI_573_MULTI_SESSION_UNIT(config, "k573msu", 0);
+	KONAMI_573_MULTI_SESSION_UNIT(config, "k573msu");
 }
 
 void ksys573_state::drmn9m(machine_config &config)
@@ -2907,9 +2907,9 @@ void ksys573_state::drmn9m(machine_config &config)
 
 	casszi(config);
 
-	KONAMI_573_MULTI_SESSION_UNIT(config, "k573msu", 0);
+	KONAMI_573_MULTI_SESSION_UNIT(config, "k573msu");
 
-	// KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu", 0);
+	// KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu");
 }
 
 void ksys573_state::drmn10m(machine_config &config)
@@ -2919,9 +2919,9 @@ void ksys573_state::drmn10m(machine_config &config)
 
 	casszi(config);
 
-	KONAMI_573_MULTI_SESSION_UNIT(config, "k573msu", 0);
+	KONAMI_573_MULTI_SESSION_UNIT(config, "k573msu");
 
-	// KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu", 0);
+	// KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu");
 }
 
 // Guitar Freaks
@@ -2946,7 +2946,7 @@ void ksys573_state::gtrfrk2ml(machine_config &config)
 	pccard1_32mb(config); // HACK: The installation tries to check and erase 32mb but only flashes 16mb.
 
 	// For Guitar Freaks 2nd Mix Link Ver 1 (memory cards) and Link Ver 2 (memory cards + controllers)
-	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, m_sys573_jvs_host);
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", m_sys573_jvs_host);
 }
 
 void ksys573_state::gtrfrk3m(machine_config &config)
@@ -2955,7 +2955,7 @@ void ksys573_state::gtrfrk3m(machine_config &config)
 	cassxzi(config);
 	pccard1_16mb(config);
 
-	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", 0, m_sys573_jvs_host);
+	KONAMI_573_MEMORY_CARD_READER(config, "k573mcr", m_sys573_jvs_host);
 }
 
 void ksys573_state::gtrfrk5m(machine_config &config)
@@ -2978,7 +2978,7 @@ void ksys573_state::gtfrk10m(machine_config &config)
 	casszi(config);
 	pccard1_32mb(config);
 
-	// KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu", 0);
+	// KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu");
 }
 
 void ksys573_state::gtfrk11m(machine_config &config)
@@ -2987,7 +2987,7 @@ void ksys573_state::gtfrk11m(machine_config &config)
 	casszi(config);
 	pccard1_32mb(config);
 
-	// KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu", 0);
+	// KONAMI_573_NETWORK_PCB_UNIT(config, "k573npu");
 }
 
 // Miscellaneous

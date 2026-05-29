@@ -447,7 +447,7 @@ void alfaskop4110_state::alfaskop4110(machine_config &config)
 	m_dia_pia->ca1_w(0);
 	m_dia_pia->ca2_w(0);
 
-	ACIA6850(config, m_kbd_acia, 0);
+	ACIA6850(config, m_kbd_acia);
 	//CLOCK(config, "acia_clock", ACIA_CLOCK).signal_handler().set(FUNC(alfaskop4110_state::write_acia_clock));
 	m_kbd_acia->irq_handler().set("irq3", FUNC(input_merger_device::in_w<3>));
 

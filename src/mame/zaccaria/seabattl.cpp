@@ -487,7 +487,7 @@ void seabattl_state::seabattl(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &seabattl_state::seabattl_data_map);
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
-	S2636(config, m_s2636, 0);
+	S2636(config, m_s2636);
 	m_s2636->set_offsets(-13, -29);
 	m_s2636->add_route(ALL_OUTPUTS, "mono", 0.10);
 

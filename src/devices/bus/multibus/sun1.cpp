@@ -184,7 +184,7 @@ void multibus_sun1_device::device_reset()
 
 void multibus_sun1_device::device_add_mconfig(machine_config &config)
 {
-	M68000(config, m_cpu, 0);
+	M68000(config, m_cpu);
 	m_cpu->set_current_mmu(this);
 	m_cpu->set_addrmap(AS_PROGRAM, &multibus_sun1_device::cpu_mem);
 
@@ -215,7 +215,7 @@ void multibus_sun1_device::device_add_mconfig(machine_config &config)
 		});
 
 	// default configuration (1=watchdog, 2=user, 3=refresh, 4=uarta, 5=uartb)
-	AM9513(config, m_stc, 0);
+	AM9513(config, m_stc);
 	m_stc->fout_cb().set(m_stc, FUNC(am9513_device::gate1_w));
 	m_stc->out1_cb().set(FUNC(multibus_sun1_device::watchdog_w));
 	m_stc->out2_cb().set(FUNC(multibus_sun1_device::irq_w<M68K_IRQ_6>));
@@ -245,7 +245,7 @@ void multibus_sun1_device::device_add_mconfig(machine_config &config)
 
 	// port A: txd, rxd, rts, cts, dsr, dtr
 	// port B: txd, rxd
-	UPD7201(config, m_duart, 0);
+	UPD7201(config, m_duart);
 	m_duart->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
 	m_duart->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	m_duart->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));

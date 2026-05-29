@@ -113,7 +113,7 @@ void isa16_f65535_lcd_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(f65535_vga_device::screen_update));
 
-	F65535_VGA(config, m_vga, 0);
+	F65535_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(512*1024);
 }
@@ -268,7 +268,7 @@ void ptpc110_state::ptpc110(machine_config &config)
 
 	RAM(config, "ram").set_default_size("4M").set_extra_options("8M");
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->iochck_callback().set(m_chipset, FUNC(vl82c420_device::iochck_w));
@@ -291,8 +291,8 @@ void ptpc110_state::ptpc110(machine_config &config)
 	m_isabus->drq6_callback().set(m_chipset, FUNC(vl82c420_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_chipset, FUNC(vl82c420_device::dreq7_w));
 
-	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa_onboard, "vga",     true);
-	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa_onboard, "superio", true).set_option_machine_config("superio", superio_config);
+	ISA16_SLOT(config, "board1", "isabus", pc_isa_onboard, "vga",     true);
+	ISA16_SLOT(config, "board2", "isabus", pc_isa_onboard, "superio", true).set_option_machine_config("superio", superio_config);
 
 	// TODO: should not fit BIOS wise
 	ps2_keyboard_controller_device &keybc(PS2_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));

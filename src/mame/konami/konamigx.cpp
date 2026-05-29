@@ -1761,13 +1761,13 @@ void konamigx_state::konamigx(machine_config &config)
 	m_k056832->set_config(K056832_BPP_5, 0, 0);
 	m_k056832->set_palette(m_palette);
 
-	K055555(config, m_k055555, 0);
+	K055555(config, m_k055555);
 
-	K054338(config, m_k054338, 0, m_k055555);
+	K054338(config, m_k054338, m_k055555);
 	m_k054338->set_screen(m_screen);
 	m_k054338->set_alpha_invert(1);
 
-	K055673(config, m_k055673, 0);
+	K055673(config, m_k055673);
 	m_k055673->set_sprite_callback(FUNC(konamigx_state::type2_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_GX, -26, -23);
 	m_k055673->set_screen(m_screen);
@@ -1915,7 +1915,7 @@ void konamigx_state::racinfrc(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::racinfrc_map);
 
-	adc0834_device &adc(ADC0834(config, "adc0834", 0));
+	adc0834_device &adc(ADC0834(config, "adc0834"));
 	adc.set_input_callback(FUNC(konamigx_state::adc0834_callback));
 }
 
@@ -2066,13 +2066,13 @@ void konamigx_state::sexyparoebl(machine_config &config)
 	m_k056832->set_config(K056832_BPP_5, 0, 0);
 	m_k056832->set_palette(m_palette);
 
-	K055555(config, m_k055555, 0);
+	K055555(config, m_k055555);
 
-	K054338(config, m_k054338, 0, m_k055555);
+	K054338(config, m_k054338, m_k055555);
 	m_k054338->set_screen(m_screen);
 	m_k054338->set_alpha_invert(1);
 
-	K055673(config, m_k055673, 0);
+	K055673(config, m_k055673);
 	m_k055673->set_sprite_callback(FUNC(konamigx_state::type2_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_GX, -42, -23);
 	m_k055673->set_screen(m_screen);

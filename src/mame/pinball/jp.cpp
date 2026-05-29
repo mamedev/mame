@@ -483,7 +483,7 @@ void jp_state::jps(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &jp_state::audio_map);
 	m_audiocpu->set_irq_acknowledge_callback(FUNC(jp_state::sound_int_cb));
 
-	LS157(config, m_adpcm_select, 0); // not labeled in manual; might even be a CD4019
+	LS157(config, m_adpcm_select); // not labeled in manual; might even be a CD4019
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	SPEAKER(config, "msmvol").front_center();

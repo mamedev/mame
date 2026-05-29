@@ -869,7 +869,7 @@ void tek6100_state::tek6130(machine_config &config)
 	// TODO: graphics board disabled for now
 	if (false)
 	{
-		NS32016(config, m_dpu_cpu, 0); // 8'000'000);
+		NS32016(config, m_dpu_cpu); // 8'000'000);
 		m_dpu_cpu->set_addrmap(0, &tek6100_state::dpu_cpu_map<0>);
 
 		ns32081_device &dpu_fpu(NS32081(config, "dpu_fpu", 8'000'000));
@@ -878,7 +878,7 @@ void tek6100_state::tek6130(machine_config &config)
 		ns32202_device &dpu_icu(NS32202(config, "dpu_icu", 20'000));
 		dpu_icu.out_int().set_inputline(m_dpu_cpu, INPUT_LINE_IRQ0).invert();
 
-		i8744_device &dpu_mcu(I8744(config, "dpu_mcu", 0)); // 10'000'000)); // 8744H-10
+		i8744_device &dpu_mcu(I8744(config, "dpu_mcu")); // 10'000'000)); // 8744H-10
 		(void)dpu_mcu;
 
 		mc6845_device &dpu_crtc(SY6845E(config, "dpu_crtc", 25.2_MHz_XTAL)); // SYP6845EA

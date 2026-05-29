@@ -249,7 +249,7 @@ public:
 		set_h8bus_slot(std::forward<T>(sltag), tag);
 	}
 
-	h8bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T>
 	void set_h8bus_slot(T &&tag, const char *slottag)
@@ -262,7 +262,7 @@ public:
 	void map_io(address_space_installer &space);
 
 protected:
-	h8bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	h8bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
@@ -280,14 +280,14 @@ class h8bus_device : public device_t, public device_memory_interface
 	friend class device_h8bus_card_interface;
 
 public:
-	h8bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	~h8bus_device();
 
 	void map_mem(address_space_installer &space);
 	void map_io(address_space_installer &space);
 
 protected:
-	h8bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	h8bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

@@ -519,7 +519,7 @@ void isa16_f65535_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(f65535_vga_device::screen_update));
 
-	F65535_VGA(config, m_vga, 0);
+	F65535_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(512*1024);
 }
@@ -647,7 +647,7 @@ void mdartstr_state::mdartstr(machine_config &config)
 	// 640 + 384 KB
 	RAM(config, "ram").set_default_size("1024K");
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->iochck_callback().set(m_chipset, FUNC(f82c836a_device::iochck_w));
@@ -671,8 +671,8 @@ void mdartstr_state::mdartstr(machine_config &config)
 	m_isabus->drq7_callback().set(m_chipset, FUNC(f82c836a_device::dreq7_w));
 
 	// all on one backplane
-	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa_onboard, "vga",     true);
-	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa_onboard, "boot",    true).set_option_machine_config("boot", romdisk_config);;
+	ISA16_SLOT(config, "board1", "isabus", pc_isa_onboard, "vga",     true);
+	ISA16_SLOT(config, "board2", "isabus", pc_isa_onboard, "boot",    true).set_option_machine_config("boot", romdisk_config);;
 
 	at_kbc_device_base &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
 	keybc.hot_res().set(m_chipset, FUNC(f82c836a_device::kbrst_w));

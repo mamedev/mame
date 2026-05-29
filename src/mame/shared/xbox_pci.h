@@ -30,7 +30,14 @@ public:
 		set_ids_host(0x10de02a5, 0, 0);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
-	nv2a_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	nv2a_host_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: nv2a_host_device(mconfig, tag, owner, 0, std::forward<T>(cpu_tag))
+	{
+		set_ids_host(0x10de02a5, 0, 0);
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
+	nv2a_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 			uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 	template <typename T> void set_cpu_tag(T &&cpu_tag) { cpu.set_tag(std::forward<T>(cpu_tag)); }
@@ -56,7 +63,7 @@ public:
 	{
 		ram_size = memory_size;
 	}
-	nv2a_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nv2a_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
@@ -107,7 +114,7 @@ public:
 class mcpx_isalpc_device : public pci_device, public lpcbus_host_interface {
 public:
 	mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id);
-	mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	template <typename T> void set_dma_space(T &&bmtag, int bmspace) { m_dma_space.set_tag(std::forward<T>(bmtag), bmspace); }
 	template <bool R> void set_dma_space(const address_space_finder<R> &finder) { m_dma_space.set_tag(finder); }
 
@@ -241,7 +248,7 @@ public:
 class mcpx_smbus_device : public pci_device {
 public:
 	mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id);
-	mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto interrupt_handler() { return m_interrupt_handler.bind(); }
 
@@ -284,7 +291,7 @@ class usb_function_device;
 class mcpx_ohci_device : public pci_device {
 public:
 	mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id);
-	mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	void set_hack_callback(std::function<void(void)> hack) { hack_callback = hack; }
 	void plug_usb_device(int port, device_usb_ohci_function_interface *function);
 
@@ -324,7 +331,7 @@ DECLARE_DEVICE_TYPE(MCPX_OHCI, mcpx_ohci_device)
 
 class mcpx_eth_device : public pci_device {
 public:
-	mcpx_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcpx_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint32_t eth_r();
 	void eth_w(uint32_t data);
@@ -355,7 +362,7 @@ public:
 		set_ids(0x10de01b0, 0xc2, 0x040100, subsystem_id);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
-	mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	template <typename T> void set_cpu_tag(T &&cpu_tag) { cpu.set_tag(std::forward<T>(cpu_tag)); }
 
 	uint32_t apu_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -413,7 +420,7 @@ DECLARE_DEVICE_TYPE(MCPX_APU, mcpx_apu_device)
 class mcpx_ac97_audio_device : public pci_device {
 public:
 	mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id);
-	mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint32_t ac97_audio_r(offs_t offset, uint32_t mem_mask = ~0);
 	void ac97_audio_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -446,7 +453,7 @@ DECLARE_DEVICE_TYPE(MCPX_AC97_AUDIO, mcpx_ac97_audio_device)
 
 class mcpx_ac97_modem_device : public pci_device {
 public:
-	mcpx_ac97_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcpx_ac97_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 DECLARE_DEVICE_TYPE(MCPX_AC97_MODEM, mcpx_ac97_modem_device)
@@ -458,7 +465,7 @@ DECLARE_DEVICE_TYPE(MCPX_AC97_MODEM, mcpx_ac97_modem_device)
 class mcpx_ide_device : public pci_device {
 public:
 	mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id);
-	mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	template <typename T> void set_bus_master_space(T &&bmtag, int bmspace)
 	{
 		m_pri.lookup()->set_bus_master_space(bmtag, bmspace);
@@ -516,7 +523,7 @@ public:
 	{
 		set_ids_bridge(main_id, revision);
 	}
-	nv2a_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nv2a_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void config_map(address_map& map) override;
 
@@ -542,7 +549,13 @@ public:
 	{
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
-	nv2a_gpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	nv2a_gpu_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: nv2a_gpu_device(mconfig, tag, owner, 0, std::forward<T>(cpu_tag))
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
+	nv2a_gpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	template <typename T> void set_cpu_tag(T &&cpu_tag) { cpu.set_tag(std::forward<T>(cpu_tag)); }
 	nv2a_renderer *debug_get_renderer() { return nvidia_nv2a; }
 

@@ -17,7 +17,7 @@
 class bt481_device : public device_t, public device_palette_interface
 {
 public:
-	bt481_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bt481_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// color lookup
 	rgb_t pixel_select(uint8_t index) const { return pen_color(index & m_read_mask); } // P0-P7
@@ -43,7 +43,7 @@ public:
 	void overlay_address_read_w(uint8_t data);
 
 protected:
-	bt481_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bt481_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_start() override ATTR_COLD;
 
@@ -79,7 +79,7 @@ protected:
 class bt482_device : public bt481_device
 {
 public:
-	bt482_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bt482_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual uint8_t mask_r() override;
 	virtual void mask_w(uint8_t data) override;

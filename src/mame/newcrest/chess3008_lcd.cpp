@@ -46,7 +46,7 @@ chess3008_lcd_device::chess3008_lcd_device(const machine_config &mconfig, const 
 
 void chess3008_lcd_device::device_add_mconfig(machine_config &config)
 {
-	LC7580(config, m_lcd, 0);
+	LC7580(config, m_lcd);
 	m_lcd->write_segs().set(FUNC(chess3008_lcd_device::lcd_output_w));
 }
 

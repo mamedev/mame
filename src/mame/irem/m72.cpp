@@ -1666,7 +1666,7 @@ void m72_state::m72_audio_chips(machine_config &config)
 	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
 	soundlatch.set_separate_acknowledge(true);
 
-	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline(m_soundcpu, 0);
+	RST_NEG_BUFFER(config, "soundirq").int_callback().set_inputline(m_soundcpu, 0);
 
 	m_soundcpu->set_irq_acknowledge_callback("soundirq", FUNC(rst_neg_buffer_device::inta_cb));
 
@@ -1693,7 +1693,7 @@ void m72_state::m72_base(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &m72_state::sound_ram_map);
 	m_soundcpu->set_addrmap(AS_IO, &m72_state::sound_portmap);
 
-	PIC8259(config, m_upd71059c, 0);
+	PIC8259(config, m_upd71059c);
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// video hardware
@@ -1842,7 +1842,7 @@ void m72_state::rtype2(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &m72_state::rtype2_sound_portmap);
 	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512)); // verified
 
-	PIC8259(config, m_upd71059c, 0);
+	PIC8259(config, m_upd71059c);
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// video hardware
@@ -1935,7 +1935,7 @@ void m82_state::m82(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &m82_state::rtype2_sound_portmap);
 	m_soundcpu->set_periodic_int(FUNC(m82_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512)); // verified
 
-	PIC8259(config, m_upd71059c, 0);
+	PIC8259(config, m_upd71059c);
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// video hardware
@@ -1970,7 +1970,7 @@ void poundfor_state::poundfor(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &poundfor_state::poundfor_sound_portmap);
 	m_soundcpu->set_periodic_int(FUNC(poundfor_state::fake_nmi), attotime::from_hz(MASTER_CLOCK/8/512));
 
-	PIC8259(config, m_upd71059c, 0);
+	PIC8259(config, m_upd71059c);
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	UPD4701A(config, m_upd4701[0]);

@@ -298,12 +298,12 @@ void gs761_state::gs761(machine_config &config)
 	m_k056832->set_config(K056832_BPP_4dj, 1, 0);
 	m_k056832->set_palette(m_palette);
 
-	K055673(config, m_k055673, 0);
+	K055673(config, m_k055673);
 	m_k055673->set_sprite_callback(FUNC(gs761_state::sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_PS, -48 + 1, -23);
 	m_k055673->set_palette(m_palette);
 
-	K055555(config, m_k055555, 0);
+	K055555(config, m_k055555);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();

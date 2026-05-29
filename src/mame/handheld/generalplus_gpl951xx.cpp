@@ -356,9 +356,9 @@ void generalplus_gpl951xx_game_state::gpl951xx(machine_config &config)
 
 	m_screen->screen_vblank().set(m_maincpu, FUNC(generalplus_gpl951xx_device::vblank));
 
-	UNKNOWN_BFTETRIS_LCDC(config, m_lcdc, 0);
+	UNKNOWN_BFTETRIS_LCDC(config, m_lcdc);
 
-	GENERIC_SPI_FLASH(config, m_genspi, 0);
+	GENERIC_SPI_FLASH(config, m_genspi);
 
 	SPEAKER(config, "speaker", 2).front();
 }

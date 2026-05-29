@@ -331,7 +331,7 @@ void i7000_state::i7000(machine_config &config)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Programmable timer */
-	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253_device &pit8253(PIT8253(config, "pit8253"));
 //  pit8253.set_clk<0>(XTAL(4'000'000) / 2); /* TODO: verify on PCB */
 //  pit8253.out_handler<0>().set(FUNC(i7000_state::i7000_pit_out0));
 //  pit8253.set_clk<1>(XTAL(4'000'000) / 2); /* TODO: verify on PCB */

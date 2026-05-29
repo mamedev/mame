@@ -139,7 +139,7 @@ void abc99_device::mouse_mem(address_map &map)
 void abc99_device::device_add_mconfig(machine_config &config)
 {
 	// keyboard CPU
-	I8035(config, m_maincpu, 0); // from Z5 T0 output
+	I8035(config, m_maincpu); // from Z5 T0 output
 	m_maincpu->set_addrmap(AS_PROGRAM, &abc99_device::keyboard_mem);
 	m_maincpu->set_addrmap(AS_IO, &abc99_device::keyboard_io);
 	m_maincpu->p1_out_cb().set(FUNC(abc99_device::z2_p1_w));
@@ -159,11 +159,11 @@ void abc99_device::device_add_mconfig(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_hz(0));
 
 	// mouse
-	LUXOR_R8(config, m_mouse, 0);
+	LUXOR_R8(config, m_mouse);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 

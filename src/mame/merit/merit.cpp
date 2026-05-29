@@ -1624,7 +1624,7 @@ void merit_state::mosdraw(machine_config &config)
 	riviera(config);
 
 	// TODO: hook up RTC and printer
-	MM58274C(config, "rtc", 0);  // actually an MM58174AN, but should be compatible according to other drivers
+	MM58274C(config, "rtc");  // actually an MM58174AN, but should be compatible according to other drivers
 }
 
 void merit_state::couple(machine_config &config)

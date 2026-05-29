@@ -88,7 +88,7 @@ enum tdr_mask : u16
 	TDR_TBUF = 0x00ff, // transmitter buffer
 };
 
-dc7085_device::dc7085_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+dc7085_device::dc7085_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0)
 	: device_t(mconfig, DC7085, tag, owner, clock)
 	, m_chan(*this, "ch%u", 0U)
 	, m_int_cb(*this)
@@ -108,7 +108,7 @@ void dc7085_device::device_add_mconfig(machine_config &config)
 	 */
 	for (unsigned i = 0; i < std::size(m_chan); i++)
 	{
-		DC7085_CHANNEL(config, m_chan[i], 0);
+		DC7085_CHANNEL(config, m_chan[i]);
 
 		m_chan[i]->rx_done().set([this, i](u16 data) { rx_done((i << 8) | data); });
 		m_chan[i]->tx_cb().set([this, i](int state) { m_tx_cb[i](state); if (m_csr & CSR_MAINT) m_chan[i]->rx_w(state); });
@@ -292,7 +292,7 @@ void dc7085_device::tx_done(int state)
 	recalc_irqs();
 }
 
-dc7085_channel::dc7085_channel(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+dc7085_channel::dc7085_channel(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0)
 	: device_t(mconfig, DC7085_CHANNEL, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, m_tx_cb(*this)

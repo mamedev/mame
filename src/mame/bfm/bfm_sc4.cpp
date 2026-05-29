@@ -1293,7 +1293,7 @@ void sc4_state::sc4dmd(machine_config &config)
 	/* video hardware */
 
 	//config.set_default_layout(layout_sc4_dmd);
-	BFM_DM01(config, m_dm01, 0);
+	BFM_DM01(config, m_dm01);
 	m_dm01->busy_callback().set(FUNC(sc4_state::bfmdm01_busy));
 
 	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);

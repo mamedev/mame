@@ -201,13 +201,13 @@ void photoply_state::photoply(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &photoply_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("pci:05.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	SIS85C496_HOST(config, "pci:05.0", 0, "maincpu", 32*1024*1024);
 
-	ISA16_SLOT(config, "superio", 0, "pci:05.0:isabus", isa_internal_devices, "w83787f", true).set_option_machine_config("w83787f", winbond_superio_config);
-	ISA16_SLOT(config, "isa1", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "superio", "pci:05.0:isabus", isa_internal_devices, "w83787f", true).set_option_machine_config("w83787f", winbond_superio_config);
+	ISA16_SLOT(config, "isa1", "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
 
 	// TODO: convert to Microtouch
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));

@@ -11,9 +11,15 @@ public:
 	using pri_cb_delegate = device_delegate<u32 (u8 pri)>;
 	using gfxbank_cb_delegate = device_delegate<u32 (u32 code, u8 ext)>;
 
-	sei25x_rise1x_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sei25x_rise1x_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	template <typename T> sei25x_rise1x_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
 		: sei25x_rise1x_device(mconfig, tag, owner, clock)
+	{
+		set_info(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
+	}
+	template <typename T> sei25x_rise1x_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: sei25x_rise1x_device(mconfig, tag, owner, 0, std::forward<T>(palette_tag), gfxinfo)
 	{
 		set_info(gfxinfo);
 		set_palette(std::forward<T>(palette_tag));
@@ -38,7 +44,7 @@ public:
 	void draw_raw(bitmap_ind16 &bitmap, const rectangle cliprect, const u16 *spriteram, u16 size);
 
 protected:
-	sei25x_rise1x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	sei25x_rise1x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

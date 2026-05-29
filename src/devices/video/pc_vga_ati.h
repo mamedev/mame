@@ -16,7 +16,7 @@ class ati_vga_device : public svga_device
 {
 public:
 	// construction/destruction
-	ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
@@ -35,7 +35,7 @@ public:
 	auto eeprom_chip_select_out_cb() { return m_eeprom_chip_select_out.bind(); }
 
 protected:
-	ati_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ati_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

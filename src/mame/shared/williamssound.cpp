@@ -201,7 +201,7 @@ void williams_cvsd_sound_device::device_add_mconfig(machine_config &config)
 
 	MC1408(config, "dac").add_route(ALL_OUTPUTS, *this, 0.25);
 
-	HC55516(config, m_hc55516, 0);
+	HC55516(config, m_hc55516);
 	m_hc55516->add_route(ALL_OUTPUTS, *this, 0.60);
 }
 
@@ -522,7 +522,7 @@ void williams_narc_sound_device::device_add_mconfig(machine_config &config)
 	AD7224(config, "dac1", 0).add_route(ALL_OUTPUTS, *this, 0.25);
 	AD7224(config, "dac2", 0).add_route(ALL_OUTPUTS, *this, 0.25);
 
-	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, *this, 0.60);
+	HC55516(config, m_hc55516).add_route(ALL_OUTPUTS, *this, 0.60);
 }
 
 
@@ -1013,7 +1013,7 @@ void williams_s6_sound_device::device_add_mconfig(machine_config &config)
 
 	MC1408(config, "dac").add_route(ALL_OUTPUTS, *this, 0.5);
 
-	HC55516(config, m_hc, 0).add_route(ALL_OUTPUTS, *this, 1.00);
+	HC55516(config, m_hc).add_route(ALL_OUTPUTS, *this, 1.00);
 
 	PIA6821(config, m_pia);
 	m_pia->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
@@ -1122,7 +1122,7 @@ void williams_s9_sound_device::device_add_mconfig(machine_config &config)
 
 	MC1408(config, "dac").add_route(ALL_OUTPUTS, *this, 0.5);
 
-	HC55516(config, m_hc, 0).add_route(ALL_OUTPUTS, *this, 1.00);
+	HC55516(config, m_hc).add_route(ALL_OUTPUTS, *this, 1.00);
 
 	PIA6821(config, m_pia);
 	m_pia->set_port_a_input_overrides_output_mask(0xff);
@@ -1235,7 +1235,7 @@ void williams_s11_sound_device::device_add_mconfig(machine_config &config)
 
 	MC1408(config, "dac").add_route(ALL_OUTPUTS, *this, 0.5);
 
-	HC55516(config, m_hc, 0).add_route(ALL_OUTPUTS, *this, 1.00);
+	HC55516(config, m_hc).add_route(ALL_OUTPUTS, *this, 1.00);
 
 	PIA6821(config, m_pia);
 	m_pia->set_port_a_input_overrides_output_mask(0xff);

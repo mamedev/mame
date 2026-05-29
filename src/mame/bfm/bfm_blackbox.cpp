@@ -1670,7 +1670,7 @@ void blackbox_base_state::blackbox_base(machine_config &config)
 	m_pia->writepb_handler().set(FUNC(blackbox_base_state::pia_portb_w));
 	m_pia->cb2_handler().set_nop(); // Not connected
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 
 	FRUIT_SAMPLES(config, m_samples);
 }

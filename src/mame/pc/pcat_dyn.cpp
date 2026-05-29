@@ -178,7 +178,7 @@ void pcat_dyn_state::pcat_dyn(machine_config &config)
 	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(tvga9000_device::screen_update));
 
-	tvga9000_device &vga(TVGA9000_VGA(config, "vga", 0));
+	tvga9000_device &vga(TVGA9000_VGA(config, "vga"));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x200000);
 
@@ -188,7 +188,7 @@ void pcat_dyn_state::pcat_dyn(machine_config &config)
 	m_mc146818->irq().set("pic8259_2", FUNC(pic8259_device::ir0_w));
 	m_mc146818->set_century_index(0x32);
 
-	ad1848_device &ad1848(AD1848(config, "ad1848", 0));
+	ad1848_device &ad1848(AD1848(config, "ad1848"));
 	ad1848.irq().set("pic8259_1", FUNC(pic8259_device::ir5_w));
 	ad1848.drq().set("dma8237_1", FUNC(am9517a_device::dreq0_w));
 
@@ -211,7 +211,7 @@ void pcat_dyn_state::pcat_dyn(machine_config &config)
 	serport.ri_handler().set("ns16550", FUNC(ins8250_uart_device::ri_w));
 	serport.cts_handler().set("ns16550", FUNC(ins8250_uart_device::cts_w));
 
-	ISA8(config, m_isabus, 0);
+	ISA8(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->irq2_callback().set("pic8259_2", FUNC(pic8259_device::ir1_w));
@@ -225,7 +225,7 @@ void pcat_dyn_state::pcat_dyn(machine_config &config)
 	m_isabus->drq3_callback().set("dma8237_1", FUNC(am9517a_device::dreq3_w));
 
 	// FIXME: determine ISA bus clock
-	isa8_slot_device &isa1(ISA8_SLOT(config, "isa1", 0, "isa", pcat_dyn_isa8_cards, "sb15", true));
+	isa8_slot_device &isa1(ISA8_SLOT(config, "isa1", "isa", pcat_dyn_isa8_cards, "sb15", true));
 	isa1.set_option_device_input_defaults("sb15", DEVICE_INPUT_DEFAULTS_NAME(pcat_dyn_sb_def));
 	isa1.set_option_machine_config("sb15", pcat_dyn_sb_conf);
 }

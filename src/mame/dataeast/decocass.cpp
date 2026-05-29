@@ -1032,7 +1032,7 @@ void decocass_state::decocass(machine_config &config)
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 16);
 
-	DECOCASS_TAPE(config, m_cassette, 0);
+	DECOCASS_TAPE(config, m_cassette);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

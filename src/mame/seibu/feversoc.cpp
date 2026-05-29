@@ -306,7 +306,7 @@ void feversoc_state::feversoc(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000);
 
-	SEI25X_RISE1X(config, m_spritegen, 0, m_palette, gfx_feversoc);
+	SEI25X_RISE1X(config, m_spritegen, m_palette, gfx_feversoc);
 	m_spritegen->set_screen("screen");
 	m_spritegen->set_pix_raw_shift(6);
 	m_spritegen->set_pri_raw_shift(14);

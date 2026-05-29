@@ -121,7 +121,7 @@ void pulltrig_state::pulltrig(machine_config &config)
 	// Needs a $40000 sized ROM, not $80000
 	AMD_29F400T(config, "flash");
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	SIS630_HOST(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
 	sis5513_ide_device &ide(SIS5513_IDE(config, "pci:00.1", 0, "maincpu"));
 	ide.irq_pri().set("pci:01.0", FUNC(sis950_lpc_device::pc_iirqa_w));
@@ -132,14 +132,14 @@ void pulltrig_state::pulltrig(machine_config &config)
 		if (state)
 			machine().schedule_soft_reset();
 	});
-	sis950_acpi_device &acpi(SIS950_ACPI(config, "pci:01.0:acpi", 0));
+	sis950_acpi_device &acpi(SIS950_ACPI(config, "pci:01.0:acpi"));
 	acpi.smi().set_inputline("maincpu", INPUT_LINE_SMI);
-	SIS950_SMBUS(config, "pci:01.0:smbus", 0);
+	SIS950_SMBUS(config, "pci:01.0:smbus");
 
-	SIS900_ETH(config, "pci:01.1", 0);
+	SIS900_ETH(config, "pci:01.1");
 	SIS7001_USB(config, "pci:01.2", 0, 3);
 	SIS7001_USB(config, "pci:01.3", 0, 2);
-	SIS7018_AUDIO(config, "pci:01.4", 0);
+	SIS7018_AUDIO(config, "pci:01.4");
 	// documentation doesn't mention modem part #, derived from Shuttle MS11 MB manual
 //  SIS7013_MODEM_AC97(config, "pci:01.6"
 
@@ -147,12 +147,12 @@ void pulltrig_state::pulltrig(machine_config &config)
 	SIS630_BRIDGE(config, "pci:02.0", 0, "pci:02.0:00.0");
 	// GUI must go under the virtual bridge
 	// This will be correctly identified as bus #1-dev #0-func #0 by the Award BIOS
-	SIS630_GUI(config, "pci:02.0:00.0", 0);
+	SIS630_GUI(config, "pci:02.0:00.0");
 
 	// TODO: 3 PCI slots, 1 AGP, whatever is CNR slot
 
 	// confirmed IT8705F
-	ISA16_SLOT(config, "superio", 0, "pci:01.0:isabus", isa_internal_devices, "it8705f", true).set_option_machine_config("it8705f", ite_superio_config);
+	ISA16_SLOT(config, "superio", "pci:01.0:isabus", isa_internal_devices, "it8705f", true).set_option_machine_config("it8705f", ite_superio_config);
 
 	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, "microsoft_mouse"));
 	serport0.rxd_handler().set("superio:it8705f", FUNC(it8705f_device::rxd1_w));

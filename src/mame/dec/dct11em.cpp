@@ -299,7 +299,7 @@ void dct11em_state::dct11em(machine_config &config)
 	rs232.dsr_handler().set(m_uart, FUNC(i8251_device::write_dsr));
 	rs232.cts_handler().set(m_uart, FUNC(i8251_device::write_cts));
 
-	GENERIC_TERMINAL(config, m_terminal, 0); // Main terminal for now
+	GENERIC_TERMINAL(config, m_terminal); // Main terminal for now
 	m_terminal->set_keyboard_callback(FUNC(dct11em_state::kbd_put));
 }
 

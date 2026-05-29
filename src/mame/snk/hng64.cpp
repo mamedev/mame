@@ -2577,7 +2577,7 @@ void hng64_state::hng64(machine_config &config)
 	m_maincpu->set_dcache_size(16384);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hng64_state::main_map);
 
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(hng64_state::hng64_irq), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(hng64_state::hng64_irq), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2627,7 +2627,7 @@ void hng64_state::hng64(machine_config &config)
 	iomcu.serial0_out_cb().set(FUNC(hng64_state::sio0_w));
 	//iomcu.serial1_out_cb().set(FUNC(hng64_state::sio1_w)); // not initialized / used
 
-	IDT71321(config, "dt71321_dpram", 0);
+	IDT71321(config, "dt71321_dpram");
 	//MCFG_MB8421_INTL_AN0R(INPUTLINE("xxx", 0)) // I don't think the IRQs are connected
 }
 
@@ -2636,7 +2636,7 @@ void hng64_state::hng64_default(machine_config &config)
 	hng64(config);
 	hng64_audio(config);
 
-	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
+	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps));
 	lamps.lamps_out_cb<0>().set(FUNC(hng64_state::default_lamps_w<0>));
 	lamps.lamps_out_cb<1>().set(FUNC(hng64_state::default_lamps_w<1>));
 	lamps.lamps_out_cb<2>().set(FUNC(hng64_state::default_lamps_w<2>));
@@ -2652,7 +2652,7 @@ void hng64_state::hng64_drive(machine_config &config)
 	hng64(config);
 	hng64_audio(config);
 
-	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
+	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps));
 	lamps.lamps_out_cb<5>().set(FUNC(hng64_state::drive_lamps5_w)); // force feedback steering
 	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::drive_lamps6_w)); // lamps + coin counter
 	lamps.lamps_out_cb<7>().set(FUNC(hng64_state::drive_lamps7_w)); // lamps
@@ -2663,7 +2663,7 @@ void hng64_state::hng64_shoot(machine_config &config)
 	hng64(config);
 	hng64_audio_bbust2(config);
 
-	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
+	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps));
 	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::shoot_lamps6_w)); // start lamps (some missing?!)
 	lamps.lamps_out_cb<7>().set(FUNC(hng64_state::shoot_lamps7_w)); // gun lamps
 }
@@ -2673,7 +2673,7 @@ void hng64_state::hng64_fight(machine_config &config)
 	hng64(config);
 	hng64_audio(config);
 
-	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
+	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps));
 	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::fight_lamps6_w)); // coin counters
 }
 

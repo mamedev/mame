@@ -367,7 +367,7 @@ void st22xx_bbl338_state::st22xx_dphh8213(machine_config &config)
 	m_screen->set_visarea(0, 160 - 1, 0, 128 - 1);
 	m_screen->set_screen_update(FUNC(st22xx_bbl338_state::screen_update));
 
-	ST7735(config, m_lcdc, 0);
+	ST7735(config, m_lcdc);
 }
 
 void st22xx_bbl338_state::st22xx_cutepet(machine_config &config)
@@ -393,7 +393,7 @@ void st22xx_bbl338_state::st22xx_bbl338(machine_config &config)
 	m_screen->set_screen_update(FUNC(st22xx_bbl338_state::screen_update));
 
 	// incorrect for bbl338 (or will need changes to support higher resolutions)
-	ST7735(config, m_lcdc, 0);
+	ST7735(config, m_lcdc);
 }
 
 

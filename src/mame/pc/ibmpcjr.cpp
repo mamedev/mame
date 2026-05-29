@@ -654,14 +654,14 @@ void pcjr_state::ibmpcjr(machine_config &config)
 
 	// On the PC Jr the input for clock 1 seems to be selectable based on bit 4(/5?) written to output port A0h.
 	// This is not supported yet.
-	PIT8253(config, m_pit8253, 0);
+	PIT8253(config, m_pit8253);
 	m_pit8253->set_clk<0>(XTAL(14'318'181)/12);
 	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
 	m_pit8253->set_clk<1>(XTAL(14'318'181)/12);
 	m_pit8253->set_clk<2>(XTAL(14'318'181)/12);
 	m_pit8253->out_handler<2>().set(FUNC(pcjr_state::out2_changed));
 
-	PIC8259(config, m_pic8259, 0);
+	PIC8259(config, m_pic8259);
 	m_pic8259->out_int_callback().set(FUNC(pcjr_state::pic8259_set_int_line));
 
 	i8255_device &ppi(I8255(config, "ppi8255"));
@@ -683,7 +683,7 @@ void pcjr_state::ibmpcjr(machine_config &config)
 	serport.cts_handler().set("ins8250", FUNC(ins8250_uart_device::cts_w));
 
 	/* video hardware */
-	PCVIDEO_PCJR(config, m_video, 0);
+	PCVIDEO_PCJR(config, m_video);
 	m_video->set_screen("pcvideo_pcjr:screen");
 	m_video->set_chr_gen_tag("gfx1");
 	m_video->vsync_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));

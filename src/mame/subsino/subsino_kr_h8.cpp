@@ -158,7 +158,7 @@ void subsino_kr_h8_state::modcart(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_modcart);
 	PALETTE(config, "palette").set_entries(256);
 
-	RAMDAC(config, "ramdac", 0, "palette");
+	RAMDAC(config, "ramdac", "palette");
 
 	SPEAKER(config, "mono").front_center();
 

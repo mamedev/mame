@@ -595,8 +595,8 @@ void apple1_state::apple1(machine_config &config)
 	m_pia->writepb_handler().set(FUNC(apple1_state::pia_display_w));
 	m_pia->cb2_handler().set(FUNC(apple1_state::pia_display_gate_w));
 
-	A1BUS(config, A1_BUS_TAG, 0).set_space(m_maincpu, AS_PROGRAM);
-	A1BUS_SLOT(config, "exp", 0, A1_BUS_TAG, apple1_cards, "cassette");
+	A1BUS(config, A1_BUS_TAG).set_space(m_maincpu, AS_PROGRAM);
+	A1BUS_SLOT(config, "exp", A1_BUS_TAG, apple1_cards, "cassette");
 
 	SNAPSHOT(config, "snapshot", "snp").set_load_callback(FUNC(apple1_state::snapshot_cb));
 

@@ -4437,7 +4437,7 @@ void nmk16_state::sprite_dma_cb(int state)
 
 void nmk16_state::set_interrupt_timing(machine_config &config)
 {
-	NMK_IRQ(config, m_nmk_irq, 0);
+	NMK_IRQ(config, m_nmk_irq);
 	m_nmk_irq->set_screen(m_screen);
 	m_nmk_irq->irq_callback().set(FUNC(nmk16_state::main_irq_cb));
 	m_nmk_irq->sprite_dma_callback().set(FUNC(nmk16_state::sprite_dma_cb));
@@ -4663,7 +4663,7 @@ void nmk16_state::mustangb(machine_config &config)
 
 	OKIM6295(config, "oki", 1320000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound"));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
 	seibu_sound.coin_io_callback().set_constant(0xff); // unused
 	seibu_sound.set_rom_tag("audiocpu");
@@ -4883,7 +4883,7 @@ void nmk16_state::acrobatmbl(machine_config &config)
 
 	OKIM6295(config, "oki", 8_MHz_XTAL / 8, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40); // divider not verified
 
-	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound"));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
 	seibu_sound.coin_io_callback().set_constant(0xff); // unused
 	seibu_sound.set_rom_tag("audiocpu");
@@ -4939,7 +4939,7 @@ void nmk16_state::tdragonb(machine_config &config)    // bootleg using Raiden so
 
 	OKIM6295(config, "oki", 1320000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound"));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
 	seibu_sound.coin_io_callback().set_constant(0xff); // unused
 	seibu_sound.set_rom_tag("audiocpu");
@@ -5216,7 +5216,7 @@ void nmk16_state::strahljbl(machine_config &config)
 
 	OKIM6295(config, "oki", 12_MHz_XTAL / 12, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40); // XTAL confirmed, divisor not
 
-	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound"));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
 	seibu_sound.coin_io_callback().set_constant(0xff); // unused
 	seibu_sound.set_rom_tag("audiocpu");
@@ -5474,7 +5474,7 @@ void nmk16_state::macross2(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 
@@ -5520,7 +5520,7 @@ void nmk16_state::tdragon2(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 
@@ -5583,7 +5583,7 @@ void nmk16_state::raphero(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 
@@ -5615,7 +5615,7 @@ void nmk16_state::bjtwin(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 
@@ -5695,11 +5695,11 @@ void macross_prot_state::base_nmk214_215(machine_config &config)
 	m_protcpu->port_write<3>().set(FUNC(macross_prot_state::mcu_port3_to_214_w));
 	m_protcpu->port_write<7>().set(FUNC(macross_prot_state::mcu_port7_to_214_w));
 
-	NMK214(config, m_nmk214[0], 0); // Descrambling device for sprite GFX data
+	NMK214(config, m_nmk214[0]); // Descrambling device for sprite GFX data
 	m_nmk214[0]->set_mode(0);
 	m_nmk214[0]->set_input_address_bitswap(nmk214_sprites_address_bitswap);
 
-	NMK214(config, m_nmk214[1], 0); // Descrambling device for BG GFX data
+	NMK214(config, m_nmk214[1]); // Descrambling device for BG GFX data
 	m_nmk214[1]->set_mode(1);
 	m_nmk214[1]->set_input_address_bitswap(nmk214_bg_address_bitswap);
 }
@@ -5759,7 +5759,7 @@ void nmk16_state::powerins(machine_config &config)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 2.0);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 
@@ -5842,7 +5842,7 @@ void nmk16_state::powerinsb(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 

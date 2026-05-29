@@ -638,7 +638,7 @@ void sammymdl_state::sammymdl(machine_config &config)
 	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	//BUFFERED_SPRITERAM8(config, m_buffered_spriteram); // not on sammymdl?
-	KY3211(config, m_spritegen, 0, m_palette);
+	KY3211(config, m_spritegen, m_palette);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

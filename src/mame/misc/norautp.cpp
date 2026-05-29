@@ -2536,19 +2536,19 @@ void norautp_state::noraut_base(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	I8255(config, m_ppi8255[0], 0);
+	I8255(config, m_ppi8255[0]);
 	// (60-63) Mode 0 - Port A set as input
 	m_ppi8255[0]->in_pa_callback().set_ioport("DSW1");
 	m_ppi8255[0]->out_pb_callback().set(FUNC(norautp_state::mainlamps_w));
 	m_ppi8255[0]->out_pc_callback().set(FUNC(norautp_state::counterlamps_w));
 
-	I8255(config, m_ppi8255[1], 0);
+	I8255(config, m_ppi8255[1]);
 	// (a0-a3) Mode 0 - Ports A & B set as input
 	m_ppi8255[1]->in_pa_callback().set_ioport("IN0");
 	m_ppi8255[1]->in_pb_callback().set_ioport("IN1");
 	m_ppi8255[1]->out_pc_callback().set(FUNC(norautp_state::soundlamps_w));
 
-	I8255(config, m_ppi8255[2], 0);
+	I8255(config, m_ppi8255[2]);
 	m_ppi8255[2]->out_pb_callback().set(FUNC(norautp_state::ppi2_b_w));
 	// (c0-c3) Group A Mode 2 (5-lines handshacked bidirectional port).
 	// PPI-2 is configured as mixed mode2 and mode0 output.

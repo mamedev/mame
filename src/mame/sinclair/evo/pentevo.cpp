@@ -743,7 +743,7 @@ void pentevo_state::pentevo(machine_config &config)
 	RAM(config, m_char_ram).set_default_size("2048").set_default_value(0);
 
 	GLUKRS(config, m_glukrs, 32.768_kHz_XTAL);
-	SPI_SDCARD(config, m_sdcard, 0);
+	SPI_SDCARD(config, m_sdcard);
 	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(pentevo_state::spi_miso_w));
 
@@ -757,8 +757,8 @@ void pentevo_state::pentevo(machine_config &config)
 
 	AT_KEYB(config, m_keyboard, pc_keyboard_device::KEYBOARD_TYPE::AT, 3);
 
-	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
-	ZXBUS_SLOT(config, "zxbus1", 0, zxbus, zxbus_cards, nullptr);
+	zxbus_device &zxbus(ZXBUS(config, "zxbus"));
+	ZXBUS_SLOT(config, "zxbus1", zxbus, zxbus_cards, nullptr);
 }
 
 

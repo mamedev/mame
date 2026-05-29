@@ -43,10 +43,10 @@ public:
 		set_options(std::forward<U>(opts), dflt, false);
 		m_a2bus.set_tag(std::forward<T>(a2bus_tag));
 	}
-	a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	a2bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_t implementation
 	virtual void device_resolve_objects() override ATTR_COLD;
@@ -67,7 +67,7 @@ class a2bus_device : public device_t
 	friend class a2bus_mcms2_device;
 public:
 	// construction/destruction
-	a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration
 	template <typename T> void set_space(T &&tag, int spacenum) { m_maincpu_space.set_tag(std::forward<T>(tag), spacenum); }
@@ -93,7 +93,7 @@ public:
 	void nmi_w(int state);
 
 protected:
-	a2bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	a2bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;

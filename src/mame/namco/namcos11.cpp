@@ -782,7 +782,7 @@ void namcos11_state::coh110(machine_config &config)
 	//c352.add_route(2, "speaker", 1.00); // Second DAC not present.
 	//c352.add_route(3, "speaker", 1.00);
 
-	AT28C16(config, "at28c16", 0);
+	AT28C16(config, "at28c16");
 }
 
 void namcos11_state::coh100(machine_config &config)
@@ -800,90 +800,90 @@ void namcos11_state::tekken(machine_config &config)
 	coh100(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
 	// TODO: either allow optional devices in memory maps, add another memory map without keycus or add a dummy keycus for tekken
-	KEYCUS_C406(config, "keycus", 0);
+	KEYCUS_C406(config, "keycus");
 }
 
 void namcos11_state::tekken2o(machine_config &config)
 {
 	coh100(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
-	KEYCUS_C406(config, "keycus", 0);
+	KEYCUS_C406(config, "keycus");
 }
 
 void namcos11_state::tekken2(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
-	KEYCUS_C406(config, "keycus", 0);
+	KEYCUS_C406(config, "keycus");
 }
 
 void namcos11_state::souledge(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
-	KEYCUS_C409(config, "keycus", 0);
+	KEYCUS_C409(config, "keycus");
 }
 
 void namcos11_state::dunkmnia(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
-	KEYCUS_C410(config, "keycus", 0);
+	KEYCUS_C410(config, "keycus");
 }
 
 void namcos11_state::primglex(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
-	KEYCUS_C411(config, "keycus", 0);
+	KEYCUS_C411(config, "keycus");
 }
 
 void namcos11_state::xevi3dg(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
-	KEYCUS_C430(config, "keycus", 0);
+	KEYCUS_C430(config, "keycus");
 }
 
 void namcos11_state::danceyes(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
-	KEYCUS_C431(config, "keycus", 0);
+	KEYCUS_C431(config, "keycus");
 }
 
 void namcos11_state::pocketrc(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
-	KEYCUS_C432(config, "keycus", 0);
+	KEYCUS_C432(config, "keycus");
 }
 
 void namcos11_state::fambowl(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
-	KEYCUS_C432(config, "keycus", 0);   // no keycus is actually present, but the driver isn't ready for that
+	KEYCUS_C432(config, "keycus");   // no keycus is actually present, but the driver isn't ready for that
 }
 
 void namcos11_state::starswep(machine_config &config)
 {
 	coh110(config);
-	KEYCUS_C442(config, "keycus", 0);
+	KEYCUS_C442(config, "keycus");
 }
 
 void namcos11_state::myangel3(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_64_map);
-	KEYCUS_C443(config, "keycus", 0);
+	KEYCUS_C443(config, "keycus");
 }
 
 void namcos11_state::ptblank2ua(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::ptblank2ua_map);
-	KEYCUS_C443(config, "keycus", 0);
+	KEYCUS_C443(config, "keycus");
 }
 
 static INPUT_PORTS_START( namcos11 )

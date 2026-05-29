@@ -2309,9 +2309,9 @@ void mpu4_state::mpu4_common(machine_config &config)
 	m_pia8->irqa_handler().set(FUNC(mpu4_state::cpu0_irq));
 	m_pia8->irqb_handler().set(FUNC(mpu4_state::cpu0_irq));
 
-	METERS(config, m_meters, 0).set_number(8);
+	METERS(config, m_meters).set_number(8);
 
-	BACTA_DATALOGGER(config, m_dataport, 0);
+	BACTA_DATALOGGER(config, m_dataport);
 	m_dataport->rxd_handler().set(FUNC(mpu4_state::dataport_rxd));
 
 	HOPPER(config, m_hopper1, attotime::from_msec(100));
@@ -2374,7 +2374,7 @@ void mpu4_state::mod2_cheatchr_f(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
 
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
 	m_characteriser->set_lamp_table(nullptr);
@@ -2414,7 +2414,7 @@ void mpu4_state::mod4oki_cheatchr_f(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4_state::mpu4_memmap_characteriser);
 
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
 	m_characteriser->set_lamp_table(nullptr);

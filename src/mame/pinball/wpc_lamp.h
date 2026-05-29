@@ -12,7 +12,7 @@
 class wpc_lamp_device : public device_t
 {
 public:
-	wpc_lamp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wpc_lamp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~wpc_lamp_device();
 
 	void set_names(char const *const (&names)[8][8]);

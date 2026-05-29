@@ -22,7 +22,7 @@ class midway_serial_pic_device : public device_t
 {
 public:
 	// construction/destruction
-	midway_serial_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	midway_serial_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_upper(int upper) { m_upper = upper; }
 
@@ -32,7 +32,7 @@ public:
 	void reset_w(int state);
 
 protected:
-	midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -61,7 +61,7 @@ class midway_serial_pic_emu_device : public device_t
 {
 public:
 	// construction/destruction
-	midway_serial_pic_emu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	midway_serial_pic_emu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	u8 read();
 	void write(u8 data);
@@ -69,7 +69,7 @@ public:
 	void reset_w(int state);
 
 protected:
-	midway_serial_pic_emu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	midway_serial_pic_emu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -97,7 +97,7 @@ class midway_serial_pic2_device : public midway_serial_pic_device, public device
 {
 public:
 	// construction/destruction
-	midway_serial_pic2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	midway_serial_pic2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_yearoffs(int yearoffs) { m_yearoffs = yearoffs; }
 
@@ -108,7 +108,7 @@ public:
 	void set_default_nvram(const uint8_t *nvram);
 
 protected:
-	midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -161,7 +161,7 @@ public:
 	};
 
 	// construction/destruction
-	midway_ioasic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	midway_ioasic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template<unsigned Port> auto in_port_cb() { return m_input_cb[Port].bind(); }
 	template <typename T> void set_cage_tag(T &&tag) { m_cage.set_tag(std::forward<T>(tag)); }

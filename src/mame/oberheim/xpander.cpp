@@ -852,7 +852,7 @@ void xpander_state::xpander(machine_config &config)
 	NVRAM(config, NVRAM_A_TAG, nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, NVRAM_B_TAG, nvram_device::DEFAULT_ALL_0);
 
-	ACIA6850(config, m_midiacia, 0);
+	ACIA6850(config, m_midiacia);
 	m_midiacia->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_midiacia->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 

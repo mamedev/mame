@@ -293,7 +293,7 @@ void coco3_state::coco3(machine_config &config)
 	m_pia_1->irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<1>));
 
 	// Becker Port device
-	COCO_DWSOCK(config, m_beckerport, 0);
+	COCO_DWSOCK(config, m_beckerport);
 
 	// sound hardware
 	coco_sound(config);
@@ -306,8 +306,8 @@ void coco3_state::coco3(machine_config &config)
 	rs232.dcd_handler().set(m_pia_1, FUNC(pia6821_device::ca1_w));
 	rs232.set_option_device_input_defaults("rs_printer", DEVICE_INPUT_DEFAULTS_NAME(rs_printer));
 
-	COCO_VHD(config, m_vhd_0, 0, m_maincpu);
-	COCO_VHD(config, m_vhd_1, 0, m_maincpu);
+	COCO_VHD(config, m_vhd_0, m_maincpu);
+	COCO_VHD(config, m_vhd_1, m_maincpu);
 
 	// monitor
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

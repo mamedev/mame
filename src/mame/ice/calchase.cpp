@@ -687,12 +687,12 @@ void calchase_state::calchase(machine_config &config)
 	pcibus.set_device(7, FUNC(calchase_state::intel82371ab_pci_r), FUNC(calchase_state::intel82371ab_pci_w));
 
 	// FIXME: determine ISA bus clock
-	isa16_device &isa(ISA16(config, "isa", 0));
+	isa16_device &isa(ISA16(config, "isa"));
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
-	ISA16_SLOT(config, "isa1", 0, "isa", calchase_isa16_cards, "calchase_jamma_if", true);
+	ISA16_SLOT(config, "isa1", "isa", calchase_isa16_cards, "calchase_jamma_if", true);
 	// TODO: temp, to be converted to PCI slot
-	ISA16_SLOT(config, "isa2", 0, "isa", calchase_isa16_cards, "tgui9680", true);
+	ISA16_SLOT(config, "isa2", "isa", calchase_isa16_cards, "tgui9680", true);
 
 	ds12885_device &rtc(DS12885(config.replace(), "rtc"));
 	rtc.irq().set("pic8259_2", FUNC(pic8259_device::ir0_w));
@@ -717,12 +717,12 @@ void calchase_state::hostinv(machine_config &config)
 	pcibus.set_device(7, FUNC(calchase_state::intel82371ab_pci_r), FUNC(calchase_state::intel82371ab_pci_w));
 
 	// TODO: determine isa bus clock
-	isa16_device &isa(ISA16(config, "isa", 0));
+	isa16_device &isa(ISA16(config, "isa"));
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
-	ISA16_SLOT(config, "isa1", 0, "isa", calchase_isa16_cards, "calchase_jamma_if", true);
+	ISA16_SLOT(config, "isa1", "isa", calchase_isa16_cards, "calchase_jamma_if", true);
 	// TODO: temp, to be converted to PCI slot
-	ISA16_SLOT(config, "isa2", 0, "isa", calchase_isa16_cards, "tgui9680", true);
+	ISA16_SLOT(config, "isa2", "isa", calchase_isa16_cards, "tgui9680", true);
 }
 
 void calchase_state::init_calchase()

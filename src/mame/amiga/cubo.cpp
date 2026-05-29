@@ -1115,11 +1115,11 @@ void cubo_state::cubo(machine_config &config)
 	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
 	m_copper->set_ecs_mode(true);
 
-	I2C_24C08(config, "i2cmem", 0); // AT24C08N
+	I2C_24C08(config, "i2cmem"); // AT24C08N
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // unknown type, odeontw accesses it
 
-	AKIKO(config, m_akiko, 0);
+	AKIKO(config, m_akiko);
 	m_akiko->mem_r_callback().set(FUNC(amiga_state::chip_ram_r));
 	m_akiko->mem_w_callback().set(FUNC(amiga_state::chip_ram_w));
 	m_akiko->int_callback().set(FUNC(cubo_state::akiko_int_w));

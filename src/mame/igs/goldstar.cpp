@@ -15783,7 +15783,7 @@ void sanghopm_state::star100(machine_config &config)
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	PALETTE(config, m_palette).set_entries(0x100);
-	RAMDAC(config, "ramdac", 0, "palette").set_addrmap(0, &sanghopm_state::ramdac_map);
+	RAMDAC(config, "ramdac", "palette").set_addrmap(0, &sanghopm_state::ramdac_map);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sangho);
 
@@ -16944,7 +16944,7 @@ void cmaster_state::crazybon(machine_config &config)
 	I8255A(config.replace(), m_ppi[1]);
 
 	PALETTE(config.replace(), m_palette).set_entries(0x100);
-	RAMDAC(config, "ramdac", 0, "palette").set_addrmap(0, &cmaster_state::ramdac_map);
+	RAMDAC(config, "ramdac", "palette").set_addrmap(0, &cmaster_state::ramdac_map);
 }
 
 void cmaster_state::crazybonb(machine_config &config)

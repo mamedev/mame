@@ -2187,7 +2187,7 @@ void cave_state::add_base_config(machine_config &config, int layer)
 
 	PALETTE(config, m_palette[0], palette_device::BLACK).set_format(palette_device::xGRB_555, 0x8000);
 
-	SPRITE013(config, m_spritegen[0], 0, m_palette[0], gfx_common_spr);
+	SPRITE013(config, m_spritegen[0], m_palette[0], gfx_common_spr);
 	m_spritegen[0]->set_screen(m_screen[0]);
 	m_spritegen[0]->set_spriteram_tag(m_spriteram[0]);
 	m_spritegen[0]->set_colpri_callback(FUNC(cave_state::colpri_cb));
@@ -2285,7 +2285,7 @@ void cave_state::donpachi(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 	nmk112.set_page_mask(1 << 0);    // chip #0 (music) is not paged
@@ -2587,7 +2587,7 @@ void ppsatan_state::ppsatan(machine_config &config)
 
 	m_spritegen[0]->set_info(gfx_korokoro_spr);
 
-	SPRITE013(config, m_spritegen[1], 0, m_palette[1], gfx_ppsatan_spr_1);
+	SPRITE013(config, m_spritegen[1], m_palette[1], gfx_ppsatan_spr_1);
 	m_spritegen[1]->set_screen(m_screen[1]);
 	m_spritegen[1]->set_spriteram_tag(m_spriteram[1]);
 	m_spritegen[1]->set_colpri_callback(FUNC(ppsatan_state::colpri_cb));
@@ -2597,7 +2597,7 @@ void ppsatan_state::ppsatan(machine_config &config)
 	m_spritegen[1]->set_transpen(0);
 	m_spritegen[1]->set_granularity(16);
 
-	SPRITE013(config, m_spritegen[2], 0, m_palette[2], gfx_ppsatan_spr_2);
+	SPRITE013(config, m_spritegen[2], m_palette[2], gfx_ppsatan_spr_2);
 	m_spritegen[2]->set_screen(m_screen[2]);
 	m_spritegen[2]->set_spriteram_tag(m_spriteram[2]);
 	m_spritegen[2]->set_colpri_callback(FUNC(ppsatan_state::colpri_cb));
@@ -2682,7 +2682,7 @@ void cave_z80_state::pwrinst2(machine_config &config)
 	ym2203.add_route(2, "mono", 0.40);
 	ym2203.add_route(3, "mono", 0.80);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
 

@@ -504,7 +504,7 @@ void mechatt_state::mechatt(machine_config &config)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	SNK_BBUSTERS_SPR(config, m_sprites, 0);
+	SNK_BBUSTERS_SPR(config, m_sprites);
 	m_sprites->set_scaletable_tag("sprites:scale_table");
 	m_sprites->set_palette("palette");
 	m_sprites->set_spriteram_tag("spriteram");

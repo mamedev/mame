@@ -397,12 +397,12 @@ void kim1_state::kim1(machine_config &config)
 
 	// KIM-1 has two edge connectors for expansion; you could plug them into a backplane,
 	// and that's what we're abstracting here.
-	KIM1BUS(config, "bus", 0).set_space(m_maincpu, AS_PROGRAM);
-	KIM1BUS_SLOT(config, "sl1", 0, "bus", kim1_cards, nullptr);
-	KIM1BUS_SLOT(config, "sl2", 0, "bus", kim1_cards, nullptr);
-	KIM1BUS_SLOT(config, "sl3", 0, "bus", kim1_cards, nullptr);
-	KIM1BUS_SLOT(config, "sl4", 0, "bus", kim1_cards, nullptr);
-	KIM1BUS_SLOT(config, "sl5", 0, "bus", kim1_cards, nullptr);
+	KIM1BUS(config, "bus").set_space(m_maincpu, AS_PROGRAM);
+	KIM1BUS_SLOT(config, "sl1", "bus", kim1_cards, nullptr);
+	KIM1BUS_SLOT(config, "sl2", "bus", kim1_cards, nullptr);
+	KIM1BUS_SLOT(config, "sl3", "bus", kim1_cards, nullptr);
+	KIM1BUS_SLOT(config, "sl4", "bus", kim1_cards, nullptr);
+	KIM1BUS_SLOT(config, "sl5", "bus", kim1_cards, nullptr);
 
 	// software list
 	SOFTWARE_LIST(config, "cass_list").set_original("kim1_cass");

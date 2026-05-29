@@ -491,10 +491,10 @@ void overdriv_state::overdriv(machine_config &config)
 	m_k051316[1]->set_offsets(111, 1);
 	m_k051316[1]->set_zoom_callback(FUNC(overdriv_state::zoom_callback_2));
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
-	K053250(config, "k053250_1", 0, "palette", m_screen, 0, 0);
-	K053250(config, "k053250_2", 0, "palette", m_screen, 0, 0);
+	K053250(config, "k053250_1", "palette", m_screen, 0, 0);
+	K053250(config, "k053250_2", "palette", m_screen, 0, 0);
 
 	K053252(config, m_k053252, 24_MHz_XTAL / 4);
 	m_k053252->set_offsets(13*8, 2*8);

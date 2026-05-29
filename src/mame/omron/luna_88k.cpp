@@ -630,7 +630,7 @@ void luna88k2_state::luna88k2(machine_config &config)
 	INPUT_MERGER_ANY_LOW(config, m_cbus_irq);
 	m_cbus_irq->output_handler().set(net_irq, FUNC(input_merger_any_low_device::in_w<2>));
 
-	PC98_CBUS_ROOT(config, m_cbus_root, 0);
+	PC98_CBUS_ROOT(config, m_cbus_root);
 	m_cbus_root->int_cb<0>().set(FUNC(luna88k2_state::cbus_irq_w<0>));
 	m_cbus_root->int_cb<1>().set(FUNC(luna88k2_state::cbus_irq_w<1>));
 	m_cbus_root->int_cb<2>().set(FUNC(luna88k2_state::cbus_irq_w<2>));

@@ -466,7 +466,7 @@ void banprestoms_state::banprestoms(machine_config &config)
 	screen.set_screen_update(FUNC(banprestoms_state::screen_update));
 	screen.set_palette(m_palette);
 
-	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc"));
 	crtc.layer_en_callback().set(FUNC(banprestoms_state::layer_en_w));
 	crtc.layer_scroll_callback().set(FUNC(banprestoms_state::layer_scroll_w));
 	crtc.layer_scroll_base_callback().set([this] (offs_t offset, u16 data, u16 mem_mask) {

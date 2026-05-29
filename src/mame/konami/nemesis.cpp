@@ -1865,7 +1865,7 @@ void gx400_state::nemesis(machine_config &config)
 	intlatch.q_out_cb<2>().set(FUNC(gx400_state::gfx_flipx_w));
 	intlatch.q_out_cb<3>().set(FUNC(gx400_state::gfx_flipy_w));
 
-	WATCHDOG_TIMER(config, "watchdog", 0);
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

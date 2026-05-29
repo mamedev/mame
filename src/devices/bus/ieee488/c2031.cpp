@@ -381,7 +381,7 @@ void c2031_device::device_add_mconfig(machine_config &config)
 	C64H156(config, m_ga, XTAL(16'000'000));
 	m_ga->byte_callback().set(FUNC(c2031_device::byte_w));
 
-	floppy_connector &connector(FLOPPY_CONNECTOR(config, C64H156_TAG":0", 0));
+	floppy_connector &connector(FLOPPY_CONNECTOR(config, C64H156_TAG":0"));
 	connector.option_add("525ssqd", FLOPPY_525_SSQD);
 	connector.set_default_option("525ssqd");
 	connector.set_fixed(true);

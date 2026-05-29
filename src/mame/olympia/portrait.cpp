@@ -568,9 +568,9 @@ void portrait_state::portrait(machine_config &config)
 	I8039(config, m_audiocpu, 3'120'000);  // ?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &portrait_state::audio_program_map);
 
-	PIT8253(config, "pit0", 0); // TODO
+	PIT8253(config, "pit0"); // TODO
 
-	PIT8253(config, "pit1", 0); // TODO
+	PIT8253(config, "pit1"); // TODO
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

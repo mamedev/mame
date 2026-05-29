@@ -1005,7 +1005,7 @@ void alphaone_state::alphaone(machine_config &config)
 	screen.set_visarea(0, 580, 0, 500);
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	avg_device &avg(AVG_MHAVOC(config, "avg", 0));
+	avg_device &avg(AVG_MHAVOC(config, "avg"));
 	avg.set_vector("vector");
 	avg.set_memory(m_alpha, AS_PROGRAM, 0x4000);
 

@@ -617,7 +617,7 @@ void systemm1_state::m1base(machine_config &config)
 	S24TILE(config, m_tiles, 0, 0x3fff);
 	m_tiles->set_palette(m_palette);
 
-	S24MIXER(config, m_mixer, 0);
+	S24MIXER(config, m_mixer);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

@@ -833,21 +833,21 @@ DEVICE_INPUT_DEFAULTS_END
 
 void intellec4_state::intellec4(machine_config &config)
 {
-	ADDRESS_MAP_BANK(config, m_program_banks, 0);
+	ADDRESS_MAP_BANK(config, m_program_banks);
 	m_program_banks->set_map(&intellec4_state::intellec4_program_banks);
 	m_program_banks->set_endianness(ENDIANNESS_LITTLE);
 	m_program_banks->set_data_width(8);
 	m_program_banks->set_addr_width(14);
 	m_program_banks->set_stride(0x1000);
 
-	ADDRESS_MAP_BANK(config, m_rom_port_banks, 0);
+	ADDRESS_MAP_BANK(config, m_rom_port_banks);
 	m_rom_port_banks->set_map(&intellec4_state::intellec4_rom_port_banks);
 	m_rom_port_banks->set_endianness(ENDIANNESS_LITTLE);
 	m_rom_port_banks->set_data_width(8);
 	m_rom_port_banks->set_addr_width(14);
 	m_rom_port_banks->set_stride(0x1000);
 
-	INTEL_IMM6_76(config, m_prom_programmer, 0);
+	INTEL_IMM6_76(config, m_prom_programmer);
 
 	RS232_PORT(config, m_tty, default_rs232_devices, "terminal");
 	m_tty->set_option_device_input_defaults("terminal",   DEVICE_INPUT_DEFAULTS_NAME(terminal));

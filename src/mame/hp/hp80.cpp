@@ -1590,11 +1590,11 @@ void hp85_state::hp85(machine_config &config)
 	TIMER(config, m_prt_busy_timer).configure_generic(FUNC(hp85_state::prt_busy_timer));
 
 	// Tape drive
-	HP_1MA6(config, "tape", 0);
+	HP_1MA6(config, "tape");
 
 	// Printer output
-	BITBANGER(config, m_prt_graph_out, 0);
-	BITBANGER(config, m_prt_alpha_out, 0);
+	BITBANGER(config, m_prt_graph_out);
+	BITBANGER(config, m_prt_alpha_out);
 
 	SOFTWARE_LIST(config, "optrom_list").set_original("hp85_rom");
 }

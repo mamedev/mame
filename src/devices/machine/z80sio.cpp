@@ -274,26 +274,26 @@ DEFINE_DEVICE_TYPE(MK68564,         mk68564_device,     "mk68564",         "Most
 //-------------------------------------------------
 void z80sio_device::device_add_mconfig(machine_config &config)
 {
-	Z80SIO_CHANNEL(config, CHANA_TAG, 0);
-	Z80SIO_CHANNEL(config, CHANB_TAG, 0);
+	Z80SIO_CHANNEL(config, CHANA_TAG);
+	Z80SIO_CHANNEL(config, CHANB_TAG);
 }
 
 void z80dart_device::device_add_mconfig(machine_config &config)
 {
-	Z80DART_CHANNEL(config, CHANA_TAG, 0);
-	Z80DART_CHANNEL(config, CHANB_TAG, 0);
+	Z80DART_CHANNEL(config, CHANA_TAG);
+	Z80DART_CHANNEL(config, CHANB_TAG);
 }
 
 void i8274_device::device_add_mconfig(machine_config &config)
 {
-	I8274_CHANNEL(config, CHANA_TAG, 0);
-	I8274_CHANNEL(config, CHANB_TAG, 0);
+	I8274_CHANNEL(config, CHANA_TAG);
+	I8274_CHANNEL(config, CHANB_TAG);
 }
 
 void mk68564_device::device_add_mconfig(machine_config &config)
 {
-	MK68564_CHANNEL(config, CHANA_TAG, 0);
-	MK68564_CHANNEL(config, CHANB_TAG, 0);
+	MK68564_CHANNEL(config, CHANA_TAG);
+	MK68564_CHANNEL(config, CHANB_TAG);
 }
 
 

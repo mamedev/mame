@@ -564,7 +564,7 @@ void isa16_oksan_lpc::device_add_mconfig(machine_config &config)
 	//m_rtc->irq().set(m_pic8259_2, FUNC(pic8259_device::ir0_w));
 	m_rtc->set_century_index(0x32);
 
-	KBDC8042(config, m_kbdc, 0);
+	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	m_kbdc->system_reset_callback().set_inputline(":maincpu", INPUT_LINE_RESET);
 	m_kbdc->gate_a20_callback().set(":pci:07.0", FUNC(i82371eb_isa_device::a20gate_w));
@@ -676,9 +676,9 @@ void xtom3d_state::xtom3d(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 	m_maincpu->smiact().set("pci:00.0", FUNC(i82443bx_host_device::smi_act_w));
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// PCB has ZX marking but BIOS returns BX, shouldn't matter
-	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 64*1024*1024);
+	I82443BX_HOST(config, "pci:00.0", "maincpu", 64*1024*1024);
 	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
 	//I82443BX_AGP   (config, "pci:01.0:00.0");
 
@@ -687,7 +687,7 @@ void xtom3d_state::xtom3d(machine_config &config)
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 
-	I82371EB_IDE(config, m_pci_ide, 0, m_maincpu);
+	I82371EB_IDE(config, m_pci_ide, m_maincpu);
 	m_pci_ide->irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
 	m_pci_ide->irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
 
@@ -696,19 +696,19 @@ void xtom3d_state::xtom3d(machine_config &config)
 
 	m_pci_ide->subdevice<bus_master_ide_controller_device>("ide2")->slot(0).set_default_option(nullptr);
 
-	I82371EB_USB (config, "pci:07.2", 0);
-	I82371EB_ACPI(config, "pci:07.3", 0);
+	I82371EB_USB (config, "pci:07.2");
+	I82371EB_ACPI(config, "pci:07.3");
 	ACPI_PIIX4   (config, "pci:07.3:acpi");
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
-	ISA16_SLOT(config, "board1", 0, "pci:07.0:isabus", xtom3d_isa_cards, "oksan_romdisk", true).set_option_machine_config("oksan_romdisk", romdisk_config);
-	ISA16_SLOT(config, "board2", 0, "pci:07.0:isabus", xtom3d_isa_cards, "oksan_lpc", true);
-	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", xtom3d_isa_cards, "xtom3d_io_sound", true);
-	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "board1", "pci:07.0:isabus", xtom3d_isa_cards, "oksan_romdisk", true).set_option_machine_config("oksan_romdisk", romdisk_config);
+	ISA16_SLOT(config, "board2", "pci:07.0:isabus", xtom3d_isa_cards, "oksan_lpc", true);
+	ISA16_SLOT(config, "isa1", "pci:07.0:isabus", xtom3d_isa_cards, "xtom3d_io_sound", true);
+	ISA16_SLOT(config, "isa2", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	// Expansion slots, mapping SVGA for debugging
 #if ENABLE_VOODOO
-	VOODOO_BANSHEE_X86_PCI(config, m_voodoo, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
+	VOODOO_BANSHEE_X86_PCI(config, m_voodoo, m_maincpu, "screen"); // "pci:0d.0" J4D2
 	m_voodoo->set_fbmem(8);
 	// NOTE: pumpit1 touches this a lot
 	m_voodoo->set_status_cycles(1000);

@@ -9,7 +9,7 @@ class powervr2_device : public device_t,
 						public device_video_interface
 {
 public:
-	powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_texture_ram(T &&tag) { dc_texture_ram.set_tag(std::forward<T>(tag)); }

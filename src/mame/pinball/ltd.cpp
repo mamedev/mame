@@ -562,7 +562,7 @@ void ltd3_state::ltd3(machine_config &config)
 	genpin_audio(config);
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	CLOCK(config, m_monotone, 0);
+	CLOCK(config, m_monotone);
 	m_monotone->signal_handler().set("snd", FUNC(input_merger_device::in_w<0>));
 	AY8910(config, "ay0", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "mono", 0.75); /* guess */
 	AY8910(config, "ay1", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "mono", 0.75); /* guess */

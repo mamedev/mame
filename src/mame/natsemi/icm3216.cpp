@@ -286,7 +286,7 @@ void icm3216_state::icm3216(machine_config &config)
 	NS32202(config, m_icu, 18.432_MHz_XTAL / 10);
 	m_icu->out_int().set_inputline(m_cpu, INPUT_LINE_IRQ0).invert();
 
-	MM58274C(config, m_rtc, 0);
+	MM58274C(config, m_rtc);
 
 	// we are dte, therefore: tx,rx,rts,cts,dsr,dtr,dcd
 	// rts o

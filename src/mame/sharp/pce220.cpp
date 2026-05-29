@@ -941,7 +941,7 @@ void pce220_state::pce220(machine_config &config)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
-	PCE220SERIAL(config, m_serial, 0);
+	PCE220SERIAL(config, m_serial);
 	config.set_default_layout(layout_pce220);
 }
 

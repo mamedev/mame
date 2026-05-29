@@ -41,7 +41,7 @@
 class tms1400_cpu_device : public tms1100_cpu_device
 {
 public:
-	tms1400_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms1400_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	tms1400_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
@@ -59,7 +59,7 @@ protected:
 class tms1470_cpu_device : public tms1400_cpu_device
 {
 public:
-	tms1470_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms1470_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	tms1470_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
@@ -68,7 +68,7 @@ protected:
 class tms1475_cpu_device : public tms1470_cpu_device
 {
 public:
-	tms1475_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms1475_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	virtual void op_setr() override { tms1100_cpu_device::op_setr(); }
@@ -78,7 +78,7 @@ protected:
 class tms1600_cpu_device : public tms1400_cpu_device
 {
 public:
-	tms1600_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms1600_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	tms1600_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
@@ -87,7 +87,7 @@ protected:
 class tms1670_cpu_device : public tms1600_cpu_device
 {
 public:
-	tms1670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tms1670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 

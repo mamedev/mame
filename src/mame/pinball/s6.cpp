@@ -521,7 +521,7 @@ void s6_state::s6(machine_config &config)
 
 	/* Add the soundcard */
 	SPEAKER(config, "mono").front_center();
-	WILLIAMS_S6_SOUND(config, m_s6sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	WILLIAMS_S6_SOUND(config, m_s6sound).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void s6_state::s6a(machine_config &config)

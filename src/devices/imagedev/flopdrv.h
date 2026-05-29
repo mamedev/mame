@@ -86,13 +86,14 @@ class legacy_floppy_image_device :  public device_t,
 {
 public:
 	// construction/destruction
-	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const floppy_interface *config)
-		: legacy_floppy_image_device(mconfig, tag, owner, clock)
+	template <typename T, std::enable_if_t<std::is_convertible_v<T, const floppy_interface *>, int> = 0>
+	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&config)
+		: legacy_floppy_image_device(mconfig, tag, owner, 0)
 	{
-		set_floppy_config(config);
+		set_floppy_config(std::forward<T>(config));
 	}
 
-	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	~legacy_floppy_image_device();
 
 	void set_floppy_config(const floppy_interface *config) { m_config = config; }
@@ -144,7 +145,7 @@ private:
 	TIMER_CALLBACK_MEMBER( set_wpt );
 
 protected:
-	legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_t implementation
 	virtual void device_config_complete() override;

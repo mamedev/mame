@@ -1867,7 +1867,7 @@ void vegas_state::vegascore(machine_config &config)
 	m_maincpu->set_system_clock(vegas_state::SYSTEM_CLOCK);
 
 	// PCI Bus Devices
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 
 	VRC5074(config, m_nile, SYSTEM_CLOCK, m_maincpu);
 	m_nile->set_sdram_size(0, 0x00800000);
@@ -1895,7 +1895,7 @@ void vegas_state::vegascore(machine_config &config)
 	m_timekeeper->reset_cb().set(FUNC(vegas_state::watchdog_reset));
 	m_timekeeper->irq_cb().set(FUNC(vegas_state::watchdog_irq));
 
-	SMC91C94(config, m_ethernet, 0);
+	SMC91C94(config, m_ethernet);
 	m_ethernet->irq_handler().set(FUNC(vegas_state::ethernet_interrupt));
 
 	// screen
@@ -2020,14 +2020,14 @@ void vegas_state::gauntleg(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_2104(config, m_dcs, 0);
+	DCS2_AUDIO_2104(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0x0b5d);
 	m_dcs->add_route(0, "speaker", 1.0, 1);
 	m_dcs->add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2047,14 +2047,14 @@ void vegas_state::gauntdl(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_2104(config, m_dcs, 0);
+	DCS2_AUDIO_2104(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0x0b5d);
 	m_dcs->add_route(0, "speaker", 1.0, 1);
 	m_dcs->add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2073,14 +2073,14 @@ void vegas_state::warfa(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_2104(config, m_dcs, 0);
+	DCS2_AUDIO_2104(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0x0b5d);
 	m_dcs->add_route(0, "speaker", 1.0, 1);
 	m_dcs->add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2099,14 +2099,14 @@ void vegas_state::tenthdeg(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_2115(config, m_dcs, 0);
+	DCS2_AUDIO_2115(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0x0afb);
 	m_dcs->add_route(0, "speaker", 1.0, 1);
 	m_dcs->add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2125,14 +2125,14 @@ void vegas_state::roadburn(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_DSIO(config, m_dcs, 0);
+	DCS2_AUDIO_DSIO(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0x0ddd);
 	m_dcs->add_route(0, "speaker", 1.0, 1);
 	m_dcs->add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2151,14 +2151,14 @@ void vegas_state::nbashowt(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_2104(config, m_dcs, 0);
+	DCS2_AUDIO_2104(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0x0b5d);
 	m_dcs->add_route(0, "speaker", 1.0, 1);
 	m_dcs->add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2179,14 +2179,14 @@ void vegas_state::nbanfl(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_2104(config, m_dcs, 0);
+	DCS2_AUDIO_2104(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0x0b5d);
 	m_dcs->add_route(0, "speaker", 1.0, 1);
 	m_dcs->add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2212,14 +2212,14 @@ void vegas_state::nbagold(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_2104(config, m_dcs, 0);
+	DCS2_AUDIO_2104(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0x0b5d);
 	m_dcs->add_route(0, "speaker", 1.0, 1);
 	m_dcs->add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2239,7 +2239,7 @@ void vegas_state::sf2049(machine_config &config)
 
 	SPEAKER(config, "speaker", 5).front().headrest_left(2).headrest_right(3).backrest(4);
 
-	DCS2_AUDIO_DENVER_5CH(config, m_dcs, 0);
+	DCS2_AUDIO_DENVER_5CH(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(8);
 	m_dcs->set_polling_offset(0x872);
@@ -2249,7 +2249,7 @@ void vegas_state::sf2049(machine_config &config)
 	m_dcs->add_route(3, "speaker", 1.0, 3);
 	m_dcs->add_route(4, "speaker", 1.0, 4);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2269,7 +2269,7 @@ void vegas_state::sf2049se(machine_config &config)
 
 	SPEAKER(config, "speaker", 5).front().headrest_left(2).headrest_right(3).backrest(4);
 
-	DCS2_AUDIO_DENVER_5CH(config, m_dcs, 0);
+	DCS2_AUDIO_DENVER_5CH(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(8);
 	m_dcs->set_polling_offset(0x872);
@@ -2279,7 +2279,7 @@ void vegas_state::sf2049se(machine_config &config)
 	m_dcs->add_route(3, "speaker", 1.0, 3);
 	m_dcs->add_route(4, "speaker", 1.0, 4);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2299,7 +2299,7 @@ void vegas_state::sf2049te(machine_config &config)
 
 	SPEAKER(config, "speaker", 5).front().headrest_left(2).headrest_right(3).backrest(4);
 
-	DCS2_AUDIO_DENVER_5CH(config, m_dcs, 0);
+	DCS2_AUDIO_DENVER_5CH(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(8);
 	m_dcs->set_polling_offset(0x872);
@@ -2309,7 +2309,7 @@ void vegas_state::sf2049te(machine_config &config)
 	m_dcs->add_route(3, "speaker", 1.0, 3);
 	m_dcs->add_route(4, "speaker", 1.0, 4);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2329,14 +2329,14 @@ void vegas_state::cartfury(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_2104(config, m_dcs, 0);
+	DCS2_AUDIO_2104(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0x0b5d);
 	m_dcs->add_route(0, "speaker", 1.0, 1);
 	m_dcs->add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");

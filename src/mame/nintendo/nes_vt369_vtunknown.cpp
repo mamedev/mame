@@ -758,7 +758,7 @@ void vt36x_gtct885_state::vt36x_8mb_gtct885(machine_config &config)
 	m_soc->io_4153_read_callback().set(FUNC(vt36x_gtct885_state::gtct885_prot_r));
 	m_soc->io_4152_write_callback().set(FUNC(vt36x_gtct885_state::gtct885_prot_w));
 
-	VT_MENU_PROTECTION(config, m_protection, 0);
+	VT_MENU_PROTECTION(config, m_protection);
 }
 
 void vt36x_gtct885_state::vt36x_altswap_2mb_36pcase(machine_config &config)
@@ -768,7 +768,7 @@ void vt36x_gtct885_state::vt36x_altswap_2mb_36pcase(machine_config &config)
 	m_soc->io_4153_read_callback().set(FUNC(vt36x_gtct885_state::gtct885_prot_r));
 	m_soc->io_4152_write_callback().set(FUNC(vt36x_gtct885_state::gtct885_prot_w));
 
-	VT_MENU_PROTECTION(config, m_protection, 0);
+	VT_MENU_PROTECTION(config, m_protection);
 }
 
 void vt4ffx_goretrop_state::vt4ffx_32mb_goretrop(machine_config &config)
@@ -777,7 +777,7 @@ void vt4ffx_goretrop_state::vt4ffx_32mb_goretrop(machine_config &config)
 	m_soc->io_4139_read_callback().set(FUNC(vt4ffx_goretrop_state::goretrop_prot_r));
 	m_soc->io_4139_write_callback().set(FUNC(vt4ffx_goretrop_state::goretrop_prot_w));
 
-	VT_MENU_PROTECTION(config, m_protection, 0);
+	VT_MENU_PROTECTION(config, m_protection);
 }
 
 void vt4ffx_goretrop_state::vt4ffx_1mb_rbbrite(machine_config &config)
@@ -797,7 +797,7 @@ void vt4ffx_state::vt4ffx_h12p1000(machine_config &config)
 void vt36x_tetrtin_state::vt36x_1mb_tetrtin(machine_config &config)
 {
 	vt36x_1mb(config);
-	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
+	VT_MENU_PROTECTION_LXCAP(config, m_protection);
 
 	m_soc->io_4153_read_callback().set(FUNC(vt36x_tetrtin_state::lxcap_prot_r));
 	m_soc->io_4152_write_callback().set(FUNC(vt36x_tetrtin_state::lxcap_prot_w));
@@ -806,7 +806,7 @@ void vt36x_tetrtin_state::vt36x_1mb_tetrtin(machine_config &config)
 void vt36x_tetrtin_state::vt36x_8mb_lxcap(machine_config &config)
 {
 	vt36x_8mb(config);
-	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
+	VT_MENU_PROTECTION_LXCAP(config, m_protection);
 
 	m_soc->io_4153_read_callback().set(FUNC(vt36x_tetrtin_state::lxcap_prot_r));
 	m_soc->io_4152_write_callback().set(FUNC(vt36x_tetrtin_state::lxcap_prot_w));
@@ -815,7 +815,7 @@ void vt36x_tetrtin_state::vt36x_8mb_lxcap(machine_config &config)
 void vt36x_tetrtin_state::vt36x_8mb_pixel(machine_config &config)
 {
 	vt36x_8mb(config);
-	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
+	VT_MENU_PROTECTION_LXCAP(config, m_protection);
 
 	m_soc->io_414b_read_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_r));
 	m_soc->io_414a_write_callback().set(FUNC(vt36x_tetrtin_state::pixel_prot_w));
@@ -824,7 +824,7 @@ void vt36x_tetrtin_state::vt36x_8mb_pixel(machine_config &config)
 void vt36x_tetrtin_state::vt36x_16mb_nesvt270(machine_config &config)
 {
 	vt36x_16mb(config);
-	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0); // might not be this device
+	VT_MENU_PROTECTION_LXCAP(config, m_protection); // might not be this device
 
 	m_soc->io_414b_read_callback().set(FUNC(vt36x_tetrtin_state::nesvt270_prot_r));
 	m_soc->io_414b_write_callback().set(FUNC(vt36x_tetrtin_state::nesvt270_prot_w));
@@ -834,9 +834,9 @@ void vt36x_tetrtin_state::vt36x_16mb_nesvt270(machine_config &config)
 void vt36x_otrail_state::vt36x_1mb_otrail(machine_config &config)
 {
 	vt36x_1mb(config);
-	VT_MENU_PROTECTION_LXCAP(config, m_protection, 0);
+	VT_MENU_PROTECTION_LXCAP(config, m_protection);
 
-	I2C_24C04(config, "i2cmem", 0);
+	I2C_24C04(config, "i2cmem");
 
 	SPEAKER(config, "internal").front_center();
 

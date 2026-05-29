@@ -669,7 +669,7 @@ void thayers_state::thayers(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(262));
 
 	// video hardware
-	PIONEER_LDV1000HLE(config, m_player, 0);
+	PIONEER_LDV1000HLE(config, m_player);
 	m_player->set_screen("screen");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

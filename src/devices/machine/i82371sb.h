@@ -32,8 +32,14 @@ public:
 	{
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
+	template <typename T>
+	i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: i82371sb_isa_device(mconfig, tag, owner)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
 
-	i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto smi() { return m_smi_callback.bind(); }
 	auto nmi() { return m_nmi_callback.bind(); }
@@ -66,7 +72,7 @@ public:
 	void pc_irq15_w(int state);
 
 protected:
-	i82371sb_isa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	i82371sb_isa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_add_mconfig(machine_config & config) override;
 	virtual void device_config_complete() override;
@@ -235,8 +241,14 @@ public:
 	{
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
+	template <typename T>
+	i82371sb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: i82371sb_ide_device(mconfig, tag, owner)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
 
-	i82371sb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82371sb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto irq_pri() { return m_irq_pri_callback.bind(); }
 	auto irq_sec() { return m_irq_sec_callback.bind(); }
@@ -245,7 +257,7 @@ public:
 	void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 
 protected:
-	i82371sb_ide_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	i82371sb_ide_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_config_complete() override;

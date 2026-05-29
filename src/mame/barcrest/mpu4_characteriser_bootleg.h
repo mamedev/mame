@@ -19,7 +19,7 @@ class mpu4_characteriser_bl : public device_t
 {
 public:
 	// construction/destruction
-	mpu4_characteriser_bl(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpu4_characteriser_bl(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_bl_fixed_return(uint8_t ret)
 	{
@@ -38,7 +38,7 @@ public:
 	}
 
 protected:
-	mpu4_characteriser_bl(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	mpu4_characteriser_bl(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -51,7 +51,7 @@ class mpu4_characteriser_bl_blastbank : public device_t
 {
 public:
 	// construction/destruction
-	mpu4_characteriser_bl_blastbank(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpu4_characteriser_bl_blastbank(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);

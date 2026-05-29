@@ -21,7 +21,7 @@ public:
 		virtual bool translate(int spacenum, int intention, offs_t &address, address_space *&target_space) = 0;
 	};
 
-	m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// Device user interface
 	void trigger_bus_error();
@@ -196,7 +196,7 @@ protected:
 	int m_post_run_cycles;
 
 	// Typed constructor
-	m68000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	m68000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
 	// Create the decode table
 	void init_decode_table();

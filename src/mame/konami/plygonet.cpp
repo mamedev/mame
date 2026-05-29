@@ -1075,7 +1075,7 @@ void polygonet_state::plygonet(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 32768);
 
-	K053936(config, m_k053936, 0);
+	K053936(config, m_k053936);
 	m_k053936->set_wrap(true);
 
 	// Sound hardware

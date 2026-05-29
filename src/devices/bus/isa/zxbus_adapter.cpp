@@ -32,6 +32,6 @@ void zxbus_adapter_device::device_start()
 
 void zxbus_adapter_device::device_add_mconfig(machine_config &config)
 {
-	ZXBUS(config, m_zxbus, 0);
-	ZXBUS_SLOT(config, "card", 0, m_zxbus, zxbus_cards, nullptr);
+	ZXBUS(config, m_zxbus);
+	ZXBUS_SLOT(config, "card", m_zxbus, zxbus_cards, nullptr);
 }

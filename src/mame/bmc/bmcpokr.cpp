@@ -1315,7 +1315,7 @@ void bmcpokr_state::bmcpokr(machine_config &config)
 	M68000(config, m_maincpu, 42_MHz_XTAL / 4); // 68000 @10.50MHz (42/4)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bmcpokr_state::bmcpokr_mem);
 
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(bmcpokr_state::interrupt), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(bmcpokr_state::interrupt), "screen", 0, 1);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(42_MHz_XTAL / 4, 680, 0, 480, 262, 0, 240); // HSync - 15.440kHz, VSync - 58.935Hz
@@ -1324,7 +1324,7 @@ void bmcpokr_state::bmcpokr(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &bmcpokr_state::ramdac_map);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bmcpokr);

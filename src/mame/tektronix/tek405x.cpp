@@ -959,7 +959,7 @@ void tek4051_state::tek4051(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tek4051_state::tek4051_mem);
 
 	// video hardware
-	VECTOR(config, "vector", 0);
+	VECTOR(config, "vector");
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_VECTOR));
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(50);
@@ -1035,7 +1035,7 @@ void tek4051_state::tek4051(machine_config &config)
 	m_com_pia->irqa_handler().set(FUNC(tek4051_state::com_pia_irqa_w));
 	m_com_pia->irqb_handler().set(FUNC(tek4051_state::com_pia_irqb_w));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->irq_handler().set(FUNC(tek4051_state::acia_irq_w));
 
 	CLOCK(config, m_acia_clock, 38400);
@@ -1060,7 +1060,7 @@ void tek4052_state::tek4052(machine_config &config)
 	cpu.set_addrmap(AS_PROGRAM, &tek4052_state::tek4052_mem);
 
 	// video hardware
-	VECTOR(config, "vector", 0);
+	VECTOR(config, "vector");
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_VECTOR));
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(50);

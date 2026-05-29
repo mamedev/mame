@@ -21,7 +21,15 @@ public:
 		set_screen(std::forward<U>(screen_tag));
 		set_offsets(offx, offy);
 	}
-	k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T, typename U>
+	k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, U &&screen_tag, int offx, int offy)
+		: k053250_device(mconfig, tag, owner, 0, std::forward<T>(palette_tag), std::forward<U>(screen_tag), offx, offy)
+	{
+		set_palette(std::forward<T>(palette_tag));
+		set_screen(std::forward<U>(screen_tag));
+		set_offsets(offx, offy);
+	}
+	k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_offsets(int offx, int offy)
 	{

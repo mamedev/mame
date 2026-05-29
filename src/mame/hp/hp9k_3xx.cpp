@@ -251,7 +251,7 @@ void hp9k3xx_state::led_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void hp9k3xx_state::add_dio16_bus(machine_config &config)
 {
-	bus::hp_dio::dio16_device &dio16(DIO16(config, "diobus", 0));
+	bus::hp_dio::dio16_device &dio16(DIO16(config, "diobus"));
 	dio16.set_program_space(m_maincpu, AS_PROGRAM);
 	m_maincpu->reset_cb().set(dio16, FUNC(bus::hp_dio::dio16_device::reset_in));
 
@@ -266,7 +266,7 @@ void hp9k3xx_state::add_dio16_bus(machine_config &config)
 
 void hp9k3xx_state::add_dio32_bus(machine_config &config)
 {
-	bus::hp_dio::dio32_device &dio32(DIO32(config, "diobus", 0));
+	bus::hp_dio::dio32_device &dio32(DIO32(config, "diobus"));
 	dio32.set_program_space(m_maincpu, AS_PROGRAM);
 
 	dio32.irq1_out_cb().set(FUNC(hp9k3xx_state::dio_irq1_w));
@@ -340,12 +340,12 @@ void hp9k3xx_state::hp9k310(machine_config &config)
 
 	add_dio16_bus(config);
 
-	DIO16_SLOT(config, "sl0", 0, "diobus", dio16_cards, "human_interface", true);
-	DIO16_SLOT(config, "sl1", 0, "diobus", dio16_cards, "98544", false);
-	DIO16_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98603b", false);
-	DIO32_SLOT(config, "sl3", 0, "diobus", dio32_cards, "98643", false);
-	DIO16_SLOT(config, "sl4", 0, "diobus", dio16_cards, "98644", false);
-	DIO16_SLOT(config, "sl5", 0, "diobus", dio16_cards, nullptr, false);
+	DIO16_SLOT(config, "sl0", "diobus", dio16_cards, "human_interface", true);
+	DIO16_SLOT(config, "sl1", "diobus", dio16_cards, "98544", false);
+	DIO16_SLOT(config, "sl2", "diobus", dio16_cards, "98603b", false);
+	DIO32_SLOT(config, "sl3", "diobus", dio32_cards, "98643", false);
+	DIO16_SLOT(config, "sl4", "diobus", dio16_cards, "98644", false);
+	DIO16_SLOT(config, "sl5", "diobus", dio16_cards, nullptr, false);
 }
 
 void hp9k3xx_state::hp9k320(machine_config &config)
@@ -356,13 +356,13 @@ void hp9k3xx_state::hp9k320(machine_config &config)
 	hp9k300(config);
 	add_dio32_bus(config);
 
-	DIO32_SLOT(config, "sl0", 0, "diobus", dio32_cards, "human_interface", true);
-	DIO32_SLOT(config, "sl1", 0, "diobus", dio32_cards, "98543", false);
-	DIO32_SLOT(config, "sl2", 0, "diobus", dio32_cards, "98603b", false);
-	DIO32_SLOT(config, "sl3", 0, "diobus", dio32_cards, "98644", false);
-	DIO32_SLOT(config, "sl4", 0, "diobus", dio32_cards, "98620", false);
-	DIO32_SLOT(config, "sl5", 0, "diobus", dio32_cards, "98265a", false);
-	DIO32_SLOT(config, "sl7", 0, "diobus", dio32_cards, nullptr, false);
+	DIO32_SLOT(config, "sl0", "diobus", dio32_cards, "human_interface", true);
+	DIO32_SLOT(config, "sl1", "diobus", dio32_cards, "98543", false);
+	DIO32_SLOT(config, "sl2", "diobus", dio32_cards, "98603b", false);
+	DIO32_SLOT(config, "sl3", "diobus", dio32_cards, "98644", false);
+	DIO32_SLOT(config, "sl4", "diobus", dio32_cards, "98620", false);
+	DIO32_SLOT(config, "sl5", "diobus", dio32_cards, "98265a", false);
+	DIO32_SLOT(config, "sl7", "diobus", dio32_cards, nullptr, false);
 }
 
 void hp9k3xx_state::hp9k330(machine_config &config)
@@ -373,11 +373,11 @@ void hp9k3xx_state::hp9k330(machine_config &config)
 	hp9k300(config);
 	add_dio32_bus(config);
 
-	DIO32_SLOT(config, "sl0", 0, "diobus", dio16_cards, "human_interface", true);
-	DIO32_SLOT(config, "sl1", 0, "diobus", dio16_cards, "98544", false);
-	DIO32_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98603b", false);
-	DIO32_SLOT(config, "sl3", 0, "diobus", dio16_cards, "98644", false);
-	DIO32_SLOT(config, "sl4", 0, "diobus", dio16_cards, nullptr, false);
+	DIO32_SLOT(config, "sl0", "diobus", dio16_cards, "human_interface", true);
+	DIO32_SLOT(config, "sl1", "diobus", dio16_cards, "98544", false);
+	DIO32_SLOT(config, "sl2", "diobus", dio16_cards, "98603b", false);
+	DIO32_SLOT(config, "sl3", "diobus", dio16_cards, "98644", false);
+	DIO32_SLOT(config, "sl4", "diobus", dio16_cards, nullptr, false);
 }
 
 void hp9k3xx_state::hp9k332(machine_config &config)
@@ -388,11 +388,11 @@ void hp9k3xx_state::hp9k332(machine_config &config)
 	hp9k300(config);
 	add_dio16_bus(config);
 
-	DIO16_SLOT(config, "sl0", 0, "diobus", dio16_cards, "human_interface", true);
-	DIO16_SLOT(config, "sl1", 0, "diobus", dio16_cards, "98603b", false);
-	DIO16_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98644", false);
-	DIO16_SLOT(config, "sl3", 0, "diobus", dio16_cards, "98543", false);
-	DIO16_SLOT(config, "sl4", 0, "diobus", dio16_cards, nullptr, false);
+	DIO16_SLOT(config, "sl0", "diobus", dio16_cards, "human_interface", true);
+	DIO16_SLOT(config, "sl1", "diobus", dio16_cards, "98603b", false);
+	DIO16_SLOT(config, "sl2", "diobus", dio16_cards, "98644", false);
+	DIO16_SLOT(config, "sl3", "diobus", dio16_cards, "98543", false);
+	DIO16_SLOT(config, "sl4", "diobus", dio16_cards, nullptr, false);
 }
 
 void hp9k3xx_state::hp9k340(machine_config &config)
@@ -412,12 +412,12 @@ void hp9k3xx_state::hp9k360(machine_config &config)
 
 	add_dio32_bus(config);
 
-	DIO32_SLOT(config, "sl0", 0, "diobus", dio32_cards, "human_interface", true);
-	DIO32_SLOT(config, "sl1", 0, "diobus", dio32_cards, "98550", false);
-	DIO32_SLOT(config, "sl2", 0, "diobus", dio32_cards, "98644", false);
-	DIO32_SLOT(config, "sl3", 0, "diobus", dio32_cards, "98620", false);
-	DIO32_SLOT(config, "sl4", 0, "diobus", dio32_cards, "98265a", false);
-	DIO32_SLOT(config, "sl5", 0, "diobus", dio32_cards, nullptr, false);
+	DIO32_SLOT(config, "sl0", "diobus", dio32_cards, "human_interface", true);
+	DIO32_SLOT(config, "sl1", "diobus", dio32_cards, "98550", false);
+	DIO32_SLOT(config, "sl2", "diobus", dio32_cards, "98644", false);
+	DIO32_SLOT(config, "sl3", "diobus", dio32_cards, "98620", false);
+	DIO32_SLOT(config, "sl4", "diobus", dio32_cards, "98265a", false);
+	DIO32_SLOT(config, "sl5", "diobus", dio32_cards, nullptr, false);
 }
 
 

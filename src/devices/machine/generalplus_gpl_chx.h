@@ -8,7 +8,7 @@
 class gpl_chx_device : public device_t
 {
 public:
-	gpl_chx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gpl_chx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto cha_write_callback() { return m_cha_output_cb.bind(); }
 	auto chb_write_callback() { return m_chb_output_cb.bind(); }

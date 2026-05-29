@@ -741,7 +741,7 @@ void bbcm_state::bbcmet(machine_config &config)
 	m_adlc->out_txd_cb().set("network", FUNC(econet_device::host_data_w));
 	m_adlc->out_irq_cb().set(FUNC(bbcm_state::adlc_irq_w));
 
-	econet_device &econet(ECONET(config, "network", 0));
+	econet_device &econet(ECONET(config, "network"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::set_cts)).invert();

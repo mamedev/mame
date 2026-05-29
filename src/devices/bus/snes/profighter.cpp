@@ -86,7 +86,7 @@ void sns_pro_fighter_q_device::device_add_mconfig(machine_config &config)
 	N82077AA(config, "fdc", 24_MHz_XTAL); // actually MCCS3201FN, divider?
 	FLOPPY_CONNECTOR(config, "fdc:0", profght_floppies, "35dd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 
-	SNS_CART_SLOT(config, "cartslot", 0, snes_cart, nullptr);
+	SNS_CART_SLOT(config, "cartslot", snes_cart, nullptr);
 }
 
 
@@ -146,7 +146,7 @@ void sns_pro_fighter_qa_device::device_add_mconfig(machine_config &config)
 	WD37C65C(config, "fdc", 16_MHz_XTAL); // actually GM82C765B
 	FLOPPY_CONNECTOR(config, "fdc:0", profght_floppies, "35dd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 
-	SNS_CART_SLOT(config, "cartslot", 0, snes_cart, nullptr);
+	SNS_CART_SLOT(config, "cartslot", snes_cart, nullptr);
 }
 
 
@@ -202,7 +202,7 @@ void sns_pro_fighter_qb_device::device_add_mconfig(machine_config &config)
 	N82077AA(config, "fdc", 24_MHz_XTAL); // actually ACCMicro 3201, divider?
 	FLOPPY_CONNECTOR(config, "fdc:0", profght_floppies, "35dd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 
-	SNS_CART_SLOT(config, "cartslot", 0, snes_cart, nullptr);
+	SNS_CART_SLOT(config, "cartslot", snes_cart, nullptr);
 }
 
 
@@ -262,5 +262,5 @@ void sns_pro_fighter_x_device::device_add_mconfig(machine_config &config)
 	WD37C65C(config, "fdc", 16_MHz_XTAL); // actually GM82C765B
 	FLOPPY_CONNECTOR(config, "fdc:0", profght_floppies, "35dd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 
-	SNS_CART_SLOT(config, "cartslot", 0, snes_cart, nullptr);
+	SNS_CART_SLOT(config, "cartslot", snes_cart, nullptr);
 }

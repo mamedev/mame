@@ -2973,7 +2973,7 @@ void prophet5_state::prophet5rev30(machine_config &config)
 	pit.set_clk<1>(5_MHz_XTAL / 2);
 	pit.set_clk<2>(5_MHz_XTAL / 2);
 
-	TTL7474(config, m_tune_ff, 0).comp_output_cb().set("tune_pit", FUNC(pit8253_device::write_clk0));
+	TTL7474(config, m_tune_ff).comp_output_cb().set("tune_pit", FUNC(pit8253_device::write_clk0));
 
 	TIMER(config, m_gate_in_delay).configure_generic(FUNC(prophet5_state::gate_in_delay_elapsed));
 

@@ -2992,9 +2992,9 @@ void cobra_state::cobra(machine_config &config)
 
 	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	M48T58(config, "m48t58", 0);
+	M48T58(config, "m48t58");
 
-	K001604(config, m_k001604, 0);     // on the LAN board in Racing Jam DX
+	K001604(config, m_k001604);     // on the LAN board in Racing Jam DX
 	m_k001604->set_palette(m_palette);
 
 	KONPPC_JVS_HOST(config, m_jvs_host, 4000000);
@@ -3004,7 +3004,7 @@ void cobra_state::cobra(machine_config &config)
 void cobra_state::bujutsu(machine_config &config)
 {
 	cobra(config);
-	KONAMI_WINDY2_JVS_IO_2L12B_PANEL(config, "windy2_jvsio", 0, m_jvs_host);
+	KONAMI_WINDY2_JVS_IO_2L12B_PANEL(config, "windy2_jvsio", m_jvs_host);
 }
 
 void cobra_state::rf5c400_map(address_map& map)

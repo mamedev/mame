@@ -678,7 +678,7 @@ void cops_state::base(machine_config &config)
 {
 	M6502(config, m_maincpu, MAIN_CLOCK/2/2); // fed through two dividers
 
-	SONY_LDP1450HLE(config, m_ld, 0);
+	SONY_LDP1450HLE(config, m_ld);
 	m_ld->set_screen("screen");
 	m_ld->set_overlay(256, 256, FUNC(cops_state::screen_update));
 	m_ld->add_route(0, "speaker", 0.50, 0);
@@ -701,7 +701,7 @@ void cops_state::base(machine_config &config)
 
 void cops_state::acia_comms(machine_config &config)
 {
-	MOS6551(config, m_acia, 0).set_xtal(ACIA_CLOCK);
+	MOS6551(config, m_acia).set_xtal(ACIA_CLOCK);
 	m_acia->txd_handler().set("laserdisc", FUNC(sony_ldp1450hle_device::rx_w));
 	m_acia->rts_handler().set("acia", FUNC(mos6551_device::write_cts));
 	m_acia->irq_handler().set(FUNC(cops_state::vqacia_irq));
@@ -754,9 +754,9 @@ void cops_state::revlatns(machine_config &config)
 	via1.writepb_handler().set(FUNC(cops_state::via1_b_w));
 	via1.cb1_handler().set(FUNC(cops_state::via1_cb1_w));
 
-	METERS(config, m_meters, 0).set_number(2);
+	METERS(config, m_meters).set_number(2);
 
-	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
+	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta"));
 
 	m_dacia->txd2_handler().set("bacta", FUNC(bacta_datalogger_device::write_txd));
 
@@ -778,7 +778,7 @@ void cops_state::visnqust(machine_config &config)
 	via1.writepb_handler().set(FUNC(cops_state::via1_b_w));
 	via1.cb1_handler().set(FUNC(cops_state::via1_cb1_w));
 
-	METERS(config, m_meters, 0).set_number(2);
+	METERS(config, m_meters).set_number(2);
 
 }
 

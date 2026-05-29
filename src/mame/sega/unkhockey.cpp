@@ -127,7 +127,7 @@ void unkhockey_state::unkhockey(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	PIT8254(config, "d71054", 0); // NEC D71054GB
+	PIT8254(config, "d71054"); // NEC D71054GB
 
 	I8255(config, "d071055"); // NEC D71055GB
 

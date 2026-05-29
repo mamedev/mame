@@ -843,7 +843,7 @@ void luckgrln_state::luckgrln(machine_config &config)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 
-	MSM6242(config, "rtc", 0);
+	MSM6242(config, "rtc");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(12_MHz_XTAL, 752, 0, 512, 274, 0, 256);

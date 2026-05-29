@@ -392,11 +392,11 @@ void speedbsk_state::speedbsk(machine_config &config)
 	uart_clock.signal_handler().append("tmp82c51", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("tmp82c51", FUNC(i8251_device::write_rxc));
 
-	i8251_device &uart_main(I8251(config, "d71051", 0));
+	i8251_device &uart_main(I8251(config, "d71051"));
 	uart_main.txd_handler().set("tmp82c51", FUNC(i8251_device::write_rxd));
 	uart_main.rts_handler().set("tmp82c51", FUNC(i8251_device::write_cts));
 
-	PIT8254(config, "d71054", 0);
+	PIT8254(config, "d71054");
 
 	I8255(config, m_ppi[0]);
 	m_ppi[0]->out_pa_callback().set(FUNC(speedbsk_state::solenoid1_w));
@@ -461,12 +461,12 @@ void speedbsk_state::speedbsk(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &speedbsk_state::audio_map);
 	audiocpu.set_addrmap(AS_IO, &speedbsk_state::audio_io_map);
 
-	i8251_device &tmp82c51(I8251(config, "tmp82c51", 0));
+	i8251_device &tmp82c51(I8251(config, "tmp82c51"));
 	tmp82c51.rxrdy_handler().set_inputline("audiocpu", INPUT_LINE_IRQ0);
 	tmp82c51.txd_handler().set("d71051", FUNC(i8251_device::write_rxd));
 	tmp82c51.rts_handler().set("d71051", FUNC(i8251_device::write_cts));
 
-	msm6253_device &adc(MSM6253(config, "adc", 0));
+	msm6253_device &adc(MSM6253(config, "adc"));
 	adc.set_input_tag<0>("unk");
 
 	SPEAKER(config, "mono").front_center(); // TODO: verify if stereo

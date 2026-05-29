@@ -418,8 +418,8 @@ void news_r4k_state::machine_common(machine_config &config)
 	m_escc->out_dtrb_callback().set(m_serial[1], FUNC(rs232_port_device::write_dtr));
 	m_escc->out_int_callback().set(FUNC(news_r4k_state::irq_w<ESCC>));
 
-	CXD8442Q(config, m_fifo0, 0);
-	CXD8442Q(config, m_fifo1, 0);
+	CXD8442Q(config, m_fifo0);
+	CXD8442Q(config, m_fifo1);
 
 	// Reverse polarity for ESCC DMA signals
 	m_escc->out_dtra_callback().set(
@@ -444,7 +444,7 @@ void news_r4k_state::machine_common(machine_config &config)
 				escc1_int_status = status ? 0x8 : 0x0; // guess
 			});
 
-	CXD8452AQ(config, m_sonic3, 0);
+	CXD8452AQ(config, m_sonic3);
 	m_sonic3->set_addrmap(0, &news_r4k_state::sonic3_map);
 	m_sonic3->irq_out().set(FUNC(news_r4k_state::irq_w<irq0_number::SONIC>));
 	m_sonic3->set_bus(m_cpu, 0);
@@ -474,7 +474,7 @@ void news_r4k_state::machine_common(machine_config &config)
 			[this] ()
 			{ return uint32_t(m_fdc->dma_r()); });
 
-	DMAC3(config, m_dmac, 0);
+	DMAC3(config, m_dmac);
 	m_dmac->set_apbus_address_translator(FUNC(news_r4k_state::apbus_virt_to_phys));
 	m_dmac->set_bus(m_cpu, 0);
 	m_dmac->irq_out().set(FUNC(news_r4k_state::irq_w<DMAC>));

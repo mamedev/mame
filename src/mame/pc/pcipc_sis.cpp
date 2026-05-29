@@ -120,13 +120,13 @@ void sis496_state::sis496(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &sis496_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("pci:05.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	SIS85C496_HOST(config, "pci:05.0", 0, "maincpu", 32*1024*1024);
 
-	ISA16_SLOT(config, "board4", 0, "pci:05.0:isabus", isa_internal_devices, "w83787f", true).set_option_machine_config("w83787f", winbond_superio_config);
-	ISA16_SLOT(config, "isa1", 0, "pci:05.0:isabus",  pc_isa16_cards, "wd90c31_lr", false);
-	ISA16_SLOT(config, "isa2", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", 0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "board4", "pci:05.0:isabus", isa_internal_devices, "w83787f", true).set_option_machine_config("w83787f", winbond_superio_config);
+	ISA16_SLOT(config, "isa1", "pci:05.0:isabus",  pc_isa16_cards, "wd90c31_lr", false);
+	ISA16_SLOT(config, "isa2", "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
 
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
 	serport0.rxd_handler().set("board4:w83787f", FUNC(w83787f_device::rxd1_w));
@@ -157,7 +157,7 @@ void sis496_voodoo1_state::sis496_voodoo1(machine_config &config)
 {
 	sis496_state::sis496(config);
 
-	VOODOO_1_PCI(config, m_voodoo, 0, m_maincpu, m_screen);
+	VOODOO_1_PCI(config, m_voodoo, m_maincpu, m_screen);
 	m_voodoo->set_fbmem(2);
 	m_voodoo->set_tmumem(4, 0);
 	// TODO: games are very annoyed with Direct3D 5 init/teardown fns around this.

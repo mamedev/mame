@@ -142,7 +142,7 @@ class igs_mux_device :
 	public device_memory_interface
 {
 public:
-	igs_mux_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	igs_mux_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void address_w(u8 data);
 	void data_w(u8 data);
@@ -207,7 +207,7 @@ u8 igs_mux_device::data_r()
 class igs_string_device : public device_t
 {
 public:
-	igs_string_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	igs_string_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	u8 result_r();                                  // 0x05:        result_r
 	void do_bitswap_w(offs_t offset, u8 data);      // 0x20-0x27:   do_bitswap_w
@@ -352,7 +352,7 @@ u8 igs_string_device::advance_string_offs_r(address_space &space)
 class igs_bitswap_device : public device_t
 {
 public:
-	igs_bitswap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	igs_bitswap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	u8 result_r();                              // 0x03:        result_r
 	void word_w(u8 data);                       // 0x40-0x47:   word_w
@@ -523,7 +523,7 @@ void igs_bitswap_device::reset_w(u8 data)
 class igs_incdec_device : public device_t
 {
 public:
-	igs_incdec_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	igs_incdec_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	u8 result_r();
 	void reset_w(u8 data);
@@ -592,7 +592,7 @@ void igs_incdec_device::device_reset()
 class igs_inc_device : public device_t
 {
 public:
-	igs_inc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	igs_inc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	u8 result_r();
 	void reset_w(u8 data);
@@ -651,7 +651,7 @@ void igs_inc_device::device_reset()
 class igs_incalt_device : public device_t
 {
 public:
-	igs_incalt_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	igs_incalt_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	u8 result_r();
 	void byte_w(u8 data);
@@ -5413,7 +5413,7 @@ INPUT_PORTS_END
 void igs017_state::base_machine_oki(machine_config &config, const XTAL &xtal_oki)
 {
 	// i/o
-	IGS_MUX(config, m_igs_mux, 0);
+	IGS_MUX(config, m_igs_mux);
 
 	I8255A(config, m_ppi);
 
@@ -5426,7 +5426,7 @@ void igs017_state::base_machine_oki(machine_config &config, const XTAL &xtal_oki
 	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
 	m_screen->set_palette("igs017_igs031:palette");
 
-	IGS017_IGS031(config, m_igs017_igs031, 0);
+	IGS017_IGS031(config, m_igs017_igs031);
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -5466,7 +5466,7 @@ void igs017_state::iqblocka(machine_config &config)
 	m_igs017_igs031->in_pc_callback().set_ioport("DSW3");
 
 	// protection
-	IGS_BITSWAP(config, m_igs_bitswap, 0);
+	IGS_BITSWAP(config, m_igs_bitswap);
 	m_igs_bitswap->set_val_xor(0x15d6);
 	m_igs_bitswap->set_mf_bits(3, 5, 9, 11);
 	m_igs_bitswap->set_m3_bits<0>(~5,  8, ~10, ~15);
@@ -5474,7 +5474,7 @@ void igs017_state::iqblocka(machine_config &config)
 	m_igs_bitswap->set_m3_bits<2>( 2, ~6, ~11, ~15);
 	m_igs_bitswap->set_m3_bits<3>( 0, ~1, ~3,  ~15);
 
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 
 	// sound
 	YM2413(config, "ymsnd", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.5);
@@ -5526,9 +5526,9 @@ void igs017_state::tarzan(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::tarzan_palette_bitswap));
@@ -5562,9 +5562,9 @@ void igs017_state::starzan(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::tarzan_palette_bitswap));
@@ -5625,9 +5625,9 @@ void igs017_state::cpoker2(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 
-	IGS_INC(config, m_igs_inc, 0);
+	IGS_INC(config, m_igs_inc);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::tarzan_palette_bitswap));
@@ -5657,7 +5657,7 @@ void igs017_state::tjsb(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::tjsb_palette_bitswap));
@@ -5690,9 +5690,9 @@ void igs017_state::spkrform(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 
 	// sound
 	YM2413(config, "ymsnd", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.5);
@@ -5732,7 +5732,7 @@ void igs017_state::mgcs(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::mgcs_palette_bitswap));
@@ -5761,9 +5761,9 @@ void igs017_state::mgcsb(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS_BITSWAP(config, m_igs_bitswap, 0);
+	IGS_BITSWAP(config, m_igs_bitswap);
 	m_igs_bitswap->set_val_xor(0x289a);
 	m_igs_bitswap->set_mf_bits(4, 7,  10, 13);
 	m_igs_bitswap->set_m3_bits<0>(~3,   8, ~12, ~15);
@@ -5774,7 +5774,7 @@ void igs017_state::mgcsb(machine_config &config)
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::mgcs_palette_bitswap));
 
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 }
 
 
@@ -5800,9 +5800,9 @@ void igs017_state::lhzb2(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS022(config, m_igs022, 0);
+	IGS022(config, m_igs022);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap));
@@ -5829,9 +5829,9 @@ void igs017_state::lhzb2a(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS_BITSWAP(config, m_igs_bitswap, 0);
+	IGS_BITSWAP(config, m_igs_bitswap);
 	m_igs_bitswap->set_val_xor(0x289a);
 	m_igs_bitswap->set_mf_bits(4, 7,  10, 13);
 	m_igs_bitswap->set_m3_bits<0>(~3,   8, ~12, ~15);
@@ -5839,7 +5839,7 @@ void igs017_state::lhzb2a(machine_config &config)
 	m_igs_bitswap->set_m3_bits<2>(~3,   4,  ~5, ~15);
 	m_igs_bitswap->set_m3_bits<3>(~9, ~11,  12, ~15);
 
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap));
@@ -5865,9 +5865,9 @@ void igs017_state::lhzb2b(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap));
@@ -5889,9 +5889,9 @@ void igs017_state::lhzb2c(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS_BITSWAP(config, m_igs_bitswap, 0);
+	IGS_BITSWAP(config, m_igs_bitswap);
 	m_igs_bitswap->set_val_xor(0x289a);
 	m_igs_bitswap->set_mf_bits(4, 7,  10, 13);
 	m_igs_bitswap->set_m3_bits<0>(~3,   8, ~12, ~15);
@@ -5899,7 +5899,7 @@ void igs017_state::lhzb2c(machine_config &config)
 	m_igs_bitswap->set_m3_bits<2>(~3,   4,  ~5, ~15);
 	m_igs_bitswap->set_m3_bits<3>(~9, ~11,  12, ~15);
 
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap));
@@ -5928,9 +5928,9 @@ void igs017_state::slqz2(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS022(config, m_igs022, 0);
+	IGS022(config, m_igs022);
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::slqz2_palette_bitswap));
@@ -5959,9 +5959,9 @@ void igs017_state::sdmg2(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// protection
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 
-	IGS_INCALT(config, m_igs_incalt, 0);
+	IGS_INCALT(config, m_igs_incalt);
 }
 
 
@@ -6022,9 +6022,9 @@ void igs017_state::sdmg2p(machine_config &config)
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
-	IGS_STRING(config, m_igs_string, 0);
+	IGS_STRING(config, m_igs_string);
 
-	IGS_INCDEC(config, m_igs_incdec, 0);
+	IGS_INCDEC(config, m_igs_incdec);
 }
 
 void igs017_state::jking302us(machine_config &config)

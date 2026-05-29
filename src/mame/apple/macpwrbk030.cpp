@@ -1425,7 +1425,7 @@ void macpb030_state::macpb165c(machine_config &config)
 	m_screen->set_screen_update(FUNC(macpb030_state::screen_update_vga));
 	m_screen->set_no_palette();
 
-	WD90C26(config, m_vga, 0);
+	WD90C26(config, m_vga);
 	m_vga->set_screen(m_screen);
 	// 512KB
 	m_vga->set_vram_size(0x80000);

@@ -47,7 +47,7 @@ f82c836a_device::f82c836a_device(const machine_config &mconfig, const char *tag,
 
 void f82c836a_device::device_add_mconfig(machine_config &config)
 {
-	AM9517A(config, m_dma[0], 0);
+	AM9517A(config, m_dma[0]);
 	m_dma[0]->out_hreq_callback().set(m_dma[1], FUNC(am9517a_device::dreq0_w));
 	m_dma[0]->out_eop_callback().set(FUNC(f82c836a_device::dma1_eop_w));
 	m_dma[0]->in_memr_callback().set(FUNC(f82c836a_device::dma_read_byte));
@@ -65,7 +65,7 @@ void f82c836a_device::device_add_mconfig(machine_config &config)
 	m_dma[0]->out_dack_callback<2>().set(FUNC(f82c836a_device::dma1_dack2_w));
 	m_dma[0]->out_dack_callback<3>().set(FUNC(f82c836a_device::dma1_dack3_w));
 
-	AM9517A(config, m_dma[1], 0);
+	AM9517A(config, m_dma[1]);
 	m_dma[1]->out_hreq_callback().set(FUNC(f82c836a_device::dma2_hreq_w));
 	m_dma[1]->in_memr_callback().set(FUNC(f82c836a_device::dma_read_word));
 	m_dma[1]->out_memw_callback().set(FUNC(f82c836a_device::dma_write_word));
@@ -80,7 +80,7 @@ void f82c836a_device::device_add_mconfig(machine_config &config)
 	m_dma[1]->out_dack_callback<2>().set(FUNC(f82c836a_device::dma2_dack2_w));
 	m_dma[1]->out_dack_callback<3>().set(FUNC(f82c836a_device::dma2_dack3_w));
 
-	PIC8259(config, m_intc[0], 0);
+	PIC8259(config, m_intc[0]);
 	m_intc[0]->out_int_callback().set([this] (int state) { m_write_intr(state); });
 	m_intc[0]->in_sp_callback().set_constant(1);
 	m_intc[0]->read_slave_ack_callback().set([this] (offs_t offset) -> u8 {
@@ -89,11 +89,11 @@ void f82c836a_device::device_add_mconfig(machine_config &config)
 		return 0;
 	});
 
-	PIC8259(config, m_intc[1], 0);
+	PIC8259(config, m_intc[1]);
 	m_intc[1]->out_int_callback().set(m_intc[0], FUNC(pic8259_device::ir2_w));
 	m_intc[1]->in_sp_callback().set_constant(0);
 
-	PIT8254(config, m_pit, 0);
+	PIT8254(config, m_pit);
 	m_pit->set_clk<0>(XTAL(14'318'181) / 12.0);
 	m_pit->out_handler<0>().set(m_intc[0], FUNC(pic8259_device::ir0_w));
 	m_pit->set_clk<1>(XTAL(14'318'181) / 12.0);

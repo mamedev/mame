@@ -1213,7 +1213,7 @@ void atarisy2_state::atarisy2(machine_config &config)
 	TILEMAP(config, m_playfield_tilemap, "gfxdecode", 2, 8,8, TILEMAP_SCAN_ROWS, 128,64).set_info_callback(FUNC(atarisy2_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, "gfxdecode", 2, 8,8, TILEMAP_SCAN_ROWS, 64,48, 0).set_info_callback(FUNC(atarisy2_state::get_alpha_tile_info));
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, atarisy2_state::s_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, atarisy2_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

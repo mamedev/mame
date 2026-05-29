@@ -17,7 +17,11 @@
 class idegdrom_device : public pci_device {
 public:
 	idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char *image_tag, const char *space_tag, int space_id);
-	idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *image_tag, const char *space_tag, int space_id)
+		: idegdrom_device(mconfig, tag, owner, 0, image_tag, space_tag, space_id)
+	{
+	}
+	idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto irq_callback() { return irq_cb.bind(); }
 
@@ -69,7 +73,7 @@ public:
 		set_image_tag(_image_tag);
 	}
 
-	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void submap(address_map &map) override ATTR_COLD;

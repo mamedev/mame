@@ -11,7 +11,7 @@
 class gpl_renderer_device : public device_t
 {
 public:
-	gpl_renderer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gpl_renderer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto space_read_callback() { return m_space_read_cb.bind(); }
 	template <typename T> void set_video_space(T &&tag, int no) { m_cpuspace.set_tag(std::forward<T>(tag), no); }
@@ -56,7 +56,7 @@ public:
 	uint16_t get_video_reg_7f() { return m_video_regs_7f; }
 
 protected:
-	gpl_renderer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gpl_renderer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

@@ -424,7 +424,7 @@ protected:
 		cat702<0>(config);
 		cat702<1>(config);
 
-		RF5C296(config, m_rf5c296, 0).set_pccard(m_pccard);
+		RF5C296(config, m_rf5c296).set_pccard(m_pccard);
 
 		PCCARD_SLOT(config, m_pccard, slot_ataflash, nullptr);
 

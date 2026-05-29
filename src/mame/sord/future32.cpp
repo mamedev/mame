@@ -580,7 +580,7 @@ void future32a_state::future32a(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &future32a_state::mem);
 	m_maincpu->set_addrmap(m68030_device::AS_CPU_SPACE, &future32a_state::cpu_space_map);
 
-	UPD71071(config, m_dma, 0);
+	UPD71071(config, m_dma);
 	m_dma->set_cpu_tag(m_maincpu->tag());
 	m_dma->set_clock((50_MHz_XTAL / 5).value());
 	m_dma->dma_read_callback<1>().set(m_scsi, FUNC(mb89352_device::dma_r));
@@ -620,7 +620,7 @@ void future32a_state::future32a(machine_config &config)
 	m_screen->set_screen_update(m_crtc, FUNC(hd6345_device::screen_update));
 	m_screen->set_raw(50_MHz_XTAL, 1248, 0, 959, 815, 0, 749);
 
-	BT451(config, m_ramdac, 0);
+	BT451(config, m_ramdac);
 	GFXDECODE(config, m_gfxdecode, m_ramdac, gfx_textlayer); // Only for F4 use
 
 	UPD72065(config, m_fdc, 32_MHz_XTAL / 8);

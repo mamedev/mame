@@ -453,7 +453,7 @@ void fixeight_state::fixeight(machine_config &config)
 	audiocpu.p0_in_cb().set_ioport("EEPROM");
 	audiocpu.p0_out_cb().set_ioport("EEPROM");
 
-	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
+	TOAPLAN_COINCOUNTER(config, "coincounter");
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
@@ -496,7 +496,7 @@ void fixeight_bootleg_state::fixeightbl(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &fixeight_bootleg_state::fixeightbl_68k_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fixeight_bootleg_state::cpu_space_fixeightbl_map);
 
-	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
+	TOAPLAN_COINCOUNTER(config, "coincounter");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

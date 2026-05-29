@@ -1804,16 +1804,16 @@ void segaxbd_state::xboard_base_mconfig(machine_config &config)
 
 	MB3773(config, "watchdog");
 
-	SEGA_315_5248_MULTIPLIER(config, "multiplier_main", 0);
-	SEGA_315_5248_MULTIPLIER(config, "multiplier_subx", 0);
-	SEGA_315_5249_DIVIDER(config, "divider_main", 0);
-	SEGA_315_5249_DIVIDER(config, "divider_subx", 0);
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_main");
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_subx");
+	SEGA_315_5249_DIVIDER(config, "divider_main");
+	SEGA_315_5249_DIVIDER(config, "divider_subx");
 
-	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_1, 0);
+	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_1);
 	m_cmptimer_1->m68kint_callback().set(FUNC(segaxbd_state::timer_irq_w));
 	m_cmptimer_1->zint_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	SEGA_315_5250_COMPARE_TIMER(config, "cmptimer_subx", 0);
+	SEGA_315_5250_COMPARE_TIMER(config, "cmptimer_subx");
 
 	CXD1095(config, m_iochip[0]); // IC160
 	m_iochip[0]->in_porta_cb().set_ioport("IO0PORTA");
@@ -1839,11 +1839,11 @@ void segaxbd_state::xboard_base_mconfig(machine_config &config)
 	m_screen->set_screen_update(FUNC(segaxbd_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	SEGA_XBOARD_SPRITES(config, m_sprites, 0);
-	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
+	SEGA_XBOARD_SPRITES(config, m_sprites);
+	SEGAIC16VID(config, m_segaic16vid, "gfxdecode");
 	m_segaic16vid->set_screen(m_screen);
 
-	SEGAIC16_ROAD(config, m_segaic16road, 0);
+	SEGAIC16_ROAD(config, m_segaic16road);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
@@ -1874,7 +1874,7 @@ void segaxbd_regular_state::device_add_mconfig(machine_config &config)
 
 void segaxbd_new_state::sega_xboard(machine_config &config)
 {
-	SEGA_XBD_REGULAR(config, "mainpcb", 0);
+	SEGA_XBD_REGULAR(config, "mainpcb");
 }
 
 
@@ -1897,13 +1897,13 @@ void segaxbd_fd1094_state::device_add_mconfig(machine_config &config)
 
 void segaxbd_new_state::sega_xboard_fd1094(machine_config &config)
 {
-	SEGA_XBD_FD1094(config, "mainpcb", 0);
+	SEGA_XBD_FD1094(config, "mainpcb");
 }
 
 void segaxbd_new_state_double::sega_xboard_fd1094_double(machine_config &config)
 {
-	SEGA_XBD_FD1094(config, "mainpcb", 0);
-	SEGA_XBD_FD1094(config, "subpcb", 0);
+	SEGA_XBD_FD1094(config, "mainpcb");
+	SEGA_XBD_FD1094(config, "subpcb");
 
 	//config.m_perfect_cpu_quantum = subtag("mainpcb:maincpu"); // doesn't help..
 }
@@ -1930,7 +1930,7 @@ void segaxbd_aburner2_state::device_add_mconfig(machine_config &config)
 
 void segaxbd_new_state::sega_aburner2(machine_config &config)
 {
-	SEGA_XBD_ABURNER2_DEVICE(config, "mainpcb", 0);
+	SEGA_XBD_ABURNER2_DEVICE(config, "mainpcb");
 }
 
 
@@ -1964,7 +1964,7 @@ void segaxbd_lastsurv_fd1094_state::device_add_mconfig(machine_config &config)
 
 void segaxbd_new_state::sega_lastsurv_fd1094(machine_config &config)
 {
-	SEGA_XBD_LASTSURV_FD1094(config, "mainpcb", 0);
+	SEGA_XBD_LASTSURV_FD1094(config, "mainpcb");
 }
 
 
@@ -1993,7 +1993,7 @@ void segaxbd_lastsurv_state::device_add_mconfig(machine_config &config)
 
 void segaxbd_new_state::sega_lastsurv(machine_config &config)
 {
-	SEGA_XBD_LASTSURV(config, "mainpcb", 0);
+	SEGA_XBD_LASTSURV(config, "mainpcb");
 }
 
 
@@ -2042,7 +2042,7 @@ void segaxbd_smgp_fd1094_state::device_add_mconfig(machine_config &config)
 
 void segaxbd_new_state::sega_smgp_fd1094(machine_config &config)
 {
-	SEGA_XBD_SMGP_FD1094(config, "mainpcb", 0);
+	SEGA_XBD_SMGP_FD1094(config, "mainpcb");
 }
 
 
@@ -2086,7 +2086,7 @@ void segaxbd_smgp_state::device_add_mconfig(machine_config &config)
 
 void segaxbd_new_state::sega_smgp(machine_config &config)
 {
-	SEGA_XBD_SMGP(config, "mainpcb", 0);
+	SEGA_XBD_SMGP(config, "mainpcb");
 }
 
 
@@ -2122,7 +2122,7 @@ void segaxbd_rascot_state::device_add_mconfig(machine_config &config)
 
 void segaxbd_new_state::sega_rascot(machine_config &config)
 {
-	SEGA_XBD_RASCOT(config, "mainpcb", 0);
+	SEGA_XBD_RASCOT(config, "mainpcb");
 }
 
 

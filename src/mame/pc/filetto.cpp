@@ -384,13 +384,13 @@ void filetto_state::filetto(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &filetto_state::filetto_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	PCNOPPI_MOTHERBOARD(config, m_mb, 0).set_cputag(m_maincpu);
+	PCNOPPI_MOTHERBOARD(config, m_mb).set_cputag(m_maincpu);
 	m_mb->int_callback().set_inputline(m_maincpu, 0);
 	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", filetto_isa8_cards, "filetto", true); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa1", "mb:isa", filetto_isa8_cards, "filetto", true); // FIXME: determine ISA bus clock
 
-	HC55516(config, m_cvsd, 0).add_route(ALL_OUTPUTS, "mb:mono", 0.60); //8923S-UM5100 is a HC55536 with ROM hook-up
+	HC55516(config, m_cvsd).add_route(ALL_OUTPUTS, "mb:mono", 0.60); //8923S-UM5100 is a HC55536 with ROM hook-up
 
 	RAM(config, RAM_TAG).set_default_size("640K");
 

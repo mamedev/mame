@@ -690,7 +690,7 @@ void midxunit_state::midxunit(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	DCS_AUDIO_2K_UART(config, m_dcs, 0);
+	DCS_AUDIO_2K_UART(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->add_route(0, "mono", 1.0);
 }

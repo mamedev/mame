@@ -598,7 +598,7 @@ void bbcmc_state::bbcmc(machine_config &config)
 	rs423.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
 	rs423.cts_handler().set("acia", FUNC(acia6850_device::write_cts));
 
-	I2C_PCD8572(config, "i2cmem", 0);
+	I2C_PCD8572(config, "i2cmem");
 
 	centronics_device &centronics(CENTRONICS(config, "printer", centronics_devices, "printer"));
 	centronics.ack_handler().set(m_uservia, FUNC(via6522_device::write_ca1));
@@ -630,7 +630,7 @@ void bbcmc_state::bbcmc(machine_config &config)
 	m_adlc->out_txd_cb().set("network", FUNC(econet_device::host_data_w));
 	m_adlc->out_irq_cb().set(FUNC(bbcmc_state::adlc_irq_w));
 
-	econet_device &econet(ECONET(config, "network", 0));
+	econet_device &econet(ECONET(config, "network"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::set_cts)).invert();

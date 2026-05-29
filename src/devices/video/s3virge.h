@@ -23,7 +23,7 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 	// construction/destruction
-	s3virge_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s3virge_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto linear_config_changed() { return m_linear_config_changed_cb.bind(); }
 
@@ -69,7 +69,7 @@ public:
 	ibm8514a_device* get_8514() { fatalerror("s3virge requested non-existent 8514/A device\n"); return nullptr; }
 
 protected:
-	s3virge_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	s3virge_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -212,10 +212,10 @@ private:
 class s3virgevx_vga_device :  public s3virge_vga_device
 {
 public:
-	s3virgevx_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s3virgevx_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-//  s3virgevx_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+//  s3virgevx_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -228,10 +228,10 @@ class s3virgedx_vga_device :  public s3virge_vga_device
 {
 public:
 	// construction/destruction
-	s3virgedx_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s3virgedx_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	s3virgedx_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	s3virgedx_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

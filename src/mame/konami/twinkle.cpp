@@ -1152,7 +1152,7 @@ void twinkle_state::twinkle(machine_config &config)
 	m_ata->irq_handler().set(FUNC(twinkle_state::spu_ata_irq));
 	m_ata->dmarq_handler().set(FUNC(twinkle_state::spu_ata_dmarq));
 
-	RTC65271(config, "rtc", 0);
+	RTC65271(config, "rtc");
 
 	FDC37C665GT(config, "fdc37c665gt", XTAL(24'000'000));
 
@@ -1181,7 +1181,7 @@ void twinkle_state::twinkle_dvd_type1(machine_config &config)
 	// All versions before beatmania IIDX 2nd style
 	//   - maincpu:sio1 (PSX SIO1) is used for the DVD player
 	//   - fdc37c665gt:uart2 is used for network/session play
-	rs232_port_device &rs232(RS232_PORT(config, "rs232_dvd", 0));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232_dvd"));
 	rs232.option_add("xvd701", JVC_XVD701);
 	rs232.set_default_option("xvd701");
 
@@ -1211,7 +1211,7 @@ void twinkle_state::twinkle_dvd_type2(machine_config &config)
 	// All versions starting from beatmania IIDX 2nd style
 	//   - fdc37c665gt:uart2 is used for the DVD player
 	//   - maincpu:sio1 (PSX SIO1) is used for network/session play
-	rs232_port_device &rs232(RS232_PORT(config, "rs232_dvd", 0));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232_dvd"));
 	rs232.option_add("xvd701", JVC_XVD701);
 	// rs232.option_add("xvs1100", JVC_XVS1100); // 8th mix only
 	rs232.set_default_option("xvd701");
@@ -1252,7 +1252,7 @@ void twinkle_state::twinklei(machine_config &config)
 {
 	twinkle(config);
 	twinkle_dvd_type2(config);
-	I2C_M24C02(config, "security", 0); // M24C02-W
+	I2C_M24C02(config, "security"); // M24C02-W
 }
 
 static INPUT_PORTS_START( twinkle )

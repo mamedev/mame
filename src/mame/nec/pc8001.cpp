@@ -787,7 +787,7 @@ void pc8001_state::pc8001(machine_config &config)
 	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
 
 	/* devices */
-	I8251(config, I8251_TAG, 0);
+	I8251(config, I8251_TAG);
 
 	UPD1990A(config, m_rtc);
 

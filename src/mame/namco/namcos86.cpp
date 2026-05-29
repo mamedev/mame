@@ -1062,11 +1062,11 @@ void namcos86_state::hopmappy(machine_config &config)
 	m_spritegen->set_gfxbank_callback(FUNC(namcos86_state::sprite_bank_cb));
 	m_spritegen->flip_callback().set(FUNC(namcos86_state::flip_screen_set));
 
-	NAMCO_CUS4XTMAP(config, m_tilegen[0], 0, m_palette, gfx_namcos86_tile_0);
+	NAMCO_CUS4XTMAP(config, m_tilegen[0], m_palette, gfx_namcos86_tile_0);
 	m_tilegen[0]->set_offset(47, 422, -9, 9);
 	m_tilegen[0]->set_tile_callback(FUNC(namcos86_state::tile_cb_0));
 
-	NAMCO_CUS4XTMAP(config, m_tilegen[1], 0, m_palette, gfx_namcos86_tile_1);
+	NAMCO_CUS4XTMAP(config, m_tilegen[1], m_palette, gfx_namcos86_tile_1);
 	m_tilegen[1]->set_offset(46, 422, -9, 9);
 	m_tilegen[1]->set_tile_callback(FUNC(namcos86_state::tile_cb_1));
 

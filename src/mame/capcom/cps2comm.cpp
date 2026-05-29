@@ -114,6 +114,10 @@ INPUT_PORTS_END
 
 
 
+cps2_comm_device::~cps2_comm_device()
+{
+}
+
 class cps2_comm_device::context
 {
 public:

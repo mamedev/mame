@@ -116,7 +116,7 @@ void nubus_m2video_device::device_add_mconfig(machine_config &config)
 	m_screen->set_screen_update(FUNC(nubus_m2video_device::screen_update));
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
 
-	BT453(config, m_ramdac, 0);
+	BT453(config, m_ramdac);
 }
 
 const tiny_rom_entry *nubus_m2video_device::device_rom_region() const

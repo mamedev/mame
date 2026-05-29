@@ -256,7 +256,7 @@ void econet_e01_device::device_add_mconfig(machine_config &config)
 	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	via.irq_handler().set(FUNC(econet_e01_device::via_irq_w));
 
-	MC6854(config, m_adlc, 0);
+	MC6854(config, m_adlc);
 	m_adlc->out_irq_cb().set(FUNC(econet_e01_device::adlc_irq_w));
 	m_adlc->out_txd_cb().set(FUNC(econet_e01_device::econet_data_w));
 

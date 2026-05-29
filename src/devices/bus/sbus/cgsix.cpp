@@ -1324,7 +1324,7 @@ void sbus_turbogx_device::device_add_mconfig(machine_config &config)
 	m_screen->set_raw(105.561_MHz_XTAL, 1472, 0, 1152, 943, 0, 900);
 	m_screen->screen_vblank().set(FUNC(sbus_turbogx_device::vblank_w));
 
-	BT458(config, m_ramdac, 0);
+	BT458(config, m_ramdac);
 }
 
 sbus_turbogx_device::sbus_turbogx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1366,7 +1366,7 @@ void sbus_turbogxp_device::device_add_mconfig(machine_config &config)
 	m_screen->set_refresh_hz(72);
 	m_screen->screen_vblank().set(FUNC(sbus_turbogxp_device::vblank_w));
 
-	BT467(config, m_ramdac, 0);
+	BT467(config, m_ramdac);
 }
 
 sbus_turbogxp_device::sbus_turbogxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

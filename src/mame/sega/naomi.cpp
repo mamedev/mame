@@ -2433,7 +2433,7 @@ void dc_state::naomi_aw_base(machine_config &config)
 	ARM7(config, m_soundcpu, ((XTAL(33'868'800)*2)/3)/8);   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	m_soundcpu->set_addrmap(AS_PROGRAM, &dc_state::dc_audio_map);
 
-	MAPLE_DC(config, m_maple, 0, m_maincpu);
+	MAPLE_DC(config, m_maple, m_maincpu);
 	m_maple->irq_callback().set(FUNC(dc_state::maple_irq));
 
 	/* video hardware */
@@ -2442,7 +2442,7 @@ void dc_state::naomi_aw_base(machine_config &config)
 	screen.set_raw(13458568*2, 820, 0, 640, 532, 0, 480);
 	screen.set_screen_update("powervr2", FUNC(powervr2_device::screen_update));
 
-	POWERVR2(config, m_powervr2, 0);
+	POWERVR2(config, m_powervr2);
 	m_powervr2->set_cpu(m_maincpu);
 	m_powervr2->set_texture_ram(dc_texture_ram);
 	m_powervr2->set_framebuffer_ram(dc_framebuffer_ram);
@@ -2482,13 +2482,13 @@ void naomi_state::naomi_base(machine_config &config)
 	mie.set_gpio_name<5>("MIE.5");
 	MIE_JVS(config, "mie", 16000000);
 
-	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "mie"));
+	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", "mie"));
 	sega837.set_port_tags("TILT", "P1", "P2", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "OUTPUT");
 
 	EEPROM_93C46_8BIT(config, "mie_eeprom");
 
 	X76F100(config, "naomibd_eeprom");
-	M3COMM(config, "comm_board", 0);
+	M3COMM(config, "comm_board");
 	MCFG_MACHINE_RESET_OVERRIDE(naomi_state,naomi)
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 }
@@ -2500,7 +2500,7 @@ void naomi_state::naomi_base(machine_config &config)
 void naomi_state::naomi(machine_config &config)
 {
 	naomi_base(config);
-	naomi_rom_board &rom_board(NAOMI_ROM_BOARD(config, "rom_board", 0, "naomibd_eeprom"));
+	naomi_rom_board &rom_board(NAOMI_ROM_BOARD(config, "rom_board", "naomibd_eeprom"));
 	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
 	rom_board.ext_irq_callback().set(FUNC(dc_state::external_irq));
 	rom_board.reset_out_callback().set(FUNC(naomi_state::external_reset));
@@ -2526,7 +2526,7 @@ void naomi_state::naomigd(machine_config &config)
 void naomi_state::naomim1(machine_config &config)
 {
 	naomi_base(config);
-	naomi_m1_board &rom_board(NAOMI_M1_BOARD(config, "rom_board", 0, "naomibd_eeprom"));
+	naomi_m1_board &rom_board(NAOMI_M1_BOARD(config, "rom_board", "naomibd_eeprom"));
 	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
 }
 
@@ -2537,7 +2537,7 @@ void naomi_state::naomim1(machine_config &config)
 void naomi_state::naomim2(machine_config &config)
 {
 	naomi_base(config);
-	naomi_m2_board &rom_board(NAOMI_M2_BOARD(config, "rom_board", 0, "naomibd_eeprom"));
+	naomi_m2_board &rom_board(NAOMI_M2_BOARD(config, "rom_board", "naomibd_eeprom"));
 	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
 }
 
@@ -2548,7 +2548,7 @@ void naomi_state::naomim2(machine_config &config)
 void naomi_state::naomim4(machine_config &config)
 {
 	naomi_base(config);
-	naomi_m4_board &rom_board(NAOMI_M4_BOARD(config, "rom_board", 0, "naomibd_eeprom", "pic_readout"));
+	naomi_m4_board &rom_board(NAOMI_M4_BOARD(config, "rom_board", "naomibd_eeprom", "pic_readout"));
 	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
 }
 
@@ -2559,7 +2559,7 @@ void naomi_state::naomim4(machine_config &config)
 void naomi_state::naomim1_hop(machine_config &config)
 {
 	naomim1(config);
-	SEGA837_14438(config, "hopperbd", 0);
+	SEGA837_14438(config, "hopperbd");
 }
 
 /*
@@ -2569,9 +2569,9 @@ void naomi_state::naomim1_hop(machine_config &config)
 void naomi_state::naomim2_kb(machine_config &config)
 {
 	naomim2(config);
-	dc_keyboard_device &dcctrl0(DC_KEYBOARD(config, "dcctrl0", 0, m_maple, 1));
+	dc_keyboard_device &dcctrl0(DC_KEYBOARD(config, "dcctrl0", m_maple, 1));
 	dcctrl0.set_port_tags("P1.M", "P1.LD", "P1.KC1", "P1.KC2", "P1.KC3", "P1.KC4", "P1.KC5", "P1.KC6");
-	dc_keyboard_device &dcctrl1(DC_KEYBOARD(config, "dcctrl1", 0, m_maple, 2));
+	dc_keyboard_device &dcctrl1(DC_KEYBOARD(config, "dcctrl1", m_maple, 2));
 	dcctrl1.set_port_tags("P2.M", "P2.LD", "P2.KC1", "P2.KC2", "P2.KC3", "P2.KC4", "P2.KC5", "P2.KC6");
 }
 
@@ -2592,9 +2592,9 @@ void naomi_state::naomim2_gun(machine_config &config)
 void naomi_state::naomigd_kb(machine_config &config)
 {
 	naomigd(config);
-	dc_keyboard_device &dcctrl0(DC_KEYBOARD(config, "dcctrl0", 0, m_maple, 1));
+	dc_keyboard_device &dcctrl0(DC_KEYBOARD(config, "dcctrl0", m_maple, 1));
 	dcctrl0.set_port_tags("P1.M", "P1.LD", "P1.KC1", "P1.KC2", "P1.KC3", "P1.KC4", "P1.KC5", "P1.KC6");
-	dc_keyboard_device &dcctrl1(DC_KEYBOARD(config, "dcctrl1", 0, m_maple, 2));
+	dc_keyboard_device &dcctrl1(DC_KEYBOARD(config, "dcctrl1", m_maple, 2));
 	dcctrl1.set_port_tags("P2.M", "P2.LD", "P2.KC1", "P2.KC2", "P2.KC3", "P2.KC4", "P2.KC5", "P2.KC6");
 }
 
@@ -2615,7 +2615,7 @@ void naomi2_state::naomi2(machine_config &config)
 
 void naomi2_state::naomi2_base(machine_config &config)
 {
-	POWERVR2(config, m_powervr2_slave, 0);
+	POWERVR2(config, m_powervr2_slave);
 	m_powervr2_slave->set_cpu(m_maincpu);
 	m_powervr2_slave->set_texture_ram(dc_texture_ram);
 	m_powervr2_slave->set_framebuffer_ram(dc_framebuffer_ram);

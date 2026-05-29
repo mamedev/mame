@@ -608,21 +608,21 @@ void lola8_base_state::crtc_vsync(int state)
 void lola8_base_state::lola_base(machine_config &config)
 {
 	/* basic machine hardware */
-	I8085A(config, m_maincpu, 0);
+	I8085A(config, m_maincpu);
 	m_maincpu->in_sid_func().set(FUNC(lola8a_state::cass_r));
 	m_maincpu->out_sod_func().set(FUNC(lola8a_state::cass_w));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, m_ay8910, 0);
+	AY8910(config, m_ay8910);
 	m_ay8910->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update(m_hd6845, FUNC(hd6845s_device::screen_update));
 
-	HD6845S(config, m_hd6845, 0); // HD6845 == HD46505S
+	HD6845S(config, m_hd6845); // HD6845 == HD46505S
 	m_hd6845->set_screen("screen");
 	m_hd6845->set_show_border_area(false);
 	m_hd6845->set_char_width(8);

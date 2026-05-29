@@ -1287,7 +1287,7 @@ void pc88va_state::machine_reset()
 // cfr. schematics pg. 260, "external bus, videoboard connector"
 void pc88va_state::pc88va_cbus(machine_config &config)
 {
-	PC98_CBUS_ROOT(config, m_cbus_root, 0);
+	PC98_CBUS_ROOT(config, m_cbus_root);
 	m_cbus_root->int_cb<0>().set_inputline(m_maincpu, INPUT_LINE_IRQ3);
 	m_cbus_root->int_cb<1>().set_inputline(m_maincpu, INPUT_LINE_IRQ5);
 	m_cbus_root->int_cb<2>().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
@@ -1349,7 +1349,7 @@ void pc88va_state::pc88va(machine_config &config)
 	d8255_3.out_pc_callback().set(FUNC(pc88va_state::r232_ctrl_portc_w));
 
 	// external PIC
-	PIC8259(config, m_pic2, 0);
+	PIC8259(config, m_pic2);
 	m_pic2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ7);
 	m_pic2->in_sp_callback().set_constant(0);
 

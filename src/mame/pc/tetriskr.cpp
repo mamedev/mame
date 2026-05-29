@@ -256,11 +256,11 @@ void tetriskr_state::tetriskr(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &tetriskr_state::tetriskr_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	PCNOPPI_MOTHERBOARD(config, m_mb, 0).set_cputag(m_maincpu);
+	PCNOPPI_MOTHERBOARD(config, m_mb).set_cputag(m_maincpu);
 	m_mb->int_callback().set_inputline(m_maincpu, 0);
 	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", tetriskr_isa8_cards, "tetriskr", true); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa1", "mb:isa", tetriskr_isa8_cards, "tetriskr", true); // FIXME: determine ISA bus clock
 
 	RAM(config, RAM_TAG).set_default_size("64K");
 }

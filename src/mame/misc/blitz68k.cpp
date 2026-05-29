@@ -1795,7 +1795,7 @@ void blitz68k_state::ramdac_map(address_map &map)
 void blitz68k_state::ramdac_config(machine_config &config)
 {
 	PALETTE(config, m_palette).set_entries(0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &blitz68k_state::ramdac_map);
 }
 

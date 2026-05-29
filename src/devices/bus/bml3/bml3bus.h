@@ -49,7 +49,7 @@ public:
 	}
 
 protected:
-	bml3bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bml3bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -69,7 +69,7 @@ class bml3bus_device : public device_t
 	friend class device_bml3bus_card_interface;
 public:
 	// construction/destruction
-	bml3bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bml3bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration
 	auto nmi_callback() { return m_out_nmi_cb.bind(); }
@@ -86,7 +86,7 @@ public:
 	void firq_w(int state);
 
 protected:
-	bml3bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bml3bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

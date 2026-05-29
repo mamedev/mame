@@ -150,7 +150,7 @@ void ct486_state::ct486(machine_config &config)
 	pc_kbdc.out_clock_cb().set(keybc, FUNC(at_kbc_device_base::kbd_clk_w));
 	pc_kbdc.out_data_cb().set(keybc, FUNC(at_kbc_device_base::kbd_data_w));
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
 	m_isabus->set_iospace(m_maincpu, AS_IO);
 	m_isabus->iochck_callback().set(m_cs4031, FUNC(cs4031_device::iochck_w));
@@ -172,15 +172,15 @@ void ct486_state::ct486(machine_config &config)
 	m_isabus->drq5_callback().set(m_cs4031, FUNC(cs4031_device::dreq5_w));
 	m_isabus->drq6_callback().set(m_cs4031, FUNC(cs4031_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_cs4031, FUNC(cs4031_device::dreq7_w));
-	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdc_smc", true);
-	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa16_cards, "comat", true);
-	ISA16_SLOT(config, "board3", 0, "isabus", pc_isa16_cards, "ide", true);
-	ISA16_SLOT(config, "board4", 0, "isabus", pc_isa16_cards, "lpt", true);
-	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "svga_et4kw32i", false);
-	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa4", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "board1", "isabus", pc_isa16_cards, "fdc_smc", true);
+	ISA16_SLOT(config, "board2", "isabus", pc_isa16_cards, "comat", true);
+	ISA16_SLOT(config, "board3", "isabus", pc_isa16_cards, "ide", true);
+	ISA16_SLOT(config, "board4", "isabus", pc_isa16_cards, "lpt", true);
+	ISA16_SLOT(config, "isa1", "isabus", pc_isa16_cards, "svga_et4kw32i", false);
+	ISA16_SLOT(config, "isa2", "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", "isabus", pc_isa16_cards, nullptr, false);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -203,7 +203,7 @@ void ct486_state::ast6000(machine_config &config)
 	// 1 ISA slot only, with ISA bridge x3
 	// CL-GD5428 on-board
 	// Chips & Technologies F82C721 Super I/O
-	ISA16_SLOT(config, "board5", 0, "isabus", pc_isa16_cards, "clgd542x", true);
+	ISA16_SLOT(config, "board5", "isabus", pc_isa16_cards, "clgd542x", true);
 	ISA16_SLOT(config.replace(), "isa1", 0, "isabus", pc_isa16_cards, nullptr, false);
 }
 
@@ -221,7 +221,7 @@ void ct486_state::ast611(machine_config &config)
 	// 1 ISA slot only, with ISA bridge x3
 	// CL-GD5428 on-board
 	// SMC/SMSC FDC37C653** Super I/O
-	ISA16_SLOT(config, "board5", 0, "isabus", pc_isa16_cards, "clgd542x", true);
+	ISA16_SLOT(config, "board5", "isabus", pc_isa16_cards, "clgd542x", true);
 	// TODO: Creative CT2504 / Vibra 16S on-board
 //  ISA16_SLOT(config, "board6", 0, "isabus", pc_isa16_cards, "vibra16s", true);
 

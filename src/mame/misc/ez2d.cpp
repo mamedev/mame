@@ -145,31 +145,31 @@ void ez2d_state::cubx(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pci:04.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 	m_maincpu->smiact().set("pci:00.0", FUNC(i82443bx_host_device::smi_act_w));
 
-	PCI_ROOT(config, "pci", 0);
-	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 128*1024*1024);
+	PCI_ROOT(config, "pci");
+	I82443BX_HOST(config, "pci:00.0", "maincpu", 128*1024*1024);
 	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
 	//I82443BX_AGP   (config, "pci:01.0:00.0");
 
 	// NOTE: at 04.x instead of 07.x as other BX targets
-	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:04.0", 0, "maincpu", true));
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:04.0", "maincpu", true));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 
 	// TODO: CMD PCI0648 UDMA4 IDE (replaces or maps on its own?)
-	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:04.1", 0, "maincpu"));
+	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:04.1", "maincpu"));
 	ide.irq_pri().set("pci:04.0", FUNC(i82371eb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:04.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
 
-	I82371EB_USB (config, "pci:04.2", 0);
-	I82371EB_ACPI(config, "pci:04.3", 0);
+	I82371EB_USB (config, "pci:04.2");
+	I82371EB_ACPI(config, "pci:04.3");
 	ACPI_PIIX4   (config, "pci:04.3:acpi");
 	SMBUS        (config, "pci:04.3:smbus", 0);
 
-	ISA16_SLOT(config, "board4", 0, "pci:04.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
-	ISA16_SLOT(config, "isa1", 0, "pci:04.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", 0, "pci:04.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", 0, "pci:04.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "board4", "pci:04.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
+	ISA16_SLOT(config, "isa1", "pci:04.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", "pci:04.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", "pci:04.0:isabus", pc_isa16_cards, nullptr, false);
 
 #if 0
 	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr)); // "microsoft_mouse"));

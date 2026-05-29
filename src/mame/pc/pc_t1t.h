@@ -23,11 +23,11 @@ protected:
 			device_type type,
 			const char *tag,
 			device_t *owner,
-			uint32_t clock,
-			uint8_t databits,
-			uint8_t addrbits,
-			unsigned chr_stride,
-			unsigned ra_stride);
+			uint32_t clock = 0,
+			uint8_t databits = 0,
+			uint8_t addrbits = 0,
+			unsigned chr_stride = 0,
+			unsigned ra_stride = 0);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;
@@ -91,7 +91,7 @@ private:
 class pcvideo_t1000_device : public pc_t1t_device, public device_gfx_interface
 {
 public:
-	pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint8_t read(address_space &space, offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
@@ -109,9 +109,9 @@ protected:
 			device_type type,
 			const char *tag,
 			device_t *owner,
-			uint32_t clock,
-			uint8_t databits,
-			uint8_t addrbits);
+			uint32_t clock = 0,
+			uint8_t databits = 0,
+			uint8_t addrbits = 0);
 
 	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -157,7 +157,7 @@ class pcvideo_t1000x_device :  public pcvideo_t1000_device
 public:
 	static auto parent_rom_device_type() { return &PCVIDEO_T1000; }
 
-	pcvideo_t1000x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pcvideo_t1000x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void write(offs_t offset, uint8_t data) override;
 
@@ -167,9 +167,9 @@ protected:
 			device_type type,
 			const char *tag,
 			device_t *owner,
-			uint32_t clock,
-			uint8_t databits,
-			uint8_t addrbits);
+			uint32_t clock = 0,
+			uint8_t databits = 0,
+			uint8_t addrbits = 0);
 
 	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
@@ -189,7 +189,7 @@ class pcvideo_pcjr_device : public pc_t1t_device
 {
 public:
 	// construction/destruction
-	pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	auto vsync_callback() { return m_vsync_cb.bind(); }

@@ -449,7 +449,7 @@ void lm24014h_device::lcd_palette(palette_device &palette) const
 
 void lm24014h_device::device_add_mconfig(machine_config &config)
 {
-	T6963C(config, m_lcdc, 0); // XTAL is unknown
+	T6963C(config, m_lcdc); // XTAL is unknown
 	m_lcdc->set_addrmap(0, &lm24014h_device::ram_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));

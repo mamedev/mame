@@ -525,12 +525,12 @@ void bbusters_state::bbusters(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_bbusters);
 	PALETTE(config, "palette").set_format(palette_device::RGBx_444, 2048);
 
-	SNK_BBUSTERS_SPR(config, m_sprites[0], 0);
+	SNK_BBUSTERS_SPR(config, m_sprites[0]);
 	m_sprites[0]->set_scaletable_tag("sprites1:scale_table");
 	m_sprites[0]->set_palette("palette");
 	m_sprites[0]->set_spriteram_tag("spriteram1");
 
-	SNK_BBUSTERS_SPR(config, m_sprites[1], 0);
+	SNK_BBUSTERS_SPR(config, m_sprites[1]);
 	m_sprites[1]->set_scaletable_tag("sprites2:scale_table");
 	m_sprites[1]->set_palette("palette");
 	m_sprites[1]->set_spriteram_tag("spriteram2");

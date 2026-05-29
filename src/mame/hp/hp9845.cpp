@@ -3654,7 +3654,7 @@ void hp9845_base_state::hp9845_base(machine_config &config)
 	m_ppu->set_int_cb(m_io_sys , FUNC(hp98x5_io_sys_device::int_r));
 	m_ppu->pa_changed_cb().set(m_io_sys , FUNC(hp98x5_io_sys_device::pa_w));
 
-	HP98X5_IO_SYS(config , m_io_sys , 0);
+	HP98X5_IO_SYS(config , m_io_sys);
 	m_io_sys->irl().set_inputline(m_ppu, HPHYBRID_IRL);
 	m_io_sys->irh().set_inputline(m_ppu, HPHYBRID_IRH);
 	m_io_sys->sts().set(m_ppu , FUNC(hp_5061_3001_cpu_device::status_w));
@@ -3689,19 +3689,19 @@ void hp9845_base_state::hp9845_base(machine_config &config)
 	// right-hand side and left-hand side drawers, respectively.
 	// Here we do away with the distinction between LPU & PPU ROMs: in the end they
 	// are visible to both CPUs at the same addresses.
-	HP9845_OPTROM(config, "drawer1", 0);
-	HP9845_OPTROM(config, "drawer2", 0);
-	HP9845_OPTROM(config, "drawer3", 0);
-	HP9845_OPTROM(config, "drawer4", 0);
-	HP9845_OPTROM(config, "drawer5", 0);
-	HP9845_OPTROM(config, "drawer6", 0);
-	HP9845_OPTROM(config, "drawer7", 0);
-	HP9845_OPTROM(config, "drawer8", 0);
+	HP9845_OPTROM(config, "drawer1");
+	HP9845_OPTROM(config, "drawer2");
+	HP9845_OPTROM(config, "drawer3");
+	HP9845_OPTROM(config, "drawer4");
+	HP9845_OPTROM(config, "drawer5");
+	HP9845_OPTROM(config, "drawer6");
+	HP9845_OPTROM(config, "drawer7");
+	HP9845_OPTROM(config, "drawer8");
 
 	// I/O slots
 	for (unsigned slot = 0; slot < 4; slot++) {
 		auto& finder = m_io_slot[ slot ];
-		hp9845_io_slot_device& tmp( HP9845_IO_SLOT(config , finder , 0) );
+		hp9845_io_slot_device& tmp( HP9845_IO_SLOT(config , finder) );
 		tmp.irq().set([this , slot](int state) { set_irq_slot(slot , state); });
 		tmp.sts().set([this , slot](int state) { set_sts_slot(slot , state); });
 		tmp.flg().set([this , slot](int state) { set_flg_slot(slot , state); });
@@ -3715,7 +3715,7 @@ void hp9845_base_state::hp9845_base(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("192K").set_extra_options("64K, 320K, 448K");
 
 	// Internal printer
-	hp9845_printer_device& prt{ HP9845_PRINTER(config , "printer" , 0) };
+	hp9845_printer_device& prt{ HP9845_PRINTER(config , "printer") };
 	prt.irq().set(FUNC(hp9845_base_state::prt_irl_w));
 	prt.flg().set([this](int state) { m_io_sys->set_flg(PRINTER_PA , state); });
 	prt.sts().set([this](int state) { m_io_sys->set_sts(PRINTER_PA , state); });

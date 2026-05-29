@@ -1319,11 +1319,11 @@ void jpmimpct_state::base(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	METERS(config, m_meters, 0).set_number(5);
+	METERS(config, m_meters).set_number(5);
 
 	// TODO: only add this to the sets that need it connected
 	m_duart->a_tx_cb().set(m_datalogger, FUNC(bacta_datalogger_device::write_txd));
-	BACTA_DATALOGGER(config, m_datalogger, 0);
+	BACTA_DATALOGGER(config, m_datalogger);
 	m_datalogger->rxd_handler().set(m_duart, FUNC(mc68681_device::rx_a_w));
 }
 

@@ -3666,71 +3666,71 @@ void vgmplay_state::vgmplay(machine_config &config)
 
 	config.set_default_layout(layout_vgmplay);
 
-	SN76489(config, m_sn76489[0], 0);
+	SN76489(config, m_sn76489[0]);
 	m_sn76489[0]->add_route(0, m_viz, 0.5, 0);
 	m_sn76489[0]->add_route(0, m_viz, 0.5, 1);
 
-	SN76489(config, m_sn76489[1], 0);
+	SN76489(config, m_sn76489[1]);
 	m_sn76489[1]->add_route(0, m_viz, 0.5, 0);
 	m_sn76489[1]->add_route(0, m_viz, 0.5, 1);
 
-	YM2413(config, m_ym2413[0], 0);
+	YM2413(config, m_ym2413[0]);
 	m_ym2413[0]->add_route(ALL_OUTPUTS, m_viz, 1, 0);
 	m_ym2413[0]->add_route(ALL_OUTPUTS, m_viz, 1, 1);
 
-	YM2413(config, m_ym2413[1], 0);
+	YM2413(config, m_ym2413[1]);
 	m_ym2413[1]->add_route(ALL_OUTPUTS, m_viz, 1, 0);
 	m_ym2413[1]->add_route(ALL_OUTPUTS, m_viz, 1, 1);
 
-	YM2612(config, m_ym2612[0], 0);
+	YM2612(config, m_ym2612[0]);
 	m_ym2612[0]->add_route(0, m_viz, 1, 0);
 	m_ym2612[0]->add_route(1, m_viz, 1, 1);
 
-	YM2612(config, m_ym2612[1], 0);
+	YM2612(config, m_ym2612[1]);
 	m_ym2612[1]->add_route(0, m_viz, 1, 0);
 	m_ym2612[1]->add_route(1, m_viz, 1, 1);
 
-	YM2151(config, m_ym2151[0], 0);
+	YM2151(config, m_ym2151[0]);
 	m_ym2151[0]->add_route(0, m_viz, 1, 0);
 	m_ym2151[0]->add_route(1, m_viz, 1, 1);
 
-	YM2151(config, m_ym2151[1], 0);
+	YM2151(config, m_ym2151[1]);
 	m_ym2151[1]->add_route(0, m_viz, 1, 0);
 	m_ym2151[1]->add_route(1, m_viz, 1, 1);
 
-	SEGAPCM(config, m_segapcm[0], 0);
+	SEGAPCM(config, m_segapcm[0]);
 	m_segapcm[0]->set_addrmap(0, &vgmplay_state::segapcm_map<0>);
 	m_segapcm[0]->add_route(0, m_viz, 1, 0);
 	m_segapcm[0]->add_route(1, m_viz, 1, 1);
 
-	SEGAPCM(config, m_segapcm[1], 0);
+	SEGAPCM(config, m_segapcm[1]);
 	m_segapcm[1]->set_addrmap(0, &vgmplay_state::segapcm_map<1>);
 	m_segapcm[1]->add_route(0, m_viz, 1, 0);
 	m_segapcm[1]->add_route(1, m_viz, 1, 1);
 
-	RF5C68(config, m_rf5c68, 0);
+	RF5C68(config, m_rf5c68);
 	m_rf5c68->set_addrmap(0, &vgmplay_state::rf5c68_map<0>);
 	m_rf5c68->add_route(0, m_viz, 1, 0);
 	m_rf5c68->add_route(1, m_viz, 1, 1);
 
 	// TODO: prevent error.log spew
-	YM2203(config, m_ym2203[0], 0);
+	YM2203(config, m_ym2203[0]);
 	m_ym2203[0]->add_route(ALL_OUTPUTS, m_viz, 0.25, 0);
 	m_ym2203[0]->add_route(ALL_OUTPUTS, m_viz, 0.25, 1);
 
-	YM2203(config, m_ym2203[1], 0);
+	YM2203(config, m_ym2203[1]);
 	m_ym2203[1]->add_route(ALL_OUTPUTS, m_viz, 0.25, 0);
 	m_ym2203[1]->add_route(ALL_OUTPUTS, m_viz, 0.25, 1);
 
 	// TODO: prevent error.log spew
-	YM2608(config, m_ym2608[0], 0);
+	YM2608(config, m_ym2608[0]);
 	m_ym2608[0]->set_addrmap(0, &vgmplay_state::ym2608_map<0>);
 	m_ym2608[0]->add_route(0, m_viz, 0.75, 0);
 	m_ym2608[0]->add_route(0, m_viz, 0.75, 1);
 	m_ym2608[0]->add_route(1, m_viz, 1.00, 0);
 	m_ym2608[0]->add_route(2, m_viz, 1.00, 1);
 
-	YM2608(config, m_ym2608[1], 0);
+	YM2608(config, m_ym2608[1]);
 	m_ym2608[1]->set_addrmap(0, &vgmplay_state::ym2608_map<1>);
 	m_ym2608[1]->add_route(0, m_viz, 0.75, 0);
 	m_ym2608[1]->add_route(0, m_viz, 0.75, 1);
@@ -3738,7 +3738,7 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_ym2608[1]->add_route(2, m_viz, 1.00, 1);
 
 	// TODO: prevent error.log spew
-	YM2610(config, m_ym2610[0], 0);
+	YM2610(config, m_ym2610[0]);
 	m_ym2610[0]->set_addrmap(0, &vgmplay_state::ym2610_adpcm_a_map<0>);
 	m_ym2610[0]->set_addrmap(1, &vgmplay_state::ym2610_adpcm_b_map<0>);
 	m_ym2610[0]->add_route(0, m_viz, 0.75, 0);
@@ -3746,7 +3746,7 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_ym2610[0]->add_route(1, m_viz, 0.50, 0);
 	m_ym2610[0]->add_route(2, m_viz, 0.50, 1);
 
-	YM2610(config, m_ym2610[1], 0);
+	YM2610(config, m_ym2610[1]);
 	m_ym2610[1]->set_addrmap(0, &vgmplay_state::ym2610_adpcm_a_map<1>);
 	m_ym2610[1]->set_addrmap(1, &vgmplay_state::ym2610_adpcm_b_map<1>);
 	m_ym2610[1]->add_route(0, m_viz, 0.75, 0);
@@ -3754,46 +3754,46 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_ym2610[1]->add_route(1, m_viz, 0.50, 0);
 	m_ym2610[1]->add_route(2, m_viz, 0.50, 1);
 
-	YM3812(config, m_ym3812[0], 0);
+	YM3812(config, m_ym3812[0]);
 	m_ym3812[0]->add_route(ALL_OUTPUTS, m_viz, 0.5, 0);
 	m_ym3812[0]->add_route(ALL_OUTPUTS, m_viz, 0.5, 1);
 
-	YM3812(config, m_ym3812[1], 0);
+	YM3812(config, m_ym3812[1]);
 	m_ym3812[1]->add_route(ALL_OUTPUTS, m_viz, 0.5, 0);
 	m_ym3812[1]->add_route(ALL_OUTPUTS, m_viz, 0.5, 1);
 
-	YM3526(config, m_ym3526[0], 0);
+	YM3526(config, m_ym3526[0]);
 	m_ym3526[0]->add_route(ALL_OUTPUTS, m_viz, 0.5, 0);
 	m_ym3526[0]->add_route(ALL_OUTPUTS, m_viz, 0.5, 1);
 
-	YM3526(config, m_ym3526[1], 0);
+	YM3526(config, m_ym3526[1]);
 	m_ym3526[1]->add_route(ALL_OUTPUTS, m_viz, 0.5, 0);
 	m_ym3526[1]->add_route(ALL_OUTPUTS, m_viz, 0.5, 1);
 
-	Y8950(config, m_y8950[0], 0);
+	Y8950(config, m_y8950[0]);
 	m_y8950[0]->set_addrmap(0, &vgmplay_state::y8950_map<0>);
 	m_y8950[0]->add_route(ALL_OUTPUTS, m_viz, 0.40, 0);
 	m_y8950[0]->add_route(ALL_OUTPUTS, m_viz, 0.40, 1);
 
-	Y8950(config, m_y8950[1], 0);
+	Y8950(config, m_y8950[1]);
 	m_y8950[1]->set_addrmap(0, &vgmplay_state::y8950_map<1>);
 	m_y8950[1]->add_route(ALL_OUTPUTS, m_viz, 0.40, 0);
 	m_y8950[1]->add_route(ALL_OUTPUTS, m_viz, 0.40, 1);
 
-	YMF262(config, m_ymf262[0], 0);
+	YMF262(config, m_ymf262[0]);
 	m_ymf262[0]->add_route(0, m_viz, 1.00, 0);
 	m_ymf262[0]->add_route(1, m_viz, 1.00, 1);
 	m_ymf262[0]->add_route(2, m_viz, 1.00, 0);
 	m_ymf262[0]->add_route(3, m_viz, 1.00, 1);
 
-	YMF262(config, m_ymf262[1], 0);
+	YMF262(config, m_ymf262[1]);
 	m_ymf262[1]->add_route(0, m_viz, 1.00, 0);
 	m_ymf262[1]->add_route(1, m_viz, 1.00, 1);
 	m_ymf262[1]->add_route(2, m_viz, 1.00, 0);
 	m_ymf262[1]->add_route(3, m_viz, 1.00, 1);
 
 	// TODO: prevent error.log spew
-	YMF278B(config, m_ymf278b[0], 0);
+	YMF278B(config, m_ymf278b[0]);
 	m_ymf278b[0]->set_addrmap(0, &vgmplay_state::ymf278b_map<0>);
 	m_ymf278b[0]->add_route(0, m_viz, 1.00, 0);
 	m_ymf278b[0]->add_route(1, m_viz, 1.00, 1);
@@ -3802,7 +3802,7 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_ymf278b[0]->add_route(4, m_viz, 1.00, 0);
 	m_ymf278b[0]->add_route(5, m_viz, 1.00, 1);
 
-	YMF278B(config, m_ymf278b[1], 0);
+	YMF278B(config, m_ymf278b[1]);
 	m_ymf278b[1]->set_addrmap(0, &vgmplay_state::ymf278b_map<1>);
 	m_ymf278b[1]->add_route(0, m_viz, 1.00, 0);
 	m_ymf278b[1]->add_route(1, m_viz, 1.00, 1);
@@ -3811,14 +3811,14 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_ymf278b[1]->add_route(4, m_viz, 1.00, 0);
 	m_ymf278b[1]->add_route(5, m_viz, 1.00, 1);
 
-	YMF271(config, m_ymf271[0], 0);
+	YMF271(config, m_ymf271[0]);
 	m_ymf271[0]->set_addrmap(0, &vgmplay_state::ymf271_map<0>);
 	m_ymf271[0]->add_route(0, m_viz, 0.25, 0);
 	m_ymf271[0]->add_route(1, m_viz, 0.25, 1);
 	m_ymf271[0]->add_route(2, m_viz, 0.25, 0);
 	m_ymf271[0]->add_route(3, m_viz, 0.25, 1);
 
-	YMF271(config, m_ymf271[1], 0);
+	YMF271(config, m_ymf271[1]);
 	m_ymf271[1]->set_addrmap(0, &vgmplay_state::ymf271_map<0>);
 	m_ymf271[1]->add_route(0, m_viz, 0.25, 0);
 	m_ymf271[1]->add_route(1, m_viz, 0.25, 1);
@@ -3826,17 +3826,17 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_ymf271[1]->add_route(3, m_viz, 0.25, 1);
 
 	// TODO: prevent error.log spew
-	YMZ280B(config, m_ymz280b[0], 0);
+	YMZ280B(config, m_ymz280b[0]);
 	m_ymz280b[0]->set_addrmap(0, &vgmplay_state::ymz280b_map<0>);
 	m_ymz280b[0]->add_route(0, m_viz, 0.50, 0);
 	m_ymz280b[0]->add_route(1, m_viz, 0.50, 1);
 
-	YMZ280B(config, m_ymz280b[1], 0);
+	YMZ280B(config, m_ymz280b[1]);
 	m_ymz280b[1]->set_addrmap(0, &vgmplay_state::ymz280b_map<1>);
 	m_ymz280b[1]->add_route(0, m_viz, 0.50, 0);
 	m_ymz280b[1]->add_route(1, m_viz, 0.50, 1);
 
-	RF5C164(config, m_rf5c164, 0);
+	RF5C164(config, m_rf5c164);
 	m_rf5c164->set_addrmap(0, &vgmplay_state::rf5c164_map<0>);
 	m_rf5c164->add_route(0, m_viz, 1, 0);
 	m_rf5c164->add_route(1, m_viz, 1, 1);
@@ -3846,249 +3846,249 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_sega32x->add_route(0, m_viz, 1.00, 0);
 	m_sega32x->add_route(1, m_viz, 1.00, 1);
 
-	auto& sega32x_maincpu(M68000(config, "sega32x_maincpu", 0));
+	auto& sega32x_maincpu(M68000(config, "sega32x_maincpu"));
 	sega32x_maincpu.set_disable();
 
-	TIMER(config, "sega32x_scanline_timer", 0);
+	TIMER(config, "sega32x_scanline_timer");
 
 	m_sega32x->subdevice<cpu_device>("32x_master_sh2")->set_disable();
 	m_sega32x->subdevice<cpu_device>("32x_slave_sh2")->set_disable();
 
 	// TODO: prevent error.log spew
-	AY8910(config, m_ay8910[0], 0);
+	AY8910(config, m_ay8910[0]);
 	m_ay8910[0]->add_route(ALL_OUTPUTS, m_viz, 0.33, 0);
 	m_ay8910[0]->add_route(ALL_OUTPUTS, m_viz, 0.33, 1);
 
-	AY8910(config, m_ay8910[1], 0);
+	AY8910(config, m_ay8910[1]);
 	m_ay8910[1]->add_route(ALL_OUTPUTS, m_viz, 0.33, 0);
 	m_ay8910[1]->add_route(ALL_OUTPUTS, m_viz, 0.33, 1);
 
-	DMG_APU(config, m_dmg[0], 0);
+	DMG_APU(config, m_dmg[0]);
 	m_dmg[0]->add_route(0, m_viz, 1, 0);
 	m_dmg[0]->add_route(0, m_viz, 1, 1);
 
-	DMG_APU(config, m_dmg[1], 0);
+	DMG_APU(config, m_dmg[1]);
 	m_dmg[1]->add_route(0, m_viz, 1, 0);
 	m_dmg[1]->add_route(0, m_viz, 1, 1);
 
-	RP2A03G(config, m_nescpu[0], 0);
+	RP2A03G(config, m_nescpu[0]);
 	m_nescpu[0]->set_addrmap(AS_PROGRAM, &vgmplay_state::nescpu_map<0>);
 	m_nescpu[0]->set_disable();
 	m_nescpu[0]->add_route(ALL_OUTPUTS, m_viz, 0.50, 0);
 	m_nescpu[0]->add_route(ALL_OUTPUTS, m_viz, 0.50, 1);
 
-	RP2A03G(config, m_nescpu[1], 0);
+	RP2A03G(config, m_nescpu[1]);
 	m_nescpu[1]->set_addrmap(AS_PROGRAM, &vgmplay_state::nescpu_map<1>);
 	m_nescpu[1]->set_disable();
 	m_nescpu[1]->add_route(ALL_OUTPUTS, m_viz, 0.50, 0);
 	m_nescpu[1]->add_route(ALL_OUTPUTS, m_viz, 0.50, 1);
 
-	MULTIPCM(config, m_multipcm[0], 0);
+	MULTIPCM(config, m_multipcm[0]);
 	m_multipcm[0]->set_addrmap(0, &vgmplay_state::multipcm_map<0>);
 	m_multipcm[0]->add_route(0, m_viz, 1, 0);
 	m_multipcm[0]->add_route(1, m_viz, 1, 1);
 
-	MULTIPCM(config, m_multipcm[1], 0);
+	MULTIPCM(config, m_multipcm[1]);
 	m_multipcm[1]->set_addrmap(0, &vgmplay_state::multipcm_map<1>);
 	m_multipcm[1]->add_route(0, m_viz, 1, 0);
 	m_multipcm[1]->add_route(1, m_viz, 1, 1);
 
-	UPD7759(config, m_upd7759[0], 0);
+	UPD7759(config, m_upd7759[0]);
 	m_upd7759[0]->drq().set(FUNC(vgmplay_state::upd7759_drq_w<0>));
 	m_upd7759[0]->set_addrmap(0, &vgmplay_state::upd7759_map<0>);
 	m_upd7759[0]->add_route(ALL_OUTPUTS, m_viz, 1.0, 0);
 	m_upd7759[0]->add_route(ALL_OUTPUTS, m_viz, 1.0, 1);
 
-	UPD7759(config, m_upd7759[1], 0);
+	UPD7759(config, m_upd7759[1]);
 	m_upd7759[1]->drq().set(FUNC(vgmplay_state::upd7759_drq_w<1>));
 	m_upd7759[1]->set_addrmap(0, &vgmplay_state::upd7759_map<1>);
 	m_upd7759[1]->add_route(ALL_OUTPUTS, m_viz, 1.0, 0);
 	m_upd7759[1]->add_route(ALL_OUTPUTS, m_viz, 1.0, 1);
 
-	OKIM6258(config, m_okim6258[0], 0);
+	OKIM6258(config, m_okim6258[0]);
 	m_okim6258[0]->add_route(ALL_OUTPUTS, m_viz, 0.5, 0);
 	m_okim6258[0]->add_route(ALL_OUTPUTS, m_viz, 0.5, 1);
 
-	OKIM6258(config, m_okim6258[1], 0);
+	OKIM6258(config, m_okim6258[1]);
 	m_okim6258[1]->add_route(ALL_OUTPUTS, m_viz, 0.5, 0);
 	m_okim6258[1]->add_route(ALL_OUTPUTS, m_viz, 0.5, 1);
 
-	OKIM6295(config, m_okim6295[0], 0, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_okim6295[0], okim6295_device::PIN7_HIGH);
 	m_okim6295[0]->set_addrmap(0, &vgmplay_state::okim6295_map<0>);
 	m_okim6295[0]->add_route(ALL_OUTPUTS, m_viz, 0.25, 0);
 	m_okim6295[0]->add_route(ALL_OUTPUTS, m_viz, 0.25, 1);
 
-	OKIM6295(config, m_okim6295[1], 0, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_okim6295[1], okim6295_device::PIN7_HIGH);
 	m_okim6295[1]->set_addrmap(0, &vgmplay_state::okim6295_map<1>);
 	m_okim6295[1]->add_route(ALL_OUTPUTS, m_viz, 0.25, 0);
 	m_okim6295[1]->add_route(ALL_OUTPUTS, m_viz, 0.25, 1);
 
-	K051649(config, m_k051649[0], 0);
+	K051649(config, m_k051649[0]);
 	m_k051649[0]->add_route(ALL_OUTPUTS, m_viz, 0.33, 0);
 	m_k051649[0]->add_route(ALL_OUTPUTS, m_viz, 0.33, 1);
 
-	K051649(config, m_k051649[1], 0);
+	K051649(config, m_k051649[1]);
 	m_k051649[1]->add_route(ALL_OUTPUTS, m_viz, 0.33, 0);
 	m_k051649[1]->add_route(ALL_OUTPUTS, m_viz, 0.33, 1);
 
-	K054539(config, m_k054539[0], 0);
+	K054539(config, m_k054539[0]);
 	m_k054539[0]->set_addrmap(0, &vgmplay_state::k054539_map<0>);
 	m_k054539[0]->add_route(0, m_viz, 1, 0);
 	m_k054539[0]->add_route(1, m_viz, 1, 1);
 
-	K054539(config, m_k054539[1], 0);
+	K054539(config, m_k054539[1]);
 	m_k054539[1]->set_addrmap(0, &vgmplay_state::k054539_map<1>);
 	m_k054539[1]->add_route(0, m_viz, 1, 0);
 	m_k054539[1]->add_route(1, m_viz, 1, 1);
 
 	// TODO: prevent error.log spew
-	H6280(config, m_huc6280[0], 0);
+	H6280(config, m_huc6280[0]);
 	m_huc6280[0]->set_disable();
 	m_huc6280[0]->add_route(0, m_viz, 1, 0);
 	m_huc6280[0]->add_route(1, m_viz, 1, 1);
 
-	H6280(config, m_huc6280[1], 0);
+	H6280(config, m_huc6280[1]);
 	m_huc6280[1]->set_disable();
 	m_huc6280[1]->add_route(0, m_viz, 1, 0);
 	m_huc6280[1]->add_route(1, m_viz, 1, 1);
 
-	C140(config, m_c140[0], 0);
+	C140(config, m_c140[0]);
 	m_c140[0]->set_addrmap(0, &vgmplay_state::c140_map<0>);
 	m_c140[0]->add_route(0, m_viz, 0.50, 0);
 	m_c140[0]->add_route(1, m_viz, 0.50, 1);
 
-	C140(config, m_c140[1], 0);
+	C140(config, m_c140[1]);
 	m_c140[1]->set_addrmap(0, &vgmplay_state::c140_map<1>);
 	m_c140[1]->add_route(0, m_viz, 0.50, 0);
 	m_c140[1]->add_route(1, m_viz, 0.50, 1);
 
-	C219(config, m_c219[0], 0);
+	C219(config, m_c219[0]);
 	m_c219[0]->set_addrmap(0, &vgmplay_state::c219_map<0>);
 	m_c219[0]->add_route(0, m_viz, 0.50, 0);
 	m_c219[0]->add_route(1, m_viz, 0.50, 1);
 
-	C219(config, m_c219[1], 0);
+	C219(config, m_c219[1]);
 	m_c219[1]->set_addrmap(0, &vgmplay_state::c219_map<1>);
 	m_c219[1]->add_route(0, m_viz, 0.50, 0);
 	m_c219[1]->add_route(1, m_viz, 0.50, 1);
 
-	K053260(config, m_k053260[0], 0);
+	K053260(config, m_k053260[0]);
 	m_k053260[0]->set_addrmap(0, &vgmplay_state::k053260_map<0>);
 	m_k053260[0]->add_route(0, m_viz, 1, 0);
 	m_k053260[0]->add_route(1, m_viz, 1, 1);
 
-	K053260(config, m_k053260[1], 0);
+	K053260(config, m_k053260[1]);
 	m_k053260[1]->set_addrmap(0, &vgmplay_state::k053260_map<1>);
 	m_k053260[1]->add_route(0, m_viz, 1, 0);
 	m_k053260[1]->add_route(1, m_viz, 1, 1);
 
-	POKEY(config, m_pokey[0], 0);
+	POKEY(config, m_pokey[0]);
 	m_pokey[0]->add_route(ALL_OUTPUTS, m_viz, 0.5, 0);
 	m_pokey[0]->add_route(ALL_OUTPUTS, m_viz, 0.5, 1);
 
-	POKEY(config, m_pokey[1], 0);
+	POKEY(config, m_pokey[1]);
 	m_pokey[1]->add_route(ALL_OUTPUTS, m_viz, 0.5, 0);
 	m_pokey[1]->add_route(ALL_OUTPUTS, m_viz, 0.5, 1);
 
-	QSOUND(config, m_qsound, 0);
+	QSOUND(config, m_qsound);
 	m_qsound->set_addrmap(0, &vgmplay_state::qsound_map<0>);
 	m_qsound->add_route(0, m_viz, 1, 0);
 	m_qsound->add_route(1, m_viz, 1, 1);
 
-	SCSP(config, m_scsp[0], 0);
+	SCSP(config, m_scsp[0]);
 	m_scsp[0]->set_addrmap(0, &vgmplay_state::scsp_map<0>);
 	m_scsp[0]->add_route(0, m_viz, 1, 0);
 	m_scsp[0]->add_route(1, m_viz, 1, 1);
 
-	SCSP(config, m_scsp[1], 0);
+	SCSP(config, m_scsp[1]);
 	m_scsp[1]->set_addrmap(0, &vgmplay_state::scsp_map<1>);
 	m_scsp[1]->add_route(0, m_viz, 1, 0);
 	m_scsp[1]->add_route(1, m_viz, 1, 1);
 
-	WSWAN_SND(config, m_wswan[0], 0);
+	WSWAN_SND(config, m_wswan[0]);
 	m_wswan[0]->set_headphone_connected(true);
 	m_wswan[0]->set_addrmap(0, &vgmplay_state::wswan_map<0>);
 	m_wswan[0]->add_route(0, m_viz, 0.50, 0);
 	m_wswan[0]->add_route(1, m_viz, 0.50, 1);
 
-	WSWAN_SND(config, m_wswan[1], 0);
+	WSWAN_SND(config, m_wswan[1]);
 	m_wswan[1]->set_headphone_connected(true);
 	m_wswan[1]->set_addrmap(0, &vgmplay_state::wswan_map<1>);
 	m_wswan[1]->add_route(0, m_viz, 0.50, 0);
 	m_wswan[1]->add_route(1, m_viz, 0.50, 1);
 
-	VBOYSND(config, m_vsu_vue[0], 0);
+	VBOYSND(config, m_vsu_vue[0]);
 	m_vsu_vue[0]->add_route(0, m_viz, 1.0, 0);
 	m_vsu_vue[0]->add_route(1, m_viz, 1.0, 1);
 
-	VBOYSND(config, m_vsu_vue[1], 0);
+	VBOYSND(config, m_vsu_vue[1]);
 	m_vsu_vue[1]->add_route(0, m_viz, 1.0, 0);
 	m_vsu_vue[1]->add_route(1, m_viz, 1.0, 1);
 
-	SAA1099(config, m_saa1099[0], 0);
+	SAA1099(config, m_saa1099[0]);
 	m_saa1099[0]->add_route(0, m_viz, 1.0, 0);
 	m_saa1099[0]->add_route(1, m_viz, 1.0, 1);
 
-	SAA1099(config, m_saa1099[1], 0);
+	SAA1099(config, m_saa1099[1]);
 	m_saa1099[1]->add_route(0, m_viz, 1.0, 0);
 	m_saa1099[1]->add_route(1, m_viz, 1.0, 1);
 
-	ES5503(config, m_es5503[0], 0);
+	ES5503(config, m_es5503[0]);
 	m_es5503[0]->set_channels(2);
 	m_es5503[0]->set_addrmap(0, &vgmplay_state::es5503_map<0>);
 	m_es5503[0]->add_route(ALL_OUTPUTS, m_viz, 0.5, 0);
 	m_es5503[0]->add_route(ALL_OUTPUTS, m_viz, 0.5, 1);
 
-	ES5503(config, m_es5503[1], 0);
+	ES5503(config, m_es5503[1]);
 	m_es5503[1]->set_channels(2);
 	m_es5503[1]->set_addrmap(0, &vgmplay_state::es5503_map<1>);
 	m_es5503[1]->add_route(ALL_OUTPUTS, m_viz, 0.5, 0);
 	m_es5503[1]->add_route(ALL_OUTPUTS, m_viz, 0.5, 1);
 
-	ES5505(config, m_es5505[0], 0);
+	ES5505(config, m_es5505[0]);
 	// TODO m_es5505[0]->set_addrmap(0, &vgmplay_state::es5505_map<0>);
 	// TODO m_es5505[0]->set_addrmap(1, &vgmplay_state::es5505_map<0>);
 	m_es5505[0]->set_channels(1);
 	m_es5505[0]->add_route(0, m_viz, 8.0, 0);
 	m_es5505[0]->add_route(1, m_viz, 8.0, 1);
 
-	ES5505(config, m_es5505[1], 0);
+	ES5505(config, m_es5505[1]);
 	// TODO m_es5505[1]->set_addrmap(0, &vgmplay_state::es5505_map<1>);
 	// TODO m_es5505[1]->set_addrmap(1, &vgmplay_state::es5505_map<1>);
 	m_es5505[1]->set_channels(1);
 	m_es5505[1]->add_route(0, m_viz, 8.0, 0);
 	m_es5505[1]->add_route(1, m_viz, 8.0, 1);
 
-	X1_010(config, m_x1_010[0], 0);
+	X1_010(config, m_x1_010[0]);
 	m_x1_010[0]->set_addrmap(0, &vgmplay_state::x1_010_map<0>);
 	m_x1_010[0]->add_route(0, m_viz, 1, 0);
 	m_x1_010[0]->add_route(1, m_viz, 1, 1);
 
-	X1_010(config, m_x1_010[1], 0);
+	X1_010(config, m_x1_010[1]);
 	m_x1_010[1]->set_addrmap(0, &vgmplay_state::x1_010_map<1>);
 	m_x1_010[1]->add_route(0, m_viz, 1, 0);
 	m_x1_010[1]->add_route(1, m_viz, 1, 1);
 
-	C352(config, m_c352[0], 0, 1);
+	C352(config, m_c352[0], 1);
 	m_c352[0]->set_addrmap(0, &vgmplay_state::c352_map<0>);
 	m_c352[0]->add_route(0, m_viz, 1, 0);
 	m_c352[0]->add_route(1, m_viz, 1, 1);
 	m_c352[0]->add_route(2, m_viz, 1, 0);
 	m_c352[0]->add_route(3, m_viz, 1, 1);
 
-	C352(config, m_c352[1], 0, 1);
+	C352(config, m_c352[1], 1);
 	m_c352[1]->set_addrmap(0, &vgmplay_state::c352_map<1>);
 	m_c352[1]->add_route(0, m_viz, 1, 0);
 	m_c352[1]->add_route(1, m_viz, 1, 1);
 	m_c352[1]->add_route(2, m_viz, 1, 0);
 	m_c352[1]->add_route(3, m_viz, 1, 1);
 
-	IREMGA20(config, m_ga20[0], 0);
+	IREMGA20(config, m_ga20[0]);
 	m_ga20[0]->set_addrmap(0, &vgmplay_state::ga20_map<0>);
 	m_ga20[0]->add_route(0, m_viz, 1, 0);
 	m_ga20[0]->add_route(1, m_viz, 1, 1);
 
-	IREMGA20(config, m_ga20[1], 0);
+	IREMGA20(config, m_ga20[1]);
 	m_ga20[1]->set_addrmap(0, &vgmplay_state::ga20_map<1>);
 	m_ga20[1]->add_route(0, m_viz, 1, 0);
 	m_ga20[1]->add_route(1, m_viz, 1, 1);

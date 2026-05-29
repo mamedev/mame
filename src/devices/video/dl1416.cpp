@@ -95,7 +95,7 @@ u16 const dl1416t_segments[128] = {
 class dl1414t_device : public dl1414_device
 {
 public:
-	dl1414t_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	dl1414t_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0)
 		: dl1414_device(mconfig, DL1414T, tag, owner, clock)
 	{
 	}
@@ -111,7 +111,7 @@ protected:
 class dl1416b_device : public dl1416_device
 {
 public:
-	dl1416b_device(machine_config const &mconfig, const char *tag, device_t *owner, u32 clock)
+	dl1416b_device(machine_config const &mconfig, const char *tag, device_t *owner, u32 clock = 0)
 		: dl1416_device(mconfig, DL1416B, tag, owner, clock)
 	{
 	}
@@ -135,7 +135,7 @@ protected:
 class dl1416t_device : public dl1416_device
 {
 public:
-	dl1416t_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	dl1416t_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0)
 		: dl1416_device(mconfig, DL1416T, tag, owner, clock)
 	{
 	}

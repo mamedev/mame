@@ -319,7 +319,7 @@ void stingnet_state::stingnet(machine_config &config)
 
 	FUJITSU_29F016A(config, m_sndflash);
 
-	RTC62423(config, m_rtc, 0);
+	RTC62423(config, m_rtc);
 
 	// video hardware
 	PALETTE(config, "palette", palette_device::RGB_555);
@@ -332,10 +332,10 @@ void stingnet_state::stingnet(machine_config &config)
 	screen.set_palette("palette");
 	screen.screen_vblank().set(m_gcu, FUNC(k057714_device::vblank_w));
 
-	K057714(config, m_gcu, 0).set_screen("screen");
+	K057714(config, m_gcu).set_screen("screen");
 	m_gcu->irq_callback().set(FUNC(stingnet_state::gcu_interrupt));
 
-	PC16552D(config, m_duart, 0);
+	PC16552D(config, m_duart);
 	NS16550(config, "duart:chan0", XTAL(19'660'800));
 	NS16550(config, "duart:chan1", XTAL(19'660'800));
 

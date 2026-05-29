@@ -26,7 +26,7 @@ class mn89304_vga_device : public svga_device
 {
 public:
 	// construction/destruction
-	mn89304_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mn89304_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_reset() override ATTR_COLD;
@@ -39,8 +39,7 @@ protected:
 DEFINE_DEVICE_TYPE(MN89304_VGA, mn89304_vga_device, "mn89304_vga", "MN89304 VGA")
 
 // TODO: nothing is known about this, configured out of usage in here for now.
-mn89304_vga_device::mn89304_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: svga_device(mconfig, MN89304_VGA, tag, owner, clock)
+mn89304_vga_device::mn89304_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock): svga_device(mconfig, MN89304_VGA, tag, owner, clock)
 {
 	// ...
 }
@@ -661,7 +660,7 @@ void kn5000_state::kn5000(machine_config &config)
 	screen.set_raw(XTAL(40'000'000)/6, 424, 0, 320, 262, 0, 240);
 	screen.set_screen_update("vga", FUNC(mn89304_vga_device::screen_update));
 
-	mn89304_vga_device &vga(MN89304_VGA(config, "vga", 0));
+	mn89304_vga_device &vga(MN89304_VGA(config, "vga"));
 	vga.set_screen("screen");
 	// 4 Mbit, M5M44265CJ6S
 	vga.set_vram_size(0x80000);

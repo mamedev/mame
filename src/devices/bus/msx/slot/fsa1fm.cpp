@@ -166,7 +166,7 @@ void msx_slot_fsa1fm_device::device_add_mconfig(machine_config &config)
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
 	// Unknown how these are connected
-	I8251(config, m_i8251, 0);
+	I8251(config, m_i8251);
 
 	I8255(config, m_i8255);
 	m_i8255->out_pa_callback().set(FUNC(msx_slot_fsa1fm_device::i8255_port_a_w));

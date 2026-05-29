@@ -294,7 +294,7 @@ INPUT_PORTS_END
 void sag_state::sag(machine_config &config)
 {
 	// basic machine hardware
-	HD38800(config, m_hmcs40_cpu, 0);
+	HD38800(config, m_hmcs40_cpu);
 	m_hmcs40_cpu->write_r<0>().set(FUNC(sag_state::hmcs40_write_r));
 	m_hmcs40_cpu->write_r<1>().set(FUNC(sag_state::hmcs40_write_r));
 	m_hmcs40_cpu->write_r<2>().set(FUNC(sag_state::hmcs40_write_r));
@@ -302,7 +302,7 @@ void sag_state::sag(machine_config &config)
 	m_hmcs40_cpu->write_d().set(FUNC(sag_state::hmcs40_write_d));
 	m_hmcs40_cpu->read_d().set(FUNC(sag_state::hmcs40_read_d));
 
-	TMS1670(config, m_tms1k_cpu, 0);
+	TMS1670(config, m_tms1k_cpu);
 	m_tms1k_cpu->read_k().set(FUNC(sag_state::tms1k_read_k));
 	m_tms1k_cpu->write_r().set(FUNC(sag_state::tms1k_write_r));
 	m_tms1k_cpu->write_o().set(FUNC(sag_state::tms1k_write_o));

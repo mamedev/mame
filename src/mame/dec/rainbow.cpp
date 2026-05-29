@@ -3230,7 +3230,7 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 	HARDDISK(config, "decharddisk1");
 	/// ******************************** / HARD DISK CONTROLLER ****************************************
 
-	CORVUS_HDC(config, m_corvus_hdc, 0);
+	CORVUS_HDC(config, m_corvus_hdc);
 	HARDDISK(config, "harddisk1", "corvus_hdd");
 	HARDDISK(config, "harddisk2", "corvus_hdd");
 	HARDDISK(config, "harddisk3", "corvus_hdd");
@@ -3266,7 +3266,7 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 	m_kbd8251->rxrdy_handler().set(FUNC(rainbow_base_state::kbd_rxready_w));
 	m_kbd8251->txrdy_handler().set(FUNC(rainbow_base_state::kbd_txready_w));
 
-	LK201(config, m_lk201, 0);
+	LK201(config, m_lk201);
 	m_lk201->tx_handler().set(m_kbd8251, FUNC(i8251_device::write_rxd));
 
 	ripple_counter_device &prtbrg(RIPPLE_COUNTER(config, "prtbrg", 24.0734_MHz_XTAL / 6 / 13)); // 74LS393 at E17 (both halves)

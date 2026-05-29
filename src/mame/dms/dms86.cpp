@@ -173,7 +173,7 @@ void dms86_state::dms86(machine_config &config)
 	rs232.dcd_handler().set(m_sio[0], FUNC(z80sio_device::dcdb_w)); // HiNet / Monitor switch
 	rs232.cts_handler().set(m_sio[0], FUNC(z80sio_device::ctsb_w)).invert();
 
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(dms86_state::kbd_put));
 }
 

@@ -123,7 +123,7 @@ protected:
 class bt451_device : public bt45x_rgb_device_base
 {
 public:
-	bt451_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bt451_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	/*
@@ -136,7 +136,7 @@ protected:
 class bt453_device : public bt45x_rgb_device_base
 {
 public:
-	bt453_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bt453_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void map(address_map &map) override ATTR_COLD;
 };
@@ -144,7 +144,7 @@ public:
 class bt454_device : public bt45x_rgb_device_base
 {
 public:
-	bt454_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bt454_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void map(address_map &map) override ATTR_COLD;
 };
@@ -174,16 +174,16 @@ protected:
 class bt458_device : public bt45x_rgb_device_base
 {
 public:
-	bt458_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bt458_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	bt458_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	bt458_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class bt467_device : public bt458_device
 {
 public:
-	bt467_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bt467_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 DECLARE_DEVICE_TYPE(BT451, bt451_device)

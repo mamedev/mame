@@ -327,10 +327,10 @@ protected:
 class hd6845s_device : public mc6845_device
 {
 public:
-	hd6845s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hd6845s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	hd6845s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	hd6845s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

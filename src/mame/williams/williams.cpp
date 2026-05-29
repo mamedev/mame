@@ -1643,11 +1643,11 @@ void williams_state::williams_muxed(machine_config &config)
 	m_pia[0]->cb2_handler().set("mux_0", FUNC(ls157_device::select_w));
 	m_pia[0]->cb2_handler().append("mux_1", FUNC(ls157_device::select_w));
 
-	ls157_device &mux0(LS157(config, "mux_0", 0)); // IC3 on interface board (actually LS257 with OC tied low)
+	ls157_device &mux0(LS157(config, "mux_0")); // IC3 on interface board (actually LS257 with OC tied low)
 	mux0.a_in_callback().set_ioport("INP2");
 	mux0.b_in_callback().set_ioport("INP1");
 
-	ls157_device &mux1(LS157(config, "mux_1", 0)); // IC4 on interface board (actually LS257 with OC tied low)
+	ls157_device &mux1(LS157(config, "mux_1")); // IC4 on interface board (actually LS257 with OC tied low)
 	mux1.a_in_callback().set_ioport("INP2A");
 	mux1.b_in_callback().set_ioport("INP1A");
 }
@@ -1698,7 +1698,7 @@ void williams_state::sinistar_upright(machine_config &config)
 	m_pia[2]->cb2_handler().set("cvsd", FUNC(hc55516_device::clock_w));
 
 	// sound hardware
-	HC55516(config, "cvsd", 0).add_route(ALL_OUTPUTS, "speaker", 0.8);
+	HC55516(config, "cvsd").add_route(ALL_OUTPUTS, "speaker", 0.8);
 }
 
 void williams_state::sinistar_cockpit(machine_config &config)
@@ -1732,7 +1732,7 @@ void williams_state::playball(machine_config &config)
 	m_screen->set_visarea(6, 298-1, 8, 240-1);
 
 	// sound hardware
-	HC55516(config, "cvsd", 0).add_route(ALL_OUTPUTS, "speaker", 0.8);
+	HC55516(config, "cvsd").add_route(ALL_OUTPUTS, "speaker", 0.8);
 
 	// pia
 	m_pia[1]->writepb_handler().set(FUNC(williams_state::playball_snd_cmd_w));
@@ -1781,7 +1781,7 @@ void blaster_state::blastkit(machine_config &config)
 	m_pia[0]->cb2_handler().set(m_muxa, FUNC(ls157_x2_device::select_w));
 
 	// All multiplexers on Blaster interface board are really LS257 with OC tied to GND (which is equivalent to LS157)
-	LS157_X2(config, m_muxa, 0);
+	LS157_X2(config, m_muxa);
 	m_muxa->a_in_callback().set_ioport("IN3");
 	m_muxa->b_in_callback().set(FUNC(blaster_state::port_0_49way_r));
 }
@@ -1803,7 +1803,7 @@ void blaster_state::blaster(machine_config &config)
 	m_muxa->a_in_callback().set(FUNC(blaster_state::port_0_49way_r));
 	m_muxa->b_in_callback().set_ioport("IN3");
 
-	ls157_device &muxb(LS157(config, "mux_b", 0)); // IC3
+	ls157_device &muxb(LS157(config, "mux_b")); // IC3
 	muxb.a_in_callback().set_ioport("INP1");
 	muxb.b_in_callback().set_ioport("INP2");
 
@@ -1896,7 +1896,7 @@ void williams2_state::inferno(machine_config &config)
 
 	m_pia[2]->set_port_a_input_overrides_output_mask(0xff);
 
-	ls157_x2_device &mux(LS157_X2(config, "mux", 0)); // IC45 (for PA4-PA7) + IC46 (for PA0-PA3) on CPU board
+	ls157_x2_device &mux(LS157_X2(config, "mux")); // IC45 (for PA4-PA7) + IC46 (for PA0-PA3) on CPU board
 	mux.a_in_callback().set_ioport("INP1");
 	mux.b_in_callback().set_ioport("INP2");
 }
@@ -1936,7 +1936,7 @@ void tshoot_state::tshoot(machine_config &config)
 
 	m_pia[2]->cb2_handler().set(FUNC(tshoot_state::maxvol_w));
 
-	LS157_X2(config, m_mux, 0); // U2 + U3 on interface board
+	LS157_X2(config, m_mux); // U2 + U3 on interface board
 	m_mux->a_in_callback().set_ioport("INP1");
 	m_mux->b_in_callback().set_ioport("INP2");
 }
@@ -1968,7 +1968,7 @@ void joust2_state::joust2(machine_config &config)
 	m_bg->cb2_cb().set(m_pia[2], FUNC(pia6821_device::cb1_w));
 	m_pia[2]->cb2_handler().set(m_bg, FUNC(s11_obg_device::resetq_w)); // inverted?
 
-	LS157(config, m_mux, 0);
+	LS157(config, m_mux);
 	m_mux->a_in_callback().set_ioport("INP1");
 	m_mux->b_in_callback().set_ioport("INP2");
 }

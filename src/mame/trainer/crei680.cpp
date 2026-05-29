@@ -314,7 +314,7 @@ void crei680_state::crei680(machine_config &config)
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	ACIA6850(config, m_uart, 0);
+	ACIA6850(config, m_uart);
 	m_uart->txd_handler().set([this] (bool state) { m_cassbit = state; });
 	//m_uart->rts_handler().set(FUNC(crei680_state::acia_rts_w));
 	m_uart->irq_handler().set_inputline("maincpu", M6800_IRQ_LINE);

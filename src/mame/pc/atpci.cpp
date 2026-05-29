@@ -121,16 +121,16 @@ void at586_state::at586(machine_config &config)
 
 	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M,256M");
 
-	PCI_BUS(config, "pcibus", 0).set_busnum(0);
+	PCI_BUS(config, "pcibus").set_busnum(0);
 	PCI_CONNECTOR(config, "pcibus:0", pci_devices, "i82439tx", true).set_option_machine_config("i82439tx", [this](device_t *device) { tx_config(device); });
 	PCI_CONNECTOR(config, "pcibus:1", pci_devices, "i82371ab", true);
 
 	// FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "isa1", 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, "svga_et4k", false);
-	ISA16_SLOT(config, "isa2", 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa4", 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa1", "pcibus:1:i82371ab:isabus", pc_isa16_cards, "svga_et4k", false);
+	ISA16_SLOT(config, "isa2", "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false);
 
 	at_softlists(config);
 }
@@ -145,16 +145,16 @@ void at586_state::at586x3(machine_config &config)
 
 	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M,256M");
 
-	PCI_BUS(config, "pcibus", 0).set_busnum(0);
+	PCI_BUS(config, "pcibus").set_busnum(0);
 	PCI_CONNECTOR(config, "pcibus:0", pci_devices, "i82439tx", true).set_option_machine_config("i82439tx", [this](device_t *device) { tx_config(device); });
 	PCI_CONNECTOR(config, "pcibus:1", pci_devices, "i82371sb", true).set_option_machine_config("i82371sb", [this](device_t *device) { sb_config(device); });
 
 	// FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "isa1", 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, "svga_et4k", false);
-	ISA16_SLOT(config, "isa2", 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa4", 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa1", "pcibus:1:i82371sb:isabus", pc_isa16_cards, "svga_et4k", false);
+	ISA16_SLOT(config, "isa2", "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false);
 
 	at_softlists(config);
 }
@@ -172,16 +172,16 @@ void at586_state::at586m55(machine_config &config)
 
 	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M,256M");
 
-	PCI_BUS(config, "pcibus", 0).set_busnum(0);
+	PCI_BUS(config, "pcibus").set_busnum(0);
 	PCI_CONNECTOR(config, "pcibus:0", pci_devices, "i82439tx", true).set_option_machine_config("i82439tx", [this](device_t *device) { tx_config(device); });
 	PCI_CONNECTOR(config, "pcibus:7", pci_devices, "i82371sb", true).set_option_machine_config("i82371sb", [this](device_t *device) { sb_config(device); });
 
-	ISA16_SLOT(config, "board4", 0, "pcibus:7:i82371sb:isabus",  isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", [this](device_t *device) { superio_config(device); });
-	ISA16_SLOT(config, "isa1", 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, "svga_et4k", false);
-	ISA16_SLOT(config, "isa2", 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa4", 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "board4", "pcibus:7:i82371sb:isabus",  isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", [this](device_t *device) { superio_config(device); });
+	ISA16_SLOT(config, "isa1", "pcibus:7:i82371sb:isabus",  pc_isa16_cards, "svga_et4k", false);
+	ISA16_SLOT(config, "isa2", "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false);
 
 	at_softlists(config);
 }

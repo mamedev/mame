@@ -126,14 +126,14 @@ void asst128_state::asst128(machine_config &config)
 	subdevice<cassette_image_device>("mb:cassette")->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	// FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "board0", 0, "mb:isa", pc_isa8_cards, "cga_mc1502", true);
-	ISA8_SLOT(config, "board1", 0, "mb:isa", pc_isa8_cards, "lpt", true);
+	ISA8_SLOT(config, "board0", "mb:isa", pc_isa8_cards, "cga_mc1502", true);
+	ISA8_SLOT(config, "board1", "mb:isa", pc_isa8_cards, "lpt", true);
 
 	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
 	kbd.out_clock_cb().set("mb", FUNC(asst128_mb_device::keyboard_clock_w));
 	kbd.out_data_cb().set("mb", FUNC(asst128_mb_device::keyboard_data_w));
 
-	PC_FDC_XT(config, m_fdc, 0);
+	PC_FDC_XT(config, m_fdc);
 	m_fdc->intrq_wr_callback().set("mb:pic8259", FUNC(pic8259_device::ir6_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", asst128_floppies, "525ssqd", asst128_state::asst128_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", asst128_floppies, "525ssqd", asst128_state::asst128_formats);

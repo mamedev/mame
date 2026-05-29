@@ -772,9 +772,9 @@ void zr107_state::zr107(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 4096);
 
-	K001005(config, m_k001005, 0, m_k001006_1);
+	K001005(config, m_k001005, m_k001006_1);
 
-	K001006(config, m_k001006_1, 0);
+	K001006(config, m_k001006_1);
 	m_k001006_1->set_gfx_region("textures");
 
 	K056800(config, m_k056800, XTAL(18'432'000));
@@ -796,7 +796,7 @@ void zr107_state::zr107(machine_config &config)
 	adc0838_device &adc(ADC0838(config, "adc0838"));
 	adc.set_input_callback(FUNC(zr107_state::adc0838_callback));
 
-	KONPPC(config, m_konppc, 0);
+	KONPPC(config, m_konppc);
 	m_konppc->set_dsp_tag(0, m_dsp);
 	m_konppc->set_num_boards(1);
 	m_konppc->set_cgboard_type(konppc_device::CGBOARD_TYPE_ZR107);
@@ -832,12 +832,12 @@ void jetwave_state::jetwave(machine_config &config)
 
 	m_palette->set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 16384);
 
-	K001604(config, m_k001604, 0);
+	K001604(config, m_k001604);
 	m_k001604->set_palette(m_palette);
 
 	// The second K001006 chip connects to the second K001005 chip.
 	// Hook this up when the K001005 separation is understood (seems the load balancing is done on hardware).
-	K001006(config, m_k001006_2, 0);
+	K001006(config, m_k001006_2);
 	m_k001006_2->set_gfx_region("textures");
 
 	m_konppc->set_cgboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);

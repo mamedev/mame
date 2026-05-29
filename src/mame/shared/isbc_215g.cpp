@@ -364,10 +364,10 @@ void isbc_215g_device::device_add_mconfig(machine_config &config)
 	HARDDISK(config, "drive0", 0);
 	HARDDISK(config, "drive1", 0);
 
-	ISBX_SLOT(config, m_sbx1, 0, isbx_cards, nullptr);
+	ISBX_SLOT(config, m_sbx1, isbx_cards, nullptr);
 	m_sbx1->mintr0().set(FUNC(isbc_215g_device::isbx_irq_00_w));
 	m_sbx1->mintr1().set(FUNC(isbc_215g_device::isbx_irq_01_w));
-	ISBX_SLOT(config, m_sbx2, 0, isbx_cards, "fdc_218a");
+	ISBX_SLOT(config, m_sbx2, isbx_cards, "fdc_218a");
 	m_sbx2->mintr0().set(FUNC(isbc_215g_device::isbx_irq_10_w));
 	m_sbx2->mintr1().set(FUNC(isbc_215g_device::isbx_irq_11_w));
 }

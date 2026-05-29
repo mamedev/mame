@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(SV602, sv602_device, "sv602", "SV-602 Single Slot Expander")
 
 void sv602_device::device_add_mconfig(machine_config &config)
 {
-	SVI_SLOT_BUS(config, m_slotbus, 0);
+	SVI_SLOT_BUS(config, m_slotbus);
 	m_slotbus->int_handler().set(FUNC(sv602_device::int_w));
 	m_slotbus->romdis_handler().set(FUNC(sv602_device::romdis_w));
 	m_slotbus->ramdis_handler().set(FUNC(sv602_device::ramdis_w));

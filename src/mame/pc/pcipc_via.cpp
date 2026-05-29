@@ -159,7 +159,7 @@ void mvp3_state::mvp3(machine_config &config)
 	maincpu.smiact().set("pci:00.0", FUNC(vt82c598mvp_host_device::smi_act_w));
 
 	// TODO: config space not known
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// Max 768 MB
 	VT82C598MVP_HOST(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
 	VT82C598MVP_BRIDGE(config, "pci:01.0", 0 );
@@ -194,10 +194,10 @@ void mvp3_state::mvp3(machine_config &config)
 	PCI_SLOT(config, "pci:3", pci_cards, 10, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 11, 3, 0, 1, 2, nullptr);
 
-	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "it8661f", true).set_option_machine_config("it8661f", ite_superio_config);
-	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "board4", "pci:07.0:isabus", isa_internal_devices, "it8661f", true).set_option_machine_config("it8661f", ite_superio_config);
+	ISA16_SLOT(config, "isa1", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
 	serport0.rxd_handler().set("board4:it8661f", FUNC(it8661f_device::rxd1_w));
@@ -226,7 +226,7 @@ void mvp3_state::apollopro(machine_config &config)
 	maincpu.smiact().set("pci:00.0", FUNC(vt82c691_host_device::smi_act_w));
 
 	// TODO: config space not known
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// Max 768 MB
 	VT82C691_HOST(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
 	VT82C691_BRIDGE(config, "pci:01.0", 0 );
@@ -261,9 +261,9 @@ void mvp3_state::apollopro(machine_config &config)
 	PCI_SLOT(config, "pci:3", pci_cards, 10, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 11, 3, 0, 1, 2, nullptr);
 
-	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "it8661f", true).set_option_machine_config("it8661f", ite_superio_config);
-	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "board4", "pci:07.0:isabus", isa_internal_devices, "it8661f", true).set_option_machine_config("it8661f", ite_superio_config);
+	ISA16_SLOT(config, "isa1", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
 	serport0.rxd_handler().set("board4:it8661f", FUNC(it8661f_device::rxd1_w));
@@ -292,7 +292,7 @@ void mvp3_state::ga6vx(machine_config &config)
 	maincpu.smiact().set("pci:00.0", FUNC(vt82c691_host_device::smi_act_w));
 
 	// TODO: config space not known
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// Max 768 MB
 	VT82C691_HOST(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
 	VT82C691_BRIDGE(config, "pci:01.0", 0 );
@@ -318,7 +318,7 @@ void mvp3_state::ga6vx(machine_config &config)
 	acpi_pipc_device &acpi_dev(ACPI_PIPC(config, "pci:07.3:acpi"));
 	acpi_dev.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 	acpi_dev.sci().set("pci:07.0", FUNC(vt82c596b_isa_device::pc_acpi_w));
-	SMBUS_PIPC(config, "pci:07.3:smbus", 0);
+	SMBUS_PIPC(config, "pci:07.3:smbus");
 
 	PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, nullptr);
 
@@ -330,9 +330,9 @@ void mvp3_state::ga6vx(machine_config &config)
 	PCI_SLOT(config, "pci:4", pci_cards, 11, 3, 0, 1, 2, nullptr);
 	PCI_SLOT(config, "pci:5", pci_cards, 12, 0, 1, 2, 3, nullptr);
 
-	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83877tf", true).set_option_machine_config("w83877tf", winbond_superio_config);
-	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "board4", "pci:07.0:isabus", isa_internal_devices, "w83877tf", true).set_option_machine_config("w83877tf", winbond_superio_config);
+	ISA16_SLOT(config, "isa1", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
 	serport0.rxd_handler().set("board4:w83877tf", FUNC(w83877tf_device::rxd1_w));
@@ -361,7 +361,7 @@ void mvp3_state::ct6vta2(machine_config &config)
 	maincpu.smiact().set("pci:00.0", FUNC(vt82c691_host_device::smi_act_w));
 
 	// TODO: config space not known
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// Max 384 MB
 	// TODO: bump to VT82C693
 	VT82C691_HOST(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
@@ -388,7 +388,7 @@ void mvp3_state::ct6vta2(machine_config &config)
 	acpi_pipc_device &acpi_dev(ACPI_PIPC(config, "pci:07.3:acpi"));
 	acpi_dev.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 	acpi_dev.sci().set("pci:07.0", FUNC(vt82c596b_isa_device::pc_acpi_w));
-	SMBUS_PIPC(config, "pci:07.3:smbus", 0);
+	SMBUS_PIPC(config, "pci:07.3:smbus");
 
 	PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, nullptr);
 
@@ -400,9 +400,9 @@ void mvp3_state::ct6vta2(machine_config &config)
 	PCI_SLOT(config, "pci:4", pci_cards, 11, 3, 0, 1, 2, nullptr);
 
 	// TODO: bump option_machine_config for the internal keyboard (and remove from PIPC)
-	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "it8671f", true).set_option_machine_config("it8671f", ite_superio_config);
-	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "board4", "pci:07.0:isabus", isa_internal_devices, "it8671f", true).set_option_machine_config("it8671f", ite_superio_config);
+	ISA16_SLOT(config, "isa1", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
 	serport0.rxd_handler().set("board4:it8671f", FUNC(it8671f_device::rxd1_w));

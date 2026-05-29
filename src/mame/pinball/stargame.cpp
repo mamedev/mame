@@ -444,7 +444,7 @@ void stargame_state::stargame(machine_config &config)
 	mainlatch.q_out_cb<6>().set(FUNC(stargame_state::reset2_w)); // SRESET
 	mainlatch.q_out_cb<7>().set_nop(); // MAKRES
 
-	TTL7474(config, m_7a, 0);
+	TTL7474(config, m_7a);
 	m_7a->comp_output_cb().set_inputline(m_audiocpu, INPUT_LINE_IRQ0).invert();
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);

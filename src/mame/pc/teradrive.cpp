@@ -921,7 +921,7 @@ void teradrive_state::teradrive(machine_config &config)
 	m_chipset->spkr_callback().set(FUNC(teradrive_state::wd7600_spkr));
 
 	// on board devices
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace(m_x86cpu, AS_PROGRAM);
 	m_isabus->set_iospace(m_x86cpu, AS_IO);
 	m_isabus->iochck_callback().set(m_chipset, FUNC(wd7600_device::iochck_w));
@@ -962,14 +962,14 @@ void teradrive_state::teradrive(machine_config &config)
 
 	// FIXME: determine ISA bus clock, unverified configuration
 	// WD76C20
-	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdc_smc", true);
-	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa16_cards, "comat", true);
+	ISA16_SLOT(config, "board1", "isabus", pc_isa16_cards, "fdc_smc", true);
+	ISA16_SLOT(config, "board2", "isabus", pc_isa16_cards, "comat", true);
 	// TODO: should be ESDI built-in interface on riser with IBM WDL-330PS 3.5" HDD, not IDE
-	ISA16_SLOT(config, "board3", 0, "isabus", pc_isa16_cards, "side116", true);
-	ISA16_SLOT(config, "board4", 0, "isabus", pc_isa16_cards, "lpt", true);
-	ISA16_SLOT(config, "board5", 0, "isabus", teradrive_isa_cards, "wd90c10_romless", true);
-	ISA16_SLOT(config, "board6", 0, "isabus", teradrive_isa_cards, "bus_switch", true).set_option_machine_config("bus_switch", romdisk_config);
-	ISA16_SLOT(config, "isa1",   0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "board3", "isabus", pc_isa16_cards, "side116", true);
+	ISA16_SLOT(config, "board4", "isabus", pc_isa16_cards, "lpt", true);
+	ISA16_SLOT(config, "board5", "isabus", teradrive_isa_cards, "wd90c10_romless", true);
+	ISA16_SLOT(config, "board6", "isabus", teradrive_isa_cards, "bus_switch", true).set_option_machine_config("bus_switch", romdisk_config);
+	ISA16_SLOT(config, "isa1", "isabus", pc_isa16_cards, nullptr, false);
 
 	// 2.5MB is the max allowed by the BIOS (even if WD chipset can do more)
 	// TODO: pcdos5v garbles font loading with 1664K, which should be the actual default
@@ -1022,13 +1022,13 @@ void teradrive_state::teradrive(machine_config &config)
 	// TODO: gated thru VDP
 	hl.output_handler().set_inputline(m_md68kcpu, 2);
 
-	MEGADRIVE_IO_PORT(config, m_md_ioports[0], 0);
+	MEGADRIVE_IO_PORT(config, m_md_ioports[0]);
 	m_md_ioports[0]->hl_handler().set("hl", FUNC(input_merger_device::in_w<0>));
 
-	MEGADRIVE_IO_PORT(config, m_md_ioports[1], 0);
+	MEGADRIVE_IO_PORT(config, m_md_ioports[1]);
 	m_md_ioports[1]->hl_handler().set("hl", FUNC(input_merger_device::in_w<1>));
 
-	MEGADRIVE_IO_PORT(config, m_md_ioports[2], 0);
+	MEGADRIVE_IO_PORT(config, m_md_ioports[2]);
 	m_md_ioports[2]->hl_handler().set("hl", FUNC(input_merger_device::in_w<2>));
 
 	for (int N = 0; N < 3; N++)

@@ -845,7 +845,7 @@ void namcos21_c67_state::namcos21(machine_config &config)
 	m_c68->dp_in_callback().set(FUNC(namcos21_c67_state::dpram_byte_r));
 	m_c68->dp_out_callback().set(FUNC(namcos21_c67_state::dpram_byte_w));
 
-	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67, 0);
+	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67);
 	m_namcos21_dsp_c67->set_renderer_tag("namcos21_3d");
 
 	config.set_maximum_quantum(attotime::from_hz(60000));
@@ -859,24 +859,24 @@ void namcos21_c67_state::namcos21(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(namcos21_c67_state::vblank_irq));
 
-	NAMCOS21_3D(config, m_namcos21_3d, 0);
+	NAMCOS21_3D(config, m_namcos21_3d);
 	m_namcos21_3d->set_framebuffer_size(496, 480);
 	m_namcos21_3d->set_num_palettes(0x10);
 	m_namcos21_3d->set_depth_reverse(false);
 
-	NAMCO_C148(config, m_master_intc, 0, m_maincpu, true);
+	NAMCO_C148(config, m_master_intc, m_maincpu, true);
 	m_master_intc->link_c148_device(m_slave_intc);
 	m_master_intc->out_ext1_callback().set(FUNC(namcos21_c67_state::sound_reset_w));
 	m_master_intc->out_ext2_callback().set(FUNC(namcos21_c67_state::system_reset_w));
 
-	NAMCO_C148(config, m_slave_intc, 0, m_slave, false);
+	NAMCO_C148(config, m_slave_intc, m_slave, false);
 	m_slave_intc->link_c148_device(m_master_intc);
 
-	NAMCO_C139(config, m_sci, 0);
+	NAMCO_C139(config, m_sci);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, 0x10000/2);
 
-	NAMCO_C355SPR(config, m_c355spr, 0);
+	NAMCO_C355SPR(config, m_c355spr);
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_palette(m_palette);
 	m_c355spr->set_scroll_offsets(0, 0x20);

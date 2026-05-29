@@ -2427,7 +2427,7 @@ void supracan_state::supracan(machine_config &config)
 
 	config.set_perfect_quantum(m_soundcpu);
 
-	UMC6650(config, m_lockout, 0);
+	UMC6650(config, m_lockout);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(U13_CLOCK / 10, 342, 0, 256, 262, 8, 232);

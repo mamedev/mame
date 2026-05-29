@@ -346,7 +346,7 @@ void c1551_device::device_add_mconfig(machine_config &config)
 
 	PLS100(config, m_pla);
 
-	TPI6525(config, m_tpi0, 0);
+	TPI6525(config, m_tpi0);
 	m_tpi0->in_pa_cb().set(FUNC(c1551_device::tcbm_data_r));
 	m_tpi0->out_pa_cb().set(FUNC(c1551_device::tcbm_data_w));
 	m_tpi0->in_pb_cb().set(m_ga, FUNC(c64h156_device::yb_r));
@@ -354,7 +354,7 @@ void c1551_device::device_add_mconfig(machine_config &config)
 	m_tpi0->in_pc_cb().set(FUNC(c1551_device::tpi0_pc_r));
 	m_tpi0->out_pc_cb().set(FUNC(c1551_device::tpi0_pc_w));
 
-	TPI6525(config, m_tpi1, 0);
+	TPI6525(config, m_tpi1);
 	m_tpi1->in_pa_cb().set(FUNC(c1551_device::tcbm_data_r));
 	m_tpi1->out_pa_cb().set(FUNC(c1551_device::tcbm_data_w));
 	m_tpi1->in_pb_cb().set(FUNC(c1551_device::tpi1_pb_r));
@@ -364,7 +364,7 @@ void c1551_device::device_add_mconfig(machine_config &config)
 	C64H156(config, m_ga, XTAL(16'000'000));
 	m_ga->byte_callback().set(m_ga, FUNC(c64h156_device::atni_w));
 
-	floppy_connector &connector(FLOPPY_CONNECTOR(config, C64H156_TAG":0", 0));
+	floppy_connector &connector(FLOPPY_CONNECTOR(config, C64H156_TAG":0"));
 	connector.option_add("525ssqd", FLOPPY_525_SSQD);
 	connector.set_default_option("525ssqd");
 	connector.set_fixed(true);

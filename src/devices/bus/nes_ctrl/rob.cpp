@@ -117,7 +117,7 @@ void nes_rob_device::device_add_mconfig(machine_config &config)
 	m_maincpu->write_r<2>().set(FUNC(nes_rob_device::output_w));
 	m_maincpu->write_r<3>().set(FUNC(nes_rob_device::output_w));
 
-	NES_ZAPPER_SENSOR(config, m_sensor, 0);
+	NES_ZAPPER_SENSOR(config, m_sensor);
 	if (m_port != nullptr)
 		m_sensor->set_screen_tag(m_port->m_screen);
 

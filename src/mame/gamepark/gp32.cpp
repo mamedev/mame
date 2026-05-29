@@ -1702,7 +1702,7 @@ void gp32_state::gp32(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	SMARTMEDIA(config, m_smartmedia, 0);
+	SMARTMEDIA(config, m_smartmedia);
 
 	SOFTWARE_LIST(config, "memc_list").set_original("gp32");
 }

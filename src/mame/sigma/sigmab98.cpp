@@ -656,7 +656,7 @@ void sigmab98_state::sigmab98(machine_config &config)
 
 	BUFFERED_SPRITERAM8(config, m_buffered_spriteram);
 
-	KY3211(config, m_spritegen, 0, m_palette);
+	KY3211(config, m_spritegen, m_palette);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
@@ -711,7 +711,7 @@ void lufykzku_state::lufykzku(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // battery backed RAM (TC55257DFL-70L)
 	// No EEPROM
 
-	MB3773(config, m_watchdog, 0);
+	MB3773(config, m_watchdog);
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// 2 x 8-bit parallel/serial converters
@@ -736,7 +736,7 @@ void lufykzku_state::lufykzku(machine_config &config)
 	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	//BUFFERED_SPRITERAM8(config, m_buffered_spriteram); // same as sammymdl?
-	KY10510(config, m_spritegen, 0, m_palette);
+	KY10510(config, m_spritegen, m_palette);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

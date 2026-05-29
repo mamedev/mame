@@ -170,7 +170,7 @@ void dmv_k220_device::device_add_mconfig(machine_config &config)
 	m_ppi->in_pb_callback().set_ioport("SWITCH");
 	m_ppi->out_pc_callback().set(FUNC(dmv_k220_device::portc_w));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(XTAL(1'000'000));  // CLK1
 	m_pit->out_handler<0>().set(FUNC(dmv_k220_device::write_out0));
 	m_pit->out_handler<1>().set(FUNC(dmv_k220_device::write_out1));

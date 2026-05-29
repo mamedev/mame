@@ -203,7 +203,7 @@ public:
 class ns32016_device : public ns32000_device<24, 1>
 {
 public:
-	ns32016_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	ns32016_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 };
 
 class ns32032_device : public ns32000_device<24, 2>

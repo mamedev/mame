@@ -493,7 +493,7 @@ void segas18_astormbl_state::astormbl_video(machine_config &config)
 	// see note in segas16a.cpp, also used here for consistency
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(64);
 }
 

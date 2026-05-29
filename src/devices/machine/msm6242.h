@@ -46,7 +46,7 @@ class msm6242_device : public device_t, public device_rtc_interface
 {
 public:
 	// construction/destruction
-	msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto out_int_handler() { return m_out_int_handler.bind(); }
 
@@ -55,7 +55,7 @@ public:
 	u8 read(offs_t offset);
 
 protected:
-	msm6242_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	msm6242_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -114,7 +114,7 @@ class rtc62423_device : public msm6242_device
 {
 public:
 	// construction/destruction
-	rtc62423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rtc62423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> rtc72421_device

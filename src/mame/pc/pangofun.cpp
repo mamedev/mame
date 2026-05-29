@@ -211,7 +211,7 @@ void pangofun_state::pangofun(machine_config &config)
 	// unknown, not provided. Chipset can go up to 32M, but will go "memory fail" with that (?)
 	RAM(config, "ram").set_default_size("64M");
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->iochck_callback().set(m_chipset, FUNC(um8498f_device::iochck_w));
@@ -234,13 +234,13 @@ void pangofun_state::pangofun(machine_config &config)
 	m_isabus->drq6_callback().set(m_chipset, FUNC(um8498f_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_chipset, FUNC(um8498f_device::dreq7_w));
 
-	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "avga1", false);
-	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa4", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", 0, "isabus", pc_isa8_cards,  nullptr, false);
+	ISA16_SLOT(config, "isa1", "isabus", pc_isa16_cards, "avga1", false);
+	ISA16_SLOT(config, "isa2", "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", "isabus", pc_isa8_cards,  nullptr, false);
 	// TODO: this space will be reserved to the romdisk
-	ISA16_SLOT(config, "isa6", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa6", "isabus", pc_isa16_cards, nullptr, false);
 
 	at_kbc_device_base &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
 	keybc.hot_res().set(m_chipset, FUNC(um8498f_device::kbrst_w));

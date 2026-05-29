@@ -1014,7 +1014,7 @@ void magicard_base_state::magicard_base(machine_config &config)
 	m_scc66470->irq().set(FUNC(magicard_base_state::scc66470_irq));
 
 	PALETTE(config, m_palette).set_entries(0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &magicard_state::ramdac_map);
 
 	SPEAKER(config, "mono").front_center();

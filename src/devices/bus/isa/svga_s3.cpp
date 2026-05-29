@@ -59,7 +59,7 @@ void isa16_svga_s3_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(s3trio64_vga_device::screen_update));
 
-	S3_TRIO64_VGA(config, m_vga, 0);
+	S3_TRIO64_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x100000);
 }

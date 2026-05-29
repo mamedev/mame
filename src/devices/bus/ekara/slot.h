@@ -66,11 +66,11 @@ class ekara_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	ekara_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ekara_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T>
-	ekara_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
-		: ekara_cart_slot_device(mconfig, tag, owner, clock)
+	ekara_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: ekara_cart_slot_device(mconfig, tag, owner)
 	{
 		set_options(std::forward<T>(opts), dflt, false);
 	}

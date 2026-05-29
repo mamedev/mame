@@ -403,7 +403,7 @@ void dc_cons_state::dc_base(machine_config &config)
 
 	FUJITSU_29LV002TC(config, "dcflash");
 
-	MAPLE_DC(config, m_maple, 0, m_maincpu);
+	MAPLE_DC(config, m_maple, m_maincpu);
 	m_maple->irq_callback().set(FUNC(dc_state::maple_irq));
 
 	/* video hardware */
@@ -412,7 +412,7 @@ void dc_cons_state::dc_base(machine_config &config)
 	screen.set_raw(13458568*2, 857, 0, 640, 524, 0, 480);
 	screen.set_screen_update("powervr2", FUNC(powervr2_device::screen_update));
 
-	POWERVR2(config, m_powervr2, 0);
+	POWERVR2(config, m_powervr2);
 	m_powervr2->set_cpu(m_maincpu);
 	m_powervr2->set_texture_ram(dc_texture_ram);
 	m_powervr2->set_framebuffer_ram(dc_framebuffer_ram);
@@ -431,7 +431,7 @@ void dc_cons_state::dc_base(machine_config &config)
 
 	AICARTC(config, "aicartc", XTAL(32'768));
 
-	ATA_INTERFACE(config, m_ata, 0);
+	ATA_INTERFACE(config, m_ata);
 	m_ata->irq_handler().set(FUNC(dc_cons_state::ata_interrupt));
 
 	ata_slot_device &ata_0(*subdevice<ata_slot_device>("ata:0"));
@@ -444,13 +444,13 @@ void dc_cons_state::dc(machine_config &config)
 {
 	dc_base(config);
 
-	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", m_maple, 0));
 	dcctrl0.set_port_tags("P1:0", "P1:1", "P1:A0", "P1:A1", "P1:A2", "P1:A3", "P1:A4", "P1:A5");
-	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
+	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", m_maple, 1));
 	dcctrl1.set_port_tags("P2:0", "P2:1", "P2:A0", "P2:A1", "P2:A2", "P2:A3", "P2:A4", "P2:A5");
-	dc_controller_device &dcctrl2(DC_CONTROLLER(config, "dcctrl2", 0, m_maple, 2));
+	dc_controller_device &dcctrl2(DC_CONTROLLER(config, "dcctrl2", m_maple, 2));
 	dcctrl2.set_port_tags("P3:0", "P3:1", "P3:A0", "P3:A1", "P3:A2", "P3:A3", "P3:A4", "P3:A5");
-	dc_controller_device &dcctrl3(DC_CONTROLLER(config, "dcctrl3", 0, m_maple, 3));
+	dc_controller_device &dcctrl3(DC_CONTROLLER(config, "dcctrl3", m_maple, 3));
 	dcctrl3.set_port_tags("P4:0", "P4:1", "P4:A0", "P4:A1", "P4:A2", "P4:A3", "P4:A4", "P4:A5");
 
 	SOFTWARE_LIST(config, "gdrom_list").set_original("dc");
@@ -462,7 +462,7 @@ void dc_cons_state::dc_fish(machine_config &config)
 {
 	dc_base(config);
 
-	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", m_maple, 0));
 	dcctrl0.set_port_tag<0>("P1:0");
 }
 

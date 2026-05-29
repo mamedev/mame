@@ -1201,7 +1201,7 @@ void midvunit_state::midvunit(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	DCS_AUDIO_2K(config, m_dcs, 0);
+	DCS_AUDIO_2K(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->add_route(0, "mono", 1.0);
 }
@@ -1214,7 +1214,7 @@ void crusnwld_state::crusnwld(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &crusnwld_state::crusnwld_map);
 
 	// valid values are 450 or 460
-	MIDWAY_SERIAL_PIC2(config, m_midway_serial_pic2, 0);
+	MIDWAY_SERIAL_PIC2(config, m_midway_serial_pic2);
 	m_midway_serial_pic2->set_upper(450);
 	m_midway_serial_pic2->set_yearoffs(94);
 }
@@ -1226,7 +1226,7 @@ void crusnwld_state::offroadc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &crusnwld_state::offroadc_map);
 
 	// valid values are 230 or 234
-	MIDWAY_SERIAL_PIC2(config, m_midway_serial_pic2, 0);
+	MIDWAY_SERIAL_PIC2(config, m_midway_serial_pic2);
 	m_midway_serial_pic2->set_upper(230);
 	m_midway_serial_pic2->set_yearoffs(94);
 }
@@ -1241,7 +1241,7 @@ void midvplus_state::midvplus(machine_config &config)
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
-	MIDWAY_IOASIC(config, m_midway_ioasic, 0);
+	MIDWAY_IOASIC(config, m_midway_ioasic);
 	m_midway_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_midway_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_midway_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -1254,7 +1254,7 @@ void midvplus_state::midvplus(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_2115(config, m_dcs, 0);
+	DCS2_AUDIO_2115(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x3839);
