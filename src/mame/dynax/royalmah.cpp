@@ -4846,6 +4846,19 @@ ROM_START( mjdiplob )
 	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(c1e427df) SHA1(9a9980d93dff4b87a940398b18277acaf946eeab) )
 ROM_END
 
+ROM_START( mjdiploba )
+	ROM_REGION( 0x90000, "maincpu", 0 )
+	ROM_LOAD( "071.4l",     0x00000, 0x10000, CRC(3f2a4d81) SHA1(046ac1908c5a796ba49d3e9d6e263d4e61c6f870) )
+	// bank switched ROMs follow
+	ROM_RELOAD(             0x10000, 0x10000 )              // 0,1
+	ROM_LOAD( "072.4k",     0x20000, 0x10000, CRC(a992bb85) SHA1(e60231e04831dac122d1d49a68641ee47b57faaf) )    // 2,3
+	ROM_LOAD( "073.4j",     0x30000, 0x10000, CRC(562ed64f) SHA1(42b4a7e5a8de4dde83c12d7b9facf561bc872978) )    // 4,5
+	ROM_LOAD( "074.4h",     0x40000, 0x10000, CRC(1eba0140) SHA1(0d0b95be338d7450ad3b24cc47e24e94f86dcefe) )    // 6,7
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(c1e427df) SHA1(9a9980d93dff4b87a940398b18277acaf946eeab) )
+ROM_END
+
 ROM_START( tontonb )
 	ROM_REGION( 0x90000, "maincpu", 0 )
 	ROM_LOAD( "091.5e",     0x00000, 0x10000, CRC(d8d67b59) SHA1(7e7a85df738f80fc031cda8a104ac9c7b3e24785) )
@@ -6635,7 +6648,8 @@ GAME( 1986,  mjsenka,     0,        mjsenka,  mjyarou,    royalmah_prgbank_state
 GAME( 1986,  mjyarou,     0,        mjyarou,  mjyarou,    royalmah_prgbank_state, init_chalgirl, ROT0,   "Visco / Video System",       "Mahjong Yarou (Japan, set 1)",          MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // never seems to set the palette bank?
 GAME( 1986,  mjyarou2,    mjyarou,  mjyarou,  mjyarou,    royalmah_prgbank_state, init_chalgirl, ROT0,   "Visco / Video System",       "Mahjong Yarou (Japan, set 2)",          MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // never seems to set the palette bank?
 GAME( 1986?, mjclub,      0,        mjclub,   mjclub,     royalmah_prgbank_state, init_tontonb,  ROT0,   "Xex",                        "Mahjong Club (Japan)",                  0 )
-GAME( 1987,  mjdiplob,    0,        mjdiplob, mjdiplob,   royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Mahjong Diplomat (Japan)",              0 )
+GAME( 1987,  mjdiplob,    0,        mjdiplob, mjdiplob,   royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Mahjong Diplomat (Japan, V2)",          0 )
+GAME( 1987,  mjdiploba,   mjdiplob, mjdiplob, mjdiplob,   royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Mahjong Diplomat (Japan)",              0 )
 GAME( 1987,  tontonb,     0,        tontonb,  tontonb,    royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Tonton (Japan, set 1)",                 0 )
 GAME( 1987,  tontonba,    tontonb,  tontonb,  tontonb,    royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Tonton (Japan, ver. 1.00)",             MACHINE_NOT_WORKING ) // hangs when entering bookkeeping, works after reset
 GAME( 1987,  makaijan,    0,        makaijan, makaijan,   royalmah_prgbank_state, init_dynax,    ROT0,   "Dynax",                      "Makaijan (Japan)",                      0 )
