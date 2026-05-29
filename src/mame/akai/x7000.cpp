@@ -94,6 +94,9 @@ protected:
 	void led_digit_w(u8 data) { m_led_digit = data; }
 	template<int Num> void led_w(int state) { m_led[Num] = state; }
 
+	void dma_w(offs_t offset, u8 data);
+	u8 dma_r(offs_t offset);
+
 	template<int Num> void voice_bank_sel_w(u8 data);
 	void cpu_bank_sel_w(u8 data);
 	void cpu_bank_msb_w(offs_t offset, u8 data);
@@ -238,8 +241,7 @@ void s612_state::common_map(address_map &map)
 {
 	// most of the system ignores /MREQ and /IORQ and can be accessed via either space
 	map(0x0000, 0x1fff).rom().region("maincpu", 0);
-	map(0x2000, 0x20ff).mirror(0x1000).rw(m_dma[0], FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-	map(0x2100, 0x21ff).mirror(0x1000).rw(m_dma[1], FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x2000, 0x21ff).mirror(0x1000).rw(FUNC(s612_state::dma_r), FUNC(s612_state::dma_w));
 	map(0x2200, 0x22ff).mirror(0x1000).rw(m_filter_timer[0], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x2300, 0x23ff).mirror(0x1000).rw(m_filter_timer[1], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x2400, 0x24ff).mirror(0x1000).rw(m_sample_timer[0], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
@@ -260,8 +262,7 @@ void s700_state::common_map(address_map &map)
 	map(0x4b00, 0x4bff).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x4c00, 0x4cff).portr("ENCDR");
 	// 4Dxx: envelope/mute control (A4..6 = address, A0 = strobe, D0..7 = data)
-	map(0x5000, 0x50ff).rw(m_dma[0], FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-	map(0x5100, 0x51ff).rw(m_dma[1], FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x5000, 0x51ff).rw(FUNC(s700_state::dma_r), FUNC(s700_state::dma_w));
 	map(0x5200, 0x52ff).rw(m_filter_timer[0], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x5300, 0x53ff).rw(m_filter_timer[1], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x5400, 0x54ff).rw(m_sample_timer[0], FUNC(pit8254_device::read), FUNC(pit8254_device::write));
@@ -480,6 +481,20 @@ void x7000_state::x7000(machine_config &config)
 TIMER_CALLBACK_MEMBER(s612_state::refresh_timer)
 {
 	m_refresh_counter++;
+}
+
+/**************************************************************************/
+void s612_state::dma_w(offs_t offset, u8 data)
+{
+	// A0 and A4 are swapped when the CPU is accessing the DMA controllers
+	// (to make 16-bit accesses easier)
+	m_dma[BIT(offset, 8)]->write(bitswap<5>(offset, 0, 3, 2, 1, 4), data);
+}
+
+/**************************************************************************/
+u8 s612_state::dma_r(offs_t offset)
+{
+	return m_dma[BIT(offset, 8)]->read(bitswap<5>(offset, 0, 3, 2, 1, 4));
 }
 
 /**************************************************************************/
