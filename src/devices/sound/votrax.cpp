@@ -854,6 +854,8 @@ void votrax_sc01_device::build_standard_filter(double *a, double *b,
 											   double c3,  // Cap between the two op-amps
 											   double c4)  // Cap over second op-amp
 {
+	constexpr double PI = std::numbers::pi;
+
 	// First compute the three coefficients of H(s).  One can note
 	// that there is as many capacitor values on both sides of the
 	// division, which confirms that the capacity-per-surface-area
@@ -863,10 +865,10 @@ void votrax_sc01_device::build_standard_filter(double *a, double *b,
 	double k2 = c4 * c2b / (m_cclock * m_cclock * c1b * c3);
 
 	// Estimate the filter cutoff frequency
-	double fpeak = sqrt(fabs(k0*k1 - k2))/(2*M_PI*k2);
+	double fpeak = sqrt(fabs(k0*k1 - k2))/(2*PI*k2);
 
 	// Turn that into a warp multiplier
-	double zc = 2*M_PI*fpeak/tan(M_PI*fpeak / m_sclock);
+	double zc = 2*PI*fpeak/tan(PI*fpeak / m_sclock);
 
 	// Finally compute the result of the z-transform
 	double m0 = zc*k0;
@@ -905,6 +907,8 @@ void votrax_sc01_device::build_lowpass_filter(double *a, double *b,
 											  double c1t, // Unswitched cap, over amp-op, top
 											  double c1b) // Switched cap, over amp-op, bottom
 {
+	constexpr double PI = std::numbers::pi;
+
 	// The caps values puts the cutoff at around 150Hz, put that's no good.
 	// Recordings shows we want it around 4K, so fuzz it.
 
@@ -912,10 +916,10 @@ void votrax_sc01_device::build_lowpass_filter(double *a, double *b,
 	double k = c1b / (m_cclock * c1t) * (150.0/4000.0);
 
 	// Compute the filter cutoff frequency
-	double fpeak = 1/(2*M_PI*k);
+	double fpeak = 1/(2*PI*k);
 
 	// Turn that into a warp multiplier
-	double zc = 2*M_PI*fpeak/tan(M_PI*fpeak / m_sclock);
+	double zc = 2*PI*fpeak/tan(PI*fpeak / m_sclock);
 
 	// Finally compute the result of the z-transform
 	double m = zc*k;
@@ -961,16 +965,18 @@ void votrax_sc01_device::build_noise_shaper_filter(double *a, double *b,
 												   double c3,  // Cap over second amp-op
 												   double c4)  // Switched cap after second amp-op
 {
+	constexpr double PI = std::numbers::pi;
+
 	// Coefficients of H(s) = k1*s / (1 + k2*s + k3*s^2)
 	double k0 = c2t*c3*c2b/c4;
 	double k1 = c2t*(m_cclock * c2b);
 	double k2 = c1*c2t*c3/(m_cclock * c4);
 
 	// Estimate the filter cutoff frequency
-	double fpeak = sqrt(1/k2)/(2*M_PI);
+	double fpeak = sqrt(1/k2)/(2*PI);
 
 	// Turn that into a warp multiplier
-	double zc = 2*M_PI*fpeak/tan(M_PI*fpeak / m_sclock);
+	double zc = 2*PI*fpeak/tan(PI*fpeak / m_sclock);
 
 	// Finally compute the result of the z-transform
 	double m0 = zc*k0;

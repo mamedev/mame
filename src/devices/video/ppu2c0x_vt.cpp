@@ -175,7 +175,7 @@ void ppu_vt03_device::init_vt03_palette_tables(int palmode)
 
 			float fLuma = (nLuma - 4) / 9.625;     // Value determined from matching saturation =0 phases 1-12
 			float fChroma = nChroma / 18.975;      // Value determined from matching phases 0 and 13 across all luminance and saturation levels
-			const float fPhase = ((nPhase - 2) * 30.0 + phaseOffset) * M_PI / 180.0;
+			const float fPhase = DEGREE_TO_RADIAN((nPhase - 2) * 30.0 + phaseOffset);
 
 			if (palmode == 1)
 			{

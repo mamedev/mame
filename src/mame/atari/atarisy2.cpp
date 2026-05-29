@@ -362,7 +362,7 @@ uint8_t atarisy2_state::leta_r(offs_t offset)
 				/* if the joystick is centered, leave the rest of this alone */
 				double angle = m_joy_last_angle;
 				if (analogx < -32 || analogx > 32 || analogy < -32 || analogy > 32)
-					angle = atan2((double)analogx, (double)analogy) * 360 / (2 * M_PI);
+					angle = RADIAN_TO_DEGREE(atan2((double)analogx, (double)analogy));
 
 				/* detect when we pass the 0 point in either direction */
 				if (m_joy_last_angle < -90 && angle > 90)

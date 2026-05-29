@@ -85,6 +85,8 @@ Usage notes:
 #include "video/dl1416.h"
 #include "speaker.h"
 
+#include <numbers>
+
 #include "oberheim_dmx.lh"
 
 #define LOG_TRIGGERS      (1U << 1)
@@ -1225,7 +1227,7 @@ void dmx_state::update_mix_level(int voice)
 	m_voice_rc[voice]->set_route_gain(0, m_right_mixer, 0, gain_right);
 
 	LOGMASKED(LOG_FADERS, "Voice %d volume changed to: %d (gain L:%f, R:%f), HPF cutoff: %.2f Hz\n",
-			voice, pot_percent, gain_left, gain_right, 1.0F / (2 * float(M_PI) * r_gnd * rc_c));
+			voice, pot_percent, gain_left, gain_right, 1.0F / (2 * std::numbers::pi_v<float> * r_gnd * rc_c));
 }
 
 void dmx_state::update_master_volume()

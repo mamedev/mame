@@ -1,6 +1,8 @@
 // license:LGPL-2.1+
 // copyright-holders:Olivier Galibert, Angelo Salese, David Haywood, Tomasz Slanina
 
+#include <numbers>
+
 /* Main COP functionality */
 
 // notes about tables:
@@ -89,7 +91,7 @@ void raiden2cop_device::LEGACY_execute_130e_cupsoc(int offset, uint16_t data)
 	}
 	else
 	{
-		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / M_PI);
+		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / std::numbers::pi);
 		if (dx < 0)
 			cop_angle += 0x80;
 
@@ -99,7 +101,7 @@ void raiden2cop_device::LEGACY_execute_130e_cupsoc(int offset, uint16_t data)
 	m_LEGACY_r0 = dy;
 	m_LEGACY_r1 = dx;
 
-	//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,cop_angle);
+	//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / std::numbers::pi, cop_angle);
 
 	if (data & 0x80)
 		cop_write_byte(cop_regs[0] + (0x34), cop_angle);
@@ -128,7 +130,7 @@ void raiden2cop_device::execute_2288(int offset, uint16_t data)
 		cop_angle = 0;
 	}
 	else {
-		cop_angle = (int)(atan(double(dx) / double(dy)) * 128 / M_PI);
+		cop_angle = (int)(atan(double(dx) / double(dy)) * 128 / std::numbers::pi);
 		if (dy < 0)
 			cop_angle += 0x80;
 	}
@@ -168,7 +170,7 @@ void raiden2cop_device::execute_338e(int offset, uint16_t data, bool is_yflip)
 		cop_angle = 0;
 	}
 	else {
-		cop_angle = (int)(atan(double(dx) / double(dy)) * 128 / M_PI);
+		cop_angle = (int)(atan(double(dx) / double(dy)) * 128 / std::numbers::pi);
 		if (dy < 0)
 			cop_angle += 0x80;
 
@@ -422,7 +424,7 @@ void raiden2cop_device::execute_7e05(int offset, uint16_t data) // raidendx
 void raiden2cop_device::execute_8100(int offset, uint16_t data)
 {
 	int raw_angle = (cop_read_word(cop_regs[0] + (0x34)) & 0xff);
-	double angle = raw_angle * M_PI / 128;
+	double angle = raw_angle * std::numbers::pi / 128;
 	double amp = (65536 >> 5)*(cop_read_word(cop_regs[0] + (0x36)) & 0xff);
 	int res;
 	// TODO: up direction needs to be doubled, happens on bootleg too, why is that?
@@ -439,7 +441,7 @@ void raiden2cop_device::execute_8100(int offset, uint16_t data)
 void raiden2cop_device::execute_8900(int offset, uint16_t data)
 {
 	int raw_angle = (cop_read_word(cop_regs[0] + (0x34)) & 0xff);
-	double angle = raw_angle * M_PI / 128;
+	double angle = raw_angle * std::numbers::pi / 128;
 	double amp = (65536 >> 5)*(cop_read_word(cop_regs[0] + (0x36)) & 0xff);
 	int res;
 	// TODO: left direction needs to be doubled, happens on bootleg too, why is that?
@@ -659,7 +661,7 @@ void raiden2cop_device::LEGACY_execute_e30e(int offset, uint16_t data)
 		cop_angle = 0;
 	}
 	else {
-		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / M_PI);
+		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / std::numbers::pi);
 		if (dx < 0)
 			cop_angle += 0x80;
 
@@ -723,7 +725,7 @@ void raiden2cop_device::LEGACY_execute_130e(int offset, uint16_t data)
 		cop_angle = 0;
 	}
 	else {
-		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / M_PI);
+		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / std::numbers::pi);
 		if (dx < 0)
 			cop_angle += 0x80;
 	}

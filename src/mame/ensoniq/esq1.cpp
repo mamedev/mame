@@ -191,6 +191,8 @@ NOTES:
 
 #include "speaker.h"
 
+#include <numbers>
+
 //#define VERBOSE 1
 #include "logmacro.h"
 
@@ -290,11 +292,13 @@ void esq1_filters::recalc_filter(filter &f)
 	double g = 6060*exp(vfc/28.5);
 	double zc = g/tan(g/2/44100);
 
-/*  if(f.vfc) {
-        double ff = g/(2*M_PI);
-        double fzc = 2*M_PI*ff/tan(M_PI*ff/44100);
-        fprintf(stderr, "%02x f=%f zc=%f zc1=%f\n", f.vfc, g/(2*M_PI), zc, fzc);
-    }*/
+	//if(f.vfc) {
+	if(0) {
+        constexpr double PI = std::numbers::pi;
+        double ff = g/(2*PI);
+        double fzc = 2*PI*ff/tan(PI*ff/44100);
+        fprintf(stderr, "%02x f=%f zc=%f zc1=%f\n", f.vfc, g/(2*PI), zc, fzc);
+    }
 
 	double gzc = zc/g;
 	double gzc2 = gzc*gzc;

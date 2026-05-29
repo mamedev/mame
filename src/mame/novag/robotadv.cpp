@@ -45,6 +45,8 @@ TODO:
 
 #include "speaker.h"
 
+#include <numbers>
+
 // internal artwork
 #include "novag_robotadv.lh"
 
@@ -219,25 +221,26 @@ void robotadv_state::update_limits()
 
 void robotadv_state::update_clawpos(double *x, double *y)
 {
+	constexpr double PI = std::numbers::pi;
 	double r, d, a;
 
 	// upper arm
 	r = 5.43;
 	d = m_counter[3] / 12670.0;
-	a = d * (M_PI / 180.0) + M_PI;
+	a = d * (PI / 180.0) + PI;
 	*x = r * cos(a);
 	*y = r * sin(a);
 
 	// elbow (home position is at a slight angle)
 	r = 1.07;
 	d = m_counter[2] / 14730.0 + 8.8;
-	a += d * (M_PI / 180.0) + (1.5 * M_PI);
+	a += d * (PI / 180.0) + (1.5 * PI);
 	*x += r * cos(a);
 	*y += r * sin(a);
 
 	// forearm is perpendicular to elbow
 	r = 5.62;
-	a += 1.5 * M_PI;
+	a += 1.5 * PI;
 	*x += r * cos(a);
 	*y += r * sin(a);
 }
