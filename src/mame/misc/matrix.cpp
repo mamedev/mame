@@ -69,7 +69,7 @@ private:
 void matrix_state::main_map(address_map &map)
 {
 	// TODO: pulling high fixes Award screen at the expense of keep looping at $c8000
-//	map.unmap_value_high();
+//  map.unmap_value_high();
 }
 
 void matrix_state::main_io(address_map &map)

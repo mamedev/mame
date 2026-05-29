@@ -17,7 +17,7 @@ namespace {
 class generalplus_gpspispi_game_state : public gcm394_game_state
 {
 public:
-	generalplus_gpspispi_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+	generalplus_gpspispi_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		gcm394_game_state(mconfig, type, tag)
 	{
 	}
@@ -35,7 +35,7 @@ protected:
 class generalplus_gpspispi_bkrankp_game_state : public generalplus_gpspispi_game_state
 {
 public:
-	generalplus_gpspispi_bkrankp_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+	generalplus_gpspispi_bkrankp_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		generalplus_gpspispi_game_state(mconfig, type, tag),
 		m_cart(*this, "cartslot")
 	{
@@ -98,7 +98,7 @@ void generalplus_gpspispi_game_state::generalplus_gpspispi(machine_config &confi
 
 DEVICE_IMAGE_LOAD_MEMBER(generalplus_gpspispi_bkrankp_game_state::cart_load)
 {
-	uint32_t const size = m_cart->common_get_size("rom");
+	u32 const size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
@@ -174,6 +174,18 @@ ROM_START( jspodred )
 	ROM_REGION(0x400000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "gpr5l322.sfrom1", 0x0000, 0x400000, CRC(5bd08294) SHA1(3a4a76b7b30c0dcf8184cb94d75819c382c1c668) )
 ROM_END
+
+ROM_START( wildking )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "mx25l12835f.sfrom1", 0x0000, 0x1000000, CRC(bc4cace6) SHA1(1fc2e28b194a59ddb1ed9a63978064d2d0a6ab8c) )
+
+	// there was an SD card slot, but the "Power Up Cartridge" included was just a piece of plastic, not a real card
+	// other software may be available for the unit however.
+ROM_END
+
 
 
 ROM_START( pokegach )
@@ -266,9 +278,9 @@ ROM_END
 void generalplus_gpspispi_game_state::init_spi()
 {
 	int vectorbase = 0x2fe0;
-	uint8_t* spirom = memregion("maincpu")->base();
+	u8 *spirom = memregion("maincpu")->base();
 
-	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 	/*  Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
 
@@ -289,13 +301,13 @@ void generalplus_gpspispi_game_state::init_spi()
 	// copy a block of code from the NAND to RAM
 	for (int i = 0; i < 0x2000; i++)
 	{
-		uint16_t word = spirom[(i * 2) + 0] | (spirom[(i * 2) + 1] << 8);
+		u16 word = spirom[(i * 2) + 0] | (spirom[(i * 2) + 1] << 8);
 
 		mem.write_word(dest + i, word);
 	}
 
 	// these vectors must either directly point to RAM, or at least redirect there after some code
-	uint16_t* internal = (uint16_t*)memregion("maincpu:internal")->base();
+	u16 *internal = (u16*)memregion("maincpu:internal")->base();
 	internal[0x7ff5] = vectorbase + 0x0a;
 	internal[0x7ff6] = vectorbase + 0x0c;
 	internal[0x7ff7] = dest + 0x20; // point boot vector at code in RAM (probably in reality points to internal code that copies the first block)
@@ -330,6 +342,8 @@ CONS(2013, anpaneng, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gps
 
 // 甲虫王者ムシキング むしとりバトルずかん  (JS Pod on PCB)
 CONS(201?, jspodred, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Sega Toys", "Kouchuu Ouja Mushiking: Mushitori Battle Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+CONS(201?, wildking, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Sega Toys", "Wild King (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2015, bkrankp,  0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 

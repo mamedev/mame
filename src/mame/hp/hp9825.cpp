@@ -49,6 +49,8 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include <bit>
+
 // Debugging
 #define VERBOSE 0
 #include "logmacro.h"
@@ -632,7 +634,7 @@ INPUT_CHANGED_MEMBER(hp98xx_state::kb_changed)
 void hp98xx_state::kb_scan_ioport(ioport_value pressed , ioport_port &port , unsigned idx_base , int& max_seq_len , unsigned& max_seq_idx)
 {
 	while (pressed) {
-		unsigned bit_no = 31 - count_leading_zeros_32(pressed);
+		unsigned bit_no = std::bit_width(pressed) - 1;
 		ioport_value mask = BIT_MASK<ioport_value>(bit_no);
 		int seq_len = port.field(mask)->seq().length();
 		if (seq_len > max_seq_len) {

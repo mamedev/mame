@@ -66,7 +66,7 @@ void gamecube_state::ppc_mem(address_map &map)
 	map(0x0000'0000, 0x017f'ffff).ram().share("workram"); // 24 MB main memory (physical)
 	map(0x0800'0000, 0x081f'ffff).ram(); //  2 MB embedded framebuffer (EFB)
 	map(0x0c00'6800, 0x0c00'683f).lr8(NAME([] () { return 0; })).nopw(); // EXI External Interface
-//	map(0xe000'0000, 0xe000'3fff).ram(); // L2 cache
+//  map(0xe000'0000, 0xe000'3fff).ram(); // L2 cache
 	map(0xfff0'0000, 0xffff'ffff).bankr("boot");
 }
 

@@ -29,6 +29,8 @@
 
 #include "rendersw.hxx"
 
+#include <bit>
+
 
 //**************************************************************************
 //  DEBUGGING
@@ -766,7 +768,7 @@ void video_manager::update_throttle(attotime emutime)
 		// if we're more than 1/10th of a second out, or if we are behind at all and emulation
 		// is taking longer than the real frame, we just need to resync
 		if (real_is_ahead_attoseconds < -ATTOSECONDS_PER_SECOND / 10 ||
-			(real_is_ahead_attoseconds < 0 && population_count_32(m_throttle_history & 0xff) < 6))
+			(real_is_ahead_attoseconds < 0 && std::popcount(m_throttle_history & 0xff) < 6))
 		{
 			if (LOG_THROTTLE)
 				machine().logerror("Resync due to being behind: %s (history=%08X)\n", attotime(0, -real_is_ahead_attoseconds).as_string(18), m_throttle_history);

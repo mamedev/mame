@@ -74,7 +74,7 @@ protected:
 
 	std::unique_ptr<uint8_t[]> m_waveram_alloc;
 
-	std::unique_ptr<uint8_t[]> m_soundregs;	
+	std::unique_ptr<uint8_t[]> m_soundregs;
 
 };
 

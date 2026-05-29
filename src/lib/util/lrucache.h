@@ -218,7 +218,7 @@ public:
 		return std::pair<iterator, bool>(inserted, true);
 	}
 	template <typename P>
-	std::enable_if_t<std::is_constructible<value_type, P>::value, std::pair<iterator, bool> > insert(P &&value)
+	std::pair<iterator, bool> insert(P &&value) requires std::is_constructible_v<value_type, P>
 	{
 		return emplace(std::forward<P>(value));
 	}

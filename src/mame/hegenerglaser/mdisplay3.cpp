@@ -16,6 +16,8 @@ TODO:
 
 #include "screen.h"
 
+#include <bit>
+
 
 DEFINE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODULE3, mephisto_display3_device, "mdisplay3", "Mephisto 6. Generation LCD Modul")
 
@@ -101,7 +103,7 @@ void mephisto_display3_device::update_lcd()
 	for (int i = 0; i < 2; i++)
 	{
 		// LCD common is analog (voltage level)
-		const u8 com = population_count_32(m_lcd_com >> (i * 2) & 3);
+		const u8 com = std::popcount(m_lcd_com >> (i * 2) & 3U);
 		const u32 data = (com == 0) ? lcd_segs : (com == 2) ? ~lcd_segs : 0;
 		m_lcd_pwm->write_row(i, data);
 	}

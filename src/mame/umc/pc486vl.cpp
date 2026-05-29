@@ -194,10 +194,10 @@ ROM_START( md4duv )
 	ROM_SYSTEM_BIOS( 0, "v31n", "V3.1N (11/17/94)")
 	ROMX_LOAD( "i376082.bin", 0x10000, 0x10000, CRC(40b350f2) SHA1(9877f24805964ab8c92bf35bf14ff97e508867c1), ROM_BIOS(0))
 	// MB labeled NMB-4DDUV, with minor data changes
-    // i376082.bin  [1/4]      i199030.bin  [1/4]      IDENTICAL
-    // i376082.bin  [3/4]      i199030.bin  [3/4]      IDENTICAL
-    // i376082.bin  [4/4]      i199030.bin  [4/4]      99.993896% (BIOS checksum change at $ffff)
-    // i376082.bin  [2/4]      i199030.bin  [2/4]      99.975586% ($57a3, $6070, $684d, $684f)
+	// i376082.bin  [1/4]      i199030.bin  [1/4]      IDENTICAL
+	// i376082.bin  [3/4]      i199030.bin  [3/4]      IDENTICAL
+	// i376082.bin  [4/4]      i199030.bin  [4/4]      99.993896% (BIOS checksum change at $ffff)
+	// i376082.bin  [2/4]      i199030.bin  [2/4]      99.975586% ($57a3, $6070, $684d, $684f)
 	ROM_SYSTEM_BIOS( 1, "v31na", "V3.1N alt (11/17/94)")
 	ROMX_LOAD( "i199030.bin", 0x10000, 0x10000, CRC(2f437c85) SHA1(841f23ae31e8cf11afa4056f4c7493c890e1be5a), ROM_BIOS(1))
 ROM_END

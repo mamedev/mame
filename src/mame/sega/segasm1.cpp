@@ -19,8 +19,9 @@
     To get past the boot error on Tinker Bell, F1 is mapped to the cabinet reset switch.
 
     TODO:
-    - Hopper
-    - tinkerbl, blicks: throws with "RAM data is BAD" at each soft reset, EEPROM?
+    - Hopper, expects line_r to kick in without a write first (?)
+    - tinkerbl, blicks: throws with "RAM data is BAD" at each soft reset (PC=514 check with $f00438)
+    ROM skipping it causes infinite RTEs
     - Bingo Party and Bingo Planet put up a message about ROM version mismatch with the RAM and say to press the reset switch.
       However, when this is done, the code simply locks up (BRA to itself) and doesn't initialize the RAM.
     - Verify sound latch locations on Tinker Bell vs. the comms games
@@ -51,6 +52,7 @@
 #include "machine/i8251.h"
 #include "machine/mb8421.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "machine/timer.h"
 #include "sound/ymopn.h"
 
@@ -76,6 +78,7 @@ public:
 		, m_ym(*this, "ym3438")
 		, m_io1(*this, "io1")
 		, m_io2(*this, "io2")
+		//, m_hopper(*this, "hopper")
 		, m_soundlatch(*this, "soundlatch%u", 1U)
 		, m_soundbank(*this, "soundbank")
 	{
@@ -105,6 +108,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<ym3438_device> m_ym;
 	required_device<sega_315_5296_device> m_io1, m_io2;
+//  required_device<ticket_dispenser_device> m_hopper;
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 	required_memory_bank m_soundbank;
 
@@ -173,7 +177,8 @@ u32 systemm1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	return 0;
 }
 
-// NOTE: both irqs calls tas to work RAM buffers prior to SR flag disable
+// NOTE: both irqs calls TAS to work RAM buffers prior to SR flag disable
+// Disabling TAS writes causes reset button to become non functional.
 TIMER_DEVICE_CALLBACK_MEMBER(systemm1_state::scan_irq)
 {
 	const int scanline = param;
@@ -341,9 +346,11 @@ static INPUT_PORTS_START( tinkerbl )
 
 	PORT_START("IN1_PE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper")
+	//PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1_PF")
+	// TODO: bit 2 used for something
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DIP1")
@@ -620,6 +627,8 @@ void systemm1_state::m1base(machine_config &config)
 	m_ym->add_route(0, "speaker", 0.40, 0);
 	m_ym->add_route(1, "speaker", 0.40, 1);
 
+//  HOPPER(config, m_hopper, attotime::from_msec(200));
+
 	SEGA_315_5296(config, m_io1, XTAL(16'000'000));
 	m_io1->in_pa_callback().set_ioport("IN1_PA");
 	m_io1->in_pb_callback().set_ioport("IN1_PB");
@@ -629,6 +638,17 @@ void systemm1_state::m1base(machine_config &config)
 	m_io1->in_pf_callback().set_ioport("IN1_PF");
 
 	SEGA_315_5296(config, m_io2, XTAL(16'000'000));
+	m_io2->out_pf_callback().set([this] (u8 data) {
+		// bit 7 is assumed for selection (writes a few 0s)
+		if (BIT(data, 7))
+		{
+			machine().bookkeeping().coin_counter_w(0, !BIT(data, 0));
+			//m_hopper->motor_w(!BIT(data, 1));
+			if ((data ^ 0xff) & 0xfc)
+				logerror("I/O 2: unknown PF write %02x\n", data);
+		}
+	});
+
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	m_soundlatch[0]->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);

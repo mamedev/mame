@@ -36,13 +36,13 @@ public:
 	void set_spi_romregion(u8 *region, u32 size) { m_spiregion = region; m_spisize = size; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
 
 private:
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 
 	u16 ioa_data_r();
 	void ioa_data_w(u16 data);

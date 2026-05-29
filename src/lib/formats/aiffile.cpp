@@ -16,6 +16,7 @@
 
 #include "eminline.h"
 
+#include <bit>
 #include <cstring>
 
 
@@ -137,7 +138,7 @@ cassette_image::error aiffile_save(cassette_image *cassette, const cassette_imag
 	put_u32be(&chunk_header[SSND_OFFSET + 4], container_length - 8 - SSND_OFFSET);
 
 	const std::uint32_t sample_rate = std::uint32_t(info->sample_frequency);
-	const std::uint16_t sample_rate_exp = 0x401e - count_leading_zeros_32(sample_rate);
+	const std::uint16_t sample_rate_exp = 0x401e - std::countl_zero(sample_rate);
 	put_u16be(&chunk_header[COMM_OFFSET + 16], sample_rate_exp);
 	put_u32be(&chunk_header[COMM_OFFSET + 18], sample_rate << (0x401e - sample_rate_exp));
 	std::memset(&chunk_header[COMM_OFFSET + 22], 0, 4);

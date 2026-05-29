@@ -63,7 +63,7 @@ void va_scale_offset_device::device_start()
 {
 	save_item(NAME(m_scale));
 	save_item(NAME(m_offset));
-	m_stream = stream_alloc(1, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
+	m_stream = stream_alloc(1, 1, SAMPLE_RATE_INPUT_ADAPTIVE);
 }
 
 void va_scale_offset_device::sound_stream_update(sound_stream &stream)

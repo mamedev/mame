@@ -45,6 +45,7 @@
 #include "emupal.h"
 
 #include <algorithm>
+#include <bit>
 #include <deque>
 
 #define LOG_UNKNOWN         (1U << 1)
@@ -3276,7 +3277,7 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::tablet_hle_tick)
 
 		for (int i = 0; i < 5; i++)
 		{
-			data[i] |= (population_count_32(data[i]) & 1) ? 0x80 : 0x00;
+			data[i] |= (std::popcount(data[i]) & 1) ? 0x80 : 0x00;
 			m_tablet_hle_tx_bits.push_back(0);
 			for (int bit = 0; bit < 8; bit++)
 			{

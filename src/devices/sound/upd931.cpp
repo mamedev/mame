@@ -256,39 +256,17 @@ void upd931_device::sync_w(int state)
 /**************************************************************************/
 void upd931_device::note_w(offs_t offset, u8 data)
 {
-	m_voice[offset].m_note = data;
+	voice_t &voice = m_voice[offset];
+	voice.m_note = data;
+	update_pitch(voice);
 }
 
 /**************************************************************************/
 void upd931_device::octave_w(offs_t offset, u8 data)
 {
 	voice_t &voice = m_voice[offset];
-	voice.m_octave = m_data;
-
-	if (voice.m_note >= 0x2 && voice.m_note <= 0xe)
-	{
-		const u8 note = voice.m_note - 2;
-		u8 octave = voice.m_octave & 7;
-
-		if (octave >= 2)
-			octave -= 2; // octave values 0-1 are the same as 2-3
-
-		/*
-		setting bit 3 of the octave reduces the duty cycle of individual notes, which is
-		implemented here by changing which part of the phase counter to use as the sample address.
-		ct8000 uses this for a few of its presets to produce a simple key-scaling effect.
-		*/
-		if (BIT(voice.m_octave, 3))
-			voice.m_timbre_shift = 3 - octave;
-		else
-			voice.m_timbre_shift = 0;
-
-		voice.m_pitch = m_pitch[octave * 12 + note];
-	}
-	else
-	{
-		voice.m_pitch = 0;
-	}
+	voice.m_octave = data;
+	update_pitch(voice);
 }
 
 /**************************************************************************/
@@ -367,6 +345,35 @@ void upd931_device::reset_timer()
 {
 	const attotime period = attotime::from_ticks(RETRIG_RATE, clock());
 	m_retrig_timer->adjust(period, 0, period);
+}
+
+/**************************************************************************/
+void upd931_device::update_pitch(voice_t &voice)
+{
+	if (voice.m_note >= 0x2 && voice.m_note <= 0xe)
+	{
+		const u8 note = voice.m_note - 2;
+		u8 octave = voice.m_octave & 7;
+
+		if (octave >= 2)
+			octave -= 2; // octave values 0-1 are the same as 2-3
+
+		/*
+		setting bit 3 of the octave reduces the duty cycle of individual notes, which is
+		implemented here by changing which part of the phase counter to use as the sample address.
+		ct8000 uses this for a few of its presets to produce a simple key-scaling effect.
+		*/
+		if (BIT(voice.m_octave, 3))
+			voice.m_timbre_shift = 3 - octave;
+		else
+			voice.m_timbre_shift = 0;
+
+		voice.m_pitch = m_pitch[octave * 12 + note];
+	}
+	else
+	{
+		voice.m_pitch = 0;
+	}
 }
 
 /**************************************************************************/

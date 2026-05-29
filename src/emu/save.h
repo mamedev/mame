@@ -179,7 +179,7 @@ public:
 
 	// templatized wrapper for general objects and arrays
 	template <typename ItemType>
-	std::enable_if_t<is_atom<typename array_unwrap<ItemType>::underlying_type>::value> save_item(device_t *device, const char *module, const char *tag, int index, ItemType &value, const char *valname)
+	void save_item(device_t *device, const char *module, const char *tag, int index, ItemType &value, const char *valname) requires is_atom<typename array_unwrap<ItemType>::underlying_type>::value
 	{
 		static_assert(!std::is_pointer<ItemType>::value, "Called save_item on a pointer with no count!");
 		save_memory(device, module, tag, index, valname, array_unwrap<ItemType>::ptr(value), array_unwrap<ItemType>::SIZE, array_unwrap<ItemType>::SAVE_COUNT);
@@ -197,7 +197,7 @@ public:
 
 	// templatized wrapper for pointers
 	template <typename ItemType>
-	std::enable_if_t<is_atom<typename array_unwrap<ItemType>::underlying_type>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, ItemType *value, const char *valname, u32 count)
+	void save_pointer(device_t *device, const char *module, const char *tag, int index, ItemType *value, const char *valname, u32 count) requires is_atom<typename array_unwrap<ItemType>::underlying_type>::value
 	{
 		save_memory(device, module, tag, index, valname, array_unwrap<ItemType>::ptr(value[0]), array_unwrap<ItemType>::SIZE, array_unwrap<ItemType>::SAVE_COUNT * count);
 	}
@@ -213,7 +213,7 @@ public:
 
 	// templatized wrapper for std::unique_ptr
 	template <typename ItemType>
-	std::enable_if_t<is_atom<typename array_unwrap<ItemType>::underlying_type>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, const std::unique_ptr<ItemType []> &value, const char *valname, u32 count)
+	void save_pointer(device_t *device, const char *module, const char *tag, int index, const std::unique_ptr<ItemType []> &value, const char *valname, u32 count) requires is_atom<typename array_unwrap<ItemType>::underlying_type>::value
 	{
 		save_memory(device, module, tag, index, valname, array_unwrap<ItemType>::ptr(value[0]), array_unwrap<ItemType>::SIZE, array_unwrap<ItemType>::SAVE_COUNT * count);
 	}
@@ -229,7 +229,7 @@ public:
 
 	// templatized wrapper for std::vector
 	template <typename ItemType>
-	std::enable_if_t<is_vector_safe<typename array_unwrap<ItemType>::underlying_type>::value> save_item(device_t *device, const char *module, const char *tag, int index, std::vector<ItemType> &value, const char *valname)
+	void save_item(device_t *device, const char *module, const char *tag, int index, std::vector<ItemType> &value, const char *valname) requires is_vector_safe<typename array_unwrap<ItemType>::underlying_type>::value
 	{
 		save_pointer(device, module, tag, index, &value[0], valname, value.size());
 	}
@@ -257,7 +257,7 @@ public:
 
 	// specializations for attotimes
 	template <typename ItemType>
-	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>::value> save_item(device_t *device, const char *module, const char *tag, int index, ItemType &value, const char *valname)
+	void save_item(device_t *device, const char *module, const char *tag, int index, ItemType &value, const char *valname) requires std::is_same_v<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>
 	{
 		std::string tempstr;
 		tempstr.assign(valname).append(".attoseconds");
@@ -267,7 +267,7 @@ public:
 	}
 
 	template <typename ItemType>
-	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, ItemType *value, const char *valname, u32 count)
+	void save_pointer(device_t *device, const char *module, const char *tag, int index, ItemType *value, const char *valname, u32 count) requires std::is_same_v<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>
 	{
 		std::string tempstr;
 		tempstr.assign(valname).append(".attoseconds");
@@ -277,7 +277,7 @@ public:
 	}
 
 	template <typename ItemType>
-	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, const std::unique_ptr<ItemType []> &value, const char *valname, u32 count)
+	void save_pointer(device_t *device, const char *module, const char *tag, int index, const std::unique_ptr<ItemType []> &value, const char *valname, u32 count) requires std::is_same_v<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>
 	{
 		std::string tempstr;
 		tempstr.assign(valname).append(".attoseconds");

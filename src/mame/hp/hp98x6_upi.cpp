@@ -33,6 +33,8 @@
 
 #include "speaker.h"
 
+#include <bit>
+
 // Debugging
 #define VERBOSE 0
 #include "logmacro.h"
@@ -935,7 +937,7 @@ void hp98x6_upi_device::acquire_keys(ioport_value input[4])
 		input[i] = m_keys[i]->read();
 		auto w = input[i];
 		while (w) {
-			auto mask = BIT_MASK<ioport_value>(31 - count_leading_zeros_32(w));
+			auto mask = BIT_MASK<ioport_value>(std::bit_width(w) - 1);
 			auto len = m_keys[i]->field(mask)->seq().length();
 			if (len > max_len) {
 				max_len = len;
@@ -949,7 +951,7 @@ void hp98x6_upi_device::acquire_keys(ioport_value input[4])
 		for (unsigned i = 0; i < 4; i++) {
 			auto w = input[i];
 			while (w) {
-				auto mask = BIT_MASK<ioport_value>(31 - count_leading_zeros_32(w));
+				auto mask = BIT_MASK<ioport_value>(std::bit_width(w) - 1);
 				auto len = m_keys[i]->field(mask)->seq().length();
 				if (len < max_len) {
 					input[i] &= ~mask;

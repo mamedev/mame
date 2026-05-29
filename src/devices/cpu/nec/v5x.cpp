@@ -250,7 +250,7 @@ void device_v5x_interface::v5x_add_mconfig(machine_config &config)
 {
 	PIT8254(config, m_tcu);
 
-	V5X_DMAU(config, m_dmau, 4000000);
+	V5X_DMAU(config, m_dmau, DERIVED_CLOCK(1, 4));
 
 	V5X_ICU(config, m_icu, 0);
 	m_icu->out_int_callback().set(FUNC(device_v5x_interface::internal_irq_w));

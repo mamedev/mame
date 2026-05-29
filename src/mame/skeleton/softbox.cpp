@@ -12,7 +12,7 @@
 
     The SoftBox can be used as a standalone computer with an RS-232 terminal,
     or as a PET/CBM peripheral.  This is an emulation of the standalone mode.
-    For the peripheral mode, see: src/devices/bus/ieee488/softbox.c.
+    For the peripheral mode, see: src/devices/bus/ieee488/softbox.cpp.
 
 
     Using the Corvus hard disk
@@ -104,7 +104,9 @@
 #include "machine/com8116.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
+
 #include "softlist_dev.h"
+
 
 namespace {
 
@@ -114,7 +116,6 @@ namespace {
 #define I8255_1_TAG     "ic16"
 #define COM8116_TAG     "ic14"
 #define RS232_TAG       "rs232"
-#define CORVUS_HDC_TAG  "corvus"
 
 class softbox_state : public driver_device
 {
@@ -123,13 +124,27 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, Z80_TAG)
 		, m_ieee(*this, IEEE488_TAG)
-		, m_hdc(*this, CORVUS_HDC_TAG)
+		, m_hdc(*this, "corvus")
+		, m_rom(*this, Z80_TAG)
+		, m_boot_mem(*this, "bootmem")
+		, m_boot_m1(*this, "bootm1")
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	void softbox(machine_config &config);
+	void softbox(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	enum
+	{
+		LED_A = 0,
+		LED_B,
+		LED_READY
+	};
+
 	// device_ieee488_interface overrides
 	virtual void ieee488_ifc(int state);
 
@@ -141,23 +156,21 @@ private:
 	uint8_t ppi1_pc_r();
 	void ppi1_pc_w(uint8_t data);
 
-	enum
-	{
-		LED_A = 0,
-		LED_B,
-		LED_READY
-	};
+	uint8_t boot_r(offs_t offset);
 
-	void softbox_io(address_map &map) ATTR_COLD;
 	void softbox_mem(address_map &map) ATTR_COLD;
-	int m_ifc = 0;  // Tracks previous state of IEEE-488 IFC line
+	void softbox_m1(address_map &map) ATTR_COLD;
+	void softbox_io(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override ATTR_COLD;
-	virtual void device_reset_after_children() override;
+	int m_ifc = 0;  // Tracks previous state of IEEE-488 IFC line
+	bool m_boot_cnt = false;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ieee488_device> m_ieee;
 	required_device<corvus_hdc_device> m_hdc;
+	required_region_ptr<uint8_t> m_rom;
+	memory_view m_boot_mem;
+	memory_view m_boot_m1;
 	output_finder<3> m_leds;
 };
 
@@ -177,8 +190,18 @@ private:
 
 void softbox_state::softbox_mem(address_map &map)
 {
-	map(0x0000, 0xefff).ram();
+	map(0x0000, 0xefff).ram().share("ram");
 	map(0xf000, 0xffff).rom().region(Z80_TAG, 0);
+	map(0x0000, 0xffff).view(m_boot_mem);
+	m_boot_mem[0](0x0000, 0x0fff).mirror(0xf000).rom().region(Z80_TAG, 0);
+}
+
+void softbox_state::softbox_m1(address_map &map)
+{
+	map(0x0000, 0xefff).ram().share("ram");
+	map(0xf000, 0xffff).rom().region(Z80_TAG, 0);
+	map(0x0000, 0xffff).view(m_boot_m1);
+	m_boot_m1[0](0x0000, 0xffff).r(FUNC(softbox_state::boot_r));
 }
 
 
@@ -372,16 +395,24 @@ DEVICE_INPUT_DEFAULTS_END
 void softbox_state::machine_start()
 {
 	m_leds.resolve();
+
+	save_item(NAME(m_boot_cnt));
 }
 
 
 //-------------------------------------------------
-//  device_reset_after_children - device-specific
-//    reset that must happen after child devices
-//    have performed their resets
+//  machine_reset
 //-------------------------------------------------
 
-void softbox_state::device_reset_after_children()
+void softbox_state::machine_reset()
+{
+	m_boot_mem.select(0);
+	m_boot_m1.select(0);
+	m_boot_cnt = false;
+}
+
+
+uint8_t softbox_state::boot_r(offs_t offset)
 {
 	/* The Z80 starts at address 0x0000 but the SoftBox has RAM there and
 	   needs to start from the BIOS at 0xf000.  The PCB has logic and a
@@ -389,11 +420,21 @@ void softbox_state::device_reset_after_children()
 	   IC3 EPROM at 0xf000 is mapped to 0x0000 for the first instruction
 	   fetch only.  The instruction normally at 0xf000 is an absolute jump
 	   into the BIOS.  On reset, the Z80 will fetch it from 0x0000 and set
-	   its PC, then the normal map will be restored before the next
-	   instruction fetch.  Here we just set the PC to 0xf000 after the Z80
-	   resets, which has the same effect. */
-
-	m_maincpu->set_state_int(Z80_PC, 0xf000);
+	   its PC, then the normal map will be restored on the next
+	   instruction fetch. */
+	if (!machine().side_effects_disabled())
+	{
+		if (!m_boot_cnt)
+		{
+			m_boot_cnt = true;
+		}
+		else
+		{
+			m_boot_mem.disable();
+			m_boot_m1.disable();
+		}
+	}
+	return m_rom[offset & 0x0fff];
 }
 
 
@@ -422,6 +463,7 @@ void softbox_state::softbox(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(8'000'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &softbox_state::softbox_mem);
+	m_maincpu->set_addrmap(AS_OPCODES, &softbox_state::softbox_m1);
 	m_maincpu->set_addrmap(AS_IO, &softbox_state::softbox_io);
 
 	// devices

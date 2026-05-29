@@ -12,6 +12,7 @@ All of these games run Linux.
 Motherboard is FIC AZ11EA with AMD Duron processor of unknown speed
 Chipset: VIA KT133a with VT8363A Northbridge and VT82C686B Southbridge
 Video: Jaton 3DForce2MX-32, based on nVidia GeForce 2MX chipset w/32 MB of VRAM
+Sound: Trident 4DWave, unknown if -DX or -NX
 I/O: JAMMA adapter board connects to parallel port, VGA out, audio out.
     Labelled "MEGAJAMMA 101 REV A2" for the stand-up Voyager
 
@@ -21,7 +22,9 @@ Upright Voyager runs at 15 kHz standard res, sit-down at 24 kHz medium res.
 
 TODO:
 - VIA KT133a chipset support, GeForce 2MX video support, lots of things ;-)
-- Run this under shutms11 will report an AC'97 error for a Trident 4DWave PCI card.
+- In ga6vx: errors on a few things (mostly on AGP mounting, and "SIOCADDRT: Network is unreachable"),
+  eventually black screen when entering in X11 video mode due of DDC.
+  If bypassed (test eax,eax on a tight loop) it will start dialoguing with the LPT1
 
 *************************************************************************************/
 

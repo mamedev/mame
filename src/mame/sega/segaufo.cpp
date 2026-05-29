@@ -64,6 +64,7 @@ TODO:
 
 #include "speaker.h"
 
+#include <bit>
 #include <iomanip>
 #include <sstream>
 
@@ -516,8 +517,8 @@ void ufo_state::ex_crane_xyz_w(u8 data)
 	// d5: move up
 	for (int m = 0; m < 3; m++)
 	{
-		int bits = data >> (m * 2) & 3;
-		m_player[P].motor[m].running = population_count_32(bits) & 1;
+		unsigned bits = data >> (m * 2) & 3;
+		m_player[P].motor[m].running = std::popcount(bits) & 1;
 		m_player[P].motor[m].direction = bits & 2;
 	}
 }
@@ -534,8 +535,8 @@ void ufo_state::ex_ufoalac_xz_w(u8 data)
 	// d7: p2 move arm out
 	for (int i = 0; i < 4; i++)
 	{
-		int bits = data >> (i * 2) & 3;
-		m_player[i & 1].motor[i & 2].running = population_count_32(bits) & 1;
+		unsigned bits = data >> (i * 2) & 3;
+		m_player[i & 1].motor[i & 2].running = std::popcount(bits) & 1;
 		m_player[i & 1].motor[i & 2].direction = bits & 1;
 	}
 
@@ -548,7 +549,7 @@ void ufo_state::ex_ufoalac_y_w(u8 data)
 	// d0: y normal speed
 	// d1: y slow speed
 	// d2: y direction
-	m_player[P].motor[1].running = population_count_32(data & 3) & 1;
+	m_player[P].motor[1].running = std::popcount(data & 3U) & 1;
 	m_player[P].motor[1].direction = data & 4;
 
 	m_player[P].motor[1].speed = 1.0f / CABINET_DEPTH;

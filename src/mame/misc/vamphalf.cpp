@@ -55,6 +55,7 @@
 TODO:
 - boonggab: simulate photo sensors with a "stroke strength"
 - boonggab: what are sensors bit used for? are they used in the japanese version?
+- misncrft: sound dies during stage 1-5;
 - wyvernsg: fails a protection check after ~1 hour of play?
 - are CRTC parameters software-configurable?
 
@@ -75,6 +76,7 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+#include "vamphalf_prot.h"
 
 namespace {
 
@@ -510,9 +512,11 @@ void vamphalf_qdsp_state::misncrft_io(address_map &map)
 	map(0x040, 0x040).w(FUNC(vamphalf_qdsp_state::flipscreen_w));
 	map(0x080, 0x080).portr("P1_P2");
 	map(0x090, 0x090).portr("SYSTEM");
+	map(0x0d0, 0x0d0).rw("fpga", FUNC(misncrft_fpga_prot_device::data_r), FUNC(misncrft_fpga_prot_device::seed_w<16>));
 	map(0x0f0, 0x0f0).w(FUNC(vamphalf_qdsp_state::eeprom_w));
 	map(0x100, 0x100).umask16(0x00ff).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x160, 0x161).r(FUNC(vamphalf_qdsp_state::eeprom_r));
+	map(0x1a0, 0x1a0).rw("fpga", FUNC(misncrft_fpga_prot_device::data_r), FUNC(misncrft_fpga_prot_device::seed_w<8>));
 }
 
 void vamphalf_state::coolmini_io(address_map &map)
@@ -552,6 +556,7 @@ void vamphalf_qdsp_state::wyvernwg_io(address_map &map)
 	map(0x0a00, 0x0a00).portr("P1_P2");
 	map(0x0c00, 0x0c00).portr("SYSTEM");
 	map(0x1500, 0x1500).umask32(0x000000ff).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x1800, 0x1800).rw("fpga", FUNC(wyvernwg_fpga_prot_device::data_r), FUNC(wyvernwg_fpga_prot_device::seed_w));
 	map(0x1c00, 0x1c00).umask32(0x0000ffff).w(FUNC(vamphalf_qdsp_state::eeprom_w));
 	map(0x1f00, 0x1f00).umask32(0x0000ffff).r(FUNC(vamphalf_qdsp_state::eeprom_r));
 }
@@ -607,6 +612,7 @@ void vamphalf_state::worldadv_io(address_map &map)
 	map(0x060, 0x060).w(FUNC(vamphalf_state::eeprom_w));
 	map(0x0a0, 0x0a0).portr("P1_P2");
 	map(0x0d0, 0x0d0).portr("SYSTEM");
+	map(0x160, 0x160).rw("fpga", FUNC(worldadv_fpga_prot_device::data_r), FUNC(worldadv_fpga_prot_device::seed_w));
 	map(0x190, 0x190).umask16(0x00ff).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x1c0, 0x1c0).umask16(0x00ff).w("ymsnd", FUNC(ym2151_device::address_w));
 	map(0x1c1, 0x1c1).umask16(0x00ff).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w));
@@ -1209,6 +1215,8 @@ void vamphalf_qdsp_state::misncrft(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_qdsp_state::misncrft_io);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
 
+	MISNCRFT_FPGA_PROT(config, "fpga", 0);
+
 	sound_qs1000(config);
 }
 
@@ -1274,6 +1282,8 @@ void vamphalf_state::worldadv(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_state::worldadv_io);
 
+	WORLDADV_FPGA_PROT(config, "fpga", 0);
+
 	sound_ym_oki(config);
 }
 
@@ -1297,6 +1307,8 @@ void vamphalf_qdsp_state::wyvernwg(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_qdsp_state::common_32bit_map);
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_qdsp_state::wyvernwg_io);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
+
+	WYVERNWG_FPGA_PROT(config, "fpga", 0);
 
 	sound_qs1000(config);
 }
@@ -3411,7 +3423,7 @@ GAME( 1999, poosho,     0,        jmpbreak,  common,    vamphalf_state,       in
 GAME( 1999, newxpang,   0,        newxpang,  common,    vamphalf_state,       init_newxpang,  ROT0,   "F2 System",                     "New Cross Pang (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, newxpanga,  newxpang, jmpbreak,  common,    vamphalf_state,       init_newxpanga, ROT0,   "F2 System",                     "New Cross Pang (set 2)", MACHINE_SUPPORTS_SAVE ) // TODO: speed up for this set
 
-GAME( 1999, worldadv,   0,        worldadv,  common,    vamphalf_state,       init_worldadv,  ROT0,   "Logic / F2 System",             "World Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // game starts to stall for several seconds at a time after it's been running for a certain amount of time
+GAME( 1999, worldadv,   0,        worldadv,  common,    vamphalf_state,       init_worldadv,  ROT0,   "Logic / F2 System",             "World Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // cfr. vamphalf_prot.cpp
 
 GAME( 1999, solitaire,  0,        solitaire, solitaire, vamphalf_state,       init_solitaire, ROT0,   "F2 System",                     "Solitaire (version 2.5)", MACHINE_SUPPORTS_SAVE )
 
@@ -3428,8 +3440,8 @@ GAME( 1999, vamphalfk,  vamphalf, vamphalf,  common,    vamphalf_state,       in
 
 GAME( 2000, dquizgo2,   0,        coolmini,  common,    vamphalf_state,       init_dquizgo2,  ROT0,   "SemiCom",                       "Date Quiz Go Go Episode 2", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, misncrft,   0,        misncrft,  common,    vamphalf_qdsp_state,  init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.7)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // game starts to stall for several seconds at a time after it's been running for a certain amount of time (you can usually complete 1 loop)
-GAME( 2000, misncrfta,  misncrft, misncrft,  common,    vamphalf_qdsp_state,  init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.4)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 2000, misncrft,   0,        misncrft,  common,    vamphalf_qdsp_state,  init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.7)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // cfr. vamphalf_prot.cpp
+GAME( 2000, misncrfta,  misncrft, misncrft,  common,    vamphalf_qdsp_state,  init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.4)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 
 GAME( 2000, mrdig,      0,        mrdig,     common,    vamphalf_state,       init_mrdig,     ROT0,   "Sun",                           "Mr. Dig", MACHINE_SUPPORTS_SAVE )
 
@@ -3442,7 +3454,7 @@ GAME( 2001, mrkickera,  mrkicker, mrkickera, finalgdr,  vamphalf_nvram_state, in
 
 GAME( 2001, toyland,    0,        coolmini,  common,    vamphalf_state,       init_toyland,   ROT0,   "SemiCom",                       "Toy Land Adventure", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, wivernwg,   0,        wyvernwg,  common,    vamphalf_qdsp_state,  init_wyvernwg,  ROT270, "SemiCom",                       "Wivern Wings",         MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // gives a protection error after a certain number of plays / coins?
+GAME( 2001, wivernwg,   0,        wyvernwg,  common,    vamphalf_qdsp_state,  init_wyvernwg,  ROT270, "SemiCom",                       "Wivern Wings",         MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // cfr. vamphalf_prot.cpp
 GAME( 2001, wyvernwg,   wivernwg, wyvernwg,  common,    vamphalf_qdsp_state,  init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, wyvernwga,  wivernwg, wyvernwg,  common,    vamphalf_qdsp_state,  init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 

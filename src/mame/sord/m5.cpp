@@ -4,30 +4,30 @@
 
     Sord m.5
 
-	https://web.archive.org/web/20241214083230/http://m5.arigato.cz/en_index.html
+    https://web.archive.org/web/20241214083230/http://m5.arigato.cz/en_index.html
     http://www.dlabi.cz/?s=sord
     https://www.facebook.com/groups/59667560188/
     http://www.oldcomp.cz/viewtopic.php?f=103&t=1164
-	https://dlabi.cz/data/IMG_8234.jpg //brno_mod ramdisk
-	http://blog.livedoor.jp/hardyboy/tag/SORDM5
-	https://web.archive.org/web/20180817030621/http://www.museo8bits.es/wiki/index.php/Sord_M5
-	#fd-5
-	https://web.archive.org/web/20250516192317if_/http://m5.arigato.cz/cs_fd5.html
-	https://dlabi.cz/data/imgs/schemata/PCB-schema-FD-5-A2-Zeravsky.png
-	https://dlabi.cz/data/imgs/schemata/PCB-schema-FD-5-A4half.png
+    https://dlabi.cz/data/IMG_8234.jpg //brno_mod ramdisk
+    http://blog.livedoor.jp/hardyboy/tag/SORDM5
+    https://web.archive.org/web/20180817030621/http://www.museo8bits.es/wiki/index.php/Sord_M5
+    #fd-5
+    https://web.archive.org/web/20250516192317if_/http://m5.arigato.cz/cs_fd5.html
+    https://dlabi.cz/data/imgs/schemata/PCB-schema-FD-5-A2-Zeravsky.png
+    https://dlabi.cz/data/imgs/schemata/PCB-schema-FD-5-A4half.png
 
 ***************************************************************************
 
 TODO:
 
-    - replace fd5 rom hack with proper emulation 
+    - replace fd5 rom hack with proper emulation
     - SI-5 serial interface (8251, ROM)
     - ramdisk for KRX Memory expansion
     - rewrite fd5 floppy as unpluggable device
     - 64krx: get windows ROM version with cpm & ramdisk support (Stuchlik S.E.I. version)
 
     - brno mod: add support for lzr floppy disc format
-	- brno mod: add support of 16kb carts
+    - brno mod: add support of 16kb carts
 
 ******************************************************************************
 
@@ -286,8 +286,6 @@ Few other notes:
 
 #include "logmacro.h"
 
-static constexpr int FDC_MOTOR_TIMEOUT = 3;
-
 namespace {
 
 class m5_state : public driver_device
@@ -314,11 +312,13 @@ public:
 		, m_motor_timer(nullptr)
 	{ }
 
-	void m5(machine_config &config);
-	void pal(machine_config &config);
-	void ntsc(machine_config &config);
+	void m5(machine_config &config) ATTR_COLD;
+	void pal(machine_config &config) ATTR_COLD;
+	void ntsc(machine_config &config) ATTR_COLD;
 
 protected:
+	static constexpr int FDC_MOTOR_TIMEOUT = 3;
+
 	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	optional_device<cpu_device> m_fd5cpu;
@@ -339,6 +339,8 @@ protected:
 	m5_cart_slot_device *m_ramcart = nullptr;
 	m5_cart_slot_device *m_romcart = nullptr;
 
+	emu_timer *m_motor_timer = nullptr;
+
 	bool m_centronics_busy = false;
 
 	u8 sts_r();
@@ -348,9 +350,16 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(FDC_MOTOR_TIMEOUT_cb);
-	emu_timer *m_motor_timer = nullptr;
 
 private:
+	u8 m_ram_mode = 0;
+	u8 m_ram_type = 0;
+	std::unique_ptr<u8[]> m_ignore_writes;
+
+	// floppy state for fd5
+	u8 m_fd5_data = 0;
+	u8 m_fd5_com = 0;
+
 	u8 ppi_pa_r();
 	void ppi_pa_w(u8 data);
 	void ppi_pb_w(u8 data);
@@ -363,8 +372,8 @@ private:
 	void fd5_com_w(u8 data);
 	void fd5_ctrl_w(u8 data);
 	void fd5_tc_w(u8 data);
-	 
-	static void floppy_formats(format_registration &fr);
+
+	static void floppy_formats(format_registration &fr) ATTR_COLD;
 
 	void write_centronics_busy(int state);
 
@@ -380,18 +389,6 @@ private:
 	void m5_mem(address_map &map) ATTR_COLD;
 	u8 cart_window_r(offs_t offset);
 	void cart_window_w(offs_t offset, u8 data);
-
-	u8 m_ram_mode = 0;
-	u8 m_ram_type = 0;
-	//memory_region *m_cart_rom = nullptr;
-	std::unique_ptr<u8[]> m_ignore_writes;
-
-	// floppy state for fd5
-	u8 m_fd5_data = 0;
-	u8 m_fd5_com = 0;
-	//int m_intr = 0;
-	//bool m_ibf = 0;
-	//bool m_obf = 0;
 };
 
 
@@ -691,14 +688,14 @@ void m5_state::mem64KRX_w(offs_t offset, u8 data) //out 0x7f
 }
 
 u8 m5_state::cart_window_r(offs_t offset)
-{	
+{
 	return m_ramcart->read_ram(offset);
 }
 
 void m5_state::cart_window_w(offs_t offset, u8 data)
 {
-    if (m_ramcart)
-        m_ramcart->write_ram(offset, data);
+	if (m_ramcart)
+		m_ramcart->write_ram(offset, data);
 }
 
 //**************************************************************************
@@ -724,14 +721,12 @@ void m5_state::m5_mem(address_map &map)
 	m_rom_view[0](0xc000, 0xffff).bankr(m_bankr[5]).bankw(m_bankw[5]);
 
 	// 64KBI memory module
-	m_rom_view[1](0x0000, 0xffff).rw(FUNC(m5_state::cart_window_r),
-		FUNC(m5_state::cart_window_w));
+	m_rom_view[1](0x0000, 0xffff).rw(FUNC(m5_state::cart_window_r), FUNC(m5_state::cart_window_w));
 	m_rom_view[1](0x0000, 0x1fff).rom().region("monitor", 0x0000).unmapw(); // monitor rom
 	m_rom_view[1](0x7000, 0x7fff).ram().share("ram");
 
 	// for RAM only mode
-	m_rom_view[2](0x0000, 0xffff).rw(FUNC(m5_state::cart_window_r),
-		FUNC(m5_state::cart_window_w));
+	m_rom_view[2](0x0000, 0xffff).rw(FUNC(m5_state::cart_window_r), FUNC(m5_state::cart_window_w));
 	m_rom_view[2](0x7000, 0x7fff).ram().share("ram");
 }
 
@@ -919,13 +914,13 @@ void m5_state::ppi_pb_w(u8 data)
 
 	    bit     description
 
-		0 	AD0 \
-		1	AD1	 > only zeroes will work here, as the FD5 expects
-	    2	AD2 /
-		3	PIO/Peripherial SWITCH 1 = DEFAULT, 0 = INTELIGENT Interface
+	    0   AD0 \
+	    1   AD1  > only zeroes will work here, as the FD5 expects
+	    2   AD2 /
+	    3   PIO/Peripherial SWITCH 1 = DEFAULT, 0 = INTELIGENT Interface
 	    4
 	    5
-	    6	!NMI
+	    6   !NMI
 	    7   !RTY
 
 	*/
@@ -936,7 +931,7 @@ void m5_state::ppi_pb_w(u8 data)
 	}
 
 	m_fd5cpu->set_input_line(INPUT_LINE_NMI, !BIT(data,6));
-	
+
 }
 
 // 0x72
@@ -949,26 +944,23 @@ u8 m5_state::ppi_pc_r()
 	    0       CMD/STATUS
 	    1       DTO
 	    2       !RFD
-	    3		?
+	    3       ?
 	    4       STB
-	    5		IBF
+	    5       IBF
 	    6       !ACK
-	    7		!OBF
+	    7       !OBF
 
 	*/
 
-	u8 out = (
-		/* FD5 bit 0-> M5 bit 2 */
-		((m_fd5_com & 0x01) << 2) |
+	u8 out =
 		/* FD5 bit 1-> M5 bit 0 */
-		((m_fd5_com & 0x02) >> 1) |
 		/* FD5 bit 2-> M5 bit 1 */
-		((m_fd5_com & 0x04) >> 1) |
+		/* FD5 bit 0-> M5 bit 2 */
+		(bitswap<3>(m_fd5_com, 0, 2, 1) << 0) |
 		/* FD5 bit 3-> M5 bit 4 */
-		((m_fd5_com & 0x08) << 1) |
+		(BIT(m_fd5_com, 3) << 4) |
 		/* FD5 bit 4-> M5 bit 6 */
-		((m_fd5_com & 0x10) << 2)
-		);
+		(BIT(m_fd5_com, 4) << 6);
 	return out;
 }
 
@@ -983,8 +975,11 @@ u8 m5_state::ppi_pc_r()
 
 u8 m5_state::fd5_data_r()
 {
-	m_ppi->pc6_w(0); //ACK
-	m_ppi->pc6_w(1); 
+	if (!machine().side_effects_disabled())
+	{
+		m_ppi->pc6_w(0); //ACK
+		m_ppi->pc6_w(1);
+	}
 	return m_fd5_data;
 }
 
@@ -998,7 +993,7 @@ void m5_state::fd5_data_w(u8 data)
 	m_fd5_data = data;
 	m_ppi->pc4_w(0); //STB
 	m_ppi->pc4_w(1);
-	
+
 }
 
 
@@ -1010,24 +1005,24 @@ u8 m5_state::fd5_com_r()
 {
 	/*
 
-		bit     description
+	    bit     description
 
-		0       DEVICE NUMBER, needs to be 0 and this is only if PB0-PB3=0
-		1       /RTY Sequence reset, needs to be 1
-		2       IBF
-		3       !OBF
-		4
-		5
-		6
-		7
+	    0       DEVICE NUMBER, needs to be 0 and this is only if PB0-PB3=0
+	    1       /RTY Sequence reset, needs to be 1
+	    2       IBF
+	    3       !OBF
+	    4
+	    5
+	    6
+	    7
 
 	*/
 
 	uint8_t pc = m_ppi->read(2);     // Read Port C (index 2)
-	bool obf = BIT(pc, 7);
-	bool ibf = BIT(pc, 5);
+	uint8_t obf = BIT(pc, 7);
+	uint8_t ibf = BIT(pc, 5);
 	uint8_t pb = m_ppi->pb_r();
-	bool DEV = BIT(pb, 0) | BIT(pb, 1) | BIT(pb, 2) | BIT(pb, 3);
+	uint8_t DEV = BIT(pb, 0) | BIT(pb, 1) | BIT(pb, 2) | BIT(pb, 3);
 	uint8_t RTY = BIT(pb, 7) << 1;
 
 	uint8_t out = obf << 3 | ibf << 2 | RTY | DEV; // device number 0 and RTY is harcoded here
@@ -1044,16 +1039,16 @@ void m5_state::fd5_com_w(u8 data)
 {
 	/*
 
-		bit     description
+	    bit     description
 
-		0       PPI PC2/RFD
-		1       PPI PC0/CMD
-		2       PPI PC1/DTO
-		3		PPI PC4/STB
-		4		PPI PC5/ACK
-		5
-		6
-		7
+	    0       PPI PC2/RFD
+	    1       PPI PC0/CMD
+	    2       PPI PC1/DTO
+	    3       PPI PC4/STB
+	    4       PPI PC5/ACK
+	    5
+	    6
+	    7
 
 	*/
 	//LOG("%04x: Out (20h),%02x\n", m_fd5cpu->pc() - 2, data);
@@ -1151,13 +1146,13 @@ void brno_state::m5_mem_brno(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xffff).view(m_rom_view);
-	m_rom_view[0](0x0000, 0xffff).rw(FUNC(brno_state::ramdisk_r),			  // where isn't ROM map RAMdisk
+	m_rom_view[0](0x0000, 0xffff).rw(FUNC(brno_state::ramdisk_r),             // where isn't ROM map RAMdisk
 		FUNC(brno_state::ramdisk_w));
 
 	// boot config
-	m_rom_view[0](0x0000, 0x1fff).rom().region("maincpu", 0x0000).unmapw();	  // monitor ROM
-	m_rom_view[0](0x2000, 0x3fff).view(m_rom12_view);						  // ROM1,ROM2 or cart, selected by m_rom12_view
-	m_rom_view[0](0x7000, 0x7fff).ram().share("internal");					  // internal RAM
+	m_rom_view[0](0x0000, 0x1fff).rom().region("maincpu", 0x0000).unmapw();   // monitor ROM
+	m_rom_view[0](0x2000, 0x3fff).view(m_rom12_view);                         // ROM1,ROM2 or cart, selected by m_rom12_view
+	m_rom_view[0](0x7000, 0x7fff).ram().share("internal");                    // internal RAM
 	m_rom12_view[0](0x2000, 0x3fff).rom().region("maincpu", 0x2000).unmapw(); // ROM1
 	m_rom12_view[1](0x2000, 0x3fff).rom().region("maincpu", 0x4000).unmapw(); // ROM2 - Basic-I
 	m_rom12_view[2](0x2000, 0x3fff).r(FUNC(brno_state::cartrom_r)).unmapw();  // cartridge ROM
@@ -1166,7 +1161,7 @@ void brno_state::m5_mem_brno(address_map &map)
 	m_rom_view[1](0x0000, 0xffff).rw(FUNC(brno_state::ramdisk_r),
 		FUNC(brno_state::ramdisk_w));
 
-	
+
 }
 
 //-------------------------------------------------
@@ -1329,7 +1324,7 @@ void m5_state::machine_reset()
 	uint8_t* ramcart_rom_base = nullptr;
 
 	m_ignore_writes = std::make_unique<u8[]>(0x2000);
-	std::memset(m_ignore_writes.get(), 0xFF, 0x2000);
+	std::memset(m_ignore_writes.get(), 0xff, 0x2000);
 	u8 entry = 1;
 
 	//is ram/rom cart plugged in?
@@ -1435,6 +1430,7 @@ void m5_state::machine_reset()
 				m_bankw[5]->configure_entry(0, ramcart_ram_base + 0xc000);
 
 				// rom entries
+				// FIXME: m_ignore_writes is unacceptably gross - use a view to unmap writes when ROM is selectted
 				m_bankr[0]->configure_entry(1, memregion("monitor")->base());
 				m_bankw[0]->configure_entry(1, m_ignore_writes.get());
 				m_bankr[1]->configure_entry(1, ramcart_rom_base);
@@ -1443,7 +1439,7 @@ void m5_state::machine_reset()
 				m_bankw[2]->configure_entry(1, m_ignore_writes.get());
 				m_bankr[3]->configure_entry(1, ramcart_rom_base + 0x4000);
 				m_bankw[3]->configure_entry(1, m_ignore_writes.get());
-	
+
 				m_rom_view.select(0);
 
 				for (int i = 0; i < 4; i++)
@@ -1498,7 +1494,7 @@ void m5_state::machine_reset()
 
 				m_rom_view.select(0);
 
-				// it seem no matter RAM/ROM selected writes allways go to ram
+				// it seem no matter RAM/ROM selected writes always go to ram
 				m_bankr[0]->set_entry(1);
 				m_bankw[0]->set_entry(0);
 				m_bankr[1]->set_entry(1);
@@ -1772,15 +1768,15 @@ ROM_START( m5p )
 	//ROM_FILL(0x2038, 3, 0) short but not safe fix
 
 	// RST 18 rutine
-	ROM_FILL(0x18, 1, 0xf3)		//di added this to avoid premature IRQ
-	ROM_FILL(0x19, 1, 0xed)		// ld de,($c3df)
+	ROM_FILL(0x18, 1, 0xf3)     //di added this to avoid premature IRQ
+	ROM_FILL(0x19, 1, 0xed)     // ld de,($c3df)
 	ROM_FILL(0x1a, 1, 0x5b)
 	ROM_FILL(0x1b, 1, 0xdf)
 	ROM_FILL(0x1c, 1, 0xc3)
-	ROM_FILL(0x1d, 1, 0xc9)		//ret
+	ROM_FILL(0x1d, 1, 0xc9)     //ret
 	//patch to jump to rst 18
-	ROM_FILL(0x1fef, 1, 0xdf)	// replace ld de,($c3df) by rst 18h where above subrutine is located
-	ROM_FILL(0x1ff0, 3, 0)		// replace rest of ld instruction by nops
+	ROM_FILL(0x1fef, 1, 0xdf)   // replace ld de,($c3df) by rst 18h where above subrutine is located
+	ROM_FILL(0x1ff0, 3, 0)      // replace rest of ld instruction by nops
 
 ROM_END
 

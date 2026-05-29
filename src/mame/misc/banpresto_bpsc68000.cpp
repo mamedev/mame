@@ -4,7 +4,7 @@
 /*
 Banpresto M68K-based medal games with Banpresto customs
 
-BPSC68000 PCB (rev B)
+BPSC68000 PCB (rev B) - used by lnumbers
 
 Main components:
 - MC68EC000FN12 main CPU
@@ -25,7 +25,25 @@ The video section has an unpopulated space marked BPBG for a 160-pin (probably) 
 The audio section also has unpopulated space marked for a YMZ280.
 
 
+PSPC68000 PCB - used by csdaruma
+Seems a cost reduced version of the BPSC68000 PCB and it's mostly compatible
+
+Main components:
+- MC68EC000FN12 main CPU
+- 2x HM62256BLFP-7T SRAM (near program ROM)
+- 24.000 MHz XTAL
+- PSPC-1 9638 KEAC Banpresto custom chip (160-pin, no Banpresto logo)
+- MFC68K 88F 9534 ACD3 Banpresto custom chip (100-pin, no Banpresto logo)
+- HM538123BJ-7 DRAM (near PSPC-1 chip)
+- 2x banks of 8 switches
+- OKI M6295
+- 1056J resonator (near M6295)
+- unpopulated space marked for MSM62X42BRS (RTC)
+
+
 TODO:
+- csdaruma: GFX glitches in the skateboard scene (curtain, dog priority)
+  see https://www.youtube.com/watch?v=KFEjFYr-kmQ for reference
 - verify ticket dispenser hook-up (seems to work)
 - unknown read / writes as noted in memory map
 - spams "requested to play sample on non-stopped voice" from the Oki. Why?
@@ -65,10 +83,10 @@ public:
 	{ }
 
 	void bpsc68000(machine_config &config) ATTR_COLD;
+	void pspc68000(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD { m_lamps.resolve(); }
-	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -82,17 +100,18 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void counters_w(uint16_t data);
-	void lamps_1_w(uint16_t data);
-	void lamps_2_w(uint16_t data);
+	void bpsc68000_counters_w(uint16_t data);
+	void bpsc68000_lamps_1_w(uint16_t data);
+	void bpsc68000_lamps_2_w(uint16_t data);
 
-	void prg_map(address_map &map) ATTR_COLD;
+	void pspc68000_counters_w(uint16_t data);
+	void pspc68000_lamps_1_w(uint16_t data);
+	void pspc68000_hopper_w(uint16_t data);
+
+	void bpsc68000_program_map(address_map &map) ATTR_COLD;
+	void pspc68000_program_map(address_map &map) ATTR_COLD;
 };
 
-
-void bpsc68000_state::video_start()
-{
-}
 
 void bpsc68000_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -112,26 +131,28 @@ void bpsc68000_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 
 		for (int cy = 0; cy < (ychain + 1); cy++)
 			for (int cx = 0; cx < (xchain + 1); cx++)
-				m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite++, color, flipx, flipy, x + 16 * cx, y + 16 * cy, 0);
+				m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite++, color, flipx, flipy, flipx ? x - 16 * cx : x + 16 * cx, y + 16 * cy, 0);
 	}
 }
 
 uint32_t bpsc68000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0, cliprect); // TODO: in csdaruma this fixes a bunch of stuff but breaks the skate scene, no changes in lnumbers
+
 	draw_sprites(bitmap, cliprect);
 
 	return 0;
 }
 
 
-void bpsc68000_state::counters_w(uint16_t data)
+void bpsc68000_state::bpsc68000_counters_w(uint16_t data)
 {
 	// at start the game writes here with a 0x00ff mem_mask. Only value observed is 0xc6c6.
 	// after that, the game writes with a 0xffff mem_mask
 
 	for (int i = 0x00; i < 0x04; i++)
 		if (BIT(data, i))
-			logerror("%s counters_w unknown bit %1x written: %04x\n", machine().describe_context(), i, data);
+			logerror("%s bpsc68000_counters_w unknown bit %1x written: %04x\n", machine().describe_context(), i, data);
 
 	// bit 1 and 2 seem coin lockout related
 
@@ -148,30 +169,70 @@ void bpsc68000_state::counters_w(uint16_t data)
 
 	for (int i = 0x08; i < 0x10; i++)
 		if (BIT(data, i))
-			logerror("%s counters_w unknown bit %1x written: %04x\n", machine().describe_context(), i, data);
+			logerror("%s bpsc68000_counters_w unknown bit %1x written: %04x\n", machine().describe_context(), i, data);
 
 }
 
-void bpsc68000_state::lamps_1_w(uint16_t data)
+void bpsc68000_state::bpsc68000_lamps_1_w(uint16_t data)
 {
 	m_lamps[1] = BIT(data, 4); // stop 1 lamp, shown in test mode
 	m_lamps[2] = BIT(data, 5); // stop 2 lamp, shown in test mode
 	m_lamps[3] = BIT(data, 6); // stop 3 lamp, shown in test mode
 
 	if (data & 0xff8f)
-		logerror("%s lamps_1_w unknown bits written: %04x\n", machine().describe_context(), data);
+		logerror("%s bpsc68000_lamps_1_w unknown bits written: %04x\n", machine().describe_context(), data);
 }
 
-void bpsc68000_state::lamps_2_w(uint16_t data)
+void bpsc68000_state::bpsc68000_lamps_2_w(uint16_t data)
 {
 	m_lamps[0] = BIT(data, 0); // start lamp, shown in test mode
 
 	if (data & 0xfffe)
-		logerror("%s lamps_2_w unknown bits written: %04x\n", machine().describe_context(), data);
+		logerror("%s bpsc68000_lamps_2_w unknown bits written: %04x\n", machine().describe_context(), data);
+}
+
+void bpsc68000_state::pspc68000_counters_w(uint16_t data)
+{
+	// at start the game writes here with a 0x00ff mem_mask. Only value observed is 0xc6c6.
+	// after that, the game writes with a 0xffff mem_mask
+
+	machine().bookkeeping().coin_lockout_w(0, !BIT(data, 2));
+
+	machine().bookkeeping().coin_lockout_w(1, !BIT(data, 3));
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4)); // 100 Yen
+
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 5)); // medal
+
+	if (data & 0xc3)
+		logerror("%s pspc68000_counters_w unknown bit written: %04x\n", machine().describe_context(), data);
+
+}
+
+void bpsc68000_state::pspc68000_lamps_1_w(uint16_t data)
+{
+	m_lamps[0] = BIT(data, 7); // start lamp, shown in test mode
+
+	if (data & 0x7f)
+		logerror("%s pspc68000_lamps_1_w unknown bits written: %04x\n", machine().describe_context(), data);
+}
+
+void bpsc68000_state::pspc68000_hopper_w(uint16_t data)
+{
+
+	// TODO: strange hook-up, check if correct
+	if (!BIT(data, 1))
+		m_ticket_dispenser->motor_w(1);
+
+	if (!BIT(data, 0))
+		m_ticket_dispenser->motor_w(0);
+
+	if (data & 0xfc)
+		logerror("%s pspc68000_hopper_w unknown bits written: %04x\n", machine().describe_context(), data);
 }
 
 
-void bpsc68000_state::prg_map(address_map &map)
+void bpsc68000_state::bpsc68000_program_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x200000, 0x2001ff).ram().w("palette", FUNC(palette_device::write16)).share("palette"); // TODO: surely bigger, adjust when a game using tilemaps is dumped
@@ -181,20 +242,48 @@ void bpsc68000_state::prg_map(address_map &map)
 	map(0xa00000, 0xa00001).portr("DSW1");
 	map(0xa00002, 0xa00003).portr("DSW2");
 	// map(0xc00000, 0xc00001).rw() // read from c00000 & 00ff (rare), write to c00000 & 00ff (rare, only seen 1111 value)
-	// map(0xc00002, 0xc00003).r() // read from c00002 & 00ff (often), write to c00000 & 00ff (often, only seen 0000 value)
+	// map(0xc00002, 0xc00003).r() // read from c00002 & 00ff (often), write to c00002 & 00ff (often, only seen 0000 value)
 	// map(0xc00008, 0xc00009).w() // write to c00008 & 00ff (rare, only seen 0808 value)
 	// map(0xc0000a, 0xc0000b).w() // write to c0000a & 00ff (rare, only seen 0000 value)
 	// map(0xc0000c, 0xc0000d).w() // write to c0000c & 00ff (rare, only seen 8c8c value)
 	// map(0xc0000e, 0xc0000f).w() // write to c0000e & 00ff (rare, only seen 9999 value)
-	map(0xc00020, 0xc00021).w(FUNC(bpsc68000_state::counters_w)); // .r() read from c00020 & ffff
-	map(0xc00022, 0xc00023).w(FUNC(bpsc68000_state::lamps_1_w)); // .r() read from c00022 & ffff
-	map(0xc00024, 0xc00025).w(FUNC(bpsc68000_state::lamps_2_w)); // .r() read from c00024 & ffff
+	map(0xc00020, 0xc00021).w(FUNC(bpsc68000_state::bpsc68000_counters_w)); // .r() read from c00020 & ffff
+	map(0xc00022, 0xc00023).w(FUNC(bpsc68000_state::bpsc68000_lamps_1_w)); // .r() read from c00022 & ffff
+	map(0xc00024, 0xc00025).w(FUNC(bpsc68000_state::bpsc68000_lamps_2_w)); // .r() read from c00024 & ffff
 	// map(0xc0002e, 0xc0002f).w() // write to c0002e & 00ff (rare, only seen 0707 value)
 	map(0xc00026, 0xc00027).portr("IN0");
 	map(0xc00028, 0xc00029).portr("IN1");
 	map(0xc0002a, 0xc0002b).portr("IN2");
 	map(0x800001, 0x800001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xe00000, 0xe07fff).ram().share("nvram");
+}
+
+void bpsc68000_state::pspc68000_program_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x01ffff).rom();
+	map(0x200000, 0x201fff).ram().share(m_spriteram);
+	map(0x202000, 0x2021ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x202800, 0x20287f).ram(); // ?
+	map(0x203000, 0x23001f).ram(); // CRTC regs?
+	map(0xa00000, 0xa00001).portr("DSW1");
+	map(0xa00002, 0xa00003).portr("DSW2");
+	// map(0xc00000, 0xc00001).w() // write to c00000 & 00ff (rare, only seen 0011 value)
+	// map(0xc00002, 0xc00003).rw() // read from c00002 & 00ff (often), write to c00002 & 00ff (often, only seen efef value)
+	// map(0xc00004, 0xc00005).w() // write to c00004 & 00ff (rare, only seen 0010 value)
+	// map(0xc00008, 0xc00009).w() // write to c00008 & 00ff (rare, only seen 0808 value)
+	// map(0xc0000a, 0xc0000b).w() // write to c0000a & 00ff (rare, only seen 0000 value)
+	// map(0xc0000c, 0xc0000d).w() // write to c0000c & 00ff (rare, only seen 8c8c value)
+	// map(0xc0000e, 0xc0000f).w() // write to c0000e & 00ff (rare, only seen 9999 value)
+	map(0xc00020, 0xc00021).w(FUNC(bpsc68000_state::pspc68000_counters_w));
+	map(0xc00022, 0xc00023).w(FUNC(bpsc68000_state::pspc68000_lamps_1_w));
+	map(0xc00024, 0xc00025).w(FUNC(bpsc68000_state::pspc68000_hopper_w));
+	// map(0xc0002e, 0xc0002f).w() // write to c0002e & 00ff (rare, only seen 0707 value)
+	map(0xc00026, 0xc00027).portr("IN0");
+	map(0xc00028, 0xc00029).portr("IN1");
+	map(0xc0002a, 0xc0002b).portr("IN2");
+	map(0x800000, 0x800003).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff).cswidth(16);
+	map(0xe00000, 0xe0ffff).ram().share("nvram");
 }
 
 
@@ -287,6 +376,40 @@ static INPUT_PORTS_START( lnumbers )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( csdaruma )
+	PORT_INCLUDE(lnumbers)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("DSW1") // these are unused according to the manual
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW2") // these are unused according to the manual
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 static GFXDECODE_START( gfx )
 	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_lsb, 0, 16 )
@@ -297,7 +420,7 @@ void bpsc68000_state::bpsc68000(machine_config &config)
 {
 	// basic machine hardware
 	M68000(config, m_maincpu, 24_MHz_XTAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &bpsc68000_state::prg_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bpsc68000_state::bpsc68000_program_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bpsc68000_state::irq4_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -308,7 +431,7 @@ void bpsc68000_state::bpsc68000(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8); // TODO
+	screen.set_size(32*8, 32*8); // TODO: verify
 	screen.set_visarea(0, 256-1, 0, 224-1);
 	screen.set_screen_update(FUNC(bpsc68000_state::screen_update));
 	screen.set_palette("palette");
@@ -321,6 +444,15 @@ void bpsc68000_state::bpsc68000(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	OKIM6295(config, "oki", 1'066'000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.40); // TODO: check pin 7.
+}
+
+void bpsc68000_state::pspc68000(machine_config &config)
+{
+	bpsc68000(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &bpsc68000_state::pspc68000_program_map);
+
+	subdevice<okim6295_device>("oki")->set_clock(1.056_MHz_XTAL);
 }
 
 
@@ -345,7 +477,26 @@ ROM_START( lnumbers )
 	// unpopulated spaces at u28 and u44 marked 18CV8
 ROM_END
 
+// クレヨンしんちゃんのだるまおとしだゾ
+// all labels were handwritten
+ROM_START( csdaruma )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "p.u6", 0x00000, 0x20000, CRC(5a5f81ed) SHA1(f8d527ec83df52905da8d14f1e61b2a563dd113b) ) // 11xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "e.u22", 0x00000, 0x80000, CRC(c131d73a) SHA1(9c5ebb96fd6423d5279d39ddc3ab19786ee3ca33) )
+	ROM_LOAD16_BYTE( "o.u21", 0x00001, 0x80000, CRC(e433226e) SHA1(4157f9cc1731c7b3d5153229c1e813f890885056) )
+	// PCB also has a space marked for a single interleaved ROM, in alternative
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "s.u16", 0x00000, 0x40000, CRC(d5eabbef) SHA1(00f38d857b2cc85ec1dd9cc8bd10ec3683d141f4) )
+
+	ROM_REGION( 0x200, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "gal16v8d.u2", 0x000, 0x117, NO_DUMP )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1995, lnumbers, 0, bpsc68000, lnumbers, bpsc68000_state, empty_init, ROT0, "Banpresto", "Ultraman Club - Lucky Numbers", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, lnumbers, 0, bpsc68000, lnumbers, bpsc68000_state, empty_init, ROT0, "Banpresto", "Ultraman Club - Lucky Numbers",           MACHINE_SUPPORTS_SAVE )
+GAME( 1998, csdaruma, 0, pspc68000, csdaruma, bpsc68000_state, empty_init, ROT0, "Banpresto", "Crayon Shin-chan no Daruma Otoshi da Zo", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

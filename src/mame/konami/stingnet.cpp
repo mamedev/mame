@@ -104,7 +104,7 @@ public:
 		m_ata_irq_pending(false)
 	{ }
 
-	void stingnet(machine_config &config);
+	void stingnet(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -121,8 +121,6 @@ private:
 	required_device<ymz280b_device> m_ymz;
 	required_device<fujitsu_29f016a_device> m_sndflash;
 
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void main_map(address_map &map) ATTR_COLD;
 	void ymz280b_map(address_map &map) ATTR_COLD;
 
@@ -138,11 +136,6 @@ private:
 	u8 m_control;
 	bool m_ata_irq_pending;
 };
-
-uint32_t stingnet_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return m_gcu->draw(screen, bitmap, cliprect);
-}
 
 void stingnet_state::gcu_interrupt(int state)
 {
@@ -333,7 +326,7 @@ void stingnet_state::stingnet(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(800, 600);
 	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(stingnet_state::screen_update));
+	screen.set_screen_update(m_gcu, FUNC(k057714_device::draw));
 	screen.set_palette("palette");
 	screen.screen_vblank().set(m_gcu, FUNC(k057714_device::vblank_w));
 
@@ -362,6 +355,6 @@ ROM_START( tropchnc )
 	DISK_IMAGE("gc968_ver_01", 0, SHA1(e96731a68e306876b9665cb9c1d69b9aa38acc3b))
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 GAME(1999, tropchnc, 0, stingnet, stingnet, stingnet_state, empty_init, ROT90, "Konami", "Tropical Chance", MACHINE_NOT_WORKING)

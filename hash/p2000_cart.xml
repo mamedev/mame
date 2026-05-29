@@ -45,7 +45,6 @@ TODO:
 		<notes><![CDATA[
 PDOS implications untested
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x4000">
 				<rom name="BASICNL1.1A2.bin" size="0x4000" crc="0d5239ff" sha1="a6313ab7cc2d052427ba852f3035377bbf76bf63" />
@@ -123,7 +122,6 @@ Requires [SLOT2] I/O module (dual RS-232)
 Requires [FDC]
 https://retroordenadoresorty.blogspot.com/2024/09/interface-bildschirmtext-io-modul-p2171.html
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
 
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x4000">
@@ -139,7 +137,6 @@ https://retroordenadoresorty.blogspot.com/2024/09/interface-bildschirmtext-io-mo
 		<notes><![CDATA[
 (same as parent)
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
 
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x4000">
@@ -193,7 +190,7 @@ Pressing '?' on [keyboard] doesn't bring information screen
 	</software>
 
 	<software name="familie3" cloneof="familie4" supported="no">
-		<description>familiegeheugen (v3.L)</description>
+		<description>Familiegeheugen (v3.L)</description>
 		<year>1986</year>
 		<publisher>Philips</publisher>
 		<notes><![CDATA[
@@ -229,7 +226,6 @@ Pressing '?' on [keyboard] doesn't bring information screen
 		<notes><![CDATA[
 Not extensively tested
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
 
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x4000">
@@ -245,7 +241,6 @@ Not extensively tested
 		<notes><![CDATA[
 Not extensively tested
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
 
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x4000">
@@ -412,7 +407,6 @@ Not extensively tested
 		<notes><![CDATA[
 Not extensively tested
 ]]></notes>
-		<info name="usage" value="Requires 64KB RAM minimum"/>
 
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x4000">
@@ -502,6 +496,7 @@ Various unsupported features
 
 	<software name="brkwall" supported="partial">
 		<description>Brick-Wall</description>
+		<!-- original is '82, this conversion may be later -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
@@ -532,7 +527,7 @@ Optional [joystick] support
 		<notes><![CDATA[
 Optional [joystick] support
 ]]></notes>
-		<info name="usage" value="Requires 32KB RAM minimum"/>
+		<info name="required_ram" value="32KB" />
 		<part name="cart" interface="p2000_cart">
 			<dataarea name="rom" size="0x3fbe">
 				<rom name="Fraxxon (joystick).bin" size="0x3fbe" crc="80e38fa5" sha1="732cb508208ff8af157fe1bdfe75f18918f90103" />

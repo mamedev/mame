@@ -6,6 +6,8 @@
 #ifndef MAME_CPU_MCS51_DS5002FP_H
 #define MAME_CPU_MCS51_DS5002FP_H
 
+#pragma once
+
 #include "i8051.h"
 
 DECLARE_DEVICE_TYPE(DS5002FP, ds5002fp_device)

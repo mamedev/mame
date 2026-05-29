@@ -116,6 +116,33 @@ void ac97_stac9704_device::codec_read_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 }
 
+/*
+ * -x-- ---- SoundBlaster Control (0) generate irq at block length done
+ * --x- ---- (0) 48kHz signal always routed to sound engine (1) 48kHz signal only if there's an active channel
+ * ---x ---- AC'97 is ready (r/o)
+ * ---- x--- Record is valid (r/o)
+ * ---- --x- Digital Audio Data is valid (playback)
+ * ---- ---x Warm reset
+ */
+u32 ac97_stac9704_device::codec_status_r(offs_t offset, u32 mem_mask)
+{
+	if (!machine().side_effects_disabled())
+		LOG("%s: codec_status_r\n", machine().describe_context());
+	// put codec in a ready state, for misc/voyager.cpp Linux boot
+	// TODO: needs improvements, and status timings from the attached sound engine.
+	return 0x12;
+}
+
+void ac97_stac9704_device::codec_command_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		LOG("%s: codec_command_w %02x\n", machine().describe_context(), data);
+		if (BIT(data, 0))
+			this->reset();
+		// TODO: other bits
+	}
+}
 
 void ac97_stac9704_device::mixer_map(address_map &map)
 {

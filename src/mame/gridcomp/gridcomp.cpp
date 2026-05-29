@@ -46,7 +46,7 @@
     - keyboard MCU emulation
     - proper custom DMA logic timing
     - loading ROMs for Compass II
-	- proper 2101 and 2102 emulation
+    - proper 2101 and 2102 emulation
 
     missing dumps:
 
@@ -67,9 +67,9 @@
 #include "gridrom.h"
 
 #include "bus/ieee488/ieee488.h"
-#include "bus/rs232/rs232.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/printer.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "machine/i7220.h"
 #include "machine/i80130.h"
@@ -176,11 +176,11 @@ static void rs232_devices(device_slot_interface &device)
 	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
 	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
 	/*
-		FIXME:
-		The GRiDPaint documentation states that this mouse should work.
-		But for some reason, the laptop does not recognize it.
+	    FIXME:
+	    The GRiDPaint documentation states that this mouse should work.
+	    But for some reason, the laptop does not recognize it.
 
-		device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	    device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
 	*/
 
 	device.option_add("printer", SERIAL_PRINTER);

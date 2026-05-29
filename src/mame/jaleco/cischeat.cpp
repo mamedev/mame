@@ -184,7 +184,7 @@ Cisco Heat.
 
 #include "logmacro.h"
 
-#define LOGUNKNOWN(...)   LOGMASKED(LOG_UNKNOWN, __VA_ARGS__) 
+#define LOGUNKNOWN(...)   LOGMASKED(LOG_UNKNOWN, __VA_ARGS__)
 
 namespace {
 // TODO: better inheritance, eventually split individual driver files

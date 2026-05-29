@@ -201,6 +201,7 @@ Motherboard Jumpers
   ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i86/i86.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
@@ -218,11 +219,13 @@ Motherboard Jumpers
 #include "machine/wd_fdc.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 #include <algorithm>
+#include <bit>
 
 
 // Single Step
@@ -396,7 +399,7 @@ void z100_state::ram_w(offs_t offset, u8 data)
 {
 	u32 &parity = m_parity[offset >> 5];
 
-	if (!BIT(m_memory_ctrl, 4) && BIT(population_count_32(data), 0))
+	if (!BIT(m_memory_ctrl, 4) && BIT(std::popcount(data), 0))
 		parity |= 1 << (offset & 31);
 	else if (parity != 0)
 		parity &= ~(1 << (offset & 31));

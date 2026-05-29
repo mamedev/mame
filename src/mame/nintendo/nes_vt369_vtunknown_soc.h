@@ -111,8 +111,8 @@ private:
 	required_device<cpu_device> m_soundcpu;
 	std::vector<u8> m_6000_ram;
 
-	u8 m_bank6000 = 0;
-	u8 m_bank6000_enable = 0;
+	u8 m_bank6000;
+	u8 m_bank6000_enable;
 
 	u8 m_415x_port_direction;
 	u8 m_4152_port_data;

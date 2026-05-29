@@ -59,6 +59,8 @@ sensor state instead.
 #include "emu.h"
 #include "sensorboard.h"
 
+#include <bit>
+
 
 DEFINE_DEVICE_TYPE(SENSORBOARD, sensorboard_device, "sensorboard", "Sensorboard")
 
@@ -501,7 +503,7 @@ INPUT_CHANGED_MEMBER(sensorboard_device::sensor)
 
 INPUT_CHANGED_MEMBER(sensorboard_device::ui_spawn)
 {
-	u8 pos = (newval) ? (u8)param : 32 - count_leading_zeros_32(m_inp_spawn->read());
+	u8 pos = newval ? u8(param) : std::bit_width(m_inp_spawn->read());
 	if (pos == 0 || pos > m_maxspawn)
 		return;
 

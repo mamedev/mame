@@ -36,7 +36,6 @@ is used to shade quads according to their depth.
 -------------------
 
 TODO:
-- some z-fighting issues, eg. signs and car rearwing (the problem is in namcos21_3d_device)
 - verify video timing, PCB videos do suggest exactly 60Hz
 - is it possible to remove the ROM hacks? see init functions, perfect quantum won't help (winrungp works
   without the hack, but to be on the safe side it's better to keep it unless it can be fixed for real)
@@ -496,11 +495,11 @@ void namcos21_state::bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 	for (int sy = cliprect.top(); sy <= cliprect.bottom(); sy++)
 	{
-		u8 const *const pSource = &m_gpu_videoram[((yscroll + sy) & 0x3ff) * 0x200];
-		u16 *const pDest = &bitmap.pix(sy);
+		u8 const *const source = &m_gpu_videoram[((yscroll + sy) & 0x3ff) * 0x200];
+		u16 *const dest = &bitmap.pix(sy);
 		for (int sx = cliprect.left(); sx <= cliprect.right(); sx++)
 		{
-			int const pen = pSource[(sx + xscroll) & 0x1ff];
+			int const pen = source[(sx + xscroll) & 0x1ff];
 			switch (pen)
 			{
 			case 0xff:
@@ -508,21 +507,21 @@ void namcos21_state::bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 			// NOTE: very similar to namcos21_c67_state::sprite_mix_callback
 			case 0x00:
-				if (pDest[sx] != (base ^ 0x10ff))
-					pDest[sx] = 0x4000 | (pDest[sx] & 0x1fff);
+				if (dest[sx] != (base ^ 0x10ff))
+					dest[sx] = 0x4000 | (dest[sx] & 0x1fff);
 				else
-					pDest[sx] = (base & 0xf00) | 0x00;
+					dest[sx] = (base & 0xf00) | 0x00;
 				break;
 
 			case 0x01:
-				if (pDest[sx] != (base ^ 0x10ff))
-					pDest[sx] = 0x6000 | (pDest[sx] & 0x1fff);
+				if (dest[sx] != (base ^ 0x10ff))
+					dest[sx] = 0x6000 | (dest[sx] & 0x1fff);
 				else
-					pDest[sx] = (base & 0xf00) | 0x01;
+					dest[sx] = (base & 0xf00) | 0x01;
 				break;
 
 			default:
-				pDest[sx] = base | pen;
+				dest[sx] = base | pen;
 				break;
 			}
 		}
@@ -694,11 +693,11 @@ static INPUT_PORTS_START( winrun )
 	PORT_START("AN0")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 0 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("AN1")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 1 */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(15) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x40) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal") // won't detect name entry below 0x40
 	PORT_START("AN2")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 2 */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
 	PORT_START("AN3")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 3 */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(15) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x40) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
 	PORT_START("AN4")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("AN5")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 5 */

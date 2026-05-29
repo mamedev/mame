@@ -851,8 +851,8 @@ void news_38xx_state::reset_cpu_registers()
 void news_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add("cdrom", NSCSI_CDROM);
-	device.option_add("tape", NSCSI_TAPE);
+	device.option_add("cdrom", NSCSI_CDROM_NEWS);
+	device.option_add("tape", NSCSI_TAPE_NEWS);
 }
 
 void news_38xx_state::common(machine_config &config)

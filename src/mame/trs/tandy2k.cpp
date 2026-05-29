@@ -954,10 +954,7 @@ void tandy2k_state::machine_reset()
 	m_hires_en = 0;
 	m_clkmouse_cnt = 0;
 	m_clkmouse_irq = 0;
-}
 
-void tandy2k_state::device_reset_after_children()
-{
 	m_pc_keyboard->enable(0);
 }
 

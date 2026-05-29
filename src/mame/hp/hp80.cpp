@@ -71,21 +71,27 @@
 // http://www.hpmuseum.net/exhibit.php?class=1&cat=9 - Last but not least: HP museum pages for HP80
 
 #include "emu.h"
-#include "emupal.h"
-#include "screen.h"
+
+#include "hp80_optrom.h"
+
+#include "bus/hp80_io/82937.h"
+#include "bus/hp80_io/hp80_io.h"
 #include "cpu/capricorn/capricorn.h"
-#include "speaker.h"
+#include "imagedev/bitbngr.h"
+#include "machine/1ma6.h"
+#include "machine/bankdev.h"
+#include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "sound/dac.h"
-#include "machine/1ma6.h"
-#include "hp80_optrom.h"
-#include "machine/ram.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "softlist_dev.h"
-#include "machine/bankdev.h"
-#include "bus/hp80_io/hp80_io.h"
-#include "bus/hp80_io/82937.h"
-#include "imagedev/bitbngr.h"
+#include "speaker.h"
+
+#include <bit>
+
 #include "hp86b.lh"
 
 // Debugging
@@ -705,7 +711,7 @@ static const uint8_t keyboard_table[ 80 ][ 2 ] = {
 bool hp80_base_state::kb_scan_ioport(ioport_value pressed , unsigned idx_base , uint8_t& row , uint8_t& col)
 {
 	if (pressed) {
-		unsigned bit_no = 31 - count_leading_zeros_32(pressed);
+		unsigned bit_no = std::bit_width(pressed) - 1;
 		row = (idx_base + bit_no) / 8;
 		col = (idx_base + bit_no) % 8;
 		return true;

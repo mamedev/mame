@@ -25,6 +25,9 @@
 #include "emu.h"
 #include "voodoo_2.h"
 
+#include <bit>
+
+
 using namespace voodoo;
 
 
@@ -207,7 +210,7 @@ u32 command_fifo::words_needed(u32 command)
 			//   Word  Bits
 			//     0  31:3  = 2D Register mask
 			//     0   2:0  = Packet type (2)
-			return 1 + population_count_32(BIT(command, 3, 29));
+			return 1 + std::popcount(BIT(command, 3, 29));
 
 		case 3:
 		{
@@ -258,7 +261,7 @@ u32 command_fifo::words_needed(u32 command)
 			//     0  28:15 = General register mask
 			//     0  14:3  = Register base
 			//     0   2:0  = Packet type (4)
-			return 1 + population_count_32(BIT(command, 15, 14)) + BIT(command, 29, 3);
+			return 1 + std::popcount(BIT(command, 15, 14)) + BIT(command, 29, 3);
 
 		case 5:
 			// Packet type 5: 2 + N words

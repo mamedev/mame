@@ -514,12 +514,9 @@ void c140_device::c140_w(offs_t offset, u8 data)
 				v->bank = vreg->bank;
 				v->mode = data;
 
-				const u32 loop = (vreg->loop_msb << 8) + vreg->loop_lsb;
-				const u32 start = (vreg->start_msb << 8) + vreg->start_lsb;
-				const u32 end = (vreg->end_msb << 8) + vreg->end_lsb;
-				v->sample_loop = loop;
-				v->sample_start = start;
-				v->sample_end = end;
+				v->sample_loop = (vreg->loop_msb << 8) | vreg->loop_lsb;
+				v->sample_start = (vreg->start_msb << 8) | vreg->start_lsb;
+				v->sample_end = (vreg->end_msb << 8) | vreg->end_lsb;
 			}
 			else
 			{
@@ -601,7 +598,7 @@ void c219_device::c219_w(offs_t offset, u8 data)
 
 		if ((offset & 0xf) == 0x5)
 		{
-			if (data & 0x80 || (data & 0x40 && v->key))
+			if (data & 0x80)
 			{
 				const struct voice_registers *vreg = (struct voice_registers *) &m_REG[offset & 0x1f0];
 				v->key = 1;
@@ -613,13 +610,10 @@ void c219_device::c219_w(offs_t offset, u8 data)
 				v->bank = vreg->bank;
 				v->mode = data;
 
-				const u32 loop = (vreg->loop_msb << 8) + vreg->loop_lsb;
-				const u32 start = (vreg->start_msb << 8) + vreg->start_lsb;
-				const u32 end = (vreg->end_msb << 8) + vreg->end_lsb;
 				// on the 219 asic, addresses are in words
-				v->sample_loop = loop << 1;
-				v->sample_start = start << 1;
-				v->sample_end = end << 1;
+				v->sample_loop = ((vreg->loop_msb << 8) | vreg->loop_lsb) << 1;
+				v->sample_start = ((vreg->start_msb << 8) | vreg->start_lsb) << 1;
+				v->sample_end = ((vreg->end_msb << 8) | vreg->end_lsb) << 1;
 
 				#if 0
 				logerror("219: play v %d mode %02x start %x loop %x end %x\n",
@@ -660,7 +654,7 @@ void c140_device::init_voice(C140_VOICE *v)
 
 
 /*
-   find_sample: compute the actual address of a sample given it's
+   find_sample: compute the actual address of a sample given its
    address and banking registers, as well as the chip type.
  */
 int c140_device::find_sample(int adrs, int bank, int voice)

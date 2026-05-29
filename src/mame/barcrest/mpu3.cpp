@@ -101,7 +101,6 @@ TODO: - Distinguish door switches using manual
 ***********************************************************************************************************/
 
 #include "emu.h"
-#include "awpvid.h" // Fruit Machines Only
 
 #include "mpu4_characteriser_pal.h"
 
@@ -563,10 +562,10 @@ void mpu3_state::pia_ic5_porta_w(uint8_t data)
 	m_reels[1]->update((data>>2) & 0x03);
 	m_reels[2]->update((data>>4) & 0x03);
 	m_reels[3]->update((data>>6) & 0x03);
-	awp_draw_reel(machine(),"reel1", *m_reels[0]);
-	awp_draw_reel(machine(),"reel2", *m_reels[1]);
-	awp_draw_reel(machine(),"reel3", *m_reels[2]);
-	awp_draw_reel(machine(),"reel4", *m_reels[3]);
+	m_reels[0]->draw();
+	m_reels[1]->draw();
+	m_reels[2]->draw();
+	m_reels[3]->draw();
 }
 
 uint8_t mpu3_state::pia_ic5_portb_r()

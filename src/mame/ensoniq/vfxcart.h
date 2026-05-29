@@ -16,10 +16,10 @@ public:
 	using unload_cb = delegate<void (ensoniq_vfx_cartridge *)>;
 
 	ensoniq_vfx_cartridge(
-		const machine_config &mconfig,
-		const char *tag,
-		device_t *owner,
-		u32 clock = 0);
+			const machine_config &mconfig,
+			const char *tag,
+			device_t *owner,
+			u32 clock = 0);
 
 	virtual ~ensoniq_vfx_cartridge();
 
@@ -50,18 +50,17 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
-
-	required_device<x28c256_device> m_eeprom;
-
 	static constexpr uint32_t SIZE = x28c256_device::DATA_SIZE_BYTES;
 	static constexpr uint32_t MASK = SIZE - 1;
 
-	bool m_is_loaded = false;
-	bool m_is_writeable = false;
+	required_device<x28c256_device> m_eeprom;
 
 	load_cb m_load_cb;
 	unload_cb m_unload_cb;
 	required_ioport m_input_config;
+
+	bool m_is_loaded;
+	bool m_is_writeable;
 };
 
 

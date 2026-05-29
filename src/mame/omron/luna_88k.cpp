@@ -56,6 +56,8 @@
 
 #include "debugger.h"
 
+#include <bit>
+
 #define VERBOSE 0
 #include "logmacro.h"
 
@@ -763,7 +765,7 @@ u32 luna_88k_state_base::irq_ctl_r(offs_t offset)
 	u8 const active = m_irq_active[offset] & (0x80 | m_irq_mask[offset] << 1);
 	if (active)
 	{
-		unsigned const level = 31 - count_leading_zeros_32(active);
+		unsigned const level = std::bit_width(active) - 1;
 
 		data |= (level << 29);
 	}

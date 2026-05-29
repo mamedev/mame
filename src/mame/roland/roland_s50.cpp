@@ -22,6 +22,7 @@
 #include "machine/nscsi_bus.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
+#include "video/hd44780.h"
 #include "video/tms3556.h"
 #include "video/t6963c.h"
 #include "emupal.h"
@@ -140,7 +141,7 @@ public:
 	}
 
 	void w30(machine_config &config);
-	[[maybe_unused]] void s330(machine_config &config);
+	void s330(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -151,9 +152,12 @@ private:
 	void psram_bank_w(u8 data);
 	void floppy_select_w(u8 data);
 	u8 unknown_status_r();
+	u8 unknown_hack_r();
+
+	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
 	void w30_mem_map(address_map &map) ATTR_COLD;
-	[[maybe_unused]] void s330_mem_map(address_map &map) ATTR_COLD;
+	void s330_mem_map(address_map &map) ATTR_COLD;
 	void psram1_map(address_map &map) ATTR_COLD;
 	void psram2_map(address_map &map) ATTR_COLD;
 
@@ -316,6 +320,17 @@ u8 roland_w30_state::unknown_status_r()
 	return 0x1c;
 }
 
+u8 roland_w30_state::unknown_hack_r()
+{
+	return 0x01;
+}
+
+HD44780_PIXEL_UPDATE(roland_w30_state::lcd_pixel_update)
+{
+	if (x < 5 && y < 8 && line < 2 && pos < 16)
+		bitmap.pix(line * 8 + y, pos * 6 + x) = state;
+}
+
 
 void roland_s50_state::mem_map(address_map &map)
 {
@@ -379,7 +394,7 @@ void roland_w30_state::w30_mem_map(address_map &map)
 	map(0xf800, 0xffff).rw(FUNC(roland_w30_state::key_r), FUNC(roland_w30_state::key_w));
 }
 
-[[maybe_unused]] void roland_w30_state::s330_mem_map(address_map &map)
+void roland_w30_state::s330_mem_map(address_map &map)
 {
 	map(0x0000, 0x1fff).view(m_bank1_view);
 	m_bank1_view[0](0x0000, 0x1fff).rom().region("program", 0);
@@ -389,6 +404,16 @@ void roland_w30_state::w30_mem_map(address_map &map)
 	map(0x8000, 0xbfff).view(m_bank2_view);
 	m_bank2_view[0](0x8000, 0xbfff).rom().region("program", 0);
 	m_bank2_view[1](0x8000, 0xbfff).bankrw(m_psram2_bank);
+	map(0xc200, 0xc200).rw(FUNC(roland_w30_state::floppy_status_r), FUNC(roland_w30_state::floppy_select_w));
+	map(0xc300, 0xc303).w("lcdc", FUNC(hd44780_device::write)).umask16(0x00ff);
+	map(0xc600, 0xc600).rw(FUNC(roland_w30_state::psram_bank_r), FUNC(roland_w30_state::psram_bank_w));
+	map(0xc800, 0xc807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
+	map(0xd000, 0xd000).r(m_vdp, FUNC(tms3556_device::vram_r));
+	map(0xd002, 0xd002).rw(m_vdp, FUNC(tms3556_device::initptr_r), FUNC(tms3556_device::vram_w));
+	map(0xd004, 0xd004).rw(m_vdp, FUNC(tms3556_device::reg_r), FUNC(tms3556_device::reg_w));
+	map(0xd806, 0xd806).r(FUNC(roland_w30_state::unknown_hack_r));
+	map(0xe800, 0xe81f).w("outas", FUNC(bu3905_device::write)).umask16(0x00ff);
+	//map(0xf000, 0xf01f).rw(m_tvf, FUNC(mb654419u_device::read), FUNC(mb654419u_device::write)).umask16(0x00ff);
 	map(0xc000, 0xffff).rw(m_wave, FUNC(sa16_device::read), FUNC(sa16_device::write)).umask16(0xff00);
 }
 
@@ -406,7 +431,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START(w30)
 INPUT_PORTS_END
 
-[[maybe_unused]] static INPUT_PORTS_START(s330)
+static INPUT_PORTS_START(s330)
 INPUT_PORTS_END
 
 static void s50_floppies(device_slot_interface &device)
@@ -536,7 +561,7 @@ void roland_w30_state::w30(machine_config &config)
 
 void roland_w30_state::s330(machine_config &config)
 {
-	C8095_90(config, m_maincpu, 24_MHz_XTAL / 2); // P8097-90
+	C8095_90(config, m_maincpu, 24_MHz_XTAL / 2); // N8097-90
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_w30_state::s330_mem_map);
 
 	WD1772(config, m_fdc, 8_MHz_XTAL); // WD1772-02
@@ -546,9 +571,23 @@ void roland_w30_state::s330(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy[1], s50_floppies, nullptr, &floppy_formats).enable_sound(true);
 
 	// LCD unit: DM1620-5BL7 (MW-5F)
+	hd44780_device &lcdc(HD44780(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
+	lcdc.set_lcd_size(2, 16);
+	lcdc.set_pixel_update_cb(FUNC(roland_w30_state::lcd_pixel_update));
+
+	screen_device &lcd_screen(SCREEN(config, "lcd_screen", SCREEN_TYPE_LCD));
+	lcd_screen.set_refresh_hz(60);
+	lcd_screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	lcd_screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
+	lcd_screen.set_size(6*16, 8*2);
+	lcd_screen.set_visarea_full();
+	lcd_screen.set_palette("lcd_palette");
+
+	PALETTE(config, "lcd_palette", palette_device::MONOCHROME_INVERTED);
 
 	TMS3556(config, m_vdp, 14.3496_MHz_XTAL); // TMS3556NL
 	m_vdp->set_addrmap(0, &roland_w30_state::vram_map);
+	m_vdp->set_screen("screen");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
@@ -602,10 +641,10 @@ ROM_START(w30)
 	ROM_LOAD16_BYTE("lh534145_15179936.ic29", 0x00001, 0x80000, NO_DUMP)
 ROM_END
 
-[[maybe_unused]] ROM_START(s330)
+ROM_START(s330)
 	ROM_REGION16_LE(0x4000, "program", 0)
-	ROM_LOAD16_BYTE("s-330.ic15", 0x0000, 0x2000, NO_DUMP)
-	ROM_LOAD16_BYTE("s-330.ic14", 0x0001, 0x2000, NO_DUMP)
+	ROM_LOAD16_BYTE("a_s-330_even_v3.02.ic15", 0x0000, 0x2000, CRC(9039fc5d) SHA1(e5d718aab7b10e25c742b74a09eb2fedf3dccb58)) // MBM27C64-20
+	ROM_LOAD16_BYTE("b_s-330_odd_v3.02.ic14", 0x0001, 0x2000, CRC(e3855737) SHA1(ab57ed4b81bb69cceb2f274e8fb599d9b8f4e7fc)) // MBM27C64-20
 ROM_END
 
 } // anonymous namespace
@@ -614,4 +653,4 @@ ROM_END
 SYST(1987, s50,  0,   0, s50,  s50,  roland_s50_state,  empty_init, "Roland", "S-50 Digital Sampling Keyboard", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 SYST(1987, s550, s50, 0, s550, s550, roland_s550_state, empty_init, "Roland", "S-550 Digital Sampler", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 SYST(1988, w30,  0,   0, w30,  w30,  roland_w30_state,  empty_init, "Roland", "W-30 Music Workstation", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-//SYST(1988, s330, w30, 0, s330, s330, roland_w30_state, empty_init, "Roland", "S-330 Digital Sampler", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1988, s330, w30, 0, s330, s330, roland_w30_state, empty_init, "Roland", "S-330 Digital Sampler", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

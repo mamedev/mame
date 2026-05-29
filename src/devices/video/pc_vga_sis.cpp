@@ -1432,7 +1432,7 @@ std::tuple<u8, u8> sis6326_vga_device::flush_true_color_mode()
 
 	// whatever is this doesn't seem related to the actual video format output
 	// win98se has it enabled, SDD doesn't, both use 24-bit depth anyway
-//	const u8 res = !BIT(m_ext_sr07, 2);
+//  const u8 res = !BIT(m_ext_sr07, 2);
 
 	return std::make_tuple(1, 0);
 }

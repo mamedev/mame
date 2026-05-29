@@ -2413,9 +2413,11 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		nr_6c_tm_default_attr_w(nr_wr_dat);
 		break;
 	case 0x6e:
+		m_screen->update_now();
 		nr_6e_tilemap_base_w(BIT(nr_wr_dat, 7), BIT(nr_wr_dat, 0, 6));
 		break;
 	case 0x6f:
+		m_screen->update_now();
 		nr_6f_tilemap_tiles_w(BIT(nr_wr_dat, 7), BIT(nr_wr_dat, 0, 6));
 		break;
 	case 0x70:
@@ -2693,7 +2695,7 @@ TIMER_CALLBACK_MEMBER(specnext_state::irq_off)
 
 TIMER_CALLBACK_MEMBER(specnext_state::irq_on)
 {
-	LOGINTVVV("<Frame IRQ>\n");
+	LOGINTVVV("<ULA/Frame IRQ>\n");
 	m_im2_ula->irq_w(ASSERT_LINE);
 	if (m_nr_c0_int_mode_pulse_0_im2_1 == 0)
 		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
@@ -2830,6 +2832,7 @@ u8 specnext_state::do_m1(offs_t offset)
 	m_divmmc->automap_nmi_delayed_on_w(0);
 
 	m_divmmc->cpu_m1_n_w(1);
+	m_divmmc->cpu_mreq_n_w(1);
 	m_divmmc->clock_w();
 	bank_update(0, 2);
 
@@ -3050,10 +3053,10 @@ void specnext_state::map_io(address_map &map)
 	}));
 
 	map(0x2001, 0x2001).mirror(0x0ffc).lr8(NAME([]() {
-		return /*m_nr_d8_io_trap_fdc_en ? ... :*/ 0x00;
+		return /*m_nr_d8_io_trap_fdc_en ? ... :*/ 0xff;
 	}));
 	map(0x3001, 0x3001).mirror(0x0ffc).lrw8(NAME([]() {
-		return /*m_nr_d8_io_trap_fdc_en ? ... :*/ 0x00;
+		return /*m_nr_d8_io_trap_fdc_en ? ... :*/ 0xff;
 	}), NAME([this](u8 data) {
 		if (m_nr_d8_io_trap_fdc_en)
 		{

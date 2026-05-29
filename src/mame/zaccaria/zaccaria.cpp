@@ -782,6 +782,52 @@ ROM_START( monymony2 )
 	ROM_LOAD( "9f",  0x0200, 0x0200, CRC(93106704) SHA1(d3b8281c87d253a2ed40ff400438e879ca40c2b7) )
 ROM_END
 
+/* Original Zaccaria PCBs, ASSA (Automave) stickers on ROMs.
+   Only one byte on CPU ROM 1A differs from "monymony2" (at 0x14e5, from 0xbe to 0x96, same value here as "monymony"). */
+ROM_START( monymony3	 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cpu1.1a",            0x0000, 0x1000, CRC(932006cd) SHA1(93cac6ad55af9f051f82abd18b5ff6ac2161b27f) ) // Original Zaccaria sticker on the only different ROM
+	ROM_CONTINUE(                   0x8000, 0x1000 )
+	ROM_LOAD( "a-00281_assa_m5.1b", 0x1000, 0x1000, CRC(87372545) SHA1(04618d007a93b3f6706f56b10bdf39727d7d748d) )
+	ROM_CONTINUE(                   0x9000, 0x1000 )
+	ROM_LOAD( "a-00281_assa_m5.1c", 0x2000, 0x1000, CRC(3c874c16) SHA1(5607475638c3c313a8150aaa0e3b653226c2442a) )
+	ROM_CONTINUE(                   0xa000, 0x1000 )
+	ROM_LOAD( "a-00281_assa_m5.1d", 0x3000, 0x1000, CRC(5fdec451) SHA1(0f955c907e0a61a725a951018fdf5cc321139863) )
+	ROM_CONTINUE(                   0xb000, 0x1000 )
+	ROM_LOAD( "a-00281_assa_m5.2a", 0x4000, 0x1000, CRC(af830e3c) SHA1(bed57c341ae3500f147efe31bcf01f81466ec1c0) )
+	ROM_CONTINUE(                   0xc000, 0x1000 )
+	ROM_LOAD( "a-00281_assa_m5.2c", 0x5000, 0x1000, CRC(31da62b1) SHA1(486f07087244f8537510afacb64ddd59eb512a4d) )
+	ROM_CONTINUE(                   0xd000, 0x1000 )
+
+	ROM_REGION( 0x10000, "audiopcb:melodycpu", 0 ) // 64k for first 6802
+	ROM_LOAD( "a-00281_assa_m5.2g", 0x8000, 0x2000, CRC(78b01b98) SHA1(2aabed56cdae9463deb513c0c5021f6c8dfd271e) )
+	ROM_LOAD( "a-00281_assa_m5.1i", 0xc000, 0x2000, CRC(94e3858b) SHA1(04961f67b95798b530bd83355dec612389f22255) )
+
+	ROM_REGION( 0x10000, "audiopcb:audiocpu", 0 ) // 64k for second 6802
+	ROM_LOAD( "a-00281_assa_m5.1h", 0x2000, 0x1000, CRC(aad76193) SHA1(e08fc184efced392ee902c4cc9daaaf3310cdfe2) )
+	ROM_CONTINUE(                   0x6000, 0x1000 )
+	ROM_LOAD( "a-00281_assa_m5.1g", 0x3000, 0x1000, CRC(1e8ffe3e) SHA1(858ee7abe88d5801237e519cae2b50ae4bf33a58) )
+	ROM_CONTINUE(                   0x7000, 0x1000 )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "a-00281_assa_m5.2d", 0x0000, 0x2000, CRC(82ab4d1a) SHA1(5aaf42a508df236f2e7c844d377132d73053907b) )
+	ROM_LOAD( "a-00281_assa_m5.1f", 0x2000, 0x2000, CRC(40d4e4d1) SHA1(79cbade30f1c9269e70ddb9c4332cfe1e8dc50a9) )
+	ROM_LOAD( "a-00281_assa_m5.1e", 0x4000, 0x2000, CRC(36980455) SHA1(4140b0cd4137c8f209124b12d9c0eb3b04f91991) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "82s123.ic9g",        0x0000, 0x0200, CRC(fc9a0f21) SHA1(2a93d684645ee1b70315386127223151582ab370) )
+	ROM_LOAD( "82s123.ic9f",        0x0200, 0x0200, CRC(93106704) SHA1(d3b8281c87d253a2ed40ff400438e879ca40c2b7) )
+
+	ROM_REGION( 0x00f5, "proms2", 0 )
+	ROM_LOAD( "82s100.ic8c",        0x0000, 0x00f5, NO_DUMP )
+	ROM_LOAD( "82s100.ic8n",        0x0000, 0x00f5, NO_DUMP )
+
+	ROM_REGION( 0x0117, "plds", 0 )
+	ROM_LOAD( "01_pal16v8.ic6j",            0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "01_pal16v8.ic6k",            0x0000, 0x0117, NO_DUMP )
+    ROM_LOAD( "a-00281_assa_m5_pal16v8.1a", 0x0000, 0x0117, NO_DUMP ) // On the ROMs PCB 1B11147
+ROM_END
+
 ROM_START( jackrabt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cpu-01.1a",    0x0000, 0x1000, CRC(499efe97) SHA1(f0efc910a5343001b27637779e1d4de218d44a4e) )
@@ -921,6 +967,7 @@ ROM_END
 
 GAME( 1983, monymony,  0,        zaccaria, monymony, zaccaria_state, empty_init, ROT90, "Zaccaria", "Money Money (set 1)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, monymony2, monymony, zaccaria, monymony, zaccaria_state, empty_init, ROT90, "Zaccaria", "Money Money (set 2)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, monymony3, monymony, zaccaria, monymony, zaccaria_state, empty_init, ROT90, "Zaccaria", "Money Money (set 3)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, jackrabt,  0,        zaccaria, jackrabt, zaccaria_state, empty_init, ROT90, "Zaccaria", "Jack Rabbit (set 1)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, jackrabt2, jackrabt, zaccaria, jackrabt, zaccaria_state, empty_init, ROT90, "Zaccaria", "Jack Rabbit (set 2)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, jackrabts, jackrabt, zaccaria, jackrabt, zaccaria_state, empty_init, ROT90, "Zaccaria", "Jack Rabbit (special)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

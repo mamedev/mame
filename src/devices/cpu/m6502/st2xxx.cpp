@@ -35,6 +35,8 @@
 #include "emu.h"
 #include "st2xxx.h"
 
+#include <bit>
+
 #define LOG_IRQ  (1U << 1)
 #define LOG_BT   (1U << 2)
 #define LOG_LCDC (1U << 3)
@@ -283,7 +285,7 @@ u8 st2xxx_device::active_irq_level() const
 	// IREQH interrupts have priority over IREQL interrupts
 	u16 ireq_active = swapendian_int16(m_ireq & m_iena);
 	if (ireq_active != 0)
-		return 31 - (8 ^ count_leading_zeros_32(ireq_active & -ireq_active));
+		return 31 - (8 ^ std::countl_zero(u32(ireq_active & -ireq_active)));
 	else
 		return 0xff;
 }

@@ -1981,7 +1981,8 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream)
 				sampleend = m_sample[m_step_sample-1].data.size();
 
 				// Mix it into the stream value
-				out += m_sample[m_step_sample-1].data[m_step_samplepos++];
+				if (m_step_samplepos < sampleend)
+					out += m_sample[m_step_sample-1].data[m_step_samplepos++];
 				if (m_step_samplepos >= sampleend)
 				{
 					// Step sample done

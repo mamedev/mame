@@ -39887,7 +39887,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 -->
 	<software name="yajiuma2">
 		<description>Yajiuma Pennant Race 2</description>
-		<year>1991</year>
+		<year>1990</year>
 		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199102xx"/>

@@ -233,8 +233,8 @@ public:
 	emu_fatalerror(util::format_argument_pack<char> const &args);
 	emu_fatalerror(int _exitcode, util::format_argument_pack<char> const &args);
 
-	template <typename Format, typename... Params, typename = std::enable_if_t<!std::is_base_of_v<emu_fatalerror, std::remove_reference_t<Format> > > >
-	emu_fatalerror(Format &&fmt, Params &&... args)
+	template <typename Format, typename... Params>
+	emu_fatalerror(Format &&fmt, Params &&... args) requires (!std::is_base_of_v<emu_fatalerror, std::remove_reference_t<Format> >)
 		: emu_fatalerror(static_cast<util::format_argument_pack<char> const &>(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...)))
 	{
 	}

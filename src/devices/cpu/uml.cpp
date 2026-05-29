@@ -36,6 +36,7 @@
 
 #include "drcumlsh.h"
 
+#include <bit>
 #include <type_traits>
 
 
@@ -621,7 +622,7 @@ public:
 			// extract right-aligned field, convert to BFXU
 			inst.m_opcode = OP_BFXU;
 			inst.m_param[2] = bits - inst.param(2).immediate();
-			inst.m_param[3] = 64 - count_leading_zeros_64(inst.param(3).immediate());
+			inst.m_param[3] = std::bit_width(inst.param(3).immediate());
 		}
 	}
 
@@ -1083,7 +1084,7 @@ public:
 			assert((size == 4) || (size == 8));
 
 			u64 const val = inst.param(1).immediate();
-			convert_to_mov_immediate(inst, (size == 4) ? count_leading_zeros_32(u32(val)) : count_leading_zeros_64(val));
+			convert_to_mov_immediate(inst, (size == 4) ? std::countl_zero(u32(val)) : std::countl_zero(val));
 		}
 	}
 

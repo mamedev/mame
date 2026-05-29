@@ -456,7 +456,7 @@ ROM_END
 
 ROM_START(kidnap)
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD("kidnap_1.bin", 0x0000, 0x2000, CRC(4b8f9bb1) SHA1(16672c1a5e55ba5963fbd8834443dbead9bdff10) BAD_DUMP)
+	ROM_LOAD("kidnap_1.bin", 0x0000, 0x2000, BAD_DUMP CRC(4b8f9bb1) SHA1(16672c1a5e55ba5963fbd8834443dbead9bdff10))
 	ROM_LOAD("kidnap_2.bin", 0x2000, 0x2000, CRC(4333d9ba) SHA1(362bcc9caaf37ad7efc116c3bee9b99cbbfa0563))
 ROM_END
 
@@ -464,22 +464,31 @@ ROM_START(glxplay2)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("1382-1.cpu", 0x0000, 0x2000, CRC(da43b0b9) SHA1(b13b260c61b3bd0b7632aabcdbcf4cdd5cbe4b22))
 	ROM_LOAD("1382-2.cpu", 0x2000, 0x2000, CRC(945c90fd) SHA1(8367992f8db8b402d82e4a3f02a35b796756ce0f))
+
+	/* Displays PLDs. Same content on both displays PCBs' PLD (A/40-B and A/41-B).
+	   The two original PAL16L8 chips were bruterforced and tested OK.
+	   They must be recorded on GAL16V8B PLDs, won't work if GAL16V8 are used.
+	   They probably work OK on other pinballs using A/40-B and A/41-B display PCBs, but this wasn't tested.
+	 */
+	ROM_REGION(0x117, "plds", 0)
+	ROM_LOAD("displays_a-40-b_gal16v8b.bin", 0x000, 0x117, BAD_DUMP CRC(6a049a57) SHA1(5277f3fa95c117a8c55625618216e7be37f91d61))
+	ROM_LOAD("displays_a-41-b_gal16v8b.bin", 0x000, 0x117, BAD_DUMP CRC(6a049a57) SHA1(5277f3fa95c117a8c55625618216e7be37f91d61))
 ROM_END
 
 } // Anonymous namespace
 
 // MAC S.A. pinballs
-GAME( 1986, macgalxy,         0, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC's Galaxy (yellow version, M.6)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, macgalxyb, macgalxy, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC's Galaxy (blue version, M.042)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, macjungl,         0, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC Jungle",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, spctrain,         0, mac32k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "Space Train (Pinball)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, spctraino, spctrain, mac16k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "Space Train (Pinball, old hardware)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, spcpnthr,         0, mac32k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "Space Panther",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME( 19??, mac_1808,         0, mac32k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "unknown game (MAC #1808)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, macjungn,         0, mac32k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC Jungle (New version)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nbamac,           0, mac32k,  macp,    macp_state, empty_init, ROT0, "MAC S.A.", "NBA MAC",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, macgalxy,         0, mac16k, macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC's Galaxy (yellow version, M.6)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, macgalxyb, macgalxy, mac16k, macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC's Galaxy (blue version, M.042)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, macjungl,         0, mac16k, macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC Jungle",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, spctrain,         0, mac32k, macp,    macp_state, empty_init, ROT0, "MAC S.A.", "Space Train (Pinball)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, spctraino, spctrain, mac16k, macp,    macp_state, empty_init, ROT0, "MAC S.A.", "Space Train (Pinball, old hardware)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, spcpnthr,         0, mac32k, macp,    macp_state, empty_init, ROT0, "MAC S.A.", "Space Panther",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, mac_1808,         0, mac32k, macp,    macp_state, empty_init, ROT0, "MAC S.A.", "unknown game (MAC #1808)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, macjungn,         0, mac32k, macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC Jungle (New version)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbamac,           0, mac32k, macp,    macp_state, empty_init, ROT0, "MAC S.A.", "NBA MAC",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
-// CICPlay pinballs
-GAME( 1985, glxplay,          0, mac16k,  cicplay, macp_state, empty_init, ROT0, "CICPlay", "Galaxy Play",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kidnap,           0, mac16k,  cicplay, macp_state, empty_init, ROT0, "CICPlay", "Kidnap",                               MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, glxplay2,         0, mac16k,  cicplay, macp_state, empty_init, ROT0, "CICPlay", "Galaxy Play 2",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+// CIC Play pinballs
+GAME( 1985, glxplay,          0, mac16k, cicplay, macp_state, empty_init, ROT0, "CIC Play", "Galaxy Play",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kidnap,           0, mac16k, cicplay, macp_state, empty_init, ROT0, "CIC Play", "Kidnap",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, glxplay2,         0, mac16k, cicplay, macp_state, empty_init, ROT0, "CIC Play", "Galaxy Play 2",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

@@ -53,7 +53,6 @@ enum : unsigned {
 	BOOKKEEPING,
 	GAME_INFO,
 	WARN_INFO,
-	IMAGE_MENU_IMAGE_INFO,
 	IMAGE_MENU_FILE_MANAGER,
 	TAPE_CONTROL,
 	SLOT_DEVICES,
@@ -130,18 +129,13 @@ void menu_main::populate()
 		item_append(_("menu-main", "Warning Information"), 0, (void *)WARN_INFO);
 
 	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
-		if (image.user_loadable())
-		{
-			item_append(_("menu-main", "Media Image Information"), 0, (void *)IMAGE_MENU_IMAGE_INFO);
-			break;
-		}
-
-	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
+	{
 		if (image.user_loadable() || image.has_preset_images_selection())
 		{
-			item_append(_("menu-main", "File Manager"), 0, (void *)IMAGE_MENU_FILE_MANAGER);
+			item_append(_("menu-main", "Media Control"), 0, (void *)IMAGE_MENU_FILE_MANAGER);
 			break;
 		}
+	}
 
 	if (cassette_device_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("menu-main", "Tape Control"), 0, (void *)TAPE_CONTROL);
@@ -249,10 +243,6 @@ bool menu_main::handle(event const *ev)
 
 		case WARN_INFO:
 			menu::stack_push<menu_warn_info>(ui(), target());
-			break;
-
-		case IMAGE_MENU_IMAGE_INFO:
-			menu::stack_push<menu_image_info>(ui(), target());
 			break;
 
 		case IMAGE_MENU_FILE_MANAGER:

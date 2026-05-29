@@ -183,7 +183,7 @@ private:
 	required_region_ptr<uint8_t> m_kanji_rom;
 	required_device<address_map_bank_device> m_bank;
 
-//	required_ioport m_extra;
+//  required_ioport m_extra;
 
 	bool m_nmi_enable = false;
 	pen_t m_pens[NUM_PENS];
@@ -309,7 +309,7 @@ void atamanot_state::main_io_map(address_map &map)
 	map(0x06, 0x06).w("ay2", FUNC(ay8910_device::address_w));
 	map(0x08, 0x08).nopr();
 	map(0x0a, 0x0a).w("ay2", FUNC(ay8910_device::data_w));
-//	map(0x16, 0x16).portr("DSW0");
+//  map(0x16, 0x16).portr("DSW0");
 	map(0x18, 0x18).w(FUNC(atamanot_state::atamanot_prot_w));
 	map(0x1c, 0x1c).nopw(); // noisy, key matrix select for $1e?
 	map(0x1a, 0x1a).lw8(NAME([this] (offs_t offset, u8 data) {
@@ -319,7 +319,7 @@ void atamanot_state::main_io_map(address_map &map)
 		if (data & 0xfc)
 			logerror("I/O $1e: %02x\n", data);
 	}));
-//	map(0x1e, 0x1e) unknown, read a lot with mask & 7
+//  map(0x1e, 0x1e) unknown, read a lot with mask & 7
 	map(0x1e, 0x1e).portr("INPUTS");
 	map(0xfe, 0xfe).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xff, 0xff).w("crtc", FUNC(mc6845_device::register_w));
@@ -327,24 +327,24 @@ void atamanot_state::main_io_map(address_map &map)
 
 void atamanot_state::bank_map(address_map &map)
 {
-//	map(0x000000, 0x001fff).rom().region("question", 0x0e000);
+//  map(0x000000, 0x001fff).rom().region("question", 0x0e000);
 	// border in example question
 	map(0x002000, 0x003fff).rom().region("question", 0x14000);
 	// example question
 	map(0x004000, 0x005fff).rom().region("question", 0x0c000);
-//	map(0x006000, 0x007fff).rom().region("question", 0x0c000);
-//	map(0x008000, 0x009fff).rom().region("question", 0x06000);
-//	map(0x00a000, 0x00bfff).rom().region("question", 0x0e000);
-//	map(0x00c000, 0x00dfff).rom().region("question", 0x02000);
-//	map(0x00e000, 0x00ffff).rom().region("question", 0x00000);
+//  map(0x006000, 0x007fff).rom().region("question", 0x0c000);
+//  map(0x008000, 0x009fff).rom().region("question", 0x06000);
+//  map(0x00a000, 0x00bfff).rom().region("question", 0x0e000);
+//  map(0x00c000, 0x00dfff).rom().region("question", 0x02000);
+//  map(0x00e000, 0x00ffff).rom().region("question", 0x00000);
 
 	// lower GFXs of example question
 	map(0x016000, 0x017fff).rom().region("question", 0x04000);
 
-//	map(0x07e000, 0x07ffff).rom().region("question", 0x0e000);
+//  map(0x07e000, 0x07ffff).rom().region("question", 0x0e000);
 
 	// Note counters and RNG answers maps here
-//	map(0x040000, 0x04ffff).lr8(NAME([this] (offs_t offset) { return machine().rand(); }));
+//  map(0x040000, 0x04ffff).lr8(NAME([this] (offs_t offset) { return machine().rand(); }));
 	map(0x040000, 0x04000f).r(FUNC(atamanot_state::atamanot_prot_r));
 	map(0x042110, 0x04211f).r(FUNC(atamanot_state::atamanot_prot_r));
 	map(0x044220, 0x04422f).r(FUNC(atamanot_state::atamanot_prot_r));

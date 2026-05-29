@@ -6,6 +6,9 @@
 
 #pragma once
 
+#include <memory>
+
+
 DECLARE_DEVICE_TYPE(ST7735, st7735_lcdc_device)
 
 class st7735_lcdc_device : public device_t
@@ -25,7 +28,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	u8 m_displaybuffer[256 * 256 * 2];
+	std::unique_ptr<u8 []> m_displaybuffer;
 	u16 m_posx, m_posy;
 	u16 m_posminx, m_posmaxx;
 	u16 m_posminy, m_posmaxy;
