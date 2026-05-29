@@ -5,7 +5,10 @@ license:CC0-1.0
 
 The majority of this list was sourced from The Ultimate Tape Archive V2.0 released 18th August 2020.
 Some others are based on c64tapes.org dumps
-Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/index.htm
+
+Notes:
+- Press SHIFT + RUN/STOP to direct startup from a tape cassette
+
 -->
 
 <softwarelist name="c64_cass" description="Commodore 64 cassettes">
@@ -5120,6 +5123,20 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<!-- origin: Ultimate Tape Archive V5.0 id=766 -->
+	<software name="fforest">
+		<description>Forbidden Forest</description>
+		<year>1983</year>
+		<publisher>U.S. Gold / Cosmi</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1232664">
+				<rom name="forbidden_forest.tap" size="1232664" crc="372077d3" sha1="de731a249d695ceb904f9481d762a77b96c220fc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TODO: fforest Cosmi version id=3156 -->
+
 	<software name="forceone">
 		<description>Force One</description>
 		<year>1987</year>
@@ -8929,6 +8946,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Law of the West</description>
 		<year>1985</year>
 		<publisher>U.S. Gold</publisher>
+		<info name="usage" value="Inputs from joystick only" />
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1946340">
@@ -8963,6 +8981,21 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="663783">
 				<rom name="Lazer_Wheel_a1.tap" size="663783" crc="96305396" sha1="806bfc8aaed7fbe6631277eaba76fc73937616d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- origin: Ultimate Tape Archive V5.0 id=619 -->
+	<software name="lazyjon" supported="partial">
+		<description>Lazy Jones</description>
+		<year>1984</year>
+		<publisher>Terminal Software</publisher>
+		<notes><![CDATA[
+Glitchy [VIC] setup screen during loading
+]]></notes>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="443777">
+				<rom name="lazy_jones.tap" size="443777" crc="74629b17" sha1="775c3d98f11830fd9493b54e56b68d211767003a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
