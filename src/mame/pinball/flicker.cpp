@@ -48,18 +48,18 @@ The programming seems to be incomplete with some bugs and omissions.
 namespace {
 
 static constexpr char const *const LAMP_NAMES[][4] = {
-		{ "0.0", /* dummy */      "lamp_credit_lamp",  "lamp_flippers",    "lamp_special"            },
-		{ "lamp_a_lamp",          "lamp_b_lamp",       "lamp_c_lamp",      "lamp_d_lamp"             },
-		{ "lamp_not_a_lamp",      "lamp_not_b_lamp",   "lamp_not_c_lamp",  "lamp_not_d_lamp"         },
-		{ "lamp_left_extra_ball", "lamp_double_bonus", "lamp_shoot_again", "lamp_right_extra_ball"   },
-		{ "lamp_00_100s",         "lamp_100",          "lamp_200",         "lamp_300"                },
-		{ "lamp_400",             "lamp_500",          "lamp_600",         "lamp_700"                },
-		{ "lamp_800",             "lamp_900",          "6.2", /* dummy */  "6.3" /* dummy */         },
-		{ "lamp_point_00",        "lamp_1000",         "lamp_2000",        "lamp_3000"               },
-		{ "lamp_4000",            "lamp_5000",         "lamp_6000",        "lamp_7000"               },
-		{ "lamp_8000",            "lamp_9000",         "lamp_10000",       "9.3" /* dummy */         },
-		{ "lamp_dummy_zero",      "lamp_game_over",    "lamp_tilt",        "lamp_same_player_shoots" },
-		{ "lamp_1_up",            "lamp_2_up",         "lamp_one_player",  "lamp_two_player"         } };
+		{ "lamp_0.0", /* dummy */ "lamp_credit_lamp",  "lamp_flippers",        "lamp_special"            },
+		{ "lamp_a_lamp",          "lamp_b_lamp",       "lamp_c_lamp",          "lamp_d_lamp"             },
+		{ "lamp_not_a_lamp",      "lamp_not_b_lamp",   "lamp_not_c_lamp",      "lamp_not_d_lamp"         },
+		{ "lamp_left_extra_ball", "lamp_double_bonus", "lamp_shoot_again",     "lamp_right_extra_ball"   },
+		{ "lamp_00_100s",         "lamp_100",          "lamp_200",             "lamp_300"                },
+		{ "lamp_400",             "lamp_500",          "lamp_600",             "lamp_700"                },
+		{ "lamp_800",             "lamp_900",          "lamp_6.2", /* dummy */ "lamp_6.3" /* dummy */    },
+		{ "lamp_point_00",        "lamp_1000",         "lamp_2000",            "lamp_3000"               },
+		{ "lamp_4000",            "lamp_5000",         "lamp_6000",            "lamp_7000"               },
+		{ "lamp_8000",            "lamp_9000",         "lamp_10000",           "lamp_9.3" /* dummy */    },
+		{ "lamp_dummy_zero",      "lamp_game_over",    "lamp_tilt",            "lamp_same_player_shoots" },
+		{ "lamp_1_up",            "lamp_2_up",         "lamp_one_player",      "lamp_two_player"         } };
 
 class flicker_state : public genpin_class
 {
@@ -80,10 +80,10 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(test_changed);
 
-	void flicker(machine_config &config);
+	void flicker(machine_config &config) ATTR_COLD;
 
 private:
-	virtual void driver_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void ram0_out(u8 data) { m_ram0_output = data; }
 	void rom0_out(u8 data) { m_rom0_output = data; }
@@ -390,10 +390,11 @@ INPUT_CHANGED_MEMBER(flicker_state::test_changed)
 }
 
 
-void flicker_state::driver_start()
+void flicker_state::machine_start()
 {
 	m_digits.resolve();
 	m_io_outputs.resolve();
+	m_lamps.resolve();
 
 	save_item(NAME(m_cm_ram1));
 	save_item(NAME(m_cm_ram2));
