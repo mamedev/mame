@@ -22,7 +22,7 @@
 	- all actual sound output (and input)
 	- layouts
 	- S612 analog dials/sliders
-	- disk support (existing MB87013 source needs to be moved out of roland directory)
+	- disk support
 
 ***************************************************************************/
 #include "emu.h"
@@ -38,9 +38,11 @@
 #include "machine/bankdev.h"
 #include "machine/clock.h"
 #include "machine/gen_latch.h"
+#include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/i8279.h"
 #include "machine/input_merger.h"
+#include "machine/mb87013.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "video/hd44780.h"
@@ -258,7 +260,7 @@ void s612_state::common_map(address_map &map)
 void s700_state::common_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("maincpu", 0);
-	// 4Axx: disk interface
+	map(0x4a00, 0x4aff).rw("qdc", FUNC(mb87013_device::read), FUNC(mb87013_device::write));
 	map(0x4b00, 0x4bff).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x4c00, 0x4cff).portr("ENCDR");
 	// 4Dxx: envelope/mute control (A4..6 = address, A0 = strobe, D0..7 = data)
@@ -441,6 +443,20 @@ void s700_state::s700(machine_config &config)
 	auto &kdc(I8279(config, "kdc", 16_MHz_XTAL / 8));
 	kdc.out_sl_callback().set(FUNC(s700_state::sl_w));
 	kdc.in_rl_callback().set(FUNC(s700_state::rl_r));
+
+	auto &i8251(I8251(config, "i8251", 16_MHz_XTAL / 4));
+	i8251.write_cts(0);
+
+	auto &qdc(MB87013(config, "qdc", 6.5_MHz_XTAL));
+	qdc.sio_rd_callback().set(i8251, FUNC(i8251_device::read));
+	qdc.sio_wr_callback().set(i8251, FUNC(i8251_device::write));
+	qdc.txc_callback().set(i8251, FUNC(i8251_device::write_txc));
+	qdc.rxc_callback().set(i8251, FUNC(i8251_device::write_rxc));
+	qdc.rxd_callback().set(i8251, FUNC(i8251_device::write_rxd));
+	qdc.dsr_callback().set(i8251, FUNC(i8251_device::write_dsr));
+	qdc.op4_callback().set(qdc, FUNC(mb87013_device::rts_w));
+	i8251.dtr_handler().set(qdc, FUNC(mb87013_device::dtr_w));
+	i8251.txd_handler().set(qdc, FUNC(mb87013_device::txd_w));
 
 	// LCD
 	HD44780(config, m_lcdc, 270'000); // TODO: type and clock both guessed
