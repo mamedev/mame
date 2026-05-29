@@ -393,7 +393,7 @@ rgb_t ppu2c0x_device::nespal_to_RGB(int color_intensity, int color_num, int colo
 
 	default:
 		sat = tint;
-		rad = M_PI * ((color_num * 30 + hue) / 180.0);
+		rad = DEGREE_TO_RADIAN(double(color_num * 30 + hue));
 		y = brightness[1][color_intensity];
 		break;
 	}

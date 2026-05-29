@@ -1429,11 +1429,12 @@ attotime specnext_state::copper_until_pos_r(u16 pos)
 	}
 	else
 	{
-		if (BIT(pos, 15))  // MOVE
+		const u16 ula_min_hactive = m_video_timings.int_h;
+		if (BIT(pos, 15))  // WAIT
 		{
 			u16 vtarget = cvc_to_vpos(vcount);
-			u16 htarget = ((hcount/* + 12*/) + m_video_timings.min_hactive + m_video_timings.max_hc) %  m_video_timings.max_hc;
-			if (htarget < (m_video_timings.min_hactive))
+			u16 htarget = ((hcount + 12 + ula_min_hactive + m_video_timings.max_hc) %  m_video_timings.max_hc);
+			if (htarget < (ula_min_hactive))
 				vtarget = (vtarget + 1) % m_screen->height();
 			htarget <<= 1;
 			const u16 vpos = m_screen->vpos();
@@ -1451,7 +1452,7 @@ attotime specnext_state::copper_until_pos_r(u16 pos)
 		{
 			assert(!vcount && !hcount);
 			LOGCOPPER("[%s] FRAME (0, 0)\n", m_copper->tag());
-			return m_screen->time_until_pos(cvc_to_vpos(0), m_video_timings.min_hactive << 1);
+			return m_screen->time_until_pos(cvc_to_vpos(0), ula_min_hactive << 1);
 		}
 	}
 }

@@ -97,6 +97,8 @@ Example:
 #include "sound/va_eg.h"
 #include "speaker.h"
 
+#include <numbers>
+
 #include "linn_linndrum.lh"
 
 #define LOG_KEYBOARD         (1U << 1)
@@ -1139,7 +1141,7 @@ void linndrum_audio_device::update_volume_and_pan(int channel)
 			// HPF transfer function: H(s) = (g * s) / (s + w) where
 			//   g = C1 / (C1 + C2)
 			//   w = 1 / (R * (C1 + C2))
-			const float fc = 1.0F / (2 * float(M_PI) * r_voice_gnd * (C_CLICK_DCBLOCK + C_CLICK_WIPER));
+			const float fc = 1.0F / (2 * std::numbers::pi_v<float> * r_voice_gnd * (C_CLICK_DCBLOCK + C_CLICK_WIPER));
 			const float gain = C_CLICK_DCBLOCK / (C_CLICK_DCBLOCK + C_CLICK_WIPER);
 			m_click_bpf->modify(filter_biquad_device::biquad_type::HIGHPASS1P1Z, fc, 1, gain * CLICK_GAIN_CORRECTION);
 			LOGMASKED(LOG_MIX, "- HPF cutoff: %.2f Hz, Gain: %.3f\n", fc, gain);
@@ -1163,7 +1165,7 @@ void linndrum_audio_device::update_volume_and_pan(int channel)
 		// The rest of the voices just have a DC-blocking filter. Its exact cutoff
 		// will depend on the volume and pan settings, but it won't be audible.
 		m_voice_hpf[channel]->filter_rc_set_RC(filter_rc_device::HIGHPASS, r_voice_gnd, 0, 0, C_VOICE);
-		LOGMASKED(LOG_MIX, "- HPF cutoff: %.2f Hz\n", 1.0F / (2 * float(M_PI) * r_voice_gnd * C_VOICE));
+		LOGMASKED(LOG_MIX, "- HPF cutoff: %.2f Hz\n", 1.0F / (2 * std::numbers::pi_v<float> * r_voice_gnd * C_VOICE));
 	}
 }
 

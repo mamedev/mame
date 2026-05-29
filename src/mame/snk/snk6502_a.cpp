@@ -17,9 +17,7 @@
 
 #include "speaker.h"
 
-#ifndef M_LN2
-#define M_LN2       0.69314718055994530942
-#endif
+#include <numbers>
 
 #define TONE_VOLUME 50
 
@@ -163,7 +161,7 @@ void snk6502_sound_device::device_start()
 	set_music_freq(43000);
 
 	// 38.99 Hz update (according to schematic)
-	set_music_clock(M_LN2 * (RES_K(18) * 2 + RES_K(1)) * CAP_U(1));
+	set_music_clock(std::numbers::ln2 * (RES_K(18) * 2 + RES_K(1)) * CAP_U(1));
 
 	m_tone_stream = stream_alloc(0, 1, SAMPLE_RATE);
 
@@ -1101,7 +1099,7 @@ void sasuke_sound_device::device_start()
 
 void sasuke_sound_device::device_reset()
 {
-	m_custom->set_music_clock(M_LN2 * (RES_K(18) + RES_K(1)) * CAP_U(1));
+	m_custom->set_music_clock(std::numbers::ln2 * (RES_K(18) + RES_K(1)) * CAP_U(1));
 
 	// adjusted (measured through audio recording of pcb)
 	m_custom->set_music_freq(35300);

@@ -69,6 +69,8 @@ done, it will load bank 1 program 1.
 
 #include "corestr.h"
 
+#include <numbers>
+
 #include "sequential_prophet5.lh"
 
 #define LOG_SWITCHES    (1U << 1)
@@ -1137,7 +1139,7 @@ void prophet5_voice_device::update_filter_freq_calibration()
 	m_filt_freq_offset->set_scale(scale);
 	m_filt_freq_offset->set_offset(offset);
 
-	const double lpf_freq = 1.0 / (2.0 * M_PI * r_feedback * CAP_U(0.001));
+	const double lpf_freq = 1.0 / (2.0 * std::numbers::pi * r_feedback * CAP_U(0.001));
 	LOGMASKED(LOG_CALIBRATION | LOG_FILTER, "%s: Filter freq CV - LPF freq: %f\n", tag(), lpf_freq);
 	LOGMASKED(LOG_CALIBRATION | LOG_FILTER, "%s: Filter frequency: %f\n", tag(), m_vcf->get_freq());
 }
@@ -2402,7 +2404,7 @@ void prophet5_audio_device::update_voice_volume()
 	// Calculate parameters for the A440 tone's LPF.
 	// The RC values are the same for the parasitic HPF.
 	const double a440_rc_r_eq = RES_2_PARALLEL(R4498, R4519 + a440_r_other);
-	const double a440_rc_freq = 1.0 / (2.0 * M_PI * a440_rc_r_eq * C_A440);
+	const double a440_rc_freq = 1.0 / (2.0 * std::numbers::pi * a440_rc_r_eq * C_A440);
 	m_a440_lpf->filter_rc_set_RC(filter_rc_device::LOWPASS, a440_rc_r_eq, 0, 0, C_A440);
 	m_parasitic_filter->filter_rc_set_RC(filter_rc_device::HIGHPASS, a440_rc_r_eq, 0, 0, C_A440);
 	LOGMASKED(LOG_CALIBRATION, "A440 LPF - Req: %f, freq: %f\n", a440_rc_r_eq, a440_rc_freq);

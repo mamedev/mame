@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "mpeg_audio.h"
 
+#include <numbers>
+
 mpeg_audio::mpeg_audio(const void *base, unsigned int accepted, bool lsb_first, int position_align)
 {
 	m_base = (const uint8_t *)base;
@@ -18,7 +20,7 @@ mpeg_audio::mpeg_audio(const void *base, unsigned int accepted, bool lsb_first, 
 
 	for (int i = 0; i < 32; i++) {
 		for (int j = 0; j < 32; j++)
-			m_cos_cache[i][j] = cos(i*(2 * j + 1) * M_PI / 64);
+			m_cos_cache[i][j] = cos(i*(2 * j + 1) * std::numbers::pi / 64);
 	}
 
 	clear();

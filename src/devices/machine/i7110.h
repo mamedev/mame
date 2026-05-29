@@ -576,7 +576,8 @@ private:
 		S18,
 		S19,
 		S20,
-		S21
+		S21,
+		S22
 	};
 
 	// Commands & sub-commands
@@ -751,6 +752,7 @@ private:
 	void dec_n_pages();
 	uint16_t get_la() const;
 	bool inc_ar();
+	bool check_mbm_change() const;
 	void select_chs();
 	unsigned fsa_n_channels() const;
 	unsigned fsa_1st_ch() const;

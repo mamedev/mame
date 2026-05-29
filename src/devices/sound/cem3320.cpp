@@ -5,6 +5,8 @@
 #include "cem3320.h"
 #include "machine/rescap.h"
 
+#include <numbers>
+
 
 // Parallel combination of the external feedback resistor (recommended value is
 // 100K) and impedance of each gain cell. This affects a lot of calculations.
@@ -20,7 +22,7 @@ cem3320_lpf4_device::cem3320_lpf4_device(const machine_config &mconfig, const ch
 {
 	// See cem3320_lpf4_device::cv_to_freq() for info on these equations.
 	constexpr float AI0 = 0.9F;  // From the datasheet.
-	m_cv2freq = AI0 / (2 * float(M_PI) * R_EQ * float(c_p));
+	m_cv2freq = AI0 / (2 * std::numbers::pi_v<float> * R_EQ * float(c_p));
 	configure_input_gain(R_EQ);
 
 	// The CEM3320 clips at 12V Peak-to-peak. Started with 1/6 (see documentation

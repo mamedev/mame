@@ -207,11 +207,11 @@ uint16_t spg2xx_video_device::video_r(offs_t offset)
 		return m_renderer->get_video_reg_42();
 
 	case 0x62: // Video IRQ Enable
-		LOGMASKED(LOG_IRQS, "video_r: Video IRQ Enable: %04x\n", VIDEO_IRQ_ENABLE);
+		LOGMASKED(LOG_IRQS, "%s: video_r: Video IRQ Enable: %04x\n", machine().describe_context(), VIDEO_IRQ_ENABLE);
 		return VIDEO_IRQ_ENABLE;
 
 	case 0x63: // Video IRQ Status
-		LOGMASKED(LOG_IRQS, "video_r: Video IRQ Status: %04x\n", VIDEO_IRQ_STATUS);
+		LOGMASKED(LOG_IRQS, "%s: video_r: Video IRQ Status: %04x\n", machine().describe_context(), VIDEO_IRQ_STATUS);
 		return VIDEO_IRQ_STATUS;
 
 	default:
@@ -350,6 +350,8 @@ void spg2xx_video_device::video_w(offs_t offset, uint16_t data)
 	case 0x37: // IRQ pos H
 		m_video_regs[offset] = data & 0x01ff;
 		LOGMASKED(LOG_IRQS, "video_w: Video IRQ Position: %04x,%04x (%04x)\n", m_video_regs[0x37], m_video_regs[0x36], 0x2800 | offset);
+		// TODO: some smartvad games set the scanline IRQ to 240 and need it to trigger to progress.
+		// should that be treated as valid, or is it intentionally disabling it for some other reason?
 		if (m_video_regs[0x37] < 160 && m_video_regs[0x36] < 240)
 			m_screenpos_timer->adjust(m_screen->time_until_pos(m_video_regs[0x36], m_video_regs[0x37] << 1));
 		else
@@ -392,7 +394,7 @@ void spg2xx_video_device::video_w(offs_t offset, uint16_t data)
 
 	case 0x62: // Video IRQ Enable
 	{
-		LOGMASKED(LOG_IRQS, "video_w: Video IRQ Enable = %04x (DMA:%d, Timing:%d, Blanking:%d)\n", data, BIT(data, 2), BIT(data, 1), BIT(data, 0));
+		LOGMASKED(LOG_IRQS, "%s: video_w: Video IRQ Enable = %04x (DMA:%d, Timing:%d, Blanking:%d)\n", machine().describe_context(), data, BIT(data, 2), BIT(data, 1), BIT(data, 0));
 		const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
 		VIDEO_IRQ_ENABLE = data & 0x0007;
 		const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);
@@ -403,7 +405,7 @@ void spg2xx_video_device::video_w(offs_t offset, uint16_t data)
 
 	case 0x63: // Video IRQ Acknowledge
 	{
-		LOGMASKED(LOG_IRQS, "video_w: Video IRQ Acknowledge = %04x\n", data);
+		LOGMASKED(LOG_IRQS, "%s: video_w: Video IRQ Acknowledge = %04x\n", machine().describe_context(), data);
 		const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
 		VIDEO_IRQ_STATUS &= ~data;
 		const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);

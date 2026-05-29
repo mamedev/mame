@@ -118,7 +118,7 @@ ROM_START( wwmspot )
 	ROM_REGION( 0x800000, "ymz", 0 ) // is this uploaded?
 	ROM_LOAD( "tc58fvm6t2a.u41", 0x000000, 0x800000, CRC(1ad2bc45) SHA1(5fde1cce603e6566d20da811c9c8bcccb044d4ae) ) // empty. Code uploaded from PCMCIA? Or not used?
 
-	ROM_REGION( 0x80, "pmmcia_eeprom", 0 )
+	ROM_REGION( 0x80, "pcmcia_eeprom", 0 )
 	ROM_LOAD( "br24c01a.u2", 0x00, 0x80, CRC(222d9eec) SHA1(24a1cc415b0786695247caaca012bc51dda5349a) )
 ROM_END
 
@@ -130,7 +130,7 @@ ROM_START( wcwroses )
 	ROM_REGION( 0x800000, "ymz", 0 )
 	ROM_LOAD( "tc58fvt641.u41", 0x000000, 0x800000, CRC(b5384b56) SHA1(d5d93d6bf2ccee51a4f7ecff90b21966b8af6c20) ) // 1xxxxxxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x100, "pmmcia_eeprom", 0 )
+	ROM_REGION( 0x100, "pcmcia_eeprom", 0 )
 	ROM_LOAD( "m24c02w.u2", 0x00, 0x100, CRC(6230ae48) SHA1(c37c9ac6550323e6878481aa3e9932ae21b93f8a) )
 ROM_END
 

@@ -44,6 +44,8 @@
 
 #include "speaker.h"
 
+#include <numbers>
+
 namespace {
 
 #include "bfm_blackbox.lh"
@@ -1887,8 +1889,9 @@ void blackbox_em_21up_state::init_21up()
 {
 	for(int s = 0; s < 477; s++)
 	{
-		double wave = sin((2 * M_PI * 3500.0 * (double)s) / 48000.0);
-		double mod = sin((2 * M_PI * 50.0 * (double)s) / 48000.0);
+		constexpr double PI = std::numbers::pi;
+		double wave = sin((2 * PI * 3500.0 * (double)s) / 48000.0);
+		double mod = sin((2 * PI * 50.0 * (double)s) / 48000.0);
 		m_beep_sample_data[s] = 32767 * wave * mod;
 	}
 }
