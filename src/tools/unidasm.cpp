@@ -225,7 +225,6 @@ using util::BIT;
 #include "cpu/z80/r800dasm.h"
 #include "cpu/z80/z80dasm.h"
 #include "cpu/z8000/8000dasm.h"
-#include "mame/sinclair/next/specnext_copper_dasm.h"
 
 #include "corestr.h"
 #include "ioprocs.h"
@@ -424,7 +423,6 @@ static const dasm_table_entry dasm_table[] =
 	{ "cdp1805",         le,  0, []() -> util::disasm_interface * { return new cosmac_disassembler(cosmac_disassembler::TYPE_1805); } },
 	{ "clipper",         le,  0, []() -> util::disasm_interface * { return new clipper_disassembler; } },
 	{ "coldfire",        be,  0, []() -> util::disasm_interface * { return new m68k_disassembler(m68k_disassembler::TYPE_COLDFIRE); } },
-	{ "specnextcopper",  be,  0, []() -> util::disasm_interface * { return new specnext_copper_disassembler; } },
 	{ "cop410",          le,  0, []() -> util::disasm_interface * { return new cop410_disassembler; } },
 	{ "cop420",          le,  0, []() -> util::disasm_interface * { return new cop420_disassembler; } },
 	{ "cop444",          le,  0, []() -> util::disasm_interface * { return new cop444_disassembler; } },
@@ -633,6 +631,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "sparcv9vis3",     be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v9, sparc_disassembler::vis_3); } },
 	{ "sparcv9vis3b",    be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v9, sparc_disassembler::vis_3b); } },
 	{ "spc700",          le,  0, []() -> util::disasm_interface * { return new spc700_disassembler; } },
+	//{ "specnextcopper",  be,  0, []() -> util::disasm_interface * { return new specnext_copper_disassembler; } },
 	{ "ssem",            le,  0, []() -> util::disasm_interface * { return new ssem_disassembler; } },
 	{ "ssp1601",         be, -1, []() -> util::disasm_interface * { return new ssp1601_disassembler; } },
 	{ "st62xx",          le,  0, []() -> util::disasm_interface * { return new st62xx_disassembler; } },
