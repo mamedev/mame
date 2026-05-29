@@ -43768,7 +43768,6 @@ ljian
 lzhudie
 msaiche
 panda2
-pkzw
 qiandd
 tzwang
 xmifeng
@@ -43934,6 +43933,9 @@ orinasp
 @source:skeleton/p8k.cpp
 p8000
 p8000_16
+
+@source:skeleton/pkzw.cpp
+pkzw
 
 @source:skeleton/paipaile.cpp
 paipail3
