@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    votrax.c
+    votrax.cpp
 
     Votrax SC01A simulation
 
@@ -24,6 +24,8 @@ tp1 = phi clock (tied to f2q rom access)
 
 #include "emu.h"
 #include "votrax.h"
+
+#include <numbers>
 
 #define LOG_PHONE  (1U << 1)
 #define LOG_COMMIT (1U << 2)
