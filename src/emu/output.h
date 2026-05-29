@@ -171,9 +171,9 @@ public:
 
 	public:
 		template <typename... T>
-		output_finder(device_t &device, std::string &&format, T &&... start_args)
+		output_finder(device_t &device, std::string_view format, T &&... start_args)
 			: m_device(device)
-			, m_spec(format_spec{ std::move(format), { std::forward<T>(start_args)... } })
+			, m_spec(format_spec{ format, { std::forward<T>(start_args)... } })
 			, m_resolver(&output_finder::resolve_format)
 		{
 			static_assert(sizeof...(N) == sizeof...(T));
