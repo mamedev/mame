@@ -13,6 +13,21 @@ class nscsi_dtc510_device : public nscsi_harddisk_device
 public:
 	nscsi_dtc510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// Optional, driver-supplied seek-timing model.  With no call the device keeps its
+	// legacy flat per-command delay, so existing users (e.g. pc9801_27) are unchanged.
+	// Arguments: the drive's published seek times in microseconds (track-to-track,
+	// average, full-stroke), spindle speed (RPM), and the format's sector interleave.
+	//
+	// Example -- a CDC 9410 "Finch": 3600 RPM; ~5 ms track-to-track (datasheet quotes
+	// 10 ms maximum), 50 ms average and 100 ms full-stroke seek; media formatted 2:1
+	// interleave.  A driver configures it once the controller is attached at a slot,
+	// e.g. from machine_start():
+	//
+	//     if (auto *dtc = dynamic_cast<nscsi_dtc510_device *>(subdevice("sasi:0:dtc510")))
+	//         dtc->set_seek_timing(5000, 50000, 100000, 3600, 2);
+	//
+	void set_seek_timing(uint32_t track_us, uint32_t average_us, uint32_t full_us, uint32_t rpm, uint8_t interleave);
+
 protected:
 	// SCSI status returns
 	enum {
@@ -105,7 +120,16 @@ protected:
 	virtual attotime scsi_data_command_delay() override;
 
 	uint8_t m_param[10];
-	//u32 m_seek;
+
+	// Seek-timing model state (set by set_seek_timing(); when m_seek_model is false
+	// the device uses the legacy flat per-command delay).
+	bool     m_seek_model = false;
+	int      m_last_cylinder = -1;   // current head cylinder (-1 = unknown)
+	uint8_t  m_interleave = 1;       // sector interleave (1 = 1:1)
+	uint32_t m_rpm = 3600;           // spindle speed -> rotational latency
+	uint32_t m_seek_track_us = 0;    // track-to-track seek time
+	uint32_t m_seek_range_us = 0;    // full-stroke minus track-to-track
+	double   m_seek_exp = 1.0;       // seek(d) = track + range*(d/ncyl)^exp
 };
 
 DECLARE_DEVICE_TYPE(NSCSI_DTC510, nscsi_dtc510_device)

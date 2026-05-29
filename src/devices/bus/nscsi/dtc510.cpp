@@ -23,11 +23,13 @@ References:
 
 #include "multibyte.h"
 
+#include <cmath>
+
 #define LOG_COMMAND (1U << 1) // raw for now
 //#define LOG_DATA    (1U << 2)
 #define LOG_C2      (1U << 3) // log assign parameter data
 
-#define VERBOSE (LOG_GENERAL | LOG_COMMAND)
+#define VERBOSE (0)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
@@ -47,6 +49,21 @@ nscsi_dtc510_device::nscsi_dtc510_device(const machine_config &mconfig, const ch
 void nscsi_dtc510_device::device_reset()
 {
 	nscsi_harddisk_device::device_reset();
+	m_last_cylinder = -1;
+}
+
+void nscsi_dtc510_device::set_seek_timing(uint32_t track_us, uint32_t average_us, uint32_t full_us, uint32_t rpm, uint8_t interleave)
+{
+	m_seek_track_us = track_us;
+	m_seek_range_us = (full_us > track_us) ? (full_us - track_us) : 0;
+	m_rpm           = rpm ? rpm : 3600;
+	m_interleave    = interleave ? interleave : 1;
+	// Fit seek(d) = track + range * (d/ncyl)^exp so an average-length seek (~1/3 of
+	// full stroke) costs average_us.
+	const double num = double(average_us) - double(track_us);
+	const double den = double(full_us)    - double(track_us);
+	m_seek_exp = (num > 0.0 && den > 0.0) ? std::log(num / den) / std::log(1.0 / 3.0) : 1.0;
+	m_seek_model = true;
 }
 
 bool nscsi_dtc510_device::scsi_command_done(uint8_t command, uint8_t length)
@@ -94,6 +111,7 @@ void nscsi_dtc510_device::scsi_command()
 			m_scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 		} else {
 			// lba = 0;
+			m_last_cylinder = 0;   // recalibrate returns the heads to track 0
 			scsi_status_complete(SS_GOOD);
 		}
 		break;
@@ -253,7 +271,7 @@ attotime nscsi_dtc510_device::scsi_data_byte_period()
 	return attotime::from_nsec(1100);
 }
 
-// Command execution delay
+// Command execution delay.
 attotime nscsi_dtc510_device::scsi_data_command_delay()
 {
 	switch(m_scsi_cmdbuf[0]) {
@@ -262,8 +280,42 @@ attotime nscsi_dtc510_device::scsi_data_command_delay()
 	case SC_SEEK:
 	case SC_ASSIGN_ALT_TRACK:
 	case SC_RETENTION:
-		// average seek time of NEC D5126A hard disk
-		return attotime::from_msec(85);
+		// Legacy default (unchanged unless a driver calls set_seek_timing()): a flat
+		// average-seek delay charged on every command.
+		if (!m_seek_model)
+			return attotime::from_msec(85);
+		else
+		{
+			// A real drive seeks only when the target cylinder changes; sequential I/O on
+			// one cylinder pays only rotational latency, scaled by the format interleave.
+			// Track the head cylinder and bill streaming or a real seek accordingly.
+			u32 spt = 1, spc = 1, ncyl = 1;
+			if (image->exists())
+			{
+				const auto &info = image->get_info();
+				spt  = info.sectors ? info.sectors : 1;          // sectors per track
+				spc  = info.heads * spt;  if (!spc)  spc  = 1;   // sectors per cylinder
+				ncyl = info.cylinders ? info.cylinders : 1;
+			}
+			const int target = int((get_u24be(&m_scsi_cmdbuf[1]) & 0x1fffff) / spc);
+			const int dist = (m_last_cylinder < 0) ? int(ncyl)
+				: (target > m_last_cylinder ? target - m_last_cylinder
+							  : m_last_cylinder - target);
+			m_last_cylinder = target;
+
+			const u32 rev_us = 60u * 1000000u / m_rpm;   // one revolution
+			u32 us;
+			if (dist == 0)
+				// Same cylinder: consecutive logical sectors arrive after the interleave
+				// gap (interleave revolutions to read one track of spt sectors).
+				us = (rev_us * m_interleave) / spt;
+			else
+				// Cylinder change: ~half a revolution rotational latency + a distance-
+				// scaled seek between the track-to-track and full-stroke times.
+				us = rev_us / 2 + m_seek_track_us
+					+ u32(double(m_seek_range_us) * std::pow(double(dist) / double(ncyl), m_seek_exp));
+			return attotime::from_usec(us);
+		}
 
 	default:
 		return attotime::zero;
