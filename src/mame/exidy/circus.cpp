@@ -44,7 +44,7 @@ Trapeze and Rip Cord are very picky about initial RAM contents.
 Trapeze locks up generating random numbers if both 0x0e and 0x0f are zero. Rip
 Cord can have minor issues like tile glitches, or the parachutist refusing to
 jump during attract mode. Or it can get very confused (eg. filling RAM with 0x55).
-The current fill value(s) of 0x00, 0xf0 works around both issues.
+The current fill pattern of 0x00, 0xf0 works around both issues.
 
 On Circus and Robot Bowl, it affects attract mode main character initial position.
 
