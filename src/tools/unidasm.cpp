@@ -225,6 +225,7 @@ using util::BIT;
 #include "cpu/z80/r800dasm.h"
 #include "cpu/z80/z80dasm.h"
 #include "cpu/z8000/8000dasm.h"
+#include "mame/sinclair/next/specnext_copper_dasm.h"
 
 #include "corestr.h"
 #include "ioprocs.h"
@@ -423,6 +424,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "cdp1805",         le,  0, []() -> util::disasm_interface * { return new cosmac_disassembler(cosmac_disassembler::TYPE_1805); } },
 	{ "clipper",         le,  0, []() -> util::disasm_interface * { return new clipper_disassembler; } },
 	{ "coldfire",        be,  0, []() -> util::disasm_interface * { return new m68k_disassembler(m68k_disassembler::TYPE_COLDFIRE); } },
+	{ "specnextcopper",  be,  0, []() -> util::disasm_interface * { return new specnext_copper_disassembler; } },
 	{ "cop410",          le,  0, []() -> util::disasm_interface * { return new cop410_disassembler; } },
 	{ "cop420",          le,  0, []() -> util::disasm_interface * { return new cop420_disassembler; } },
 	{ "cop444",          le,  0, []() -> util::disasm_interface * { return new cop444_disassembler; } },

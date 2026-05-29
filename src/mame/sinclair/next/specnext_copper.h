@@ -5,7 +5,7 @@
 
 #pragma once
 
-class specnext_copper_device : public device_t
+class specnext_copper_device : public device_t, public device_memory_interface, public device_disasm_interface
 {
 
 public:
@@ -23,13 +23,19 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	virtual space_config_vector memory_space_config() const override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
 	TIMER_CALLBACK_MEMBER(timer_callback);
 	TIMER_CALLBACK_MEMBER(frame_timer_callback);
 
+	address_space_config m_space_config;
 	emu_timer *m_timer;
 	emu_timer *m_frame_timer;
 
 private:
+	void copper_map(address_map &map) ATTR_COLD;
+
 	memory_share_creator<u8> m_listram;
 
 	devcb_write8 m_out_nextreg_cb;
