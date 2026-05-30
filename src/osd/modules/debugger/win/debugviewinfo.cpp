@@ -300,7 +300,6 @@ HWND debugview_info::create_source_combobox(HWND parent, LONG_PTR userdata)
 	return result;
 }
 
-
 void debugview_info::restore_configuration_from_node(util::xml::data_node const &node)
 {
 	if (m_view->cursor_supported())
@@ -572,9 +571,23 @@ void debugview_info::draw_contents(HDC windc)
 				}
 
 				// add this character to the buffer
-				if (count < buffer_size)
-					buffer[count] = viewdata[col].byte;
-				count++;
+				if (viewdata[col].byte == '\t')
+				{
+					if (count + 4 < buffer_size)
+					{
+						for (int space_num = 0; space_num < 4; space_num++)
+						{
+							buffer[count++] = L' ';
+						}
+					}
+				}
+				else
+				{
+					if (count < buffer_size)
+					{
+						buffer[count++] = viewdata[col].byte;
+					}
+				}
 			}
 
 			// flush any remaining stuff

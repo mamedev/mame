@@ -15,6 +15,7 @@
 #include "debug/debugcmd.h"
 #include "debug/debugcon.h"
 #include "debug/debugvw.h"
+#include "debug/srcdbg_provider.h"
 #include <cctype>
 
 /***************************************************************************
@@ -64,6 +65,7 @@ debugger_manager::debugger_manager(running_machine &machine)
 	/* initialize the submodules */
 	m_cpu = std::make_unique<debugger_cpu>(machine);
 	m_console = std::make_unique<debugger_console>(machine);
+	m_debug_info = load_debug_info(machine);
 	m_commands = std::make_unique<debugger_commands>(machine, cpu(), console());
 
 	g_machine = &machine;
@@ -85,6 +87,18 @@ debugger_manager::~debugger_manager()
 {
 	g_machine = nullptr;
 }
+
+
+/*-------------------------------------------------
+    load_debug_info - load the source-level
+    debugging information file if enabled
+-------------------------------------------------*/
+
+std::unique_ptr<srcdbg_provider_base> debugger_manager::load_debug_info(running_machine &machine)
+{
+	return srcdbg_provider_base::create_debug_info(machine);
+}
+
 
 /*-------------------------------------------------
     refresh_display - redraw the current
