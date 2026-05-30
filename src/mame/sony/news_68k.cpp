@@ -889,7 +889,7 @@ void news_68k_laptop_state::nws1250(machine_config &config)
 
 static INPUT_PORTS_START(nws12x0)
 	PORT_START("SW1")
-	PORT_DIPNAME(0x07, 0x02, "Display") PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME(0x07, 0x05, "Display") PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(0x07, "Console")
 	PORT_DIPSETTING(0x05, "LCD")
 	PORT_DIPSETTING(0x00, "Autoselect")
