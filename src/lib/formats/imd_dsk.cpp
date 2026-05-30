@@ -650,6 +650,53 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				delete [] sects[i].data;
 	}
 
+	// Tag the image with form-factor + variant.  Without this the floppy_image
+	// keeps FF_UNKNOWN/variant=0, which propagates to any subsequent save
+	// (e.g. MFI) and to MAME runtime code that uses the form factor to pick
+	// rotation rate / cell timing.  When the caller passed FF_UNKNOWN (e.g.
+	// floptool's auto-detect) we infer everything from the parsed geometry;
+	// when the caller passed a real form factor we keep theirs and only deduce
+	// the variant.
+	uint32_t img_form = form_factor;
+	if (img_form == floppy_image::FF_UNKNOWN) {
+		if (maxtrack >= 75 && maxtrack <= 78)
+			img_form = floppy_image::FF_8;       // 77-track 8"
+		else if (maxtrack <= 42)
+			img_form = floppy_image::FF_525;     // 40-track 5.25"
+		else
+			img_form = floppy_image::FF_525;     // 80-track: ambiguous 5.25" vs 3.5"; prefer 525 (IMD-era PC default)
+	}
+
+	bool any_mfm = false;
+	bool any_500kbps = false;
+	for (uint8_t m : mode) {
+		if (m >= 3) any_mfm = true;
+		if (m == 0 || m == 3) any_500kbps = true;
+	}
+	uint8_t maxhead = 0;
+	for (uint8_t h : head)
+		if ((h & 0x3f) > maxhead)
+			maxhead = h & 0x3f;
+	const bool ds = (maxhead >= 1);
+
+	uint32_t img_variant;
+	if (img_form == floppy_image::FF_8) {
+		img_variant = any_mfm ? (ds ? floppy_image::DSDD : floppy_image::SSDD)
+		                      : (ds ? floppy_image::DSSD : floppy_image::SSSD);
+	} else if (img_form == floppy_image::FF_525 || img_form == floppy_image::FF_35) {
+		if (any_500kbps && any_mfm)
+			img_variant = floppy_image::DSHD;
+		else if (any_mfm)
+			img_variant = ds ? (maxtrack > 42 ? floppy_image::DSQD : floppy_image::DSDD)
+			                 : floppy_image::SSDD;
+		else
+			img_variant = ds ? floppy_image::DSSD : floppy_image::SSSD;
+	} else {
+		img_variant = any_mfm ? (ds ? floppy_image::DSDD : floppy_image::SSDD)
+		                      : (ds ? floppy_image::DSSD : floppy_image::SSSD);
+	}
+	image.set_form_variant(img_form, img_variant);
+
 	return true;
 }
 
@@ -895,12 +942,31 @@ bool imd_format::detect_track(const floppy_image &image, int cyl, int head,
 							  track_info &out) const
 {
 	// (encoding, cell_size_ns, IMD mode byte)
+	// cell_size is in MAME's internal flux representation: 200,000,000 ns
+	// canonical per revolution / cells_per_revolution.  So a given media rate
+	// needs *different* probe cell_sizes for 300 RPM vs 360 RPM disks:
+	//   300 RPM, MFM 500 kbps: 200M / 200000 = 1000 ns/cell  (5.25" HD, 3.5" HD)
+	//   360 RPM, MFM 500 kbps: 200M / 166666 = 1200 ns/cell  (8" DSDD/SSDD)
+	//   300 RPM, MFM 250 kbps: 200M / 100000 = 2000 ns/cell  (5.25" DD, 3.5" DD)
+	//   360 RPM, MFM 250 kbps: 200M /  83333 = 2400 ns/cell  (8" rare)
+	//   300 RPM, FM  500 kbps: 200M / 100000 = 2000 ns/cell
+	//   360 RPM, FM  500 kbps: 200M /  83333 = 2400 ns/cell  (8" SSSD)
+	//   300 RPM, FM  250 kbps: 200M /  50000 = 4000 ns/cell  (5.25" SD; T-200/250)
+	//   360 RPM, FM  250 kbps: 200M /  41666 = 4800 ns/cell  (8" rare)
+	// Without the 360 RPM variants, MAME-loaded 8" MFM disks save as empty IMD
+	// records because the PLL's ~25% lock tolerance is overrun by the 20%
+	// cell-size mismatch (1200 vs 1000) -- the 5.25" probe scores zero sectors
+	// and detect_track returns "mode 3 with no sectors".
 	struct probe { bool is_mfm; int cell_size; uint8_t mode; };
 	static const probe probes[] = {
-		{ true,  1000, 3 },   // MFM 500 kbps  (8" DD, 5.25" HD, 3.5" HD)
-		{ true,  2000, 5 },   // MFM 250 kbps  (5.25" DD, 3.5" DD)
-		{ false, 2000, 0 },   // FM  500 kbps  (rare)
-		{ false, 4000, 2 },   // FM  250 kbps  (5.25" SD; Toshiba T-200/250 boot)
+		{ true,  1000, 3 },   // MFM 500 kbps @ 300 RPM (5.25" HD, 3.5" HD)
+		{ true,  1200, 3 },   // MFM 500 kbps @ 360 RPM (8" DSDD/SSDD)
+		{ true,  2000, 5 },   // MFM 250 kbps @ 300 RPM (5.25" DD, 3.5" DD)
+		{ true,  2400, 5 },   // MFM 250 kbps @ 360 RPM (8")
+		{ false, 2000, 0 },   // FM  500 kbps @ 300 RPM
+		{ false, 2400, 0 },   // FM  500 kbps @ 360 RPM (8" SSSD)
+		{ false, 4000, 2 },   // FM  250 kbps @ 300 RPM (5.25" SD; T-200/250 boot)
+		{ false, 4800, 2 },   // FM  250 kbps @ 360 RPM (8")
 	};
 
 	int best_score = -1;
