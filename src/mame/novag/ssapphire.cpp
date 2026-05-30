@@ -34,17 +34,17 @@ TODO:
 
 namespace {
 
-class ssaphire_state : public driver_device
+class ssapphire_state : public driver_device
 {
 public:
-	ssaphire_state(const machine_config &mconfig, device_type type, const char *tag) :
+	ssapphire_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
 		m_rs232(*this, "rs232")
 	{ }
 
-	void ssaphire(machine_config &config);
+	void ssapphire(machine_config &config);
 
 private:
 	// devices/pointers
@@ -61,7 +61,7 @@ private:
     Address Maps
 *******************************************************************************/
 
-void ssaphire_state::main_map(address_map &map)
+void ssapphire_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x400000, 0x43ffff).ram().share("nvram");
@@ -73,7 +73,7 @@ void ssaphire_state::main_map(address_map &map)
     Input Ports
 *******************************************************************************/
 
-static INPUT_PORTS_START( ssaphire )
+static INPUT_PORTS_START( ssapphire )
 INPUT_PORTS_END
 
 
@@ -82,11 +82,11 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-void ssaphire_state::ssaphire(machine_config &config)
+void ssapphire_state::ssapphire(machine_config &config)
 {
 	// basic machine hardware
 	H8S2312(config, m_maincpu, 25_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ssaphire_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssapphire_state::main_map);
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(h8s2312_device::nvram_set_battery));
 	m_maincpu->write_sci_tx<1>().set(m_rs232, FUNC(rs232_port_device::write_txd));
@@ -110,7 +110,7 @@ void ssaphire_state::ssaphire(machine_config &config)
     ROM Definitions
 *******************************************************************************/
 
-ROM_START( ssaphire ) // ID = H8S/SS V1.01
+ROM_START( ssapphire ) // ID = H8S/SS V1.01
 	ROM_REGION16_BE( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP("39vf400a.ic6", 0x00000, 0x80000, CRC(3854c8cb) SHA1(7cbf0d186dda6d1ea408423b8f185136cca0b291) )
 
@@ -126,5 +126,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 2003, ssaphire, 0,      0,      ssaphire, ssaphire, ssaphire_state, empty_init, "Perfect Technology / Intelligent Heuristic Programming", "Star Sapphire", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
+SYST( 2003, ssapphire, 0,      0,      ssapphire, ssapphire, ssapphire_state, empty_init, "Perfect Technology / Intelligent Heuristic Programming", "Star Sapphire", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
