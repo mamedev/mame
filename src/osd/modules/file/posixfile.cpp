@@ -425,13 +425,6 @@ std::error_condition osd_get_full_path(std::string &dst, std::string const &path
 			dst = canonical.get();
 			return std::error_condition();
 		}
-
-		std::vector<char> path_buffer(PATH_MAX);
-		if (::realpath(path.c_str(), &path_buffer[0]))
-		{
-			dst = &path_buffer[0];
-			return std::error_condition();
-		}
 		else if (path[0] == PATHSEPCH)
 		{
 			dst = path;
@@ -439,6 +432,7 @@ std::error_condition osd_get_full_path(std::string &dst, std::string const &path
 		}
 		else
 		{
+			std::vector<char> path_buffer(128);
 			while (!::getcwd(&path_buffer[0], path_buffer.size()))
 			{
 				if (errno != ERANGE)
