@@ -226,6 +226,7 @@ TODO:
 #include "cpu/nec/nec.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
+#include "machine/nvram.h"
 #include "machine/output_latch.h"
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
@@ -249,6 +250,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "v20hl")
 		, m_rtc(*this, "rtc")
+		, m_nvram(*this, "nvram")
 		, m_upd71051(*this, "upd71051")
 		, m_usart_clock(*this, "usart_clock")
 		, m_centronics(*this, "centronics")
@@ -332,6 +334,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<rp5c01_device> m_rtc;
+	required_device<nvram_device> m_nvram;
 	required_device<i8251_device> m_upd71051;
 	required_device<clock_device> m_usart_clock;
 	required_device<centronics_device> m_centronics;
@@ -786,6 +789,7 @@ void nakajies_state::machine_start()
 	u32 rom_size = m_rom_region->bytes();
 
 	m_ram_base = make_unique_clear<uint8_t[]>(m_ram_size);
+	m_nvram->set_base(m_ram_base.get(), m_ram_size);
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -960,6 +964,7 @@ void nakajies_state::nakajies210(machine_config &config)
 
 	/* rtc */
 	RP5C01(config, m_rtc, XTAL(32'768));
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// NEC uPD71051-compatible USART.
 	I8251(config, m_upd71051, 0);
