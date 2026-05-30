@@ -5,7 +5,7 @@
 	Akai S612, S700, X7000 samplers
 
 	These early Akai samplers share a 6-voice sound hardware design based around
-	two 8253 (or 8254) timers each clocking an 8237 DMA controller into three 12-bit DACs.
+	two 8253 (or 8254) timers each clocking an 8237 DMA controller into a 12-bit DAC.
 	Two more 8253s also clock a total of six MF6CN-50 lowpass filter ICs (one per voice).
 	The S700 and X7000 expand the sampling capacity via bank switching.
 
@@ -393,8 +393,8 @@ void s612_state::s612(machine_config &config)
 	base_config(config, false);
 	m_maincpu->set_addrmap(AS_IO, &s612_state::io_map);
 
-	// sample memory: 12-bit x 64k x 1 bank
-	m_ram->set_default_size("128K");
+	// sample memory: 12-bit x 32k x 1 bank
+	m_ram->set_default_size("64K");
 
 	PET_DATASSETTE_PORT(config, m_cass, cbm_datassette_devices, "c1530");
 
