@@ -249,6 +249,7 @@ public:
 	nakajies_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "v20hl")
+		, m_screen(*this, "screen")
 		, m_rtc(*this, "rtc")
 		, m_nvram(*this, "nvram")
 		, m_upd71051(*this, "upd71051")
@@ -277,7 +278,7 @@ public:
 	void dator3k(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(retained_reset);
+	DECLARE_INPUT_CHANGED_MEMBER(power_button);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -292,6 +293,8 @@ private:
 	void irq_clear_w(u8 data);
 	u8 irq_enable_r();
 	void irq_enable_w(u8 data);
+	void keyboard_control_w(u8 data);
+	void power_control_w(u8 data);
 	u8 unk_a0_r();
 	void lcd_memory_start_w(u8 data);
 	u8 keyboard_r();
@@ -333,6 +336,7 @@ private:
 	void nakajies_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<rp5c01_device> m_rtc;
 	required_device<nvram_device> m_nvram;
 	required_device<i8251_device> m_upd71051;
@@ -352,6 +356,8 @@ private:
 	u8 m_irq_enabled = 0;
 	u8 m_irq_active = 0;
 	u8 m_lcd_memory_start = 0;
+	u8 m_lcd_enabled = 1;
+	u8 m_keyboard_control = 0xff;
 	u8 m_matrix = 0;
 	u8 m_control = 0;
 	u8 m_buzzer_low = 0;
@@ -391,9 +397,10 @@ void nakajies_state::nakajies_map(address_map &map)
 
 void nakajies_state::nakajies_update_irqs()
 {
-	// Hack: IRQ mask is temporarily disabled because it doesn't allow the IRQ vectors 0xFA
-	// and 0xFB that are used for scanning the kb, this need further investigation.
-	uint8_t irq = m_irq_active; // & m_irq_enabled;
+	// Port 0x60 is an active-low source mask, but its bit order is opposite the
+	// port 0x90 source/clear latch used by m_irq_active: port 0x60 bit 0 masks
+	// vector F8, while m_irq_active bit 7 represents vector F8.
+	uint8_t irq = m_irq_active & ~bitswap<8>(m_irq_enabled, 0, 1, 2, 3, 4, 5, 6, 7);
 	uint8_t vector = 0xff;
 
 	if (LOG)
@@ -447,6 +454,34 @@ void nakajies_state::irq_enable_w(u8 data)
 {
 	m_irq_enabled = data;
 	nakajies_update_irqs();
+}
+
+
+void nakajies_state::keyboard_control_w(u8 data)
+{
+	// Bit 0 appears to hold/release the external row-scan counter.  The
+	// firmware pulses FE->FF when starting a scan and writes FE after repeated
+	// empty scans, switching back to the scan-cycle IRQ source.
+	const bool was_enabled = BIT(m_keyboard_control, 0);
+	const bool enabled = BIT(data, 0);
+
+	m_keyboard_control = data;
+
+	if (!enabled || !was_enabled)
+		m_matrix = 0;
+}
+
+
+void nakajies_state::power_control_w(u8 data)
+{
+	// Firmware writes 0x01 here immediately before entering the retained
+	// power-off loop.  The screen update path shows an emulator status message.
+	if (BIT(data, 0))
+	{
+		m_lcd_enabled = 0;
+		m_screen->set_brightness(0xa6);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	}
 }
 
 
@@ -623,6 +658,8 @@ void nakajies_state::nakajies_io_map(address_map &map)
 	map(0x0052, 0x0052).w(FUNC(nakajies_state::buzzer_gate_w));
 	map(0x0053, 0x0053).w(FUNC(nakajies_state::timer_count_w));
 	map(0x0060, 0x0060).rw(FUNC(nakajies_state::irq_enable_r), FUNC(nakajies_state::irq_enable_w));
+	map(0x0061, 0x0061).w(FUNC(nakajies_state::keyboard_control_w));
+	map(0x0070, 0x0070).w(FUNC(nakajies_state::power_control_w));
 	map(0x0090, 0x0090).rw(FUNC(nakajies_state::irq_clear_r), FUNC(nakajies_state::irq_clear_w));
 	map(0x00a0, 0x00a0).r(FUNC(nakajies_state::unk_a0_r));
 	map(0x00b0, 0x00b0).r(FUNC(nakajies_state::keyboard_r));
@@ -638,18 +675,25 @@ INPUT_CHANGED_MEMBER(nakajies_state::trigger_irq)
 }
 
 
-INPUT_CHANGED_MEMBER(nakajies_state::retained_reset)
+INPUT_CHANGED_MEMBER(nakajies_state::power_button)
 {
 	if (!newval)
 		return;
 
-	machine().schedule_soft_reset();
+	if (m_lcd_enabled)
+		set_irq(0x01); // IRQ vector 0xff: warm/power-management source.
+	else
+	{
+		m_screen->set_brightness(0xff);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		machine().schedule_soft_reset();
+	}
 }
 
 
 static INPUT_PORTS_START(nakajies)
-	PORT_START("WAKE")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME) PORT_NAME("Retained Reset/Wake") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::retained_reset), 0)
+	PORT_START("POWER")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME) PORT_NAME("Power") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::power_button), 0)
 
 	PORT_START("STATUS")
 	PORT_BIT(0x21, IP_ACTIVE_HIGH, IPT_UNKNOWN)
@@ -680,7 +724,7 @@ static INPUT_PORTS_START(nakajies)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5) PORT_NAME("irq 0xfb") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6) PORT_NAME("irq 0xfa") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7) PORT_NAME("irq 0xf9") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8) PORT_NAME("irq 0xf8") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("irq 0xf8") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
 
 	PORT_START("ROW0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")  PORT_CODE(KEYCODE_LSHIFT)
@@ -807,6 +851,8 @@ void nakajies_state::machine_start()
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_irq_active));
 	save_item(NAME(m_lcd_memory_start));
+	save_item(NAME(m_lcd_enabled));
+	save_item(NAME(m_keyboard_control));
 	save_item(NAME(m_matrix));
 	save_item(NAME(m_control));
 	save_item(NAME(m_buzzer_low));
@@ -821,10 +867,13 @@ void nakajies_state::machine_start()
 
 void nakajies_state::machine_reset()
 {
-	m_irq_enabled = 0;
+	m_irq_enabled = m_ram_base[0x6d4f];
 	m_irq_active = 0;
 	m_lcd_memory_start = 0;
-	m_matrix = 0;
+	m_lcd_enabled = 1;
+	m_screen->set_brightness(0xff);
+	m_keyboard_control = BIT(m_irq_enabled, 3) ? 0xfe : 0xff;
+	m_matrix = (BIT(m_keyboard_control, 0) && (m_ram_base[0x6d29] <= 0x09)) ? m_ram_base[0x6d29] : 0;
 	m_control = 0;
 	m_buzzer_low = 0;
 	m_buzzer_high = 0;
@@ -846,6 +895,53 @@ void nakajies_state::machine_reset()
 
 u32 nakajies_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	if (!m_lcd_enabled)
+	{
+		bitmap.fill(0, cliprect);
+
+		static constexpr char message[] = "POWERED OFF";
+		static constexpr u8 glyphs[8][7] =
+		{
+			{ 0x1e, 0x11, 0x11, 0x1e, 0x10, 0x10, 0x10 }, // P
+			{ 0x0e, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0e }, // O
+			{ 0x11, 0x11, 0x11, 0x15, 0x15, 0x15, 0x0a }, // W
+			{ 0x1f, 0x10, 0x10, 0x1e, 0x10, 0x10, 0x1f }, // E
+			{ 0x1e, 0x11, 0x11, 0x1e, 0x14, 0x12, 0x11 }, // R
+			{ 0x1e, 0x11, 0x11, 0x11, 0x11, 0x11, 0x1e }, // D
+			{ 0x1f, 0x10, 0x10, 0x1e, 0x10, 0x10, 0x10 }, // F
+			{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }  // space
+		};
+
+		constexpr int scale = 2;
+		constexpr int glyph_width = 5;
+		constexpr int glyph_height = 7;
+		constexpr int glyph_spacing = 1;
+		const int text_width = (sizeof(message) - 1) * (glyph_width + glyph_spacing) * scale - glyph_spacing * scale;
+		const int start_x = (screen.width() - text_width) / 2;
+		const int start_y = (screen.height() - glyph_height * scale) / 2;
+
+		for (int i = 0; message[i] != 0; i++)
+		{
+			const int glyph = (message[i] == 'P') ? 0 :
+					(message[i] == 'O') ? 1 :
+					(message[i] == 'W') ? 2 :
+					(message[i] == 'E') ? 3 :
+					(message[i] == 'R') ? 4 :
+					(message[i] == 'D') ? 5 :
+					(message[i] == 'F') ? 6 : 7;
+			const int x_base = start_x + i * (glyph_width + glyph_spacing) * scale;
+
+			for (int y = 0; y < glyph_height; y++)
+				for (int x = 0; x < glyph_width; x++)
+					if (BIT(glyphs[glyph][y], glyph_width - 1 - x))
+						for (int sy = 0; sy < scale; sy++)
+							for (int sx = 0; sx < scale; sx++)
+								bitmap.pix(start_y + y * scale + sy, x_base + x * scale + sx) = 1;
+		}
+
+		return 0;
+	}
+
 	uint8_t* lcd_memory_start = &m_ram_base[m_lcd_memory_start << 9];
 	int height = screen.height();
 
@@ -867,6 +963,12 @@ u32 nakajies_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 TIMER_DEVICE_CALLBACK_MEMBER(nakajies_state::kb_timer)
 {
+	if (!BIT(m_keyboard_control, 0))
+	{
+		set_irq(0x20); // IRQ vector 0xfa: scan-cycle/reset source.
+		return;
+	}
+
 	if (m_matrix > 0x09)
 	{
 		// reset the keyboard scan
