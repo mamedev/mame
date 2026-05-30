@@ -13100,10 +13100,11 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="skylinea" supported="no"> <!-- game loads fully with a working loader game but unable to launch main game with CBM key -->
+	<software name="skylinea" supported="yes">
 		<description>Skyline Attack</description>
 		<year>1984</year>
 		<publisher>Century Software</publisher>
+		<info name="usage" value="Requires manual RUN issued after tape IPL. Press space or fire during loading for playing Sssnake minigame. Press RUN STOP when prompted to for the actual game." />
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="512730">

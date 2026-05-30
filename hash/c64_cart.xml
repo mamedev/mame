@@ -4858,10 +4858,13 @@ Erratic [VIC] collsion detection, warps and invincibility bonuses can kill playe
 		</part>
 	</software>
 
-	<software name="c64diag">
+	<software name="c64diag" supported="partial">
 		<description>C-64 Diagnostic (rev 586220)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Fails [MOS6526], [SID] and [cassette] checks
+]]></notes>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
