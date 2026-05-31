@@ -5065,7 +5065,7 @@ Fails [tape] loading, light blue screen
 		</part>
 
 		<part name="cass4" interface="cbm_cass">
-			<feature name="part_id" value="Tape 2 Side B: Buggy Boy / Thundercats"/>
+			<feature name="part_id" value="Tape 2 Side B: Buggy Boy / ThunderCats"/>
 			<dataarea name="cass" size="1360150">
 				<rom name="Fists_'N'_Throttles_Tape_2_Side_B.tap" size="1360150" crc="e8fe6f73" sha1="bd65bf898fe669509bfcad6493d6638c4f42b0b3"/>
 			</dataarea>
@@ -15504,7 +15504,7 @@ Kung-Fu Master: randomly crashes on life losses
 	</software>
 
 	<software name="thndcats">
-		<description>Thundercats</description>
+		<description>ThunderCats</description>
 		<year>1989</year>
 		<publisher>Encore</publisher>
 
@@ -15516,7 +15516,7 @@ Kung-Fu Master: randomly crashes on life losses
 	</software>
 
 	<software name="thndcatse" cloneof="thndcats">
-		<description>Thundercats (Elite Systems)</description>
+		<description>ThunderCats (Elite Systems)</description>
 		<year>1987</year>
 		<publisher>Elite Systems</publisher>
 

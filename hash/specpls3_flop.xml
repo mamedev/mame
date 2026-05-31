@@ -18433,7 +18433,7 @@ Disk 3 - Side A: Vindicators (Domark)
 
 	<software name="thdrcats">
 		<!-- SPS dump 3624 -->
-		<description>Thundercats</description>
+		<description>ThunderCats</description>
 		<year>1987</year>
 		<publisher>Elite Systems</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -18445,7 +18445,7 @@ Disk 3 - Side A: Vindicators (Domark)
 
 	<software name="thdrcatsa" cloneof="thdrcats">
 		<!-- May be the same edition as the IPF dump. -->
-		<description>Thundercats (alt)</description>
+		<description>ThunderCats (alt)</description>
 		<year>1987</year>
 		<publisher>Elite Systems</publisher>
 		<part name="flop1" interface="floppy_3">
