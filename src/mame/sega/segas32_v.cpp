@@ -180,6 +180,8 @@
 #include "emu.h"
 #include "segas32.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 /*************************************

@@ -28,6 +28,7 @@
 #include "softlist.h"
 #include "speaker.h"
 
+#include "endianness.h"
 #include "multibyte.h"
 
 #include <zlib.h>

@@ -13,8 +13,11 @@
 
 #include "debugcpu.h"
 
+#include "corefloat.h"
+
 #include <algorithm>
 #include <cctype>
+#include <cstdio>
 #include <locale>
 #include <tuple>
 
@@ -266,38 +269,6 @@ void debug_view_memory::view_notify(debug_view_notification type)
 
 
 //-------------------------------------------------
-//  u32_to_float - return a floating point number
-//  whose 32 bit representation is value
-//-------------------------------------------------
-
-static inline float u32_to_float(u32 value)
-{
-	union {
-		float f;
-		u32 i;
-	} v;
-
-	v.i = value;
-	return v.f;
-}
-
-//-------------------------------------------------
-//  u64_to_double - return a floating point number
-//  whose 64 bit representation is value
-//-------------------------------------------------
-
-static inline float u64_to_double(u64 value)
-{
-	union {
-		double f;
-		u64 i;
-	} v;
-
-	v.i = value;
-	return v.f;
-}
-
-//-------------------------------------------------
 //  generate_row - read one row of data and make a
 //  text representation of the chunks
 //-------------------------------------------------
@@ -360,15 +331,15 @@ void debug_view_memory::generate_row(debug_view_char *destmin, debug_view_char *
 				switch (m_data_format)
 				{
 				case data_format::FLOAT_32BIT:
-					snprintf(valuetext, 64, "%.8g", u32_to_float(u32(chunkdata)));
+					snprintf(valuetext, 64, "%.8g", u2f(chunkdata));
 					break;
 				case data_format::FLOAT_64BIT:
-					snprintf(valuetext, 64, "%.24g", u64_to_double(chunkdata));
+					snprintf(valuetext, 64, "%.24g", u2d(chunkdata));
 					break;
 				case data_format::FLOAT_80BIT:
 				{
 					float64_t f64 = extF80M_to_f64(&chunkdata80);
-					snprintf(valuetext, 64, "%.24g", u64_to_double(f64.v));
+					snprintf(valuetext, 64, "%.24g", u2d(f64.v));
 					break;
 				}
 				default:

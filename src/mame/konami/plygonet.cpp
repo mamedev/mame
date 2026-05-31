@@ -79,6 +79,8 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "endianness.h"
+
 #define LOG_DSP_AB0         (1U << 1)
 #define LOG_DSP_A6          (1U << 2)
 #define LOG_DSP_A7          (1U << 3)

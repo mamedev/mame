@@ -16,6 +16,8 @@
 #include "emu.h"
 #include "gsc.h"
 
+#include "endianness.h"
+
 DEFINE_DEVICE_TYPE(GSC, gsc_device, "applegsc", "Apple Gray Scale Controller video")
 
 static constexpr u8 GSC_GRAYSCALE               = 0x04;

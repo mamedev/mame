@@ -183,6 +183,8 @@ Protection Notes:
 #include "debugger.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 
 #define LOG_SPRCRPT (1 << 1)
 #define LOG_BANK    (1 << 2)

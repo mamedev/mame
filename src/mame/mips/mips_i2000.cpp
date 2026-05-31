@@ -121,6 +121,8 @@
 
 #include "imagedev/floppy.h"
 
+#include "endianness.h"
+
 #define LOG_MMU     (1U << 1)
 #define LOG_IOCB    (1U << 2)
 

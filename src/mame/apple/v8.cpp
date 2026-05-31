@@ -42,6 +42,8 @@
 #include "formats/ap_dsk35.h"
 #include "layout/generic.h"
 
+#include "endianness.h"
+
 #define LOG_RAM (1U << 1)
 
 #define VERBOSE (0)

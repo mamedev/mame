@@ -15,6 +15,8 @@
 
 #include "debug/debugcpu.h"
 
+#include "corefloat.h"
+
 #include <bit>
 #include <cfenv>
 #include <cmath>

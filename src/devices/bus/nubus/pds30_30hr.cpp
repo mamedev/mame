@@ -38,6 +38,8 @@
 
 #include "screen.h"
 
+#include "endianness.h"
+
 #define LOG_REGISTERS   (1U << 1)
 #define LOG_CRTC        (1U << 2)
 

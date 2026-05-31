@@ -45,6 +45,8 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "endianness.h"
+
 #include "rungun_dual.lh"
 
 

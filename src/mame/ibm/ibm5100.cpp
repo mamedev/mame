@@ -29,6 +29,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 

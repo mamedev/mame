@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Vas Crabb
 /***************************************************************************
 
     endianness.h
 
-    Endianness types and utility functions.
+    Endianness helper types and utility functions.
 
 ***************************************************************************/
 
@@ -13,11 +13,14 @@
 
 #pragma once
 
+#include <bit>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <string_view>
 #include <type_traits>
+
+static_assert(ENDIANNESS_NATIVE == ENDIANNESS_LITTLE || ENDIANNESS_NATIVE == ENDIANNESS_BIG, "Mixed-endian platforms not supported");
 
 
 namespace util {
@@ -26,21 +29,8 @@ namespace util {
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// constants for expression endianness
-enum class endianness
-{
-	little,
-	big,
-#ifdef LSB_FIRST
-	native = little
-#else
-	native = big
-#endif
-};
-
-
 // helper for accessing data adjusted for endianness
-template <typename In, typename Out, endianness Endian>
+template <typename In, typename Out, std::endian Endian>
 class offset_endian_cast
 {
 private:
@@ -55,8 +45,8 @@ private:
 public:
 	constexpr offset_endian_cast(In *ptr, std::ptrdiff_t offs) noexcept : m_ptr(reinterpret_cast<Out *>(ptr)), m_offs(offs) { }
 
-	constexpr Out &operator[](std::ptrdiff_t i) const noexcept { return m_ptr[(m_offs + i) ^ ((Endian != endianness::native) ? SWIZZLE : 0)]; }
-	constexpr Out &operator*() const noexcept { return m_ptr[m_offs ^ ((Endian != endianness::native) ? SWIZZLE : 0)]; }
+	constexpr Out &operator[](std::ptrdiff_t i) const noexcept { return m_ptr[(m_offs + i) ^ ((Endian != std::endian::native) ? SWIZZLE : 0)]; }
+	constexpr Out &operator*() const noexcept { return m_ptr[m_offs ^ ((Endian != std::endian::native) ? SWIZZLE : 0)]; }
 
 	constexpr offset_endian_cast operator+(std::ptrdiff_t i) const noexcept { return offset_endian_cast(*this) += i; }
 	constexpr offset_endian_cast operator-(std::ptrdiff_t i) const noexcept { return offset_endian_cast(*this) -= i; }
@@ -71,7 +61,7 @@ public:
 
 
 // helper for accessing data adjusted for endianness
-template <typename In, typename Out, endianness Endian>
+template <typename In, typename Out, std::endian Endian>
 class endian_cast
 {
 private:
@@ -85,7 +75,7 @@ private:
 public:
 	constexpr endian_cast(In *ptr) noexcept : m_ptr(reinterpret_cast<Out *>(ptr)) { }
 
-	constexpr Out &operator[](std::ptrdiff_t i) const noexcept { return m_ptr[i ^ ((Endian != endianness::native) ? SWIZZLE : 0)]; }
+	constexpr Out &operator[](std::ptrdiff_t i) const noexcept { return m_ptr[i ^ ((Endian != std::endian::native) ? SWIZZLE : 0)]; }
 
 	constexpr auto operator+(std::ptrdiff_t offs) const noexcept
 	{
@@ -108,10 +98,10 @@ public:
 //  MACROS AND INLINE FUNCTIONS
 //**************************************************************************
 
-constexpr std::string_view endian_to_string_view(endianness e) { using namespace std::literals; return e == endianness::little ? "little"sv : "big"sv; }
+constexpr std::string_view endian_to_string_view(std::endian e) { using namespace std::literals; return e == std::endian::little ? "little"sv : "big"sv; }
 
 // endian-based value: first value is if native endianness is little-endian, second is if native is big-endian
-#define NATIVE_ENDIAN_VALUE_LE_BE(leval, beval)  ((util::endianness::native == util::endianness::little) ? (leval) : (beval))
+#define NATIVE_ENDIAN_VALUE_LE_BE(leval, beval)  ((std::endian::native == std::endian::little) ? (leval) : (beval))
 
 
 // inline functions for accessing bytes and words within larger chunks
@@ -121,7 +111,7 @@ auto big_endian_cast(U *ptr)
 {
 	using requested_const = std::conditional_t<std::is_const_v<U>, std::add_const_t<T>, T>;
 	using requested_cv = std::conditional_t<std::is_volatile_v<U>, std::add_volatile<requested_const>, requested_const>;
-	return endian_cast<U, requested_cv, endianness::big>(ptr);
+	return endian_cast<U, requested_cv, std::endian::big>(ptr);
 }
 
 template <typename T, typename U>
@@ -129,8 +119,10 @@ auto little_endian_cast(U *ptr)
 {
 	using requested_const = std::conditional_t<std::is_const_v<U>, std::add_const_t<T>, T>;
 	using requested_cv = std::conditional_t<std::is_volatile_v<U>, std::add_volatile<requested_const>, requested_const>;
-	return endian_cast<U, requested_cv, endianness::little>(ptr);
+	return endian_cast<U, requested_cv, std::endian::little>(ptr);
 }
+
+} // namespace util
 
 // read/write a byte to a 16-bit space
 template <typename T> constexpr T BYTE_XOR_BE(T a) { return a ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0); }
@@ -155,7 +147,5 @@ template <typename T> constexpr T WORD2_XOR_LE(T a) { return a ^ NATIVE_ENDIAN_V
 // read/write a dword to a 64-bit space
 template <typename T> constexpr T DWORD_XOR_BE(T a) { return a ^ NATIVE_ENDIAN_VALUE_LE_BE(4,0); }
 template <typename T> constexpr T DWORD_XOR_LE(T a) { return a ^ NATIVE_ENDIAN_VALUE_LE_BE(0,4); }
-
-} // namespace util
 
 #endif // MAME_LIB_UTIL_ENDIANNESS_H

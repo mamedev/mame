@@ -91,6 +91,8 @@
 
 #include "speaker.h"
 
+#include "endianness.h"
+
 #include "model1io2.lh"
 #include "segabill.lh"
 

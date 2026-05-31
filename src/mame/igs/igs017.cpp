@@ -110,6 +110,7 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
 #include "multibyte.h"
 
 #include "igspoker.lh"

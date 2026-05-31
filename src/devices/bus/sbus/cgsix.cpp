@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "cgsix.h"
 
+#include "endianness.h"
+
 DEFINE_DEVICE_TYPE(SBUS_TURBOGX, sbus_turbogx_device, "turbogx", "Sun TurboGX SBus Video")
 DEFINE_DEVICE_TYPE(SBUS_TURBOGXP, sbus_turbogxp_device, "turbogxp", "Sun TurboGX+ SBus Video")
 

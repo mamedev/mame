@@ -4,6 +4,8 @@
 #include "i960.h"
 #include "i960dis.h"
 
+#include "corefloat.h"
+
 #include <algorithm>
 
 #ifdef _MSC_VER

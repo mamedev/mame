@@ -10,6 +10,8 @@
 #include "cgthree.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 DEFINE_DEVICE_TYPE(SBUS_CGTHREE, sbus_cgthree_device, "cgthree", "Sun cgthree SBus Video")
 
 void sbus_cgthree_device::mem_map(address_map &map)

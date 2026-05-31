@@ -54,6 +54,8 @@ trivia: TJF stands for Tai Ji Feng
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 

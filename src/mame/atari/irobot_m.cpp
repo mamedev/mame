@@ -10,6 +10,8 @@
 #include "cpu/m6809/m6809.h"
 #include "irobot.h"
 
+#include "endianness.h"
+
 #define LOG_VIDEO (1 << 1)
 #define LOG_VG    (1 << 2)
 #define LOG_MATH  (1 << 3)

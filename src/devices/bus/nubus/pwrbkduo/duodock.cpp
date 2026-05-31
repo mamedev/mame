@@ -56,6 +56,8 @@
 #include "screen.h"
 #include "softlist_dev.h"
 
+#include "endianness.h"
+
 #define LOG_DRQ         (1U << 1)
 #define LOG_HANDSHAKE   (1U << 2)
 #define LOG_VIDEO       (1U << 3)

@@ -15,6 +15,8 @@
 
 #include "video/rgbutil.h"
 
+#include "endianness.h"
+
 
 /*************************************
 *  Constants

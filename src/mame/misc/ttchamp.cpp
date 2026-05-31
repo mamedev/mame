@@ -74,6 +74,8 @@ we currently simulate this as the PIC is read protected.
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 
 class ttchamp_state : public driver_device
 {

@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Farfetch'd, R. Belmont
 
+#include "corefloat.h"
+
 #define F2END() \
 	return 2 + m_amlength1 + m_amlength2;
 

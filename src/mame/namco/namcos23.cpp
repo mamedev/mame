@@ -1251,6 +1251,9 @@ It can also be used with Final Furlong when wired correctly.
 #include "namco_settings.h"
 #include "vpx3220a.h"
 
+#include "corefloat.h"
+#include "endianness.h"
+
 #include <cfloat>
 
 #define LOG_CLIP_DATA       (1ULL << 1)
@@ -2362,7 +2365,7 @@ float namcos23_state::f24_to_f32(u32 v)
 	}
 
 	r = r | (e << 23) | ((m & 0x7fff) << 8);
-	return *(float *)&r;
+	return u2f(r);
 }
 
 s32 *namcos23_state::c435_getv(u16 id)

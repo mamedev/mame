@@ -40,6 +40,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 // This must be outside of the namespace
 DECLARE_DEVICE_TYPE(STINGNET_ATAPI_CDROM, stingnet_cdr)
 

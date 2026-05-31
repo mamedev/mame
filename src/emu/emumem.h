@@ -2081,6 +2081,10 @@ public:
 	inline offs_t addr2byte_end(offs_t address) const { return (m_addr_shift < 0) ? ((address << -m_addr_shift) | ((1 << -m_addr_shift) - 1)) : (address >> m_addr_shift); }
 	inline offs_t byte2addr_end(offs_t address) const { return (m_addr_shift > 0) ? ((address << m_addr_shift) | ((1 << m_addr_shift) - 1)) : (address >> -m_addr_shift); }
 
+	// error checking helpers
+	void check_parameters(const char *objname, int width, int addr_shift, endianness_t endian) const;
+	void check_parameters(const char *objname, int level, int width, int addr_shift, endianness_t endian) const;
+
 	// state (TODO: privatize)
 	const char *        m_name;
 	endianness_t        m_endianness;
@@ -2369,28 +2373,12 @@ public:
 	address_map *map() const { return m_map.get(); }
 
 	template<int Width, int AddrShift, endianness_t Endian> void cache(emu::detail::memory_access_cache<Width, AddrShift, Endian> &v) {
-		if(AddrShift != m_config.addr_shift())
-			fatalerror("Requesting cache() with address shift %d while the config says %d\n", AddrShift, m_config.addr_shift());
-		if(8 << Width != m_config.data_width())
-			fatalerror("Requesting cache() with data width %d while the config says %d\n", 8 << Width, m_config.data_width());
-		if(Endian != m_config.endianness())
-			fatalerror("Requesting cache() with endianness %s while the config says %s\n",
-					   util::endian_to_string_view(Endian), util::endian_to_string_view(m_config.endianness()));
-
+		m_config.check_parameters("cache()", Width, AddrShift, Endian);
 		v.set(this, get_cache_info());
 	}
 
 	template<int Level, int Width, int AddrShift, endianness_t Endian> void specific(emu::detail::memory_access_specific<Level, Width, AddrShift, Endian> &v) {
-		if(Level != emu::detail::handler_entry_dispatch_level(m_config.addr_width()))
-			fatalerror("Requesting specific() with wrong level, bad address width (the config says %d)\n", m_config.addr_width());
-		if(AddrShift != m_config.addr_shift())
-			fatalerror("Requesting specific() with address shift %d while the config says %d\n", AddrShift, m_config.addr_shift());
-		if(8 << Width != m_config.data_width())
-			fatalerror("Requesting specific() with data width %d while the config says %d\n", 8 << Width, m_config.data_width());
-		if(Endian != m_config.endianness())
-			fatalerror("Requesting spefific() with endianness %s while the config says %s\n",
-					   util::endian_to_string_view(Endian), util::endian_to_string_view(m_config.endianness()));
-
+		m_config.check_parameters("specific()", Level, Width, AddrShift, Endian);
 		v.set(this, get_specific_info());
 	}
 

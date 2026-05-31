@@ -7,6 +7,8 @@
 
 #include <cpu/i386/i386dasm.h>
 
+#include "endianness.h"
+
 /////////////////////////////////////////////////////////////////
 
 DECLARE_DEVICE_TYPE(I8086, i8086_cpu_device)

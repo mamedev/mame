@@ -26,6 +26,8 @@
 
 #include "screen.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 #define LOG_REGISTERS (1U << 1)

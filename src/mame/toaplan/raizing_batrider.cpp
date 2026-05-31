@@ -5,6 +5,8 @@
 
 #include "raizing.h"
 
+#include "endianness.h"
+
 /*
 
 Name        Board No      Maker         Game name
