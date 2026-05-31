@@ -20,7 +20,7 @@
 #include <string_view>
 #include <type_traits>
 
-static_assert(ENDIANNESS_NATIVE == ENDIANNESS_LITTLE || ENDIANNESS_NATIVE == ENDIANNESS_BIG, "Mixed-endian platforms not supported");
+static_assert(std::endian::native == std::endian::little || std::endian::native == std::endian::big, "Mixed-endian platforms not supported");
 
 
 namespace util {
