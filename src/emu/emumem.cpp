@@ -9,8 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include <list>
-#include <map>
 #include "emuopts.h"
 #include "debug/debugcpu.h"
 
@@ -24,6 +22,12 @@
 #include "emumem_hedw.h"
 #include "emumem_hep.h"
 #include "emumem_het.h"
+
+#include "endianness.h"
+
+#include <cstdio>
+#include <list>
+#include <map>
 
 
 //**************************************************************************
@@ -489,6 +493,26 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 		m_internal_map(internal)
 {
 }
+
+
+void address_space_config::check_parameters(const char *objname, int width, int addr_shift, endianness_t endian) const
+{
+	if(addr_shift != m_addr_shift)
+		fatalerror("Requesting %s with address shift %d while the config says %d\n", objname, addr_shift, m_addr_shift);
+	if(8 << width != m_data_width)
+		fatalerror("Requesting %s with data width %d while the config says %d\n", objname, 8 << width, m_data_width);
+	if(endian != m_endianness)
+		fatalerror("Requesting %s with endianness %s while the config says %s\n",
+				   objname, util::endian_to_string_view(endian), util::endian_to_string_view(m_endianness));
+}
+
+void address_space_config::check_parameters(const char *objname, int level, int width, int addr_shift, endianness_t endian) const
+{
+	if(level != emu::detail::handler_entry_dispatch_level(m_addr_width))
+		fatalerror("Requesting %s with wrong level, bad address width (the config says %d)\n", objname, m_addr_width);
+	check_parameters(objname, width, addr_shift, endian);
+}
+
 
 
 void address_space_installer::check_optimize_all(const char *function, int width, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth, offs_t &nstart, offs_t &nend, offs_t &nmask, offs_t &nmirror, u64 &nunitmask, int &ncswidth)

@@ -113,6 +113,8 @@
 #include "bus/interpro/keyboard/keyboard.h"
 #include "bus/interpro/mouse/mouse.h"
 
+#include "corefloat.h"
+
 #define LOG_LINE    (1U << 1)
 #define LOG_BLIT    (1U << 2)
 

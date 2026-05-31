@@ -14,10 +14,10 @@ public:
 	wpc_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~wpc_pic_device();
 
+	void set_serial(const char *serial);
+
 	uint8_t read();
 	void write(uint8_t data);
-
-	void set_serial(const char *serial);
 
 protected:
 	required_ioport_array<8> swarray;

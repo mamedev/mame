@@ -638,7 +638,7 @@ void tandy1000_state::machine_start()
 				0xffff);
 	}
 
-	if ((mem_space.data_width() == vram_space.data_width()) || (util::endianness::native == util::endianness::little))
+	if ((mem_space.data_width() == vram_space.data_width()) || (std::endian::native == std::endian::little))
 	{
 		m_video->space(0).install_ram(0, (128 * 1024) - 1, &m_ram->pointer()[0]);
 	}

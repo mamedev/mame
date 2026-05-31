@@ -20,6 +20,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 /*
 Name        Board No      Maker         Game name
 ----------------------------------------------------------------------------

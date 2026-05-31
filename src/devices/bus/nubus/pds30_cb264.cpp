@@ -17,6 +17,8 @@
 
 #include "screen.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 namespace {

@@ -111,6 +111,8 @@ Component Side   A   B   Solder Side
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "endianness.h"
+
 
 namespace {
 

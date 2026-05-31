@@ -41,6 +41,8 @@
 #include "emupal.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 #define LOG_REGISTERS (1U << 1)
 #define LOG_RAMDAC (1U << 2)
 

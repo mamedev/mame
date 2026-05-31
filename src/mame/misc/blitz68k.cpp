@@ -64,6 +64,8 @@ To Do:
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 // configurable logging
 #define LOG_MCU     (1U << 1)
 #define LOG_BLITTER (1U << 2)

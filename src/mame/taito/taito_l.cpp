@@ -2410,6 +2410,15 @@ ROM_END
 
 ROM_START( plgirls2 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "pg2_1e.ic6", 0x00000, 0x40000, CRC(b279990b) SHA1(b3e67599b114c03a6894200a34eb67bca1810c70) )
+
+	ROM_REGION( 0x100000, "maincpu:gfx", 0 )
+	ROM_LOAD16_BYTE( "cho-l.ic9",  0x00000, 0x80000, CRC(956384ec) SHA1(94a2b95f340e96bdccbeafd373f0dea90b8328dd) )
+	ROM_LOAD16_BYTE( "cho-h.ic7",  0x00001, 0x80000, CRC(992f99b1) SHA1(c79f1014d73654740f7823812f92376d65d6b15d) )
+ROM_END
+
+ROM_START( plgirls2j )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "pg2_1j.ic6", 0x00000, 0x40000, CRC(f924197a) SHA1(ecaaefd1b3715ba60608e05d58be67e3c71f653a) )
 
 	ROM_REGION( 0x100000, "maincpu:gfx", 0 )
@@ -2417,7 +2426,7 @@ ROM_START( plgirls2 )
 	ROM_LOAD16_BYTE( "cho-h.ic7",  0x00001, 0x80000, CRC(992f99b1) SHA1(c79f1014d73654740f7823812f92376d65d6b15d) )
 ROM_END
 
-ROM_START( plgirls2b )
+ROM_START( plgirls2b ) // bootleg based on Europe version
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "playgirls2b.d1", 0x00000, 0x40000, CRC(d58159fa) SHA1(541c6ca5f12c38b5a08f90048f52c31d27bb9233) )
 
@@ -2551,7 +2560,8 @@ GAME( 199?, cubybop,   0,        cachat,    cubybop,   taitol_1cpu_state, empty_
 GAME( 1992, plgirls,   0,        cachat,    plgirls,   taitol_1cpu_state, empty_init,     ROT270, "Hot-B Co., Ltd.", "Play Girls", 0 )
 GAME( 1992, lagirl,    plgirls,  cachat,    plgirls,   taitol_1cpu_state, empty_init,     ROT270, "bootleg", "LA Girl", 0 ) // bootleg hardware with changed title & backgrounds
 
-GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  taitol_1cpu_state, empty_init,     ROT270, "Hot-B Co., Ltd.", "Play Girls 2", 0 )
+GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  taitol_1cpu_state, empty_init,     ROT270, "Hot-B Co., Ltd.", "Play Girls 2 (Europe)", 0 )
+GAME( 1993, plgirls2j, plgirls2, cachat,    plgirls2,  taitol_1cpu_state, empty_init,     ROT270, "Hot-B Co., Ltd.", "Play Girls 2 (Japan)", 0 )
 GAME( 1993, plgirls2b, plgirls2, cachat,    plgirls2,  taitol_1cpu_state, empty_init,     ROT270, "bootleg", "Play Girls 2 (bootleg)", MACHINE_IMPERFECT_GRAPHICS ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts almost the same - scroll offset problems)
 
 GAME( 1990, evilston,  0,        evilston,  evilston,  taitol_2cpu_state, empty_init,     ROT270, "Spacy Industrial, Ltd.", "Evil Stone", 0 ) // Taiwanese publisher, unknown Japanese developer

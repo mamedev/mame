@@ -199,6 +199,8 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 #include "crmaze2p.lh"
 #include "crmaze4p.lh"
 #include "v4addlad.lh"

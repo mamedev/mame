@@ -118,6 +118,8 @@ TODO:
 #include "emu.h"
 #include "voodoo.h"
 
+#include "endianness.h"
+
 using namespace voodoo;
 
 

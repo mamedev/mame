@@ -16,6 +16,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 //#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
 
 /*

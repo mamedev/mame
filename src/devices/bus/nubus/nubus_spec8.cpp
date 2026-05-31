@@ -54,6 +54,8 @@
 #include "video/bt47x.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 //#define VERBOSE 1

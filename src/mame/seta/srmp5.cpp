@@ -46,6 +46,8 @@ This is not a bug (real machine behaves the same).
 #include "emupal.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 
 namespace {
 

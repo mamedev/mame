@@ -42,6 +42,8 @@
 #include "emupal.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 static constexpr u32 VRAM_SIZE = 0x40000;   // ROM tests for 512K, but card has 8x uPD41264 (64K x 4 bit) = 256 KiB

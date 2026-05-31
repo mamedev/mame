@@ -64,6 +64,8 @@
 #include "video/bt47x.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 #define VERBOSE (0)
 #include "logmacro.h"
 

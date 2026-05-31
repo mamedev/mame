@@ -76,6 +76,8 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 #include "vamphalf_prot.h"
 
 namespace {

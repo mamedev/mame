@@ -32,6 +32,8 @@
 #include "sound/ymopn.h"
 #include "sound/ymz280b.h"
 
+#include "endianness.h"
+
 #define LOG_BANK        (1U << 1)
 #define LOG_DMA         (1U << 2)
 #define LOG_MCU         (1U << 3)

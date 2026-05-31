@@ -28,13 +28,13 @@ public:
 		, m_decwriter(*this, "decwriter")
 		, m_tty(*this, "teletype")
 		, m_mode_button(*this, "MODE_BUTTON%u", 0U)
-		, m_output_acc(*this, "acc%u")
-		, m_output_opcode(*this, "opcode%u")
-		, m_output_mem_data(*this, "mem_data%u")
-		, m_output_mem_addr(*this, "mem_addr%u")
-		, m_output_pc(*this, "pc%u")
-		, m_output_rc(*this, "rc%u")
-		, m_output_flags(*this, "flags%u")
+		, m_output_acc(*this, "acc%u", 0U)
+		, m_output_opcode(*this, "opcode%u", 0U)
+		, m_output_mem_data(*this, "mem_data%u", 0U)
+		, m_output_mem_addr(*this, "mem_addr%u", 0U)
+		, m_output_pc(*this, "pc%u", 0U)
+		, m_output_rc(*this, "rc%u", 0U)
+		, m_output_flags(*this, "flags%u", 0U)
 	{ }
 
 	void init_patinho_feio() ATTR_COLD;

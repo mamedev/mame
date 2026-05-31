@@ -8,6 +8,7 @@
 
 #include "romload.h"
 
+#include "endianness.h"
 #include "multibyte.h"
 
 /*

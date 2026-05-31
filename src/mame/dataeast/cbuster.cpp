@@ -56,6 +56,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 
 // configurable logging
 #define LOG_PROT (1U << 1)

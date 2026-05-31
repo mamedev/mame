@@ -334,6 +334,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "corefloat.h"
+
 #define LOG_DEBUG_STATES   (1U << 1)
 
 #define VERBOSE (0)

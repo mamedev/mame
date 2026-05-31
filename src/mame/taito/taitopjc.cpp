@@ -303,6 +303,8 @@ G)ame Connector, dual row 50 pins
 #include "screen.h"
 #include "tilemap.h"
 
+#include "endianness.h"
+
 
 #define LOG_TLCS_TO_PPC_COMMANDS (1U << 1)
 #define LOG_PPC_TO_TLCS_COMMANDS (1U << 2)

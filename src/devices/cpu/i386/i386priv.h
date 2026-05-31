@@ -6,6 +6,7 @@
 #pragma once
 
 #include "i386dasm.h"
+#include "endianness.h"
 
 //#define DEBUG_MISSING_OPCODE
 

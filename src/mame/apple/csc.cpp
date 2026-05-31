@@ -17,6 +17,8 @@
 #include "emu.h"
 #include "csc.h"
 
+#include "endianness.h"
+
 DEFINE_DEVICE_TYPE(CSC, csc_device, "applecsc", "Apple Color Screen Controller video")
 
 static constexpr u8 CSC_PANEL_ID        = 0x02;

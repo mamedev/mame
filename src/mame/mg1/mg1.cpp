@@ -43,6 +43,7 @@
 
 #include "imagedev/floppy.h"
 #include "formats/applix_dsk.h"
+#include "util/endianness.h"
 
 #include "screen.h"
 #include "speaker.h"

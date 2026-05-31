@@ -98,6 +98,8 @@ TODO (socrates):
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "corefloat.h"
+
 
 namespace {
 

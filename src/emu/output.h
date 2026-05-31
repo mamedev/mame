@@ -11,10 +11,13 @@
 
 #pragma once
 
+#include <any>
+#include <cassert>
 #include <functional>
 #include <iterator>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
@@ -98,11 +101,89 @@ private:
 public:
 	template <typename X, unsigned... N> class output_finder
 	{
+	private:
+		struct format_spec
+		{
+			std::string_view format;
+			unsigned start_args[sizeof...(N)];
+		};
+
+		template <unsigned A, unsigned C, typename... T>
+		void resolve_format(format_spec const &spec, item_proxy (&proxies)[C], T &&... i)
+		{
+			for (unsigned j = 0U; C > j; ++j)
+				proxies[j].resolve(m_device, util::string_format(spec.format, std::forward<T>(i)..., j + spec.start_args[A]));
+		}
+
+		template <unsigned A, unsigned C, unsigned D, typename T, typename... U>
+		void resolve_format(format_spec const &spec, T (&proxies)[C][D], U &&... i)
+		{
+			for (unsigned j = 0U; C > j; ++j)
+				resolve_format<A + 1>(spec, proxies[j], std::forward<U>(i)..., j + spec.start_args[A]);
+		}
+
+		template <typename T, unsigned C>
+		void resolve_array(T const &spec, item_proxy (&proxies)[C])
+		{
+			assert(std::size(spec) == std::size(proxies));
+			auto i = std::begin(spec);
+			auto j = std::begin(proxies);
+			while ((std::end(spec) != i) && (std::end(proxies) != j))
+			{
+				j->resolve(m_device, *i);
+				++i;
+				++j;
+			}
+		}
+
+		template <typename T, typename U, unsigned C, unsigned D>
+		void resolve_array(T const &spec, U (&proxies)[C][D])
+		{
+			assert(std::size(spec) == std::size(proxies));
+			auto i = std::begin(spec);
+			auto j = std::begin(proxies);
+			while ((std::end(spec) != i) && (std::end(proxies) != j))
+			{
+				resolve_array(*i, *j);
+				++i;
+				++j;
+			}
+		}
+
+		static void resolve_format(output_finder &obj)
+		{
+			obj.resolve_format<0U>(*std::any_cast<format_spec>(&obj.m_spec), obj.m_proxies);
+		}
+
+		template <typename T>
+		static void resolve_array(output_finder &obj)
+		{
+			T const &names = *std::any_cast<std::reference_wrapper<T const> >(&obj.m_spec);
+			obj.resolve_array(names, obj.m_proxies);
+		}
+
+		using resolver_func = void (*)(output_finder &);
+
+		device_t                    &m_device;
+		item_proxy_array_t<N...>    m_proxies;
+		std::any const              m_spec;
+		resolver_func               m_resolver;
+
 	public:
-		template <typename... T> output_finder(device_t &device, std::string &&format, T &&... start_args)
+		template <typename... T>
+		output_finder(device_t &device, std::string_view format, T &&... start_args)
 			: m_device(device)
-			, m_format(std::move(format))
-			, m_start_args{ std::forward<T>(start_args)... }
+			, m_spec(format_spec{ format, { std::forward<T>(start_args)... } })
+			, m_resolver(&output_finder::resolve_format)
+		{
+			static_assert(sizeof...(N) == sizeof...(T));
+		}
+
+		template <typename T>
+		output_finder(device_t &device, T const &names)
+			: m_device(device)
+			, m_spec(std::cref(names))
+			, m_resolver(&output_finder::resolve_array<T>)
 		{
 		}
 
@@ -117,27 +198,7 @@ public:
 		auto cbegin() const { return std::begin(m_proxies); }
 		auto cend() const { return std::end(m_proxies); }
 
-		void resolve() { resolve<0U>(m_proxies); }
-
-	private:
-		template <unsigned A, unsigned C, typename... T>
-		void resolve(item_proxy (&proxies)[C], T &&... i)
-		{
-			for (unsigned j = 0U; C > j; ++j)
-				proxies[j].resolve(m_device, util::string_format(m_format, std::forward<T>(i)..., j + m_start_args[A]));
-		}
-
-		template <unsigned A, unsigned C, unsigned D, typename T, typename... U>
-		void resolve(T (&proxies)[C][D], U &&... i)
-		{
-			for (unsigned j = 0U; C > j; ++j)
-				resolve<A + 1>(proxies[j], std::forward<U>(i)..., j + m_start_args[A]);
-		}
-
-		device_t                    &m_device;
-		std::string const           m_format;
-		unsigned const              m_start_args[sizeof...(N)];
-		item_proxy_array_t<N...>    m_proxies;
+		void resolve() { m_resolver(*this); }
 	};
 
 	template <typename X> class output_finder<X>
@@ -156,7 +217,7 @@ public:
 
 	private:
 		device_t            &m_device;
-		std::string const   m_format;
+		std::string const   m_format; // TODO: change to std::string_view after separating lightweight output proxy
 		item_proxy          m_proxy;
 	};
 
@@ -170,9 +231,11 @@ public:
 	running_machine &machine() const { return m_machine; }
 
 	// set the value for a given output
+	[[deprecated("set_value is incompatible with per-device outputs and will be removed.")]]
 	void set_value(std::string_view outname, s32 value);
 
 	// return the current value for a given output
+	[[deprecated("get_value is incompatible with per-device outputs and will be removed.")]]
 	s32 get_value(std::string_view outname);
 
 	// set a notifier on a particular output
@@ -181,7 +244,7 @@ public:
 	// set a notifier globally
 	void set_global_notifier(notifier_func callback, void *param);
 
-	// immdediately call a notifier for all outputs
+	// immediately call a notifier for all outputs
 	template <typename T> void notify_all(T &&notifier) const
 	{
 		for (auto const &item : m_itemtable)

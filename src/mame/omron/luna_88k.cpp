@@ -56,6 +56,8 @@
 
 #include "debugger.h"
 
+#include "endianness.h"
+
 #include <bit>
 
 #define VERBOSE 0
@@ -148,7 +150,7 @@ private:
 	u8 m_irq_active[4];
 	u8 m_irq_mask[4];
 
-	util::endian_cast<u32, u16, util::endianness::big> m_nram;
+	util::endian_cast<u32, u16, std::endian::big> m_nram;
 };
 
 class luna88k_state : public luna_88k_state_base

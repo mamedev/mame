@@ -7,9 +7,14 @@
 DEFINE_DEVICE_TYPE(WPC_OUT, wpc_out_device, "wpc_out", "Williams Pinball Controller Output Control")
 
 wpc_out_device::wpc_out_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, WPC_OUT, tag, owner, clock)
+	device_t(mconfig, WPC_OUT, tag, owner, clock),
+	m_cpu_led(*this, "L:cpu led"),
+	gi(0),
+	first_after_led(false),
+	gi_count(0),
+	timer(nullptr),
+	names(nullptr)
 {
-	names = nullptr;
 }
 
 wpc_out_device::~wpc_out_device()
@@ -120,11 +125,13 @@ void wpc_out_device::gi_w(uint8_t data)
 void wpc_out_device::led_w(uint8_t data)
 {
 	first_after_led = true;
-	machine().output().set_value("L:cpu led", data & 0x80 ? 1 : 0);
+	m_cpu_led = (data & 0x80) ? 1 : 0;
 }
 
 void wpc_out_device::device_start()
 {
+	m_cpu_led.resolve();
+
 	save_item(NAME(state));
 	save_item(NAME(gi));
 	save_item(NAME(first_after_led));
@@ -136,7 +143,7 @@ void wpc_out_device::device_start()
 
 void wpc_out_device::device_reset()
 {
-	memset(state, 0x00, 6);
+	std::fill(std::begin(state), std::end(state), 0x00);
 	first_after_led = false;
 	gi = 0x00;
 	previous_gi_update = attotime::zero;
@@ -149,7 +156,7 @@ TIMER_CALLBACK_MEMBER(wpc_out_device::update_outputs)
 	gi_update();
 	for (int i = 0; i < gi_count; i++)
 	{
-		//      fprintf(stderr, "gi[%d] = %d\n", i, gi_time[i]);
+		//logerror("gi[%d] = %d\n", i, gi_time[i]);
 		gi_time[i] = 0;
 	}
 }

@@ -25,6 +25,8 @@
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
 
+#include "endianness.h"
+
 #define LOG_MULTIBUS (1U << 1)
 //#define VERBOSE (LOG_GENERAL|LOG_MULTIBUS)
 
@@ -211,7 +213,7 @@ private:
 
 	memory_access<24, 1, 0, ENDIANNESS_LITTLE>::specific m_bus_mem;
 	memory_access<16, 1, 0, ENDIANNESS_LITTLE>::specific m_bus_pio;
-	util::endian_cast<u32, u16, util::endianness::big> m_mem;
+	util::endian_cast<u32, u16, std::endian::big> m_mem;
 
 	std::unique_ptr<u32[]> m_page;
 	std::unique_ptr<u16[]> m_map;

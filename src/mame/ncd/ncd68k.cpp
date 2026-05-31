@@ -77,6 +77,8 @@
 #include "screen.h"
 #include "video/bt47x.h"
 
+#include "endianness.h"
+
 #define LOG_MCU     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL|LOG_MCU)

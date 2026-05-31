@@ -214,9 +214,11 @@ Reference of music tempo:
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
 
-#include "multibyte.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "endianness.h"
+#include "multibyte.h"
 
 #define VERBOSE     0
 #include "logmacro.h"

@@ -590,6 +590,8 @@ Hardware registers info
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 #include "sfiii2.lh"

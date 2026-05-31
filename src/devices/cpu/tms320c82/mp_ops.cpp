@@ -5,6 +5,8 @@
 #include "emu.h"
 #include "tms320c82.h"
 
+#include "corefloat.h"
+
 
 #define OP_LINK() ((m_ir >> 27) & 0x1f)
 #define OP_RD() ((m_ir >> 27) & 0x1f)

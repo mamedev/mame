@@ -7,6 +7,8 @@
 #include "cpu/mb86233/mb86233.h"
 #include "model1.h"
 
+#include "corefloat.h"
+
 #define LOG_TGP (1U << 1)
 
 #define VERBOSE (0)

@@ -370,6 +370,7 @@ protected:
 	void receive_data();
 	void queue_received(uint16_t data, uint32_t error);
 	void advance_rx_fifo();
+	void update_rr1();
 	uint8_t get_special_rx_mask() const;
 	void update_rx_int();
 

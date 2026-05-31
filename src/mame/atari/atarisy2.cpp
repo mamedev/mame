@@ -132,6 +132,8 @@
 #include "machine/eeprompar.h"
 #include "speaker.h"
 
+#include "corefloat.h"
+
 
 static constexpr XTAL MASTER_CLOCK = XTAL(20'000'000);
 
