@@ -921,11 +921,28 @@ void floppy_image_device::check_led()
 
 bool floppy_image_device::twosid_r()
 {
-	int tracks = 0, heads = 0;
-
-	if (m_image) m_image->get_actual_geometry(tracks, heads);
-
-	return heads == 1;
+	// Report media-sided-ness from the variant tag, not from observed track
+	// data.  Drives sense single- vs double-sided media physically (e.g. 8"
+	// Shugart TS# on pin 30, derived from index-hole position); the answer
+	// must come from the media itself, not from whether the host happens to
+	// have written to head 1 yet.  An unformatted SSSD diskette is still SS.
+	if (!m_image)
+		return false;
+	switch (m_image->get_variant()) {
+	case floppy_image::SSSD:
+	case floppy_image::SSSD10:
+	case floppy_image::SSSD16:
+	case floppy_image::SSSD32:
+	case floppy_image::SSDD:
+	case floppy_image::SSDD10:
+	case floppy_image::SSDD16:
+	case floppy_image::SSDD32:
+	case floppy_image::SSQD:
+	case floppy_image::SSQD16:
+		return true;
+	default:
+		return false;
+	}
 }
 
 bool floppy_image_device::floppy_is_hd()
