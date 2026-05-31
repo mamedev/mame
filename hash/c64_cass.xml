@@ -7,7 +7,7 @@ The majority of this list was sourced from The Ultimate Tape Archive V2.0 releas
 Some others are based on c64tapes.org dumps
 
 Notes:
-- Press SHIFT + RUN/STOP to direct startup from a tape cassette
+- Press SHIFT + RUNSTOP to direct startup from a tape cassette
 
 -->
 
@@ -169,11 +169,11 @@ Notes:
 		</part>
 	</software>
 
+	<!-- Dumped by @c64tapes -->
 	<software name="3dpinbl">
 		<description>3D Pinball</description>
 		<year>1989</year>
 		<publisher>Mastertronic Plus</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -214,11 +214,11 @@ Notes:
 		</part>
 	</software>
 
+	<!-- Dumped by @c64tapes -->
 	<software name="a3dpool">
 		<description>American 3D Pool</description>
 		<year>1991</year>
 		<publisher>Zeppelin Games</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -451,11 +451,14 @@ Notes:
 		</part>
 	</software>
 
-	<software name="aceofaces" supported="no"> <!-- tape loads but doesn't run (remains stuck showing flashing colour lines) -->
+	<software name="aceofaces" supported="no">
 		<description>Ace of Aces</description>
 		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
-
+		<notes><![CDATA[
+Fails [tape] loading after title screen, colored border bars
+(doesn't require rewind the first time around, should reach 082 on its own)
+]]></notes>
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="695802">
 				<rom name="Ace_of_Aces.tap" size="695802" crc="11b8d169" sha1="dacab57251c5649ee82a306a6d5fea098fb00ca3"/>
@@ -682,11 +685,11 @@ Notes:
 		</part>
 	</software>
 
+	<!-- Dumped by @c64tapes -->
 	<software name="alice">
 		<description>Alice in Videoland</description>
 		<year>1984</year>
 		<publisher>Audiogenic Software</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -788,6 +791,7 @@ Notes:
 	<software name="anarchy">
 		<description>Anarchy</description>
 		<year>1987</year>
+		<!-- Hewson co-published? -->
 		<publisher>Rack It</publisher>
 
 		<part name="cass" interface="cbm_cass">
@@ -809,10 +813,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="andycapp">
+	<software name="andycapp" supported="partial">
 		<description>Andy Capp</description>
 		<year>1987</year>
 		<publisher>Mirrorsoft</publisher>
+		<notes><![CDATA[
+[VIC] glitchy main sprite during gameplay
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="607163">
@@ -895,10 +902,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="aquanaut" supported="no"> <!-- tape loads but doesn't run (remains stuck showing light blue screen) -->
+	<software name="aquanaut" supported="no">
 		<description>Aquanaut</description>
 		<year>1984</year>
 		<publisher>Interceptor Software</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, light blue screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="544422">
@@ -1107,10 +1117,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="asterixa" supported="no"> <!-- tape loads but doesn't run (remains stuck showing light blue screen) -->
+	<software name="asterixa" supported="no">
 		<description>Asterix and the Magic Cauldron</description>
 		<year>1988</year>
 		<publisher>Melbourne House</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, light blue screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="472372">
@@ -1334,11 +1347,11 @@ Notes:
 		</part>
 	</software>
 
+	<!-- Dumped by @c64tapes -->
 	<software name="ballcrz">
 		<description>Ball Crazy</description>
 		<year>1987</year>
 		<publisher>Mastertronic Added Dimension</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -1533,10 +1546,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="bazbillm" cloneof="bazbill" supported="no"> <!-- tape loads but doesn't run (remains stuck light blue screen) -->
+	<software name="bazbillm" cloneof="bazbill" supported="no">
 		<description>Bazooka Bill (Melbourne House)</description>
 		<year>1986</year>
 		<publisher>Melbourne House</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, light blue screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="585746">
@@ -2361,10 +2377,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="bbloodax" supported="no"> <!-- tape doesn't load fully (drops to READY message with flashing cursor) -->
+	<software name="bbloodax" supported="no">
 		<description>Brian Bloodaxe</description>
 		<year>1985</year>
 		<publisher>The Edge</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, returns to BASIC prompt (c64p) or pink screen (c64)
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="345742">
@@ -2936,10 +2955,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="champwrs" supported="no"> <!-- loading stops with a black screen after the options screen -->
+	<software name="champwrs" supported="no">
 		<description>Championship Wrestling</description>
 		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
+		<notes><![CDATA[
+[tape] black screen after character select (second loading)
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1239702">
@@ -3165,11 +3187,11 @@ Notes:
 		</part>
 	</software>
 
+	<!-- Dumped by @c64tapes -->
 	<software name="collaps">
 		<description>Collapse</description>
 		<year>1985</year>
 		<publisher>Firebird Silver</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -3186,10 +3208,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="cobra" supported="no"> <!-- game loads but crashes as soon as game runs (garbled graphics) -->
+	<software name="cobra" supported="no">
 		<description>Cobra</description>
 		<year>1989</year>
 		<publisher>The Hit Squad</publisher>
+		<notes><![CDATA[
+Non-functional gameplay graphics when [tape] loading stops
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="524590">
@@ -3498,10 +3523,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="crackdow" supported="no"> <!-- game loads but doesn't run (just displays a black screen) -->
+	<software name="crackdow" supported="no">
 		<description>Crack Down</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
+		<notes><![CDATA[
+Black screen after [tape] loading
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -3602,10 +3630,14 @@ Notes:
 		</part>
 	</software>
 
-	<software name="creature" supported="no"> <!-- game loads but doesn't run (just displays a light blue screen) -->
+	<software name="creature" supported="no">
 		<description>Creatures</description>
 		<year>1990</year>
 		<publisher>Thalamus</publisher>
+		<notes><![CDATA[
+[tape] fails loading after side swap, light blue screen
+]]></notes>
+		<info name="usage" value="Manually stop Datassette and swap tape side when asked to, then press play. A loading bar will appear if done correctly." />
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -3926,10 +3958,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="decathln" supported="no"> <!-- game loads but doesn't run (just displays a blue screen) -->
+	<software name="decathln" supported="no">
 		<description>Decathlon</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+[tape] fail loading gameplay, blue screen
+]]></notes>
 		<info name="alt_title" value="The Activision Decathlon"/>
 
 		<part name="cass1" interface="cbm_cass">
@@ -3939,10 +3974,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="deceptor" supported="no"> <!-- game loads but doesn't run (just displays a black screen) -->
+	<software name="deceptor" supported="no">
 		<description>Deceptor</description>
 		<year>1987</year>
 		<publisher>U.S. Gold</publisher>
+		<notes><![CDATA[
+[tape] fail loading gameplay, black screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1176542">
@@ -4077,10 +4115,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="docthede" supported="no"> <!-- game loads but doesn't run (just displays a light blue screen) -->
+	<software name="docthede" supported="no">
 		<description>Doc the Destroyer</description>
 		<year>1987</year>
 		<publisher>Melbourne House</publisher>
+		<notes><![CDATA[
+[tape] fail loading, light blue screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="597590">
@@ -4089,10 +4130,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="dodgygee" supported="no"> <!-- game loads but doesn't run (just displays a light blue screen) -->
+	<software name="dodgygee" supported="no">
 		<description>Dodgy Geezers</description>
 		<year>1986</year>
 		<publisher>Melbourne House</publisher>
+		<notes><![CDATA[
+[tape] fail loading, light blue screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="718005">
@@ -4131,10 +4175,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="dkong" supported="no"> <!-- game partially loads and stops with a black screen -->
+	<software name="dkong" supported="no">
 		<description>Donkey Kong</description>
 		<year>1986</year>
 		<publisher>Erbe</publisher>
+		<notes><![CDATA[
+[tape] fail loading, black screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="451003">
@@ -4143,7 +4190,7 @@ Notes:
 		</part>
 	</software>
 
-	<software name="dkongo" cloneof="dkong" supported="no"> <!-- game partially loads and stops with a black screen -->
+	<software name="dkongo" cloneof="dkong" supported="no">
 		<description>Donkey Kong (Ocean)</description>
 		<year>1986</year>
 		<publisher>Ocean</publisher>
@@ -4818,10 +4865,15 @@ Notes:
 		</part>
 	</software>
 
-	<software name="ffight" supported="no"> <!-- game loads and runs, but once past the player select screen, graphics are completely garbled so game is unplayable -->
+	<software name="ffight" supported="no">
 		<description>Final Fight</description>
 		<year>1991</year>
 		<publisher>U.S. Gold</publisher>
+		<notes><![CDATA[
+c64p: [tape] black screen hang if opening requested (no tape side swap is prompted)
+c64: [tape] hangs even without opening
+Garbled graphics during gameplay
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -4940,10 +4992,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="fist2" supported="no"> <!-- game loads but doesn't run (just displays a light blue screen) -->
+	<software name="fist2" supported="no">
 		<description>Fist II: La Leyenda Continua</description>
 		<year>1986</year>
 		<publisher>Erbe</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, light blue screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -4960,10 +5015,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="fist2m" cloneof="fist2" supported="no"> <!-- game loads but doesn't run (just displays a light blue screen) -->
+	<software name="fist2m" cloneof="fist2" supported="no">
 		<description>Fist II: The Legend Continues</description>
 		<year>1986</year>
 		<publisher>Melbourne House</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, light blue screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -5295,10 +5353,14 @@ Notes:
 		</part>
 	</software>
 
-	<software name="freddy" supported="partial"> <!-- game loads load and runs but when starting game, player character keeps dropping through floor and dies -->
+	<software name="freddy" supported="no">
 		<description>Freddy Hardest</description>
 		<year>1987</year>
 		<publisher>Imagine</publisher>
+		<notes><![CDATA[
+[VIC] Player won't collide with playfield, causing instant death at level starts
+]]></notes>
+		<info name="developer" value="Dinamic"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -5465,10 +5527,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="galivan" supported="no"> <!-- game loads partially and then stops (just displays a black screen) -->
+	<software name="galivan" supported="no">
 		<description>Galivan</description>
 		<year>1986</year>
 		<publisher>Imagine</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, black screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="669787">
@@ -5511,10 +5576,14 @@ Notes:
 		</part>
 	</software>
 
-	<software name="gamesse" supported="no"> <!-- game loads to a point and then just displays a green screen -->
+	<software name="gamesse" supported="no">
 		<description>The Games: Summer Edition</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, green screen
+]]></notes>
+		<info name="usage" value="Requires manual RUN issued after tape IPL" />
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -5531,10 +5600,14 @@ Notes:
 		</part>
 	</software>
 
-	<software name="gameswe" supported="no"> <!-- game loads to a point and then just displays a light blue screen -->
+	<software name="gameswe" supported="no">
 		<description>The Games: Winter Edition</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, light blue screen
+]]></notes>
+		<info name="usage" value="Requires manual RUN issued after tape IPL" />
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -5718,11 +5791,11 @@ Notes:
 		</part>
 	</software>
 
+	<!-- Dumped by @c64tapes -->
 	<software name="gemini">
 		<description>Gemini Wing</description>
 		<year>1990</year>
 		<publisher>Mastertronic Plus</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="483502">
@@ -5786,8 +5859,10 @@ Notes:
 
 	<software name="ghostbst">
 		<description>Ghostbusters</description>
+		<!-- TODO: MCMLXXXVII on loader -->
 		<year>1988</year>
 		<publisher>Ricochet</publisher>
+		<info name="usage" value="Swap joystick port 2 in 1 once you reach the shop screen"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="491599">
@@ -5800,7 +5875,10 @@ Notes:
 		<description>Ghostbusters (Activision)</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
-		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
+		<notes><![CDATA[
+BASIC IPL dislikes being skipped with SPACE key (wants specifically CBM key)
+]]></notes>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading, swap joystick port 2 in 1 once you reach the shop screen"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="467682">
@@ -6305,10 +6383,14 @@ Notes:
 		</part>
 	</software>
 
-	<software name="ggiana" supported="no"> <!-- game loads fully with a light blue screen but doesn't run -->
+	<software name="ggiana" supported="no">
 		<description>The Great Giana Sisters</description>
 		<year>1987</year>
 		<publisher>Go!</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, light blue screen
+]]></notes>
+		<info name="usage" value="Requires manual RUN issued after tape IPL" />
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="770867">
@@ -6317,11 +6399,11 @@ Notes:
 		</part>
 	</software>
 
+	<!-- Dumped by @c64tapes -->
 	<software name="greedmn">
 		<description>The Greed Monster</description>
 		<year>1990</year>
 		<publisher>Hi Tec Software</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -6618,11 +6700,11 @@ Notes:
 		</part>
 	</software>
 
+	<!-- Dumped by @c64tapes -->
 	<software name="hacker2">
 		<description>Hacker II</description>
 		<year>1989</year>
 		<publisher>Mastertronic</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -6717,10 +6799,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="hawkeye" supported="no"> <!-- game loads fully with a black screen but doesn't run -->
+	<software name="hawkeye" supported="no">
 		<description>Hawkeye</description>
 		<year>1988</year>
 		<publisher>Thalamus</publisher>
+		<notes><![CDATA[
+Fails [tape] loading after title screen, black screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -6893,10 +6978,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="highlndr" supported="no"> <!-- game loads partially and then stops (just displays a black screen) -->
+	<software name="highlndr" supported="no">
 		<description>Highlander</description>
 		<year>1986</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, black screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="2034089">
@@ -6905,10 +6993,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="highwaye" supported="no"> <!-- game loads fully with a light blue screen but doesn't run -->
+	<software name="highwaye" supported="no">
 		<description>Highway Ecounter</description>
 		<year>1986</year>
 		<publisher>Gremlin Graphics</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, light blue screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="474042">
@@ -6955,10 +7046,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="hobbita" cloneof="hobbit" supported="no"> <!-- game loads fully with a light blue screen but doesn't run -->
+	<software name="hobbita" cloneof="hobbit" supported="no">
 		<description>The Hobbit (alt)</description>
 		<year>1985</year>
 		<publisher>Melbourne House</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, light blue screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="360879">
@@ -7183,10 +7277,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="hunchadv" supported="no"> <!-- game loads to title screen but fails to load part 1 -->
+	<software name="hunchadv" supported="no">
 		<description>Hunchback: The Adventure</description>
 		<year>1986</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Fails [tape] loading on gameplay part 1
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Tape 1 Side 1: Loader"/>
@@ -7940,10 +8037,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="intsoccr" supported="no"> <!-- once FOUND SOCCER is displayed, game title does not load any further -->
+	<software name="intsoccr" supported="no">
 		<description>International Soccer</description>
 		<year>1988</year>
 		<publisher>CRL</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, light blue screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="361008">
@@ -7976,10 +8076,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="eaglnest" supported="no"> <!-- game loads to the title screen but crashes to a black screen once player has started a game -->
+	<software name="eaglnest" supported="no">
 		<description>Into the Eagles Nest</description>
 		<year>1987</year>
 		<publisher>Pandora</publisher>
+		<notes><![CDATA[
+Fails [tape] loading after pressing joy fire on title screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="472663">
@@ -8230,10 +8333,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="judgedre" supported="no"> <!-- game loads fully with a light blue screen but doesn't run -->
+	<software name="judgedre" supported="no">
 		<description>Judge Dredd</description>
 		<year>1986</year>
 		<publisher>Melbourne House</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, light blue screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="512664">
@@ -8443,6 +8549,7 @@ Notes:
 		<description>Kikstart 2</description>
 		<year>1987</year>
 		<publisher>Mastertronic</publisher>
+		<sharedfeat name="joy1_default" value="joy" />
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="718821">
@@ -8583,10 +8690,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="knuckleb" supported="no"> <!-- game loads fully with a light blue screen but doesn't run -->
+	<software name="knuckleb" supported="no">
 		<description>Knuckle Busters</description>
 		<year>1986</year>
 		<publisher>Melbourne House</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, light blue screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="355994">
@@ -8708,10 +8818,15 @@ Notes:
 		</part>
 	</software>
 
-	<software name="kpbiker">
+	<!-- TODO: concile metadata with spectrum_cass:actionbi -->
+	<software name="kpbiker" supported="partial">
 		<description>KP Skips Action Biker with Clumsy Colin</description>
 		<year>1985</year>
 		<publisher>Mastertronic</publisher>
+		<notes><![CDATA[
+[VIC] status bar GFX positioning desync during gameplay (particularly when scrolling fast)
+]]></notes>
+		<info name="alt_title" value="Action Biker"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="864924">
@@ -8750,10 +8865,13 @@ Notes:
 		</part>
 	</software>
 
-	<software name="kwah" supported="no"> <!-- game loads fully with a light blue screen but doesn't run -->
+	<software name="kwah" supported="no">
 		<description>Kwah!</description>
 		<year>1986</year>
 		<publisher>Melbourne House</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, light blue screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="428018">
@@ -8993,6 +9111,7 @@ Notes:
 		<notes><![CDATA[
 Glitchy [VIC] setup screen during loading
 ]]></notes>
+
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="443777">
 				<rom name="lazy_jones.tap" size="443777" crc="74629b17" sha1="775c3d98f11830fd9493b54e56b68d211767003a" offset="0" />
@@ -9088,11 +9207,18 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="liveammo">
+	<software name="liveammo" supported="partial">
 		<description>Live Ammo</description>
 		<year>1987</year>
 		<publisher>Ocean</publisher>
-		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading Green Beret"/>
+		<notes><![CDATA[
+The Great Escape:
+Army Moves: fails [tape] loading, black screen
+Green Beret:
+Top Gun:
+Rambo: LOAD "RAMBO" at around 250 tape counter. [VIC] status bar at bottom cuts off score display.
+]]></notes>
+		<info name="usage" value="Green Beret: Ensure c1541 Slot Device is removed."/>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Tape 1 Side 1: The Great Escape"/>
@@ -9124,7 +9250,7 @@ Glitchy [VIC] setup screen during loading
 	</software>
 
 	<software name="laswat">
-		<description>Los Angeles Swat</description>
+		<description>Los Angeles SWAT</description>
 		<year>1986</year>
 		<publisher>Entertainment USA</publisher>
 
@@ -9141,10 +9267,13 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="lotus" supported="no"> <!-- game loads to side 2 but gets stuck continuosuly loading (game never starts) -->
+	<software name="lotus" supported="no">
 		<description>Lotus Esprit Turbo Challenge</description>
 		<year>1992</year>
 		<publisher>GBH</publisher>
+		<notes><![CDATA[
+Fails [tape] loading side 2
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -9161,10 +9290,13 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="lotusg" cloneof="lotus" supported="no"> <!-- game loads to side 2 but gets stuck continuosuly loading (game never starts) -->
+	<software name="lotusg" cloneof="lotus" supported="no">
 		<description>Lotus Esprit Turbo Challenge (Gremlin Graphics)</description>
 		<year>1990</year>
 		<publisher>Gremlin Graphics</publisher>
+		<notes><![CDATA[
+Fails [tape] loading side 2
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -9580,11 +9712,11 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
+	<!-- Dumped by @c64tapes -->
 	<software name="midnghth">
 		<description>Midnight Resistance</description>
 		<year>1992</year>
 		<publisher>The Hit Squad</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="726358">
@@ -9961,6 +10093,9 @@ Glitchy [VIC] setup screen during loading
 		<description>Mystery of the Nile</description>
 		<year>1987</year>
 		<publisher>Firebird</publisher>
+		<notes><![CDATA[
+Player sprite can overrun outside the playfield i.e. crouching to the right edge in 2nd screen (btanb)
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="625862">
@@ -10029,10 +10164,13 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="nemwar" supported="no"> <!-- game loads partially and then stops with a flashing cursor -->
+	<software name="nemwar" supported="no">
 		<description>Nemesis the Warlock</description>
 		<year>1987</year>
 		<publisher>Martech</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, punts back to BASIC prompt
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="467422">
@@ -10463,11 +10601,11 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
+	<!-- Dumped by @c64tapes -->
 	<software name="omahd">
 		<description>One Man and His Droid</description>
 		<year>1985</year>
 		<publisher>199 Range</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -10912,10 +11050,14 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="phmpeg" supported="no"> <!-- game loads fully including scenario but screen is filled with garbled graphics -->
-		<description>PHM Pegasus</description>
+	<software name="phmpeg" supported="no">
+		<description>P.H.M. Pegasus</description>
 		<year>1987</year>
 		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+Hangs with garbled GFXs after [tape] scenario loading
+]]></notes>
+		<info name="usage" value="When asked to swap tape side, press play on tape after striking any keyboard key"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1: Loader"/>
@@ -11385,11 +11527,11 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
+	<!-- Dumped by @c64tapes -->
 	<software name="pulsewr">
 		<description>Pulse Warrior</description>
 		<year>1988</year>
 		<publisher>Mastertronic</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -11775,11 +11917,13 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="rambo2">
+	<software name="rambo2" supported="partial">
 		<description>Rambo: First Blood Part II</description>
 		<year>1989</year>
 		<publisher>The Hit Squad</publisher>
-		<info name="alt_title" value="Rambo"/>
+		<notes><![CDATA[
+[VIC] status bar at bottom cuts off score display
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="642762">
@@ -11788,11 +11932,13 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="rambo2o" cloneof="rambo2">
+	<software name="rambo2o" cloneof="rambo2" supported="partial">
 		<description>Rambo: First Blood Part II (Ocean)</description>
 		<year>1985</year>
 		<publisher>Ocean</publisher>
-		<info name="alt_title" value="Rambo"/>
+		<notes><![CDATA[
+[VIC] status bar at bottom cuts off score display
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="743231">
@@ -11829,6 +11975,7 @@ Glitchy [VIC] setup screen during loading
 		<description>Rana Rama</description>
 		<year>1987</year>
 		<publisher>Hewson Consultants</publisher>
+		<info name="alt_title" value="Ranarama"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="371686">
@@ -11887,11 +12034,11 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
+	<!-- Dumped by @c64tapes -->
 	<software name="realm">
 		<description>Realm</description>
 		<year>1987</year>
 		<publisher>Firebird Silver</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -12303,11 +12450,11 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
+	<!-- Dumped by @c64tapes -->
 	<software name="robocop">
 		<description>RoboCop</description>
 		<year>1991</year>
 		<publisher>The Hit Squad</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -12380,11 +12527,11 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
+	<!-- Dumped by @c64tapes -->
 	<software name="rockfrd">
 		<description>Rockford / Back to Reality</description>
 		<year>1987</year>
 		<publisher>Mastertronic Added Dimension</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Back to Reality"/>
@@ -12633,10 +12780,14 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="scooby" supported="no"> <!-- game loads to the title screen but crashes once player has started a game -->
+	<software name="scooby" supported="no">
 		<description>Scooby-Doo</description>
 		<year>1986</year>
 		<publisher>Elite Systems</publisher>
+		<notes><![CDATA[
+Crashes on first frame of gameplay after title, [tape] loading?
+]]></notes>
+		<info name="usage" value="Requires manual RUN issued after tape IPL" />
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="626873">
@@ -12784,10 +12935,13 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="shadowso" supported="no"> <!-- tape loads but doesn't run (remains stuck showing light blue screen) -->
+	<software name="shadowso" supported="no">
 		<description>Shadows of Mordor</description>
 		<year>1987</year>
 		<publisher>Melbourne House</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, light blue screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="682118">
@@ -12864,10 +13018,13 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="shrtcirco" cloneof="shrtcirc" supported="no"> <!-- game loads to the title screen and locks up -->
+	<software name="shrtcirco" cloneof="shrtcirc" supported="no">
 		<description>Short Circuit (Ocean)</description>
 		<year>1987</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Hangs at credits screen after title, [tape] loading?
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="643155">
@@ -13104,7 +13261,7 @@ Glitchy [VIC] setup screen during loading
 		<description>Skyline Attack</description>
 		<year>1984</year>
 		<publisher>Century Software</publisher>
-		<info name="usage" value="Requires manual RUN issued after tape IPL. Press space or fire during loading for playing Sssnake minigame. Press RUN STOP when prompted to for the actual game." />
+		<info name="usage" value="Requires manual RUN issued after tape IPL. Press space or fire during loading for playing Sssnake minigame. Press RUNSTOP when prompted to for the actual game." />
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="512730">
@@ -13235,10 +13392,13 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="snare" supported="no"> <!-- game loads fully and music starts playing but no picture (black screen) -->
+	<software name="snare" supported="no">
 		<description>Snare</description>
 		<year>1989</year>
 		<publisher>Thalamus</publisher>
+		<notes><![CDATA[
+Black screen after [tape] loading with music playing
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -13785,10 +13945,13 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="steel" supported="no"> <!-- game loads fully and displays "steel" but no music and unable to start a game -->
+	<software name="steel" supported="no">
 		<description>Steel</description>
 		<year>1988</year>
 		<publisher>Rack It</publisher>
+		<notes><![CDATA[
+Hangs at "STEEL" screen after [tape] loading
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="420211">
@@ -13797,10 +13960,13 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="steelp" cloneof="steel" supported="no"> <!-- game loads fully and displays "steel" but no music and unable to start a game -->
+	<software name="steelp" cloneof="steel" supported="no">
 		<description>Steel (Prism Leisure)</description>
 		<year>1992</year>
 		<publisher>Prism Leisure</publisher>
+		<notes><![CDATA[
+Hangs at "STEEL" screen after [tape] loading
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="462635">
@@ -14028,10 +14194,16 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="sssoccer" supported="no"> <!-- tape loads but doesn't run (remains stuck showing light blue screen) -->
+	<software name="sssoccer" supported="no">
 		<description>Street Sports Soccer</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
+		<notes><![CDATA[
+Randomly fails [tape] loading, light blue screen (sometimes it boots fine)
+TODO: check collision detection, manual claims stealing happens if player is on ball
+]]></notes>
+		<info name="usage" value="Requires manual RUN issued after tape IPL" />
+		<!-- TODO: sharedfeat joystick in port 1 -->
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1: Field 1"/>
@@ -14114,7 +14286,7 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="spoker">
+	<software name="spoker" supported="yes">
 		<description>Strip Poker</description>
 		<year>1984</year>
 		<publisher>U.S. Gold</publisher>
@@ -14134,10 +14306,13 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="spokerc" cloneof="spoker">
+	<software name="spokerc" cloneof="spoker" supported="no">
 		<description>Strip Poker (CDS)</description>
 		<year>1985</year>
 		<publisher>Blue Ribbon</publisher>
+		<notes><![CDATA[
+Hangs on title screen with FIRE pressed for side 1 at least, [tape]?
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1: Suzi"/>
@@ -14154,10 +14329,13 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="spoker2">
+	<software name="spoker2" supported="no">
 		<description>Strip Poker II</description>
 		<year>1989</year>
 		<publisher>Byte Back</publisher>
+		<notes><![CDATA[
+Fails [tape] loading for side 2, light blue screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1: Donna"/>
@@ -14246,11 +14424,11 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
+	<!-- Dumped by @c64tapes -->
 	<software name="summrck">
 		<description>Summer Camp</description>
 		<year>1992</year>
 		<publisher>Kixx</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -14885,10 +15063,13 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="tarzan" supported="no"> <!-- running game produces a syntax error -->
+	<software name="tarzan" supported="no">
 		<description>Tarzan</description>
 		<year>1986</year>
 		<publisher>Martech</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, punts back to BASIC prompt
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="566994">
@@ -14897,11 +15078,15 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="technoco" supported="no"> <!-- game partly loads and then crashes -->
+	<software name="technoco" supported="no">
 		<description>Techno Cop</description>
 		<year>1989</year>
 		<publisher>Gremlin Graphics</publisher>
-
+		<notes><![CDATA[
+Playfield charset has heavy [VIC] glitches on title screen (random corruption)
+Fails [tape] loading after side swap (update: cannot reproduce, random?)
+]]></notes>
+		<info name="usage" value="Requires manual RUN issued after tape IPL" />
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
 			<dataarea name="cass" size="425634">
@@ -14998,11 +15183,11 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="tetris">
+	<!-- Dumped by @c64tapes -->
+	<software name="tetris" supported="yes">
 		<description>Tetris</description>
 		<year>1989</year>
 		<publisher>Mastertronic Plus</publisher>
-		<!-- Dumped by @c64tapes -->
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -15037,10 +15222,17 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="tsam">
+	<software name="tsam" supported="partial">
 		<description>They Sold a Million</description>
 		<year>1985</year>
 		<publisher>The Hit Squad</publisher>
+		<notes><![CDATA[
+Beach Head:
+Decathlon: Player select 1 and 2 chars looks weird (btanb); Minor [VIC] timing line glitches during gameplay;
+The Staff of Karnath: Fails [tape] loading, light blue screen
+Jet Set Willy:
+]]></notes>
+		<info name="usage" value="Decathlon: Requires manual RUN issued after tape IPL, and joystick in port 1" />
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Tape 1 Side 1: Beach Head"/>
@@ -15071,10 +15263,17 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="tsam3">
+	<software name="tsam3" supported="partial">
 		<description>They Sold a Million 3</description>
 		<year>1987</year>
 		<publisher>The Hit Squad</publisher>
+		<notes><![CDATA[
+Fighter Pilot:
+Ghostbusters: BASIC IPL dislikes being skipped with SPACE key (wants specifically CBM key); [tape] fails when loading gameplay with a garbage screen (btanb, remove c1541)
+Rambo: [VIC] status bar at bottom cuts off score display
+Kung-Fu Master: randomly crashes on life losses
+]]></notes>
+		<info name="usage" value="Ghostbusters: Ensure c1541 Slot Device is removed prior to loading, swap joystick port 2 in 1 once you reach the shop screen"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Tape 1 Side 1: Fighter Pilot"/>
@@ -15105,10 +15304,13 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="theystol" supported="no"> <!-- copy protection prevents from fully loading -->
+	<software name="theystol" supported="no">
 		<description>They Stole a Million</description>
 		<year>1986</year>
 		<publisher>39 Steps</publisher>
+		<notes><![CDATA[
+[tape] hangs with a "I/O ERROR #666: DODGEY GEEZER AT KEYBOARD ERROR" (copy protection?)
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="818802">
@@ -15525,10 +15727,13 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="trailblzg" cloneof="trailblz" supported="no"> <!-- game title doesn't fully load (stuck on light blue screen) -->
+	<software name="trailblzg" cloneof="trailblz" supported="no">
 		<description>Trailblazer (Gremlin Graphics)</description>
 		<year>1986</year>
 		<publisher>Gremlin Graphics</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, light blue screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="367554">
@@ -15839,10 +16044,14 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="v" supported="no"> <!-- game loads to the title screen but crashes once player has started a game -->
+	<software name="v" supported="no">
 		<description>V</description>
 		<year>1985</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Hangs with bad graphics after pressing FIRE (actually SPACE key), [tape]?
+]]></notes>
+		<info name="alt_title" value="V: The Computer Game" />
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="483637">
@@ -15987,10 +16196,13 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="war" supported="no"> <!-- game partially loads and stops with only "W.A.R" text displayed -->
+	<software name="war" supported="no">
 		<description>W.A.R</description>
 		<year>1986</year>
 		<publisher>Martech</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, prints "- W.A.R. -" and hangs there
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="687530">
@@ -15999,10 +16211,13 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="wgtrhyme" supported="no"> <!-- tape loads but doesn't run (remains stuck showing light blue screen) -->
+	<software name="wgtrhyme" supported="no">
 		<description>Wallie goes to Rhymeland</description>
 		<year>1984</year>
 		<publisher>Inteceptor Software</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, light blue screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="544664">
@@ -16119,10 +16334,13 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="explfistmh" cloneof="explfist" supported="no"> <!-- tape loads but doesn't run (remains stuck showing light blue screen) -->
+	<software name="explfistmh" cloneof="explfist" supported="no">
 		<description>The Way of the Exploding Fist (Melbourne House)</description>
 		<year>1985</year>
 		<publisher>Melbourne House</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, light blue screen
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="596605">
@@ -16240,10 +16458,14 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="wimbledo" supported="no"> <!-- game loads fully with a light blue screen but doesn't run -->
+	<software name="wimbledo" supported="no">
 		<description>Wimbledon '64</description>
 		<year>1984</year>
 		<publisher>Merlin Software</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, light blue screen
+A cover art sports a "featuring Jetload 1200" sticker (?)
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="333715">
@@ -16643,10 +16865,13 @@ Glitchy [VIC] setup screen during loading
 		</part>
 	</software>
 
-	<software name="yiear2" supported="no"> <!-- game partially loads and stops with a black screen -->
-		<description>Yie Ar Kung Fu II</description>
+	<software name="yiear2" supported="no">
+		<description>Yie Ar Kung-Fu II</description>
 		<year>1986</year>
 		<publisher>Imagine</publisher>
+		<notes><![CDATA[
+Fails [tape] loading, black screen
+]]></notes>
 		<info name="alt_title" value="Yie Ar Kung-Fu 2: The Emperor Yie-Gah"/>
 
 		<part name="cass1" interface="cbm_cass">

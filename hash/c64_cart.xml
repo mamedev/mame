@@ -4407,6 +4407,9 @@ Erratic [VIC] collsion detection, warps and invincibility bonuses can kill playe
 		<description>Kung-Fu Master</description>
 		<year>1985</year>
 		<publisher>Data East</publisher>
+		<notes><![CDATA[
+Randomly crashes on life losses
+]]></notes>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="magic_desk" />
 			<feature name="exrom" value="0" />
@@ -4502,10 +4505,13 @@ Erratic [VIC] collsion detection, warps and invincibility bonuses can kill playe
 		</part>
 	</software>
 
-	<software name="pang">
+	<software name="pang" supported="no">
 		<description>Pang</description>
 		<year>1991</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=8755
+]]></notes>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ocean" />
 			<feature name="exrom" value="0" />
