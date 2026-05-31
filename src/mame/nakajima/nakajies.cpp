@@ -295,6 +295,7 @@ private:
 	void irq_enable_w(u8 data);
 	void keyboard_control_w(u8 data);
 	void power_control_w(u8 data);
+	void sample_keyboard_rows();
 	u8 unk_a0_r();
 	void lcd_memory_start_w(u8 data);
 	u8 keyboard_r();
@@ -467,8 +468,15 @@ void nakajies_state::keyboard_control_w(u8 data)
 
 	m_keyboard_control = data;
 
+	if (enabled && !was_enabled)
+		sample_keyboard_rows();
+
 	if (!enabled || !was_enabled)
+	{
 		m_matrix = 0;
+		m_irq_active &= ~0x30;
+		nakajies_update_irqs();
+	}
 }
 
 
@@ -482,6 +490,13 @@ void nakajies_state::power_control_w(u8 data)
 		m_screen->set_brightness(0xa6);
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
+}
+
+
+void nakajies_state::sample_keyboard_rows()
+{
+	for (unsigned row = 0; row < std::size(m_port_row); row++)
+		m_ram_base[0x6d06 + row] = m_port_row[row]->read();
 }
 
 
@@ -679,6 +694,8 @@ INPUT_CHANGED_MEMBER(nakajies_state::power_button)
 {
 	if (!newval)
 		return;
+
+	sample_keyboard_rows();
 
 	if (m_lcd_enabled)
 		set_irq(0x01); // IRQ vector 0xff: warm/power-management source.
