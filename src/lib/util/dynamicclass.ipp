@@ -174,8 +174,8 @@ inline std::pair<R MAME_ABI_CXX_MEMBER_CALL (*)(void const *, T...), void const 
 ///
 /// Only used for the Itanium C++ ABI.
 /// \param [in] object Reference to the object to destroy.
-template <class Base, typename Extra> requires std::has_virtual_destructor_v<Base>
-void MAME_ABI_CXX_MEMBER_CALL dynamic_derived_class_base::destroyer<Base, Extra>::complete_object_destructor(
+template <class Base, typename Extra>
+void MAME_ABI_CXX_MEMBER_CALL dynamic_derived_class_base::destroyer<Base, Extra, std::enable_if_t<std::has_virtual_destructor_v<Base> > >::complete_object_destructor(
 		value_type<Base, Extra> &object)
 {
 	restore_base_vptr(object.base);
@@ -193,8 +193,8 @@ void MAME_ABI_CXX_MEMBER_CALL dynamic_derived_class_base::destroyer<Base, Extra>
 ///
 /// Only used for the Itanium C++ ABI.
 /// \param [in] object Pointer to the object to destroy.
-template <class Base, typename Extra> requires std::has_virtual_destructor_v<Base>
-void MAME_ABI_CXX_MEMBER_CALL dynamic_derived_class_base::destroyer<Base, Extra>::deleting_destructor(
+template <class Base, typename Extra>
+void MAME_ABI_CXX_MEMBER_CALL dynamic_derived_class_base::destroyer<Base, Extra, std::enable_if_t<std::has_virtual_destructor_v<Base> > >::deleting_destructor(
 		value_type<Base, Extra> *object)
 {
 	restore_base_vptr(object->base);
@@ -215,8 +215,8 @@ void MAME_ABI_CXX_MEMBER_CALL dynamic_derived_class_base::destroyer<Base, Extra>
 /// \param [in] flags If bit 0 is set, the memory occupied by the object
 ///   will be freed.
 /// \return The supplied object pointer.
-template <class Base, typename Extra> requires std::has_virtual_destructor_v<Base>
-void *MAME_ABI_CXX_MEMBER_CALL dynamic_derived_class_base::destroyer<Base, Extra>::scalar_deleting_destructor(
+template <class Base, typename Extra>
+void *MAME_ABI_CXX_MEMBER_CALL dynamic_derived_class_base::destroyer<Base, Extra, std::enable_if_t<std::has_virtual_destructor_v<Base> > >::scalar_deleting_destructor(
 		value_type<Base, Extra> *object,
 		unsigned int flags)
 {
@@ -235,8 +235,8 @@ void *MAME_ABI_CXX_MEMBER_CALL dynamic_derived_class_base::destroyer<Base, Extra
 /// object.  Used to delete instances of a dynamic derived class when
 /// the base class type does not have a virtual destructor.
 /// \param [in] object Pointer to the object to destroy.
-template <class Base, typename Extra> requires (!std::has_virtual_destructor_v<Base>)
-void dynamic_derived_class_base::destroyer<Base, Extra>::operator()(
+template <class Base, typename Extra>
+void dynamic_derived_class_base::destroyer<Base, Extra, std::enable_if_t<!std::has_virtual_destructor_v<Base> > >::operator()(
 		Base *object) const
 {
 	restore_base_vptr(*object);
