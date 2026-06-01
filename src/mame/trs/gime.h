@@ -51,6 +51,9 @@ public:
 	bool update_composite(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	bool update_rgb(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	// ROM decoder
+	static void decode_gime_font_rom(const uint8_t *raw_rom, uint8_t dest[][12], int char_count, int row_offset, const int *source_order = nullptr);
+
 	// interrupt outputs
 	bool firq_r() const { return m_firq != 0x00; }
 	bool irq_r() const { return m_irq != 0x00; }
