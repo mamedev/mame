@@ -179,7 +179,6 @@ All sprites are cutoff
 		<publisher>Muse Software</publisher>
 		<notes><![CDATA[
 LOAD "SPACE TAXI",8
-Bad [VIC] collision detection for landing pads (will always cause a crash)
 No [SID] sample voices
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
