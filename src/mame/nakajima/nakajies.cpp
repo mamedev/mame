@@ -395,7 +395,26 @@ protected:
 	required_device<n82077aa_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
 
+	u8 m_fdc_dor = 0;
+	u8 m_fdc_cmd[9] = {};
+	u8 m_fdc_cmd_len = 0;
+	u8 m_fdc_cmd_pos = 0;
+	u8 m_fdc_reset_sense_data[2] = {};
+	u8 m_fdc_reset_sense_count = 0;
+	u8 m_fdc_reset_sense_pos = 0;
+	u8 m_fdc_sense_interrupt_pos = 0;
+	u16 m_fdc_data_fifo_reads = 0;
+	u16 m_fdc_data_fifo_writes = 0;
+	bool m_fdc_reset_sense_active = false;
+	bool m_fdc_sense_interrupt_active = false;
+
 	void nakajies_io_map_fdc(address_map &map) ATTR_COLD;
+
+	u8 fdc_dor_r();
+	void fdc_dor_w(u8 data);
+	u8 fdc_msr_r();
+	u8 fdc_fifo_r();
+	void fdc_fifo_w(u8 data);
 };
 
 
@@ -472,7 +491,215 @@ void nakajies_state::nakajies_io_map(address_map &map)
 void nakajies_fdc_state::nakajies_io_map_fdc(address_map &map)
 {
 	nakajies_io_map(map);
-	map(0x00e0, 0x00ef).m(m_fdc, FUNC(n82077aa_device::map));
+	map(0x00e0, 0x00e0).r(m_fdc, FUNC(n82077aa_device::sra_r));
+	map(0x00e1, 0x00e1).r(m_fdc, FUNC(n82077aa_device::srb_r));
+	map(0x00e2, 0x00e2).rw(FUNC(nakajies_fdc_state::fdc_dor_r), FUNC(nakajies_fdc_state::fdc_dor_w));
+	map(0x00e3, 0x00e3).rw(m_fdc, FUNC(n82077aa_device::tdr_r), FUNC(n82077aa_device::tdr_w));
+	map(0x00e4, 0x00e4).r(FUNC(nakajies_fdc_state::fdc_msr_r));
+	map(0x00e4, 0x00e4).w(m_fdc, FUNC(n82077aa_device::dsr_w));
+	map(0x00e5, 0x00e5).rw(FUNC(nakajies_fdc_state::fdc_fifo_r), FUNC(nakajies_fdc_state::fdc_fifo_w));
+	map(0x00e7, 0x00e7).rw(m_fdc, FUNC(n82077aa_device::dir_r), FUNC(n82077aa_device::ccr_w));
+}
+
+
+static u8 t200_fdc_command_length(u8 command)
+{
+	switch (command & 0x1f)
+	{
+	case 0x03: // specify
+	case 0x0f: // seek
+		return 3;
+	case 0x04: // sense drive status
+	case 0x07: // recalibrate
+	case 0x0a: // read ID
+	case 0x12: // perpendicular mode
+		return 2;
+	case 0x05: // write data
+	case 0x06: // read data
+	case 0x09: // write deleted data
+	case 0x0c: // read deleted data
+		return 9;
+	case 0x0d: // format track
+		return 6;
+	case 0x13: // configure
+		return 4;
+	default:
+		return 1;
+	}
+}
+
+
+static u16 t200_fdc_sector_size(u8 n, u8 dtl)
+{
+	return n ? (128U << n) : dtl;
+}
+
+
+u8 nakajies_fdc_state::fdc_dor_r()
+{
+	return m_fdc->dor_r();
+}
+
+
+void nakajies_fdc_state::fdc_dor_w(u8 data)
+{
+	const bool reset_released = !BIT(m_fdc_dor, 2) && BIT(data, 2);
+
+	m_fdc_dor = data;
+	m_fdc->dor_w(data);
+
+	if (reset_released)
+	{
+		// The T200 ROM immediately polls Sense Interrupt Status after
+		// releasing reset and expects reset-complete status bytes.
+		m_fdc_cmd_len = 0;
+		m_fdc_cmd_pos = 0;
+		m_fdc_data_fifo_reads = 0;
+		m_fdc_data_fifo_writes = 0;
+		m_fdc_reset_sense_count = 4;
+		m_fdc_reset_sense_pos = 0;
+		m_fdc_sense_interrupt_pos = 0;
+		m_fdc_reset_sense_active = false;
+		m_fdc_sense_interrupt_active = false;
+	}
+}
+
+
+u8 nakajies_fdc_state::fdc_msr_r()
+{
+	if (m_fdc_reset_sense_active)
+		return 0xd0; // RQM | DIO | CB: result byte ready.
+
+	return m_fdc->msr_r();
+}
+
+
+u8 nakajies_fdc_state::fdc_fifo_r()
+{
+	if (m_fdc_reset_sense_active)
+	{
+		const u8 data = m_fdc_reset_sense_data[m_fdc_reset_sense_pos & 1];
+
+		m_fdc_reset_sense_pos++;
+		if (m_fdc_reset_sense_pos == 2)
+		{
+			m_fdc_reset_sense_pos = 0;
+			m_fdc_reset_sense_active = false;
+		}
+
+		return data;
+	}
+
+	if (m_fdc_data_fifo_reads)
+	{
+		const u8 data = m_fdc->fifo_r();
+
+		m_fdc_data_fifo_reads--;
+
+		if (!m_fdc_data_fifo_reads)
+		{
+			m_fdc->tc_w(true);
+			m_fdc->tc_w(false);
+		}
+
+		return data;
+	}
+
+	u8 data = m_fdc->fifo_r();
+	if (m_fdc_sense_interrupt_active)
+	{
+		if (!m_fdc_sense_interrupt_pos)
+		{
+			data &= ~0x04;
+		}
+
+		m_fdc_sense_interrupt_pos++;
+		if (data == 0x80 || m_fdc_sense_interrupt_pos == 2)
+		{
+			m_fdc_sense_interrupt_active = false;
+			m_fdc_sense_interrupt_pos = 0;
+		}
+	}
+
+	return data;
+}
+
+
+void nakajies_fdc_state::fdc_fifo_w(u8 data)
+{
+	if (data == 0x08 && m_fdc_reset_sense_count)
+	{
+		m_fdc->fifo_w(data);
+
+		const u8 core_st0 = m_fdc->fifo_r();
+		u8 core_pcn = 0x00;
+		bool core_has_pcn = false;
+		if (core_st0 != 0x80 && (m_fdc->msr_r() & 0xc0) == 0xc0)
+		{
+			core_pcn = m_fdc->fifo_r();
+			core_has_pcn = true;
+		}
+
+		m_fdc_reset_sense_data[0] = core_st0 != 0x80 ? core_st0 : (0xc0 | (4 - m_fdc_reset_sense_count));
+		m_fdc_reset_sense_data[1] = core_has_pcn ? core_pcn : 0x00;
+
+		m_fdc_reset_sense_count--;
+		if (!m_fdc_reset_sense_count && (m_fdc->msr_r() & 0xc0) == 0x80)
+		{
+			m_fdc->fifo_w(0x08);
+			const u8 drain_st0 = m_fdc->fifo_r();
+			if (drain_st0 != 0x80 && (m_fdc->msr_r() & 0xc0) == 0xc0)
+				m_fdc->fifo_r();
+		}
+		m_fdc_reset_sense_pos = 0;
+		m_fdc_reset_sense_active = true;
+		return;
+	}
+
+	if (m_fdc_data_fifo_writes)
+	{
+		m_fdc->fifo_w(data);
+
+		m_fdc_data_fifo_writes--;
+
+		if (!m_fdc_data_fifo_writes)
+		{
+			m_fdc->tc_w(true);
+			m_fdc->tc_w(false);
+		}
+
+		return;
+	}
+
+	if (!m_fdc_cmd_pos)
+	{
+		m_fdc_cmd_len = t200_fdc_command_length(data);
+		m_fdc_sense_interrupt_active = data == 0x08;
+		m_fdc_sense_interrupt_pos = 0;
+	}
+
+	m_fdc_cmd[m_fdc_cmd_pos++] = data;
+
+	m_fdc->fifo_w(data);
+
+	if (m_fdc_cmd_pos >= m_fdc_cmd_len)
+	{
+		switch (m_fdc_cmd[0] & 0x1f)
+		{
+		case 0x05:
+			m_fdc_data_fifo_writes = t200_fdc_sector_size(m_fdc_cmd[5], m_fdc_cmd[8]);
+			break;
+		case 0x06:
+			m_fdc_data_fifo_reads = t200_fdc_sector_size(m_fdc_cmd[5], m_fdc_cmd[8]);
+			break;
+		case 0x0d:
+			m_fdc_data_fifo_writes = m_fdc_cmd[3] * 4;
+			break;
+		}
+
+		m_fdc_cmd_len = 0;
+		m_fdc_cmd_pos = 0;
+	}
 }
 
 
@@ -1216,7 +1443,7 @@ void nakajies_fdc_state::nakajies250(machine_config &config)
 	m_screen->set_visarea(0, 6 * 80 - 1, 0, 16 * 8 - 1);
 	m_gfxdecode->set_info(gfx_drwrt200);
 
-	N82077AA(config, m_fdc, 24_MHz_XTAL);  // Actually Intel N82877SL
+	N82077AA(config, m_fdc, 24_MHz_XTAL, n82077aa_device::mode_t::PS2);  // Actually Intel N82877SL
 	FLOPPY_CONNECTOR(config, m_floppy, "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 }
 
