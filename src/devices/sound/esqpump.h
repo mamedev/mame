@@ -8,6 +8,7 @@
 #include "sound/es5506.h"
 #include "cpu/es5510/es5510.h"
 
+#define PUMP_TRACK_ESP_HALT 0
 #define PUMP_DETECT_SILENCE 0
 #define PUMP_TRACK_SAMPLES 0
 #define PUMP_FAKE_ESP_PROCESSING 0
@@ -21,7 +22,7 @@ public:
 	template <typename T> void set_esp(T &&tag) { m_esp.set_tag(std::forward<T>(tag)); }
 	void set_esp_halted(bool esp_halted) {
 		m_esp_halted = esp_halted;
-		logerror("ESP-halted -> %d\n", m_esp_halted);
+		if constexpr (PUMP_TRACK_ESP_HALT) logerror("ESP-halted -> %d\n", static_cast<int>(m_esp_halted));
 		if (!esp_halted) {
 #if PUMP_REPLACE_ESP_PROGRAM
 			m_esp->write_reg(245, 0x1d0f << 8); // dlength = 0x3fff, 16-sample delay
