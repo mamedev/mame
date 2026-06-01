@@ -20,6 +20,7 @@
 #include "nanosvg.h"
 #include "png.h"
 
+#include <cstdio>
 #include <set>
 
 
