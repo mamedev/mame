@@ -407,6 +407,10 @@ protected:
 	bool m_cache_weak;
 
 	bool m_image_dirty, m_track_dirty;
+	bool m_pending_write;
+	int m_pending_write_cyl, m_pending_write_ss, m_pending_write_subcyl;
+	int m_pending_write_start, m_pending_write_end;
+	std::vector<int> m_pending_write_flux_change_positions;
 	int m_ready_counter;
 
 	load_cb m_cur_load_cb;
@@ -436,6 +440,7 @@ protected:
 	attotime position_to_time(const attotime &base, int position) const;
 
 	void commit_image();
+	void flush_pending_write();
 
 	u32 hash32(u32 val) const;
 

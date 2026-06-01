@@ -297,6 +297,12 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 	m_amplifier_freakout_time(attotime::from_usec(16)),
 	m_image_dirty(false),
 	m_track_dirty(false),
+	m_pending_write(false),
+	m_pending_write_cyl(0),
+	m_pending_write_ss(0),
+	m_pending_write_subcyl(0),
+	m_pending_write_start(0),
+	m_pending_write_end(0),
 	m_ready_counter(0),
 	m_make_sound(false),
 	m_sound_out(*this, FLOPSND_TAG)
@@ -502,6 +508,7 @@ void floppy_image_device::setup_write(const floppy_image_format_t *_output_forma
 
 void floppy_image_device::commit_image()
 {
+	flush_pending_write();
 	m_image_dirty = false;
 	if(!m_output_format || !m_output_format->supports_save())
 		return;
@@ -648,6 +655,8 @@ std::pair<std::error_condition, const floppy_image_format_t *> floppy_image_devi
 void floppy_image_device::init_floppy_load(bool write_supported)
 {
 	cache_clear();
+	m_pending_write = false;
+	m_pending_write_flux_change_positions.clear();
 	m_revolution_start_time = m_mon ? attotime::never : machine().time();
 	m_revolution_count = 0;
 
@@ -1092,6 +1101,7 @@ void floppy_image_device::cache_clear()
 
 void floppy_image_device::cache_fill(const attotime &when)
 {
+	flush_pending_write();
 	std::vector<uint32_t> &buf = m_image->get_buffer(m_cyl, m_ss, m_subcyl);
 	uint32_t const cells = buf.size();
 	if(cells <= 1) {
@@ -1201,8 +1211,38 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 
 	wspan_split_on_wrap(wspans);
 
-	std::vector<uint32_t> &buf = m_image->get_buffer(m_cyl, m_ss, m_subcyl);
+	for(const auto &ws : wspans) {
+		if(!m_pending_write || m_pending_write_cyl != m_cyl || m_pending_write_ss != m_ss || m_pending_write_subcyl != m_subcyl || m_pending_write_end != ws.start) {
+			flush_pending_write();
+			m_pending_write = true;
+			m_pending_write_cyl = m_cyl;
+			m_pending_write_ss = m_ss;
+			m_pending_write_subcyl = m_subcyl;
+			m_pending_write_start = ws.start;
+			m_pending_write_end = ws.start;
+			m_pending_write_flux_change_positions.clear();
+		}
 
+		m_pending_write_end = ws.end;
+		m_pending_write_flux_change_positions.insert(
+				m_pending_write_flux_change_positions.end(),
+				ws.flux_change_positions.begin(),
+				ws.flux_change_positions.end());
+	}
+}
+
+
+void floppy_image_device::flush_pending_write()
+{
+	if(!m_pending_write)
+		return;
+
+	std::vector<wspan> wspans(1);
+	wspans[0].start = m_pending_write_start;
+	wspans[0].end = m_pending_write_end;
+	wspans[0].flux_change_positions.swap(m_pending_write_flux_change_positions);
+
+	std::vector<uint32_t> &buf = m_image->get_buffer(m_pending_write_cyl, m_pending_write_ss, m_pending_write_subcyl);
 	if(buf.empty()) {
 		buf.push_back(floppy_image::MG_N);
 		buf.push_back(floppy_image::MG_E | 199999999);
@@ -1211,6 +1251,7 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 	wspan_remove_damaged(wspans, buf);
 	wspan_write(wspans, buf);
 
+	m_pending_write = false;
 	cache_clear();
 }
 
@@ -1337,6 +1378,7 @@ void floppy_image_device::wspan_write(const std::vector<wspan> &wspans, std::vec
 void floppy_image_device::set_write_splice(const attotime &when)
 {
 	if(m_image && !m_mon) {
+		flush_pending_write();
 		m_image_dirty = true;
 		attotime base;
 		int splice_pos = find_position(base, when);
