@@ -139,15 +139,15 @@ protected:
 	void mct_map(address_map &map) ATTR_COLD;
 
 	// machine config
-	void jazz(machine_config &config);
+	void jazz(machine_config &config) ATTR_COLD;
 
 	void led_w(u8 data);
 
 public:
-	void mmr4000be(machine_config &config);
-	void mmr4000le(machine_config &config);
+	void mmr4000be(machine_config &config) ATTR_COLD;
+	void mmr4000le(machine_config &config) ATTR_COLD;
 
-	void init_common();
+	void init_common() ATTR_COLD;
 
 protected:
 	// devices
@@ -176,7 +176,6 @@ protected:
 
 void jazz_state::machine_start()
 {
-	m_led.resolve();
 }
 
 void jazz_state::machine_reset()
@@ -488,7 +487,7 @@ ROM_START(mmr4000le)
 	ROM_LOAD64_BYTE("mips_g364.bin", 0x000000, 0x020000, CRC(be6a726e) SHA1(225c198f6a7f8445dac3de052ecceecbb5be6bc7) BAD_DUMP)
 ROM_END
 
-}
+} // anonymous namespace
 
 /*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT         COMPANY  FULLNAME             FLAGS */
 COMP(1992,  mmr4000be, 0,      0,      mmr4000be, 0,     jazz_state, init_common, "MIPS",  "Magnum R4000 (be)", MACHINE_NO_SOUND)

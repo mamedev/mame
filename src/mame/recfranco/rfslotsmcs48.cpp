@@ -84,12 +84,14 @@ public:
 		, m_outbit(*this, "outbit%u", 0U)
 	{ }
 
-	void rf_3115_base(machine_config &config);
-	void ajofrin(machine_config &config);
-	void babyfrts(machine_config &config);
+	void ajofrin(machine_config &config) ATTR_COLD;
+	void babyfrts(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+
+	void rf_3115_base(machine_config &config) ATTR_COLD;
+
 	memory_share_creator<uint8_t> m_data_ram;
 
 	required_device<i8035_device> m_maincpu;
@@ -162,7 +164,6 @@ private:
 
 void rfslotsmcs48_state::machine_start()
 {
-	m_outbit.resolve();
 }
 
 

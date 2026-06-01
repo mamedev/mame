@@ -1033,8 +1033,6 @@ INPUT_PORTS_END
 
 void mpu12_base_state::machine_start()
 {
-	m_lamps.resolve();
-
 	m_change_pia2a_bit7_timer = timer_alloc(FUNC(mpu1_state::change_pia2a_bit7), this);
 
 	save_item(NAME(m_lamp_relay));
@@ -1045,8 +1043,6 @@ void mpu12_base_state::machine_start()
 void mpu2_em_state::machine_start()
 {
 	mpu12_base_state::machine_start();
-
-	m_digits.resolve();
 }
 
 void mpu2_stepper_state::machine_start()

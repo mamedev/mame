@@ -126,9 +126,6 @@ void bbcmc_state::machine_start()
 {
 	bbc_state::machine_start();
 
-	m_power_led.resolve();
-	m_floppy_leds.resolve();
-
 	if (m_floppy[0]->get_device())
 		m_floppy[0]->get_device()->setup_led_cb(floppy_image_device::led_cb(&bbcmc_state::floppy_led_cb<0>, this));
 	if (m_floppy[1]->get_device())

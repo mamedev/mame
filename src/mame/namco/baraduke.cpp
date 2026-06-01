@@ -669,8 +669,6 @@ GFXDECODE_END
 
 void baraduke_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_inputport_selected));
 }
 

@@ -283,8 +283,6 @@ private:
 
 void igs_m027_state::machine_start()
 {
-	m_out_lamps.resolve();
-
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
 	std::fill(std::begin(m_io_select), std::end(m_io_select), 0xff);
 	m_first_start = true;

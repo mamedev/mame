@@ -492,13 +492,6 @@ void gaplus_base_state::machine_start()
 	save_item(NAME(m_sub2_irq_mask));
 }
 
-void gaplus_state::machine_start()
-{
-	gaplus_base_state::machine_start();
-
-	m_lamps.resolve();
-}
-
 void gaplus_base_state::gaplus_base(machine_config &config)
 {
 	/* basic machine hardware */

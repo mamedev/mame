@@ -197,7 +197,6 @@ epson_lx800_device::epson_lx800_device(const machine_config &mconfig, device_typ
 
 void epson_lx800_device::device_start()
 {
-	m_online_led.resolve();
 }
 
 

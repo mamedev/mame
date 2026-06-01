@@ -143,9 +143,6 @@ private:
 void gunbustr_state::video_start()
 {
 	m_spritelist = std::make_unique<gb_tempsprite[]>(0x4000);
-
-	m_gun_recoil_pl.resolve();
-	m_hit_lamp.resolve();
 }
 
 /************************************************************

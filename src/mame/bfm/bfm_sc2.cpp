@@ -2257,7 +2257,6 @@ void bfm_sc2_state::_8meters(machine_config &config)
 
 void bfm_sc2_state::machine_start()
 {
-	m_lamps.resolve();
 	nvram_device *e2ram = subdevice<nvram_device>("e2ram");
 	if (e2ram != nullptr)
 		e2ram->set_base(m_e2ram, sizeof(m_e2ram));

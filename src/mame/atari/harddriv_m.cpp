@@ -36,10 +36,6 @@
 
 void harddriv_state::device_start()
 {
-	m_lamps.resolve();
-	m_sel.resolve();
-	m_wheel.resolve();
-
 	/* predetermine memory regions */
 	m_adsp_pgm_memory_word = (uint16_t *)(reinterpret_cast<uint8_t *>(m_adsp_pgm_memory.target()) + 1);
 

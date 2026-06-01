@@ -433,7 +433,6 @@ void flyball_state::machine_start()
 		m_pot_assert_timer[i] = timer_alloc(FUNC(flyball_state::joystick_callback), this);
 	m_pot_clear_timer = timer_alloc(FUNC(flyball_state::pot_clear_callback), this);
 	m_quarter_timer = timer_alloc(FUNC(flyball_state::quarter_callback), this);
-	m_lamp.resolve();
 
 	save_item(NAME(m_pitcher_vert));
 	save_item(NAME(m_pitcher_horz));

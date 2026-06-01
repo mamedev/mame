@@ -58,7 +58,6 @@ public:
 	void init_losttrea();
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 private:

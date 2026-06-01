@@ -97,8 +97,6 @@ public:
 	void init_ucytokyu() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD { m_leds.resolve(); }
-
 	void c4_w(u8 data);
 	void c6_w(u8 data);
 	void c8_w(u8 data);

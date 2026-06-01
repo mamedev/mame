@@ -142,8 +142,6 @@ void dmv_k220_device::device_start()
 	space.install_readwrite_handler(0x08, 0x0b, read8sm_delegate(*m_pit, FUNC(pit8253_device::read)), write8sm_delegate(*m_pit, FUNC(pit8253_device::write)), 0);
 	space.install_readwrite_handler(0x0c, 0x0f, read8sm_delegate(*m_ppi, FUNC(i8255_device::read)), write8sm_delegate(*m_ppi, FUNC(i8255_device::write)), 0);
 
-	m_digits.resolve();
-
 	// register for state saving
 	save_item(NAME(m_portc));
 	save_pointer(NAME(m_ram->base()), m_ram->bytes());

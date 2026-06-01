@@ -427,11 +427,6 @@ void ctk551_state::ctk601_map(address_map& map)
 
 void ctk551_state::driver_start()
 {
-	m_led_touch.resolve();
-	m_led_console.resolve();
-	m_led_power.resolve();
-	m_outputs.resolve();
-
 	m_nmi_timer = timer_alloc(FUNC(ctk551_state::nmi_clear), this);
 
 	m_input_sel = 0xf;

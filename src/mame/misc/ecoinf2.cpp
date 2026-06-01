@@ -12,7 +12,6 @@
 
 #include "emu.h"
 
-
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
 #include "machine/steppers.h" // stepper motor
@@ -39,7 +38,7 @@ public:
 	{
 	}
 
-	void ecoinf2_oxo(machine_config &config);
+	void ecoinf2_oxo(machine_config &config) ATTR_COLD;
 
 private:
 	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
@@ -196,13 +195,6 @@ private:
 		int data = m_optic_pattern;
 		data |= m_key->read();
 		return data;
-	}
-
-	virtual void machine_start() override
-	{
-		m_lamp_outputs.resolve();
-		m_led_outputs.resolve();
-		m_coinlamp_outputs.resolve();
 	}
 
 	void oxo_memmap(address_map &map) ATTR_COLD;

@@ -504,24 +504,24 @@ public:
 
 	enum { STEPS_PER_SYMBOL = 168 };
 
-	void add_em_reels(machine_config &config, int symbols, attotime period);
-
-	void interflip(machine_config &config);
-	void cbr_81_cnf(machine_config &config);
-	void cbr_77_cnf(machine_config &config);
-	void sev_81_cnf(machine_config &config);
-	void sev_77_cnf(machine_config &config);
-	void tol_87_cnf(machine_config &config);
-	void tol_83_cnf(machine_config &config);
-	void jkp_cnf(machine_config &config);
+	void cbr_81_cnf(machine_config &config) ATTR_COLD;
+	void cbr_77_cnf(machine_config &config) ATTR_COLD;
+	void sev_81_cnf(machine_config &config) ATTR_COLD;
+	void sev_77_cnf(machine_config &config) ATTR_COLD;
+	void tol_87_cnf(machine_config &config) ATTR_COLD;
+	void tol_83_cnf(machine_config &config) ATTR_COLD;
+	void jkp_cnf(machine_config &config) ATTR_COLD;
 
 	template <unsigned Reel> int symbol_opto_r();
 	template <unsigned Reel> int reel_opto_r();
 
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	void add_em_reels(machine_config &config, int symbols, attotime period) ATTR_COLD;
+	void interflip(machine_config &config) ATTR_COLD;
+
 	memory_share_creator<uint8_t> m_data_ram;
 
 private:
@@ -591,12 +591,11 @@ private:
 
 void interflip8035_state::machine_start()
 {
-	m_outbit.resolve();
-	m_outbyte.resolve();
 }
 
 void interflip8035_state::machine_reset()
-{}
+{
+}
 
 
 /*********************************************

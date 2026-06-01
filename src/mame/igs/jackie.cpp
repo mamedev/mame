@@ -236,9 +236,6 @@ void jackie_state::machine_start()
 {
 	m_exprom_bank->configure_entries(0, 2, memregion("gfx3")->base(), 0x8000);
 
-	m_led.resolve();
-	m_lamps.resolve();
-
 	// save_item(NAME(m_irq_enable)); //always 1?
 	save_item(NAME(m_nmi_enable));
 	// save_item(NAME(m_bg_enable)); //always 1?

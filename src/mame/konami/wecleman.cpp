@@ -1036,7 +1036,6 @@ void wecleman_state::machine_reset()
 
 void wecleman_state::machine_start()
 {
-	m_led.resolve();
 }
 
 void wecleman_state::wecleman(machine_config &config)

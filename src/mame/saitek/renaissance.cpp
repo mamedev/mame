@@ -76,7 +76,7 @@ public:
 	template <int N> DECLARE_INPUT_CHANGED_MEMBER(change_view);
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
-	void ren(machine_config &config);
+	void ren(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -125,8 +125,6 @@ private:
 
 void ren_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	save_item(NAME(m_ack_state));
 	save_item(NAME(m_rts_state));
 	save_item(NAME(m_inp_mux));

@@ -51,7 +51,7 @@ public:
 		, m_led_matrix(*this, "ledmatrix%u", 0U)
 	{ }
 
-	void cucaracha(machine_config &config);
+	void cucaracha(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -113,8 +113,6 @@ void cucaracha_state::led_transfer_w(offs_t offset, u8 data)
 
 void cucaracha_state::machine_start()
 {
-	m_led_matrix.resolve();
-
 	m_program_bank->configure_entries(0, 8, memregion("program_rom")->base(), 0x2000);
 
 	save_item(NAME(m_scrollx));

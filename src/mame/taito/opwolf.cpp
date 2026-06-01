@@ -311,13 +311,13 @@ public:
 		m_recoil(*this, "Player%u_Recoil_Piston", 1U)
 	{ }
 
-	void opwolf(machine_config &config);
-	void opwolfb(machine_config &config);
-	void opwolfp(machine_config &config);
+	void opwolf(machine_config &config) ATTR_COLD;
+	void opwolfb(machine_config &config) ATTR_COLD;
+	void opwolfp(machine_config &config) ATTR_COLD;
 
-	void init_opwolf();
-	void init_opwolfb();
-	void init_opwolfp();
+	void init_opwolf() ATTR_COLD;
+	void init_opwolfb() ATTR_COLD;
+	void init_opwolfp() ATTR_COLD;
 
 	ioport_value gun_x_r();
 	ioport_value gun_y_r();
@@ -778,8 +778,6 @@ void opwolf_state::init_opwolfp()
 
 void opwolf_state::machine_start()
 {
-	m_recoil.resolve();
-
 	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
 	save_item(NAME(m_adpcm_regs));

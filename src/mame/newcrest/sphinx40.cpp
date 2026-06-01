@@ -117,9 +117,6 @@ private:
 
 void sphinx40_state::machine_start()
 {
-	m_out_digit.resolve();
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_cb_mux));
 	save_item(NAME(m_led_data));

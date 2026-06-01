@@ -204,14 +204,6 @@ Board contains only 29 ROMs and not much else.
 #include "cbombers.lh"
 
 
-void undrfire_state::machine_start()
-{
-	m_lamp_start.resolve();
-	m_gun_recoil.resolve();
-	m_lamp.resolve();
-	m_wheel_vibration.resolve();
-}
-
 /**********************************************************
             GAME INPUTS
 **********************************************************/

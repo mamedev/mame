@@ -962,13 +962,6 @@ void cdtv_state::machine_start()
 	// setup dmac
 	m_dmac->set_address_space(&m_maincpu->space(AS_PROGRAM));
 	m_dmac->ramsz_w(0);
-
-	// resolve outputs
-	m_vfd_ampm.resolve();
-	m_vfd_digits.resolve();
-	m_vfd_colon.resolve();
-	m_vfd_volume.resolve();
-	m_cd_led.resolve();
 }
 
 void cdtv_state::machine_reset()

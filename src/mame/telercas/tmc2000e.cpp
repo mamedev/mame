@@ -265,8 +265,6 @@ void tmc2000e_state::dma_w(offs_t offset, uint8_t data)
 
 void tmc2000e_state::machine_start()
 {
-	m_led.resolve();
-
 	/* register for state saving */
 	save_item(NAME(m_cdp1864_efx));
 	save_item(NAME(m_keylatch));

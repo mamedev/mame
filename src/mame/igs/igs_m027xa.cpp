@@ -132,8 +132,6 @@ void igs_m027xa_state::machine_reset()
 
 void igs_m027xa_state::machine_start()
 {
-	m_out_lamps.resolve();
-
 	if (m_okibank[1])
 	{
 		u8 *const samples = memregion("oki")->base();

@@ -508,10 +508,6 @@ void bishi_state::machine_start()
 {
 	save_item(NAME(m_cur_control));
 	save_item(NAME(m_cur_control2));
-	m_red_button_lamps.resolve();
-	m_green_button_lamps.resolve();
-	m_blue_button_lamps.resolve();
-	m_start_button_lamps.resolve();
 }
 
 void bishi_state::machine_reset()

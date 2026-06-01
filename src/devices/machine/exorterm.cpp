@@ -732,11 +732,6 @@ TIMER_CALLBACK_MEMBER(exorterm155_device::kbd_repeat)
 
 void exorterm155_device::device_start()
 {
-	m_online_led.resolve();
-	m_auto_lf_led.resolve();
-	m_page_mode_led.resolve();
-	m_insert_char_led.resolve();
-
 	// register for save states
 	save_item(NAME(m_term_data));
 	save_item(NAME(m_framecnt));

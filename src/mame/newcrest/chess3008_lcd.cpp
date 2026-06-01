@@ -57,8 +57,6 @@ void chess3008_lcd_device::device_add_mconfig(machine_config &config)
 
 void chess3008_lcd_device::device_start()
 {
-	m_out_digit.resolve();
-	m_out_lcd.resolve();
 }
 
 

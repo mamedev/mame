@@ -107,7 +107,7 @@ public:
 		m_start_lamp(*this, "start_lamp")
 	{ }
 
-	void speedbsk(machine_config &config);
+	void speedbsk(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -364,10 +364,6 @@ void speedbsk_state::soundbank_w(uint8_t data)
 
 void speedbsk_state::machine_start()
 {
-	// resolve outputs
-	m_lamps.resolve();
-	m_start_lamp.resolve();
-
 	m_soundbank->configure_entries(0, 0x100, memregion("audiocpu")->base(), 0x2000);
 	m_soundbank->set_entry(0);
 }

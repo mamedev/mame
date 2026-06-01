@@ -732,8 +732,6 @@ int newbrain_state::get_pwrup_t()
 
 void newbrain_state::machine_start()
 {
-	m_digits.resolve();
-
 	// initialize timers
 	m_reset_timer = timer_alloc(FUNC(newbrain_state::clear_reset), this);
 	m_power_timer = timer_alloc(FUNC(newbrain_state::power_on), this);

@@ -897,9 +897,6 @@ void smc777_state::machine_start()
 	save_item(NAME(m_warm_reset));
 
 	m_warm_reset = -1;
-
-	m_caplock_led.resolve();
-	m_kanalock_led.resolve();
 }
 
 void smc777_state::machine_reset()

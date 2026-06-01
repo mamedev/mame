@@ -178,11 +178,6 @@ enum { MODE_OFF, MODE_KEY, MODE_REM, MODE_SIM };
 
 void digel804_state::machine_start()
 {
-	m_func_leds.resolve();
-	m_input_led.resolve();
-	m_busy_led.resolve();
-	m_error_led.resolve();
-
 	save_item(NAME(m_speaker_state));
 	save_item(NAME(m_ram_bank));
 	save_item(NAME(m_acia_intq));

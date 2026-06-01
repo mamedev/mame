@@ -164,70 +164,71 @@ using ws_delay_delegate = device_delegate<u32 (offs_t)>;
 
 namespace emu::detail {
 
-// TODO: work out why this doesn't work with clang and/or libc++ void_t but works with this C++14 work-alike
-template <typename... T> struct void_wrapper { using type = void; };
-template <typename... T> using void_t = typename void_wrapper<T...>::type;
+// name is slightly misleading - it also supports a free function taking an object reference as the first parameter
+template <typename D, typename T> struct mfp_device_class { };
 
-template <typename D, typename T, typename Enable = void> struct rw_device_class { };
+template <typename D, typename T, typename Ret, typename... Params> requires std::is_constructible_v<D, device_t &, const char *, Ret (T::*)(Params...), const char *>
+struct mfp_device_class<D, Ret (T::*)(Params...)> { using type = T; };
+template <typename D, typename T, typename Ret, typename... Params> requires std::is_constructible_v<D, device_t &, const char *, Ret (T::*)(Params...) const, const char *>
+struct mfp_device_class<D, Ret (T::*)(Params...) const> { using type = T; };
+template <typename D, typename T, typename Ret, typename... Params> requires std::is_constructible_v<D, device_t &, const char *, Ret (*)(T &, Params...), const char *>
+struct mfp_device_class<D, Ret (*)(T &, Params...)> { using type = T; };
 
-template <typename D, typename T, typename Ret, typename... Params>
-struct rw_device_class<D, Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<D, device_t &, const char *, Ret (T::*)(Params...), const char *>::value> > { using type = T; };
-template <typename D, typename T, typename Ret, typename... Params>
-struct rw_device_class<D, Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<D, device_t &, const char *, Ret (T::*)(Params...) const, const char *>::value> > { using type = T; };
-template <typename D, typename T, typename Ret, typename... Params>
-struct rw_device_class<D, Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<D, device_t &, const char *, Ret (*)(T &, Params...), const char *>::value> > { using type = T; };
+template <typename D, typename T> using mfp_device_class_t  = typename mfp_device_class<D, std::remove_reference_t<T> >::type;
 
-template <typename D, typename T> using rw_device_class_t  = typename rw_device_class<D, T>::type;
+// function pointer suitable for constructing a given delegate
+template <typename T, typename D> concept suitable_member_func = requires { typename mfp_device_class_t<D, T>; };
 
-template <typename T, typename Enable = void> struct rw_delegate_type;
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read8_delegate, std::remove_reference_t<T> > > > { using type = read8_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read16_delegate, std::remove_reference_t<T> > > > { using type = read16_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read32_delegate, std::remove_reference_t<T> > > > { using type = read32_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read64_delegate, std::remove_reference_t<T> > > > { using type = read64_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read8m_delegate, std::remove_reference_t<T> > > > { using type = read8m_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read16m_delegate, std::remove_reference_t<T> > > > { using type = read16m_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read32m_delegate, std::remove_reference_t<T> > > > { using type = read32m_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read64m_delegate, std::remove_reference_t<T> > > > { using type = read64m_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read8s_delegate, std::remove_reference_t<T> > > > { using type = read8s_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read16s_delegate, std::remove_reference_t<T> > > > { using type = read16s_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read32s_delegate, std::remove_reference_t<T> > > > { using type = read32s_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read64s_delegate, std::remove_reference_t<T> > > > { using type = read64s_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read8sm_delegate, std::remove_reference_t<T> > > > { using type = read8sm_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read16sm_delegate, std::remove_reference_t<T> > > > { using type = read16sm_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read32sm_delegate, std::remove_reference_t<T> > > > { using type = read32sm_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read64sm_delegate, std::remove_reference_t<T> > > > { using type = read64sm_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read8mo_delegate, std::remove_reference_t<T> > > > { using type = read8mo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read16mo_delegate, std::remove_reference_t<T> > > > { using type = read16mo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read32mo_delegate, std::remove_reference_t<T> > > > { using type = read32mo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read64mo_delegate, std::remove_reference_t<T> > > > { using type = read64mo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read8smo_delegate, std::remove_reference_t<T> > > > { using type = read8smo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read16smo_delegate, std::remove_reference_t<T> > > > { using type = read16smo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read32smo_delegate, std::remove_reference_t<T> > > > { using type = read32smo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read64smo_delegate, std::remove_reference_t<T> > > > { using type = read64smo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write8_delegate, std::remove_reference_t<T> > > > { using type = write8_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write16_delegate, std::remove_reference_t<T> > > > { using type = write16_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write32_delegate, std::remove_reference_t<T> > > > { using type = write32_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write64_delegate, std::remove_reference_t<T> > > > { using type = write64_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write8m_delegate, std::remove_reference_t<T> > > > { using type = write8m_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write16m_delegate, std::remove_reference_t<T> > > > { using type = write16m_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write32m_delegate, std::remove_reference_t<T> > > > { using type = write32m_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write64m_delegate, std::remove_reference_t<T> > > > { using type = write64m_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write8s_delegate, std::remove_reference_t<T> > > > { using type = write8s_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write16s_delegate, std::remove_reference_t<T> > > > { using type = write16s_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write32s_delegate, std::remove_reference_t<T> > > > { using type = write32s_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write64s_delegate, std::remove_reference_t<T> > > > { using type = write64s_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write8sm_delegate, std::remove_reference_t<T> > > > { using type = write8sm_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write16sm_delegate, std::remove_reference_t<T> > > > { using type = write16sm_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write32sm_delegate, std::remove_reference_t<T> > > > { using type = write32sm_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write64sm_delegate, std::remove_reference_t<T> > > > { using type = write64sm_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write8mo_delegate, std::remove_reference_t<T> > > > { using type = write8mo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write16mo_delegate, std::remove_reference_t<T> > > > { using type = write16mo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write32mo_delegate, std::remove_reference_t<T> > > > { using type = write32mo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write64mo_delegate, std::remove_reference_t<T> > > > { using type = write64mo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write8smo_delegate, std::remove_reference_t<T> > > > { using type = write8smo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write16smo_delegate, std::remove_reference_t<T> > > > { using type = write16smo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write32smo_delegate, std::remove_reference_t<T> > > > { using type = write32smo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write64smo_delegate, std::remove_reference_t<T> > > > { using type = write64smo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type;
+template <suitable_member_func<read8_delegate> T> struct rw_delegate_type<T> { using type = read8_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read16_delegate> T> struct rw_delegate_type<T> { using type = read16_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read32_delegate> T> struct rw_delegate_type<T> { using type = read32_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read64_delegate> T> struct rw_delegate_type<T> { using type = read64_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read8m_delegate> T> struct rw_delegate_type<T> { using type = read8m_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read16m_delegate> T> struct rw_delegate_type<T> { using type = read16m_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read32m_delegate> T> struct rw_delegate_type<T> { using type = read32m_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read64m_delegate> T> struct rw_delegate_type<T> { using type = read64m_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read8s_delegate> T> struct rw_delegate_type<T> { using type = read8s_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read16s_delegate> T> struct rw_delegate_type<T> { using type = read16s_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read32s_delegate> T> struct rw_delegate_type<T> { using type = read32s_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read64s_delegate> T> struct rw_delegate_type<T> { using type = read64s_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read8sm_delegate> T> struct rw_delegate_type<T> { using type = read8sm_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read16sm_delegate> T> struct rw_delegate_type<T> { using type = read16sm_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read32sm_delegate> T> struct rw_delegate_type<T> { using type = read32sm_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read64sm_delegate> T> struct rw_delegate_type<T> { using type = read64sm_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read8mo_delegate> T> struct rw_delegate_type<T> { using type = read8mo_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read16mo_delegate> T> struct rw_delegate_type<T> { using type = read16mo_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read32mo_delegate> T> struct rw_delegate_type<T> { using type = read32mo_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read64mo_delegate> T> struct rw_delegate_type<T> { using type = read64mo_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read8smo_delegate> T> struct rw_delegate_type<T> { using type = read8smo_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read16smo_delegate> T> struct rw_delegate_type<T> { using type = read16smo_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read32smo_delegate> T> struct rw_delegate_type<T> { using type = read32smo_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<read64smo_delegate> T> struct rw_delegate_type<T> { using type = read64smo_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write8_delegate> T> struct rw_delegate_type<T> { using type = write8_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write16_delegate> T> struct rw_delegate_type<T> { using type = write16_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write32_delegate> T> struct rw_delegate_type<T> { using type = write32_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write64_delegate> T> struct rw_delegate_type<T> { using type = write64_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write8m_delegate> T> struct rw_delegate_type<T> { using type = write8m_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write16m_delegate> T> struct rw_delegate_type<T> { using type = write16m_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write32m_delegate> T> struct rw_delegate_type<T> { using type = write32m_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write64m_delegate> T> struct rw_delegate_type<T> { using type = write64m_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write8s_delegate> T> struct rw_delegate_type<T> { using type = write8s_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write16s_delegate> T> struct rw_delegate_type<T> { using type = write16s_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write32s_delegate> T> struct rw_delegate_type<T> { using type = write32s_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write64s_delegate> T> struct rw_delegate_type<T> { using type = write64s_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write8sm_delegate> T> struct rw_delegate_type<T> { using type = write8sm_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write16sm_delegate> T> struct rw_delegate_type<T> { using type = write16sm_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write32sm_delegate> T> struct rw_delegate_type<T> { using type = write32sm_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write64sm_delegate> T> struct rw_delegate_type<T> { using type = write64sm_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write8mo_delegate> T> struct rw_delegate_type<T> { using type = write8mo_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write16mo_delegate> T> struct rw_delegate_type<T> { using type = write16mo_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write32mo_delegate> T> struct rw_delegate_type<T> { using type = write32mo_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write64mo_delegate> T> struct rw_delegate_type<T> { using type = write64mo_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write8smo_delegate> T> struct rw_delegate_type<T> { using type = write8smo_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write16smo_delegate> T> struct rw_delegate_type<T> { using type = write16smo_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write32smo_delegate> T> struct rw_delegate_type<T> { using type = write32smo_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write64smo_delegate> T> struct rw_delegate_type<T> { using type = write64smo_delegate; using device_class = mfp_device_class_t<type, T>; };
+
 template <typename T> using rw_delegate_type_t = typename rw_delegate_type<T>::type;
 template <typename T> using rw_delegate_device_class_t = typename rw_delegate_type<T>::device_class;
 

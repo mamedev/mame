@@ -864,11 +864,6 @@ void segaorun_state::nop_w(address_space &space, offs_t offset, uint16_t data, u
 
 void segaorun_state::machine_start()
 {
-	m_bank_motor_direction.resolve();
-	m_bank_motor_speed.resolve();
-	m_vibration_motor.resolve();
-	m_start_lamp.resolve();
-	m_brake_lamp.resolve();
 }
 
 //-------------------------------------------------

@@ -54,7 +54,7 @@ public:
 	{ }
 
 	// machine configs
-	void y532xl(machine_config &config);
+	void y532xl(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -88,9 +88,6 @@ private:
 
 void y532xl_state::machine_start()
 {
-	m_out_digit.resolve();
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_cb_mux));

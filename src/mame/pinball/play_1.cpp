@@ -48,8 +48,8 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void chance(machine_config &config);
-	void play_1(machine_config &config);
+	void chance(machine_config &config) ATTR_COLD;
+	void play_1(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -322,11 +322,6 @@ INPUT_PORTS_END
 void play_1_state::machine_start()
 {
 	genpin_class::machine_start();
-
-	m_digits.resolve();
-	m_leds.resolve();
-	m_player_lamps.resolve();
-	m_io_outputs.resolve();
 
 	save_item(NAME(m_resetcnt));
 	save_item(NAME(m_clockcnt));

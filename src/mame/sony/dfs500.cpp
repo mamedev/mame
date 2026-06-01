@@ -102,7 +102,7 @@ public:
 	{
 	}
 
-	void dfs500(machine_config &config);
+	void dfs500(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -203,17 +203,6 @@ void dfs500_state::machine_start()
 	m_cpanel_serial->write_cts(0);
 	m_rombank1->configure_entries(0, 128, memregion("effectdata")->base(), 0x4000);
 	m_rombank2->configure_entries(0, 128, memregion("effectdata")->base(), 0x4000);
-
-	m_transition.resolve();
-	m_7seg_status.resolve();
-	m_7seg_edit.resolve();
-	m_7seg_trail_shadow_frames.resolve();
-	m_7seg_snapshot.resolve();
-	m_7seg_trans_rate.resolve();
-	m_7seg_pattern_number.resolve();
-	m_LD.resolve();
-	m_LD_effect_ctrl_shift.resolve();
-	m_LD_effect_ctrl_mask.resolve();
 }
 
 void dfs500_state::machine_reset()

@@ -76,7 +76,7 @@ protected:
 		, m_io_keypad(*this, "KEYPAD")
 	{ }
 
-	virtual void machine_start() override
+	virtual void machine_start() override ATTR_COLD
 	{
 		midzeus_state::machine_start();
 
@@ -88,7 +88,7 @@ protected:
 		save_item(NAME(m_fw_int));
 	}
 
-	virtual void machine_reset() override
+	virtual void machine_reset() override ATTR_COLD
 	{
 		midzeus_state::machine_reset();
 
@@ -97,7 +97,7 @@ protected:
 		m_fw_int = 0;
 	}
 
-	virtual void video_start() override {}
+	virtual void video_start() override ATTR_COLD {}
 
 	uint32_t disk_asic_r(offs_t offset);
 	void disk_asic_w(offs_t offset, uint32_t data);
@@ -139,18 +139,14 @@ public:
 		, m_io_analog(*this, "ANALOG%u", 0U)
 	{ }
 
-	void crusnexo(machine_config &config);
+	void crusnexo(machine_config &config) ATTR_COLD;
 
 	ioport_value keypad_r();
 
 protected:
-	virtual void machine_start() override
+	virtual void machine_start() override ATTR_COLD
 	{
 		midzeus2_state::machine_start();
-
-		m_digits.resolve();
-		m_leds.resolve();
-		m_lamps.resolve();
 
 		save_item(NAME(m_keypad_select));
 		save_item(NAME(m_crusnexo_leds_select));

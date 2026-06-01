@@ -473,7 +473,6 @@ c2031_device::c2031_device(const machine_config &mconfig, const char *tag, devic
 
 void c2031_device::device_start()
 {
-	m_leds.resolve();
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);
 

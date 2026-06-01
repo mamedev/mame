@@ -577,8 +577,6 @@ GFXDECODE_END
 
 void othunder_state::machine_start()
 {
-	m_recoil_piston.resolve();
-
 	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
 	save_item(NAME(m_pan));

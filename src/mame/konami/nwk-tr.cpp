@@ -455,9 +455,6 @@ void nwktr_state::soundtimer_ack_w(uint16_t data)
 
 void nwktr_state::machine_start()
 {
-	m_pcb_digit.resolve();
-	m_wheel_motor.resolve();
-
 	// set conservative DRC options
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 

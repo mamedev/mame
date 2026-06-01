@@ -916,11 +916,6 @@ void x68k_state::machine_reset()
 
 void x68k_state::machine_start()
 {
-	// resolve outputs
-	m_eject_drv_out.resolve();
-	m_ctrl_drv_out.resolve();
-	m_access_drv_out.resolve();
-
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	// install RAM handlers
 	m_spriteram = (uint16_t*)(memregion("user1")->base());

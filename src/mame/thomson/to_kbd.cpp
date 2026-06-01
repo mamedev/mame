@@ -533,8 +533,6 @@ void to8_keyboard_device::device_reset()
 
 void to8_keyboard_device::device_start()
 {
-	m_caps_led.resolve();
-
 	m_kbd_timer = timer_alloc(FUNC(to8_keyboard_device::timer_cb), this);
 	m_kbd_signal = machine().scheduler().timer_alloc(timer_expired_delegate());
 	save_item(NAME(m_kbd_ack));
@@ -980,8 +978,6 @@ void to9_keyboard_device::device_reset()
 
 void to9_keyboard_device::device_start()
 {
-	m_caps_led.resolve();
-
 	m_kbd_timer = timer_alloc(FUNC(to9_keyboard_device::timer_cb), this);
 	save_item(NAME(m_kbd_parity));
 	save_item(NAME(m_kbd_intr));

@@ -560,8 +560,6 @@ void segahang_state::i8751_p1_w(uint8_t data)
 
 void segahang_state::machine_start()
 {
-	m_lamps.resolve();
-
 	m_i8751_sync_timer = timer_alloc(FUNC(segahang_state::i8751_sync), this);
 }
 

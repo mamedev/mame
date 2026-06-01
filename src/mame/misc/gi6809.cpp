@@ -119,16 +119,17 @@ public:
 		m_sound_bit3(*this, "sound_nl:bit3")
 	{ }
 
-	void castawayt(machine_config &config);
-	void glck6809(machine_config &config);
-	void jesterch(machine_config &config);
-	void init_cast();
+	void castawayt(machine_config &config) ATTR_COLD;
+	void glck6809(machine_config &config) ATTR_COLD;
+	void jesterch(machine_config &config) ATTR_COLD;
+
+	void init_cast() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void gi6809_base(machine_config &config);
+	void gi6809_base(machine_config &config) ATTR_COLD;
 
 private:
 
@@ -595,7 +596,6 @@ GFXDECODE_END
 void gi6809_state::machine_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gi6809_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_lamps.resolve();
 }
 
 /*********************************************

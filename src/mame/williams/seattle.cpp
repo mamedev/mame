@@ -296,39 +296,32 @@ public:
 	{
 	}
 
-	void seattle_common(machine_config &config);
-	void phoenix(machine_config &config);
-	void seattle150(machine_config &config);
-	void seattle150_widget(machine_config &config);
-	void seattle200(machine_config &config);
-	void seattle200_widget(machine_config &config);
-	void flagstaff(machine_config &config);
-	void wg3dh(machine_config &config);
-	void sfrush(machine_config &config);
-	void hyprdriv(machine_config &config);
-	void carnevil(machine_config &config);
-	void blitz99(machine_config &config);
-	void blitz2k(machine_config &config);
-	void blitz(machine_config &config);
-	void biofreak(machine_config &config);
-	void sfrushrkw(machine_config &config);
-	void calspeed(machine_config &config);
-	void mace(machine_config &config);
-	void vaportrx(machine_config &config);
-	void sfrushrk(machine_config &config);
+	void wg3dh(machine_config &config) ATTR_COLD;
+	void sfrush(machine_config &config) ATTR_COLD;
+	void hyprdriv(machine_config &config) ATTR_COLD;
+	void carnevil(machine_config &config) ATTR_COLD;
+	void blitz99(machine_config &config) ATTR_COLD;
+	void blitz2k(machine_config &config) ATTR_COLD;
+	void blitz(machine_config &config) ATTR_COLD;
+	void biofreak(machine_config &config) ATTR_COLD;
+	void sfrushrkw(machine_config &config) ATTR_COLD;
+	void calspeed(machine_config &config) ATTR_COLD;
+	void mace(machine_config &config) ATTR_COLD;
+	void vaportrx(machine_config &config) ATTR_COLD;
+	void sfrushrk(machine_config &config) ATTR_COLD;
 
-	void init_sfrush();
-	void init_blitz2k();
-	void init_carnevil();
-	void init_biofreak();
-	void init_calspeed();
-	void init_sfrushrk();
-	void init_vaportrx();
-	void init_hyprdriv();
-	void init_blitz();
-	void init_wg3dh();
-	void init_mace();
-	void init_blitz99();
+	void init_sfrush() ATTR_COLD;
+	void init_blitz2k() ATTR_COLD;
+	void init_carnevil() ATTR_COLD;
+	void init_biofreak() ATTR_COLD;
+	void init_calspeed() ATTR_COLD;
+	void init_sfrushrk() ATTR_COLD;
+	void init_vaportrx() ATTR_COLD;
+	void init_hyprdriv() ATTR_COLD;
+	void init_blitz() ATTR_COLD;
+	void init_wg3dh() ATTR_COLD;
+	void init_mace() ATTR_COLD;
+	void init_blitz99() ATTR_COLD;
 
 	ioport_value blitz_49way_r();
 	ioport_value i40_r();
@@ -337,6 +330,14 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	void seattle_common(machine_config &config) ATTR_COLD;
+	void phoenix(machine_config &config) ATTR_COLD;
+	void seattle150(machine_config &config) ATTR_COLD;
+	void seattle150_widget(machine_config &config) ATTR_COLD;
+	void seattle200(machine_config &config) ATTR_COLD;
+	void seattle200_widget(machine_config &config) ATTR_COLD;
+	void flagstaff(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<mips3_device> m_maincpu;
@@ -483,11 +484,6 @@ void seattle_state::machine_start()
 	save_item(NAME(m_i40_data));
 	save_item(NAME(m_gear));
 	save_item(NAME(m_wheel_calibrated));
-
-	m_wheel_driver.resolve();
-	m_wheel_motor.resolve();
-	m_lamps.resolve();
-	m_leds.resolve();
 }
 
 

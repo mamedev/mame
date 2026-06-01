@@ -708,7 +708,6 @@ protected:
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void device_resolve_objects() override ATTR_COLD;
 
 	void namcos10_base(machine_config &config) ATTR_COLD;
 	void namcos10_exio(machine_config &config) ATTR_COLD;
@@ -1078,11 +1077,6 @@ void namcos10_state::machine_reset()
 
 	std::fill(std::begin(m_mgexio_outputs), std::end(m_mgexio_outputs), 0);
 	std::fill(std::begin(m_mgexio_coin_start_time), std::end(m_mgexio_coin_start_time), attotime::never);
-}
-
-void namcos10_state::device_resolve_objects()
-{
-	m_mgexio_outputs.resolve();
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos10_state::io_update_interrupt_callback)

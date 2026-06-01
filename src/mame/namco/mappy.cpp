@@ -1298,8 +1298,6 @@ void mappy_state::out_lamps(uint8_t data)
 
 void mappy_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_namcoio_run_timer[0] = timer_alloc(FUNC(mappy_state::namcoio_run_timer<0>), this);
 	m_namcoio_run_timer[1] = timer_alloc(FUNC(mappy_state::namcoio_run_timer<1>), this);
 

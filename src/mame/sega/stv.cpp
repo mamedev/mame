@@ -1345,8 +1345,6 @@ std::pair<std::error_condition, std::string> stv_state::load_cart(device_image_i
 
 void stv_state::machine_start()
 {
-	m_cc_digits.resolve();
-
 	// save states
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_prev_gamebank_select));

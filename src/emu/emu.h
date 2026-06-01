@@ -99,6 +99,8 @@
 #include "video/generic.h"
 
 // member templates that don't like incomplete types
+#include "devdelegate.ipp"
 #include "device.ipp"
+#include "output.ipp"
 
 #endif // __EMU_H__

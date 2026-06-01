@@ -59,9 +59,6 @@ void cinemat_state::machine_start()
 	save_item(NAME(m_vector_color));
 	save_item(NAME(m_lastx));
 	save_item(NAME(m_lasty));
-
-	m_led.resolve();
-	m_pressed.resolve();
 }
 
 

@@ -61,7 +61,6 @@ ioport_constructor vme_smvme2000_card_device::device_input_ports() const
 
 void vme_smvme2000_card_device::device_start()
 {
-	m_fail.resolve();
 }
 
 void vme_smvme2000_card_device::device_reset()

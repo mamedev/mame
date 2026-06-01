@@ -97,7 +97,7 @@ public:
 	{
 	}
 
-	void gotcha(machine_config &config);
+	void gotcha(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -392,11 +392,6 @@ GFXDECODE_END
 
 void gotcha_state::machine_start()
 {
-	m_lamp_r.resolve();
-	m_lamp_g.resolve();
-	m_lamp_b.resolve();
-	m_lamp_s.resolve();
-
 	save_item(NAME(m_banksel));
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_scroll));

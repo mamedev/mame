@@ -118,8 +118,6 @@ TIMER_CALLBACK_MEMBER(acefruit_state::refresh_tick)
 
 void acefruit_state::machine_start()
 {
-	m_lamps.resolve();
-	m_solenoids.resolve();
 }
 
 void acefruit_state::video_start()

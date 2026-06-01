@@ -3111,7 +3111,6 @@ void taitoz_state::device_post_load()
 void taitoz_state::machine_start()
 {
 	save_item(NAME(m_cpua_ctrl));
-	m_cpua_out.resolve();
 }
 
 void taitoz_z80_sound_state::machine_start()
@@ -3125,8 +3124,6 @@ void taitoz_z80_sound_state::machine_start()
 void contcirc_state::machine_start()
 {
 	taitoz_z80_sound_state::machine_start();
-
-	m_shutter_out.resolve();
 
 	m_shutter_toggle = 0;
 	m_shutter_control = 0;
@@ -3142,23 +3139,6 @@ void sci_state::machine_start()
 	save_item(NAME(m_sci_int6));
 
 	m_int6_timer = timer_alloc(FUNC(sci_state::trigger_int6), this);
-}
-
-void nightstr_state::machine_start()
-{
-	taitoz_z80_sound_state::machine_start();
-
-	m_motor_dir.resolve();
-	m_motor_speed.resolve();
-	m_motor_debug.resolve();
-	m_lamps.resolve();
-}
-
-void spacegun_state::machine_start()
-{
-	taitoz_state::machine_start();
-
-	m_recoil.resolve();
 }
 
 void taitoz_state::machine_reset()

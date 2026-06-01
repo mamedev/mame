@@ -360,8 +360,6 @@ void galaxi_state::machine_start()
 {
 	save_item(NAME(m_bg3_xscroll));
 	save_item(NAME(m_bg3_yscroll));
-
-	m_lamps.resolve();
 }
 
 void galaxi_state::machine_reset()

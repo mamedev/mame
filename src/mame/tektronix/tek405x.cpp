@@ -908,8 +908,6 @@ void tek4051_state::write_acia_clock(int state)
 
 void tek4051_state::machine_start()
 {
-	m_lamps.resolve();
-
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	// configure RAM

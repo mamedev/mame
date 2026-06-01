@@ -3959,8 +3959,6 @@ ROM_END
 
 MACHINE_START_MEMBER(konamigx_state,konamigx)
 {
-	m_lamp.resolve();
-
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_intck));
 

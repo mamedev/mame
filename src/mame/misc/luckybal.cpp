@@ -343,8 +343,6 @@ private:
 
 void luckybal_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_csio_in));
 	save_item(NAME(m_csio_out));
 	save_item(NAME(m_csio_txs));

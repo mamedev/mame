@@ -441,9 +441,6 @@ uint16_t sc4_state::sc4_mem_r(offs_t offset, uint16_t mem_mask)
 
 void bfm_sc45_state::machine_start()
 {
-	m_lamps.resolve();
-	m_matrix.resolve();
-	m_digits.resolve();
 }
 
 void bfm_sc45_state::mux_output_w(offs_t offset, uint8_t data)

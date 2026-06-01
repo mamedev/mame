@@ -29,12 +29,16 @@ ToDo:
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/clock.h"
 #include "genpin.h"
-#include "sound/spkrdev.h"
+
 #include "cpu/scmp/scmp.h"
+#include "machine/clock.h"
+#include "sound/spkrdev.h"
+
 #include "speaker.h"
+
 #include "zac_proto.lh"
+
 
 namespace {
 
@@ -49,7 +53,11 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void zac_proto(machine_config &config);
+	void zac_proto(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void out0_w(offs_t offset, uint8_t data);
@@ -59,13 +67,12 @@ private:
 	void audio_clock(int state);
 	int slam_r();
 	void zac_proto_map(address_map &map) ATTR_COLD;
+
 	u8 m_u36 = 0x80U;  // preset divider for u44/u45
 	u8 m_u37 = 0U;  // selector for u48
 	u8 m_u44u45 = 0U;  // counters for u44/u45
 	u8 m_u46u47 = 0U;  // counters for u46/u47
 
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
 	required_device<scmp_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	output_finder<11> m_digits;
@@ -310,9 +317,6 @@ void zac_proto_state::audio_clock(int state)
 
 void zac_proto_state::machine_start()
 {
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_u36));
 	save_item(NAME(m_u37));
 	save_item(NAME(m_u44u45));

@@ -405,9 +405,6 @@ private:
 
 void gottlieb_state::machine_start()
 {
-	m_leds.resolve();
-	m_knockers.resolve();
-
 	// register for save states
 	save_item(NAME(m_joystick_select));
 	save_item(NAME(m_track));

@@ -63,6 +63,8 @@ TODO:
 
 #include "emu.h"
 
+#include "vamphalf_prot.h"
+
 #include "cpu/e132xs/e132xs.h"
 #include "cpu/mcs51/i8051.h"
 #include "machine/eepromser.h"
@@ -78,7 +80,6 @@ TODO:
 
 #include "endianness.h"
 
-#include "vamphalf_prot.h"
 
 namespace {
 

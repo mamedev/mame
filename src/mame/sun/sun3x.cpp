@@ -147,6 +147,7 @@
 #include "screen.h"
 
 #include "formats/flopimg.h"
+
 #include "util/endianness.h"
 
 

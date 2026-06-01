@@ -149,16 +149,16 @@ public:
 
 	{ }
 
-	enum { STEPS_PER_SYMBOL = 1 };
-
-	void add_em_reels(machine_config &config, int symbols, attotime period);
-
-	void rf53_3297(machine_config &config);
+	void rf53_3297(machine_config &config) ATTR_COLD;
 
 	int reel_opto_r();
 
 protected:
+	enum { STEPS_PER_SYMBOL = 1 };
+
 	virtual void machine_start() override ATTR_COLD;
+
+	void add_em_reels(machine_config &config, int symbols, attotime period) ATTR_COLD;
 
 private:
 	void main_io_map(address_map &map) ATTR_COLD;
@@ -227,7 +227,6 @@ private:
 
 void rfslots8085_state::machine_start()
 {
-	m_lamps.resolve();
 }
 
 

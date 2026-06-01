@@ -386,8 +386,6 @@ loop:
 
 void crystal_state::machine_start()
 {
-	m_lamps.resolve();
-
 	patchreset();
 
 	if (m_mainbank)

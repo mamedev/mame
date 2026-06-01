@@ -160,7 +160,6 @@ TIMER_CALLBACK_MEMBER(segas18_state::initial_boost)
 
 void segas18_state::machine_start()
 {
-	m_gun_recoil.resolve(); // lghost
 	m_soundbank->configure_entries(0, 256, memregion("soundcpu")->base(), 0x2000);
 	m_init_boost_timer = timer_alloc(FUNC(segas18_state::initial_boost), this);
 }

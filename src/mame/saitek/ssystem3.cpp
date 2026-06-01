@@ -111,10 +111,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(cu_plug);
 
 	// machine configs
-	void ssystem3(machine_config &config);
-	void ssystem4(machine_config &config);
+	void ssystem3(machine_config &config) ATTR_COLD;
+	void ssystem4(machine_config &config) ATTR_COLD;
 
-	void init_ssystem3() { m_xor_kludge = true; }
+	void init_ssystem3() ATTR_COLD { m_xor_kludge = true; }
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -168,8 +168,6 @@ private:
 
 void ssystem3_state::machine_start()
 {
-	m_out_lcd2.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_control));

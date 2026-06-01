@@ -403,7 +403,6 @@ protected:
 	uint8_t m_reel_ena = 0U;
 	uint16_t m_bank_shift = 0x100U;
 
-	virtual void machine_start() override ATTR_COLD { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 	void fg_vidram_w(offs_t offset, uint8_t data);

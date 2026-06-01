@@ -356,7 +356,6 @@ void cesclassic_state::palette_init(palette_device &palette) const
 
 void cesclassic_state::machine_start()
 {
-	m_led_matrix.resolve();
 }
 
 void cesclassic_state::cesclassic(machine_config &config)

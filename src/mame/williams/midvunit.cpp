@@ -84,9 +84,6 @@ void midvunit_state::machine_start()
 	save_item(NAME(m_wheel_board_u8_latch));
 	save_item(NAME(m_comm_flags));
 	save_item(NAME(m_comm_data));
-
-	m_optional_drivers.resolve();
-	m_wheel_motor.resolve();
 }
 
 

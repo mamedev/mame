@@ -27,14 +27,16 @@ TODO:
 
 
 #include "emu.h"
+
 #include "cpu/m6800/m6800.h"
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "machine/timer.h"
-#include "video/mc6845.h"
 #include "sound/beep.h"
+#include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -59,12 +61,16 @@ public:
 		, m_palette(*this, "palette")
 		, m_beep(*this, "beeper")
 		, m_leds(*this, "led%u", 0U)
-		{ }
+	{ }
 
 
-	void crei680(machine_config &config);
+	void crei680(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+protected:
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
@@ -79,8 +85,6 @@ private:
 	bool m_cassbit = 0;
 	bool m_cassold = 0;
 	u8 m_cass_data[4]{};
-	void machine_start() override ATTR_COLD;
-	void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<pia6821_device> m_pia0;
@@ -249,7 +253,6 @@ void crei680_state::piaset_w(offs_t offset, u8 data)
 
 void crei680_state::machine_start()
 {
-	m_leds.resolve();
 	save_item(NAME(m_cassold));
 	save_item(NAME(m_cass_data));
 	save_item(NAME(m_cassbit));

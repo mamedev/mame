@@ -199,9 +199,6 @@ protected:
 /**************************************************************************/
 void s612_state::machine_start()
 {
-	m_led_digit.resolve();
-	m_led.resolve();
-
 	m_cpu_bank->space().install_ram(0, m_ram->mask(), m_ram->pointer());
 	for (int i = 0; i < 6; i++)
 		m_voice_bank[i]->space().install_ram(0, m_ram->mask(), m_ram->pointer());

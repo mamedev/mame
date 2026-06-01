@@ -123,8 +123,6 @@ void sgi_pm2_device::device_start()
 	save_item(NAME(m_status));
 	save_item(NAME(m_exception));
 	save_item(NAME(m_map));
-
-	m_led.resolve();
 }
 
 void sgi_pm2_device::device_reset()

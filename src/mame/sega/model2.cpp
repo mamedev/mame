@@ -161,8 +161,6 @@ void model2_state::machine_start()
 	// initialize custom debugger pool, @see machine/model2.cpp
 	debug_init();
 
-	m_lamps.resolve();
-
 	save_item(NAME(m_intreq));
 	save_item(NAME(m_intena));
 	save_item(NAME(m_coproctl));

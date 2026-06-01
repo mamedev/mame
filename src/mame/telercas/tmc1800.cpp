@@ -705,8 +705,6 @@ void osc1000b_state::machine_reset()
 
 void tmc2000_state::machine_start()
 {
-	m_led.resolve();
-
 	// randomize color RAM contents
 	for (uint16_t addr = 0; addr < TMC2000_COLORRAM_SIZE; addr++)
 	{
@@ -739,8 +737,6 @@ TIMER_CALLBACK_MEMBER(nano_state::assert_ef4)
 
 void nano_state::machine_start()
 {
-	m_led.resolve();
-
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 

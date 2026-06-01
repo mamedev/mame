@@ -902,10 +902,6 @@ void rainbow_base_state::machine_start()
 	switch_off_timer = timer_alloc(FUNC(rainbow_base_state::switch_off_tick), this);
 	switch_off_timer->adjust(attotime::from_msec(10));
 
-	m_digits.resolve();
-	m_leds.resolve();
-	m_driveleds.resolve();
-
 	m_screen_blank = false;
 
 	auto *printer_port = subdevice<rs232_port_device>("printer");

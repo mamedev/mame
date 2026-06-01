@@ -392,14 +392,10 @@ INPUT_PORTS_END
 
 void pluto6_state::machine_start()
 {
-	m_open_drain.resolve();
-	m_lamp.resolve();
-	m_led.resolve();
-	m_aux.resolve();
 }
 
-void pluto6_state::machine_reset(){
-
+void pluto6_state::machine_reset()
+{
 }
 
 void pluto6_state::duart_irq_handler(int state)

@@ -98,7 +98,6 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void driver_start() override;
 
 private:
 	void hp9k300(machine_config &config);
@@ -220,11 +219,6 @@ void hp9k3xx_state::hp9k382_map(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( hp9k330 )
 INPUT_PORTS_END
-
-void hp9k3xx_state::driver_start()
-{
-	m_diag_led.resolve();
-}
 
 void hp9k3xx_state::machine_start()
 {

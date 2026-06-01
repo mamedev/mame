@@ -1681,7 +1681,6 @@ GFXDECODE_END
 
 void astrocorp_state::machine_start()
 {
-	m_lamps.resolve();
 	m_screen_enable = 0;
 }
 

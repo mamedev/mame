@@ -284,7 +284,6 @@ void feversoc_state::irq_ack_w(uint16_t data)
 
 void feversoc_state::machine_start()
 {
-	m_lamps.resolve();
 }
 
 void feversoc_state::feversoc(machine_config &config)

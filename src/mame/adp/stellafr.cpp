@@ -376,9 +376,6 @@ void stellafr_state::fc7_map(address_map &map)
 
 void stellafr_state::machine_start()
 {
-	m_digits.resolve();
-	m_lamps.resolve();
-	m_leds.resolve();
 	save_item(NAME(m_mux1));
 }
 

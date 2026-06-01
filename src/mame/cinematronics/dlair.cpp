@@ -249,8 +249,6 @@ uint32_t dlair_state::screen_update_dleuro(screen_device &screen, bitmap_rgb32 &
 
 void dlair_state::machine_start()
 {
-	m_digits.resolve();
-
 	save_item(NAME(m_last_misc));
 	save_item(NAME(m_laserdisc_data));
 }

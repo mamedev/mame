@@ -392,10 +392,6 @@ INPUT_CHANGED_MEMBER(flicker_state::test_changed)
 
 void flicker_state::machine_start()
 {
-	m_digits.resolve();
-	m_io_outputs.resolve();
-	m_lamps.resolve();
-
 	save_item(NAME(m_cm_ram1));
 	save_item(NAME(m_cm_ram2));
 	save_item(NAME(m_ram0_output));

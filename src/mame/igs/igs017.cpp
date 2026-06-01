@@ -1080,8 +1080,6 @@ private:
 
 void igs017_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_remap_addr));
 	save_item(NAME(m_input_select));
 	save_item(NAME(m_dsw_select));

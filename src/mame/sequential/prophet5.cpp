@@ -2513,6 +2513,18 @@ protected:
 private:
 	static double i_bias(const required_ioport &rp, double rp_max, double r, double v);
 
+	static constexpr const char *LED_NAMES[8][5] =
+	{
+		{"led_osc_a_sqr",  "led_pmod_freq_a", "led_wmod_freq_a", "led_ps1", "led_record"},
+		{"led_osc_a_saw",  "led_pmod_pw_a",   "led_wmod_freq_b", "led_ps2", "led_unused_1"},
+		{"led_osc_a_sync", "led_pmod_filt",   "led_wmod_pw_a",   "led_ps3", "led_a_440"},
+		{"led_osc_b_saw",  "led_lfo_saw",     "led_wmod_pw_b",   "led_ps4", "led_tune"},
+		{"led_osc_b_tri",  "led_lfo_tri",     "led_wmod_filt",   "led_ps5", "led_to_cass"},
+		{"led_osc_b_sqr",  "led_lfo_sqr",     "led_osc_b_lo",    "led_ps6", "led_from_cass"},
+		{"led_osc_b_kbd",  "led_filt_kbd",    "led_unused_2",    "led_ps7", "led_unused_3"},
+		{"led_unison",     "led_release",     "led_unused_4",    "led_ps8", "led_preset"},
+	};
+
 	void switch_w(u8 data);
 	u8 switch_r();
 	u8 misc_r();
@@ -2560,7 +2572,7 @@ private:
 	required_ioport m_seq_cv_in;
 	required_ioport m_seq_offset;
 	required_ioport m_seq_scale;
-	std::vector<std::vector<output_finder<>>> m_leds;
+	output_finder<8, 5> m_leds;
 
 	u8 m_switch_row = 0;  // U212 input (CD4514 decoder).
 	u8 m_mux_abc = 0;  // U338 (CD4174 latch): Q3, Q2, Q5 (MSbit to LSbit).
@@ -2599,25 +2611,8 @@ prophet5_state::prophet5_state(const machine_config &mconfig, device_type type, 
 	, m_seq_cv_in(*this, "cv_in_seq")
 	, m_seq_offset(*this, "trimmer_seq_offset")
 	, m_seq_scale(*this, "trimmer_seq_scale")
+	, m_leds(*this, LED_NAMES)
 {
-	static constexpr const char *LED_NAMES[8][5] =
-	{
-		{"osc_a_sqr",  "pmod_freq_a", "wmod_freq_a", "ps1", "record"},
-		{"osc_a_saw",  "pmod_pw_a",   "wmod_freq_b", "ps2", "unused_1"},
-		{"osc_a_sync", "pmod_filt",   "wmod_pw_a",   "ps3", "a_440"},
-		{"osc_b_saw",  "lfo_saw",     "wmod_pw_b",   "ps4", "tune"},
-		{"osc_b_tri",  "lfo_tri",     "wmod_filt",   "ps5", "to_cass"},
-		{"osc_b_sqr",  "lfo_sqr",     "osc_b_lo",    "ps6", "from_cass"},
-		{"osc_b_kbd",  "filt_kbd",    "unused_2",    "ps7", "unused_3"},
-		{"unison",     "release",     "unused_4",    "ps8", "preset"},
-	};
-
-	for (int y = 0; y < 8; ++y)
-	{
-		m_leds.push_back(std::vector<output_finder<>>());
-		for (int x = 0; x < 5; ++x)
-			m_leds[y].push_back(output_finder<>(*this, std::string("led_") + LED_NAMES[y][x]));
-	}
 }
 
 // Computes the current through resistor R, from the junction of the resistors
@@ -2955,10 +2950,6 @@ void prophet5_state::machine_start()
 	save_item(NAME(m_tune_counter_out));
 	save_item(NAME(m_latch_gate5));
 	save_item(NAME(m_ext_gate5));
-
-	for (auto &led_row : m_leds)
-		for (auto &led : led_row)
-			led.resolve();
 }
 
 void prophet5_state::machine_reset()

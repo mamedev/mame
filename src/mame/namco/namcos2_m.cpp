@@ -80,11 +80,6 @@ void namcos2_base_state::machine_start()
 void gollygho_state::machine_start()
 {
 	namcos2_state::machine_start();
-
-	// resolve outputs
-	m_out_digit.resolve();
-	m_out_diorama.resolve();
-	m_out_gun_recoil.resolve();
 }
 
 void namcos2_base_state::machine_reset()

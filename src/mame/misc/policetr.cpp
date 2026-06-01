@@ -422,8 +422,6 @@ INPUT_PORTS_END
 
 void policetr_state::machine_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_control_data));
 	save_item(NAME(m_bsmt_data_bank));
 	save_item(NAME(m_bsmt_data_offset));

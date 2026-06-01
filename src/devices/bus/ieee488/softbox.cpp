@@ -387,7 +387,6 @@ softbox_device::softbox_device(const machine_config &mconfig, const char *tag, d
 
 void softbox_device::device_start()
 {
-	m_leds.resolve();
 }
 
 

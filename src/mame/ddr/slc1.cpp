@@ -107,8 +107,6 @@ private:
 
 void slc1_state::machine_start()
 {
-	m_busyled.resolve();
-
 	save_item(NAME(m_select));
 	save_item(NAME(m_segment));
 }

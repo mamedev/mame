@@ -79,7 +79,6 @@ private:
 	uint8_t m_riot_port_b;
 	emu_timer *m_led_update;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_r);
 	void sym1_74145_output_0_w(int state);

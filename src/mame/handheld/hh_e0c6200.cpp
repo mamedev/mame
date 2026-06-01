@@ -64,7 +64,6 @@ protected:
 
 void hh_e0c6200_state::machine_start()
 {
-	m_out_x.resolve();
 }
 
 

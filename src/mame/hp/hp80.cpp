@@ -1777,8 +1777,6 @@ void hp86_state::machine_start()
 {
 	hp80_base_state::machine_start();
 
-	m_run_light.resolve();
-
 	m_screen->register_screen_bitmap(m_bitmap);
 	m_video_mem = std::make_unique<uint8_t[]>(VIDEO_MEM_SIZE);
 

@@ -355,8 +355,6 @@ uint8_t bfmsys85_state::triac_r()
 
 void bfmsys85_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_mmtr_latch));
 	save_item(NAME(m_triac_latch));
 	// save_item(NAME(m_alpha_clock));

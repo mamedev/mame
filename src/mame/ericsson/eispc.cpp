@@ -492,8 +492,6 @@ void epc_state::machine_start()
 	save_item(NAME(m_drq));
 	save_item(NAME(m_fdc_irq));
 	save_item(NAME(m_fdc_drq));
-
-	m_leds.resolve();
 }
 
 void epc_state::machine_reset()

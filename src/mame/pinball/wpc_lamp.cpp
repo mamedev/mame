@@ -8,7 +8,7 @@ DEFINE_DEVICE_TYPE(WPC_LAMP, wpc_lamp_device, "wpc_lamp", "Williams Pinball Cont
 
 wpc_lamp_device::wpc_lamp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WPC_LAMP, tag, owner, clock),
-	outputs(),
+	outputs(*this, "l:%u%u", 0U, 0U),
 	timer(nullptr),
 	col(0),
 	row(0)
@@ -19,11 +19,9 @@ wpc_lamp_device::~wpc_lamp_device()
 {
 }
 
-void wpc_lamp_device::set_names(char const *const (&lamp_names)[8][8])
+void wpc_lamp_device::set_names(char const *const (&names)[8][8])
 {
-	if (outputs)
-		throw emu_fatalerror("wpc_lamp(%s): lamp output names may only be set once", tag());
-	outputs.emplace(*this, lamp_names);
+	outputs.set_names(names);
 }
 
 void wpc_lamp_device::update()
@@ -55,16 +53,8 @@ void wpc_lamp_device::col_w(uint8_t data)
 	update();
 }
 
-void wpc_lamp_device::device_config_complete()
-{
-	if (!outputs)
-		outputs.emplace(*this, "l:%u%u", 0U, 0U);
-}
-
 void wpc_lamp_device::device_start()
 {
-	outputs->resolve();
-
 	save_item(NAME(state));
 	save_item(NAME(col));
 	save_item(NAME(row));
@@ -85,6 +75,6 @@ TIMER_CALLBACK_MEMBER(wpc_lamp_device::update_lamps)
 		uint8_t s = state[i];
 		state[i] = s >> 1;
 		if ((s & 0xc0) == 0x40 || (s & 0xc0) == 0x80)
-			(*outputs)[i >> 3][i & 7] = (s & 0xc0) == 0x80;
+			outputs[i >> 3][i & 7] = (s & 0xc0) == 0x80;
 	}
 }

@@ -177,6 +177,7 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
+private:
 	uint8_t video_vdp_r(offs_t offset);
 	void video_vdp_w(offs_t offset, uint8_t data);
 	uint8_t video_joy_r();
@@ -201,8 +202,6 @@ protected:
 
 void tm990189_state::machine_start()
 {
-	m_digits.resolve();
-	m_leds.resolve();
 	m_displayena_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 
 	m_digitsel = 0;

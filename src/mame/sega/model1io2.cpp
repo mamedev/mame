@@ -237,9 +237,6 @@ model1io2_device::model1io2_device(const machine_config &mconfig, const char *ta
 
 void model1io2_device::device_start()
 {
-	// resolve outputs
-	m_led_comm_err.resolve();
-
 	// register for save states
 	save_item(NAME(m_secondary_controls));
 	save_item(NAME(m_lcd_data));

@@ -1319,8 +1319,6 @@ INPUT_PORTS_END
 
 void hornet_state::machine_start()
 {
-	m_pcb_digit.resolve();
-
 	// set conservative DRC options
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 

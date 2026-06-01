@@ -328,9 +328,6 @@ void seta2_state::machine_start()
 			}
 		}
 	}
-
-	m_leds.resolve();
-	m_lamps.resolve();
 }
 
 void seta2_state::sound_bank_w(offs_t offset, uint8_t data)

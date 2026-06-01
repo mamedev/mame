@@ -1574,10 +1574,6 @@ void linndrum_state::io_map(address_map &map)
 
 void linndrum_state::machine_start()
 {
-	m_step_display.resolve();
-	m_pattern_display.resolve();
-	m_tape_sync_out.resolve();
-
 	save_item(NAME(m_debouncing));
 	save_item(NAME(m_tempo_state));
 	save_item(NAME(m_tape_sync_enabled));

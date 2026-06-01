@@ -420,8 +420,6 @@ void segaxbd_state::device_start()
 	if(!m_segaic16road->started())
 		throw device_missing_dependencies();
 
-	m_lamps.resolve();
-
 	video_start();
 
 	// allocate a scanline timer

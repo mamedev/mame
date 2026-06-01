@@ -183,10 +183,6 @@ ioport_value wackygtr_state::alligators_front_sensors_r()
 
 void wackygtr_state::machine_start()
 {
-	m_alligator.resolve();
-	m_digit.resolve();
-	m_lamps.resolve();
-
 	save_item(NAME(m_adpcm_sel));
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_ctrl));

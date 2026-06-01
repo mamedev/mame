@@ -154,7 +154,6 @@ public:
 	void init_tbonusal() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD { m_leds.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 private:

@@ -319,8 +319,6 @@ void namcos86_state::machine_start()
 	if (m_subbank)
 		m_subbank->configure_entries(0, 4, memregion("cpu2")->base(), 0x2000);
 
-	m_leds.resolve();
-
 	save_item(NAME(m_wdog));
 }
 

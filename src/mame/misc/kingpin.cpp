@@ -58,8 +58,8 @@ public:
 		, m_leds(*this, "led_%u", 0U)
 	{ }
 
-	void kingpin(machine_config &config);
-	void dealracl(machine_config &config);
+	void kingpin(machine_config &config) ATTR_COLD;
+	void dealracl(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -84,7 +84,6 @@ private:
 
 void kingpin_state::machine_start()
 {
-	m_leds.resolve();
 }
 
 void kingpin_state::output1_w(uint8_t data)

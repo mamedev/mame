@@ -119,7 +119,6 @@ public:
 	void spacewin(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 	required_shared_ptr<uint16_t> m_bg_videoram;

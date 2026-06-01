@@ -155,8 +155,6 @@ private:
 
 void icm3216_state::machine_start()
 {
-	m_led.resolve();
-
 	save_item(NAME(m_iop_cmd));
 	save_item(NAME(m_iop_sts));
 	save_item(NAME(m_nmi_state));

@@ -178,7 +178,7 @@ public:
 	{
 	}
 
-	void init_common();
+	void init_common() ATTR_COLD;
 
 protected:
 	// driver_device overrides
@@ -328,8 +328,6 @@ protected:
 
 void news_68k_base_state::machine_start()
 {
-	m_led.resolve();
-
 	// Initialize state
 	u32 constexpr NET_RAM_SIZE = 8192;
 	m_net_ram = std::make_unique<u16[]>(NET_RAM_SIZE);

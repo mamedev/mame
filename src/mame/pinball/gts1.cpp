@@ -394,10 +394,6 @@ INPUT_PORTS_END
 
 void gts1_state::machine_start()
 {
-	m_digit8.resolve();
-	m_digit7.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_nvram_addr));
 	save_item(NAME(m_nvram_data));

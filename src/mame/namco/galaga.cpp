@@ -820,7 +820,6 @@ void digdug_state::earom_control_w(uint8_t data)
 
 void galaga_state::machine_start()
 {
-	m_leds.resolve();
 	/* create the interrupt timer */
 	m_cpu3_interrupt_timer = timer_alloc(FUNC(galaga_state::cpu3_interrupt_callback), this);
 	save_item(NAME(m_main_irq_mask));

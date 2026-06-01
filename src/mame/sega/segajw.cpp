@@ -351,9 +351,6 @@ INPUT_PORTS_END
 
 void segajw_state::machine_start()
 {
-	m_lamps.resolve();
-	m_towerlamps.resolve();
-
 	m_coin_start_cycles = 0;
 	m_hopper_start_cycles = 0;
 

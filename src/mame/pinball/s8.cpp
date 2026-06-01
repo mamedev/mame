@@ -144,11 +144,11 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void s8(machine_config &config);
-	void pfevr(machine_config &config);
-	void ratrc(machine_config &config);
-	void scrzy(machine_config &config);
-	void psound(machine_config &config);
+	void s8(machine_config &config) ATTR_COLD;
+	void pfevr(machine_config &config) ATTR_COLD;
+	void ratrc(machine_config &config) ATTR_COLD;
+	void scrzy(machine_config &config) ATTR_COLD;
+	void psound(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
@@ -541,9 +541,6 @@ TIMER_CALLBACK_MEMBER(s8_state::irq_timer)
 
 void s8_state::machine_start()
 {
-	m_io_outputs.resolve();
-	m_digits.resolve();
-
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_row));
 	save_item(NAME(m_data_ok));

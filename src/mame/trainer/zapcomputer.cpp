@@ -159,7 +159,6 @@ INPUT_PORTS_END
 
 void zapcomp_state::machine_start()
 {
-	m_digits.resolve();
 }
 
 void zapcomp_state::zapcomp(machine_config &config)

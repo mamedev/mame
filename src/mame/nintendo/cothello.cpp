@@ -96,8 +96,6 @@ private:
 
 void cothello_state::machine_start()
 {
-	m_digits.resolve();
-
 	m_counter_timer = timer_alloc(FUNC(cothello_state::counter_tick), this);
 	m_beeper_off = timer_alloc(FUNC(cothello_state::beeper_off), this);
 

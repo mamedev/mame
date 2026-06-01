@@ -832,8 +832,6 @@ void esqpanel2x40_vfx_device::device_start()
 {
 	esqpanel_device::device_start();
 
-	m_lights.resolve();
-
 	m_blink_timer = timer_alloc(FUNC(esqpanel2x40_vfx_device::update_blink), this);
 	m_blink_timer->enable(false);
 }

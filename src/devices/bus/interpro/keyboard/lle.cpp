@@ -451,8 +451,6 @@ void lle_device_base::device_add_mconfig(machine_config &config)
 
 void lle_device_base::device_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_txd));
 	save_item(NAME(m_p1));
 	save_item(NAME(m_p2));

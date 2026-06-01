@@ -105,15 +105,15 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_palette_ram(*this, "palette", 0x1000, ENDIANNESS_LITTLE),
-		m_lamps(*this, "lamp%u", 0U) { }
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
-	void init_luckgrln();
+	void init_luckgrln() ATTR_COLD;
 
-	void _7smash(machine_config &config);
-	void luckgrln(machine_config &config);
+	void _7smash(machine_config &config) ATTR_COLD;
+	void luckgrln(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -152,11 +152,6 @@ private:
 	void mainmap(address_map &map) ATTR_COLD;
 };
 
-
-void luckgrln_state::machine_start()
-{
-	m_lamps.resolve();
-}
 
 template<uint8_t Reel>
 void luckgrln_state::reel_ram_w(offs_t offset, uint8_t data)

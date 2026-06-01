@@ -98,23 +98,25 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void dmd(machine_config &config);
-	void gunshot(machine_config &config);
-	void jolypark(machine_config &config);
-	void mach2(machine_config &config);
-	void metalman(machine_config &config);
-	void msm5205(machine_config &config);
-	void msm6585(machine_config &config);
-	void spinb(machine_config &config);
-	void vrnwrld(machine_config &config);
+	void dmd(machine_config &config) ATTR_COLD;
+	void gunshot(machine_config &config) ATTR_COLD;
+	void jolypark(machine_config &config) ATTR_COLD;
+	void mach2(machine_config &config) ATTR_COLD;
+	void metalman(machine_config &config) ATTR_COLD;
+	void msm5205(machine_config &config) ATTR_COLD;
+	void msm6585(machine_config &config) ATTR_COLD;
+	void spinb(machine_config &config) ATTR_COLD;
+	void vrnwrld(machine_config &config) ATTR_COLD;
 
-	void init_1() { m_game = 1; }
-	void init_2() { m_game = 2; }
-	void init_3() { m_game = 3; }
+	void init_1() ATTR_COLD { m_game = 1; }
+	void init_2() ATTR_COLD { m_game = 2; }
+	void init_3() ATTR_COLD { m_game = 3; }
 
-private:
+protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
+
+private:
 	void p1_w(u8 data);
 	u8 p3_r();
 	void p3_w(u8 data);
@@ -153,7 +155,7 @@ private:
 	void update_sound_m();
 	void ic5a_w(int state);
 	void ic5m_w(int state);
-	void spinb_palette(palette_device &palette) const;
+	void spinb_palette(palette_device &palette) const ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -889,8 +891,6 @@ void spinb_state::ppim_c_w(u8 data)
 void spinb_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_digits.resolve();
-	m_io_outputs.resolve();
 
 	if (m_dmdcpu)
 		m_dmd_size = memregion("dmdcpu")->bytes();
@@ -922,6 +922,7 @@ void spinb_state::machine_start()
 void spinb_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 
@@ -934,7 +935,7 @@ void spinb_state::machine_reset()
 	update_sound_m();
 }
 
-void  spinb_state::spinb_palette(palette_device &palette) const
+void spinb_state::spinb_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
 	palette.set_pen_color(1, rgb_t(0xf7, 0xaa, 0x00));

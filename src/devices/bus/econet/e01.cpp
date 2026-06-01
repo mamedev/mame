@@ -427,8 +427,6 @@ econet_e01_device::econet_e01_device(const machine_config &mconfig, device_type 
 
 void econet_e01_device::device_start()
 {
-	m_led.resolve();
-
 	// allocate timers
 	m_clk_timer = timer_alloc(FUNC(econet_e01_device::clk_tick), this);
 

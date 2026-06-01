@@ -1179,7 +1179,6 @@ public:
 	void init_ped42() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 	uint8_t pottnpkr_mux_port_r();
@@ -5290,8 +5289,6 @@ DISCRETE_SOUND_END
 
 MACHINE_START_MEMBER(goldnpkr_state, mondial)
 {
-	m_lamps.resolve();
-
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x4000);
 }

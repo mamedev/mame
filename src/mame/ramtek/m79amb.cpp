@@ -85,9 +85,9 @@ public:
 		m_exp_lamp(*this, "EXP_LAMP")
 	{ }
 
-	void m79amb(machine_config &config);
+	void m79amb(machine_config &config) ATTR_COLD;
 
-	void init_m79amb();
+	void init_m79amb() ATTR_COLD;
 
 protected:
 	void machine_start() override ATTR_COLD;
@@ -146,8 +146,6 @@ void m79amb_state::_8003_w(uint8_t data)
 
 void m79amb_state::machine_start()
 {
-	m_self_test.resolve();
-	m_exp_lamp.resolve();
 }
 
 void m79amb_state::videoram_w(offs_t offset, uint8_t data)

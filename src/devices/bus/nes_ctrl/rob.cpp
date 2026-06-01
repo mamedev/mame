@@ -69,9 +69,6 @@ nes_rob_device::nes_rob_device(const machine_config &mconfig, const char *tag, d
 
 void nes_rob_device::device_start()
 {
-	// resolve handlers
-	m_motor_out.resolve();
-	m_led_out.resolve();
 }
 
 

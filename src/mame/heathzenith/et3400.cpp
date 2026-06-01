@@ -81,7 +81,6 @@ private:
 
 void et3400_state::machine_start()
 {
-	m_digit.resolve();
 }
 
 

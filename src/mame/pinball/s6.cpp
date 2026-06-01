@@ -88,8 +88,8 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void s6(machine_config &config);
-	void s6a(machine_config &config);
+	void s6(machine_config &config) ATTR_COLD;
+	void s6a(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 
@@ -433,9 +433,6 @@ void s6_state::pia_irq(int state)
 void s6_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_io_outputs.resolve();
-	m_digits.resolve();
-	m_leds.resolve();
 
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_row));
@@ -449,6 +446,7 @@ void s6_state::machine_start()
 void s6_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 }

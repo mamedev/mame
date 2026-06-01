@@ -75,10 +75,7 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	void quantum(machine_config &config);
-
-protected:
-	virtual void machine_start() override { m_leds.resolve(); }
+	void quantum(machine_config &config) ATTR_COLD;
 
 private:
 	uint16_t trackball_r();

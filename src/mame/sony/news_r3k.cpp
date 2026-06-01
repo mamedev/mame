@@ -182,8 +182,6 @@ protected:
 
 void news_r3k_base_state::machine_start()
 {
-	m_led.resolve();
-
 	m_net_ram = std::make_unique<u16[]>(8192);
 	save_pointer(NAME(m_net_ram), 8192);
 

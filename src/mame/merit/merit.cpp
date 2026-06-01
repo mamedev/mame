@@ -246,8 +246,6 @@ private:
 
 void merit_state::machine_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_lscnblk));
 	save_item(NAME(m_extra_video_bank_bit));
 }

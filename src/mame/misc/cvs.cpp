@@ -1316,8 +1316,6 @@ GFXDECODE_END
 
 void cvs_state::machine_start()
 {
-	m_lamps.resolve();
-
 	// register state save
 	save_item(NAME(m_character_ram_page_start));
 	save_item(NAME(m_character_banking_mode));

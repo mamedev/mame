@@ -2235,9 +2235,6 @@ void hng64_state::machine_start()
 	save_item(NAME(m_raster_irq_pos));
 
 	save_item(NAME(m_texture_wrapsize_table));
-
-	m_wheel_motor.resolve();
-	m_lamps_out.resolve();
 }
 
 TIMER_CALLBACK_MEMBER(hng64_state::comhack_callback)

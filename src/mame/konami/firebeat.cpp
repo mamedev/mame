@@ -416,7 +416,6 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void device_resolve_objects() override ATTR_COLD;
 
 	void firebeat(machine_config &config) ATTR_COLD;
 
@@ -491,7 +490,6 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void device_resolve_objects() override ATTR_COLD;
 
 	void firebeat_spu_base(machine_config &config) ATTR_COLD;
 	void firebeat_spu_map(address_map &map) ATTR_COLD;
@@ -553,8 +551,6 @@ public:
 	void init_ppp_overseas() ATTR_COLD;
 
 private:
-	virtual void device_resolve_objects() override ATTR_COLD;
-
 	void firebeat_ppp_map(address_map &map) ATTR_COLD;
 
 	void init_ppp_base() ATTR_COLD;
@@ -598,8 +594,6 @@ public:
 	void init_kbm_overseas() ATTR_COLD;
 
 private:
-	virtual void device_resolve_objects() override ATTR_COLD;
-
 	void firebeat_kbm_map(address_map &map) ATTR_COLD;
 
 	void init_kbm_base() ATTR_COLD;
@@ -688,8 +682,6 @@ public:
 	void init_popn_rental() ATTR_COLD;
 
 private:
-	virtual void device_resolve_objects() override ATTR_COLD;
-
 	void firebeat_popn_map(address_map &map) ATTR_COLD;
 
 	void init_popn_base() ATTR_COLD;
@@ -700,15 +692,6 @@ private:
 	output_finder<4> m_side_leds;
 	output_finder<5> m_top_leds;
 };
-
-void firebeat_popn_state::device_resolve_objects()
-{
-	firebeat_spu_state::device_resolve_objects();
-
-	m_button_leds.resolve();
-	m_side_leds.resolve();
-	m_top_leds.resolve();
-}
 
 /*****************************************************************************/
 
@@ -726,11 +709,6 @@ void firebeat_state::machine_reset()
 	m_extend_board_irq_enable = 0x3f;
 	m_extend_board_irq_active = 0x00;
 	m_control = 0;
-}
-
-void firebeat_state::device_resolve_objects()
-{
-	m_status_leds.resolve();
 }
 
 void firebeat_state::init_firebeat()
@@ -1198,12 +1176,6 @@ void firebeat_spu_state::machine_reset()
 	m_sync_ata_irq = 0;
 }
 
-void firebeat_spu_state::device_resolve_objects()
-{
-	firebeat_state::device_resolve_objects();
-	m_spu_status_leds.resolve();
-}
-
 void firebeat_spu_state::firebeat_spu_base(machine_config &config)
 {
 	firebeat(config);
@@ -1647,20 +1619,6 @@ void firebeat_popn_state::lamp_output_popn_w(offs_t offset, uint32_t data, uint3
 /*****************************************************************************
 * ParaParaParadise / ParaParaDancing
 ******************************************************************************/
-void firebeat_ppp_state::device_resolve_objects()
-{
-	firebeat_state::device_resolve_objects();
-
-	m_stage_leds.resolve();
-	m_top_leds.resolve();
-	m_lamps.resolve();
-	m_cab_led_left.resolve();
-	m_cab_led_right.resolve();
-	m_cab_led_door_lamp.resolve();
-	m_cab_led_ok.resolve();
-	m_cab_led_slim.resolve();
-}
-
 void firebeat_ppp_state::firebeat_ppp(machine_config &config)
 {
 	firebeat(config);
@@ -1807,16 +1765,6 @@ void firebeat_ppp_state::lamp_output3_ppp_w(offs_t offset, uint32_t data, uint32
 /*****************************************************************************
 * Keyboardmania
 ******************************************************************************/
-void firebeat_kbm_state::device_resolve_objects()
-{
-	firebeat_state::device_resolve_objects();
-	m_lamps.resolve();
-	m_cab_led_door_lamp.resolve();
-	m_cab_led_start1p.resolve();
-	m_cab_led_start2p.resolve();
-	m_lamp_neon.resolve();
-}
-
 void firebeat_kbm_state::init_kbm_base()
 {
 	init_firebeat();

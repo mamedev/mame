@@ -458,9 +458,6 @@ void kn5000_state::machine_start()
 	save_item(NAME(m_cpanel_inta));
 
 	m_extension->program_map(m_maincpu->space(AS_PROGRAM));
-
-	m_checking_device_led_cn11.resolve();
-	m_checking_device_led_cn12.resolve();
 }
 
 void kn5000_state::machine_reset()

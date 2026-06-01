@@ -244,11 +244,6 @@ void jpmimpct_video_state::machine_reset()
 
 void jpmimpct_state::machine_start()
 {
-	m_digits.resolve();
-	m_lamp_output.resolve();
-	m_pwrled.resolve();
-	m_statled.resolve();
-
 	save_item(NAME(m_optic_pattern));
 	save_item(NAME(m_payen));
 	save_item(NAME(m_hopinhibit));

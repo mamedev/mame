@@ -57,12 +57,15 @@ public:
 		, m_io_keyboard(*this, "X%d", 0U)
 		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
-		{ }
+	{ }
 
-	void nsm(machine_config &config);
+	void nsm(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-
 	u8 ff_r() { return 1; }
 	void e600_w(offs_t, u8);
 	u8 enwnv_r();
@@ -90,8 +93,6 @@ private:
 	u8 m_np_cru = 0U;
 	u8 m_np_sel = 0U;
 	bool m_e600_locked = false;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
 	required_device<tms9995_device> m_maincpu;
 	required_shared_ptr<u8> m_nvram;
 	required_ioport_array<13> m_io_keyboard;
@@ -395,9 +396,6 @@ void nsm_state::ay2a_w(u8 data)
 void nsm_state::machine_start()
 {
 	genpin_class::machine_start();
-
-	m_digits.resolve();
-	m_io_outputs.resolve();
 
 	save_item(NAME(m_cru_out));
 	save_item(NAME(m_cru_in));

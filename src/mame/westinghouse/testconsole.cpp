@@ -80,7 +80,7 @@ public:
 	{
 	}
 
-	void whousetc(machine_config &config);
+	void whousetc(machine_config &config) ATTR_COLD;
 
 private:
 	template <unsigned Dsp> void update_dsp(offs_t offset, u16 data)
@@ -88,12 +88,7 @@ private:
 		m_digit[(Dsp << 2) | offset] = data;
 	}
 
-	virtual void machine_start() override
-	{
-		m_digit.resolve();
-	}
-
-	virtual void machine_reset() override
+	virtual void machine_reset() override ATTR_COLD
 	{
 		for (required_device<dl1416_device> const &dsp : m_dsp)
 			dsp->cu_w(1);

@@ -596,14 +596,14 @@ using delegate_mfp_conventional_return = std::bool_constant<
 		std::is_scalar_v<ReturnType> ||
 		std::is_reference_v<ReturnType> >;
 
-template <typename ReturnType, typename Enable = void>
+template <typename ReturnType>
 struct delegate_mfp;
 
 template <typename ReturnType>
-struct delegate_mfp<ReturnType, std::enable_if_t<delegate_mfp_conventional_return<ReturnType>::value> > { using type = delegate_mfp_msvc; };
+struct delegate_mfp<ReturnType> requires delegate_mfp_conventional_return<ReturnType>::value { using type = delegate_mfp_msvc; };
 
 template <typename ReturnType>
-struct delegate_mfp<ReturnType, std::enable_if_t<!delegate_mfp_conventional_return<ReturnType>::value> > { using type = delegate_mfp_compatible; };
+struct delegate_mfp<ReturnType> requires (!delegate_mfp_conventional_return<ReturnType>::value) { using type = delegate_mfp_compatible; };
 
 #endif
 

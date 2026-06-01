@@ -667,7 +667,6 @@ void cischeat_state::f1gpstr2_io_w(offs_t offset, u16 data, u16 mem_mask)
 
 void cischeat_state::machine_start()
 {
-	m_leds.resolve();
 	m_motor_value = 0;
 	m_io_value = 0;
 

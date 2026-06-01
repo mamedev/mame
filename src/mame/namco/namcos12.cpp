@@ -1624,9 +1624,6 @@ protected:
 	{
 		namcos12_state::driver_start();
 
-		m_start_lamp.resolve();
-		m_gun_recoil.resolve();
-
 		/* HACK: patch out wait for dma 5 to complete */
 		*((uint32_t *)(m_mainrom->base() + 0x331c4)) = 0;
 	}
@@ -1768,13 +1765,6 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
-	{
-		namcos12_state::driver_start();
-
-		m_led.resolve();
-	}
-
 	virtual void configure_jvs(machine_config &config, device_jvs_interface &io) override ATTR_COLD
 	{
 		namcos12_state::configure_jvs(config, io);

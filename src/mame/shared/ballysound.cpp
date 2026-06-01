@@ -528,8 +528,6 @@ void bally_cheap_squeak_device::device_add_mconfig(machine_config &config)
 
 void bally_cheap_squeak_device::device_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_sound_select));
 	save_item(NAME(m_sound_int));
 }

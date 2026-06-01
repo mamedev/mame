@@ -1461,8 +1461,6 @@ uint32_t exidy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 void exidy_state::machine_start()
 {
-	m_led.resolve();
-
 	for (int i = 0; i < 128; i++)
 		m_collision_timer[i] = timer_alloc(FUNC(exidy_state::latch_collision), this);
 }

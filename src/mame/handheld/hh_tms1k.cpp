@@ -424,9 +424,6 @@ protected:
 
 void hh_tms1k_state::machine_start()
 {
-	// resolve outputs
-	m_out_power.resolve();
-
 	// register for savestates
 	save_item(NAME(m_o));
 	save_item(NAME(m_r));
@@ -991,9 +988,6 @@ public:
 
 	void bcheetah(machine_config &config);
 
-protected:
-	virtual void machine_start() override ATTR_COLD;
-
 private:
 	output_finder<> m_motor1;
 	output_finder<> m_motor2_left;
@@ -1003,16 +997,6 @@ private:
 	void write_o(u16 data);
 	u8 read_k();
 };
-
-void bcheetah_state::machine_start()
-{
-	hh_tms1k_state::machine_start();
-
-	// resolve outputs
-	m_motor1.resolve();
-	m_motor2_left.resolve();
-	m_motor2_right.resolve();
-}
 
 // handlers
 
@@ -5014,7 +4998,7 @@ ROM_END
   are denoted by words ("left", "center", "short", etc), and an alternate one
   with little guys drawn next to the LEDs.
 
-  led translation table: led LDzz from game PCB = MAME y.x:
+  LED translation table: LED LDzz from game PCB = MAME y.x:
 
     0 = -     10 = 1.2   20 = 4.2   30 = 6.0
     1 = 2.3   11 = 0.4   21 = 4.1   31 = 6.1
@@ -10126,13 +10110,6 @@ void bigtrak_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
 
-	// resolve outputs
-	m_left_motor_forward.resolve();
-	m_left_motor_reverse.resolve();
-	m_right_motor_forward.resolve();
-	m_right_motor_reverse.resolve();
-	m_ext_out.resolve();
-
 	// register for savestates
 	save_item(NAME(m_gearbox_pos));
 }
@@ -10353,11 +10330,6 @@ private:
 void mbdtower_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
-
-	// resolve outputs
-	m_motor_pos_out.resolve();
-	m_card_pos_out.resolve();
-	m_motor_on_out.resolve();
 
 	// register for savestates
 	save_item(NAME(m_motor_pos));

@@ -69,14 +69,15 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void s4(machine_config &config);
+	void s4(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+private:
 	void dig0_w(u8 data);
 	void dig1_w(u8 data);
 	void lamp0_w(u8 data);
@@ -312,9 +313,6 @@ void s4_state::clockcnt_w(u16 data)
 void s4_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_io_outputs.resolve();
-	m_digits.resolve();
-	m_leds.resolve();
 
 	save_item(NAME(m_irq_in_progress));
 	save_item(NAME(m_strobe));
@@ -326,6 +324,7 @@ void s4_state::machine_start()
 void s4_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 

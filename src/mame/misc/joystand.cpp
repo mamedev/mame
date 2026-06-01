@@ -640,11 +640,6 @@ GFXDECODE_END
 
 void joystand_state::machine_start()
 {
-	m_blocker.resolve();
-	m_error_lamp.resolve();
-	m_photo_lamp.resolve();
-	m_ok_button_led.resolve();
-	m_cancel_button_led.resolve();
 }
 
 

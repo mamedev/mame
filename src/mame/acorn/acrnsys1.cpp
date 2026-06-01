@@ -93,8 +93,6 @@ private:
 
 void acrnsys1_state::machine_start()
 {
-	m_display.resolve();
-
 	save_item(NAME(m_digit));
 	save_item(NAME(m_cass_data));
 	save_item(NAME(m_cassbit));

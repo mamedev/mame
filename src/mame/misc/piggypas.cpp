@@ -182,8 +182,6 @@ INPUT_PORTS_END
 
 void piggypas_state::machine_start()
 {
-	m_digits.resolve();
-
 	m_digit_latch = 0;
 }
 

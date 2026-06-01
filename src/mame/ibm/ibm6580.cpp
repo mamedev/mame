@@ -907,8 +907,6 @@ void ibm6580_state::machine_start()
 	m_floppy[0].image = m_fdc->subdevice<floppy_connector>("0")->get_device();
 	m_floppy[1].image = m_fdc->subdevice<floppy_connector>("1")->get_device();
 
-	m_leds.resolve();
-
 	memset(m_p_videoram, 0x0, 0x1000);
 }
 

@@ -1082,9 +1082,6 @@ MACHINE_START_MEMBER(meritm_state, common)
 
 void meritm_state::machine_start()
 {
-	m_p1_disc_lamp.resolve();
-	m_p1_play_lamp.resolve();
-	m_p1_cancel_lamp.resolve();
 	m_banks[0]->configure_entries(0, 8, m_region_maincpu->base(), 0x10000);
 	m_bank = 0xff;
 	crt250_switch_banks();

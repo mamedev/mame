@@ -1717,9 +1717,6 @@ void sega_segacd_device::device_start()
 
 	segacd_4meg_prgbank = 0;
 
-	m_red_led.resolve();
-	m_green_led.resolve();
-
 	space.unmap_readwrite        (0x020000,0x3fffff);
 
 	space.install_read_handler (0x0020000, 0x003ffff, read16sm_delegate(*this, FUNC(sega_segacd_device::scd_4m_prgbank_ram_r)) );

@@ -19,12 +19,14 @@ TODO:
 ****************************************************************************/
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/t11/t11.h"
+#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "bus/rs232/rs232.h"
-#include "machine/clock.h"
 #include "machine/terminal.h"
+
 #include "dct11em.lh"
 
 
@@ -204,9 +206,6 @@ void dct11em_state::machine_reset()
 
 void dct11em_state::machine_start()
 {
-	m_digits.resolve();
-	m_led.resolve();
-
 	save_item(NAME(m_seg_lower));
 	save_item(NAME(m_seg_upper));
 	save_item(NAME(m_portc));

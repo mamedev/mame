@@ -189,9 +189,6 @@
 
 void turbo_base_state::machine_start()
 {
-	m_digits.resolve();
-	m_lamp.resolve();
-
 	save_item(NAME(m_i8279_scanlines));
 	save_item(NAME(m_sound_state));
 }
@@ -217,8 +214,6 @@ void subroc3d_state::machine_start()
 {
 	turbo_base_state::machine_start();
 
-	m_shutter.resolve();
-
 	save_item(NAME(m_col));
 	save_item(NAME(m_ply));
 	save_item(NAME(m_flip));
@@ -235,9 +230,6 @@ void subroc3d_state::machine_start()
 void turbo_state::machine_start()
 {
 	turbo_base_state::machine_start();
-
-	m_tachometer.resolve();
-	m_speed.resolve();
 
 	save_item(NAME(m_osel));
 	save_item(NAME(m_bsel));

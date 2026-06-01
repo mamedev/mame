@@ -154,7 +154,7 @@ public:
 		, m_gun_led(*this, "Player%u_Gun_LED", 1U)
 	{ }
 
-	void midxunit(machine_config &config);
+	void midxunit(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -419,9 +419,6 @@ void midxunit_state::uart_w(offs_t offset, uint8_t data)
 
 void midxunit_state::machine_start()
 {
-	m_gun_recoil.resolve();
-	m_gun_led.resolve();
-
 	m_nvram->set_base(m_nvram_data.target(), 0x2000);
 
 	save_item(NAME(m_iodata));

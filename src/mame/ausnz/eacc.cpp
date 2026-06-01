@@ -157,9 +157,6 @@ void eacc_state::machine_reset()
 
 void eacc_state::machine_start()
 {
-	m_digits.resolve();
-	m_leds.resolve();
-
 	save_item(NAME(m_cb2));
 	save_item(NAME(m_scan));
 	save_item(NAME(m_digit));

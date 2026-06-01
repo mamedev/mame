@@ -88,10 +88,10 @@ public:
 		m_led(*this, "led0")
 	{ }
 
-	void berzerk(machine_config &config);
-	void frenzy(machine_config &config);
+	void berzerk(machine_config &config) ATTR_COLD;
+	void frenzy(machine_config &config) ATTR_COLD;
 
-	void init_moonwarp();
+	void init_moonwarp() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -399,8 +399,6 @@ void berzerk_state::machine_start()
 {
 	create_irq_timer();
 	create_nmi_timer();
-
-	m_led.resolve();
 
 	/* register for state saving */
 	save_item(NAME(m_magicram_control));

@@ -363,7 +363,6 @@ protected:
 
 void tempest_state::machine_start()
 {
-	m_leds.resolve();
 	save_item(NAME(m_player_select));
 }
 

@@ -138,8 +138,6 @@ void linux4004_state::linux4004(machine_config &config)
 void linux4004_state::machine_start()
 {
 	m_rom_bank->configure_entries(0, 2, memregion("4004firmware")->base(), 0x1000);
-	m_led_pc.resolve();
-	m_led_sdcard.resolve();
 
 	std::fill(std::begin(m_psram_so), std::end(m_psram_so), 1);
 	m_u3_in = 0;

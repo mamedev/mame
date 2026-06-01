@@ -299,8 +299,6 @@ INPUT_PORTS_END
 
 void maygay1b_state::machine_start()
 {
-	m_lamps.resolve();
-	m_triacs.resolve();
 }
 
 void maygay1b_state::reel12_w(uint8_t data)

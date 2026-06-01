@@ -927,14 +927,6 @@ INPUT_PORTS_END
 
 void vk100_state::machine_start()
 {
-	m_online_led.resolve();
-	m_local_led.resolve();
-	m_noscroll_led.resolve();
-	m_basic_led.resolve();
-	m_hardcopy_led.resolve();
-	m_l1_led.resolve();
-	m_l2_led.resolve();
-
 	m_online_led = 1;
 	m_local_led = 0;
 	m_noscroll_led = 1;

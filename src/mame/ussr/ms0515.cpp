@@ -83,7 +83,7 @@ public:
 		, m_led17(*this, "led17")
 	{ }
 
-	void ms0515(machine_config &config);
+	void ms0515(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -364,9 +364,6 @@ void ms0515_state::pit8253_out2_changed(int state)
 
 void ms0515_state::machine_start()
 {
-	m_led9.resolve();
-	m_led16.resolve();
-	m_led17.resolve();
 }
 
 void ms0515_state::machine_reset()

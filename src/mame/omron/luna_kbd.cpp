@@ -189,8 +189,6 @@ void luna_keyboard_device::device_add_mconfig(machine_config &config)
 
 void luna_keyboard_device::device_start()
 {
-	m_leds.resolve();
-
 	m_beep_timer = timer_alloc(FUNC(luna_keyboard_device::beep_timer), this);
 }
 

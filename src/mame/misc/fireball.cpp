@@ -62,7 +62,7 @@ public:
 		, m_rv(*this, "RV")
 	{ }
 
-	void fireball(machine_config &config);
+	void fireball(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -443,16 +443,6 @@ INPUT_PORTS_END
 
 void fireball_state::machine_start()
 {
-	m_digits.resolve();
-	m_hopper.resolve();
-	m_gameover.resolve();
-	m_title.resolve();
-	m_credit.resolve();
-	m_ss.resolve();
-	m_c_lock.resolve();
-	m_sv.resolve();
-	m_fbv.resolve();
-	m_rv.resolve();
 }
 
 void fireball_state::machine_reset()

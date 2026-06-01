@@ -80,6 +80,7 @@ using util::make_bitmask;
 using util::BIT;
 using util::bitswap;
 using util::iabs;
+using util::make_unique_clear;
 using util::string_format;
 
 using endianness_t = std::endian;
@@ -293,12 +294,5 @@ template <typename... T>
 {
 	throw emu_fatalerror(std::forward<T>(args)...);
 }
-
-
-//**************************************************************************
-//  USEFUL UTILITIES
-//**************************************************************************
-
-using util::make_unique_clear;
 
 #endif // MAME_EMU_EMUCORE_H

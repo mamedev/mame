@@ -135,8 +135,6 @@ private:
 
 void tasc_state::machine_start()
 {
-	m_out_leds.resolve();
-
 	m_boot_timer = timer_alloc(FUNC(tasc_state::disable_bootrom), this);
 	m_boot_view[1].install_ram(0, m_ram->size() - 1, m_ram->pointer());
 

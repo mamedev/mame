@@ -105,7 +105,6 @@ protected:
 	uint8_t m_port18;
 	uint8_t m_battery_sel;
 
-	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
@@ -823,11 +822,6 @@ static INPUT_PORTS_START( pcg850v )
 	PORT_START("ON")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_PGUP)         PORT_NAME("ON")         PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pce220_state::on_irq), 0)
 INPUT_PORTS_END
-
-void pce220_state::device_resolve_objects()
-{
-	m_lcd_symbols.resolve();
-}
 
 void pce220_state::machine_start()
 {

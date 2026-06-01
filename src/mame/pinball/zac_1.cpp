@@ -72,17 +72,20 @@ ToDo:
 
 
 #include "emu.h"
-#include "cpu/s2650/s2650.h"
+#include "genpin.h"
+
 #include "cpu/mcs48/mcs48.h"
+#include "cpu/s2650/s2650.h"
 #include "machine/clock.h"
 #include "machine/gen_latch.h"
-#include "genpin.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/mm5837.h"
 #include "sound/sn76477.h"
 #include "sound/spkrdev.h"
+
 #include "speaker.h"
+
 #include "zac_1.lh"
 
 namespace {
@@ -105,12 +108,16 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 		{ }
 
-	void locomotp(machine_config &config);
-	void config_base(machine_config &config);
-	void zac1(machine_config &config);
-	void zac2(machine_config &config);
-	void zac3(machine_config &config);
-	void zac4(machine_config &config);
+	void locomotp(machine_config &config) ATTR_COLD;
+	void config_base(machine_config &config) ATTR_COLD;
+	void zac1(machine_config &config) ATTR_COLD;
+	void zac2(machine_config &config) ATTR_COLD;
+	void zac3(machine_config &config) ATTR_COLD;
+	void zac4(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 ctrl_r();
@@ -124,8 +131,6 @@ private:
 	void reset_int_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_outtimer);
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
 	void audio_command_w(u8 data);
 	u8 audio_command_r();
 
@@ -536,9 +541,6 @@ void zac_1_state::machine_reset()
 
 void zac_1_state::machine_start()
 {
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_t_c));
 	save_item(NAME(m_out_offs));
 	save_item(NAME(m_input_line));

@@ -236,7 +236,6 @@ void mg1_kbd_device::map_pio(address_map &map)
 
 void mg1_kbd_device::device_start()
 {
-	m_led.resolve();
 }
 
 ioport_constructor mg1_kbd_device::device_input_ports() const

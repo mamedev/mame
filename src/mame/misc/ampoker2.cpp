@@ -418,7 +418,6 @@
 
 void ampoker2_state::machine_start()
 {
-	m_lamps.resolve();
 }
 
 /**********************

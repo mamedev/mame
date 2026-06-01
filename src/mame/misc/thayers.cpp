@@ -50,7 +50,7 @@ public:
 	{
 	}
 
-	void thayers(machine_config &config);
+	void thayers(machine_config &config) ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
@@ -125,8 +125,6 @@ private:
 
 void thayers_state::machine_start()
 {
-	m_digits.resolve();
-
 	m_intrq_timer = timer_alloc(FUNC(thayers_state::intrq_tick), this);
 
 	save_item(NAME(m_laserdisc_data));

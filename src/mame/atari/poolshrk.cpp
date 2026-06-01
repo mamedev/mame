@@ -46,7 +46,6 @@ public:
 	void init_poolshrk();
 
 protected:
-	virtual void machine_start() override { m_leds.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 private:

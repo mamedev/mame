@@ -110,9 +110,10 @@ protected:
 	{
 	}
 
-	void common_config(machine_config &config);
-	void common_init();
+	void common_config(machine_config &config) ATTR_COLD;
+	void common_init() ATTR_COLD;
 
+protected:
 	// driver_device overrides
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -151,7 +152,6 @@ protected:
 
 	emu_timer *m_buserror = nullptr;
 
-private:
 	u8 m_nmr = 0; // nonvolatile memory register
 	u16 m_per = 0; // parity error register
 	u8 m_scr = 0; // system control register
@@ -180,8 +180,8 @@ public:
 	{
 	}
 
-	void tek6130(machine_config &config);
-	void init() { tekigw_state_base::common_init(); }
+	void tek6130(machine_config &config) ATTR_COLD;
+	void init() ATTR_COLD { tekigw_state_base::common_init(); }
 
 protected:
 	// driver_device overrides
@@ -234,8 +234,8 @@ public:
 	{
 	}
 
-	void tek4132(machine_config &config);
-	void init() { tekigw_state_base::common_init(); }
+	void tek4132(machine_config &config) ATTR_COLD;
+	void init() ATTR_COLD { tekigw_state_base::common_init(); }
 
 protected:
 	// driver_device overrides
@@ -301,8 +301,6 @@ void tek6100_state::machine_reset()
 
 void tekigw_state_base::common_init()
 {
-	m_led.resolve();
-
 	m_lan->space(0).install_ram(0, m_ram->mask(), m_ram->pointer());
 }
 

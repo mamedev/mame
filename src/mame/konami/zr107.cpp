@@ -491,9 +491,6 @@ void zr107_state::ccu_w(uint32_t data)
 
 void zr107_state::machine_start()
 {
-	m_pcb_digit.resolve();
-	m_wheel_motor.resolve();
-
 	// set conservative DRC options
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 

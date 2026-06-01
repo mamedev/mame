@@ -273,6 +273,7 @@ protected:
 	emu_timer *m_update_sprites_timer = nullptr;
 
 	// Binary outputs
+	// FIXME: split this up into derived classes so games only show the outputs they actually have
 	output_finder<> m_output_back_lamp;
 	output_finder<2> m_output_blue_button;
 	output_finder<> m_output_blue_corner_lamp;
@@ -371,12 +372,12 @@ public:
 	void lamps1_w(uint8_t data);
 	void lamps2_w(uint8_t data);
 	void scsi_irq_w(int state);
-	void scsi_drq_w(int state);
 
-	static void cdrom_config(device_t *device);
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual void device_start() override ATTR_COLD;
+	void scsi_drq_w(int state);
+
+	static void cdrom_config(device_t *device) ATTR_COLD;
 
 private:
 	output_finder<16> m_lamps;

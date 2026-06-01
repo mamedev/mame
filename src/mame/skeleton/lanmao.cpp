@@ -136,9 +136,6 @@ private:
 
 void panda2_state::machine_start()
 {
-	m_digits.resolve();
-	m_leds.resolve();
-
 	save_item(NAME(m_kbd_line));
 	save_item(NAME(m_p1_out));
 }

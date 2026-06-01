@@ -472,15 +472,6 @@ void ie15_device::kbd_sdv(int state)
 
 void ie15_device::device_start()
 {
-	m_lat_led.resolve();
-	m_nr_led.resolve();
-	m_pch_led.resolve();
-	m_dup_led.resolve();
-	m_lin_led.resolve();
-	m_red_led.resolve();
-	m_sdv_led.resolve();
-	m_prd_led.resolve();
-
 	m_hblank_timer = timer_alloc(FUNC(ie15_device::hblank_onoff_tick), this);
 	m_hblank_timer->adjust(attotime::never);
 

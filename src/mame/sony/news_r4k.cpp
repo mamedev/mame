@@ -157,7 +157,7 @@ public:
 	{
 	}
 
-	void nws5000x(machine_config &config);
+	void nws5000x(machine_config &config) ATTR_COLD;
 
 protected:
 
@@ -792,9 +792,6 @@ void news_r4k_state::ram_w(offs_t offset, uint8_t data)
  */
 void news_r4k_state::machine_start()
 {
-	// Init front panel LEDs
-	m_led.resolve();
-
 	// Save state support
 	save_item(NAME(m_inten));
 	save_item(NAME(m_intst));

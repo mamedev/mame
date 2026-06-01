@@ -156,7 +156,6 @@ TIMER_CALLBACK_MEMBER(irobot_state::scanline_callback)
 
 void irobot_state::machine_start()
 {
-	m_leds.resolve();
 	m_vg_clear = 0;
 	m_statwr = 0;
 

@@ -73,17 +73,19 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void inder(machine_config &config);
-	void brvteam(machine_config &config);
-	void canasta(machine_config &config);
-	void lapbylap(machine_config &config);
+	void inder(machine_config &config) ATTR_COLD;
+	void brvteam(machine_config &config) ATTR_COLD;
+	void canasta(machine_config &config) ATTR_COLD;
+	void lapbylap(machine_config &config) ATTR_COLD;
 
-	void init_0();
-	void init_1();
+	void init_0() ATTR_COLD;
+	void init_1() ATTR_COLD;
 
-private:
+protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
+
+private:
 	u8 ppic_r();
 	void ppia_w(u8 data);
 	void ppib_w(u8 data);
@@ -1333,9 +1335,6 @@ void inder_state::ppic_w(u8 data)
 void inder_state::machine_start()
 {
 	genpin_class::machine_start();
-
-	m_digits.resolve();
-	m_io_outputs.resolve();
 
 	save_item(NAME(m_pc0));
 	save_item(NAME(m_game));

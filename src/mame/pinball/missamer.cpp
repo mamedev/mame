@@ -61,7 +61,7 @@ public:
 		m_scan(0)
 	{ }
 
-	void missamer(machine_config &config);
+	void missamer(machine_config &config) ATTR_COLD;
 
 protected:
 	void machine_start() override ATTR_COLD;
@@ -493,10 +493,6 @@ void missamer_state::ramio2_pc_w(uint8_t data)
 
 void missamer_state::machine_start()
 {
-	// resolve artwork outputs
-	m_lamps.resolve();
-	m_digits.resolve();
-
 	// register for save states
 	save_item(NAME(m_dy));
 	save_item(NAME(m_scan));

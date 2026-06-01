@@ -503,8 +503,6 @@ GFXDECODE_END
 
 void atarifb_state::machine_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_ctrld));
 	save_item(NAME(m_sign_x_1));
 	save_item(NAME(m_sign_x_2));

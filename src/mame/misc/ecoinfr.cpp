@@ -56,18 +56,18 @@
 class ecoinfr_state : public driver_device
 {
 public:
-	ecoinfr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ecoinfr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_reel(*this, "reel%u", 0U),
 		m_digits(*this, "digit%u", 0U)
-		{ }
+	{ }
 
-	void ecoinfr(machine_config &config);
+	void ecoinfr(machine_config &config) ATTR_COLD;
 
-	void init_ecoinfrbr();
-	void init_ecoinfr();
-	void init_ecoinfrmab();
+	void init_ecoinfrbr() ATTR_COLD;
+	void init_ecoinfr() ATTR_COLD;
+	void init_ecoinfrmab() ATTR_COLD;
 
 	int reel1_opto_r();
 	int reel2_opto_r();
@@ -115,7 +115,6 @@ private:
 	void ec_port18_out_w(uint8_t data);
 
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_irq_timer);
 
 	uint8_t m_banksel = 0;

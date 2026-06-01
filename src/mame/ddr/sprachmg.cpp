@@ -322,12 +322,6 @@ void sprachmg_state::sys_w(uint8_t data)
 
 void sprachmg_state::machine_start()
 {
-	// resolve outputs
-	m_dmd.resolve();
-	m_led_speech.resolve();
-	m_led_morse.resolve();
-	m_led_standard.resolve();
-
 	// register for save states
 	save_item(NAME(m_display_data));
 	save_item(NAME(m_key_scan));

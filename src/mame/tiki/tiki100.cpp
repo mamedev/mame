@@ -683,8 +683,6 @@ void tiki100_state::busrq_w(int state)
 
 void tiki100_state::machine_start()
 {
-	m_leds.resolve();
-
 	/* register for state saving */
 	save_item(NAME(m_rome));
 	save_item(NAME(m_vire));

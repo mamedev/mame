@@ -4208,8 +4208,6 @@ void jantouki_state::machine_start()
 
 	dynax_adpcm_state::machine_start();
 
-	m_led.resolve();
-
 	m_blitter2_irq_mask = 1;
 
 	save_item(NAME(m_blitter2_irq_mask));

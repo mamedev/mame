@@ -49,10 +49,10 @@ DEFINE_DEVICE_TYPE(PWM_DISPLAY, pwm_display_device, "pwm_display", "PWM Display"
 
 pwm_display_device::pwm_display_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, PWM_DISPLAY, tag, owner, clock),
-	m_out_x(*this, "%u.%u", 0U, 0U),
-	m_out_a(*this, "%u.a", 0U),
-	m_out_multi(*this, "multi%u.%u", 0U, 0U),
-	m_out_digit(*this, "digit%u", 0U),
+	m_out_x(),
+	m_out_a(),
+	m_out_multi(),
+	m_out_digit(),
 	m_output_x_cb(*this),
 	m_output_a_cb(*this),
 	m_output_multi_cb(*this),
@@ -69,23 +69,31 @@ pwm_display_device::pwm_display_device(const machine_config &mconfig, const char
 }
 
 
-//-------------------------------------------------
-//  device_start/reset
-//-------------------------------------------------
-
-void pwm_display_device::device_start()
+void pwm_display_device::device_config_complete()
 {
 	// resolve handlers
 	m_external_output = !m_output_x_cb.isunset() || !m_output_a_cb.isunset() || !m_output_multi_cb.isunset() || !m_output_digit_cb.isunset();
 
 	if (!m_external_output)
 	{
-		m_out_x.resolve();
-		m_out_a.resolve();
-		m_out_multi.resolve();
-		m_out_digit.resolve();
+		if (!m_out_x)
+			m_out_x.emplace(*this, "%u.%u", 0U, 0U);
+		if (!m_out_a)
+			m_out_a.emplace(*this, "%u.a", 0U);
+		if (!m_out_multi)
+			m_out_multi.emplace(*this, "multi%u.%u", 0U, 0U);
+		if (!m_out_digit)
+			m_out_digit.emplace(*this, "digit%u", 0U);
 	}
+}
 
+
+//-------------------------------------------------
+//  device_start/reset
+//-------------------------------------------------
+
+void pwm_display_device::device_start()
+{
 	// initialize
 	m_rowsel = 0;
 	m_rowdata_last = 0;
@@ -230,14 +238,14 @@ TIMER_CALLBACK_MEMBER(pwm_display_device::frame_tick)
 				if (m_external_output)
 					m_output_x_cb(x << 6 | y, level);
 				else
-					m_out_x[y][x] = level;
+					(*m_out_x)[y][x] = level;
 			}
 			else
 			{
 				if (m_external_output)
 					m_output_a_cb(y, level);
 				else
-					m_out_a[y] = level;
+					(*m_out_a)[y] = level;
 			}
 		}
 
@@ -256,14 +264,14 @@ TIMER_CALLBACK_MEMBER(pwm_display_device::frame_tick)
 				if (m_external_output)
 					m_output_multi_cb(b << 6 | y, digit_row);
 				else
-					m_out_multi[y][b] = multi_row[b];
+					(*m_out_multi)[y][b] = multi_row[b];
 			}
 
 			// output to digity (single brightness level)
 			if (m_external_output)
 				m_output_digit_cb(y, digit_row);
 			else
-				m_out_digit[y] = digit_row;
+				(*m_out_digit)[y] = digit_row;
 		}
 	}
 

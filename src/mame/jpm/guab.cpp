@@ -300,8 +300,6 @@ uint32_t guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bit
 
 void guab_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_fdc->set_floppy(m_floppy->get_device());
 }
 

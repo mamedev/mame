@@ -171,9 +171,6 @@ public:
 	void init_animalc() ATTR_COLD;
 	void init_haekaka() ATTR_COLD;
 
-protected:
-	virtual void machine_start() override ATTR_COLD { m_leds.resolve(); }
-
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(gocowboy_int);
 

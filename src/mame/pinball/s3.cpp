@@ -77,17 +77,18 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void s3(machine_config &config);
+	void s3(machine_config &config) ATTR_COLD;
+
+	void init_1() ATTR_COLD { m_game = 1; } // wldcp
+	void init_2() ATTR_COLD { m_game = 2; } // cntct
+	void init_3() ATTR_COLD { m_game = 3; } // disco
+	void init_4() ATTR_COLD { m_game = 4; } // lucky
+
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
-	void init_1() { m_game = 1; } // wldcp
-	void init_2() { m_game = 2; } // cntct
-	void init_3() { m_game = 3; } // disco
-	void init_4() { m_game = 4; } // lucky
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-
 
 	void dig0_w(u8 data);
 	void dig1_w(u8 data);
@@ -140,7 +141,7 @@ public:
 		, m_s4sound(*this, "s4sound")
 	{ }
 
-	void s3a(machine_config &config);
+	void s3a(machine_config &config) ATTR_COLD;
 
 private:
 	void s3a_sol0_w(u8 data);
@@ -378,9 +379,6 @@ INPUT_PORTS_END
 void s3_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_io_outputs.resolve();
-	m_digits.resolve();
-	m_leds.resolve();
 
 	save_item(NAME(m_t_c));
 	save_item(NAME(m_strobe));
@@ -393,6 +391,7 @@ void s3_state::machine_start()
 void s3_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 

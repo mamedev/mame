@@ -65,10 +65,6 @@ private:
 
 void submar_state::machine_start()
 {
-	m_motors.resolve();
-	m_lamps.resolve();
-	m_solenoids.resolve();
-	m_digits.resolve();
 }
 
 uint8_t submar_state::submar_sensor0_r()

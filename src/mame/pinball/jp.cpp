@@ -72,9 +72,10 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void init_6d() { m_game = 1; }
-	void jp(machine_config &config);
-	void jps(machine_config &config);
+	void init_6d() ATTR_COLD { m_game = 1; }
+
+	void jp(machine_config &config) ATTR_COLD;
+	void jps(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -372,9 +373,6 @@ u8 jp_state::portb_r()
 void jp_state::machine_start()
 {
 	genpin_class::machine_start();
-
-	m_digits.resolve();
-	m_io_outputs.resolve();
 
 	if (m_adpcm_bank.found())
 		m_adpcm_bank->configure_entries(0, 16, memregion("sound1")->base(), 0x8000);

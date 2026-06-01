@@ -1272,8 +1272,6 @@ msd_sd2_device::msd_sd2_device(const machine_config &mconfig, const char *tag, d
 
 void c1541_device_base::device_start()
 {
-	m_leds.resolve();
-
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);
 

@@ -53,14 +53,12 @@ public:
 
 	{ }
 
-	void jackhouse(machine_config &config);
+	void jackhouse(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); };
 	virtual void video_start() override ATTR_COLD;
 
 private:
-
 	void io_map(address_map &map) ATTR_COLD;
 	void program_map(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;

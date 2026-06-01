@@ -652,12 +652,6 @@ void segas32_v25_state::device_start()
 	decrypt_protrom();
 }
 
-void segas32_cd_state::device_start()
-{
-	segas32_state::device_start();
-	m_lamps.resolve();
-}
-
 void sega_multi32_analog_state::device_start()
 {
 	sega_multi32_state::device_start();

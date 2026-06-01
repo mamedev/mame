@@ -365,8 +365,6 @@ INPUT_PORTS_END
 
 void spg29x_game_state::machine_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_tve_control));
 	save_item(NAME(m_tve_fade_offset));
 	save_item(NAME(m_timers_clk_sel));

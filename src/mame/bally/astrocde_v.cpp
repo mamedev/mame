@@ -55,13 +55,6 @@ void demndrgn_state::machine_start()
 	save_item(NAME(m_trackball_last));
 }
 
-void tenpindx_state::machine_start()
-{
-	astrocde_state::machine_start();
-
-	m_lamps.resolve();
-}
-
 
 
 /*************************************

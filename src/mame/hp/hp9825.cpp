@@ -230,12 +230,6 @@ private:
 
 void hp98xx_state::machine_start()
 {
-	m_display.resolve();
-	m_run_light.resolve();
-	m_shift_lock.resolve();
-	m_tape_led.resolve();
-	m_cassette.resolve();
-
 	save_item(NAME(m_display_on));
 	save_item(NAME(m_display_mem));
 	save_item(NAME(m_display_idx));

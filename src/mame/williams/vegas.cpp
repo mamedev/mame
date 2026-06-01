@@ -345,39 +345,31 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void vegascore(machine_config &config);
-	void vegas(machine_config &config);
-	void vegas250(machine_config &config);
-	void vegas32m(machine_config &config);
-	void vegasban(machine_config &config);
-	void vegasv3(machine_config &config);
-	void denver(machine_config &config);
+	void nbanfl(machine_config &config) ATTR_COLD;
+	void sf2049te(machine_config &config) ATTR_COLD;
+	void sf2049se(machine_config &config) ATTR_COLD;
+	void nbashowt(machine_config &config) ATTR_COLD;
+	void gauntdl(machine_config &config) ATTR_COLD;
+	void sf2049(machine_config &config) ATTR_COLD;
+	void gauntleg(machine_config &config) ATTR_COLD;
+	void cartfury(machine_config &config) ATTR_COLD;
+	void tenthdeg(machine_config &config) ATTR_COLD;
+	void nbagold(machine_config &config) ATTR_COLD;
+	void roadburn(machine_config &config) ATTR_COLD;
+	void warfa(machine_config &config) ATTR_COLD;
 
-	void nbanfl(machine_config &config);
-	void sf2049te(machine_config &config);
-	void sf2049se(machine_config &config);
-	void nbashowt(machine_config &config);
-	void gauntdl(machine_config &config);
-	void sf2049(machine_config &config);
-	void gauntleg(machine_config &config);
-	void cartfury(machine_config &config);
-	void tenthdeg(machine_config &config);
-	void nbagold(machine_config &config);
-	void roadburn(machine_config &config);
-	void warfa(machine_config &config);
-
-	void init_gauntleg();
-	void init_cartfury();
-	void init_tenthdeg();
-	void init_nbashowt();
-	void init_nbagold();
-	void init_warfa();
-	void init_roadburn();
-	void init_sf2049te();
-	void init_gauntdl();
-	void init_nbanfl();
-	void init_sf2049();
-	void init_sf2049se();
+	void init_gauntleg() ATTR_COLD;
+	void init_cartfury() ATTR_COLD;
+	void init_tenthdeg() ATTR_COLD;
+	void init_nbashowt() ATTR_COLD;
+	void init_nbagold() ATTR_COLD;
+	void init_warfa() ATTR_COLD;
+	void init_roadburn() ATTR_COLD;
+	void init_sf2049te() ATTR_COLD;
+	void init_gauntdl() ATTR_COLD;
+	void init_nbanfl() ATTR_COLD;
+	void init_sf2049() ATTR_COLD;
+	void init_sf2049se() ATTR_COLD;
 
 	ioport_value i40_r();
 	ioport_value gauntleg_p12_r();
@@ -388,6 +380,14 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	void vegascore(machine_config &config) ATTR_COLD;
+	void vegas(machine_config &config) ATTR_COLD;
+	void vegas250(machine_config &config) ATTR_COLD;
+	void vegas32m(machine_config &config) ATTR_COLD;
+	void vegasban(machine_config &config) ATTR_COLD;
+	void vegasv3(machine_config &config) ATTR_COLD;
+	void denver(machine_config &config) ATTR_COLD;
 
 private:
 	static constexpr unsigned SYSTEM_CLOCK = 100'000'000;
@@ -491,10 +491,6 @@ void vegas_state::machine_start()
 	uint32_t new_options = m_maincpu->mips3drc_get_options();
 	new_options |= MIPS3DRC_FASTEST_OPTIONS | MIPS3DRC_STRICT_VERIFY;
 	m_maincpu->mips3drc_set_options(new_options);
-
-	m_system_led.resolve();
-	m_wheel_driver.resolve();
-	m_lamps.resolve();
 
 	/* register for save states */
 	save_item(NAME(m_vblank_state));

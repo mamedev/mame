@@ -108,11 +108,11 @@ public:
 	{ }
 
 	// machine configs
-	void newufo(machine_config &config);
-	void ufomini(machine_config &config);
-	void ufo21(machine_config &config);
-	void ufoalac(machine_config &config);
-	void ufo800(machine_config &config);
+	void newufo(machine_config &config) ATTR_COLD;
+	void ufomini(machine_config &config) ATTR_COLD;
+	void ufo21(machine_config &config) ATTR_COLD;
+	void ufoalac(machine_config &config) ATTR_COLD;
+	void ufo800(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -183,11 +183,6 @@ private:
 
 void ufo_state::machine_start()
 {
-	// resolve outputs
-	m_counters.resolve();
-	m_digits.resolve();
-	m_lamps.resolve();
-
 	// register for savestates
 	save_item(NAME(m_stepper));
 	save_item(NAME(m_nmi_enable));

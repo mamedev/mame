@@ -47,7 +47,8 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void video21(machine_config &config);
+	void video21(machine_config &config) ATTR_COLD;
+
 	int hopper_coinout_r() { return m_hopper_coin; }
 
 protected:
@@ -84,8 +85,6 @@ private:
 void video21_state::machine_start()
 {
 	m_hopper_timer = timer_alloc(FUNC(video21_state::hopper_coinout), this);
-
-	m_lamps.resolve();
 
 	// register for savestates
 	save_item(NAME(m_hopper_motor));

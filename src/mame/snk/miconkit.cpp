@@ -102,8 +102,6 @@ private:
 
 void miconkit_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_select));
 }
 

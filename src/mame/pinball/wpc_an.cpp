@@ -117,17 +117,18 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void wpc_an_dd(machine_config &config);
-	void wpc_an(machine_config &config);
-	void wpc_an_base(machine_config &config);
+	void wpc_an_dd(machine_config &config) ATTR_COLD;
+	void wpc_an(machine_config &config) ATTR_COLD;
+	void wpc_an_base(machine_config &config) ATTR_COLD;
 
-	void init_wpc_an();
+	void init_wpc_an() ATTR_COLD;
 
-private:
+protected:
 	// driver_device overrides
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
 
+private:
 	void wpc_an_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(vblank_tick);
@@ -387,7 +388,6 @@ void wpc_an_state::ram_w(offs_t offset, uint8_t data)
 
 void wpc_an_state::machine_start()
 {
-	m_digits.resolve();
 	save_item(NAME(m_vblank_count));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_bankmask));

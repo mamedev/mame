@@ -299,8 +299,6 @@ void kn01_state::machine_start()
 	m_dram = std::make_unique<u16[]>(65536);
 	m_nram = std::make_unique<u16[]>(32768);
 
-	m_leds.resolve();
-
 	m_cpu->space(AS_PROGRAM).install_ram(0, m_mram->mask(), m_mram->pointer());
 
 	m_cpu->space(AS_PROGRAM).install_readwrite_tap(0x1c000000, 0x1c00001b, "dz_delay",

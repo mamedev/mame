@@ -132,10 +132,9 @@ public:
 
 	static constexpr feature_type unemulated_features() { return feature::CAMERA; }
 
-	void portrait(machine_config &config);
+	void portrait(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); m_photo.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 private:

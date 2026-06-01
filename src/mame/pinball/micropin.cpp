@@ -54,13 +54,14 @@ public:
 		, m_leds(*this, "led%d", 0U)
 	{ }
 
-	void pentacup2(machine_config &config);
+	void pentacup2(machine_config &config) ATTR_COLD;
 
 protected:
+	virtual void machine_start() ATTR_COLD;
+	virtual void machine_reset() ATTR_COLD;
+
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 	u8 m_led_time[10]{}; // size must match m_leds
-	void mr_common();
-	void ms_common();
 	output_finder<76> m_digits;
 	output_finder<10> m_leds;
 };
@@ -75,7 +76,11 @@ public:
 		, m_beep(*this, "beeper")
 	{ }
 
-	void pent6800(machine_config &config);
+	void pent6800(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 pia51_r(offs_t offset);
@@ -94,8 +99,6 @@ private:
 
 	u8 m_row = 0U;
 	u8 m_counter = 0U;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
 	required_device<m6800_cpu_device> m_v1cpu;
 	required_device<pia6821_device> m_pia51;
 	required_device<beep_device> m_beep;
@@ -109,15 +112,13 @@ public:
 		, m_v2cpu(*this, "v2cpu")
 	{ }
 
-	void pent8085(machine_config &config);
+	void pent8085(machine_config &config) ATTR_COLD;
 
 private:
 	void clock_w(int state);
 	void disp_w(offs_t, u8);
 	void io_map(address_map &map) ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
 	required_device<i8085a_cpu_device> m_v2cpu;
 };
 
@@ -429,27 +430,25 @@ void pent8085_state::clock_w(int state)
 		m_v2cpu->set_input_line(I8085_RST65_LINE, HOLD_LINE);
 }
 
-void micropin_state::ms_common()
+void micropin_state::machine_start()
 {
 	genpin_class::machine_start();
-
-	m_digits.resolve();
-	m_leds.resolve();
-	//m_io_outputs.resolve();
 
 	save_item(NAME(m_led_time));
 }
 
 void pent6800_state::machine_start()
 {
-	ms_common();
+	micropin_state::machine_start();
+
 	save_item(NAME(m_row));
 	save_item(NAME(m_counter));
 }
 
-void micropin_state::mr_common()
+void micropin_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	//for (u8 i = 0; i < m_io_outputs.size(); i++)
 		//m_io_outputs[i] = 0;
 
@@ -459,18 +458,9 @@ void micropin_state::mr_common()
 
 void pent6800_state::machine_reset()
 {
-	mr_common();
+	micropin_state::machine_reset();
+
 	m_row = 0;
-}
-
-void pent8085_state::machine_start()
-{
-	ms_common();
-}
-
-void pent8085_state::machine_reset()
-{
-	mr_common();
 }
 
 

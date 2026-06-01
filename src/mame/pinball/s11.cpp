@@ -389,8 +389,6 @@ u8 s11_state::sound_r()
 void s11_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_io_outputs.resolve();
-	m_digits.resolve();
 
 	save_item(NAME(m_sound_data));
 	save_item(NAME(m_diag));

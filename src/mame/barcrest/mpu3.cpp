@@ -738,10 +738,6 @@ INPUT_PORTS_END
 void mpu3_state::machine_start()
 {
 	m_ic21_timer = timer_alloc(FUNC(mpu3_state::ic21_timeout), this);
-
-	m_triac.resolve();
-	m_digit.resolve();
-	m_lamp.resolve();
 }
 
 /* generate a 100 Hz signal (some components rely on this for external sync) */

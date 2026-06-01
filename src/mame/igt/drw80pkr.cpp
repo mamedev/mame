@@ -217,7 +217,6 @@ void drw80pkr_state::machine_start()
 	subdevice<nvram_device>("nvram")->set_base(m_pkr_io_ram, sizeof(m_pkr_io_ram));
 
 	m_active_bank = 0;
-	m_lamps.resolve();
 	m_t1 = 1;  // battery level sensor (1 = battery ok)
 }
 

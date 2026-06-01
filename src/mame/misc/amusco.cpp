@@ -131,8 +131,8 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void amusco(machine_config &config);
-	void draw88pkr(machine_config &config);
+	void amusco(machine_config &config) ATTR_COLD;
+	void draw88pkr(machine_config &config) ATTR_COLD;
 
 	void coin_irq(int state);
 
@@ -222,7 +222,6 @@ void amusco_state::video_start()
 
 void amusco_state::machine_start()
 {
-	m_lamps.resolve();
 }
 
 

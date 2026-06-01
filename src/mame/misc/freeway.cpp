@@ -39,7 +39,7 @@ public:
 	{
 	}
 
-	void freeway(machine_config &config);
+	void freeway(machine_config &config) ATTR_COLD;
 
 	void nmi_w(int state);
 
@@ -70,7 +70,6 @@ private:
 
 void freeway_state::machine_start()
 {
-	m_lamps.resolve();
 }
 
 // TODO: just the minimum to show errors on screen

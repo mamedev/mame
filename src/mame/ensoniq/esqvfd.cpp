@@ -134,7 +134,6 @@ esqvfd_device::esqvfd_device(const machine_config &mconfig, device_type type, co
 
 void esqvfd_device::device_start()
 {
-	m_vfds->resolve();
 	save_item(NAME(m_cursx));
 	save_item(NAME(m_cursy));
 	save_item(NAME(m_savedx));

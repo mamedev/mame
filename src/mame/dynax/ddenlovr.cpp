@@ -989,8 +989,6 @@ VIDEO_START_MEMBER(hanakanz_state,hanakanz)
 	m_ddenlovr_blit_rom_bits = 16;
 	m_ddenlovr_blit_commands = hanakanz_commands;
 
-	m_led.resolve();
-
 	save_item(NAME(m_romdata));
 	save_item(NAME(m_palette_index));
 	save_item(NAME(m_daimyojn_palette_sel));
@@ -9576,8 +9574,6 @@ MACHINE_START_MEMBER(ddenlovr_state,rongrong)
 
 MACHINE_START_MEMBER(mmpanic_state,mmpanic)
 {
-	m_leds.resolve();
-
 	uint8_t *rom = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &rom[0x10000], 0x8000);
 
@@ -9588,8 +9584,6 @@ MACHINE_START_MEMBER(mmpanic_state,mmpanic)
 
 MACHINE_START_MEMBER(mmpanic_state,funkyfig)
 {
-	m_leds.resolve();
-
 	uint8_t *rom = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &rom[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &rom[0x90000], 0x1000);

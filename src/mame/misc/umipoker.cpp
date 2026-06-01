@@ -56,7 +56,7 @@ public:
 	{
 	}
 
-	void umipoker(machine_config &config);
+	void umipoker(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -98,10 +98,7 @@ public:
 	{
 	}
 
-	void saiyukip(machine_config &config);
-
-protected:
-	virtual void machine_start() override ATTR_COLD;
+	void saiyukip(machine_config &config) ATTR_COLD;
 
 private:
 	void lamps_w(uint16_t data);
@@ -877,13 +874,6 @@ INPUT_PORTS_END
 static GFXDECODE_START( gfx_umipoker )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar, 0, 0x40)
 GFXDECODE_END
-
-void saiyukip_state::machine_start()
-{
-	umipoker_state::machine_start();
-
-	m_lamps.resolve();
-}
 
 // TODO: Verify clocks (XTALs are 14.3181 and 2.000MHz)
 void umipoker_state::umipoker(machine_config &config)

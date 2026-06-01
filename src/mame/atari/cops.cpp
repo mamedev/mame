@@ -655,8 +655,6 @@ INPUT_PORTS_END
 
 void cops_state::machine_start()
 {
-	m_digits.resolve();
-	m_lamps.resolve();
 }
 
 void cops_state::machine_reset()

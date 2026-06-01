@@ -279,7 +279,6 @@ INPUT_PORTS_END
 
 void midcoin24cdjuke_state::machine_start()
 {
-	m_digits.resolve();
 }
 
 void midcoin24cdjuke_state::machine_reset()

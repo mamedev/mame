@@ -465,8 +465,6 @@ void neogs_device::device_start()
 				}
 			});
 
-	m_neogs_led.resolve();
-
 	save_item(NAME(m_data_in));
 	save_item(NAME(m_data_out));
 	save_item(NAME(m_command_in));

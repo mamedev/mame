@@ -129,8 +129,6 @@ private:
 
 void aviion88k_state::machine_start()
 {
-	m_leds.resolve();
-
 	for (emu_timer *&pit : m_pit)
 		pit = timer_alloc(FUNC(aviion88k_state::pit_timer), this);
 }

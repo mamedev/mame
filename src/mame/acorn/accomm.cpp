@@ -143,9 +143,6 @@ void accomm_state::machine_reset()
 
 void accomm_state::machine_start()
 {
-	m_shiftlock_led.resolve();
-	m_capslock_led.resolve();
-
 	m_ula->set_ram(m_vram);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x000000, 0xffffff, "cpu_clock_tap",

@@ -678,6 +678,7 @@ protected:
 	output_finder<4> m_output_extra_balls;
 
 	// Individual outputs
+	// FIXME: split these up into derived classes so games only show the outputs they actually have
 	output_finder<> m_output_motor;
 	output_finder<> m_output_brake;
 	output_finder<> m_output_cymbal;
@@ -1230,62 +1231,6 @@ void ksys573_state::driver_start()
 
 void ksys573_state::machine_start()
 {
-	m_output_lamps.resolve();
-	m_output_blue_io_lamp.resolve();
-	m_output_red_io_lamp.resolve();
-	m_output_extra_balls.resolve();
-	m_output_motor.resolve();
-	m_output_brake.resolve();
-	m_output_cymbal.resolve();
-	m_output_speaker.resolve();
-	m_output_start_lamp.resolve();
-	m_output_select_button.resolve();
-	m_output_select_left.resolve();
-	m_output_select_right.resolve();
-	m_output_select_lrl.resolve();
-	m_output_left.resolve();
-	m_output_right.resolve();
-	m_output_neon_top.resolve();
-	m_output_neon_woofer.resolve();
-	m_output_halogen.resolve();
-	m_output_foot_up.resolve();
-	m_output_foot_left.resolve();
-	m_output_foot_right.resolve();
-	m_output_foot_down.resolve();
-	m_output_body_right_low.resolve();
-	m_output_body_left_low.resolve();
-	m_output_body_left_high.resolve();
-	m_output_body_right_high.resolve();
-	m_output_body_center.resolve();
-	m_output_body_right.resolve();
-	m_output_body_left.resolve();
-	m_output_hi_hat.resolve();
-	m_output_high_tom.resolve();
-	m_output_low_tom.resolve();
-	m_output_snare.resolve();
-	m_output_spot_left.resolve();
-	m_output_spot_right.resolve();
-	m_output_spot_left_right.resolve();
-	m_output_player_start.resolve();
-	m_output_player_red.resolve();
-	m_output_player_green.resolve();
-	m_output_player_blue.resolve();
-	m_output_punchman_left_top.resolve();
-	m_output_punchman_left_middle.resolve();
-	m_output_punchman_left_bottom.resolve();
-	m_output_punchman_right_top.resolve();
-	m_output_punchman_right_middle.resolve();
-	m_output_punchman_right_bottom.resolve();
-	m_output_fire_lamp_left.resolve();
-	m_output_fire_fan_left.resolve();
-	m_output_fire_fan_right.resolve();
-	m_output_fire_lamp_right.resolve();
-	m_output_conga_left.resolve();
-	m_output_conga_right.resolve();
-	m_output_conga_centre.resolve();
-	m_output_spot_light_yellow.resolve();
-	m_output_spot_light_blue.resolve();
-	m_output_spot_light_pink.resolve();
 }
 
 void ksys573_state::machine_reset()

@@ -215,8 +215,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy2_state::scanline_update)
 
 void atarisy2_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_scanline_int_state = false;
 	m_video_int_state = false;
 	m_p2portwr_state = false;

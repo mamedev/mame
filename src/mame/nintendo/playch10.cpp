@@ -687,8 +687,6 @@ void playch10_state::machine_reset()
 
 void playch10_state::machine_start()
 {
-	m_timedigits.resolve();
-
 	m_vrom = m_vrom_region ? m_vrom_region->base() : nullptr;
 
 	// sanity check: make sure PRG/CHR sizes are powers of 2 and big enough

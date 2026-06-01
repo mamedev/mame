@@ -6500,8 +6500,6 @@ void namcos23_state::machine_start()
 	save_item(NAME(m_sub_porta));
 	save_item(NAME(m_sub_portb));
 
-	m_lamps.resolve();
-
 	m_c361.timer = timer_alloc(FUNC(namcos23_state::c361_timer_cb), this);
 	m_c361.timer->adjust(attotime::never);
 

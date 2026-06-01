@@ -104,7 +104,7 @@ public:
 		, m_keyboard(*this, "X%d", 0U)
 	{ }
 
-	void mekd2(machine_config &config);
+	void mekd2(machine_config &config) ATTR_COLD;
 
 private:
 	int key40_r();
@@ -352,7 +352,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::kansas_r)
 
 void mekd2_state::machine_start()
 {
-	m_digits.resolve();
 }
 
 /***********************************************************

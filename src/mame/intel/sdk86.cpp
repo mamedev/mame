@@ -165,7 +165,6 @@ u8 sdk86_state::kbd_r()
 
 void sdk86_state::machine_start()
 {
-	m_digits.resolve();
 	save_item(NAME(m_digit));
 }
 

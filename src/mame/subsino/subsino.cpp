@@ -371,8 +371,6 @@ private:
 
 void subsino_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_tiles_offset));
 	save_item(NAME(m_out_c));
 }

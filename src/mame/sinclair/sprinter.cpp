@@ -1460,8 +1460,6 @@ void sprinter_state::machine_start()
 
 	spectrum_128_state::machine_start();
 
-	m_turbo_led.resolve();
-
 	save_item(NAME(m_ram_pages));
 	save_item(NAME(m_pages));
 	save_item(NAME(m_z80_m1));

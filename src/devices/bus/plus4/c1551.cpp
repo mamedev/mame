@@ -438,8 +438,6 @@ c1551_device::c1551_device(const machine_config &mconfig, const char *tag, devic
 
 void c1551_device::device_start()
 {
-	m_leds.resolve();
-
 	// allocate timers
 	m_irq_timer = timer_alloc(FUNC(c1551_device::irq_timer_tick), this);
 	m_irq_timer->adjust(attotime::zero, CLEAR_LINE);

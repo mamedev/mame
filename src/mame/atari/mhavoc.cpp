@@ -401,8 +401,6 @@ void mhavoc_state::gamma_irq_ack_w(uint8_t data)
 
 void alphaone_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_alpha_irq_clock));
 	save_item(NAME(m_alpha_irq_clock_enable));
 }

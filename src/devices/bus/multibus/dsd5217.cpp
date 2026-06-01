@@ -217,8 +217,6 @@ void multibus_dsd5217_device::device_start()
 
 	save_item(NAME(m_hdd_cyl));
 
-	m_led.resolve();
-
 	// populate 32-bit crc lookup table
 	u32 const polynomial = 0x0010'5187U;
 	for (unsigned i = 0; i < 256; i++)

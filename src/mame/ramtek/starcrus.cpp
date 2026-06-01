@@ -476,7 +476,6 @@ uint8_t starcrus_state::coll_det_r()
 
 void starcrus_state::machine_start()
 {
-	m_led.resolve();
 }
 
 void starcrus_state::program_map(address_map &map)

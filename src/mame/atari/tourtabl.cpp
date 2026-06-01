@@ -38,9 +38,6 @@ public:
 
 	void tourtabl(machine_config &config) ATTR_COLD;
 
-protected:
-	virtual void machine_start() override ATTR_COLD { m_leds.resolve(); }
-
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<mos6532_device, 2> m_riot;

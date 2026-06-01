@@ -376,7 +376,6 @@ DEVICE_INPUT_DEFAULTS_END
 
 void sage2_state::machine_start()
 {
-	m_led.resolve();
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x000000, 0x001fff, 0x07e000, m_rom->base()); // Avoid the 68000 reading from lalaland in its reset handler
 }

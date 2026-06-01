@@ -229,32 +229,6 @@ void segas32_state::device_start()
 	if (!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_output_back_lamp.resolve();
-	m_output_blue_button.resolve();
-	m_output_blue_corner_lamp.resolve();
-	m_output_entry_lamp.resolve();
-	m_output_p_start.resolve();
-	m_output_lamp0.resolve();
-	m_output_lamp1.resolve();
-	m_output_left_lamp.resolve();
-	m_output_left_winner_lamp.resolve();
-	m_output_lights_lamp.resolve();
-	m_output_monitor_check_point_lamp.resolve();
-	m_output_monitor_dj_music_lamp.resolve();
-	m_output_monitor_digit.resolve();
-	m_output_monitor_arrow_lamp.resolve();
-	m_output_monitor_race_leader_lamp.resolve();
-	m_output_monitor_start_lamp.resolve();
-	m_output_monitor_steering_wheel_motor.resolve();
-	m_output_start_lamp.resolve();
-	m_output_winner_lamp.resolve();
-	m_output_player_gun_recoil.resolve();
-	m_output_red_button.resolve();
-	m_output_red_corner_lamp.resolve();
-	m_output_right_lamp.resolve();
-	m_output_right_winner_lamp.resolve();
-	m_output_wiper_lamp.resolve();
-
 	m_vblank_end_int_timer = timer_alloc(FUNC(segas32_state::end_of_vblank_int), this);
 	m_update_sprites_timer = timer_alloc(FUNC(segas32_state::update_sprites), this);
 

@@ -246,15 +246,6 @@ void patinho_feio_state::machine_start(){
 	m_teletype_timer = timer_alloc(FUNC(patinho_feio_state::teletype_callback), this);
 	m_decwriter_timer = timer_alloc(FUNC(patinho_feio_state::decwriter_callback), this);
 
-	m_mode_button.resolve();
-	m_output_acc.resolve();
-	m_output_opcode.resolve();
-	m_output_mem_data.resolve();
-	m_output_mem_addr.resolve();
-	m_output_pc.resolve();
-	m_output_rc.resolve();
-	m_output_flags.resolve();
-
 	// Copy some programs directly into RAM.
 	// This is a hack for setting up the computer
 	// while we don't support loading programs

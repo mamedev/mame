@@ -709,9 +709,6 @@ void namcos11_state::c76_speedup_w(offs_t offset, uint16_t data, uint16_t mem_ma
 
 void namcos11_state::driver_start()
 {
-	m_led.resolve();
-	m_recoil.resolve();
-
 	// C76 idle skipping, large speedboost
 	if (C76_SPEEDUP)
 	{

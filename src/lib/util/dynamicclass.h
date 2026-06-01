@@ -294,7 +294,7 @@ protected:
 		Base base;
 	};
 
-	template <class Base, typename Extra, typename Enable = void>
+	template <class Base, typename Extra>
 	struct destroyer;
 
 	/// \brief Destroyer for base classes with virtual destructors
@@ -304,8 +304,8 @@ protected:
 	/// dynamic derived classes through pointers to the base class type.
 	/// \tparam Base The base class type.
 	/// \tparam Extra The extra data type.
-	template <class Base, typename Extra>
-	struct destroyer<Base, Extra, std::enable_if_t<std::has_virtual_destructor_v<Base> > >
+	template <class Base, typename Extra> requires std::has_virtual_destructor_v<Base>
+	struct destroyer<Base, Extra>
 	{
 		using pointer_type = std::unique_ptr<Base>;
 
@@ -327,8 +327,8 @@ protected:
 	/// the base class type does not have a virtual destructor.
 	/// \tparam Base The base class type.
 	/// \tparam Extra The extra data type.
-	template <class Base, typename Extra>
-	struct destroyer<Base, Extra, std::enable_if_t<!std::has_virtual_destructor_v<Base> > >
+	template <class Base, typename Extra> requires (!std::has_virtual_destructor_v<Base>)
+	struct destroyer<Base, Extra>
 	{
 		static_assert(sizeof(Base) == sizeof(value_type<Base, Extra>), "Value type does not have expected layout");
 

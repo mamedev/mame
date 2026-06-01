@@ -46,7 +46,7 @@ public:
 		, m_flash_icon(*this, "flash_icon")
 	{ }
 
-	void svmu(machine_config &config);
+	void svmu(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -174,10 +174,6 @@ INPUT_PORTS_END
 
 void svmu_state::machine_start()
 {
-	m_file_icon.resolve();
-	m_game_icon.resolve();
-	m_clock_icon.resolve();
-	m_flash_icon.resolve();
 }
 
 void svmu_state::machine_reset()

@@ -44,7 +44,7 @@ public:
 		, m_vdata_led(*this, "vdata_led")
 	{ }
 
-	void executel(machine_config &config);
+	void executel(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -215,9 +215,6 @@ INPUT_PORTS_END
 
 void executel_state::machine_start()
 {
-	m_hfree_led.resolve();
-	m_vdata_led.resolve();
-
 	m_rombank->configure_entries(0, 3, memregion("maincpu")->base() + 0x4000, 0x4000);
 }
 

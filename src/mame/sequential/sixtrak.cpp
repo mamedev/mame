@@ -750,8 +750,6 @@ void sixtrak_state::machine_start()
 	save_item(NAME(m_sampling_gain));
 	save_item(NAME(m_sampling_freq));
 
-	m_digits.resolve();
-
 	m_maincpu->space(AS_IO).install_readwrite_before_time(
 		0x00, 0xff, ws_time_delegate(*this, FUNC(sixtrak_state::iorq_wait_state)));
 

@@ -483,8 +483,6 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 
 void abc99_device::device_start()
 {
-	m_leds.resolve();
-
 	// allocate timers
 	m_serial_timer = timer_alloc(FUNC(abc99_device::serial_clock), this);
 	attotime serial_clock = MCS48_ALE_CLOCK(m_mousecpu->get_t0_clock() * 2); // 8333 bps x16

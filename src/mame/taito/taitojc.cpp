@@ -1090,9 +1090,6 @@ void taitojc_state::machine_reset()
 
 void taitojc_state::machine_start()
 {
-	m_lamps.resolve();
-	m_wheel_motor.resolve();
-
 	// register for savestates
 	save_item(NAME(m_dsp_rom_pos));
 	save_item(NAME(m_first_dsp_reset));
@@ -1104,13 +1101,6 @@ void taitojc_state::machine_start()
 	save_item(NAME(m_mcu_comm_hc11));
 	save_item(NAME(m_mcu_data_main));
 	save_item(NAME(m_mcu_data_hc11));
-}
-
-void dendego_state::machine_start()
-{
-	taitojc_state::machine_start();
-
-	m_counters.resolve();
 }
 
 

@@ -75,10 +75,7 @@ public:
 		, m_lamp(*this, "lamp")
 	{ }
 
-	void big10(machine_config &config);
-
-protected:
-	virtual void machine_start() override { save_item(NAME(m_mux_data)); m_lamp.resolve(); }
+	void big10(machine_config &config) ATTR_COLD;
 
 private:
 	uint8_t m_mux_data = 0;

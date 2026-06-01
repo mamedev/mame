@@ -47,7 +47,7 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	void babbage(machine_config &config);
+	void babbage(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -223,8 +223,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)
 
 void babbage_state::machine_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_seg));
 	save_item(NAME(m_key));
 	save_item(NAME(m_prev_key));

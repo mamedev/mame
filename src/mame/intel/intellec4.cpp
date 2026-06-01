@@ -641,17 +641,6 @@ void intellec4_state::driver_start()
 {
 	m_reset_timer = timer_alloc(FUNC(intellec4_state::reset_expired), this);
 
-	m_led_address.resolve();
-	m_led_instruction.resolve();
-	m_led_active_bank.resolve();
-	m_led_execution.resolve();
-	m_led_last_ptr.resolve();
-	m_led_status_ptr_valid.resolve();
-	m_led_status_search.resolve();
-	m_led_mode_mon.resolve();
-	m_led_mode_ram.resolve();
-	m_led_mode_prom.resolve();
-
 	save_item(NAME(m_ram_page));
 	save_item(NAME(m_ram_data));
 	save_item(NAME(m_ram_write));
@@ -1178,8 +1167,6 @@ void mod4_state::driver_start()
 {
 	intellec4_state::driver_start();
 
-	m_led_status_cpu.resolve();
-
 	m_one_shot_timer = timer_alloc(FUNC(mod4_state::one_shot_expired), this);
 
 	save_item(NAME(m_one_shot));
@@ -1407,8 +1394,6 @@ void mod40_state::mod40(machine_config &config)
 void mod40_state::driver_start()
 {
 	intellec4_state::driver_start();
-
-	m_led_status_run.resolve();
 
 	m_single_step_timer = timer_alloc(FUNC(mod40_state::single_step_expired), this);
 

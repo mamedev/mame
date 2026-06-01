@@ -326,9 +326,6 @@ epson_ap2000_device::epson_ap2000_device(const machine_config &mconfig, const ch
 
 void epson_lx810l_device::device_start()
 {
-	m_online_led.resolve();
-	m_ready_led.resolve();
-
 	m_cr_timer = timer_alloc(FUNC(epson_lx810l_device::cr_tick), this);
 }
 

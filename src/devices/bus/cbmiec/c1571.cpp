@@ -781,8 +781,6 @@ mini_chief_device::mini_chief_device(const machine_config &mconfig, const char *
 
 void c1571_device::device_start()
 {
-	m_leds.resolve();
-
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);
 	//m_fdc->set_floppy(m_floppy);

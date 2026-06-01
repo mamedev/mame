@@ -735,14 +735,6 @@ public:
 	}
 
 protected:
-	virtual void device_resolve_objects() override ATTR_COLD
-	{
-		taitogn_state::device_resolve_objects();
-
-		m_lamp.resolve();
-		m_start.resolve();
-	}
-
 	virtual void driver_start() override ATTR_COLD
 	{
 		taitogn_state::driver_start();

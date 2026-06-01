@@ -225,7 +225,7 @@ enum
 
 class magicard_base_state : public driver_device
 {
-public:
+protected:
 	magicard_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -237,9 +237,8 @@ public:
 
 	{ }
 
-	void magicard_base(machine_config &config);
+	void magicard_base(machine_config &config) ATTR_COLD;
 
-protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
@@ -292,11 +291,11 @@ public:
 		, m_ds1207(*this, "ds1207")
 	{ }
 
-	void magicard_pic54(machine_config &config);
-	void magicard(machine_config &config);
-	void magicard_pic56(machine_config &config);
+	void magicard_pic54(machine_config &config) ATTR_COLD;
+	void magicard(machine_config &config) ATTR_COLD;
+	void magicard_pic56(machine_config &config) ATTR_COLD;
 
-	void init_dallaspk();
+	void init_dallaspk() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -324,12 +323,12 @@ public:
 		, m_rtc(*this, "rtc")
 	{ }
 
-	void hotslots_base(machine_config &config);
-	void hotslots(machine_config &config);
-	void hotslots_pic54(machine_config &config);
-	void magicle(machine_config &config);
-	void puzzleme(machine_config &config);
-	void simpbest(machine_config &config);
+	void hotslots_base(machine_config &config) ATTR_COLD;
+	void hotslots(machine_config &config) ATTR_COLD;
+	void hotslots_pic54(machine_config &config) ATTR_COLD;
+	void magicle(machine_config &config) ATTR_COLD;
+	void puzzleme(machine_config &config) ATTR_COLD;
+	void simpbest(machine_config &config) ATTR_COLD;
 
 private:
 	void hotslots_map_base(address_map &map) ATTR_COLD;
@@ -351,7 +350,6 @@ private:
 
 void magicard_base_state::machine_start()
 {
-	m_lamps.resolve();
 	m_dram = make_unique_clear<uint16_t []>(0x80000 / 2);
 	save_pointer(NAME(m_dram), 0x80000 / 2);
 	save_item(NAME(m_sda_state));

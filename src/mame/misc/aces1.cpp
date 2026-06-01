@@ -266,8 +266,6 @@ void aces1_state::machine_start()
 	}
 	m_aces1_irq_timer = timer_alloc(FUNC(aces1_state::m_aces1_irq_timer_callback), this);
 	m_aces1_nmi_timer = timer_alloc(FUNC(aces1_state::m_aces1_nmi_timer_callback), this);
-	m_digits.resolve();
-	m_lamps.resolve();
 
 	save_item(NAME(m_input_strobe));
 	save_item(NAME(m_lamp_strobe));

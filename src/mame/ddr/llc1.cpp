@@ -238,7 +238,6 @@ void llc1_state::machine_reset()
 
 void llc1_state::machine_start()
 {
-	m_digits.resolve();
 	save_item(NAME(m_porta));
 	save_item(NAME(m_term_data));
 }

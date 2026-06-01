@@ -2265,18 +2265,30 @@ void lua_engine::initialize()
 
 
 	auto output_type = sol().registry().new_usertype<output_manager>("output", sol::no_constructor);
-	output_type["set_value"] = &output_manager::set_value;
-	output_type["set_indexed_value"] =
-		[] (output_manager &o, char const *basename, int index, int value)
-		{
-			o.set_value(util::string_format("%s%d", basename, index), value);
-		};
-	output_type["get_value"] = &output_manager::get_value;
-	output_type["get_indexed_value"] =
-		[] (output_manager &o, char const *basename, int index)
-		{
-			return o.get_value(util::string_format("%s%d", basename, index));
-		};
+	output_type.set_function(
+			"set_value",
+			[] (output_manager &o, char const *name, int value)
+			{
+				output_proxy(o.machine().root_device(), name).set(value);
+			});
+	output_type.set_function(
+			"set_indexed_value",
+			[] (output_manager &o, char const *basename, int index, int value)
+			{
+				output_proxy(o.machine().root_device(), util::string_format("%s%d", basename, index)).set(value);
+			});
+	output_type.set_function(
+			"get_value",
+			[] (output_manager &o, char const *name)
+			{
+				return output_proxy(o.machine().root_device(), name).get();
+			});
+	output_type.set_function(
+			"get_indexed_value",
+			[] (output_manager &o, char const *basename, int index)
+			{
+				return output_proxy(o.machine().root_device(), util::string_format("%s%d", basename, index)).get();
+			});
 	output_type["name_to_id"] = &output_manager::name_to_id;
 	output_type["id_to_name"] = &output_manager::id_to_name;
 

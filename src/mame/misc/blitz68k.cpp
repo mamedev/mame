@@ -136,9 +136,6 @@ public:
 	void steaser(machine_config &config) ATTR_COLD;
 	void texasrls(machine_config &config) ATTR_COLD;
 
-protected:
-	virtual void machine_start() override { m_leds.resolve(); }
-
 private:
 	void blit_copy_w(uint16_t data);
 	uint8_t blit_status_r();

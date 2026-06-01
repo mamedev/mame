@@ -488,17 +488,6 @@ void mysticm_state::machine_start()
  *
  *************************************/
 
-void tshoot_state::machine_start()
-{
-	williams2_state::machine_start();
-
-	m_grenade_lamp.resolve();
-	m_gun_lamp.resolve();
-	m_p1_gun_recoil.resolve();
-	m_feather_blower.resolve();
-}
-
-
 void tshoot_state::maxvol_w(int state)
 {
 	// something to do with the sound volume

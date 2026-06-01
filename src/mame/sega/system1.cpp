@@ -419,8 +419,6 @@ void shtngmst_state::machine_start()
 {
 	system1_state::machine_start();
 
-	m_gun_solenoid.resolve();
-
 	save_item(NAME(m_gun_output));
 	save_item(NAME(m_gun_trigger));
 }

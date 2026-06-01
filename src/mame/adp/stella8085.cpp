@@ -119,9 +119,6 @@ private:
 
 void stella8085_state::machine_start()
 {
-	m_digits.resolve();
-	m_lamps.resolve();
-
 	m_sound_timer = timer_alloc(FUNC(stella8085_state::sound_stop), this);
 
 	save_item(NAME(m_digit));

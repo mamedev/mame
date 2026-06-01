@@ -294,8 +294,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpf1_88_state::key_nmi)
 
 void mpf1_88_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->mask(), m_ram->pointer());
 
 	// register for state saving

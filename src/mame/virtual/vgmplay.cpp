@@ -444,7 +444,12 @@ public:
 	template<int Index> void scc_w(offs_t offset, uint8_t data);
 	template<int Index> void c140_c219_w(offs_t offset, uint8_t data);
 
-	void vgmplay(machine_config &config);
+	void vgmplay(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
 	void file_map(address_map &map) ATTR_COLD;
 	void soundchips_map(address_map &map) ATTR_COLD;
 	void soundchips16le_map(address_map &map) ATTR_COLD;
@@ -475,9 +480,6 @@ public:
 	template<int Index> void x1_010_map(address_map &map) ATTR_COLD;
 	template<int Index> void c352_map(address_map &map) ATTR_COLD;
 	template<int Index> void ga20_map(address_map &map) ATTR_COLD;
-
-private:
-	virtual void machine_start() override ATTR_COLD;
 
 	uint32_t m_held_clock = 0;
 	std::vector<uint8_t> m_file_data;
@@ -560,9 +562,6 @@ void vgmplay_device::device_start()
 	m_io16le = &space(AS_IO16LE);
 	m_io16be = &space(AS_IO16BE);
 
-	m_playing_led.resolve();
-	m_loop_led.resolve();
-	m_act_leds.resolve();
 	m_act_led_index = std::make_unique<led_expiry_iterator[]>(CT_COUNT);
 	for (vgm_chip led = vgm_chip(0); led != CT_COUNT; led = vgm_chip(led + 1))
 		m_act_led_index[led] = m_act_led_expiries.emplace(m_act_led_expiries.end(), led, attotime::never);

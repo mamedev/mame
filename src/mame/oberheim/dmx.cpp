@@ -1285,10 +1285,6 @@ void dmx_state::io_map(address_map &map)
 
 void dmx_state::machine_start()
 {
-	m_clk_out_tip.resolve();
-	m_metronome_out.resolve();
-	m_digit_output.resolve();
-
 	save_item(NAME(m_int_timer_preset));
 	save_item(NAME(m_int_timer_enabled));
 	save_item(NAME(m_int_timer_value));

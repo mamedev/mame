@@ -67,7 +67,6 @@ uint8_t z80dev_state::test_r()
 
 void z80dev_state::machine_start()
 {
-	m_digits.resolve();
 }
 
 void z80dev_state::mem_map(address_map &map)

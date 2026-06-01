@@ -417,7 +417,6 @@ INPUT_PORTS_END
 
 void overdriv_state::machine_start()
 {
-	m_led.resolve();
 	m_objdma_end_timer = timer_alloc(FUNC(overdriv_state::objdma_end_cb), this);
 
 	save_item(NAME(m_cpuB_ctrl));

@@ -1198,9 +1198,6 @@ MACHINE_START_MEMBER(apollo_state,apollo)
 
 	m_dma_channel = -1;
 	m_cur_eop = false;
-
-	m_internal_leds.resolve();
-	m_external_leds.resolve();
 }
 
 MACHINE_RESET_MEMBER(apollo_state,apollo)

@@ -96,7 +96,6 @@ private:
 
 void ns32kdb_state::machine_start()
 {
-	m_led.resolve();
 }
 
 void ns32kdb_state::machine_reset()

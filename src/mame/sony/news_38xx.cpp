@@ -285,7 +285,6 @@ protected:
 
 void news_38xx_state::machine_start()
 {
-	m_led.resolve();
 	m_cpu->space(AS_PROGRAM).specific(m_memory_access);
 	m_timer = timer_alloc(FUNC(news_38xx_state::timer), this);
 	m_net_ram = std::make_unique<u16[]>(8192);

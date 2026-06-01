@@ -169,7 +169,6 @@ public:
 	void mechatt(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -213,11 +212,6 @@ private:
 };
 
 /******************************************************************************/
-
-void mechatt_state::machine_start()
-{
-	m_gun_recoil.resolve();
-}
 
 void mechatt_state::sound_cpu_w(uint8_t data)
 {

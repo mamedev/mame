@@ -394,8 +394,6 @@ DEVICE_INPUT_DEFAULTS_END
 
 void softbox_state::machine_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_boot_cnt));
 }
 

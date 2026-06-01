@@ -501,8 +501,6 @@ void drivedge_state::machine_start()
 {
 	itech32_state::machine_start();
 
-	m_leds.resolve();
-
 	save_item(NAME(m_tms_spinning));
 #if LOG_DRIVEDGE_UNINIT_RAM
 	save_item(NAME(m_written));

@@ -92,7 +92,7 @@ public:
 	}
 
 	// machine config
-	void mg1(machine_config &config);
+	void mg1(machine_config &config) ATTR_COLD;
 
 protected:
 	// driver_device overrides
@@ -169,9 +169,6 @@ private:
 
 void mg1_state::machine_start()
 {
-	m_led_err.resolve();
-	m_led_fdd.resolve();
-
 	save_item(NAME(m_sem));
 	save_item(NAME(m_iop_p2));
 	save_item(NAME(m_mouse));

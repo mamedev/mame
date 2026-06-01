@@ -232,19 +232,21 @@
 void bzone_state::machine_start()
 {
 	save_item(NAME(m_analog_data));
-	m_startled.resolve();
 }
 
 
 void redbaron_state::machine_start()
 {
 	bzone_state::machine_start();
+
 	save_item(NAME(m_rb_input_select));
 }
 
 
 void redbaron_state::machine_reset()
 {
+	bzone_state::machine_reset();
+
 	earom_control_w(0);
 }
 

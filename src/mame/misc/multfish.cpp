@@ -1024,8 +1024,6 @@ GFXDECODE_END
 
 void igrosoft_gamble_state::machine_start()
 {
-	m_lamps.resolve();
-
 	m_mainbank->configure_entries(0, 16, memregion("maincpu")->base(), 0x4000);
 
 	save_item(NAME(m_disp_enable));

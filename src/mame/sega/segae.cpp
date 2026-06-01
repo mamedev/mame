@@ -460,7 +460,6 @@ void systeme_state::coin_counters_write(uint8_t data)
 
 void systeme_state::machine_start()
 {
-	m_lamp.resolve();
 	membank("vdp1_bank")->configure_entries(0, 2, m_vram[0], 0x4000);
 	membank("vdp2_bank")->configure_entries(0, 2, m_vram[1], 0x4000);
 	m_bank1->configure_entries(0, 16, m_maincpu_region->base() + 0x10000, 0x4000);

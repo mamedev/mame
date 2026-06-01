@@ -208,18 +208,6 @@ void cgang_state::machine_start()
 	m_door_timer = timer_alloc(FUNC(cgang_state::door_motor_tick), this);
 	m_door_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 
-	// resolve outputs
-	m_gun_lamps.resolve();
-	m_spot_lamps.resolve();
-	m_misc_lamps.resolve();
-	m_ufo_lamps.resolve();
-	m_ufo_sol.resolve();
-	m_en_sol.resolve();
-	m_cg_sol.resolve();
-	m_door_count.resolve();
-	m_en_count.resolve();
-	m_cg_count.resolve();
-
 	// register for savestates
 	save_item(NAME(m_watchdog_clk));
 	save_item(NAME(m_main_irq));

@@ -1260,8 +1260,6 @@ void sfbonus_state::machine_start()
 {
 	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base(), 0x10000);
 	m_mainbank->set_entry(0);
-
-	m_lamps.resolve();
 }
 
 

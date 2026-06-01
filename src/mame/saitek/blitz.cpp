@@ -69,7 +69,7 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
-	void blitz(machine_config &config);
+	void blitz(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_off) { m_power = false; }
 
@@ -126,8 +126,6 @@ private:
 
 void blitz_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_sensor_strength));

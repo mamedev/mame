@@ -833,34 +833,35 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void noraut_base(machine_config &config);
-	void gtipkra(machine_config &config);
-	void kimble(machine_config &config);
-	void kimbldhl(machine_config &config);
-	void norautp(machine_config &config);
-	void norautu(machine_config &config);
-	void norautx4(machine_config &config);
-	void norautpl(machine_config &config);
-	void tpoker2(machine_config &config);
-	void nortest1(machine_config &config);
-	void ssjkrpkr(machine_config &config);
-	void dphl(machine_config &config);
-	void dphla(machine_config &config);
-	void dphlxtnd(machine_config &config);
-	void drhl(machine_config &config);
-	void norautxp(machine_config &config);
-	void noraut3(machine_config &config);
-	void cgidjp(machine_config &config);
-	void cdrawpkr(machine_config &config);
-	void krampcb4(machine_config &config);
+	void gtipkra(machine_config &config) ATTR_COLD;
+	void kimble(machine_config &config) ATTR_COLD;
+	void kimbldhl(machine_config &config) ATTR_COLD;
+	void norautp(machine_config &config) ATTR_COLD;
+	void norautu(machine_config &config) ATTR_COLD;
+	void norautx4(machine_config &config) ATTR_COLD;
+	void norautpl(machine_config &config) ATTR_COLD;
+	void tpoker2(machine_config &config) ATTR_COLD;
+	void nortest1(machine_config &config) ATTR_COLD;
+	void ssjkrpkr(machine_config &config) ATTR_COLD;
+	void dphl(machine_config &config) ATTR_COLD;
+	void dphla(machine_config &config) ATTR_COLD;
+	void dphlxtnd(machine_config &config) ATTR_COLD;
+	void drhl(machine_config &config) ATTR_COLD;
+	void norautxp(machine_config &config) ATTR_COLD;
+	void noraut3(machine_config &config) ATTR_COLD;
+	void cgidjp(machine_config &config) ATTR_COLD;
+	void cdrawpkr(machine_config &config) ATTR_COLD;
+	void krampcb4(machine_config &config) ATTR_COLD;
 
-	void init_enc();
-	void init_unka();
-	void init_kram4();
+	void init_enc() ATTR_COLD;
+	void init_unka() ATTR_COLD;
+	void init_kram4() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
+
+	void noraut_base(machine_config &config) ATTR_COLD;
 
 private:
 	void ppi2_obf_w(int state);
@@ -933,7 +934,6 @@ private:
 
 void norautp_state::machine_start()
 {
-	m_lamps.resolve();
 	save_item(NAME(m_videoram));
 	save_item(NAME(m_nvunlock));
 }

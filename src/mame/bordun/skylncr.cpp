@@ -255,8 +255,6 @@ TILE_GET_INFO_MEMBER(skylncr_state::get_reel_tile_info)
 
 void skylncr_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_nmi_enable));
 
 	m_nmi_enable = 0;

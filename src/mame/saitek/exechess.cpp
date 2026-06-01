@@ -41,7 +41,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	void exechess(machine_config &config);
+	void exechess(machine_config &config) ATTR_COLD;
 
 	// battery status indicator is not software controlled
 	DECLARE_INPUT_CHANGED_MEMBER(battery) { m_battery = newval; }
@@ -79,7 +79,6 @@ private:
 
 void exechess_state::machine_start()
 {
-	m_battery.resolve();
 	m_ram = make_unique_clear<u8[]>(0x400);
 
 	// register for savestates

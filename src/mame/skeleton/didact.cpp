@@ -109,8 +109,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_shift);
 
 protected:
-	virtual void machine_start() override { m_led.resolve(); }
-
 	optional_device<cassette_image_device> m_cass;
 	required_ioport_array<5> m_io_lines;
 	uint8_t m_lines[4]{};
@@ -171,7 +169,7 @@ public:
 		, m_segments(0)
 	{ }
 
-	void md6802(machine_config &config);
+	void md6802(machine_config &config) ATTR_COLD;
 
 protected:
 	uint8_t pia2_kbA_r();
@@ -268,7 +266,6 @@ void md6802_state::machine_start()
 	LOG("--->%s()\n", FUNCNAME);
 
 	didact_state::machine_start();
-	m_7segs.resolve();
 
 	save_item(NAME(m_reset));
 	save_item(NAME(m_shift));
@@ -343,11 +340,10 @@ public:
 		, m_pia2(*this, PIA2_TAG)
 	{ }
 
-	required_device<m6800_cpu_device> m_maincpu;
+	void mp68a(machine_config &config) ATTR_COLD;
 
-	// The display segment driver device (there is actually just one, needs rewrite to be correct)
-	required_device_array<dm9368_device, 6> m_digits;
-	output_finder<6> m_7segs;
+protected:
+	required_device<m6800_cpu_device> m_maincpu;
 
 	uint8_t pia2_kbA_r();
 	void pia2_kbA_w(uint8_t data);
@@ -358,10 +354,11 @@ public:
 
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
-	void mp68a(machine_config &config);
 	void mp68a_map(address_map &map) ATTR_COLD;
 
-protected:
+	required_device_array<dm9368_device, 6> m_digits;
+	output_finder<6> m_7segs; // The display segment driver device (there is actually just one, needs rewrite to be correct)
+
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
 };
@@ -475,7 +472,6 @@ void mp68a_state::machine_start()
 	LOG("--->%s()\n", FUNCNAME);
 
 	didact_state::machine_start();
-	m_7segs.resolve();
 
 	/* register for state saving */
 	save_item(NAME(m_shift));
@@ -546,15 +542,16 @@ public:
 		, m_da(0)
 	{ }
 
+	void modulab(machine_config &config) ATTR_COLD;
+
+protected:
 	required_device<m6802_cpu_device> m_maincpu;
 
 	output_finder<6> m_7segs;
 
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
-	void modulab(machine_config &config);
 
-protected:
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
 	void da_w(int state);
@@ -644,7 +641,6 @@ void modulab_state::machine_start()
 	LOG("--->%s()\n", FUNCNAME);
 
 	didact_state::machine_start();
-	m_7segs.resolve();
 
 	/* register for state saving */
 	save_item(NAME(m_shift));

@@ -455,7 +455,6 @@ GFXDECODE_END
 
 void boxer_state::machine_start()
 {
-	m_leds.resolve();
 	m_pot_interrupt = timer_alloc(FUNC(boxer_state::pot_interrupt), this);
 	m_periodic_timer = timer_alloc(FUNC(boxer_state::periodic_callback), this);
 

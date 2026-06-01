@@ -577,18 +577,6 @@ void twinkle_state::machine_start()
 {
 	m_dma_timer = timer_alloc(FUNC(twinkle_state::scsi_dma_transfer), this);
 
-	m_led_displays.resolve();
-	m_spotlights.resolve();
-	m_main_leds.resolve();
-	m_key_leds.resolve();
-	m_spu_leds.resolve();
-	m_player_lamps.resolve();
-	m_vefx_lamp.resolve();
-	m_effect_lamp.resolve();
-	m_credit_lamp.resolve();
-	m_neon_lamp.resolve();
-	m_unknown_outputs.resolve();
-
 	save_item(NAME(m_spu_ctrl));
 	save_item(NAME(m_spu_ata_dma));
 	save_item(NAME(m_spu_ata_dmarq));

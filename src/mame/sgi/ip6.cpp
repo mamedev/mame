@@ -555,8 +555,6 @@ void ip6_state::machine_start()
 	m_lio_int = false;
 
 	m_dmahi = make_unique_clear<u16 []>(2048);
-
-	m_leds.resolve();
 }
 
 void ip6_state::lio_interrupt(unsigned number, int state)

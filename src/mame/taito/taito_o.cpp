@@ -85,11 +85,9 @@ public:
 
 	{ }
 
-	void taitoo(machine_config &config);
-	DECLARE_INPUT_CHANGED_MEMBER(all_clear_cb);
+	void taitoo(machine_config &config) ATTR_COLD;
 
-protected:
-	virtual void machine_start() override { m_lamps.resolve(); };
+	DECLARE_INPUT_CHANGED_MEMBER(all_clear_cb);
 
 private:
 	required_device<cpu_device> m_maincpu;

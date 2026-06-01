@@ -293,9 +293,6 @@ void maxaflex_state::machine_start()
 {
 	atari_common_state::machine_start();
 
-	m_lamps.resolve();
-	m_digits.resolve();
-
 	save_item(NAME(m_portb_out));
 	save_item(NAME(m_portc_out));
 }

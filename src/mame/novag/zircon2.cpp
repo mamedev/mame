@@ -61,7 +61,7 @@ public:
 		m_out_digit(*this, "digit%u", 0U)
 	{ }
 
-	void zircon2(machine_config &config);
+	void zircon2(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
@@ -104,9 +104,6 @@ private:
 
 void zircon2_state::machine_start()
 {
-	m_out_lcd.resolve();
-	m_out_digit.resolve();
-
 	// register for savestates
 	save_item(NAME(m_power));
 	save_item(NAME(m_inp_mux));

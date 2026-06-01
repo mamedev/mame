@@ -107,7 +107,6 @@ private:
 
 void hh_ht1130_state::machine_start()
 {
-	m_out_x.resolve();
 }
 
 void hh_ht1130_state::segment_w(offs_t offset, u64 data)
@@ -159,7 +158,6 @@ private:
 
 void hh_ht1190_state::machine_start()
 {
-	m_out_x.resolve();
 }
 
 void hh_ht1190_state::segment_w(offs_t offset, u64 data)

@@ -220,8 +220,6 @@ private:
 
 void highvdeo_state::machine_start()
 {
-	m_lamps.resolve();
-
 	if (m_mainbank.found()) /*bankaddress might be incorrect at brasil/fasion/grancapi/magicbom*/
 	{
 		uint32_t max = memregion("maincpu")->bytes() / 0x40000;

@@ -51,9 +51,13 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void stargame(machine_config &config);
-	void init_0() { m_game = 0; }
-	void init_1() { m_game = 1; }
+	void stargame(machine_config &config) ATTR_COLD;
+	void init_0() ATTR_COLD { m_game = 0; }
+	void init_1() ATTR_COLD { m_game = 1; }
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void reset2_w(int state) { m_audiocpu->reset(); }
@@ -72,8 +76,6 @@ private:
 	u8 m_game = 0U;
 	u8 m_row = 0U;
 
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<z80ctc_device> m_ctc;
@@ -374,9 +376,6 @@ void stargame_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_segment));
 	save_item(NAME(m_game));
 }
@@ -384,6 +383,7 @@ void stargame_state::machine_start()
 void stargame_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 

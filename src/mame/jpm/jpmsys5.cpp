@@ -1094,10 +1094,6 @@ INPUT_PORTS_END
 
 void jpmsys5_state::machine_start()
 {
-	m_lamps.resolve();
-	m_sys5leds.resolve();
-	m_reellamp_out.resolve();
-
 	m_lamp_strobe = 0;
 }
 

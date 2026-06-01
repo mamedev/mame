@@ -284,7 +284,6 @@ public:
 
 protected:
 	// device overrides
-	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
@@ -448,31 +447,6 @@ void segaybd_state::output2_w(uint8_t data)
 }
 
 
-
-//**************************************************************************
-//  DRIVER OVERRIDES
-//**************************************************************************
-
-void segaybd_state::device_resolve_objects()
-{
-	m_start_lamp.resolve();
-	m_right_motor_position.resolve();
-	m_right_motor_position_nor.resolve();
-	m_right_motor_speed.resolve();
-	m_left_motor_position.resolve();
-	m_left_motor_position_nor.resolve();
-	m_left_motor_speed.resolve();
-	m_danger_lamp.resolve();
-	m_crash_lamp.resolve();
-	m_emergency_stop_lamp.resolve();
-	m_bank_data_raw.resolve();
-	m_vibration_motor.resolve();
-	m_bank_motor_position.resolve();
-	m_upright_wheel_motor.resolve();
-	m_left_start_lamp.resolve();
-	m_right_start_lamp.resolve();
-	m_gun_recoil.resolve();
-}
 
 //**************************************************************************
 //  VIDEO STARTUP

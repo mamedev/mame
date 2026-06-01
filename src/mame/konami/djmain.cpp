@@ -1739,15 +1739,6 @@ void djmain_state::machine_start()
 	if (m_ata_user_password != nullptr)
 		hdd->set_user_password(m_ata_user_password);
 
-	m_pcb_leds.resolve();
-	m_button_leds.resolve();
-	m_right_red_hlt.resolve();
-	m_left_red_hlt.resolve();
-	m_right_blue_hlt.resolve();
-	m_left_blue_hlt.resolve();
-	m_right_ssr.resolve();
-	m_left_ssr.resolve();
-
 	save_item(NAME(m_sndram_bank));
 	save_item(NAME(m_turntable_select));
 	//save_item(NAME(m_turntable_last_pos));

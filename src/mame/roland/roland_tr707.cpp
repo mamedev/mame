@@ -960,6 +960,14 @@ private:
 		offs_t y;
 	};
 
+	static constexpr const char *LED_NAMES[4][6] =
+	{
+		{"led_1",  "led_2",  "led_3",  "led_4",  "led_scale_1", "led_scale_2"},
+		{"led_5",  "led_6",  "led_7",  "led_8",  "led_scale_3", "led_scale_4"},
+		{"led_9",  "led_10", "led_11", "led_12", "led_group_1", "led_group_2"},
+		{"led_13", "led_14", "led_15", "led_16", "led_group_3", "led_group_4"},
+	};
+
 	static double discharge_t(double r, double c, double v);
 
 	u8 key_scan_r();
@@ -1003,7 +1011,7 @@ private:
 	required_device<pwm_display_device> m_led_matrix;
 	required_ioport_array<4> m_key_switches;
 	output_finder<> m_cart_led;  // D325 (GL9NP2) dual LED (red & green).
-	std::vector<std::vector<output_finder<>>> m_leds;
+	output_finder<4, 6> m_leds;
 
 	required_device<hd61602_device> m_lcdc;
 	required_device<pwm_display_device> m_lcd_pwm;
@@ -1056,7 +1064,7 @@ roland_tr707_state::roland_tr707_state(const machine_config &mconfig, device_typ
 	, m_led_matrix(*this, "led_matrix")
 	, m_key_switches(*this, "KEY%u", 0U)
 	, m_cart_led(*this, "led_cart")
-	, m_leds(4)
+	, m_leds(*this, LED_NAMES)
 	, m_lcdc(*this, "lcdc")
 	, m_lcd_pwm(*this, "lcd_pwm")
 	, m_seg_triangle(*this, "seg_triangle_%u", 1U)
@@ -1088,20 +1096,6 @@ roland_tr707_state::roland_tr707_state(const machine_config &mconfig, device_typ
 	, m_tempo_source(0xff)
 	, m_midi_rxd_bit(true)  // Initial value is high, for serial "idle".
 {
-	// Initalize LED outputs.
-
-	constexpr const char *LED_NAME_SUFFIXES[4][6] =
-	{
-		{"1", "2", "3", "4", "scale_1", "scale_2"},
-		{"5", "6", "7", "8", "scale_3", "scale_4"},
-		{"9", "10", "11", "12", "group_1", "group_2"},
-		{"13", "14", "15", "16", "group_3", "group_4"},
-	};
-	for (int i = 0; i < 4; ++i)
-		for (int j = 0; j < 6; ++j)
-			m_leds[i].push_back(output_finder<>(*this, std::string("led_") + LED_NAME_SUFFIXES[i][j]));
-
-
 	// Build a mapping (m_seg_map) from the LCD controller's rows and columns (
 	// "com" and "seg" in hd61602 parlance) to the corresponding outputs.
 
@@ -1192,20 +1186,6 @@ void roland_tr707_state::machine_start()
 	save_item(NAME(m_key_led_row));
 	save_item(NAME(m_tempo_source));
 	save_item(NAME(m_midi_rxd_bit));
-
-	m_layout_727.resolve();
-	m_layout_cart.resolve();
-	m_dinsync_out.resolve();
-	m_cart_led.resolve();
-	for (std::vector<output_finder<>> &led_row : m_leds)
-		for (output_finder<> &led_output : led_row)
-			led_output.resolve();
-
-	m_seg_triangle.resolve();
-	m_seg_track.resolve();
-	m_seg_text.resolve();
-	m_seg_dot.resolve();
-	m_seg_digit.resolve();
 }
 
 void roland_tr707_state::machine_reset()
