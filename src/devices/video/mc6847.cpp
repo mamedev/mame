@@ -1136,11 +1136,15 @@ mc6847_friend_device::character_map::character_map(bool is_mc6847t1)
 void mc6847_friend_device::character_map::setup_font()
 {
 	// set up font data
-	for (int i = 0; i < 64*12; i++)
+	for (int i = 0; i < 64; i++)
 	{
-		m_text_fontdata_inverse[i]              = m_text_fontdata[0][i] ^ 0xff;
-		m_text_fontdata_lower_case[i]           = m_text_fontdata[0][i + (i < 32*12 ? 64*12 : 0)] ^ (i < 32*12 ? 0xff : 0x00);
-		m_text_fontdata_lower_case_inverse[i]   = m_text_fontdata_lower_case[i] ^ 0xff;
+		for (int j = 0; j < 12; j++)
+		{
+			int idx = i * 12 + j;
+			m_text_fontdata_inverse[idx]            = m_text_fontdata[i][j] ^ 0xff;
+			m_text_fontdata_lower_case[idx]         = m_text_fontdata[i < 32 ? i + 64 : i][j] ^ (i < 32 ? 0xff : 0x00);
+			m_text_fontdata_lower_case_inverse[idx] = m_text_fontdata_lower_case[idx] ^ 0xff;
+		}
 	}
 	for (int i = 0; i < 128*12; i++)
 		m_stripes[i] = ~(i / 12);
