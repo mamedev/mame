@@ -173,12 +173,24 @@ void gime_device::device_start()
 	if (!m_cpu->started())
 		throw device_missing_dependencies();
 
+	const uint8_t *font_rom_base = m_font_rom_region->base();
+	auto *text_fontdata = m_character_map.get_text_fontdata();
+
+	// lo-res GIME font ROM (characters scattered across three raw blocks)
+	int source_order[96], out_idx = 0;
+	for (int ch = 64; ch <= 95;  ch++) source_order[out_idx++] = ch;
+	for (int ch = 32; ch <= 63;  ch++) source_order[out_idx++] = ch;
+	for (int ch = 96; ch <= 127; ch++) source_order[out_idx++] = ch;
+
+	decode_gime_font_rom(font_rom_base, *text_fontdata, 96, /*row_offset=*/1, source_order);
+
 	// inherited device_start - need to do this after checking dependencies
+	// and after setting up 8x12 low res font
 	super::device_start();
 
 	// decode the hi-res GIME font ROM. 128 characters, no index remapping,
 	// glyphs start at row 0 of the 12-row canvas.
-	decode_gime_font_rom(m_font_rom_region->base(), hires_font, 128, /*row_offset=*/0);
+	decode_gime_font_rom(font_rom_base, hires_font, 128, /*row_offset=*/0);
 
 	// initialize variables
 	memset(m_scanlines, 0, sizeof(m_scanlines));
@@ -1970,6 +1982,56 @@ bool gime_device::update_rgb(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	update_value(&m_displayed_rgb, true);
 	return update_screen(bitmap, cliprect, m_rgb_palette);
+}
+
+
+
+//-------------------------------------------------
+//  decode_gime_font_rom
+//-------------------------------------------------
+
+void gime_device::decode_gime_font_rom(const uint8_t *raw_rom, uint8_t dest[][12], int char_count, int row_offset, const int *source_order)
+{
+	// Physical row-to-column group wiring on the GIME die.
+	// subcols[row][even/odd char] gives the bit-group index within a
+	// 16-entry column band.
+	static constexpr uint8_t subcols[8][2] = { { 0, 4 }, { 15, 11 }, { 1, 2 },
+		{ 14, 13 }, { 6, 3 }, { 9, 12 }, { 7, 5 }, { 8, 10 } };
+
+	for (int i = 0; i < char_count; i++)
+	{
+		// When a reordering table is supplied (lo-res case), the raw ROM
+		// index differs from the output index.
+		int raw_ch = source_order ? source_order[i] : i;
+
+		for (int r = 0; r < 8; r++)
+		{
+			uint8_t row_accumulator = 0;
+
+			// Extract each of the 5 horizontal pixel columns.
+			for (int c = 0; c < 5; c++)
+			{
+				// Base bit index for this character/column group.
+				size_t bix = ((size_t)(raw_ch / 2)) * 80 + (c * 16);
+
+				// Odd column bands (1, 3) are wired in reverse order.
+				if (c == 1 || c == 3)
+					bix += 15 - subcols[r][raw_ch % 2];
+				else
+					bix += subcols[r][raw_ch % 2];
+
+				// Extract the single bit from the packed byte array.
+				int bit_offset = 7 - (int)(bix % 8);
+				uint8_t bit_val = (raw_rom[bix / 8] >> bit_offset) & 1;
+
+				row_accumulator = (row_accumulator << 1) | bit_val;
+			}
+
+			// The 5 active pixels occupy bits 6..2 of the output byte,
+			// matching the mc6847 character_map pixel layout.
+			dest[i][row_offset + r] = row_accumulator << 2;
+		}
+	}
 }
 
 
