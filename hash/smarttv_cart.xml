@@ -17,6 +17,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="enlunait" cloneof="amuseprk" supported="no"> <!-- first bytes of ROM are 0xff, erasing part of the checksum string, but checksum otherwise matches -->
+		<description>English Luna Park (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="English Luna Park (Italy).bin" size="0x400000" crc="4bfa7b27" sha1="b594844b25f470a7a07a2a4f43d2c2573dfb80aa"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spazio" supported="no"> <!-- checksum matches header -->
 		<description>Avventure nello Spazio (Italy)</description>
 		<year>200?</year>
@@ -133,18 +144,7 @@ license:CC0-1.0
 		<publisher>Clementoni</publisher>
 		<part name="cart" interface="smarttv_cart">
 			<dataarea name="rom" size="0x400000">
-				<rom name="Smart TV Evolution - Bundle Cartridge (Italy).BIN" size="0x400000" crc="6ae11784" sha1="f08e68c298921bb6245c4134bce01d60d0d58f58"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="enlunait" supported="no"> <!-- first bytes of ROM are 0xff, erasing part of the checksum string, but checksum otherwise matches -->
-		<description>English Luna Park (Italy)</description>
-		<year>200?</year>
-		<publisher>Clementoni</publisher>
-		<part name="cart" interface="smarttv_cart">
-			<dataarea name="rom" size="0x400000">
-				<rom name="English Luna Park (Italy).bin" size="0x400000" crc="11e11784" sha1="f08e68c298921bb6245c4134bce01d60d0d58f58"/>
+				<rom name="Smart TV Evolution - Bundle Cartridge (Italy).bin" size="0x400000" crc="6ae11784" sha1="f08e68c298921bb6245c4134bce01d60d0d58f58"/>
 			</dataarea>
 		</part>
 	</software>
