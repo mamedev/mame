@@ -118,7 +118,6 @@ void electron_ula_device::device_start()
 	m_tape_timer = timer_alloc(FUNC(electron_ula_device::tape_timer_handler), this);
 
 	m_scanline_timer = timer_alloc(FUNC(electron_ula_device::scanline_interrupt), this);
-	m_scanline_timer->adjust(screen().time_until_pos(0), 0, screen().scan_period());
 
 	// large stream buffer to favour emu/sound.cpp re-sample quality
 	m_sound_stream = stream_alloc(0, 1, 48000 * 32);
@@ -150,6 +149,8 @@ void electron_ula_device::device_start()
 
 void electron_ula_device::device_reset()
 {
+	m_scanline_timer->adjust(screen().time_until_pos(0), 0, screen().scan_period());
+
 	// install RAM, ROM, and I/O
 	space().install_ram(0x0000, 0x7fff, m_ram);
 	space().install_read_handler(0x8000, 0xffff, emu::rw_delegate(*this, FUNC(electron_ula_device::rom_r)));

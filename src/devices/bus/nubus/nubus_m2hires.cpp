@@ -172,13 +172,13 @@ void nubus_m2hires_device::device_start()
 	save_item(NAME(m_mode));
 
 	m_timer = timer_alloc(FUNC(nubus_m2hires_device::vbl_tick), this);
-	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
 void nubus_m2hires_device::device_reset()
 {
 	m_vbl_disable = 1;
 	std::fill(m_vram.begin(), m_vram.end(), 0);
+	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
 TIMER_CALLBACK_MEMBER(nubus_m2hires_device::vbl_tick)

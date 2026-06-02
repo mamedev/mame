@@ -233,16 +233,10 @@ void k052109_device::device_start()
 
 	// allocate scanline timers and start at first scanline
 	if (!m_firq_handler.isunset())
-	{
 		m_firq_scanline = timer_alloc(FUNC(k052109_device::firq_scanline), this);
-		m_firq_scanline->adjust(screen().time_until_pos(0), 0);
-	}
 
 	if (!m_nmi_handler.isunset())
-	{
 		m_nmi_scanline = timer_alloc(FUNC(k052109_device::nmi_scanline), this);
-		m_nmi_scanline->adjust(screen().time_until_pos(0), 0);
-	}
 
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
@@ -294,6 +288,11 @@ void k052109_device::device_start()
 
 void k052109_device::device_reset()
 {
+	if (!m_firq_handler.isunset())
+		m_firq_scanline->adjust(screen().time_until_pos(0), 0);
+	if (!m_nmi_handler.isunset())
+		m_nmi_scanline->adjust(screen().time_until_pos(0), 0);
+
 	m_rmrd_line = CLEAR_LINE;
 	m_has_extra_video_ram = 0;
 

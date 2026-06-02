@@ -199,16 +199,10 @@ void k051960_device::device_start()
 
 	// allocate scanline timers and start at first scanline
 	if (!m_firq_handler.isunset())
-	{
 		m_firq_scanline = timer_alloc(FUNC(k051960_device::firq_scanline), this);
-		m_firq_scanline->adjust(screen().time_until_pos(0), 0);
-	}
 
 	if (!m_nmi_handler.isunset())
-	{
 		m_nmi_scanline = timer_alloc(FUNC(k051960_device::nmi_scanline), this);
-		m_nmi_scanline->adjust(screen().time_until_pos(0), 0);
-	}
 
 	m_sprites_busy = timer_alloc(timer_expired_delegate());
 
@@ -236,6 +230,11 @@ void k051960_device::device_start()
 
 void k051960_device::device_reset()
 {
+	if (!m_firq_handler.isunset())
+		m_firq_scanline->adjust(screen().time_until_pos(0), 0);
+	if (!m_nmi_handler.isunset())
+		m_nmi_scanline->adjust(screen().time_until_pos(0), 0);
+
 	for (int i = 0; i < 5; i++)
 		k051937_w(i, 0);
 

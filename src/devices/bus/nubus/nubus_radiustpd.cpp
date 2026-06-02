@@ -106,7 +106,6 @@ void nubus_radiustpd_device::device_start()
 	nubus().install_map(*this, &nubus_radiustpd_device::card_map);
 
 	m_timer = timer_alloc(FUNC(nubus_radiustpd_device::vbl_tick), this);
-	m_timer->adjust(m_screen->time_until_pos(879, 0), 0);
 
 	save_pointer(NAME(m_vram), VRAM_SIZE / sizeof(u32));
 	save_item(NAME(m_vbl_disable));
@@ -115,6 +114,7 @@ void nubus_radiustpd_device::device_start()
 void nubus_radiustpd_device::device_reset()
 {
 	m_vbl_disable = 1;
+	m_timer->adjust(m_screen->time_until_pos(879, 0), 0);
 }
 
 TIMER_CALLBACK_MEMBER(nubus_radiustpd_device::vbl_tick)

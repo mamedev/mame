@@ -183,7 +183,6 @@ void k007121_device::device_start()
 	memset(m_sprites_buffer, 0, sizeof(m_sprites_buffer));
 
 	m_scanline_timer = timer_alloc(FUNC(k007121_device::scanline), this);
-	m_scanline_timer->adjust(screen().time_until_pos(0), 0);
 }
 
 //-------------------------------------------------
@@ -192,6 +191,8 @@ void k007121_device::device_start()
 
 void k007121_device::device_reset()
 {
+	m_scanline_timer->adjust(screen().time_until_pos(0), 0);
+
 	for (int i = 0; i < 8; i++)
 		ctrl_w(i, 0);
 }

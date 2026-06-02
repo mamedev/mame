@@ -1991,9 +1991,7 @@ void sega315_5124_device::device_start()
 	screen().register_screen_bitmap(m_y1_bitmap);
 
 	m_display_timer = timer_alloc(FUNC(sega315_5124_device::process_line_timer), this);
-	m_display_timer->adjust(screen().time_until_pos(0, DISPLAY_CB_HPOS), 0, screen().scan_period());
 	m_pending_flags_timer = timer_alloc(FUNC(sega315_5124_device::eol_flag_check), this);
-	m_pending_flags_timer->adjust(screen().time_until_pos(0, WIDTH - 1), 0, screen().scan_period());
 	m_draw_timer = timer_alloc(FUNC(sega315_5124_device::draw_scanline), this);
 	m_lborder_timer = timer_alloc(FUNC(sega315_5124_device::draw_lborder), this);
 	m_rborder_timer = timer_alloc(FUNC(sega315_5124_device::draw_rborder), this);
@@ -2049,6 +2047,9 @@ void sega315_5124_device::device_start()
 
 void sega315_5124_device::device_reset()
 {
+	m_display_timer->adjust(screen().time_until_pos(0, DISPLAY_CB_HPOS), 0, screen().scan_period());
+	m_pending_flags_timer->adjust(screen().time_until_pos(0, WIDTH - 1), 0, screen().scan_period());
+
 	/* Most register are 0x00 at power-up */
 	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 

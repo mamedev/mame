@@ -65,9 +65,8 @@ void deco_irq_device::device_start()
 	if (!m_screen->started())
 		throw device_missing_dependencies();
 
-	// allocate scanline timer and start it
+	// allocate scanline timer
 	m_scanline_timer = timer_alloc(FUNC(deco_irq_device::scanline_callback), this);
-	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 
 	// register for save states
 	save_item(NAME(m_lightgun_irq));
@@ -85,6 +84,7 @@ void deco_irq_device::device_start()
 
 void deco_irq_device::device_reset()
 {
+	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 }
 
 //-------------------------------------------------

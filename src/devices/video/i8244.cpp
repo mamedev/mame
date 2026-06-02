@@ -152,10 +152,7 @@ void i8244_device::device_start()
 {
 	// allocate timers
 	m_vblank_timer = timer_alloc(FUNC(i8244_device::vblank_start), this);
-	m_vblank_timer->adjust(screen().time_until_pos(m_vblank_start, m_hblank_start - 1), 0, screen().frame_period());
-
 	m_hblank_timer = timer_alloc(FUNC(i8244_device::hblank_start), this);
-	m_hblank_timer->adjust(screen().time_until_pos(0, m_hblank_start), 0, screen().scan_period());
 
 	// allocate a stream
 	m_stream = stream_alloc(0, 1, clock());
@@ -193,6 +190,11 @@ void i8244_device::device_start()
 	save_item(NAME(m_sh_duty));
 }
 
+void i8244_device::device_reset()
+{
+	m_vblank_timer->adjust(screen().time_until_pos(m_vblank_start, m_hblank_start - 1), 0, screen().frame_period());
+	m_hblank_timer->adjust(screen().time_until_pos(0, m_hblank_start), 0, screen().scan_period());
+}
 
 //-------------------------------------------------
 //  timer events

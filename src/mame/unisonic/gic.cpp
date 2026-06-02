@@ -115,7 +115,6 @@ void gic_device::device_start()
 	screen().register_screen_bitmap(m_bitmap);
 
 	m_vblank_timer = timer_alloc(FUNC(gic_device::vblank_tick), this);
-	m_vblank_timer->adjust( screen().time_until_pos(1, END_ACTIVE_SCAN + 18 ), 0, screen().scan_period() );
 
 	// allocate the audio stream
 	m_stream = stream_alloc( 0, 1, clock()/(2*228) );
@@ -128,6 +127,7 @@ void gic_device::device_start()
 
 void gic_device::device_reset()
 {
+	m_vblank_timer->adjust( screen().time_until_pos(1, END_ACTIVE_SCAN + 18 ), 0, screen().scan_period() );
 	m_audiocnt=0;
 	m_audioval=0;
 	m_audioreset=0;
