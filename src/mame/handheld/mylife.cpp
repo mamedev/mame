@@ -24,8 +24,6 @@ public:
 	void mylife(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<screen_device> m_screen;
@@ -33,22 +31,12 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void mem_map(address_map &map) ATTR_COLD;
-
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) ATTR_COLD;
 };
 
 uint32_t mylife_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
-}
-
-void mylife_state::machine_start()
-{
-}
-
-void mylife_state::machine_reset()
-{
 }
 
 static INPUT_PORTS_START( mylife )
