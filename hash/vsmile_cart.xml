@@ -2075,6 +2075,23 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<software name="elmo">
+		<description>Elmo's World - Elmo's Big Discoveries (USA)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="52-92260(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="706714" />
+			<feature name="pcb_model" value="706714-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x800000">
+				<rom name="92260.u1" size="0x800000" crc="1b4c8e92" sha1="8b5d2240c39adfc96c451114f8efbdfb434b307b" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="elmoge">
 		<description>Elmos großes Abenteuer (Germany)</description>
 		<year>2005?</year>
