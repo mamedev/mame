@@ -138,9 +138,6 @@ private:
 
 	uint8_t last_6502_write;
 	bool mode_write, write_desync;
-	attotime write_start_time;
-	attotime write_buffer[32];
-	int write_position;
 
 	int m_seektime;
 	int m_waittime;
@@ -238,8 +235,6 @@ void a2bus_agat_fdc_device::device_start()
 	save_item(NAME(last_6502_write));
 	save_item(NAME(mode_write));
 	save_item(NAME(write_desync));
-	save_item(NAME(write_start_time));
-	save_item(NAME(write_position));
 }
 
 void a2bus_agat_fdc_device::device_reset()
@@ -249,8 +244,6 @@ void a2bus_agat_fdc_device::device_reset()
 	mode_write = false;
 	write_desync = false;
 	last_6502_write = 0x00;
-	write_start_time = attotime::never;
-	write_position = 0;
 }
 
 void a2bus_agat_fdc_device::reset_from_bus()
@@ -400,15 +393,6 @@ TIMER_CALLBACK_MEMBER(a2bus_agat_fdc_device::lss_sync)
 					m_d15->pc2_w(0);
 					if (mode_write)
 					{
-						if(write_position) {
-							LOGWRITE("writing %d transitions\n", write_position);
-							attotime now = cycles_to_time(cycles);
-							if(floppy)
-								floppy->write_flux(write_start_time, now, write_position, write_buffer);
-							write_start_time = now;
-							write_position = 0;
-						}
-
 						if (write_desync)
 						{
 							live_write_raw(0x2d55);
@@ -430,8 +414,10 @@ TIMER_CALLBACK_MEMBER(a2bus_agat_fdc_device::lss_sync)
 					cur_live.shift_reg <<= 2;
 					if (b)
 					{
-						if (b & 2) write_buffer[write_position++] = cycles_to_time(cycles);
-						if (b & 1) write_buffer[write_position++] = cycles_to_time(cycles + 8);
+						if (floppy && (b & 2))
+							floppy->write_flux_change(cycles_to_time(cycles));
+						if (floppy && (b & 1))
+							floppy->write_flux_change(cycles_to_time(cycles + 8));
 					}
 				}
 			}
@@ -588,6 +574,8 @@ uint8_t a2bus_agat_fdc_device::d14_i_b()
 void a2bus_agat_fdc_device::d14_o_c(uint8_t data)
 {
 	const bool new_write = BIT(data, 6) & BIT(data, 7);
+	const attotime now = machine().time();
+	floppy_image_device *const old_floppy = floppy;
 	m_unit = BIT(data, 3);
 
 	switch (m_unit)
@@ -598,6 +586,13 @@ void a2bus_agat_fdc_device::d14_o_c(uint8_t data)
 	case 1:
 		floppy = floppy1 ? floppy1->get_device() : nullptr;
 		break;
+	}
+
+	if (mode_write && old_floppy != floppy)
+	{
+		if (old_floppy)
+			old_floppy->write_end(now);
+		mode_write = false;
 	}
 
 	if (floppy)
@@ -617,10 +612,10 @@ void a2bus_agat_fdc_device::d14_o_c(uint8_t data)
 		LOGWRITE("n_w %d (%d)\n", new_write, mode_write);
 		address |= 0x100;
 		if(!mode_write) {
-			write_start_time = machine().time();
-			write_position = 0;
-			if(floppy)
-				floppy->set_write_splice(write_start_time);
+			if(floppy) {
+				floppy->set_write_splice(now);
+				floppy->write_start(now);
+			}
 			mode_write = true;
 		}
 	}
@@ -628,9 +623,9 @@ void a2bus_agat_fdc_device::d14_o_c(uint8_t data)
 	{
 		address &= 0xff;
 		if(mode_write) {
-			LOGWRITE("write->read: writing %d transitions\n", write_position);
-			if(floppy && write_position)
-				floppy->write_flux(write_start_time, machine().time(), write_position, write_buffer);
+			LOGWRITE("write->read\n");
+			if(floppy)
+				floppy->write_end(now);
 			mode_write = false;
 		}
 	}

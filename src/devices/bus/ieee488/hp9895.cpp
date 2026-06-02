@@ -255,6 +255,10 @@ private:
 
 	// PLL
 	fdc_pll_t m_pll;
+
+	// Write loopback buffer for read-during-write verification
+	attotime m_loopback_buf[32];
+	int m_loopback_pos;
 };
 
 hp9895_device::hp9895_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -315,6 +319,8 @@ void hp9895_device::device_start()
 	save_item(NAME(m_sync_cnt));
 	save_item(NAME(m_hiden));
 	save_item(NAME(m_mgnena));
+	save_item(NAME(m_loopback_buf));
+	save_item(NAME(m_loopback_pos));
 
 	m_timeout_timer = timer_alloc(FUNC(hp9895_device::timeout_timer_tick), this);
 	m_byte_timer = timer_alloc(FUNC(hp9895_device::byte_timer_tick), this);
@@ -349,6 +355,7 @@ void hp9895_device::device_reset()
 	m_sync_cnt = 0;
 	m_hiden = false;
 	m_mgnena = false;
+	m_loopback_pos = 0;
 	m_timeout_timer->reset();
 	m_byte_timer->reset();
 	m_half_bit_timer->reset();
@@ -390,6 +397,7 @@ TIMER_CALLBACK_MEMBER(hp9895_device::byte_timer_tick)
 		// Writing
 		m_pll.commit(get_write_device() , sdok_time);
 		m_pll.ctime = sdok_time;
+		m_loopback_pos = 0;
 
 		// Check for AMDT when in loopback mode
 		if (!m_lckup && !m_amdt && BIT(m_cntl_reg , REG_CNTL_READON_BIT)) {
@@ -687,7 +695,8 @@ void hp9895_device::cntl_w(uint8_t data)
 		if (!old_writon && new_writon) {
 			// Writing enabled
 			LOGMASKED(LOG_LEVEL0, "Start writing\n");
-			m_pll.start_writing(machine().time());
+			m_pll.start_writing(machine().time(), get_write_device());
+			m_loopback_pos = 0;
 			m_wr_context = 0;
 			m_had_transition = false;
 		} else if (old_writon && !new_writon) {
@@ -896,10 +905,9 @@ void hp9895_device::get_next_transition(const attotime& from_when , attotime& ed
 	edge = attotime::never;
 
 	if (BIT(m_cntl_reg , REG_CNTL_WRITON_BIT)) {
-		// Loop back write transitions into reading data path
-		for (int idx = 0; idx < m_pll.write_position; idx++) {
-			if (m_pll.write_buffer[ idx ] >= from_when) {
-				edge = m_pll.write_buffer[ idx ];
+		for (int idx = 0; idx < m_loopback_pos; idx++) {
+			if (m_loopback_buf[idx] >= from_when) {
+				edge = m_loopback_buf[idx];
 				break;
 			}
 		}
@@ -946,9 +954,14 @@ void hp9895_device::write_bit(bool data_bit , bool clock_bit)
 	// else... IBM mode, nothing to do
 
 	attotime dummy;
+	floppy_image_device *wd = get_write_device();
 
-	m_pll.write_next_bit(clock_bit , dummy , nullptr , attotime::never);
-	m_pll.write_next_bit(data_bit , dummy , nullptr , attotime::never);
+	if(clock_bit && m_loopback_pos < int(std::size(m_loopback_buf)))
+		m_loopback_buf[m_loopback_pos++] = m_pll.ctime + m_pll.period/2;
+	m_pll.write_next_bit(clock_bit , dummy , wd , attotime::never);
+	if(data_bit && m_loopback_pos < int(std::size(m_loopback_buf)))
+		m_loopback_buf[m_loopback_pos++] = m_pll.ctime + m_pll.period/2;
+	m_pll.write_next_bit(data_bit , dummy , wd , attotime::never);
 }
 
 ROM_START(hp9895)

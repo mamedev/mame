@@ -123,7 +123,7 @@ protected:
 	virtual int settle_time() const;
 
 	virtual void pll_reset(bool fm, bool enmf, const attotime &when) = 0;
-	virtual void pll_start_writing(const attotime &tm) = 0;
+	virtual void pll_start_writing(const attotime &tm, floppy_image_device *floppy) = 0;
 	virtual void pll_commit(floppy_image_device *floppy, const attotime &tm) = 0;
 	virtual void pll_stop_writing(floppy_image_device *floppy, const attotime &tm) = 0;
 	virtual int pll_get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit) = 0;
@@ -381,7 +381,7 @@ protected:
 	wd_fdc_analog_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void pll_reset(bool fm, bool enmf, const attotime &when) override;
-	virtual void pll_start_writing(const attotime &tm) override;
+	virtual void pll_start_writing(const attotime &tm, floppy_image_device *floppy) override;
 	virtual void pll_commit(floppy_image_device *floppy, const attotime &tm) override;
 	virtual void pll_stop_writing(floppy_image_device *floppy, const attotime &tm) override;
 	virtual int pll_get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit) override;
@@ -400,7 +400,7 @@ protected:
 	static constexpr int wd_digital_step_times[4] = { 12000, 24000, 40000, 60000 };
 
 	virtual void pll_reset(bool fm, bool enmf, const attotime &when) override;
-	virtual void pll_start_writing(const attotime &tm) override;
+	virtual void pll_start_writing(const attotime &tm, floppy_image_device *floppy) override;
 	virtual void pll_commit(floppy_image_device *floppy, const attotime &tm) override;
 	virtual void pll_stop_writing(floppy_image_device *floppy, const attotime &tm) override;
 	virtual int pll_get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit) override;
@@ -420,15 +420,11 @@ private:
 
 		attotime delays[42];
 
-		attotime write_start_time;
-		attotime write_buffer[32];
-		int write_position;
-
 		void set_clock(const attotime &period);
 		void reset(const attotime &when);
 		int get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit);
 		bool write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit);
-		void start_writing(const attotime &tm);
+		void start_writing(const attotime &tm, floppy_image_device *floppy);
 		void commit(floppy_image_device *floppy, const attotime &tm);
 		void stop_writing(floppy_image_device *floppy, const attotime &tm);
 	};

@@ -686,7 +686,7 @@ void swim3_device::live_start(int state, bool start_writing)
 	m_cur_live.pll.reset(m_cur_live.tm);
 	m_cur_live.pll.set_clock(period);
 	if(start_writing)
-		m_cur_live.pll.start_writing(machine().time());
+		m_cur_live.pll.start_writing(machine().time(), m_floppy);
 
 	LOG("PLL %s clock %s\n", start_writing ? "write" : "read", period.to_string());
 
@@ -1100,7 +1100,7 @@ void swim3_device::live_run(attotime limit)
 			LOG("%s write gate open\n", m_cur_live.tm.to_string());
 			m_cur_sector &= 0x7f;
 			m_cur_live.pll.set_clock(cell_period(((m_setup >> 6) & 1) | ((m_setup >> 2) & 2)));
-			m_cur_live.pll.start_writing(m_cur_live.tm);
+			m_cur_live.pll.start_writing(m_cur_live.tm, m_floppy);
 			if(m_floppy)
 				m_floppy->set_write_splice(m_cur_live.tm);
 			m_cur_live.data_bit_context = false;   // the preceding $4e gap byte ends in a 0

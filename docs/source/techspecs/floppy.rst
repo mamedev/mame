@@ -409,6 +409,29 @@ A number of methods are provided to simplify writing the converter classes.
 
 The read/write interface is designed to work asynchronously, e.g. somewhat independently of the current time.
 
+**get_next_transition(from_when)**
+
+  Returns the attotime of the next flux transition after *from_when*.  Returns ``attotime::never`` when there is no upcoming transition.
+
+**write_start(when)**
+
+  Activates the write gate at time *when*.  No effect when no disk is loaded, the motor is off or the media is write-protected.
+
+**write_flux_change(when)**
+
+  Records a single flux transition at time *when*.  Buffered until a flush or end.  If *when* is not after the most recently buffered transition, later entries are discarded first; this handles speculative re-execution transparently.
+
+**write_end(when)**
+
+  Deactivates the write gate.  Buffered transitions earlier than *when* are flushed to the track with the write span ending at *when*.
+
+**write_flush(when)**
+
+  Commits buffered transitions earlier than *when* without deactivating the write gate.  Transitions at or after *when* are retained for a subsequent flush or end.
+
+**set_write_splice(when)**
+
+  Sets the track write-splice position to the angular position corresponding to *when*.
 
 
 .. [1] Cylinder is a hard-drive term somewhat improperly used for floppies.  It comes from the fact that hard-drives are similar to floppies but include a series of stacked disks with a read/write head on each.  The heads are physically linked and all point to the same circle on every disk at a given time, making the accessed area look like a cylinder.  Hence the name.

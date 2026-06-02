@@ -252,9 +252,9 @@ void c8050_fdc_device::pll_reset(const attotime &when)
 	cur_pll.set_clock(attotime::from_hz(clock() / (16 - m_ds)));
 }
 
-void c8050_fdc_device::pll_start_writing(const attotime &tm)
+void c8050_fdc_device::pll_start_writing(const attotime &tm, floppy_image_device *floppy)
 {
-	cur_pll.start_writing(tm);
+	cur_pll.start_writing(tm, floppy);
 	pll_reset(cur_live.tm);
 }
 
@@ -558,7 +558,7 @@ void c8050_fdc_device::rw_sel_w(int state)
 		if (m_rw_sel) {
 			pll_stop_writing(get_floppy(), cur_live.tm);
 		} else {
-			pll_start_writing(cur_live.tm);
+			pll_start_writing(cur_live.tm, get_floppy());
 		}
 		live_run();
 	}

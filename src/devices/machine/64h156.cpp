@@ -75,7 +75,6 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
-	cur_live.write_start_time = attotime::never;
 }
 
 
@@ -170,49 +169,41 @@ void c64h156_device::rollback()
 
 void c64h156_device::start_writing(const attotime &tm)
 {
-	cur_live.write_start_time = tm;
-	cur_live.write_position = 0;
+	if(m_floppy)
+		m_floppy->write_start(tm);
+	cur_live.write_transition_count = 0;
 }
 
 void c64h156_device::stop_writing(const attotime &tm)
 {
-	commit(tm, true);
-	cur_live.write_start_time = attotime::never;
+	if(m_floppy)
+		m_floppy->write_end(tm);
+	cur_live.write_transition_count = 0;
 }
 
 bool c64h156_device::write_next_bit(bool bit, const attotime &limit)
 {
-	if(cur_live.write_start_time.is_never()) {
-		cur_live.write_start_time = cur_live.tm;
-		cur_live.write_position = 0;
-	}
-
 	attotime etime = cur_live.tm + m_period;
 	if(etime > limit)
 		return true;
 
-	if(bit && cur_live.write_position < std::size(cur_live.write_buffer))
-		cur_live.write_buffer[cur_live.write_position++] = cur_live.tm - m_period;
+	if(bit && m_floppy) {
+		m_floppy->write_flux_change(cur_live.tm - m_period);
+		cur_live.write_transition_count++;
+	}
 
 	LOG("%s write bit %u (%u)\n", cur_live.tm.as_string(), cur_live.bit_counter, bit);
 
 	return false;
 }
 
-void c64h156_device::commit(const attotime &tm, bool force)
+void c64h156_device::commit(const attotime &tm)
 {
-	if(cur_live.write_start_time.is_never() || tm == cur_live.write_start_time || !cur_live.write_position)
+	if(!m_floppy || cur_live.write_transition_count < WRITE_BATCH_SIZE)
 		return;
 
-	if(!force && cur_live.write_position < std::size(cur_live.write_buffer))
-		return;
-
-	LOG("%s committing %u transitions since %s\n", tm.as_string(), cur_live.write_position, cur_live.write_start_time.as_string());
-
-	m_floppy->write_flux(cur_live.write_start_time, tm, cur_live.write_position, cur_live.write_buffer);
-
-	cur_live.write_start_time = tm;
-	cur_live.write_position = 0;
+	m_floppy->write_flush(tm);
+	cur_live.write_transition_count = 0;
 }
 
 void c64h156_device::live_delay(int state)
@@ -259,8 +250,6 @@ void c64h156_device::live_abort()
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
-	cur_live.write_position = 0;
-	cur_live.write_start_time = attotime::never;
 
 	cur_live.sync = 1;
 	cur_live.byte = 1;
