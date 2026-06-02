@@ -9764,7 +9764,7 @@ ROM_START( redhawkc ) // China & Hong Kong
 	// Unused
 
 	ROM_REGION( 0x40000, "oki1", 0 ) // Samples
-	ROM_LOAD( "afega_5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) ) // same as all Red Hawk sets
+	ROM_LOAD( "afega_5.bin", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) ) // same as all Red Hawk sets
 ROM_END
 
 
