@@ -6,7 +6,7 @@ license:CC0-1.0
 
 <softwarelist name="smarttv_cart" description="WinFun KidConnection SmarTV Adventures / Funtastic TV Adventures cartridges">
 
-	<software name="amuseprk" supported="no">
+	<software name="amuseprk" supported="no"> <!-- checksum matches header -->
 		<description>Amusement Park</description>
 		<year>200?</year>
 		<publisher>WinFun</publisher>
@@ -17,7 +17,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="spazio" supported="no">
+	<software name="spazio" supported="no"> <!-- checksum matches header -->
 		<description>Avventure nello Spazio (Italy)</description>
 		<year>200?</year>
 		<publisher>Clementoni</publisher>
@@ -28,7 +28,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="scuola4" supported="no">
+	<software name="scuola4" supported="no"> <!-- checksum matches header -->
 		<description>La Scuola di Smart TV - 4 anni (Italy)</description>
 		<year>200?</year>
 		<publisher>Clementoni</publisher>
@@ -39,7 +39,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="scuola5" supported="no">
+	<software name="scuola5" supported="no"> <!-- checksum matches header -->
 		<description>La Scuola di Smart TV - 5+ anni (Italy)</description>
 		<year>200?</year>
 		<publisher>Clementoni</publisher>
@@ -50,7 +50,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mondo" supported="no">
+	<software name="mondo" supported="no"> <!-- checksum matches header -->
 		<description>Mondosauro (Italy)</description>
 		<year>200?</year>
 		<publisher>Clementoni</publisher>
@@ -61,7 +61,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cuccioli" supported="no">
+	<software name="cuccioli" supported="no"> <!-- no checksum in header -->
 		<description>Cuccioli Labrador (Italy)</description>
 		<year>200?</year>
 		<publisher>Clementoni</publisher>
@@ -72,7 +72,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="winxblm" supported="no">
+	<software name="winxblm" supported="no"> <!-- no checksum in header -->
 		<description>Winx Club Bloom (Italy)</description>
 		<year>200?</year>
 		<publisher>Clementoni</publisher>
@@ -83,13 +83,68 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="imove" supported="no"> <!-- uses a camera -->
+	<software name="imove" supported="no"> <!-- uses a camera --> <!-- checksum matches header -->
 		<description>i-move (Italy)</description>
 		<year>2008</year>
 		<publisher>Clementoni</publisher>
 		<part name="cart" interface="smarttv_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="smarttv_imove.bin" size="0x800000" crc="7267485e" sha1="5a9ae3b17dae325dee872ad594adb55b6251a900"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohit" supported="no"> <!-- checksum matches header -->
+		<description>Winnie the Pooh - Le Avventure di Winnie the Pooh (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="Winnie the Pooh - Le Avventure di Winnie the Pooh (Italy).bin" size="0x400000" crc="888d974a" sha1="ea98bb4860dc3de68ebc935286b5d9d84ab062c3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidmit" supported="no"> <!-- no checksum in header -->
+		<description>Spider-Man - Spider Sense (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="Spider-Man - Spider Sense (Italy).bin" size="0x400000" crc="b9405c08" sha1="25ae00a43c5b2284bf6e6cfa54f8decb8070ab80"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bosnumit" supported="no"> <!-- checksum matches header -->
+		<description>il Bosco dei Numeri (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="il Bosco dei Numeri (Italy).bin" size="0x400000" crc="945fd0ea" sha1="1540d20c145412414dc5c882747d8af5da085f8b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stvevit" supported="no"> <!-- checksum matches header -->
+		<description>Smart TV Evolution (bundle cartridge, Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="Smart TV Evolution - Bundle Cartridge (Italy).BIN" size="0x400000" crc="6ae11784" sha1="f08e68c298921bb6245c4134bce01d60d0d58f58"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enlunait" supported="no"> <!-- first bytes of ROM are 0xff, erasing part of the checksum string, but checksum otherwise matches -->
+		<description>English Luna Park (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="English Luna Park (Italy).bin" size="0x400000" crc="11e11784" sha1="f08e68c298921bb6245c4134bce01d60d0d58f58"/>
 			</dataarea>
 		</part>
 	</software>
