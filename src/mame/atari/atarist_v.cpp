@@ -622,6 +622,9 @@ void stx_video_device::device_start()
 	m_shifter_timer = timer_alloc(FUNC(stx_video_device::shifter_tick), this);
 	m_glue_timer = timer_alloc(FUNC(stx_video_device::glue_tick), this);
 
+//  m_shifter_timer->adjust(screen().time_until_pos(0), 0, clocks_to_attotime(4)); // 125 ns
+	m_glue_timer->adjust(screen().time_until_pos(0), 0, clocks_to_attotime(16)); // 500 ns
+
 	screen().register_screen_bitmap(m_bitmap);
 
 	// register for state saving
@@ -658,8 +661,6 @@ void ste_video_device::device_start()
 void stx_video_device::device_reset()
 {
 	// TODO: reset glue chip
-//  m_shifter_timer->adjust(screen().time_until_pos(0), 0, clocks_to_attotime(4)); // 125 ns
-	m_glue_timer->adjust(screen().time_until_pos(0), 0, clocks_to_attotime(16)); // 500 ns
 }
 
 

@@ -131,6 +131,7 @@ void nubus_procolor816_device::device_start()
 	nubus().install_map(*this, &nubus_procolor816_device::card_map);
 
 	m_timer = timer_alloc(FUNC(nubus_procolor816_device::vbl_tick), this);
+	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_vbl_disable));
@@ -142,7 +143,6 @@ void nubus_procolor816_device::device_reset()
 	m_vbl_disable = 1;
 	m_video_enable = 0;
 	std::fill_n(&m_vram[0], VRAM_SIZE / sizeof(u32), 0);
-	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
 TIMER_CALLBACK_MEMBER(nubus_procolor816_device::vbl_tick)

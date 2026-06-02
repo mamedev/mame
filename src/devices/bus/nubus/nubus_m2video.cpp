@@ -156,13 +156,13 @@ void nubus_m2video_device::device_start()
 	std::fill_n(&m_regs[0], 16, 0);
 
 	m_timer = timer_alloc(FUNC(nubus_m2video_device::vbl_tick), this);
+	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
 void nubus_m2video_device::device_reset()
 {
 	m_vbl_disable = 1;
 	m_mode = 0;
-	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
 TIMER_CALLBACK_MEMBER(nubus_m2video_device::vbl_tick)

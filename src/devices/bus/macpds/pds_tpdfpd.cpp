@@ -115,6 +115,7 @@ void macpds_sedisplay_device::device_start()
 	m_macpds->install_device(0xc10000, 0xc2ffff, read16sm_delegate(*this, FUNC(macpds_sedisplay_device::sedisplay_r)), write16sm_delegate(*this, FUNC(macpds_sedisplay_device::sedisplay_w)));
 
 	m_timer = timer_alloc(FUNC(macpds_sedisplay_device::vbl_tick), this);
+	m_timer->adjust(screen().time_until_pos(879, 0), 0);
 }
 
 //-------------------------------------------------
@@ -131,8 +132,6 @@ void macpds_sedisplay_device::device_reset()
 
 	m_palette[0] = rgb_t(0, 0, 0);
 	m_palette[1] = rgb_t(255, 255, 255);
-
-	m_timer->adjust(screen().time_until_pos(879, 0), 0);
 }
 
 

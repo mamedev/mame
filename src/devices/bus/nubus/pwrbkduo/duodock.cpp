@@ -100,9 +100,6 @@ public:
 	duodock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device_t implementation
-	void device_reset() override ATTR_COLD;
-
 	duodock_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	required_device<pseudovia_device> m_pvia;
@@ -343,10 +340,6 @@ void duodock_device::device_start()
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
 
 	m_vbl_timer = timer_alloc(FUNC(duodock_device::vbl_tick), this);
-}
-
-void duodock_device::device_reset()
-{
 	m_vbl_timer->adjust(m_screen->time_until_pos(479, 0), 0);
 }
 

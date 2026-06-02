@@ -65,6 +65,7 @@ void k005849_device::device_start()
 	memset(m_scrollram, 0, sizeof(m_scrollram));
 
 	m_scanline_timer = timer_alloc(FUNC(k005849_device::scanline), this);
+	m_scanline_timer->adjust(screen().time_until_pos(0), 0);
 }
 
 //-------------------------------------------------
@@ -73,8 +74,6 @@ void k005849_device::device_start()
 
 void k005849_device::device_reset()
 {
-	m_scanline_timer->adjust(screen().time_until_pos(0), 0);
-
 	for (int i = 0; i < 8; i++)
 		ctrl_w(i, 0);
 }

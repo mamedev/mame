@@ -62,7 +62,10 @@ void ef9340_1_device::device_start()
 	screen().register_screen_bitmap(m_tmp_bitmap);
 
 	m_line_timer = timer_alloc(FUNC(ef9340_1_device::draw_scanline), this);
+	m_line_timer->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
+
 	m_blink_timer = timer_alloc(FUNC(ef9340_1_device::blink_update), this);
+	m_blink_timer->adjust(screen().time_until_pos(0, 0), 0, screen().frame_period());
 
 	// zerofill
 	m_ef9341.TA = 0;
@@ -97,12 +100,6 @@ void ef9340_1_device::device_start()
 
 	save_item(NAME(m_ram_a));
 	save_item(NAME(m_ram_b));
-}
-
-void ef9340_1_device::device_reset()
-{
-	m_line_timer->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
-	m_blink_timer->adjust(screen().time_until_pos(0, 0), 0, screen().frame_period());
 }
 
 

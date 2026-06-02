@@ -138,6 +138,7 @@ void nick_device::device_start()
 
 	// allocate timers
 	m_timer_scanline = timer_alloc(FUNC(nick_device::scanline_tick), this);
+	m_timer_scanline->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
 
 	// state saving
 	save_item(NAME(m_scanline_count));
@@ -170,8 +171,6 @@ void nick_device::device_start()
 
 void nick_device::device_reset()
 {
-	m_timer_scanline->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
-
 	m_write_virq(CLEAR_LINE);
 	m_virq = 0;
 
