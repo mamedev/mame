@@ -15,6 +15,7 @@
 #include "video/mc6845.h"
 #include "machine/mm58167.h"
 #include "machine/wd_fdc.h"
+#include "machine/wd1010.h"
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
@@ -121,6 +122,8 @@ public:
 		: kaypro_state(mconfig, type, tag)
 		, m_crtc(*this, "crtc")
 		, m_rtc(*this, "rtc")
+		, m_hdc(*this, "hdc")
+		, m_hdd(*this, "hdc:0")
 	{}
 
 	void kaypronew2(machine_config &config);
@@ -136,7 +139,16 @@ protected:
 
 private:
 	void kaypro10_io(address_map &map) ATTR_COLD;
+	void kaypro10hd_io(address_map &map) ATTR_COLD;
 	void kaypro484_io(address_map &map) ATTR_COLD;
+	void kaypro1084_io(address_map &map) ATTR_COLD;
+
+	void add_hdc(machine_config &config);          // shared WD1002-HD0 wiring (kaypro10 + kaypro1084)
+	u8 hdc_r(offs_t offset);
+	void hdc_w(offs_t offset, u8 data);
+	u8 hdc_buf_in();
+	void hdc_buf_out(u8 data);
+	void hdc_bcr_w(int state);
 
 	u8 kaypro484_87_r();
 	u8 kaypro484_system_port_r();
@@ -157,6 +169,10 @@ private:
 
 	required_device<mc6845_device> m_crtc;
 	optional_device<mm58167_device> m_rtc;
+	optional_device<wd1010_device> m_hdc;          // WD1002-HD0 Winchester controller (kaypro10/1084)
+	optional_device<harddisk_image_device> m_hdd;
+	std::unique_ptr<u8[]> m_hdc_buf;               // WD1002 board sector buffer
+	u16 m_hdc_ptr = 0U;
 
 	u8 m_mc6845_reg[32]{};
 	u8 m_mc6845_ind = 0U;
