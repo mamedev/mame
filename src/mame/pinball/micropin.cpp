@@ -24,7 +24,7 @@ Rev.2:
 - Uses a different layout, not coded.
 - Picture of display panel shows 52x 7seg digits, and 10x round LEDs.
 
-ToDo:
+TODO:
 - Rev 1: Mechanical sounds, outputs (need better schematic), electronic volume control.
 - Rev.2: Mechanical sounds, outputs, inputs, displays, sound (no info available)
 
@@ -47,18 +47,15 @@ namespace {
 
 class micropin_state : public genpin_class
 {
-public:
+protected:
 	micropin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_digits(*this, "digit%d", 0U)
 		, m_leds(*this, "led%d", 0U)
 	{ }
 
-	void pentacup2(machine_config &config) ATTR_COLD;
-
-protected:
-	virtual void machine_start() ATTR_COLD;
-	virtual void machine_reset() ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 	u8 m_led_time[10]{}; // size must match m_leds
@@ -119,6 +116,7 @@ private:
 	void disp_w(offs_t, u8);
 	void io_map(address_map &map) ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
+
 	required_device<i8085a_cpu_device> m_v2cpu;
 };
 
