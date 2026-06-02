@@ -17,8 +17,8 @@ DECLARE_DEVICE_TYPE(CEM3340, cem3340_device)
 // The CEM3340 supports multiple types of sync, some of which are unusual. At
 // the moment, only the "conventional hard sync" setup is emulated (figure 5 in
 // the datasheet), which is one that's commonly used. In this mode, a negative
-// pulse will unconditionally flip the triangle wave from which the other
-// waveforms are derived.
+// pulse will unconditionally switch the direction of the triangle wave, from
+// which the other waveforms are derived.
 //
 // In order to produce anti-aliased synced waveforms, we need to know the exact
 // time the sync pulse occured. It is not enough to know at which sample it
@@ -40,7 +40,7 @@ public:
 	{
 		INPUT_FREQ = 0,
 		INPUT_PW,
-		// Frequency of sync oscillator used for "conventional" hard sync.
+		// Frequency of the sync oscillator used for "conventional" hard sync.
 		INPUT_SYNC_FREQ,
 	};
 
