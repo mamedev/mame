@@ -35,8 +35,6 @@ public:
 	void submar(machine_config &config);
 
 private:
-	virtual void machine_start() override ATTR_COLD;
-
 	uint8_t submar_sensor0_r();
 	uint8_t submar_sensor1_r();
 	void submar_motor_w(uint8_t data);
@@ -62,10 +60,6 @@ private:
   I/O, Memorymap
 
 ***************************************************************************/
-
-void submar_state::machine_start()
-{
-}
 
 uint8_t submar_state::submar_sensor0_r()
 {

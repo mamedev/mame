@@ -80,7 +80,7 @@ private:
 	output_finder<> m_pro;
 	output_finder<> m_run;
 
-	uint8_t m_kb_matrix;
+	uint8_t m_kb_matrix = 0;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -165,6 +165,7 @@ uint32_t pc1500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 void pc1500_state::machine_start()
 {
+	save_item(NAME(m_kb_matrix));
 }
 
 void pc1500_state::machine_reset()

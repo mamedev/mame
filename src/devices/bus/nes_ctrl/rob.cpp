@@ -64,15 +64,6 @@ nes_rob_device::nes_rob_device(const machine_config &mconfig, const char *tag, d
 
 
 //-------------------------------------------------
-//  device_start
-//-------------------------------------------------
-
-void nes_rob_device::device_start()
-{
-}
-
-
-//-------------------------------------------------
 //  R.O.B. specific handlers
 //-------------------------------------------------
 

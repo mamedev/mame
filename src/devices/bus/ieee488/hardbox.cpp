@@ -405,6 +405,7 @@ hardbox_device::hardbox_device(const machine_config &mconfig, const char *tag, d
 
 void hardbox_device::device_start()
 {
+	save_item(NAME(m_ifc));
 }
 
 

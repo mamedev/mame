@@ -116,9 +116,6 @@ public:
 
 	void feversoc(machine_config &config) ATTR_COLD;
 
-protected:
-	virtual void machine_start() override ATTR_COLD;
-
 private:
 	uint16_t spriteram_r(offs_t offset);
 	void spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -280,10 +277,6 @@ void feversoc_state::screen_vblank(int state)
 void feversoc_state::irq_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(8, CLEAR_LINE);
-}
-
-void feversoc_state::machine_start()
-{
 }
 
 void feversoc_state::feversoc(machine_config &config)

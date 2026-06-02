@@ -3896,19 +3896,13 @@ GFXDECODE_END
 *
 ********************************************************************/
 
-MACHINE_START_MEMBER(cps_state,common)
-{
-}
-
 MACHINE_START_MEMBER(cps_state,cps1)
 {
-	MACHINE_START_CALL_MEMBER(common);
 	m_audiobank->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 MACHINE_START_MEMBER(cps_state,qsound)
 {
-	MACHINE_START_CALL_MEMBER(common);
 	m_audiobank->configure_entries(0, 6, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
@@ -3924,7 +3918,7 @@ void cps_state::cps1_10MHz(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(3'579'545));  /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps_state::sub_map);
 
-	MCFG_MACHINE_START_OVERRIDE(cps_state,cps1)
+	MCFG_MACHINE_START_OVERRIDE(cps_state, cps1)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

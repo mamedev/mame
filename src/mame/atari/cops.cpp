@@ -655,6 +655,7 @@ INPUT_PORTS_END
 
 void cops_state::machine_start()
 {
+	// TODO: savestates
 }
 
 void cops_state::machine_reset()
@@ -850,7 +851,7 @@ ROM_END
 } // Anonymous namespace
 
 
-GAMEL( 1994, cops,     0,    cops,     cops,     cops_state, init_cops, ROT0, "Atari Games",                                 "Cops (USA)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
-GAMEL( 1994, copsuk,   cops, cops,     cops,     cops_state, init_cops, ROT0, "Nova Productions Ltd./ Deith Leisure",        "Cops (UK)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
-GAMEL( 1991, revlatns, 0,    revlatns, revlatns, cops_state, init_cops, ROT0, "Nova Productions Ltd.",                       "Revelations", MACHINE_SUPPORTS_SAVE, layout_revlatns )
+GAMEL( 1994, cops,     0,    cops,     cops,     cops_state, init_cops, ROT0, "Atari Games",                                 "Cops (USA)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
+GAMEL( 1994, copsuk,   cops, cops,     cops,     cops_state, init_cops, ROT0, "Nova Productions Ltd./ Deith Leisure",        "Cops (UK)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
+GAMEL( 1991, revlatns, 0,    revlatns, revlatns, cops_state, init_cops, ROT0, "Nova Productions Ltd.",                       "Revelations",  MACHINE_SUPPORTS_SAVE, layout_revlatns )
 GAMEL( 1992, visnqust, 0,    visnqust, visnqust, cops_state, init_cops, ROT0, "Kramer Manufacturing / Nova Productions Ltd.","Vision Quest", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_visnqust )

@@ -211,6 +211,7 @@ void mgavegas_state::mgavegas_map(address_map &map)
 
 void mgavegas_state::machine_start()
 {
+	// TODO: savestates
 }
 
 void mgavegas_state::machine_reset()

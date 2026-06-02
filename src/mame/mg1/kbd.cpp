@@ -234,10 +234,6 @@ void mg1_kbd_device::map_pio(address_map &map)
 	map(0x30, 0x3f).nopw().lr8([this](offs_t offset) { return u8(m_matrix[offset]->read()); }, "matrix_r");
 }
 
-void mg1_kbd_device::device_start()
-{
-}
-
 ioport_constructor mg1_kbd_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(mg1_kbd_device);

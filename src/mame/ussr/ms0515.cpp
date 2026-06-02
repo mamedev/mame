@@ -364,6 +364,7 @@ void ms0515_state::pit8253_out2_changed(int state)
 
 void ms0515_state::machine_start()
 {
+	// TODO: savestates
 }
 
 void ms0515_state::machine_reset()

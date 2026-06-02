@@ -101,13 +101,14 @@ sensorboard_device::sensorboard_device(const machine_config &mconfig, const char
 
 
 //-------------------------------------------------
-//  device_start / reset
+//  device_config_complete
 //-------------------------------------------------
 
 void sensorboard_device::device_config_complete()
 {
 	if (m_output_cb.isunset())
 	{
+		// resolve optional output handlers
 		if (!m_out_piece)
 			m_out_piece.emplace(*this, "piece_%c%u", unsigned('a'), 1U);
 		if (!m_out_pui)
@@ -115,8 +116,13 @@ void sensorboard_device::device_config_complete()
 		if (!m_out_count)
 			m_out_count.emplace(*this, "count_ui%u", 0U);
 	}
-
 }
+
+
+
+//-------------------------------------------------
+//  device_start / reset
+//-------------------------------------------------
 
 void sensorboard_device::device_start()
 {

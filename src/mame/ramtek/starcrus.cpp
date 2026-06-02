@@ -46,7 +46,6 @@ public:
 	void starcrus(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -473,10 +472,6 @@ uint8_t starcrus_state::coll_det_r()
 	return m_collision_reg ^ 0xff;
 }
 
-
-void starcrus_state::machine_start()
-{
-}
 
 void starcrus_state::program_map(address_map &map)
 {

@@ -102,7 +102,7 @@
 void maygay1b_state::machine_reset()
 {
 	m_vfd->reset(); // reset display1
-	m_Vmm=false;
+	m_Vmm = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -294,11 +294,11 @@ INPUT_PORTS_START( maygay_m1 )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("70")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RESET")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("73")
-
 INPUT_PORTS_END
 
 void maygay1b_state::machine_start()
 {
+	// TODO: savestates
 }
 
 void maygay1b_state::reel12_w(uint8_t data)

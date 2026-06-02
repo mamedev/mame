@@ -25,7 +25,6 @@ TODO:
 
 **************************************************************************************************/
 
-
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
@@ -60,7 +59,6 @@ public:
 	void tsclass(machine_config &config);
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 	virtual void video_reset() override ATTR_COLD;
 
@@ -71,6 +69,7 @@ protected:
 
 	void palette_init(palette_device &palette) const;
 	void main_map(address_map &map) ATTR_COLD;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
@@ -100,6 +99,7 @@ public:
 	{ }
 
 	void hrclass(machine_config &config);
+
 private:
 	virtual void lamps_w(u16 data) override;
 };
@@ -107,6 +107,8 @@ private:
 
 void cesclassic_state::video_start()
 {
+	save_item(NAME(m_lcd_display));
+
 	m_screen[0]->register_screen_bitmap(m_lcd_bitmap[0]);
 	m_screen[1]->register_screen_bitmap(m_lcd_bitmap[1]);
 }
@@ -352,10 +354,6 @@ void cesclassic_state::palette_init(palette_device &palette) const
 	// red *seems* more charged in motion with the 240p video refs, just camera artifact?
 	for (int idx = 0; idx < 4; idx++)
 		palette.set_pen_color(idx, 0x3f * idx, 0x2a * idx, 0);
-}
-
-void cesclassic_state::machine_start()
-{
 }
 
 void cesclassic_state::cesclassic(machine_config &config)

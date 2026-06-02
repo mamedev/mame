@@ -234,7 +234,6 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void pluto6(machine_config &config) ATTR_COLD;    // Private to prevent use
@@ -392,10 +391,7 @@ INPUT_PORTS_END
 
 void pluto6_state::machine_start()
 {
-}
-
-void pluto6_state::machine_reset()
-{
+	// TODO: savestates
 }
 
 void pluto6_state::duart_irq_handler(int state)

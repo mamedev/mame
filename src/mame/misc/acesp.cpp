@@ -54,8 +54,6 @@ public:
 	void init_ace_cr() ATTR_COLD;
 
 private:
-	void machine_start() override ATTR_COLD;
-
 	TIMER_DEVICE_CALLBACK_MEMBER(gen_fixfreq);
 
 	void ace_sp_map(address_map &map) ATTR_COLD;
@@ -77,10 +75,6 @@ private:
 };
 
 
-
-void ace_sp_state::machine_start()
-{
-}
 
 void ace_sp_state::dmd_w(offs_t offset, uint8_t data)
 {

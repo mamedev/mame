@@ -69,13 +69,17 @@ pwm_display_device::pwm_display_device(const machine_config &mconfig, const char
 }
 
 
+//-------------------------------------------------
+//  device_config_complete
+//-------------------------------------------------
+
 void pwm_display_device::device_config_complete()
 {
-	// resolve handlers
 	m_external_output = !m_output_x_cb.isunset() || !m_output_a_cb.isunset() || !m_output_multi_cb.isunset() || !m_output_digit_cb.isunset();
 
 	if (!m_external_output)
 	{
+		// resolve optional output handlers
 		if (!m_out_x)
 			m_out_x.emplace(*this, "%u.%u", 0U, 0U);
 		if (!m_out_a)

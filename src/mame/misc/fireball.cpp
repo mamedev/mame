@@ -443,6 +443,7 @@ INPUT_PORTS_END
 
 void fireball_state::machine_start()
 {
+	// TODO: savestates
 }
 
 void fireball_state::machine_reset()

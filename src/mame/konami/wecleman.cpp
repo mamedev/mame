@@ -1034,10 +1034,6 @@ void wecleman_state::machine_reset()
 	m_k007232[0]->set_bank( 0, 1 );
 }
 
-void wecleman_state::machine_start()
-{
-}
-
 void wecleman_state::wecleman(machine_config &config)
 {
 	/* basic machine hardware */

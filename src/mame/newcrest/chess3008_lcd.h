@@ -25,7 +25,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD { };
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:

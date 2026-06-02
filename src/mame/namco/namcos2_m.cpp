@@ -77,11 +77,6 @@ void namcos2_base_state::machine_start()
 	save_item(NAME(m_sendval));
 }
 
-void gollygho_state::machine_start()
-{
-	namcos2_state::machine_start();
-}
-
 void namcos2_base_state::machine_reset()
 {
 	/* Initialise the bank select in the sound CPU */

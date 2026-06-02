@@ -40,10 +40,11 @@ public:
 	void fidlstix(machine_config &config);
 	DECLARE_INPUT_CHANGED_MEMBER(ball_sensor);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	void output_digits();
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	void ctrl_w(uint8_t data);
 	void port3_w(uint8_t data);
 	void led_strobe_w(uint8_t data);
@@ -55,9 +56,11 @@ private:
 	required_device<hd44780_device> m_hd44780;
 	required_device<ticket_dispenser_device> m_ticket;
 	output_finder<4> m_digits;
-	uint8_t   m_ctrl = 0;
-	uint8_t   m_lcd_latch = 0;
-	uint32_t  m_digit_latch = 0;
+
+	uint8_t m_ctrl = 0;
+	uint8_t m_lcd_latch = 0;
+	uint32_t m_digit_latch = 0;
+
 	void piggypas_data(address_map &map) ATTR_COLD;
 	void piggypas_map(address_map &map) ATTR_COLD;
 	void fidlstix_data(address_map &map) ATTR_COLD;
@@ -182,11 +185,9 @@ INPUT_PORTS_END
 
 void piggypas_state::machine_start()
 {
-	m_digit_latch = 0;
-}
-
-void piggypas_state::machine_reset()
-{
+	save_item(NAME(m_ctrl));
+	save_item(NAME(m_lcd_latch));
+	save_item(NAME(m_digit_latch));
 }
 
 HD44780_PIXEL_UPDATE(piggypas_state::piggypas_pixel_update)

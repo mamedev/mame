@@ -517,7 +517,6 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 	void add_em_reels(machine_config &config, int symbols, attotime period) ATTR_COLD;
 	void interflip(machine_config &config) ATTR_COLD;
@@ -591,10 +590,7 @@ private:
 
 void interflip8035_state::machine_start()
 {
-}
-
-void interflip8035_state::machine_reset()
-{
+	// TODO: savestates
 }
 
 

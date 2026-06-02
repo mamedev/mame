@@ -94,8 +94,6 @@ public:
 	void piko55(machine_config &config);
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-
 	void segment_w(offs_t offset, u64 data);
 
 private:
@@ -104,10 +102,6 @@ private:
 	required_ioport m_in_pp;
 	required_ioport m_in_ps;
 };
-
-void hh_ht1130_state::machine_start()
-{
-}
 
 void hh_ht1130_state::segment_w(offs_t offset, u64 data)
 {
@@ -146,8 +140,6 @@ public:
 	void brke23p2(machine_config &config);
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-
 	void segment_w(offs_t offset, u64 data);
 
 private:
@@ -155,10 +147,6 @@ private:
 	required_ioport m_in_pp;
 	required_ioport m_in_ps;
 };
-
-void hh_ht1190_state::machine_start()
-{
-}
 
 void hh_ht1190_state::segment_w(offs_t offset, u64 data)
 {

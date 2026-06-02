@@ -69,7 +69,6 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -316,7 +315,9 @@ void seabattl_state::seabattl_control_w(uint8_t data)
 uint8_t seabattl_state::seabattl_collision_clear_r()
 {
 	m_screen->update_partial(m_screen->vpos());
-	m_collision = 0;
+	if (!machine().side_effects_disabled())
+		m_collision = 0;
+
 	return 0;
 }
 
@@ -455,10 +456,8 @@ INPUT_PORTS_END
 
 void seabattl_state::machine_start()
 {
-}
-
-void seabattl_state::machine_reset()
-{
+	save_item(NAME(m_waveenable));
+	save_item(NAME(m_collision));
 }
 
 static const gfx_layout tiles32x16x3_layout =

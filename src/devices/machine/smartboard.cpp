@@ -77,6 +77,10 @@ tasc_sb30_device::tasc_sb30_device(const machine_config &mconfig, const char *ta
 { }
 
 
+//-------------------------------------------------
+//  device_config_complete
+//-------------------------------------------------
+
 void tasc_sb30_device::device_config_complete()
 {
 	if (m_led_out.isunset())

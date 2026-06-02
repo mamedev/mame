@@ -7,8 +7,7 @@
 
 #include "cpu/mcs48/mcs48.h"
 
-class mg1_kbd_device
-	: public device_t
+class mg1_kbd_device : public device_t
 {
 public:
 	auto out_data() { return m_data_cb.bind(); }
@@ -17,7 +16,7 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual void device_start() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD { };
 
 	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;

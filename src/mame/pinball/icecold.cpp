@@ -203,6 +203,7 @@ INPUT_PORTS_END
 
 void icecold_state::machine_start()
 {
+	// TODO: savestates
 }
 
 void icecold_state::machine_reset()

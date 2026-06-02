@@ -192,15 +192,6 @@ epson_lx800_device::epson_lx800_device(const machine_config &mconfig, device_typ
 
 
 //-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void epson_lx800_device::device_start()
-{
-}
-
-
-//-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 

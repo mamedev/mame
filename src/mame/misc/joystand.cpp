@@ -141,7 +141,6 @@ public:
 	void x180ii(machine_config &config);
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -636,11 +635,6 @@ static GFXDECODE_START( gfx_x180ii )
 	GFXDECODE_ENTRY( "tiles", 0,        gfx_8x8x4_packed_msb, 0, 0x100 )
 	GFXDECODE_ENTRY( "tiles", 0x200000, layout_16x16x8,       0, 0x10 ) // wrong
 GFXDECODE_END
-
-
-void joystand_state::machine_start()
-{
-}
 
 
 void joystand_state::joystand(machine_config &config)

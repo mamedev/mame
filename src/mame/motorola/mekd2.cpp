@@ -106,6 +106,9 @@ public:
 
 	void mekd2(machine_config &config) ATTR_COLD;
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	int key40_r();
 	uint8_t key_r();
@@ -125,7 +128,7 @@ private:
 	uint8_t m_keydata = 0U;
 	bool m_cassbit = 0;
 	bool m_cassold = 0;
-	virtual void machine_start() override ATTR_COLD;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_s;
 	required_device<pia6821_device> m_pia_u;
@@ -352,7 +355,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::kansas_r)
 
 void mekd2_state::machine_start()
 {
+	// TODO: savestates
 }
+
 
 /***********************************************************
 

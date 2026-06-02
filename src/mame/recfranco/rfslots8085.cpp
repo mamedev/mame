@@ -227,6 +227,7 @@ private:
 
 void rfslots8085_state::machine_start()
 {
+	// TODO: savestates
 }
 
 

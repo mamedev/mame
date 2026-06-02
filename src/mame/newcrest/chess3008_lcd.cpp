@@ -52,15 +52,6 @@ void chess3008_lcd_device::device_add_mconfig(machine_config &config)
 
 
 //-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void chess3008_lcd_device::device_start()
-{
-}
-
-
-//-------------------------------------------------
 //  I/O handlers
 //-------------------------------------------------
 

@@ -328,6 +328,9 @@ void alesis_state::alesis_palette(palette_device &palette) const
 
 void alesis_state::machine_start()
 {
+	save_item(NAME(m_kb_matrix));
+	save_item(NAME(m_leds));
+	save_item(NAME(m_lcd_digits));
 }
 
 void alesis_state::machine_reset()

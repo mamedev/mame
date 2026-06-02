@@ -164,6 +164,7 @@ private:
 
 void rfslotsmcs48_state::machine_start()
 {
+	// TODO: savestates
 }
 
 

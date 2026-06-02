@@ -222,6 +222,7 @@ void amusco_state::video_start()
 
 void amusco_state::machine_start()
 {
+	// TODO: savestates
 }
 
 

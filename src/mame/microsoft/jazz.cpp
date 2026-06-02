@@ -131,7 +131,6 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
@@ -173,10 +172,6 @@ protected:
 
 	output_finder<> m_led;
 };
-
-void jazz_state::machine_start()
-{
-}
 
 void jazz_state::machine_reset()
 {

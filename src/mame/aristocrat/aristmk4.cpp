@@ -1810,8 +1810,8 @@ void aristmk4_state::init_aristmk4()
 
 void aristmk4_state::machine_start()
 {
-	save_pointer(NAME(m_nvram), 0x1000); // m_nvram
-										 //
+	save_pointer(NAME(m_nvram), 0x1000);
+
 	m_power_timer = timer_alloc(FUNC(aristmk4_state::power_fail), this);
 	m_note_reset_timer = timer_alloc(FUNC(aristmk4_state::note_input_reset), this);
 	m_coin_reset_timer = timer_alloc(FUNC(aristmk4_state::coin_input_reset), this);
