@@ -3913,12 +3913,12 @@ void vgmplay_state::vgmplay(machine_config &config)
 	m_okim6258[1]->add_route(ALL_OUTPUTS, m_viz, 0.5, 0);
 	m_okim6258[1]->add_route(ALL_OUTPUTS, m_viz, 0.5, 1);
 
-	OKIM6295(config, m_okim6295[0], okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_okim6295[0], 0, okim6295_device::PIN7_HIGH);
 	m_okim6295[0]->set_addrmap(0, &vgmplay_state::okim6295_map<0>);
 	m_okim6295[0]->add_route(ALL_OUTPUTS, m_viz, 0.25, 0);
 	m_okim6295[0]->add_route(ALL_OUTPUTS, m_viz, 0.25, 1);
 
-	OKIM6295(config, m_okim6295[1], okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_okim6295[1], 0, okim6295_device::PIN7_HIGH);
 	m_okim6295[1]->set_addrmap(0, &vgmplay_state::okim6295_map<1>);
 	m_okim6295[1]->add_route(ALL_OUTPUTS, m_viz, 0.25, 0);
 	m_okim6295[1]->add_route(ALL_OUTPUTS, m_viz, 0.25, 1);

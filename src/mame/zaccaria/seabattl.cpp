@@ -77,7 +77,7 @@ private:
 	void seabattl_colorram_w(offs_t offset, uint8_t data);
 	void seabattl_control_w(uint8_t data);
 	uint8_t seabattl_collision_r();
-	void seabattl_collision_clear_w(uint8_t data);
+	void seabattl_collision_clear_w(uint8_t data = 0);
 	uint8_t seabattl_collision_clear_r();
 	void sound_w(uint8_t data);
 	void sound2_w(uint8_t data);
@@ -314,10 +314,8 @@ void seabattl_state::seabattl_control_w(uint8_t data)
 
 uint8_t seabattl_state::seabattl_collision_clear_r()
 {
-	m_screen->update_partial(m_screen->vpos());
 	if (!machine().side_effects_disabled())
-		m_collision = 0;
-
+		seabattl_collision_clear_w();
 	return 0;
 }
 
