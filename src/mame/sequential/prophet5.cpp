@@ -443,6 +443,7 @@ public:
 	void osc_a_mix_w(double cc);
 	void osc_a_ramp_s_w(int state);   // U459B pin 5
 	void osc_a_pulse_s_w(int state);  // U459D pin 12
+	void osc_a_sync_s_w(int state);   // U446C pin 6
 
 	void osc_b_sh_w(double cv);
 	void osc_b_mix_w(double cc);
@@ -679,7 +680,7 @@ void prophet5_voice_device::device_add_mconfig(machine_config &config)
 		.configure_voltage_output(R4108)
 		.add_route(0, m_pmod, 1.0);
 
-	// The output of the two VCAs is mixed and distributed to osc A and filter
+	// The outputs of the two VCAs are mixed and distributed to osc A and filter
 	// control signals.
 	MIXER(config, m_pmod)
 		.add_route(0, m_osc_a_freq, 0.0)  // Gain computed in pmod_freq_a_s_w().
@@ -749,6 +750,7 @@ void prophet5_voice_device::device_add_mconfig(machine_config &config)
 	const double cf_b = jittered(CAP_P(1000), m_jitter[2], 5);  // C481 (poly). Tolerance not documented. Assuming 5%.
 	const double rr_b = jittered(RES_M(2.21), m_jitter[3], 1);  // R4209 (1%)
 	CEM3340(config, m_osc_b, cf_b, rr_b)  // U441
+		.add_route(cem3340_device::OUTPUT_FREQ, m_osc_a, 1.0, cem3340_device::INPUT_SYNC_FREQ)
 		.add_route(cem3340_device::OUTPUT_RAMP, m_osc_b_mix, 0.0, ca3280_vca_device::INPUT_AUDIO)
 		.add_route(cem3340_device::OUTPUT_RAMP, m_pmod_osc_vca, 0.0, ca3280_vca_device::INPUT_AUDIO)
 		.add_route(cem3340_device::OUTPUT_PULSE, m_osc_b_mix, 0.0, ca3280_vca_device::INPUT_AUDIO_INV)
@@ -887,7 +889,7 @@ void prophet5_voice_device::pmod_freq_a_s_w(int state)
 {
 	const double gain = state ? (1.0 / RES_K(301)) : 0.0;  // R4357 (1%)
 	m_pmod->set_route_gain(0, m_osc_a_freq, 0, gain);
-	LOGMASKED(LOG_PMOD, "%s: PMOD osc A freq: %d - %f\n", tag(), state, gain);
+	LOGMASKED(LOG_PMOD, "%s: PMOD osc A freq: %d\n", tag(), state);
 }
 
 void prophet5_voice_device::pmod_pw_a_s_w(int state)
@@ -931,6 +933,12 @@ void prophet5_voice_device::osc_a_pulse_s_w(int state)
 	constexpr int to = ca3280_vca_device::INPUT_AUDIO_INV;
 	m_osc_a->set_route_gain(from, m_osc_a_mix, to, state ? 1.0 : 0.0);
 	LOGMASKED(LOG_OSC, "%s: Osc A pulse: %d\n", tag(), state);
+}
+
+void prophet5_voice_device::osc_a_sync_s_w(int state)
+{
+	m_osc_a->set_sync_enabled(state);
+	LOGMASKED(LOG_OSC, "%s: Osc A sync: %d\n", tag(), state);
 }
 
 void prophet5_voice_device::osc_b_sh_w(double cv)
@@ -1207,6 +1215,7 @@ public:
 	void pmod_filt_s_w(int state);
 	void osc_a_ramp_s_w(int state);
 	void osc_a_pulse_s_w(int state);
+	void osc_a_sync_s_w(int state);
 	void osc_b_ramp_s_w(int state);
 	void osc_b_pulse_s_w(int state);
 	void osc_b_tri_s_w(int state);
@@ -1782,6 +1791,13 @@ void prophet5_audio_device::osc_a_pulse_s_w(int state)
 	LOGMASKED(LOG_PROG_LATCH, "osc_a_pulse_s = %d\n", state);
 	for (prophet5_voice_device *v : m_voices)
 		v->osc_a_pulse_s_w(state);
+}
+
+void prophet5_audio_device::osc_a_sync_s_w(int state)
+{
+	LOGMASKED(LOG_PROG_LATCH, "osc_a_sync_s = %d\n", state);
+	for (prophet5_voice_device *v : m_voices)
+		v->osc_a_sync_s_w(state);
 }
 
 void prophet5_audio_device::osc_b_ramp_s_w(int state)
@@ -3000,7 +3016,7 @@ void prophet5_state::prophet5rev30(machine_config &config)
 	auto &u335 = OUTPUT_LATCH(config, "program_latch_0");
 	u335.bit_handler<0>().set(m_audio, FUNC(prophet5_audio_device::osc_a_pulse_s_w));
 	u335.bit_handler<1>().set(m_audio, FUNC(prophet5_audio_device::osc_a_ramp_s_w));
-	u335.bit_handler<2>().set_output("osc_a_sync");
+	u335.bit_handler<2>().set(m_audio, FUNC(prophet5_audio_device::osc_a_sync_s_w));
 	u335.bit_handler<3>().set(m_audio, FUNC(prophet5_audio_device::osc_b_ramp_s_w));
 	u335.bit_handler<4>().set(m_audio, FUNC(prophet5_audio_device::osc_b_tri_s_w));
 	u335.bit_handler<5>().set(m_audio, FUNC(prophet5_audio_device::osc_b_pulse_s_w));
