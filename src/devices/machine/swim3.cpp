@@ -475,7 +475,7 @@ void swim3_device::live_start(int state, bool start_writing)
 	m_cur_live.pll.reset(m_cur_live.tm);
 	m_cur_live.pll.set_clock(attotime::from_ticks(cycles_per_cell[(m_setup >> 2) & 3], clock()));
 	if(start_writing)
-		m_cur_live.pll.start_writing(machine().time());
+		m_cur_live.pll.start_writing(machine().time(), m_floppy);
 
 	logerror("PLL %s clock %s\n", start_writing ? "write" : "read", attotime::from_ticks(cycles_per_cell[(m_setup >> 2) & 3], clock()).to_string());
 

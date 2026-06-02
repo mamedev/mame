@@ -93,8 +93,6 @@ c2040_fdc_device::c2040_fdc_device(const machine_config &mconfig, const char *ta
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
-	cur_live.write_position = 0;
-	cur_live.write_start_time = attotime::never;
 	cur_live.drv_sel = m_drv_sel;
 }
 
@@ -194,29 +192,24 @@ void c2040_fdc_device::rollback()
 
 void c2040_fdc_device::start_writing(const attotime &tm)
 {
-	cur_live.write_start_time = tm;
-	cur_live.write_position = 0;
+	if(get_floppy())
+		get_floppy()->write_start(tm);
 }
 
 void c2040_fdc_device::stop_writing(const attotime &tm)
 {
-	commit(tm);
-	cur_live.write_start_time = attotime::never;
+	if(get_floppy())
+		get_floppy()->write_end(tm);
 }
 
 bool c2040_fdc_device::write_next_bit(bool bit, const attotime &limit)
 {
-	if(cur_live.write_start_time.is_never()) {
-		cur_live.write_start_time = cur_live.tm;
-		cur_live.write_position = 0;
-	}
-
 	attotime etime = cur_live.tm + m_period;
 	if(etime > limit)
 		return true;
 
-	if(bit && cur_live.write_position < std::size(cur_live.write_buffer))
-		cur_live.write_buffer[cur_live.write_position++] = cur_live.tm - m_period;
+	if(bit && get_floppy())
+		get_floppy()->write_flux_change(cur_live.tm - m_period);
 
 	if (LOG) logerror("%s write bit %u (%u)\n", cur_live.tm.as_string(), cur_live.bit_counter, bit);
 
@@ -225,16 +218,8 @@ bool c2040_fdc_device::write_next_bit(bool bit, const attotime &limit)
 
 void c2040_fdc_device::commit(const attotime &tm)
 {
-	if(cur_live.write_start_time.is_never() || tm == cur_live.write_start_time || !cur_live.write_position)
-		return;
-
-	if (LOG) logerror("%s committing %u transitions since %s\n", tm.as_string(), cur_live.write_position, cur_live.write_start_time.as_string());
-
 	if(get_floppy())
-		get_floppy()->write_flux(cur_live.write_start_time, tm, cur_live.write_position, cur_live.write_buffer);
-
-	cur_live.write_start_time = tm;
-	cur_live.write_position = 0;
+		get_floppy()->write_flush(tm);
 }
 
 void c2040_fdc_device::live_delay(int state)
@@ -281,8 +266,6 @@ void c2040_fdc_device::live_abort()
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
-	cur_live.write_position = 0;
-	cur_live.write_start_time = attotime::never;
 
 	cur_live.ready = 1;
 	cur_live.sync = 1;

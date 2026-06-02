@@ -380,7 +380,7 @@ void paula_fdc_device::dma_check()
 	if(was_writing && !(dskbyt & 0x2000))
 		cur_live.pll.stop_writing(floppy, cur_live.tm);
 	if(!was_writing && (dskbyt & 0x2000))
-		cur_live.pll.start_writing(cur_live.tm);
+		cur_live.pll.start_writing(cur_live.tm, floppy);
 }
 
 void paula_fdc_device::adkcon_set(uint16_t data)
@@ -647,25 +647,20 @@ int paula_fdc_device::pll_t::get_next_bit(attotime &tm, floppy_image_device *flo
 	return bit;
 }
 
-void paula_fdc_device::pll_t::start_writing(const attotime & tm)
+void paula_fdc_device::pll_t::start_writing(const attotime & tm, floppy_image_device *floppy)
 {
-	write_start_time = tm;
-	write_position = 0;
+	if(floppy)
+		floppy->write_start(tm);
 }
 
 void paula_fdc_device::pll_t::stop_writing(floppy_image_device *floppy, const attotime &tm)
 {
-	commit(floppy, tm);
-	write_start_time = attotime::never;
+	if(floppy)
+		floppy->write_end(tm);
 }
 
 bool paula_fdc_device::pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit)
 {
-	if(write_start_time.is_never()) {
-		write_start_time = ctime;
-		write_position = 0;
-	}
-
 	for(;;) {
 		attotime etime = ctime+delays[slot];
 		if(etime > limit)
@@ -673,8 +668,8 @@ bool paula_fdc_device::pll_t::write_next_bit(bool bit, attotime &tm, floppy_imag
 		uint16_t pre_counter = counter;
 		counter += increment;
 		if(bit && !(pre_counter & 0x400) && (counter & 0x400))
-			if(write_position < std::size(write_buffer))
-				write_buffer[write_position++] = etime;
+			if(floppy)
+				floppy->write_flux_change(etime);
 		slot++;
 		tm = etime;
 		if(counter & 0x800)
@@ -692,11 +687,6 @@ bool paula_fdc_device::pll_t::write_next_bit(bool bit, attotime &tm, floppy_imag
 
 void paula_fdc_device::pll_t::commit(floppy_image_device *floppy, const attotime &tm)
 {
-	if(write_start_time.is_never() || tm == write_start_time)
-		return;
-
 	if(floppy)
-		floppy->write_flux(write_start_time, tm, write_position, write_buffer);
-	write_start_time = tm;
-	write_position = 0;
+		floppy->write_flush(tm);
 }

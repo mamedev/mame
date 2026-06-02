@@ -297,12 +297,10 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 	m_amplifier_freakout_time(attotime::from_usec(16)),
 	m_image_dirty(false),
 	m_track_dirty(false),
-	m_pending_write(false),
-	m_pending_write_cyl(0),
-	m_pending_write_ss(0),
-	m_pending_write_subcyl(0),
-	m_pending_write_start(0),
-	m_pending_write_end(0),
+	m_writing(false),
+	m_write_cyl(0),
+	m_write_ss(0),
+	m_write_subcyl(0),
 	m_ready_counter(0),
 	m_make_sound(false),
 	m_sound_out(*this, FLOPSND_TAG)
@@ -508,7 +506,8 @@ void floppy_image_device::setup_write(const floppy_image_format_t *_output_forma
 
 void floppy_image_device::commit_image()
 {
-	flush_pending_write();
+	if(m_writing)
+		write_do_flush(machine().time());
 	m_image_dirty = false;
 	if(!m_output_format || !m_output_format->supports_save())
 		return;
@@ -655,8 +654,8 @@ std::pair<std::error_condition, const floppy_image_format_t *> floppy_image_devi
 void floppy_image_device::init_floppy_load(bool write_supported)
 {
 	cache_clear();
-	m_pending_write = false;
-	m_pending_write_flux_change_positions.clear();
+	m_writing = false;
+	m_write_transition_times.clear();
 	m_revolution_start_time = m_mon ? attotime::never : machine().time();
 	m_revolution_count = 0;
 
@@ -1101,7 +1100,8 @@ void floppy_image_device::cache_clear()
 
 void floppy_image_device::cache_fill(const attotime &when)
 {
-	flush_pending_write();
+	if(m_writing)
+		write_do_flush(when);
 	std::vector<uint32_t> &buf = m_image->get_buffer(m_cyl, m_ss, m_subcyl);
 	uint32_t const cells = buf.size();
 	if(cells <= 1) {
@@ -1188,7 +1188,7 @@ bool floppy_image_device::writing_disabled() const
 	return m_wpt || (m_phases & 2);
 }
 
-void floppy_image_device::write_flux(const attotime &start, const attotime &end, int transition_count, const attotime *transitions)
+void floppy_image_device::write_start(const attotime &when)
 {
 	if(!m_image || m_mon)
 		return;
@@ -1196,53 +1196,76 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 	if(writing_disabled())
 		return;
 
+	if(m_writing)
+		write_do_flush(when);
+
+	m_writing = true;
+	m_write_cyl = m_cyl;
+	m_write_ss = m_ss;
+	m_write_subcyl = m_subcyl;
+	m_write_start_time = when;
+	m_write_transition_times.clear();
 	m_image_dirty = true;
 	m_track_dirty = true;
-	cache_clear();
-
-	std::vector<wspan> wspans(1);
-
-	attotime base;
-	wspans[0].start = find_position(base, start);
-	wspans[0].end   = find_position(base, end);
-
-	for(int i=0; i != transition_count; i++)
-		wspans[0].flux_change_positions.push_back(find_position(base, transitions[i]));
-
-	wspan_split_on_wrap(wspans);
-
-	for(const auto &ws : wspans) {
-		if(!m_pending_write || m_pending_write_cyl != m_cyl || m_pending_write_ss != m_ss || m_pending_write_subcyl != m_subcyl || m_pending_write_end != ws.start) {
-			flush_pending_write();
-			m_pending_write = true;
-			m_pending_write_cyl = m_cyl;
-			m_pending_write_ss = m_ss;
-			m_pending_write_subcyl = m_subcyl;
-			m_pending_write_start = ws.start;
-			m_pending_write_end = ws.start;
-			m_pending_write_flux_change_positions.clear();
-		}
-
-		m_pending_write_end = ws.end;
-		m_pending_write_flux_change_positions.insert(
-				m_pending_write_flux_change_positions.end(),
-				ws.flux_change_positions.begin(),
-				ws.flux_change_positions.end());
-	}
 }
 
-
-void floppy_image_device::flush_pending_write()
+void floppy_image_device::write_flux_change(const attotime &when)
 {
-	if(!m_pending_write)
+	if(!m_writing)
+		return;
+
+	// Some controllers speculatively run ahead of machine time then
+	// replay from an earlier point.  Discard stale entries so the
+	// replayed transitions replace them cleanly.
+	if(!m_write_transition_times.empty() && when <= m_write_transition_times.back()) {
+		auto it = std::lower_bound(m_write_transition_times.begin(), m_write_transition_times.end(), when);
+		m_write_transition_times.erase(it, m_write_transition_times.end());
+	}
+	// Best-effort rewind if replay crosses a flush boundary.  Does not
+	// reconstruct transitions already committed to the track, but no
+	// current controller replays across a committed flush point.
+	if(when < m_write_start_time)
+		m_write_start_time = when;
+	m_write_transition_times.push_back(when);
+}
+
+void floppy_image_device::write_end(const attotime &when)
+{
+	if(!m_writing)
+		return;
+
+	write_do_flush(when);
+	m_writing = false;
+}
+
+void floppy_image_device::write_flush(const attotime &when)
+{
+	if(!m_writing)
+		return;
+
+	write_do_flush(when);
+}
+
+void floppy_image_device::write_do_flush(const attotime &when)
+{
+	int committed = 0;
+	for(int i = 0; i != int(m_write_transition_times.size()); i++)
+		if(m_write_transition_times[i] < when)
+			committed = i + 1;
+
+	if(when == m_write_start_time && !committed)
 		return;
 
 	std::vector<wspan> wspans(1);
-	wspans[0].start = m_pending_write_start;
-	wspans[0].end = m_pending_write_end;
-	wspans[0].flux_change_positions.swap(m_pending_write_flux_change_positions);
+	attotime base;
+	wspans[0].start = find_position(base, m_write_start_time);
+	wspans[0].end = find_position(base, when);
+	for(int i = 0; i != committed; i++)
+		wspans[0].flux_change_positions.push_back(find_position(base, m_write_transition_times[i]));
 
-	std::vector<uint32_t> &buf = m_image->get_buffer(m_pending_write_cyl, m_pending_write_ss, m_pending_write_subcyl);
+	wspan_split_on_wrap(wspans);
+
+	std::vector<uint32_t> &buf = m_image->get_buffer(m_write_cyl, m_write_ss, m_write_subcyl);
 	if(buf.empty()) {
 		buf.push_back(floppy_image::MG_N);
 		buf.push_back(floppy_image::MG_E | 199999999);
@@ -1251,7 +1274,9 @@ void floppy_image_device::flush_pending_write()
 	wspan_remove_damaged(wspans, buf);
 	wspan_write(wspans, buf);
 
-	m_pending_write = false;
+	if(committed)
+		m_write_transition_times.erase(m_write_transition_times.begin(), m_write_transition_times.begin() + committed);
+	m_write_start_time = when;
 	cache_clear();
 }
 
@@ -1378,7 +1403,8 @@ void floppy_image_device::wspan_write(const std::vector<wspan> &wspans, std::vec
 void floppy_image_device::set_write_splice(const attotime &when)
 {
 	if(m_image && !m_mon) {
-		flush_pending_write();
+		if(m_writing)
+			write_do_flush(when);
 		m_image_dirty = true;
 		attotime base;
 		int splice_pos = find_position(base, when);
