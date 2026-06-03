@@ -37,7 +37,10 @@ vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config &mconfig, devi
 	m_soundcpu(*this, "soundcpu"),
 	m_bank6000(0),
 	m_bank6000_enable(0),
+	m_411f(0),
 	m_sound_timer(nullptr),
+	m_36pcase_lcdc_nmi_timer(nullptr),
+	m_36pcase_deferred_oam_dma_timer(nullptr),
 	m_internal_rom(*this, "internal"),
 	m_soundram(*this, "soundram"),
 	m_vt369adpcm(*this, "vt369adpcm"),
@@ -96,7 +99,7 @@ void vt3xx_soc_base_device::device_add_mconfig(machine_config &config)
 
 	PPU_VT3XX(config.replace(), m_ppu, RP2A03_NTSC_XTAL);
 	m_ppu->set_cpu_tag(m_maincpu);
-	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_ppu->int_callback().set(FUNC(vt3xx_soc_base_device::ppu_nmi));
 	m_ppu->read_bg().set(FUNC(vt3xx_soc_base_device::chr_r));
 	m_ppu->read_sp().set(FUNC(vt3xx_soc_base_device::spr_r));
 	m_ppu->read_onespace_with_relative().set(FUNC(vt3xx_soc_base_device::read_onespace_bus_with_relative_offset));
@@ -124,10 +127,55 @@ void vt3xx_soc_base_device::vt369_soundcpu_control_w(u8 data)
 		m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
+u8 vt3xx_soc_base_device::vt369_soundram_r(offs_t offset)
+{
+	return m_soundram[offset & 0x7ff];
+}
+
+void vt3xx_soc_base_device::vt369_soundram_w(offs_t offset, u8 data)
+{
+	m_soundram[offset & 0x7ff] = data;
+}
+
+u8 vt3xx_soc_base_device::vt369_ppu_mirror_r(offs_t offset)
+{
+	return m_ppu->ppu_vram_direct_read(0x2000 + (offset & 0x0fff));
+}
+
+void vt3xx_soc_base_device::vt369_ppu_mirror_w(offs_t offset, u8 data)
+{
+	const offs_t address = 0x2000 + (offset & 0x0fff);
+	m_ppu->ppu_vram_direct_write(address, data);
+}
+
 void vt3xx_soc_base_device::vt369_relative_w(offs_t offset, u8 data)
 {
 	logerror("%s: vt369_relative_w %02x %02x\n", machine().describe_context(), offset,  data);
 	m_relative[offset] = data;
+}
+
+void vt3xx_soc_base_device::ppu_nmi(int state)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(vt3xx_soc_base_device::assert_36pcase_lcdc_nmi)
+{
+	if (m_36pcase_gpio_enabled)
+	{
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_36pcase_lcdc_nmi_timer->adjust(m_screen->frame_period());
+	}
+}
+
+void vt3xx_soc_base_device::vt3xx_2050_w(u8 data)
+{
+	downcast<ppu_vt3xx_device &>(*m_ppu).lcdc_2050_w(data);
+
+	if (m_36pcase_gpio_enabled && BIT(data, 0))
+		m_36pcase_lcdc_nmi_timer->adjust(m_screen->frame_period() + m_screen->time_until_pos(240, 120));
+	else if (m_36pcase_gpio_enabled)
+		m_36pcase_lcdc_nmi_timer->adjust(attotime::never);
 }
 
 u8 vt3xx_soc_base_device::read_internal(offs_t offset)
@@ -209,6 +257,25 @@ void vt3xx_soc_base_device::highres_sprite_dma_w(u8 data)
 	}
 }
 
+TIMER_CALLBACK_MEMBER(vt3xx_soc_base_device::flush_36pcase_deferred_oam_dma)
+{
+	for (int req = 0; req < m_36pcase_deferred_oam_dma_count; req++)
+	{
+		const u16 src = m_36pcase_deferred_oam_dma_src[req];
+		const u16 dst = m_36pcase_deferred_oam_dma_dst[req];
+		const int length = m_36pcase_deferred_oam_dma_len[req] ? m_36pcase_deferred_oam_dma_len[req] : 0x100;
+
+		for (int i = 0; i < length; i++)
+		{
+			const u8 read_data = m_maincpu->space(AS_PROGRAM).read_byte(src + i);
+			m_ppu->set_spriteram_value((dst + i) & 0x1ff, read_data);
+		}
+	}
+
+	m_36pcase_deferred_oam_dma_count = 0;
+	m_36pcase_deferred_oam_dma_next = 0;
+}
+
 void vt3xx_soc_base_device::vt369_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram(); // 8k RAM?
@@ -231,13 +298,16 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	map(0x201c, 0x201c).rw(m_ppu, FUNC(ppu_vt3xx_device::extvidreg_201c_r), FUNC(ppu_vt3xx_device::extvidreg_201c_w));
 	map(0x201d, 0x201d).rw(m_ppu, FUNC(ppu_vt3xx_device::extvidreg_201d_r), FUNC(ppu_vt3xx_device::extvidreg_201d_w));
 	map(0x201e, 0x201e).rw(m_ppu, FUNC(ppu_vt3xx_device::extvidreg_201e_r), FUNC(ppu_vt3xx_device::extvidreg_201e_w));
-	map(0x201f, 0x201f).r(m_ppu, FUNC(ppu_vt3xx_device::gun2_y_r));
+	map(0x201f, 0x201f).rw(m_ppu, FUNC(ppu_vt3xx_device::gun2_y_r), FUNC(ppu_vt3xx_device::extvidreg_201f_w));
 
 	map(0x2020, 0x2023).rw(m_ppu, FUNC(ppu_vt3xx_device::tilebases_202x_r), FUNC(ppu_vt3xx_device::tilebases_202x_w));
+	map(0x2024, 0x2024).rw(m_ppu, FUNC(ppu_vt3xx_device::lightgun1_y_2024_r), FUNC(ppu_vt3xx_device::lightgun1_y_2024_w));
 
 	map(0x2040, 0x2049).w(m_ppu, FUNC(ppu_vt3xx_device::lcdc_regs_w));
+	map(0x2050, 0x2050).w(FUNC(vt3xx_soc_base_device::vt3xx_2050_w));
+	map(0x2102, 0x2102).w(FUNC(vt3xx_soc_base_device::vt3xx_2102_w));
 
-	map(0x3000, 0x3fff).ram(); // 240in1ar clears this region (does it only exist on some SoCs?)
+	map(0x3000, 0x3fff).rw(FUNC(vt3xx_soc_base_device::vt369_ppu_mirror_r), FUNC(vt3xx_soc_base_device::vt369_ppu_mirror_w));
 
 	map(0x4000, 0x4017).w(m_apu, FUNC(nes_apu_vt_device::write));
 
@@ -269,34 +339,36 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	map(0x411c, 0x411c).w(FUNC(vt3xx_soc_base_device::vt369_411c_bank6000_enable_w));
 	map(0x411d, 0x411d).w(FUNC(vt3xx_soc_base_device::vt369_411d_w));
 	map(0x411e, 0x411e).w(FUNC(vt3xx_soc_base_device::vt369_411e_w));
+	map(0x411f, 0x411f).rw(FUNC(vt3xx_soc_base_device::vt3xx_411f_status_r), FUNC(vt3xx_soc_base_device::vt3xx_411f_w));
 
-	// 412d
+	map(0x412d, 0x412d).w(FUNC(vt3xx_soc_base_device::vt3xx_412d_w));
 
 	// the ALU is not VT1682 compatible
 	map(0x4130, 0x4137).rw(FUNC(vt3xx_soc_base_device::alu_r), FUNC(vt3xx_soc_base_device::alu_w));
 	map(0x4138, 0x413d).rw(FUNC(vt3xx_soc_base_device::alu_r), FUNC(vt3xx_soc_base_device::alu_w)); // mirror or 2nd ALU?
 
-	// 4144
-	// 4147
+	map(0x4144, 0x4147).rw(FUNC(vt3xx_soc_base_device::vt3xx_4144_latch_r), FUNC(vt3xx_soc_base_device::vt3xx_4144_latch_w));
 
 	// based on nesvt270, otrail, pixel246 this looks like another I/O port?
 	map(0x4148, 0x4148).rw(FUNC(vt3xx_soc_base_device::vt_414x_port_direction_r), FUNC(vt3xx_soc_base_device::vt_414x_port_direction_w));
 	map(0x414a, 0x414a).rw(FUNC(vt3xx_soc_base_device::vt_414a_port_in_r), FUNC(vt3xx_soc_base_device::vt_414a_port_out_w));
 	map(0x414b, 0x414b).rw(FUNC(vt3xx_soc_base_device::vt_414b_port_in_r), FUNC(vt3xx_soc_base_device::vt_414b_port_out_w));
-
-	map(0x414f, 0x414f).r(FUNC(vt3xx_soc_base_device::vt369_414f_r));
+	map(0x414c, 0x414f).rw(FUNC(vt3xx_soc_base_device::vt3xx_414c_latch_r), FUNC(vt3xx_soc_base_device::vt3xx_414c_latch_w));
 
 	// several games use these addresses for what seem to be extra protection data
 	map(0x4150, 0x4150).rw(FUNC(vt3xx_soc_base_device::vt_415x_port_direction_r), FUNC(vt3xx_soc_base_device::vt_415x_port_direction_w));
 	// 4151 also sometimes written
 	map(0x4152, 0x4152).rw(FUNC(vt3xx_soc_base_device::vt_4152_port_in_r), FUNC(vt3xx_soc_base_device::vt_4152_port_out_w));
 	map(0x4153, 0x4153).rw(FUNC(vt3xx_soc_base_device::vt_4153_port_in_r), FUNC(vt3xx_soc_base_device::vt_4153_port_out_w));
-	// 0x4158 is written before the above
+	map(0x4158, 0x4158).w(FUNC(vt3xx_soc_base_device::vt3xx_4158_w)); // written before the above
 
+	map(0x4155, 0x4157).rw(FUNC(vt3xx_soc_base_device::vt3xx_4155_latch_r), FUNC(vt3xx_soc_base_device::vt3xx_4155_latch_w));
+	map(0x415a, 0x415b).rw(FUNC(vt3xx_soc_base_device::vt3xx_415a_latch_r), FUNC(vt3xx_soc_base_device::vt3xx_415a_latch_w));
 	map(0x415c, 0x415c).r(FUNC(vt3xx_soc_base_device::vt369_415c_r)); // related to getting into menus in some games
 
 	map(0x4160, 0x4161).w(FUNC(vt3xx_soc_base_device::vt369_relative_w));
 	map(0x4162, 0x4162).w(FUNC(vt3xx_soc_base_device::vt369_soundcpu_control_w));
+	map(0x4165, 0x4165).w(FUNC(vt3xx_soc_base_device::vt3xx_4165_w));
 
 	// 4175
 
@@ -308,11 +380,13 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 
 	map(0x41b0, 0x41bf).r(FUNC(vt3xx_soc_base_device::vt369_41bx_r)).w(FUNC(vt3xx_soc_base_device::vt369_41bx_w));
 
-	map(0x41e6, 0x41e6).w(FUNC(vt3xx_soc_base_device::extra_io_41e6_w)); // banking on red5mam
+	map(0x41e4, 0x41e5).rw(FUNC(vt3xx_soc_base_device::vt3xx_41e4_latch_r), FUNC(vt3xx_soc_base_device::vt3xx_41e4_latch_w));
+	map(0x41e6, 0x41e6).rw(FUNC(vt3xx_soc_base_device::vt3xx_41e6_latch_r), FUNC(vt3xx_soc_base_device::vt3xx_41e6_latch_w)); // banking on red5mam
+	map(0x41e7, 0x41eb).rw(FUNC(vt3xx_soc_base_device::vt3xx_41e7_latch_r), FUNC(vt3xx_soc_base_device::vt3xx_41e7_latch_w));
 
 	map(0x4201, 0x4201).w(FUNC(vt3xx_soc_base_device::highres_sprite_dma_w));
 
-	// 4304
+	map(0x4304, 0x4304).w(FUNC(vt3xx_soc_base_device::vt3xx_4304_w));
 
 	// 4310-4315 SD Card data out
 	// 4318-431b SD Card data in
@@ -324,7 +398,7 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	// 4327
 	// 4328
 
-	map(0x4800, 0x4fff).ram().share("soundram"); // sound program for 2nd CPU is uploaded here, but some sets aren't uploading anything, do they rely on an internal ROM? other DMA? possibility to map ROM?
+	map(0x4800, 0x4fff).rw(FUNC(vt3xx_soc_base_device::vt369_soundram_r), FUNC(vt3xx_soc_base_device::vt369_soundram_w)).share("soundram"); // sound program for 2nd CPU is uploaded here, but some sets aren't uploading anything, do they rely on an internal ROM? other DMA? possibility to map ROM?
 
 	map(0x6000, 0x7fff).r(FUNC(vt3xx_soc_base_device::vt369_6000_r)).w(FUNC(vt3xx_soc_base_device::vt369_6000_w));
 
@@ -345,16 +419,51 @@ void vt3xx_soc_base_device::vt_dma_w(u8 data)
 
 		logerror("%s: attempting to do NEW style dma src %04x length %04x dest type %d\n", machine().describe_context(), src_addr, length, m_vdma_ctrl & 1);
 
-		for (int i = 0; i < length; i++)
+		if (m_36pcase_gpio_enabled && (m_vdma_ctrl & 1))
 		{
-			u8 read_data = m_maincpu->space(AS_PROGRAM).read_byte(src_addr + i);
-			if (m_vdma_ctrl & 1)
+			u16 dma_dest = m_ppu->get_vram_dest();
+
+			for (int i = 0; i < length; i++)
 			{
-				m_maincpu->space(AS_PROGRAM).write_byte(0x2007, read_data);
+				const u8 read_data = m_maincpu->space(AS_PROGRAM).read_byte(src_addr + i);
+				m_ppu->ppu_vram_direct_write(dma_dest & 0x3fff, read_data);
+				dma_dest = (dma_dest + 1) & 0x3fff;
+			}
+
+			m_ppu->set_vram_dest(dma_dest);
+		}
+		else
+		{
+			if (m_36pcase_gpio_enabled && !(m_vdma_ctrl & 1))
+			{
+				if (m_36pcase_deferred_oam_dma_count < std::size(m_36pcase_deferred_oam_dma_src))
+				{
+					const int slot = m_36pcase_deferred_oam_dma_count++;
+					m_36pcase_deferred_oam_dma_src[slot] = src_addr;
+					m_36pcase_deferred_oam_dma_dst[slot] = m_36pcase_deferred_oam_dma_next & 0x1ff;
+					m_36pcase_deferred_oam_dma_len[slot] = length & 0xff;
+					m_36pcase_deferred_oam_dma_next = (m_36pcase_deferred_oam_dma_next + length) & 0x1ff;
+					m_36pcase_deferred_oam_dma_timer->adjust(attotime::from_msec(2));
+				}
+				else
+				{
+					logerror("%s: 36pcase deferred oam dma queue overflow src=%04x length=%04x\n", machine().describe_context(), src_addr, length);
+				}
 			}
 			else
 			{
-				m_maincpu->space(AS_PROGRAM).write_byte(0x2004, read_data);
+				for (int i = 0; i < length; i++)
+				{
+					const u8 read_data = m_maincpu->space(AS_PROGRAM).read_byte(src_addr + i);
+					if (m_vdma_ctrl & 1)
+					{
+						m_maincpu->space(AS_PROGRAM).write_byte(0x2007, read_data);
+					}
+					else
+					{
+						m_maincpu->space(AS_PROGRAM).write_byte(0x2004, read_data);
+					}
+				}
 			}
 		}
 	}
@@ -474,7 +583,155 @@ u8 vt3xx_soc_base_device::vt_414b_port_in_r()
 
 
 
-void vt3xx_soc_base_device::extra_io_41e6_w(u8 data) { logerror("%s: extra_io_41e6_w %02x (external banking?)\n", machine().describe_context(), data); m_41e6_write_cb(data); }
+
+u8 vt3xx_soc_base_device::vt3xx_36pcase_gpio_bus_latch() const
+{
+	return (m_414x_gpio[0x0f] & 0x1f) | ((m_41ex_gpio[0x07] & 0x1c) << 3);
+}
+
+u8 vt3xx_soc_base_device::vt3xx_36pcase_gpio_bus_r()
+{
+	if (m_36pcase_gpio_response_pos < m_36pcase_gpio_response_len)
+		return m_36pcase_gpio_response[m_36pcase_gpio_response_pos];
+
+	return vt3xx_36pcase_gpio_bus_latch();
+}
+
+void vt3xx_soc_base_device::vt3xx_36pcase_gpio_bus_w()
+{
+	m_36pcase_gpio_write_history[0] = m_36pcase_gpio_write_history[1];
+	m_36pcase_gpio_write_history[1] = vt3xx_36pcase_gpio_bus_latch();
+
+	if ((m_36pcase_gpio_write_history[0] == 0x00) && (m_36pcase_gpio_write_history[1] == 0x00))
+	{
+		// The menu waits for this two-byte response before applying the LCD/GPIO table at f7d6.
+		m_36pcase_gpio_response[0] = 0x93;
+		m_36pcase_gpio_response[1] = 0x35;
+		m_36pcase_gpio_response_pos = 0;
+		m_36pcase_gpio_response_len = 2;
+	}
+}
+
+void vt3xx_soc_base_device::vt3xx_36pcase_gpio_advance_response()
+{
+	if (m_36pcase_gpio_response_pos < m_36pcase_gpio_response_len)
+		m_36pcase_gpio_response_pos++;
+}
+
+u8 vt3xx_soc_base_device::vt3xx_4144_latch_r(offs_t offset)
+{
+	const u8 reg = 0x04 + offset;
+	logerror("%s: vt3xx_414x_latch_r %02x\n", machine().describe_context(), reg);
+	return m_414x_gpio[reg];
+}
+
+void vt3xx_soc_base_device::vt3xx_4144_latch_w(offs_t offset, u8 data)
+{
+	const u8 reg = 0x04 + offset;
+	logerror("%s: vt3xx_414x_latch_w %02x %02x\n", machine().describe_context(), reg, data);
+
+	const u8 old = m_414x_gpio[reg];
+	m_414x_gpio[reg] = data;
+
+	if (m_36pcase_gpio_enabled && (reg == 0x07) && !BIT(old, 5) && BIT(data, 5))
+		vt3xx_36pcase_gpio_bus_w();
+}
+
+u8 vt3xx_soc_base_device::vt3xx_414c_latch_r(offs_t offset)
+{
+	const u8 reg = 0x0c + offset;
+	logerror("%s: vt3xx_414x_latch_r %02x\n", machine().describe_context(), reg);
+
+	if (m_36pcase_gpio_enabled && (reg == 0x0f))
+		return (m_414x_gpio[reg] & 0xe0) | (vt3xx_36pcase_gpio_bus_r() & 0x1f);
+
+	return m_414x_gpio[reg];
+}
+
+void vt3xx_soc_base_device::vt3xx_414c_latch_w(offs_t offset, u8 data)
+{
+	const u8 reg = 0x0c + offset;
+	logerror("%s: vt3xx_414x_latch_w %02x %02x\n", machine().describe_context(), reg, data);
+	m_414x_gpio[reg] = data;
+}
+
+u8 vt3xx_soc_base_device::vt3xx_4155_latch_r(offs_t offset)
+{
+	const u8 reg = 0x05 + offset;
+	logerror("%s: vt3xx_415x_latch_r %02x\n", machine().describe_context(), reg);
+	return m_415x_gpio[reg];
+}
+
+void vt3xx_soc_base_device::vt3xx_4155_latch_w(offs_t offset, u8 data)
+{
+	const u8 reg = 0x05 + offset;
+	logerror("%s: vt3xx_415x_latch_w %02x %02x\n", machine().describe_context(), reg, data);
+	m_415x_gpio[reg] = data;
+}
+
+u8 vt3xx_soc_base_device::vt3xx_415a_latch_r(offs_t offset)
+{
+	const u8 reg = 0x0a + offset;
+	logerror("%s: vt3xx_415x_latch_r %02x\n", machine().describe_context(), reg);
+	return m_415x_gpio[reg];
+}
+
+void vt3xx_soc_base_device::vt3xx_415a_latch_w(offs_t offset, u8 data)
+{
+	const u8 reg = 0x0a + offset;
+	logerror("%s: vt3xx_415x_latch_w %02x %02x\n", machine().describe_context(), reg, data);
+	m_415x_gpio[reg] = data;
+}
+
+u8 vt3xx_soc_base_device::vt3xx_41e4_latch_r(offs_t offset)
+{
+	const u8 reg = 0x04 + offset;
+	logerror("%s: vt3xx_41ex_latch_r %02x\n", machine().describe_context(), reg);
+	return m_41ex_gpio[reg];
+}
+
+void vt3xx_soc_base_device::vt3xx_41e4_latch_w(offs_t offset, u8 data)
+{
+	const u8 reg = 0x04 + offset;
+	logerror("%s: vt3xx_41ex_latch_w %02x %02x\n", machine().describe_context(), reg, data);
+	m_41ex_gpio[reg] = data;
+}
+
+u8 vt3xx_soc_base_device::vt3xx_41e6_latch_r()
+{
+	logerror("%s: vt3xx_41ex_latch_r 06\n", machine().describe_context());
+	return m_41ex_gpio[0x06];
+}
+
+void vt3xx_soc_base_device::vt3xx_41e6_latch_w(u8 data)
+{
+	logerror("%s: vt3xx_41ex_latch_w 06 %02x (external banking?)\n", machine().describe_context(), data);
+	m_41ex_gpio[0x06] = data;
+	m_41e6_write_cb(data);
+}
+
+u8 vt3xx_soc_base_device::vt3xx_41e7_latch_r(offs_t offset)
+{
+	const u8 reg = 0x07 + offset;
+	logerror("%s: vt3xx_41ex_latch_r %02x\n", machine().describe_context(), reg);
+
+	if (m_36pcase_gpio_enabled && (reg == 0x07))
+		return (m_41ex_gpio[reg] & 0xe3) | ((vt3xx_36pcase_gpio_bus_r() >> 3) & 0x1c);
+
+	return m_41ex_gpio[reg];
+}
+
+void vt3xx_soc_base_device::vt3xx_41e7_latch_w(offs_t offset, u8 data)
+{
+	const u8 reg = 0x07 + offset;
+	logerror("%s: vt3xx_41ex_latch_w %02x %02x\n", machine().describe_context(), reg, data);
+
+	const u8 old = m_41ex_gpio[reg];
+	m_41ex_gpio[reg] = data;
+
+	if (m_36pcase_gpio_enabled && (reg == 0x0b) && !BIT(old, 4) && BIT(data, 4))
+		vt3xx_36pcase_gpio_advance_response();
+}
 
 void vt3xx_soc_base_device::update_timer()
 {
@@ -698,6 +955,43 @@ void vt3xx_soc_base_device::vt369_411e_w(u8 data)
 	m_411e_write_cb(data);
 }
 
+u8 vt3xx_soc_base_device::vt3xx_411f_status_r()
+{
+	logerror("%s: vt3xx_411f_status_r %02x\n", machine().describe_context(), m_411f);
+	return m_411f;
+}
+
+void vt3xx_soc_base_device::vt3xx_411f_w(u8 data)
+{
+	logerror("%s: vt3xx_411f_w %02x\n", machine().describe_context(), data);
+	m_411f = data;
+}
+
+void vt3xx_soc_base_device::vt3xx_412d_w(u8 data)
+{
+	logerror("%s: vt3xx_412d_w %02x\n", machine().describe_context(), data);
+}
+
+void vt3xx_soc_base_device::vt3xx_4158_w(u8 data)
+{
+	logerror("%s: vt3xx_4158_w %02x\n", machine().describe_context(), data);
+}
+
+void vt3xx_soc_base_device::vt3xx_4165_w(u8 data)
+{
+	logerror("%s: vt3xx_4165_w %02x\n", machine().describe_context(), data);
+}
+
+void vt3xx_soc_base_device::vt3xx_2102_w(u8 data)
+{
+	logerror("%s: vt3xx_2102_w %02x\n", machine().describe_context(), data);
+}
+
+void vt3xx_soc_base_device::vt3xx_4304_w(u8 data)
+{
+	logerror("%s: vt3xx_4304_w %02x\n", machine().describe_context(), data);
+}
+
 
 void vt3xx_soc_base_device::vt369_4112_bank6000_select_w(u8 data)
 {
@@ -782,14 +1076,18 @@ void vt3xx_soc_base_device::device_start()
 	m_6000_ram.resize(0x2000);
 	m_bank6000 = 0;
 	m_bank6000_enable = 0;
+	m_411f = 0;
 
 	m_sound_timer = timer_alloc(FUNC(vt3xx_soc_base_device::sound_timer_expired), this);
+	m_36pcase_lcdc_nmi_timer = timer_alloc(FUNC(vt3xx_soc_base_device::assert_36pcase_lcdc_nmi), this);
+	m_36pcase_deferred_oam_dma_timer = timer_alloc(FUNC(vt3xx_soc_base_device::flush_36pcase_deferred_oam_dma), this);
 
 	save_item(NAME(m_timerperiod));
 	save_item(NAME(m_timercontrol));
 	save_item(NAME(m_6000_ram));
 	save_item(NAME(m_bank6000));
 	save_item(NAME(m_bank6000_enable));
+	save_item(NAME(m_411f));
 	save_item(NAME(m_alu_params));
 	save_item(NAME(m_sound_adder_addr));
 	save_item(NAME(m_sound_adder_result));
@@ -803,7 +1101,18 @@ void vt3xx_soc_base_device::device_start()
 	save_item(NAME(m_414x_port_direction));
 	save_item(NAME(m_414a_port_data));
 	save_item(NAME(m_414b_port_data));
-
+	save_item(NAME(m_414x_gpio));
+	save_item(NAME(m_415x_gpio));
+	save_item(NAME(m_41ex_gpio));
+	save_item(NAME(m_36pcase_gpio_write_history));
+	save_item(NAME(m_36pcase_gpio_response));
+	save_item(NAME(m_36pcase_gpio_response_pos));
+	save_item(NAME(m_36pcase_gpio_response_len));
+	save_item(NAME(m_36pcase_deferred_oam_dma_src));
+	save_item(NAME(m_36pcase_deferred_oam_dma_dst));
+	save_item(NAME(m_36pcase_deferred_oam_dma_len));
+	save_item(NAME(m_36pcase_deferred_oam_dma_count));
+	save_item(NAME(m_36pcase_deferred_oam_dma_next));
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x3c00, 0x3fff, read8sm_delegate(*this, FUNC(vt3xx_soc_base_device::vt3xx_palette_r)), write8sm_delegate(*this, FUNC(vt3xx_soc_base_device::vt3xx_palette_w)));
 }
 
@@ -817,6 +1126,7 @@ void vt3xx_soc_base_device::device_reset()
 
 	m_timerperiod = 0;
 	m_timercontrol = 0;
+	m_411f = 0;
 
 	m_sound_adder_addr[0] = 0;
 	m_sound_adder_addr[1] = 0;
@@ -831,6 +1141,8 @@ void vt3xx_soc_base_device::device_reset()
 		m_sound_dac[i] = 0;
 
 	m_sound_timer->adjust(attotime::never);
+	m_36pcase_lcdc_nmi_timer->adjust(attotime::never);
+	m_36pcase_deferred_oam_dma_timer->adjust(attotime::never);
 
 	m_415x_port_direction = 0x00;
 	m_4152_port_data = 0x00;
@@ -838,6 +1150,20 @@ void vt3xx_soc_base_device::device_reset()
 	m_414x_port_direction = 0x00;
 	m_414a_port_data = 0x00;
 	m_414b_port_data = 0x00;
+
+	for (int i = 0; i < 0x10; i++)
+	{
+		m_414x_gpio[i] = 0x00;
+		m_415x_gpio[i] = 0x00;
+		m_41ex_gpio[i] = 0x00;
+	}
+
+	m_36pcase_gpio_write_history[0] = 0xff;
+	m_36pcase_gpio_write_history[1] = 0xff;
+	m_36pcase_gpio_response_pos = 0;
+	m_36pcase_gpio_response_len = 0;
+	m_36pcase_deferred_oam_dma_count = 0;
+	m_36pcase_deferred_oam_dma_next = 0;
 }
 
 
@@ -862,15 +1188,12 @@ void vt3xx_soc_base_device::vt369_41bx_w(offs_t offset, u8 data)
 }
 
 
-u8 vt3xx_soc_base_device::vt369_414f_r()
-{
-	logerror("%s: vt369_414f_r (unknown)\n", machine().describe_context());
-	return 0xff;
-}
-
 u8 vt3xx_soc_base_device::vt369_415c_r()
 {
 	logerror("%s: vt369_415c_r (unknown - important)\n", machine().describe_context());
+	if (m_36pcase_gpio_enabled)
+		return 0x10;
+
 	// returning 0x00 allows zonefusn and lexi30 (and many other lexibook sets) to show menus, but stops sealvt from showing anything
 	// returning 0xff allows sealvt to show the boot screen
 	// 0xf0 allows all those to boot?

@@ -178,16 +178,21 @@ public:
 	u8 extvidreg_201c_r(offs_t offset);
 	u8 extvidreg_201d_r(offs_t offset);
 	u8 extvidreg_201e_r(offs_t offset);
+	u8 lightgun1_y_2024_r();
 	u8 tilebases_202x_r(offs_t offset);
 
 	void extvidreg_201c_w(offs_t offset, u8 data);
 	void extvidreg_201d_w(offs_t offset, u8 data);
 	void extvidreg_201e_w(offs_t offset, u8 data);
+	void extvidreg_201f_w(u8 data);
+	void lightgun1_y_2024_w(u8 data);
 	void tilebases_202x_w(offs_t offset, u8 data);
 	void lcdc_regs_w(offs_t offset, u8 data);
+	void lcdc_2050_w(u8 data);
 
 	u8 spritehigh_2008_r() { return m_2008_spritehigh; }
 	void spritehigh_2008_w(u8 data) { m_2008_spritehigh = data; logerror("%s: spritehigh_2008_w %02x\n", machine().describe_context(), data); }
+	virtual void write(offs_t offset, u8 data) override;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -196,6 +201,7 @@ protected:
 private:
 	virtual void read_tile_plane_data(int address, int color) override;
 	virtual void shift_tile_plane_data(u8 &pix) override;
+	virtual void draw_background(u8 *line_priority) override;
 	virtual void draw_sprites(u8 *line_priority) override;
 	u8 vt3xx_palette_r(offs_t offset);
 	void vt3xx_palette_w(offs_t offset, u8 data);
@@ -215,6 +221,9 @@ private:
 
 	u8 m_204x_screenregs[0xa];
 	u8 m_2008_spritehigh;
+	u8 m_201f_ext;
+	u8 m_2024_lightgun1_y;
+	u8 m_2050_lcdc;
 };
 
 
