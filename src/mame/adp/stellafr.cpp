@@ -231,7 +231,7 @@ private:
 	uint8_t m_anz2;
 	uint8_t m_mux2;
 	uint8_t m_strobe;
-	uint8_t m_anz_bank;
+	uint16_t m_anz1_bank[8];
 
 	uint8_t mux_r();
 	void enable_w(uint8_t data);
@@ -290,9 +290,11 @@ void stellafr_state::lamps_w(bool second)
 
 void stellafr_state::anzeigen_w()
 {
-	if (m_anz_bank < m_digits.size())
-		m_digits[m_anz_bank] = m_anz1;
-	m_anz_bank++;
+	for (uint8_t i = 0; i < 8; i++)
+	{
+		m_anz1_bank[i] = (m_anz1_bank[i] << 1) | BIT(m_anz1, i);
+	}
+	
 }
 
 void stellafr_state::service_w()
@@ -302,9 +304,6 @@ void stellafr_state::service_w()
 
 void stellafr_state::enable_w(uint8_t data)
 {
-	if (!BIT(data, U5_ENMUX1) && BIT(m_strobe, U5_ENMUX1))
-		m_anz_bank = 0;
-
 	if (BIT(data, U5_ENMUX1) && !BIT(m_strobe, U5_ENMUX1))
 		lamps_w(false); //main lamps out
 
@@ -398,14 +397,13 @@ void stellafr_state::machine_start()
 {
 	save_item(NAME(m_mux1));
 	save_item(NAME(m_strobe));
-	save_item(NAME(m_anz_bank));
+	save_item(NAME(m_anz1_bank));
 }
 
 void stellafr_state::machine_reset()
 {
 	m_mux1 = 0;
 	m_strobe = 0;
-	m_anz_bank = 0;
 }
 
 static INPUT_PORTS_START( stellafr )
