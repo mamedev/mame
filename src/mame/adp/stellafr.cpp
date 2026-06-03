@@ -197,6 +197,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
+		m_aysnd(*this, "aysnd"),
 		m_dac(*this, "dac"),
 		m_digits(*this, "digit%u", 0U),
 		m_lamps(*this, "lamp%u", 0U),
@@ -214,6 +215,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
+	required_device<ay8910_device> m_aysnd;
 	required_device<ad7224_device> m_dac;
 	output_finder<8> m_digits;
 	output_finder<128> m_lamps;
@@ -344,8 +346,8 @@ void stellafr_state::mem_map_steuereinheit(address_map &map)
 	// Y2 graphics board
 	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::enable_w)); // Y3 En out
 	map(0x800100, 0x800101).rw(FUNC(stellafr_state::mux_r), FUNC(stellafr_state::mux_w)); // Y4 SP/ME out / Inputs
-	map(0x800141, 0x800141).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)); // Y5
-	map(0x800143, 0x800143).w("aysnd", FUNC(ay8910_device::data_w)); // Y5
+	map(0x800141, 0x800141).rw(m_aysnd, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)); // Y5
+	map(0x800143, 0x800143).w(m_aysnd, FUNC(ay8910_device::data_w)); // Y5
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff); // Y6
 	// Y7 NC
 }
@@ -407,10 +409,10 @@ void stellafr_state::sus_tk(machine_config &config)
 	AD7224(config, m_dac, 0);
 
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1'000'000));
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.85);
-	aysnd.port_a_read_callback().set_ioport("IN0");
-	aysnd.port_b_write_callback().set(FUNC(stellafr_state::ay8910_portb_w));
+	AY8910(config, m_aysnd, 3'686'400 / 2);
+	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.85);
+	m_aysnd->port_a_read_callback().set_ioport("IN0");
+	m_aysnd->port_b_write_callback().set(FUNC(stellafr_state::ay8910_portb_w));
 }
 
 void stellafr_state::sus_rtc(machine_config &config)
@@ -430,10 +432,10 @@ void stellafr_state::sus_rtc(machine_config &config)
 	AD7224(config, m_dac, 0);
 
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1'000'000));
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.85);
-	aysnd.port_a_read_callback().set_ioport("IN0");
-	aysnd.port_b_write_callback().set(FUNC(stellafr_state::ay8910_portb_w));
+	AY8910(config, m_aysnd, 3'686'400 / 2);
+	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.85);
+	m_aysnd->port_a_read_callback().set_ioport("IN0");
+	m_aysnd->port_b_write_callback().set(FUNC(stellafr_state::ay8910_portb_w));
 }
 
 ROM_START( actionf2 )
