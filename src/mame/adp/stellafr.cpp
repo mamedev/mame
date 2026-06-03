@@ -94,6 +94,7 @@ Connectors:
 #include "machine/mc68681.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
+#include "machine/timekpr.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "speaker.h"
@@ -196,7 +197,6 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
-		m_nvram(*this, "nvram"),
 		m_dac(*this, "dac"),
 		m_digits(*this, "digit%u", 0U),
 		m_lamps(*this, "lamp%u", 0U),
@@ -214,7 +214,6 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
-	required_device<nvram_device> m_nvram;
 	required_device<ad7224_device> m_dac;
 	output_finder<8> m_digits;
 	output_finder<128> m_lamps;
@@ -355,7 +354,8 @@ void stellafr_state::mem_map_tk(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	mem_map_steuereinheit(map);
-	map(0xff0000, 0xffffff).ram().share("nvram");
+	map(0xff0000, 0xffffff).ram().share("timekeeper").umask16(0x00ff);
+	map(0xff0000, 0xffffff).ram().share("zeropower").umask16(0xff00);
 }
 
 void stellafr_state::mem_map_rtc(address_map &map)
@@ -401,7 +401,8 @@ void stellafr_state::sus_tk(machine_config &config)
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2); // ?
 	m_duart->outport_cb().set(FUNC(stellafr_state::duart_output_w));
 
-	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
+	MK48T08(config, "timekeeper");
+	MK48T08(config, "zeropower");
 
 	AD7224(config, m_dac, 0);
 
@@ -422,7 +423,7 @@ void stellafr_state::sus_rtc(machine_config &config)
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2); // ?
 	m_duart->outport_cb().set(FUNC(stellafr_state::duart_output_w));
 
-	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	MSM6242(config, "rtc", XTAL(32'768));
 
