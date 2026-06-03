@@ -1006,10 +1006,6 @@ macro   check_interrupts
 	} else if (m_irq_state != CLEAR_LINE && m_iff1 && !get_service_attention<SA_AFTER_EI>()) { // SA_IRQ_ON
 		@take_interrupt
 	}
-	// In case NMI happened during IRQ Ack, we need to process it, not postpone check until next instruction
-	if (get_service_attention<SA_NMI_PENDING>()) {
-		@take_nmi
-	}
 
 macro   nsc800_take_interrupt
 	// Check if processor was halted
@@ -1043,10 +1039,6 @@ macro   nsc800:check_interrupts
 		@nsc800_take_interrupt
 	} else if (m_irq_state != CLEAR_LINE && m_iff1 && !get_service_attention<SA_AFTER_EI>()) { // SA_IRQ_ON
 		@take_interrupt
-	}
-	// In case NMI happened during IRQ Ack, we need to process it, not postpone check until next instruction
-	if (get_service_attention<SA_NMI_PENDING>()) {
-		@take_nmi
 	}
 
 
