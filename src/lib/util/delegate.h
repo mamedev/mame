@@ -599,11 +599,11 @@ using delegate_mfp_conventional_return = std::bool_constant<
 template <typename ReturnType>
 struct delegate_mfp;
 
-template <typename ReturnType>
-struct delegate_mfp<ReturnType> requires delegate_mfp_conventional_return<ReturnType>::value { using type = delegate_mfp_msvc; };
+template <typename ReturnType> requires delegate_mfp_conventional_return<ReturnType>::value
+struct delegate_mfp<ReturnType> { using type = delegate_mfp_msvc; };
 
-template <typename ReturnType>
-struct delegate_mfp<ReturnType> requires (!delegate_mfp_conventional_return<ReturnType>::value) { using type = delegate_mfp_compatible; };
+template <typename ReturnType> requires (!delegate_mfp_conventional_return<ReturnType>::value)
+struct delegate_mfp<ReturnType> { using type = delegate_mfp_compatible; };
 
 #endif
 
