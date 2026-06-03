@@ -33,7 +33,6 @@ TODO:
  - venom    : gfx glitches on second level
  - wldgunsb : remove hack for continue counter (values at 0x781010 and 0x781012 are expected to be initialized on reset/boot)
  - piratdwb : is coinage supposed to be configurable?
- - issdxb: protection simulation, inputs
 
 ***************************************************************************
 
@@ -514,10 +513,11 @@ void snesb_state::issdxb_map(address_map &map)
 {
 	extrainp_map(map);
 
-	// TODO: protection emulation
-
+	map(0x5b0956, 0x5b0956).lr8(NAME([]() { return 0xd3; }));
+	map(0x5b134a, 0x5b134a).lr8(NAME([]() { return 0x69; }));
+	map(0x5b2c8f, 0x5b2c8f).lr8(NAME([]() { return 0xb6; }));
 	map(0x6a6d1d, 0x6a6d1d).r(FUNC(snesb_state::prot_cnt_r));
-	map(0x781000, 0x78100f).ram().share(m_shared_ram[0]);
+	map(0x781000, 0x781013).ram().share(m_shared_ram[0]);
 }
 
 
@@ -1092,6 +1092,51 @@ static INPUT_PORTS_START( piratdwb )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(snesb_state::piratdwb_coin_w), 0)
 INPUT_PORTS_END
 
+// verified from 5A22 code
+static INPUT_PORTS_START( issdxb )
+	PORT_INCLUDE(snes_common)
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            // duplicate setting
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x05, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( Very_Easy ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hardest ) ) // duplicate settings
+	PORT_DIPSETTING(    0x01, DEF_STR( Hardest ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x18, 0x10, "Time" )
+	PORT_DIPSETTING(    0x18, "3 Minutes" )
+	PORT_DIPSETTING(    0x10, "5 Minutes" )
+	PORT_DIPSETTING(    0x08, "7 Minutes" )
+	PORT_DIPSETTING(    0x00, "7 Minutes" ) // duplicate setting
+	PORT_DIPNAME( 0x20, 0x20, "Sound" )
+	PORT_DIPSETTING(    0x20, "Stereo" )
+	PORT_DIPSETTING(    0x00, "Mono" )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+INPUT_PORTS_END
 
 void snesb_state::base(machine_config &config)
 {
@@ -2033,4 +2078,4 @@ GAME( 1997, rushbets,     0,        rushbets,     legendsb, snesb_state, init_ru
 GAME( 1997, venom,        0,        venom,        venom,    snesb_state, init_venom,     ROT0, "bootleg",         "Venom & Spider-Man - Separation Anxiety (SNES bootleg)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, wldgunsb,     0,        wldgunsb,     wldgunsb, snesb_state, init_wldgunsb,  ROT0, "bootleg",         "Wild Guns (SNES bootleg)",                                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based off Japanese version
 GAME( 1996, piratdwb,     0,        piratdwb,     piratdwb, snesb_state, init_piratdwb,  ROT0, "bootleg (Conny)", "The Pirates of Dark Water (SNES bootleg)",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, issdxb,       0,        issdxb,       venom,    snesb_state, init_issdxb,    ROT0, "bootleg",         "International Superstar Soccer Deluxe (SNES bootleg)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, issdxb,       0,        issdxb,       issdxb,   snesb_state, init_issdxb,    ROT0, "bootleg",         "International Superstar Soccer Deluxe (SNES bootleg)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
