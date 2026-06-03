@@ -42835,10 +42835,11 @@ renju
 
 @source:seta/speedatk.cpp
 daifugo
+hana6
+hana6bl
 hanaren2
 harashi
 speedatk
-unkalba
 
 @source:seta/speglsht.cpp
 speglsht
