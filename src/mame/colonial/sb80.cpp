@@ -114,7 +114,6 @@ private:
 	void unboot_w(uint8_t data);
 	void dsel_w(uint8_t data);
 	void fdc_drq_w(int state);
-	TIMER_CALLBACK_MEMBER(nmi_assert_tick);
 
 	required_device<z80_device>           m_maincpu;
 	required_region_ptr<uint8_t>          m_bootrom;
@@ -128,9 +127,6 @@ private:
 	required_device<com8116_device>       m_brg;
 
 	bool      m_boot_active = true;
-	emu_timer *m_nmi_assert_timer = nullptr;
-	attotime  m_drq_drop_time = attotime::zero;
-	bool      m_nmi_assert_pending = false;
 };
 
 
@@ -211,68 +207,10 @@ void sb80_state::dsel_w(uint8_t data)
 
 // DRQ -> Z80 /NMI: the boot ROM's NMI handler at $0066 does EXAF / EXX /
 // INI / EXX / EXAF / RETN for one byte per DRQ.  After the boot ROM banks
-// out, the CBIOS replaces the $0066 vector with its own equivalent (the
-// EXAF/EXX dance assumes atomic per-byte dispatch -- there's no protection
-// against re-entry).
-//
-// Workaround for the MAME-side nested-NMI bug (see the CTC-cascade TODO
-// above and mamedev/mame issue #15416): if a DRQ rising edge would arrive
-// less than `nmi_settle` after the previous falling edge, defer the NMI
-// line assertion via a timer.  That gap is what the FDC's next set_drq()
-// can take to fire after the host's data_r drops drq -- in MAME the next
-// rising edge can land within a microsecond or two of the falling edge,
-// which is shorter than the BIOS NMI handler's ~12 us total execution
-// time.  Real WD1793 pipeline silicon guarantees one byte-time of spacing
-// between rising edges; until the upstream wd_fdc fix lands, we close the
-// equivalent window here.
-//
-// 6 us is the empirically-tuned threshold: it's enough to cover the
-// post-data_r tail of the BIOS handler (EXX/EXAF/RETN ~= 5.5 us at
-// 4 MHz at the BIOS handler's instruction sequence) and short enough
-// that, when the FDC is firing bytes at 25 us per byte at MFM 500 kbps,
-// the deferred assertion still lands well before the next byte
-// boundary -- no spurious LOST_DATA.  Tested at 8 us and observed the
-// FDC raising LOST_DATA after the workaround pushed valid NMI service
-// just past byte boundaries on CTC-INT-preempted byte arrivals; 6 us
-// is the sweet spot where the nested-NMI window is closed without
-// over-deferring legitimate dispatches.
+// out, the CBIOS replaces the $0066 vector with its own equivalent.
 void sb80_state::fdc_drq_w(int state)
 {
-	if (state)
-	{
-		// Rising edge.  Check whether we're inside the settle window.
-		attotime now = machine().time();
-		if (!m_drq_drop_time.is_zero()
-		    && (now - m_drq_drop_time) < attotime::from_usec(6))
-		{
-			m_nmi_assert_pending = true;
-			m_nmi_assert_timer->adjust(attotime::from_usec(6) - (now - m_drq_drop_time));
-			return;
-		}
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	}
-	else
-	{
-		// Falling edge.  Clear NMI and cancel any pending deferred assert
-		// (the chip won't have anything ready for the host until the next
-		// byte boundary, which is well past our settle window).
-		if (m_nmi_assert_pending)
-		{
-			m_nmi_assert_timer->reset();
-			m_nmi_assert_pending = false;
-		}
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		m_drq_drop_time = machine().time();
-	}
-}
-
-TIMER_CALLBACK_MEMBER(sb80_state::nmi_assert_tick)
-{
-	if (m_nmi_assert_pending)
-	{
-		m_nmi_assert_pending = false;
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	}
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -303,10 +241,7 @@ void sb80_state::machine_start()
 {
 	m_bootbank->configure_entry(0, &m_bootrom[0]);    // /RESET state
 	m_bootbank->configure_entry(1, &m_ram[0]);        // post-UNBOOT
-	m_nmi_assert_timer = timer_alloc(FUNC(sb80_state::nmi_assert_tick), this);
 	save_item(NAME(m_boot_active));
-	save_item(NAME(m_drq_drop_time));
-	save_item(NAME(m_nmi_assert_pending));
 }
 
 
@@ -341,33 +276,16 @@ void sb80_state::sb80(machine_config &config)
 	// yield a 40 Hz tick that drives `clock:` in the BIOS.  The cascade is
 	// a physical board trace from ch 2's ZC/TO pin to ch 3's CLK/TRG pin.
 	//
-	// The cascade exposes a MAME-side bug -- NOT a flaw in this BIOS.
-	// Real-hardware testimony from the BIOS author (the SB-80 booted
-	// reliably with this exact CBIOS + CTC cascade + WD1793 + Z80 from
-	// 04/15/84 onward, in production, no boot problems).  Per-EXX
-	// instrumentation in MAME's Z80 captured the signature: pairs of
-	// `[EXX] PC=0068 ... PC=0068 ...` -- two consecutive NMI-entry EXXs
-	// with no PC=006B (exit EXX) in between, i.e. a nested NMI
-	// dispatched before the first handler's exit EXX.  The nested EXX
-	// swaps a state that's already swapped, the inner INI reads port
-	// (caller's C, typically $00) instead of port $FF, and `$FF`
-	// garbage gets scribbled at (caller's HL) inside BIOS working
-	// memory.  For the nested NMI to happen, the second drq_cb(true)
-	// must fire while the first NMI handler is still executing -- i.e.
-	// within ~14 us of the previous data_r dropping DRQ.  Real WD1793
-	// cannot do this: the bit-decoder pipeline guarantees >= one full
-	// byte-time between successive DRQ rising edges.  MAME's wd_fdc
-	// fires set_drq() from the live-FSM at byte-boundary timing, but
-	// under heavy INT-preemption load (40 Hz CTC + tight FDC bit
-	// timing) the rising-edge spacing can fall short.  Filed upstream
-	// as mamedev/mame issue #15416.
-	//
-	// Until the wd_fdc fix lands, the driver-side workaround in
-	// fdc_drq_w() gates the NMI line transitions with a 6 us settle
-	// floor, which closes the nested-NMI window without over-deferring
-	// legitimate dispatches.  bigbord2 doesn't surface this bug
-	// because its floppy path is Z80DMA-driven, not NMI-per-byte -- so
-	// DRQ races never hit the Z80 instruction stream.
+	// The cascade exposed a MAME-side Z80 bug -- NOT a flaw in this BIOS:
+	// the SB-80 ran reliably in production with this exact CBIOS + CTC
+	// cascade + WD1793 + Z80 from 04/15/84 onward.  Under the 40 Hz CTC
+	// load a DRQ-driven /NMI that came due during a maskable IM2 interrupt
+	// acknowledge was dispatched late, compressing the next DRQ's spacing
+	// and re-entering the $0066 NMI handler -> FDC LOST_DATA on warm-boot
+	// reads.  Filed as mamedev/mame issue #15416 and fixed in the Z80 core
+	// by #15434 (NMI prioritised over a maskable INT in the ack race), so
+	// no driver-side workaround is needed.  bigbord2 doesn't surface this
+	// bug because its floppy path is Z80DMA-driven, not NMI-per-byte.
 	Z80CTC(config, m_ctc, 4_MHz_XTAL);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
