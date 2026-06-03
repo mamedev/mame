@@ -230,13 +230,17 @@ private:
 	uint16_t m_mux1;
 	uint8_t m_anz2;
 	uint8_t m_mux2;
+	uint8_t m_strobe;
+	uint8_t m_anz_bank;
 
 	uint8_t mux_r();
 	void enable_w(uint8_t data);
 	void mux_w(uint8_t data);
 	void duart_output_w(uint8_t data);
 	void ay8910_portb_w(uint8_t data);
-	void lamps_w(uint8_t row, uint16_t data);
+	void lamps_w(bool second);
+	void anzeigen_w();
+	void service_w();
 
 	void mem_map_steuereinheit(address_map &map) ATTR_COLD;
 	void mem_map_tk(address_map &map) ATTR_COLD;
@@ -270,8 +274,11 @@ uint8_t stellafr_state::mux_r()
 	return data;
 }
 
-void stellafr_state::lamps_w(uint8_t row, uint16_t data)
+void stellafr_state::lamps_w(bool second)
 {
+	uint8_t row = (m_mux1 >> 12) & 0x07;
+	uint16_t data = m_mux1 & 0x0fff;
+
 	LOG("Row %d\n",row);
 	for (int i = 0; i < 8; i++)
 	{
@@ -281,37 +288,51 @@ void stellafr_state::lamps_w(uint8_t row, uint16_t data)
 	}
 }
 
+void stellafr_state::anzeigen_w()
+{
+	if (m_anz_bank < m_digits.size())
+		m_digits[m_anz_bank] = m_anz1;
+	m_anz_bank++;
+}
+
+void stellafr_state::service_w()
+{
+	; // LOG("Service %d\n", m_ma1);
+}
+
 void stellafr_state::enable_w(uint8_t data)
 {
-	bool enma1  = BIT(data,U5_EN1MA);
-	bool enma2  = BIT(data,U5_EN2MA);
-	bool aw1    = BIT(data,U5_AW1);
-	bool aw2    = BIT(data,U5_AW2);
-	bool enanz1 = BIT(data,U5_ENANZ1); //enable 7seg
-	bool enmux1 = BIT(data,U5_ENMUX1); //enable lamps/buttons
-	bool enanz2 = BIT(data,U5_ENANZ2);
-	bool enmux2 = BIT(data,U5_ENMUX2);
+	if (!BIT(data, U5_ENMUX1) && BIT(m_strobe, U5_ENMUX1))
+		m_anz_bank = 0;
 
-	if (enma1)
-		; // LOG("1MA %d\n",m_ma1);
-	if (enma1)
-		; // LOG("ME %d\n",m_me);
-	if (enma2)
-		; // LOG("2MA %d\n",m_ma2);
-	if (enanz1)
-		; // LOG("ANZ1 %d\n",m_anz1); //main 7seg led out
-	if (enanz1)
-		; // LOG("ST %d\n",m_ma1);
-	if (enmux1)
-		lamps_w((m_mux1 >> 12) & 0x07, m_mux1 & 0x0FFF); //main lamps out
-	if (enanz2)
-		; // LOG("ANZ2 %d\n",m_anz2);
-	if (enmux2)
-		; // LOG("MUX2 %d\n",m_mux2);
-	if (aw1)
-		;
-	if (aw2)
-		;
+	if (BIT(data, U5_ENMUX1) && !BIT(m_strobe, U5_ENMUX1))
+		lamps_w(false); //main lamps out
+
+	if (BIT(data, U5_EN1MA) && !BIT(m_strobe, U5_EN1MA))
+		; // LOG("1MA %d / ME %d\n", m_ma1, m_me); //machine out 1 / coin enable
+
+	if (BIT(data, U5_EN2MA) && !BIT(m_strobe, U5_EN2MA))
+		; // LOG("2MA %d\n", m_ma2); //machine out 2
+
+	if (BIT(data, U5_ENANZ1) && !BIT(m_strobe, U5_ENANZ1))
+	{
+		anzeigen_w();
+		service_w();
+	}
+
+	if (BIT(data, U5_ENANZ2) && !BIT(m_strobe, U5_ENANZ2))
+		; // anzeigen_w(true); //second 7seg out
+
+	if (BIT(data, U5_ENMUX2) && !BIT(m_strobe, U5_ENMUX2))
+		; // lamps_w(true); //second lamps out
+
+	if (BIT(data, U5_AW1) && !BIT(m_strobe, U5_AW1))
+		; // coin unit 1 select
+
+	if (BIT(data, U5_AW2) && !BIT(m_strobe, U5_AW2))
+		; // coin unit 2 select
+
+	m_strobe = data;
 }
 
 void stellafr_state::mux_w(uint8_t data)
@@ -376,11 +397,15 @@ void stellafr_state::fc7_map(address_map &map)
 void stellafr_state::machine_start()
 {
 	save_item(NAME(m_mux1));
+	save_item(NAME(m_strobe));
+	save_item(NAME(m_anz_bank));
 }
 
 void stellafr_state::machine_reset()
 {
 	m_mux1 = 0;
+	m_strobe = 0;
+	m_anz_bank = 0;
 }
 
 static INPUT_PORTS_START( stellafr )
