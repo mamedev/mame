@@ -237,6 +237,7 @@ private:
 	void ay8910_portb_w(uint8_t data);
 	void lamps_w(uint8_t row, uint16_t data);
 
+	void mem_map_steuereinheit(address_map &map) ATTR_COLD;
 	void mem_map_tk(address_map &map) ATTR_COLD;
 	void mem_map_rtc(address_map &map) ATTR_COLD;
 	void fc7_map(address_map &map) ATTR_COLD;
@@ -336,19 +337,24 @@ void stellafr_state::ay8910_portb_w(uint8_t data)
 {
 }
 
-void stellafr_state::mem_map_tk(address_map &map)
+void stellafr_state::mem_map_steuereinheit(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();
 	// controlled by U17 74HC138
 	map(0x800001, 0x800001).w(m_dac, FUNC(dac_byte_interface::data_w)); // Y0
 	// Y1 device on cpu board
-	// Y2 device on cpu board
+	// Y2 graphics board
 	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::enable_w)); // Y3 En out
 	map(0x800100, 0x800101).rw(FUNC(stellafr_state::mux_r), FUNC(stellafr_state::mux_w)); // Y4 SP/ME out / Inputs
 	map(0x800141, 0x800141).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)); // Y5
 	map(0x800143, 0x800143).w("aysnd", FUNC(ay8910_device::data_w)); // Y5
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff); // Y6
 	// Y7 NC
+}
+
+void stellafr_state::mem_map_tk(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	mem_map_steuereinheit(map);
 	map(0xff0000, 0xffffff).ram().share("nvram");
 }
 
@@ -356,16 +362,7 @@ void stellafr_state::mem_map_rtc(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x400000, 0x40001f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	// controlled by U17 74HC138
-	map(0x800001, 0x800001).w(m_dac, FUNC(dac_byte_interface::data_w)); // Y0
-	// Y1 device on cpu board
-	// Y2 device on cpu board
-	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::mux_w)); // Y3 En out
-	map(0x800100, 0x800101).rw(FUNC(stellafr_state::mux_r), FUNC(stellafr_state::enable_w)); // Y4 SP/ME out / Inputs
-	map(0x800141, 0x800141).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)); // Y5
-	map(0x800143, 0x800143).w("aysnd", FUNC(ay8910_device::data_w)); // Y5
-	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff); // Y6
-	// Y7 NC
+	mem_map_steuereinheit(map);
 	map(0xfc0000, 0xffffff).ram().share("nvram");
 }
 
