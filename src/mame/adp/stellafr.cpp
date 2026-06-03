@@ -231,8 +231,8 @@ private:
 	uint8_t m_mux2;
 
 	uint8_t mux_r();
+	void enable_w(uint8_t data);
 	void mux_w(uint8_t data);
-	void mux2_w(uint8_t data);
 	void duart_output_w(uint8_t data);
 	void ay8910_portb_w(uint8_t data);
 	void lamps_w(uint8_t row, uint16_t data);
@@ -279,7 +279,7 @@ void stellafr_state::lamps_w(uint8_t row, uint16_t data)
 	}
 }
 
-void stellafr_state::mux_w(uint8_t data)
+void stellafr_state::enable_w(uint8_t data)
 {
 	bool enma1  = BIT(data,U5_EN1MA);
 	bool enma2  = BIT(data,U5_EN2MA);
@@ -312,7 +312,7 @@ void stellafr_state::mux_w(uint8_t data)
 		;
 }
 
-void stellafr_state::mux2_w(uint8_t data)
+void stellafr_state::mux_w(uint8_t data)
 {
 	// anz goes into one 74hc4094
 	// mux has 2 chained for lamp cols 0 - 11, 3 bits for lz encoded and EnSDAp
@@ -343,8 +343,8 @@ void stellafr_state::mem_map_tk(address_map &map)
 	map(0x800001, 0x800001).w(m_dac, FUNC(dac_byte_interface::data_w)); // Y0
 	// Y1 device on cpu board
 	// Y2 device on cpu board
-	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::mux2_w)); // Y3 SP/ME II out
-	map(0x800100, 0x800101).rw(FUNC(stellafr_state::mux_r), FUNC(stellafr_state::mux_w)); // Y4 SP/ME I out / Inputs
+	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::enable_w)); // Y3 En out
+	map(0x800100, 0x800101).rw(FUNC(stellafr_state::mux_r), FUNC(stellafr_state::mux_w)); // Y4 SP/ME out / Inputs
 	map(0x800141, 0x800141).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)); // Y5
 	map(0x800143, 0x800143).w("aysnd", FUNC(ay8910_device::data_w)); // Y5
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff); // Y6
@@ -360,8 +360,8 @@ void stellafr_state::mem_map_rtc(address_map &map)
 	map(0x800001, 0x800001).w(m_dac, FUNC(dac_byte_interface::data_w)); // Y0
 	// Y1 device on cpu board
 	// Y2 device on cpu board
-	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::mux2_w)); // Y3 SP/ME II out
-	map(0x800100, 0x800101).rw(FUNC(stellafr_state::mux_r), FUNC(stellafr_state::mux_w)); // Y4 SP/ME I out / Inputs
+	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::mux_w)); // Y3 En out
+	map(0x800100, 0x800101).rw(FUNC(stellafr_state::mux_r), FUNC(stellafr_state::enable_w)); // Y4 SP/ME out / Inputs
 	map(0x800141, 0x800141).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)); // Y5
 	map(0x800143, 0x800143).w("aysnd", FUNC(ay8910_device::data_w)); // Y5
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff); // Y6
