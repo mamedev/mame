@@ -306,9 +306,10 @@ void comebaby_state::comebaby(machine_config &config)
 	ACPI_PIIX4   (config, "pci:07.3:acpi");
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
-	ISA16_SLOT(config, "board4", "pci:07.0:isabus", isa_internal_devices, "it8671f", true).set_option_machine_config("it8671f", superio_config);
-	ISA16_SLOT(config, "isa1", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "it8671f", true).set_option_machine_config("it8671f", superio_config);
+	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	// YMF740G goes thru "pci:0c.0"
 	// Expansion slots, mapping SVGA for debugging

@@ -152,6 +152,10 @@ device:memregion(tag)
 device:ioport(tag)
     Gets an :ref:`I/O port <luascript-ref-ioport>` by tag relative to the
     device, or ``nil`` if no such I/O port exists.
+device:output(name)
+    Gets an :ref:`output proxy <luascript-ref-outputproxy>` for the output with
+    the specified name relative to the device.  Note that the output will not be
+    created if it does not exist.
 device:subdevice(tag)
     Gets a device by tag relative to the device.
 device:siblingdevice(tag)

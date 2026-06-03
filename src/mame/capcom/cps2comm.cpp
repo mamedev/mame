@@ -114,10 +114,6 @@ INPUT_PORTS_END
 
 
 
-cps2_comm_device::~cps2_comm_device()
-{
-}
-
 class cps2_comm_device::context
 {
 public:
@@ -574,6 +570,11 @@ DEFINE_DEVICE_TYPE(CAPCOM_CPS2_COMM, cps2_comm_device, "cps2comm", "Capcom CPS-2
 cps2_comm_device::cps2_comm_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, CAPCOM_CPS2_COMM, tag, owner, clock),
 	m_config(*this, "CFG")
+{
+}
+
+
+cps2_comm_device::~cps2_comm_device()
 {
 }
 

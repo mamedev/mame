@@ -184,7 +184,7 @@ void multibus_sun1_device::device_reset()
 
 void multibus_sun1_device::device_add_mconfig(machine_config &config)
 {
-	M68000(config, m_cpu);
+	M68000(config, m_cpu, 0);
 	m_cpu->set_current_mmu(this);
 	m_cpu->set_addrmap(AS_PROGRAM, &multibus_sun1_device::cpu_mem);
 

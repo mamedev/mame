@@ -43,7 +43,7 @@ public:
 	void rs232_conn_rxd_w(int state);
 
 protected:
-	exorterm155_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+	exorterm155_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

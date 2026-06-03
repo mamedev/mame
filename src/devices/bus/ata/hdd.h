@@ -44,7 +44,7 @@ public:
 	virtual void write_pdiag(int state) override { set_pdiag_in(state); }
 
 protected:
-	ide_hdd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	ide_hdd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 private:
 	// ata_hle_device_base implementation

@@ -837,7 +837,7 @@ void plus4_state::machine_reset()
 void plus4_state::plus4(machine_config &config)
 {
 	// basic machine hardware
-	M7501(config, m_maincpu);
+	M7501(config, m_maincpu, 0); // derived configurations will set clock frequency
 	m_maincpu->set_addrmap(AS_PROGRAM, &plus4_state::plus4_mem);
 	m_maincpu->read_callback().set(FUNC(plus4_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(plus4_state::cpu_w));

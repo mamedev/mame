@@ -1140,13 +1140,13 @@ void apollo_state::common(machine_config &config)
 	m_isa->drq6_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq2_w));
 	m_isa->drq7_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq3_w));
 
-	ISA16_SLOT(config, "isa1", APOLLO_ISA_TAG, apollo_isa_cards, "wdc", false); // FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "isa2", APOLLO_ISA_TAG, apollo_isa_cards, "ctape", false);
-	ISA16_SLOT(config, "isa3", APOLLO_ISA_TAG, apollo_isa_cards, "3c505", false);
-	ISA16_SLOT(config, "isa4", APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
-	ISA16_SLOT(config, "isa6", APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
-	ISA16_SLOT(config, "isa7", APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
+	ISA16_SLOT(config, "isa1", 0, m_isa, apollo_isa_cards, "wdc", false); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "isa2", 0, m_isa, apollo_isa_cards, "ctape", false);
+	ISA16_SLOT(config, "isa3", 0, m_isa, apollo_isa_cards, "3c505", false);
+	ISA16_SLOT(config, "isa4", 0, m_isa, apollo_isa_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, m_isa, apollo_isa_cards, nullptr, false);
+	ISA16_SLOT(config, "isa6", 0, m_isa, apollo_isa_cards, nullptr, false);
+	ISA16_SLOT(config, "isa7", 0, m_isa, apollo_isa_cards, nullptr, false);
 
 	SOFTWARE_LIST(config, "ctape_list").set_original("apollo_ctape");
 }

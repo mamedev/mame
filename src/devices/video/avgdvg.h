@@ -45,7 +45,7 @@ protected:
 		int status;
 	};
 
-	avgdvg_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+	avgdvg_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual void device_start() override ATTR_COLD;
 
@@ -147,7 +147,7 @@ public:
 	avg_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	avg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+	avg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual void device_start() override ATTR_COLD;
 

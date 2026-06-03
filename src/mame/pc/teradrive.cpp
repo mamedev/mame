@@ -962,14 +962,14 @@ void teradrive_state::teradrive(machine_config &config)
 
 	// FIXME: determine ISA bus clock, unverified configuration
 	// WD76C20
-	ISA16_SLOT(config, "board1", "isabus", pc_isa16_cards, "fdc_smc", true);
-	ISA16_SLOT(config, "board2", "isabus", pc_isa16_cards, "comat", true);
+	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdc_smc", true);
+	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa16_cards, "comat", true);
 	// TODO: should be ESDI built-in interface on riser with IBM WDL-330PS 3.5" HDD, not IDE
-	ISA16_SLOT(config, "board3", "isabus", pc_isa16_cards, "side116", true);
-	ISA16_SLOT(config, "board4", "isabus", pc_isa16_cards, "lpt", true);
-	ISA16_SLOT(config, "board5", "isabus", teradrive_isa_cards, "wd90c10_romless", true);
-	ISA16_SLOT(config, "board6", "isabus", teradrive_isa_cards, "bus_switch", true).set_option_machine_config("bus_switch", romdisk_config);
-	ISA16_SLOT(config, "isa1", "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "board3", 0, "isabus", pc_isa16_cards, "side116", true);
+	ISA16_SLOT(config, "board4", 0, "isabus", pc_isa16_cards, "lpt", true);
+	ISA16_SLOT(config, "board5", 0, "isabus", teradrive_isa_cards, "wd90c10_romless", true);
+	ISA16_SLOT(config, "board6", 0, "isabus", teradrive_isa_cards, "bus_switch", true).set_option_machine_config("bus_switch", romdisk_config);
+	ISA16_SLOT(config, "isa1",   0, "isabus", pc_isa16_cards, nullptr, false);
 
 	// 2.5MB is the max allowed by the BIOS (even if WD chipset can do more)
 	// TODO: pcdos5v garbles font loading with 1664K, which should be the actual default

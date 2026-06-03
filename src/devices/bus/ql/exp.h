@@ -89,13 +89,7 @@ public:
 	{
 		set_options(std::forward<T>(opts), dflt, false);
 	}
-	template <typename T>
-	ql_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: ql_expansion_slot_device(mconfig, tag, owner)
-	{
-		set_options(std::forward<T>(opts), dflt, false);
-	}
-	ql_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ql_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto ipl0l_wr_callback() { return m_write_ipl0l.bind(); }
 	auto ipl1l_wr_callback() { return m_write_ipl1l.bind(); }

@@ -19,7 +19,7 @@ public:
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 protected:
-	pvga1a_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	pvga1a_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -171,7 +171,7 @@ public:
 	virtual void ext_io_map(address_map &map) ATTR_COLD;
 
 protected:
-	wd90c31_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	wd90c31_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual space_config_vector memory_space_config() const override;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -200,7 +200,7 @@ public:
 	void localbus_if_map(address_map &map) ATTR_COLD;
 
 protected:
-	wd90c33_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	wd90c33_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
 
 DECLARE_DEVICE_TYPE(PVGA1A, pvga1a_vga_device)

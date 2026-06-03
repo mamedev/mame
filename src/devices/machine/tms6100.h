@@ -99,9 +99,9 @@ public:
 	int data_line_r();
 
 protected:
-	tms6100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+	tms6100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	void handle_command(u8 cmd);
@@ -134,7 +134,7 @@ public:
 	m58819_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 };
 

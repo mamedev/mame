@@ -909,12 +909,13 @@ void epc_state::epc(machine_config &config)
 		}
 	});
 
-	ISA8_SLOT(config, "isa1", m_isabus, epc_isa8_cards, "epc_mda", false);
-	ISA8_SLOT(config, "isa2", m_isabus, epc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa3", m_isabus, epc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa4", m_isabus, epc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa5", m_isabus, epc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa6", m_isabus, epc_isa8_cards, nullptr, false);
+	// FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa1", 0, m_isabus, epc_isa8_cards, "epc_mda", false);
+	ISA8_SLOT(config, "isa2", 0, m_isabus, epc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 0, m_isabus, epc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", 0, m_isabus, epc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa5", 0, m_isabus, epc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa6", 0, m_isabus, epc_isa8_cards, nullptr, false);
 
 	// System board has 128kB memory with parity, expansion can be achieved through the
 	// 128kB Memory Expansion Board 1090 and/or the 128kB Multifunction Board MB1080-001

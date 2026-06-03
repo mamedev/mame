@@ -26,7 +26,7 @@ class rf5c68_device : public device_t,
 public:
 	typedef device_delegate<void (int channel)> sample_end_cb_delegate;
 
-	rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	template <typename... T> void set_end_callback(T &&... args) { m_sample_end_cb.set(std::forward<T>(args)...); }
 

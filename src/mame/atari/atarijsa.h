@@ -234,7 +234,7 @@ public:
 	void jsa3_oki1_map(address_map &map) ATTR_COLD;
 protected:
 	// derived construction/destruction
-	atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock = 0);
+	atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock);
 
 public:
 	// read/write handlers

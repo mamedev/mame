@@ -528,14 +528,15 @@ void rtpc_state::ibm6150(machine_config &config)
 	m_scc->out_txdb_callback().set(port1, FUNC(rs232_port_device::write_txd));
 
 	// ISA slots
-	ISA16_SLOT(config, m_slot[0], m_isa, rtpc_isa16_cards, "fdc",      false); // slot 1: disk/diskette adapter
-	ISA16_SLOT(config, m_slot[1], m_isa, rtpc_isa16_cards, nullptr,    false); // slot 2: option
-	ISA8_SLOT(config,  m_slot[2], m_isa, rtpc_isa8_cards,  "mda",      false); // slot 3: option
-	ISA16_SLOT(config, m_slot[3], m_isa, rtpc_isa16_cards, nullptr,    false); // slot 4: option
-	ISA16_SLOT(config, m_slot[4], m_isa, rtpc_isa16_cards, nullptr,    false); // slot 5: option
-	ISA8_SLOT(config,  m_slot[5], m_isa, rtpc_isa8_cards,  "baseband", false); // slot 6: option
-	ISA16_SLOT(config, m_slot[6], m_isa, rtpc_isa16_cards, nullptr,    false); // slot 7: option
-	ISA16_SLOT(config, m_slot[7], m_isa, rtpc_isa16_cards, nullptr,    false); // slot 8: coprocessor/option
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, m_slot[0], 0, m_isa, rtpc_isa16_cards, "fdc",      false); // slot 1: disk/diskette adapter
+	ISA16_SLOT(config, m_slot[1], 0, m_isa, rtpc_isa16_cards, nullptr,    false); // slot 2: option
+	ISA8_SLOT(config,  m_slot[2], 0, m_isa, rtpc_isa8_cards,  "mda",      false); // slot 3: option
+	ISA16_SLOT(config, m_slot[3], 0, m_isa, rtpc_isa16_cards, nullptr,    false); // slot 4: option
+	ISA16_SLOT(config, m_slot[4], 0, m_isa, rtpc_isa16_cards, nullptr,    false); // slot 5: option
+	ISA8_SLOT(config,  m_slot[5], 0, m_isa, rtpc_isa8_cards,  "baseband", false); // slot 6: option
+	ISA16_SLOT(config, m_slot[6], 0, m_isa, rtpc_isa16_cards, nullptr,    false); // slot 7: option
+	ISA16_SLOT(config, m_slot[7], 0, m_isa, rtpc_isa16_cards, nullptr,    false); // slot 8: coprocessor/option
 }
 
 void rtpc_state::ibm6151(machine_config &config)
@@ -544,12 +545,13 @@ void rtpc_state::ibm6151(machine_config &config)
 	m_iocc->set_addrmap(2, &rtpc_state::iocc_pio_map<false>);
 
 	// ISA slots
-	ISA8_SLOT(config,  m_slot[0], m_isa, rtpc_isa8_cards,  "mda",      false); // slot 1: option
-	ISA16_SLOT(config, m_slot[1], m_isa, rtpc_isa16_cards, "baseband", false); // slot 2: option
-	ISA16_SLOT(config, m_slot[2], m_isa, rtpc_isa16_cards, nullptr,    false); // slot 2: option
-	ISA16_SLOT(config, m_slot[3], m_isa, rtpc_isa16_cards, nullptr,    false); // slot 4: option
-	ISA16_SLOT(config, m_slot[4], m_isa, rtpc_isa16_cards, nullptr,    false); // slot 5: coprocessor/option
-	ISA16_SLOT(config, m_slot[5], m_isa, rtpc_isa16_cards, "fdc",      false); // slot 6: disk/diskette adapter
+	// FIXME: determine ISA bus clock
+	ISA8_SLOT(config,  m_slot[0], 0, m_isa, rtpc_isa8_cards,  "mda",      false); // slot 1: option
+	ISA16_SLOT(config, m_slot[1], 0, m_isa, rtpc_isa16_cards, "baseband", false); // slot 2: option
+	ISA16_SLOT(config, m_slot[2], 0, m_isa, rtpc_isa16_cards, nullptr,    false); // slot 2: option
+	ISA16_SLOT(config, m_slot[3], 0, m_isa, rtpc_isa16_cards, nullptr,    false); // slot 4: option
+	ISA16_SLOT(config, m_slot[4], 0, m_isa, rtpc_isa16_cards, nullptr,    false); // slot 5: coprocessor/option
+	ISA16_SLOT(config, m_slot[5], 0, m_isa, rtpc_isa16_cards, "fdc",      false); // slot 6: disk/diskette adapter
 }
 
 ROM_START(ibm6150)

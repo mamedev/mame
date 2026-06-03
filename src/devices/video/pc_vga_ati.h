@@ -35,7 +35,7 @@ public:
 	auto eeprom_chip_select_out_cb() { return m_eeprom_chip_select_out.bind(); }
 
 protected:
-	ati_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	ati_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

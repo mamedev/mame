@@ -53,15 +53,7 @@ public:
 		set_options(std::forward<T>(opts), dflt, false);
 	}
 
-	comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-
-	// overload for (config, tag, opts, dflt) - no clock
-	template <typename T>
-	comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: comx_expansion_slot_device(mconfig, tag, owner)
-	{
-		set_options(std::forward<T>(opts), dflt, false);
-	}
+	comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto irq_callback() { return m_write_irq.bind(); }
 

@@ -41,7 +41,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(dip_changed);
 
 protected:
-	ie15_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	ie15_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

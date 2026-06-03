@@ -637,7 +637,8 @@ void pinball2k_state::mediagx(machine_config &config)
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
 	// VGA hook is for temp debugging aid
-	ISA16_SLOT(config, "isa1", "isa", pc_isa16_cards, "vga", false);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "isa1", 0, "isa", pc_isa16_cards, "vga", false);
 
 	RAMDAC(config, m_ramdac, m_palette);
 	m_ramdac->set_addrmap(0, &pinball2k_state::ramdac_map);

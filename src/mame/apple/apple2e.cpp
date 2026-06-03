@@ -5073,7 +5073,7 @@ void apple2e_state::apple2e_common(machine_config &config, bool enhanced, bool r
 	m_a2eauxslot->set_space(m_maincpu, AS_PROGRAM);
 	m_a2eauxslot->out_irq_callback().set(FUNC(apple2e_state::a2bus_irq_w));
 	m_a2eauxslot->out_nmi_callback().set(FUNC(apple2e_state::a2bus_nmi_w));
-	A2EAUXSLOT_SLOT(config, "aux", m_a2eauxslot, apple2eaux_cards, "ext80");   // default to an extended 80-column card
+	A2EAUXSLOT_SLOT(config, "aux", A2BUS_7M_CLOCK, m_a2eauxslot, apple2eaux_cards, "ext80");   // default to an extended 80-column card
 
 	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::default_options, nullptr);
 

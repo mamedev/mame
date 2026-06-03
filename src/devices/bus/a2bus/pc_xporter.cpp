@@ -273,8 +273,8 @@ void a2bus_pcxporter_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	ISA8_SLOT(config, "isa1", m_isabus, pc_isa8_cards, "cga", true); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", m_isabus, pc_isa8_cards, "fdc_xt", true);
+	ISA8_SLOT(config, "isa1", 0, m_isabus, pc_isa8_cards, "cga", true); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, m_isabus, pc_isa8_cards, "fdc_xt", true);
 }
 
 void a2bus_pcxporter_device::device_resolve_objects()

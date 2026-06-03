@@ -21,7 +21,7 @@ public:
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 
 protected:
-	tseng_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	tseng_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 

@@ -56,7 +56,7 @@ class device_zxbus_card_interface;
 class zxbus_slot_device : public device_t, public device_single_card_slot_interface<device_zxbus_card_interface>
 {
 public:
-	zxbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	zxbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	template <typename T, typename U>
 	zxbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, T &&zxbus_tag, U &&slot_options, const char *dflt)
@@ -65,16 +65,9 @@ public:
 		set_options(std::forward<U>(slot_options), dflt, false);
 		m_zxbus_bus.set_tag(std::forward<T>(zxbus_tag));
 	}
-	template <typename T, typename U>
-	zxbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&zxbus_tag, U &&slot_options, const char *dflt)
-		: zxbus_slot_device(mconfig, tag, owner)
-	{
-		set_options(std::forward<U>(slot_options), dflt, false);
-		m_zxbus_bus.set_tag(std::forward<T>(zxbus_tag));
-	}
 
 protected:
-	zxbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+	zxbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual void device_start() override ATTR_COLD;
 
@@ -98,7 +91,7 @@ public:
 	void add_slot(zxbus_slot_device &slot);
 
 protected:
-	zxbus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+	zxbus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual void device_start() override ATTR_COLD;
 

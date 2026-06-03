@@ -63,8 +63,8 @@ public:
 		m_keyboard(*this, "pc_keyboard")
 	{ }
 
-	void ibmpcjx(machine_config &config);
-	void ibmpcjr(machine_config &config);
+	void ibmpcjx(machine_config &config) ATTR_COLD;
+	void ibmpcjr(machine_config &config) ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;

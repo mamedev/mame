@@ -124,7 +124,7 @@ public:
 	};
 
 	// construction/destruction
-	pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <unsigned N> auto pot_r() { return m_pot_r_cb[N].bind(); }
 	auto allpot_r() { return m_allpot_r_cb.bind(); }

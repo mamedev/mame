@@ -890,7 +890,7 @@ void snk68_state::powbl(machine_config &config)
 
 	config.device_remove("upd");
 
-	MSM5205(config, "msm").add_route(ALL_OUTPUTS, "mono", 0.50); // TODO: hook this up
+	MSM5205(config, "msm", 0).add_route(ALL_OUTPUTS, "mono", 0.50); // TODO: hook this up
 }
 
 void snk68_state::streetsm(machine_config &config)

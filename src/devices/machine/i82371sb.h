@@ -72,7 +72,7 @@ public:
 	void pc_irq15_w(int state);
 
 protected:
-	i82371sb_isa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	i82371sb_isa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config & config) override;
 	virtual void device_config_complete() override;
@@ -257,7 +257,7 @@ public:
 	void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 
 protected:
-	i82371sb_ide_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	i82371sb_ide_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_config_complete() override;

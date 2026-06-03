@@ -417,10 +417,11 @@ void isbc_state::rpc86(machine_config &config)
 	rs232.dsr_handler().set(m_uart8251, FUNC(i8251_device::write_dsr));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(isbc286_terminal));
 
-	ISBX_SLOT(config, m_sbx[0], isbx_cards, nullptr);
+	// FIXME: set expansion bus clock frequency
+	ISBX_SLOT(config, m_sbx[0], 0, isbx_cards, nullptr);
 	//m_sbx[0]->mintr0().set("pic_0", FUNC(pic8259_device::ir3_w));
 	//m_sbx[0]->mintr1().set("pic_0", FUNC(pic8259_device::ir4_w));
-	ISBX_SLOT(config, m_sbx[1], isbx_cards, nullptr);
+	ISBX_SLOT(config, m_sbx[1], 0, isbx_cards, nullptr);
 	//m_sbx[1]->mintr0().set("pic_0", FUNC(pic8259_device::ir5_w));
 	//m_sbx[1]->mintr1().set("pic_0", FUNC(pic8259_device::ir6_w));
 }
@@ -526,10 +527,11 @@ void isbc_state::isbc286(machine_config &config)
 	rs232b.cts_handler().set(m_uart8274, FUNC(i8274_device::ctsb_w));
 	rs232b.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(isbc286_terminal));
 
-	ISBX_SLOT(config, m_sbx[0], isbx_cards, nullptr);
+	// FIXME: set expansion bus clock frequency
+	ISBX_SLOT(config, m_sbx[0], 0, isbx_cards, nullptr);
 	m_sbx[0]->mintr0().set("pic_1", FUNC(pic8259_device::ir3_w));
 	m_sbx[0]->mintr1().set("pic_1", FUNC(pic8259_device::ir4_w));
-	ISBX_SLOT(config, m_sbx[1], isbx_cards, nullptr);
+	ISBX_SLOT(config, m_sbx[1], 0, isbx_cards, nullptr);
 	m_sbx[1]->mintr0().set("pic_1", FUNC(pic8259_device::ir5_w));
 	m_sbx[1]->mintr1().set("pic_1", FUNC(pic8259_device::ir6_w));
 

@@ -2093,14 +2093,15 @@ void a2000_state::a2000(machine_config &config)
 	m_cpuslot->ipl7_cb().set([this](int state) { m_maincpu->set_input_line(7, state); });
 
 	// zorro2 slots
-	ZORRO2_BUS(config, m_zorro);
+	// FIXME: set Zorro bus clock frequency
+	ZORRO2_BUS(config, m_zorro, 0);
 	m_zorro->int2_handler().set(FUNC(a2000_state::zorro2_int2_w));
 	m_zorro->int6_handler().set(FUNC(a2000_state::zorro2_int6_w));
-	ZORRO2_SLOT(config, "zorro2:1", zorro2_cards, nullptr);
-	ZORRO2_SLOT(config, "zorro2:2", zorro2_cards, nullptr);
-	ZORRO2_SLOT(config, "zorro2:3", zorro2_cards, nullptr);
-	ZORRO2_SLOT(config, "zorro2:4", zorro2_cards, nullptr);
-	ZORRO2_SLOT(config, "zorro2:5", zorro2_cards, nullptr);
+	ZORRO2_SLOT(config, "zorro2:1", 0, zorro2_cards, nullptr);
+	ZORRO2_SLOT(config, "zorro2:2", 0, zorro2_cards, nullptr);
+	ZORRO2_SLOT(config, "zorro2:3", 0, zorro2_cards, nullptr);
+	ZORRO2_SLOT(config, "zorro2:4", 0, zorro2_cards, nullptr);
+	ZORRO2_SLOT(config, "zorro2:5", 0, zorro2_cards, nullptr);
 }
 
 void a2000_state::a2000n(machine_config &config)

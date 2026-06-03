@@ -84,7 +84,7 @@ public:
 	IRQ_CALLBACK_MEMBER(int_acknowledge);
 
 protected:
-	f3853_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	f3853_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
 	virtual void device_resolve_objects() override ATTR_COLD;
@@ -134,7 +134,7 @@ public:
 	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
-	f3851_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	f3851_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	devcb_read8::array<2> m_read_port;
 	devcb_write8::array<2> m_write_port;
@@ -151,7 +151,7 @@ public:
 	virtual TIMER_CALLBACK_MEMBER(timer_callback) override;
 
 protected:
-	f3856_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	f3856_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 
@@ -171,7 +171,7 @@ public:
 	virtual void write(offs_t offset, uint8_t data) override;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(F3853, f3853_device)
 DECLARE_DEVICE_TYPE(F3851, f3851_device)
 DECLARE_DEVICE_TYPE(F3856, f3856_device)

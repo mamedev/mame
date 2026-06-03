@@ -617,7 +617,8 @@ void _4enlinea_state::_4enlinea(machine_config &config)
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
 
-	ISA8_SLOT(config, "isa1", "isa", _4enlinea_isa8_cards, "4enlinea", true);
+	// FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa1", 0, "isa", _4enlinea_isa8_cards, "4enlinea", true);
 
 
 /*  6845 clock is a guess, since it's a UM6845R embedded in the UM487F.
@@ -652,7 +653,8 @@ void _4enlinea_state::k7_olym(machine_config &config)
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
 
-	ISA8_SLOT(config, "isa1", "isa", _4enlinea_isa8_cards, "4enlinea", true); // UM487F
+	// FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa1", 0, "isa", _4enlinea_isa8_cards, "4enlinea", true); // UM487F
 
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, m_ay, 14.318181_MHz_XTAL / 8); // Winbond WF19054

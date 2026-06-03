@@ -130,10 +130,11 @@ void jaleco_vj_pc_device::device_add_mconfig(machine_config &config)
 	// TODO: Should actually be pci:0a.0 but it only shows a black screen
 	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, "virgedx").set_fixed(true);
 
-	ISA16_SLOT(config, "board4", "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", [this] (device_t *device) { superio_config(*device); });
-	ISA16_SLOT(config, "isa1", "pci:07.0:isabus", isa_cards, "vj_sound", true).set_option_machine_config("vj_sound", [this] (device_t *device) { sound_config(*device); });
-	ISA16_SLOT(config, "isa2", "pci:07.0:isabus", isa_cards, nullptr, true);
-	ISA16_SLOT(config, "isa3", "pci:07.0:isabus", isa_cards, nullptr, true);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", [this] (device_t *device) { superio_config(*device); });
+	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", isa_cards, "vj_sound", true).set_option_machine_config("vj_sound", [this] (device_t *device) { sound_config(*device); });
+	ISA16_SLOT(config, "isa2",   0, "pci:07.0:isabus", isa_cards, nullptr, true);
+	ISA16_SLOT(config, "isa3",   0, "pci:07.0:isabus", isa_cards, nullptr, true);
 
 	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, "vj_ups"));
 	serport0.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd1_w));

@@ -318,7 +318,8 @@ void sis630_state::sis630(machine_config &config)
 
 	// TODO: move in MB implementations
 	// (some unsupported variants uses W83697HF, namely Gigabyte GA-6SMZ7)
-	ISA16_SLOT(config, "superio", "pci:01.0:isabus", isa_internal_devices, "it8705f", true).set_option_machine_config("it8705f", ite_superio_config);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "superio", 0, "pci:01.0:isabus", isa_internal_devices, "it8705f", true).set_option_machine_config("it8705f", ite_superio_config);
 
 	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, "microsoft_mouse"));
 	serport0.rxd_handler().set("superio:it8705f", FUNC(it8705f_device::rxd1_w));
@@ -335,6 +336,7 @@ void sis630_state::sis630(machine_config &config)
 	serport1.cts_handler().set("superio:it8705f", FUNC(it8705f_device::ncts2_w));
 
 	// TODO: AMR (Audio/modem riser) + UPT (Panel Link-TV out), assume [E]ISA compliant, needs specific slot options
+	// FIXME: determine ISA bus clock
 //  ISA16_SLOT(config, "isa1", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
 //  ISA16_SLOT(config, "isa2", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
 }

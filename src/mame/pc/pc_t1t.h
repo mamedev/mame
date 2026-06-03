@@ -23,11 +23,11 @@ protected:
 			device_type type,
 			const char *tag,
 			device_t *owner,
-			uint32_t clock = 0,
-			uint8_t databits = 0,
-			uint8_t addrbits = 0,
-			unsigned chr_stride = 0,
-			unsigned ra_stride = 0);
+			uint32_t clock,
+			uint8_t databits,
+			uint8_t addrbits,
+			unsigned chr_stride,
+			unsigned ra_stride);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;
@@ -109,9 +109,9 @@ protected:
 			device_type type,
 			const char *tag,
 			device_t *owner,
-			uint32_t clock = 0,
-			uint8_t databits = 0,
-			uint8_t addrbits = 0);
+			uint32_t clock,
+			uint8_t databits,
+			uint8_t addrbits);
 
 	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -167,9 +167,9 @@ protected:
 			device_type type,
 			const char *tag,
 			device_t *owner,
-			uint32_t clock = 0,
-			uint8_t databits = 0,
-			uint8_t addrbits = 0);
+			uint32_t clock,
+			uint8_t databits,
+			uint8_t addrbits);
 
 	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;

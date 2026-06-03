@@ -16,7 +16,7 @@ class k051649_device : public device_t,
 						public device_sound_interface
 {
 public:
-	k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void k051649_waveform_w(offs_t offset, u8 data);
 	u8 k051649_waveform_r(offs_t offset);
@@ -32,10 +32,10 @@ public:
 	void scc_map(address_map &map) ATTR_COLD;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_post_load() override;
+	virtual void device_post_load() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides

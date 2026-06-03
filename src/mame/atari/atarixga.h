@@ -22,13 +22,10 @@ public:
 
 protected:
 	// construction/destruction
-	atari_xga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0)
+	atari_xga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, type, tag, owner, clock)
 	{
 	}
-
-	virtual void device_start() override = 0;
-	virtual void device_reset() override = 0;
 
 	std::unique_ptr<uint16_t[]> m_ram; // CY7C185-45PC, only 16-Kbit used
 };

@@ -775,7 +775,7 @@ void karnov_state::karnov(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(karnov_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_karnov);
-	DECO_RMC3(config, m_palette, 1024); // xxxxBBBBGGGGRRRR with custom weighting
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 	m_palette->set_prom_region("proms");
 	m_palette->set_init("palette", FUNC(deco_rmc3_device::palette_init_proms));
 

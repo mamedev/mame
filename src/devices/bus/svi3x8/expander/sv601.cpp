@@ -26,13 +26,13 @@ void sv601_device::device_add_mconfig(machine_config &config)
 	m_slotbus->int_handler().set(FUNC(sv601_device::int_w));
 	m_slotbus->romdis_handler().set(FUNC(sv601_device::romdis_w));
 	m_slotbus->ramdis_handler().set(FUNC(sv601_device::ramdis_w));
-	SVI_SLOT(config, "0", m_slotbus, svi_slot_cards, nullptr);
-	SVI_SLOT(config, "1", m_slotbus, svi_slot_cards, nullptr);
-	SVI_SLOT(config, "2", m_slotbus, svi_slot_cards, nullptr);
-	SVI_SLOT(config, "3", m_slotbus, svi_slot_cards, nullptr);
-	SVI_SLOT(config, "4", m_slotbus, svi_slot_cards, nullptr);
-	SVI_SLOT(config, "5", m_slotbus, svi_slot_cards, nullptr);
-	SVI_SLOT(config, "6", m_slotbus, svi_slot_cards, nullptr);
+	SVI_SLOT(config, "0", DERIVED_CLOCK(1, 1), m_slotbus, svi_slot_cards, nullptr);
+	SVI_SLOT(config, "1", DERIVED_CLOCK(1, 1), m_slotbus, svi_slot_cards, nullptr);
+	SVI_SLOT(config, "2", DERIVED_CLOCK(1, 1), m_slotbus, svi_slot_cards, nullptr);
+	SVI_SLOT(config, "3", DERIVED_CLOCK(1, 1), m_slotbus, svi_slot_cards, nullptr);
+	SVI_SLOT(config, "4", DERIVED_CLOCK(1, 1), m_slotbus, svi_slot_cards, nullptr);
+	SVI_SLOT(config, "5", DERIVED_CLOCK(1, 1), m_slotbus, svi_slot_cards, nullptr);
+	SVI_SLOT(config, "6", DERIVED_CLOCK(1, 1), m_slotbus, svi_slot_cards, nullptr);
 }
 
 

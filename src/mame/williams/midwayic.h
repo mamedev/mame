@@ -32,7 +32,7 @@ public:
 	void reset_w(int state);
 
 protected:
-	midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	midway_serial_pic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -69,7 +69,7 @@ public:
 	void reset_w(int state);
 
 protected:
-	midway_serial_pic_emu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	midway_serial_pic_emu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -108,7 +108,7 @@ public:
 	void set_default_nvram(const uint8_t *nvram);
 
 protected:
-	midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	midway_serial_pic2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;

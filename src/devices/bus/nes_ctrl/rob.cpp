@@ -99,6 +99,10 @@ void nes_rob_device::output_w(offs_t offset, u8 data)
 	}
 }
 
+void nes_rob_device::device_start()
+{
+}
+
 void nes_rob_device::device_add_mconfig(machine_config &config)
 {
 	SM590(config, m_maincpu, 455_kHz_XTAL);

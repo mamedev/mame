@@ -21,7 +21,7 @@ public:
 	void sound_w(offs_t offset, uint8_t data);
 
 protected:
-	galaxian_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	galaxian_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

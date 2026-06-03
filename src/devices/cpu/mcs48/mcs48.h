@@ -515,7 +515,7 @@ public:
 	auto p0_out_cb() { return bus_out_cb(); }
 
 	// construction/destruction
-	i8021_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	i8021_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// device_execute_interface overrides
@@ -527,7 +527,7 @@ class i8022_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8022_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	i8022_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// device_execute_interface overrides
@@ -539,84 +539,84 @@ class i8035_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8035_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	i8035_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class i8048_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8048_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	i8048_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class i8648_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8648_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	i8648_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class i8748_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8748_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	i8748_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class i8039_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8039_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	i8039_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class i8049_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8049_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	i8049_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class i8749_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8749_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	i8749_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class i8040_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8040_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	i8040_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class i8050_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	i8050_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	i8050_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class mb8884_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	mb8884_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	mb8884_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class upd7751_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	upd7751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	upd7751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class m58715_device : public mcs48_cpu_device
 {
 public:
 	// construction/destruction
-	m58715_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	m58715_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
@@ -638,56 +638,56 @@ class i8041a_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8041a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	i8041a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class i8741a_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8741a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	i8741a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class i8041ah_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8041ah_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	i8041ah_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class i8741ah_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8741ah_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	i8741ah_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class i8042_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8042_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	i8042_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class i8742_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8742_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	i8742_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class i8042ah_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8042ah_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	i8042ah_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class i8742ah_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8742ah_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	i8742ah_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 

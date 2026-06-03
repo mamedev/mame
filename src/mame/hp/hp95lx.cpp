@@ -742,7 +742,8 @@ void hp95lx_state::hp95lx(machine_config &config)
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 
-	ISA8_SLOT(config, "board0", "isa", pc_isa8_cards, "com", true);
+	// FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "board0", 0, m_isabus, pc_isa8_cards, "com", true);
 
 	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270));
 	pc_kbdc.out_clock_cb().set(FUNC(hp95lx_state::keyboard_clock_w));

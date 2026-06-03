@@ -160,17 +160,10 @@ public:
 		set_options(std::forward<U>(opts), dflt, fixed);
 		m_bus.set_tag(std::forward<T>(cbus_tag));
 	}
-	template <typename T, typename U>
-	pc98_cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cbus_tag, U &&opts, const char *dflt, bool fixed = false)
-		: pc98_cbus_slot_device(mconfig, tag, owner)
-	{
-		set_options(std::forward<U>(opts), dflt, fixed);
-		m_bus.set_tag(std::forward<T>(cbus_tag));
-	}
-	pc98_cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pc98_cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	pc98_cbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	pc98_cbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 

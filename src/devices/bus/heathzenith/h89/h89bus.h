@@ -219,7 +219,7 @@ public:
 	}
 
 protected:
-	h89bus_left_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	h89bus_left_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
 	virtual void device_resolve_objects() override ATTR_COLD;
@@ -261,7 +261,7 @@ public:
 	}
 
 protected:
-	h89bus_right_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	h89bus_right_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
 	virtual void device_resolve_objects() override ATTR_COLD;
@@ -413,7 +413,7 @@ public:
 	auto out_wait_callback() { return m_out_wait_cb.bind(); }
 
 protected:
-	h89bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	h89bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;

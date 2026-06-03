@@ -29,7 +29,7 @@ public:
 	void input_kbde(int state);
 
 protected:
-	pc98_kbd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	pc98_kbd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override ATTR_COLD;

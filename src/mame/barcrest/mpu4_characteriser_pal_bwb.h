@@ -33,7 +33,7 @@ public:
 	constexpr static uint8_t bwb_chr_table_common[16] = {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x14,0x2c,0x5c,0x2c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 protected:
-	mpu4_characteriser_pal_bwb(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	mpu4_characteriser_pal_bwb(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

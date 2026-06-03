@@ -657,7 +657,7 @@ INPUT_PORTS_END
 void p1_state::poisk1(machine_config &config)
 {
 	/* basic machine hardware */
-	I8088(config, m_maincpu, 5000000);
+	I8088(config, m_maincpu, 5'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &p1_state::poisk1_map);
 	m_maincpu->set_addrmap(AS_IO, &p1_state::poisk1_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
@@ -694,11 +694,11 @@ void p1_state::poisk1(machine_config &config)
 	m_isabus->irq7_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 	m_isabus->iochrdy_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
-	// FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa1", m_isabus, p1_isa8_cards, "fdc", false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
-	ISA8_SLOT(config, "isa2", m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
-	ISA8_SLOT(config, "isa3", m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
-	ISA8_SLOT(config, "isa4", m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	// TODO: confirm ISA bus clock
+	ISA8_SLOT(config, "isa1", 5'000'000, m_isabus, p1_isa8_cards, "fdc", false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	ISA8_SLOT(config, "isa2", 5'000'000, m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	ISA8_SLOT(config, "isa3", 5'000'000, m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	ISA8_SLOT(config, "isa4", 5'000'000, m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);

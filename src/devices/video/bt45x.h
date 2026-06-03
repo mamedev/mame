@@ -177,7 +177,7 @@ public:
 	bt458_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	bt458_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	bt458_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class bt467_device : public bt458_device

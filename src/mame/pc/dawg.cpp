@@ -108,8 +108,9 @@ void dawg_state::dawg(machine_config &config)
 	ZFMICRO_USB(config, "pci:13.0");
 
 	// 2 PCI slots, 2 ISA slots
-	ISA16_SLOT(config, "isa1", "pci:12.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", "pci:12.0:isabus", pc_isa16_cards, nullptr, false);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "isa1", 0, "pci:12.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", 0, "pci:12.0:isabus", pc_isa16_cards, nullptr, false);
 }
 
 

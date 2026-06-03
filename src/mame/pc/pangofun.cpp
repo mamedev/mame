@@ -234,13 +234,14 @@ void pangofun_state::pangofun(machine_config &config)
 	m_isabus->drq6_callback().set(m_chipset, FUNC(um8498f_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_chipset, FUNC(um8498f_device::dreq7_w));
 
-	ISA16_SLOT(config, "isa1", "isabus", pc_isa16_cards, "avga1", false);
-	ISA16_SLOT(config, "isa2", "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa4", "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", "isabus", pc_isa8_cards,  nullptr, false);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "isa1", 0, m_isabus, pc_isa16_cards, "avga1", false);
+	ISA16_SLOT(config, "isa2", 0, m_isabus, pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, m_isabus, pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, m_isabus, pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, m_isabus, pc_isa8_cards,  nullptr, false);
 	// TODO: this space will be reserved to the romdisk
-	ISA16_SLOT(config, "isa6", "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa6", 0, m_isabus, pc_isa16_cards, nullptr, false);
 
 	at_kbc_device_base &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
 	keybc.hot_res().set(m_chipset, FUNC(um8498f_device::kbrst_w));

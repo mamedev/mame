@@ -66,9 +66,9 @@ public:
 	void data_w(uint8_t data);
 
 protected:
-	i8155_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	i8155_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -132,9 +132,8 @@ public:
 	i8156_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(I8155, i8155_device)
 DECLARE_DEVICE_TYPE(I8156, i8156_device)
-
 
 #endif

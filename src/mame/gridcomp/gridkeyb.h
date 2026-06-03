@@ -54,7 +54,7 @@ protected:
 			device_type type,
 			char const *tag,
 			device_t *owner,
-			u32 clock = 0);
+			u32 clock);
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void key_make(u8 row, u8 column) override;

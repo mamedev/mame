@@ -19,7 +19,7 @@ class wswan_sound_device : public device_t,
 	public device_rom_interface<14,1>
 {
 public:
-	wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void set_headphone_connected(bool headphone_connected) { m_headphone_connected = headphone_connected; }
 

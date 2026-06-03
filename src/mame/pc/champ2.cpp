@@ -164,12 +164,12 @@ void champ2_state::champ2(machine_config &config)
 	pc_kbdc.out_data_cb().set(m_mb, FUNC(at_mb_device::kbd_data_w));
 
 	// FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "isa1", "mb:isabus", pc_isa16_cards, "vga", false);
-	ISA16_SLOT(config, "isa2", "mb:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", "mb:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa4", "mb:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", "mb:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa6", "mb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "vga", false);
+	ISA16_SLOT(config, "isa2", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa6", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
 
 	RAM(config, m_ram).set_default_size("15M").set_extra_options("640K,1024K,1664K,2M,4M,8M,15M");
 

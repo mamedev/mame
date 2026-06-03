@@ -36,7 +36,7 @@ public:
 	auto so_callback() { return write_so.bind(); }
 
 protected:
-	at45db041_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	at45db041_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

@@ -614,7 +614,7 @@ public:
 	racedriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	racedriv_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	racedriv_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
@@ -639,7 +639,7 @@ public:
 	racedrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	racedrivc_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	racedrivc_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
@@ -688,7 +688,7 @@ public:
 	steeltal_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	steeltal_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	steeltal_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
@@ -736,7 +736,7 @@ public:
 	hdrivair_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	hdrivair_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	hdrivair_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;

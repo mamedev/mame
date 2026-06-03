@@ -78,7 +78,7 @@ class device_zorro2_card_interface;
 class zorro2_bus_device : public device_t, public device_memory_interface
 {
 public:
-	zorro2_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	zorro2_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto eint1_handler() { return m_eint1_handler.bind(); }
 	auto eint4_handler() { return m_eint4_handler.bind(); }
@@ -147,17 +147,17 @@ DECLARE_DEVICE_TYPE(ZORRO2_BUS, zorro2_bus_device)
 class zorro2_slot_device : public device_t, public device_single_card_slot_interface<device_zorro2_card_interface>
 {
 public:
-	zorro2_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	zorro2_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename T>
-	zorro2_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt) :
-		zorro2_slot_device(mconfig, tag, owner, 0)
+	zorro2_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt) :
+		zorro2_slot_device(mconfig, tag, owner, clock)
 	{
 		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 protected:
-	zorro2_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	zorro2_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;

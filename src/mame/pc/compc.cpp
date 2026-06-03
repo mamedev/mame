@@ -189,10 +189,10 @@ void compc_state::compc(machine_config &config)
 	pit.out_handler<2>().set(m_mb, FUNC(pc_noppi_mb_device::pc_pit8253_out2_changed));
 
 	// FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa1", "mb:isa", pc_isa8_cards, "mda", false);
-	ISA8_SLOT(config, "isa2", "mb:isa", pc_isa8_cards, "lpt", false);
-	ISA8_SLOT(config, "isa3", "mb:isa", pc_isa8_cards, "com", false);
-	ISA8_SLOT(config, "isa4", "mb:isa", pc_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "mda", false);
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
 
 	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "keyboard", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
 	pc_kbdc.out_clock_cb().set(m_mb, FUNC(pc_noppi_mb_device::keyboard_clock_w));

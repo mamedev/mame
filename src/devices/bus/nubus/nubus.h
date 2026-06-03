@@ -91,7 +91,7 @@ public:
 	const char *get_nubus_bustag() { return m_nubus_tag; }
 
 protected:
-	nubus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+	nubus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
 	virtual void device_resolve_objects() override ATTR_COLD;
@@ -180,7 +180,7 @@ public:
 	void irqe_w(int state);
 
 protected:
-	nubus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+	nubus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;

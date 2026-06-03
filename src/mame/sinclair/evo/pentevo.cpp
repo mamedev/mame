@@ -68,7 +68,7 @@ public:
 		, m_io_mouse(*this, "mouse_input%u", 1U)
 	{ }
 
-	void pentevo(machine_config &config);
+	void pentevo(machine_config &config) ATTR_COLD;
 
 protected:
 	void machine_start() override ATTR_COLD;
@@ -733,6 +733,7 @@ INPUT_PORTS_END
 void pentevo_state::pentevo(machine_config &config)
 {
 	atmtb2(config);
+
 	m_maincpu->set_addrmap(AS_IO, &pentevo_state::pentevo_io);
 	m_maincpu->set_vblank_int("screen", FUNC(pentevo_state::pentevo_interrupt));
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(pentevo_state::nmi_check_callback), attotime::from_hz(50));
@@ -758,7 +759,7 @@ void pentevo_state::pentevo(machine_config &config)
 	AT_KEYB(config, m_keyboard, pc_keyboard_device::KEYBOARD_TYPE::AT, 3);
 
 	zxbus_device &zxbus(ZXBUS(config, "zxbus"));
-	ZXBUS_SLOT(config, "zxbus1", zxbus, zxbus_cards, nullptr);
+	ZXBUS_SLOT(config, "zxbus1", X1_128_SINCLAIR / 10, zxbus, zxbus_cards, nullptr);
 }
 
 

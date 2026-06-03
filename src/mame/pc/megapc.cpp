@@ -144,17 +144,17 @@ void megapc_state::megapc(machine_config &config)
 	m_isabus->drq7_callback().set(m_wd7600, FUNC(wd7600_device::dreq7_w));
 
 	// FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "board1", "isabus", pc_isa16_cards, "fdc_smc", true);
-	ISA16_SLOT(config, "board2", "isabus", pc_isa16_cards, "comat", true);
-	ISA16_SLOT(config, "board3", "isabus", pc_isa16_cards, "ide", true);
-	ISA16_SLOT(config, "board4", "isabus", pc_isa16_cards, "lpt", true);
+	ISA16_SLOT(config, "board1", 0, m_isabus, pc_isa16_cards, "fdc_smc", true);
+	ISA16_SLOT(config, "board2", 0, m_isabus, pc_isa16_cards, "comat", true);
+	ISA16_SLOT(config, "board3", 0, m_isabus, pc_isa16_cards, "ide", true);
+	ISA16_SLOT(config, "board4", 0, m_isabus, pc_isa16_cards, "lpt", true);
 	// WD90C11A-LR
-	ISA16_SLOT(config, "board5", "isabus", pc_isa16_cards, "wd90c11_lr", true);
+	ISA16_SLOT(config, "board5", 0, m_isabus, pc_isa16_cards, "wd90c11_lr", true);
 	// TODO: motherboard ISA resource for MD portion (8-bit slot?)
 	// (doesn't share anything with base except drawing power)
 	// TODO: reuses MD sound chip as Adlib-compatible sound card
 
-	ISA16_SLOT(config, "isa1", "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa1", 0, m_isabus, pc_isa16_cards, nullptr, false);
 
 	ps2_keyboard_controller_device &keybc(PS2_KEYBOARD_CONTROLLER(config, "keybc", 12_MHz_XTAL));
 	keybc.hot_res().set("wd7600", FUNC(wd7600_device::kbrst_w));

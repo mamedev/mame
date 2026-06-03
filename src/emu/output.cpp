@@ -94,9 +94,9 @@ output_manager::output_proxy::output_proxy(device_t &device, std::string_view na
 output_manager::output_proxy &output_manager::output_proxy::operator=(output_proxy &&that) noexcept
 {
 	m_item = std::exchange(that.m_item, nullptr);
-	m_value = m_item ? m_item->get() : m_local_value;
-	m_local_value = that.m_local_value;
+	m_local_value = std::exchange(that.m_local_value, that.m_value);
 	that.m_value = that.m_local_value;
+	m_value = m_item ? m_item->get() : m_local_value;
 	return *this;
 }
 

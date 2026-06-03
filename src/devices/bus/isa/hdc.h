@@ -46,7 +46,7 @@ public:
 	bool install_rom() { return (m_type != EC1841); }
 
 protected:
-	xt_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	xt_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -114,6 +114,7 @@ class ec1841_device : public xt_hdc_device
 {
 public:
 	ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
 protected:
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;

@@ -10,7 +10,7 @@
 class multipcm_device : public gew_pcm_device
 {
 public:
-	multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void write(offs_t offset, uint8_t data);
 	uint8_t read();

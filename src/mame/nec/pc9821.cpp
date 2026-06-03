@@ -1131,6 +1131,7 @@ void pc9821_state::pc9821(machine_config &config)
 	m_pit->set_clk<1>(MAIN_CLOCK_X2);
 	m_pit->set_clk<2>(MAIN_CLOCK_X2);
 
+	// FIXME: set clock to SCKL1 clock frequency
 	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, "pc9801_86");
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_state, pc9821)
@@ -1224,8 +1225,9 @@ void pc9821_canbe_state::pc9821ce(machine_config &config)
 //  m_ram->set_extra_options("6M,8M,14M,15M");
 
 	// pc9801-86 (built-in)
+	// FIXME: set clock to SCKL1 clock frequency
 	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, nullptr);
-	PC98_CBUS_SLOT(config, "cbus:mb1", "cbus", pc98_cbus_devices, "sound_pc9821ce", true);
+	PC98_CBUS_SLOT(config, "cbus:mb1", 0, "cbus", pc98_cbus_devices, "sound_pc9821ce", true);
 
 	// 3.5 x2
 	config_floppy_35hd(config);
@@ -1252,8 +1254,9 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
 //  m_cbus[0]->set_default_option(nullptr);
+	// FIXME: set clock to SCKL1 clock frequency
 	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, nullptr);
-	PC98_CBUS_SLOT(config, "cbus:mb1", "cbus", pc98_cbus_devices, "sound_pc9821cx3", true);
+	PC98_CBUS_SLOT(config, "cbus:mb1", 0, "cbus", pc98_cbus_devices, "sound_pc9821cx3", true);
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
 	MCFG_MACHINE_RESET_OVERRIDE(pc9821_canbe_state, pc9821_canbe);

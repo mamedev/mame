@@ -262,7 +262,7 @@ public:
 	void map_io(address_space_installer &space);
 
 protected:
-	h8bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	h8bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
@@ -287,7 +287,7 @@ public:
 	void map_io(address_space_installer &space);
 
 protected:
-	h8bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	h8bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

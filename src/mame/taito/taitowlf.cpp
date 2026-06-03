@@ -605,13 +605,14 @@ void p5txla_state::p5txla(machine_config &config)
 	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
 
-	ISA16_SLOT(config, "board1", "pci:07.0:isabus", isa_internal_devices, "w83877tf", true).set_option_machine_config("w83877tf", winbond_superio_config);
-	ISA16_SLOT(config, "board2", "pci:07.0:isabus", isa_internal_devices, "p5txla_mb", true);
-	ISA16_SLOT(config, "isa1", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa4", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board1", 0, "pci:07.0:isabus", isa_internal_devices, "w83877tf", true).set_option_machine_config("w83877tf", winbond_superio_config);
+	ISA16_SLOT(config, "board2", 0, "pci:07.0:isabus", isa_internal_devices, "p5txla_mb", true);
+	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr)); // "microsoft_mouse"));
 	serport0.rxd_handler().set("board1:w83877tf", FUNC(w83877tf_device::rxd1_w));
@@ -644,7 +645,8 @@ void taitowlf_state::taitowlf(machine_config &config)
 
 	m_maincpu->set_clock(200'000'000);
 
-	ISA16_SLOT(config, "board3", "pci:07.0:isabus", isa_internal_devices, "taito_romdisk", true).set_option_machine_config("taito_romdisk", romdisk_config);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board3", 0, "pci:07.0:isabus", isa_internal_devices, "taito_romdisk", true).set_option_machine_config("taito_romdisk", romdisk_config);
 	// TODO: remove keyboard slot option
 
 	VOODOO_1_PCI(config.replace(), m_voodoo, 0, m_maincpu, m_screen);

@@ -2442,7 +2442,7 @@ void dc_state::naomi_aw_base(machine_config &config)
 	screen.set_raw(13458568*2, 820, 0, 640, 532, 0, 480);
 	screen.set_screen_update("powervr2", FUNC(powervr2_device::screen_update));
 
-	POWERVR2(config, m_powervr2);
+	POWERVR2(config, m_powervr2, 0); // FIXME: set clock so we can have a change of implementing proper timings
 	m_powervr2->set_cpu(m_maincpu);
 	m_powervr2->set_texture_ram(dc_texture_ram);
 	m_powervr2->set_framebuffer_ram(dc_framebuffer_ram);
@@ -2615,7 +2615,7 @@ void naomi2_state::naomi2(machine_config &config)
 
 void naomi2_state::naomi2_base(machine_config &config)
 {
-	POWERVR2(config, m_powervr2_slave);
+	POWERVR2(config, m_powervr2_slave, 0); // FIXME: set clock so we can have a change of implementing proper timings
 	m_powervr2_slave->set_cpu(m_maincpu);
 	m_powervr2_slave->set_texture_ram(dc_texture_ram);
 	m_powervr2_slave->set_framebuffer_ram(dc_framebuffer_ram);

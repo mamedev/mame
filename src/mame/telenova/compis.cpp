@@ -815,11 +815,12 @@ void compis_state::compis(machine_config &config)
 
 	COMPIS_GRAPHICS_SLOT(config, m_graphics, 15.36_MHz_XTAL/2, compis_graphics_cards, "hrg");
 
-	ISBX_SLOT(config, m_isbx0, isbx_cards, "fdc");
+	// FIXME: set clock to MCLK frequency
+	ISBX_SLOT(config, m_isbx0, 0, isbx_cards, "fdc");
 	m_isbx0->mintr0().set(m_osp, FUNC(i80130_device::ir1_w));
 	m_isbx0->mintr1().set(m_osp, FUNC(i80130_device::ir0_w));
 	m_isbx0->mdrqt().set(m_maincpu, FUNC(i80186_cpu_device::drq0_w));
-	ISBX_SLOT(config, m_isbx1, isbx_cards, nullptr);
+	ISBX_SLOT(config, m_isbx1, 0, isbx_cards, nullptr);
 	m_isbx1->mintr0().set(m_osp, FUNC(i80130_device::ir6_w));
 	m_isbx1->mintr1().set(m_osp, FUNC(i80130_device::ir5_w));
 	m_isbx1->mdrqt().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));

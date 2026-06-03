@@ -44,7 +44,7 @@ public:
 	void draw_raw(bitmap_ind16 &bitmap, const rectangle cliprect, const u16 *spriteram, u16 size);
 
 protected:
-	sei25x_rise1x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+	sei25x_rise1x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

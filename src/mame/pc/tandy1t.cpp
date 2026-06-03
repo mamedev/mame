@@ -857,7 +857,7 @@ void tandy1000_state::tandy1000_common(machine_config &config)
 	/* sound hardware */
 	NCR8496(config, "sn76496", XTAL(14'318'181) / 4).add_route(ALL_OUTPUTS, "mb:mono", 0.80);
 
-	isa8_slot_device &isa_fdc(ISA8_SLOT(config, "isa_fdc", "mb:isa", pc_isa8_cards, "fdc_xt", true)); // FIXME: determine ISA bus clock
+	isa8_slot_device &isa_fdc(ISA8_SLOT(config, "isa_fdc", 0, "mb:isa", pc_isa8_cards, "fdc_xt", true)); // FIXME: determine ISA bus clock
 	isa_fdc.set_option_machine_config("fdc_xt", cfg_fdc_35);
 
 	PC_LPT(config, "lpt").irq_handler().set(m_mb->m_pic8259, FUNC(pic8259_device::ir7_w));
@@ -974,7 +974,7 @@ void tandy1000_state::t1000rl(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE(tandy1000_state,tandy1000rl)
 
-	ISA8_SLOT(config, "isa_com", "mb:isa", pc_isa8_cards, "com", true);
+	ISA8_SLOT(config, "isa_com", 0, "mb:isa", pc_isa8_cards, "com", true); // FIXME: determine ISA bus clock
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
@@ -985,10 +985,10 @@ void tandy1000_state::t1000sl2(machine_config &config)
 
 	m_maincpu->set_clock(XTAL(24'000'000) / 3);
 
-	ISA8_SLOT(config, "isa1", "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa3", "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa4", "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 }
 
 void tandy1000_state::t1000tl2(machine_config &config)
@@ -1007,15 +1007,15 @@ void tandy1000_state::t1000tl2(machine_config &config)
 
 	m_ram->set_default_size("640K");
 
-	ISA8_SLOT(config, "isa_com", "mb:isa", pc_isa8_cards, "com", true);
+	ISA8_SLOT(config, "isa_com", 0, "mb:isa", pc_isa8_cards, "com", true);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	ISA8_SLOT(config, "isa1", "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa3", "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa4", "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa5", "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 }
 
 void tandy1000_state::t1000tl(machine_config &config)

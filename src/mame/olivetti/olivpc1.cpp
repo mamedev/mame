@@ -192,8 +192,9 @@ void olivpc1_state::olivpc1(machine_config &config)
 	isa.irq5_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ5);
 	isa.iochck_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	ISA8_SLOT(config, "intcga", isa, pc_isa8_cards, "cga", true);
-	ISA8_SLOT(config, "isa1", isa, pc_isa8_cards, nullptr, false);
+	// FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "intcga", 0, isa, pc_isa8_cards, "cga", true);
+	ISA8_SLOT(config, "isa1",   0, isa, pc_isa8_cards, nullptr, false);
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("128K, 256K, 384K");
 
 	SOFTWARE_LIST(config, "pc_list").set_compatible("ibm5150");

@@ -1000,9 +1000,9 @@ void myb3k_state::myb3k(machine_config &config)
 	m_isabus->drq2_callback().set("dma", FUNC(i8257_device::dreq2_w));
 	m_isabus->drq3_callback().set("dma", FUNC(i8257_device::dreq3_w));
 
-	ISA8_SLOT(config, "isa1", m_isabus, stepone_isa_cards, "myb3k_fdc4711", false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", m_isabus, stepone_isa_cards, "myb3k_com", false);
-	ISA8_SLOT(config, "isa3", m_isabus, stepone_isa_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", 0, m_isabus, stepone_isa_cards, "myb3k_fdc4711", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, m_isabus, stepone_isa_cards, "myb3k_com", false);
+	ISA8_SLOT(config, "isa3", 0, m_isabus, stepone_isa_cards, nullptr, false);
 
 	/* Centronics */
 

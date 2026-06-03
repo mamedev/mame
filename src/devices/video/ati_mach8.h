@@ -57,7 +57,7 @@ public:
 	uint16_t offset() { if(mach8.ati_mode) return mach8.ge_pitch; else return 128; }
 
 protected:
-	mach8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	mach8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual void device_start() override ATTR_COLD;
 	struct
 	{

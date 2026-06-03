@@ -20,7 +20,7 @@ public:
 	static constexpr int S64_4B = 6; // prescaler 1/64(6KHz), data 4bit
 	static constexpr int SEX_4B = 7; // VCK slave mode      , data 4bit
 
-	msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void set_prescaler_selector(int select)
 	{
@@ -50,7 +50,7 @@ public:
 protected:
 	msm5205_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 dac_bits);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;

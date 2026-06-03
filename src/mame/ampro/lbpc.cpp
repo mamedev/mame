@@ -404,7 +404,8 @@ void lbpc_state::lbpc(machine_config &config)
 	m_expbus->irq3_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ3);
 	m_expbus->iochck_callback().set(FUNC(lbpc_state::iochck_w));
 
-	ISA8_SLOT(config, "exp", m_expbus, pc_isa8_cards, "ega", false);
+	// FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "exp", 0, m_expbus, pc_isa8_cards, "ega", false);
 }
 
 

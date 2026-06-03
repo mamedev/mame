@@ -462,7 +462,7 @@ void magistr16_state::magistr16(machine_config &config)
 	// FIXME: determine ISA bus clock
 	ISA16(config, m_isabus);
 	m_isabus->set_custom_spaces();
-	ISA16_SLOT(config, "board1", "isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
+	ISA16_SLOT(config, "board1", 0, m_isabus, isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
 }
 
 
@@ -478,4 +478,3 @@ ROM_END
 } // anonymous namespace
 
 CONS( 2001, magistr16, 0, 0, magistr16, magistr16, magistr16_state, empty_init, "New Game", "Magistr16 (Russia)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-

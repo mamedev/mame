@@ -52,7 +52,7 @@ public:
 	void video_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
-	jaleco_vj_king_qtaro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	jaleco_vj_king_qtaro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

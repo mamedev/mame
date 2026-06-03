@@ -87,17 +87,10 @@ public:
 		set_options(std::forward<U>(opts), dflt, fixed);
 		m_isa_bus.set_tag(std::forward<T>(isa_tag));
 	}
-	template <typename T, typename U>
-	isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&isa_tag, U &&opts, const char *dflt, bool fixed)
-		: isa8_slot_device(mconfig, tag, owner)
-	{
-		set_options(std::forward<U>(opts), dflt, fixed);
-		m_isa_bus.set_tag(std::forward<T>(isa_tag));
-	}
-	isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	isa8_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	isa8_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -110,6 +103,7 @@ protected:
 DECLARE_DEVICE_TYPE(ISA8_SLOT, isa8_slot_device)
 
 class device_isa8_card_interface;
+
 // ======================> isa8_device
 class isa8_device : public device_t,
 					public device_memory_interface
@@ -210,7 +204,7 @@ public:
 	const address_space_config m_mem_config, m_io_config, m_mem16_config, m_io16_config;
 
 protected:
-	isa8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	isa8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	template<typename R, typename W> void install_space(int spacenum, offs_t start, offs_t end, R rhandler, W whandler);
 
@@ -290,14 +284,7 @@ public:
 		set_options(std::forward<U>(opts), dflt, fixed);
 		m_isa_bus.set_tag(std::forward<T>(isa_tag));
 	}
-	template <typename T, typename U>
-	isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&isa_tag, U &&opts, const char *dflt, bool fixed)
-		: isa16_slot_device(mconfig, tag, owner)
-	{
-		set_options(std::forward<U>(opts), dflt, fixed);
-		m_isa_bus.set_tag(std::forward<T>(isa_tag));
-	}
-	isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device_t implementation

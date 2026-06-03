@@ -675,10 +675,11 @@ void mini_chief_device::device_add_mconfig(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mini_chief_device::mini_chief_mem);
 
+	// FIXME: determine ISA bus clock
 	isa8_device &isa8(ISA8(config, ISA_BUS_TAG));
 	isa8.set_memspace(m_maincpu, AS_PROGRAM);
 	isa8.set_iospace(m_maincpu, AS_PROGRAM);
-	ISA8_SLOT(config, "isa1", ISA_BUS_TAG, mini_chief_isa8_cards, "wd1002a_wx1", false);
+	ISA8_SLOT(config, "isa1", 0, ISA_BUS_TAG, mini_chief_isa8_cards, "wd1002a_wx1", false);
 }
 
 

@@ -528,7 +528,7 @@ public:
 	void syncb_w(int state) { m_chanB->sync_w(state); }
 
 protected:
-	z80sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	z80sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
 	virtual void device_validity_check(validity_checker &valid) const override;
@@ -598,7 +598,7 @@ public:
 	uint8_t inta_r() { return m1_r(); }
 
 protected:
-	i8274_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	i8274_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -622,7 +622,7 @@ class mk68564_device : public i8274_device
 public:
 	mk68564_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void set_xtal(uint32_t clock = 0);
+	void set_xtal(uint32_t clock);
 	void set_xtal(const XTAL &clock) { set_xtal(clock.value()); }
 
 	uint8_t read(offs_t offset);

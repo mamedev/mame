@@ -140,9 +140,10 @@ void silverball_state::silverball_i440zx(machine_config &config)
 	ACPI_PIIX4   (config, "pci:07.3:acpi");
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
-	ISA16_SLOT(config, "board4", "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", i440zx_superio_config);
-	ISA16_SLOT(config, "isa1", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", i440zx_superio_config);
+	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	PCI_SLOT(config, "pci:1", pci_cards, 14, 0, 1, 2, 3, "trio64dx");
 }

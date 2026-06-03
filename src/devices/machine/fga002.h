@@ -37,16 +37,16 @@ class fga002_device :  public device_t
 
  protected:
 	// type for array of mapping of FGA registers that assembles an IRQ source
-	typedef struct {
+	struct fga_irq_t {
 		int vector;
 		int status;
 		int control;
-	} fga_irq_t;
+	};
 
 	// interrupt sources in prio order if on same interrupt level. TODO: Add all sources
 	const static fga_irq_t s_irq_sources[];
 
-	fga002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	fga002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

@@ -26,7 +26,7 @@ public:
 	static constexpr int OUTPUT_10BITS       = 10;
 	static constexpr int OUTPUT_12BITS       = 12;
 
-	okim6258_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	okim6258_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
 	void set_start_div(int div) { m_start_divider = div; }

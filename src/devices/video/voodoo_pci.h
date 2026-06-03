@@ -25,7 +25,7 @@ public:
 	void vga_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 protected:
-	voodoo_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+	voodoo_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual void map_extra(u64 memory_window_start, u64 memory_window_end, u64 memory_offset, address_space *memory_space,
 							u64 io_window_start, u64 io_window_end, u64 io_offset, address_space *io_space) override;
@@ -108,7 +108,7 @@ public:
 	voodoo_banshee_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	voodoo_banshee_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+	voodoo_banshee_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -168,7 +168,7 @@ public:
 	voodoo_3_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	voodoo_3_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+	voodoo_3_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

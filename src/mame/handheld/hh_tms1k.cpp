@@ -9153,7 +9153,9 @@ class mdndclab_state : public hh_tms1k_state
 {
 public:
 	mdndclab_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_tms1k_state(mconfig, type, tag)
+		hh_tms1k_state(mconfig, type, tag),
+		m_colwall(*this, "colwall%u%u", 1U, 1U),
+		m_rowwall(*this, "rowwall%u%u", 1U, 1U)
 	{ }
 
 	void mdndclab(machine_config &config);
@@ -9162,6 +9164,9 @@ private:
 	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
+
+	// these are used by the layout to store the presence of walls
+	output_finder<7, 8> m_colwall, m_rowwall;
 };
 
 // handlers

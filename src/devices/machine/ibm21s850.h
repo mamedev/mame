@@ -25,7 +25,7 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::COMMS; }
 
 protected:
-	ibm21s85x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	ibm21s85x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

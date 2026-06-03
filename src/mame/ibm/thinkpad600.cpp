@@ -287,7 +287,8 @@ void thinkpad600_state::thinkpad600e(machine_config &config)
 //  TODO: NeoMagic at "pci:14.0" / "pci:14.1" (video & AC'97 integrated sound, likely requires BIOS)
 
 //  TODO: motherboard Super I/O resource here
-	ISA16_SLOT(config, "board4", "pci:07.0:isabus", isa_internal_devices, "pc97338", true).set_option_machine_config("pc97338", superio_config);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "pc97338", true).set_option_machine_config("pc97338", superio_config);
 
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
 	serport0.rxd_handler().set("board4:pc97338", FUNC(pc97338_device::rxd1_w));

@@ -291,8 +291,9 @@ void ptpc110_state::ptpc110(machine_config &config)
 	m_isabus->drq6_callback().set(m_chipset, FUNC(vl82c420_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_chipset, FUNC(vl82c420_device::dreq7_w));
 
-	ISA16_SLOT(config, "board1", "isabus", pc_isa_onboard, "vga",     true);
-	ISA16_SLOT(config, "board2", "isabus", pc_isa_onboard, "superio", true).set_option_machine_config("superio", superio_config);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board1", 0, m_isabus, pc_isa_onboard, "vga",     true);
+	ISA16_SLOT(config, "board2", 0, m_isabus, pc_isa_onboard, "superio", true).set_option_machine_config("superio", superio_config);
 
 	// TODO: should not fit BIOS wise
 	ps2_keyboard_controller_device &keybc(PS2_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));

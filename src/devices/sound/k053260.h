@@ -24,7 +24,7 @@ class k053260_device : public device_t,
 					   public device_rom_interface<21>
 {
 public:
-	k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	u8 main_read(offs_t offset);
 	void main_write(offs_t offset, u8 data);
@@ -36,7 +36,7 @@ public:
 	auto tim2_cb() { return m_tim2_cb.bind(); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 	virtual void device_reset() override ATTR_COLD;

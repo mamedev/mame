@@ -98,7 +98,7 @@ public:
 	void bhlda_w(int state, int bcas);
 
 protected:
-	mikromikko2_expansion_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	mikromikko2_expansion_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 
@@ -138,7 +138,7 @@ public:
 	mikromikko2_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	mikromikko2_expansion_bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	mikromikko2_expansion_bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 

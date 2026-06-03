@@ -90,7 +90,7 @@ public:
 	uint8_t reg8_r(offs_t offset);
 
 protected:
-	phi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	phi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

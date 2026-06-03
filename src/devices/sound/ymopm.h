@@ -20,7 +20,7 @@ class ym2151_device : public ymfm_device_base<ymfm::ym2151>
 
 public:
 	// constructor
-	ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers, handled by the interface
 	auto port_write_handler() { return io_write_handler(); }

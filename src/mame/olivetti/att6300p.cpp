@@ -987,15 +987,15 @@ void att6300p_state::att6300p(machine_config &config)
 	m_isabus->drq3_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
 	m_isabus->iochck_callback().set(FUNC(att6300p_state::chck_w));
 
-	ISA8_SLOT(config, "mb1", m_isabus, pc_isa8_cards, "cga_m24", true);
-	ISA8_SLOT(config, "mb2", m_isabus, att6300p_mb_isa_devices, "fdc_6300p", true);
-	ISA8_SLOT(config, "mb3", m_isabus, pc_isa8_cards, "lpt", true);
-	ISA8_SLOT(config, "mb4", m_isabus, pc_isa8_cards, "com", true).set_option_machine_config("com", cfg_no_serial_mouse);
+	ISA8_SLOT(config, "mb1", 14.318181_MHz_XTAL / 3, m_isabus, pc_isa8_cards, "cga_m24", true);
+	ISA8_SLOT(config, "mb2", 14.318181_MHz_XTAL / 3, m_isabus, att6300p_mb_isa_devices, "fdc_6300p", true);
+	ISA8_SLOT(config, "mb3", 14.318181_MHz_XTAL / 3, m_isabus, pc_isa8_cards, "lpt", true);
+	ISA8_SLOT(config, "mb4", 14.318181_MHz_XTAL / 3, m_isabus, pc_isa8_cards, "com", true).set_option_machine_config("com", cfg_no_serial_mouse);
 
-	ISA8_SLOT(config, "isa1", m_isabus, pc_isa8_cards, "hdc", false);
-	ISA8_SLOT(config, "isa2", m_isabus, pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa3", m_isabus, pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa4", m_isabus, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", 14.318181_MHz_XTAL / 3, m_isabus, pc_isa8_cards, "hdc", false);
+	ISA8_SLOT(config, "isa2", 14.318181_MHz_XTAL / 3, m_isabus, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 14.318181_MHz_XTAL / 3, m_isabus, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", 14.318181_MHz_XTAL / 3, m_isabus, pc_isa8_cards, nullptr, false);
 
 	// The following three expansion slots can take Olivetti 16-bit boards in
 	// addition to standard 8-bit ISA boards, but they cannot take standard ISA
@@ -1019,9 +1019,9 @@ void att6300p_state::att6300p(machine_config &config)
 	// amount of possible memory should be reduced by 2M (from a max of 7M)
 	// in order to keep the system configuration legitimate.
 	//
-	ISA8_SLOT(config, "isa5", m_isabus, pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa6", m_isabus, pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa7", m_isabus, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa5", 14.318181_MHz_XTAL / 3, m_isabus, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa6", 14.318181_MHz_XTAL / 3, m_isabus, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa7", 14.318181_MHz_XTAL / 3, m_isabus, pc_isa8_cards, nullptr, false);
 
 	RAM(config, m_ram).set_default_size("1M").set_extra_options("128K, 256K, 512K, 640K, 3M, 5M, 7M");
 

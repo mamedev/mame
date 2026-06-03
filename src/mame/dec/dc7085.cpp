@@ -88,7 +88,7 @@ enum tdr_mask : u16
 	TDR_TBUF = 0x00ff, // transmitter buffer
 };
 
-dc7085_device::dc7085_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0)
+dc7085_device::dc7085_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, DC7085, tag, owner, clock)
 	, m_chan(*this, "ch%u", 0U)
 	, m_int_cb(*this)
@@ -292,7 +292,7 @@ void dc7085_device::tx_done(int state)
 	recalc_irqs();
 }
 
-dc7085_channel::dc7085_channel(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0)
+dc7085_channel::dc7085_channel(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, DC7085_CHANNEL, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, m_tx_cb(*this)

@@ -24,7 +24,7 @@ public:
 	ibm8514a_device* get_8514() { return m_8514; }
 
 protected:
-	s3vision864_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	s3vision864_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -101,7 +101,7 @@ public:
 	s3vision964_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	s3vision964_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	s3vision964_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual void device_start() override ATTR_COLD;
 };
 
@@ -111,7 +111,7 @@ public:
 	s3vision968_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	s3vision968_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	s3vision968_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual void device_start() override ATTR_COLD;
 };
 
@@ -121,7 +121,7 @@ public:
 	s3trio64_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	s3trio64_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	s3trio64_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual void device_start() override ATTR_COLD;
 };
 

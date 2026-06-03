@@ -671,8 +671,9 @@ void mdartstr_state::mdartstr(machine_config &config)
 	m_isabus->drq7_callback().set(m_chipset, FUNC(f82c836a_device::dreq7_w));
 
 	// all on one backplane
-	ISA16_SLOT(config, "board1", "isabus", pc_isa_onboard, "vga",     true);
-	ISA16_SLOT(config, "board2", "isabus", pc_isa_onboard, "boot",    true).set_option_machine_config("boot", romdisk_config);;
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa_onboard, "vga",     true);
+	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa_onboard, "boot",    true).set_option_machine_config("boot", romdisk_config);;
 
 	at_kbc_device_base &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
 	keybc.hot_res().set(m_chipset, FUNC(f82c836a_device::kbrst_w));

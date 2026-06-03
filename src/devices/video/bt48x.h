@@ -43,7 +43,7 @@ public:
 	void overlay_address_read_w(uint8_t data);
 
 protected:
-	bt481_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	bt481_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 

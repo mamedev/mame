@@ -50,7 +50,7 @@ public:
 	template <typename T> void set_dio(T &&dio_tag) { m_dio.set_tag(std::forward<T>(dio_tag)); }
 
 protected:
-	dio16_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	dio16_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
 	virtual void device_resolve_objects() override ATTR_COLD;
@@ -132,7 +132,7 @@ public:
 	void set_dmar(unsigned int index, unsigned int num, int state);
 
 protected:
-	dio16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	dio16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	void install_space(int spacenum, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 
 	// device_t implementation

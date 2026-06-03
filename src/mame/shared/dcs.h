@@ -317,7 +317,7 @@ class dcs2_audio_device : public dcs_audio_device
 {
 protected:
 	// construction/destruction
-	dcs2_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	dcs2_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -374,7 +374,7 @@ class dcs2_audio_denver_device : public dcs2_audio_device
 {
 protected:
 	// construction/destruction
-	dcs2_audio_denver_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	dcs2_audio_denver_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

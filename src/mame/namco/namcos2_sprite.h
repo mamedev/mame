@@ -43,7 +43,7 @@ public:
 	bitmap_ind16 &screen_bitmap() { return m_screenbitmap; }
 
 protected:
-	namcos2_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+	namcos2_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;

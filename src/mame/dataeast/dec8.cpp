@@ -2015,7 +2015,7 @@ void lastmisn_state::lastmisn(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shackled);
-	DECO_RMC3(config, m_palette, 1024); // xxxxBBBBGGGGRRRR with custom weighting
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(lastmisn_state,lastmisn)
 
@@ -2075,7 +2075,7 @@ void lastmisn_state::shackled(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shackled);
-	DECO_RMC3(config, m_palette, 1024); // xxxxBBBBGGGGRRRR with custom weighting
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(lastmisn_state,shackled)
 
@@ -2135,7 +2135,7 @@ void gondo_state::gondo(machine_config &config)
 	INPUT_MERGER_ALL_HIGH(config, m_nmigate).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gondo);
-	DECO_RMC3(config, m_palette, 1024); // xxxxBBBBGGGGRRRR with custom weighting
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2191,7 +2191,7 @@ void ghostb_state::garyoret(machine_config &config)
 	INPUT_MERGER_ALL_HIGH(config, m_nmigate).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gondo);
-	DECO_RMC3(config, m_palette, 1024); // xxxxBBBBGGGGRRRR with custom weighting
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(ghostb_state,garyoret)
 
@@ -2253,7 +2253,7 @@ void ghostb_state::ghostb(machine_config &config)
 	INPUT_MERGER_ALL_HIGH(config, m_nmigate).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ghostb);
-	DECO_RMC3(config, m_palette, 1024); // xxxxBBBBGGGGRRRR with custom weighting
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 	m_palette->set_prom_region("proms");
 	m_palette->set_init(m_palette, FUNC(deco_rmc3_device::palette_init_proms));
 	MCFG_VIDEO_START_OVERRIDE(ghostb_state,ghostb)
@@ -2323,7 +2323,7 @@ void csilver_state::csilver(machine_config &config)
 	m_screen->screen_vblank().set_inputline(m_subcpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shackled);
-	DECO_RMC3(config, m_palette, 1024); // xxxxBBBBGGGGRRRR with custom weighting
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(csilver_state,lastmisn)
 
@@ -2380,7 +2380,7 @@ void oscar_state::oscar(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_oscar);
-	DECO_RMC3(config, m_palette, 1024); // xxxxBBBBGGGGRRRR with custom weighting
+	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(oscar_state,oscar)
 
@@ -2441,7 +2441,7 @@ void srdarwin_state::srdarwin(machine_config &config)
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_srdarwin);
-	DECO_RMC3(config, m_palette, 144); // xxxxBBBBGGGGRRRR with custom weighting
+	DECO_RMC3(config, m_palette, 0, 144); // xxxxBBBBGGGGRRRR with custom weighting
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2504,7 +2504,7 @@ void oscar_state::cobracom(machine_config &config)
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cobracom);
-	DECO_RMC3(config, m_palette, 256); // xxxxBBBBGGGGRRRR with custom weighting
+	DECO_RMC3(config, m_palette, 0, 256); // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_VIDEO_START_OVERRIDE(oscar_state,cobracom)
 

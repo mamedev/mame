@@ -113,7 +113,7 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 			return std::make_pair(image_error::UNSUPPORTED, "Can only load TMS1670 type through software list");
 
 		memcpy(memregion("tms1k_cpu")->base(), m_cart->get_rom_base(), size);
-		m_tms1k_cpu->set_clock(375000); // approximation - RC osc. R=47K, C=47pF
+		m_tms1k_cpu->set_clock(375'000); // approximation - RC osc. R=47K, C=47pF
 
 		// init PLAs
 		size = image.get_software_region_length("rom:mpla");
@@ -141,7 +141,7 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 		if (size == 0x1100)
 			memmove(dest + 0x1e80, dest + 0x1000, 0x100);
 
-		m_hmcs40_cpu->set_clock(450000); // from main PCB
+		m_hmcs40_cpu->set_clock(450'000); // from main PCB
 	}
 
 	return std::make_pair(std::error_condition(), std::string());
@@ -293,8 +293,11 @@ INPUT_PORTS_END
 
 void sag_state::sag(machine_config &config)
 {
+	// CPU is actually in the cartridge.
+	// All possible types are instantiated stopped, and the one that's present will be started when the cartridge is loaded.
+
 	// basic machine hardware
-	HD38800(config, m_hmcs40_cpu);
+	HD38800(config, m_hmcs40_cpu, 0);
 	m_hmcs40_cpu->write_r<0>().set(FUNC(sag_state::hmcs40_write_r));
 	m_hmcs40_cpu->write_r<1>().set(FUNC(sag_state::hmcs40_write_r));
 	m_hmcs40_cpu->write_r<2>().set(FUNC(sag_state::hmcs40_write_r));
@@ -302,7 +305,7 @@ void sag_state::sag(machine_config &config)
 	m_hmcs40_cpu->write_d().set(FUNC(sag_state::hmcs40_write_d));
 	m_hmcs40_cpu->read_d().set(FUNC(sag_state::hmcs40_read_d));
 
-	TMS1670(config, m_tms1k_cpu);
+	TMS1670(config, m_tms1k_cpu, 0);
 	m_tms1k_cpu->read_k().set(FUNC(sag_state::tms1k_read_k));
 	m_tms1k_cpu->write_r().set(FUNC(sag_state::tms1k_write_r));
 	m_tms1k_cpu->write_o().set(FUNC(sag_state::tms1k_write_o));

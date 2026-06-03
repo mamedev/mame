@@ -163,10 +163,11 @@ void startouch_state::europl01(machine_config &config)
 	PCI_SLOT(config, "pci:4", pci_cards, 11, 3, 0, 1, 2, "trio64dx");
 
 	// TODO: add Med3931
-	ISA16_SLOT(config, "board4", "pci:07.0:isabus", isa_internal_devices, "superio", true).set_option_machine_config("superio", superio_config);
-	ISA16_SLOT(config, "isa1", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "superio", true).set_option_machine_config("superio", superio_config);
+	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
 	serport0.rxd_handler().set("board4:superio", FUNC(fdc37c665ir_device::rxd1_w));

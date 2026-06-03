@@ -45,7 +45,7 @@ public:
 	void pit1_2_w(int state);
 
 protected:
-	leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+	leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

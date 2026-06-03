@@ -45,7 +45,7 @@ public:
 	void inh_w(int state) { m_blank = bool(state); refresh_output(); }
 
 protected:
-	lc7580_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+	lc7580_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;

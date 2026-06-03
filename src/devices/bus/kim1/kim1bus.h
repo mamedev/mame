@@ -107,16 +107,7 @@ public:
 		set_options(std::forward<U>(opts), dflt, false);
 		m_kim1bus.set_tag(std::forward<T>(kim1bus_tag));
 	}
-	kim1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-
-	// overload for (config, tag, kim1bus_tag, opts, dflt) - no clock
-	template <typename T, typename U>
-	kim1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&kim1bus_tag, U &&opts, const char *dflt)
-		: kim1bus_slot_device(mconfig, tag, owner)
-	{
-		set_options(std::forward<U>(opts), dflt, false);
-		m_kim1bus.set_tag(std::forward<T>(kim1bus_tag));
-	}
+	kim1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	kim1bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -138,7 +129,7 @@ class kim1bus_device : public device_t
 {
 public:
 	// construction/destruction
-	kim1bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	kim1bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
 	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }

@@ -379,7 +379,7 @@ public:
 	apollo_ni(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~apollo_ni();
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return true; }
@@ -399,7 +399,7 @@ public:
 	void set_node_id_from_disk();
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -409,7 +409,7 @@ private:
 	uint32_t m_node_id = 0U;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(APOLLO_NI, apollo_ni)
 
 /*----------- video/apollo.cpp -----------*/
@@ -447,9 +447,9 @@ public:
 protected:
 	required_device<screen_device> m_screen;
 
-	apollo_graphics_15i(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	apollo_graphics_15i(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -657,13 +657,10 @@ class apollo_graphics_19i : public apollo_graphics_15i
 public:
 	apollo_graphics_19i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-
-private:
-	// internal state
 };
 
 DECLARE_DEVICE_TYPE(APOLLO_MONO19I, apollo_graphics_19i)
@@ -689,11 +686,11 @@ public:
 	auto tx_cb() { return m_tx_w.bind(); }
 
 private:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// serial overrides
+	// device_serial_interface implementation
 	virtual void rcv_complete() override; // Rx completed receiving byte
 	virtual void tra_complete() override; // Tx completed sending byte
 	virtual void tra_callback() override; // Tx send bit
@@ -712,7 +709,7 @@ private:
 	devcb_write_line m_tx_w;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(APOLLO_STDIO, apollo_stdio_device)
 #endif /* APOLLO_XXL */
 

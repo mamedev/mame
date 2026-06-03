@@ -4120,7 +4120,7 @@ void specnext_state::tbblue(machine_config &config)
 	SPECNEXT_DIVMMC(config, m_divmmc);
 
 	zxbus_device &zxbus(ZXBUS(config, "zxbus"));
-	ZXBUS_SLOT(config, "zxbus:1", zxbus, zxbus_cards, nullptr);
+	ZXBUS_SLOT(config, "zxbus:1", 28_MHz_XTAL / 8, zxbus, zxbus_cards, nullptr);
 
 	m_screen->set_raw(28_MHz_XTAL / 2, 456 << 1, 312,  { 0, (359 << 1) | 1, 0, 287 });
 	m_screen->set_screen_update(FUNC(specnext_state::screen_update));

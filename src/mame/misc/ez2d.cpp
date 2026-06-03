@@ -166,10 +166,11 @@ void ez2d_state::cubx(machine_config &config)
 	ACPI_PIIX4   (config, "pci:04.3:acpi");
 	SMBUS        (config, "pci:04.3:smbus", 0);
 
-	ISA16_SLOT(config, "board4", "pci:04.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
-	ISA16_SLOT(config, "isa1", "pci:04.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", "pci:04.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", "pci:04.0:isabus", pc_isa16_cards, nullptr, false);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board4", 0, "pci:04.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
+	ISA16_SLOT(config, "isa1",   0, "pci:04.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2",   0, "pci:04.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3",   0, "pci:04.0:isabus", pc_isa16_cards, nullptr, false);
 
 #if 0
 	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr)); // "microsoft_mouse"));

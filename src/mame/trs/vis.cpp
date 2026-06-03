@@ -1102,9 +1102,9 @@ void vis_state::vis(machine_config &config)
 	kbdc.input_buffer_full_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir1_w));
 
 	// FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "mcd", "mb:isabus", pc_isa16_cards, "mcd",      true);
-	ISA16_SLOT(config, "visaudio", "mb:isabus", vis_cards,      "visaudio", true);
-	ISA16_SLOT(config, "visvga", "mb:isabus", vis_cards,      "visvga",   true);
+	ISA16_SLOT(config, "mcd",      0, "mb:isabus", pc_isa16_cards, "mcd",      true);
+	ISA16_SLOT(config, "visaudio", 0, "mb:isabus", vis_cards,      "visaudio", true);
+	ISA16_SLOT(config, "visvga",   0, "mb:isabus", vis_cards,      "visvga",   true);
 
 	SOFTWARE_LIST(config, "cd_list").set_original("vis");
 

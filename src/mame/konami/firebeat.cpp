@@ -216,7 +216,7 @@ private:
 	int m_bars[TOTAL_CHANNELS][TOTAL_BARS]{};
 };
 
-firebeat_extend_spectrum_analyzer_device::firebeat_extend_spectrum_analyzer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+firebeat_extend_spectrum_analyzer_device::firebeat_extend_spectrum_analyzer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, KONAMI_FIREBEAT_EXTEND_SPECTRUM_ANALYZER, tag, owner, clock),
 	device_mixer_interface(mconfig, *this)
 {

@@ -599,14 +599,14 @@ void m24_state::olivetti(machine_config &config)
 	m_isabus->drq3_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
 	m_isabus->iochck_callback().set(FUNC(m24_state::chck_w));
 
-	ISA8_SLOT(config, "mb1", m_isabus, pc_isa8_cards, "cga_m24", true);
-	ISA8_SLOT(config, "mb2", m_isabus, pc_isa8_cards, "fdc_xt", true).set_option_machine_config("fdc_xt", cfg_m20_format);
-	ISA8_SLOT(config, "mb3", m_isabus, pc_isa8_cards, "lpt", true);
-	ISA8_SLOT(config, "mb4", m_isabus, pc_isa8_cards, "com", true).set_option_machine_config("com", cfg_no_serial_mouse);
+	ISA8_SLOT(config, "mb1", 24_MHz_XTAL / 6, m_isabus, pc_isa8_cards, "cga_m24", true);
+	ISA8_SLOT(config, "mb2", 24_MHz_XTAL / 6, m_isabus, pc_isa8_cards, "fdc_xt", true).set_option_machine_config("fdc_xt", cfg_m20_format);
+	ISA8_SLOT(config, "mb3", 24_MHz_XTAL / 6, m_isabus, pc_isa8_cards, "lpt", true);
+	ISA8_SLOT(config, "mb4", 24_MHz_XTAL / 6, m_isabus, pc_isa8_cards, "com", true).set_option_machine_config("com", cfg_no_serial_mouse);
 
-	ISA8_SLOT(config, "isa1", m_isabus, pc_isa8_cards, "hdc", false);
-	ISA8_SLOT(config, "isa2", m_isabus, pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa3", m_isabus, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", 24_MHz_XTAL / 6, m_isabus, pc_isa8_cards, "hdc", false);
+	ISA8_SLOT(config, "isa2", 24_MHz_XTAL / 6, m_isabus, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 24_MHz_XTAL / 6, m_isabus, pc_isa8_cards, nullptr, false);
 
 	// 2 banks of 16 64Kx1 or 256Kx1 DRAMs on motherboard
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K, 256K, 512K");

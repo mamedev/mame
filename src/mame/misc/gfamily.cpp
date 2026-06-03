@@ -161,7 +161,8 @@ void gfamily_state::gfamily(machine_config &config)
 	// TODO: PCI/AGP slots
 
 	// TODO: looks different
-	ISA16_SLOT(config, "superio", "pci:01.0:isabus", isa_internal_devices, "it8705f", true).set_option_machine_config("it8705f", ite_superio_config);
+	// FIXME determine ISA bus clock
+	ISA16_SLOT(config, "superio", 0, "pci:01.0:isabus", isa_internal_devices, "it8705f", true).set_option_machine_config("it8705f", ite_superio_config);
 
 	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, "microsoft_mouse"));
 	serport0.rxd_handler().set("superio:it8705f", FUNC(it8705f_device::rxd1_w));

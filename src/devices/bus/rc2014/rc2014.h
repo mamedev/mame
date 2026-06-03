@@ -91,7 +91,7 @@ public:
 	void user3_w(int state);
 	void user4_w(int state);
 
-	void set_bus_clock(u32 clock = 0);
+	void set_bus_clock(u32 clock);
 	void set_bus_clock(const XTAL &xtal) { set_bus_clock(xtal.value()); }
 	void assign_installer(int index, address_space_installer *installer);
 	address_space_installer *installer(int index) const;
@@ -100,7 +100,7 @@ public:
 
 	void add_card(device_rc2014_card_interface &card);
 protected:
-	rc2014_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	rc2014_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -146,7 +146,7 @@ protected:
 class rc2014_slot_device : public device_t, public device_slot_interface
 {
 public:
-	rc2014_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	rc2014_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	template <typename T, typename U>
 	rc2014_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus_tag, U &&slot_options, char const *default_option, bool fixed = false)
@@ -157,7 +157,7 @@ public:
 	}
 
 protected:
-	rc2014_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock = 0);
+	rc2014_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -192,7 +192,7 @@ public:
 	void add_card(device_rc2014_ext_card_interface &card);
 
 protected:
-	rc2014_ext_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	rc2014_ext_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 private:
 	using card_vector = std::vector<std::reference_wrapper<device_rc2014_ext_card_interface> >;
@@ -229,7 +229,7 @@ protected:
 class rc2014_ext_slot_device : public rc2014_slot_device
 {
 public:
-	rc2014_ext_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	rc2014_ext_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	template <typename T, typename U>
 	rc2014_ext_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus_tag, U &&slot_options, char const *default_option, bool fixed = false)
@@ -240,7 +240,7 @@ public:
 	}
 
 protected:
-	rc2014_ext_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock = 0);
+	rc2014_ext_slot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -263,7 +263,7 @@ public:
 	void add_card(device_rc2014_rc80_card_interface &card);
 
 protected:
-	rc2014_rc80_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	rc2014_rc80_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -291,7 +291,7 @@ protected:
 class rc2014_rc80_slot_device : public rc2014_ext_slot_device
 {
 public:
-	rc2014_rc80_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	rc2014_rc80_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	template <typename T, typename U>
 	rc2014_rc80_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus_tag, U &&slot_options, char const *default_option, bool fixed = false)

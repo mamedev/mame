@@ -247,7 +247,7 @@ void magtouch_state::magtouch(machine_config &config)
 	m_isabus->drq3_callback().set("dma8237_1", FUNC(am9517a_device::dreq3_w));
 
 	// FIXME: determine ISA bus clock
-	isa8_slot_device &isa1(ISA8_SLOT(config, "isa1", m_isabus, magtouch_isa8_cards, "sb15", true));
+	isa8_slot_device &isa1(ISA8_SLOT(config, "isa1", 0, m_isabus, magtouch_isa8_cards, "sb15", true));
 	isa1.set_option_device_input_defaults("sb15", DEVICE_INPUT_DEFAULTS_NAME(magtouch_sb_def));
 	isa1.set_option_machine_config("sb15", magtouch_sb_conf);
 }

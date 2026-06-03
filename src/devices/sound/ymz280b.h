@@ -19,7 +19,7 @@
 class ymz280b_device : public device_t, public device_sound_interface, public device_rom_interface<24>
 {
 public:
-	ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }

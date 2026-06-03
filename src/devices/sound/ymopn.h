@@ -21,7 +21,7 @@ class ym2203_device : public ymfm_ssg_device_base<ymfm::ym2203>
 
 public:
 	// constructor
-	ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers, handled by the interface
 	auto port_a_read_callback() { return io_read_handler(0); }
@@ -48,7 +48,7 @@ class ym2608_device : public ymfm_ssg_device_base<ymfm::ym2608>, public device_r
 
 public:
 	// constructor
-	ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers, handled by the interface
 	auto port_a_read_callback() { return io_read_handler(0); }
@@ -66,7 +66,7 @@ public:
 	void data_hi_w(u8 data) { update_streams().write_data_hi(data); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
@@ -106,7 +106,7 @@ public:
 protected:
 	using parent::update_streams;
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	// memory space configuration
@@ -131,7 +131,7 @@ DECLARE_DEVICE_TYPE(YM2610, ym2610_device);
 class ym2610_device : public ym2610_device_base<ymfm::ym2610>
 {
 public:
-	ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -154,7 +154,7 @@ class ym2612_device : public ymfm_device_base<ymfm::ym2612>
 {
 public:
 	// constructor
-	ym2612_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ym2612_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// additional register writes
 	void address_hi_w(u8 data) { update_streams().write_address_hi(data); }

@@ -28,7 +28,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const u8 *spriteram, int pri_mask);
 
 protected:
-	ky3211_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	ky3211_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 

@@ -536,13 +536,13 @@ void southbridge_extended_device::device_add_mconfig(machine_config &config)
 	rtc.set_century_index(0x32);
 
 	// on board devices
-	ISA16_SLOT(config, "board1", "isabus", pc_isa_onboard, "fdcsmc", true); // FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "board2", "isabus", pc_isa_onboard, "comat", true);
-	ISA16_SLOT(config, "board3", "isabus", pc_isa_onboard, "lpt", true);
+	ISA16_SLOT(config, "board1", 0, m_isabus, pc_isa_onboard, "fdcsmc", true); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board2", 0, m_isabus, pc_isa_onboard, "comat", true);
+	ISA16_SLOT(config, "board3", 0, m_isabus, pc_isa_onboard, "lpt", true);
 }
 
-southbridge_extended_device::southbridge_extended_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: southbridge_device(mconfig, type, tag, owner, clock),
+southbridge_extended_device::southbridge_extended_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	southbridge_device(mconfig, type, tag, owner, clock),
 	m_keybc(*this, "keybc"),
 	m_ds12885(*this, "rtc"),
 	m_pc_kbdc(*this, "kbd")

@@ -701,10 +701,11 @@ void xtom3d_state::xtom3d(machine_config &config)
 	ACPI_PIIX4   (config, "pci:07.3:acpi");
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
-	ISA16_SLOT(config, "board1", "pci:07.0:isabus", xtom3d_isa_cards, "oksan_romdisk", true).set_option_machine_config("oksan_romdisk", romdisk_config);
-	ISA16_SLOT(config, "board2", "pci:07.0:isabus", xtom3d_isa_cards, "oksan_lpc", true);
-	ISA16_SLOT(config, "isa1", "pci:07.0:isabus", xtom3d_isa_cards, "xtom3d_io_sound", true);
-	ISA16_SLOT(config, "isa2", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board1", 0, "pci:07.0:isabus", xtom3d_isa_cards, "oksan_romdisk", true).set_option_machine_config("oksan_romdisk", romdisk_config);
+	ISA16_SLOT(config, "board2", 0, "pci:07.0:isabus", xtom3d_isa_cards, "oksan_lpc", true);
+	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", xtom3d_isa_cards, "xtom3d_io_sound", true);
+	ISA16_SLOT(config, "isa2",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	// Expansion slots, mapping SVGA for debugging
 #if ENABLE_VOODOO

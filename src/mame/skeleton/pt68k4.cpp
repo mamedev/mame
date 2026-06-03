@@ -427,12 +427,12 @@ void pt68k4_state::pt68k2(machine_config &config)
 	m_isa->set_custom_spaces();
 	m_isa->irq5_callback().set(FUNC(pt68k4_state::irq5_w));
 
-	ISA8_SLOT(config, "isa1", m_isa, pt68k4_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", m_isa, pt68k4_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa3", m_isa, pt68k4_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa4", m_isa, pt68k4_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa5", m_isa, pt68k4_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa6", m_isa, pt68k4_isa8_cards, nullptr, false),
+	ISA8_SLOT(config, "isa1", 0, m_isa, pt68k4_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, m_isa, pt68k4_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 0, m_isa, pt68k4_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", 0, m_isa, pt68k4_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa5", 0, m_isa, pt68k4_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa6", 0, m_isa, pt68k4_isa8_cards, nullptr, false),
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
@@ -462,13 +462,13 @@ void pt68k4_state::pt68k4(machine_config &config)
 	ISA8(config, m_isa);
 	m_isa->set_custom_spaces();
 
-	ISA8_SLOT(config, "isa1", m_isa, pt68k4_isa8_cards, "fdc_at", false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", m_isa, pt68k4_isa8_cards, "cga", false);
-	ISA8_SLOT(config, "isa3", m_isa, pt68k4_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa4", m_isa, pt68k4_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa5", m_isa, pt68k4_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa6", m_isa, pt68k4_isa8_cards, nullptr, false),
-	ISA8_SLOT(config, "isa7", m_isa, pt68k4_isa8_cards, nullptr, false),
+	ISA8_SLOT(config, "isa1", 0, m_isa, pt68k4_isa8_cards, "fdc_at", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, m_isa, pt68k4_isa8_cards, "cga", false);
+	ISA8_SLOT(config, "isa3", 0, m_isa, pt68k4_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", 0, m_isa, pt68k4_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa5", 0, m_isa, pt68k4_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa6", 0, m_isa, pt68k4_isa8_cards, nullptr, false),
+	ISA8_SLOT(config, "isa7", 0, m_isa, pt68k4_isa8_cards, nullptr, false),
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);

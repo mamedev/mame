@@ -634,12 +634,13 @@ void pcipc_state::pcipc(machine_config &config)
 	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "virge");
 
-	ISA16_SLOT(config, "board4", "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", smc_superio_config);
-	ISA16_SLOT(config, "isa1", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa4", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", smc_superio_config);
+	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
 	serport0.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd1_w));
@@ -701,10 +702,11 @@ void pcipc_state::pcipctx(machine_config &config)
 	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "mga2064w");
 
-	ISA16_SLOT(config, "board4", "pci:07.0:isabus", isa_internal_devices, "it8671f", true).set_option_machine_config("it8671f", ite_superio_config);
-	ISA16_SLOT(config, "isa1", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "it8671f", true).set_option_machine_config("it8671f", ite_superio_config);
+	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
 	serport0.rxd_handler().set("board4:it8671f", FUNC(it8671f_device::rxd1_w));
@@ -751,10 +753,11 @@ void pcipc_state::pciagp(machine_config &config)
 	ACPI_PIIX4   (config, "pci:07.3:acpi");
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
-	ISA16_SLOT(config, "board4", "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
-	ISA16_SLOT(config, "isa1", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
+	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 #if 0
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
@@ -814,9 +817,10 @@ void pcipc_state::se440bx2(machine_config &config)
 	ACPI_PIIX4   (config, "pci:07.3:acpi");
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
-	ISA16_SLOT(config, "board4", "pci:07.0:isabus", isa_internal_devices, "fdc37m707", true).set_option_machine_config("fdc37m707", smc707_superio_config);
-	ISA16_SLOT(config, "isa1", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa2", "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37m707", true).set_option_machine_config("fdc37m707", smc707_superio_config);
+	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
 	serport0.rxd_handler().set("board4:fdc37m707", FUNC(fdc37c93x_device::rxd1_w));

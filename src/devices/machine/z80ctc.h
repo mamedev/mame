@@ -100,7 +100,7 @@ public:
 	u16 get_channel_constant(int ch) const { return m_channel[ch]->m_tconst; }
 
 protected:
-	z80ctc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+	z80ctc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

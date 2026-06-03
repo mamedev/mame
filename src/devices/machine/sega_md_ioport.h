@@ -97,7 +97,7 @@ protected:
 			device_type type,
 			char const *tag,
 			device_t *owner,
-			u32 clock = 0) ATTR_COLD;
+			u32 clock) ATTR_COLD;
 
 	// device_t implementation
 	virtual void device_resolve_objects() override ATTR_COLD;
