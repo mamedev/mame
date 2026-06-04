@@ -180,6 +180,7 @@ All sprites are cutoff
 		<notes><![CDATA[
 LOAD "SPACE TAXI",8
 No [SID] sample voices
+Hi-score table is corrupt (dump really?)
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">

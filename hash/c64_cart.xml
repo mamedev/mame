@@ -152,10 +152,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="epyxfast">
+	<software name="epyxfast" supported="no">
 		<description>Fast Load Cartridge v2</description>
 		<year>1984</year>
 		<publisher>Epyx</publisher>
+		<notes><![CDATA[
+Random corruption on any disk loaded with FASTLOAD enabled
+]]></notes>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="epyxfastload" />
@@ -168,10 +171,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="epyxfast1" cloneof="epyxfast">
+	<software name="epyxfast1" cloneof="epyxfast" supported="no">
 		<description>Fast Load Cartridge v1</description>
 		<year>1984</year>
 		<publisher>Epyx</publisher>
+		<notes><![CDATA[
+Random corruption on any disk loaded with FASTLOAD enabled
+]]></notes>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="epyxfastload" />
