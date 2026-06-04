@@ -650,8 +650,8 @@ GAME(1974,  qwakttl,   0,        atarikee,        0, atarikee_state, empty_init,
 GAME(1975,  sharkjaw,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Horror Games",    "Shark JAWS",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 GAME(1975,  steeplec,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Steeplechase",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 GAME(1976,  stuntcyc,  0,        stuntcyc, stuntcyc, stuntcyc_state, empty_init, ROT0,  "Atari",        "Stunt Cycle",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-GAME(1974,  tank,      0,        tank,         tank, tank_state,     empty_init, ROT0,  "Atari/Kee",    "Tank/Tank Cocktail",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1975,  tankii,    0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Tank II",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1974,  tank,      0,        tank,         tank, tank_state,     empty_init, ROT0,  "Atari/Kee",    "Tank/Tank Cocktail",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS)
+GAME(1975,  tankii,    0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Tank II",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
 
 // MISSING ROM DUMPS
 //GAME(1975,  astrotrf,  steeplec, atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Astroturf",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
