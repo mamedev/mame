@@ -199,6 +199,7 @@ public:
 		m_duart(*this, "duart"),
 		m_aysnd(*this, "aysnd"),
 		m_dac(*this, "dac"),
+		m_speaker(*this, "speaker"),
 		m_digits(*this, "digit%02u", 0U),
 		m_coinled(*this, "anzled%u", 0U),
 		m_magnet(*this, "magnet%u", 0U),
@@ -219,6 +220,7 @@ private:
 	required_device<mc68681_device> m_duart;
 	required_device<ay8910_device> m_aysnd;
 	required_device<ad7224_device> m_dac;
+	required_device<speaker_device> m_speaker;
 	output_finder<74> m_digits;
 	output_finder<5> m_coinled;
 	output_finder<2> m_magnet;
@@ -429,6 +431,7 @@ void stellafr_state::mux_w(uint8_t data)
 
 void stellafr_state::duart_output_w(uint8_t data)
 {
+	m_speaker->set_input_gain(0, !BIT(data, PORT_O_EN_SPK) ? 0.9 : 0.0);
 	m_leds[0] = !BIT(data, PORT_O_LED0);
 	m_leds[1] = !BIT(data, PORT_O_SDA);
 }
@@ -515,9 +518,9 @@ void stellafr_state::sus_tk(machine_config &config)
 
 	AD7224(config, m_dac, 0);
 
-	SPEAKER(config, "mono").front_center();
+	SPEAKER(config, m_speaker).front_center();
 	AY8910(config, m_aysnd, 3'686'400 / 2);
-	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.85);
+	m_aysnd->add_route(ALL_OUTPUTS, m_speaker, 0.9);
 	m_aysnd->port_a_read_callback().set_ioport("IN0");
 	m_aysnd->port_b_write_callback().set(FUNC(stellafr_state::ay8910_portb_w));
 }
@@ -538,9 +541,9 @@ void stellafr_state::sus_rtc(machine_config &config)
 
 	AD7224(config, m_dac, 0);
 
-	SPEAKER(config, "mono").front_center();
+	SPEAKER(config, m_speaker).front_center();
 	AY8910(config, m_aysnd, 3'686'400 / 2);
-	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.85);
+	m_aysnd->add_route(ALL_OUTPUTS, m_speaker, 0.9);
 	m_aysnd->port_a_read_callback().set_ioport("IN0");
 	m_aysnd->port_b_write_callback().set(FUNC(stellafr_state::ay8910_portb_w));
 }
