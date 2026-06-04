@@ -26,10 +26,10 @@ CPU Board:
 Parts:
 
  68EC000FN8         - Motorola 68k CPU
- NVRAM		        - Either KM681000ALP7 128K X 8 Bit Low Power CMOS Static RAM or ST M48T08 timekeeper
+ NVRAM              - Either KM681000ALP7 128K X 8 Bit Low Power CMOS Static RAM or ST M48T08 timekeeper
  OKIM62X42B         - Real-time Clock ic With Built-in Crystal
  MAX691CPE          - P Reset ic With Watchdog And Battery Switchover
- X                    - 8MHz xtal
+ X                  - 8MHz xtal
  3V Bat             - Lithium 3V power module
 
 Sound  and I/O board:
@@ -364,7 +364,7 @@ void stellafr_state::anzeigen_w()
 	if (pos == 7 && m_anz_bank == 1)
 	{
 		int const even_field = m_anz_cycle << 1;
-		
+
 		anzout_digit_w(0, even_field); // 150er
 		anzout_digit_w(1, even_field); // usually NC
 		anzout_digit_w(2, even_field); // usually NC
@@ -554,7 +554,7 @@ void stellafr_state::sus_rtc(machine_config &config)
 	M68000(config, m_maincpu, 12'000'000 ); //?
 	m_maincpu->set_addrmap(AS_PROGRAM, &stellafr_state::mem_map_rtc);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &stellafr_state::fc7_map);
-	
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	MSM6242(config, "rtc", XTAL(32'768));
