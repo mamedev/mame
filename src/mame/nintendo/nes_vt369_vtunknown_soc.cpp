@@ -421,7 +421,7 @@ void vt3xx_soc_base_device::vt_dma_w(u8 data)
 
 		if (m_36pcase_gpio_enabled && (m_vdma_ctrl & 1))
 		{
-			u16 dma_dest = m_ppu->get_vram_dest();
+			u16 dma_dest = m_ppu->vt369_dma_vram_target();
 
 			for (int i = 0; i < length; i++)
 			{
@@ -430,7 +430,7 @@ void vt3xx_soc_base_device::vt_dma_w(u8 data)
 				dma_dest = (dma_dest + 1) & 0x3fff;
 			}
 
-			m_ppu->set_vram_dest(dma_dest);
+			m_ppu->set_vt369_dma_vram_target(dma_dest);
 		}
 		else
 		{

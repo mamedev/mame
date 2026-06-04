@@ -249,6 +249,7 @@ void ppu_vt03_device::device_start()
 	save_item(NAME(m_newvid_1d));
 	save_item(NAME(m_newvid_1e));
 	save_item(NAME(m_tilebases_2x));
+	save_item(NAME(m_vt369_dma_vram_target));
 }
 
 void ppu_vt03_device::device_reset()
@@ -281,6 +282,8 @@ void ppu_vt03_device::device_reset()
 
 	for (int i = 0; i < 4; i++)
 		m_tilebases_2x[i] = 0x00;
+
+	m_vt369_dma_vram_target = 0;
 }
 
 
@@ -838,12 +841,9 @@ void ppu_vt3xx_device::write(offs_t offset, u8 data)
 	if (((offset & 7) == PPU_ADDRESS) && (m_newvid_1c == 0x12) && (m_newvid_1d == 0x09) && (m_newvid_1e == 0x0f))
 	{
 		if (m_toggle)
-			set_vram_dest((get_vram_dest() & 0xff00) | data);
+			m_vt369_dma_vram_target = (m_vt369_dma_vram_target & 0xff00) | data;
 		else
-			set_vram_dest((get_vram_dest() & 0x00ff) | ((data & (m_videoram_addr_mask >> 8)) << 8));
-
-		m_toggle = !m_toggle;
-		return;
+			m_vt369_dma_vram_target = (m_vt369_dma_vram_target & 0x00ff) | ((data & (m_videoram_addr_mask >> 8)) << 8);
 	}
 
 	const bool was_rendering = (m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES)) != 0;
@@ -992,7 +992,7 @@ void ppu_vt3xx_device::shift_tile_plane_data(u8 &pix)
 void ppu_vt3xx_device::draw_background(u8 *line_priority)
 {
 	const bool is_vt369_64_byte_names = (m_newvid_1c == 0x12) && (m_newvid_1d == 0x09) && (m_newvid_1e == 0x0f)
-			&& BIT(m_tilebases_2x[0], 4);
+			&& BIT(m_tilebases_2x[0], 4) && (m_tilebases_2x[2] == 0x08);
 
 	if (!is_vt369_64_byte_names)
 	{

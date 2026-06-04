@@ -81,6 +81,8 @@ public:
 	u16 get_newmode_spritebase() { return m_tilebases_2x[2] | (m_tilebases_2x[3] << 8); }
 	u8 vt3xx_extended_palette_r(offs_t offset) { return m_vt3xx_palette[offset]; }
 	void vt3xx_extended_palette_w(offs_t offset, u8 data) { /*logerror("%s: extended palette write %04x %02x\n", machine().describe_context(), offset, data);*/ m_vt3xx_palette[offset] = data; }
+	u16 vt369_dma_vram_target() const { return m_vt369_dma_vram_target; }
+	void set_vt369_dma_vram_target(u16 target) { m_vt369_dma_vram_target = target; }
 
 	u8 get_m_read_bg4_bg3();
 	u8 get_speva2_speva0();
@@ -133,6 +135,7 @@ protected:
 	u8 m_tilebases_2x[4];
 
 	u8 m_vt3xx_palette[0x400];
+	u16 m_vt369_dma_vram_target;
 
 	static constexpr unsigned YUV444_COLOR = (0x40 * 8);
 private:
