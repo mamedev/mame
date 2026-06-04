@@ -199,7 +199,9 @@ public:
 		m_duart(*this, "duart"),
 		m_aysnd(*this, "aysnd"),
 		m_dac(*this, "dac"),
-		m_digits(*this, "digit%u", 0U),
+		m_digits(*this, "digit%02u", 0U),
+		m_coinled(*this, "anzled%u", 0U),
+		m_magnet(*this, "magnet%u", 0U),
 		m_lamps(*this, "lamp%u", 0U),
 		m_leds(*this, "led%u", 0U),
 		m_in0(*this, "IN0")
@@ -217,7 +219,9 @@ private:
 	required_device<mc68681_device> m_duart;
 	required_device<ay8910_device> m_aysnd;
 	required_device<ad7224_device> m_dac;
-	output_finder<8> m_digits;
+	output_finder<74> m_digits;
+	output_finder<5> m_coinled;
+	output_finder<2> m_magnet;
 	output_finder<128> m_lamps;
 	output_finder<2> m_leds;
 	required_ioport m_in0;
@@ -231,7 +235,11 @@ private:
 	uint8_t m_anz2;
 	uint8_t m_mux2;
 	uint8_t m_strobe;
+
 	uint16_t m_anz1_bank[8];
+	uint8_t m_anz_bank;      // which of the two ANZ banks per scan step (0/1)
+	uint8_t m_anz_cycle;     // module pair: 0 = modules 0/1, 1 = modules 2/3
+	uint8_t m_anz_prevpos;   // previous step (to detect wrap)
 
 	uint8_t mux_r();
 	void enable_w(uint8_t data);
@@ -240,7 +248,10 @@ private:
 	void ay8910_portb_w(uint8_t data);
 	void lamps_w(bool second);
 	void anzeigen_w();
+	void anzout_digit_w(int anzout, int even_field);
+	void anzout_aux(int even_field);
 	void service_w();
+	static uint8_t digit_map(int field, uint8_t s);
 
 	void mem_map_steuereinheit(address_map &map) ATTR_COLD;
 	void mem_map_tk(address_map &map) ATTR_COLD;
@@ -288,13 +299,76 @@ void stellafr_state::lamps_w(bool second)
 	}
 }
 
+uint8_t stellafr_state::digit_map(int field, uint8_t s)
+{
+	// they switched up the segment wiring between the shift register and the display
+	if (field & 1)
+		return bitswap<8>(s, 0, 4, 1, 6, 5, 7, 3, 2); // digits 1 & 3
+	else
+		return bitswap<8>(s, 7, 3, 4, 2, 1, 0, 6, 5); // digits 0 & 2
+}
+
+// Each Anzout chain is one or two 74HC4094s holding two modules: the even field of the pair
+// just latched lives in the low 4094 (segment s in bit s), the odd field in the
+// high 4094.  Only that pair is updated; the other two fields belong to the
+// other module pair and are written on its strobe.
+void stellafr_state::anzout_digit_w(int anzout, int even_field)
+{
+	int const odd_field = even_field | 1;
+	uint16_t const v = m_anz1_bank[anzout];
+	m_digits[anzout * 10 + even_field] = digit_map(even_field, v & 0xff) & 0x7f;
+	m_digits[anzout * 10 + odd_field]  = digit_map(odd_field, v >> 8) & 0x7f;
+}
+
+// Anzout4 chain, only one 4094: coin-accept LEDs + magnets.
+void stellafr_state::anzout_aux(int even_field)
+{
+	if (even_field != 2)
+		return;
+	uint8_t const aux = m_anz1_bank[4] >> 8;
+	m_coinled[0] = BIT(aux, 0); // 0,10 DM
+	m_coinled[1] = BIT(aux, 1); // 1 DM
+	m_coinled[2] = BIT(aux, 2); // 2 DM
+	m_coinled[3] = BIT(aux, 3); // 5 DM
+	m_magnet[0] = BIT(aux, 4); // Magnet L
+	m_magnet[1] = BIT(aux, 5); // Magnet R
+	// bit 6 = NC
+	m_coinled[4] = BIT(aux, 7); // Freispiele
+}
+
 void stellafr_state::anzeigen_w()
 {
+	// clock one bit downstream
 	for (uint8_t i = 0; i < 8; i++)
+		m_anz1_bank[i] = (m_anz1_bank[i] >> 1) | (BIT(m_anz1, i) << 15);
+
+	// which module/segment this strobe belongs to, derived from the MUX1 "lz"
+	// select alone: after bank 0 it sits in bits 4-7, after bank 1 in bits 12-15.
+	int const sel = m_anz_bank ? ((m_mux1 >> 12) & 0x0f) : ((m_mux1 >> 4) & 0x0f);
+	int const pos = 7 - (sel & 0x07);
+	if (m_anz_bank == 0)
 	{
-		m_anz1_bank[i] = (m_anz1_bank[i] << 1) | BIT(m_anz1, i);
+		if (pos == 0 && m_anz_prevpos == 7) // select wrap 7->0: next module pair
+			m_anz_cycle ^= 1;
+		m_anz_prevpos = pos;
 	}
-	
+
+	// either U6A or U9 QP7 triggering the enable
+	if (pos == 7 && m_anz_bank == 1)
+	{
+		int const even_field = m_anz_cycle << 1;
+		
+		anzout_digit_w(0, even_field); // 150er
+		anzout_digit_w(1, even_field); // usually NC
+		anzout_digit_w(2, even_field); // usually NC
+		anzout_digit_w(3, even_field); // Serienspeicher
+		anzout_aux(even_field); // coin-accept LEDs + magnets (Anzout4 high 4094)
+		anzout_digit_w(5, even_field); // Munzspeicher
+		anzout_digit_w(6, even_field); // usually NC
+		anzout_digit_w(7, even_field); // usually NC
+	}
+
+	m_anz_bank ^= 1; // the two banks alternate, reset by ENMUX down
 }
 
 void stellafr_state::service_w()
@@ -304,6 +378,11 @@ void stellafr_state::service_w()
 
 void stellafr_state::enable_w(uint8_t data)
 {
+	// ENMUX falls just before the first ANZ bank of each scan step, so its
+	// falling edge re-aligns the ANZ bank counter
+	if (!BIT(data, U5_ENMUX1) && BIT(m_strobe, U5_ENMUX1))
+		m_anz_bank = 0;
+
 	if (BIT(data, U5_ENMUX1) && !BIT(m_strobe, U5_ENMUX1))
 		lamps_w(false); //main lamps out
 
@@ -397,13 +476,18 @@ void stellafr_state::machine_start()
 {
 	save_item(NAME(m_mux1));
 	save_item(NAME(m_strobe));
-	save_item(NAME(m_anz1_bank));
+	save_item(NAME(m_anz_bank));
+	save_item(NAME(m_anz_cycle));
+	save_item(NAME(m_anz_prevpos));
 }
 
 void stellafr_state::machine_reset()
 {
 	m_mux1 = 0;
 	m_strobe = 0;
+	m_anz_bank = 0;
+	m_anz_cycle = 0;
+	m_anz_prevpos = 0;
 }
 
 static INPUT_PORTS_START( stellafr )
