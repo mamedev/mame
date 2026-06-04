@@ -259,6 +259,8 @@ private:
 	void mem_map_tk(address_map &map) ATTR_COLD;
 	void mem_map_rtc(address_map &map) ATTR_COLD;
 	void fc7_map(address_map &map) ATTR_COLD;
+
+	void steuereinheit(machine_config &config) ATTR_COLD;
 };
 
 
@@ -456,17 +458,17 @@ void stellafr_state::mem_map_steuereinheit(address_map &map)
 
 void stellafr_state::mem_map_tk(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();
 	mem_map_steuereinheit(map);
+	map(0x000000, 0x0fffff).rom();
 	map(0xff0000, 0xffffff).ram().share("timekeeper").umask16(0x00ff);
 	map(0xff0000, 0xffffff).ram().share("zeropower").umask16(0xff00);
 }
 
 void stellafr_state::mem_map_rtc(address_map &map)
 {
+	mem_map_steuereinheit(map);
 	map(0x000000, 0x0fffff).rom();
 	map(0x400000, 0x40001f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	mem_map_steuereinheit(map);
 	map(0xfc0000, 0xffffff).ram().share("nvram");
 }
 
@@ -502,19 +504,11 @@ static INPUT_PORTS_START( stellafr )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_GAMBLE_LOW ) // Right
 INPUT_PORTS_END
 
-
-void stellafr_state::sus_tk(machine_config &config)
+void stellafr_state::steuereinheit(machine_config &config)
 {
-	M68000(config, m_maincpu, 8'000'000 ); //?
-	m_maincpu->set_addrmap(AS_PROGRAM, &stellafr_state::mem_map_tk);
-	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &stellafr_state::fc7_map);
-
 	MC68681(config, m_duart, 3'686'400);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2); // ?
 	m_duart->outport_cb().set(FUNC(stellafr_state::duart_output_w));
-
-	MK48T08(config, "timekeeper");
-	MK48T08(config, "zeropower");
 
 	AD7224(config, m_dac, 0);
 
@@ -525,27 +519,29 @@ void stellafr_state::sus_tk(machine_config &config)
 	m_aysnd->port_b_write_callback().set(FUNC(stellafr_state::ay8910_portb_w));
 }
 
+void stellafr_state::sus_tk(machine_config &config)
+{
+	steuereinheit(config);
+
+	M68000(config, m_maincpu, 8'000'000 ); //?
+	m_maincpu->set_addrmap(AS_PROGRAM, &stellafr_state::mem_map_tk);
+	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &stellafr_state::fc7_map);
+
+	MK48T08(config, "timekeeper");
+	MK48T08(config, "zeropower");
+}
+
 void stellafr_state::sus_rtc(machine_config &config)
 {
+	steuereinheit(config);
+
 	M68000(config, m_maincpu, 12'000'000 ); //?
 	m_maincpu->set_addrmap(AS_PROGRAM, &stellafr_state::mem_map_rtc);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &stellafr_state::fc7_map);
-
-	MC68681(config, m_duart, 3'686'400);
-	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2); // ?
-	m_duart->outport_cb().set(FUNC(stellafr_state::duart_output_w));
-
+	
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	MSM6242(config, "rtc", XTAL(32'768));
-
-	AD7224(config, m_dac, 0);
-
-	SPEAKER(config, m_speaker).front_center();
-	AY8910(config, m_aysnd, 3'686'400 / 2);
-	m_aysnd->add_route(ALL_OUTPUTS, m_speaker, 0.9);
-	m_aysnd->port_a_read_callback().set_ioport("IN0");
-	m_aysnd->port_b_write_callback().set(FUNC(stellafr_state::ay8910_portb_w));
 }
 
 ROM_START( actionf2 )
