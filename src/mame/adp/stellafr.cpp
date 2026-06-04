@@ -197,7 +197,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
-		m_aysnd(*this, "aysnd"),
+		m_ym2149(*this, "ym2149"),
 		m_dac(*this, "dac"),
 		m_speaker(*this, "speaker"),
 		m_digits(*this, "digit%02u", 0U),
@@ -218,7 +218,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
-	required_device<ay8910_device> m_aysnd;
+	required_device<ym2149_device> m_ym2149;
 	required_device<ad7224_device> m_dac;
 	required_device<speaker_device> m_speaker;
 	output_finder<74> m_digits;
@@ -247,7 +247,7 @@ private:
 	void enable_w(uint8_t data);
 	void mux_w(uint8_t data);
 	void duart_output_w(uint8_t data);
-	void ay8910_portb_w(uint8_t data);
+	void ym2149_portb_w(uint8_t data);
 	void lamps_w(bool second);
 	void anzeigen_w();
 	void anzout_digit_w(int anzout, int even_field);
@@ -438,7 +438,7 @@ void stellafr_state::duart_output_w(uint8_t data)
 	m_leds[1] = !BIT(data, PORT_O_SDA);
 }
 
-void stellafr_state::ay8910_portb_w(uint8_t data)
+void stellafr_state::ym2149_portb_w(uint8_t data)
 {
 }
 
@@ -450,8 +450,8 @@ void stellafr_state::mem_map_steuereinheit(address_map &map)
 	// Y2 graphics board
 	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::enable_w)); // Y3 En out
 	map(0x800100, 0x800101).rw(FUNC(stellafr_state::mux_r), FUNC(stellafr_state::mux_w)); // Y4 SP/ME out / Inputs
-	map(0x800141, 0x800141).rw(m_aysnd, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)); // Y5
-	map(0x800143, 0x800143).w(m_aysnd, FUNC(ay8910_device::data_w)); // Y5
+	map(0x800141, 0x800141).rw(m_ym2149, FUNC(ym2149_device::data_r), FUNC(ym2149_device::address_w)); // Y5
+	map(0x800143, 0x800143).w(m_ym2149, FUNC(ym2149_device::data_w)); // Y5
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff); // Y6
 	// Y7 NC
 }
@@ -513,10 +513,10 @@ void stellafr_state::steuereinheit(machine_config &config)
 	AD7224(config, m_dac, 0);
 
 	SPEAKER(config, m_speaker).front_center();
-	AY8910(config, m_aysnd, 3'686'400 / 2);
-	m_aysnd->add_route(ALL_OUTPUTS, m_speaker, 0.9);
-	m_aysnd->port_a_read_callback().set_ioport("IN0");
-	m_aysnd->port_b_write_callback().set(FUNC(stellafr_state::ay8910_portb_w));
+	YM2149(config, m_ym2149, 3'686'400 / 2);
+	m_ym2149->add_route(ALL_OUTPUTS, m_speaker, 0.9);
+	m_ym2149->port_a_read_callback().set_ioport("IN0");
+	m_ym2149->port_b_write_callback().set(FUNC(stellafr_state::ym2149_portb_w));
 }
 
 void stellafr_state::sus_tk(machine_config &config)
