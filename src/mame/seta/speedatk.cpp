@@ -13,9 +13,9 @@ TODO:
  - daifugo: Improve IOX device (many hardwired reads);
  - It's possible that there is only one coin chute and not two, needs a real board to know
    more about it.
- - hanaren2, harashi, hana6: Everything. They seem to run on similar hardware, similar
-   address maps, etc.
- - hana6bl: correct GFX, hook up DSW
+ - harashi, hana6: Everything. They seem to run on similar hardware, similar
+   address maps, etc. Seem to be missing some ROM internal to one of the customs.
+ - hana6bl, hanaren: correct GFX, hook up DSW
 
 How to play:
  - A to D select a card.
@@ -151,6 +151,7 @@ public:
 	void daifugo(machine_config &config) ATTR_COLD;
 	void harashi(machine_config &config) ATTR_COLD;
 	void hana6bl(machine_config &config) ATTR_COLD;
+	void hanaren(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -180,6 +181,8 @@ private:
 
 	uint8_t m_inp_matrix = 0xff;
 
+	uint8_t m_hanaren_prot_cmd = 0;
+
 	uint8_t key_matrix_r();
 	void key_matrix_w(uint8_t data);
 	uint8_t daifugo_key_matrix_r();
@@ -189,6 +192,8 @@ private:
 	void output_w(uint8_t data);
 
 	uint8_t hana6bl_key_r();
+
+	uint8_t hanaren_prot_r();
 
 	void palette_init(palette_device &palette) const;
 
@@ -202,6 +207,7 @@ private:
 	void daifugo_program_map(address_map &map) ATTR_COLD;
 	void harashi_program_map(address_map &map) ATTR_COLD;
 	void hana6bl_program_map(address_map &map) ATTR_COLD;
+	void hanaren_program_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -306,6 +312,7 @@ void speedatk_state::machine_start()
 	save_item(NAME(m_coin_settings));
 	save_item(NAME(m_coin_impulse));
 	save_item(NAME(m_inp_matrix));
+	save_item(NAME(m_hanaren_prot_cmd));
 
 	m_coin_impulse = 0;
 }
@@ -433,6 +440,19 @@ uint8_t speedatk_state::hana6bl_key_r()
 	return data;
 }
 
+uint8_t speedatk_state::hanaren_prot_r()
+{
+	switch (m_hanaren_prot_cmd)
+	{
+		case 0x19: return 0xef;
+		case 0x25: return 0xf7;
+		case 0x31: return 0xbf;
+		case 0x45: return 0xfd;
+		default: logerror("%s prot_r: cmd %02x\n", machine().describe_context(), m_hanaren_prot_cmd); return 0xff;
+	}
+}
+
+
 void speedatk_state::speedatk_program_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -487,6 +507,20 @@ void speedatk_state::hana6bl_program_map(address_map &map)
 	map(0x8800, 0x8fff).ram();
 	map(0xa000, 0xa3ff).ram().share(m_videoram);
 	map(0xb000, 0xb3ff).ram().share(m_colorram);
+}
+
+void speedatk_state::hanaren_program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x6200, 0x6203).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x7020, 0x7020).r(FUNC(speedatk_state::hanaren_prot_r)); // PAL or custom?
+	map(0x7040, 0x7040).lw8(NAME([this] (uint8_t data) { m_hanaren_prot_cmd = data; }));
+	map(0x8000, 0x80ff).ram();
+	map(0x8800, 0x8fff).ram();
+	map(0x9000, 0x97ff).ram();
+	map(0xa000, 0xa3ff).ram().share(m_videoram);
+	map(0xb000, 0xb3ff).ram().share(m_colorram);
+	map(0xc000, 0xffff).rom();
 }
 
 void speedatk_state::io_map(address_map &map)
@@ -696,7 +730,7 @@ static INPUT_PORTS_START( hana6bl )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // hanaren expects this active high?
 
 	// TODO: use hanaroku_panel? this game doesn't seem to have payout and flip flop
 	PORT_START("KEY0")
@@ -831,6 +865,12 @@ void speedatk_state::hana6bl(machine_config &config)
 	subdevice<ay8910_device>("aysnd")->port_b_read_callback().set_ioport("COINS");
 }
 
+void speedatk_state::hanaren(machine_config &config)
+{
+	hana6bl(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &speedatk_state::hanaren_program_map);
+}
+
 
 ROM_START( daifugo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -877,15 +917,18 @@ ROM_END
 // Main chips on main PCB are: HD46505SP, 11 MHz XTAL, AY38910A/P, unmarked chip at u41, 2 banks of 8 DIP switches, bank of 4 DIP switches
 // Main chips on CPU PCB are: Z0840004PSC, program ROM, 3 banks of 8 DIP switches, 3x GAL16V8B, several unreadable chips and empty locations
 // DIP sheet is available
-ROM_START( hanaren2 )
+// While the program ROM label says II, title screen only shows 花れんちゃん
+// Has 1985 K&K ELECTRON LTD string in ROM but shows 1982 NAS on screen. Bootleg?
+ROM_START( hanaren )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hana_ren_ii_kyo_rom.ic2.sub", 0x00000, 0x10000, CRC(fbf4c7cd) SHA1(90f9915f72f9bdfb4b487266057c86dad2a19299) ) // actual label is 花れんⅡ 強ROM
-
-	ROM_REGION( 0x6000, "gfx1", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
 	ROM_LOAD( "k.u8", 0x0000, 0x6000, CRC(86633086) SHA1(ad7d9c4f0fe74a72dbe1e139d9c02c7b44e25df9) ) // last 0x2000 empty
 	ROM_IGNORE(               0x2000 )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_COPY( "gfx2", 0x4000, 0x0000, 0x2000 )
 
 	ROM_REGION( 0x0220, "proms", 0 ) // not dumped for this set, using daifugo's for now
 	ROM_LOAD( "tbp18s030.7l",  0x0000, 0x0020, BAD_DUMP CRC(bd674823) SHA1(c664b9959c939900dde3f86722404253b0e3f3f6) )  // color PROM
@@ -927,6 +970,7 @@ ROM_END
 // AAA-51 PCB with original Alba sticker
 // NEC D780C-1, LH5164-12, HD46505SP, D8255AC-2, AY-3-8910A, X1-019B and X2-001C, 11 MHz XTAL, 2 banks of 8 switches and 1 bank of 4 switches
 // strangely has Bonanza and Black Jack strings at the end of the program ROM
+// jumps to the 0xc000 - 0xffff space. Probably has some code in the X1-019B (battery-backed RAM?).
 ROM_START( hana6 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "zb002.001.h1", 0x0000, 0x8000, CRC(65eda973) SHA1(493e0a86209bc53157fa061aecd2cff3bb7bb993) ) // M27C256
@@ -971,7 +1015,7 @@ ROM_END
 
 GAME( 1983, daifugo,  0,     daifugo,  daifugo,  speedatk_state, empty_init, ROT90, "Seta Kikaku / Sega (Esco Trading Co license)", "Daifugo (Japan)",                      MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1984, speedatk, 0,     speedatk, speedatk, speedatk_state, empty_init, ROT0,  "Seta Kikaku",                                  "Speed Attack! (Japan)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1985, hanaren2, 0,     harashi,  speedatk, speedatk_state, empty_init, ROT0,  "K & K Electron",                               "Hana no Ren-Chan II (Japan)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, hanaren,  0,     hanaren,  hana6bl,  speedatk_state, empty_init, ROT0,  "bootleg (K & K Electron)",                     "Hana Ren-Chan (Japan, bootleg)",       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1993, harashi,  0,     harashi,  speedatk, speedatk_state, empty_init, ROT0,  "Asahi Bussan",                                 "Hana Arashi (Japan)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1982, hana6,    0,     harashi,  speedatk, speedatk_state, empty_init, ROT90, "Alba",                                         "Hana Awase 6 (Japan)",                 MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, hana6bl,  hana6, hana6bl,  hana6bl,  speedatk_state, empty_init, ROT0,  "bootleg",                                      "Hana Awase 6 (Japan, bootleg)",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1985, hana6bl,  hana6, hana6bl,  hana6bl,  speedatk_state, empty_init, ROT0,  "bootleg (K & K Electron)",                     "Hana Awase 6 (Japan, bootleg)",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
