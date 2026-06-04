@@ -31,7 +31,7 @@ protected:
 private:
 	required_device<mc6854_device> m_mc6854;
 	required_memory_region m_rom;
-	required_ioport m_id;
+	optional_ioport m_id;
 	bool m_no_id;
 
 	emu_timer *m_timer;
