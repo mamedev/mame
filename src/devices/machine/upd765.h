@@ -432,6 +432,19 @@ private:
 	int delayed_command;
 };
 
+class fdc9266_device : public upd765_family_device {
+public:
+	fdc9266_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool ready, bool select)
+		: fdc9266_device(mconfig, tag, owner, clock)
+	{
+		set_ready_line_connected(ready);
+		set_select_lines_connected(select);
+	}
+	fdc9266_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void map(address_map &map) override ATTR_COLD;
+};
+
 class ps2_fdc_device : public upd765_family_device {
 public:
 	void set_mode(mode_t mode);
@@ -474,6 +487,11 @@ public:
 
 protected:
 	upd72065_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class upd72066_device : public upd72065_device {
+public:
+	upd72066_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class upd72067_device : public upd72065_device {
@@ -543,13 +561,13 @@ public:
 	virtual void map(address_map &map) override ATTR_COLD;
 };
 
-class wd37c65c_device : public upd765_family_device {
+class wd37c65_device : public upd765_family_device {
 public:
-	wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	wd37c65_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename X>
-	wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, X &&clock2)
-		: wd37c65c_device(mconfig, tag, owner, clock)
+	wd37c65_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, X &&clock2)
+		: wd37c65_device(mconfig, tag, owner, clock)
 	{
 		set_clock2(std::forward<X>(clock2));
 	}
@@ -560,8 +578,35 @@ public:
 	virtual void map(address_map &map) override ATTR_COLD;
 	virtual uint8_t get_st3(floppy_info &fi) override;
 
+protected:
+	wd37c65_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 private:
 	uint32_t m_clock2;
+};
+
+class wd37c65b_device : public wd37c65_device {
+public:
+	wd37c65b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename X>
+	wd37c65b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, X &&clock2)
+		: wd37c65b_device(mconfig, tag, owner, clock)
+	{
+		set_clock2(std::forward<X>(clock2));
+	}
+};
+
+class wd37c65c_device : public wd37c65_device {
+public:
+	wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename X>
+	wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, X &&clock2)
+		: wd37c65c_device(mconfig, tag, owner, clock)
+	{
+		set_clock2(std::forward<X>(clock2));
+	}
 };
 
 class mcs3201_device : public upd765_family_device {
@@ -626,15 +671,19 @@ DECLARE_DEVICE_TYPE(UPD765A,        upd765a_device)
 DECLARE_DEVICE_TYPE(UPD765B,        upd765b_device)
 DECLARE_DEVICE_TYPE(I8272A,         i8272a_device)
 DECLARE_DEVICE_TYPE(UPD72065,       upd72065_device)
+DECLARE_DEVICE_TYPE(UPD72066,       upd72066_device)
 DECLARE_DEVICE_TYPE(UPD72067,       upd72067_device)
 DECLARE_DEVICE_TYPE(UPD72069,       upd72069_device)
 DECLARE_DEVICE_TYPE(I82072,         i82072_device)
+DECLARE_DEVICE_TYPE(FDC9266,        fdc9266_device)
 DECLARE_DEVICE_TYPE(SMC37C78,       smc37c78_device)
 DECLARE_DEVICE_TYPE(N82077AA,       n82077aa_device)
 DECLARE_DEVICE_TYPE(PC_FDC_SUPERIO, pc_fdc_superio_device)
 DECLARE_DEVICE_TYPE(DP8473,         dp8473_device)
 DECLARE_DEVICE_TYPE(PC8477A,        pc8477a_device)
 DECLARE_DEVICE_TYPE(PC8477B,        pc8477b_device)
+DECLARE_DEVICE_TYPE(WD37C65,        wd37c65_device)
+DECLARE_DEVICE_TYPE(WD37C65B,       wd37c65b_device)
 DECLARE_DEVICE_TYPE(WD37C65C,       wd37c65c_device)
 DECLARE_DEVICE_TYPE(MCS3201,        mcs3201_device)
 DECLARE_DEVICE_TYPE(TC8566AF,       tc8566af_device)

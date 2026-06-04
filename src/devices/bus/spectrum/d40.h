@@ -113,7 +113,7 @@ protected:
 	virtual void pre_opcode_fetch(offs_t offset) override;
 	virtual uint8_t mreq_r(offs_t offset) override;
 
-	required_device<wd37c65c_device> m_fdc;
+	required_device<wd37c65b_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 
 	virtual uint8_t fdc0_r(offs_t offset) override;

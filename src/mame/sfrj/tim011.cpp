@@ -49,7 +49,7 @@ private:
 	uint8_t m_scroll;
 
 	required_device<z180_device> m_maincpu;
-	required_device<upd765a_device> m_fdc;
+	required_device<fdc9266_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
 	required_shared_ptr<u8> m_vram;
 	required_device<palette_device> m_palette;
@@ -72,8 +72,8 @@ void tim011_state::tim011_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x007f).ram(); /* Z180 internal registers */
-	map(0x0080, 0x0081).mirror(0xff0e).m(m_fdc, FUNC(upd765a_device::map));
-	map(0x00a0, 0x00a0).mirror(0xff0f).rw(m_fdc, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
+	map(0x0080, 0x0081).mirror(0xff0e).m(m_fdc, FUNC(fdc9266_device::map));
+	map(0x00a0, 0x00a0).mirror(0xff0f).rw(m_fdc, FUNC(fdc9266_device::dma_r), FUNC(fdc9266_device::dma_w));
 	map(0x00c0, 0x00c1).mirror(0xff0e).rw(FUNC(tim011_state::print_r), FUNC(tim011_state::print_w));
 	map(0x00d0, 0x00d0).mirror(0xff0f).rw(FUNC(tim011_state::scroll_r), FUNC(tim011_state::scroll_w));
 	map(0x8000, 0xffff).ram().share(m_vram); // Video RAM 43256 SRAM  (32KB)
@@ -172,7 +172,7 @@ void tim011_state::tim011(machine_config &config)
 	TIM011_KEYBOARD(config, "keyboard").txd_callback().set(m_maincpu, FUNC(z180_device::rxa1_w));
 
 	// FDC9266 location U43
-	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
+	FDC9266(config, m_fdc, 8_MHz_XTAL, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 	m_fdc->drq_wr_callback().set_inputline(m_maincpu, Z180_INPUT_LINE_DREQ1);
 

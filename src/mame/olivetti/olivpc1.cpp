@@ -68,7 +68,7 @@ private:
 	required_device<isa8_device> m_isa;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pc_keyboard_device> m_keyboard;
-	required_device<wd37c65c_device> m_fdc;
+	required_device<wd37c65b_device> m_fdc;
 	required_device<address_map_bank_device> m_bank;
 	bool m_obf = false;
 };
@@ -104,8 +104,8 @@ void olivpc1_state::pc8_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0xffff).lrw8(NAME([this]() { nmi(); return 0xff; }), NAME([this](u8 d) { nmi(); }));
 	map(0x0060, 0x0067).rw(FUNC(olivpc1_state::port6x_r), FUNC(olivpc1_state::port6x_w));
-	map(0x03f2, 0x03f2).w("fdc", FUNC(wd37c65c_device::dor_w));
-	map(0x03f4, 0x03f5).m("fdc", FUNC(wd37c65c_device::map));
+	map(0x03f2, 0x03f2).w("fdc", FUNC(wd37c65b_device::dor_w));
+	map(0x03f4, 0x03f5).m("fdc", FUNC(wd37c65b_device::map));
 }
 
 static INPUT_PORTS_START(olivpc1)
@@ -162,14 +162,14 @@ void olivpc1_state::olivpc1(machine_config &config)
 	m_maincpu->out_memw_cb().set([this](offs_t offset, u8 data) { m_maincpu->space(AS_PROGRAM).write_byte(offset, data); });
 	m_maincpu->in_ior_cb<0>().set([this]() { return m_isa->dack_r(0); });
 	m_maincpu->out_iow_cb<0>().set([this](u8 data) { m_isa->dack_w(0, data); });
-	m_maincpu->in_ior_cb<1>().set("fdc", FUNC(wd37c65c_device::dma_r));
-	m_maincpu->out_iow_cb<1>().set("fdc", FUNC(wd37c65c_device::dma_w));
+	m_maincpu->in_ior_cb<1>().set("fdc", FUNC(wd37c65b_device::dma_r));
+	m_maincpu->out_iow_cb<1>().set("fdc", FUNC(wd37c65b_device::dma_w));
 	m_maincpu->in_ior_cb<2>().set([this]() { return m_isa->dack_r(2); });
 	m_maincpu->out_iow_cb<2>().set([this](u8 data) { m_isa->dack_w(2, data); });
 
 	ADDRESS_MAP_BANK(config, m_bank).set_map(&olivpc1_state::bank).set_options(ENDIANNESS_LITTLE, 8, 15, 0x4000);
 
-	WD37C65C(config, m_fdc, 16_MHz_XTAL);
+	WD37C65B(config, m_fdc, 16_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v40_device::dreq_w<1>));
 	FLOPPY_CONNECTOR(config, "fdc:0", pc1_floppies, "35dd", isa8_fdc_device::floppy_formats).enable_sound(true);
