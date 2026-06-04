@@ -2092,7 +2092,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="elmoge">
+	<software name="elmoge" cloneof="elmo">
 		<description>Elmos großes Abenteuer (Germany)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -2109,7 +2109,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="elmofr" cloneof="elmoge">
+	<software name="elmofr" cloneof="elmo">
 		<description>Le Monde d'Elmo - Les Grandes Découvertes D'Elmo (France)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -2126,7 +2126,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="elmosp" cloneof="elmoge">
+	<software name="elmosp" cloneof="elmo">
 		<description>El Mundo de Elmo - Grandes descubrimientos de Elmo (Spain)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
