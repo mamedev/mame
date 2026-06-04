@@ -90,6 +90,7 @@ Connectors:
 
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
 #include "machine/msm6242.h"
@@ -197,6 +198,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
+		m_printer(*this, "printer"),
 		m_ym2149(*this, "ym2149"),
 		m_dac(*this, "dac"),
 		m_speaker(*this, "speaker"),
@@ -218,6 +220,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
+	required_device<rs232_port_device> m_printer;
 	required_device<ym2149_device> m_ym2149;
 	required_device<ad7224_device> m_dac;
 	required_device<speaker_device> m_speaker;
@@ -441,7 +444,7 @@ void stellafr_state::duart_output_w(uint8_t data)
 void stellafr_state::ym2149_portb_w(uint8_t data)
 {
 	//TODO
-	
+
 	//PORT_B
 }
 
@@ -512,6 +515,16 @@ void stellafr_state::steuereinheit(machine_config &config)
 	MC68681(config, m_duart, 3'686'400);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2); // ?
 	m_duart->outport_cb().set(FUNC(stellafr_state::duart_output_w));
+
+	// P20 - Serielle-Schnittstelle for printer
+	m_duart->a_tx_cb().set(m_printer, FUNC(rs232_port_device::write_txd));
+
+	RS232_PORT(config, m_printer, default_rs232_devices, "printer");
+	m_printer->rxd_handler().set(m_duart, FUNC(mc68681_device::rx_a_w));
+
+	// RS485 (P18 - RS485 Aus, P19 - RS485 Ein)
+	// m_duart->b_tx_cb().set(m_rs485, ???);
+	// m_rs485->rxd_handler().set(m_duart, FUNC(mc68681_device::rx_b_w));
 
 	AD7224(config, m_dac, 0);
 
