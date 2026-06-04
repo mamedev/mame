@@ -9,11 +9,11 @@ CPU Board:
 ----------
  ____________________________________________________________
  |           ______________  ______________     ___________ |
- | 74HC245N  | t1 i       |  |KM681000ALP7|     |+        | |
+ | 74HC245N  | t1 i       |  |NVRAM       |     |+        | |
  | 74HC573   |____________|  |____________|     |  3V Bat | |
  |                                              |         | |
  |           ______________  ______________     |        -| |
- |           | t1 ii      |  |KM681000ALP7|     |_________| |
+ |           | t1 ii      |  |NVRAM       |     |_________| |
  |     |||   |____________|  |____________| |||             |
  |     |||   ___________                    |||  M62X42B    |
  | X   |||   |         |                    |||             |
@@ -26,7 +26,7 @@ CPU Board:
 Parts:
 
  68EC000FN8         - Motorola 68k CPU
- KM681000ALP7       - 128K X 8 Bit Low Power CMOS Static RAM
+ NVRAM		        - Either KM681000ALP7 128K X 8 Bit Low Power CMOS Static RAM or ST M48T08 timekeeper
  OKIM62X42B         - Real-time Clock ic With Built-in Crystal
  MAX691CPE          - P Reset ic With Watchdog And Battery Switchover
  X                    - 8MHz xtal
@@ -388,31 +388,31 @@ void stellafr_state::enable_w(uint8_t data)
 		m_anz_bank = 0;
 
 	if (BIT(data, U5_ENMUX1) && !BIT(m_strobe, U5_ENMUX1))
-		lamps_w(false); //main lamps out
+		lamps_w(false); // P12
 
 	if (BIT(data, U5_EN1MA) && !BIT(m_strobe, U5_EN1MA))
-		; // LOG("1MA %d / ME %d\n", m_ma1, m_me); //machine out 1 / coin enable
+		; // LOG("1MA %d / ME %d\n", m_ma1, m_me); // P7
 
 	if (BIT(data, U5_EN2MA) && !BIT(m_strobe, U5_EN2MA))
-		; // LOG("2MA %d\n", m_ma2); //machine out 2
+		; // LOG("2MA %d\n", m_ma2); // P7
 
 	if (BIT(data, U5_ENANZ1) && !BIT(m_strobe, U5_ENANZ1))
 	{
-		anzeigen_w();
-		service_w();
+		anzeigen_w(); // P12
+		service_w();  // P6
 	}
 
 	if (BIT(data, U5_ENANZ2) && !BIT(m_strobe, U5_ENANZ2))
-		; // anzeigen_w(true); //second 7seg out
+		; // anzeigen_w(true); // P13
 
 	if (BIT(data, U5_ENMUX2) && !BIT(m_strobe, U5_ENMUX2))
-		; // lamps_w(true); //second lamps out
+		; // lamps_w(true); // P13
 
 	if (BIT(data, U5_AW1) && !BIT(m_strobe, U5_AW1))
-		; // coin unit 1 select
+		; // P8
 
 	if (BIT(data, U5_AW2) && !BIT(m_strobe, U5_AW2))
-		; // coin unit 2 select
+		; // P14
 
 	m_strobe = data;
 }
@@ -420,7 +420,7 @@ void stellafr_state::enable_w(uint8_t data)
 void stellafr_state::mux_w(uint8_t data)
 {
 	// anz goes into one 74hc4094
-	// mux has 2 chained for lamp cols 0 - 11, 3 bits for lz encoded and EnSDAp
+	// mux has 2 chained 74hc4094 for lamp cols 0 - 11, 3 bits for lz encoded and EnSDAp
 	m_ma1   = (m_ma1   << 1) | BIT(data,U1_1MA);
 	m_ma2   = (m_ma2   << 1) | BIT(data,U1_2MA);
 	m_me    = (m_me    << 1) | BIT(data,U1_ME);
@@ -440,6 +440,9 @@ void stellafr_state::duart_output_w(uint8_t data)
 
 void stellafr_state::ym2149_portb_w(uint8_t data)
 {
+	//TODO
+	
+	//PORT_B
 }
 
 void stellafr_state::mem_map_steuereinheit(address_map &map)
