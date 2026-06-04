@@ -207,7 +207,8 @@ public:
 		m_magnet(*this, "magnet%u", 0U),
 		m_lamps(*this, "lamp%u", 0U),
 		m_leds(*this, "led%u", 0U),
-		m_in0(*this, "IN0")
+		m_in0(*this, "IN0"),
+		m_door(*this, "DOOR")
 	{ }
 
 	void sus_tk(machine_config &config) ATTR_COLD;
@@ -230,6 +231,7 @@ private:
 	output_finder<128> m_lamps;
 	output_finder<2> m_leds;
 	required_ioport m_in0;
+	required_ioport m_door;
 
 	uint8_t m_ma1;
 	uint8_t m_ma2;
@@ -247,6 +249,7 @@ private:
 	uint8_t m_anz_prevpos;   // previous step (to detect wrap)
 
 	uint8_t mux_r();
+	uint8_t duart_input_r();
 	void enable_w(uint8_t data);
 	void mux_w(uint8_t data);
 	void duart_output_w(uint8_t data);
@@ -434,6 +437,16 @@ void stellafr_state::mux_w(uint8_t data)
 	m_mux2  = (m_mux2  << 1) | BIT(data,U1_MUX2);
 }
 
+uint8_t stellafr_state::duart_input_r()
+{
+	uint8_t data = 0x00;
+
+	if (BIT(m_door->read(), 0))
+		data |= (1 << PORT_I_DOOR);
+
+	return data;
+}
+
 void stellafr_state::duart_output_w(uint8_t data)
 {
 	m_speaker->set_input_gain(0, !BIT(data, PORT_O_EN_SPK) ? 0.9 : 0.0);
@@ -508,12 +521,18 @@ static INPUT_PORTS_START( stellafr )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_SLOT_STOP1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SLOT_STOP2 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_GAMBLE_LOW ) // Right
+
+	PORT_START("DOOR")
+	PORT_CONFNAME( 0x01, 0x00, "Door" ) // P21 - Türschalter
+	PORT_CONFSETTING(    0x00, "Closed" )
+	PORT_CONFSETTING(    0x01, "Open" )
 INPUT_PORTS_END
 
 void stellafr_state::steuereinheit(machine_config &config)
 {
 	MC68681(config, m_duart, 3'686'400);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2); // ?
+	m_duart->inport_cb().set(FUNC(stellafr_state::duart_input_r));
 	m_duart->outport_cb().set(FUNC(stellafr_state::duart_output_w));
 
 	// P20 - Serielle-Schnittstelle for printer
