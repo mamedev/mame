@@ -69,7 +69,6 @@ private:
 void ggconnie_state::machine_start()
 {
 	pce_common_state::machine_start();
-	m_lamp.resolve();
 
 	for (auto &okibank : m_okibank)
 		okibank->configure_entries(0, 8, memregion("oki")->base(), 0x10000);

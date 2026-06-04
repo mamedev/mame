@@ -255,8 +255,6 @@ void msx_state::machine_reset()
 
 void msx_state::machine_start()
 {
-	m_caps_led.resolve();
-	m_code_led.resolve();
 	m_port_c_old = 0xff;
 
 	if (m_region_kanji.found() && m_region_kanji.length() >= 0x20000)

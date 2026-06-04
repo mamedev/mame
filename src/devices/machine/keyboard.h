@@ -77,7 +77,7 @@ public:
 			const machine_config &mconfig,
 			const char *tag,
 			device_t *owner,
-			u32 clock);
+			u32 clock = 0);
 	virtual ~generic_keyboard_device();
 
 	template <typename... T>

@@ -1265,8 +1265,6 @@ INTERRUPT_GEN_MEMBER(segas16b_state::i8751_main_cpu_vblank)
 
 void segas16b_state::machine_start()
 {
-	m_lamps.resolve();
-
 	m_i8751_sync_timer = timer_alloc(FUNC(segas16b_state::i8751_sync), this);
 }
 
@@ -4111,8 +4109,8 @@ void segas16b_state::system16b(machine_config &config)
 	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
-	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
+	SEGAIC16VID(config, m_segaic16vid, m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -4202,7 +4200,7 @@ void segas16b_state::aceattacb_fd1094(machine_config &config)
 void segas16b_state::hwchamp(machine_config &config)
 {
 	system16b(config);
-	MSM6253(config, m_adc, 0);
+	MSM6253(config, m_adc);
 	m_adc->set_input_tag<0>("MONITOR");
 	// TODO: order of these two flipped when returning a status of 0xf0 instead of open bus in r 0x30?
 	m_adc->set_input_tag<1>("RIGHT");
@@ -4212,7 +4210,7 @@ void segas16b_state::hwchamp(machine_config &config)
 void segas16b_state::hwchamp_fd1094(machine_config &config)
 {
 	system16b_fd1094(config);
-	MSM6253(config, m_adc, 0);
+	MSM6253(config, m_adc);
 	m_adc->set_input_tag<0>("MONITOR");
 	// TODO: order of these two flipped when returning a status of 0xf0 instead of open bus in r 0x30?
 	m_adc->set_input_tag<1>("RIGHT");
@@ -4238,9 +4236,9 @@ void segas16b_state::system16b_i8751(machine_config &config)
 
 void segas16b_state::rom_5797_fragment(machine_config &config)
 {
-	SEGA_315_5248_MULTIPLIER(config, m_multiplier, 0);
-	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_1, 0);
-	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_2, 0);
+	SEGA_315_5248_MULTIPLIER(config, m_multiplier);
+	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_1);
+	SEGA_315_5250_COMPARE_TIMER(config, m_cmptimer_2);
 }
 
 void segas16b_state::system16b_5797(machine_config &config)
@@ -4317,7 +4315,7 @@ void segas16b_state::fpointbl(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(75); // these align the pieces with the playfield
 	m_sprites->set_local_originy(-2); // some other gfx don't have identical alignment to original tho (flickey character over 'good luck')
 
@@ -4357,8 +4355,8 @@ void segas16b_state::lockonph(machine_config &config)
 	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
-	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
+	SEGAIC16VID(config, m_segaic16vid, m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

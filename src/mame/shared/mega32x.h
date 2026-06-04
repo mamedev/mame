@@ -208,7 +208,7 @@ public:
 		m_scan_timer.set_tag(std::forward<U>(timer_tag));
 	}
 
-	sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class sega_32x_pal_device : public sega_32x_device

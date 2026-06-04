@@ -147,7 +147,7 @@ private:
 class mrdrilr2_decrypter_device : public ns10_type1_decrypter_device
 {
 public:
-	mrdrilr2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mrdrilr2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 DECLARE_DEVICE_TYPE(MRDRILR2_DECRYPTER, mrdrilr2_decrypter_device) // Type 1

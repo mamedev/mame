@@ -149,7 +149,7 @@ void bebox_state::bebox_peripherals(machine_config &config)
 {
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	PIT8254(config, m_pit8254, 0);
+	PIT8254(config, m_pit8254);
 	m_pit8254->set_clk<0>(4772720/4); /* heartbeat IRQ */
 	m_pit8254->set_clk<1>(4772720/4); /* dram refresh */
 	m_pit8254->set_clk<2>(4772720/4); /* pio port c pin 4, and speaker polling */
@@ -170,19 +170,19 @@ void bebox_state::bebox_peripherals(machine_config &config)
 
 	AM9517A(config, m_dma8237[1], XTAL(14'318'181)/3);
 
-	PIC8259(config, m_pic8259[0], 0);
+	PIC8259(config, m_pic8259[0]);
 	m_pic8259[0]->out_int_callback().set(FUNC(bebox_state::bebox_pic8259_master_set_int_line));
 	m_pic8259[0]->in_sp_callback().set_constant(1);
 	m_pic8259[0]->read_slave_ack_callback().set(m_pic8259[1], FUNC(pic8259_device::acknowledge));
 
-	PIC8259(config, m_pic8259[1], 0);
+	PIC8259(config, m_pic8259[1]);
 	m_pic8259[1]->out_int_callback().set(FUNC(bebox_state::bebox_pic8259_slave_set_int_line));
 	m_pic8259[1]->in_sp_callback().set_constant(0);
 
-	NS16550(config, "ns16550_0", 0);   /* TODO: Verify model */
-	NS16550(config, "ns16550_1", 0);   /* TODO: Verify model */
-	NS16550(config, "ns16550_2", 0);   /* TODO: Verify model */
-	NS16550(config, "ns16550_3", 0);   /* TODO: Verify model */
+	NS16550(config, "ns16550_0");   /* TODO: Verify model */
+	NS16550(config, "ns16550_1");   /* TODO: Verify model */
+	NS16550(config, "ns16550_2");   /* TODO: Verify model */
+	NS16550(config, "ns16550_3");   /* TODO: Verify model */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -190,7 +190,7 @@ void bebox_state::bebox_peripherals(machine_config &config)
 	screen.set_screen_update(m_vga, FUNC(cirrus_gd5446_vga_device::screen_update));
 
 	// was GD5428, assume mistake (GD5446 is PCI)
-	CIRRUS_GD5446_VGA(config, m_vga, 0);
+	CIRRUS_GD5446_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x200000);
 
@@ -217,7 +217,7 @@ void bebox_state::bebox_peripherals(machine_config &config)
 	idectrl.irq_handler().set(FUNC(bebox_state::bebox_ide_interrupt));
 
 	/* pci */
-	PCI_BUS(config, m_pcibus, 0);
+	PCI_BUS(config, m_pcibus);
 	m_pcibus->set_busnum(0);
 
 	pci_connector_device &pcislot0 = add_pci_slot(config, "pcibus:0", 0, "mpc105");

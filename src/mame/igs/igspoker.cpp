@@ -130,7 +130,6 @@ public:
 	int hopper_r();
 
 protected:
-	virtual void machine_start() override ATTR_COLD { m_led.resolve(); m_lamps.resolve(); }
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 

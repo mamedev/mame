@@ -12,7 +12,7 @@
 class gunbustr_link_device : public device_t
 {
 public:
-	gunbustr_link_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	gunbustr_link_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 	~gunbustr_link_device();
 
 	void map(address_map &map) ATTR_COLD;

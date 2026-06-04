@@ -415,9 +415,6 @@ void dragrace_state::palette(palette_device &palette) const
 
 void dragrace_state::machine_start()
 {
-	m_gear_sel.resolve();
-	m_tacho_sel.resolve();
-
 	m_scan_timer = timer_alloc(FUNC(dragrace_state::scanline_irq), this);
 	m_irq_off_timer = timer_alloc(FUNC(dragrace_state::irq_off), this);
 	m_scan_timer->adjust(m_screen->time_until_pos(64));

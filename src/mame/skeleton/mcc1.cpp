@@ -50,8 +50,6 @@ private:
 
 void mcc1_state::machine_start()
 {
-	m_digits.resolve();
-
 	save_item(NAME(m_pa_out));
 	save_item(NAME(m_pb_out));
 	save_item(NAME(m_shift_reg));

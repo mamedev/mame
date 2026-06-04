@@ -20,6 +20,8 @@
 #include "sh4comn.h"
 #include "cpu/drcumlsh.h"
 
+#include "endianness.h"
+
 DEFINE_DEVICE_TYPE(SH7709S, sh7709s_device, "sh7709s", "Hitachi SH7709S")
 
 sh7709s_device::sh7709s_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock, endianness_t endianness)

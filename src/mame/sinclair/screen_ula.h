@@ -87,13 +87,13 @@ private:
 class screen_ula_plus_device : public screen_ula_device
 {
 public:
-	screen_ula_plus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	screen_ula_plus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class screen_ula_next_device : public screen_ula_device
 {
 public:
-	screen_ula_next_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	screen_ula_next_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 DECLARE_DEVICE_TYPE(SCREEN_ULA_PLUS, screen_ula_plus_device)

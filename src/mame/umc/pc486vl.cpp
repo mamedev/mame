@@ -112,7 +112,7 @@ void pc486vl_state::base_config(machine_config &config)
 	// - doesn't apply with md4duv (that effectively supports 64M)
 	RAM(config, "ram").set_default_size("64M");
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->iochck_callback().set(m_chipset, FUNC(um8498f_device::iochck_w));
@@ -154,6 +154,7 @@ void pc486vl_state::pccm912(machine_config &config)
 {
 	base_config(config);
 	// TODO: actually 4 + 3 VLB
+	// FIXME: set ISA bus clock
 	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "vga", false);
 	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, "fdc", false);
 	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, "ide", false);
@@ -166,6 +167,7 @@ void pc486vl_state::pccm912(machine_config &config)
 void pc486vl_state::pc486vl(machine_config &config)
 {
 	base_config(config);
+	// FIXME: set ISA bus clock
 	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "vga", false);
 	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, "fdc", false);
 	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, "ide", false);

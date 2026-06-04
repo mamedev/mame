@@ -116,6 +116,36 @@ t.nsec (read-only)
     interval.
 
 
+.. _luascript-ref-outputproxy:
+
+Output proxy
+------------
+
+Wraps MAME’s ``output_proxy`` class, which can be used to get or set the value
+of an output.
+
+Instantiation
+~~~~~~~~~~~~~
+
+manager.machine.devices[tag]:output(name)
+    Gets a proxy to an output by name relative to a device.  The output will not
+    be created if it does not already exist.
+
+Methods
+~~~~~~~
+
+output:exists()
+    Returns a Boolean indicating whether the output exists.
+output:get()
+    Returns the current value of the output if it exists, or a value stored by
+    the output proxy if the output does no exist.
+output:set(val)
+    Sets the value of the output if it exists, or stores the value in the output
+    proxy if the output does not exist.  Note that if the output does not exist,
+    the new value will not be reflected by other output proxies created with the
+    same device and name
+
+
 .. _luascript-ref-mameman:
 
 MAME machine manager
@@ -430,18 +460,6 @@ manager.machine.output
 Methods
 ~~~~~~~
 
-output:set_value(name, val)
-    Sets the specified output value.  The value must be an integer.  The output
-    will be created if it does not already exist.
-output:set_indexed_value(prefix, index, val)
-    Appends the index (formatted as a decimal integer) to the prefix and sets
-    the value of the corresponding output.  The value must be an integer.  The
-    output will be created if it does not already exist.
-output:get_value(name)
-    Returns the value of the specified output, or zero if it doesn’t exist.
-output:get_indexed_value(prefix, index)
-    Appends the index (formatted as a decimal integer) to the prefix and returns
-    the value of the corresponding output, or zero if it doesn’t exist.
 output:name_to_id(name)
     Gets the per-session unique integer ID for the specified output, or zero if
     it doesn’t exist.

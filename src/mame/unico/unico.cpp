@@ -57,10 +57,9 @@ public:
 		m_spriteram(*this, "spriteram", 0x800, ENDIANNESS_BIG)
 	{ }
 
-	void burglarx(machine_config &config);
+	void burglarx(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	static rgb_t unico_R6G6B6X(uint32_t raw);
@@ -901,12 +900,6 @@ GFXDECODE_END
 
 
 ***************************************************************************/
-
-
-void burglarx_state::machine_start()
-{
-	m_leds.resolve();
-}
 
 
 /***************************************************************************

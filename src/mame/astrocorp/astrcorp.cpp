@@ -235,7 +235,7 @@ winbingo: Win Win Bingo
 class astro_cpucode_device : public device_t
 {
 public:
-	astro_cpucode_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	astro_cpucode_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// read handlers
 	int do_read();              // DO
@@ -1681,7 +1681,6 @@ GFXDECODE_END
 
 void astrocorp_state::machine_start()
 {
-	m_lamps.resolve();
 	m_screen_enable = 0;
 }
 
@@ -1832,7 +1831,7 @@ void zoo_state::zoo(machine_config &config)
 
 	m_screen->set_raw(26.824_MHz_XTAL / 4, 437, 0, 320, 261, 0, 240); // ??? ~15.345kHz Hsync, ??? ~58.795Hz Vsync
 
-	ASTRO_CPUCODE(config, m_cpucode, 0);
+	ASTRO_CPUCODE(config, m_cpucode);
 }
 
 void zoo_state::zulu(machine_config &config)
@@ -1996,7 +1995,7 @@ void astoneag_state::astoneag(machine_config &config)
 
 	// Adds RAMDAC
 	PALETTE(config.replace(), m_palette).set_entries(256);
-	RAMDAC(config, m_ramdac, 0, m_palette);
+	RAMDAC(config, m_ramdac, m_palette);
 	m_ramdac->set_addrmap(0, &astoneag_state::ramdac_map);
 
 	// Tiles are double size vertically

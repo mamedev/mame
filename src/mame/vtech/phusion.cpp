@@ -76,7 +76,7 @@ void phusion_state::phusion(machine_config &config)
 	screen.set_visarea(0, 160-1, 0, 160-1);
 	screen.set_screen_update(FUNC(phusion_state::screen_update));
 
-	SPEAKER(config, "speaker", 0).front_center();
+	SPEAKER(config, "speaker").front_center();
 }
 
 ROM_START( phusion )

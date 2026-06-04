@@ -44,7 +44,7 @@ class am9513_device : public device_t
 {
 public:
 	// device type constructor
-	am9513_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	am9513_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// static configuration
 	auto out1_cb() { return m_out_cb[0].bind(); }

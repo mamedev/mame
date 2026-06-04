@@ -440,7 +440,7 @@ void quizpani_state::quizpani(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki");
 
 	okim6295_device &oki(OKIM6295(config, "oki", 16'000'000 / 4, okim6295_device::PIN7_LOW));

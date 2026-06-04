@@ -120,10 +120,12 @@ public:
 		, m_iobank(*this, "iobank")
 		, m_keypad(*this, "COL.%u", 0)
 		, m_calenable(*this, "CAL_EN")
+		, m_outputs(*this, "vfd%u", 0U)
+		, m_annuns(*this, "ann%u", 0U)
 	{
 	}
 
-	void hp3478a(machine_config &config);
+	void hp3478a(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -148,8 +150,8 @@ private:
 
 	/////////////// stuff for internal LCD emulation
 	// shoud be split to a separate driver
-	std::unique_ptr<output_finder<16> > m_outputs;
-	std::unique_ptr<output_finder<12> > m_annuns;
+	output_finder<16> m_outputs;
+	output_finder<12> m_annuns;
 
 	void lcd_interface(uint8_t p2new);
 	void lcd_update_hinib(uint64_t shiftreg);
@@ -369,7 +371,7 @@ void hp3478a_state::lcd_update_annuns(uint64_t shiftreg)
 		m_lcd_annuns[i] = (shiftreg & 0x01);
 		shiftreg >>=1;
 	}
-	std::copy(std::begin(m_lcd_annuns), std::end(m_lcd_annuns), std::begin(*m_annuns));
+	std::copy(std::begin(m_lcd_annuns), std::end(m_lcd_annuns), std::begin(m_annuns));
 }
 
 /** map LCD char to ASCII and segment data + update
@@ -433,7 +435,7 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 		LOGMASKED(DEBUG_LCD, "LCD : state=IDLE, PWO deselected, %d stray bits(0x...%02X)\n",m_lcd_bitcount, m_lcd_bitbuf & 0xFF);
 		m_lcdstate = lcd_state::IDLE;
 		m_lcdiwa = lcd_iwatype::DISCARD;
-		std::transform(std::begin(m_lcd_segdata), std::end(m_lcd_segdata), std::begin(*m_outputs), lcd_set_display);
+		std::transform(std::begin(m_lcd_segdata), std::end(m_lcd_segdata), std::begin(m_outputs), lcd_set_display);
 		m_lcd_bitcount = 0;
 		m_lcd_bitbuf = 0;
 		return;
@@ -561,11 +563,6 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 void hp3478a_state::machine_start()
 {
 	m_bank0->configure_entries(0, 2, memregion("maincpu")->base(), 0x1000);
-
-	m_outputs = std::make_unique<output_finder<16> >(*this, "vfd%u", (unsigned) 0);
-	m_outputs->resolve();
-	m_annuns = std::make_unique<output_finder<12> >(*this, "ann%u", (unsigned) 0);
-	m_annuns->resolve();
 
 	m_p2_oldstate = 0;
 }
@@ -696,7 +693,7 @@ void hp3478a_state::hp3478a(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	ADDRESS_MAP_BANK(config, m_iobank, 0);
+	ADDRESS_MAP_BANK(config, m_iobank);
 	m_iobank->set_map(&hp3478a_state::io_bank);
 	m_iobank->set_data_width(8);
 	m_iobank->set_addr_width(18);

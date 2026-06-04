@@ -9,7 +9,7 @@
 class vt_menu_protection_device :  public device_t
 {
 public:
-	vt_menu_protection_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vt_menu_protection_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint8_t read();
 	void write_clock(int state);

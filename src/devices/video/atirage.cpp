@@ -77,7 +77,7 @@ void atirage_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(FUNC(atirage_device::screen_update));
 
-	ATIMACH64(config, m_mach64, 0);
+	ATIMACH64(config, m_mach64);
 	m_mach64->set_screen("screen");
 	m_mach64->set_vram_size(0x600000);
 }

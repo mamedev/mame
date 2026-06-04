@@ -8,6 +8,7 @@
 
 #pragma once
 
+
 class wpc_out_device : public device_t
 {
 public:
@@ -22,7 +23,7 @@ public:
 	wpc_out_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~wpc_out_device();
 
-	void set_names(const char *const *names);
+	void set_names(char const *const (&names)[54]);
 	void set_handler(handler_t cb);
 	void set_gi_count(int _count);
 
@@ -41,7 +42,8 @@ protected:
 
 	void send_output(int sid, int state);
 
-	output_finder<> m_cpu_led;
+	output_finder<54> outputs;
+	output_finder<> cpu_led;
 	handler_t handler_cb;
 	uint8_t state[6], gi;
 	bool first_after_led;
@@ -49,7 +51,6 @@ protected:
 	int gi_count;
 	uint32_t gi_time[5];
 	emu_timer *timer;
-	const char *const *names;
 };
 
 DECLARE_DEVICE_TYPE(WPC_OUT, wpc_out_device)

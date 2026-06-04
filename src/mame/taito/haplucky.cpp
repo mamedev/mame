@@ -157,7 +157,7 @@ void haplucky_state::haplucky(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &haplucky_state::sound_map);
 	audiocpu.set_addrmap(AS_IO, &haplucky_state::sound_io_map);
 
-	i8255_device &ppi(I8255(config, "ppi", 0)); // M5L8255AP-5
+	i8255_device &ppi(I8255(config, "ppi")); // M5L8255AP-5
 	ppi.in_pc_callback().set_ioport("IN0");
 
 	// video hardware

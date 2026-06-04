@@ -8,6 +8,7 @@
 
 #include "romload.h"
 
+#include "endianness.h"
 #include "multibyte.h"
 
 /*
@@ -1080,19 +1081,19 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &naomi_gdrom_board::sh4_map);
 	m_maincpu->set_addrmap(AS_IO, &naomi_gdrom_board::sh4_io_map);
 
-	PCI_ROOT(config, "pci", 0);
-	SEGA315_6154(config, m_315_6154, 0);
+	PCI_ROOT(config, "pci");
+	SEGA315_6154(config, m_315_6154);
 	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &naomi_gdrom_board::pci_map);
-	IDE_GDROM(config, m_idegdrom, 0, image_tag, m_315_6154->tag(), sega_315_6154_device::AS_PCI_MEMORY);
+	IDE_GDROM(config, m_idegdrom, image_tag, m_315_6154->tag(), sega_315_6154_device::AS_PCI_MEMORY);
 	m_idegdrom->irq_callback().set_inputline(m_maincpu, SH4_IRL2);
 	PIC16C622(config, m_securitycpu, PIC_CLOCK);
 	m_securitycpu->read_b().set(FUNC(naomi_gdrom_board::pic_dimm_r));
 	m_securitycpu->write_b().set(FUNC(naomi_gdrom_board::pic_dimm_w));
 	m_securitycpu->set_config(0x3fff - 0x04);
-	I2C_24C01(config, m_i2c0, 0);
+	I2C_24C01(config, m_i2c0);
 	m_i2c0->set_e0(0);
 	m_i2c0->set_wc(1);
-	I2C_24C01(config, m_i2c1, 0);
+	I2C_24C01(config, m_i2c1);
 	m_i2c1->set_e0(1);
 	m_i2c1->set_wc(1);
 	EEPROM_93C46_8BIT(config, m_eeprom, 0);

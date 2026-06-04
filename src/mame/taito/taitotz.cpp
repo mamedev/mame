@@ -182,6 +182,8 @@ Notes:
 
 #include "screen.h"
 
+#include "corefloat.h"
+
 #include <algorithm>
 
 #define LOG_PPC_TO_TLCS_COMMANDS    (1U << 1)

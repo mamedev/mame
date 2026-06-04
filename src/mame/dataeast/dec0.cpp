@@ -1809,19 +1809,19 @@ void dec0_state::dec0_base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dec0);
 	PALETTE(config, m_palette);
 
-	DECO_BAC06(config, m_tilegen[0], 0);
+	DECO_BAC06(config, m_tilegen[0]);
 	m_tilegen[0]->set_gfx_region_wide(0, 0, 0);
 	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_BAC06(config, m_tilegen[1], 0);
+	DECO_BAC06(config, m_tilegen[1]);
 	m_tilegen[1]->set_gfx_region_wide(0, 1, 0);
 	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_BAC06(config, m_tilegen[2], 0);
+	DECO_BAC06(config, m_tilegen[2]);
 	m_tilegen[2]->set_gfx_region_wide(0, 2, 0);
 	m_tilegen[2]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_MXC06(config, m_spritegen, 0, m_palette, gfx_dec0_spr);
+	DECO_MXC06(config, m_spritegen, m_palette, gfx_dec0_spr);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -1944,19 +1944,19 @@ void automat_state::automat(machine_config &config)
 	m_screen->set_screen_update(FUNC(automat_state::screen_update_automat));
 	m_screen->set_palette(m_palette);
 
-	DECO_BAC06(config, m_tilegen[0], 0);
+	DECO_BAC06(config, m_tilegen[0]);
 	m_tilegen[0]->set_gfx_region_wide(0, 0, 0);
 	m_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_BAC06(config, m_tilegen[1], 0);
+	DECO_BAC06(config, m_tilegen[1]);
 	m_tilegen[1]->set_gfx_region_wide(0, 1, 0);
 	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_BAC06(config, m_tilegen[2], 0);
+	DECO_BAC06(config, m_tilegen[2]);
 	m_tilegen[2]->set_gfx_region_wide(0, 2, 0);
 	m_tilegen[2]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_MXC06(config, m_spritegen, 0, m_palette, gfx_automat_spr);
+	DECO_MXC06(config, m_spritegen, m_palette, gfx_automat_spr);
 	m_spritegen->set_colpri_callback(FUNC(automat_state::robocop_colpri_cb));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
@@ -1980,10 +1980,10 @@ void automat_state::automat(machine_config &config)
 	ym2203b.add_route(2, "mono", 0.90);
 	ym2203b.add_route(3, "mono", 0.35);
 
-	LS157(config, m_adpcm_select[0], 0);
+	LS157(config, m_adpcm_select[0]);
 	m_adpcm_select[0]->out_callback().set("msm1", FUNC(msm5205_device::data_w));
 
-	LS157(config, m_adpcm_select[1], 0);
+	LS157(config, m_adpcm_select[1]);
 	m_adpcm_select[1]->out_callback().set("msm2", FUNC(msm5205_device::data_w));
 
 	msm5205_device &msm1(MSM5205(config, "msm1", 384'000));
@@ -2018,20 +2018,20 @@ void automat_state::secretab(machine_config &config) // all clocks verified on P
 	m_screen->set_screen_update(FUNC(automat_state::screen_update_secretab));
 	m_screen->set_palette(m_palette);
 
-	DECO_BAC06(config, m_tilegen[0], 0);
+	DECO_BAC06(config, m_tilegen[0]);
 	m_tilegen[0]->set_gfx_region_wide(0, 0, 0);
 	m_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_BAC06(config, m_tilegen[1], 0);
+	DECO_BAC06(config, m_tilegen[1]);
 	m_tilegen[1]->set_gfx_region_wide(0, 1, 0);
 	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 	m_tilegen[1]->set_tile_callback(FUNC(automat_state::baddudes_tile_cb));
 
-	DECO_BAC06(config, m_tilegen[2], 0);
+	DECO_BAC06(config, m_tilegen[2]);
 	m_tilegen[2]->set_gfx_region_wide(0, 2, 0);
 	m_tilegen[2]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_MXC06(config, m_spritegen, 0, m_palette, gfx_automat_spr);
+	DECO_MXC06(config, m_spritegen, m_palette, gfx_automat_spr);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
@@ -2052,10 +2052,10 @@ void automat_state::secretab(machine_config &config) // all clocks verified on P
 	ym3812_device &ym3812(YM3812(config, "ym3812", 20_MHz_XTAL / 8));
 	ym3812.add_route(ALL_OUTPUTS, "mono", 0.35);
 
-	LS157(config, m_adpcm_select[0], 0);
+	LS157(config, m_adpcm_select[0]);
 	m_adpcm_select[0]->out_callback().set("msm1", FUNC(msm5205_device::data_w));
 
-	LS157(config, m_adpcm_select[1], 0);
+	LS157(config, m_adpcm_select[1]);
 	m_adpcm_select[1]->out_callback().set("msm2", FUNC(msm5205_device::data_w));
 
 	msm5205_device &msm1(MSM5205(config, "msm1", 400_kHz_XTAL));

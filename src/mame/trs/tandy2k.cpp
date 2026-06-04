@@ -1021,11 +1021,11 @@ void tandy2k_state::tandy2k(machine_config &config)
 	vpac.sld_callback().set(FUNC(tandy2k_state::vpac_sld_w));
 	vpac.set_screen(SCREEN_TAG);
 
-	CRT9212(config, m_drb0, 0);
+	CRT9212(config, m_drb0);
 	m_drb0->set_wen2(1);
 	m_drb0->dout().set(FUNC(tandy2k_state::vidla_w));
 
-	CRT9212(config, m_drb1, 0);
+	CRT9212(config, m_drb1);
 	m_drb1->set_wen2(1);
 	m_drb1->dout().set(FUNC(tandy2k_state::drb_attr_w));
 
@@ -1046,7 +1046,7 @@ void tandy2k_state::tandy2k(machine_config &config)
 	m_i8255a->in_pb_callback().set(FUNC(tandy2k_state::ppi_pb_r));
 	m_i8255a->out_pc_callback().set(FUNC(tandy2k_state::ppi_pc_w));
 
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_uart->dtr_handler().set(m_rs232, FUNC(rs232_port_device::write_dtr));
 	m_uart->rts_handler().set(m_rs232, FUNC(rs232_port_device::write_rts));
@@ -1059,7 +1059,7 @@ void tandy2k_state::tandy2k(machine_config &config)
 	// TODO pin 15 external transmit clock
 	// TODO pin 17 external receiver clock
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(16_MHz_XTAL / 16);
 	m_pit->out_handler<0>().set(FUNC(tandy2k_state::outspkr_w));
 	m_pit->set_clk<1>(16_MHz_XTAL / 8);
@@ -1067,10 +1067,10 @@ void tandy2k_state::tandy2k(machine_config &config)
 	//m_pit->set_clk<2>(16_MHz_XTAL / 8);
 	//m_pit->out_handler<2>().set(FUNC(tandy2k_state::rfrqpulse_w));
 
-	PIC8259(config, m_pic0, 0);
+	PIC8259(config, m_pic0);
 	m_pic0->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 
-	PIC8259(config, m_pic1, 0);
+	PIC8259(config, m_pic1);
 	m_pic1->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int1_w));
 
 	// there were two drive types shipped on the 2k, one sets ready when a disk is inserted
@@ -1094,12 +1094,12 @@ void tandy2k_state::tandy2k(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	TANDY2K_KEYBOARD(config, m_kb, 0);
+	TANDY2K_KEYBOARD(config, m_kb);
 	m_kb->clock_wr_callback().set(FUNC(tandy2k_state::kbdclk_w));
 	m_kb->data_wr_callback().set(FUNC(tandy2k_state::kbddat_w));
 
 	// temporary until the tandy keyboard has a rom dump
-	TANDY2K_HLE_KEYB(config, m_pc_keyboard, 0).keypress().set(I8259A_1_TAG, FUNC(pic8259_device::ir0_w));
+	TANDY2K_HLE_KEYB(config, m_pc_keyboard).keypress().set(I8259A_1_TAG, FUNC(pic8259_device::ir0_w));
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("tandy2k");

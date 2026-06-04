@@ -521,7 +521,7 @@ void roland_d70_state::d70(machine_config &config) {
 	m_pcm->add_route(0, "speaker", 1.0, 0);
 	m_pcm->add_route(1, "speaker", 1.0, 1);
 
-	T6963C(config, m_lcd, 0);
+	T6963C(config, m_lcd);
 	m_lcd->set_addrmap(0, &roland_d70_state::lcd_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));

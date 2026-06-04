@@ -296,39 +296,32 @@ public:
 	{
 	}
 
-	void seattle_common(machine_config &config);
-	void phoenix(machine_config &config);
-	void seattle150(machine_config &config);
-	void seattle150_widget(machine_config &config);
-	void seattle200(machine_config &config);
-	void seattle200_widget(machine_config &config);
-	void flagstaff(machine_config &config);
-	void wg3dh(machine_config &config);
-	void sfrush(machine_config &config);
-	void hyprdriv(machine_config &config);
-	void carnevil(machine_config &config);
-	void blitz99(machine_config &config);
-	void blitz2k(machine_config &config);
-	void blitz(machine_config &config);
-	void biofreak(machine_config &config);
-	void sfrushrkw(machine_config &config);
-	void calspeed(machine_config &config);
-	void mace(machine_config &config);
-	void vaportrx(machine_config &config);
-	void sfrushrk(machine_config &config);
+	void wg3dh(machine_config &config) ATTR_COLD;
+	void sfrush(machine_config &config) ATTR_COLD;
+	void hyprdriv(machine_config &config) ATTR_COLD;
+	void carnevil(machine_config &config) ATTR_COLD;
+	void blitz99(machine_config &config) ATTR_COLD;
+	void blitz2k(machine_config &config) ATTR_COLD;
+	void blitz(machine_config &config) ATTR_COLD;
+	void biofreak(machine_config &config) ATTR_COLD;
+	void sfrushrkw(machine_config &config) ATTR_COLD;
+	void calspeed(machine_config &config) ATTR_COLD;
+	void mace(machine_config &config) ATTR_COLD;
+	void vaportrx(machine_config &config) ATTR_COLD;
+	void sfrushrk(machine_config &config) ATTR_COLD;
 
-	void init_sfrush();
-	void init_blitz2k();
-	void init_carnevil();
-	void init_biofreak();
-	void init_calspeed();
-	void init_sfrushrk();
-	void init_vaportrx();
-	void init_hyprdriv();
-	void init_blitz();
-	void init_wg3dh();
-	void init_mace();
-	void init_blitz99();
+	void init_sfrush() ATTR_COLD;
+	void init_blitz2k() ATTR_COLD;
+	void init_carnevil() ATTR_COLD;
+	void init_biofreak() ATTR_COLD;
+	void init_calspeed() ATTR_COLD;
+	void init_sfrushrk() ATTR_COLD;
+	void init_vaportrx() ATTR_COLD;
+	void init_hyprdriv() ATTR_COLD;
+	void init_blitz() ATTR_COLD;
+	void init_wg3dh() ATTR_COLD;
+	void init_mace() ATTR_COLD;
+	void init_blitz99() ATTR_COLD;
 
 	ioport_value blitz_49way_r();
 	ioport_value i40_r();
@@ -337,6 +330,14 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	void seattle_common(machine_config &config) ATTR_COLD;
+	void phoenix(machine_config &config) ATTR_COLD;
+	void seattle150(machine_config &config) ATTR_COLD;
+	void seattle150_widget(machine_config &config) ATTR_COLD;
+	void seattle200(machine_config &config) ATTR_COLD;
+	void seattle200_widget(machine_config &config) ATTR_COLD;
+	void flagstaff(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<mips3_device> m_maincpu;
@@ -483,11 +484,6 @@ void seattle_state::machine_start()
 	save_item(NAME(m_i40_data));
 	save_item(NAME(m_gear));
 	save_item(NAME(m_wheel_calibrated));
-
-	m_wheel_driver.resolve();
-	m_wheel_motor.resolve();
-	m_lamps.resolve();
-	m_leds.resolve();
 }
 
 
@@ -2008,7 +2004,7 @@ void seattle_state::seattle_common(machine_config &config)
 	m_maincpu->set_system_clock(SYSTEM_CLOCK);
 
 	// PCI Bus Devices
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 
 	GT64010(config, m_galileo, SYSTEM_CLOCK, m_maincpu, GALILEO_IRQ_NUM);
 	m_galileo->set_map(0, address_map_constructor(&seattle_state::seattle_cs0_map, "seattle_cs0_map", this), this);
@@ -2024,7 +2020,7 @@ void seattle_state::seattle_common(machine_config &config)
 	ide.subdevice<bus_master_ide_controller_device>("ide")->slot(0).set_option_machine_config("hdd", hdd_config);
 
 	// video hardware
-	VOODOO_1_PCI(config, m_voodoo, 0, m_maincpu, m_screen);
+	VOODOO_1_PCI(config, m_voodoo, m_maincpu, m_screen);
 	m_voodoo->set_fbmem(2);
 	m_voodoo->set_tmumem(4, 0);
 	m_voodoo->set_status_cycles(1000); // optimization to consume extra cycles when polling status
@@ -2078,7 +2074,7 @@ void seattle_state::seattle150_widget(machine_config &config)
 
 	m_galileo->set_map(3, address_map_constructor(&seattle_state::widget_cs3_map, "widget_cs3_map", this), this);
 
-	SMC91C94(config, m_ethernet, 0);
+	SMC91C94(config, m_ethernet);
 	m_ethernet->irq_handler().set(FUNC(seattle_state::ethernet_interrupt));
 }
 
@@ -2096,7 +2092,7 @@ void seattle_state::seattle200_widget(machine_config &config)
 
 	m_galileo->set_map(3, address_map_constructor(&seattle_state::widget_cs3_map, "widget_cs3_map", this), this);
 
-	SMC91C94(config, m_ethernet, 0);
+	SMC91C94(config, m_ethernet);
 	m_ethernet->irq_handler().set(FUNC(seattle_state::ethernet_interrupt));
 }
 
@@ -2106,7 +2102,7 @@ void seattle_state::flagstaff(machine_config &config)
 
 	m_galileo->set_map(3, address_map_constructor(&seattle_state::flagstaff_cs3_map, "flagstaff_cs3_map", this), this);
 
-	SMC91C94(config, m_ethernet, 0);
+	SMC91C94(config, m_ethernet);
 	m_ethernet->irq_handler().set(FUNC(seattle_state::ethernet_interrupt));
 
 	m_voodoo->set_fbmem(2);
@@ -2122,14 +2118,14 @@ void seattle_state::wg3dh(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_2115(config, m_dcs, 0);
+	DCS2_AUDIO_2115(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x3839);
 	m_dcs->add_route(0, "speaker", 1.0, 1);
 	m_dcs->add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2147,14 +2143,14 @@ void seattle_state::mace(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_2115(config, m_dcs, 0);
+	DCS2_AUDIO_2115(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x3839);
 	m_dcs->add_route(0, "speaker", 1.0, 1);
 	m_dcs->add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2174,7 +2170,7 @@ void seattle_state::sfrush(machine_config &config)
 	SPEAKER(config, "speaker", 4).corners();
 	//SPEAKER(config, "subwoofer").lfe(); Not implemented, Quad Amp PCB output;
 
-	ATARI_CAGE_SEATTLE(config, m_cage, 0);
+	ATARI_CAGE_SEATTLE(config, m_cage);
 	m_cage->set_speedup(0x5236);
 	m_cage->irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
 	// TODO: copied from atarigt.cpp; Same configurations as T-Mek?
@@ -2183,7 +2179,7 @@ void seattle_state::sfrush(machine_config &config)
 	m_cage->add_route(2, "speaker", 1.0, 0); // Forward Left
 	m_cage->add_route(3, "speaker", 1.0, 3); // Back Right
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2204,7 +2200,7 @@ void seattle_state::sfrushrk(machine_config &config)
 	SPEAKER(config, "speaker", 4).corners();
 	//SPEAKER(config, "subwoofer").lfe(); Not implemented, Quad Amp PCB output;
 
-	ATARI_CAGE_SEATTLE(config, m_cage, 0);
+	ATARI_CAGE_SEATTLE(config, m_cage);
 	m_cage->set_speedup(0x5329);
 	m_cage->irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
 	// TODO: copied from atarigt.cpp; Same configurations as T-Mek?
@@ -2213,7 +2209,7 @@ void seattle_state::sfrushrk(machine_config &config)
 	m_cage->add_route(2, "speaker", 1.0, 0); // Forward Left
 	m_cage->add_route(3, "speaker", 1.0, 3); // Back Right
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2238,14 +2234,14 @@ void seattle_state::calspeed(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_2115(config, m_dcs, 0);
+	DCS2_AUDIO_2115(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x39c0);
 	m_dcs->add_route(0, "speaker", 1.0, 1);
 	m_dcs->add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2264,14 +2260,14 @@ void seattle_state::vaportrx(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_2115(config, m_dcs, 0);
+	DCS2_AUDIO_2115(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x39c2);
 	m_dcs->add_route(0, "speaker", 1.0, 1);
 	m_dcs->add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2289,14 +2285,14 @@ void seattle_state::biofreak(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_2115(config, m_dcs, 0);
+	DCS2_AUDIO_2115(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x3835);
 	m_dcs->add_route(0, "speaker", 1.0, 1);
 	m_dcs->add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2314,14 +2310,14 @@ void seattle_state::blitz(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_2115(config, m_dcs, 0);
+	DCS2_AUDIO_2115(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x39c2);
 	m_dcs->add_route(0, "speaker", 1.0, 1);
 	m_dcs->add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2340,14 +2336,14 @@ void seattle_state::blitz99(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_2115(config, m_dcs, 0);
+	DCS2_AUDIO_2115(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x0afb);
 	m_dcs->add_route(0, "speaker", 1.0, 1);
 	m_dcs->add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2366,14 +2362,14 @@ void seattle_state::blitz2k(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_2115(config, m_dcs, 0);
+	DCS2_AUDIO_2115(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x0b5d);
 	m_dcs->add_route(0, "speaker", 1.0, 1);
 	m_dcs->add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2393,14 +2389,14 @@ void seattle_state::carnevil(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_2115(config, m_dcs, 0);
+	DCS2_AUDIO_2115(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x0af7);
 	m_dcs->add_route(0, "speaker", 1.0, 1);
 	m_dcs->add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");
@@ -2418,14 +2414,14 @@ void seattle_state::hyprdriv(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DCS2_AUDIO_2115(config, m_dcs, 0);
+	DCS2_AUDIO_2115(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x0af7);
 	m_dcs->add_route(0, "speaker", 1.0, 1);
 	m_dcs->add_route(1, "speaker", 1.0, 0);
 
-	MIDWAY_IOASIC(config, m_ioasic, 0);
+	MIDWAY_IOASIC(config, m_ioasic);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
 	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
 	m_ioasic->in_port_cb<2>().set_ioport("IN1");

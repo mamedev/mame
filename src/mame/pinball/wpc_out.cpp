@@ -8,12 +8,12 @@ DEFINE_DEVICE_TYPE(WPC_OUT, wpc_out_device, "wpc_out", "Williams Pinball Control
 
 wpc_out_device::wpc_out_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WPC_OUT, tag, owner, clock),
-	m_cpu_led(*this, "L:cpu led"),
+	outputs(*this, "u:output %02d", 1U),
+	cpu_led(*this, "L:cpu led"),
 	gi(0),
 	first_after_led(false),
 	gi_count(0),
-	timer(nullptr),
-	names(nullptr)
+	timer(nullptr)
 {
 }
 
@@ -21,9 +21,9 @@ wpc_out_device::~wpc_out_device()
 {
 }
 
-void wpc_out_device::set_names(const char *const *_names)
+void wpc_out_device::set_names(char const *const (&names)[54])
 {
-	names = _names;
+	outputs.set_names(names);
 }
 
 void wpc_out_device::set_handler(handler_t cb)
@@ -56,18 +56,7 @@ void wpc_out_device::send_output(int sid, int state)
 	if(!handler_cb.isnull() && handler_cb(sid, state))
 		return;
 
-	char buffer[32];
-	const char *name;
-	if (names && names[sid - 1] && strcmp(names[sid - 1], "s:"))
-	{
-		name = names[sid - 1];
-	}
-	else
-	{
-		sprintf(buffer, "u:output %02d", sid);
-		name = buffer;
-	}
-	machine().output().set_value(name, state);
+	outputs[sid - 1] = state;
 
 	if (sid == 41)
 		machine().bookkeeping().coin_counter_w(0, state);
@@ -125,13 +114,11 @@ void wpc_out_device::gi_w(uint8_t data)
 void wpc_out_device::led_w(uint8_t data)
 {
 	first_after_led = true;
-	m_cpu_led = (data & 0x80) ? 1 : 0;
+	cpu_led = (data & 0x80) ? 1 : 0;
 }
 
 void wpc_out_device::device_start()
 {
-	m_cpu_led.resolve();
-
 	save_item(NAME(state));
 	save_item(NAME(gi));
 	save_item(NAME(first_after_led));

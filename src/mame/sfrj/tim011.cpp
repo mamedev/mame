@@ -13,6 +13,7 @@
 
 #include "cpu/z180/z180.h"
 #include "imagedev/floppy.h"
+#include "formats/hxchfe_dsk.h"
 #include "formats/tim011_dsk.h"
 #include "machine/upd765.h"
 #include "bus/rs232/rs232.h"
@@ -140,7 +141,9 @@ static void tim011_floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
 	fr.add(FLOPPY_TIM011_FORMAT);
+	fr.add(FLOPPY_HFE_FORMAT);
 }
+
 
 void tim011_state::tim011_palette(palette_device &palette) const
 {

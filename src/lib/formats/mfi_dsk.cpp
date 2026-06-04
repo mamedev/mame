@@ -216,20 +216,6 @@ bool mfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			ent++;
 		}
 
-	for(int side=0; side != 2; side++)
-		for(int track=0; track!=46; track++) {
-			std::map<int, int> lengths;
-			const std::vector<uint32_t> &trackbuf = image.get_buffer(track, side, 0);
-			uint32_t cpos = 0;
-			for(uint32_t p : trackbuf) {
-				lengths[p-cpos] ++;
-				cpos = p;
-			}
-			std::ostringstream s;
-			for(const auto &e : lengths)
-				util::stream_format(s, " %d:%d", e.first, e.second);
-			util::stream_format(std::cerr, "%d.%2d:%s\n", side, track, std::move(s).str());
-		}
 	return true;
 }
 

@@ -396,11 +396,11 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void miniboy7(machine_config &config);
-	void sminiboy(machine_config &config);
-	void bejpoker(machine_config &config);
+	void miniboy7(machine_config &config) ATTR_COLD;
+	void sminiboy(machine_config &config) ATTR_COLD;
+	void bejpoker(machine_config &config) ATTR_COLD;
 
-	void init_smini();
+	void init_smini() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -538,8 +538,6 @@ void miniboy7_state::miniboy7_palette(palette_device &palette) const
 
 void miniboy7_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_ay_pa));
 	save_item(NAME(m_ay_pb));
 	save_item(NAME(m_gpri));

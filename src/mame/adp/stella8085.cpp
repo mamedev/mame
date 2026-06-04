@@ -119,9 +119,6 @@ private:
 
 void stella8085_state::machine_start()
 {
-	m_digits.resolve();
-	m_lamps.resolve();
-
 	m_sound_timer = timer_alloc(FUNC(stella8085_state::sound_stop), this);
 
 	save_item(NAME(m_digit));
@@ -573,7 +570,7 @@ void stella8085_state::dicemstr(machine_config &config)
 	RTC62421(config, "rtc", 32.768_kHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 0)
+	BEEP(config, m_beep)
 		.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -606,7 +603,7 @@ void stella8085_state::doppelpot(machine_config &config)
 	MC146818(config, "rtc", 32.768_kHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 0)
+	BEEP(config, m_beep)
 		.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 

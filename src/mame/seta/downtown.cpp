@@ -1995,7 +1995,7 @@ void usclssic_state::usclssic(machine_config &config)
 	m_upd4701->set_portx_tag("TRACKX");
 	m_upd4701->set_porty_tag("TRACKY");
 
-	HC157(config, m_buttonmux, 0);
+	HC157(config, m_buttonmux);
 	m_buttonmux->out_callback().set(m_upd4701, FUNC(upd4701_device::middle_w)).bit(0);
 	m_buttonmux->out_callback().append(m_upd4701, FUNC(upd4701_device::right_w)).bit(1);
 	m_buttonmux->out_callback().append(m_upd4701, FUNC(upd4701_device::left_w)).bit(2);

@@ -103,7 +103,7 @@ namespace {
 
 class lola8_base_state : public driver_device
 {
-public:
+protected:
 	lola8_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -119,9 +119,8 @@ public:
 		, m_io_modifier(*this, "MODIFIER")
 	{ }
 
-	void lola_base(machine_config &config);
+	void lola_base(machine_config &config) ATTR_COLD;
 
-protected:
 	void crtc_vsync(int state);
 	int cass_r();
 	void cass_w(int state);
@@ -148,7 +147,7 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
-	void lola8(machine_config &config);
+	void lola8(machine_config &config) ATTR_COLD;
 
 private:
 	void machine_start() override ATTR_COLD;
@@ -173,7 +172,7 @@ public:
 		: lola8_state(mconfig, type, tag)
 	{ }
 
-	void lola8nk(machine_config &config);
+	void lola8nk(machine_config &config) ATTR_COLD;
 
 private:
 	void machine_start() override ATTR_COLD;
@@ -189,7 +188,7 @@ public:
 		: lola8_base_state(mconfig, type, tag)
 	{ }
 
-	void lola8a(machine_config &config);
+	void lola8a(machine_config &config) ATTR_COLD;
 
 private:
 	void machine_reset() override ATTR_COLD;
@@ -608,21 +607,21 @@ void lola8_base_state::crtc_vsync(int state)
 void lola8_base_state::lola_base(machine_config &config)
 {
 	/* basic machine hardware */
-	I8085A(config, m_maincpu, 0);
+	I8085A(config, m_maincpu, 0); // derived machine configuration will set clock frequency
 	m_maincpu->in_sid_func().set(FUNC(lola8a_state::cass_r));
 	m_maincpu->out_sod_func().set(FUNC(lola8a_state::cass_w));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, m_ay8910, 0);
+	AY8910(config, m_ay8910);
 	m_ay8910->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update(m_hd6845, FUNC(hd6845s_device::screen_update));
 
-	HD6845S(config, m_hd6845, 0); // HD6845 == HD46505S
+	HD6845S(config, m_hd6845, 0); // HD6845 == HD46505S derived machine configuration will set clock frequency
 	m_hd6845->set_screen("screen");
 	m_hd6845->set_show_border_area(false);
 	m_hd6845->set_char_width(8);

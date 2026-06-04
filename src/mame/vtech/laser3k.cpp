@@ -1236,7 +1236,7 @@ void laser3k_state::laser3k(machine_config &config)
 	I8048(config, "kbdmcu", 14_MHz_XTAL * 2 / 7).set_disable();
 
 	/* the 8048 isn't dumped, so substitute modified real Apple II h/w */
-	AY3600(config, m_ay3600, 0);
+	AY3600(config, m_ay3600);
 	m_ay3600->x0().set_ioport("X0");
 	m_ay3600->x1().set_ioport("X1");
 	m_ay3600->x2().set_ioport("X2");

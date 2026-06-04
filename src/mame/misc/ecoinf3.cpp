@@ -41,16 +41,13 @@ public:
 	{
 	}
 
-	void init_ecoinf3();
-	void init_ecoinf3_swap();
-	void ecoinf3_pyramid(machine_config &config);
+	void init_ecoinf3() ATTR_COLD;
+	void init_ecoinf3_swap() ATTR_COLD;
+	void ecoinf3_pyramid(machine_config &config) ATTR_COLD;
 
 private:
-	virtual void machine_start() override
+	virtual void machine_start() override ATTR_COLD
 	{
-		m_lamp_outputs.resolve();
-		m_vfd_outputs.resolve();
-
 		save_item(NAME(m_lamps));
 		save_item(NAME(m_chars));
 		save_item(NAME(m_strobe_addr));

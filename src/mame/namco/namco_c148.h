@@ -27,7 +27,13 @@ public:
 	{
 		set_hostcpu(std::forward<T>(hostcpu), is_master);
 	}
-	namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T, std::enable_if_t<!std::is_integral_v<std::remove_reference_t<T>>, int> = 0>
+	namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&hostcpu, bool is_master) :
+		namco_c148_device(mconfig, tag, owner, 0)
+	{
+		set_hostcpu(std::forward<T>(hostcpu), is_master);
+	}
+	namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void map(address_map &map) ATTR_COLD;
 

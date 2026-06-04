@@ -119,6 +119,8 @@ TODO:
 #include "emu.h"
 #include "psikyosh.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 //#define DEBUG_KEYS

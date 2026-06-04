@@ -1055,6 +1055,8 @@ The lever must be wired to analog port 0 (pin B22 parts side) of the Namco 48-wa
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 #include "technodr.lh"
 
 #define LOG_BANK     (1U << 1)
@@ -1183,12 +1185,12 @@ public:
 		m_sub->write_sci_clk<1>().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
 		m_sub->write_sci_clk<1>().append(m_settings, FUNC(namco_settings_device::clk_w));
 
-		NAMCO_SETTINGS(config, m_settings, 0);
+		NAMCO_SETTINGS(config, m_settings);
 
 		RTC4543(config, m_rtc, XTAL(32'768));
 		m_rtc->data_cb().set(m_sub, FUNC(h8_device::sci_rx_w<1>));
 
-		AT28C16(config, "at28c16", 0);
+		AT28C16(config, "at28c16");
 
 		/* sound hardware */
 		SPEAKER(config, "speaker", 2).front();
@@ -1622,9 +1624,6 @@ protected:
 	{
 		namcos12_state::driver_start();
 
-		m_start_lamp.resolve();
-		m_gun_recoil.resolve();
-
 		/* HACK: patch out wait for dma 5 to complete */
 		*((uint32_t *)(m_mainrom->base() + 0x331c4)) = 0;
 	}
@@ -1766,13 +1765,6 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
-	{
-		namcos12_state::driver_start();
-
-		m_led.resolve();
-	}
-
 	virtual void configure_jvs(machine_config &config, device_jvs_interface &io) override ATTR_COLD
 	{
 		namcos12_state::configure_jvs(config, io);

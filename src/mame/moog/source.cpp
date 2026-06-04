@@ -755,19 +755,6 @@ void source_state::io_map(address_map &map)
 
 void source_state::machine_start()
 {
-	m_octave_led.resolve();
-	m_lfo_rate_led.resolve();
-	m_program_display.resolve();
-	m_edit_display.resolve();
-	m_edit_led.resolve();
-	m_kb_track.resolve();
-	m_osc_waveform.resolve();
-	m_sync.resolve();
-	m_lfo_to_filter.resolve();
-	m_lfo_to_osc.resolve();
-	m_lfo_shape.resolve();
-	m_trigger_out.resolve();
-
 	save_item(NAME(m_octave_hi));
 	save_item(NAME(m_button_row_latch));
 	save_item(NAME(m_encoder_incr));

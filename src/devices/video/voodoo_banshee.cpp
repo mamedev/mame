@@ -31,6 +31,8 @@
 #include "emu.h"
 #include "voodoo_banshee.h"
 
+#include "endianness.h"
+
 using namespace voodoo;
 
 

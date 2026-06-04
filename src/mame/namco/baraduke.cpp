@@ -669,8 +669,6 @@ GFXDECODE_END
 
 void baraduke_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_inputport_selected));
 }
 
@@ -699,7 +697,7 @@ void baraduke_state::baraduke(machine_config &config)
 	screen.screen_vblank().set(FUNC(baraduke_state::screen_vblank));
 	screen.set_palette(m_palette);
 
-	NAMCO_CUS4XTMAP(config, m_tilegen, 0, m_palette, gfx_baraduke_tile);
+	NAMCO_CUS4XTMAP(config, m_tilegen, m_palette, gfx_baraduke_tile);
 	m_tilegen->set_offset(-26, -227, -9, 9);
 	m_tilegen->set_tile_callback(FUNC(baraduke_state::tile_cb));
 

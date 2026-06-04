@@ -21,7 +21,6 @@ DEFINE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODULE1, mephisto_display1_device, "mdisplay
 mephisto_display1_device::mephisto_display1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, MEPHISTO_DISPLAY_MODULE1, tag, owner, clock),
 	m_lcd_pwm(*this, "lcd_pwm"),
-	m_digits(*this, "digit%u", 0U),
 	m_output_digit(*this)
 { }
 
@@ -40,14 +39,22 @@ void mephisto_display1_device::device_add_mconfig(machine_config &config)
 
 
 //-------------------------------------------------
+//  device_config_complete
+//-------------------------------------------------
+
+void mephisto_display1_device::device_config_complete()
+{
+	if (m_output_digit.isunset() && !m_digits)
+		m_digits.emplace(*this, "digit%u", 0U);
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void mephisto_display1_device::device_start()
 {
-	if (m_output_digit.isunset())
-		m_digits.resolve();
-
 	// initialize
 	m_common = 0;
 	m_digit_data = 0;
@@ -65,7 +72,7 @@ void mephisto_display1_device::device_start()
 void mephisto_display1_device::lcd_pwm_w(offs_t offset, u64 data)
 {
 	if (m_output_digit.isunset())
-		m_digits[offset] = data;
+		(*m_digits)[offset] = data;
 	else
 		m_output_digit(offset, data);
 }

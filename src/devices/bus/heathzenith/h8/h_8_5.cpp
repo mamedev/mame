@@ -187,7 +187,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void h_8_5_device::device_add_mconfig(machine_config &config)
 {
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set([this] (bool state) { m_cassbit = state; });
 	m_uart->rts_handler().set(FUNC(h_8_5_device::uart_rts));
 	m_uart->txempty_handler().set(FUNC(h_8_5_device::uart_tx_empty));
@@ -196,7 +196,7 @@ void h_8_5_device::device_add_mconfig(machine_config &config)
 	cassette_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	cassette_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
-	I8251(config, m_console, 0);
+	I8251(config, m_console);
 
 	m_console->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_console->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));

@@ -251,7 +251,7 @@ void a26_rom_dpc_device::setup_addon_ptr(uint8_t *ptr)
 
 void a26_rom_dpc_device::device_add_mconfig(machine_config &config)
 {
-	ATARI_DPC(config, m_dpc, 0);
+	ATARI_DPC(config, m_dpc);
 }
 
 void a26_rom_dpc_device::install_memory_handlers(address_space *space)

@@ -547,7 +547,7 @@ void bbcbp_state::bbcbp(machine_config &config)
 	TMS5220(config, m_vsp, 640000);
 	m_vsp->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	TMS6100(config, "vsm", 0);
+	TMS6100(config, "vsm");
 	m_vsp->m0_cb().set("vsm", FUNC(tms6100_device::m0_w));
 	m_vsp->m1_cb().set("vsm", FUNC(tms6100_device::m1_w));
 	m_vsp->addr_cb().set("vsm", FUNC(tms6100_device::add_w));
@@ -621,7 +621,7 @@ void bbcbp_state::bbcbp(machine_config &config)
 	m_adlc->out_irq_cb().set(FUNC(bbcbp_state::adlc_irq_w));
 	//m_adlc->out_rts_cb().
 
-	econet_device &econet(ECONET(config, "network", 0));
+	econet_device &econet(ECONET(config, "network"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));

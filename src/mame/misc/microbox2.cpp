@@ -327,7 +327,7 @@ void microbx2_state::microbx2(machine_config &config)
 	m_pia1->writepb_handler().set(FUNC(microbx2_state::pia1_pb_w));
 	m_pia1->cb2_handler().set("centronics", FUNC(centronics_device::write_strobe));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(microbx2_state::kbd_w));
 
 	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));

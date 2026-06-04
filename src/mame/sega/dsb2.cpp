@@ -58,14 +58,14 @@ void dsb2_device::dsb2_map(address_map &map)
 void dsb2_device::device_add_mconfig(machine_config &config)
 {
 	// TODO: unknown clocks
-	M68000(config, m_ourcpu, 8000000);
+	M68000(config, m_ourcpu, 8'000'000);
 	m_ourcpu->set_addrmap(AS_PROGRAM, &dsb2_device::dsb2_map);
 
-	I8251(config, m_uart, 4000000);
+	I8251(config, m_uart, 4'000'000);
 	m_uart->rxrdy_handler().set_inputline(m_ourcpu, INPUT_LINE_IRQ1);
 	m_uart->txd_handler().set(FUNC(dsb2_device::output_txd));
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 500'000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	uart_clock.signal_handler().set("uart", FUNC(i8251_device::write_rxc));
 	uart_clock.signal_handler().append("uart", FUNC(i8251_device::write_txc));
 }

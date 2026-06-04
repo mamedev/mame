@@ -208,18 +208,6 @@ void cgang_state::machine_start()
 	m_door_timer = timer_alloc(FUNC(cgang_state::door_motor_tick), this);
 	m_door_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 
-	// resolve outputs
-	m_gun_lamps.resolve();
-	m_spot_lamps.resolve();
-	m_misc_lamps.resolve();
-	m_ufo_lamps.resolve();
-	m_ufo_sol.resolve();
-	m_en_sol.resolve();
-	m_cg_sol.resolve();
-	m_door_count.resolve();
-	m_en_count.resolve();
-	m_cg_count.resolve();
-
 	// register for savestates
 	save_item(NAME(m_watchdog_clk));
 	save_item(NAME(m_main_irq));
@@ -748,7 +736,7 @@ void cgang_state::cgang(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cgang_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(cgang_state::nmi_line_pulse), attotime::from_hz(8_MHz_XTAL/4 / 0x1000));
 
-	PIT8253(config, m_pit[0], 0);
+	PIT8253(config, m_pit[0]);
 	m_pit[0]->set_clk<0>(4_MHz_XTAL/4);
 	m_pit[0]->set_clk<1>(4_MHz_XTAL/4);
 	m_pit[0]->set_clk<2>(4_MHz_XTAL/4);
@@ -756,7 +744,7 @@ void cgang_state::cgang(machine_config &config)
 	m_pit[0]->out_handler<1>().set(FUNC(cgang_state::motor_clock_w<1>));
 	m_pit[0]->out_handler<2>().set(FUNC(cgang_state::motor_clock_w<2>));
 
-	PIT8253(config, m_pit[1], 0);
+	PIT8253(config, m_pit[1]);
 	m_pit[1]->set_clk<0>(4_MHz_XTAL/4);
 	m_pit[1]->set_clk<1>(4_MHz_XTAL/4);
 	m_pit[1]->set_clk<2>(4_MHz_XTAL/4);

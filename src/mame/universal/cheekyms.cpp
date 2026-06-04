@@ -382,7 +382,7 @@ void cheekyms_state::cheekyms(machine_config &config)
 	PALETTE(config, m_palette, FUNC(cheekyms_state::palette), 0xc0);
 
 	// audio hardware
-	CHEEKY_MOUSE_AUDIO(config, m_sound_board, 0);
+	CHEEKY_MOUSE_AUDIO(config, m_sound_board);
 }
 
 

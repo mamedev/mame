@@ -40,9 +40,6 @@ mulcd_device::mulcd_device(const machine_config &mconfig, const char *tag, devic
 void mulcd_device::device_start()
 {
 	hd44780_base_device::device_start();
-	m_outputs.resolve();
-	m_contrast.resolve();
-	m_led_outputs.resolve();
 }
 
 void mulcd_device::device_reset()

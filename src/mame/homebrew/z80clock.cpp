@@ -66,7 +66,7 @@ public:
 	{
 	}
 
-	void z80clock(machine_config& config)
+	void z80clock(machine_config& config) ATTR_COLD
 	{
 		static const z80_daisy_config z80clock_daisy_chain[] =
 		{
@@ -132,19 +132,12 @@ public:
 	}
 
 protected:
-	virtual void machine_start() override
+	virtual void machine_start() override ATTR_COLD
 	{
-		m_col.resolve();
-		m_dp.resolve();
-		m_debug.resolve();
-
-		m_shift.resize(17);
-
-		save_item(NAME(m_shift));
-
 		m_clear_display_timer = timer_alloc(FUNC(z80clock_state::clear_display), this);
 		m_clear_display_timer->adjust(attotime::zero, 0, attotime::from_hz(240));
-		m_clear_display_count.resize(3);
+
+		save_item(NAME(m_shift));
 
 		save_item(NAME(m_clear_display_count));
 
@@ -152,7 +145,7 @@ protected:
 		save_item(NAME(m_ctc_sound_flipflop));
 	}
 
-	virtual void machine_reset() override
+	virtual void machine_reset() override ATTR_COLD
 	{
 		/// HACK: start the sio clock on first write for speed
 		m_sio_clock->set_clock_scale(0.0);
@@ -182,9 +175,9 @@ private:
 	required_ioport m_jp4;
 	required_ioport m_jp5;
 	required_ioport m_jp6;
-	std::vector<uint8_t> m_shift;
+	uint8_t m_shift[17];
 	emu_timer* m_clear_display_timer;
-	std::vector<uint8_t> m_clear_display_count;
+	uint8_t m_clear_display_count[3];
 	int m_ctc_sound_state;
 	bool m_ctc_sound_flipflop;
 
@@ -229,7 +222,7 @@ private:
 
 	void disp_data_w(uint8_t data)
 	{
-		std::copy_backward(m_shift.begin(), m_shift.end() - 1, m_shift.end());
+		std::copy_backward(std::begin(m_shift), std::end(m_shift) - 1, std::end(m_shift));
 
 		m_shift[0] = data;
 	}

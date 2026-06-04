@@ -20093,7 +20093,6 @@ pokemech
 pokgoget
 punifrnd
 punij1m
-punij1pk
 punij1pu
 punij2pk
 punirune
@@ -20615,6 +20614,10 @@ lk3000
 @source:handheld/monty.cpp
 mmonty
 monty
+
+@source:handheld/mylife.cpp
+mylife
+mylifei
 
 @source:handheld/pensebem.cpp
 pbem2017
@@ -21831,6 +21834,7 @@ iqblock
 jackie
 jackiea
 kungfu
+spec8way
 
 @source:igs/lordgun.cpp
 aliencha
@@ -36270,8 +36274,8 @@ sforteb
 sfortec
 sfortec1
 
-@source:novag/ssaphire.cpp
-ssaphire
+@source:novag/ssapphire.cpp
+ssapphire
 
 @source:novag/vip.cpp
 nsvip
@@ -42831,10 +42835,11 @@ renju
 
 @source:seta/speedatk.cpp
 daifugo
+hana6
+hana6bl
 hanaren2
 harashi
 speedatk
-unkalba
 
 @source:seta/speglsht.cpp
 speglsht
@@ -46039,6 +46044,7 @@ palamed
 palamedj
 plgirls
 plgirls2
+plgirls2j
 plgirls2b
 plotting
 plottinga

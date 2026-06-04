@@ -479,5 +479,5 @@ TIMER_CALLBACK_MEMBER(spg2xx_video_device::screenpos_hit)
 
 void spg2xx_video_device::device_add_mconfig(machine_config &config)
 {
-	SPG_RENDERER(config, m_renderer, 0);
+	SPG_RENDERER(config, m_renderer);
 }

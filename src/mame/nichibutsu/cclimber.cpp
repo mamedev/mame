@@ -2488,7 +2488,7 @@ void cclimber_state::root(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, 18.432_MHz_XTAL/3/2); // 3.072 MHz
 
-	LS259(config, m_mainlatch, 0);
+	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(cclimber_state::nmi_mask_w));
 	m_mainlatch->q_out_cb<1>().set(FUNC(cclimber_state::flip_screen_x_w));
 	m_mainlatch->q_out_cb<2>().set(FUNC(cclimber_state::flip_screen_y_w));
@@ -2663,7 +2663,7 @@ void swimmer_state::swimmer(machine_config &config)
 	Z80(config, m_maincpu, 18.432_MHz_XTAL/6); // verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &swimmer_state::swimmer_map);
 
-	LS259(config, m_mainlatch, 0);
+	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(swimmer_state::nmi_mask_w));
 	m_mainlatch->q_out_cb<1>().set(FUNC(swimmer_state::flip_screen_x_w));
 	m_mainlatch->q_out_cb<2>().set(FUNC(swimmer_state::flip_screen_y_w));

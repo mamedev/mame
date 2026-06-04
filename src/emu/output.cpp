@@ -54,14 +54,52 @@ void output_manager::output_item::notify(s32 value)
 
 
 //**************************************************************************
-//  OUTPUT ITEM PROXY
+//  OUTPUT ITEM CREATOR PROXY
 //**************************************************************************
 
-void output_manager::item_proxy::resolve(device_t &device, std::string_view name)
+bool output_manager::item_creator_proxy::resolve(device_t &device, std::string_view name)
 {
 	assert(!m_item);
-	m_item = &device.machine().output().find_or_create_item(name, 0);
+	m_item = device.machine().output().find_or_create_item(device, name, 0);
+	return bool(m_item);
 }
+
+
+
+//**************************************************************************
+//  OUTPUT PROXY
+//**************************************************************************
+
+output_manager::output_proxy::output_proxy() noexcept
+	: m_item(nullptr)
+	, m_value(m_local_value)
+	, m_local_value(0)
+{
+}
+
+output_manager::output_proxy::output_proxy(output_proxy &&that) noexcept
+	: output_proxy()
+{
+	operator=(std::move(that));
+}
+
+output_manager::output_proxy::output_proxy(device_t &device, std::string_view name)
+	: output_proxy()
+{
+	m_item = device.machine().output().find_item(device, name);
+	if (m_item)
+		m_value = m_item->get();
+}
+
+output_manager::output_proxy &output_manager::output_proxy::operator=(output_proxy &&that) noexcept
+{
+	m_item = std::exchange(that.m_item, nullptr);
+	m_local_value = std::exchange(that.m_local_value, that.m_value);
+	that.m_value = that.m_local_value;
+	m_value = m_item ? m_item->get() : m_local_value;
+	return *this;
+}
+
 
 
 
@@ -113,10 +151,48 @@ void output_manager::register_save()
 
 
 /*-------------------------------------------------
+    validate_name - check for illegal names
+-------------------------------------------------*/
+
+bool output_manager::validate_name(device_t &device, std::string_view name)
+{
+	if (name.empty())
+	{
+		osd_printf_error("Output names must not be empty\n");
+		return false;
+	}
+	else if ((name[0] == ':') || (name[0] == '^'))
+	{
+		osd_printf_error("Output names must not begin with a parent device or root device reference\n");
+		return false;
+	}
+	else if ((name[0] == '.') && ((name.size() == 1U) || (name[1] == ':')))
+	{
+		osd_printf_error("Output names must not begin with a current device reference\n");
+		return false;
+	}
+	else if ((name.front() == ' ') || (name.back() == ' ' ))
+	{
+		osd_printf_error("Output names must not begin or end with whitespace\n");
+		return false;
+	}
+	else if (std::find_if(name.begin(), name.end(), [] (char ch) { return (' ' > ch) || ('~' < ch); }) != name.end())
+	{
+		osd_printf_error("Output name contains invalid characters\n");
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
+
+/*-------------------------------------------------
     find_item - find an item based on a string
 -------------------------------------------------*/
 
-output_manager::output_item *output_manager::find_item(std::string_view string)
+output_manager::output_item *output_manager::find_item(device_t &device, std::string_view string)
 {
 	auto item = m_itemtable.find(string);
 	if (item != m_itemtable.end())
@@ -130,7 +206,7 @@ output_manager::output_item *output_manager::find_item(std::string_view string)
     create_new_item - create a new item
 -------------------------------------------------*/
 
-output_manager::output_item &output_manager::create_new_item(std::string_view outname, s32 value)
+output_manager::output_item &output_manager::create_new_item(device_t &device, std::string_view outname, s32 value)
 {
 	if (OUTPUT_VERBOSE)
 		osd_printf_verbose("Creating output %s = %d%s\n", outname, value, m_save_data ? " (will not be saved)" : "");
@@ -143,10 +219,10 @@ output_manager::output_item &output_manager::create_new_item(std::string_view ou
 	return ins.first->second;
 }
 
-output_manager::output_item &output_manager::find_or_create_item(std::string_view outname, s32 value)
+output_manager::output_item *output_manager::find_or_create_item(device_t &device, std::string_view outname, s32 value)
 {
-	output_item *const item = find_item(outname);
-	return item ? *item : create_new_item(outname, value);
+	output_item *const item = find_item(device, outname);
+	return item ? item : &create_new_item(device, outname, value);
 }
 
 
@@ -156,12 +232,16 @@ output_manager::output_item &output_manager::find_or_create_item(std::string_vie
 
 void output_manager::pause()
 {
-	set_value("pause", 1);
+	// temporary hack until output module API is updated
+	for (auto const &notify : m_global_notifylist)
+		notify("pause", 1);
 }
 
 void output_manager::resume()
 {
-	set_value("pause", 0);
+	// temporary hack until output module API is updated
+	for (auto const &notify : m_global_notifylist)
+		notify("pause", 0);
 }
 
 
@@ -187,36 +267,6 @@ void output_manager::postload()
 }
 
 
-/*-------------------------------------------------
-    output_set_value - set the value of an output
--------------------------------------------------*/
-
-void output_manager::set_value(std::string_view outname, s32 value)
-{
-	output_item *const item = find_item(outname);
-
-	// if no item of that name, create a new one and force notification
-	if (!item)
-		create_new_item(outname, value).notify(value);
-	else
-		item->set(value); // set the new value (notifies on change)
-}
-
-
-/*-------------------------------------------------
-    output_get_value - return the value of an
-    output
--------------------------------------------------*/
-
-s32 output_manager::get_value(std::string_view outname)
-{
-	output_item const *const item = find_item(outname);
-
-	// if no item, value is 0
-	return item ? item->get() : 0;
-}
-
-
 //-------------------------------------------------
 //  set_notifier - sets a notifier callback for a
 //  particular output
@@ -225,8 +275,8 @@ s32 output_manager::get_value(std::string_view outname)
 void output_manager::set_notifier(std::string_view outname, notifier_func callback, void *param)
 {
 	// if an item is specified, find/create it
-	output_item *const item = find_item(outname);
-	(item ? *item : create_new_item(outname, 0)).set_notifier(callback, param);
+	output_item *const item = find_item(machine().root_device(), outname);
+	(item ? *item : create_new_item(machine().root_device(), outname, 0)).set_notifier(callback, param);
 }
 
 
@@ -249,7 +299,7 @@ void output_manager::set_global_notifier(notifier_func callback, void *param)
 u32 output_manager::name_to_id(std::string_view outname)
 {
 	// if no item, ID is 0
-	output_item const *const item = find_item(outname);
+	output_item const *const item = find_item(machine().root_device(), outname);
 	return item ? item->id() : 0;
 }
 

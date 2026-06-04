@@ -38,7 +38,7 @@ protected:
 class namcos10_exio_device : public namcos10_exio_base_device
 {
 public:
-	namcos10_exio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namcos10_exio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto analog_callback() { return m_analog_cb.bind(); }
 
@@ -79,7 +79,7 @@ private:
 class namcos10_mgexio_device : public namcos10_exio_base_device
 {
 public:
-	namcos10_mgexio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namcos10_mgexio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto port4_read_callback() { return m_port_read[0].bind(); }
 	auto port6_read_callback() { return m_port_read[1].bind(); }

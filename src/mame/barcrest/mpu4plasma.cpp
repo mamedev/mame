@@ -99,7 +99,7 @@ void mpu4plasma_state::mpu4plasma_f(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(0x200);
 
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
 	m_characteriser->set_lamp_table(nullptr);

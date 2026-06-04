@@ -513,7 +513,7 @@ void vc4000_state::vc4000(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	VC4000_SND(config, m_custom, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
+	VC4000_SND(config, m_custom).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* quickload */
 	QUICKLOAD(config, "quickload", "pgm,tvc").set_load_callback(FUNC(vc4000_state::quickload_cb));

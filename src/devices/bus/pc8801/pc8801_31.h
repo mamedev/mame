@@ -25,7 +25,7 @@ class pc8801_31_device : public device_t
 {
 public:
 	// construction/destruction
-	pc8801_31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc8801_31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 

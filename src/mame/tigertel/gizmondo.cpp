@@ -189,7 +189,7 @@ void gizmondo_state::gizmondo(machine_config &config)
 	screen.set_visarea_full();
 	screen.set_screen_update("gf4500", FUNC(gf4500_device::screen_update));
 
-	GF4500(config, m_gf4500, 0);
+	GF4500(config, m_gf4500);
 
 	S3C2440(config, m_s3c2440, 12000000);
 	m_s3c2440->set_palette_tag("palette");

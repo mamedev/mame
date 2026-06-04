@@ -281,7 +281,7 @@ void arc_io_aka_device::add_1mhzbus(machine_config &config)
 
 void arc_io_aka_device::add_midi_6850(machine_config &config)
 {
-	acia6850_device &acia(ACIA6850(config, "acia", 0));
+	acia6850_device &acia(ACIA6850(config, "acia"));
 	acia.irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<3>));
 	acia.txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 

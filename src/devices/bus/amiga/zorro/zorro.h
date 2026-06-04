@@ -150,8 +150,8 @@ public:
 	zorro2_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename T>
-	zorro2_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt) :
-		zorro2_slot_device(mconfig, tag, owner, 0)
+	zorro2_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt) :
+		zorro2_slot_device(mconfig, tag, owner, clock)
 	{
 		set_options(std::forward<T>(opts), dflt, false);
 	}

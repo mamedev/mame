@@ -12,7 +12,7 @@ class atari_maria_device :  public device_t, public device_video_interface
 {
 public:
 	// construction/destruction
-	atari_maria_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_maria_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T> void set_dmaspace_tag(T &&tag, int spacenum) { m_dmaspace.set_tag(std::forward<T>(tag), spacenum); }
 

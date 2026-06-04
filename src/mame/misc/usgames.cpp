@@ -53,8 +53,8 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	void usg32(machine_config &config);
-	void usg185(machine_config &config);
+	void usg32(machine_config &config) ATTR_COLD;
+	void usg185(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -136,8 +136,6 @@ MC6845_UPDATE_ROW(usgames_state::update_row)
 
 void usgames_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_rombank->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 

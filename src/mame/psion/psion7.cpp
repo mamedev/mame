@@ -394,7 +394,7 @@ void psion7_state::psion7(machine_config &config)
 	rs232_port_device &uart3(RS232_PORT(config, "uart3", default_rs232_devices, nullptr));
 	uart3.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(debug_port));
 
-	//ADS7843(config, "adc", 0);
+	//ADS7843(config, "adc");
 
 	RAM(config, m_ram).set_default_size("16M").set_extra_options("32M");
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);

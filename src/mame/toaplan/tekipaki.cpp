@@ -263,7 +263,7 @@ void tekipaki_state::tekipaki(machine_config &config)
 	audiocpu.set_addrmap(AS_IO, &tekipaki_state::hd647180_io_map);
 	audiocpu.in_pa_callback().set(FUNC(tekipaki_state::tekipaki_cmdavailable_r));
 
-	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
+	TOAPLAN_COINCOUNTER(config, "coincounter");
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 

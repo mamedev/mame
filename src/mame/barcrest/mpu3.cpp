@@ -738,10 +738,6 @@ INPUT_PORTS_END
 void mpu3_state::machine_start()
 {
 	m_ic21_timer = timer_alloc(FUNC(mpu3_state::ic21_timeout), this);
-
-	m_triac.resolve();
-	m_digit.resolve();
-	m_lamp.resolve();
 }
 
 /* generate a 100 Hz signal (some components rely on this for external sync) */
@@ -857,7 +853,7 @@ void mpu3_state::mpu3base(machine_config &config)
 	REEL(config, m_reels[3], MPU3_48STEP_REEL, 96, 2, 0x00, 2);
 	m_reels[3]->optic_handler().set(FUNC(mpu3_state::reel_optic_cb<3>));
 
-	METERS(config, m_meters, 0).set_number(8);
+	METERS(config, m_meters).set_number(8);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x HM4334 or HMI6514 or MB8414 + 2.4V battery
 
@@ -870,7 +866,7 @@ void mpu3_chr_state::mpu3_chr_3000(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu3_chr_state::mpu3_map_chr_3000);
 
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6800_cheat(true);
 }
@@ -881,7 +877,7 @@ void mpu3_chr_state::mpu3_chr_c000(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpu3_chr_state::mpu3_map_chr_c000);
 
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6800_cheat(true);
 }

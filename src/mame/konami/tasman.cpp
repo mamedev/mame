@@ -677,9 +677,9 @@ void kongambl_state::kongambl(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 32768);
 
-	K055555(config, m_k055555, 0);
+	K055555(config, m_k055555);
 
-	K055673(config, m_k055673, 0);
+	K055673(config, m_k055673);
 	m_k055673->set_sprite_callback(FUNC(kongambl_state::sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_LE2, -48+1, -23);
 	m_k055673->set_palette(m_palette);

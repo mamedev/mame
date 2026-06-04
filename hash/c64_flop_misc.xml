@@ -19,6 +19,37 @@ license:CC0-1.0
 		</part>
 	</software>
 
+    <!-- origin: archive.org -->
+    <software name="bopnrumb" supported="no">
+        <description>Bop 'n Rumble (cracked by The Last Science and The Artworx)</description>
+        <year>1987</year>
+        <publisher>Melbourne House</publisher>
+        <notes><![CDATA[
+LOAD "BOP N RUMBLE",8,1
+[VIC] player sprite cuts off in the middle
+]]></notes>
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="174848">
+                <rom name="bopn_rumble_1987_melbourne_house_h_the_last_sciencethe_artworx.d64" size="174848" crc="9ba2f963" sha1="d3e672d586f8fdc4719adce13cbe14a281bf7696" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <!-- origin: archive.org -->
+    <software name="detgame" supported="no">
+        <description>The Detective Game (cracked by Trianon)</description>
+        <year>1986</year>
+        <publisher>APS Software</publisher>
+        <notes><![CDATA[
+Laggy [joystick] fire button (half the times won't trigger)
+]]></notes>
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="174848">
+                <rom name="detective_game_the_1986_aps_software.d64" size="174848" crc="d6a07a1d" sha1="702b17a1aec12646283d32c0437295214fcf7dd5" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
 	<software name="fcc"> <!-- optional -->
 		<description>The Final ChessCard</description>
 		<year>1990</year>
@@ -124,6 +155,23 @@ Lemon64 claims Joystick in port 2 but that's unresponsive, works in port 1 (veri
 		</part>
 	</software>
 
+    <!-- origin: archive.org -->
+    <software name="usagiyoj" supported="no">
+		<description>Samurai Warrior: The Battles of... Usagi Yojimbo</description>
+		<year>1988</year>
+		<publisher>Firebird Software</publisher>
+        <notes><![CDATA[
+LOAD "LOADER",8,1 then strike B
+Fails loading with "disk turbo" enabled
+All sprites are cutoff
+]]></notes>
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="174848">
+                <rom name="samurai_warrior_the_battles_of_usagi_yojimbo_1988_firebird.d64" size="174848" crc="4f744c0a" sha1="da54e72053c52ef681fabb32726865f667e0161b" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
 	<!-- origin: archive.org -->
 	<software name="spacetax" supported="no">
 		<description>Space Taxi (cracked by Exodus)</description>
@@ -131,8 +179,8 @@ Lemon64 claims Joystick in port 2 but that's unresponsive, works in port 1 (veri
 		<publisher>Muse Software</publisher>
 		<notes><![CDATA[
 LOAD "SPACE TAXI",8
-Bad [VIC] collision detection for landing pads (will always cause a crash)
 No [SID] sample voices
+Hi-score table is corrupt (dump really?)
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">

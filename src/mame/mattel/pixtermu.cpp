@@ -492,7 +492,7 @@ void pixter_multimedia_state::pixter_multimedia(machine_config &config)
 	ARM7(config, m_maincpu, 76'205'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pixter_multimedia_state::arm7_map);
 
-	PL190_VIC(config, m_vic, 0);
+	PL190_VIC(config, m_vic);
 	m_vic->out_irq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
 	m_vic->out_fiq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_FIRQ_LINE);
 

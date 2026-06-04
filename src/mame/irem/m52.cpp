@@ -965,7 +965,7 @@ void m52_state::m52(machine_config &config)
 	m_screen->set_screen_update(FUNC(m52_state::screen_update));
 
 	// sound hardware
-	IREM_M52_SOUNDC_AUDIO(config, "irem_audio", 0);
+	IREM_M52_SOUNDC_AUDIO(config, "irem_audio");
 }
 
 

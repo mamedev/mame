@@ -167,9 +167,6 @@ The MCUs used were not imported from Sharp, but cloned by USSR, renamed to
 
 void hh_sm510_state::machine_start()
 {
-	// resolve outputs
-	m_out_x.resolve();
-
 	// determine number of input lines (set it in the subclass constructor if different)
 	if (m_inp_lines == 0 && m_inp_fixed < 0)
 	{
@@ -4898,18 +4895,11 @@ public:
 	void elbaskb(machine_config &config);
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void update_display() override;
 
 private:
 	output_finder<4> m_digits;
 };
-
-void elbaskb_state::machine_start()
-{
-	hh_sm510_state::machine_start();
-	m_digits.resolve();
-}
 
 // handlers
 
@@ -7195,20 +7185,11 @@ public:
 
 	void tgaiden(machine_config &config);
 
-protected:
-	virtual void machine_start() override ATTR_COLD;
-
 private:
 	// R2 connects to a single LED behind the screen
 	output_finder<> m_led_out;
 	void led_w(u8 data) { m_led_out = data >> 1 & 1; }
 };
-
-void tgaiden_state::machine_start()
-{
-	hh_sm510_state::machine_start();
-	m_led_out.resolve();
-}
 
 // inputs
 

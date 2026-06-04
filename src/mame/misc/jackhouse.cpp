@@ -53,14 +53,12 @@ public:
 
 	{ }
 
-	void jackhouse(machine_config &config);
+	void jackhouse(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); };
 	virtual void video_start() override ATTR_COLD;
 
 private:
-
 	void io_map(address_map &map) ATTR_COLD;
 	void program_map(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
@@ -700,7 +698,7 @@ void jackhouse_state::jackhouse(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(0x300);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &jackhouse_state::ramdac_map);
 	ramdac.set_color_base(0);
 

@@ -32,6 +32,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstdio>
 #include <fstream>
 #include <locale>
 #include <sstream>

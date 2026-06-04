@@ -704,9 +704,6 @@ GFXDECODE_END
 
 void igs009_state::machine_start()
 {
-	m_leds.resolve();
-
-
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_out));

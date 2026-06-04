@@ -102,7 +102,7 @@ void wangpc_wdc_device::device_add_mconfig(machine_config &config)
 	Z80CTC(config, m_ctc, 2000000);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	SCSIHD(config, "harddisk0", 0);
+	SCSIHD(config, "harddisk0");
 }
 
 

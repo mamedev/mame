@@ -97,9 +97,9 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void by6803(machine_config &config);
-	void gen1(machine_config &config);
-	void s11(machine_config &config);
+	void by6803(machine_config &config) ATTR_COLD;
+	void gen1(machine_config &config) ATTR_COLD;
+	void s11(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
@@ -436,9 +436,6 @@ void by6803_state::pia0_ca2_g1w(int state)
 void by6803_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_io_outputs.resolve();
-	m_digits.resolve();
-	m_leds.resolve();
 
 	save_item(NAME(m_pia0_a));
 	save_item(NAME(m_pia0_b));

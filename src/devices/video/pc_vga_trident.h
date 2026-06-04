@@ -167,13 +167,13 @@ private:
 class tgui9680_device : public trident_vga_device
 {
 public:
-	tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class tvga9000_device : public trident_vga_device
 {
 public:
-	tvga9000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tvga9000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void recompute_params() override;

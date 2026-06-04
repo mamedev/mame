@@ -318,7 +318,7 @@ void xds_state::xds19p(machine_config &config)
 	m_serialport->dcd_handler().set(m_duart, FUNC(mc68681_device::ip2_w));
 	m_serialport->si_handler().set(m_duart, FUNC(mc68681_device::ip5_w));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->irq_handler().set_inputline(m_maincpu, 3);
 	m_acia->txd_handler().set("kbd", FUNC(xds_kbd_hle_device::rx_w));
 

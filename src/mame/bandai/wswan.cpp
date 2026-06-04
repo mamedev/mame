@@ -478,8 +478,6 @@ void wswan_state::common_start()
 	if (m_cart->exists())
 		m_cart->save_nvram();
 
-	m_icons.resolve();
-
 	if (m_cart->exists())
 	{
 		// ROM

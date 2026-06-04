@@ -296,7 +296,7 @@ void dmx_voice_card_device::device_add_mconfig(machine_config &config)
 	static constexpr const double SK_R4 = RES_R(0.001);
 
 	TIMER(config, m_timer).configure_generic(FUNC(dmx_voice_card_device::clock_callback));
-	DAC76(config, m_dac, 0U).configure_voltage_output(RES_K(2.4), RES_K(2.4));  // R16, R11 on voice card.
+	DAC76(config, m_dac).configure_voltage_output(RES_K(2.4), RES_K(2.4));  // R16, R11 on voice card.
 
 	if (has_decay())
 	{
@@ -1285,10 +1285,6 @@ void dmx_state::io_map(address_map &map)
 
 void dmx_state::machine_start()
 {
-	m_clk_out_tip.resolve();
-	m_metronome_out.resolve();
-	m_digit_output.resolve();
-
 	save_item(NAME(m_int_timer_preset));
 	save_item(NAME(m_int_timer_enabled));
 	save_item(NAME(m_int_timer_value));

@@ -106,7 +106,7 @@ void vt3xx_soc_base_device::device_add_mconfig(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &vt3xx_soc_base_device::vt369_sound_map);
 	m_soundcpu->set_addrmap(5, &vt3xx_soc_base_device::vt369_sound_external_map);
 
-	VT369_ADPCM_DECODER(config, m_vt369adpcm, 0);
+	VT369_ADPCM_DECODER(config, m_vt369adpcm);
 
 	// are these really left/right, or just 2 channels (does this SoC support stereo?)
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_leftdac, 0).add_route(0, "mono", 0.2, 0);

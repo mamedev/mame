@@ -777,7 +777,7 @@ void apple2_state::apple2_common(machine_config &config)
 	m_kbd->reset_callback().set(FUNC(apple2_state::keyb_reset_w));
 
 	/* slot devices */
-	A2BUS(config, m_a2bus, 0);
+	A2BUS(config, m_a2bus);
 	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple2_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple2_state::a2bus_nmi_w));

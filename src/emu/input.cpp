@@ -22,6 +22,8 @@
 
 #include "corestr.h"
 
+#include <cstdio>
+
 
 
 namespace {

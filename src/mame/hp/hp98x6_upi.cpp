@@ -249,7 +249,7 @@ void hp98x6_upi_device::device_add_mconfig(machine_config &config)
 {
 	// Beep
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beep).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	TIMER(config, m_10ms_timer).configure_periodic(FUNC(hp98x6_upi_device::ten_ms), clocks_to_attotime(CLOCKS_PER_10MS));
 	TIMER(config, m_delay_timer).configure_generic(FUNC(hp98x6_upi_device::delay));

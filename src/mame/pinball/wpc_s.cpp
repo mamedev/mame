@@ -132,15 +132,15 @@ private:
 	static const char *const lamps_rs[8][8];
 	static const char *const outputs_rs[54];
 	//static const char *const lamps_fs[8][8];
-	static const char *const outputs_fs[54];
+	//static const char *const outputs_fs[54];
 	//static const char *const lamps_ts[8][8];
-	static const char *const outputs_ts[54];
+	//static const char *const outputs_ts[54];
 	//static const char *const lamps_tom[8][8];
-	static const char *const outputs_tom[54];
+	//static const char *const outputs_tom[54];
 	//static const char *const lamps_wd[8][8];
-	static const char *const outputs_wd[54];
+	//static const char *const outputs_wd[54];
 	//static const char *const lamps_wcs[8][8];
-	static const char *const outputs_wcs[54];
+	//static const char *const outputs_wcs[54];
 	uint8_t m_firq_src = 0U, m_zc = 0U;
 	uint16_t m_rtc_base_day = 0U;
 };
@@ -308,7 +308,7 @@ void wpc_s_state::machine_reset()
 	m_rtc_base_day = systime.local_time.day;
 }
 
-const char *const wpc_s_state::lamps_corv[8][8] = {
+const char *const wpc_s_state::lamps_corv[][8] = {
 	{ "l:L rollover",       "l:M rollover",    "l:R rollover",      "l:Skid pad arrow",  "l:Sticky tires",    "l:Skid pad jackpot", "l:Route 66 arrow", "l:Race today"      },
 	{ "l:Inner loop arrow", "l:Fuelie",        "l:Nitrous",         "l:In loop jackpot", "l:R O loop arrow",  "l:ZO7 suspension",   "l:Big brakes",     "l:Super charger"   },
 	{ "l:L O loop arrow",   "l:Lite lock",     "l:Qualify",         "l:Big block",       "l:ZR1 ramp lock",   "l:6 speed trans",    "l:Hi lift cams",   "l:ZR1 ramp arrow"  },
@@ -319,15 +319,15 @@ const char *const wpc_s_state::lamps_corv[8][8] = {
 	{ "l:R tree red",       "l:L tree red",    "l:Tree bot yellow", "l:Tree top yellow", "l:R tree green",    "l:L tree green",     "l:Buy in",         "l:Start button"    }
 };
 
-const char *const wpc_s_state::outputs_corv[54] = {
-	"s:Trough eject", "s:ZR1 low rev gate", "s:Kickback", "s:Pit stop popper", "s:ZR1 up rev gate", nullptr, "s:Knocker", "s:Route 66 kickout",
-	"s:L slingshot", "s:R slingshot", "s:Left jet", "s:Bottom jet", "s:Right jet", nullptr, "s:ZR1 lockup", "s:Loop gate",
-	"s:Race direction", "s:L race enable", "s:R race enable", "f:Tenth corvette", "f:Jets", "f:R ramps", "f:U L flipper", "f:Catch me",
-	"f:ZR1 ramp", "f:ZR1 underside", "f:R rear panel", "f:R standup", "s:R flip power", "s:R flip hold", "s:L flip power", "s:L flip hold",
-	"s:Diverter power", "s:Diverter hold", "s:UL flip power", "s:UL flip hold", nullptr, nullptr, nullptr, nullptr,
-	nullptr,
-	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-	"g:Upper left", "g:Upper right", "g:Lower left", "g:Lower right", "g:Back box title"
+const char *const wpc_s_state::outputs_corv[] = {
+	/*  1 */ "s:Trough eject",   "s:ZR1 low rev gate", "s:Kickback",      "s:Pit stop popper", "s:ZR1 up rev gate", "u:06", /* dummy */ "s:Knocker",        "s:Route 66 kickout",
+	/*  9 */ "s:L slingshot",    "s:R slingshot",      "s:Left jet",      "s:Bottom jet",      "s:Right jet",       "u:14", /* dummy */ "s:ZR1 lockup",     "s:Loop gate",
+	/* 17 */ "s:Race direction", "s:L race enable",    "s:R race enable", "f:Tenth corvette",  "f:Jets",            "f:R ramps",        "f:U L flipper",    "f:Catch me",
+	/* 25 */ "f:ZR1 ramp",       "f:ZR1 underside",    "f:R rear panel",  "f:R standup",       "s:R flip power",    "s:R flip hold",    "s:L flip power",   "s:L flip hold",
+	/* 33 */ "s:Diverter power", "s:Diverter hold",    "s:UL flip power", "s:UL flip hold",    "u:37", /* dummy */  "u:38", /* dummy */ "u:39", /* dummy */ "u:40", /* dummy */
+	/* 41 */ "u:41", /* dummy */
+	/* 42 */ "u:42", "u:43", "u:44", "u:45", "u:46", "u:47", "u:48", "u:49", /* dummy row */
+	/* 50 */ "g:Upper left", "g:Upper right", "g:Lower left", "g:Lower right", "g:Back box title"
 };
 
 static INPUT_PORTS_START( corv )
@@ -440,7 +440,7 @@ static INPUT_PORTS_START( corv )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-const char *const wpc_s_state::lamps_dh[8][8] = {
+const char *const wpc_s_state::lamps_dh[][8] = {
 	{ "l:Left rollover",   "l:Middle rollover", "l:Right rollover",   "l:Magnum jets",    "l:Magnum bullets",   "l:Lite extra ball",  "l:Lite shootout",  "l:Playfield promo" },
 	{ "l:R ramp badge",    "l:Sil 6 bullet",    "l:R loop generic",   "l:Magna force",    "l:R ramp generic",   "l:R ramp jackpot",   "l:R loop HQ",      "l:Warehouse badge" },
 	{ "l:Barroom brawl",   "l:Car chase",       "l:Warehouse raid",   "l:Letter bomb",    "l:Meet the mob",     "l:Stop scorpio",     "l:Crime wave",     "l:Bank rbr hry up" },
@@ -451,15 +451,15 @@ const char *const wpc_s_state::lamps_dh[8][8] = {
 	{ "l:Sil 8 bullet",    "l:Left shootout",   "l:Lite magna force", "l:L/R jets",       "l:Bottom jet",       "l:Body armor",       "l:Extra ball",     "l:Start"           }
 };
 
-const char *const wpc_s_state::outputs_dh[54] = {
-	"s:Ball release", "s:Autoplunger", "s:Gun launch", "s:Top R popper", "s:Gun popper", "s:Drop target down", "s:Knocker", "s:Trap door hi",
-	"s:Left sling", "s:Right sling", "s:Left jet", "s:Middle jet", "s:Right jet", "s:Left popper", "s:Right diverter", "s:Trap door hold",
-	"f:Headquarters", "f:Top L popper", "f:Warehouse", "s:Gun motor", "f:Gun loaded", "f:Right ramp", "f:Right back", "f:Left back",
-	"s:Drop reset", "s:Top L popper", "s:Left diverter", "s:Right loop gate", "s:R flip power", "s:R flip hold", "s:L flip power", "s:L flip hold",
-	"s:UR flip power", "s:UR flip hold", "s:R loop magnet", "s:Left loop gate", nullptr, nullptr, nullptr, nullptr,
-	"s:Coin meter",
-	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-	"g:Right string", "g:Left string", "g:Backbox title", "g:Backbox face", "g:Bottom string"
+const char *const wpc_s_state::outputs_dh[] = {
+	/*  1 */ "s:Ball release",  "s:Autoplunger",  "s:Gun launch",    "s:Top R popper",    "s:Gun popper",      "s:Drop target down", "s:Knocker",        "s:Trap door hi",
+	/*  9 */ "s:Left sling",    "s:Right sling",  "s:Left jet",      "s:Middle jet",      "s:Right jet",       "s:Left popper",      "s:Right diverter", "s:Trap door hold",
+	/* 17 */ "f:Headquarters",  "f:Top L popper", "f:Warehouse",     "s:Gun motor",       "f:Gun loaded",      "f:Right ramp",       "f:Right back",     "f:Left back",
+	/* 25 */ "s:Drop reset",    "s:Top L popper", "s:Left diverter", "s:Right loop gate", "s:R flip power",    "s:R flip hold",      "s:L flip power",   "s:L flip hold",
+	/* 33 */ "s:UR flip power", "s:UR flip hold", "s:R loop magnet", "s:Left loop gate",  "u:37", /* dummy */  "u:38", /* dummy */   "u:39", /* dummy */ "u:40", /* dummy */
+	/* 41 */ "s:Coin meter",
+	/* 42 */ "u:42", "u:43", "u:44", "u:45", "u:46", "u:47", "u:48", "u:49", /* dummy row */
+	/* 50 */ "g:Right string", "g:Left string", "g:Backbox title", "g:Backbox face", "g:Bottom string"
 };
 
 static INPUT_PORTS_START( dh )
@@ -572,7 +572,7 @@ static INPUT_PORTS_START( dh )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-const char *const wpc_s_state::lamps_i500[8][8] = {
+const char *const wpc_s_state::lamps_i500[][8] = {
 	{ "l:Left lane",        "l:Center lane",      "l:Right lane",       "l:Upper eject top",  "l:Jet wrench",     "l:Extra ball",     "l:Victory lap",      "l:Turbo wrench"     },
 	{ "l:Turbo lock 1",     "l:Turbo lock 2",     "l:Turbo lock 3",     "l:Light lock lamp",  "l:Light speedway", "l:\"Pass\"",       "l:Left ramp wrench", "l:Lft ramp standup" },
 	{ "l:Hit the \"wall\"", "l:Hit \"the\" wall", "l:\"Hit\" the wall", "l:Lft ramp jackpot", "l:Increase boost", "l:Souvenir lamp",  "l:Left flip lane",   "l:Left outlane"     },
@@ -583,15 +583,15 @@ const char *const wpc_s_state::lamps_i500[8][8] = {
 	{ "l:Stnd3 lower RT",   "l:Stnd3 upper RT",   "l:Stnd3 upper left", "l:Stnd3 lower left", "l:74", /* dummy */ "l:Launch button",  "l:Buy-in button",    "l:Start button"     }
 };
 
-const char *const wpc_s_state::outputs_i500[54] = {
-	"s:Auto plunger", "s:Upper popper", "s:Upper eject", "s:Lower eject", "s:Turbo popper", nullptr, "s:Knocker", "s:Left jet",
-	"s:Right jet", "s:Center jet", "s:Left sling", "s:Right sling", "s:Trough", nullptr, "f:Upper popper fls", "f:Top left corner",
-	"f:Top right corner", "s:Race track motor", "f:Orange car", "f:Yellow car", "f:Blue car", "f:Green car", "f:Lft jet flasher", "f:Rt jet flasher",
-	"f:Cntr jet flasher", "f:Right side", "f:Left side (2)", "f:Rt ramp enter", "s:R flip power", "s:R flip hold", "s:L flip power", "s:L flip hold",
-	"s:UR flip power", "s:UR flip hold", "s:Diverter power", "s:Diverter hold", nullptr, nullptr, nullptr, nullptr,
-	"s:Coin meter",
-	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-	"g:Upper lft plyfld", "g:Upper rt plyfld", "g:Lower playfield", "g:Backbox", "g:Title-coindoor"
+const char *const wpc_s_state::outputs_i500[] = {
+	/*  1 */ "s:Auto plunger",     "s:Upper popper",     "s:Upper eject",    "s:Lower eject",   "s:Turbo popper",    "u:06", /* dummy */ "s:Knocker",          "s:Left jet",
+	/*  9 */ "s:Right jet",        "s:Center jet",       "s:Left sling",     "s:Right sling",   "s:Trough",          "u:14", /* dummy */ "f:Upper popper fls", "f:Top left corner",
+	/* 17 */ "f:Top right corner", "s:Race track motor", "f:Orange car",     "f:Yellow car",    "f:Blue car",        "f:Green car",      "f:Lft jet flasher",  "f:Rt jet flasher",
+	/* 25 */ "f:Cntr jet flasher", "f:Right side",       "f:Left side (2)",  "f:Rt ramp enter", "s:R flip power",    "s:R flip hold",    "s:L flip power",     "s:L flip hold",
+	/* 33 */ "s:UR flip power",    "s:UR flip hold",     "s:Diverter power", "s:Diverter hold", "u:37", /* dummy */  "u:38", /* dummy */ "u:39", /* dummy */   "u:40", /* dummy */
+	/* 41 */ "s:Coin meter",
+	/* 42 */ "u:42", "u:43", "u:44", "u:45", "u:46", "u:47", "u:48", "u:49", /* dummy row */
+	/* 50 */ "g:Upper lft plyfld", "g:Upper rt plyfld", "g:Lower playfield", "g:Backbox", "g:Title-coindoor"
 };
 
 static INPUT_PORTS_START( i500 )
@@ -697,7 +697,7 @@ static INPUT_PORTS_START( i500 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-const char *const wpc_s_state::lamps_jb[8][8] = {
+const char *const wpc_s_state::lamps_jb[][8] = {
 	{ "l:Yellow arrow",    "l:Yellow 1 (hi)",    "l:Yellow 2",        "l:Yellow 3",         "l:Yellow 4",    "l:Yellow 5 (low)",  "l:Left outlane",     "l:L flipper lane"   },
 	{ "l:Blue arrow",      "l:Blue 1 (hi)",      "l:Blue 2",          "l:Blue 3",           "l:Blue 4",      "l:Blue 5 (low)",    "l:Bonus 2X",         "l:Bonus 4X"         },
 	{ "l:Amber arrow",     "l:Amber 1 (hi)",     "l:Amber 2",         "l:Amber 3",          "l:Amber 4",     "l:Amber 5 (low)",   "l:Shoot again",      "l:Bonus 5X"         },
@@ -708,15 +708,15 @@ const char *const wpc_s_state::lamps_jb[8][8] = {
 	{ "l:Pinbot poker",    "l:Slot machine",     "l:Roll the dice",   "l:Keno",             "l:Cashier",     "l:Jack*Bot (ramp)", "l:Buy in button",    "l:Start button"     }
 };
 
-const char *const wpc_s_state::outputs_jb[54] = {
-	"s:Ball release", nullptr, "s:Game saucer", "s:Drop targets", "s:Right eject hole", "s:Raise ramp", "s:Knocker", "s:Left eject hole",
-	"s:Left slingshot", "s:Right slingshot", "s:Lower jet bumper", "s:Left jet bumber", "s:Upper jet bumper", "s:Drop ramp", "f:Right visor", "f:Left visor",
-	"f:Center visor", "f:Pinbot face", "f:Jet bumpers", "f:Lower left", "f:Mid left", "f:Lower right", "f:Back panel 1 (L)", "f:Back panel 2",
-	"f:Back panel 3", "f:Back panel 4", "f:Back panel 5 (R)", nullptr, "s:R flip power", "s:R flip hold", "s:L flip power", "s:L flip hold",
-	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-	"s:Coin meter",
-	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-	"g:Playfield lower", "g:Playfield left", "g:Playfield upper", "g:Playfield right", "g:Insert"
+const char *const wpc_s_state::outputs_jb[] = {
+	/*  1 */ "s:Ball release",   "u:02", /* dummy */  "s:Game saucer",      "s:Drop targets",    "s:Right eject hole", "s:Raise ramp",     "s:Knocker",          "s:Left eject hole",
+	/*  9 */ "s:Left slingshot", "s:Right slingshot", "s:Lower jet bumper", "s:Left jet bumper", "s:Upper jet bumper", "s:Drop ramp",      "f:Right visor",      "f:Left visor",
+	/* 17 */ "f:Center visor",   "f:Pinbot face",     "f:Jet bumpers",      "f:Lower left",      "f:Mid left",         "f:Lower right",    "f:Back panel 1 (L)", "f:Back panel 2",
+	/* 25 */ "f:Back panel 3",   "f:Back panel 4",    "f:Back panel 5 (R)", "u:28", /* dummy */  "s:R flip power",     "s:R flip hold",    "s:L flip power",     "s:L flip hold",
+	/* 33 */ "u:33", /* dummy */ "u:34", /* dummy */  "u:35", /* dummy */   "u:36", /* dummy */  "u:37", /* dummy */   "u:38", /* dummy */ "u:39", /* dummy */   "u:40", /* dummy */
+	/* 41 */ "s:Coin meter",
+	/* 42 */ "u:42", "u:43", "u:44", "u:45", "u:46", "u:47", "u:48", "u:49", /* dummy row */
+	/* 50 */ "g:Playfield lower", "g:Playfield left", "g:Playfield upper", "g:Playfield right", "g:Insert"
 };
 
 static INPUT_PORTS_START( jb )
@@ -815,7 +815,7 @@ static INPUT_PORTS_START( jb )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-const char *const wpc_s_state::lamps_jm[8][8] = {
+const char *const wpc_s_state::lamps_jm[][8] = {
 	{ "l:Mode ready",       "l:Download",        "l:Access code 2",   "l:Access code 1",    "l:Upload",         "l:Left jet lane",    "l:Middle jet lane", "l:Right jet lane"  },
 	{ "l:Power down",       "l:NAS cure",        "l:R ramp block 4",  "l:Sector 6",         "l:R ramp block 2", "l:Hold bonus",       "l:R standup R blk", "l:R standup L blk" },
 	{ "l:L ramp block 4",   "l:Extra ball",      "l:Sector 2",        "l:L ramp block 2",   "l:L ramp block 1", "l:Sector 1",         "l:26", /* dummy */  "l:Shoot again"     },
@@ -826,15 +826,15 @@ const char *const wpc_s_state::lamps_jm[8][8] = {
 	{ "l:R loop top arrow", "l:Cyber lock 3",    "l:Sector 7",        "l:Left outlane",     "l:Left flip lane", "l:Ball launch",      "l:Buy-in button",   "l:Start button"    }
 };
 
-const char *const wpc_s_state::outputs_jm[54] = {
-	"s:Trough eject", "s:Autoplunger", "s:Popper", nullptr, "s:Clear matrix", "s:Hand magnet", "s:Knocker", nullptr,
-	"s:Left sling", "s:Right sling", "s:Left jet", "s:Bottom jet", "s:Right jet", "s:Crazy Bob's", "s:Drop target up", "s:Drop target down",
-	"f:Jets", "f:Crazy Bob's", "f:Left sling", "f:Right sling", "s:X mot direction", "s:X motor enable", "s:Y mot direction", "s:Y motor enable",
-	"f:Left ramp", "f:Right ramp", "f:Hand popper", "f:R backpanel", "s:R flip power", "s:R flip hold", "s:L flip power", "s:L flip hold",
-	"s:L diverter power", "s:L diverter hold", "s:R diverter power", "s:R diverter hold", nullptr, nullptr, nullptr, nullptr,
-	"s:Coin meter",
-	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-	"g:String 1", "g:String 2", "g:String 3", "g:String 4", "g:String 5"
+const char *const wpc_s_state::outputs_jm[] = {
+	/*  1 */ "s:Trough eject",     "s:Autoplunger",     "s:Popper",           "u:04", /* dummy */  "s:Clear matrix",    "s:Hand magnet",    "s:Knocker",         "u:08", /* dummy */
+	/*  9 */ "s:Left sling",       "s:Right sling",     "s:Left jet",         "s:Bottom jet",      "s:Right jet",       "s:Crazy Bob's",    "s:Drop target up",  "s:Drop target down",
+	/* 17 */ "f:Jets",             "f:Crazy Bob's",     "f:Left sling",       "f:Right sling",     "s:X mot direction", "s:X motor enable", "s:Y mot direction", "s:Y motor enable",
+	/* 25 */ "f:Left ramp",        "f:Right ramp",      "f:Hand popper",      "f:R backpanel",     "s:R flip power",    "s:R flip hold",    "s:L flip power",    "s:L flip hold",
+	/* 33 */ "s:L diverter power", "s:L diverter hold", "s:R diverter power", "s:R diverter hold", "u:37", /* dummy */  "u:38", /* dummy */ "u:39", /* dummy */  "u:40", /* dummy */
+	/* 41 */ "s:Coin meter",
+	/* 42 */ "u:42", "u:43", "u:44", "u:45", "u:46", "u:47", "u:48", "u:49", /* dummy row */
+	/* 50 */ "g:String 1", "g:String 2", "g:String 3", "g:String 4", "g:String 5"
 };
 
 static INPUT_PORTS_START( jm )
@@ -940,7 +940,7 @@ static INPUT_PORTS_START( jm )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-const char *const wpc_s_state::lamps_nf[8][8] = {
+const char *const wpc_s_state::lamps_nf[][8] = {
 	{ "l:15 million",   "l:10 million",      "l:5 million",        "l:L over the edge",  "l:Dirt",             "l:Alphalt",        "l:No limits",      "l:Water"           },
 	{ "l:No fear",      "l:20 million",      "l:Light extra ball", "l:R over the edge",  "l:Air",              "l:Snow",           "l:Fear fest",      "l:Meet your maker" },
 	{ "l:Skull",        "l:R track",         "l:Center jackpot",   "l:Extra ball",       "l:Start challenge",  "l:Center lock",    "l:R autofire (2)", "l:L hurry up"      },
@@ -951,15 +951,15 @@ const char *const wpc_s_state::lamps_nf[8][8] = {
 	{ "l:Shoot again",  "l:L skull eye",     "l:Jump now",         "l:Super jackpot",    "l:R skull eye",      "l:Ball launch",    "l:Buy-in button",  "l:Start button"    }
 };
 
-const char *const wpc_s_state::outputs_nf[54] = {
-	"s:Right popper", "s:Auto plunger", "s:Right magnet", "s:Kickback", "s:Center magnet", "s:Left magnet", "s:Knocker", "s:Drop target down",
-	nullptr, "s:Right slingshot", "s:Left slingshot", "s:Drop target up", nullptr, "s:Trough", "s:Eject", "s:Skull mouth",
-	"f:Fls(2) flip rtrn", "f:Fls spinner", "f:Fls no fear", "f:Fls(3) rt ramp", "f:Fls(2) skull", "f:Fls bkbox expl", "f:Fls(3) left ramp", "f:Fls top left",
-	"f:Fls(2) auto-fire", "f:Fls bkbox L top", "f:Fls bkbox R top", "f:Fls rt popper", "s:R flip power", "s:R flip hold", "s:L flip power", "s:L flip hold",
-	"s:UR flip power", "s:UR flip hold", nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-	"s:Coin meter",
-	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-	"g:Playfield top", "g:Playfield right", "g:Playfield left", "g:Insert title", "g:Insert bkground"
+const char *const wpc_s_state::outputs_nf[] = {
+	/*  1 */ "s:Right popper",     "s:Auto plunger",    "s:Right magnet",    "s:Kickback",       "s:Center magnet",   "s:Left magnet",    "s:Knocker",          "s:Drop target down",
+	/*  9 */ "u:09", /* dummy */   "s:Right slingshot", "s:Left slingshot",  "s:Drop target up", "u:13", /* dummy */  "s:Trough",         "s:Eject",            "s:Skull mouth",
+	/* 17 */ "f:Fls(2) flip rtrn", "f:Fls spinner",     "f:Fls no fear",     "f:Fls(3) rt ramp", "f:Fls(2) skull",    "f:Fls bkbox expl", "f:Fls(3) left ramp", "f:Fls top left",
+	/* 25 */ "f:Fls(2) auto-fire", "f:Fls bkbox L top", "f:Fls bkbox R top", "f:Fls rt popper",  "s:R flip power",    "s:R flip hold",    "s:L flip power",     "s:L flip hold",
+	/* 33 */ "s:UR flip power",    "s:UR flip hold",    "u:35", /* dummy */  "u:36", /* dummy */ "u:35", /* dummy */  "u:36", /* dummy */ "u:39", /* dummy */   "u:40", /* dummy */
+	/* 41 */ "s:Coin meter",
+	/* 42 */ "u:42", "u:43", "u:44", "u:45", "u:46", "u:47", "u:48", "u:49", /* dummy row */
+	/* 50 */ "g:Playfield top", "g:Playfield right", "g:Playfield left", "g:Insert title", "g:Insert bkground"
 };
 
 static INPUT_PORTS_START( nf )
@@ -1058,7 +1058,7 @@ static INPUT_PORTS_START( nf )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-const char *const wpc_s_state::lamps_rs[8][8] = {
+const char *const wpc_s_state::lamps_rs[][8] = {
 	{ "l:Salt lake",        "l:Denver",           "l:Butte",           "l:Minnesota",          "l:Kansas city",  "l:New york city",    "l:Ohio",               "l:Chicago"            },
 	{ "l:Los angeles",      "l:Las vegas",        "l:Albuquerque",     "l:Dallas",             "l:New orleans",  "l:Nashville",        "l:Atlanta",            "l:Miami"              },
 	{ "l:San francisco",    "l:Seatle",           "l:Left special",    "l:\"Sh here\" L loop", "l:Shoot again",  "l:Right special",    "l:Blasting zone",      "l:\"Sh here\" R ramp" },
@@ -1069,15 +1069,15 @@ const char *const wpc_s_state::lamps_rs[8][8] = {
 	{ "l:F rocks 5x blast", "l:F rocks rad riot", "l:F rocks ex ball", "l:Left bridge out",    "l:Bob's bunker", "l:Right bridge out", "l:Buy in button",      "l:Start button"       }
 };
 
-const char *const wpc_s_state::outputs_rs[54] = {
-	"s:Trough", "s:L left diverter", "s:Lock-up pin", "s:U left diverter", "s:U right diverter", "s:Start city", "s:Knocker", "s:Lock kickout",
-	"s:\"Ted\" eyes left", "s:\"Ted\" lids down", "s:\"Ted\" lids up", "s:\"Ted\" eyes right", "s:\"Red\" lids down", "s:\"Red\" eyes left", "s:\"Red\" lids up", "s:\"Red\" eyes right",
-	"s:", "s:", "s:", "s:", "s:Left sling", "s:Right sling", "s:Bulldozer motor", "s:\"Red\" eject",
-	"s:Top jet", "s:Left jet", "s:Right jet", "s:Shaker motor", "s:", "s:", "s:", "s:",
-	"s:", "s:", "s:", "s:", "f:Little flipper", "f:Left ramp", "f:Back white", "f:Back yellow",
-	"s:Coin meter",
-	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-	"g:Playfld/insert 1", "g:Playfld/insert 2", "g:Playfld/insert 3", "g:Right playfield", "g:Left playfield"
+const char *const wpc_s_state::outputs_rs[] = {
+	/*  1 */ "s:Trough",             "s:L left diverter",   "s:Lock-up pin",     "s:U left diverter",    "s:U right diverter",  "s:Start city",        "s:Knocker",         "s:Lock kickout",
+	/*  9 */ "s:\"Ted\" eyes left",  "s:\"Ted\" lids down", "s:\"Ted\" lids up", "s:\"Ted\" eyes right", "s:\"Red\" lids down", "s:\"Red\" eyes left", "s:\"Red\" lids up", "s:\"Red\" eyes right",
+	/* 17 */ "u:17", /* dummy */     "u:18", /* dummy */    "u:19", /* dummy */  "u:20", /* dummy */     "s:Left sling",        "s:Right sling",       "s:Bulldozer motor", "s:\"Red\" eject",
+	/* 25 */ "s:Top jet",            "s:Left jet",          "s:Right jet",       "s:Shaker motor",       "u:29", /* dummy */    "u:30", /* dummy */    "u:31", /* dummy */  "u:32", /* dummy */
+	/* 33 */ "u:33", /* dummy */     "u:34", /* dummy */    "u:35", /* dummy */  "u:36", /* dummy */     "f:Little flipper",    "f:Left ramp",        "f:Back white",       "f:Back yellow",
+	/* 41 */ "s:Coin meter",
+	/* 42 */ "u:42", "u:43", "u:44", "u:45", "u:46", "u:47", "u:48", "u:49", /* dummy row */
+	/* 50 */ "g:Playfld/insert 1", "g:Playfld/insert 2", "g:Playfld/insert 3", "g:Right playfield", "g:Left playfield"
 };
 
 static INPUT_PORTS_START( rs )
@@ -1191,7 +1191,7 @@ static INPUT_PORTS_START( rs )
 INPUT_PORTS_END
 
 #if 0
-const char *const wpc_s_state::lamps_fs[8][8] = {
+const char *const wpc_s_state::lamps_fs[][8] = {
 	{ "", "", "", "", "", "", "", "" },
 	{ "", "", "", "", "", "", "", "" },
 	{ "", "", "", "", "", "", "", "" },
@@ -1201,9 +1201,8 @@ const char *const wpc_s_state::lamps_fs[8][8] = {
 	{ "", "", "", "", "", "", "", "" },
 	{ "", "", "", "", "", "", "", "" }
 };
-#endif
 
-const char *const wpc_s_state::outputs_fs[54] = {
+const char *const wpc_s_state::outputs_fs[] = {
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
@@ -1213,6 +1212,7 @@ const char *const wpc_s_state::outputs_fs[54] = {
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 	"g:", "g:", "g:", "g:", "g:"
 };
+#endif
 
 static INPUT_PORTS_START( fs )
 	PORT_START("X0")
@@ -1318,7 +1318,7 @@ static INPUT_PORTS_START( fs )
 INPUT_PORTS_END
 
 #if 0
-const char *const wpc_s_state::lamps_ts[0][8] = {
+const char *const wpc_s_state::lamps_ts[][8] = {
 	{ "", "", "", "", "", "", "", "" },
 	{ "", "", "", "", "", "", "", "" },
 	{ "", "", "", "", "", "", "", "" },
@@ -1328,9 +1328,8 @@ const char *const wpc_s_state::lamps_ts[0][8] = {
 	{ "", "", "", "", "", "", "", "" },
 	{ "", "", "", "", "", "", "", "" }
 };
-#endif
 
-const char *const wpc_s_state::outputs_ts[54] = {
+const char *const wpc_s_state::outputs_ts[] = {
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
@@ -1340,6 +1339,7 @@ const char *const wpc_s_state::outputs_ts[54] = {
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 	"g:", "g:", "g:", "g:", "g:"
 };
+#endif
 
 static INPUT_PORTS_START( ts )
 	PORT_START("X0")
@@ -1452,7 +1452,7 @@ static INPUT_PORTS_START( ts )
 INPUT_PORTS_END
 
 #if 0
-const char *const wpc_s_state::lamps_tom[8][8] = {
+const char *const wpc_s_state::lamps_tom[][8] = {
 	{ "", "", "", "", "", "", "", "" },
 	{ "", "", "", "", "", "", "", "" },
 	{ "", "", "", "", "", "", "", "" },
@@ -1462,9 +1462,8 @@ const char *const wpc_s_state::lamps_tom[8][8] = {
 	{ "", "", "", "", "", "", "", "" },
 	{ "", "", "", "", "", "", "", "" }
 };
-#endif
 
-const char *const wpc_s_state::outputs_tom[54] = {
+const char *const wpc_s_state::outputs_tom[] = {
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
@@ -1474,6 +1473,7 @@ const char *const wpc_s_state::outputs_tom[54] = {
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 	"g:", "g:", "g:", "g:", "g:"
 };
+#endif
 
 static INPUT_PORTS_START( tom )
 	PORT_START("X0")
@@ -1586,7 +1586,7 @@ static INPUT_PORTS_START( tom )
 INPUT_PORTS_END
 
 #if 0
-const char *const wpc_s_state::lamps_wd[8][8] = {
+const char *const wpc_s_state::lamps_wd[][8] = {
 	{ "", "", "", "", "", "", "", "" },
 	{ "", "", "", "", "", "", "", "" },
 	{ "", "", "", "", "", "", "", "" },
@@ -1596,9 +1596,8 @@ const char *const wpc_s_state::lamps_wd[8][8] = {
 	{ "", "", "", "", "", "", "", "" },
 	{ "", "", "", "", "", "", "", "" }
 };
-#endif
 
-const char *const wpc_s_state::outputs_wd[54] = {
+const char *const wpc_s_state::outputs_wd[] = {
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
@@ -1608,6 +1607,7 @@ const char *const wpc_s_state::outputs_wd[54] = {
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 	"g:", "g:", "g:", "g:", "g:"
 };
+#endif
 
 static INPUT_PORTS_START( wd )
 	PORT_START("X0")
@@ -1713,7 +1713,7 @@ static INPUT_PORTS_START( wd )
 INPUT_PORTS_END
 
 #if 0
-const char *const wpc_s_state::lamps_wcs[8][8] = {
+const char *const wpc_s_state::lamps_wcs[][8] = {
 	{ "", "", "", "", "", "", "", "" },
 	{ "", "", "", "", "", "", "", "" },
 	{ "", "", "", "", "", "", "", "" },
@@ -1723,9 +1723,8 @@ const char *const wpc_s_state::lamps_wcs[8][8] = {
 	{ "", "", "", "", "", "", "", "" },
 	{ "", "", "", "", "", "", "", "" }
 };
-#endif
 
-const char *const wpc_s_state::outputs_wcs[54] = {
+const char *const wpc_s_state::outputs_wcs[] = {
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
@@ -1735,6 +1734,7 @@ const char *const wpc_s_state::outputs_wcs[54] = {
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 	"g:", "g:", "g:", "g:", "g:"
 };
+#endif
 
 static INPUT_PORTS_START( wcs )
 	PORT_START("X0")
@@ -1950,17 +1950,17 @@ void wpc_s_state::wpc_s(machine_config &config)
 
 	TIMER(config, "zero_crossing").configure_periodic(FUNC(wpc_s_state::zc_timer), attotime::from_hz(120)); // Mains power zero crossing
 
-	WPC_SHIFT(config, "shift", 0);
-	WPC_PIC(config, m_pic, 0);
-	WPC_LAMP(config, m_lamp, 0);
-	WPC_OUT(config, m_out, 0, 5);
-	WPC_DMD(config, "dmd", 0).scanline_callback().set(FUNC(wpc_s_state::scanline_irq));
+	WPC_SHIFT(config, "shift");
+	WPC_PIC(config, m_pic);
+	WPC_LAMP(config, m_lamp);
+	WPC_OUT(config, m_out, 5);
+	WPC_DMD(config, "dmd").scanline_callback().set(FUNC(wpc_s_state::scanline_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "mono").front_center();
 
-	DCS_AUDIO_8K(config, m_dcs, 0);
+	DCS_AUDIO_8K(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->add_route(0, "mono", 1.0);
 }
@@ -2034,7 +2034,7 @@ void wpc_s_state::fs(machine_config &config)
 
 	m_pic->set_serial("529 123456 12345 123");
 	//m_lamp->set_names(lamps_fs);
-	m_out->set_names(outputs_fs);
+	//m_out->set_names(outputs_fs);
 }
 
 void wpc_s_state::ts(machine_config &config)
@@ -2043,7 +2043,7 @@ void wpc_s_state::ts(machine_config &config)
 
 	m_pic->set_serial("532 123456 12345 123");
 	//m_lamp->set_names(lamps_ts);
-	m_out->set_names(outputs_ts);
+	//m_out->set_names(outputs_ts);
 }
 
 void wpc_s_state::tom(machine_config &config)
@@ -2052,7 +2052,7 @@ void wpc_s_state::tom(machine_config &config)
 
 	m_pic->set_serial("539 123456 12345 124");
 	//m_lamp->set_names(lamps_tom);
-	m_out->set_names(outputs_tom);
+	//m_out->set_names(outputs_tom);
 }
 
 void wpc_s_state::tom14(machine_config &config)
@@ -2061,7 +2061,7 @@ void wpc_s_state::tom14(machine_config &config)
 
 	m_pic->set_serial("124 123456 12345 123");
 	//m_lamp->set_names(lamps_tom);
-	m_out->set_names(outputs_tom);
+	//m_out->set_names(outputs_tom);
 }
 
 void wpc_s_state::wd(machine_config &config)
@@ -2070,7 +2070,7 @@ void wpc_s_state::wd(machine_config &config)
 
 	m_pic->set_serial("544 123456 12345 123");
 	//m_lamp->set_names(lamps_wd);
-	m_out->set_names(outputs_wd);
+	//m_out->set_names(outputs_wd);
 }
 
 void wpc_s_state::wcs(machine_config &config)
@@ -2079,7 +2079,7 @@ void wpc_s_state::wcs(machine_config &config)
 
 	m_pic->set_serial("531 123456 12345 123");
 	//m_lamp->set_names(lamps_wcs);
-	m_out->set_names(outputs_wcs);
+	//m_out->set_names(outputs_wcs);
 }
 
 void wpc_s_state::tfs(machine_config &config)

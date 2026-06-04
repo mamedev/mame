@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "hpc3.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 #define LOG_UNKNOWN     (1U << 1)

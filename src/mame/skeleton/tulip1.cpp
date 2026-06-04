@@ -166,7 +166,7 @@ void tulip1_state::tulip1(machine_config &config)
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(tulip1_state::crtc_update_row));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("kbd", FUNC(rs232_port_device::write_txd));
 
 	rs232_port_device &rs232(RS232_PORT(config, "kbd", default_rs232_devices, "keyboard"));

@@ -350,14 +350,13 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void winner81(machine_config &config);
-	void winner82(machine_config &config);
-	void rcirulet(machine_config &config);
-	void luckyrlt(machine_config &config);
-	void re800(machine_config &config);
+	void winner81(machine_config &config) ATTR_COLD;
+	void winner82(machine_config &config) ATTR_COLD;
+	void rcirulet(machine_config &config) ATTR_COLD;
+	void luckyrlt(machine_config &config) ATTR_COLD;
+	void re800(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 private:

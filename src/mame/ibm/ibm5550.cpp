@@ -226,7 +226,7 @@ void ibm5550_state::ibm5550(machine_config &config)
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// D8253C-2
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 
 	// Parallel port, 36 pins
 	// keyboard connector

@@ -203,7 +203,7 @@ void quadra630_state::macqd630(machine_config &config)
 	m_primetimeii->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
 	m_primetimeii->write_cb2().set(m_cuda, FUNC(cuda_device::set_via_data));
 
-	nubus_device &nubus(NUBUS(config, "pds", 0));
+	nubus_device &nubus(NUBUS(config, "pds"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.set_bus_mode(nubus_device::nubus_mode_t::QUADRA_DAFB);
 	nubus.out_irqe_callback().set(m_primetimeii, FUNC(primetime_device::via2_irq_w<0x20>));

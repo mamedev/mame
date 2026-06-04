@@ -15,7 +15,7 @@
 #define LOG_REGS    (1U << 4)
 #define LOG_DATA    (1U << 5)
 
-#define VERBOSE  (LOG_CMD | LOG_INT | LOG_SEEK | LOG_REGS | LOG_DATA)
+#define VERBOSE  (0)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"

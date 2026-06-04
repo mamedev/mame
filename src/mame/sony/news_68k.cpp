@@ -178,7 +178,7 @@ public:
 	{
 	}
 
-	void init_common();
+	void init_common() ATTR_COLD;
 
 protected:
 	// driver_device overrides
@@ -328,8 +328,6 @@ protected:
 
 void news_68k_base_state::machine_start()
 {
-	m_led.resolve();
-
 	// Initialize state
 	u32 constexpr NET_RAM_SIZE = 8192;
 	m_net_ram = std::make_unique<u16[]>(NET_RAM_SIZE);
@@ -711,7 +709,7 @@ void news_68k_base_state::common(machine_config &config)
 {
 	M48T02(config, m_rtc);
 
-	DMAC_0266(config, m_dma, 0);
+	DMAC_0266(config, m_dma);
 	m_dma->set_bus(m_cpu, 0);
 
 	INPUT_MERGER_ANY_HIGH(config, m_irq5);
@@ -889,7 +887,7 @@ void news_68k_laptop_state::nws1250(machine_config &config)
 
 static INPUT_PORTS_START(nws12x0)
 	PORT_START("SW1")
-	PORT_DIPNAME(0x07, 0x02, "Display") PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME(0x07, 0x05, "Display") PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(0x07, "Console")
 	PORT_DIPSETTING(0x05, "LCD")
 	PORT_DIPSETTING(0x00, "Autoselect")

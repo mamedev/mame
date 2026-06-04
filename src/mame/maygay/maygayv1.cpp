@@ -821,7 +821,6 @@ void maygayv1_state::b_writ(uint8_t data)
 
 void maygayv1_state::machine_start()
 {
-	m_lamp.resolve();
 	m_i82716.dram = std::make_unique<uint16_t[]>(0x80000/2);   // ???
 	m_i82716.line_buf = std::make_unique<uint8_t[]>(512);
 

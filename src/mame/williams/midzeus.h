@@ -82,7 +82,7 @@ public:
 		m_mainbank(*this, "mainbank")
 	{ }
 
-	void mk4(machine_config &config);
+	void mk4(machine_config &config) ATTR_COLD;
 
 	optional_shared_ptr<uint32_t> m_zeusbase;
 

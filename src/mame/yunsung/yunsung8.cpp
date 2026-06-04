@@ -611,7 +611,7 @@ void yunsung8_state::yunsung8(machine_config &config)
 	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	LS157(config, m_adpcm_select, 0);
+	LS157(config, m_adpcm_select);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	MSM5205(config, m_msm, XTAL(400'000)); // verified on PCB

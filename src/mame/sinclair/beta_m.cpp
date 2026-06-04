@@ -67,8 +67,6 @@ void beta_disk_device::device_start()
 	save_item(NAME(m_betadisk_active));
 	save_item(NAME(m_control));
 	save_item(NAME(m_motor_active));
-
-	m_floppy_led.resolve();
 }
 
 //-------------------------------------------------

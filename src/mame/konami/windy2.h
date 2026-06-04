@@ -47,11 +47,17 @@ private:
 class windy2_2l6b_device : public windy2_device
 {
 public:
-	windy2_2l6b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	windy2_2l6b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T>
 	windy2_2l6b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&jvs_host_tag)
 		: windy2_2l6b_device(mconfig, tag, owner, clock)
+	{
+		host.set_tag(std::forward<T>(jvs_host_tag));
+	}
+	template <typename T>
+	windy2_2l6b_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&jvs_host_tag)
+		: windy2_2l6b_device(mconfig, tag, owner, 0, std::forward<T>(jvs_host_tag))
 	{
 		host.set_tag(std::forward<T>(jvs_host_tag));
 	}
@@ -115,11 +121,17 @@ public:
 class windy2_2l12b_device : public windy2_device
 {
 public:
-	windy2_2l12b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	windy2_2l12b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T>
 	windy2_2l12b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&jvs_host_tag)
 		: windy2_2l12b_device(mconfig, tag, owner, clock)
+	{
+		host.set_tag(std::forward<T>(jvs_host_tag));
+	}
+	template <typename T>
+	windy2_2l12b_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&jvs_host_tag)
+		: windy2_2l12b_device(mconfig, tag, owner, 0, std::forward<T>(jvs_host_tag))
 	{
 		host.set_tag(std::forward<T>(jvs_host_tag));
 	}

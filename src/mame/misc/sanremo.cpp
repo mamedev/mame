@@ -123,8 +123,8 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void roadstar(machine_config &config);
-	void sanremo(machine_config &config);
+	void roadstar(machine_config &config) ATTR_COLD;
+	void sanremo(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -174,8 +174,6 @@ TILE_GET_INFO_MEMBER(sanremo_state::get_tile_info)
 void sanremo_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sanremo_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 48, 40);
-
-	m_lamps.resolve();
 
 	save_item(NAME(m_attrram));
 	save_item(NAME(m_banksel));

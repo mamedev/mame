@@ -188,7 +188,7 @@ void gamate_state::gamate(machine_config &config)
 	M6502(config, m_maincpu, 4433000/2); // NCR 65CX02
 	m_maincpu->set_addrmap(AS_PROGRAM, &gamate_state::gamate_mem);
 
-	GAMATE_VIDEO(config, "video", 0);
+	GAMATE_VIDEO(config, "video");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front(); // Stereo headphone output

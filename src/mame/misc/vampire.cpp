@@ -612,7 +612,7 @@ void vampire_state::vampire(machine_config &config)
 	MC6809(config, m_maincpu, 8_MHz_XTAL); // HD68B09P
 	m_maincpu->set_addrmap(AS_PROGRAM, &vampire_state::vampire_memory);
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<0>(4_MHz_XTAL/2);
 	pit.set_clk<1>(4_MHz_XTAL/2);
 	pit.set_clk<2>(4_MHz_XTAL/2);

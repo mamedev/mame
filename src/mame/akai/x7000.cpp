@@ -5,7 +5,7 @@
 	Akai S612, S700, X7000 samplers
 
 	These early Akai samplers share a 6-voice sound hardware design based around
-	two 8253 (or 8254) timers each clocking an 8237 DMA controller into three 12-bit DACs.
+	two 8253 (or 8254) timers each clocking an 8237 DMA controller into a 12-bit DAC.
 	Two more 8253s also clock a total of six MF6CN-50 lowpass filter ICs (one per voice).
 	The S700 and X7000 expand the sampling capacity via bank switching.
 
@@ -22,7 +22,7 @@
 	- all actual sound output (and input)
 	- layouts
 	- S612 analog dials/sliders
-	- disk support (existing MB87013 source needs to be moved out of roland directory)
+	- disk support
 
 ***************************************************************************/
 #include "emu.h"
@@ -38,9 +38,11 @@
 #include "machine/bankdev.h"
 #include "machine/clock.h"
 #include "machine/gen_latch.h"
+#include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/i8279.h"
 #include "machine/input_merger.h"
+#include "machine/mb87013.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "video/hd44780.h"
@@ -199,9 +201,6 @@ protected:
 /**************************************************************************/
 void s612_state::machine_start()
 {
-	m_led_digit.resolve();
-	m_led.resolve();
-
 	m_cpu_bank->space().install_ram(0, m_ram->mask(), m_ram->pointer());
 	for (int i = 0; i < 6; i++)
 		m_voice_bank[i]->space().install_ram(0, m_ram->mask(), m_ram->pointer());
@@ -258,7 +257,7 @@ void s612_state::common_map(address_map &map)
 void s700_state::common_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("maincpu", 0);
-	// 4Axx: disk interface
+	map(0x4a00, 0x4aff).rw("qdc", FUNC(mb87013_device::read), FUNC(mb87013_device::write));
 	map(0x4b00, 0x4bff).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x4c00, 0x4cff).portr("ENCDR");
 	// 4Dxx: envelope/mute control (A4..6 = address, A0 = strobe, D0..7 = data)
@@ -391,8 +390,8 @@ void s612_state::s612(machine_config &config)
 	base_config(config, false);
 	m_maincpu->set_addrmap(AS_IO, &s612_state::io_map);
 
-	// sample memory: 12-bit x 64k x 1 bank
-	m_ram->set_default_size("128K");
+	// sample memory: 12-bit x 32k x 1 bank
+	m_ram->set_default_size("64K");
 
 	PET_DATASSETTE_PORT(config, m_cass, cbm_datassette_devices, "c1530");
 
@@ -441,6 +440,20 @@ void s700_state::s700(machine_config &config)
 	auto &kdc(I8279(config, "kdc", 16_MHz_XTAL / 8));
 	kdc.out_sl_callback().set(FUNC(s700_state::sl_w));
 	kdc.in_rl_callback().set(FUNC(s700_state::rl_r));
+
+	auto &i8251(I8251(config, "i8251", 16_MHz_XTAL / 4));
+	i8251.write_cts(0);
+
+	auto &qdc(MB87013(config, "qdc", 6.5_MHz_XTAL));
+	qdc.sio_rd_callback().set(i8251, FUNC(i8251_device::read));
+	qdc.sio_wr_callback().set(i8251, FUNC(i8251_device::write));
+	qdc.txc_callback().set(i8251, FUNC(i8251_device::write_txc));
+	qdc.rxc_callback().set(i8251, FUNC(i8251_device::write_rxc));
+	qdc.rxd_callback().set(i8251, FUNC(i8251_device::write_rxd));
+	qdc.dsr_callback().set(i8251, FUNC(i8251_device::write_dsr));
+	qdc.op4_callback().set(qdc, FUNC(mb87013_device::rts_w));
+	i8251.dtr_handler().set(qdc, FUNC(mb87013_device::dtr_w));
+	i8251.txd_handler().set(qdc, FUNC(mb87013_device::txd_w));
 
 	// LCD
 	HD44780(config, m_lcdc, 270'000); // TODO: type and clock both guessed
@@ -672,12 +685,12 @@ static INPUT_PORTS_START( s700 )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ENCDR")
-	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(s700_state::dial_r))
-	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Play Back")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER  ) PORT_NAME("Program Up")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER  ) PORT_NAME("Rec/PB Trigger")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x03, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(s700_state::dial_r))
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW,  IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Play Back")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_OTHER  ) PORT_NAME("Program Up")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_OTHER  ) PORT_NAME("Rec/PB Trigger")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_START("DIAL")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_NAME("Control") PORT_SENSITIVITY(50) PORT_KEYDELTA(75) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT)
@@ -725,17 +738,17 @@ static INPUT_PORTS_START( x7000 )
 	PORT_START("ENCDR")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(s700_state::dial_r))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER  ) PORT_NAME("Sustain")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Local") PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER  ) PORT_NAME("Local") PORT_TOGGLE
 	// default to on
-	PORT_DIPSETTING( 0x00, DEF_STR(On) )
-	PORT_DIPSETTING( 0x08, DEF_STR(Off) )
+	PORT_DIPSETTING( 0x08, DEF_STR(On) )
+	PORT_DIPSETTING( 0x00, DEF_STR(Off) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // no playback button
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER  ) PORT_NAME("Program Up")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER  ) PORT_NAME("Rec/PB Trigger")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DIAL")
-		PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_NAME("Control") PORT_SENSITIVITY(50) PORT_KEYDELTA(75) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT)
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_NAME("Control") PORT_SENSITIVITY(50) PORT_KEYDELTA(75) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT)
 
 	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("C2")

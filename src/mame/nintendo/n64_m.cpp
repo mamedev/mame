@@ -13,6 +13,8 @@
 #include "debugger.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 

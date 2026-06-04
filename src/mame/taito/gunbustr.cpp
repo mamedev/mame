@@ -143,9 +143,6 @@ private:
 void gunbustr_state::video_start()
 {
 	m_spritelist = std::make_unique<gb_tempsprite[]>(0x4000);
-
-	m_gun_recoil_pl.resolve();
-	m_hit_lamp.resolve();
 }
 
 /************************************************************
@@ -518,7 +515,7 @@ void gunbustr_state::gunbustr(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_0_callback().set_ioport("EXTRA");
 	tc0510nio.read_2_callback().set_ioport("INPUTS");
 	tc0510nio.read_3_callback().set_ioport("SPECIAL");
@@ -542,7 +539,7 @@ void gunbustr_state::gunbustr(machine_config &config)
 	adc.in_callback<6>().set_constant(0xff);
 	adc.in_callback<7>().set_constant(0xff);
 
-	GUNBUSTR_LINK(config, "link", 0);
+	GUNBUSTR_LINK(config, "link");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -556,7 +553,7 @@ void gunbustr_state::gunbustr(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gunbustr);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 4096);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x20, 0x08);
 	m_tc0480scp->set_offsets_tx(-1, -1);
@@ -565,7 +562,7 @@ void gunbustr_state::gunbustr(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en"));
 	taito_en.add_route(0, "speaker", 1.0, 0);
 	taito_en.add_route(1, "speaker", 1.0, 1);
 }

@@ -364,8 +364,6 @@ public:
 	void init_gollygho() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-
 	virtual void dpram_word_w(offs_t offset, u16 data, u16 mem_mask = ~0) override;
 
 private:

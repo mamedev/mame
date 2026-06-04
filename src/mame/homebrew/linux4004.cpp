@@ -118,7 +118,7 @@ void linux4004_state::linux4004(machine_config &config)
 	m_psram[1]->set_size(4 << 20); // supports 128 KiB to 16 MiB
 	m_psram[1]->sio_cb().set(FUNC(linux4004_state::psram_sio_w<1>));
 
-	SPI_SDCARD(config, m_sdcard, 0U);
+	SPI_SDCARD(config, m_sdcard);
 	m_sdcard->spi_miso_callback().set(FUNC(linux4004_state::miso_w<3>));
 
 	SC16IS741A(config, m_uart, 3.072_MHz_XTAL);
@@ -138,8 +138,6 @@ void linux4004_state::linux4004(machine_config &config)
 void linux4004_state::machine_start()
 {
 	m_rom_bank->configure_entries(0, 2, memregion("4004firmware")->base(), 0x1000);
-	m_led_pc.resolve();
-	m_led_sdcard.resolve();
 
 	std::fill(std::begin(m_psram_so), std::end(m_psram_so), 1);
 	m_u3_in = 0;

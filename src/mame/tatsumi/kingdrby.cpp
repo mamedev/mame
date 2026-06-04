@@ -106,9 +106,9 @@ public:
 	{
 	}
 
-	void kingdrbb(machine_config &config);
-	void cowrace(machine_config &config);
-	void kingdrby(machine_config &config);
+	void kingdrbb(machine_config &config) ATTR_COLD;
+	void cowrace(machine_config &config) ATTR_COLD;
+	void kingdrby(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -220,8 +220,6 @@ void kingdrby_state::video_start()
 	m_sc0w_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kingdrby_state::get_sc0_tile_info)), TILEMAP_SCAN_ROWS, 8,8,32,32);
 
 	m_sc1_tilemap->set_transparent_pen(0);
-
-	m_digits.resolve();
 }
 
 static const uint8_t hw_sprite[16] =

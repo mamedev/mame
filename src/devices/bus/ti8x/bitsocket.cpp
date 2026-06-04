@@ -58,7 +58,7 @@ bit_socket_device::bit_socket_device(
 
 void bit_socket_device::device_add_mconfig(machine_config &config)
 {
-	BITBANGER(config, m_stream, 0);
+	BITBANGER(config, m_stream);
 }
 
 
