@@ -23,11 +23,11 @@
 // option priorities
 enum
 {
-	// command-line options are HIGH priority
+	// command-line options override everything (HIGH priority)
 	OPTION_PRIORITY_SUBCMD = OPTION_PRIORITY_HIGH,
 	OPTION_PRIORITY_CMDLINE,
 
-	// INI-based options are NORMAL priority, in increasing order:
+	// user INI files, in increasing order of specificity (NORMAL priority)
 	OPTION_PRIORITY_MAME_INI = OPTION_PRIORITY_NORMAL + 1,
 	OPTION_PRIORITY_DEBUG_INI,
 	OPTION_PRIORITY_ORIENTATION_INI,
@@ -37,6 +37,9 @@ enum
 	OPTION_PRIORITY_PARENT_INI,
 	OPTION_PRIORITY_DRIVER_INI,
 	OPTION_PRIORITY_INI,
+
+	// hardcoded bootstrap INI, overridden by everything else (DEFAULT priority)
+	OPTION_PRIORITY_BOOTSTRAP = OPTION_PRIORITY_DEFAULT + 1,
 };
 
 //**************************************************************************

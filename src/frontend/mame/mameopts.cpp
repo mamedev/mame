@@ -46,7 +46,7 @@ void mame_options::parse_standard_inis(emu_options &options, std::ostream &error
 			osd_printf_verbose("Parsing %s\n", file.fullpath());
 			try
 			{
-				options.parse_ini_file(static_cast<util::core_file &>(file), OPTION_PRIORITY_MAME_INI, true, false);
+				options.parse_ini_file(static_cast<util::core_file &>(file), OPTION_PRIORITY_BOOTSTRAP, true, false);
 			}
 			catch (options_exception const &ex)
 			{
