@@ -82,6 +82,10 @@ X - change banks
 #include "machine/z80ctc.h"
 #include "machine/z80dma.h"
 #include "machine/z80sio.h"
+#include "bus/rs232/rs232.h"
+#include "bus/nscsi/devices.h"
+#include "bus/nscsi/s1410.h"
+#include "machine/nscsi_bus.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
 
@@ -91,6 +95,153 @@ X - change banks
 
 
 namespace {
+
+// ============================================================================
+//  bigbord2_sasi_host_device - Xebec S1410 SASI host adapter bridge.
+//
+//  The Big Board II reaches the Xebec controller through two ports:
+//    D8  data    - read/write one bus byte; the Z80 DMA streams the sector
+//                  payload and the trailing status/message bytes through here.
+//    D9  status  - read returns the SASI phase lines (active high):
+//                  bit0 = I/O, bit1 = BSY, bit3 = MSG, bit5 = C/D.
+//  SEL and RST are not driven here directly: the addressable latch U96
+//  (outlatch1) decodes the BIOS' XEBEC.DMA writes (SEL+ON = 0x0b, RST+ON =
+//  0x0a) as Q3 (SEL) and Q2 (RST), wired in via sel_w()/rst_w().  The SASI
+//  REQ line gates the Z80 DMA through the 74LS151 ready mux (input 7), so it
+//  is surfaced via req_cb().
+// ============================================================================
+
+class bigbord2_sasi_host_device : public device_t, public nscsi_device_interface
+{
+public:
+	bigbord2_sasi_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	auto req_cb() { return m_req_cb.bind(); }   // SASI REQ -> 74LS151 mux input 7
+
+	u8   data_r();          // D8 read  (data in  + ACK pulse during transfer)
+	void data_w(u8 data);   // D8 write (data out + ACK pulse during transfer)
+	u8   status_r();        // D9 read  (phase bits)
+	void sel_w(int state);  // U96 Q3 -> SEL
+	void rst_w(int state);  // U96 Q2 -> RST
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void scsi_ctrl_changed() override;
+
+private:
+	TIMER_CALLBACK_MEMBER(ack_off);
+
+	static constexpr attotime SASI_PULSE = attotime::from_nsec(500);
+
+	devcb_write_line m_req_cb;
+	u32 m_prev_ctrl = 0;
+	emu_timer *m_ack_timer = nullptr;
+};
+
+DEFINE_DEVICE_TYPE_PRIVATE(BIGBORD2_SASI_HOST, bigbord2_sasi_host_device, bigbord2_sasi_host_device, "bigbord2_sasi_host", "Big Board II SASI host adapter")
+
+bigbord2_sasi_host_device::bigbord2_sasi_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, BIGBORD2_SASI_HOST, tag, owner, clock)
+	, nscsi_device_interface(mconfig, *this)
+	, m_req_cb(*this)
+{
+}
+
+void bigbord2_sasi_host_device::device_start()
+{
+	save_item(NAME(m_prev_ctrl));
+	m_ack_timer = timer_alloc(FUNC(bigbord2_sasi_host_device::ack_off), this);
+}
+
+void bigbord2_sasi_host_device::device_reset()
+{
+	m_prev_ctrl = 0;
+	m_scsi_bus->ctrl_w(m_scsi_refid, 0, nscsi_device_interface::S_ALL);
+	m_scsi_bus->data_w(m_scsi_refid, 0);
+	// Register for ctrl-change notifications on target-driven lines so
+	// scsi_ctrl_changed() actually fires (the bus only dispatches to devices
+	// whose m_wait_ctrl overlaps the changed bits -- nscsi_bus.cpp:99). Without
+	// this, req_cb() never sees REQ edges (breaking the DMA-variant BIOS, which
+	// clocks its Z80 DMA off SASI REQ via the 74LS151 mux), and we get no
+	// phase-transition trace.
+	constexpr u32 target_mask =
+		nscsi_device_interface::S_BSY |
+		nscsi_device_interface::S_REQ |
+		nscsi_device_interface::S_MSG |
+		nscsi_device_interface::S_CTL |
+		nscsi_device_interface::S_INP;
+	m_scsi_bus->ctrl_wait(m_scsi_refid, target_mask, target_mask);
+}
+
+void bigbord2_sasi_host_device::scsi_ctrl_changed()
+{
+	const u32 ctrl = m_scsi_bus->ctrl_r();
+	if ((ctrl ^ m_prev_ctrl) & S_REQ)
+		m_req_cb((ctrl & S_REQ) ? 1 : 0);
+	m_prev_ctrl = ctrl;
+}
+
+TIMER_CALLBACK_MEMBER(bigbord2_sasi_host_device::ack_off)
+{
+	// Drop ACK and release the data bus.  Releasing data is essential on
+	// DATA_IN / STATUS phases: otherwise the last byte we drove stays asserted
+	// and OR's with the target-driven byte, corrupting every inbound read.
+	m_scsi_bus->ctrl_w(m_scsi_refid, 0, nscsi_device_interface::S_ACK);
+	m_scsi_bus->data_w(m_scsi_refid, 0);
+}
+
+u8 bigbord2_sasi_host_device::data_r()
+{
+	const u8 v = m_scsi_bus->data_r();
+	// ACK only inside a connected transfer phase (BSY asserted); never during
+	// selection, where the data bus carries the target id.
+	if (!machine().side_effects_disabled() && (m_scsi_bus->ctrl_r() & S_BSY))
+	{
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
+		m_ack_timer->adjust(SASI_PULSE);
+	}
+	return v;
+}
+
+void bigbord2_sasi_host_device::data_w(u8 data)
+{
+	m_scsi_bus->data_w(m_scsi_refid, data);
+	if (m_scsi_bus->ctrl_r() & S_BSY)
+	{
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
+		m_ack_timer->adjust(SASI_PULSE);
+	}
+}
+
+u8 bigbord2_sasi_host_device::status_r()
+{
+	const u32 ctrl = m_scsi_bus->ctrl_r();
+	u8 d = 0;
+	if (ctrl & S_INP) d |= 0x01;   // I/O
+	if (ctrl & S_BSY) d |= 0x02;   // BSY
+	if (ctrl & S_MSG) d |= 0x08;   // MSG
+	if (ctrl & S_CTL) d |= 0x20;   // C/D
+	if (ctrl & S_REQ) d |= 0x80;   // REQ -- the DMA-variant ST412 BIOS polls D9 bit7
+	                               // (REQBIT); the INIR cbios masks it off (0x2b/0x21)
+	return d;
+}
+
+void bigbord2_sasi_host_device::sel_w(int state)
+{
+	// The BIOS placed the target-id byte (0x01 = id 0) on the data bus via
+	// data_w before raising SEL.  Release the bus when SEL drops so the target
+	// can drive the command phase.
+	m_scsi_bus->ctrl_w(m_scsi_refid, state ? S_SEL : 0, S_SEL);
+	if (!state)
+		m_scsi_bus->data_w(m_scsi_refid, 0);
+}
+
+void bigbord2_sasi_host_device::rst_w(int state)
+{
+	m_scsi_bus->ctrl_w(m_scsi_refid, state ? S_RST : 0, S_RST);
+}
+
 
 class bigbord2_state : public driver_device
 {
@@ -115,6 +266,8 @@ public:
 		, m_banka(*this, "banka")
 		, m_bankv1(*this, "bankv1")
 		, m_banka1(*this, "banka1")
+		, m_sasi(*this, "sasi")
+		, m_sasi_host(*this, "sasi_host")
 	{ }
 
 	void bigbord2(machine_config &config);
@@ -127,6 +280,7 @@ private:
 	void head_load_w(int state);
 	void disk_motor_w(int state);
 	void syslatch2_w(u8 data);
+	u8   fdc_status_r();      // wd_fdc command_end race-window mask (see body)
 	u8 status_port_r();
 	u8 kbd_r();
 	void kbd_put(u8 data);
@@ -135,6 +289,10 @@ private:
 	void sio_wrdya_w(int state);
 	void sio_wrdyb_w(int state);
 	void fdc_drq_w(int state);
+	void fdc_intrq_w(int state);
+	void sasi_req_w(int state);
+	void cpu_halt_w(int state);
+	void update_fdc_nmi();
 	u8 memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, u8 data);
 	u8 io_read_byte(offs_t offset);
@@ -145,8 +303,11 @@ private:
 	u8 crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, uint16_t ac_cnt, bool ac_curs);
 	u8 m_term_data = 0U;
 	u8 m_term_status = 0U;
+	u8 m_dma_sel = 0U;   // 74LS151 select for DMA RDY (syslatch2[0:2])
 	uint16_t m_cnt = 0U;
 	bool m_cc[8]{};
+	u8 m_fdc_rq = 0U;    // bit0=FDC INTRQ, bit1=FDC DRQ, bit7=NMI asserted (HALT-gated NMI gate)
+	bool m_cpu_halted = false;  // tracked via the Z80 halt_cb
 	floppy_image_device *m_floppy;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -174,6 +335,8 @@ private:
 	required_memory_bank m_banka;
 	required_memory_bank m_bankv1;
 	required_memory_bank m_banka1;
+	required_device<nscsi_bus_device> m_sasi;
+	required_device<bigbord2_sasi_host_device> m_sasi_host;
 };
 
 /* Status port
@@ -216,16 +379,84 @@ void bigbord2_state::kbd_put(u8 data)
 void bigbord2_state::sio_wrdya_w(int state)
 {
 	m_cc[0] = state;
+	if (m_dma_sel == 0) m_dma->rdy_w(state);
 }
 
 void bigbord2_state::sio_wrdyb_w(int state)
 {
 	m_cc[1] = state;
+	if (m_dma_sel == 1) m_dma->rdy_w(state);
 }
 
 void bigbord2_state::fdc_drq_w(int state)
 {
 	m_cc[2] = state;
+	if (m_dma_sel == 2) m_dma->rdy_w(state);
+	m_fdc_rq = (m_fdc_rq & 0x81) | (state ? 2 : 0);   // DRQ also feeds the HALT-gated NMI gate
+	update_fdc_nmi();
+}
+
+void bigbord2_state::fdc_intrq_w(int state)
+{
+	m_fdc_rq = (m_fdc_rq & 0x82) | (state ? 1 : 0);
+	update_fdc_nmi();
+}
+
+// FDC INTRQ (pin 39) and DRQ are OR'd and gated by the Z80 /HALT line to drive
+// /NMI (BB-II schematic: INTRQ+pullup -> 74LS32 with DRQ -> inverted -> 74LS32
+// with /HALT -> /NMI).  During a DMA transfer the CPU is bus-released (not
+// halted) so this stays quiet; the CP/M BIOS PIO path issues an FDC command,
+// executes HALT, and each DRQ (and the final INTRQ) fires an NMI that moves one
+// byte / completes the command.  Evaluated on the actual gate inputs -- the Z80
+// halt_cb edge and the FDC DRQ/INTRQ edges -- so /NMI tracks (/HALT & (DRQ|INTRQ))
+// with no polling latency.  (The Kaypro polls Z80_HALT on a ~100 kHz timer only
+// because the Z80 halt callback did not exist when it was written.)
+void bigbord2_state::cpu_halt_w(int state)
+{
+	m_cpu_halted = bool(state);
+	update_fdc_nmi();
+}
+
+void bigbord2_state::update_fdc_nmi()
+{
+	bool const want = m_cpu_halted && (m_fdc_rq & 3);
+	if (want && !(m_fdc_rq & 0x80))
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_fdc_rq |= 0x80;
+	}
+	else if (!want && (m_fdc_rq & 0x80))
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_fdc_rq &= 0x7f;
+	}
+}
+
+void bigbord2_state::sasi_req_w(int state)
+{
+	m_cc[7] = state;
+	if (m_dma_sel == 7) m_dma->rdy_w(state);
+}
+
+u8 bigbord2_state::fdc_status_r()
+{
+	// Race-window mask.  MAME's wd_fdc::command_end() clears BUSY without
+	// dropping DRQ when LOST_DATA isn't set -- it has a literal "TBD: lost data
+	// should probably negate DRQ" comment.  That exposes a transient
+	// BUSY=0 + DRQ=1 state that real WD179x DMA hardware doesn't because its
+	// arbitration grabs the trailing byte before BUSY drops.  Without this mask
+	// the BB-II V1.1 CBIOS's DISKOP polling exits the "wait for BUSY=0" loop,
+	// masks the returned status with AND $9F, sees bit 1 (DRQ) set, and calls
+	// REPORT which prints "BIOS error on A: drq track N sector M" (bit 1 -> "drq"
+	// in the BBII_CBIOS REPORT bit-to-string table).  Re-assert BUSY in the read
+	// so the BIOS keeps polling; once the DMA has actually drained the data
+	// register, DRQ drops and the next read returns a clean STS=00.  The byte
+	// stays in the FDC's data register either way -- this only delays when the
+	// BIOS thinks the command completed, it doesn't fabricate or hide data.
+	u8 v = m_fdc->status_r();
+	if ((v & 0x03) == 0x02)
+		v |= 0x01;
+	return v;
 }
 
 
@@ -320,7 +551,8 @@ void bigbord2_state::syslatch2_w(u8 data)
 		m_floppy->mon_w(m_syslatch1->q6_r() ? 0 : 1);
 	}
 
-	m_dma->rdy_w(m_cc[data & 7]);
+	m_dma_sel = data & 7;
+	m_dma->rdy_w(m_cc[m_dma_sel]);
 }
 
 
@@ -351,9 +583,13 @@ void bigbord2_state::io_map(address_map &map)
 	map(0xc8, 0xcb).w(m_syslatch1, FUNC(ls259_device::write_nibble_d3)); // u14
 	map(0xcc, 0xcf).w(FUNC(bigbord2_state::syslatch2_w));
 	map(0xd0, 0xd3).r(FUNC(bigbord2_state::kbd_r)); // u1
-	map(0xd4, 0xd7).rw(m_fdc, FUNC(mb8877_device::read), FUNC(mb8877_device::write)); // u10
-	//map(0xd8, 0xdb).rw(FUNC(bigbord2_state::portd8_r), FUNC(bigbord2_state::portd8_w)); // various external data ports; DB = centronics printer
-	map(0xd9, 0xd9).w("outlatch1", FUNC(ls259_device::write_nibble_d3)); // u96
+	map(0xd4, 0xd4).r(FUNC(bigbord2_state::fdc_status_r)).w(m_fdc, FUNC(mb8877_device::cmd_w));  // u10 status (race-mask) / command
+	map(0xd5, 0xd5).rw(m_fdc, FUNC(mb8877_device::track_r),  FUNC(mb8877_device::track_w));
+	map(0xd6, 0xd6).rw(m_fdc, FUNC(mb8877_device::sector_r), FUNC(mb8877_device::sector_w));
+	map(0xd7, 0xd7).rw(m_fdc, FUNC(mb8877_device::data_r),   FUNC(mb8877_device::data_w));
+	map(0xd8, 0xd8).rw(m_sasi_host, FUNC(bigbord2_sasi_host_device::data_r), FUNC(bigbord2_sasi_host_device::data_w)); // SASI data
+	//map(0xda, 0xdb) // remaining external data ports; DB = centronics printer (no software support)
+	map(0xd9, 0xd9).r(m_sasi_host, FUNC(bigbord2_sasi_host_device::status_r)).w("outlatch1", FUNC(ls259_device::write_nibble_d3)); // u96: read=SASI phase status; write latch Q3=SEL Q2=RST
 	map(0xdc, 0xdc).mirror(2).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w)); // u30
 	map(0xdd, 0xdd).mirror(2).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
@@ -430,6 +666,15 @@ void bigbord2_state::machine_start()
 	save_item(NAME(m_cc));
 
 	m_floppy = nullptr;
+
+	// Opt the Xebec S1410 into the ST-506/ST-412 seek model.  Without this the
+	// device uses a flat 85 ms per-command delay (the spec's average) regardless
+	// of distance, which over-bills track-to-track and undercounts full strokes.
+	// ST412 OEM manual (Apr 82) lists track-to-track 3 ms, average 85 ms,
+	// full-stroke 205 ms (both fast-seek/burst, settling included); 3600 RPM;
+	// the BB-II CBIOS reads 1 sector per command with 1:1 interleave.
+	if (auto *s = dynamic_cast<nscsi_s1410_device *>(subdevice("sasi:0:s1410")))
+		s->set_seek_timing(3000, 85000, 205000, 3600, 1);
 }
 
 void bigbord2_state::machine_reset()
@@ -438,6 +683,16 @@ void bigbord2_state::machine_reset()
 	for (i = 0; i < 8; i++)
 		m_cc[i] = 1;
 	m_cc[2] = 0;
+
+	// A soft reset must re-init the DMA-RDY mux, the FDC->NMI gate and the NMI
+	// line the same way a cold start does -- otherwise stale state from the prior
+	// session makes the first DMA floppy read (boot) intermittently miss DRQ.
+	m_dma_sel = 0;                       // 74LS259 powers up cleared -> mux input 0
+	m_dma->rdy_w(m_cc[m_dma_sel]);       // re-sync DMA RDY to the reset mux output
+	m_fdc_rq = 0;                        // clear the FDC INTRQ/DRQ -> NMI gate
+	m_cpu_halted = false;
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);  // drop any stale NMI
+
 	m_bankr->set_entry(0);
 	m_bankw->set_entry(0);
 	m_bankv->set_entry(0);
@@ -612,6 +867,22 @@ void bigbord2_state::bigbord2(machine_config &config)
 	m_sio->out_synca_callback().set(m_ctc1, FUNC(z80ctc_device::trg2));
 	m_sio->out_wrdya_callback().set(FUNC(bigbord2_state::sio_wrdya_w));
 	m_sio->out_wrdyb_callback().set(FUNC(bigbord2_state::sio_wrdyb_w));
+	m_sio->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
+	m_sio->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
+
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_sio, FUNC(z80sio_device::rxa_w));
+	rs232a.cts_handler().set(m_sio, FUNC(z80sio_device::ctsa_w));
+	rs232a.dcd_handler().set(m_sio, FUNC(z80sio_device::dcda_w));
+
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
+	rs232b.cts_handler().set(m_sio, FUNC(z80sio_device::ctsb_w));
+	rs232b.dcd_handler().set(m_sio, FUNC(z80sio_device::dcdb_w));
 
 	Z80CTC(config, m_ctc1, MAIN_CLOCK); // U37
 	m_ctc1->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -623,8 +894,12 @@ void bigbord2_state::bigbord2(machine_config &config)
 	m_ctc2->zc_callback<2>().set(m_ctc2, FUNC(z80ctc_device::trg3));
 
 	MB8877(config, m_fdc, 16_MHz_XTAL / 8); // U10 : 2MHz for 8 inch, or 1MHz otherwise (jumper-selectable)
-	//m_fdc->intrq_wr_callback().set_inputline(m_maincpu, ??); // info missing from schematic
+	m_fdc->intrq_wr_callback().set(FUNC(bigbord2_state::fdc_intrq_w)); // INTRQ+DRQ -> HALT-gated /NMI (see update_fdc_nmi)
 	m_fdc->drq_wr_callback().set(FUNC(bigbord2_state::fdc_drq_w));
+
+	// Drive the FDC->NMI gate from the real signal edges (Z80 halt_cb + FDC DRQ/
+	// INTRQ) rather than polling -- zero latency, matches the hardware gate.
+	m_maincpu->halt_cb().set(FUNC(bigbord2_state::cpu_halt_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", bigbord2_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", bigbord2_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
@@ -654,7 +929,19 @@ void bigbord2_state::bigbord2(machine_config &config)
 	m_syslatch1->q_out_cb<6>().set(FUNC(bigbord2_state::disk_motor_w)); // MOTOR
 	m_syslatch1->q_out_cb<7>().set("beeper", FUNC(beep_device::set_state)); // BELL
 
-	LS259(config, "outlatch1"); // U96
+	ls259_device &outlatch1(LS259(config, "outlatch1")); // U96
+	outlatch1.q_out_cb<2>().set(m_sasi_host, FUNC(bigbord2_sasi_host_device::rst_w)); // SASI RST
+	outlatch1.q_out_cb<3>().set(m_sasi_host, FUNC(bigbord2_sasi_host_device::sel_w)); // SASI SEL
+
+	// SASI bus: Xebec S1410 hard-disk controller (target id 0), host adapter id 7.
+	// Attach a drive with:  -sasi:0 s1410 -hard <chd>
+	// ST-412 geometry the BIOS expects:  chdman createhd -chs 306,4,17 -ss 512
+	NSCSI_BUS(config, m_sasi);
+	NSCSI_CONNECTOR(config, "sasi:0", default_scsi_devices, "s1410");
+	NSCSI_CONNECTOR(config, "sasi:1", default_scsi_devices, nullptr);
+	bigbord2_sasi_host_device &sasi_host(BIGBORD2_SASI_HOST(config, m_sasi_host));
+	sasi_host.req_cb().set(FUNC(bigbord2_state::sasi_req_w));
+	m_sasi->set_external_device(7, m_sasi_host);
 
 	/* keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
@@ -687,4 +974,4 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY                       FULLNAME        FLAGS
-COMP( 1982, bigbord2, 0,      0,      bigbord2, bigbord2, bigbord2_state, init_bigbord2, "Digital Research Computers", "Big Board II", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, bigbord2, 0,      0,      bigbord2, bigbord2, bigbord2_state, init_bigbord2, "Digital Research Computers", "Big Board II", MACHINE_SUPPORTS_SAVE )
