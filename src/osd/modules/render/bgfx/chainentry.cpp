@@ -154,8 +154,12 @@ void bgfx_chain_entry::setup_screensize_uniforms(texture_manager& textures, uint
 	if (m_inputs.size() > 0)
 	{
 		std::string name = m_inputs[0]->texture() + std::to_string(screen);
-		width = float(textures.provider(name)->width());
-		height = float(textures.provider(name)->height());
+		bgfx_texture_handle_provider* prov = textures.provider(name);
+		if (prov != nullptr)
+		{
+			width = float(prov->width());
+			height = float(prov->height());
+		}
 	}
 
 	bgfx_uniform* screen_dims = m_effect->uniform("u_screen_dims");
@@ -306,7 +310,10 @@ bool bgfx_chain_entry::setup_view(texture_manager &textures, int view, uint16_t 
 	const bgfx::Caps* caps = bgfx::getCaps();
 
 	std::string name = m_inputs[0]->texture() + std::to_string(screen);
-	const float right_ratio = float(textures.provider(name)->width()) / textures.provider(name)->rowpixels();
+	bgfx_texture_handle_provider* first_prov = textures.provider(name);
+	if (first_prov == nullptr)
+		return false;
+	const float right_ratio = float(first_prov->width()) / first_prov->rowpixels();
 
 	float projMat[16];
 	bx::mtxOrtho(projMat, 0.0f, right_ratio, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f, caps->homogeneousDepth);

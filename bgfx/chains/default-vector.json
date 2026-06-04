@@ -1,0 +1,37 @@
+// license:BSD-3-Clause
+// copyright-holders:okaz-code
+// Default minimal vector chain. Auto-selected for vector games under BGFX when no compatible chain
+// is configured. It presents the analytic-AA vector lines that drawbgfx renders into a supersampled
+// FBO (exposed to the chain as "screen") by blitting that FBO to the output; the analytic line shape
+// (rounded caps, point handling) is produced by drawbgfx's fs_vector_line pass. Richer CRT chains
+// (phosphor / bloom / shadow mask / distortion) can be selected in place of this one.
+{
+	"name": "Vector",
+	"author": "okaz-code",
+	"screen_type": "vector",
+
+	"targets": [
+		{   "name": "guest",
+			"mode": "guest",
+			"bilinear": true,
+			"user_prescale": true
+		}
+	],
+
+	"passes": [
+		{   "effect": "misc/blit",
+			"name": "Copy vector FBO to guest texture",
+			"input": [
+				{ "sampler": "s_tex", "texture": "screen" }
+			],
+			"output": "guest"
+		},
+		{   "effect": "misc/blit",
+			"name": "Final blit to output",
+			"input": [
+				{ "sampler": "s_tex", "target": "guest" }
+			],
+			"output": "output"
+		}
+	]
+}
