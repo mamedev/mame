@@ -992,11 +992,7 @@ void ppu_vt3xx_device::shift_tile_plane_data(u8 &pix)
 void ppu_vt3xx_device::draw_background(u8 *line_priority)
 {
 	const bool is_vt369_64_byte_names = (m_newvid_1c == 0x12) && (m_newvid_1d == 0x09) && (m_newvid_1e == 0x0f)
-			&& (m_204x_screenregs[0] == 0x40) && (m_204x_screenregs[1] == 0xa1)
-			&& (m_204x_screenregs[2] == 0x00) && (m_204x_screenregs[3] == 0x78)
-			&& (m_204x_screenregs[4] == 0xff) && (m_204x_screenregs[5] == 0x04)
-			&& (m_204x_screenregs[6] == 0x0a) && (m_204x_screenregs[7] == 0xd8)
-			&& (m_204x_screenregs[8] == 0x0a) && (m_204x_screenregs[9] == 0x00);
+			&& BIT(m_tilebases_2x[0], 4);
 
 	if (!is_vt369_64_byte_names)
 	{
