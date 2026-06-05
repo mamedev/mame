@@ -114,6 +114,9 @@ private:
 
 		bool operator()(item_impl const &a, std::pair<device_t &, std::string_view> const &b) const
 		{ return (&a.device() == &b.first) && (a.name() == b.second); }
+
+		bool operator()(std::pair<device_t &, std::string_view> const &a, item_impl const &b) const
+		{ return (&a.first == &b.device()) && (a.second == b.name()); }
 	};
 
 	struct qualified_name_hash : protected std::hash<std::string_view>
@@ -135,6 +138,9 @@ private:
 
 		bool operator()(item_impl const &a, std::string_view b) const
 		{ return a.qualified_name() == b; }
+
+		bool operator()(std::string_view a, item_impl const &b) const
+		{ return a == b.qualified_name(); }
 	};
 
 	struct unqualified_name_hash : protected std::hash<std::string_view>
@@ -156,6 +162,9 @@ private:
 
 		bool operator()(item_impl const &a, std::string_view b) const
 		{ return a.name() == b; }
+
+		bool operator()(std::string_view a, item_impl const &b) const
+		{ return a == b.name(); }
 	};
 
 	using item_reference = std::reference_wrapper<item_impl const>;
