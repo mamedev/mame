@@ -15,19 +15,27 @@ public:
 	void write_clock(int state);
 	void write_data(int state);
 	void write_enable(int state);
+	void set_read_start_byte(u8 byte) { m_read_start_byte = byte; }
+	void enable_36pcase_late_protocol() { m_36pcase_late_protocol = true; }
 
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 private:
+	u8 compute_36pcase_late_response(u8 data);
+
 	required_memory_region m_extrarom;
 
 	u8 m_command;
 	u8 m_commandbits;
 	u8 m_protectionstate;
 	u8 m_protlatch;
+	u8 m_read_start_byte = 0;
 	u16 m_protreadposition;
+	u8 m_36pcase_late_response;
+	u8 m_36pcase_late_response_pos;
+	bool m_36pcase_late_protocol = false;
 	bool m_in_data;
 	bool m_in_enable;
 	bool m_in_clock;

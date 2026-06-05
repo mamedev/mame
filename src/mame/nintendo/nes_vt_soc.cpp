@@ -345,12 +345,14 @@ void nes_vt02_vt03_soc_device::scrambled_410x_w(u16 offset, u8 data)
 
 	case 0x1:
 		// latch timer value
+		LOG("%s: vt03_410x_w timer latch %02x\n", machine().describe_context(), data);
 		m_410x[0x1] = data;
 		m_timer_running = 0;
 		break;
 
 	case 0x2:
 		// load latched value and start counting
+		LOG("%s: vt03_410x_w timer reload/start %02x (latch %02x)\n", machine().describe_context(), data, m_410x[0x1]);
 		m_410x[0x2] = data; // value doesn't matter?
 		m_timer_val = m_410x[0x1];
 
@@ -363,6 +365,7 @@ void nes_vt02_vt03_soc_device::scrambled_410x_w(u16 offset, u8 data)
 		break;
 
 	case 0x3:
+		LOG("%s: vt03_410x_w irq disable %02x\n", machine().describe_context(), data);
 		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 		// disable timer irq
 		m_410x[0x3] = data; // value doesn't matter?
@@ -371,6 +374,7 @@ void nes_vt02_vt03_soc_device::scrambled_410x_w(u16 offset, u8 data)
 
 	case 0x4:
 		// enable timer irq
+		LOG("%s: vt03_410x_w irq enable %02x\n", machine().describe_context(), data);
 		m_410x[0x4] = data; // value doesn't matter?
 		m_timer_irq_enabled = 1;
 		break;
@@ -493,7 +497,11 @@ void nes_vt02_vt03_soc_device::video_irq(bool hblank, int scanline, bool vblank,
 		}
 
 		if (irqstate)
+		{
+			LOG("%s: vt03 video irq assert hblank=%d scanline=%d vblank=%d blanked=%d timer=%d latch=%02x ctrl=%02x\n",
+					machine().describe_context(), hblank, scanline, vblank, blanked, m_timer_val, m_410x[0x1], m_410x[0x0b]);
 			m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+		}
 		//else
 		//  m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	}

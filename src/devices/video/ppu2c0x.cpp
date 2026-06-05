@@ -299,6 +299,16 @@ u8 ppu2c0x_device::readbyte(offs_t address)
 	return space().read_byte(address);
 }
 
+u8 ppu2c0x_device::ppu_vram_direct_read(offs_t address)
+{
+	return readbyte(address);
+}
+
+void ppu2c0x_device::ppu_vram_direct_write(offs_t address, u8 data)
+{
+	writebyte(address, data);
+}
+
 
 //-------------------------------------------------
 //  writebyte - write a byte at the given address
@@ -1381,6 +1391,11 @@ u16 ppu2c0x_device::get_vram_dest()
 void ppu2c0x_device::set_vram_dest(u16 dest)
 {
 	m_videomem_addr = dest;
+}
+
+void ppu2c0x_device::reload_refresh_data()
+{
+	m_refresh_data = m_refresh_latch;
 }
 
 /*************************************
