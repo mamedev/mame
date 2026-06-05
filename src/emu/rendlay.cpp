@@ -4847,7 +4847,7 @@ void layout_view_item::resolve_tags(device_t &device)
 	if (!m_output_name.empty())
 	{
 		m_output = output_proxy(device, m_output_name);
-		if (m_element)
+		if (!m_output.exists() && m_element)
 			m_output.set(m_element->default_state());
 	}
 

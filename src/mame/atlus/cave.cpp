@@ -47,7 +47,7 @@ Year + Game               License       PCB         Tilemaps        Sprites     
 01 Thunder Heroes         Primetek      ?           038 9838WX003   013 9918EX008
 -----------------------------------------------------------------------------------------
 
-To Do:
+TODO:
 
 - Modernize state objects for each PCB sub-variant, rename to something more
   apt than "cave_state";

@@ -28,7 +28,7 @@ public:
 	s32 operator=(s32 value) { m_item->set(value); return m_item->get(); }
 
 private:
-	output_item *m_item = nullptr;
+	item_impl const *m_item = nullptr;
 };
 
 
@@ -377,7 +377,7 @@ public:
 	void set(s32 value) { if (m_item) m_item->set(value); else m_local_value = value; }
 
 private:
-	output_item                         *m_item;
+	item_impl const                     *m_item;
 	std::reference_wrapper<s32 const>   m_value;
 	s32                                 m_local_value;
 };

@@ -24,6 +24,8 @@
 #include "emu.h"
 #include "realbrk.h"
 
+#include "input.h" // for video debug keys
+
 
 void realbrk_state::realbrk_flipscreen_w(offs_t offset, u16 data, u16 mem_mask)
 {

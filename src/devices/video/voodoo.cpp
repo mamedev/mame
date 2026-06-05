@@ -118,6 +118,8 @@ TODO:
 #include "emu.h"
 #include "voodoo.h"
 
+#include "input.h" // for video debug keys
+
 #include "endianness.h"
 
 using namespace voodoo;

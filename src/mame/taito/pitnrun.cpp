@@ -417,31 +417,12 @@ uint32_t pitnrun_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	int dx = 0, dy = 0;
 	rectangle myclip = cliprect;
 
-#ifdef MAME_DEBUG
-	if (machine().input().code_pressed_once(KEYCODE_Q))
-	{
-		uint8_t *ROM = memregion("maincpu")->base();
-		ROM[0x84f6] = 0; // lap 0 - normal
-	}
-
-	if (machine().input().code_pressed_once(KEYCODE_W))
-	{
-		uint8_t *ROM = memregion("maincpu")->base();
-		ROM[0x84f6] = 6; // lap 6 = spotlight
-	}
-
-	if (machine().input().code_pressed_once(KEYCODE_E))
-	{
-		uint8_t *ROM = memregion("maincpu")->base();
-		ROM[0x84f6] = 2; // lap 3 (trial 2)= lightnings
-		ROM[0x8102] = 1;
-	}
-#endif
-
 	bitmap.fill(0, cliprect);
 
 	if (!(m_ha & 4))
+	{
 		m_bg->draw(screen, bitmap, cliprect, 0, 0);
+	}
 	else
 	{
 		dx = 128 - m_h_heed + ((m_ha & 8) << 5) + 3;

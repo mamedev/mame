@@ -92,6 +92,7 @@ NOTE: Mask ROMs from Power Flipper Pinball Shooting have not been dumped, but as
 #include "sound/okim6295.h"
 
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"

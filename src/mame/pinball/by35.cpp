@@ -137,6 +137,7 @@ ToDo:
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 
+#include "input.h" // FIXME: use inputs properly and remove this, reading keyboard directly is bad pracice
 #include "speaker.h"
 
 //#define VERBOSE 1

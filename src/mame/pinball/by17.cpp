@@ -39,6 +39,8 @@ ToDo:
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 
+#include "input.h" // FIXME: use inputs properly and remove this, reading keyboard directly is bad pracice
+
 #include "by17.lh"
 #include "by17_pwerplay.lh"
 #include "by17_matahari.lh"

@@ -16,6 +16,7 @@
 #include "machine/i2cmem.h"
 
 #include "emupal.h"
+#include "input.h" // for keys to manually raise interrupts
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

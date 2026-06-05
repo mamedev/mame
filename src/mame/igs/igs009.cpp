@@ -238,20 +238,7 @@ void gp98_state::video_start()
 
 uint32_t igs009_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int layers_ctrl = m_video_enable ? -1 : 0;
-
-#ifdef MAME_DEBUG
-	if (machine().input().code_pressed(KEYCODE_Z))
-	{
-		int mask = 0;
-		if (machine().input().code_pressed(KEYCODE_Q))  mask |= 1;
-		if (machine().input().code_pressed(KEYCODE_W))  mask |= 2;
-		if (machine().input().code_pressed(KEYCODE_A))  mask |= 4;
-		if (mask != 0) layers_ctrl &= mask;
-	}
-#endif
-
-	if (layers_ctrl & 1)
+	if (m_video_enable)
 	{
 		int startclipmin = 0;
 		const rectangle &visarea = screen.visible_area();
@@ -295,11 +282,12 @@ uint32_t igs009_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			startclipmin += 2;
 		}
 
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
-	else bitmap.fill(m_palette->black_pen(), cliprect);
-
-
-	if (layers_ctrl & 2) m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	else
+	{
+		bitmap.fill(m_palette->black_pen(), cliprect);
+	}
 
 	return 0;
 }

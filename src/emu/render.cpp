@@ -39,14 +39,14 @@
 #include "emu.h"
 #include "render.h"
 
-#include "corestr.h"
+#include "config.h"
+#include "drivenum.h"
 #include "emuopts.h"
 #include "fileio.h"
 #include "rendfont.h"
 #include "rendlay.h"
 #include "rendutil.h"
-#include "config.h"
-#include "drivenum.h"
+#include "uiinput.h"
 #include "layout/generic.h"
 
 #include "ui/uimain.h"
@@ -55,6 +55,8 @@
 #include "util/language.h"
 #include "util/path.h"
 #include "util/xmlfile.h"
+
+#include "corestr.h"
 
 #include <algorithm>
 #include <limits>
@@ -933,6 +935,7 @@ template <typename T>
 render_target::render_target(render_manager &manager, render_container *ui, T &&layout, u32 flags, constructor_impl_t)
 	: m_next(nullptr)
 	, m_manager(manager)
+	, m_event_sink(manager.m_event_sink)
 	, m_ui_container(ui)
 	, m_curview(0U)
 	, m_flags(flags)
@@ -1055,7 +1058,7 @@ void render_target::set_bounds(s32 width, s32 height, float pixel_aspect)
 	m_bounds.x0 = m_bounds.y0 = 0;
 	m_bounds.x1 = float(width);
 	m_bounds.y1 = float(height);
-	m_pixel_aspect = pixel_aspect != 0.0F ? pixel_aspect : 1.0F;
+	m_pixel_aspect = (pixel_aspect != 0.0F) ? pixel_aspect : 1.0F;
 }
 
 
@@ -1832,6 +1835,46 @@ void render_target::resolve_tags()
 
 	update_layer_config();
 	current_view().preload();
+}
+
+
+//-------------------------------------------------
+//  osd::ui_event_handler implementation
+//-------------------------------------------------
+
+void render_target::push_window_focus_event()
+{
+	m_event_sink.push_window_focus_event(*this);
+}
+
+void render_target::push_window_defocus_event()
+{
+	m_event_sink.push_window_defocus_event(*this);
+}
+
+void render_target::push_mouse_wheel_event(s32 x, s32 y, short delta, int lines)
+{
+	m_event_sink.push_mouse_wheel_event(*this, x, y, delta, lines);
+}
+
+void render_target::push_pointer_update(pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 buttons, u32 pressed, u32 released, s16 clicks)
+{
+	m_event_sink.push_pointer_update(*this, type, ptrid, device, x, y, buttons, pressed, released, clicks);
+}
+
+void render_target::push_pointer_leave(pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks)
+{
+	m_event_sink.push_pointer_leave(*this, type, ptrid, device, x, y, released, clicks);
+}
+
+void render_target::push_pointer_abort(pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks)
+{
+	m_event_sink.push_pointer_abort(*this, type, ptrid, device, x, y, released, clicks);
+}
+
+void render_target::push_char_event(char32_t ch)
+{
+	m_event_sink.push_char_event(*this, ch);
 }
 
 
@@ -3320,8 +3363,9 @@ done:
 //  render_manager - constructor
 //-------------------------------------------------
 
-render_manager::render_manager(running_machine &machine)
+render_manager::render_manager(running_machine &machine, ui_event_sink &event_sink)
 	: m_machine(machine)
+	, m_event_sink(event_sink)
 	, m_ui_target(nullptr)
 	, m_live_textures(0)
 	, m_texture_id(0)

@@ -23,6 +23,7 @@
 #include "drivenum.h"
 #include "emuopts.h"
 #include "fileio.h"
+#include "input.h"
 #include "inputdev.h"
 #include "natkeyboard.h"
 #include "screen.h"
@@ -2302,8 +2303,6 @@ void lua_engine::initialize()
 				osd_printf_warning("[LUA] output.get_indexed_value is deprecated - please use output proxy objects\n");
 				return output_proxy(o.machine().root_device(), util::string_format("%s%d", basename, index)).get();
 			});
-	output_type["name_to_id"] = &output_manager::name_to_id;
-	output_type["id_to_name"] = &output_manager::id_to_name;
 
 
 	auto mame_manager_type = sol().registry().new_usertype<mame_machine_manager>("manager", sol::no_constructor);

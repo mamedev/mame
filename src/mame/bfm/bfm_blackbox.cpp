@@ -89,7 +89,7 @@ protected:
 		m_nvram(*this, "nvram", 0x40, ENDIANNESS_BIG)
 	{ }
 
-	void blackbox_base(machine_config &config);
+	void blackbox_base(machine_config &config) ATTR_COLD;
 
 	virtual void machine_start() override ATTR_COLD;
 
@@ -151,7 +151,7 @@ protected:
 
 	enum { STEPS_PER_SYMBOL = 20 };
 
-	void add_em_reels(machine_config &config, int symbols, attotime period);
+	void add_em_reels(machine_config &config, int symbols, attotime period) ATTR_COLD;
 	template <unsigned Reel> void reel_sample_cb(int state);
 
 	void out_triacs2_w(address_space &space, uint8_t data);
@@ -168,8 +168,8 @@ public:
 		m_in_extra(*this, "EXTRA")
 	{ }
 
-	void blackbox_em(machine_config &config);
-	void blackbox_em_bellt(machine_config &config);
+	void blackbox_em(machine_config &config) ATTR_COLD;
+	void blackbox_em_bellt(machine_config &config) ATTR_COLD;
 
 	int in_extra_r();
 
@@ -198,9 +198,9 @@ public:
 		m_beep_sample(*this, "beep_sample")
 	{ }
 
-	void blackbox_em_21up(machine_config &config);
+	void blackbox_em_21up(machine_config &config) ATTR_COLD;
 
-	void init_21up();
+	void init_21up() ATTR_COLD;
 
 private:
 	void out_lamps1_beeper_w(address_space &space, uint8_t data);
@@ -221,7 +221,7 @@ public:
 		blackbox_em_state(mconfig, type, tag)
 	{ }
 
-	void blackbox_em_admc(machine_config &config);
+	void blackbox_em_admc(machine_config &config) ATTR_COLD;
 
 private:
 	void out_triacs2_w(address_space &space, uint8_t data);
@@ -268,7 +268,7 @@ public:
 		m_beep(*this, "beep")
 	{ }
 
-	void blackbox_em_opto_sndgen(machine_config &config);
+	void blackbox_em_opto_sndgen(machine_config &config) ATTR_COLD;
 
 private:
 	void out_tone_w(address_space &space, uint8_t data);
@@ -289,10 +289,11 @@ public:
 		m_beep(*this, "beep")
 	{ }
 
-	void blackbox_em_opto_aux_base(machine_config &config);
-	void blackbox_em_opto_aux(machine_config &config);
+	void blackbox_em_opto_aux(machine_config &config) ATTR_COLD;
 
 protected:
+	void blackbox_em_opto_aux_base(machine_config &config) ATTR_COLD;
+
 	void out_tone_w(address_space &space, uint8_t data);
 	uint8_t out_tone_r(address_space &space);
 
@@ -311,7 +312,7 @@ public:
 		m_speaker(*this, "speaker")
 	{ }
 
-	void blackbox_em_opto_music(machine_config &config);
+	void blackbox_em_opto_music(machine_config &config) ATTR_COLD;
 
 private:
 	void out_music_480_w(address_space &space, uint8_t data);
@@ -342,11 +343,12 @@ public:
 		blackbox_em_opto_aux_state(mconfig, type, tag)
 	{ }
 
-	void blackbox_em_opto_club(machine_config &config);
+	void blackbox_em_opto_club(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 
+private:
 	void out_triacs1_w(address_space &space, uint8_t data);
 	void out_triacs2_w(address_space &space, uint8_t data);
 	void out_meters_w(address_space &space, uint8_t data);
@@ -1647,7 +1649,7 @@ void blackbox_base_state::machine_start()
 
 void blackbox_em_opto_club_state::machine_start()
 {
-	blackbox_base_state::machine_start();
+	blackbox_em_opto_aux_state::machine_start();
 
 	m_payout_en[0] = false;
 	m_payout_en[1] = false;
@@ -1677,14 +1679,11 @@ void blackbox_base_state::blackbox_base(machine_config &config)
 
 void blackbox_em_base_state::add_em_reels(machine_config &config, int symbols, attotime period)
 {
-	for(int i = 0; i < 4; i++)
-	{
-		std::set<uint16_t> detents;
-		for(int i = 0; i < symbols; i++)
-			detents.insert(i * STEPS_PER_SYMBOL);
-
-		EM_REEL(config, m_reels[i], symbols * STEPS_PER_SYMBOL, detents, period);
-	}
+	std::set<uint16_t> detents;
+	for(int i = 0; i < symbols; i++)
+		detents.insert(i * STEPS_PER_SYMBOL);
+	for(auto &reel : m_reels)
+		EM_REEL(config, reel, reel.finder_tag(), symbols * STEPS_PER_SYMBOL, detents, period);
 
 	m_reels[0]->state_changed_callback().set(FUNC(blackbox_em_base_state::reel_sample_cb<0>));
 	m_reels[1]->state_changed_callback().set(FUNC(blackbox_em_base_state::reel_sample_cb<1>));

@@ -19,7 +19,7 @@ DEFINE_DEVICE_TYPE(EM_REEL, em_reel_device, "em_reel", "Electromechanical Reel")
 
 em_reel_device::em_reel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, EM_REEL, tag, owner, clock),
-	m_reel_out(*this, tag), // FIXME: provide a better way to configure the output name
+	m_reel_out(*this, "position"),
 	m_state_cb(*this)
 {
 }

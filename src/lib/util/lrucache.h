@@ -46,7 +46,7 @@ private:
 	class iterator_compare
 	{
 	public:
-		typedef std::true_type is_transparent;
+		using is_transparent = void;
 		iterator_compare(Compare const &comp) : m_comp(comp) { }
 		iterator_compare(iterator_compare const &that) = default;
 		iterator_compare(iterator_compare &&that) = default;

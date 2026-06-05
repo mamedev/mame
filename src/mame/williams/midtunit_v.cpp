@@ -16,8 +16,10 @@
 #include "debug/debugcon.h"
 #include "debugger.h"
 
+#include "input.h" // for DMA debug keys
 #include "emuopts.h" // Used by PNG logging
 #include "fileio.h" // Used by PNG logging
+
 #include "png.h" // Used by PNG logging
 
 #include <rapidjson/prettywriter.h> // Used by JSON logging

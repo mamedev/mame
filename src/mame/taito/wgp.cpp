@@ -410,6 +410,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "sound/ymopn.h"
 
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"

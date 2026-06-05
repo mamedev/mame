@@ -15,6 +15,7 @@
 #include "ui/ui.h"
 
 // emu
+#include "input.h"
 #include "speaker.h"
 
 // osd

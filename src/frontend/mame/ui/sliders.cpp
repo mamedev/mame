@@ -14,6 +14,8 @@
 #include "ui/slider.h"
 #include "ui/ui.h"
 
+#include "input.h"
+
 #include "osdepend.h"
 
 

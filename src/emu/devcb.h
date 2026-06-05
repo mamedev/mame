@@ -1902,7 +1902,7 @@ private:
 				assert(this->m_consumed);
 				this->built();
 				return
-						[&item = *m_devbase.machine().output().find_or_create_item(m_devbase, m_tag, 0)] (offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
+						[&item = m_devbase.machine().output().find_or_create_item(m_devbase, m_tag)] (offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
 						{ item.set(data); };
 			}
 
@@ -1960,7 +1960,7 @@ private:
 			assert(this->m_consumed);
 			this->built();
 			return
-					[&item = *m_devbase.machine().output().find_or_create_item(m_devbase, m_tag, 0), exor = this->exor(), mask = this->mask()] (offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
+					[&item = m_devbase.machine().output().find_or_create_item(m_devbase, m_tag), exor = this->exor(), mask = this->mask()] (offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
 					{ item.set((data ^ exor) & mask); };
 		}
 	};

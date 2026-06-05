@@ -53,7 +53,7 @@ public:
 
 	int render(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	static void output_notifier(const char *outname, s32 value, void *param);
+	static void output_notifier(void *param, osd::output_item const &output, s32 seconds, s64 attoseconds);
 
 private:
 	struct paired_entry {
@@ -85,7 +85,7 @@ private:
 
 	std::vector<cached_bitmap> m_cache;
 
-	void output_change(const char *outname, s32 value);
+	void output_change(const osd::output_item &output);
 	void render_state(std::vector<u32> &dest, const std::vector<bool> &state);
 	void compute_initial_bboxes(std::vector<bbox> &bboxes);
 	bool compute_mask_intersection_bbox(int key1, int key2, bbox &bb) const;
@@ -220,17 +220,19 @@ int screen_device::svg_renderer::render(screen_device &screen, bitmap_rgb32 &bit
 	return 0;
 }
 
-void screen_device::svg_renderer::output_notifier(const char *outname, s32 value, void *param)
+void screen_device::svg_renderer::output_notifier(void *param, osd::output_item const &output, s32 seconds, s64 attoseconds)
 {
-	static_cast<svg_renderer *>(param)->output_change(outname, value);
+	reinterpret_cast<svg_renderer *>(param)->output_change(output);
 }
 
-void screen_device::svg_renderer::output_change(const char *outname, s32 value)
+void screen_device::svg_renderer::output_change(const osd::output_item &output)
 {
-	auto l = m_key_ids.find(outname);
+	// for now, use the unqualified name for backwards compatibility
+	// TODO: migrate to using qualified output names
+	const auto l = m_key_ids.find(output.name());
 	if (l == m_key_ids.end())
 		return;
-	m_key_state[l->second] = value;
+	m_key_state[l->second] = output.value();
 }
 
 void screen_device::svg_renderer::compute_initial_bboxes(std::vector<bbox> &bboxes)
@@ -796,7 +798,7 @@ void screen_device::device_start()
 		if (!m_svg_region)
 			fatalerror("%s: SVG region \"%s\" does not exist\n", tag(), m_svg_region.finder_tag());
 		m_svg = std::make_unique<svg_renderer>(m_svg_region);
-		machine().output().set_global_notifier(svg_renderer::output_notifier, m_svg.get());
+		machine().output().add_global_notifier(svg_renderer::output_notifier, m_svg.get());
 
 		// don't do this - SVG units are arbitrary and interpreting them as pixels causes bad things to happen
 		// just render at the size/aspect ratio supplied by the driver

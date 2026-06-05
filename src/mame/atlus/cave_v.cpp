@@ -7,16 +7,6 @@
                     driver by   Luca Elia (l.elia@tin.it)
 
 
-Note:   if MAME_DEBUG is defined, pressing:
-
-        X/C/V/B/Z  with  Q   shows layer 0 (tiles with priority 0/1/2/3/All)
-        X/C/V/B/Z  with  W   shows layer 1 (tiles with priority 0/1/2/3/All)
-        X/C/V/B/Z  with  E   shows layer 2 (tiles with priority 0/1/2/3/All)
-        X/C/V/B/Z  with  R   shows layer 3 (tiles with priority 0/1/2/3/All)
-        X/C/V/B/Z  with  A   shows sprites (tiles with priority 0/1/2/3/All)
-
-        Keys can be used together!
-
     [ 1 Layer per chip (games use as many as 4 chips) ]
 
         Layer Size:             512 x 512
@@ -47,8 +37,9 @@ Note:   if MAME_DEBUG is defined, pressing:
 **************************************************************************/
 
 #include "emu.h"
-#include "crsshair.h"
 #include "cave.h"
+
+#include "crsshair.h"
 
 
 /* Sailormn: the lower 2 Megabytes of tiles banked */
@@ -329,63 +320,11 @@ inline void cave_state::tilemap_draw(int chip,
 
 u32 cave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int layers_ctrl = -1;
-
 	for (int layer = 0; layer < 4; layer++)
 	{
 		if (m_tilemap[layer])
 			m_tilemap[layer]->prepare();
 	}
-
-#ifdef MAME_DEBUG
-{
-	if (machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed(KEYCODE_X) || machine().input().code_pressed(KEYCODE_C) ||
-			machine().input().code_pressed(KEYCODE_V) || machine().input().code_pressed(KEYCODE_B))
-	{
-		int msk = 0, val = 0;
-
-		if (machine().input().code_pressed(KEYCODE_X))  val = 1;    // priority 0 only
-		if (machine().input().code_pressed(KEYCODE_C))  val = 2;    // ""       1
-		if (machine().input().code_pressed(KEYCODE_V))  val = 4;    // ""       2
-		if (machine().input().code_pressed(KEYCODE_B))  val = 8;    // ""       3
-		if (machine().input().code_pressed(KEYCODE_Z))  val = 1|2|4|8;  // All of the above priorities
-
-		if (machine().input().code_pressed(KEYCODE_Q))  msk |= val <<  0;   // for layer 0
-		if (machine().input().code_pressed(KEYCODE_W))  msk |= val <<  4;   // for layer 1
-		if (machine().input().code_pressed(KEYCODE_E))  msk |= val <<  8;   // for layer 2
-		if (machine().input().code_pressed(KEYCODE_R))  msk |= val << 12;   // for layer 3
-		if (machine().input().code_pressed(KEYCODE_A))  msk |= val << 16;   // for sprites
-		if (msk != 0) layers_ctrl &= msk;
-
-		/* Show the scroll / flags registers of the selected layer */
-		if ((m_tilemap[0]) && (msk & 0x000f))   popmessage("x:%04X y:%04X f:%04X", m_tilemap[0]->vregs(0),m_tilemap[0]->vregs(1),m_tilemap[0]->vregs(2));
-		if ((m_tilemap[1]) && (msk & 0x00f0))   popmessage("x:%04X y:%04X f:%04X", m_tilemap[1]->vregs(0),m_tilemap[1]->vregs(1),m_tilemap[1]->vregs(2));
-		if ((m_tilemap[2]) && (msk & 0x0f00))   popmessage("x:%04X y:%04X f:%04X", m_tilemap[2]->vregs(0),m_tilemap[2]->vregs(1),m_tilemap[2]->vregs(2));
-		if ((m_tilemap[3]) && (msk & 0xf000))   popmessage("x:%04X y:%04X f:%04X", m_tilemap[3]->vregs(0),m_tilemap[3]->vregs(1),m_tilemap[3]->vregs(2));
-	}
-
-	/* Show the row / "column" scroll enable flags, when they change state */
-	m_rasflag = 0;
-	for (int layer = 0; layer < 4; layer++)
-	{
-		if (m_tilemap[layer])
-		{
-			m_rasflag |= (m_tilemap[layer]->vregs(0) & 0x4000) ? 0x0001 << (4*layer) : 0;
-			m_rasflag |= (m_tilemap[layer]->vregs(1) & 0x4000) ? 0x0002 << (4*layer) : 0;
-		}
-	}
-
-	if (m_rasflag != m_old_rasflag)
-	{
-		popmessage("Line Effect: 0:%c%c 1:%c%c 2:%c%c 3:%c%c",
-			(m_rasflag & 0x0001) ? 'x' : ' ', (m_rasflag & 0x0002) ? 'y' : ' ',
-			(m_rasflag & 0x0010) ? 'x' : ' ', (m_rasflag & 0x0020) ? 'y' : ' ',
-			(m_rasflag & 0x0100) ? 'x' : ' ', (m_rasflag & 0x0200) ? 'y' : ' ',
-			(m_rasflag & 0x1000) ? 'x' : ' ', (m_rasflag & 0x2000) ? 'y' : ' ');
-		m_old_rasflag = m_rasflag;
-	}
-}
-#endif
 
 	bitmap.fill(m_palette[0]->pen_color(m_background_pen[0]), cliprect);
 	screen.priority().fill(0, cliprect);
@@ -406,10 +345,10 @@ u32 cave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	{
 		for (int pri2 = 0; pri2 <= 3; pri2++)   // priority of the whole layer
 		{
-			if (layers_ctrl & (1 << (pri +  0)))    tilemap_draw(0, screen, bitmap, cliprect, pri, pri + 1, pri2, 0);
-			if (layers_ctrl & (1 << (pri +  4)))    tilemap_draw(0, screen, bitmap, cliprect, pri, pri + 1, pri2, 1);
-			if (layers_ctrl & (1 << (pri +  8)))    tilemap_draw(0, screen, bitmap, cliprect, pri, pri + 1, pri2, 2);
-			if (layers_ctrl & (1 << (pri + 12)))    tilemap_draw(0, screen, bitmap, cliprect, pri, pri + 1, pri2, 3);
+			tilemap_draw(0, screen, bitmap, cliprect, pri, pri + 1, pri2, 0);
+			tilemap_draw(0, screen, bitmap, cliprect, pri, pri + 1, pri2, 1);
+			tilemap_draw(0, screen, bitmap, cliprect, pri, pri + 1, pri2, 2);
+			tilemap_draw(0, screen, bitmap, cliprect, pri, pri + 1, pri2, 3);
 		}
 	}
 	m_spritegen[0]->draw(screen, bitmap, cliprect);

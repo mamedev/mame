@@ -106,7 +106,7 @@ ST M27C4001-10F1 EPROM.
 
 --------------------------------------------------------------------------------------
 
-To Do:
+TODO:
 
 - Consolidate the sammymdl games in one memory map and run the BIOS without ROM patches
 - pyenaget intro: when the theater scrolls out to the left, the train should scroll in from the right,
@@ -132,6 +132,7 @@ Notes:
 #include "video/ky3211_ky10510.h"
 
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 

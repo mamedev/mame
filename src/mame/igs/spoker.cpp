@@ -429,8 +429,9 @@ uint32_t jb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 int spoker_state::hopper_r()
 {
+	// FIXME: use a hopper device
 	if (m_hopper) return !(m_screen->frame_number() % 10);
-	return machine().input().code_pressed(KEYCODE_H);
+	else return 0;
 }
 
 static void show_out(running_machine &machine, uint8_t *out)

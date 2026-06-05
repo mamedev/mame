@@ -35,12 +35,10 @@
     Gunbuster also uses the TC0480SCP tilemap chip (like the last Taito
     Z game, Double Axle).
 
-    Todo:
+    TODO:
 
         FLIPX support in the video chips is not quite correct - the Taito logo is wrong,
         and the floor in the Doom levels has horizontal scrolling where it shouldn't.
-
-        No networked machine support
 
 ***************************************************************************/
 
@@ -57,6 +55,7 @@
 #include "sound/es5506.h"
 
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 

@@ -182,14 +182,15 @@ public:
 		m_nvram(*this, "nvram", 0x100, ENDIANNESS_BIG)
 	{ }
 
-	void mpu2_em(machine_config &config);
-	void mpu2_em_sstar(machine_config &config);
-	void mpu2_em_starl(machine_config &config);
-	void mpu2_em_lg(machine_config &config);
+	void mpu2_em(machine_config &config) ATTR_COLD;
+	void mpu2_em_sstar(machine_config &config) ATTR_COLD;
+	void mpu2_em_starl(machine_config &config) ATTR_COLD;
+	void mpu2_em_lg(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 
+private:
 	template <unsigned Digit> TIMER_DEVICE_CALLBACK_MEMBER(clear_digit) { m_digits[Digit] = 0; };
 
 	void pia1_portb_w(uint8_t data);
@@ -1120,14 +1121,11 @@ void mpu12_base_state::mpu12_base(machine_config &config)
 
 void mpu1_state::add_em_reels(machine_config &config, int symbols, attotime period)
 {
-	for(int i = 0; i < 4; i++)
-	{
-		std::set<uint16_t> detents;
-		for(int i = 0; i < symbols; i++)
-			detents.insert(i * STEPS_PER_SYMBOL);
-
-		EM_REEL(config, m_reels[i], symbols * STEPS_PER_SYMBOL, detents, period);
-	}
+	std::set<uint16_t> detents;
+	for(int i = 0; i < symbols; i++)
+		detents.insert(i * STEPS_PER_SYMBOL);
+	for(auto &reel : m_reels)
+		EM_REEL(config, reel, reel.finder_tag(), symbols * STEPS_PER_SYMBOL, detents, period);
 
 	m_reels[0]->state_changed_callback().set(FUNC(mpu1_state::reel_sample_cb<0>));
 	m_reels[1]->state_changed_callback().set(FUNC(mpu1_state::reel_sample_cb<1>));

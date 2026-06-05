@@ -13,6 +13,7 @@
 #include "config.h"
 #include "emuopts.h"
 #include "fileio.h"
+#include "input.h"
 #include "inputdev.h"
 #include "main.h"
 #include "natkeyboard.h"
