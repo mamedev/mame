@@ -37,7 +37,7 @@ public:
 protected:
 	output_item(std::string_view n, std::string_view d) :
 		m_qualified_name((":" == d) ? std::string(n) : (std::string(d.substr(1)).append(":").append(n))),
-		m_name(std::move(n)),
+		m_name(&m_qualified_name[m_qualified_name.length() - n.length()], n.length()),
 		m_device_tag(d),
 		m_value(0)
 	{
