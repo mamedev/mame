@@ -109,10 +109,10 @@ private:
 	{
 		using is_transparent = void;
 
-		std::size_t operator()(item_impl const &a, item_impl const &b) const
+		bool operator()(item_impl const &a, item_impl const &b) const
 		{ return (&a.device() == &b.device()) && (a.name() == b.name()); }
 
-		std::size_t operator()(item_impl const &a, std::pair<device_t &, std::string_view> const &b) const
+		bool operator()(item_impl const &a, std::pair<device_t &, std::string_view> const &b) const
 		{ return (&a.device() == &b.first) && (a.name() == b.second); }
 	};
 
@@ -130,10 +130,10 @@ private:
 	{
 		using is_transparent = void;
 
-		std::size_t operator()(item_impl const &a, item_impl const &b) const
+		bool operator()(item_impl const &a, item_impl const &b) const
 		{ return a.qualified_name() == b.qualified_name(); }
 
-		std::size_t operator()(item_impl const &a, std::string_view b) const
+		bool operator()(item_impl const &a, std::string_view b) const
 		{ return a.qualified_name() == b; }
 	};
 
@@ -151,10 +151,10 @@ private:
 	{
 		using is_transparent = void;
 
-		std::size_t operator()(item_impl const &a, item_impl const &b) const
+		bool operator()(item_impl const &a, item_impl const &b) const
 		{ return a.name() == b.name(); }
 
-		std::size_t operator()(item_impl const &a, std::string_view b) const
+		bool operator()(item_impl const &a, std::string_view b) const
 		{ return a.name() == b; }
 	};
 
