@@ -79,6 +79,8 @@ private:
 	u8 m_ula_scroll_x;
 	u8 m_ula_scroll_y;
 	bool m_ula_fine_scroll_x;
+	u8 m_ula_scr_latch;
+	u8 m_ula_attr_latch;
 
 	u8 screen_mode();
 	std::pair<rgb_t, rgb_t> parse_attribute(u8 attr);
