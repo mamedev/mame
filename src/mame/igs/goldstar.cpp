@@ -403,7 +403,6 @@ protected:
 	uint8_t m_reel_ena = 0U;
 	uint16_t m_bank_shift = 0x100U;
 
-	virtual void machine_start() override ATTR_COLD { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 	void fg_vidram_w(offs_t offset, uint8_t data);
@@ -15784,7 +15783,7 @@ void sanghopm_state::star100(machine_config &config)
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	PALETTE(config, m_palette).set_entries(0x100);
-	RAMDAC(config, "ramdac", 0, "palette").set_addrmap(0, &sanghopm_state::ramdac_map);
+	RAMDAC(config, "ramdac", "palette").set_addrmap(0, &sanghopm_state::ramdac_map);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sangho);
 
@@ -16945,7 +16944,7 @@ void cmaster_state::crazybon(machine_config &config)
 	I8255A(config.replace(), m_ppi[1]);
 
 	PALETTE(config.replace(), m_palette).set_entries(0x100);
-	RAMDAC(config, "ramdac", 0, "palette").set_addrmap(0, &cmaster_state::ramdac_map);
+	RAMDAC(config, "ramdac", "palette").set_addrmap(0, &cmaster_state::ramdac_map);
 }
 
 void cmaster_state::crazybonb(machine_config &config)

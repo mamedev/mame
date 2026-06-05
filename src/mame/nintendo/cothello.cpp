@@ -96,8 +96,6 @@ private:
 
 void cothello_state::machine_start()
 {
-	m_digits.resolve();
-
 	m_counter_timer = timer_alloc(FUNC(cothello_state::counter_tick), this);
 	m_beeper_off = timer_alloc(FUNC(cothello_state::beeper_off), this);
 
@@ -285,7 +283,7 @@ void cothello_state::cothello(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, m_beeper).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 

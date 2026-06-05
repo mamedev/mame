@@ -182,7 +182,6 @@ protected:
 
 	void save_state();
 
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override ATTR_COLD;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void sc1_common_init(int reels, int decrypt, int defaultbank);
@@ -1108,7 +1107,7 @@ void bfm_sc1_state::scorpion1(machine_config &config)
 	REEL(config, m_reels[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reels[5]->optic_handler().set(FUNC(bfm_sc1_state::reel_optic_cb<5>));
 
-	METERS(config, m_meters, 0).set_number(8);
+	METERS(config, m_meters).set_number(8);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1123,7 +1122,7 @@ void bfm_sc1_state::scorpion1_adder2(machine_config &config)
 
 	config.set_default_layout(layout_sc1_vid);
 
-	BFM_ADDER2(config, "adder2", 0);
+	BFM_ADDER2(config, "adder2");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

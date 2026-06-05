@@ -136,9 +136,6 @@ private:
 
 void panda2_state::machine_start()
 {
-	m_digits.resolve();
-	m_leds.resolve();
-
 	save_item(NAME(m_kbd_line));
 	save_item(NAME(m_p1_out));
 }
@@ -430,7 +427,7 @@ void panda2_state::panda2(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	AT28C16(config, "at28c16", 0);
+	AT28C16(config, "at28c16");
 
 	HOPPER(config, m_hopper, attotime::from_msec(100)); // Guessed
 

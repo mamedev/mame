@@ -555,10 +555,10 @@ void special_state::specimx(machine_config &config)
 	m_palette->set_entries(16);
 
 	/* audio hardware */
-	SPECIMX_SND(config, "custom", 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SPECIMX_SND(config, "custom").add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* Devices */
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(2000000);
 	m_pit->out_handler<0>().set("custom", FUNC(specimx_sound_device::set_input_ch0));
 	m_pit->set_clk<1>(2000000);

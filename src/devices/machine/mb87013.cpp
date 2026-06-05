@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /***************************************************************************
 
-    Roland MB87013 QD (Quick Disk) Drive Interface Adapter
+    Fujitsu MB87013 QD (Quick Disk) Drive Interface Adapter
 
     This device uses a MB89251 (Intel 8251 compatible USART) to serialize
     and deserialize the disk data. The two ICs appear to be clocked at the
@@ -21,7 +21,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(MB87013, mb87013_device, "mb87013", "Roland MB87013 QDC")
+DEFINE_DEVICE_TYPE(MB87013, mb87013_device, "mb87013", "Fujitsu MB87013 QDC")
 
 
 //**************************************************************************
@@ -73,10 +73,13 @@ u8 mb87013_device::read(offs_t offset)
 		return m_sio_rd_callback(offset);
 
 	// TODO
-	if (BIT(offset, 0))
-		logerror("%s: Reading data from control register or CRC register (LSB)\n", machine().describe_context());
-	else
-		logerror("%s: Reading data from CRC register (MSB)\n", machine().describe_context());
+	if (!machine().side_effects_disabled())
+	{
+		if (BIT(offset, 0))
+			logerror("%s: Reading data from control register or CRC register (LSB)\n", machine().describe_context());
+		else
+			logerror("%s: Reading data from CRC register (MSB)\n", machine().describe_context());
+	}
 	return 0;
 }
 

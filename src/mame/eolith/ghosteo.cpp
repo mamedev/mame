@@ -602,7 +602,7 @@ void ghosteo_state::ghosteo(machine_config &config)
 //  samsung_k9f5608u0d_device &nand(SAMSUNG_K9F5608U0D(config, "nand", 0));  // or another variant with ID 0xEC 0x75 ?
 //  nand.rnb_wr_callback().set(m_s3c2410, FUNC(s3c2410_device::s3c24xx_pin_frnb_w));
 
-	I2C_24C16(config, "i2cmem", 0); // M24CL16-S
+	I2C_24C16(config, "i2cmem"); // M24CL16-S
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

@@ -54,7 +54,7 @@ void trio64dx_pci_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3trio64_vga_device::screen_update));
 
-	S3_TRIO64_VGA(config, m_vga, 0);
+	S3_TRIO64_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	// 1MB or 2MB
 	m_vga->set_vram_size(2*1024*1024);

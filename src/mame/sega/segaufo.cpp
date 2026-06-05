@@ -108,11 +108,11 @@ public:
 	{ }
 
 	// machine configs
-	void newufo(machine_config &config);
-	void ufomini(machine_config &config);
-	void ufo21(machine_config &config);
-	void ufoalac(machine_config &config);
-	void ufo800(machine_config &config);
+	void newufo(machine_config &config) ATTR_COLD;
+	void ufomini(machine_config &config) ATTR_COLD;
+	void ufo21(machine_config &config) ATTR_COLD;
+	void ufoalac(machine_config &config) ATTR_COLD;
+	void ufo800(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -183,11 +183,6 @@ private:
 
 void ufo_state::machine_start()
 {
-	// resolve outputs
-	m_counters.resolve();
-	m_digits.resolve();
-	m_lamps.resolve();
-
 	// register for savestates
 	save_item(NAME(m_stepper));
 	save_item(NAME(m_nmi_enable));
@@ -1059,7 +1054,7 @@ void ufo_state::ufo21(machine_config &config)
 	m_io[1]->out_pf_callback().set(FUNC(ufo_state::ex_crane_xyz_w<1>));
 	m_io[1]->out_pg_callback().set_nop();
 
-	sega_315_5338a_device &io3(SEGA_315_5338A(config, "io3", 0));
+	sega_315_5338a_device &io3(SEGA_315_5338A(config, "io3"));
 	io3.out_pa_callback().set(FUNC(ufo_state::ex_upd_start_w));
 	io3.in_pb_callback().set(FUNC(ufo_state::ex_upd_busy_r));
 	io3.out_pe_callback().set(FUNC(ufo_state::ex_ufo21_lamps1_w));

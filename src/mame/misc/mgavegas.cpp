@@ -211,36 +211,7 @@ void mgavegas_state::mgavegas_map(address_map &map)
 
 void mgavegas_state::machine_start()
 {
-	m_mga4.resolve();
-	m_mga3.resolve();
-	m_mga2.resolve();
-	m_mga.resolve();
-	m_pl.resolve();
-	m_pc.resolve();
-	m_pr.resolve();
-	m_luz_250_rul.resolve();
-	m_luz_100_rul.resolve();
-	m_luz_50_rlul.resolve();
-	m_luz_25_lrul.resolve();
-	m_luz_25_rrul.resolve();
-	m_fl.resolve();
-	m_fc.resolve();
-	m_fr.resolve();
-	m_insert_coin.resolve();
-	m_no_cambio.resolve();
-	m_fuse.resolve();
-	m_falta.resolve();
-	m_cl.resolve();
-	m_cc.resolve();
-	m_cr.resolve();
-	m_premio_s.resolve();
-	m_100.resolve();
-	m_200.resolve();
-	m_300.resolve();
-	m_500.resolve();
-	m_ml.resolve();
-	m_mc.resolve();
-	m_mr.resolve();
+	// TODO: savestates
 }
 
 void mgavegas_state::machine_reset()

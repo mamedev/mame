@@ -497,13 +497,13 @@ void multivision_state::multivision(machine_config &config)
 	m_dma->in_ior_callback<2>().set(m_fdc, FUNC(fd1793_device::data_r));
 	m_dma->out_iow_callback<2>().set(m_fdc, FUNC(fd1793_device::data_w));
 
-	I8251(config, m_usart[0], 0);
+	I8251(config, m_usart[0]);
 	m_usart[0]->rxrdy_handler().set_inputline(m_maincpu, I8085_RST55_LINE);
 	m_usart[0]->txrdy_handler().set(m_pic, FUNC(pic8259_device::ir7_w));
 	m_usart[0]->txd_handler().set(FUNC(multivision_state::console_txd_w));
 	m_usart[0]->rts_handler().set(m_console, FUNC(rs232_port_device::write_rts));
 
-	I8251(config, m_usart[1], 0);
+	I8251(config, m_usart[1]);
 	m_usart[1]->rxrdy_handler().set_inputline(m_maincpu, I8085_RST65_LINE);
 	m_usart[1]->txrdy_handler().set(m_pic, FUNC(pic8259_device::ir5_w));
 	m_usart[1]->txd_handler().set(FUNC(multivision_state::communication_txd_w));

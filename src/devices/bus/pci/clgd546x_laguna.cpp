@@ -59,7 +59,7 @@ void cirrus_gd5465_laguna3d_device::device_add_mconfig(machine_config &config)
 	screen.set_screen_update(m_vga, FUNC(cirrus_gd5446_vga_device::screen_update));
 
 	// TODO: bump to GD5465
-	CIRRUS_GD5446_VGA(config, m_vga, 0);
+	CIRRUS_GD5446_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	// FIXME: shared RAM
 	// in 4 and 8 MB versions

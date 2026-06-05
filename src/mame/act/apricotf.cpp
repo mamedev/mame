@@ -403,7 +403,7 @@ void f1_state::act_f1(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_act_f1);
 
 	/* Devices */
-	APRICOT_KEYBOARD(config, APRICOT_KEYBOARD_TAG, 0);
+	APRICOT_KEYBOARD(config, APRICOT_KEYBOARD_TAG);
 
 	Z80SIO(config, m_sio, CLK5 / 2); // Z80-CTC @ 13D
 	m_sio->out_txda_callback().set("speaker", FUNC(speaker_sound_device::level_w));

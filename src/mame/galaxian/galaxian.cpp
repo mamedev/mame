@@ -7658,7 +7658,7 @@ void galaxian_state::galaxian(machine_config &config)
 {
 	galaxian_base(config);
 
-	GALAXIAN_SOUND(config, "cust", 0);
+	GALAXIAN_SOUND(config, "cust");
 }
 
 void galaxian_state::galartic(machine_config &config)
@@ -7790,7 +7790,7 @@ void galaxian_state::mooncrst(machine_config &config)
 	// alternate memory map
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::mooncrst_map);
 
-	MOONCRST_SOUND(config, "cust", 0);
+	MOONCRST_SOUND(config, "cust");
 }
 
 void galaxian_state::eagle(machine_config &config)
@@ -7858,7 +7858,7 @@ void galaxian_state::bongog(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::bongog_map);
 
 	// sound hardware
-	BONGO_SOUND(config, "cust", 0);
+	BONGO_SOUND(config, "cust");
 }
 
 void bmxstunts_state::bmxstunts(machine_config &config)
@@ -8434,7 +8434,7 @@ void sbhoei_state::sbhoei(machine_config &config)
 
 	SP0250(config, m_sp0250, 3.12_MHz_XTAL).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	SBHOEI_SOUND(config, "cust", 0);
+	SBHOEI_SOUND(config, "cust");
 }
 
 

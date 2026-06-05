@@ -594,7 +594,7 @@ void olibochu_state::olibochu(machine_config &config)
 
 	AY8910(config, m_ay8910, MASTER_CLOCK / 3 / 2 / 2).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	HC55516(config, m_cvsd, 0).add_route(ALL_OUTPUTS, "mono", 0.5);
+	HC55516(config, m_cvsd).add_route(ALL_OUTPUTS, "mono", 0.5);
 	CLOCK(config, m_cvsd_clock, 16000);
 	m_cvsd_clock->signal_handler().set(FUNC(olibochu_state::cvsd_tick));
 	m_cvsd_clock->signal_handler().append(m_cvsd, FUNC(hc55516_device::mclock_w));

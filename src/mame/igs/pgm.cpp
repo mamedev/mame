@@ -525,7 +525,7 @@ void pgm_state::pgmbase(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 	GENERIC_LATCH_8(config, m_soundlatch[2]);
 
-	IGS023_VIDEO(config, m_video, 0);
+	IGS023_VIDEO(config, m_video);
 	m_video->set_palette(m_palette);
 	m_video->set_screen("screen");
 	m_video->read_spriteram_callback().set(FUNC(pgm_state::sprites_r));

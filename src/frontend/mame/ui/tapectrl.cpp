@@ -185,7 +185,7 @@ bool menu_tape_control::handle(event const *ev)
 		}
 	}
 
-	// uupdate counters
+	// update counters
 	if ((0 <= m_slider_item_index) && current_device() && current_device()->exists())
 	{
 		menu_item &slider_item(item(m_slider_item_index));

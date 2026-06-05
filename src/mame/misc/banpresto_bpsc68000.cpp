@@ -85,9 +85,6 @@ public:
 	void bpsc68000(machine_config &config) ATTR_COLD;
 	void pspc68000(machine_config &config) ATTR_COLD;
 
-protected:
-	virtual void machine_start() override ATTR_COLD { m_lamps.resolve(); }
-
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

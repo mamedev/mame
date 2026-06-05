@@ -10,7 +10,7 @@ class fga002_device :  public device_t
 {
 	public:
 	// construction/destruction
-	fga002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fga002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void write(offs_t offset, uint8_t data);
 	uint8_t read(offs_t offset);
@@ -37,11 +37,11 @@ class fga002_device :  public device_t
 
  protected:
 	// type for array of mapping of FGA registers that assembles an IRQ source
-	typedef struct {
+	struct fga_irq_t {
 		int vector;
 		int status;
 		int control;
-	} fga_irq_t;
+	};
 
 	// interrupt sources in prio order if on same interrupt level. TODO: Add all sources
 	const static fga_irq_t s_irq_sources[];

@@ -462,8 +462,6 @@ GFXDECODE_END
 
 void chance32_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_port_select));
 }
 

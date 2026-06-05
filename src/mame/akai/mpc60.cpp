@@ -134,7 +134,7 @@ private:
 
 	required_device<upd7810_device> m_panelcpu;
 	required_device<l4003_sound_device> m_dsp;
-	required_device<upd72065_device> m_fdc;
+	required_device<upd72066_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
 	required_device<i8255_device> m_ppi;
 	required_device_array<mb89371_device, 2> m_sio;
@@ -217,9 +217,9 @@ void mpc60_state::mem_map(address_map &map)
 void mpc60_state::io_map(address_map &map)
 {
 	map(0x0000, 0x0003).m(m_dsp, FUNC(l4003_sound_device::map));
-	map(0x0080, 0x0083).m(m_fdc, FUNC(upd72065_device::map)).umask16(0x00ff);
+	map(0x0080, 0x0083).m(m_fdc, FUNC(upd72066_device::map)).umask16(0x00ff);
 	map(0x0090, 0x0090).w(FUNC(mpc60_state::fdc_tc_w));
-	map(0x00a0, 0x00a0).rw(m_fdc, FUNC(upd72065_device::dma_r), FUNC(upd72065_device::dma_w));
+	map(0x00a0, 0x00a0).rw(m_fdc, FUNC(upd72066_device::dma_r), FUNC(upd72066_device::dma_w));
 	map(0x00b0, 0x00b0).r("lcdc", FUNC(hd61830_device::status_r));
 	map(0x00b2, 0x00b2).r("lcdc", FUNC(hd61830_device::data_r));
 	map(0x00b4, 0x00b4).w("lcdc", FUNC(hd61830_device::control_w));
@@ -644,7 +644,7 @@ void mpc60_state::mpc60(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "drq1").output_handler().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
 
-	UPD72065(config, m_fdc, 16_MHz_XTAL / 4); // μPD72066C (clocked by SED9420CAC)
+	UPD72066(config, m_fdc, 16_MHz_XTAL / 4); // μPD72066C (clocked by SED9420CAC)
 	m_fdc->set_ready_line_connected(false); // RDY tied to VDD
 	m_fdc->set_select_lines_connected(false);
 	m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
@@ -652,7 +652,7 @@ void mpc60_state::mpc60(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, m_floppy, mpc60_state::floppies, "35dd", add_formats).enable_sound(true);
 
-	hd61830_device &lcdc(HD61830(config, "lcdc", 0)); // LC7981
+	hd61830_device &lcdc(HD61830(config, "lcdc")); // LC7981
 	lcdc.set_addrmap(0, &mpc60_state::lcd_map);
 	lcdc.set_screen("screen");
 
@@ -717,7 +717,7 @@ void mpc60_scsi_state::mpc60_scsi(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr, false);
 
-	NCR5380(config, m_ncr5380, 16_MHz_XTAL / 2);
+	NCR5380(config, m_ncr5380);
 	m_scsibus->set_external_device(7, m_ncr5380);
 }
 

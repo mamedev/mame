@@ -83,7 +83,7 @@ public:
 		m_fake(*this, "FAKE")
 	{ }
 
-	void stactics(machine_config &config);
+	void stactics(machine_config &config) ATTR_COLD;
 
 	int frame_count_d3_r();
 	int shot_standby_r();
@@ -511,17 +511,6 @@ void stactics_state::update_artwork()
 
 void stactics_state::video_start()
 {
-	m_base_lamps.resolve();
-	m_beam_leds_left.resolve();
-	m_beam_leds_right.resolve();
-	m_score_digits.resolve();
-	m_credit_leds.resolve();
-	m_barrier_leds.resolve();
-	m_round_leds.resolve();
-	m_barrier_lamp.resolve();
-	m_start_lamp.resolve();
-	m_sight_led.resolve();
-
 	m_y_scroll_d = 0;
 	m_y_scroll_e = 0;
 	m_y_scroll_f = 0;

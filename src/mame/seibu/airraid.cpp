@@ -438,7 +438,7 @@ void airraid_state::airraid(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x100);
 
-	AIRRAID_VIDEO(config, m_airraid_video, 0);
+	AIRRAID_VIDEO(config, m_airraid_video);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -448,7 +448,7 @@ void airraid_state::airraid(machine_config &config)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	SEIBU_SOUND(config, m_seibu_sound, 0);
+	SEIBU_SOUND(config, m_seibu_sound);
 	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
 	m_seibu_sound->coin_io_callback().set_ioport("COIN");
 	m_seibu_sound->set_rom_tag("audiocpu");

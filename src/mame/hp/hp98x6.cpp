@@ -263,7 +263,7 @@ void hp98x6_base_state::hp98x6_base(machine_config &config, unsigned dot_clock, 
 
 	SOFTWARE_LIST(config, "optrom_list").set_original("hp98x6_rom");
 
-	DIO16(config, m_dio_bus, 0);
+	DIO16(config, m_dio_bus);
 	m_dio_bus->set_program_space(m_cpu, AS_PROGRAM);
 	m_cpu->reset_cb().append(m_dio_bus, FUNC(bus::hp_dio::dio16_device::reset_in));
 	// IRQ mergers
@@ -285,8 +285,8 @@ void hp98x6_base_state::hp98x6_base(machine_config &config, unsigned dot_clock, 
 
 	m_upi->irq1_write_cb().set(m_irq1_merger, FUNC(input_merger_any_high_device::in_w<1>));
 
-	DIO16_SLOT(config, "slot0", 0, "diobus", dio16_hp98x6_cards, nullptr, false);
-	DIO16_SLOT(config, "slot1", 0, "diobus", dio16_hp98x6_cards, nullptr, false);
+	DIO16_SLOT(config, "slot0", "diobus", dio16_hp98x6_cards, nullptr, false);
+	DIO16_SLOT(config, "slot1", "diobus", dio16_hp98x6_cards, nullptr, false);
 }
 
 void hp98x6_base_state::cpu_mem_map(address_map &map)

@@ -613,10 +613,11 @@ void _4enlinea_state::_4enlinea(machine_config &config)
 	I2C_24C16(config, m_eeprom); // X24C16P
 
 	// FIXME: determine ISA bus clock
-	isa8_device &isa(ISA8(config, "isa", 0));
+	isa8_device &isa(ISA8(config, "isa"));
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
 
+	// FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa1", 0, "isa", _4enlinea_isa8_cards, "4enlinea", true);
 
 
@@ -648,10 +649,11 @@ void _4enlinea_state::k7_olym(machine_config &config)
 
 	I2C_24C16(config, m_eeprom); // X24C16P
 
-	isa8_device &isa(ISA8(config, "isa", 0));
+	isa8_device &isa(ISA8(config, "isa"));
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
 
+	// FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa1", 0, "isa", _4enlinea_isa8_cards, "4enlinea", true); // UM487F
 
 	SPEAKER(config, "mono").front_center();

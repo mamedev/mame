@@ -322,12 +322,6 @@ void sprachmg_state::sys_w(uint8_t data)
 
 void sprachmg_state::machine_start()
 {
-	// resolve outputs
-	m_dmd.resolve();
-	m_led_speech.resolve();
-	m_led_morse.resolve();
-	m_led_standard.resolve();
-
 	// register for save states
 	save_item(NAME(m_display_data));
 	save_item(NAME(m_key_scan));
@@ -373,12 +367,12 @@ void sprachmg_state::sprachmg(machine_config &config)
 	m_pio[1]->out_pa_callback().set(FUNC(sprachmg_state::display_data_w));
 	m_pio[1]->out_pb_callback().set(FUNC(sprachmg_state::display_column_w));
 
-	Z80PIO(config, m_pio[2], 0);
+	Z80PIO(config, m_pio[2]);
 	m_pio[2]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio[2]->out_pa_callback().set([this](uint8_t data) { m_dac->write(data); });
 	m_pio[2]->out_pb_callback().set(FUNC(sprachmg_state::sys_w));
 
-	Z80PIO(config, m_pio[3], 0);
+	Z80PIO(config, m_pio[3]);
 	m_pio[3]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	// port a: tape
 	// port b: tape, dac gain

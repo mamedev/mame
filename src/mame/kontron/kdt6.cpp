@@ -12,26 +12,29 @@
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "bus/centronics/ctronics.h"
+#include "bus/psi_kbd/psi_kbd.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
+#include "machine/clock.h"
 #include "machine/timer.h"
+#include "machine/upd1990a.h"
+#include "machine/upd765.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "machine/upd765.h"
-#include "machine/upd1990a.h"
-#include "machine/clock.h"
-#include "video/mc6845.h"
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
-#include "bus/centronics/ctronics.h"
-#include "bus/psi_kbd/psi_kbd.h"
-#include "bus/rs232/rs232.h"
+#include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
-#include "speaker.h"
 #include "softlist_dev.h"
+#include "speaker.h"
+
 #include "kdt6.lh"
 
 
@@ -71,7 +74,7 @@ public:
 		m_video_address(0)
 	{ }
 
-	void psi98(machine_config &config);
+	void psi98(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -543,8 +546,6 @@ void kdt6_state::status2_w(uint8_t data)
 
 void kdt6_state::machine_start()
 {
-	m_drive_led.resolve();
-
 	// 256 kb ram, 64 kb vram (and two dummy regions for invalid pages)
 	m_ram = std::make_unique<uint8_t[]>(0x40000);
 	m_vram = std::make_unique<uint16_t[]>(0x10000);

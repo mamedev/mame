@@ -300,8 +300,6 @@ uint32_t guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bit
 
 void guab_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_fdc->set_floppy(m_floppy->get_device());
 }
 
@@ -470,7 +468,7 @@ void guab_state::guab(machine_config &config)
 
 	EF9369(config, "ef9369").set_color_update_callback(FUNC(guab_state::ef9369_color_update));
 
-	TMS34061(config, m_tms34061, 0);
+	TMS34061(config, m_tms34061);
 	m_tms34061->set_rowshift(8);  /* VRAM address is (row << rowshift) | col */
 	m_tms34061->set_vram_size(0x40000);
 	m_tms34061->int_callback().set_inputline("maincpu", 5);
@@ -508,9 +506,9 @@ void guab_state::guab(machine_config &config)
 	ppi4.in_pc_callback().set(FUNC(guab_state::watchdog_r));
 	ppi4.out_pc_callback().set(FUNC(guab_state::watchdog_w));
 
-	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
+	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta"));
 
-	acia6850_device &acia1(ACIA6850(config, "acia6850_1", 0));
+	acia6850_device &acia1(ACIA6850(config, "acia6850_1"));
 	acia1.txd_handler().set("bacta", FUNC(bacta_datalogger_device::write_txd));
 	acia1.irq_handler().set_inputline("maincpu", 4);
 
@@ -520,7 +518,7 @@ void guab_state::guab(machine_config &config)
 	acia_clock.signal_handler().set("acia6850_1", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia6850_1", FUNC(acia6850_device::write_rxc));
 
-	ACIA6850(config, "acia6850_2", 0);
+	ACIA6850(config, "acia6850_2");
 
 	// floppy
 	WD1773(config, m_fdc, 8000000);

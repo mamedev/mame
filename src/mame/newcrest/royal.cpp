@@ -70,9 +70,9 @@ public:
 		m_out_digit(*this, "digit%u", 0U)
 	{ }
 
-	void royal(machine_config &config);
-	void granada(machine_config &config);
-	void supra(machine_config &config);
+	void royal(machine_config &config) ATTR_COLD;
+	void granada(machine_config &config) ATTR_COLD;
+	void supra(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(granada_change_cpu_freq);
 	DECLARE_INPUT_CHANGED_MEMBER(supra_on_button);
@@ -110,8 +110,6 @@ private:
 
 void royal_state::machine_start()
 {
-	m_out_digit.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_lcd_com));

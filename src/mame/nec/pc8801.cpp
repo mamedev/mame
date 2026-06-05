@@ -197,7 +197,9 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 {
 	if(m_gfx_ctrl & 8)
 	{
-		// BG Pal applies to 1bpp mode only, sharrier draws blue backdrop with pen #0
+		// BG Pal applies to 1bpp mode only
+		// - sharrier draws blue backdrop with pen #0 during gameplay
+		// - archon sets a blue BG Pal but definitely expects pen #0 black (BPS logo)
 		const bool bitmap_color_mode = bool(m_gfx_ctrl & 0x10);
 		bitmap.fill(m_palette->pen(bitmap_color_mode ? 0 : BGPAL_PEN), cliprect);
 
@@ -439,149 +441,125 @@ inline bool pc8801_state::cdbios_rom_enable()
 	return false;
 }
 
-uint8_t pc8801_state::mem_r(offs_t offset)
+void pc8801_state::main_map(address_map &map)
 {
-	if(offset <= 0x7fff)
-	{
-		if(m_extram_mode & 1)
-			return ext_wram_r(offset | (m_extram_bank * 0x8000));
+	map(0x0000, 0x7fff).lrw8(
+		NAME([this] (offs_t offset) {
+			if(m_extram_mode & 1)
+				return ext_wram_r(offset | (m_extram_bank * 0x8000));
 
-		if(m_gfx_ctrl & 2)
-			return wram_r(offset);
+			if(m_gfx_ctrl & 2)
+				return wram_r(offset);
 
-		if(cdbios_rom_enable())
-			return cdbios_rom_r(offset & 0x7fff);
+			if(cdbios_rom_enable())
+				return cdbios_rom_r(offset & 0x7fff);
 
-		if(m_gfx_ctrl & 4)
-			return nbasic_rom_r(offset);
+			if(m_gfx_ctrl & 4)
+				return nbasic_rom_r(offset);
 
-		if(offset >= 0x6000 && offset <= 0x7fff && ((m_ext_rom_bank & 1) == 0))
-			return n88basic_rom_r(0x8000 + (offset & 0x1fff) + (0x2000 * (m_misc_ctrl & 3)));
+			if(offset >= 0x6000 && offset <= 0x7fff && ((m_ext_rom_bank & 1) == 0))
+				return n88basic_rom_r(0x8000 + (offset & 0x1fff) + (0x2000 * (m_misc_ctrl & 3)));
 
-		return n88basic_rom_r(offset);
-	}
-	else if(offset >= 0x8000 && offset <= 0x83ff) // work RAM window
-	{
-		uint32_t window_offset;
-
-		// work RAM read select or N-Basic select always banks this as normal work RAM
-		if(m_gfx_ctrl & 6)
-			return wram_r(offset);
-
-		window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
-
-		// castlex and imenes accesses this
-		// TODO: high TVRAM even
-		if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
-			return high_wram_r(window_offset & 0xfff);
-
-		return wram_r(window_offset);
-	}
-	else if(offset >= 0x8400 && offset <= 0xbfff)
-	{
-		return wram_r(offset);
-	}
-	else if(offset >= 0xc000 && offset <= 0xffff)
-	{
-		if(dictionary_rom_enable())
-			return dictionary_rom_r(offset & 0x3fff);
-
-		if(m_misc_ctrl & 0x40)
-		{
-			if(!machine().side_effects_disabled())
-				m_vram_sel = 3;
-
-			if(m_alu_ctrl2 & 0x80)
-				return alu_r(offset & 0x3fff);
-		}
-
-		if(m_vram_sel == 3)
-		{
-			if(offset >= 0xf000 && offset <= 0xffff && (m_misc_ctrl & 0x10))
-				return high_wram_r(offset & 0xfff);
-
-			return wram_r(offset);
-		}
-
-		return gvram_r((offset & 0x3fff) + (0x4000 * m_vram_sel));
-	}
-
-	return 0xff;
-}
-
-void pc8801_state::mem_w(offs_t offset, uint8_t data)
-{
-	if(offset <= 0x7fff)
-	{
-		if(m_extram_mode & 0x10)
-			ext_wram_w(offset | (m_extram_bank * 0x8000),data);
-		else
-			wram_w(offset,data);
-
-		return;
-	}
-	else if(offset >= 0x8000 && offset <= 0x83ff)
-	{
-		// work RAM read select or N-Basic select always banks this as normal work RAM
-		if(m_gfx_ctrl & 6)
-			wram_w(offset,data);
-		else
-		{
+			return n88basic_rom_r(offset);
+		}),
+		NAME([this] (offs_t offset, uint8_t data) {
+			if(m_extram_mode & 0x10)
+				ext_wram_w(offset | (m_extram_bank * 0x8000),data);
+			else
+				wram_w(offset,data);
+		})
+	);
+	map(0x8000, 0x83ff).lrw8(
+		NAME([this] (offs_t offset) {
 			uint32_t window_offset;
+
+			// work RAM read select or N-Basic select always banks this as normal work RAM
+			if(m_gfx_ctrl & 6)
+				return wram_r(offset + 0x8000);
 
 			window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
 
 			// castlex and imenes accesses this
 			// TODO: high TVRAM even
-			// μPD3301 DMAs from this instead of the regular work RAM in later models
-			// to resolve a bus bottleneck.
 			if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
-				high_wram_w(window_offset & 0xfff,data);
+				return high_wram_r(window_offset & 0xfff);
+
+			return wram_r(window_offset);
+		}),
+		NAME([this] (offs_t offset, uint8_t data) {
+			if(m_gfx_ctrl & 6)
+				wram_w(offset + 0x8000,data);
 			else
-				wram_w(window_offset,data);
-		}
-
-		return;
-	}
-	else if(offset >= 0x8400 && offset <= 0xbfff)
-	{
-		wram_w(offset,data);
-		return;
-	}
-	else if(offset >= 0xc000 && offset <= 0xffff)
-	{
-		if(m_misc_ctrl & 0x40)
-		{
-			if(!machine().side_effects_disabled())
-				m_vram_sel = 3;
-
-			if(m_alu_ctrl2 & 0x80)
 			{
-				alu_w(offset & 0x3fff,data);
+				uint32_t window_offset;
+
+				window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
+
+				// castlex and imenes accesses this
+				// TODO: high TVRAM even
+				// μPD3301 DMAs from this instead of the regular work RAM in later models
+				// to resolve a bus bottleneck.
+				if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
+					high_wram_w(window_offset & 0xfff,data);
+				else
+					wram_w(window_offset,data);
+			}
+		})
+	);
+	map(0x8400, 0xbfff).lrw8(
+		NAME([this] (offs_t offset) {
+			return wram_r(offset + 0x8400);
+		}),
+		NAME([this] (offs_t offset, uint8_t data) {
+			wram_w(offset + 0x8400, data);
+		})
+	);
+	map(0xc000, 0xffff).lrw8(
+		NAME([this] (offs_t offset) {
+			if(dictionary_rom_enable())
+				return dictionary_rom_r(offset & 0x3fff);
+
+			if(m_misc_ctrl & 0x40)
+			{
+				if(m_alu_ctrl2 & 0x80)
+					return alu_r(offset & 0x3fff);
+			}
+
+			if(m_vram_sel == 3)
+			{
+				if((offset & 0x3000) == 0x3000 && (m_misc_ctrl & 0x10))
+					return high_wram_r(offset & 0xfff);
+
+				return wram_r(offset + 0xc000);
+			}
+
+			return gvram_r((offset & 0x3fff) + (0x4000 * m_vram_sel));
+		}),
+		NAME([this] (offs_t offset, uint8_t data) {
+			if(m_misc_ctrl & 0x40)
+			{
+				if(m_alu_ctrl2 & 0x80)
+				{
+					alu_w(offset & 0x3fff, data);
+					return;
+				}
+			}
+
+			if(m_vram_sel == 3)
+			{
+				if((offset & 0x3000) == 0x3000 && (m_misc_ctrl & 0x10))
+				{
+					high_wram_w(offset & 0xfff, data);
+					return;
+				}
+
+				wram_w(offset + 0xc000, data);
 				return;
 			}
-		}
 
-		if(m_vram_sel == 3)
-		{
-			if(offset >= 0xf000 && offset <= 0xffff && (m_misc_ctrl & 0x10))
-			{
-				high_wram_w(offset & 0xfff,data);
-				return;
-			}
-
-			wram_w(offset,data);
-			return;
-		}
-
-		gvram_w((offset & 0x3fff) + (0x4000 * m_vram_sel),data);
-		return;
-	}
-}
-
-void pc8801_state::main_map(address_map &map)
-{
-	map(0x0000, 0xffff).rw(FUNC(pc8801_state::mem_r), FUNC(pc8801_state::mem_w));
+			gvram_w((offset & 0x3fff) + (0x4000 * m_vram_sel), data);
+		})
+	);
 }
 
 uint8_t pc8801_state::ext_rom_bank_r()
@@ -757,7 +735,7 @@ void pc8801_state::window_bank_inc_w(uint8_t data)
  * ---- 00-- TV / video mode
  * ---- 01-- None (as in disabling the screen entirely?)
  * ---- 10-- Analog RGB mode
- * ---- 11-- Optional mode
+ * ---- 11-- Option mode
  * ---- --xx internal EROM selection
  */
 uint8_t pc8801_state::misc_ctrl_r()
@@ -1677,7 +1655,7 @@ void pc8801_state::pc8801(machine_config &config)
 
 
 	// TODO: clock, receiver handler, DCD?
-	I8251(config, m_usart, 0);
+	I8251(config, m_usart);
 	m_usart->txd_handler().set(FUNC(pc8801_state::txdata_callback));
 	m_usart->rxrdy_handler().set(FUNC(pc8801_state::rxrdy_irq_w));
 
@@ -1801,7 +1779,7 @@ void pc8801mc_state::pc8801mc(machine_config &config)
 {
 	pc8801ma(config);
 
-	PC8801_31(config, m_cdrom_if, 0);
+	PC8801_31(config, m_cdrom_if);
 	m_cdrom_if->rom_bank_cb().set([this](bool state) { m_cdrom_bank = state; });
 	m_cdrom_if->drq_cb().set(m_dma, FUNC(i8257_device::dreq1_w));
 	m_dma->in_ior_cb<1>().set(m_cdrom_if, FUNC(pc8801_31_device::dma_r));

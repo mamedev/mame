@@ -53,12 +53,9 @@ public:
 		m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void montec(machine_config &config);
-	void montec4(machine_config &config);
-	void montec4le(machine_config &config);
-
-protected:
-	virtual void machine_start() override ATTR_COLD;
+	void montec(machine_config &config) ATTR_COLD;
+	void montec4(machine_config &config) ATTR_COLD;
+	void montec4le(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -77,11 +74,6 @@ private:
 	u8 irq_ack_r();
 	u8 input_r();
 };
-
-void montec_state::machine_start()
-{
-	m_digits.resolve();
-}
 
 
 

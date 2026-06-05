@@ -378,7 +378,7 @@ void jailbrek_state::jailbrek(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	K005849(config, m_k005849, 0);
+	K005849(config, m_k005849);
 	m_k005849->set_irq_cb().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	m_k005849->set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_k005849->set_flipscreen_cb().set(FUNC(jailbrek_state::flip_screen_set));

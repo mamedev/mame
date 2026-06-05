@@ -78,10 +78,6 @@ void kn5000_cpanel_device::device_start()
 	m_self_clock_timer = timer_alloc(FUNC(kn5000_cpanel_device::self_clock_callback), this);
 	m_button_scan_timer = timer_alloc(FUNC(kn5000_cpanel_device::button_scan_callback), this);
 
-	// Resolve LED outputs
-	m_cpl_leds.resolve();
-	m_cpr_leds.resolve();
-
 	// Save state
 	save_item(NAME(m_baud_rate));
 	save_item(NAME(m_rx_clock_count));

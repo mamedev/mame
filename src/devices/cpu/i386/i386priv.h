@@ -7,6 +7,8 @@
 
 #include "i386dasm.h"
 
+#include "endianness.h"
+
 //#define DEBUG_MISSING_OPCODE
 
 #define I386OP(XX)      i386_##XX

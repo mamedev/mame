@@ -1635,10 +1635,6 @@ INPUT_PORTS_END
 
 void blackbox_base_state::machine_start()
 {
-	m_lamps.resolve();
-	m_digits.resolve();
-	m_test_led.resolve();
-
 	save_item(NAME(m_input_en));
 
 	std::fill(std::begin(m_input_en), std::end(m_input_en), false);
@@ -1674,7 +1670,7 @@ void blackbox_base_state::blackbox_base(machine_config &config)
 	m_pia->writepb_handler().set(FUNC(blackbox_base_state::pia_portb_w));
 	m_pia->cb2_handler().set_nop(); // Not connected
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 
 	FRUIT_SAMPLES(config, m_samples);
 }

@@ -13,6 +13,33 @@ class nscsi_s1410_device : public nscsi_harddisk_device
 public:
 	nscsi_s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// Optional, driver-supplied seek-timing model.  With no call the device keeps
+	// its legacy flat 85 ms per-command delay, so existing users (victor9k,
+	// mikromik, x37_sasi, db4105, idpartner_sasi) are unchanged.  Arguments:
+	// published seek times in microseconds (track-to-track, average,
+	// full-stroke), spindle speed (RPM), and the format's sector interleave.
+	//
+	// Examples -- the Seagate ST-506 (153 cyl, 5 MB formatted) and ST-412
+	// (306 cyl, 10 MB formatted) share the same timing specification in the
+	// ST412 OEM manual (April 1982): 3600 RPM; track-to-track 3 ms; average
+	// 85 ms; full-stroke (maximum) 205 ms with "fast seek / burst mode"
+	// (settling already included).  Sector interleave depends on the host
+	// CBIOS's format -- 1:1 for the Big Board II's Cal-Tex monitor.
+	//
+	// Configure once the controller is attached at a slot, e.g. from
+	// machine_start():
+	//
+	//   ST-506 (5 MB):
+	//     if (auto *s = dynamic_cast<nscsi_s1410_device *>(subdevice("sasi:0:s1410")))
+	//         s->set_seek_timing(3000, 85000, 205000, 3600, 1);
+	//
+	//   ST-412 (10 MB; identical parameters -- the burst-mode model adapts to
+	//   whatever physical cylinder count the CHD's GDDD metadata reports):
+	//     if (auto *s = dynamic_cast<nscsi_s1410_device *>(subdevice("sasi:0:s1410")))
+	//         s->set_seek_timing(3000, 85000, 205000, 3600, 1);
+	//
+	void set_seek_timing(uint32_t track_us, uint32_t average_us, uint32_t full_us, uint32_t rpm, uint8_t interleave);
+
 protected:
 	// SCSI status returns
 	enum {
@@ -81,6 +108,16 @@ protected:
 	virtual attotime scsi_data_command_delay() override;
 
 	uint8_t params[8];
+
+	// Seek-timing model state (set by set_seek_timing(); when m_seek_model is
+	// false the device uses the legacy flat 85 ms per-command delay).
+	bool     m_seek_model = false;
+	int      m_last_cylinder = -1;   // current head cylinder (-1 = unknown)
+	uint8_t  m_interleave = 1;       // sector interleave (1 = 1:1)
+	uint32_t m_rpm = 3600;           // spindle speed -> rotational latency
+	uint32_t m_seek_track_us = 0;    // track-to-track seek time
+	uint32_t m_seek_range_us = 0;    // full-stroke minus track-to-track
+	double   m_seek_exp = 1.0;       // seek(d) = track + range*(d/ncyl)^exp
 };
 
 DECLARE_DEVICE_TYPE(NSCSI_S1410, nscsi_s1410_device)

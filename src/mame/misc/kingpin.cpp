@@ -58,11 +58,8 @@ public:
 		, m_leds(*this, "led_%u", 0U)
 	{ }
 
-	void kingpin(machine_config &config);
-	void dealracl(machine_config &config);
-
-protected:
-	virtual void machine_start() override ATTR_COLD;
+	void kingpin(machine_config &config) ATTR_COLD;
+	void dealracl(machine_config &config) ATTR_COLD;
 
 private:
 	void sound_nmi_w(uint8_t data);
@@ -81,11 +78,6 @@ private:
 	void output1_w(uint8_t data);
 	void output2_w(uint8_t data);
 };
-
-void kingpin_state::machine_start()
-{
-	m_leds.resolve();
-}
 
 void kingpin_state::output1_w(uint8_t data)
 {

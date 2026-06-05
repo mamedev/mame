@@ -75,6 +75,8 @@
 
 #include "tms320c3x_dasm.h"
 
+#include "endianness.h"
+
 #include <bit>
 
 

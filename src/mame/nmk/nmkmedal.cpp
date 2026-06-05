@@ -359,7 +359,7 @@ void hpierrot_state::drail(machine_config &config)
 	TMP90841(config, m_maincpu, 16_MHz_XTAL / 2); // exact model unknown as the socket was empty
 	m_maincpu->set_addrmap(AS_PROGRAM, &hpierrot_state::drail_mem_map);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112_device &nmk112(NMK112(config, "nmk112"));
 	nmk112.set_rom0_tag("oki");
 
 	SPEAKER(config, "mono").front_center();
@@ -374,7 +374,7 @@ void hpierrot_state::sweethrt(machine_config &config)
 	TMP90841(config, m_maincpu, 16_MHz_XTAL / 2); // actually a NMK-113 custom
 	m_maincpu->set_addrmap(AS_PROGRAM, &hpierrot_state::sweethrt_mem_map);
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0)); // actually thought to be included in the NMK-113 custom
+	nmk112_device &nmk112(NMK112(config, "nmk112")); // actually thought to be included in the NMK-113 custom
 	nmk112.set_rom0_tag("oki");
 	nmk112.set_rom1_tag("oki2");
 

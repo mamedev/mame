@@ -18,7 +18,7 @@ public:
 	bfm_bda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	void set_port_val(uint8_t val) { m_port_val = val; }
+	void set_port_val(uint8_t val) { m_outputs.set_names("vfd%u", unsigned(val << 4)); m_brightness.set_names("vfdduty", unsigned(val)); }
 
 	int write_char(int data);
 	virtual void update_display();
@@ -39,9 +39,8 @@ private:
 	static constexpr uint8_t AT_BLANK   = 0x02;
 	static constexpr uint8_t AT_FLASHED = 0x80;   // set when character should be blinked off
 
-	std::unique_ptr<output_finder<16> > m_outputs;
-	std::unique_ptr<output_finder<1> > m_brightness;
-	uint8_t m_port_val;
+	output_finder<16> m_outputs;
+	output_finder<1> m_brightness;
 
 	int m_cursor_pos = 0;
 	int m_window_start = 0;     // display window start pos 0-15

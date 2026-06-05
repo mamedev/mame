@@ -68,7 +68,7 @@ public:
 		m_out_pos(*this, "pos_%c", unsigned('x'))
 	{ }
 
-	void robotadv(machine_config &config);
+	void robotadv(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -123,11 +123,6 @@ private:
 void robotadv_state::machine_start()
 {
 	m_refresh_timer = timer_alloc(FUNC(robotadv_state::refresh), this);
-
-	// resolve outputs
-	m_piece_hand.resolve();
-	m_out_motor.resolve();
-	m_out_pos.resolve();
 
 	// register for savestates
 	save_item(NAME(m_control1));

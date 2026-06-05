@@ -336,7 +336,7 @@ void proconn_state::proconn(machine_config &config)
 	m_ay->port_b_write_callback().set(FUNC(proconn_state::meter_w));
 	m_ay->add_route(ALL_OUTPUTS, "speaker", 0.33, 1);
 
-	METERS(config, m_meters, 0);
+	METERS(config, m_meters);
 	m_meters->set_number(8);
 }
 

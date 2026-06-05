@@ -49,11 +49,12 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void amico2k(machine_config &config);
+	void amico2k(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	void machine_start() override ATTR_COLD;
 
+private:
 	uint8_t ppi_pa_r();
 	void ppi_pa_w(uint8_t data);
 	uint8_t ppi_pb_r();
@@ -211,7 +212,6 @@ void amico2k_state::ppi_pb_w(uint8_t data)
 
 void amico2k_state::machine_start()
 {
-	m_digits.resolve();
 	m_led_refresh_timer = timer_alloc(FUNC(amico2k_state::led_refresh), this);
 
 	// state saving

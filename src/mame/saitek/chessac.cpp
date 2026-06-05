@@ -59,8 +59,8 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
-	void chessac(machine_config &config);
-	void schachak(machine_config &config);
+	void chessac(machine_config &config) ATTR_COLD;
+	void schachak(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
@@ -109,8 +109,6 @@ private:
 
 void chessac_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_lcd_segs));

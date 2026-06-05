@@ -109,9 +109,6 @@ void stepper_device::device_start()
 	save_item(NAME(m_step_pos));
 	save_item(NAME(m_abs_step_pos));
 	save_item(NAME(m_max_steps));
-
-	m_output_pos.resolve();
-	m_output_scroll.resolve();
 }
 
 ///////////////////////////////////////////////////////////////////////////

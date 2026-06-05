@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "luaengine.ipp"
 
+#include "endianness.h"
+
 #include <cstring>
 
 

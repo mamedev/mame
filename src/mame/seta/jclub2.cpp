@@ -1158,7 +1158,7 @@ void jclub2o_state::jclub2o(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
 
-	ST0020_SPRITES(config, m_st0020, 0);
+	ST0020_SPRITES(config, m_st0020);
 	m_st0020->set_is_jclub2(1);
 	m_st0020->set_palette(m_palette);
 
@@ -1199,7 +1199,7 @@ void jclub2_state::jclub2(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
 
 	// NOT an ST0020 but instead ST0032, ram format isn't compatible at least
-	ST0032_SPRITES(config, m_st0020, 0);
+	ST0032_SPRITES(config, m_st0020);
 	m_st0020->set_is_jclub2(1); // offsets
 	m_st0020->set_palette(m_palette);
 

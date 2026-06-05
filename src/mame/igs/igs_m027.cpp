@@ -283,8 +283,6 @@ private:
 
 void igs_m027_state::machine_start()
 {
-	m_out_lamps.resolve();
-
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
 	std::fill(std::begin(m_io_select), std::end(m_io_select), 0xff);
 	m_first_start = true;
@@ -2561,7 +2559,7 @@ void igs_m027_state::m027_noppi(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs_m027_state::interrupt), "screen", 0, 1);
 
-	IGS017_IGS031(config, m_igs017_igs031, 0);
+	IGS017_IGS031(config, m_igs017_igs031);
 	m_igs017_igs031->set_text_reverse_bits(true);
 	m_igs017_igs031->in_pa_callback().set(NAME((&igs_m027_state::dsw_r<1, 0, 0>)));
 	m_igs017_igs031->in_pb_callback().set_ioport("PORTB");

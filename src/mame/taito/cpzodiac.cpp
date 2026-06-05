@@ -273,7 +273,7 @@ void cpzodiac_state::cpzodiac(machine_config &config)
 	ymsnd.add_route(1, "speaker", 1.0, 0);
 	ymsnd.add_route(2, "speaker", 1.0, 1);
 
-	tc0140syt_device &syt(TC0140SYT(config, "syt", 0));
+	tc0140syt_device &syt(TC0140SYT(config, "syt"));
 	syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }

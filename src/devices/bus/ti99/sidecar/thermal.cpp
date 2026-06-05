@@ -328,7 +328,7 @@ void ti_thermal_printer_device::device_add_mconfig(machine_config& config)
 {
 	BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT, 120, 72);  // do 72 dpi
 
-	TTL74123(config, m_heatmf_u8, 0);
+	TTL74123(config, m_heatmf_u8);
 	m_heatmf_u8->set_connection_type(TTL74123_GROUNDED);
 	m_heatmf_u8->set_resistor_value(RES_K(10)); // actually, the 74122 is used (Rint = 10k)
 	m_heatmf_u8->set_capacitor_value(CAP_U(4.7f));
@@ -344,7 +344,7 @@ void ti_thermal_printer_device::device_add_mconfig(machine_config& config)
 
 	m_heatmf_u8->out_cb().set(FUNC(ti_thermal_printer_device::enable_column_latches));
 
-	TI99_IOPORT(config, m_port, 0, ti99_ioport_options_evpc1, nullptr);
+	TI99_IOPORT(config, m_port, ti99_ioport_options_evpc1, nullptr);
 	m_port->extint_cb().set(FUNC(ti_thermal_printer_device::extint));
 	m_port->ready_cb().set(FUNC(ti_thermal_printer_device::extready));
 }

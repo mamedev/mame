@@ -5000,10 +5000,10 @@ void apple2e_state::apple2e_common(machine_config &config, bool enhanced, bool r
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
-	TIMER(config, m_scantimer, 0).configure_generic(FUNC(apple2e_state::apple2_interrupt));
+	TIMER(config, m_scantimer).configure_generic(FUNC(apple2e_state::apple2_interrupt));
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	TIMER(config, m_acceltimer, 0).configure_generic(FUNC(apple2e_state::accel_timer));
+	TIMER(config, m_acceltimer).configure_generic(FUNC(apple2e_state::accel_timer));
 
 	if (rgb_option)
 	{
@@ -5035,7 +5035,7 @@ void apple2e_state::apple2e_common(machine_config &config, bool enhanced, bool r
 	RAM(config, m_ram).set_default_size("64K").set_default_value(0x00);
 
 	/* keyboard controller */
-	ay3600_device &kbdc(AY3600(config, "ay3600", 0));
+	ay3600_device &kbdc(AY3600(config, "ay3600"));
 	kbdc.x0().set_ioport("X0");
 	kbdc.x1().set_ioport("X1");
 	kbdc.x2().set_ioport("X2");
@@ -5051,11 +5051,11 @@ void apple2e_state::apple2e_common(machine_config &config, bool enhanced, bool r
 	kbdc.ako().set(FUNC(apple2e_state::ay3600_ako_w));
 
 	/* repeat timer.  15 Hz from page 7-15 of "Understanding the Apple IIe" */
-	timer_device &timer(TIMER(config, "repttmr", 0));
+	timer_device &timer(TIMER(config, "repttmr"));
 	timer.configure_periodic(FUNC(apple2e_state::ay3600_repeat), attotime::from_hz(15));
 
 	/* slot devices */
-	A2BUS(config, m_a2bus, 0);
+	A2BUS(config, m_a2bus);
 	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple2e_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple2e_state::a2bus_nmi_w));
@@ -5069,11 +5069,11 @@ void apple2e_state::apple2e_common(machine_config &config, bool enhanced, bool r
 	A2BUS_SLOT(config, "sl6", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, "diskiing");
 	A2BUS_SLOT(config, "sl7", A2BUS_7M_CLOCK, m_a2bus, apple2e_cards, nullptr);
 
-	A2EAUXSLOT(config, m_a2eauxslot, 0);
+	A2EAUXSLOT(config, m_a2eauxslot);
 	m_a2eauxslot->set_space(m_maincpu, AS_PROGRAM);
 	m_a2eauxslot->out_irq_callback().set(FUNC(apple2e_state::a2bus_irq_w));
 	m_a2eauxslot->out_nmi_callback().set(FUNC(apple2e_state::a2bus_nmi_w));
-	A2EAUXSLOT_SLOT(config, "aux", m_a2eauxslot, apple2eaux_cards, "ext80");   // default to an extended 80-column card
+	A2EAUXSLOT_SLOT(config, "aux", A2BUS_7M_CLOCK, m_a2eauxslot, apple2eaux_cards, "ext80");   // default to an extended 80-column card
 
 	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::default_options, nullptr);
 
@@ -5250,12 +5250,12 @@ void apple2e_state::apple2c(machine_config &config)
 	config.device_remove("sl6");
 	config.device_remove("sl7");
 
-	MOS6551(config, m_acia1, 0);
+	MOS6551(config, m_acia1);
 	m_acia1->set_xtal(1.8432_MHz_XTAL);
 	m_acia1->txd_handler().set(PRINTER_PORT_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia1->irq_handler().set(FUNC(apple2e_state::a2bus_irq_w));
 
-	MOS6551(config, m_acia2, 0);
+	MOS6551(config, m_acia2);
 	m_acia2->set_xtal(1.8432_MHz_XTAL);   // matches SSC so modem software is compatible
 	m_acia2->txd_handler().set("modem", FUNC(rs232_port_device::write_txd));
 	m_acia2->irq_handler().set(FUNC(apple2e_state::a2bus_irq_w));
@@ -5468,7 +5468,7 @@ void apple2e_state::ace500(machine_config &config)
 	OUTPUT_LATCH(config, m_printer_out);
 	m_printer_conn->set_output_latch(*m_printer_out);
 
-	MOS6551(config, m_acia1, 0);
+	MOS6551(config, m_acia1);
 	m_acia1->set_xtal(1.8432_MHz_XTAL);
 	m_acia1->txd_handler().set(MODEM_PORT_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia1->irq_handler().set(FUNC(apple2e_state::a2bus_irq_w));

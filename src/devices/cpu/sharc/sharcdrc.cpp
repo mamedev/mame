@@ -348,7 +348,7 @@ void adsp21062_device::static_generate_memory_accessors()
 		UML_READ(block, I0, I1, SIZE_DWORD, SPACE_DATA);
 		UML_RET(block);
 		UML_LABEL(block, sram_short);
-		if (util::endianness::native == util::endianness::big)
+		if (std::endian::native == std::endian::big)
 			UML_XOR(block, I1, I1, 1);
 		UML_TEST(block, I1, ~((m_blocks[0].length() << 1) - 1) & 0x3ffff);
 		UML_JMPc(block, COND_NZ, sram_short_block1);
@@ -398,7 +398,7 @@ void adsp21062_device::static_generate_memory_accessors()
 		UML_WRITE(block, I1, I0, SIZE_DWORD, SPACE_DATA);
 		UML_RET(block);
 		UML_LABEL(block, sram_short);
-		if (util::endianness::native == util::endianness::big)
+		if (std::endian::native == std::endian::big)
 			UML_XOR(block, I1, I1, 1);
 		UML_TEST(block, I1, ~((m_blocks[0].length() << 1) - 1) & 0x3ffff);
 		UML_JMPc(block, COND_NZ, sram_short_block1);

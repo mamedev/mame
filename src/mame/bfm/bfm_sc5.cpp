@@ -349,7 +349,7 @@ void bfm_sc5_state::bfm_sc5(machine_config &config)
 	m_duart->inport_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_input_r));
 	m_duart->outport_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_output_w));
 
-	// BFM_BDA(config, m_vfd0, 60, 0);
+	// BFM_BDA(config, m_vfd0, 60);
 	BFM_GU96X8M_K657C2(config, m_vfd1, 60, 0);
 
 

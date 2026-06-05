@@ -38,6 +38,8 @@
 #include "emupal.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 #define LOG_BLITTER (1U << 1)
 #define LOG_CLOCKGEN (1U << 2)
 #define LOG_MONSENSE (1U << 3)

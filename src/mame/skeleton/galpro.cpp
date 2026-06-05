@@ -93,7 +93,7 @@ void galpro_state::galpro(machine_config &config)
 	m_rs232->cts_handler().set(m_uart, FUNC(i8251_device::write_cts));
 	m_rs232->rxd_handler().set(m_uart, FUNC(i8251_device::write_rxd));
 
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->dtr_handler().set(m_rs232, FUNC(rs232_port_device::write_dtr));
 	m_uart->rts_handler().set(m_rs232, FUNC(rs232_port_device::write_rts));
 	m_uart->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));

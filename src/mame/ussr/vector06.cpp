@@ -224,7 +224,7 @@ void vector06_state::vector06(machine_config &config)
 
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(1500000);
 	m_pit->set_clk<1>(1500000);
 	m_pit->set_clk<2>(1500000);

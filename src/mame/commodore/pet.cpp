@@ -1650,7 +1650,7 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_pia2->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<4>));
 
 	ieee488_slot_device::add_cbm_defaults(config, default_drive);
-	IEEE488(config, m_ieee, 0);
+	IEEE488(config, m_ieee);
 	m_ieee->srq_callback().set(m_pia2, FUNC(pia6821_device::cb1_w));
 	m_ieee->atn_callback().set(m_pia2, FUNC(pia6821_device::ca1_w));
 

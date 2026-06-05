@@ -507,7 +507,7 @@ void mpcb849_device::device_add_mconfig(machine_config &config)
 	m_dsp->holda().set(FUNC(mpcb828_device::holda));
 	m_dsp->set_disable();
 
-	BT458(config, "ramdac", 0); // unconfirmed clock
+	BT458(config, "ramdac"); // unconfirmed clock
 
 	SCC8530(config, m_scc, 4.9152_MHz_XTAL);
 	m_scc->out_int_callback().set(FUNC(mpcb849_device::scc_irq));
@@ -535,9 +535,9 @@ void mpcba63_device::device_add_mconfig(machine_config &config)
 	//m_screen->set_raw(83'020'800, 1504, 296 + 20, 1184 + 296 + 20, 920, 34, 884 + 34);
 	//m_screen->set_screen_update().set(FUNC(mpcba63_device::screen_update));
 	//m_screen->screen_vblank().set(FUNC(?, vblank));
-	//BT457(config, "ramdac0", 0); // PS045701-165
-	//BT457(config, "ramdac1", 0);
-	//BT457(config, "ramdac2", 0);
+	//BT457(config, "ramdac0"); // PS045701-165
+	//BT457(config, "ramdac1");
+	//BT457(config, "ramdac2");
 }
 
 /*

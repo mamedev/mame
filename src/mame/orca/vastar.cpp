@@ -494,7 +494,7 @@ void vastar_state::vastar(machine_config &config)
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 
-	VASTAR_VIDEO_DEVICE(config, m_vasvid, 0);
+	VASTAR_VIDEO_DEVICE(config, m_vasvid);
 	m_vasvid->set_screen("screen");
 	m_vasvid->set_bg_bases(0x800, 0x000, 0xc00);
 	m_vasvid->set_fg_bases(0x800, 0x400, 0x000);
@@ -516,7 +516,7 @@ void dogfightp_state::dogfightp(machine_config &config)
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	orca_ovg_40c_device& videopcb(ORCA_OVG_40C(config, "videopcb", 0));
+	orca_ovg_40c_device& videopcb(ORCA_OVG_40C(config, "videopcb"));
 	videopcb.set_screen("screen");
 	videopcb.set_percuss_hardware(true);
 }

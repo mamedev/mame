@@ -719,9 +719,9 @@ void xexex_state::xexex(machine_config &config)
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -48, 32);
 	m_k053246->set_palette(m_palette);
 
-	K053250(config, m_k053250, 0, m_palette, m_screen, -5, -16);
+	K053250(config, m_k053250, m_palette, m_screen, -5, -16);
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	K053252(config, m_k053252, 32_MHz_XTAL / 4).set_offsets(40, 0);
 

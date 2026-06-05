@@ -49,7 +49,7 @@ class am9517a_device :  public device_t,
 
 public:
 	// construction/destruction
-	am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto out_hreq_callback() { return m_out_hreq_cb.bind(); }
 	auto out_eop_callback() { return m_out_eop_cb.bind(); }
@@ -79,7 +79,7 @@ public:
 	void dreq3_w(int state);
 
 protected:
-	am9517a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	am9517a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

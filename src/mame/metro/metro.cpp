@@ -3384,7 +3384,7 @@ void vmetal_state::vmetal(machine_config &config)
 
 	OKIM6295(config, m_oki, 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	ES8712(config, m_essnd, 0);
+	ES8712(config, m_essnd);
 	m_essnd->reset_handler().set(FUNC(vmetal_state::es8712_irq));
 	m_essnd->msm_write_handler().set("msm", FUNC(msm6585_device::data_w));
 	m_essnd->set_msm_tag("msm");
@@ -3426,7 +3426,7 @@ void blzntrnd_state::blzntrnd(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, "vdp2:palette", gfx_blzntrnd);
 
-	K053936(config, m_k053936, 0);
+	K053936(config, m_k053936);
 	m_k053936->set_offsets(-77, -21);
 
 	// sound hardware

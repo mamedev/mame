@@ -652,7 +652,7 @@ public:
 			case format_flags::conversion::scientific_hexadecimal:
 			case format_flags::conversion::character:
 			case format_flags::conversion::pointer:
-				apply(str, flags, unsigned(value));
+				format_output<Stream, unsigned>().apply(str, flags, unsigned(value));
 				break;
 			default:
 				if (flags.get_alternate_format()) str.setf(Stream::boolalpha);

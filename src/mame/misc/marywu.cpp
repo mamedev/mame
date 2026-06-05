@@ -199,9 +199,6 @@ void marywu_state::data_map(address_map &map)
 
 void marywu_state::machine_start()
 {
-	m_digits.resolve();
-	m_leds.resolve();
-
 	save_item(NAME(m_selected_7seg_module));
 	save_item(NAME(m_p1_out));
 }

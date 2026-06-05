@@ -111,10 +111,10 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	void pasha2(machine_config &config);
-	void zdrum(machine_config &config);
+	void pasha2(machine_config &config) ATTR_COLD;
+	void zdrum(machine_config &config) ATTR_COLD;
 
-	void init_pasha2();
+	void init_pasha2() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -470,10 +470,6 @@ u32 pasha2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 void pasha2_state::machine_start()
 {
-	m_lamps_r.resolve();
-	m_lamps_g.resolve();
-	m_lamps_b.resolve();
-
 	m_mainbank->configure_entries(0, 6, memregion("bankeddata")->base(), 0x400000);
 	m_mainbank->set_entry(0);
 

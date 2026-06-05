@@ -14,6 +14,8 @@
 
 #include "screen.h"
 
+#include "corefloat.h"
+
 /* constant definitions */
 #define VISIBLE_SCREEN_WIDTH         (32*8) /* Visible screen width */
 

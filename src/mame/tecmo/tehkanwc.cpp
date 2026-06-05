@@ -197,8 +197,6 @@ void tehkanwc_state::machine_start()
 	save_item(NAME(m_msm_data_offs));
 	save_item(NAME(m_toggle));
 	save_item(NAME(m_scroll_x));
-
-	m_digits.resolve();
 }
 
 void tehkanwc_state::sub_cpu_reset_w(uint8_t data)

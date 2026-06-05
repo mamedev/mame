@@ -209,10 +209,6 @@ bfm_gu96x8m_k657c2_device::bfm_gu96x8m_k657c2_device(const machine_config &mconf
 
 void bfm_gu96x8m_k657c2_device::device_start()
 {
-	m_vfd_background.resolve();
-	m_dotmatrix.resolve();
-	m_duty.resolve();
-
 	m_frame_timer = timer_alloc(FUNC(bfm_gu96x8m_k657c2_device::frame_update_callback), this);
 
 	save_item(NAME(m_cursor_pos));

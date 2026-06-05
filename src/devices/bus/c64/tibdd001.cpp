@@ -68,7 +68,7 @@ void c64_tib_dd_001_device::floppy_formats(format_registration &fr)
 
 void c64_tib_dd_001_device::device_add_mconfig(machine_config &config)
 {
-	WD37C65C(config, m_fdc, 16'000'000);
+	WD37C65B(config, m_fdc, 16_MHz_XTAL);
 	m_fdc->hdl_wr_callback().set(FUNC(c64_tib_dd_001_device::motor_w));
 
 	FLOPPY_CONNECTOR(config, m_floppy, tib_dd_001_floppies, "35dd", c64_tib_dd_001_device::floppy_formats, true).enable_sound(true);

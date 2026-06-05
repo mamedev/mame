@@ -187,10 +187,7 @@ INPUT_PORTS_END
 
 void gigatron_state::machine_start()
 {
-	//blinkenlights
-	m_blinken.resolve();
-
-	//Savestate stuff
+	// Save state stuff
 	save_item(NAME(m_lights));
 	save_item(NAME(m_out));
 	save_item(NAME(m_row));

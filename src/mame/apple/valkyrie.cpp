@@ -26,6 +26,8 @@
 #include "emu.h"
 #include "valkyrie.h"
 
+#include "endianness.h"
+
 #define LOG_MODE        (1U << 1)
 #define LOG_MONSENSE    (1U << 2)
 #define LOG_RAMDAC      (1U << 3)

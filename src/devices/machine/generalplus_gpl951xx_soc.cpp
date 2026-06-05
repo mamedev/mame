@@ -1868,15 +1868,15 @@ void generalplus_gpl951xx_device::device_add_mconfig(machine_config &config)
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac0, 0).add_route(0, *this, 1.0, 0);
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac1, 0).add_route(0, *this, 1.0, 1);
 
-	GPL_DMA(config, m_gpl_dma, 0);
+	GPL_DMA(config, m_gpl_dma);
 	m_gpl_dma->space_read_callback().set(FUNC(generalplus_gpl951xx_device::read_space));
 	m_gpl_dma->space_write_callback().set(FUNC(generalplus_gpl951xx_device::write_space));
 
-	GPL_CHX(config, m_gpl_chx, 0);
+	GPL_CHX(config, m_gpl_chx);
 	m_gpl_chx->cha_write_callback().set(FUNC(generalplus_gpl951xx_device::dac_0_w));
 	m_gpl_chx->chb_write_callback().set(FUNC(generalplus_gpl951xx_device::dac_1_w));
 
-	GPL_TIMEBASE(config, m_gpl_timebase, 0);
+	GPL_TIMEBASE(config, m_gpl_timebase);
 	m_gpl_timebase->updateirqs_callback().set(FUNC(generalplus_gpl951xx_device::update_interrupts));
 
 	GCM394_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), DEVICE_SELF, m_screen);
@@ -1898,7 +1898,7 @@ void generalplus_gpl951xx_device::device_add_mconfig(machine_config &config)
 
 	TIMER(config, m_adc_timer).configure_generic(FUNC(generalplus_gpl951xx_device::adc_timer_cb));
 
-	GPL951XX_RTC(config, m_rtc, 0);
+	GPL951XX_RTC(config, m_rtc);
 }
 
 DEFINE_DEVICE_TYPE(GPL951XX, generalplus_gpl951xx_device, "gpl951xx", "GeneralPlus GPL951xx")

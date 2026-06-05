@@ -450,8 +450,6 @@ void thomson_state::video_start()
 	m_thom_mode_point = 0;
 	save_item(NAME(m_thom_mode_point));
 	m_vrambank->set_entry( 0 );
-
-	m_caps_led.resolve();
 }
 
 

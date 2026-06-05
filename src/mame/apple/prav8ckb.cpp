@@ -56,10 +56,6 @@ prav8ckb_device::prav8ckb_device(const machine_config &mconfig, const char *tag,
 
 void prav8ckb_device::device_start()
 {
-	m_power_led.resolve();
-	m_caps_led.resolve();
-	m_cl_led.resolve();
-
 	m_power_led = 1;
 
 	save_item(NAME(m_key_select));

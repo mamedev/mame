@@ -1899,7 +1899,7 @@ void captaven_state::captaven(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline(m_maincpu, ARM_IRQ_LINE);
 
-	DECO_IRQ(config, m_deco_irq, 0);
+	DECO_IRQ(config, m_deco_irq);
 	m_deco_irq->set_screen_tag(m_screen);
 	m_deco_irq->raster2_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<0>));
 	m_deco_irq->vblank_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
@@ -1912,7 +1912,7 @@ void captaven_state::captaven(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_captaven);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x20);
@@ -1923,7 +1923,7 @@ void captaven_state::captaven(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1], 0);    // pf3 is in 8bpp mode, pf4 is not used
+	DECO16IC(config, m_deco_tilegen[1]);    // pf3 is in 8bpp mode, pf4 is not used
 	m_deco_tilegen[1]->set_pf1_size(DECO_32x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_32x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x04);
@@ -1937,11 +1937,11 @@ void captaven_state::captaven(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_captaven_spr);
+	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_captaven_spr);
 	m_sprgen[0]->set_pri_callback(FUNC(captaven_state::captaven_pri_callback));
 	m_sprgen[0]->set_alt_format(true);
 
-	DECO146PROT(config, m_ioprot, 0);
+	DECO146PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("IN0");
 	m_ioprot->port_b_cb().set_ioport("SYSTEM");
 	m_ioprot->port_c_cb().set_ioport("IN1");
@@ -1986,7 +1986,7 @@ void fghthist_state::fghthist(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fghthist);
 	PALETTE(config, m_palette).set_entries(2048);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
@@ -1999,7 +1999,7 @@ void fghthist_state::fghthist(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x20);
@@ -2012,10 +2012,10 @@ void fghthist_state::fghthist(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_fghthist_spr);
+	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_fghthist_spr);
 	m_sprgen[0]->set_pri_callback(FUNC(fghthist_state::fghthist_pri_callback));
 
-	DECO146PROT(config, m_ioprot, 0);
+	DECO146PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("IN0");
 	m_ioprot->port_b_cb().set("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)).lshift(0);
 	m_ioprot->port_c_cb().set_ioport("IN1");
@@ -2088,7 +2088,7 @@ void dragngun_state::dragngun(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline("maincpu", ARM_IRQ_LINE);
 
-	DECO_IRQ(config, m_deco_irq, 0);
+	DECO_IRQ(config, m_deco_irq);
 	m_deco_irq->set_screen_tag(m_screen);
 	m_deco_irq->raster2_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<0>));
 	m_deco_irq->vblank_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
@@ -2103,7 +2103,7 @@ void dragngun_state::dragngun(machine_config &config)
 
 	BUFFERED_SPRITERAM32(config, m_spriteram);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x20);
@@ -2116,7 +2116,7 @@ void dragngun_state::dragngun(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x04);
@@ -2138,7 +2138,7 @@ void dragngun_state::dragngun(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dragngun);
 	PALETTE(config, m_palette).set_entries(2048);
 
-	DECO146PROT(config, m_ioprot, 0);
+	DECO146PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
 	m_ioprot->port_b_cb().set_ioport("SYSTEM");
 	m_ioprot->port_c_cb().set_ioport("DSW");
@@ -2195,7 +2195,7 @@ void dragngun_state::lockloadu(machine_config &config)
 
 void dragngun_state::namco_sprites(machine_config &config)
 {
-	NAMCO_C355SPR(config, m_sprgenzoom, 0);
+	NAMCO_C355SPR(config, m_sprgenzoom);
 	m_sprgenzoom->set_tile_callback(FUNC(dragngun_state::sprite_bank_callback));
 	m_sprgenzoom->set_palette(m_palette);
 	m_sprgenzoom->set_transparent_pen(15);
@@ -2229,7 +2229,7 @@ void dragngun_state::lockload(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));  // to improve main<->audio comms
 
-	DECO_IRQ(config, m_deco_irq, 0);
+	DECO_IRQ(config, m_deco_irq);
 	m_deco_irq->set_screen_tag(m_screen);
 	m_deco_irq->lightgun1_callback().set_ioport("LIGHT0_Y");
 	m_deco_irq->lightgun2_callback().set_ioport("LIGHT1_Y");
@@ -2249,7 +2249,7 @@ void dragngun_state::lockload(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dragngun);
 	PALETTE(config, m_palette).set_entries(2048);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x20);
@@ -2262,7 +2262,7 @@ void dragngun_state::lockload(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_32x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_32x32);    // lockload definitely wants pf34 half width..
 	m_deco_tilegen[1]->set_pf1_col_bank(0x04);
@@ -2277,7 +2277,7 @@ void dragngun_state::lockload(machine_config &config)
 
 	namco_sprites(config);
 
-	DECO146PROT(config, m_ioprot, 0);
+	DECO146PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
 	m_ioprot->port_b_cb().set_ioport("SYSTEM");
 	m_ioprot->port_c_cb().set_ioport("DSW");
@@ -2317,9 +2317,9 @@ void tattass_state::tattass(machine_config &config)
 	m_screen->set_raw(28_MHz_XTAL / 4, 442, 0, 320, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(tattass_state::screen_update_tattass));
 
-	DECO_ACE(config, m_deco_ace, 0);
+	DECO_ACE(config, m_deco_ace);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
@@ -2332,7 +2332,7 @@ void tattass_state::tattass(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x20);
@@ -2346,12 +2346,12 @@ void tattass_state::tattass(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[0], 0, m_deco_ace, gfx_nslasher_spr1);
-	DECO_SPRITE(config, m_sprgen[1], 0, m_deco_ace, gfx_nslasher_spr2);
+	DECO_SPRITE(config, m_sprgen[0], m_deco_ace, gfx_nslasher_spr1);
+	DECO_SPRITE(config, m_sprgen[1], m_deco_ace, gfx_nslasher_spr2);
 
 	GFXDECODE(config, m_gfxdecode, m_deco_ace, gfx_nslasher);
 
-	DECO104PROT(config, m_ioprot, 0);
+	DECO104PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("IN0");
 	m_ioprot->port_b_cb().set(FUNC(tattass_state::port_b_tattass));
 	m_ioprot->port_c_cb().set_ioport("IN1");
@@ -2361,7 +2361,7 @@ void tattass_state::tattass(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	DECOBSMT(config, m_decobsmt, 0);
+	DECOBSMT(config, m_decobsmt);
 	m_decobsmt->add_route(0, "speaker", 1.0, 0);
 	m_decobsmt->add_route(1, "speaker", 1.0, 1);
 }
@@ -2387,9 +2387,9 @@ void nslasher_state::nslasher(machine_config &config)
 	m_screen->set_raw(28_MHz_XTAL / 4, 442, 0, 320, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(nslasher_state::screen_update_nslasher));
 
-	DECO_ACE(config, m_deco_ace, 0);
+	DECO_ACE(config, m_deco_ace);
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
+	DECO16IC(config, m_deco_tilegen[0]);
 	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
@@ -2402,7 +2402,7 @@ void nslasher_state::nslasher(machine_config &config)
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO16IC(config, m_deco_tilegen[1], 0);
+	DECO16IC(config, m_deco_tilegen[1]);
 	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
 	m_deco_tilegen[1]->set_pf1_col_bank(0x20);
@@ -2416,12 +2416,12 @@ void nslasher_state::nslasher(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen[0], 0, m_deco_ace, gfx_nslasher_spr1);
-	DECO_SPRITE(config, m_sprgen[1], 0, m_deco_ace, gfx_nslasher_spr2);
+	DECO_SPRITE(config, m_sprgen[0], m_deco_ace, gfx_nslasher_spr1);
+	DECO_SPRITE(config, m_sprgen[1], m_deco_ace, gfx_nslasher_spr2);
 
 	GFXDECODE(config, m_gfxdecode, m_deco_ace, gfx_nslasher);
 
-	DECO104PROT(config, m_ioprot, 0);
+	DECO104PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("IN0");
 	m_ioprot->port_b_cb().set("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)).lshift(0);
 	m_ioprot->port_c_cb().set_ioport("IN1");

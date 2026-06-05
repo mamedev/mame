@@ -463,7 +463,7 @@ void es9501_state::es9501(machine_config &config)
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1000));
 
-	for (auto bank : m_vram_bank)
+	for (auto &bank : m_vram_bank)
 		ADDRESS_MAP_BANK(config, bank).set_map(&es9501_state::vram_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x1000);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

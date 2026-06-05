@@ -170,7 +170,7 @@ void gamate_rom_4in1_device::write_rom(offs_t offset, uint8_t data)
 
 void gamate_rom_plain_device::device_add_mconfig(machine_config &config)
 {
-	GAMATE_PROT(config, m_protection, 0);
+	GAMATE_PROT(config, m_protection);
 }
 
 

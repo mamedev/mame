@@ -152,10 +152,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="epyxfast">
+	<software name="epyxfast" supported="no">
 		<description>Fast Load Cartridge v2</description>
 		<year>1984</year>
 		<publisher>Epyx</publisher>
+		<notes><![CDATA[
+Random corruption on any disk loaded with FASTLOAD enabled
+]]></notes>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="epyxfastload" />
@@ -168,10 +171,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="epyxfast1" cloneof="epyxfast">
+	<software name="epyxfast1" cloneof="epyxfast" supported="no">
 		<description>Fast Load Cartridge v1</description>
 		<year>1984</year>
 		<publisher>Epyx</publisher>
+		<notes><![CDATA[
+Random corruption on any disk loaded with FASTLOAD enabled
+]]></notes>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="epyxfastload" />
@@ -4407,6 +4413,9 @@ Erratic [VIC] collsion detection, warps and invincibility bonuses can kill playe
 		<description>Kung-Fu Master</description>
 		<year>1985</year>
 		<publisher>Data East</publisher>
+		<notes><![CDATA[
+Randomly crashes on life losses
+]]></notes>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="magic_desk" />
 			<feature name="exrom" value="0" />
@@ -4502,10 +4511,13 @@ Erratic [VIC] collsion detection, warps and invincibility bonuses can kill playe
 		</part>
 	</software>
 
-	<software name="pang">
+	<software name="pang" supported="no">
 		<description>Pang</description>
 		<year>1991</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=8755
+]]></notes>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ocean" />
 			<feature name="exrom" value="0" />
@@ -4858,10 +4870,13 @@ Erratic [VIC] collsion detection, warps and invincibility bonuses can kill playe
 		</part>
 	</software>
 
-	<software name="c64diag">
+	<software name="c64diag" supported="partial">
 		<description>C-64 Diagnostic (rev 586220)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Fails [MOS6526], [SID] and [cassette] checks
+]]></notes>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />

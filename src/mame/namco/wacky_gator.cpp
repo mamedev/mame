@@ -183,10 +183,6 @@ ioport_value wackygtr_state::alligators_front_sensors_r()
 
 void wackygtr_state::machine_start()
 {
-	m_alligator.resolve();
-	m_digit.resolve();
-	m_lamps.resolve();
-
 	save_item(NAME(m_adpcm_sel));
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_ctrl));
@@ -321,7 +317,7 @@ void wackygtr_state::wackygtr(machine_config &config)
 	ppi2.in_pb_callback().set_ioport("IN1");
 	ppi2.in_pc_callback().set_ioport("IN2");
 
-	PIT8253(config, m_pit8253[0], 0);
+	PIT8253(config, m_pit8253[0]);
 	m_pit8253[0]->set_clk<0>(XTAL(3'579'545)/16);  // this is a guess
 	m_pit8253[0]->out_handler<0>().set(FUNC(wackygtr_state::alligator_ck<0>));
 	m_pit8253[0]->set_clk<1>(XTAL(3'579'545)/16);  // this is a guess
@@ -329,7 +325,7 @@ void wackygtr_state::wackygtr(machine_config &config)
 	m_pit8253[0]->set_clk<2>(XTAL(3'579'545)/16);  // this is a guess
 	m_pit8253[0]->out_handler<2>().set(FUNC(wackygtr_state::alligator_ck<2>));
 
-	PIT8253(config, m_pit8253[1], 0);
+	PIT8253(config, m_pit8253[1]);
 	m_pit8253[1]->set_clk<0>(XTAL(3'579'545)/16);  // this is a guess
 	m_pit8253[1]->out_handler<0>().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 	m_pit8253[1]->set_clk<1>(XTAL(3'579'545)/16);  // this is a guess

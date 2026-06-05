@@ -250,8 +250,6 @@ void tsconf_beta_device::device_start()
 	save_item(NAME(m_vdos));
 	save_item(NAME(m_io_forced));
 	save_item(NAME(m_fddvirt));
-
-	m_floppy_led.resolve();
 }
 
 void tsconf_beta_device::device_reset()

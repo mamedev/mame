@@ -238,6 +238,8 @@ if BUSES["A2KBD"] then
 		MAME_DIR .. "src/devices/bus/a2kbd/a2kbd.h",
 		MAME_DIR .. "src/devices/bus/a2kbd/am100kbd.cpp",
 		MAME_DIR .. "src/devices/bus/a2kbd/am100kbd.h",
+		MAME_DIR .. "src/devices/bus/a2kbd/autokbd.cpp",
+		MAME_DIR .. "src/devices/bus/a2kbd/autokbd.h",
 		MAME_DIR .. "src/devices/bus/a2kbd/ivelultrkb.cpp",
 		MAME_DIR .. "src/devices/bus/a2kbd/ivelultrkb.h",
 		MAME_DIR .. "src/devices/bus/a2kbd/kb200.cpp",

@@ -466,8 +466,6 @@ c8280_device::c8280_device(const machine_config &mconfig, const char *tag, devic
 
 void c8280_device::device_start()
 {
-	m_leds.resolve();
-
 	// state saving
 	save_item(NAME(m_rfdo));
 	save_item(NAME(m_daco));

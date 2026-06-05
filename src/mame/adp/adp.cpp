@@ -570,7 +570,7 @@ void adp_state::quickjac(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(adp_state::adp_palette), 0x10);
 
-	HD63484(config, m_acrtc, 0).set_addrmap(0, &adp_state::adp_hd63484_map);
+	HD63484(config, m_acrtc).set_addrmap(0, &adp_state::adp_hd63484_map);
 
 	SPEAKER(config, "mono").front_center();
 	ym2149_device &aysnd(YM2149(config, "aysnd", 3686400/2));
@@ -609,7 +609,7 @@ void adp_state::funland(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::funland_mem);
 
 	PALETTE(config.replace(), m_palette, palette_device::BLACK, 0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &adp_state::ramdac_map);
 
 	m_acrtc->set_addrmap(0, &adp_state::fstation_hd63484_map);

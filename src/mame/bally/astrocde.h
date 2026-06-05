@@ -266,12 +266,11 @@ public:
 	{ }
 
 	void tenpindx(machine_config &config);
+
 private:
 	void lamp_w(offs_t offset, uint8_t data);
 	void counter_w(uint8_t data);
 	void lights_w(uint8_t data);
-
-	virtual void machine_start() override ATTR_COLD;
 
 	void port_map_16col_pattern_tenpindx(address_map &map) ATTR_COLD;
 	void sub_io_map(address_map &map) ATTR_COLD;

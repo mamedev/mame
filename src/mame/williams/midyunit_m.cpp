@@ -602,20 +602,6 @@ void midyunit_base_state::machine_start()
 	save_pointer(NAME(m_cmos_ram), (0x2000 * 4)/2);
 }
 
-void term2_state::machine_start()
-{
-	midyunit_adpcm_state::machine_start();
-
-	m_left_flash.resolve();
-	m_right_flash.resolve();
-	m_left_gun_recoil.resolve();
-	m_right_gun_recoil.resolve();
-	m_left_gun_green_led.resolve();
-	m_left_gun_red_led.resolve();
-	m_right_gun_green_led.resolve();
-	m_right_gun_red_led.resolve();
-}
-
 void midzunit_state::machine_reset()
 {
 	midyunit_base_state::machine_reset();

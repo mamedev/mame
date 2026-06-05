@@ -922,7 +922,7 @@ void m92_state::m92(machine_config &config)
 	V35(config, m_soundcpu, 14.318181_MHz_XTAL);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &m92_state::sound_map);
 
-	PIC8259(config, m_upd71059c, 0);
+	PIC8259(config, m_upd71059c);
 	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(m92_state::scanline_interrupt), "screen", 0, 1);

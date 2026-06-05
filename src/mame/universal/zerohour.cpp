@@ -870,7 +870,7 @@ void redclash_state::redclash(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_beep).add_route(ALL_OUTPUTS, "mono", 0.2);
 
-	CLOCK(config, m_beep_clock, 0);
+	CLOCK(config, m_beep_clock);
 	m_beep_clock->signal_handler().set(m_beep, FUNC(speaker_sound_device::level_w));
 	m_beep_clock->set_duty_cycle(0.2);
 

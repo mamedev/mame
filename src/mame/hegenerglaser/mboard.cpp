@@ -74,8 +74,6 @@ void mephisto_board_device::set_config(machine_config &config, sensorboard_devic
 
 void mephisto_board_device::device_start()
 {
-	m_led_out.resolve();
-
 	m_board->set_delay(m_sensordelay);
 
 	// zerofill

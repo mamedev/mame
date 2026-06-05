@@ -811,7 +811,7 @@ void wheelfir_state::wheelfir(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_wheelfir);
 
 	PALETTE(config, m_palette).set_entries(NUM_COLORS);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &wheelfir_state::ramdac_map);
 
 	EEPROM_93C46_16BIT(config, "eeprom");

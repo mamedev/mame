@@ -813,7 +813,7 @@ void pc8401a_state::pc8401a(machine_config &config)
 
 	UPD1990A(config, m_rtc);
 
-	i8251_device &uart(I8251(config, I8251_TAG, 0));
+	i8251_device &uart(I8251(config, I8251_TAG));
 	uart.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	uart.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));

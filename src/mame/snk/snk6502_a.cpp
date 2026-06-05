@@ -685,7 +685,7 @@ void vanguard_sound_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	SNK6502_SOUND(config, m_custom, 0);
+	SNK6502_SOUND(config, m_custom);
 	m_custom->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	SAMPLES(config, m_samples);
@@ -882,7 +882,7 @@ void fantasy_sound_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	SNK6502_SOUND(config, m_custom, 0);
+	SNK6502_SOUND(config, m_custom);
 	m_custom->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	samples_device &samples(SAMPLES(config, "samples"));
@@ -1032,7 +1032,7 @@ void sasuke_sound_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	SNK6502_SOUND(config, m_custom, 0);
+	SNK6502_SOUND(config, m_custom);
 	m_custom->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	samples_device &samples(SAMPLES(config, "samples"));
@@ -1173,7 +1173,7 @@ void satansat_sound_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	SNK6502_SOUND(config, m_custom, 0);
+	SNK6502_SOUND(config, m_custom);
 	m_custom->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	samples_device &samples(SAMPLES(config, "samples"));

@@ -422,8 +422,6 @@ void lockon_state::ym2203_out_b(uint8_t data)
 
 void lockon_state::machine_start()
 {
-	m_lamp.resolve();
-
 	save_item(NAME(m_ground_ctrl));
 	save_item(NAME(m_scroll_h));
 	save_item(NAME(m_scroll_v));

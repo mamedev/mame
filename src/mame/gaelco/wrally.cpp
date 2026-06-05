@@ -141,6 +141,8 @@ The PCB has a layout that can either use the 4 ROM set of I7, I9, I11 & I13 or l
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "endianness.h"
+
 
 namespace {
 
@@ -542,7 +544,7 @@ void wrally_state::wrally(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024*8);
 
-	GAELCO_WRALLY_SPRITES(config, m_sprites, 0, m_palette, gfx_wrally);
+	GAELCO_WRALLY_SPRITES(config, m_sprites, m_palette, gfx_wrally);
 	m_sprites->set_screen("screen");
 
 	LS259(config, m_outlatch);

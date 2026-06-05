@@ -421,16 +421,16 @@ void wpc_dcs_state::wpc_dcs(machine_config &config)
 
 	TIMER(config, "zero_crossing").configure_periodic(FUNC(wpc_dcs_state::zc_timer), attotime::from_hz(120)); // Mains power zero crossing
 
-	WPC_LAMP(config, m_lamp, 0);
-	WPC_OUT(config, m_out, 0, 3);
-	WPC_SHIFT(config, "shift", 0);
-	WPC_DMD(config, "dmd", 0).scanline_callback().set(FUNC(wpc_dcs_state::scanline_irq));
+	WPC_LAMP(config, m_lamp);
+	WPC_OUT(config, m_out, 3);
+	WPC_SHIFT(config, "shift");
+	WPC_DMD(config, "dmd").scanline_callback().set(FUNC(wpc_dcs_state::scanline_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "mono").front_center();
 
-	DCS_AUDIO_8K(config, m_dcs, 0);
+	DCS_AUDIO_8K(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->add_route(0, "mono", 1.0);
 }

@@ -531,7 +531,7 @@ void sliver_state::sliver(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(0x100);
 	// AT76C176
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette"));
 	ramdac.set_addrmap(0, &sliver_state::ramdac_map);
 
 	SPEAKER(config, "speaker", 2).front();

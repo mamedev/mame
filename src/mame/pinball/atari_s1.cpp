@@ -477,10 +477,6 @@ void atari_s1_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_player_lamps.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_audio_en));
 	save_item(NAME(m_timer_s));
 	save_item(NAME(m_vol));

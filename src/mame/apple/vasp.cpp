@@ -19,6 +19,8 @@
 #include "formats/ap_dsk35.h"
 #include "layout/generic.h"
 
+#include "endianness.h"
+
 static constexpr u32 C7M  = 7833600;
 static constexpr u32 C15M = (C7M * 2);
 

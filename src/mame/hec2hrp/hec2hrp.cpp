@@ -412,7 +412,7 @@ void hec2hrp_state::interact_common(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("interact");
 
 	/* printer */
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 }
 
 void hec2hrp_state::interact(machine_config &config)
@@ -483,7 +483,7 @@ void hec2hrp_state::hec2hr(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("interact_cass");
 
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("80K").set_default_value(0x00);

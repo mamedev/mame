@@ -685,7 +685,6 @@ c4040_device::c4040_device(const machine_config &mconfig, const char *tag, devic
 
 void c2040_device::device_start()
 {
-	m_leds.resolve();
 	// install image callbacks
 	m_fdc->set_floppy(m_floppy0, m_floppy1);
 

@@ -111,8 +111,6 @@ void iris_kbd_device::device_start()
 	save_item(NAME(m_p1));
 	save_item(NAME(m_p2));
 	save_item(NAME(m_col));
-
-	m_led.resolve();
 }
 
 void iris_kbd_device::input_txd(int state)

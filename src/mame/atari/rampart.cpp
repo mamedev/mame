@@ -477,7 +477,7 @@ void rampart_state::rampart(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_rampart);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 512).set_membits(8);
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, rampart_state::s_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, rampart_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

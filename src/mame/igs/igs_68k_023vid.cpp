@@ -237,7 +237,7 @@ void igs_68k_023vid_state::xypmd(machine_config &config)
 	m6502_device &subcpu(M6502(config, "subcpu", 8_MHz_XTAL)); // TODO: something M6502 derived (data.u13 is M6502 derived code)
 	subcpu.set_addrmap(AS_PROGRAM, &igs_68k_023vid_state::sub_program_map);
 
-	//IGS025(config, "igs025", 0);
+	//IGS025(config, "igs025");
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // TODO: verify everything once emulation works
@@ -248,7 +248,7 @@ void igs_68k_023vid_state::xypmd(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x1400 / 2);
 
-	IGS023_VIDEO(config, m_video, 0);
+	IGS023_VIDEO(config, m_video);
 	m_video->set_palette("palette");
 	m_video->set_screen(m_screen);
 	m_video->read_spriteram_callback().set([this](offs_t offset) { return m_mainram[offset]; });

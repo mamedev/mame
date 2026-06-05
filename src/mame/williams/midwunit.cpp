@@ -651,7 +651,7 @@ void midwunit_state::wunit(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	DCS_AUDIO_8K(config, m_dcs, 0);
+	DCS_AUDIO_8K(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->add_route(0, "mono", 1.0);
 }
@@ -659,14 +659,14 @@ void midwunit_state::wunit(machine_config &config)
 void midwunit_state::wunit_picsim(machine_config &config)
 {
 	wunit(config);
-	MIDWAY_SERIAL_PIC(config, m_midway_serial_pic, 0);
+	MIDWAY_SERIAL_PIC(config, m_midway_serial_pic);
 	m_midway_serial_pic->set_upper(528); // this is actually development PIC code, all games check for in addition to their own game specific code!
 }
 
 void midwunit_state::wunit_picemu(machine_config &config)
 {
 	wunit(config);
-	MIDWAY_SERIAL_PIC_EMU(config, m_midway_serial_pic_emu, 0);
+	MIDWAY_SERIAL_PIC_EMU(config, m_midway_serial_pic_emu);
 }
 
 

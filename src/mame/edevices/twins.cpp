@@ -104,6 +104,8 @@ To access Service Mode:
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 
 namespace {
 
@@ -606,7 +608,7 @@ void twins_state::twins(machine_config &config)
 	m_screen->set_screen_update(FUNC(twins_state::screen_update_twins));
 
 	PALETTE(config, m_palette).set_entries(256);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &twins_state::ramdac_map);
 	ramdac.set_split_read(0);
 

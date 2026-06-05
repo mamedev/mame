@@ -659,7 +659,7 @@ void hvyunit_state::hvyunit(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hvyunit);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
 
-	KANEKO_PANDORA(config, m_pandora, 0, m_palette, gfx_hvyunit_spr);
+	KANEKO_PANDORA(config, m_pandora, m_palette, gfx_hvyunit_spr);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -93,7 +93,7 @@ void williams_pred_sound_device::device_add_mconfig(machine_config &config)
 	m_pia->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_pia->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	HC55516(config, "cvsd", 0).add_route(ALL_OUTPUTS, *this, 0.8);
+	HC55516(config, "cvsd").add_route(ALL_OUTPUTS, *this, 0.8);
 
 	MC1408(config, m_dac, 0).add_route(ALL_OUTPUTS, *this, 0.1);
 }

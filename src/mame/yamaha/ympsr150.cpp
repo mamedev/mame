@@ -218,11 +218,6 @@ u32 psr150_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 
 void psr150_state::driver_start()
 {
-	m_outputs.resolve();
-	m_led.resolve();
-	m_digit.resolve();
-	m_switch.resolve();
-
 	m_switch = 0x2; // "Voice Play" mode
 
 	save_item(NAME(m_key_sel));

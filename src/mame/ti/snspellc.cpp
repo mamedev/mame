@@ -232,9 +232,6 @@ protected:
 
 void snspellc_state::machine_start()
 {
-	m_power_on.resolve();
-	m_overlay_code_output.resolve();
-
 	// register for savestates
 	save_item(NAME(m_o));
 	save_item(NAME(m_r));
@@ -276,7 +273,6 @@ void tntell_state::machine_start()
 {
 	snspellc_state::machine_start();
 
-	m_overlay_out.resolve();
 	save_item(NAME(m_overlay_code));
 }
 

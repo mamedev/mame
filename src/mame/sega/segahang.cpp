@@ -560,8 +560,6 @@ void segahang_state::i8751_p1_w(uint8_t data)
 
 void segahang_state::machine_start()
 {
-	m_lamps.resolve();
-
 	m_i8751_sync_timer = timer_alloc(FUNC(segahang_state::i8751_sync), this);
 }
 
@@ -1014,8 +1012,8 @@ void segahang_state::shared_base(machine_config &config)
 	ADC0804(config, m_adc, 25.1748_MHz_XTAL / 4 / 6);
 	m_adc->vin_callback().set(FUNC(segahang_state::analog_r));
 
-	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
-	SEGAIC16_ROAD(config, m_segaic16road, 0);
+	SEGAIC16VID(config, m_segaic16vid, "gfxdecode");
+	SEGAIC16_ROAD(config, m_segaic16road);
 
 	// video hardware
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_segahang);
@@ -1033,7 +1031,7 @@ void segahang_state::hangon_base(machine_config &config)
 {
 	shared_base(config);
 	// video hardware
-	SEGA_HANGON_SPRITES(config, m_sprites, 0);
+	SEGA_HANGON_SPRITES(config, m_sprites);
 }
 
 void segahang_state::sharrier_base(machine_config &config)
@@ -1047,7 +1045,7 @@ void segahang_state::sharrier_base(machine_config &config)
 	m_subcpu->set_clock(10_MHz_XTAL);
 
 	// video hardware
-	SEGA_SHARRIER_SPRITES(config, m_sprites, 0);
+	SEGA_SHARRIER_SPRITES(config, m_sprites);
 	m_palette->set_entries(2048*2);
 }
 

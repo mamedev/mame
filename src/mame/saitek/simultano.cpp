@@ -67,8 +67,8 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
-	void simultano(machine_config &config);
-	void cc2150(machine_config &config);
+	void simultano(machine_config &config) ATTR_COLD;
+	void cc2150(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -106,8 +106,6 @@ private:
 
 void simultano_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_power));
 	save_item(NAME(m_select));

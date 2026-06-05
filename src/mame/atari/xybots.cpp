@@ -376,7 +376,7 @@ void xybots_state::xybots(machine_config &config)
 	TILEMAP(config, m_playfield_tilemap, "gfxdecode", 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32).set_info_callback(FUNC(xybots_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, "gfxdecode", 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(FUNC(xybots_state::get_alpha_tile_info));
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, xybots_state::s_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, xybots_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -391,7 +391,7 @@ void xybots_state::xybots(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	ATARI_JSA_I(config, m_jsa, 0);
+	ATARI_JSA_I(config, m_jsa);
 	m_jsa->set_swapped_coins(true);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_2);
 	m_jsa->test_read_cb().set_ioport("FFE200").bit(8);

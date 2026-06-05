@@ -110,7 +110,7 @@ private:
 
 	void rombank_w(uint8_t data);
 	void matrix_w(uint8_t data);
-	uint8_t key_r(offs_t offset);
+	uint8_t key_r();
 	uint8_t m1_rom_r(offs_t offset);
 
 	void palette_enable_w(uint8_t data);
@@ -278,7 +278,7 @@ void anes_state::matrix_w(uint8_t data)
 		logerror("%s: Unknown mux bit written %02X\n", machine().describe_context(), data);
 }
 
-uint8_t anes_state::key_r(offs_t offset)
+uint8_t anes_state::key_r()
 {
 	uint8_t data = 0xff;
 

@@ -50,7 +50,7 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
-	void professor(machine_config &config);
+	void professor(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(on_button);
 
@@ -79,8 +79,6 @@ private:
 
 void professor_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 }
@@ -212,7 +210,7 @@ void professor_state::professor(machine_config &config)
 	m_board->set_nvram_enable(true);
 
 	// video hardware
-	LC7580(config, m_lcd, 0);
+	LC7580(config, m_lcd);
 	m_lcd->write_segs().set(FUNC(professor_state::lcd_output_w));
 	m_lcd->nvram_enable_backup(true);
 

@@ -7,6 +7,26 @@ Video Slot machine game for amusement only.
 IGS PCB N0-T0039-4
 
 Driver by David Haywood and Mirko Buffoni
+
+
+TODO:
+- spec8way: doesn't boot without a debugger trick (bpset 979c,1,{pw@f40e=d963;g})
+  AI analysis:
+  hangs during boot. Root cause isolated: the routine at 0x979C recurses via
+  "call 4116" (= jp (hl) -> 0x979C) until the PRNG at 0x4000 returns 0. The PRNG is a
+  full-period LCG (new = 1024*(S&0xFF) - 3*S + 41) with no seed (the only writer is
+  0x400E, inside the PRNG itself), so the recursion runs thousands of levels deep ->
+  stack overflow into 0xF8xx -> corrupts F93F/F899 (reel index / symbol table) ->
+  the de-interleave routine at 0x4284 then reads unmapped I/O and derails.
+  Forcing F40E=0xD963 on every entry to 0x979C (debugger hack) makes the game boot and
+  run normally, but it's only a workaround: it's unknown why real hardware doesn't hit
+  the runaway. As written, this code path should overflow on real hardware too.
+  Ruled out (with evidence): decryption is correct (raw<->decrypted consistent, 0x00
+  padding clean, jumps/strings valid); Z180 core opcodes on the LCG path are correct
+  (sbc/add/inc, "or a" clears CF, "jr z" tests ZF); PRT timer/interrupts/clock are
+  correct; no F40E seed exists (confirmed at runtime via watchpoint); no RAM fill value
+  works (and mathematically can't); IGS003 protection is orthogonal (the F40E hack,
+  which doesn't touch it, is enough to boot). ROM verified on two different programmers.
 */
 /*
 
@@ -49,8 +69,10 @@ Note
 
 #include "emu.h"
 
+#include "cpu/z180/z180.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/ymopl.h"
 
@@ -58,6 +80,16 @@ Note
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+
+
+// configurable logging
+#define LOG_IGS003 (1U << 1)
+
+// #define VERBOSE (LOG_GENERAL | LOG_IGS003)
+
+#include "logmacro.h"
+
+#define LOGIGS003(...) LOGMASKED(LOG_IGS003, __VA_ARGS__)
 
 
 namespace {
@@ -76,15 +108,18 @@ public:
 		, m_fg_tile_ram(*this, "fg_tile_ram")
 		, m_fg_color_ram(*this, "fg_color_ram")
 		, m_exprom_bank(*this, "exprom_bank")
+		, m_buttons1(*this, "BUTTONS1")
 		, m_led(*this, "led")
 		, m_lamps(*this, "lamp%u", 1U)
 	{ }
 
 	void jackie(machine_config &config) ATTR_COLD;
+	void spec8way(machine_config &config) ATTR_COLD;
 
 	void init_jackie() ATTR_COLD;
 	void init_jackiea() ATTR_COLD;
 	void init_kungfu() ATTR_COLD;
+	void init_spec8way() ATTR_COLD;
 
 	int hopper_r();
 
@@ -99,6 +134,7 @@ private:
 	template<uint8_t Which> void reel_ram_w(offs_t offset, uint8_t data);
 
 	void nmi_and_coins_w(uint8_t data);
+	void spec8way_nmi_and_coins_w(uint8_t data);
 	void lamps_w(uint8_t data);
 	uint8_t irqack_r();
 	void irqack_w(uint8_t data);
@@ -113,6 +149,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	void io_map(address_map &map) ATTR_COLD;
+	void spec8way_io_map(address_map &map) ATTR_COLD;
 	void prg_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
@@ -125,6 +162,7 @@ private:
 	required_shared_ptr<uint8_t> m_fg_tile_ram;
 	required_shared_ptr<uint8_t> m_fg_color_ram;
 	required_memory_bank m_exprom_bank;
+	required_ioport m_buttons1;
 	output_finder<> m_led;
 	output_finder<6> m_lamps;
 
@@ -136,6 +174,10 @@ private:
 	uint8_t m_hopper = 0;
 	uint8_t m_out[3]{};
 	uint16_t m_unk_reg[3][5]{};
+	uint8_t m_igs003_reg = 0;
+
+	void igs003_w(uint8_t data);
+	uint8_t igs003_r();
 };
 
 
@@ -236,15 +278,13 @@ void jackie_state::machine_start()
 {
 	m_exprom_bank->configure_entries(0, 2, memregion("gfx3")->base(), 0x8000);
 
-	m_led.resolve();
-	m_lamps.resolve();
-
 	// save_item(NAME(m_irq_enable)); //always 1?
 	save_item(NAME(m_nmi_enable));
 	// save_item(NAME(m_bg_enable)); //always 1?
 	save_item(NAME(m_hopper));
 	save_item(NAME(m_out));
 	save_item(NAME(m_unk_reg));
+	save_item(NAME(m_igs003_reg));
 }
 
 void jackie_state::machine_reset()
@@ -300,6 +340,25 @@ void jackie_state::nmi_and_coins_w(uint8_t data)
 	show_out();
 }
 
+void jackie_state::spec8way_nmi_and_coins_w(uint8_t data)
+{
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);   // coin_a
+	machine().bookkeeping().coin_counter_w(1, data & 0x04);   // coin_c
+	machine().bookkeeping().coin_counter_w(2, data & 0x08);   // key in
+	machine().bookkeeping().coin_counter_w(3, data & 0x10);   // coin m_out mech
+
+	if (((m_nmi_enable & 0x80) == 0) && data & 0x80)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+
+	m_nmi_enable = data & 0x80;
+
+	if (data & 0x62)
+		logerror("%s unknown PPI1 port A write: %02x\n", machine().describe_context(), data);
+
+	m_out[0] = data;
+	show_out();
+}
+
 void jackie_state::lamps_w(uint8_t data)
 {
 /*
@@ -339,10 +398,37 @@ void jackie_state::irqack_w(uint8_t data)
 	show_out();
 }
 
+void jackie_state::igs003_w(uint8_t data)
+{
+	m_igs003_reg = data;
+	LOGIGS003("%s: igs003 reg = %02x\n", machine().describe_context(), data);
+}
+
+uint8_t jackie_state::igs003_r()
+{
+	switch (m_igs003_reg)
+	{
+		case 0x00: return m_buttons1->read();
+		case 0x20: return 0x49;
+		case 0x21: return 0x47;
+		case 0x22: return 0x53;
+		case 0x24: return 0x41;
+		case 0x25: return 0x41;
+		case 0x26: return 0x7f;
+		case 0x27: return 0x41;
+		case 0x28: return 0x41;
+		case 0x2a: return 0x3e;
+		case 0x2b: return 0x41;
+		default:
+			LOGIGS003("%s: igs003 read with reg %02x\n", machine().describe_context(), m_igs003_reg);
+			return 0xff;
+	}
+}
+
 void jackie_state::prg_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xffff).ram();
+	map(0xf000, 0xffff).ram().share("nvram");
 }
 
 void jackie_state::io_map(address_map &map)
@@ -370,6 +456,32 @@ void jackie_state::io_map(address_map &map)
 	map(0x6800, 0x69ff).ram().w(FUNC(jackie_state::reel_ram_w<0>)).share(m_reel_ram[0]);
 	map(0x6a00, 0x6bff).ram().w(FUNC(jackie_state::reel_ram_w<1>)).share(m_reel_ram[1]);
 	map(0x6c00, 0x6dff).ram().w(FUNC(jackie_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0x7000, 0x77ff).ram().w(FUNC(jackie_state::fg_tile_w)).share(m_fg_tile_ram);
+	map(0x7800, 0x7fff).ram().w(FUNC(jackie_state::fg_color_w)).share(m_fg_color_ram);
+	map(0x8000, 0xffff).bankr(m_exprom_bank);
+}
+
+void jackie_state::spec8way_io_map(address_map &map)
+{
+	map(0x0000, 0x003f).ram(); // Z180 internal regs
+	map(0x1000, 0x1107).ram().share(m_bg_scroll[1]);
+	map(0x2000, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x2800, 0x2fff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0x4000, 0x4000).portr("DSW1");
+	map(0x4001, 0x4001).portr("DSW2");
+	map(0x4002, 0x4002).portr("DSW3");
+	map(0x4003, 0x4003).portr("DSW4");
+	map(0x4004, 0x4004).portr("DSW5");
+	map(0x5080, 0x5083).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5090, 0x5090).w(FUNC(jackie_state::igs003_w));
+	map(0x5091, 0x5091).r(FUNC(jackie_state::igs003_r)).nopw(); // TODO: writes here a lot
+	map(0x50a0, 0x50a0).portr("BUTTONS2");
+	map(0x50c0, 0x50c1).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x6000, 0x60ff).ram().share(m_bg_scroll[0]);
+	map(0x6800, 0x69ff).ram().w(FUNC(jackie_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0x6a00, 0x6bff).ram().w(FUNC(jackie_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0x6c00, 0x6dff).ram().w(FUNC(jackie_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0x6e00, 0x6fff).ram();
 	map(0x7000, 0x77ff).ram().w(FUNC(jackie_state::fg_tile_w)).share(m_fg_tile_ram);
 	map(0x7800, 0x7fff).ram().w(FUNC(jackie_state::fg_color_w)).share(m_fg_color_ram);
 	map(0x8000, 0xffff).bankr(m_exprom_bank);
@@ -466,7 +578,7 @@ static INPUT_PORTS_START( jackie )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Key In")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Clear")   // pays out
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("Togglemode") // Used
-	PORT_BIT( 0xC0, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("BUTTONS1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )
@@ -618,6 +730,117 @@ static INPUT_PORTS_START( kungfu )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( spec8way ) // DIP definitions taken from test mode
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN( 0x01, 0x01 ) PORT_DIPLOCATION("SWA:1")
+	PORT_DIPNAME(    0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWA:2")
+	PORT_DIPSETTING(       0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(       0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x04, 0x04 ) PORT_DIPLOCATION("SWA:3")
+	PORT_DIPUNKNOWN( 0x08, 0x08 ) PORT_DIPLOCATION("SWA:4")
+	PORT_DIPNAME(    0x30, 0x30, "Minimum Bet" ) PORT_DIPLOCATION("SWA:5,6")
+	PORT_DIPSETTING(       0x30, "1" )
+	PORT_DIPSETTING(       0x20, "8" )
+	PORT_DIPSETTING(       0x10, "16" )
+	PORT_DIPSETTING(       0x00, "32" )
+	PORT_DIPNAME(    0xc0, 0xc0, "Maximum Bet" ) PORT_DIPLOCATION("SWA:7,8")
+	PORT_DIPSETTING(       0xc0, "8" )
+	PORT_DIPSETTING(       0x80, "16" )
+	PORT_DIPSETTING(       0x40, "32" )
+	PORT_DIPSETTING(       0x00, "40" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME(    0x07, 0x07, "Main Game Rate" ) PORT_DIPLOCATION("SWB:1,2,3")
+	PORT_DIPSETTING(       0x07, "65%" )
+	PORT_DIPSETTING(       0x06, "70%" )
+	PORT_DIPSETTING(       0x05, "73%" )
+	PORT_DIPSETTING(       0x04, "77%" )
+	PORT_DIPSETTING(       0x03, "80%" )
+	PORT_DIPSETTING(       0x02, "83%" )
+	PORT_DIPSETTING(       0x01, "87%" )
+	PORT_DIPSETTING(       0x00, "90%" )
+	PORT_DIPNAME(    0x08, 0x08, "Double Up Rate" ) PORT_DIPLOCATION("SWB:4")
+	PORT_DIPSETTING(       0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(       0x08, DEF_STR( Hard ) )
+	PORT_DIPUNKNOWN( 0x10, 0x10 ) PORT_DIPLOCATION("SWB:5")
+	PORT_DIPUNKNOWN( 0x20, 0x20 ) PORT_DIPLOCATION("SWB:6")
+	PORT_DIPUNKNOWN( 0x40, 0x40 ) PORT_DIPLOCATION("SWB:7")
+	PORT_DIPUNKNOWN( 0x80, 0x80 ) PORT_DIPLOCATION("SWB:8")
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN( 0x01, 0x01 ) PORT_DIPLOCATION("SWC:1")
+	PORT_DIPUNKNOWN( 0x02, 0x02 ) PORT_DIPLOCATION("SWC:2")
+	PORT_DIPUNKNOWN( 0x04, 0x04 ) PORT_DIPLOCATION("SWC:3")
+	PORT_DIPUNKNOWN( 0x08, 0x08 ) PORT_DIPLOCATION("SWC:4")
+	PORT_DIPUNKNOWN( 0x10, 0x10 ) PORT_DIPLOCATION("SWC:5")
+	PORT_DIPUNKNOWN( 0x20, 0x20 ) PORT_DIPLOCATION("SWC:6")
+	PORT_DIPNAME(    0xc0, 0xc0, "Credit Limit" ) PORT_DIPLOCATION("SWC:7,8")
+	PORT_DIPSETTING(       0x80, "5000" )
+	PORT_DIPSETTING(       0x40, "10000" )
+	PORT_DIPSETTING(       0x00, "20000" )
+	PORT_DIPSETTING(       0xc0, "999999" )
+
+	PORT_START("DSW4")
+	PORT_DIPUNKNOWN( 0x01, 0x01 ) PORT_DIPLOCATION("SWD:1")
+	PORT_DIPUNKNOWN( 0x02, 0x02 ) PORT_DIPLOCATION("SWD:2")
+	PORT_DIPUNKNOWN( 0x04, 0x04 ) PORT_DIPLOCATION("SWD:3")
+	PORT_DIPUNKNOWN( 0x08, 0x08 ) PORT_DIPLOCATION("SWD:4")
+	PORT_DIPUNKNOWN( 0x10, 0x10 ) PORT_DIPLOCATION("SWD:5")
+	PORT_DIPUNKNOWN( 0x20, 0x20 ) PORT_DIPLOCATION("SWD:6")
+	PORT_DIPUNKNOWN( 0x40, 0x40 ) PORT_DIPLOCATION("SWD:7")
+	PORT_DIPUNKNOWN( 0x80, 0x80 ) PORT_DIPLOCATION("SWD:8")
+
+	PORT_START("DSW5")
+	PORT_DIPUNKNOWN( 0x01, 0x01 ) PORT_DIPLOCATION("SWE:1")
+	PORT_DIPUNKNOWN( 0x02, 0x02 ) PORT_DIPLOCATION("SWE:2")
+	PORT_DIPUNKNOWN( 0x04, 0x04 ) PORT_DIPLOCATION("SWE:3")
+	PORT_DIPUNKNOWN( 0x08, 0x08 ) PORT_DIPLOCATION("SWE:4")
+	PORT_DIPUNKNOWN( 0x10, 0x10 ) PORT_DIPLOCATION("SWE:5")
+	PORT_DIPUNKNOWN( 0x20, 0x20 ) PORT_DIPLOCATION("SWE:6")
+	PORT_DIPUNKNOWN( 0x40, 0x40 ) PORT_DIPLOCATION("SWE:7")
+	PORT_DIPUNKNOWN( 0x80, 0x80 ) PORT_DIPLOCATION("SWE:8")
+
+	PORT_START("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jackie_state::hopper_r)) PORT_NAME("HPSW")    // hopper sensor
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("BUTTONS1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("BUTTONS2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 
 static const gfx_layout layout_8x8x6 =
 {
@@ -701,6 +924,18 @@ void jackie_state::init_kungfu()
 	rom[0xbcc5] = 0xc3;
 }
 
+void jackie_state::init_spec8way()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	for (int A = 0; A < 0x10000; A++)
+	{
+		rom[A] ^= 0x01;
+		if ((A & 0x0060) != 0x0040) rom[A] ^= 0x20;
+		if ((A & 0x0282) == 0x0282) rom[A] ^= 0x01;
+		if ((A & 0x0940) == 0x0940) rom[A] ^= 0x02;
+	}
+}
+
 
 TIMER_DEVICE_CALLBACK_MEMBER(jackie_state::irq)
 {
@@ -721,7 +956,7 @@ void jackie_state::jackie(machine_config &config)
 	Z80(config, m_maincpu, XTAL(12'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jackie_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &jackie_state::io_map);
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(jackie_state::irq), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(jackie_state::irq), "screen", 0, 1);
 
 	i8255_device &ppi1(I8255A(config, "ppi1")); // D8255AC
 	ppi1.out_pa_callback().set(FUNC(jackie_state::nmi_and_coins_w));
@@ -731,6 +966,8 @@ void jackie_state::jackie(machine_config &config)
 	i8255_device &ppi2(I8255A(config, "ppi2")); // D8255AC
 	ppi2.in_pa_callback().set_ioport("BUTTONS1");
 	ppi2.out_pb_callback().set(FUNC(jackie_state::lamps_w));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -747,6 +984,40 @@ void jackie_state::jackie(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void jackie_state::spec8way(machine_config &config)
+{
+	// basic machine hardware
+	HD64180RP(config, m_maincpu, 12_MHz_XTAL * 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jackie_state::prg_map);
+	m_maincpu->set_addrmap(AS_IO, &jackie_state::spec8way_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(jackie_state::nmi_line_assert));
+
+	i8255_device &ppi1(I8255A(config, "ppi1")); // D8255AC
+	ppi1.out_pa_callback().set(FUNC(jackie_state::spec8way_nmi_and_coins_w));
+	ppi1.in_pb_callback().set_ioport("SERVICE");
+	ppi1.in_pc_callback().set_ioport("COINS");
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
+	// video hardware
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(57);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 64*8-1, 0, 32*8-1);
+	m_screen->set_screen_update(FUNC(jackie_state::screen_update));
+	m_screen->set_palette(m_palette);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jackie);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	// OKIM6295 present on PCB but no ROM in socket
 }
 
 
@@ -822,9 +1093,38 @@ ROM_START( kungfu ) // IGS PCB N0- 0139
 	ROM_LOAD( "18cv8.u9",   0x0000, 0x155, NO_DUMP )
 ROM_END
 
+// IGS PCB N0- 0073-3 (HD64180RP, 12 MHz XTAL, AMT001, IGS002, D8255AC-2, IGS003 (no letter), YM2413 plus an OKI M6295, but the ROM socket is empty
+ROM_START( spec8way )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "spec8_v122f.u30", 0x00000, 0x10000, CRC(9191c0ab) SHA1(ddf23f61fe6fa26a434c5c9ad00bd0065b41d322) )
+
+	ROM_REGION( 0x60000, "tiles", 0 )
+	ROM_LOAD( "spec8_6f-1.u21", 0x00000, 0x20000, CRC(6fa2d50f) SHA1(a10d9c977bbda582f7729555f557fd46f301a907) )
+	ROM_LOAD( "spec8_5f-1.u19", 0x20000, 0x20000, CRC(35cf257a) SHA1(3f3d11fa5e198338905ee2ce02c3f17d87e48eff) )
+	ROM_LOAD( "spec8_4f-1.u15", 0x40000, 0x20000, CRC(915851b8) SHA1(babcdba0a44a9adef090f61d7bb8cb721039cebe) )
+
+	ROM_REGION( 0x30000, "reels", 0 )
+	ROM_LOAD( "3-1.u11", 0x00000, 0x4000, CRC(2051535a) SHA1(e2e9ce7a03231f6e41c3bb6688507460883473e9) )
+	ROM_LOAD( "2-1.u7",  0x10000, 0x4000, CRC(48d119d7) SHA1(7d5563c1dcdd683bf14ac6b6488bc1a6f91f00ca) )
+	ROM_LOAD( "1-1.u2",  0x20000, 0x4000, CRC(3b757729) SHA1(eacf2e0df38a56d2529fa8d0ffb92ab61c3a588b) )
+
+	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 )
+	ROM_LOAD( "spec8_7f-b.u39", 0x0000, 0x08000, CRC(dd7b7ffa) SHA1(68d5f2b88c343717aa7433a80c54abbacb7160f9) )
+
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
+	ROM_LOAD( "27c020.u59", 0x00000, 0x40000, NO_DUMP ) // assumed removed, but possibly never fitted
+
+	ROM_REGION( 0x155, "misc", 0 )
+	ROM_LOAD( "16l8.u31",   0x0000, 0x104, NO_DUMP )
+	ROM_LOAD( "18cv8.u14",  0x0000, 0x155, NO_DUMP )
+	ROM_LOAD( "18cv8.u8",   0x0000, 0x155, NO_DUMP )
+	ROM_LOAD( "18cv8.u9",   0x0000, 0x155, NO_DUMP )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1993, jackie,  0,      jackie, jackie, jackie_state, init_jackie,  ROT0, "IGS", "Happy Jackie (v119U)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1993, jackiea, jackie, jackie, jackie, jackie_state, init_jackiea, ROT0, "IGS", "Happy Jackie (v110U)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, kungfu,  0,      jackie, kungfu, jackie_state, init_kungfu,  ROT0, "IGS", "Kung Fu Fighters (IGS, v202N)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // inputs for the fighting part
+GAME( 1993, jackie,   0,      jackie,   jackie,   jackie_state, init_jackie,   ROT0, "IGS", "Happy Jackie (v119U)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1993, jackiea,  jackie, jackie,   jackie,   jackie_state, init_jackiea,  ROT0, "IGS", "Happy Jackie (v110U)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1992, kungfu,   0,      jackie,   kungfu,   jackie_state, init_kungfu,   ROT0, "IGS", "Kung Fu Fighters (IGS, v202N)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // inputs for the fighting part
+GAME( 1994, spec8way, 0,      spec8way, spec8way, jackie_state, init_spec8way, ROT0, "IGS", "Special 8 Way (v122F)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

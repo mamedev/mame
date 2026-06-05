@@ -1307,9 +1307,6 @@ INPUT_PORTS_END
 
 void jpmsru_state::machine_start()
 {
-	m_lamp.resolve();
-	m_digits.resolve();
-
 	save_item(NAME(m_reelbits));
 	save_item(NAME(m_int1));
 	save_item(NAME(m_int2));

@@ -344,7 +344,7 @@ void deco156_state::hvysmsh(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_hvysmsh);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 1024);
 
-	DECO16IC(config, m_deco_tilegen, 0);
+	DECO16IC(config, m_deco_tilegen);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_col_bank(0x00);
@@ -357,7 +357,7 @@ void deco156_state::hvysmsh(machine_config &config)
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen, 0, m_palette, gfx_hvysmsh_spr);
+	DECO_SPRITE(config, m_sprgen, m_palette, gfx_hvysmsh_spr);
 	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback));
 
 	/* sound hardware */
@@ -389,7 +389,7 @@ void deco156_state::wcvol95(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_hvysmsh);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
-	DECO16IC(config, m_deco_tilegen, 0);
+	DECO16IC(config, m_deco_tilegen);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_col_bank(0x00);
@@ -402,7 +402,7 @@ void deco156_state::wcvol95(machine_config &config)
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen, 0, m_palette, gfx_hvysmsh_spr);
+	DECO_SPRITE(config, m_sprgen, m_palette, gfx_hvysmsh_spr);
 	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback));
 
 	/* sound hardware */

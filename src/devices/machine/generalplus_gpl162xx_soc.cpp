@@ -1990,12 +1990,12 @@ void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)
 	m_spg_audio->add_route(0, *this, 1.0, 0);
 	m_spg_audio->add_route(1, *this, 1.0, 1);
 
-	GPL_DMA(config, m_gpl_dma, 0);
+	GPL_DMA(config, m_gpl_dma);
 	m_gpl_dma->space_read_callback().set(FUNC(sunplus_gcm394_base_device::read_space));
 	m_gpl_dma->space_write_callback().set(FUNC(sunplus_gcm394_base_device::write_space));
 	m_gpl_dma->dma_complete_callback().set(FUNC(sunplus_gcm394_base_device::dma_complete));
 
-	GPL_TIMEBASE(config, m_gpl_timebase, 0);
+	GPL_TIMEBASE(config, m_gpl_timebase);
 	m_gpl_timebase->updateirqs_callback().set(FUNC(sunplus_gcm394_base_device::update_interrupts));
 
 	GCM394_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), DEVICE_SELF, m_screen);

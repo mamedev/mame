@@ -102,7 +102,7 @@ public:
 protected:
 	gba_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -138,8 +138,6 @@ public:
 	gba_rom_drilldoz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
 	virtual void gpio_dev_write(uint16_t data, int gpio_dirs) override;
 
 private:
@@ -161,7 +159,7 @@ public:
 	virtual void gpio_dev_write(uint16_t data, int gpio_dirs) override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -191,7 +189,7 @@ protected:
 
 	virtual void device_reset() override ATTR_COLD;
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	//uint32_t m_flash_size;
@@ -208,7 +206,6 @@ public:
 	// construction/destruction
 	gba_rom_flash_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
 	virtual uint16_t gpio_dev_read(int gpio_dirs) override;
 	virtual void gpio_dev_write(uint16_t data, int gpio_dirs) override;
 
@@ -235,10 +232,9 @@ public:
 protected:
 	gba_rom_flash1m_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_reset() override ATTR_COLD;
-
-	// device-level overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	//uint32_t m_flash_size;
 	uint32_t m_flash_mask;
@@ -254,11 +250,11 @@ public:
 	// construction/destruction
 	gba_rom_flash1m_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
 	virtual uint16_t gpio_dev_read(int gpio_dirs) override;
 	virtual void gpio_dev_write(uint16_t data, int gpio_dirs) override;
 
 protected:
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 private:
@@ -281,7 +277,7 @@ public:
 protected:
 	gba_rom_eeprom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 private:
@@ -297,7 +293,7 @@ public:
 	// construction/destruction
 	gba_rom_yoshiug_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// reading and writing
@@ -331,7 +327,7 @@ public:
 protected:
 	gba_rom_eeprom64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	std::unique_ptr<gba_eeprom_device> m_eeprom;
@@ -346,7 +342,7 @@ public:
 	// construction/destruction
 	gba_rom_boktai_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual uint16_t gpio_dev_read(int gpio_dirs) override;
@@ -375,7 +371,7 @@ public:
 	virtual void write_mapper(offs_t offset, uint32_t data) override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 

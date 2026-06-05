@@ -10,6 +10,8 @@
 #include "midzeus.h"
 #include "video/rgbutil.h"
 
+#include "endianness.h"
+
 
 #define LOG_ZEUS    (1U << 1)
 #define LOG_PTR     (1U << 2)

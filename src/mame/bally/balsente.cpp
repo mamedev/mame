@@ -1377,7 +1377,7 @@ void balsente_state::balsente(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &balsente_state::cpu1_map);
 	m_maincpu->set_vblank_int("screen", FUNC(balsente_state::update_analog_inputs));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("audio6vb", FUNC(sente6vb_device::rec_w));
 	m_acia->irq_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
@@ -1386,7 +1386,7 @@ void balsente_state::balsente(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	TIMER(config, m_scanline_timer, 0).configure_generic(FUNC(balsente_state::interrupt_timer));
+	TIMER(config, m_scanline_timer).configure_generic(FUNC(balsente_state::interrupt_timer));
 
 	LS259(config, m_outlatch); // U9H
 	// these outputs are generally used to control the various lamps

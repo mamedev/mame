@@ -295,7 +295,7 @@ void _3do_state::green_config(machine_config &config)
 	AMY(config, m_amy, XTAL(50'000'000)/4);
 	m_amy->set_screen("screen");
 
-	CR560B(config, m_cdrom, 0);
+	CR560B(config, m_cdrom);
 	m_cdrom->add_route(0, "speaker", 1.0, 0);
 	m_cdrom->add_route(1, "speaker", 1.0, 1);
 	m_cdrom->set_interface("cdrom");

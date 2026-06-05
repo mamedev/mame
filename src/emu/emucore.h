@@ -26,7 +26,6 @@
 #include "corealloc.h"
 #include "coretmpl.h"
 #include "bitmap.h"
-#include "endianness.h"
 #include "strformat.h"
 #include "vecstream.h"
 
@@ -34,6 +33,7 @@
 #include "osdcomm.h"
 
 // standard C++ includes
+#include <bit>
 #include <exception>
 #include <string>
 #include <type_traits>
@@ -80,22 +80,10 @@ using util::make_bitmask;
 using util::BIT;
 using util::bitswap;
 using util::iabs;
+using util::make_unique_clear;
 using util::string_format;
 
-using endianness_t = util::endianness;
-
-using util::BYTE_XOR_BE;
-using util::BYTE_XOR_LE;
-using util::BYTE4_XOR_BE;
-using util::BYTE4_XOR_LE;
-using util::WORD_XOR_BE;
-using util::WORD_XOR_LE;
-using util::BYTE8_XOR_BE;
-using util::BYTE8_XOR_LE;
-using util::WORD2_XOR_BE;
-using util::WORD2_XOR_LE;
-using util::DWORD_XOR_BE;
-using util::DWORD_XOR_LE;
+using endianness_t = std::endian;
 
 
 // input ports support up to 32 bits each
@@ -172,16 +160,9 @@ union PAIR64
 //  COMMON CONSTANTS
 //**************************************************************************
 
-constexpr endianness_t ENDIANNESS_LITTLE = util::endianness::little;
-constexpr endianness_t ENDIANNESS_BIG    = util::endianness::big;
-constexpr endianness_t ENDIANNESS_NATIVE = util::endianness::native;
-
-
-// M_PI is not part of the C/C++ standards and is not present on
-// strict ANSI compilers or when compiling under GCC with -ansi
-#ifndef M_PI
-#define M_PI                            3.14159265358979323846
-#endif
+constexpr endianness_t ENDIANNESS_LITTLE = std::endian::little;
+constexpr endianness_t ENDIANNESS_BIG    = std::endian::big;
+constexpr endianness_t ENDIANNESS_NATIVE = std::endian::native;
 
 
 /// \name Image orientation flags
@@ -209,11 +190,6 @@ constexpr int ROT270               = ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y;  
 
 // this macro wraps a function 'x' and can be used to pass a function followed by its name
 #define FUNC(x) &x, #x
-
-
-// macros to convert radians to degrees and degrees to radians
-template <typename T> constexpr auto RADIAN_TO_DEGREE(T const &x) { return (180.0 / M_PI) * x; }
-template <typename T> constexpr auto DEGREE_TO_RADIAN(T const &x) { return (M_PI / 180.0) * x; }
 
 
 //**************************************************************************
@@ -318,60 +294,5 @@ template <typename... T>
 {
 	throw emu_fatalerror(std::forward<T>(args)...);
 }
-
-
-// convert a series of 32 bits into a float
-inline float u2f(u32 v)
-{
-	union {
-		float ff;
-		u32 vv;
-	} u;
-	u.vv = v;
-	return u.ff;
-}
-
-
-// convert a float into a series of 32 bits
-inline u32 f2u(float f)
-{
-	union {
-		float ff;
-		u32 vv;
-	} u;
-	u.ff = f;
-	return u.vv;
-}
-
-
-// convert a series of 64 bits into a double
-inline double u2d(u64 v)
-{
-	union {
-		double dd;
-		u64 vv;
-	} u;
-	u.vv = v;
-	return u.dd;
-}
-
-
-// convert a double into a series of 64 bits
-inline u64 d2u(double d)
-{
-	union {
-		double dd;
-		u64 vv;
-	} u;
-	u.dd = d;
-	return u.vv;
-}
-
-
-//**************************************************************************
-//  USEFUL UTILITIES
-//**************************************************************************
-
-using util::make_unique_clear;
 
 #endif // MAME_EMU_EMUCORE_H

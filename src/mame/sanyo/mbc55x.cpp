@@ -341,7 +341,7 @@ void mbc55x_state::mbc55x(machine_config &config)
 	isa.irq7_callback().set(m_pic, FUNC(pic8259_device::ir7_w)); // all other IRQ and DRQ lines are NC
 	isa.iochck_callback().set_inputline(m_maincpu, INPUT_LINE_NMI).invert();
 
-	ISA8_SLOT(config, "external", 0, "isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "external", 0, "isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
 
 	i8251_device &sio(I8251(config, "sio", 14.318181_MHz_XTAL / 8)); // on separate board, through 20-pin header
 	sio.dtr_handler().set("line", FUNC(rs232_port_device::write_dtr));

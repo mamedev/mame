@@ -286,7 +286,7 @@ void visual50_state::visual50(machine_config &config)
 
 	X2210(config, m_novram);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(17.320_MHz_XTAL / 8);
 	m_pit->set_clk<1>(17.320_MHz_XTAL / 8);
 	m_pit->set_clk<2>(17.320_MHz_XTAL / 8);

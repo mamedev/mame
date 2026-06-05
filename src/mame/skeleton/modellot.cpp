@@ -234,7 +234,7 @@ void modellot_state::modellot(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Devices */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(modellot_state::kbd_put));
 }
 

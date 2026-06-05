@@ -1294,7 +1294,7 @@ void pcw_state::pcw(machine_config &config)
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("256K");
 
-	TIMER(config, "pcw_timer", 0).configure_periodic(FUNC(pcw_state::pcw_timer_interrupt), attotime::from_hz(300));
+	TIMER(config, "pcw_timer").configure_periodic(FUNC(pcw_state::pcw_timer_interrupt), attotime::from_hz(300));
 }
 
 void pcw_state::pcw8256(machine_config &config)

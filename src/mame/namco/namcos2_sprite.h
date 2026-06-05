@@ -16,9 +16,15 @@ public:
 	using ns2_mix_delegate = device_delegate<bool (u16 &dest, u8 &destpri, u16 colbase, u16 src, u32 prival)>;
 
 	// construction/destruction
-	namcos2_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	namcos2_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	template <typename T> namcos2_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
 		: namcos2_sprite_device(mconfig, tag, owner, clock)
+	{
+		set_info(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
+	}
+	template <typename T> namcos2_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: namcos2_sprite_device(mconfig, tag, owner, 0, std::forward<T>(palette_tag), gfxinfo)
 	{
 		set_info(gfxinfo);
 		set_palette(std::forward<T>(palette_tag));
@@ -84,9 +90,15 @@ class namcos2_sprite_metalhawk_device : public namcos2_sprite_device
 {
 public:
 	// construction/destruction
-	namcos2_sprite_metalhawk_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	namcos2_sprite_metalhawk_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	template <typename T> namcos2_sprite_metalhawk_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
 		: namcos2_sprite_metalhawk_device(mconfig, tag, owner, clock)
+	{
+		set_info(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
+	}
+	template <typename T> namcos2_sprite_metalhawk_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: namcos2_sprite_metalhawk_device(mconfig, tag, owner, 0, std::forward<T>(palette_tag), gfxinfo)
 	{
 		set_info(gfxinfo);
 		set_palette(std::forward<T>(palette_tag));

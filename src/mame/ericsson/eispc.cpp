@@ -492,8 +492,6 @@ void epc_state::machine_start()
 	save_item(NAME(m_drq));
 	save_item(NAME(m_fdc_irq));
 	save_item(NAME(m_fdc_drq));
-
-	m_leds.resolve();
 }
 
 void epc_state::machine_reset()
@@ -911,6 +909,7 @@ void epc_state::epc(machine_config &config)
 		}
 	});
 
+	// FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa1", 0, m_isabus, epc_isa8_cards, "epc_mda", false);
 	ISA8_SLOT(config, "isa2", 0, m_isabus, epc_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa3", 0, m_isabus, epc_isa8_cards, nullptr, false);

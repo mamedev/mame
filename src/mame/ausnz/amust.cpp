@@ -498,7 +498,7 @@ void amust_state::amust(machine_config &config)
 	uart_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart1", FUNC(i8251_device::write_rxc));
 
-	i8251_device &uart1(I8251(config, "uart1", 0));
+	i8251_device &uart1(I8251(config, "uart1"));
 	uart1.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart1.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart1.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -508,12 +508,12 @@ void amust_state::amust(machine_config &config)
 	rs232.cts_handler().set("uart1", FUNC(i8251_device::write_cts));
 	rs232.dsr_handler().set("uart1", FUNC(i8251_device::write_dsr));
 
-	I8251(config, "uart2", 0);
+	I8251(config, "uart2");
 	//uart2.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	//uart2.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	//uart2.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	PIT8253(config, "pit", 0);
+	PIT8253(config, "pit");
 
 	i8255_device &ppi1(I8255A(config, "ppi1"));
 	ppi1.in_pa_callback().set(FUNC(amust_state::port04_r));

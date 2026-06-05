@@ -20,6 +20,7 @@
 #include "nanosvg.h"
 #include "png.h"
 
+#include <cstdio>
 #include <set>
 
 
@@ -75,7 +76,7 @@ private:
 	util::nsvg_rasterizer_ptr m_rasterizer;
 	std::vector<bool> m_key_state;
 	std::vector<std::vector<NSVGshape *>> m_keyed_shapes;
-	std::unordered_map<std::string, int> m_key_ids;
+	util::transparent_string_unordered_map<std::string, int> m_key_ids;
 	int m_key_count;
 
 	int m_sx, m_sy;

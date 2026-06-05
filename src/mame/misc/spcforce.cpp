@@ -68,8 +68,8 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void meteors(machine_config &config);
-	void spcforce(machine_config &config);
+	void meteors(machine_config &config) ATTR_COLD;
+	void spcforce(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -141,8 +141,6 @@ uint32_t spcforce_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void spcforce_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_sn76496_latch));
 	save_item(NAME(m_sn76496_select));
 	save_item(NAME(m_sn_ready));

@@ -14,7 +14,7 @@ swtpc8212_terminal_device::swtpc8212_terminal_device(const machine_config &mconf
 
 void swtpc8212_terminal_device::device_add_mconfig(machine_config &config)
 {
-	SWTPC8212(config, m_swtpc8212, 0);
+	SWTPC8212(config, m_swtpc8212);
 	m_swtpc8212->rs232_conn_txd_handler().set(FUNC(swtpc8212_terminal_device::output_rxd));
 	m_swtpc8212->rs232_conn_rts_handler().set(FUNC(swtpc8212_terminal_device::route_term_rts));
 	m_swtpc8212->rs232_conn_dtr_handler().set(FUNC(swtpc8212_terminal_device::route_term_dtr));

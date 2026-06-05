@@ -127,9 +127,9 @@ public:
 	{
 	}
 
-	void zunit(machine_config &config);
+	void zunit(machine_config &config) ATTR_COLD;
 
-	void init_narc();
+	void init_narc() ATTR_COLD;
 
 	int narc_talkback_strobe_r();
 	ioport_value narc_talkback_data_r();
@@ -155,15 +155,15 @@ public:
 	{
 	}
 
-	void yunit_cvsd_4bit_fast(machine_config &config);
-	void yunit_cvsd_4bit_slow(machine_config &config);
-	void yunit_cvsd_6bit_slow(machine_config &config);
+	void yunit_cvsd_4bit_fast(machine_config &config) ATTR_COLD;
+	void yunit_cvsd_4bit_slow(machine_config &config) ATTR_COLD;
+	void yunit_cvsd_6bit_slow(machine_config &config) ATTR_COLD;
 
-	void init_hiimpact();
-	void init_shimpact();
-	void init_smashtv();
-	void init_strkforc();
-	void init_trog();
+	void init_hiimpact() ATTR_COLD;
+	void init_shimpact() ATTR_COLD;
+	void init_smashtv() ATTR_COLD;
+	void init_strkforc() ATTR_COLD;
+	void init_trog() ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -191,14 +191,14 @@ public:
 	{
 	}
 
-	void yunit_adpcm_6bit_fast(machine_config &config);
-	void yunit_adpcm_6bit_faster(machine_config &config);
+	void yunit_adpcm_6bit_fast(machine_config &config) ATTR_COLD;
+	void yunit_adpcm_6bit_faster(machine_config &config) ATTR_COLD;
 
-	void init_mkla3bl();
-	void init_mkrep();
-	void init_mkyturbo();
-	void init_mkyunit();
-	void init_totcarn();
+	void init_mkla3bl() ATTR_COLD;
+	void init_mkrep() ATTR_COLD;
+	void init_mkyturbo() ATTR_COLD;
+	void init_mkyunit() ATTR_COLD;
+	void init_totcarn() ATTR_COLD;
 
 	int adpcm_irq_state_r();
 
@@ -234,15 +234,12 @@ public:
 	{
 	}
 
-	void term2(machine_config &config);
+	void term2(machine_config &config) ATTR_COLD;
 
-	void init_term2();
-	void init_term2la1();
-	void init_term2la2();
-	void init_term2la3();
-
-protected:
-	virtual void machine_start() override ATTR_COLD;
+	void init_term2() ATTR_COLD;
+	void init_term2la1() ATTR_COLD;
+	void init_term2la2() ATTR_COLD;
+	void init_term2la3() ATTR_COLD;
 
 private:
 	required_device<adc0844_device> m_adc;

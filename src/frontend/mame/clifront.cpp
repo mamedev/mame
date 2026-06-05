@@ -42,6 +42,7 @@
 #include <set>
 #include <tuple>
 #include <cctype>
+#include <cstdio>
 #include <iostream>
 
 

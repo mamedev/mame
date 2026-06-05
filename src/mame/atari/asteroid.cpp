@@ -860,7 +860,7 @@ void asteroid_state::asteroid_base(machine_config &config)
 	screen.set_visarea(522, 1566, 394, 1182);
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	DVG(config, m_dvg, 0);
+	DVG(config, m_dvg);
 	m_dvg->set_vector("vector");
 	m_dvg->set_memory(m_maincpu, AS_PROGRAM, 0x4000);
 }
