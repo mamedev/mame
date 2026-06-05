@@ -68,9 +68,6 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	uint8_t mem_r(offs_t offset);
-	void mem_w(offs_t offset, uint8_t data);
-
 	virtual UPD3301_FETCH_ATTRIBUTE( attr_fetch ) override;
 
 	virtual uint8_t dma_mem_r(offs_t offset) override;
