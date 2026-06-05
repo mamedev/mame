@@ -31,7 +31,7 @@ end
 
 if _OPTIONS["SDL_INI_PATH"]~=nil then
 	defines {
-		"INI_PATH=\"" .. _OPTIONS["SDL_INI_PATH"] .. "\"",
+		"'INI_PATH=\"" .. _OPTIONS["SDL_INI_PATH"] .. "\"'",
 	}
 end
 
