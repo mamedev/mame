@@ -4,8 +4,8 @@
 
     Capcom-Q1 DL 1425 DSP
 
-    Also mainly referred by QSound™ because Capcom referred this to
-    QSound™ chips.
+    Also mainly referred by QSound™ because it was the most common
+    implementation of QSound™ effects in arcade systems.
 
     Sixteen-channel sample player.  Previous HLE implementation by Paul
     Leaman and Miguel Angel Horna, with thanks to CAB (author of Amuse).
