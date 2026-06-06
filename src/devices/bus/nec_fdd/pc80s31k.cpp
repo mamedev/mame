@@ -293,7 +293,12 @@ void pc80s31_device::device_add_mconfig(machine_config &config)
 	}
 
 	for (auto &latch : m_latch)
+	{
 		GENERIC_LATCH_8(config, latch);
+		// log spawns a ton, particularly with 8255 port C intermediate setups,
+		// or with NOP checks for .d88 copy protection workarounds.
+		latch->set_suppress_log_warnings(true);
+	}
 
 	I8255A(config, m_ppi_host);
 	m_ppi_host->in_pa_callback().set(FUNC(pc80s31_device::latch_r<0>));

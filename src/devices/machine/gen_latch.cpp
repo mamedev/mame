@@ -33,6 +33,7 @@ DEFINE_DEVICE_TYPE(GENERIC_LATCH_16, generic_latch_16_device, "generic_latch_16"
 
 generic_latch_base_device::generic_latch_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	m_suppress_log(false),
 	m_separate_acknowledge(false),
 	m_latch_written(false),
 	m_data_pending_cb(*this)
@@ -157,7 +158,7 @@ void generic_latch_8_device::sync_callback(s32 param)
 	u8 value = param;
 
 	// if the latch has been written and the value is changed, log a warning
-	if (is_latch_written() && m_latched_value != value)
+	if (is_latch_written() && m_latched_value != value && !m_suppress_log)
 		LOGMASKED(LOG_WARN, "Warning: latch written before being read. Previous: %02x, new: %02x\n", m_latched_value, value);
 
 	// store the new value and mark it not read
@@ -228,7 +229,7 @@ void generic_latch_16_device::sync_callback(s32 param)
 	u16 value = param;
 
 	// if the latch has been written and the value is changed, log a warning
-	if (is_latch_written() && m_latched_value != value)
+	if (is_latch_written() && m_latched_value != value && !m_suppress_log)
 		LOGMASKED(LOG_WARN, "Warning: latch written before being read. Previous: %02x, new: %02x\n", m_latched_value, value);
 
 	// store the new value and mark it not read

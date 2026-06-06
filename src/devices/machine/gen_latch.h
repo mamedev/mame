@@ -39,6 +39,9 @@ public:
 	u8 acknowledge_r(address_space &space);
 	void acknowledge_w(u8 data = 0);
 
+	// configuration option: bus/nec_fdd/pc80s31k doesn't care about reading
+	void set_suppress_log_warnings(bool setting) { m_suppress_log = setting; }
+
 protected:
 	// construction/destruction
 	generic_latch_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -50,6 +53,7 @@ protected:
 	bool is_latch_written() const { return m_latch_written; }
 	void set_latch_written(bool latch_written);
 
+	bool                    m_suppress_log;
 private:
 	void init_callback(s32 param);
 
