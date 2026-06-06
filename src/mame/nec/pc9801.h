@@ -11,6 +11,11 @@
 
 #pragma once
 
+#include "bus/ata/atadev.h"
+#include "bus/ata/ataintf.h"
+#include "bus/pc98_cbus/slot.h"
+#include "bus/rs232/rs232.h"
+
 #include "cpu/i386/i386.h"
 #include "cpu/i86/i286.h"
 #include "cpu/i86/i86.h"
@@ -32,10 +37,6 @@
 #include "machine/upd4991a.h"
 #include "machine/upd765.h"
 
-#include "bus/rs232/rs232.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
-
 #include "sound/beep.h"
 //#include "sound/dac.h"
 #include "sound/spkrdev.h"
@@ -43,15 +44,10 @@
 
 #include "video/upd7220.h"
 
-#include "bus/pc98_cbus/slot.h"
-
 #include "pc98_cd.h"
 #include "pc98_kbd.h"
 #include "pc98_memsw.h"
 #include "pc98_sdip.h"
-
-#include "bus/ata/atadev.h"
-#include "bus/ata/ataintf.h"
 
 #include "emupal.h"
 #include "screen.h"
