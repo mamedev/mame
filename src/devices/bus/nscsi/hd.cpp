@@ -6,6 +6,8 @@
 
 #include "multibyte.h"
 
+#include <cmath>
+
 #define LOG_COMMAND     (1U << 1)
 #define LOG_DATA        (1U << 2)
 #define LOG_UNSUPPORTED (1U << 3)
@@ -57,6 +59,84 @@ void nscsi_harddisk_device::device_reset()
 		image->get_inquiry_data(m_inquiry_data);
 	}
 	cur_lba = -1;
+	m_last_cylinder = -1;
+}
+
+void nscsi_harddisk_device::set_seek_timing(uint32_t track_us, uint32_t average_us, uint32_t full_us, uint32_t rpm, uint8_t interleave)
+{
+	m_seek_track_us = track_us;
+	m_seek_range_us = (full_us > track_us) ? (full_us - track_us) : 0;
+	m_rpm           = rpm ? rpm : 3600;
+	m_interleave    = interleave ? interleave : 1;
+	// Fit seek(d) = track + range * (d/ncyl)^exp so an average-length seek
+	// (~1/3 of full stroke) costs average_us.
+	const double num = double(average_us) - double(track_us);
+	const double den = double(full_us)    - double(track_us);
+	m_seek_exp = (num > 0.0 && den > 0.0) ? std::log(num / den) / std::log(1.0 / 3.0) : 1.0;
+	m_seek_model = true;
+}
+
+// Cylinder-aware seek delay for the block at lba.  A real drive seeks only when
+// the target cylinder changes; sequential I/O on one cylinder pays only
+// rotational latency, scaled by the format interleave.  Tracks the head cylinder
+// across commands so sustained reads on one cylinder are not billed a seek each.
+// The exponent fitted in set_seek_timing() captures a controller's "burst mode"
+// multi-cylinder seek -- faster than naive track-to-track stepping over a long
+// seek, but still cheap for short ones.
+attotime nscsi_harddisk_device::seek_time(uint32_t lba)
+{
+	uint32_t spt = 1, spc = 1, ncyl = 1;
+	if (image->exists())
+	{
+		const auto &info = image->get_info();
+		spt  = info.sectors ? info.sectors : 1;          // sectors per track
+		spc  = info.heads * spt;  if (!spc)  spc = 1;    // sectors per cylinder
+		ncyl = info.cylinders ? info.cylinders : 1;
+	}
+	const int target = int(lba / spc);
+	const int dist = (m_last_cylinder < 0) ? int(ncyl)
+		: (target > m_last_cylinder ? target - m_last_cylinder
+					  : m_last_cylinder - target);
+	m_last_cylinder = target;
+
+	const uint32_t rev_us = 60u * 1000000u / m_rpm;   // one revolution
+	uint32_t us;
+	if (dist == 0)
+		// Same cylinder: consecutive logical sectors arrive after the interleave
+		// gap (interleave revolutions to read one track of spt sectors).
+		us = (rev_us * m_interleave) / spt;
+	else
+		// Cylinder change: ~half a revolution rotational latency + a distance-
+		// scaled seek between the track-to-track and full-stroke times.
+		us = rev_us / 2 + m_seek_track_us
+			+ uint32_t(double(m_seek_range_us) * std::pow(double(dist) / double(ncyl), m_seek_exp));
+	return attotime::from_usec(us);
+}
+
+// Command execution delay.  Inert (returns the base zero delay) until a driver
+// calls set_seek_timing(); then the generic SCSI READ/WRITE/SEEK opcodes (6- and
+// 10-byte) are billed a cylinder-aware seek.  Subclasses with their own command
+// set override this and call seek_time() for the relevant opcodes.
+attotime nscsi_harddisk_device::scsi_data_command_delay()
+{
+	if (!m_seek_model)
+		return attotime::zero;
+
+	switch (m_scsi_cmdbuf[0])
+	{
+	case 0x08: // READ (6)
+	case 0x0a: // WRITE (6)
+	case 0x0b: // SEEK (6)
+		return seek_time(get_u24be(&m_scsi_cmdbuf[1]) & 0x1fffff);
+
+	case 0x28: // READ (10)
+	case 0x2a: // WRITE (10)
+	case 0x2b: // SEEK (10)
+		return seek_time(get_u32be(&m_scsi_cmdbuf[2]));
+
+	default:
+		return attotime::zero;
+	}
 }
 
 void nscsi_harddisk_device::device_add_mconfig(machine_config &config)
