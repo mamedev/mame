@@ -39,7 +39,7 @@ public:
 	u8 acknowledge_r(address_space &space);
 	void acknowledge_w(u8 data = 0);
 
-	// configuration option: bus/nec_fdd/pc80s31k doesn't care about reading
+	// configuration option: suppress "Warning: latch written before being read" messages in logerror
 	void set_suppress_log_warnings(bool setting) { m_suppress_log = setting; }
 
 protected:
