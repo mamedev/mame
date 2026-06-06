@@ -21,6 +21,7 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
+#include "machine/bankdev.h"
 #include "machine/i8214.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -59,6 +60,7 @@ public:
 		, m_mouse_port(*this, "mouseport") // labelled "マウス" (mouse) - can't use "mouse" because of core -mouse option
 		, m_exp(*this, "exp")
 		, m_window_view(*this, "window_view")
+		, m_gvram_bank(*this, "gvram_bank")
 	{
 	}
 
@@ -75,12 +77,11 @@ protected:
 	void dma_mem_w(offs_t offset, u8 data);
 	uint8_t dackv(offs_t offset);
 
-	virtual uint8_t dictionary_rom_r(offs_t offset);
-	virtual bool dictionary_rom_enable();
-
 	virtual uint8_t cdbios_rom_r(offs_t offset);
 	virtual bool cdbios_rom_enable();
+	virtual void main_map(address_map &map) ATTR_COLD;
 	virtual void main_io(address_map &map) ATTR_COLD;
+	virtual void gvram_map(address_map &map) ATTR_COLD;
 
 //  required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -100,31 +101,32 @@ protected:
 	required_device<msx_general_purpose_port_device> m_mouse_port;
 	required_device<pc8801_exp_slot_device> m_exp;
 	memory_view m_window_view;
+	required_device<address_map_bank_device> m_gvram_bank;
 
 	void int4_irq_w(int state);
 
+	std::unique_ptr<uint8_t[]> m_gvram;
 	uint8_t m_gfx_ctrl = 0;
+	uint8_t m_vram_sel = 0;
+	uint8_t m_misc_ctrl = 0;
 
+	virtual void flush_gvram_access();
+
+	virtual uint8_t wram_c000_r(offs_t offset);
 private:
-	void main_map(address_map &map) ATTR_COLD;
+	void wram_c000_w(offs_t offset, uint8_t data);
 
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	std::unique_ptr<uint8_t[]> m_hi_work_ram;
 	std::unique_ptr<uint8_t[]> m_ext_work_ram;
-	std::unique_ptr<uint8_t[]> m_gvram;
 
 	std::array<std::array<u16, 80>, 400> m_attr_info = {};
 
 	uint8_t m_ext_rom_bank = 0;
-	uint8_t m_vram_sel = 0;
-	uint8_t m_misc_ctrl = 0;
 	uint8_t m_device_ctrl_data = 0;
 	uint8_t m_window_offset_bank = 0;
 	bool m_text_layer_mask = false;
 	u8 m_bitmap_layer_mask = 0;
-	uint8_t m_alu_reg[3]{};
-	uint8_t m_alu_ctrl1 = 0;
-	uint8_t m_alu_ctrl2 = 0;
 	uint8_t m_extram_mode = 0;
 	uint8_t m_extram_bank = 0;
 	uint32_t m_extram_size = 0;
@@ -137,8 +139,6 @@ private:
 
 	uint32_t m_knj_addr[2]{};
 
-	uint8_t alu_r(offs_t offset);
-	void alu_w(offs_t offset, uint8_t data);
 	uint8_t wram_r(offs_t offset);
 	void wram_w(offs_t offset, uint8_t data);
 	uint8_t ext_wram_r(offs_t offset);
@@ -171,8 +171,6 @@ private:
 	void extram_mode_w(uint8_t data);
 	uint8_t extram_bank_r();
 	void extram_bank_w(uint8_t data);
-	void alu_ctrl1_w(uint8_t data);
-	void alu_ctrl2_w(uint8_t data);
 	template <unsigned kanji_level> uint8_t kanji_r(offs_t offset);
 	template <unsigned kanji_level> void kanji_w(offs_t offset, uint8_t data);
 //  void rtc_w(uint8_t data);
@@ -221,20 +219,38 @@ public:
 	pc8801mk2sr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc8801_state(mconfig, type, tag)
 		, m_opn(*this, "opn")
+		, m_alu_view(*this, "alu_view")
 	{ }
 
 	void pc8801mk2sr(machine_config &config);
 	void pc8801mk2mr(machine_config &config);
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	virtual void main_map(address_map &map) override ATTR_COLD;
 	virtual void main_io(address_map &map) override ATTR_COLD;
 
 	uint8_t opn_porta_r();
 	uint8_t opn_portb_r();
 	void opn_portb_w(uint8_t data);
 
+	void alu_ctrl1_w(uint8_t data);
+	void alu_ctrl2_w(uint8_t data);
+
 private:
 	optional_device<ym2203_device> m_opn;
+	memory_view m_alu_view;
+
+	uint8_t m_alu_reg[3]{};
+	uint8_t m_alu_ctrl1 = 0;
+	uint8_t m_alu_ctrl2 = 0;
+
+	uint8_t alu_r(offs_t offset);
+	void alu_w(offs_t offset, uint8_t data);
+
+	virtual void flush_gvram_access() override;
 };
 
 // FH and MH families and beyond has selectable 8/4 MHz CPU clock switch
@@ -282,8 +298,8 @@ protected:
 
 	virtual void main_io(address_map &map) override ATTR_COLD;
 
-	virtual uint8_t dictionary_rom_r(offs_t offset) override;
-	virtual bool dictionary_rom_enable() override;
+	uint8_t dictionary_rom_r(offs_t offset);
+	virtual uint8_t wram_c000_r(offs_t offset) override;
 
 private:
 	void dic_bank_w(uint8_t data);

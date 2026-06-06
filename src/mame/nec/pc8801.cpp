@@ -20,8 +20,9 @@ TODO:
 - understand why i8214 needs a dis_hack setter (depends on attached i8212?);
 - slotify extended work RAM, make sure that p8suite memtest88 detects it properly;
 - better state machine isolation of features between various models.
-  Vanilla PC-8801 doesn't have analog palette, PC80S31 device as default
+  \- Vanilla PC-8801 doesn't have analog palette, PC80S31 device as default
   (uses external minidisk instead), only model with working border color, other misc banking bits.
+  \- GVRAM and ALU is reused by PC-8001mk2SR, except moved in $8000 range rather than $c000.
 - move keyboard implementation to own device (matters particularly for PC-88VA);
 - double check dipswitches;
 - backport/merge what is portable to PC-8001;
@@ -299,72 +300,6 @@ uint8_t pc8801_state::dackv(offs_t offset)
 	return 0;
 }
 
-uint8_t pc8801_state::alu_r(offs_t offset)
-{
-	uint8_t b, r, g;
-
-	/* store data to ALU regs */
-	for(int i = 0; i < 3; i++)
-		m_alu_reg[i] = m_gvram[i*0x4000 + offset];
-
-	b = m_gvram[offset + 0x0000];
-	r = m_gvram[offset + 0x4000];
-	g = m_gvram[offset + 0x8000];
-	if(!(m_alu_ctrl2 & 1)) { b^=0xff; }
-	if(!(m_alu_ctrl2 & 2)) { r^=0xff; }
-	if(!(m_alu_ctrl2 & 4)) { g^=0xff; }
-
-	return b & r & g;
-}
-
-void pc8801_state::alu_w(offs_t offset, uint8_t data)
-{
-	int i;
-
-	// ALU write mode
-	switch(m_alu_ctrl2 & 0x30)
-	{
-		// logic operation
-		case 0x00:
-		{
-			uint8_t logic_op;
-
-			for(i = 0; i < 3; i++)
-			{
-				logic_op = (m_alu_ctrl1 & (0x11 << i)) >> i;
-
-				switch(logic_op)
-				{
-					case 0x00: { m_gvram[i*0x4000 + offset] &= ~data; } break;
-					case 0x01: { m_gvram[i*0x4000 + offset] |= data; } break;
-					case 0x10: { m_gvram[i*0x4000 + offset] ^= data; } break;
-					case 0x11: break; // NOP
-				}
-			}
-		}
-		break;
-
-		// restore data from ALU regs
-		case 0x10:
-		{
-			for(i = 0; i < 3; i++)
-				m_gvram[i*0x4000 + offset] = m_alu_reg[i];
-		}
-		break;
-
-		// swap ALU reg 1 into R GVRAM
-		case 0x20:
-			m_gvram[0x0000 + offset] = m_alu_reg[1];
-			break;
-
-		// swap ALU reg 0 into B GVRAM
-		case 0x30:
-			m_gvram[0x4000 + offset] = m_alu_reg[0];
-			break;
-	}
-}
-
-
 uint8_t pc8801_state::wram_r(offs_t offset)
 {
 	return m_work_ram[offset];
@@ -423,17 +358,8 @@ void pc8801_state::high_wram_w(offs_t offset, uint8_t data)
 }
 
 // TODO: remove these virtual trampolines once we modernize memory map
-// Needs confirmation about really not being there tho, given the design
-// may be that both dictionary and CD-ROM are generic slots instead.
-inline uint8_t pc8801_state::dictionary_rom_r(offs_t offset)
-{
-	return 0xff;
-}
-
-inline bool pc8801_state::dictionary_rom_enable()
-{
-	return false;
-}
+// CD-ROM stuff should be moved in expansion slot so that MA can mount it
+// (once we have a BIOS for that)
 
 inline uint8_t pc8801_state::cdbios_rom_r(offs_t offset)
 {
@@ -503,52 +429,32 @@ void pc8801_state::main_map(address_map &map)
 				wram_w(window_offset, data);
 		})
 	);
-	map(0xc000, 0xffff).lrw8(
-		NAME([this] (offs_t offset) {
-			if(dictionary_rom_enable())
-				return dictionary_rom_r(offset & 0x3fff);
+	map(0xc000, 0xffff).m(m_gvram_bank, FUNC(address_map_bank_device::amap8));
+}
 
-			if(m_misc_ctrl & 0x40)
-			{
-				if(m_alu_ctrl2 & 0x80)
-					return alu_r(offset & 0x3fff);
-			}
+uint8_t pc8801_state::wram_c000_r(offs_t offset)
+{
+	if((offset & 0x3000) == 0x3000 && (m_misc_ctrl & 0x10))
+		return high_wram_r(offset & 0xfff);
 
-			if(m_vram_sel == 3)
-			{
-				if((offset & 0x3000) == 0x3000 && (m_misc_ctrl & 0x10))
-					return high_wram_r(offset & 0xfff);
+	return wram_r(offset + 0xc000);
+}
 
-				return wram_r(offset + 0xc000);
-			}
+void pc8801_state::wram_c000_w(offs_t offset, uint8_t data)
+{
+	if((offset & 0x3000) == 0x3000 && (m_misc_ctrl & 0x10))
+	{
+		high_wram_w(offset & 0xfff, data);
+		return;
+	}
 
-			return gvram_r((offset & 0x3fff) + (0x4000 * m_vram_sel));
-		}),
-		NAME([this] (offs_t offset, uint8_t data) {
-			if(m_misc_ctrl & 0x40)
-			{
-				if(m_alu_ctrl2 & 0x80)
-				{
-					alu_w(offset & 0x3fff, data);
-					return;
-				}
-			}
+	wram_w(offset + 0xc000, data);
+}
 
-			if(m_vram_sel == 3)
-			{
-				if((offset & 0x3000) == 0x3000 && (m_misc_ctrl & 0x10))
-				{
-					high_wram_w(offset & 0xfff, data);
-					return;
-				}
-
-				wram_w(offset + 0xc000, data);
-				return;
-			}
-
-			gvram_w((offset & 0x3fff) + (0x4000 * m_vram_sel), data);
-		})
-	);
+void pc8801_state::gvram_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rw(FUNC(pc8801_state::gvram_r), FUNC(pc8801_state::gvram_w));
+	map(0xc000, 0xffff).rw(FUNC(pc8801_state::wram_c000_r), FUNC(pc8801_state::wram_c000_w));
 }
 
 uint8_t pc8801_state::ext_rom_bank_r()
@@ -677,6 +583,12 @@ uint8_t pc8801_state::vram_select_r()
 void pc8801_state::vram_select_w(offs_t offset, uint8_t data)
 {
 	m_vram_sel = offset & 3;
+	flush_gvram_access();
+}
+
+void pc8801_state::flush_gvram_access()
+{
+	m_gvram_bank->set_bank(m_vram_sel);
 }
 
 void pc8801_state::irq_level_w(uint8_t data)
@@ -743,6 +655,8 @@ void pc8801_state::misc_ctrl_w(uint8_t data)
 	m_misc_ctrl = data;
 
 	m_sound_irq_enable = ((data & 0x80) == 0);
+
+	flush_gvram_access();
 
 	// Note: this will map to no irq anyway if there isn't any device interested in INT4
 	if (m_sound_irq_enable)
@@ -839,16 +753,6 @@ void pc8801_state::extram_bank_w(uint8_t data)
 	m_extram_bank = data;
 }
 
-void pc8801_state::alu_ctrl1_w(uint8_t data)
-{
-	m_alu_ctrl1 = data;
-}
-
-void pc8801_state::alu_ctrl2_w(uint8_t data)
-{
-	m_alu_ctrl2 = data;
-}
-
 /*
  * $e8-$eb kanji LV1
  * $ec-$ef kanji LV2
@@ -881,6 +785,124 @@ template <unsigned kanji_level> void pc8801_state::kanji_w(offs_t offset, uint8_
 	// https://retrocomputerpeople.web.fc2.com/machines/nec/8801/io_map88.html
 }
 
+/*
+ * PC-8801mkIISR overrides (ALU)
+ */
+
+uint8_t pc8801mk2sr_state::alu_r(offs_t offset)
+{
+	uint8_t b, r, g;
+
+	// ignore for debugger, wouldn't make sense anyway
+	if (machine().side_effects_disabled())
+		return 0xff;
+
+	offset &= 0x3fff;
+
+	/* store data to ALU regs */
+	for(int i = 0; i < 3; i++)
+		m_alu_reg[i] = m_gvram[i*0x4000 + offset];
+
+	b = m_alu_reg[0];
+	r = m_alu_reg[1];
+	g = m_alu_reg[2];
+	if(!(m_alu_ctrl2 & 1)) { b^=0xff; }
+	if(!(m_alu_ctrl2 & 2)) { r^=0xff; }
+	if(!(m_alu_ctrl2 & 4)) { g^=0xff; }
+
+	return b & r & g;
+}
+
+void pc8801mk2sr_state::alu_w(offs_t offset, uint8_t data)
+{
+	int i;
+
+	offset &= 0x3fff;
+
+	// ALU write mode
+	switch(m_alu_ctrl2 & 0x30)
+	{
+		// logic operation
+		case 0x00:
+		{
+			uint8_t logic_op;
+
+			for(i = 0; i < 3; i++)
+			{
+				logic_op = (m_alu_ctrl1 & (0x11 << i)) >> i;
+
+				switch(logic_op)
+				{
+					case 0x00: { m_gvram[i*0x4000 + offset] &= ~data; } break;
+					case 0x01: { m_gvram[i*0x4000 + offset] |= data; } break;
+					case 0x10: { m_gvram[i*0x4000 + offset] ^= data; } break;
+					case 0x11: break; // NOP
+				}
+			}
+		}
+		break;
+
+		// restore data from ALU regs
+		case 0x10:
+		{
+			for(i = 0; i < 3; i++)
+				m_gvram[i*0x4000 + offset] = m_alu_reg[i];
+		}
+		break;
+
+		// swap ALU reg 1 into R GVRAM
+		case 0x20:
+			m_gvram[0x0000 + offset] = m_alu_reg[1];
+			break;
+
+		// swap ALU reg 0 into B GVRAM
+		case 0x30:
+			m_gvram[0x4000 + offset] = m_alu_reg[0];
+			break;
+	}
+}
+
+void pc8801mk2sr_state::alu_ctrl1_w(uint8_t data)
+{
+	m_alu_ctrl1 = data;
+}
+
+void pc8801mk2sr_state::alu_ctrl2_w(uint8_t data)
+{
+	m_alu_ctrl2 = data;
+	flush_gvram_access();
+}
+
+void pc8801mk2sr_state::flush_gvram_access()
+{
+	if (BIT(m_misc_ctrl, 6))
+	{
+		if (BIT(m_alu_ctrl2, 7))
+		{
+			m_alu_view.select(0);
+		}
+		else
+		{
+			m_alu_view.disable();
+		}
+
+		// NOTE: ALU enabled wins over GVRAM, to the point of disabling its latch when setting changes
+		m_vram_sel = 3;
+	}
+	else
+		m_alu_view.disable();
+
+	pc8801_state::flush_gvram_access();
+}
+
+
+void pc8801mk2sr_state::main_map(address_map &map)
+{
+	pc8801_state::main_map(map);
+	map(0xc000, 0xffff).view(m_alu_view);
+	m_alu_view[0](0xc000, 0xffff).rw(FUNC(pc8801mk2sr_state::alu_r), FUNC(pc8801mk2sr_state::alu_w));
+}
+
 
 /*
  * PC8801FH overrides (CPU clock switch)
@@ -910,11 +932,6 @@ inline uint8_t pc8801ma_state::dictionary_rom_r(offs_t offset)
 	return m_dictionary_rom[offset + ((m_dic_bank & 0x1f) * 0x4000)];
 }
 
-inline bool pc8801ma_state::dictionary_rom_enable()
-{
-	return m_dic_ctrl;
-}
-
 void pc8801ma_state::dic_bank_w(uint8_t data)
 {
 	m_dic_bank = data & 0x1f;
@@ -923,6 +940,16 @@ void pc8801ma_state::dic_bank_w(uint8_t data)
 void pc8801ma_state::dic_ctrl_w(uint8_t data)
 {
 	m_dic_ctrl = (data ^ 1) & 1;
+}
+
+uint8_t pc8801ma_state::wram_c000_r(offs_t offset)
+{
+	// overlays at Work RAM level (GVRAM and ALU wins over this) and on reads only
+	if (m_dic_ctrl)
+		return dictionary_rom_r(offset);
+
+	// assume unchanged vs. vanilla PC-8801
+	return pc8801fh_state::wram_c000_r(offset);
 }
 
 /*
@@ -964,11 +991,9 @@ void pc8801_state::main_io(address_map &map)
 	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::port30_w));
 	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::port31_w));
 	map(0x32, 0x32).rw(FUNC(pc8801_state::misc_ctrl_r), FUNC(pc8801_state::misc_ctrl_w));
+	// NOTE: anything after 0x32 reads 0xff on a PC8801MA real HW test
 //  map(0x33, 0x33) PC8001mkIISR port, mirror on PC8801?
-	// TODO: ALU not installed on pre-mkIISR machines
-	// NB: anything after 0x32 reads 0xff on a PC8801MA real HW test
-	map(0x34, 0x34).w(FUNC(pc8801_state::alu_ctrl1_w));
-	map(0x35, 0x35).w(FUNC(pc8801_state::alu_ctrl2_w));
+//  map(0x34, 0x35) ALU regs, unmapped on regular
 //  map(0x35, 0x35).r <unknown>, accessed by cancanb during OP, mistake? Mirror for intended HW?
 	map(0x40, 0x40).rw(FUNC(pc8801_state::port40_r), FUNC(pc8801_state::port40_w));
 //  map(0x44, 0x47).rw internal OPN/OPNA sound card for 8801mkIISR and beyond
@@ -1024,12 +1049,18 @@ void pc8801_state::main_io(address_map &map)
 void pc8801mk2sr_state::main_io(address_map &map)
 {
 	pc8801_state::main_io(map);
+	map(0x34, 0x34).w(FUNC(pc8801mk2sr_state::alu_ctrl1_w));
+	map(0x35, 0x35).w(FUNC(pc8801mk2sr_state::alu_ctrl2_w));
+
 	map(0x44, 0x45).rw(m_opn, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 }
 
 void pc8801fh_state::main_io(address_map &map)
 {
 	pc8801_state::main_io(map);
+	map(0x34, 0x34).w(FUNC(pc8801fh_state::alu_ctrl1_w));
+	map(0x35, 0x35).w(FUNC(pc8801fh_state::alu_ctrl2_w));
+
 	map(0x44, 0x47).rw(m_opna, FUNC(ym2608_device::read), FUNC(ym2608_device::write));
 
 	map(0x6e, 0x6e).r(FUNC(pc8801fh_state::cpuclock_r));
@@ -1040,6 +1071,7 @@ void pc8801ma_state::main_io(address_map &map)
 {
 	pc8801fh_state::main_io(map);
 	map(0xf0, 0xf0).w(FUNC(pc8801ma_state::dic_bank_w));
+	// TODO: readable
 	map(0xf1, 0xf1).w(FUNC(pc8801ma_state::dic_ctrl_w));
 }
 
@@ -1386,9 +1418,6 @@ void pc8801_state::machine_start()
 	save_item(NAME(m_window_offset_bank));
 	save_item(NAME(m_text_layer_mask));
 	save_item(NAME(m_bitmap_layer_mask));
-	save_pointer(NAME(m_alu_reg), 3);
-	save_item(NAME(m_alu_ctrl1));
-	save_item(NAME(m_alu_ctrl2));
 	save_item(NAME(m_extram_mode));
 	save_item(NAME(m_extram_bank));
 	save_item(NAME(m_extram_size));
@@ -1419,10 +1448,7 @@ void pc8801_state::machine_reset()
 	m_text_layer_mask = false;
 	m_bitmap_layer_mask = 0;
 	m_vram_sel = 3;
-
-	// initialize ALU
-	for(int i = 0; i < 3; i++)
-		m_alu_reg[i] = 0x00;
+	m_gvram_bank->set_bank(3);
 
 	m_beeper->set_state(0);
 
@@ -1449,6 +1475,27 @@ void pc8801_state::machine_reset()
 	const bool pixel_clock_setting = bool(!BIT(ioport("CTRL")->read(), 1));
 	set_screen_frequency(pixel_clock_setting);
 	m_crtc->set_unscaled_clock(pixel_clock_setting ? PIXEL_CLOCK_24KHz : PIXEL_CLOCK_15KHz);
+}
+
+void pc8801mk2sr_state::machine_start()
+{
+	pc8801_state::machine_start();
+
+	save_pointer(NAME(m_alu_reg), 3);
+	save_item(NAME(m_alu_ctrl1));
+	save_item(NAME(m_alu_ctrl2));
+}
+
+void pc8801mk2sr_state::machine_reset()
+{
+	pc8801_state::machine_reset();
+
+	// initialize ALU, assume disabled by default
+	for(int i = 0; i < 3; i++)
+		m_alu_reg[i] = 0x00;
+	m_alu_ctrl1 = m_alu_ctrl2 = 0;
+
+	m_alu_view.disable();
 }
 
 void pc8801fh_state::machine_start()
@@ -1484,6 +1531,7 @@ void pc8801ma_state::machine_reset()
 	pc8801fh_state::machine_reset();
 
 	m_dic_bank = 0;
+	// disable by default (inverted in handler)
 	m_dic_ctrl = 0;
 }
 
@@ -1686,6 +1734,8 @@ void pc8801_state::pc8801(machine_config &config)
 	// CH3: <autoload only?>
 
 	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::clock_irq_w), attotime::from_hz(600));
+
+	ADDRESS_MAP_BANK(config, m_gvram_bank).set_map(&pc8801_state::gvram_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x4000);
 
 	// Note: original models up to OPNA variants really have an internal mono speaker,
 	// but user eventually can have a stereo mixing audio card mounted so for simplicity we MCM here.
