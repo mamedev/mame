@@ -7,7 +7,6 @@
 
     **** TODO ****
     - Commands to be tested: WR_BLR, WR_BL, RD_FSA_STAT, RCD
-    - More than 1 MBM
 
 *********************************************************************/
 
@@ -79,7 +78,7 @@ void fsa_channel_device::field_rotate()
 	rotate(m_bootloop, true);
 	for (unsigned i = 0; i < QUADS_PER_CH; i++) {
 		for (unsigned j = 0; j < LOOPS_PER_QUAD; j++) {
-			rotate(m_data_loops[ i ][ j ], true);
+			rotate(m_data_loops[i][j], true);
 		}
 	}
 	rotate(m_even_out, false);
@@ -226,7 +225,7 @@ void fsa_channel_device::dio_w(int data)
 		break;
 
 	case FSA_CMD_WRITE_BLR:
-		m_blr[ m_blr_idx ] = data != 0;
+		m_blr[m_blr_idx] = data != 0;
 		m_blr_idx++;
 		if (m_blr_idx == BLR_BITS) {
 			m_blr_idx = 0;
@@ -272,7 +271,7 @@ int fsa_channel_device::dio_r()
 			break;
 
 		case FSA_CMD_READ_BLR:
-			res = m_blr[ m_blr_idx ];
+			res = m_blr[m_blr_idx];
 			m_blr_idx++;
 			if (m_blr_idx == BLR_BITS) {
 				m_blr_idx = 0;
@@ -322,8 +321,8 @@ void fsa_channel_device::shiftclk()
 	case FSA_CMD_WRITE_DATA: {
 		bool gen = false;
 		// Writing to a good loop?
-		// LOGFSA("WR blr @%u=%u\n", get_blr_idx(), m_blr[ get_blr_idx() ]);
-		if (m_blr[ get_blr_idx() ]) {
+		// LOGFSA("WR blr @%u=%u\n", get_blr_idx(), m_blr[get_blr_idx()]);
+		if (m_blr[get_blr_idx()]) {
 			gen = fifo_dequeue();
 		}
 		m_blr_idx++;
@@ -331,14 +330,14 @@ void fsa_channel_device::shiftclk()
 			m_blr_idx = 0;
 		}
 		generate(gen);
-	}
 		break;
+	}
 
 	case FSA_CMD_READ_DATA: {
 		bool bit = detector_r();
 		// Reading from a good loop?
-		// LOGFSA("RD blr @%u=%u\n", get_blr_idx(), m_blr[ get_blr_idx() ]);
-		if (m_blr[ get_blr_idx() ]) {
+		// LOGFSA("RD blr @%u=%u\n", get_blr_idx(), m_blr[get_blr_idx()]);
+		if (m_blr[get_blr_idx()]) {
 			fifo_enqueue(bit);
 			if (BIT(m_status, STAT_ECF)) {
 				fire_code_syn(bit);
@@ -355,8 +354,8 @@ void fsa_channel_device::shiftclk()
 		if (m_blr_idx == BLR_BITS * 2) {
 			m_blr_idx = 0;
 		}
-	}
 		break;
+	}
 
 	default:
 		LOG("Cmd %d invalid in shiftclk\n", m_curr_cmd);
@@ -369,18 +368,18 @@ void fsa_channel_device::bubble_replicate()
 {
 	// Even quad
 	for (unsigned i = 0; i < LOOPS_PER_QUAD; ++i) {
-		m_even_out[ EVEN_OUT_LOOP80_POS - i * DATA_BIT_OUT_DIST ] = m_data_loops[ EVEN_QUAD ][ i ][ LOOP_RD_POS ];
+		m_even_out[EVEN_OUT_LOOP80_POS - i * DATA_BIT_OUT_DIST] = m_data_loops[EVEN_QUAD][i][LOOP_RD_POS];
 	}
 	// Odd quad
 	for (unsigned i = 0; i < LOOPS_PER_QUAD; ++i) {
-		m_odd_out[ ODD_OUT_LOOP80_POS - i * DATA_BIT_OUT_DIST ] = m_data_loops[ ODD_QUAD ][ i ][ LOOP_RD_POS ];
+		m_odd_out[ODD_OUT_LOOP80_POS - i * DATA_BIT_OUT_DIST] = m_data_loops[ODD_QUAD][i][LOOP_RD_POS];
 	}
 }
 
 void fsa_channel_device::bootloop_replicate()
 {
-	auto bl = m_bootloop[ LOOP_RD_POS ];
-	m_even_out[ EVEN_OUT_BL_POS ] = bl;
+	auto bl = m_bootloop[LOOP_RD_POS];
+	m_even_out[EVEN_OUT_BL_POS] = bl;
 }
 
 void fsa_channel_device::bubble_swap()
@@ -388,24 +387,24 @@ void fsa_channel_device::bubble_swap()
 	// Even quad
 	for (unsigned i = 0; i < LOOPS_PER_QUAD; i++) {
 		unsigned idx = EVEN_IN_LOOP80_POS - i * DATA_BIT_IN_DIST;
-		auto tmp = m_data_loops[ EVEN_QUAD ][ i ][ LOOP_WR_POS ];
-		m_data_loops[ EVEN_QUAD ][ i ][ LOOP_WR_POS ] = m_even_in[ idx ];
-		m_even_in[ idx ] = tmp;
+		auto tmp = m_data_loops[EVEN_QUAD][i][LOOP_WR_POS];
+		m_data_loops[EVEN_QUAD][i][LOOP_WR_POS] = m_even_in[idx];
+		m_even_in[idx] = tmp;
 	}
 	// Odd quad
 	for (unsigned i = 0; i < LOOPS_PER_QUAD; i++) {
 		unsigned idx = ODD_IN_LOOP80_POS - i * DATA_BIT_IN_DIST;
-		auto tmp = m_data_loops[ ODD_QUAD ][ i ][ LOOP_WR_POS ];
-		m_data_loops[ ODD_QUAD ][ i ][ LOOP_WR_POS ] = m_odd_in[ idx ];
-		m_odd_in[ idx ] = tmp;
+		auto tmp = m_data_loops[ODD_QUAD][i][LOOP_WR_POS];
+		m_data_loops[ODD_QUAD][i][LOOP_WR_POS] = m_odd_in[idx];
+		m_odd_in[idx] = tmp;
 	}
 }
 
 void fsa_channel_device::bootloop_swap()
 {
-	auto tmp = m_bootloop[ LOOP_WR_POS ];
-	m_bootloop[ LOOP_WR_POS ] = m_even_in[ EVEN_IN_BL_POS ];
-	m_even_in[ EVEN_IN_BL_POS ] = tmp;
+	auto tmp = m_bootloop[LOOP_WR_POS];
+	m_bootloop[LOOP_WR_POS] = m_even_in[EVEN_IN_BL_POS];
+	m_even_in[EVEN_IN_BL_POS] = tmp;
 }
 
 bool fsa_channel_device::errflg_r() const
@@ -428,7 +427,7 @@ void fsa_channel_device::load_image(const std::vector<uint8_t>& img)
 	decode_loop(it, m_bootloop);
 	for (unsigned i = 0; i < QUADS_PER_CH; i++) {
 		for (unsigned j = 0; j < LOOPS_PER_QUAD; j++) {
-			decode_loop(it, m_data_loops[ i ][ j ]);
+			decode_loop(it, m_data_loops[i][j]);
 		}
 	}
 	m_even_out.reset();
@@ -440,7 +439,7 @@ void fsa_channel_device::load_image(const std::vector<uint8_t>& img)
 // Default bootloop
 // It comes from https://hpmuseum.net/images/98259A_BubbleMemory-50.jpg
 // There are 138 good loops in each channel
-static const uint8_t default_bl[ fsa_channel_device::BL_BOOTLOOP_BITS / 8 ] = {
+static const uint8_t default_bl[fsa_channel_device::BL_BOOTLOOP_BITS / 8] = {
 	0xb7, 0xbb, 0xb3, 0xfb, 0x7f, 0xff, 0x37, 0x9f,
 	0xfb, 0xff, 0xf7, 0x7f, 0xbd, 0x9b, 0xfb, 0xff,
 	0xf5, 0xff, 0xfb, 0xff, 0xff, 0xff, 0x97, 0xff,
@@ -452,28 +451,28 @@ void fsa_channel_device::create_image()
 {
 	unsigned idx = 0;
 	for (unsigned i = 0; i < BL_PRE_SYNC_BITS; ++i) {
-		m_bootloop[ idx++ ] = 1;
+		m_bootloop[idx++] = 1;
 	}
 	for (unsigned i = 0; i < BL_SYNC_BITS; ++i) {
-		m_bootloop[ idx++ ] = 0;
+		m_bootloop[idx++] = 0;
 	}
 	for (unsigned i = 0; i < BL_PATTERN_BITS; ++i) {
-		m_bootloop[ idx++ ] = (i & 1) == 0;
+		m_bootloop[idx++] = (i & 1) == 0;
 	}
-	const uint8_t *bl = &default_bl[ 0 ];
+	const uint8_t *bl = &default_bl[0];
 	for (unsigned i = 0; i < BL_BOOTLOOP_BITS; i += 8) {
 		uint8_t tmp = *bl++;
 		for (unsigned j = 0; j < 8; j++) {
-			m_bootloop[ idx++ ] = BIT(tmp, 7 - j);
+			m_bootloop[idx++] = BIT(tmp, 7 - j);
 		}
 	}
 	for (unsigned i = 0; i < BL_PAD_BITS; ++i) {
-		m_bootloop[ idx++ ] = 0;
+		m_bootloop[idx++] = 0;
 	}
 
 	for (unsigned i = 0; i < QUADS_PER_CH; i++) {
 		for (unsigned j = 0; j < LOOPS_PER_QUAD; j++) {
-			m_data_loops[ i ][ j ].reset();
+			m_data_loops[i][j].reset();
 		}
 	}
 	m_even_out.reset();
@@ -490,7 +489,7 @@ std::vector<uint8_t> fsa_channel_device::save_image() const
 	encode_loop(m_bootloop, out);
 	for (unsigned i = 0; i < QUADS_PER_CH; i++) {
 		for (unsigned j = 0; j < LOOPS_PER_QUAD; j++) {
-			encode_loop(m_data_loops[ i ][ j ], out);
+			encode_loop(m_data_loops[i][j], out);
 		}
 	}
 	// Even though they are as non-volatile as data/boot loops, there's no need to save input/output tracks
@@ -594,7 +593,7 @@ void fsa_channel_device::set_enable(bool en)
 
 template<std::size_t N> void fsa_channel_device::rotate(std::bitset<N>& bits, bool loop)
 {
-	bool first = loop && bits[ 0 ];
+	bool first = loop && bits[0];
 	bits >>= 1;
 	if (first) {
 		bits.set(bits.size() - 1);
@@ -603,13 +602,13 @@ template<std::size_t N> void fsa_channel_device::rotate(std::bitset<N>& bits, bo
 
 bool fsa_channel_device::detector_r() const
 {
-	return m_even_out[ EVEN_OUT_DET_POS ] || m_odd_out[ ODD_OUT_DET_POS ];
+	return m_even_out[EVEN_OUT_DET_POS] || m_odd_out[ODD_OUT_DET_POS];
 }
 
 void fsa_channel_device::generate(bool bit)
 {
-	m_even_in[ EVEN_IN_GEN_POS ] = bit;
-	m_odd_in[ ODD_IN_GEN_POS ] = bit;
+	m_even_in[EVEN_IN_GEN_POS] = bit;
+	m_odd_in[ODD_IN_GEN_POS] = bit;
 }
 
 unsigned fsa_channel_device::fifo_size() const
@@ -623,7 +622,7 @@ void fsa_channel_device::fifo_enqueue(bool bit)
 		// FIFO overflow
 		BIT_SET(m_status, STAT_TIMERR);
 	} else {
-		m_fifo[ m_fifo_in_idx ] = bit;
+		m_fifo[m_fifo_in_idx] = bit;
 		m_fifo_in_idx++;
 		if (m_fifo_in_idx >= fifo_size()) {
 			m_fifo_in_idx = 0;
@@ -643,7 +642,7 @@ bool fsa_channel_device::fifo_dequeue()
 		// FIFO underflow
 		BIT_SET(m_status, STAT_TIMERR);
 	} else {
-		res = m_fifo[ m_fifo_out_idx ];
+		res = m_fifo[m_fifo_out_idx];
 		m_fifo_out_idx++;
 		if (m_fifo_out_idx >= fifo_size()) {
 			m_fifo_out_idx = 0;
@@ -738,7 +737,7 @@ void fsa_channel_device::encode_loop(const std::bitset<BITS_PER_LOOP>& loop, std
 	for (unsigned i = 0; i < BITS_PER_LOOP; i += 8) {
 		uint8_t tmp = 0;
 		for (unsigned j = 0; j < 8; j++) {
-			if (loop[ i + j ]) {
+			if (loop[i + j]) {
 				BIT_SET(tmp, j);
 			}
 		}
@@ -751,7 +750,7 @@ void fsa_channel_device::decode_loop(std::vector<uint8_t>::const_iterator& in, s
 	for (unsigned i = 0; i < BITS_PER_LOOP; i += 8) {
 		uint8_t tmp = *in++;
 		for (unsigned j = 0; j < 8; j++) {
-			loop[ i + j ] = BIT(tmp, j);
+			loop[i + j] = BIT(tmp, j);
 		}
 	}
 }
@@ -774,6 +773,7 @@ ibubble_device::ibubble_device(const machine_config &mconfig, const char *tag, d
 	, m_select_b(false)
 	, m_dirty(false)
 {
+	set_must_be_loaded(true);
 }
 
 void ibubble_device::field_rotate(int state)
@@ -1115,23 +1115,25 @@ void ibubble_device::device_add_mconfig(machine_config &config)
 //     else
 //       goto read_mbm_changed
 //   else
-//     ar = (ar + 1) & 0x7fff
-//     mbm_select_changed = selected_mbms != fsa_ch_mask(nfc,mbm_select)
+//     mbm_select_changed = check_mbm_change()
 //     if n_pages == 0
 //       set_op_complete()
 //       fsa_to_bmc_xfer()
+//       ar = (ar + 1) & 0x7fff
 //       leave_read_bubble()
 //     else if mbm_select_changed
 //       fsa_to_bmc_xfer() @S19
-//       cmd_w(selected_mbms, FSA_CMD_SWRESET) + delay @S1
+//       cmd_w(selected_mbms, FSA_CMD_SWRESET) + delay
+//       ar = (ar + 1) & 0x7fff
 //       goto read_mbm_changed
 //     else
+//       ar = (ar + 1) & 0x7fff
 //       delay 320 clocks @S4
 //       goto read_loop
 //   fn read_seek()
 //     @S0
 //     first_mbm = fsa_1st_mbm(nfc, mbm_select)
-//     while ar != m_la[ first_mbm ] || m_skip[ first_mbm ] != 0
+//     while ar != m_la[first_mbm] || m_skip[first_mbm] != 0
 //       field_rotate() + delay @S0
 //   fn read_ch_status()
 //     @S0
@@ -1216,7 +1218,7 @@ void ibubble_device::device_add_mconfig(machine_config &config)
 //   fn write_seek()
 //     @S0
 //     first_mbm = fsa_1st_mbm(nfc, mbm_select)
-//     while (ar + 0x706) & 0x7ff != m_la[ first_mbm ] || m_skip[ first_mbm ] != 0
+//     while (ar + 0x706) & 0x7ff != m_la[first_mbm] || m_skip[first_mbm] != 0
 //       field_rotate() + delay @S0
 // *************
 // * Read seek *
@@ -1418,8 +1420,8 @@ void ibubble_device::device_add_mconfig(machine_config &config)
 //         fifo_enqueue_bits(1, bit)
 //         if --cnt3 == 0
 //           mbm = fsa_1st_mbm(nfc, mbm_select)
-//           m_la[ mbm ] = 0
-//           m_skip[ mbm ] = 0
+//           m_la[mbm] = 0
+//           m_skip[mbm] = 0
 //           while cnt2 > 0
 //             delay 80 clocks @S8
 //             cnt2--
@@ -1692,20 +1694,20 @@ void i7220_1_device::field_rotate(fsm_state new_state)
 	for (unsigned i = 0; i < MAX_MBM; i++) {
 		// Update logical address
 		if (m_selected_chs & fsa_ch_mask(2, i)) {
-			LOGFSM("ROT bfr %u la %03x sk %u\n", i, m_la[ i ], m_skip[ i ]);
-			if (m_skip[ i ] == 0) {
-				if (BIT(m_la[ i ], 0)) {
-					m_skip[ i ] = 1;
+			LOGFSM("ROT bfr %u la %03x sk %u\n", i, m_la[i], m_skip[i]);
+			if (m_skip[i] == 0) {
+				if (BIT(m_la[i], 0)) {
+					m_skip[i] = 1;
 				} else {
-					m_la[ i ] = (m_la[ i ] + LA_DIST) & LA_MASK;
+					m_la[i] = (m_la[i] + LA_DIST) & LA_MASK;
 				}
-			} else if (m_skip[ i ] == 1) {
-				m_skip[ i ]++;
+			} else if (m_skip[i] == 1) {
+				m_skip[i]++;
 			} else {
-				m_skip[ i ] = 0;
-				m_la[ i ] = (m_la[ i ] + LA_DIST) & LA_MASK;
+				m_skip[i] = 0;
+				m_la[i] = (m_la[i] + LA_DIST) & LA_MASK;
 			}
-			LOGFSM("ROT aft %u la %03x sk %u\n", i, m_la[ i ], m_skip[ i ]);
+			LOGFSM("ROT aft %u la %03x sk %u\n", i, m_la[i], m_skip[i]);
 		}
 	}
 	delay(CLKS_ROTATE, new_state);
@@ -1814,7 +1816,7 @@ void i7220_1_device::update_drq()
 {
 	bool new_drq;
 
-	if (get_busy_state()) {
+	if (get_busy_state() && m_cmdr != cmds::CMDS_RESET_FIFO) {
 		if (BIT(m_en, EN_DMA)) {
 			if (m_read_cmd) {
 				new_drq = !m_fifo.empty();
@@ -2343,13 +2345,14 @@ void i7220_1_device::do_rd_data()
 				delay(CLKS_CMD, S14);
 			}
 		} else {
-			m_mbm_select_changed = inc_ar();
+			m_mbm_select_changed = check_mbm_change();
 			if (get_n_pages() == 0) {
 				set_op_complete();
 				call_subcmd(cmds::SUBCMD_FSA_BMC_XFER, S20);
 			} else if (m_mbm_select_changed) {
 				call_subcmd(cmds::SUBCMD_FSA_BMC_XFER, S19);
 			} else {
+				inc_ar();
 				delay(320, S4);
 			}
 		}
@@ -2381,7 +2384,7 @@ void i7220_1_device::do_rd_data()
 	case S15:
 		if (!BIT(m_str, STAT_UNCORRERR)) {
 			if (BIT(m_en, EN_INT_ERR)) {
-				m_fsm_state = S20;
+				m_fsm_state = S21;
 			} else {
 				cmd_w(m_selected_chs, fsa_channel_device::FSA_CMD_RCD);
 				delay(CLKS_CMD, S16);
@@ -2408,10 +2411,10 @@ void i7220_1_device::do_rd_data()
 			} else {
 				set_op_fail();
 			}
-			m_fsm_state = S20;
+			m_fsm_state = S21;
 		} else if (BIT(m_str, STAT_UNCORRERR)) {
 			set_op_fail();
-			m_fsm_state = S20;
+			m_fsm_state = S21;
 		} else {
 			m_fsm_state = S1;
 		}
@@ -2419,15 +2422,21 @@ void i7220_1_device::do_rd_data()
 
 	case S19:
 		cmd_w(m_selected_chs, fsa_channel_device::FSA_CMD_SWRESET);
+		inc_ar();
 		delay(CLKS_CMD, S1);
 		break;
 
 	case S20:
-		cmd_w(m_selected_chs, fsa_channel_device::FSA_CMD_NOP);
-		delay(CLKS_CMD, S21);
+		inc_ar();
+		m_fsm_state = S21;
 		break;
 
 	case S21:
+		cmd_w(m_selected_chs, fsa_channel_device::FSA_CMD_NOP);
+		delay(CLKS_CMD, S22);
+		break;
+
+	case S22:
 		leave();
 		break;
 
@@ -2492,8 +2501,8 @@ void i7220_1_device::do_wr_data()
 		dio_w(w << fsa_1st_ch());
 		m_cnt1 = 0;
 		delay(CLKS_SLOW_IO, S8);
-	}
 		break;
+	}
 
 	case S8:
 		if (m_cnt1 < fsa_channel_device::RAW_BITS) {
@@ -2847,8 +2856,8 @@ void i7220_1_device::do_rd_fsa_stat()
 		}
 		m_cnt1++;
 		m_fsm_state = S1;
-	}
 		break;
+	}
 
 	case S4:
 		set_op_complete_n_leave();
@@ -3042,8 +3051,8 @@ void i7220_1_device::do_rd_bl()
 			} else {
 				m_fsm_state = S3;
 			}
-		}
 			break;
+		}
 
 		case S7:
 			// Read BL bits
@@ -3055,8 +3064,8 @@ void i7220_1_device::do_rd_bl()
 				// Padding is not checked, its purpose is to keep even output track clean (filled with 0's) after synchronization
 				auto mbm = fsa_1st_mbm();
 				LOGCMD("SYNC %u %u %u\n", mbm, m_cnt1, m_cnt2);
-				m_la[ mbm ] = 0;
-				m_skip[ mbm ] = 0;
+				m_la[mbm] = 0;
+				m_skip[mbm] = 0;
 				m_fsm_state = S8;
 				return;
 			}
@@ -3079,8 +3088,8 @@ void i7220_1_device::do_rd_bl()
 			bootloop_replicate();
 			field_rotate(m_fsm_state);
 		}
-	}
 		break;
+	}
 	}
 }
 
@@ -3146,8 +3155,8 @@ void i7220_1_device::do_mbm_purge()
 	case S0:
 		m_initialized = true;
 		for (unsigned i = 0; i < MAX_MBM; i++) {
-			m_la[ i ] = 0;
-			m_skip[ i ] = 0;
+			m_la[i] = 0;
+			m_skip[i] = 0;
 		}
 		m_ar &= ~LA_MASK;
 		m_cnt1 = 0;
@@ -3210,7 +3219,7 @@ void i7220_1_device::do_swreset()
 void i7220_1_device::do_seek(uint16_t offset)
 {
 	auto first_mbm = fsa_1st_mbm();
-	if (((get_la() + offset) & LA_MASK) == m_la[ first_mbm ] && m_skip[ first_mbm ] == 0) {
+	if (((get_la() + offset) & LA_MASK) == m_la[first_mbm] && m_skip[first_mbm] == 0) {
 		// LA reached
 		ret_subcmd();
 	} else {
@@ -3264,8 +3273,8 @@ void i7220_1_device::do_read_ch_stat()
 		}
 		m_cnt1++;
 		m_fsm_state = S2;
-	}
 		break;
+	}
 
 	default:
 		LOG("Unexpected state %d in do_read_ch_stat", m_fsm_state);
@@ -3357,10 +3366,15 @@ uint16_t i7220_1_device::get_la() const
 
 bool i7220_1_device::inc_ar()
 {
-	auto old_mbm = get_mbm_select();
+	bool mbm_change = check_mbm_change();
 	m_ar = (m_ar + 1) & AR_MASK;
 	LOGFSM("AR: %04x\n", m_ar);
-	return old_mbm != get_mbm_select();
+	return mbm_change;
+}
+
+bool i7220_1_device::check_mbm_change() const
+{
+	return (m_ar & LA_MASK) == LA_MASK;
 }
 
 void i7220_1_device::select_chs()

@@ -23,6 +23,8 @@
 
 #include "screen.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 static constexpr u32 VRAM_SIZE  =   0x200000;

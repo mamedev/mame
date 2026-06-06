@@ -170,7 +170,6 @@ void cphantom_state::machine_start()
 {
 	phantom_state::machine_start();
 
-	m_eye_led.resolve();
 	save_item(NAME(m_select2));
 }
 

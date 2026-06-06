@@ -108,7 +108,7 @@ void dc7085_device::device_add_mconfig(machine_config &config)
 	 */
 	for (unsigned i = 0; i < std::size(m_chan); i++)
 	{
-		DC7085_CHANNEL(config, m_chan[i], 0);
+		DC7085_CHANNEL(config, m_chan[i]);
 
 		m_chan[i]->rx_done().set([this, i](u16 data) { rx_done((i << 8) | data); });
 		m_chan[i]->tx_cb().set([this, i](int state) { m_tx_cb[i](state); if (m_csr & CSR_MAINT) m_chan[i]->rx_w(state); });

@@ -78,10 +78,9 @@ public:
 		m_led(*this, "led0")
 	{ }
 
-	void tunhunt(machine_config &config);
+	void tunhunt(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override { m_led.resolve(); }
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 

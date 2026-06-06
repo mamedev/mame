@@ -525,11 +525,11 @@ void de_3_state::de_3(machine_config &config)
 void de_3_state::de_3_dmd2(machine_config &config)
 {
 	de_3(config);
-	DECODMD2(config, m_dmdtype2, 0);
+	DECODMD2(config, m_dmdtype2);
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DECOBSMT(config, m_decobsmt, 0);
+	DECOBSMT(config, m_decobsmt);
 	m_decobsmt->add_route(0, "speaker", 1.0, 0);
 	m_decobsmt->add_route(1, "speaker", 1.0, 1);
 }
@@ -537,11 +537,11 @@ void de_3_state::de_3_dmd2(machine_config &config)
 void de_3_state::de_3_dmd1(machine_config &config)
 {
 	de_3(config);
-	DECODMD1(config, m_dmdtype1, 0);
+	DECODMD1(config, m_dmdtype1);
 
 	SPEAKER(config, "speaker", 2).front();
 
-	DECOBSMT(config, m_decobsmt, 0);
+	DECOBSMT(config, m_decobsmt);
 	m_decobsmt->add_route(0, "speaker", 1.0, 0);
 	m_decobsmt->add_route(1, "speaker", 1.0, 1);
 }
@@ -549,7 +549,7 @@ void de_3_state::de_3_dmd1(machine_config &config)
 void de_3_state::de_3_dmdo(machine_config &config)
 {
 	de_3(config);
-	DECODMD1(config, m_dmdtype1, 0);
+	DECODMD1(config, m_dmdtype1);
 	de_bg_audio(config);
 }
 
@@ -568,12 +568,12 @@ void de_3_state::de_3b(machine_config &config)
 
 	genpin_audio(config);
 
-	DECODMD3(config, m_dmdtype3, 0);
+	DECODMD3(config, m_dmdtype3);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	DECOBSMT(config, m_decobsmt, 0);
+	DECOBSMT(config, m_decobsmt);
 	m_decobsmt->add_route(0, "speaker", 1.0, 0);
 	m_decobsmt->add_route(1, "speaker", 1.0, 1);
 }

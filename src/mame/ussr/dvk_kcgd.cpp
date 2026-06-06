@@ -460,7 +460,7 @@ void kcgd_state::kcgd(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_kcgd);
 
-	K1801VP033(config, m_pic, 0);
+	K1801VP033(config, m_pic);
 	m_pic->set_vec_a(0300);
 	m_pic->set_vec_b(0304);
 	m_pic->pic_out_wr_callback().set(FUNC(kcgd_state::palette_control));
@@ -490,7 +490,7 @@ void kcgd_state::kcgd(machine_config &config)
 	m_dl11kbd->txrdy_wr_callback().set_inputline(m_maincpu, t11_device::VEC_LINE);
 	m_dl11kbd->rxrdy_wr_callback().set_inputline(m_maincpu, t11_device::VEC_LINE);
 
-	MS7004(config, m_ms7004, 0);
+	MS7004(config, m_ms7004);
 	m_ms7004->tx_handler().set(m_dl11kbd, FUNC(k1801vp065_device::rx_w));
 }
 

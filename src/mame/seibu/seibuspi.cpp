@@ -1789,14 +1789,14 @@ void seibuspi_tilemap_state::base_video(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::BLACK, 6144);
 
-	SEI25X_RISE1X(config, m_spritegen, 0, m_palette, gfx_spi_spr);
+	SEI25X_RISE1X(config, m_spritegen, m_palette, gfx_spi_spr);
 	m_spritegen->set_screen("screen");
 	m_spritegen->set_gfxbank_callback(FUNC(seibuspi_state::gfxbank_callback));
 	m_spritegen->set_pix_raw_shift(6);
 	m_spritegen->set_pri_raw_shift(14);
 	m_spritegen->set_transpen(63);
 
-	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc"));
 	crtc.decrypt_key_callback().set(FUNC(seibuspi_tilemap_state::tile_decrypt_key_w));
 	crtc.layer_en_callback().set(FUNC(seibuspi_tilemap_state::layer_enable_w));
 	crtc.reg_1a_callback().set(FUNC(seibuspi_tilemap_state::layer_bank_w));
@@ -1985,7 +1985,7 @@ void sys386f_state::sys386f(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::BLACK, 8192);
 
-	SEI25X_RISE1X(config, m_spritegen, 0, m_palette, gfx_sys386f);
+	SEI25X_RISE1X(config, m_spritegen, m_palette, gfx_sys386f);
 	m_spritegen->set_screen("screen");
 	m_spritegen->set_pix_raw_shift(8);
 	m_spritegen->set_pri_raw_shift(14);

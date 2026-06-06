@@ -24,7 +24,7 @@ Hardware notes:
 
 H8/325 C88 MCU is used in:
 - Novag Emerald Classic Plus
-- Novag Amber (suspected)
+- Novag Amber
 - Novag Turquoise (suspected)
 - Excalibur Karpov 2294 (Excalibur brand Emerald Classic Plus)
 
@@ -56,6 +56,8 @@ There's also a newer version with a H8/3687 MCU.
 #include "screen.h"
 #include "speaker.h"
 
+#include <bit>
+
 // internal artwork
 #include "novag_emerclp.lh"
 #include "novag_obsidian.lh"
@@ -77,16 +79,17 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
-	template <typename T> void cpu_config(T &maincpu);
-	void shared(machine_config &config);
-	void emerclp(machine_config &config);
-	void obsidian(machine_config &config);
+	void emerclp(machine_config &config) ATTR_COLD;
+	void obsidian(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD { set_power(true); }
+
+	template <typename T> void cpu_config(T &maincpu) ATTR_COLD;
+	void shared(machine_config &config) ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -121,8 +124,6 @@ private:
 
 void emerclp_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_power));
 	save_item(NAME(m_inp_mux));
@@ -182,7 +183,7 @@ void emerclp_state::update_lcd()
 	for (int i = 0; i < 4; i++)
 	{
 		// LCD common is analog (voltage level)
-		const u8 com = population_count_32(m_lcd_com >> (i * 2) & 3);
+		const u8 com = std::popcount(m_lcd_com >> (i * 2) & 3U);
 		const u16 data = (com == 0) ? lcd_segs : (com == 2) ? ~lcd_segs : 0;
 		m_lcd_pwm->write_row(i, data);
 	}

@@ -208,7 +208,7 @@ public:
 	virtual void exit() override
 	{
 		// tell clients MAME is shutting down
-		notify("mame_stop", 1);
+		m_server->deliver_to_all("mame_stop = 1\r");
 		m_io_context->stop();
 		m_working_thread.join();
 		m_server.reset();
@@ -218,10 +218,20 @@ public:
 
 	// output_module
 
-	virtual void notify(const char *outname, int32_t value) override
+	virtual void notify(const output_item &item, std::int32_t seconds, std::int64_t attoseconds) override
 	{
-		auto msg = util::string_format("%s = %d\r", ((outname==nullptr) ? "none" : outname), value);
+		auto msg = util::string_format("%s = %d\r", item.qualified_name(), item.value());
 		m_server->deliver_to_all(msg);
+	}
+
+	virtual void pause() override
+	{
+		m_server->deliver_to_all("pause = 1\r");
+	}
+
+	virtual void resume() override
+	{
+		m_server->deliver_to_all("pause = 0\r");
 	}
 
 	// implementation

@@ -132,7 +132,7 @@ public:
 	configuration_manager  &configuration() const { assert(m_configuration != nullptr); return *m_configuration; }
 	output_manager  &output() const { assert(m_output != nullptr); return *m_output; }
 	ui_manager &ui() const { assert(m_ui != nullptr); return *m_ui; }
-	ui_input_manager &ui_input() const { assert(m_ui_input != nullptr); return *m_ui_input; }
+	ui_input_manager &ui_input() const noexcept;
 	crosshair_manager &crosshair() const { assert(m_crosshair != nullptr); return *m_crosshair; }
 	image_manager &image() const { assert(m_image != nullptr); return *m_image; }
 	rom_load_manager &rom_load() const { assert(m_rom_load != nullptr); return *m_rom_load; }
@@ -272,7 +272,7 @@ private:
 	std::unique_ptr<sound_manager> m_sound;            // internal data from sound.cpp
 	std::unique_ptr<video_manager> m_video;            // internal data from video.cpp
 	ui_manager *m_ui;                                  // internal data from ui.cpp
-	std::unique_ptr<ui_input_manager> m_ui_input;      // internal data from uiinput.cpp
+	std::unique_ptr<ui_input_manager_impl> m_ui_input; // internal data from uiinput.cpp
 	std::unique_ptr<tilemap_manager> m_tilemap;        // internal data from tilemap.cpp
 	std::unique_ptr<debug_view_manager> m_debug_view;  // internal data from debugvw.cpp
 	std::unique_ptr<network_manager> m_network;        // internal data from network.cpp

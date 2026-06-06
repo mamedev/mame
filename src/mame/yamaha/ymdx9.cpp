@@ -175,7 +175,6 @@ private:
  */
 void yamaha_dx9_state::machine_start()
 {
-	m_leds.resolve();
 	m_rx_data = ASSERT_LINE;
 }
 

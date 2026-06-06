@@ -225,8 +225,8 @@ public:
 	void set_mmc1_type(mmc1_type val) {  m_mmc1_type = val; }
 	void set_vrc_lines(int PRG_A, int PRG_B, int CHR) { m_vrc_ls_prg_a = PRG_A; m_vrc_ls_prg_b = PRG_B; m_vrc_ls_chr = CHR; }
 	void set_n163_vol(int vol) { m_n163_vol = vol; }
-	void set_outer_prg_size(int val) { m_outer_prg_size = val; }
-	void set_outer_chr_size(int val) { m_outer_chr_size = val; }
+	void set_outer_prg_size(unsigned val) { m_outer_prg_size = val; }
+	void set_outer_chr_size(unsigned val) { m_outer_chr_size = val; }
 	void set_smd133_addr(int val) {  m_smd133_addr = val; }
 	void set_x1_005_alt(bool val) { m_x1_005_alt_mirroring = val; }
 	void set_bus_conflict(bool val) { m_bus_conflict = val; }
@@ -298,8 +298,8 @@ protected:
 	int m_vrc_ls_prg_b;
 	int m_vrc_ls_chr;
 	int m_n163_vol;
-	int m_outer_prg_size;
-	int m_outer_chr_size;
+	unsigned m_outer_prg_size;
+	unsigned m_outer_chr_size;
 	int m_smd133_addr;
 
 	int32_t m_mirroring;

@@ -56,7 +56,10 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	void thedealr(machine_config &config);
+	void thedealr(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// IOX
@@ -80,8 +83,6 @@ private:
 
 	void thedealr_main(address_map &map) ATTR_COLD;
 	void thedealr_sub(address_map &map) ATTR_COLD;
-
-	virtual void machine_start() override ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -447,7 +448,6 @@ GFXDECODE_END
 
 void thedealr_state::machine_start()
 {
-	m_leds.resolve();
 	m_led_timer = timer_alloc(FUNC(thedealr_state::update_leds), this);
 
 	m_iox_p1 = 0xff;

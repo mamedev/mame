@@ -860,7 +860,7 @@ void lastbank_state::lastbank(machine_config &config)
 
 	OKIM6295(config, m_oki, 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	ES8712(config, m_essnd, 0);
+	ES8712(config, m_essnd);
 	m_essnd->msm_write_handler().set("msm", FUNC(msm6585_device::data_w));
 	m_essnd->set_msm_tag("msm");
 

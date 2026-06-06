@@ -134,10 +134,10 @@ void elzet80_state::elzet80(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", elzet80_floppies, "fdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", elzet80_floppies, "fdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
-	Z80PIO(config, m_pio, 0);
-	Z80SIO(config, m_uart, 0);
-	Z80CTC(config, m_ctc, 0);
-	Z80DMA(config, m_dma, 0);
+	Z80PIO(config, m_pio);
+	Z80SIO(config, m_uart);
+	Z80CTC(config, m_ctc);
+	Z80DMA(config, m_dma);
 }
 
 

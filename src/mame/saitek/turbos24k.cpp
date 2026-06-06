@@ -54,7 +54,7 @@ public:
 		m_lcd_colon(*this, "lc%u", 0U)
 	{ }
 
-	void turbos24k(machine_config &config);
+	void turbos24k(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
@@ -95,9 +95,6 @@ private:
 
 void turbos24k_state::machine_start()
 {
-	m_lcd_digits.resolve();
-	m_lcd_colon.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));

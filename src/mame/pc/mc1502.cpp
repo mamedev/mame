@@ -348,7 +348,7 @@ void mc1502_state::mc1502(machine_config &config)
 	m_ppi8255n2->in_pc_callback().set("cent_status_in", FUNC(input_buffer_device::read));
 	m_ppi8255n2->out_pc_callback().set(FUNC(mc1502_state::mc1502_kppi_portc_w));
 
-	I8251(config, m_upd8251, 0);
+	I8251(config, m_upd8251);
 	m_upd8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_upd8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_upd8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -361,7 +361,7 @@ void mc1502_state::mc1502(machine_config &config)
 	rs232.dsr_handler().set(m_upd8251, FUNC(i8251_device::write_dsr));
 	rs232.cts_handler().set(m_upd8251, FUNC(i8251_device::write_cts));
 
-	isa8_device &isa(ISA8(config, "isa", 0));
+	isa8_device &isa(ISA8(config, "isa"));
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
 	isa.irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w));

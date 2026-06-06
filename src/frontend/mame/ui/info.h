@@ -103,7 +103,7 @@ private:
 class menu_game_info : public menu_textbox
 {
 public:
-	menu_game_info(mame_ui_manager &mui, render_container &container);
+	menu_game_info(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_game_info() override;
 
 protected:
@@ -112,13 +112,17 @@ protected:
 
 private:
 	virtual void populate() override;
+
+	void reload(device_image_interface::media_change_event ev);
+
+	std::vector<util::notifier_subscription> m_notifiers;
 };
 
 
 class menu_warn_info : public menu_textbox
 {
 public:
-	menu_warn_info(mame_ui_manager &mui, render_container &container);
+	menu_warn_info(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_warn_info() override;
 
 protected:
@@ -126,25 +130,6 @@ protected:
 
 private:
 	virtual void populate() override;
-};
-
-
-class menu_image_info : public menu
-{
-public:
-	menu_image_info(mame_ui_manager &mui, render_container &container);
-	virtual ~menu_image_info() override;
-
-protected:
-	virtual void menu_activated() override;
-
-private:
-	virtual void populate() override;
-	virtual bool handle(event const *ev) override;
-	void image_info(device_image_interface &image);
-	void reload(device_image_interface::media_change_event ev);
-
-	std::vector<util::notifier_subscription> m_notifiers;
 };
 
 } // namespace ui

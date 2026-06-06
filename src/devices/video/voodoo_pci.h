@@ -59,8 +59,15 @@ public:
 		set_cpu(std::forward<T>(cpu_tag));
 		set_screen(std::forward<U>(screen_tag));
 	}
+	template <typename T, typename U>
+	voodoo_1_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&screen_tag)
+		: voodoo_1_pci_device(mconfig, tag, owner)
+	{
+		set_cpu(std::forward<T>(cpu_tag));
+		set_screen(std::forward<U>(screen_tag));
+	}
 
-	voodoo_1_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	voodoo_1_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -79,7 +86,7 @@ public:
 		set_screen(std::forward<U>(screen_tag));
 	}
 
-	voodoo_2_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	voodoo_2_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -98,7 +105,7 @@ public:
 		set_screen(std::forward<U>(screen_tag));
 	}
 
-	voodoo_banshee_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	voodoo_banshee_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	voodoo_banshee_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -121,8 +128,15 @@ public:
 		set_cpu(std::forward<T>(cpu_tag));
 		set_screen(std::forward<U>(screen_tag));
 	}
+	template <typename T, typename U>
+	voodoo_banshee_x86_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&screen_tag)
+		: voodoo_banshee_x86_pci_device(mconfig, tag, owner)
+	{
+		set_cpu(std::forward<T>(cpu_tag));
+		set_screen(std::forward<U>(screen_tag));
+	}
 
-	voodoo_banshee_x86_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	voodoo_banshee_x86_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -143,8 +157,15 @@ public:
 		set_cpu(std::forward<T>(cpu_tag));
 		set_screen(std::forward<U>(screen_tag));
 	}
+	template <typename T, typename U>
+	voodoo_3_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&screen_tag)
+		: voodoo_3_pci_device(mconfig, tag, owner)
+	{
+		set_cpu(std::forward<T>(cpu_tag));
+		set_screen(std::forward<U>(screen_tag));
+	}
 
-	voodoo_3_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	voodoo_3_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	voodoo_3_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -168,7 +189,7 @@ public:
 		set_screen(std::forward<U>(screen_tag));
 	}
 
-	voodoo_3000_x86_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	voodoo_3000_x86_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	virtual void device_start() override ATTR_COLD;

@@ -1179,7 +1179,6 @@ public:
 	void init_ped42() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 	uint8_t pottnpkr_mux_port_r();
@@ -5290,8 +5289,6 @@ DISCRETE_SOUND_END
 
 MACHINE_START_MEMBER(goldnpkr_state, mondial)
 {
-	m_lamps.resolve();
-
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x4000);
 }
@@ -5766,7 +5763,7 @@ void blitz_state::megadpkr(machine_config &config)
 	m_mcu->portb_w().set(FUNC(blitz_state::mcu_portb_w));
 	m_mcu->portc_w().set(FUNC(blitz_state::mcu_portc_w));
 
-	M48T02(config, "timekpr", 0);
+	M48T02(config, "timekpr");
 
 	PIA6821(config, m_pia[0]);
 	m_pia[0]->readpa_handler().set(FUNC(blitz_state::pottnpkr_mux_port_r));

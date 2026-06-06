@@ -40,28 +40,28 @@ private:
 class elim_audio_device : public segag80_audio_device_base
 {
 public:
-	elim_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	elim_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
 class zektor_audio_device : public segag80_audio_device_base
 {
 public:
-	zektor_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	zektor_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
 class spacfury_audio_device : public segag80_audio_device_base
 {
 public:
-	spacfury_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	spacfury_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
 class astrob_audio_device : public segag80_audio_device_base
 {
 public:
-	astrob_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	astrob_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 

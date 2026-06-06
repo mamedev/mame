@@ -102,16 +102,16 @@ license:CC0-1.0
 			<bounds x="145" y="200" width="9" height="17"/>
 		</element>
 
-		<element name="sreel1" ref="SteppersReel1" state="0">
+		<element name="reel1:scroll" ref="SteppersReel1" state="0">
 			<bounds x="85" y="491.3333" width="50" height="90"/>
 		</element>
-		<element name="sreel2" ref="SteppersReel2" state="0">
+		<element name="reel2:scroll" ref="SteppersReel2" state="0">
 			<bounds x="161" y="491.3333" width="50" height="90"/>
 		</element>
-		<element name="sreel3" ref="SteppersReel3" state="0">
+		<element name="reel3:scroll" ref="SteppersReel3" state="0">
 			<bounds x="236" y="491.3333" width="50" height="90"/>
 		</element>
-		<element name="sreel4" ref="SteppersReel4" state="0">
+		<element name="reel4:scroll" ref="SteppersReel4" state="0">
 			<bounds x="277" y="214" width="40" height="80"/>
 		</element>
 		<element name="lamp0" ref="matrixlamp" state="0">

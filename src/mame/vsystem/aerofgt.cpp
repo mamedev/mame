@@ -59,7 +59,7 @@ private:
 	void gfxbank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t tile_callback(uint32_t code);
 	uint32_t pri_callback(uint32_t color);
-	void soundlatch_pending_w(int state);
+	uint8_t soundlatch_pending_r();
 	void sh_bankswitch_w(uint8_t data);
 
 	void main_map(address_map &map) ATTR_COLD;
@@ -82,11 +82,12 @@ private:
 
 	required_memory_bank m_soundbank;
 
-	// video-related
-	tilemap_t   *m_tilemap[2]{};
-	uint8_t     m_gfxbank[8]{};
-	uint16_t    m_bank[4]{};
-	uint16_t    m_scrolly[2]{};
+	// variables
+	tilemap_t *m_tilemap[2]{};
+	uint8_t m_gfxbank[8]{};
+	uint16_t m_bank[4]{};
+	uint16_t m_scrolly[2]{};
+	bool m_z80_sync = false;
 };
 
 
@@ -187,13 +188,18 @@ uint32_t aerofgt_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-void aerofgt_state::soundlatch_pending_w(int state)
+uint8_t aerofgt_state::soundlatch_pending_r()
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+	{
+		// retry_access() forces the z80 to catch up before maincpu does the read
+		if (!m_z80_sync)
+			m_maincpu->retry_access();
 
-	// NMI routine is very short, so briefly set perfect_quantum to make sure that the timing is right
-	if (state)
-		machine().scheduler().perfect_quantum(attotime::from_usec(100));
+		m_z80_sync = !m_z80_sync;
+	}
+
+	return m_soundlatch->pending_r();
 }
 
 void aerofgt_state::sh_bankswitch_w(uint8_t data)
@@ -353,11 +359,14 @@ GFXDECODE_END
 void aerofgt_state::machine_start()
 {
 	m_soundbank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
+
+	save_item(NAME(m_z80_sync));
 }
 
 void aerofgt_state::machine_reset()
 {
 	m_soundbank->set_entry(0);
+	m_z80_sync = false;
 }
 
 void aerofgt_state::aerofgt(machine_config &config)
@@ -371,17 +380,17 @@ void aerofgt_state::aerofgt(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &aerofgt_state::sound_portmap); // IRQs are triggered by the YM2610
 
-	vs9209_device &io(VS9209(config, "io", 0));
+	vs9209_device &io(VS9209(config, "io"));
 	io.porta_input_cb().set_ioport("P1");
 	io.portb_input_cb().set_ioport("P2");
 	io.portc_input_cb().set_ioport("SYSTEM");
 	io.portd_input_cb().set_ioport("DSW1");
 	io.porte_input_cb().set_ioport("DSW2");
-	io.portg_input_cb().set(m_soundlatch, FUNC(generic_latch_8_device::pending_r)).lshift(0);
+	io.portg_input_cb().set(FUNC(aerofgt_state::soundlatch_pending_r));
 	io.portg_output_cb().set("watchdog", FUNC(mb3773_device::write_line_ck)).bit(7);
 	io.porth_input_cb().set_ioport("JP1");
 
-	MB3773(config, "watchdog", 0);
+	MB3773(config, "watchdog");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -395,7 +404,7 @@ void aerofgt_state::aerofgt(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aerofgt);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	VSYSTEM_SPR(config, m_spr, 0, m_palette, gfx_aerofgt_spr);
+	VSYSTEM_SPR(config, m_spr, m_palette, gfx_aerofgt_spr);
 	m_spr->set_tile_indirect_cb(FUNC(aerofgt_state::tile_callback));
 	m_spr->set_pri_cb(FUNC(aerofgt_state::pri_callback));
 
@@ -403,10 +412,10 @@ void aerofgt_state::aerofgt(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set(FUNC(aerofgt_state::soundlatch_pending_w));
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000)));  // verified on pcb
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000))); // verified on pcb
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "speaker", 0.75, 0);
 	ymsnd.add_route(0, "speaker", 0.75, 1);

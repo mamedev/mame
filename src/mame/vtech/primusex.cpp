@@ -21,9 +21,13 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "video/hd61202.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
+
+#include <bit>
+
 
 namespace {
 
@@ -185,7 +189,7 @@ ioport_value primusex_state::encoder_r()
 	if (cursor_keys == 0)
 		return 0xf;
 	else
-		return 31 - count_leading_zeros_32(cursor_keys);
+		return std::bit_width(cursor_keys) - 1;
 }
 
 INPUT_PORTS_START(primusex)

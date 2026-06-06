@@ -29,6 +29,9 @@
 
 #include "rendersw.hxx"
 
+#include <bit>
+#include <cstdio>
+
 
 //**************************************************************************
 //  DEBUGGING
@@ -65,11 +68,9 @@ const bool video_manager::s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
 //  VIDEO MANAGER
 //**************************************************************************
 
-static void video_notifier_callback(const char *outname, s32 value, void *param)
+static void video_notifier_callback(void *param, osd::output_item const &output, s32 seconds, s64 attoseconds)
 {
-	video_manager *vm = (video_manager *)param;
-
-	vm->set_output_changed();
+	reinterpret_cast<video_manager *>(param)->set_output_changed();
 }
 
 
@@ -176,7 +177,7 @@ video_manager::video_manager(running_machine &machine)
 	{
 		m_screenless_frame_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(video_manager::screenless_update_callback), this));
 		m_screenless_frame_timer->adjust(screen_device::DEFAULT_FRAME_PERIOD, 0, screen_device::DEFAULT_FRAME_PERIOD);
-		machine.output().set_global_notifier(video_notifier_callback, this);
+		machine.output().add_global_notifier(video_notifier_callback, this);
 	}
 }
 
@@ -766,7 +767,7 @@ void video_manager::update_throttle(attotime emutime)
 		// if we're more than 1/10th of a second out, or if we are behind at all and emulation
 		// is taking longer than the real frame, we just need to resync
 		if (real_is_ahead_attoseconds < -ATTOSECONDS_PER_SECOND / 10 ||
-			(real_is_ahead_attoseconds < 0 && population_count_32(m_throttle_history & 0xff) < 6))
+			(real_is_ahead_attoseconds < 0 && std::popcount(m_throttle_history & 0xff) < 6))
 		{
 			if (LOG_THROTTLE)
 				machine().logerror("Resync due to being behind: %s (history=%08X)\n", attotime(0, -real_is_ahead_attoseconds).as_string(18), m_throttle_history);

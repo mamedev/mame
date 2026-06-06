@@ -107,7 +107,6 @@ private:
 
 void ivanto_state::machine_start()
 {
-	m_out_lcd.resolve();
 	m_rombank->configure_entries(0, 64, memregion("rombank")->base(), 0x4000);
 
 	// periodically check for interrupts

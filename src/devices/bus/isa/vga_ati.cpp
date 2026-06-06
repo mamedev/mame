@@ -85,7 +85,7 @@ void isa16_vga_gfxultra_device::device_add_mconfig(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	ATI_VGA(config, m_vga, 0);
+	ATI_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x100000);
 	m_vga->eeprom_data_in_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read));
@@ -102,7 +102,7 @@ void isa16_vga_gfxultrapro_device::device_add_mconfig(machine_config &config)
 
 	EEPROM_93C56_16BIT(config, m_eeprom);
 
-	ATIMACH32(config, m_vga, 0);
+	ATIMACH32(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x400000);
 	m_vga->eeprom_data_in_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read));
@@ -119,7 +119,7 @@ void isa16_vga_mach64_device::device_add_mconfig(machine_config &config)
 
 	EEPROM_93C56_16BIT(config, m_eeprom);
 
-	ATIMACH64(config, m_vga, 0);
+	ATIMACH64(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x400000);
 	m_vga->eeprom_data_in_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read));

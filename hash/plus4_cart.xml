@@ -149,27 +149,27 @@ license:CC0-1.0
 	</software>
 
 	<software name="diag264p">
-		<description>Diag 264 (PAL)</description>
+		<description>Diag 264 (v0.97, PAL)</description>
 		<year>2012</year>
 		<publisher>crock</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="diag264c_pal.bin" size="0x4000" crc="c314c674" sha1="4acadaf84ecc3eb252ad765fdab583c45e771fd0" offset="0" />
+				<rom name="diag264_097_pal_lowrom.bin" size="16384" crc="743eac8f" sha1="af4d1224199e7f68f3be7a845e4e3af97bbd6d06" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="diag264n" cloneof="diag264p">
-		<description>Diag 264 (NTSC)</description>
+		<description>Diag 264 (v0.97, NTSC)</description>
 		<year>2012</year>
 		<publisher>crock</publisher>
 		<sharedfeat name="compatibility" value="NTSC"/>
 
 		<part name="cart" interface="plus4_cart">
 			<dataarea name="c1l" size="0x4000">
-				<rom name="diag264c_ntsc.bin" size="0x4000" crc="9398ae1c" sha1="d75a28a1a9727914620d57157768c3a84b23544a" offset="0" />
+				<rom name="diag264_097_ntsc_lowrom.bin" size="16384" crc="b7f74cdf" sha1="efd6cecac83d5e7e44f7e56ec369b4d408c7c6a2" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -243,7 +243,7 @@ class galgames_slot_device : public device_t, public device_memory_interface
 {
 public:
 	// construction/destruction
-	galgames_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	galgames_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void slot_map(address_map &map) ATTR_COLD;
 
@@ -1008,7 +1008,7 @@ void galgames_state::galgames_base(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(galgames_state::scanline_interrupt), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
-	GALGAMES_SLOT(config, m_slot, 0);
+	GALGAMES_SLOT(config, m_slot);
 	GALGAMES_BIOS_CART(config, "cart0", 0);
 
 	// video hardware

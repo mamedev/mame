@@ -140,7 +140,7 @@ private:
 class deco146_device : public deco_146_base_device
 {
 public:
-	deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 DECLARE_DEVICE_TYPE(DECO146PROT, deco146_device)

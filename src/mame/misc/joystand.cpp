@@ -94,6 +94,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/tmp68301.h"
 #include "machine/bankdev.h"
 #include "machine/eepromser.h"
@@ -102,7 +103,9 @@ TODO:
 #include "machine/msm6242.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
+
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
@@ -141,7 +144,6 @@ public:
 	void x180ii(machine_config &config);
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -636,16 +638,6 @@ static GFXDECODE_START( gfx_x180ii )
 	GFXDECODE_ENTRY( "tiles", 0,        gfx_8x8x4_packed_msb, 0, 0x100 )
 	GFXDECODE_ENTRY( "tiles", 0x200000, layout_16x16x8,       0, 0x10 ) // wrong
 GFXDECODE_END
-
-
-void joystand_state::machine_start()
-{
-	m_blocker.resolve();
-	m_error_lamp.resolve();
-	m_photo_lamp.resolve();
-	m_ok_button_led.resolve();
-	m_cancel_button_led.resolve();
-}
 
 
 void joystand_state::joystand(machine_config &config)

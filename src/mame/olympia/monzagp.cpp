@@ -174,8 +174,6 @@ void monzagp_state::machine_start()
 	save_item(NAME(m_mycar_pos));
 
 	m_nvram->set_base(m_score_ram, 0x100);
-
-	m_digits.resolve();
 }
 
 uint32_t monzagp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

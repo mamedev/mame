@@ -1238,8 +1238,6 @@ void px4p_state::init_px4p()
 
 void px4_state::machine_start()
 {
-	m_leds.resolve();
-
 	for (int i = 0; i < 2; i++)
 		m_caps_rom[i] = m_caps[i]->get_rom_base();
 

@@ -538,7 +538,6 @@ uint8_t hotchili_state::extram_r(offs_t offset)
 
 void hotchili_state::machine_start()
 {
-	m_lamp.resolve();
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 }
 

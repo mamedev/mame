@@ -16,8 +16,8 @@
  *   http://www.bitsavers.org/pdf/3Com/1569-03_EtherLink_Plus_Technical_Reference_Jan89.pdf
  *
  * TODO
- *   - resolve intermittent diagnostics bug on 8-bit dma channels
- *   - 8-bit isa slot support
+ *   - resolve intermittent diagnostics bug on 8-bit DMA channels
+ *   - 8-bit ISA slot support
  *   - revision 1.0 and 2.0 hardware/firmware variants
  *   - 8023 loopback mode
  */
@@ -244,8 +244,6 @@ void isa16_3c505_device::device_start()
 
 	m_cpu->space(0).install_ram(0x00000, m_ram->mask() & 0xfffff, m_ram->pointer());
 	m_net->space(0).install_ram(0x00000, m_ram->mask() & 0xfffff, m_ram->pointer());
-
-	m_led.resolve();
 
 	save_item(NAME(m_acmdr));
 	save_item(NAME(m_acr));

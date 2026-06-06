@@ -498,6 +498,14 @@ ROM_START( jpaddp )
 	ROM_LOAD( "mx25l6406e.sfrom1", 0x0000, 0x800000, CRC(4e482f10) SHA1(e393090a98324fb33374d2203ef7763e1e15b361) )
 ROM_END
 
+ROM_START( jpad )
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx25l6406e.sfrom1", 0x0000, 0x800000, CRC(be2d7c59) SHA1(9b205b1a35e26720726fecac2d4523ef9a6e4d9d) )
+
+	DISK_REGION( "sdcard" ) // 2GB SD Card (might just be user data)
+	DISK_IMAGE( "jewel", 0, SHA1(6b39a2617ebbf9b2bebbf5ae118ea032072c011e) )
+ROM_END
+
 ROM_START( dinopc )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
@@ -604,7 +612,7 @@ CONS( 2014, bandolap,        0,        0,      gpl32612, gpl32612, generalplus_g
 CONS( 2018, disbestf,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney & Disney/Pixar Characters Best Friends PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32630A
-CONS( 2020, anp2020t,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman Chiiku Paddo (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2020, anp2020t,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman Chiiku Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32630A has GPspispi header  マーメイドアクアポット
 CONS( 2021, banaquap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Tropical Rouge! PreCure: Mermaid Aqua Pot (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
@@ -690,6 +698,8 @@ CONS( 201?, segcarsh,            0,        0,      gpl32612, gpl32612, generalpl
 
 // uses glob, has GPSPI header
 CONS( 201?, jpaddp,              0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Jewel Pad Diamond Premium (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+CONS( 201?, jpad,                0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Jewel Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32600A
 // マウスでバトル!! 恐竜図鑑パソコン

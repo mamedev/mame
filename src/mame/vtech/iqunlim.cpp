@@ -199,7 +199,7 @@ void iqunlim_state::iqunlim(machine_config &config)
 	m_screen->set_visarea(0, 480 - 1, 0, 260 - 1);
 	m_screen->set_screen_update(FUNC(iqunlim_state::screen_update));
 
-	MC68328_LCD(config, m_lcdctrl, 0);
+	MC68328_LCD(config, m_lcdctrl);
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "iqunlim_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);

@@ -1173,13 +1173,13 @@ void scramble_state::scramble(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &scramble_state::scramble_sound_io_map);
 	m_audiocpu->set_irq_acknowledge_callback(FUNC(scramble_state::scramble_sh_irq_callback));
 
-	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
+	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1"));
 	ttl7474_9m_1.output_cb().set(FUNC(scramble_state::galaxold_7474_9m_1_callback));
 
-	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
+	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2"));
 	ttl7474_9m_2.comp_output_cb().set(FUNC(scramble_state::galaxold_7474_9m_2_q_callback));
 
-	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
+	ttl7474_device &konami_7474(TTL7474(config, "konami_7474"));
 	konami_7474.comp_output_cb().set(FUNC(scramble_state::scramble_sh_7474_q_callback));
 
 	TIMER(config, "int_timer").configure_generic(FUNC(scramble_state::galaxold_interrupt_timer));
@@ -1400,13 +1400,13 @@ void scramble_state::ad2083(machine_config &config)
 	Z80(config, m_maincpu, 18432000/6);    /* 3.072 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &scramble_state::ad2083_map);
 
-	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
+	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1"));
 	ttl7474_9m_1.output_cb().set(FUNC(scramble_state::galaxold_7474_9m_1_callback));
 
-	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
+	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2"));
 	ttl7474_9m_2.comp_output_cb().set(FUNC(scramble_state::galaxold_7474_9m_2_q_callback));
 
-	ttl7474_device &konami_7474(TTL7474(config, "konami_7474", 0));
+	ttl7474_device &konami_7474(TTL7474(config, "konami_7474"));
 	konami_7474.comp_output_cb().set(FUNC(scramble_state::scramble_sh_7474_q_callback));
 
 	TIMER(config, "int_timer").configure_generic(FUNC(scramble_state::galaxold_interrupt_timer));

@@ -184,8 +184,8 @@ public:
 		m_flipswitch(*this, "FLIP")
 	{ }
 
-	void brkthru(machine_config &config);
-	void darwin(machine_config &config);
+	void brkthru(machine_config &config) ATTR_COLD;
+	void darwin(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(flipscreen_switch) { flipscreen_w(m_flipscreen); }
@@ -197,18 +197,18 @@ protected:
 
 private:
 	// memory pointers
-	required_shared_ptr<uint8_t> m_fg_videoram;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<u8> m_fg_videoram;
+	required_shared_ptr<u8> m_videoram;
+	required_shared_ptr<u8> m_spriteram;
 	required_memory_bank m_mainbank;
 
 	// video-related
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_bg_tilemap = nullptr;
-	uint16_t m_bgscroll = 0;
-	uint8_t m_bgbasecolor = 0;
-	uint8_t m_flipscreen = 0;
-	uint8_t m_int_enable = 0;
+	u16 m_bgscroll = 0;
+	u8 m_bgbasecolor = 0;
+	u8 m_flipscreen = 0;
+	u8 m_int_enable = 0;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -217,18 +217,18 @@ private:
 	required_device<palette_device> m_palette;
 	required_ioport m_flipswitch;
 
-	void control_w(uint8_t data);
+	void control_w(u8 data);
 	void flipscreen_w(int state);
-	void bgscroll_w(uint8_t data);
-	void int_enable_w(uint8_t data);
-	void bgram_w(offs_t offset, uint8_t data);
-	void fgram_w(offs_t offset, uint8_t data);
+	void bgscroll_w(u8 data);
+	void int_enable_w(u8 data);
+	void bgram_w(offs_t offset, u8 data);
+	void fgram_w(offs_t offset, u8 data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void palette(palette_device &palette) const;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int prio);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void brkthru_main_map(address_map &map) ATTR_COLD;
 	void darwin_main_map(address_map &map) ATTR_COLD;
@@ -263,7 +263,7 @@ private:
 
 void brkthru_state::palette(palette_device &palette) const
 {
-	uint8_t const *color_prom = memregion("proms")->base();
+	u8 const *color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
@@ -305,14 +305,14 @@ TILE_GET_INFO_MEMBER(brkthru_state::get_bg_tile_info)
 	    ---- --xx xxxx xxxx = Code
 	*/
 
-	int code = (m_videoram[tile_index * 2] | ((m_videoram[tile_index * 2 + 1]) << 8)) & 0x3ff;
-	int region = 1 + (code >> 7);
-	int colour = m_bgbasecolor + ((m_videoram[tile_index * 2 + 1] & 0x04) >> 2);
+	u32 const code = (m_videoram[tile_index * 2] | ((m_videoram[tile_index * 2 + 1]) << 8)) & 0x3ff;
+	u8 const region = 1 + (code >> 7);
+	u32 const colour = m_bgbasecolor + BIT(m_videoram[tile_index * 2 + 1], 2);
 
 	tileinfo.set(region, code & 0x7f, colour,0);
 }
 
-void brkthru_state::bgram_w(offs_t offset, uint8_t data)
+void brkthru_state::bgram_w(offs_t offset, u8 data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
@@ -321,11 +321,11 @@ void brkthru_state::bgram_w(offs_t offset, uint8_t data)
 
 TILE_GET_INFO_MEMBER(brkthru_state::get_fg_tile_info)
 {
-	uint8_t code = m_fg_videoram[tile_index];
+	u8 const code = m_fg_videoram[tile_index];
 	tileinfo.set(0, code, 0, 0);
 }
 
-void brkthru_state::fgram_w(offs_t offset, uint8_t data)
+void brkthru_state::fgram_w(offs_t offset, u8 data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -341,7 +341,7 @@ void brkthru_state::video_start()
 }
 
 
-void brkthru_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int prio)
+void brkthru_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// Draw the sprites. Note that it is important to draw them exactly in this order, to have the correct priorities.
 
@@ -357,57 +357,85 @@ void brkthru_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	    ---- ---- ---- ---- ---- ---- xxxx xxxx = X position
 	*/
 
-	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	gfx_element *gfx = m_gfxdecode->gfx(9);
+
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-		if ((m_spriteram[offs] & 0x09) == prio) // enabled && low priority
+		if (BIT(m_spriteram[offs], 0)) // enabled
 		{
+			u32 const primask = BIT(m_spriteram[offs], 3) ? 0 : GFX_PMASK_2;
 			int sx = 240 - m_spriteram[offs + 3];
 			if (sx < -7)
 				sx += 256;
 
 			int sy = 240 - m_spriteram[offs + 2];
-			int code = m_spriteram[offs + 1] + 128 * (m_spriteram[offs] & 0x06);
-			int color = (m_spriteram[offs] & 0xe0) >> 5;
-			int flip = flip_screen();
+			u32 const code = m_spriteram[offs + 1] + 128 * (m_spriteram[offs] & 0x06);
+			u32 const color = (m_spriteram[offs] & 0xe0) >> 5;
+			bool const flip = flip_screen();
 			if (flip)
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
 			}
 
-			if (m_spriteram[offs] & 0x10) // double height
+			if (BIT(m_spriteram[offs], 4)) // double height
 			{
-				m_gfxdecode->gfx(9)->transpen(bitmap, cliprect, code & ~1, color, flip, flip, sx, flip ? sy + 16 : sy - 16, 0);
-				m_gfxdecode->gfx(9)->transpen(bitmap, cliprect, code | 1, color, flip, flip, sx, sy, 0);
+				gfx->prio_transpen(bitmap, cliprect,
+						code & ~1, color,
+						flip, flip,
+						sx, flip ? sy + 16 : sy - 16,
+						screen.priority(), primask, 0);
+
+				gfx->prio_transpen(bitmap, cliprect,
+						code | 1, color,
+						flip, flip,
+						sx, sy,
+						screen.priority(), primask, 0);
 
 				// redraw with wraparound
-				m_gfxdecode->gfx(9)->transpen(bitmap, cliprect, code & ~1, color, flip, flip, sx,(flip ? sy + 16 : sy - 16) + 256, 0);
-				m_gfxdecode->gfx(9)->transpen(bitmap, cliprect, code | 1, color, flip, flip, sx, sy + 256, 0);
+				gfx->prio_transpen(bitmap, cliprect,
+						code & ~1, color,
+						flip, flip,
+						sx, (flip ? sy + 16 : sy - 16) + 256,
+						screen.priority(), primask, 0);
+
+				gfx->prio_transpen(bitmap, cliprect,
+						code | 1, color,
+						flip, flip,
+						sx, sy + 256,
+						screen.priority(), primask, 0);
 			}
 			else
 			{
-				m_gfxdecode->gfx(9)->transpen(bitmap, cliprect, code, color, flip, flip, sx, sy, 0);
+				gfx->prio_transpen(bitmap, cliprect,
+						code, color,
+						flip, flip,
+						sx, sy,
+						screen.priority(), primask, 0);
 
 				// redraw with wraparound
-				m_gfxdecode->gfx(9)->transpen(bitmap, cliprect, code, color, flip, flip, sx, sy + 256, 0);
+				gfx->prio_transpen(bitmap, cliprect,
+						code, color,
+						flip, flip,
+						sx, sy + 256,
+						screen.priority(), primask, 0);
 			}
 		}
 	}
 }
 
-uint32_t brkthru_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 brkthru_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->set_scrollx(0, m_bgscroll);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	screen.priority().fill(0, cliprect);
 
-	// low priority sprites
-	draw_sprites(bitmap, cliprect, 0x01);
+	m_bg_tilemap->set_scrollx(0, m_bgscroll);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
 
 	// draw background over low priority sprites
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
 
-	// high priority sprites
-	draw_sprites(bitmap, cliprect, 0x09);
+	// sprites
+	draw_sprites(screen, bitmap, cliprect);
 
 	// fg layer
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -429,7 +457,7 @@ void brkthru_state::flipscreen_w(int state)
 	m_flipscreen = state;
 }
 
-void brkthru_state::control_w(uint8_t data)
+void brkthru_state::control_w(u8 data)
 {
 	// bit 0-2 = ROM bank select
 	m_mainbank->set_entry(data & 0x07);
@@ -448,18 +476,18 @@ void brkthru_state::control_w(uint8_t data)
 	m_bgscroll = (m_bgscroll & 0xff) | ((data & 0x80) << 1);
 }
 
-void brkthru_state::bgscroll_w(uint8_t data)
+void brkthru_state::bgscroll_w(u8 data)
 {
 	// low 8 bits of scroll
 	m_bgscroll = (m_bgscroll & 0x100) | data;
 }
 
-void brkthru_state::int_enable_w(uint8_t data)
+void brkthru_state::int_enable_w(u8 data)
 {
 	// bit 0 = IRQ disable, bit 1 = NMI enable
 	m_int_enable = data;
 
-	if (data & 1)
+	if (BIT(data, 0))
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
@@ -499,9 +527,6 @@ void brkthru_state::brkthru_main_map(address_map &map)
 // same as brktrhu, but XOR 0x1000 below 8k
 void brkthru_state::darwin_main_map(address_map &map)
 {
-	map(0x1000, 0x13ff).ram().w(FUNC(brkthru_state::fgram_w)).share(m_fg_videoram);
-	map(0x1400, 0x1bff).ram();
-	map(0x1c00, 0x1fff).ram().w(FUNC(brkthru_state::bgram_w)).share(m_videoram);
 	map(0x0000, 0x00ff).ram().share(m_spriteram);
 	map(0x0100, 0x01ff).nopw(); // tidy up, nothing really here?
 	map(0x0800, 0x0800).portr("P1");
@@ -512,6 +537,9 @@ void brkthru_state::darwin_main_map(address_map &map)
 	map(0x0801, 0x0801).w(FUNC(brkthru_state::control_w));
 	map(0x0802, 0x0802).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0803, 0x0803).w(FUNC(brkthru_state::int_enable_w)); // always 0xff?
+	map(0x1000, 0x13ff).ram().w(FUNC(brkthru_state::fgram_w)).share(m_fg_videoram);
+	map(0x1400, 0x1bff).ram();
+	map(0x1c00, 0x1fff).ram().w(FUNC(brkthru_state::bgram_w)).share(m_videoram);
 	map(0x2000, 0x3fff).bankr(m_mainbank);
 	map(0x4000, 0xffff).rom();
 }
@@ -734,7 +762,7 @@ GFXDECODE_END
 
 void brkthru_state::machine_start()
 {
-	uint8_t *rom = memregion("maincpu")->base();
+	u8 *rom = memregion("maincpu")->base();
 	m_mainbank->configure_entries(0, 8, &rom[0x10000], 0x2000);
 
 	save_item(NAME(m_bgscroll));

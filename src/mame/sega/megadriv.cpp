@@ -807,13 +807,13 @@ void md_base_state::megadriv_ioports(machine_config &config)
 	auto &hl(INPUT_MERGER_ANY_HIGH(config, "hl"));
 	hl.output_handler().set_inputline(m_maincpu, 2);
 
-	MEGADRIVE_IO_PORT(config, m_ioports[0], 0);
+	MEGADRIVE_IO_PORT(config, m_ioports[0]);
 	m_ioports[0]->hl_handler().set("hl", FUNC(input_merger_device::in_w<0>));
 
-	MEGADRIVE_IO_PORT(config, m_ioports[1], 0);
+	MEGADRIVE_IO_PORT(config, m_ioports[1]);
 	m_ioports[1]->hl_handler().set("hl", FUNC(input_merger_device::in_w<1>));
 
-	MEGADRIVE_IO_PORT(config, m_ioports[2], 0);
+	MEGADRIVE_IO_PORT(config, m_ioports[2]);
 	m_ioports[2]->hl_handler().set("hl", FUNC(input_merger_device::in_w<2>));
 }
 

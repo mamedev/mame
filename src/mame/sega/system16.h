@@ -213,8 +213,6 @@ private:
 	void wb3bble_map(address_map &map) ATTR_COLD;
 	void wb3bble_decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override { m_leds.resolve(); }
-
 	required_shared_ptr<uint16_t> m_textram;
 	optional_shared_ptr<uint16_t> m_bg0_tileram;
 	optional_shared_ptr<uint16_t> m_bg1_tileram;

@@ -238,6 +238,8 @@ if BUSES["A2KBD"] then
 		MAME_DIR .. "src/devices/bus/a2kbd/a2kbd.h",
 		MAME_DIR .. "src/devices/bus/a2kbd/am100kbd.cpp",
 		MAME_DIR .. "src/devices/bus/a2kbd/am100kbd.h",
+		MAME_DIR .. "src/devices/bus/a2kbd/autokbd.cpp",
+		MAME_DIR .. "src/devices/bus/a2kbd/autokbd.h",
 		MAME_DIR .. "src/devices/bus/a2kbd/ivelultrkb.cpp",
 		MAME_DIR .. "src/devices/bus/a2kbd/ivelultrkb.h",
 		MAME_DIR .. "src/devices/bus/a2kbd/kb200.cpp",
@@ -4115,8 +4117,6 @@ if BUSES["NUBUS"] then
 		MAME_DIR .. "src/devices/bus/nubus/pds30_cb264.h",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_procolor816.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_procolor816.h",
-		MAME_DIR .. "src/devices/bus/nubus/pds30_sigmalview.cpp",
-		MAME_DIR .. "src/devices/bus/nubus/pds30_sigmalview.h",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_30hr.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_30hr.h",
 		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/cards.cpp",
@@ -4992,6 +4992,8 @@ if BUSES["SAITEK_OSA"] then
 	files {
 		MAME_DIR .. "src/devices/bus/saitek_osa/expansion.cpp",
 		MAME_DIR .. "src/devices/bus/saitek_osa/expansion.h",
+		MAME_DIR .. "src/devices/bus/saitek_osa/bruteforce.cpp",
+		MAME_DIR .. "src/devices/bus/saitek_osa/bruteforce.h",
 		MAME_DIR .. "src/devices/bus/saitek_osa/maestro.cpp",
 		MAME_DIR .. "src/devices/bus/saitek_osa/maestro.h",
 		MAME_DIR .. "src/devices/bus/saitek_osa/maestroa.cpp",
@@ -5881,6 +5883,8 @@ if BUSES["TI99"] then
 		MAME_DIR .. "src/devices/bus/ti99/sidecar/arcturus.h",
 		MAME_DIR .. "src/devices/bus/ti99/sidecar/speechsyn.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/sidecar/speechsyn.h",
+		MAME_DIR .. "src/devices/bus/ti99/sidecar/thermal.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/sidecar/thermal.h",
 	}
 end
 

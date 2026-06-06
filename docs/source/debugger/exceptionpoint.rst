@@ -50,6 +50,11 @@ Examples:
   Set an exception that will halt execution whenever the visible CPU
   raises exception number 2.
 
+``ep a, ir == a9c9``
+  Set an exception that will halt execution whenever the visible CPU
+  raises exception number 10 (the "A-line" opcode trap on a MC68000)
+  when IR is equal to 0xa9c9.
+
 Back to :ref:`debugger-exceptionpoint-list`
 
 

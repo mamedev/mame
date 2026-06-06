@@ -166,20 +166,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/at28.h,MACHINES["AT28"] = true
----------------------------------------------------
-
-if MACHINES["AT28"] then
-	files {
-		MAME_DIR .. "src/devices/machine/at28.cpp",
-		MAME_DIR .. "src/devices/machine/at28.h",
-		MAME_DIR .. "src/devices/machine/ee28.ipp",
-		MAME_DIR .. "src/devices/machine/ee28.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/autoconfig.h,MACHINES["AUTOCONFIG"] = true
 ---------------------------------------------------
 
@@ -1401,6 +1387,24 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/at28.h,MACHINES["EEPROM28"] = true
+--@src/devices/machine/eeprom28.h,MACHINES["EEPROM28"] = true
+--@src/devices/machine/x28.h,MACHINES["EEPROM28"] = true
+---------------------------------------------------
+
+if MACHINES["EEPROM28"] then
+	files {
+		MAME_DIR .. "src/devices/machine/at28.cpp",
+		MAME_DIR .. "src/devices/machine/at28.h",
+		MAME_DIR .. "src/devices/machine/eeprom28.ipp",
+		MAME_DIR .. "src/devices/machine/eeprom28.h",
+		MAME_DIR .. "src/devices/machine/x28.cpp",
+		MAME_DIR .. "src/devices/machine/x28.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/eeprom.h,MACHINES["EEPROMDEV"] = true
 --@src/devices/machine/eepromser.h,MACHINES["EEPROMDEV"] = true
 --@src/devices/machine/eeprompar.h,MACHINES["EEPROMDEV"] = true
@@ -2182,6 +2186,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/lh79524_timer.h,MACHINES["LH79524"] = true
+---------------------------------------------------
+
+if MACHINES["LH79524"] then
+	files {
+		MAME_DIR .. "src/devices/machine/lh79524_timer.cpp",
+		MAME_DIR .. "src/devices/machine/lh79524_timer.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/locomo.h,MACHINES["LOCOMO"] = true
 ---------------------------------------------------
 
@@ -2314,6 +2330,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/mb87013.h,MACHINES["MB87013"] = true
+---------------------------------------------------
+
+if MACHINES["MB87013"] then
+	files {
+		MAME_DIR .. "src/devices/machine/mb87013.cpp",
+		MAME_DIR .. "src/devices/machine/mb87013.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/mb87030.h,MACHINES["MB87030"] = true
 ---------------------------------------------------
 
@@ -2321,18 +2349,6 @@ if MACHINES["MB87030"] then
 	files {
 		MAME_DIR .. "src/devices/machine/mb87030.cpp",
 		MAME_DIR .. "src/devices/machine/mb87030.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/mb87078.h,MACHINES["MB87078"] = true
----------------------------------------------------
-
-if MACHINES["MB87078"] then
-	files {
-		MAME_DIR .. "src/devices/machine/mb87078.cpp",
-		MAME_DIR .. "src/devices/machine/mb87078.h",
 	}
 end
 
@@ -3593,8 +3609,16 @@ if MACHINES["SPG2XX"] then
 		MAME_DIR .. "src/devices/machine/generalplus_gpl162xx_soc_video.h",
 		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_soc.cpp",
 		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_soc.h",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_rtc.cpp",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_rtc.h",
 		MAME_DIR .. "src/devices/machine/generalplus_gpce4_soc.cpp",
 		MAME_DIR .. "src/devices/machine/generalplus_gpce4_soc.h",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl_chx.cpp",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl_chx.h",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl_dma.cpp",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl_dma.h",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl_timebase.cpp",
+		MAME_DIR .. "src/devices/machine/generalplus_gpl_timebase.h",
 		MAME_DIR .. "src/devices/machine/spg_renderer.cpp",
 		MAME_DIR .. "src/devices/machine/spg_renderer.h",
 		MAME_DIR .. "src/devices/machine/gpl_renderer.cpp",
@@ -4195,20 +4219,6 @@ if MACHINES["X2212"] then
 	files {
 		MAME_DIR .. "src/devices/machine/x2212.cpp",
 		MAME_DIR .. "src/devices/machine/x2212.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/x28.h,MACHINES["X28"] = true
----------------------------------------------------
-
-if MACHINES["X28"] then
-	files {
-		MAME_DIR .. "src/devices/machine/x28.cpp",
-		MAME_DIR .. "src/devices/machine/x28.h",
-		MAME_DIR .. "src/devices/machine/ee28.ipp",
-		MAME_DIR .. "src/devices/machine/ee28.h",
 	}
 end
 
@@ -4878,17 +4888,6 @@ if MACHINES["INPUT_MERGER"] then
 	files {
 		MAME_DIR .. "src/devices/machine/input_merger.cpp",
 		MAME_DIR .. "src/devices/machine/input_merger.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/k054321.h,MACHINES["K054321"] = true
----------------------------------------------------
-if MACHINES["K054321"] then
-	files {
-		MAME_DIR .. "src/devices/machine/k054321.cpp",
-		MAME_DIR .. "src/devices/machine/k054321.h",
 	}
 end
 

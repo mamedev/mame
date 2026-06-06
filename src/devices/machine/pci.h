@@ -155,7 +155,7 @@ public:
 	{
 		set_ids_bridge(main_id, revision);
 	}
-	pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void set_remap_cb(mapper_cb _remap_cb) override;
 	virtual void map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -285,7 +285,7 @@ using pci_irq_handler = device_delegate<void (int, int)>;
 
 class pci_root_device : public device_t {
 public:
-	pci_root_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pci_root_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void irq_pin_w(int pin, int state);
 	void irq_w(int line, int state);

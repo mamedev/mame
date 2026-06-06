@@ -191,7 +191,7 @@ void arc_scsi_aka30_device::device_add_mconfig(machine_config &config)
 	m_wd33c93->irq_cb().set([this](int state) { m_sbic_int = state; update_interrupts(); });
 	m_wd33c93->drq_cb().set([this](int state) { m_dmac->dmarq(state, 0); });
 
-	UPD71071(config, m_dmac, 0);
+	UPD71071(config, m_dmac);
 	m_dmac->set_cpu_tag(":maincpu");
 	m_dmac->set_clock(DERIVED_CLOCK(1, 1));
 	m_dmac->out_eop_callback().set([this](int state) { m_dmac_int = state; update_interrupts(); });

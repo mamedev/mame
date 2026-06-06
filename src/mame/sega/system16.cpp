@@ -2149,7 +2149,7 @@ void segas1x_bootleg_state::datsu_2x_ym2203_msm5205(machine_config &config)
 	ym2.add_route(2, "mono", 0.50);
 	ym2.add_route(3, "mono", 0.80);
 
-	LS157(config, m_adpcm_select, 0);
+	LS157(config, m_adpcm_select);
 	m_adpcm_select->out_callback().set("5205", FUNC(msm5205_device::data_w));
 
 	MSM5205(config, m_msm, 384000);
@@ -2283,7 +2283,7 @@ void segas1x_bootleg_state::goldnaxeb_base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sys16);
 	PALETTE(config, m_palette, palette_device::BLACK, 2048*SHADOW_COLORS_MULTIPLIER);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(189-121);
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system16)
@@ -2306,7 +2306,7 @@ void segas1x_bootleg_state::goldnaxeb2(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::goldnaxeb2_map);
-	m_maincpu->set_addrmap(AS_OPCODES, address_map_constructor());
+	m_maincpu->remove_addrmap(AS_OPCODES);
 
 	m_palette->set_entries(0x2000*SHADOW_COLORS_MULTIPLIER);
 
@@ -2328,7 +2328,7 @@ void segas1x_bootleg_state::bayrouteb2(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::bayrouteb2_map);
-	m_maincpu->set_addrmap(AS_OPCODES, address_map_constructor());
+	m_maincpu->remove_addrmap(AS_OPCODES);
 
 	datsu_ym2151_msm5205(config);
 
@@ -2344,7 +2344,7 @@ void segas1x_bootleg_state::tturfbl(machine_config &config)
 
 	datsu_ym2151_msm5205(config);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(189-107);
 }
 
@@ -2355,7 +2355,7 @@ void segas1x_bootleg_state::dduxbl(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::dduxbl_map);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(189-112);
 
 	z80_ym2151(config);
@@ -2368,7 +2368,7 @@ void segas1x_bootleg_state::eswatbl(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::eswatbl_map);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(189-124);
 
 	z80_ym2151_upd7759(config);
@@ -2381,7 +2381,7 @@ void segas1x_bootleg_state::eswatbl2(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::eswatbl2_map);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(189-121);
 
 	datsu_2x_ym2203_msm5205(config);
@@ -2394,7 +2394,7 @@ void segas1x_bootleg_state::tetrisbl(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::tetrisbl_map);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(189-112);
 
 	z80_ym2151(config);
@@ -2407,7 +2407,7 @@ void segas1x_bootleg_state::altbeastbl(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::tetrisbl_map);
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(189-112);
 
 	datsu_2x_ym2203_msm5205(config);
@@ -2451,7 +2451,7 @@ void segas1x_bootleg_state::system18(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(64);
 
 	/* sound hardware */
@@ -2497,7 +2497,7 @@ void segas1x_bootleg_state::mwalkbl(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(64);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -2583,7 +2583,7 @@ void segas1x_bootleg_state::ddcrewbl(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(189-124);
 
 	MCFG_MACHINE_RESET_OVERRIDE(segas1x_bootleg_state,ddcrewbl)
@@ -2619,7 +2619,7 @@ void segas1x_bootleg_state::bloxeedbl(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state, system16)
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 	m_sprites->set_local_originx(64);
 
 	GENERIC_LATCH_8(config, m_soundlatch);

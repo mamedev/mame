@@ -14,9 +14,9 @@
 =============================================================================
 
 Interrupt Controller C148          1C0000-1FFFFF  R/W  D00-D02
-    Bus Controller?                1C0XXX
+    ????????                       1C0XXX
     ????????                       1C2XXX
-    ????????                       1C4XXX
+    Bus Controller?                1C4XXX              D00-D02
     -x- master priority bit?
     Master/Slave IRQ level         1C6XXX              D00-D02
     EXIRQ level                    1C8XXX              D00-D02
@@ -24,9 +24,10 @@ Interrupt Controller C148          1C0000-1FFFFF  R/W  D00-D02
     SCIRQ level                    1CCXXX              D00-D02
     VBLANK IRQ level               1CEXXX              D00-D02
     xxx irq level for specific irq.
-    ????????                       1D0XXX
-    ????????                       1D4000 trigger master/slave INT?
 
+    ????????                       1D0XXX
+    ????????                       1D2XXX
+    Acknowledge Bus?               1D4XXX
     Acknowlegde Master/Slave IRQ   1D6XXX ack master/slave INT
     Acknowledge EXIRQ              1D8XXX
     Acknowledge POSIRQ             1DAXXX
@@ -69,6 +70,7 @@ DEFINE_DEVICE_TYPE(NAMCO_C148, namco_c148_device, "namco_c148", "Namco C148 Inte
 
 namco_c148_device::namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NAMCO_C148, tag, owner, clock),
+	m_in_ext_cb(*this, 0x07),
 	m_out_ext1_cb(*this),
 	m_out_ext2_cb(*this),
 	m_hostcpu(*this, finder_base::DUMMY_TAG),
@@ -87,6 +89,7 @@ void namco_c148_device::map(address_map &map)
 	map(0x0e000, 0x0ffff).rw(FUNC(namco_c148_device::vblank_irq_level_r), FUNC(namco_c148_device::vblank_irq_level_w)).umask16(0x00ff); // VBlank IRQ lv
 
 	map(0x10000, 0x11fff).w(FUNC(namco_c148_device::cpu_irq_assert_w));
+	map(0x14000, 0x15fff).noprw(); // busack
 	map(0x16000, 0x17fff).rw(FUNC(namco_c148_device::cpu_irq_ack_r), FUNC(namco_c148_device::cpu_irq_ack_w)); // CPUIRQ ack
 	map(0x18000, 0x19fff).rw(FUNC(namco_c148_device::ex_irq_ack_r), FUNC(namco_c148_device::ex_irq_ack_w)); // EXIRQ ack
 	map(0x1a000, 0x1bfff).rw(FUNC(namco_c148_device::pos_irq_ack_r), FUNC(namco_c148_device::pos_irq_ack_w)); // POSIRQ ack
@@ -94,7 +97,7 @@ void namco_c148_device::map(address_map &map)
 	map(0x1e000, 0x1ffff).rw(FUNC(namco_c148_device::vblank_irq_ack_r), FUNC(namco_c148_device::vblank_irq_ack_w)); // VBlank IRQ ack
 	map(0x20000, 0x21fff).r(FUNC(namco_c148_device::ext_r)).umask16(0x00ff); // EEPROM ready status (*)
 	map(0x22000, 0x23fff).nopr().w(FUNC(namco_c148_device::ext1_w)).umask16(0x00ff); // sound CPU reset (*)
-	map(0x24000, 0x25fff).w(FUNC(namco_c148_device::ext2_w)).umask16(0x00ff); // slave & i/o reset (*)
+	map(0x24000, 0x25fff).nopr().w(FUNC(namco_c148_device::ext2_w)).umask16(0x00ff); // slave & i/o reset (*)
 	map(0x26000, 0x27fff).noprw(); // watchdog
 }
 
@@ -117,7 +120,6 @@ void namco_c148_device::device_validity_check(validity_checker &valid) const
 void namco_c148_device::device_start()
 {
 	// TODO: link to SCI, EX and the screen device controller devices
-	m_posirq_line = 0;
 	m_bus_reg = 0;
 
 	save_item(NAME(m_irqlevel.cpu));
@@ -125,7 +127,6 @@ void namco_c148_device::device_start()
 	save_item(NAME(m_irqlevel.sci));
 	save_item(NAME(m_irqlevel.pos));
 	save_item(NAME(m_irqlevel.vblank));
-	save_item(NAME(m_posirq_line));
 	save_item(NAME(m_bus_reg));
 }
 
@@ -185,7 +186,7 @@ void namco_c148_device::sci_irq_trigger()    { m_hostcpu->set_input_line(m_irqle
 
 uint8_t namco_c148_device::ext_r()
 {
-	return 0xff; // TODO: bit 0 EEPROM bit ready
+	return m_in_ext_cb() & 7;
 }
 
 void namco_c148_device::ext1_w(uint8_t data)
@@ -196,7 +197,6 @@ void namco_c148_device::ext1_w(uint8_t data)
 void namco_c148_device::ext2_w(uint8_t data)
 {
 	m_out_ext2_cb(data & 7);
-	// TODO: bit 1/2 in Winning Run GPU might be irq enable?
 }
 
 uint8_t namco_c148_device::bus_ctrl_r()
@@ -215,26 +215,4 @@ void namco_c148_device::cpu_irq_assert_w(uint16_t data)
 	// TODO: Starblade relies on this for showing large polygons, is it the right place?
 	if (m_linked_c148)
 		m_linked_c148->cpu_irq_trigger();
-}
-
-
-//**************************************************************************
-//  GETTERS/SETTERS
-//**************************************************************************
-
-// TODO: these doesn't belong here, needs C116 device
-uint8_t namco_c148_device::ext_posirq_line_r()
-{
-	// TODO: same as regular register? winrun91 reads here and subs with integer 0x39 for a new posirq that never gets triggered.
-	return m_posirq_line;
-}
-
-void namco_c148_device::ext_posirq_line_w(uint8_t data)
-{
-	m_posirq_line = data;
-}
-
-uint8_t namco_c148_device::get_posirq_line()
-{
-	return m_posirq_line;
 }

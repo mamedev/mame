@@ -513,13 +513,13 @@ void sorcererd_state::sorcererd(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sorcererd_state::sorcererd_mem);
 	m_maincpu->set_addrmap(AS_IO, &sorcererd_state::sorcererd_io);
 
-	MICROPOLIS(config, m_fdc, 0);
+	MICROPOLIS(config, m_fdc);
 	m_fdc->set_drive_tags(FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3);
 
-	LEGACY_FLOPPY(config, FLOPPY_0, 0, &sorcerer_floppy_interface);
-	LEGACY_FLOPPY(config, FLOPPY_1, 0, &sorcerer_floppy_interface);
-	LEGACY_FLOPPY(config, FLOPPY_2, 0, &sorcerer_floppy_interface);
-	LEGACY_FLOPPY(config, FLOPPY_3, 0, &sorcerer_floppy_interface);
+	LEGACY_FLOPPY(config, FLOPPY_0, &sorcerer_floppy_interface);
+	LEGACY_FLOPPY(config, FLOPPY_1, &sorcerer_floppy_interface);
+	LEGACY_FLOPPY(config, FLOPPY_2, &sorcerer_floppy_interface);
+	LEGACY_FLOPPY(config, FLOPPY_3, &sorcerer_floppy_interface);
 
 	FD1793(config, m_fdc2, 8_MHz_XTAL / 8);  // confirmed clock
 	m_fdc2->set_force_ready(true);

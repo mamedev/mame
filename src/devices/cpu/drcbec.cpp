@@ -15,6 +15,9 @@
 
 #include "debug/debugcpu.h"
 
+#include "corefloat.h"
+
+#include <bit>
 #include <cfenv>
 #include <cmath>
 
@@ -330,26 +333,6 @@ inline int dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, b
 	dsthi = hi;
 	dstlo = lo;
 	return ((hi >> 60) & FLAG_S) | ((hi != (int64_t(lo) >> 63)) << 1);
-}
-
-inline uint32_t tzcount32(uint32_t value)
-{
-	for (int i = 0; i < 32; i++)
-	{
-		if (value & (uint32_t(1) << i))
-			return i;
-	}
-	return 32;
-}
-
-inline uint64_t tzcount64(uint64_t value)
-{
-	for (int i = 0; i < 64; i++)
-	{
-		if (value & (uint64_t(1) << i))
-			return i;
-	}
-	return 64;
 }
 
 
@@ -1408,21 +1391,21 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LZCNT, 4, 0):     // LZCNT   dst,src
-				PARAM0 = count_leading_zeros_32(PARAM1);
+				PARAM0 = std::countl_zero(PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LZCNT, 4, 1):
-				temp32 = count_leading_zeros_32(PARAM1);
+				temp32 = std::countl_zero(PARAM1);
 				flags = FLAGS32_NZ(temp32);
 				PARAM0 = temp32;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_TZCNT, 4, 0):     // TZCNT   dst,src
-				PARAM0 = tzcount32(PARAM1);
+				PARAM0 = std::countr_zero(PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_TZCNT, 4, 1):
-				temp32 = tzcount32(PARAM1);
+				temp32 = std::countr_zero(PARAM1);
 				flags = (temp32 == 32) ? FLAG_Z : 0;
 				PARAM0 = temp32;
 				break;
@@ -2089,21 +2072,21 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LZCNT, 8, 0):     // DLZCNT  dst,src
-				DPARAM0 = count_leading_zeros_64(DPARAM1);
+				DPARAM0 = std::countl_zero(DPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LZCNT, 8, 1):
-				temp64 = count_leading_zeros_64(DPARAM1);
+				temp64 = std::countl_zero(DPARAM1);
 				flags = FLAGS64_NZ(temp64);
 				DPARAM0 = temp64;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_TZCNT, 8, 0):     // DTZCNT  dst,src
-				DPARAM0 = tzcount64(DPARAM1);
+				DPARAM0 = std::countr_zero(DPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_TZCNT, 8, 1):
-				temp64 = tzcount64(DPARAM1);
+				temp64 = std::countr_zero(DPARAM1);
 				flags = (temp64 == 64) ? FLAG_Z : 0;
 				DPARAM0 = temp64;
 				break;

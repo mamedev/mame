@@ -864,11 +864,6 @@ void segaorun_state::nop_w(address_space &space, offs_t offset, uint16_t data, u
 
 void segaorun_state::machine_start()
 {
-	m_bank_motor_direction.resolve();
-	m_bank_motor_speed.resolve();
-	m_vibration_motor.resolve();
-	m_start_lamp.resolve();
-	m_brake_lamp.resolve();
 }
 
 //-------------------------------------------------
@@ -1532,8 +1527,8 @@ void segaorun_state::outrun_base(machine_config &config)
 	m_screen->set_screen_update(FUNC(segaorun_state::screen_update_outrun));
 	m_screen->set_palette(m_palette);
 
-	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
-	SEGAIC16_ROAD(config, m_segaic16road, 0);
+	SEGAIC16VID(config, m_segaic16vid, "gfxdecode");
+	SEGAIC16_ROAD(config, m_segaic16road);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
@@ -1562,7 +1557,7 @@ void segaorun_state::outrundx(machine_config &config)
 	TIMER(config, "bankmotor").configure_periodic(FUNC(segaorun_state::bankmotor_update), attotime::from_msec(10));
 
 	// video hardware
-	SEGA_OUTRUN_SPRITES(config, m_sprites, 0);
+	SEGA_OUTRUN_SPRITES(config, m_sprites);
 }
 
 void segaorun_state::outrun(machine_config &config)
@@ -1611,7 +1606,7 @@ void segaorun_state::shangon(machine_config &config)
 	m_screen->set_raw(25.1748_MHz_XTAL / 4, 400, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segaorun_state::screen_update_shangon));
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGA_SYS16B_SPRITES(config, m_sprites);
 }
 
 void segaorun_state::shangon_fd1089b(machine_config &config)

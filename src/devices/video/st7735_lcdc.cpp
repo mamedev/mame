@@ -4,6 +4,9 @@
 #include "emu.h"
 #include "st7735_lcdc.h"
 
+#include "multibyte.h"
+
+
 // The ST7735 does not allow user to upload color conversion table
 // The ST7735S does allow user to upload conversion table (command 2d)
 
@@ -20,21 +23,29 @@ st7735_lcdc_device::st7735_lcdc_device(const machine_config &mconfig, const char
 
 u32 st7735_lcdc_device::render_to_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_x; y <= cliprect.max_y; y++)
+	bitmap.fill(0, cliprect);
+
+	if (m_displayon)
 	{
-		u32* dst = &bitmap.pix(y);
+		if (m_sleep)
+			return 0;
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			int count = (y * 0x200) + x;
+			u32 *const dst = &bitmap.pix(y);
 
-			u16 dat = m_displaybuffer[(count * 2) + 1] | (m_displaybuffer[(count * 2) + 0] << 8);
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			{
+				int const count = (y * 0x200) + x;
 
-			int b = ((dat >> 0) & 0x1f) << 3;
-			int g = ((dat >> 5) & 0x3f) << 2;
-			int r = ((dat >> 11) & 0x1f) << 3;
+				u16 const dat = get_u16be(&m_displaybuffer[count * 2]);
 
-			dst[x] = (r << 16) | (g << 8) | (b << 0);
+				int const b = ((dat >> 0) & 0x1f) << 3;
+				int const g = ((dat >> 5) & 0x3f) << 2;
+				int const r = ((dat >> 11) & 0x1f) << 3;
+
+				dst[x] = (r << 16) | (g << 8) | (b << 0);
+			}
 		}
 	}
 
@@ -47,13 +58,20 @@ void st7735_lcdc_device::lcdc_command_w(u8 data)
 	m_command = data;
 	m_commandstep = 0;
 
-	if (m_command == 0x11)
+	if (m_command == 0x10)
+	{
+		logerror("command is %02x (SLEEP IN - no params expected)\n", m_command);
+		m_sleep = 1;
+	}
+	else if (m_command == 0x11)
 	{
 		logerror("command is %02x (SLEEP OUT - no params expected)\n", m_command);
+		m_sleep = 0;
 	}
 	else if (m_command == 0x29)
 	{
 		logerror("command is %02x (DISPLAY ON - no params expected)\n", m_command);
+		m_displayon = 1;
 	}
 	else if (m_command == 0x2a)
 	{
@@ -125,7 +143,7 @@ void st7735_lcdc_device::lcdc_command_w(u8 data)
 	}
 	else
 	{
-		logerror("unknown command is %02x\n", m_command);
+		logerror("lcdc unknown command is %02x\n", m_command);
 	}
 }
 
@@ -288,7 +306,7 @@ void st7735_lcdc_device::lcdc_data_w(u8 data)
 		default: logerror("unexpected parameter for command %02x\n", m_command); break;
 		}
 	}
-	else if (m_command == 0xe0) // GMCTRP (Gamma +polarity Correction Characteristics) 
+	else if (m_command == 0xe0) // GMCTRP (Gamma +polarity Correction Characteristics)
 	{
 		if (m_commandstep < 16)
 		{
@@ -299,7 +317,7 @@ void st7735_lcdc_device::lcdc_data_w(u8 data)
 			logerror("unexpected parameter for command %02x\n", m_command);
 		}
 	}
-	else if (m_command == 0xe1) // GMCTRN (Gamma -polarity Correction Characteristics) 
+	else if (m_command == 0xe1) // GMCTRN (Gamma -polarity Correction Characteristics)
 	{
 		if (m_commandstep < 16)
 		{
@@ -317,7 +335,7 @@ void st7735_lcdc_device::lcdc_data_w(u8 data)
 
 void st7735_lcdc_device::device_start()
 {
-	std::fill(std::begin(m_displaybuffer), std::end(m_displaybuffer), 0);
+	m_displaybuffer = make_unique_clear<u8 []>(256 * 256 * 2);
 	m_posx = 0;
 	m_posy = 0;
 	m_posminx = 0;
@@ -326,8 +344,10 @@ void st7735_lcdc_device::device_start()
 	m_posmaxy = 0;
 	m_command = 0;
 	m_commandstep = 0;
+	m_displayon = 0;
+	m_sleep = 1;
 
-	save_item(NAME(m_displaybuffer));
+	save_pointer(NAME(m_displaybuffer), 256 * 256 * 2);
 	save_item(NAME(m_posx));
 	save_item(NAME(m_posy));
 	save_item(NAME(m_posminx));
@@ -336,6 +356,8 @@ void st7735_lcdc_device::device_start()
 	save_item(NAME(m_posmaxy));
 	save_item(NAME(m_command));
 	save_item(NAME(m_commandstep));
+	save_item(NAME(m_displayon));
+	save_item(NAME(m_sleep));
 }
 
 void st7735_lcdc_device::device_reset()

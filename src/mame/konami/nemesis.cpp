@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
 /***************************************************************************
+
 This entire hardware series is generally called 'GX400'
 
     Bubble System           (various games) GX400 PWB(B) 200207F
@@ -30,15 +31,15 @@ driver by Bryan McPhail
 
 Boards, from earliest to latest:
 * GX400 PWB(B) 200207F - The Bubble System top board: (DATA VERIFIED THRU TRACING)
-    Uses an 0x800 long block of shared SRAM at 0x000-0x7ff with the bubble MCU used for block transfers and boot
+    Uses an 0x800 long block of shared SRAM at 0x000-0x7ff with the 005297 used for block transfers and boot
     Uses Program RAM (0x10000-0x1ffff), data uploaded from bubble cart
     Uses 8-bit RAM at (0x20000-0x27fff) on the lower half of the bus (upper half is ???)
     Uses Graphics RAM (0x30000-0x3ffff) data uploaded from bubble cart
     Uses Work RAM at 0x70000-0x73fff
-    Uses an unknown SDIP64 'Bubble MCU' to handle all bubble access and refresh and system init; the bubble MCU
+    Uses an unknown SDIP64 '005297' to handle all bubble access and refresh and system init; the 005297
       uploads a 0x1e0 long BIOS/Bootloader to the shared ram at 0x000-0x800 and controls the 68k /RESET and /BR lines
       and only releases these lines after the bubble memory has warmed up and is ready.
-    Has 4 Interrupts: ODD/EVEN frame, VBLANK, MCU done, and 220hz timer, through a priority encoder
+    Has 4 Interrupts: ODD/EVEN frame, VBLANK, 005297 done, and 220hz timer, through a priority encoder
     Has VLM5030
     VLM5030 voice data is at ram at Sound CPU 0x8000
     Sound CPU clocked at 1.789772MHz
@@ -76,9 +77,9 @@ TODO: others.
 TODO:
 - exact cycles/scanlines for VBLANK and 256V int assert/clear need to be figured out and implemented.
 - bubble system needs a delay (and auto-sound-nmi hookup) so the 'getting ready... 49...' countdown actually
-  plays before the simulated MCU releases the 68k and the load (and morning music) begins.
+  plays before the simulated 005297 releases the 68k and the load (and morning music) begins.
 - hcrash: Konami GT-type inputs doesn't work properly.
-- gradiusb: still needs proper MCU emulation;
+- bs_gradius: still needs proper 005297 emulation;
 
 modified by Hau
 03/27/2009
@@ -256,7 +257,7 @@ void gx400_base_state::sound_nmi_w(int state)
 	// Effectively, if the bit is 1, NMI is asserted, otherwise it is cleared. This is also cleared on reset.
 	// The ??? input is likely either tied to VBLANK or 256V, or tied to one of those two through a 74ls74 enable latch, controlled
 	// by something else (probably either the one of the two output/int enable latches of the 68k, or by exx0/exx7 address-latched
-	// accesses from the sound z80, though technically it could be anything, even the /BS signal from the mcu to the 68k)
+	// accesses from the sound z80, though technically it could be anything, even the /BS signal from the 005297 to the 68k)
 	// TODO: trace implement the other NMI source; without this, the 'getting ready' pre-bubble-ready countdown in bubble system cannot work,
 	// since it requires a sequence of NMIs in order to function.
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
@@ -291,10 +292,10 @@ void hcrash_state::citybomb_outlatch_w(uint8_t data)
 	m_selected_ip = BIT(~data, 4); // citybomb steering & accel
 }
 
-void bubsys_state::bubsys_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void bubsys_state::bubsys_005297_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bubsys_control_ram[offset]);
-	//logerror("bubsys_mcu_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
+	//logerror("bubsys_005297_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
 
 	if (offset == 1)
 	{
@@ -305,7 +306,7 @@ void bubsys_state::bubsys_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		// Read
 		else if (m_bubsys_control_ram[1] == 1)
 		{
-			// The MCU copies the requested page of bubble memory to 0xf00 of shared RAM
+			// The 005297 copies the requested page of bubble memory to 0xf00 of shared RAM
 			int page = m_bubsys_control_ram[0] & 0x7ff;
 			//int unknownBit = m_bubsys_control_ram[0] & 0x800;
 
@@ -316,7 +317,7 @@ void bubsys_state::bubsys_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 			// The last 2 bytes of the block are loaded into the control register
 			m_bubsys_control_ram[0] = src[page * 0x90 + 0x80] | (src[page * 0x90 + 0x81]<<8);
-			m_maincpu->set_input_line(5, HOLD_LINE); // This presumably gets asserted (under mcu control) whenever the MCU has completed a command
+			m_maincpu->set_input_line(5, HOLD_LINE); // This presumably gets asserted (under 005297 control) whenever the 005297 has completed a command
 		}
 		// Write?
 		else if (m_bubsys_control_ram[1] == 2)
@@ -326,8 +327,8 @@ void bubsys_state::bubsys_mcu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 	else
 	{
-		//logerror("bubsys_mcu_trigger_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
-		// Not confirmed the clear happens here; clear is done by the MCU code itself, presumably some number of cycles after the assert.
+		//logerror("bubsys_005297_trigger_w (%08x) %d (%02x %02x %02x %02x)\n", m_maincpu->pc(), state, m_bubsys_control_ram[0], m_bubsys_control_ram[1], m_bubsys_control_ram[2], m_bubsys_control_ram[3]);
+		// Not confirmed the clear happens here; clear is done by the 005297 itself, presumably some number of cycles after the assert.
 		m_maincpu->set_input_line(5, CLEAR_LINE);
 	}
 }
@@ -533,11 +534,11 @@ void gx400_state::gx400_map(address_map &map)
 
 void bubsys_state::main_map(address_map &map)
 {
-	map(0x000000, 0x000fff).ram().share(m_bubsys_shared_ram); /* Shared with MCU */
+	map(0x000000, 0x000fff).ram().share(m_bubsys_shared_ram); /* Shared with 005297 */
 	map(0x010000, 0x01ffff).ram(); /* PROGRAM RAM */
 	map(0x020000, 0x027fff).rw(FUNC(bubsys_state::sound_sharedram_word_r), FUNC(bubsys_state::sound_sharedram_word_w));
 	map(0x030000, 0x03ffff).ram().w(FUNC(bubsys_state::charram_w)).share(m_charram);
-	map(0x040000, 0x040007).ram().w(FUNC(bubsys_state::bubsys_mcu_w)).share(m_bubsys_control_ram); // Shared with MCU
+	map(0x040000, 0x040007).ram().w(FUNC(bubsys_state::bubsys_005297_w)).share(m_bubsys_control_ram); // Shared with 005297
 	map(0x050000, 0x0503ff).ram().share(m_xscroll[0]);
 	map(0x050400, 0x0507ff).ram().share(m_xscroll[1]);
 	map(0x050800, 0x050eff).ram();
@@ -1627,7 +1628,7 @@ static INPUT_PORTS_START( bubsys )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( gradiusb )
+static INPUT_PORTS_START( bs_gradius )
 	PORT_INCLUDE( bubsys )
 
 	PORT_MODIFY("DSW1")
@@ -1651,7 +1652,7 @@ static INPUT_PORTS_START( gradiusb )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( twinbeeb )
+static INPUT_PORTS_START( bs_twinbee )
 	PORT_INCLUDE( bubsys )
 
 	PORT_MODIFY("DSW1")
@@ -1864,7 +1865,7 @@ void gx400_state::nemesis(machine_config &config)
 	intlatch.q_out_cb<2>().set(FUNC(gx400_state::gfx_flipx_w));
 	intlatch.q_out_cb<3>().set(FUNC(gx400_state::gfx_flipy_w));
 
-	WATCHDOG_TIMER(config, "watchdog", 0);
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2317,6 +2318,79 @@ void hcrash_state::hcrash(machine_config &config)
 	ymsnd.add_route(1, "speaker", 0.50, 1);
 }
 
+void bubsys_state::bubsys(machine_config &config)
+{
+	/* basic machine hardware */
+	M68000(config, m_maincpu, 18'432'000/2); /* 9.216MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &bubsys_state::main_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(bubsys_state::bubsys_interrupt), "screen", 0, 1);
+
+	Z80(config, m_audiocpu, 14'318'180/8); /* 1.7897725MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bubsys_state::gx400_sound_map);
+
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(bubsys_state::coin1_lockout_w));
+	outlatch.q_out_cb<1>().set(FUNC(bubsys_state::coin2_lockout_w));
+	outlatch.q_out_cb<2>().set(FUNC(bubsys_state::sound_irq_w));
+	outlatch.q_out_cb<4>().set(FUNC(bubsys_state::sound_nmi_w));
+	outlatch.q_out_cb<7>().set(FUNC(bubsys_state::irq4_enable_w));
+
+	ls259_device &intlatch(LS259(config, "intlatch"));
+	intlatch.q_out_cb<0>().set(FUNC(bubsys_state::irq2_enable_w));
+	intlatch.q_out_cb<1>().set(FUNC(bubsys_state::irq1_enable_w));
+	intlatch.q_out_cb<2>().set(FUNC(bubsys_state::gfx_flipx_w));
+	intlatch.q_out_cb<3>().set(FUNC(bubsys_state::gfx_flipy_w));
+
+	WATCHDOG_TIMER(config, "watchdog");
+
+	/* video hardware */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	set_screen_raw_params(config);
+	m_screen->set_screen_update(FUNC(bubsys_state::screen_update));
+	m_screen->set_palette(m_palette);
+	// TODO: This is supposed to be gated by something on bubble system, unclear what.
+	// it should only be active while the bubble memory is warming up, and disabled after
+	// the bubble 005297 'releases' the 68k from reset.
+	//m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
+	PALETTE(config, m_palette).set_entries(2048);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	GENERIC_LATCH_8(config, "soundlatch");
+
+	ay8910_device &ay1(AY8910(config, "ay1", 14'318'180/8));
+	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
+	ay1.port_a_read_callback().set(FUNC(bubsys_state::nemesis_portA_r));
+	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
+
+	ay8910_device &ay2(AY8910(config, "ay2", 14'318'180/8));
+	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::control_A_w));
+	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::control_B_w));
+	ay2.add_route(0, "filter2", 1.00);
+	ay2.add_route(1, "filter3", 1.00);
+	ay2.add_route(2, "filter4", 1.00);
+
+	FILTER_RC(config, m_filter[0]);
+	m_filter[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter[1]);
+	m_filter[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter[2]);
+	m_filter[2]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter[3]);
+	m_filter[3]->add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	K005289(config, m_k005289, 3'579'545);
+	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.35);
+
+	VLM5030(config, m_vlm, 3'579'545);
+	m_vlm->set_addrmap(0, &bubsys_state::gx400_vlm_map);
+	m_vlm->add_route(ALL_OUTPUTS, "mono", 0.70);
+}
+
+
 /***************************************************************************
 
   Game driver(s)
@@ -2753,27 +2827,6 @@ ROM_START( hcrashc )
 ROM_END
 
 
-
-GAME(  1985, nemesis,   0,        nemesis,   nemesis,  gx400_state,    empty_init, ROT0,   "Konami",                  "Nemesis (ROM version)",         MACHINE_SUPPORTS_SAVE )
-GAME(  1985, nemesisuk, nemesis,  nemesis,   nemesuk,  gx400_state,    empty_init, ROT0,   "Konami",                  "Nemesis (World?, ROM version)", MACHINE_SUPPORTS_SAVE )
-GAMEL( 1985, konamigt,  0,        konamigt,  konamigt, gx400_state,    empty_init, ROT0,   "Konami",                  "Konami GT",                     MACHINE_SUPPORTS_SAVE, layout_konamigt )
-GAME(  1985, rf2,       konamigt, rf2_gx400, rf2,      gx400_state,    empty_init, ROT0,   "Konami",                  "Konami RF2 - Red Fighter",      MACHINE_SUPPORTS_SAVE )
-GAME(  1985, twinbee,   0,        gx400,     twinbee,  gx400_state,    empty_init, ROT90,  "Konami",                  "TwinBee (ROM version)",         MACHINE_SUPPORTS_SAVE )
-GAME(  1985, gradius,   nemesis,  gx400,     gradius,  gx400_state,    empty_init, ROT0,   "Konami",                  "Gradius (Japan, ROM version)",  MACHINE_SUPPORTS_SAVE )
-GAME(  1985, gwarrior,  0,        gx400,     gwarrior, gx400_state,    empty_init, ROT0,   "Konami",                  "Galactic Warriors",             MACHINE_SUPPORTS_SAVE )
-GAME(  1986, salamand,  0,        salamand,  salamand, salamand_state, empty_init, ROT0,   "Konami",                  "Salamander (version D)",        MACHINE_SUPPORTS_SAVE )
-GAME(  1986, salamandj, salamand, salamand,  salamand, salamand_state, empty_init, ROT0,   "Konami",                  "Salamander (version J)",        MACHINE_SUPPORTS_SAVE )
-GAME(  1986, salamandt, salamand, salamand,  salamand, salamand_state, empty_init, ROT0,   "Konami (Tecfri license)", "Salamander (Tecfri license)",   MACHINE_SUPPORTS_SAVE )
-GAME(  1986, lifefrce,  salamand, salamand,  salamand, salamand_state, empty_init, ROT0,   "Konami",                  "Lifeforce (US)",                MACHINE_SUPPORTS_SAVE )
-GAME(  1987, lifefrcej, salamand, salamand,  lifefrcj, salamand_state, empty_init, ROT0,   "Konami",                  "Lifeforce (Japan)",             MACHINE_SUPPORTS_SAVE )
-GAME(  1987, blkpnthr,  0,        blkpnthr,  blkpnthr, salamand_state, empty_init, ROT0,   "Konami",                  "Black Panther",                 MACHINE_SUPPORTS_SAVE )
-GAME(  1987, citybomb,  0,        citybomb,  citybomb, hcrash_state,   empty_init, ROT270, "Konami",                  "City Bomber (World)",           MACHINE_SUPPORTS_SAVE )
-GAME(  1987, citybombj, citybomb, citybomb,  citybomb, hcrash_state,   empty_init, ROT270, "Konami",                  "City Bomber (Japan)",           MACHINE_SUPPORTS_SAVE )
-GAME(  1987, hcrash,    0,        hcrash,    hcrash,   hcrash_state,   empty_init, ROT0,   "Konami",                  "Hyper Crash (version D)",       MACHINE_SUPPORTS_SAVE )
-GAME(  1987, hcrashc,   hcrash,   hcrash,    hcrash,   hcrash_state,   empty_init, ROT0,   "Konami",                  "Hyper Crash (version C)",       MACHINE_SUPPORTS_SAVE )
-GAME(  1988, kittenk,   0,        nyanpani,  nyanpani, salamand_state, empty_init, ROT0,   "Konami",                  "Kitten Kaboodle",               MACHINE_SUPPORTS_SAVE )
-GAME(  1988, nyanpani,  kittenk,  nyanpani,  nyanpani, salamand_state, empty_init, ROT0,   "Konami",                  "Nyan Nyan Panic (Japan)",       MACHINE_SUPPORTS_SAVE )
-
 /*
 
 Konami Bubble System
@@ -3029,7 +3082,7 @@ Manual says SW4, 5, 6, 7 & 8 not used, leave off
 Interrupt source info from ArcadeHacker:
 74LS147 @ 17E
 PIN1 INPUT 4 -> 14H 74LS74 PIN 5
-PIN2 INPUT 5 -> MCU PIN  31
+PIN2 INPUT 5 -> 005297 PIN  31
 PIN3 INPUT 6 -> VCC
 PIN4 INPUT 7 -> VCC
 PIN5 INPUT 8 -> VCC
@@ -3047,89 +3100,12 @@ PIN16 VCC
 
 */
 
-void bubsys_state::bubsys(machine_config &config)
-{
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 18'432'000/2); /* 9.216MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &bubsys_state::main_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(bubsys_state::bubsys_interrupt), "screen", 0, 1);
-
-	Z80(config, m_audiocpu, 14'318'180/8); /* 1.7897725MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &bubsys_state::gx400_sound_map);
-
-	ls259_device &outlatch(LS259(config, "outlatch"));
-	outlatch.q_out_cb<0>().set(FUNC(bubsys_state::coin1_lockout_w));
-	outlatch.q_out_cb<1>().set(FUNC(bubsys_state::coin2_lockout_w));
-	outlatch.q_out_cb<2>().set(FUNC(bubsys_state::sound_irq_w));
-	outlatch.q_out_cb<4>().set(FUNC(bubsys_state::sound_nmi_w));
-	outlatch.q_out_cb<7>().set(FUNC(bubsys_state::irq4_enable_w));
-
-	ls259_device &intlatch(LS259(config, "intlatch"));
-	intlatch.q_out_cb<0>().set(FUNC(bubsys_state::irq2_enable_w));
-	intlatch.q_out_cb<1>().set(FUNC(bubsys_state::irq1_enable_w));
-	intlatch.q_out_cb<2>().set(FUNC(bubsys_state::gfx_flipx_w));
-	intlatch.q_out_cb<3>().set(FUNC(bubsys_state::gfx_flipy_w));
-
-	WATCHDOG_TIMER(config, "watchdog");
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	set_screen_raw_params(config);
-	m_screen->set_screen_update(FUNC(bubsys_state::screen_update));
-	m_screen->set_palette(m_palette);
-	// TODO: This is supposed to be gated by something on bubble system, unclear what.
-	// it should only be active while the bubble memory is warming up, and disabled after
-	// the bubble mcu 'releases' the 68k from reset.
-	//m_screen->screen_vblank().set_inputline("audiocpu", INPUT_LINE_NMI);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nemesis);
-	PALETTE(config, m_palette).set_entries(2048);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	GENERIC_LATCH_8(config, "soundlatch");
-
-	ay8910_device &ay1(AY8910(config, "ay1", 14'318'180/8));
-	ay1.set_flags(AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT);
-	ay1.port_a_read_callback().set(FUNC(bubsys_state::nemesis_portA_r));
-	ay1.add_route(ALL_OUTPUTS, "filter1", 0.20);
-
-	ay8910_device &ay2(AY8910(config, "ay2", 14'318'180/8));
-	ay2.port_a_write_callback().set(m_k005289, FUNC(k005289_device::control_A_w));
-	ay2.port_b_write_callback().set(m_k005289, FUNC(k005289_device::control_B_w));
-	ay2.add_route(0, "filter2", 1.00);
-	ay2.add_route(1, "filter3", 1.00);
-	ay2.add_route(2, "filter4", 1.00);
-
-	FILTER_RC(config, m_filter[0]);
-	m_filter[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter[1]);
-	m_filter[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter[2]);
-	m_filter[2]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	FILTER_RC(config, m_filter[3]);
-	m_filter[3]->add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	K005289(config, m_k005289, 3'579'545);
-	m_k005289->add_route(ALL_OUTPUTS, "mono", 0.35);
-
-	VLM5030(config, m_vlm, 3'579'545);
-	m_vlm->set_addrmap(0, &bubsys_state::gx400_vlm_map);
-	m_vlm->add_route(ALL_OUTPUTS, "mono", 0.70);
-}
-
-
-
 ROM_START( bubsys )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD( "boot.bin", 0x0000, 0x1e0, CRC(f0774fc2) SHA1(84fade54e025f170d983200a86c1ed96ef1a9ed3) )
 
 	ROM_REGION( 0x49000, "bubblememory", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 ) /* Fujitsu MCU, unknown type */
-	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
-
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD( "400b03.8g",   0x00000, 0x2000, CRC(85c2afc5) SHA1(387842d02d50d0d78a27270e7267af19555b9e63) )
 
@@ -3138,16 +3114,13 @@ ROM_START( bubsys )
 	ROM_LOAD( "400a2.1b", 0x100, 0x100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
 ROM_END
 
-ROM_START( gradiusb )
+ROM_START( bs_gradius )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD( "boot.bin", 0x0000, 0x1e0, CRC(f0774fc2) SHA1(84fade54e025f170d983200a86c1ed96ef1a9ed3) )
 
 	ROM_REGION( 0x48360, "bubblememory", 0 )
-	/* The Gradius cartridge contains 0x807 pages of 130 bytes each */
+	/* The cartridge contains 0x807 pages of 130 bytes each */
 	ROM_LOAD16_WORD_SWAP( "gradius.bin", 0x000, 0x48360, CRC(f83b9607) SHA1(53493c2d5b0e66dd6b75865abf0982ee50c01a6f) )
-
-	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 ) /* Fujitsu MCU, unknown type */
-	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD( "400b03.8g",   0x00000, 0x2000, CRC(85c2afc5) SHA1(387842d02d50d0d78a27270e7267af19555b9e63) )
@@ -3157,7 +3130,39 @@ ROM_START( gradiusb )
 	ROM_LOAD( "400a2.1b", 0x100, 0x100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
 ROM_END
 
-ROM_START( twinbeeb )
+ROM_START( bs_gwarrior )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD( "boot.bin", 0x000, 0x1e0, CRC(728263bd) SHA1(70dde04b9e3d55e3ac809be52cdc2d616eaa114a) )
+
+	ROM_REGION( 0x48360, "bubblememory", 0 )
+	/* The cartridge contains 0x807 pages of 130 bytes each */
+	ROM_LOAD16_WORD_SWAP( "gwarriorb.bin", 0x00000, 0x48360, CRC(a10e1b62) SHA1(a801ad8d318644495fbe2c971395d271d12508f1)    )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_LOAD( "400b03.8g", 0x0000, 0x2000, CRC(85c2afc5) SHA1(387842d02d50d0d78a27270e7267af19555b9e63) )
+
+	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
+	ROM_LOAD( "400a1.2b", 0x000, 0x100, CRC(5827b1e8) SHA1(fa8cf5f868cfb08bce203baaebb6c4055ee2a000) )
+	ROM_LOAD( "400a2.1b", 0x100, 0x100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
+ROM_END
+
+ROM_START( bs_rf2 )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD( "boot.bin", 0x000, 0x1e0, CRC(ee6e93d7) SHA1(7302c08a726a760f59d6837be8fd10bbd1f79da0) )
+
+	ROM_REGION( 0x48360, "bubblememory", 0 )
+	/* The cartridge contains 0x807 pages of 130 bytes each */
+	ROM_LOAD16_WORD_SWAP( "rf2b.bin", 0x00000, 0x48360, CRC(7ee7acc5) SHA1(ab95a75b259327a7f88c7ec56dbca74496c91688)     )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
+	ROM_LOAD( "400b03.8g", 0x0000, 0x2000, CRC(85c2afc5) SHA1(387842d02d50d0d78a27270e7267af19555b9e63) )
+
+	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
+	ROM_LOAD( "400a1.2b", 0x000, 0x100, CRC(5827b1e8) SHA1(fa8cf5f868cfb08bce203baaebb6c4055ee2a000) )
+	ROM_LOAD( "400a2.1b", 0x100, 0x100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
+ROM_END
+
+ROM_START( bs_twinbee )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD( "boot.bin", 0x000, 0x1e0, CRC(ee6e93d7) SHA1(7302c08a726a760f59d6837be8fd10bbd1f79da0) )
 
@@ -3167,9 +3172,6 @@ ROM_START( twinbeeb )
 	ROM_REGION( 0x806*0x80, "bubblememory_temp", 0 )
 	ROM_LOAD( "twinbee.bin", 0x00000, 0x40300, CRC(4d396a0a) SHA1(ee922a1bd7062c0fcf358f5079cca6424aadc975) )
 
-	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 ) // Fujitsu MCU
-	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
-
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "400-e03.5l",   0x00000, 0x02000, CRC(a5a8e57d) SHA1(f4236770093392dec3f76835a5766e9b3ed64e2e) )
 
@@ -3178,16 +3180,17 @@ ROM_START( twinbeeb )
 	ROM_LOAD( "400-a02.fse",  0x00100, 0x0100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
 ROM_END
 
+
 void bubsys_state::bubsys_init()
 {
 	/*
-	    The MCU is the master of the system and controls the /RESET and /BS lines of the 68000.
-	    At boot the MCU asserts /RESET and /BS of the 68000 and waits for the bubble memory to warm up.
+	    The 005297 is the master of the system and controls the /RESET and /BS lines of the 68000.
+	    At boot the 005297 asserts /RESET and /BS of the 68000 and waits for the bubble memory to warm up.
 	    During this period, the Audio CPU is running and speaking the "Getting ready... Fifty..."
-	    countdown via the vlm5030. Once the bubble memory is ready, the MCU copies the 68000 boot program
+	    countdown via the vlm5030. Once the bubble memory is ready, the 005297 copies the 68000 boot program
 	    to shared RAM which takes 30.65 milliseconds then releases /RESET and /BS so the 68000 starts execution.
 
-	    As the MCU is not dumped we effectively start the simulation at the point the 68000
+	    As the 005297 is not emulated we effectively start the simulation at the point the 68000
 	    is released, and manually copy the boot program to 68000 address space.
 
 	    TODO: add a 'delay' (configurable) to simulate the bubble memory 'warming up' and only release the 68k after this is done.
@@ -3197,15 +3200,15 @@ void bubsys_state::bubsys_init()
 	memcpy(m_bubsys_shared_ram, src, 0x1e0);
 
 	/*
-	    The MCU sets this flag once the boot program is copied.  The 68000 will reset
+	    The 005297 sets this flag once the boot program is copied.  The 68000 will reset
 	    if the value is not correct. Presumably this was done for safety in case somehow the
-	    68000 was released from reset when the MCU wasn't yet ready.
+	    68000 was released from reset when the 005297 wasn't yet ready.
 	*/
 	m_bubsys_control_ram[3] = 0x240;
 }
 
 
-void bubsys_state::bubsys_twinbeeb_init()
+void bubsys_state::bs_twinbee_init()
 {
 	// the twinbee bubble data is in a stripped down, predecoded state already, why?
 	// this reencodes it to something the loading code can actually use
@@ -3243,9 +3246,34 @@ void bubsys_state::bubsys_twinbeeb_init()
 	bubsys_init();
 }
 
-GAME( 1985, bubsys,   0,         bubsys,    bubsys,   bubsys_state, bubsys_init, ROT0,   "Konami", "Bubble System BIOS", MACHINE_IS_BIOS_ROOT )
-GAME( 1985, gradiusb, bubsys,    bubsys,    gradiusb, bubsys_state, bubsys_init, ROT0,   "Konami", "Gradius (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1985, twinbeeb, bubsys,    bubsys,    twinbeeb, bubsys_state, bubsys_twinbeeb_init, ROT90,   "Konami", "TwinBee (Bubble System)", MACHINE_UNEMULATED_PROTECTION )
-// Bubble System RF2
-// Bubble System Galactic Warriors
-// Bubble System Attack Rush
+
+// Dedicated
+GAME( 1985, nemesis,     0,        nemesis,   nemesis,    gx400_state,    empty_init,      ROT0,   "Konami", "Nemesis (ROM version)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nemesisuk,   nemesis,  nemesis,   nemesuk,    gx400_state,    empty_init,      ROT0,   "Konami", "Nemesis (World?, ROM version)",           MACHINE_SUPPORTS_SAVE )
+GAMEL(1985, konamigt,    0,        konamigt,  konamigt,   gx400_state,    empty_init,      ROT0,   "Konami", "Konami GT",                               MACHINE_SUPPORTS_SAVE, layout_konamigt )
+GAME( 1985, rf2,         konamigt, rf2_gx400, rf2,        gx400_state,    empty_init,      ROT0,   "Konami", "Konami RF2: Red Fighter",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1985, twinbee,     0,        gx400,     twinbee,    gx400_state,    empty_init,      ROT90,  "Konami", "TwinBee (ROM version)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gradius,     nemesis,  gx400,     gradius,    gx400_state,    empty_init,      ROT0,   "Konami", "Gradius (Japan, ROM version)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gwarrior,    0,        gx400,     gwarrior,   gx400_state,    empty_init,      ROT0,   "Konami", "Galactic Warriors",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, salamand,    0,        salamand,  salamand,   salamand_state, empty_init,      ROT0,   "Konami", "Salamander (version D)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, salamandj,   salamand, salamand,  salamand,   salamand_state, empty_init,      ROT0,   "Konami", "Salamander (version J)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, salamandt,   salamand, salamand,  salamand,   salamand_state, empty_init,      ROT0,   "Konami (Tecfri license)", "Salamander (Tecfri license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lifefrce,    salamand, salamand,  salamand,   salamand_state, empty_init,      ROT0,   "Konami", "Lifeforce (US)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, lifefrcej,   salamand, salamand,  lifefrcj,   salamand_state, empty_init,      ROT0,   "Konami", "Lifeforce (Japan)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blkpnthr,    0,        blkpnthr,  blkpnthr,   salamand_state, empty_init,      ROT0,   "Konami", "Black Panther",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1987, citybomb,    0,        citybomb,  citybomb,   hcrash_state,   empty_init,      ROT270, "Konami", "City Bomber (World)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, citybombj,   citybomb, citybomb,  citybomb,   hcrash_state,   empty_init,      ROT270, "Konami", "City Bomber (Japan)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hcrash,      0,        hcrash,    hcrash,     hcrash_state,   empty_init,      ROT0,   "Konami", "Hyper Crash (version D)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hcrashc,     hcrash,   hcrash,    hcrash,     hcrash_state,   empty_init,      ROT0,   "Konami", "Hyper Crash (version C)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kittenk,     0,        nyanpani,  nyanpani,   salamand_state, empty_init,      ROT0,   "Konami", "Kitten Kaboodle",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nyanpani,    kittenk,  nyanpani,  nyanpani,   salamand_state, empty_init,      ROT0,   "Konami", "Nyan Nyan Panic (Japan)",                 MACHINE_SUPPORTS_SAVE )
+
+// Bubble System
+GAME( 1985, bubsys,      0,        bubsys,    bubsys,     bubsys_state,   bubsys_init,     ROT0,   "Konami", "Bubble System BIOS",                      MACHINE_IS_BIOS_ROOT )
+
+GAME( 1985, bs_gradius,  bubsys,   bubsys,    bs_gradius, bubsys_state,   bubsys_init,     ROT0,   "Konami", "Gradius (Bubble System)",                 MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, bs_gwarrior, bubsys,   bubsys,    gwarrior,   bubsys_state,   bubsys_init,     ROT0,   "Konami", "Galactic Warriors (Bubble System)",       MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, bs_rf2,      bubsys,   bubsys,    rf2,        bubsys_state,   bubsys_init,     ROT0,   "Konami", "Konami RF2: Red Fighter (Bubble System)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1985, bs_twinbee,  bubsys,   bubsys,    bs_twinbee, bubsys_state,   bs_twinbee_init, ROT90,  "Konami", "TwinBee (Bubble System)",                 MACHINE_UNEMULATED_PROTECTION )
+
+// Bubble System Attack Rush was announced, but never released

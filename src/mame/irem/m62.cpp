@@ -948,7 +948,7 @@ void m62_state::ldrun(machine_config &config)
 	PALETTE(config, m_spr_palette, FUNC(m62_state::m62_spr), 256);
 
 	// sound hardware
-	IREM_M62_AUDIO(config, m_audio, 0);
+	IREM_M62_AUDIO(config, m_audio);
 }
 
 
@@ -1393,7 +1393,7 @@ ROM_START( kungfub3s )
 	ROM_LOAD( "5.bin", 0x4000, 0x4000, CRC(8e7e4c56) SHA1(fdb79fcc652f1d0af74517e5df75921e8d3ca50f) )
 
 	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )
-	ROM_LOAD( "3.bin", 0xa000, 0x2000, BAD_DUMP CRC(b4293435) SHA1(5e2b96c19c4f5c63a5afa2de504d29fe64a4c908) ) // Empty ROM
+	ROM_LOAD( "3.bin", 0xa000, 0x2000, BAD_DUMP CRC(58e87ab0) SHA1(3b03c101fec58eac13fc309a78df9a2cd44f7604) ) // ROM dump was bad (empty data), take one from another set, probably correct
 	ROM_LOAD( "2.bin", 0xc000, 0x2000, CRC(c81e31ea) SHA1(f0fc58b929188c8802cd85549bdf9f4566e6a677) ) // samples (ADPCM 4-bit)
 	ROM_LOAD( "1.bin", 0xe000, 0x2000, CRC(d99fb995) SHA1(caa6acdbc3b02d248fd123be95ea6fdcb4f35b59) )
 
@@ -2097,8 +2097,8 @@ ROM_START( yanjamar )
 	ROM_LOAD( "dr27.3j",           0x00200, 0x0100, BAD_DUMP CRC(70d668ef) SHA1(2cc647f2708932105bb9a5130aacc5a8a160e418) ) // character palette blue component
 
 	/* The PCBs have a total of 25 PROMs, all of them were soldered and none of them were dumped.
-           The previous seven PROMs (sprite height, sprite palette, and character palette) should be some of the following NO_DUMP declaratios, but
-           is difficult to determine which is which. */
+	       The previous seven PROMs (sprite height, sprite palette, and character palette) should be some of the following NO_DUMP declaratios, but
+	       is difficult to determine which is which. */
 	ROM_REGION( 0x200, "other_proms", 0 )
 	ROM_LOAD( "2_ic25_n82s129n.d7", 0x0000, 0x0100, NO_DUMP )
 	ROM_LOAD( "2_ic29_n82s129n.d8", 0x0000, 0x0100, NO_DUMP )

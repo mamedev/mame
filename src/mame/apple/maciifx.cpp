@@ -494,7 +494,7 @@ void maciifx_state::maciifx(machine_config &config)
 	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 
-	nubus_device &nubus(NUBUS(config, "nubus", 0));
+	nubus_device &nubus(NUBUS(config, "nubus"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irq9_callback().set(FUNC(maciifx_state::oss_interrupt<0>));
 	nubus.out_irqa_callback().set(FUNC(maciifx_state::oss_interrupt<1>));

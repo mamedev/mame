@@ -462,7 +462,8 @@ const double XTAL::known_xtals[] = {
 	 36'000'000, // 36_MHz_XTAL            Sega Model 1 video board
 	 36'864'000, // 36.864_MHz_XTAL        Unidesa Cirsa Rock 'n' Roll
 	 37'980'000, // 37.98_MHz_XTAL         Falco 5220
-	 38'769'220, // 38.76922_MHz_XTAL      Namco System 21 video board
+	 38'769'220, // 38.76922_MHz_XTAL      Namco System 21 video board (C67 / Driver's Eyes)
+	 38'808'000, // 38.808_MHz_XTAL        Namco System 21 video board (Winning Run)
 	 38'863'630, // 38.86363_MHz_XTAL      Sharp X68000 15.98kHz video
 	 39'321'600, // 39.3216_MHz_XTAL       Sun 2/120
 	 39'710'000, // 39.71_MHz_XTAL         Wyse WY-60 132-column display clock

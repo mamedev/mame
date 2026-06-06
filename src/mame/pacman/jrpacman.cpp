@@ -147,7 +147,7 @@ void jrpacman_state::main_map(address_map &map)
 	map(0x5040, 0x505f).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x5060, 0x506f).writeonly().share("spriteram2");
 	map(0x5070, 0x5077).w("latch2", FUNC(ls259_device::write_d0));
-	map(0x5080, 0x50bf).portr("DSW");
+	map(0x5080, 0x50bf).portr("DSW1");
 	map(0x5080, 0x5080).w(FUNC(jrpacman_state::jrpacman_scroll_w));
 	map(0x50c0, 0x50c0).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x8000, 0xdfff).rom();
@@ -193,7 +193,7 @@ static INPUT_PORTS_START( jrpacman )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
-	PORT_START("DSW")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
@@ -264,11 +264,13 @@ GFXDECODE_END
 
 void jrpacman_state::jrpacman(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 18432000/6);    /* 3.072 MHz */
+	pacman(config);
+
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &jrpacman_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &jrpacman_state::port_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(jrpacman_state::interrupt_vector_r));
+
+	config.device_remove("mainlatch");
 
 	ls259_device &latch1(LS259(config, "latch1")); // 5P
 	latch1.q_out_cb<0>().set(FUNC(jrpacman_state::irq_mask_w));
@@ -283,28 +285,10 @@ void jrpacman_state::jrpacman(machine_config &config)
 	latch2.q_out_cb<4>().set(FUNC(jrpacman_state::jrpacman_charbank_w));
 	latch2.q_out_cb<5>().set(FUNC(jrpacman_state::jrpacman_spritebank_w));
 
-	WATCHDOG_TIMER(config, m_watchdog);
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60.606060);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(36*8, 28*8);
-	m_screen->set_visarea(0*8, 36*8-1, 0*8, 28*8-1);
-	m_screen->set_screen_update(FUNC(jrpacman_state::screen_update_pacman));
-	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(jrpacman_state::vblank_irq));
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jrpacman);
-	PALETTE(config, m_palette, FUNC(jrpacman_state::pacman_palette), 128 * 4, 32);
+	// video hardware
+	m_gfxdecode->set_info(gfx_jrpacman);
 
 	MCFG_VIDEO_START_OVERRIDE(jrpacman_state,jrpacman)
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	NAMCO_WSG(config, m_namco_sound, 3072000/32);
-	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

@@ -101,7 +101,9 @@
     Other notes:
     - "Distribution error" means there's a region mismatch.
     - Hold TEST while booting (from the very start) to initialize the RTC for most games.
-    - It seems that p911 has 3 unique regional images: U/E, K/A, and J. If you try booting, for example, U region on a K/A image, it won't find some files and will error out with "distribution error".
+    - It seems that p911 has 3 unique regional images: U/E, K/A, and J. If you try booting,
+      for example, U region on a K/A image, it won't find some files and will error
+      out with "distribution error".
     - mocapglf: enable "show diag" at boot then disable it once the diag text appears.
       This will allow game to bypass the I/O SENSOR error later on.
 
@@ -2574,7 +2576,7 @@ void viper_state::viper(machine_config &config)
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
-	PC16552D(config, "duart_com", 0);
+	PC16552D(config, "duart_com");
 	// TODO: unverified clocks and channel types, likely connects to sensor motion based games
 	NS16550(config, "duart_com:chan0", XTAL(19'660'800));
 	NS16550(config, "duart_com:chan1", XTAL(19'660'800)).out_int_callback().set(FUNC(viper_state::uart_int));
@@ -2605,7 +2607,7 @@ void viper_state::viper(machine_config &config)
 	DMADAC(config, "dacl").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	DMADAC(config, "dacr").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	M48T58(config, "m48t58", 0);
+	M48T58(config, "m48t58");
 
 	// Each IRQ3 will update the data buffers with 256 samples, and the playback rate is always 44100hz.
 	// The frequency is picked such that the DMADAC buffer should never overflow or underflow.

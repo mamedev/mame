@@ -55,6 +55,7 @@ protected:
 	virtual void update_irq_filter() override;
 	virtual void interrupt_taken() override;
 	virtual void internal_update(u64 current_time) override;
+	using h8_device::internal_update;
 	virtual void notify_standby(int state) override;
 	virtual void irq_setup() override;
 	virtual void execute_set_input(int inputnum, int state) override;

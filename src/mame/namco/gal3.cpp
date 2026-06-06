@@ -140,6 +140,7 @@ better notes (complete chip lists) for each board still needed
 #include "sound/c140.h"
 
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "layout/generic.h"
 #include "speaker.h"
 
@@ -662,7 +663,7 @@ void gal3_state::gal3(machine_config &config)
 	PALETTE(config, m_palette[0]).set_format(palette_device::xBRG_888, 0x10000/2);
 	m_palette[0]->set_membits(16);
 
-	NAMCO_C355SPR(config, m_c355spr[0], 0);
+	NAMCO_C355SPR(config, m_c355spr[0]);
 	m_c355spr[0]->set_screen("lscreen");
 	m_c355spr[0]->set_palette(m_palette[0]);
 	m_c355spr[0]->set_scroll_offsets(0, 0x20);
@@ -670,12 +671,12 @@ void gal3_state::gal3(machine_config &config)
 	m_c355spr[0]->set_color_base(0x1000); // TODO : verify palette offset
 	m_c355spr[0]->set_external_prifill(true);
 
-	NAMCOS21_3D(config, m_namcos21_3d[0], 0);
-	m_namcos21_3d[0]->set_zz_shift_mult(11, 0x200);
-	m_namcos21_3d[0]->set_depth_reverse(false);
+	NAMCOS21_3D(config, m_namcos21_3d[0]);
 	m_namcos21_3d[0]->set_framebuffer_size(496, 480);
+	m_namcos21_3d[0]->set_num_palettes(0x10);
+	m_namcos21_3d[0]->set_depth_reverse(false);
 
-	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67[0], 0);
+	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67[0]);
 	m_namcos21_dsp_c67[0]->set_renderer_tag("namcos21_3d_1");
 
 	// video chain 2
@@ -690,7 +691,7 @@ void gal3_state::gal3(machine_config &config)
 	PALETTE(config, m_palette[1]).set_format(palette_device::xBRG_888, 0x10000/2);
 	m_palette[1]->set_membits(16);
 
-	NAMCO_C355SPR(config, m_c355spr[1], 0);
+	NAMCO_C355SPR(config, m_c355spr[1]);
 	m_c355spr[1]->set_screen("rscreen");
 	m_c355spr[1]->set_palette(m_palette[1]);
 	m_c355spr[1]->set_scroll_offsets(0, 0x20);
@@ -698,12 +699,12 @@ void gal3_state::gal3(machine_config &config)
 	m_c355spr[1]->set_color_base(0x1000); // TODO : verify palette offset
 	m_c355spr[1]->set_external_prifill(true);
 
-	NAMCOS21_3D(config, m_namcos21_3d[1], 0);
-	m_namcos21_3d[1]->set_zz_shift_mult(11, 0x200);
-	m_namcos21_3d[1]->set_depth_reverse(false);
+	NAMCOS21_3D(config, m_namcos21_3d[1]);
 	m_namcos21_3d[1]->set_framebuffer_size(496, 480);
+	m_namcos21_3d[1]->set_num_palettes(0x10);
+	m_namcos21_3d[1]->set_depth_reverse(false);
 
-	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67[1], 0);
+	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67[1]);
 	m_namcos21_dsp_c67[1]->set_renderer_tag("namcos21_3d_2");
 
 	// sound hardware

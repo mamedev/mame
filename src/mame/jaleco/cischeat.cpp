@@ -184,7 +184,7 @@ Cisco Heat.
 
 #include "logmacro.h"
 
-#define LOGUNKNOWN(...)   LOGMASKED(LOG_UNKNOWN, __VA_ARGS__) 
+#define LOGUNKNOWN(...)   LOGMASKED(LOG_UNKNOWN, __VA_ARGS__)
 
 namespace {
 // TODO: better inheritance, eventually split individual driver files
@@ -667,7 +667,6 @@ void cischeat_state::f1gpstr2_io_w(offs_t offset, u16 data, u16 mem_mask)
 
 void cischeat_state::machine_start()
 {
-	m_leds.resolve();
 	m_motor_value = 0;
 	m_io_value = 0;
 
@@ -1819,7 +1818,7 @@ void cischeat_state::bigrun(machine_config &config)
 void cischeat_state::bigrun_d65006(machine_config &config)
 {
 	bigrun(config);
-	MEGASYS1_GATEARRAY_D65006(config, m_gatearray, 0);
+	MEGASYS1_GATEARRAY_D65006(config, m_gatearray);
 	m_gatearray->set_cpuspace_tag(m_soundcpu, AS_PROGRAM);
 	m_gatearray->set_cpuregion_tag("soundcpu");
 }
@@ -1837,7 +1836,7 @@ void cischeat_state::cischeat(machine_config &config)
 
 	m_soundcpu->set_addrmap(AS_PROGRAM, &cischeat_state::cischeat_sound_map);
 
-	MEGASYS1_GATEARRAY_GS88000(config, m_gatearray, 0);
+	MEGASYS1_GATEARRAY_GS88000(config, m_gatearray);
 	m_gatearray->set_cpuspace_tag(m_soundcpu, AS_PROGRAM);
 	m_gatearray->set_cpuregion_tag("soundcpu");
 

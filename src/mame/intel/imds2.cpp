@@ -262,15 +262,15 @@ void imds2_state::imds2(machine_config &config)
 	m_ipccpu->in_inta_func().set("ipcsyspic", FUNC(pic8259_device::acknowledge));
 	//config.set_maximum_quantum(attotime::from_hz(100));
 
-	PIC8259(config, m_ipcsyspic, 0);
+	PIC8259(config, m_ipcsyspic);
 	m_ipcsyspic->out_int_callback().set(FUNC(imds2_state::ipc_intr_w));
 	m_ipcsyspic->in_sp_callback().set_constant(1);
 
-	PIC8259(config, m_ipclocpic, 0);
+	PIC8259(config, m_ipclocpic);
 	m_ipclocpic->out_int_callback().set(m_ipcsyspic, FUNC(pic8259_device::ir7_w));
 	m_ipclocpic->in_sp_callback().set_constant(0);
 
-	PIT8253(config, m_ipctimer, 0);
+	PIT8253(config, m_ipctimer);
 	m_ipctimer->set_clk<0>(IPC_XTAL_Y1 / 16);
 	m_ipctimer->set_clk<1>(IPC_XTAL_Y1 / 16);
 	m_ipctimer->set_clk<2>(IPC_XTAL_Y1 / 16);

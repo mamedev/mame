@@ -502,7 +502,7 @@ void mcs51_cpu_device::djnz_mem(u8 r)
 	s8 rel_addr = m_program.read_byte(m_pc++);        //Grab relative code address
 	u8 data = read_direct(addr) - 1;         //Decrement value contained at data address
 	write_direct(addr, data);
-	if (data != 0)                  //Branch if contents of data address is not 0
+	if (data != 0)                  //Branch if decremented value is not 0
 	{
 		m_pc = m_pc + rel_addr;
 	}

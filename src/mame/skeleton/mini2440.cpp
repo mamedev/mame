@@ -258,7 +258,7 @@ void mini2440_state::mini2440(machine_config &config)
 	m_s3c2440->nand_data_r_callback().set(FUNC(mini2440_state::s3c2440_nand_data_r));
 	m_s3c2440->nand_data_w_callback().set(FUNC(mini2440_state::s3c2440_nand_data_w));
 
-	SAMSUNG_K9F1G08U0B(config, m_nand, 0);
+	SAMSUNG_K9F1G08U0B(config, m_nand);
 	m_nand->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
 }
 

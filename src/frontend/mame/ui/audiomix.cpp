@@ -15,6 +15,7 @@
 #include "ui/ui.h"
 
 // emu
+#include "input.h"
 #include "speaker.h"
 
 // osd
@@ -45,8 +46,8 @@ enum {
 
 } // anonymous namespace
 
-menu_audio_mixer::menu_audio_mixer(mame_ui_manager &mui, render_container &container)
-	: menu(mui, container)
+menu_audio_mixer::menu_audio_mixer(mame_ui_manager &mui, render_target &target)
+	: menu(mui, target)
 	, m_generation(0)
 	, m_reset_item(0)
 {

@@ -195,7 +195,7 @@ void tim100_state::tim100(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(3);
 
-	i8251_device &uart_u17(I8251(config, "uart_u17", 0));
+	i8251_device &uart_u17(I8251(config, "uart_u17"));
 	uart_u17.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart_u17.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart_u17.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -207,7 +207,7 @@ void tim100_state::tim100(machine_config &config)
 	rs232.cts_handler().set("uart_u17", FUNC(i8251_device::write_cts));
 	rs232.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
-	i8251_device &uart_u18(I8251(config, "uart_u18", 0));
+	i8251_device &uart_u18(I8251(config, "uart_u18"));
 	uart_u18.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 	uart_u18.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	uart_u18.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));

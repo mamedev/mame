@@ -78,6 +78,7 @@ public:
 		m_lock(*this, "LOCK"),
 		m_caps(*this, "CAPS"),
 		m_40_80(*this, "40_80"),
+		m_portswap(*this, "JOYSWAP"),
 		m_z80en(0),
 		m_loram(1),
 		m_hiram(1),
@@ -122,6 +123,7 @@ public:
 	required_ioport m_lock;
 	required_ioport m_caps;
 	required_ioport m_40_80;
+	optional_ioport m_portswap;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -851,6 +853,11 @@ static INPUT_PORTS_START( c128 )
 
 	PORT_START( "40_80" )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("40/80 DISPLAY") PORT_CODE(KEYCODE_F11) PORT_TOGGLE
+
+	PORT_START( "JOYSWAP" )
+	PORT_CONFNAME( 0x01, 0x00, "Swap joystick ports" )
+	PORT_CONFSETTING( 0x01, "Joystick in swapped port" )
+	PORT_CONFSETTING( 0x00, "Joystick in assigned port" )
 INPUT_PORTS_END
 
 
@@ -1112,23 +1119,25 @@ void c128_state::vic_k_w(uint8_t data)
 uint8_t c128_state::sid_potx_r()
 {
 	uint8_t data = 0xff;
+	vcs_control_port_device *cur1 = m_portswap->read() ? m_joy2 : m_joy1;
+	vcs_control_port_device *cur2 = m_portswap->read() ? m_joy1 : m_joy2;
 
 	switch (m_cia1->pa_r() >> 6)
 	{
-	case 1: data = m_joy1->read_pot_x(); break;
-	case 2: data = m_joy2->read_pot_x(); break;
+	case 1: data = cur1->read_pot_x(); break;
+	case 2: data = cur2->read_pot_x(); break;
 	case 3:
-		if (m_joy1->has_pot_x() && m_joy2->has_pot_x())
+		if (cur1->has_pot_x() && cur2->has_pot_x())
 		{
-			data = 1 / (1 / m_joy1->read_pot_x() + 1 / m_joy2->read_pot_x());
+			data = 1 / (1 / cur1->read_pot_x() + 1 / cur2->read_pot_x());
 		}
-		else if (m_joy1->has_pot_x())
+		else if (cur1->has_pot_x())
 		{
-			data = m_joy1->read_pot_x();
+			data = cur1->read_pot_x();
 		}
-		else if (m_joy2->has_pot_x())
+		else if (cur2->has_pot_x())
 		{
-			data = m_joy2->read_pot_x();
+			data = cur2->read_pot_x();
 		}
 		break;
 	}
@@ -1139,23 +1148,25 @@ uint8_t c128_state::sid_potx_r()
 uint8_t c128_state::sid_poty_r()
 {
 	uint8_t data = 0xff;
+	vcs_control_port_device *cur1 = m_portswap->read() ? m_joy2 : m_joy1;
+	vcs_control_port_device *cur2 = m_portswap->read() ? m_joy1 : m_joy2;
 
 	switch (m_cia1->pa_r() >> 6)
 	{
-	case 1: data = m_joy1->read_pot_y(); break;
-	case 2: data = m_joy2->read_pot_y(); break;
+	case 1: data = cur1->read_pot_y(); break;
+	case 2: data = cur2->read_pot_y(); break;
 	case 3:
-		if (m_joy1->has_pot_y() && m_joy2->has_pot_y())
+		if (cur1->has_pot_y() && cur2->has_pot_y())
 		{
-			data = 1 / (1 / m_joy1->read_pot_y() + 1 / m_joy2->read_pot_y());
+			data = 1 / (1 / cur1->read_pot_y() + 1 / cur2->read_pot_y());
 		}
-		else if (m_joy1->has_pot_y())
+		else if (cur1->has_pot_y())
 		{
-			data = m_joy1->read_pot_y();
+			data = cur1->read_pot_y();
 		}
-		else if (m_joy2->has_pot_y())
+		else if (cur2->has_pot_y())
 		{
-			data = m_joy2->read_pot_y();
+			data = cur2->read_pot_y();
 		}
 		break;
 	}
@@ -1186,9 +1197,10 @@ uint8_t c128_state::cia1_pa_r()
 	*/
 
 	uint8_t data = 0xff;
+	vcs_control_port_device *cur2 = m_portswap->read() ? m_joy1 : m_joy2;
 
 	// joystick
-	uint8_t joy_b = m_joy2->read_joy();
+	uint8_t joy_b = cur2->read_joy();
 
 	data &= (0xf0 | (joy_b & 0x0f));
 	data &= ~(!BIT(joy_b, 5) << 4);
@@ -1233,7 +1245,8 @@ void c128_state::cia1_pa_w(uint8_t data)
 
 	*/
 
-	m_joy2->joy_w(data & 0x1f);
+	vcs_control_port_device *cur2 = m_portswap->read() ? m_joy1 : m_joy2;
+	cur2->joy_w(data & 0x1f);
 }
 
 uint8_t c128_state::cia1_pb_r()
@@ -1254,9 +1267,10 @@ uint8_t c128_state::cia1_pb_r()
 	*/
 
 	uint8_t data = 0xff;
+	vcs_control_port_device *cur1 = m_portswap->read() ? m_joy2 : m_joy1;
 
 	// joystick
-	uint8_t joy_a = m_joy1->read_joy();
+	uint8_t joy_a = cur1->read_joy();
 
 	data &= (0xf0 | (joy_a & 0x0f));
 	data &= ~(!BIT(joy_a, 5) << 4);
@@ -1297,7 +1311,9 @@ void c128_state::cia1_pb_w(uint8_t data)
 
 	*/
 
-	m_joy1->joy_w(data & 0x1f);
+	vcs_control_port_device *cur1 = m_portswap->read() ? m_joy2 : m_joy1;
+
+	cur1->joy_w(data & 0x1f);
 
 	m_vic->lp_w(BIT(data, 4));
 }

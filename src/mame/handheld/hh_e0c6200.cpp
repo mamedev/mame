@@ -54,18 +54,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-
 	void lcd_segment_w(offs_t offset, u8 data) { m_out_x[offset & 0xf][offset >> 4] = data; }
 
 	required_device<e0c6s46_device> m_maincpu;
 	output_finder<16, 51> m_out_x; // max 16 * 51
 };
-
-void hh_e0c6200_state::machine_start()
-{
-	m_out_x.resolve();
-}
 
 
 

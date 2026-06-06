@@ -348,7 +348,7 @@ void abc80_state::abc80_video(machine_config &config)
 	m_screen->set_screen_update(FUNC(abc80_state::screen_update));
 	m_screen->set_raw(XTAL(11'980'800)/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART);
 
-	SN74S263(config, m_rocg, 0);
+	SN74S263(config, m_rocg);
 	m_rocg->set_palette(m_palette);
 }
 
@@ -365,6 +365,6 @@ void tkn80_state::tkn80_video(machine_config &config)
 	m_screen->set_screen_update(FUNC(tkn80_state::screen_update));
 	m_screen->set_raw(XTAL(11'980'800), ABC80_HTOTAL*2, ABC80_HBEND*2, ABC80_HBSTART*2, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART);
 
-	SN74S263(config, m_rocg, 0);
+	SN74S263(config, m_rocg);
 	m_rocg->set_palette(m_palette);
 }

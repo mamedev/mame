@@ -57,10 +57,9 @@ public:
 		m_spriteram(*this, "spriteram", 0x800, ENDIANNESS_BIG)
 	{ }
 
-	void burglarx(machine_config &config);
+	void burglarx(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	static rgb_t unico_R6G6B6X(uint32_t raw);
@@ -368,8 +367,6 @@ void burglarx_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 uint32_t burglarx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int layers_ctrl = -1;
-
 	m_tilemap[0]->set_scrollx(0, m_scroll[0x00]);
 	m_tilemap[0]->set_scrolly(0, m_scroll[0x01]);
 
@@ -379,28 +376,16 @@ uint32_t burglarx_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_tilemap[2]->set_scrollx(0, m_scroll[0x04]);
 	m_tilemap[2]->set_scrolly(0, m_scroll[0x02]);
 
-#ifdef MAME_DEBUG
-if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed(KEYCODE_X) )
-{
-	int msk = 0;
-	if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
-	if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
-	if (machine().input().code_pressed(KEYCODE_E))  msk |= 4;
-	if (machine().input().code_pressed(KEYCODE_A))  msk |= 8;
-	if (msk != 0) layers_ctrl &= msk;
-}
-#endif
-
 	// The background color is the first of the last palette
 	bitmap.fill(0x1f00, cliprect);
 	screen.priority().fill(0, cliprect);
 
-	if (layers_ctrl & 1)    m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1);
-	if (layers_ctrl & 2)    m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 2);
-	if (layers_ctrl & 4)    m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 4);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 2);
+	m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 4);
 
 	// Sprites are drawn last, using pdrawgfx
-	if (layers_ctrl & 8)    draw_sprites(screen, bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -901,12 +886,6 @@ GFXDECODE_END
 
 
 ***************************************************************************/
-
-
-void burglarx_state::machine_start()
-{
-	m_leds.resolve();
-}
 
 
 /***************************************************************************

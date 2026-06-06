@@ -542,14 +542,14 @@ void swtpc8212_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_update_row_callback(FUNC(swtpc8212_device::update_row));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(swtpc8212_device::keyboard_put));
 
 	SPEAKER(config, "bell").front_center();
 	BEEP(config, m_beeper, 2000);
 	m_beeper->add_route(ALL_OUTPUTS, "bell", 0.25);
 
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 }
 
 ioport_constructor swtpc8212_device::device_input_ports() const

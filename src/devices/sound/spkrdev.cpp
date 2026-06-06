@@ -75,6 +75,7 @@
 #include "spkrdev.h"
 
 #include <algorithm>
+#include <numbers>
 
 
 // The default is 1-bit, but can be customized with set_levels.
@@ -140,7 +141,7 @@ void speaker_sound_device::device_start()
 	 *    With -samplerate 96000, cutoff freq is ca 24kHz while the Nyq. freq is 48kHz.
 	 * For a steeper, more efficient filter, increase FILTER_LENGTH at the expense of CPU usage.
 	 */
-	constexpr double FILTER_STEP = M_PI / 2 / RATE_MULTIPLIER;
+	constexpr double FILTER_STEP = std::numbers::pi / 2 / RATE_MULTIPLIER;
 	/* Distribute symmetrically on x axis; center has x=0 if length is odd */
 	int i;
 	double x;

@@ -100,10 +100,13 @@ Small outline design for easy kit retrofitting of existing cabinets.
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mips/mips3.h"
+
 #include "bus/ata/ataintf.h"
-#include "machine/nvram.h"
+#include "cpu/mips/mips3.h"
 #include "imagedev/harddriv.h"
+#include "machine/nvram.h"
+
+#include "input.h" // for keys to manually generate interrupts
 #include "screen.h"
 
 #define VERBOSE (0)

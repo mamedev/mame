@@ -26,8 +26,6 @@
 #include "machine/msm6242.h"
 #include "sound/okim6295.h"
 #include "video/huc6202.h"
-#include "video/huc6260.h"
-#include "video/huc6270.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -71,7 +69,6 @@ private:
 void ggconnie_state::machine_start()
 {
 	pce_common_state::machine_start();
-	m_lamp.resolve();
 
 	for (auto &okibank : m_okibank)
 		okibank->configure_entries(0, 8, memregion("oki")->base(), 0x10000);

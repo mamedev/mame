@@ -43,7 +43,7 @@ namespace ui {
 //  menu_slot_devices constructor
 //-------------------------------------------------
 
-menu_slot_devices::menu_slot_devices(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+menu_slot_devices::menu_slot_devices(mame_ui_manager &mui, render_target &target) : menu(mui, target)
 {
 	set_heading(_("Slot Devices"));
 }
@@ -262,7 +262,7 @@ bool menu_slot_devices::handle(event const *ev)
 		device_slot_interface *slot = (device_slot_interface *)ev->itemref;
 		device_slot_interface::slot_option const *const option = get_current_option(*slot);
 		if (option)
-			menu::stack_push<menu_device_config>(ui(), container(), slot, option);
+			menu::stack_push<menu_device_config>(ui(), target(), slot, option);
 	}
 
 	return false; // any changes require the menu to be rebuilt

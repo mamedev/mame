@@ -34,7 +34,7 @@
     MACROS
 ***************************************************************************/
 
-template <typename T> inline std::enable_if_t<!std::is_pointer<T>::value, T const &> ROMENTRY_UNWRAP(T const &r) { return r; }
+template <typename T> inline T const &ROMENTRY_UNWRAP(T const &r) requires (!std::is_pointer<T>::value) { return r; }
 template <typename T> inline T const &ROMENTRY_UNWRAP(T const *r) { return *r; }
 
 /* ----- per-entry macros ----- */

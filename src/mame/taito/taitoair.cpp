@@ -689,7 +689,7 @@ void taitoair_state::airsys(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -697,7 +697,7 @@ void taitoair_state::airsys(machine_config &config)
 	m_tc0220ioc->write_4_callback().set(FUNC(taitoair_state::coin_control_w));
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
-	TAITOIO_YOKE(config, m_yoke, 0);
+	TAITOIO_YOKE(config, m_yoke);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -712,7 +712,7 @@ void taitoair_state::airsys(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::BLACK, 512*16+512*16);
 
-	TC0080VCO(config, m_tc0080vco, 0);
+	TC0080VCO(config, m_tc0080vco);
 	m_tc0080vco->set_offsets(1, 1);
 	m_tc0080vco->set_bgflip_yoffs(-2);
 	m_tc0080vco->set_palette(m_palette);
@@ -726,7 +726,7 @@ void taitoair_state::airsys(machine_config &config)
 	ymsnd.add_route(1, "mono", 0.60);
 	ymsnd.add_route(2, "mono", 0.60);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -771,8 +771,8 @@ ROM_START( topland )
 	ROM_LOAD16_BYTE( "b62-21.35", 0x00000, 0x02000, CRC(5f38460d) SHA1(0593718d15b30b10f7686959932e2c934de2a529) )  // cpu board
 	ROM_LOAD16_BYTE( "b62-20.6",  0x00001, 0x02000, CRC(a4afe958) SHA1(7593a327f4ea0cc9e28fd3269278871f62fb0598) )  // cpu board
 
-	ROM_REGION( 0x10000, "mechacpu", 0 )
-	ROM_LOAD( "b62_mecha.rom", 0x00000, 0x08000, NO_DUMP )
+	ROM_REGION( 0x10000, "mechacpu", 0 ) // on POWER P.C. BOARD J3000014A
+	ROM_LOAD( "b09_37.13", 0x00000, 0x08000, CRC(4bdf15ed) SHA1(b960208e63cede116925e064279a6cf107aef81c) ) // same as mlanding
 
 	ROM_REGION( 0x100000, "tc0080vco", 0 )   /* 16x16 tiles */
 	ROM_LOAD64_BYTE( "b62-33.39",  0x000007, 0x20000, CRC(38786867) SHA1(7292e3fa69cad6494f2e8e7efa9c3f989bdf958d) )
@@ -820,8 +820,8 @@ ROM_START( toplandj )
 	ROM_LOAD16_BYTE( "b62-21.35", 0x00000, 0x02000, CRC(5f38460d) SHA1(0593718d15b30b10f7686959932e2c934de2a529) )  // cpu board
 	ROM_LOAD16_BYTE( "b62-20.6",  0x00001, 0x02000, CRC(a4afe958) SHA1(7593a327f4ea0cc9e28fd3269278871f62fb0598) )  // cpu board
 
-	ROM_REGION( 0x10000, "mechacpu", 0 )
-	ROM_LOAD( "b62_mecha.rom", 0x00000, 0x08000, NO_DUMP )
+	ROM_REGION( 0x10000, "mechacpu", 0 ) // on POWER P.C. BOARD J3000014A
+	ROM_LOAD( "b09_37.13", 0x00000, 0x08000, CRC(4bdf15ed) SHA1(b960208e63cede116925e064279a6cf107aef81c) ) // same as mlanding
 
 	ROM_REGION( 0x100000, "tc0080vco", 0 )   /* 16x16 tiles */
 	ROM_LOAD64_BYTE( "b62-33.39",  0x000007, 0x20000, CRC(38786867) SHA1(7292e3fa69cad6494f2e8e7efa9c3f989bdf958d) )

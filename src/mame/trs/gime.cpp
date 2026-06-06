@@ -80,6 +80,9 @@
 
     Cloud Kingdoms: 512K bank switch on scanline.
 
+    kbchk: Keyboard interrupt test.
+           https://github.com/callsop/coco-test
+
 **********************************************************************/
 
 

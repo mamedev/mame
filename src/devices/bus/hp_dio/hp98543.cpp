@@ -107,7 +107,7 @@ void dio16_98543_device::device_add_mconfig(machine_config &config)
 	topcat3.set_planemask(8);
 	topcat3.irq_out_cb().set(FUNC(dio16_98543_device::int3_w));
 
-	NEREID(config, m_nereid, 0);
+	NEREID(config, m_nereid);
 }
 
 const tiny_rom_entry *dio16_98543_device::device_rom_region() const

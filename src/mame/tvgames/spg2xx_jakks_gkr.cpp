@@ -455,13 +455,13 @@ void jakks_gkr_state::jakks_gkr(machine_config &config)
 	m_maincpu->portc_in().set_ioport("P3");
 	m_maincpu->portc_out().set(FUNC(jakks_gkr_state::gkr_portc_w));
 
-	JAKKS_GAMEKEY_SLOT(config, m_cart, 0, jakks_gamekey, nullptr);
+	JAKKS_GAMEKEY_SLOT(config, m_cart, jakks_gamekey, nullptr);
 }
 
 void jakks_gkr_state::jakks_gkr_i2c(machine_config &config)
 {
 	jakks_gkr(config);
-	I2C_24C16(config, m_i2cmem, 0); // ?
+	I2C_24C16(config, m_i2cmem); // ?
 }
 
 
@@ -537,7 +537,7 @@ void jakks_gkr_state::jakks_gkr_wp(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
 	m_maincpu->adc_in<0>().set_ioport("JOYX");
 	m_maincpu->adc_in<2>().set_ioport("JOYY");
-	//SOFTWARE_LIST(config, "jakks_gamekey_wp").set_original("jakks_gamekey_wp"); // NO KEYS RELEASED
+	SOFTWARE_LIST(config, "jakks_gamekey_wp").set_original("jakks_gamekey_wp");
 
 	m_maincpu->set_force_no_drc(true); // the Light Tag game seems to hang maybe once every 7 times with the DRC, appears more stable without (could just be chance tho)
 }

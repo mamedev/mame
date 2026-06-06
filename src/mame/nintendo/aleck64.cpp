@@ -1065,7 +1065,7 @@ void aleck64_state::aleck64(machine_config &config)
 	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	N64PERIPH(config, m_rcp_periphs, 0);
+	N64PERIPH(config, m_rcp_periphs);
 	m_rcp_periphs->set_sram(m_sram);
 	m_rcp_periphs->set_rdram(m_rdram);
 }

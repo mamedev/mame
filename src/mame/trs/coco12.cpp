@@ -527,7 +527,7 @@ void coco12_state::coco(machine_config &config)
 	m_sam->set_addrmap(7, &coco12_state::coco_ff60);
 
 	// Becker Port device
-	COCO_DWSOCK(config, m_beckerport, 0);
+	COCO_DWSOCK(config, m_beckerport);
 
 	// sound hardware
 	coco_sound(config);
@@ -567,8 +567,8 @@ void coco12_state::coco(machine_config &config)
 	SOFTWARE_LIST(config, "dragon_cart_list").set_compatible("dragon_cart");
 
 	// virtual hard disks
-	COCO_VHD(config, m_vhd_0, 0, m_maincpu);
-	COCO_VHD(config, m_vhd_1, 0, m_maincpu);
+	COCO_VHD(config, m_vhd_0, m_maincpu);
+	COCO_VHD(config, m_vhd_1, m_maincpu);
 }
 
 void coco12_state::cocoh(machine_config &config)
@@ -584,7 +584,7 @@ void deluxecoco_state::deluxecoco(machine_config &config)
 	coco2b(config);
 
 	// Asynchronous Communications Interface Adapter
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(1.8432_MHz_XTAL);
 	m_acia->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 	m_acia->txd_handler().set(ACIA_TAG, FUNC(rs232_port_device::write_txd));

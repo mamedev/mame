@@ -15,75 +15,21 @@
 ******************************************************************************/
 
 #include "emu.h"
+#include "codec.h"
+
+#include "bus/psion/honda/slot.h"
+#include "bus/psion/sibo/slot.h"
 #include "machine/nvram.h"
 #include "machine/psion_asic9.h"
 #include "machine/psion_condor.h"
 #include "machine/psion_ssd.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
-#include "bus/psion/honda/slot.h"
-#include "bus/psion/sibo/slot.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
-
-
-class psion3a_codec_device : public device_t, public device_sound_interface
-{
-public:
-	psion3a_codec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-
-	void pcm_in(uint8_t data);
-
-protected:
-	void device_start() override ATTR_COLD;
-	void sound_stream_update(sound_stream &stream) override;
-
-private:
-	sound_stream *m_stream;
-	int16_t m_audio_out;
-};
-
-DEFINE_DEVICE_TYPE(PSION_S3A_CODEC, psion3a_codec_device, "psion3a_codec", "Series 3a A-law Codec")
-
-psion3a_codec_device::psion3a_codec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PSION_S3A_CODEC, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
-	, m_stream(nullptr)
-	, m_audio_out(0)
-{
-}
-
-void psion3a_codec_device::device_start()
-{
-	m_stream = stream_alloc(0, 1, 8000);
-}
-
-void psion3a_codec_device::sound_stream_update(sound_stream &stream)
-{
-	stream.fill(0, sound_stream::sample_t(m_audio_out) * (1.0 / 4096.0));
-}
-
-void psion3a_codec_device::pcm_in(uint8_t data)
-{
-	m_stream->update();
-
-	// Expand 8-bit signed compressed number to 16-bit 2's complement integer (13-bit magnitude) using A-law
-	data ^= 0x55;
-
-	uint8_t seg = (data & 0x70) >> 4;
-	m_audio_out = 0;
-	if (seg)
-	{
-		m_audio_out = 0x10;
-		seg--;
-	}
-	m_audio_out = (((m_audio_out + (data & 0x0f)) << 1) + 1) << seg;
-
-	m_audio_out *= (data & 0x80) ? -1.0 : 1.0;
-}
 
 
 namespace {
@@ -98,8 +44,9 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_palette(*this, "palette")
 		, m_keyboard(*this, "COL%u", 0U)
-		, m_speaker(*this, "speaker")
+		, m_buzzer(*this, "buzzer")
 		, m_codec(*this, "codec")
+		, m_mic(*this, "mic")
 		, m_ssd(*this, "ssd%u", 1U)
 	{ }
 
@@ -115,13 +62,16 @@ protected:
 	required_device<nvram_device> m_nvram;
 	required_device<palette_device> m_palette;
 	required_ioport_array<8> m_keyboard;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<psion3a_codec_device> m_codec;
+	required_device<speaker_sound_device> m_buzzer;
+	required_device<psion_codec_device> m_codec;
+	required_device<microphone_device> m_mic;
 	required_device_array<psion_ssd_device, 2> m_ssd;
 
 	void palette_init(palette_device &palette);
 
 	uint16_t kbd_r();
+	void portcd_w(uint16_t data);
+	void update_amp();
 
 	uint8_t m_key_col = 0;
 };
@@ -179,6 +129,8 @@ private:
 void psion3a_base_state::machine_start()
 {
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
+
+	save_item(NAME(m_key_col));
 }
 
 void psion3c_state::machine_reset()
@@ -481,6 +433,30 @@ uint16_t psion3a_base_state::kbd_r()
 }
 
 
+void psion3a_base_state::portcd_w(uint16_t data)
+{
+	// TODO: LCD backlight BIT(data, 0) (Series 3mx only)
+
+	// TODO: MSC1192 speaker amplifier, can be put into standby to mute audio (buzzer maybe Series 3mx only)
+	static const float codec_volume[4] = { 1.0f, 0.75f, 0.5f, 0.25f };
+
+	if (BIT(data, 3)) // AMPEN
+	{
+		//m_buzzer->set_output_gain(ALL_OUTPUTS, 1.0);
+		m_codec->set_output_gain(ALL_OUTPUTS, codec_volume[BIT(data, 6, 2)]); // VOL
+	}
+	else
+	{
+		//m_buzzer->set_output_gain(ALL_OUTPUTS, 0.0);
+		m_codec->set_output_gain(ALL_OUTPUTS, 0.0);
+	}
+
+	// TODO: LCD contrast BIT(data, 8, 4)
+
+	m_codec->pdn_w(BIT(data, 14)); // CODEN
+}
+
+
 void psion3a_base_state::palette_init(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(190, 220, 190));
@@ -501,8 +477,8 @@ void psion3a_base_state::psion_asic9(machine_config &config)
 	m_asic9->set_screen("screen");
 	m_asic9->set_ram_rom("ram", "rom");
 	m_asic9->port_ab_r().set(FUNC(psion3a_base_state::kbd_r));
-	m_asic9->buz_cb().set(m_speaker, FUNC(speaker_sound_device::level_w));
-	//m_asic9->buzvol_cb().set([this](int state) { m_speaker->set_output_gain(ALL_OUTPUTS, state ? 1.0 : 0.25); });
+	m_asic9->port_cd_w().set(FUNC(psion3a_base_state::portcd_w));
+	m_asic9->buz_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_asic9->col_cb().set([this](uint8_t data) { m_key_col = data; });
 	m_asic9->data_r<0>().set(m_ssd[1], FUNC(psion_ssd_device::data_r));      // SSD Pack 2
 	m_asic9->data_w<0>().set(m_ssd[1], FUNC(psion_ssd_device::data_w));
@@ -518,7 +494,7 @@ void psion3a_base_state::psion_asic9(machine_config &config)
 	PALETTE(config, "palette", FUNC(psion3a_base_state::palette_init), 3);
 
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
+	SPEAKER_SOUND(config, m_buzzer).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	RAM(config, m_ram);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
@@ -544,8 +520,12 @@ void psion3a_state::psion3a(machine_config &config)
 	m_asic9->data_r<4>().set(m_sibo, FUNC(psion_sibo_slot_device::data_r));
 	m_asic9->data_w<4>().set(m_sibo, FUNC(psion_sibo_slot_device::data_w));
 
-	PSION_S3A_CODEC(config, m_codec).add_route(ALL_OUTPUTS, "mono", 1.00); // TODO: M7542
-	m_asic9->pcm_out().set(m_codec, FUNC(psion3a_codec_device::pcm_in));
+	PSION_CODEC(config, m_codec, 8000).add_route(ALL_OUTPUTS, "mono", 1.0); // TODO: M7542
+	m_asic9->pcm_in().set(m_codec, FUNC(psion_codec_device::pcm_out));
+	m_asic9->pcm_out().set(m_codec, FUNC(psion_codec_device::pcm_in));
+
+	MICROPHONE(config, m_mic, 1).front_center();
+	m_mic->add_route(0, m_codec, 1.0);
 }
 
 void psion3a_state::psion3a2(machine_config &config)
@@ -568,8 +548,12 @@ void psion3c_state::psion3c(machine_config &config)
 
 	m_ram->set_default_size("2M").set_extra_options("1M");
 
-	PSION_S3A_CODEC(config, m_codec).add_route(ALL_OUTPUTS, "mono", 1.00); // TODO: M7702-03
-	m_asic9->pcm_out().set(m_codec, FUNC(psion3a_codec_device::pcm_in));
+	PSION_CODEC(config, m_codec, 8000).add_route(ALL_OUTPUTS, "mono", 1.0); // TODO: M7702-03
+	m_asic9->pcm_in().set(m_codec, FUNC(psion_codec_device::pcm_out));
+	m_asic9->pcm_out().set(m_codec, FUNC(psion_codec_device::pcm_in));
+
+	MICROPHONE(config, m_mic, 1).front_center();
+	m_mic->add_route(0, m_codec, 1.0);
 
 	PSION_CONDOR(config, m_condor, 3'686'400); // FIXME: unknown clock source
 	m_condor->txd_handler().set(m_honda, FUNC(psion_honda_slot_device::write_txd));
@@ -596,8 +580,7 @@ void psion3mx_state::psion3mx(machine_config &config)
 	m_asic9->set_screen("screen");
 	m_asic9->set_ram_rom("ram", "rom");
 	m_asic9->port_ab_r().set(FUNC(psion3mx_state::kbd_r));
-	m_asic9->buz_cb().set(m_speaker, FUNC(speaker_sound_device::level_w));
-	//m_asic9->buzvol_cb().set([this](int state) { m_speaker->set_output_gain(ALL_OUTPUTS, state ? 1.0 : 0.25); });
+	m_asic9->buz_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_asic9->col_cb().set([this](uint8_t data) { m_key_col = data; });
 	m_asic9->data_r<0>().set(m_ssd[1], FUNC(psion_ssd_device::data_r));      // SSD Pack 2
 	m_asic9->data_w<0>().set(m_ssd[1], FUNC(psion_ssd_device::data_w));
@@ -606,8 +589,12 @@ void psion3mx_state::psion3mx(machine_config &config)
 
 	m_ram->set_default_size("2M").set_extra_options("");
 
-	PSION_S3A_CODEC(config, m_codec).add_route(ALL_OUTPUTS, "mono", 1.00); // TODO: M7702-03
-	m_asic9->pcm_out().set(m_codec, FUNC(psion3a_codec_device::pcm_in));
+	PSION_CODEC(config, m_codec, 8000).add_route(ALL_OUTPUTS, "mono", 1.0); // TODO: M7702-03
+	m_asic9->pcm_in().set(m_codec, FUNC(psion_codec_device::pcm_out));
+	m_asic9->pcm_out().set(m_codec, FUNC(psion_codec_device::pcm_in));
+
+	MICROPHONE(config, m_mic, 1).front_center();
+	m_mic->add_route(0, m_codec, 1.0);
 
 	// Honda expansion port
 	PSION_HONDA_SLOT(config, m_honda, psion_honda_devices, nullptr);

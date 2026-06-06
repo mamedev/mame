@@ -341,7 +341,7 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 	m_cococart->halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// acia
-	mos6551_device &acia(MOS6551(config, "acia", 0));
+	mos6551_device &acia(MOS6551(config, "acia"));
 	acia.set_xtal(1.8432_MHz_XTAL);
 
 	// floppy

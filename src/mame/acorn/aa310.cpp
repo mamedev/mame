@@ -1146,12 +1146,12 @@ void aa500_state::aa500(machine_config &config)
 	m_adlc->out_irq_cb().set(m_ioc, FUNC(acorn_ioc_device::fl_w));
 	//m_adlc->out_rts_cb().
 
-	econet_device &econet(ECONET(config, "network", 0));
+	econet_device &econet(ECONET(config, "network"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
 
-	mos6551_device &acia(MOS6551(config, "acia", 0));
+	mos6551_device &acia(MOS6551(config, "acia"));
 	acia.set_xtal(1.8432_MHz_XTAL);
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -1232,7 +1232,7 @@ void aa310_state::aa310(machine_config &config)
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
 
-	mos6551_device &acia(MOS6551(config, "acia", 0));
+	mos6551_device &acia(MOS6551(config, "acia"));
 	acia.set_xtal(1.8432_MHz_XTAL);
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));

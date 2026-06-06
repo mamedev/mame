@@ -319,7 +319,7 @@ void macvail_state::maclc3_base(machine_config &config)
 	m_sonora->set_maincpu_tag("maincpu");
 	m_sonora->set_rom_tag("bootrom");
 
-	nubus_device &nubus(NUBUS(config, "pds", 0));
+	nubus_device &nubus(NUBUS(config, "pds"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.set_bus_mode(nubus_device::nubus_mode_t::LC32_PDS);
 	// LC III style PDS cards have slot IRQs $C, $D, and $E connected

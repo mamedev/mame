@@ -488,9 +488,9 @@ void wildpkr_state::wildpkr(machine_config &config)
 	screen.set_screen_update("acrtc", FUNC(hd63484_device::update_screen));
 	screen.set_palette("palette");
 
-	HD63484(config, "acrtc", 0).set_addrmap(0, &wildpkr_state::hd63484_map);
+	HD63484(config, "acrtc").set_addrmap(0, &wildpkr_state::hd63484_map);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette"));
 	ramdac.set_addrmap(0, &wildpkr_state::ramdac_map);
 
 	PALETTE(config, "palette", FUNC(wildpkr_state::wildpkr_palette), 256);
@@ -528,9 +528,9 @@ void wildpkr_state::tabpkr(machine_config &config)
 	screen.set_palette("palette");
 	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
-	HD63484(config, "acrtc", 0).set_addrmap(0, &wildpkr_state::hd63484_map);
+	HD63484(config, "acrtc").set_addrmap(0, &wildpkr_state::hd63484_map);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette"));
 	ramdac.set_addrmap(0, &wildpkr_state::ramdac_map);
 
 	PALETTE(config, "palette", FUNC(wildpkr_state::wildpkr_palette), 256);

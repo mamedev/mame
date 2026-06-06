@@ -6,8 +6,9 @@
     Emulation by R. Belmont
 
     This is the audio chip used in the Akai MPC60, with 16 voices of 12-bit sample playback.
-    No filter, but some sort of "echo buffer" exists which is probably similar/identical to the
-    delay effect on the later L6028 chip.
+    There are many similarities to the later L6028 chip and many of the registers are either
+    binary identical or very similar.  The main difference is the sense of the volume envelope
+    is reversed, where 0 here is max volume and 0xffff is silence.
 
     The chip has a total of 10 unique outputs, 8 individual outputs and a stereo pair.  Each voice
     can be sent to an individual output, the stereo pair, or both.
@@ -19,24 +20,37 @@
     (768K or 1536K bytes).  For ease of emulation, we make those 16-bit words.
 
     Voice registers (low 4 bits are the voice number)
+    000x - ssss ssss ssss ssss
+    s - start offset in samples from the start of memory (low word)
+
     001x - ssss ssss ssss ssss
-    s - loop start offset in samples from the start of memory
+    s - start offset in samples from the start of memory (high word)
 
-    011x - ssss ssss ssss ssss
-    s - start offset in samples from the start of memory
-
-    002x - key on/off
+    002x - pitch in 4.12 fixed point where 0x1000 is 40.0 kHz
 
     003x - eeee eeee ???? oooo
-    e - echo send level
-    o - mix output where 0 = 7, 1 = 8, 2 = 9, ... f = 8
+    e - send level
+    o - send destination where 0 = 7, 1 = 8, 2 = 9, ... f = 8
 
-    004x - unknown
+    004x - Envelope volume (0 = max volume, 0xffff = silent)
 
-    005x - unknown
+    005x - Volume envelope target, same units as register 004x
 
-    006x - ???? ???? ???? ????
-    This is somehow both volume and pitch.  Volume changes by 0x66 each step, pitch by 0x4c (102 and 76)
+    006x - Volume envelope rate in 13.3 fixed point, and inverted.
+           So this value XOR 0xffff gives the 13.3 fixed point rate
+           in envelope steps per sample period
+
+    007x - Main stereo left and right volumes
+
+    011x - Readback of register 001x
+
+    015x - Readback of register 005x
+
+    016x - Readback of register 006x
+
+    0200 - Wave RAM write (uses voice 1's start address as the pointer)
+
+    0300 - Wave RAM read (uses voice 1's start address as the pointer)
 
 **************************************************************************************************/
 
@@ -48,6 +62,9 @@
 #define LOG_REGISTERS_HIFREQ    (1U << 2)
 #define LOG_SAMPLE_READ         (1U << 3)
 #define LOG_SAMPLE_WRITE        (1U << 4)
+#define LOG_KEYON               (1U << 5)
+#define LOG_ENVELOPE            (1U << 6)
+#define LOG_VOLUME              (1U << 7)
 
 #define VERBOSE (0)
 
@@ -55,6 +72,8 @@
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(L4003, l4003_sound_device, "l4003", "Akai/Roger Linn L4003 wavetable sound")
+
+static constexpr uint32_t OUTPUT_SCALE = 0x7fff;
 
 l4003_sound_device::l4003_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, L4003, tag, owner, clock)
@@ -64,9 +83,24 @@ l4003_sound_device::l4003_sound_device(const machine_config &mconfig, const char
 	  , m_mem_config("l4003", ENDIANNESS_LITTLE, 16, 21)
 	  , m_data(0)
 	  , m_control(0)
-	  , m_key_status(0)
 	  , m_sample_rate(0)
 {
+	for (auto &voice : m_voices)
+	{
+		voice.start = 0;
+		voice.step = 0;
+		voice.pos = 0;
+		voice.frac = 0;
+		voice.l_volume = 0;
+		voice.r_volume = 0;
+		voice.env_volume = 0xffff;
+		voice.env_target = 0xffff;
+		voice.env_step = 0;
+		voice.env_pos = 0;
+		voice.send_dest = 0;
+		voice.send_level = 0;
+		voice.filt_state = 0;
+	}
 }
 
 void l4003_sound_device::map(address_map &map)
@@ -86,7 +120,23 @@ void l4003_sound_device::device_start()
 
 	// Allocate the stream
 	m_sample_rate = clock() / 896.0f;   // 35.84 MHz clock / 896 = 40.0 kHz sample rate
-	m_stream = stream_alloc(0, 10, m_sample_rate);
+	m_stream = stream_alloc(0, 10, m_sample_rate, STREAM_SYNCHRONOUS);
+
+	save_item(STRUCT_MEMBER(m_voices, start));
+	save_item(STRUCT_MEMBER(m_voices, step));
+	save_item(STRUCT_MEMBER(m_voices, pos));
+	save_item(STRUCT_MEMBER(m_voices, frac));
+	save_item(STRUCT_MEMBER(m_voices, l_volume));
+	save_item(STRUCT_MEMBER(m_voices, r_volume));
+	save_item(STRUCT_MEMBER(m_voices, env_volume));
+	save_item(STRUCT_MEMBER(m_voices, env_target));
+	save_item(STRUCT_MEMBER(m_voices, env_step));
+	save_item(STRUCT_MEMBER(m_voices, env_pos));
+	save_item(STRUCT_MEMBER(m_voices, send_dest));
+	save_item(STRUCT_MEMBER(m_voices, send_level));
+	save_item(STRUCT_MEMBER(m_voices, filt_state));
+	save_item(NAME(m_data));
+	save_item(NAME(m_control));
 }
 
 void l4003_sound_device::device_reset()
@@ -97,60 +147,101 @@ void l4003_sound_device::sound_stream_update(sound_stream &stream)
 {
 	for (int i = 0; i < NUM_VOICES; i++)
 	{
-		if (m_key_status & (1 << i))
+		l4003_voice &vptr = m_voices[i];
+
+		const uint32_t step = vptr.step;
+		uint32_t pos = vptr.pos;
+		uint32_t frac = vptr.frac;
+
+		for (int j = 0; j < stream.samples(); j++)
 		{
-			l4003_voice &vptr = m_voices[i];
+			uint32_t address;
+			int32_t sample;
 
-			uint32_t start = vptr.start;
-			const uint32_t step = vptr.step;
+			pos += (frac >> 12);
+			frac &= 0xfff;
 
-			uint32_t pos = vptr.pos;
-			uint32_t frac = vptr.frac;
+			address = (vptr.start << 1) + pos;
+			sample = (int16_t)m_cache.read_word(address & 0x1fffff);
 
-			for (int j = 0; j < stream.samples(); j++)
+			frac += step;
+
+			// The following is a pretty literal decompile of the assembly code in the MPC3000
+			// which massages the MPC60 samples into 16 bits.  It's presumed to be simulating internal
+			// processing of the L4003 since it sounds closer than just playing the 12-bit samples
+			// as 12-bit linear.
+			const int32_t temp =
+				(int32_t)(((uint32_t)(uint16_t)sample << 16) | (uint16_t)vptr.filt_state) >> 8;
+			const int32_t new_state = temp + (int32_t)(((int64_t)vptr.filt_state * 0x9e227) >> 20);
+
+			int32_t temp2 =
+				(int32_t)(((int64_t)new_state * 0x5b708) >> 20) +
+				(int32_t)(((int64_t)vptr.filt_state * 0x645d) >> 20);
+
+			vptr.filt_state = new_state;
+			temp2 = (temp2 * 19) >> 4;
+
+			if (temp2 >= 0)
 			{
-				uint32_t address;
-				int32_t sample;
-
-				pos += (frac >> 12);
-				frac &= 0xfff;
-
-				address = start + pos;
-				sample = (int16_t)m_cache.read_word(address);
-
-				frac += step;
-
-				if (vptr.send_level == 0)
+				if ((uint32_t)temp2 >= ((uint32_t)OUTPUT_SCALE << 8))
 				{
-					sample = 0;
+					sample = (int16_t)(OUTPUT_SCALE - 1);
 				}
-
-				const int64_t left = (sample * (uint64_t(vptr.volume) * uint64_t(vptr.env_volume))) >> 24;
-				const int64_t right = (sample * (uint64_t(vptr.volume) * uint64_t(vptr.env_volume))) >> 24;
-				stream.add_int(0, j, left, 32768);
-				stream.add_int(1, j, right, 32768);
-
-				if (vptr.send_level > 0)
+				else
 				{
-					const int dest = vptr.send_dest & 0xf;
-					if (dest != 0xf)
-					{
-						const int64_t send = (sample * (uint64_t(vptr.send_level) * uint64_t(vptr.env_volume))) >> 24;
-						stream.add_int(2 + (dest - 7), j, send, 32768);
-					}
+					sample = (int16_t)((temp2 << 7) / (int32_t)OUTPUT_SCALE);
+				}
+			}
+			else
+			{
+				if ((temp2 >> 8) <= -(int32_t)OUTPUT_SCALE)
+				{
+					sample = (int16_t)-(int16_t)(OUTPUT_SCALE - 1);
+				}
+				else
+				{
+					sample = (int16_t)((temp2 << 7) / (int32_t)OUTPUT_SCALE);
 				}
 			}
 
-			vptr.pos = pos;
-			vptr.frac = frac;
+			// volume envelope processing
+			const uint16_t env_step = (uint16_t)vptr.env_step ^ 0xffff;
+			vptr.env_pos += env_step;
+
+			const int steps = (uint32_t)vptr.env_pos >> 3;
+			if (vptr.env_volume < vptr.env_target)
+			{
+				vptr.env_volume += std::min(steps, (vptr.env_target - vptr.env_volume));
+			}
+			else if (vptr.env_volume > vptr.env_target)
+			{
+				vptr.env_volume -= std::min(steps, (vptr.env_volume - vptr.env_target));
+			}
+			vptr.env_pos &= 0x7;
+
+			const int64_t left = (sample * (uint64_t(vptr.l_volume) * uint64_t(0xffff - vptr.env_volume))) >> 24;
+			const int64_t right = (sample * (uint64_t(vptr.r_volume) * uint64_t(0xffff - vptr.env_volume))) >> 24;
+			stream.add_int(0, j, left, 32768);
+			stream.add_int(1, j, right, 32768);
+
+			if (vptr.send_level > 0)
+			{
+				const int dest = vptr.send_dest & 0xf;
+				if (dest != 0xf)
+				{
+					const int64_t send = (sample * (uint64_t(vptr.send_level) * uint64_t(0xffff - vptr.env_volume))) >> 24;
+					stream.add_int(2 + (dest - 7), j, send, 32768);
+				}
+			}
 		}
+
+		vptr.pos = pos;
+		vptr.frac = frac;
 	}
 }
 
 uint16_t l4003_sound_device::data_r()
 {
-	m_stream->update();
-
 	LOGMASKED(LOG_REGISTERS, "%s: read data, control %04x (%s)\n", tag(), m_control, machine().describe_context());
 
 	return m_data;
@@ -158,8 +249,6 @@ uint16_t l4003_sound_device::data_r()
 
 void l4003_sound_device::data_w(uint16_t data)
 {
-	m_stream->update();
-
 	LOGMASKED(LOG_REGISTERS_HIFREQ, "%s: %04x to data\n", tag(), data);
 
 	m_data = data;
@@ -203,39 +292,65 @@ void l4003_sound_device::control_w(uint16_t data)
 				LOGMASKED(LOG_REGISTERS, "ch %d Sample ptr high %04x => %04x\n", voice, m_data, v.start);
 				break;
 
-			// key on/off
+			// pitch in 4.12 fixed-point format, similar to the L6028
 			case 0x0002:
-				if (m_data & 0x1000)
+				// if the pitch is being set from 0 to nonzero, it's a key-on so reset some state
+				if ((m_data != 0) && (v.step == 0))
 				{
-					m_key_status |= (1 << voice);
-
+					LOGMASKED(LOG_KEYON, "ch %d: Key on @ pitch %04x start %08x env rate %04x target %04x L %02x R %02x\n", voice, m_data, v.start, v.env_step, v.env_target, v.l_volume, v.r_volume);
 					v.pos = 0;
 					v.frac = 0;
-					v.step = 0x1000;
-					v.env_volume = 0x7fff;
-				}
-				else
-				{
-					m_key_status &= ~(1 << voice);
+					v.env_pos = 0;
+					v.filt_state = 0;
 				}
 
-				LOGMASKED(LOG_REGISTERS, "ch %d: Key %s %04x (%s)\n", voice, (m_data & 0x1000) ? "on" : "off", m_data, machine().describe_context());
+				v.step = m_data;
+
+				LOGMASKED(LOG_REGISTERS, "ch %d: Pitch %04x (%s)\n", voice, m_data, machine().describe_context());
 				break;
 
 			case 0x0003:
 				v.send_level = (m_data >> 8) & 0xff;
-				v.send_dest = m_data & 0x0f;
-				LOGMASKED(LOG_REGISTERS, "ch %d: Echo send volume %02x, dest %x (%s)\n", voice, v.send_level, v.send_dest, machine().describe_context());
+				v.send_dest = m_data & 0xf;
+				LOGMASKED(LOG_REGISTERS, "ch %d: Send volume %02x, dest %x (%s)\n", voice, v.send_level, v.send_dest, machine().describe_context());
+				break;
+
+			case 0x0004:
+				v.env_volume = m_data;
+				LOGMASKED(LOG_ENVELOPE, "ch %d: Envelope volume %04x (%s)\n", voice, v.env_volume, machine().describe_context());
+				break;
+
+			case 0x0005:
+				v.env_target = m_data;
+				LOGMASKED(LOG_ENVELOPE, "ch %d: Envelope target %04x (cur %04x) (%s)\n", voice, v.env_target, v.env_volume, machine().describe_context());
 				break;
 
 			case 0x0006:
-				v.volume = (m_data / 0x66) & 0xff;
-				LOGMASKED(LOG_REGISTERS, "ch %d: Volume %02x (%s)\n", voice, v.volume, machine().describe_context());
+				v.env_step = m_data;
+				LOGMASKED(LOG_ENVELOPE, "ch %d: Envelope rate %04x (%s)\n", voice, v.env_step, machine().describe_context());
 				break;
 
+			case 0x0007:
+				v.l_volume = m_data & 0xff;
+				v.r_volume = (m_data >> 8) & 0xff;
+				LOGMASKED(LOG_VOLUME, "ch %d: Volume L %02x R %02x (env %04x) (%s)\n", voice, v.l_volume, v.r_volume, v.env_volume, machine().describe_context());
+				break;
+
+// ----- Readbacks ----------------------------
+
 			case 0x0011:
-				v.loop_start = m_data;
-				LOGMASKED(LOG_REGISTERS, "ch %d Loop start %04x\n", voice, m_data);
+				m_data = v.start >> 4;
+				LOGMASKED(LOG_REGISTERS, "ch %d: Sample ptr readback %04x (%s)\n", voice, v.start, machine().describe_context());
+				break;
+
+			case 0x0015:
+				m_data = v.env_target;
+				LOGMASKED(LOG_REGISTERS, "ch %d: Envelope target readback %04x (%s)\n", voice, v.env_target, machine().describe_context());
+				break;
+
+			case 0x0016:
+				m_data = v.env_step;
+				LOGMASKED(LOG_REGISTERS, "ch %d: Envelope rate readback %04x (%s)\n", voice, v.env_step, machine().describe_context());
 				break;
 
 			default:
@@ -265,3 +380,4 @@ void l4003_sound_device::control_w(uint16_t data)
 		}
 	}
 }
+

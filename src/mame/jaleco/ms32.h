@@ -83,16 +83,13 @@ public:
 		, m_io_mj(*this, "KEY%u", 0U)
 	{ }
 
-	void ms32(machine_config &config);
-	void ms32_invert_lines(machine_config &config);
+	void ms32(machine_config &config) ATTR_COLD;
+	void ms32_invert_lines(machine_config &config) ATTR_COLD;
 
-	void init_ss92047_01();
-	void init_ss91022_10();
-	void init_kirarast();
-	void init_suchie2();
-	void init_ss92048_01();
-	void init_bnstars();
-	void init_ss92046_01();
+	void init_ss92047_01() ATTR_COLD;
+	void init_ss91022_10() ATTR_COLD;
+	void init_ss92048_01() ATTR_COLD;
+	void init_ss92046_01() ATTR_COLD;
 
 	ioport_value mahjong_ctrl_r();
 
@@ -184,8 +181,8 @@ public:
 		// TODO: COPROs
 	{}
 
-	void f1superb(machine_config &config);
-	void init_f1superb();
+	void f1superb(machine_config &config) ATTR_COLD;
+	void init_f1superb() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;

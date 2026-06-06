@@ -35,6 +35,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include <bit>
+
+
 namespace {
 
 static constexpr uint8_t NUM_PENS = 4 * 8;
@@ -160,7 +163,7 @@ void ssingles_state::c001_w(uint8_t data)
 ioport_value ssingles_state::controls_r()
 {
 	// multiplexed
-	return count_leading_zeros_32(m_extra->read() & 0x7f) - 25;
+	return std::countl_zero(u8(m_extra->read() & 0x7f)) - 1;
 }
 
 void ssingles_state::ssingles_map(address_map &map)

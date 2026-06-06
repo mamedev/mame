@@ -481,7 +481,7 @@ void deco_ld_state::rblaster(machine_config &config)
 
 //  config.set_maximum_quantum(attotime::from_hz(6000));
 
-	SONY_LDP1000(config, m_laserdisc, 0);
+	SONY_LDP1000(config, m_laserdisc);
 	m_laserdisc->set_overlay(256, 256, FUNC(deco_ld_state::screen_update));
 	//m_laserdisc->set_overlay_clip(0, 256-1, 8, 240-1);
 	m_laserdisc->add_route(0, "speaker", 1.0, 0);
@@ -492,7 +492,7 @@ void deco_ld_state::rblaster(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rblaster);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 0x800);
 
-	//ACIA6850(config, m_acia, 0);
+	//ACIA6850(config, m_acia);
 	//m_acia->txd_handler().set("laserdisc", FUNC(sony_ldp1000_device::write));
 	//m_acia->rxd_handler().set("laserdisc", FUNC(sony_ldp1000_device::read));
 

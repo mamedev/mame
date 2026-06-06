@@ -663,11 +663,11 @@ void multi8_state::multi8(machine_config &config)
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	I8251(config, m_uart, 0); // for cassette
+	I8251(config, m_uart); // for cassette
 	m_uart->txd_handler().set([this] (bool state) { m_cassbit = state; });
 
-	PIT8253(config, "pit", 0);
-	PIC8259(config, "pic", 0);
+	PIT8253(config, "pit");
+	PIC8259(config, "pic");
 
 	//UPD765A(config, "fdc", false, true);
 	//FLOPPY_CONNECTOR(config, "fdc:0", multi8_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);

@@ -128,7 +128,7 @@ Bucky:
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/k053252.h"
-#include "machine/k054321.h"
+#include "sound/k054321.h"
 #include "sound/k054539.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
@@ -794,7 +794,7 @@ void moo_prot_state::moo(machine_config &config)
 	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette("palette");
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	K054338(config, m_k054338, 0);
 
@@ -846,7 +846,7 @@ void moobl_state::moobl(machine_config &config)
 	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette("palette");
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	K054338(config, m_k054338, 0);
 
@@ -863,7 +863,7 @@ void moo_prot_state::bucky(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &moo_prot_state::bucky_map);
 
-	K054000(config, "k054000", 0);
+	K054000(config, "k054000");
 
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -48, 23);
 

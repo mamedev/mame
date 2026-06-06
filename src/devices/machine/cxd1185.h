@@ -41,7 +41,7 @@ protected:
 	template <unsigned Register> u8 int_req_r();
 	u8 scsi_ctrl_monitor_r();
 	u8 fifo_status_r();
-	u8 scsi_id_r() { return m_scsi_id; }
+	u8 scsi_idr_r() { return m_scsi_idr; }
 	template <unsigned Byte> u8 count_r() { return u8(m_count >> (Byte * 8)); }
 	template <unsigned Register> u8 int_auth_r() { return m_int_auth[Register]; }
 	u8 mode_r() { return m_mode; }
@@ -53,7 +53,7 @@ protected:
 	void scsi_data_w(u8 data);
 	void environ_w(u8 data);
 	void timer_w(u8 data);
-	void scsi_id_w(u8 data) { m_scsi_id = data; }
+	void scsi_idr_w(u8 data) { m_scsi_idr = data; }
 	template <unsigned Byte> void count_w(u8 data) { m_count &= ~(0xffU << (Byte * 8)); m_count |= u32(data) << (Byte * 8); }
 	template <unsigned Register> void int_auth_w(u8 data);
 	void mode_w(u8 data) { m_mode = data; }

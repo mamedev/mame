@@ -30,7 +30,7 @@ public:
 	void sound_command_w(u8 data);
 
 protected:
-	efo_zsu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	efo_zsu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
@@ -83,7 +83,7 @@ class cedar_magnet_sound_device : public efo_zsu_device, public cedar_magnet_boa
 {
 public:
 	// construction/destruction
-	cedar_magnet_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cedar_magnet_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

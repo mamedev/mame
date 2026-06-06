@@ -364,7 +364,7 @@ class tx0_readtape_image_device : public paper_tape_reader_device
 {
 public:
 	// construction/destruction
-	tx0_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tx0_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_image_interface implementation
 	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
@@ -393,7 +393,7 @@ class tx0_punchtape_image_device : public paper_tape_punch_device
 {
 public:
 	// construction/destruction
-	tx0_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tx0_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_image_interface implementation
 	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
@@ -424,7 +424,7 @@ class tx0_printer_image_device :    public device_t,
 {
 public:
 	// construction/destruction
-	tx0_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tx0_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return false; }
@@ -460,7 +460,7 @@ class tx0_magtape_image_device : public magtape_image_device
 {
 public:
 	// construction/destruction
-	tx0_magtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tx0_magtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_image_interface implementation
 	virtual const char *file_extensions() const noexcept override { return "tap"; }
@@ -1573,15 +1573,15 @@ void tx0_state::tx0_64kw(machine_config &config)
 	screen.screen_vblank().set(FUNC(tx0_state::screen_vblank_tx0));
 	screen.set_palette(m_palette);
 
-	CRT(config, m_crt, 0);
+	CRT(config, m_crt);
 	m_crt->set_num_levels(pen_crt_num_levels);
 	m_crt->set_offsets(crt_window_offset_x, crt_window_offset_y);
 	m_crt->set_size(crt_window_width, crt_window_height);
 
-	TX0_READTAPE(config, "readt", 0);
-	TX0_PUNCHTAPE(config, "punch", 0);
-	TX0_PRINTER(config, "typewriter", 0);
-	TX0_MAGTAPE(config, "magtape", 0);
+	TX0_READTAPE(config, "readt");
+	TX0_PUNCHTAPE(config, "punch");
+	TX0_PRINTER(config, "typewriter");
+	TX0_MAGTAPE(config, "magtape");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tx0);
 	PALETTE(config, m_palette, FUNC(tx0_state::tx0_palette), total_colors_needed + sizeof(tx0_pens), total_colors_needed);

@@ -20,6 +20,7 @@
 #include "fileio.h"
 #include "http.h"
 #include "image.h"
+#include "input.h"
 #include "main.h"
 #include "natkeyboard.h"
 #include "network.h"
@@ -54,6 +55,13 @@ osd_interface &running_machine::osd() const
 {
 	return m_manager.osd();
 }
+
+ui_input_manager &running_machine::ui_input() const noexcept
+{
+	assert(m_ui_input);
+	return m_ui_input->input_manager();
+}
+
 
 //-------------------------------------------------
 //  running_machine - constructor
@@ -141,16 +149,14 @@ void running_machine::start()
 {
 	// initialize basic can't-fail systems here
 	m_configuration = std::make_unique<configuration_manager>(*this);
+	m_ui_input = std::make_unique<ui_input_manager_impl>(*this);
 	m_input = std::make_unique<input_manager>(*this);
 	m_output = std::make_unique<output_manager>(*this);
-	m_render = std::make_unique<render_manager>(*this);
+	m_render = std::make_unique<render_manager>(*this, m_ui_input->event_sink());
 	m_bookkeeping = std::make_unique<bookkeeping_manager>(*this);
 
 	// allocate a soft_reset timer
 	m_soft_reset_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::soft_reset), this));
-
-	// initialize UI input
-	m_ui_input = std::make_unique<ui_input_manager>(*this);
 
 	// init the OSD layer
 	m_manager.osd().init(*this);

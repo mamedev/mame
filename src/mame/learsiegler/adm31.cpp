@@ -78,8 +78,6 @@ private:
 
 void adm31_state::machine_start()
 {
-	m_caps_lamp.resolve();
-
 	save_item(NAME(m_kbd_scan));
 }
 

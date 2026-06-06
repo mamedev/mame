@@ -66,7 +66,7 @@ public:
 	template <class FunctionClass> named_delegate(member_func_type<FunctionClass> funcptr, char const *name, FunctionClass *object) : basetype(funcptr, object), m_name(name) { }
 	template <class FunctionClass> named_delegate(const_member_func_type<FunctionClass> funcptr, char const *name, FunctionClass *object) : basetype(funcptr, object), m_name(name) { }
 	template <class FunctionClass> named_delegate(static_ref_func_type<FunctionClass> funcptr, char const *name, FunctionClass *object) : basetype(funcptr, object), m_name(name) { }
-	template <typename T> named_delegate(T &&funcptr, std::enable_if_t<suitable_functoid<T>::value, char const *> name) : basetype(std::forward<T>(funcptr)), m_name(name) { }
+	template <typename T> named_delegate(T &&funcptr, char const *name) requires (suitable_functoid<T>::value) : basetype(std::forward<T>(funcptr)), m_name(name) { }
 
 	// allow assignment
 	named_delegate &operator=(named_delegate const &) = default;
@@ -141,8 +141,8 @@ private:
 	template <class T, class U>
 	using is_related_device = std::bool_constant<is_related_device_implementation<T, U>::value || is_related_device_interface<T, U>::value>;
 
-	template <class T> static std::enable_if_t<is_related_device_implementation<T, T>::value, device_t &> get_device(T &object) { return object; }
-	template <class T> static std::enable_if_t<is_related_device_interface<T, T>::value, device_t &> get_device(T &object) { return object.device(); }
+	template <class T> static device_t &get_device(T &object) requires is_related_device_implementation<T, T>::value { return object; }
+	template <class T> static device_t &get_device(T &object) requires is_related_device_interface<T, T>::value { return object.device(); }
 
 public:
 	// construct/assign
@@ -190,24 +190,24 @@ public:
 
 	// construct with target object
 	template <class T, class D>
-	device_delegate_base(T &object, ReturnType (D::*funcptr)(Params...), std::enable_if_t<is_related_device<D, T>::value, char const *> name)
+	device_delegate_base(T &object, ReturnType (D::*funcptr)(Params...), char const *name) requires (is_related_device<D, T>::value)
 		: basetype(funcptr, name, static_cast<D *>(&object))
 		, device_delegate_helper(get_device(object))
 	{ }
 	template <class T, class D>
-	device_delegate_base(T &object, ReturnType (D::*funcptr)(Params...) const, std::enable_if_t<is_related_device<D, T>::value, char const *> name)
+	device_delegate_base(T &object, ReturnType (D::*funcptr)(Params...) const, char const *name) requires (is_related_device<D, T>::value)
 		: basetype(funcptr, name, static_cast<D *>(&object))
 		, device_delegate_helper(get_device(object))
 	{ }
 	template <class T, class D>
-	device_delegate_base(T &object, ReturnType (*funcptr)(D &, Params...), std::enable_if_t<is_related_device<D, T>::value, char const *> name)
+	device_delegate_base(T &object, ReturnType (*funcptr)(D &, Params...), char const *name) requires (is_related_device<D, T>::value)
 		: basetype(funcptr, name, static_cast<D *>(&object))
 		, device_delegate_helper(get_device(object))
 	{ }
 
 	// construct with callable object
 	template <typename T>
-	device_delegate_base(device_t &owner, T &&funcptr, std::enable_if_t<suitable_functoid<T>::value, char const *> name)
+	device_delegate_base(device_t &owner, T &&funcptr, char const *name) requires (suitable_functoid<T>::value)
 		: basetype(std::forward<T>(funcptr), name)
 		, device_delegate_helper(owner)
 	{ }
@@ -229,15 +229,15 @@ public:
 	{ basetype::operator=(basetype(funcptr, name, static_cast<D *>(nullptr))); set_tag(std::forward<T>(tag)); }
 
 	// setters that take a target object
-	template <class T, class D> std::enable_if_t<std::is_base_of<D, T>::value> set(T &object, ReturnType (D::*funcptr)(Params...), char const *name)
+	template <class T, class D> void set(T &object, ReturnType (D::*funcptr)(Params...), char const *name) requires std::is_base_of_v<D, T>
 	{ basetype::operator=(basetype(funcptr, name, static_cast<D *>(&object))); set_tag(finder_target().first); }
-	template <class T, class D> std::enable_if_t<std::is_base_of<D, T>::value> set(T &object, ReturnType (D::*funcptr)(Params...) const, char const *name)
+	template <class T, class D> void set(T &object, ReturnType (D::*funcptr)(Params...) const, char const *name) requires std::is_base_of_v<D, T>
 	{ basetype::operator=(basetype(funcptr, name, static_cast<D *>(&object))); set_tag(finder_target().first); }
-	template <class T, class D> std::enable_if_t<std::is_base_of<D, T>::value> set(T &object, ReturnType (*funcptr)(D &, Params...), char const *name)
+	template <class T, class D> void set(T &object, ReturnType (*funcptr)(D &, Params...), char const *name) requires std::is_base_of_v<D, T>
 	{ basetype::operator=(basetype(funcptr, name, static_cast<D *>(&object))); set_tag(finder_target().first); }
 
 	// setter that takes a functoid
-	template <typename T> std::enable_if_t<suitable_functoid<T>::value> set(T &&funcptr, char const *name)
+	template <typename T> void set(T &&funcptr, char const *name) requires suitable_functoid<T>::value
 	{ basetype::operator=(basetype(std::forward<T>(funcptr), name)); }
 
 	// unsetter

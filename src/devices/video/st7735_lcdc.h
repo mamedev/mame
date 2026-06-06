@@ -6,13 +6,16 @@
 
 #pragma once
 
+#include <memory>
+
+
 DECLARE_DEVICE_TYPE(ST7735, st7735_lcdc_device)
 
 class st7735_lcdc_device : public device_t
 {
 public:
 	// construction/destruction
-	st7735_lcdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	st7735_lcdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void lcdc_command_w(u8 data);
 	u8 lcdc_data_r();
@@ -25,13 +28,14 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	u8 m_displaybuffer[256 * 256 * 2]{};
-	u16 m_posx = 0, m_posy = 0;
-	u16 m_posminx = 0, m_posmaxx = 0;
-	u16 m_posminy = 0, m_posmaxy = 0;
-	u8 m_command = 0;
-	u8 m_commandstep = 0;
-
+	std::unique_ptr<u8 []> m_displaybuffer;
+	u16 m_posx, m_posy;
+	u16 m_posminx, m_posmaxx;
+	u16 m_posminy, m_posmaxy;
+	u8 m_command;
+	u8 m_commandstep;
+	u8 m_displayon;
+	u8 m_sleep;
 };
 
 #endif // MAME_VIDEO_ST7735_LCDC_H

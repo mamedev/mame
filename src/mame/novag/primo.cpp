@@ -159,8 +159,6 @@ private:
 
 void primo_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_power));
 	save_item(NAME(m_lcd_strobe));

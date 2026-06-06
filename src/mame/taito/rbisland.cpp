@@ -836,9 +836,9 @@ void rbisland_state::rbisland(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
-	PC080SN(config, m_pc080sn, 0, m_palette, gfx_rbisland);
+	PC080SN(config, m_pc080sn, m_palette, gfx_rbisland);
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_palette(m_palette);
 	m_pc090oj->set_colpri_callback(FUNC(rbisland_state::colpri_cb));
 
@@ -851,7 +851,7 @@ void rbisland_state::rbisland(machine_config &config)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -882,7 +882,7 @@ void jumping_state::jumping(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jumping);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
 
-	PC080SN(config, m_pc080sn, 0, m_palette, gfx_jumping_tmap);
+	PC080SN(config, m_pc080sn, m_palette, gfx_jumping_tmap);
 	m_pc080sn->set_yinvert(1);
 
 	// sound hardware

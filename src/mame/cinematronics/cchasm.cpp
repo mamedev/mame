@@ -480,7 +480,7 @@ void cchasm_state::cchasm(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	VECTOR(config, m_vector, 0);
+	VECTOR(config, m_vector);
 	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
 	m_screen->set_refresh_hz(40);
 	m_screen->set_size(400, 300);

@@ -88,7 +88,7 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void acommand(machine_config &config);
+	void acommand(machine_config &config) ATTR_COLD;
 
 private:
 	void oki_bank_w(uint8_t data);
@@ -129,7 +129,10 @@ private:
 
 void acommand_state::machine_start()
 {
-	m_digits.resolve();
+	save_item(NAME(m_7seg0));
+	save_item(NAME(m_7seg1));
+	save_item(NAME(m_ufo_lane));
+	save_item(NAME(m_boss_door));
 }
 
 // TODO: copied over from cischeat_draw_sprites, merge in common device

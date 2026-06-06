@@ -51,7 +51,7 @@ public:
 		m_lamps(*this, "lamp_%u", 0U)
 	{ }
 
-	void summit(machine_config &config);
+	void summit(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -379,8 +379,6 @@ void summit_state::lamps2_w(uint8_t data)
 
 void summit_state::machine_start()
 {
-	m_lamps.resolve();
-
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(summit_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap->set_scroll_rows(32);
 }

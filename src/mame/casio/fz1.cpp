@@ -542,8 +542,6 @@ void fz1_state::fz20m(machine_config &config)
 /**************************************************************************/
 void fz1_state::machine_start()
 {
-	m_led.resolve();
-
 	m_key_sel = 0;
 	m_adc_sel = 0;
 	m_adc_value = 0;

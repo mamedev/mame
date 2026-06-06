@@ -811,7 +811,7 @@ void tvc_state::tvc(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	TVC_SOUND(config, m_sound, 0);
+	TVC_SOUND(config, m_sound);
 	m_sound->sndint_wr_callback().set(FUNC(tvc_state::int_ff_set));
 	m_sound->add_route(ALL_OUTPUTS, "mono", 0.75);
 

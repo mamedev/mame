@@ -325,7 +325,7 @@ void nexus3d_state::nexus3d(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::RGB_565);
 
-	SAMSUNG_K9F2G08U0M(config, m_nand, 0);
+	SAMSUNG_K9F2G08U0M(config, m_nand);
 }
 
 

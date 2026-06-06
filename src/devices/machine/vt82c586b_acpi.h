@@ -155,7 +155,7 @@ class smbus_pipc_device : public lpc_device
 						, public device_memory_interface
 {
 public:
-	smbus_pipc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	smbus_pipc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;

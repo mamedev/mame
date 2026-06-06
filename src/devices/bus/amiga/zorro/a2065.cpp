@@ -37,7 +37,7 @@ a2065_device::a2065_device(const machine_config &mconfig, const char *tag, devic
 
 void a2065_device::device_add_mconfig(machine_config &config)
 {
-	AM7990(config, m_lance);
+	AM7990(config, m_lance, 20_MHz_XTAL / 2);
 	m_lance->intr_out().set(FUNC(a2065_device::lance_irq_w));
 	m_lance->dma_in().set(FUNC(a2065_device::lance_ram_r));
 	m_lance->dma_out().set(FUNC(a2065_device::lance_ram_w));

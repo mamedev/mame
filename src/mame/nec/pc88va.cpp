@@ -1287,7 +1287,7 @@ void pc88va_state::machine_reset()
 // cfr. schematics pg. 260, "external bus, videoboard connector"
 void pc88va_state::pc88va_cbus(machine_config &config)
 {
-	PC98_CBUS_ROOT(config, m_cbus_root, 0);
+	PC98_CBUS_ROOT(config, m_cbus_root);
 	m_cbus_root->int_cb<0>().set_inputline(m_maincpu, INPUT_LINE_IRQ3);
 	m_cbus_root->int_cb<1>().set_inputline(m_maincpu, INPUT_LINE_IRQ5);
 	m_cbus_root->int_cb<2>().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
@@ -1299,6 +1299,7 @@ void pc88va_state::pc88va_cbus(machine_config &config)
 	m_maincpu->out_iow_cb<0>().set([this] (u8 data) { m_cbus_root->dack_w(0, data); });
 
 	// should be 3 slots for each iteration here
+	// FIXME: set clock to SCKL1 clock frequency
 	PC98_CBUS_SLOT(config, "cbus:0", 0, "cbus", pc88va_cbus_devices, nullptr);
 	PC98_CBUS_SLOT(config, "cbus:1", 0, "cbus", pc88va_cbus_devices, nullptr);
 	PC98_CBUS_SLOT(config, "cbus:2", 0, "cbus", pc88va_cbus_devices, nullptr);
@@ -1349,7 +1350,7 @@ void pc88va_state::pc88va(machine_config &config)
 	d8255_3.out_pc_callback().set(FUNC(pc88va_state::r232_ctrl_portc_w));
 
 	// external PIC
-	PIC8259(config, m_pic2, 0);
+	PIC8259(config, m_pic2);
 	m_pic2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ7);
 	m_pic2->in_sp_callback().set_constant(0);
 

@@ -95,8 +95,8 @@ namespace {
 class apple1_state : public driver_device
 {
 public:
-	apple1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	apple1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, A1_CPU_TAG),
 		m_pia(*this, A1_PIA_TAG),
 		m_ram(*this, RAM_TAG),
@@ -109,7 +109,7 @@ public:
 		m_kbspecial(*this, "KBSPECIAL")
 	{ }
 
-	void apple1(machine_config &config);
+	void apple1(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -595,6 +595,7 @@ void apple1_state::apple1(machine_config &config)
 	m_pia->writepb_handler().set(FUNC(apple1_state::pia_display_w));
 	m_pia->cb2_handler().set(FUNC(apple1_state::pia_display_gate_w));
 
+	// FIXME: set bus clock frequency
 	A1BUS(config, A1_BUS_TAG, 0).set_space(m_maincpu, AS_PROGRAM);
 	A1BUS_SLOT(config, "exp", 0, A1_BUS_TAG, apple1_cards, "cassette");
 

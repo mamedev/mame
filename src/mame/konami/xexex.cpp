@@ -149,9 +149,9 @@ reference(xexexj) : https://www.youtube.com/watch?v=TegjBEvvGxI
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/k053252.h"
-#include "machine/k054321.h"
 #include "machine/timer.h"
 #include "sound/flt_vol.h"
+#include "sound/k054321.h"
 #include "sound/k054539.h"
 #include "sound/ymopm.h"
 
@@ -719,9 +719,9 @@ void xexex_state::xexex(machine_config &config)
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -48, 32);
 	m_k053246->set_palette(m_palette);
 
-	K053250(config, m_k053250, 0, m_palette, m_screen, -5, -16);
+	K053250(config, m_k053250, m_palette, m_screen, -5, -16);
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 
 	K053252(config, m_k053252, 32_MHz_XTAL / 4).set_offsets(40, 0);
 

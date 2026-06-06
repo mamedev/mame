@@ -233,20 +233,25 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void reaktor(machine_config &config);
-	void atlantol(machine_config &config);
-	void yieartf(machine_config &config);
-	void wizzquiz(machine_config &config);
-	void trackfld(machine_config &config);
-	void trackfldu(machine_config &config);
-	void hyprolyb(machine_config &config);
-	void mastkin(machine_config &config);
+	void trackfld(machine_config &config) ATTR_COLD;
+	void trackfldu(machine_config &config) ATTR_COLD;
+	void yieartf(machine_config &config) ATTR_COLD;
+	void hyprolyb(machine_config &config) ATTR_COLD;
+	void atlantol(machine_config &config) ATTR_COLD;
+	void mastkin(machine_config &config) ATTR_COLD;
+	void wizzquiz(machine_config &config) ATTR_COLD;
+	void reaktor(machine_config &config) ATTR_COLD;
 
-	void init_trackfld();
-	void init_atlantol();
-	void init_wizzquiz();
-	void init_mastkin();
-	void init_trackfldnz();
+	void init_trackfld() ATTR_COLD;
+	void init_atlantol() ATTR_COLD;
+	void init_wizzquiz() ATTR_COLD;
+	void init_mastkin() ATTR_COLD;
+	void init_trackfldnz() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void questions_bank_w(uint8_t data);
@@ -309,11 +314,7 @@ private:
 	void nmi_mask_w(int state);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_MACHINE_START(trackfld);
-	DECLARE_MACHINE_RESET(trackfld);
-	DECLARE_VIDEO_START(trackfld);
 	void trackfld_palette(palette_device &palette) const;
-	DECLARE_VIDEO_START(atlantol);
 	uint32_t screen_update_trackfld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	void vblank_nmi(int state);
@@ -469,18 +470,10 @@ TILE_GET_INFO_MEMBER(trackfld_state::get_bg_tile_info)
 	tileinfo.set(1, code, color, flags);
 }
 
-VIDEO_START_MEMBER(trackfld_state,trackfld)
+void trackfld_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(trackfld_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap->set_scroll_rows(32);
-	m_sprites_gfx_banked = 0;
-}
-
-
-VIDEO_START_MEMBER(trackfld_state,atlantol)
-{
-	VIDEO_START_CALL_MEMBER( trackfld );
-	m_sprites_gfx_banked = 1;
 }
 
 
@@ -1201,7 +1194,7 @@ GFXDECODE_END
 
 
 
-MACHINE_START_MEMBER(trackfld_state,trackfld)
+void trackfld_state::machine_start()
 {
 	save_item(NAME(m_irq_mask));
 	save_item(NAME(m_nmi_mask));
@@ -1213,7 +1206,7 @@ MACHINE_START_MEMBER(trackfld_state,trackfld)
 	save_item(NAME(m_old_gfx_bank));
 }
 
-MACHINE_RESET_MEMBER(trackfld_state,trackfld)
+void trackfld_state::machine_reset()
 {
 	m_bg_bank = 0;
 	m_sprite_bank1 = 0;
@@ -1242,9 +1235,6 @@ void trackfld_state::trackfld(machine_config &config)
 	Z80(config, m_audiocpu, SOUND_CLOCK/4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &trackfld_state::sound_map);
 
-	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
-	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
-
 	LS259(config, m_mainlatch); // 1D
 	m_mainlatch->q_out_cb<0>().set(FUNC(trackfld_state::flip_screen_set)); // FLIP
 	m_mainlatch->q_out_cb<1>().set("trackfld_audio", FUNC(trackfld_audio_device::sh_irqtrigger_w)); // 26 = SOUND ON
@@ -1268,14 +1258,14 @@ void trackfld_state::trackfld(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_trackfld);
 	PALETTE(config, m_palette, FUNC(trackfld_state::trackfld_palette), 16*16+16*16, 32);
-	MCFG_VIDEO_START_OVERRIDE(trackfld_state,trackfld)
+	m_sprites_gfx_banked = 0;
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	TRACKFLD_AUDIO(config, m_soundbrd, 0, m_audiocpu, m_vlm);
+	TRACKFLD_AUDIO(config, m_soundbrd, m_audiocpu, m_vlm);
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
 
@@ -1290,6 +1280,7 @@ void trackfld_state::trackfld(machine_config &config)
 void trackfld_state::trackfldu(machine_config &config)
 {
 	trackfld(config);
+
 	MC6809E(config.replace(), m_maincpu, MASTER_CLOCK/6/2); /* exact M6809 model unknown */
 	m_maincpu->set_addrmap(AS_PROGRAM, &trackfld_state::main_map);
 }
@@ -1308,9 +1299,6 @@ void trackfld_state::yieartf(machine_config &config)
 
 	// NMI source assumed to be same as in yiear
 	TIMER(config, "16v").configure_scanline(FUNC(trackfld_state::yieartf_timer_irq), "screen", 16, 32);
-
-	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
-	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 1D
 	mainlatch.q_out_cb<0>().set(FUNC(trackfld_state::flip_screen_set));
@@ -1335,14 +1323,14 @@ void trackfld_state::yieartf(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_trackfld);
 	PALETTE(config, m_palette, FUNC(trackfld_state::trackfld_palette), 16*16+16*16, 32);
-	MCFG_VIDEO_START_OVERRIDE(trackfld_state,trackfld)
+	m_sprites_gfx_banked = 0;
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	TRACKFLD_AUDIO(config, m_soundbrd, 0, finder_base::DUMMY_TAG, m_vlm);
+	TRACKFLD_AUDIO(config, m_soundbrd, finder_base::DUMMY_TAG, m_vlm);
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
 
@@ -1376,16 +1364,13 @@ void trackfld_state::hyprolyb_adpcm_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-/* same as the original, but uses ADPCM instead of VLM5030 */
-/* also different memory handlers do handle that */
+// same as the original, but uses ADPCM instead of VLM5030
+// also different memory handlers to handle that
 void trackfld_state::hyprolyb(machine_config &config)
 {
 	trackfld(config);
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, &trackfld_state::hyprolyb_sound_map);
-
-	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
-	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 
 	/* sound hardware */
 	config.device_remove("vlm");
@@ -1393,7 +1378,7 @@ void trackfld_state::hyprolyb(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	HYPROLYB_ADPCM(config, "hyprolyb_adpcm", 0);
+	HYPROLYB_ADPCM(config, "hyprolyb_adpcm");
 
 	msm5205_device &msm(MSM5205(config, "msm", 384000));
 	msm.vck_legacy_callback().set("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::vck_callback));
@@ -1405,7 +1390,7 @@ void trackfld_state::atlantol(machine_config &config)
 {
 	hyprolyb(config);
 
-	MCFG_VIDEO_START_OVERRIDE(trackfld_state,atlantol)
+	m_sprites_gfx_banked = 1;
 }
 
 void trackfld_state::mastkin(machine_config &config)
@@ -1425,7 +1410,7 @@ void trackfld_state::wizzquiz(machine_config &config)
 	trackfld(config);
 
 	/* basic machine hardware */
-	// right cpu?
+	// right CPU?
 	M6800(config.replace(), m_maincpu, 2048000);    /* 1.400 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &trackfld_state::wizzquiz_map);
 

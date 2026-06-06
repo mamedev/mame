@@ -556,8 +556,6 @@ TIMER_CALLBACK_MEMBER(missile_state::adjust_cpu_speed)
 
 void missile_state::machine_start()
 {
-	m_leds.resolve();
-
 	// create a timer to speed/slow the CPU
 	m_cpu_timer = timer_alloc(FUNC(missile_state::adjust_cpu_speed), this);
 	m_cpu_timer->adjust(m_screen->time_until_pos(v_to_scanline(0), 0));

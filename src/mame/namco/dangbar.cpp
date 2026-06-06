@@ -24,55 +24,101 @@ Main PCB named Hi-Pric P41 B 8813960102 (8813970102)
 For Dangerous Bar:
 Led display PCB named Namco ST-M4
  CPU: Sharp LZ8415M
- Xtal: Marked "D122C5"
+ Xtal: Marked "D122C5" on X1 position
  Display controller: Seiko-Epson SED1351F-0A
 */
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/mc68hc11/mc68hc11.h"
+#include "cpu/z80/z80.h"
 #include "sound/c140.h"
 #include "speaker.h"
 
 
 namespace {
 
-class dangbar_state : public driver_device
+class sspanic_state : public driver_device
+{
+public:
+	sspanic_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+	{ }
+
+	void sspanic(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void main_map(address_map &map) ATTR_COLD;
+
+	required_device<mc68hc11_cpu_device> m_maincpu;
+private:
+
+	void audio_map(address_map &map) ATTR_COLD;
+};
+
+class dangbar_state : public sspanic_state
 {
 public:
 	dangbar_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		sspanic_state(mconfig, type, tag),
+		m_ledcpu(*this, "ledcpu")
 	{ }
 
 	void dangbar(machine_config &config);
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-
+	virtual void main_map(address_map &map) override ATTR_COLD;
 private:
-	required_device<mc68hc11_cpu_device> m_maincpu;
+	required_device<z80_device> m_ledcpu;
 
-	void main_map(address_map &map) ATTR_COLD;
-	void audio_map(address_map &map) ATTR_COLD;
+	void ledcpu_map(address_map &map) ATTR_COLD;
+	void ledcpu_io(address_map &map) ATTR_COLD;
+	INTERRUPT_GEN_MEMBER(led_timer_irq);
 };
 
 
-void dangbar_state::machine_start()
+void sspanic_state::machine_start()
 {
 }
 
 
-void dangbar_state::main_map(address_map &map)
+void sspanic_state::main_map(address_map &map)
 {
+	map(0x1000, 0x17ff).ram(); // other half of dpram?
 	map(0x8000, 0xffff).rom().region("maincpu", 0x8000);
 }
 
-void dangbar_state::audio_map(address_map &map) // TODO: audio section seems similar to namcos2.cpp / namcos21.cpp
+void sspanic_state::audio_map(address_map &map) // TODO: audio section seems similar to namcos2.cpp / namcos21.cpp
 {
-	map(0xd000, 0xffff).rom().region("audiocpu", 0x01000);
+	map(0x7000, 0x77ff).mirror(0x0800).ram(); //.rw(FUNC(namcos21_state::dpram_byte_r), FUNC(namcos21_state::dpram_byte_w)).share("dpram");
+	map(0xc000, 0xffff).rom().region("audiocpu", 0);
 }
 
+/*
+ *
+ * Dangerous Bar overrides
+ *
+ */
+
+void dangbar_state::main_map(address_map &map)
+{
+	sspanic_state::main_map(map);
+//	map(0x4000, 0x4000) comms with LED CPU?
+}
+
+void dangbar_state::ledcpu_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).ram();
+	map(0xc000, 0xc1ff).ram(); // video?
+}
+
+void dangbar_state::ledcpu_io(address_map &map)
+{
+	map.global_mask(0xff);
+}
 
 static INPUT_PORTS_START( dangbar )
 	PORT_START("IN0")
@@ -94,22 +140,46 @@ static INPUT_PORTS_START( dangbar )
 INPUT_PORTS_END
 
 
-void dangbar_state::dangbar(machine_config &config)
+void sspanic_state::sspanic(machine_config &config)
 {
 	// basic machine hardware
 	MC68HC11K1(config, m_maincpu, 49.152_MHz_XTAL / 4); // divider guessed
-	m_maincpu->set_addrmap(AS_PROGRAM, &dangbar_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sspanic_state::main_map);
 
 	mc6809_device &audiocpu(MC6809(config, "audiocpu", 49.152_MHz_XTAL / 24)); // HD68B09P, divider guessed from other Namco drivers
-	audiocpu.set_addrmap(AS_PROGRAM, &dangbar_state::audio_map);
-
-	// video hardware
-	// TODO: LED screen
+	audiocpu.set_addrmap(AS_PROGRAM, &sspanic_state::audio_map);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center(); // TODO: verify if stereo
 
 	C140(config, "c140", 49.152_MHz_XTAL / 384 / 6).add_route(ALL_OUTPUTS, "mono", 0.75); // 21.333kHz, copied from other Namco drivers
+}
+
+// IM 2
+// vectors 0x02, 0x04, and 0x20~0x2a filled but points at reti
+// Otherwise:
+// [0x00] - timer irqs?
+// [0x10] /
+// [0x2c] reads I/O port $0c, comms?
+// [0x2e] writes a 0x30 to I/O port $0d and exit
+
+INTERRUPT_GEN_MEMBER(dangbar_state::led_timer_irq)
+{
+	m_ledcpu->set_input_line_and_vector(0, HOLD_LINE, 0x00);
+}
+
+void dangbar_state::dangbar(machine_config &config)
+{
+	sspanic(config);
+
+	// LZ8415M
+	Z80(config, m_ledcpu, 12'000'000 / 2); // TODO: actual clock/divider, D122C5?
+	m_ledcpu->set_addrmap(AS_PROGRAM, &dangbar_state::ledcpu_map);
+	m_ledcpu->set_addrmap(AS_IO, &dangbar_state::ledcpu_io);
+	m_ledcpu->set_periodic_int(FUNC(dangbar_state::led_timer_irq), attotime::from_hz(60));
+
+	// video hardware
+	// TODO: LED screen
 }
 
 /** Belly Bomber (named Dodongadon in Japan).
@@ -157,6 +227,9 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1993, sspanic,   0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Same Same Panic", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+// screenless
+GAME( 1993, sspanic,   0, sspanic, dangbar, sspanic_state, empty_init, ROT0, "Namco", "Same Same Panic", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1994, bellybmbr, 0, sspanic, dangbar, sspanic_state, empty_init, ROT0, "Namco", "Belly Bomber",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+
+// with optional LED PCB "ST-M4"
 GAME( 1994, dangbar,   0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Dangerous Bar",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1994, bellybmbr, 0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Belly Bomber",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

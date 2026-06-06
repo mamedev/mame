@@ -293,7 +293,7 @@ void m79152pc_state::m79152pc(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_m79152pc);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	pit8253_device &pit(PIT8253(config, "pit", 0)); // КР580ВИ53
+	pit8253_device &pit(PIT8253(config, "pit")); // КР580ВИ53
 	pit.set_clk<1>(921600);
 	pit.set_clk<2>(921600);
 	pit.out_handler<1>().set(m_uart, FUNC(z80sio_device::txcb_w));

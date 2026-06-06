@@ -99,14 +99,14 @@ private:
 
 void bbc_sdcard_device::device_add_mconfig(machine_config &config)
 {
-	SPI_SDCARD(config, m_sdcard, 0);
+	SPI_SDCARD(config, m_sdcard);
 	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set([this](int state) { m_slot->cb2_w(state); });
 }
 
 void bbc_sdcardt_device::device_add_mconfig(machine_config &config)
 {
-	SPI_SDCARD(config, m_sdcard, 0);
+	SPI_SDCARD(config, m_sdcard);
 	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set([this](int state) { if (!m_turbo) m_slot->cb2_w(state); });
 }

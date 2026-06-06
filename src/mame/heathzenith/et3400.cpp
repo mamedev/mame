@@ -55,9 +55,6 @@ public:
 	void segment_test_w(int state);
 
 private:
-
-	virtual void machine_start() override ATTR_COLD;
-
 	uint8_t keypad_r(offs_t offset);
 	void display_w(offs_t offset, uint8_t data);
 	template <int Digit> void led_w(uint8_t data);
@@ -76,13 +73,6 @@ private:
 	required_ioport_array<3> m_x;
 	output_finder<6> m_digit;
 };
-
-
-
-void et3400_state::machine_start()
-{
-	m_digit.resolve();
-}
 
 
 uint8_t et3400_state::keypad_r(offs_t offset)

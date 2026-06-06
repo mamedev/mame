@@ -22,6 +22,6 @@ midiin_port_device::midiin_port_device(const machine_config &mconfig, const char
 
 void midiin_port_device::device_add_mconfig(machine_config &config)
 {
-	MIDIIN(config, m_midiin, 0);
+	MIDIIN(config, m_midiin);
 	m_midiin->input_callback().set(FUNC(midiin_port_device::read));
 }

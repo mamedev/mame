@@ -23,6 +23,7 @@
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
 
+#include "util/endianness.h"
 #include "util/vecstream.h"
 
 #include <locale>

@@ -17,7 +17,7 @@
 
     where:
         "ctrl" is a MIDI OUT device such as
-        an external usb midi keyboard controller.
+        an external USB MIDI keyboard controller.
 
         "synth" is a D-50 or a D-550.
         (and I guess it may work with a Roland MT-32 as well)
@@ -77,7 +77,7 @@ public:
 	{
 	}
 
-	void pg1000(machine_config &config);
+	void pg1000(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -110,8 +110,6 @@ private:
 
 void pg1000_state::machine_start()
 {
-	m_led.resolve();
-
 	save_item(NAME(m_scan));
 	save_item(NAME(m_an_select));
 	save_item(NAME(m_mdin_bit));

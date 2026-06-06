@@ -2497,7 +2497,7 @@ void gdfs_state::gdfs(machine_config &config)
 	m_screen->set_visarea(0, (0xd5-0x2c)*2-1, 0, (0x102-0x12)-1);
 	m_screen->set_screen_update(FUNC(gdfs_state::screen_update));
 
-	ST0020_SPRITES(config, m_st0020, 0);
+	ST0020_SPRITES(config, m_st0020);
 	m_st0020->set_palette(m_palette);
 
 	m_gfxdecode->set_info(gfx_gdfs);

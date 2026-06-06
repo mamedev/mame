@@ -31,10 +31,10 @@ namespace ui {
 
 menu_device_config::menu_device_config(
 		mame_ui_manager &mui,
-		render_container &container,
+		render_target &target,
 		device_slot_interface *slot,
 		device_slot_interface::slot_option const *option)
-	: menu_textbox(mui, container)
+	: menu_textbox(mui, target)
 	, m_option(option)
 	, m_mounted(machine().root_device().subdevice(slot->device().subtag(option->name())) != nullptr)
 {

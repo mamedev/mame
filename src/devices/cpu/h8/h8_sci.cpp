@@ -55,7 +55,7 @@
 #include "emu.h"
 #include "h8_sci.h"
 
-#include "h8.h"
+#include "h8_cpu_base.h"
 
 #define LOG_REGS  (1 << 1U)  // Register writes
 #define LOG_RREGS (1 << 2U)  // Register reads

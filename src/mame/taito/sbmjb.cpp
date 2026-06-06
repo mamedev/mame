@@ -328,7 +328,7 @@ void sbmjb_state::sbmjb(machine_config &config)
 	io.in_port2_cb().set_ioport("IN1");
 	// TODO: rest of ports. port9 medal / hopper?
 
-	TAITOIO_OPTO(config, "opto", 0);
+	TAITOIO_OPTO(config, "opto");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // all wrong

@@ -48,12 +48,12 @@ uint32_t pc98lt_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 16)
 		{
-			u16 pen = bitswap<16>(m_gvram[(y*640+x)/16], 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7);
+			u16 pen = bitswap<16>(m_gvram[(y * 640 + x) / 16], 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7);
 
 			for (int xi = 0; xi < 16; xi++)
 			{
 				u8 dot = (pen >> xi) & 1;
-				bitmap.pix(y, x+xi) = m_palette->pen(dot);
+				bitmap.pix(y, x + xi) = m_palette->pen(dot);
 			}
 		}
 
@@ -517,7 +517,7 @@ void pc98lt_state::lt_config(machine_config &config)
 
 	pc9801_serial(config);
 
-	I8251(config, m_sio_kbd, 0);
+	I8251(config, m_sio_kbd);
 	m_sio_kbd->txd_handler().set("keyb", FUNC(pc98_kbd_device::input_txd));
 	m_sio_kbd->rxrdy_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 	m_sio_kbd->write_cts(0);
@@ -527,17 +527,17 @@ void pc98lt_state::lt_config(machine_config &config)
 	kbd_clock.signal_handler().set(m_sio_kbd, FUNC(i8251_device::write_rxc));
 	kbd_clock.signal_handler().append(m_sio_kbd, FUNC(i8251_device::write_txc));
 
-	PC98_KBD(config, m_keyb, 0);
+	PC98_KBD(config, m_keyb);
 	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 
-	I8255(config, m_ppi_sys, 0);
+	I8255(config, m_ppi_sys);
 	// PC98LT/HA has no dips, port A acts as a RAM storage
 	m_ppi_sys->in_pa_callback().set(m_ppi_sys, FUNC(i8255_device::pa_r));
 	m_ppi_sys->in_pb_callback().set_ioport("SYSB");
 //  m_ppi_sys->in_pc_callback().set_constant(0xa0); // 0x80 cpu triple fault reset flag?
 	m_ppi_sys->out_pc_callback().set(FUNC(pc98lt_state::ppi_sys_beep_portc_w));
 
-	I8255(config, m_ppi_prn, 0);
+	I8255(config, m_ppi_prn);
 	m_ppi_prn->in_pb_callback().set_ioport("PRNB");
 
 	UPD1990A(config, m_rtc);

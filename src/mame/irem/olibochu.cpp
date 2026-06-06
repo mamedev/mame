@@ -83,6 +83,8 @@ VIDEO M-47B-A:
 #include "tilemap.h"
 #include "video/resnet.h"
 
+#include <bit>
+
 
 namespace {
 
@@ -347,20 +349,19 @@ void olibochu_state::sound_command_w(offs_t offset, u8 data)
 	else
 		m_sound_command = (m_sound_command & 0xff00) | data;
 
-	u8 c;
 	u16 const hi = m_sound_command & 0xffc0;
 	u16 const lo = m_sound_command & 0x003f;
 
 	// sound command low bits (edge-triggered) = soundlatch d4-d7
 	if (lo && lo != prev_lo)
 	{
-		c = count_leading_zeros_32(lo) - 26;
+		u8 const c = std::countl_zero(lo) - 10;
 		m_soundlatch[1]->write(c & 0xf);
 	}
 
 	// sound command high bits = soundlatch d0-d3
-	for (c = 0; c < 16 && !BIT(hi, c); c++) { }
-	m_soundlatch[0]->write((16 - c) & 0xf);
+	u8 const c = 16 - std::countr_zero(hi);
+	m_soundlatch[0]->write(c & 0xf);
 }
 
 void olibochu_state::sample_latch_w(u8 data)
@@ -593,7 +594,7 @@ void olibochu_state::olibochu(machine_config &config)
 
 	AY8910(config, m_ay8910, MASTER_CLOCK / 3 / 2 / 2).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	HC55516(config, m_cvsd, 0).add_route(ALL_OUTPUTS, "mono", 0.5);
+	HC55516(config, m_cvsd).add_route(ALL_OUTPUTS, "mono", 0.5);
 	CLOCK(config, m_cvsd_clock, 16000);
 	m_cvsd_clock->signal_handler().set(FUNC(olibochu_state::cvsd_tick));
 	m_cvsd_clock->signal_handler().append(m_cvsd, FUNC(hc55516_device::mclock_w));

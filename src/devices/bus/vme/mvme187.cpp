@@ -121,7 +121,7 @@ void vme_mvme187_card_device::device_add_mconfig(machine_config &config)
 	RS232_PORT(config, m_serial[4], default_rs232_devices, nullptr);
 	RS232_PORT(config, m_serial[5], default_rs232_devices, nullptr);
 
-	//NCR53C7XX(config, m_scsi, 0);
+	//NCR53C7XX(config, m_scsi);
 	I82596_BE32(config, m_lan, 20'000'000);
 }
 
