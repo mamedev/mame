@@ -595,6 +595,7 @@ Fails [tape] loading after title screen, colored border bars
 		<notes><![CDATA[
 [VIC] glitchy main sprite during gameplay
 ]]></notes>
+		<info name="usage" value="In option menu: change joystick control to keyboard for actually use the joystick" />
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="607163">
@@ -1181,10 +1182,13 @@ Fails [tape] loading, light blue screen
 		</part>
 	</software>
 
-	<software name="batmancc">
+	<software name="batmancc" supported="partial">
 		<description>Batman: The Caped Crusader</description>
 		<year>1989</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Non-functional [joystick]: partially works with port 1 i.e. with inputs mapped wrong, it's supposed to be a port 2 game.
+]]></notes>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -7013,7 +7017,7 @@ Fails [tape] loading on gameplay part 1
 		<year>1985</year>
 		<publisher>System 3</publisher>
 		<notes><![CDATA[
-[VIC] timing slightly off on title and gameplay
+[VIC] timing slightly off on title (credits naming) and gameplay
 ]]></notes>
 		<info name="alt_title" value="World Karate Championship"/>
 
@@ -15765,7 +15769,7 @@ Thrust (294):
 		<year>1987</year>
 		<publisher>Elite Systems</publisher>
 		<notes><![CDATA[
-Commando (000): [VIC] stray bullet sprite appears when player shoots
+Commando (000): [VIC] stray bullet sprite appears on bottom when player shoots
 Airwolf (281):
 Bomb Jack (558):
 Frank Bruno's Boxing (000): [VIC] stripes of garbage for player and opponent graphics
@@ -16594,8 +16598,8 @@ War Cars (1088):
 The Great Escape:
 Army Moves: fails [tape] loading, black screen
 Green Beret:
-Top Gun:
-Rambo: LOAD "RAMBO" at around 250 tape counter. [VIC] status bar at bottom cuts off score display.
+Top Gun (000):
+Rambo (250): [VIC] status bar at bottom cuts off score display.
 ]]></notes>
 		<info name="usage" value="Green Beret: Ensure c1541 Slot Device is removed."/>
 
