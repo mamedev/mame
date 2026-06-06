@@ -19,7 +19,7 @@
 	support it if present, though.
 
 	TODO:
-	- all actual sound output (and input)
+	- output & input filters
 	- layouts
 	- S612 analog dials/sliders
 	- disk support
@@ -31,6 +31,7 @@
 #include "bus/pet/cass.h"
 #include "cpu/upd7810/upd7810.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
 #include "machine/6850acia.h"
 #include "machine/74259.h"
 #include "machine/adc0808.h"
@@ -45,11 +46,16 @@
 #include "machine/mb87013.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "sound/adc.h"
+#include "sound/dac.h"
+#include "sound/mixer.h"
 #include "video/hd44780.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include <algorithm>
 
 namespace {
 	
@@ -67,6 +73,9 @@ public:
 		, m_sample_timer(*this, "sample_timer%u", 0)
 		, m_filter_timer(*this, "filter_timer%u", 0)
 		, m_dma(*this, "dma%u", 0)
+		, m_dac(*this, "dac%u", 0)
+		, m_adc(*this, "adc")
+		, m_feedback(*this, "feedback")
 		, m_cass(*this, "cass")
 		, m_led_digit(*this, "led_digit")
 		, m_led(*this, "led%u", 0U)
@@ -99,12 +108,24 @@ protected:
 	void dma_w(offs_t offset, u8 data);
 	u8 dma_r(offs_t offset);
 
-	template<int Num> void voice_bank_sel_w(u8 data);
+	template<int Voice> void voice_bank_sel_w(u8 data);
 	void cpu_bank_sel_w(u8 data);
 	void cpu_bank_msb_w(offs_t offset, u8 data);
 	void cpu_bank_lsb_w(offs_t offset, u8 data);
 	u8 cpu_bank_msb_r(offs_t offset);
 	u8 cpu_bank_lsb_r(offs_t offset);
+
+	template<int Voice> void dreq_set_w(int state);
+	template<int Voice> void dreq_clear_w(int state);
+	template<int Num> void dma_eop_w(int state);
+
+	u8 dma_io_r(offs_t offset);
+	void dma_mem_w(offs_t offset, u8 data);
+	template<int Voice> void dma_io_w(offs_t offset, u8 data);
+
+	void mute_w(int state);
+	void overdub_w(int state);
+	template<int Voice> void envelope_w(u8 data);
 
 	required_device<z80_device> m_maincpu;
 	required_device<input_merger_any_high_device> m_irq;
@@ -118,6 +139,10 @@ protected:
 	required_device_array<pit8253_device, 2> m_filter_timer;
 	required_device_array<am9517a_device, 2> m_dma;
 
+	required_device_array<dac_12bit_r2r_device, 6> m_dac;
+	required_device<am2504_device> m_adc;
+	required_device<mixer_device> m_feedback;
+
 	optional_device<pet_datassette_port_device> m_cass;
 
 	output_finder<> m_led_digit;
@@ -126,6 +151,9 @@ protected:
 	emu_timer *m_refresh_timer;
 
 	u8 m_refresh_counter;
+	u8 m_voice_nmi[6];
+	u8 m_dma_eop[2];
+	u16 m_input_sample;
 };
 
 class s700_state : public s612_state
@@ -134,6 +162,7 @@ public:
 	s700_state(const machine_config &mconfig, device_type type, const char *tag)
 		: s612_state(mconfig, type, tag)
 		, m_lcdc(*this, "lcdc")
+		, m_env_latch(*this, "env_latch")
 		, m_dial(*this, "DIAL")
 		, m_sl(*this, "SL%u", 0)
 	{}
@@ -150,15 +179,20 @@ protected:
 
 	HD44780_PIXEL_UPDATE(lcd_update);
 
+	template<int Voice> void env_strobe_w(int state);
+	void env_latch_w(offs_t offset, u8 data);
+
 	void sl_w(u8 data) { m_sl_select = data; }
 	u8 rl_r();
 
 	required_device<hd44780_device> m_lcdc;
+	required_device<hc259_device> m_env_latch;
 
 	required_ioport m_dial;
 	required_ioport_array<4> m_sl;
 
 	u8 m_sl_select;
+	u8 m_env_data;
 };
 
 class x7000_state : public s700_state
@@ -209,8 +243,15 @@ void s612_state::machine_start()
 	m_refresh_timer->adjust(attotime::zero, 0, attotime::from_ticks(4096, 8_MHz_XTAL));
 
 	m_refresh_counter = 0;
+	std::fill(std::begin(m_voice_nmi), std::end(m_voice_nmi), 0);
+	m_dma_eop[0] = m_dma_eop[1] = 0;
+
+	m_input_sample = 0;
 
 	save_item(NAME(m_refresh_counter));
+	save_item(NAME(m_voice_nmi));
+	save_item(NAME(m_dma_eop));
+	save_item(NAME(m_input_sample));
 }
 
 /**************************************************************************/
@@ -219,8 +260,10 @@ void s700_state::machine_start()
 	s612_state::machine_start();
 
 	m_sl_select = 0xf;
+	m_env_data = 0;
 
 	save_item(NAME(m_sl_select));
+	save_item(NAME(m_env_data));
 }
 
 /**************************************************************************/
@@ -245,9 +288,14 @@ void s612_state::common_map(address_map &map)
 	map(0x2300, 0x23ff).mirror(0x1000).rw(m_filter_timer[1], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x2400, 0x24ff).mirror(0x1000).rw(m_sample_timer[0], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x2500, 0x25ff).mirror(0x1000).rw(m_sample_timer[1], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x2600, 0x26ff).mirror(0x1000).rw("adc", FUNC(adc0809_device::data_r), FUNC(adc0809_device::address_offset_start_w));
+	map(0x2600, 0x26ff).mirror(0x1000).rw("adc0809", FUNC(adc0809_device::data_r), FUNC(adc0809_device::address_offset_start_w));
 	map(0x2700, 0x2703).mirror(0x10f8).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	// 28xx-2Dxx: envelope control
+	map(0x2800, 0x28ff).mirror(0x1000).w(FUNC(s612_state::envelope_w<0>));
+	map(0x2900, 0x29ff).mirror(0x1000).w(FUNC(s612_state::envelope_w<1>));
+	map(0x2a00, 0x2aff).mirror(0x1000).w(FUNC(s612_state::envelope_w<2>));
+	map(0x2b00, 0x2bff).mirror(0x1000).w(FUNC(s612_state::envelope_w<3>));
+	map(0x2c00, 0x2cff).mirror(0x1000).w(FUNC(s612_state::envelope_w<4>));
+	map(0x2d00, 0x2dff).mirror(0x1000).w(FUNC(s612_state::envelope_w<5>));
 	map(0x2e00, 0x2eff).mirror(0x1000).w("latch0", FUNC(hc259_device::write_a0));
 	map(0x2f00, 0x2fff).mirror(0x1000).w("latch1", FUNC(hc259_device::write_a0));
 	// 6000-7fff: disk interface
@@ -260,7 +308,7 @@ void s700_state::common_map(address_map &map)
 	map(0x4a00, 0x4aff).rw("qdc", FUNC(mb87013_device::read), FUNC(mb87013_device::write));
 	map(0x4b00, 0x4bff).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x4c00, 0x4cff).portr("ENCDR");
-	// 4Dxx: envelope/mute control (A4..6 = address, A0 = strobe, D0..7 = data)
+	map(0x4d00, 0x4dff).w(FUNC(s700_state::env_latch_w));
 	map(0x5000, 0x51ff).rw(FUNC(s700_state::dma_r), FUNC(s700_state::dma_w));
 	map(0x5200, 0x52ff).rw(m_filter_timer[0], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x5300, 0x53ff).rw(m_filter_timer[1], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
@@ -319,11 +367,14 @@ void s612_state::base_config(machine_config &config, bool use_8254)
 	INPUT_MERGER_ANY_HIGH(config, m_irq);
 	m_irq->output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
+	auto& busreq(INPUT_MERGER_ANY_HIGH(config, "busreq"));
+	busreq.output_handler().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
+
 	// MIDI
 	ACIA6850(config, m_acia);
 	m_acia->irq_handler().set(m_irq, FUNC(input_merger_any_high_device::in_w<IRQ_ACIA>));
 
-	auto& midi_clock(CLOCK(config, "midi_clock", clk/16));
+	auto &midi_clock(CLOCK(config, "midi_clock", clk/16));
 	midi_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	midi_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
@@ -345,23 +396,61 @@ void s612_state::base_config(machine_config &config, bool use_8254)
 	for (int i = 0; i < 6; i++)
 		ADDRESS_MAP_BANK(config, m_voice_bank[i]).set_options(ENDIANNESS_NATIVE, 16, 20, 0x20000);
 
+	SPEAKER(config, "speaker", 6);
+	SPEAKER(config, "monitor").front_center();
+
+	AM2504(config, m_adc);
+
+	auto &input_mixer(MIXER(config, "input"));
+	input_mixer.add_route(0, m_adc, 1.0);
+
+	MIXER(config, m_feedback);
+	m_feedback->add_route(0, m_adc, 1.0);
+
+	for (int i = 0; i < 6; i++)
+	{
+		DAC_12BIT_R2R(config, m_dac[i]);
+		// TODO: filters
+		m_dac[i]->add_route(0, "speaker", 1.0 / 6, i);
+		m_dac[i]->add_route(0, m_feedback, 1.0);
+	}
+
+	auto &mic(MICROPHONE(config, "mic"));
+	mic.add_route(0, "input", 1.0);
+	//mic.add_route(0, "monitor", 1.0 / 6);
+
+	auto& linein(CASSETTE(config, "linein"));
+	linein.set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	linein.add_route(0, "input", 1.0);
+	linein.add_route(0, "monitor", 1.0 / 6);
+
 	// voice 0-3 DMA
 	AM9517A(config, m_dma[0], clk/2);
+	m_dma[0]->dreq_active_low();
+	m_dma[0]->out_hreq_callback().set(busreq, FUNC(input_merger_any_high_device::in_w<0>));
+	m_maincpu->busack_cb().set(m_dma[0], FUNC(am9517a_device::hack_w));
+	m_dma[0]->out_eop_callback().set(FUNC(s612_state::dma_eop_w<0>));
+	m_dma[0]->in_ior_callback<0>().set(FUNC(s612_state::dma_io_r));
+	m_dma[0]->out_memw_callback().set(FUNC(s612_state::dma_mem_w));
+	m_dma[0]->out_iow_callback<0>().set(FUNC(s612_state::dma_io_w<0>));
+	m_dma[0]->out_iow_callback<1>().set(FUNC(s612_state::dma_io_w<1>));
+	m_dma[0]->out_iow_callback<2>().set(FUNC(s612_state::dma_io_w<2>));
+	m_dma[0]->out_iow_callback<3>().set(FUNC(s612_state::dma_io_w<3>));
+	m_dma[0]->out_dack_callback<0>().set(FUNC(s612_state::dreq_clear_w<0>));
+	m_dma[0]->out_dack_callback<1>().set(FUNC(s612_state::dreq_clear_w<1>));
+	m_dma[0]->out_dack_callback<2>().set(FUNC(s612_state::dreq_clear_w<2>));
+	m_dma[0]->out_dack_callback<3>().set(FUNC(s612_state::dreq_clear_w<3>));
 
 	// voice 4-5 DMA
 	AM9517A(config, m_dma[1], clk/2);
-
-	// voice 0-2 filter clocks
-	PIT8253(config, m_filter_timer[0]);
-	m_filter_timer[0]->set_clk<0>(clk/2);
-	m_filter_timer[0]->set_clk<1>(clk/2);
-	m_filter_timer[0]->set_clk<2>(clk/2);
-
-	// voice 3-5 filter clocks
-	PIT8253(config, m_filter_timer[1]);
-	m_filter_timer[1]->set_clk<0>(clk/2);
-	m_filter_timer[1]->set_clk<1>(clk/2);
-	m_filter_timer[1]->set_clk<2>(clk/2);
+	m_dma[1]->dreq_active_low();
+	m_dma[1]->out_hreq_callback().set(busreq, FUNC(input_merger_any_high_device::in_w<1>));
+	m_maincpu->busack_cb().append(m_dma[1], FUNC(am9517a_device::hack_w));
+	m_dma[1]->out_eop_callback().set(FUNC(s612_state::dma_eop_w<1>));
+	m_dma[1]->out_iow_callback<0>().set(FUNC(s612_state::dma_io_w<4>));
+	m_dma[1]->out_iow_callback<1>().set(FUNC(s612_state::dma_io_w<5>));
+	m_dma[1]->out_dack_callback<0>().set(FUNC(s612_state::dreq_clear_w<4>));
+	m_dma[1]->out_dack_callback<1>().set(FUNC(s612_state::dreq_clear_w<5>));
 
 	if (use_8254)
 	{
@@ -378,10 +467,28 @@ void s612_state::base_config(machine_config &config, bool use_8254)
 	m_sample_timer[0]->set_clk<0>(clk);
 	m_sample_timer[0]->set_clk<1>(clk);
 	m_sample_timer[0]->set_clk<2>(clk);
+	m_sample_timer[0]->out_handler<0>().set(FUNC(s612_state::dreq_set_w<0>));
+	m_sample_timer[0]->out_handler<1>().set(FUNC(s612_state::dreq_set_w<1>));
+	m_sample_timer[0]->out_handler<2>().set(FUNC(s612_state::dreq_set_w<2>));
 
 	m_sample_timer[1]->set_clk<0>(clk);
 	m_sample_timer[1]->set_clk<1>(clk);
 	m_sample_timer[1]->set_clk<2>(clk);
+	m_sample_timer[1]->out_handler<0>().set(FUNC(s612_state::dreq_set_w<3>));
+	m_sample_timer[1]->out_handler<1>().set(FUNC(s612_state::dreq_set_w<4>));
+	m_sample_timer[1]->out_handler<2>().set(FUNC(s612_state::dreq_set_w<5>));
+
+	// voice 0-2 filter clocks
+	PIT8253(config, m_filter_timer[0]);
+	m_filter_timer[0]->set_clk<0>(clk/2);
+	m_filter_timer[0]->set_clk<1>(clk/2);
+	m_filter_timer[0]->set_clk<2>(clk/2);
+
+	// voice 3-5 filter clocks
+	PIT8253(config, m_filter_timer[1]);
+	m_filter_timer[1]->set_clk<0>(clk/2);
+	m_filter_timer[1]->set_clk<1>(clk/2);
+	m_filter_timer[1]->set_clk<2>(clk/2);
 }
 
 /**************************************************************************/
@@ -400,7 +507,7 @@ void s612_state::s612(machine_config &config)
 	ppi.in_pb_callback().set_ioport("PB");
 	ppi.in_pc_callback().set_ioport("PC");
 
-	auto &adc(ADC0809(config, "adc", 8_MHz_XTAL / 16)); // TODO
+	auto &adc(ADC0809(config, "adc0809", 8_MHz_XTAL / 16)); // TODO
 	adc.in_callback<0>().set_constant(0x80); // tune
 	adc.in_callback<1>().set_constant(0x00); // start/splice point
 	adc.in_callback<2>().set_constant(0xff); // end point
@@ -425,7 +532,8 @@ void s612_state::s612(machine_config &config)
 	latch1.q_out_cb<1>().set(FUNC(s612_state::led_w<7>)); // looping
 	latch1.q_out_cb<2>().set(FUNC(s612_state::led_w<8>)); // alternating
 	latch1.q_out_cb<3>().set(FUNC(s612_state::led_w<9>)); // manual splice
-	// TODO: bit 6 = mute, bit 7 = feedback
+	latch1.q_out_cb<6>().set(FUNC(s612_state::mute_w));
+	latch1.q_out_cb<7>().set(FUNC(s612_state::overdub_w));
 }
 
 /**************************************************************************/
@@ -436,6 +544,16 @@ void s700_state::s700(machine_config &config)
 
 	// sample memory: 12-bit x 64k x 3 banks, expandable to 8 banks
 	m_ram->set_default_size("1M").set_extra_options("384K");
+
+	HC259(config, m_env_latch);
+	m_env_latch->q_out_cb<0>().set(FUNC(s700_state::env_strobe_w<0>));
+	m_env_latch->q_out_cb<1>().set(FUNC(s700_state::env_strobe_w<1>));
+	m_env_latch->q_out_cb<2>().set(FUNC(s700_state::env_strobe_w<2>));
+	m_env_latch->q_out_cb<3>().set(FUNC(s700_state::env_strobe_w<3>));
+	m_env_latch->q_out_cb<4>().set(FUNC(s700_state::env_strobe_w<4>));
+	m_env_latch->q_out_cb<5>().set(FUNC(s700_state::env_strobe_w<5>));
+	m_env_latch->q_out_cb<6>().set(FUNC(s700_state::overdub_w));
+	m_env_latch->q_out_cb<7>().set(FUNC(s700_state::mute_w));
 
 	auto &kdc(I8279(config, "kdc", 16_MHz_XTAL / 8));
 	kdc.out_sl_callback().set(FUNC(s700_state::sl_w));
@@ -511,11 +629,11 @@ u8 s612_state::dma_r(offs_t offset)
 }
 
 /**************************************************************************/
-template<int Num>
+template<int Voice>
 void s612_state::voice_bank_sel_w(u8 data)
 {
-	// TODO: bit 3 = generate NMI on DMA EOP
-	m_voice_bank[Num]->set_bank(data & 0x7);
+	m_voice_bank[Voice]->set_bank(data & 0x7);
+	m_voice_nmi[Voice] = BIT(~data, 3);
 }
 
 /**************************************************************************/
@@ -549,6 +667,86 @@ u8 s612_state::cpu_bank_lsb_r(offs_t offset)
 	// bits 0-3 of DRAM, bits 0-3 of refresh counter
 	return (m_cpu_bank->read16(offset, 0x00ff) & 0xf0)
 		| (m_refresh_counter & 0x0f);
+}
+
+/**************************************************************************/
+template<int Voice>
+void s612_state::dreq_set_w(int state)
+{
+	if (state)
+		m_dma[Voice / 4]->dreq_w<Voice % 4>(0);
+}
+/**************************************************************************/
+template<int Voice>
+void s612_state::dreq_clear_w(int state)
+{
+	if (!state)
+		m_dma[Voice / 4]->dreq_w<Voice % 4>(1);
+}
+
+/**************************************************************************/
+template<int Num>
+void s612_state::dma_eop_w(int state)
+{
+	m_dma_eop[Num] = state;
+}
+
+/**************************************************************************/
+u8 s612_state::dma_io_r(offs_t offset)
+{
+	m_input_sample = m_adc->read();
+	return m_input_sample >> 4;
+}
+
+/**************************************************************************/
+void s612_state::dma_mem_w(offs_t offset, u8 data)
+{
+	m_voice_bank[0]->write16(offset, m_input_sample << 4);
+}
+
+/**************************************************************************/
+template<int Voice>
+void s612_state::dma_io_w(offs_t offset, u8 data)
+{
+	const u16 sample = m_voice_bank[Voice]->read16(offset);
+	m_dac[Voice]->write(sample >> 4);
+
+	if (m_dma_eop[Voice / 4] && m_voice_nmi[Voice])
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
+/**************************************************************************/
+void s612_state::mute_w(int state)
+{
+	machine().sound().system_mute(state);
+}
+
+/**************************************************************************/
+void s612_state::overdub_w(int state)
+{
+	m_feedback->set_output_gain(0, state ? 0.0 : 1.0);
+}
+
+/**************************************************************************/
+template<int Voice>
+void s612_state::envelope_w(u8 data)
+{
+	m_dac[Voice]->set_output_gain(0, data / 255.0);
+}
+
+/**************************************************************************/
+template<int Voice>
+void s700_state::env_strobe_w(int state)
+{
+	if (state)
+		envelope_w<Voice>(m_env_data);
+}
+
+/**************************************************************************/
+void s700_state::env_latch_w(offs_t offset, u8 data)
+{
+	m_env_data = data;
+	m_env_latch->write_bit(offset >> 4, offset & 1);
 }
 
 /**************************************************************************/
@@ -689,7 +887,7 @@ static INPUT_PORTS_START( s700 )
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Play Back")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_OTHER  ) PORT_NAME("Program Up")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_OTHER  ) PORT_NAME("Rec/PB Trigger")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("Rec/PB Trigger")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_START("DIAL")
@@ -742,10 +940,10 @@ static INPUT_PORTS_START( x7000 )
 	// default to on
 	PORT_DIPSETTING( 0x08, DEF_STR(On) )
 	PORT_DIPSETTING( 0x00, DEF_STR(Off) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // no playback button
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER  ) PORT_NAME("Program Up")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER  ) PORT_NAME("Rec/PB Trigger")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNUSED ) // no playback button
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_OTHER  ) PORT_NAME("Program Up")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("Rec/PB Trigger")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_START("DIAL")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_NAME("Control") PORT_SENSITIVITY(50) PORT_KEYDELTA(75) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT)
@@ -865,6 +1063,6 @@ ROM_END
 
 }
 
-SYST( 1985, s612,  0,     0, s612,  s612,  s612_state,  empty_init, "Akai", "S612 MIDI Digital Sampler", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-SYST( 1986, x7000, 0,     0, x7000, x7000, x7000_state, empty_init, "Akai", "X7000 Sampling Keyboard",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-SYST( 1986, s700,  x7000, 0, s700,  s700,  s700_state,  empty_init, "Akai", "S700 MIDI Digital Sampler", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+SYST( 1985, s612,  0,     0, s612,  s612,  s612_state,  empty_init, "Akai", "S612 MIDI Digital Sampler", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+SYST( 1986, x7000, 0,     0, x7000, x7000, x7000_state, empty_init, "Akai", "X7000 Sampling Keyboard",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+SYST( 1986, s700,  x7000, 0, s700,  s700,  s700_state,  empty_init, "Akai", "S700 MIDI Digital Sampler", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
