@@ -58,6 +58,7 @@ public:
 		, m_kanji_lv2_rom(*this, "kanji_lv2")
 		, m_mouse_port(*this, "mouseport") // labelled "マウス" (mouse) - can't use "mouse" because of core -mouse option
 		, m_exp(*this, "exp")
+		, m_window_view(*this, "window_view")
 	{
 	}
 
@@ -98,6 +99,7 @@ protected:
 	required_region_ptr<u8> m_kanji_lv2_rom;
 	required_device<msx_general_purpose_port_device> m_mouse_port;
 	required_device<pc8801_exp_slot_device> m_exp;
+	memory_view m_window_view;
 
 	void int4_irq_w(int state);
 
@@ -235,7 +237,7 @@ private:
 	optional_device<ym2203_device> m_opn;
 };
 
-// both FH and MH family bases sports selectable 8/4 MHz CPU clock switch
+// FH and MH families and beyond has selectable 8/4 MHz CPU clock switch
 class pc8801fh_state : public pc8801mk2sr_state
 {
 public:
@@ -263,6 +265,7 @@ private:
 	uint8_t m_baudrate_val = 0;
 };
 
+// MA has a newer floppy BIOS, an extra dictionary ROM and optional bay for CD-ROM i/f
 class pc8801ma_state : public pc8801fh_state
 {
 public:

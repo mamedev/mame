@@ -17,11 +17,12 @@ TODO:
 - waitstates (relevant for V1 mode);
 - hook Z80_INPUT_LINE_BUSREQ to DMA interactions in place of HALT (common with pc8001);
 - complete support for partial palette updates (pretty off in p8suite analog RGB test);
-- understand why i8214 needs a dis hack setter (depends on attached i8212?);
+- understand why i8214 needs a dis_hack setter (depends on attached i8212?);
 - slotify extended work RAM, make sure that p8suite memtest88 detects it properly;
 - better state machine isolation of features between various models.
   Vanilla PC-8801 doesn't have analog palette, PC80S31 device as default
   (uses external minidisk instead), only model with working border color, other misc banking bits.
+- move keyboard implementation to own device (matters particularly for PC-88VA);
 - double check dipswitches;
 - backport/merge what is portable to PC-8001;
 - Kanji LV1/LV2 ROM hookups needs to be moved at slot level.
@@ -413,6 +414,9 @@ uint8_t pc8801_state::high_wram_r(offs_t offset)
 	return m_hi_work_ram[offset];
 }
 
+// TODO: high TVRAM even
+// μPD3301 DMAs from this instead of the regular work RAM in later models
+// to resolve a bus bottleneck.
 void pc8801_state::high_wram_w(offs_t offset, uint8_t data)
 {
 	m_hi_work_ram[offset] = data;
@@ -464,54 +468,39 @@ void pc8801_state::main_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, uint8_t data) {
 			if(m_extram_mode & 0x10)
-				ext_wram_w(offset | (m_extram_bank * 0x8000),data);
+				ext_wram_w(offset | (m_extram_bank * 0x8000), data);
 			else
-				wram_w(offset,data);
+				wram_w(offset, data);
 		})
 	);
-	map(0x8000, 0x83ff).lrw8(
+	map(0x8000, 0xbfff).lrw8(
 		NAME([this] (offs_t offset) {
-			uint32_t window_offset;
-
-			// work RAM read select or N-Basic select always banks this as normal work RAM
-			if(m_gfx_ctrl & 6)
-				return wram_r(offset + 0x8000);
-
-			window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
+			return wram_r(offset + 0x8000);
+		}),
+		NAME([this] (offs_t offset, uint8_t data) {
+			wram_w(offset + 0x8000, data);
+		})
+	);
+	// Text window overlay
+	map(0x8000, 0x83ff).view(m_window_view);
+	m_window_view[0](0x8000, 0x83ff).lrw8(
+		NAME([this] (offs_t offset) {
+			const uint16_t window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
 
 			// castlex and imenes accesses this
-			// TODO: high TVRAM even
 			if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
 				return high_wram_r(window_offset & 0xfff);
 
 			return wram_r(window_offset);
 		}),
 		NAME([this] (offs_t offset, uint8_t data) {
-			if(m_gfx_ctrl & 6)
-				wram_w(offset + 0x8000,data);
+			const uint16_t window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
+
+			// castlex and imenes accesses this
+			if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
+				high_wram_w(window_offset & 0xfff, data);
 			else
-			{
-				uint32_t window_offset;
-
-				window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
-
-				// castlex and imenes accesses this
-				// TODO: high TVRAM even
-				// μPD3301 DMAs from this instead of the regular work RAM in later models
-				// to resolve a bus bottleneck.
-				if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
-					high_wram_w(window_offset & 0xfff,data);
-				else
-					wram_w(window_offset,data);
-			}
-		})
-	);
-	map(0x8400, 0xbfff).lrw8(
-		NAME([this] (offs_t offset) {
-			return wram_r(offset + 0x8400);
-		}),
-		NAME([this] (offs_t offset, uint8_t data) {
-			wram_w(offset + 0x8400, data);
+				wram_w(window_offset, data);
 		})
 	);
 	map(0xc000, 0xffff).lrw8(
@@ -602,6 +591,12 @@ void pc8801_state::port30_w(uint8_t data)
 void pc8801_state::port31_w(uint8_t data)
 {
 	m_gfx_ctrl = data;
+
+	// RMODE or MMODE maps $8000-$83ff as regular work RAM
+	if (m_gfx_ctrl & 6)
+		m_window_view.disable();
+	else
+		m_window_view.select(0);
 
 //  set_screen_frequency((data & 0x11) != 0x11);
 //  dynamic_res_change();
@@ -1418,6 +1413,7 @@ void pc8801_state::machine_reset()
 	m_ext_rom_bank = 0xff;
 	m_gfx_ctrl = 0x31;
 	m_window_offset_bank = 0x80;
+	m_window_view.select(0);
 	m_misc_ctrl = 0x80;
 	// N-BASIC never pings $53, definitely expects text layer to be enabled on default
 	m_text_layer_mask = false;
@@ -2009,25 +2005,25 @@ ROM_START( pc8801mc )
 ROM_END
 
 
-COMP( 1981, pc8801,      0,      0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1981, pc8801,      0,      0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS ) // MIG for border, heavy V1 timing issues
 // PC-8801A (120V, USA & Canada) / PC-8801B (240V, Export?) for Western markets according to a NEC brochure
-COMP( 1983, pc8801mk2,   pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801mkII",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, pc8801mk2,   pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801mkII",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING ) // as above but no border
 
 // internal OPN
-COMP( 1985, pc8801mk2sr, 0,           0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIISR", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-//COMP( 1985, pc8801mk2tr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIITR", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1985, pc8801mk2fr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIFR", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1985, pc8801mk2mr, pc8801mk2sr, 0,      pc8801mk2mr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1985, pc8801mk2sr, 0,           0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIISR", MACHINE_IMPERFECT_TIMING )
+//COMP( 1985, pc8801mk2tr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIITR", MACHINE_IMPERFECT_TIMING )
+COMP( 1985, pc8801mk2fr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIFR", MACHINE_IMPERFECT_TIMING )
+COMP( 1985, pc8801mk2mr, pc8801mk2sr, 0,      pc8801mk2mr, pc8801, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_IMPERFECT_TIMING )
 
 // internal OPNA
-//COMP( 1986, pc8801fh,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FH",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1986, pc8801mh,    0,        0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801MH",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1987, pc8801fa,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FA",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1987, pc8801ma,    0,        0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-//COMP( 1988, pc8801fe,    pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE",     MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1988, pc8801ma2,   pc8801ma, 0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA2",    MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-//COMP( 1989, pc8801fe2,   pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE2",    MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1989, pc8801mc,    pc8801ma, 0,      pc8801mc,    pc8801fh, pc8801mc_state, empty_init, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+//COMP( 1986, pc8801fh,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FH",     MACHINE_IMPERFECT_TIMING )
+COMP( 1986, pc8801mh,    0,        0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801MH",     MACHINE_IMPERFECT_TIMING )
+COMP( 1987, pc8801fa,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, empty_init, "NEC",   "PC-8801FA",     MACHINE_IMPERFECT_TIMING )
+COMP( 1987, pc8801ma,    0,        0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA",     MACHINE_IMPERFECT_TIMING )
+//COMP( 1988, pc8801fe,    pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE",     MACHINE_IMPERFECT_TIMING )
+COMP( 1988, pc8801ma2,   pc8801ma, 0,      pc8801ma,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801MA2",    MACHINE_IMPERFECT_TIMING ) // missing SDIP-style BIOS bank?
+//COMP( 1989, pc8801fe2,   pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, empty_init, "NEC",   "PC-8801FE2",    MACHINE_IMPERFECT_TIMING )
+COMP( 1989, pc8801mc,    pc8801ma, 0,      pc8801mc,    pc8801fh, pc8801mc_state, empty_init, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING ) // missing SDIP-style BIOS bank, extra CD issues (dioscd essentially), otherwise same as MA
 
 // PC98DO (PC88+PC98, V33 + μPD70008AC)
 // belongs to own driver
