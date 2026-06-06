@@ -41,7 +41,7 @@ inline auto capcom_q1_hle_device::parent_rom_device_type()
 DEFINE_DEVICE_TYPE(CAPCOM_Q1_HLE, capcom_q1_hle_device, "capcom_q1_hle", "Capcom-Q1 DL 1425 DSP (HLE)")
 
 // DSP internal ROM region
-ROM_START( capcom_q1_hle )
+ROM_START( qsound_hle )
 	ROM_REGION16_LE( 0x2000, "dsp", 0 )
 	// removing WORD_SWAP from original definition
 	ROM_LOAD16_WORD( "dl-1425.bin", 0x0000, 0x2000, CRC(d6cf5ef5) SHA1(555f50fe5cdf127619da7d854c03f4a244a0c501) )
@@ -73,7 +73,7 @@ capcom_q1_hle_device::capcom_q1_hle_device(const machine_config &mconfig, const 
 
 const tiny_rom_entry *capcom_q1_hle_device::device_rom_region() const
 {
-	return ROM_NAME( capcom_q1_hle );
+	return ROM_NAME( qsound_hle );
 }
 
 //-------------------------------------------------

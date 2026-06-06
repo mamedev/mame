@@ -121,7 +121,7 @@ DEFINE_DEVICE_TYPE(CAPCOM_Q1, capcom_q1_device, "capcom_q1", "Capcom-Q1 DL 1425 
 
 
 // DSP internal ROM region
-ROM_START( capcom_q1 )
+ROM_START( qsound )
 	ROM_REGION16_BE( 0x2000, "dsp", 0 )
 	ROM_LOAD16_WORD_SWAP( "dl-1425.bin", 0x0000, 0x2000, CRC(d6cf5ef5) SHA1(555f50fe5cdf127619da7d854c03f4a244a0c501) )
 	ROM_IGNORE( 0x4000 )
@@ -188,7 +188,7 @@ u8 capcom_q1_device::read()
 
 const tiny_rom_entry *capcom_q1_device::device_rom_region() const
 {
-	return ROM_NAME( capcom_q1 );
+	return ROM_NAME( qsound );
 }
 
 
