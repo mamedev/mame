@@ -175,9 +175,9 @@ public:
 		m_towerlamps(*this, "towerlamp%u", 0U)
 	{ }
 
-	void jwildb52(machine_config &config);
+	void jwildb52(machine_config &config) ATTR_COLD;
 
-	void init_jwildb52();
+	void init_jwildb52() ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 
@@ -599,8 +599,6 @@ INPUT_PORTS_END
 void sigmab52_state::machine_start()
 {
 	m_bank1->configure_entries(0, 2, memregion("maincpu")->base(), 0x4000);
-	m_lamps.resolve();
-	m_towerlamps.resolve();
 }
 
 void sigmab52_state::machine_reset()

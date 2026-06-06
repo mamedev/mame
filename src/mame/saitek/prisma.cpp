@@ -59,7 +59,7 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
-	void prisma(machine_config &config);
+	void prisma(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
@@ -105,8 +105,6 @@ private:
 
 void prisma_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_lcd_data));
 	save_item(NAME(m_lcd_address));

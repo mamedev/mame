@@ -45,6 +45,7 @@
 #include "emupal.h"
 
 #include <algorithm>
+#include <bit>
 #include <deque>
 
 #define LOG_UNKNOWN         (1U << 1)
@@ -3276,7 +3277,7 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::tablet_hle_tick)
 
 		for (int i = 0; i < 5; i++)
 		{
-			data[i] |= (population_count_32(data[i]) & 1) ? 0x80 : 0x00;
+			data[i] |= (std::popcount(data[i]) & 1) ? 0x80 : 0x00;
 			m_tablet_hle_tx_bits.push_back(0);
 			for (int bit = 0; bit < 8; bit++)
 			{
@@ -3681,16 +3682,16 @@ void dpb7000_state::dpb7000(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, m_p_int).output_handler().set_inputline(m_maincpu, 3);
 
-	ACIA6850(config, m_acia[0], 0);
+	ACIA6850(config, m_acia[0]);
 	m_acia[0]->txd_handler().set(m_rs232[0], FUNC(rs232_port_device::write_txd));
 	m_acia[0]->rts_handler().set(m_rs232[0], FUNC(rs232_port_device::write_rts));
 	m_acia[0]->irq_handler().set_inputline(m_maincpu, 6);
 
-	ACIA6850(config, m_acia[1], 0);
+	ACIA6850(config, m_acia[1]);
 	m_acia[1]->txd_handler().set(m_tds_duart, FUNC(scn2681_device::rx_a_w));
 	m_acia[1]->irq_handler().set(m_p_int, FUNC(input_merger_device::in_w<0>));
 
-	ACIA6850(config, m_acia[2], 0);
+	ACIA6850(config, m_acia[2]);
 	m_acia[2]->txd_handler().set(m_rs232[1], FUNC(rs232_port_device::write_txd));
 	m_acia[2]->rts_handler().set(m_rs232[1], FUNC(rs232_port_device::write_rts));
 	m_acia[2]->irq_handler().set(m_p_int, FUNC(input_merger_device::in_w<1>));

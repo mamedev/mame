@@ -5,7 +5,7 @@ license:CC0-1.0
 -->
 <softwarelist name="c64_flop_orig" description="Commodore 64 original disks">
 
-	<!-- Games -->
+<!-- !Games -->
 
 	<software name="aztecchl">
 		<description>Aztec Challenge</description>
@@ -378,7 +378,7 @@ Punts to BASIC
 		</part>
 	</software>
 
-	<!-- Compilations -->
+<!-- !Compilations -->
 
 	<software name="gameset" supported="no">
 		<description>Game Set and Match</description>
@@ -415,7 +415,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Applications -->
+<!-- !Applications -->
 
 	<software name="basickaa">
 		<description>BASIC-kääntäjä (Finland)</description>
@@ -453,7 +453,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- diskmags -->
+<!-- !diskmags -->
 
 	<software name="input64_22">
 		<description>INPUT 64 10/86</description>
@@ -789,7 +789,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Educational -->
+<!-- !Educational -->
 
 	<software name="koalapnt">
 		<!-- Flippy disk, a800 version on side B -->
@@ -805,9 +805,9 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Test/Demo disks -->
+<!-- !Test/Demo disks -->
 
-	<!-- MIDI -->
+<!-- !MIDI -->
 
 	<software name="midi8p">
 		<description>MIDI 8+</description>

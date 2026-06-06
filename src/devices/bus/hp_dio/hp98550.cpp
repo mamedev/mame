@@ -94,7 +94,7 @@ void dio32_98550_device::device_add_mconfig(machine_config &config)
 		m_catseye[i]->irq_out_cb().set(FUNC(dio32_98550_device::int_w));
 	}
 
-	NEREID(config, m_nereid, 0);
+	NEREID(config, m_nereid);
 }
 
 const tiny_rom_entry *dio32_98550_device::device_rom_region() const

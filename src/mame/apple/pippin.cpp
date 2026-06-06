@@ -169,17 +169,17 @@ void pippin_state::pippin(machine_config &config)
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pippin_state::pippin_map);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	ASPEN(config, m_aspen, 66000000, "maincpu").set_dev_offset(1);
 
-	cdrom_image_device &cdrom(CDROM(config, "cdrom", 0));
+	cdrom_image_device &cdrom(CDROM(config, "cdrom"));
 	cdrom.set_interface("cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("pippin");
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("32M");
 
-	grandcentral_device &grandcentral(GRAND_CENTRAL(config, "pci:0d.0", 0));
+	grandcentral_device &grandcentral(GRAND_CENTRAL(config, "pci:0d.0"));
 	grandcentral.set_maincpu_tag("maincpu");
 	grandcentral.irq_callback().set(FUNC(pippin_state::irq_w));
 

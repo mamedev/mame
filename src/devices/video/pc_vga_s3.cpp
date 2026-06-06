@@ -40,7 +40,7 @@ s3vision864_vga_device::s3vision864_vga_device(const machine_config &mconfig, de
 
 void s3vision864_vga_device::device_add_mconfig(machine_config &config)
 {
-	IBM8514A(config, "8514a", 0).set_vga_owner();
+	IBM8514A(config, "8514a").set_vga_owner();
 }
 
 uint32_t s3vision864_vga_device::latch_start_addr()

@@ -1321,7 +1321,7 @@ void alpha68k_II_state::video_config(machine_config &config, u16 num_pens, const
 	m_color_entry_mask = (num_pens / 16) - 1;
 
 	// TODO: change into NeoGeo palette format ...
-	ALPHA68K_PALETTE(config, m_palette, 0);
+	ALPHA68K_PALETTE(config, m_palette);
 	m_palette->set_entries(num_pens);
 }
 

@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "inputdevices.h"
 
+#include "input.h"
 #include "inputdev.h"
 
 // FIXME: allow OSD module headers to be included in a less ugly way
@@ -32,7 +33,7 @@ public:
 		set_heading(
 				util::string_format(_("menu-inputdev", "%1$s (%2$s %3$d)"),
 					device.name(),
-					machine().input().device_class(device.devclass()).name(),
+					machine().input().device_class(device.device_class()).name(),
 					device.devindex() + 1));
 	}
 
@@ -51,7 +52,7 @@ protected:
 			// get the complete token for the highlighted input
 			input_device_item &input = *reinterpret_cast<input_device_item *>(selectedref);
 			input_code code = input.code();
-			if (!machine().input().device_class(m_device.devclass()).multi())
+			if (!machine().input().device_class(m_device.device_class()).multi())
 				code.set_device_index(0);
 			std::string const token = machine().input().code_to_token(code);
 
@@ -255,7 +256,7 @@ bool menu_input_devices::handle(event const *ev)
 
 	case IPT_UI_PREV_GROUP:
 		{
-			auto group = dev.devclass();
+			auto group = dev.device_class();
 			bool found_break = false;
 			int target = 0;
 			for (auto i = selected_index(); 0 < i--; )
@@ -263,13 +264,13 @@ bool menu_input_devices::handle(event const *ev)
 				input_device *const candidate = reinterpret_cast<input_device *>(item(i).ref());
 				if (candidate)
 				{
-					if (candidate->devclass() == group)
+					if (candidate->device_class() == group)
 					{
 						target = i;
 					}
 					else if (!found_break)
 					{
-						group = candidate->devclass();
+						group = candidate->device_class();
 						found_break = true;
 						target = i;
 					}
@@ -290,11 +291,11 @@ bool menu_input_devices::handle(event const *ev)
 
 	case IPT_UI_NEXT_GROUP:
 		{
-			auto const group = dev.devclass();
+			auto const group = dev.device_class();
 			for (auto i = selected_index(); item_count() > ++i; )
 			{
 				input_device *const candidate = reinterpret_cast<input_device *>(item(i).ref());
-				if (candidate && (candidate->devclass() != group))
+				if (candidate && (candidate->device_class() != group))
 				{
 					set_selected_index(i);
 					return true;

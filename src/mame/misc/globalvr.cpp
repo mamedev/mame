@@ -305,7 +305,7 @@ void globalvr_state::globalvr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &globalvr_state::globalvr_map);
 	m_maincpu->set_disable();
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

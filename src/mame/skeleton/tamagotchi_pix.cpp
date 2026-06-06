@@ -15,9 +15,8 @@ SN73231M1N-000
 
 Dual-core ARM Cortex-M3 SoC (Sonix SNC7320 series)
 
-other sources mention that the Tamagotchi Pix uses a GeneralPlus GP32 (ARM)
-series CPU, so are there multiple hardware revisions or is that information
-incorrect?
+Other sources mention that the Tamagotchi Pix uses a GeneralPlus GP32 (ARM)
+series CPU, apparently the GP32 was only used for the first production run.
 
 device has a camera
 
@@ -146,6 +145,12 @@ ROM_START( precur2w )
 	ROM_LOAD( "by25q64ess.bin", 0x000000, 0x800000, CRC(35351cd0) SHA1(0b07a613c3e9b638e531ba668d72ebefd459d0d4) )
 ROM_END
 
+ROM_START( rotom800 )
+	// this is a NAND ROM so there's an internal bootstrap at least
+	ROM_REGION( 0x10800000, "maincpu", ROMREGION_ERASEFF ) // SNC7320A header in ROM
+	ROM_LOAD( "mx35lf2ge4ad.u1", 0x000000, 0x10800000, CRC(b0ad2e03) SHA1(ec2d5254b2a3e183389bcf1cbb50ceb08f9c7cd3) )
+ROM_END
+
 } // anonymous namespace
 
 CONS( 2020, tamapix,       0,              0,      tamapix,  tamapix, tamagotchi_pix_state, empty_init, "Bandai", "Tamagotchi Pix", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
@@ -153,6 +158,9 @@ CONS( 2020, tamapix,       0,              0,      tamapix,  tamapix, tamagotchi
 // デリシャスパーティ プリキュア ハートキュアウォッチ＆ハートフルーツペンダントカバースペシャルセット
 // "Muscat A 2022 01 15" on PCB
 CONS( 2022, precur2w,      0,              0,      precur2w, tamapix, precur2w_state,       empty_init, "Bandai", "Delicious Party PreCure Heart Cure Watch & Heart Fruit Pendant Cover Special Set (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+// キミもポケモン博士！ スマホロトムPad
+CONS( 2022, rotom800,      0,              0,      precur2w, tamapix, precur2w_state,       empty_init, "Bandai", "Kimi mo Pokemon Hakase! Rotom Pad (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // わんだふるぷりきゅあ！　どうぶつおせわがた～っぷり　あつめておせわしよ　キラニコトランク
 // Wonderful Precure! Dōbutsu Osewa ga Ta~ppuri Atsumete Osewa Shiyo♥ Kiraniko Trunk (c)2024 Bandai

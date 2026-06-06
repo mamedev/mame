@@ -376,7 +376,7 @@ offs_t h8500_disassembler::dasm_misc(std::ostream &stream, offs_t pc, u8 ea, con
 	else if ((op & 0xf8) == 0xb8)
 	{
 		util::stream_format(stream, "%-9s", util::string_format("SCB/%s", ea == 0x01 ? "F" : ea == 0x06 ? "NE" : ea == 0x07 ? "EQ" : "?"));
-		format_reg(stream, op & 0x07, true);
+		format_reg(stream, opcodes.r8(pc + 1) & 0x07, true);
 		stream << ", ";
 		format_bdisp(stream, s16(s8(opcodes.r8(pc + 2))), pc + 3);
 		return 3 | STEP_COND | SUPPORTED;
@@ -484,7 +484,7 @@ offs_t h8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const h8
 	case 0x03: case 0x13:
 		if (m_expanded)
 		{
-			util::stream_format(stream, "%-9s@H'%02X%04X", BIT(op, 4) ? "PJSR" : "PJMP", opcodes.r8(pc + 1), opcodes.r16(pc + 2));
+			util::stream_format(stream, "%-9s@H'%02X%04X", BIT(op, 4) ? "PJMP" : "PJSR", opcodes.r8(pc + 1), opcodes.r16(pc + 2));
 			return 4 | (BIT(op, 4) ? STEP_OVER : 0) | SUPPORTED;
 		}
 		else
@@ -508,7 +508,7 @@ offs_t h8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const h8
 		util::stream_format(stream, "%-9s", "TRAPA");
 		u8 v = opcodes.r8(pc + 1);
 		if ((v & 0xf0) == 0x10)
-			format_imm8(stream, v);
+			format_imm8(stream, v & 0xf);
 		else
 			stream << "illegal";
 		return 2 | STEP_OVER | SUPPORTED;
@@ -552,7 +552,7 @@ offs_t h8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const h8
 			format_imm16(stream, opcodes.r16(pc + 1));
 		else
 			format_imm8(stream, opcodes.r8(pc + 1));
-		return (BIT(op, 3) ? 3 : 2) | STEP_OVER | SUPPORTED;
+		return (BIT(op, 3) ? 3 : 2) | STEP_OUT | SUPPORTED;
 
 	case 0x17: case 0x1f:
 		util::stream_format(stream, "%-9s", "LINK");

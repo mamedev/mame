@@ -52,7 +52,7 @@ void konami_pc_state::konami_pc(machine_config &config)
 	PENTIUM3(config, m_maincpu, 100000000); // actually Celeron
 	m_maincpu->set_addrmap(AS_PROGRAM, &konami_pc_state::konami_pc_map);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

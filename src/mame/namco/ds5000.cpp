@@ -190,8 +190,8 @@ private:
 
 uint32_t ds5000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//	m_c355spr->build_sprite_list_and_render_sprites(cliprect);
-//	m_c355spr->draw(screen, bitmap, cliprect);
+//  m_c355spr->build_sprite_list_and_render_sprites(cliprect);
+//  m_c355spr->draw(screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -276,17 +276,17 @@ void ds5000_state::ds5000(machine_config &config)
 	// TODO: DSPs
 
 	// TODO: Namco customs
-	NAMCO_C148(config, m_sub_intc, 0, m_subcpu, true);
+	NAMCO_C148(config, m_sub_intc, m_subcpu, true);
 	m_sub_intc->out_ext1_callback().set_nop(); //(FUNC(namcos2_base_state::sound_reset_w));
 	m_sub_intc->out_ext2_callback().set_nop(); //(FUNC(namcos2_base_state::system_reset_w));
 
-	NAMCO_C355SPR(config, m_c355spr, 0);
+	NAMCO_C355SPR(config, m_c355spr);
 	m_c355spr->set_screen("screen");
 	m_c355spr->set_palette("palette");
 	m_c355spr->set_scroll_offsets(0, 0x20);
-//	m_c355spr->set_mix_callback(FUNC(namcos21_c67_state::sprite_mix_callback));
+//  m_c355spr->set_mix_callback(FUNC(namcos21_c67_state::sprite_mix_callback));
 	m_c355spr->set_color_base(0x1000);
-//	m_c355spr->set_external_prifill(true);
+//  m_c355spr->set_external_prifill(true);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);

@@ -65,6 +65,8 @@ Notes:
 
 #include "bus/ata/atapicdr.h"
 
+#include "endianness.h"
+
 // Any drive as long as the ident name starts with "TOSHIB" will do, but this is the one that's used with CDXA games specifically
 DECLARE_DEVICE_TYPE(TOSHIBA_XM6402B_CDROM, toshiba_xm6402b_cdrom_device)
 

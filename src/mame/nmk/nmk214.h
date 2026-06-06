@@ -11,7 +11,7 @@
 class nmk214_device : public device_t
 {
 public:
-	nmk214_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nmk214_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_mode(const u8 mode) { m_mode = mode; }
 	void set_input_address_bitswap(const std::array<u8, 13> &input_address_bitswap) { m_input_address_bitswap = input_address_bitswap; }

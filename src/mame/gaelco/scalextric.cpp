@@ -63,7 +63,7 @@ ROM_START(scxsp)
 
 	ROM_REGION(0x02000, "subcpu", 0)
 	/* User ID0=0x00F, ID1=0x00F, ID2=0x00F, ID3=0x00F.
-           Config Word = 0x0FFD. */
+	       Config Word = 0x0FFD. */
 	ROM_LOAD("9-3_esp_33646_pic16c57.u1", 0x00000, 0x02000, CRC(520f6e27) SHA1(3c3f148c211ed0a71d9d896e921a158d736c6154)) // 9-mar
 
 	ROM_REGION(0x40000, "musicrom", 0)
@@ -79,7 +79,7 @@ ROM_START(scxspa)
 
 	ROM_REGION(0x02000, "subcpu", 0)
 	/* User ID0=0x00F, ID1=0x00F, ID2=0x00F, ID3=0x00F.
-           Config Word = 0x0FFF. */
+	       Config Word = 0x0FFF. */
 	ROM_LOAD("mostra_spain_24-1-04_33924_pic16c57.bin", 0x00000, 0x02000, CRC(e331429c) SHA1(b6e9cd1a4dd92f0b1f04c1e27d5b965949d1e215)) // 24-jan
 
 	ROM_REGION(0x40000, "musicrom", 0)
@@ -95,7 +95,7 @@ ROM_START(scxspb)
 
 	ROM_REGION(0x02000, "subcpu", 0)
 	/* User ID0=0x00F, ID1=0x00F, ID2=0x00F, ID3=0x00F.
-           Config Word = 0x0FF5. */
+	       Config Word = 0x0FF5. */
 	ROM_LOAD("esp_4-12_pic16c57.u1", 0x00000, 0x02000, CRC(2836d5bb) SHA1(07b20515d1fdb19e44be984ba24955f57b563d9a)) // 04-dec
 
 	ROM_REGION(0x40000, "musicrom", 0)
@@ -111,7 +111,7 @@ ROM_START(scxspc)
 
 	ROM_REGION(0x02000, "subcpu", 0)
 	/* User ID0=0x00F, ID1=0x00F, ID2=0x00F, ID3=0x00F.
-           Config Word = 0x0FFD. */
+	       Config Word = 0x0FFD. */
 	ROM_LOAD("q_mostra_esca_sp3_334a2_pic16c57.bin", 0x00000, 0x02000, CRC(d6a0d0ec) SHA1(bb64e0e9c432584766014277ecf12752e3c6948f))
 
 	ROM_REGION(0x40000, "musicrom", 0)
@@ -127,7 +127,7 @@ ROM_START(scxspd)
 
 	ROM_REGION(0x02000, "subcpu", 0)
 	/* User ID0=0x00F, ID1=0x00F, ID2=0x00F, ID3=0x00F.
-           Config Word = 0x0FFD. */
+	       Config Word = 0x0FFD. */
 	ROM_LOAD("mostra_pic16c57.bin", 0x00000, 0x02000, CRC(414f08b6) SHA1(fb471db71adde7fcd2d931f16d1d2dd6bb17dfad))
 
 	ROM_REGION(0x40000, "musicrom", 0)
@@ -143,7 +143,7 @@ ROM_START(scxam)
 
 	ROM_REGION(0x02000, "subcpu", 0)
 	/* User ID0=0x00F, ID1=0x00F, ID2=0x00F, ID3=0x00F.
-           Config Word = 0x0FFD. */
+	       Config Word = 0x0FFD. */
 	ROM_LOAD("america_mostra_puc16c57.bin", 0x00000, 0x02000, CRC(fbcf2894) SHA1(d2cd7d601716b97624ba7cf1d8e6e7ab9daa60ca))
 
 	ROM_REGION(0x40000, "musicrom", 0)
@@ -159,7 +159,7 @@ ROM_START(scxen)
 
 	ROM_REGION(0x02000, "subcpu", 0)
 	/* User ID0=0x00F, ID1=0x00F, ID2=0x00F, ID3=0x00F.
-           Config Word = 0x0FFD. */
+	       Config Word = 0x0FFD. */
 	ROM_LOAD("9-3_ing_33749_pic16c57.u1", 0x00000, 0x02000, CRC(9f5e1c52) SHA1(2120f070f95039138e1471060e1cd4653b17101a)) // 09-mar
 
 	ROM_REGION(0x40000, "musicrom", 0)
@@ -176,7 +176,7 @@ ROM_START(scxena)
 
 	ROM_REGION(0x02000, "subcpu", 0)
 	/* User ID0=0x00F, ID1=0x00F, ID2=0x00F, ID3=0x00F.
-           Config Word = 0x0FFD. */
+	       Config Word = 0x0FFD. */
 	ROM_LOAD("mostra_esca_ing3_ing_pic16c57.bin", 0x00000, 0x02000, CRC(47f8446f) SHA1(4738073da9d8020e11c972c6657c788b1ddd2f08))
 
 	ROM_REGION(0x40000, "musicrom", 0)
@@ -192,7 +192,7 @@ ROM_START(scxfr)
 
 	ROM_REGION(0x02000, "subcpu", 0)
 	/* User ID0=0x00F, ID1=0x00F, ID2=0x00F, ID3=0x00F.
-           Config Word = 0x0FFD. */
+	       Config Word = 0x0FFD. */
 	ROM_LOAD("fra_33749_10-7_pic16c57.u1", 0x00000, 0x02000, CRC(1c5b2e41) SHA1(9efc95995eca1935bc34f208003ea2ba9c527ba5)) // 10-jul
 
 	ROM_REGION(0x40000, "musicrom", 0)
@@ -209,7 +209,7 @@ ROM_START(scxfra)
 
 	ROM_REGION(0x02000, "subcpu", 0)
 	/* User ID0=0x00F, ID1=0x00F, ID2=0x00F, ID3=0x00F.
-           Config Word = 0x0FFD. */
+	       Config Word = 0x0FFD. */
 	ROM_LOAD("mostra_esca_fra3_fra_pic16c57.bin", 0x00000, 0x02000, CRC(c4fd767c) SHA1(fcec74f824d1a63931903783f6b3c4b0e19ab46e))
 
 	ROM_REGION(0x40000, "musicrom", 0)
@@ -225,7 +225,7 @@ ROM_START(scxgr)
 
 	ROM_REGION(0x02000, "subcpu", 0)
 	/* User ID0=0x00F, ID1=0x00F, ID2=0x00F, ID3=0x00F.
-           Config Word = 0x0FFD. */
+	       Config Word = 0x0FFD. */
 	ROM_LOAD("9-3_ale_3373d_pic16c57.u1", 0x00000, 0x02000, CRC(c16249e8) SHA1(b5f5202bb181120c3f45af134c9392ed72963f61)) // 09-mar
 
 	ROM_REGION(0x40000, "musicrom", 0)
@@ -241,7 +241,7 @@ ROM_START(scxit)
 
 	ROM_REGION(0x02000, "subcpu", 0)
 	/* User ID0=0x00F, ID1=0x00F, ID2=0x00F, ID3=0x00F.
-           Config Word = 0x0FFD. */
+	       Config Word = 0x0FFD. */
 	ROM_LOAD("ita_14-3_33740_pic16c57.u1", 0x00000, 0x02000, CRC(60da3ba2) SHA1(a8576ebb99899cedf9a6114b6279a67be7f05e24)) // 14-mar
 
 	ROM_REGION(0x40000, "musicrom", 0)
@@ -258,7 +258,7 @@ ROM_START(scxita)
 
 	ROM_REGION(0x02000, "subcpu", 0)
 	/* User ID0=0x00F, ID1=0x00F, ID2=0x00F, ID3=0x00F.
-           Config Word = 0x0FFD. */
+	       Config Word = 0x0FFD. */
 	ROM_LOAD("mostra_esca_ita3_ita_pic16c57.bin", 0x00000, 0x02000, CRC(116ce768) SHA1(1dc926c0a0fe7f3bb970305b0dedaa952ec4837c))
 
 	ROM_REGION(0x40000, "musicrom", 0)
@@ -274,7 +274,7 @@ ROM_START(scxpt)
 
 	ROM_REGION(0x02000, "subcpu", 0)
 	/* User ID0=0x00F, ID1=0x00F, ID2=0x00F, ID3=0x00F.
-           Config Word = 0x0FFD. */
+	       Config Word = 0x0FFD. */
 	ROM_LOAD("9-3_por_3373f_pic16c57.u1", 0x00000, 0x02000, CRC(2e21de9a) SHA1(979188bb71d1e241500bd4266222d0d28154fe5a)) // 9-mar
 
 	ROM_REGION(0x40000, "musicrom", 0)
@@ -290,7 +290,7 @@ ROM_START(scxus)
 
 	ROM_REGION(0x02000, "subcpu", 0)
 	/* User ID0=0x00F, ID1=0x00F, ID2=0x00F, ID3=0x00F.
-           Config Word = 0x0FFD. */
+	       Config Word = 0x0FFD. */
 	ROM_LOAD("otu_913_usa_3373c_pic16c57.u1", 0x00000, 0x02000, CRC(12eacf0f) SHA1(b37cddb8d735707191dce6f6622a8fd80ea2d3e3))
 
 	ROM_REGION(0x40000, "musicrom", 0)

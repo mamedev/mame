@@ -5,6 +5,8 @@
 
 #include "multibyte.h"
 
+#include <cmath>
+
 #define LOG_COMMAND (1U << 1)
 #define LOG_DATA    (1U << 2)
 
@@ -32,6 +34,22 @@ void nscsi_s1410_device::device_reset()
 	params[5] = 0;
 	params[6] = 64;
 	params[7] = 11;
+
+	m_last_cylinder = -1;
+}
+
+void nscsi_s1410_device::set_seek_timing(uint32_t track_us, uint32_t average_us, uint32_t full_us, uint32_t rpm, uint8_t interleave)
+{
+	m_seek_track_us = track_us;
+	m_seek_range_us = (full_us > track_us) ? (full_us - track_us) : 0;
+	m_rpm           = rpm ? rpm : 3600;
+	m_interleave    = interleave ? interleave : 1;
+	// Fit seek(d) = track + range * (d/ncyl)^exp so an average-length seek
+	// (~1/3 of full stroke) costs average_us.
+	const double num = double(average_us) - double(track_us);
+	const double den = double(full_us)    - double(track_us);
+	m_seek_exp = (num > 0.0 && den > 0.0) ? std::log(num / den) / std::log(1.0 / 3.0) : 1.0;
+	m_seek_model = true;
 }
 
 bool nscsi_s1410_device::scsi_command_done(uint8_t command, uint8_t length)
@@ -226,8 +244,44 @@ attotime nscsi_s1410_device::scsi_data_command_delay()
 	case SC_READ:
 	case SC_WRITE:
 	case SC_SEEK:
-		// average seek time of NEC D5126A hard disk
-		return attotime::from_msec(85);
+	{
+		// Legacy default (unchanged unless a driver calls set_seek_timing()):
+		// a flat average-seek delay charged on every command, matching the
+		// older NEC D5126A approximation used by the existing s1410 users.
+		if (!m_seek_model)
+			return attotime::from_msec(85);
+
+		// A real drive seeks only when the target cylinder changes; sequential
+		// I/O on one cylinder pays only rotational latency, scaled by the
+		// format interleave.  Track the head cylinder and bill streaming or a
+		// real seek accordingly.  For the ST-506/ST-412 the model fits
+		// track-to-track 3 ms, average 85 ms and full-stroke 205 ms with
+		// exp ~= 0.82, capturing the drive's "burst mode" multi-cylinder seek
+		// (faster than naive 3 ms/cyl stepping for long seeks, but still cheap
+		// for short ones).
+		uint32_t spt = 1, spc = 1, ncyl = 1;
+		if (image->exists())
+		{
+			const auto &info = image->get_info();
+			spt  = info.sectors ? info.sectors : 1;
+			spc  = info.heads * spt;  if (!spc)  spc = 1;
+			ncyl = info.cylinders ? info.cylinders : 1;
+		}
+		const int target = int((get_u24be(&m_scsi_cmdbuf[1]) & 0x1fffff) / spc);
+		const int dist = (m_last_cylinder < 0) ? int(ncyl)
+			: (target > m_last_cylinder ? target - m_last_cylinder
+						  : m_last_cylinder - target);
+		m_last_cylinder = target;
+
+		const uint32_t rev_us = 60u * 1000000u / m_rpm;
+		uint32_t us;
+		if (dist == 0)
+			us = (rev_us * m_interleave) / spt;
+		else
+			us = rev_us / 2 + m_seek_track_us
+				+ uint32_t(double(m_seek_range_us) * std::pow(double(dist) / double(ncyl), m_seek_exp));
+		return attotime::from_usec(us);
+	}
 
 	default:
 		return attotime::zero;

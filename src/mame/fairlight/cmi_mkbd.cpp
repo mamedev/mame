@@ -65,11 +65,6 @@ cmi_music_keyboard_device::cmi_music_keyboard_device(const machine_config &mconf
 {
 }
 
-void cmi_music_keyboard_device::device_resolve_objects()
-{
-	m_digit.resolve();
-}
-
 void cmi_music_keyboard_device::device_start()
 {
 	m_cmi10_scnd_timer = timer_alloc(FUNC(cmi_music_keyboard_device::scnd_update), this);

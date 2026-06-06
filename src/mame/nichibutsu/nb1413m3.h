@@ -31,7 +31,7 @@ public:
 		set_type(type);
 	}
 
-	nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	~nb1413m3_device() {}
 
 	// configuration helpers

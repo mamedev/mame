@@ -75,7 +75,7 @@ public:
 	static constexpr unsigned PAL_LINES = 312;
 
 	// construction/destruction
-	mos7360_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos7360_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// callbacks
 	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }

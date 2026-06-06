@@ -275,7 +275,7 @@ void att4425_state::att4425(machine_config &config)
 	clock_device &line_clock(CLOCK(config, "line_clock", 9600 * 64));
 	line_clock.signal_handler().set(FUNC(att4425_state::write_line_clock));
 
-	I8251(config, m_i8251, 0);
+	I8251(config, m_i8251);
 	m_i8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_i8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_i8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));

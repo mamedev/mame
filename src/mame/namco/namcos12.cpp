@@ -18,6 +18,7 @@
     - sws2001 crashes at random times in-game, and always after the opening video. You can spam insert coin and start to get in-game.
     - sws2000 also crashes after opening video
     - toukon3 has garbage graphics
+	- kartduel has unemulated link support
 
 Namco System 12 - Arcade Playstation-based Hardware
 ===================================================
@@ -1055,6 +1056,8 @@ The lever must be wired to analog port 0 (pin B22 parts side) of the Namco 48-wa
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 #include "technodr.lh"
 
 #define LOG_BANK     (1U << 1)
@@ -1183,12 +1186,12 @@ public:
 		m_sub->write_sci_clk<1>().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
 		m_sub->write_sci_clk<1>().append(m_settings, FUNC(namco_settings_device::clk_w));
 
-		NAMCO_SETTINGS(config, m_settings, 0);
+		NAMCO_SETTINGS(config, m_settings);
 
 		RTC4543(config, m_rtc, XTAL(32'768));
 		m_rtc->data_cb().set(m_sub, FUNC(h8_device::sci_rx_w<1>));
 
-		AT28C16(config, "at28c16", 0);
+		AT28C16(config, "at28c16");
 
 		/* sound hardware */
 		SPEAKER(config, "speaker", 2).front();
@@ -1622,9 +1625,6 @@ protected:
 	{
 		namcos12_state::driver_start();
 
-		m_start_lamp.resolve();
-		m_gun_recoil.resolve();
-
 		/* HACK: patch out wait for dma 5 to complete */
 		*((uint32_t *)(m_mainrom->base() + 0x331c4)) = 0;
 	}
@@ -1766,13 +1766,6 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
-	{
-		namcos12_state::driver_start();
-
-		m_led.resolve();
-	}
-
 	virtual void configure_jvs(machine_config &config, device_jvs_interface &io) override ATTR_COLD
 	{
 		namcos12_state::configure_jvs(config, io);
@@ -3667,7 +3660,7 @@ GAME( 2000, sws2000,    0,        coh700b,  namcos12, namcos12_state,         em
 // truckk can't be a Japanese set despite the game title still being in Japanese.  The option for in-game Japanese text is disabled in this set, and it has a Parental Advisory screen usually associated with US releases
 // TKK1 is probably the Japanese release, although a TKK1 CD contains identical data to a TKK2 CD, so any difference is in the ROM data rather than the CD
 GAME( 2000, truckk,     0,        truckk,   truckk,   truckk_state,           empty_init, ROT0, "Metro / Namco",   "Truck Kyosokyoku (US?, TKK2/VER.A)", MACHINE_IMPERFECT_SOUND ) /* KC056 */
-GAME( 2000, kartduel,   0,        kartduel, kartduel, kartduel_state,         empty_init, ROT0, "Gaps / Namco",    "Kart Duel (World, KTD2/VER.A)", 0 ) /* KC057 */
-GAME( 2000, kartduelja, kartduel, kartduel, kartduel, kartduel_state,         empty_init, ROT0, "Gaps / Namco",    "Kart Duel (Japan, KTD1/VER.A)", 0 ) /* KC057 */
+GAME( 2000, kartduel,   0,        kartduel, kartduel, kartduel_state,         empty_init, ROT0, "Gaps / Namco",    "Kart Duel (World, KTD2/VER.A)", MACHINE_NODEVICE_LAN ) /* KC057 */
+GAME( 2000, kartduelja, kartduel, kartduel, kartduel, kartduel_state,         empty_init, ROT0, "Gaps / Namco",    "Kart Duel (Japan, KTD1/VER.A)", MACHINE_NODEVICE_LAN ) /* KC057 */
 GAME( 2000, g13knd,     0,        golgo13,  golgo13,  golgo13_state,          empty_init, ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", 0 ) /* KC059 */
 GAME( 2001, sws2001,    0,        coh716,   namcos12, namcos12_altbank_state, empty_init, ROT0, "Namco",           "Super World Stadium 2001 (Japan, SS11/VER.A)", MACHINE_NOT_WORKING ) /* KC061 */

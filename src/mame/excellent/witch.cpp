@@ -1122,7 +1122,7 @@ void witch_state::witch(machine_config &config)
 	static constexpr XTAL YM2203_CLOCK = MAIN_CLOCK / 4;
 	static constexpr XTAL MSM5202_CLOCK = 384_kHz_XTAL;
 
-	es8712_device &essnd(ES8712(config, "essnd", 0));
+	es8712_device &essnd(ES8712(config, "essnd"));
 	essnd.msm_write_handler().set("msm", FUNC(msm5205_device::data_w));
 	essnd.set_msm_tag("msm");
 

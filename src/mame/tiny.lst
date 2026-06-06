@@ -9,6 +9,12 @@
 
 *******************************************************************************/
 
+@source:bally/astrocde.cpp
+robby
+
+@source:bally/gridlee.cpp
+gridlee
+
 @source:exidy/carpolo.cpp
 carpolo
 
@@ -43,15 +49,6 @@ victorba
 
 @source:gaelco/wrally.cpp
 wrally
-
-@source:midway/astrocde.cpp
-robby
-
-@source:midway/gridlee.cpp
-gridlee
-
-@source:midway/williams.cpp
-alienar
 
 @source:misc/goldnpkr.cpp
 witchgme
@@ -93,3 +90,6 @@ looping
 
 @source:videogames/supertnk.cpp
 supertnk
+
+@source:williams/williams.cpp
+alienar

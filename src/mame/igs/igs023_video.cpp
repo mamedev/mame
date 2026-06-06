@@ -181,16 +181,16 @@ u16 igs023_video_device::bg_scale_r()
 void igs023_video_device::bg_scale_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/*
-		Background scale register format
+	    Background scale register format
 
-		Bit                 Description
-		fedc ba98 7654 3210 
-		---- --xx xxx- ---- Vertical scale
-		---- ---- ---x xxxx Horizontal scale
+	    Bit                 Description
+	    fedc ba98 7654 3210
+	    ---- --xx xxx- ---- Vertical scale
+	    ---- ---- ---x xxxx Horizontal scale
 
-		* Scale range is 50% to 200%, 0b10000 being 100%
-		* Unmarked bits are can be set but unknown and/or unused
-		TODO: not implemented, unknown algorithm
+	    * Scale range is 50% to 200%, 0b10000 being 100%
+	    * Unmarked bits are can be set but unknown and/or unused
+	    TODO: not implemented, unknown algorithm
 	*/
 	COMBINE_DATA(&m_bg_scale);
 	if (m_bg_scale != 0x210)
@@ -228,18 +228,18 @@ void igs023_video_device::ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	const u16 prev = m_ctrl;
 	/*
-		Control register format
+	    Control register format
 
-		Bit                 Description
-		fedc ba98 7654 3210 
-		--x- ---- ---- ---- Disable high priority sprites
-		---x ---- ---- ---- Disable background layer
-		---- x--- ---- ---- Disable text layer
-		---- ---- ---- x--- enable interrupt triggered each VBlank
-		---- ---- ---- -x-- enable interrupt triggered every 62 scanlines (Not synced with VBlank)
-		---- ---- ---- ---x Sprite DMA enable
+	    Bit                 Description
+	    fedc ba98 7654 3210
+	    --x- ---- ---- ---- Disable high priority sprites
+	    ---x ---- ---- ---- Disable background layer
+	    ---- x--- ---- ---- Disable text layer
+	    ---- ---- ---- x--- enable interrupt triggered each VBlank
+	    ---- ---- ---- -x-- enable interrupt triggered every 62 scanlines (Not synced with VBlank)
+	    ---- ---- ---- ---x Sprite DMA enable
 
-		* Unmarked bits are can be set but unknown and/or unused
+	    * Unmarked bits are can be set but unknown and/or unused
 	*/
 	COMBINE_DATA(&m_ctrl);
 	if ((prev ^ m_ctrl) & 0xc7f2)

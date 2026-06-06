@@ -789,7 +789,7 @@ void m90_state::m90(machine_config &config)
 	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
 	soundlatch.set_separate_acknowledge(true);
 
-	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline(m_soundcpu, 0);
+	RST_NEG_BUFFER(config, "soundirq").int_callback().set_inputline(m_soundcpu, 0);
 
 	IREM_M72_AUDIO(config, m_audio);
 	m_audio->set_dac_tag("dac");

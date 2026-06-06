@@ -424,7 +424,7 @@ void ksm_state::ksm(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_ksm);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	PIC8259(config, m_pic8259, 0);
+	PIC8259(config, m_pic8259);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// D30
@@ -435,7 +435,7 @@ void ksm_state::ksm(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(ksm_state::ksm_ppi_portc_w));
 
 	// D42 - serial connection to host
-	I8251(config, m_i8251line, 0);
+	I8251(config, m_i8251line);
 	m_i8251line->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_i8251line->rxrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir3_w));
 
@@ -445,12 +445,12 @@ void ksm_state::ksm(machine_config &config)
 	m_rs232->dsr_handler().set(m_i8251line, FUNC(i8251_device::write_dsr));
 
 	// D41 - serial connection to MS7004 keyboard
-	I8251(config, m_i8251kbd, 0);
+	I8251(config, m_i8251kbd);
 	m_i8251kbd->rxrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir1_w));
 	m_i8251kbd->rts_handler().set(FUNC(ksm_state::write_brga));
 	m_i8251kbd->dtr_handler().set(FUNC(ksm_state::write_brgb));
 
-	MS7004(config, m_ms7004, 0);
+	MS7004(config, m_ms7004);
 	m_ms7004->tx_handler().set(m_i8251kbd, FUNC(i8251_device::write_rxd));
 
 	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4800 * 16));

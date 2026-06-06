@@ -16,8 +16,8 @@ class i82425ex_psc_device : public pci_host_device
 {
 public:
 	template <typename T, typename U>
-	i82425ex_psc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&ib_tag, int ram_size)
-		: i82425ex_psc_device(mconfig, tag, owner, clock)
+	i82425ex_psc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&ib_tag, int ram_size)
+		: i82425ex_psc_device(mconfig, tag, owner)
 	{
 		// blanked class code
 		set_ids(0x80860486, 0x00, 0x000000, 0x00);
@@ -26,7 +26,7 @@ public:
 		set_ib_tag(std::forward<U>(ib_tag));
 		set_ram_size(ram_size);
 	}
-	i82425ex_psc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82425ex_psc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T> void set_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_ib_tag(T &&tag)  { m_ib.set_tag(std::forward<T>(tag)); }

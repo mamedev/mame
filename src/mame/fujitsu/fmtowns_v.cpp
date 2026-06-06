@@ -95,6 +95,8 @@
 
 #include "machine/pic8259.h"
 #include "machine/ram.h"
+
+#include "input.h" // for video debug keys
 #include "screen.h"
 
 #define LOG_VID     (1U << 1)

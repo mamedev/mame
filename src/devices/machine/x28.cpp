@@ -7,9 +7,15 @@
 #include "emu.h"
 #include "x28.h"
 
-#define DEFINE_X28_DEVICE_TYPES(Type,Class,ShortName,LongName)                                    \
+#include "eeprom28.ipp"
+
+#define DEFINE_X28_DEVICE_TYPES(Type, Class, ShortName, LongName)                                 \
 DEFINE_DEVICE_TYPE(Type, Class##_device, ShortName, LongName)                                     \
-DEFINE_DEVICE_TYPE(Type##_NVRAM, Class##_nvram_device, ShortName "_nvram", LongName " (nvram)")
+DEFINE_DEVICE_TYPE(Type##_NVRAM, Class##_nvram_device, ShortName "_nvram", LongName " (nvram)")   \
+template class eeprom28_device<Class##_device::ADDRESS_BITS, Class##_device::PAGE_SIZE_BYTES, Class##_device::T_BLC_USEC, Class##_device::T_WC_USEC, true, Class##_device::HAS_ID_PAGE, Class##_device::HAS_HARDWARE_CHIP_ERASE, Class##_device::HAS_SOFTWARE_CHIP_ERASE, Class##_device::T_CE_USEC>; \
+template class eeprom28_device<Class##_device::ADDRESS_BITS, Class##_device::PAGE_SIZE_BYTES, Class##_device::T_BLC_USEC, Class##_device::T_WC_USEC, false, Class##_device::HAS_ID_PAGE, Class##_device::HAS_HARDWARE_CHIP_ERASE, Class##_device::HAS_SOFTWARE_CHIP_ERASE, Class##_device::T_CE_USEC>; \
+template class eeprom28_nvram_device<Class##_device::ADDRESS_BITS, Class##_device::PAGE_SIZE_BYTES, Class##_device::T_BLC_USEC, Class##_device::T_WC_USEC, true, Class##_device::HAS_ID_PAGE, Class##_device::HAS_HARDWARE_CHIP_ERASE, Class##_device::HAS_SOFTWARE_CHIP_ERASE, Class##_device::T_CE_USEC>; \
+template class eeprom28_nvram_device<Class##_device::ADDRESS_BITS, Class##_device::PAGE_SIZE_BYTES, Class##_device::T_BLC_USEC, Class##_device::T_WC_USEC, false, Class##_device::HAS_ID_PAGE, Class##_device::HAS_HARDWARE_CHIP_ERASE, Class##_device::HAS_SOFTWARE_CHIP_ERASE, Class##_device::T_CE_USEC>;
 
 // device type definitions
 DEFINE_X28_DEVICE_TYPES(X28C64, x28c64, "x28c64", "X28C64 8Kx8 EEPROM")

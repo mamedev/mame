@@ -670,7 +670,7 @@ void sys68k_cpu30_device_base::sys68k_cpu30(machine_config &config, XTAL clock, 
 //  m_pit2->timer_irq_callback().set(m_fga002, FUNC(fga002_device::lirq3_w)); // The timer interrupt seems to silence the terminal interrupt, needs invectigation
 
 	/* FGA-002, Force Gate Array */
-	FGA002(config, m_fga002, 0);
+	FGA002(config, m_fga002);
 	m_fga002->out_int().set(FUNC(sys68k_cpu30_device_base::fga_irq_callback));
 	m_fga002->liack4().set("duscc",  FUNC(duscc_device::iack));
 	m_fga002->liack5().set("duscc2", FUNC(duscc_device::iack));

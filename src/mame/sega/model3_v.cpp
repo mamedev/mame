@@ -4,6 +4,8 @@
 #include "video/rgbutil.h"
 #include "model3.h"
 
+#include "endianness.h"
+
 /*
     TODO:
     - Tilemap flash effect

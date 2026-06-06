@@ -9,7 +9,7 @@ class specnext_lores_device : public device_t, public device_gfx_interface
 {
 
 public:
-	specnext_lores_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	specnext_lores_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	specnext_lores_device &set_bram_bank5_ptr(const u8 *bram_bank5_ptr) { m_bram_bank5_ptr = bram_bank5_ptr; return *this; }
 	specnext_lores_device &set_palette(const char *tag, u16 base_offset, u16 alt_offset);

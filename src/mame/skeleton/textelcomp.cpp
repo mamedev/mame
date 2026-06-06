@@ -67,8 +67,6 @@ void textelcomp_state::machine_start()
 	m_rtc->cs1_w(1);
 	subdevice<mos6551_device>("acia")->write_cts(0);
 
-	m_leds.resolve();
-
 	save_item(NAME(m_keyscan));
 	save_item(NAME(m_shift_register));
 	save_item(NAME(m_shift_data));

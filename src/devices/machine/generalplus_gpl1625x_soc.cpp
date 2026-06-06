@@ -317,6 +317,7 @@
 // 78e0 - TimerE_Ctrl
 // 78e2 - TimerE_Preload
 // 78e4 - TimerE_UpCount
+
 // 78e8 - TimerF_Ctrl
 // 78ea - TimerF_Preload
 // 78ec - TimerF_UpCount
@@ -568,12 +569,12 @@
 DEFINE_DEVICE_TYPE(GPAC800,   generalplus_gpac800_device,  "gpac800",    "GeneralPlus GPL1625x System-on-a-Chip (with NAND handling)")
 DEFINE_DEVICE_TYPE(GP_SPISPI, generalplus_gpspispi_device, "gpac800spi", "GeneralPlus GPL1625x System-on-a-Chip (with SPI handling)")
 
-generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	sunplus_gcm394_base_device(mconfig, GPAC800, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpac800_device::gpac800_internal_map), this))
 {
 }
 
-generalplus_gpspispi_device::generalplus_gpspispi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+generalplus_gpspispi_device::generalplus_gpspispi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	sunplus_gcm394_base_device(mconfig, GP_SPISPI, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpspispi_device::gpspispi_internal_map), this))
 {
 }
@@ -583,7 +584,7 @@ generalplus_gpspispi_device::generalplus_gpspispi_device(const machine_config &m
 // HY27UF081G2A = AD F1 80 1D
 // H27U518S2C   = AD 76
 
-uint16_t generalplus_gpac800_device::nand_7854_r()
+u16 generalplus_gpac800_device::nand_7854_r()
 {
 	// TODO: use actual NAND / Smart Media devices once this is better understood.
 	// The games have extensive checks on startup to determine the flash types, but then it appears that
@@ -604,7 +605,7 @@ uint16_t generalplus_gpac800_device::nand_7854_r()
 	{
 		logerror("%s:sunplus_gcm394_base_device::nand_7854_r   READ IDENT byte %d\n", machine().describe_context(), m_curblockaddr);
 
-		uint8_t data = 0x00;
+		u8 data = 0x00;
 
 		if (m_romtype == 0)
 		{
@@ -640,7 +641,7 @@ uint16_t generalplus_gpac800_device::nand_7854_r()
 	{
 		//logerror("%s:sunplus_gcm394_base_device::nand_7854_r   READ DATA byte %d\n", machine().describe_context(), m_curblockaddr);
 
-		uint8_t data = m_nand_read_cb(m_effectiveaddress + m_curblockaddr);
+		u8 data = m_nand_read_cb(m_effectiveaddress + m_curblockaddr);
 
 		m_curblockaddr++;
 
@@ -663,13 +664,13 @@ uint16_t generalplus_gpac800_device::nand_7854_r()
 
 // 7998
 
-void generalplus_gpac800_device::nand_command_w(uint16_t data)
+void generalplus_gpac800_device::nand_command_w(u16 data)
 {
 	logerror("%s:sunplus_gcm394_base_device::nand_command_w %04x\n", machine().describe_context(), data);
 	m_nandcommand = data;
 }
 
-void generalplus_gpac800_device::nand_addr_low_w(uint16_t data)
+void generalplus_gpac800_device::nand_addr_low_w(u16 data)
 {
 	logerror("%s:sunplus_gcm394_base_device::nand_addr_low_w %04x\n", machine().describe_context(), data);
 	m_nand_addr_low = data;
@@ -678,9 +679,9 @@ void generalplus_gpac800_device::nand_addr_low_w(uint16_t data)
 
 void generalplus_gpac800_device::recalculate_calculate_effective_nand_address()
 {
-	uint8_t type = m_nand_7856 & 0xf;
-	uint8_t shift = 0;
-	uint32_t page_offset = 0;
+	u8 type = m_nand_7856 & 0xf;
+	u8 shift = 0;
+	u32 page_offset = 0;
 
 	if (type == 7)
 		shift = 4;
@@ -692,18 +693,18 @@ void generalplus_gpac800_device::recalculate_calculate_effective_nand_address()
 	else if (m_nandcommand == 0x50)
 		page_offset = 512;
 
-	uint32_t nandaddress = (m_nand_addr_high << 16) | m_nand_addr_low;
+	u32 nandaddress = (m_nand_addr_high << 16) | m_nand_addr_low;
 
 	if (m_nand_7850 & 0x4000)
 		nandaddress *= 2;
 
-	uint32_t page = type ? nandaddress : /*(m_nand_7850 & 0x4000) ?*/ nandaddress >> 8 /*: nandaddress >> 9*/;
+	u32 page = type ? nandaddress : /*(m_nand_7850 & 0x4000) ?*/ nandaddress >> 8 /*: nandaddress >> 9*/;
 	m_effectiveaddress = (page * 528 + page_offset) << shift;
 
 	logerror("%s: Requested address is %08x, translating to %08x\n", machine().describe_context(), nandaddress, m_effectiveaddress);
 }
 
-void generalplus_gpac800_device::nand_addr_high_w(uint16_t data)
+void generalplus_gpac800_device::nand_addr_high_w(u16 data)
 {
 	logerror("%s:sunplus_gcm394_base_device::nand_addr_high_w %04x\n", machine().describe_context(), data);
 	m_nand_addr_high = data;
@@ -713,25 +714,25 @@ void generalplus_gpac800_device::nand_addr_high_w(uint16_t data)
 	m_curblockaddr = 0;
 }
 
-void generalplus_gpac800_device::nand_dma_ctrl_w(uint16_t data)
+void generalplus_gpac800_device::nand_dma_ctrl_w(u16 data)
 {
 	logerror("%s:sunplus_gcm394_base_device::nand_dma_ctrl_w(?) %04x\n", machine().describe_context(), data);
 	m_nand_dma_ctrl = data;
 }
 
-uint16_t generalplus_gpac800_device::nand_7850_status_r()
+u16 generalplus_gpac800_device::nand_7850_status_r()
 {
 	// 0x8000 = ready
 	return m_nand_7850 | 0x8000;
 }
 
-void generalplus_gpac800_device::nand_7850_w(uint16_t data)
+void generalplus_gpac800_device::nand_7850_w(u16 data)
 {
 	logerror("%s:sunplus_gcm394_base_device::nand_7850_w %04x\n", machine().describe_context(), data);
 	m_nand_7850 = data;
 }
 
-void generalplus_gpac800_device::nand_7856_type_w(uint16_t data)
+void generalplus_gpac800_device::nand_7856_type_w(u16 data)
 {
 	logerror("%s:sunplus_gcm394_base_device::nand_7856_type_w %04x\n", machine().describe_context(), data);
 	m_nand_7856 = data;
@@ -741,38 +742,38 @@ void generalplus_gpac800_device::nand_7856_type_w(uint16_t data)
 	m_curblockaddr = 0;
 }
 
-void generalplus_gpac800_device::nand_7857_w(uint16_t data)
+void generalplus_gpac800_device::nand_7857_w(u16 data)
 {
 	logerror("%s:sunplus_gcm394_base_device::nand_7857_w %04x\n", machine().describe_context(), data);
 	m_nand_7857 = data;
 }
 
-void generalplus_gpac800_device::nand_785b_w(uint16_t data)
+void generalplus_gpac800_device::nand_785b_w(u16 data)
 {
 	logerror("%s:sunplus_gcm394_base_device::nand_785b_w %04x\n", machine().describe_context(), data);
 	m_nand_785b = data;
 }
 
-void generalplus_gpac800_device::nand_785c_w(uint16_t data)
+void generalplus_gpac800_device::nand_785c_w(u16 data)
 {
 	logerror("%s:sunplus_gcm394_base_device::nand_785c_w %04x\n", machine().describe_context(), data);
 	m_nand_785c = data;
 }
 
-void generalplus_gpac800_device::nand_785d_w(uint16_t data)
+void generalplus_gpac800_device::nand_785d_w(u16 data)
 {
 	logerror("%s:sunplus_gcm394_base_device::nand_785d_w %04x\n", machine().describe_context(), data);
 	m_nand_785d = data;
 }
 
 // [:maincpu] ':maincpu' (00146D)  jak_tsm
-uint16_t generalplus_gpac800_device::nand_785e_r()
+u16 generalplus_gpac800_device::nand_785e_r()
 {
 	return 0x0000;
 }
 
 //[:maincpu] ':maincpu' (001490)  jak_tsm
-uint16_t generalplus_gpac800_device::nand_ecc_low_byte_error_flag_1_r()
+u16 generalplus_gpac800_device::nand_ecc_low_byte_error_flag_1_r()
 {
 	return 0x0000;
 }
@@ -854,7 +855,7 @@ vbaby code is very differet, attempts to load NAND block manually, not with DMA
 
 // all tilemap registers etc. appear to be in the same place as the above system, including the 'extra' ones not on the earlier models
 // so it's likely this is built on top of that just with NAND support
-void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
+void generalplus_gpac800_device::gpac800_internal_map(address_map &map)
 {
 	sunplus_gcm394_base_device::base_internal_map(map);
 
@@ -902,12 +903,12 @@ void generalplus_gpac800_device::device_reset()
 }
 
 
-uint16_t generalplus_gpspispi_device::spi_unk_7943_r()
+u16 generalplus_gpspispi_device::spi_unk_7943_r()
 {
 	return 0x0007;
 }
 
-void generalplus_gpspispi_device::gpspispi_internal_map(address_map& map)
+void generalplus_gpspispi_device::gpspispi_internal_map(address_map &map)
 {
 	sunplus_gcm394_base_device::base_internal_map(map);
 

@@ -263,7 +263,7 @@ void acrnsys_state::acrnsys2(machine_config &config)
 	a6502(config);
 
 	/* Acorn Bus - 8 Slot Backplane */
-	ACORN_BUS(config, m_bus, 0);
+	ACORN_BUS(config, m_bus);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set_inputline(m_maincpu, M6502_NMI_LINE);
 	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k").set_option_device_input_defaults("8k", DEVICE_INPUT_DEFAULTS_NAME(8k_ram2000)); // 0x2000-0x3fff
@@ -286,7 +286,7 @@ void acrnsys_state::acrnsys3(machine_config &config)
 	a6502(config);
 
 	/* Acorn Bus - 8 Slot Backplane */
-	ACORN_BUS(config, m_bus, 0);
+	ACORN_BUS(config, m_bus);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set_inputline(m_maincpu, M6502_NMI_LINE);
 	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k").set_option_device_input_defaults("8k", DEVICE_INPUT_DEFAULTS_NAME(8k_ram2000)); // 0x2000-0x3fff
@@ -309,7 +309,7 @@ void acrnsys_state::acrnsys3_6809(machine_config &config)
 	a6809(config);
 
 	/* Acorn Bus - 8 Slot Backplane */
-	ACORN_BUS(config, m_bus, 0);
+	ACORN_BUS(config, m_bus);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set_inputline(m_maincpu, M6502_NMI_LINE);
 	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k").set_option_device_input_defaults("8k", DEVICE_INPUT_DEFAULTS_NAME(8k_ram0000)); // 0x0000-0x1fff
@@ -331,7 +331,7 @@ void acrnsys_state::acrnsys4(machine_config &config)
 	a6502(config);
 
 	/* Acorn Bus - 14 Slot Backplane */
-	ACORN_BUS(config, m_bus, 0);
+	ACORN_BUS(config, m_bus);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set_inputline(m_maincpu, M6502_NMI_LINE);
 	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k").set_option_device_input_defaults("8k", DEVICE_INPUT_DEFAULTS_NAME(8k_ram2000)); // 0x2000-0x3fff
@@ -360,7 +360,7 @@ void acrnsys_state::acrnsys5(machine_config &config)
 	a6502a(config);
 
 	/* Acorn Bus - 7 Slot Backplane */
-	ACORN_BUS(config, m_bus, 0);
+	ACORN_BUS(config, m_bus);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set_inputline(m_maincpu, M6502_NMI_LINE);
 	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "32k").set_option_device_input_defaults("32k", DEVICE_INPUT_DEFAULTS_NAME(32k_ram32k)); // 32K

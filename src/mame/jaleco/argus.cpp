@@ -500,7 +500,7 @@ void argus_state::argus(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_argus);
 	PALETTE(config, m_palette).set_entries(896);
 
-	JALECO_BLEND(config, m_blend, 0);
+	JALECO_BLEND(config, m_blend);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -539,7 +539,7 @@ void valtric_state::valtric(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_valtric);
 	PALETTE(config, m_palette).set_entries(768);
 
-	JALECO_BLEND(config, m_blend, 0);
+	JALECO_BLEND(config, m_blend);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -584,7 +584,7 @@ void butasan_state::butasan(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_butasan);
 	PALETTE(config, m_palette).set_entries(768);
 
-	JALECO_BLEND(config, m_blend, 0);
+	JALECO_BLEND(config, m_blend);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

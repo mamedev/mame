@@ -34,6 +34,7 @@
 #include "mameopts.h"
 #include "drivenum.h"
 #include "fileio.h"
+#include "input.h"
 #include "natkeyboard.h"
 #include "render.h"
 #include "cheat.h"
@@ -679,13 +680,14 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 			// draw a standard message window
 			draw_text_box(target, warning_text, ui::text_layout::text_justify::LEFT, 0.5F, 0.5F, warning_color);
 
-			if (machine().ui_input().pressed(IPT_UI_CANCEL))
+			auto &inp(machine().ui_input());
+			if (inp.pressed(IPT_UI_CANCEL))
 			{
 				// if the user cancels, exit out completely
 				machine().schedule_exit();
 				return HANDLER_CANCEL;
 			}
-			else if (machine().ui_input().pressed(IPT_UI_MENU))
+			else if (inp.pressed(IPT_UI_MENU))
 			{
 				config_menu = true;
 				return HANDLER_CANCEL;
@@ -697,7 +699,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 			}
 
 			ui_event event;
-			while (machine().ui_input().pop_event(&event))
+			while (inp.pop_event(&event))
 			{
 				if (event.target)
 				{
@@ -1680,6 +1682,7 @@ uint32_t mame_ui_manager::handler_ingame()
 	}
 
 	// process UI events and update pointers if necessary
+	auto &inp(machine().ui_input());
 	process_ui_events();
 	display_pointer_vector pointers;
 	pointers.reserve(m_active_pointers.size());
@@ -1708,7 +1711,7 @@ uint32_t mame_ui_manager::handler_ingame()
 	if (!ui_disabled)
 	{
 		// paste command
-		if (machine().ui_input().pressed(IPT_UI_PASTE))
+		if (inp.pressed(IPT_UI_PASTE))
 			machine().natkeyboard().paste();
 	}
 
@@ -1717,14 +1720,14 @@ uint32_t mame_ui_manager::handler_ingame()
 	if (ui_disabled)
 		return 0;
 
-	if (machine().ui_input().pressed(IPT_UI_CANCEL))
+	if (inp.pressed(IPT_UI_CANCEL))
 	{
 		request_quit();
 		return 0;
 	}
 
 	// turn on menus if requested
-	if (machine().ui_input().pressed(IPT_UI_MENU))
+	if (inp.pressed(IPT_UI_MENU))
 	{
 		m_ui_target = &current_ui_target();
 		if (!machine().paused() && options().menu_pause())
@@ -1739,7 +1742,7 @@ uint32_t mame_ui_manager::handler_ingame()
 	}
 
 	// if the on-screen display isn't up and the user has toggled it, turn it on
-	if (!get_slider_list().empty() && !(machine().debug_flags & DEBUG_FLAG_ENABLED) && machine().ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
+	if (!get_slider_list().empty() && !(machine().debug_flags & DEBUG_FLAG_ENABLED) && inp.pressed(IPT_UI_ON_SCREEN_DISPLAY))
 	{
 		m_ui_target = &current_ui_target();
 		ui::menu::stack_push<ui::menu_sliders>(*this, *m_ui_target, true);
@@ -1748,13 +1751,13 @@ uint32_t mame_ui_manager::handler_ingame()
 	}
 
 	// handle a reset request
-	if (machine().ui_input().pressed(IPT_UI_RESET_MACHINE))
+	if (inp.pressed(IPT_UI_RESET_MACHINE))
 		machine().schedule_hard_reset();
-	if (machine().ui_input().pressed(IPT_UI_SOFT_RESET))
+	if (inp.pressed(IPT_UI_SOFT_RESET))
 		machine().schedule_soft_reset();
 
 	// handle a request to display graphics/palette
-	if (machine().ui_input().pressed(IPT_UI_SHOW_GFX))
+	if (inp.pressed(IPT_UI_SHOW_GFX))
 	{
 		for (auto *target = machine().render().first_target(); target; target = target->next())
 		{
@@ -1775,7 +1778,7 @@ uint32_t mame_ui_manager::handler_ingame()
 	}
 
 	// handle a tape control key
-	if (machine().ui_input().pressed(IPT_UI_TAPE_START))
+	if (inp.pressed(IPT_UI_TAPE_START))
 	{
 		for (cassette_image_device &cass : cassette_device_enumerator(machine().root_device()))
 		{
@@ -1783,7 +1786,7 @@ uint32_t mame_ui_manager::handler_ingame()
 			return 0;
 		}
 	}
-	if (machine().ui_input().pressed(IPT_UI_TAPE_STOP))
+	if (inp.pressed(IPT_UI_TAPE_STOP))
 	{
 		for (cassette_image_device &cass : cassette_device_enumerator(machine().root_device()))
 		{
@@ -1793,7 +1796,7 @@ uint32_t mame_ui_manager::handler_ingame()
 	}
 
 	// handle a save state request
-	if (machine().ui_input().pressed(IPT_UI_SAVE_STATE))
+	if (inp.pressed(IPT_UI_SAVE_STATE))
 	{
 		m_ui_target = &current_ui_target();
 		ui::menu::stack_push<ui::menu_save_state>(*this, *m_ui_target, true);
@@ -1802,7 +1805,7 @@ uint32_t mame_ui_manager::handler_ingame()
 	}
 
 	// handle a load state request
-	if (machine().ui_input().pressed(IPT_UI_LOAD_STATE))
+	if (inp.pressed(IPT_UI_LOAD_STATE))
 	{
 		m_ui_target = &current_ui_target();
 		ui::menu::stack_push<ui::menu_load_state>(*this, *m_ui_target, true);
@@ -1811,29 +1814,29 @@ uint32_t mame_ui_manager::handler_ingame()
 	}
 
 	// handle a quick save state request
-	if (machine().ui_input().pressed(IPT_UI_SAVE_STATE_QUICK))
+	if (inp.pressed(IPT_UI_SAVE_STATE_QUICK))
 	{
 		machine().schedule_save("quick");
 		return 0;
 	}
 
 	// handle a quick load state request
-	if (machine().ui_input().pressed(IPT_UI_LOAD_STATE_QUICK))
+	if (inp.pressed(IPT_UI_LOAD_STATE_QUICK))
 	{
 		machine().schedule_load("quick");
 		return 0;
 	}
 
 	// handle a save snapshot request
-	if (machine().ui_input().pressed(IPT_UI_SNAPSHOT))
+	if (inp.pressed(IPT_UI_SNAPSHOT))
 		machine().video().save_active_screen_snapshots();
 
 	// toggle pause
-	if (machine().ui_input().pressed(IPT_UI_PAUSE))
+	if (inp.pressed(IPT_UI_PAUSE))
 		machine().toggle_pause();
 
 	// pause single step
-	if (machine().ui_input().pressed(IPT_UI_PAUSE_SINGLE))
+	if (inp.pressed(IPT_UI_PAUSE_SINGLE))
 	{
 		machine().rewind_capture();
 		set_single_step(true);
@@ -1841,39 +1844,39 @@ uint32_t mame_ui_manager::handler_ingame()
 	}
 
 	// rewind single step
-	if (machine().ui_input().pressed(IPT_UI_REWIND_SINGLE))
+	if (inp.pressed(IPT_UI_REWIND_SINGLE))
 		machine().rewind_step();
 
 	// handle a toggle cheats request
-	if (machine().ui_input().pressed(IPT_UI_TOGGLE_CHEAT))
+	if (inp.pressed(IPT_UI_TOGGLE_CHEAT))
 		mame_machine_manager::instance()->cheat().set_enable(!mame_machine_manager::instance()->cheat().enabled(), true);
 
 	// toggle MNG recording
-	if (machine().ui_input().pressed(IPT_UI_RECORD_MNG))
+	if (inp.pressed(IPT_UI_RECORD_MNG))
 		machine().video().toggle_record_movie(movie_recording::format::MNG);
 
 	// toggle AVI recording
-	if (machine().ui_input().pressed(IPT_UI_RECORD_AVI))
+	if (inp.pressed(IPT_UI_RECORD_AVI))
 		machine().video().toggle_record_movie(movie_recording::format::AVI);
 
 	// toggle profiler display
-	if (machine().ui_input().pressed(IPT_UI_SHOW_PROFILER))
+	if (inp.pressed(IPT_UI_SHOW_PROFILER))
 		set_show_profiler(!show_profiler());
 
 	// toggle FPS display
-	if (machine().ui_input().pressed(IPT_UI_SHOW_FPS))
+	if (inp.pressed(IPT_UI_SHOW_FPS))
 		set_show_fps(!show_fps());
 
 	// increment frameskip
-	if (machine().ui_input().pressed(IPT_UI_FRAMESKIP_INC))
+	if (inp.pressed(IPT_UI_FRAMESKIP_INC))
 		increase_frameskip();
 
 	// decrement frameskip
-	if (machine().ui_input().pressed(IPT_UI_FRAMESKIP_DEC))
+	if (inp.pressed(IPT_UI_FRAMESKIP_DEC))
 		decrease_frameskip();
 
 	// toggle throttle
-	if (machine().ui_input().pressed(IPT_UI_THROTTLE))
+	if (inp.pressed(IPT_UI_THROTTLE))
 		machine().video().set_throttled(!machine().video().throttled());
 
 	// check for fast forward

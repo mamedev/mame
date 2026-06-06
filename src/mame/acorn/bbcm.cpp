@@ -155,9 +155,6 @@ void bbcm_state::machine_start()
 {
 	bbc_state::machine_start();
 
-	m_power_led.resolve();
-	m_floppy_leds.resolve();
-
 	if (m_floppy[0] && m_floppy[0]->get_device())
 		m_floppy[0]->get_device()->setup_led_cb(floppy_image_device::led_cb(&bbcm_state::floppy_led_cb<0>, this));
 	if (m_floppy[1] && m_floppy[1]->get_device())
@@ -744,7 +741,7 @@ void bbcm_state::bbcmet(machine_config &config)
 	m_adlc->out_txd_cb().set("network", FUNC(econet_device::host_data_w));
 	m_adlc->out_irq_cb().set(FUNC(bbcm_state::adlc_irq_w));
 
-	econet_device &econet(ECONET(config, "network", 0));
+	econet_device &econet(ECONET(config, "network"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::set_cts)).invert();

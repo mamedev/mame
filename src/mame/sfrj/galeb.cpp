@@ -327,7 +327,7 @@ void galeb_state::galeb(machine_config &config)
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set([this] (bool state) { m_cassbit = state; });
 
 	/* cassette */

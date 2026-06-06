@@ -210,8 +210,6 @@ uint32_t skyraid_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 void skyraid_state::machine_start()
 {
-	m_led.resolve();
-
 	save_item(NAME(m_analog_range));
 	save_item(NAME(m_analog_offset));
 	save_item(NAME(m_scroll));

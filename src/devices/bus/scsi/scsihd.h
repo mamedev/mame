@@ -18,10 +18,10 @@ class scsihd_device : public scsihle_device, public t10sbc
 {
 public:
 	// construction/destruction
-	scsihd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scsihd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	scsihd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	scsihd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual bool exists() const override;

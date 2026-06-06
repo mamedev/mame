@@ -2448,8 +2448,6 @@ void aristmk5_state::machine_start()
 
 	m_mk5_2KHz_timer = timer_alloc(FUNC(aristmk5_state::mk5_2KHz_callback), this);
 	m_spi_timer = timer_alloc(FUNC(aristmk5_state::spi_timer), this);
-
-	m_lamps.resolve();
 }
 
 void aristmk5_state::machine_reset()

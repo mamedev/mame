@@ -415,8 +415,8 @@ private:
 			m_entries.emplace(pos, std::move(name), std::forward<T>(value));
 	}
 
-	template <typename T, typename U, typename = std::enable_if_t<std::is_constructible_v<std::string, T>>>
-	void try_insert(T &&name, U &&value)
+	template <typename T, typename U>
+	void try_insert(T &&name, U &&value) requires std::is_constructible_v<std::string, T>
 	{
 		entry_vector::iterator const pos(
 				std::lower_bound(
@@ -4420,10 +4420,10 @@ void layout_view::preload()
 //  resolve_tags - resolve tags
 //-------------------------------------------------
 
-void layout_view::resolve_tags()
+void layout_view::resolve_tags(device_t &device)
 {
 	for (item &curitem : items())
-		curitem.resolve_tags();
+		curitem.resolve_tags(device);
 }
 
 
@@ -4630,10 +4630,10 @@ layout_view_item::layout_view_item(
 		layout_group::transform const &trans,
 		render_color const &color)
 	: m_element(find_element(env, itemnode, elemmap))
-	, m_output(env.device(), std::string(env.get_attribute_string(itemnode, "name")))
-	, m_animoutput(env.device(), make_child_output_tag(env, itemnode, "animate"))
-	, m_scrollxoutput(env.device(), make_child_output_tag(env, itemnode, "xscroll"))
-	, m_scrollyoutput(env.device(), make_child_output_tag(env, itemnode, "yscroll"))
+	, m_output()
+	, m_animoutput()
+	, m_scrollxoutput()
+	, m_scrollyoutput()
 	, m_animinput_port(nullptr)
 	, m_scrollxinput_port(nullptr)
 	, m_scrollyinput_port(nullptr)
@@ -4670,11 +4670,11 @@ layout_view_item::layout_view_item(
 	, m_scrollxinput_tag(make_child_input_tag(env, itemnode, "xscroll"))
 	, m_scrollyinput_tag(make_child_input_tag(env, itemnode, "yscroll"))
 	, m_rawbounds(make_bounds(env, itemnode, trans))
-	, m_have_output(!env.get_attribute_string(itemnode, "name").empty())
+	, m_output_name(env.get_attribute_string(itemnode, "name"))
+	, m_animoutput_name(make_child_output_tag(env, itemnode, "animate"))
+	, m_scrollxoutput_name(make_child_output_tag(env, itemnode, "xscroll"))
+	, m_scrollyoutput_name(make_child_output_tag(env, itemnode, "yscroll"))
 	, m_input_raw(env.get_attribute_bool(itemnode, "inputraw", 0))
-	, m_have_animoutput(!make_child_output_tag(env, itemnode, "animate").empty())
-	, m_have_scrollxoutput(!make_child_output_tag(env, itemnode, "xscroll").empty())
-	, m_have_scrollyoutput(!make_child_output_tag(env, itemnode, "yscroll").empty())
 	, m_has_clickthrough(!env.get_attribute_string(itemnode, "clickthrough").empty())
 {
 	// fetch common data
@@ -4841,23 +4841,23 @@ void layout_view_item::set_scroll_pos_y_callback(scroll_pos_delegate &&handler)
 //  resolve_tags - resolve tags, if any are set
 //-------------------------------------------------
 
-void layout_view_item::resolve_tags()
+void layout_view_item::resolve_tags(device_t &device)
 {
 	// resolve element state output and set default value
-	if (m_have_output)
+	if (!m_output_name.empty())
 	{
-		m_output.resolve();
-		if (m_element)
-			m_output = m_element->default_state();
+		m_output = output_proxy(device, m_output_name);
+		if (!m_output.exists() && m_element)
+			m_output.set(m_element->default_state());
 	}
 
 	// resolve animation state and scroll outputs
-	if (m_have_animoutput)
-		m_animoutput.resolve();
-	if (m_have_scrollxoutput)
-		m_scrollxoutput.resolve();
-	if (m_have_scrollyoutput)
-		m_scrollyoutput.resolve();
+	if (!m_animoutput_name.empty())
+		m_animoutput = output_proxy(device, m_animoutput_name);
+	if (!m_scrollxoutput_name.empty())
+		m_scrollxoutput = output_proxy(device, m_scrollxoutput_name);
+	if (!m_scrollyoutput_name.empty())
+		m_scrollyoutput = output_proxy(device, m_scrollyoutput_name);
 
 	// resolve animation state and scroll inputs
 	if (!m_animinput_tag.empty())
@@ -4909,7 +4909,7 @@ void layout_view_item::resolve_tags()
 
 layout_view_item::state_delegate layout_view_item::default_get_elem_state()
 {
-	if (m_have_output)
+	if (!m_output_name.empty())
 		return state_delegate(&layout_view_item::get_output, this);
 	else if (!m_input_port)
 		return state_delegate(&layout_view_item::get_state, this);
@@ -4929,7 +4929,7 @@ layout_view_item::state_delegate layout_view_item::default_get_elem_state()
 
 layout_view_item::state_delegate layout_view_item::default_get_anim_state()
 {
-	if (m_have_animoutput)
+	if (!m_animoutput_name.empty())
 		return state_delegate(&layout_view_item::get_anim_output, this);
 	else if (m_animinput_port)
 		return state_delegate(&layout_view_item::get_anim_input, this);
@@ -4991,7 +4991,7 @@ layout_view_item::scroll_size_delegate layout_view_item::default_get_scroll_size
 
 layout_view_item::scroll_pos_delegate layout_view_item::default_get_scroll_pos_x()
 {
-	if (m_have_scrollxoutput)
+	if (!m_scrollxoutput_name.empty())
 		return scroll_pos_delegate(m_scrollwrapx ? &layout_view_item::get_scrollx_output<true> : &layout_view_item::get_scrollx_output<false>, this);
 	else if (m_scrollxinput_port)
 		return scroll_pos_delegate(m_scrollwrapx ? &layout_view_item::get_scrollx_input<true> : &layout_view_item::get_scrollx_input<false>, this);
@@ -5007,7 +5007,7 @@ layout_view_item::scroll_pos_delegate layout_view_item::default_get_scroll_pos_x
 
 layout_view_item::scroll_pos_delegate layout_view_item::default_get_scroll_pos_y()
 {
-	if (m_have_scrollyoutput)
+	if (!m_scrollyoutput_name.empty())
 		return scroll_pos_delegate(m_scrollwrapy ? &layout_view_item::get_scrolly_output<true> : &layout_view_item::get_scrolly_output<false>, this);
 	else if (m_scrollyinput_port)
 		return scroll_pos_delegate(m_scrollwrapy ? &layout_view_item::get_scrolly_input<true> : &layout_view_item::get_scrolly_input<false>, this);
@@ -5032,8 +5032,8 @@ int layout_view_item::get_state() const
 
 int layout_view_item::get_output() const
 {
-	assert(m_have_output);
-	return int(s32(m_output));
+	assert(!m_output_name.empty());
+	return int(m_output.get());
 }
 
 
@@ -5079,8 +5079,8 @@ int layout_view_item::get_input_field_conditional() const
 
 int layout_view_item::get_anim_output() const
 {
-	assert(m_have_animoutput);
-	return int(unsigned((u32(s32(m_animoutput) & m_animmask) >> m_animshift)));
+	assert(!m_animoutput_name.empty());
+	return int(unsigned((u32(m_animoutput.get() & m_animmask) >> m_animshift)));
 }
 
 
@@ -5146,8 +5146,8 @@ float layout_view_item::get_scrollposy() const
 template <bool Wrap>
 float layout_view_item::get_scrollx_output() const
 {
-	assert(m_have_scrollxoutput);
-	u32 const unscaled(((u32(s32(m_scrollxoutput)) & m_scrollxmask) >> m_scrollxshift) - m_scrollxmin);
+	assert(!m_scrollxoutput_name.empty());
+	u32 const unscaled(((u32(m_scrollxoutput.get()) & m_scrollxmask) >> m_scrollxshift) - m_scrollxmin);
 	float const range(std::make_signed_t<ioport_value>(m_scrollxmax - m_scrollxmin) + (!Wrap ? 0 : (m_scrollxmin < m_scrollxmax) ? 1 : -1));
 	return float(s32(unscaled)) / range;
 }
@@ -5176,8 +5176,8 @@ float layout_view_item::get_scrollx_input() const
 template <bool Wrap>
 float layout_view_item::get_scrolly_output() const
 {
-	assert(m_have_scrollyoutput);
-	u32 const unscaled(((u32(s32(m_scrollyoutput)) & m_scrollymask) >> m_scrollyshift) - m_scrollymin);
+	assert(!m_scrollyoutput_name.empty());
+	u32 const unscaled(((u32(m_scrollyoutput.get()) & m_scrollymask) >> m_scrollyshift) - m_scrollymin);
 	float const range(std::make_signed_t<ioport_value>(m_scrollymax - m_scrollymin) + (!Wrap ? 0 : (m_scrollymin < m_scrollymax) ? 1 : -1));
 	return float(s32(unscaled)) / range;
 }
@@ -5391,7 +5391,7 @@ layout_file::~layout_file()
 void layout_file::resolve_tags()
 {
 	for (layout_view &view : views())
-		view.resolve_tags();
+		view.resolve_tags(m_device);
 
 	if (!m_resolve_tags.isnull())
 		m_resolve_tags();

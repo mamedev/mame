@@ -112,7 +112,7 @@ void pc486vl_state::base_config(machine_config &config)
 	// - doesn't apply with md4duv (that effectively supports 64M)
 	RAM(config, "ram").set_default_size("64M");
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->iochck_callback().set(m_chipset, FUNC(um8498f_device::iochck_w));
@@ -154,6 +154,7 @@ void pc486vl_state::pccm912(machine_config &config)
 {
 	base_config(config);
 	// TODO: actually 4 + 3 VLB
+	// FIXME: set ISA bus clock
 	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "vga", false);
 	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, "fdc", false);
 	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, "ide", false);
@@ -166,6 +167,7 @@ void pc486vl_state::pccm912(machine_config &config)
 void pc486vl_state::pc486vl(machine_config &config)
 {
 	base_config(config);
+	// FIXME: set ISA bus clock
 	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "vga", false);
 	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, "fdc", false);
 	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, "ide", false);
@@ -194,10 +196,10 @@ ROM_START( md4duv )
 	ROM_SYSTEM_BIOS( 0, "v31n", "V3.1N (11/17/94)")
 	ROMX_LOAD( "i376082.bin", 0x10000, 0x10000, CRC(40b350f2) SHA1(9877f24805964ab8c92bf35bf14ff97e508867c1), ROM_BIOS(0))
 	// MB labeled NMB-4DDUV, with minor data changes
-    // i376082.bin  [1/4]      i199030.bin  [1/4]      IDENTICAL
-    // i376082.bin  [3/4]      i199030.bin  [3/4]      IDENTICAL
-    // i376082.bin  [4/4]      i199030.bin  [4/4]      99.993896% (BIOS checksum change at $ffff)
-    // i376082.bin  [2/4]      i199030.bin  [2/4]      99.975586% ($57a3, $6070, $684d, $684f)
+	// i376082.bin  [1/4]      i199030.bin  [1/4]      IDENTICAL
+	// i376082.bin  [3/4]      i199030.bin  [3/4]      IDENTICAL
+	// i376082.bin  [4/4]      i199030.bin  [4/4]      99.993896% (BIOS checksum change at $ffff)
+	// i376082.bin  [2/4]      i199030.bin  [2/4]      99.975586% ($57a3, $6070, $684d, $684f)
 	ROM_SYSTEM_BIOS( 1, "v31na", "V3.1N alt (11/17/94)")
 	ROMX_LOAD( "i199030.bin", 0x10000, 0x10000, CRC(2f437c85) SHA1(841f23ae31e8cf11afa4056f4c7493c890e1be5a), ROM_BIOS(1))
 ROM_END

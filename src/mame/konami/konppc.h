@@ -21,7 +21,7 @@ public:
 	static constexpr int MAX_CG_BOARDS        = 2;
 
 	// construction/destruction
-	konppc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	konppc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configurations
 	template <typename T> void set_dsp_tag(int which, T &&tag) { m_dsp[which].set_tag(std::forward<T>(tag)); }

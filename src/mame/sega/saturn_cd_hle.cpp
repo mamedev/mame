@@ -247,16 +247,18 @@ void saturn_cd_hle_device::device_reset()
 void saturn_cd_hle_device::amap(address_map &map)
 {
 	map(0x18000, 0x18003).rw(FUNC(saturn_cd_hle_device::datatrns_r), FUNC(saturn_cd_hle_device::datatrns_w));
-	map(0x90000, 0x90003).mirror(0x08000).rw(FUNC(saturn_cd_hle_device::datatrns_r), FUNC(saturn_cd_hle_device::datatrns_w));
-	map(0x90008, 0x9000b).mirror(0x08000).rw(FUNC(saturn_cd_hle_device::hirq_r), FUNC(saturn_cd_hle_device::hirq_w)).umask32(0xffffffff);
-	map(0x9000c, 0x9000f).mirror(0x08000).rw(FUNC(saturn_cd_hle_device::hirqmask_r), FUNC(saturn_cd_hle_device::hirqmask_w)).umask32(0xffffffff);
-	map(0x90018, 0x9001b).mirror(0x08000).rw(FUNC(saturn_cd_hle_device::dr1_r), FUNC(saturn_cd_hle_device::cr1_w)).umask32(0xffffffff);
-	map(0x9001c, 0x9001f).mirror(0x08000).rw(FUNC(saturn_cd_hle_device::dr2_r), FUNC(saturn_cd_hle_device::cr2_w)).umask32(0xffffffff);
-	map(0x90020, 0x90023).mirror(0x08000).rw(FUNC(saturn_cd_hle_device::dr3_r), FUNC(saturn_cd_hle_device::cr3_w)).umask32(0xffffffff);
-	map(0x90024, 0x90027).mirror(0x08000).rw(FUNC(saturn_cd_hle_device::dr4_r), FUNC(saturn_cd_hle_device::cr4_w)).umask32(0xffffffff);
+	// normally read at $58900xx, test1f probes $58800xx instead
+	map(0x80000, 0x80003).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::datatrns_r), FUNC(saturn_cd_hle_device::datatrns_w));
+	map(0x80008, 0x8000b).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::hirq_r), FUNC(saturn_cd_hle_device::hirq_w)).umask32(0xffffffff);
+	map(0x8000c, 0x8000f).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::hirqmask_r), FUNC(saturn_cd_hle_device::hirqmask_w)).umask32(0xffffffff);
+	map(0x80018, 0x8001b).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::dr1_r), FUNC(saturn_cd_hle_device::cr1_w)).umask32(0xffffffff);
+	map(0x8001c, 0x8001f).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::dr2_r), FUNC(saturn_cd_hle_device::cr2_w)).umask32(0xffffffff);
+	map(0x80020, 0x80023).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::dr3_r), FUNC(saturn_cd_hle_device::cr3_w)).umask32(0xffffffff);
+	map(0x80024, 0x80027).mirror(0x18000).rw(FUNC(saturn_cd_hle_device::dr4_r), FUNC(saturn_cd_hle_device::cr4_w)).umask32(0xffffffff);
 
 	// NetLink access
 	// dragndrm expects this value, most likely for status
+	// TODO: move out of here
 	map(0x8502a, 0x8502a).lr8(NAME([] () -> u8 { return 0x11; }));
 }
 

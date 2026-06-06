@@ -381,8 +381,6 @@ void royalpk2_state::machine_start()
 	save_item(NAME(m_protection_response_byte));
 	save_item(NAME(m_protection_response_bit));
 
-	m_lamps.resolve();
-
 	for (int i = 0; i < 31; i++)
 		m_lamps[i] = 0;
 

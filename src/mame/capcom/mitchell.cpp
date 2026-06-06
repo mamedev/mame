@@ -1913,7 +1913,7 @@ void spangbl_state::spangbl(machine_config &config)
 	m_msm->set_prescaler_selector(msm5205_device::S96_4B);
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	LS157(config, m_adpcm_select, 0);
+	LS157(config, m_adpcm_select);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 }
 

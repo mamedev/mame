@@ -607,7 +607,7 @@ void atronic_state::atronic(machine_config &config)
 	m_screen->set_screen_update("tms", FUNC(tms34020_device::tms340x0_rgb32));
 
 	PALETTE(config, "palette").set_entries(256);
-	RAMDAC(config, m_ramdac, 0, m_palette);
+	RAMDAC(config, m_ramdac, m_palette);
 	m_ramdac->set_addrmap(0, &atronic_state::ramdac_map);
 
 	TMS34020(config, m_videocpu, 40_MHz_XTAL);

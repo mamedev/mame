@@ -2604,8 +2604,6 @@ GFXDECODE_END
 
 void gms_2layers_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_reels_toggle));
 	save_item(NAME(m_tilebank));
 	save_item(NAME(m_mux_data));

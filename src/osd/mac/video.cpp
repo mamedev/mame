@@ -133,8 +133,10 @@ void mac_osd_interface::input_update(bool relative_reset)
 
 void mac_osd_interface::check_osd_inputs()
 {
+	auto &inp = machine().ui_input();
+
 	// check for toggling fullscreen mode (don't do this in debug mode)
-	if (machine().ui_input().pressed(IPT_OSD_1) && !(machine().debug_flags & DEBUG_FLAG_OSD_ENABLED))
+	if (inp.pressed(IPT_OSD_1) && !(machine().debug_flags & DEBUG_FLAG_OSD_ENABLED))
 	{
 		// destroy the renderers first so that the render module can bounce if it depends on having a window handle
 		for (auto it = window_list().rbegin(); window_list().rend() != it; ++it)
@@ -146,19 +148,19 @@ void mac_osd_interface::check_osd_inputs()
 	auto const &window = window_list().front();
 
 	//FIXME: on a per window basis
-	if (machine().ui_input().pressed(IPT_OSD_5))
+	if (inp.pressed(IPT_OSD_5))
 	{
 		video_config.filter = !video_config.filter;
 		machine().ui().popup_time(1, "Filter %s", video_config.filter? "enabled":"disabled");
 	}
 
-	if (machine().ui_input().pressed(IPT_OSD_6))
+	if (inp.pressed(IPT_OSD_6))
 		dynamic_cast<mac_window_info &>(*window).modify_prescale(-1);
 
-	if (machine().ui_input().pressed(IPT_OSD_7))
+	if (inp.pressed(IPT_OSD_7))
 		dynamic_cast<mac_window_info &>(*window).modify_prescale(1);
 
-	if (machine().ui_input().pressed(IPT_OSD_8))
+	if (inp.pressed(IPT_OSD_8))
 		window->renderer().record();
 }
 

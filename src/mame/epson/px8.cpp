@@ -715,8 +715,6 @@ GFXDECODE_END
 
 void px8_state::machine_start()
 {
-	m_leds.resolve();
-
 	/* register for state saving */
 	save_item(NAME(m_ier));
 	save_item(NAME(m_isr));

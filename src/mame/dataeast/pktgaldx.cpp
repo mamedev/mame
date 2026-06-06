@@ -510,7 +510,7 @@ void pktgaldx_state::pktgaldx(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pktgaldx);
 
-	DECO16IC(config, m_deco_tilegen, 0);
+	DECO16IC(config, m_deco_tilegen);
 	m_deco_tilegen->set_pf1_size(DECO_64x32);
 	m_deco_tilegen->set_pf2_size(DECO_64x32);
 	m_deco_tilegen->set_pf1_col_bank(0x00);
@@ -523,9 +523,9 @@ void pktgaldx_state::pktgaldx(machine_config &config)
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_SPRITE(config, m_sprgen, 0, m_palette, gfx_pktgaldx_spr);
+	DECO_SPRITE(config, m_sprgen, m_palette, gfx_pktgaldx_spr);
 
-	DECO104PROT(config, m_deco104, 0);
+	DECO104PROT(config, m_deco104);
 	m_deco104->port_a_cb().set_ioport("INPUTS");
 	m_deco104->port_b_cb().set_ioport("SYSTEM");
 	m_deco104->port_c_cb().set_ioport("DSW");

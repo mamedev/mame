@@ -290,7 +290,7 @@ private:
 	required_device<timer_device> m_timer;
 
 	std::bitset<BITS_PER_LOOP> m_bootloop;  // 4096 bits
-	std::bitset<BITS_PER_LOOP> m_data_loops[ QUADS_PER_CH ][ LOOPS_PER_QUAD ];  // 655360 bits
+	std::bitset<BITS_PER_LOOP> m_data_loops[QUADS_PER_CH][LOOPS_PER_QUAD];  // 655360 bits
 	std::bitset<EVEN_OUT_LEN> m_even_out;   // 363 bits
 	std::bitset<ODD_OUT_LEN> m_odd_out;     // 357 bits
 	std::bitset<EVEN_IN_LEN> m_even_in;     // 340 bits
@@ -576,7 +576,8 @@ private:
 		S18,
 		S19,
 		S20,
-		S21
+		S21,
+		S22
 	};
 
 	// Commands & sub-commands
@@ -676,8 +677,8 @@ private:
 	uint16_t m_cnt4;
 	uint16_t m_ar;
 	uint16_t m_selected_chs;
-	uint16_t m_la[ MAX_MBM ];
-	unsigned m_skip[ MAX_MBM ];
+	uint16_t m_la[MAX_MBM];
+	unsigned m_skip[MAX_MBM];
 	unsigned m_mbm_count;
 	fsm_state m_fsm_state;
 	fsm_state m_ret_state;
@@ -751,6 +752,7 @@ private:
 	void dec_n_pages();
 	uint16_t get_la() const;
 	bool inc_ar();
+	bool check_mbm_change() const;
 	void select_chs();
 	unsigned fsa_n_channels() const;
 	unsigned fsa_1st_ch() const;

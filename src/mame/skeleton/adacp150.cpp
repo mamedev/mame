@@ -39,7 +39,7 @@ public:
 	{
 	}
 
-	void adacp150(machine_config &config);
+	void adacp150(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -67,8 +67,6 @@ private:
 
 void adacp150_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_lcdc->rw_w(0);
 
 	save_item(NAME(m_bcp_cmd));

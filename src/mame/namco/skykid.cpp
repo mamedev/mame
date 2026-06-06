@@ -425,8 +425,6 @@ void skykid_state::irq_2_ctrl_w(offs_t offset, uint8_t data)
 
 void skykid_state::machine_start()
 {
-	m_leds.resolve();
-
 	// configure the banks
 	m_rombank->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x2000);
 

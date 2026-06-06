@@ -1086,7 +1086,7 @@ void polepos_state::topracern(machine_config &config)
 	m_namco_sound->add_route(3, "rspeaker", 0.80, 1);
 
 	/* engine sound */
-	polepos_sound_device &polepos(POLEPOS_SOUND(config, "engine", 0));
+	polepos_sound_device &polepos(POLEPOS_SOUND(config, "engine"));
 	polepos.add_route(ALL_OUTPUTS, "speaker", 0.90 * 0.77, 0);
 	polepos.add_route(ALL_OUTPUTS, "speaker", 0.90 * 0.77, 1);
 	polepos.add_route(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77, 0);

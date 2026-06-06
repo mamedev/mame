@@ -359,10 +359,9 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void fortecrd(machine_config &config);
+	void fortecrd(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
@@ -390,11 +389,6 @@ private:
 /***********************************
 *         Video Hardware           *
 ***********************************/
-
-void fortecrd_state::machine_start()
-{
-	m_lamps.resolve();
-}
 
 uint32_t fortecrd_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {

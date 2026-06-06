@@ -706,13 +706,13 @@ void lethal_state::lethalen(machine_config &config)
 	m_k056832->set_palette(m_palette);
 	m_k056832->set_ext_linescroll(true); // this game uses external linescroll RAM
 
-	K053244(config, m_k053244, 0);
+	K053244(config, m_k053244);
 	m_k053244->set_palette(m_palette);
 	m_k053244->set_bpp(6);
 	m_k053244->set_sprite_callback(FUNC(lethal_state::sprite_callback));
 	m_k053244->set_priority_shadows(true);
 
-	K054000(config, "k054000", 0);
+	K054000(config, "k054000");
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

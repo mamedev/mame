@@ -778,13 +778,13 @@ void bwidow_state::bwidow(machine_config &config)
 	ER2055(config, m_earom);
 
 	/* video hardware */
-	VECTOR(config, "vector", 0);
+	VECTOR(config, "vector");
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
 	screen.set_refresh_hz(CLOCK_3KHZ / 12 / 4);
 	screen.set_size(400, 300);
 	screen.set_visarea(0, 480, 0, 440);
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
-	AVG(config, m_avg, 0);
+	AVG(config, m_avg);
 	m_avg->set_vector("vector");
 	m_avg->set_memory(m_maincpu, AS_PROGRAM, 0x2000);
 

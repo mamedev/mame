@@ -92,16 +92,16 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void mrgame(machine_config &config);
-	void macattck(machine_config &config);
-	void wcup90(machine_config &config);
+	void mrgame(machine_config &config) ATTR_COLD;
+	void macattck(machine_config &config) ATTR_COLD;
+	void wcup90(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void mrgame_palette(palette_device &palette) const;
+	void mrgame_palette(palette_device &palette) const ATTR_COLD;
 	u8 ack1_r();
 	void ack2_w(u8 data);
 	void portb_w(u8 data);
@@ -488,15 +488,13 @@ u8 mrgame_state::portc_r()
 
 void mrgame_state::machine_start()
 {
+	genpin_class::machine_start();
+
 	m_tilemap = &machine().tilemap().create(
 			*m_gfxdecode,
 			tilemap_get_info_delegate(*this, FUNC(mrgame_state::get_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 	m_tilemap->set_scroll_cols(32);
-
-	genpin_class::machine_start();
-
-	m_io_outputs.resolve();
 
 	save_item(NAME(m_ack1));
 	save_item(NAME(m_ack2));

@@ -71,8 +71,8 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	void chesstrv(machine_config &config);
-	void chesstrvi(machine_config &config);
+	void chesstrv(machine_config &config) ATTR_COLD;
+	void chesstrvi(machine_config &config) ATTR_COLD;
 
 	// battery status indicator is not software controlled
 	DECLARE_INPUT_CHANGED_MEMBER(battery) { update_display(); }
@@ -113,7 +113,6 @@ private:
 void chesstrv_state::machine_start()
 {
 	m_ram = make_unique_clear<u8[]>(0x100);
-	m_computing.resolve();
 
 	// register for savestates
 	save_pointer(NAME(m_ram), 0x100);

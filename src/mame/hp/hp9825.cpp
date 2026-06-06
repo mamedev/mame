@@ -49,6 +49,8 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include <bit>
+
 // Debugging
 #define VERBOSE 0
 #include "logmacro.h"
@@ -228,12 +230,6 @@ private:
 
 void hp98xx_state::machine_start()
 {
-	m_display.resolve();
-	m_run_light.resolve();
-	m_shift_lock.resolve();
-	m_tape_led.resolve();
-	m_cassette.resolve();
-
 	save_item(NAME(m_display_on));
 	save_item(NAME(m_display_mem));
 	save_item(NAME(m_display_idx));
@@ -632,7 +628,7 @@ INPUT_CHANGED_MEMBER(hp98xx_state::kb_changed)
 void hp98xx_state::kb_scan_ioport(ioport_value pressed , ioport_port &port , unsigned idx_base , int& max_seq_len , unsigned& max_seq_idx)
 {
 	while (pressed) {
-		unsigned bit_no = 31 - count_leading_zeros_32(pressed);
+		unsigned bit_no = std::bit_width(pressed) - 1;
 		ioport_value mask = BIT_MASK<ioport_value>(bit_no);
 		int seq_len = port.field(mask)->seq().length();
 		if (seq_len > max_seq_len) {
@@ -700,20 +696,20 @@ void hp98xx_state::hp98xx_base(machine_config &config)
 	// Needed when 98035 RTC module is connected or time advances at about 1/4 the correct speed (NP misses a lot of 1kHz interrupts)
 	config.set_maximum_quantum(attotime::from_hz(5000));
 
-	HP98X5_IO_SYS(config , m_io_sys , 0);
+	HP98X5_IO_SYS(config , m_io_sys);
 	m_io_sys->irl().set_inputline(m_cpu, HPHYBRID_IRL);
 	m_io_sys->irh().set_inputline(m_cpu, HPHYBRID_IRH);
 	m_io_sys->sts().set(m_cpu , FUNC(hp_09825_67907_cpu_device::status_w));
 	m_io_sys->flg().set(m_cpu , FUNC(hp_09825_67907_cpu_device::flag_w));
 	m_io_sys->dmar().set(m_cpu , FUNC(hp_09825_67907_cpu_device::dmar_w));
 
-	TIMER(config , m_cursor_timer , 0).configure_generic(FUNC(hp98xx_state::cursor_blink));
+	TIMER(config , m_cursor_timer).configure_generic(FUNC(hp98xx_state::cursor_blink));
 
 	// Keyboard scan timer. A scan of the whole keyboard should take 2^14 KDP clocks.
-	TIMER(config , "kb_timer" , 0).configure_periodic(FUNC(hp98xx_state::kb_scan), attotime::from_ticks(16384 , KDP_CLOCK));
+	TIMER(config , "kb_timer").configure_periodic(FUNC(hp98xx_state::kb_scan), attotime::from_ticks(16384 , KDP_CLOCK));
 
 	// Tape drive
-	HP9825_TAPE(config , m_tape , 0);
+	HP9825_TAPE(config , m_tape);
 	m_tape->flg().set([this](int state) { m_io_sys->set_flg(TAPE_PA , state); });
 	m_tape->sts().set([this](int state) { m_io_sys->set_sts(TAPE_PA , state); });
 	m_tape->dmar().set([this](int state) { m_io_sys->set_dmar(TAPE_PA , state); });
@@ -721,17 +717,17 @@ void hp98xx_state::hp98xx_base(machine_config &config)
 	m_tape->cart_in().set([this](int state) { if (started()) m_cassette = state; });
 
 	// Printer
-	TIMER(config , m_prt_timer , 0).configure_generic(FUNC(hp98xx_state::prt_timer));
+	TIMER(config , m_prt_timer).configure_generic(FUNC(hp98xx_state::prt_timer));
 
 	// Beeper
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, BEEPER_FREQ).add_route(ALL_OUTPUTS, "mono", 1.00);
-	TIMER(config , m_beep_timer , 0).configure_generic(FUNC(hp98xx_state::beep_timer));
+	TIMER(config , m_beep_timer).configure_generic(FUNC(hp98xx_state::beep_timer));
 
 	// I/O slots
 	for (unsigned slot = 0; slot < 3; slot++) {
 		auto& finder = m_io_slot[ slot ];
-		hp9845_io_slot_device& tmp( HP9845_IO_SLOT(config , finder , 0) );
+		hp9845_io_slot_device& tmp( HP9845_IO_SLOT(config , finder) );
 		tmp.irq().set([this , slot](int state) { set_irq_slot(slot , state); });
 		tmp.sts().set([this , slot](int state) { set_sts_slot(slot , state); });
 		tmp.flg().set([this , slot](int state) { set_flg_slot(slot , state); });
@@ -942,8 +938,8 @@ void hp9825_state::hp9825_base(machine_config &config)
 	hp98xx_base(config);
 
 	// Printer
-	BITBANGER(config , m_prt_alpha_out , 0);
-	BITBANGER(config , m_prt_graph_out , 0);
+	BITBANGER(config , m_prt_alpha_out);
+	BITBANGER(config , m_prt_graph_out);
 	SCREEN(config , m_prt_out , SCREEN_TYPE_RASTER);
 	m_prt_out->set_screen_update(FUNC(hp9825_state::printer_out_update));
 	m_prt_out->set_refresh_hz(60);

@@ -69,10 +69,10 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void speedbal(machine_config &config);
+	void speedbal(machine_config &config) ATTR_COLD;
 
-	void init_speedbal();
-	void init_musicbal();
+	void init_speedbal() ATTR_COLD;
+	void init_musicbal() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -235,7 +235,6 @@ uint32_t speedbal_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void speedbal_state::machine_start()
 {
-	m_digits.resolve();
 	save_item(NAME(m_leds_start));
 	save_item(NAME(m_leds_shiftreg));
 }

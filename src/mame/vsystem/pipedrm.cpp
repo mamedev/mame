@@ -672,7 +672,7 @@ void pipedrm_state::pipedrm(machine_config &config)
 	VSYSTEM_GGA(config, m_gga, 14.318181_MHz_XTAL / 2); // divider not verified
 	m_gga->write_cb().set(FUNC(pipedrm_state::fromance_gga_data_w));
 
-	VSYSTEM_SPR2(config, m_spr_old, 0, m_palette, gfx_pipedrm_spr);
+	VSYSTEM_SPR2(config, m_spr_old, m_palette, gfx_pipedrm_spr);
 	m_spr_old->set_offsets(-13, -6);
 	m_spr_old->set_pritype(3);
 

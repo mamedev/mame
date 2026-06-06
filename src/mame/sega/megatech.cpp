@@ -122,7 +122,6 @@ public:
 	void init_mt_slot();
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
@@ -649,14 +648,6 @@ void mtech_state::screen_vblank_main(int state)
 {
 	if (!m_current_machine_is_sms)
 		screen_vblank_megadriv(state);
-}
-
-void mtech_state::machine_start()
-{
-	md_ctrl_state::machine_start();
-
-	m_alarm_sound.resolve();
-	m_flash_screen.resolve();
 }
 
 void mtech_state::machine_reset()

@@ -162,24 +162,24 @@ uint16_t luxor_x37_sasi_device::stat_r(offs_t offset, uint16_t mem_mask)
 {
 	/*
 
-		bit		description
+	    bit     description
 
-		0		HLC
-		1		SCSIA0
-		2	  	SCSIA1
-		3 		SCSIA2
-		4 	    SCSIA3
-		5		0
-		6		0
-		7		0
-		8		BRQ
-		9		SCSIDIR
-		10
-		11
-		12
-		13
-		14		BSY
-		15		*SASIINT
+	    0       HLC
+	    1       SCSIA0
+	    2       SCSIA1
+	    3       SCSIA2
+	    4       SCSIA3
+	    5       0
+	    6       0
+	    7       0
+	    8       BRQ
+	    9       SCSIDIR
+	    10
+	    11
+	    12
+	    13
+	    14      BSY
+	    15      *SASIINT
 
 	*/
 
@@ -201,24 +201,24 @@ void luxor_x37_sasi_device::ctrl_w(offs_t offset, uint16_t data, uint16_t mem_ma
 {
 	/*
 
-		bit		description
+	    bit     description
 
-		0 		D0
-		1		D1
-		2		D2
-		3		D3
-		4		D4
-		5		D5
-		6		D6
-		7		D7
-		8		DXD8
-		9		RST
-		10
-		11
-		12
-		13      REQ
-		14		I/O
-		15
+	    0       D0
+	    1       D1
+	    2       D2
+	    3       D3
+	    4       D4
+	    5       D5
+	    6       D6
+	    7       D7
+	    8       DXD8
+	    9       RST
+	    10
+	    11
+	    12
+	    13      REQ
+	    14      I/O
+	    15
 
 	*/
 
@@ -265,7 +265,7 @@ void luxor_x37_sasi_device::ctrl_w(offs_t offset, uint16_t data, uint16_t mem_ma
 uint16_t luxor_x37_sasi_device::tre_r(offs_t offset, uint16_t mem_mask)
 {
 	u16 data = 0;
-	if (m_dxd8)	{
+	if (m_dxd8) {
 		data = m_buffer[m_a];
 		LOG("%s tre_r: dxd8=1 tre=%04x a=%01x\n", machine().describe_context(), data, m_a);
 		count();

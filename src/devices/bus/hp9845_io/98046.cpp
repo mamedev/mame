@@ -183,7 +183,7 @@ void hp98046_io_card_device::device_add_mconfig(machine_config &config)
 	m_cpu->p2_out_cb().set(FUNC(hp98046_io_card_device::p2_w));
 	m_cpu->t1_in_cb().set([this] () { return int(!m_sio_int); });
 	// Clock to SIO is actually provided by T0 output of CPU
-	Z80SIO(config , m_sio , 0);
+	Z80SIO(config , m_sio);
 	m_sio->out_int_callback().set(FUNC(hp98046_io_card_device::sio_int_w));
 	m_sio->out_txda_callback().set(FUNC(hp98046_io_card_device::sio_txd_w));
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);

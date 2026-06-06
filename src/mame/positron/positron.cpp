@@ -926,7 +926,7 @@ void positron_state::positron(machine_config &config)
 	hpib.atn_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
 	hpib.ren_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ren_w));
 
-	//DS75160A(config, m_ieee1, 0);
+	//DS75160A(config, m_ieee1);
 	//m_ieee1->read_callback().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	//m_ieee1->write_callback().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
 

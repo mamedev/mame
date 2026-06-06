@@ -90,7 +90,7 @@ TODO:
 
 #include "logmacro.h"
 
-#define LOGUNKNOWN(...)   LOGMASKED(LOG_UNKNOWN, __VA_ARGS__) 
+#define LOGUNKNOWN(...)   LOGMASKED(LOG_UNKNOWN, __VA_ARGS__)
 
 namespace {
 
@@ -110,7 +110,7 @@ public:
 		, m_io_in(*this, "IN%u", 0U)
 		, m_leds(*this, "led%u", 0U)
 	{
-		
+
 	}
 
 	void scudhamm(machine_config &config) ATTR_COLD;
@@ -271,7 +271,6 @@ u32 scudhamm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void scudhamm_state::machine_start()
 {
-	m_leds.resolve();
 	m_scudhamm_motor_command = 0;
 
 	save_item(NAME(m_prev));
@@ -523,9 +522,6 @@ void captflag_state::machine_start()
 	m_oki_bank[1]->configure_entries(0, 0x100000 / 0x20000, memregion("oki2")->base(), 0x20000);
 	m_oki_bank[0]->set_entry(1);
 	m_oki_bank[1]->set_entry(1);
-
-	m_motor_left_output.resolve();
-	m_motor_right_output.resolve();
 
 	save_item(NAME(m_captflag_leds));
 	save_item(NAME(m_motor_command));
@@ -1741,7 +1737,7 @@ void captflag_state::init_vscaptfl()
 	space.install_write_handler(0x100050, 0x100051, write16s_delegate(*this, FUNC(captflag_state::motor_command_right_w)));
 }
 
-} // anonymous namespace 
+} // anonymous namespace
 
 /***************************************************************************
 

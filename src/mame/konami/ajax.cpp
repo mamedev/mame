@@ -389,7 +389,6 @@ void ajax_state::machine_start()
 	uint8_t *main = memregion("maincpu")->base();
 	uint8_t *sub  = memregion("sub")->base();
 
-	m_lamps.resolve();
 	m_mainbank->configure_entries(0, 4, &main[0x00000], 0x2000);
 	m_mainbank->configure_entries(4, 8, &main[0x10000], 0x2000);
 	m_subbank->configure_entries(0, 9, &sub[0x00000], 0x2000);

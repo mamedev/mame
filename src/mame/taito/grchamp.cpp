@@ -95,10 +95,9 @@
 
 void grchamp_state::machine_start()
 {
-	m_digits.resolve();
-	m_led0.resolve();
 	m_soundlatch_data = 0x00;
 	m_soundlatch_flag = false;
+
 	save_item(NAME(m_cpu0_out));
 	save_item(NAME(m_cpu1_out));
 	save_item(NAME(m_comm_latch));

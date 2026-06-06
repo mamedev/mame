@@ -78,6 +78,8 @@ DS5002FP Box contains:
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "endianness.h"
+
 
 namespace {
 

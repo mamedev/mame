@@ -771,7 +771,7 @@ void airbustr_state::airbustrb(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_airbustr);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 768);
 
-	KANEKO_PANDORA(config, m_pandora, 0, m_palette, gfx_airbustr_spr);
+	KANEKO_PANDORA(config, m_pandora, m_palette, gfx_airbustr_spr);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -151,7 +151,7 @@ void sacstate_state::sacstate(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &sacstate_state::sacstate_io);
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(sacstate_state::kbd_put));
 }
 

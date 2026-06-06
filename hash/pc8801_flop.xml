@@ -631,11 +631,13 @@ INVESTIGATE
 		</part>
 	</software>
 
-	<!-- Gameplay speed is erratic (especially noticeable on vanilla PC8801) -->
 	<software name="177" supported="partial">
 		<description>177</description>
 		<year>1986</year>
 		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
+		<notes><![CDATA[
+Gameplay speed is erratic (especially noticeable on vanilla PC8801)
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -645,11 +647,14 @@ INVESTIGATE
 		</part>
 	</software>
 
-	<!-- Gameplay speed is erratic (especially noticeable on vanilla PC8801) -->
 	<software name="177a" cloneof="177" supported="partial">
 		<description>177 (alt)</description>
 		<year>1986</year>
 		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
+		<notes><![CDATA[
+(same as parent)
+]]></notes>
+
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -659,11 +664,14 @@ INVESTIGATE
 		</part>
 	</software>
 
-	<!-- Gameplay speed is erratic (especially noticeable on vanilla PC8801) -->
 	<software name="177b" cloneof="177" supported="partial">
 		<description>177 (alt 2)</description>
 		<year>1986</year>
 		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
+		<notes><![CDATA[
+(same as parent)
+]]></notes>
+
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -673,11 +681,14 @@ INVESTIGATE
 		</part>
 	</software>
 
-	<!-- Gameplay speed is erratic (especially noticeable on vanilla PC8801) -->
 	<software name="177c" cloneof="177" supported="partial">
 		<description>177 (alt 3)</description>
 		<year>1986</year>
 		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
+		<notes><![CDATA[
+(same as parent)
+]]></notes>
+
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -687,11 +698,14 @@ INVESTIGATE
 		</part>
 	</software>
 
-	<!-- Gameplay speed is erratic (especially noticeable on vanilla PC8801) -->
 	<software name="177d" cloneof="177" supported="partial">
 		<description>177 (alt 4)</description>
 		<year>1986</year>
 		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
+		<notes><![CDATA[
+(same as parent)
+]]></notes>
+
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1580,12 +1594,14 @@ ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 		</part>
 	</software>
 
-	<!-- Opening movie hangs at the title screen, FDC stalls [Missing CHRN=(00 00 01 03)] -->
-	<!-- TODO: Game is otherwise working if you skip that, may have further stalls -->
-	<software name="agnishi" supported="partial">
+	<software name="agnishi" supported="no">
 		<description>Agni no Ishi - The Stone of Agni</description>
 		<year>1988</year>
 		<publisher>ハミングバード (HummingBird)</publisher>
+		<notes><![CDATA[
+Opening movie hangs at the title screen, FDC stalls [Missing CHRN=(00 00 01 03)]
+TODO: Game is otherwise working if you skip that, may have further stalls
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198803xx"/>
 		<info name="alt_title" value="アグニの石"/>
@@ -1615,12 +1631,13 @@ ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 		</part>
 	</software>
 
-	<!-- Opening movie hangs at the title screen, FDC stalls [Missing CHRN=(00 00 01 03)] -->
-	<!-- TODO: Game is otherwise working if you skip that, may have further stalls -->
-	<software name="agnishia" cloneof="agnishi" supported="partial">
+	<software name="agnishia" cloneof="agnishi" supported="no">
 		<description>Agni no Ishi - The Stone of Agni (Mad?)</description>
 		<year>1988</year>
 		<publisher>ハミングバード (HummingBird)</publisher>
+		<notes><![CDATA[
+(same as parent)
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198803xx"/>
 		<info name="alt_title" value="アグニの石"/>
@@ -2507,11 +2524,13 @@ Fails boot [underlying data is corrupt, error reading in HxC / winimage etc.]
 		</part>
 	</software>
 
-	<!-- reads the light pen? -->
-	<software name="amerisuc" supported="partial">
+	<software name="amerisuc" supported="yes">
 		<description>American Success</description>
 		<year>1988</year>
 		<publisher>ウィンキーソフト (Winky Soft)</publisher>
+		<notes><![CDATA[
+[7220] reads the light pen? TODO: add steps to reproduce
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198811xx"/>
 		<info name="alt_title" value="アメリカン・サクセス"/>
@@ -2522,11 +2541,13 @@ Fails boot [underlying data is corrupt, error reading in HxC / winimage etc.]
 		</part>
 	</software>
 
-	<!-- reads the light pen? -->
-	<software name="amerisuca" cloneof="amerisuc" supported="partial">
+	<software name="amerisuca" cloneof="amerisuc" supported="yes">
 		<description>American Success (alt)</description>
 		<year>1988</year>
 		<publisher>ウィンキーソフト (Winky Soft)</publisher>
+		<notes><![CDATA[
+[7220] reads the light pen? TODO: add steps to reproduce
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198811xx"/>
 		<info name="alt_title" value="アメリカン・サクセス"/>
@@ -3397,11 +3418,13 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 		</part>
 	</software>
 
-	<!-- Gameplay speed is erratic (especially noticeable on vanilla PC8801) -->
 	<software name="apploon" supported="partial">
 		<description>Apploon</description>
 		<year>1984</year>
 		<publisher>タカラ (Takara)</publisher>
+		<notes><![CDATA[
+Runs too fast, wants [V1S]
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198402xx"/>
 		<info name="alt_title" value="アップルーン"/>
@@ -3414,11 +3437,13 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 		</part>
 	</software>
 
-	<!-- Uses BG Pal color -->
 	<software name="archon" supported="partial">
 		<description>Archon</description>
 		<year>1986</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
+		<notes><![CDATA[
+Runs too fast, requires [V1S]
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198606xx"/>
 		<info name="alt_title" value="アーコン"/>
@@ -4165,16 +4190,20 @@ A few kanji drawings in gameplay are odd to look at (cfr. signs, sports as full 
 		</part>
 	</software>
 
-	<!-- TODO: investigate over [SIO] usage -->
-	<!-- Requires floppies to not be write protected -->
 	<software name="balpower" supported="partial">
 		<description>Balance of Power</description>
 		<year>1989</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<notes><![CDATA[
+TODO: investigate over [SIO] usage
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198907xx"/>
 		<info name="alt_title" value="バランスオブパワー"/>
 		<info name="usage" value="Set 8MHz mode on a PC8801MA+"/>
+		<sharedfeat name="mouseport_default" value="mouse" />
+		<!-- will throw an "error -4" otherwise -->
+		<sharedfeat name="write_protected" value="false" />
 		<!--combined image-->
 		<!--rom name="ballance of power.d88" size="762128" crc="09d9686f" sha1="0d54291a8d835cdd63d7351d68c1be7cb20a4f4f"/-->
 
@@ -4228,11 +4257,13 @@ Should be supported by [PC8001mkIISR] too
 		</part>
 	</software>
 
-	<!-- TODO: flaky disk swaps (investigate) -->
 	<software name="barbatus" supported="partial">
 		<description>Barbatus no Majo</description>
 		<year>1990</year>
 		<publisher>アーテック (Artec)</publisher>
+		<notes><![CDATA[
+TODO: flaky disk swaps (investigate)
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900309"/>
 		<info name="alt_title" value="バルバドゥスの魔女"/>
@@ -4510,11 +4541,13 @@ All weapons GFX displays are garbled in this version, is the dump right?
 		</part>
 	</software>
 
-	<!-- Not extensively tested -->
 	<software name="bellonch" supported="partial">
 		<description>Belloncho Series 1 - Belloncho Shintai Kensa</description>
 		<year>1990</year>
 		<publisher>ハード (Hard)</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900329"/>
 		<info name="alt_title" value="べろんちょ身体検査"/>
@@ -4574,11 +4607,13 @@ All weapons GFX displays are garbled in this version, is the dump right?
 		</part>
 	</software>
 
-	<!-- Not extensively tested -->
 	<software name="bishojbg" supported="partial">
 		<description>Bishoujo Baseball Gakuen</description>
 		<year>1989</year>
 		<publisher>パソケット (Pasoket)</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198910xx"/>
 		<info name="alt_title" value="美少女ベースボール学園"/>
@@ -4950,12 +4985,14 @@ Note: cannot mix party from disk 1 and 2
 		</part>
 	</software>
 
-	<!-- Not extensively tested -->
-	<!-- Tests [Sound Board 2] -->
 	<software name="blassty" supported="partial">
 		<description>Cruise Chaser - Blassty</description>
 		<year>1986</year>
 		<publisher>スクウェア (Square)</publisher>
+		<notes><![CDATA[
+Not extensively tested
+Tests [Sound Board 2]
+]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198604xx"/>
 		<info name="alt_title" value="ブラスティ"/>
@@ -16914,7 +16951,7 @@ Not extensively tested
 	</software>
 
 	<software name="inindo" supported="no">
-		<description>Inindo</description>
+		<description>Inindou: Datou Nobunaga</description>
 		<year>1991</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
@@ -16922,7 +16959,7 @@ Not extensively tested
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19910719"/>
-		<info name="alt_title" value="伊忍道"/>
+		<info name="alt_title" value="伊忍道 打倒信長"/>
 		<!--combined image-->
 		<!--rom name="inindo.d88" size="1978192" crc="bfebfab5" sha1="c947f2e7bb82e0b0b421af4a409a26fc351d36b8"/-->
 
@@ -16963,7 +17000,7 @@ Not extensively tested
 	</software>
 
 	<software name="inindoa" cloneof="inindo" supported="no">
-		<description>Inindo (alt?)</description>
+		<description>Inindou: Datou Nobunaga (alt?)</description>
 		<year>1991</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
@@ -16971,7 +17008,7 @@ Not extensively tested
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19910719"/>
-		<info name="alt_title" value="伊忍道"/>
+		<info name="alt_title" value="伊忍道 打倒信長"/>
 		<!--combined image-->
 		<!--rom name="inindo.d88" size="1930272" crc="2237c01b" sha1="02f13c7d481ece86919944e9a91b11c551a91c36"/-->
 
@@ -39887,7 +39924,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 -->
 	<software name="yajiuma2">
 		<description>Yajiuma Pennant Race 2</description>
-		<year>1991</year>
+		<year>1990</year>
 		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199102xx"/>

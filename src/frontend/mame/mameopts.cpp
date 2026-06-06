@@ -36,9 +36,26 @@
 
 void mame_options::parse_standard_inis(emu_options &options, std::ostream &error_stream, const game_driver *driver)
 {
-	// parse the INI file defined by the platform (e.g., "mame.ini")
-	// we do this twice so that the first file can change the INI path
-	parse_one_ini(options, emulator_info::get_configname(), OPTION_PRIORITY_MAME_INI);
+	// parse exactly one of the main INI file to pick up and apply inipath and [no]readconfig
+	{
+		emu_file file(options.ini_path(), OPEN_FLAG_READ);
+		osd_printf_verbose("Attempting load of %s.ini\n", emulator_info::get_configname());
+		std::error_condition const filerr = file.open(std::string(emulator_info::get_configname()) + ".ini");
+		if (!filerr)
+		{
+			osd_printf_verbose("Parsing %s\n", file.fullpath());
+			try
+			{
+				options.parse_ini_file(static_cast<util::core_file &>(file), OPTION_PRIORITY_MAME_INI, true, false);
+			}
+			catch (options_exception const &ex)
+			{
+				util::stream_format(error_stream, "While parsing %s:\n%s\n", file.fullpath(), ex.message());
+			}
+		}
+	}
+
+	// now parse the main INI file following the potentially updated search path
 	parse_one_ini(options, emulator_info::get_configname(), OPTION_PRIORITY_MAME_INI, &error_stream);
 
 	// debug mode: parse "debug.ini" as well
@@ -122,21 +139,19 @@ void mame_options::parse_one_ini(emu_options &options, const char *basename, int
 	// open the file; if we fail, that's ok
 	emu_file file(options.ini_path(), OPEN_FLAG_READ);
 	osd_printf_verbose("Attempting load of %s.ini\n", basename);
-	std::error_condition const filerr = file.open(std::string(basename) + ".ini");
-	if (filerr)
-		return;
-
-	// parse the file
-	osd_printf_verbose("Parsing %s.ini\n", basename);
-	try
+	for (std::error_condition filerr = file.open(std::string(basename) + ".ini"); !filerr; filerr = file.open_next())
 	{
-		options.parse_ini_file(static_cast<util::core_file &>(file), priority, priority < OPTION_PRIORITY_DRIVER_INI, false);
-	}
-	catch (options_exception &ex)
-	{
-		if (error_stream)
-			util::stream_format(*error_stream, "While parsing %s:\n%s\n", file.fullpath(), ex.message());
-		return;
+		// parse the file
+		osd_printf_verbose("Parsing %s\n", file.fullpath());
+		try
+		{
+			options.parse_ini_file(static_cast<util::core_file &>(file), priority, priority < OPTION_PRIORITY_DRIVER_INI, false);
+		}
+		catch (options_exception const &ex)
+		{
+			if (error_stream)
+				util::stream_format(*error_stream, "While parsing %s:\n%s\n", file.fullpath(), ex.message());
+		}
 	}
 }
 

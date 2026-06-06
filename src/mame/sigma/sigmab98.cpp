@@ -36,7 +36,7 @@ Dumped games:                           ROMs:    Video:
 
 --------------------------------------------------------------------------------------
 
-To Do:
+TODO:
 
 - Remove ROM patches: gegege checks the EEPROM output after reset, and wants a timed 0->1 transition or locks up while
   saving setting in service mode. Using a reset_delay of 7 works, unless when "play style" is set
@@ -97,8 +97,6 @@ public:
 	void init_ucytokyu() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD { m_leds.resolve(); }
-
 	void c4_w(u8 data);
 	void c6_w(u8 data);
 	void c8_w(u8 data);
@@ -193,28 +191,14 @@ private:
 
 u32 sigmab98_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int layers_ctrl = -1;
-
-#ifdef MAME_DEBUG
-	if (machine().input().code_pressed(KEYCODE_Z))
-	{
-		int msk = 0;
-		if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
-		if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
-		if (machine().input().code_pressed(KEYCODE_E))  msk |= 4;
-		if (machine().input().code_pressed(KEYCODE_R))  msk |= 8;
-		if (msk != 0) layers_ctrl &= msk;
-	}
-#endif
-
 	bitmap.fill(m_palette->pens()[0x1000], cliprect);
 
 	// Draw from priority 3 (bottom, converted to a bitmask) to priority 0 (top)
-	u8* spriteram = (m_buffered_spriteram ? m_buffered_spriteram->buffer() : m_spriteram);
-	m_spritegen->draw_sprites(bitmap, cliprect, spriteram, layers_ctrl & 8);
-	m_spritegen->draw_sprites(bitmap, cliprect, spriteram, layers_ctrl & 4);
-	m_spritegen->draw_sprites(bitmap, cliprect, spriteram, layers_ctrl & 2);
-	m_spritegen->draw_sprites(bitmap, cliprect, spriteram, layers_ctrl & 1);
+	u8 const *spriteram = (m_buffered_spriteram ? m_buffered_spriteram->buffer() : m_spriteram);
+	m_spritegen->draw_sprites(bitmap, cliprect, spriteram, 8);
+	m_spritegen->draw_sprites(bitmap, cliprect, spriteram, 4);
+	m_spritegen->draw_sprites(bitmap, cliprect, spriteram, 2);
+	m_spritegen->draw_sprites(bitmap, cliprect, spriteram, 1);
 
 	return 0;
 }
@@ -658,7 +642,7 @@ void sigmab98_state::sigmab98(machine_config &config)
 
 	BUFFERED_SPRITERAM8(config, m_buffered_spriteram);
 
-	KY3211(config, m_spritegen, 0, m_palette);
+	KY3211(config, m_spritegen, m_palette);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
@@ -713,7 +697,7 @@ void lufykzku_state::lufykzku(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // battery backed RAM (TC55257DFL-70L)
 	// No EEPROM
 
-	MB3773(config, m_watchdog, 0);
+	MB3773(config, m_watchdog);
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// 2 x 8-bit parallel/serial converters
@@ -738,7 +722,7 @@ void lufykzku_state::lufykzku(machine_config &config)
 	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	//BUFFERED_SPRITERAM8(config, m_buffered_spriteram); // same as sammymdl?
-	KY10510(config, m_spritegen, 0, m_palette);
+	KY10510(config, m_spritegen, m_palette);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

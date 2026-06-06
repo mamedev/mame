@@ -9,7 +9,7 @@
 class upd71071_device : public device_t
 {
 public:
-	upd71071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd71071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
 	void set_clock(int clock) { m_upd_clock = clock; }

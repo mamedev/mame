@@ -280,11 +280,11 @@ public:
 	}
 
 	template <typename F>
-	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, F &&init, std::enable_if_t<init_delegate::supports_callback<F>::value, const char *> name, u32 entries = 0U, u32 indirect = 0U)
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, F &&init, const char *name, u32 entries = 0U, u32 indirect = 0U) requires (init_delegate::supports_callback<F>::value)
 		: palette_device(mconfig, tag, owner, 0U)
 	{ set_init(std::forward<F>(init), name).set_entries(entries, indirect); }
 	template <typename T, typename F>
-	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&devname, F &&init, std::enable_if_t<init_delegate::supports_callback<F>::value, const char *> name, u32 entries = 0U, u32 indirect = 0U)
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&devname, F &&init, const char *name, u32 entries = 0U, u32 indirect = 0U) requires (init_delegate::supports_callback<F>::value)
 		: palette_device(mconfig, tag, owner, 0U)
 	{ set_init(std::forward<T>(devname), std::forward<F>(init), name).set_entries(entries, indirect); }
 

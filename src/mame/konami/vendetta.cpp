@@ -651,8 +651,8 @@ void vendetta_state::vendetta(machine_config &config)
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -43, 6);
 	m_k053246->set_palette(m_palette);
 
-	K053251(config, m_k053251, 0);
-	K054000(config, m_k054000, 0);
+	K053251(config, m_k053251);
+	K054000(config, m_k054000);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

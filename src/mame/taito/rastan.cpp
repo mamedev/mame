@@ -454,9 +454,9 @@ void rastan_state::rastan(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048);
 
-	PC080SN(config, m_pc080sn, 0, "palette", gfx_rastan);
+	PC080SN(config, m_pc080sn, "palette", gfx_rastan);
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_palette("palette");
 	m_pc090oj->set_colpri_callback(FUNC(rastan_state::colpri_cb));
 
@@ -474,10 +474,10 @@ void rastan_state::rastan(machine_config &config)
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  // 8 kHz
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	LS157(config, m_adpcm_sel, 0);
+	LS157(config, m_adpcm_sel);
 	m_adpcm_sel->out_callback().set(m_msm, FUNC(msm5205_device::data_w));
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }

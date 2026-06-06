@@ -1189,7 +1189,7 @@ void tomy_princ_state::tomy_princ(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(tomy_princ_state::princ_palette), 16);
 
-	TIMER(config, m_scantimer, 0);
+	TIMER(config, m_scantimer);
 	m_scantimer->configure_scanline(FUNC(tomy_princ_state::scan_interrupt), "screen", 0, 1);
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "princ_cart");

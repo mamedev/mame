@@ -271,8 +271,6 @@ private:
 
 void lethalj_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_blitter_data));
 	save_item(NAME(m_vispage));
 	save_item(NAME(m_gunx));

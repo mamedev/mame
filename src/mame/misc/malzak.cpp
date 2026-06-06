@@ -472,7 +472,7 @@ void malzak_state::machine_reset()
 void malzak_state::malzak(machine_config &config)
 {
 	/* basic machine hardware */
-	S2650(config, m_maincpu, 3800000/4);
+	S2650(config, m_maincpu, 3800000/4); // ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &malzak_state::malzak_map);
 	m_maincpu->set_addrmap(AS_IO, &malzak_state::malzak_io_map);
 	m_maincpu->set_addrmap(AS_DATA, &malzak_state::malzak_data_map);
@@ -480,25 +480,23 @@ void malzak_state::malzak(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// TODO: convert to PAL set_raw
-	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(480, 512);  /* vert size is a guess */
-	m_screen->set_visarea(0, 479, 0, 479);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	// TODO: handtuned, unverified
+	m_screen->set_raw(6'000'000 * 4, 768, 0, 80 * 6, 312 * 2, 0, 240 * 2);
 	m_screen->set_screen_update(FUNC(malzak_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_malzak);
 	PALETTE(config, m_palette, FUNC(malzak_state::palette_init), 128);
 
-	S2636(config, m_s2636[0], 0);
+	S2636(config, m_s2636[0]);
 	m_s2636[0]->set_offsets(0, -16);  // -8, -16
 	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	S2636(config, m_s2636[1], 0);
+	S2636(config, m_s2636[1]);
 	m_s2636[1]->set_offsets(0, -16);  // -9, -16
 	m_s2636[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	SAA5050(config, m_trom, 6000000);
+	SAA5050(config, m_trom, 6'000'000);
 	m_trom->d_cb().set(FUNC(malzak_state::videoram_r));
 	m_trom->set_screen_size(42, 24, 64);
 

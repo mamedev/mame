@@ -634,6 +634,7 @@ void comx35_state::base(machine_config &config, const XTAL clock)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// expansion bus
+	// FIXME: determine expansion bus clock frequency
 	COMX_EXPANSION_SLOT(config, m_exp, 0, comx_expansion_cards, "eb").irq_callback().set(FUNC(comx35_state::irq_w));
 
 	// internal ram

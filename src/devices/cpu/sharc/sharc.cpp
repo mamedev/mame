@@ -1337,8 +1337,6 @@ void adsp21062_device::execute_run()
 			(this->*m_sharc_op[(m_core->opcode >> 39) & 0x1ff])();
 
 
-
-
 			// System register latency effect
 			if (m_core->systemreg_latency_cycles > 0)
 			{

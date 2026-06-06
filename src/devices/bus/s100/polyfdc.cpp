@@ -115,7 +115,7 @@ void poly_fdc_device::pc_w(u8 data)
 
 void poly_fdc_device::device_add_mconfig(machine_config &config)
 {
-	MC6852(config, m_usrt, 0); // E generated from PDBIN+ and PWR-
+	MC6852(config, m_usrt); // E generated from PDBIN+ and PWR-
 
 	I8255(config, m_pio);
 	m_pio->out_pa_callback().set(FUNC(poly_fdc_device::pa_w));

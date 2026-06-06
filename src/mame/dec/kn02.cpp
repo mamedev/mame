@@ -263,7 +263,7 @@ void kn02ba_state::kn02ba(machine_config &config, u32 clock)
 	m_scc[1]->out_int_callback().set("ioga", FUNC(dec_ioga_device::scc1_irq_w));
 	m_scc[1]->out_txdb_callback().set(m_lk201, FUNC(lk201_device::rx_w));
 
-	LK201(config, m_lk201, 0);
+	LK201(config, m_lk201);
 	m_lk201->tx_handler().set(m_scc[1], FUNC(z80scc_device::rxb_w));
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));

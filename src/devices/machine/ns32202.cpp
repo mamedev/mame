@@ -14,6 +14,8 @@
 #include "emu.h"
 #include "ns32202.h"
 
+#include <bit>
+
 #define LOG_STATE     (1U << 1)
 #define LOG_REGW      (1U << 2)
 #define LOG_REGR      (1U << 3)
@@ -290,7 +292,7 @@ void ns32202_device::interrupt(s32 param)
 						// check equal priority unmasked pending cascade interrupt
 						if ((m_csrc & mask) && (m_ipnd & mask) && !(m_imsk & mask))
 						{
-							LOGMASKED(LOG_STATE, "unmasked pending cascade in-service interrupt %d\n", 31 - count_leading_zeros_32(mask));
+							LOGMASKED(LOG_STATE, "unmasked pending cascade in-service interrupt %d\n", std::bit_width(mask) - 1);
 							int_state = true;
 						}
 
@@ -300,7 +302,7 @@ void ns32202_device::interrupt(s32 param)
 					// check unmasked pending interrupt
 					if ((m_ipnd & mask) && !(m_imsk & mask))
 					{
-						LOGMASKED(LOG_STATE, "unmasked pending interrupt %d\n", 31 - count_leading_zeros_32(mask));
+						LOGMASKED(LOG_STATE, "unmasked pending interrupt %d\n", std::bit_width(mask) - 1);
 						int_state = true;
 						break;
 					}
@@ -337,7 +339,7 @@ u8 ns32202_device::interrupt_acknowledge(bool side_effects)
 			mask = (mask << 1) | (mask >> 15);
 		}
 
-		unsigned const number = 31 - count_leading_zeros_32(mask);
+		unsigned const number = std::bit_width(mask) - 1;
 		if (side_effects)
 		{
 			LOGMASKED(LOG_STATE, "acknowledge highest priority unmasked interrupt %d\n", number);
@@ -415,7 +417,7 @@ u8 ns32202_device::interrupt_return(bool side_effects)
 			// rotate priority mask
 			mask = (mask << 1) | (mask >> 15);
 		}
-		unsigned const number = 31 - count_leading_zeros_32(mask);
+		unsigned const number = std::bit_width(mask) - 1;
 
 		if (side_effects)
 		{

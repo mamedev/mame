@@ -116,7 +116,6 @@ void psr340_state::s_map(address_map &map)
 void psr340_state::machine_start()
 {
 	save_item(NAME(m_matrixsel));
-	m_outputs.resolve();
 }
 
 void psr340_state::machine_reset()

@@ -19,7 +19,7 @@
 class xbox_pic16lc_device : public device_t, public smbus_interface
 {
 public:
-	xbox_pic16lc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xbox_pic16lc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual int execute_command(int command, int rw, int data) override;
 
 protected:
@@ -39,7 +39,7 @@ DECLARE_DEVICE_TYPE(XBOX_PIC16LC, xbox_pic16lc_device)
 class xbox_cx25871_device : public device_t, public smbus_interface
 {
 public:
-	xbox_cx25871_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xbox_cx25871_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual int execute_command(int command, int rw, int data) override;
 
 protected:
@@ -58,7 +58,7 @@ DECLARE_DEVICE_TYPE(XBOX_CX25871, xbox_cx25871_device)
 class xbox_eeprom_device : public device_t, public smbus_interface
 {
 public:
-	xbox_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xbox_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual int execute_command(int command, int rw, int data) override;
 
 	std::function<void(void)> hack_eeprom;
@@ -79,7 +79,7 @@ DECLARE_DEVICE_TYPE(XBOX_EEPROM, xbox_eeprom_device)
 class xbox_superio_device : public device_t, public lpcbus_device_interface
 {
 public:
-	xbox_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xbox_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual void map_extra(address_space *memory_space, address_space *io_space) override;
 	virtual uint32_t dma_transfer(int channel, dma_operation operation, dma_size size, uint32_t data) override;
 	virtual void set_host(int device_index, lpcbus_host_interface *host) override;

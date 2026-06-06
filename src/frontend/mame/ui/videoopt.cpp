@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "ui/videoopt.h"
 
+#include "input.h"
 #include "rendfont.h"
 #include "rendlay.h"
 #include "rendutil.h"

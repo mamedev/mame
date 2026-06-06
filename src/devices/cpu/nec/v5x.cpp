@@ -250,16 +250,16 @@ void device_v5x_interface::v5x_add_mconfig(machine_config &config)
 {
 	PIT8254(config, m_tcu);
 
-	V5X_DMAU(config, m_dmau, 4000000);
+	V5X_DMAU(config, m_dmau, DERIVED_CLOCK(1, 4));
 
-	V5X_ICU(config, m_icu, 0);
+	V5X_ICU(config, m_icu);
 	m_icu->out_int_callback().set(FUNC(device_v5x_interface::internal_irq_w));
 	m_icu->in_sp_callback().set_constant(1);
 	m_icu->read_slave_ack_callback().set(FUNC(device_v5x_interface::get_pic_ack));
 
-	V5X_SCU(config, m_scu, 0);
+	V5X_SCU(config, m_scu);
 
-	TIMER(config, m_brc_timer, 0);
+	TIMER(config, m_brc_timer);
 	m_brc_timer->set_callback(FUNC(device_v5x_interface::brc_timer_tick));
 }
 

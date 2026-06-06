@@ -93,7 +93,6 @@ Optional (on expansion card) (Viper)
 #include "bfm_bd1.h" // vfd
 #include "bfm_comn.h"
 
-#include "awpvid.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
@@ -183,7 +182,6 @@ protected:
 
 	void save_state();
 
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override ATTR_COLD;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void sc1_common_init(int reels, int decrypt, int defaultbank);
@@ -320,8 +318,8 @@ void bfm_sc1_state::reel12_w(uint8_t data)
 		m_reels[0]->update((data>>4)&0x0f);
 		m_reels[1]->update( data    &0x0f);
 	}
-	awp_draw_reel(machine(),"reel1", *m_reels[0]);
-	awp_draw_reel(machine(),"reel2", *m_reels[1]);
+	m_reels[0]->draw();
+	m_reels[1]->draw();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -337,8 +335,8 @@ void bfm_sc1_state::reel34_w(uint8_t data)
 		m_reels[2]->update((data>>4)&0x0f);
 		m_reels[3]->update( data    &0x0f);
 	}
-	awp_draw_reel(machine(),"reel3", *m_reels[2]);
-	awp_draw_reel(machine(),"reel4", *m_reels[3]);
+	m_reels[2]->draw();
+	m_reels[3]->draw();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -348,8 +346,8 @@ void bfm_sc1_state::reel56_w(uint8_t data)
 	m_reels[4]->update((data>>4)&0x0f);
 	m_reels[5]->update( data    &0x0f);
 
-	awp_draw_reel(machine(),"reel5", *m_reels[4]);
-	awp_draw_reel(machine(),"reel6", *m_reels[5]);
+	m_reels[4]->draw();
+	m_reels[5]->draw();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1109,7 +1107,7 @@ void bfm_sc1_state::scorpion1(machine_config &config)
 	REEL(config, m_reels[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reels[5]->optic_handler().set(FUNC(bfm_sc1_state::reel_optic_cb<5>));
 
-	METERS(config, m_meters, 0).set_number(8);
+	METERS(config, m_meters).set_number(8);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1124,7 +1122,7 @@ void bfm_sc1_state::scorpion1_adder2(machine_config &config)
 
 	config.set_default_layout(layout_sc1_vid);
 
-	BFM_ADDER2(config, "adder2", 0);
+	BFM_ADDER2(config, "adder2");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

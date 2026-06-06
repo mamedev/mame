@@ -31,14 +31,18 @@ private:
 		constexpr l4003_voice() {}
 
 		uint32_t start = 0;
-		uint32_t loop_start = 0;
+		uint32_t step = 0;
 		uint32_t pos = 0;
 		uint32_t frac = 0;
-		uint32_t step = 0;
+		uint16_t l_volume = 0;
+		uint16_t r_volume = 0;
 		uint16_t env_volume = 0;
-		uint8_t volume = 0;
-		uint8_t send_level = 0;
+		uint16_t env_target = 0;
+		uint16_t env_step = 0;
+		uint32_t env_pos = 0;
 		uint8_t send_dest = 0;
+		uint8_t send_level = 0;
+		int32_t filt_state = 0;
 	};
 
 	sound_stream    *m_stream;
@@ -47,7 +51,7 @@ private:
 
 	memory_access<21, 1, 0, ENDIANNESS_LITTLE>::cache m_cache;
 
-	uint16_t m_data, m_control, m_key_status;
+	uint16_t m_data, m_control;
 	uint32_t m_sample_rate;
 
 	uint16_t data_r();

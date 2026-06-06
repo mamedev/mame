@@ -15,6 +15,8 @@
 #include "inputdev.h"
 #include "uiinput.h"
 
+#include "input.h"
+
 #include "path.h"
 
 

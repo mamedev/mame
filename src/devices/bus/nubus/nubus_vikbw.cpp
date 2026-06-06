@@ -24,6 +24,8 @@
 #include "nubus_vikbw.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 namespace {
 
 static constexpr u32 VRAM_SIZE = 0x20000;       // 4x HM53461 VRAMs (64K x 4 bit)

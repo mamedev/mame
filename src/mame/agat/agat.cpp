@@ -1252,7 +1252,7 @@ void agat7_state::agat7(machine_config &config)
 
 	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::joystick_options, nullptr);
 
-	agat_keyboard_device &keyboard(AGAT_KEYBOARD(config, "keyboard", 0));
+	agat_keyboard_device &keyboard(AGAT_KEYBOARD(config, "keyboard"));
 	keyboard.out_callback().set(FUNC(agat_base_state::kbd_put));
 	keyboard.out_meta_callback().set(FUNC(agat_base_state::kbd_meta));
 	keyboard.out_reset_callback().set([this](bool state) { m_maincpu->reset(); });
@@ -1262,7 +1262,7 @@ void agat7_state::agat7(machine_config &config)
 	 * slot 1 always holds the CPU card.
 	 * most of the software expects a7lang in slot 2 and a7ram in slot 6.
 	 */
-	A2BUS(config, m_a2bus, 0);
+	A2BUS(config, m_a2bus);
 	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(agat_base_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(agat_base_state::a2bus_nmi_w));
@@ -1300,12 +1300,12 @@ void agat9_state::agat9(machine_config &config)
 
 	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::joystick_options, nullptr);
 
-	agat_keyboard_device &keyboard(AGAT_KEYBOARD(config, "keyboard", 0));
+	agat_keyboard_device &keyboard(AGAT_KEYBOARD(config, "keyboard"));
 	keyboard.out_callback().set(FUNC(agat_base_state::kbd_put));
 	keyboard.out_meta_callback().set(FUNC(agat_base_state::kbd_meta));
 	keyboard.out_reset_callback().set([this](bool state) { m_maincpu->reset(); });
 
-	A2BUS(config, m_a2bus, 0);
+	A2BUS(config, m_a2bus);
 	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(agat_base_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(agat_base_state::a2bus_nmi_w));

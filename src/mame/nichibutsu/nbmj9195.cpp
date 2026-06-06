@@ -1704,7 +1704,7 @@ void nbmj9195_state::nbmjtype1(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	nichisnd_device &nichisnd(NICHISND(config, "nichisnd", 0));
+	nichisnd_device &nichisnd(NICHISND(config, "nichisnd"));
 	nichisnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
@@ -1738,7 +1738,7 @@ void nbmj9195_state::nbmjtype2(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	nichisnd_device &nichisnd(NICHISND(config, "nichisnd", 0));
+	nichisnd_device &nichisnd(NICHISND(config, "nichisnd"));
 	nichisnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 

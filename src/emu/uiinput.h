@@ -56,18 +56,13 @@ struct ui_event
 	s16                 pointer_clicks;     // positive for multi-click, negative on release if turned into hold or drag
 };
 
-// ======================> ui_input_manager
 
-class ui_input_manager final : public osd::ui_event_handler
+class ui_input_manager
 {
 public:
-	// construction/destruction
-	ui_input_manager(running_machine &machine);
+	~ui_input_manager();
 
 	void check_ui_inputs();
-
-	// pushes a single event onto the queue
-	bool push_event(ui_event event);
 
 	// pops an event off of the queue
 	bool pop_event(ui_event *event);
@@ -92,23 +87,22 @@ public:
 	render_target *focused_target() const { return m_focused_target; }
 	render_target *last_focused_target() const { return m_last_focused_target; }
 
-	// getters
-	running_machine &machine() const { return m_machine; }
-
-	// queueing events
-	virtual void push_window_focus_event(render_target *target) override;
-	virtual void push_window_defocus_event(render_target *target) override;
-	virtual void push_mouse_wheel_event(render_target *target, s32 x, s32 y, short delta, int lines) override;
-	virtual void push_pointer_update(render_target *target, pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 buttons, u32 pressed, u32 released, s16 clicks) override;
-	virtual void push_pointer_leave(render_target *target, pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks) override;
-	virtual void push_pointer_abort(render_target *target, pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks) override;
-	virtual void push_char_event(render_target *target, char32_t ch) override;
-
 	void mark_all_as_pressed();
+
+protected:
+	// construction/destruction
+	ui_input_manager(running_machine &machine);
+
+	bool push_event(ui_event event);
+	void target_focused(render_target &target);
+	void target_defocused(render_target &target);
 
 private:
 	// constants
 	static constexpr unsigned EVENT_QUEUE_SIZE = 256;
+
+	// getters
+	running_machine &machine() const { return m_machine; }
 
 	// internal state
 	running_machine &   m_machine;
@@ -126,6 +120,39 @@ private:
 	ui_event            m_events[EVENT_QUEUE_SIZE];
 	int                 m_events_start;
 	int                 m_events_end;
+};
+
+
+class ui_event_sink : protected ui_input_manager
+{
+public:
+	using pointer = osd::ui_event_handler::pointer;
+
+	~ui_event_sink();
+
+	// queueing events
+	void push_window_focus_event(render_target &target);
+	void push_window_defocus_event(render_target &target);
+	void push_mouse_wheel_event(render_target &target, s32 x, s32 y, short delta, int lines);
+	void push_pointer_update(render_target &target, pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 buttons, u32 pressed, u32 released, s16 clicks);
+	void push_pointer_leave(render_target &target, pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks);
+	void push_pointer_abort(render_target &target, pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks);
+	void push_char_event(render_target &target, char32_t ch);
+
+protected:
+	// construction/destruction
+	ui_event_sink(running_machine &machine);
+};
+
+
+class ui_input_manager_impl : protected ui_event_sink
+{
+public:
+	ui_input_manager_impl(running_machine &machine);
+	~ui_input_manager_impl();
+
+	auto &input_manager() { return *static_cast<ui_input_manager *>(this); }
+	auto &event_sink() { return *static_cast<ui_event_sink*>(this); }
 };
 
 #endif // MAME_EMU_UIINPUT_H

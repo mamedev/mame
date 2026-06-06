@@ -99,6 +99,10 @@ public:
 
 	u16 get_vram_dest();
 	void set_vram_dest(u16 dest);
+	void reload_refresh_data();
+
+	u8 ppu_vram_direct_read(offs_t address);
+	void ppu_vram_direct_write(offs_t address, u8 data);
 
 	bool in_vblanking() { return (m_scanline >= m_vblank_first_scanline - 1); }
 protected:

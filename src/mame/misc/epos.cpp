@@ -671,7 +671,6 @@ void epos_base_state::video_start()
 
 void tristar8000_state::machine_start()
 {
-	m_leds.resolve();
 	save_item(NAME(m_coin_latch));
 }
 

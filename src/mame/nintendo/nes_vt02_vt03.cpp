@@ -131,6 +131,8 @@ public:
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
+	void nes_vt_pjoy_1mb(machine_config &config) ATTR_COLD;
+	void nes_vt_pjoy_2mb(machine_config &config) ATTR_COLD;
 	void nes_vt_pjoy_4mb(machine_config &config) ATTR_COLD;
 };
 
@@ -699,16 +701,27 @@ void nes_vt_hum_state::nes_vt_hummer_4mb(machine_config &config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hum_state::vt_external_space_map_4mbyte);
 }
 
-void nes_vt_pjoy_state::nes_vt_pjoy_4mb(machine_config &config)
+void nes_vt_pjoy_state::nes_vt_pjoy_1mb(machine_config &config)
 {
 	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_4mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_1mbyte);
 	//m_soc->set_8000_scramble(0x4, 0x5, 0x0, 0x1, 0x2, 0x3); // this is the default config in the SoC device
 	m_soc->set_8006_scramble(0x8, 0x7);
 	m_soc->set_410x_scramble(0x8, 0x7);
 }
 
+void nes_vt_pjoy_state::nes_vt_pjoy_2mb(machine_config &config)
+{
+	nes_vt_pjoy_1mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_2mbyte);
+}
+
+void nes_vt_pjoy_state::nes_vt_pjoy_4mb(machine_config &config)
+{
+	nes_vt_pjoy_1mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_4mbyte);
+}
 
 void nes_vt_sp69_state::nes_vt_4mb_sp69(machine_config &config)
 {
@@ -1197,6 +1210,11 @@ ROM_START( mc_105te )
 	ROM_LOAD( "2011 super hik 105-in-1 turbo edition.prg", 0x00000, 0x800000, CRC(c0f85771) SHA1(8c4182b1de3be10dd895089823cc67a9d12589ef) )
 ROM_END
 
+ROM_START( gamekid )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "gamekid.bin", 0x00000, 0x800000, CRC(df721044) SHA1(b8ba8d1303b8a10b7d2f6c74bf40027156848fbd) )
+ROM_END
+
 ROM_START( mc_sp69 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "sports game 69-in-1.prg", 0x00000, 0x400000, CRC(1242da7f) SHA1(bb8f99b1f4a4783b3f7e54d74f1f2a6a628da154) )
@@ -1285,6 +1303,16 @@ ROM_END
 ROM_START( pjoys60 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "power joy supermax 60-in-1.prg", 0x00000, 0x400000, CRC(1ab45228) SHA1(d148924afc39fc588235331a1a30df6e0d8e1e18) )
+ROM_END
+
+ROM_START( vjtv2500 )
+	ROM_REGION( 0x100000, "mainrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "tvjoypro2500.u2", 0x00000, 0x100000, CRC(d2e29e79) SHA1(c04cb4af3236d1cd568c18550035c69d66bb897e) )
+ROM_END
+
+ROM_START( vjtv2501 )
+	ROM_REGION( 0x200000, "mainrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "tvjoypro2501.bin", 0x00000, 0x200000, CRC(9a1a3aef) SHA1(b0ddb464f6d0e8e7ba5714335c8eb1d0d52d481f) )
 ROM_END
 
 ROM_START( joysti30 )
@@ -1555,6 +1583,12 @@ CONS( 2006, ablmini,   0, 0,  nes_vt_waixing_alt_pal_8mb, nes_vt, nes_vt_waixing
 
 CONS( 200?, solargm,   0,  0, nes_vt_waixing_alt_pal_8mb, nes_vt, nes_vt_waixing_alt_state, empty_init, "<unknown>", "Solar Games 80-in-1 (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Solar Games logo is also found in the SunPlus based Millennium Arcade units
 
+// Front of the box has the French name used in the description, no company name is present.
+// back of box has "85 in 1 TV console and 1 LCD soccer game" (English) and "85 juegos para la televisión y 1 juego LCD incluido!" (Spanish)
+// ingame shows "Kid Land 85 in 1"
+// the LCD soccer game built into the unit appears to be driven by a separate glob and is not dumped
+CONS( 200?, gamekid,   0,  0,  nes_vt_waixing_alt_pal_8mb,    nes_vt, nes_vt_waixing_alt_state, empty_init, "<unknown>", u8"Game Kid - 85 jeux pour la télévision et 1 jeu LCD inclus! / Kid Land 85 in 1 (TV part)", MACHINE_IMPERFECT_GRAPHICS )
+
 // silver 'N64' type controller design
 CONS( 200?, zudugo,    0, 0,  nes_vt_waixing_alt_4mb,     nes_vt, nes_vt_waixing_alt_state, empty_init, "Macro Winners / Waixing", "Zudu-go / 2udu-go", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // the styling on the box looks like a '2' in places, a 'Z' in others.
 
@@ -1576,7 +1610,7 @@ CONS( 2004, polmega,   0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_
 CONS( 200?, dgun851,   0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "dreamGEAR / JungleTac", "Plug 'N' Play 30-in-1 (DGUN-851)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, dgun853,   0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "dreamGEAR / JungleTac", "Plug 'N' Play 50-in-1 (DGUN-853)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, silv35,    0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "SilverLit / JungleTac", "35 in 1 Super Twins", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, silvlt50,  0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "SilverLit / JungleTac", "50 in 1 Arcade Joystick", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) 
+CONS( 200?, silvlt50,  0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "SilverLit / JungleTac", "50 in 1 Arcade Joystick", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2004, vsmaxxvd,  0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx Video Extreme 50-in-1 (with Speed Racer and Snood)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, vsmaxx77,  0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx Wireless 77-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, joysti30,  0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "WinFun / JungleTac",    "Joystick 30", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // doesn't show WinFun onscreen, but packaging does
@@ -1611,6 +1645,10 @@ CONS( 200?, zdog,      0,  0,  nes_vt_hummer_4mb,    nes_vt, nes_vt_hum_state, e
 CONS( 200?, pjoyn50,    0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "PowerJoy Navigator 50 in 1", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, pjoys30,    0,        0,  nes_vt_pjoy_4mb,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 30 in 1", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, pjoys60,    0,        0,  nes_vt_pjoy_4mb,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 60 in 1", MACHINE_IMPERFECT_GRAPHICS )
+
+// these have WT051-CPU on the sub-board, and WT062-MAIN on the main board
+CONS( 2004, vjtv2500,   0,        0,  nes_vt_pjoy_1mb,    nes_vt, nes_vt_pjoy_state,  empty_init, "VideoJet", "TV Joy Pro 15-in-1 (2500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, vjtv2501,   0,        0,  nes_vt_pjoy_2mb,    nes_vt, nes_vt_pjoy_state,  empty_init, "VideoJet", "TV Joy Pro 30-in-1 (2501)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // doesn't boot, bad dump
 CONS( 201?, cbrs8,      0,        0,  nes_vt_16mb,    nes_vt, nes_vt_state, empty_init, "CoolBoy", "CoolBoy RS-8 168 in 1", MACHINE_NOT_WORKING )

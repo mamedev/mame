@@ -383,7 +383,7 @@ void banprestomsz80_state::banprestomsz80(machine_config &config)
 	screen.set_screen_update(FUNC(banprestomsz80_state::screen_update));
 	screen.set_palette(m_palette);
 
-	SEIBU_CRTC(config, m_crtc, 0);
+	SEIBU_CRTC(config, m_crtc);
 	m_crtc->layer_en_callback().set([this] (uint16_t data) { m_layer_en = data; });
 	m_crtc->layer_scroll_callback().set([this] (offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_scrollram[offset]); });
 

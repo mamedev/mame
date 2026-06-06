@@ -7,11 +7,8 @@ Namco System 21 (later hardware with 5 TMS320C25 DSPs)
 TODO:
 - lamp/vibration outputs, from MCU? (particularly starblad);
 - verify video timing, it's assumed to be the same as namcos21 with a different XTAL;
-- mix_layer0_sprites can be improved when namcos21_3d_device removes the z-buffer, there are currently
-  glitches in cybsled, eg. missile pickups behind pillars;
+- mix_layer0_sprites can be improved, there are currently glitches in cybsled, eg. items behind pillars;
 - wrong global sprite layer offsets in service mode for all games except aircomb, it's fine in-game though;
-- aircomb: z-fighting issue on attract mode with the plane renders (after the first title screen),
-  and on pilot parachuting with a time over;
 - aircomb: missing background on attract mode ranking screen (masking? cfr. shared/namco_c355spr.cpp);
 - aircomb: bad sprite colors on debriefing medal screen;
 - aircomb: may show glitches when pressing start at the intro sequence, it forgot to turn off video_enable?
@@ -286,7 +283,6 @@ Palette:
 #include "cpu/m6809/m6809.h"
 #include "machine/nvram.h"
 #include "namcoio_gearbox.h"
-#include "machine/timer.h"
 #include "sound/c140.h"
 #include "sound/ymopm.h"
 
@@ -376,8 +372,7 @@ private:
 	void sound_reset_w(u8 data);
 	void system_reset_w(u8 data);
 	void reset_all_subcpus(int state);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
+	void vblank_irq(int state);
 
 	bool sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri);
 	void mix_layer0_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -788,6 +783,16 @@ void namcos21_c67_state::reset_all_subcpus(int state)
 		m_slave_intc->reset();
 }
 
+void namcos21_c67_state::vblank_irq(int state)
+{
+	if (state)
+	{
+		m_master_intc->vblank_irq_trigger();
+		m_slave_intc->vblank_irq_trigger();
+		m_c68->ext_interrupt(ASSERT_LINE);
+	}
+}
+
 void namcos21_c67_state::machine_reset()
 {
 	// Initialise the bank select in the sound CPU
@@ -807,25 +812,12 @@ void namcos21_c67_state::machine_start()
 		m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos21_c67_state::screen_scanline)
-{
-	int scanline = param;
-
-	if (scanline == 240 * 2)
-	{
-		m_master_intc->vblank_irq_trigger();
-		m_slave_intc->vblank_irq_trigger();
-		m_c68->ext_interrupt(ASSERT_LINE);
-	}
-}
-
 // starblad, solvalou, aircomb, cybsled base state
 void namcos21_c67_state::namcos21(machine_config &config)
 {
 	// basic machine hardware
 	M68000(config, m_maincpu, 49.152_MHz_XTAL / 4); // Master
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos21_c67_state::master_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(namcos21_c67_state::screen_scanline), "screen", 0, 1);
 
 	M68000(config, m_slave, 49.152_MHz_XTAL / 4); // Slave
 	m_slave->set_addrmap(AS_PROGRAM, &namcos21_c67_state::slave_map);
@@ -853,7 +845,7 @@ void namcos21_c67_state::namcos21(machine_config &config)
 	m_c68->dp_in_callback().set(FUNC(namcos21_c67_state::dpram_byte_r));
 	m_c68->dp_out_callback().set(FUNC(namcos21_c67_state::dpram_byte_w));
 
-	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67, 0);
+	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67);
 	m_namcos21_dsp_c67->set_renderer_tag("namcos21_3d");
 
 	config.set_maximum_quantum(attotime::from_hz(60000));
@@ -865,25 +857,26 @@ void namcos21_c67_state::namcos21(machine_config &config)
 	m_screen->set_raw(38.76922_MHz_XTAL / 4 * 2, 616, 0, 496, 262 + 263, 0, 480); // x2 is for interlace
 	m_screen->set_screen_update(FUNC(namcos21_c67_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(namcos21_c67_state::vblank_irq));
 
-	NAMCOS21_3D(config, m_namcos21_3d, 0);
+	NAMCOS21_3D(config, m_namcos21_3d);
 	m_namcos21_3d->set_framebuffer_size(496, 480);
 	m_namcos21_3d->set_num_palettes(0x10);
 	m_namcos21_3d->set_depth_reverse(false);
 
-	NAMCO_C148(config, m_master_intc, 0, m_maincpu, true);
+	NAMCO_C148(config, m_master_intc, m_maincpu, true);
 	m_master_intc->link_c148_device(m_slave_intc);
 	m_master_intc->out_ext1_callback().set(FUNC(namcos21_c67_state::sound_reset_w));
 	m_master_intc->out_ext2_callback().set(FUNC(namcos21_c67_state::system_reset_w));
 
-	NAMCO_C148(config, m_slave_intc, 0, m_slave, false);
+	NAMCO_C148(config, m_slave_intc, m_slave, false);
 	m_slave_intc->link_c148_device(m_master_intc);
 
-	NAMCO_C139(config, m_sci, 0);
+	NAMCO_C139(config, m_sci);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_888, 0x10000/2);
 
-	NAMCO_C355SPR(config, m_c355spr, 0);
+	NAMCO_C355SPR(config, m_c355spr);
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_palette(m_palette);
 	m_c355spr->set_scroll_offsets(0, 0x20);

@@ -705,8 +705,6 @@ void osc1000b_state::machine_reset()
 
 void tmc2000_state::machine_start()
 {
-	m_led.resolve();
-
 	// randomize color RAM contents
 	for (uint16_t addr = 0; addr < TMC2000_COLORRAM_SIZE; addr++)
 	{
@@ -739,8 +737,6 @@ TIMER_CALLBACK_MEMBER(nano_state::assert_ef4)
 
 void nano_state::machine_start()
 {
-	m_led.resolve();
-
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 
@@ -797,7 +793,7 @@ void tmc1800_state::tmc1800(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, m_beeper).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb));
@@ -832,7 +828,7 @@ void osc1000b_state::osc1000b(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, m_beeper).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb));

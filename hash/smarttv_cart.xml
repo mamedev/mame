@@ -6,13 +6,145 @@ license:CC0-1.0
 
 <softwarelist name="smarttv_cart" description="WinFun KidConnection SmarTV Adventures / Funtastic TV Adventures cartridges">
 
-	<software name="amuseprk" supported="no">
+	<software name="amuseprk" supported="no"> <!-- checksum matches header -->
 		<description>Amusement Park</description>
 		<year>200?</year>
 		<publisher>WinFun</publisher>
 		<part name="cart" interface="smarttv_cart">
 			<dataarea name="rom" size="0x400000">
 				<rom name="kidconnectionamusementpark.bin" size="0x400000" crc="360f6306" sha1="72f9f9ba1498cdefd35956daf21b2668048e9af3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enlunait" cloneof="amuseprk" supported="no"> <!-- first bytes of ROM are 0xff, erasing part of the checksum string, but checksum otherwise matches -->
+		<description>English Luna Park (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="English Luna Park (Italy).bin" size="0x400000" crc="4bfa7b27" sha1="b594844b25f470a7a07a2a4f43d2c2573dfb80aa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spazio" supported="no"> <!-- checksum matches header -->
+		<description>Avventure nello Spazio (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="AvventureNelloSpazio.bin" size="0x400000" crc="5b59714a" sha1="5d810e85b261e8bfe769bb7bace34b04a13aa48c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scuola4" supported="no"> <!-- checksum matches header -->
+		<description>La Scuola di Smart TV - 4 anni (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="lascuoladismarttv4.bin" size="0x400000" crc="d0a5eeb3" sha1="f25302ad4439f097fd2e8a5b92d09e5e5817fa48"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scuola5" supported="no"> <!-- checksum matches header -->
+		<description>La Scuola di Smart TV - 5+ anni (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="lascuoladismarttv5plus.bin" size="0x400000" crc="82e8dbe7" sha1="64801e36be5e1db5e5888ff84459196508b8ceee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mondo" supported="no"> <!-- checksum matches header -->
+		<description>Mondosauro (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="mondosauro.bin" size="0x400000" crc="46c310df" sha1="2a73c60a5b52954def57405c0751d88f1e5d389c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cuccioli" supported="no"> <!-- no checksum in header -->
+		<description>Cuccioli Labrador (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="cuccioli.bin" size="0x400000" crc="a95580eb" sha1="de4c01189e4c78a1a287bd49d322d4f762986601"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winxblm" supported="no"> <!-- no checksum in header -->
+		<description>Winx Club Bloom (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="winxbloom.bin" size="0x400000" crc="cad48e67" sha1="e2d8be2fcc5da63e471c3f4d85a01bf4f25fec5f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="imove" supported="no"> <!-- uses a camera --> <!-- checksum matches header -->
+		<description>i-move (Italy)</description>
+		<year>2008</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="smarttv_imove.bin" size="0x800000" crc="7267485e" sha1="5a9ae3b17dae325dee872ad594adb55b6251a900"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohit" supported="no"> <!-- checksum matches header -->
+		<description>Winnie the Pooh - Le Avventure di Winnie the Pooh (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="Winnie the Pooh - Le Avventure di Winnie the Pooh (Italy).bin" size="0x400000" crc="888d974a" sha1="ea98bb4860dc3de68ebc935286b5d9d84ab062c3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidmit" supported="no"> <!-- no checksum in header -->
+		<description>Spider-Man - Spider Sense (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="Spider-Man - Spider Sense (Italy).bin" size="0x400000" crc="b9405c08" sha1="25ae00a43c5b2284bf6e6cfa54f8decb8070ab80"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bosnumit" supported="no"> <!-- checksum matches header -->
+		<description>il Bosco dei Numeri (Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="il Bosco dei Numeri (Italy).bin" size="0x400000" crc="945fd0ea" sha1="1540d20c145412414dc5c882747d8af5da085f8b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stvevit" supported="no"> <!-- checksum matches header -->
+		<description>Smart TV Evolution (bundle cartridge, Italy)</description>
+		<year>200?</year>
+		<publisher>Clementoni</publisher>
+		<part name="cart" interface="smarttv_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="Smart TV Evolution - Bundle Cartridge (Italy).bin" size="0x400000" crc="6ae11784" sha1="f08e68c298921bb6245c4134bce01d60d0d58f58"/>
 			</dataarea>
 		</part>
 	</software>

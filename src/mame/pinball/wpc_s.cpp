@@ -68,27 +68,27 @@ public:
 		, m_out(*this, "out")
 	{ }
 
-	void wpc_s(machine_config &config) ATTR_COLD;
-
-	void init() ATTR_COLD;
-	void init_corv() ATTR_COLD;
-	void init_dh() ATTR_COLD;
-	void init_i500() ATTR_COLD;
-	void init_jb() ATTR_COLD;
-	void init_jm() ATTR_COLD;
-	void init_nf() ATTR_COLD;
-	void init_rs() ATTR_COLD;
-	void init_fs() ATTR_COLD;
-	void init_ts() ATTR_COLD;
-	void init_tom() ATTR_COLD;
-	void init_tom14() ATTR_COLD;
-	void init_wd() ATTR_COLD;
-	void init_wcs() ATTR_COLD;
-	void init_tfs() ATTR_COLD;
+	void corv(machine_config &config) ATTR_COLD;
+	void dh(machine_config &config) ATTR_COLD;
+	void i500(machine_config &config) ATTR_COLD;
+	void jb(machine_config &config) ATTR_COLD;
+	void jm(machine_config &config) ATTR_COLD;
+	void nf(machine_config &config) ATTR_COLD;
+	void rs(machine_config &config) ATTR_COLD;
+	void fs(machine_config &config) ATTR_COLD;
+	void ts(machine_config &config) ATTR_COLD;
+	void tom(machine_config &config) ATTR_COLD;
+	void tom14(machine_config &config) ATTR_COLD;
+	void wd(machine_config &config) ATTR_COLD;
+	void wcs(machine_config &config) ATTR_COLD;
+	void tfs(machine_config &config) ATTR_COLD;
 
 protected:
 	// driver_device overrides
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	void wpc_s(machine_config &config) ATTR_COLD;
 
 private:
 	void bank_w(uint8_t data);
@@ -117,30 +117,30 @@ private:
 	required_device<wpc_lamp_device> m_lamp;
 	required_device<wpc_out_device> m_out;
 
-	static const char *const lamps_corv[64];
+	static const char *const lamps_corv[8][8];
 	static const char *const outputs_corv[54];
-	static const char *const lamps_dh[64];
+	static const char *const lamps_dh[8][8];
 	static const char *const outputs_dh[54];
-	static const char *const lamps_i500[64];
+	static const char *const lamps_i500[8][8];
 	static const char *const outputs_i500[54];
-	static const char *const lamps_jb[64];
+	static const char *const lamps_jb[8][8];
 	static const char *const outputs_jb[54];
-	static const char *const lamps_jm[64];
+	static const char *const lamps_jm[8][8];
 	static const char *const outputs_jm[54];
-	static const char *const lamps_nf[64];
+	static const char *const lamps_nf[8][8];
 	static const char *const outputs_nf[54];
-	static const char *const lamps_rs[64];
+	static const char *const lamps_rs[8][8];
 	static const char *const outputs_rs[54];
-	static const char *const lamps_fs[64];
-	static const char *const outputs_fs[54];
-	static const char *const lamps_ts[64];
-	static const char *const outputs_ts[54];
-	static const char *const lamps_tom[64];
-	static const char *const outputs_tom[54];
-	static const char *const lamps_wd[64];
-	static const char *const outputs_wd[54];
-	static const char *const lamps_wcs[64];
-	static const char *const outputs_wcs[54];
+	//static const char *const lamps_fs[8][8];
+	//static const char *const outputs_fs[54];
+	//static const char *const lamps_ts[8][8];
+	//static const char *const outputs_ts[54];
+	//static const char *const lamps_tom[8][8];
+	//static const char *const outputs_tom[54];
+	//static const char *const lamps_wd[8][8];
+	//static const char *const outputs_wd[54];
+	//static const char *const lamps_wcs[8][8];
+	//static const char *const outputs_wcs[54];
 	uint8_t m_firq_src = 0U, m_zc = 0U;
 	uint16_t m_rtc_base_day = 0U;
 };
@@ -268,6 +268,15 @@ void wpc_s_state::irq_ack_w(uint8_t data)
 	m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
+void wpc_s_state::machine_start()
+{
+	m_rombank->configure_entries(0, 0x20, memregion("maincpu")->base(), 0x4000);
+	m_nvram->set_base(m_mainram, m_mainram.bytes());
+
+	save_item(NAME(m_firq_src));
+	save_item(NAME(m_zc));
+}
+
 void wpc_s_state::machine_reset()
 {
 	m_firq_src = 0x00;
@@ -299,147 +308,26 @@ void wpc_s_state::machine_reset()
 	m_rtc_base_day = systime.local_time.day;
 }
 
-void wpc_s_state::init()
-{
-	m_rombank->configure_entries(0, 0x20, memregion("maincpu")->base(), 0x4000);
-	m_nvram->set_base(m_mainram, m_mainram.bytes());
-
-	save_item(NAME(m_firq_src));
-	save_item(NAME(m_zc));
-}
-
-void wpc_s_state::init_corv()
-{
-	m_pic->set_serial("536 123456 12345 123");
-	m_lamp->set_names(lamps_corv);
-	m_out->set_names(outputs_corv);
-	init();
-}
-
-void wpc_s_state::init_dh()
-{
-	m_pic->set_serial("530 123456 12345 123");
-	m_lamp->set_names(lamps_dh);
-	m_out->set_names(outputs_dh);
-	init();
-}
-
-void wpc_s_state::init_i500()
-{
-	m_pic->set_serial("526 123456 12345 123");
-	m_lamp->set_names(lamps_i500);
-	m_out->set_names(outputs_i500);
-	init();
-}
-
-void wpc_s_state::init_jb()
-{
-	m_pic->set_serial("551 123456 12345 123");
-	m_lamp->set_names(lamps_jb);
-	m_out->set_names(outputs_jb);
-	init();
-}
-
-void wpc_s_state::init_jm()
-{
-	m_pic->set_serial("542 123456 12345 123");
-	m_lamp->set_names(lamps_jm);
-	m_out->set_names(outputs_jm);
-	init();
-}
-
-void wpc_s_state::init_nf()
-{
-	m_pic->set_serial("525 123456 12345 123");
-	m_lamp->set_names(lamps_nf);
-	m_out->set_names(outputs_nf);
-	init();
-}
-
-void wpc_s_state::init_rs()
-{
-	m_pic->set_serial("524 123456 12345 123");
-	m_lamp->set_names(lamps_rs);
-	m_out->set_names(outputs_rs);
-	init();
-}
-
-void wpc_s_state::init_fs()
-{
-	m_pic->set_serial("529 123456 12345 123");
-	m_lamp->set_names(lamps_fs);
-	m_out->set_names(outputs_fs);
-	init();
-}
-
-void wpc_s_state::init_ts()
-{
-	m_pic->set_serial("532 123456 12345 123");
-	m_lamp->set_names(lamps_ts);
-	m_out->set_names(outputs_ts);
-	init();
-}
-
-void wpc_s_state::init_tom()
-{
-	m_pic->set_serial("539 123456 12345 124");
-	m_lamp->set_names(lamps_tom);
-	m_out->set_names(outputs_tom);
-	init();
-}
-
-void wpc_s_state::init_tom14()
-{
-	m_pic->set_serial("124 123456 12345 123");
-	m_lamp->set_names(lamps_tom);
-	m_out->set_names(outputs_tom);
-	init();
-}
-
-void wpc_s_state::init_wd()
-{
-	m_pic->set_serial("544 123456 12345 123");
-	m_lamp->set_names(lamps_wd);
-	m_out->set_names(outputs_wd);
-	init();
-}
-
-void wpc_s_state::init_wcs()
-{
-	m_pic->set_serial("531 123456 12345 123");
-	m_lamp->set_names(lamps_wcs);
-	m_out->set_names(outputs_wcs);
-	init();
-}
-
-void wpc_s_state::init_tfs()
-{
-	m_pic->set_serial("648 123456 12345 123");
-	m_lamp->set_names(nullptr);
-	m_out->set_names(nullptr);
-	init();
-}
-
-const char *const wpc_s_state::lamps_corv[64] = {
-	"L rollover", "M rollover", "R rollover", "Skid pad arrow", "Sticky tires", "Skid pad jackpot", "Route 66 arrow", "Race today",
-	"Inner loop arrow", "Fuelie", "Nitrous", "In loop jackpot", "R O loop arrow", "ZO7 suspension", "Big brakes", "Super charger",
-	"L O loop arrow", "Lite lock", "Qualify", "Big block", "ZR1 ramp lock", "6 speed trans", "Hi lift cams", "ZR1 ramp arrow",
-	"Corvette 6", "Corvette 3", "Corvette 1", "Corvette 2", "Corvette 4", "L standup 3", "L standup 2", "L standup 1",
-	"Corvette 9", "Corvette 8", "Pit stop", "Corvette 7", "Corvette 5", "Pit stop arrow", "Spinner arrow", "Drive again",
-	"L outer tail", "L inner tail", "Catch me", "R inner tail", "R outer tail", "R standup arrow", "Lite kickback", "Start challenge",
-	"Kickback arrow", "L return lane", "R return lane", "R out lane", "Million standup", "Side pipe 1", "Side pipe 2", "Side pipe 3",
-	"R tree red", "L tree red", "Tree bot yellow", "Tree top yellow", "R tree green", "L tree green", "Buy in", "Start button"
+const char *const wpc_s_state::lamps_corv[][8] = {
+	{ "l:L rollover",       "l:M rollover",    "l:R rollover",      "l:Skid pad arrow",  "l:Sticky tires",    "l:Skid pad jackpot", "l:Route 66 arrow", "l:Race today"      },
+	{ "l:Inner loop arrow", "l:Fuelie",        "l:Nitrous",         "l:In loop jackpot", "l:R O loop arrow",  "l:ZO7 suspension",   "l:Big brakes",     "l:Super charger"   },
+	{ "l:L O loop arrow",   "l:Lite lock",     "l:Qualify",         "l:Big block",       "l:ZR1 ramp lock",   "l:6 speed trans",    "l:Hi lift cams",   "l:ZR1 ramp arrow"  },
+	{ "l:Corvette 6",       "l:Corvette 3",    "l:Corvette 1",      "l:Corvette 2",      "l:Corvette 4",      "l:L standup 3",      "l:L standup 2",    "l:L standup 1"     },
+	{ "l:Corvette 9",       "l:Corvette 8",    "l:Pit stop",        "l:Corvette 7",      "l:Corvette 5",      "l:Pit stop arrow",   "l:Spinner arrow",  "l:Drive again"     },
+	{ "l:L outer tail",     "l:L inner tail",  "l:Catch me",        "l:R inner tail",    "l:R outer tail",    "l:R standup arrow",  "l:Lite kickback",  "l:Start challenge" },
+	{ "l:Kickback arrow",   "l:L return lane", "l:R return lane",   "l:R out lane",      "l:Million standup", "l:Side pipe 1",      "l:Side pipe 2",    "l:Side pipe 3"     },
+	{ "l:R tree red",       "l:L tree red",    "l:Tree bot yellow", "l:Tree top yellow", "l:R tree green",    "l:L tree green",     "l:Buy in",         "l:Start button"    }
 };
 
-const char *const wpc_s_state::outputs_corv[54] = {
-	"s:Trough eject", "s:ZR1 low rev gate", "s:Kickback", "s:Pit stop popper", "s:ZR1 up rev gate", nullptr, "s:Knocker", "s:Route 66 kickout",
-	"s:L slingshot", "s:R slingshot", "s:Left jet", "s:Bottom jet", "s:Right jet", nullptr, "s:ZR1 lockup", "s:Loop gate",
-	"s:Race direction", "s:L race enable", "s:R race enable", "f:Tenth corvette", "f:Jets", "f:R ramps", "f:U L flipper", "f:Catch me",
-	"f:ZR1 ramp", "f:ZR1 underside", "f:R rear panel", "f:R standup", "s:R flip power", "s:R flip hold", "s:L flip power", "s:L flip hold",
-	"s:Diverter power", "s:Diverter hold", "s:UL flip power", "s:UL flip hold", nullptr, nullptr, nullptr, nullptr,
-	nullptr,
-	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-	"g:Upper left", "g:Upper right", "g:Lower left", "g:Lower right", "g:Back box title"
+const char *const wpc_s_state::outputs_corv[] = {
+	/*  1 */ "s:Trough eject",   "s:ZR1 low rev gate", "s:Kickback",      "s:Pit stop popper", "s:ZR1 up rev gate", "u:06", /* dummy */ "s:Knocker",        "s:Route 66 kickout",
+	/*  9 */ "s:L slingshot",    "s:R slingshot",      "s:Left jet",      "s:Bottom jet",      "s:Right jet",       "u:14", /* dummy */ "s:ZR1 lockup",     "s:Loop gate",
+	/* 17 */ "s:Race direction", "s:L race enable",    "s:R race enable", "f:Tenth corvette",  "f:Jets",            "f:R ramps",        "f:U L flipper",    "f:Catch me",
+	/* 25 */ "f:ZR1 ramp",       "f:ZR1 underside",    "f:R rear panel",  "f:R standup",       "s:R flip power",    "s:R flip hold",    "s:L flip power",   "s:L flip hold",
+	/* 33 */ "s:Diverter power", "s:Diverter hold",    "s:UL flip power", "s:UL flip hold",    "u:37", /* dummy */  "u:38", /* dummy */ "u:39", /* dummy */ "u:40", /* dummy */
+	/* 41 */ "u:41", /* dummy */
+	/* 42 */ "u:42", "u:43", "u:44", "u:45", "u:46", "u:47", "u:48", "u:49", /* dummy row */
+	/* 50 */ "g:Upper left", "g:Upper right", "g:Lower left", "g:Lower right", "g:Back box title"
 };
 
 static INPUT_PORTS_START( corv )
@@ -552,26 +440,26 @@ static INPUT_PORTS_START( corv )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-const char *const wpc_s_state::lamps_dh[64] = {
-	"Left rollover", "Middle rollover", "Right rollover", "Magnum jets", "Magnum bullets", "Lite extra ball", "Lite shootout", "Playfield promo",
-	"R ramp badge", "Sil 6 bullet", "R loop generic", "Magna force", "R ramp generic", "R ramp jackpot", "R loop HQ", "Warehouse badge",
-	"Barroom brawl", "Car chase", "Warehouse raid", "Letter bomb", "Meet the mob", "Stop scorpio", "Crime wave", "Bank rbr hry up",
-	"Safehouse badge", "L ramp badge", "Sil 3 bullet", "Super jackpot", "L ramp generic", "Ramp start mball", "Magazine award", "Contraband",
-	"Safehouse arrow", "Sil 4 bullet", "Sil 5 bullet", "L loop HQ", "Whse start mball", "Feel lucky", "Right shootout", "Lite ransom",
-	"L loop generic", "Ricochet", "Extra ball", "HQ badge", "Ransom", "Sil 1 bullet", "HQ", "Sil 2 bullet",
-	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, "Shhot again", "Sil 7 bullet",
-	"Sil 8 bullet", "Left shootout", "Lite magna force", "L/R jets", "Bottom jet", "Body armor", "Extra ball", "Start"
+const char *const wpc_s_state::lamps_dh[][8] = {
+	{ "l:Left rollover",   "l:Middle rollover", "l:Right rollover",   "l:Magnum jets",    "l:Magnum bullets",   "l:Lite extra ball",  "l:Lite shootout",  "l:Playfield promo" },
+	{ "l:R ramp badge",    "l:Sil 6 bullet",    "l:R loop generic",   "l:Magna force",    "l:R ramp generic",   "l:R ramp jackpot",   "l:R loop HQ",      "l:Warehouse badge" },
+	{ "l:Barroom brawl",   "l:Car chase",       "l:Warehouse raid",   "l:Letter bomb",    "l:Meet the mob",     "l:Stop scorpio",     "l:Crime wave",     "l:Bank rbr hry up" },
+	{ "l:Safehouse badge", "l:L ramp badge",    "l:Sil 3 bullet",     "l:Super jackpot",  "l:L ramp generic",   "l:Ramp start mball", "l:Magazine award", "l:Contraband"      },
+	{ "l:Safehouse arrow", "l:Sil 4 bullet",    "l:Sil 5 bullet",     "l:L loop HQ",      "l:Whse start mball", "l:Feel lucky",       "l:Right shootout", "l:Lite ransom"     },
+	{ "l:L loop generic",  "l:Ricochet",        "l:Extra ball",       "l:HQ badge",       "l:Ransom",           "l:Sil 1 bullet",     "l:HQ",             "l:Sil 2 bullet"    },
+	{ "l:60", /* dummy */  "l:61", /* dummy */  "l:62", /* dummy */   "l:63", /* dummy */ "l:64", /* dummy */   "l:65", /* dummy */   "l:Shhot again",    "l:Sil 7 bullet"    },
+	{ "l:Sil 8 bullet",    "l:Left shootout",   "l:Lite magna force", "l:L/R jets",       "l:Bottom jet",       "l:Body armor",       "l:Extra ball",     "l:Start"           }
 };
 
-const char *const wpc_s_state::outputs_dh[54] = {
-	"s:Ball release", "s:Autoplunger", "s:Gun launch", "s:Top R popper", "s:Gun popper", "s:Drop target down", "s:Knocker", "s:Trap door hi",
-	"s:Left sling", "s:Right sling", "s:Left jet", "s:Middle jet", "s:Right jet", "s:Left popper", "s:Right diverter", "s:Trap door hold",
-	"f:Headquarters", "f:Top L popper", "f:Warehouse", "s:Gun motor", "f:Gun loaded", "f:Right ramp", "f:Right back", "f:Left back",
-	"s:Drop reset", "s:Top L popper", "s:Left diverter", "s:Right loop gate", "s:R flip power", "s:R flip hold", "s:L flip power", "s:L flip hold",
-	"s:UR flip power", "s:UR flip hold", "s:R loop magnet", "s:Left loop gate", nullptr, nullptr, nullptr, nullptr,
-	"s:Coin meter",
-	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-	"g:Right string", "g:Left string", "g:Backbox title", "g:Backbox face", "g:Bottom string"
+const char *const wpc_s_state::outputs_dh[] = {
+	/*  1 */ "s:Ball release",  "s:Autoplunger",  "s:Gun launch",    "s:Top R popper",    "s:Gun popper",      "s:Drop target down", "s:Knocker",        "s:Trap door hi",
+	/*  9 */ "s:Left sling",    "s:Right sling",  "s:Left jet",      "s:Middle jet",      "s:Right jet",       "s:Left popper",      "s:Right diverter", "s:Trap door hold",
+	/* 17 */ "f:Headquarters",  "f:Top L popper", "f:Warehouse",     "s:Gun motor",       "f:Gun loaded",      "f:Right ramp",       "f:Right back",     "f:Left back",
+	/* 25 */ "s:Drop reset",    "s:Top L popper", "s:Left diverter", "s:Right loop gate", "s:R flip power",    "s:R flip hold",      "s:L flip power",   "s:L flip hold",
+	/* 33 */ "s:UR flip power", "s:UR flip hold", "s:R loop magnet", "s:Left loop gate",  "u:37", /* dummy */  "u:38", /* dummy */   "u:39", /* dummy */ "u:40", /* dummy */
+	/* 41 */ "s:Coin meter",
+	/* 42 */ "u:42", "u:43", "u:44", "u:45", "u:46", "u:47", "u:48", "u:49", /* dummy row */
+	/* 50 */ "g:Right string", "g:Left string", "g:Backbox title", "g:Backbox face", "g:Bottom string"
 };
 
 static INPUT_PORTS_START( dh )
@@ -684,26 +572,26 @@ static INPUT_PORTS_START( dh )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-const char *const wpc_s_state::lamps_i500[64] = {
-	"Left lane", "Center lane", "Right lane", "Upper eject top", "Jet wrench", "Extra ball", "Victory lap", "Turbo wrench",
-	"Turbo lock 1", "Turbo lock 2", "Turbo lock 3", "Light lock lamp", "Light speedway", "\"Pass\"", "Left ramp wrench", "Lft ramp standup",
-	"Hit the \"wall\"", "Hit \"the\" wall", "\"Hit\" the wall", "Lft ramp jackpot", "Increase boost", "Souvenir lamp", "Left flip lane", "Left outlane",
-	"Super jets", "Turbo boost", "Checkered flag", "Go for the pole", "Quick pit", "3X playfield", "UR flip wrench", "Right flip lane",
-	"Dueling drivers", "Super lightups", "Caution flag", "Extra ball flag", "Wrong turn", "Gasoline alley", "Right outlane", "Shoot again",
-	"Change setup", "Award speedway", "Hit the wall", "Rt ramp jackpot", "Pit stop", "Fast laps", nullptr, nullptr,
-	"Stnd1 lower RT", "Stnd1 upper RT", "Stnd1 upper left", "Stnd1 lower left", "Stnd2 lower RT", "Stnd2 upper RT", "Stnd2 upper left", "Stnd2 lower left",
-	"Stnd3 lower RT", "Stnd3 upper RT", "Stnd3 upper left", "Stnd3 lower left", nullptr, "Launch button", "Buy-in button", "Start button"
+const char *const wpc_s_state::lamps_i500[][8] = {
+	{ "l:Left lane",        "l:Center lane",      "l:Right lane",       "l:Upper eject top",  "l:Jet wrench",     "l:Extra ball",     "l:Victory lap",      "l:Turbo wrench"     },
+	{ "l:Turbo lock 1",     "l:Turbo lock 2",     "l:Turbo lock 3",     "l:Light lock lamp",  "l:Light speedway", "l:\"Pass\"",       "l:Left ramp wrench", "l:Lft ramp standup" },
+	{ "l:Hit the \"wall\"", "l:Hit \"the\" wall", "l:\"Hit\" the wall", "l:Lft ramp jackpot", "l:Increase boost", "l:Souvenir lamp",  "l:Left flip lane",   "l:Left outlane"     },
+	{ "l:Super jets",       "l:Turbo boost",      "l:Checkered flag",   "l:Go for the pole",  "l:Quick pit",      "l:3X playfield",   "l:UR flip wrench",   "l:Right flip lane"  },
+	{ "l:Dueling drivers",  "l:Super lightups",   "l:Caution flag",     "l:Extra ball flag",  "l:Wrong turn",     "l:Gasoline alley", "l:Right outlane",    "l:Shoot again"      },
+	{ "l:Change setup",     "l:Award speedway",   "l:Hit the wall",     "l:Rt ramp jackpot",  "l:Pit stop",       "l:Fast laps",      "l:56", /* dummy */   "l:57" /* dummy */   },
+	{ "l:Stnd1 lower RT",   "l:Stnd1 upper RT",   "l:Stnd1 upper left", "l:Stnd1 lower left", "l:Stnd2 lower RT", "l:Stnd2 upper RT", "l:Stnd2 upper left", "l:Stnd2 lower left" },
+	{ "l:Stnd3 lower RT",   "l:Stnd3 upper RT",   "l:Stnd3 upper left", "l:Stnd3 lower left", "l:74", /* dummy */ "l:Launch button",  "l:Buy-in button",    "l:Start button"     }
 };
 
-const char *const wpc_s_state::outputs_i500[54] = {
-	"s:Auto plunger", "s:Upper popper", "s:Upper eject", "s:Lower eject", "s:Turbo popper", nullptr, "s:Knocker", "s:Left jet",
-	"s:Right jet", "s:Center jet", "s:Left sling", "s:Right sling", "s:Trough", nullptr, "f:Upper popper fls", "f:Top left corner",
-	"f:Top right corner", "s:Race track motor", "f:Orange car", "f:Yellow car", "f:Blue car", "f:Green car", "f:Lft jet flasher", "f:Rt jet flasher",
-	"f:Cntr jet flasher", "f:Right side", "f:Left side (2)", "f:Rt ramp enter", "s:R flip power", "s:R flip hold", "s:L flip power", "s:L flip hold",
-	"s:UR flip power", "s:UR flip hold", "s:Diverter power", "s:Diverter hold", nullptr, nullptr, nullptr, nullptr,
-	"s:Coin meter",
-	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-	"g:Upper lft plyfld", "g:Upper rt plyfld", "g:Lower playfield", "g:Backbox", "g:Title-coindoor"
+const char *const wpc_s_state::outputs_i500[] = {
+	/*  1 */ "s:Auto plunger",     "s:Upper popper",     "s:Upper eject",    "s:Lower eject",   "s:Turbo popper",    "u:06", /* dummy */ "s:Knocker",          "s:Left jet",
+	/*  9 */ "s:Right jet",        "s:Center jet",       "s:Left sling",     "s:Right sling",   "s:Trough",          "u:14", /* dummy */ "f:Upper popper fls", "f:Top left corner",
+	/* 17 */ "f:Top right corner", "s:Race track motor", "f:Orange car",     "f:Yellow car",    "f:Blue car",        "f:Green car",      "f:Lft jet flasher",  "f:Rt jet flasher",
+	/* 25 */ "f:Cntr jet flasher", "f:Right side",       "f:Left side (2)",  "f:Rt ramp enter", "s:R flip power",    "s:R flip hold",    "s:L flip power",     "s:L flip hold",
+	/* 33 */ "s:UR flip power",    "s:UR flip hold",     "s:Diverter power", "s:Diverter hold", "u:37", /* dummy */  "u:38", /* dummy */ "u:39", /* dummy */   "u:40", /* dummy */
+	/* 41 */ "s:Coin meter",
+	/* 42 */ "u:42", "u:43", "u:44", "u:45", "u:46", "u:47", "u:48", "u:49", /* dummy row */
+	/* 50 */ "g:Upper lft plyfld", "g:Upper rt plyfld", "g:Lower playfield", "g:Backbox", "g:Title-coindoor"
 };
 
 static INPUT_PORTS_START( i500 )
@@ -809,26 +697,26 @@ static INPUT_PORTS_START( i500 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-const char *const wpc_s_state::lamps_jb[64] = {
-	"Yellow arrow", "Yellow 1 (hi)", "Yellow 2", "Yellow 3", "Yellow 4", "Yellow 5 (low)", "Left outlane", "L flipper lane",
-	"Blue arrow", "Blue 1 (hi)", "Blue 2", "Blue 3", "Blue 4", "Blue 5 (low)", "Bonus 2X", "Bonus 4X",
-	"Amber arrow", "Amber 1 (hi)", "Amber 2", "Amber 3", "Amber 4", "Amber 5 (low)", "Shoot again", "Bonus 5X",
-	"Green arrow", "Green 1 (hi)", "Green 2", "Green 3", "Green 4", "Green 5 (low)", "Bonus 3X", "Jack*Bot target",
-	"Red arrow", "Red 1 (hi)", "Red 2", "Red 3", "Red 4", "Red 5 (low)", "R flipper lane", "Right outlane",
-	"Card 1 (L)", "Card 2", "Card 3", "Card 4", "Card 5 (R)", "Casino run", "Hit me", "Low drop target",
-	"Cashier mini-PF", "Meg ramp mini-PF", "Lite extra ball", "Jack*Bot mini-PF", "Game saucer", "Mega ramp", "High drop target", "Cent drop target",
-	"Pinbot poker", "Slot machine", "Roll the dice", "Keno", "Cashier", "Jack*Bot (ramp)", "Buy in button", "Start button"
+const char *const wpc_s_state::lamps_jb[][8] = {
+	{ "l:Yellow arrow",    "l:Yellow 1 (hi)",    "l:Yellow 2",        "l:Yellow 3",         "l:Yellow 4",    "l:Yellow 5 (low)",  "l:Left outlane",     "l:L flipper lane"   },
+	{ "l:Blue arrow",      "l:Blue 1 (hi)",      "l:Blue 2",          "l:Blue 3",           "l:Blue 4",      "l:Blue 5 (low)",    "l:Bonus 2X",         "l:Bonus 4X"         },
+	{ "l:Amber arrow",     "l:Amber 1 (hi)",     "l:Amber 2",         "l:Amber 3",          "l:Amber 4",     "l:Amber 5 (low)",   "l:Shoot again",      "l:Bonus 5X"         },
+	{ "l:Green arrow",     "l:Green 1 (hi)",     "l:Green 2",         "l:Green 3",          "l:Green 4",     "l:Green 5 (low)",   "l:Bonus 3X",         "l:Jack*Bot target"  },
+	{ "l:Red arrow",       "l:Red 1 (hi)",       "l:Red 2",           "l:Red 3",            "l:Red 4",       "l:Red 5 (low)",     "l:R flipper lane",   "l:Right outlane"    },
+	{ "l:Card 1 (L)",      "l:Card 2",           "l:Card 3",          "l:Card 4",           "l:Card 5 (R)",  "l:Casino run",      "l:Hit me",           "l:Low drop target"  },
+	{ "l:Cashier mini-PF", "l:Meg ramp mini-PF", "l:Lite extra ball", "l:Jack*Bot mini-PF", "l:Game saucer", "l:Mega ramp",       "l:High drop target", "l:Cent drop target" },
+	{ "l:Pinbot poker",    "l:Slot machine",     "l:Roll the dice",   "l:Keno",             "l:Cashier",     "l:Jack*Bot (ramp)", "l:Buy in button",    "l:Start button"     }
 };
 
-const char *const wpc_s_state::outputs_jb[54] = {
-	"s:Ball release", nullptr, "s:Game saucer", "s:Drop targets", "s:Right eject hole", "s:Raise ramp", "s:Knocker", "s:Left eject hole",
-	"s:Left slingshot", "s:Right slingshot", "s:Lower jet bumper", "s:Left jet bumber", "s:Upper jet bumper", "s:Drop ramp", "f:Right visor", "f:Left visor",
-	"f:Center visor", "f:Pinbot face", "f:Jet bumpers", "f:Lower left", "f:Mid left", "f:Lower right", "f:Back panel 1 (L)", "f:Back panel 2",
-	"f:Back panel 3", "f:Back panel 4", "f:Back panel 5 (R)", nullptr, "s:R flip power", "s:R flip hold", "s:L flip power", "s:L flip hold",
-	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-	"s:Coin meter",
-	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-	"g:Playfield lower", "g:Playfield left", "g:Playfield upper", "g:Playfield right", "g:Insert"
+const char *const wpc_s_state::outputs_jb[] = {
+	/*  1 */ "s:Ball release",   "u:02", /* dummy */  "s:Game saucer",      "s:Drop targets",    "s:Right eject hole", "s:Raise ramp",     "s:Knocker",          "s:Left eject hole",
+	/*  9 */ "s:Left slingshot", "s:Right slingshot", "s:Lower jet bumper", "s:Left jet bumper", "s:Upper jet bumper", "s:Drop ramp",      "f:Right visor",      "f:Left visor",
+	/* 17 */ "f:Center visor",   "f:Pinbot face",     "f:Jet bumpers",      "f:Lower left",      "f:Mid left",         "f:Lower right",    "f:Back panel 1 (L)", "f:Back panel 2",
+	/* 25 */ "f:Back panel 3",   "f:Back panel 4",    "f:Back panel 5 (R)", "u:28", /* dummy */  "s:R flip power",     "s:R flip hold",    "s:L flip power",     "s:L flip hold",
+	/* 33 */ "u:33", /* dummy */ "u:34", /* dummy */  "u:35", /* dummy */   "u:36", /* dummy */  "u:37", /* dummy */   "u:38", /* dummy */ "u:39", /* dummy */   "u:40", /* dummy */
+	/* 41 */ "s:Coin meter",
+	/* 42 */ "u:42", "u:43", "u:44", "u:45", "u:46", "u:47", "u:48", "u:49", /* dummy row */
+	/* 50 */ "g:Playfield lower", "g:Playfield left", "g:Playfield upper", "g:Playfield right", "g:Insert"
 };
 
 static INPUT_PORTS_START( jb )
@@ -927,26 +815,26 @@ static INPUT_PORTS_START( jb )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-const char *const wpc_s_state::lamps_jm[64] = {
-	"Mode ready", "Download", "Access code 2", "Access code 1", "Upload", "Left jet lane", "Middle jet lane", "Right jet lane",
-	"Power down", "NAS cure", "R ramp block 4", "Sector 6", "R ramp block 2", "Hold bonus", "R standup R blk", "R standup L blk",
-	"L ramp block 4", "Extra ball", "Sector 2", "L ramp block 2", "L ramp block 1", "Sector 1", nullptr, "Shoot again",
-	"L loop top arrow", "L standup arrow", "R ramp block 1", "Lite spinner", "Big points", "Gigabytes", "Lite extra ball", "Quick multiball",
-	"Cyber matrix 13", "Cyber matrix 23", "Cyber matrix 33", "Right outlane", "Bonus held", "Bonus 4x", "Bonus 3x", "Bonus 2x",
-	"Cyber matrix 12", "Cyber matrix 22", "Cyber matrix 32", "Right flip lane", "Sector 5", "Spinner millions", "Cyber lock 2", "Inner loop top",
-	"Cyber matrix 11", "Cyber matrix 21", "Cyber matrix 31", "Popper top arrow", "Sector 3", "Crazy Bob's", "Mode start", "Cyber lock 1",
-	"R loop top arrow", "Cyber lock 3", "Sector 7", "Left outlane", "Left flip lane", "Ball launch", "Buy-in button", "Start button"
+const char *const wpc_s_state::lamps_jm[][8] = {
+	{ "l:Mode ready",       "l:Download",        "l:Access code 2",   "l:Access code 1",    "l:Upload",         "l:Left jet lane",    "l:Middle jet lane", "l:Right jet lane"  },
+	{ "l:Power down",       "l:NAS cure",        "l:R ramp block 4",  "l:Sector 6",         "l:R ramp block 2", "l:Hold bonus",       "l:R standup R blk", "l:R standup L blk" },
+	{ "l:L ramp block 4",   "l:Extra ball",      "l:Sector 2",        "l:L ramp block 2",   "l:L ramp block 1", "l:Sector 1",         "l:26", /* dummy */  "l:Shoot again"     },
+	{ "l:L loop top arrow", "l:L standup arrow", "l:R ramp block 1",  "l:Lite spinner",     "l:Big points",     "l:Gigabytes",        "l:Lite extra ball", "l:Quick multiball" },
+	{ "l:Cyber matrix 13",  "l:Cyber matrix 23", "l:Cyber matrix 33", "l:Right outlane",    "l:Bonus held",     "l:Bonus 4x",         "l:Bonus 3x",        "l:Bonus 2x"        },
+	{ "l:Cyber matrix 12",  "l:Cyber matrix 22", "l:Cyber matrix 32", "l:Right flip lane",  "l:Sector 5",       "l:Spinner millions", "l:Cyber lock 2",    "l:Inner loop top"  },
+	{ "l:Cyber matrix 11",  "l:Cyber matrix 21", "l:Cyber matrix 31", "l:Popper top arrow", "l:Sector 3",       "l:Crazy Bob's",      "l:Mode start",      "l:Cyber lock 1"    },
+	{ "l:R loop top arrow", "l:Cyber lock 3",    "l:Sector 7",        "l:Left outlane",     "l:Left flip lane", "l:Ball launch",      "l:Buy-in button",   "l:Start button"    }
 };
 
-const char *const wpc_s_state::outputs_jm[54] = {
-	"s:Trough eject", "s:Autoplunger", "s:Popper", nullptr, "s:Clear matrix", "s:Hand magnet", "s:Knocker", nullptr,
-	"s:Left sling", "s:Right sling", "s:Left jet", "s:Bottom jet", "s:Right jet", "s:Crazy Bob's", "s:Drop target up", "s:Drop target down",
-	"f:Jets", "f:Crazy Bob's", "f:Left sling", "f:Right sling", "s:X mot direction", "s:X motor enable", "s:Y mot direction", "s:Y motor enable",
-	"f:Left ramp", "f:Right ramp", "f:Hand popper", "f:R backpanel", "s:R flip power", "s:R flip hold", "s:L flip power", "s:L flip hold",
-	"s:L diverter power", "s:L diverter hold", "s:R diverter power", "s:R diverter hold", nullptr, nullptr, nullptr, nullptr,
-	"s:Coin meter",
-	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-	"g:String 1", "g:String 2", "g:String 3", "g:String 4", "g:String 5"
+const char *const wpc_s_state::outputs_jm[] = {
+	/*  1 */ "s:Trough eject",     "s:Autoplunger",     "s:Popper",           "u:04", /* dummy */  "s:Clear matrix",    "s:Hand magnet",    "s:Knocker",         "u:08", /* dummy */
+	/*  9 */ "s:Left sling",       "s:Right sling",     "s:Left jet",         "s:Bottom jet",      "s:Right jet",       "s:Crazy Bob's",    "s:Drop target up",  "s:Drop target down",
+	/* 17 */ "f:Jets",             "f:Crazy Bob's",     "f:Left sling",       "f:Right sling",     "s:X mot direction", "s:X motor enable", "s:Y mot direction", "s:Y motor enable",
+	/* 25 */ "f:Left ramp",        "f:Right ramp",      "f:Hand popper",      "f:R backpanel",     "s:R flip power",    "s:R flip hold",    "s:L flip power",    "s:L flip hold",
+	/* 33 */ "s:L diverter power", "s:L diverter hold", "s:R diverter power", "s:R diverter hold", "u:37", /* dummy */  "u:38", /* dummy */ "u:39", /* dummy */  "u:40", /* dummy */
+	/* 41 */ "s:Coin meter",
+	/* 42 */ "u:42", "u:43", "u:44", "u:45", "u:46", "u:47", "u:48", "u:49", /* dummy row */
+	/* 50 */ "g:String 1", "g:String 2", "g:String 3", "g:String 4", "g:String 5"
 };
 
 static INPUT_PORTS_START( jm )
@@ -1052,26 +940,26 @@ static INPUT_PORTS_START( jm )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-const char *const wpc_s_state::lamps_nf[64] = {
-	"15 million", "10 million", "5 million", "L over the edge", "Dirt", "Alphalt", "No limits", "Water",
-	"No fear", "20 million", "Light extra ball", "R over the edge", "Air", "Snow", "Fear fest", "Meet your maker",
-	"Skull", "R track", "Center jackpot", "Extra ball", "Start challenge", "Center lock", "R autofire (2)", "L hurry up",
-	"L track", "1st", "2nd", "3rd", "Skydive", "Drop jackpot", "Drop lock", "L autofire (2)",
-	"Raceway", "L ramp \"turn\"", "Super spin", "L ramp \"start\"", "L ramp \"win!\"", "Hill climb", "Screamer", nullptr,
-	"Tube", "Video mode", "R ramp \"win!\"", "R ramp \"turn\"", "R ramp \"start\"", "L flipper lane", "L outlane", "Kickback",
-	"Light kb top", "Light kb bottom", "R flipper lane", "R outlane", "Hairpin", "Downhill", "Summit", "R hurry up",
-	"Shoot again", "L skull eye", "Jump now", "Super jackpot", "R skull eye", "Ball launch", "Buy-in button", "Start button"
+const char *const wpc_s_state::lamps_nf[][8] = {
+	{ "l:15 million",   "l:10 million",      "l:5 million",        "l:L over the edge",  "l:Dirt",             "l:Alphalt",        "l:No limits",      "l:Water"           },
+	{ "l:No fear",      "l:20 million",      "l:Light extra ball", "l:R over the edge",  "l:Air",              "l:Snow",           "l:Fear fest",      "l:Meet your maker" },
+	{ "l:Skull",        "l:R track",         "l:Center jackpot",   "l:Extra ball",       "l:Start challenge",  "l:Center lock",    "l:R autofire (2)", "l:L hurry up"      },
+	{ "l:L track",      "l:1st",             "l:2nd",              "l:3rd",              "l:Skydive",          "l:Drop jackpot",   "l:Drop lock",      "l:L autofire (2)"  },
+	{ "l:Raceway",      "l:L ramp \"turn\"", "l:Super spin",       "l:L ramp \"start\"", "l:L ramp \"win!\"",  "l:Hill climb",     "l:Screamer",       "l:47" /* dummy */  },
+	{ "l:Tube",         "l:Video mode",      "l:R ramp \"win!\"",  "l:R ramp \"turn\"",  "l:R ramp \"start\"", "l:L flipper lane", "l:L outlane",      "l:Kickback"        },
+	{ "l:Light kb top", "l:Light kb bottom", "l:R flipper lane",   "l:R outlane",        "l:Hairpin",          "l:Downhill",       "l:Summit",         "l:R hurry up"      },
+	{ "l:Shoot again",  "l:L skull eye",     "l:Jump now",         "l:Super jackpot",    "l:R skull eye",      "l:Ball launch",    "l:Buy-in button",  "l:Start button"    }
 };
 
-const char *const wpc_s_state::outputs_nf[54] = {
-	"s:Right popper", "s:Auto plunger", "s:Right magnet", "s:Kickback", "s:Center magnet", "s:Left magnet", "s:Knocker", "s:Drop target down",
-	nullptr, "s:Right slingshot", "s:Left slingshot", "s:Drop target up", nullptr, "s:Trough", "s:Eject", "s:Skull mouth",
-	"f:Fls(2) flip rtrn", "f:Fls spinner", "f:Fls no fear", "f:Fls(3) rt ramp", "f:Fls(2) skull", "f:Fls bkbox expl", "f:Fls(3) left ramp", "f:Fls top left",
-	"f:Fls(2) auto-fire", "f:Fls bkbox L top", "f:Fls bkbox R top", "f:Fls rt popper", "s:R flip power", "s:R flip hold", "s:L flip power", "s:L flip hold",
-	"s:UR flip power", "s:UR flip hold", nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-	"s:Coin meter",
-	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-	"g:Playfield top", "g:Playfield right", "g:Playfield left", "g:Insert title", "g:Insert bkground"
+const char *const wpc_s_state::outputs_nf[] = {
+	/*  1 */ "s:Right popper",     "s:Auto plunger",    "s:Right magnet",    "s:Kickback",       "s:Center magnet",   "s:Left magnet",    "s:Knocker",          "s:Drop target down",
+	/*  9 */ "u:09", /* dummy */   "s:Right slingshot", "s:Left slingshot",  "s:Drop target up", "u:13", /* dummy */  "s:Trough",         "s:Eject",            "s:Skull mouth",
+	/* 17 */ "f:Fls(2) flip rtrn", "f:Fls spinner",     "f:Fls no fear",     "f:Fls(3) rt ramp", "f:Fls(2) skull",    "f:Fls bkbox expl", "f:Fls(3) left ramp", "f:Fls top left",
+	/* 25 */ "f:Fls(2) auto-fire", "f:Fls bkbox L top", "f:Fls bkbox R top", "f:Fls rt popper",  "s:R flip power",    "s:R flip hold",    "s:L flip power",     "s:L flip hold",
+	/* 33 */ "s:UR flip power",    "s:UR flip hold",    "u:35", /* dummy */  "u:36", /* dummy */ "u:35", /* dummy */  "u:36", /* dummy */ "u:39", /* dummy */   "u:40", /* dummy */
+	/* 41 */ "s:Coin meter",
+	/* 42 */ "u:42", "u:43", "u:44", "u:45", "u:46", "u:47", "u:48", "u:49", /* dummy row */
+	/* 50 */ "g:Playfield top", "g:Playfield right", "g:Playfield left", "g:Insert title", "g:Insert bkground"
 };
 
 static INPUT_PORTS_START( nf )
@@ -1170,26 +1058,26 @@ static INPUT_PORTS_START( nf )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-const char *const wpc_s_state::lamps_rs[64] = {
-	"Salt lake", "Denver", "Butte", "Minnesota", "Kansas city", "New york city", "Ohio", "Chicago",
-	"Los angeles", "Las vegas", "Albuquerque", "Dallas", "New orleans", "Nashville", "Atlanta", "Miami",
-	"San francisco", "Seatle", "Left special", "\"Sh here\" L loop", "Shoot again", "Right special", "Blasting zone", "\"Sh here\" R ramp",
-	"Bad weather", "Jets at max", "Radio (2)", "M plus wheel", "Big millions", "Lite special", "Lite big blast", "Flying rocks",
-	"Monday", "Spinner at max", "Hold bonus", "Lite EB wheel", "Lunch time!", "Bob's freebie", "\"Sh here\" L ramp", "You're there",
-	"Wednesday", "Tuesday", "Thursday", "Friday", "Lock", "Extra ball", "\"Sh here\" R loop", "Lite Bob's",
-	"Bonus 6x", "Bonus 5x", "Bonus 4x", "Bonus 3x", "Bonus 2x", "Lite EB lower", "Start city", "M plus R ramp",
-	"F rocks 5x blast", "F rocks rad riot", "F rocks ex ball", "Left bridge out", "Bob's bunker", "Right bridge out", "Buy in button", "Start button"
+const char *const wpc_s_state::lamps_rs[][8] = {
+	{ "l:Salt lake",        "l:Denver",           "l:Butte",           "l:Minnesota",          "l:Kansas city",  "l:New york city",    "l:Ohio",               "l:Chicago"            },
+	{ "l:Los angeles",      "l:Las vegas",        "l:Albuquerque",     "l:Dallas",             "l:New orleans",  "l:Nashville",        "l:Atlanta",            "l:Miami"              },
+	{ "l:San francisco",    "l:Seatle",           "l:Left special",    "l:\"Sh here\" L loop", "l:Shoot again",  "l:Right special",    "l:Blasting zone",      "l:\"Sh here\" R ramp" },
+	{ "l:Bad weather",      "l:Jets at max",      "l:Radio (2)",       "l:M plus wheel",       "l:Big millions", "l:Lite special",     "l:Lite big blast",     "l:Flying rocks"       },
+	{ "l:Monday",           "l:Spinner at max",   "l:Hold bonus",      "l:Lite EB wheel",      "l:Lunch time!",  "l:Bob's freebie",    "l:\"Sh here\" L ramp", "l:You're there"       },
+	{ "l:Wednesday",        "l:Tuesday",          "l:Thursday",        "l:Friday",             "l:Lock",         "l:Extra ball",       "l:\"Sh here\" R loop", "l:Lite Bob's"         },
+	{ "l:Bonus 6x",         "l:Bonus 5x",         "l:Bonus 4x",        "l:Bonus 3x",           "l:Bonus 2x",     "l:Lite EB lower",    "l:Start city",         "l:M plus R ramp"      },
+	{ "l:F rocks 5x blast", "l:F rocks rad riot", "l:F rocks ex ball", "l:Left bridge out",    "l:Bob's bunker", "l:Right bridge out", "l:Buy in button",      "l:Start button"       }
 };
 
-const char *const wpc_s_state::outputs_rs[54] = {
-	"s:Trough", "s:L left diverter", "s:Lock-up pin", "s:U left diverter", "s:U right diverter", "s:Start city", "s:Knocker", "s:Lock kickout",
-	"s:\"Ted\" eyes left", "s:\"Ted\" lids down", "s:\"Ted\" lids up", "s:\"Ted\" eyes right", "s:\"Red\" lids down", "s:\"Red\" eyes left", "s:\"Red\" lids up", "s:\"Red\" eyes right",
-	"s:", "s:", "s:", "s:", "s:Left sling", "s:Right sling", "s:Bulldozer motor", "s:\"Red\" eject",
-	"s:Top jet", "s:Left jet", "s:Right jet", "s:Shaker motor", "s:", "s:", "s:", "s:",
-	"s:", "s:", "s:", "s:", "f:Little flipper", "f:Left ramp", "f:Back white", "f:Back yellow",
-	"s:Coin meter",
-	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-	"g:Playfld/insert 1", "g:Playfld/insert 2", "g:Playfld/insert 3", "g:Right playfield", "g:Left playfield"
+const char *const wpc_s_state::outputs_rs[] = {
+	/*  1 */ "s:Trough",             "s:L left diverter",   "s:Lock-up pin",     "s:U left diverter",    "s:U right diverter",  "s:Start city",        "s:Knocker",         "s:Lock kickout",
+	/*  9 */ "s:\"Ted\" eyes left",  "s:\"Ted\" lids down", "s:\"Ted\" lids up", "s:\"Ted\" eyes right", "s:\"Red\" lids down", "s:\"Red\" eyes left", "s:\"Red\" lids up", "s:\"Red\" eyes right",
+	/* 17 */ "u:17", /* dummy */     "u:18", /* dummy */    "u:19", /* dummy */  "u:20", /* dummy */     "s:Left sling",        "s:Right sling",       "s:Bulldozer motor", "s:\"Red\" eject",
+	/* 25 */ "s:Top jet",            "s:Left jet",          "s:Right jet",       "s:Shaker motor",       "u:29", /* dummy */    "u:30", /* dummy */    "u:31", /* dummy */  "u:32", /* dummy */
+	/* 33 */ "u:33", /* dummy */     "u:34", /* dummy */    "u:35", /* dummy */  "u:36", /* dummy */     "f:Little flipper",    "f:Left ramp",        "f:Back white",       "f:Back yellow",
+	/* 41 */ "s:Coin meter",
+	/* 42 */ "u:42", "u:43", "u:44", "u:45", "u:46", "u:47", "u:48", "u:49", /* dummy row */
+	/* 50 */ "g:Playfld/insert 1", "g:Playfld/insert 2", "g:Playfld/insert 3", "g:Right playfield", "g:Left playfield"
 };
 
 static INPUT_PORTS_START( rs )
@@ -1302,18 +1190,19 @@ static INPUT_PORTS_START( rs )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-const char *const wpc_s_state::lamps_fs[64] = {
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", ""
+#if 0
+const char *const wpc_s_state::lamps_fs[][8] = {
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" }
 };
 
-const char *const wpc_s_state::outputs_fs[54] = {
+const char *const wpc_s_state::outputs_fs[] = {
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
@@ -1323,6 +1212,7 @@ const char *const wpc_s_state::outputs_fs[54] = {
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 	"g:", "g:", "g:", "g:", "g:"
 };
+#endif
 
 static INPUT_PORTS_START( fs )
 	PORT_START("X0")
@@ -1427,18 +1317,19 @@ static INPUT_PORTS_START( fs )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-const char *const wpc_s_state::lamps_ts[64] = {
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", ""
+#if 0
+const char *const wpc_s_state::lamps_ts[][8] = {
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" }
 };
 
-const char *const wpc_s_state::outputs_ts[54] = {
+const char *const wpc_s_state::outputs_ts[] = {
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
@@ -1448,6 +1339,7 @@ const char *const wpc_s_state::outputs_ts[54] = {
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 	"g:", "g:", "g:", "g:", "g:"
 };
+#endif
 
 static INPUT_PORTS_START( ts )
 	PORT_START("X0")
@@ -1559,18 +1451,19 @@ static INPUT_PORTS_START( ts )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-const char *const wpc_s_state::lamps_tom[64] = {
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", ""
+#if 0
+const char *const wpc_s_state::lamps_tom[][8] = {
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" }
 };
 
-const char *const wpc_s_state::outputs_tom[54] = {
+const char *const wpc_s_state::outputs_tom[] = {
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
@@ -1580,6 +1473,7 @@ const char *const wpc_s_state::outputs_tom[54] = {
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 	"g:", "g:", "g:", "g:", "g:"
 };
+#endif
 
 static INPUT_PORTS_START( tom )
 	PORT_START("X0")
@@ -1691,18 +1585,19 @@ static INPUT_PORTS_START( tom )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-const char *const wpc_s_state::lamps_wd[64] = {
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", ""
+#if 0
+const char *const wpc_s_state::lamps_wd[][8] = {
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" }
 };
 
-const char *const wpc_s_state::outputs_wd[54] = {
+const char *const wpc_s_state::outputs_wd[] = {
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
@@ -1712,6 +1607,7 @@ const char *const wpc_s_state::outputs_wd[54] = {
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 	"g:", "g:", "g:", "g:", "g:"
 };
+#endif
 
 static INPUT_PORTS_START( wd )
 	PORT_START("X0")
@@ -1816,18 +1712,19 @@ static INPUT_PORTS_START( wd )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-const char *const wpc_s_state::lamps_wcs[64] = {
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", ""
+#if 0
+const char *const wpc_s_state::lamps_wcs[][8] = {
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" },
+	{ "", "", "", "", "", "", "", "" }
 };
 
-const char *const wpc_s_state::outputs_wcs[54] = {
+const char *const wpc_s_state::outputs_wcs[] = {
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
 	"s:", "s:", "s:", "s:", "s:", "s:", "s:", "s:",
@@ -1837,6 +1734,7 @@ const char *const wpc_s_state::outputs_wcs[54] = {
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 	"g:", "g:", "g:", "g:", "g:"
 };
+#endif
 
 static INPUT_PORTS_START( wcs )
 	PORT_START("X0")
@@ -2052,19 +1950,145 @@ void wpc_s_state::wpc_s(machine_config &config)
 
 	TIMER(config, "zero_crossing").configure_periodic(FUNC(wpc_s_state::zc_timer), attotime::from_hz(120)); // Mains power zero crossing
 
-	WPC_SHIFT(config, "shift", 0);
-	WPC_PIC(config, m_pic, 0);
-	WPC_LAMP(config, m_lamp, 0);
-	WPC_OUT(config, m_out, 0, 5);
-	WPC_DMD(config, "dmd", 0).scanline_callback().set(FUNC(wpc_s_state::scanline_irq));
+	WPC_SHIFT(config, "shift");
+	WPC_PIC(config, m_pic);
+	WPC_LAMP(config, m_lamp);
+	WPC_OUT(config, m_out, 5);
+	WPC_DMD(config, "dmd").scanline_callback().set(FUNC(wpc_s_state::scanline_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "mono").front_center();
 
-	DCS_AUDIO_8K(config, m_dcs, 0);
+	DCS_AUDIO_8K(config, m_dcs);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->add_route(0, "mono", 1.0);
+}
+
+void wpc_s_state::corv(machine_config &config)
+{
+	wpc_s(config);
+
+	m_pic->set_serial("536 123456 12345 123");
+	m_lamp->set_names(lamps_corv);
+	m_out->set_names(outputs_corv);
+}
+
+void wpc_s_state::dh(machine_config &config)
+{
+	wpc_s(config);
+
+	m_pic->set_serial("530 123456 12345 123");
+	m_lamp->set_names(lamps_dh);
+	m_out->set_names(outputs_dh);
+}
+
+void wpc_s_state::i500(machine_config &config)
+{
+	wpc_s(config);
+
+	m_pic->set_serial("526 123456 12345 123");
+	m_lamp->set_names(lamps_i500);
+	m_out->set_names(outputs_i500);
+}
+
+void wpc_s_state::jb(machine_config &config)
+{
+	wpc_s(config);
+
+	m_pic->set_serial("551 123456 12345 123");
+	m_lamp->set_names(lamps_jb);
+	m_out->set_names(outputs_jb);
+}
+
+void wpc_s_state::jm(machine_config &config)
+{
+	wpc_s(config);
+
+	m_pic->set_serial("542 123456 12345 123");
+	m_lamp->set_names(lamps_jm);
+	m_out->set_names(outputs_jm);
+}
+
+void wpc_s_state::nf(machine_config &config)
+{
+	wpc_s(config);
+
+	m_pic->set_serial("525 123456 12345 123");
+	m_lamp->set_names(lamps_nf);
+	m_out->set_names(outputs_nf);
+}
+
+void wpc_s_state::rs(machine_config &config)
+{
+	wpc_s(config);
+
+	m_pic->set_serial("524 123456 12345 123");
+	m_lamp->set_names(lamps_rs);
+	m_out->set_names(outputs_rs);
+}
+
+void wpc_s_state::fs(machine_config &config)
+{
+	wpc_s(config);
+
+	m_pic->set_serial("529 123456 12345 123");
+	//m_lamp->set_names(lamps_fs);
+	//m_out->set_names(outputs_fs);
+}
+
+void wpc_s_state::ts(machine_config &config)
+{
+	wpc_s(config);
+
+	m_pic->set_serial("532 123456 12345 123");
+	//m_lamp->set_names(lamps_ts);
+	//m_out->set_names(outputs_ts);
+}
+
+void wpc_s_state::tom(machine_config &config)
+{
+	wpc_s(config);
+
+	m_pic->set_serial("539 123456 12345 124");
+	//m_lamp->set_names(lamps_tom);
+	//m_out->set_names(outputs_tom);
+}
+
+void wpc_s_state::tom14(machine_config &config)
+{
+	wpc_s(config);
+
+	m_pic->set_serial("124 123456 12345 123");
+	//m_lamp->set_names(lamps_tom);
+	//m_out->set_names(outputs_tom);
+}
+
+void wpc_s_state::wd(machine_config &config)
+{
+	wpc_s(config);
+
+	m_pic->set_serial("544 123456 12345 123");
+	//m_lamp->set_names(lamps_wd);
+	//m_out->set_names(outputs_wd);
+}
+
+void wpc_s_state::wcs(machine_config &config)
+{
+	wpc_s(config);
+
+	m_pic->set_serial("531 123456 12345 123");
+	//m_lamp->set_names(lamps_wcs);
+	//m_out->set_names(outputs_wcs);
+}
+
+void wpc_s_state::tfs(machine_config &config)
+{
+	wpc_s(config);
+
+	m_pic->set_serial("648 123456 12345 123");
+	//m_lamp->set_names(nullptr);
+	//m_out->set_names(nullptr);
 }
 
 /*-----------------
@@ -3071,70 +3095,70 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1994,  corv_21,    0,          wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (2.1)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  corv_px4,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (PX4 Prototype)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  corv_px3,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (PX3 Prototype)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  corv_lx1,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (LX1)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  corv_lx2,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (LX2)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  corv_la1,   corv_21,    wpc_s,  corv, wpc_s_state,  init_corv,  ROT0,  "Bally",        "Corvette (LA1)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  dh_lx2,     0,          wpc_s,  dh,   wpc_s_state,  init_dh,    ROT0,  "Williams",     "Dirty Harry (LX-2)",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  dh_lf2,     dh_lx2,     wpc_s,  dh,   wpc_s_state,  init_dh,    ROT0,  "Williams",     "Dirty Harry (LF-2)",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  i500_11r,   0,          wpc_s,  i500, wpc_s_state,  init_i500,  ROT0,  "Bally",        "Indianapolis 500 (1.1R)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  i500_10r,   i500_11r,   wpc_s,  i500, wpc_s_state,  init_i500,  ROT0,  "Bally",        "Indianapolis 500 (1.0R)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  i500_11b,   i500_11r,   wpc_s,  i500, wpc_s_state,  init_i500,  ROT0,  "Bally",        "Indianapolis 500 (1.1 Belgium)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  jb_10r,     0,          wpc_s,  jb,   wpc_s_state,  init_jb,    ROT0,  "Williams",     "Jack*Bot (1.0R)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  jb_10b,     jb_10r,     wpc_s,  jb,   wpc_s_state,  init_jb,    ROT0,  "Williams",     "Jack*Bot (1.0B) (Belgium/Canada)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  jb_04a,     jb_10r,     wpc_s,  jb,   wpc_s_state,  init_jb,    ROT0,  "Williams",     "Jack*Bot (0.4A prototype)",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  jm_12r,     0,          wpc_s,  jm,   wpc_s_state,  init_jm,    ROT0,  "Williams",     "Johnny Mnemonic (1.2R)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  jm_12b,     jm_12r,     wpc_s,  jm,   wpc_s_state,  init_jm,    ROT0,  "Williams",     "Johnny Mnemonic (1.2B) Belgium",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  jm_05r,     jm_12r,     wpc_s,  jm,   wpc_s_state,  init_jm,    ROT0,  "Williams",     "Johnny Mnemonic (0.5R)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  nf_23x,     0,          wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.3X)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  nf_23,      nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.3)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  nf_23f,     nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.3F)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  nf_22,      nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.2)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  nf_20,      nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (2.0)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  nf_10f,     nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (1.0F)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  nf_08x,     nf_23x,     wpc_s,  nf,   wpc_s_state,  init_nf,    ROT0,  "Williams",     "No Fear: Dangerous Sports (0.8X)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  rs_l6,      0,          wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (L-6)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  rs_la5,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (La-5)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  rs_lx5,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-5)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  rs_la4,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (La-4)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  rs_lx4,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-4)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  rs_lx3,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-3)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  rs_lx2,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (Lx-2)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  rs_pa2,     rs_l6,      wpc_s,  rs,   wpc_s_state,  init_rs,    ROT0,  "Williams",     "Red and Ted's Road Show (PA-2 prototype)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  fs_lx5,     0,          wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LX-5)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  fs_lx2,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LX-2)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  fs_sp2,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (SP-2)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  fs_lx3,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LX-3)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  fs_lx4,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LX-4)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  fs_la5,     fs_lx5,     wpc_s,  fs,   wpc_s_state,  init_fs,    ROT0,  "Williams",     "The Flintstones (LA-5)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  ts_lx5,     0,          wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LX-5)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  ts_lh6,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LH-6)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  ts_lx4,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LX-4)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  ts_la4,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LA-4)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  ts_la2,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LA-2)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  ts_pa1,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (PA-1)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  ts_lf6,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LF-6) French",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  ts_lf4,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LF-4) French",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  ts_lm6,     ts_lx5,     wpc_s,  ts,   wpc_s_state,  init_ts,    ROT0,  "Bally",        "The Shadow (LM-6) Mild",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  tom_13,     0,          wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (1.3X)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(2005,  tom_14h,    tom_13,     wpc_s,  tom,  wpc_s_state,  init_tom14, ROT0,  "Bally",        "Theatre Of Magic (1.4H)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  tom_12,     tom_13,     wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (1.2X)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  tom_12a,    tom_13,     wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (1.2A)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  tom_10f,    tom_13,     wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (1.0 French)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  tom_06,     tom_13,     wpc_s,  tom,  wpc_s_state,  init_tom,   ROT0,  "Bally",        "Theatre Of Magic (0.6a)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  wd_12,      0,          wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.2)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  wd_12g,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.2 Germany)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  wd_11,      wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.1)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  wd_10r,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.0 R)",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  wd_10g,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.0 Germany)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  wd_10f,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (1.0 French)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  wd_03r,     wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (0.3 R)",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1995,  wd_048r,    wd_12,      wpc_s,  wd,   wpc_s_state,  init_wd,    ROT0,  "Bally",        "Who Dunnit (0.48 R)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  wcs_l2,     0,          wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (Lx-2)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  wcs_l1,     wcs_l2,     wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (Lx-1)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  wcs_la2,    wcs_l2,     wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (La-2)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  wcs_p2,     wcs_l2,     wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (Pa-2)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  wcs_p3,     wcs_l2,     wpc_s,  wcs,  wpc_s_state,  init_wcs,   ROT0,  "Bally",        "World Cup Soccer (Px-3)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  tfs_12,     0,          wpc_s,  tfs,  wpc_s_state,  init_tfs,   ROT0,  "Bally",        "WPC Test Fixture: Security (1.2)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  corv_21,    0,          corv,   corv, wpc_s_state,  empty_init, ROT0,  "Bally",        "Corvette (2.1)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  corv_px4,   corv_21,    corv,   corv, wpc_s_state,  empty_init, ROT0,  "Bally",        "Corvette (PX4 Prototype)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  corv_px3,   corv_21,    corv,   corv, wpc_s_state,  empty_init, ROT0,  "Bally",        "Corvette (PX3 Prototype)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  corv_lx1,   corv_21,    corv,   corv, wpc_s_state,  empty_init, ROT0,  "Bally",        "Corvette (LX1)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  corv_lx2,   corv_21,    corv,   corv, wpc_s_state,  empty_init, ROT0,  "Bally",        "Corvette (LX2)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  corv_la1,   corv_21,    corv,   corv, wpc_s_state,  empty_init, ROT0,  "Bally",        "Corvette (LA1)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  dh_lx2,     0,          dh,     dh,   wpc_s_state,  empty_init, ROT0,  "Williams",     "Dirty Harry (LX-2)",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  dh_lf2,     dh_lx2,     dh,     dh,   wpc_s_state,  empty_init, ROT0,  "Williams",     "Dirty Harry (LF-2)",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  i500_11r,   0,          i500,   i500, wpc_s_state,  empty_init, ROT0,  "Bally",        "Indianapolis 500 (1.1R)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  i500_10r,   i500_11r,   i500,   i500, wpc_s_state,  empty_init, ROT0,  "Bally",        "Indianapolis 500 (1.0R)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  i500_11b,   i500_11r,   i500,   i500, wpc_s_state,  empty_init, ROT0,  "Bally",        "Indianapolis 500 (1.1 Belgium)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  jb_10r,     0,          jb,     jb,   wpc_s_state,  empty_init, ROT0,  "Williams",     "Jack*Bot (1.0R)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  jb_10b,     jb_10r,     jb,     jb,   wpc_s_state,  empty_init, ROT0,  "Williams",     "Jack*Bot (1.0B) (Belgium/Canada)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  jb_04a,     jb_10r,     jb,     jb,   wpc_s_state,  empty_init, ROT0,  "Williams",     "Jack*Bot (0.4A prototype)",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  jm_12r,     0,          jm,     jm,   wpc_s_state,  empty_init, ROT0,  "Williams",     "Johnny Mnemonic (1.2R)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  jm_12b,     jm_12r,     jm,     jm,   wpc_s_state,  empty_init, ROT0,  "Williams",     "Johnny Mnemonic (1.2B) Belgium",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  jm_05r,     jm_12r,     jm,     jm,   wpc_s_state,  empty_init, ROT0,  "Williams",     "Johnny Mnemonic (0.5R)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  nf_23x,     0,          nf,     nf,   wpc_s_state,  empty_init, ROT0,  "Williams",     "No Fear: Dangerous Sports (2.3X)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  nf_23,      nf_23x,     nf,     nf,   wpc_s_state,  empty_init, ROT0,  "Williams",     "No Fear: Dangerous Sports (2.3)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  nf_23f,     nf_23x,     nf,     nf,   wpc_s_state,  empty_init, ROT0,  "Williams",     "No Fear: Dangerous Sports (2.3F)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  nf_22,      nf_23x,     nf,     nf,   wpc_s_state,  empty_init, ROT0,  "Williams",     "No Fear: Dangerous Sports (2.2)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  nf_20,      nf_23x,     nf,     nf,   wpc_s_state,  empty_init, ROT0,  "Williams",     "No Fear: Dangerous Sports (2.0)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  nf_10f,     nf_23x,     nf,     nf,   wpc_s_state,  empty_init, ROT0,  "Williams",     "No Fear: Dangerous Sports (1.0F)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  nf_08x,     nf_23x,     nf,     nf,   wpc_s_state,  empty_init, ROT0,  "Williams",     "No Fear: Dangerous Sports (0.8X)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  rs_l6,      0,          rs,     rs,   wpc_s_state,  empty_init, ROT0,  "Williams",     "Red and Ted's Road Show (L-6)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  rs_la5,     rs_l6,      rs,     rs,   wpc_s_state,  empty_init, ROT0,  "Williams",     "Red and Ted's Road Show (La-5)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  rs_lx5,     rs_l6,      rs,     rs,   wpc_s_state,  empty_init, ROT0,  "Williams",     "Red and Ted's Road Show (Lx-5)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  rs_la4,     rs_l6,      rs,     rs,   wpc_s_state,  empty_init, ROT0,  "Williams",     "Red and Ted's Road Show (La-4)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  rs_lx4,     rs_l6,      rs,     rs,   wpc_s_state,  empty_init, ROT0,  "Williams",     "Red and Ted's Road Show (Lx-4)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  rs_lx3,     rs_l6,      rs,     rs,   wpc_s_state,  empty_init, ROT0,  "Williams",     "Red and Ted's Road Show (Lx-3)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  rs_lx2,     rs_l6,      rs,     rs,   wpc_s_state,  empty_init, ROT0,  "Williams",     "Red and Ted's Road Show (Lx-2)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  rs_pa2,     rs_l6,      rs,     rs,   wpc_s_state,  empty_init, ROT0,  "Williams",     "Red and Ted's Road Show (PA-2 prototype)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  fs_lx5,     0,          fs,     fs,   wpc_s_state,  empty_init, ROT0,  "Williams",     "The Flintstones (LX-5)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  fs_lx2,     fs_lx5,     fs,     fs,   wpc_s_state,  empty_init, ROT0,  "Williams",     "The Flintstones (LX-2)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  fs_sp2,     fs_lx5,     fs,     fs,   wpc_s_state,  empty_init, ROT0,  "Williams",     "The Flintstones (SP-2)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  fs_lx3,     fs_lx5,     fs,     fs,   wpc_s_state,  empty_init, ROT0,  "Williams",     "The Flintstones (LX-3)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  fs_lx4,     fs_lx5,     fs,     fs,   wpc_s_state,  empty_init, ROT0,  "Williams",     "The Flintstones (LX-4)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  fs_la5,     fs_lx5,     fs,     fs,   wpc_s_state,  empty_init, ROT0,  "Williams",     "The Flintstones (LA-5)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  ts_lx5,     0,          ts,     ts,   wpc_s_state,  empty_init, ROT0,  "Bally",        "The Shadow (LX-5)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  ts_lh6,     ts_lx5,     ts,     ts,   wpc_s_state,  empty_init, ROT0,  "Bally",        "The Shadow (LH-6)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  ts_lx4,     ts_lx5,     ts,     ts,   wpc_s_state,  empty_init, ROT0,  "Bally",        "The Shadow (LX-4)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  ts_la4,     ts_lx5,     ts,     ts,   wpc_s_state,  empty_init, ROT0,  "Bally",        "The Shadow (LA-4)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  ts_la2,     ts_lx5,     ts,     ts,   wpc_s_state,  empty_init, ROT0,  "Bally",        "The Shadow (LA-2)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  ts_pa1,     ts_lx5,     ts,     ts,   wpc_s_state,  empty_init, ROT0,  "Bally",        "The Shadow (PA-1)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  ts_lf6,     ts_lx5,     ts,     ts,   wpc_s_state,  empty_init, ROT0,  "Bally",        "The Shadow (LF-6) French",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  ts_lf4,     ts_lx5,     ts,     ts,   wpc_s_state,  empty_init, ROT0,  "Bally",        "The Shadow (LF-4) French",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  ts_lm6,     ts_lx5,     ts,     ts,   wpc_s_state,  empty_init, ROT0,  "Bally",        "The Shadow (LM-6) Mild",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  tom_13,     0,          tom,    tom,  wpc_s_state,  empty_init, ROT0,  "Bally",        "Theatre Of Magic (1.3X)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(2005,  tom_14h,    tom_13,     tom14,  tom,  wpc_s_state,  empty_init, ROT0,  "Bally",        "Theatre Of Magic (1.4H)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  tom_12,     tom_13,     tom,    tom,  wpc_s_state,  empty_init, ROT0,  "Bally",        "Theatre Of Magic (1.2X)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  tom_12a,    tom_13,     tom,    tom,  wpc_s_state,  empty_init, ROT0,  "Bally",        "Theatre Of Magic (1.2A)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  tom_10f,    tom_13,     tom,    tom,  wpc_s_state,  empty_init, ROT0,  "Bally",        "Theatre Of Magic (1.0 French)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  tom_06,     tom_13,     tom,    tom,  wpc_s_state,  empty_init, ROT0,  "Bally",        "Theatre Of Magic (0.6a)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  wd_12,      0,          wd,     wd,   wpc_s_state,  empty_init, ROT0,  "Bally",        "Who Dunnit (1.2)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  wd_12g,     wd_12,      wd,     wd,   wpc_s_state,  empty_init, ROT0,  "Bally",        "Who Dunnit (1.2 Germany)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  wd_11,      wd_12,      wd,     wd,   wpc_s_state,  empty_init, ROT0,  "Bally",        "Who Dunnit (1.1)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  wd_10r,     wd_12,      wd,     wd,   wpc_s_state,  empty_init, ROT0,  "Bally",        "Who Dunnit (1.0 R)",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  wd_10g,     wd_12,      wd,     wd,   wpc_s_state,  empty_init, ROT0,  "Bally",        "Who Dunnit (1.0 Germany)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  wd_10f,     wd_12,      wd,     wd,   wpc_s_state,  empty_init, ROT0,  "Bally",        "Who Dunnit (1.0 French)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  wd_03r,     wd_12,      wd,     wd,   wpc_s_state,  empty_init, ROT0,  "Bally",        "Who Dunnit (0.3 R)",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995,  wd_048r,    wd_12,      wd,     wd,   wpc_s_state,  empty_init, ROT0,  "Bally",        "Who Dunnit (0.48 R)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  wcs_l2,     0,          wcs,    wcs,  wpc_s_state,  empty_init, ROT0,  "Bally",        "World Cup Soccer (Lx-2)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  wcs_l1,     wcs_l2,     wcs,    wcs,  wpc_s_state,  empty_init, ROT0,  "Bally",        "World Cup Soccer (Lx-1)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  wcs_la2,    wcs_l2,     wcs,    wcs,  wpc_s_state,  empty_init, ROT0,  "Bally",        "World Cup Soccer (La-2)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  wcs_p2,     wcs_l2,     wcs,    wcs,  wpc_s_state,  empty_init, ROT0,  "Bally",        "World Cup Soccer (Pa-2)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  wcs_p3,     wcs_l2,     wcs,    wcs,  wpc_s_state,  empty_init, ROT0,  "Bally",        "World Cup Soccer (Px-3)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  tfs_12,     0,          tfs,    tfs,  wpc_s_state,  empty_init, ROT0,  "Bally",        "WPC Test Fixture: Security (1.2)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

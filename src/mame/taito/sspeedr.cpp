@@ -52,7 +52,6 @@ public:
 
 protected:
 	virtual void video_start() override ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -357,13 +356,6 @@ void sspeedr_state::screen_vblank(int state)
 	}
 }
 
-
-void sspeedr_state::machine_start()
-{
-	m_digits.resolve();
-	m_lampgo.resolve();
-	m_lampep.resolve();
-}
 
 void sspeedr_state::palette(palette_device &palette) const
 {

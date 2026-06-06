@@ -258,15 +258,15 @@ void przone_state::przone(machine_config &config)
 	maincpu.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 	maincpu.smiact().set("pci:00.0", FUNC(i82439hx_host_device::smi_act_w));
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// 256MB on vidpro1's board, may ship with less RAM
-	I82439HX(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
+	I82439HX(config, "pci:00.0", "maincpu", 256*1024*1024);
 
-	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, "maincpu"));
+	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", "maincpu"));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 
-	i82371sb_ide_device &ide(I82371SB_IDE(config, "pci:07.1", 0, "maincpu"));
+	i82371sb_ide_device &ide(I82371SB_IDE(config, "pci:07.1", "maincpu"));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
 	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option("cdrom");
@@ -279,6 +279,7 @@ void przone_state::przone(machine_config &config)
 	// TODO: has a stroke with virgevx
 	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "virge");
 
+	// FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", smc_superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", przone_isa16_cards, "przone_jamma_if", true);
 	// TODO: one slot for vibra16

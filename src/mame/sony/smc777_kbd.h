@@ -11,7 +11,7 @@ class smc777_kbd_device : public device_t
 						, protected device_matrix_keyboard_interface<10>
 {
 public:
-	smc777_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	smc777_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	u8 data_r(offs_t offset);
 	void data_w(offs_t offset, u8 data);

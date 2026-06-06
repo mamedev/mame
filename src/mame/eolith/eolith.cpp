@@ -254,8 +254,6 @@ void eolith_state::machine_start()
 {
 	eolith_e1_speedup_state_base::machine_start();
 
-	m_led.resolve();
-
 	// Configure the sound ROM banking
 	m_sndbank->configure_entries(0, 16, memregion("sounddata")->base(), 0x8000);
 }

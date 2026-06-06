@@ -13,7 +13,7 @@
 class cr560b_device : public cdrom_image_device, public device_mixer_interface
 {
 public:
-	cr560b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cr560b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// callbacks
 	auto stch_cb() { return m_stch_cb.bind(); }

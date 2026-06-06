@@ -612,7 +612,7 @@ void jchan_state::jchan(machine_config &config)
 
 	for (auto &spritegen : m_spritegen)
 	{
-		KANEKO_RLE_SPRITES(config, spritegen, 0);
+		KANEKO_RLE_SPRITES(config, spritegen);
 		spritegen->set_screen("screen");
 		spritegen->set_sprite_kludge(0, 0);
 	}

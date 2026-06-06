@@ -753,7 +753,7 @@ void raiden_state::raiden(machine_config &config)
 	okim6295_device &oki(OKIM6295(config, "oki", 12_MHz_XTAL / 12, okim6295_device::PIN7_HIGH)); // frequency and pin 7 verified
 	oki.add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	SEIBU_SOUND(config, m_seibu_sound, 0);
+	SEIBU_SOUND(config, m_seibu_sound);
 	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
 	m_seibu_sound->coin_io_callback().set_ioport("COIN");
 	m_seibu_sound->set_rom_tag("audiocpu");
@@ -799,7 +799,7 @@ void raidenb_state::raidenb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &raidenb_state::main_map);
 
 	// video hardware
-	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc"));
 	crtc.layer_en_callback().set(FUNC(raidenb_state::layer_enable_w));
 	crtc.layer_scroll_callback().set(FUNC(raidenb_state::layer_scroll_w));
 

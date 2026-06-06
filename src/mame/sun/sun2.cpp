@@ -133,6 +133,8 @@ How the architecture works:
 
 #include "screen.h"
 
+#include "endianness.h"
+
 //#define VERBOSE 1
 #include "logmacro.h"
 

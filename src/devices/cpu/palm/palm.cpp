@@ -16,6 +16,8 @@
 #include "palm.h"
 #include "palmd.h"
 
+#include <bit>
+
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
@@ -151,7 +153,7 @@ void palm_device::execute_run()
 			case 0xc: Rx = (Rx & 0xff00U) | (Ry >> 8); break; // high to low
 			case 0xd: Rx = (Rx & 0x00ffU) | (Ry << 8); break; // low to high
 			case 0xe: Ry = (Ry & 0xff00U) | m_iod.read_byte(DA); break; // get to register
-			case 0xf: Ry += (7 - count_leading_ones_32(u32(m_iod.read_byte(DA)) << 24)) * 2; break; // get to register and add
+			case 0xf: Ry += (7 - std::countl_one(m_iod.read_byte(DA))) * 2; break; // get to register and add
 			}
 			break;
 		case 0x1:

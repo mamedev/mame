@@ -789,9 +789,6 @@ void montecar_state::output_2_w(uint8_t data)
 
 void firetrk_state::machine_start()
 {
-	m_leds.resolve();
-	m_p1gear.resolve();
-
 	save_item(NAME(m_in_service_mode));
 	save_item(NAME(m_dial));
 	save_item(NAME(m_steer_dir));
@@ -851,7 +848,7 @@ int firetrk_state::skid_r()
 {
 	uint32_t ret;
 
-	if (P != 2)
+	if constexpr (P != 2)
 		ret = m_skid[P];
 	else
 		ret = m_skid[0] | m_skid[1];
@@ -865,7 +862,7 @@ int firetrk_state::crash_r()
 {
 	uint32_t ret;
 
-	if (P != 2)
+	if constexpr (P != 2)
 		ret = m_crash[P];
 	else
 		ret = m_crash[0] | m_crash[1];

@@ -337,7 +337,7 @@ int hp_1ma6_device::wr_bit_r()
 
 void hp_1ma6_device::device_add_mconfig(machine_config &config)
 {
-	HP_DC100_TAPE(config , m_tape , 0);
+	HP_DC100_TAPE(config , m_tape);
 	m_tape->set_acceleration(ACCELERATION);
 	m_tape->set_set_points(SLOW_SPEED , FAST_SPEED);
 	m_tape->set_tick_size(TACH_TICK_LEN);

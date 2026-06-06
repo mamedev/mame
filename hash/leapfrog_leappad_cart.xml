@@ -1061,6 +1061,21 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="minnatanb" cloneof="minnatan"  supported="no">
+		<description>Minna de tanoshiku! CoCoPad (Japan)</description>
+		<year>2003</year>
+		<publisher>LeapFrog / Sega Toys</publisher>
+		<info name="alt_title" value="みんなでたのしく! ココパッド!" />
+		<info name="serial" value="500-10176"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7123"/>
+			<feature name="u1" value="OKi 32m REV.01"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-10176.bin" size="0x400000" crc="47df0443" sha1="e25337d9810c4922875d7fa5f40e834ed7c05d9e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bennyeng2" supported="no">
 		<description>Benny and Friends English Book Vol. 2 -Majo to taiketsu! Daibouken- (Japan)</description>
 		<year>2002</year>
@@ -1303,6 +1318,21 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="oshaberi" supported="no">
+		<description>Oshaberi CoCoPad Mic (Japan)</description>
+		<year>2006</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おしゃべりココパッドマイク" />
+		<info name="serial" value="500-11720"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7234"/>
+			<feature name="u1" value="OKI 32M(L)-XXWE REV:00"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-11720.bin" size="0x400000" crc="c4c71c9d" sha1="1d7933d95bde0247690c2e8e4d5c8374ecb4c0c5" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="oej1ggdni" supported="no">
 		<description>Oyako Eigo Step 1-gatsu gou - Doubutsuen ni Ikou! (Japan)</description>
 		<year>2003</year>
@@ -1317,6 +1347,66 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="oes9ggsno" supported="no">
+		<description>Oyako Eigo Step 9-gatsu gou - Shimajirou no Otetsudaiyasan (Japan)</description>
+		<year>2004</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご すてっぷ 9がつごう しまじろうのおてつだいやさん" />
+		<info name="serial" value="500-10691"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="000-835040-101005V1"/>
+			<feature name="u1" value="MR27V1602E"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-10691.bin" size="0x200000" crc="ab13077a" sha1="93a8a3be44ac90eae4256dd44693617d814b0bab" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oes579gg" supported="no">
+		<description>Oyako Eigo Step - 2005 nen 5, 7, 9 gatsu gou (Japan)</description>
+		<year>2005</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご すてっぷ 2005ねん5, 7, 9がつごう" />
+		<info name="serial" value="500-11398"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7218"/>
+			<feature name="u1" value="OKi 16M REV.01"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-11398.bin" size="0x200000" crc="244bc839" sha1="26e17782868e47c58b09c0489603231ee1b491d9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oes1113gg" supported="no">
+		<description>Oyako Eigo Step - 2005 nen 11 gatsu gou / 2006 nen 1, 3 gatsu gou (Japan)</description>
+		<year>2005</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご すてっぷ 2005ねん11がつごう / 2006ねん1, 3がつごう" />
+		<info name="serial" value="500-11401"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7228"/>
+			<feature name="u1" value="OKI 32(J) REV:00"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-11401.bin" size="0x400000" crc="ce0cf7ba" sha1="86d6d0794596e3210809bb67b856068ec7968730" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oes3gwg" supported="no">
+		<description>Oyako Eigo Step - 2005 nen 3 gatsu Welcome gou (Japan)</description>
+		<year>2005</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご すてっぷ 2005ねん3がつウェルカムごう - しまじろうとえいごにちょうせん!" />
+		<info name="serial" value="500-11409"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="000-835040-101040V1"/>
+			<feature name="u1" value="5124K"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-11409.bin" size="0x200000" crc="86bd2bf0" sha1="17855b265ecce83d4d29a923fa63c6672aca0039" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="oej5gg" supported="no">
 		<description>Oyako Eigo Jump 5-gatsu gou - Okashi no Kuni no Daibouken (Japan)</description>
 		<year>2003</year>
@@ -1327,6 +1417,21 @@ license:CC0-1.0
 			<feature name="pcb" value="57000-003-7218"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="500-01007.bin" size="0x200000" crc="ff72de90" sha1="2bc9c03c8ee1bf0418d0e8644d1ab36c7161473e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oej5ggabc" supported="no">
+		<description>Oyako Eigo Jump 5-gatsu gou - Shimajirou to ABC / 7 gatsu gou - The Three Little Pigs (Japan)</description>
+		<year>2005</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご じゃんぷ 5がつごう - しまじろうと ABC / 7がつごう THE THREE LITTLE PIGS" />
+		<info name="serial" value="500-11744"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7228"/>
+			<feature name="u1" value="OKI 32(J) REV:00"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-11744.bin" size="0x400000" crc="e3995d9b" sha1="0cef61e46c40aac657dd1cd772efac0170a88dd5" />
 			</dataarea>
 		</part>
 	</software>
@@ -1345,6 +1450,36 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="oej9ggsrej" supported="no">
+		<description>Oyako Eigo Jump 9-gatsu gou - Shiamjirou to Ribby no Eigo Jiten (Japan)</description>
+		<year>2005</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご じゃんぷ 9がつごう - しまじろうとリビーの えいごえじてん" />
+		<info name="serial" value="500-11733"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7218"/>
+			<feature name="u1" value="OKi 16M REV.01"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-11733.bin" size="0x200000" crc="b671fcf7" sha1="753e3b2400804381d408e8a0fe5129637f480693" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oej111gg" supported="no">
+		<description>Oyako Eigo Jump 11-gatsu gou - Shimajirou to Ribby no CoCoPad Eigo party / 1-gatsu gou - Shimajirou to Ribby no Shougakkou Tanken (Japan)</description>
+		<year>2006</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご じゃんぷ 11がつごう - しまじろうとリビーのココパッドえいごパーティー / 1がつごう - しまじろうとリビーのしょうがっこうたんけん" />
+		<info name="serial" value="500-12451"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7228"/>
+			<feature name="u1" value="OKI 32(J) REV:00"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12451.bin" size="0x400000" crc="689101ad" sha1="b4aa797eddf3d690ae551a795250ca449cf6fbbd" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="oej1ggstr" supported="no">
 		<description>Oyako Eigo Jump 1-gatsu gou - Shougakkou Taiken Report (Japan)</description>
 		<year>2004</year>
@@ -1359,6 +1494,21 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="oej1ggsrst" supported="no">
+		<description>Oyako Eigo Jump 1 gatsu gou - Shimajirou to Ribby no Shougakkou Tanken (Japan)</description>
+		<year>2006</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="おやこえいご じゃんぷ 1がつごう - しまじろうとリビーの しょうがっこうたんけん" />
+		<info name="serial" value="500-11412"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7218"/>
+			<feature name="u1" value="OKi 16M REV.01"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-11412.bin" size="0x200000" crc="b606fc7c" sha1="9246725af5eb9e2991d72c96cda17c2952276a5e" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="kland1" supported="no">
 		<description>Korasho Land 1: Gakkou e Ikou! (Japan)</description>
 		<year>2004</year>
@@ -1514,6 +1664,21 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="ribbytmd08" cloneof="ribbytmd" supported="no">
+		<description>2008 July Shimajirou to Ribby no Eigo Jiten / 2008 September Onahashi CoCoPad Time Machine de Daibouken! (Japan)</description>
+		<year>2008</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="2008 July しまじろうトリビーのえいごえじてん / 2008 September しまじろうとりびーのおはなしココパッド タイムマシーンでだいぼうけん!" />
+		<info name="serial" value="500-13254"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7234"/>
+			<feature name="u1" value="OKI 32M(L)-XXWE REV:00"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-113254.bin" size="0x400000" crc="47cd11fe" sha1="48efe795b2ac151f63678d09bbb5d0102cdc3b59" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ribbyst" supported="no">
 		<description>Shimajirou to Ribby no CoCoPad Game Party / Shougakkou Tanken (Japan)</description>
 		<year>2007</year> <!-- title has 2008, but copyright on cartridge is still 2007 -->
@@ -1524,6 +1689,21 @@ license:CC0-1.0
 			<feature name="pcb" value="57000+003+7238"/>
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-12814.bin" size="0x400000" crc="2707fd55" sha1="e73e5d551c7a8e29e1aa49b968c4de142b72aa25" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ribbyst08" cloneof="ribbyst" supported="no">
+		<description>2008 November Shimajirou to Ribby no CoCoPad Game Party / 2009 January Shimajirou to Ribby Shougakkou Tanken (Japan)</description>
+		<year>2008</year>
+		<publisher>LeapFrog / Benesse</publisher>
+		<info name="alt_title" value="2008 November しまじろうとリビーのココパッドゲームパーティ / 2009 January しまじろうとリビーのしょうがっこうたんけん" />
+		<info name="serial" value="500-13237"/>
+		<part name="cart" interface="leapfrog_leappad_cart">
+			<feature name="pcb" value="57000-003-7234"/>
+			<feature name="u1" value="OKI 32M(L)-XXWE REV:00"/> <!-- ROM under epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-13237.bin" size="0x400000" crc="d6427414" sha1="e4fd7f72f48aa764cb6c882df7678dcff307c1e6" />
 			</dataarea>
 		</part>
 	</software>

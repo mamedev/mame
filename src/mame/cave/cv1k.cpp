@@ -483,7 +483,7 @@ void cv1k_state::cv1k(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(cv1k_state::irq2_line_hold)); // irq2 actually asserted at V-sync pulse, not at V-blank
 
 	RTC9701(config, m_eeprom);
-	SAMSUNG_K9F1G08U0M(config, m_nand, 0);
+	SAMSUNG_K9F1G08U0M(config, m_nand);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -496,7 +496,7 @@ void cv1k_state::cv1k(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	YMZ770(config, "ymz770", 16.384_MHz_XTAL).add_route(1, "mono", 1.0); // only Right output used, Left is not connected
 
-	CV1K_BLITTER(config, m_blitter, 0);
+	CV1K_BLITTER(config, m_blitter);
 	m_blitter->set_screen("screen");
 	m_blitter->port_r_callback().set_ioport("DSW");
 	m_blitter->set_mainramsize(0x800000);

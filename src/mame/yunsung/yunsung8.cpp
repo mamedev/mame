@@ -261,17 +261,7 @@ void yunsung8_state::video_start()
 
 uint32_t yunsung8_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int layers_ctrl = (~m_layers_ctrl) >> 4;
-
-#ifdef MAME_DEBUG
-if (machine().input().code_pressed(KEYCODE_Z))
-{
-	int msk = 0;
-	if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
-	if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
-	if (msk != 0) layers_ctrl &= msk;
-}
-#endif
+	int const layers_ctrl = (~m_layers_ctrl) >> 4;
 
 	if (layers_ctrl & 1)
 		m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
@@ -611,7 +601,7 @@ void yunsung8_state::yunsung8(machine_config &config)
 	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	LS157(config, m_adpcm_select, 0);
+	LS157(config, m_adpcm_select);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	MSM5205(config, m_msm, XTAL(400'000)); // verified on PCB

@@ -324,7 +324,7 @@ void host_state::host(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	IGS025(config, "igs025", 0);
+	IGS025(config, "igs025");
 }
 
 void extension_state::cjsll(machine_config &config)
@@ -344,9 +344,9 @@ void extension_state::cjsll(machine_config &config)
 	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
 	m_screen->set_palette("igs017_igs031:palette");
 
-	IGS025(config, "igs025", 0);
+	IGS025(config, "igs025");
 
-	IGS017_IGS031(config, m_igs017_igs031, 0);
+	IGS017_IGS031(config, m_igs017_igs031);
 	m_igs017_igs031->set_text_reverse_bits(true);
 
 	SPEAKER(config, "mono").front_center();

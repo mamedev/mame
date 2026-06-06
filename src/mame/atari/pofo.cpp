@@ -10,7 +10,7 @@
     http://www.atari-portfolio.co.uk/pfnews/pf9.txt
 
     Command line for dual RAM expansion with A: File Manager ROM card and B: RAM card
-    ./mess64 pofo -exp ram -exp:ram:exp ram2 -cart1 fileman -exp:ram:ccmb ram
+    ./mame pofo -exp ram -exp:ram:exp ram2 -cart1 fileman -exp:ram:ccmb ram
 
 */
 
@@ -27,7 +27,6 @@
         - HD61830A00
         - 5816 2Kx8 RAM
         - 27C256 32Kx8 EPROM
-        - PCD3311T DTMF generator @ 3.578640MHz
 
 */
 
@@ -1051,5 +1050,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE     INPUT      CLASS            INIT        COMPANY  FULLNAME       FLAGS
-COMP( 1989, pofo,  0,      0,      portfolio,  portfolio, portfolio_state, empty_init, "Atari", "Portfolio",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-COMP( 1990, pofo2, pofo,   0,      portfolio2, portfolio, portfolio_state, empty_init, "Atari", "Portfolio 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1989, pofo,  0,      0,      portfolio,  portfolio, portfolio_state, empty_init, "Atari", "Portfolio",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1990, pofo2, pofo,   0,      portfolio2, portfolio, portfolio_state, empty_init, "Atari", "Portfolio 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

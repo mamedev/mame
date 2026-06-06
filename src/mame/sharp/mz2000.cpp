@@ -1381,7 +1381,7 @@ void mz80b_state::mz80b(machine_config &config)
 	pio.out_pa_callback().set(FUNC(mz80b_state::pio_porta_w));
 	pio.in_pb_callback().set(FUNC(mz80b_state::pio_portb_r));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(MASTER_CLOCK / 128); // 31'250
 	// 1 sec, needed by mz2000_flop:gfxedit/mz2000_cass:vosque2k
 	m_pit->out_handler<0>().set(m_pit, FUNC(pit8253_device::write_clk1));

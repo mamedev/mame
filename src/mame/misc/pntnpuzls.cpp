@@ -279,7 +279,7 @@ void pntnpuzls_state::pntnpuzls(machine_config &config)
 	PALETTE(config, "palette").set_entries(0x100);
 
 	// HM86171-80
-	RAMDAC(config, m_ramdac, 0, "palette");
+	RAMDAC(config, m_ramdac, "palette");
 	m_ramdac->set_addrmap(0, &pntnpuzls_state::ramdac_map);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 27'500'000 / 32)); // clock / divider not verified

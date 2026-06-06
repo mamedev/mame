@@ -13,8 +13,8 @@
 #include "machine/sa1111.h"
 #include "sound/uda1344.h"
 #include "video/sed1356.h"
-#include "screen.h"
 #include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 #define LOG_MCU     (1U << 1)
@@ -23,8 +23,7 @@
 #define VERBOSE     (0)
 #include "logmacro.h"
 
-namespace
-{
+namespace {
 
 class jornada_state : public driver_device
 {
@@ -150,7 +149,6 @@ protected:
 	// driver_device overrides
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void device_reset_after_children() override;
 
 	static constexpr u32 SA1110_CLOCK = 206000000;
 
@@ -219,15 +217,6 @@ void jornada_state::main_map(address_map &map)
 	map(0xc0000000, 0xc1ffffff).ram().share("ram");
 	map(0xe0000000, 0xe0003fff).noprw(); // Cache-Flush Region 0
 	map(0xe0100000, 0xe01003ff).noprw(); // Cache-Flush Region 1
-}
-
-void jornada_state::device_reset_after_children()
-{
-	driver_device::device_reset_after_children();
-
-	m_sa_periphs->gpio_in<4>(0); // Flag as plugged into AC power
-	m_sa_periphs->gpio_in<9>(1); // Pen input is active-low
-	m_sa_periphs->gpio_in<26>(0); // Flag as charging
 }
 
 void jornada_state::cpu_rts_to_mcu(int state)
@@ -598,6 +587,10 @@ void jornada_state::machine_reset()
 
 	memset(m_mcu_rx_fifo, 0, sizeof(m_mcu_rx_fifo));
 	m_mcu_rx_count = 0;
+
+	m_sa_periphs->gpio_in<4>(0); // Flag as plugged into AC power
+	m_sa_periphs->gpio_in<9>(1); // Pen input is active-low
+	m_sa_periphs->gpio_in<26>(0); // Flag as charging
 
 	LOGMASKED(LOG_MCU, "MCU State: %08x\n", m_mcu_state);
 }

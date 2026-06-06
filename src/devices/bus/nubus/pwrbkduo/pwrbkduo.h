@@ -47,7 +47,7 @@ public:
 		m_nubus_tag = nbtag;
 	}
 
-	pwrbkduo_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pwrbkduo_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration
 	template <typename T>
@@ -61,7 +61,7 @@ public:
 	const char *get_bus_tag() const { return m_nubus_tag; }
 
 protected:
-	pwrbkduo_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pwrbkduo_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_t implementation
 	virtual void device_resolve_objects() override ATTR_COLD;
@@ -78,7 +78,7 @@ DECLARE_DEVICE_TYPE(PWRBKDUO, pwrbkduo_device);
 class pwrbkduo_device : public nubus_device
 {
 public:
-	pwrbkduo_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	pwrbkduo_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0)
 		: nubus_device(mconfig, PWRBKDUO, tag, owner, clock),
 		  m_maincpu(*this, finder_base::DUMMY_TAG),
 		  m_internal_screen(*this, finder_base::DUMMY_TAG),

@@ -98,6 +98,7 @@
 #include "emuopts.h"
 
 #include <algorithm>
+#include <bit>
 
 //#define VERBOSE 1
 #include "logmacro.h"

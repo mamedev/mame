@@ -936,29 +936,29 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( puzznic )
 	PORT_START("DSWA")
-	TAITO_MACHINE_COCKTAIL_LOC(SW1)
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:5,6")
+	TAITO_MACHINE_COCKTAIL_LOC(DSA)
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )  PORT_DIPLOCATION("DSA:5,6")
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )    // There is no coin B in the manual
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )    // There is no coin B in the manual
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DSA:7" )    // There is no coin B in the manual
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DSA:8" )    // There is no coin B in the manual
 
 	PORT_START("DSWB")
-	TAITO_DIFFICULTY_LOC(SW2)           // Difficulty controls the Timer Speed (how many seconds are there in a minute)
-	PORT_DIPNAME( 0x0c, 0x0c, "Retries" )       PORT_DIPLOCATION("SW2:3,4")
+	TAITO_DIFFICULTY_LOC(DSB)           // Difficulty controls the Timer Speed (how many seconds are there in a minute)
+	PORT_DIPNAME( 0x0c, 0x0c, "Retries" )       PORT_DIPLOCATION("DSB:3,4")
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x04, "1" )
 	PORT_DIPSETTING(    0x0c, "2" )
 	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPNAME( 0x10, 0x10, "Bombs" )     PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x10, "Bombs" )     PORT_DIPLOCATION("DSB:5")
 	PORT_DIPSETTING(    0x10, "0" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x20, 0x20, "Girls" )     PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Girls" )     PORT_DIPLOCATION("DSB:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "Terms of Replay" )   PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, "Terms of Replay" )   PORT_DIPLOCATION("DSB:7,8")
 	PORT_DIPSETTING(    0x40, "Stage one step back/Timer continuous" )
 	PORT_DIPSETTING(    0xc0, "Stage reset to start/Timer continuous" )
 	PORT_DIPSETTING(    0x80, "Stage reset to start/Timer reset to start" )
@@ -993,6 +993,16 @@ static INPUT_PORTS_START( puzznic )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( puzznicnn )
+	PORT_INCLUDE( puzznic )
+
+	PORT_MODIFY("DSWB")
+	// marked unused in the manual and the World version doesn't have girls GFX anyway
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSB:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( plotting )
@@ -1039,7 +1049,7 @@ static INPUT_PORTS_START( plotting )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( plottingu )
-	PORT_INCLUDE(plotting)
+	PORT_INCLUDE( plotting )
 	PORT_MODIFY("DSWA")
 	TAITO_COINAGE_US_LOC(SW1)
 INPUT_PORTS_END
@@ -1522,7 +1532,7 @@ void fhawk_state::fhawk(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
+	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc"));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
 	tc0220ioc.read_1_callback().set_ioport("DSWB");
 	tc0220ioc.read_2_callback().set_ioport("IN0");
@@ -1544,7 +1554,7 @@ void fhawk_state::fhawk(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.20);
 	ymsnd.add_route(3, "mono", 0.80);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
 	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -1584,7 +1594,7 @@ void taitol_2cpu_state::raimais(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
+	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc"));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
 	tc0040ioc.read_1_callback().set_ioport("DSWB");
 	tc0040ioc.read_2_callback().set_ioport("IN0");
@@ -1606,7 +1616,7 @@ void taitol_2cpu_state::raimais(machine_config &config)
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
@@ -1624,7 +1634,7 @@ void taitol_2cpu_state::kurikint(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
+	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc"));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
 	tc0040ioc.read_1_callback().set_ioport("DSWB");
 	tc0040ioc.read_2_callback().set_ioport("IN0");
@@ -1649,11 +1659,11 @@ void taitol_2cpu_state::kurikint(machine_config &config)
 
 void taitol_1cpu_state::add_muxes(machine_config &config)
 {
-	LS157_X2(config, m_mux[0], 0);
+	LS157_X2(config, m_mux[0]);
 	m_mux[0]->a_in_callback().set_ioport("DSWA");
 	m_mux[0]->b_in_callback().set_ioport("DSWB");
 
-	LS157_X2(config, m_mux[1], 0);
+	LS157_X2(config, m_mux[1]);
 	m_mux[1]->a_in_callback().set_ioport("IN0");
 	m_mux[1]->b_in_callback().set_ioport("IN1");
 }
@@ -1692,7 +1702,7 @@ void taitol_1cpu_state::puzznic(machine_config &config)
 	add_muxes(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitol_1cpu_state::puzznic_map);
 
-	ARKANOID_68705P3(config, "mcu", 3_MHz_XTAL);
+	ARKANOID_68705P3(config, "mcu", 3.579545_MHz_XTAL);
 }
 
 void taitol_1cpu_state::puzznici(machine_config &config)
@@ -1724,7 +1734,7 @@ void horshoes_state::horshoes(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &horshoes_state::horshoes_map);
 	m_maincpu->set_tile_callback(FUNC(horshoes_state::horshoes_tile_cb));
 
-	UPD4701A(config, m_upd4701, 0);
+	UPD4701A(config, m_upd4701);
 	m_upd4701->set_portx_tag("AN0");
 	m_upd4701->set_porty_tag("AN1");
 }
@@ -1737,7 +1747,7 @@ void taitol_1cpu_state::palamed(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitol_1cpu_state::palamed_map);
 
-	i8255_device &ppi(I8255(config, "ppi", 0)); // Toshiba TMP8255AP-5
+	i8255_device &ppi(I8255(config, "ppi")); // Toshiba TMP8255AP-5
 	ppi.in_pa_callback().set_ioport("IN0");
 	ppi.in_pb_callback().set_ioport("IN1");
 	ppi.in_pc_callback().set_ioport("IN2");
@@ -1767,7 +1777,7 @@ void taitol_2cpu_state::evilston(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_0_callback().set_ioport("DSWA");
 	tc0510nio.read_1_callback().set_ioport("DSWB");
 	tc0510nio.read_2_callback().set_ioport("IN0");
@@ -2150,6 +2160,81 @@ ROM_START( flipull ) // The demo mode is 1 player
 	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )  // derived, but verified  Pal stamped B86-04
 ROM_END
 
+/*
+Puzznic, Taito 1989
+Hardware info by Guru
+---------------------
+
+TAITO L SYSTEM
+K1100439A
+J1100187A
+|-------X-------JAMMA-----------------|
+|                         TD62064     |
+|DSB 74157             MB3735  VOL    |
+|    74157        Y3014B        74393 |
+|    74157 YM2203    C4556 74174      |
+|    74157                       DIP20|
+|DSA                       74175     Y|
+|               13.33056MHz           |
+|    TMM2063         74HC74           |
+|            MB3771          CXK58257 |
+|                                     |
+|            |---------|     CXK58257 |
+|  DIP28     |         |              |
+|            | TAITO   |     CXK58257 |
+|  DIP28     |TC0090LVC|              |
+|            |         |     CXK58257 |
+|  DIP28     |---------|              |
+|-------------------------------------|
+Notes: (all ICs shown)
+       TC0090LVC - Taito custom chip (Z80 core + GFX + I/O). Clock 6.66528MHz [13.33056/2]
+        CXK58257 - Sony CXK58257 32KiB x8-bit SRAM
+         TMM2063 - Toshiba TMM2063 8KiB x8-bit SRAM
+          YM2203 - Yamaha YM2203 OPN (FM Operator Type-N) Sound Chip. Clock 3.33264MHz [13.33056/4]
+          Y3014B - Yamaha YM3014B Serial Input Floating D/A Converter
+          MB3771 - Fujitsu MB3771 Reset IC
+           C4556 - NEC uPC4556 Dual Operational Amplifier
+         DSA/DSB - 8-position DIP switch
+           DIP28 - 28 pin socket (top board plugs in here on all 3 sockets)
+           DIP20 - 20 pin socket (top board plugs in here)
+               X - Wire on JAMMA pin 23 top and bottom to provide 2x button 2. Wires join to
+                   custom 48CR-1 resistor arrays on the edge near the JAMMA connector.
+               Y - Another wire joins from the custom chip pin 80 then to DIP20 socket pin 11.
+
+      Sync Timing (actual measurements on PCB)
+      -----------
+      MASTER OSC - 13.33040MHz
+           HSYNC - 15.4190kHz
+           VSYNC - 59.9992Hz
+
+
+Top Board
+---------
+
+J9100241A                      |------|
+K9100186A SUB PCB              |      |
+                               | DIP20|
+                               |      |
+                               |      |
+                               |      |
+|------------------------------|      |
+|                          PAL20L8.IC3|
+|                          74174      |
+|  DIP28     C20_09.IC11   74374 74139|
+|                          74374 74244|
+|  DIP28     C20_07.IC10   7474       |
+|                          3.579545MHz|
+|  DIP28     C20_06.IC9   68705P3     |
+|-------------------------------------|
+Notes: (all ICs shown)
+       DIP28 - 28 pin socket (pins on bottom plug into main board on all 3 sockets)
+       DIP20 - 20 pin socket (pins on bottom plug into main board)
+       C20_* - EPROMs, 3x 27C010
+     68705P3 - Motorola MC68705P3 Microcontroller with 2KiB x8-bit internal ROM. Clock 3.579545MHz
+     PAL20L8 - MMI PAL20L8ACN PAL. Note both world and Japan region games use the same PAL.
+
+*/
+
 ROM_START( puzznic )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "c20-09.ic11", 0x00000, 0x20000, CRC(156d6de1) SHA1(c247936b62ef354851c9bace76a7a0aa14194d5f) )
@@ -2161,8 +2246,8 @@ ROM_START( puzznic )
 	ROM_LOAD16_BYTE( "c20-07.ic10", 0x00000, 0x10000, CRC(be12749a) SHA1(c67d1a434486843a6776d89e905362b7db595d8d) )
 	ROM_LOAD16_BYTE( "c20-06.ic9",  0x00001, 0x10000, CRC(ac85a9c5) SHA1(2d72dae86a191ccdac9648980aca832fb9886544) )
 
-	ROM_REGION( 0x0800, "pals", 0 )
-	ROM_LOAD( "mmipal20l8.ic3", 0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0200, "pals", 0 ) // PAL20L8
+	ROM_LOAD( "c20-05.ic3", 0x0000, 0x0144, CRC(f90e5594) SHA1(6181bb25b77028bb150c84bdc073f0457efd7eaa) ) // Confirmed/Matches Japan Set
 ROM_END
 
 ROM_START( puzznicu )
@@ -2176,8 +2261,8 @@ ROM_START( puzznicu )
 	ROM_LOAD16_BYTE( "c20-03.ic10",  0x00000, 0x20000, CRC(4264056c) SHA1(d2d8a170ae0f361093a5384935238605a59e5938) )
 	ROM_LOAD16_BYTE( "c20-02.ic9",   0x00001, 0x20000, CRC(3c115f8b) SHA1(8d518be01b7c4d6d993d5d9b62aab719a5c8baca) )
 
-	ROM_REGION( 0x0800, "pals", 0 )
-	ROM_LOAD( "mmipal20l8.ic3", 0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0200, "pals", 0 ) // PAL20L8
+	ROM_LOAD( "c20-05.ic3", 0x0000, 0x0144, CRC(f90e5594) SHA1(6181bb25b77028bb150c84bdc073f0457efd7eaa) ) // Confirmed/Matches Japan Set
 ROM_END
 
 ROM_START( puzznicj )
@@ -2325,6 +2410,15 @@ ROM_END
 
 ROM_START( plgirls2 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "pg2_1e.ic6", 0x00000, 0x40000, CRC(b279990b) SHA1(b3e67599b114c03a6894200a34eb67bca1810c70) )
+
+	ROM_REGION( 0x100000, "maincpu:gfx", 0 )
+	ROM_LOAD16_BYTE( "cho-l.ic9",  0x00000, 0x80000, CRC(956384ec) SHA1(94a2b95f340e96bdccbeafd373f0dea90b8328dd) )
+	ROM_LOAD16_BYTE( "cho-h.ic7",  0x00001, 0x80000, CRC(992f99b1) SHA1(c79f1014d73654740f7823812f92376d65d6b15d) )
+ROM_END
+
+ROM_START( plgirls2j )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "pg2_1j.ic6", 0x00000, 0x40000, CRC(f924197a) SHA1(ecaaefd1b3715ba60608e05d58be67e3c71f653a) )
 
 	ROM_REGION( 0x100000, "maincpu:gfx", 0 )
@@ -2332,7 +2426,7 @@ ROM_START( plgirls2 )
 	ROM_LOAD16_BYTE( "cho-h.ic7",  0x00001, 0x80000, CRC(992f99b1) SHA1(c79f1014d73654740f7823812f92376d65d6b15d) )
 ROM_END
 
-ROM_START( plgirls2b )
+ROM_START( plgirls2b ) // bootleg based on Europe version
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "playgirls2b.d1", 0x00000, 0x40000, CRC(d58159fa) SHA1(541c6ca5f12c38b5a08f90048f52c31d27bb9233) )
 
@@ -2446,9 +2540,9 @@ GAME( 1989, plottingb, plotting, plotting,  plotting,  taitol_1cpu_state, empty_
 GAME( 1989, plottingu, plotting, plotting,  plottingu, taitol_1cpu_state, empty_init,     ROT0,   "Taito America Corporation", "Plotting (US)", 0 )
 GAME( 1989, flipull,   plotting, plotting,  plotting,  taitol_1cpu_state, empty_init,     ROT0,   "Taito Corporation", "Flipull (Japan)", 0 )
 
-GAME( 1989, puzznic,   0,        puzznic,   puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
+GAME( 1989, puzznic,   0,        puzznic,   puzznicnn, taitol_1cpu_state, empty_init,     ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
 GAME( 1989, puzznicu,  puzznic,  puzznic,   puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "Taito America Corporation", "Puzznic (US)", 0 )
-GAME( 1989, puzznicj,  puzznic,  puzznic,   puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "Taito Corporation", "Puzznic (Japan)", 0 )
+GAME( 1989, puzznicj,  puzznic,  puzznic,   puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "Taito Corporation / Animation 20", "Puzznic (Japan)", 0 )
 GAME( 1989, puzznici,  puzznic,  puzznici,  puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "bootleg", "Puzznic (Italian bootleg)", 0 )
 GAME( 1989, puzznicb,  puzznic,  puzznici,  puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "bootleg", "Puzznic (bootleg, set 1)", 0 )
 GAME( 1989, puzznicba, puzznic,  puzznici,  puzznic,   taitol_1cpu_state, empty_init,     ROT0,   "bootleg", "Puzznic (bootleg, set 2)", 0 )
@@ -2466,7 +2560,8 @@ GAME( 199?, cubybop,   0,        cachat,    cubybop,   taitol_1cpu_state, empty_
 GAME( 1992, plgirls,   0,        cachat,    plgirls,   taitol_1cpu_state, empty_init,     ROT270, "Hot-B Co., Ltd.", "Play Girls", 0 )
 GAME( 1992, lagirl,    plgirls,  cachat,    plgirls,   taitol_1cpu_state, empty_init,     ROT270, "bootleg", "LA Girl", 0 ) // bootleg hardware with changed title & backgrounds
 
-GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  taitol_1cpu_state, empty_init,     ROT270, "Hot-B Co., Ltd.", "Play Girls 2", 0 )
+GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  taitol_1cpu_state, empty_init,     ROT270, "Hot-B Co., Ltd.", "Play Girls 2 (Europe)", 0 )
+GAME( 1993, plgirls2j, plgirls2, cachat,    plgirls2,  taitol_1cpu_state, empty_init,     ROT270, "Hot-B Co., Ltd.", "Play Girls 2 (Japan)", 0 )
 GAME( 1993, plgirls2b, plgirls2, cachat,    plgirls2,  taitol_1cpu_state, empty_init,     ROT270, "bootleg", "Play Girls 2 (bootleg)", MACHINE_IMPERFECT_GRAPHICS ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts almost the same - scroll offset problems)
 
 GAME( 1990, evilston,  0,        evilston,  evilston,  taitol_2cpu_state, empty_init,     ROT270, "Spacy Industrial, Ltd.", "Evil Stone", 0 ) // Taiwanese publisher, unknown Japanese developer

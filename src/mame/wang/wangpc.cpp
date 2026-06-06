@@ -1160,8 +1160,6 @@ void wangpc_state::machine_start()
 	m_floppy[1]->setup_load_cb(floppy_image_device::load_cb(&wangpc_state::on_disk1_load, this));
 	m_floppy[1]->setup_unload_cb(floppy_image_device::unload_cb(&wangpc_state::on_disk1_unload, this));
 
-	m_led_diagnostic.resolve();
-
 	// state saving
 	save_item(NAME(m_dma_page));
 	save_item(NAME(m_dack));
